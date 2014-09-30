@@ -6,87 +6,87 @@
 
 void 
 AXL_API
-axl_win_TPropertyLine_Construct(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_Construct(axl_win_TPropertyLine* line)
 {
-	pLine->m_Flags = 0;
-	pLine->m_Delimiters = axl_win_EPropertyLineDelimiter_All;
-	pLine->m_OptionBoxType = axl_win_EPropertyOptionBoxType_None;
-	pLine->m_OptionBoxCheckState = axl_win_EPropertyCheckState_Unchecked;
-	pLine->m_OptionBoxVolatileState = axl_win_EPropertyButtonVolatileState_Normal;
-	pLine->m_ButtonVolatileState = axl_win_EPropertyButtonVolatileState_Normal;
-	pLine->m_ButtonCheckState = axl_win_EPropertyCheckState_Unchecked;
-	pLine->m_Icon = -1;
-	pLine->m_ToolTipIcon = 0;
-	pLine->m_VisibleIndex = -1;
-	pLine->m_Level = 0;
-	pLine->m_Indent = 0;
-	pLine->m_ChildrenHeight = 0;
-	pLine->m_MenuWidth = 0;
-	pLine->m_SinglePaneWidth = 0;
-	pLine->m_NameWidth = 0;
-	pLine->m_ValueWidth = 0;
-	pLine->m_ChildrenSinglePaneWidth = 0;
-	pLine->m_ChildrenValueWidth = 0;
-	pLine->m_pPropertyCtrl = NULL;
-	pLine->m_pParent = NULL;
-	pLine->m_pInPlace = NULL;
-	axl_obj_TData_Construct(&pLine->m_UserData);
-	axl_rtl_TList_Construct(&pLine->m_ChildrenList);
-	axl_gr_TTextAttr_Construct(&pLine->m_NameAttr);
-	axl_gr_TTextAttr_Construct(&pLine->m_ValueAttr);
-	axl_rtl_TString_Construct(&pLine->m_Name);
-	axl_rtl_TString_Construct(&pLine->m_Value);
-	axl_rtl_TString_Construct(&pLine->m_ToolTipTitle);
-	axl_rtl_TString_Construct(&pLine->m_ToolTipText);
-	axl_gr_THyperText_Construct(&pLine->m_NameHyperText);
-	axl_gr_THyperText_Construct(&pLine->m_ValueHyperText);
+	line->m_flags = 0;
+	line->m_delimiters = axl_win_EPropertyLineDelimiter_All;
+	line->m_optionBoxType = axl_win_EPropertyOptionBoxType_None;
+	line->m_optionBoxCheckState = axl_win_EPropertyCheckState_Unchecked;
+	line->m_optionBoxVolatileState = axl_win_EPropertyButtonVolatileState_Normal;
+	line->m_buttonVolatileState = axl_win_EPropertyButtonVolatileState_Normal;
+	line->m_buttonCheckState = axl_win_EPropertyCheckState_Unchecked;
+	line->m_icon = -1;
+	line->m_toolTipIcon = 0;
+	line->m_visibleIndex = -1;
+	line->m_level = 0;
+	line->m_indent = 0;
+	line->m_childrenHeight = 0;
+	line->m_menuWidth = 0;
+	line->m_singlePaneWidth = 0;
+	line->m_nameWidth = 0;
+	line->m_valueWidth = 0;
+	line->m_childrenSinglePaneWidth = 0;
+	line->m_childrenValueWidth = 0;
+	line->m_propertyCtrl = NULL;
+	line->m_parent = NULL;
+	line->m_inPlace = NULL;
+	axl_obj_TData_Construct(&line->m_userData);
+	axl_rtl_TList_Construct(&line->m_childrenList);
+	axl_gr_TTextAttr_Construct(&line->m_nameAttr);
+	axl_gr_TTextAttr_Construct(&line->m_valueAttr);
+	axl_rtl_TString_Construct(&line->m_name);
+	axl_rtl_TString_Construct(&line->m_value);
+	axl_rtl_TString_Construct(&line->m_toolTipTitle);
+	axl_rtl_TString_Construct(&line->m_toolTipText);
+	axl_gr_THyperText_Construct(&line->m_nameHyperText);
+	axl_gr_THyperText_Construct(&line->m_valueHyperText);
 }
 
 void 
 AXL_API
-axl_win_TPropertyLine_Destruct(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_Destruct(axl_win_TPropertyLine* line)
 {
-	axl_win_TPropertyLine_ClearLineList(&pLine->m_ChildrenList);
-	axl_rtl_TString_Destruct(&pLine->m_Name);
-	axl_rtl_TString_Destruct(&pLine->m_Value);
-	axl_rtl_TString_Destruct(&pLine->m_ToolTipTitle);
-	axl_rtl_TString_Destruct(&pLine->m_ToolTipText);
-	axl_gr_THyperText_Destruct(&pLine->m_NameHyperText);
-	axl_gr_THyperText_Destruct(&pLine->m_ValueHyperText);
-	axl_obj_TData_Destruct(&pLine->m_UserData);
-	axl_obj_TObject_Dereference(pLine->m_pInPlace);
+	axl_win_TPropertyLine_ClearLineList(&line->m_childrenList);
+	axl_rtl_TString_Destruct(&line->m_name);
+	axl_rtl_TString_Destruct(&line->m_value);
+	axl_rtl_TString_Destruct(&line->m_toolTipTitle);
+	axl_rtl_TString_Destruct(&line->m_toolTipText);
+	axl_gr_THyperText_Destruct(&line->m_nameHyperText);
+	axl_gr_THyperText_Destruct(&line->m_valueHyperText);
+	axl_obj_TData_Destruct(&line->m_userData);
+	axl_obj_TObject_Dereference(line->m_inPlace);
 }
 
 void 
 AXL_API
-axl_win_TPropertyLine_ClearLineList(axl_rtl_TList* pLineList)
+axl_win_TPropertyLine_ClearLineList(axl_rtl_TList* lineList)
 {
-	while (!axl_rtl_TList_IsEmpty(pLineList))
+	while (!axl_rtl_TList_IsEmpty(lineList))
 	{
-		axl_win_TPropertyLine* pLine = (axl_win_TPropertyLine*) axl_rtl_TList_RemoveHead(pLineList);
-		axl_win_TPropertyLine_Destruct(pLine);
-		axl_mem_Free(pLine);
+		axl_win_TPropertyLine* line = (axl_win_TPropertyLine*) axl_rtl_TList_RemoveHead(lineList);
+		axl_win_TPropertyLine_Destruct(line);
+		axl_mem_Free(line);
 	}
 }
 
 axl_win_TPropertyLine* 
 AXL_API
-axl_win_TPropertyLine_GetNextSibling(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_GetNextSibling(axl_win_TPropertyLine* line)
 {
-	axl_rtl_TListEntry* p = pLine->m_pParent ?
-		axl_rtl_TList_GetNext(&pLine->m_pParent->m_ChildrenList, (axl_rtl_TListEntry*) pLine) :
-		axl_rtl_TList_GetNext(&pLine->m_pPropertyCtrl->m_LineList, (axl_rtl_TListEntry*) pLine);
+	axl_rtl_TListEntry* p = line->m_parent ?
+		axl_rtl_TList_GetNext(&line->m_parent->m_childrenList, (axl_rtl_TListEntry*) line) :
+		axl_rtl_TList_GetNext(&line->m_propertyCtrl->m_lineList, (axl_rtl_TListEntry*) line);
 
 	return (axl_win_TPropertyLine*) p;
 }
 
 axl_win_TPropertyLine* 
 AXL_API
-axl_win_TPropertyLine_GetPrevSibling(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_GetPrevSibling(axl_win_TPropertyLine* line)
 {
-	axl_rtl_TListEntry* p = pLine->m_pParent ?
-		axl_rtl_TList_GetPrev(&pLine->m_pParent->m_ChildrenList, (axl_rtl_TListEntry*) pLine) :
-		axl_rtl_TList_GetPrev(&pLine->m_pPropertyCtrl->m_LineList, (axl_rtl_TListEntry*) pLine);
+	axl_rtl_TListEntry* p = line->m_parent ?
+		axl_rtl_TList_GetPrev(&line->m_parent->m_childrenList, (axl_rtl_TListEntry*) line) :
+		axl_rtl_TList_GetPrev(&line->m_propertyCtrl->m_lineList, (axl_rtl_TListEntry*) line);
 
 	return (axl_win_TPropertyLine*) p;
 }
@@ -94,32 +94,32 @@ axl_win_TPropertyLine_GetPrevSibling(axl_win_TPropertyLine* pLine)
 long 
 AXL_API
 axl_win_TPropertyLine_GetPartWidth(
-	axl_win_TPropertyLine* pLine,
-	int Part
+	axl_win_TPropertyLine* line,
+	int part
 	)
 {
-	axl_win_TPropertyCtrl* pPropertyCtrl = pLine->m_pPropertyCtrl;
+	axl_win_TPropertyCtrl* propertyCtrl = line->m_propertyCtrl;
 
-	switch (Part)
+	switch (part)
 	{
 	case axl_win_EPropertyLinePart_Name:
-		return pLine->m_NameWidth + pPropertyCtrl->m_Margins.left + pPropertyCtrl->m_Margins.right;
+		return line->m_nameWidth + propertyCtrl->m_margins.left + propertyCtrl->m_margins.right;
 
 	case axl_win_EPropertyLinePart_Value:
-		return pLine->m_ValueWidth + pPropertyCtrl->m_Margins.left + pPropertyCtrl->m_Margins.right;
+		return line->m_valueWidth + propertyCtrl->m_margins.left + propertyCtrl->m_margins.right;
 
 	case axl_win_EPropertyLinePart_Icon:
-		return pLine->m_Icon != -1 ? pPropertyCtrl->m_IconWidth : 0;
+		return line->m_icon != -1 ? propertyCtrl->m_iconWidth : 0;
 
 	case axl_win_EPropertyLinePart_OptionBox:
-		return pLine->m_OptionBoxType ? pPropertyCtrl->m_OptionBoxWidth : 0;
+		return line->m_optionBoxType ? propertyCtrl->m_optionBoxWidth : 0;
 
 	case axl_win_EPropertyLinePart_Button:
-		if (pLine->m_Flags & axl_win_EPropertyLine_Button)
-			return axl_win_TPropertyLine_GetPartWidth(pLine, axl_win_EPropertyLinePart_Icon) + pLine->m_NameWidth + pPropertyCtrl->m_Margins.left + 2 * pPropertyCtrl->m_Margins.right;
+		if (line->m_flags & axl_win_EPropertyLine_Button)
+			return axl_win_TPropertyLine_GetPartWidth(line, axl_win_EPropertyLinePart_Icon) + line->m_nameWidth + propertyCtrl->m_margins.left + 2 * propertyCtrl->m_margins.right;
 		
-		if (pLine->m_Flags & axl_win_EPropertyLine_Menu)
-			return pLine->m_MenuWidth + pPropertyCtrl->m_Margins.left + pPropertyCtrl->m_Margins.right + GetSystemMetrics(SM_CXVSCROLL) - axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Button);
+		if (line->m_flags & axl_win_EPropertyLine_Menu)
+			return line->m_menuWidth + propertyCtrl->m_margins.left + propertyCtrl->m_margins.right + getSystemMetrics(SM_CXVSCROLL) - axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Button);
 	}
 
 	return 0;
@@ -128,20 +128,20 @@ axl_win_TPropertyLine_GetPartWidth(
 long 
 AXL_API
 axl_win_TPropertyLine_GetPartX(
-	axl_win_TPropertyLine* pLine,
-	int Part
+	axl_win_TPropertyLine* line,
+	int part
 	)
 {
-	axl_win_TPropertyCtrl* pPropertyCtrl = pLine->m_pPropertyCtrl;
+	axl_win_TPropertyCtrl* propertyCtrl = line->m_propertyCtrl;
 
-	long xBase = axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl) ?
-		(pLine->m_Indent + 1) * pPropertyCtrl->m_IndentWidth :
-		(pLine->m_Level + pLine->m_Indent + 1) * pPropertyCtrl->m_IndentWidth;
+	long xBase = axl_win_TPropertyCtrl_IsMenu(propertyCtrl) ?
+		(line->m_indent + 1) * propertyCtrl->m_indentWidth :
+		(line->m_level + line->m_indent + 1) * propertyCtrl->m_indentWidth;
 
-	switch (Part)
+	switch (part)
 	{
 	case axl_win_EPropertyLinePart_Value:
-		return pPropertyCtrl->m_SplitterPos;
+		return propertyCtrl->m_splitterPos;
 
 	case axl_win_EPropertyLinePart_Grid:
 		return xBase;
@@ -150,13 +150,13 @@ axl_win_TPropertyLine_GetPartX(
 	case axl_win_EPropertyLinePart_Button:
 		return 
 			xBase + 
-			axl_win_TPropertyLine_GetPartWidth(pLine, axl_win_EPropertyLinePart_OptionBox);
+			axl_win_TPropertyLine_GetPartWidth(line, axl_win_EPropertyLinePart_OptionBox);
 
 	case axl_win_EPropertyLinePart_Name:
 		return 
 			xBase + 
-			axl_win_TPropertyLine_GetPartWidth(pLine, axl_win_EPropertyLinePart_OptionBox) +
-			axl_win_TPropertyLine_GetPartWidth(pLine, axl_win_EPropertyLinePart_Icon);
+			axl_win_TPropertyLine_GetPartWidth(line, axl_win_EPropertyLinePart_OptionBox) +
+			axl_win_TPropertyLine_GetPartWidth(line, axl_win_EPropertyLinePart_Icon);
 	}
 
 	return xBase;
@@ -165,606 +165,606 @@ axl_win_TPropertyLine_GetPartX(
 bool_t
 AXL_API
 axl_win_TPropertyLine_IsPartFullyVisible(
-	axl_win_TPropertyLine* pLine,
-	int Part
+	axl_win_TPropertyLine* line,
+	int part
 	)
 {
 	long left; 
 	long right;
 	
-	left = -pLine->m_pPropertyCtrl->m_FirstVisibleX + axl_win_TPropertyLine_GetPartX(pLine, Part);
+	left = -line->m_propertyCtrl->m_firstVisibleX + axl_win_TPropertyLine_GetPartX(line, part);
 	if (left < 0)
 		return false;
 
-	right = left + axl_win_TPropertyLine_GetPartWidth(pLine, Part);
+	right = left + axl_win_TPropertyLine_GetPartWidth(line, part);
 
-	if ((pLine->m_Flags & axl_win_EPropertyLine_SinglePane) || Part == axl_win_EPropertyLinePart_Value)
-		return right < (long) pLine->m_pPropertyCtrl->m_VisibleWidth;
+	if ((line->m_flags & axl_win_EPropertyLine_SinglePane) || part == axl_win_EPropertyLinePart_Value)
+		return right < (long) line->m_propertyCtrl->m_visibleWidth;
 	else
-		return right < pLine->m_pPropertyCtrl->m_SplitterPos;
+		return right < line->m_propertyCtrl->m_splitterPos;
 }
 
-static void AXL_API _AddInterval(long* pLeft, long* pRight, long x, long Width)
+static void AXL_API _AddInterval(long* left, long* right, long x, long width)
 {
-	if (x < *pLeft)
-		*pLeft = x;
+	if (x < *left)
+		*left = x;
 
-	if (Width == MAXLONG)
+	if (width == MAXLONG)
 		x = MAXLONG;
 	else
-		x += Width;
+		x += width;
 
-	if (x > *pRight)
-		*pRight = x;
+	if (x > *right)
+		*right = x;
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_Invalidate(
-	axl_win_TPropertyLine* pLine,
-	ulong_t Mask
+	axl_win_TPropertyLine* line,
+	ulong_t mask
 	)
 {
-	axl_win_TPropertyCtrl* pPropertyCtrl = pLine->m_pPropertyCtrl;
+	axl_win_TPropertyCtrl* propertyCtrl = line->m_propertyCtrl;
 
-	RECT Rect;
+	RECT rect;
 
-	long Left = MAXLONG, Right = 0;
-	long NameBase = (pLine->m_Level + pLine->m_Indent + 1) * pPropertyCtrl->m_IndentWidth;
+	long left = MAXLONG, right = 0;
+	long nameBase = (line->m_level + line->m_indent + 1) * propertyCtrl->m_indentWidth;
 
-	if (pLine->m_VisibleIndex == -1)
+	if (line->m_visibleIndex == -1)
 		return;
 
-	if (Mask & axl_win_EPropertyLineInvalidate_Left)
+	if (mask & axl_win_EPropertyLineInvalidate_Left)
 		_AddInterval(
-			&Left, &Right, 
-			0, pPropertyCtrl->m_SplitterPos
+			&left, &right, 
+			0, propertyCtrl->m_splitterPos
 			);
 
-	if (Mask & axl_win_EPropertyLineInvalidate_Right)
+	if (mask & axl_win_EPropertyLineInvalidate_Right)
 		_AddInterval(
-			&Left, &Right, 
-			pPropertyCtrl->m_SplitterPos, MAXLONG
+			&left, &right, 
+			propertyCtrl->m_splitterPos, MAXLONG
 			);
 
-	if (Mask & axl_win_EPropertyLineInvalidate_Name)
-		if (axl_win_TPropertyLine_IsSinglePane(pLine))
+	if (mask & axl_win_EPropertyLineInvalidate_Name)
+		if (axl_win_TPropertyLine_IsSinglePane(line))
 			_AddInterval(
-				&Left, &Right, 
-				axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Name), 
+				&left, &right, 
+				axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Name), 
 				MAXLONG
 				);
 		else
 			_AddInterval(
-				&Left, &Right, 
-				axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Name), 
+				&left, &right, 
+				axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Name), 
 				MAXLONG
 				);
 
-	if (Mask & axl_win_EPropertyLineInvalidate_Value)
+	if (mask & axl_win_EPropertyLineInvalidate_Value)
 		_AddInterval(
-			&Left, &Right, 
-			pPropertyCtrl->m_SplitterPos, MAXLONG
+			&left, &right, 
+			propertyCtrl->m_splitterPos, MAXLONG
 			);
 
-	if (Mask & axl_win_EPropertyLineInvalidate_OptionBox)
+	if (mask & axl_win_EPropertyLineInvalidate_OptionBox)
 		_AddInterval(
-			&Left, &Right, 
-			axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_OptionBox), 
-			axl_win_TPropertyLine_GetPartWidth(pLine, axl_win_EPropertyLinePart_OptionBox)
+			&left, &right, 
+			axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_OptionBox), 
+			axl_win_TPropertyLine_GetPartWidth(line, axl_win_EPropertyLinePart_OptionBox)
 			);
 
-	if (Mask & axl_win_EPropertyLineInvalidate_Icon)
+	if (mask & axl_win_EPropertyLineInvalidate_Icon)
 		_AddInterval(
-			&Left, &Right, 
-			axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Icon), 
-			axl_win_TPropertyLine_GetPartWidth(pLine, axl_win_EPropertyLinePart_Icon)
+			&left, &right, 
+			axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Icon), 
+			axl_win_TPropertyLine_GetPartWidth(line, axl_win_EPropertyLinePart_Icon)
 			);
 
-	if (Mask & axl_win_EPropertyLineInvalidate_Button)
+	if (mask & axl_win_EPropertyLineInvalidate_Button)
 		_AddInterval(
-			&Left, &Right, 
-			axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Button), 
-			axl_win_TPropertyLine_GetPartWidth(pLine, axl_win_EPropertyLinePart_Button)
+			&left, &right, 
+			axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Button), 
+			axl_win_TPropertyLine_GetPartWidth(line, axl_win_EPropertyLinePart_Button)
 			);
 
-	Left -= pPropertyCtrl->m_FirstVisibleX;
-	Right -= pPropertyCtrl->m_FirstVisibleX;
+	left -= propertyCtrl->m_firstVisibleX;
+	right -= propertyCtrl->m_firstVisibleX;
 
-	GetClientRect(pPropertyCtrl->m_hWnd, &Rect);
-	Rect.top = (long) (pLine->m_VisibleIndex - pPropertyCtrl->m_FirstVisibleLine) * pPropertyCtrl->m_LineHeight;
-	Rect.bottom = Rect.top + pPropertyCtrl->m_LineHeight;
-	Rect.left = max(Rect.left, Left);
-	Rect.right = min(Rect.right, Right);
-	InvalidateRect(pPropertyCtrl->m_hWnd, &Rect, false);
+	getClientRect(propertyCtrl->m_hWnd, &rect);
+	rect.top = (long) (line->m_visibleIndex - propertyCtrl->m_firstVisibleLine) * propertyCtrl->m_lineHeight;
+	rect.bottom = rect.top + propertyCtrl->m_lineHeight;
+	rect.left = max(rect.left, left);
+	rect.right = min(rect.right, right);
+	invalidateRect(propertyCtrl->m_hWnd, &rect, false);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetFlags(
-	axl_win_TPropertyLine* pLine,
-	int Flags
+	axl_win_TPropertyLine* line,
+	int flags
 	)
 {
-	if (pLine->m_Flags == Flags)
+	if (line->m_flags == flags)
 		return;
 
-	pLine->m_Flags = Flags;
-	axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_All);
+	line->m_flags = flags;
+	axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_All);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetDelimiters(
-	axl_win_TPropertyLine* pLine,
-	int Delimiters
+	axl_win_TPropertyLine* line,
+	int delimiters
 	)
 {
-	if (pLine->m_Delimiters == Delimiters)
+	if (line->m_delimiters == delimiters)
 		return;
 
-	pLine->m_Delimiters = Delimiters;
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_All);
+	line->m_delimiters = delimiters;
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_All);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_ModifyFlags(
-	axl_win_TPropertyLine* pLine,
-	int Modifier,
-	bool_t Set
+	axl_win_TPropertyLine* line,
+	int modifier,
+	bool_t set
 	)
 {
 	axl_win_TPropertyLine_SetFlags(
-		pLine, Set ? 
-		pLine->m_Flags | Modifier : 
-		pLine->m_Flags & ~Modifier
+		line, set ? 
+		line->m_flags | modifier : 
+		line->m_flags & ~modifier
 		);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetName(
-	axl_win_TPropertyLine* pLine,
-	const tchar_t* pString
+	axl_win_TPropertyLine* line,
+	const tchar_t* string
 	)
 {
-	axl_rtl_TString_CopyString(&pLine->m_Name, pString, -1);
+	axl_rtl_TString_CopyString(&line->m_name, string, -1);
 	
-	if (pLine->m_Flags & axl_win_EPropertyLine_NameHyperText)
+	if (line->m_flags & axl_win_EPropertyLine_NameHyperText)
 	{
-		axl_gr_THyperText_SetHyperText(&pLine->m_NameHyperText, pString, -1, NULL);
-		axl_gr_THyperText_CalcHyperlinkXMap(&pLine->m_NameHyperText, &pLine->m_pPropertyCtrl->m_TextPaint.m_Font);
+		axl_gr_THyperText_SetHyperText(&line->m_nameHyperText, string, -1, NULL);
+		axl_gr_THyperText_CalcHyperlinkXMap(&line->m_nameHyperText, &line->m_propertyCtrl->m_textPaint.m_font);
 	}
 
-	if (axl_win_TPropertyLine_IsSinglePane(pLine))
-		axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
+	if (axl_win_TPropertyLine_IsSinglePane(line))
+		axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
 	
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Name);
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Name);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetValue(
-	axl_win_TPropertyLine* pLine,
-	const tchar_t* pString
+	axl_win_TPropertyLine* line,
+	const tchar_t* string
 	)
 {
-	axl_rtl_TString_CopyString(&pLine->m_Value, pString, -1);
+	axl_rtl_TString_CopyString(&line->m_value, string, -1);
 
-	if (pLine->m_Flags & axl_win_EPropertyLine_ValueHyperText)
+	if (line->m_flags & axl_win_EPropertyLine_ValueHyperText)
 	{
-		axl_gr_THyperText_SetHyperText(&pLine->m_ValueHyperText, pString, -1, NULL);
-		axl_gr_THyperText_CalcHyperlinkXMap(&pLine->m_ValueHyperText, &pLine->m_pPropertyCtrl->m_TextPaint.m_Font);
+		axl_gr_THyperText_SetHyperText(&line->m_valueHyperText, string, -1, NULL);
+		axl_gr_THyperText_CalcHyperlinkXMap(&line->m_valueHyperText, &line->m_propertyCtrl->m_textPaint.m_font);
 	}
 
-	if (!axl_win_TPropertyLine_IsSinglePane(pLine))
-		axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
+	if (!axl_win_TPropertyLine_IsSinglePane(line))
+		axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
 
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Value);
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Value);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetOptionBoxType(
-	axl_win_TPropertyLine* pLine,
-	int Type
+	axl_win_TPropertyLine* line,
+	int type
 	)
 {
-	if (pLine->m_OptionBoxType == Type)
+	if (line->m_optionBoxType == type)
 		return;
 
-	pLine->m_OptionBoxType = Type;
+	line->m_optionBoxType = type;
 
-	if (axl_win_TPropertyLine_IsSinglePane(pLine))
-		axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
+	if (axl_win_TPropertyLine_IsSinglePane(line))
+		axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
 
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Left);
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Left);
 }
 
 void 
 AXL_API
-axl_win_TPropertyLine_UncheckRadioButtonGroup(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_UncheckRadioButtonGroup(axl_win_TPropertyLine* line)
 {
-	axl_win_TPropertyLine* pSibling;
+	axl_win_TPropertyLine* sibling;
 
-	pSibling = axl_win_TPropertyLine_GetPrevSibling(pLine);
-	while (pSibling && pSibling->m_OptionBoxType == axl_win_EPropertyOptionBoxType_RadioButton)
+	sibling = axl_win_TPropertyLine_GetPrevSibling(line);
+	while (sibling && sibling->m_optionBoxType == axl_win_EPropertyOptionBoxType_RadioButton)
 	{
-		axl_win_TPropertyLine_SetOptionBoxCheckState(pSibling, false);
-		pSibling = axl_win_TPropertyLine_GetPrevSibling(pSibling);
+		axl_win_TPropertyLine_SetOptionBoxCheckState(sibling, false);
+		sibling = axl_win_TPropertyLine_GetPrevSibling(sibling);
 	}
 
-	pSibling = axl_win_TPropertyLine_GetNextSibling(pLine);
-	while (pSibling && pSibling->m_OptionBoxType == axl_win_EPropertyOptionBoxType_RadioButton)
+	sibling = axl_win_TPropertyLine_GetNextSibling(line);
+	while (sibling && sibling->m_optionBoxType == axl_win_EPropertyOptionBoxType_RadioButton)
 	{
-		axl_win_TPropertyLine_SetOptionBoxCheckState(pSibling, false);
-		pSibling = axl_win_TPropertyLine_GetNextSibling(pSibling);
+		axl_win_TPropertyLine_SetOptionBoxCheckState(sibling, false);
+		sibling = axl_win_TPropertyLine_GetNextSibling(sibling);
 	}
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetOptionBoxCheckState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	)
 {
-	if (pLine->m_OptionBoxCheckState == State)
+	if (line->m_optionBoxCheckState == state)
 		return;
 
-	if (pLine->m_OptionBoxType == axl_win_EPropertyOptionBoxType_RadioButton && State)
-		axl_win_TPropertyLine_UncheckRadioButtonGroup(pLine);
+	if (line->m_optionBoxType == axl_win_EPropertyOptionBoxType_RadioButton && state)
+		axl_win_TPropertyLine_UncheckRadioButtonGroup(line);
 
-	pLine->m_OptionBoxCheckState = State;
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_OptionBox);
+	line->m_optionBoxCheckState = state;
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_OptionBox);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetOptionBoxVolatileState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	)
 {
-	if (pLine->m_OptionBoxVolatileState == State)
+	if (line->m_optionBoxVolatileState == state)
 		return;
 
-	pLine->m_OptionBoxVolatileState = State;
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_OptionBox);
+	line->m_optionBoxVolatileState = state;
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_OptionBox);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetButtonCheckState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	)
 {
-	if (pLine->m_ButtonCheckState == State)
+	if (line->m_buttonCheckState == state)
 		return;
 
-	pLine->m_ButtonCheckState = State;
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Button);
+	line->m_buttonCheckState = state;
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Button);
 }
 
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetButtonVolatileState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	)
 {
-	if (pLine->m_ButtonVolatileState == State)
+	if (line->m_buttonVolatileState == state)
 		return;
 
-	pLine->m_ButtonVolatileState = State;
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Button);
+	line->m_buttonVolatileState = state;
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Button);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetNameAttr(
-	axl_win_TPropertyLine* pLine,
-	axl_gr_TTextAttr* pAttr
+	axl_win_TPropertyLine* line,
+	axl_gr_TTextAttr* attr
 	)
 {
-	ulong_t OldFontFlags = pLine->m_NameAttr.m_FontFlags;
+	ulong_t oldFontFlags = line->m_nameAttr.m_fontFlags;
 
-	pLine->m_NameAttr = pAttr ? *pAttr : g_axl_gr_TTextAttr_NullAttr;
+	line->m_nameAttr = attr ? *attr : g_axl_gr_TTextAttr_NullAttr;
 
-	if (axl_win_TPropertyLine_IsSinglePane(pLine))
-		axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
+	if (axl_win_TPropertyLine_IsSinglePane(line))
+		axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
 
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Name);
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Name);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetValueAttr(
-	axl_win_TPropertyLine* pLine,
-	axl_gr_TTextAttr* pAttr
+	axl_win_TPropertyLine* line,
+	axl_gr_TTextAttr* attr
 	)
 {
-	ulong_t OldFontFlags = pLine->m_NameAttr.m_FontFlags;
+	ulong_t oldFontFlags = line->m_nameAttr.m_fontFlags;
 
-	pLine->m_ValueAttr = pAttr ? *pAttr : g_axl_gr_TTextAttr_NullAttr;
+	line->m_valueAttr = attr ? *attr : g_axl_gr_TTextAttr_NullAttr;
 
-	if (!axl_win_TPropertyLine_IsSinglePane(pLine))
-		axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
+	if (!axl_win_TPropertyLine_IsSinglePane(line))
+		axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
 
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Value);
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Value);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetIcon(
-	axl_win_TPropertyLine* pLine,
-	int Icon
+	axl_win_TPropertyLine* line,
+	int icon
 	)
 {
-	int Invalidate;
+	int invalidate;
 
-	if (pLine->m_Icon == Icon)
+	if (line->m_icon == icon)
 		return;
 
-	if (Icon == -1 && pLine->m_Icon != -1 || Icon != -1 && pLine->m_Icon == -1)
-		Invalidate = axl_win_EPropertyLineInvalidate_Left;
+	if (icon == -1 && line->m_icon != -1 || icon != -1 && line->m_icon == -1)
+		invalidate = axl_win_EPropertyLineInvalidate_Left;
 	else
-		Invalidate = axl_win_EPropertyLineInvalidate_Icon;
+		invalidate = axl_win_EPropertyLineInvalidate_Icon;
 
-	pLine->m_Icon = Icon;
+	line->m_icon = icon;
 
-	if (axl_win_TPropertyLine_IsSinglePane(pLine))
-		axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
+	if (axl_win_TPropertyLine_IsSinglePane(line))
+		axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
 
-	axl_win_TPropertyLine_Invalidate(pLine, Invalidate);
+	axl_win_TPropertyLine_Invalidate(line, invalidate);
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetIndent(
-	axl_win_TPropertyLine* pLine,
-	int Indent
+	axl_win_TPropertyLine* line,
+	int indent
 	)
 {
-	if (pLine->m_Indent == Indent)
+	if (line->m_indent == indent)
 		return;
 
-	pLine->m_Indent = Indent;
+	line->m_indent = indent;
 
-	if (axl_win_TPropertyLine_IsSinglePane(pLine))
-		axl_win_TPropertyCtrl_UpdateLineWidth(pLine->m_pPropertyCtrl, pLine);
+	if (axl_win_TPropertyLine_IsSinglePane(line))
+		axl_win_TPropertyCtrl_UpdateLineWidth(line->m_propertyCtrl, line);
 
-	axl_win_TPropertyLine_Invalidate(pLine, axl_win_EPropertyLineInvalidate_Left);
+	axl_win_TPropertyLine_Invalidate(line, axl_win_EPropertyLineInvalidate_Left);
 }
 
 void
 AXL_API
 axl_win_TPropertyLine_ModifyChildrenHeight(
-	axl_win_TPropertyLine* pLine,
-	long Delta	
+	axl_win_TPropertyLine* line,
+	long delta	
 	)
 {
-	pLine->m_ChildrenHeight += Delta;
+	line->m_childrenHeight += delta;
 
-	while ((pLine->m_Flags & axl_win_EPropertyLine_IsExpanded) && pLine->m_pParent)
+	while ((line->m_flags & axl_win_EPropertyLine_IsExpanded) && line->m_parent)
 	{
-		pLine = pLine->m_pParent;
-		pLine->m_ChildrenHeight += Delta;
+		line = line->m_parent;
+		line->m_childrenHeight += delta;
 	}
 }
 
 bool_t
 AXL_API
 axl_win_TPropertyLine_CalcWidth(
-	axl_win_TPropertyLine* pLine,
-	int Flags
+	axl_win_TPropertyLine* line,
+	int flags
 	)
 {
-	axl_win_TPropertyCtrl* pPropertyCtrl = pLine->m_pPropertyCtrl;
-	bool_t HasChanged = false;
+	axl_win_TPropertyCtrl* propertyCtrl = line->m_propertyCtrl;
+	bool_t hasChanged = false;
 
-	if ((Flags & axl_win_EPropertyCalcWidth_Menu) && (pLine->m_Flags & axl_win_EPropertyLine_Menu))
+	if ((flags & axl_win_EPropertyCalcWidth_Menu) && (line->m_flags & axl_win_EPropertyLine_Menu))
 	{
-		ulong_t MenuWidth = pLine->m_SinglePaneWidth;
+		ulong_t menuWidth = line->m_singlePaneWidth;
 
-		axl_win_TPropertyLine* pSibling;
+		axl_win_TPropertyLine* sibling;
 
-		pSibling = axl_win_TPropertyLine_GetPrevSibling(pLine);
-		while (pSibling && (pSibling->m_Flags & axl_win_EPropertyLine_Menu))
+		sibling = axl_win_TPropertyLine_GetPrevSibling(line);
+		while (sibling && (sibling->m_flags & axl_win_EPropertyLine_Menu))
 		{
-			if (pSibling->m_SinglePaneWidth > MenuWidth)
-				MenuWidth = pSibling->m_SinglePaneWidth;
+			if (sibling->m_singlePaneWidth > menuWidth)
+				menuWidth = sibling->m_singlePaneWidth;
 
-			pSibling = axl_win_TPropertyLine_GetPrevSibling(pSibling);
+			sibling = axl_win_TPropertyLine_GetPrevSibling(sibling);
 		}
 
-		pSibling = axl_win_TPropertyLine_GetNextSibling(pLine);
-		while (pSibling && (pSibling->m_Flags & axl_win_EPropertyLine_Menu))
+		sibling = axl_win_TPropertyLine_GetNextSibling(line);
+		while (sibling && (sibling->m_flags & axl_win_EPropertyLine_Menu))
 		{
-			if (pSibling->m_SinglePaneWidth > MenuWidth)
-				MenuWidth = pSibling->m_SinglePaneWidth;
+			if (sibling->m_singlePaneWidth > menuWidth)
+				menuWidth = sibling->m_singlePaneWidth;
 
-			pSibling = axl_win_TPropertyLine_GetNextSibling(pSibling);
+			sibling = axl_win_TPropertyLine_GetNextSibling(sibling);
 		}
 
-		pLine->m_MenuWidth = MenuWidth;
+		line->m_menuWidth = menuWidth;
 	}
 
-	if (Flags & axl_win_EPropertyCalcWidth_Line)
+	if (flags & axl_win_EPropertyCalcWidth_Line)
 	{
-		HFONT hFont = axl_gr_TFontMod_GetFont(&pPropertyCtrl->m_TextPaint.m_Font, pLine->m_NameAttr.m_FontFlags);
-		size_t Length = axl_rtl_TString_GetLength(&pLine->m_Name);
-		SIZE Size = axl_gr_TFont__CalcStringSize(hFont, pLine->m_Name.m_p, Length);
+		HFONT hFont = axl_gr_TFontMod_GetFont(&propertyCtrl->m_textPaint.m_font, line->m_nameAttr.m_fontFlags);
+		size_t length = axl_rtl_TString_GetLength(&line->m_name);
+		SIZE size = axl_gr_TFont__CalcStringSize(hFont, line->m_name.m_p, length);
 
-		pLine->m_NameWidth = Size.cx;
+		line->m_nameWidth = size.cx;
 
-		if (axl_win_TPropertyLine_IsSinglePane(pLine))
+		if (axl_win_TPropertyLine_IsSinglePane(line))
 		{
-            Size.cx += axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Name);
+            size.cx += axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Name);
 
-			if (pLine->m_Flags & axl_win_EPropertyLine_Menu)
-				Size.cx += pPropertyCtrl->m_IndentWidth;
+			if (line->m_flags & axl_win_EPropertyLine_Menu)
+				size.cx += propertyCtrl->m_indentWidth;
 
-			if (pLine->m_SinglePaneWidth != Size.cx || pLine->m_ValueWidth != 0)
+			if (line->m_singlePaneWidth != size.cx || line->m_valueWidth != 0)
 			{
-				pLine->m_SinglePaneWidth = Size.cx;
-				pLine->m_ValueWidth = 0;
-				HasChanged = true;
+				line->m_singlePaneWidth = size.cx;
+				line->m_valueWidth = 0;
+				hasChanged = true;
 			}
 		}
 		else
 		{
-			HFONT hFont = axl_gr_TFontMod_GetFont(&pPropertyCtrl->m_TextPaint.m_Font, pLine->m_ValueAttr.m_FontFlags);
-			size_t Length = axl_rtl_TString_GetLength(&pLine->m_Value);
-			SIZE Size = axl_gr_TFont__CalcStringSize(hFont, pLine->m_Value.m_p, Length);
+			HFONT hFont = axl_gr_TFontMod_GetFont(&propertyCtrl->m_textPaint.m_font, line->m_valueAttr.m_fontFlags);
+			size_t length = axl_rtl_TString_GetLength(&line->m_value);
+			SIZE size = axl_gr_TFont__CalcStringSize(hFont, line->m_value.m_p, length);
 
-			if (pLine->m_SinglePaneWidth != 0 || pLine->m_ValueWidth != Size.cx)
+			if (line->m_singlePaneWidth != 0 || line->m_valueWidth != size.cx)
 			{
-				pLine->m_SinglePaneWidth = 0;
-				pLine->m_ValueWidth = Size.cx;
-				HasChanged = true;
+				line->m_singlePaneWidth = 0;
+				line->m_valueWidth = size.cx;
+				hasChanged = true;
 			}
 		}
 	}
 
-	if (Flags & axl_win_EPropertyCalcWidth_Children)
+	if (flags & axl_win_EPropertyCalcWidth_Children)
 	{
-		axl_win_TPropertyLine* pChild;
+		axl_win_TPropertyLine* child;
 
-		ulong_t MaxSinglePaneWidth = 0;
-		ulong_t MaxValueWidth = 0;
+		ulong_t maxSinglePaneWidth = 0;
+		ulong_t maxValueWidth = 0;
 
-		pChild = (axl_win_TPropertyLine*) axl_rtl_TList_GetHead(&pLine->m_ChildrenList);
-		while (pChild)
+		child = (axl_win_TPropertyLine*) axl_rtl_TList_GetHead(&line->m_childrenList);
+		while (child)
 		{
-			ulong_t SinglePaneWidth = 0;
-			ulong_t ValueWidth = 0;
+			ulong_t singlePaneWidth = 0;
+			ulong_t valueWidth = 0;
 
-			if (Flags & axl_win_EPropertyCalcWidth_Recursive)
-				axl_win_TPropertyLine_CalcWidth(pChild, Flags);
+			if (flags & axl_win_EPropertyCalcWidth_Recursive)
+				axl_win_TPropertyLine_CalcWidth(child, flags);
 
-			if (pChild->m_Flags & axl_win_EPropertyLine_IsExpanded)
+			if (child->m_flags & axl_win_EPropertyLine_IsExpanded)
 			{
-				SinglePaneWidth = max(pChild->m_ChildrenSinglePaneWidth, pChild->m_SinglePaneWidth);
-				ValueWidth = max(pChild->m_ChildrenValueWidth, pChild->m_ValueWidth);
+				singlePaneWidth = max(child->m_childrenSinglePaneWidth, child->m_singlePaneWidth);
+				valueWidth = max(child->m_childrenValueWidth, child->m_valueWidth);
 			}
 			else
 			{
-				SinglePaneWidth = pChild->m_SinglePaneWidth;
-				ValueWidth = pChild->m_ValueWidth;
+				singlePaneWidth = child->m_singlePaneWidth;
+				valueWidth = child->m_valueWidth;
 			}
 
-			if (SinglePaneWidth > MaxSinglePaneWidth)
-				MaxSinglePaneWidth = SinglePaneWidth;
+			if (singlePaneWidth > maxSinglePaneWidth)
+				maxSinglePaneWidth = singlePaneWidth;
 
-			if (ValueWidth > MaxValueWidth)
-				MaxValueWidth = ValueWidth;
+			if (valueWidth > maxValueWidth)
+				maxValueWidth = valueWidth;
 
-			pChild = (axl_win_TPropertyLine*) axl_rtl_TList_GetNext(&pLine->m_ChildrenList, (axl_rtl_TListEntry*) pChild);
+			child = (axl_win_TPropertyLine*) axl_rtl_TList_GetNext(&line->m_childrenList, (axl_rtl_TListEntry*) child);
 		}
 
-		if (MaxValueWidth != pLine->m_ChildrenValueWidth || MaxSinglePaneWidth != pLine->m_ChildrenSinglePaneWidth)
-			HasChanged = true;
+		if (maxValueWidth != line->m_childrenValueWidth || maxSinglePaneWidth != line->m_childrenSinglePaneWidth)
+			hasChanged = true;
 
-		pLine->m_ChildrenValueWidth = MaxValueWidth;
-		pLine->m_ChildrenSinglePaneWidth = MaxSinglePaneWidth;
+		line->m_childrenValueWidth = maxValueWidth;
+		line->m_childrenSinglePaneWidth = maxSinglePaneWidth;
 	}
 
-	if (Flags & axl_win_EPropertyCalcWidth_Parent)
+	if (flags & axl_win_EPropertyCalcWidth_Parent)
 	{
-		while (pLine->m_pParent)
+		while (line->m_parent)
 		{
-			HasChanged = axl_win_TPropertyLine_CalcWidth(pLine->m_pParent, axl_win_EPropertyCalcWidth_Children);
-			if (!HasChanged)
+			hasChanged = axl_win_TPropertyLine_CalcWidth(line->m_parent, axl_win_EPropertyCalcWidth_Children);
+			if (!hasChanged)
 				return false;
 
-			pLine = pLine->m_pParent;
+			line = line->m_parent;
 		}
 
-		HasChanged = true;
+		hasChanged = true;
 	}
 
-	return HasChanged;
+	return hasChanged;
 }
 
 bool_t
 AXL_API
-axl_win_TPropertyLine_IsLastChild(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_IsLastChild(axl_win_TPropertyLine* line)
 {
-	if (pLine->m_pParent)
-		return pLine == (axl_win_TPropertyLine*) axl_rtl_TList_GetTail(&pLine->m_pParent->m_ChildrenList);
+	if (line->m_parent)
+		return line == (axl_win_TPropertyLine*) axl_rtl_TList_GetTail(&line->m_parent->m_childrenList);
 	else 
-		return pLine == (axl_win_TPropertyLine*) axl_rtl_TList_GetTail(pLine->m_pPropertyCtrl->m_pLineList);
+		return line == (axl_win_TPropertyLine*) axl_rtl_TList_GetTail(line->m_propertyCtrl->m_lineList);
 }
 
 bool_t
 AXL_API
-axl_win_TPropertyLine_HasGridLines(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_HasGridLines(axl_win_TPropertyLine* line)
 {
-	if (pLine->m_Flags & axl_win_EPropertyLine_ForceNoGridLines)
+	if (line->m_flags & axl_win_EPropertyLine_ForceNoGridLines)
 		return false;
-	else if (pLine->m_pParent)
-		return (pLine->m_pParent->m_Flags & axl_win_EPropertyLine_NoChildGridLines) == 0;
+	else if (line->m_parent)
+		return (line->m_parent->m_flags & axl_win_EPropertyLine_NoChildGridLines) == 0;
 	else
-		return pLine->m_pPropertyCtrl->m_HasGridLinesAtRoot;
+		return line->m_propertyCtrl->m_hasGridLinesAtRoot;
 }
 
 bool_t
 AXL_API
-axl_win_TPropertyLine_HasNameDelimiter(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_HasNameDelimiter(axl_win_TPropertyLine* line)
 {
-	axl_win_TPropertyCtrl* pPropertyCtrl = pLine->m_pPropertyCtrl;
-	axl_win_TPropertyLine* pNextLine;
+	axl_win_TPropertyCtrl* propertyCtrl = line->m_propertyCtrl;
+	axl_win_TPropertyLine* nextLine;
 
-	size_t LastVisibleLine = axl_rtl_TPtrArray_GetCount(&pPropertyCtrl->m_VisibleLineArray) - 1;
+	size_t lastVisibleLine = axl_rtl_TPtrArray_GetCount(&propertyCtrl->m_visibleLineArray) - 1;
 
-	if (pLine->m_VisibleIndex == LastVisibleLine) 
-		return !axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl);
+	if (line->m_visibleIndex == lastVisibleLine) 
+		return !axl_win_TPropertyCtrl_IsMenu(propertyCtrl);
 
-	if (pLine->m_Delimiters & axl_win_EPropertyLineDelimiter_NameBottom)
+	if (line->m_delimiters & axl_win_EPropertyLineDelimiter_NameBottom)
 		return true;
 
-	if (pLine->m_VisibleIndex == -1 || pLine->m_VisibleIndex > axl_rtl_TPtrArray_GetCount(&pPropertyCtrl->m_VisibleLineArray))
+	if (line->m_visibleIndex == -1 || line->m_visibleIndex > axl_rtl_TPtrArray_GetCount(&propertyCtrl->m_visibleLineArray))
 		return false;
 
-	pNextLine = ((axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p)[pLine->m_VisibleIndex + 1];
-	return (pNextLine->m_Delimiters & axl_win_EPropertyLineDelimiter_NameTop) != 0;
+	nextLine = ((axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p)[line->m_visibleIndex + 1];
+	return (nextLine->m_delimiters & axl_win_EPropertyLineDelimiter_NameTop) != 0;
 }
 
 bool_t
 AXL_API
-axl_win_TPropertyLine_HasValueDelimiter(axl_win_TPropertyLine* pLine)
+axl_win_TPropertyLine_HasValueDelimiter(axl_win_TPropertyLine* line)
 {
-	axl_win_TPropertyCtrl* pPropertyCtrl = pLine->m_pPropertyCtrl;
-	axl_win_TPropertyLine* pNextLine;
+	axl_win_TPropertyCtrl* propertyCtrl = line->m_propertyCtrl;
+	axl_win_TPropertyLine* nextLine;
 
-	size_t LastVisibleLine = axl_rtl_TPtrArray_GetCount(&pLine->m_pPropertyCtrl->m_VisibleLineArray) - 1;
+	size_t lastVisibleLine = axl_rtl_TPtrArray_GetCount(&line->m_propertyCtrl->m_visibleLineArray) - 1;
 
-	if (pLine->m_VisibleIndex == LastVisibleLine) 
-		return !axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl);
+	if (line->m_visibleIndex == lastVisibleLine) 
+		return !axl_win_TPropertyCtrl_IsMenu(propertyCtrl);
 
-	if (pLine->m_Delimiters & axl_win_EPropertyLineDelimiter_ValueBottom)
+	if (line->m_delimiters & axl_win_EPropertyLineDelimiter_ValueBottom)
 		return true;
 
-	if (pLine->m_VisibleIndex == -1 || pLine->m_VisibleIndex > axl_rtl_TPtrArray_GetCount(&pPropertyCtrl->m_VisibleLineArray))
+	if (line->m_visibleIndex == -1 || line->m_visibleIndex > axl_rtl_TPtrArray_GetCount(&propertyCtrl->m_visibleLineArray))
 		return false;
 
-	pNextLine = ((axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p)[pLine->m_VisibleIndex + 1];
-	return (pNextLine->m_Delimiters & axl_win_EPropertyLineDelimiter_ValueTop) != 0;
+	nextLine = ((axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p)[line->m_visibleIndex + 1];
+	return (nextLine->m_delimiters & axl_win_EPropertyLineDelimiter_ValueTop) != 0;
 }
 
 void 
 AXL_API
 axl_win_TPropertyLine_ExpandCollapse(
-	axl_win_TPropertyLine* pLine,
-	bool_t IsExpanded
+	axl_win_TPropertyLine* line,
+	bool_t isExpanded
 	)
 {
-	axl_win_TPropertyCtrl_ExpandCollapse(pLine->m_pPropertyCtrl, pLine, IsExpanded);
+	axl_win_TPropertyCtrl_ExpandCollapse(line->m_propertyCtrl, line, isExpanded);
 }
 
 //.............................................................................

@@ -35,142 +35,142 @@ class CParseErrorProvider: public CErrorProvider
 public:
 	virtual 
 	rtl::CString 
-	GetErrorDescription (const TError* pError);
-
-	static 
-	void 
-	Register ()
-	{
-		GetErrorMgr ()->RegisterProvider (
-			GUID_ParseError, 
-			rtl::GetSimpleSingleton <CParseErrorProvider> ()
-			);
-	}
+	getErrorDescription (const TError* error);
 };
 
 //.............................................................................
 
 // utility
 
+inline 
+void 
+registerParseErrorProvider ()
+{
+	getErrorMgr ()->registerProvider (
+		GUID_ParseError, 
+		rtl::getSimpleSingleton <CParseErrorProvider> ()
+		);
+}
+
 inline
 CError
-PushSrcPosError (
-	const char* pFilePath,
-	int Line,
-	int Col = 0
+pushSrcPosError (
+	const char* filePath,
+	int line,
+	int col = 0
 	)
 {
-	return PushPackError <rtl::CPackSeqT_3 <const char*, int, int> > (
+	return pushPackError <rtl::CPackSeqT_3 <const char*, int, int> > (
 		GUID_ParseError,
 		EParseError_SrcPos, 
-		pFilePath, 
-		Line, 
-		Col
+		filePath, 
+		line, 
+		col
 		);
 }
 
 inline
 CError
-PushSrcPosError (
-	const char* pFilePath,
-	const lex::CLineCol& LineCol
+pushSrcPosError (
+	const char* filePath,
+	const lex::CLineCol& lineCol
 	)
 {
-	return PushSrcPosError (pFilePath, LineCol.m_Line, LineCol.m_Col);
+	return pushSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
 }
 
 inline
 CError
-PushSrcPosError (const lex::CSrcPos& SrcPos)
+pushSrcPosError (const lex::CSrcPos& srcPos)
 {
-	return PushSrcPosError (SrcPos.m_FilePath, SrcPos.m_Line, SrcPos.m_Col);
+	return pushSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
 inline
 CError
-EnsureSrcPosError (
-	const char* pFilePath,
-	int Line,
-	int Col = 0
+ensureSrcPosError (
+	const char* filePath,
+	int line,
+	int col = 0
 	)
 {
-	CError Error = GetError ();
-	return Error->IsKind (GUID_ParseError, EParseError_SrcPos) ? Error : PushSrcPosError (pFilePath, Line, Col);
+	CError error = getError ();
+	return error->isKind (GUID_ParseError, EParseError_SrcPos) ? error : pushSrcPosError (filePath, line, col);
 }
 
 inline
 CError
-EnsureSrcPosError (
-	const char* pFilePath,
-	const lex::CLineCol& LineCol
+ensureSrcPosError (
+	const char* filePath,
+	const lex::CLineCol& lineCol
 	)
 {
-	return EnsureSrcPosError (pFilePath, LineCol.m_Line, LineCol.m_Col);
+	return ensureSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
 }
 
 inline
 CError
-EnsureSrcPosError (const lex::CSrcPos& SrcPos)
+ensureSrcPosError (const lex::CSrcPos& srcPos)
 {
-	return EnsureSrcPosError (SrcPos.m_FilePath, SrcPos.m_Line, SrcPos.m_Col);
+	return ensureSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
 inline
 CError
-SetSyntaxError ()
+setSyntaxError ()
 {
-	return SetError (GUID_ParseError, EParseError_InvalidSyntax);
+	return setError (GUID_ParseError, EParseError_InvalidSyntax);
 }
 
 inline
 CError
-SetSyntaxError (const char* pLocation)
+setSyntaxError (const char* location)
 {
-	return SetPackError <rtl::CPackT <const char*> > (
+	return setPackError <rtl::CPackT <const char*> > (
 		GUID_ParseError,
 		EParseError_InvalidSyntaxIn, 
-		pLocation
+		location
 		);
 }
 
 inline
 CError
-SetExpectedTokenError (
-	const char* pExpectedToken,
-	const char* pActualToken
+setExpectedTokenError (
+	const char* expectedToken,
+	const char* actualToken
 	)
 {
-	return SetPackError <rtl::CPackSeqT_2 <const char*, const char*> > (
+	return setPackError <rtl::CPackSeqT_2 <const char*, const char*> > (
 		GUID_ParseError,
 		EParseError_ExpectedToken, 
-		pExpectedToken,
-		pActualToken
+		expectedToken,
+		actualToken
 		);
 }
 
 inline
 CError
-SetUnexpectedTokenError (const char* pToken)
+setUnexpectedTokenError (const char* token)
 {
-	return SetPackError <rtl::CPackT <const char*> > (
+	return setPackError <rtl::CPackT <const char*> > (
 		GUID_ParseError,
 		EParseError_UnexpectedToken, 
-		pToken
+		token
 		);
 }
 
 inline
 CError
-SetUnexpectedTokenError (
-	const char* pToken,
-	const char* pLocation
+setUnexpectedTokenError (
+	const char* token,
+	const char* location
 	)
 {
-	return SetPackError <rtl::CPackSeqT_2 <const char*, const char*> > (
+	return setPackError <rtl::CPackSeqT_2 <const char*, const char*> > (
 		GUID_ParseError,
 		EParseError_UnexpectedTokenIn, 
-		pToken,
-		pLocation
+		token,
+		location
 		);
 }
 

@@ -9,7 +9,7 @@ namespace gui {
 
 CQtCursor::CQtCursor ()
 {
-	m_pEngine = CQtEngine::GetSingleton ();
+	m_engine = CQtEngine::getSingleton ();
 }
 
 //.............................................................................

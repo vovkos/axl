@@ -7,19 +7,19 @@
 // inline static void FastRectangle(HDC hdc, const RECT& rc)
 //	{ ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL); }
 
-inline static void FastChar(HDC hdc, const RECT& rc, TCHAR ch)
-	{ ExtTextOut(hdc, rc.left, rc.top, ETO_OPAQUE, &rc, &ch, 1, NULL); }
+inline static void fastChar(HDC hdc, const RECT& rc, TCHAR ch)
+	{ extTextOut(hdc, rc.left, rc.top, ETO_OPAQUE, &rc, &ch, 1, NULL); }
 
-static HFONT CreatePointFont(int nPointSize, LPCTSTR pszFaceName, BYTE CharSet = DEFAULT_CHARSET)
+static HFONT createPointFont(int nPointSize, LPCTSTR pszFaceName, BYTE charSet = DEFAULT_CHARSET)
 {
 	LOGFONT lf = {0};
 	_tcsncpy(lf.lfFaceName, pszFaceName, sizeof(lf.lfFaceName) / sizeof(TCHAR));
-	lf.lfCharSet = CharSet;
+	lf.lfCharSet = charSet;
 
-	HDC hdc = GetDC(NULL);
+	HDC hdc = getDC(NULL);
 	
 	POINT pt = {0};
-	pt.y = GetDeviceCaps(hdc, LOGPIXELSY) * nPointSize;
+	pt.y = getDeviceCaps(hdc, LOGPIXELSY) * nPointSize;
 	pt.y /= 720; // 72 points/inch, 10 decipoints/point
 	DPtoLP(hdc, &pt, 1);
 	
@@ -27,30 +27,30 @@ static HFONT CreatePointFont(int nPointSize, LPCTSTR pszFaceName, BYTE CharSet =
 	DPtoLP(hdc, &ptOrg, 1);
 	lf.lfHeight = -abs(pt.y - ptOrg.y);
 
-	ReleaseDC(NULL, hdc);
+	releaseDC(NULL, hdc);
 
-	return CreateFontIndirect(&lf);
+	return createFontIndirect(&lf);
 }
 
-static void CalcCharSize(SIZE* pSize, HFONT hFont, TCHAR Char)
+static void calcCharSize(SIZE* size, HFONT hFont, TCHAR char)
 {
-	HDC hdc = GetDC(NULL);
-	HFONT hOldFont = (HFONT) SelectObject(hdc, hFont);
-	GetTextExtentPoint32(hdc, &Char, 1, pSize);
-	SelectObject(hdc, hOldFont);
-	ReleaseDC(NULL, hdc);
+	HDC hdc = getDC(NULL);
+	HFONT hOldFont = (HFONT) selectObject(hdc, hFont);
+	getTextExtentPoint32(hdc, &char, 1, size);
+	selectObject(hdc, hOldFont);
+	releaseDC(NULL, hdc);
 }
 
 //.............................................................................
 
 CHexEditCtrl::CHexEditCtrl() 
 {
-	m_hUpdateRgn = CreateRectRgn(0, 0, 0, 0);
-	m_hDefaultFont = CreatePointFont(100, _T("Courier New"));
+	m_hUpdateRgn = createRectRgn(0, 0, 0, 0);
+	m_hDefaultFont = createPointFont(100, _T("Courier New"));
 
 	m_hFont = m_hDefaultFont;
 
-	CalcCharSize(&m_CharSize, m_hFont, '|');
+	calcCharSize(&m_charSize, m_hFont, '|');
 
 	m_nVisibleLineCount = 0;
 	m_nVisibleColCount = 0;
@@ -65,7 +65,7 @@ CHexEditCtrl::CHexEditCtrl()
 
 	m_nMouseWheelSpeed = 2;
 
-	m_OffsetWidth = 0;
+	m_offsetWidth = 0;
 	
 	m_nHexGapStep = 0;
 	m_nHexCol = 0;
@@ -79,38 +79,38 @@ CHexEditCtrl::CHexEditCtrl()
 	m_bOverwriteMode = FALSE;
 	m_bDragging = FALSE;
 
-	m_StdColorBg.m_Flags = CF_FORE_COLOR | CF_BACK_COLOR;
-	m_StdColorBg.m_rgbForeColor = GetSysColor(COLOR_WINDOWTEXT);
-	m_StdColorBg.m_rgbBackColor = GetSysColor(COLOR_WINDOW);
+	m_stdColorBg.m_flags = CF_FORE_COLOR | CF_BACK_COLOR;
+	m_stdColorBg.m_rgbForeColor = getSysColor(COLOR_WINDOWTEXT);
+	m_stdColorBg.m_rgbBackColor = getSysColor(COLOR_WINDOW);
 
-	m_StdColorAscii.m_Flags = CF_FORE_COLOR | CF_BACK_COLOR;
-	m_StdColorAscii.m_rgbForeColor = GetSysColor(COLOR_WINDOWTEXT);
-	m_StdColorAscii.m_rgbBackColor = RGB (
-		GetRValue(m_StdColorBg.m_rgbBackColor) / 1.15,
-		GetGValue(m_StdColorBg.m_rgbBackColor) / 1.1,
-		GetBValue(m_StdColorBg.m_rgbBackColor)
+	m_stdColorAscii.m_flags = CF_FORE_COLOR | CF_BACK_COLOR;
+	m_stdColorAscii.m_rgbForeColor = getSysColor(COLOR_WINDOWTEXT);
+	m_stdColorAscii.m_rgbBackColor = RGB (
+		getRValue(m_stdColorBg.m_rgbBackColor) / 1.15,
+		getGValue(m_stdColorBg.m_rgbBackColor) / 1.1,
+		getBValue(m_stdColorBg.m_rgbBackColor)
 		);
 
-	m_pStdColor = NULL;
+	m_stdColor = NULL;
 	
-	m_SelectionColor.m_Flags = CF_FORE_COLOR | CF_BACK_COLOR;
-	m_SelectionColor.m_rgbForeColor = GetSysColor(COLOR_HIGHLIGHTTEXT);
-	m_SelectionColor.m_rgbBackColor = GetSysColor(COLOR_HIGHLIGHT);
-	m_CursorColor.m_Flags = CF_BACK_COLOR;
+	m_selectionColor.m_flags = CF_FORE_COLOR | CF_BACK_COLOR;
+	m_selectionColor.m_rgbForeColor = getSysColor(COLOR_HIGHLIGHTTEXT);
+	m_selectionColor.m_rgbBackColor = getSysColor(COLOR_HIGHLIGHT);
+	m_cursorColor.m_flags = CF_BACK_COLOR;
 
-	m_CursorColor.m_rgbBackColor = RGB(
-		GetRValue(m_StdColorBg.m_rgbBackColor) / 1.3,
-		GetGValue(m_StdColorBg.m_rgbBackColor) / 1.2,
-		GetBValue(m_StdColorBg.m_rgbBackColor)
+	m_cursorColor.m_rgbBackColor = RGB(
+		getRValue(m_stdColorBg.m_rgbBackColor) / 1.3,
+		getGValue(m_stdColorBg.m_rgbBackColor) / 1.2,
+		getBValue(m_stdColorBg.m_rgbBackColor)
 		);
 
-	m_ModifiedColor.m_Flags = CF_FORE_COLOR;
-	m_ModifiedColor.m_rgbForeColor = RGB(255, 0, 0);
+	m_modifiedColor.m_flags = CF_FORE_COLOR;
+	m_modifiedColor.m_rgbForeColor = RGB(255, 0, 0);
 
 	m_bSelecting = FALSE;
 
-	m_pData = NULL;
-	m_pDataEnd = NULL;
+	m_data = NULL;
+	m_dataEnd = NULL;
 	m_nDataSize = 0;
 	m_nAllocSize = 0;
 
@@ -122,21 +122,21 @@ CHexEditCtrl::CHexEditCtrl()
 
 CHexEditCtrl::~CHexEditCtrl()
 {
-	DeleteObject(m_hDefaultFont);
-	DeleteObject(m_hUpdateRgn);
+	deleteObject(m_hDefaultFont);
+	deleteObject(m_hUpdateRgn);
 
-	if (m_pData)
-		free(m_pData);
+	if (m_data)
+		free(m_data);
 }
 
-ATL::CWndClassInfo& CHexEditCtrl::GetWndClassInfo()
+ATL::CWndClassInfo& CHexEditCtrl::getWndClassInfo()
 {
 	static ATL::CWndClassInfo wc =
 	{
 		{ 
 			sizeof(WNDCLASSEX), 
 			CS_DBLCLKS, 
-			StartWindowProc,
+			startWindowProc,
 			0, 0, NULL, NULL, NULL, 
 			NULL, 
 			NULL, 
@@ -154,66 +154,66 @@ ATL::CWndClassInfo& CHexEditCtrl::GetWndClassInfo()
 	return wc;
 }
 
-void CHexEditCtrl::ShowOnlyPrintableChars(BOOL bEnable)
+void CHexEditCtrl::showOnlyPrintableChars(BOOL bEnable)
 {
 	if (m_bOnlyPrintableChars == bEnable)
 		return;
 
 	m_bOnlyPrintableChars = bEnable;
-	Invalidate();
+	invalidate();
 }
 
-void CHexEditCtrl::SetOffsetWidth(BYTE Width)
+void CHexEditCtrl::setOffsetWidth(BYTE width)
 {
-	if (Width > 8)
-		Width = 8;
+	if (width > 8)
+		width = 8;
 
-	if (m_OffsetWidth == Width)
+	if (m_offsetWidth == width)
 		return;
 
-	m_OffsetWidth = Width;
+	m_offsetWidth = width;
 
 	if (m_bAutoAdjustBytesPerLine)
-		AutoAdjustBytesPerLine();
+		autoAdjustBytesPerLine();
 
-	RecalcColumns();
-	RecalcLayout();
-	Invalidate();
+	recalcColumns();
+	recalcLayout();
+	invalidate();
 }
 
-void CHexEditCtrl::SetReadOnly(BOOL bReadOnly)
+void CHexEditCtrl::setReadOnly(BOOL bReadOnly)
 {
 	if (m_bReadOnly == bReadOnly)
 		return;
 
 	m_bReadOnly = bReadOnly;
-	Invalidate();
+	invalidate();
 }
 
-void CHexEditCtrl::SetModified()
+void CHexEditCtrl::setModified()
 {
 	m_bModified = TRUE;
-	NotifyParent(HEN_DATA_CHANGE);
+	notifyParent(HEN_DATA_CHANGE);
 }
 
-LRESULT CHexEditCtrl::NotifyParent(UINT nCode, HEN_PARAMS* pParams)
+LRESULT CHexEditCtrl::notifyParent(UINT nCode, HEN_PARAMS* params)
 {
-	HEN_PARAMS Hdr;
+	HEN_PARAMS hdr;
 
-	if (!pParams)
-		pParams = &Hdr;
+	if (!params)
+		params = &hdr;
 
-	pParams->hwndFrom = m_hWnd;
-    pParams->idFrom = GetDlgCtrlID();
-    pParams->code = nCode;
+	params->hwndFrom = m_hWnd;
+    params->idFrom = getDlgCtrlID();
+    params->code = nCode;
 
-	HWND hwndParent = GetParent();
+	HWND hwndParent = getParent();
 	ASSERT(::IsWindow(hwndParent));
 	
-	return SendMessage(hwndParent, WM_NOTIFY, (WPARAM) pParams->idFrom, (LPARAM) pParams);
+	return sendMessage(hwndParent, WM_NOTIFY, (WPARAM) params->idFrom, (LPARAM) params);
 }
 
-SIZE_T CHexEditCtrl::GetData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
+SIZE_T CHexEditCtrl::getData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 {
 	if (nOffset >= m_nDataSize)
 		return 0;
@@ -222,32 +222,32 @@ SIZE_T CHexEditCtrl::GetData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 	if (nCopySize > nBufferSize)
 		nCopySize = nBufferSize;
 
-	DATA* pData = m_pData + nOffset;
-	DATA* pEnd = pData + nCopySize;
-	BYTE* pBuffer = (BYTE*) pvBuffer;
-	for (; pData < pEnd; pData++, pBuffer++)
-		*pBuffer = pData->m_Data;
+	DATA* data = m_data + nOffset;
+	DATA* end = data + nCopySize;
+	BYTE* buffer = (BYTE*) pvBuffer;
+	for (; data < end; data++, buffer++)
+		*buffer = data->m_data;
 
 	return nCopySize;
 }
 
-SIZE_T CHexEditCtrl::GetSelectedData(PVOID pvBuffer, SIZE_T nBufferSize)
+SIZE_T CHexEditCtrl::getSelectedData(PVOID pvBuffer, SIZE_T nBufferSize)
 {
-	SIZE_T nSelectedDataSize = GetSelectedDataSize();
+	SIZE_T nSelectedDataSize = getSelectedDataSize();
 
 	if (!nSelectedDataSize || nBufferSize < nSelectedDataSize)
 		return 0;
 
-	DATA* pData = m_pData + m_Selection.m_nStartOffset;
-	DATA* pEnd = m_pData + m_Selection.m_nEndOffset;
-	BYTE* pBuffer = (BYTE*) pvBuffer;
-	for (; pData < pEnd; pData++, pBuffer++)
-		*pBuffer = pData->m_Data;
+	DATA* data = m_data + m_selection.m_nStartOffset;
+	DATA* end = m_data + m_selection.m_nEndOffset;
+	BYTE* buffer = (BYTE*) pvBuffer;
+	for (; data < end; data++, buffer++)
+		*buffer = data->m_data;
 
 	return nSelectedDataSize;
 }
 
-BOOL CHexEditCtrl::SetData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
+BOOL CHexEditCtrl::setData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 {
 	if (nOffset > m_nDataSize)
 		return FALSE;
@@ -256,58 +256,58 @@ BOOL CHexEditCtrl::SetData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset)
 	if (nDelete > nBufferSize)
 		nDelete = nBufferSize;
 
-	if (!InsertDeleteData(nOffset, nBufferSize, nDelete))
+	if (!insertDeleteData(nOffset, nBufferSize, nDelete))
 		return FALSE;
 
-	DATA* pData = m_pData + nOffset;
-	DATA* pEnd = pData + nBufferSize;
-	BYTE* pBuffer = (BYTE*) pvBuffer;
+	DATA* data = m_data + nOffset;
+	DATA* end = data + nBufferSize;
+	BYTE* buffer = (BYTE*) pvBuffer;
 	
-	for (; pData < pEnd; pData++, pBuffer++)
-		pData->m_Data = *pBuffer;
+	for (; data < end; data++, buffer++)
+		data->m_data = *buffer;
 
 	// invalidate has already been called (withing InsertDeleteData)
 	return TRUE;
 }
 
-BOOL CHexEditCtrl::SetDataSize(SIZE_T nDataSize)
+BOOL CHexEditCtrl::setDataSize(SIZE_T nDataSize)
 {
 	if (nDataSize < m_nDataSize)
-		return InsertDeleteData(nDataSize, 0, m_nDataSize - nDataSize);
+		return insertDeleteData(nDataSize, 0, m_nDataSize - nDataSize);
 	else
-		return InsertDeleteData(m_nDataSize, nDataSize - m_nDataSize, 0);
+		return insertDeleteData(m_nDataSize, nDataSize - m_nDataSize, 0);
 }
 
-BOOL CHexEditCtrl::SetFont(HFONT hFont)
+BOOL CHexEditCtrl::setFont(HFONT hFont)
 {
-	HDC hdc = GetDC();
-	HFONT hFontOld = (HFONT) SelectObject(hdc, hFont);
+	HDC hdc = getDC();
+	HFONT hFontOld = (HFONT) selectObject(hdc, hFont);
 	TEXTMETRIC tm;
-	GetTextMetrics(hdc, &tm);
-	SelectObject(hdc, hFontOld);
-	ReleaseDC(hdc);
+	getTextMetrics(hdc, &tm);
+	selectObject(hdc, hFontOld);
+	releaseDC(hdc);
 
 	if (!(tm.tmPitchAndFamily & TMPF_FIXED_PITCH)) // how stupid the name is huh? :))
 		return FALSE;
 
 	m_hFont = hFont;
-	Invalidate();
+	invalidate();
 	return TRUE;
 }
 
-BOOL CHexEditCtrl::SetUpperCase(BOOL bUpperCase)
+BOOL CHexEditCtrl::setUpperCase(BOOL bUpperCase)
 {
 	m_bUpperCase = bUpperCase;
-	Invalidate();
+	invalidate();
 	return TRUE;
 }
 
-BOOL CHexEditCtrl::SetBytesPerLine(int nBytesPerLine)
+BOOL CHexEditCtrl::setBytesPerLine(int nBytesPerLine)
 {
 	if (!nBytesPerLine)
 	{
 		m_bAutoAdjustBytesPerLine = TRUE;
-		AutoAdjustBytesPerLine();
+		autoAdjustBytesPerLine();
 		return TRUE;
 	}
 
@@ -321,19 +321,19 @@ BOOL CHexEditCtrl::SetBytesPerLine(int nBytesPerLine)
 	}
 
 	m_bAutoAdjustBytesPerLine = FALSE;
-	SetBytesPerLineImpl(nBytesPerLine);
+	setBytesPerLineImpl(nBytesPerLine);
 	return TRUE;
 }
 
-void CHexEditCtrl::RecalcColumns()
+void CHexEditCtrl::recalcColumns()
 {
-	m_nHexCol = m_OffsetWidth ? m_OffsetWidth + 2 : 0;
+	m_nHexCol = m_offsetWidth ? m_offsetWidth + 2 : 0;
 	m_nGapCol = m_nHexCol + m_nBytesPerLine * 3;
 	m_nAsciiCol = m_nGapCol + 1;
 	m_nSpaceCol = m_nAsciiCol + m_nBytesPerLine;
 }
 
-void CHexEditCtrl::SetBytesPerLineImpl(int nBytesPerLine)
+void CHexEditCtrl::setBytesPerLineImpl(int nBytesPerLine)
 {
 	if (m_nBytesPerLine == nBytesPerLine)
 		return;
@@ -344,82 +344,82 @@ void CHexEditCtrl::SetBytesPerLineImpl(int nBytesPerLine)
 	if (m_nDataSize % m_nBytesPerLine)
 		m_nLineCount++;
 
-	RecalcColumns();
-	Invalidate();
-	UpdateCaretPos();
-	RecalcLayout();
+	recalcColumns();
+	invalidate();
+	updateCaretPos();
+	recalcLayout();
 }
 
-CHexEditCtrl::CURSOR_POS CHexEditCtrl::SetCursorPos(CURSOR_POS Pos, int Flags)
+CHexEditCtrl::CURSOR_POS CHexEditCtrl::setCursorPos(CURSOR_POS pos, int flags)
 {
-	EnsureVisible(Pos);
+	ensureVisible(pos);
 
-	if (Pos.m_Location >= CURSOR_LOCATION_COUNT)
-        Pos.m_Location = CURSOR_LOCATION_COUNT - 1;
+	if (pos.m_location >= CURSOR_LOCATION_COUNT)
+        pos.m_location = CURSOR_LOCATION_COUNT - 1;
 
-	if (m_bOverwriteMode && Pos.m_nOffset != (int) m_nDataSize - 1) // in overwrite mode certain locations are unavailable
+	if (m_bOverwriteMode && pos.m_nOffset != (int) m_nDataSize - 1) // in overwrite mode certain locations are unavailable
 	{
-		if (Pos.m_Location == CURSOR_ASCII_1)
-			Pos.m_Location = CURSOR_ASCII_0;
-		else if (Pos.m_Location == CURSOR_HEX_2)
-			Pos.m_Location = CURSOR_HEX_1;
+		if (pos.m_location == CURSOR_ASCII_1)
+			pos.m_location = CURSOR_ASCII_0;
+		else if (pos.m_location == CURSOR_HEX_2)
+			pos.m_location = CURSOR_HEX_1;
 	}
 
-	if (Pos.m_nOffset >= (int) m_nDataSize)
+	if (pos.m_nOffset >= (int) m_nDataSize)
 	{
-		Pos.m_nOffset = (int) m_nDataSize - 1;
-		if (Pos.m_Location >= CURSOR_ASCII_0)
-			Pos.m_Location = CURSOR_ASCII_1;
+		pos.m_nOffset = (int) m_nDataSize - 1;
+		if (pos.m_location >= CURSOR_ASCII_0)
+			pos.m_location = CURSOR_ASCII_1;
 		else 
-			Pos.m_Location = CURSOR_HEX_2;
+			pos.m_location = CURSOR_HEX_2;
 	}
 
-	if (Pos.m_nOffset < 0)
+	if (pos.m_nOffset < 0)
 	{
-		Pos.m_nOffset = 0;
-		if (Pos.m_Location >= CURSOR_ASCII_0)
-			Pos.m_Location = CURSOR_ASCII_0;
+		pos.m_nOffset = 0;
+		if (pos.m_location >= CURSOR_ASCII_0)
+			pos.m_location = CURSOR_ASCII_0;
 		else 
-			Pos.m_Location = CURSOR_HEX_0;
+			pos.m_location = CURSOR_HEX_0;
 	}
 
-	if ((Flags & MCF_FORCE) == 0 &&
-		m_CursorPos.m_nOffset == Pos.m_nOffset && 
-		m_CursorPos.m_Location == Pos.m_Location)
-		return Pos;
+	if ((flags & MCF_FORCE) == 0 &&
+		m_cursorPos.m_nOffset == pos.m_nOffset && 
+		m_cursorPos.m_location == pos.m_location)
+		return pos;
 
-	if (m_CursorPos.m_nOffset != Pos.m_nOffset || m_CursorPos.IsHex() && Pos.IsAscii())
-		Finalize4Bits();
+	if (m_cursorPos.m_nOffset != pos.m_nOffset || m_cursorPos.isHex() && pos.isAscii())
+		finalize4Bits();
 
-	if (m_CursorPos.m_nOffset != Pos.m_nOffset)
+	if (m_cursorPos.m_nOffset != pos.m_nOffset)
 	{
-		InvalidateOffset(m_CursorPos.m_nOffset);
-		InvalidateOffset(Pos.m_nOffset);
+		invalidateOffset(m_cursorPos.m_nOffset);
+		invalidateOffset(pos.m_nOffset);
 	}
 
-	if (Flags & MCF_SELECT)
+	if (flags & MCF_SELECT)
 	{
 		if (!m_bSelecting)
 		{
 			m_bSelecting = TRUE;
-			m_SelStart = m_CursorPos;		
+			m_selStart = m_cursorPos;		
 		}
 	}
-	else if (!(Flags & MCF_KEEP_SELECTION))
+	else if (!(flags & MCF_KEEP_SELECTION))
 	{
-		KillSelection();
+		killSelection();
 	}
 
-	m_CursorPos = Pos;
-	UpdateCaretPos();
+	m_cursorPos = pos;
+	updateCaretPos();
 
-	if (Flags & MCF_SELECT)
-		SetSelEnd(Pos);
+	if (flags & MCF_SELECT)
+		setSelEnd(pos);
 
-	return Pos;
+	return pos;
 }
 
-BOOL CHexEditCtrl::IsEqualCursorPos(CURSOR_POS& Pos1, CURSOR_POS& Pos2)
+BOOL CHexEditCtrl::isEqualCursorPos(CURSOR_POS& pos1, CURSOR_POS& pos2)
 {
 	static BYTE _EqualityTable1[CURSOR_LOCATION_COUNT][CURSOR_LOCATION_COUNT] = 
 	{
@@ -442,39 +442,39 @@ BOOL CHexEditCtrl::IsEqualCursorPos(CURSOR_POS& Pos1, CURSOR_POS& Pos2)
 	};
 
 	return
-		Pos1.m_nOffset == Pos2.m_nOffset && 
-		_EqualityTable1[Pos1.m_Location][Pos2.m_Location] ||
+		pos1.m_nOffset == pos2.m_nOffset && 
+		_EqualityTable1[pos1.m_location][pos2.m_location] ||
 
-		Pos1.m_nOffset + 1 == Pos2.m_nOffset && 
-		_EqualityTable2[Pos1.m_Location][Pos2.m_Location] ||
+		pos1.m_nOffset + 1 == pos2.m_nOffset && 
+		_EqualityTable2[pos1.m_location][pos2.m_location] ||
 
-		Pos2.m_nOffset + 1 == Pos1.m_nOffset && 
-		_EqualityTable2[Pos2.m_Location][Pos1.m_Location];
+		pos2.m_nOffset + 1 == pos1.m_nOffset && 
+		_EqualityTable2[pos2.m_location][pos1.m_location];
 }
 
-void CHexEditCtrl::SetSelEnd(CURSOR_POS Pos)
+void CHexEditCtrl::setSelEnd(CURSOR_POS pos)
 {
-	SELECTION_INFO OldSelection = m_Selection;
+	SELECTION_INFO oldSelection = m_selection;
 
-	m_SelEnd = Pos;
+	m_selEnd = pos;
 
-	if (IsEqualCursorPos(Pos, m_SelStart)) // "no selection" shortcut
+	if (isEqualCursorPos(pos, m_selStart)) // "no selection" shortcut
 	{
-		m_Selection.m_nStartOffset = 0;
-		m_Selection.m_nEndOffset = 0;
-		m_Selection.m_bLeadingGap = FALSE;
-		m_Selection.m_bTrailingGap = FALSE;
-		InvalidateSelection(&OldSelection);
+		m_selection.m_nStartOffset = 0;
+		m_selection.m_nEndOffset = 0;
+		m_selection.m_bLeadingGap = FALSE;
+		m_selection.m_bTrailingGap = FALSE;
+		invalidateSelection(&oldSelection);
 		return;
 	}
 
-	if (m_SelStart.m_nOffset == m_SelEnd.m_nOffset) // "single char selection" shortcut
+	if (m_selStart.m_nOffset == m_selEnd.m_nOffset) // "single char selection" shortcut
 	{
-		m_Selection.m_nStartOffset = m_SelStart.m_nOffset;
-		m_Selection.m_nEndOffset = m_SelEnd.m_nOffset + 1;
-		m_Selection.m_bLeadingGap = FALSE;
-		m_Selection.m_bTrailingGap = FALSE;
-		InvalidateSelectionDiff(&m_Selection, &OldSelection);
+		m_selection.m_nStartOffset = m_selStart.m_nOffset;
+		m_selection.m_nEndOffset = m_selEnd.m_nOffset + 1;
+		m_selection.m_bLeadingGap = FALSE;
+		m_selection.m_bTrailingGap = FALSE;
+		invalidateSelectionDiff(&m_selection, &oldSelection);
 		return;
 	}
 
@@ -482,18 +482,18 @@ void CHexEditCtrl::SetSelEnd(CURSOR_POS Pos)
 
 	// first, arrange SelStart and SelEnd according to offsets
 
-	CURSOR_POS SelStart;
-	CURSOR_POS SelEnd;
+	CURSOR_POS selStart;
+	CURSOR_POS selEnd;
 
-	if (m_SelStart.m_nOffset < m_SelEnd.m_nOffset)
+	if (m_selStart.m_nOffset < m_selEnd.m_nOffset)
 	{
-		SelStart = m_SelStart;
-		SelEnd = m_SelEnd;
+		selStart = m_selStart;
+		selEnd = m_selEnd;
 	}
 	else
 	{
-		SelStart = m_SelEnd;
-		SelEnd = m_SelStart;
+		selStart = m_selEnd;
+		selEnd = m_selStart;
 	}
 
 	// now, do a lookup on selection rules
@@ -511,66 +511,66 @@ void CHexEditCtrl::SetSelEnd(CURSOR_POS Pos)
 		{ SF_L | SF_T,  SF_E | SF_L, SF_E | SF_L,   SF_L | SF_T,   SF_E | SF_L }  // CURSOR_ASCII_1
 	};
 
-	BYTE SelectionFlags = _SelectionTable[SelStart.m_Location][SelEnd.m_Location];
+	BYTE selectionFlags = _SelectionTable[selStart.m_location][selEnd.m_location];
 
 	if (m_bOverwriteMode) 		
 	{
 		// in overwrite mode end position is always included and no trailing gap
-		SelectionFlags |= SF_E;
-		SelectionFlags &= ~SF_T;
+		selectionFlags |= SF_E;
+		selectionFlags &= ~SF_T;
 	}
 
-	if (SelectionFlags & SF_S)
-		m_Selection.m_nStartOffset = SelStart.m_nOffset;
+	if (selectionFlags & SF_S)
+		m_selection.m_nStartOffset = selStart.m_nOffset;
 	else
-		m_Selection.m_nStartOffset = SelStart.m_nOffset + 1;
+		m_selection.m_nStartOffset = selStart.m_nOffset + 1;
 
-	if (SelectionFlags & SF_E)
-		m_Selection.m_nEndOffset = SelEnd.m_nOffset + 1;
+	if (selectionFlags & SF_E)
+		m_selection.m_nEndOffset = selEnd.m_nOffset + 1;
 	else
-		m_Selection.m_nEndOffset = SelEnd.m_nOffset;
+		m_selection.m_nEndOffset = selEnd.m_nOffset;
 
-	m_Selection.m_bLeadingGap = (SelectionFlags & SF_L) != 0;
-	m_Selection.m_bTrailingGap = (SelectionFlags & SF_T) != 0;
+	m_selection.m_bLeadingGap = (selectionFlags & SF_L) != 0;
+	m_selection.m_bTrailingGap = (selectionFlags & SF_T) != 0;
 
-	InvalidateSelectionDiff(&m_Selection, &OldSelection);
+	invalidateSelectionDiff(&m_selection, &oldSelection);
 }
 
-BOOL CHexEditCtrl::IsDataSelected(SIZE_T nOffset)
+BOOL CHexEditCtrl::isDataSelected(SIZE_T nOffset)
 { 
 	return 
-		nOffset >= m_Selection.m_nStartOffset && 
-		nOffset < m_Selection.m_nEndOffset; 
+		nOffset >= m_selection.m_nStartOffset && 
+		nOffset < m_selection.m_nEndOffset; 
 }
 
-BOOL CHexEditCtrl::IsGapSelected(SIZE_T nOffset)
+BOOL CHexEditCtrl::isGapSelected(SIZE_T nOffset)
 {
 	return 
-		nOffset == m_Selection.m_nStartOffset - 1 && m_Selection.m_bLeadingGap ||
-		nOffset == m_Selection.m_nEndOffset - 1 && m_Selection.m_bTrailingGap;
+		nOffset == m_selection.m_nStartOffset - 1 && m_selection.m_bLeadingGap ||
+		nOffset == m_selection.m_nEndOffset - 1 && m_selection.m_bTrailingGap;
 }
 
-void CHexEditCtrl::InvalidateSelectionDiff(SELECTION_INFO* pOld, SELECTION_INFO* pNew)
+void CHexEditCtrl::invalidateSelectionDiff(SELECTION_INFO* old, SELECTION_INFO* new)
 {
-	InvalidateSelection(pOld);
-	InvalidateSelection(pNew);
+	invalidateSelection(old);
+	invalidateSelection(new);
 }
 
-void CHexEditCtrl::InvalidateSelection(SELECTION_INFO* pSel)
+void CHexEditCtrl::invalidateSelection(SELECTION_INFO* sel)
 {
-	if (pSel->IsEmpty())
+	if (sel->isEmpty())
 		return;
 
-	SIZE_T nOffsetFrom = pSel->m_nStartOffset;
-	SIZE_T nOffsetTo = pSel->m_nEndOffset;
+	SIZE_T nOffsetFrom = sel->m_nStartOffset;
+	SIZE_T nOffsetTo = sel->m_nEndOffset;
 
-	if (pSel->m_bLeadingGap && nOffsetFrom)
+	if (sel->m_bLeadingGap && nOffsetFrom)
 		nOffsetFrom--;
 
-	InvalidateRange(nOffsetFrom, nOffsetTo);
+	invalidateRange(nOffsetFrom, nOffsetTo);
 }
 
-void CHexEditCtrl::InvalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo)
+void CHexEditCtrl::invalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo)
 {
 	int nLineFrom = (int) nOffsetFrom / m_nBytesPerLine;
 	int nLineTo = (int) nOffsetTo / m_nBytesPerLine;
@@ -580,45 +580,45 @@ void CHexEditCtrl::InvalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo)
 		int nFirstCol = (int) nOffsetFrom % m_nBytesPerLine * 3 + m_nHexCol;
 		int nLastCol = (int) nOffsetTo % m_nBytesPerLine + m_nAsciiCol;
 		
-		InvalidateHelper(nLineFrom,  nFirstCol, 1, nLastCol - nFirstCol);
+		invalidateHelper(nLineFrom,  nFirstCol, 1, nLastCol - nFirstCol);
 	}
 	else
 	{
-		InvalidateHelper(
+		invalidateHelper(
 			nLineFrom, m_nHexCol, 
 			nLineTo - nLineFrom + 1, m_nSpaceCol - m_nHexCol + 1);
 	}
 }
 
-void CHexEditCtrl::InvalidateOffset(SIZE_T nOffset)
+void CHexEditCtrl::invalidateOffset(SIZE_T nOffset)
 {
 	int nLine = (int) nOffset / m_nBytesPerLine;
 	int nCol = (int) nOffset % m_nBytesPerLine;
 	
-	InvalidateHelper(nLine, nCol * 3 + m_nHexCol, 1, 3);
-	InvalidateHelper(nLine, nCol + m_nAsciiCol, 1, 1);
+	invalidateHelper(nLine, nCol * 3 + m_nHexCol, 1, 3);
+	invalidateHelper(nLine, nCol + m_nAsciiCol, 1, 1);
 }
 
-void CHexEditCtrl::InvalidateHelper(int nLine, int nCol, int nLineCount, int nColCount)
+void CHexEditCtrl::invalidateHelper(int nLine, int nCol, int nLineCount, int nColCount)
 {
 	nLine -= m_nFirstVisibleLine;
 	nCol -= m_nFirstVisibleCol;
 
 	RECT rct = 
 	{ 
-		nCol * m_CharSize.cx, 
-		nLine * m_CharSize.cy,  
-		(nCol + nColCount) * m_CharSize.cx, 
-		(nLine + nLineCount) * m_CharSize.cy,  
+		nCol * m_charSize.cx, 
+		nLine * m_charSize.cy,  
+		(nCol + nColCount) * m_charSize.cx, 
+		(nLine + nLineCount) * m_charSize.cy,  
 	};
 
-	InvalidateRect(&rct);
+	invalidateRect(&rct);
 }
 
-void CHexEditCtrl::EnsureVisible(CURSOR_POS Pos)
+void CHexEditCtrl::ensureVisible(CURSOR_POS pos)
 {
 	int nLine, nCol;
-	GetCursorLineCol(Pos, nLine, nCol, FALSE);
+	getCursorLineCol(pos, nLine, nCol, FALSE);
 
 	BOOL bInvalidate = FALSE;
 
@@ -634,7 +634,7 @@ void CHexEditCtrl::EnsureVisible(CURSOR_POS Pos)
 		bInvalidate = TRUE;
 	}
 
-	int nColSpan = Pos.m_Location >= CURSOR_ASCII_0 ? 1 : 2;
+	int nColSpan = pos.m_location >= CURSOR_ASCII_0 ? 1 : 2;
 
 	if (nCol + nColSpan >= m_nFirstVisibleCol + m_nVisibleColCount)
 	{
@@ -648,14 +648,14 @@ void CHexEditCtrl::EnsureVisible(CURSOR_POS Pos)
 		bInvalidate = TRUE;
 	}
 
-	FixupFirstVisibleLineCol();
-	RecalcScrollBars();
+	fixupFirstVisibleLineCol();
+	recalcScrollBars();
 
 	if (bInvalidate)
-		Invalidate();
+		invalidate();
 }
 
-BOOL CHexEditCtrl::InsertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDelete)
+BOOL CHexEditCtrl::insertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDelete)
 {
 	ASSERT(nOffset <= m_nDataSize);
 	ASSERT(nOffset + nDelete <= m_nDataSize);
@@ -667,8 +667,8 @@ BOOL CHexEditCtrl::InsertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDele
 	{
 		if (nLeftOver)
 			memmove(
-				m_pData + nOffset + nInsert, 
-				m_pData + nOffset + nDelete,
+				m_data + nOffset + nInsert, 
+				m_data + nOffset + nDelete,
 				nLeftOver * sizeof(DATA)
 				);
 	}
@@ -676,37 +676,37 @@ BOOL CHexEditCtrl::InsertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDele
 	{
 		// reserve at least one more page in buffer
 		SIZE_T nNewAllocSize = nNewSize + 2 * BUFFER_PAGE_SIZE - nNewSize % BUFFER_PAGE_SIZE;
-		DATA* pNewData = (DATA*) malloc(nNewAllocSize * sizeof(DATA));
-		if (!pNewData)
+		DATA* newData = (DATA*) malloc(nNewAllocSize * sizeof(DATA));
+		if (!newData)
 			return FALSE;
 
-		if (m_pData) 
+		if (m_data) 
 		{
 			// copy old data
-			memcpy(pNewData, m_pData, nOffset * sizeof(DATA));
+			memcpy(newData, m_data, nOffset * sizeof(DATA));
 			
 			if (nLeftOver)
 				memcpy(
-					pNewData + nOffset + nInsert, 
-					m_pData + nOffset + nDelete, 
+					newData + nOffset + nInsert, 
+					m_data + nOffset + nDelete, 
 					nLeftOver * sizeof(DATA)
 					);
 
-			free(m_pData);
+			free(m_data);
 		}
 
-        m_pData = pNewData;
+        m_data = newData;
 		m_nAllocSize = nNewAllocSize;
 	}
 
 	if (nInsert) // zero out inserted memory
 	{
-		memset(m_pData + nOffset, 0, nInsert * sizeof(DATA));
-		DATA* pData = m_pData + nOffset;
-		DATA* pEnd = pData + nInsert;
+		memset(m_data + nOffset, 0, nInsert * sizeof(DATA));
+		DATA* data = m_data + nOffset;
+		DATA* end = data + nInsert;
 
-		for (; pData < pEnd; pData++)
-			pData->m_Flags |= DF_MODIFIED;
+		for (; data < end; data++)
+			data->m_flags |= DF_MODIFIED;
 	}
 
 	int nNewLineCount = (int) nNewSize / m_nBytesPerLine;
@@ -716,72 +716,72 @@ BOOL CHexEditCtrl::InsertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDele
 	int nInvalidateFromLine = (int) nOffset / m_nBytesPerLine;
 	int nInvalidateToLine = max(m_nLineCount, nNewLineCount);
 
-	m_pDataEnd = m_pData + nNewSize;
+	m_dataEnd = m_data + nNewSize;
 	m_nDataSize = nNewSize;
 	m_nLineCount = nNewLineCount;
 
 	RECT rct = 
 	{ 
 		0, 
-		(nInvalidateFromLine - m_nFirstVisibleLine) * m_CharSize.cy,
-		(m_nSpaceCol - m_nFirstVisibleCol) * m_CharSize.cx,
-		(nInvalidateToLine - m_nFirstVisibleLine) * m_CharSize.cy
+		(nInvalidateFromLine - m_nFirstVisibleLine) * m_charSize.cy,
+		(m_nSpaceCol - m_nFirstVisibleCol) * m_charSize.cx,
+		(nInvalidateToLine - m_nFirstVisibleLine) * m_charSize.cy
 	};
 
-	InvalidateRect(&rct);
-	RecalcLayout();
+	invalidateRect(&rct);
+	recalcLayout();
 
 	return TRUE;
 }
 
-void CHexEditCtrl::TransitCursor(int nOffsetDelta, int NewLocation, int Flags)
+void CHexEditCtrl::transitCursor(int nOffsetDelta, int newLocation, int flags)
 {
-	CURSOR_POS NewPos;
-	NewPos.m_nOffset = m_CursorPos.m_nOffset + nOffsetDelta;
-	NewPos.m_Location = NewLocation != -1 ? 
-		NewLocation : 
-		m_CursorPos.m_Location;
+	CURSOR_POS newPos;
+	newPos.m_nOffset = m_cursorPos.m_nOffset + nOffsetDelta;
+	newPos.m_location = newLocation != -1 ? 
+		newLocation : 
+		m_cursorPos.m_location;
 
-	SetCursorPos(NewPos, Flags);
+	setCursorPos(newPos, flags);
 }
 
-void CHexEditCtrl::KillSelection()
+void CHexEditCtrl::killSelection()
 {
-	SELECTION_INFO OldSelection = m_Selection;
+	SELECTION_INFO oldSelection = m_selection;
 
-	m_SelStart.m_nOffset = 0;
-	m_SelStart.m_Location = 0;
-	m_SelEnd.m_nOffset = 0;
-	m_SelEnd.m_Location = 0;
+	m_selStart.m_nOffset = 0;
+	m_selStart.m_location = 0;
+	m_selEnd.m_nOffset = 0;
+	m_selEnd.m_location = 0;
 	
-	m_Selection.Clear();
+	m_selection.clear();
 
 	m_bSelecting = FALSE;
 	
-	InvalidateSelection(&OldSelection);
+	invalidateSelection(&oldSelection);
 }
 
-void CHexEditCtrl::Finalize4Bits()
+void CHexEditCtrl::finalize4Bits()
 {
-	DATA* pData = m_pData + m_CursorPos.m_nOffset;
-	if (pData < m_pDataEnd && pData->m_Flags & DF_4_BITS)
+	DATA* data = m_data + m_cursorPos.m_nOffset;
+	if (data < m_dataEnd && data->m_flags & DF_4_BITS)
 	{
-		pData->m_Flags &= ~DF_4_BITS;
-		InvalidateOffset(m_CursorPos.m_nOffset);
+		data->m_flags &= ~DF_4_BITS;
+		invalidateOffset(m_cursorPos.m_nOffset);
 	}
 }
 
-BOOL CHexEditCtrl::SetOverwriteMode(BOOL bOverwriteMode)
+BOOL CHexEditCtrl::setOverwriteMode(BOOL bOverwriteMode)
 {
 	m_bOverwriteMode = bOverwriteMode;
-	UpdateCaret();
+	updateCaret();
 	return TRUE;
 }
 
-CHexEditCtrl::CURSOR_POS CHexEditCtrl::CursorPosFromMousePos(POINT pt)
+CHexEditCtrl::CURSOR_POS CHexEditCtrl::cursorPosFromMousePos(POINT pt)
 {
-	int nLine = pt.y / m_CharSize.cy;
-	int nCol = pt.x / m_CharSize.cx;
+	int nLine = pt.y / m_charSize.cy;
+	int nCol = pt.x / m_charSize.cx;
 
 	nLine += m_nFirstVisibleLine;
 	nCol += m_nFirstVisibleCol;
@@ -789,19 +789,19 @@ CHexEditCtrl::CURSOR_POS CHexEditCtrl::CursorPosFromMousePos(POINT pt)
 	if (nLine < 0)
 		nLine = 0;
 
-	CURSOR_POS Pos;
+	CURSOR_POS pos;
 
 	if (nCol >= m_nGapCol)
 	{
 		nCol = max(nCol, m_nAsciiCol);
 		nCol -= m_nAsciiCol;
 
-		Pos.m_Location = CURSOR_ASCII_0;
+		pos.m_location = CURSOR_ASCII_0;
 
 		if (nCol >= m_nBytesPerLine)
 		{
 			nCol = m_nBytesPerLine - 1;
-			Pos.m_Location = CURSOR_ASCII_1;
+			pos.m_location = CURSOR_ASCII_1;
 		}
 	}
 	else 
@@ -809,41 +809,41 @@ CHexEditCtrl::CURSOR_POS CHexEditCtrl::CursorPosFromMousePos(POINT pt)
 		nCol = max(nCol, m_nHexCol);
 		nCol -= m_nHexCol; 
 		
-		Pos.m_Location = CURSOR_HEX_0 + nCol % 3;
+		pos.m_location = CURSOR_HEX_0 + nCol % 3;
 
 		nCol /= 3;
 
 		if (nCol >= m_nBytesPerLine)
 		{
 			nCol = m_nBytesPerLine - 1;
-			Pos.m_Location = CURSOR_HEX_2;
+			pos.m_location = CURSOR_HEX_2;
 		}
 	}
 
-	Pos.m_nOffset = nLine * m_nBytesPerLine + nCol;
-	return Pos;
+	pos.m_nOffset = nLine * m_nBytesPerLine + nCol;
+	return pos;
 }
 
-void CHexEditCtrl::UpdateCaret()
+void CHexEditCtrl::updateCaret()
 {
-	if (GetFocus() != m_hWnd)
+	if (getFocus() != m_hWnd)
 		return;
 
-	int cx = m_bOverwriteMode ? m_CharSize.cx : 2;
+	int cx = m_bOverwriteMode ? m_charSize.cx : 2;
 
-	if (CreateSolidCaret(cx, m_CharSize.cy))
+	if (createSolidCaret(cx, m_charSize.cy))
 	{
-		UpdateCaretPos();
-		ShowCaret();
+		updateCaretPos();
+		showCaret();
 	}
 }
 
-void CHexEditCtrl::GetCursorLineCol(CURSOR_POS Pos, int& nLine, int& nCol, BOOL bAddExtra)
+void CHexEditCtrl::getCursorLineCol(CURSOR_POS pos, int& nLine, int& nCol, BOOL bAddExtra)
 {
-	nLine = (int) Pos.m_nOffset / m_nBytesPerLine;
-	nCol = (int) Pos.m_nOffset % m_nBytesPerLine;
+	nLine = (int) pos.m_nOffset / m_nBytesPerLine;
+	nCol = (int) pos.m_nOffset % m_nBytesPerLine;
 
-	if (Pos.m_Location >= CURSOR_ASCII_0)
+	if (pos.m_location >= CURSOR_ASCII_0)
 	{
 		nCol += m_nAsciiCol;
 	}
@@ -856,56 +856,56 @@ void CHexEditCtrl::GetCursorLineCol(CURSOR_POS Pos, int& nLine, int& nCol, BOOL 
 	if (bAddExtra)
 	{
 		static int _ExtraCol[] = { 0, 1, 2, 0, 1, };
-		nCol += _ExtraCol[Pos.m_Location];
+		nCol += _ExtraCol[pos.m_location];
 	}
 }
 
-void CHexEditCtrl::UpdateCaretPos()
+void CHexEditCtrl::updateCaretPos()
 {
 	int nLine, nCol;
 
-	GetCursorLineCol(m_CursorPos, nLine, nCol);
+	getCursorLineCol(m_cursorPos, nLine, nCol);
 
 	nLine -= m_nFirstVisibleLine;
 	nCol -= m_nFirstVisibleCol;
 
-	if (m_hWnd == GetFocus())
-		SetCaretPos(nCol * m_CharSize.cx, nLine * m_CharSize.cy);
+	if (m_hWnd == getFocus())
+		setCaretPos(nCol * m_charSize.cx, nLine * m_charSize.cy);
 }
 
-void CHexEditCtrl::ClearModified()
+void CHexEditCtrl::clearModified()
 {
-	DATA* pData = m_pData;
-	for (; pData < m_pDataEnd; pData++)
-		pData->m_Flags &= ~DF_MODIFIED;
+	DATA* data = m_data;
+	for (; data < m_dataEnd; data++)
+		data->m_flags &= ~DF_MODIFIED;
 
 	m_bModified = FALSE;
-	Invalidate();
+	invalidate();
 }
 
-void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
+void CHexEditCtrl::paintRect(HDC hdc, RECT& rctUpdate)
 {
 	RECT rct;
-	rct.left = rctUpdate.left - rctUpdate.left % m_CharSize.cx;
-	rct.top = rctUpdate.top - rctUpdate.top % m_CharSize.cy;
-	rct.right = rct.left + m_CharSize.cx;
-	rct.bottom = rct.top + m_CharSize.cy;
+	rct.left = rctUpdate.left - rctUpdate.left % m_charSize.cx;
+	rct.top = rctUpdate.top - rctUpdate.top % m_charSize.cy;
+	rct.right = rct.left + m_charSize.cx;
+	rct.bottom = rct.top + m_charSize.cy;
 
-	int nFirstLine = rctUpdate.top / m_CharSize.cy;
-	int nLineCount = rctUpdate.bottom / m_CharSize.cy - nFirstLine;
-	if (rctUpdate.bottom % m_CharSize.cy)
+	int nFirstLine = rctUpdate.top / m_charSize.cy;
+	int nLineCount = rctUpdate.bottom / m_charSize.cy - nFirstLine;
+	if (rctUpdate.bottom % m_charSize.cy)
 		nLineCount++;
 
-	int nFirstCol = rctUpdate.left / m_CharSize.cx;
-	int nColCount = rctUpdate.right / m_CharSize.cx - nFirstCol;
-	if (rctUpdate.right % m_CharSize.cx)
+	int nFirstCol = rctUpdate.left / m_charSize.cx;
+	int nColCount = rctUpdate.right / m_charSize.cx - nFirstCol;
+	if (rctUpdate.right % m_charSize.cx)
 		nColCount++;
 
 	nFirstLine += m_nFirstVisibleLine;
 	nFirstCol += m_nFirstVisibleCol;
 
-	SetBkColor(hdc, m_StdColorBg.m_rgbBackColor);
-	m_pStdColor = &m_StdColorBg;
+	setBkColor(hdc, m_stdColorBg.m_rgbBackColor);
+	m_stdColor = &m_stdColorBg;
 
 	int nTotalLineCount = m_nLineCount;
 	if (!nTotalLineCount)
@@ -913,7 +913,7 @@ void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
 
 	if (nFirstLine >= nTotalLineCount) // shortcut
 	{
-		FastRectangle(hdc, rctUpdate);
+		fastRectangle(hdc, rctUpdate);
 		return;
 	}
 
@@ -924,25 +924,25 @@ void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
 
 	SIZE_T nOffset = nFirstLine * m_nBytesPerLine;
 
-	if (m_OffsetWidth && nFirstCol < m_OffsetWidth)
+	if (m_offsetWidth && nFirstCol < m_offsetWidth)
 	{
 		int m = nFirstCol;
 		if (m)
 		{
 			nFirstCol -= m;
 			nColCount += m;
-			rct.left -= m * m_CharSize.cx;
-			rct.right -= m * m_CharSize.cx;
+			rct.left -= m * m_charSize.cx;
+			rct.right -= m * m_charSize.cx;
 		}
 
 		int nPaintColCount = m_nHexCol - nFirstCol;
 
-		PaintOffs(hdc, rct, nLineCount, nOffset);
+		paintOffs(hdc, rct, nLineCount, nOffset);
 
 		nFirstCol += nPaintColCount;
 		nColCount -= nPaintColCount;
 
-		int nPaintWidth = nPaintColCount * m_CharSize.cx;
+		int nPaintWidth = nPaintColCount * m_charSize.cx;
 		rct.left += nPaintWidth;
 		rct.right += nPaintWidth;
 
@@ -957,8 +957,8 @@ void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
 		{
 			nFirstCol -= m;
 			nColCount += m;
-			rct.left -= m * m_CharSize.cx;
-			rct.right -= m * m_CharSize.cx;
+			rct.left -= m * m_charSize.cx;
+			rct.right -= m * m_charSize.cx;
 		}
 
 		int nPaintColCount = m_nGapCol - nFirstCol;
@@ -970,12 +970,12 @@ void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
 				nPaintColCount += 3 - m;
 		}
 
-		PaintHex(hdc, rct, nPaintColCount / 3, nLineCount, nOffset + (nFirstCol - m_nHexCol) / 3);
+		paintHex(hdc, rct, nPaintColCount / 3, nLineCount, nOffset + (nFirstCol - m_nHexCol) / 3);
 
 		nFirstCol += nPaintColCount;
 		nColCount -= nPaintColCount;
 
-		int nPaintWidth = nPaintColCount * m_CharSize.cx;
+		int nPaintWidth = nPaintColCount * m_charSize.cx;
 		rct.left += nPaintWidth;
 		rct.right += nPaintWidth;
 	}
@@ -983,13 +983,13 @@ void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
 	if (nFirstCol < m_nAsciiCol &&
 		nFirstCol + nColCount >= m_nGapCol)
 	{
-		PaintGap(hdc, rct, nLineCount);
+		paintGap(hdc, rct, nLineCount);
 
 		nFirstCol++;
 		nColCount--;
 
-		rct.left += m_CharSize.cx;
-		rct.right += m_CharSize.cx;
+		rct.left += m_charSize.cx;
+		rct.right += m_charSize.cx;
 	}
 
 	if (nFirstCol < m_nSpaceCol &&
@@ -999,30 +999,30 @@ void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
 		if (nPaintColCount > nColCount)
 			nPaintColCount = nColCount;
 
-		m_pStdColor = &m_StdColorAscii;
-		SetBkColor(hdc, m_StdColorAscii.m_rgbBackColor);
+		m_stdColor = &m_stdColorAscii;
+		setBkColor(hdc, m_stdColorAscii.m_rgbBackColor);
 
-		PaintAscii(hdc, rct, nPaintColCount, nLineCount, nOffset + (nFirstCol - m_nAsciiCol));
+		paintAscii(hdc, rct, nPaintColCount, nLineCount, nOffset + (nFirstCol - m_nAsciiCol));
 
 		nFirstCol += nPaintColCount;
 		nColCount -= nPaintColCount;
 
-		int nPaintWidth = nPaintColCount * m_CharSize.cx;
+		int nPaintWidth = nPaintColCount * m_charSize.cx;
 		rct.left += nPaintWidth;
 		rct.right += nPaintWidth;
 
-		m_pStdColor = &m_StdColorBg;
-		SetBkColor(hdc, m_StdColorBg.m_rgbBackColor);
+		m_stdColor = &m_stdColorBg;
+		setBkColor(hdc, m_stdColorBg.m_rgbBackColor);
 	}
 
-	int nBottom = rct.top + nLineCount * m_CharSize.cy;
+	int nBottom = rct.top + nLineCount * m_charSize.cy;
 
 	if (nColCount > 0)
 	{
 		rct.right = rctUpdate.right;
 		rct.bottom = nBottom;
 
-		FastRectangle(hdc, rct);
+		fastRectangle(hdc, rct);
 	}
 
 	if (rctUpdate.bottom > nBottom)
@@ -1030,71 +1030,71 @@ void CHexEditCtrl::PaintRect(HDC hdc, RECT& rctUpdate)
 		rct = rctUpdate;
 		rct.top = nBottom;
 
-		FastRectangle(hdc, rct);
+		fastRectangle(hdc, rct);
 	}
 }
 
-void CHexEditCtrl::ApplyColor(HDC hdc, COLOR_INFO* pColor, int PrevColorFlags)
+void CHexEditCtrl::applyColor(HDC hdc, COLOR_INFO* color, int prevColorFlags)
 {
-	if (!pColor)
+	if (!color)
 	{
-		if (PrevColorFlags & CF_BACK_COLOR)
-			SetBkColor(hdc, m_pStdColor->m_rgbBackColor);
+		if (prevColorFlags & CF_BACK_COLOR)
+			setBkColor(hdc, m_stdColor->m_rgbBackColor);
 
-		if (PrevColorFlags & CF_FORE_COLOR)
-			SetTextColor(hdc, m_pStdColor->m_rgbForeColor);
+		if (prevColorFlags & CF_FORE_COLOR)
+			setTextColor(hdc, m_stdColor->m_rgbForeColor);
 	}
 	else
 	{
-		if (pColor->m_Flags & CF_BACK_COLOR)
-			SetBkColor(hdc, pColor->m_rgbBackColor);
-		else if (PrevColorFlags & CF_BACK_COLOR)
-			SetBkColor(hdc, m_pStdColor->m_rgbBackColor);
+		if (color->m_flags & CF_BACK_COLOR)
+			setBkColor(hdc, color->m_rgbBackColor);
+		else if (prevColorFlags & CF_BACK_COLOR)
+			setBkColor(hdc, m_stdColor->m_rgbBackColor);
 
-		if (pColor->m_Flags & CF_FORE_COLOR)
-			SetTextColor(hdc, pColor->m_rgbForeColor);
-		else if (PrevColorFlags & CF_FORE_COLOR)
-			SetTextColor(hdc, m_pStdColor->m_rgbForeColor);
+		if (color->m_flags & CF_FORE_COLOR)
+			setTextColor(hdc, color->m_rgbForeColor);
+		else if (prevColorFlags & CF_FORE_COLOR)
+			setTextColor(hdc, m_stdColor->m_rgbForeColor);
 	}
 }
 
-CHexEditCtrl::COLOR_INFO CHexEditCtrl::GetDataColor(DATA* pData)
+CHexEditCtrl::COLOR_INFO CHexEditCtrl::getDataColor(DATA* data)
 {
-	if (!pData)
+	if (!data)
 		return COLOR_INFO();
 
-	COLOR_INFO Color;
+	COLOR_INFO color;
 
-	Color += pData->m_Color;
+	color += data->m_color;
 
-	if (pData->m_Flags & DF_MODIFIED)
-		Color += m_ModifiedColor;
+	if (data->m_flags & DF_MODIFIED)
+		color += m_modifiedColor;
 
-	if (m_Selection.IsEmpty() && pData == m_pData + m_CursorPos.m_nOffset)
-		Color += m_CursorColor;
+	if (m_selection.isEmpty() && data == m_data + m_cursorPos.m_nOffset)
+		color += m_cursorColor;
 
-	if (IsDataSelected(pData - m_pData))
-		Color += m_SelectionColor;
+	if (isDataSelected(data - m_data))
+		color += m_selectionColor;
 
-	return Color;
+	return color;
 }
 
-CHAR CHexEditCtrl::GetHexChar(BYTE Data)
+CHAR CHexEditCtrl::getHexChar(BYTE data)
 {
 	static CHAR _UpperCaseHexChars[] = "0123456789ABCDEF";
 	static CHAR _LowerCaseHexChars[] = "0123456789abcdef";
 	
-	Data &= 0xf;
+	data &= 0xf;
 
-	return m_bUpperCase ? _UpperCaseHexChars[Data] : _LowerCaseHexChars[Data];
+	return m_bUpperCase ? _UpperCaseHexChars[data] : _LowerCaseHexChars[data];
 }
 
-void CHexEditCtrl::PaintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset)
+void CHexEditCtrl::paintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset)
 {
-	rct.right = m_nHexCol * m_CharSize.cx;
-	rct.bottom = rct.top + m_CharSize.cy;
+	rct.right = m_nHexCol * m_charSize.cx;
+	rct.bottom = rct.top + m_charSize.cy;
 
-	COLORREF OldColor = SetTextColor(hdc, GetSysColor(COLOR_GRAYTEXT));
+	COLORREF oldColor = setTextColor(hdc, getSysColor(COLOR_GRAYTEXT));
 
     for (int i = 0; i < nLineCount; i++)
 	{
@@ -1105,180 +1105,180 @@ void CHexEditCtrl::PaintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset)
 
 		CHAR szText[8] = 
 		{ 
-			GetHexChar(b1 >> 4),
-			GetHexChar(b1),
-			GetHexChar(b2 >> 4),
-			GetHexChar(b2),
-			GetHexChar(b3 >> 4),
-			GetHexChar(b3),
-			GetHexChar(b4 >> 4),
-			GetHexChar(b4),
+			getHexChar(b1 >> 4),
+			getHexChar(b1),
+			getHexChar(b2 >> 4),
+			getHexChar(b2),
+			getHexChar(b3 >> 4),
+			getHexChar(b3),
+			getHexChar(b4 >> 4),
+			getHexChar(b4),
 		};
 
-		ExtTextOut(hdc, rct.left, rct.top, ETO_OPAQUE, &rct, szText + 8 - m_OffsetWidth, m_OffsetWidth, NULL);
+		extTextOut(hdc, rct.left, rct.top, ETO_OPAQUE, &rct, szText + 8 - m_offsetWidth, m_offsetWidth, NULL);
 		
-		rct.top += m_CharSize.cy;
-		rct.bottom += m_CharSize.cy;
+		rct.top += m_charSize.cy;
+		rct.bottom += m_charSize.cy;
 
 		nOffset += m_nBytesPerLine;
 	}
 
-	SetTextColor(hdc, OldColor);
+	setTextColor(hdc, oldColor);
 }
 
-void CHexEditCtrl::PaintHex(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
+void CHexEditCtrl::paintHex(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
 {
 
 	ASSERT(nColCount <= m_nBytesPerLine);
 
 	int left = rct.left;
 
-	DATA* pData = m_pData + nOffset;
+	DATA* data = m_data + nOffset;
 	int nExtra = m_nBytesPerLine - nColCount;
 
-	int PrevColorFlags = 0;
+	int prevColorFlags = 0;
 
     for (int i = 0; i < nLineCount; i++)
 	{
-		for (int j = 0; j < nColCount; j++, pData++)
+		for (int j = 0; j < nColCount; j++, data++)
 		{
-			if (pData >= m_pDataEnd)
+			if (data >= m_dataEnd)
 			{
 				ASSERT(i == nLineCount - 1);
-				rct.right = rct.left + (nColCount - j) * m_CharSize.cx * 3;
-				ApplyColor(hdc, NULL, PrevColorFlags);
-				FastRectangle(hdc, rct);
+				rct.right = rct.left + (nColCount - j) * m_charSize.cx * 3;
+				applyColor(hdc, NULL, prevColorFlags);
+				fastRectangle(hdc, rct);
 				return;
 			}	
 
-			COLOR_INFO Color = GetDataColor(pData);
-			ApplyColor(hdc, &Color, PrevColorFlags);
+			COLOR_INFO color = getDataColor(data);
+			applyColor(hdc, &color, prevColorFlags);
 
-			if (pData->m_Flags & DF_4_BITS)
+			if (data->m_flags & DF_4_BITS)
 			{
-				FastChar(hdc, rct, GetHexChar(pData->m_Data));
-				rct.left += m_CharSize.cx;
-				rct.right += m_CharSize.cx;
+				fastChar(hdc, rct, getHexChar(data->m_data));
+				rct.left += m_charSize.cx;
+				rct.right += m_charSize.cx;
 
-				FastRectangle(hdc, rct);
-				rct.left += m_CharSize.cx;
-				rct.right += m_CharSize.cx;
+				fastRectangle(hdc, rct);
+				rct.left += m_charSize.cx;
+				rct.right += m_charSize.cx;
 			}
 			else
 			{
-				FastChar(hdc, rct, GetHexChar(pData->m_Data >> 4));
-				rct.left += m_CharSize.cx;
-				rct.right += m_CharSize.cx;
+				fastChar(hdc, rct, getHexChar(data->m_data >> 4));
+				rct.left += m_charSize.cx;
+				rct.right += m_charSize.cx;
 
-				FastChar(hdc, rct, GetHexChar(pData->m_Data));
-				rct.left += m_CharSize.cx;
-				rct.right += m_CharSize.cx;
+				fastChar(hdc, rct, getHexChar(data->m_data));
+				rct.left += m_charSize.cx;
+				rct.right += m_charSize.cx;
 			}
 
-			if (IsGapSelected(pData - m_pData))
+			if (isGapSelected(data - m_data))
 			{
 				// gap shuold be selection color (even though NOT both left and right are selection)
-				ApplyColor(hdc, &m_SelectionColor, Color.m_Flags);
-				PrevColorFlags = m_SelectionColor.m_Flags;
+				applyColor(hdc, &m_selectionColor, color.m_flags);
+				prevColorFlags = m_selectionColor.m_flags;
 			} 
 			else
 			{
 				// color of this gap depend on the next data
 
-				DATA* pNextData = pData + 1;
+				DATA* nextData = data + 1;
 
-				if (pNextData < m_pDataEnd && GetDataColor(pNextData) == Color)
+				if (nextData < m_dataEnd && getDataColor(nextData) == color)
 				{
 					// keep color
-					PrevColorFlags = Color.m_Flags;
+					prevColorFlags = color.m_flags;
 				}
 				else
 				{
 					// reset color
-					ApplyColor(hdc, NULL, Color.m_Flags);
-					PrevColorFlags = 0;
+					applyColor(hdc, NULL, color.m_flags);
+					prevColorFlags = 0;
 				}
 			}
 
-			if (m_nHexGapStep > 0 && ((pData - m_pData) % m_nHexGapStep) == m_nHexGapStep - 1)
+			if (m_nHexGapStep > 0 && ((data - m_data) % m_nHexGapStep) == m_nHexGapStep - 1)
 			{
-				int width = m_CharSize.cx * 2;
+				int width = m_charSize.cx * 2;
 				RECT rctBigGap = { rct.left, rct.top, rct.left + width, rct.bottom };
-				FastRectangle(hdc, rctBigGap);
+				fastRectangle(hdc, rctBigGap);
 				rct.left += width;
 				rct.right += width;
 			}
 			else
 			{
-				FastRectangle(hdc, rct);
-				rct.left += m_CharSize.cx;
-				rct.right += m_CharSize.cx;
+				fastRectangle(hdc, rct);
+				rct.left += m_charSize.cx;
+				rct.right += m_charSize.cx;
 			}
 		}
 
 		rct.left = left;
-		rct.right = rct.left + m_CharSize.cx;
-		rct.top += m_CharSize.cy;
-		rct.bottom += m_CharSize.cy;
+		rct.right = rct.left + m_charSize.cx;
+		rct.top += m_charSize.cy;
+		rct.bottom += m_charSize.cy;
 
-		pData += nExtra;
+		data += nExtra;
 	}
 
-	ApplyColor(hdc, NULL, PrevColorFlags);
+	applyColor(hdc, NULL, prevColorFlags);
 }
 
-void CHexEditCtrl::PaintGap(HDC hdc, RECT rct, int nLineCount)
+void CHexEditCtrl::paintGap(HDC hdc, RECT rct, int nLineCount)
 {
-	rct.bottom = rct.top + nLineCount * m_CharSize.cy;
-	FastRectangle(hdc, rct);
+	rct.bottom = rct.top + nLineCount * m_charSize.cy;
+	fastRectangle(hdc, rct);
 }
 
-void CHexEditCtrl::PaintAscii(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
+void CHexEditCtrl::paintAscii(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset)
 {
 	ASSERT(nColCount <= m_nBytesPerLine);
 
 	int left = rct.left;
 
-	DATA* pData = m_pData + nOffset;
+	DATA* data = m_data + nOffset;
 	int nExtra = m_nBytesPerLine - nColCount;
 
-	int PrevColorFlags = 0;
+	int prevColorFlags = 0;
 
     for (int i = 0; i < nLineCount; i++)
 	{
-		for (int j = 0; j < nColCount; j++, pData++)
+		for (int j = 0; j < nColCount; j++, data++)
 		{
-			if (pData >= m_pDataEnd)
+			if (data >= m_dataEnd)
 			{
 				ASSERT(i == nLineCount - 1);
-				rct.right = rct.left + (nColCount - j) * m_CharSize.cx;
-				ApplyColor(hdc, NULL, PrevColorFlags);
-				FastRectangle(hdc, rct);
+				rct.right = rct.left + (nColCount - j) * m_charSize.cx;
+				applyColor(hdc, NULL, prevColorFlags);
+				fastRectangle(hdc, rct);
 				return;
 			}			
 
-			COLOR_INFO Color = GetDataColor(pData);
-			ApplyColor(hdc, &Color, PrevColorFlags);
-			PrevColorFlags = Color.m_Flags;
+			COLOR_INFO color = getDataColor(data);
+			applyColor(hdc, &color, prevColorFlags);
+			prevColorFlags = color.m_flags;
 
-			CHAR ch = m_bOnlyPrintableChars ? isprint(pData->m_Data) ? pData->m_Data : '.' : pData->m_Data;
-			FastChar(hdc, rct, ch);
-			rct.left += m_CharSize.cx;
-			rct.right += m_CharSize.cx;
+			CHAR ch = m_bOnlyPrintableChars ? isprint(data->m_data) ? data->m_data : '.' : data->m_data;
+			fastChar(hdc, rct, ch);
+			rct.left += m_charSize.cx;
+			rct.right += m_charSize.cx;
 		}
 
 		rct.left = left;
-		rct.right = rct.left + m_CharSize.cx;
-		rct.top += m_CharSize.cy;
-		rct.bottom += m_CharSize.cy;
+		rct.right = rct.left + m_charSize.cx;
+		rct.top += m_charSize.cy;
+		rct.bottom += m_charSize.cy;
 
-		pData += nExtra;
+		data += nExtra;
 	}
 
-	ApplyColor(hdc, NULL, PrevColorFlags);
+	applyColor(hdc, NULL, prevColorFlags);
 }
 
-void CHexEditCtrl::FixupFirstVisibleLineCol()
+void CHexEditCtrl::fixupFirstVisibleLineCol()
 {
 	int nNewFirstVisibleLine = m_nFirstVisibleLine;
 	int nNewFirstVisibleCol = m_nFirstVisibleCol;
@@ -1300,12 +1300,12 @@ void CHexEditCtrl::FixupFirstVisibleLineCol()
 		m_nFirstVisibleLine = nNewFirstVisibleLine;
 		m_nFirstVisibleCol = nNewFirstVisibleCol;
 
-		Invalidate();
-		UpdateCaretPos();
+		invalidate();
+		updateCaretPos();
 	}
 }
 
-void CHexEditCtrl::RecalcScrollBars()
+void CHexEditCtrl::recalcScrollBars()
 {
 	SCROLLINFO si = { sizeof(si) };
 	si.fMask = SIF_ALL;
@@ -1314,103 +1314,103 @@ void CHexEditCtrl::RecalcScrollBars()
     si.nMax = m_nLineCount - 1;
     si.nPage = m_nVisibleLineCount;
 	si.nPos = m_nFirstVisibleLine;
-	SetScrollInfo(SB_VERT, &si);
+	setScrollInfo(SB_VERT, &si);
 
 	si.nMin = 0;
     si.nMax = m_nSpaceCol - 1;
     si.nPage = m_nVisibleColCount;
     si.nPos = m_nFirstVisibleCol;
-	SetScrollInfo(SB_HORZ, &si);
+	setScrollInfo(SB_HORZ, &si);
 }
 
-void CHexEditCtrl::RecalcLayout()
+void CHexEditCtrl::recalcLayout()
 {
 	RECT rctClient;
-	GetClientRect(&rctClient);
+	getClientRect(&rctClient);
 
-	m_nVisibleLineCount = rctClient.bottom / m_CharSize.cy;
-	m_nVisibleColCount = rctClient.right / m_CharSize.cx;
+	m_nVisibleLineCount = rctClient.bottom / m_charSize.cy;
+	m_nVisibleColCount = rctClient.right / m_charSize.cx;
 
-	FixupFirstVisibleLineCol();	
+	fixupFirstVisibleLineCol();	
 
-	RecalcScrollBars();
+	recalcScrollBars();
 }
 
-LRESULT CHexEditCtrl::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	SetBytesPerLineImpl(8);
+	setBytesPerLineImpl(8);
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnGetDlgCode(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onGetDlgCode(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	return DLGC_WANTTAB | DLGC_WANTARROWS | DLGC_WANTCHARS;
 }
 
-LRESULT CHexEditCtrl::OnPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	PAINTSTRUCT ps;
-	HDC hdc = BeginPaint(&ps);
+	HDC hdc = beginPaint(&ps);
 
-	int nResult = GetClipRgn(hdc, m_hUpdateRgn);
+	int nResult = getClipRgn(hdc, m_hUpdateRgn);
 
 	if (nResult == NULLREGION)
 	{
-		EndPaint(&ps);
+		endPaint(&ps);
 		return 0;
 	}
 
-	BYTE Buffer[sizeof(RGNDATA) + 2 * sizeof(RECT)];
-	RGNDATA* pRgnData = (RGNDATA*) Buffer;
-	RECT* pRects = (RECT*) pRgnData->Buffer;
+	BYTE buffer[sizeof(RGNDATA) + 2 * sizeof(RECT)];
+	RGNDATA* rgnData = (RGNDATA*) buffer;
+	RECT* rects = (RECT*) rgnData->Buffer;
 
-	HFONT hOldFont = (HFONT) SelectObject(hdc, m_hFont);
+	HFONT hOldFont = (HFONT) selectObject(hdc, m_hFont);
 
-	nResult = GetRegionData(m_hUpdateRgn, sizeof(Buffer), pRgnData);
-	if (!nResult || pRgnData->rdh.nCount != 2) // not enough
+	nResult = getRegionData(m_hUpdateRgn, sizeof(buffer), rgnData);
+	if (!nResult || rgnData->rdh.nCount != 2) // not enough
 	{
-		PaintRect(hdc, ps.rcPaint);
+		paintRect(hdc, ps.rcPaint);
 	}
 	else
 	{
-		PaintRect(hdc, pRects[0]);
-		PaintRect(hdc, pRects[1]);
+		paintRect(hdc, rects[0]);
+		paintRect(hdc, rects[1]);
 	}
 
-	SelectObject(hdc, hOldFont);
+	selectObject(hdc, hOldFont);
 
-	EndPaint(&ps);
+	endPaint(&ps);
 	return 0;
 }
 
 /*
 
-LRESULT CHexEditCtrl::OnPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	int nResult = GetUpdateRgn(m_hUpdateRgn);
+	int nResult = getUpdateRgn(m_hUpdateRgn);
 
 	PAINTSTRUCT ps;
 	if (nResult == NULLREGION)
 	{
-		BeginPaint(&ps);
-		EndPaint(&ps);
+		beginPaint(&ps);
+		endPaint(&ps);
 		return 0;
 	}
 
-	BYTE Buffer[sizeof(RGNDATA) + 2 * sizeof(RECT)];
-	RGNDATA* pRgnData = (RGNDATA*) Buffer;
-	RECT* pRects = (RECT*) pRgnData->Buffer;
+	BYTE buffer[sizeof(RGNDATA) + 2 * sizeof(RECT)];
+	RGNDATA* rgnData = (RGNDATA*) buffer;
+	RECT* rects = (RECT*) rgnData->Buffer;
 	UINT nCount = 0;
 
-	nResult = GetRegionData(m_hUpdateRgn, sizeof(Buffer), pRgnData);
-	if (nResult == 0 || nResult > sizeof(Buffer)) // not enough
+	nResult = getRegionData(m_hUpdateRgn, sizeof(buffer), rgnData);
+	if (nResult == 0 || nResult > sizeof(buffer)) // not enough
 	{
-		GetUpdateRect(&pRects[0]);
+		getUpdateRect(&rects[0]);
 		nCount = 1;
 	}
-	else if (pRgnData->rdh.nCount != 2)
+	else if (rgnData->rdh.nCount != 2)
 	{
-		pRects[0] = pRgnData->rdh.rcBound;
+		rects[0] = rgnData->rdh.rcBound;
 		nCount = 1;
 	}
 	else
@@ -1418,13 +1418,13 @@ LRESULT CHexEditCtrl::OnPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 		nCount = 2;
 	}
 
-	HDC hdc = BeginPaint(&ps);
+	HDC hdc = beginPaint(&ps);
 
 	for (UINT i = 0; i < nCount; i++)
 	{
 #ifdef _HEXEDIT_USE_OFFSCREEN_BUFFER
-		Paint(m_hOffscreenDC, pRects[i]);
-		BitBlt(
+		paint(m_hOffscreenDC, rects[i]);
+		bitBlt(
 			hdc, 
 			ps.rcPaint.left, ps.rcPaint.top, 
 			ps.rcPaint.right - ps.rcPaint.left, 
@@ -1434,75 +1434,75 @@ LRESULT CHexEditCtrl::OnPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 			SRCCOPY
 			);
 #else
-		Paint(hdc, pRects[i]); // paint direct
+		paint(hdc, rects[i]); // paint direct
 #endif
 	}
 
 #ifdef _HEXEDIT_SHOW_ACTUAL_REPAINT_AREAS 
-	int y = m_ClientSize.cy / 2;
+	int y = m_clientSize.cy / 2;
 
-	SetViewportOrgEx(hdc, 0, y, NULL);
+	setViewportOrgEx(hdc, 0, y, NULL);
 
-	RECT rct = { 0, 0, m_ClientSize.cx, y }; 
-	FillRect(hdc, &rct, (HBRUSH) GetStockObject(GRAY_BRUSH));
+	RECT rct = { 0, 0, m_clientSize.cx, y }; 
+	fillRect(hdc, &rct, (HBRUSH) getStockObject(GRAY_BRUSH));
 
 	for (UINT i = 0; i < nCount; i++)
-		Paint(hdc, pRects[i]); // paint direct
+		paint(hdc, rects[i]); // paint direct
 #endif
 
-	EndPaint(&ps);
+	endPaint(&ps);
 	return 0;
 }
 
 */
 
-LRESULT CHexEditCtrl::OnSetFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onSetFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	UpdateCaret();
+	updateCaret();
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnKillFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onKillFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	Finalize4Bits();
-	DestroyCaret();
+	finalize4Bits();
+	destroyCaret();
 	return 0;
 }
 
-int CHexEditCtrl::AutoAdjustBytesPerLine()
+int CHexEditCtrl::autoAdjustBytesPerLine()
 {
 	static int _BytesPerLine[] = { 32, 16, 8, 4 };
 
-	int nDelta = m_OffsetWidth + 1;
+	int nDelta = m_offsetWidth + 1;
 
 	for (int i = 0; i < sizeof(_BytesPerLine) / sizeof(_BytesPerLine[0]); i++)
 		if (m_nVisibleColCount >= _BytesPerLine[i] * 4 + nDelta)
 		{
-			SetBytesPerLineImpl(_BytesPerLine[i]);
+			setBytesPerLineImpl(_BytesPerLine[i]);
 			return _BytesPerLine[i];
 		}
 
-	SetBytesPerLineImpl(2);
+	setBytesPerLineImpl(2);
 	return 2;
 }
 
-LRESULT CHexEditCtrl::OnSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {	
-	RecalcLayout();
+	recalcLayout();
 
 	if (m_bAutoAdjustBytesPerLine)
-		AutoAdjustBytesPerLine();
+		autoAdjustBytesPerLine();
 
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	int nBar = nMsg == WM_VSCROLL ? SB_VERT : SB_HORZ;
 
 	SCROLLINFO si = { sizeof(si) };
 	si.fMask = SIF_ALL;
-	GetScrollInfo(nBar, &si);
+	getScrollInfo(nBar, &si);
 
 	int nNewPos = si.nPos;
 	
@@ -1555,16 +1555,16 @@ LRESULT CHexEditCtrl::OnScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 
 		si.fMask = SIF_POS;
 		si.nPos = nNewPos;
-		SetScrollInfo(nBar, &si);
+		setScrollInfo(nBar, &si);
 
-		Invalidate();
-		UpdateCaretPos();
+		invalidate();
+		updateCaretPos();
 	}
 
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	SHORT zDelta = HIWORD(wParam);
 
@@ -1585,25 +1585,25 @@ LRESULT CHexEditCtrl::OnMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 	nLineCount *= m_nMouseWheelSpeed;
 	
 	for (int i = 0; i < nLineCount; i++)
-		OnScroll(WM_VSCROLL, wParamScroll, 0, bHandled);
+		onScroll(WM_VSCROLL, wParamScroll, 0, bHandled);
 
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	POINT pt = { (SHORT) LOWORD(lParam), (SHORT) HIWORD(lParam) };
-	CURSOR_POS pos = CursorPosFromMousePos(pt);
-	BOOL bShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+	CURSOR_POS pos = cursorPosFromMousePos(pt);
+	BOOL bShift = (getAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
 
-	SetFocus();
-	SetCapture();
-	SetCursorPos(pos, bShift);
+	setFocus();
+	setCapture();
+	setCursorPos(pos, bShift);
 
 	if (!bShift)
 	{
 		m_bSelecting = TRUE;
-		m_SelStart = m_SelEnd = m_CursorPos;
+		m_selStart = m_selEnd = m_cursorPos;
 	}
 
 	m_bDragging = TRUE;
@@ -1611,46 +1611,46 @@ LRESULT CHexEditCtrl::OnLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnLButtonUp(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onLButtonUp(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_bDragging = FALSE;
-	ReleaseCapture();
+	releaseCapture();
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnCaptureChanged(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onCaptureChanged(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	m_bDragging = FALSE;
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnMouseMove(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onMouseMove(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if (!m_bDragging)
 		return 0;
 
 	POINT pt = { (SHORT) LOWORD(lParam), (SHORT) HIWORD(lParam) };
-	CURSOR_POS pos = CursorPosFromMousePos(pt);
+	CURSOR_POS pos = cursorPosFromMousePos(pt);
 
-	if (m_SelStart.m_Location < CURSOR_ASCII_0 && pos.m_Location >= CURSOR_ASCII_0)
+	if (m_selStart.m_location < CURSOR_ASCII_0 && pos.m_location >= CURSOR_ASCII_0)
 	{
 		pos.m_nOffset += m_nBytesPerLine - pos.m_nOffset % m_nBytesPerLine - 1;
-		pos.m_Location = CURSOR_HEX_2;
+		pos.m_location = CURSOR_HEX_2;
 	}
-	else if (m_SelStart.m_Location >= CURSOR_ASCII_0 && pos.m_Location < CURSOR_ASCII_0)
+	else if (m_selStart.m_location >= CURSOR_ASCII_0 && pos.m_location < CURSOR_ASCII_0)
 	{
 		pos.m_nOffset -= pos.m_nOffset % m_nBytesPerLine;
-		pos.m_Location = CURSOR_ASCII_0;
+		pos.m_location = CURSOR_ASCII_0;
 	}
 
-	SetCursorPos(pos, MCF_SELECT);
+	setCursorPos(pos, MCF_SELECT);
 
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnSysKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onSysKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	BOOL bAlt = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
+	BOOL bAlt = (getAsyncKeyState(VK_MENU) & 0x8000) != 0;
 
 	switch (wParam)
 	{
@@ -1658,7 +1658,7 @@ LRESULT CHexEditCtrl::OnSysKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 		if (bAlt)
 		{
 			m_bIgnoreBackspace = TRUE;
-			Undo();
+			undo();
 		};
 		break;
 
@@ -1671,69 +1671,69 @@ LRESULT CHexEditCtrl::OnSysKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 	return 0;
 }
 
-LRESULT CHexEditCtrl::OnKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	BOOL bShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
-	BOOL bCtrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+	BOOL bShift = (getAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+	BOOL bCtrl = (getAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
 
 	switch (wParam)
 	{
 	case VK_TAB:
 		m_bIgnoreTab = TRUE;
-		OnKeyTab();
+		onKeyTab();
 		break;
 
 	case VK_LEFT:
-		OnKeyLeft(bShift, bCtrl);
+		onKeyLeft(bShift, bCtrl);
 		break;
 
 	case VK_RIGHT:
-		OnKeyRight(bShift, bCtrl);
+		onKeyRight(bShift, bCtrl);
 		break;
 
 	case VK_UP:
-		OnKeyUp(bShift, bCtrl);
+		onKeyUp(bShift, bCtrl);
 		break;
 
 	case VK_DOWN:
-		OnKeyDown(bShift, bCtrl);
+		onKeyDown(bShift, bCtrl);
 		break;
 
 	case VK_PRIOR:
-		OnKeyPageUp(bShift, bCtrl);
+		onKeyPageUp(bShift, bCtrl);
 		break;
 
 	case VK_NEXT:
-		OnKeyPageDown(bShift, bCtrl);
+		onKeyPageDown(bShift, bCtrl);
 		break;
 
 	case VK_HOME:
-		OnKeyHome(bShift, bCtrl);
+		onKeyHome(bShift, bCtrl);
 		break;
 
 	case VK_END:
-		OnKeyEnd(bShift, bCtrl);
+		onKeyEnd(bShift, bCtrl);
 		break;
 
 	case VK_DELETE:
 		if (bShift)
-			Cut();
+			cut();
 		else
-			OnKeyDelete();
+			onKeyDelete();
 		break;
 
 	case VK_BACK:
 		m_bIgnoreBackspace = TRUE;
-		OnKeyBackspace();
+		onKeyBackspace();
 		break;
 
 	case VK_INSERT:
 		if (bCtrl)
-			Copy();
+			copy();
 		else if (bShift)
-			Paste();
+			paste();
 		else
-			SetOverwriteMode(!m_bOverwriteMode);
+			setOverwriteMode(!m_bOverwriteMode);
 
 		break;
 	};
@@ -1741,7 +1741,7 @@ LRESULT CHexEditCtrl::OnKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 	return 0;
 }
 
-void CHexEditCtrl::OnKeyTab()
+void CHexEditCtrl::onKeyTab()
 {
 	static BYTE _TransitionTable[] = 
 	{
@@ -1753,17 +1753,17 @@ void CHexEditCtrl::OnKeyTab()
 		CURSOR_HEX_2, // from CURSOR_ASCII_1
 	};
 	
-	BYTE NewLocation = _TransitionTable[m_CursorPos.m_Location];
-	TransitCursor(0, NewLocation, MCF_KEEP_SELECTION);
+	BYTE newLocation = _TransitionTable[m_cursorPos.m_location];
+	transitCursor(0, newLocation, MCF_KEEP_SELECTION);
 }
 
-void CHexEditCtrl::OnKeyLeft(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyLeft(BOOL bShift, BOOL bCtrl)
 {
 	// begin of ASCII line -- special case
-	if (m_CursorPos.m_Location == CURSOR_ASCII_0 && 
-		m_CursorPos.m_nOffset % m_nBytesPerLine == 0)
+	if (m_cursorPos.m_location == CURSOR_ASCII_0 && 
+		m_cursorPos.m_nOffset % m_nBytesPerLine == 0)
 	{
-		TransitCursor(-1, CURSOR_ASCII_1, bShift ? MCF_SELECT : 0);
+		transitCursor(-1, CURSOR_ASCII_1, bShift ? MCF_SELECT : 0);
 		return;
 	}
 
@@ -1777,21 +1777,21 @@ void CHexEditCtrl::OnKeyLeft(BOOL bShift, BOOL bCtrl)
 		{ 0,  CURSOR_ASCII_0 }, // from CURSOR_ASCII_1
 	};
 
-	CURSOR_TRANSITION Transition = _TransitionTable[m_CursorPos.m_Location];
+	CURSOR_TRANSITION transition = _TransitionTable[m_cursorPos.m_location];
 
-	if (m_bOverwriteMode && Transition.m_NewLocation == CURSOR_HEX_2)
-		Transition.m_NewLocation = CURSOR_HEX_1;
+	if (m_bOverwriteMode && transition.m_newLocation == CURSOR_HEX_2)
+		transition.m_newLocation = CURSOR_HEX_1;
 
-	TransitCursor(&Transition, bShift ? MCF_SELECT : 0);
+	transitCursor(&transition, bShift ? MCF_SELECT : 0);
 }
 
-void CHexEditCtrl::OnKeyRight(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyRight(BOOL bShift, BOOL bCtrl)
 {
 	// end of ASCII line -- special case
-	if (m_CursorPos.m_Location == CURSOR_ASCII_1 && 
-		m_CursorPos.m_nOffset % m_nBytesPerLine == m_nBytesPerLine - 1)
+	if (m_cursorPos.m_location == CURSOR_ASCII_1 && 
+		m_cursorPos.m_nOffset % m_nBytesPerLine == m_nBytesPerLine - 1)
 	{
-		TransitCursor(1, CURSOR_ASCII_0, bShift ? MCF_SELECT : 0);
+		transitCursor(1, CURSOR_ASCII_0, bShift ? MCF_SELECT : 0);
 		return;
 	}
 
@@ -1805,165 +1805,165 @@ void CHexEditCtrl::OnKeyRight(BOOL bShift, BOOL bCtrl)
 		{ 1, CURSOR_ASCII_1 }, // from CURSOR_ASCII_1
 	};
 
-	CURSOR_TRANSITION Transition = _TransitionTable[m_CursorPos.m_Location];
+	CURSOR_TRANSITION transition = _TransitionTable[m_cursorPos.m_location];
 
 	if (m_bOverwriteMode)
 	{
-		if (Transition.m_NewLocation == CURSOR_ASCII_1)
+		if (transition.m_newLocation == CURSOR_ASCII_1)
 		{
-			Transition.m_NewLocation = CURSOR_ASCII_0;
-			Transition.m_nOffsetDelta = 1;
+			transition.m_newLocation = CURSOR_ASCII_0;
+			transition.m_nOffsetDelta = 1;
 		}
-		else if (Transition.m_NewLocation == CURSOR_HEX_2)
+		else if (transition.m_newLocation == CURSOR_HEX_2)
 		{
-			Transition.m_NewLocation = CURSOR_HEX_0;
-			Transition.m_nOffsetDelta = 1;
+			transition.m_newLocation = CURSOR_HEX_0;
+			transition.m_nOffsetDelta = 1;
 		}
 	}
 
-	TransitCursor(&Transition, bShift ? MCF_SELECT : 0);
+	transitCursor(&transition, bShift ? MCF_SELECT : 0);
 }
 
-void CHexEditCtrl::OnKeyUp(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyUp(BOOL bShift, BOOL bCtrl)
 {
-	int Flags = bShift ? MCF_SELECT : 0;
-	TransitCursor(-m_nBytesPerLine, -1, Flags);
+	int flags = bShift ? MCF_SELECT : 0;
+	transitCursor(-m_nBytesPerLine, -1, flags);
 }
 
-void CHexEditCtrl::OnKeyDown(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyDown(BOOL bShift, BOOL bCtrl)
 {
-	int Flags = bShift ? MCF_SELECT : 0;
-	TransitCursor(m_nBytesPerLine, -1, Flags);
+	int flags = bShift ? MCF_SELECT : 0;
+	transitCursor(m_nBytesPerLine, -1, flags);
 }
 
-void CHexEditCtrl::OnKeyPageUp(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyPageUp(BOOL bShift, BOOL bCtrl)
 {
-	int Flags = bShift ? MCF_SELECT : 0;
+	int flags = bShift ? MCF_SELECT : 0;
 	
 	if (!bCtrl)
 	{
-		TransitCursor(-m_nVisibleLineCount * m_nBytesPerLine, -1, Flags);
+		transitCursor(-m_nVisibleLineCount * m_nBytesPerLine, -1, flags);
 	}
 	else
 	{
 		int nLine, nCol;
-		GetCursorLineCol(m_CursorPos, nLine, nCol, FALSE);
+		getCursorLineCol(m_cursorPos, nLine, nCol, FALSE);
 		nLine -= m_nFirstVisibleLine;
 
-		TransitCursor(-nLine * m_nBytesPerLine, -1, Flags);
+		transitCursor(-nLine * m_nBytesPerLine, -1, flags);
 	}
 }
 
 
-void CHexEditCtrl::OnKeyPageDown(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyPageDown(BOOL bShift, BOOL bCtrl)
 {
-	int Flags = bShift ? MCF_SELECT : 0;
+	int flags = bShift ? MCF_SELECT : 0;
 	
 	if (!bCtrl)
 	{
-		TransitCursor(m_nVisibleLineCount * m_nBytesPerLine, -1, Flags);
+		transitCursor(m_nVisibleLineCount * m_nBytesPerLine, -1, flags);
 	}
 	else if (m_nVisibleLineCount > 1)
 	{		
 		int nLine, nCol;
-		GetCursorLineCol(m_CursorPos, nLine, nCol, FALSE);
+		getCursorLineCol(m_cursorPos, nLine, nCol, FALSE);
 		nLine -= m_nFirstVisibleLine;
 
-		TransitCursor((m_nVisibleLineCount - nLine - 1) * m_nBytesPerLine, -1, Flags);
+		transitCursor((m_nVisibleLineCount - nLine - 1) * m_nBytesPerLine, -1, flags);
 	}
 }
 
-void CHexEditCtrl::OnKeyHome(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyHome(BOOL bShift, BOOL bCtrl)
 {
-	int Flags = bShift ? MCF_SELECT : 0;
-	int Location = m_CursorPos.m_Location >= CURSOR_ASCII_0 ? CURSOR_ASCII_0 : CURSOR_HEX_0;
+	int flags = bShift ? MCF_SELECT : 0;
+	int location = m_cursorPos.m_location >= CURSOR_ASCII_0 ? CURSOR_ASCII_0 : CURSOR_HEX_0;
 
 	if (bCtrl)
 	{
-		CURSOR_POS Pos;
-		Pos.m_nOffset = 0;
-		Pos.m_Location = Location;
-		SetCursorPos(Pos, Flags);
+		CURSOR_POS pos;
+		pos.m_nOffset = 0;
+		pos.m_location = location;
+		setCursorPos(pos, flags);
 	}
 	else
 	{
-		int nDelta = (int) m_CursorPos.m_nOffset % m_nBytesPerLine;
-		TransitCursor(-nDelta, Location, Flags);
+		int nDelta = (int) m_cursorPos.m_nOffset % m_nBytesPerLine;
+		transitCursor(-nDelta, location, flags);
 	}
 }
 
-void CHexEditCtrl::OnKeyEnd(BOOL bShift, BOOL bCtrl)
+void CHexEditCtrl::onKeyEnd(BOOL bShift, BOOL bCtrl)
 {
-	int Flags = bShift ? MCF_SELECT : 0;
-	int Location = m_CursorPos.m_Location >= CURSOR_ASCII_0 ? CURSOR_ASCII_1 : CURSOR_HEX_2;
+	int flags = bShift ? MCF_SELECT : 0;
+	int location = m_cursorPos.m_location >= CURSOR_ASCII_0 ? CURSOR_ASCII_1 : CURSOR_HEX_2;
 
 	if (bCtrl)
 	{
-		CURSOR_POS Pos;
-		Pos.m_nOffset = (int) m_nDataSize - 1;
-		Pos.m_Location = Location;
-		SetCursorPos(Pos, Flags);
+		CURSOR_POS pos;
+		pos.m_nOffset = (int) m_nDataSize - 1;
+		pos.m_location = location;
+		setCursorPos(pos, flags);
 	}
 	else
 	{
-		int nDelta = m_nBytesPerLine - (int) m_CursorPos.m_nOffset % m_nBytesPerLine - 1;
-		TransitCursor(nDelta, Location, Flags);
+		int nDelta = m_nBytesPerLine - (int) m_cursorPos.m_nOffset % m_nBytesPerLine - 1;
+		transitCursor(nDelta, location, flags);
 	}
 }
 
-void CHexEditCtrl::OnKeyDelete()
+void CHexEditCtrl::onKeyDelete()
 {
-	if (!m_Selection.IsEmpty())
+	if (!m_selection.isEmpty())
 	{
-		ReplaceSelection(NULL, 0);
+		replaceSelection(NULL, 0);
 		return;
 	}
 
-	switch (m_CursorPos.m_Location)
+	switch (m_cursorPos.m_location)
 	{
 	case CURSOR_ASCII_0:
-		if (m_CursorPos.m_nOffset >= (int) m_nDataSize)
+		if (m_cursorPos.m_nOffset >= (int) m_nDataSize)
 			break;
 
-		BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-		InsertDeleteData(m_CursorPos.m_nOffset, 0, 1);		
-		EndUndoableTransaction(0);
+		beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+		insertDeleteData(m_cursorPos.m_nOffset, 0, 1);		
+		endUndoableTransaction(0);
 
 		break;
 
 	case CURSOR_ASCII_1:
 		{
-		SIZE_T nOffset = m_CursorPos.m_nOffset + 1;
+		SIZE_T nOffset = m_cursorPos.m_nOffset + 1;
 		if (nOffset >= m_nDataSize)
 			break;
 
-		BeginUndoableTransaction(nOffset, 1);
-		InsertDeleteData(nOffset, 0, 1);
-		EndUndoableTransaction(0);
+		beginUndoableTransaction(nOffset, 1);
+		insertDeleteData(nOffset, 0, 1);
+		endUndoableTransaction(0);
 		}
 		break;
 
 	case CURSOR_HEX_0:
 		{
-		if (m_CursorPos.m_nOffset >= (LONG) m_nDataSize)
+		if (m_cursorPos.m_nOffset >= (LONG) m_nDataSize)
 			break;
 
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
+		DATA* data = m_data + m_cursorPos.m_nOffset;
 
-		if (pData->m_Flags & DF_4_BITS)
+		if (data->m_flags & DF_4_BITS)
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-			InsertDeleteData(m_CursorPos.m_nOffset, 0, 1);
-			EndUndoableTransaction(0);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+			insertDeleteData(m_cursorPos.m_nOffset, 0, 1);
+			endUndoableTransaction(0);
 		}
 		else
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-			pData->m_Data &= 0xf;
-			pData->m_Flags |= DF_4_BITS | DF_MODIFIED;
-			SetModified();
-			InvalidateOffset(m_CursorPos.m_nOffset);
-			EndUndoableTransaction(1);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+			data->m_data &= 0xf;
+			data->m_flags |= DF_4_BITS | DF_MODIFIED;
+			setModified();
+			invalidateOffset(m_cursorPos.m_nOffset);
+			endUndoableTransaction(1);
 		}
 
 		}
@@ -1971,96 +1971,96 @@ void CHexEditCtrl::OnKeyDelete()
 
 	case CURSOR_HEX_1:
 		{
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
+		DATA* data = m_data + m_cursorPos.m_nOffset;
 
-		if (pData->m_Flags & DF_4_BITS)
+		if (data->m_flags & DF_4_BITS)
 		{
-			if (m_CursorPos.m_nOffset >= (LONG) m_nDataSize -1)
+			if (m_cursorPos.m_nOffset >= (LONG) m_nDataSize -1)
 				break;
 
-			OnKeyRight(FALSE, FALSE);
-			OnKeyDelete();
+			onKeyRight(FALSE, FALSE);
+			onKeyDelete();
 		}
 		else
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-			pData->m_Data >>= 4;
-			pData->m_Data &= 0xf;
-			pData->m_Flags |= DF_4_BITS | DF_MODIFIED;
-			SetModified();
-			InvalidateOffset(m_CursorPos.m_nOffset);
-			EndUndoableTransaction(1);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+			data->m_data >>= 4;
+			data->m_data &= 0xf;
+			data->m_flags |= DF_4_BITS | DF_MODIFIED;
+			setModified();
+			invalidateOffset(m_cursorPos.m_nOffset);
+			endUndoableTransaction(1);
 		}
 		}
 		break;
 
 	case CURSOR_HEX_2:
-		if (m_CursorPos.m_nOffset >= (LONG) m_nDataSize -1)
+		if (m_cursorPos.m_nOffset >= (LONG) m_nDataSize -1)
 			break;
 
-		OnKeyRight(FALSE, FALSE);
-		OnKeyDelete();
+		onKeyRight(FALSE, FALSE);
+		onKeyDelete();
 		break;
 	}
 }
 
-void CHexEditCtrl::OnKeyBackspace()
+void CHexEditCtrl::onKeyBackspace()
 {
-	if (!m_Selection.IsEmpty())
+	if (!m_selection.isEmpty())
 	{
-		ReplaceSelection(NULL, 0);
+		replaceSelection(NULL, 0);
 		return;
 	}
 
-	switch (m_CursorPos.m_Location)
+	switch (m_cursorPos.m_location)
 	{
 	case CURSOR_ASCII_0:
-		if (m_CursorPos.m_nOffset == 0)
+		if (m_cursorPos.m_nOffset == 0)
 			break;
 
-		BeginUndoableTransaction(m_CursorPos.m_nOffset - 1, 1);
-		InsertDeleteData(m_CursorPos.m_nOffset - 1, 0, 1);
-		TransitCursor(-1, -1);
-		EndUndoableTransaction(0);
+		beginUndoableTransaction(m_cursorPos.m_nOffset - 1, 1);
+		insertDeleteData(m_cursorPos.m_nOffset - 1, 0, 1);
+		transitCursor(-1, -1);
+		endUndoableTransaction(0);
 
 		break;
 
 	case CURSOR_ASCII_1:
-		BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-		InsertDeleteData(m_CursorPos.m_nOffset, 0, 1);
-		TransitCursor(-1, -1);
-		EndUndoableTransaction(0);
+		beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+		insertDeleteData(m_cursorPos.m_nOffset, 0, 1);
+		transitCursor(-1, -1);
+		endUndoableTransaction(0);
 
 		break;
 
 	case CURSOR_HEX_0:
-		if (m_CursorPos.m_nOffset == 0)
+		if (m_cursorPos.m_nOffset == 0)
 			break;
 
-		OnKeyLeft(FALSE, FALSE);
-		OnKeyBackspace();
+		onKeyLeft(FALSE, FALSE);
+		onKeyBackspace();
 		break;
 
 	case CURSOR_HEX_1:
 		{
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
+		DATA* data = m_data + m_cursorPos.m_nOffset;
 		
-		if (pData->m_Flags & DF_4_BITS)
+		if (data->m_flags & DF_4_BITS)
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-			InsertDeleteData(m_CursorPos.m_nOffset, 0, 1);
-			TransitCursor(-1, CURSOR_HEX_2);
-			EndUndoableTransaction(0);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+			insertDeleteData(m_cursorPos.m_nOffset, 0, 1);
+			transitCursor(-1, CURSOR_HEX_2);
+			endUndoableTransaction(0);
 		}
 		else
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-			pData->m_Data &= 0xf;
-			pData->m_Flags |= DF_4_BITS | DF_MODIFIED;
-			SetModified();
-			InvalidateOffset(m_CursorPos.m_nOffset);
-			TransitCursor(0, CURSOR_HEX_0);
-			EndUndoableTransaction(1);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+			data->m_data &= 0xf;
+			data->m_flags |= DF_4_BITS | DF_MODIFIED;
+			setModified();
+			invalidateOffset(m_cursorPos.m_nOffset);
+			transitCursor(0, CURSOR_HEX_0);
+			endUndoableTransaction(1);
 		}
 
 		}
@@ -2068,23 +2068,23 @@ void CHexEditCtrl::OnKeyBackspace()
 
 	case CURSOR_HEX_2:
 		{
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
+		DATA* data = m_data + m_cursorPos.m_nOffset;
 
-		BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
-		pData->m_Data >>= 4;
-		pData->m_Data &= 0xf;
-		pData->m_Flags |= DF_4_BITS | DF_MODIFIED;
-		SetModified();
-		InvalidateOffset(m_CursorPos.m_nOffset);
-		TransitCursor(0, CURSOR_HEX_1);
-		EndUndoableTransaction(1);
+		beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
+		data->m_data >>= 4;
+		data->m_data &= 0xf;
+		data->m_flags |= DF_4_BITS | DF_MODIFIED;
+		setModified();
+		invalidateOffset(m_cursorPos.m_nOffset);
+		transitCursor(0, CURSOR_HEX_1);
+		endUndoableTransaction(1);
 		}
 		break;
 		
 	}
 }
 
-static int GetHex(CHAR ch)
+static int getHex(CHAR ch)
 {
 	if (ch >= '0' && ch <= '9')
 		return ch - '0';
@@ -2098,31 +2098,31 @@ static int GetHex(CHAR ch)
 	return -1; // error
 }
 
-void CHexEditCtrl::ModifyData(DATA* pData, BYTE Data, BOOL b4Bits)
+void CHexEditCtrl::modifyData(DATA* data, BYTE data, BOOL b4Bits)
 {
-	pData->m_Data = Data;
+	data->m_data = data;
 	if (b4Bits)
-		pData->m_Flags |= DF_4_BITS;
+		data->m_flags |= DF_4_BITS;
 	else
-		pData->m_Flags &= ~DF_4_BITS;
+		data->m_flags &= ~DF_4_BITS;
 
-	pData->m_Flags |= DF_MODIFIED;
-	SetModified();
-	InvalidateData(pData);
+	data->m_flags |= DF_MODIFIED;
+	setModified();
+	invalidateData(data);
 }
 
-void CHexEditCtrl::SelectAll()
+void CHexEditCtrl::selectAll()
 {
 	m_bSelecting = TRUE;
-	m_SelStart.m_nOffset = 0;
-	m_SelStart.m_Location = m_CursorPos.m_Location >= CURSOR_ASCII_0 ? CURSOR_ASCII_0 : CURSOR_HEX_0;
+	m_selStart.m_nOffset = 0;
+	m_selStart.m_location = m_cursorPos.m_location >= CURSOR_ASCII_0 ? CURSOR_ASCII_0 : CURSOR_HEX_0;
 	
-	CURSOR_POS Pos;
-	Pos.m_nOffset = (int) m_nDataSize;
-	SetCursorPos(Pos, MCF_SELECT | MCF_FORCE);
+	CURSOR_POS pos;
+	pos.m_nOffset = (int) m_nDataSize;
+	setCursorPos(pos, MCF_SELECT | MCF_FORCE);
 }
 
-LRESULT CHexEditCtrl::OnChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CHexEditCtrl::onChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	CHAR ch = (CHAR) wParam;
 
@@ -2141,191 +2141,191 @@ LRESULT CHexEditCtrl::OnChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	switch (ch)
 	{
 	case 1 + 'C' - 'A':
-		Copy();
+		copy();
 		return 0;
 
 	case 1 + 'V' - 'A':
-		Paste();
+		paste();
 		return 0;
 
 	case 1 + 'X' - 'A':
-		Cut();
+		cut();
 		return 0;
 	}
 
-	if (!m_Selection.IsEmpty())
+	if (!m_selection.isEmpty())
 	{
-		if (m_CursorPos.m_Location >= CURSOR_ASCII_0)
+		if (m_cursorPos.m_location >= CURSOR_ASCII_0)
 		{
-			ReplaceSelection(&ch, 1);
+			replaceSelection(&ch, 1);
 			return 0;
 		}
 
-		int x = GetHex(ch);
+		int x = getHex(ch);
 		if (x == -1)
 			return 0;
 
-		ReplaceSelection(&ch, 1, FALSE);
+		replaceSelection(&ch, 1, FALSE);
 
-		BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
+		beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
 
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
-		ModifyData(pData, x, TRUE);
-		TransitCursor(0, CURSOR_HEX_1);
+		DATA* data = m_data + m_cursorPos.m_nOffset;
+		modifyData(data, x, TRUE);
+		transitCursor(0, CURSOR_HEX_1);
 
-		EndUndoableTransaction(1);
+		endUndoableTransaction(1);
 
 		return 0;
 	}
 
-	switch (m_CursorPos.m_Location)
+	switch (m_cursorPos.m_location)
 	{
 	case CURSOR_ASCII_0:
 		{
 
-		BOOL bInsert = !m_bOverwriteMode || m_CursorPos.m_nOffset == (int) m_nDataSize;
+		BOOL bInsert = !m_bOverwriteMode || m_cursorPos.m_nOffset == (int) m_nDataSize;
 
 		if (bInsert)
-			InsertDeleteData(m_CursorPos.m_nOffset, 1, 0);
+			insertDeleteData(m_cursorPos.m_nOffset, 1, 0);
 
-		BeginUndoableTransaction(m_CursorPos.m_nOffset, bInsert ? 0 : 1);
+		beginUndoableTransaction(m_cursorPos.m_nOffset, bInsert ? 0 : 1);
 
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
-		ModifyData(pData, ch);
+		DATA* data = m_data + m_cursorPos.m_nOffset;
+		modifyData(data, ch);
 
-		TransitCursor(1, -1);
+		transitCursor(1, -1);
 		
-		EndUndoableTransaction(1);
+		endUndoableTransaction(1);
 
 		}
 		break;
 
 	case CURSOR_ASCII_1:
 		{
-		SIZE_T nOffset = m_CursorPos.m_nOffset + 1;
+		SIZE_T nOffset = m_cursorPos.m_nOffset + 1;
 		BOOL bInsert = !m_bOverwriteMode || nOffset == m_nDataSize;
 
 		if (bInsert)
-			InsertDeleteData(nOffset, 1, 0);
+			insertDeleteData(nOffset, 1, 0);
 
-		BeginUndoableTransaction(nOffset, bInsert ? 0 : 1);
+		beginUndoableTransaction(nOffset, bInsert ? 0 : 1);
 
-		DATA* pData = m_pData + nOffset;
-		ModifyData(pData, ch);
+		DATA* data = m_data + nOffset;
+		modifyData(data, ch);
 
-		TransitCursor(1, -1);
+		transitCursor(1, -1);
 
-		EndUndoableTransaction(1);
+		endUndoableTransaction(1);
 
 		}
 		break;
 
 	case CURSOR_HEX_0:
 		{
-		int x = GetHex(ch);
+		int x = getHex(ch);
 		if (x == -1)
 			break;
 
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
+		DATA* data = m_data + m_cursorPos.m_nOffset;
 
 		if (m_bOverwriteMode)
 		{
-			ASSERT(pData < m_pDataEnd);
+			ASSERT(data < m_dataEnd);
 
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
 
-			BOOL b4Bits = (pData->m_Flags & DF_4_BITS) != 0;
-			BYTE Value = b4Bits ? (x & 0xf) : ((pData->m_Data & 0xf) | ((x << 4) & 0xf0));
-			ModifyData(pData, Value, b4Bits);
+			BOOL b4Bits = (data->m_flags & DF_4_BITS) != 0;
+			BYTE value = b4Bits ? (x & 0xf) : ((data->m_data & 0xf) | ((x << 4) & 0xf0));
+			modifyData(data, value, b4Bits);
 		}
-		else if (pData < m_pDataEnd && (pData->m_Flags & DF_4_BITS))
+		else if (data < m_dataEnd && (data->m_flags & DF_4_BITS))
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
 
-			BYTE Value = (pData->m_Data & 0xf) | ((x << 4) & 0xf0);
-			ModifyData(pData, Value, FALSE);
+			BYTE value = (data->m_data & 0xf) | ((x << 4) & 0xf0);
+			modifyData(data, value, FALSE);
 		}
 		else
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 0);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 0);
 
-			InsertDeleteData(m_CursorPos.m_nOffset, 1, 0);
+			insertDeleteData(m_cursorPos.m_nOffset, 1, 0);
 
-			pData = m_pData + m_CursorPos.m_nOffset; // cause insert/delete can reallocate
-			ModifyData(pData, x & 0xf, TRUE);
+			data = m_data + m_cursorPos.m_nOffset; // cause insert/delete can reallocate
+			modifyData(data, x & 0xf, TRUE);
 		}
 
-		TransitCursor(0, CURSOR_HEX_1);
-		EndUndoableTransaction(1);
+		transitCursor(0, CURSOR_HEX_1);
+		endUndoableTransaction(1);
 
 		}
 		break;
 
 	case CURSOR_HEX_1:
 		{
-		int x = GetHex(ch);
+		int x = getHex(ch);
 		if (x == -1)
 			break;
 
-		DATA* pData = m_pData + m_CursorPos.m_nOffset;
-		BOOL b4Bits = (pData->m_Flags & DF_4_BITS) != 0;
+		DATA* data = m_data + m_cursorPos.m_nOffset;
+		BOOL b4Bits = (data->m_flags & DF_4_BITS) != 0;
 
 		if (m_bOverwriteMode)
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
 
-			BYTE Value = ((b4Bits ? pData->m_Data << 4 : pData->m_Data) & 0xf0) | (x & 0xf);
-			ModifyData(pData, Value, FALSE);
+			BYTE value = ((b4Bits ? data->m_data << 4 : data->m_data) & 0xf0) | (x & 0xf);
+			modifyData(data, value, FALSE);
 
-			TransitCursor(1, CURSOR_HEX_0);
+			transitCursor(1, CURSOR_HEX_0);
 		}
 		else if (b4Bits)
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 1);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 1);
 
-			BYTE Value = ((b4Bits ? pData->m_Data << 4 : pData->m_Data) & 0xf0) | (x & 0xf);
-			ModifyData(pData, Value, FALSE);
+			BYTE value = ((b4Bits ? data->m_data << 4 : data->m_data) & 0xf0) | (x & 0xf);
+			modifyData(data, value, FALSE);
 
-			TransitCursor(0, CURSOR_HEX_2);
+			transitCursor(0, CURSOR_HEX_2);
 		}
 		else
 		{
-			BeginUndoableTransaction(m_CursorPos.m_nOffset, 0);
+			beginUndoableTransaction(m_cursorPos.m_nOffset, 0);
 
-			InsertDeleteData(m_CursorPos.m_nOffset, 1, 0);
+			insertDeleteData(m_cursorPos.m_nOffset, 1, 0);
 			
-			pData = m_pData + m_CursorPos.m_nOffset; // cause insert/delete can reallocate
-			DATA* pNextData = pData + 1;
+			data = m_data + m_cursorPos.m_nOffset; // cause insert/delete can reallocate
+			DATA* nextData = data + 1;
 	
-			ModifyData(pData, (pNextData->m_Data & 0xf0) | (x & 0xf), FALSE);
-			ModifyData(pNextData, pNextData->m_Data & 0xf, TRUE);
+			modifyData(data, (nextData->m_data & 0xf0) | (x & 0xf), FALSE);
+			modifyData(nextData, nextData->m_data & 0xf, TRUE);
 
-			TransitCursor(1, CURSOR_HEX_0);
+			transitCursor(1, CURSOR_HEX_0);
 		}
 
-		EndUndoableTransaction(1);
+		endUndoableTransaction(1);
 
 		}
 		break;	
 
 	case CURSOR_HEX_2:
 		{
-		int x = GetHex(ch);
+		int x = getHex(ch);
 		if (x == -1)
 			break;
 
-		SIZE_T nOffset = m_CursorPos.m_nOffset + 1;
+		SIZE_T nOffset = m_cursorPos.m_nOffset + 1;
 
-		BeginUndoableTransaction(nOffset, 0);
+		beginUndoableTransaction(nOffset, 0);
 
-		InsertDeleteData(nOffset, 1, 0);
-		DATA* pData = m_pData + nOffset; // cause insert/delete can reallocate
+		insertDeleteData(nOffset, 1, 0);
+		DATA* data = m_data + nOffset; // cause insert/delete can reallocate
 		
-		ModifyData(pData, x & 0xf, TRUE);
+		modifyData(data, x & 0xf, TRUE);
 
-		TransitCursor(1, CURSOR_HEX_1);
+		transitCursor(1, CURSOR_HEX_1);
 
-		EndUndoableTransaction(1);
+		endUndoableTransaction(1);
 
 		}
 		break;	
@@ -2334,253 +2334,253 @@ LRESULT CHexEditCtrl::OnChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	return 0;
 }
 
-BOOL CHexEditCtrl::ReplaceData(SIZE_T nOffset, SIZE_T nDelete, DATA* pData, SIZE_T nSize, BOOL bCursorToEnd)
+BOOL CHexEditCtrl::replaceData(SIZE_T nOffset, SIZE_T nDelete, DATA* data, SIZE_T nSize, BOOL bCursorToEnd)
 {	
-	BOOL bResult = InsertDeleteData(nOffset, nSize, nDelete);
+	BOOL bResult = insertDeleteData(nOffset, nSize, nDelete);
 	if (!bResult)
 		return FALSE;
 
-	memcpy(m_pData + nOffset, pData, nSize * sizeof(DATA));
+	memcpy(m_data + nOffset, data, nSize * sizeof(DATA));
 
-	SetModified();
+	setModified();
 
 	SIZE_T nInvalidateSize = max(nDelete, nSize);
 	ASSERT(nInvalidateSize);
 
-	InvalidateRange(nOffset, nOffset + nInvalidateSize - 1);
+	invalidateRange(nOffset, nOffset + nInvalidateSize - 1);
 
-	CURSOR_POS Pos;
-	Pos.m_nOffset = (int) nOffset; 
+	CURSOR_POS pos;
+	pos.m_nOffset = (int) nOffset; 
 	if (bCursorToEnd)
-		Pos.m_nOffset += (int) nSize;
+		pos.m_nOffset += (int) nSize;
 
-	if (m_CursorPos.m_Location >= CURSOR_ASCII_0)
-		Pos.m_Location = CURSOR_ASCII_0;
+	if (m_cursorPos.m_location >= CURSOR_ASCII_0)
+		pos.m_location = CURSOR_ASCII_0;
 	else
-		Pos.m_Location = CURSOR_HEX_0;
+		pos.m_location = CURSOR_HEX_0;
 
-	SetCursorPos(Pos);
+	setCursorPos(pos);
 
 	return TRUE;
 }
 
 #if (_AXL_VER >= 0x0200)
-void CHexEditCtrl::UndoImpl(axl::obj::TData* _pParams)
+void CHexEditCtrl::undoImpl(axl::obj::TData* _pParams)
 #else
-void CHexEditCtrl::UndoImpl(AXL_PTR* _pParams)
+void CHexEditCtrl::undoImpl(AXL_PTR* _pParams)
 #endif
 {
-	UNDO_PARAMS* pParams = (UNDO_PARAMS*) _pParams->m_p;
-	if (pParams->m_OldData.size())
-		ReplaceData(pParams->m_nOffset, pParams->m_NewData.size(), &pParams->m_OldData.front(), pParams->m_OldData.size(), FALSE);
+	UNDO_PARAMS* params = (UNDO_PARAMS*) _pParams->m_p;
+	if (params->m_oldData.size())
+		replaceData(params->m_nOffset, params->m_newData.size(), &params->m_oldData.front(), params->m_oldData.size(), FALSE);
 	else
-		ReplaceData(pParams->m_nOffset, pParams->m_NewData.size(), NULL, 0, FALSE);
+		replaceData(params->m_nOffset, params->m_newData.size(), NULL, 0, FALSE);
 
-	SetCursorPos(pParams->m_OldCursorPos);
+	setCursorPos(params->m_oldCursorPos);
 }
 
 #if (_AXL_VER >= 0x0200)
-void CHexEditCtrl::RedoImpl(axl::obj::TData* _pParams)
+void CHexEditCtrl::redoImpl(axl::obj::TData* _pParams)
 #else
-void CHexEditCtrl::RedoImpl(AXL_PTR* _pParams)
+void CHexEditCtrl::redoImpl(AXL_PTR* _pParams)
 #endif
 {
-	UNDO_PARAMS* pParams = (UNDO_PARAMS*) _pParams->m_p;
-	if (pParams->m_NewData.size())
-		ReplaceData(pParams->m_nOffset, pParams->m_OldData.size(), &pParams->m_NewData.front(), pParams->m_NewData.size(), FALSE);
+	UNDO_PARAMS* params = (UNDO_PARAMS*) _pParams->m_p;
+	if (params->m_newData.size())
+		replaceData(params->m_nOffset, params->m_oldData.size(), &params->m_newData.front(), params->m_newData.size(), FALSE);
 	else
-		ReplaceData(pParams->m_nOffset, pParams->m_OldData.size(), NULL, 0, FALSE);
+		replaceData(params->m_nOffset, params->m_oldData.size(), NULL, 0, FALSE);
 
-	SetCursorPos(pParams->m_NewCursorPos);
+	setCursorPos(params->m_newCursorPos);
 }
 
-void CHexEditCtrl::BeginUndoableTransaction(SIZE_T nOffset, SIZE_T nOldDataSize)
+void CHexEditCtrl::beginUndoableTransaction(SIZE_T nOffset, SIZE_T nOldDataSize)
 {
-	m_UndoParams.Create(_AXLTAG("replace_sel_undo"));
-	m_UndoParams->m_nOffset = nOffset;
-	m_UndoParams->m_OldCursorPos = m_CursorPos;
+	m_undoParams.create(_AXLTAG("replace_sel_undo"));
+	m_undoParams->m_nOffset = nOffset;
+	m_undoParams->m_oldCursorPos = m_cursorPos;
 
 	if (nOldDataSize)
 	{
-		m_UndoParams->m_OldData.resize(nOldDataSize);
-		memcpy(&m_UndoParams->m_OldData.front(), m_pData + nOffset, nOldDataSize * sizeof(DATA));
+		m_undoParams->m_oldData.resize(nOldDataSize);
+		memcpy(&m_undoParams->m_oldData.front(), m_data + nOffset, nOldDataSize * sizeof(DATA));
 	}
 }
 
-void CHexEditCtrl::EndUndoableTransaction(SIZE_T nNewDataSize)
+void CHexEditCtrl::endUndoableTransaction(SIZE_T nNewDataSize)
 {
-	ASSERT(m_UndoParams->m_nOffset != -1);
+	ASSERT(m_undoParams->m_nOffset != -1);
 
 	if (nNewDataSize)
 	{
-		m_UndoParams->m_NewData.resize(nNewDataSize);
-		memcpy(&m_UndoParams->m_NewData.front(), m_pData + m_UndoParams->m_nOffset, nNewDataSize * sizeof(DATA));
+		m_undoParams->m_newData.resize(nNewDataSize);
+		memcpy(&m_undoParams->m_newData.front(), m_data + m_undoParams->m_nOffset, nNewDataSize * sizeof(DATA));
 	}
 
-	ASSERT(m_UndoParams->m_NewData.size() != 0 || m_UndoParams->m_OldData.size() != 0);
+	ASSERT(m_undoParams->m_newData.size() != 0 || m_undoParams->m_oldData.size() != 0);
 
-	m_UndoParams->m_NewCursorPos = m_CursorPos;
+	m_undoParams->m_newCursorPos = m_cursorPos;
 
 #if (_AXL_VER >= 0x0200)
-	axl::call::CSillyThisCallT<CHexEditCtrl> Undo(this, &CHexEditCtrl::UndoImpl, NULL);
-	axl::call::CSillyThisCallT<CHexEditCtrl> Redo(this, &CHexEditCtrl::RedoImpl, NULL);
+	axl::call::CSillyThisCallT<CHexEditCtrl> undo(this, &CHexEditCtrl::undoImpl, NULL);
+	axl::call::CSillyThisCallT<CHexEditCtrl> redo(this, &CHexEditCtrl::redoImpl, NULL);
 #else
-	axl::CSillyThisCallT<CHexEditCtrl> Undo(this, &CHexEditCtrl::UndoImpl, NULL);
-	axl::CSillyThisCallT<CHexEditCtrl> Redo(this, &CHexEditCtrl::RedoImpl, NULL);
+	axl::CSillyThisCallT<CHexEditCtrl> undo(this, &CHexEditCtrl::undoImpl, NULL);
+	axl::CSillyThisCallT<CHexEditCtrl> redo(this, &CHexEditCtrl::redoImpl, NULL);
 #endif
 
-	m_UndoRedo.AddUndoableAction(Undo, Redo, m_UndoParams, m_UndoParams->m_OldData.size() + m_UndoParams->m_NewData.size());
-	m_UndoParams = NULL;
+	m_undoRedo.addUndoableAction(undo, redo, m_undoParams, m_undoParams->m_oldData.size() + m_undoParams->m_newData.size());
+	m_undoParams = NULL;
 }
 
-BOOL CHexEditCtrl::ReplaceSelection(PVOID pvData, SIZE_T nSize, BOOL bCursorToEnd)
+BOOL CHexEditCtrl::replaceSelection(PVOID pvData, SIZE_T nSize, BOOL bCursorToEnd)
 { 
 	SIZE_T nOffset;
 	SIZE_T nDelete; 
 	
-	if (m_Selection.m_nStartOffset != m_Selection.m_nEndOffset)
+	if (m_selection.m_nStartOffset != m_selection.m_nEndOffset)
 	{
-		nOffset = m_Selection.m_nStartOffset;
-		nDelete = m_Selection.m_nEndOffset - m_Selection.m_nStartOffset;
+		nOffset = m_selection.m_nStartOffset;
+		nDelete = m_selection.m_nEndOffset - m_selection.m_nStartOffset;
 	}
 	else
 	{
-		nOffset = m_CursorPos.m_nOffset;
-		if (m_CursorPos.m_Location != CURSOR_ASCII_0 && m_CursorPos.m_Location != CURSOR_HEX_0 )
+		nOffset = m_cursorPos.m_nOffset;
+		if (m_cursorPos.m_location != CURSOR_ASCII_0 && m_cursorPos.m_location != CURSOR_HEX_0 )
 			nOffset++;
 		nDelete = 0;
 	}
 
-	m_Selection.Clear();
+	m_selection.clear();
 
-	BeginUndoableTransaction(nOffset, nDelete);
+	beginUndoableTransaction(nOffset, nDelete);
 
-	m_UndoParams->m_NewData.resize(nSize);
+	m_undoParams->m_newData.resize(nSize);
 
 	BOOL bResult;
 
 	if (!nSize)
 	{
-		bResult = ReplaceData(nOffset, nDelete, NULL, 0, bCursorToEnd);
-		EndUndoableTransaction(0);
+		bResult = replaceData(nOffset, nDelete, NULL, 0, bCursorToEnd);
+		endUndoableTransaction(0);
 		return bResult;
 	}
 
-	DATA* pDst = &m_UndoParams->m_NewData.front();
-	BYTE* pSrc = (BYTE*) pvData;
-	BYTE* pEnd = pSrc + nSize;
+	DATA* dst = &m_undoParams->m_newData.front();
+	BYTE* src = (BYTE*) pvData;
+	BYTE* end = src + nSize;
 
-	for (; pSrc < pEnd; pSrc++, pDst++)
+	for (; src < end; src++, dst++)
 	{
-		pDst->m_Flags = DF_MODIFIED;
-		pDst->m_Data = *pSrc;
+		dst->m_flags = DF_MODIFIED;
+		dst->m_data = *src;
 	}
 
-	bResult = ReplaceData(nOffset, nDelete, &m_UndoParams->m_NewData.front(), nSize, bCursorToEnd);
-	EndUndoableTransaction(0);
+	bResult = replaceData(nOffset, nDelete, &m_undoParams->m_newData.front(), nSize, bCursorToEnd);
+	endUndoableTransaction(0);
 	return bResult;
 }
 
-void CHexEditCtrl::Copy()
+void CHexEditCtrl::copy()
 {
-	SIZE_T nSize = m_Selection.m_nEndOffset - m_Selection.m_nStartOffset;
+	SIZE_T nSize = m_selection.m_nEndOffset - m_selection.m_nStartOffset;
 
 	if (!nSize)
 		return;
 
-	BOOL bResult = OpenClipboard();
+	BOOL bResult = openClipboard();
 	if (!bResult)
 		return;
 
-	BOOL bAsciiFormat = m_CursorPos.m_Location >= CURSOR_ASCII_0;
+	BOOL bAsciiFormat = m_cursorPos.m_location >= CURSOR_ASCII_0;
 	
 	if (!bAsciiFormat)
 		nSize *= 3;
 
-	HANDLE hData = GlobalAlloc(GMEM_MOVEABLE, nSize + 1);
+	HANDLE hData = globalAlloc(GMEM_MOVEABLE, nSize + 1);
 
 	if (!hData)
 	{
-		CloseClipboard();
+		closeClipboard();
 		return;
 	}
 
-	PBYTE pDst = (PBYTE) GlobalLock(hData);
-	ASSERT(pDst);
+	PBYTE dst = (PBYTE) globalLock(hData);
+	ASSERT(dst);
 
-	pDst[nSize] = 0;
+	dst[nSize] = 0;
 
-	DATA* pSrc = m_pData + m_Selection.m_nStartOffset;
-	DATA* pEnd = m_pData + m_Selection.m_nEndOffset;
+	DATA* src = m_data + m_selection.m_nStartOffset;
+	DATA* end = m_data + m_selection.m_nEndOffset;
 
 	if (bAsciiFormat)
 	{
-		for (; pSrc < pEnd; pSrc++, pDst++)
-			*pDst = pSrc->m_Data;
+		for (; src < end; src++, dst++)
+			*dst = src->m_data;
 	}
 	else
 	{
-		for (; pSrc < pEnd; pSrc++)		
+		for (; src < end; src++)		
 		{
-			*pDst++ = GetHexChar(pSrc->m_Data >> 4);
-			*pDst++ = GetHexChar(pSrc->m_Data);
-			*pDst++ = ' ';
+			*dst++ = getHexChar(src->m_data >> 4);
+			*dst++ = getHexChar(src->m_data);
+			*dst++ = ' ';
 		}
 	}
 
-	GlobalUnlock(hData);
+	globalUnlock(hData);
 
-	EmptyClipboard();
-	SetClipboardData(CF_TEXT, hData);
-	CloseClipboard();
+	emptyClipboard();
+	setClipboardData(CF_TEXT, hData);
+	closeClipboard();
 }
 
-void CHexEditCtrl::Cut()
+void CHexEditCtrl::cut()
 {
-	if (m_Selection.IsEmpty())
+	if (m_selection.isEmpty())
 		return;
 
-	Copy();
-	ReplaceSelection(NULL, 0);
+	copy();
+	replaceSelection(NULL, 0);
 }
 
-static SIZE_T ScanHexString(
-	PBYTE pDst, SIZE_T nDstBufferSize, 
-	PBYTE pSrc, SIZE_T nSrcBufferSize
+static SIZE_T scanHexString(
+	PBYTE dst, SIZE_T nDstBufferSize, 
+	PBYTE src, SIZE_T nSrcBufferSize
 	)
 {
 	SIZE_T nActualSize = 0;
 
-	PBYTE pEnd = pSrc + nSrcBufferSize;
+	PBYTE end = src + nSrcBufferSize;
 	
 	enum STATE
 	{
 		STATE_IDLE = 0,
 		STATE_SCAN,
-	} State = STATE_IDLE;
+	} state = STATE_IDLE;
 
-	for(; pSrc < pEnd; pSrc++)
+	for(; src < end; src++)
 	{
-		if (isspace(*pSrc))
+		if (isspace(*src))
 		{
-			if (State == STATE_SCAN)
+			if (state == STATE_SCAN)
 			{
-				pDst++;
-				State = STATE_IDLE;
+				dst++;
+				state = STATE_IDLE;
 			}
 
 			continue;
 		}
 
-		int x = GetHex(*pSrc);
+		int x = getHex(*src);
 		if (x == -1) 
 			break;
 
-		if (State == STATE_SCAN)
+		if (state == STATE_SCAN)
 		{
-			*pDst = ((*pDst << 4) & 0xf0) | (x & 0xf);
-			pDst++;
-			State = STATE_IDLE;
+			*dst = ((*dst << 4) & 0xf0) | (x & 0xf);
+			dst++;
+			state = STATE_IDLE;
 		}
 		else 
 		{
@@ -2588,212 +2588,212 @@ static SIZE_T ScanHexString(
 				break;
 
 			nActualSize++;
-			*pDst = (x & 0xf);
-			State = STATE_SCAN;
+			*dst = (x & 0xf);
+			state = STATE_SCAN;
 		}
 	}
 
 	return nActualSize;
 }
 
-void CHexEditCtrl::Paste()
+void CHexEditCtrl::paste()
 {
-	BOOL bResult = OpenClipboard();
+	BOOL bResult = openClipboard();
 	if (!bResult)
 		return;
 
-	HANDLE hData = GetClipboardData(CF_TEXT);
+	HANDLE hData = getClipboardData(CF_TEXT);
 
 	if (!hData)
 	{
-		CloseClipboard();
+		closeClipboard();
 		return;
 	}
 
-	SIZE_T nSize = GlobalSize(hData);
+	SIZE_T nSize = globalSize(hData);
 	if (!nSize)
 	{
-		CloseClipboard();
+		closeClipboard();
 		return;
 	}
 
-	BOOL bAsciiFormat = m_CursorPos.m_Location >= CURSOR_ASCII_0;
+	BOOL bAsciiFormat = m_cursorPos.m_location >= CURSOR_ASCII_0;
 
-	PBYTE pData = (PBYTE) GlobalLock(hData);
-	ASSERT(pData);
+	PBYTE data = (PBYTE) globalLock(hData);
+	ASSERT(data);
 
-	nSize = strlen((CHAR*) pData);
+	nSize = strlen((CHAR*) data);
 	
 	if (bAsciiFormat)
 	{
-		ReplaceSelection(pData, nSize);
+		replaceSelection(data, nSize);
 	}
 	else
 	{
 		SIZE_T nAllocSize = nSize / 2; // no more than this (probably less)
-		PBYTE pActualData = (PBYTE) malloc(nAllocSize); 
-		if (!pActualData)
+		PBYTE actualData = (PBYTE) malloc(nAllocSize); 
+		if (!actualData)
 		{
-			GlobalUnlock(hData);
-			CloseClipboard();
+			globalUnlock(hData);
+			closeClipboard();
 			return;
 		}
 
-		SIZE_T nActualSize = ScanHexString(pActualData, nAllocSize, pData, nSize);
-		ReplaceSelection(pActualData, nActualSize);
+		SIZE_T nActualSize = scanHexString(actualData, nAllocSize, data, nSize);
+		replaceSelection(actualData, nActualSize);
 
-		free(pActualData);
+		free(actualData);
 	}
 	
-	GlobalUnlock(pData);
+	globalUnlock(data);
 
-	CloseClipboard();
+	closeClipboard();
 }
 
-void CHexEditCtrl::SetFindPattern(PVOID p, SIZE_T nSize, BOOL bMatchCase)
+void CHexEditCtrl::setFindPattern(PVOID p, SIZE_T nSize, BOOL bMatchCase)
 {
-	m_FindPattern.resize(nSize);
-	memcpy(&m_FindPattern.front(), p, nSize);
+	m_findPattern.resize(nSize);
+	memcpy(&m_findPattern.front(), p, nSize);
 
 	SIZE_T i;
 	for (i = 0; i < 256; i++)
 	{
-		m_FindNextBadCharTable[i] = nSize;
-		m_FindPrevBadCharTable[i] = nSize;
+		m_findNextBadCharTable[i] = nSize;
+		m_findPrevBadCharTable[i] = nSize;
 	}
 
 	SIZE_T m = nSize - 1;
 
-	BYTE* pData = (BYTE*) p;
+	BYTE* data = (BYTE*) p;
 
 	if (bMatchCase)
 	{
 		for (i = 0; i < m; i++) 
-			m_FindNextBadCharTable[pData[i]] = m - i;
+			m_findNextBadCharTable[data[i]] = m - i;
 
 		for (i = m; i > 0; i--) 
-			m_FindPrevBadCharTable[pData[i]] = i;
+			m_findPrevBadCharTable[data[i]] = i;
 	}
 	else
 	{
 		for (i = 0; i < m; i++) 
 		{
-			m_FindNextBadCharTable[tolower(pData[i])] = m - i;
-			m_FindNextBadCharTable[toupper(pData[i])] = m - i;
+			m_findNextBadCharTable[tolower(data[i])] = m - i;
+			m_findNextBadCharTable[toupper(data[i])] = m - i;
 		}
 
 		for (i = m; i > 0; i--) 
 		{
-			m_FindPrevBadCharTable[tolower(pData[i])] = i;
-			m_FindPrevBadCharTable[toupper(pData[i])] = i;
+			m_findPrevBadCharTable[tolower(data[i])] = i;
+			m_findPrevBadCharTable[toupper(data[i])] = i;
 		}
 	}
 
 	m_bFindMatchCase = bMatchCase;
 }
 
-inline BOOL IsMatchChar(BYTE b1, BYTE b2, BOOL bMatchCase)
+inline BOOL isMatchChar(BYTE b1, BYTE b2, BOOL bMatchCase)
 	{ return bMatchCase ? b1 == b2 : toupper(b1) == toupper(b2);}
 
-BOOL CHexEditCtrl::IsMatch(DATA* pData, BYTE* pPattern, SIZE_T nSize, BOOL bMatchCase)
+BOOL CHexEditCtrl::isMatch(DATA* data, BYTE* pattern, SIZE_T nSize, BOOL bMatchCase)
 {
-	BYTE* p = pPattern;
-	BYTE* pEnd = p + nSize;
+	BYTE* p = pattern;
+	BYTE* end = p + nSize;
 
-	for (; p != pEnd; p++, pData++)
-		if (!IsMatchChar(*p, pData->m_Data, bMatchCase))
+	for (; p != end; p++, data++)
+		if (!isMatchChar(*p, data->m_data, bMatchCase))
 			return FALSE;
 
 	return TRUE;
 }		
 
-void CHexEditCtrl::SelectRange(SIZE_T nOffset, SIZE_T nSize, int Flags)
+void CHexEditCtrl::selectRange(SIZE_T nOffset, SIZE_T nSize, int flags)
 {
-	CURSOR_POS Pos1, Pos2;
-	Pos1.m_nOffset = (long) nOffset;
-	Pos2.m_nOffset = (long) (nOffset + nSize - 1);
+	CURSOR_POS pos1, pos2;
+	pos1.m_nOffset = (long) nOffset;
+	pos2.m_nOffset = (long) (nOffset + nSize - 1);
 	
-	if (Flags & SRF_CURSOR_TO_HEX)
+	if (flags & SRF_CURSOR_TO_HEX)
 	{
-		Pos1.m_Location = CURSOR_HEX_0;
-		Pos2.m_Location = CURSOR_HEX_2;
+		pos1.m_location = CURSOR_HEX_0;
+		pos2.m_location = CURSOR_HEX_2;
 	}
 	else
 	{
-		Pos1.m_Location = CURSOR_ASCII_0;
-		Pos2.m_Location = CURSOR_ASCII_1;
+		pos1.m_location = CURSOR_ASCII_0;
+		pos2.m_location = CURSOR_ASCII_1;
 	}
 
-	if (Flags & SRF_CURSOR_TO_BEGIN)
+	if (flags & SRF_CURSOR_TO_BEGIN)
 	{
-		SetCursorPos(Pos2);
-		SetCursorPos(Pos1, MCF_SELECT);
+		setCursorPos(pos2);
+		setCursorPos(pos1, MCF_SELECT);
 	}
 	else
 	{
-		SetCursorPos(Pos1);
-		SetCursorPos(Pos2, MCF_SELECT);
+		setCursorPos(pos1);
+		setCursorPos(pos2, MCF_SELECT);
 	}
 }
 
-BOOL CHexEditCtrl::FindNext()
+BOOL CHexEditCtrl::findNext()
 {
-	SIZE_T nSize = m_FindPattern.size();
+	SIZE_T nSize = m_findPattern.size();
 	SIZE_T m = nSize - 1;
 
-	BYTE Last = m_FindPattern[m];
+	BYTE last = m_findPattern[m];
 
-	DATA* p = m_pData + m_CursorPos.m_nOffset;
-	DATA* pEnd = m_pDataEnd - nSize;
+	DATA* p = m_data + m_cursorPos.m_nOffset;
+	DATA* end = m_dataEnd - nSize;
 
-	while (p <= pEnd) 
+	while (p <= end) 
 	{
-		BYTE b = p[m].m_Data;
+		BYTE b = p[m].m_data;
 
-		if (IsMatchChar(b, Last, m_bFindMatchCase) && IsMatch(p, &m_FindPattern.front(), m, m_bFindMatchCase))
+		if (isMatchChar(b, last, m_bFindMatchCase) && isMatch(p, &m_findPattern.front(), m, m_bFindMatchCase))
 		{
-			int Flags = 0;
-			if (m_CursorPos.m_Location < CURSOR_ASCII_0)
-				Flags |= SRF_CURSOR_TO_HEX;
+			int flags = 0;
+			if (m_cursorPos.m_location < CURSOR_ASCII_0)
+				flags |= SRF_CURSOR_TO_HEX;
 
-			SelectRange(p - m_pData, nSize);
+			selectRange(p - m_data, nSize);
 			return TRUE;
 		}
 
-		p += m_FindNextBadCharTable[b];
+		p += m_findNextBadCharTable[b];
 	}
 
 	return FALSE;
 
 }
 
-BOOL CHexEditCtrl::FindPrev()
+BOOL CHexEditCtrl::findPrev()
 {
-	SIZE_T nSize = m_FindPattern.size();
+	SIZE_T nSize = m_findPattern.size();
 	SIZE_T m = nSize - 1;
 
-	if ((LONG) nSize > m_CursorPos.m_nOffset)
+	if ((LONG) nSize > m_cursorPos.m_nOffset)
 		return FALSE;
 
-	BYTE First = m_FindPattern[0];
+	BYTE first = m_findPattern[0];
 
-	DATA* p = m_pData + m_CursorPos.m_nOffset - nSize;
+	DATA* p = m_data + m_cursorPos.m_nOffset - nSize;
 
-	while (p >= m_pData)
+	while (p >= m_data)
 	{
-		BYTE b = p[0].m_Data;
+		BYTE b = p[0].m_data;
 
-		if (IsMatchChar(b, First, m_bFindMatchCase) && IsMatch(p, &m_FindPattern.front(), m, m_bFindMatchCase))
+		if (isMatchChar(b, first, m_bFindMatchCase) && isMatch(p, &m_findPattern.front(), m, m_bFindMatchCase))
 		{
-			int Flags = SRF_CURSOR_TO_BEGIN;
-			if (m_CursorPos.m_Location < CURSOR_ASCII_0)
-				Flags |= SRF_CURSOR_TO_HEX;
+			int flags = SRF_CURSOR_TO_BEGIN;
+			if (m_cursorPos.m_location < CURSOR_ASCII_0)
+				flags |= SRF_CURSOR_TO_HEX;
 
-			SelectRange(p - m_pData, nSize);
+			selectRange(p - m_data, nSize);
 			return TRUE;
 		}
 
-		p -= m_FindPrevBadCharTable[b];
+		p -= m_findPrevBadCharTable[b];
 	}
 
 	return FALSE;

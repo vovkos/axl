@@ -8,14 +8,14 @@ namespace lua {
 //.............................................................................
 
 bool
-CLuaState::Create ()
+CLuaState::create ()
 {
-	Close ();
+	close ();
 
 	m_h = luaL_newstate ();
 	if (!m_h)
 	{
-		err::SetError (err::EStatus_InsufficientResources);
+		err::setError (err::EStatus_InsufficientResources);
 		return false;
 	}
 
@@ -23,61 +23,61 @@ CLuaState::Create ()
 }
 
 bool
-CLuaState::Complete (int Result)
+CLuaState::complete (int result)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	if (Result == LUA_OK)
+	if (result == LUA_OK)
 		return true;
 
-	rtl::CString Message = PopString ();
-	err::SetStringError (Message, Message.GetLength ());
+	rtl::CString message = popString ();
+	err::setStringError (message, message.getLength ());
 	return false;
 }
 
 bool
-CLuaState::Load (
-	const char* pName,
-	const char* pSource,
-	size_t Length
+CLuaState::load (
+	const char* name,
+	const char* source,
+	size_t length
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	if (Length == -1)
-		Length = strlen (pSource);
+	if (length == -1)
+		length = strlen (source);
 
-	int Result = luaL_loadbuffer (m_h, pSource, Length, pName);
-	return Complete (Result);
+	int result = luaL_loadbuffer (m_h, source, length, name);
+	return complete (result);
 }
 
 #ifdef _DEBUG
 void
-CLuaState::Trace ()
+CLuaState::trace ()
 {
-	int Top = GetTop ();
+	int top = getTop ();
 
-	for (int i = 1; i <= Top; i++) 
+	for (int i = 1; i <= top; i++) 
 	{
-		int Type = GetType (i);
+		int type = getType (i);
 		const void* p = lua_topointer (m_h, i);
 		
-		switch (Type) 
+		switch (type) 
 		{    
 		case LUA_TSTRING:
-			TRACE ("%08x %s\n", p, GetString(i));
+			TRACE ("%08x %s\n", p, getString(i));
 			break;
 	
 		case LUA_TBOOLEAN:
-			TRACE ("%08x %s\n", p, GetBoolean (i) ? "true" : "false");
+			TRACE ("%08x %s\n", p, getBoolean (i) ? "true" : "false");
 			break;
 	
 		case LUA_TNUMBER:
-			TRACE ("%08x %g\n", p, GetNumber (i));
+			TRACE ("%08x %g\n", p, getNumber (i));
 			break;
 
 		default:
-			TRACE ("%08x %s\n", p, GetTypeName (Type));
+			TRACE ("%08x %s\n", p, getTypeName (type));
 			break;
 	
 		}

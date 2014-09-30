@@ -27,7 +27,7 @@ protected:
 public:
 	CGdiEngine ()
 	{
-		m_EngineKind = EEngine_Gdi;
+		m_engineKind = EEngine_Gdi;
 		m_hWndClipboardOwner = NULL;
 	}
 
@@ -35,97 +35,97 @@ public:
 
 	static
 	CGdiEngine*
-	GetSingleton ()
+	getSingleton ()
 	{
-		return rtl::GetSingleton <CGdiEngine> ();
+		return rtl::getSingleton <CGdiEngine> ();
 	}
 
 	// fonts
 
 	CFont*
-	GetDefaultGuiFont ();
+	getDefaultGuiFont ();
 
 	virtual
 	CFont*
-	GetDefaultMonospaceFont ();
+	getDefaultMonospaceFont ();
 
 	virtual
 	ref::CPtrT <CFont>
-	CreateFont (
-		const char* pFaceName,
-		size_t PointSize = 0,
-		uint_t Flags = 0
+	createFont (
+		const char* faceName,
+		size_t pointSize = 0,
+		uint_t flags = 0
 		);
 
 	ref::CPtrT <CFont>
-	CreateStockFont (int StockFontKind);
+	createStockFont (int stockFontKind);
 
 	ref::CPtrT <CFont>
-	CreateFont (HFONT hFont);
+	createFont (HFONT hFont);
 
 	// cursors
 
 	ref::CPtrT <CCursor>
-	CreateStockCursor (LPCTSTR pStockCursorRes);
+	createStockCursor (LPCTSTR stockCursorRes);
 
 	// images
 
 	virtual
 	ref::CPtrT <CImage>
-	CreateImage ();
+	createImage ();
 
 	virtual
 	ref::CPtrT <CImage>
-	CreateImage (
-		int Width,
-		int Height,
-		EPixelFormat PixelFormat,
-		const void* pData,
-		bool IsScreenCompatible = true
+	createImage (
+		int width,
+		int height,
+		EPixelFormat pixelFormat,
+		const void* data,
+		bool isScreenCompatible = true
 		);
 
 	virtual
 	ref::CPtrT <CCanvas>
-	CreateOffscreenCanvas (
-		int Width,
-		int Height
+	createOffscreenCanvas (
+		int width,
+		int height
 		);
 
 	// clipboard
 
 	virtual
 	uintptr_t 
-	RegisterClipboardFormat (const rtl::CString& FormatName);
+	registerClipboardFormat (const rtl::CString& formatName);
 
 	virtual
 	bool
-	ReadClipboard (rtl::CString* pString);
+	readClipboard (rtl::CString* string);
 
 	virtual
 	bool
-	ReadClipboard (
-		uintptr_t Format,
-		rtl::CArrayT <char>* pData
+	readClipboard (
+		uintptr_t format,
+		rtl::CArrayT <char>* data
 		);
 
 	virtual
 	bool
-	WriteClipboard (
-		const char* pString,
-		size_t Length = -1
+	writeClipboard (
+		const char* string,
+		size_t length = -1
 		);
 
 	virtual
 	bool
-	WriteClipboard (
-		uintptr_t Format,
-		const void* pData,
-		size_t Size
+	writeClipboard (
+		uintptr_t format,
+		const void* data,
+		size_t size
 		);
 
 	virtual
 	bool
-	CommitClipboard ()
+	commitClipboard ()
 	{
 		return true;
 	}
@@ -134,33 +134,33 @@ public:
 
 	virtual
 	bool
-	ShowCaret (
-		CWidget* pWidget,
-		const TRect& Rect
+	showCaret (
+		CWidget* widget,
+		const TRect& rect
 		);
 
 	virtual
 	void
-	HideCaret ();
+	hideCaret ();
 
 protected:
 	bool
-	OpenClipboard ();
+	openClipboard ();
 
 	virtual
 	CFont*
-	GetFontMod (
-		CFont* pBaseFont,
-		uint_t Flags
+	getFontMod (
+		CFont* baseFont,
+		uint_t flags
 		);
 
 	virtual
 	ref::CPtrT <CFont>
-	CreateStdFont (EStdFont FontKind);
+	createStdFont (EStdFont fontKind);
 
 	virtual
 	ref::CPtrT <CCursor>
-	CreateStdCursor (EStdCursor CursorKind);
+	createStdCursor (EStdCursor cursorKind);
 };
 
 //.............................................................................

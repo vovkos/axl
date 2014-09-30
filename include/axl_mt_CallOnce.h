@@ -18,10 +18,10 @@ template <
 	typename TArgument
 	>
 void 
-CallOnce (
-	TFunction Functor,
-	TArgument Argument,
-	volatile int32_t* pFlag = NULL
+callOnce (
+	TFunction functor,
+	TArgument argument,
+	volatile int32_t* flag = NULL
 	)
 {
 	enum EOnce
@@ -32,23 +32,23 @@ CallOnce (
 	};
 
 	static volatile int32_t _Flag = 0;
-	if (!pFlag)
-		pFlag = &_Flag;
+	if (!flag)
+		flag = &_Flag;
 
-	int32_t Value = *pFlag;
-	if (Value == EOnce_Initialized)
+	int32_t value = *flag;
+	if (value == EOnce_Initialized)
 		return;
 
-	if (Value == EOnce_Uninitialized && // try to save one interlocked cmpxcg
-		mt::AtomicCmpXchg (pFlag, EOnce_Uninitialized, EOnce_Initializing) == EOnce_Uninitialized)
+	if (value == EOnce_Uninitialized && // try to save one interlocked cmpxcg
+		mt::atomicCmpXchg (flag, EOnce_Uninitialized, EOnce_Initializing) == EOnce_Uninitialized)
 	{
-		Functor (Argument);
-		mt::AtomicXchg (pFlag, EOnce_Initialized);
+		functor (argument);
+		mt::atomicXchg (flag, EOnce_Initialized);
 	}
 	else do
 	{
-		mt::YieldProcessor ();
-	} while (*pFlag != EOnce_Initialized);
+		mt::yieldProcessor ();
+	} while (*flag != EOnce_Initialized);
 }
 
 //.............................................................................

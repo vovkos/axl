@@ -8,186 +8,186 @@ namespace gui {
 //.............................................................................
 
 size_t
-CTextAttrAnchorArray::FindAnchor (size_t Offset) const
+CTextAttrAnchorArray::findAnchor (size_t offset) const
 {
-	size_t Index = -1;
-	size_t Count = m_Array.GetCount ();
-	size_t Begin = 0;
-	size_t End = Count;
+	size_t index = -1;
+	size_t count = m_array.getCount ();
+	size_t begin = 0;
+	size_t end = count;
 
-	while (Begin < End)
+	while (begin < end)
 	{
-		size_t Mid = (Begin + End) / 2;
-		const TTextAttrAnchor* pAnchor = &m_Array [Mid];
+		size_t mid = (begin + end) / 2;
+		const TTextAttrAnchor* anchor = &m_array [mid];
 
-		ASSERT (Mid < Count);
+		ASSERT (mid < count);
 			
-		if (pAnchor->m_Offset == Offset)
-			return Mid;
+		if (anchor->m_offset == offset)
+			return mid;
 
-		if (pAnchor->m_Offset < Offset)
+		if (anchor->m_offset < offset)
 		{
-			Index = Mid;
-			Begin = Mid + 1;
+			index = mid;
+			begin = mid + 1;
 		}
 		else
 		{
-			End = Mid;
+			end = mid;
 		}
 	}
 
-	return Index;
+	return index;
 }
 
 size_t
-CTextAttrAnchorArray::GetStartAnchor (
-	size_t Offset,
-	size_t Metric
+CTextAttrAnchorArray::getStartAnchor (
+	size_t offset,
+	size_t metric
 	)
 {
-	size_t Index = FindAnchor (Offset);
-	if (Index == -1)
+	size_t index = findAnchor (offset);
+	if (index == -1)
 	{
-		m_Array.Insert (0, TTextAttrAnchor (Offset, TTextAttr (), Metric));
+		m_array.insert (0, TTextAttrAnchor (offset, TTextAttr (), metric));
 		return 0;
 	}
 
-	TTextAttrAnchor* pAnchor = &m_Array [Index];
-	if (pAnchor->m_Metric > Metric || pAnchor->m_Offset == Offset)
-		return Index;
+	TTextAttrAnchor* anchor = &m_array [index];
+	if (anchor->m_metric > metric || anchor->m_offset == offset)
+		return index;
 
-	TTextAttr LastAttr = pAnchor->m_Attr;
-	Index++;
+	TTextAttr lastAttr = anchor->m_attr;
+	index++;
 
-	m_Array.Insert (Index, TTextAttrAnchor (Offset, LastAttr, Metric));
-	return Index;
+	m_array.insert (index, TTextAttrAnchor (offset, lastAttr, metric));
+	return index;
 }
 
 size_t
-CTextAttrAnchorArray::GetEndAnchor (
-	size_t Offset,
-	size_t Metric
+CTextAttrAnchorArray::getEndAnchor (
+	size_t offset,
+	size_t metric
 	)
 {
-	size_t Index = FindAnchor (Offset);
-	if (Index == -1)
+	size_t index = findAnchor (offset);
+	if (index == -1)
 	{
-		m_Array.Insert (0, TTextAttrAnchor (Offset, TTextAttr (), 0));
+		m_array.insert (0, TTextAttrAnchor (offset, TTextAttr (), 0));
 		return 0;
 	}
 
-	TTextAttrAnchor* pAnchor = &m_Array [Index];
-	if (pAnchor->m_Metric > Metric || pAnchor->m_Offset == Offset)
-		return Index;
+	TTextAttrAnchor* anchor = &m_array [index];
+	if (anchor->m_metric > metric || anchor->m_offset == offset)
+		return index;
 
-	TTextAttr LastAttr = pAnchor->m_Attr;
-	size_t LastMetric = pAnchor->m_Metric;
-	Index++;
+	TTextAttr lastAttr = anchor->m_attr;
+	size_t lastMetric = anchor->m_metric;
+	index++;
 
-	m_Array.Insert (Index, TTextAttrAnchor (Offset, LastAttr, LastMetric));
-	return Index;
+	m_array.insert (index, TTextAttrAnchor (offset, lastAttr, lastMetric));
+	return index;
 }
 
 void
-CTextAttrAnchorArray::Normalize (
-	size_t Start,
-	size_t End
+CTextAttrAnchorArray::normalize (
+	size_t start,
+	size_t end
 	)
 {
-	size_t RemoveIndex = -1;
-	size_t RemoveCount = 0;
+	size_t removeIndex = -1;
+	size_t removeCount = 0;
 		
-	TTextAttrAnchor LastAnchor;
+	TTextAttrAnchor lastAnchor;
 
-	if (Start)
-		LastAnchor = m_Array [Start - 1];
+	if (start)
+		lastAnchor = m_array [start - 1];
 
-	for (size_t i = Start; i <= End; i++)
+	for (size_t i = start; i <= end; i++)
 	{
-		TTextAttrAnchor* pAnchor = &m_Array [i];
+		TTextAttrAnchor* anchor = &m_array [i];
 		
-		if (pAnchor->m_Metric >= LastAnchor.m_Metric && pAnchor->m_Attr.Cmp (LastAnchor.m_Attr) == 0)
+		if (anchor->m_metric >= lastAnchor.m_metric && anchor->m_attr.cmp (lastAnchor.m_attr) == 0)
 		{
-			if (!RemoveCount)
-				RemoveIndex = i;
+			if (!removeCount)
+				removeIndex = i;
 
-			RemoveCount++;
+			removeCount++;
 		}
 		else 
 		{
-			LastAnchor = *pAnchor;
+			lastAnchor = *anchor;
 
-			if (RemoveCount)
+			if (removeCount)
 			{
-				m_Array.Remove (RemoveIndex, RemoveCount);
-				i -= RemoveCount;
-				End -= RemoveCount;
-				RemoveCount = 0;
+				m_array.remove (removeIndex, removeCount);
+				i -= removeCount;
+				end -= removeCount;
+				removeCount = 0;
 			}
 		}
 	}
 
-	if (RemoveCount)
-		m_Array.Remove (RemoveIndex, RemoveCount);
+	if (removeCount)
+		m_array.remove (removeIndex, removeCount);
 }
 
 void 
-CTextAttrAnchorArray::ClearBefore (size_t Offset)
+CTextAttrAnchorArray::clearBefore (size_t offset)
 {
-	size_t Anchor = FindAnchor (Offset);
-	if (Anchor != -1)
-		m_Array.Remove (0, Anchor + 1);
+	size_t anchor = findAnchor (offset);
+	if (anchor != -1)
+		m_array.remove (0, anchor + 1);
 }
 
 void
-TraceAttrArray (const CTextAttrAnchorArray& Array)
+traceAttrArray (const CTextAttrAnchorArray& array)
 {
-	size_t Count = Array.GetCount ();
-	dbg::Trace ("--- CTextAttrAnchorArray {%d}---\n", Count);
+	size_t count = array.getCount ();
+	dbg::trace ("--- CTextAttrAnchorArray {%d}---\n", count);
 
-	for (size_t i = 0; i < Count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
-		const gui::TTextAttrAnchor* pAnchor = &(Array [i]);
-		dbg::Trace ("[%d] ofs:%02x m:%d fc:%x\n", i, pAnchor->m_Offset, pAnchor->m_Metric, pAnchor->m_Attr.m_ForeColor);
+		const gui::TTextAttrAnchor* anchor = &(array [i]);
+		dbg::trace ("[%d] ofs:%02x m:%d fc:%x\n", i, anchor->m_offset, anchor->m_metric, anchor->m_attr.m_foreColor);
 	}
 }
 
 void
-CTextAttrAnchorArray::SetAttr (
-	size_t BeginOffset, 
-	size_t EndOffset, 
-	const TTextAttr& Attr,
-	size_t Metric
+CTextAttrAnchorArray::setAttr (
+	size_t beginOffset, 
+	size_t endOffset, 
+	const TTextAttr& attr,
+	size_t metric
 	)
 {
-	if (BeginOffset >= EndOffset)
+	if (beginOffset >= endOffset)
 		return;
 
-	m_Array.EnsureExclusive ();
+	m_array.ensureExclusive ();
 
 	// important: END anchor first! otherwise the first anchor could "bleed" metric to the right
 
-	size_t EndIdx = GetEndAnchor (EndOffset, Metric);
+	size_t endIdx = getEndAnchor (endOffset, metric);
 
-	size_t OldCount = m_Array.GetCount ();
-	size_t StartIdx = GetStartAnchor (BeginOffset, Metric);
+	size_t oldCount = m_array.getCount ();
+	size_t startIdx = getStartAnchor (beginOffset, metric);
 
 	// detect insertion
 
-	if (StartIdx <= EndIdx && m_Array.GetCount () > OldCount)
-		EndIdx++;
+	if (startIdx <= endIdx && m_array.getCount () > oldCount)
+		endIdx++;
 
-	for (size_t i = StartIdx; i < EndIdx; i++)
+	for (size_t i = startIdx; i < endIdx; i++)
 	{
-		TTextAttrAnchor* pAnchor = &m_Array [i];
-		if (pAnchor->m_Metric <= Metric)
+		TTextAttrAnchor* anchor = &m_array [i];
+		if (anchor->m_metric <= metric)
 		{
-			pAnchor->m_Metric = Metric;
-			pAnchor->m_Attr.Overlay (Attr);
+			anchor->m_metric = metric;
+			anchor->m_attr.overlay (attr);
 		}
 	}
 
-	Normalize (StartIdx, EndIdx);
+	normalize (startIdx, endIdx);
 	// TraceAttrArray (*this);
 }
 

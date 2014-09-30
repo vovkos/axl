@@ -16,16 +16,16 @@ namespace lex {
 class CRagelTokenPos: public CLineCol
 {
 public:
-	size_t m_Offset;
-	size_t m_Length;
+	size_t m_offset;
+	size_t m_length;
 
 	char* m_p;
 
 public:
 	CRagelTokenPos ()
 	{
-		m_Offset = 0;
-		m_Length = 0;
+		m_offset = 0;
+		m_length = 0;
 		m_p = NULL;
 	}
 };
@@ -41,27 +41,27 @@ class CRagelTokenT: public CTokenT <TEnum, TGetName, TData, CRagelTokenPos>
 {
 public:
 	rtl::CString
-	GetText () const
+	getText () const
 	{
-		return rtl::CString (this->m_Pos.m_p, this->m_Pos.m_Length); // thanks a lot gcc
+		return rtl::CString (this->m_pos.m_p, this->m_pos.m_length); // thanks a lot gcc
 	}
 
 	static
 	rtl::CString 
-	GetTokenListString (const rtl::CConstBoxListT <CRagelTokenT>& List)
+	getTokenListString (const rtl::CConstBoxListT <CRagelTokenT>& list)
 	{
-		if (List.IsEmpty ())
+		if (list.isEmpty ())
 			return rtl::CString ();
 
-		rtl::CBoxIteratorT <CRagelTokenT> Token = List.GetHead ();
-		rtl::CString String (Token->m_Pos.m_p, Token->m_Pos.m_Length);
-		for (Token++; Token; Token++)
+		rtl::CBoxIteratorT <CRagelTokenT> token = list.getHead ();
+		rtl::CString string (token->m_pos.m_p, token->m_pos.m_length);
+		for (token++; token; token++)
 		{
-			String.Append (' ');
-			String.Append (Token->m_Pos.m_p, Token->m_Pos.m_Length);
+			string.append (' ');
+			string.append (token->m_pos.m_p, token->m_pos.m_length);
 		}
 
-		return String;
+		return string;
 	}
 };
 
@@ -80,16 +80,16 @@ class CRagelLexerT: public CLexerT <T, TToken>
 	friend class CLexerT <T, TToken>;
 
 protected:
-	size_t m_TokenizeLimit;
-	size_t m_TokenizeCount;
+	size_t m_tokenizeLimit;
+	size_t m_tokenizeCount;
 
-	rtl::CString m_FilePath;
+	rtl::CString m_filePath;
 
-	char* m_pBegin;
-	int m_Line;
-	size_t m_LineOffset;
+	char* m_begin;
+	int m_line;
+	size_t m_lineOffset;
 
-	rtl::CArrayT <int> m_Stack; // stack of states
+	rtl::CArrayT <int> m_stack; // stack of states
 
 	// ragel interface variables
 
@@ -106,94 +106,94 @@ protected:
 public:
 	CRagelLexerT ()
 	{
-		OnReset ();
+		onReset ();
 	}
 
 	size_t 
-	GetTokenizeLimit ()
+	getTokenizeLimit ()
 	{
-		return m_TokenizeLimit;
+		return m_tokenizeLimit;
 	}
 
 	void
-	SetTokenizeLimit (size_t TokenizeLimit)
+	setTokenizeLimit (size_t tokenizeLimit)
 	{
-		ASSERT (TokenizeLimit);
-		m_TokenizeLimit = TokenizeLimit;
+		ASSERT (tokenizeLimit);
+		m_tokenizeLimit = tokenizeLimit;
 	}
 
 	bool
-	Create (
-		int State,
-		const rtl::CString& FilePath,
-		const rtl::CString& Source
+	create (
+		int state,
+		const rtl::CString& filePath,
+		const rtl::CString& source
 		)
 	{
-		return Create (State, FilePath, Source, Source.GetLength ());
+		return create (state, filePath, source, source.getLength ());
 	}
 
 	bool
-	Create (
-		const rtl::CString& FilePath,
-		const rtl::CString& Source
+	create (
+		const rtl::CString& filePath,
+		const rtl::CString& source
 		)
 	{
-		return Create (FilePath, Source, Source.GetLength ());
+		return create (filePath, source, source.getLength ());
 	}
 
 	bool
-	Create (
-		int State,
-		const rtl::CString& FilePath,
-		const char* pSource,
-		size_t Length = -1
+	create (
+		int state,
+		const rtl::CString& filePath,
+		const char* source,
+		size_t length = -1
 		)
 	{
-		Create (FilePath, pSource, Length);
-		cs = State;
+		create (filePath, source, length);
+		cs = state;
 		return true;
 	}
 
 	bool
-	Create (
-		const rtl::CString& FilePath,
-		const char* pSource,
-		size_t Length = -1
+	create (
+		const rtl::CString& filePath,
+		const char* source,
+		size_t length = -1
 		)
 	{
-		this->Reset (); 
+		this->reset (); 
 		
-		static_cast <T*> (this)->Init ();
+		static_cast <T*> (this)->init ();
 
-		p   = (char*) pSource;
-		eof = (char*) pSource + Length;
+		p   = (char*) source;
+		eof = (char*) source + length;
 
-		m_FilePath = FilePath;
-		m_pBegin = p;
+		m_filePath = filePath;
+		m_begin = p;
 
 		return true;
 	}
 
 	const TToken*
-	ExpectToken (int Token)
+	expectToken (int tokenKind)
 	{
-		const TToken* pToken = this->GetToken (); 
-		if (pToken->m_Token == Token)
-			return pToken;
+		const TToken* token = this->getToken (); 
+		if (token->m_token == tokenKind)
+			return token;
 
-		err::SetExpectedTokenError (TToken::GetName (Token), pToken->GetName ());
+		err::setExpectedTokenError (TToken::getName (token), token->getName ());
 		return NULL;
 	}
 
 	void
-	EnsureSrcPosError ()
+	ensureSrcPosError ()
 	{
-		err::CError Error = err::GetError ();
-		if (!Error->IsKind (err::GUID_ParseError, err::EParseError_SrcPos))
-			err::PushSrcPosError (
-				m_FilePath, 
-				this->m_LastTokenPos.m_Line, 
-				this->m_LastTokenPos.m_Col 
+		err::CError error = err::getError ();
+		if (!error->isKind (err::GUID_ParseError, err::EParseError_SrcPos))
+			err::pushSrcPosError (
+				m_filePath, 
+				this->m_lastTokenPos.m_line, 
+				this->m_lastTokenPos.m_col 
 				);
 	}
 
@@ -204,142 +204,142 @@ public:
 	};
 
 	void 
-	GotoState (
-		int State,
-		const TToken* pToken,
-		EGotoState Kind
+	gotoState (
+		int state,
+		const TToken* token,
+		EGotoState kind
 		)
 	{
-		p = m_pBegin + pToken->m_Pos.m_Offset;
+		p = m_begin + token->m_pos.m_offset;
 
-		if (Kind == EGotoState_EatToken)
-			p += pToken->m_Pos.m_Length;
+		if (kind == EGotoState_EatToken)
+			p += token->m_pos.m_length;
 
-		m_LineOffset = pToken->m_Pos.m_Offset - pToken->m_Pos.m_Col;
-		m_Line = pToken->m_Pos.m_Line;
-		cs = State;
-		this->m_TokenList.Clear(); 
+		m_lineOffset = token->m_pos.m_offset - token->m_pos.m_col;
+		m_line = token->m_pos.m_line;
+		cs = state;
+		this->m_tokenList.clear(); 
 	}
 
 	void
-	CallState (int State)
+	callState (int state)
 	{
-		int OldState = cs;
+		int oldState = cs;
 
-		GotoState (State);
+		gotoState (state);
 
-		stack = PrePush ();
-		stack [top++] = OldState; 
+		stack = prePush ();
+		stack [top++] = oldState; 
 	}
 
 	void
-	SetLineCol (
-		int Line,
-		int Col
+	setLineCol (
+		int line,
+		int col
 		)
 	{
-		m_Line = Line;
-		m_LineOffset = p - m_pBegin - Col;
+		m_line = line;
+		m_lineOffset = p - m_begin - col;
 	}
 
 	void
-	SetLineCol (const CLineCol& LineCol)
+	setLineCol (const CLineCol& lineCol)
 	{
-		SetLineCol (LineCol.m_Line, LineCol.m_Col);
+		setLineCol (lineCol.m_line, lineCol.m_col);
 	}
 
 protected:
 	// these are to be called from withing ragel scanner (*.rl)
 	
 	void 
-	NewLine (char* pLine)
+	newLine (char* line)
 	{ 
-		ASSERT (pLine [-1] == '\n');
+		ASSERT (line [-1] == '\n');
 
-		m_LineOffset = pLine - m_pBegin;
-		m_Line++;
+		m_lineOffset = line - m_begin;
+		m_line++;
 	}
 
 	int* 
-	PrePush ()
+	prePush ()
 	{ 
-		size_t Count = m_Stack.GetCount ();
-		m_Stack.SetCount (Count + 1);
-		stack = m_Stack;
+		size_t count = m_stack.getCount ();
+		m_stack.setCount (count + 1);
+		stack = m_stack;
 		return stack;
 	}
 
 	void 
-	PostPop ()
+	postPop ()
 	{ 
-		size_t Count = m_Stack.GetCount ();
-		if (!Count)
+		size_t count = m_stack.getCount ();
+		if (!count)
 			return;
 
-		m_Stack.SetCount (Count - 1);
+		m_stack.setCount (count - 1);
 	}
 
 	void
-	Break ()
+	stop ()
 	{
 		pe = p + 1;
 	}
 
 	void 
-	OnLexerError ()
+	onLexerError ()
 	{	
 	}
 	
 	TToken*
-	PreCreateToken (
-		int Token,
-		size_t Channel = 0
+	preCreateToken (
+		int tokenKind,
+		size_t channel = 0
 		)
 	{
-		size_t Offset = ts - m_pBegin;
-		size_t Length = te - ts;
+		size_t offset = ts - m_begin;
+		size_t length = te - ts;
 
-		TToken* pToken = this->AllocateToken (); 
-		pToken->m_Token = Token;
-		pToken->m_Channel = Channel;
-		pToken->m_Pos.m_Offset = Offset;
-		pToken->m_Pos.m_Line = m_Line;
-		pToken->m_Pos.m_Col = Offset - m_LineOffset;
-		pToken->m_Pos.m_Length = Length;
-		pToken->m_Pos.m_p = ts;
-		return pToken;
+		TToken* token = this->allocateToken (); 
+		token->m_token = tokenKind;
+		token->m_channel = channel;
+		token->m_pos.m_offset = offset;
+		token->m_pos.m_line = m_line;
+		token->m_pos.m_col = offset - m_lineOffset;
+		token->m_pos.m_length = length;
+		token->m_pos.m_p = ts;
+		return token;
 	}
 
 	void
-	PostCreateToken ()
+	postCreateToken ()
 	{
-		m_TokenizeCount++;
-		if (m_TokenizeCount >= m_TokenizeLimit)
-			Break ();
+		m_tokenizeCount++;
+		if (m_tokenizeCount >= m_tokenizeLimit)
+			stop ();
 	}
 
 	TToken*
-	CreateToken (
-		int Token,
-		size_t Channel = 0
+	createToken (
+		int tokenKind,
+		size_t channel = 0
 		)
 	{
-		TToken* pToken = PreCreateToken (Token, Channel);
-		PostCreateToken ();
-		return pToken;
+		TToken* token = preCreateToken (tokenKind, channel);
+		postCreateToken ();
+		return token;
 	}
 
 	TToken*
-	CreateErrorToken (int Char)
+	createErrorToken (int c)
 	{
-		TToken* pToken = CreateToken (-1);
-		pToken->m_Data.m_Integer = Char;
-		PostCreateToken ();
-		return pToken;
+		TToken* token = createToken (-1);
+		token->m_data.m_integer = c;
+		postCreateToken ();
+		return token;
 	}
 	
 	void 
-	OnReset ()
+	onReset ()
 	{
 		p = NULL;
 		pe = NULL;
@@ -351,30 +351,30 @@ protected:
 		top = 0;
 		stack = NULL;
 
-		m_pBegin = NULL;
-		m_Line = 0;
-		m_LineOffset = 0;
-		m_TokenizeLimit = 8;
-		m_TokenizeCount = 0;
+		m_begin = NULL;
+		m_line = 0;
+		m_lineOffset = 0;
+		m_tokenizeLimit = 8;
+		m_tokenizeCount = 0;
 
-		m_FilePath.Clear ();
-		m_Stack.Clear ();
+		m_filePath.clear ();
+		m_stack.clear ();
 	}
 
 	void
-	Tokenize ()
+	tokenize ()
 	{
 		if (p != eof) 
 		{
 			pe = eof;
-			m_TokenizeCount = 0;
-			static_cast <T*> (this)->Exec ();
+			m_tokenizeCount = 0;
+			static_cast <T*> (this)->exec ();
 		}
 		else
 		{
 			// add eof token
 			ts = te = p;
-			CreateToken (0);
+			createToken (0);
 		}
 	}
 

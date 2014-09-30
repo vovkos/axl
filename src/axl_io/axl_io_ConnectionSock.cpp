@@ -8,132 +8,132 @@ namespace io {
 //.............................................................................
 
 bool
-CConnectionSock::Open (
-	ESockProto Protocol,
-	ESockAddr AddrKind,
-	const TSockAddr* pAddr
+CConnectionSock::open (
+	ESockProto protocol,
+	ESockAddr addrKind,
+	const TSockAddr* addr
 	)
 {
-	Close ();
+	close ();
 
-	bool Result = m_Sock.Open (AddrKind, SOCK_STREAM, Protocol);
-	if (!Result)
+	bool result = m_sock.open (addrKind, SOCK_STREAM, protocol);
+	if (!result)
 		return false;
 
-	if (pAddr)
+	if (addr)
 	{
-		SOCKADDR Addr;
+		SOCKADDR addr;
 		
-		Result = 
-			pAddr->ToWinSockAddr (&Addr) &&
-			m_Sock.Bind (&Addr);
+		result = 
+			addr->toWinSockAddr (&addr) &&
+			m_sock.bind (&addr);
 
-		if (!Result)
+		if (!result)
 			return false;
 	}
 
-	exe::CFunctionT <exe::CArgT <CConnectionSock*>, exe::CArgT <void> > OnEvent (
-		pvoid_cast (&CConnectionSock::OnSocketEvent_wt), 
+	exe::CFunctionT <exe::CArgT <CConnectionSock*>, exe::CArgT <void> > onEvent (
+		pvoid_cast (&CConnectionSock::onSocketEvent_wt), 
 		this
 		);
 
-	m_WorkerThread = exe::GetWorkerThread (&m_Event, &OnEvent, &m_hWorkerThreadEvent);
-	if (!m_WorkerThread)
+	m_workerThread = exe::getWorkerThread (&m_event, &onEvent, &m_hWorkerThreadEvent);
+	if (!m_workerThread)
 		return false;
 
 	return true;
 }
 
 void
-CConnectionSock::Close ()
+CConnectionSock::close ()
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return;
 
-	m_WorkerThread->SyncSchedule <exe::CArgT <CConnectionSock*> > (
-		pvoid_cast (&CConnectionSock::Close_wt),
+	m_workerThread->syncSchedule <exe::CArgT <CConnectionSock*> > (
+		pvoid_cast (&CConnectionSock::close_wt),
 		this
 		);
 }
 
 bool 
-CConnectionSock::Connect (
-	const TSockAddr* pAddr,
-	uint_t Timeout,
-	const exe::CFunction& OnComplete
+CConnectionSock::connect (
+	const TSockAddr* addr,
+	uint_t timeout,
+	const exe::CFunction& onComplete
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_4 <
+	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
 		CConnectionSock*,
 		TSockAddr*,
 		uint_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::Connect_wt),
+		pvoid_cast (&CConnectionSock::connect_wt),
 		this,
-		pAddr,
-		Timeout,
-		pOnComplete
+		addr,
+		timeout,
+		onComplete
 		) != 0;
 }
 
 bool 
-CConnectionSock::Disconnect (
-	uint_t Timeout,
-	const exe::CFunction& OnComplete
+CConnectionSock::disconnect (
+	uint_t timeout,
+	const exe::CFunction& onComplete
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_3 <
+	return m_workerThread->syncSchedule <exe::CArgSeqT_3 <
 		CConnectionSock*,
 		uint_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::Disconnect_wt),
+		pvoid_cast (&CConnectionSock::disconnect_wt),
 		this,
-		Timeout,
-		pOnComplete
+		timeout,
+		onComplete
 		) != 0;
 }
 
 void 
-OnSyncConnectDisconnectComplete (
-	mt::CEvent* pEvent,
-	err::CError* pError,
-	const err::CError& Error
+onSyncConnectDisconnectComplete (
+	mt::CEvent* event,
+	err::CError* error,
+	const err::CError& error
 	)
 {
-	if (pError)
-		*pError = Error;
+	if (error)
+		*error = error;
 
-	pEvent->Signal ();
+	event->signal ();
 }
 
 bool 
-CConnectionSock::SyncConnect (
-	const TSockAddr* pAddr,
-	uint_t Timeout
+CConnectionSock::syncConnect (
+	const TSockAddr* addr,
+	uint_t timeout
 	)
 {
-	mt::CEvent Event;
-	err::CError Error;
+	mt::CEvent event;
+	err::CError error;
 	
 	exe::CFunctionT <
 		exe::CArgSeqT_2 <mt::CEvent*, err::CError*>,
 		COnConnectCompleteArg
-		> OnComplete (OnSyncConnectDisconnectComplete, &Event, &Error);
+		> onComplete (onSyncConnectDisconnectComplete, &event, &error);
 
-	Connect (pAddr, Timeout, &OnComplete);
-	Event.Wait ();
+	connect (addr, timeout, &onComplete);
+	event.wait ();
 
-	if (Error)
+	if (error)
 	{
-		err::SetError (Error);
+		err::setError (error);
 		return false;
 	}
 
@@ -141,22 +141,22 @@ CConnectionSock::SyncConnect (
 }
 
 bool 
-CConnectionSock::SyncDisconnect (uint_t Timeout)
+CConnectionSock::syncDisconnect (uint_t timeout)
 {
-	mt::CEvent Event;
-	err::CError Error;
+	mt::CEvent event;
+	err::CError error;
 
 	exe::CFunctionT <
 		exe::CArgSeqT_2 <mt::CEvent*, err::CError*>,
 		COnDisconnectCompleteArg
-		> OnComplete (OnSyncConnectDisconnectComplete, &Event, &Error);
+		> onComplete (onSyncConnectDisconnectComplete, &event, &error);
 
-	Disconnect (Timeout, &OnComplete);
-	Event.Wait ();
+	disconnect (timeout, &onComplete);
+	event.wait ();
 
-	if (Error)
+	if (error)
 	{
-		err::SetError (Error);
+		err::setError (error);
 		return false;
 	}
 
@@ -164,200 +164,200 @@ CConnectionSock::SyncDisconnect (uint_t Timeout)
 }
 
 bool
-CConnectionSock::Send (
+CConnectionSock::send (
 	const void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+	size_t size,
+	const exe::CFunction& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_4 <
+	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
 		CConnectionSock*,
 		void*,
 		size_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::Send_wt),
+		pvoid_cast (&CConnectionSock::send_wt),
 		this,
 		p,
-		Size,
-		pOnComplete
+		size,
+		onComplete
 		) != 0;
 }
 
 bool
-CConnectionSock::Recv (
+CConnectionSock::recv (
 	void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete // void OnComplete (err::CError* pError, size_t ActualSize);
+	size_t size,
+	const exe::CFunction& onComplete // void OnComplete (err::CError* pError, size_t ActualSize);
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_4 <
+	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
 		CConnectionSock*,
 		void*,
 		size_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CConnectionSock::Recv_wt),
+		pvoid_cast (&CConnectionSock::recv_wt),
 		this,
 		p,
-		Size,
-		pOnComplete
+		size,
+		onComplete
 		) != 0;
 }
 
 void
-CConnectionSock::Close_wt ()
+CConnectionSock::close_wt ()
 {
-	m_Sock.Close ();
+	m_sock.close ();
 	
-	if (m_OnConnectComplete)
-		m_OnConnectComplete->Invoke (0, &err::CError (err::EStatus_Cancelled));
+	if (m_onConnectComplete)
+		m_onConnectComplete->invoke (0, &err::CError (err::EStatus_Cancelled));
 
-	if (m_OnDisconnectComplete)
-		m_OnDisconnectComplete->Invoke (0, &err::CError (err::EStatus_Cancelled));
+	if (m_onDisconnectComplete)
+		m_onDisconnectComplete->invoke (0, &err::CError (err::EStatus_Cancelled));
 
-	while (!m_SendRecvList.IsEmpty ())
+	while (!m_sendRecvList.isEmpty ())
 		::SleepEx (0, true);
 
-	m_OnConnectComplete = ref::EPtr_Null;
-	m_OnDisconnectComplete = ref::EPtr_Null;
-	m_Event.Reset ();
-	m_WorkerThread->RemoveEvent (m_hWorkerThreadEvent);
-	m_WorkerThread = ref::EPtr_Null;
+	m_onConnectComplete = ref::EPtr_Null;
+	m_onDisconnectComplete = ref::EPtr_Null;
+	m_event.reset ();
+	m_workerThread->removeEvent (m_hWorkerThreadEvent);
+	m_workerThread = ref::EPtr_Null;
 	m_hWorkerThreadEvent = NULL;
 }
 
 bool 
-CConnectionSock::Connect_wt (
-	const TSockAddr* pAddr,
-	uint_t Timeout,
-	const exe::CFunction& OnComplete
+CConnectionSock::connect_wt (
+	const TSockAddr* addr,
+	uint_t timeout,
+	const exe::CFunction& onComplete
 	)
 {
-	SOCKADDR Addr;
+	SOCKADDR addr;
 
-	bool Result = 
-		pAddr->ToWinSockAddr (&Addr) && 
-		m_Sock.Select (m_Event.m_Event, FD_CONNECT) &&
-		m_Sock.Connect (&Addr);
+	bool result = 
+		addr->toWinSockAddr (&addr) && 
+		m_sock.select (m_event.m_event, FD_CONNECT) &&
+		m_sock.connect (&addr);
 
-	if (!Result)
+	if (!result)
 	{
-		pOnComplete->Invoke (0, err::GetError ());
+		onComplete->invoke (0, err::getError ());
 		return false;
 	}
 
-	m_OnConnectComplete = ref::GetPtrOrClone (pOnComplete);
+	m_onConnectComplete = ref::getPtrOrClone (onComplete);
 	return true;
 }
 
 bool 
-CConnectionSock::Disconnect_wt (
-	uint_t Timeout,
-	const exe::CFunction& OnComplete
+CConnectionSock::disconnect_wt (
+	uint_t timeout,
+	const exe::CFunction& onComplete
 	)
 {
-	bool Result = 
-		m_Sock.Select (m_Event.m_Event, FD_CLOSE) &&
-		m_Sock.Shutdown (SD_BOTH);
+	bool result = 
+		m_sock.select (m_event.m_event, FD_CLOSE) &&
+		m_sock.shutdown (SD_BOTH);
 
-	if (!Result)
+	if (!result)
 	{
-		pOnComplete->Invoke (0, false, err::GetError ());
+		onComplete->invoke (0, false, err::getError ());
 		return false;
 	}
 
-	m_OnDisconnectComplete = ref::GetPtrOrClone (pOnComplete);
+	m_onDisconnectComplete = ref::getPtrOrClone (onComplete);
 	return true;
 }
 
 void
-CConnectionSock::OnSocketEvent_wt ()
+CConnectionSock::onSocketEvent_wt ()
 {
-	WSANETWORKEVENTS Events = { 0 };
+	WSANETWORKEVENTS events = { 0 };
 
-	int Result = WSAEnumNetworkEvents (m_Sock, NULL, &Events);
-	if (Result == SOCKET_ERROR)
+	int result = WSAEnumNetworkEvents (m_sock, NULL, &events);
+	if (result == SOCKET_ERROR)
 		return ;
 
-	if (Events.lNetworkEvents & FD_CONNECT)
+	if (events.lNetworkEvents & FD_CONNECT)
 	{
-		Result = Events.iErrorCode [FD_CONNECT_BIT];
+		result = events.iErrorCode [FD_CONNECT_BIT];
 
-		err::CError e (Result);
+		err::CError e (result);
 
-		m_OnConnectComplete->Invoke (0, Result ? &e : NULL);
+		m_onConnectComplete->invoke (0, result ? &e : NULL);
 
 		memset (&e, -1, sizeof (e));
 
-		m_OnConnectComplete = ref::EPtr_Null;
+		m_onConnectComplete = ref::EPtr_Null;
 	}
 
-	if (Events.lNetworkEvents & FD_CLOSE)
+	if (events.lNetworkEvents & FD_CLOSE)
 	{
-		Result = Events.iErrorCode [FD_CLOSE_BIT];
+		result = events.iErrorCode [FD_CLOSE_BIT];
 
-		m_OnDisconnectComplete->Invoke (0, Result ? &err::CError (Result) : NULL);
-		m_OnDisconnectComplete = ref::EPtr_Null;
+		m_onDisconnectComplete->invoke (0, result ? &err::CError (result) : NULL);
+		m_onDisconnectComplete = ref::EPtr_Null;
 	}
 }
 
 bool
-CConnectionSock::Send_wt (
+CConnectionSock::send_wt (
 	const void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete
+	size_t size,
+	const exe::CFunction& onComplete
 	)
 {
-	TSendRecv* pSend = AXL_MEM_NEW (TSendRecv);
-	pSend->m_pSock = this;
-	pSend->m_OnComplete = ref::GetPtrOrClone (pOnComplete);
-	pSend->m_Overlapped.hEvent = pSend;
-	m_SendRecvList.InsertTail (pSend);
+	TSendRecv* send = AXL_MEM_NEW (TSendRecv);
+	send->m_sock = this;
+	send->m_onComplete = ref::getPtrOrClone (onComplete);
+	send->m_overlapped.hEvent = send;
+	m_sendRecvList.insertTail (send);
 
-	bool Result = m_Sock.Send (p, Size, &pSend->m_Overlapped, OnSendRecvComplete_wt);
-	if (!Result)	
-		CompleteSendRecv_wt (pSend, err::GetError (), 0); 
+	bool result = m_sock.send (p, size, &send->m_overlapped, onSendRecvComplete_wt);
+	if (!result)	
+		completeSendRecv_wt (send, err::getError (), 0); 
 
-	return Result;
+	return result;
 }
 
 bool
-CConnectionSock::Recv_wt (
+CConnectionSock::recv_wt (
 	void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete
+	size_t size,
+	const exe::CFunction& onComplete
 	)
 {
-	TSendRecv* pRecv = AXL_MEM_NEW (TSendRecv);
-	pRecv->m_pSock = this;
-	pRecv->m_OnComplete = ref::GetPtrOrClone (pOnComplete);
-	pRecv->m_Overlapped.hEvent = pRecv;
-	m_SendRecvList.InsertTail (pRecv);
+	TSendRecv* recv = AXL_MEM_NEW (TSendRecv);
+	recv->m_sock = this;
+	recv->m_onComplete = ref::getPtrOrClone (onComplete);
+	recv->m_overlapped.hEvent = recv;
+	m_sendRecvList.insertTail (recv);
 
-	bool Result = m_Sock.Recv (p, Size, &pRecv->m_Overlapped, OnSendRecvComplete_wt);
-	if (!Result)	
-		CompleteSendRecv_wt (pRecv, err::GetError (), 0); 
+	bool result = m_sock.recv (p, size, &recv->m_overlapped, onSendRecvComplete_wt);
+	if (!result)	
+		completeSendRecv_wt (recv, err::getError (), 0); 
 
-	return Result;
+	return result;
 }
 
 void
-CConnectionSock::CompleteSendRecv_wt (
-	TSendRecv* pSendRecv,
-	const err::CError& Error,
-	size_t ActualSize
+CConnectionSock::completeSendRecv_wt (
+	TSendRecv* sendRecv,
+	const err::CError& error,
+	size_t actualSize
 	)
 {
-	pSendRecv->m_OnComplete->Invoke (0, &Error, ActualSize);
-	m_SendRecvList.Remove (pSendRecv);
-	AXL_MEM_DELETE (pSendRecv);
+	sendRecv->m_onComplete->invoke (0, &error, actualSize);
+	m_sendRecvList.remove (sendRecv);
+	AXL_MEM_DELETE (sendRecv);
 }
 
 //.............................................................................

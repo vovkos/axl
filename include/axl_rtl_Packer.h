@@ -20,67 +20,67 @@ class CPacker
 public:
 	virtual
 	axl_va_list
-	Pack_va (
+	pack_va (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		) = 0;
 	
 	void
-	Pack (
+	pack (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pSize);
-		Pack_va (p, pSize, va);
+		AXL_VA_DECL (va, size);
+		pack_va (p, size, va);
 	}
 
 	size_t
-	Count_va (axl_va_list va)
+	count_va (axl_va_list va)
 	{
-		size_t Size = 0;
-		Pack_va (NULL, &Size, va);
-		return Size;
+		size_t size = 0;
+		pack_va (NULL, &size, va);
+		return size;
 	}
 
 	size_t
-	Count (
-		int Unused,
+	count (
+		int unused,
 		...
 		)
 	{
-		AXL_VA_DECL (va, Unused);
-		return Count_va (va);
+		AXL_VA_DECL (va, unused);
+		return count_va (va);
 	}
 
 	ref::CPtrT <mem::TBlock> 
-	CreatePackage_va (axl_va_list va)
+	createPackage_va (axl_va_list va)
 	{
-		size_t Size = 0;
-		Pack_va (NULL, &Size, va);
+		size_t size = 0;
+		pack_va (NULL, &size, va);
 
-		if (Size == -1)
+		if (size == -1)
 			return ref::EPtr_Null;
 
 		typedef ref::CBoxT <mem::TBlock> CPackage;
-		ref::CPtrT <CPackage> Package = AXL_REF_NEW_EXTRA (CPackage, Size);
-		Pack_va (Package + 1, &Size, va);
-		Package->m_p = Package + 1;
-		Package->m_Size = Size;
+		ref::CPtrT <CPackage> package = AXL_REF_NEW_EXTRA (CPackage, size);
+		pack_va (package + 1, &size, va);
+		package->m_p = package + 1;
+		package->m_size = size;
 
-		return Package;			
+		return package;			
 	}
 
 	ref::CPtrT <mem::TBlock> 
-	CreatePackage (
-		int Unused,
+	createPackage (
+		int unused,
 		...
 		)
 	{
-		AXL_VA_DECL (va, Unused);
-		return CreatePackage_va (va);
+		AXL_VA_DECL (va, unused);
+		return createPackage_va (va);
 	}
 };
 
@@ -92,21 +92,20 @@ class CPackerImplT: public CPacker
 public:
 	virtual
 	axl_va_list
-	Pack_va (
+	pack_va (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		size_t Size;
-		return TPack () (p, &Size, va);
+		return TPack () (p, size, va);
 	}
 
 	static
 	CPackerImplT*
-	GetSingleton ()
+	getSingleton ()
 	{
-		return rtl::GetSimpleSingleton <CPackerImplT> ();
+		return rtl::getSimpleSingleton <CPackerImplT> ();
 	}
 };
 
@@ -117,47 +116,47 @@ public:
 class CPackerSeq: public CPacker
 {
 protected:
-	rtl::CArrayT <CPacker*> m_Sequence;
+	rtl::CArrayT <CPacker*> m_sequence;
 
 public:
 	virtual
 	axl_va_list
-	Pack_va (
+	pack_va (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		);
 
 	void
-	Clear ()
+	clear ()
 	{
-		m_Sequence.Clear ();
+		m_sequence.clear ();
 	}
 
 	size_t
-	Append (CPacker* pPacker)
+	append (CPacker* packer)
 	{
-		m_Sequence.Append (pPacker);
-		return m_Sequence.GetCount ();
+		m_sequence.append (packer);
+		return m_sequence.getCount ();
 	}
 
 	template <typename T>
 	size_t
-	Append ()
+	append ()
 	{
-		return Append (CPackerImplT <T>::GetSingleton ());
+		return append (CPackerImplT <T>::getSingleton ());
 	}
 
 	// often times it is more convenient to use printf-like format string for sequencing
 
 	size_t
-	AppendFormat (const char* pFormat);
+	appendFormat (const char* formatString);
 
 	size_t
-	Format (const char* pFormat)
+	format (const char* formatString)
 	{
-		Clear ();
-		return AppendFormat (pFormat);
+		clear ();
+		return appendFormat (formatString);
 	}
 };
 
@@ -165,27 +164,27 @@ public:
 
 inline
 ref::CPtrT <mem::TBlock> 
-FormatPackage_va (
-	const char* pFormat, 
+formatPackage_va (
+	const char* formatString, 
 	axl_va_list va
 	)
 {
-	CPackerSeq Packer;
-	Packer.Format (pFormat);
-	return Packer.CreatePackage_va (va);
+	CPackerSeq packer;
+	packer.format (formatString);
+	return packer.createPackage_va (va);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 ref::CPtrT <mem::TBlock> 
-FormatPackage (
-	const char* pFormat, 
+formatPackage (
+	const char* formatString, 
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return FormatPackage_va (pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	return formatPackage_va (formatString, va);
 }
 
 //.............................................................................
@@ -195,94 +194,94 @@ FormatPackage (
 class CPackage
 {
 protected:
-	axl::rtl::CArrayT <uchar_t> m_Buffer;
+	axl::rtl::CArrayT <uchar_t> m_buffer;
 
 public:
 	void 
-	Clear ()
+	clear ()
 	{
-		m_Buffer.Clear ();
+		m_buffer.clear ();
 	}
 
 	const uchar_t*
-	GetBuffer ()
+	getBuffer ()
 	{
-		return m_Buffer;
+		return m_buffer;
 	}
 
 	size_t
-	GetSize ()
+	getSize ()
 	{
-		return m_Buffer.GetCount ();
+		return m_buffer.getCount ();
 	}
 
 	size_t
-	Append_va (
-		CPacker* pPack,
+	append_va (
+		CPacker* pack,
 		axl_va_list va
 		);
 
 	template <typename TPack>
 	size_t
-	Append_va (axl_va_list va)
+	append_va (axl_va_list va)
 	{
-		CPacker* pPack = CPackerImplT <TPack>::GetSingleton ();
-		return Append_va (pPack, va);
+		CPacker* pack = CPackerImplT <TPack>::getSingleton ();
+		return append_va (pack, va);
 	}
 
 	size_t
-	Append (
+	append (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 /*
 	template <typename T>
 	size_t 
-	Append (const T& Data)
+	append (const T& data)
 	{
-		CPacker* pPack = CPackerImplT <CPackT <T> >::GetSingleton ();
-		return Pack (&Data, sizeof (Data));
+		CPacker* pack = CPackerImplT <CPackT <T> >::getSingleton ();
+		return pack (&data, sizeof (data));
 	}
 */
 	size_t
-	AppendFormat_va (
-		const char* pFormat,
+	appendFormat_va (
+		const char* formatString,
 		axl_va_list va
 		)
 	{
-		CPackerSeq Packer;
-		Packer.Format (pFormat);
-		return Append_va (&Packer, va);
+		CPackerSeq packer;
+		packer.format (formatString);
+		return append_va (&packer, va);
 	}
 
 	size_t
-	AppendFormat (
-		const char* pFormat,
+	appendFormat (
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return AppendFormat_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return appendFormat_va (formatString, va);
 	}
 
 	size_t
-	Format_va (
-		const char* pFormat,
+	format_va (
+		const char* formatString,
 		axl_va_list va
 		)
 	{
-		Clear ();
-		return AppendFormat_va (pFormat, va);
+		clear ();
+		return appendFormat_va (formatString, va);
 	}
 
 	size_t
-	Format (
-		const char* pFormat,
+	format (
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return Format_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return format_va (formatString, va);
 	}
 };
 

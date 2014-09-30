@@ -7,16 +7,16 @@ namespace err {
 //.............................................................................
 
 TError*
-CErrno::Create (int Error)
+CErrno::create (int code)
 {
-	TError* pError = GetBuffer (sizeof (TError));
-	if (!pError)
+	TError* error = getBuffer (sizeof (TError));
+	if (!error)
 		return NULL;
 
-	pError->m_Size = sizeof (TError);
-	pError->m_Guid = GUID_Errno;
-	pError->m_Code = Error;
-	return pError;
+	error->m_size = sizeof (TError);
+	error->m_guid = GUID_Errno;
+	error->m_code = code;
+	return error;
 }
 
 //.............................................................................

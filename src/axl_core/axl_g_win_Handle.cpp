@@ -8,17 +8,17 @@ namespace win {
 //.............................................................................
 
 bool
-CFileHandle::CompleteAsyncRequest (
-	bool_t Result,
-	OVERLAPPED* pOverlapped
+CFileHandle::completeAsyncRequest (
+	bool_t result,
+	OVERLAPPED* overlapped
 	)
 {
-	if (!Result)
+	if (!result)
 	{
-		dword_t Error = ::GetLastError ();
-		if (!pOverlapped || Error != ERROR_IO_PENDING)
+		dword_t error = ::GetLastError ();
+		if (!overlapped || error != ERROR_IO_PENDING)
 		{
-			err::SetError (Error);
+			err::setError (error);
 			return false;
 		}
 	}
@@ -27,21 +27,21 @@ CFileHandle::CompleteAsyncRequest (
 }
 
 size_t
-CFileHandle::GetOverlappedResult (OVERLAPPED* pOverlapped)
+CFileHandle::getOverlappedResult (OVERLAPPED* overlapped)
 {
-	dword_t ActualSize;
-	bool_t Result = ::GetOverlappedResult (m_h, pOverlapped, &ActualSize, true);
-	if (!Result)
+	dword_t actualSize;
+	bool_t result = ::GetOverlappedResult (m_h, overlapped, &actualSize, true);
+	if (!result)
 	{
-		DWORD Error = ::GetLastError ();
-		if (Error == ERROR_HANDLE_EOF)
+		DWORD error = ::GetLastError ();
+		if (error == ERROR_HANDLE_EOF)
 			return 0;
 
-		err::SetError (Error);
+		err::setError (error);
 		return -1;
 	}
 
-	return ActualSize;
+	return actualSize;
 }
 
 //.............................................................................

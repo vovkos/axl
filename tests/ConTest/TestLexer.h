@@ -166,39 +166,39 @@ class CLexer: public axl::lex::CRagelLexerT <CLexer, CToken>
 
 protected:
 	CToken*
-	CreateIntegerToken (
-		int Begin, 
-		int Base
+	createIntegerToken (
+		int begin, 
+		int base
 		)
 	{
-		CToken* pToken = CreateToken (EToken_Integer);
-		pToken->m_Data.m_Integer = strtoul(ts + Begin, NULL, Base);
-		return pToken;
+		CToken* token = createToken (EToken_Integer);
+		token->m_data.m_integer = strtoul(ts + begin, NULL, base);
+		return token;
 	}
 
 	CToken*
-	CreateDoubleToken ()
+	createDoubleToken ()
 	{
-		CToken* pToken = CreateToken (EToken_Double);
-		pToken->m_Data.m_Double = strtod (ts, NULL);
-		return pToken;
+		CToken* token = createToken (EToken_Double);
+		token->m_data.m_double = strtod (ts, NULL);
+		return token;
 	}
 
 	CToken*
-	CreateStringToken(
-		int Begin,
-		int End,
-		EToken Token,
-		size_t Channel = 0
+	createStringToken(
+		int begin,
+		int end,
+		EToken token,
+		size_t channel = 0
 		)
 	{
-		CToken* pToken = CreateToken (Token, Channel);
-		pToken->m_Data.m_String.Copy (ts + Begin, pToken->m_Pos.m_Length - Begin - End);
-		return pToken;
+		CToken* token = createToken (token, channel);
+		token->m_data.m_string.copy (ts + begin, token->m_pos.m_length - begin - end);
+		return token;
 	}
 
 	uchar_t
-	GetHexValue (char c)
+	getHexValue (char c)
 	{
 		return 
 			c >= '0' && c <= '9' ? c - '0' :
@@ -207,45 +207,45 @@ protected:
 	}
 
 	CToken*
-	CreateCharConstToken(
-		int Begin,
-		int End	
+	createCharConstToken(
+		int begin,
+		int end	
 		)
 	{
-		CToken* pToken = CreateToken (EToken_Integer);
-		pToken->m_Data.m_Int64 = 0;
+		CToken* token = createToken (EToken_Integer);
+		token->m_data.m_int64 = 0;
 
-		if (!pToken->m_Pos.m_Length)
-			return pToken;
+		if (!token->m_pos.m_length)
+			return token;
 
-		size_t Length = pToken->m_Pos.m_Length - Begin - End;
-		if (Length > 16) // int64
-			Length = 16;
+		size_t length = token->m_pos.m_length - begin - end;
+		if (length > 16) // int64
+			length = 16;
 		
-		char* p = ts + Begin;
-		int Base = 1 << (Length - 1) * 4;
+		char* p = ts + begin;
+		int base = 1 << (length - 1) * 4;
 
-		for (; Base; p++, Base >>= 4)
-			pToken->m_Data.m_Int64 += Base * GetHexValue (*p);
+		for (; base; p++, base >>= 4)
+			token->m_data.m_int64 += base * getHexValue (*p);
 
-		return pToken;
+		return token;
 	}
 
 	CToken*
-	CreateIntegerConstToken (int Value)
+	createIntegerConstToken (int value)
 	{
-		CToken* pToken = CreateToken (EToken_Integer);
-		pToken->m_Data.m_Integer = Value;
-		return pToken;
+		CToken* token = createToken (EToken_Integer);
+		token->m_data.m_integer = value;
+		return token;
 	}
 
 	// implemented in TestLexer.rl
 
 	void 
-	Init ();
+	init ();
 
 	bool
-	Exec ();
+	exec ();
 };
 
 //.............................................................................

@@ -19,34 +19,34 @@ class CTracker
 public:
 	struct TBlockHdr: rtl::TListLink
 	{
-		size_t m_Size;
-		size_t m_SeqNum;
-		const char* m_pTag;
-		const char* m_pFilePath;
-		size_t m_Line;
+		size_t m_size;
+		size_t m_seqNum;
+		const char* m_tag;
+		const char* m_filePath;
+		size_t m_line;
 	};
 
 protected:
-	mt::CLock m_Lock;
-	rtl::CAuxListT <TBlockHdr> m_BlockList;
+	mt::CLock m_lock;
+	rtl::CAuxListT <TBlockHdr> m_blockList;
 
-	size_t m_PeakBlockCount;
-	size_t m_TotalBlockCount;
-	size_t m_Size;
-	size_t m_PeakSize;
-	size_t m_TotalSize;
+	size_t m_peakBlockCount;
+	size_t m_totalBlockCount;
+	size_t m_size;
+	size_t m_peakSize;
+	size_t m_totalSize;
 
 public:
 	CTracker ();
 
 	void
-	Add (TBlockHdr* pHdr);
+	add (TBlockHdr* hdr);
 
 	void
-	Remove (TBlockHdr* pHdr);
+	remove (TBlockHdr* hdr);
 
 	void 
-	Trace ();
+	trace ();
 };
 
 //.............................................................................

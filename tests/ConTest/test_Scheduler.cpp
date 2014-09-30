@@ -49,7 +49,7 @@ public:
 //.............................................................................
 
 void 
-Test (
+test (
 	int x,
 	int y,
 	int z
@@ -63,12 +63,12 @@ class CMyScheduler: public exe::IScheduler
 public:
 	virtual
 	EScheduleResult
-	Schedule_va (
-		const exe::CFunction& Function, 
+	schedule_va (
+		const exe::CFunction& function, 
 		axl_va_list va
 		)
 	{
-		pFunction->Invoke_va (va);
+		function->invoke_va (va);
 		return EScheduleResult_Invoke;
 	}
 };
@@ -77,7 +77,7 @@ struct IInterfaceA
 {
 	int m_x;
 
-	virtual void Foo () {}
+	virtual void foo () {}
 };
 
 struct IInterfaceB: IInterfaceA
@@ -91,23 +91,23 @@ struct IInterfaceC: IInterfaceA
 };
 
 void 
-Run ()
+run ()
 {
 	CTest* p;
 	
-	p = rtl::GetSingleton <CTest> ();
-	p = rtl::GetSingleton <CTest> ();
+	p = rtl::getSingleton <CTest> ();
+	p = rtl::getSingleton <CTest> ();
 	
 	CTest2* p2;
 	
-	p2 = rtl::GetSingleton <CTest2> ();
-	p2 = rtl::GetSingleton <CTest2> ();
+	p2 = rtl::getSingleton <CTest2> ();
+	p2 = rtl::getSingleton <CTest2> ();
 
 	ref::CPtrT<CTest> x = AXL_REF_NEW (ref::CBoxT <CTest>);
 	ref::CWeakPtrT<CTest> y = x;
-	y.Detach ();
+	y.detach ();
 
-	CMyScheduler Scheduler;
+	CMyScheduler scheduler;
 
 	exe::CFunctionT <
 		exe::CArgSeqT_2 <
@@ -119,9 +119,9 @@ Run ()
 			int,
 			int
 			>
-		> Function (Test, -1, -2);
+		> function (test, -1, -2);
 
-	Function.Invoke (0, 100, 200, 300);
+	function.invoke (0, 100, 200, 300);
 }
 
 */

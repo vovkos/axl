@@ -118,7 +118,7 @@ public:
 template <
 	typename A, 
 	typename B, 
-	size_t Offset
+	size_t offset
 	>
 class COffsetT
 {
@@ -126,7 +126,7 @@ public:
 	B* 
 	operator () (A* p) const
 	{ 
-		return (B*) ((uchar_t*) p + Offset); 
+		return (B*) ((uchar_t*) p + offset); 
 	}
 };
 
@@ -238,7 +238,7 @@ public:
 	void 
 	operator () (T* p) const
 	{ 
-		p->Release (); 
+		p->release (); 
 	}
 };
 
@@ -763,13 +763,13 @@ typedef CCmpStringT_i <wchar_t> CCmpString_wi;
 size_t
 djb2 (
 	const void* p,
-	size_t Size
+	size_t size
 	);
 
 uint16_t
 crc16(
 	const void* p, 
-	size_t Size
+	size_t size
 	);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -779,9 +779,9 @@ class CHashDjb2T
 {
 public:
 	size_t 
-	operator () (const T& Key) const
+	operator () (const T& key) const
 	{ 
-		return djb2 (&Key, sizeof (Key)); 
+		return djb2 (&key, sizeof (key)); 
 	}
 };
 
@@ -792,9 +792,9 @@ class CHashCrc16T
 {
 public:
 	size_t 
-	operator () (const T& Key) const
+	operator () (const T& key) const
 	{ 
-		return crc16 (&Key, sizeof (Key)); 
+		return crc16 (&key, sizeof (key)); 
 	}
 };
 
@@ -805,9 +805,9 @@ class CHashIdT
 {
 public:
 	size_t 
-	operator () (T Key) const
+	operator () (T key) const
 	{ 
-		return (size_t) Key; 
+		return (size_t) key; 
 	}
 };
 
@@ -972,7 +972,7 @@ public:
 
 template <typename T>
 void
-Swap (
+swap (
 	T& a, 
 	T& b
 	)
@@ -992,7 +992,7 @@ public:
 		T& b
 		) const
 	{ 
-		Swap (a, b);
+		swap (a, b);
 	}
 };
 

@@ -10,8 +10,8 @@ namespace gui {
 
 CGdiCanvas::CGdiCanvas ()
 {
-	m_pEngine = CGdiEngine::GetSingleton ();
-	m_DestructKind = EDestruct_None;
+	m_engine = CGdiEngine::getSingleton ();
+	m_destructKind = EDestruct_None;
 	m_hCompatibleDc = NULL;
 	m_hBitmap = NULL;
 	m_hPrevBitmap = NULL;
@@ -19,21 +19,21 @@ CGdiCanvas::CGdiCanvas ()
 }
 
 void
-CGdiCanvas::Attach (
+CGdiCanvas::attach (
 	HDC hdc,
 	HWND hWnd,
-	EDestruct DestructKind
+	EDestruct destructKind
 	)
 {
-	Release ();
+	release ();
 
 	m_h = hdc;
 	m_hWnd = hWnd;
-	m_DestructKind = DestructKind;
+	m_destructKind = destructKind;
 }
 
 void
-CGdiCanvas::Release ()
+CGdiCanvas::release ()
 {
 	if (!m_h)
 		return;
@@ -50,7 +50,7 @@ CGdiCanvas::Release ()
 	if (m_hCompatibleDc)
 		::DeleteDC (m_hCompatibleDc);
 
-	switch (m_DestructKind)
+	switch (m_destructKind)
 	{
 	case EDestruct_DeleteDc:
 		::DeleteDC (m_h);
@@ -61,7 +61,7 @@ CGdiCanvas::Release ()
 		break;
 	}
 
-	m_DestructKind = EDestruct_None;
+	m_destructKind = EDestruct_None;
 	m_h = NULL;
 	m_hCompatibleDc = NULL;
 	m_hBitmap = NULL;
@@ -70,185 +70,185 @@ CGdiCanvas::Release ()
 }
 
 bool
-CGdiCanvas::DrawRect (
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t Color
+CGdiCanvas::drawRect (
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t color
 	)
 {
-	Color = OverlayColor (m_BaseTextAttr.m_BackColor, Color);
+	color = overlayColor (m_baseTextAttr.m_backColor, color);
 
-	if (m_ColorAttr.m_BackColor != Color)
+	if (m_colorAttr.m_backColor != color)
 	{
-		m_ColorAttr.m_BackColor = Color;
+		m_colorAttr.m_backColor = color;
 
-		if (!(Color & EColorFlag_Transparent))
-			::SetBkColor (m_h, m_Palette.GetColorRgb (Color));
+		if (!(color & EColorFlag_Transparent))
+			::SetBkColor (m_h, m_palette.getColorRgb (color));
 	}
 
-	RECT GdiRect = { Left, Top, Right, Bottom };
-	ExtTextOut (m_h, 0, 0, ETO_OPAQUE, &GdiRect, NULL, 0, NULL);
+	RECT gdiRect = { left, top, right, bottom };
+	::ExtTextOut (m_h, 0, 0, ETO_OPAQUE, &gdiRect, NULL, 0, NULL);
 	return true;
 }
 
 bool
-CGdiCanvas::DrawText_utf8 (
+CGdiCanvas::drawText_utf8 (
 	int x,
 	int y,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t TextColor,
-	uint_t BackColor,
-	uint_t FontFlags,
-	const utf8_t* pText,
-	size_t Length
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
+	const utf8_t* text,
+	size_t length
 	)
 {
-	char Buffer [256];
-	rtl::CString_w String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	String.Copy (pText, Length);
+	char buffer [256];
+	rtl::CString_w string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	string.copy (text, length);
 
-	return DrawText_utf16 (
+	return drawText_utf16 (
 		x,
 		y,
-		Left,
-		Top,
-		Right,
-		Bottom,
-		TextColor,
-		BackColor,
-		FontFlags,
-		String,
-		String.GetLength ()
+		left,
+		top,
+		right,
+		bottom,
+		textColor,
+		backColor,
+		fontFlags,
+		string,
+		string.getLength ()
 	);
 }
 
 bool
-CGdiCanvas::DrawText_utf16 (
+CGdiCanvas::drawText_utf16 (
 	int x,
 	int y,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t TextColor,
-	uint_t BackColor,
-	uint_t FontFlags,
-	const utf16_t* pText,
-	size_t Length
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
+	const utf16_t* text,
+	size_t length
 	)
 {
-	TextColor = OverlayColor (m_BaseTextAttr.m_ForeColor, TextColor);
-	BackColor = OverlayColor (m_BaseTextAttr.m_BackColor, BackColor);
-	FontFlags = OverlayFontFlags (m_BaseTextAttr.m_FontFlags, FontFlags);
+	textColor = overlayColor (m_baseTextAttr.m_foreColor, textColor);
+	backColor = overlayColor (m_baseTextAttr.m_backColor, backColor);
+	fontFlags = overlayFontFlags (m_baseTextAttr.m_fontFlags, fontFlags);
 
-	CFont* pFont = m_pBaseFont->GetFontMod (FontFlags);
+	CFont* font = m_baseFont->getFontMod (fontFlags);
 
-	if (m_pFont != pFont)
+	if (m_font != font)
 	{
-		ASSERT (pFont->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-		CGdiFont* pGdiFont = (CGdiFont*) pFont;
+		ASSERT (font->getEngine ()->getEngineKind () == EEngine_Gdi);
+		CGdiFont* gdiFont = (CGdiFont*) font;
 
-		m_pFont = pFont;
-		HFONT hPrevFont = (HFONT) ::SelectObject (m_h, *pGdiFont);
+		m_font = font;
+		HFONT hPrevFont = (HFONT) ::SelectObject (m_h, *gdiFont);
 
 		if (!m_hPrevFont)
 			m_hPrevFont = hPrevFont;
 	}
 
-	if (m_ColorAttr.m_ForeColor != TextColor)
+	if (m_colorAttr.m_foreColor != textColor)
 	{
-		m_ColorAttr.m_ForeColor = TextColor;
+		m_colorAttr.m_foreColor = textColor;
 
-		if (!(TextColor & EColorFlag_Transparent))
-			::SetTextColor (m_h, m_Palette.GetColorRgb (TextColor));
+		if (!(textColor & EColorFlag_Transparent))
+			::SetTextColor (m_h, m_palette.getColorRgb (textColor));
 	}
 
-	if (m_ColorAttr.m_BackColor != BackColor)
+	if (m_colorAttr.m_backColor != backColor)
 	{
-		m_ColorAttr.m_BackColor = BackColor;
+		m_colorAttr.m_backColor = backColor;
 
-		if (!(BackColor & EColorFlag_Transparent))
-			::SetBkColor (m_h, m_Palette.GetColorRgb (BackColor));
+		if (!(backColor & EColorFlag_Transparent))
+			::SetBkColor (m_h, m_palette.getColorRgb (backColor));
 	}
 
-	if (Length == -1)
-		Length = wcslen (pText);
+	if (length == -1)
+		length = wcslen (text);
 
-	RECT GdiRect = { Left, Top, Right, Bottom };
-	::ExtTextOutW (m_h, x, y, ETO_OPAQUE, &GdiRect, pText, Length, NULL);
+	RECT gdiRect = { left, top, right, bottom };
+	::ExtTextOutW (m_h, x, y, ETO_OPAQUE, &gdiRect, text, length, NULL);
 	return true;
 }
 
 bool
-CGdiCanvas::DrawText_utf32 (
+CGdiCanvas::drawText_utf32 (
 	int x,
 	int y,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t TextColor,
-	uint_t BackColor,
-	uint_t FontFlags,
-	const utf32_t* pText,
-	size_t Length
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
+	const utf32_t* text,
+	size_t length
 	)
 {
-	char Buffer [256];
-	rtl::CString_w String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	String.Copy (pText, Length);
+	char buffer [256];
+	rtl::CString_w string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	string.copy (text, length);
 
-	return DrawText_utf16 (
+	return drawText_utf16 (
 		x,
 		y,
-		Left,
-		Top,
-		Right,
-		Bottom,
-		TextColor,
-		BackColor,
-		FontFlags,
-		String,
-		String.GetLength ()
+		left,
+		top,
+		right,
+		bottom,
+		textColor,
+		backColor,
+		fontFlags,
+		string,
+		string.getLength ()
 	);
 }
 
 bool
-CGdiCanvas::DrawImage (
+CGdiCanvas::drawImage (
 	int x,
 	int y,
-	CImage* pImage,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom
+	CImage* image,
+	int left,
+	int top,
+	int right,
+	int bottom
 	)
 {
-	ASSERT (pImage->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-	CGdiImage* pGdiImage = (CGdiImage*) pImage;
+	ASSERT (image->getEngine ()->getEngineKind () == EEngine_Gdi);
+	CGdiImage* gdiImage = (CGdiImage*) image;
 
 	if (!m_hCompatibleDc)
 	{
-		CScreenDc ScreenDc;
-		m_hCompatibleDc = ::CreateCompatibleDC (ScreenDc);
+		CScreenDc screenDc;
+		m_hCompatibleDc = ::CreateCompatibleDC (screenDc);
 	}
 
-	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *pGdiImage);
+	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *gdiImage);
 
 	::BitBlt (
 		m_h,
 		x,
 		y,
-		Right - Left,
-		Bottom - Top,
+		right - left,
+		bottom - top,
 		m_hCompatibleDc,
-		Left,
-		Top,
+		left,
+		top,
 		SRCCOPY
 		);
 
@@ -257,26 +257,26 @@ CGdiCanvas::DrawImage (
 }
 
 bool
-CGdiCanvas::CopyRect (
-	CCanvas* pSrcCanvas,
+CGdiCanvas::copyRect (
+	CCanvas* srcCanvas,
 	int xDst,
 	int yDst,
 	int xSrc,
 	int ySrc,
-	int Width,
-	int Height
+	int width,
+	int height
 	)
 {
-	ASSERT (pSrcCanvas->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-	CGdiCanvas* pDc = (CGdiCanvas*) pSrcCanvas;
+	ASSERT (srcCanvas->getEngine ()->getEngineKind () == EEngine_Gdi);
+	CGdiCanvas* dc = (CGdiCanvas*) srcCanvas;
 
 	::BitBlt (
 		m_h,
 		xDst,
 		yDst,
-		Width,
-		Height,
-		pDc->m_h,
+		width,
+		height,
+		dc->m_h,
 		xSrc,
 		ySrc,
 		SRCCOPY

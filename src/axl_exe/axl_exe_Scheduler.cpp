@@ -10,39 +10,39 @@ namespace exe {
 
 static
 void
-InvokeAndSignalV (
-	IFunction* pFunction,
-	intptr_t* pInvokeResult,
-	mt::CEvent* pEvent,
+invokeAndSignalV (
+	IFunction* function,
+	intptr_t* invokeResult,
+	mt::CEvent* event,
 	axl_va_list va
 	)
 {
-	*pInvokeResult = pFunction->InvokeV (va);
-	pEvent->Signal ();
+	*invokeResult = function->invokeV (va);
+	event->signal ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 intptr_t
-IScheduler::SyncScheduleV (
-	IFunction* pFunction, 
+IScheduler::syncScheduleV (
+	IFunction* function, 
 	axl_va_list va
 	)
 {
-	intptr_t InvokeResult = -1;
-	mt::CEvent Event;
+	intptr_t invokeResult = -1;
+	mt::CEvent event;
 	
-	int Result = Schedule <exe::CArgSeqT_4 <
+	int result = schedule <exe::CArgSeqT_4 <
 		IFunction*,
 		intptr_t*,
 		mt::CEvent*,
 		axl_va_list
-		> > (InvokeAndSignalV, pFunction, &InvokeResult, &Event, va); 
+		> > (invokeAndSignalV, function, &invokeResult, &event, va); 
 
-	if (Result == EScheduleResult_Pending)
-		Event.Wait ();
+	if (result == EScheduleResult_Pending)
+		event.wait ();
 
-	return InvokeResult;
+	return invokeResult;
 }
 
 //.............................................................................

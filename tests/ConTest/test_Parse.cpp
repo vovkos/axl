@@ -12,42 +12,42 @@ namespace test_Parse
 /*
 
 void 
-Run (const char* pFileName)
+run (const char* fileName)
 {
-	bool Result;
+	bool result;
 
-	io::CMappedFile File;
-	Result = File.Open (pFileName, io::EFileFlag_ReadOnly);
-	if (!Result)
+	io::CMappedFile file;
+	result = file.open (fileName, io::EFileFlag_ReadOnly);
+	if (!result)
 	{
-		printf ("%s\n", err::GetError ()->GetDescription ());
+		printf ("%s\n", err::getError ()->getDescription ());
 		return;
 	}
 
-	char* p = (char*) File.View ();
-	size_t Size = (size_t) File.GetSize ();
+	char* p = (char*) file.view ();
+	size_t size = (size_t) file.getSize ();
 
-	CLexer Lexer;
-	CParser Parser;
+	CLexer lexer;
+	CParser parser;
 
-	Lexer.Create (pFileName, p, Size);
-	Parser.Create ();
+	lexer.create (fileName, p, size);
+	parser.create ();
 
 	for (;;)
 	{
-		const CToken* pToken = Lexer.GetToken (); 
+		const CToken* token = lexer.getToken (); 
 
-		Result = Parser.ParseToken (pToken);
-		if (!Result)
+		result = parser.parseToken (token);
+		if (!result)
 		{
-			printf ("%s\n", err::GetError ()->GetDescription ());
+			printf ("%s\n", err::getError ()->getDescription ());
 			return;
 		}
 
-		if (!pToken->m_Token)
+		if (!token->m_token)
 			break;
 
-		Lexer.NextToken ();
+		lexer.nextToken ();
 	}
 }
 

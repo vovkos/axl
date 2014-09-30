@@ -47,19 +47,19 @@ public:
 	struct CURSOR_POS
 	{
 		LONG m_nOffset;
-		BYTE m_Location;
+		BYTE m_location;
 		
 		CURSOR_POS()
 		{
 			m_nOffset = 0;
-			m_Location = CURSOR_ASCII_0;
+			m_location = CURSOR_ASCII_0;
 		}
 
-		BOOL IsAscii()
-			{ return m_Location >= CURSOR_ASCII_0; }
+		BOOL isAscii()
+			{ return m_location >= CURSOR_ASCII_0; }
 
-		BOOL IsHex()
-			{ return !IsAscii(); }
+		BOOL isHex()
+			{ return !isAscii(); }
 	};
 
 	enum COLOR_FLAGS
@@ -70,31 +70,31 @@ public:
 
 	struct COLOR_INFO
 	{
-		int m_Flags;
+		int m_flags;
 		COLORREF m_rgbBackColor;
 		COLORREF m_rgbForeColor;
 
 		COLOR_INFO()
 		{
-			m_Flags = 0;
+			m_flags = 0;
 			m_rgbBackColor = 0;
 			m_rgbForeColor = 0;
 		}
 
 		BOOL operator == (const COLOR_INFO& src)
-			{ return m_Flags == src.m_Flags && m_rgbBackColor == src.m_rgbBackColor && m_rgbForeColor == src.m_rgbForeColor; }
+			{ return m_flags == src.m_flags && m_rgbBackColor == src.m_rgbBackColor && m_rgbForeColor == src.m_rgbForeColor; }
 
 		BOOL operator != (const COLOR_INFO& src)
 			{ return !operator == (src); }
 
 		COLOR_INFO& operator += (const COLOR_INFO& src)
 		{ 
-			m_Flags |= src.m_Flags;
+			m_flags |= src.m_flags;
 
-			if (src.m_Flags & CF_BACK_COLOR)
+			if (src.m_flags & CF_BACK_COLOR)
 				m_rgbBackColor = src.m_rgbBackColor;
 
-			if (src.m_Flags & CF_FORE_COLOR)
+			if (src.m_flags & CF_FORE_COLOR)
 				m_rgbForeColor = src.m_rgbForeColor;
 
 			return *this;
@@ -130,15 +130,15 @@ protected:
 	struct DATA
 	{
 		PVOID m_pvUserContext;
-		COLOR_INFO m_Color;
-		BYTE m_Data;
-		BYTE m_Flags; // data flags and color flags
+		COLOR_INFO m_color;
+		BYTE m_data;
+		BYTE m_flags; // data flags and color flags
 	};
 
 	struct CURSOR_TRANSITION
 	{
 		int m_nOffsetDelta;
-		int m_NewLocation;
+		int m_newLocation;
 	};
 
 	struct SELECTION_INFO
@@ -149,12 +149,12 @@ protected:
 		BOOL m_bTrailingGap;
 
 		SELECTION_INFO()
-			{ Clear(); }
+			{ clear(); }
 
-		BOOL IsEmpty()
+		BOOL isEmpty()
 			{ return m_nStartOffset == m_nEndOffset && !m_bLeadingGap && !m_bTrailingGap; }
 
-		void Clear()
+		void clear()
 			{ m_nStartOffset = m_nEndOffset = 0, m_bLeadingGap = m_bTrailingGap = FALSE; }
 	};
 
@@ -177,34 +177,34 @@ protected:
 
 	int m_nMouseWheelSpeed;
 	
-	SIZE m_CharSize;
+	SIZE m_charSize;
 
 	HRGN m_hUpdateRgn;
 
 	HFONT m_hDefaultFont;
 	HFONT m_hFont;
 
-	DATA* m_pData;
+	DATA* m_data;
 	SIZE_T m_nDataSize;
 	SIZE_T m_nAllocSize;
-	DATA* m_pDataEnd;
+	DATA* m_dataEnd;
 
 	BOOL m_bSelecting;
-	CURSOR_POS m_SelStart;
-	CURSOR_POS m_SelEnd;
-	SELECTION_INFO m_Selection;
+	CURSOR_POS m_selStart;
+	CURSOR_POS m_selEnd;
+	SELECTION_INFO m_selection;
 
-	COLOR_INFO* m_pStdColor;
+	COLOR_INFO* m_stdColor;
 
-	COLOR_INFO m_StdColorBg;
-	COLOR_INFO m_StdColorAscii;
-	COLOR_INFO m_SelectionColor;
-	COLOR_INFO m_CursorColor;
-	COLOR_INFO m_ModifiedColor;
+	COLOR_INFO m_stdColorBg;
+	COLOR_INFO m_stdColorAscii;
+	COLOR_INFO m_selectionColor;
+	COLOR_INFO m_cursorColor;
+	COLOR_INFO m_modifiedColor;
 
-	CURSOR_POS m_CursorPos;
+	CURSOR_POS m_cursorPos;
 
-	BYTE m_OffsetWidth;
+	BYTE m_offsetWidth;
 	BOOL m_bOnlyPrintableChars;
 	BOOL m_bReadOnly;
 	BOOL m_bOverwriteMode;
@@ -218,266 +218,266 @@ protected:
 	struct UNDO_PARAMS
 	{
 		SIZE_T m_nOffset;
-		std::vector<DATA> m_OldData;
-		std::vector<DATA> m_NewData;
-		CURSOR_POS m_OldCursorPos;
-		CURSOR_POS m_NewCursorPos;
+		std::vector<DATA> m_oldData;
+		std::vector<DATA> m_newData;
+		CURSOR_POS m_oldCursorPos;
+		CURSOR_POS m_newCursorPos;
 	};
 
 #if (_AXL_VER >= 0x0200)
-	axl::obj::CDataT<UNDO_PARAMS> m_UndoParams;
-	axl::rtl::CUndoRedo m_UndoRedo;
+	axl::obj::CDataT<UNDO_PARAMS> m_undoParams;
+	axl::rtl::CUndoRedo m_undoRedo;
 #else
-	axl::CDataT<UNDO_PARAMS> m_UndoParams;
-	axl::CUndoRedo m_UndoRedo;
+	axl::CDataT<UNDO_PARAMS> m_undoParams;
+	axl::CUndoRedo m_undoRedo;
 #endif
 
 	// Boyer-Moore-Horspool find
-	std::vector<BYTE> m_FindPattern;
-	size_t m_FindNextBadCharTable[256];
-	size_t m_FindPrevBadCharTable[256];
+	std::vector<BYTE> m_findPattern;
+	size_t m_findNextBadCharTable[256];
+	size_t m_findPrevBadCharTable[256];
 	BOOL m_bFindMatchCase;
 
 public:
 	CHexEditCtrl();
 	~CHexEditCtrl();
 
-	COLOR_INFO& GetStdColorBg()
-		{ return m_StdColorBg; }
+	COLOR_INFO& getStdColorBg()
+		{ return m_stdColorBg; }
 
-	COLOR_INFO& GetStdColorAscii()
-		{ return m_StdColorAscii; }
+	COLOR_INFO& getStdColorAscii()
+		{ return m_stdColorAscii; }
 
-	COLOR_INFO& GetSelectionColor()
-		{ return m_SelectionColor; }
+	COLOR_INFO& getSelectionColor()
+		{ return m_selectionColor; }
 
-	COLOR_INFO& GetCursorColor()
-		{ return m_CursorColor; }
+	COLOR_INFO& getCursorColor()
+		{ return m_cursorColor; }
 
-	COLOR_INFO& GetModifiedColor()
-		{ return m_ModifiedColor; }
+	COLOR_INFO& getModifiedColor()
+		{ return m_modifiedColor; }
 
-	static ATL::CWndClassInfo& GetWndClassInfo();
+	static ATL::CWndClassInfo& getWndClassInfo();
 
-	BOOL SetUpperCase(BOOL bUpperCase);
+	BOOL setUpperCase(BOOL bUpperCase);
 
-	BOOL GetUpperCase()
+	BOOL getUpperCase()
 		{ return m_bUpperCase; }
 
-	void SetOffsetWidth(BYTE Width);
+	void setOffsetWidth(BYTE width);
 
-	void ShowOnlyPrintableChars(BOOL bEnable);
+	void showOnlyPrintableChars(BOOL bEnable);
 
-	void SetReadOnly(BOOL bReadOnly);
+	void setReadOnly(BOOL bReadOnly);
 
-	BOOL IsReadOnly()
+	BOOL isReadOnly()
 		{ return m_bReadOnly; }
 
-	SIZE_T GetDataSize()		
+	SIZE_T getDataSize()		
 		{ return m_nDataSize; }
 
-	BOOL SetData(PVOID pvData, SIZE_T nDataSize, SIZE_T nOffset = 0);
-	SIZE_T GetData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset = 0);
+	BOOL setData(PVOID pvData, SIZE_T nDataSize, SIZE_T nOffset = 0);
+	SIZE_T getData(PVOID pvBuffer, SIZE_T nBufferSize, SIZE_T nOffset = 0);
 
-	SIZE_T GetSelectedDataSize()		
-		{ return m_Selection.IsEmpty() ? 0 : m_Selection.m_nEndOffset - m_Selection.m_nStartOffset; }
+	SIZE_T getSelectedDataSize()		
+		{ return m_selection.isEmpty() ? 0 : m_selection.m_nEndOffset - m_selection.m_nStartOffset; }
 
-	SIZE_T GetSelectedData(PVOID pvBuffer, SIZE_T nBufferSize);
+	SIZE_T getSelectedData(PVOID pvBuffer, SIZE_T nBufferSize);
 	
-	BOOL SetDataSize(SIZE_T nDataSize);
+	BOOL setDataSize(SIZE_T nDataSize);
 
-	BOOL SetFont(HFONT hFont);
+	BOOL setFont(HFONT hFont);
 	
-	HFONT GetFont()
+	HFONT getFont()
 		{ return m_hFont; }
 
-	BOOL SetBytesPerLine(int nBytesPerLine);
+	BOOL setBytesPerLine(int nBytesPerLine);
 
-	int AutoAdjustBytesPerLine();
+	int autoAdjustBytesPerLine();
 
-	SIZE_T GetBytesPerLine()
+	SIZE_T getBytesPerLine()
 		{ return m_nBytesPerLine; }
 	
-	CURSOR_POS SetCursorPos(CURSOR_POS Pos, int Flags = 0);
+	CURSOR_POS setCursorPos(CURSOR_POS pos, int flags = 0);
 
-	CURSOR_POS GetCursorPos()
-		{ return m_CursorPos; }
+	CURSOR_POS getCursorPos()
+		{ return m_cursorPos; }
 
-	void SelectRange(SIZE_T nOffset, SIZE_T nSize, int Flags = 0);
+	void selectRange(SIZE_T nOffset, SIZE_T nSize, int flags = 0);
 
-	CURSOR_POS CursorPosFromMousePos(POINT pt);
+	CURSOR_POS cursorPosFromMousePos(POINT pt);
 
-	void EnsureVisible(CURSOR_POS Pos);
+	void ensureVisible(CURSOR_POS pos);
 
-	BOOL SetOverwriteMode(BOOL bOverwriteMode);
+	BOOL setOverwriteMode(BOOL bOverwriteMode);
 
-	BOOL GetOverwriteMode()
+	BOOL getOverwriteMode()
 		{ return m_bOverwriteMode; }
 
-	BOOL IsModified()
+	BOOL isModified()
 		{ return m_bModified; }
 
-	void ClearModified();
+	void clearModified();
 
-	BOOL ReplaceSelection(PVOID pvData, SIZE_T nSize, BOOL bCursorToEnd = TRUE);
+	BOOL replaceSelection(PVOID pvData, SIZE_T nSize, BOOL bCursorToEnd = TRUE);
 
-	BOOL IsEqualCursorPos(CURSOR_POS& Pos1, CURSOR_POS& Pos2);
+	BOOL isEqualCursorPos(CURSOR_POS& pos1, CURSOR_POS& pos2);
 
-	void SelectAll();
+	void selectAll();
 
-	BOOL CanCopy()
-		{ return m_Selection.m_nStartOffset != m_Selection.m_nEndOffset; }
+	BOOL canCopy()
+		{ return m_selection.m_nStartOffset != m_selection.m_nEndOffset; }
 
-	BOOL CanCut()
-		{ return m_Selection.m_nStartOffset != m_Selection.m_nEndOffset; }
+	BOOL canCut()
+		{ return m_selection.m_nStartOffset != m_selection.m_nEndOffset; }
 
-	BOOL CanPaste()
-		{ return IsClipboardFormatAvailable(CF_TEXT); }
+	BOOL canPaste()
+		{ return isClipboardFormatAvailable(CF_TEXT); }
 
-	void Copy();
-	void Cut();
-	void Paste();
+	void copy();
+	void cut();
+	void paste();
 
-	BOOL CanUndo()
-		{ return m_UndoRedo.CanUndo(); }
+	BOOL canUndo()
+		{ return m_undoRedo.canUndo(); }
 
-	BOOL CanRedo()
-		{ return m_UndoRedo.CanRedo(); }
+	BOOL canRedo()
+		{ return m_undoRedo.canRedo(); }
 
-	void Undo()
-		{ m_UndoRedo.Undo(); }
+	void undo()
+		{ m_undoRedo.undo(); }
 
-	void Redo()
-		{ m_UndoRedo.Redo(); }
+	void redo()
+		{ m_undoRedo.redo(); }
 
-	void SetFindPattern(PVOID p, SIZE_T nSize, BOOL bMatchCase = FALSE);
+	void setFindPattern(PVOID p, SIZE_T nSize, BOOL bMatchCase = FALSE);
 
-	BOOL CanFindNextPrev()
-		{ return !m_FindPattern.empty(); }
+	BOOL canFindNextPrev()
+		{ return !m_findPattern.empty(); }
 
-	BOOL FindNext();
-	BOOL FindPrev();
-
-protected:
-	static BOOL IsMatch(DATA* pData, BYTE* pPattern, SIZE_T nSize, BOOL bMatchCase);
-
-	LRESULT NotifyParent(UINT nCode, HEN_PARAMS* pParams = NULL);
-
-	void SetModified();
-
-	CHAR GetHexChar(BYTE Data);
-
-	void SetBytesPerLineImpl(int nBytesPerLine);
-	void RecalcLayout();
-	void RecalcColumns();
-	void RecalcScrollBars();
-	void FixupFirstVisibleLineCol();
-
-	BOOL InsertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDelete);
-	
-	BOOL ReplaceData(SIZE_T nOffset, SIZE_T nDelete, DATA* pData, SIZE_T nSize, BOOL bCursorToEnd);
-
-	void PaintRect(HDC hdc, RECT& rctUpdate);
-	void PaintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset);
-	void PaintHex(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset);
-	void PaintGap(HDC hdc, RECT rct, int nLineCount);
-	void PaintAscii(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset);
-
-	COLOR_INFO GetDataColor(DATA* pData);
-	void ApplyColor(HDC hdc, COLOR_INFO* pColor, int PrevColorFlags);
-
-	void GetCursorLineCol(CURSOR_POS Pos, int& nLine, int& nCol, BOOL bAddExtra = TRUE);
-
-	void UpdateCaret();
-	void UpdateCaretPos();
-	
-	void TransitCursor(CURSOR_TRANSITION* pTransition, int Flags = 0)
-		{ TransitCursor(pTransition->m_nOffsetDelta, pTransition->m_NewLocation, Flags); }
-
-	void TransitCursor(int nOffsetDelta, int NewLocation, int Flags = 0);
-
-	void InvalidateData(DATA* pData)
-		{ InvalidateOffset(pData - m_pData); }
-
-	void InvalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo);
-	void InvalidateOffset(SIZE_T nOffset);
-	void InvalidateSelectionDiff(SELECTION_INFO* pSel, SELECTION_INFO* pOld);
-	void InvalidateSelection(SELECTION_INFO* pSel);
-	void InvalidateHelper(int nLine, int nCol, int nLineCount, int nColCount);
-
-	void ModifyData(DATA* pData, BYTE Data, BOOL b4Bits = FALSE);
-
-	BOOL IsDataSelected(SIZE_T nOffset);
-	BOOL IsGapSelected(SIZE_T nOffset);
-
-	void SetSelEnd(CURSOR_POS Pos);
-
-	void KillSelection();
-
-	void Finalize4Bits();
+	BOOL findNext();
+	BOOL findPrev();
 
 protected:
-	void BeginUndoableTransaction(SIZE_T nOffset, SIZE_T nOldDataSize);
-	void EndUndoableTransaction(SIZE_T nNewDataSize);
+	static BOOL isMatch(DATA* data, BYTE* pattern, SIZE_T nSize, BOOL bMatchCase);
+
+	LRESULT notifyParent(UINT nCode, HEN_PARAMS* params = NULL);
+
+	void setModified();
+
+	CHAR getHexChar(BYTE data);
+
+	void setBytesPerLineImpl(int nBytesPerLine);
+	void recalcLayout();
+	void recalcColumns();
+	void recalcScrollBars();
+	void fixupFirstVisibleLineCol();
+
+	BOOL insertDeleteData(SIZE_T nOffset, SIZE_T nInsert, SIZE_T nDelete);
+	
+	BOOL replaceData(SIZE_T nOffset, SIZE_T nDelete, DATA* data, SIZE_T nSize, BOOL bCursorToEnd);
+
+	void paintRect(HDC hdc, RECT& rctUpdate);
+	void paintOffs(HDC hdc, RECT rct, int nLineCount, SIZE_T nOffset);
+	void paintHex(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset);
+	void paintGap(HDC hdc, RECT rct, int nLineCount);
+	void paintAscii(HDC hdc, RECT rct, int nColCount, int nLineCount, SIZE_T nOffset);
+
+	COLOR_INFO getDataColor(DATA* data);
+	void applyColor(HDC hdc, COLOR_INFO* color, int prevColorFlags);
+
+	void getCursorLineCol(CURSOR_POS pos, int& nLine, int& nCol, BOOL bAddExtra = TRUE);
+
+	void updateCaret();
+	void updateCaretPos();
+	
+	void transitCursor(CURSOR_TRANSITION* transition, int flags = 0)
+		{ transitCursor(transition->m_nOffsetDelta, transition->m_newLocation, flags); }
+
+	void transitCursor(int nOffsetDelta, int newLocation, int flags = 0);
+
+	void invalidateData(DATA* data)
+		{ invalidateOffset(data - m_data); }
+
+	void invalidateRange(SIZE_T nOffsetFrom, SIZE_T nOffsetTo);
+	void invalidateOffset(SIZE_T nOffset);
+	void invalidateSelectionDiff(SELECTION_INFO* sel, SELECTION_INFO* old);
+	void invalidateSelection(SELECTION_INFO* sel);
+	void invalidateHelper(int nLine, int nCol, int nLineCount, int nColCount);
+
+	void modifyData(DATA* data, BYTE data, BOOL b4Bits = FALSE);
+
+	BOOL isDataSelected(SIZE_T nOffset);
+	BOOL isGapSelected(SIZE_T nOffset);
+
+	void setSelEnd(CURSOR_POS pos);
+
+	void killSelection();
+
+	void finalize4Bits();
+
+protected:
+	void beginUndoableTransaction(SIZE_T nOffset, SIZE_T nOldDataSize);
+	void endUndoableTransaction(SIZE_T nNewDataSize);
 
 #if (_AXL_VER >= 0x0200)
-	void UndoImpl(axl::obj::TData* pParams);
-	void RedoImpl(axl::obj::TData* pParams);
+	void undoImpl(axl::obj::TData* params);
+	void redoImpl(axl::obj::TData* params);
 #else
-	void UndoImpl(AXL_PTR* pParams);
-	void RedoImpl(AXL_PTR* pParams);
+	void undoImpl(AXL_PTR* params);
+	void redoImpl(AXL_PTR* params);
 #endif
 
 public:
 	BEGIN_MSG_MAP(CHexEditCtrl)
-		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		MESSAGE_HANDLER(WM_GETDLGCODE, OnGetDlgCode)
-		MESSAGE_HANDLER(WM_PAINT, OnPaint)
-		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
-		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
-		MESSAGE_HANDLER(WM_SIZE, OnSize)
-		MESSAGE_HANDLER(WM_HSCROLL, OnScroll)
-		MESSAGE_HANDLER(WM_VSCROLL, OnScroll)
-		MESSAGE_HANDLER(WM_MOUSEWHEEL, OnMouseWheel)
-		MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
-		MESSAGE_HANDLER(WM_LBUTTONDOWN, OnLButtonDown)
-		MESSAGE_HANDLER(WM_LBUTTONUP, OnLButtonUp)
-		MESSAGE_HANDLER(WM_CAPTURECHANGED, OnCaptureChanged)
-		MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
-		MESSAGE_HANDLER(WM_CHAR, OnChar)
-		MESSAGE_HANDLER(WM_SYSKEYDOWN, OnSysKeyDown)
+		MESSAGE_HANDLER(WM_CREATE, onCreate)
+		MESSAGE_HANDLER(WM_GETDLGCODE, onGetDlgCode)
+		MESSAGE_HANDLER(WM_PAINT, onPaint)
+		MESSAGE_HANDLER(WM_SETFOCUS, onSetFocus)
+		MESSAGE_HANDLER(WM_KILLFOCUS, onKillFocus)
+		MESSAGE_HANDLER(WM_SIZE, onSize)
+		MESSAGE_HANDLER(WM_HSCROLL, onScroll)
+		MESSAGE_HANDLER(WM_VSCROLL, onScroll)
+		MESSAGE_HANDLER(WM_MOUSEWHEEL, onMouseWheel)
+		MESSAGE_HANDLER(WM_MOUSEMOVE, onMouseMove)
+		MESSAGE_HANDLER(WM_LBUTTONDOWN, onLButtonDown)
+		MESSAGE_HANDLER(WM_LBUTTONUP, onLButtonUp)
+		MESSAGE_HANDLER(WM_CAPTURECHANGED, onCaptureChanged)
+		MESSAGE_HANDLER(WM_KEYDOWN, onKeyDown)
+		MESSAGE_HANDLER(WM_CHAR, onChar)
+		MESSAGE_HANDLER(WM_SYSKEYDOWN, onSysKeyDown)
 	END_MSG_MAP()
 
 protected:
-	LRESULT OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnGetDlgCode(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnSetFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnKillFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnMouseMove(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnCaptureChanged(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnLButtonUp(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT OnSysKeyDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT onCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onGetDlgCode(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onSetFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onKillFocus(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onScroll(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onMouseWheel(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onMouseMove(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onCaptureChanged(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onLButtonDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onLButtonUp(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onKeyDown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onChar(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT onSysKeyDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
-	void OnKeyTab();
-	void OnKeyLeft(BOOL bShift, BOOL bCtrl);
-	void OnKeyRight(BOOL bShift, BOOL bCtrl);
-	void OnKeyUp(BOOL bShift, BOOL bCtrl);
-	void OnKeyDown(BOOL bShift, BOOL bCtrl);
-	void OnKeyPageUp(BOOL bShift, BOOL bCtrl);
-	void OnKeyPageDown(BOOL bShift, BOOL bCtrl);
-	void OnKeyHome(BOOL bShift, BOOL bCtrl);
-	void OnKeyEnd(BOOL bShift, BOOL bCtrl);
+	void onKeyTab();
+	void onKeyLeft(BOOL bShift, BOOL bCtrl);
+	void onKeyRight(BOOL bShift, BOOL bCtrl);
+	void onKeyUp(BOOL bShift, BOOL bCtrl);
+	void onKeyDown(BOOL bShift, BOOL bCtrl);
+	void onKeyPageUp(BOOL bShift, BOOL bCtrl);
+	void onKeyPageDown(BOOL bShift, BOOL bCtrl);
+	void onKeyHome(BOOL bShift, BOOL bCtrl);
+	void onKeyEnd(BOOL bShift, BOOL bCtrl);
 
-	void OnKeyDelete();
-	void OnKeyBackspace();
+	void onKeyDelete();
+	void onKeyBackspace();
 
-	void OnChar(CHAR ch);
+	void onChar(CHAR ch);
 };
 

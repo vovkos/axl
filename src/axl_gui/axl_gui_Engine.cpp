@@ -7,9 +7,9 @@ namespace gui {
 //.............................................................................
 
 const char* 
-GetEngineKindString (EEngine EngineKind)
+getEngineKindString (EEngine engineKind)
 {
-	static const char* StringTable [] = 
+	static const char* stringTable [] = 
 	{
 		"undefined-gui-engine", // EEngine_Undefined,
 		"GDI",                  // EEngine_Gdi,
@@ -17,70 +17,70 @@ GetEngineKindString (EEngine EngineKind)
 		"GTK+",                 // EEngine_Gtk,
 	};
 
-	return EngineKind < countof (StringTable) ? 
-		StringTable [EngineKind] : 
-		StringTable [EEngine_Undefined];
+	return engineKind < countof (stringTable) ? 
+		stringTable [engineKind] : 
+		stringTable [EEngine_Undefined];
 }
 
 //.............................................................................
 
 CFont*
-CEngine::GetStdFont (EStdFont FontKind)
+CEngine::getStdFont (EStdFont fontKind)
 {
-	if (FontKind < 0 || FontKind >= EStdFont__Count)
+	if (fontKind < 0 || fontKind >= EStdFont__Count)
 		return NULL;
 
-	if (!m_StdFontArray [FontKind])
-		m_StdFontArray [FontKind] = CreateStdFont (FontKind);	
+	if (!m_stdFontArray [fontKind])
+		m_stdFontArray [fontKind] = createStdFont (fontKind);	
 		
-	return m_StdFontArray [FontKind];
+	return m_stdFontArray [fontKind];
 }
 
 CCursor*
-CEngine::GetStdCursor (EStdCursor CursorKind)
+CEngine::getStdCursor (EStdCursor cursorKind)
 {
-	if (CursorKind < 0 || CursorKind >= EStdCursor__Count)
+	if (cursorKind < 0 || cursorKind >= EStdCursor__Count)
 		return NULL;
 
-	if (!m_StdCursorArray [CursorKind])
-		m_StdCursorArray [CursorKind] = CreateStdCursor (CursorKind);	
+	if (!m_stdCursorArray [cursorKind])
+		m_stdCursorArray [cursorKind] = createStdCursor (cursorKind);	
 		
-	return m_StdCursorArray [CursorKind];
+	return m_stdCursorArray [cursorKind];
 }
 
 CCanvas*
-CEngine::GetSharedOffscreenCanvas (
-	int Width,
-	int Height
+CEngine::getSharedOffscreenCanvas (
+	int width,
+	int height
 	)
 {
-	EFormFactor FormFactor = GetFormFactor (Width, Height);
-	ASSERT (FormFactor < countof (m_SharedOffscreenCanvasArray));
+	EFormFactor formFactor = getFormFactor (width, height);
+	ASSERT (formFactor < countof (m_sharedOffscreenCanvasArray));
 	
-	TSharedOffscreenCanvas* pOffscreenCanvas = &m_SharedOffscreenCanvasArray [FormFactor];
-	if (pOffscreenCanvas->m_Canvas &&
-		pOffscreenCanvas->m_Size.m_Width >= Width && 
-		pOffscreenCanvas->m_Size.m_Height >= Height)
-		return pOffscreenCanvas->m_Canvas;
+	TSharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [formFactor];
+	if (offscreenCanvas->m_canvas &&
+		offscreenCanvas->m_size.m_width >= width && 
+		offscreenCanvas->m_size.m_height >= height)
+		return offscreenCanvas->m_canvas;
 
-	if (pOffscreenCanvas->m_Size.m_Width < Width)
-		pOffscreenCanvas->m_Size.m_Width = Width;
+	if (offscreenCanvas->m_size.m_width < width)
+		offscreenCanvas->m_size.m_width = width;
 
-	if (pOffscreenCanvas->m_Size.m_Height < Height)
-		pOffscreenCanvas->m_Size.m_Height = Height;
+	if (offscreenCanvas->m_size.m_height < height)
+		offscreenCanvas->m_size.m_height = height;
 
-	pOffscreenCanvas->m_Canvas = CreateOffscreenCanvas (pOffscreenCanvas->m_Size);
-	return pOffscreenCanvas->m_Canvas;
+	offscreenCanvas->m_canvas = createOffscreenCanvas (offscreenCanvas->m_size);
+	return offscreenCanvas->m_canvas;
 }
 
 void 
-CEngine::DeleteAllSharedOffscreenCanvases ()
+CEngine::deleteAllSharedOffscreenCanvases ()
 {
 	for (size_t i = 0; i < EFormFactor__Count; i++)
 	{
-		TSharedOffscreenCanvas* pOffscreenCanvas = &m_SharedOffscreenCanvasArray [i];
-		pOffscreenCanvas->m_Canvas = ref::EPtr_Null;
-		pOffscreenCanvas->m_Size.Setup (0, 0);
+		TSharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [i];
+		offscreenCanvas->m_canvas = ref::EPtr_Null;
+		offscreenCanvas->m_size.setup (0, 0);
 	}
 }
 

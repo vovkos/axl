@@ -7,7 +7,7 @@ namespace gui {
 
 //.............................................................................
 
-static uint_t g_StdPalColorArray [EStdPalColor__Count] =
+static uint_t g_stdPalColorArray [EStdPalColor__Count] =
 {
 	0, // EStdPalColor_Widget,
 	0, // EStdPalColor_Text,
@@ -46,36 +46,36 @@ static uint_t g_StdPalColorArray [EStdPalColor__Count] =
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const uint_t*
-GetStdPalColorArray ()
+getStdPalColorArray ()
 {
-	return g_StdPalColorArray;
+	return g_stdPalColorArray;
 }
 
 void
-UpdateStdPalSystemColors ()
+updateStdPalSystemColors ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]    = InverseRgb (GetSysColor (COLOR_WINDOWTEXT));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]    = InverseRgb (GetSysColor (COLOR_WINDOW));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]      = InverseRgb (GetSysColor (COLOR_GRAYTEXT));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText] = InverseRgb (GetSysColor (COLOR_HIGHLIGHTTEXT));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack] = InverseRgb (GetSysColor (COLOR_HIGHLIGHT));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]        = InverseRgb (GetSysColor (COLOR_3DFACE));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]      = InverseRgb (GetSysColor (COLOR_3DSHADOW));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]  = InverseRgb (GetSysColor (COLOR_3DDKSHADOW));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]       = InverseRgb (GetSysColor (COLOR_3DLIGHT));
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]     = InverseRgb (GetSysColor (COLOR_3DHILIGHT));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]    = inverseRgb (::GetSysColor (COLOR_WINDOWTEXT));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]    = inverseRgb (::GetSysColor (COLOR_WINDOW));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]      = inverseRgb (::GetSysColor (COLOR_GRAYTEXT));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHTTEXT));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHT));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]        = inverseRgb (::GetSysColor (COLOR_3DFACE));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]      = inverseRgb (::GetSysColor (COLOR_3DSHADOW));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]  = inverseRgb (::GetSysColor (COLOR_3DDKSHADOW));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]       = inverseRgb (::GetSysColor (COLOR_3DLIGHT));
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]     = inverseRgb (::GetSysColor (COLOR_3DHILIGHT));
 #else
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]    = 0x000000;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]    = 0xffffff;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]      = 0x808080;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText] = 0xffffff;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack] = 0x000080;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]        = 0xc0c0c0;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]      = 0x808080;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]  = 0x000000;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]       = 0xe0e0e0;
-	g_StdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]     = 0xffffff;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetText]    = 0x000000;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_WidgetBack]    = 0xffffff;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_GrayText]      = 0x808080;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionText] = 0xffffff;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_SelectionBack] = 0x000080;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DFace]        = 0xc0c0c0;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DShadow]      = 0x808080;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DDarkShadow]  = 0x000000;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DLight]       = 0xe0e0e0;
+	g_stdPalColorArray [~EColorFlag_Index & EStdPalColor_3DHiLight]     = 0xffffff;
 #endif
 }
 
@@ -85,80 +85,80 @@ class CInitStdPalSystemColors
 public:
 	CInitStdPalSystemColors ()
 	{
-		UpdateStdPalSystemColors ();
+		updateStdPalSystemColors ();
 	}
-} g_InitStdColors;
+} g_initStdColors;
 
 //.............................................................................
 
 uint_t
-ParseColorString (
-	const char* pString,
-	const char** ppEnd
+parseColorString (
+	const char* string,
+	const char** end_o
 	)
 {
-	if (!pString)
+	if (!string)
 	{
-		if (ppEnd)
-			*ppEnd = NULL;
+		if (end_o)
+			*end_o = NULL;
 
 		return EColorFlag_Transparent;
 	}
 
-	uint_t Color = EColorFlag_Transparent;
+	uint_t color = EColorFlag_Transparent;
 
-	char* pEnd;
+	char* end;
 
-	if (pString[0] == '#')
+	if (string[0] == '#')
 	{
-		uint_t Rgb = strtol (pString + 1, &pEnd, 16);
-		if (pEnd != pString)
-			Color = Rgb;
+		uint_t rgb = strtol (string + 1, &end, 16);
+		if (end != string)
+			color = rgb;
 	}
 	else
 	{
-		uint_t Index = strtol (pString, &pEnd, 10);
-		if (pEnd != pString)
-			Color = EColorFlag_Index | Index;
+		uint_t index = strtol (string, &end, 10);
+		if (end != string)
+			color = EColorFlag_Index | index;
 	}
 
-	if (ppEnd)
-		*ppEnd = pEnd;
+	if (end_o)
+		*end_o = end;
 
-	return Color;
+	return color;
 }
 
 //.............................................................................
 
 void
-TColorAttr::Parse (
-	const char* pString,
-	const char** ppEnd
+TColorAttr::parse (
+	const char* string,
+	const char** end
 	)
 {
-	m_ForeColor = ParseColorString (pString, &pString);
-	m_BackColor = EColorFlag_Transparent;
+	m_foreColor = parseColorString (string, &string);
+	m_backColor = EColorFlag_Transparent;
 
-	while (isspace (*pString))
-		pString++;
+	while (isspace (*string))
+		string++;
 
-	if (*pString == '|')
-		m_BackColor = ParseColorString (pString + 1, &pString);
+	if (*string == '|')
+		m_backColor = parseColorString (string + 1, &string);
 
-	if (ppEnd)
-		*ppEnd = pString;
+	if (end)
+		*end = string;
 }
 
 void
-TColorAttr::ParseOverlay (
-	const TColorAttr& BaseAttr,
-	const char* pString,
-	const char** ppEnd
+TColorAttr::parseOverlay (
+	const TColorAttr& baseAttr,
+	const char* string,
+	const char** end
 	)
 {
-	TColorAttr OverlayAttr;
-	OverlayAttr.Parse (pString, ppEnd);
-	Overlay (BaseAttr, OverlayAttr);
+	TColorAttr overlayAttr;
+	overlayAttr.parse (string, end);
+	overlay (baseAttr, overlayAttr);
 }
 
 //.............................................................................

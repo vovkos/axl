@@ -7,177 +7,177 @@ namespace rtl {
 //.............................................................................
 
 size_t
-CPacketizerRoot::WriteImpl (
+CPacketizerRoot::writeImpl (
 	const void* p0,
-	size_t Size0
+	size_t size0
 	)
 {
 	const char* p = (char*) p0;
-	size_t Size = Size0;
-	size_t BufferSize = m_Buffer.GetCount ();
+	size_t size = size0;
+	size_t bufferSize = m_buffer.getCount ();
 
-	static uint32_t Signature = EPacketHdr_Signature;
-	const char* pSignature = (char*) &Signature;
+	static uint32_t signatureBuffer = EPacketHdr_Signature;
+	const char* signature = (char*) &signatureBuffer;
 
-	while (BufferSize < sizeof (uint32_t)) // append signature byte-by-byte
+	while (bufferSize < sizeof (uint32_t)) // append signature byte-by-byte
 	{
-		if (!Size)
+		if (!size)
 			return -1; // all is buffered
 
 		char c = *p;
 
-		if (c == pSignature [BufferSize])
+		if (c == signature [bufferSize])
 		{
-			m_Buffer.Append (c);
-			BufferSize++;
+			m_buffer.append (c);
+			bufferSize++;
 		}
-		else if (BufferSize)
+		else if (bufferSize)
 		{
-			m_Buffer.Clear ();
-			BufferSize = 0;
+			m_buffer.clear ();
+			bufferSize = 0;
 
-			if (c == pSignature [0])
+			if (c == signature [0])
 			{
-				m_Buffer.Copy (c);
-				BufferSize = 1;
+				m_buffer.copy (c);
+				bufferSize = 1;
 			}
 		}
 
 		p++;
-		Size--;
+		size--;
 	}
 
-	if (BufferSize < sizeof (uint64_t)) // packet size
+	if (bufferSize < sizeof (uint64_t)) // packet size
 	{
-		size_t ChunkSize = sizeof (uint64_t) - BufferSize;
-		if (Size < ChunkSize)
+		size_t chunkSize = sizeof (uint64_t) - bufferSize;
+		if (size < chunkSize)
 		{
-			m_Buffer.Append (p, Size);
+			m_buffer.append (p, size);
 			return -1; // all is buffered
 		}
 
-		m_Buffer.Append (p, ChunkSize);
-		p += ChunkSize;
-		Size -= ChunkSize;
+		m_buffer.append (p, chunkSize);
+		p += chunkSize;
+		size -= chunkSize;
 
-		BufferSize = sizeof (uint64_t);
+		bufferSize = sizeof (uint64_t);
 	}
 
-	uint32_t DataSize = ((const uint32_t*) m_Buffer.ca ()) [1];
-	uint32_t PacketSize = sizeof (uint64_t) + DataSize;
+	uint32_t dataSize = ((const uint32_t*) m_buffer.ca ()) [1];
+	uint32_t packetSize = sizeof (uint64_t) + dataSize;
 
-	if (BufferSize < PacketSize)
+	if (bufferSize < packetSize)
 	{
-		size_t ChunkSize = PacketSize - BufferSize;
-		if (Size < ChunkSize)
+		size_t chunkSize = packetSize - bufferSize;
+		if (size < chunkSize)
 		{
-			m_Buffer.Append (p, Size);
+			m_buffer.append (p, size);
 			return -1; // all is buffered
 		}
 
-		m_Buffer.Append (p, ChunkSize);
-		p += ChunkSize;
-		Size -= ChunkSize;
+		m_buffer.append (p, chunkSize);
+		p += chunkSize;
+		size -= chunkSize;
 	}
 
-	ASSERT (Size0 >= Size);
-	return Size0 - Size;
+	ASSERT (size0 >= size);
+	return size0 - size;
 }
 
 //.............................................................................
 
 uint64_t
-CLegacyPacketizerRoot::CreateHdr (size_t Size)
+CLegacyPacketizerRoot::createHdr (size_t size)
 {
-	TPacketHdr Hdr;
-	Hdr.m_Signature = EPacketHdr_Signature;
-	Hdr.m_DataSize = (uint16_t) Size;
-	Hdr.m_Checksum = 0;	
-	Hdr.m_Checksum = crc16 (&Hdr, sizeof (Hdr));
+	TPacketHdr hdr;
+	hdr.m_signature = EPacketHdr_Signature;
+	hdr.m_dataSize = (uint16_t) size;
+	hdr.m_checksum = 0;	
+	hdr.m_checksum = crc16 (&hdr, sizeof (hdr));
 	
-	return *(uint64_t*) &Hdr;
+	return *(uint64_t*) &hdr;
 }
 
 size_t
-CLegacyPacketizerRoot::WriteImpl (
+CLegacyPacketizerRoot::writeImpl (
 	const void* p0,
-	size_t Size0
+	size_t size0
 	)
 {
 	const char* p = (char*) p0;
-	size_t Size = Size0;
-	size_t BufferSize = m_Buffer.GetCount ();
+	size_t size = size0;
+	size_t bufferSize = m_buffer.getCount ();
 
-	static uint32_t Signature = EPacketHdr_Signature;
-	const char* pSignature = (char*) &Signature;
+	static uint32_t signatureBuffer = EPacketHdr_Signature;
+	const char* signature = (char*) &signatureBuffer;
 
-	while (BufferSize < sizeof (uint32_t)) // append signature byte-by-byte
+	while (bufferSize < sizeof (uint32_t)) // append signature byte-by-byte
 	{
-		if (!Size)
+		if (!size)
 			return -1; // all is buffered
 
 		char c = *p;
 
-		if (c == pSignature [BufferSize])
+		if (c == signature [bufferSize])
 		{
-			m_Buffer.Append (c);
-			BufferSize++;
+			m_buffer.append (c);
+			bufferSize++;
 		}
-		else if (BufferSize)
+		else if (bufferSize)
 		{
-			m_Buffer.Clear ();
-			BufferSize = 0;
+			m_buffer.clear ();
+			bufferSize = 0;
 
-			if (c == pSignature [0])
+			if (c == signature [0])
 			{
-				m_Buffer.Copy (c);
-				BufferSize = 1;
+				m_buffer.copy (c);
+				bufferSize = 1;
 			}
 		}
 
 		p++;
-		Size--;
+		size--;
 	}
 
-	if (BufferSize < sizeof (uint64_t)) // packet size and crc
+	if (bufferSize < sizeof (uint64_t)) // packet size and crc
 	{
-		size_t ChunkSize = sizeof (uint64_t) - BufferSize;
-		if (Size < ChunkSize)
+		size_t chunkSize = sizeof (uint64_t) - bufferSize;
+		if (size < chunkSize)
 		{
-			m_Buffer.Append (p, Size);
+			m_buffer.append (p, size);
 			return -1; // all is buffered
 		}
 
-		m_Buffer.Append (p, ChunkSize);
-		p += ChunkSize;
-		Size -= ChunkSize;
+		m_buffer.append (p, chunkSize);
+		p += chunkSize;
+		size -= chunkSize;
 
-		uint16_t Checksum = crc16 (m_Buffer, sizeof (uint64_t));
-		if (Checksum)
-			return Size0 - Size; // ignore broken packet hdr
+		uint16_t checksum = crc16 (m_buffer, sizeof (uint64_t));
+		if (checksum)
+			return size0 - size; // ignore broken packet hdr
 
-		BufferSize = sizeof (uint64_t);
+		bufferSize = sizeof (uint64_t);
 	}
 
-	uint32_t DataSize = ((const TPacketHdr*) m_Buffer.ca ())->m_DataSize;
-	uint32_t PacketSize = sizeof (uint64_t) + DataSize;
+	uint32_t dataSize = ((const TPacketHdr*) m_buffer.ca ())->m_dataSize;
+	uint32_t packetSize = sizeof (uint64_t) + dataSize;
 
-	if (BufferSize < PacketSize)
+	if (bufferSize < packetSize)
 	{
-		size_t ChunkSize = PacketSize - BufferSize;
-		if (Size < ChunkSize)
+		size_t chunkSize = packetSize - bufferSize;
+		if (size < chunkSize)
 		{
-			m_Buffer.Append (p, Size);
+			m_buffer.append (p, size);
 			return -1; // all is buffered
 		}
 
-		m_Buffer.Append (p, ChunkSize);
-		p += ChunkSize;
-		Size -= ChunkSize;
+		m_buffer.append (p, chunkSize);
+		p += chunkSize;
+		size -= chunkSize;
 	}
 
-	ASSERT (Size0 >= Size);
-	return Size0 - Size;
+	ASSERT (size0 >= size);
+	return size0 - size;
 }
 
 //.............................................................................

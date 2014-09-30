@@ -9,41 +9,41 @@ namespace rtl {
 size_t
 djb2 (
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
 	uchar_t* p = (uchar_t*) _p;
-	uchar_t* pEnd = p + Size;
+	uchar_t* end = p + size;
 
-	size_t Hash = 5381;
+	size_t hash = 5381;
 
-	for (; p < pEnd; p++)
-		Hash = ((Hash << 5) + Hash) + *p; /* hash * 33 + c */
+	for (; p < end; p++)
+		hash = ((hash << 5) + hash) + *p; /* hash * 33 + c */
 
-	return Hash;
+	return hash;
 }
 
 uint16_t
 crc16(
 	const void* _p, 
-	size_t Size
+	size_t size
 	)
 {
 	ushort_t* p = (ushort_t*) _p;
-	uchar_t* pLast = (uchar_t*) _p + Size - 1;
+	uchar_t* last = (uchar_t*) _p + size - 1;
 
-	uintptr_t CheckSum = 0;
+	uintptr_t checkSum = 0;
 
-	for (; (uchar_t*) p < pLast; p++)
-		CheckSum += *p;
+	for (; (uchar_t*) p < last; p++)
+		checkSum += *p;
   
-	if (Size & 1)
-		CheckSum += *pLast;
+	if (size & 1)
+		checkSum += *last;
 
-	CheckSum = (CheckSum >> 16) + (CheckSum & 0xffff);
-	CheckSum += (CheckSum >>16);
+	checkSum = (checkSum >> 16) + (checkSum & 0xffff);
+	checkSum += (checkSum >>16);
 
-	return (ushort_t) ~CheckSum;
+	return (ushort_t) ~checkSum;
 }
 
 //.............................................................................

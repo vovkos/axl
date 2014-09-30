@@ -7,9 +7,9 @@ namespace rtl {
 //.............................................................................
 
 const char*
-GetUtfKindString (EUtf UtfKind)
+getUtfKindString (EUtf utfKind)
 {
-	static const char* StringTable [] = 
+	static const char* stringTable [] = 
 	{
 		"UTF-8",                // EUtf_Utf8 = 0,
 		"UTF-16",               // EUtf_Utf16,
@@ -18,8 +18,8 @@ GetUtfKindString (EUtf UtfKind)
 		"UTF-32 (big-endian)",  // EUtf_Utf32_be,
 	};
 
-	return (size_t) UtfKind < countof (StringTable) ? 
-		StringTable [UtfKind] : 
+	return (size_t) utfKind < countof (stringTable) ? 
+		stringTable [utfKind] : 
 		"undefined-utf-kind";
 }
 

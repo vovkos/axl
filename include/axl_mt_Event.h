@@ -27,7 +27,7 @@ namespace mt {
 class CEventRoot
 {
 public:
-	win::CEvent m_Event;
+	win::CEvent m_event;
 
 protected:
 	CEventRoot () // protected construction
@@ -36,21 +36,21 @@ protected:
 
 public:
 	bool
-	Signal ()
+	signal ()
 	{
-		return m_Event.Signal ();
+		return m_event.signal ();
 	}
 
 	bool
-	Reset ()
+	reset ()
 	{
-		return m_Event.Reset ();
+		return m_event.reset ();
 	}
 
 	bool
-	Wait (uint_t Timeout = -1)
+	wait (uint_t timeout = -1)
 	{
-		return m_Event.Wait (Timeout) == win::EWaitResult_Object0;
+		return m_event.wait (timeout) == win::EWaitResult_Object0;
 	}
 };
 
@@ -61,7 +61,7 @@ class CEvent: public CEventRoot
 public:
 	CEvent ()
 	{
-		m_Event.Create (NULL, false, false, NULL);
+		m_event.create (NULL, false, false, NULL);
 	}
 };
 
@@ -72,7 +72,7 @@ class CNotificationEvent: public CEventRoot
 public:
 	CNotificationEvent ()
 	{
-		m_Event.Create (NULL, true, false, NULL);
+		m_event.create (NULL, true, false, NULL);
 	}
 };
 
@@ -83,44 +83,44 @@ public:
 class CEvent
 {
 protected:
-	psx::CMutex m_Mutex;
-	psx::CSem m_Sem;
+	psx::CMutex m_mutex;
+	psx::CSem m_sem;
 
 public:
 	bool
-	Signal ();
+	signal ();
 
 	bool
-	Reset ();
+	reset ();
 
 	bool
-	Wait (uint_t Timeout = -1)
+	wait (uint_t timeout = -1)
 	{
-		return m_Sem.Wait (Timeout);
+		return m_sem.wait (timeout);
 	}
 };
 
 class CNotificationEvent
 {
 protected:
-	psx::CMutex m_Mutex;
-	psx::CCond m_Cond;
-	bool m_State;
+	psx::CMutex m_mutex;
+	psx::CCond m_cond;
+	bool m_state;
 
 public:
 	CNotificationEvent ()
 	{
-		m_State = false;
+		m_state = false;
 	}
 
 	bool
-	Signal ();
+	signal ();
 
 	bool
-	Reset ();
+	reset ();
 
 	bool
-	Wait (uint_t Timeout = -1);
+	wait (uint_t timeout = -1);
 };
 
 #endif

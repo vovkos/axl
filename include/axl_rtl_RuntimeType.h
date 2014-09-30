@@ -24,45 +24,45 @@ namespace rtl {
 struct IType
 {
 protected:
-	size_t m_Size;
-	const char* m_pName;
-	const rtl::TGuid* m_pGuid;
+	size_t m_size;
+	const char* m_name;
+	const rtl::TGuid* m_guid;
 	
 public:
 	size_t 
-	GetSize ()
+	getSize ()
 	{ 
-		return m_Size;
+		return m_size;
 	}
 
 	const char*
-	GetName ()
+	getName ()
 	{ 
-		return m_pName;
+		return m_name;
 	}
 
 	const rtl::TGuid*
-	GetGuid ()
+	getGuid ()
 	{ 
-		return m_pGuid;
+		return m_guid;
 	}
 
 	virtual
 	void
-	Construct (void* p) = 0;
+	construct (void* p) = 0;
 
 	virtual
 	void
-	Destruct (void* p) = 0;
+	destruct (void* p) = 0;
 
 	virtual
 	size_t
-	GetInterfaceOffset (const rtl::TGuid& Guid) = 0;
+	getInterfaceOffset (const rtl::TGuid& guid) = 0;
 
 	bool
-	HasInterface (const rtl::TGuid& Guid)
+	hasInterface (const rtl::TGuid& guid)
 	{
-		return GetInterfaceOffset (Guid) != -1;
+		return getInterfaceOffset (guid) != -1;
 	}
 };
 
@@ -80,29 +80,29 @@ struct IRoot
 
 	virtual
 	void*
-	GetObject (IType** ppType) = 0;
+	getObject (IType** type) = 0;
 
 	void* 
-	GetObject ()
+	getObject ()
 	{
-		return GetObject (NULL);
+		return getObject (NULL);
 	}	
 
 	IType* 
-	GetType ()
+	getType ()
 	{
-		IType* pType;
-		GetObject (&pType);
-		return pType;
+		IType* type;
+		getObject (&type);
+		return type;
 	}
 	
 	void*
-	GetInterface (const rtl::TGuid& Guid)
+	getInterface (const rtl::TGuid& guid)
 	{
-		IType* pType;
-		void* p = GetObject (&pType);
-		size_t Offset = pType->GetInterfaceOffset (Guid);
-		return Offset != -1 ? (uchar_t*) p + Offset : NULL;
+		IType* type;
+		void* p = getObject (&type);
+		size_t offset = type->getInterfaceOffset (guid);
+		return offset != -1 ? (uchar_t*) p + offset : NULL;
 	}
 };
 
@@ -129,7 +129,7 @@ public:
 
 	CPtrT (IRoot* p)
 	{
-		m_p = (I*) p->GetInterface (AXL_OBJ_GUIDOF (I));
+		m_p = (I*) p->getInterface (AXL_OBJ_GUIDOF (I));
 	}
 
 	operator I* ()
@@ -154,36 +154,36 @@ public:
 
 	ITypeSimpleImplT ()
 	{
-		m_Size = CType::GetSize ();
-		m_pName = CType::GetName ();
+		m_size = CType::getSize ();
+		m_name = CType::getName ();
 	}
 
 	virtual
 	void
-	Construct (void* p)
+	construct (void* p)
 	{
-		CType::Construct (p);
+		CType::construct (p);
 	}
 
 	virtual
 	void
-	Destruct (void* p)
+	destruct (void* p)
 	{
-		CType::Destruct (p);
+		CType::destruct (p);
 	}
 
 	virtual
 	size_t
-	GetInterfaceOffset (const rtl::TGuid& Guid)
+	getInterfaceOffset (const rtl::TGuid& guid)
 	{
 		return -1;
 	}
 
 	static
 	ITypeSimpleImplT*
-	GetSingleton ()
+	getSingleton ()
 	{
-		return rtl::GetSimpleSingleton <ITypeSimpleImplT> ();
+		return rtl::getSimpleSingleton <ITypeSimpleImplT> ();
 	}
 };
 
@@ -195,21 +195,21 @@ class ITypeClassImplT: public ITypeSimpleImplT <T>
 public:
 	ITypeClassImplT ()
 	{
-		this->m_pGuid = T::__GetGuid (); // thanks a lot gcc
+		this->m_guid = T::__GetGuid (); // thanks a lot gcc
 	}
 
 	virtual
 	size_t
-	GetInterfaceOffset (const rtl::TGuid& Guid)
+	getInterfaceOffset (const rtl::TGuid& guid)
 	{
-		return T::__GetInterfaceOffset (Guid);
+		return T::__GetInterfaceOffset (guid);
 	}
 
 	static
 	ITypeClassImplT*
-	GetSingleton ()
+	getSingleton ()
 	{
-		return rtl::GetSimpleSingleton <ITypeClassImplT> ();
+		return rtl::getSimpleSingleton <ITypeClassImplT> ();
 	}
 };
 
@@ -217,11 +217,11 @@ public:
 
 // convenient macros for accessing IType* singletons
 
-#define AXL_OBJ_TYPEOF(Class) \
-	axl::obj::ITypeSimpleImplT <Class>::GetSingleton ()
+#define AXL_OBJ_TYPEOF(class) \
+	axl::obj::ITypeSimpleImplT <class>::getSingleton ()
 
-#define AXL_OBJ_CLASSOF(Class) \
-	axl::obj::ITypeClassImplT <Class>::GetSingleton ()
+#define AXL_OBJ_CLASSOF(class) \
+	axl::obj::ITypeClassImplT <class>::getSingleton ()
 
 //.............................................................................
 
@@ -232,43 +232,43 @@ public:
 	const axl::rtl::TGuid* \
 	__GetGuid () \
 	{ \
-		static axl::rtl::TGuid GuidTag = AXL_RTL_GUID_INITIALIZER(l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8); \
-		return &GuidTag; \
+		static axl::rtl::TGuid guidTag = AXL_RTL_GUID_INITIALIZER(l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8); \
+		return &guidTag; \
 	}
 
 // use existing GUID
 
-#define AXL_OBJ_GUID_TAG_E(Guid) \
+#define AXL_OBJ_GUID_TAG_E(guid) \
 	static \
 	const axl::rtl::TGuid* \
 	__GetGuid () \
 	{ \
-		return &Guid; \
+		return &guid; \
 	}
 
-#define AXL_OBJ_GUIDOF(Class) \
-	(*(Class::__GetGuid ()))
+#define AXL_OBJ_GUIDOF(class) \
+	(*(class::__GetGuid ()))
 
 //.............................................................................
 
 // convenient macros for organizing interface maps
 
-#define AXL_OBJ_BEGIN_INTERFACE_MAP(Class) \
-	typedef Class __CThisClass; \
+#define AXL_OBJ_BEGIN_INTERFACE_MAP(class) \
+	typedef class __CThisClass; \
 	static \
 	size_t \
-	__GetInterfaceOffset (const rtl::TGuid& Guid) \
+	__GetInterfaceOffset (const rtl::TGuid& guid) \
 	{
 
 #define AXL_OBJ_INTERFACE_ENTRY(I) \
-		if (Guid == AXL_OBJ_GUIDOF (I)) \
+		if (guid == AXL_OBJ_GUIDOF (I)) \
 			return rtl::COffsetOfClassT <__CThisClass, I> () (); \
 
 #define AXL_OBJ_INTERFACE_CHAIN(B) \
 		{ \
-		size_t Offset = B::__GetInterfaceOffset (Guid); \
-		if (Offset != -1) \
-			return rtl::COffsetOfClassT <__CThisClass, B> () () + Offset; \
+		size_t offset = B::__GetInterfaceOffset (guid); \
+		if (offset != -1) \
+			return rtl::COffsetOfClassT <__CThisClass, B> () () + offset; \
 		}
 
 #define AXL_OBJ_END_INTERFACE_MAP() \
@@ -277,8 +277,8 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_OBJ_SIMPLE_INTERFACE_MAP(Class, I) \
-	AXL_OBJ_BEGIN_INTERFACE_MAP (Class) \
+#define AXL_OBJ_SIMPLE_INTERFACE_MAP(class, I) \
+	AXL_OBJ_BEGIN_INTERFACE_MAP (class) \
 		AXL_OBJ_INTERFACE_ENTRY (I) \
 	AXL_OBJ_END_INTERFACE_MAP ()
 
@@ -287,66 +287,66 @@ public:
 // tag with GUID and create a singe-entry interface map, so when deriving from 
 // a single interface it is not required to explicitly specify interface map
 
-#define AXL_OBJ_INTERFACE(Iface, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
+#define AXL_OBJ_INTERFACE(iface, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
 	AXL_OBJ_GUID_TAG (l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
-	AXL_OBJ_SIMPLE_INTERFACE_MAP (Iface, Iface)
+	AXL_OBJ_SIMPLE_INTERFACE_MAP (iface, iface)
 
 //.............................................................................
 
-#define AXL_OBJ_IMPLEMENT_GET_OBJECT(Class) \
+#define AXL_OBJ_IMPLEMENT_GET_OBJECT(class) \
 	virtual \
 	void* \
-	GetObject (axl::obj::IType** ppType) \
+	getObject (axl::obj::IType** type) \
 	{ \
-		if (ppType) \
-			*ppType = AXL_OBJ_CLASSOF (Class); \
+		if (type) \
+			*type = AXL_OBJ_CLASSOF (class); \
 		return this; \
 	}	
 
 // will be redefined in axl_ref_RefCount.h
 
-#define AXL_OBJ_REF_COUNT_MISCREATION_GUARD(Class) 
+#define AXL_OBJ_REF_COUNT_MISCREATION_GUARD(class) 
 
 //.............................................................................
 
 // convenient macros for declaring creatable classes
 
-#define AXL_OBJ_BEGIN_CLASS(Class, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
+#define AXL_OBJ_BEGIN_CLASS(class, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
 	AXL_OBJ_GUID_TAG (l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
-	AXL_OBJ_IMPLEMENT_GET_OBJECT (Class) \
-	AXL_OBJ_REF_COUNT_MISCREATION_GUARD (Class) \
-	AXL_OBJ_BEGIN_INTERFACE_MAP (Class)
+	AXL_OBJ_IMPLEMENT_GET_OBJECT (class) \
+	AXL_OBJ_REF_COUNT_MISCREATION_GUARD (class) \
+	AXL_OBJ_BEGIN_INTERFACE_MAP (class)
 
-#define AXL_OBJ_BEGIN_CLASS_E(Class, Guid) \
-	AXL_OBJ_GUID_TAG_E (Guid) \
-	AXL_OBJ_IMPLEMENT_GET_OBJECT (Class) \
-	AXL_OBJ_REF_COUNT_MISCREATION_GUARD (Class) \
-	AXL_OBJ_BEGIN_INTERFACE_MAP (Class)
+#define AXL_OBJ_BEGIN_CLASS_E(class, guid) \
+	AXL_OBJ_GUID_TAG_E (guid) \
+	AXL_OBJ_IMPLEMENT_GET_OBJECT (class) \
+	AXL_OBJ_REF_COUNT_MISCREATION_GUARD (class) \
+	AXL_OBJ_BEGIN_INTERFACE_MAP (class)
 
-#define AXL_OBJ_BEGIN_CLASS_0(Class) \
+#define AXL_OBJ_BEGIN_CLASS_0(class) \
 	AXL_OBJ_GUID_TAG_E (axl::rtl::GUID_Null) \
-	AXL_OBJ_IMPLEMENT_GET_OBJECT (Class) \
-	AXL_OBJ_REF_COUNT_MISCREATION_GUARD (Class) \
-	AXL_OBJ_BEGIN_INTERFACE_MAP (Class)
+	AXL_OBJ_IMPLEMENT_GET_OBJECT (class) \
+	AXL_OBJ_REF_COUNT_MISCREATION_GUARD (class) \
+	AXL_OBJ_BEGIN_INTERFACE_MAP (class)
 
 #define AXL_OBJ_END_CLASS() \
 	AXL_OBJ_END_INTERFACE_MAP ()
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_OBJ_CLASS(Class, Iface, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
-	AXL_OBJ_BEGIN_CLASS (Class, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
-	AXL_OBJ_INTERFACE_ENTRY (Iface) \
+#define AXL_OBJ_CLASS(class, iface, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
+	AXL_OBJ_BEGIN_CLASS (class, l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8) \
+	AXL_OBJ_INTERFACE_ENTRY (iface) \
 	AXL_OBJ_END_CLASS()
 
-#define AXL_OBJ_CLASS_E(Class, Iface, Guid) \
-	AXL_OBJ_BEGIN_CLASS_E (Class, Guid) \
-	AXL_OBJ_INTERFACE_ENTRY (Iface) \
+#define AXL_OBJ_CLASS_E(class, iface, guid) \
+	AXL_OBJ_BEGIN_CLASS_E (class, guid) \
+	AXL_OBJ_INTERFACE_ENTRY (iface) \
 	AXL_OBJ_END_CLASS()
 
-#define AXL_OBJ_CLASS_0(Class, Iface) \
-	AXL_OBJ_BEGIN_CLASS_0 (Class) \
-	AXL_OBJ_INTERFACE_ENTRY (Iface) \
+#define AXL_OBJ_CLASS_0(class, iface) \
+	AXL_OBJ_BEGIN_CLASS_0 (class) \
+	AXL_OBJ_INTERFACE_ENTRY (iface) \
 	AXL_OBJ_END_CLASS()
 
 //.............................................................................

@@ -11,66 +11,66 @@ namespace ref {
 
 CRefCount::CRefCount () 
 {
-	m_RefCount = 0;
-	m_WeakRefCount = 1;
-	m_pObject = NULL;
+	m_refCount = 0;
+	m_weakRefCount = 1;
+	m_object = NULL;
 	m_pfDestruct = NULL;
 	m_pfFree = NULL;
 }
 
 void
-CRefCount::SetTarget (
-	void* pObject,
+CRefCount::setTarget (
+	void* object,
 	mem::FFree* pfDestruct,
 	mem::FFree* pfFree
 	)
 {
-	m_pObject = pObject;
+	m_object = object;
 	m_pfDestruct = pfDestruct;
 	m_pfFree = pfFree;
 }
 
 size_t
-CRefCount::Release ()
+CRefCount::release ()
 {
-	int32_t RefCount = mt::AtomicDec (&m_RefCount);
+	int32_t refCount = mt::atomicDec (&m_refCount);
 	 
-	if (!RefCount)
+	if (!refCount)
 	{
 		if (m_pfDestruct)
-			m_pfDestruct (m_pObject);
+			m_pfDestruct (m_object);
 
-		WeakRelease (); 
+		weakRelease (); 
 
 		// WeakRelease () should be here and not in ~CRefCount ()
 		// otherwise it's possible to free memory prematurely
 	}
 
-	return (uint32_t) RefCount;
+	return (uint32_t) refCount;
 }
 
 size_t
-CRefCount::WeakRelease ()
+CRefCount::weakRelease ()
 {
-	int32_t RefCount = mt::AtomicDec (&m_WeakRefCount);
+	int32_t refCount = mt::atomicDec (&m_weakRefCount);
 
-	if (!RefCount && m_pfFree != NULL && (size_t) m_pfFree < -10)
-		m_pfFree (m_pObject);
+	if (!refCount && m_pfFree != NULL && (size_t) m_pfFree < -10)
+		m_pfFree (m_object);
 
-	return (uint32_t) RefCount;
+	return (uint32_t) refCount;
 }
 
 size_t
-CRefCount::AddRefByWeakPtr ()
+CRefCount::addRefByWeakPtr ()
 { 
 	for (;;)
 	{
-		int32_t Old = m_RefCount; 
-		if (Old == 0)
+		int32_t old = m_refCount; 
+		if (old == 0)
 			return 0;
 
-		if (mt::AtomicCmpXchg (&m_RefCount, Old, Old + 1) == Old)
-			return (uint32_t) (Old + 1);
+		if (mt::atomicCmpXchg (&m_refCount, old, old + 1) == old)
+			return (uint32_t) (old + 1);
 	}
 }
 

@@ -29,27 +29,27 @@ class CMyParser: public rtl::CCmdLineParserT <CMyParser, CSwitchTable>
 {
 public:
 	bool
-	OnValue (const char* pValue)
+	onValue (const char* value)
 	{
-		printf ("OnValue '%s'\n", pValue);
+		printf ("OnValue '%s'\n", value);
 		return true;
 	}
 
 	bool 
-	OnSwitch (
-		ESwitch Switch,
-		const char* pValue
+	onSwitch (
+		ESwitch switch,
+		const char* value
 		)
 	{
-		printf ("OnSwitch #%d = '%s'\n", Switch, pValue);
+		printf ("OnSwitch #%d = '%s'\n", switch, value);
 		return true;
 	}
 };
 
 void
-Run ()
+run ()
 {
-	const char* CmdLine [] = 
+	const char* cmdLine [] = 
 	{
 		"--help",
 		"--session-provider=serial",
@@ -59,8 +59,8 @@ Run ()
 		"-l=serial_ssn.njlog",
 	};
 
-	CMyParser Parser;
-	Parser.Parse ((int) countof (CmdLine), CmdLine);
+	CMyParser parser;
+	parser.parse ((int) countof (cmdLine), cmdLine);
 
 }
 

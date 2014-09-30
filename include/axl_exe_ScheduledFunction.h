@@ -26,96 +26,96 @@ public:
 protected:
 	typedef CFunctionT <TCtxArg, TParArg> CFunction;
 
-	IScheduler* m_pScheduler;
-	CFunction m_Function;
+	IScheduler* m_scheduler;
+	CFunction m_function;
 
 public:
-	CScheduledFunctionT (IScheduler* pScheduler = NULL)
+	CScheduledFunctionT (IScheduler* scheduler = NULL)
 	{
-		m_pScheduler = pScheduler;
+		m_scheduler = scheduler;
 	}
 
 	CScheduledFunctionT (
-		IScheduler* pScheduler,
-		int Convention,
+		IScheduler* scheduler,
+		int convention,
 		void* pf,
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (pScheduler, Convention, pf, va);
+		setupV (scheduler, convention, pf, va);
 	}
 
 	CScheduledFunctionT (
-		IScheduler* pScheduler,
+		IScheduler* scheduler,
 		void* pf,
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (pScheduler, pf, va);
+		setupV (scheduler, pf, va);
 	}
 
 	void
-	SetupV (
-		IScheduler* pScheduler,
-		ECallConv Convention,
+	setupV (
+		IScheduler* scheduler,
+		ECallConv convention,
 		void* pf,
 		axl_va_list va
 		)
 	{
-		m_pScheduler = pScheduler;
-		m_Function.SetupV (Convention, pf, va);
+		m_scheduler = scheduler;
+		m_function.setupV (convention, pf, va);
 	}
 
 	void
-	SetupV (
-		IScheduler* pScheduler,
+	setupV (
+		IScheduler* scheduler,
 		void* pf,
 		axl_va_list va
 		)
 	{
-		SetupV (pScheduler, ECallConv_Cdecl, pf, va);
+		setupV (scheduler, ECallConv_Cdecl, pf, va);
 	}
 
 	void
-	Setup (
-		IScheduler* pScheduler,
-		ECallConv Convention,
+	setup (
+		IScheduler* scheduler,
+		ECallConv convention,
 		void* pf,
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (pScheduler, Convention, pf, va);
+		setupV (scheduler, convention, pf, va);
 	}
 
 	void
-	Setup (
-		IScheduler* pScheduler,
+	setup (
+		IScheduler* scheduler,
 		void* pf,
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (pScheduler, pf, va);
+		setupV (scheduler, pf, va);
 	}
 
 	virtual 
 	IArgPacker* 
-	GetArgPacker ()
+	getArgPacker ()
 	{
-		return m_Function.GetArgPacker ();
+		return m_function.getArgPacker ();
 	}
 
 	virtual 
 	intptr_t 
-	InvokeV (axl_va_list va)
+	invokeV (axl_va_list va)
 	{
-		if (!m_pScheduler)
-			return m_Function.InvokeV (va);
+		if (!m_scheduler)
+			return m_function.invokeV (va);
 
-		m_pScheduler->ScheduleV (&m_Function, va);
+		m_scheduler->scheduleV (&m_function, va);
 		return 0;
 	}
 };

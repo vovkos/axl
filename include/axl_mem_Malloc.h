@@ -20,9 +20,9 @@ public:
 	{
 	public:
 		void* 
-		operator () (size_t Size)
+		operator () (size_t size)
 		{
-			return malloc (Size);
+			return malloc (size);
 		}
 	};
 
@@ -39,14 +39,14 @@ public:
 public:
 	static
 	void* 
-	Alloc (size_t Size)
+	alloc (size_t size)
 	{
-		return CAlloc () (Size);
+		return CAlloc () (size);
 	}
 
 	static
 	void 
-	Free (void* p)
+	free (void* p)
 	{
 		return CFree () (p);
 	}

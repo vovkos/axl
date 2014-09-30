@@ -9,21 +9,21 @@ namespace gui {
 //.............................................................................
 
 bool
-CQtCaret::Show (
-	CWidget* pWidget,
-	const TRect& Rect
+CQtCaret::show (
+	CWidget* widget,
+	const TRect& rect
 	)
 {
-	ASSERT (pWidget);
+	ASSERT (widget);
 
-	if (m_pWidget && m_IsVisible)
-		m_pWidget->Redraw (m_Rect);
+	if (m_widget && m_isVisible)
+		m_widget->redraw (m_rect);
 
-	m_pWidget = pWidget;
-	m_Rect = Rect;
-	m_IsVisible = true;
+	m_widget = widget;
+	m_rect = rect;
+	m_isVisible = true;
 	
-	pWidget->Redraw (Rect);
+	widget->redraw (rect);
 	
 	setSingleShot (false);
 	start (500);
@@ -31,52 +31,52 @@ CQtCaret::Show (
 }
 
 void
-CQtCaret::Hide ()
+CQtCaret::hide ()
 {
-	if (!m_pWidget)
+	if (!m_widget)
 		return;
 
-	if (m_IsVisible)
-		m_pWidget->Redraw (m_Rect);
+	if (m_isVisible)
+		m_widget->redraw (m_rect);
 
-	m_pWidget = NULL;
-	m_IsVisible = false;
+	m_widget = NULL;
+	m_isVisible = false;
 	stop ();
 }
 
 void
 CQtCaret::timerEvent  (QTimerEvent* e)
 {
-	if (!m_pWidget)
+	if (!m_widget)
 		return;
 
-	m_IsVisible = !m_IsVisible;
-	m_pWidget->Redraw (m_Rect);
+	m_isVisible = !m_isVisible;
+	m_widget->redraw (m_rect);
 }
 
 //.............................................................................
 
 CQtEngine*
-GetQtEngineSingleton ()
+getQtEngineSingleton ()
 {
-	return CQtEngine::GetSingleton ();
+	return CQtEngine::getSingleton ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 ref::CPtrT <CFont>
-CQtEngine::CreateStdFont (EStdFont FontKind)
+CQtEngine::createStdFont (EStdFont fontKind)
 {
-	switch (FontKind)
+	switch (fontKind)
 	{
 	case EStdFont_Gui:
-		return CreateFont (QApplication::font ());
+		return createFont (QApplication::font ());
 
 	case EStdFont_Monospace:
 		{
-		QFont QtFont ("Monospace", 10);
-		QtFont.setStyleHint (QFont::TypeWriter, QFont::NoFontMerging);
-		return CreateFont (QtFont);
+		QFont qtFont ("Monospace", 10);
+		qtFont.setStyleHint (QFont::TypeWriter, QFont::NoFontMerging);
+		return createFont (qtFont);
 		}
 
 	default:
@@ -85,74 +85,74 @@ CQtEngine::CreateStdFont (EStdFont FontKind)
 }
 
 QFont
-CQtEngine::CreateQtFont (
-	const char* pFaceName,
-	size_t PointSize,
-	uint_t Flags
+CQtEngine::createQtFont (
+	const char* faceName,
+	size_t pointSize,
+	uint_t flags
 	)
 {
-	QString FamilyName = QString::fromUtf8 (pFaceName);
+	QString familyName = QString::fromUtf8 (faceName);
 
-	int Weight = (Flags & EFontFlag_Bold) ? QFont::Bold : QFont::Normal;
-	bool IsItalic = (Flags & EFontFlag_Italic) != 0;
+	int weight = (flags & EFontFlag_Bold) ? QFont::Bold : QFont::Normal;
+	bool isItalic = (flags & EFontFlag_Italic) != 0;
 
-	QFont QtFont (FamilyName, PointSize, Weight, IsItalic);
+	QFont qtFont (familyName, pointSize, weight, isItalic);
 
-	if (Flags & EFontFlag_Underline)
-		QtFont.setUnderline (true);
+	if (flags & EFontFlag_Underline)
+		qtFont.setUnderline (true);
 
-	if (Flags & EFontFlag_Strikeout)
-		QtFont.setStrikeOut (true);
+	if (flags & EFontFlag_Strikeout)
+		qtFont.setStrikeOut (true);
 
-	return QtFont;
+	return qtFont;
 }
 
 ref::CPtrT <CFont>
-CQtEngine::CreateFont (const QFont& QtFont)
+CQtEngine::createFont (const QFont& qtFont)
 {
-	CQtFont* pFont = AXL_MEM_NEW (CQtFont);
-	pFont->m_QtFont = QtFont;
+	CQtFont* font = AXL_MEM_NEW (CQtFont);
+	font->m_qtFont = qtFont;
 
-	GetFontDescFromFontInfo (QFontInfo (QtFont), &pFont->m_FontDesc);
+	getFontDescFromFontInfo (QFontInfo (qtFont), &font->m_fontDesc);
 
-	ref::CPtrT <CQtFontTuple> FontTuple = AXL_REF_NEW (CQtFontTuple);
-	FontTuple->m_pBaseFont = pFont;
-	FontTuple->m_FontModArray [pFont->m_FontDesc.m_Flags] = pFont;
+	ref::CPtrT <CQtFontTuple> fontTuple = AXL_REF_NEW (CQtFontTuple);
+	fontTuple->m_baseFont = font;
+	fontTuple->m_fontModArray [font->m_fontDesc.m_flags] = font;
 
-	pFont->m_pTuple = FontTuple;
+	font->m_tuple = fontTuple;
 
-	return ref::CPtrT <CFont> (pFont, FontTuple);
+	return ref::CPtrT <CFont> (font, fontTuple);
 }
 
 CFont*
-CQtEngine::GetFontMod (
+CQtEngine::getFontMod (
 	CFont* _pBaseFont,
-	uint_t Flags
+	uint_t flags
 	)
 {
-	ASSERT (_pBaseFont->GetEngine () == this);
+	ASSERT (_pBaseFont->getEngine () == this);
 
-	CQtFont* pBaseFont = (CQtFont*) _pBaseFont;
-	CQtFontTuple* pFontTuple = (CQtFontTuple*) pBaseFont->m_pTuple;
+	CQtFont* baseFont = (CQtFont*) _pBaseFont;
+	CQtFontTuple* fontTuple = (CQtFontTuple*) baseFont->m_tuple;
 
-	TFontDesc FontDesc = *pBaseFont->GetFontDesc ();
+	TFontDesc fontDesc = *baseFont->getFontDesc ();
 
-	CQtFont* pFont = AXL_MEM_NEW (CQtFont);
-	pFont->m_FontDesc = FontDesc;
-	pFont->m_FontDesc.m_Flags = Flags;
-	pFont->m_QtFont = CreateQtFont (FontDesc.m_FaceName, FontDesc.m_PointSize, Flags);
+	CQtFont* font = AXL_MEM_NEW (CQtFont);
+	font->m_fontDesc = fontDesc;
+	font->m_fontDesc.m_flags = flags;
+	font->m_qtFont = createQtFont (fontDesc.m_faceName, fontDesc.m_pointSize, flags);
 
-	ASSERT (!(Flags & EFontFlag_Transparent) && Flags < countof (pFontTuple->m_FontModArray));
-	ASSERT (!pFontTuple->m_FontModArray [Flags]);
+	ASSERT (!(flags & EFontFlag_Transparent) && flags < countof (fontTuple->m_fontModArray));
+	ASSERT (!fontTuple->m_fontModArray [flags]);
 
-	pFontTuple->m_FontModArray [Flags] = pFont;
-	return pFont;
+	fontTuple->m_fontModArray [flags] = font;
+	return font;
 }
 
 ref::CPtrT <CCursor>
-CQtEngine::CreateStdCursor (EStdCursor CursorKind)
+CQtEngine::createStdCursor (EStdCursor cursorKind)
 {
-	static Qt::CursorShape StdCursorShapeTable [EStdCursor__Count] =
+	static Qt::CursorShape stdCursorShapeTable [EStdCursor__Count] =
 	{
 		Qt::ArrowCursor,         // EStdCursor_Arrow = 0,
 		Qt::WaitCursor,          // EStdCursor_Wait,
@@ -165,210 +165,208 @@ CQtEngine::CreateStdCursor (EStdCursor CursorKind)
 		Qt::SizeAllCursor,       // EStdCursor_SizeAll,
 	};
 
-	ASSERT (CursorKind < EStdCursor__Count);
-	return CreateCursor (StdCursorShapeTable [CursorKind]);
+	ASSERT (cursorKind < EStdCursor__Count);
+	return createCursor (stdCursorShapeTable [cursorKind]);
 }
 
 ref::CPtrT <CCursor>
-CQtEngine::CreateCursor (const QCursor& QtCursor)
+CQtEngine::createCursor (const QCursor& qtCursor)
 {
-	ref::CPtrT <CQtCursor> Cursor = AXL_REF_NEW (ref::CBoxT <CQtCursor>);
-	Cursor->m_QtCursor = QtCursor;
-	return Cursor;
+	ref::CPtrT <CQtCursor> cursor = AXL_REF_NEW (ref::CBoxT <CQtCursor>);
+	cursor->m_qtCursor = qtCursor;
+	return cursor;
 }
 
 ref::CPtrT <CImage>
-CQtEngine::CreateImage ()
+CQtEngine::createImage ()
 {
-	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
-	return Image;
+	ref::CPtrT <CQtImage> image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
+	return image;
 }
 
 ref::CPtrT <CImage>
-CQtEngine::CreateImage (
-	int Width,
-	int Height,
-	EPixelFormat PixelFormat,
-	const void* pData,
-	bool IsScreenCompatible
+CQtEngine::createImage (
+	int width,
+	int height,
+	EPixelFormat pixelFormat,
+	const void* data,
+	bool isScreenCompatible
 	)
 {
-	uint_t BitCount;
+	uint_t bitCount;
 
-	switch (PixelFormat)
+	switch (pixelFormat)
 	{
 	case EPixelFormat_Rgba:
-		BitCount = 32;
+		bitCount = 32;
 		break;
 
 	case EPixelFormat_Rgb:
-		BitCount = 24;
+		bitCount = 24;
 		break;
 
 	default:
-		err::SetFormatStringError ("unsupported pixel format '%s'", GetPixelFormatString (PixelFormat));
+		err::setFormatStringError ("unsupported pixel format '%s'", getPixelFormatString (pixelFormat));
 	};
 
-	QPixmap QtPixmap;
+	QPixmap qtPixmap;
 
 /*
-	if (!IsScreenCompatible)
+	if (!isScreenCompatible)
 	{
 		hBitmap = ::CreateBitmap (
-			Width,
-			Height,
+			width,
+			height,
 			1,
-			BitCount,
-			pData
+			bitCount,
+			data
 			);
 
 		if (!hBitmap)
-			return err::FailWithLastSystemError (ref::EPtr_Null);
+			return err::failWithLastSystemError (ref::EPtr_Null);
 	}
 	else
 	{
-		BITMAPINFO BitmapInfo = { 0 };
-		BitmapInfo.bmiHeader.biSize = sizeof (BitmapInfo.bmiHeader);
-		BitmapInfo.bmiHeader.biPlanes = 1;
-		BitmapInfo.bmiHeader.biBitCount = BitCount;
-		BitmapInfo.bmiHeader.biCompression = BI_RGB;
-		BitmapInfo.bmiHeader.biWidth = Width;
-		BitmapInfo.bmiHeader.biHeight = Height;
+		BITMAPINFO bitmapInfo = { 0 };
+		bitmapInfo.bmiHeader.biSize = sizeof (bitmapInfo.bmiHeader);
+		bitmapInfo.bmiHeader.biPlanes = 1;
+		bitmapInfo.bmiHeader.biBitCount = bitCount;
+		bitmapInfo.bmiHeader.biCompression = BI_RGB;
+		bitmapInfo.bmiHeader.biWidth = width;
+		bitmapInfo.bmiHeader.biHeight = height;
 
-		CScreenDc ScreenDc;
+		CScreenDc screenDc;
 
 		hBitmap = ::CreateCompatibleBitmap (
-			ScreenDc,
-			Width,
-			Height
+			screenDc,
+			width,
+			height
 			);
 
 		if (!hBitmap)
-			return err::FailWithLastSystemError (ref::EPtr_Null);
+			return err::failWithLastSystemError (ref::EPtr_Null);
 
-		bool_t Result = SetDIBits (
-			ScreenDc,
+		bool_t result = setDIBits (
+			screenDc,
 			hBitmap,
 			0,
-			Height,
-			pData,
-			&BitmapInfo,
+			height,
+			data,
+			&bitmapInfo,
 			DIB_RGB_COLORS
 			);
 
-		if (!Result)
-			return err::FailWithLastSystemError (ref::EPtr_Null);
+		if (!result)
+			return err::failWithLastSystemError (ref::EPtr_Null);
 	} */
 
-	ref::CPtrT <CQtImage> Image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
-	Image->m_QtPixmap = QtPixmap;
-	return Image;
+	ref::CPtrT <CQtImage> image = AXL_REF_NEW (ref::CBoxT <CQtImage>);
+	image->m_qtPixmap = qtPixmap;
+	return image;
 }
 
 ref::CPtrT <CCanvas>
-CQtEngine::CreateOffscreenCanvas (
-	int Width,
-	int Height
+CQtEngine::createOffscreenCanvas (
+	int width,
+	int height
 	)
 {
 	return ref::EPtr_Null;
 }
 
 uintptr_t 
-CQtEngine::RegisterClipboardFormat (const rtl::CString& FormatName)
+CQtEngine::registerClipboardFormat (const rtl::CString& formatName)
 {
-	rtl::CStringHashTableMapIteratorT <uintptr_t> It = m_ClipboardFormatNameMap.Find (FormatName);
-	if (It)
-		return It->m_Value;
+	rtl::CStringHashTableMapIteratorT <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
+	if (it)
+		return it->m_value;
 
-	size_t Count = m_ClipboardFormatTable.GetCount ();
-	m_ClipboardFormatTable.Append (FormatName);
-	m_ClipboardFormatNameMap [FormatName] = Count;
-	return Count;
+	size_t count = m_clipboardFormatNameTable.getCount ();
+	m_clipboardFormatNameTable.append (formatName);
+	m_clipboardFormatNameMap [formatName] = count;
+	return count;
 }
 
 bool
-CQtEngine::ReadClipboard (rtl::CString* pString)
+CQtEngine::readClipboard (rtl::CString* string)
 {
-	QClipboard* pQtClipboard = QApplication::clipboard ();
-	QString QtString = pQtClipboard->text ();
-	QByteArray Data = QtString.toUtf8 ();
-	pString->Copy (Data.constData (), Data.size ());
+	QClipboard* qtClipboard = QApplication::clipboard ();
+	QString qtString = qtClipboard->text ();
+	QByteArray data = qtString.toUtf8 ();
+	string->copy (data.constData (), data.size ());
 	return true;
 }
 
 bool
-CQtEngine::ReadClipboard (
-	uintptr_t Format,
-	rtl::CArrayT <char>* pData
+CQtEngine::readClipboard (
+	uintptr_t format,
+	rtl::CArrayT <char>* data
 	)
 {
-	size_t Count = m_ClipboardFormatTable.GetCount ();
-	if (Format >= Count)
+	size_t count = m_clipboardFormatNameTable.getCount ();
+	if (format >= count)
 	{
-		err::SetError (err::EStatus_InvalidParameter);
+		err::setError (err::EStatus_InvalidParameter);
 		return false;
 	}
 
-	const char* pFormat = m_ClipboardFormatTable [Format];
+	const char* formatName = m_clipboardFormatNameTable [format];
 
-	QClipboard* pQtClipboard = QApplication::clipboard ();
-	const QMimeData* mimeData = pQtClipboard->mimeData ();
+	QClipboard* qtClipboard = QApplication::clipboard ();
+	const QMimeData* mimeData = qtClipboard->mimeData ();
 
-	QByteArray data = mimeData->data (pFormat);
-	size_t Size = data.size ();	
-	pData->Copy (data.constData (), Size);
+	QByteArray qtData = mimeData->data (formatName);
+	data->copy (qtData.constData (), qtData.size ());
 	return true;
 }
 
 bool
-CQtEngine::WriteClipboard (
-	const char* pString,
-	size_t Length
+CQtEngine::writeClipboard (
+	const char* string,
+	size_t length
 	)
 {
-	QString String = QString::fromUtf8 (pString, Length);
+	if (!m_qtClipboardMimeData)
+		m_qtClipboardMimeData = new QMimeData;
 
-	if (!m_pQtClipboardMimeData)
-		m_pQtClipboardMimeData = new QMimeData;
-
-	m_pQtClipboardMimeData->setText (String);
+	QString qtString = QString::fromUtf8 (string, length);
+	m_qtClipboardMimeData->setText (qtString);
 	return true;
 }
 
 bool
-CQtEngine::WriteClipboard (
-	uintptr_t Format,
-	const void* pData,
-	size_t Size
+CQtEngine::writeClipboard (
+	uintptr_t format,
+	const void* data,
+	size_t size
 	)
 {
-	size_t Count = m_ClipboardFormatTable.GetCount ();
-	if (Format >= Count)
+	size_t count = m_clipboardFormatNameTable.getCount ();
+	if (format >= count)
 	{
-		err::SetError (err::EStatus_InvalidParameter);
+		err::setError (err::EStatus_InvalidParameter);
 		return false;
 	}
 
-	const char* pFormat = m_ClipboardFormatTable [Format];
+	const char* formatName = m_clipboardFormatNameTable [format];
 
-	if (!m_pQtClipboardMimeData)
-		m_pQtClipboardMimeData = new QMimeData;
+	if (!m_qtClipboardMimeData)
+		m_qtClipboardMimeData = new QMimeData;
 
-	m_pQtClipboardMimeData->setData (pFormat, QByteArray ((const char*) pData, Size));
+	m_qtClipboardMimeData->setData (formatName, QByteArray ((const char*) data, size));
 	return true;
 }
 
 bool
-CQtEngine::CommitClipboard ()
+CQtEngine::commitClipboard ()
 {
-	if (!m_pQtClipboardMimeData)
+	if (!m_qtClipboardMimeData)
 		return false;
 
-	QClipboard* pQtClipboard = QApplication::clipboard ();
-	pQtClipboard->setMimeData (m_pQtClipboardMimeData);
+	QClipboard* qtClipboard = QApplication::clipboard ();
+	qtClipboard->setMimeData (m_qtClipboardMimeData);
 
-	m_pQtClipboardMimeData = NULL;
+	m_qtClipboardMimeData = NULL;
 	return true;
 }
 

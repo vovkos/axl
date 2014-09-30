@@ -18,84 +18,84 @@ class CEscapeEncoding
 public:
 	static
 	char
-	FindEscapeChar (char x);
+	findEscapeChar (char x);
 
 	static
 	char
-	FindEscapeReplaceChar (char x);
+	findEscapeReplaceChar (char x);
 
 	static
 	size_t
-	Encode (
-		CString* pString,
+	encode (
+		CString* string,
 		const char* p, 
-		size_t Length = -1
+		size_t length = -1
 		);
 
 	static
 	CString
-	Encode (
+	encode (
 		const char* p, 
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
-		CString String;
-		Encode (&String, p, Length);
-		return String;
+		CString string;
+		encode (&string, p, length);
+		return string;
 	}
 
 	static
 	size_t
-	Encode (
-		CString* pString,
-		const CString& String
+	encode (
+		CString* dstString,
+		const CString& srcString
 		)
 	{
-		return Encode (pString, String, String.GetLength ());
+		return encode (dstString, srcString, srcString.getLength ());
 	}
 
 	static
 	CString
-	Encode (const CString& String)
+	encode (const CString& string)
 	{
-		return Encode (String, String.GetLength ());
+		return encode (string, string.getLength ());
 	}
 
 	static
 	size_t
-	Decode (
-		CString* pString,
+	decode (
+		CString* string,
 		const char* p, 
-		size_t Length = -1
+		size_t length = -1
 		);
 
 	static
 	CString
-	Decode (		
+	decode (		
 		const char* p, 
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
-		CString String;
-		Decode (&String, p, Length);
-		return String;
+		CString string;
+		decode (&string, p, length);
+		return string;
 	}
 
 	static
 	size_t
-	Decode (
-		CString* pString,
-		const CString& String
+	decode (
+		CString* dstString,
+		const CString& srcString
 		)
 	{
-		return Decode (pString, String, String.GetLength ());
+		return decode (dstString, srcString, srcString.getLength ());
 	}
 
 	static
 	CString
-	Decode (const CString& String)
+	decode (const CString& string)
 	{
-		return Decode (String, String.GetLength ());
+		return decode (string, string.getLength ());
 	}
 };
 

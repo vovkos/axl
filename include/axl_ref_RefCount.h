@@ -34,10 +34,10 @@ class CRefCount
 	AXL_DISABLE_COPY (CRefCount)
 	
 protected:
-	volatile int32_t m_RefCount;
-	volatile int32_t m_WeakRefCount;
+	volatile int32_t m_refCount;
+	volatile int32_t m_weakRefCount;
 
-	void* m_pObject;
+	void* m_object;
 	mem::FFree* m_pfDestruct;
 	mem::FFree* m_pfFree;
 
@@ -46,66 +46,66 @@ public:
 
 	~CRefCount ()
 	{ 
-		ASSERT (m_RefCount == 0 && m_WeakRefCount > 0);
+		ASSERT (m_refCount == 0 && m_weakRefCount > 0);
 	}
 
 	void
-	SetTarget (
-		void* pObject,
+	setTarget (
+		void* object,
 		mem::FFree* pfDestruct,
 		mem::FFree* pfFree
 		);
 
 	size_t
-	GetRefCount ()
+	getRefCount ()
 	{ 
-		return m_RefCount; 
+		return m_refCount; 
 	}
 
 	size_t
-	GetWeakRefCount () 
+	getWeakRefCount () 
 	{ 
-		return m_WeakRefCount; 
+		return m_weakRefCount; 
 	}
 
 	void*
-	GetObject ()
+	getObject ()
 	{
-		return m_pObject;
+		return m_object;
 	}
 
 	mem::FFree*
-	GetDestruct ()
+	getDestruct ()
 	{
 		return m_pfDestruct;
 	}
 
 	mem::FFree*
-	GetFree ()
+	getFree ()
 	{
 		return m_pfFree;
 	}
 
 	size_t
-	AddRef ()
+	addRef ()
 	{ 
-		return mt::AtomicInc (&m_RefCount); 
+		return mt::atomicInc (&m_refCount); 
 	}
 
 	size_t
-	Release ();
+	release ();
 
 	size_t
-	AddWeakRef ()
+	addWeakRef ()
 	{ 
-		return mt::AtomicInc (&m_WeakRefCount); 
+		return mt::atomicInc (&m_weakRefCount); 
 	}
 
 	size_t
-	WeakRelease ();
+	weakRelease ();
 
 	size_t
-	AddRefByWeakPtr ();
+	addRefByWeakPtr ();
 };
 
 //.............................................................................

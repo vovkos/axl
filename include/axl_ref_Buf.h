@@ -43,7 +43,7 @@ public:
 	class CHdr: public CRefCount
 	{
 	public:
-		size_t m_BufferSize;
+		size_t m_bufferSize;
 
 		~CHdr ()
 		{
@@ -53,7 +53,7 @@ public:
 
 	enum
 	{
-		MinBufSize = sizeof (CHdr) + sizeof (T)
+		minBufSize = sizeof (CHdr) + sizeof (T)
 	};
 
 protected:
@@ -65,31 +65,31 @@ public:
 		m_p = NULL;
 	}
 
-	CBufT (const CBufT& Src)
+	CBufT (const CBufT& src)
 	{
 		m_p = NULL;
-		Copy (Src);
+		copy (src);
 	}
 
-	CBufT (const T& Src)
+	CBufT (const T& src)
 	{
 		m_p = NULL;
-		Copy (Src);
+		copy (src);
 	}
 	
 	CBufT (
-		EBuf Kind,
+		EBuf kind,
 		void* p, 
-		size_t Size
+		size_t size
 		)
 	{
 		m_p = NULL;
-		SetBuffer (Kind, p, Size);
+		setBuffer (kind, p, size);
 	}
 
 	~CBufT ()
 	{
-		Release ();
+		release ();
 	}
 
 	operator const T* () const
@@ -117,174 +117,174 @@ public:
 	}
 
 	CBufT& 
-	operator = (const CBufT& Src)
+	operator = (const CBufT& src)
 	{ 
-		Copy (Src);
+		copy (src);
 		return *this;
 	}
 
 	CBufT& 
-	operator = (const T& Src)
+	operator = (const T& src)
 	{
-		Copy (Src);
+		copy (src);
 		return *this;
 	}
 
 	void 
-	Release ()
+	release ()
 	{
 		if (!m_p)
 			return;
 
-		GetHdr ()->Release ();
+		getHdr ()->release ();
 		m_p = NULL;
 	}
 
 	T* 
-	Create (size_t Size = sizeof (T))
+	create (size_t size = sizeof (T))
 	{
-		Release ();
-		return AllocateBuffer (Size, NULL);
+		release ();
+		return allocateBuffer (size, NULL);
 	}
 
 	bool
-	Copy (const CBufT& Src)
+	copy (const CBufT& src)
 	{
-		if (m_p == Src.m_p)
+		if (m_p == src.m_p)
 			return true;
 
-		if (Src.m_p)
+		if (src.m_p)
 		{
-			if (Src.GetHdr ()->GetFree () == (mem::FFree*) -1)
-				return Copy (*Src);
+			if (src.getHdr ()->getFree () == (mem::FFree*) -1)
+				return copy (*src);
 
-			Src.GetHdr ()->AddRef ();
+			src.getHdr ()->addRef ();
 		}
 
 		if (m_p)
-			GetHdr ()->Release ();
+			getHdr ()->release ();
 
-		m_p = Src.m_p;
+		m_p = src.m_p;
 		return true;
 	}
 
 	bool
-	Copy (const T& Src)
+	copy (const T& src)
 	{
-		return m_p == &Src ? true : AllocateBuffer (TGetSize () (Src), &Src) != NULL;
+		return m_p == &src ? true : allocateBuffer (TGetSize () (src), &src) != NULL;
 	}
 
 	T* 
-	GetBuffer ()
+	getBuffer ()
 	{
-		return AllocateBuffer (m_p ? TGetSize () (*m_p) : sizeof (T), m_p);
+		return allocateBuffer (m_p ? TGetSize () (*m_p) : sizeof (T), m_p);
 	}
 
 	T* 
-	GetBuffer (size_t Size, bool SaveContents = false)
+	getBuffer (size_t size, bool saveContents = false)
 	{
-		return AllocateBuffer (Size, SaveContents ? m_p : NULL);
+		return allocateBuffer (size, saveContents ? m_p : NULL);
 	}
 
 	void
-	SetBuffer (
-		EBuf Kind,
+	setBuffer (
+		EBuf kind,
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		ASSERT (Size >= sizeof (CHdr) + sizeof (T));
+		ASSERT (size >= sizeof (CHdr) + sizeof (T));
 
-		CHdr* pOldHdr = GetHdr ();
+		CHdr* oldHdr = getHdr ();
 
-		mem::FFree* pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
-		CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
-		NewHdr->m_BufferSize = Size - sizeof (CHdr);
+		mem::FFree* pfFree = kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
+		CPtrT <CHdr> newHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
+		newHdr->m_bufferSize = size - sizeof (CHdr);
 
-		m_p = (T*) (NewHdr + 1);
-		NewHdr.Detach ();
+		m_p = (T*) (newHdr + 1);
+		newHdr.detach ();
 
 		new (m_p) T;
 
-		if (pOldHdr)
-			pOldHdr->Release ();
+		if (oldHdr)
+			oldHdr->release ();
 	}
 
 	bool 
-	EnsureExclusive ()
+	ensureExclusive ()
 	{ 
-		return m_p ? GetBuffer () != NULL : true; 
+		return m_p ? getBuffer () != NULL : true; 
 	}
 
 protected:
 	CHdr*
-	GetHdr () const
+	getHdr () const
 	{
 		return m_p ? (CHdr*) m_p - 1 : NULL;
 	}
 
 	T* 
-	AllocateBuffer (
-		size_t Size,
-		const T* pSrc
+	allocateBuffer (
+		size_t size,
+		const T* src
 		)
 	{
-		ASSERT (Size >= sizeof (T));
+		ASSERT (size >= sizeof (T));
 
-		CHdr* pOldHdr = GetHdr ();
+		CHdr* oldHdr = getHdr ();
 		
-		if (pOldHdr && 
-			pOldHdr->m_BufferSize >= Size &&
-			pOldHdr->GetRefCount () == 1
+		if (oldHdr && 
+			oldHdr->m_bufferSize >= size &&
+			oldHdr->getRefCount () == 1
 			)
 		{
-			if (pSrc)
+			if (src)
 			{
-				*m_p = *pSrc;
-				CopyExtra (m_p, pSrc);
+				*m_p = *src;
+				copyExtra (m_p, src);
 			}
 
-			CHdr* pSrcHdr = (CHdr*) pSrc - 1;
+			CHdr* srcHdr = (CHdr*) src - 1;
 
 			return m_p;
 		}
 
-		size_t BufferSize = rtl::GetMinPower2Ge (Size);
+		size_t bufferSize = rtl::getMinPower2Ge (size);
 
-		CPtrT <CHdr> NewHdr = AXL_REF_NEW_EXTRA (CHdr, BufferSize);
-		if (!NewHdr)
+		CPtrT <CHdr> newHdr = AXL_REF_NEW_EXTRA (CHdr, bufferSize);
+		if (!newHdr)
 			return NULL;
 
-		NewHdr->m_BufferSize = BufferSize;
-		m_p = (T*) (NewHdr + 1);
-		NewHdr.Detach ();
+		newHdr->m_bufferSize = bufferSize;
+		m_p = (T*) (newHdr + 1);
+		newHdr.detach ();
 
-		if (pSrc)
+		if (src)
 		{
-			new (m_p) T (*pSrc);
-			CopyExtra (m_p, pSrc);
+			new (m_p) T (*src);
+			copyExtra (m_p, src);
 		}
 		else
 		{
 			new (m_p) T;
 		}
 
-		if (pOldHdr)
-			pOldHdr->Release ();
+		if (oldHdr)
+			oldHdr->release ();
 
 		return m_p;
 	}
 
 	static
 	void 
-	CopyExtra (
-		T* pDst,
-		const T* pSrc
+	copyExtra (
+		T* dst,
+		const T* src
 		)
 	{
-		size_t Size = TGetSize () (*pSrc);
-		if (Size > sizeof (T))
-			memcpy (pDst + 1, pSrc + 1, Size - sizeof (T));
+		size_t size = TGetSize () (*src);
+		if (size > sizeof (T))
+			memcpy (dst + 1, src + 1, size - sizeof (T));
 	}
 };
 

@@ -15,49 +15,49 @@ namespace io {
 //.............................................................................
 
 rtl::CString
-GetCurrentDir ();
+getCurrentDir ();
 
 bool
-DoesFileExist (const char* pFileName);
+doesFileExist (const char* fileName);
 
 bool
-EnsureDirExists (const char* pFileName);
+ensureDirExists (const char* fileName);
 
 rtl::CString
-GetFullFilePath (const char* pFileName);
+getFullFilePath (const char* fileName);
 
 rtl::CString
-GetDir (const char* pFilePath);
+getDir (const char* filePath);
 
 rtl::CString
-GetFileName (const char* pFilePath);
+getFileName (const char* filePath);
 
 rtl::CString
-GetExtension (const char* pFilePath);
+getExtension (const char* filePath);
 
 rtl::CString
-ConcatFilePath (
-	rtl::CString* pFilePath,
-	const char* pFileName
+concatFilePath (
+	rtl::CString* filePath,
+	const char* fileName
 	);
 
 inline
 rtl::CString
-ConcatFilePath (
-	const char* pDir,
-	const char* pFileName
+concatFilePath (
+	const char* dir,
+	const char* fileName
 	)
 {
-	rtl::CString FilePath = pDir;
-	return ConcatFilePath (&FilePath, pFileName);
+	rtl::CString filePath = dir;
+	return concatFilePath (&filePath, fileName);
 }
 
 rtl::CString
-FindFilePath (
-	const char* pFileName,
-	const char* pFirstDir,
-	const rtl::CBoxListT <rtl::CString>* pDirList,
-	bool DoFindInCurrentDir = true
+findFilePath (
+	const char* fileName,
+	const char* firstDir,
+	const rtl::CBoxListT <rtl::CString>* dirList,
+	bool doFindInCurrentDir = true
 	);
 
 //.............................................................................

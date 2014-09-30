@@ -19,40 +19,40 @@ class CThread: public CWaitableHandle
 {
 public:
 	bool 
-	Create (
-		SECURITY_ATTRIBUTES* pSecAttr,
-		size_t StackSize,
+	create (
+		SECURITY_ATTRIBUTES* secAttr,
+		size_t stackSize,
 		PTHREAD_START_ROUTINE pfThreadProc,
-		void* pContext,
-		uint_t Flags
+		void* context,
+		uint_t flags
 		);
 
 	uint_t
-	GetThreadId ()
+	getThreadId ()
 	{
-		uint_t Id = ::GetThreadId (m_h);
-		return err::Complete (Id, (uint_t) -1);
+		uint_t id = ::GetThreadId (m_h);
+		return err::complete (id, (uint_t) -1);
 	}
 
 	bool 
-	SetPriority (int Priority)
+	setPriority (int priority)
 	{
-		bool_t Result = ::SetThreadPriority (m_h, Priority);
-		return err::Complete (Result);
+		bool_t result = ::SetThreadPriority (m_h, priority);
+		return err::complete (result);
 	}
 
 	bool 
-	Terminate (dword_t ExitCode)
+	terminate (dword_t exitCode)
 	{
-		bool_t Result = ::TerminateThread (m_h, ExitCode);
-		return err::Complete (Result);
+		bool_t result = ::TerminateThread (m_h, exitCode);
+		return err::complete (result);
 	}
 
 	bool
-	GetExitCode (dword_t* pExitCode)
+	getExitCode (dword_t* exitCode)
 	{
-		bool_t Result = ::GetExitCodeThread (m_h, pExitCode);
-		return err::Complete (Result);
+		bool_t result = ::GetExitCodeThread (m_h, exitCode);
+		return err::complete (result);
 	}
 };
 

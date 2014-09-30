@@ -18,60 +18,60 @@ namespace io {
 class CFileTransport: public CTransport
 {
 protected:
-	CFile* m_pTransmitFile;
-	CFile* m_pReceiveFile;
+	CFile* m_transmitFile;
+	CFile* m_receiveFile;
 
 public:
 	CFileTransport ()
 	{
-		m_pTransmitFile = NULL;
-		m_pReceiveFile = NULL;
+		m_transmitFile = NULL;
+		m_receiveFile = NULL;
 	}
 
 	void
-	Attach (CFile* pFile)
+	attach (CFile* file)
 	{
-		m_pTransmitFile = pFile;
-		m_pReceiveFile = pFile;
+		m_transmitFile = file;
+		m_receiveFile = file;
 	}
 
 	void
-	Attach (
-		CFile* pTransmitFile,
-		CFile* pReceiveFile
+	attach (
+		CFile* transmitFile,
+		CFile* receiveFile
 		)
 	{
-		m_pTransmitFile = pTransmitFile;
-		m_pReceiveFile = pReceiveFile;
+		m_transmitFile = transmitFile;
+		m_receiveFile = receiveFile;
 	}
 
 	void
-	Detach ()
+	detach ()
 	{
-		m_pTransmitFile = NULL;
-		m_pReceiveFile = NULL;
+		m_transmitFile = NULL;
+		m_receiveFile = NULL;
 	}
 
 	virtual
 	size_t
-	Transmit (
+	transmit (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		ASSERT (m_pTransmitFile);
-		return m_pTransmitFile->Write (p, Size);
+		ASSERT (m_transmitFile);
+		return m_transmitFile->write (p, size);
 	}
 
 	virtual
 	size_t
-	Receive (
+	receive (
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		ASSERT (m_pReceiveFile);
-		return m_pReceiveFile->Read (p, Size);
+		ASSERT (m_receiveFile);
+		return m_receiveFile->read (p, size);
 	}
 };
 

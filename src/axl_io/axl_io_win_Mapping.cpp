@@ -9,63 +9,63 @@ namespace win {
 //.............................................................................
 
 bool
-CMapping::Create (
+CMapping::create (
 	HANDLE hFile,
-	SECURITY_ATTRIBUTES* pSecAttr,
-	uint_t PageProtection,
+	SECURITY_ATTRIBUTES* secAttr,
+	uint_t pageProtection,
 	uint64_t _MaxSize,
-	const wchar_t* pName
+	const wchar_t* name
 	)
 {
-	Close ();
+	close ();
 
-	ULARGE_INTEGER MaxSize;
-	MaxSize.QuadPart = _MaxSize;
+	ULARGE_INTEGER maxSize;
+	maxSize.QuadPart = _MaxSize;
 
 	m_h = ::CreateFileMappingW (
 		hFile, 
-		pSecAttr, 
-		PageProtection, 
-		MaxSize.HighPart, 
-		MaxSize.LowPart,
-		pName
+		secAttr, 
+		pageProtection, 
+		maxSize.HighPart, 
+		maxSize.LowPart,
+		name
 		);
 
-	return err::Complete (m_h != NULL);
+	return err::complete (m_h != NULL);
 }
 
 bool
-CMapping::Open (
-	uint_t Access,
-	bool DoInheritHandle,
-	const wchar_t* pName
+CMapping::open (
+	uint_t access,
+	bool doInheritHandle,
+	const wchar_t* name
 	)
 {
-	Close ();
+	close ();
 
-	m_h = ::OpenFileMappingW (Access, DoInheritHandle, pName);
-	return err::Complete (m_h != NULL);
+	m_h = ::OpenFileMappingW (access, doInheritHandle, name);
+	return err::complete (m_h != NULL);
 }
 
 //.............................................................................
 
 void*
-CMappedView::View (
+CMappedView::view (
 	HANDLE hMapping,
-	uint_t Access,
+	uint_t access,
 	uint64_t _Offset,
-	uint32_t Size
+	uint32_t size
 	)
 {
-	Close ();
+	close ();
 
-	ULARGE_INTEGER Offset;
-	Offset.QuadPart = _Offset;
+	ULARGE_INTEGER offset;
+	offset.QuadPart = _Offset;
 
-	m_h = ::MapViewOfFile (hMapping, Access, Offset.HighPart, Offset.LowPart, Size);
+	m_h = ::MapViewOfFile (hMapping, access, offset.HighPart, offset.LowPart, size);
 	if (!m_h)
 	{
-		err::FailWithLastSystemError ();
+		err::failWithLastSystemError ();
 		return NULL;
 	}
 

@@ -29,29 +29,29 @@ class CPCap: public rtl::CHandleT <pcap_t*, CClosePCap>
 {
 public:
 	bool
-	Open (
-		const char* pDevice,
-		size_t SnapshotSize,
-		bool IsPromiscious,
-		uint_t ReadTimeout
+	open (
+		const char* device,
+		size_t snapshotSize,
+		bool isPromiscious,
+		uint_t readTimeout
 		);
 
 	bool
-	SetFilter (const char* pFilter);
+	setFilter (const char* filter);
 
 	bool
-	SetBlockingMode (bool IsBlocking);
+	setBlockingMode (bool isBlocking);
 
 	size_t
-	Read (
+	read (
 		void* p,
-		size_t Size
+		size_t size
 		);
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 };
 

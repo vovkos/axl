@@ -9,140 +9,140 @@ namespace rtl {
 //.............................................................................
 
 void
-CBuddyAllocMap::CLevel::Format (
-	TPage* pPage,
-	size_t Count
+CBuddyAllocMap::CLevel::format (
+	TPage* page,
+	size_t count
 	)
 {
 	size_t i;
 
-	m_AvailablePageList.Clear ();
-	m_pFirstPage = pPage;
+	m_availablePageList.clear ();
+	m_firstPage = page;
 
-	ASSERT (Count);
-	for (i = 0; i < Count; i++, pPage++)
+	ASSERT (count);
+	for (i = 0; i < count; i++, page++)
 	{
-		m_AvailablePageList.InsertTail (pPage);
-		pPage->m_Map = 0;
+		m_availablePageList.insertTail (page);
+		page->m_map = 0;
 	}
 }
 
 void
-CBuddyAllocMap::CLevel::SetPageMap (
-	TPage* pPage,
-	size_t Map
+CBuddyAllocMap::CLevel::setPageMap (
+	TPage* page,
+	size_t map
 	)
 {
-	if (Map == -1 && pPage->m_Map != -1)
-		m_AvailablePageList.Remove (pPage);
-	else if (Map != -1 && pPage->m_Map == -1)
-		m_AvailablePageList.InsertTail (pPage);
+	if (map == -1 && page->m_map != -1)
+		m_availablePageList.remove (page);
+	else if (map != -1 && page->m_map == -1)
+		m_availablePageList.insertTail (page);
 
-	pPage->m_Map = Map;
+	page->m_map = map;
 }
 
 void
-CBuddyAllocMap::CLevel::SetBit (
-	TPage* pPage,
-	size_t Bit,
-	bool Value
+CBuddyAllocMap::CLevel::setBit (
+	TPage* page,
+	size_t bit,
+	bool value
 	)
 {
-	size_t Mask;
+	size_t mask;
 
-	pPage += Bit / _AXL_PTR_BITNESS;
-	Bit &= _AXL_PTR_BITNESS - 1;
-	Mask = (size_t) 1 << Bit;
+	page += bit / _AXL_PTR_BITNESS;
+	bit &= _AXL_PTR_BITNESS - 1;
+	mask = (size_t) 1 << bit;
 
-	if (Value)
+	if (value)
 	{
-		ASSERT ((pPage->m_Map & Mask) == 0);
-		SetPageMap (pPage, pPage->m_Map | Mask);
+		ASSERT ((page->m_map & mask) == 0);
+		setPageMap (page, page->m_map | mask);
 	}
 	else
 	{
-		ASSERT ((pPage->m_Map & Mask) == Mask);
-		SetPageMap (pPage, pPage->m_Map & ~Mask);
+		ASSERT ((page->m_map & mask) == mask);
+		setPageMap (page, page->m_map & ~mask);
 	}
 }
 
 void
-CBuddyAllocMap::CLevel::SetBitRange (
-	TPage* pPage,
-	size_t From,
-	size_t To,
-	bool Value
+CBuddyAllocMap::CLevel::setBitRange (
+	TPage* page,
+	size_t from,
+	size_t to,
+	bool value
 	)
 {
-	size_t PageIndex = From / _AXL_PTR_BITNESS;
-	size_t Mask;
+	size_t pageIdx = from / _AXL_PTR_BITNESS;
+	size_t mask;
 
-	pPage += PageIndex;
-	From -= PageIndex * _AXL_PTR_BITNESS;
-	To -= PageIndex * _AXL_PTR_BITNESS;
+	page += pageIdx;
+	from -= pageIdx * _AXL_PTR_BITNESS;
+	to -= pageIdx * _AXL_PTR_BITNESS;
 
-	if (Value)
+	if (value)
 	{
-		if (To < _AXL_PTR_BITNESS)
+		if (to < _AXL_PTR_BITNESS)
 		{
-			Mask = GetBitmask (From, To);
+			mask = getBitmask (from, to);
 			// ASSERT ((pPage->m_Map & Mask) == 0);
-			SetPageMap (pPage, pPage->m_Map | Mask);
+			setPageMap (page, page->m_map | mask);
 			return;
 		}
 
-		Mask = GetHiBitmask(From);
+		mask = getHiBitmask(from);
 		// ASSERT ((pPage->m_Map & Mask) == 0);
-		SetPageMap (pPage, pPage->m_Map | Mask);
+		setPageMap (page, page->m_map | mask);
 
-		To -= _AXL_PTR_BITNESS;
-		pPage++;
+		to -= _AXL_PTR_BITNESS;
+		page++;
 
-		while (To >= _AXL_PTR_BITNESS)
+		while (to >= _AXL_PTR_BITNESS)
 		{
 			// ASSERT (pPage->m_Map == 0);
-			pPage->m_Map = -1;
-			To -= _AXL_PTR_BITNESS;
-			pPage++;
+			page->m_map = -1;
+			to -= _AXL_PTR_BITNESS;
+			page++;
 		}
 
-		if (To)
+		if (to)
 		{
-			Mask = GetLoBitmask(To);
+			mask = getLoBitmask(to);
 			// ASSERT ((pPage->m_Map & Mask) == 0);
-			SetPageMap (pPage, pPage->m_Map | Mask);
+			setPageMap (page, page->m_map | mask);
 		}
 	}
 	else
 	{
-		if (To < _AXL_PTR_BITNESS)
+		if (to < _AXL_PTR_BITNESS)
 		{
-			Mask = GetBitmask(From, To);
+			mask = getBitmask(from, to);
 			// ASSERT ((pPage->m_Map & Mask) == Mask);
-			SetPageMap (pPage, pPage->m_Map & ~Mask);
+			setPageMap (page, page->m_map & ~mask);
 			return;
 		}
 
-		Mask = GetHiBitmask(From);
+		mask = getHiBitmask(from);
 		// ASSERT ((pPage->m_Map & Mask) == Mask);
-		SetPageMap (pPage, pPage->m_Map & ~Mask);
+		setPageMap (page, page->m_map & ~mask);
 
-		To -= _AXL_PTR_BITNESS;
-		pPage++;
+		to -= _AXL_PTR_BITNESS;
+		page++;
 
-		while (To >= _AXL_PTR_BITNESS)
+		while (to >= _AXL_PTR_BITNESS)
 		{
 			// ASSERT (pPage->m_Map == -1);
-			pPage->m_Map = 0;
-			To -= _AXL_PTR_BITNESS;
-			pPage++;
+			page->m_map = 0;
+			to -= _AXL_PTR_BITNESS;
+			page++;
 		}
 
-		if (To)
+		if (to)
 		{
-			Mask = GetLoBitmask(To);
+			mask = getLoBitmask(to);
 			// ASSERT ((pPage->m_Map & Mask) == Mask);
-			SetPageMap (pPage, pPage->m_Map & ~Mask);
+			setPageMap (page, page->m_map & ~mask);
 		}
 	}
 }
@@ -151,364 +151,364 @@ CBuddyAllocMap::CLevel::SetBitRange (
 
 CBuddyAllocMap::CBuddyAllocMap ()
 {
-	m_Width = 0;
-	m_Height = 0;
-	m_TotalSize = 0;
-	m_FreeSizeTop = 0;
-	m_FreeSizeBottom = 0;
-	m_MaxAllocSize = 0;
+	m_width = 0;
+	m_height = 0;
+	m_totalSize = 0;
+	m_freeSizeTop = 0;
+	m_freeSizeBottom = 0;
+	m_maxAllocSize = 0;
 }
 
 bool
-CBuddyAllocMap::Create(
-	size_t Width,
-	size_t Height
+CBuddyAllocMap::create(
+	size_t width,
+	size_t height
 	)
 {
-	bool_t Result;
+	bool_t result;
 
-	size_t TotalPageCount;
-	size_t PageCount;
+	size_t totalPageCount;
+	size_t pageCount;
 
-	CLevel* pLevel;
-	CLevel* pEnd;
+	CLevel* level;
+	CLevel* end;
 
-	TPage* pPage;
+	TPage* page;
 
-	Close();
+	close();
 
-	if (!Width)
-		Width = 1;
+	if (!width)
+		width = 1;
 
-	if (!Height)
-		Height = 1;
+	if (!height)
+		height = 1;
 
-	TotalPageCount = ((1 << Height) - 1) * Width;
+	totalPageCount = ((1 << height) - 1) * width;
 
-	Result = m_PageArray.SetCount (TotalPageCount) && m_LevelArray.SetCount (Height);
-	if (!Result)
+	result = m_pageArray.setCount (totalPageCount) && m_levelArray.setCount (height);
+	if (!result)
 	{
-		Close ();
+		close ();
 		return false;
 	}
 
-	pPage = m_PageArray;
-	pLevel = m_LevelArray;
-	pEnd = pLevel + Height;
+	page = m_pageArray;
+	level = m_levelArray;
+	end = level + height;
 
-	PageCount = Width << (Height - 1); // on the bottom level
+	pageCount = width << (height - 1); // on the bottom level
 
-	m_Width = Width;
-	m_Height = Height;
-	m_TotalSize = PageCount * _AXL_PTR_BITNESS;
-	m_FreeSizeTop = m_TotalSize;
-	m_FreeSizeBottom = m_TotalSize;
-	m_MaxAllocSize = (size_t) 1 << (Height - 1);
+	m_width = width;
+	m_height = height;
+	m_totalSize = pageCount * _AXL_PTR_BITNESS;
+	m_freeSizeTop = m_totalSize;
+	m_freeSizeBottom = m_totalSize;
+	m_maxAllocSize = (size_t) 1 << (height - 1);
 
-	for (; pLevel < pEnd; pLevel++)
+	for (; level < end; level++)
 	{
-		pLevel->Format (pPage, PageCount);
+		level->format (page, pageCount);
 
-		pPage += PageCount;
-		PageCount /= 2;
+		page += pageCount;
+		pageCount /= 2;
 	}
 
 	return true;
 }
 
 void
-CBuddyAllocMap::Close ()
+CBuddyAllocMap::close ()
 {
-	m_PageArray.Clear();
-	m_LevelArray.Clear();
+	m_pageArray.clear();
+	m_levelArray.clear();
 
-	m_MaxAllocSize = 0;
-	m_TotalSize = 0;
-	m_FreeSizeTop = 0;
-	m_FreeSizeBottom = 0;
+	m_maxAllocSize = 0;
+	m_totalSize = 0;
+	m_freeSizeTop = 0;
+	m_freeSizeBottom = 0;
 }
 
 void
-CBuddyAllocMap::Clear ()
+CBuddyAllocMap::clear ()
 {
-	TPage* pPage = m_PageArray;
-	CLevel* pLevel = m_LevelArray;
-	CLevel* pEnd = pLevel + m_Height;
+	TPage* page = m_pageArray;
+	CLevel* level = m_levelArray;
+	CLevel* end = level + m_height;
 
-	size_t PageCount = m_Width << (m_Height - 1); // on the bottom level
+	size_t pageCount = m_width << (m_height - 1); // on the bottom level
 
-	for (; pLevel < pEnd; pLevel++)
+	for (; level < end; level++)
 	{
-		pLevel->Format(pPage, PageCount);
+		level->format(page, pageCount);
 
-		pPage += PageCount;
-		PageCount /= 2;
+		page += pageCount;
+		pageCount /= 2;
 	}
 
-	m_FreeSizeTop = m_TotalSize;
-	m_FreeSizeBottom = m_TotalSize;
+	m_freeSizeTop = m_totalSize;
+	m_freeSizeBottom = m_totalSize;
 }
 
 size_t
-CBuddyAllocMap::Allocate (size_t Size)
+CBuddyAllocMap::allocate (size_t size)
 {
-	CLevel* pLevel;
-	TPage* pPage;
+	CLevel* level;
+	TPage* page;
 
-	size_t PageCount;
-	size_t BitSize;
-	size_t BitIndex;
-	size_t Address;
-	size_t AddressEnd;
+	size_t pageCount;
+	size_t bitSize;
+	size_t bitIdx;
+	size_t address;
+	size_t addressEnd;
 	size_t i;
 
-	size_t Level;
+	size_t levelIdx;
 
-	if (Size > m_MaxAllocSize)
+	if (size > m_maxAllocSize)
 	{
-		err::SetError (err::EStatus_InvalidParameter);
+		err::setError (err::EStatus_InvalidParameter);
 		return -1;
 	}
 
-	Level = GetHiBitIdx(Size);
+	levelIdx = getHiBitIdx(size);
 
-	if (Level && (Size & ((1 << Level) - 1)))
-		Level++;
+	if (levelIdx && (size & ((1 << levelIdx) - 1)))
+		levelIdx++;
 
-	ASSERT (Level < m_Height);
-	pLevel = m_LevelArray + Level;
+	ASSERT (levelIdx < m_height);
+	level = m_levelArray + levelIdx;
 
-	pPage = pLevel->GetFirstAvailablePage ();
-	if (!pPage)
+	page = level->getFirstAvailablePage ();
+	if (!page)
 	{
-		err::SetError(err::EStatus_InsufficientResources);
+		err::setError(err::EStatus_InsufficientResources);
 		return -1;
 	}
 
-	ASSERT (pPage->m_Map != -1);
+	ASSERT (page->m_map != -1);
 
-	BitIndex = GetHiBitIdx(((pPage->m_Map + 1) | pPage->m_Map) ^ pPage->m_Map);
-	BitSize = (size_t) 1 << Level;
+	bitIdx = getHiBitIdx(((page->m_map + 1) | page->m_map) ^ page->m_map);
+	bitSize = (size_t) 1 << levelIdx;
 
-	size_t PageIndex = pPage - pLevel->GetFirstPage ();
+	size_t pageIdx = page - level->getFirstPage ();
 
-	Address = (PageIndex * _AXL_PTR_BITNESS + BitIndex) * BitSize;
-	AddressEnd = Address + Size;
+	address = (pageIdx * _AXL_PTR_BITNESS + bitIdx) * bitSize;
+	addressEnd = address + size;
 
-	m_FreeSizeBottom -= Size;
+	m_freeSizeBottom -= size;
 
 	// mark starting with the bottom level (level 0)
 
-	pLevel = m_LevelArray;
-	pPage = m_PageArray;
-	PageCount = m_Width << (m_Height - 1); // on the bottom level
-	BitSize = 1;
+	level = m_levelArray;
+	page = m_pageArray;
+	pageCount = m_width << (m_height - 1); // on the bottom level
+	bitSize = 1;
 
 	// below the allocation level we mark ranges of clusters
 
-	for (i = 0; i < Level; i++)
+	for (i = 0; i < levelIdx; i++)
 	{
-		size_t From = Address / BitSize;
-		size_t To = AddressEnd / BitSize;
+		size_t from = address / bitSize;
+		size_t to = addressEnd / bitSize;
 
-		ASSERT (!(Address % BitSize)); // beacuse we below the allocation level
+		ASSERT (!(address % bitSize)); // beacuse we below the allocation level
 
-		if (AddressEnd % BitSize)
-			To++;
+		if (addressEnd % bitSize)
+			to++;
 
-		pLevel->SetBitRange(pPage, From, To, true);
+		level->setBitRange(page, from, to, true);
 
-		pLevel++;
-		pPage += PageCount;
-		PageCount /= 2;
-		BitSize *= 2;
+		level++;
+		page += pageCount;
+		pageCount /= 2;
+		bitSize *= 2;
 	}
 
 	// from the allocation level and above we only mark one cluster, also we can stop as soon as we find a marked cluster
 
-	for (; i < m_Height; i++)
+	for (; i < m_height; i++)
 	{
-		size_t Bit = Address / BitSize;
+		size_t bit = address / bitSize;
 
-		if (GetBit(pPage, Bit))
+		if (getBit(page, bit))
 			break;
 
-		pLevel->SetBit(pPage, Bit, true);
+		level->setBit(page, bit, true);
 
-		pLevel++;
-		pPage += PageCount;
-		PageCount /= 2;
-		BitSize *= 2;
+		level++;
+		page += pageCount;
+		pageCount /= 2;
+		bitSize *= 2;
 	}
 
 
-	if (i == m_Height) // we marked all the way to the top, adjust top level free size
-		m_FreeSizeTop -= (size_t) 1 << (m_Height - 1);
+	if (i == m_height) // we marked all the way to the top, adjust top level free size
+		m_freeSizeTop -= (size_t) 1 << (m_height - 1);
 
-	return Address;
+	return address;
 }
 
 void
-CBuddyAllocMap::Mark (
-	size_t Address,
-	size_t Size
+CBuddyAllocMap::mark (
+	size_t address,
+	size_t size
 	)
 {
-	CLevel* pLevel = m_LevelArray;
-	TPage* pPage = m_PageArray;
+	CLevel* level = m_levelArray;
+	TPage* page = m_pageArray;
 
-	size_t PageCount = m_Width << (m_Height - 1); // on the bottom level
-	size_t BitSize = 1;
-	size_t AddressEnd = Address + Size;
+	size_t pageCount = m_width << (m_height - 1); // on the bottom level
+	size_t bitSize = 1;
+	size_t addressEnd = address + size;
 	size_t i;
 
-	size_t Level = GetHiBitIdx(Size);
+	size_t levelIdx = getHiBitIdx(size);
 
-	if (Level && (Size & ((1 << Level) - 1)))
-		Level++;
+	if (levelIdx && (size & ((1 << levelIdx) - 1)))
+		levelIdx++;
 
-	m_FreeSizeBottom -= Size;
+	m_freeSizeBottom -= size;
 
 	// below the allocation level we mark ranges of clusters
 
-	for (i = 0; i < Level; i++)
+	for (i = 0; i < levelIdx; i++)
 	{
-		size_t From = Address / BitSize;
-		size_t To = AddressEnd / BitSize;
+		size_t from = address / bitSize;
+		size_t to = addressEnd / bitSize;
 
-		ASSERT (!(Address % BitSize)); // beacuse we below the allocation level
+		ASSERT (!(address % bitSize)); // beacuse we below the allocation level
 
-		if (AddressEnd % BitSize)
-			To++;
+		if (addressEnd % bitSize)
+			to++;
 
-		pLevel->SetBitRange(pPage, From, To, true);
+		level->setBitRange(page, from, to, true);
 
-		pLevel++;
-		pPage += PageCount;
-		PageCount /= 2;
-		BitSize *= 2;
+		level++;
+		page += pageCount;
+		pageCount /= 2;
+		bitSize *= 2;
 	}
 
 	// from the allocation level and above we only mark one cluster, also we can stop as soon as we find a marked cluster
 
-	for (; i < m_Height; i++)
+	for (; i < m_height; i++)
 	{
-		size_t Bit = Address / BitSize;
+		size_t bit = address / bitSize;
 
-		if (GetBit(pPage, Bit))
+		if (getBit(page, bit))
 			break;
 
-		pLevel->SetBit(pPage, Bit, true);
+		level->setBit(page, bit, true);
 
-		pLevel++;
-		pPage += PageCount;
-		PageCount /= 2;
-		BitSize *= 2;
+		level++;
+		page += pageCount;
+		pageCount /= 2;
+		bitSize *= 2;
 	}
 
-	if (i == m_Height) // we marked all the way to the top, adjust top level free size
-		m_FreeSizeTop -= (size_t) 1 << (m_Height - 1);
+	if (i == m_height) // we marked all the way to the top, adjust top level free size
+		m_freeSizeTop -= (size_t) 1 << (m_height - 1);
 }
 
 void
-CBuddyAllocMap::Free (
-	size_t Address,
-	size_t Size
+CBuddyAllocMap::free (
+	size_t address,
+	size_t size
 	)
 {
-	CLevel* pLevel = m_LevelArray;
-	TPage* pPage = m_PageArray;
-	TPage* pPrevPage = NULL;
+	CLevel* level = m_levelArray;
+	TPage* page = m_pageArray;
+	TPage* prevPage = NULL;
 
-	size_t PageCount = m_Width << (m_Height - 1); // on the bottom level
-	size_t BitSize = 1;
-	size_t Bit;
-	size_t PrevBit;
-	size_t AddressEnd = Address + Size;
+	size_t pageCount = m_width << (m_height - 1); // on the bottom level
+	size_t bitSize = 1;
+	size_t bit;
+	size_t prevBit;
+	size_t addressEnd = address + size;
 	size_t i;
 
-	bool_t IsBlocked = false;
+	bool_t isBlocked = false;
 
-	size_t Level = GetHiBitIdx(Size);
+	size_t levelIdx = getHiBitIdx(size);
 
-	if (Level && (Size & ((1 << Level) - 1)))
-		Level++;
+	if (levelIdx && (size & ((1 << levelIdx) - 1)))
+		levelIdx++;
 
-	m_FreeSizeBottom += Size;
+	m_freeSizeBottom += size;
 
 	// below the allocation level we unmark ranges of clusters
 
-	for (i = 0; i < Level; i++)
+	for (i = 0; i < levelIdx; i++)
 	{
-		size_t From = Address / BitSize;
-		size_t To = AddressEnd / BitSize;
-		size_t Mod = AddressEnd % BitSize;
+		size_t from = address / bitSize;
+		size_t to = addressEnd / bitSize;
+		size_t mod = addressEnd % bitSize;
 
-		ASSERT (!(Address % BitSize)); // beacuse we below the allocation level
+		ASSERT (!(address % bitSize)); // beacuse we below the allocation level
 
-		if (Mod && !IsBlocked)
+		if (mod && !isBlocked)
 		{
-			ASSERT (pPrevPage != NULL);
+			ASSERT (prevPage != NULL);
 
-			if (GetBit(pPrevPage, PrevBit))
+			if (getBit(prevPage, prevBit))
 			{
-				IsBlocked = true;
+				isBlocked = true;
 			}
 			else
 			{
-				AddressEnd += BitSize - Mod;
-				To++;
+				addressEnd += bitSize - mod;
+				to++;
 			}
 		}
 
-		pLevel->SetBitRange(pPage, From, To, false);
+		level->setBitRange(page, from, to, false);
 
-		pLevel++;
-		pPrevPage = pPage;
-		PrevBit = To;
-		pPage += PageCount;
-		PageCount /= 2;
-		BitSize *= 2;
+		level++;
+		prevPage = page;
+		prevBit = to;
+		page += pageCount;
+		pageCount /= 2;
+		bitSize *= 2;
 	}
 
-	if (IsBlocked)
+	if (isBlocked)
 		return;
 
 	// from the allocation level and above we only unmark one cluster, and only if both children are free
 
-	PrevBit--; // in the next cycle PrevBit has meaning of the last cleared cluster
+	prevBit--; // in the next cycle PrevBit has meaning of the last cleared cluster
 
-	for (; i < m_Height; i++)
+	for (; i < m_height; i++)
 	{
 		// check adjacent cluster
 
-		if (pPrevPage)
+		if (prevPage)
 		{
-			if (PrevBit & 1)
+			if (prevBit & 1)
 			{
-				if (GetBit(pPrevPage, PrevBit - 1))
+				if (getBit(prevPage, prevBit - 1))
 					break;
 			}
 			else
 			{
-				if (GetBit(pPrevPage, PrevBit + 1))
+				if (getBit(prevPage, prevBit + 1))
 					break;
 			}
 		}
 
-		Bit = Address / BitSize;
-		pLevel->SetBit(pPage, Bit, false);
+		bit = address / bitSize;
+		level->setBit(page, bit, false);
 
-		pLevel++;
-		pPrevPage = pPage;
-		PrevBit = Bit;
-		pPage += PageCount;
-		PageCount /= 2;
-		BitSize *= 2;
+		level++;
+		prevPage = page;
+		prevBit = bit;
+		page += pageCount;
+		pageCount /= 2;
+		bitSize *= 2;
 	}
 
-	if (i == m_Height) // we marked all the way to the top, adjust top level free size
-		m_FreeSizeTop += (size_t) 1 << (m_Height - 1);
+	if (i == m_height) // we marked all the way to the top, adjust top level free size
+		m_freeSizeTop += (size_t) 1 << (m_height - 1);
 }
 
 //.............................................................................

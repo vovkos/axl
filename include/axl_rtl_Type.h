@@ -21,28 +21,28 @@ class CTypeT
 public:
 	static
 	size_t 
-	GetSize ()
+	getSize ()
 	{ 
 		return sizeof (T);
 	}
 
 	static
 	const char*
-	GetName ()
+	getName ()
 	{ 
 		return typeid (T).name ();
 	}
 
 	static
 	void
-	Construct (void* p)
+	construct (void* p)
 	{
 		new (p) T;
 	}
 
 	static
 	void
-	Destruct (void* p)
+	destruct (void* p)
 	{
 		((T*) p)->~T ();
 	}
@@ -58,27 +58,27 @@ class CTypeT <void>
 public:
 	static
 	size_t 
-	GetSize ()
+	getSize ()
 	{ 
 		return 0;
 	}
 
 	static
 	const char*
-	GetName ()
+	getName ()
 	{ 
 		return typeid (void).name ();
 	}
 
 	static
 	void
-	Construct (void* p)
+	construct (void* p)
 	{
 	}
 
 	static
 	void
-	Destruct (void* p)
+	destruct (void* p)
 	{
 	}
 };

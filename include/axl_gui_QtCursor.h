@@ -18,7 +18,7 @@ class CQtCursor: public CCursor
 	friend class CQtEngine;
 	
 public:
-	QCursor m_QtCursor;
+	QCursor m_qtCursor;
 
 public:	
 	CQtCursor ();

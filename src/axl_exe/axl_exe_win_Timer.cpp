@@ -8,46 +8,46 @@ namespace win {
 //.............................................................................
 
 bool
-CTimer::Create (
-	SECURITY_ATTRIBUTES* pSecAttr,
-	bool IsManualReset,
-	const tchar_t* pName
+CTimer::create (
+	SECURITY_ATTRIBUTES* secAttr,
+	bool isManualReset,
+	const tchar_t* name
 	)
 {
-	Close ();
+	close ();
 
-	m_h = ::CreateWaitableTimer (pSecAttr, IsManualReset, pName);
-	return err::Complete (m_h != NULL);
+	m_h = ::CreateWaitableTimer (secAttr, isManualReset, name);
+	return err::complete (m_h != NULL);
 }
 
 bool
-CTimer::Open (
-	ulong_t Access,
-	bool DoInheritHandle,
-	const tchar_t* pName
+CTimer::open (
+	ulong_t access,
+	bool doInheritHandle,
+	const tchar_t* name
 	)
 {
-	Close ();
+	close ();
 
-	m_h = ::OpenWaitableTimer (Access, DoInheritHandle, pName);
-	return err::Complete (m_h != NULL);
+	m_h = ::OpenWaitableTimer (access, doInheritHandle, name);
+	return err::complete (m_h != NULL);
 }
 
 bool 
-CTimer::SetTimer (	
+CTimer::setTimer (	
 	uint64_t _DueTime,
-	ulong_t Period, 
+	ulong_t period, 
 	PTIMERAPCROUTINE pfThreadProc,
-	void* pContext
+	void* context
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	LARGE_INTEGER DueTime;
-	DueTime.QuadPart = _DueTime;
+	LARGE_INTEGER dueTime;
+	dueTime.QuadPart = _DueTime;
 
-	bool_t Result = ::SetWaitableTimer (m_h, &DueTime, Period, pfThreadProc, pContext, false);
-	return err::Complete (Result);
+	bool_t result = ::SetWaitableTimer (m_h, &dueTime, period, pfThreadProc, context, false);
+	return err::complete (result);
 }
 
 //.............................................................................

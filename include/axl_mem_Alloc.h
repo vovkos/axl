@@ -29,10 +29,10 @@ public:
 	public:
 		void* 
 		operator () (
-			size_t Size,
-			const char* pTag,
-			const char* pFilePath,
-			int Line
+			size_t size,
+			const char* tag,
+			const char* filePath,
+			int line
 			);
 	};
 
@@ -46,19 +46,19 @@ public:
 public:
 	static
 	void* 
-	Alloc (
-		size_t Size,
-		const char* pTag,
-		const char* pFilePath,
-		int Line
+	alloc (
+		size_t size,
+		const char* tag,
+		const char* filePath,
+		int line
 		)
 	{
-		return CAlloc () (Size, pTag, pFilePath, Line);
+		return CAlloc () (size, tag, filePath, line);
 	}
 
 	static
 	void 
-	Free (void* p)
+	free (void* p)
 	{
 		return CFree () (p);
 	}
@@ -74,18 +74,18 @@ typedef CMalloc CStdAlloc;
 
 #ifdef _DEBUG
 
-#define AXL_MEM_ALLOC(Size) \
-	axl::mem::CStdAlloc::Alloc (Size, "<buffer>", __FILE__, __LINE__)
+#define AXL_MEM_ALLOC(size) \
+	axl::mem::CStdAlloc::alloc (size, "<buffer>", __FILE__, __LINE__)
 
 #else
 
-#define AXL_MEM_ALLOC(Size) \
-	axl::mem::CStdAlloc::Alloc (Size)
+#define AXL_MEM_ALLOC(size) \
+	axl::mem::CStdAlloc::alloc (size)
 
 #endif
 
 #define AXL_MEM_FREE(p) \
-	axl::mem::CStdAlloc::Free (p)
+	axl::mem::CStdAlloc::free (p)
 
 //.............................................................................
 

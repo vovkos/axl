@@ -6,27 +6,27 @@ namespace io {
 
 //.............................................................................
 
-bool CPipe::Open (
-	const char* pName,
-	SECURITY_DESCRIPTOR* pSd
+bool CPipe::open (
+	const char* name,
+	SECURITY_DESCRIPTOR* sd
 	)
 {
 	return false;
 }
 
 void 
-CPipe::Close ()
+CPipe::close ()
 {
 }
 
 //.............................................................................
 
 bool
-CListenerPipe::Listen (
-	const char* pName,
-	SECURITY_DESCRIPTOR* pSd,
-	size_t BackLog,
-	const exe::CFunction& OnAccept
+CListenerPipe::listen (
+	const char* name,
+	SECURITY_DESCRIPTOR* sd,
+	size_t backLog,
+	const exe::CFunction& onAccept
 	)
 {
 	return false;
@@ -35,60 +35,60 @@ CListenerPipe::Listen (
 //.............................................................................
 
 bool 
-CConnectionPipe::Connect (
-	const char* pAddress,
-	uint_t Timeout,
-	const exe::CFunction& OnComplete
+CConnectionPipe::connect (
+	const char* address,
+	uint_t timeout,
+	const exe::CFunction& onComplete
 	)
 {
 	return false;
 }
 
 bool 
-CConnectionPipe::Disconnect (
-	uint_t Timeout,
-	const exe::CFunction& OnComplete
+CConnectionPipe::disconnect (
+	uint_t timeout,
+	const exe::CFunction& onComplete
 	)
 {
 	return false;
 }
 
 bool 
-CConnectionPipe::SyncConnect (
-	const char* pAddress,
-	uint_t Timeout
+CConnectionPipe::syncConnect (
+	const char* address,
+	uint_t timeout
 	)
 {
 	return false;
 }
 
 bool 
-CConnectionPipe::SyncDisconnect (uint_t Timeout)
+CConnectionPipe::syncDisconnect (uint_t timeout)
 {
 	return false;
 }
 
 bool
-CConnectionPipe::IsConnected ()
+CConnectionPipe::isConnected ()
 {
 	return false;
 }
 
 bool
-CConnectionPipe::Send (
+CConnectionPipe::send (
 	const void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
+	size_t size,
+	const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
 	)
 {
 	return false;
 }
 
 bool
-CConnectionPipe::Recv (
+CConnectionPipe::recv (
 	void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
+	size_t size,
+	const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
 	)
 {
 	return false;

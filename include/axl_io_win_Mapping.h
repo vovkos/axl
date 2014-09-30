@@ -18,19 +18,19 @@ class CMapping: public g::win::CHandle
 {
 public:
 	bool
-	Create (
+	create (
 		HANDLE hFile,
-		SECURITY_ATTRIBUTES* pSecAttr,
-		uint_t PageProtection,
-		uint64_t MaxSize,
-		const wchar_t* pName = NULL
+		SECURITY_ATTRIBUTES* secAttr,
+		uint_t pageProtection,
+		uint64_t maxSize,
+		const wchar_t* name = NULL
 		);
 
 	bool 
-	Open (
-		uint_t Access,
-		bool DoInheritHandle,
-		const wchar_t* pName
+	open (
+		uint_t access,
+		bool doInheritHandle,
+		const wchar_t* name
 		);
 };
 
@@ -52,11 +52,11 @@ class CMappedView: public rtl::CHandleT <void*, CUnmapViewOfFile>
 {
 public:
 	void* 
-	View (
+	view (
 		HANDLE hMapping,
-		uint_t Access,
-		uint64_t Offset,
-		uint32_t Size
+		uint_t access,
+		uint64_t offset,
+		uint32_t size
 		);
 };
 

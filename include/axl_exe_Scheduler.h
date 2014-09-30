@@ -33,125 +33,125 @@ struct IScheduler: obj::IRoot
 
 	virtual 
 	EScheduleResult
-	ScheduleV (
-		IFunction* pFunction, 
+	scheduleV (
+		IFunction* function, 
 		axl_va_list va
 		) = 0; // the only overridable
 
 	EScheduleResult
-	Schedule (
-		IFunction* pFunction, 
+	schedule (
+		IFunction* function, 
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFunction);
-		return ScheduleV (pFunction, va);
+		AXL_VA_DECL (va, function);
+		return scheduleV (function, va);
 	}
 
 	template <typename TArgPacker>
 	EScheduleResult
-	ScheduleV (
-		ECallConv Convention,
+	scheduleV (
+		ECallConv convention,
 		void* pf, 
 		axl_va_list va
 		)
 	{
-		CFunctionT <exe::CArgT <void>, TArgPacker> Function (Convention, pf);
-		return ScheduleV (&Function, va);
+		CFunctionT <exe::CArgT <void>, TArgPacker> function (convention, pf);
+		return scheduleV (&function, va);
 	}
 
 	template <typename TArgPacker>
 	EScheduleResult
-	Schedule (
-		ECallConv Convention,
+	schedule (
+		ECallConv convention,
 		void* pf, 
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		return ScheduleV <TArgPacker> (Convention, pf, va);
+		return scheduleV <TArgPacker> (convention, pf, va);
 	}
 
 	template <typename TArgPacker>
 	EScheduleResult
-	ScheduleV (
+	scheduleV (
 		void* pf, 
 		axl_va_list va
 		)
 	{
-		return ScheduleV <TArgPacker> (ECallConv_Cdecl, pf, va);
+		return scheduleV <TArgPacker> (ECallConv_Cdecl, pf, va);
 	}
 
 	template <typename TArgPacker>
 	EScheduleResult
-	Schedule (
+	schedule (
 		void* pf, 
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		return ScheduleV <TArgPacker> (pf, va);
+		return scheduleV <TArgPacker> (pf, va);
 	}
 
 	intptr_t
-	SyncScheduleV (
-		IFunction* pFunction, 
+	syncScheduleV (
+		IFunction* function, 
 		axl_va_list va
 		);
 
 	intptr_t
-	SyncSchedule (
-		IFunction* pFunction, 
+	syncSchedule (
+		IFunction* function, 
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFunction);
-		return SyncScheduleV (pFunction, va);
+		AXL_VA_DECL (va, function);
+		return syncScheduleV (function, va);
 	}
 
 	template <typename TArgPacker>
 	intptr_t
-	SyncScheduleV (
-		ECallConv Convention,
+	syncScheduleV (
+		ECallConv convention,
 		void* pf, 
 		axl_va_list va
 		)
 	{
-		CFunctionT <exe::CArgT <void>, TArgPacker> Function (Convention, pf);
-		return SyncScheduleV (&Function, va);
+		CFunctionT <exe::CArgT <void>, TArgPacker> function (convention, pf);
+		return syncScheduleV (&function, va);
 	}
 
 	template <typename TArgPacker>
 	intptr_t
-	SyncSchedule (
-		ECallConv Convention,
+	syncSchedule (
+		ECallConv convention,
 		void* pf, 
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		return SyncScheduleV <TArgPacker> (Convention, pf, va);
+		return syncScheduleV <TArgPacker> (convention, pf, va);
 	}
 
 	template <typename TArgPacker>
 	intptr_t
-	SyncScheduleV (
+	syncScheduleV (
 		void* pf, 
 		axl_va_list va
 		)
 	{
-		return SyncScheduleV <TArgPacker> (ECallConv_Cdecl, pf, va);
+		return syncScheduleV <TArgPacker> (ECallConv_Cdecl, pf, va);
 	}
 
 	template <typename TArgPacker>
 	intptr_t
-	SyncSchedule (
+	syncSchedule (
 		void* pf, 
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		return SyncScheduleV <TArgPacker> (pf, va);
+		return syncScheduleV <TArgPacker> (pf, va);
 	}
 };
 

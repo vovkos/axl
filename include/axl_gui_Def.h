@@ -27,9 +27,9 @@ enum EMouseButton
 
 inline
 EMouseButton
-GetFirstMouseButton (uint_t Buttons)
+getFirstMouseButton (uint_t buttons)
 {
-	return (EMouseButton) rtl::GetLoBitIdx32 (Buttons);
+	return (EMouseButton) rtl::getLoBitIdx32 (buttons);
 }
 
 //.............................................................................
@@ -46,9 +46,9 @@ enum EModifierKey
 
 inline
 EModifierKey
-GetFirstModifierKey (uint_t ModifierKeys)
+getFirstModifierKey (uint_t modifierKeys)
 {
-	return (EModifierKey) rtl::GetLoBitIdx32 (ModifierKeys);
+	return (EModifierKey) rtl::getLoBitIdx32 (modifierKeys);
 }
 
 //.............................................................................
@@ -133,19 +133,19 @@ struct TPoint
 	}
 
 	TPoint 
-	operator + (const TPoint& Point2)
+	operator + (const TPoint& point2)
 	{
-		return TPoint (m_x + Point2.m_x, m_y + Point2.m_y);
+		return TPoint (m_x + point2.m_x, m_y + point2.m_y);
 	}
 
 	TPoint 
-	operator - (const TPoint& Point2)
+	operator - (const TPoint& point2)
 	{
-		return TPoint (m_x - Point2.m_x, m_y - Point2.m_y);
+		return TPoint (m_x - point2.m_x, m_y - point2.m_y);
 	}
 
 	void
-	Setup (
+	setup (
 		int x,
 		int y
 		)
@@ -155,7 +155,7 @@ struct TPoint
 	}
 
 	void
-	ClipNegative ()
+	clipNegative ()
 	{
 		if (m_x < 0)
 			m_x = 0;
@@ -173,62 +173,62 @@ struct TSize
 	{
 		struct 
 		{
-			int m_Width;
-			int m_Height;
+			int m_width;
+			int m_height;
 		};
 
 		struct 
 		{
-			uint_t m_Width_u;
-			uint_t m_Height_u;
+			uint_t m_width_u;
+			uint_t m_height_u;
 		};
 	};
 
 	TSize ()
 	{
-		m_Width = 0;
-		m_Height = 0;
+		m_width = 0;
+		m_height = 0;
 	}
 
 	TSize (
-		int Width,
-		int Height
+		int width,
+		int height
 		)
 	{
-		m_Width = Width;
-		m_Height = Height;
+		m_width = width;
+		m_height = height;
 	}
 
 	TSize 
-	operator + (const TSize& Size2)
+	operator + (const TSize& size2)
 	{
-		return TSize (m_Width + Size2.m_Width, m_Height + Size2.m_Height);
+		return TSize (m_width + size2.m_width, m_height + size2.m_height);
 	}
 
 	TSize 
-	operator - (const TSize& Size2)
+	operator - (const TSize& size2)
 	{
-		return TSize (m_Width - Size2.m_Width, m_Height - Size2.m_Height);
+		return TSize (m_width - size2.m_width, m_height - size2.m_height);
 	}
 
 	void
-	Setup (
-		int Width,
-		int Height
+	setup (
+		int width,
+		int height
 		)
 	{
-		m_Width = Width;
-		m_Height = Height;
+		m_width = width;
+		m_height = height;
 	}
 
 	void
-	ClipNegative ()
+	clipNegative ()
 	{
-		if (m_Width < 0)
-			m_Width = 0;
+		if (m_width < 0)
+			m_width = 0;
 
-		if (m_Height < 0)
-			m_Height = 0;
+		if (m_height < 0)
+			m_height = 0;
 	}
 };
 
@@ -247,26 +247,26 @@ enum EFormFactor
 
 inline
 EFormFactor
-GetFormFactor (
-	int Width,
-	int Height, 
-	int StripThreshold = 32
+getFormFactor (
+	int width,
+	int height, 
+	int stripThreshold = 32
 	)
 {
 	return 
-		Height > Width * StripThreshold ? EFormFactor_LineStrip :
-		Width > Height * StripThreshold ? EFormFactor_ColumnStrip :
-		Height > Width ? EFormFactor_Portrait : EFormFactor_Landscape;
+		height > width * stripThreshold ? EFormFactor_LineStrip :
+		width > height * stripThreshold ? EFormFactor_ColumnStrip :
+		height > width ? EFormFactor_Portrait : EFormFactor_Landscape;
 }
 
 inline
 EFormFactor
-GetFormFactor (
-	const TSize& Size, 
-	int StripThreshold = 32
+getFormFactor (
+	const TSize& size, 
+	int stripThreshold = 32
 	)
 {
-	return GetFormFactor (Size.m_Width, Size.m_Height, StripThreshold);
+	return getFormFactor (size.m_width, size.m_height, stripThreshold);
 }
 
 //.............................................................................
@@ -277,135 +277,135 @@ struct TRect
 	{
 		struct 
 		{
-			int m_Left;
-			int m_Top;
-			int m_Right;
-			int m_Bottom;
+			int m_left;
+			int m_top;
+			int m_right;
+			int m_bottom;
 		};
 
 		struct 
 		{
-			uint_t m_Left_u;
-			uint_t m_Top_u;
-			uint_t m_Right_u;
-			uint_t m_Bottom_u;
+			uint_t m_left_u;
+			uint_t m_top_u;
+			uint_t m_right_u;
+			uint_t m_bottom_u;
 		};
 	};
 
 	TRect ()
 	{
-		m_Left = 0;
-		m_Top = 0;
-		m_Right = 0;
-		m_Bottom = 0;
+		m_left = 0;
+		m_top = 0;
+		m_right = 0;
+		m_bottom = 0;
 	}
 
 	TRect (
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+		int left,
+		int top,
+		int right,
+		int bottom
 		)
 	{
-		m_Left = Left;
-		m_Top = Top;
-		m_Right = Right;
-		m_Bottom = Bottom;
+		m_left = left;
+		m_top = top;
+		m_right = right;
+		m_bottom = bottom;
 	}
 
 	TRect (
-		int Left,
-		int Top
+		int left,
+		int top
 		)
 	{
-		m_Left = Left;
-		m_Top = Top;
-		m_Right = Left;
-		m_Bottom = Top;
+		m_left = left;
+		m_top = top;
+		m_right = left;
+		m_bottom = top;
 	}
 
 	TRect (
-		const TPoint& LeftTop,
-		const TPoint& RightBottom
+		const TPoint& leftTop,
+		const TPoint& rightBottom
 		)
 	{
-		m_Left = LeftTop.m_x;
-		m_Top = LeftTop.m_y;
-		m_Right = RightBottom.m_x;
-		m_Bottom = RightBottom.m_y;
+		m_left = leftTop.m_x;
+		m_top = leftTop.m_y;
+		m_right = rightBottom.m_x;
+		m_bottom = rightBottom.m_y;
 	}
 
-	TRect (const TPoint& LeftTop)
+	TRect (const TPoint& leftTop)
 	{
-		m_Left = LeftTop.m_x;
-		m_Top = LeftTop.m_y;
-		m_Right = LeftTop.m_x;
-		m_Bottom = LeftTop.m_y;
+		m_left = leftTop.m_x;
+		m_top = leftTop.m_y;
+		m_right = leftTop.m_x;
+		m_bottom = leftTop.m_y;
 	}
 
 	TRect (
-		const TPoint& LeftTop,
-		const TSize& Size
+		const TPoint& leftTop,
+		const TSize& size
 		)
 	{
-		m_Left = LeftTop.m_x;
-		m_Top = LeftTop.m_y;
-		m_Right = LeftTop.m_x + Size.m_Width;
-		m_Bottom = LeftTop.m_y + Size.m_Height;
+		m_left = leftTop.m_x;
+		m_top = leftTop.m_y;
+		m_right = leftTop.m_x + size.m_width;
+		m_bottom = leftTop.m_y + size.m_height;
 	}
 
 	bool
-	IsEmpty () const
+	isEmpty () const
 	{
-		return m_Right == m_Left || m_Bottom == m_Top;
+		return m_right == m_left || m_bottom == m_top;
 	}
 
 	int
-	GetWidth () const
+	getWidth () const
 	{
-		return m_Right - m_Left;
+		return m_right - m_left;
 	}
 
 	int
-	GetHeight () const
+	getHeight () const
 	{
-		return m_Bottom - m_Top;
+		return m_bottom - m_top;
 	}
 
 	TSize
-	GetSize () const
+	getSize () const
 	{
-		return TSize (GetWidth (), GetHeight ());
+		return TSize (getWidth (), getHeight ());
 	}
 
 	void
-	Setup (
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+	setup (
+		int left,
+		int top,
+		int right,
+		int bottom
 		)
 	{
-		m_Left = Left;
-		m_Top = Top;
-		m_Right = Right;
-		m_Bottom = Bottom;
+		m_left = left;
+		m_top = top;
+		m_right = right;
+		m_bottom = bottom;
 	}
 
 	void
-	ClipNegative ()
+	clipNegative ()
 	{
-		if (m_Left < 0)
-			m_Left = 0;
+		if (m_left < 0)
+			m_left = 0;
 
-		if (m_Top < 0)
-			m_Top = 0;
+		if (m_top < 0)
+			m_top = 0;
 
-		if (m_Right < 0)
-			m_Right = 0;
+		if (m_right < 0)
+			m_right = 0;
 
-		if (m_Bottom < 0)
-			m_Bottom = 0;
+		if (m_bottom < 0)
+			m_bottom = 0;
 	}
 };
 
@@ -417,105 +417,105 @@ struct TCursorPos
 	{
 		struct
 		{
-			int m_Line;
-			int m_Col;
+			int m_line;
+			int m_col;
 		};
 
 		struct
 		{
-			uint_t m_Line_u;
-			uint_t m_Col_u;
+			uint_t m_line_u;
+			uint_t m_col_u;
 		};
 	};
 
 	TCursorPos ()
 	{
-		m_Line = 0;
-		m_Col = 0;
+		m_line = 0;
+		m_col = 0;
 	}
 
 	TCursorPos (
-		int Line,
-		int Col
+		int line,
+		int col
 		)
 	{
-		Setup (Line, Col);
+		setup (line, col);
 	}
 
 	bool
-	operator == (const TCursorPos& Pos2) const
+	operator == (const TCursorPos& pos2) const
 	{
-		return Cmp (Pos2) == 0;
+		return cmp (pos2) == 0;
 	}
 
 	bool
-	operator != (const TCursorPos& Pos2) const
+	operator != (const TCursorPos& pos2) const
 	{
-		return Cmp (Pos2) != 0;
+		return cmp (pos2) != 0;
 	}
 
 	bool
-	operator < (const TCursorPos& Pos2) const
+	operator < (const TCursorPos& pos2) const
 	{
-		return Cmp (Pos2) < 0;
+		return cmp (pos2) < 0;
 	}
 
 	bool
-	operator <= (const TCursorPos& Pos2) const
+	operator <= (const TCursorPos& pos2) const
 	{
-		return Cmp (Pos2) <= 0;
+		return cmp (pos2) <= 0;
 	}
 
 	bool
-	operator > (const TCursorPos& Pos2) const
+	operator > (const TCursorPos& pos2) const
 	{
-		return Cmp (Pos2) > 0;
+		return cmp (pos2) > 0;
 	}
 
 	bool
-	operator >= (const TCursorPos& Pos2) const
+	operator >= (const TCursorPos& pos2) const
 	{
-		return Cmp (Pos2) >= 0;
+		return cmp (pos2) >= 0;
 	}
 
 	int
-	Cmp (const TCursorPos& Pos2) const
+	cmp (const TCursorPos& pos2) const
 	{
 		return 
-			m_Line < Pos2.m_Line ? -1 : 
-			m_Line > Pos2.m_Line ?  1 : 
-			m_Col < Pos2.m_Col ? -1 : 
-			m_Col > Pos2.m_Col ?  1 : 0;
+			m_line < pos2.m_line ? -1 : 
+			m_line > pos2.m_line ?  1 : 
+			m_col < pos2.m_col ? -1 : 
+			m_col > pos2.m_col ?  1 : 0;
 	}
 
 	int
-	Cmp_u (const TCursorPos& Pos2) const
+	cmp_u (const TCursorPos& pos2) const
 	{
 		return 
-			m_Line_u < Pos2.m_Line_u ? -1 : 
-			m_Line_u > Pos2.m_Line_u ?  1 : 
-			m_Col_u < Pos2.m_Col_u ? -1 : 
-			m_Col_u > Pos2.m_Col_u ?  1 : 0;
+			m_line_u < pos2.m_line_u ? -1 : 
+			m_line_u > pos2.m_line_u ?  1 : 
+			m_col_u < pos2.m_col_u ? -1 : 
+			m_col_u > pos2.m_col_u ?  1 : 0;
 	}
 
 	void
-	Setup (
-		int Line,
-		int Col
+	setup (
+		int line,
+		int col
 		)
 	{
-		m_Line = Line;
-		m_Col = Col;
+		m_line = line;
+		m_col = col;
 	}
 
 	void
-	ClipNegative ()
+	clipNegative ()
 	{
-		if (m_Line < 0)
-			m_Line = 0;
+		if (m_line < 0)
+			m_line = 0;
 
-		if (m_Col < 0)
-			m_Col = 0;
+		if (m_col < 0)
+			m_col = 0;
 	}
 };
 
@@ -524,18 +524,18 @@ struct TCursorPos
 class CGuiItem
 {
 protected:
-	CEngine* m_pEngine;
+	CEngine* m_engine;
 
 public:
 	CGuiItem ()
 	{
-		m_pEngine = NULL;
+		m_engine = NULL;
 	}
 
 	CEngine* 
-	GetEngine ()
+	getEngine ()
 	{
-		return m_pEngine;
+		return m_engine;
 	}
 };
 

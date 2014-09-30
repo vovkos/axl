@@ -13,9 +13,9 @@ class CMyWindow: public g::win::CWindowImplT <CMyWindow>
 public:
 	enum
 	{
-		ClassStyle      = CS_DBLCLKS,
-		ClassCursor     = (int) IDC_ARROW,
-		ClassBackground = COLOR_MENUHILIGHT,
+		classStyle      = CS_DBLCLKS,
+		classCursor     = (int) IDC_ARROW,
+		classBackground = COLOR_MENUHILIGHT,
 	};
 
 public:
@@ -32,53 +32,53 @@ public:
 //	AXL_G_WINDOW_CLASS ("CMyWindow")
 
 	AXL_G_WINDOW_MSG_MAP_BEGIN ()
-		AXL_G_WINDOW_MSG_HANDLER (WM_CREATE, OnCreate)
-		AXL_G_WINDOW_MSG_HANDLER (WM_DESTROY, OnDestroy)
-		AXL_G_WINDOW_MSG_HANDLER (WM_MOVE, OnMove)
-		AXL_G_WINDOW_MSG_HANDLER (WM_SIZE, OnSize)
+		AXL_G_WINDOW_MSG_HANDLER (WM_CREATE, onCreate)
+		AXL_G_WINDOW_MSG_HANDLER (WM_DESTROY, onDestroy)
+		AXL_G_WINDOW_MSG_HANDLER (WM_MOVE, onMove)
+		AXL_G_WINDOW_MSG_HANDLER (WM_SIZE, onSize)
 	AXL_G_WINDOW_MSG_MAP_END ()
 
-	LRESULT OnCreate (UINT Msg, WPARAM wParam, LPARAM lParam, bool* pHandled)
+	LRESULT onCreate (UINT msg, WPARAM wParam, LPARAM lParam, bool* handled)
 	{
 		printf ("WM_CREATE\n");
-		*pHandled = false;
+		*handled = false;
 		return 0;
 	}
 
-	LRESULT OnDestroy (UINT Msg, WPARAM wParam, LPARAM lParam, bool* pHandled)
+	LRESULT onDestroy (UINT msg, WPARAM wParam, LPARAM lParam, bool* handled)
 	{
 		printf ("WM_DESTROY\n");
-		PostQuitMessage (0);
-		*pHandled = false;
+		postQuitMessage (0);
+		*handled = false;
 		return 0;
 	}
 
-	LRESULT OnMove (UINT Msg, WPARAM wParam, LPARAM lParam, bool* pHandled)
+	LRESULT onMove (UINT msg, WPARAM wParam, LPARAM lParam, bool* handled)
 	{
 		printf ("WM_MOVE\n");
-		*pHandled = false;
+		*handled = false;
 		return 0;
 	}
 
-	LRESULT OnSize (UINT Msg, WPARAM wParam, LPARAM lParam, bool* pHandled)
+	LRESULT onSize (UINT msg, WPARAM wParam, LPARAM lParam, bool* handled)
 	{
 		printf ("WM_SIZE\n");
-		*pHandled = false;
+		*handled = false;
 		return 0;
 	}
 };
 
 void
-Test4_mt (int a)
+test4_mt (int a)
 {
-	printf ("Test4_mt: TID: %x, i: %d\n", GetCurrentThreadId (), a);
+	printf ("Test4_mt: TID: %x, i: %d\n", getCurrentThreadId (), a);
 }
 
 void
-Test4_wt (exe::IScheduler* pMtScheduler, int a)
+test4_wt (exe::IScheduler* mtScheduler, int a)
 {
-	printf ("Test4_wt: TID: %x, i: %d\n", GetCurrentThreadId (), a);
-	pMtScheduler->Schedule <exe::CArgT <int> > (Test4_mt, 600);
+	printf ("Test4_wt: TID: %x, i: %d\n", getCurrentThreadId (), a);
+	mtScheduler->schedule <exe::CArgT <int> > (test4_mt, 600);
 }
 
 //.............................................................................
@@ -89,27 +89,27 @@ public:
 	DECLARE_WND_SUPERCLASS ("MyEdit", "EDIT")
 
 	BEGIN_MSG_MAP (CMyAtlWindow)
-		MESSAGE_HANDLER (WM_CREATE, OnCreate)
-		MESSAGE_HANDLER (WM_DESTROY, OnDestroy)
-		MESSAGE_HANDLER (WM_MOVE, OnMove)
+		MESSAGE_HANDLER (WM_CREATE, onCreate)
+		MESSAGE_HANDLER (WM_DESTROY, onDestroy)
+		MESSAGE_HANDLER (WM_MOVE, onMove)
 	END_MSG_MAP ()
 
-	LRESULT OnCreate (UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	LRESULT onCreate (UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
 		printf ("CMyAtlWindow::OnCreate\n");
 		bHandled = false;
 		return 0;
 	}
 
-	LRESULT OnDestroy (UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	LRESULT onDestroy (UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
 		printf ("CMyAtlWindow::OnDestroy\n");
-		PostQuitMessage (0);
+		postQuitMessage (0);
 		bHandled = false;
 		return 0;
 	}
 
-	LRESULT OnMove (UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	LRESULT onMove (UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
 		printf ("CMyAtlWindow::OnMove\n");
 		bHandled = false;
@@ -120,34 +120,34 @@ public:
 //.............................................................................
 
 void 
-Run ()
+run ()
 {
-	printf ("Test4: TID: %x\n", GetCurrentThreadId ()); 
+	printf ("Test4: TID: %x\n", getCurrentThreadId ()); 
 
-	CMyWindow::Register ();
+	CMyWindow::register ();
 
 	//CMyAtlWindow Window3;
 	//Window3.Create (NULL, 0, "ATL:GOVNO", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 
-	CMyWindow Window;
-	Window.Create (NULL, NULL, "HHHUI!", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+	CMyWindow window;
+	window.create (NULL, NULL, "HHHUI!", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 
-	exe::CWorkerWindow WorkerWindow;
-	WorkerWindow.Create ();
+	exe::CWorkerWindow workerWindow;
+	workerWindow.create ();
 
-	exe::CWorkerThread WorkerThread;
-	WorkerThread.Start ();
+	exe::CWorkerThread workerThread;
+	workerThread.start ();
 
-	WorkerThread.Schedule <exe::CArgSeqT_2 < 
+	workerThread.schedule <exe::CArgSeqT_2 < 
 		exe::IScheduler*,
 		int
-		> > (Test4_wt, (exe::IScheduler*) &WorkerWindow, 300);
+		> > (test4_wt, (exe::IScheduler*) &workerWindow, 300);
 
-	MSG Msg;
-	while (GetMessage (&Msg, NULL, 0, 0))
+	MSG msg;
+	while (getMessage (&msg, NULL, 0, 0))
 	{
-		TranslateMessage (&Msg);
-		DispatchMessage (&Msg);
+		translateMessage (&msg);
+		dispatchMessage (&msg);
 	}
 }
 

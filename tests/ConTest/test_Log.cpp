@@ -19,61 +19,61 @@ enum EMsg
 class CLogWidget: public log::CWidget
 {
 public:
-	CLogWidget (gui::IEngine* pEngine):
-		log::CWidget (pEngine)
+	CLogWidget (gui::IEngine* engine):
+		log::CWidget (engine)
 	{
 	}
 
 protected:
 	AXL_GUI_WIDGET_MSG_MAP_BEGIN ()
-		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_Close, OnClose)
-		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, OnKeyDown)
+		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_Close, onClose)
+		AXL_GUI_WIDGET_MSG_HANDLER (gui::EWidgetMsg_KeyDown, onKeyDown)
 	AXL_GUI_WIDGET_MSG_MAP_END_CHAIN (log::CWidget)
 
 	void
-	OnClose (
-		gui::TWidgetMsg* pMsg,
-		bool* pIsHandled
+	onClose (
+		gui::TWidgetMsg* msg,
+		bool* isHandled
 		)
 	{
-		PostQuitMessage (0);
+		postQuitMessage (0);
 	}
 
 	void
-	OnKeyDown (
-		gui::TWidgetMsg* pMsg,
-		bool* pIsHandled
+	onKeyDown (
+		gui::TWidgetMsg* msg,
+		bool* isHandled
 		)
 	{
-		gui::TWidgetKeyMsg* pKeyMsg = (gui::TWidgetKeyMsg*) pMsg;
+		gui::TWidgetKeyMsg* keyMsg = (gui::TWidgetKeyMsg*) msg;
 
-		switch (pKeyMsg->m_Key)
+		switch (keyMsg->m_key)
 		{
 		case '1':
-			GetPacketFile ()->Write (EMsg_DeviceOpened);
+			getPacketFile ()->write (EMsg_DeviceOpened);
 			break;
 
 		case '2':
-			GetPacketFile ()->Write (EMsg_DeviceClosed);
+			getPacketFile ()->write (EMsg_DeviceClosed);
 			break;
 
 		case '3':
-			GetPacketFile ()->Write (EMsg_Connect);
+			getPacketFile ()->write (EMsg_Connect);
 			break;
 
 		case '4':
-			GetPacketFile ()->Write (EMsg_ConnectComplete);
+			getPacketFile ()->write (EMsg_ConnectComplete);
 			break;
 
 		case '5':
-			GetPacketFile ()->Write (EMsg_ConnectError);
+			getPacketFile ()->write (EMsg_ConnectError);
 			break;
 
 		default:
-			GetPacketFile ()->Write (EMsg_Bin, &pKeyMsg->m_Key, 1);
+			getPacketFile ()->write (EMsg_Bin, &keyMsg->m_key, 1);
 		}
 
-		UpdateLog ();
+		updateLog ();
 	}
 };
 
@@ -82,50 +82,50 @@ class CRepresentor: public log::IRepresentor
 public:
 	virtual 
 	bool 
-	Represent (
-		log::IRepresentorTarget* pTarget, 
-		uint_t PacketCode, 
+	represent (
+		log::IRepresentorTarget* target, 
+		uint_t packetCode, 
 		const void* p, 
-		size_t Size, 
-		uint_t VolatileFlags
+		size_t size, 
+		uint_t volatileFlags
 		)
 	{
-		char Data [] = 
+		char data [] = 
 			"sdfjshdjfjhsdjkhfkjsdfsdfsdfsdhkfhkjsdhfkjhsdkjf hsdjkfh skdjhf kjshd kj "
 			"sdfjshdjfjhsdjkhfkjsdfsdfsdfsdhkfhkjsdhfkjhsdkjf hsdjkfh skdjhf kjshd kj "
 			"sdfjshdjfjhsdjkhfkjsdfsdfsdfsdhkfhkjsdhfkjhsdkjf hsdjkfh skdjhf kjshd kj "
 			"sdfjshdjfjhsdjkhfkjsdfsdfsdfsdhkfhkjsdhfkjhsdkjf hsdjkfh skdjhf kjshd kj ";
 
-		switch (PacketCode)
+		switch (packetCode)
 		{
 		case EMsg_DeviceOpened:
-			pTarget->m_LineAttr.m_Icon = 3;
+			target->m_lineAttr.m_icon = 3;
 
-			pTarget->AddHyperText(
+			target->addHyperText(
 				log::EMergeFlag_MergeableForward,
 				"Device <#0000ff>COM3<> is..."
 				);
 
-			pTarget->AddHyperText(
+			target->addHyperText(
 				log::EMergeFlag_Mergeable,
 				"<+b>opened<> <=!5,3>nahui!<>\n"
 				);
 
-			pTarget->AddHyperText(
+			target->addHyperText(
 				log::EMergeFlag_Mergeable,
 				"Vot <+is>tak<> vot!!"
 				);
 
-			pTarget->AddBin(Data, sizeof(Data));
+			target->addBin(data, sizeof(data));
 			break;
 
 		case EMsg_DeviceClosed:
-			pTarget->m_LineAttr.m_Icon = 2;
+			target->m_lineAttr.m_icon = 2;
 
-			if (!(VolatileFlags & 1))
-				pTarget->AddHyperText("[<#0000ff=+1>+<>] Device is closed.");
+			if (!(volatileFlags & 1))
+				target->addHyperText("[<#0000ff=+1>+<>] Device is closed.");
 			else
-				pTarget->AddHyperText(
+				target->addHyperText(
 					"[<#0000ff=-1>-<>] Device is closed.\n"
 					"  Some info...\n"
 					"  Some more info which makes a very long line..\n"
@@ -133,20 +133,20 @@ public:
 			break;
 
 		case EMsg_Connect:
-			pTarget->m_LineAttr.m_Icon = 4;
-			pTarget->m_LineAttr.m_BackColor = gui::EStdColor_PastelGreen;
+			target->m_lineAttr.m_icon = 4;
+			target->m_lineAttr.m_backColor = gui::EStdColor_PastelGreen;
 
-			pTarget->AddHyperText(
+			target->addHyperText(
 				log::EMergeFlag_MergeableForward,
 				"Connecting..."
 				);
 			break;
 
 		case EMsg_ConnectComplete:
-			pTarget->m_LineAttr.m_Icon = 1;
-			pTarget->m_LineAttr.m_BackColor = gui::EStdColor_PastelBlue;
+			target->m_lineAttr.m_icon = 1;
+			target->m_lineAttr.m_backColor = gui::EStdColor_PastelBlue;
 
-			pTarget->AddHyperText(
+			target->addHyperText(
 				EMsg_Connect,
 				log::EMergeFlag_MergeableBackward,
 				"OK!"
@@ -154,9 +154,9 @@ public:
 			break;
 
 		case EMsg_ConnectError:
-			pTarget->m_LineAttr.m_Icon = 0;
-			pTarget->m_LineAttr.m_BackColor = gui::EStdColor_PastelRed;
-			pTarget->AddHyperText(
+			target->m_lineAttr.m_icon = 0;
+			target->m_lineAttr.m_backColor = gui::EStdColor_PastelRed;
+			target->addHyperText(
 				EMsg_Connect,
 				log::EMergeFlag_MergeableBackward,
 				"<\b*>FAIL!"
@@ -164,9 +164,9 @@ public:
 			break;
 
 		case EMsg_Bin:
-			pTarget->m_LineAttr.m_Icon = 8;
-			pTarget->m_LineAttr.m_Flags |= log::ELineAttrFlag_TileIcon;
-			pTarget->AddBin(p, Size);
+			target->m_lineAttr.m_icon = 8;
+			target->m_lineAttr.m_flags |= log::ELineAttrFlag_TileIcon;
+			target->addBin(p, size);
 			break;
 
 		default:
@@ -178,15 +178,15 @@ public:
 };
 
 void
-Run ()
+run ()
 {
 /*
 	io::CMappedFile f;
-	f.Open ("d:\\c.txt");
-	uchar_t* p = (uchar_t*) f.View ();
-	uchar_t* pEnd = p + f.GetSize ();
+	f.open ("d:\\c.txt");
+	uchar_t* p = (uchar_t*) f.view ();
+	uchar_t* end = p + f.getSize ();
 
-	for (size_t i = 0; p < pEnd; p++, i++)
+	for (size_t i = 0; p < end; p++, i++)
 	{
 		if (i >= 8)
 		{
@@ -201,20 +201,20 @@ Run ()
 */
 	printf ("hui govno i muravei\n");
 
-	log::CPacketFile PacketFile;
-	PacketFile.Open ("test_log.nlog");
+	log::CPacketFile packetFile;
+	packetFile.open ("test_log.nlog");
 	
-	CRepresentor Representor;
+	CRepresentor representor;
 
-	gui::gdi::CWidgetT <CLogWidget> Widget;
-	Widget.Create (NULL, NULL, L"Test", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
-	Widget.SetPacketFile (&PacketFile, &Representor);
+	gui::gdi::CWidgetT <CLogWidget> widget;
+	widget.create (NULL, NULL, L"Test", WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+	widget.setPacketFile (&packetFile, &representor);
 
-	MSG Msg;
-	while (GetMessage(&Msg, NULL, 0, 0))
+	MSG msg;
+	while (getMessage(&msg, NULL, 0, 0))
 	{
-		TranslateMessage(&Msg);
-		DispatchMessage(&Msg);
+		translateMessage(&msg);
+		dispatchMessage(&msg);
 	}
 }
 

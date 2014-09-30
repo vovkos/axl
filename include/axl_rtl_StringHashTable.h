@@ -66,9 +66,9 @@ public:
 	{ 
 	}
 
-	CStringHashTableMapIteratorT (const CIteratorT <typename CStringHashTableMapIteratorT::CEntry>& Src)
+	CStringHashTableMapIteratorT (const CIteratorT <typename CStringHashTableMapIteratorT::CEntry>& src)
 	{ 
-		this->m_p = Src.GetLink (); // thanks a lot gcc
+		this->m_p = src.getLink (); // thanks a lot gcc
 	}
 
 	CStringHashTableMapIteratorT (typename CStringHashTableMapIteratorT::CEntry* p)
@@ -87,9 +87,9 @@ public:
 	{ 
 	}
 
-	CStringHashTableMapIteratorT_w (const CIteratorT <typename CStringHashTableMapIteratorT_w::CEntry>& Src)
+	CStringHashTableMapIteratorT_w (const CIteratorT <typename CStringHashTableMapIteratorT_w::CEntry>& src)
 	{ 
-		this->m_p = Src.GetLink (); 
+		this->m_p = src.getLink (); 
 	}
 
 	CStringHashTableMapIteratorT_w (typename CStringHashTableMapIteratorT_w::CEntry* p)
@@ -100,12 +100,12 @@ public:
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING(Class, TValue) \
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T (Class, TValue, char)
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING(class, TValue) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T (class, TValue, char)
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T(Class, TValue, C) \
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T(class, TValue, C) \
 	AXL_RTL_BEGIN_HASH_TABLE_MAP ( \
-		Class, \
+		class, \
 		const C*, \
 		TValue, \
 		rtl::CHashStringT <C>, \

@@ -24,44 +24,44 @@ public:
 	};
 
 protected:
-	win::CTimer m_Timer;
-	ref::CPtrT <exe::IFunction> m_OnTimer;
-	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
+	win::CTimer m_timer;
+	ref::CPtrT <exe::IFunction> m_onTimer;
+	ref::CPtrT <exe::CWorkerThread> m_workerThread;
 
 public:
 	~CTimer ()
 	{
-		Cancel ();
+		cancel ();
 	}
 
 	bool 
-	SetTimer (	
-		ulong_t Timeout,
-		exe::IFunction* pOnTimer,
-		int Flags
+	setTimer (	
+		ulong_t timeout,
+		exe::IFunction* onTimer,
+		int flags
 		);
 
 	void
-	Cancel ();
+	cancel ();
 
 protected:
 	bool 
-	SetTimer_wt (	
-		ulong_t Timeout,
-		exe::IFunction* pOnTimer,
-		int Flags
+	setTimer_wt (	
+		ulong_t timeout,
+		exe::IFunction* onTimer,
+		int flags
 		);
 
 	void
-	Cancel_wt ();
+	cancel_wt ();
 
 	static
 	VOID 
 	CALLBACK
-	TimerProc (
-		LPVOID pContext,
-		DWORD TimerLo,
-		DWORD TimerHi
+	timerProc (
+		LPVOID context,
+		DWORD timerLo,
+		DWORD timerHi
 		);
 };
 
@@ -69,9 +69,9 @@ protected:
 
 inline
 ulong_t
-GetCurrentTime ()
+getCurrentTime ()
 {
-	return win::CTimer::GetTickCount ();
+	return win::CTimer::getTickCount ();
 }
 
 //.............................................................................

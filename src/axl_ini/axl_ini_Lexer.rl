@@ -18,7 +18,7 @@ write data;
 #
 
 ws     = [ \t\r]+;
-nl     = '\n' @{ NewLine (p + 1); };
+nl     = '\n' @{ newLine (p + 1); };
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -31,8 +31,8 @@ ws | nl               ;
 [;#] [^\n]*           ;
 '//' [^\n]*           ;
 
-'[' [^\n\]]+ ']'      { ParseSection (ts, te); };
-[^;# \t\r\n\[] [^\n]* { ParseKeyValue (ts, te); };
+'[' [^\n\]]+ ']'      { parseSection (ts, te); };
+[^;# \t\r\n\[] [^\n]* { parseKeyValue (ts, te); };
 
 *|;
 
@@ -41,13 +41,13 @@ ws | nl               ;
 //.............................................................................
 
 void 
-CLexer::Init ()
+CLexer::init ()
 {
 	%% write init;
 }
 
 bool
-CLexer::Exec ()
+CLexer::exec ()
 {
 	%% write exec;
 	return cs != axl_ini_error;
@@ -57,5 +57,3 @@ CLexer::Exec ()
 
 } // namespace ini {
 } // namespace axl {
-
-

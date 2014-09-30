@@ -18,7 +18,7 @@ namespace ref {
 
 template <
 	typename T,
-	size_t Extra = 0
+	size_t extra = 0
 	>
 class CChildT
 {
@@ -27,7 +27,7 @@ class CChildT
 protected:
 	struct THdr
 	{
-		CRefCount* m_pParent;
+		CRefCount* m_parent;
 	};
 	
 	class CObject: 
@@ -37,51 +37,51 @@ protected:
 	};
 
 protected:
-	char m_Buffer [sizeof (CObject) + Extra];
+	char m_buffer [sizeof (CObject) + extra];
 
 public:
-	CChildT (CRefCount* pParent)
+	CChildT (CRefCount* parent)
 	{ 
-		memset (m_Buffer, 0, sizeof (m_Buffer));
-		CObject* pObject = (CObject*) m_Buffer;
-		pObject->SetTarget (pObject, &rtl::CTypeT <CObject>::Destruct, &Free);
-		pObject->AddRef ();
-		pParent->AddWeakRef ();
+		memset (m_buffer, 0, sizeof (m_buffer));
+		CObject* object = (CObject*) m_buffer;
+		object->setTarget (object, &rtl::CTypeT <CObject>::destruct, &free);
+		object->addRef ();
+		parent->addWeakRef ();
 	}
 
 	~CChildT ()
 	{ 
-		GetObject ()->Release (); 
+		getObject ()->release (); 
 	}
 	
 	operator T* ()
 	{ 
-		return GetObject (); 
+		return getObject (); 
 	}
 
 	T*
 	operator & ()
 	{ 
-		return GetObject (); 
+		return getObject (); 
 	}
 
 	T*
 	operator -> ()
 	{ 
-		return GetObject (); 
+		return getObject (); 
 	}
 
-	T* GetObject ()
+	T* getObject ()
 	{
-		return (CObject*) m_Buffer; 
+		return (CObject*) m_buffer; 
 	}
 
 protected:
 	static 
 	void 
-	Free (void* p)
+	free (void* p)
 	{ 			
-		((CObject*) p)->m_pParent->WeakRelease (); 
+		((CObject*) p)->m_parent->weakRelease (); 
 	}
 };
 

@@ -18,37 +18,37 @@ class CSemaphore: public CWaitableHandle
 {
 public:
 	bool 
-	Create (
-		SECURITY_ATTRIBUTES* pSecAttr,
-		uint_t InitialCount,
-		uint_t MaxCount,
-		const char* pName
+	create (
+		SECURITY_ATTRIBUTES* secAttr,
+		uint_t initialCount,
+		uint_t maxCount,
+		const char* name
 		)
 	{
-		Close ();
+		close ();
 
-		m_h = ::CreateSemaphore (pSecAttr, InitialCount, MaxCount, pName);
-		return err::Complete (m_h != NULL);
+		m_h = ::CreateSemaphore (secAttr, initialCount, maxCount, name);
+		return err::complete (m_h != NULL);
 	}
 
 	bool 
-	Open (
-		uint_t Access,
-		bool DoInheritHandle,
-		const char* pName
+	open (
+		uint_t access,
+		bool doInheritHandle,
+		const char* name
 		)
 	{
-		Close ();
+		close ();
 
-		m_h = ::OpenSemaphore (Access, DoInheritHandle, pName);
-		return err::Complete (m_h != NULL);
+		m_h = ::OpenSemaphore (access, doInheritHandle, name);
+		return err::complete (m_h != NULL);
 	}
 
 	bool
-	Signal (uint_t Count = 1)
+	signal (uint_t count = 1)
 	{
-		bool_t Result = ::ReleaseSemaphore (m_h, Count, NULL);
-		return err::Complete (Result);
+		bool_t result = ::ReleaseSemaphore (m_h, count, NULL);
+		return err::complete (result);
 	}
 };
 

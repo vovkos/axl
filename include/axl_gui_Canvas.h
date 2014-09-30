@@ -19,232 +19,232 @@ namespace gui {
 class CCanvas: public CGuiItem
 {
 protected:
-	CFont* m_pFont;
-	TColorAttr m_ColorAttr;
+	CFont* m_font;
+	TColorAttr m_colorAttr;
 
 public:
-	CFont* m_pBaseFont;
-	TTextAttr m_BaseTextAttr;
-	TTextAttr m_DefTextAttr;
-	TPalette m_Palette;
+	CFont* m_baseFont;
+	TTextAttr m_baseTextAttr;
+	TTextAttr m_defTextAttr;
+	TPalette m_palette;
 
 public:
 	CCanvas ()
 	{
-		m_pFont = NULL;
-		m_pBaseFont = NULL;
-		m_BaseTextAttr.Setup (EStdPalColor_WidgetText, EStdPalColor_WidgetBack, 0);
+		m_font = NULL;
+		m_baseFont = NULL;
+		m_baseTextAttr.setup (EStdPalColor_WidgetText, EStdPalColor_WidgetBack, 0);
 	}
 
 	// rect drawing
 
 	virtual
 	bool
-	DrawRect (
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t Color
+	drawRect (
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color
 		) = 0;
 
 	bool
-	DrawRect (
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+	drawRect (
+		int left,
+		int top,
+		int right,
+		int bottom
 		)
 	{
-		return DrawRect (Left, Top, Right, Bottom, m_DefTextAttr.m_BackColor);
+		return drawRect (left, top, right, bottom, m_defTextAttr.m_backColor);
 	}
 
 	bool
-	DrawRect (
-		const TRect& Rect,
-		uint_t Color
+	drawRect (
+		const TRect& rect,
+		uint_t color
 		)
 	{
-		return DrawRect (
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			Color
+		return drawRect (
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			color
 			);
 	}
 
 	bool
-	DrawRect (const TRect& Rect)
+	drawRect (const TRect& rect)
 	{
-		return DrawRect (
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			m_DefTextAttr.m_BackColor
+		return drawRect (
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			m_defTextAttr.m_backColor
 			);
 	}
 
 	// default to utf8 
 
 	bool
-	DrawText (
+	drawText (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const char* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const char* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf8 (
+		return drawText_utf8 (
 			x,
 			y,
-			Left,
-			Top,
-			Right,
-			Bottom,
-			TextColor,
-			BackColor,
-			FontFlags,
-			pText,
-			Length
+			left,
+			top,
+			right,
+			bottom,
+			textColor,
+			backColor,
+			fontFlags,
+			text,
+			length
 			);
 	}
 
 	bool
-	DrawText (
+	drawText (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		const char* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		const char* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf8 (x, y, Left, Top, Right, Bottom, pText, Length);
+		return drawText_utf8 (x, y, left, top, right, bottom, text, length);
 	}
 
 	bool
-	DrawText (
-		const TPoint& Point,
-		const TRect& Rect,
-		const TTextAttr& TextAttr,
-		const char* pText,
-		size_t Length = -1
+	drawText (
+		const TPoint& point,
+		const TRect& rect,
+		const TTextAttr& textAttr,
+		const char* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf8 (Point, Rect, TextAttr, pText, Length);
+		return drawText_utf8 (point, rect, textAttr, text, length);
 	}
 
 	bool
-	DrawText (
-		const TPoint& Point,
-		const TRect& Rect,
-		const char* pText,
-		size_t Length = -1
+	drawText (
+		const TPoint& point,
+		const TRect& rect,
+		const char* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf8 (Point, Rect, pText, Length);
+		return drawText_utf8 (point, rect, text, length);
 	}
 
 	// utf8 text drawing
 
 	virtual
 	bool
-	DrawText_utf8 (
+	drawText_utf8 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf8_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf8_t* text,
+		size_t length = -1
 		) = 0;
 
 	bool
-	DrawText_utf8 (
+	drawText_utf8 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		const utf8_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		const utf8_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf8 (
+		return drawText_utf8 (
 			x,
 			y,
-			Left,
-			Top,
-			Right,
-			Bottom,
-			m_DefTextAttr.m_ForeColor,
-			m_DefTextAttr.m_BackColor,
-			m_DefTextAttr.m_FontFlags,
-			pText,
-			Length
+			left,
+			top,
+			right,
+			bottom,
+			m_defTextAttr.m_foreColor,
+			m_defTextAttr.m_backColor,
+			m_defTextAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
 	bool
-	DrawText_utf8 (
-		const TPoint& Point,
-		const TRect& Rect,
-		const TTextAttr& TextAttr,
-		const utf8_t* pText,
-		size_t Length = -1
+	drawText_utf8 (
+		const TPoint& point,
+		const TRect& rect,
+		const TTextAttr& textAttr,
+		const utf8_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf8 (
-			Point.m_x,
-			Point.m_y,
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			TextAttr.m_ForeColor,
-			TextAttr.m_BackColor,
-			TextAttr.m_FontFlags,
-			pText,
-			Length
+		return drawText_utf8 (
+			point.m_x,
+			point.m_y,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			textAttr.m_foreColor,
+			textAttr.m_backColor,
+			textAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
 	bool
-	DrawText_utf8 (
-		const TPoint& Point,
-		const TRect& Rect,
-		const utf8_t* pText,
-		size_t Length = -1
+	drawText_utf8 (
+		const TPoint& point,
+		const TRect& rect,
+		const utf8_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf8 (
-			Point.m_x,
-			Point.m_y,
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			m_DefTextAttr.m_ForeColor,
-			m_DefTextAttr.m_BackColor,
-			m_DefTextAttr.m_FontFlags,
-			pText,
-			Length
+		return drawText_utf8 (
+			point.m_x,
+			point.m_y,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			m_defTextAttr.m_foreColor,
+			m_defTextAttr.m_backColor,
+			m_defTextAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
@@ -252,91 +252,91 @@ public:
 
 	virtual
 	bool
-	DrawText_utf16 (
+	drawText_utf16 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf16_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf16_t* text,
+		size_t length = -1
 		) = 0;
 
 	bool
-	DrawText_utf16 (
+	drawText_utf16 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		const utf16_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		const utf16_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf16 (
+		return drawText_utf16 (
 			x,
 			y,
-			Left,
-			Top,
-			Right,
-			Bottom,
-			m_DefTextAttr.m_ForeColor,
-			m_DefTextAttr.m_BackColor,
-			m_DefTextAttr.m_FontFlags,
-			pText,
-			Length
+			left,
+			top,
+			right,
+			bottom,
+			m_defTextAttr.m_foreColor,
+			m_defTextAttr.m_backColor,
+			m_defTextAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
 	bool
-	DrawText_utf16 (
-		const TPoint& Point,
-		const TRect& Rect,
-		const TTextAttr& TextAttr,
-		const utf16_t* pText,
-		size_t Length = -1
+	drawText_utf16 (
+		const TPoint& point,
+		const TRect& rect,
+		const TTextAttr& textAttr,
+		const utf16_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf16 (
-			Point.m_x,
-			Point.m_y,
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			TextAttr.m_ForeColor,
-			TextAttr.m_BackColor,
-			TextAttr.m_FontFlags,
-			pText,
-			Length
+		return drawText_utf16 (
+			point.m_x,
+			point.m_y,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			textAttr.m_foreColor,
+			textAttr.m_backColor,
+			textAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
 	bool
-	DrawText_utf16 (
-		const TPoint& Point,
-		const TRect& Rect,
-		const utf16_t* pText,
-		size_t Length = -1
+	drawText_utf16 (
+		const TPoint& point,
+		const TRect& rect,
+		const utf16_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf16 (
-			Point.m_x,
-			Point.m_y,
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			m_DefTextAttr.m_ForeColor,
-			m_DefTextAttr.m_BackColor,
-			m_DefTextAttr.m_FontFlags,
-			pText,
-			Length
+		return drawText_utf16 (
+			point.m_x,
+			point.m_y,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			m_defTextAttr.m_foreColor,
+			m_defTextAttr.m_backColor,
+			m_defTextAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
@@ -344,91 +344,91 @@ public:
 
 	virtual
 	bool
-	DrawText_utf32 (
+	drawText_utf32 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf32_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf32_t* text,
+		size_t length = -1
 		) = 0;
 
 	bool
-	DrawText_utf32 (
+	drawText_utf32 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		const utf32_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		const utf32_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf32 (
+		return drawText_utf32 (
 			x,
 			y,
-			Left,
-			Top,
-			Right,
-			Bottom,
-			m_DefTextAttr.m_ForeColor,
-			m_DefTextAttr.m_BackColor,
-			m_DefTextAttr.m_FontFlags,
-			pText,
-			Length
+			left,
+			top,
+			right,
+			bottom,
+			m_defTextAttr.m_foreColor,
+			m_defTextAttr.m_backColor,
+			m_defTextAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
 	bool
-	DrawText_utf32 (
-		const TPoint& Point,
-		const TRect& Rect,
-		const TTextAttr& TextAttr,
-		const utf32_t* pText,
-		size_t Length = -1
+	drawText_utf32 (
+		const TPoint& point,
+		const TRect& rect,
+		const TTextAttr& textAttr,
+		const utf32_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf32 (
-			Point.m_x,
-			Point.m_y,
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			TextAttr.m_ForeColor,
-			TextAttr.m_BackColor,
-			TextAttr.m_FontFlags,
-			pText,
-			Length
+		return drawText_utf32 (
+			point.m_x,
+			point.m_y,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			textAttr.m_foreColor,
+			textAttr.m_backColor,
+			textAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
 	bool
-	DrawText_utf32 (
-		const TPoint& Point,
-		const TRect& Rect,
-		const utf32_t* pText,
-		size_t Length = -1
+	drawText_utf32 (
+		const TPoint& point,
+		const TRect& rect,
+		const utf32_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_utf32 (
-			Point.m_x,
-			Point.m_y,
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom,
-			m_DefTextAttr.m_ForeColor,
-			m_DefTextAttr.m_BackColor,
-			m_DefTextAttr.m_FontFlags,
-			pText,
-			Length
+		return drawText_utf32 (
+			point.m_x,
+			point.m_y,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			m_defTextAttr.m_foreColor,
+			m_defTextAttr.m_backColor,
+			m_defTextAttr.m_fontFlags,
+			text,
+			length
 			);
 	}
 
@@ -436,31 +436,31 @@ public:
 
 	virtual
 	bool
-	DrawImage (
+	drawImage (
 		int x,
 		int y,
-		CImage* pImage,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+		CImage* image,
+		int left,
+		int top,
+		int right,
+		int bottom
 		) = 0;
 
 	bool
-	DrawImage (
-		const TPoint& Point,
-		CImage* pImage,
-		const TRect& Rect = TRect ()
+	drawImage (
+		const TPoint& point,
+		CImage* image,
+		const TRect& rect = TRect ()
 		)
 	{
-		return DrawImage (
-			Point.m_x,
-			Point.m_y,
-			pImage,
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom
+		return drawImage (
+			point.m_x,
+			point.m_y,
+			image,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom
 			);
 	}
 
@@ -468,32 +468,32 @@ public:
 
 	virtual
 	bool
-	CopyRect (
-		CCanvas* pSrcCanvas,
+	copyRect (
+		CCanvas* srcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,
 		int ySrc,
-		int Width,
-		int Height
+		int width,
+		int height
 		) = 0;
 
 	bool
-	CopyRect (
-		CCanvas* pSrcCanvas,
-		const TPoint& DstPoint,
-		const TPoint& SrcPoint,
-		const TSize& Size
+	copyRect (
+		CCanvas* srcCanvas,
+		const TPoint& dstPoint,
+		const TPoint& srcPoint,
+		const TSize& size
 		)
 	{
-		return CopyRect (
-			pSrcCanvas,
-			DstPoint.m_x,
-			DstPoint.m_y,
-			SrcPoint.m_x,
-			SrcPoint.m_y,
-			Size.m_Width,
-			Size.m_Height
+		return copyRect (
+			srcCanvas,
+			dstPoint.m_x,
+			dstPoint.m_y,
+			srcPoint.m_x,
+			srcPoint.m_y,
+			size.m_width,
+			size.m_height
 			);
 	}
 };

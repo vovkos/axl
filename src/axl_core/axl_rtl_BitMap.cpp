@@ -8,201 +8,201 @@ namespace rtl {
 //.............................................................................
 
 bool
-GetBit (
-	const size_t* pMap,
-	size_t PageCount,
-	size_t Bit)
+getBit (
+	const size_t* map,
+	size_t pageCount,
+	size_t bit)
 {
-	size_t Page = Bit / _AXL_PTR_BITNESS;
-	if (Page >= PageCount)
+	size_t page = bit / _AXL_PTR_BITNESS;
+	if (page >= pageCount)
 		return false;
 
-	size_t Mask = (size_t) 1 << (Bit & (_AXL_PTR_BITNESS - 1));
+	size_t mask = (size_t) 1 << (bit & (_AXL_PTR_BITNESS - 1));
 	
-	return (pMap [Page] & Mask) != 0;
+	return (map [page] & mask) != 0;
 }
 
 bool
-SetBit (
-	size_t* pMap,
-	size_t PageCount,
-	size_t Bit,
-	bool Value
+setBit (
+	size_t* map,
+	size_t pageCount,
+	size_t bit,
+	bool value
 	)
 {
-	size_t Page = Bit / _AXL_PTR_BITNESS;
-	if (Page >= PageCount)
+	size_t page = bit / _AXL_PTR_BITNESS;
+	if (page >= pageCount)
 		return false;
 
-	size_t* p = pMap + Page;
-	size_t Mask = (size_t) 1 << (Bit & (_AXL_PTR_BITNESS - 1));
-	size_t Old = *p;
+	size_t* p = map + page;
+	size_t mask = (size_t) 1 << (bit & (_AXL_PTR_BITNESS - 1));
+	size_t old = *p;
 
-	if (Value)
-		*p |= Mask;
+	if (value)
+		*p |= mask;
 	else
-		*p &= ~Mask;
+		*p &= ~mask;
 
-	return *p != Old;
+	return *p != old;
 }
 
 bool
-SetBitRange ( 
-	size_t* pMap,
-	size_t PageCount,
-	size_t From,
-	size_t To,
-	bool Value
+setBitRange ( 
+	size_t* map,
+	size_t pageCount,
+	size_t from,
+	size_t to,
+	bool value
 	)
 {
-	bool HasChanged = false;
+	bool hasChanged = false;
 
-	size_t BitCount = PageCount * _AXL_PTR_BITNESS;
+	size_t bitCount = pageCount * _AXL_PTR_BITNESS;
 
-	if (From >= BitCount)
+	if (from >= bitCount)
 		return false;
 
-	if (To > BitCount)
-		To = BitCount;
+	if (to > bitCount)
+		to = bitCount;
 
-	size_t PageIndex = From / _AXL_PTR_BITNESS;
-	size_t* p = pMap + PageIndex;
+	size_t pageIndex = from / _AXL_PTR_BITNESS;
+	size_t* p = map + pageIndex;
 
-	From -= PageIndex * _AXL_PTR_BITNESS;
-	To -= PageIndex * _AXL_PTR_BITNESS;
+	from -= pageIndex * _AXL_PTR_BITNESS;
+	to -= pageIndex * _AXL_PTR_BITNESS;
 
-	size_t Mask;
-	size_t Old;
+	size_t mask;
+	size_t old;
 
-	if (Value)
+	if (value)
 	{
-		Old = *p;
+		old = *p;
 
-		if (To < _AXL_PTR_BITNESS)
+		if (to < _AXL_PTR_BITNESS)
 		{
-			Mask = GetBitmask (From, To);
-			*p |= Mask;
-			return *p != Old;
+			mask = getBitmask (from, to);
+			*p |= mask;
+			return *p != old;
 		}
 
-		Mask = GetHiBitmask (From);
-		*p |= Mask;
+		mask = getHiBitmask (from);
+		*p |= mask;
 
-		if (*p != Old)
-			HasChanged = true;
+		if (*p != old)
+			hasChanged = true;
 
-		To -= _AXL_PTR_BITNESS;
+		to -= _AXL_PTR_BITNESS;
 		p++;
 	
-		while (To >= _AXL_PTR_BITNESS)
+		while (to >= _AXL_PTR_BITNESS)
 		{
 			if (*p != -1)
-				HasChanged = true;
+				hasChanged = true;
 
 			*p = -1;
-			To -= _AXL_PTR_BITNESS;
+			to -= _AXL_PTR_BITNESS;
 			p++;
 		}
 
-		if (To)
+		if (to)
 		{
-			Mask = GetLoBitmask (To);
-			Old = *p;
-			*p |= Mask;
+			mask = getLoBitmask (to);
+			old = *p;
+			*p |= mask;
 
-			if (*p != Old)
-				HasChanged = true;
+			if (*p != old)
+				hasChanged = true;
 		}
 	}
 	else
 	{
-		Old = *p;
+		old = *p;
 
-		if (To < _AXL_PTR_BITNESS)
+		if (to < _AXL_PTR_BITNESS)
 		{
-			Mask = GetBitmask (From, To);
-			*p &= ~Mask;
-			return *p != Old;
+			mask = getBitmask (from, to);
+			*p &= ~mask;
+			return *p != old;
 		}
 
-		Mask = GetHiBitmask (From);
-		*p &= ~Mask;
+		mask = getHiBitmask (from);
+		*p &= ~mask;
 
-		if (*p != Old)
-			HasChanged = true;
+		if (*p != old)
+			hasChanged = true;
 
-		To -= _AXL_PTR_BITNESS;
+		to -= _AXL_PTR_BITNESS;
 		p++;
 	
-		while (To >= _AXL_PTR_BITNESS)
+		while (to >= _AXL_PTR_BITNESS)
 		{
 			if (*p != 0)
-				HasChanged = true;
+				hasChanged = true;
 
 			*p = 0;
-			To -= _AXL_PTR_BITNESS;
+			to -= _AXL_PTR_BITNESS;
 			p++;
 		}
 
-		if (To)
+		if (to)
 		{
-			Mask = GetLoBitmask (To);
-			Old = *p;
-			*p &= ~Mask;
+			mask = getLoBitmask (to);
+			old = *p;
+			*p &= ~mask;
 
-			if (*p != Old)
-				HasChanged = true;
+			if (*p != old)
+				hasChanged = true;
 		}
 	}
 
-	return HasChanged;
+	return hasChanged;
 }
 
 bool
-MergeBitMaps ( 
-	size_t* pMap,
-	const size_t* pMap2,
-	size_t PageCount,
-	EBitOp Op
+mergeBitMaps ( 
+	size_t* map,
+	const size_t* map2,
+	size_t pageCount,
+	EBitOp op
 	)
 {
-	bool HasChanged = false;
+	bool hasChanged = false;
 
-	size_t Old;
+	size_t old;
 
-	size_t* p = pMap;
-	size_t* pEnd = p + PageCount;
-	const size_t* p2 = pMap2;
+	size_t* p = map;
+	size_t* end = p + pageCount;
+	const size_t* p2 = map2;
 
-	switch (Op)
+	switch (op)
 	{
 	case EBitOp_Or:
-		for (; p < pEnd; p++, p2++)
+		for (; p < end; p++, p2++)
 		{
-			Old = *p;
+			old = *p;
 			*p |= *p2;
-			if (*p != Old)
-				HasChanged = true;
+			if (*p != old)
+				hasChanged = true;
 		}
 
 		break;
 
 	case EBitOp_And:
 		{
-			Old = *p;
+			old = *p;
 			*p &= *p2;
-			if (*p != Old)
-				HasChanged = true;
+			if (*p != old)
+				hasChanged = true;
 		}
 
 		break;
 
 	case EBitOp_Xor:
 		{
-			Old = *p;
+			old = *p;
 			*p ^= *p2;
-			if (*p != Old)
-				HasChanged = true;
+			if (*p != old)
+				hasChanged = true;
 		}
 
 		break;
@@ -211,49 +211,49 @@ MergeBitMaps (
 		ASSERT (false);	
 	}
 
-	return HasChanged;
+	return hasChanged;
 }
 
 size_t 
-FindBit (
-	const size_t* pMap,
-	size_t PageCount,
-	size_t From,
-	bool Value
+findBit (
+	const size_t* map,
+	size_t pageCount,
+	size_t from,
+	bool value
 	)
 {
-	size_t i = From / _AXL_PTR_BITNESS;
-	if (i >= PageCount)
+	size_t i = from / _AXL_PTR_BITNESS;
+	if (i >= pageCount)
 		return -1;
 
-	const size_t* p = pMap + i;
+	const size_t* p = map + i;
 
-	From -= i * _AXL_PTR_BITNESS;
+	from -= i * _AXL_PTR_BITNESS;
 
-	if (Value)
+	if (value)
 	{
-		size_t x = *p & GetHiBitmask (From);
+		size_t x = *p & getHiBitmask (from);
 
 		if (x)
-			return i * _AXL_PTR_BITNESS + GetLoBitIdx (x);
+			return i * _AXL_PTR_BITNESS + getLoBitIdx (x);
 
-		for (i++, p++; i < PageCount; i++, p++)
+		for (i++, p++; i < pageCount; i++, p++)
 		{
 			if (*p != 0)
-				return i * _AXL_PTR_BITNESS + GetLoBitIdx (*p);
+				return i * _AXL_PTR_BITNESS + getLoBitIdx (*p);
 		}
 	}
 	else
 	{
-		size_t x = ~*p & GetHiBitmask (From);
+		size_t x = ~*p & getHiBitmask (from);
 
 		if (x)
-			return i * _AXL_PTR_BITNESS + GetLoBitIdx (x);
+			return i * _AXL_PTR_BITNESS + getLoBitIdx (x);
 
-		for (i++, p++; i < PageCount; i++, p++)
+		for (i++, p++; i < pageCount; i++, p++)
 		{
 			if (*p != -1)
-				return i * _AXL_PTR_BITNESS + GetLoBitIdx (~*p);
+				return i * _AXL_PTR_BITNESS + getLoBitIdx (~*p);
 		}
 	}
 
@@ -263,68 +263,68 @@ FindBit (
 //.............................................................................
 
 bool
-CBitMap::Create (size_t BitCount)
+CBitMap::create (size_t bitCount)
 {
-	bool Result = SetBitCount (BitCount);
-	if (!Result)
+	bool result = setBitCount (bitCount);
+	if (!result)
 		return false;
 
-	Clear ();
+	clear ();
 	return true;
 }
 
 bool 
-CBitMap::SetBitCount (size_t BitCount)
+CBitMap::setBitCount (size_t bitCount)
 {
-	size_t PageCount = BitCount / _AXL_PTR_BITNESS;
-	if (BitCount & (_AXL_PTR_BITNESS - 1))
-		PageCount++;
+	size_t pageCount = bitCount / _AXL_PTR_BITNESS;
+	if (bitCount & (_AXL_PTR_BITNESS - 1))
+		pageCount++;
 
-	return m_Map.SetCount (PageCount);
+	return m_map.setCount (pageCount);
 }
 
 void 
-CBitMap::Copy (const CBitMap& Src)
+CBitMap::copy (const CBitMap& src)
 {
-	size_t Count = Src.m_Map.GetCount ();
-	m_Map.SetCount (Count);
-	memcpy (m_Map, Src.m_Map, Count * sizeof (size_t));
+	size_t count = src.m_map.getCount ();
+	m_map.setCount (count);
+	memcpy (m_map, src.m_map, count * sizeof (size_t));
 }
 
 int
-CBitMap::Cmp (const CBitMap& Src)
+CBitMap::cmp (const CBitMap& src)
 {
-	size_t Count = m_Map.GetCount ();
-	size_t Count2 = Src.m_Map.GetCount ();
+	size_t count = m_map.getCount ();
+	size_t count2 = src.m_map.getCount ();
 
 	return 
-		Count < Count2 ? -1 :
-		Count > Count2 ? 1 :
-		memcmp (m_Map, Src.m_Map, Count * sizeof (size_t));
+		count < count2 ? -1 :
+		count > count2 ? 1 :
+		memcmp (m_map, src.m_map, count * sizeof (size_t));
 }
 
 bool 
-CBitMap::Merge (
-	const CBitMap& BitMap2, 
-	EBitOp Op
+CBitMap::merge (
+	const CBitMap& bitMap2, 
+	EBitOp op
 	)
 {
-	size_t PageCount = m_Map.GetCount ();
-	size_t PageCount2 = BitMap2.m_Map.GetCount ();
+	size_t pageCount = m_map.getCount ();
+	size_t pageCount2 = bitMap2.m_map.getCount ();
 	
-	return rtl::MergeBitMaps (m_Map, BitMap2.m_Map, AXL_MIN (PageCount, PageCount2), Op);
+	return rtl::mergeBitMaps (m_map, bitMap2.m_map, AXL_MIN (pageCount, pageCount2), op);
 }
 
 bool
-CBitMap::MergeResize (
-	const CBitMap& BitMap2, 
-	EBitOp Op
+CBitMap::mergeResize (
+	const CBitMap& bitMap2, 
+	EBitOp op
 	)
 {
-	size_t PageCount2 = BitMap2.m_Map.GetCount ();
-	size_t PageCount = m_Map.EnsureCount (PageCount2);
+	size_t pageCount2 = bitMap2.m_map.getCount ();
+	size_t pageCount = m_map.ensureCount (pageCount2);
 
-	return rtl::MergeBitMaps (m_Map, BitMap2.m_Map, PageCount, Op);
+	return rtl::mergeBitMaps (m_map, bitMap2.m_map, pageCount, op);
 }
 
 //.............................................................................

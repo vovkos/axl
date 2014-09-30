@@ -23,7 +23,7 @@ oct    = [0-7];
 bin    = [01];
 id     = [a-zA-Z_] [a-zA-Z0-9_]*;
 ws     = [ \t\r]+;
-nl     = '\n' @{ NewLine (p + 1); };
+nl     = '\n' @{ newLine (p + 1); };
 esc    = '\\' [^\n];
 lit_dq = '"' ([^"\n\\] | esc)* (["\\] | nl);
 lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
@@ -35,7 +35,7 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 
 user_code := |*
 
-[{}]         { CreateToken (ts [0]); };
+[{}]         { createToken (ts [0]); };
 nl           ;
 any          ;
 
@@ -45,7 +45,7 @@ any          ;
 
 user_data := |*
 
-[()]         { CreateToken (ts [0]); };
+[()]         { createToken (ts [0]); };
 nl           ;
 any          ;
    
@@ -55,9 +55,9 @@ any          ;
 
 main := |*
 
-'%{'         { CreateToken (EToken_OpenCode); };
-'$('         { CreateToken (EToken_OpenData); };
-'$' id       { CreateStringToken (EToken_Data, 1); };
+'%{'         { createToken (EToken_OpenCode); };
+'$('         { createToken (EToken_OpenData); };
+'$' id       { createStringToken (EToken_Data, 1); };
 nl           ;
 any          ;
 
@@ -68,21 +68,21 @@ any          ;
 //.............................................................................
 
 void 
-CLexer::Init ()
+CLexer::init ()
 {
 	%% write init;
 }
 
 void
-CLexer::Exec ()
+CLexer::exec ()
 {
 	%% write exec;
 }
 
 int
-CLexer::GetMachineState (ELexerMachine Machine)
+CLexer::getMachineState (ELexerMachine machine)
 {
-	switch (Machine)
+	switch (machine)
 	{
 	case ELexerMachine_Main:
 		return axl_lua_st_en_main;

@@ -21,64 +21,64 @@ public:
 	typedef CIteratorT <T> CIterator;
 
 protected:
-	rtl::CStdListT <T> m_List;
-	rtl::CArrayT <T*> m_Array;
+	rtl::CStdListT <T> m_list;
+	rtl::CArrayT <T*> m_array;
 
 public:
 	bool
-	IsEmpty () const
+	isEmpty () const
 	{
-		return m_List.IsEmpty ();
+		return m_list.isEmpty ();
 	}
 
 	size_t 
-	GetCount () const
+	getCount () const
 	{
-		ASSERT (m_List.GetCount () == m_Array.GetCount ());
-		return m_List.GetCount ();
+		ASSERT (m_list.getCount () == m_array.getCount ());
+		return m_list.getCount ();
 	}
 
 	CIterator
-	GetHead () const
+	getHead () const
 	{
-		return m_List.GetHead ();
+		return m_list.getHead ();
 	}
 
 	CIterator
-	GetTail () const
+	getTail () const
 	{
-		return m_List.GetTail ();
+		return m_list.getTail ();
 	}
 
 	T*
-	Add ()
+	add ()
 	{
 		T* p = AXL_MEM_NEW (T);
-		m_List.InsertTail (p);
+		m_list.insertTail (p);
 		
-		size_t Count = m_Array.GetCount ();
-		m_Array.SetCount (Count + 1);
-		m_Array [Count] = p;
+		size_t count = m_array.getCount ();
+		m_array.setCount (count + 1);
+		m_array [count] = p;
 		return p;
 	}
 
 	T*
-	Get (size_t Index)
+	get (size_t index)
 	{
-		size_t Count = m_Array.GetCount ();
-		if (Index < Count)
-			return m_Array [Index];
+		size_t count = m_array.getCount ();
+		if (index < count)
+			return m_array [index];
 
-		m_Array.SetCount (Index + 1);
+		m_array.setCount (index + 1);
 			
-		for (size_t i = Count; i <= Index; i++)
+		for (size_t i = count; i <= index; i++)
 		{
 			T* p = AXL_MEM_NEW (T);
-			m_List.InsertTail (p);
-			m_Array [i] = p;
+			m_list.insertTail (p);
+			m_array [i] = p;
 		}
 
-		return m_Array [Index];
+		return m_array [index];
 	}
 };
 

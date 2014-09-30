@@ -37,27 +37,27 @@ public:
 typedef ref::CBufT <CPoint> CPointBuf;
 
 void 
-Run ()
+run ()
 {
-	size_t BufSize = sizeof (CPoint) + sizeof (CPointBuf::CHdr);
-	CPointBuf Point (ref::EBuf_Stack, _alloca (BufSize), BufSize);
-	CPointBuf Point2 = Point;
+	size_t bufSize = sizeof (CPoint) + sizeof (CPointBuf::CHdr);
+	CPointBuf point (ref::EBuf_Stack, _alloca (bufSize), bufSize);
+	CPointBuf point2 = point;
 
-	printf ("point: %d, %d\n", Point->x, Point->y);
-	printf ("point2: %d, %d\n", Point2->x, Point2->y);
+	printf ("point: %d, %d\n", point->x, point->y);
+	printf ("point2: %d, %d\n", point2->x, point2->y);
 
-	Point2->x *= 10;
-	Point2->y *= 10;
+	point2->x *= 10;
+	point2->y *= 10;
 
-	printf ("point: %d, %d\n", Point->x, Point->y);
-	printf ("point2: %d, %d\n", Point2->x, Point2->y);
+	printf ("point: %d, %d\n", point->x, point->y);
+	printf ("point2: %d, %d\n", point2->x, point2->y);
 
-	char Buf [80];
-	rtl::CString String (ref::EBuf_Stack, Buf, sizeof (Buf));
+	char buf [80];
+	rtl::CString string (ref::EBuf_Stack, buf, sizeof (buf));
 
-	String.Format ("hui %d %d %d", 1, 2, 3);
-	String.Append ("govno");
-	String.Append ("muravei");
+	string.format ("hui %d %d %d", 1, 2, 3);
+	string.append ("govno");
+	string.append ("muravei");
 }
 
 //.............................................................................

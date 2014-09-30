@@ -135,19 +135,19 @@ main := |*
 'countof'         |
 'typeof'       
 
-)                   { SetAttr (ts, te, gui::EStdColor_LightBlue); };		
+)                   { setAttr (ts, te, gui::EStdColor_LightBlue); };		
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 id                  {  };
-(lit_sq | lit_dq)   { SetAttr (ts, te, gui::EStdColor_Red); };
-dec+                { SetAttr (ts, te, gui::EStdColor_Red); };
-'0' [Xx] hex+       { SetAttr (ts, te, gui::EStdColor_Red); };
-'0' [Xx] lit_dq     { SetAttr (ts, te, gui::EStdColor_Red); };
-'$' lit_dq          { SetAttr (ts, te, gui::EStdColor_Red); };
+(lit_sq | lit_dq)   { setAttr (ts, te, gui::EStdColor_Red); };
+dec+                { setAttr (ts, te, gui::EStdColor_Red); };
+'0' [xx] hex+       { setAttr (ts, te, gui::EStdColor_Red); };
+'0' [xx] lit_dq     { setAttr (ts, te, gui::EStdColor_Red); };
+'$' lit_dq          { setAttr (ts, te, gui::EStdColor_Red); };
 
 '//'                { SetAttr (ts, te, gui::EStdColor_Green); fgoto comment_sl; };
-'/*'                { SetAttr (ts, te, gui::EStdColor_Green); fgoto comment_ml; };
+'/*'                { setAttr (ts, te, gui::EStdColor_Green); fgoto comment_ml; };
 
 any                 ;
 
@@ -160,8 +160,8 @@ any                 ;
 
 comment_sl := |*
 
-nl                  { SetAttr (ts, te, gui::EStdColor_Green); fgoto main; };
-any                 { SetAttr (ts, te, gui::EStdColor_Green); };
+nl                  { setAttr (ts, te, gui::EStdColor_Green); fgoto main; };
+any                 { setAttr (ts, te, gui::EStdColor_Green); };
 
 *|;
 
@@ -172,8 +172,8 @@ any                 { SetAttr (ts, te, gui::EStdColor_Green); };
 
 comment_ml := |*
 
-'*/'                { SetAttr (ts, te, gui::EStdColor_Green); fgoto main; };
-any                 { SetAttr (ts, te, gui::EStdColor_Green); };
+'*/'                { setAttr (ts, te, gui::EStdColor_Green); fgoto main; };
+any                 { setAttr (ts, te, gui::EStdColor_Green); };
 
 *|;
 
@@ -181,12 +181,12 @@ any                 { SetAttr (ts, te, gui::EStdColor_Green); };
 
 //.............................................................................
 
-void JancyColorizer::Init()
+void jancyColorizer::init()
 {
 	%% write init;
 }
 
-void JancyColorizer::Exec()
+void jancyColorizer::exec()
 {
 	%% write exec;
 }

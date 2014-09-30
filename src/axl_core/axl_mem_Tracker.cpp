@@ -9,105 +9,97 @@ namespace mem {
 
 CTracker::CTracker ()
 {
-	m_PeakBlockCount = 0;
-	m_TotalBlockCount = 0;
-	m_Size = 0;
-	m_PeakSize = 0;
-	m_TotalSize = 0;
+	m_peakBlockCount = 0;
+	m_totalBlockCount = 0;
+	m_size = 0;
+	m_peakSize = 0;
+	m_totalSize = 0;
 }
 
 void
-CTracker::Add (TBlockHdr* pHdr)
+CTracker::add (TBlockHdr* hdr)
 {
-	m_Lock.Lock ();
+	m_lock.lock ();
 
-	pHdr->m_SeqNum = m_TotalBlockCount;
+	hdr->m_seqNum = m_totalBlockCount;
 
-	m_TotalBlockCount++;
-	m_TotalSize += pHdr->m_Size;
+	m_totalBlockCount++;
+	m_totalSize += hdr->m_size;
 
-	m_BlockList.InsertTail (pHdr);
+	m_blockList.insertTail (hdr);
 
-	size_t BlockCount = m_BlockList.GetCount ();
-	if (BlockCount > m_PeakBlockCount)
-		m_PeakBlockCount = BlockCount;
+	size_t blockCount = m_blockList.getCount ();
+	if (blockCount > m_peakBlockCount)
+		m_peakBlockCount = blockCount;
 
-	m_Size += pHdr->m_Size;
+	m_size += hdr->m_size;
 
-	if (m_Size > m_PeakSize)
-		m_PeakSize = m_Size;
+	if (m_size > m_peakSize)
+		m_peakSize = m_size;
 
-	m_Lock.Unlock ();
+	m_lock.unlock ();
 }
 
 void
-CTracker::Remove (TBlockHdr* pHdr)
+CTracker::remove (TBlockHdr* hdr)
 {
-	m_Lock.Lock ();
+	m_lock.lock ();
 
-	m_BlockList.Remove (pHdr);
-	m_Size -= pHdr->m_Size;
+	m_blockList.remove (hdr);
+	m_size -= hdr->m_size;
 
-	m_Lock.Unlock ();
+	m_lock.unlock ();
 }
 
 void 
-CTracker::Trace ()
+CTracker::trace ()
 {
-	m_Lock.Lock ();
+	m_lock.lock ();
 
-	dbg::TraceEx (
-		AXL_SUBSYS_MEM,
-		dbg::ETraceLevel_Info, 
+	dbg::trace (
 		"Allocated size:\n"
 		"    Current.............................%d B\n"
 		"    Peak................................%d B\n"
 		"    Total...............................%d B\n",
-		m_Size,
-		m_PeakSize,
-		m_TotalSize
+		m_size,
+		m_peakSize,
+		m_totalSize
 		);
 
-	dbg::TraceEx (
-		AXL_SUBSYS_MEM,
-		dbg::ETraceLevel_Info, 
+	dbg::trace (
 		"Allocated blocks:\n"
 		"    Current.............................%d\n"
 		"    Peak................................%d\n"
 		"    Total...............................%d\n",
-		m_BlockList.GetCount (),
-		m_PeakBlockCount,
-		m_TotalBlockCount
+		m_blockList.getCount (),
+		m_peakBlockCount,
+		m_totalBlockCount
 		);
 
-	if (!m_BlockList.IsEmpty ())
+	if (!m_blockList.isEmpty ())
 	{
-		dbg::TraceEx (
-			AXL_SUBSYS_REF,
-			dbg::ETraceLevel_Info, 
+		dbg::trace (
 			"*** Found %d unfreed blocks:\n",
-			m_BlockList.GetCount ()
+			m_blockList.getCount ()
 			);
 
-		rtl::CIteratorT <TBlockHdr> It = m_BlockList.GetHead ();
-		for (; It; It++)
+		rtl::CIteratorT <TBlockHdr> it = m_blockList.getHead ();
+		for (; it; it++)
 		{
-			TBlockHdr* pBlockHdr = *It;
+			TBlockHdr* blockHdr = *it;
 
-			dbg::TraceEx (
-				AXL_SUBSYS_REF,
-				dbg::ETraceLevel_Info, 
+			dbg::trace (
 				"    %s(%d): %s seq: #%d size: %d B\n",
-				pBlockHdr->m_pFilePath,
-				pBlockHdr->m_Line,
-				pBlockHdr->m_pTag,
-				pBlockHdr->m_SeqNum,
-				pBlockHdr->m_Size
+				blockHdr->m_filePath,
+				blockHdr->m_line,
+				blockHdr->m_tag,
+				blockHdr->m_seqNum,
+				blockHdr->m_size
 				);
 		}
 	}
 
-	m_Lock.Unlock ();
+	m_lock.unlock ();
 }
 
 //.............................................................................

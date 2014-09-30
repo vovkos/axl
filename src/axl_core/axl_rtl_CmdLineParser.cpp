@@ -8,20 +8,20 @@ namespace rtl {
 //.............................................................................
 
 size_t
-CCmdLineParserRoot::ExtractArg (
+CCmdLineParserRoot::extractArg (
 	const char* p,
-	const char* pEnd,
-	rtl::CString* pArg
+	const char* end,
+	rtl::CString* arg
 	)
 {
 	const char* p0 = p;
 
-	while (p < pEnd && isspace (*p))
+	while (p < end && isspace (*p))
 		p++;
 
-	if (p >= pEnd)
+	if (p >= end)
 	{
-		pArg->Clear ();
+		arg->clear ();
 		return p - p0;
 	}
 
@@ -29,14 +29,14 @@ CCmdLineParserRoot::ExtractArg (
 
 	if (*p != '\"')
 	{
-		while (p < pEnd && !isspace (*p))
+		while (p < end && !isspace (*p))
 			p++;
 	}
 	else
 	{
 		p1++;
 
-		while (p < pEnd)
+		while (p < end)
 		{
 			if (*p == '\"')
 				break;
@@ -46,28 +46,28 @@ CCmdLineParserRoot::ExtractArg (
 			p++;
 		}
 
-		if (p > pEnd)
+		if (p > end)
 		{
-			err::SetStringError ("unterminated escape sequence");
+			err::setStringError ("unterminated escape sequence");
 			return -1;
 		}
 	}
 
-	pArg->Copy (p1, p - p1);
+	arg->copy (p1, p - p1);
 	return p - p0;
 }
 
 bool
-CCmdLineParserRoot::ParseArg (
+CCmdLineParserRoot::parseArg (
 	const char* p,
-	rtl::CString* pSwitchName,
-	rtl::CString* pValue
+	rtl::CString* switchName,
+	rtl::CString* value
 	)
 {
 	if (*p != '-')
 	{
-		pSwitchName->Clear ();
-		pValue->Copy (p);
+		switchName->clear ();
+		value->copy (p);
 		return true;
 	}
 
@@ -77,11 +77,11 @@ CCmdLineParserRoot::ParseArg (
 	{
 		if (!isalpha (*p))
 		{
-			err::SetStringError ("invalid command line switch syntax");
+			err::setStringError ("invalid command line switch syntax");
 			return false;
 		}
 
-		pSwitchName->Copy (*p);
+		switchName->copy (*p);
 		p++;
 	}
 	else
@@ -90,7 +90,7 @@ CCmdLineParserRoot::ParseArg (
 
 		if (!isalpha (*p))
 		{
-			err::SetStringError ("invalid command line switch syntax");
+			err::setStringError ("invalid command line switch syntax");
 			return false;
 		}
 
@@ -99,7 +99,7 @@ CCmdLineParserRoot::ParseArg (
 		while (*p && *p != '=' && !isspace (*p))
 			p++;
 
-		pSwitchName->Copy (p1, p - p1);
+		switchName->copy (p1, p - p1);
 	}
 
 	if (*p && !isspace (*p)) // have value
@@ -112,11 +112,11 @@ CCmdLineParserRoot::ParseArg (
 		while (*p && !isspace (*p))
 			p++;
 
-		pValue->Copy (p1, p - p1);
+		value->copy (p1, p - p1);
 	}
 	else
 	{
-		pValue->Clear ();
+		value->clear ();
 	}
 
 	return true;
@@ -125,142 +125,142 @@ CCmdLineParserRoot::ParseArg (
 //.............................................................................
 
 CString
-GetCmdLineHelpString (const CConstListT <TSwitchInfo>& SwitchInfoList)
+getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList)
 {
 	enum
 	{
-		IndentSize        = 2,
-		GapSize           = 2,
-		SwitchLengthLimit = 40,
+		indentSize        = 2,
+		gapSize           = 2,
+		switchLengthLimit = 40,
 	};
 
 	// calculate max switch length
 
-	size_t MaxSwitchLength = 0;
+	size_t maxSwitchLength = 0;
 
-	CIteratorT <TSwitchInfo> It = SwitchInfoList.GetHead ();
-	for (; It; It++)
+	CIteratorT <TSwitchInfo> it = switchInfoList.getHead ();
+	for (; it; it++)
 	{
-		TSwitchInfo* pSwitchInfo = *It;
-		if (!pSwitchInfo->m_Switch) // group
+		TSwitchInfo* switchInfo = *it;
+		if (!switchInfo->m_switch) // group
 			continue;
 
-		size_t SwitchLength = 0;
+		size_t switchLength = 0;
 
-		bool HasValue = (pSwitchInfo->m_Switch & ECmdLineSwitchFlag_HasValue) != 0;
+		bool hasValue = (switchInfo->m_switch & ECmdLineSwitchFlag_HasValue) != 0;
 
 		size_t i = 0;
-		for (; i < countof (pSwitchInfo->m_NameTable); i++)
+		for (; i < countof (switchInfo->m_nameTable); i++)
 		{
-			if (!pSwitchInfo->m_NameTable [i])
+			if (!switchInfo->m_nameTable [i])
 				break;
 
-			if (pSwitchInfo->m_NameTable [i] [1])
+			if (switchInfo->m_nameTable [i] [1])
 			{
-				SwitchLength += 2; // "--"
-				SwitchLength += strlen (pSwitchInfo->m_NameTable [i]);
+				switchLength += 2; // "--"
+				switchLength += strlen (switchInfo->m_nameTable [i]);
 			}
 			else
 			{
-				SwitchLength += 2; // "-c"
+				switchLength += 2; // "-c"
 			}
 		}
 
 		if (i > 1)
 		{
-			SwitchLength += (i - 1) * 2; // ", "
+			switchLength += (i - 1) * 2; // ", "
 		}
 
-		if (HasValue)
+		if (hasValue)
 		{
-			SwitchLength++; // '='
-			SwitchLength += strlen (pSwitchInfo->m_pValue);
+			switchLength++; // '='
+			switchLength += strlen (switchInfo->m_value);
 		}
 
-		if (SwitchLength < SwitchLengthLimit && MaxSwitchLength < SwitchLength)
-			MaxSwitchLength = SwitchLength;
+		if (switchLength < switchLengthLimit && maxSwitchLength < switchLength)
+			maxSwitchLength = switchLength;
 	}
 
-	size_t DescriptionCol = MaxSwitchLength + IndentSize + GapSize;
+	size_t descriptionCol = maxSwitchLength + indentSize + gapSize;
 
 	// generate string
 
-	CString String;
-	CString LineString;
+	CString string;
+	CString lineString;
 
-	It = SwitchInfoList.GetHead ();
-	for (; It; It++)
+	it = switchInfoList.getHead ();
+	for (; it; it++)
 	{
-		TSwitchInfo* pSwitchInfo = *It;
-		if (!pSwitchInfo->m_Switch) // group
+		TSwitchInfo* switchInfo = *it;
+		if (!switchInfo->m_switch) // group
 		{
-			if (!String.IsEmpty ())
-				String.AppendNewLine ();
+			if (!string.isEmpty ())
+				string.appendNewLine ();
 
-			LineString = pSwitchInfo->m_pDescription;
+			lineString = switchInfo->m_description;
 		}
 		else
 		{
-			LineString.Copy (' ', IndentSize);
+			lineString.copy (' ', indentSize);
 
-			bool HasValue = (pSwitchInfo->m_Switch & ECmdLineSwitchFlag_HasValue) != 0;
+			bool hasValue = (switchInfo->m_switch & ECmdLineSwitchFlag_HasValue) != 0;
 
-			ASSERT (pSwitchInfo->m_NameTable [0]);
-			if (pSwitchInfo->m_NameTable [0] [1])
+			ASSERT (switchInfo->m_nameTable [0]);
+			if (switchInfo->m_nameTable [0] [1])
 			{
-				LineString += "--";
-				LineString += pSwitchInfo->m_NameTable [0];
+				lineString += "--";
+				lineString += switchInfo->m_nameTable [0];
 			}
 			else
 			{
-				LineString += '-';
-				LineString += pSwitchInfo->m_NameTable [0] [0];
+				lineString += '-';
+				lineString += switchInfo->m_nameTable [0] [0];
 			}
 
-			for (size_t i = 1; i < countof (pSwitchInfo->m_NameTable); i++)
+			for (size_t i = 1; i < countof (switchInfo->m_nameTable); i++)
 			{
-				if (!pSwitchInfo->m_NameTable [i])
+				if (!switchInfo->m_nameTable [i])
 					break;
 
-				LineString += ", ";
+				lineString += ", ";
 
-				if (pSwitchInfo->m_NameTable [i] [1])
+				if (switchInfo->m_nameTable [i] [1])
 				{
-					LineString += "--";
-					LineString += pSwitchInfo->m_NameTable [i];
+					lineString += "--";
+					lineString += switchInfo->m_nameTable [i];
 				}
 				else
 				{
-					LineString += '-';
-					LineString += pSwitchInfo->m_NameTable [i] [0];
+					lineString += '-';
+					lineString += switchInfo->m_nameTable [i] [0];
 				}
 			}
 
-			if (HasValue)
+			if (hasValue)
 			{
-				LineString += '=';
-				LineString += pSwitchInfo->m_pValue;
+				lineString += '=';
+				lineString += switchInfo->m_value;
 			}
 
-			size_t Length = LineString.GetLength ();
-			if (Length < DescriptionCol)
+			size_t length = lineString.getLength ();
+			if (length < descriptionCol)
 			{
-				LineString.Append (' ', DescriptionCol - Length);
+				lineString.append (' ', descriptionCol - length);
 			}
 			else
 			{
-				LineString.AppendNewLine ();
-				LineString.Append (' ', DescriptionCol);
+				lineString.appendNewLine ();
+				lineString.append (' ', descriptionCol);
 			}
 
-			LineString += pSwitchInfo->m_pDescription;
+			lineString += switchInfo->m_description;
 		}
 
-		String += LineString;
-		String.AppendNewLine ();
+		string += lineString;
+		string.appendNewLine ();
 	}
 
-	return String;
+	return string;
 }
 
 //.............................................................................

@@ -27,22 +27,22 @@ class CErrnoProvider: public CErrorProvider
 public:
 	static
 	rtl::CString
-	GetErrorDescription (int Error)
+	getErrorDescription (int code)
 	{
-		char Buffer [512] = { 0 };
+		char buffer [512] = { 0 };
 #if (_AXL_ENV == AXL_ENV_WIN)
-		strerror_s (Buffer, countof (Buffer) - 1, Error);
-		return Buffer;
+		strerror_s (buffer, countof (buffer) - 1, code);
+		return buffer;
 #else
-		return strerror_r (Error, Buffer, countof (Buffer) - 1);
+		return strerror_r (error, buffer, countof (buffer) - 1);
 #endif
 	}
 
 	virtual
 	rtl::CString
-	GetErrorDescription (const TError* pError)
+	getErrorDescription (const TError* error)
 	{
-		return GetErrorDescription (pError->m_Code);
+		return getErrorDescription (error->m_code);
 	}
 };
 
@@ -55,22 +55,22 @@ public:
 	{
 	}
 
-	CErrno (int Error)
+	CErrno (int code)
 	{
-		Create (Error);
+		create (code);
 	}
 
 	TError*
-	Create (int Error);
+	create (int code);
 };
 
 //.............................................................................
 
 inline
 CError
-SetErrno (int Error)
+setErrno (int code)
 {
-	SetError (CErrno (Error));
+	setError (CErrno (code));
 }
 
 //.............................................................................

@@ -8,707 +8,707 @@ namespace gui {
 //.............................................................................
 
 void
-CTextPaint::Init (CCanvas* pCanvas)
+CTextPaint::init (CCanvas* canvas)
 {
-	m_pCanvas = pCanvas;
+	m_canvas = canvas;
 	m_p = NULL;
-	m_pBegin = NULL;
-	m_pEnd = NULL;
-	m_pAttr = NULL;
-	m_pAttrBegin = NULL;
-	m_pAttrEnd = NULL;
-	m_Top = 0;
-	m_Bottom = 0;
-	m_HexEncodingFlags = 0; 
-	m_UnprintableChar = '.';
+	m_begin = NULL;
+	m_end = NULL;
+	m_attr = NULL;
+	m_attrBegin = NULL;
+	m_attrEnd = NULL;
+	m_top = 0;
+	m_bottom = 0;
+	m_hexEncodingFlags = 0; 
+	m_unprintableChar = '.';
 }
 
 // calc monospace/proportional text rect
 
 TRect
-CTextPaint::CalcTextRect_utf8 (
-	const utf8_t* pText,
-	size_t Length
+CTextPaint::calcTextRect_utf8 (
+	const utf8_t* text,
+	size_t length
 	)
 {
-	CFont* pFont = m_pCanvas->m_pBaseFont->GetFontMod (m_pCanvas->m_DefTextAttr.m_FontFlags);
-	TSize Size = pFont->CalcTextSize_utf8 (pText, Length);
-	return TRect (m_Point.m_x, m_Top, m_Point.m_x + Size.m_Width, m_Bottom);
+	CFont* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
+	TSize size = font->calcTextSize_utf8 (text, length);
+	return TRect (m_point.m_x, m_top, m_point.m_x + size.m_width, m_bottom);
 }
 
 TRect
-CTextPaint::CalcTextRect_utf32 (
-	const utf32_t* pText,
-	size_t Length
+CTextPaint::calcTextRect_utf32 (
+	const utf32_t* text,
+	size_t length
 	)
 {
-	CFont* pFont = m_pCanvas->m_pBaseFont->GetFontMod (m_pCanvas->m_DefTextAttr.m_FontFlags);
-	TSize Size = pFont->CalcTextSize_utf32 (pText, Length);
-	return TRect (m_Point.m_x, m_Top, m_Point.m_x + Size.m_Width, m_Bottom);
+	CFont* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
+	TSize size = font->calcTextSize_utf32 (text, length);
+	return TRect (m_point.m_x, m_top, m_point.m_x + size.m_width, m_bottom);
 }
 
 // space
 
 int 
-CTextPaint::PaintSpace_p (
-	int Width,
-	uint_t Color
+CTextPaint::paintSpace_p (
+	int width,
+	uint_t color
 	)
 {
-	TRect Rect;
-	Rect.m_Left = m_Point.m_x;
-	Rect.m_Top = m_Top;
-	Rect.m_Right = m_Point.m_x + Width;
-	Rect.m_Bottom = m_Bottom;
+	TRect rect;
+	rect.m_left = m_point.m_x;
+	rect.m_top = m_top;
+	rect.m_right = m_point.m_x + width;
+	rect.m_bottom = m_bottom;
 
-	m_pCanvas->DrawRect (Rect, Color);
+	m_canvas->drawRect (rect, color);
 
-	m_Point.m_x = Rect.m_Right;
-	return m_Point.m_x;
+	m_point.m_x = rect.m_right;
+	return m_point.m_x;
 }
 
 int 
-CTextPaint::PaintSpace (
-	size_t Length,
-	uint_t Color
+CTextPaint::paintSpace (
+	size_t length,
+	uint_t color
 	)
 {
-	CFont* pFont = m_pCanvas->m_pBaseFont->GetFontMod (m_pCanvas->m_DefTextAttr.m_FontFlags);
-	TSize Size = pFont->CalcTextSize (" ", 1);
-	return PaintSpace_p (Length * Size.m_Width, Color);
+	CFont* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
+	TSize size = font->calcTextSize (" ", 1);
+	return paintSpace_p (length * size.m_width, color);
 }
 
 // text
 
 int
-CTextPaint::PaintText_utf8 (
-	const utf8_t* pText,
-	size_t Length
+CTextPaint::paintText_utf8 (
+	const utf8_t* text,
+	size_t length
 	)
 {
-	if (Length == -1)
-		Length = strlen (pText);
+	if (length == -1)
+		length = strlen (text);
 	
-	m_p = pText;
-	m_pBegin = pText;
-	m_pEnd = pText + Length;
+	m_p = text;
+	m_begin = text;
+	m_end = text + length;
 
-	return PaintTextPart_utf8 (Length);
+	return paintTextPart_utf8 (length);
 }
 
 int
-CTextPaint::PaintText_utf32 (
-	const utf32_t* pText,
-	size_t Length
+CTextPaint::paintText_utf32 (
+	const utf32_t* text,
+	size_t length
 	)
 {
-	if (Length == -1)
-		Length = rtl::CStringDetails_utf32::CalcLength (pText);
+	if (length == -1)
+		length = rtl::CStringDetails_utf32::calcLength (text);
 	
-	m_p = (char*) pText;
-	m_pBegin = (char*) pText;
-	m_pEnd = (char*) (pText + Length);
+	m_p = (char*) text;
+	m_begin = (char*) text;
+	m_end = (char*) (text + length);
 
-	return PaintTextPart_utf32 (Length);
+	return paintTextPart_utf32 (length);
 }
 
 int
-CTextPaint::PaintTextPart_utf8 (size_t Length)
+CTextPaint::paintTextPart_utf8 (size_t length)
 {
-	ASSERT (Length <= (size_t) (m_pEnd - m_p));
+	ASSERT (length <= (size_t) (m_end - m_p));
 
-	if (!Length)
-		return m_Point.m_x;
+	if (!length)
+		return m_point.m_x;
 
-	TRect Rect = CalcTextRect_utf8 (m_p, Length);
-	m_pCanvas->DrawText_utf8 (m_Point, Rect, m_p, Length);
+	TRect rect = calcTextRect_utf8 (m_p, length);
+	m_canvas->drawText_utf8 (m_point, rect, m_p, length);
 	
-	m_p += Length;
-	m_Point.m_x = Rect.m_Right;
+	m_p += length;
+	m_point.m_x = rect.m_right;
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 int
-CTextPaint::PaintTextPart_utf32 (size_t Length)
+CTextPaint::paintTextPart_utf32 (size_t length)
 {
-	ASSERT (Length <= (size_t) ((m_pEnd - m_p) / sizeof (utf32_t)));
+	ASSERT (length <= (size_t) ((m_end - m_p) / sizeof (utf32_t)));
 
-	if (!Length)
-		return m_Point.m_x;
+	if (!length)
+		return m_point.m_x;
 
-	TRect Rect = CalcTextRect_utf32 ((utf32_t*) m_p, Length);
-	m_pCanvas->DrawText_utf32 (m_Point, Rect, (utf32_t*) m_p, Length);
+	TRect rect = calcTextRect_utf32 ((utf32_t*) m_p, length);
+	m_canvas->drawText_utf32 (m_point, rect, (utf32_t*) m_p, length);
 	
-	m_p += Length * sizeof (utf32_t);
-	m_Point.m_x = Rect.m_Right;
+	m_p += length * sizeof (utf32_t);
+	m_point.m_x = rect.m_right;
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 // hyper text
 
 int
-CTextPaint::PaintHyperText_utf8 (
-	const CTextAttrAnchorArray* pAttrArray,
-	const utf8_t* pText,
-	size_t Length
+CTextPaint::paintHyperText_utf8 (
+	const CTextAttrAnchorArray* attrArray,
+	const utf8_t* text,
+	size_t length
 	)
 {
-	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
-	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
+	const TTextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
+	size_t attrCount = attrArray ? attrArray->getCount () : 0;
 
-	size_t Offset = 0;
+	size_t offset = 0;
 
-	if (Length == -1)
-		Length = strlen (pText);
+	if (length == -1)
+		length = strlen (text);
 	
-	m_p = pText;
-	m_pBegin = pText;
-	m_pEnd = pText + Length;
-	m_pAttr = pAttr;
-	m_pAttrBegin = pAttr;
-	m_pAttrEnd = pAttr + AttrCount;
+	m_p = text;
+	m_begin = text;
+	m_end = text + length;
+	m_attr = attr;
+	m_attrBegin = attr;
+	m_attrEnd = attr + attrCount;
 
-	if (!Length)
-		return m_Point.m_x;
+	if (!length)
+		return m_point.m_x;
 
-	if (!AttrCount)
+	if (!attrCount)
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		return PaintTextPart_utf8 (Length);
+		m_canvas->m_defTextAttr.clear ();
+		return paintTextPart_utf8 (length);
 	}
 
-	const TTextAttrAnchor* pNextAttr;
+	const TTextAttrAnchor* nextAttr;
 
-	if (m_pAttr->m_Offset <= Offset)
+	if (m_attr->m_offset <= offset)
 	{
-		m_pCanvas->m_DefTextAttr = m_pAttr->m_Attr;
-		pNextAttr = m_pAttr + 1;
+		m_canvas->m_defTextAttr = m_attr->m_attr;
+		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		pNextAttr = m_pAttr;
+		m_canvas->m_defTextAttr.clear ();
+		nextAttr = m_attr;
 	}
 
-	const char* p = pText;
-	const char* pEnd = p + Length;
+	const char* p = text;
+	const char* end = p + length;
 
-	while (p < pEnd && pNextAttr < m_pAttrEnd)
+	while (p < end && nextAttr < m_attrEnd)
 	{	
-		size_t MaxLength = pEnd - p;
+		size_t maxLength = end - p;
 
-		Length = pNextAttr->m_Offset - Offset;
-		if (Length > MaxLength)
-			return PaintTextPart_utf8 (MaxLength);
+		length = nextAttr->m_offset - offset;
+		if (length > maxLength)
+			return paintTextPart_utf8 (maxLength);
 
-		PaintTextPart_utf8 (Length);
+		paintTextPart_utf8 (length);
 
-		m_pCanvas->m_DefTextAttr = pNextAttr->m_Attr;
-		m_pAttr = pNextAttr;
-		pNextAttr++;
+		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_attr = nextAttr;
+		nextAttr++;
 
 		p = m_p;
-		Offset = p - m_pBegin;
+		offset = p - m_begin;
 	}
 
-	if (p < pEnd)
-		PaintTextPart_utf8 (pEnd - p);
+	if (p < end)
+		paintTextPart_utf8 (end - p);
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 int
-CTextPaint::PaintHyperText_utf32 (
-	const CTextAttrAnchorArray* pAttrArray,
-	const utf32_t* pText,
-	size_t Length
+CTextPaint::paintHyperText_utf32 (
+	const CTextAttrAnchorArray* attrArray,
+	const utf32_t* text,
+	size_t length
 	)
 {
-	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
-	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
+	const TTextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
+	size_t attrCount = attrArray ? attrArray->getCount () : 0;
 
-	size_t Offset = 0;
+	size_t offset = 0;
 
-	if (Length == -1)
-		Length = rtl::CStringDetails_utf32::CalcLength (pText);
+	if (length == -1)
+		length = rtl::CStringDetails_utf32::calcLength (text);
 	
-	m_p = (char*) pText;
-	m_pBegin = (char*) pText;
-	m_pEnd = (char*) (pText + Length);
-	m_pAttr = pAttr;
-	m_pAttrBegin = pAttr;
-	m_pAttrEnd = pAttr + AttrCount;
+	m_p = (char*) text;
+	m_begin = (char*) text;
+	m_end = (char*) (text + length);
+	m_attr = attr;
+	m_attrBegin = attr;
+	m_attrEnd = attr + attrCount;
 
-	if (!Length)
-		return m_Point.m_x;
+	if (!length)
+		return m_point.m_x;
 
-	if (!AttrCount)
+	if (!attrCount)
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		return PaintTextPart_utf32 (Length);
+		m_canvas->m_defTextAttr.clear ();
+		return paintTextPart_utf32 (length);
 	}
 
-	const TTextAttrAnchor* pNextAttr;
+	const TTextAttrAnchor* nextAttr;
 
-	if (m_pAttr->m_Offset <= Offset)
+	if (m_attr->m_offset <= offset)
 	{
-		m_pCanvas->m_DefTextAttr = m_pAttr->m_Attr;
-		pNextAttr = m_pAttr + 1;
+		m_canvas->m_defTextAttr = m_attr->m_attr;
+		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		pNextAttr = m_pAttr;
+		m_canvas->m_defTextAttr.clear ();
+		nextAttr = m_attr;
 	}
 
-	const utf32_t* p = pText;
-	const utf32_t* pEnd = p + Length;
+	const utf32_t* p = text;
+	const utf32_t* end = p + length;
 
-	while (p < pEnd && pNextAttr < m_pAttrEnd)
+	while (p < end && nextAttr < m_attrEnd)
 	{	
-		size_t MaxLength = pEnd - p;
+		size_t maxLength = end - p;
 
-		Length = pNextAttr->m_Offset - Offset;
-		if (Length > MaxLength)
-			return PaintTextPart_utf32 (MaxLength);
+		length = nextAttr->m_offset - offset;
+		if (length > maxLength)
+			return paintTextPart_utf32 (maxLength);
 
-		PaintTextPart_utf32 (Length);
+		paintTextPart_utf32 (length);
 
-		m_pCanvas->m_DefTextAttr = pNextAttr->m_Attr;
-		m_pAttr = pNextAttr;
-		pNextAttr++;
+		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_attr = nextAttr;
+		nextAttr++;
 
 		p = (utf32_t*) m_p;
-		Offset = p - (utf32_t*) m_pBegin;
+		offset = p - (utf32_t*) m_begin;
 	}
 
-	if (p < pEnd)
-		PaintTextPart_utf32 (pEnd - p);
+	if (p < end)
+		paintTextPart_utf32 (end - p);
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 int
-CTextPaint::PaintSelHyperText_utf8 (
-	const CTextAttrAnchorArray* pAttrArray,
-	size_t SelStart,
-	size_t SelEnd,
-	const utf8_t* pText,
-	size_t Length
+CTextPaint::paintSelHyperText_utf8 (
+	const CTextAttrAnchorArray* attrArray,
+	size_t selStart,
+	size_t selEnd,
+	const utf8_t* text,
+	size_t length
 	)
 {
-	if (SelStart >= SelEnd) 
-		return PaintHyperText_utf8 (pAttrArray, pText, Length);
+	if (selStart >= selEnd) 
+		return paintHyperText_utf8 (attrArray, text, length);
 
-	if (Length == -1)
-		Length = strlen (pText);
+	if (length == -1)
+		length = strlen (text);
 
-	if (pAttrArray)
-		m_SelOverlay.Copy (*pAttrArray, pAttrArray->GetCount ());
+	if (attrArray)
+		m_selOverlay.copy (*attrArray, attrArray->getCount ());
 	else
-		m_SelOverlay.Clear ();
+		m_selOverlay.clear ();
 
-	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
-	return PaintHyperText_utf8 (&m_SelOverlay, pText, Length);
+	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
+	return paintHyperText_utf8 (&m_selOverlay, text, length);
 }
 
 int
-CTextPaint::PaintSelHyperText_utf32 (
-	const CTextAttrAnchorArray* pAttrArray,
-	size_t SelStart,
-	size_t SelEnd,
-	const utf32_t* pText,
-	size_t Length
+CTextPaint::paintSelHyperText_utf32 (
+	const CTextAttrAnchorArray* attrArray,
+	size_t selStart,
+	size_t selEnd,
+	const utf32_t* text,
+	size_t length
 	)
 {
-	if (SelStart >= SelEnd) 
-		return PaintHyperText_utf32 (pAttrArray, pText, Length);
+	if (selStart >= selEnd) 
+		return paintHyperText_utf32 (attrArray, text, length);
 
-	if (Length == -1)
-		Length = rtl::CStringDetails_utf32::CalcLength (pText);
+	if (length == -1)
+		length = rtl::CStringDetails_utf32::calcLength (text);
 
-	if (pAttrArray)
-		m_SelOverlay.Copy (*pAttrArray, pAttrArray->GetCount ());
+	if (attrArray)
+		m_selOverlay.copy (*attrArray, attrArray->getCount ());
 	else
-		m_SelOverlay.Clear ();
+		m_selOverlay.clear ();
 
-	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
-	return PaintHyperText_utf32 (&m_SelOverlay, pText, Length);
+	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
+	return paintHyperText_utf32 (&m_selOverlay, text, length);
 }
 
 // bin hex
 
 int
-CTextPaint::PaintBinHexPart (size_t Size)
+CTextPaint::paintBinHexPart (size_t size)
 {
-	size_t MaxSize = m_pEnd - m_p;
-	if (Size > MaxSize)
-		Size = MaxSize;
+	size_t maxSize = m_end - m_p;
+	if (size > maxSize)
+		size = maxSize;
 
-	if (!Size)
-		return m_Point.m_x;
+	if (!size)
+		return m_point.m_x;
 
-	rtl::CHexEncoding::Encode (&m_StringBuffer, m_p, Size, 0);
-	m_StringBuffer.Append (' ');
+	rtl::CHexEncoding::encode (&m_stringBuffer, m_p, size, 0);
+	m_stringBuffer.append (' ');
 	
-	size_t Length = m_StringBuffer.GetLength ();
-	TRect Rect = CalcTextRect_utf8 (m_StringBuffer, Length);
-	m_pCanvas->DrawText (m_Point, Rect, m_StringBuffer, Length);
+	size_t length = m_stringBuffer.getLength ();
+	TRect rect = calcTextRect_utf8 (m_stringBuffer, length);
+	m_canvas->drawText (m_point, rect, m_stringBuffer, length);
 
-	m_p += Size;
-	m_Point.m_x = Rect.m_Right;
+	m_p += size;
+	m_point.m_x = rect.m_right;
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 int
-CTextPaint::PaintBinHex (
+CTextPaint::paintBinHex (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
 	m_p = (const char*) p;
-	m_pBegin = m_p;
-	m_pEnd = m_p + Size;
+	m_begin = m_p;
+	m_end = m_p + size;
 
-	return PaintBinHexPart (-1);
+	return paintBinHexPart (-1);
 }
 
 int
-CTextPaint::PaintHyperBinHex (
-	const CTextAttrAnchorArray* pAttrArray,
+CTextPaint::paintHyperBinHex (
+	const CTextAttrAnchorArray* attrArray,
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
-	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
-	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
+	const TTextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
+	size_t attrCount = attrArray ? attrArray->getCount () : 0;
 
 	const char* p = (char*) _p;
-	const char* pEnd; 
+	const char* end; 
 
-	size_t Offset = 0;
+	size_t offset = 0;
 
 	m_p = p;
-	m_pBegin = p;
-	m_pEnd = p + Size;
-	m_pAttr = pAttr;
-	m_pAttrBegin = pAttr;
-	m_pAttrEnd = pAttr + AttrCount;
+	m_begin = p;
+	m_end = p + size;
+	m_attr = attr;
+	m_attrBegin = attr;
+	m_attrEnd = attr + attrCount;
 
-	if (!Size)
-		return m_Point.m_x;
+	if (!size)
+		return m_point.m_x;
 
-	if (!AttrCount)
+	if (!attrCount)
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		return PaintBinHexPart (Size);
+		m_canvas->m_defTextAttr.clear ();
+		return paintBinHexPart (size);
 	}
 
-	const TTextAttrAnchor* pNextAttr;
+	const TTextAttrAnchor* nextAttr;
 
-	if (m_pAttr->m_Offset <= Offset)
+	if (m_attr->m_offset <= offset)
 	{
-		m_pCanvas->m_DefTextAttr = m_pAttr->m_Attr;
-		pNextAttr = m_pAttr + 1;
+		m_canvas->m_defTextAttr = m_attr->m_attr;
+		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		pNextAttr = m_pAttr;
+		m_canvas->m_defTextAttr.clear ();
+		nextAttr = m_attr;
 	}
 
-	pEnd = p + Size;
-	while (p < pEnd && pNextAttr < m_pAttrEnd)
+	end = p + size;
+	while (p < end && nextAttr < m_attrEnd)
 	{	
-		size_t MaxSize = pEnd - p;
+		size_t maxSize = end - p;
 
-		Size = pNextAttr->m_Offset - Offset;
-		if (Size > MaxSize)
-			return PaintBinHexPart (MaxSize);
+		size = nextAttr->m_offset - offset;
+		if (size > maxSize)
+			return paintBinHexPart (maxSize);
 
-		PaintBinHexPart (Size);
+		paintBinHexPart (size);
 
 		p = m_p;
-		Offset = p - m_pBegin;
+		offset = p - m_begin;
 
-		m_pCanvas->m_DefTextAttr = pNextAttr->m_Attr;
-		m_pAttr = pNextAttr;
-		pNextAttr++;
+		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_attr = nextAttr;
+		nextAttr++;
 	}
 
-	if (p < pEnd)
-		PaintBinHexPart (pEnd - p);
+	if (p < end)
+		paintBinHexPart (end - p);
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 int
-CTextPaint::PaintSelHyperBinHex (
-	const CTextAttrAnchorArray* pAttrArray,
-	size_t SelStart,
-	size_t SelEnd,
+CTextPaint::paintSelHyperBinHex (
+	const CTextAttrAnchorArray* attrArray,
+	size_t selStart,
+	size_t selEnd,
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	if (SelStart >= SelEnd) 
-		return PaintHyperBinHex (pAttrArray, p, Size);
+	if (selStart >= selEnd) 
+		return paintHyperBinHex (attrArray, p, size);
 
-	if (pAttrArray)
-		m_SelOverlay.Copy (*pAttrArray, pAttrArray->GetCount ());
+	if (attrArray)
+		m_selOverlay.copy (*attrArray, attrArray->getCount ());
 	else
-		m_SelOverlay.Clear ();
+		m_selOverlay.clear ();
 
-	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
-	return PaintHyperBinHex (&m_SelOverlay, p, Size);
+	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
+	return paintHyperBinHex (&m_selOverlay, p, size);
 }
 
 int
-CTextPaint::PaintHyperBinHex4BitCursor (
-	const CTextAttrAnchorArray* pAttrArray, 
-	size_t CursorPos, 
+CTextPaint::paintHyperBinHex4BitCursor (
+	const CTextAttrAnchorArray* attrArray, 
+	size_t cursorPos, 
 	const void* p, 
-	size_t Size
+	size_t size
 	)
 {
-	if (CursorPos >= Size) 
-		return PaintHyperBinHex (pAttrArray, p, Size);
+	if (cursorPos >= size) 
+		return paintHyperBinHex (attrArray, p, size);
 
-	PaintHyperBinHex (pAttrArray, p, CursorPos);
+	paintHyperBinHex (attrArray, p, cursorPos);
 
-	char* pCursor = (char*) p + CursorPos;
+	char* cursor = (char*) p + cursorPos;
 	
-	gui::TTextAttr Attr = m_pCanvas->m_DefTextAttr;
+	gui::TTextAttr attr = m_canvas->m_defTextAttr;
 
-	char Char = rtl::CHexEncoding::GetHexChar_l (*pCursor & 0xf);
-	char CharBuffer [8] = { Char, ' ', ' ', 0 };
-	TRect Rect = CalcTextRect_utf8 (CharBuffer, 3);
-	m_pCanvas->m_DefTextAttr.Overlay (m_SelAttr);
-	m_pCanvas->DrawText (m_Point, Rect, CharBuffer, 3);
+	char c = rtl::CHexEncoding::getHexChar_l (*cursor & 0xf);
+	char charBuffer [8] = { c, ' ', ' ', 0 };
+	TRect rect = calcTextRect_utf8 (charBuffer, 3);
+	m_canvas->m_defTextAttr.overlay (m_selAttr);
+	m_canvas->drawText (m_point, rect, charBuffer, 3);
 
-	m_Point.m_x = Rect.m_Right;
+	m_point.m_x = rect.m_right;
 
-	if (CursorPos + 1 < Size)
+	if (cursorPos + 1 < size)
 	{
-		size_t Leftover = Size - CursorPos - 1;
+		size_t leftover = size - cursorPos - 1;
 
-		m_p = m_p + CursorPos + 1;
-		m_pCanvas->m_DefTextAttr = Attr;
+		m_p = m_p + cursorPos + 1;
+		m_canvas->m_defTextAttr = attr;
 
-		if (!pAttrArray)
+		if (!attrArray)
 		{
-			PaintHyperBinHex (NULL, pCursor + 1, Leftover);
+			paintHyperBinHex (NULL, cursor + 1, leftover);
 		}
 		else
 		{
-			m_SelOverlay = *pAttrArray;
-			m_SelOverlay.ClearBefore (CursorPos);
-			PaintHyperBinHex (&m_SelOverlay, pCursor + 1, Leftover);
+			m_selOverlay = *attrArray;
+			m_selOverlay.clearBefore (cursorPos);
+			paintHyperBinHex (&m_selOverlay, cursor + 1, leftover);
 		}		
 	}
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 // bin text
 
 int
-CTextPaint::PaintBinTextPart (
-	rtl::CCharCodec* pCodec,
-	size_t Size
+CTextPaint::paintBinTextPart (
+	rtl::CCharCodec* codec,
+	size_t size
 	)
 {
-	size_t MaxSize = m_pEnd - m_p;
-	if (Size > MaxSize)
-		Size = MaxSize;
+	size_t maxSize = m_end - m_p;
+	if (size > maxSize)
+		size = maxSize;
 
-	if (!Size)
-		return m_Point.m_x;
+	if (!size)
+		return m_point.m_x;
 
-	m_BinTextBuffer.SetCount (Size);
+	m_binTextBuffer.setCount (size);
 
-	size_t UnitSize = pCodec->GetUnitSize ();
+	size_t unitSize = codec->getUnitSize ();
 	size_t i = 0;
 
 	const char* p = m_p;
-	const char* pEnd = p + Size;
+	const char* end = p + size;
 
-	size_t UnitSizeMod = (p - m_pBegin) % UnitSize;
-	if (UnitSizeMod)
+	size_t unitSizeMod = (p - m_begin) % unitSize;
+	if (unitSizeMod)
 	{
-		size_t IncompleteSize = UnitSize - UnitSizeMod;
+		size_t incompleteSize = unitSize - unitSizeMod;
 
-		if (IncompleteSize > Size)
-			IncompleteSize = Size;
+		if (incompleteSize > size)
+			incompleteSize = size;
 
-		for (; i < IncompleteSize; i++)
-			m_BinTextBuffer [i] = m_UnprintableChar;
+		for (; i < incompleteSize; i++)
+			m_binTextBuffer [i] = m_unprintableChar;
 
-		p += IncompleteSize;
+		p += incompleteSize;
 	}
 
-	while (p < pEnd)
+	while (p < end)
 	{
-		utf32_t CodePoint;
-		size_t TakenBufferLength = 0;
-		size_t TakenSize = 0;
-		size_t ExpectedSize;
+		utf32_t codePoint;
+		size_t takenBufferLength = 0;
+		size_t takenSize = 0;
+		size_t expectedSize;
 
-		size_t Leftover = pEnd - p;
-		if (Leftover < UnitSize)
-			ExpectedSize = UnitSize;
+		size_t leftover = end - p;
+		if (leftover < unitSize)
+			expectedSize = unitSize;
 		else
-			pCodec->DecodeToUtf32 (&CodePoint, 1, p, Leftover, &TakenBufferLength, &TakenSize, &ExpectedSize);
+			codec->decodeToUtf32 (&codePoint, 1, p, leftover, &takenBufferLength, &takenSize, &expectedSize);
 
-		if (!TakenSize)
+		if (!takenSize)
 		{
-			size_t End = i + Leftover;
+			size_t end = i + leftover;
 
-			Leftover = m_pEnd - p;
-			if (ExpectedSize <= Leftover)
+			leftover = m_end - p;
+			if (expectedSize <= leftover)
 			{
-				pCodec->DecodeToUtf32 (&CodePoint, 1, p, Leftover, &TakenBufferLength);
+				codec->decodeToUtf32 (&codePoint, 1, p, leftover, &takenBufferLength);
 				
-				if (TakenBufferLength == 1) // might still be not enough (e.g. UTF-16)
+				if (takenBufferLength == 1) // might still be not enough (e.g. UTF-16)
 				{
-					m_BinTextBuffer [i] = IsPrintable (CodePoint) ? CodePoint : m_UnprintableChar;
+					m_binTextBuffer [i] = isPrintable (codePoint) ? codePoint : m_unprintableChar;
 					i++;
 				}
 			}
 
-			for (; i < End; i++)
-				m_BinTextBuffer [i] = m_UnprintableChar;
+			for (; i < end; i++)
+				m_binTextBuffer [i] = m_unprintableChar;
 
 			break;
 		}
 
-		m_BinTextBuffer [i] = IsPrintable (CodePoint) ? CodePoint : m_UnprintableChar;
+		m_binTextBuffer [i] = isPrintable (codePoint) ? codePoint : m_unprintableChar;
 
-		size_t End = i + TakenSize;
-		for (i++; i < End; i++)
-			m_BinTextBuffer [i] = m_UnprintableChar;
+		size_t end = i + takenSize;
+		for (i++; i < end; i++)
+			m_binTextBuffer [i] = m_unprintableChar;
 
-		p += TakenSize;
+		p += takenSize;
 	}
 
-	ASSERT (i == Size);
+	ASSERT (i == size);
 	
-	TRect Rect = CalcTextRect_utf32 (m_BinTextBuffer, Size);
-	m_pCanvas->DrawText_utf32 (m_Point, Rect, m_BinTextBuffer, Size);
+	TRect rect = calcTextRect_utf32 (m_binTextBuffer, size);
+	m_canvas->drawText_utf32 (m_point, rect, m_binTextBuffer, size);
 
-	m_p = m_p + Size;
-	m_Point.m_x = Rect.m_Right;
+	m_p = m_p + size;
+	m_point.m_x = rect.m_right;
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 int
-CTextPaint::PaintBinText (
-	rtl::CCharCodec* pCodec,
+CTextPaint::paintBinText (
+	rtl::CCharCodec* codec,
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
 	m_p = (const char*) p;
-	m_pBegin = m_p;
-	m_pEnd = m_p + Size;
+	m_begin = m_p;
+	m_end = m_p + size;
 
-	return PaintBinTextPart (pCodec, -1);
+	return paintBinTextPart (codec, -1);
 }
 
 int
-CTextPaint::PaintHyperBinText (
-	rtl::CCharCodec* pCodec,
-	const CTextAttrAnchorArray* pAttrArray,
+CTextPaint::paintHyperBinText (
+	rtl::CCharCodec* codec,
+	const CTextAttrAnchorArray* attrArray,
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
-	const TTextAttrAnchor* pAttr = pAttrArray ? pAttrArray->ca () : NULL;
-	size_t AttrCount = pAttrArray ? pAttrArray->GetCount () : 0;
+	const TTextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
+	size_t attrCount = attrArray ? attrArray->getCount () : 0;
 
 	const char* p = (const char*) _p;
-	const char* pEnd; 
+	const char* end; 
 
-	size_t Offset = 0;
+	size_t offset = 0;
 
 	m_p = p;
-	m_pBegin = p;
-	m_pEnd = p + Size;
-	m_pAttr = pAttr;
-	m_pAttrBegin = pAttr;
-	m_pAttrEnd = pAttr + AttrCount;
+	m_begin = p;
+	m_end = p + size;
+	m_attr = attr;
+	m_attrBegin = attr;
+	m_attrEnd = attr + attrCount;
 
-	if (!Size)
-		return m_Point.m_x;
+	if (!size)
+		return m_point.m_x;
 
-	if (!AttrCount)
+	if (!attrCount)
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		return PaintBinTextPart (pCodec, Size);
+		m_canvas->m_defTextAttr.clear ();
+		return paintBinTextPart (codec, size);
 	}
 
-	const TTextAttrAnchor* pNextAttr;
+	const TTextAttrAnchor* nextAttr;
 
-	if (m_pAttr->m_Offset <= Offset)
+	if (m_attr->m_offset <= offset)
 	{
-		m_pCanvas->m_DefTextAttr = m_pAttr->m_Attr;
-		pNextAttr = m_pAttr + 1;
+		m_canvas->m_defTextAttr = m_attr->m_attr;
+		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_pCanvas->m_DefTextAttr.Clear ();
-		pNextAttr = m_pAttr;
+		m_canvas->m_defTextAttr.clear ();
+		nextAttr = m_attr;
 	}
 
-	pEnd = p + Size;
-	while (p < pEnd && pNextAttr < m_pAttrEnd)
+	end = p + size;
+	while (p < end && nextAttr < m_attrEnd)
 	{	
-		size_t MaxSize = pEnd - p;
+		size_t maxSize = end - p;
 
-		Size = pNextAttr->m_Offset - Offset;
-		if (Size > MaxSize)
-			return PaintBinTextPart (pCodec, MaxSize);
+		size = nextAttr->m_offset - offset;
+		if (size > maxSize)
+			return paintBinTextPart (codec, maxSize);
 
-		PaintBinTextPart (pCodec, Size);
+		paintBinTextPart (codec, size);
 
 		p = m_p;
-		Offset = p - m_pBegin;
+		offset = p - m_begin;
 
-		m_pCanvas->m_DefTextAttr = pNextAttr->m_Attr;
-		m_pAttr = pNextAttr;
-		pNextAttr++;
+		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_attr = nextAttr;
+		nextAttr++;
 	}
 
-	if (p < pEnd)
-		PaintBinTextPart (pCodec, pEnd - p);
+	if (p < end)
+		paintBinTextPart (codec, end - p);
 
-	return m_Point.m_x;
+	return m_point.m_x;
 }
 
 int
-CTextPaint::PaintSelHyperBinText (
-	rtl::CCharCodec* pCodec,
-	const CTextAttrAnchorArray* pAttrArray,
-	size_t SelStart,
-	size_t SelEnd,
+CTextPaint::paintSelHyperBinText (
+	rtl::CCharCodec* codec,
+	const CTextAttrAnchorArray* attrArray,
+	size_t selStart,
+	size_t selEnd,
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	if (SelStart >= SelEnd) 
-		return PaintHyperBinText (pCodec, pAttrArray, p, Size);
+	if (selStart >= selEnd) 
+		return paintHyperBinText (codec, attrArray, p, size);
 
-	if (pAttrArray)
-		m_SelOverlay.Copy (*pAttrArray, pAttrArray->GetCount ());
+	if (attrArray)
+		m_selOverlay.copy (*attrArray, attrArray->getCount ());
 	else
-		m_SelOverlay.Clear ();
+		m_selOverlay.clear ();
 
-	m_SelOverlay.SetAttr (SelStart, SelEnd, m_SelAttr, -1);
-	return PaintHyperBinText (pCodec, &m_SelOverlay, p, Size);
+	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
+	return paintHyperBinText (codec, &m_selOverlay, p, size);
 }
 
 //.............................................................................

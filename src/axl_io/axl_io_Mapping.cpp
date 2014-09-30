@@ -9,135 +9,135 @@ namespace io {
 //.............................................................................
 
 void*
-CMapping::Open (
-	CFile* pFile,
-	uint64_t Offset,
-	size_t Size,
-	uint_t Flags
+CMapping::open (
+	CFile* file,
+	uint64_t offset,
+	size_t size,
+	uint_t flags
 	)
 {
-	Close ();
+	close ();
 
-	if (Size == -1)
-		Size = (size_t) (pFile->GetSize () - Offset);
+	if (size == -1)
+		size = (size_t) (file->getSize () - offset);
 
-	g::TSystemInfo* pSystemInfo = g::GetModule ()->GetSystemInfo ();
-	uint64_t ViewBegin = Offset - Offset % pSystemInfo->m_MappingAlignFactor;
+	g::TSystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
 
 	void* p;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t Protection = (Flags & EFileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
-	uint_t Access = (Flags & EFileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
+	uint_t protection = (flags & EFileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
+	uint_t access = (flags & EFileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
-	bool Result = m_Mapping.Create (pFile->m_File, NULL, Protection, Offset + Size);
-	if (!Result)
+	bool result = m_mapping.create (file->m_file, NULL, protection, offset + size);
+	if (!result)
 		return NULL;
 
-	p = m_View.View (m_Mapping, Access, Offset, Size);
+	p = m_view.view (m_mapping, access, offset, size);
 	if (!p)
 	{
-		m_Mapping.Close ();
+		m_mapping.close ();
 		return NULL;
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int Protection = (Flags & EFileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
+	int protection = (flags & EFileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
-	p = m_Mapping.Map (NULL, Size, Protection, MAP_SHARED, pFile->m_File, Offset);
+	p = m_mapping.map (NULL, size, protection, MAP_SHARED, file->m_file, offset);
 	if (!p)
 		return NULL;
 #endif
 
-	m_p = (char*) p + Offset - ViewBegin;
-	m_Size = Size;
+	m_p = (char*) p + offset - viewBegin;
+	m_size = size;
 	return m_p;
 }
 
 void*
-CMapping::Open (
-	const char* pName,
-	size_t Size,
-	uint_t Flags
+CMapping::open (
+	const char* name,
+	size_t size,
+	uint_t flags
 	)
 {
-	ASSERT (Size != 0 && Size != -1);
+	ASSERT (size != 0 && size != -1);
 
-	Close ();
+	close ();
 
 	void* p;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t Protection = (Flags & EFileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
-	uint_t Access = (Flags & EFileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
+	uint_t protection = (flags & EFileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
+	uint_t access = (flags & EFileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
-	rtl::CString_utf16 Name = pName;
+	rtl::CString_w name_w = name;
 
-	bool Result = (Flags & EFileFlag_OpenExisting) ?
-		m_Mapping.Open (Access, false, Name):
-		m_Mapping.Create (INVALID_HANDLE_VALUE, NULL, Protection, Size, Name);
+	bool result = (flags & EFileFlag_OpenExisting) ?
+		m_mapping.open (access, false, name_w):
+		m_mapping.create (INVALID_HANDLE_VALUE, NULL, protection, size, name_w);
 
-	if (!Result)
+	if (!result)
 		return NULL;
 
-	p = m_View.View (m_Mapping, Access, 0, Size);
+	p = m_view.view (m_mapping, access, 0, size);
 	if (!p)
 	{
-		m_Mapping.Close ();
+		m_mapping.close ();
 		return NULL;
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int ShmFlags = (Flags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
-	int Protection = (Flags & EFileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
+	int shmFlags = (flags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
+	int protection = (flags & EFileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
-	if (!(Flags & EFileFlag_OpenExisting))
+	if (!(flags & EFileFlag_OpenExisting))
 	{
-		ShmFlags |= O_CREAT;
-		m_SharedMemoryName = pName;
+		shmFlags |= O_CREAT;
+		m_sharedMemoryName = name;
 	}
 
-	bool Result = m_SharedMemory.Open (pName, ShmFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-	if (!Result)
+	bool result = m_sharedMemory.open (name, shmFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	if (!result)
 		return NULL;
 
-	p = m_Mapping.Map (NULL, Size, Protection, MAP_SHARED, m_SharedMemory, 0);
+	p = m_mapping.map (NULL, size, protection, MAP_SHARED, m_sharedMemory, 0);
 	if (!p)
 	{
-		m_SharedMemory.Close ();
-		psx::CSharedMemory::Unlink (pName);
+		m_sharedMemory.close ();
+		psx::CSharedMemory::unlink (name);
 		return NULL;
 	}
 
-	if (!(Flags & EFileFlag_OpenExisting))
-		m_SharedMemoryName = pName;
+	if (!(flags & EFileFlag_OpenExisting))
+		m_sharedMemoryName = name;
 #endif
 
 	m_p = p;
-	m_Size = Size;
+	m_size = size;
 	return m_p;
 }
 
 void
-CMapping::Close ()
+CMapping::close ()
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	m_Mapping.Close ();
-	m_View.Close ();
+	m_mapping.close ();
+	m_view.close ();
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	m_SharedMemory.Close ();
-	m_Mapping.Close ();
+	m_sharedMemory.close ();
+	m_mapping.close ();
 
-	if (!m_SharedMemoryName.IsEmpty())
+	if (!m_sharedMemoryName.isEmpty())
 	{
-		psx::CSharedMemory::Unlink (m_SharedMemoryName);
-		m_SharedMemoryName.Clear ();
+		psx::CSharedMemory::unlink (m_sharedMemoryName);
+		m_sharedMemoryName.clear ();
 	}
 #endif
 
 	m_p = NULL;
-	m_Size = 0;
+	m_size = 0;
 }
 
 //.............................................................................

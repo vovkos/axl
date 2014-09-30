@@ -30,58 +30,58 @@ struct TGuid
 	{
 		struct
 		{
-			uint32_t m_Data1;
-			uint16_t m_Data2;
-			uint16_t m_Data3;
-			uint8_t m_Data4 [8];
+			uint32_t m_data1;
+			uint16_t m_data2;
+			uint16_t m_data3;
+			uint8_t m_data4 [8];
 		};
 
 		struct
 		{
-			uint32_t m_Long1;
-			uint32_t m_Long2;
-			uint32_t m_Long3;
-			uint32_t m_Long4;
+			uint32_t m_long1;
+			uint32_t m_long2;
+			uint32_t m_long3;
+			uint32_t m_long4;
 		};
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-		GUID m_Guid;
+		GUID m_guid;
 #endif
 	};
 
 	bool
-	operator == (const TGuid& Guid) const
+	operator == (const TGuid& guid) const
 	{
-		return IsEqual (Guid);
+		return isEqual (guid);
 	}
 
 	bool
-	operator != (const TGuid& Guid) const
+	operator != (const TGuid& guid) const
 	{
-		return !IsEqual (Guid);
+		return !isEqual (guid);
 	}
 
 	int
-	Cmp (const TGuid& Guid) const
+	cmp (const TGuid& guid) const
 	{
-		return memcmp (this, &Guid, sizeof (TGuid));
+		return memcmp (this, &guid, sizeof (TGuid));
 	}
 
 	bool
-	IsEqual (const TGuid& Guid) const
+	isEqual (const TGuid& guid) const
 	{
 		return
-			m_Long1 == Guid.m_Long1 &&
-			m_Long2 == Guid.m_Long2 &&
-			m_Long3 == Guid.m_Long3 &&
-			m_Long4 == Guid.m_Long4;
+			m_long1 == guid.m_long1 &&
+			m_long2 == guid.m_long2 &&
+			m_long3 == guid.m_long3 &&
+			m_long4 == guid.m_long4;
 	}
 
 	rtl::CString
-	GetGuidString (uint_t Flags = 0) const;
+	getGuidString (uint_t flags = 0) const;
 
 	void
-	Setup (
+	setup (
 		uint32_t l,
 		uint16_t s1,
 		uint16_t s2,
@@ -95,31 +95,31 @@ struct TGuid
 		uint8_t b8
 		)
 	{
-		m_Data1 = l;
-		m_Data2 = s1;
-		m_Data3 = s2;
-		m_Data4 [0] = b1;
-		m_Data4 [1] = b2;
-		m_Data4 [2] = b3;
-		m_Data4 [3] = b4;
-		m_Data4 [4] = b5;
-		m_Data4 [5] = b6;
-		m_Data4 [6] = b7;
-		m_Data4 [7] = b8;
+		m_data1 = l;
+		m_data2 = s1;
+		m_data3 = s2;
+		m_data4 [0] = b1;
+		m_data4 [1] = b2;
+		m_data4 [2] = b3;
+		m_data4 [3] = b4;
+		m_data4 [4] = b5;
+		m_data4 [5] = b6;
+		m_data4 [6] = b7;
+		m_data4 [7] = b8;
 	}
 
 	bool
-	Parse (const char* pString);
+	parse (const char* string);
 
 	bool
-	Generate ();
+	generate ();
 };
 
 //.............................................................................
 
 inline
 TGuid
-BuildGuid (
+buildGuid (
 	uint32_t l,
 	uint16_t s1,
 	uint16_t s2,
@@ -133,27 +133,27 @@ BuildGuid (
 	uint8_t b8
 	)
 {
-	TGuid Guid;
-	Guid.Setup (l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8);
-	return Guid;
+	TGuid guid;
+	guid.setup (l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8);
+	return guid;
 }
 
 inline
 TGuid
-ParseGuid (const char* pString)
+parseGuid (const char* string)
 {
-	TGuid Guid;
-	Guid.Parse (pString);
-	return Guid;
+	TGuid guid;
+	guid.parse (string);
+	return guid;
 }
 
 inline
 TGuid
-GenerateGuid ()
+generateGuid ()
 {
-	TGuid Guid;
-	Guid.Generate ();
-	return Guid;
+	TGuid guid;
+	guid.generate ();
+	return guid;
 }
 
 //.............................................................................

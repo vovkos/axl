@@ -27,23 +27,23 @@ class CHexEncoding
 public:
 	static 
 	char
-	GetHexChar_l (uchar_t x)
+	getHexChar_l (uchar_t x)
 	{
-		static char CharTable [] = "0123456789abcdef";
-		return CharTable [x & 0xf];
+		static char charTable [] = "0123456789abcdef";
+		return charTable [x & 0xf];
 	}
 
 	static 
 	char
-	GetHexChar_u (uchar_t x)
+	getHexChar_u (uchar_t x)
 	{
-		static char CharTable [] = "0123456789ABCDEF";	
-		return CharTable [x & 0xf];
+		static char charTable [] = "0123456789ABCDEF";	
+		return charTable [x & 0xf];
 	}
 
 	static 
 	uchar_t
-	GetHexCharValue (char x)
+	getHexCharValue (char x)
 	{
 		return 
 			x >= '0' && x <= '9' ? x - '0' :
@@ -53,94 +53,94 @@ public:
 
 	static
 	size_t
-	Encode (
-		CString* pString,
+	encode (
+		CString* string,
 		const void* p, 
-		size_t Size,
-		uint_t Flags = 0
+		size_t size,
+		uint_t flags = 0
 		);
 
 	static
 	CString
-	Encode (
+	encode (
 		const void* p, 
-		size_t Size,
-		uint_t Flags = 0
+		size_t size,
+		uint_t flags = 0
 		)
 	{
-		CString String;
-		Encode (&String, p, Size, Flags);
-		return String;
+		CString string;
+		encode (&string, p, size, flags);
+		return string;
 	}
 
 	static
 	size_t
-	Decode (
-		CArrayT <uchar_t>* pBuffer,
+	decode (
+		CArrayT <uchar_t>* buffer,
 		const char* p, 
-		size_t Length = -1
+		size_t length = -1
 		);
 
 	static
 	CArrayT <uchar_t>
-	Decode (
+	decode (
 		const char* p, 
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
-		CArrayT <uchar_t> Buffer;
-		Decode (&Buffer, p, Length);
-		return Buffer;
+		CArrayT <uchar_t> buffer;
+		decode (&buffer, p, length);
+		return buffer;
 	}
 
 	static
 	size_t
-	Decode (
-		CArrayT <uchar_t>* pBuffer,
-		const CString& String
+	decode (
+		CArrayT <uchar_t>* buffer,
+		const CString& string
 		)
 	{
-		return Decode (pBuffer, String, String.GetLength ());
+		return decode (buffer, string, string.getLength ());
 	}
 
 	static
 	CArrayT <uchar_t>
-	Decode (const CString& String)
+	decode (const CString& string)
 	{
-		return Decode (String, String.GetLength ());
+		return decode (string, string.getLength ());
 	}
 
 protected:
 	static
 	void
-	Encode_l (
-		char* pDst,
-		const uchar_t* pSrc, 
-		const uchar_t* pSrcEnd
+	encode_l (
+		char* dst,
+		const uchar_t* src, 
+		const uchar_t* srcEnd
 		);
 
 	static
 	void
-	Encode_u (
-		char* pDst,
-		const uchar_t* pSrc, 
-		const uchar_t* pSrcEnd
+	encode_u (
+		char* dst,
+		const uchar_t* src, 
+		const uchar_t* srcEnd
 		);
 
 	static
 	void
-	Encode_nsl (
-		char* pDst,
-		const uchar_t* pSrc, 
-		const uchar_t* pSrcEnd
+	encode_nsl (
+		char* dst,
+		const uchar_t* src, 
+		const uchar_t* srcEnd
 		);
 
 	static
 	void
-	Encode_nsu (
-		char* pDst,
-		const uchar_t* pSrc, 
-		const uchar_t* pSrcEnd
+	encode_nsu (
+		char* dst,
+		const uchar_t* src, 
+		const uchar_t* srcEnd
 		);
 };
 

@@ -33,13 +33,13 @@ class CNtErrorProvider: public CErrorProvider
 public:
 	static
 	rtl::CString 
-	GetErrorDescription (NTSTATUS Status);
+	getErrorDescription (NTSTATUS status);
 
 	virtual 
 	rtl::CString 
-	GetErrorDescription (const TError* pError)
+	getErrorDescription (const TError* error)
 	{
-		return GetErrorDescription (pError->m_Code);
+		return getErrorDescription (error->m_code);
 	}
 };
 
@@ -52,22 +52,22 @@ public:
 	{
 	}
 
-	CNtError (NTSTATUS Status)
+	CNtError (NTSTATUS status)
 	{
-		Create (Status);
+		create (status);
 	}
 
 	TError* 
-	Create (NTSTATUS Status);
+	create (NTSTATUS status);
 };
 
 //.............................................................................
 
 inline
 CError
-SetNtError (NTSTATUS Status)
+setNtError (NTSTATUS status)
 {
-	SetError (CNtError (Status));
+	setError (CNtError (status));
 }
 
 //.............................................................................

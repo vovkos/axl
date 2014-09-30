@@ -23,16 +23,16 @@ public:
 	{
 	public:
 		rtl::TListLink* 
-		operator () (T* pEntry)
+		operator () (T* entry)
 		{
-			return &pEntry->m_BucketLink;
+			return &entry->m_bucketLink;
 		}
 	};
 
 	typedef rtl::CAuxListT <T, CBucketLink> CBucket;
 
-	rtl::TListLink m_BucketLink;
-	CBucket* m_pBucket;
+	rtl::TListLink m_bucketLink;
+	CBucket* m_bucket;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -41,7 +41,7 @@ template <typename TKey>
 class CHashTableEntryT: public CHashTableEntryBaseT <CHashTableEntryT <TKey> >
 {
 public:
-	TKey m_Key;
+	TKey m_key;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,8 +53,8 @@ template <
 class CHashTableMapEntryT: public CHashTableEntryBaseT <CHashTableMapEntryT <TKey, TValue> >
 {
 public:
-	TKey m_Key;
-	TValue m_Value;
+	TKey m_key;
+	TValue m_value;
 };
 
 //.............................................................................
@@ -86,9 +86,9 @@ public:
 	{ 
 	}
 
-	CHashTableIteratorT (const CIteratorT <CHashTableEntryT <TKey> >& Src)
+	CHashTableIteratorT (const CIteratorT <CHashTableEntryT <TKey> >& src)
 	{ 
-		this->m_p = Src.GetLink (); // thanks a lot gcc
+		this->m_p = src.getLink (); // thanks a lot gcc
 	}
 
 	CHashTableIteratorT (CEntry* p)
@@ -112,9 +112,9 @@ public:
 	{ 
 	}
 
-	CHashTableMapIteratorT (const CIteratorT <CHashTableMapEntryT <TKey, TValue> >& Src)
+	CHashTableMapIteratorT (const CIteratorT <CHashTableMapEntryT <TKey, TValue> >& src)
 	{ 
-		this->m_p = Src.GetLink ();
+		this->m_p = src.getLink ();
 	}
 
 	CHashTableMapIteratorT (CEntry* p)
@@ -149,172 +149,172 @@ public:
 	typedef rtl::CIteratorT <CEntry> CIterator;
 	
 protected:
-	rtl::CStdListT <CEntry> m_List;
-	rtl::CArrayT <CBucket> m_Table;
-	size_t m_ResizeThreshold;
+	rtl::CStdListT <CEntry> m_list;
+	rtl::CArrayT <CBucket> m_table;
+	size_t m_resizeThreshold;
 
 public:
 	CHashTableT ()
 	{
-		m_ResizeThreshold = EDef_ResizeThreshold;
+		m_resizeThreshold = EDef_ResizeThreshold;
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{
-		m_Table.Clear ();
-		m_List.Clear ();
+		m_table.clear ();
+		m_list.clear ();
 	}
 
 	bool 
-	IsEmpty () const
+	isEmpty () const
 	{ 
-		return m_List.IsEmpty (); 
+		return m_list.isEmpty (); 
 	}
 
 	CIterator 
-	GetHead () const
+	getHead () const
 	{ 
-		return m_List.GetHead (); 
+		return m_list.getHead (); 
 	}	
 
 	CIterator 
-	GetTail () const
+	getTail () const
 	{ 
-		return m_List.GetHead (); 
+		return m_list.getHead (); 
 	}	
 
 	size_t 
-	GetCount () const
+	getCount () const
 	{ 
-		return m_List.GetCount (); 
+		return m_list.getCount (); 
 	}	
 
 	size_t 
-	GetBucketCount () const
+	getBucketCount () const
 	{ 
-		return m_Table.GetCount (); 
+		return m_table.getCount (); 
 	}
 
 	bool 
-	SetBucketCount (size_t BucketCount)
+	setBucketCount (size_t bucketCount)
 	{
-		rtl::CArrayT <CBucket> NewTable;
-		bool Result = NewTable.SetCount (BucketCount);
-		if (!Result)
+		rtl::CArrayT <CBucket> newTable;
+		bool result = newTable.setCount (bucketCount);
+		if (!result)
 			return false;
 
-		size_t OldBucketCount = m_Table.GetCount ();
-		for (size_t i = 0; i < OldBucketCount; i++)
+		size_t oldBucketCount = m_table.getCount ();
+		for (size_t i = 0; i < oldBucketCount; i++)
 		{
-			CBucket* pOldBucket = &m_Table [i];
-			while (!pOldBucket->IsEmpty ())
+			CBucket* oldBucket = &m_table [i];
+			while (!oldBucket->isEmpty ())
 			{
-				CEntry* pEntry = pOldBucket->RemoveHead ();
-				size_t Hash = CHash () (pEntry->m_Key);
+				CEntry* entry = oldBucket->removeHead ();
+				size_t hash = CHash () (entry->m_key);
 				
-				CBucket* pNewBucket = &NewTable [Hash % BucketCount];
-				pEntry->m_pBucket = pNewBucket;
-				pNewBucket->InsertTail (pEntry);
+				CBucket* newBucket = &newTable [hash % bucketCount];
+				entry->m_bucket = newBucket;
+				newBucket->insertTail (entry);
 			}
 		}
 
-		m_Table = NewTable;
+		m_table = newTable;
 		return true;
 	}
 
 	size_t 
-	GetResizeThreshold () const
+	getResizeThreshold () const
 	{ 
-		return m_ResizeThreshold; 
+		return m_resizeThreshold; 
 	}	
 
 	void 
-	SetResizeThreshold (size_t ResizeThreshold)
+	setResizeThreshold (size_t resizeThreshold)
 	{ 
-		m_ResizeThreshold = ResizeThreshold; 
+		m_resizeThreshold = resizeThreshold; 
 	}
 
 	CIterator 
-	Find (const CKey& Key) const
+	find (const CKey& key) const
 	{ 
-		size_t BucketCount = m_Table.GetCount ();
-		if (!BucketCount)
+		size_t bucketCount = m_table.getCount ();
+		if (!bucketCount)
 			return NULL;
 
-		size_t Hash = CHash () (Key);	
-		const CBucket* pBucket = &m_Table [Hash % BucketCount];
+		size_t hash = CHash () (key);	
+		const CBucket* bucket = &m_table [hash % bucketCount];
 
-		typename CBucket::CIterator It = pBucket->GetHead ();
-		for (; It; It++)
+		typename CBucket::CIterator it = bucket->getHead ();
+		for (; it; it++)
 		{
-			int Cmp = CCmp () (Key, It->m_Key);
-			if (Cmp == 0)
-				return It;
+			int cmp = CCmp () (key, it->m_key);
+			if (cmp == 0)
+				return it;
 		}
 
 		return NULL;
 	}
 
 	CIterator
-	Goto (const CKey& Key)
+	visit (const CKey& key)
 	{ 
-		size_t BucketCount = m_Table.GetCount ();
-		if (!BucketCount)
+		size_t bucketCount = m_table.getCount ();
+		if (!bucketCount)
 		{
-			BucketCount = EDef_InitialBucketCount;
+			bucketCount = EDef_InitialBucketCount;
 			
-			bool Result = m_Table.SetCount (BucketCount);
-			if (!Result)
+			bool result = m_table.setCount (bucketCount);
+			if (!result)
 				return NULL;
 		}
 
-		size_t Hash = CHash () (Key);
-		CBucket* pBucket = &m_Table [Hash % BucketCount];
+		size_t hash = CHash () (key);
+		CBucket* bucket = &m_table [hash % bucketCount];
 
-		typename CBucket::CIterator It = pBucket->GetHead ();
-		for (; It; It++)
+		typename CBucket::CIterator it = bucket->getHead ();
+		for (; it; it++)
 		{
-			int Cmp = CCmp () (Key, It->m_Key);
-			if (Cmp == 0)
-				return It;
+			int cmp = CCmp () (key, it->m_key);
+			if (cmp == 0)
+				return it;
 		}
 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		pEntry->m_Key = Key;
-		pEntry->m_pBucket = pBucket;
-		m_List.InsertTail (pEntry);
-		pBucket->InsertTail (pEntry);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		entry->m_key = key;
+		entry->m_bucket = bucket;
+		m_list.insertTail (entry);
+		bucket->insertTail (entry);
 
 	#if (_AXL_PTR_BITNESS == 64)
-		size_t LoadFactor = GetCount () * 100 / BucketCount;
+		size_t loadFactor = getCount () * 100 / bucketCount;
 	#else
-		size_t LoadFactor = (size_t) ((uint64_t) GetCount () * 100 / BucketCount);
+		size_t loadFactor = (size_t) ((uint64_t) getCount () * 100 / bucketCount);
 	#endif
 
-		if (LoadFactor > m_ResizeThreshold)
-			SetBucketCount (BucketCount * 2);
+		if (loadFactor > m_resizeThreshold)
+			setBucketCount (bucketCount * 2);
 
-		return pEntry;
+		return entry;
 	}
 
 	void 
-	Delete (CIterator It)
+	erase (CIterator it)
 	{
-		CEntry* pEntry = *It;
-		pEntry->m_pBucket->Remove (pEntry);
-		m_List.Remove (pEntry);
-		AXL_MEM_DELETE (pEntry);
+		CEntry* entry = *it;
+		entry->m_bucket->remove (entry);
+		m_list.remove (entry);
+		AXL_MEM_DELETE (entry);
 	}
 
 	bool 
-	DeleteByKey (const CKey& Key)
+	eraseByKey (const CKey& key)
 	{ 
-		CIterator It = Find (Key);
-		if (!It)
+		CIterator it = find (key);
+		if (!it)
 			return false;
 
-		Delete (It);
+		erase (it);
 		return true; 
 	}
 };
@@ -336,30 +336,30 @@ class CHashTableMapT: public CHashTableT <
 {
 public:
 	TValue& 
-	operator [] (const TKey& Key)
+	operator [] (const TKey& key)
 	{
-		return this->Goto (Key)->m_Value;
+		return this->visit (key)->m_value;
 	}
 };
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP(Class, TKey, TValue, THash, TCmp) \
-class Class \
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP(class, TKey, TValue, THash, TCmp) \
+class class \
 { \
 public: \
 	typedef axl::rtl::CHashTableMapT <TKey, TValue, THash, TCmp> CMapBase; \
 	typedef CMapBase::CIterator CIterator; \
 	static \
 	CIterator \
-	Find (TKey Key) \
+	find (TKey key) \
 	{ \
-		return axl::rtl::GetSingleton <CMap> ()->Find (Key); \
+		return axl::rtl::getSingleton <CMap> ()->find (key); \
 	} \
 	CIterator \
-	operator () (TKey Key) \
+	operator () (TKey key) \
 	{ \
-		return Find (Key); \
+		return find (key); \
 	} \
 protected: \
 	class CMap: public CMapBase \
@@ -368,8 +368,8 @@ protected: \
 		CMap () \
 		{
 
-#define AXL_RTL_HASH_TABLE_MAP_ENTRY(Key, Value) \
-			Goto (Key)->m_Value = Value;
+#define AXL_RTL_HASH_TABLE_MAP_ENTRY(key, value) \
+			visit (key)->m_value = value;
 
 #define AXL_RTL_END_HASH_TABLE_MAP() \
 		} \
@@ -378,15 +378,15 @@ protected: \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT(Class, TValue) \
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, int, TValue)
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT(class, TValue) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(class, int, TValue)
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_CHAR(Class, TValue) \
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, char, TValue)
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_CHAR(class, TValue) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(class, char, TValue)
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, TKey, TValue) \
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(class, TKey, TValue) \
 	AXL_RTL_BEGIN_HASH_TABLE_MAP ( \
-		Class, \
+		class, \
 		TKey, \
 		TValue, \
 		axl::rtl::CHashIdT <TKey>, \

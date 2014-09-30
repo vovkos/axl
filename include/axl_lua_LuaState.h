@@ -20,9 +20,9 @@ class CLuaClose
 {
 public:
 	void 
-	operator () (lua_State* pLua)
+	operator () (lua_State* lua)
 	{
-		lua_close (pLua);
+		lua_close (lua);
 	}
 };
 
@@ -33,438 +33,438 @@ class CLuaState: public rtl::CHandleT <lua_State*, CLuaClose>
 public:
 	CLuaState ()
 	{
-		Create ();
+		create ();
 	}
 
-	CLuaState (lua_State* pLuaState)
+	CLuaState (lua_State* h)
 	{
-		Attach (pLuaState);
+		attach (h);
 	}
 
 	bool
-	Create ();
+	create ();
 
 	bool
-	Load (
-		const char* pName,
-		const char* pSource,
-		size_t Length = -1
+	load (
+		const char* name,
+		const char* source,
+		size_t length = -1
 		);
 
 #ifdef _DEBUG
 	void
-	Trace ();
+	trace ();
 #endif
 
 	void 
-	ClearStack ()
+	clearStack ()
 	{
-		ASSERT (IsOpen ());
+		ASSERT (isOpen ());
 		lua_settop (m_h, 0);
 	}
 
 	int 
-	GetTop ()
+	getTop ()
 	{
-		ASSERT (IsOpen ());
+		ASSERT (isOpen ());
 		return lua_gettop (m_h);
 	}
 
 	int 
-	GetType (int Index)
+	getType (int index)
 	{
-		ASSERT (IsOpen ());
-		return lua_type (m_h, Index);
+		ASSERT (isOpen ());
+		return lua_type (m_h, index);
 	}
 
 	const char*
-	GetTypeName (int Type)
+	getTypeName (int type)
 	{
-		ASSERT (IsOpen ());
-		return lua_typename (m_h, Type);
+		ASSERT (isOpen ());
+		return lua_typename (m_h, type);
 	}
 
 	void 
-	Insert (int Index)
+	insert (int index)
 	{
-		ASSERT (IsOpen ());
-		lua_insert (m_h, Index);
+		ASSERT (isOpen ());
+		lua_insert (m_h, index);
 	}
 
 	void 
-	Remove (int Index)
+	remove (int index)
 	{
-		ASSERT (IsOpen ());
-		lua_remove (m_h, Index);
+		ASSERT (isOpen ());
+		lua_remove (m_h, index);
 	}
 
 	void 
-	Swap ()
+	swap ()
 	{
-		Insert (-2);
+		insert (-2);
 	}
 
 	void
-	PushNil ()
+	pushNil ()
 	{
-		ASSERT (IsOpen ());
+		ASSERT (isOpen ());
 		lua_pushnil (m_h);
 	}
 
 	void
-	PushInteger (lua_Integer Value)
+	pushInteger (lua_Integer value)
 	{
-		ASSERT (IsOpen ());
-		lua_pushinteger (m_h, Value);
+		ASSERT (isOpen ());
+		lua_pushinteger (m_h, value);
 	}
 
 	void
-	PushBoolean (bool Value)
+	pushBoolean (bool value)
 	{
-		ASSERT (IsOpen ());
-		lua_pushboolean (m_h, Value);
+		ASSERT (isOpen ());
+		lua_pushboolean (m_h, value);
 	}
 
 	void
-	PushString (
-		const char* pString,
-		size_t Length = -1
+	pushString (
+		const char* string,
+		size_t length = -1
 		)
 	{
-		ASSERT (IsOpen ());
+		ASSERT (isOpen ());
 
-		if (!pString)
-			pString = "";
+		if (!string)
+			string = "";
 
-		if (Length != -1)
-			lua_pushlstring (m_h, pString, Length);
+		if (length != -1)
+			lua_pushlstring (m_h, string, length);
 		else
-			lua_pushstring (m_h, pString);
+			lua_pushstring (m_h, string);
 	}
 
 	void
-	PushClosure (
+	pushClosure (
 		lua_CFunction pf,
-		size_t ContextArgumentCount
+		size_t contextArgumentCount
 		)
 	{
-		ASSERT (IsOpen ());
-		lua_pushcclosure (m_h, pf, ContextArgumentCount);
+		ASSERT (isOpen ());
+		lua_pushcclosure (m_h, pf, contextArgumentCount);
 	}	
 
 	void
-	PushFunction (lua_CFunction pf)
+	pushFunction (lua_CFunction pf)
 	{
-		ASSERT (IsOpen ());
+		ASSERT (isOpen ());
 		lua_pushcfunction (m_h, pf);
 	}	
 
 	void
-	PushFunction (
+	pushFunction (
 		lua_CFunction pf,
-		intptr_t Context
+		intptr_t context
 		)
 	{
-		PushInteger (Context);
-		PushClosure (pf, 1);
+		pushInteger (context);
+		pushClosure (pf, 1);
 	}
 
 	void
-	CreateTable (
-		size_t ElementCount = 0,
-		size_t MemberCount = 0
+	createTable (
+		size_t elementCount = 0,
+		size_t memberCount = 0
 		)
 	{
-		ASSERT (IsOpen ());
-		lua_createtable (m_h, ElementCount, MemberCount);
+		ASSERT (isOpen ());
+		lua_createtable (m_h, elementCount, memberCount);
 	}
 
 	void
-	GetTable (int Index = -2)
+	getTable (int index = -2)
 	{
-		ASSERT (IsOpen ());
-		lua_gettable (m_h, Index);
+		ASSERT (isOpen ());
+		lua_gettable (m_h, index);
 	}
 
 	void
-	SetTable (int Index = -3)
+	setTable (int index = -3)
 	{
-		ASSERT (IsOpen ());
-		lua_settable (m_h, Index);
+		ASSERT (isOpen ());
+		lua_settable (m_h, index);
 	}
 
 	void
-	GetMember (const char* pName)
+	getMember (const char* name)
 	{
-		PushString (pName);
-		GetTable ();
+		pushString (name);
+		getTable ();
 	}
 
 	void
-	SetMember (const char* pName)
+	setMember (const char* name)
 	{
-		PushString (pName);
-		Swap ();
-		SetTable ();
+		pushString (name);
+		swap ();
+		setTable ();
 	}
 
 	void
-	GetArrayElement (int Index)
+	getArrayElement (int index)
 	{
-		PushInteger (Index);
-		GetTable ();
+		pushInteger (index);
+		getTable ();
 	}
 
 	void
-	SetArrayElement (int Index)
+	setArrayElement (int index)
 	{
-		PushInteger (Index);
-		Swap ();
-		SetTable ();
+		pushInteger (index);
+		swap ();
+		setTable ();
 	}
 
 	void
-	SetMemberInteger (
-		const char* pName,
-		lua_Integer Value
+	setMemberInteger (
+		const char* name,
+		lua_Integer value
 		)
 	{
-		PushString (pName);
-		PushInteger (Value);
-		SetTable ();
+		pushString (name);
+		pushInteger (value);
+		setTable ();
 	}
 
 	void
-	SetMemberBoolean (
-		const char* pName,
-		bool Value
+	setMemberBoolean (
+		const char* name,
+		bool value
 		)
 	{
-		PushString (pName);
-		PushBoolean (Value);
-		SetTable ();
+		pushString (name);
+		pushBoolean (value);
+		setTable ();
 	}
 
 	void
-	SetMemberString (
-		const char* pName,
-		const char* pString,
-		size_t Length = -1
+	setMemberString (
+		const char* name,
+		const char* string,
+		size_t length = -1
 		)
 	{
-		PushString (pName);
-		PushString (pString, Length);
-		SetTable ();
+		pushString (name);
+		pushString (string, length);
+		setTable ();
 	}
 
 	void
-	SetArrayElementInteger (
-		int Index,
-		lua_Integer Value
+	setArrayElementInteger (
+		int index,
+		lua_Integer value
 		)
 	{
-		PushInteger (Index);
-		PushInteger (Value);
-		SetTable ();
+		pushInteger (index);
+		pushInteger (value);
+		setTable ();
 	}
 
 	void
-	SetArrayElementString (
-		int Index,
-		const char* pString,
-		size_t Length = -1
+	setArrayElementString (
+		int index,
+		const char* string,
+		size_t length = -1
 		)
 	{
-		PushInteger (Index);
-		PushString (pString, Length);
-		SetTable ();
+		pushInteger (index);
+		pushString (string, length);
+		setTable ();
 	}
 
 	void
-	Pop (size_t Count = 1)
+	pop (size_t count = 1)
 	{
-		ASSERT (IsOpen ());
-		lua_pop (m_h, Count);
+		ASSERT (isOpen ());
+		lua_pop (m_h, count);
 	}
 
 	lua_Integer
-	GetInteger (int Index = -1)
+	getInteger (int index = -1)
 	{
-		ASSERT (IsOpen ());
-		return lua_tointeger (m_h, Index);
+		ASSERT (isOpen ());
+		return lua_tointeger (m_h, index);
 	}
 
 	lua_Number
-	GetNumber (int Index = -1)
+	getNumber (int index = -1)
 	{
-		ASSERT (IsOpen ());
-		return lua_tonumber (m_h, Index);
+		ASSERT (isOpen ());
+		return lua_tonumber (m_h, index);
 	}
 
 	bool
-	GetBoolean (int Index = -1)
+	getBoolean (int index = -1)
 	{
-		ASSERT (IsOpen ());
-		return lua_toboolean (m_h, Index) != 0;
+		ASSERT (isOpen ());
+		return lua_toboolean (m_h, index) != 0;
 	}
 
 	const char*
-	GetString (int Index = -1)
+	getString (int index = -1)
 	{
-		ASSERT (IsOpen ());
-		return lua_tostring (m_h, Index);
+		ASSERT (isOpen ());
+		return lua_tostring (m_h, index);
 	}
 
 	lua_Integer
-	PopInteger ()
+	popInteger ()
 	{
-		lua_Integer Value = GetInteger (-1);
-		Pop ();
-		return Value;
+		lua_Integer value = getInteger (-1);
+		pop ();
+		return value;
 	}
 
 	bool
-	PopBoolean ()
+	popBoolean ()
 	{
-		bool Value = GetBoolean (-1);
-		Pop ();
-		return Value;
+		bool value = getBoolean (-1);
+		pop ();
+		return value;
 	}
 
 	rtl::CString
-	PopString ()
+	popString ()
 	{
-		rtl::CString String = GetString (-1);
-		Pop ();
-		return String;
+		rtl::CString string = getString (-1);
+		pop ();
+		return string;
 	}
 
 	void
-	GetGlobal (const char* pName)
+	getGlobal (const char* name)
 	{
-		ASSERT (IsOpen ());
-		lua_getglobal (m_h, pName);
+		ASSERT (isOpen ());
+		lua_getglobal (m_h, name);
 	}
 
 	void
-	SetGlobal (const char* pName)
+	setGlobal (const char* name)
 	{
-		ASSERT (IsOpen ());
-		lua_setglobal (m_h, pName);
+		ASSERT (isOpen ());
+		lua_setglobal (m_h, name);
 	}
 
 	void
-	GetGlobalArrayElement (
-		const char* pName,
-		int Index
+	getGlobalArrayElement (
+		const char* name,
+		int index
 		)
 	{
-		GetGlobal (pName);
-		GetArrayElement (Index);
-		Remove (-2);
+		getGlobal (name);
+		getArrayElement (index);
+		remove (-2);
 	}
 
 	void
-	GetGlobalMember (
-		const char* pName,
-		const char* pMember
+	getGlobalMember (
+		const char* name,
+		const char* member
 		)
 	{
-		GetGlobal (pName);
-		GetMember (pMember);
-		Remove (-2);
+		getGlobal (name);
+		getMember (member);
+		remove (-2);
 	}
 
 
 	void
-	SetGlobalInteger (
-		const char* pName,
-		lua_Integer Value
+	setGlobalInteger (
+		const char* name,
+		lua_Integer value
 		)
 	{
-		PushInteger (Value);
-		SetGlobal (pName);
+		pushInteger (value);
+		setGlobal (name);
 	}
 
 	void
-	SetGlobalBoolean (
-		const char* pName,
-		bool Value
+	setGlobalBoolean (
+		const char* name,
+		bool value
 		)
 	{
-		PushBoolean (Value);
-		SetGlobal (pName);
+		pushBoolean (value);
+		setGlobal (name);
 	}
 
 	void
-	SetGlobalString (
-		const char* pName,
-		const char* pString,
-		size_t Length = -1
+	setGlobalString (
+		const char* name,
+		const char* string,
+		size_t length = -1
 		)
 	{
-		PushString (pString, Length);
-		SetGlobal (pName);
+		pushString (string, length);
+		setGlobal (name);
 	}
 
 	void
-	RegisterFunction (
-		const char* pName,
+	registerFunction (
+		const char* name,
 		lua_CFunction pf
 		)
 	{
-		PushFunction (pf);
-		SetGlobal (pName);
+		pushFunction (pf);
+		setGlobal (name);
 	}
 
 	void
-	RegisterFunction (
-		const char* pName,
+	registerFunction (
+		const char* name,
 		lua_CFunction pf,
-		intptr_t Context
+		intptr_t context
 		)
 	{
-		PushFunction (pf, Context);
-		SetGlobal (pName);
+		pushFunction (pf, context);
+		setGlobal (name);
 	}
 
 	intptr_t
-	GetContext ()
+	getContext ()
 	{
-		int Index = GetUpValueIndex ();
-		return GetInteger (Index);
+		int index = getUpValueIndex ();
+		return getInteger (index);
 	}
 
 	int
-	GetUpValueIndex (int Index = 1)
+	getUpValueIndex (int index = 1)
 	{
-		ASSERT (IsOpen ());
-		return lua_upvalueindex (Index);
+		ASSERT (isOpen ());
+		return lua_upvalueindex (index);
 	}
 
 	void
-	Call (
-		size_t ArgumentCount,
-		size_t ResultCount = LUA_MULTRET
+	call (
+		size_t argumentCount,
+		size_t resultCount = LUA_MULTRET
 		)
 	{
-		ASSERT (IsOpen ());
-		lua_call (m_h, ArgumentCount, ResultCount);
+		ASSERT (isOpen ());
+		lua_call (m_h, argumentCount, resultCount);
 	}
 
 	bool
 	PCall (
-		size_t ArgumentCount,
-		size_t ResultCount = LUA_MULTRET
+		size_t argumentCount,
+		size_t resultCount = LUA_MULTRET
 		)
 	{
-		ASSERT (IsOpen ());
-		return Complete (lua_pcall (m_h, ArgumentCount, ResultCount, 0));
+		ASSERT (isOpen ());
+		return complete (lua_pcall (m_h, argumentCount, resultCount, 0));
 	}
 
 protected:
 	bool
-	Complete (int Result);
+	complete (int result);
 };
 
 //.............................................................................

@@ -20,18 +20,18 @@ class CCmdLineParserRoot
 protected:
 	static
 	size_t
-	ExtractArg (
+	extractArg (
 		const char* p,
-		const char* pEnd,
-		rtl::CString* pArg
+		const char* end,
+		rtl::CString* arg
 		);
 
 	static
 	bool
-	ParseArg (
+	parseArg (
 		const char* p,
-		rtl::CString* pSwitchName,
-		rtl::CString* pValue
+		rtl::CString* switchName,
+		rtl::CString* value
 		);
 };
 
@@ -60,130 +60,130 @@ protected:
 	};
 
 protected:
-	ESwitch m_ValueSwitch;
-	rtl::CString m_ValueSwitchName;
-	uint_t m_Flags;
+	ESwitch m_valueSwitch;
+	rtl::CString m_valueSwitchName;
+	uint_t m_flags;
 
 public:
 	CCmdLineParserT ()
 	{
-		m_ValueSwitch = (ESwitch) 0;
-		m_Flags = 0;
+		m_valueSwitch = (ESwitch) 0;
+		m_flags = 0;
 	}
 
 	bool
-	Parse (
-		const char* pCmdLine,
-		size_t Length = -1
+	parse (
+		const char* cmdLine,
+		size_t length = -1
 		)
 	{
-		bool Result;
+		bool result;
 
-		if (Length == -1)
-			Length = strlen (pCmdLine);
+		if (length == -1)
+			length = strlen (cmdLine);
 
-		const char* p = pCmdLine;
-		const char* pEnd = p + Length;
+		const char* p = cmdLine;
+		const char* end = p + length;
 
-		rtl::CString Arg;
-		rtl::CString SwitchName;
-		rtl::CString Value;
+		rtl::CString arg;
+		rtl::CString switchName;
+		rtl::CString value;
 
-		m_ValueSwitch = (ESwitch) 0;
+		m_valueSwitch = (ESwitch) 0;
 
-		for (int i = 0; p < pEnd; i++)
+		for (int i = 0; p < end; i++)
 		{
-			size_t Length = ExtractArg (p, pEnd, &Arg);
-			if (Length == -1)
+			size_t length = extractArg (p, end, &arg);
+			if (length == -1)
 				return false;
 
-			if (Arg.IsEmpty ())
+			if (arg.isEmpty ())
 				break;
 
-			Result = (m_Flags & EFlag_Forward) ?
-				static_cast <T*> (this)->OnValue (Arg) :
-				ParseArg (Arg, &SwitchName, &Value) &&
-				ProcessArg (i, SwitchName, Value);
+			result = (m_flags & EFlag_Forward) ?
+				static_cast <T*> (this)->onValue (arg) :
+				parseArg (arg, &switchName, &value) &&
+				processArg (i, switchName, value);
 
-			if (!Result)
+			if (!result)
 				return false;
 
-			p += Length;
+			p += length;
 		}
 
 		return
-			CheckMissingValue () &&
-			static_cast <T*> (this)->Finalize ();
+			checkMissingValue () &&
+			static_cast <T*> (this)->finalize ();
 	}
 
 	bool
-	Parse (
-		const wchar_t* pCmdLine,
-		size_t Length = -1
+	parse (
+		const wchar_t* cmdLine,
+		size_t length = -1
 		)
 	{
-		rtl::CString CmdLine (pCmdLine, Length);
-		return Parse (CmdLine, CmdLine.GetLength ());
+		rtl::CString cmdLine (cmdLine, length);
+		return parse (cmdLine, cmdLine.getLength ());
 	}
 
 	bool
-	Parse (
+	parse (
 		int argc,
 		const char* const* argv
 		)
 	{
-		bool Result;
+		bool result;
 
-		rtl::CString SwitchName;
-		rtl::CString Value;
+		rtl::CString switchName;
+		rtl::CString value;
 
 		for (int i = 0; i < argc; i++)
 		{
-			const char* pArg = argv [i];
+			const char* arg = argv [i];
 
-			Result = (m_Flags & EFlag_Forward) ?
-				static_cast <T*> (this)->OnValue (pArg) :
-				ParseArg (pArg, &SwitchName, &Value) &&
-				ProcessArg (i, SwitchName, Value);
+			result = (m_flags & EFlag_Forward) ?
+				static_cast <T*> (this)->onValue (arg) :
+				parseArg (arg, &switchName, &value) &&
+				processArg (i, switchName, value);
 
-			if (!Result)
+			if (!result)
 				return false;
 		}
 
-		return static_cast <T*> (this)->Finalize ();
+		return static_cast <T*> (this)->finalize ();
 	}
 
 	bool
-	Parse (
+	parse (
 		int argc,
 		const wchar_t* const* argv
 		)
 	{
-		bool Result;
+		bool result;
 
-		rtl::CString SwitchName;
-		rtl::CString Value;
+		rtl::CString switchName;
+		rtl::CString value;
 
 		for (int i = 0; i < argc; i++)
 		{
-			rtl::CString Arg = argv [i];
+			rtl::CString arg = argv [i];
 
-			Result = (m_Flags & EFlag_Forward) ?
-				static_cast <T*> (this)->OnValue (Arg) :
-				ParseArg (Arg, &SwitchName, &Value) &&
-				ProcessArg (i, SwitchName, Value);
+			result = (m_flags & EFlag_Forward) ?
+				static_cast <T*> (this)->onValue (arg) :
+				parseArg (arg, &switchName, &value) &&
+				processArg (i, switchName, value);
 
-			if (!Result)
+			if (!result)
 				return false;
 		}
 
-		return static_cast <T*> (this)->Finalize ();
+		return static_cast <T*> (this)->finalize ();
 	}
 
 	// overridables
 
 	bool
-	OnValue0 (const char* pValue)
+	onValue0 (const char* value)
 	{
 		return true;
 	}
@@ -198,65 +198,65 @@ public:
 	//		);
 
 	bool
-	Finalize ()
+	finalize ()
 	{
 		return true;
 	}
 
 protected:
 	bool
-	CheckMissingValue ()
+	checkMissingValue ()
 	{
-		if (!m_ValueSwitch)
+		if (!m_valueSwitch)
 			return true;
 
-		err::SetFormatStringError ("missing value for switch '%s'", m_ValueSwitchName.cc ());
+		err::setFormatStringError ("missing value for switch '%s'", m_valueSwitchName.cc ());
 		return false;
 	}
 
 	bool
-	ProcessArg (
+	processArg (
 		int i,
-		const rtl::CString& SwitchName,
-		const rtl::CString& Value
+		const rtl::CString& switchName,
+		const rtl::CString& value
 		)
 	{
-		bool Result;
+		bool result;
 
-		T* pThis = static_cast <T*> (this);
+		T* self = static_cast <T*> (this);
 
-		if (SwitchName.IsEmpty ())
+		if (switchName.isEmpty ())
 		{
-			if (!m_ValueSwitch)
-				return i == 0 ? pThis->OnValue0 (Value) : pThis->OnValue (Value);
+			if (!m_valueSwitch)
+				return i == 0 ? self->onValue0 (value) : self->onValue (value);
 
-			Result = pThis->OnSwitch (m_ValueSwitch, Value);
-			if (!Result)
+			result = self->onSwitch (m_valueSwitch, value);
+			if (!result)
 				return false;
 
-			m_ValueSwitch = (ESwitch) 0;
+			m_valueSwitch = (ESwitch) 0;
 			return true;
 		}
 
-		Result = CheckMissingValue ();
-		if (!Result)
+		result = checkMissingValue ();
+		if (!result)
 			return false;
 
-		ESwitch Switch = TSwitchTable::FindSwitch (SwitchName);
-		if (!Switch)
+		ESwitch switch = TSwitchTable::findSwitch (switchName);
+		if (!switch)
 		{
-			err::SetFormatStringError ("unknown switch '%s'", SwitchName.cc ());
+			err::setFormatStringError ("unknown switch '%s'", switchName.cc ());
 			return false;
 		}
 
-		if ((Switch & ECmdLineSwitchFlag_HasValue) && Value.IsEmpty ())
+		if ((switch & ECmdLineSwitchFlag_HasValue) && value.isEmpty ())
 		{
-			m_ValueSwitch = Switch;
-			m_ValueSwitchName = SwitchName;
+			m_valueSwitch = switch;
+			m_valueSwitchName = switchName;
 			return true;
 		}
 
-		return pThis->OnSwitch (Switch, Value);
+		return self->onSwitch (switch, value);
 	}
 };
 
@@ -264,117 +264,117 @@ protected:
 
 struct TSwitchInfo: rtl::TListLink
 {
-	int m_Switch;
-	const char* m_NameTable [4]; // up to 4 alternative names
-	const char* m_pValue;
-	const char* m_pDescription;
+	int m_switch;
+	const char* m_nameTable [4]; // up to 4 alternative names
+	const char* m_value;
+	const char* m_description;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 CString
-GetCmdLineHelpString (const CConstListT <TSwitchInfo>& SwitchInfoList);
+getCmdLineHelpString (const CConstListT <TSwitchInfo>& switchInfoList);
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE(Class, Switch) \
-class Class \
+#define AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE(class, switch) \
+class class \
 { \
 public: \
-	typedef Switch ESwitch; \
+	typedef switch ESwitch; \
 	typedef axl::rtl::CHashTableMapT <char, ESwitch, axl::rtl::CHashIdT <char> > CCharMap; \
 	typedef axl::rtl::CStringHashTableMapT <ESwitch> CStringMap; \
 protected: \
-	axl::rtl::CAuxListT <axl::rtl::TSwitchInfo> m_SwitchInfoList; \
-	CCharMap m_CodeMap; \
-	CStringMap m_NameMap; \
+	axl::rtl::CAuxListT <axl::rtl::TSwitchInfo> m_switchInfoList; \
+	CCharMap m_codeMap; \
+	CStringMap m_nameMap; \
 protected: \
 	ESwitch \
-	FindSwitchImpl (char Code) \
+	findSwitchImpl (char code) \
 	{ \
-		CCharMap::CIterator It = m_CodeMap.Find (Code); \
-		return It ? It->m_Value : (ESwitch) 0; \
+		CCharMap::CIterator it = m_codeMap.find (code); \
+		return it ? it->m_value : (ESwitch) 0; \
 	} \
 	ESwitch \
-	FindSwitchImpl (const char* pName) \
+	findSwitchImpl (const char* name) \
 	{ \
-		CStringMap::CIterator It = m_NameMap.Find (pName); \
-		return It ? It->m_Value : (ESwitch) 0; \
+		CStringMap::CIterator it = m_nameMap.find (name); \
+		return it ? it->m_value : (ESwitch) 0; \
 	} \
 public: \
 	static \
-	Class* \
-	GetSingleton () \
+	class* \
+	getSingleton () \
 	{ \
-		return axl::rtl::GetSingleton <Class> (); \
+		return axl::rtl::getSingleton <class> (); \
 	} \
 	static \
 	const axl::rtl::CConstListT <axl::rtl::TSwitchInfo> \
-	GetSwitchInfoList () \
+	getSwitchInfoList () \
 	{ \
-		return GetSingleton ()->m_SwitchInfoList; \
+		return getSingleton ()->m_switchInfoList; \
 	} \
 	static \
 	ESwitch \
-	FindSwitch (const char* pName) \
+	findSwitch (const char* name) \
 	{ \
-		return pName [1] ? \
-			GetSingleton ()->FindSwitchImpl (pName) : \
-			GetSingleton ()->FindSwitchImpl (pName [0]); \
+		return name [1] ? \
+			getSingleton ()->findSwitchImpl (name) : \
+			getSingleton ()->findSwitchImpl (name [0]); \
 	} \
 	static \
 	axl::rtl::CString \
-	GetHelpString () \
+	getHelpString () \
 	{ \
-		return axl::rtl::GetCmdLineHelpString (GetSingleton ()->m_SwitchInfoList); \
+		return axl::rtl::getCmdLineHelpString (getSingleton ()->m_switchInfoList); \
 	} \
-	Class () \
+	class () \
 	{
 
-#define AXL_RTL_CMD_LINE_ADD_SWITCH_INFO(Switch, Name0, Name1, Name2, Name3, Value, Description) \
+#define AXL_RTL_CMD_LINE_ADD_SWITCH_INFO(switch, name0, name1, name2, name3, value, description) \
 		{ \
-			static axl::rtl::TSwitchInfo SwitchInfo; \
-			SwitchInfo.m_Switch = Switch; \
-			SwitchInfo.m_NameTable [0] = Name0; \
-			SwitchInfo.m_NameTable [1] = Name1; \
-			SwitchInfo.m_NameTable [2] = Name2; \
-			SwitchInfo.m_NameTable [3] = Name3; \
-			SwitchInfo.m_pValue = Value; \
-			SwitchInfo.m_pDescription = Description; \
-			m_SwitchInfoList.InsertTail (&SwitchInfo); \
+			static axl::rtl::TSwitchInfo switchInfo; \
+			switchInfo.m_switch = switch; \
+			switchInfo.m_nameTable [0] = name0; \
+			switchInfo.m_nameTable [1] = name1; \
+			switchInfo.m_nameTable [2] = name2; \
+			switchInfo.m_nameTable [3] = name3; \
+			switchInfo.m_value = value; \
+			switchInfo.m_description = description; \
+			m_switchInfoList.insertTail (&switchInfo); \
 		}
 
-#define AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name) \
-		ASSERT (Name); \
-		if (Name [1]) \
-			m_NameMap.Goto (Name)->m_Value = Switch; \
+#define AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name) \
+		ASSERT (name); \
+		if (name [1]) \
+			m_nameMap.visit (name)->m_value = switch; \
 		else \
-			m_CodeMap.Goto (Name [0])->m_Value = Switch; \
+			m_codeMap.visit (name [0])->m_value = switch; \
 
-#define AXL_RTL_CMD_LINE_SWITCH_GROUP(Description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (0, NULL, NULL, NULL, NULL, NULL, Description)
+#define AXL_RTL_CMD_LINE_SWITCH_GROUP(description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (0, NULL, NULL, NULL, NULL, NULL, description)
 
-#define AXL_RTL_CMD_LINE_SWITCH_1(Switch, Name, Value, Description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (Switch, Name, NULL, NULL, NULL, Value, Description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name)
+#define AXL_RTL_CMD_LINE_SWITCH_1(switch, name, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name, NULL, NULL, NULL, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name)
 
-#define AXL_RTL_CMD_LINE_SWITCH_2(Switch, Name0, Name1, Value, Description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (Switch, Name0, Name1, NULL, NULL, Value, Description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name0) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name1) \
+#define AXL_RTL_CMD_LINE_SWITCH_2(switch, name0, name1, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name0, name1, NULL, NULL, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name0) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name1) \
 
-#define AXL_RTL_CMD_LINE_SWITCH_3(Switch, Name0, Name1, Name2, Value, Description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (Switch, Name0, Name1, Name2, NULL, Value, Description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name0) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name1) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name2) \
+#define AXL_RTL_CMD_LINE_SWITCH_3(switch, name0, name1, name2, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name0, name1, name2, NULL, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name0) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name1) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name2) \
 
-#define AXL_RTL_CMD_LINE_SWITCH_4(Switch, Name0, Name1, Name2, Name3, Value, Description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (Switch, Name0, Name1, Name2, Name3, Value, Description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name0) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name1) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name2) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(Switch, Name3)
+#define AXL_RTL_CMD_LINE_SWITCH_4(switch, name0, name1, name2, name3, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name0, name1, name2, name3, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name0) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name1) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name2) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name3)
 
 #define AXL_RTL_CMD_LINE_SWITCH AXL_RTL_CMD_LINE_SWITCH_1
 

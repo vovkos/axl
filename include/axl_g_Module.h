@@ -19,9 +19,9 @@ namespace g {
 	
 struct TSystemInfo
 {
-	size_t m_ProcessorCount;
-	size_t m_PageSize;
-	size_t m_MappingAlignFactor;
+	size_t m_processorCount;
+	size_t m_pageSize;
+	size_t m_mappingAlignFactor;
 };
 
 //.............................................................................
@@ -31,7 +31,7 @@ class CFinalizer
 public:
 	virtual 
 	void 
-	Finalize () = 0;
+	finalize () = 0;
 };
 
 //.............................................................................
@@ -42,26 +42,26 @@ protected:
 	class CFinalizerEntry: public rtl::TListLink
 	{
 	public:
-		ref::CPtrT <CFinalizer> m_Finalizer;
+		ref::CPtrT <CFinalizer> m_finalizer;
 	};
 
 protected:
 #ifdef _DEBUG
-	const char* m_pTag;
+	const char* m_tag;
 #endif
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	HMODULE m_hModule;
 #endif
 	
-	TSystemInfo m_SystemInfo;
+	TSystemInfo m_systemInfo;
 
-	mem::CTracker m_MemTracker;
+	mem::CTracker m_memTracker;
 
 	// finalizers
 	
-	mt::CLock m_FinalizerListLock;
-	rtl::CStdListT <CFinalizerEntry> m_FinalizerList;
+	mt::CLock m_finalizerListLock;
+	rtl::CStdListT <CFinalizerEntry> m_finalizerList;
 
 public:
 	CModule ();
@@ -70,38 +70,38 @@ public:
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	HMODULE 
-	GetModuleHandle ()
+	getModuleHandle ()
 	{
 		return m_hModule;
 	}
 #endif
 
 	TSystemInfo* 
-	GetSystemInfo ()
+	getSystemInfo ()
 	{
-		return &m_SystemInfo;
+		return &m_systemInfo;
 	}
 
 	mem::CTracker*
-	GetMemTracker ()
+	getMemTracker ()
 	{
-		return &m_MemTracker;
+		return &m_memTracker;
 	}
 
 	bool 
-	AddFinalizer (const ref::CPtrT <CFinalizer>& Finalizer);
+	addFinalizer (const ref::CPtrT <CFinalizer>& finalizer);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_SELECT_ANY 
-CModule g_Module;
+CModule g_module;
 
 inline
 CModule*
-GetModule ()
+getModule ()
 {
-	return &g_Module;
+	return &g_module;
 }
 
 //.............................................................................

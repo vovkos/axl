@@ -8,76 +8,76 @@ namespace io {
 //.............................................................................
 
 void 
-OnSyncSendRecvComplete (
-	mt::CEvent* pEvent,
-	err::CError* pError,
-	size_t* pActualSize,
+onSyncSendRecvComplete (
+	mt::CEvent* event,
+	err::CError* error,
+	size_t* actualSize,
 	
-	const err::CError& Error,
-	size_t ActualSize
+	const err::CError& error,
+	size_t actualSize
 	)
 {
-	if (pError)
-		*pError = Error,
+	if (error)
+		*error = error,
 
-	*pActualSize = ActualSize;
-	pEvent->Signal ();
+	*actualSize = actualSize;
+	event->signal ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-CAsyncTransport::SyncSend (
+CAsyncTransport::syncSend (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	mt::CEvent Event;
-	err::CError Error;
-	size_t ActualSize;
+	mt::CEvent event;
+	err::CError error;
+	size_t actualSize;
 	
 	exe::CFunctionT <
 		exe::CArgSeqT_3 <mt::CEvent*, err::CError*, size_t*>,
 		COnRecvCompleteArg
-		> OnComplete (OnSyncSendRecvComplete, &Event, &Error, &ActualSize);
+		> onComplete (onSyncSendRecvComplete, &event, &error, &actualSize);
 
-	Send (p, Size, &OnComplete);
-	Event.Wait ();
+	send (p, size, &onComplete);
+	event.wait ();
 
-	if (Error)
+	if (error)
 	{
-		SetError (Error);
+		setError (error);
 		return -1;
 	}
 
-	return ActualSize;
+	return actualSize;
 }
 
 size_t
-CAsyncTransport::SyncRecv (
+CAsyncTransport::syncRecv (
 	void* p,
-	size_t Size
+	size_t size
 	)
 {
-	mt::CEvent Event;
-	err::CError Error;
-	size_t ActualSize;
+	mt::CEvent event;
+	err::CError error;
+	size_t actualSize;
 	
 	exe::CFunctionT <
 		exe::CArgSeqT_3 <mt::CEvent*, err::CError*, size_t*>,
 		COnRecvCompleteArg
-		> OnComplete (OnSyncSendRecvComplete, &Event, &Error, &ActualSize);
+		> onComplete (onSyncSendRecvComplete, &event, &error, &actualSize);
 
-	Recv (p, Size, &OnComplete);
-	Event.Wait ();
+	recv (p, size, &onComplete);
+	event.wait ();
 
-	if (Error)
+	if (error)
 	{
-		SetError (Error);
+		setError (error);
 		return -1;
 	}
 
-	return ActualSize;
+	return actualSize;
 }
 
 //.............................................................................

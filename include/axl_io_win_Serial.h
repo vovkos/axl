@@ -19,115 +19,115 @@ class CSerial: public g::win::CFileHandle
 {
 public:
 	bool
-	Open (
-		const char* pName,
-		uint_t Flags = 0
+	open (
+		const char* name,
+		uint_t flags = 0
 		);
 
 	bool
-	GetSettings (DCB* pDcb)
+	getSettings (DCB* dcb)
 	{
-		bool_t Result = ::GetCommState (m_h, pDcb);
-		return err::Complete (Result);
+		bool_t result = ::GetCommState (m_h, dcb);
+		return err::complete (result);
 	}
 
 	bool
-	SetSettings (const DCB* pDcb)
+	setSettings (const DCB* dcb)
 	{
-		bool_t Result = ::SetCommState (m_h, (DCB*) pDcb);
-		return err::Complete (Result);
+		bool_t result = ::SetCommState (m_h, (DCB*) dcb);
+		return err::complete (result);
 	}
 
 	bool
-	GetTimeouts (COMMTIMEOUTS* pTimeouts)
+	getTimeouts (COMMTIMEOUTS* timeouts)
 	{
-		bool_t Result = ::GetCommTimeouts (m_h, pTimeouts);
-		return err::Complete (Result);
+		bool_t result = ::GetCommTimeouts (m_h, timeouts);
+		return err::complete (result);
 	}
 
 	bool
-	SetTimeouts (const COMMTIMEOUTS* pTimeouts)
+	setTimeouts (const COMMTIMEOUTS* timeouts)
 	{
-		bool_t Result = ::SetCommTimeouts (m_h, (COMMTIMEOUTS*) pTimeouts);
-		return err::Complete (Result);
+		bool_t result = ::SetCommTimeouts (m_h, (COMMTIMEOUTS*) timeouts);
+		return err::complete (result);
 	}
 
 	bool
-	Escape (uint_t Function)
+	escape (uint_t function)
 	{
-		bool_t Result = ::EscapeCommFunction (m_h, Function);
-		return err::Complete (Result);
+		bool_t result = ::EscapeCommFunction (m_h, function);
+		return err::complete (result);
 	}
 
 	dword_t
-	GetStatusLines ();
+	getStatusLines ();
 
 	bool
-	SetDtr (bool IsSet)
+	setDtr (bool isSet)
 	{
-		return Escape (IsSet ? SETDTR : CLRDTR);
+		return escape (isSet ? SETDTR : CLRDTR);
 	}
 
 	bool
-	SetRts (bool IsSet)
+	setRts (bool isSet)
 	{
-		return Escape (IsSet ? SETRTS : CLRRTS);
+		return escape (isSet ? SETRTS : CLRRTS);
 	}
 
 	dword_t
-	GetWaitMask ();
+	getWaitMask ();
 
 	bool
-	SetWaitMask (dword_t Mask)
+	setWaitMask (dword_t mask)
 	{
-		bool_t Result = ::SetCommMask (m_h, Mask);
-		return err::Complete (Result);
+		bool_t result = ::SetCommMask (m_h, mask);
+		return err::complete (result);
 	}
 
 	bool
-	Wait (
-		dword_t* pEvent,
-		OVERLAPPED* pOverlapped
+	wait (
+		dword_t* event,
+		OVERLAPPED* overlapped
 		)
 	{
-		bool_t Result = ::WaitCommEvent (m_h, pEvent, pOverlapped);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::WaitCommEvent (m_h, event, overlapped);
+		return completeAsyncRequest (result, overlapped);
 	}
 
 	size_t
-	Read (
+	read (
 		void* p,
-		size_t Size
+		size_t size
 		);
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	bool
-	Read (
+	read (
 		void* p,
-		dword_t Size,
-		dword_t* pActualSize,
-		OVERLAPPED* pOverlapped
+		dword_t size,
+		dword_t* actualSize,
+		OVERLAPPED* overlapped
 		)
 	{
-		bool_t Result = ::ReadFile (m_h, p, Size, pActualSize, pOverlapped);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::ReadFile (m_h, p, size, actualSize, overlapped);
+		return completeAsyncRequest (result, overlapped);
 	}
 
 	bool
-	Write (
+	write (
 		const void* p,
-		dword_t Size,
-		dword_t* pActualSize,
-		OVERLAPPED* pOverlapped
+		dword_t size,
+		dword_t* actualSize,
+		OVERLAPPED* overlapped
 		)
 	{
-		bool_t Result = ::WriteFile (m_h, p, Size, pActualSize, pOverlapped);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::WriteFile (m_h, p, size, actualSize, overlapped);
+		return completeAsyncRequest (result, overlapped);
 	}
 };
 

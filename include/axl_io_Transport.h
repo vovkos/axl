@@ -18,16 +18,16 @@ class CTransport
 public:
 	virtual
 	size_t
-	Transmit (
+	transmit (
 		const void* p,
-		size_t Size
+		size_t size
 		) = 0;
 
 	virtual
 	size_t
-	Receive (
+	receive (
 		void* p,
-		size_t Size
+		size_t size
 		) = 0;
 };
 
@@ -42,30 +42,30 @@ class CAsyncTransport: public CTransport
 
 	virtual
 	bool
-	Send (
+	send (
 		const void* p,
-		size_t Size,
-		const exe::CFunction& OnComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
+		size_t size,
+		const exe::CFunction& onComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
 		) = 0;
 
 	virtual
 	bool
-	Recv (
+	recv (
 		void* p,
-		size_t Size,
-		const exe::CFunction& OnComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
+		size_t size,
+		const exe::CFunction& onComplete // void OnComplete (const err::CError& Error, size_t ActualSize);
 		) = 0;
 
 	size_t
-	SyncSend (
+	syncSend (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	size_t
-	SyncRecv (
+	syncRecv (
 		void* p,
-		size_t Size
+		size_t size
 		);
 };
 

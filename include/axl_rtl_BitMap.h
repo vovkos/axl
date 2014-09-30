@@ -23,164 +23,164 @@ enum EBitOp
 //.............................................................................
 
 bool
-GetBit (
-	const size_t* pMap,
-	size_t PageCount,
-	size_t Bit
+getBit (
+	const size_t* map,
+	size_t pageCount,
+	size_t bit
 	);
 
 bool
-SetBit (
-	size_t* pMap,
-	size_t PageCount,
-	size_t Bit,
-	bool Value = true
+setBit (
+	size_t* map,
+	size_t pageCount,
+	size_t bit,
+	bool value = true
 	);
 
 bool
-SetBitRange ( 
-	size_t* pMap,
-	size_t PageCount,
-	size_t From,
-	size_t To,
-	bool Value = true
+setBitRange ( 
+	size_t* map,
+	size_t pageCount,
+	size_t from,
+	size_t to,
+	bool value = true
 	);
 
 bool
-MergeBitMaps ( 
-	size_t* pMap,
-	const size_t* pMap2,
-	size_t PageCount,
-	EBitOp Op
+mergeBitMaps ( 
+	size_t* map,
+	const size_t* map2,
+	size_t pageCount,
+	EBitOp op
 	);
 
 inline
 void
-InverseBitMap (
-	size_t* pMap,
-	size_t PageCount
+inverseBitMap (
+	size_t* map,
+	size_t pageCount
 	)
 {
-	for (size_t i = 0; i < PageCount; i++)
-		pMap [i] = ~pMap [i];
+	for (size_t i = 0; i < pageCount; i++)
+		map [i] = ~map [i];
 }
 
 size_t 
-FindBit (
-	const size_t* pMap,
-	size_t PageCount,
-	size_t From,
-	bool Value = true
+findBit (
+	const size_t* map,
+	size_t pageCount,
+	size_t from,
+	bool value = true
 	);
 
 //.............................................................................
 
-template <size_t BitCount> 
+template <size_t bitCount> 
 class CBitMapT
 {
 public:
 	enum
 	{
-		PageCount = BitCount / _AXL_PTR_BITNESS
+		pageCount = bitCount / _AXL_PTR_BITNESS
 	};
 
 protected:
-	size_t m_Map [PageCount];
+	size_t m_map [pageCount];
 
 public:
 	CBitMapT ()
 	{
-		Clear ();
+		clear ();
 	}
 
-	CBitMapT (const CBitMapT& Src)
+	CBitMapT (const CBitMapT& src)
 	{
-		Copy (Src);
+		copy (src);
 	}
 
 	void 
-	Clear()
+	clear()
 	{ 
-		memset (m_Map, 0, sizeof (m_Map));
+		memset (m_map, 0, sizeof (m_map));
 	}
 
 	void
-	Copy (const CBitMapT& Src)
+	copy (const CBitMapT& src)
 	{
-		memcpy (m_Map, Src.m_Map, sizeof (m_Map));
+		memcpy (m_map, src.m_map, sizeof (m_map));
 	}
 
 	int 
-	Cmp (const CBitMapT& Src)
+	cmp (const CBitMapT& src)
 	{
-		return memcmp (m_Map, Src.m_Map, sizeof (m_Map));
+		return memcmp (m_map, src.m_map, sizeof (m_map));
 	}
 
 	const size_t* 
-	GetMap () const
+	getMap () const
 	{
-		return m_Map;
+		return m_map;
 	}
 
 	size_t* 
-	GetMap ()
+	getMap ()
 	{
-		return m_Map;
+		return m_map;
 	}
 	
 	size_t 
-	GetPageCount () const
+	getPageCount () const
 	{
-		return PageCount;
+		return pageCount;
 	}
 
 	bool 
-	GetBit (size_t Bit) const
+	getBit (size_t bit) const
 	{
-		return rtl::GetBit (m_Map, PageCount, Bit);
+		return rtl::getBit (m_map, pageCount, bit);
 	}
 
 	bool
-	SetBit (
-		size_t Bit, 
-		bool Value = true
+	setBit (
+		size_t bit, 
+		bool value = true
 		)
 	{
-		return rtl::SetBit (m_Map, PageCount, Bit, Value);
+		return rtl::setBit (m_map, pageCount, bit, value);
 	}
 
 	bool
-	SetBitRange ( 
-		size_t From,
-		size_t To,
-		bool Value = true
+	setBitRange ( 
+		size_t from,
+		size_t to,
+		bool value = true
 		)
 	{
-		return rtl::SetBitRange (m_Map, PageCount, From, To, Value);
+		return rtl::setBitRange (m_map, pageCount, from, to, value);
 	}
 
 	bool
-	Merge ( 
-		const CBitMapT& BitMap2,
-		EBitOp Op
+	merge ( 
+		const CBitMapT& bitMap2,
+		EBitOp op
 		)
 	{
-		return rtl::MergeBitMaps (m_Map, BitMap2.m_Map, PageCount, Op);
+		return rtl::mergeBitMaps (m_map, bitMap2.m_map, pageCount, op);
 	}
 
 	void 
-	Inverse ()
+	inverse ()
 	{ 
-		rtl::InverseBitMap (m_Map, PageCount);
+		rtl::inverseBitMap (m_map, pageCount);
 	}
 
 	size_t 
-	FindBit (
-		size_t Start,
-		bool Value = true
+	findBit (
+		size_t start,
+		bool value = true
 		) const
 	{
-		return rtl::FindBit (m_Map, PageCount, Start, Value);
+		return rtl::findBit (m_map, pageCount, start, value);
 	}
 };
 
@@ -189,133 +189,133 @@ public:
 class CBitMap
 {
 protected:
-	CArrayT <size_t> m_Map;
+	CArrayT <size_t> m_map;
 
 public:
-	CBitMap (size_t BitCount = 0)
+	CBitMap (size_t bitCount = 0)
 	{
-		Create (BitCount);
+		create (bitCount);
 	}
 
 	const size_t* 
-	GetMap () const
+	getMap () const
 	{
-		return m_Map;
+		return m_map;
 	}
 
 	size_t* 
-	GetMap ()
+	getMap ()
 	{
-		return m_Map;
+		return m_map;
 	}
 
 	size_t 
-	GetPageCount () const
+	getPageCount () const
 	{
-		return m_Map.GetCount ();
+		return m_map.getCount ();
 	}
 
 	size_t 
-	GetBitCount () const
+	getBitCount () const
 	{
-		return GetPageCount () * _AXL_PTR_BITNESS;
+		return getPageCount () * _AXL_PTR_BITNESS;
 	}
 
 	void 
-	Clear()
+	clear()
 	{
-		memset (m_Map, 0, m_Map.GetCount () * sizeof (size_t));
+		memset (m_map, 0, m_map.getCount () * sizeof (size_t));
 	}
 
 	void 
-	Copy (const CBitMap& Src);
+	copy (const CBitMap& src);
 
 	int
-	Cmp (const CBitMap& Src);
+	cmp (const CBitMap& src);
 	
 	bool 
-	Create (size_t BitCount);
+	create (size_t bitCount);
 
 	bool 
-	SetBitCount (size_t BitCount);
+	setBitCount (size_t bitCount);
 
 	bool 
-	EnsureBitCount (size_t BitCount)
+	ensureBitCount (size_t bitCount)
 	{
-		return BitCount > GetBitCount () ? SetBitCount (BitCount) : true;
-	}
-
-	bool 
-	GetBit (size_t Bit) const
-	{
-		return rtl::GetBit (m_Map, m_Map.GetCount (), Bit);
-	}
-
-	bool
-	SetBit (
-		size_t Bit,
-		bool Value = true
-		)
-	{
-		return rtl::SetBit (m_Map, m_Map.GetCount (), Bit, Value);
-	}
-
-	bool
-	SetBitResize (
-		size_t Bit,
-		bool Value = true
-		)
-	{
-		EnsureBitCount (Bit + 1);
-		return rtl::SetBit (m_Map, m_Map.GetCount (), Bit, Value);
-	}
-
-	bool
-	SetBitRange (
-		size_t From, 
-		size_t To,
-		bool Value = true
-		)
-	{
-		return rtl::SetBitRange (m_Map, m_Map.GetCount (), From, To, Value);
-	}
-
-	bool
-	SetBitRangeResize (
-		size_t From, 
-		size_t To,
-		bool Value = true
-		)
-	{
-		EnsureBitCount (To);
-		return rtl::SetBitRange (m_Map, m_Map.GetCount (), From, To, Value);
+		return bitCount > getBitCount () ? setBitCount (bitCount) : true;
 	}
 
 	bool 
-	Merge (
-		const CBitMap& BitMap2, 
-		EBitOp Op
+	getBit (size_t bit) const
+	{
+		return rtl::getBit (m_map, m_map.getCount (), bit);
+	}
+
+	bool
+	setBit (
+		size_t bit,
+		bool value = true
+		)
+	{
+		return rtl::setBit (m_map, m_map.getCount (), bit, value);
+	}
+
+	bool
+	setBitResize (
+		size_t bit,
+		bool value = true
+		)
+	{
+		ensureBitCount (bit + 1);
+		return rtl::setBit (m_map, m_map.getCount (), bit, value);
+	}
+
+	bool
+	setBitRange (
+		size_t from, 
+		size_t to,
+		bool value = true
+		)
+	{
+		return rtl::setBitRange (m_map, m_map.getCount (), from, to, value);
+	}
+
+	bool
+	setBitRangeResize (
+		size_t from, 
+		size_t to,
+		bool value = true
+		)
+	{
+		ensureBitCount (to);
+		return rtl::setBitRange (m_map, m_map.getCount (), from, to, value);
+	}
+
+	bool 
+	merge (
+		const CBitMap& bitMap2, 
+		EBitOp op
 		);
 
 	bool 
-	MergeResize (
-		const CBitMap& BitMap2, 
-		EBitOp Op
+	mergeResize (
+		const CBitMap& bitMap2, 
+		EBitOp op
 		);
 
 	void 
-	Inverse ()
+	inverse ()
 	{
-		rtl::InverseBitMap (m_Map, m_Map.GetCount ());
+		rtl::inverseBitMap (m_map, m_map.getCount ());
 	}
 
 	size_t 
-	FindBit (
-		size_t Start,
-		bool Value = true
+	findBit (
+		size_t start,
+		bool value = true
 		) const 
 	{
-		return rtl::FindBit (m_Map, m_Map.GetCount (), Start, Value);
+		return rtl::findBit (m_map, m_map.getCount (), start, value);
 	}
 };
 

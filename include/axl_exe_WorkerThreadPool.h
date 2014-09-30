@@ -19,17 +19,17 @@ class CWorkerThreadPool
 protected:
 	struct TThreadEntry: rtl::TListLink
 	{
-		CWorkerThread m_Thread;
-		size_t m_ReserveEventCount;
-		size_t m_PinCount;
+		CWorkerThread m_thread;
+		size_t m_reserveEventCount;
+		size_t m_pinCount;
 	};
 
 	class CThreadPin: public ref::IRefCount
 	{
 	public:
-		CWorkerThreadPool* m_pThreadPool;
-		TThreadEntry* m_pThreadEntry;
-		size_t m_ReserveEventCount;
+		CWorkerThreadPool* m_threadPool;
+		TThreadEntry* m_threadEntry;
+		size_t m_reserveEventCount;
 
 	public:
 		CThreadPin ();
@@ -40,26 +40,26 @@ protected:
 protected:
 	friend class CThreadPin;
 
-	mt::CLock m_Lock;
-	rtl::CStdListT <TThreadEntry> m_ThreadList;
+	mt::CLock m_lock;
+	rtl::CStdListT <TThreadEntry> m_threadList;
 
 public:
 	~CWorkerThreadPool ()
 	{
-		Stop ();
+		stop ();
 	}
 
 	bool 
-	Start (size_t ThreadCount = 0); // 0 -- auto (processor count)
+	start (size_t threadCount = 0); // 0 -- auto (processor count)
 
 	bool 
-	Grow (size_t ThreadCount = 0);
+	grow (size_t threadCount = 0);
 
 	void 
-	Stop (ulong_t Timeout = -1);
+	stop (ulong_t timeout = -1);
 
 	ref::CPtrT <CWorkerThread> 
-	GetThread (size_t ReserveEventCount = 0);
+	getThread (size_t reserveEventCount = 0);
 };
 
 //.............................................................................

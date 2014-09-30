@@ -19,7 +19,7 @@ class CBuddyAllocMap
 protected:
 	struct TPage: TListLink
 	{
-		size_t m_Map;
+		size_t m_map;
 	};
 
 	//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -27,132 +27,132 @@ protected:
 	class CLevel
 	{
 	protected:
-		CAuxListT <TPage> m_AvailablePageList;
-		TPage* m_pFirstPage;
+		CAuxListT <TPage> m_availablePageList;
+		TPage* m_firstPage;
 
 	public:
 		TPage*
-		GetFirstPage ()
+		getFirstPage ()
 		{
-			return m_pFirstPage;
+			return m_firstPage;
 		}
 
 		TPage*
-		GetFirstAvailablePage ()
+		getFirstAvailablePage ()
 		{
-			return *m_AvailablePageList.GetHead ();
+			return *m_availablePageList.getHead ();
 		}
 
 		void
-		Format (
-			TPage* pPage,
-			size_t Count
+		format (
+			TPage* page,
+			size_t count
 			);
 
 		void
-		SetPageMap (
-			TPage* pPage,
-			size_t Map
+		setPageMap (
+			TPage* page,
+			size_t map
 			);
 
 		void
-		SetBit (
-			TPage* pPage,
-			size_t Bit,
-			bool Value
+		setBit (
+			TPage* page,
+			size_t bit,
+			bool value
 			);
 
 		void
-		SetBitRange (
-			TPage* pPage,
-			size_t From,
-			size_t To,
-			bool Value
+		setBitRange (
+			TPage* page,
+			size_t from,
+			size_t to,
+			bool value
 			);
 	};
 
 protected:
-	CArrayT <TPage> m_PageArray;
-	CArrayT <CLevel> m_LevelArray;
+	CArrayT <TPage> m_pageArray;
+	CArrayT <CLevel> m_levelArray;
 
-	size_t m_Width;
-	size_t m_Height;
-	size_t m_TotalSize;
-	size_t m_FreeSizeTop; // free size if allocating on top level (max alloc size)
-	size_t m_FreeSizeBottom; // free size if allocating on bottom level (size 1)
-	size_t m_MaxAllocSize;
+	size_t m_width;
+	size_t m_height;
+	size_t m_totalSize;
+	size_t m_freeSizeTop; // free size if allocating on top level (max alloc size)
+	size_t m_freeSizeBottom; // free size if allocating on bottom level (size 1)
+	size_t m_maxAllocSize;
 
 public:
 	CBuddyAllocMap ();
 
 	bool
-	Create (
-		size_t Width,
-		size_t Height
+	create (
+		size_t width,
+		size_t height
 		);
 
 	void
-	Close ();
+	close ();
 
 	void
-	Clear ();
+	clear ();
 
 	size_t
-	GetFreeSizeTop ()
+	getFreeSizeTop ()
 	{
-		return m_FreeSizeTop;
+		return m_freeSizeTop;
 	}
 
 	size_t
-	GetFreeSizeBottom ()
+	getFreeSizeBottom ()
 	{
-		return m_FreeSizeBottom;
+		return m_freeSizeBottom;
 	}
 
 	size_t
-	GetTotalSize ()
+	getTotalSize ()
 	{
-		return m_TotalSize;
+		return m_totalSize;
 	}
 
 	bool
-	IsEmpty ()
+	isEmpty ()
 	{
-		return m_FreeSizeBottom == m_TotalSize; // can compare either (top or bottom)
+		return m_freeSizeBottom == m_totalSize; // can compare either (top or bottom)
 	}
 
 	size_t
-	Allocate (size_t Size);
+	allocate (size_t size);
 
 	void
-	Mark (
-		size_t Address,
-		size_t Size
+	mark (
+		size_t address,
+		size_t size
 		);
 
 	void
-	Free (
-		size_t Address,
-		size_t Size
+	free (
+		size_t address,
+		size_t size
 		);
 
 	bool
-	GetBit (size_t Address)
+	getBit (size_t address)
 	{
-		return Address < m_TotalSize ? GetBit (m_PageArray, Address) : false;
+		return address < m_totalSize ? getBit (m_pageArray, address) : false;
 	}
 
 protected:
 	static
 	bool
-	GetBit (
-		TPage* pPage,
-		size_t Bit
+	getBit (
+		TPage* page,
+		size_t bit
 		)
 	{
-		size_t Page = Bit / _AXL_PTR_BITNESS;
-		size_t Mask = (size_t) 1 << (Bit & (_AXL_PTR_BITNESS - 1));
-		return (pPage [Page].m_Map & Mask) != 0;
+		size_t pageIdx = bit / _AXL_PTR_BITNESS;
+		size_t mask = (size_t) 1 << (bit & (_AXL_PTR_BITNESS - 1));
+		return (page [pageIdx].m_map & mask) != 0;
 	}
 };
 

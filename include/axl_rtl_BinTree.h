@@ -17,7 +17,7 @@ template <typename TKey>
 class CKeyT
 {
 public:
-	TKey m_Key;
+	TKey m_key;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -29,7 +29,7 @@ template <
 class CKeyValueT: public CKeyT <TKey>
 {
 public:
-	TValue m_Value;
+	TValue m_value;
 };  
 
 //.............................................................................
@@ -43,24 +43,24 @@ class CBinTreeNodeBaseT:
 	public TNodeData
 {
 public:
-	T* m_pParent;
-	T* m_pLeft;
-	T* m_pRight;
+	T* m_parent;
+	T* m_left;
+	T* m_right;
 
 	CBinTreeNodeBaseT ()
 	{
-		m_pParent = NULL;
-		m_pLeft = NULL;
-		m_pRight = NULL; 
+		m_parent = NULL;
+		m_left = NULL;
+		m_right = NULL; 
 	}
 
 	// overridable
 
 	static 
 	void 
-	OnXcg (
-		T* pNode1, 
-		T* pNode2
+	onXcg (
+		T* node1, 
+		T* node2
 		)
 	{
 	}
@@ -95,379 +95,379 @@ public:
 	typedef CIteratorT <CNode> CIterator;
 
 protected:
-	CStdListT <CNode> m_NodeList;
-	CNode* m_pRoot;
+	CStdListT <CNode> m_nodeList;
+	CNode* m_root;
 
 public:
 	CBinTreeBaseT ()
 	{ 
-		m_pRoot = NULL; 
+		m_root = NULL; 
 	}
 	
 	bool 
-	IsEmpty () const
+	isEmpty () const
 	{ 
-		return m_NodeList.IsEmpty (); 
+		return m_nodeList.isEmpty (); 
 	}
 
 	size_t 
-	GetCount () const
+	getCount () const
 	{ 
-		return m_NodeList.GetCount (); 
+		return m_nodeList.getCount (); 
 	}
 
 	CIterator 
-	GetHead () const
+	getHead () const
 	{ 
-		return m_NodeList.GetHead (); 
+		return m_nodeList.getHead (); 
 	}
 
 	CIterator 
-	GetTail () const
+	getTail () const
 	{ 
-		return m_NodeList.GetTail (); 
+		return m_nodeList.getTail (); 
 	}
 
 	CIterator 
-	Find (const CKey& Key) const
+	find (const CKey& key) const
 	{
-		CNode* pNode = m_pRoot;
+		CNode* node = m_root;
 
-		while (pNode) 
+		while (node) 
 		{
-			int Cmp = CCmp () (Key, pNode->m_Key);
-			if (Cmp == 0) 
-				return pNode;
+			int cmp = CCmp () (key, node->m_key);
+			if (cmp == 0) 
+				return node;
 
-			pNode = Cmp < 0 ? pNode->m_pLeft : pNode->m_pRight;
+			node = cmp < 0 ? node->m_left : node->m_right;
 		}
 
 		return NULL;
 	}
 
 	CIterator 
-	FindEx (
-		const CKey& Key,
-		EBinTreeFindEx FindExKind
+	findEx (
+		const CKey& key,
+		EBinTreeFindEx findExKind
 		) const
 	{
-		CNode* pNode = m_pRoot;
-		CNode* pPrevNode;
-		int PrevCmp;
+		CNode* node = m_root;
+		CNode* prevNode;
+		int prevCmp;
 
-		if (IsEmpty ())
+		if (isEmpty ())
 			return NULL;
 
-		while (pNode) 
+		while (node) 
 		{
-			int Cmp = CCmp () (Key, pNode->m_Key);			
-			if (Cmp == 0) 
+			int cmp = CCmp () (key, node->m_key);			
+			if (cmp == 0) 
 				break; // exact match
 
-			pPrevNode = pNode;
-			PrevCmp = Cmp;
+			prevNode = node;
+			prevCmp = cmp;
 
-			pNode = Cmp < 0 ? pNode->m_pLeft : pNode->m_pRight;
+			node = cmp < 0 ? node->m_left : node->m_right;
 		}
 
-		ASSERT (pNode || pPrevNode);
-		switch (FindExKind)
+		ASSERT (node || prevNode);
+		switch (findExKind)
 		{
 		case EBinTreeFindEx_Lt:
-			return pNode ? pNode->m_pLeft : PrevCmp > 0 ? pPrevNode : CIterator (pPrevNode).GetPrev ();
+			return node ? node->m_left : prevCmp > 0 ? prevNode : CIterator (prevNode).getPrev ();
 
 		case EBinTreeFindEx_Le:
-			return pNode ? pNode : PrevCmp > 0 ? pPrevNode : CIterator (pPrevNode).GetPrev ();
+			return node ? node : prevCmp > 0 ? prevNode : CIterator (prevNode).getPrev ();
 
 		case EBinTreeFindEx_Gt:
-			return pNode ? pNode->m_pRight : PrevCmp < 0 ? pPrevNode : CIterator (pPrevNode).GetNext ();
+			return node ? node->m_right : prevCmp < 0 ? prevNode : CIterator (prevNode).getNext ();
 
 		case EBinTreeFindEx_Ge:
-			return pNode ? pNode : PrevCmp < 0 ? pPrevNode : CIterator (pPrevNode).GetNext ();
+			return node ? node : prevCmp < 0 ? prevNode : CIterator (prevNode).getNext ();
 		
 		case EBinTreeFindEx_Eq:
 		default:
-			return pNode;
+			return node;
 		}		
 	}
 
 	CIterator 
-	Goto (const CKey& Key)
+	visit (const CKey& key)
 	{
-		CNode* pParent = NULL;
-		CNode* pNode = m_pRoot;
+		CNode* parent = NULL;
+		CNode* node = m_root;
 
 		// find the place to insert
 
-		int Cmp;
+		int cmp;
 
-		while (pNode) 
+		while (node) 
 		{
-			Cmp = CCmp () (Key, pNode->m_Key);
-			if (Cmp == 0) 
-				return pNode;
+			cmp = CCmp () (key, node->m_key);
+			if (cmp == 0) 
+				return node;
 
-			pParent = pNode;
-			pNode = Cmp < 0 ? pNode->m_pLeft : pNode->m_pRight;
+			parent = node;
+			node = cmp < 0 ? node->m_left : node->m_right;
 		}
 
 		// create and insert new node
 
-		pNode = AXL_MEM_NEW (CNode);
-		pNode->m_Key = Key;
-		pNode->m_pParent = pParent;
-		pNode->m_pLeft = NULL;
-		pNode->m_pRight = NULL;
+		node = AXL_MEM_NEW (CNode);
+		node->m_key = key;
+		node->m_parent = parent;
+		node->m_left = NULL;
+		node->m_right = NULL;
 
-		if (!pParent)
+		if (!parent)
 		{
-			m_pRoot = pNode;
-			m_NodeList.InsertTail (pNode);
+			m_root = node;
+			m_nodeList.insertTail (node);
 		}
-		else if (Cmp < 0)
+		else if (cmp < 0)
 		{
-			pParent->m_pLeft = pNode;
-			m_NodeList.InsertBefore (pNode, pParent);
+			parent->m_left = node;
+			m_nodeList.insertBefore (node, parent);
 		}
 		else
 		{
-			pParent->m_pRight = pNode;
-			m_NodeList.InsertAfter (pNode, pParent);
+			parent->m_right = node;
+			m_nodeList.insertAfter (node, parent);
 		}
 
-		static_cast <T*> (this)->OnInsert (pNode);
-		return pNode;
+		static_cast <T*> (this)->onInsert (node);
+		return node;
 	}
 
 	void 
-	Delete (CIterator It)
+	erase (CIterator it)
 	{
-		CNode* pNode = *It;
+		CNode* node = *it;
 
-		if (pNode->m_pLeft && pNode->m_pRight) 
+		if (node->m_left && node->m_right) 
 		{
-			CNode* pNext = (CNode*) pNode->m_pNext;
-			ASSERT (pNext == GetLeftmostChild (pNode->m_pRight));
-			Xcg (pNode, pNext);
+			CNode* next = (CNode*) node->m_next;
+			ASSERT (next == getLeftmostChild (node->m_right));
+			xcg (node, next);
 		}
 
-		static_cast <T*> (this)->OnDelete (pNode);
-		m_NodeList.Delete (pNode);
+		static_cast <T*> (this)->onErase (node);
+		m_nodeList.erase (node);
 	}
 
 	bool 
-	DeleteByKey (const CKey& Key)
+	eraseByKey (const CKey& key)
 	{
-		CIterator It = Find (Key);
-		if (!It)
+		CIterator it = find (key);
+		if (!it)
 			return false;
 
-		Delete (It);
+		erase (it);
 		return true;
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{ 
-		m_NodeList.Clear ();
-		m_pRoot = NULL;
+		m_nodeList.clear ();
+		m_root = NULL;
 	}
 
 protected:
 	CNode* 
-	GetLeftmostChild (CNode* pNode)
+	getLeftmostChild (CNode* node)
 	{
-		while (pNode->m_pLeft)
-			pNode = pNode->m_pLeft;
+		while (node->m_left)
+			node = node->m_left;
 		
-		return pNode;
+		return node;
 	}
 
 	CNode* 
-	GetRightmostChild (CNode* pNode)
+	getRightmostChild (CNode* node)
 	{
-		while (pNode->m_pRight)
-			pNode = pNode->m_pRight;
+		while (node->m_right)
+			node = node->m_right;
 		
-		return pNode;
+		return node;
 	}
 
 	void 
-	Xcg (
-		CNode* pNode1, 
-		CNode* pNode2
+	xcg (
+		CNode* node1, 
+		CNode* node2
 		)
 	{
-		CNode* pOldParent = pNode1->m_pParent;
-		CNode* pOldLeft = pNode1->m_pLeft;
-		CNode* pOldRight = pNode1->m_pRight;
+		CNode* oldParent = node1->m_parent;
+		CNode* oldLeft = node1->m_left;
+		CNode* oldRight = node1->m_right;
 
 		// special cases: direct parent-child relations
 
-		if (pNode1 == pNode2->m_pLeft)
+		if (node1 == node2->m_left)
 		{
-			pNode1->m_pLeft = pNode2;
-			pNode1->m_pRight = pNode2->m_pRight;
-			pNode1->m_pParent = pNode2->m_pParent;
+			node1->m_left = node2;
+			node1->m_right = node2->m_right;
+			node1->m_parent = node2->m_parent;
 
-			pNode2->m_pLeft = pOldLeft;
-			pNode2->m_pRight = pOldRight;
-			pNode2->m_pParent = pNode1;
+			node2->m_left = oldLeft;
+			node2->m_right = oldRight;
+			node2->m_parent = node1;
 		}
-		else if (pNode1 == pNode2->m_pRight)
+		else if (node1 == node2->m_right)
 		{
-			pNode1->m_pLeft = pNode2->m_pLeft;
-			pNode1->m_pRight = pNode2;
-			pNode1->m_pParent = pNode2->m_pParent;
+			node1->m_left = node2->m_left;
+			node1->m_right = node2;
+			node1->m_parent = node2->m_parent;
 
-			pNode2->m_pLeft = pOldLeft;
-			pNode2->m_pRight = pOldRight;
-			pNode2->m_pParent = pNode1;
+			node2->m_left = oldLeft;
+			node2->m_right = oldRight;
+			node2->m_parent = node1;
 		}
-		else if (pNode2 == pNode1->m_pLeft)
+		else if (node2 == node1->m_left)
 		{
-			pNode1->m_pLeft = pNode2->m_pLeft;
-			pNode1->m_pRight = pNode2->m_pRight;
-			pNode1->m_pParent = pNode2;
+			node1->m_left = node2->m_left;
+			node1->m_right = node2->m_right;
+			node1->m_parent = node2;
 
-			pNode2->m_pLeft = pNode1;
-			pNode2->m_pRight = pOldRight;
-			pNode2->m_pParent = pOldParent;
+			node2->m_left = node1;
+			node2->m_right = oldRight;
+			node2->m_parent = oldParent;
 		}
-		else if (pNode2 == pNode1->m_pRight)
+		else if (node2 == node1->m_right)
 		{
-			pNode1->m_pLeft = pNode2->m_pLeft;
-			pNode1->m_pRight = pNode2->m_pRight;
-			pNode1->m_pParent = pNode2;
+			node1->m_left = node2->m_left;
+			node1->m_right = node2->m_right;
+			node1->m_parent = node2;
 
-			pNode2->m_pLeft = pOldLeft;
-			pNode2->m_pRight = pNode1;
-			pNode2->m_pParent = pOldParent;
+			node2->m_left = oldLeft;
+			node2->m_right = node1;
+			node2->m_parent = oldParent;
 		}
 		else 
 		{
-			pNode1->m_pLeft = pNode2->m_pLeft;
-			pNode1->m_pRight = pNode2->m_pRight;
-			pNode1->m_pParent = pNode2->m_pParent;
+			node1->m_left = node2->m_left;
+			node1->m_right = node2->m_right;
+			node1->m_parent = node2->m_parent;
 
-			pNode2->m_pLeft = pOldLeft;
-			pNode2->m_pRight = pOldRight;
-			pNode2->m_pParent = pOldParent;
+			node2->m_left = oldLeft;
+			node2->m_right = oldRight;
+			node2->m_parent = oldParent;
 		}
 
 		// fixup parents
 
-		if (!pNode1->m_pParent)
-			m_pRoot = pNode1;
-		else if (pNode1->m_pParent->m_pLeft == pNode2)
-			pNode1->m_pParent->m_pLeft = pNode1;
+		if (!node1->m_parent)
+			m_root = node1;
+		else if (node1->m_parent->m_left == node2)
+			node1->m_parent->m_left = node1;
 		else
-			pNode1->m_pParent->m_pRight = pNode1;
+			node1->m_parent->m_right = node1;
 
-		if (!pNode2->m_pParent)
-			m_pRoot = pNode2;
-		else if (pNode2->m_pParent->m_pLeft == pNode1)
-			pNode2->m_pParent->m_pLeft = pNode2;
+		if (!node2->m_parent)
+			m_root = node2;
+		else if (node2->m_parent->m_left == node1)
+			node2->m_parent->m_left = node2;
 		else
-			pNode2->m_pParent->m_pRight = pNode2;
+			node2->m_parent->m_right = node2;
 
 		// fixup children
 
-		if (pNode1->m_pLeft)
-			pNode1->m_pLeft->m_pParent = pNode1;
+		if (node1->m_left)
+			node1->m_left->m_parent = node1;
 
-		if (pNode1->m_pRight)
-			pNode1->m_pRight->m_pParent = pNode1;
+		if (node1->m_right)
+			node1->m_right->m_parent = node1;
 
-		if (pNode2->m_pLeft)
-			pNode2->m_pLeft->m_pParent = pNode2;
+		if (node2->m_left)
+			node2->m_left->m_parent = node2;
 
-		if (pNode2->m_pRight)
-			pNode2->m_pRight->m_pParent = pNode2;
+		if (node2->m_right)
+			node2->m_right->m_parent = node2;
 
-		CNode::OnXcg (pNode1, pNode2);
+		CNode::onXcg (node1, node2);
 	}
 
 	CNode* 
-	ReplaceWithChild (CNode* pNode)
+	replaceWithChild (CNode* node)
 	{		
-		CNode* pChild = pNode->m_pRight ? pNode->m_pRight : pNode->m_pLeft;
+		CNode* child = node->m_right ? node->m_right : node->m_left;
 		 
-		if (!pNode->m_pParent)
+		if (!node->m_parent)
 		{
-			ASSERT (pNode == m_pRoot);
-			m_pRoot = pChild;
+			ASSERT (node == m_root);
+			m_root = child;
 		}
-		else if (pNode == pNode->m_pParent->m_pLeft)
-			pNode->m_pParent->m_pLeft = pChild;
+		else if (node == node->m_parent->m_left)
+			node->m_parent->m_left = child;
 		else
-			pNode->m_pParent->m_pRight = pChild;
+			node->m_parent->m_right = child;
 
-		if (pChild)
-			pChild->m_pParent = pNode->m_pParent;
+		if (child)
+			child->m_parent = node->m_parent;
 
-		return pChild;
+		return child;
 	}
 
 	void 
-	RotateLeft (CNode* x)
+	rotateLeft (CNode* x)
 	{
-		CNode* y = x->m_pRight;
+		CNode* y = x->m_right;
 		ASSERT (y);
 
-		x->m_pRight = y->m_pLeft;
+		x->m_right = y->m_left;
 
-		if (y->m_pLeft) 
-			y->m_pLeft->m_pParent = x;
+		if (y->m_left) 
+			y->m_left->m_parent = x;
 
-		y->m_pParent = x->m_pParent;
+		y->m_parent = x->m_parent;
 	    
-		if (!x->m_pParent) 
-			m_pRoot = y;
-		else if (x == x->m_pParent->m_pLeft)
-			x->m_pParent->m_pLeft = y;
+		if (!x->m_parent) 
+			m_root = y;
+		else if (x == x->m_parent->m_left)
+			x->m_parent->m_left = y;
 		else
-			x->m_pParent->m_pRight = y;
+			x->m_parent->m_right = y;
 
-		y->m_pLeft = x;
-		x->m_pParent = y;
+		y->m_left = x;
+		x->m_parent = y;
 	}
 
 	void 
-	RotateRight (CNode* x)
+	rotateRight (CNode* x)
 	{
-		CNode* y = x->m_pLeft;
+		CNode* y = x->m_left;
 		ASSERT (y);
 
-		x->m_pLeft = y->m_pRight;
+		x->m_left = y->m_right;
 
-		if (y->m_pRight) 
-			y->m_pRight->m_pParent = x;
+		if (y->m_right) 
+			y->m_right->m_parent = x;
 
-		y->m_pParent = x->m_pParent;
+		y->m_parent = x->m_parent;
 	    
-		if (!x->m_pParent) 
-			m_pRoot = y;
-		else if (x == x->m_pParent->m_pRight)
-			x->m_pParent->m_pRight = y;
+		if (!x->m_parent) 
+			m_root = y;
+		else if (x == x->m_parent->m_right)
+			x->m_parent->m_right = y;
 		else
-			x->m_pParent->m_pLeft = y;
+			x->m_parent->m_left = y;
 
-		y->m_pRight = x;
-		x->m_pParent = y;
+		y->m_right = x;
+		x->m_parent = y;
 	}
 
 	// overridables: tree rebalancing on insert/delete
 
 	void 
-	OnInsert (CNode* pNode)
+	onInsert (CNode* node)
 	{
 	}
 
 	void 
-	OnDelete (CNode* pNode)
+	onErase (CNode* node)
 	{ 
-		ReplaceWithChild (pNode); 
+		replaceWithChild (node); 
 	}
 };
 

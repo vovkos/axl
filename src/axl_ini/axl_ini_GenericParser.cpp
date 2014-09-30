@@ -7,50 +7,50 @@ namespace ini {
 //.............................................................................
 
 bool
-CGenericParser::OnSection (const char* pSectionName)
+CGenericParser::onSection (const char* sectionName)
 {
-	ASSERT (m_pIni);
+	ASSERT (m_ini);
 
-	rtl::CStringHashTableMapIteratorT <CSection*> It = m_pIni->m_NamedSectionMap.Find (pSectionName);
-	if (It)
+	rtl::CStringHashTableMapIteratorT <CSection*> it = m_ini->m_namedSectionMap.find (sectionName);
+	if (it)
 	{
-		m_pCurrentSection = It->m_Value;
+		m_currentSection = it->m_value;
 		return true;
 	}
 
-	CSection* pSection = AXL_MEM_NEW (CSection);
-	pSection->m_Name = pSectionName;
-	m_pIni->m_NamedSectionList.InsertTail (pSection);
-	m_pIni->m_NamedSectionMap [pSection->m_Name] = pSection;
+	CSection* section = AXL_MEM_NEW (CSection);
+	section->m_name = sectionName;
+	m_ini->m_namedSectionList.insertTail (section);
+	m_ini->m_namedSectionMap [section->m_name] = section;
 	return true;
 }
 
 bool
-CGenericParser::OnKeyValue (
-	const char* pKeyName, 
-	const char* pValue
+CGenericParser::onKeyValue (
+	const char* keyName, 
+	const char* value
 	)
 {
-	ASSERT (m_pCurrentSection);
+	ASSERT (m_currentSection);
 
-	if (!pValue || !*pValue)
+	if (!value || !*value)
 	{
-		m_pCurrentSection->m_UnnamedValueList.InsertTail (pKeyName);
+		m_currentSection->m_unnamedValueList.insertTail (keyName);
 		return true;
 	}
 
-	rtl::CStringHashTableMapIteratorT <CNamedValue*> It = m_pCurrentSection->m_NamedValueMap.Find (pKeyName);
-	if (It)
+	rtl::CStringHashTableMapIteratorT <CNamedValue*> it = m_currentSection->m_namedValueMap.find (keyName);
+	if (it)
 	{
-		It->m_Value->m_Value = pValue;
+		it->m_value->m_value = value;
 		return true;
 	}
 
-	CNamedValue* pNamedValue = AXL_MEM_NEW (CNamedValue);
-	pNamedValue->m_Name = pKeyName;
-	pNamedValue->m_Value = pValue;
-	m_pCurrentSection->m_NamedValueList.InsertTail (pNamedValue);
-	m_pCurrentSection->m_NamedValueMap [pNamedValue->m_Value] = pNamedValue;
+	CNamedValue* namedValue = AXL_MEM_NEW (CNamedValue);
+	namedValue->m_name = keyName;
+	namedValue->m_value = value;
+	m_currentSection->m_namedValueList.insertTail (namedValue);
+	m_currentSection->m_namedValueMap [namedValue->m_value] = namedValue;
 	return true;
 }
 

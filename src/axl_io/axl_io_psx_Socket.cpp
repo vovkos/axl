@@ -10,59 +10,59 @@ namespace psx {
 //.............................................................................
 
 bool
-CSocket::Open (
-	int AddressFamily,
-	int SockKind,
-	int Protocol
+CSocket::open (
+	int addressFamily,
+	int sockKind,
+	int protocol
 	)
 {
-	Close ();
-	m_h = ::socket (AddressFamily, SockKind, Protocol);
-	return err::Complete (m_h != -1);
+	close ();
+	m_h = ::socket (addressFamily, sockKind, protocol);
+	return err::complete (m_h != -1);
 }
 
 int
-CSocket::GetError ()
+CSocket::getError ()
 {
-	int Error = 0;
-	GetOption (SOL_SOCKET, SO_ERROR, &Error, sizeof (int));
-	return Error;
+	int error = 0;
+	getOption (SOL_SOCKET, SO_ERROR, &error, sizeof (int));
+	return error;
 }
 
 bool
-CSocket::SetBlockingMode (bool IsBlocking)
+CSocket::setBlockingMode (bool isBlocking)
 {
-	int Value = !IsBlocking;
-	int Result = ::ioctl (m_h, FIONBIO, &Value);
-	return err::Complete (m_h != -1);
+	int value = !isBlocking;
+	int result = ::ioctl (m_h, FIONBIO, &value);
+	return err::complete (m_h != -1);
 }
 
 bool
-CSocket::GetAddress (sockaddr* pAddr)
+CSocket::getAddress (sockaddr* addr)
 {
-	socklen_t Size = sizeof (sockaddr);
-	int Result = ::getsockname (m_h, pAddr, &Size);
-	return err::Complete (Result != -1);
+	socklen_t size = sizeof (sockaddr);
+	int result = ::getsockname (m_h, addr, &size);
+	return err::complete (result != -1);
 }
 
 bool
-CSocket::GetPeerAddress (sockaddr* pAddr)
+CSocket::getPeerAddress (sockaddr* addr)
 {
-	socklen_t Size = sizeof (sockaddr);
-	int Result = ::getpeername (m_h, pAddr, &Size);
-	return err::Complete (Result != -1);
+	socklen_t size = sizeof (sockaddr);
+	int result = ::getpeername (m_h, addr, &size);
+	return err::complete (result != -1);
 }
 
 bool
-CSocket::Connect (const sockaddr* pAddr)
+CSocket::connect (const sockaddr* addr)
 {
-	int Result = ::connect (m_h, pAddr, sizeof (sockaddr));
-	if (Result != -1)
+	int result = ::connect (m_h, addr, sizeof (sockaddr));
+	if (result != -1)
 		return true;
 
 	if (errno != EINPROGRESS)
 	{
-		err::SetError (errno);
+		err::setError (errno);
 		return false;
 	}
 
@@ -70,23 +70,23 @@ CSocket::Connect (const sockaddr* pAddr)
 }
 
 int
-CSocket::Accept (sockaddr* pAddr)
+CSocket::accept (sockaddr* addr)
 {
-	socklen_t Size = sizeof (sockaddr);
-	int Socket = ::accept (m_h, pAddr, &Size);
-	return err::Complete (Socket, -1);
+	socklen_t size = sizeof (sockaddr);
+	int socket = ::accept (m_h, addr, &size);
+	return err::complete (socket, -1);
 }
 
 size_t
-CSocket::RecvFrom (
+CSocket::recvFrom (
 	void* p,
-	size_t Size,
-	sockaddr* pAddr
+	size_t size,
+	sockaddr* addr
 	)
 {
-	socklen_t SockAddrSize = sizeof (sockaddr);
-	int Result = ::recvfrom (m_h, p, Size, 0, pAddr, &SockAddrSize);
-	return err::Complete (Result, -1);
+	socklen_t sockAddrSize = sizeof (sockaddr);
+	int result = ::recvfrom (m_h, p, size, 0, addr, &sockAddrSize);
+	return err::complete (result, -1);
 }
 
 //.............................................................................

@@ -21,122 +21,122 @@ protected:
 	struct THyperlinkXMapEntry
 	{
 		int m_x;
-		THyperlinkAnchor* m_pAnchor;
+		THyperlinkAnchor* m_anchor;
 	};
 
 protected:
-	rtl::CString m_Source;
-	rtl::CString m_Text;
-	CTextAttrAnchorArray m_AttrArray;
-	CHyperlinkAnchorArray m_HyperlinkArray;
-	rtl::CArrayT <THyperlinkXMapEntry> m_HyperlinkXMap;
+	rtl::CString m_source;
+	rtl::CString m_text;
+	CTextAttrAnchorArray m_attrArray;
+	CHyperlinkAnchorArray m_hyperlinkArray;
+	rtl::CArrayT <THyperlinkXMapEntry> m_hyperlinkXMap;
 
 public:
 	rtl::CString
-	GetSource () const 
+	getSource () const 
 	{
-		return m_Source;
+		return m_source;
 	}
 
 	rtl::CString
-	GetText () const 
+	getText () const 
 	{
-		return m_Text;
+		return m_text;
 	}
 
 	const CTextAttrAnchorArray*
-	GetAttrArray () const 
+	getAttrArray () const 
 	{
-		return &m_AttrArray;
+		return &m_attrArray;
 	}
 
 	void 
-	Clear ();
+	clear ();
 
 	size_t 
-	SetHyperText (
-		const TTextAttr& BaseAttr,
-		const char* pText, 
-		size_t Length = -1
+	setHyperText (
+		const TTextAttr& baseAttr,
+		const char* text, 
+		size_t length = -1
 		)
 	{
-		Clear ();
-		return AppendHyperText (BaseAttr, pText, Length);
+		clear ();
+		return appendHyperText (baseAttr, text, length);
 	}
 
 	size_t 
-	SetHyperText (
-		const char* pText, 
-		size_t Length = -1
+	setHyperText (
+		const char* text, 
+		size_t length = -1
 		)
 	{
-		return SetHyperText (TTextAttr (), pText, Length);
+		return setHyperText (TTextAttr (), text, length);
 	}
 
 	size_t 
-	SetPlainText (
-		const char* pText, 
-		size_t Length = -1
+	setPlainText (
+		const char* text, 
+		size_t length = -1
 		)
 	{
-		Clear ();
-		return AppendPlainText (pText, Length);
+		clear ();
+		return appendPlainText (text, length);
 	}
 
 	size_t 
-	SetPlainText (
-		char Char, 
-		size_t Count = 1
+	setPlainText (
+		char c, 
+		size_t count = 1
 		)
 	{
-		Clear ();
-		return AppendPlainText (Char, Count);
+		clear ();
+		return appendPlainText (c, count);
 	}
 
 	size_t 
-	AppendHyperText (
-		const TTextAttr& BaseAttr,
-		const char* pText, 
-		size_t Length = -1
+	appendHyperText (
+		const TTextAttr& baseAttr,
+		const char* text, 
+		size_t length = -1
 		);
 
 	size_t 
-	AppendHyperText (
-		const char* pText, 
-		size_t Length = -1
+	appendHyperText (
+		const char* text, 
+		size_t length = -1
 		)
 	{
-		return AppendHyperText (TTextAttr (), pText, Length);
+		return appendHyperText (TTextAttr (), text, length);
 	}
 
 	size_t 
-	AppendPlainText (
-		const char* pText, 
-		size_t Length = -1
+	appendPlainText (
+		const char* text, 
+		size_t length = -1
 		);
 
 	size_t 
-	AppendPlainText (
-		char Char, 
-		size_t Count = 1
+	appendPlainText (
+		char c, 
+		size_t count = 1
 		);
 
 	size_t
-	Backspace (size_t BackLength);
+	backspace (size_t backLength);
 
 	TSize
-	CalcTextSize (CFont* pFont) const;
+	calcTextSize (CFont* font) const;
 
 	void 
-	CalcHyperlinkXMap (CFont* pFont);
+	calcHyperlinkXMap (CFont* font);
 
 	THyperlinkAnchor* 
-	FindHyperlinkByX (int x) const ;
+	findHyperlinkByX (int x) const ;
 
 	THyperlinkAnchor* 
-	FindHyperlinkByOffset (size_t Offset) const 
+	findHyperlinkByOffset (size_t offset) const 
 	{
-		return m_HyperlinkArray.Find (Offset);
+		return m_hyperlinkArray.find (offset);
 	}
 };
 

@@ -27,19 +27,19 @@ class CTlsMgr
 protected:
 	struct TPage
 	{
-		rtl::CArrayT <rtl::CBoxListEntryT <CTlsValue>*> m_Array;
-		rtl::CBoxListT <CTlsValue> m_ValueList;
+		rtl::CArrayT <rtl::CBoxListEntryT <CTlsValue>*> m_array;
+		rtl::CBoxListT <CTlsValue> m_valueList;
 	};
 
 protected:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t m_TlsIdx;
-	static bool m_IsDead;
+	uint_t m_tlsIdx;
+	static bool m_isDead;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	pthread_key_t m_TlsKey;
+	pthread_key_t m_tlsKey;
 #endif
 
-	int32_t m_SlotCount;
+	int32_t m_slotCount;
 
 public:
 	CTlsMgr ();
@@ -47,63 +47,63 @@ public:
 	~CTlsMgr ();
 
 	size_t
-	CreateSlot ()
+	createSlot ()
 	{
-		return mt::AtomicInc (&m_SlotCount) - 1;
+		return mt::atomicInc (&m_slotCount) - 1;
 	}
 
 	CTlsValue
-	GetSlotValue (size_t Slot);
+	getSlotValue (size_t slot);
 
 	CTlsValue
-	SetSlotValue (
-		size_t Slot,
-		const CTlsValue& Value
+	setSlotValue (
+		size_t slot,
+		const CTlsValue& value
 		);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	static
 	void
 	NTAPI
-	TlsCallback (
+	tlsCallback (
 		HANDLE hModule,
-		dword_t Reason,
-		void* pReserved
+		dword_t reason,
+		void* reserved
 		);
 #endif
 
 protected:
 	TPage*
-	GetCurrentThreadPage ();
+	getCurrentThreadPage ();
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	TPage*
-	FindCurrentThreadPage ()
+	findCurrentThreadPage ()
 	{
-		return (TPage*) TlsGetValue (m_TlsIdx);
+		return (TPage*) ::TlsGetValue (m_tlsIdx);
 	}
 
 	void
-	SetCurrentThreadPage (TPage* pPage)
+	setCurrentThreadPage (TPage* page)
 	{
-		TlsSetValue (m_TlsIdx, pPage);
+		::TlsSetValue (m_tlsIdx, page);
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	TPage*
-	FindCurrentThreadPage ()
+	findCurrentThreadPage ()
 	{
-		return (TPage*) pthread_getspecific (m_TlsKey);
+		return (TPage*) pthread_getspecific (m_tlsKey);
 	}
 
 	void
-	SetCurrentThreadPage (TPage* pPage)
+	setCurrentThreadPage (TPage* page)
 	{
-		pthread_setspecific (m_TlsKey, pPage);
+		pthread_setspecific (m_tlsKey, page);
 	}
 
 	static
 	void
-	TlsDestructor (void* p)
+	tlsDestructor (void* p)
 	{
 		ASSERT (p);
 		AXL_MEM_DELETE ((TPage*) p);
@@ -115,9 +115,9 @@ protected:
 
 inline
 CTlsMgr*
-GetTlsMgr ()
+getTlsMgr ()
 {
-	return rtl::GetSingleton <CTlsMgr> ();
+	return rtl::getSingleton <CTlsMgr> ();
 }
 
 //.............................................................................

@@ -27,16 +27,16 @@ namespace io {
 class CPipe
 {
 protected:
-	g::win::CFileHandle m_Socket;
+	g::win::CFileHandle m_socket;
 
 protected:
-	bool Open (
-		const char* pName,
-		SECURITY_DESCRIPTOR* pSd
+	bool open (
+		const char* name,
+		SECURITY_DESCRIPTOR* sd
 		);
 
 	void 
-	Close ();
+	close ();
 };
 
 //.............................................................................
@@ -46,17 +46,17 @@ class CConnectionPipe;
 class CListenerPipe: public CPipe
 {
 protected:
-	rtl::CArrayT <CConnectionPipe*> m_BackLog;
-	exe::CFunction m_OnAccept;
-	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
+	rtl::CArrayT <CConnectionPipe*> m_backLog;
+	exe::CFunction m_onAccept;
+	ref::CPtrT <exe::CWorkerThread> m_workerThread;
 
 public:
 	bool
-	Listen (
-		const char* pName,
-		SECURITY_DESCRIPTOR* pSecDescr,
-		size_t BackLog,
-		const exe::CFunction& OnAccept
+	listen (
+		const char* name,
+		SECURITY_DESCRIPTOR* secDescr,
+		size_t backLog,
+		const exe::CFunction& onAccept
 		);
 };
 
@@ -65,49 +65,49 @@ public:
 class CConnectionPipe: public CPipe
 {
 protected:
-	exe::CFunction m_OnConnectComplete;
-	exe::CFunction m_OnDisconnectComplete;	
+	exe::CFunction m_onConnectComplete;
+	exe::CFunction m_onDisconnectComplete;	
 
 public:
 	bool 
-	Connect (
-		const char* pAddress,
-		uint_t Timeout,
-		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError)
+	connect (
+		const char* address,
+		uint_t timeout,
+		const exe::CFunction& onComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
-	Disconnect (
-		uint_t Timeout,
-		const exe::CFunction& OnComplete // void OnComplete (err::CError* pError)
+	disconnect (
+		uint_t timeout,
+		const exe::CFunction& onComplete // void OnComplete (err::CError* pError)
 		);
 
 	bool 
-	SyncConnect (
-		const char* pAddress,
-		uint_t Timeout
+	syncConnect (
+		const char* address,
+		uint_t timeout
 		);
 
 	bool 
-	SyncDisconnect (uint_t Timeout);
+	syncDisconnect (uint_t timeout);
 
 	bool
-	IsConnected ();
+	isConnected ();
 
 	virtual
 	bool
-	Send (
+	send (
 		const void* p,
-		size_t Size,
-		const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
+		size_t size,
+		const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
 		);
 
 	virtual
 	bool
-	Recv (
+	recv (
 		void* p,
-		size_t Size,
-		const exe::CFunction& OnComplete // void OnComplete (size_t ActualSize);
+		size_t size,
+		const exe::CFunction& onComplete // void OnComplete (size_t ActualSize);
 		);
 };
 

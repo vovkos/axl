@@ -7,72 +7,72 @@ namespace mt {
 //.............................................................................
 
 bool
-CEvent::Signal ()
+CEvent::signal ()
 {
-	m_Mutex.Lock ();
+	m_mutex.lock ();
 
-	int Value = 0;
-	bool Result = m_Sem.GetValue (&Value);
-	if (Result && Value <= 0)
-		Result = m_Sem.Post ();
+	int value = 0;
+	bool result = m_sem.getValue (&value);
+	if (result && value <= 0)
+		result = m_sem.post ();
 
-	m_Mutex.Unlock ();
+	m_mutex.unlock ();
 
-	return Result;
+	return result;
 }
 
 bool
-CEvent::Reset ()
+CEvent::reset ()
 {
-	m_Mutex.Lock ();
+	m_mutex.lock ();
 
-	int Value = 0;
-	bool Result = m_Sem.GetValue (&Value);
-	if (Result && Value > 0)
-		Result = m_Sem.Wait ();
+	int value = 0;
+	bool result = m_sem.getValue (&value);
+	if (result && value > 0)
+		result = m_sem.wait ();
 
-	m_Mutex.Unlock ();
+	m_mutex.unlock ();
 
-	return Result;
+	return result;
 }
 
 //.............................................................................
 
 bool
-CNotificationEvent::Signal ()
+CNotificationEvent::signal ()
 {
-	m_Mutex.Lock ();
+	m_mutex.lock ();
 
-	bool Result = m_Cond.Broadcast ();			
-	if (Result)
-		m_State = true;
+	bool result = m_cond.broadcast ();			
+	if (result)
+		m_state = true;
 
-	m_Mutex.Unlock ();
-	return Result;
+	m_mutex.unlock ();
+	return result;
 }
 
 bool
-CNotificationEvent::Reset ()
+CNotificationEvent::reset ()
 {
-	m_Mutex.Lock ();
-	m_State = false;
-	m_Mutex.Unlock ();
+	m_mutex.lock ();
+	m_state = false;
+	m_mutex.unlock ();
 	return true;		
 }
 
 bool
-CNotificationEvent::Wait (uint_t Timeout)
+CNotificationEvent::wait (uint_t timeout)
 {
-	m_Mutex.Lock ();
-	if (m_State)
+	m_mutex.lock ();
+	if (m_state)
 	{
-		m_Mutex.Unlock ();
+		m_mutex.unlock ();
 		return true;
 	}
 
-	bool Result = m_Cond.Wait (m_Mutex, Timeout);
-	m_Mutex.Unlock ();
-	return Result;		
+	bool result = m_cond.wait (m_mutex, timeout);
+	m_mutex.unlock ();
+	return result;		
 }
 
 //.............................................................................

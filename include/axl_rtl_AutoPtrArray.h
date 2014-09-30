@@ -24,71 +24,71 @@ class CAutoPtrArrayDetailsT: public CSimpleArrayDetailsT <T*>
 public:
 	static 
 	void 
-	Destruct (
+	destruct (
 		T** p, 
-		size_t Count
+		size_t count
 		)
 	{ 
-		T** pEnd = p + Count;
-		for (; p < pEnd; p++)
+		T** end = p + count;
+		for (; p < end; p++)
 			if (*p)
 				TDelete () (*p);
 	}
 
 	static 
 	void 
-	Copy (
-		T** pDst, 
-		T* const* pSrc, 
-		size_t Count
+	copy (
+		T** dst, 
+		T* const* src, 
+		size_t count
 		)
 	{ 
-		if (pSrc > pDst || pSrc + Count <= pDst)
+		if (src > dst || src + count <= dst)
 		{
-			T** pEnd = pDst + Count;
-			for (; pDst < pEnd; pDst++, pSrc++)
+			T** end = dst + count;
+			for (; dst < end; dst++, src++)
 			{
-				if (*pDst)
-					TDelete () (*pDst);
+				if (*dst)
+					TDelete () (*dst);
 
-				*pDst = *pSrc;
+				*dst = *src;
 			}
 		}
 		else
 		{
-			T** pEnd = pDst;
+			T** end = dst;
 
-			pDst += Count;
-			pSrc += Count;
+			dst += count;
+			src += count;
 
-			while (pDst > pEnd)
+			while (dst > end)
 			{
-				pDst--;
-				pSrc--;
+				dst--;
+				src--;
 
-				if (*pDst)
-					TDelete () (*pDst);
+				if (*dst)
+					TDelete () (*dst);
 
-				*pDst = *pSrc;
+				*dst = *src;
 			}
 		}
 	}
 
 	static 
 	void 
-	Clear (
+	clear (
 		T** p, 
-		size_t Count
+		size_t count
 		)
 	{
-		T** pBegin = p;
-		T** pEnd = p + Count;
+		T** begin = p;
+		T** end = p + count;
 
-		for (; p < pEnd; p++)
+		for (; p < end; p++)
 			if (*p)
 				TDelete () (*p);
 		
-		memset (pBegin, 0, Count * sizeof (T)); 
+		memset (begin, 0, count * sizeof (T)); 
 	}	
 };
 
@@ -96,7 +96,7 @@ public:
 
 template <
 	typename T,
-	typename TDelete = mem::CStdFactoryT <T>::CDelete
+	typename TDelete = mem::CStdFactoryT <T>::COperatorDelete
 	>
 class CAutoPtrArrayT: public rtl::CArrayT <T*, CAutoPtrArrayDetailsT <T, TDelete> >
 {
@@ -115,18 +115,18 @@ public:
 
 	CAutoPtrArrayT (
 		T* const* p, 
-		size_t Count
+		size_t count
 		):
-		CBaseType (p, Count)
+		CBaseType (p, count)
 	{ 
 	}
 
 	CAutoPtrArrayT (
-		ref::EBuf BufKind,
+		ref::EBuf bufKind,
 		void* p, 
-		size_t Size
+		size_t size
 		):
-		CBaseType (BufKind, p, Size)
+		CBaseType (bufKind, p, size)
 	{
 	}
 
@@ -156,104 +156,104 @@ public:
 	}
 
 	void
-	TakeOver (CAutoPtrArrayT* pSrc)
+	takeOver (CAutoPtrArrayT* src)
 	{
-		Release ();
-		m_p = pSrc;
-		pSrc->m_p = NULL;
+		release ();
+		m_p = src;
+		src->m_p = NULL;
 	}
 
 	bool 
-	Copy (
+	copy (
 		T* const* p, 
-		size_t Count
+		size_t count
 		)
 	{
-		return CBaseType::Copy (p, Count);
+		return CBaseType::copy (p, count);
 	}
 
 	bool 
-	Copy (T* e)
+	copy (T* e)
 	{
-		return CBaseType::Copy (e);
+		return CBaseType::copy (e);
 	}
 
 	T** 
-	Append (
+	append (
 		T* const* p, 
-		size_t Count
+		size_t count
 		)
 	{ 
-		return CBaseType::Append (p, Count);
+		return CBaseType::append (p, count);
 	}
 
 	T**
-	Append (T* e)
+	append (T* e)
 	{ 
-		return CBaseType::Append (e);
+		return CBaseType::append (e);
 	}
 
 	T**
-	Insert (
-		size_t Index, 
+	insert (
+		size_t index, 
 		T* const* p, 
-		size_t Count
+		size_t count
 		)
 	{
-		return CBaseType::Insert (Index, p, Count);
+		return CBaseType::insert (index, p, count);
 	}
 
 	T**
-	Insert (
-		size_t Index, 
+	insert (
+		size_t index, 
 		T* e
 		)
 	{
-		return CBaseType::Insert (Index, e);
+		return CBaseType::insert (index, e);
 	}
 
 	size_t
-	Pop (size_t Count = 1)
+	pop (size_t count = 1)
 	{
-		size_t OldCount = GetCount ();
-		if (Count >= OldCount)
-			Count = OldCount;
+		size_t oldCount = getCount ();
+		if (count >= oldCount)
+			count = oldCount;
 
-		SetCount (OldCount - Count);
-		return Count;
+		setCount (oldCount - count);
+		return count;
 	}
 
 	T* 
-	GetBackAndPop ()
+	getBackAndPop ()
 	{
-		T* e = GetBack ();
-		Pop ();
+		T* e = getBack ();
+		pop ();
 		return e;
 	}
 
 private:
-	CAutoPtrArrayT (const CAutoPtrArrayT& Src)
+	CAutoPtrArrayT (const CAutoPtrArrayT& src)
 	{   
 	}
 
 	void
-	operator = (const CAutoPtrArrayT& Src)
+	operator = (const CAutoPtrArrayT& src)
 	{ 
 	}
 
 	T**
-	AppendMultiply (
+	appendMultiply (
 		T* e,
-		size_t Count
+		size_t count
 		)
 	{ 
 	}
 
 	T**
-	InsertMultiply (
-		size_t Index, 
+	insertMultiply (
+		size_t index, 
 		T* e, 
-		size_t Count
+		size_t count
 		)
 	{
 	}

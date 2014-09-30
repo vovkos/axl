@@ -8,27 +8,27 @@ namespace psx {
 //.............................................................................
 
 uint64_t
-CFile::GetSize () const
+CFile::getSize () const
 {
-	struct stat64 Stat;
-	int Result = fstat64 (m_h, &Stat);
-	if (Result == -1)
+	struct stat64 stat;
+	int result = fstat64 (m_h, &stat);
+	if (result == -1)
 	{
-		err::SetLastSystemError ();
+		err::setLastSystemError ();
 		return -1;
 	}
 
-	return Stat.st_size;
+	return stat.st_size;
 }
 
 uint64_t
-CFile::GetPosition () const
+CFile::getPosition () const
 {
-	uint64_t Offset = lseek64 (m_h, 0, SEEK_CUR);
-	if (Offset == -1)
-		err::SetLastSystemError ();
+	uint64_t offset = lseek64 (m_h, 0, SEEK_CUR);
+	if (offset == -1)
+		err::setLastSystemError ();
 
-	return Offset;
+	return offset;
 }
 
 //.............................................................................

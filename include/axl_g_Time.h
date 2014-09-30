@@ -17,10 +17,10 @@ namespace g {
 // note that Windows FILETIME epoch is different from POSIX time epoch which is January 1, 1970
 
 uint64_t
-GetTimestamp ();
+getTimestamp ();
 
 void
-Sleep (uint32_t MsCount);
+sleep (uint32_t msCount);
 
 //.............................................................................
 
@@ -28,27 +28,27 @@ Sleep (uint32_t MsCount);
 
 inline
 int
-GetTimeZoneOffsetInMinutes (int TimeZone)
+getTimeZoneOffsetInMinutes (int timeZone)
 {
-	return TimeZone <= -100 || TimeZone >= 100 ?
-		(TimeZone / 100) * 60 + TimeZone % 100 :
-		TimeZone * 60;
+	return timeZone <= -100 || timeZone >= 100 ?
+		(timeZone / 100) * 60 + timeZone % 100 :
+		timeZone * 60;
 }
 
 //.............................................................................
 
 struct TTime
 {
-	uint16_t m_Year;
-	uint16_t m_Month;
-	uint16_t m_MonthDay;
-	uint16_t m_DayOfWeek;
-	uint16_t m_Hour;
-	uint16_t m_Minute;
-	uint16_t m_Second;
-	uint16_t m_MilliSecond;
-	uint16_t m_MicroSecond;
-	uint16_t m_NanoSecond;
+	uint16_t m_year;
+	uint16_t m_month;
+	uint16_t m_monthDay;
+	uint16_t m_dayOfWeek;
+	uint16_t m_hour;
+	uint16_t m_minute;
+	uint16_t m_second;
+	uint16_t m_milliSecond;
+	uint16_t m_microSecond;
+	uint16_t m_nanoSecond;
 
 public:
 	TTime ()
@@ -56,72 +56,72 @@ public:
 		memset (this, 0, sizeof (TTime));
 	}
 
-	TTime (uint64_t Timestamp)
+	TTime (uint64_t timestamp)
 	{
-		SetTimestampImpl (Timestamp, true, 0);
+		setTimestampImpl (timestamp, true, 0);
 	}
 
 	TTime (
-		uint64_t Timestamp,
-		int TimeZone
+		uint64_t timestamp,
+		int timeZone
 		)
 	{
-		SetTimestampImpl (Timestamp, false, TimeZone);
+		setTimestampImpl (timestamp, false, timeZone);
 	}
 
 	uint64_t
-	GetTimestamp () const
+	getTimestamp () const
 	{
-		return GetTimestampImpl (true, 0);
+		return getTimestampImpl (true, 0);
 	}
 
 	uint64_t
-	GetTimestamp (int TimeZone) const
+	getTimestamp (int timeZone) const
 	{
-		return GetTimestampImpl (false, TimeZone);
+		return getTimestampImpl (false, timeZone);
 	}
 
 	void
-	SetTimestamp (uint64_t Timestamp)
+	setTimestamp (uint64_t timestamp)
 	{
-		SetTimestampImpl (Timestamp, true, 0);
+		setTimestampImpl (timestamp, true, 0);
 	}
 
 	void
-	SetTimestamp (
-		uint64_t Timestamp,
-		int TimeZone
+	setTimestamp (
+		uint64_t timestamp,
+		int timeZone
 		)
 	{
-		SetTimestampImpl (Timestamp, false, TimeZone);
+		setTimestampImpl (timestamp, false, timeZone);
 	}
 
 	size_t
-	Format (
-		rtl::CString* pString,
-		const char* pFormat = "%W %D %N %Y %h:%m:%s"
+	format (
+		rtl::CString* string,
+		const char* formatString = "%W %D %N %Y %h:%m:%s"
 		) const;
 
 	rtl::CString
-	Format (const char* pFormat = "%W %D %N %Y %h:%m:%s") const
+	format (const char* formatString = "%W %D %N %Y %h:%m:%s") const
 	{
-		rtl::CString String;
-		Format (&String, pFormat);
-		return String;
+		rtl::CString string;
+		format (&string, formatString);
+		return string;
 	}
 
 protected:
 	uint64_t
-	GetTimestampImpl (
-		bool IsLocal,
-		int TimeZone
+	getTimestampImpl (
+		bool isLocal,
+		int timeZone
 		) const;
 
 	void
-	SetTimestampImpl (
-		uint64_t Timestamp,
-		bool IsLocal,
-		int TimeZone
+	setTimestampImpl (
+		uint64_t timestamp,
+		bool isLocal,
+		int timeZone
 		);
 };
 
@@ -154,27 +154,27 @@ protected:
 
 inline
 void
-GetTimespecFromTimeout (
-	uint_t Timeout,
-	timespec* pTimespec
+getTimespecFromTimeout (
+	uint_t timeout,
+	timespec* timespec
 	)
 {
-	pTimespec->tv_sec = Timeout / 1000;
-	pTimespec->tv_nsec = (Timeout % 1000) * 1000000;
+	timespec->tv_sec = timeout / 1000;
+	timespec->tv_nsec = (timeout % 1000) * 1000000;
 }
 
 inline
 void
-GetAbsTimespecFromTimeout (
-	uint_t Timeout,
-	timespec* pTimespec
+getAbsTimespecFromTimeout (
+	uint_t timeout,
+	timespec* timespec
 	)
 {
-	int Result = clock_gettime (CLOCK_REALTIME, pTimespec);
-	ASSERT (Result == 0);
+	int result = clock_gettime (CLOCK_REALTIME, timespec);
+	ASSERT (result == 0);
 
-	pTimespec->tv_sec += Timeout / 1000;
-	pTimespec->tv_nsec += (Timeout % 1000) * 1000000;
+	timespec->tv_sec += timeout / 1000;
+	timespec->tv_nsec += (timeout % 1000) * 1000000;
 }
 
 #endif

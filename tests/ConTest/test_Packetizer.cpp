@@ -10,9 +10,9 @@ class CMyPacketizer: public rtl::CPacketizerT <CMyPacketizer>
 {
 public:
 	void
-	OnPacket (
+	onPacket (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
 		printf ("packet received: %s\n", p);
@@ -20,38 +20,38 @@ public:
 };
 
 void
-Run ()
+run ()
 {
 	printf ("test_Packetizer::Run ()\n");
 
-	CMyPacketizer Packetizer;
+	CMyPacketizer packetizer;
 
-	char Data [] = "papapaapak:\xf\0\0\0pizda ivanovna";
+	char data [] = "papapaapak:\xf\0\0\0pizda ivanovna";
 
 	srand (::GetTickCount ());
 
 	for (size_t i = 0; i < 64; i++)
 	{
-		char* p = Data;
-		size_t Size = sizeof (Data);
+		char* p = data;
+		size_t size = sizeof (data);
 
 		size_t j = 0;
-		for (; Size; j++)
+		for (; size; j++)
 		{
-			size_t ChunkSize = rand () % (sizeof (Data) + 1);
-			if (ChunkSize > Size)
-				ChunkSize = Size;
+			size_t chunkSize = rand () % (sizeof (data) + 1);
+			if (chunkSize > size)
+				chunkSize = size;
 
-			Packetizer.Write (p, ChunkSize);
-			p += ChunkSize;
-			Size -= ChunkSize;
+			packetizer.write (p, chunkSize);
+			p += chunkSize;
+			size -= chunkSize;
 		}
 
 		printf ("complete (%d, %d chunks).\n", i, j);
 	}
 	
 	rtl::CString s = "dsjsdljsdkl";
-	s.Clear ();
+	s.clear ();
 
 	printf ("done.\n");
 }

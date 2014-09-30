@@ -19,55 +19,55 @@ class CParserT: protected CLexer
 {
 public:
 	bool
-	ParseFile (const rtl::CString& FilePath)
+	parseFile (const rtl::CString& filePath)
 	{
-		io::CSimpleMappedFile File;
+		io::CSimpleMappedFile file;
 		return 
-			File.Open (FilePath, io::EFileFlag_ReadOnly) &&
-			Parse (FilePath, (const char*) File.p (), (size_t) File.GetSize ());
+			file.open (filePath, io::EFileFlag_ReadOnly) &&
+			parse (filePath, (const char*) file.p (), (size_t) file.getSize ());
 	}
 
 	bool
-	Parse (
-		const char* pSource,
-		size_t Length = -1
+	parse (
+		const char* source,
+		size_t length = -1
 		)
 	{
-		return Parse ("INI", pSource, Length);
+		return parse ("INI", source, length);
 	}
 
 	bool
-	Parse (
-		const rtl::CString& FilePath,
-		const char* pSource,
-		size_t Length = -1
+	parse (
+		const rtl::CString& filePath,
+		const char* source,
+		size_t length = -1
 		)
 	{
-		bool Result;
+		bool result;
 
-		CLexer::Create (FilePath, pSource, Length);
+		CLexer::create (filePath, source, length);
 
 		for (;;)
 		{
-			EScanResult ScanResult = ScanLine ();
-			switch (ScanResult)
+			EScanResult scanResult = scanLine ();
+			switch (scanResult)
 			{
 			case EScanResult_Error:
 				return false;
 			
 			case EScanResult_Eof:
-				return static_cast <T*> (this)->Finalize ();
+				return static_cast <T*> (this)->finalize ();
 
 			case EScanResult_Section:
-				Result = static_cast <T*> (this)->OnSection (m_SectionName);
-				if (!Result)
+				result = static_cast <T*> (this)->onSection (m_sectionName);
+				if (!result)
 					return false;
 
 				break;
 
 			case EScanResult_KeyValue:
-				Result = static_cast <T*> (this)->OnKeyValue (m_KeyName, m_Value);
-				if (!Result)
+				result = static_cast <T*> (this)->onKeyValue (m_keyName, m_value);
+				if (!result)
 					return false;
 
 				break;
@@ -79,22 +79,22 @@ public:
 	}
 
 	bool 
-	OnSection (const char* pSectionName) // overridable
+	onSection (const char* sectionName) // overridable
 	{
 		return true;
 	}
 
 	bool
-	Finalize () // overridable
+	finalize () // overridable
 	{
 		return true;
 	}
 
 	static 
 	bool
-	ParseBoolValue (const char* pValue)
+	parseBoolValue (const char* value)
 	{
-		return _stricmp (pValue, "true") == 0 || atoi (pValue) != 0;
+		return _stricmp (value, "true") == 0 || atoi (value) != 0;
 	}
 };
 

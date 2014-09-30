@@ -28,13 +28,13 @@ public:
 	}
 
 	void 
-	Enter ()
+	enter ()
 	{
 		::EnterCriticalSection (this);
 	}
 
 	void 
-	Leave ()
+	leave ()
 	{
 		::LeaveCriticalSection (this);
 	}

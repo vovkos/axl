@@ -19,16 +19,16 @@ template <
 	typename TAction
 	>
 void
-LoopArray (
+loopArray (
 	T* p,
-	size_t Count,
-	TAction Action
+	size_t count,
+	TAction action
 	)
 {
-	T* pEnd = p + Count;
+	T* end = p + count;
 
-	for (; p < pEnd; p++)
-		Action (*p);
+	for (; p < end; p++)
+		action (*p);
 }
 
 template <
@@ -36,13 +36,13 @@ template <
 	typename TAction
 	>
 void
-LoopIterator (
-	TIterator It,
-	TAction Action
+loopIterator (
+	TIterator it,
+	TAction action
 	)
 {
-	for (; It; It++)
-		Action (*It);
+	for (; it; it++)
+		action (*it);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,25 +53,25 @@ template <
 	typename TAction
 	>
 size_t
-FilteredLoopArray (
+filteredLoopArray (
 	T* p,
-	size_t Count,
-	TFilter Filter,
-	TAction Action
+	size_t count,
+	TFilter filter,
+	TAction action
 	)
 {
-	T* pEnd = p + Count;
+	T* end = p + count;
 
-	size_t FilterPassCount = 0;
+	size_t filterPassCount = 0;
 
-	for (; p < pEnd; p++)
-		if (Filter (*p))
+	for (; p < end; p++)
+		if (filter (*p))
 		{
-			Action (*p);
-			FilterPassCount++;
+			action (*p);
+			filterPassCount++;
 		}
 
-	return FilterPassCount;
+	return filterPassCount;
 }
 
 template <
@@ -80,22 +80,22 @@ template <
 	typename TAction
 	>
 size_t
-FilteredLoopIterator (
-	TIterator It,
-	TFilter Filter,
-	TAction Action
+filteredLoopIterator (
+	TIterator it,
+	TFilter filter,
+	TAction action
 	)
 {
-	size_t FilterPassCount = 0;
+	size_t filterPassCount = 0;
 
-	for (; It; It++)
-		if (Filter (*It))
+	for (; it; it++)
+		if (filter (*it))
 		{
-			Action (*It);
-			FilterPassCount++;
+			action (*it);
+			filterPassCount++;
 		}
 
-	return FilterPassCount;
+	return filterPassCount;
 }
 
 //.............................................................................

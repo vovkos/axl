@@ -22,24 +22,24 @@ class CSocketTransport:
 public:
 	virtual
 	size_t
-	Transmit (
+	transmit (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		int Result = send (m_h, (const char*) p, Size, 0);
-		return err::Complete (Result, SOCKET_ERROR);
+		int result = send (m_h, (const char*) p, size, 0);
+		return err::complete (result, SOCKET_ERROR);
 	}
 
 	virtual
 	size_t
-	Receive (
+	receive (
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		int Result = recv (m_h, (char*) p, Size, 0);
-		return err::Complete (Result, SOCKET_ERROR);
+		int result = recv (m_h, (char*) p, size, 0);
+		return err::complete (result, SOCKET_ERROR);
 	}
 };
 

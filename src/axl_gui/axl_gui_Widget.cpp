@@ -7,62 +7,62 @@ namespace gui {
 
 //.............................................................................
 
-CWidget::CWidget (CEngine* pEngine)
+CWidget::CWidget (CEngine* engine)
 {
-	ASSERT (pEngine);
+	ASSERT (engine);
 
-	m_pEngine = pEngine;
-	m_pCursor = pEngine->GetStdCursor (EStdCursor_Arrow);
-	m_pBaseFont = pEngine->GetStdFont (EStdFont_Monospace);
-	m_Style = 0;
-	m_MsgMask = -1;	
-	m_BaseTextAttr.m_ForeColor = EStdPalColor_WidgetText;
-	m_BaseTextAttr.m_BackColor = EStdPalColor_WidgetBack;
-	m_BaseTextAttr.m_FontFlags = 0;
-	m_CaretSize.m_Width = 2;
-	m_CaretSize.m_Height = 16;
-	m_IsCaretVisible = false;
+	m_engine = engine;
+	m_cursor = engine->getStdCursor (EStdCursor_Arrow);
+	m_baseFont = engine->getStdFont (EStdFont_Monospace);
+	m_style = 0;
+	m_msgMask = -1;	
+	m_baseTextAttr.m_foreColor = EStdPalColor_WidgetText;
+	m_baseTextAttr.m_backColor = EStdPalColor_WidgetBack;
+	m_baseTextAttr.m_fontFlags = 0;
+	m_caretSize.m_width = 2;
+	m_caretSize.m_height = 16;
+	m_isCaretVisible = false;
 }
 
 bool
-CWidget::SetCaretVisible (bool IsVisible)
+CWidget::setCaretVisible (bool isVisible)
 {
-	if (m_IsCaretVisible == IsVisible)
+	if (m_isCaretVisible == isVisible)
 		return true;
 
-	m_IsCaretVisible = IsVisible;
+	m_isCaretVisible = isVisible;
 
-	if (IsVisible)
-		return m_pEngine->ShowCaret (this, TRect (m_CaretPos, m_CaretSize));
+	if (isVisible)
+		return m_engine->showCaret (this, TRect (m_caretPos, m_caretSize));
 
-	m_pEngine->HideCaret ();
+	m_engine->hideCaret ();
 	return true;
 }
 
 bool
-CWidget::SetCaretSize (
-	uint_t Width,
-	uint_t Height
+CWidget::setCaretSize (
+	uint_t width,
+	uint_t height
 	)
 {
-	if (m_CaretSize.m_Width == Width && m_CaretSize.m_Height == Height)
+	if (m_caretSize.m_width == width && m_caretSize.m_height == height)
 		return true; // nothing changed
 
-	m_CaretSize.Setup (Width, Height);
-	return m_IsCaretVisible ? m_pEngine->ShowCaret (this, TRect (m_CaretPos, m_CaretSize)) : true;
+	m_caretSize.setup (width, height);
+	return m_isCaretVisible ? m_engine->showCaret (this, TRect (m_caretPos, m_caretSize)) : true;
 }
 
 bool
-CWidget::SetCaretPos (
+CWidget::setCaretPos (
 	int x, 
 	int y
 	)
 {
-	if (m_CaretPos.m_x == x && m_CaretPos.m_y == y)
+	if (m_caretPos.m_x == x && m_caretPos.m_y == y)
 		return true; // nothing changed
 
-	m_CaretPos.Setup (x, y);
-	return m_IsCaretVisible ? m_pEngine->ShowCaret (this, TRect (m_CaretPos, m_CaretSize)) : true;
+	m_caretPos.setup (x, y);
+	return m_isCaretVisible ? m_engine->showCaret (this, TRect (m_caretPos, m_caretSize)) : true;
 }
 
 //.............................................................................

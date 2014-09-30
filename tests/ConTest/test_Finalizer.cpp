@@ -23,7 +23,7 @@ public:
 
 	virtual
 	void 
-	Finalize ()
+	finalize ()
 	{
 		printf ("CMyFinalizer::Finalize (this = %x)\n", this);
 	}
@@ -32,10 +32,10 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-Run ()
+run ()
 {
-	ref::CPtrT <CMyFinalizer> Fin = AXL_REF_NEW (CMyFinalizer);
-	g::GetModule ()->AddFinalizer (Fin);
+	ref::CPtrT <CMyFinalizer> fin = AXL_REF_NEW (CMyFinalizer);
+	g::getModule ()->addFinalizer (fin);
 }
 
 //.............................................................................

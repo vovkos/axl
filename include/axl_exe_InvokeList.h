@@ -25,56 +25,56 @@ protected:
 	class CEntry: public rtl::TListLink
 	{
 	public:
-		ref::CPtrT <CArgBlock> m_Stack;
-		ref::CPtrT <IFunction> m_Function;
+		ref::CPtrT <CArgBlock> m_stack;
+		ref::CPtrT <IFunction> m_function;
 	};
 
 protected:
-	rtl::CStdListT <CEntry> m_List;
+	rtl::CStdListT <CEntry> m_list;
 
 public:
 	bool 
-	IsEmpty () const 
+	isEmpty () const 
 	{
-		return m_List.IsEmpty ();
+		return m_list.isEmpty ();
 	}
 
 	size_t 
-	GetCount () const 
+	getCount () const 
 	{
-		return m_List.GetCount ();
+		return m_list.getCount ();
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{
-		m_List.Clear ();
+		m_list.clear ();
 	}
 
 	void 
-	TakeOver (CInvokeList* pSrc)
+	takeOver (CInvokeList* src)
 	{ 
-		m_List.TakeOver (&pSrc->m_List);
+		m_list.takeOver (&src->m_list);
 	}
 
 	bool 
-	AddV (
-		IFunction* pFunction, 
+	addV (
+		IFunction* function, 
 		axl_va_list va
 		);
 
 	bool 
-	Add__ (
-		IFunction* pFunction, 
+	add__ (
+		IFunction* function, 
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFunction);
-		return AddV (pFunction, va);
+		AXL_VA_DECL (va, function);
+		return addV (function, va);
 	}
 
 	size_t 
-	Process (size_t Count = -1);
+	process (size_t count = -1);
 };
 
 //.............................................................................

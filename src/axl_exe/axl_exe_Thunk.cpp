@@ -10,12 +10,12 @@ namespace exe {
 #pragma AXL_TODO ("implement proper thunk allocator")
 
 TThunk* 
-CreateThunk (
+createThunk (
 	void* pf,
-	void* pContext
+	void* context
 	)
 {
-	TThunk* pThunk = (TThunk*) AXL_MEM_ALLOC (sizeof (TThunk));
+	TThunk* thunk = (TThunk*) AXL_MEM_ALLOC (sizeof (TThunk));
 
 #if (_AXL_CPU == AXL_CPU_X86)
 
@@ -25,9 +25,9 @@ CreateThunk (
 		0xe9,       0   // jmp		pf
 	};
 
-	*pThunk = _Thunk;
-	pThunk->m_pContext = (uintptr_t) pContext;
-	pThunk->m_pfDiff = (uintptr_t) pf - (uintptr_t) (pThunk + 1);
+	*thunk = _Thunk;
+	thunk->m_context = (uintptr_t) context;
+	thunk->m_pfDiff = (uintptr_t) pf - (uintptr_t) (thunk + 1);
 
 #elif (_AXL_CPU == AXL_CPU_AMD64)
 
@@ -38,35 +38,35 @@ CreateThunk (
 		0xe0ff	        // jmp		rax
 	};
 
-	*pThunk = _Thunk;
-	pThunk->m_pContext = (uintptr_t) pContext;
-	pThunk->m_pf = (uintptr_t) pf;
+	*thunk = _Thunk;
+	thunk->m_context = (uintptr_t) context;
+	thunk->m_pf = (uintptr_t) pf;
 
 #else
-	#error Unsupported processor
+	#error unsupported processor
 #endif
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-	ulong_t OldProtect;
+	ulong_t oldProtect;
 	
-	bool_t Result = 
-		VirtualProtect (pThunk, sizeof (TThunk), PAGE_EXECUTE_READWRITE, &OldProtect) &&
-		FlushInstructionCache (GetCurrentProcess (), pThunk, sizeof (TThunk));
+	bool_t result = 
+		virtualProtect (thunk, sizeof (TThunk), PAGE_EXECUTE_READWRITE, &oldProtect) &&
+		flushInstructionCache (getCurrentProcess (), thunk, sizeof (TThunk));
 
-	if (!Result)
+	if (!result)
 	{
-		err::SetLastSystemError ();
+		err::setLastSystemError ();
 		return NULL;
 	}
 
 #elif _AXL_ENV == AXL_ENV_NT
 
-	ZwFlushInstructionCache (ZwCurrentProcess (), pThunk, sizeof (TThunk));
+	zwFlushInstructionCache (zwCurrentProcess (), thunk, sizeof (TThunk));
 
 #endif
 
-	return pThunk;
+	return thunk;
 }
 
 //.............................................................................

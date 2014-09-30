@@ -17,33 +17,33 @@ struct TDerived: TBase
 };
 
 void 
-Run ()
+run ()
 {
-	rtl::CIteratorT <TDerived> ItDerived;
-	rtl::CIteratorT <TBase> ItBase;
+	rtl::CIteratorT <TDerived> itDerived;
+	rtl::CIteratorT <TBase> itBase;
 
-	ItBase = ItDerived;
+	itBase = itDerived;
 
-	rtl::CRbTreeMapT <int, int> Tree;
-	rtl::CRbTreeMapT <int, int>::CIterator It;
+	rtl::CRbTreeMapT <int, int> tree;
+	rtl::CRbTreeMapT <int, int>::CIterator it;
 
-	srand (GetTickCount ());
+	srand (getTickCount ());
 
 	for (size_t i = 0; i < 50; i++)
-		Tree.Goto (rand () % 50);
+		tree.goto (rand () % 50);
 
-	It = Tree.GetHead ();
-	for (; It; It++)
-		printf ("%d\n", It->m_Key);
+	it = tree.getHead ();
+	for (; it; it++)
+		printf ("%d\n", it->m_key);
 
 	printf (".........\n");
 
 	for (size_t i = 0; i < 50; i++)
-		Tree.DeleteByKey (rand () % 50);
+		tree.deleteByKey (rand () % 50);
 
-	It = Tree.GetHead ();
-	for (; It; It++)
-		printf ("%d\n", It->m_Key);
+	it = tree.getHead ();
+	for (; it; it++)
+		printf ("%d\n", it->m_key);
 
 	printf (".........\n");
 }

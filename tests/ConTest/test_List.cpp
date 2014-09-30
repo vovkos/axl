@@ -57,20 +57,20 @@ namespace test_List {
 //.............................................................................
 
 void
-Run_BoxList ()
+run_BoxList ()
 {
-	rtl::CBoxListT <int> List;
-	List.InsertTail (10);
-	List.InsertHead (-10);
-	List.InsertTail (20);
-	List.InsertHead (-20);
+	rtl::CBoxListT <int> list;
+	list.insertTail (10);
+	list.insertHead (-10);
+	list.insertTail (20);
+	list.insertHead (-20);
 
-	List.RemoveHead ();
+	list.removeHead ();
 
-	rtl::CBoxIteratorT <int> It = List.GetHead ();
-	for (; It; It++)
+	rtl::CBoxIteratorT <int> it = list.getHead ();
+	for (; it; it++)
 	{
-		printf ("%d\n", *It);
+		printf ("%d\n", *it);
 	}
 }
 

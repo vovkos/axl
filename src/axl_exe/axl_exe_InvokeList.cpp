@@ -9,29 +9,29 @@ namespace exe {
 //.............................................................................
 
 bool 
-CInvokeList::AddV (
-	IFunction* pFunction, 
+CInvokeList::addV (
+	IFunction* function, 
 	axl_va_list va
 	)
 {
-	CEntry* pEntry = AXL_MEM_NEW (CEntry);
-	pEntry->m_Function = ref::GetPtrOrClone (pFunction);
-	pEntry->m_Stack = pFunction->GetArgPacker ()->CreateArgBlockV (va);
-	m_List.InsertTail (pEntry);
+	CEntry* entry = AXL_MEM_NEW (CEntry);
+	entry->m_function = ref::getPtrOrClone (function);
+	entry->m_stack = function->getArgPacker ()->createArgBlockV (va);
+	m_list.insertTail (entry);
 	return true;
 }
 
 size_t 
-CInvokeList::Process (size_t Count)
+CInvokeList::process (size_t count)
 {
 	size_t i;
 
-	for (i = 0; i < Count && !m_List.IsEmpty (); i++)
+	for (i = 0; i < count && !m_list.isEmpty (); i++)
 	{
-		CEntry* pEntry = m_List.RemoveHead ();
-		axl_va_list va = { (va_list) pEntry->m_Stack->m_p };
-		pEntry->m_Function->InvokeV (va);
-		AXL_MEM_DELETE (pEntry);
+		CEntry* entry = m_list.removeHead ();
+		axl_va_list va = { (va_list) entry->m_stack->m_p };
+		entry->m_function->invokeV (va);
+		AXL_MEM_DELETE (entry);
 	}
 
 	return i;

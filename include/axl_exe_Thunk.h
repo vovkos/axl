@@ -33,20 +33,20 @@ struct TThunk
 #if (_AXL_CPU == AXL_CPU_X86)
 
 	ulong_t   m_mov_esp4;
-	uintptr_t m_pContext;
+	uintptr_t m_context;
 	uchar_t   m_jmp;
 	uintptr_t m_pfDiff;
 
 #elif (_AXL_CPU == AXL_CPU_AMD64)
 
 	ushort_t  m_mov_esp4;
-	uintptr_t m_pContext;
+	uintptr_t m_context;
 	ushort_t  m_mov_rax;
 	uintptr_t m_pf;
 	ushort_t  m_jmp_rax;
 
 #else
-	#error Unsupported processor
+	#error unsupported processor
 #endif
 };
 
@@ -55,9 +55,9 @@ struct TThunk
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 TThunk* 
-CreateThunk (
+createThunk (
 	void* pf, 
-	void* pContext
+	void* context
 	);
 
 //.............................................................................

@@ -8,27 +8,27 @@ namespace io {
 //.............................................................................
 
 bool
-CPCap::Open (
-	const char* pDevice,
-	size_t SnapshotSize,
-	bool IsPromiscious,
-	uint_t ReadTimeout
+CPCap::open (
+	const char* device,
+	size_t snapshotSize,
+	bool isPromiscious,
+	uint_t readTimeout
 	)
 {
-	Close ();
+	close ();
 
-	char ErrorBuffer [PCAP_ERRBUF_SIZE];
+	char errorBuffer [PCAP_ERRBUF_SIZE];
 	m_h = pcap_open_live (
-		pDevice,
-		SnapshotSize,
-		IsPromiscious,
-		ReadTimeout,
-		ErrorBuffer
+		device,
+		snapshotSize,
+		isPromiscious,
+		readTimeout,
+		errorBuffer
 		);
 
 	if (!m_h)
 	{
-		err::SetStringError (ErrorBuffer);
+		err::setStringError (errorBuffer);
 		return false;
 	}
 
@@ -36,30 +36,30 @@ CPCap::Open (
 }
 
 bool
-CPCap::SetFilter (const char* pFilter)
+CPCap::setFilter (const char* filter)
 {
-	bpf_program Program;
+	bpf_program program;
 
-	int Result = pcap_compile (m_h, &Program, (char*) pFilter, true, 0);
-	if (Result == -1)
+	int result = pcap_compile (m_h, &program, (char*) filter, true, 0);
+	if (result == -1)
 	{
-		err::SetStringError (pcap_geterr (m_h));
+		err::setStringError (pcap_geterr (m_h));
 		return false;
 	}
 
-	Result = pcap_setfilter (m_h, &Program);
-	pcap_freecode (&Program);
-	return Result == 0;
+	result = pcap_setfilter (m_h, &program);
+	pcap_freecode (&program);
+	return result == 0;
 }
 
 bool
-CPCap::SetBlockingMode (bool IsBlocking)
+CPCap::setBlockingMode (bool isBlocking)
 {
-	char ErrorBuffer [PCAP_ERRBUF_SIZE];
-	int Result = pcap_setnonblock (m_h, !IsBlocking, ErrorBuffer);
-	if (Result == -1)
+	char errorBuffer [PCAP_ERRBUF_SIZE];
+	int result = pcap_setnonblock (m_h, !isBlocking, errorBuffer);
+	if (result == -1)
 	{
-		err::SetStringError (ErrorBuffer);
+		err::setStringError (errorBuffer);
 		return false;
 	}
 
@@ -67,47 +67,47 @@ CPCap::SetBlockingMode (bool IsBlocking)
 }
 
 size_t
-CPCap::Read (
+CPCap::read (
 	void* p,
-	size_t Size
+	size_t size
 	)
 {
-	pcap_pkthdr* pHdr;
-	const uchar_t* pData;
+	pcap_pkthdr* hdr;
+	const uchar_t* data;
 
-	int Result = pcap_next_ex (m_h, &pHdr, &pData);
-	if (Result == -1)
+	int result = pcap_next_ex (m_h, &hdr, &data);
+	if (result == -1)
 	{
-		err::SetStringError (pcap_geterr (m_h));
+		err::setStringError (pcap_geterr (m_h));
 		return -1;
 	}
 
-	if (Result != 1) // special values
-		return Result;
+	if (result != 1) // special values
+		return result;
 
-	size_t CopySize = AXL_MIN (pHdr->caplen, Size);
-	memcpy (p, pData, CopySize);
-	return CopySize;
+	size_t copySize = AXL_MIN (hdr->caplen, size);
+	memcpy (p, data, copySize);
+	return copySize;
 }
 
 size_t
-CPCap::Write (
+CPCap::write (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	int Result = pcap_sendpacket (m_h, (const u_char*) p, (int) Size);
+	int result = pcap_sendpacket (m_h, (const u_char*) p, (int) size);
 #else
-	int Result = pcap_inject (m_h, p, (int) Size);
+	int result = pcap_inject (m_h, p, (int) size);
 #endif
-	if (Result == -1)
+	if (result == -1)
 	{
-		err::SetStringError (pcap_geterr (m_h));
+		err::setStringError (pcap_geterr (m_h));
 		return -1;
 	}
 
-	return Size;
+	return size;
 }
 
 //.............................................................................

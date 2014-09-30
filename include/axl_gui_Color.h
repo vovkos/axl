@@ -24,11 +24,11 @@ enum
 
 inline 
 uint_t 
-GetColorIndex (uint_t Color)
+getColorIndex (uint_t color)
 { 
-	ASSERT ((Color & EColorFlag_Index) && !(Color & EColorFlag_Transparent));
+	ASSERT ((color & EColorFlag_Index) && !(color & EColorFlag_Transparent));
 	
-	return Color & EColorFlag_IndexMask;
+	return color & EColorFlag_IndexMask;
 }
 
 //.............................................................................
@@ -111,58 +111,58 @@ enum EStdPalColor
 
 inline
 uint_t 
-InverseRgb (uint_t Rgb)
+inverseRgb (uint_t rgb)
 {
-	return ((Rgb & 0x0000ff) << 16) | ((Rgb & 0xff0000) >> 16) | Rgb & 0x00ff00;
+	return ((rgb & 0x0000ff) << 16) | ((rgb & 0xff0000) >> 16) | rgb & 0x00ff00;
 }
 
 const uint_t*
-GetStdPalColorArray ();
+getStdPalColorArray ();
 
 void
-UpdateStdPalSystemColors (); // call this upon theme change
+updateStdPalSystemColors (); // call this upon theme change
 
 //.............................................................................
 
 struct TPalette
 {
-	const uint_t* m_pColorArray;
-	size_t m_Count;
+	const uint_t* m_colorArray;
+	size_t m_count;
 
 	TPalette ()
 	{
-		m_pColorArray = GetStdPalColorArray ();
-		m_Count = EStdPalColor__Count;
+		m_colorArray = getStdPalColorArray ();
+		m_count = EStdPalColor__Count;
 	}
 
 	TPalette (
-		const uint_t* pColorArray,
-		size_t Count
+		const uint_t* colorArray,
+		size_t count
 		)
 	{
-		m_pColorArray = pColorArray;
-		m_Count = Count;
+		m_colorArray = colorArray;
+		m_count = count;
 	}
 
 	uint_t
-	GetColorRgb (uint_t Color)
+	getColorRgb (uint_t color)
 	{
-		ASSERT (!(Color & EColorFlag_Transparent));
+		ASSERT (!(color & EColorFlag_Transparent));
 		
-		if (!(Color & EColorFlag_Index))
-			return Color;
+		if (!(color & EColorFlag_Index))
+			return color;
 
-		size_t i = Color & EColorFlag_IndexMask;
-		Color = i < m_Count ? m_pColorArray [i] : EColorFlag_Transparent;
+		size_t i = color & EColorFlag_IndexMask;
+		color = i < m_count ? m_colorArray [i] : EColorFlag_Transparent;
 			
-		if (Color & EColorFlag_Index) // allow two-staged index lookup
+		if (color & EColorFlag_Index) // allow two-staged index lookup
 		{
-			i = Color & EColorFlag_IndexMask;
-			Color = i < m_Count ? m_pColorArray [i] : EColorFlag_Transparent;
-			ASSERT (!(Color & EColorFlag_Index)); // bad palette!
+			i = color & EColorFlag_IndexMask;
+			color = i < m_count ? m_colorArray [i] : EColorFlag_Transparent;
+			ASSERT (!(color & EColorFlag_Index)); // bad palette!
 		}
 
-		return Color;
+		return color;
 	}
 };
 
@@ -170,105 +170,105 @@ struct TPalette
 
 inline
 uint_t
-OverlayColor (
-	uint_t BaseColor,
-	uint_t OverlayColor
+overlayColor (
+	uint_t baseColor,
+	uint_t overlayColor
 	)
 {
-	return (OverlayColor & EColorFlag_Transparent) ? BaseColor : OverlayColor;
+	return (overlayColor & EColorFlag_Transparent) ? baseColor : overlayColor;
 }
 
 uint_t
-ParseColorString (
-	const char* pString,
-	const char** ppEnd = NULL
+parseColorString (
+	const char* string,
+	const char** end = NULL
 	);
 
 //.............................................................................
 
 struct TColorAttr
 {
-	uint_t m_ForeColor;
-	uint_t m_BackColor;
+	uint_t m_foreColor;
+	uint_t m_backColor;
 
 	TColorAttr ()
 	{
-		m_ForeColor = EColorFlag_Transparent;
-		m_BackColor = EColorFlag_Transparent;
+		m_foreColor = EColorFlag_Transparent;
+		m_backColor = EColorFlag_Transparent;
 	}
 
 	TColorAttr (
-		uint_t ForeColor,
-		uint_t BackColor = EColorFlag_Transparent
+		uint_t foreColor,
+		uint_t backColor = EColorFlag_Transparent
 		)
 	{
-		Setup (ForeColor, BackColor);
+		setup (foreColor, backColor);
 	}
 
-	TColorAttr (const char* pString)
+	TColorAttr (const char* string)
 	{
-		Parse (pString);
+		parse (string);
 	}
 
 	int 
-	Cmp (const TColorAttr& Attr)
+	cmp (const TColorAttr& attr)
 	{
-		return memcmp (this, &Attr, sizeof (TColorAttr));
+		return memcmp (this, &attr, sizeof (TColorAttr));
 	}
 
 	void
-	Clear ()
+	clear ()
 	{
-		m_ForeColor = EColorFlag_Transparent;
-		m_BackColor = EColorFlag_Transparent;
+		m_foreColor = EColorFlag_Transparent;
+		m_backColor = EColorFlag_Transparent;
 	}
 
 	void
-	Setup (
-		uint_t ForeColor,
-		uint_t BackColor
+	setup (
+		uint_t foreColor,
+		uint_t backColor
 		)
 	{
-		m_ForeColor = ForeColor;
-		m_BackColor = BackColor;
+		m_foreColor = foreColor;
+		m_backColor = backColor;
 	}
 
 	void
-	Overlay (
-		const TColorAttr& BaseAttr,
-		const TColorAttr& OverlayAttr
+	overlay (
+		const TColorAttr& baseAttr,
+		const TColorAttr& overlayAttr
 		)
 	{
-		m_ForeColor = OverlayColor (BaseAttr.m_ForeColor, OverlayAttr.m_ForeColor);
-		m_BackColor = OverlayColor (BaseAttr.m_BackColor, OverlayAttr.m_BackColor);
+		m_foreColor = overlayColor (baseAttr.m_foreColor, overlayAttr.m_foreColor);
+		m_backColor = overlayColor (baseAttr.m_backColor, overlayAttr.m_backColor);
 	}
 
 	void
-	Overlay (const TColorAttr& OverlayAttr)
+	overlay (const TColorAttr& overlayAttr)
 	{
-		Overlay (*this, OverlayAttr);
+		overlay (*this, overlayAttr);
 	}
 
 	void
-	Parse (
-		const char* pString,
-		const char** ppEnd = NULL
+	parse (
+		const char* string,
+		const char** end = NULL
 		);
 
 	void
-	ParseOverlay (
-		const TColorAttr& BaseAttr,
-		const char* pString,
-		const char** ppEnd = NULL
+	parseOverlay (
+		const TColorAttr& baseAttr,
+		const char* string,
+		const char** end = NULL
 		);
 
 	void
-	ParseOverlay (
-		const char* pString,
-		const char** ppEnd = NULL
+	parseOverlay (
+		const char* string,
+		const char** end = NULL
 		)
 	{
-		ParseOverlay (*this, pString, ppEnd);
+		parseOverlay (*this, string, end);
 	}
 };
 

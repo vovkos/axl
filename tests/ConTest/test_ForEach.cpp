@@ -7,9 +7,9 @@ namespace test_ForEach {
 //.............................................................................
 
 void
-Run ()
+run ()
 {
-	char Buffer [] = "hui govno i muravei";
+	char buffer [] = "hui govno i muravei";
 
 }
 

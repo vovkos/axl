@@ -198,53 +198,53 @@ typedef
 bool_t
 (AXL_API*
  axl_win_FPropertyInPlaceLoad)(
-	axl_win_TPropertyInPlace* pInPlace,
-	axl_win_TPropertyLine* pLine,
-	const RECT* pRect,
-	ulong_t* pMinWidth
+	axl_win_TPropertyInPlace* inPlace,
+	axl_win_TPropertyLine* line,
+	const RECT* rect,
+	ulong_t* minWidth
 	);
 
 typedef
 bool_t
 (AXL_API*
  axl_win_FPropertyInPlaceSave)(
-	axl_win_TPropertyInPlace* pInPlace,
-	axl_win_TPropertyLine* pLine
+	axl_win_TPropertyInPlace* inPlace,
+	axl_win_TPropertyLine* line
 	);
 
 typedef
 void
 (AXL_API*
  axl_win_FPropertyInPlaceLayout)(
-	axl_win_TPropertyInPlace* pInPlace,
-	const RECT* pRect
+	axl_win_TPropertyInPlace* inPlace,
+	const RECT* rect
 	);
 
 typedef
 void
 (AXL_API*
- axl_win_FPropertyInPlaceSetFocus)(axl_win_TPropertyInPlace* pInPlace);
+ axl_win_FPropertyInPlaceSetFocus)(axl_win_TPropertyInPlace* inPlace);
 
 //.............................................................................
 
 void
 AXL_API
 axl_win_TPropertyInPlace_Construct(
-	axl_win_TPropertyInPlace* pInPlace,
-	axl_obj_TAgent* pAgent
+	axl_win_TPropertyInPlace* inPlace,
+	axl_obj_TAgent* agent
 	);
 
-#define axl_win_TPropertyInPlace_Load(pInPlace, pLine, pRect, pMinWidth) \
-	((pInPlace)->m_pfLoad(pInPlace, pLine, pRect, pMinWidth))
+#define axl_win_TPropertyInPlace_Load(inPlace, line, rect, minWidth) \
+	((inPlace)->m_pfLoad(inPlace, line, rect, minWidth))
 
-#define axl_win_TPropertyInPlace_Save(pInPlace, pLine) \
-	((pInPlace)->m_pfSave(pInPlace, pLine))
+#define axl_win_TPropertyInPlace_Save(inPlace, line) \
+	((inPlace)->m_pfSave(inPlace, line))
 
-#define axl_win_TPropertyInPlace_Layout(pInPlace, pRect) \
-	((pInPlace)->m_pfLayout(pInPlace, pRect))
+#define axl_win_TPropertyInPlace_Layout(inPlace, rect) \
+	((inPlace)->m_pfLayout(inPlace, rect))
 
-#define axl_win_TPropertyInPlace_SetFocus(pInPlace) \
-	((pInPlace)->m_pfSetFocus(pInPlace))
+#define axl_win_TPropertyInPlace_SetFocus(inPlace) \
+	((inPlace)->m_pfSetFocus(inPlace))
 
 #ifdef __cplusplus
 typedef struct _axl_win_TPropertyInPlace: axl_obj_TObject {
@@ -282,215 +282,215 @@ enum
 
 void 
 AXL_API
-axl_win_TPropertyLine_Construct(axl_win_TPropertyLine* pLine);
+axl_win_TPropertyLine_Construct(axl_win_TPropertyLine* line);
 
 void 
 AXL_API
-axl_win_TPropertyLine_Destruct(axl_win_TPropertyLine* pLine);
+axl_win_TPropertyLine_Destruct(axl_win_TPropertyLine* line);
 
 void 
 AXL_API
-axl_win_TPropertyLine_ClearLineList(axl_rtl_TList* pLineList);
+axl_win_TPropertyLine_ClearLineList(axl_rtl_TList* lineList);
 
 bool_t 
 AXL_API
 axl_win_TPropertyLine_Clone(
-	axl_win_TPropertyLine* pLine,
-	axl_win_TPropertyLine* pSrc
+	axl_win_TPropertyLine* line,
+	axl_win_TPropertyLine* src
 	);
 
 long 
 AXL_API
 axl_win_TPropertyLine_GetPartX(
-	axl_win_TPropertyLine* pLine,
-	int Part
+	axl_win_TPropertyLine* line,
+	int part
 	);
 
 bool_t
 AXL_API
 axl_win_TPropertyLine_IsPartFullyVisible(
-	axl_win_TPropertyLine* pLine,
-	int Part
+	axl_win_TPropertyLine* line,
+	int part
 	);
 
 bool_t
 AXL_API
 axl_win_TPropertyLine_CalcWidth(
-	axl_win_TPropertyLine* pLine,
-	int Flags
+	axl_win_TPropertyLine* line,
+	int flags
 	);
 
 void
 AXL_API
 axl_win_TPropertyLine_ModifyChildrenHeight(
-	axl_win_TPropertyLine* pLine,
-	long Delta	
+	axl_win_TPropertyLine* line,
+	long delta	
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetOptionBoxVolatileState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetButtonVolatileState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	);
 
 bool_t
 AXL_API
-axl_win_TPropertyLine_IsLastChild(axl_win_TPropertyLine* pLine);
+axl_win_TPropertyLine_IsLastChild(axl_win_TPropertyLine* line);
  
 bool_t
 AXL_API
-axl_win_TPropertyLine_HasGridLines(axl_win_TPropertyLine* pLine);
+axl_win_TPropertyLine_HasGridLines(axl_win_TPropertyLine* line);
 
 bool_t
 AXL_API
-axl_win_TPropertyLine_HasNameDelimiter(axl_win_TPropertyLine* pLine);
+axl_win_TPropertyLine_HasNameDelimiter(axl_win_TPropertyLine* line);
 
 bool_t
 AXL_API
-axl_win_TPropertyLine_HasValueDelimiter(axl_win_TPropertyLine* pLine);
+axl_win_TPropertyLine_HasValueDelimiter(axl_win_TPropertyLine* line);
 
 long 
 AXL_API
 axl_win_TPropertyLine_GetPartWidth(
-	axl_win_TPropertyLine* pLine,
-	int Part
+	axl_win_TPropertyLine* line,
+	int part
 	);
 
-#define axl_win_TPropertyLine_HasPlusMinus(pLine) \
-	(!axl_rtl_TList_IsEmpty(&(pLine)->m_ChildrenList) && !((pLine)->m_Flags & axl_win_EPropertyLine_Menu))
+#define axl_win_TPropertyLine_HasPlusMinus(line) \
+	(!axl_rtl_TList_IsEmpty(&(line)->m_childrenList) && !((line)->m_flags & axl_win_EPropertyLine_Menu))
 
-#define axl_win_TPropertyLine_IsSinglePane(pLine) \
-	(((pLine)->m_Flags & (axl_win_EPropertyLine_SinglePane | axl_win_EPropertyLine_Menu)) != 0)
+#define axl_win_TPropertyLine_IsSinglePane(line) \
+	(((line)->m_flags & (axl_win_EPropertyLine_SinglePane | axl_win_EPropertyLine_Menu)) != 0)
 
-#define axl_win_TPropertyLine_GetFirstChild(pLine) \
-	((axl_win_TPropertyLine*) axl_rtl_TList_GetHead(&pLine->m_ChildrenList))
+#define axl_win_TPropertyLine_GetFirstChild(line) \
+	((axl_win_TPropertyLine*) axl_rtl_TList_GetHead(&line->m_childrenList))
 
-#define axl_win_TPropertyLine_GetLastChild(pLine) \
-	((axl_win_TPropertyLine*) axl_rtl_TList_GetTail(&pLine->m_ChildrenList))
-
-axl_win_TPropertyLine* 
-AXL_API
-axl_win_TPropertyLine_GetNextSibling(axl_win_TPropertyLine* pLine);
+#define axl_win_TPropertyLine_GetLastChild(line) \
+	((axl_win_TPropertyLine*) axl_rtl_TList_GetTail(&line->m_childrenList))
 
 axl_win_TPropertyLine* 
 AXL_API
-axl_win_TPropertyLine_GetPrevSibling(axl_win_TPropertyLine* pLine);
+axl_win_TPropertyLine_GetNextSibling(axl_win_TPropertyLine* line);
 
-#define axl_win_TPropertyLine_SetInPlace(pLine, pInPlace) \
-	axl_obj_TObject_CopyPtr(&pLine->m_pInPlace, pInPlace)
+axl_win_TPropertyLine* 
+AXL_API
+axl_win_TPropertyLine_GetPrevSibling(axl_win_TPropertyLine* line);
 
-#define axl_win_TPropertyLine_IsReArrangeable(pLine) \
-	((pLine)->m_pParent && ((pLine)->m_pParent->m_Flags & axl_win_EPropertyLine_ReArrangeable))
+#define axl_win_TPropertyLine_SetInPlace(line, inPlace) \
+	axl_obj_TObject_CopyPtr(&line->m_inPlace, inPlace)
 
-#define axl_win_TPropertyLine_IsButton(pLine) \
-	((pLine->m_Flags & axl_win_EPropertyLine_Button) || \
-	((pLine->m_Flags & axl_win_EPropertyLine_Menu) && !pLine->m_pPropertyCtrl->m_pMenuParentPropertyCtrl))
+#define axl_win_TPropertyLine_IsReArrangeable(line) \
+	((line)->m_parent && ((line)->m_parent->m_flags & axl_win_EPropertyLine_ReArrangeable))
+
+#define axl_win_TPropertyLine_IsButton(line) \
+	((line->m_flags & axl_win_EPropertyLine_Button) || \
+	((line->m_flags & axl_win_EPropertyLine_Menu) && !line->m_propertyCtrl->m_menuParentPropertyCtrl))
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetName(
-	axl_win_TPropertyLine* pLine,
-	const tchar_t* pString
+	axl_win_TPropertyLine* line,
+	const tchar_t* string
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetValue(
-	axl_win_TPropertyLine* pLine,
-	const tchar_t* pString
+	axl_win_TPropertyLine* line,
+	const tchar_t* string
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetNameAttr(
-	axl_win_TPropertyLine* pLine,
-	axl_gr_TTextAttr* pAttr
+	axl_win_TPropertyLine* line,
+	axl_gr_TTextAttr* attr
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetValueAttr(
-	axl_win_TPropertyLine* pLine,
-	axl_gr_TTextAttr* pAttr
+	axl_win_TPropertyLine* line,
+	axl_gr_TTextAttr* attr
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetIcon(
-	axl_win_TPropertyLine* pLine,
-	int Icon
+	axl_win_TPropertyLine* line,
+	int icon
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetIndent(
-	axl_win_TPropertyLine* pLine,
-	int Indent
+	axl_win_TPropertyLine* line,
+	int indent
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetOptionBoxType(
-	axl_win_TPropertyLine* pLine,
-	int Type
+	axl_win_TPropertyLine* line,
+	int type
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetOptionBoxCheckState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetButtonCheckState(
-	axl_win_TPropertyLine* pLine,
-	int State
+	axl_win_TPropertyLine* line,
+	int state
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetFlags(
-	axl_win_TPropertyLine* pLine,
-	int Flags
+	axl_win_TPropertyLine* line,
+	int flags
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_SetDelimiters(
-	axl_win_TPropertyLine* pLine,
-	int Delimiters
+	axl_win_TPropertyLine* line,
+	int delimiters
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_ModifyFlags(
-	axl_win_TPropertyLine* pLine,
-	int Modifier,
-	bool_t Set
+	axl_win_TPropertyLine* line,
+	int modifier,
+	bool_t set
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_Invalidate(
-	axl_win_TPropertyLine* pLine,
-	ulong_t Mask
+	axl_win_TPropertyLine* line,
+	ulong_t mask
 	);
 
 void 
 AXL_API
 axl_win_TPropertyLine_ExpandCollapse(
-	axl_win_TPropertyLine* pLine,
-	bool_t IsExpanded
+	axl_win_TPropertyLine* line,
+	bool_t isExpanded
 	);
 
 #ifdef __cplusplus
@@ -498,96 +498,96 @@ typedef struct _axl_win_TPropertyLine: axl_rtl_TListEntry {
 #else
 typedef struct _axl_win_TPropertyLine { axl_rtl_TListEntry;
 #endif	
-	int m_Flags;
-	int m_Delimiters;
-	int m_OptionBoxType;
-	int m_OptionBoxCheckState;
-	int m_OptionBoxVolatileState;
-	int m_ButtonVolatileState;
-	int m_ButtonCheckState;
-	int m_Icon;
-	int m_ToolTipIcon;
-	int m_Level;
-	int m_Indent;
-	size_t m_VisibleIndex;
-	size_t m_ChildrenHeight;
-	ulong_t m_MenuWidth;
-	ulong_t m_SinglePaneWidth;
-	ulong_t m_NameWidth;
-	ulong_t m_ValueWidth;
-	ulong_t m_ChildrenSinglePaneWidth;
-	ulong_t m_ChildrenValueWidth;
-	axl_win_TPropertyCtrl* m_pPropertyCtrl;
-	axl_win_TPropertyLine* m_pParent;
-	axl_rtl_TList m_ChildrenList;
-	axl_rtl_TString m_Name;
-	axl_rtl_TString m_Value;
-	axl_rtl_TString m_ToolTipTitle;
-	axl_rtl_TString m_ToolTipText;
-	axl_gr_TTextAttr m_NameAttr;
-	axl_gr_TTextAttr m_ValueAttr;
-	axl_gr_THyperText m_NameHyperText;
-	axl_gr_THyperText m_ValueHyperText;
-	axl_win_TPropertyInPlace* m_pInPlace;
-	axl_obj_TData m_UserData;
+	int m_flags;
+	int m_delimiters;
+	int m_optionBoxType;
+	int m_optionBoxCheckState;
+	int m_optionBoxVolatileState;
+	int m_buttonVolatileState;
+	int m_buttonCheckState;
+	int m_icon;
+	int m_toolTipIcon;
+	int m_level;
+	int m_indent;
+	size_t m_visibleIndex;
+	size_t m_childrenHeight;
+	ulong_t m_menuWidth;
+	ulong_t m_singlePaneWidth;
+	ulong_t m_nameWidth;
+	ulong_t m_valueWidth;
+	ulong_t m_childrenSinglePaneWidth;
+	ulong_t m_childrenValueWidth;
+	axl_win_TPropertyCtrl* m_propertyCtrl;
+	axl_win_TPropertyLine* m_parent;
+	axl_rtl_TList m_childrenList;
+	axl_rtl_TString m_name;
+	axl_rtl_TString m_value;
+	axl_rtl_TString m_toolTipTitle;
+	axl_rtl_TString m_toolTipText;
+	axl_gr_TTextAttr m_nameAttr;
+	axl_gr_TTextAttr m_valueAttr;
+	axl_gr_THyperText m_nameHyperText;
+	axl_gr_THyperText m_valueHyperText;
+	axl_win_TPropertyInPlace* m_inPlace;
+	axl_obj_TData m_userData;
 
 #ifdef __cplusplus
-	axl_win_TPropertyLine* GetFirstChild()
+	axl_win_TPropertyLine* getFirstChild()
 		{ return axl_win_TPropertyLine_GetFirstChild(this); }
 
-	axl_win_TPropertyLine* GetLastChild()
+	axl_win_TPropertyLine* getLastChild()
 		{ return axl_win_TPropertyLine_GetLastChild(this); }
 
-	axl_win_TPropertyLine* GetNextSibling()
+	axl_win_TPropertyLine* getNextSibling()
 		{ return axl_win_TPropertyLine_GetNextSibling(this); }
 
-	axl_win_TPropertyLine* GetPrevSibling()
+	axl_win_TPropertyLine* getPrevSibling()
 		{ return axl_win_TPropertyLine_GetPrevSibling(this); }
 
-	void SetInPlace(axl_win_TPropertyInPlace* pInPlace)
-		{ axl_win_TPropertyLine_SetInPlace(this, pInPlace); }
+	void setInPlace(axl_win_TPropertyInPlace* inPlace)
+		{ axl_win_TPropertyLine_SetInPlace(this, inPlace); }
 
-	void SetName(const tchar_t* pString)
-		{ axl_win_TPropertyLine_SetName(this, pString); }
+	void setName(const tchar_t* string)
+		{ axl_win_TPropertyLine_SetName(this, string); }
 
-	void SetValue(const tchar_t* pString)
-		{ axl_win_TPropertyLine_SetValue(this, pString); }
+	void setValue(const tchar_t* string)
+		{ axl_win_TPropertyLine_SetValue(this, string); }
 
-	void SetNameAttr(axl_gr_TTextAttr* pAttr)
-		{ axl_win_TPropertyLine_SetNameAttr(this, pAttr); }
+	void setNameAttr(axl_gr_TTextAttr* attr)
+		{ axl_win_TPropertyLine_SetNameAttr(this, attr); }
 
-	void SetValueAttr(axl_gr_TTextAttr* pAttr)
-		{ axl_win_TPropertyLine_SetValueAttr(this, pAttr); }
+	void setValueAttr(axl_gr_TTextAttr* attr)
+		{ axl_win_TPropertyLine_SetValueAttr(this, attr); }
 
-	void SetIcon(int Icon)
-		{ axl_win_TPropertyLine_SetIcon(this, Icon); }
+	void setIcon(int icon)
+		{ axl_win_TPropertyLine_SetIcon(this, icon); }
 
-	void SetIndent(int Indent)
-		{ axl_win_TPropertyLine_SetIndent(this, Indent); }
+	void setIndent(int indent)
+		{ axl_win_TPropertyLine_SetIndent(this, indent); }
 
-	void SetOptionBoxType(int Type)
-		{ axl_win_TPropertyLine_SetOptionBoxType(this, Type); }
+	void setOptionBoxType(int type)
+		{ axl_win_TPropertyLine_SetOptionBoxType(this, type); }
 
-	void SetOptionBoxCheckState(int State)
-		{ axl_win_TPropertyLine_SetOptionBoxCheckState(this, State); }
+	void setOptionBoxCheckState(int state)
+		{ axl_win_TPropertyLine_SetOptionBoxCheckState(this, state); }
 
-	void SetButtonCheckState(int State)
-		{ axl_win_TPropertyLine_SetButtonCheckState(this, State); }
+	void setButtonCheckState(int state)
+		{ axl_win_TPropertyLine_SetButtonCheckState(this, state); }
 
-	void ModifyFlags(int Modifier, bool_t Set)
-		{ axl_win_TPropertyLine_ModifyFlags(this, Modifier, Set); }
+	void modifyFlags(int modifier, bool_t set)
+		{ axl_win_TPropertyLine_ModifyFlags(this, modifier, set); }
 
-	void SetFlags(int Flags)
-		{ axl_win_TPropertyLine_SetFlags(this, Flags); }
+	void setFlags(int flags)
+		{ axl_win_TPropertyLine_SetFlags(this, flags); }
 
-	void SetDelimiters(int Delimiters)
-		{ axl_win_TPropertyLine_SetDelimiters(this, Delimiters); }
+	void setDelimiters(int delimiters)
+		{ axl_win_TPropertyLine_SetDelimiters(this, delimiters); }
 
-	void Invalidate(int Mask = axl_win_EPropertyLineInvalidate_All)
-		{ axl_win_TPropertyLine_Invalidate(this, Mask); }
+	void invalidate(int mask = axl_win_EPropertyLineInvalidate_All)
+		{ axl_win_TPropertyLine_Invalidate(this, mask); }
 
-	void ExpandCollapse(bool_t IsExpanded)
-		{ axl_win_TPropertyLine_ExpandCollapse(this, IsExpanded); }
+	void expandCollapse(bool_t isExpanded)
+		{ axl_win_TPropertyLine_ExpandCollapse(this, isExpanded); }
 #endif
 } axl_win_TPropertyLine;
 
@@ -595,15 +595,15 @@ typedef struct _axl_win_TPropertyLine { axl_rtl_TListEntry;
 
 typedef struct _axl_win_TPropertyHitTest
 {
-	int m_HitTest;
-	axl_win_TPropertyLine* m_pLine;
-	axl_gr_THyperlinkAnchor* m_pHyperlink;
+	int m_hitTest;
+	axl_win_TPropertyLine* m_line;
+	axl_gr_THyperlinkAnchor* m_hyperlink;
 } axl_win_TPropertyHitTest;
 
 typedef struct _axl_win_TPropertyNotify
 {
-	NMHDR m_Hdr;
-	axl_win_TPropertyHitTest m_HitTest;
+	NMHDR m_hdr;
+	axl_win_TPropertyHitTest m_hitTest;
 } axl_win_TPropertyNotify;
 
 //.............................................................................
@@ -612,11 +612,11 @@ typedef struct _axl_win_TPropertyNotify
 
 void
 AXL_API
-axl_win_TPropertyCtrl_Construct(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_Construct(axl_win_TPropertyCtrl* propertyCtrl);
 
 void
 AXL_API
-axl_win_TPropertyCtrl_Destruct(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_Destruct(axl_win_TPropertyCtrl* propertyCtrl);
 
 bool_t
 AXL_API
@@ -625,174 +625,174 @@ axl_win_TPropertyCtrl_RegisterWndClass();
 HWND
 AXL_API
 axl_win_TPropertyCtrl_CreateEx(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	DWORD ExStyle,
-	DWORD Style,
-	const RECT* pRect,
+	axl_win_TPropertyCtrl* propertyCtrl,
+	DWORD exStyle,
+	DWORD style,
+	const RECT* rect,
 	HWND hWndParent,
 	UINT ID,
 	HINSTANCE hInstance
 	);
 
-#define axl_win_TPropertyCtrl_Create(pPropertyCtrl, Style, pRect, hWndParent, ID, hInstance) \
-	axl_win_TPropertyCtrl_CreateEx(pPropertyCtrl, 0, Style, pRect, hWndParent, ID, hInstance)
+#define axl_win_TPropertyCtrl_Create(propertyCtrl, style, rect, hWndParent, ID, hInstance) \
+	axl_win_TPropertyCtrl_CreateEx(propertyCtrl, 0, style, rect, hWndParent, ID, hInstance)
 
 #define axl_win_TPropertyCtrl_FromHwnd(hWnd) \
-	((axl_win_TPropertyCtrl*) (LONG_PTR) GetWindowLongPtr(hWnd, 0))
+	((axl_win_TPropertyCtrl*) (LONG_PTR) getWindowLongPtr(hWnd, 0))
 
 void
 AXL_API
-axl_win_TPropertyCtrl_Destroy(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_Destroy(axl_win_TPropertyCtrl* propertyCtrl);
 
 void
 AXL_API
 axl_win_TPropertyCtrl_SetSelection(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	size_t Line,
-	bool_t SetInPlaceFocus
+	axl_win_TPropertyCtrl* propertyCtrl,
+	size_t line,
+	bool_t setInPlaceFocus
 	);
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_AdvanceSelection(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	int Delta,
-	bool_t SetInPlaceFocus
+	axl_win_TPropertyCtrl* propertyCtrl,
+	int delta,
+	bool_t setInPlaceFocus
 	);
 
 void
 AXL_API
-axl_win_TPropertyCtrl_KillSelection(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_KillSelection(axl_win_TPropertyCtrl* propertyCtrl);
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_EnsureVisible(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	size_t Line
+	axl_win_TPropertyCtrl* propertyCtrl,
+	size_t line
 	);
 
-#define axl_win_TPropertyCtrl_IsMenuActive(pPropertyCtrl) \
-	(pPropertyCtrl->m_pMenuAnchorLine != NULL)
+#define axl_win_TPropertyCtrl_IsMenuActive(propertyCtrl) \
+	(propertyCtrl->m_menuAnchorLine != NULL)
 
-#define axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl) \
-	(pPropertyCtrl->m_pMenuRootPropertyCtrl != NULL)
+#define axl_win_TPropertyCtrl_IsMenu(propertyCtrl) \
+	(propertyCtrl->m_menuRootPropertyCtrl != NULL)
 
-#define axl_win_TPropertyCtrl_GetMenuRootPropertyCtrl(pPropertyCtrl) \
-	((pPropertyCtrl)->m_pMenuRootPropertyCtrl ? (pPropertyCtrl)->m_pMenuRootPropertyCtrl : (pPropertyCtrl))
+#define axl_win_TPropertyCtrl_GetMenuRootPropertyCtrl(propertyCtrl) \
+	((propertyCtrl)->m_menuRootPropertyCtrl ? (propertyCtrl)->m_menuRootPropertyCtrl : (propertyCtrl))
 
-#define axl_win_TPropertyCtrl_GetFirstLine(pPropertyCtrl) \
-	((axl_win_TPropertyLine*) axl_rtl_TList_GetHead(&pPropertyCtrl->m_LineList))
+#define axl_win_TPropertyCtrl_GetFirstLine(propertyCtrl) \
+	((axl_win_TPropertyLine*) axl_rtl_TList_GetHead(&propertyCtrl->m_lineList))
 
-#define axl_win_TPropertyCtrl_GetLastLine(pPropertyCtrl) \
-	((axl_win_TPropertyLine*) axl_rtl_TList_GetTail(&pPropertyCtrl->m_LineList))
+#define axl_win_TPropertyCtrl_GetLastLine(propertyCtrl) \
+	((axl_win_TPropertyLine*) axl_rtl_TList_GetTail(&propertyCtrl->m_lineList))
 
 axl_win_TPropertyLine*
 AXL_API
-axl_win_TPropertyCtrl_GetSelectedLine(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_GetSelectedLine(axl_win_TPropertyCtrl* propertyCtrl);
 
 bool_t
 AXL_API
-axl_win_TPropertyCtrl_SaveActiveInPlace(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_SaveActiveInPlace(axl_win_TPropertyCtrl* propertyCtrl);
 
 axl_win_TPropertyLine*
 AXL_API
 axl_win_TPropertyCtrl_InsertLineEx(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	axl_win_TPropertyLine* pParent,
-	axl_win_TPropertyLine* pBefore,
-	axl_win_TPropertyLine* pSource
+	axl_win_TPropertyCtrl* propertyCtrl,
+	axl_win_TPropertyLine* parent,
+	axl_win_TPropertyLine* before,
+	axl_win_TPropertyLine* source
 	);
 
-#define axl_win_TPropertyCtrl_InsertLine(pPropertyCtrl, pParent, pBefore) \
-	axl_win_TPropertyCtrl_InsertLineEx(pPropertyCtrl, pParent, pBefore, NULL)
+#define axl_win_TPropertyCtrl_InsertLine(propertyCtrl, parent, before) \
+	axl_win_TPropertyCtrl_InsertLineEx(propertyCtrl, parent, before, NULL)
 
 void
 AXL_API
-axl_win_TPropertyCtrl_Clear(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_Clear(axl_win_TPropertyCtrl* propertyCtrl);
 
 void
 AXL_API
 axl_win_TPropertyCtrl_GetSize(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	SIZE* pSize
+	axl_win_TPropertyCtrl* propertyCtrl,
+	SIZE* size
 	);
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_UpdateLineWidth(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	axl_win_TPropertyLine* pLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	axl_win_TPropertyLine* line
 	);
 
 void 
 AXL_API
-axl_win_TPropertyCtrl_UpdateAllLineWidths(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_UpdateAllLineWidths(axl_win_TPropertyCtrl* propertyCtrl);
 
 bool_t
 AXL_API
 axl_win_TPropertyCtrl_Expand(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	axl_win_TPropertyLine* pLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	axl_win_TPropertyLine* line
 	);
 
 bool_t
 AXL_API
 axl_win_TPropertyCtrl_Collapse(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	axl_win_TPropertyLine* pLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	axl_win_TPropertyLine* line
 	);
 
-#define axl_win_TPropertyCtrl_ExpandCollapse(pPropertyCtrl, pLine, DoExpand) \
-	((DoExpand) ? axl_win_TPropertyCtrl_Expand(pPropertyCtrl, pLine) : axl_win_TPropertyCtrl_Collapse(pPropertyCtrl, pLine))
+#define axl_win_TPropertyCtrl_ExpandCollapse(propertyCtrl, line, doExpand) \
+	((doExpand) ? axl_win_TPropertyCtrl_Expand(propertyCtrl, line) : axl_win_TPropertyCtrl_Collapse(propertyCtrl, line))
 
 axl_win_TPropertyLine*
 AXL_API
-axl_win_TPropertyCtrl_GetSelectedLine(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_GetSelectedLine(axl_win_TPropertyCtrl* propertyCtrl);
 
 long
 AXL_API
 axl_win_TPropertyCtrl_SetSplitterPos(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	long SplitterPos
+	axl_win_TPropertyCtrl* propertyCtrl,
+	long splitterPos
 	);
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_SetImageList(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
+	axl_win_TPropertyCtrl* propertyCtrl,
 	HIMAGELIST hImageList
 	);
 
 axl_win_TPropertyLine* 
 AXL_API
 axl_win_TPropertyCtrl_HitTest(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
+	axl_win_TPropertyCtrl* propertyCtrl,
 	long x,
 	long y,	
-	axl_win_TPropertyHitTest* pHitTest
+	axl_win_TPropertyHitTest* hitTest
 	);
 
 #ifdef __cplusplus
 
-#define axl_win_TPropertyCtrl_SetFocus(pPropertyCtrl) \
-	(::SetFocus((pPropertyCtrl)->m_hWnd))
+#define axl_win_TPropertyCtrl_SetFocus(propertyCtrl) \
+	(::SetFocus((propertyCtrl)->m_hWnd))
 
-#define axl_win_TPropertyCtrl_Invalidate(pPropertyCtrl) \
-	(::InvalidateRect((pPropertyCtrl)->m_hWnd, NULL, FALSE))
+#define axl_win_TPropertyCtrl_Invalidate(propertyCtrl) \
+	(::InvalidateRect((propertyCtrl)->m_hWnd, NULL, FALSE))
 
-#define axl_win_TPropertyCtrl_ClientToScreen(pPropertyCtrl, pPoint) \
-	(::ClientToScreen((pPropertyCtrl)->m_hWnd, pPoint))
+#define axl_win_TPropertyCtrl_ClientToScreen(propertyCtrl, point) \
+	(::ClientToScreen((propertyCtrl)->m_hWnd, point))
 
 #else
 
-#define axl_win_TPropertyCtrl_SetFocus(pPropertyCtrl) \
-	SetFocus((pPropertyCtrl)->m_hWnd)
+#define axl_win_TPropertyCtrl_SetFocus(propertyCtrl) \
+	setFocus((propertyCtrl)->m_hWnd)
 
-#define axl_win_TPropertyCtrl_Invalidate(pPropertyCtrl) \
-	InvalidateRect((pPropertyCtrl)->m_hWnd, NULL, FALSE)
+#define axl_win_TPropertyCtrl_Invalidate(propertyCtrl) \
+	invalidateRect((propertyCtrl)->m_hWnd, NULL, FALSE)
 
-#define axl_win_TPropertyCtrl_ClientToScreen(pPropertyCtrl, pPoint) \
-	ClientToScreen((pPropertyCtrl)->m_hWnd, pPoint)
+#define axl_win_TPropertyCtrl_ClientToScreen(propertyCtrl, point) \
+	clientToScreen((propertyCtrl)->m_hWnd, point)
 
 #endif
 
@@ -801,7 +801,7 @@ AXL_API
 axl_win_TPropertyCtrl_CreatePlusMinusImageList(
 	ulong_t cx, 
 	ulong_t cy,
-	COLORREF* pPalette
+	COLORREF* palette
 	);
 
 HIMAGELIST 
@@ -809,7 +809,7 @@ AXL_API
 axl_win_TPropertyCtrl_CreateGridImageList(
 	ulong_t cx, 
 	ulong_t cy,
-	COLORREF* pPalette
+	COLORREF* palette
 	);
 
 HIMAGELIST 
@@ -819,62 +819,62 @@ axl_win_TPropertyCtrl_CreateMenuArrowImageList();
 void 
 AXL_API
 axl_win_TPropertyCtrl_PaintRect(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
+	axl_win_TPropertyCtrl* propertyCtrl,
 	HDC hdc,
-	const RECT* pRect
+	const RECT* rect
 	);
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_InvalidateLineRange(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	size_t FromLine,
-	size_t ToLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	size_t fromLine,
+	size_t toLine
 	);
 
 long
 AXL_API
-axl_win_TPropertyCtrl_GetFullWidth(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_GetFullWidth(axl_win_TPropertyCtrl* propertyCtrl);
 
 long
 AXL_API
-axl_win_TPropertyCtrl_GetFullHeight(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_GetFullHeight(axl_win_TPropertyCtrl* propertyCtrl);
 
 void 
 AXL_API
-axl_win_TPropertyCtrl_UpdateAllLineWidth(axl_win_TPropertyCtrl* pPropertyCtrl);
+axl_win_TPropertyCtrl_UpdateAllLineWidth(axl_win_TPropertyCtrl* propertyCtrl);
 
-#define axl_win_TPropertyCtrl_SetNotify(pPropertyCtrl, hWndNotify, IdNotify) \
-	((pPropertyCtrl)->m_hWndNotify = (hWndNotify), (pPropertyCtrl)->m_IdNotify = (IdNotify))
+#define axl_win_TPropertyCtrl_SetNotify(propertyCtrl, hWndNotify, idNotify) \
+	((propertyCtrl)->m_hWndNotify = (hWndNotify), (propertyCtrl)->m_idNotify = (idNotify))
 
 LRESULT
 AXL_API
 axl_win_TPropertyCtrl_Notify(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	int Code,
-	axl_win_TPropertyHitTest* pHitTest
+	axl_win_TPropertyCtrl* propertyCtrl,
+	int code,
+	axl_win_TPropertyHitTest* hitTest
 	);
 
 void
 AXL_API
 axl_win_TPropertyCtrl_OnScroll(
-	axl_win_TPropertyCtrl* pPropertyCtrl, 
-	int Bar,
-	int Code
+	axl_win_TPropertyCtrl* propertyCtrl, 
+	int bar,
+	int code
 	);
 
 void
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	int VkCode
+	axl_win_TPropertyCtrl* propertyCtrl,
+	int vkCode
 	);
 
 void
 AXL_API
 axl_win_TPropertyCtrl_OnKeyUp(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	int VkCode
+	axl_win_TPropertyCtrl* propertyCtrl,
+	int vkCode
 	);
 
 #ifdef __cplusplus
@@ -886,17 +886,17 @@ typedef struct _axl_win_TPropertyCtrl
 	HWND m_hWnd;
 	HWND m_hWndToolTip;
 	HWND m_hWndNotify;
-	UINT m_IdNotify;
+	UINT m_idNotify;
 
-	axl_win_TPropertyCtrl* m_pMenuPropertyCtrl;
-	axl_win_TPropertyCtrl* m_pMenuParentPropertyCtrl;
-	axl_win_TPropertyCtrl* m_pMenuRootPropertyCtrl;
-	axl_win_TPropertyLine* m_pMenuAnchorLine;
-	DWORD m_MenuDelay;
+	axl_win_TPropertyCtrl* m_menuPropertyCtrl;
+	axl_win_TPropertyCtrl* m_menuParentPropertyCtrl;
+	axl_win_TPropertyCtrl* m_menuRootPropertyCtrl;
+	axl_win_TPropertyLine* m_menuAnchorLine;
+	DWORD m_menuDelay;
 
-	axl_gr_TTextPaint m_TextPaint;
-	axl_gr_TStockCtrlPaint m_StockCtrlPaint;
-	axl_gr_TOffscreenBuffer m_OffscreenBuffer;
+	axl_gr_TTextPaint m_textPaint;
+	axl_gr_TStockCtrlPaint m_stockCtrlPaint;
+	axl_gr_TOffscreenBuffer m_offscreenBuffer;
 
 //	HRGN m_hUpdateRgn;
 
@@ -904,136 +904,136 @@ typedef struct _axl_win_TPropertyCtrl
 	HIMAGELIST m_hPlusMinusImageList;
 	HIMAGELIST m_hGridImageList;
 	HIMAGELIST m_hMenuArrowImageList;
-	axl_gr_TFont m_DefaultFont;
+	axl_gr_TFont m_defaultFont;
 	HCURSOR m_hArrowCursor;
 	HCURSOR m_hSplitterCursor;
 	HCURSOR m_hHyperlinkCursor;
 	HCURSOR m_hReArrangeCursor;
-	RECT m_SplitterProximityRect;
-	RECT m_Margins;
-	SIZE m_CharSize;
-	SIZE m_PlusMinusSize;
-	SIZE m_OptionBoxSize;
-	SIZE m_IconSize;
-	RECT m_PlusMinusRect;
-	RECT m_OptionBoxRect;
-	RECT m_IconRect;
-	POINT m_TextOrigin;
+	RECT m_splitterProximityRect;
+	RECT m_margins;
+	SIZE m_charSize;
+	SIZE m_plusMinusSize;
+	SIZE m_optionBoxSize;
+	SIZE m_iconSize;
+	RECT m_plusMinusRect;
+	RECT m_optionBoxRect;
+	RECT m_iconRect;
+	POINT m_textOrigin;
 
-	DWORD m_ToolTipShowDelay;
-	DWORD m_ToolTipReShowDelay;
+	DWORD m_toolTipShowDelay;
+	DWORD m_toolTipReShowDelay;
 
-	int m_Drag;
-	int m_DragAnchorHitTest;
-	axl_win_TPropertyLine* m_pDragAnchorLine;
-	axl_gr_THyperlinkAnchor* m_pDragAnchorHyperlink;
-	POINT m_DragDelta;
+	int m_drag;
+	int m_dragAnchorHitTest;
+	axl_win_TPropertyLine* m_dragAnchorLine;
+	axl_gr_THyperlinkAnchor* m_dragAnchorHyperlink;
+	POINT m_dragDelta;
 
-	int m_Hover;
-	axl_win_TPropertyLine* m_pHoverAnchorLine;
-	axl_win_TPropertyLine* m_pLastTooltipLine;
+	int m_hover;
+	axl_win_TPropertyLine* m_hoverAnchorLine;
+	axl_win_TPropertyLine* m_lastTooltipLine;
 
-	size_t m_FirstVisibleLine;
-	size_t m_FullyVisibleLineCount;
-	size_t m_VisibleLineCount;
-	size_t m_SelectedLine;
-	long m_SplitterPos;
-	long m_FirstVisibleX;
-	ulong_t m_VisibleWidth;
-	ulong_t m_IndentWidth;
-	ulong_t m_OptionBoxWidth;
-	ulong_t m_IconWidth;
-	ulong_t m_LineHeight;
-	ulong_t m_MinNamePaneWidth;
-	ulong_t m_SinglePaneWidth;
-	ulong_t m_ValueWidth;
+	size_t m_firstVisibleLine;
+	size_t m_fullyVisibleLineCount;
+	size_t m_visibleLineCount;
+	size_t m_selectedLine;
+	long m_splitterPos;
+	long m_firstVisibleX;
+	ulong_t m_visibleWidth;
+	ulong_t m_indentWidth;
+	ulong_t m_optionBoxWidth;
+	ulong_t m_iconWidth;
+	ulong_t m_lineHeight;
+	ulong_t m_minNamePaneWidth;
+	ulong_t m_singlePaneWidth;
+	ulong_t m_valueWidth;
 
-	bool_t m_HasGridLinesAtRoot;
-	bool_t m_DoAlwaysDrawButtons;
+	bool_t m_hasGridLinesAtRoot;
+	bool_t m_doAlwaysDrawButtons;
 
-	ulong_t m_MouseWheelSpeed;
+	ulong_t m_mouseWheelSpeed;
 
-	axl_rtl_TList m_LineList;
-	axl_rtl_TList* m_pLineList;
-	axl_rtl_TPtrArray m_VisibleLineArray;
-	axl_win_TPropertyInPlace* m_pActiveInPlace;
-	ulong_t m_ActiveInPlaceMinWidth;
+	axl_rtl_TList m_lineList;
+	axl_rtl_TList* m_lineList;
+	axl_rtl_TPtrArray m_visibleLineArray;
+	axl_win_TPropertyInPlace* m_activeInPlace;
+	ulong_t m_activeInPlaceMinWidth;
 
-	COLORREF m_Palette[axl_win_EPropertyColor_Count];
+	COLORREF m_palette[axl_win_EPropertyColor_Count];
 
 #ifdef __cplusplus
 	operator HWND () 
 		{ return m_hWnd; }
 
-	static axl_TStatus RegisterWndClass()
+	static axl_TStatus registerWndClass()
 		{ return axl_win_TPropertyCtrl_RegisterWndClass(); }
 
-	HWND CreateEx(DWORD ExStyle, DWORD Style, const RECT* pRect, HWND hWndParent, UINT ID, HINSTANCE hInstance)
-		{ return axl_win_TPropertyCtrl_CreateEx(this, ExStyle, Style, pRect, hWndParent, ID, hInstance); }
+	HWND createEx(DWORD exStyle, DWORD style, const RECT* rect, HWND hWndParent, UINT ID, HINSTANCE hInstance)
+		{ return axl_win_TPropertyCtrl_CreateEx(this, exStyle, style, rect, hWndParent, ID, hInstance); }
 
-	HWND Create(DWORD Style, const RECT* pRect, HWND hWndParent, UINT ID, HINSTANCE hInstance)
-		{ return axl_win_TPropertyCtrl_Create(this, Style, pRect, hWndParent, ID, hInstance); }
+	HWND create(DWORD style, const RECT* rect, HWND hWndParent, UINT ID, HINSTANCE hInstance)
+		{ return axl_win_TPropertyCtrl_Create(this, style, rect, hWndParent, ID, hInstance); }
 
-	void Destroy()
+	void destroy()
 		{ axl_win_TPropertyCtrl_Destroy(this); }
 
-	static axl_win_TPropertyCtrl* FromHwnd(HWND hWnd)
+	static axl_win_TPropertyCtrl* fromHwnd(HWND hWnd)
 		{ return axl_win_TPropertyCtrl_FromHwnd(hWnd); }
 
-	void Clear()
+	void clear()
 		{ axl_win_TPropertyCtrl_Clear(this); }
 
-	int GetFullWidth()
+	int getFullWidth()
 		{ return axl_win_TPropertyCtrl_GetFullWidth(this); }
 
-	int GetFullHeight()
+	int getFullHeight()
 		{ return axl_win_TPropertyCtrl_GetFullHeight(this); }
 
-	void GetSize(SIZE* pSize)
-		{ axl_win_TPropertyCtrl_GetSize(this, pSize); }
+	void getSize(SIZE* size)
+		{ axl_win_TPropertyCtrl_GetSize(this, size); }
 
-	SIZE GetSize()
+	SIZE getSize()
 	{ 
-		SIZE Size;
-		axl_win_TPropertyCtrl_GetSize(this, &Size); 
-		return Size;
+		SIZE size;
+		axl_win_TPropertyCtrl_GetSize(this, &size); 
+		return size;
 	}
 
-	void SetImageList(HIMAGELIST hImageList)
+	void setImageList(HIMAGELIST hImageList)
 		{ axl_win_TPropertyCtrl_SetImageList(this, hImageList); }
 
-	void SetFocus()
+	void setFocus()
 		{ axl_win_TPropertyCtrl_SetFocus(this); }
 
-	void Invalidate()
+	void invalidate()
 		{ axl_win_TPropertyCtrl_Invalidate(this); }
 
-	void ClientToScreen(POINT* pPoint)
-		{ axl_win_TPropertyCtrl_ClientToScreen(this, pPoint); }
+	void clientToScreen(POINT* point)
+		{ axl_win_TPropertyCtrl_ClientToScreen(this, point); }
 
-	axl_win_TPropertyLine* GetFirstLine()
+	axl_win_TPropertyLine* getFirstLine()
 		{ return axl_win_TPropertyCtrl_GetFirstLine(this); }
 
-	axl_win_TPropertyLine* GetLastLine()
+	axl_win_TPropertyLine* getLastLine()
 		{ return axl_win_TPropertyCtrl_GetLastLine(this); }
 
-	axl_win_TPropertyLine* GetSelectedLine()
+	axl_win_TPropertyLine* getSelectedLine()
 		{ return axl_win_TPropertyCtrl_GetSelectedLine(this); }
 
-	bool SaveActiveInPlace()
+	bool saveActiveInPlace()
 		{ return axl_win_TPropertyCtrl_SaveActiveInPlace(this) != 0; }
 
-	axl_win_TPropertyLine* InsertLine(axl_win_TPropertyLine* pParent = NULL, axl_win_TPropertyLine* pBefore = NULL)
-		{ return axl_win_TPropertyCtrl_InsertLine(this, pParent, pBefore); }
+	axl_win_TPropertyLine* insertLine(axl_win_TPropertyLine* parent = NULL, axl_win_TPropertyLine* before = NULL)
+		{ return axl_win_TPropertyCtrl_InsertLine(this, parent, before); }
 
-	void UpdateLineWidth(axl_win_TPropertyLine* pLine)
-		{ axl_win_TPropertyCtrl_UpdateLineWidth(this, pLine); }
+	void updateLineWidth(axl_win_TPropertyLine* line)
+		{ axl_win_TPropertyCtrl_UpdateLineWidth(this, line); }
 
-	void UpdateAllLineWidths()
+	void updateAllLineWidths()
 		{ axl_win_TPropertyCtrl_UpdateAllLineWidths(this); }
 
-	long SetSplitterPos(long SplitterPos)
-		{ return axl_win_TPropertyCtrl_SetSplitterPos(this, SplitterPos); }
+	long setSplitterPos(long splitterPos)
+		{ return axl_win_TPropertyCtrl_SetSplitterPos(this, splitterPos); }
 
 #endif
 } axl_win_TPropertyCtrl;
@@ -1052,77 +1052,77 @@ namespace win {
 
 struct EPropertyLine { enum
 {
-	SinglePane           = axl_win_EPropertyLine_SinglePane,
-	ReArrangeable        = axl_win_EPropertyLine_ReArrangeable,
-	IsExpanded           = axl_win_EPropertyLine_IsExpanded,
-	IsDisabled           = axl_win_EPropertyLine_IsDisabled,
-	NotSelectable        = axl_win_EPropertyLine_NotSelectable,
-	Button               = axl_win_EPropertyLine_Button,
-	NameHyperText        = axl_win_EPropertyLine_NameHyperText,
-	ValueHyperText       = axl_win_EPropertyLine_ValueHyperText,
-	Menu                 = axl_win_EPropertyLine_Menu,
-	NoChildGridLines     = axl_win_EPropertyLine_NoChildGridLines,
-	ForceNoGridLines     = axl_win_EPropertyLine_ForceNoGridLines,
-	AlwaysDrawButton     = axl_win_EPropertyLine_AlwaysDrawButton,
-	NameShadow           = axl_win_EPropertyLine_NameShadow,
-	ValueShadow          = axl_win_EPropertyLine_ValueShadow,
-	Separator            = axl_win_EPropertyLine_Separator
+	singlePane           = axl_win_EPropertyLine_SinglePane,
+	reArrangeable        = axl_win_EPropertyLine_ReArrangeable,
+	isExpanded           = axl_win_EPropertyLine_IsExpanded,
+	isDisabled           = axl_win_EPropertyLine_IsDisabled,
+	notSelectable        = axl_win_EPropertyLine_NotSelectable,
+	button               = axl_win_EPropertyLine_Button,
+	nameHyperText        = axl_win_EPropertyLine_NameHyperText,
+	valueHyperText       = axl_win_EPropertyLine_ValueHyperText,
+	menu                 = axl_win_EPropertyLine_Menu,
+	noChildGridLines     = axl_win_EPropertyLine_NoChildGridLines,
+	forceNoGridLines     = axl_win_EPropertyLine_ForceNoGridLines,
+	alwaysDrawButton     = axl_win_EPropertyLine_AlwaysDrawButton,
+	nameShadow           = axl_win_EPropertyLine_NameShadow,
+	valueShadow          = axl_win_EPropertyLine_ValueShadow,
+	separator            = axl_win_EPropertyLine_Separator
 };};
 
 struct EPropertyLineDelimiter { enum
 {
-	None        = axl_win_EPropertyLineDelimiter_None,
-	NameTop     = axl_win_EPropertyLineDelimiter_NameTop,
-	NameBottom  = axl_win_EPropertyLineDelimiter_NameBottom,
-	ValueTop    = axl_win_EPropertyLineDelimiter_ValueTop,
-	ValueBottom = axl_win_EPropertyLineDelimiter_ValueBottom,
-	All         = axl_win_EPropertyLineDelimiter_All,
+	none        = axl_win_EPropertyLineDelimiter_None,
+	nameTop     = axl_win_EPropertyLineDelimiter_NameTop,
+	nameBottom  = axl_win_EPropertyLineDelimiter_NameBottom,
+	valueTop    = axl_win_EPropertyLineDelimiter_ValueTop,
+	valueBottom = axl_win_EPropertyLineDelimiter_ValueBottom,
+	all         = axl_win_EPropertyLineDelimiter_All,
 
-	Top         = axl_win_EPropertyLineDelimiter_Top,
-	Bottom      = axl_win_EPropertyLineDelimiter_Bottom,
-	Name        = axl_win_EPropertyLineDelimiter_Name,
-	Value       = axl_win_EPropertyLineDelimiter_Value,
+	top         = axl_win_EPropertyLineDelimiter_Top,
+	bottom      = axl_win_EPropertyLineDelimiter_Bottom,
+	name        = axl_win_EPropertyLineDelimiter_Name,
+	value       = axl_win_EPropertyLineDelimiter_Value,
 };};
 
 struct EPropertyOptionBoxType { enum
 {
-	None        = axl_win_EPropertyOptionBoxType_None,
-	CheckBox    = axl_win_EPropertyOptionBoxType_CheckBox,
-	RadioButton = axl_win_EPropertyOptionBoxType_RadioButton,
+	none        = axl_win_EPropertyOptionBoxType_None,
+	checkBox    = axl_win_EPropertyOptionBoxType_CheckBox,
+	radioButton = axl_win_EPropertyOptionBoxType_RadioButton,
 };};
 
 struct EPropertyCheckState { enum
 {
-	Unchecked    = axl_win_EPropertyCheckState_Unchecked,
-	Checked      = axl_win_EPropertyCheckState_Checked,
-	State3       = axl_win_EPropertyCheckState_State3,
+	unchecked    = axl_win_EPropertyCheckState_Unchecked,
+	checked      = axl_win_EPropertyCheckState_Checked,
+	state3       = axl_win_EPropertyCheckState_State3,
 };};
 
 struct EPropertyHitTest { enum
 {
-	None      = axl_win_EPropertyHitTest_None,
-	Indent    = axl_win_EPropertyHitTest_Indent,
-	PlusMinus = axl_win_EPropertyHitTest_PlusMinus,
-	OptionBox = axl_win_EPropertyHitTest_OptionBox,
-	Button    = axl_win_EPropertyHitTest_Button,
-	Menu      = axl_win_EPropertyHitTest_Menu,
-	Icon      = axl_win_EPropertyHitTest_Icon,
-	Name      = axl_win_EPropertyHitTest_Name,
-	NameTail  = axl_win_EPropertyHitTest_NameTail,
-	Splitter  = axl_win_EPropertyHitTest_Splitter,
-	Value     = axl_win_EPropertyHitTest_Value,
-	ValueTail = axl_win_EPropertyHitTest_ValueTail,
-	Hyperlink = axl_win_EPropertyHitTest_Hyperlink,
+	none      = axl_win_EPropertyHitTest_None,
+	indent    = axl_win_EPropertyHitTest_Indent,
+	plusMinus = axl_win_EPropertyHitTest_PlusMinus,
+	optionBox = axl_win_EPropertyHitTest_OptionBox,
+	button    = axl_win_EPropertyHitTest_Button,
+	menu      = axl_win_EPropertyHitTest_Menu,
+	icon      = axl_win_EPropertyHitTest_Icon,
+	name      = axl_win_EPropertyHitTest_Name,
+	nameTail  = axl_win_EPropertyHitTest_NameTail,
+	splitter  = axl_win_EPropertyHitTest_Splitter,
+	value     = axl_win_EPropertyHitTest_Value,
+	valueTail = axl_win_EPropertyHitTest_ValueTail,
+	hyperlink = axl_win_EPropertyHitTest_Hyperlink,
 };};
 
 struct EPropertyNotify { enum
 {
-	ButtonClick    = axl_win_EPropertyNotify_ButtonClick,
-	OptionBoxClick = axl_win_EPropertyNotify_OptionBoxClick,
-	HyperlinkClick = axl_win_EPropertyNotify_HyperlinkClick,
-	MenuClick      = axl_win_EPropertyNotify_MenuClick,
-	ReArrange      = axl_win_EPropertyNotify_ReArrange,
-	ExpandCollapse = axl_win_EPropertyNotify_ExpandCollapse,
+	buttonClick    = axl_win_EPropertyNotify_ButtonClick,
+	optionBoxClick = axl_win_EPropertyNotify_OptionBoxClick,
+	hyperlinkClick = axl_win_EPropertyNotify_HyperlinkClick,
+	menuClick      = axl_win_EPropertyNotify_MenuClick,
+	reArrange      = axl_win_EPropertyNotify_ReArrange,
+	expandCollapse = axl_win_EPropertyNotify_ExpandCollapse,
 };};
 
 typedef axl_win_TPropertyCtrl    TPropertyCtrl;
@@ -1144,8 +1144,8 @@ public:
 class CPropertyInPlace: public TPropertyInPlace
 {
 public:
-	CPropertyInPlace(axl_obj_TAgent* pAgent)
-		{ axl_win_TPropertyInPlace_Construct(this, pAgent); }
+	CPropertyInPlace(axl_obj_TAgent* agent)
+		{ axl_win_TPropertyInPlace_Construct(this, agent); }
 };
 
 template <class T>
@@ -1155,8 +1155,8 @@ public:
 	typedef CPropertyInPlaceT CBaseClass;
 
 public:
-	CPropertyInPlaceT(axl::obj::TAgent* pAgent):
-		CPropertyInPlace(pAgent)
+	CPropertyInPlaceT(axl::obj::TAgent* agent):
+		CPropertyInPlace(agent)
 	{ 
 		m_pfLoad = _Load;
 		m_pfSave = _Save;
@@ -1165,17 +1165,17 @@ public:
 	}
 
 protected:
-	static bool_t AXL_API _Load(axl_win_TPropertyInPlace* pInPlace, axl_win_TPropertyLine* pLine, const RECT* pRect, ulong_t* pMinWidth)
-		{ return static_cast<T*>(pInPlace)->Load(pLine, pRect, pMinWidth); }
+	static bool_t AXL_API _Load(axl_win_TPropertyInPlace* inPlace, axl_win_TPropertyLine* line, const RECT* rect, ulong_t* minWidth)
+		{ return static_cast<T*>(inPlace)->load(line, rect, minWidth); }
 
-	static bool_t AXL_API _Save(axl_win_TPropertyInPlace* pInPlace, axl_win_TPropertyLine* pLine)
-		{ return static_cast<T*>(pInPlace)->Save(pLine); }
+	static bool_t AXL_API _Save(axl_win_TPropertyInPlace* inPlace, axl_win_TPropertyLine* line)
+		{ return static_cast<T*>(inPlace)->save(line); }
 
-	static void AXL_API _Layout(axl_win_TPropertyInPlace* pInPlace, const RECT* pRect)
-		{ static_cast<T*>(pInPlace)->Layout(pRect); }
+	static void AXL_API _Layout(axl_win_TPropertyInPlace* inPlace, const RECT* rect)
+		{ static_cast<T*>(inPlace)->layout(rect); }
 
-	static void AXL_API _SetFocus(axl_win_TPropertyInPlace* pInPlace)
-		{ static_cast<T*>(pInPlace)->SetFocus(); }
+	static void AXL_API _SetFocus(axl_win_TPropertyInPlace* inPlace)
+		{ static_cast<T*>(inPlace)->setFocus(); }
 };
 
 } // namespace win {

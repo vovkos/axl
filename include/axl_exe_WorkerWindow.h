@@ -28,44 +28,44 @@ protected:
 		WM_PROCESS_INVOKE_LIST = WM_USER + 1,
 	};
 
-	mt::CLock m_Lock;
-	exe::CInvokeList m_InvokeList;
-	ulong_t m_ThreadId;
+	mt::CLock m_lock;
+	exe::CInvokeList m_invokeList;
+	ulong_t m_threadId;
 
 public:
 	CWorkerWindow ()
 	{
-		m_ThreadId = 0;
+		m_threadId = 0;
 	}
 
 	bool 
-	Create ()
+	create ()
 	{
-		m_ThreadId = ::GetCurrentThreadId ();
-		return CWindowImplT <CWorkerWindow>::Create (NULL);
+		m_threadId = ::GetCurrentThreadId ();
+		return CWindowImplT <CWorkerWindow>::create (NULL);
 	}
 
 	// IScheduler
 
 	virtual 
 	EScheduleResult
-	ScheduleV (
-		exe::IFunction* pFunction, 
+	scheduleV (
+		exe::IFunction* function, 
 		axl_va_list va
 		);
 
 	// CWindowImpl
 
 	AXL_G_WINDOW_MSG_MAP_BEGIN ()
-		AXL_G_WINDOW_MSG_HANDLER (WM_PROCESS_INVOKE_LIST, OnProcessInvokeList)
+		AXL_G_WINDOW_MSG_HANDLER (WM_PROCESS_INVOKE_LIST, onProcessInvokeList)
 	AXL_G_WINDOW_MSG_MAP_END ()
 
 	LRESULT 
-	OnProcessInvokeList (
-		UINT Msg, 
+	onProcessInvokeList (
+		UINT msg, 
 		WPARAM wParam, 
 		LPARAM lParam, 
-		bool* pIsHandled
+		bool* isHandled
 		);
 };
 

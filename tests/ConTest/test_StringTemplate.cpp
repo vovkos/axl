@@ -7,32 +7,32 @@ namespace test_StringTemplate {
 //.............................................................................
 
 void
-Run (const char* pFileName)
+run (const char* fileName)
 {
-	bool Result;
+	bool result;
 
-	io::CMappedFile File;
-	Result = File.Open (pFileName, io::EFileFlag_ReadOnly);
-	if (!Result)
+	io::CMappedFile file;
+	result = file.open (fileName, io::EFileFlag_ReadOnly);
+	if (!result)
 	{
-		printf ("%s\n", err::GetError ()->GetDescription ());
+		printf ("%s\n", err::getError ()->getDescription ());
 		return;
 	}
 
-	char* p = (char*) File.View ();
-	size_t Size = (size_t) File.GetSize ();
+	char* p = (char*) file.view ();
+	size_t size = (size_t) file.getSize ();
 	
-	lua::CStringTemplate St;
+	lua::CStringTemplate st;
 
-	rtl::CString ResultString;
-	Result = St.Process (&ResultString, pFileName, p, Size);
-	if (!Result)
+	rtl::CString resultString;
+	result = st.process (&resultString, fileName, p, size);
+	if (!result)
 	{
-		printf ("error processing string template: %s\n", err::GetError ()->GetDescription ());
+		printf ("error processing string template: %s\n", err::getError ()->getDescription ());
 		return;
 	}
 
-	printf ("result string:\n%s\n", ResultString);
+	printf ("result string:\n%s\n", resultString);
 }
 
 //.............................................................................

@@ -30,10 +30,10 @@ public:
 
 template <typename T>
 T*
-GetSimpleSingleton (volatile int32_t* pFlag = NULL)
+getSimpleSingleton (volatile int32_t* flag = NULL)
 {
 	static uchar_t _Buffer [sizeof (T)] = { 0 };	
-	mt::CallOnce (CConstructSimpleSingletonT <T> (), _Buffer, pFlag);
+	mt::callOnce (CConstructSimpleSingletonT <T> (), _Buffer, flag);
 	return (T*) _Buffer;
 }
 

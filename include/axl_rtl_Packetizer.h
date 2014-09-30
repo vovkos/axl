@@ -22,27 +22,27 @@ protected:
 	};
 
 protected:
-	rtl::CArrayT <char> m_Buffer;
+	rtl::CArrayT <char> m_buffer;
 
 public:
 	void
-	Reset ()
+	reset ()
 	{
-		m_Buffer.Clear ();
+		m_buffer.clear ();
 	}
 
 	static
 	uint64_t
-	CreateHdr (size_t Size)
+	createHdr (size_t size)
 	{
-		return ((uint64_t) Size << 32) | EPacketHdr_Signature;
+		return ((uint64_t) size << 32) | EPacketHdr_Signature;
 	}
 
 protected:
 	size_t
-	WriteImpl (
+	writeImpl (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 };
 
@@ -53,26 +53,26 @@ class CPacketizerT: public CPacketizerRoot
 {
 public:
 	void
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		while (Size)
+		while (size)
 		{
-			size_t Taken = WriteImpl (p, Size);
-			if (Taken == -1)
+			size_t taken = writeImpl (p, size);
+			if (taken == -1)
 				break;
 
-			ASSERT (m_Buffer.GetCount () >= sizeof (uint64_t));
-			size_t DataSize = m_Buffer.GetCount () - sizeof (uint64_t);
-			if (DataSize)
-				static_cast <T*> (this)->OnPacket (m_Buffer.a () + sizeof (uint64_t), DataSize);
+			ASSERT (m_buffer.getCount () >= sizeof (uint64_t));
+			size_t dataSize = m_buffer.getCount () - sizeof (uint64_t);
+			if (dataSize)
+				static_cast <T*> (this)->onPacket (m_buffer.a () + sizeof (uint64_t), dataSize);
 
-			Reset ();
+			reset ();
 
-			p = (char*) p + Taken;
-			Size -= Taken;
+			p = (char*) p + taken;
+			size -= taken;
 		}
 	}
 };
@@ -91,30 +91,30 @@ protected:
 
 	struct TPacketHdr
 	{
-		uint32_t m_Signature;
-		uint16_t m_DataSize;
-		uint16_t m_Checksum; // CRC16
+		uint32_t m_signature;
+		uint16_t m_dataSize;
+		uint16_t m_checksum; // CRC16
 	};
 
 protected:
-	rtl::CArrayT <char> m_Buffer;
+	rtl::CArrayT <char> m_buffer;
 
 public:
 	void
-	Reset ()
+	reset ()
 	{
-		m_Buffer.Clear ();
+		m_buffer.clear ();
 	}
 
 	static
 	uint64_t
-	CreateHdr (size_t Size);
+	createHdr (size_t size);
 
 protected:
 	size_t
-	WriteImpl (
+	writeImpl (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 };
 
@@ -125,26 +125,26 @@ class CLegacyPacketizerT: public CLegacyPacketizerRoot
 {
 public:
 	void
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		while (Size)
+		while (size)
 		{
-			size_t Taken = WriteImpl (p, Size);
-			if (Taken == -1)
+			size_t taken = writeImpl (p, size);
+			if (taken == -1)
 				break;
 
-			ASSERT (m_Buffer.GetCount () >= sizeof (uint64_t));
-			size_t DataSize = m_Buffer.GetCount () - sizeof (uint64_t);
-			if (DataSize)
-				static_cast <T*> (this)->OnPacket (m_Buffer.a () + sizeof (uint64_t), DataSize);
+			ASSERT (m_buffer.getCount () >= sizeof (uint64_t));
+			size_t dataSize = m_buffer.getCount () - sizeof (uint64_t);
+			if (dataSize)
+				static_cast <T*> (this)->onPacket (m_buffer.a () + sizeof (uint64_t), dataSize);
 
-			Reset ();
+			reset ();
 
-			p = (char*) p + Taken;
-			Size -= Taken;
+			p = (char*) p + taken;
+			size -= taken;
 		}
 	}
 };

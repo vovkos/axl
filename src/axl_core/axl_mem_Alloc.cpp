@@ -11,36 +11,36 @@ namespace mem {
 
 void* 
 CStdAlloc::CAlloc::operator () (
-	size_t Size,
-	const char* pTag,
-	const char* pFilePath,
-	int Line
+	size_t size,
+	const char* tag,
+	const char* filePath,
+	int line
 	)
 {
-	size_t FullSize = Size + sizeof (CTracker::TBlockHdr);
+	size_t fullSize = size + sizeof (CTracker::TBlockHdr);
 
-	CTracker::TBlockHdr* pHdr = (CTracker::TBlockHdr*) CMalloc::Alloc (FullSize);
-	if (!pHdr)
+	CTracker::TBlockHdr* hdr = (CTracker::TBlockHdr*) CMalloc::alloc (fullSize);
+	if (!hdr)
 		return NULL;
 
-	pHdr->m_Size = Size;
-	pHdr->m_pTag = pTag;
-	pHdr->m_pFilePath = pFilePath;
-	pHdr->m_Line = Line;
+	hdr->m_size = size;
+	hdr->m_tag = tag;
+	hdr->m_filePath = filePath;
+	hdr->m_line = line;
 
-	g::GetModule ()->GetMemTracker ()->Add (pHdr);
+	g::getModule ()->getMemTracker ()->add (hdr);
 
-	return pHdr + 1;
+	return hdr + 1;
 }
 
 void 
 CStdAlloc::CFree::operator () (void* p)
 {
-	CTracker::TBlockHdr* pHdr = (CTracker::TBlockHdr*) p - 1;
+	CTracker::TBlockHdr* hdr = (CTracker::TBlockHdr*) p - 1;
 	
-	g::GetModule ()->GetMemTracker ()->Remove (pHdr);
+	g::getModule ()->getMemTracker ()->remove (hdr);
 
-	CMalloc::Free (pHdr);
+	CMalloc::free (hdr);
 }
 
 #endif

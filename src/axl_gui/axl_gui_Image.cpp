@@ -7,16 +7,16 @@ namespace gui {
 //.............................................................................
 
 const char* 
-GetPixelFormatString (EPixelFormat PixelFormat)
+getPixelFormatString (EPixelFormat pixelFormat)
 {
-	static const char* StringTable [] = 
+	static const char* stringTable [] = 
 	{
 		"RGBA", // EPixelFormat_Rgba = 0,
 		"RGB",  // EPixelFormat_Rgb,
 	};
 
-	return PixelFormat < countof (StringTable) ? 
-		StringTable [PixelFormat] : 
+	return pixelFormat < countof (stringTable) ? 
+		stringTable [pixelFormat] : 
 		"undefined-pixel-format";
 }
 

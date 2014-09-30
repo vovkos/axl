@@ -33,172 +33,172 @@ enum ECharCodec
 class CCharCodec
 {
 protected:
-	size_t m_UnitSize;
+	size_t m_unitSize;
 
 public:
 	CCharCodec ()
 	{
-		m_UnitSize = 1;
+		m_unitSize = 1;
 	}
 
 	size_t
-	GetUnitSize ()
+	getUnitSize ()
 	{
-		return m_UnitSize;
+		return m_unitSize;
 	}
 
 	void
-	EncodeFromUtf8 (
-		rtl::CArrayT <char>* pBuffer,
+	encodeFromUtf8 (
+		rtl::CArrayT <char>* buffer,
 		const utf8_t* p,
-		size_t Length
+		size_t length
 		);
 
 	void
-	EncodeFromUtf16 (
-		rtl::CArrayT <char>* pBuffer,
+	encodeFromUtf16 (
+		rtl::CArrayT <char>* buffer,
 		const utf16_t* p,
-		size_t Length
+		size_t length
 		);
 
 	void
-	EncodeFromUtf32 (
-		rtl::CArrayT <char>* pBuffer,
+	encodeFromUtf32 (
+		rtl::CArrayT <char>* buffer,
 		const utf32_t* p,
-		size_t Length
+		size_t length
 		);
 
 	rtl::CArrayT <char>
-	EncodeFromUtf8 (
+	encodeFromUtf8 (
 		const utf8_t* p,
-		size_t Length
+		size_t length
 		);
 
 	rtl::CArrayT <char>
-	EncodeFromUtf16 (
+	encodeFromUtf16 (
 		const utf16_t* p,
-		size_t Length
+		size_t length
 		);
 
 	rtl::CArrayT <char>
-	EncodeFromUtf32 (
+	encodeFromUtf32 (
 		const utf32_t* p,
-		size_t Length
+		size_t length
 		);
 
 	virtual
 	void
-	EncodeFromUtf8 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf8 (
+		void* buffer,
+		size_t bufferSize,
 		const utf8_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		) = 0;
 
 	virtual
 	void
-	EncodeFromUtf16 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf16 (
+		void* buffer,
+		size_t bufferSize,
 		const utf16_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		) = 0;
 
 	virtual
 	void
-	EncodeFromUtf32 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf32 (
+		void* buffer,
+		size_t bufferSize,
 		const utf32_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		) = 0;
 
 	void
-	DecodeToUtf8 (
-		rtl::CArrayT <utf8_t>* pBuffer,
+	decodeToUtf8 (
+		rtl::CArrayT <utf8_t>* buffer,
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	void
-	DecodeToUtf16 (
-		rtl::CArrayT <utf16_t>* pBuffer,
+	decodeToUtf16 (
+		rtl::CArrayT <utf16_t>* buffer,
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	void
-	DecodeToUtf32 (
-		rtl::CArrayT <utf32_t>* pBuffer,
+	decodeToUtf32 (
+		rtl::CArrayT <utf32_t>* buffer,
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	rtl::CArrayT <utf8_t>
-	DecodeToUtf8 (
+	decodeToUtf8 (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	rtl::CArrayT <utf16_t>
-	DecodeToUtf16 (
+	decodeToUtf16 (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	rtl::CArrayT <utf32_t>
-	DecodeToUtf32 (
+	decodeToUtf32 (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 
 	virtual
 	void
-	DecodeToUtf8 (
-		utf8_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf8 (
+		utf8_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		) = 0;
 
 	virtual
 	void
-	DecodeToUtf16 (
-		utf16_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf16 (
+		utf16_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		) = 0;
 
 	virtual
 	void
-	DecodeToUtf32 (
-		utf32_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf32 (
+		utf32_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		) = 0;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 CCharCodec*
-GetCharCodec (ECharCodec CodecKind);
+getCharCodec (ECharCodec codecKind);
 
 //.............................................................................
 
@@ -207,138 +207,138 @@ class CAsciiCodec: public CCharCodec
 public:
 	CAsciiCodec ()
 	{
-		m_UnitSize = 1;
+		m_unitSize = 1;
 	}
 
 	virtual
 	void
-	EncodeFromUtf8 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf8 (
+		void* buffer,
+		size_t bufferSize,
 		const utf8_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::CUtfToAsciiConvertT <rtl::CUtf8>::Convert (
-			(char*) pBuffer,
-			BufferSize,
+		rtl::CUtfToAsciiConvertT <rtl::CUtf8>::convert (
+			(char*) buffer,
+			bufferSize,
 			p,
-			Length,
-			pTakenBufferSize,
-			pTakenLength
+			length,
+			takenBufferSize_o,
+			takenLength_o
 			);
 	}
 
 	virtual
 	void
-	EncodeFromUtf16 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf16 (
+		void* buffer,
+		size_t bufferSize,
 		const utf16_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::CUtfToAsciiConvertT <rtl::CUtf16>::Convert (
-			(char*) pBuffer,
-			BufferSize,
+		rtl::CUtfToAsciiConvertT <rtl::CUtf16>::convert (
+			(char*) buffer,
+			bufferSize,
 			p,
-			Length,
-			pTakenBufferSize,
-			pTakenLength
+			length,
+			takenBufferSize_o,
+			takenLength_o
 			);
 	}
 
 	virtual
 	void
-	EncodeFromUtf32 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf32 (
+		void* buffer,
+		size_t bufferSize,
 		const utf32_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::CUtfToAsciiConvertT <rtl::CUtf32>::Convert (
-			(char*) pBuffer,
-			BufferSize,
+		rtl::CUtfToAsciiConvertT <rtl::CUtf32>::convert (
+			(char*) buffer,
+			bufferSize,
 			p,
-			Length,
-			pTakenBufferSize,
-			pTakenLength
+			length,
+			takenBufferSize_o,
+			takenLength_o
 			);
 	}
 
 	virtual
 	void
-	DecodeToUtf8 (
-		utf8_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf8 (
+		utf8_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength,
-		size_t* pTakenSize,
-		size_t* pExpectedSize
+		size_t size,
+		size_t* takenBufferLength_o,
+		size_t* takenSize_o,
+		size_t* expectedSize_o
 		)
 	{
-		rtl::CAsciiToUtfConvertT <rtl::CUtf8>::Convert (
-			pBuffer,
-			BufferLength,
+		rtl::CAsciiToUtfConvertT <rtl::CUtf8>::convert (
+			buffer,
+			bufferLength,
 			(const char*) p,
-			Size,
-			pTakenBufferLength,
-			pTakenSize,
-			pExpectedSize
+			size,
+			takenBufferLength_o,
+			takenSize_o,
+			expectedSize_o
 			);
 	}
 
 	virtual
 	void
-	DecodeToUtf16 (
-		utf16_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf16 (
+		utf16_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		)
 	{
-		rtl::CAsciiToUtfConvertT <rtl::CUtf16>::Convert (
-			pBuffer,
-			BufferLength,
+		rtl::CAsciiToUtfConvertT <rtl::CUtf16>::convert (
+			buffer,
+			bufferLength,
 			(const char*) p,
-			Size,
-			pTakenBufferLength,
-			pTakenSize,
-			pExpectedSize
+			size,
+			takenBufferLength_o,
+			takenSize_o,
+			expectedSize_o
 			);
 	}
 
 	virtual
 	void
-	DecodeToUtf32 (
-		utf32_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf32 (
+		utf32_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		)
 	{
-		rtl::CAsciiToUtfConvertT <rtl::CUtf32>::Convert (
-			pBuffer,
-			BufferLength,
+		rtl::CAsciiToUtfConvertT <rtl::CUtf32>::convert (
+			buffer,
+			bufferLength,
 			(const char*) p,
-			Size,
-			pTakenBufferLength,
-			pTakenSize,
-			pExpectedSize
+			size,
+			takenBufferLength_o,
+			takenSize_o,
+			expectedSize_o
 			);
 	}
 };
@@ -354,193 +354,193 @@ public:
 public:
 	CUtfCodecT ()
 	{
-		m_UnitSize = sizeof (C);
+		m_unitSize = sizeof (C);
 	}
 
 	virtual
 	void
-	EncodeFromUtf8 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf8 (
+		void* buffer,
+		size_t bufferSize,
 		const utf8_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		)
 	{
-		size_t BufferLength = BufferSize / sizeof (C);
-		size_t TakenDstLength;
+		size_t bufferLength = bufferSize / sizeof (C);
+		size_t takenDstLength;
 
-		rtl::CUtfConvertT <T, rtl::CUtf8>::Convert (
-			(C*) pBuffer,
-			BufferLength,
+		rtl::CUtfConvertT <T, rtl::CUtf8>::convert (
+			(C*) buffer,
+			bufferLength,
 			p,
-			Length,
-			&TakenDstLength,
-			pTakenLength
+			length,
+			&takenDstLength,
+			takenLength_o
 			);
 
-		if (pTakenBufferSize)
-			*pTakenBufferSize = TakenDstLength * sizeof (C);
+		if (takenBufferSize_o)
+			*takenBufferSize_o = takenDstLength * sizeof (C);
 	}
 
 	virtual
 	void
-	EncodeFromUtf16 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf16 (
+		void* buffer,
+		size_t bufferSize,
 		const utf16_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		)
 	{
-		size_t BufferLength = BufferSize / sizeof (C);
-		size_t TakenDstLength;
+		size_t bufferLength = bufferSize / sizeof (C);
+		size_t takenDstLength;
 
-		rtl::CUtfConvertT <T, rtl::CUtf16>::Convert (
-			(C*) pBuffer,
-			BufferLength,
+		rtl::CUtfConvertT <T, rtl::CUtf16>::convert (
+			(C*) buffer,
+			bufferLength,
 			p,
-			Length,
-			&TakenDstLength,
-			pTakenLength
+			length,
+			&takenDstLength,
+			takenLength_o
 			);
 
-		if (pTakenBufferSize)
-			*pTakenBufferSize = TakenDstLength * sizeof (C);
+		if (takenBufferSize_o)
+			*takenBufferSize_o = takenDstLength * sizeof (C);
 	}
 
 	virtual
 	void
-	EncodeFromUtf32 (
-		void* pBuffer,
-		size_t BufferSize,
+	encodeFromUtf32 (
+		void* buffer,
+		size_t bufferSize,
 		const utf32_t* p,
-		size_t Length,
-		size_t* pTakenBufferSize = NULL,
-		size_t* pTakenLength = NULL
+		size_t length,
+		size_t* takenBufferSize_o = NULL,
+		size_t* takenLength_o = NULL
 		)
 	{
-		size_t BufferLength = BufferSize / sizeof (C);
-		size_t TakenDstLength;
+		size_t bufferLength = bufferSize / sizeof (C);
+		size_t takenDstLength;
 
-		rtl::CUtfConvertT <T, rtl::CUtf32>::Convert (
-			(C*) pBuffer,
-			BufferLength,
+		rtl::CUtfConvertT <T, rtl::CUtf32>::convert (
+			(C*) buffer,
+			bufferLength,
 			p,
-			Length,
-			&TakenDstLength,
-			pTakenLength
+			length,
+			&takenDstLength,
+			takenLength_o
 			);
 
-		if (pTakenBufferSize)
-			*pTakenBufferSize = TakenDstLength * sizeof (C);
+		if (takenBufferSize_o)
+			*takenBufferSize_o = takenDstLength * sizeof (C);
 	}
 
 	virtual
 	void
-	DecodeToUtf8 (
-		utf8_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf8 (
+		utf8_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		)
 	{
-		size_t Length = Size / sizeof (C);
-		ASSERT (Length || !Size); // don't pass less than one unit
+		size_t length = size / sizeof (C);
+		ASSERT (length || !size); // don't pass less than one unit
 
-		size_t TakenLength;
-		size_t ExpectedLength;
+		size_t takenLength;
+		size_t expectedLength;
 
-		rtl::CUtfConvertT <rtl::CUtf8, T>::Convert (
-			pBuffer,
-			BufferLength,
+		rtl::CUtfConvertT <rtl::CUtf8, T>::convert (
+			buffer,
+			bufferLength,
 			(C*) p,
-			Length,
-			pTakenBufferLength,
-			&TakenLength,
-			&ExpectedLength
+			length,
+			takenBufferLength_o,
+			&takenLength,
+			&expectedLength
 			);
 
-		if (pTakenSize)
-			*pTakenSize = TakenLength * sizeof (C);
+		if (takenSize_o)
+			*takenSize_o = takenLength * sizeof (C);
 
-		if (pExpectedSize)
-			*pExpectedSize = ExpectedLength * sizeof (C);
+		if (expectedSize_o)
+			*expectedSize_o = expectedLength * sizeof (C);
 	}
 
 	virtual
 	void
-	DecodeToUtf16 (
-		utf16_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf16 (
+		utf16_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		)
 	{
-		size_t Length = Size / sizeof (C);
-		ASSERT (Length || !Size); // don't pass less than one unit
+		size_t length = size / sizeof (C);
+		ASSERT (length || !size); // don't pass less than one unit
 
-		size_t TakenLength;
-		size_t ExpectedLength;
+		size_t takenLength;
+		size_t expectedLength;
 
-		rtl::CUtfConvertT <rtl::CUtf16, T>::Convert (
-			pBuffer,
-			BufferLength,
+		rtl::CUtfConvertT <rtl::CUtf16, T>::convert (
+			buffer,
+			bufferLength,
 			(C*) p,
-			Length,
-			pTakenBufferLength,
-			&TakenLength,
-			&ExpectedLength
+			length,
+			takenBufferLength_o,
+			&takenLength,
+			&expectedLength
 			);
 
-		if (pTakenSize)
-			*pTakenSize = TakenLength * sizeof (C);
+		if (takenSize_o)
+			*takenSize_o = takenLength * sizeof (C);
 
-		if (pExpectedSize)
-			*pExpectedSize = ExpectedLength * sizeof (C);
+		if (expectedSize_o)
+			*expectedSize_o = expectedLength * sizeof (C);
 	}
 
 	virtual
 	void
-	DecodeToUtf32 (
-		utf32_t* pBuffer,
-		size_t BufferLength,
+	decodeToUtf32 (
+		utf32_t* buffer,
+		size_t bufferLength,
 		const void* p,
-		size_t Size,
-		size_t* pTakenBufferLength = NULL,
-		size_t* pTakenSize = NULL,
-		size_t* pExpectedSize = NULL
+		size_t size,
+		size_t* takenBufferLength_o = NULL,
+		size_t* takenSize_o = NULL,
+		size_t* expectedSize_o = NULL
 		)
 	{
-		size_t Length = Size / sizeof (C);
-		ASSERT (Length || !Size); // don't pass less than one unit
+		size_t length = size / sizeof (C);
+		ASSERT (length || !size); // don't pass less than one unit
 
-		size_t TakenLength;
-		size_t ExpectedLength;
+		size_t takenLength;
+		size_t expectedLength;
 
-		rtl::CUtfConvertT <rtl::CUtf32, T>::Convert (
-			pBuffer,
-			BufferLength,
+		rtl::CUtfConvertT <rtl::CUtf32, T>::convert (
+			buffer,
+			bufferLength,
 			(C*) p,
-			Length,
-			pTakenBufferLength,
-			&TakenLength,
-			&ExpectedLength
+			length,
+			takenBufferLength_o,
+			&takenLength,
+			&expectedLength
 			);
 
-		if (pTakenSize)
-			*pTakenSize = TakenLength * sizeof (C);
+		if (takenSize_o)
+			*takenSize_o = takenLength * sizeof (C);
 
-		if (pExpectedSize)
-			*pExpectedSize = ExpectedLength * sizeof (C);
+		if (expectedSize_o)
+			*expectedSize_o = expectedLength * sizeof (C);
 	}
 };
 
@@ -549,73 +549,73 @@ public:
 class CCodePointDecoder
 {
 protected:
-	CCharCodec* m_pCharCodec;
+	CCharCodec* m_charCodec;
 
-	char m_Accumulator [8];
-	size_t m_AccumulatorCurrentSize;
-	size_t m_AccumulatorExpectedSize;
+	char m_accumulator [8];
+	size_t m_accumulatorCurrentSize;
+	size_t m_accumulatorExpectedSize;
 
 public:
 	CCodePointDecoder (
-		ECharCodec CodecKind = ECharCodec_Utf8,
-		uint32_t State = 0
+		ECharCodec codecKind = ECharCodec_Utf8,
+		uint32_t state = 0
 		)
 	{
-		Setup (CodecKind, State);
+		setup (codecKind, state);
 	}
 
 	CCharCodec*
-	GetCharCodec ()
+	getCharCodec ()
 	{
-		return m_pCharCodec;
+		return m_charCodec;
 	}
 
 	void
-	Setup (
-		ECharCodec CodecKind,
-		uint32_t State = 0
+	setup (
+		ECharCodec codecKind,
+		uint32_t state = 0
 		)
 	{
-		Setup (rtl::GetCharCodec (CodecKind), State);
+		setup (rtl::getCharCodec (codecKind), state);
 	}
 
 	void
-	Setup (
-		CCharCodec* pCodec,
-		uint32_t State = 0
+	setup (
+		CCharCodec* codec,
+		uint32_t state = 0
 		)
 	{
-		m_pCharCodec = pCodec;
-		LoadState (State);
+		m_charCodec = codec;
+		loadState (state);
 	}
 
 	void
-	ResetAccumulator ()
+	resetAccumulator ()
 	{
-		m_AccumulatorCurrentSize = 0;
-		m_AccumulatorExpectedSize = 0;
+		m_accumulatorCurrentSize = 0;
+		m_accumulatorExpectedSize = 0;
 	}
 
 	void
-	Clear ()
+	clear ()
 	{
-		m_pCharCodec = NULL;
-		ResetAccumulator ();
+		m_charCodec = NULL;
+		resetAccumulator ();
 	}
 
 	void
-	LoadState (uint32_t State);
+	loadState (uint32_t state);
 
 	uint32_t
-	SaveState ();
+	saveState ();
 
 	// Decode () returns taken size or -1 if code point is incomplete yet
 
 	size_t
-	Decode (
-		utf32_t* pCodePoint,
+	decode (
+		utf32_t* codePoint,
 		const void* p,
-		size_t Size
+		size_t size
 		);
 };
 

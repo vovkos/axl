@@ -19,9 +19,9 @@ class CCloseSocket
 {
 public:
 	void
-	operator () (SOCKET Socket)
+	operator () (SOCKET socket)
 	{
-		::closesocket (Socket);
+		::closesocket (socket);
 	}
 };
 
@@ -31,200 +31,200 @@ class CSocket: public rtl::CHandleT <SOCKET, CCloseSocket, rtl::CMinusOneT <SOCK
 {
 public:
 	bool
-	Open (
-		int AddressFamily,
-		int SockKind,
-		int Protocol
+	open (
+		int addressFamily,
+		int sockKind,
+		int protocol
 		);
 
 	int
-	GetError ();
+	getError ();
 
 	bool
-	SetBlockingMode (bool IsBlocking);
+	setBlockingMode (bool isBlocking);
 
 	size_t
-	GetIncomingDataSize ();
+	getIncomingDataSize ();
 
 	bool
-	Bind (const sockaddr* pAddr)
+	bind (const sockaddr* addr)
 	{
-		int Result = ::bind (m_h, pAddr, sizeof (sockaddr));
-		return err::Complete (Result != SOCKET_ERROR);
+		int result = ::bind (m_h, addr, sizeof (sockaddr));
+		return err::complete (result != SOCKET_ERROR);
 	}
 
 	bool
-	GetAddress (sockaddr* pAddr);
+	getAddress (sockaddr* addr);
 
 	bool
-	GetPeerAddress (sockaddr* pAddr);
+	getPeerAddress (sockaddr* addr);
 
 	bool
-	GetOption (
-		int Level,
-		int Option,
+	getOption (
+		int level,
+		int option,
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		int Result = ::getsockopt (m_h, Level, Option, (char*) p, (int*) &Size);
-		return err::Complete (Result != SOCKET_ERROR);
+		int result = ::getsockopt (m_h, level, option, (char*) p, (int*) &size);
+		return err::complete (result != SOCKET_ERROR);
 	}
 
 	bool
-	SetOption (
-		int Level,
-		int Option,
+	setOption (
+		int level,
+		int option,
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		int Result = ::setsockopt (m_h, Level, Option, (char*) p, Size);
-		return err::Complete (Result != SOCKET_ERROR);
+		int result = ::setsockopt (m_h, level, option, (char*) p, size);
+		return err::complete (result != SOCKET_ERROR);
 	}
 
 	bool
-	Listen (size_t BackLog)
+	listen (size_t backLog)
 	{
-		int Result = ::listen (m_h, (int) BackLog);
-		return err::Complete (Result != SOCKET_ERROR);
+		int result = ::listen (m_h, (int) backLog);
+		return err::complete (result != SOCKET_ERROR);
 	}
 
 	SOCKET
-	Accept (sockaddr* pAddr = NULL);
+	accept (sockaddr* addr = NULL);
 
 	bool
-	Connect (const sockaddr* pAddr)
+	connect (const sockaddr* addr)
 	{
-		int Result = ::connect (m_h, pAddr, sizeof (sockaddr));
-		return CompleteAsyncRequest (Result, WSAEWOULDBLOCK);
+		int result = ::connect (m_h, addr, sizeof (sockaddr));
+		return completeAsyncRequest (result, WSAEWOULDBLOCK);
 	}
 
 	bool
-	Shutdown (int Mode = SD_BOTH)
+	shutdown (int mode = SD_BOTH)
 	{
-		int Result = ::shutdown (m_h, Mode);
-		return err::Complete (Result);
+		int result = ::shutdown (m_h, mode);
+		return err::complete (result);
 	}
 
 	size_t
-	Send (
+	send (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		int Result = ::send (m_h, (const char*) p, (int) Size, 0);
-		return err::Complete (Result, SOCKET_ERROR);
+		int result = ::send (m_h, (const char*) p, (int) size, 0);
+		return err::complete (result, SOCKET_ERROR);
 	}
 
 	size_t
-	Recv (
+	recv (
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		int Result = ::recv (m_h, (char*) p, (int) Size, 0);
-		return err::Complete (Result, SOCKET_ERROR);
+		int result = ::recv (m_h, (char*) p, (int) size, 0);
+		return err::complete (result, SOCKET_ERROR);
 	}
 
 	size_t
-	SendTo (
+	sendTo (
 		void* p,
-		size_t Size,
-		const sockaddr* pAddr
+		size_t size,
+		const sockaddr* addr
 		)
 	{
-		int Result = ::sendto (m_h, (char*) p, (int) Size, 0, pAddr, sizeof (sockaddr));
-		return err::Complete (Result, SOCKET_ERROR);
+		int result = ::sendto (m_h, (char*) p, (int) size, 0, addr, sizeof (sockaddr));
+		return err::complete (result, SOCKET_ERROR);
 	}
 
 	size_t
-	RecvFrom (
+	recvFrom (
 		void* p,
-		size_t Size,
-		sockaddr* pAddr
+		size_t size,
+		sockaddr* addr
 		);
 
 public:
 	bool
-	WsaOpen (
-		int AddressFamily,
-		int SockKind,
-		int Protocol,
-		dword_t Flags = WSA_FLAG_OVERLAPPED
+	wsaOpen (
+		int addressFamily,
+		int sockKind,
+		int protocol,
+		dword_t flags = WSA_FLAG_OVERLAPPED
 		);
 
 	bool
-	WsaEventSelect (
+	wsaEventSelect (
 		HANDLE hEvent,
-		int Mask
+		int mask
 		)
 	{
-		int Result = ::WSAEventSelect (m_h, hEvent, Mask);
-		return err::Complete (Result != SOCKET_ERROR);
+		int result = ::WSAEventSelect (m_h, hEvent, mask);
+		return err::complete (result != SOCKET_ERROR);
 	}
 
 	bool
-	WsaEnumEvents (
-		WSANETWORKEVENTS* pEvents,
+	wsaEnumEvents (
+		WSANETWORKEVENTS* events,
 		HANDLE hEvent = NULL
 		)
 	{
-		int Result = ::WSAEnumNetworkEvents (m_h, hEvent, pEvents);
-		return err::Complete (Result != SOCKET_ERROR);
+		int result = ::WSAEnumNetworkEvents (m_h, hEvent, events);
+		return err::complete (result != SOCKET_ERROR);
 	}
 
 	bool
-	WsaConnect (const sockaddr* pAddr)
+	wsaConnect (const sockaddr* addr)
 	{
-		int Result = ::WSAConnect (m_h, pAddr, sizeof (sockaddr), NULL, NULL, NULL, NULL);
-		return CompleteAsyncRequest (Result, WSAEWOULDBLOCK);
+		int result = ::WSAConnect (m_h, addr, sizeof (sockaddr), NULL, NULL, NULL, NULL);
+		return completeAsyncRequest (result, WSAEWOULDBLOCK);
 	}
 
 	SOCKET
-	WsaAccept (sockaddr* pAddr);
+	wsaAccept (sockaddr* addr);
 
 	bool
-	WsaSend (
+	wsaSend (
 		const void* p,
-		dword_t Size,
-		WSAOVERLAPPED* pOverlapped,
+		dword_t size,
+		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		);
 
 	bool
-	WsaRecv (
+	wsaRecv (
 		void* p,
-		dword_t Size,
-		WSAOVERLAPPED* pOverlapped,
+		dword_t size,
+		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		);
 
 	bool
-	WsaSendTo (
+	wsaSendTo (
 		const void* p,
-		dword_t Size,
-		const sockaddr* pAddr,
-		WSAOVERLAPPED* pOverlapped,
+		dword_t size,
+		const sockaddr* addr,
+		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		);
 
 	bool
-	WsaRecvFrom (
+	wsaRecvFrom (
 		void* p,
-		dword_t Size,
-		sockaddr* pAddr,
-		int* pAddrSize,
-		WSAOVERLAPPED* pOverlapped,
+		dword_t size,
+		sockaddr* addr,
+		int* addrSize,
+		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		);
 
 protected:
 	static
 	bool
-	CompleteAsyncRequest (
-		int Result,
-		int PendingResult
+	completeAsyncRequest (
+		int result,
+		int pendingResult
 		);
 };
 

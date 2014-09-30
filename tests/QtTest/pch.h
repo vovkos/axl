@@ -15,7 +15,7 @@
 
 // QT
 
-#include <QtGui>
+#include <qtGui>
 #include <QAction>
 #include <QApplication>
 #include <QDockWidget>

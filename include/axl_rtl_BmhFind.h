@@ -22,123 +22,123 @@ namespace rtl {
 class CBmhFind
 {
 protected:	
-	CArrayT <uchar_t> m_Buffer; // work size of buffer is 2 * m_PatternSize
-	size_t m_PatternSize;
-	size_t m_IncFindOffset;
-	size_t m_IncFindTailSize; // IncrementalFind temporary storage size -- always < m_PatternSize
-	size_t m_NextBadCharTable [256];
-	size_t m_PrevBadCharTable [256];
-	bool m_DoMatchCase;
+	CArrayT <uchar_t> m_buffer; // work size of buffer is 2 * m_PatternSize
+	size_t m_patternSize;
+	size_t m_incFindOffset;
+	size_t m_incFindTailSize; // IncrementalFind temporary storage size -- always < m_PatternSize
+	size_t m_nextBadCharTable [256];
+	size_t m_prevBadCharTable [256];
+	bool m_doMatchCase;
 
 public:
 	CBmhFind ();
 
 	void
-	Clear ();
+	clear ();
 
 	bool 
-	IsEmpty ()
+	isEmpty ()
 	{
-		return m_PatternSize == 0;
+		return m_patternSize == 0;
 	}
 
 	size_t 
-	GetPatternSize ()
+	getPatternSize ()
 	{
-		return m_PatternSize;
+		return m_patternSize;
 	}
 
 	const void* 
-	GetPattern ()
+	getPattern ()
 	{
-		return m_Buffer;
+		return m_buffer;
 	}
 
 	bool
-	SetPattern (
+	setPattern (
 		const void* p, 
-		size_t Size, 
-		bool DoMatchCase = true
+		size_t size, 
+		bool doMatchCase = true
 		);
 
 	size_t 
-	Find (
+	find (
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	size_t 
-	ReverseFind (
+	reverseFind (
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	size_t 
-	IncrementalFind (
+	incrementalFind (
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	size_t 
-	ReverseIncrementalFind (
+	reverseIncrementalFind (
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	void 
-	ResetIncrementalFind (size_t IncFindOffset = 0)
+	resetIncrementalFind (size_t incFindOffset = 0)
 	{
-		m_IncFindOffset = IncFindOffset;
-		m_IncFindTailSize = 0;
+		m_incFindOffset = incFindOffset;
+		m_incFindTailSize = 0;
 	}
 
 	size_t
-	GetIncrementalFindOffset ()
+	getIncrementalFindOffset ()
 	{
-		return m_IncFindOffset;
+		return m_incFindOffset;
 	}
 
 	size_t
-	GetIncrementalFindTailSize ()
+	getIncrementalFindTailSize ()
 	{
-		return m_IncFindTailSize;
+		return m_incFindTailSize;
 	}
 
 protected:
 	void 
-	RebuildTables ();
+	rebuildTables ();
 
 	size_t
-	CmpPattern (uchar_t* _p);
+	cmpPattern (uchar_t* _p);
 
 	size_t
-	ReverseCmpPattern (uchar_t* _p);
+	reverseCmpPattern (uchar_t* _p);
 
 	size_t
-	IncrementalCmpPattern (	
+	incrementalCmpPattern (	
 		uchar_t* _p,
 		size_t i
 		);
 
 	size_t
-	ReverseIncrementalCmpPattern (	
+	reverseIncrementalCmpPattern (	
 		uchar_t* _p,
-		size_t Size,
+		size_t size,
 		size_t i
 		);
 
 	void
-	UpdateIncrementalTail (	
+	updateIncrementalTail (	
 		uchar_t* p,
-		size_t Size,
-		size_t TailSize
+		size_t size,
+		size_t tailSize
 		);
 
 	void
-	UpdateReverseIncrementalTail (	
+	updateReverseIncrementalTail (	
 		uchar_t* p,
-		size_t Size,
-		size_t TailSize
+		size_t size,
+		size_t tailSize
 		);
 };
 

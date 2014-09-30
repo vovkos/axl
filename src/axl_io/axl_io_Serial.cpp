@@ -10,439 +10,439 @@ namespace io {
 #if (_AXL_ENV == AXL_ENV_WIN)
 
 bool
-CSerial::SetSettings (
-	const TSerialSettings* pSettings,
-	uint_t Mask
+CSerial::setSettings (
+	const TSerialSettings* settings,
+	uint_t mask
 	)
 {
-	DCB Dcb;
-	Dcb.DCBlength = sizeof (Dcb);
+	DCB dcb;
+	dcb.DCBlength = sizeof (dcb);
 
-	bool Result = m_Serial.GetSettings (&Dcb);
-	if (!Result)
+	bool result = m_serial.getSettings (&dcb);
+	if (!result)
 		return false;
 
-	Dcb.fBinary = TRUE;
-	Dcb.fDsrSensitivity = FALSE;
-	Dcb.fDtrControl = DTR_CONTROL_DISABLE;
+	dcb.fBinary = TRUE;
+	dcb.fDsrSensitivity = FALSE;
+	dcb.fDtrControl = DTR_CONTROL_DISABLE;
 
-	if (Mask & ESerialSetting_BaudRate)
-		Dcb.BaudRate = pSettings->m_BaudRate;
+	if (mask & ESerialSetting_BaudRate)
+		dcb.BaudRate = settings->m_baudRate;
 
-	if (Mask & ESerialSetting_DataBits)
-		Dcb.ByteSize = pSettings->m_DataBits;
+	if (mask & ESerialSetting_DataBits)
+		dcb.ByteSize = settings->m_dataBits;
 
-	if (Mask & ESerialSetting_StopBits)
-		Dcb.StopBits = pSettings->m_StopBits;
+	if (mask & ESerialSetting_StopBits)
+		dcb.StopBits = settings->m_stopBits;
 
-	if (Mask & ESerialSetting_Parity)
-		Dcb.fParity = pSettings->m_Parity;
+	if (mask & ESerialSetting_Parity)
+		dcb.fParity = settings->m_parity;
 
-	if (Mask & ESerialSetting_FlowControl)
-		switch (pSettings->m_FlowControl)
+	if (mask & ESerialSetting_FlowControl)
+		switch (settings->m_flowControl)
 		{
 		case ESerialFlowControl_None:
-			Dcb.fOutxCtsFlow = FALSE;
-			Dcb.fRtsControl = RTS_CONTROL_DISABLE;
+			dcb.fOutxCtsFlow = FALSE;
+			dcb.fRtsControl = RTS_CONTROL_DISABLE;
 			break;
 
 		case ESerialFlowControl_RtsCts:
-			Dcb.fOutxCtsFlow = TRUE;
-			Dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+			dcb.fOutxCtsFlow = TRUE;
+			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
 			break;
 
 		case ESerialFlowControl_XonXoff:
-			Dcb.fOutX = TRUE;
-			Dcb.fInX = TRUE;
+			dcb.fOutX = TRUE;
+			dcb.fInX = TRUE;
 			break;
 		}
 
-	if (!(Mask & ESerialSetting_ReadInterval))
-		return m_Serial.SetSettings (&Dcb);
+	if (!(mask & ESerialSetting_ReadInterval))
+		return m_serial.setSettings (&dcb);
 
-	COMMTIMEOUTS Timeouts = { 0 };
-	Timeouts.ReadIntervalTimeout =
-		pSettings->m_ReadInterval == 0 ? -1 :
-		pSettings->m_ReadInterval == -1 ? 0 :
-		pSettings->m_ReadInterval;
+	COMMTIMEOUTS timeouts = { 0 };
+	timeouts.ReadIntervalTimeout =
+		settings->m_readInterval == 0 ? -1 :
+		settings->m_readInterval == -1 ? 0 :
+		settings->m_readInterval;
 
 	return
-		m_Serial.SetSettings (&Dcb) &&
-		m_Serial.SetTimeouts (&Timeouts);
+		m_serial.setSettings (&dcb) &&
+		m_serial.setTimeouts (&timeouts);
 }
 
 bool
-CSerial::GetSettings (TSerialSettings* pSettings)
+CSerial::getSettings (TSerialSettings* settings)
 {
-	DCB Dcb;
-	Dcb.DCBlength = sizeof (Dcb);
+	DCB dcb;
+	dcb.DCBlength = sizeof (dcb);
 
-	bool Result = m_Serial.GetSettings (&Dcb);
-	if (!Result)
+	bool result = m_serial.getSettings (&dcb);
+	if (!result)
 		return false;
 
-	pSettings->m_BaudRate = Dcb.BaudRate;
-	pSettings->m_DataBits = Dcb.ByteSize;
-	pSettings->m_StopBits = (ESerialStopBits) Dcb.StopBits;
-	pSettings->m_Parity   = (ESerialParity) Dcb.Parity;
+	settings->m_baudRate = dcb.BaudRate;
+	settings->m_dataBits = dcb.ByteSize;
+	settings->m_stopBits = (ESerialStopBits) dcb.StopBits;
+	settings->m_parity   = (ESerialParity) dcb.Parity;
 
-	pSettings->m_FlowControl =
-		Dcb.fOutxCtsFlow && Dcb.fRtsControl == RTS_CONTROL_HANDSHAKE ? ESerialFlowControl_RtsCts :
-		Dcb.fOutX && Dcb.fInX ? ESerialFlowControl_XonXoff : ESerialFlowControl_None;
+	settings->m_flowControl =
+		dcb.fOutxCtsFlow && dcb.fRtsControl == RTS_CONTROL_HANDSHAKE ? ESerialFlowControl_RtsCts :
+		dcb.fOutX && dcb.fInX ? ESerialFlowControl_XonXoff : ESerialFlowControl_None;
 
 	return true;
 }
 
 uint_t
-CSerial::GetStatusLines ()
+CSerial::getStatusLines ()
 {
-	uint_t Lines = m_Serial.GetStatusLines ();
-	return Lines != -1 ? (Lines & 0xf0) >> 4 : -1;
+	uint_t lines = m_serial.getStatusLines ();
+	return lines != -1 ? (lines & 0xf0) >> 4 : -1;
 }
 
 size_t
-CSerial::Read (
+CSerial::read (
 	void* p,
-	size_t Size
+	size_t size
 	)
 {
-	mt::CEvent CompletionEvent;
+	mt::CEvent completionEvent;
 
-	OVERLAPPED Overlapped = { 0 };
-	Overlapped.hEvent = CompletionEvent.m_Event;
+	OVERLAPPED overlapped = { 0 };
+	overlapped.hEvent = completionEvent.m_event;
 
-	bool_t Result = m_Serial.Read (p, (dword_t) Size, NULL, &Overlapped);
-	if (!Result)
+	bool_t result = m_serial.read (p, (dword_t) size, NULL, &overlapped);
+	if (!result)
 		return -1;
 
-	dword_t ActualSize;
-	Result = GetOverlappedResult (m_Serial, &Overlapped, &ActualSize, true);
-	if (!Result)
+	dword_t actualSize;
+	result = ::GetOverlappedResult (m_serial, &overlapped, &actualSize, true);
+	if (!result)
 	{
-		err::SetLastSystemError ();
+		err::setLastSystemError ();
 		return -1;
 	}
 
-	return ActualSize;
+	return actualSize;
 }
 
 size_t
-CSerial::Write (
+CSerial::write (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	mt::CEvent CompletionEvent;
+	mt::CEvent completionEvent;
 
-	OVERLAPPED Overlapped = { 0 };
-	Overlapped.hEvent = CompletionEvent.m_Event;
+	OVERLAPPED overlapped = { 0 };
+	overlapped.hEvent = completionEvent.m_event;
 
-	bool_t Result = m_Serial.Write (p, (dword_t) Size, NULL, &Overlapped);
-	if (!Result)
+	bool_t result = m_serial.write (p, (dword_t) size, NULL, &overlapped);
+	if (!result)
 		return -1;
 
-	dword_t ActualSize;
-	Result = GetOverlappedResult (m_Serial, &Overlapped, &ActualSize, true);
-	if (!Result)
+	dword_t actualSize;
+	result = ::GetOverlappedResult (m_serial, &overlapped, &actualSize, true);
+	if (!result)
 	{
-		err::SetLastSystemError ();
+		err::setLastSystemError ();
 		return -1;
 	}
 
-	return ActualSize;
+	return actualSize;
 }
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
 bool
-CSerial::SetSettings (
-	const TSerialSettings* pSettings,
-	uint_t Mask
+CSerial::setSettings (
+	const TSerialSettings* settings,
+	uint_t mask
 	)
 {
-	termios Attr;
-	bool Result = m_Serial.GetAttr (&Attr);
-	if (!Result)
+	termios attr;
+	bool result = m_serial.getAttr (&attr);
+	if (!result)
 		return false;
 
-	if (Mask & ESerialSetting_BaudRate)
+	if (mask & ESerialSetting_BaudRate)
 	{
-		speed_t Speed;
+		speed_t speed;
 
-		switch (pSettings->m_BaudRate)
+		switch (settings->m_baudRate)
 		{
 		case 110:
-			Speed = B110;
+			speed = B110;
 			break;
 
 		case 300:
-			Speed = B300;
+			speed = B300;
 			break;
 
 		case 600:
-			Speed = B600;
+			speed = B600;
 			break;
 
 		case 1200:
-			Speed = B1200;
+			speed = B1200;
 			break;
 
 		case 2400:
-			Speed = B2400;
+			speed = B2400;
 			break;
 
 		case 4800:
-			Speed = B4800;
+			speed = B4800;
 			break;
 
 		case 9600:
-			Speed = B9600;
+			speed = B9600;
 			break;
 
 		case 19200:
-			Speed = B19200;
+			speed = B19200;
 			break;
 
 		case 38400:
-			Speed = B38400;
+			speed = B38400;
 			break;
 
 		case 57600:
-			Speed = B57600;
+			speed = B57600;
 			break;
 
 		case 115200:
-			Speed = B115200;
+			speed = B115200;
 			break;
 
 		default:
 			// TODO: custom baud rate (currently fall back to 38400)
-			Speed = B38400;
+			speed = B38400;
 		}
 
-		cfsetispeed (&Attr, Speed);
-		cfsetospeed (&Attr, Speed);
+		cfsetispeed (&attr, speed);
+		cfsetospeed (&attr, speed);
 	}
 
-	if (Mask & ESerialSetting_DataBits)
+	if (mask & ESerialSetting_DataBits)
 	{
-		Attr.c_cflag &= ~CSIZE;
+		attr.c_cflag &= ~CSIZE;
 
-		switch (pSettings->m_DataBits)
+		switch (settings->m_dataBits)
 		{
 		case 5:
-			Attr.c_cflag |= CS5;
+			attr.c_cflag |= CS5;
 			break;
 
 		case 6:
-			Attr.c_cflag |= CS6;
+			attr.c_cflag |= CS6;
 			break;
 
 		case 7:
-			Attr.c_cflag |= CS7;
+			attr.c_cflag |= CS7;
 			break;
 
 		case 8:
 		default:
-			Attr.c_cflag |= CS8;
+			attr.c_cflag |= CS8;
 			break;
 		}
 	}
 
-	if (Mask & ESerialSetting_StopBits)
+	if (mask & ESerialSetting_StopBits)
 	{
-		if (pSettings->m_StopBits == ESerialStopBits_2)
-			Attr.c_cflag |= CSTOPB;
+		if (settings->m_stopBits == ESerialStopBits_2)
+			attr.c_cflag |= CSTOPB;
 		else
-			Attr.c_cflag &= ~CSTOPB;
+			attr.c_cflag &= ~CSTOPB;
 	}
 
-	if (Mask & ESerialSetting_Parity)
+	if (mask & ESerialSetting_Parity)
 	{
-		Attr.c_iflag &= ~(PARMRK | INPCK);
-		Attr.c_iflag |= IGNPAR;
+		attr.c_iflag &= ~(PARMRK | INPCK);
+		attr.c_iflag |= IGNPAR;
 
-		switch (pSettings->m_Parity)
+		switch (settings->m_parity)
 		{
 		case ESerialParity_None:
-			Attr.c_cflag &= ~PARENB;
+			attr.c_cflag &= ~PARENB;
 			break;
 
 		case ESerialParity_Odd:
-			Attr.c_cflag |= PARENB | PARODD;
+			attr.c_cflag |= PARENB | PARODD;
 			break;
 
 		case ESerialParity_Even:
-			Attr.c_cflag &= ~PARODD;
-			Attr.c_cflag |= PARENB;
+			attr.c_cflag &= ~PARODD;
+			attr.c_cflag |= PARENB;
 			break;
 
 		case ESerialParity_Mark:
-			Attr.c_cflag |= PARENB | CMSPAR | PARODD;
+			attr.c_cflag |= PARENB | CMSPAR | PARODD;
 			break;
 
 		case ESerialParity_Space:
-			Attr.c_cflag &= ~PARODD;
-			Attr.c_cflag |= PARENB | CMSPAR;
+			attr.c_cflag &= ~PARODD;
+			attr.c_cflag |= PARENB | CMSPAR;
 			break;
 
 		default:
-			Attr.c_cflag |= PARENB;
-			Attr.c_iflag |= PARMRK | INPCK;
-			Attr.c_iflag &= ~IGNPAR;
+			attr.c_cflag |= PARENB;
+			attr.c_iflag |= PARMRK | INPCK;
+			attr.c_iflag &= ~IGNPAR;
 		}
 	}
 
-	if (Mask & ESerialSetting_FlowControl)
-		switch (pSettings->m_FlowControl)
+	if (mask & ESerialSetting_FlowControl)
+		switch (settings->m_flowControl)
 		{
 		case ESerialFlowControl_RtsCts:
-			Attr.c_cflag |= CRTSCTS;
-			Attr.c_iflag &= ~(IXON | IXOFF | IXANY);
+			attr.c_cflag |= CRTSCTS;
+			attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 			break;
 
 		case ESerialFlowControl_XonXoff:
-			Attr.c_cflag &= ~CRTSCTS;
-			Attr.c_iflag |= IXON | IXOFF | IXANY;
+			attr.c_cflag &= ~CRTSCTS;
+			attr.c_iflag |= IXON | IXOFF | IXANY;
 			break;
 
 		case ESerialFlowControl_None:
 		default:
-			Attr.c_cflag &= ~CRTSCTS;
-			Attr.c_iflag &= ~(IXON | IXOFF | IXANY);
+			attr.c_cflag &= ~CRTSCTS;
+			attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 		}
 
 	// ensure some extra default flags
 
-	Attr.c_cflag |= CREAD | CLOCAL;
-	Attr.c_lflag = 0;
-	Attr.c_oflag = 0;
-	Attr.c_cc [VTIME] = 0;
-	Attr.c_cc [VMIN]  = 1;
+	attr.c_cflag |= CREAD | CLOCAL;
+	attr.c_lflag = 0;
+	attr.c_oflag = 0;
+	attr.c_cc [VTIME] = 0;
+	attr.c_cc [VMIN]  = 1;
 
-	return m_Serial.SetAttr (&Attr);
+	return m_serial.setAttr (&attr);
 }
 
 bool
-CSerial::GetSettings (TSerialSettings* pSettings)
+CSerial::getSettings (TSerialSettings* settings)
 {
-	termios Attr;
-	bool Result = m_Serial.GetAttr (&Attr);
-	if (!Result)
+	termios attr;
+	bool result = m_serial.getAttr (&attr);
+	if (!result)
 		return false;
 
-	speed_t Speed = cfgetispeed (&Attr);
-	switch (Speed)
+	speed_t speed = cfgetispeed (&attr);
+	switch (speed)
 	{
 	case B110:
-		pSettings->m_BaudRate = 110;
+		settings->m_baudRate = 110;
 		break;
 
 	case B300:
-		pSettings->m_BaudRate = 300;
+		settings->m_baudRate = 300;
 		break;
 
 	case B600:
-		pSettings->m_BaudRate = 600;
+		settings->m_baudRate = 600;
 		break;
 
 	case B1200:
-		pSettings->m_BaudRate = 1200;
+		settings->m_baudRate = 1200;
 		break;
 
 	case B2400:
-		pSettings->m_BaudRate = 2400;
+		settings->m_baudRate = 2400;
 		break;
 
 	case B4800:
-		pSettings->m_BaudRate = 4800;
+		settings->m_baudRate = 4800;
 		break;
 
 	case B9600:
-		pSettings->m_BaudRate = 9600;
+		settings->m_baudRate = 9600;
 		break;
 
 	case B19200:
-		pSettings->m_BaudRate = 19200;
+		settings->m_baudRate = 19200;
 		break;
 
 	case B38400:
-		pSettings->m_BaudRate = 38400;
+		settings->m_baudRate = 38400;
 		break;
 
 	case B57600:
-		pSettings->m_BaudRate = 57600;
+		settings->m_baudRate = 57600;
 		break;
 
 	case B115200:
-		pSettings->m_BaudRate = 115200;
+		settings->m_baudRate = 115200;
 		break;
 
 	default:
 		// TODO: custom baud rate (currently fall back to 38400)
-		pSettings->m_BaudRate = 38400;
+		settings->m_baudRate = 38400;
 	}
 
-	uint_t ByteSize = Attr.c_cflag & CSIZE;
-	switch (ByteSize)
+	uint_t byteSize = attr.c_cflag & CSIZE;
+	switch (byteSize)
 	{
 	case CS5:
-		pSettings->m_DataBits = 5;
+		settings->m_dataBits = 5;
 		break;
 
 	case CS6:
-		pSettings->m_DataBits = 6;
+		settings->m_dataBits = 6;
 		break;
 
 	case CS7:
-		pSettings->m_DataBits = 7;
+		settings->m_dataBits = 7;
 		break;
 
 	case CS8:
 	default:
-		pSettings->m_DataBits = 8;
+		settings->m_dataBits = 8;
 		break;
 	}
 
-	pSettings->m_StopBits = (Attr.c_cflag & CSTOPB) ?
+	settings->m_stopBits = (attr.c_cflag & CSTOPB) ?
 		ESerialStopBits_2 :
 		ESerialStopBits_1;
 
-	pSettings->m_Parity =
-		(Attr.c_cflag & PARENB) ?
-			(Attr.c_cflag & CMSPAR)  ?
-				(Attr.c_cflag & PARODD) ? ESerialParity_Odd : ESerialParity_Even :
-				(Attr.c_cflag & PARODD) ? ESerialParity_Mark : ESerialParity_Space :
+	settings->m_parity =
+		(attr.c_cflag & PARENB) ?
+			(attr.c_cflag & CMSPAR)  ?
+				(attr.c_cflag & PARODD) ? ESerialParity_Odd : ESerialParity_Even :
+				(attr.c_cflag & PARODD) ? ESerialParity_Mark : ESerialParity_Space :
 		ESerialParity_None;
 
-	pSettings->m_FlowControl =
-		(Attr.c_cflag & CRTSCTS) ? ESerialFlowControl_RtsCts :
-		(Attr.c_iflag & (IXON | IXOFF)) ? ESerialFlowControl_XonXoff : ESerialFlowControl_None;
+	settings->m_flowControl =
+		(attr.c_cflag & CRTSCTS) ? ESerialFlowControl_RtsCts :
+		(attr.c_iflag & (IXON | IXOFF)) ? ESerialFlowControl_XonXoff : ESerialFlowControl_None;
 
 	return true;
 }
 
 uint_t
-CSerial::GetStatusLines ()
+CSerial::getStatusLines ()
 {
-	uint_t Result = m_Serial.GetStatusLines ();
-	if (Result == -1)
+	uint_t result = m_serial.getStatusLines ();
+	if (result == -1)
 		return -1;
 
-	uint_t Lines = 0;
-	if (Result & TIOCM_CTS)
-		Lines |= ESerialStatusLine_Cts;
+	uint_t lines = 0;
+	if (result & TIOCM_CTS)
+		lines |= ESerialStatusLine_Cts;
 
-	if (Result & TIOCM_DSR)
-		Lines |= ESerialStatusLine_Dsr;
+	if (result & TIOCM_DSR)
+		lines |= ESerialStatusLine_Dsr;
 
-	if (Result & TIOCM_RNG)
-		Lines |= ESerialStatusLine_Ring;
+	if (result & TIOCM_RNG)
+		lines |= ESerialStatusLine_Ring;
 
-	if (Result & TIOCM_CAR)
-		Lines |= ESerialStatusLine_Dcd;
+	if (result & TIOCM_CAR)
+		lines |= ESerialStatusLine_Dcd;
 
-	return Lines;
+	return lines;
 }
 
 #endif

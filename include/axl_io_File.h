@@ -33,112 +33,112 @@ class CFile
 {
 public:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CFile m_File;
+	win::CFile m_file;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CFile m_File;
+	psx::CFile m_file;
 #endif
 
 public:
 	bool
-	IsOpen () const
+	isOpen () const
 	{
-		return m_File.IsOpen ();
+		return m_file.isOpen ();
 	}
 
 	void
-	Close ()
+	close ()
 	{
-		m_File.Close ();
+		m_file.close ();
 	}
 
 	bool
-	Open (
-		const char* pFileName,
-		uint_t Flags = 0
+	open (
+		const char* fileName,
+		uint_t flags = 0
 		);
 
 	uint64_t
-	GetSize () const
+	getSize () const
 	{
-		return m_File.GetSize ();
+		return m_file.getSize ();
 	}
 
 	bool
-	SetSize (uint64_t Size)
+	setSize (uint64_t size)
 	{
-		return m_File.SetSize (Size);
+		return m_file.setSize (size);
 	}
 
 	uint64_t
-	GetPosition () const
+	getPosition () const
 	{
-		return m_File.GetPosition ();
+		return m_file.getPosition ();
 	}
 
 	bool
-	SetPosition (uint64_t Offset) const
+	setPosition (uint64_t offset) const
 	{
-		return m_File.SetPosition (Offset);
+		return m_file.setPosition (offset);
 	}
 
 	size_t
-	Read (
+	read (
 		void* p,
-		size_t Size
+		size_t size
 		) const
 	{
-		return m_File.Read (p, Size);
+		return m_file.read (p, size);
 	}
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_File.Write (p, Size);
+		return m_file.write (p, size);
 	}
 
 	size_t
-	ReadAt (
-		uint64_t Offset,
+	readAt (
+		uint64_t offset,
 		void* p,
-		size_t Size
+		size_t size
 		) const
 	{
-		return SetPosition (Offset) ? Read (p, Size) : -1;
+		return setPosition (offset) ? read (p, size) : -1;
 	}
 
 	size_t
-	WriteAt	(
-		uint64_t Offset,
+	writeAt	(
+		uint64_t offset,
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return SetPosition (Offset) ? Write (p, Size) : -1;
+		return setPosition (offset) ? write (p, size) : -1;
 	}
 
 	size_t
-	WriteFormat_va (
-		const char* pFormat,
+	writeFormat_va (
+		const char* formatString,
 		axl_va_list va
 		);
 
 	size_t
-	WriteFormat (
-		const char* pFormat,
+	writeFormat (
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return WriteFormat_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return writeFormat_va (formatString, va);
 	}
 
 	bool
-	Flush ()
+	flush ()
 	{
-		return m_File.Flush ();
+		return m_file.flush ();
 	}
 };
 
@@ -147,7 +147,7 @@ public:
 #if (_AXL_ENV == AXL_ENV_POSIX)
 
 uint_t
-GetPosixOpenFlags (uint_t FileFlags);
+getPosixOpenFlags (uint_t fileFlags);
 
 #endif
 

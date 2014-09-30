@@ -19,30 +19,30 @@ class CFile: public CFd
 {
 public:
 	uint64_t
-	GetSize () const;
+	getSize () const;
 
 	bool
-	SetSize (uint64_t Size)
+	setSize (uint64_t size)
 	{
-		int Result = ftruncate64 (m_h, Size);
-		return err::Complete (Result != -1);
+		int result = ftruncate64 (m_h, size);
+		return err::complete (result != -1);
 	}
 
 	uint64_t
-	GetPosition () const;
+	getPosition () const;
 
 	bool
-	SetPosition (off64_t Offset) const
+	setPosition (off64_t offset) const
 	{
-		uint64_t ActualOffset = lseek64 (m_h, Offset, SEEK_SET);
-		return err::Complete (ActualOffset != -1);
+		uint64_t actualOffset = lseek64 (m_h, offset, SEEK_SET);
+		return err::complete (actualOffset != -1);
 	}
 
 	bool
-	Flush ()
+	flush ()
 	{
-		int Result = fdatasync (m_h);
-		return err::Complete (Result != -1);
+		int result = fdatasync (m_h);
+		return err::complete (result != -1);
 	}
 };
 

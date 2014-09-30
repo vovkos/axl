@@ -19,39 +19,39 @@ class CIocp: public g::win::CHandle
 {
 public:
 	bool 
-	Create (dword_t ThreadCount);
+	create (dword_t threadCount);
 
 	bool 
-	Associate (
+	associate (
 		HANDLE hIo,
-		void* pContext
+		void* context
 		)
 	{
-		HANDLE h = ::CreateIoCompletionPort (hIo, m_h, (uintptr_t) pContext, 0);
-		return err::Complete (h != NULL);
+		HANDLE h = ::CreateIoCompletionPort (hIo, m_h, (uintptr_t) context, 0);
+		return err::complete (h != NULL);
 	}
 
 	bool 
-	PostCompletionStatus (
-		dword_t ActualSize,
-		void* pContext,
-		OVERLAPPED* pOverlapped
+	postCompletionStatus (
+		dword_t actualSize,
+		void* context,
+		OVERLAPPED* overlapped
 		)
 	{
-		bool_t Result = ::PostQueuedCompletionStatus (m_h, ActualSize, (uintptr_t) pContext, pOverlapped);
-		return err::Complete (Result);
+		bool_t result = ::PostQueuedCompletionStatus (m_h, actualSize, (uintptr_t) context, overlapped);
+		return err::complete (result);
 	}
 
 	bool 
-	GetCompletionStatus (
-		dword_t* pActualSize,
-		void** ppContext,
-		OVERLAPPED** ppOverlapped,
-		uint_t Timeout
+	getCompletionStatus (
+		dword_t* actualSize,
+		void** context,
+		OVERLAPPED** overlapped,
+		uint_t timeout
 		)
 	{
-		bool_t Result = ::GetQueuedCompletionStatus (m_h, pActualSize, (ULONG_PTR*) ppContext, ppOverlapped, Timeout);
-		return err::Complete (Result);
+		bool_t result = ::GetQueuedCompletionStatus (m_h, actualSize, (ULONG_PTR*) context, overlapped, timeout);
+		return err::complete (result);
 	}
 };
 

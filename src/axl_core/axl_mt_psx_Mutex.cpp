@@ -9,27 +9,27 @@ namespace psx {
 //.............................................................................
 
 bool 
-CMutex::Lock (uint_t Timeout)
+CMutex::lock (uint_t timeout)
 {	
-	int Result;
+	int result;
 	
-	switch (Timeout)
+	switch (timeout)
 	{
 	case 0:
-		Result = pthread_mutex_trylock (&m_Mutex);
+		result = pthread_mutex_trylock (&m_mutex);
 		break;
 		
 	case -1:
-		Result = pthread_mutex_lock (&m_Mutex);		
+		result = pthread_mutex_lock (&m_mutex);		
 		break;
 		
 	default:		
-		timespec Timespec = { 0 };
-		g::GetAbsTimespecFromTimeout (Timeout, &Timespec);
-		Result = pthread_mutex_timedlock (&m_Mutex, &Timespec);
+		timespec timespec = { 0 };
+		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		result = pthread_mutex_timedlock (&m_mutex, &timespec);
 	}
 			
-	return Result == 0 ? true : err::Fail (Result);
+	return result == 0 ? true : err::fail (result);
 }	
 
 //.............................................................................

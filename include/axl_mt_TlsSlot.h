@@ -17,24 +17,24 @@ template <typename T>
 class CTlsSlotT
 {
 protected:
-	size_t m_TlsSlot;
+	size_t m_tlsSlot;
 	
 public:	
 	CTlsSlotT ()
 	{
-		m_TlsSlot = GetTlsMgr ()->CreateSlot ();
+		m_tlsSlot = getTlsMgr ()->createSlot ();
 	}
 
 	T*
-	GetValue ()
+	getValue ()
 	{
-		return (T*) GetTlsMgr ()->GetSlotValue (m_TlsSlot).p ();
+		return (T*) getTlsMgr ()->getSlotValue (m_tlsSlot).p ();
 	}
 
 	T* 
-	SetValue (T* p)
+	setValue (T* p)
 	{
-		return (T*) GetTlsMgr ()->SetSlotValue (m_TlsSlot, mt::CTlsValue (p, NULL)).p ();
+		return (T*) getTlsMgr ()->setSlotValue (m_tlsSlot, mt::CTlsValue (p, NULL)).p ();
 	}
 };
 
@@ -42,18 +42,18 @@ public:
 
 template <typename T>
 T*
-GetTlsSlotValue ()
+getTlsSlotValue ()
 {
-	return rtl::GetSimpleSingleton <CTlsSlotT <T> > ()->GetValue ();
+	return rtl::getSimpleSingleton <CTlsSlotT <T> > ()->getValue ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 T*
-SetTlsSlotValue (T* p)
+setTlsSlotValue (T* p)
 {
-	return rtl::GetSimpleSingleton <CTlsSlotT <T> > ()->SetValue (p);
+	return rtl::getSimpleSingleton <CTlsSlotT <T> > ()->setValue (p);
 }
 
 //.............................................................................
@@ -62,17 +62,17 @@ template <typename T>
 class CScopeTlsSlotT
 {
 protected:
-	T* m_pPrevValue;
+	T* m_prevValue;
 
 public:
 	CScopeTlsSlotT (T* p)
 	{
-		m_pPrevValue = SetTlsSlotValue <T> (p);
+		m_prevValue = setTlsSlotValue <T> (p);
 	}
 
 	~CScopeTlsSlotT ()
 	{
-		SetTlsSlotValue <T> (m_pPrevValue);
+		setTlsSlotValue <T> (m_prevValue);
 	}
 };
 

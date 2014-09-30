@@ -9,36 +9,36 @@ namespace test_Sock {
 /*
 
 void 
-OnAccept (ref::CPtrT <io::CConnectionSock> ConnectionSock)
+onAccept (ref::CPtrT <io::CConnectionSock> connectionSock)
 {
-	io::TSockAddrU LocalAddr;
-	io::TSockAddrU PeerAddr;
+	io::TSockAddrU localAddr;
+	io::TSockAddrU peerAddr;
 
-	ConnectionSock->GetLocalAddress (&LocalAddr);
-	ConnectionSock->GetPeerAddress (&PeerAddr);
+	connectionSock->getLocalAddress (&localAddr);
+	connectionSock->getPeerAddress (&peerAddr);
 	
-	printf ("accepted connection from %s\n", PeerAddr.ToString ());
+	printf ("accepted connection from %s\n", peerAddr.toString ());
 }
 
-void Run_Listen ()
+void run_Listen ()
 {
-	io::CListenerSock Sock;	
+	io::CListenerSock sock;	
 
-	io::CSockAddrIp Addr (1001);
+	io::CSockAddrIp addr (1001);
 
-	bool Result = 
-		Sock.Open (io::ESockProto_Tcp, Addr) &&
-		Sock.Listen (32, &exe::CFunctionT <
+	bool result = 
+		sock.open (io::ESockProto_Tcp, addr) &&
+		sock.listen (32, &exe::CFunctionT <
 			exe::CArgT <void>, 
-			exe::CArgT <ref::CPtrT <io::CConnectionSock> > > (OnAccept));;
+			exe::CArgT <ref::CPtrT <io::CConnectionSock> > > (onAccept));;
 	
-	if (!Result)
+	if (!result)
 	{
-		printf ("cannot listen on %s: %s\n", Addr.ToString (), err::GetError ()->GetDescription ());
+		printf ("cannot listen on %s: %s\n", addr.toString (), err::getError ()->getDescription ());
 		return;
 	}
 
-	printf ("listening on %s\n", Addr.ToString ());
+	printf ("listening on %s\n", addr.toString ());
 	
 	char s [32];
 	gets (s);
@@ -47,45 +47,45 @@ void Run_Listen ()
 //.............................................................................
 
 void 
-OnConnect (
-	io::CConnectionSock* pSock,
-	const err::CError& Error
+onConnect (
+	io::CConnectionSock* sock,
+	const err::CError& error
 	)
 {
-	io::TSockAddrU LocalAddr;
-	io::TSockAddrU PeerAddr;
+	io::TSockAddrU localAddr;
+	io::TSockAddrU peerAddr;
 
-	pSock->GetLocalAddress (&LocalAddr);
-	pSock->GetPeerAddress (&PeerAddr);
+	sock->getLocalAddress (&localAddr);
+	sock->getPeerAddress (&peerAddr);
 
-	if (!Error)
-		printf ("established connection to %s from %s\n", PeerAddr.ToString (), LocalAddr.ToString ());
+	if (!error)
+		printf ("established connection to %s from %s\n", peerAddr.toString (), localAddr.toString ());
 	else
-		printf ("cannot establish connection: %s\n", Error->GetDescription ());
+		printf ("cannot establish connection: %s\n", error->getDescription ());
 }
 
 void 
-Run_Connect ()
+run_Connect ()
 {
-	exe::CWorkerThread WorkerThread;
-	WorkerThread.Start ();
+	exe::CWorkerThread workerThread;
+	workerThread.start ();
 
-	io::CConnectionSock Sock;	
+	io::CConnectionSock sock;	
 
-	io::CSockAddrIp Addr (0x7f000001, 1001);
+	io::CSockAddrIp addr (0x7f000001, 1001);
 
 	exe::CScheduledFunctionT <
 		exe::CArgT <io::CConnectionSock*>, 
 		io::CConnectionSock::COnConnectCompleteArg> 
-		OnComplete (&WorkerThread, OnConnect, &Sock);
+		onComplete (&workerThread, onConnect, &sock);
 
-	bool Result = 
-		Sock.Open (io::ESockProto_Tcp, io::ESockAddr_Ip) &&
-		Sock.SyncConnect (&Addr, 1000);
+	bool result = 
+		sock.open (io::ESockProto_Tcp, io::ESockAddr_Ip) &&
+		sock.syncConnect (&addr, 1000);
 	
-	if (!Result)
+	if (!result)
 	{
-		printf ("cannot connect to %s: %s\n", Addr.ToString (), err::GetError ()->GetDescription ());
+		printf ("cannot connect to %s: %s\n", addr.toString (), err::getError ()->getDescription ());
 		return;
 	}
 
@@ -95,47 +95,47 @@ Run_Connect ()
 
 //.............................................................................
 
-char Buffer [1024] = { 0 };
+char buffer [1024] = { 0 };
 
 void 
-OnRecvFrom (
-	io::CDgramSock* pSock,
-	const err::CError& Error,
-	io::TSockAddr* pAddr,
-	size_t ActualSize
+onRecvFrom (
+	io::CDgramSock* sock,
+	const err::CError& error,
+	io::TSockAddr* addr,
+	size_t actualSize
 	)
 {
-	if (Error)
+	if (error)
 	{
-		printf ("error during recvfrom: %s\n", Error->GetDescription ());
+		printf ("error during recvfrom: %s\n", error->getDescription ());
 		return;
 	}
 
-	printf ("received %d bytes from %s: %s\n", ActualSize, pAddr->ToString (), Buffer);
+	printf ("received %d bytes from %s: %s\n", actualSize, addr->toString (), buffer);
 
 	exe::CFunctionT <
 		exe::CArgT <io::CDgramSock*>, 
 		io::CDgramSock::COnSendRecvCompleteArg> 
-		OnComplete (OnRecvFrom, pSock);
+		onComplete (onRecvFrom, sock);
 
-	pSock->RecvFrom (Buffer, 1023, &OnComplete);
+	sock->recvFrom (buffer, 1023, &onComplete);
 }
 
 void 
-Run_Dgram ()
+run_Dgram ()
 {
-	io::CDgramSock Sock;	
+	io::CDgramSock sock;	
 
-	io::CSockAddrIp Addr (0, 1001);
+	io::CSockAddrIp addr (0, 1001);
 
-	bool Result = Sock.Open (io::ESockProto_Udp, &Addr);
-	if (!Result)
+	bool result = sock.open (io::ESockProto_Udp, &addr);
+	if (!result)
 	{
-		printf ("cannot open %s: %s\n", Addr.ToString (), err::GetError ()->GetDescription ());
+		printf ("cannot open %s: %s\n", addr.toString (), err::getError ()->getDescription ());
 		return;
 	}
 
-	printf ("listening on UDP %s\n", Addr.ToString ());
+	printf ("listening on UDP %s\n", addr.toString ());
 
 //	io::CSockAddrIp AddrTo (0x7f000001, 1002);
 //	size_t x = Sock.SyncSendTo ("hui!", 4, &AddrTo);
@@ -143,9 +143,9 @@ Run_Dgram ()
 	exe::CFunctionT <
 		exe::CArgT <io::CDgramSock*>, 
 		io::CDgramSock::COnSendRecvCompleteArg> 
-		OnComplete (OnRecvFrom, &Sock);
+		onComplete (onRecvFrom, &sock);
 
-	Sock.RecvFrom (Buffer, 1023, &OnComplete);
+	sock.recvFrom (buffer, 1023, &onComplete);
 
 	char s [32];
 	gets (s);

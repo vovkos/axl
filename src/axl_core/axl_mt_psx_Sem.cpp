@@ -9,71 +9,71 @@ namespace psx {
 //.............................................................................
 
 bool
-CSem::Init (
-	bool IsShared,
-	uint_t Value
+CSem::init (
+	bool isShared,
+	uint_t value
 	)
 {
-	Close ();
+	close ();
 
-	int Result = sem_init (&m_UnnamedSem, IsShared, Value);
-	if (Result != 0)
-		return err::FailWithLastSystemError ();
+	int result = sem_init (&m_unnamedSem, isShared, value);
+	if (result != 0)
+		return err::failWithLastSystemError ();
 
-	m_pSem = &m_UnnamedSem;
+	m_sem = &m_unnamedSem;
 	return true;
 }
 
 bool
-CSem::Open (
-	const char* pName,
-	int Flags,
-	mode_t Mode,
-	uint_t Value
+CSem::open (
+	const char* name,
+	int flags,
+	mode_t mode,
+	uint_t value
 	)
 {
-	Close ();
+	close ();
 
-	m_pSem = sem_open (pName, Flags, Mode, Value);
-	return err::Complete (m_pSem != SEM_FAILED);
+	m_sem = sem_open (name, flags, mode, value);
+	return err::complete (m_sem != SEM_FAILED);
 }
 
 void
-CSem::Close ()
+CSem::close ()
 {
-	if (!m_pSem)
+	if (!m_sem)
 		return;
 
-	if (m_pSem == &m_UnnamedSem)
-		sem_destroy (&m_UnnamedSem);
+	if (m_sem == &m_unnamedSem)
+		sem_destroy (&m_unnamedSem);
 	else
-		sem_close (m_pSem);
+		sem_close (m_sem);
 
-	m_pSem = NULL;
+	m_sem = NULL;
 }
 
 bool
-CSem::Wait (uint_t Timeout)
+CSem::wait (uint_t timeout)
 {
-	int Result;
+	int result;
 
-	switch (Timeout)
+	switch (timeout)
 	{
 	case 0:
-		Result = sem_trywait (m_pSem);
+		result = sem_trywait (m_sem);
 		break;
 
 	case -1:
-		Result = sem_wait (m_pSem);
+		result = sem_wait (m_sem);
 		break;
 
 	default:
-		timespec Timespec = { 0 };
-		g::GetAbsTimespecFromTimeout (Timeout, &Timespec);
-		Result = sem_timedwait (m_pSem, &Timespec);
+		timespec timespec = { 0 };
+		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		result = sem_timedwait (m_sem, &timespec);
 	}
 
-	return err::Complete (Result == 0);
+	return err::complete (result == 0);
 }
 
 //.............................................................................

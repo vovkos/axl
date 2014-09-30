@@ -9,7 +9,7 @@ namespace gui {
 
 CGdiCursor::CGdiCursor ()
 {
-	m_pEngine = CGdiEngine::GetSingleton ();
+	m_engine = CGdiEngine::getSingleton ();
 }
 
 //.............................................................................

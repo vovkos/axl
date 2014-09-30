@@ -8,250 +8,250 @@ namespace rtl {
 
 CBmhFind::CBmhFind ()
 {
-	m_PatternSize = 0;
-	m_IncFindOffset = 0;
-	m_IncFindTailSize = 0; // IncrementalFind temporary storage size -- always < m_PatternSize
-	m_DoMatchCase = true;
+	m_patternSize = 0;
+	m_incFindOffset = 0;
+	m_incFindTailSize = 0; // IncrementalFind temporary storage size -- always < m_PatternSize
+	m_doMatchCase = true;
 }
 
 void
-CBmhFind::Clear ()
+CBmhFind::clear ()
 {
-	m_PatternSize = 0;
-	m_IncFindOffset = 0;
-	m_IncFindTailSize = 0;
-	m_DoMatchCase = true;
+	m_patternSize = 0;
+	m_incFindOffset = 0;
+	m_incFindTailSize = 0;
+	m_doMatchCase = true;
 }
 
 bool
-CBmhFind::SetPattern (	
+CBmhFind::setPattern (	
 	const void* p,
-	size_t Size,
-	bool DoMatchCase
+	size_t size,
+	bool doMatchCase
 	)
 {
-	size_t NewBufferSize = Size * 2;
+	size_t newBufferSize = size * 2;
 	
-	NewBufferSize += 128 - NewBufferSize % 128; // 128-byte granularity
+	newBufferSize += 128 - newBufferSize % 128; // 128-byte granularity
 
-	Clear ();
+	clear ();
 
-	if (!Size)
+	if (!size)
 		return true;
 
-	m_Buffer.SetCount (Size * 2);
+	m_buffer.setCount (size * 2);
 
-	m_PatternSize = Size;
-	m_IncFindOffset = 0;
-	m_IncFindTailSize = 0;
-	m_DoMatchCase = DoMatchCase;
+	m_patternSize = size;
+	m_incFindOffset = 0;
+	m_incFindTailSize = 0;
+	m_doMatchCase = doMatchCase;
 
-	memcpy (m_Buffer, p, Size);
+	memcpy (m_buffer, p, size);
 
-	RebuildTables ();
+	rebuildTables ();
 	return true;
 }
 
 size_t 
-CBmhFind::Find (
+CBmhFind::find (
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
 	uchar_t* p;
-	uchar_t* pEnd;
+	uchar_t* end;
 	size_t m;
 
-	if (!m_PatternSize || Size < m_PatternSize)
+	if (!m_patternSize || size < m_patternSize)
 		return -1;
 
 	p = (uchar_t*) _p;
-	pEnd = p + Size - m_PatternSize;
-	m = m_PatternSize - 1;
+	end = p + size - m_patternSize;
+	m = m_patternSize - 1;
 
 	do
 	{
 		uchar_t y = p [m];
 
-		if (CmpPattern (p) == -1)
+		if (cmpPattern (p) == -1)
 			return p - (uchar_t*) _p;
 
-		p += m_NextBadCharTable [y];
-	} while (p <= pEnd);
+		p += m_nextBadCharTable [y];
+	} while (p <= end);
 
 	return -1;
 }
 
 size_t
-CBmhFind::ReverseFind (	
+CBmhFind::reverseFind (	
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
 	uchar_t* p;
 
-	if (!m_PatternSize || Size < m_PatternSize)
+	if (!m_patternSize || size < m_patternSize)
 		return -1;
 
-	p = (uchar_t*) _p + Size - m_PatternSize;
+	p = (uchar_t*) _p + size - m_patternSize;
 
 	do 
 	{
 		uchar_t y = *p;
 
-		if (ReverseCmpPattern (p) == -1)
-			return Size - (p - (uchar_t*) _p);
+		if (reverseCmpPattern (p) == -1)
+			return size - (p - (uchar_t*) _p);
 
-		p -= m_PrevBadCharTable [y];
+		p -= m_prevBadCharTable [y];
 	} while (p >= (uchar_t*) _p);
 
 	return -1;
 }
 
 size_t
-CBmhFind::IncrementalFind (	
+CBmhFind::incrementalFind (	
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
 	uchar_t* p = (uchar_t*) _p;
-	size_t TestSize = Size + m_IncFindTailSize;
+	size_t testSize = size + m_incFindTailSize;
 
 	size_t i;
 	size_t iEnd;
 	size_t n;
 
-	if (!m_PatternSize)
+	if (!m_patternSize)
 		return -1;
 
-	if (TestSize < m_PatternSize)
+	if (testSize < m_patternSize)
 	{
 		// incapsulate tail until BM/BMH is possible
 
-		memcpy (m_Buffer + m_PatternSize + m_IncFindTailSize, _p, Size);
-		m_IncFindTailSize += Size;
+		memcpy (m_buffer + m_patternSize + m_incFindTailSize, _p, size);
+		m_incFindTailSize += size;
 		return -1;
 	}
 	
 	i = 0;
-	iEnd = TestSize - m_PatternSize;
-	n = m_PatternSize - m_IncFindTailSize - 1;
+	iEnd = testSize - m_patternSize;
+	n = m_patternSize - m_incFindTailSize - 1;
 
 	do
 	{
 		uchar_t y = p [n + i];
 
-		if (IncrementalCmpPattern (p, i) == -1)
+		if (incrementalCmpPattern (p, i) == -1)
 		{
-			size_t Result = m_IncFindOffset + i;
-			m_IncFindOffset = 0;
-			m_IncFindTailSize = 0;
-			return Result;
+			size_t result = m_incFindOffset + i;
+			m_incFindOffset = 0;
+			m_incFindTailSize = 0;
+			return result;
 		}
 
-		i += m_NextBadCharTable [y];
+		i += m_nextBadCharTable [y];
 	} while (i <= iEnd);
 
-	if (i < TestSize)
-		UpdateIncrementalTail (p, Size, TestSize - i);
+	if (i < testSize)
+		updateIncrementalTail (p, size, testSize - i);
 	else 
-		m_IncFindTailSize = 0;
+		m_incFindTailSize = 0;
 
-	m_IncFindOffset += i;
+	m_incFindOffset += i;
 
 	return -1;
 }
 
 size_t
-CBmhFind::ReverseIncrementalFind (	
+CBmhFind::reverseIncrementalFind (	
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
 	uchar_t* p = (uchar_t*) _p;
-	size_t TestSize = Size + m_IncFindTailSize;
+	size_t testSize = size + m_incFindTailSize;
 
 	size_t i;
 
-	if (!m_PatternSize)
+	if (!m_patternSize)
 		return -1;
 
-	if (TestSize < m_PatternSize)
+	if (testSize < m_patternSize)
 	{
 		// incapsulate tail until BM/BMH is possible
 		
-		memcpy (m_Buffer + 2 * m_PatternSize - m_IncFindTailSize - Size, _p, Size);
-		m_IncFindTailSize += Size;
-		m_IncFindOffset += Size;
+		memcpy (m_buffer + 2 * m_patternSize - m_incFindTailSize - size, _p, size);
+		m_incFindTailSize += size;
+		m_incFindOffset += size;
 		return -1;
 	}
 	
-	i = TestSize - m_PatternSize;
+	i = testSize - m_patternSize;
 
 	for (;;)
 	{
 		uchar_t y = p [i];
 
-		if (ReverseIncrementalCmpPattern (p, Size, i) == -1)
+		if (reverseIncrementalCmpPattern (p, size, i) == -1)
 		{
-			size_t Result = m_IncFindOffset + Size - i;
-			m_IncFindOffset = 0;
-			m_IncFindTailSize = 0;
-			return Result;
+			size_t result = m_incFindOffset + size - i;
+			m_incFindOffset = 0;
+			m_incFindTailSize = 0;
+			return result;
 		}
 
-		if (i >= m_PrevBadCharTable [y])
+		if (i >= m_prevBadCharTable [y])
 		{
-			i -= m_PrevBadCharTable [y];
+			i -= m_prevBadCharTable [y];
 			continue;
 		}
 
-		if (m_PrevBadCharTable [y] - i < m_PatternSize)
-			UpdateReverseIncrementalTail (p, Size, m_PatternSize - (m_PrevBadCharTable [y] - i));
+		if (m_prevBadCharTable [y] - i < m_patternSize)
+			updateReverseIncrementalTail (p, size, m_patternSize - (m_prevBadCharTable [y] - i));
 		else
-			m_IncFindTailSize = 0;
+			m_incFindTailSize = 0;
 
 		break;
 	}
 
-	m_IncFindOffset += Size;
+	m_incFindOffset += size;
 
 	return -1;
 }
 
 void 
-CBmhFind::RebuildTables ()
+CBmhFind::rebuildTables ()
 {
 	size_t i;
-	size_t m = m_PatternSize - 1;
-	uchar_t* p = m_Buffer;
+	size_t m = m_patternSize - 1;
+	uchar_t* p = m_buffer;
 	
 	for (i = 0; i < 256; i++)
 	{
-		m_NextBadCharTable [i] = 
-		m_PrevBadCharTable [i] = m_PatternSize;
+		m_nextBadCharTable [i] = 
+		m_prevBadCharTable [i] = m_patternSize;
 	}
 
-	if (m_DoMatchCase)
+	if (m_doMatchCase)
 	{
 		for (i = 0; i < m; i++) 
-			m_NextBadCharTable [p [i]] = m - i;
+			m_nextBadCharTable [p [i]] = m - i;
 
 		for (i = m; i > 0; i--) 
-			m_PrevBadCharTable [p [i]] = i;
+			m_prevBadCharTable [p [i]] = i;
 	}
 	else
 	{
 		for (i = 0; i < m; i++) 
 		{
-			m_NextBadCharTable [tolower (p [i])] = 
-			m_NextBadCharTable [toupper (p [i])] = m - i;
+			m_nextBadCharTable [tolower (p [i])] = 
+			m_nextBadCharTable [toupper (p [i])] = m - i;
 		}
 
 		for (i = m; i > 0; i--) 
 		{
-			m_PrevBadCharTable [tolower (p [i])] = 
-			m_PrevBadCharTable [toupper (p [i])] = i;
+			m_prevBadCharTable [tolower (p [i])] = 
+			m_prevBadCharTable [toupper (p [i])] = i;
 		}
 	}
 }
@@ -261,52 +261,52 @@ CBmhFind::RebuildTables ()
 // the following 4 helpers return offset of a mismatch or -1 if argument matches the pattern
 
 size_t
-CBmhFind::CmpPattern (uchar_t* _p)
+CBmhFind::cmpPattern (uchar_t* _p)
 {
-	uchar_t* p1 = m_Buffer + m_PatternSize - 1; 
-	uchar_t* p2 = _p + m_PatternSize - 1; 
+	uchar_t* p1 = m_buffer + m_patternSize - 1; 
+	uchar_t* p2 = _p + m_patternSize - 1; 
 
-	if (m_DoMatchCase)
+	if (m_doMatchCase)
 	{
-		for (; p1 >= m_Buffer; p1--, p2--)
+		for (; p1 >= m_buffer; p1--, p2--)
 			if (*p1 != *p2)
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 	else
 	{
-		for (; p1 >= m_Buffer; p1--, p2--)
+		for (; p1 >= m_buffer; p1--, p2--)
 			if (toupper (*p1) != toupper (*p2))
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 
 	return -1;
 }
 
 size_t
-CBmhFind::ReverseCmpPattern (uchar_t* _p)
+CBmhFind::reverseCmpPattern (uchar_t* _p)
 {
-	uchar_t* p1 = m_Buffer;
+	uchar_t* p1 = m_buffer;
 	uchar_t* p2 = _p;
-	uchar_t* pEnd = p1 + m_PatternSize;
+	uchar_t* end = p1 + m_patternSize;
 
-	if (m_DoMatchCase)
+	if (m_doMatchCase)
 	{
-		for (; p1 < pEnd; p1++, p2++)
+		for (; p1 < end; p1++, p2++)
 			if (*p1 != *p2)
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 	else
 	{
-		for (; p1 < pEnd; p1++, p2++)
+		for (; p1 < end; p1++, p2++)
 			if (toupper (*p1) != toupper (*p2))
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 
 	return -1;
 }
 
 size_t
-CBmhFind::IncrementalCmpPattern (	
+CBmhFind::incrementalCmpPattern (	
 	uchar_t* _p,
 	size_t i
 	)
@@ -314,85 +314,85 @@ CBmhFind::IncrementalCmpPattern (
 	uchar_t* p1;
 	uchar_t* p2;
 
-	if (i >= m_IncFindTailSize)
-		return CmpPattern (_p + i - m_IncFindTailSize);
+	if (i >= m_incFindTailSize)
+		return cmpPattern (_p + i - m_incFindTailSize);
 
-	p1 = m_Buffer + m_PatternSize - 1; 
-	p2 = _p + i + m_PatternSize - m_IncFindTailSize - 1; 
+	p1 = m_buffer + m_patternSize - 1; 
+	p2 = _p + i + m_patternSize - m_incFindTailSize - 1; 
 
-	if (m_DoMatchCase)
+	if (m_doMatchCase)
 	{
 		for (; p2 >= _p; p1--, p2--)
 			if (*p1 != *p2)
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 
-		p2 = m_Buffer + m_PatternSize + m_IncFindTailSize - 1;
+		p2 = m_buffer + m_patternSize + m_incFindTailSize - 1;
 
-		for (; p1 >= m_Buffer; p1--, p2--)
+		for (; p1 >= m_buffer; p1--, p2--)
 			if (*p1 != *p2)
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 	else
 	{
 		for (; p2 >= _p; p1--, p2--)
 			if (toupper (*p1) != toupper (*p2))
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 
-		p2 = m_Buffer + m_PatternSize + m_IncFindTailSize - 1;
+		p2 = m_buffer + m_patternSize + m_incFindTailSize - 1;
 
-		for (; p1 >= m_Buffer; p1--, p2--)
+		for (; p1 >= m_buffer; p1--, p2--)
 			if (toupper (*p1) != toupper (*p2))
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 
 	return -1;
 }
 
 size_t
-CBmhFind::ReverseIncrementalCmpPattern (	
+CBmhFind::reverseIncrementalCmpPattern (	
 	uchar_t* _p,
-	size_t Size,
+	size_t size,
 	size_t i
 	)
 {
 	uchar_t* p1;
-	uchar_t* pEnd1;
+	uchar_t* end1;
 
 	uchar_t* p2;
-	uchar_t* pEnd2;
+	uchar_t* end2;
 
-	if (Size >= i + m_PatternSize)
-		return ReverseCmpPattern (_p + i);
+	if (size >= i + m_patternSize)
+		return reverseCmpPattern (_p + i);
 
-	p1 = m_Buffer;
-	pEnd1 = p1 + m_PatternSize;
+	p1 = m_buffer;
+	end1 = p1 + m_patternSize;
 	
 	p2 = _p + i;
-	pEnd2 = _p + Size;
+	end2 = _p + size;
 
-	if (m_DoMatchCase)
+	if (m_doMatchCase)
 	{
-		for (; p2 < pEnd2; p1++, p2++)
+		for (; p2 < end2; p1++, p2++)
 			if (*p1 != *p2)
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 
-		p2 = m_Buffer + 2 * m_PatternSize - m_IncFindTailSize;
+		p2 = m_buffer + 2 * m_patternSize - m_incFindTailSize;
 	
-		for (; p1 < pEnd1; p1++, p2++)
+		for (; p1 < end1; p1++, p2++)
 			if (*p1 != *p2)
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 	else
 	{
-		for (; p2 < pEnd2; p1++, p2++)
+		for (; p2 < end2; p1++, p2++)
 			if (toupper (*p1) != toupper (*p2))
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 
-		p2 = m_Buffer + 2 * m_PatternSize - m_IncFindTailSize;
+		p2 = m_buffer + 2 * m_patternSize - m_incFindTailSize;
 
-		for (; p1 < pEnd1; p1++, p2++)
+		for (; p1 < end1; p1++, p2++)
 			if (toupper (*p1) != toupper (*p2))
-				return p1 - m_Buffer;
+				return p1 - m_buffer;
 	}
 
 	return -1;
@@ -403,91 +403,91 @@ CBmhFind::ReverseIncrementalCmpPattern (
 // the following 2 helpers are used to update the state of incremental-find tail
 
 void
-CBmhFind::UpdateIncrementalTail (	
+CBmhFind::updateIncrementalTail (	
 	uchar_t* p,
-	size_t Size,
-	size_t TailSize
+	size_t size,
+	size_t tailSize
 	)
 {
-	size_t LeftOver;
+	size_t leftOver;
 
-	ASSERT (m_IncFindTailSize + Size >= m_PatternSize);
-	ASSERT (TailSize < m_PatternSize);
+	ASSERT (m_incFindTailSize + size >= m_patternSize);
+	ASSERT (tailSize < m_patternSize);
 
-	if (Size >= TailSize) 
+	if (size >= tailSize) 
 	{
 		// shortcut -- fill the tail all from the new data
 
-		memcpy (m_Buffer + m_PatternSize, p + Size - TailSize, TailSize);
-		m_IncFindTailSize = TailSize;
+		memcpy (m_buffer + m_patternSize, p + size - tailSize, tailSize);
+		m_incFindTailSize = tailSize;
 		return;
 	}
 
 	// to fill up the tail here, we need to use some part of old tail...
 
-	LeftOver = TailSize - Size;
-	ASSERT (LeftOver < m_IncFindTailSize);
+	leftOver = tailSize - size;
+	ASSERT (leftOver < m_incFindTailSize);
 
 	memmove (
-		m_Buffer + m_PatternSize, 
-		m_Buffer + m_PatternSize + m_IncFindTailSize - LeftOver,
-		LeftOver
+		m_buffer + m_patternSize, 
+		m_buffer + m_patternSize + m_incFindTailSize - leftOver,
+		leftOver
 		);
 
 	// ... and new data too
 
 	memcpy (
-		m_Buffer + m_PatternSize + LeftOver,
+		m_buffer + m_patternSize + leftOver,
 		p, 
-		TailSize - LeftOver
+		tailSize - leftOver
 		);
 
-	m_IncFindTailSize = TailSize;
+	m_incFindTailSize = tailSize;
 }
 
 void
-CBmhFind::UpdateReverseIncrementalTail (	
+CBmhFind::updateReverseIncrementalTail (	
 	uchar_t* p,
-	size_t Size,
-	size_t TailSize
+	size_t size,
+	size_t tailSize
 	)
 {
-	size_t LeftOver;
+	size_t leftOver;
 
-	ASSERT (m_IncFindTailSize + Size >= m_PatternSize);
-	ASSERT (TailSize < m_PatternSize);
+	ASSERT (m_incFindTailSize + size >= m_patternSize);
+	ASSERT (tailSize < m_patternSize);
 
-	if (Size >= TailSize) 
+	if (size >= tailSize) 
 	{
 		// shortcut -- fill the tail all from the new data
 
-		memcpy (m_Buffer + 2 * m_PatternSize - TailSize, p, TailSize);
-		m_IncFindTailSize = TailSize;
+		memcpy (m_buffer + 2 * m_patternSize - tailSize, p, tailSize);
+		m_incFindTailSize = tailSize;
 		return;
 	}
 
 	// to fill up the tail here, we need to use some part of old tail...
 
-	LeftOver = TailSize - Size;
-	ASSERT (LeftOver < m_IncFindTailSize);
+	leftOver = tailSize - size;
+	ASSERT (leftOver < m_incFindTailSize);
 
 	memmove (
-		m_Buffer + 2 * m_PatternSize - LeftOver, 
-		m_Buffer + 2 * m_PatternSize - m_IncFindTailSize,
-		LeftOver
+		m_buffer + 2 * m_patternSize - leftOver, 
+		m_buffer + 2 * m_patternSize - m_incFindTailSize,
+		leftOver
 		);
 
 	// ... and new data too
 
 	memcpy (
-		m_Buffer + 2 * m_PatternSize - TailSize,
+		m_buffer + 2 * m_patternSize - tailSize,
 		p, 
-		Size
+		size
 		);
 
 	// tail is filled now
 
-	m_IncFindTailSize = TailSize;
+	m_incFindTailSize = tailSize;
 }
 
 //.............................................................................

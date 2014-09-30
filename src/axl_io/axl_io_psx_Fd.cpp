@@ -9,73 +9,73 @@ namespace psx {
 //.............................................................................
 
 bool
-CFd::Open (
-	const char* pFileName,
-	uint_t OpenFlags,
-	mode_t Mode
+CFd::open (
+	const char* fileName,
+	uint_t openFlags,
+	mode_t mode
 	)
 {
-	Close ();
+	close ();
 
-	m_h = open (pFileName, OpenFlags, Mode);
-	return err::Complete (m_h != -1);
+	m_h = open (fileName, openFlags, mode);
+	return err::complete (m_h != -1);
 }
 
 bool
-CFd::SetBlockingMode (bool IsBlocking)
+CFd::setBlockingMode (bool isBlocking)
 {
-	int Result = ::fcntl (m_h, F_GETFL, 0);
-	if (Result == -1)
-		return err::FailWithLastSystemError ();
+	int result = ::fcntl (m_h, F_GETFL, 0);
+	if (result == -1)
+		return err::failWithLastSystemError ();
 
-	int Flags = Result;
-	if (IsBlocking)
-		Flags &= ~O_NONBLOCK;
+	int flags = result;
+	if (isBlocking)
+		flags &= ~O_NONBLOCK;
 	else
-		Flags |= O_NONBLOCK;
+		flags |= O_NONBLOCK;
 
-	Result = ::fcntl (m_h, F_SETFL, Flags);
-	return err::Complete (Result != -1);
+	result = ::fcntl (m_h, F_SETFL, flags);
+	return err::complete (result != -1);
 }
 
 size_t
-CFd::GetIncomingDataSize ()
+CFd::getIncomingDataSize ()
 {
-	int Value;
-	int Result = ::ioctl (m_h, FIONREAD, &Value);
-	if (Result == -1)
+	int value;
+	int result = ::ioctl (m_h, FIONREAD, &value);
+	if (result == -1)
 	{
-		err::SetLastSystemError ();
+		err::setLastSystemError ();
 		return -1;
 	}
 
-	return Value;
+	return value;
 }
 
 size_t
-CFd::Read (
+CFd::read (
 	void* p,
-	size_t Size
+	size_t size
 	) const
 {
-	size_t ActualSize = read (m_h, p, Size);
-	if (ActualSize == -1)
-		err::SetLastSystemError ();
+	size_t actualSize = read (m_h, p, size);
+	if (actualSize == -1)
+		err::setLastSystemError ();
 
-	return ActualSize;
+	return actualSize;
 }
 
 size_t
-CFd::Write (
+CFd::write (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	size_t ActualSize = write (m_h, p, Size);
-	if (ActualSize == -1)
-		err::SetLastSystemError ();
+	size_t actualSize = write (m_h, p, size);
+	if (actualSize == -1)
+		err::setLastSystemError ();
 
-	return ActualSize;
+	return actualSize;
 }
 
 //.............................................................................

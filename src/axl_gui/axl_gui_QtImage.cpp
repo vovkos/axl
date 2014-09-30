@@ -11,36 +11,36 @@ namespace gui {
 
 CQtImage::CQtImage ()
 {
-	m_pEngine = CQtEngine::GetSingleton ();
+	m_engine = CQtEngine::getSingleton ();
 }
 
 bool
-CQtImage::GetData (
-	void* pData,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom
+CQtImage::getData (
+	void* data,
+	int left,
+	int top,
+	int right,
+	int bottom
 	)
 {
-	int Width = Right - Left;
-	int Height = Bottom - Top;
+	int width = right - left;
+	int height = bottom - top;
 
-	QImage Image = m_QtPixmap.toImage ().convertToFormat (QImage::Format_ARGB32);
+	QImage image = m_qtPixmap.toImage ().convertToFormat (QImage::Format_ARGB32);
 
-	const uint_t* pSrc = (const uint_t*) Image.bits ();	
-	pSrc += Width * Top;
+	const uint_t* src = (const uint_t*) image.bits ();	
+	src += width * top;
 
-	if (Width == m_Size.m_Width)
+	if (width == m_size.m_width)
 	{
-		memcpy (pData, pSrc, Width * (Bottom - Top));
+		memcpy (data, src, width * (bottom - top));
 		return true;
 	}
 	
-	uint_t* pDst = (uint_t*) pData;
+	uint_t* dst = (uint_t*) data;
 
-	for (int i = 0; i < Height; i++, pDst += Width, pSrc += m_Size.m_Width)
-		memcpy (pDst, pSrc, Width * sizeof (uint_t));
+	for (int i = 0; i < height; i++, dst += width, src += m_size.m_width)
+		memcpy (dst, src, width * sizeof (uint_t));
 
 	return true;
 }

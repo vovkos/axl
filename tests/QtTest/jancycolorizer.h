@@ -1,11 +1,11 @@
 #ifndef JANCYCOLORIZER_H
 #define JANCYCOLORIZER_H
 
-class JancyColorizer: public log::CRagelColorizerT <JancyColorizer>
+class jancyColorizer: public log::CRagelColorizerT <jancyColorizer>
 {
 public:
-	void Init();
-	void Exec();
+	void init();
+	void exec();
 };
 
 #endif

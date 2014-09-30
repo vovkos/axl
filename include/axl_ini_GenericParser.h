@@ -19,20 +19,20 @@ class CNamedValue: public rtl::TListLink
 	friend class CGenericParser;
 
 protected:
-	rtl::CString m_Name;
-	rtl::CString m_Value;
+	rtl::CString m_name;
+	rtl::CString m_value;
 
 public:
 	rtl::CString 
-	GetName () const
+	getName () const
 	{
-		return m_Name;
+		return m_name;
 	}
 
 	rtl::CString 
-	GetValue () const
+	getValue () const
 	{
-		return m_Value;
+		return m_value;
 	}
 };
 
@@ -43,29 +43,29 @@ class CSection: public rtl::TListLink
 	friend class CGenericParser;
 
 protected:
-	rtl::CString m_Name;
-	rtl::CStringHashTableMapT <CNamedValue*> m_NamedValueMap;
-	rtl::CStdListT <CNamedValue> m_NamedValueList;
-	rtl::CBoxListT <rtl::CString> m_UnnamedValueList;
+	rtl::CString m_name;
+	rtl::CStringHashTableMapT <CNamedValue*> m_namedValueMap;
+	rtl::CStdListT <CNamedValue> m_namedValueList;
+	rtl::CBoxListT <rtl::CString> m_unnamedValueList;
 
 public:
 	rtl::CString 
-	GetName ()
+	getName ()
 	{
-		return m_Name;
+		return m_name;
 	}
 
 	CNamedValue*
-	GetNamedValue (const char* pName) const
+	getNamedValue (const char* name) const
 	{
-		rtl::CStringHashTableMapIteratorT <CNamedValue*> It = m_NamedValueMap.Find (pName);
-		return It ? It->m_Value : NULL;
+		rtl::CStringHashTableMapIteratorT <CNamedValue*> it = m_namedValueMap.find (name);
+		return it ? it->m_value : NULL;
 	}
 
 	rtl::CConstBoxListT <rtl::CString>
-	GetUnnamedValueList () const
+	getUnnamedValueList () const
 	{
-		return m_UnnamedValueList;
+		return m_unnamedValueList;
 	}
 };
 
@@ -76,22 +76,22 @@ class CGenericIni
 	friend class CGenericParser;
 
 protected:
-	rtl::CStringHashTableMapT <CSection*> m_NamedSectionMap;
-	rtl::CStdListT <CSection> m_NamedSectionList;
-	CSection m_UnnamedSection;
+	rtl::CStringHashTableMapT <CSection*> m_namedSectionMap;
+	rtl::CStdListT <CSection> m_namedSectionList;
+	CSection m_unnamedSection;
 
 public:
 	CSection* 
-	GetSection (const char* pName) const
+	getSection (const char* name) const
 	{
-		rtl::CStringHashTableMapIteratorT <CSection*> It = m_NamedSectionMap.Find (pName);
-		return It ? It->m_Value : NULL;
+		rtl::CStringHashTableMapIteratorT <CSection*> it = m_namedSectionMap.find (name);
+		return it ? it->m_value : NULL;
 	}
 
 	const CSection* 
-	GetUnnamedSection () const
+	getUnnamedSection () const
 	{
-		return &m_UnnamedSection;
+		return &m_unnamedSection;
 	}
 };
 
@@ -100,36 +100,36 @@ public:
 class CGenericParser: public CParserT <CGenericParser>
 {
 protected:
-	CGenericIni* m_pIni;
-	CSection* m_pCurrentSection;
+	CGenericIni* m_ini;
+	CSection* m_currentSection;
 
 public:
-	CGenericParser (CGenericIni* pIni = NULL)
+	CGenericParser (CGenericIni* ini = NULL)
 	{
-		SetIni (pIni);
+		setIni (ini);
 	}
 
 	CGenericIni*
-	GetIni () const
+	getIni () const
 	{
-		return m_pIni;
+		return m_ini;
 	}
 
 	void
-	SetIni (CGenericIni* pIni)
+	setIni (CGenericIni* ini)
 	{
-		m_pIni = pIni;
-		m_pCurrentSection = pIni ? &pIni->m_UnnamedSection : NULL;
+		m_ini = ini;
+		m_currentSection = ini ? &ini->m_unnamedSection : NULL;
 	}
 
 public:
 	bool
-	OnSection (const char* pSectionName);
+	onSection (const char* sectionName);
 
 	bool
-	OnKeyValue (
-		const char* pKeyName, 
-		const char* pValue
+	onKeyValue (
+		const char* keyName, 
+		const char* value
 		);
 };
 

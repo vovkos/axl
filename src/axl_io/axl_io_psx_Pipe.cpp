@@ -8,17 +8,17 @@ namespace psx {
 //.............................................................................
 
 bool
-CPipe::Create ()
+CPipe::create ()
 {
-	Close ();
+	close ();
 
 	int fd [2];
-	int Result = pipe (fd);
-	if (Result == -1)
-		return err::FailWithLastSystemError ();
+	int result = pipe (fd);
+	if (result == -1)
+		return err::failWithLastSystemError ();
 
-	m_ReadFile.Attach (fd [0]);
-	m_WriteFile.Attach (fd [1]);
+	m_readFile.attach (fd [0]);
+	m_writeFile.attach (fd [1]);
 	return true;
 }
 

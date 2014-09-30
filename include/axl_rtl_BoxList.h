@@ -17,16 +17,16 @@ template <typename T>
 class CBoxListEntryT: public TListLink
 {
 public:
-	T m_Value;
+	T m_value;
 
 public:
 	CBoxListEntryT ()
 	{
 	}
 
-	CBoxListEntryT (const T& Value)
+	CBoxListEntryT (const T& value)
 	{
-		m_Value = Value;
+		m_value = value;
 	}
 };
 
@@ -51,39 +51,39 @@ public:
 	T&
 	operator * () const
 	{ 
-		return *GetObject (); 
+		return *getObject (); 
 	}
 
 	T* 
 	operator -> () const
 	{ 
-		return GetObject (); 
+		return getObject (); 
 	}
 
 	CBoxListEntryT <T>*
-	GetEntry () const
+	getEntry () const
 	{
-		return GetEntryFromLink (this->m_p);
+		return getEntryFromLink (this->m_p);
 	}
 
 	static
 	CBoxListEntryT <T>*
-	GetEntryFromLink (const TListLink* p)
+	getEntryFromLink (const TListLink* p)
 	{ 
 		return (CBoxListEntryT <T>*) p;
 	}
 
 	T* 
-	GetObject () const
+	getObject () const
 	{ 
-		return GetObjectFromLink (this->m_p);
+		return getObjectFromLink (this->m_p);
 	}
 
 	static
 	T* 
-	GetObjectFromLink (const TListLink* p)
+	getObjectFromLink (const TListLink* p)
 	{ 
-		return p ? &GetEntryFromLink (p)->m_Value : NULL;
+		return p ? &getEntryFromLink (p)->m_value : NULL;
 	}
 };
 
@@ -96,14 +96,14 @@ template <
 class CBoxListT: public CListBaseT <
 	CBoxListEntryT <T>, 
 	CBoxIteratorT <T>,
-	typename mem::CStdFactoryT <CBoxListEntryT <T> >::CDelete
+	typename mem::CStdFactoryT <CBoxListEntryT <T> >::COperatorDelete
 	>
 {
 public:
 	typedef CListBaseT <
 		CBoxListEntryT <T>, 
 		CBoxIteratorT <T>,
-		typename mem::CStdFactoryT <CBoxListEntryT <T> >::CDelete
+		typename mem::CStdFactoryT <CBoxListEntryT <T> >::COperatorDelete
 		> CListBase;
 	
 	typedef CBoxListEntryT <T> CEntry;
@@ -111,143 +111,143 @@ public:
 
 public:
 	T
-	Remove (CIterator It)
+	remove (CIterator it)
 	{ 
-		T Value = *It;
-		CEntry* pEntry = It.GetEntry ();
-		CListBase::Remove (pEntry);
-		AXL_MEM_DELETE (pEntry);
-		return Value;
+		T value = *it;
+		CEntry* entry = it.getEntry ();
+		CListBase::remove (entry);
+		AXL_MEM_DELETE (entry);
+		return value;
 	}
 
 	T
-	RemoveHead ()
+	removeHead ()
 	{ 
-		return this->m_pHead ? Remove (CIterator::FromLink (this->m_pHead)) : T ();
+		return this->m_head ? remove (CIterator::fromLink (this->m_head)) : T ();
 	}
 
 	T 
-	RemoveTail ()
+	removeTail ()
 	{ 
-		return this->m_pTail ? Remove (CIterator::FromLink (this->m_pTail)) : T ();
+		return this->m_tail ? remove (CIterator::fromLink (this->m_tail)) : T ();
 	}
 
 	CIterator 
-	InsertHead (TInsertArg Value)
+	insertHead (TInsertArg value)
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		pEntry->m_Value = Value;
-		return InsertHeadEntry (pEntry);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		entry->m_value = value;
+		return insertHeadEntry (entry);
 	}
 
 	CIterator 
-	InsertTail (TInsertArg Value)
+	insertTail (TInsertArg value)
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		pEntry->m_Value = Value;
-		return InsertTailEntry (pEntry);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		entry->m_value = value;
+		return insertTailEntry (entry);
 	}
 
 	CIterator 
-	InsertBefore (
-		TInsertArg Value, 
-		CIterator Before
+	insertBefore (
+		TInsertArg value, 
+		CIterator before
 		)
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		pEntry->m_Value = Value;
-		return InsertBeforeEntry (pEntry, Before);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		entry->m_value = value;
+		return insertBeforeEntry (entry, before);
 	}
 
 	CIterator 
-	InsertAfter (
-		TInsertArg Value, 
-		CIterator After
+	insertAfter (
+		TInsertArg value, 
+		CIterator after
 		)
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		pEntry->m_Value = Value;
-		return InsertAfterEntry (pEntry, After);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		entry->m_value = value;
+		return insertAfterEntry (entry, after);
 	}
 
 	// empty element insertion
 
 	CIterator 
-	InsertHead ()
+	insertHead ()
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		return InsertHeadEntry (pEntry);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		return insertHeadEntry (entry);
 	}
 
 	CIterator 
-	InsertTail ()
+	insertTail ()
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		return InsertTailEntry (pEntry);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		return insertTailEntry (entry);
 	}
 
 	CIterator 
-	InsertBefore (CIterator Before)
+	insertBefore (CIterator before)
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		return InsertBeforeEntry (pEntry, Before);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		return insertBeforeEntry (entry, before);
 	}
 
 	CIterator 
-	InsertAfter (CIterator After)
+	insertAfter (CIterator after)
 	{ 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		return InsertAfterEntry (pEntry, After);
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		return insertAfterEntry (entry, after);
 	}
 
 	// direct access to entries
 
 	CEntry*
-	RemoveEntry (CIterator It)
+	removeEntry (CIterator it)
 	{ 
-		return CListBase::Remove (It);
+		return CListBase::remove (it);
 	}
 
 	CEntry*
-	RemoveHeadEntry ()
+	removeHeadEntry ()
 	{ 
-		return CListBase::RemoveHead ();
+		return CListBase::removeHead ();
 	}
 
 	CEntry*
-	RemoveTailEntry ()
+	removeTailEntry ()
 	{ 
-		return CListBase::RemoveTail ();
+		return CListBase::removeTail ();
 	}
 
 	CIterator 
-	InsertHeadEntry (CEntry* pEntry)
+	insertHeadEntry (CEntry* entry)
 	{ 
-		return CListBase::InsertHead (pEntry);
+		return CListBase::insertHead (entry);
 	}
 
 	CIterator 
-	InsertTailEntry (CEntry* pEntry)
+	insertTailEntry (CEntry* entry)
 	{ 
-		return CListBase::InsertTail (pEntry);
+		return CListBase::insertTail (entry);
 	}
 
 	CIterator 
-	InsertBeforeEntry (
-		CEntry* pEntry, 
-		CIterator Before
+	insertBeforeEntry (
+		CEntry* entry, 
+		CIterator before
 		)
 	{ 
-		return CListBase::InsertBefore (pEntry, Before);
+		return CListBase::insertBefore (entry, before);
 	}
 
 	CIterator 
-	InsertAfterEntry (
-		CEntry* pEntry, 
-		CIterator After
+	insertAfterEntry (
+		CEntry* entry, 
+		CIterator after
 		)
 	{ 
-		return CListBase::InsertAfter (pEntry, After);
+		return CListBase::insertAfter (entry, after);
 	}
 };
 
@@ -262,15 +262,15 @@ public:
 	}
 
 	template <typename TInsertArg>
-	CConstBoxListT (const CBoxListT <T, TInsertArg>& List)
+	CConstBoxListT (const CBoxListT <T, TInsertArg>& list)
 	{ 
-		this->m_pList = List.GetList ();
+		this->m_list = list.getList ();
 	}
 
 	template <typename TDelete>
-	CConstBoxListT (const CListT <CBoxListEntryT <T>, TDelete>& List)
+	CConstBoxListT (const CListT <CBoxListEntryT <T>, TDelete>& list)
 	{ 
-		this->m_pList = List.GetList ();
+		this->m_list = list.getList ();
 	}
 };
 

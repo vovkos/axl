@@ -32,11 +32,11 @@ class CUsbContext: public rtl::CHandleT <libusb_context*, CCloseUsbContext>
 public:
 	CUsbContext ()
 	{
-		Open ();
+		open ();
 	}
 
 	bool 
-	Open ();
+	open ();
 };
 
 //.............................................................................
@@ -57,7 +57,7 @@ class CUsbDeviceList: public rtl::CHandleT <libusb_device**, CFreeUsbDeviceList>
 {
 public:
 	size_t
-	EnumerateDevices (libusb_context* pContext);
+	enumerateDevices (libusb_context* context);
 };
 
 //.............................................................................
@@ -89,228 +89,228 @@ public:
 	};
 
 protected:
-	libusb_device* m_pDevice;
-	libusb_device_handle* m_pOpenHandle;
+	libusb_device* m_device;
+	libusb_device_handle* m_openHandle;
 
 public:
 	CUsbDevice ()
 	{
-		m_pDevice = NULL;
-		m_pOpenHandle = NULL;
+		m_device = NULL;
+		m_openHandle = NULL;
 	}
 
 	~CUsbDevice ()
 	{
-		SetDevice (NULL);
+		setDevice (NULL);
 	}
 
 	libusb_device* 
-	GetDevice ()
+	getDevice ()
 	{
-		return m_pDevice;
+		return m_device;
 	}
 
 	libusb_device_handle* 
-	GetOpenHandle ()
+	getOpenHandle ()
 	{
-		return m_pOpenHandle;
+		return m_openHandle;
 	}
 	
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_pOpenHandle != NULL;
+		return m_openHandle != NULL;
 	}
 
 	uint8_t 
-	GetBusNumber ()
+	getBusNumber ()
 	{
-		ASSERT (m_pDevice);
-		return libusb_get_bus_number (m_pDevice);
+		ASSERT (m_device);
+		return libusb_get_bus_number (m_device);
 	}
 
 	uint8_t
-	GetDeviceAddress ()
+	getDeviceAddress ()
 	{
-		ASSERT (m_pDevice);
-		return libusb_get_device_address (m_pDevice);
+		ASSERT (m_device);
+		return libusb_get_device_address (m_device);
 	}
 
 	libusb_speed 
-	GetDeviceSpeed ()
+	getDeviceSpeed ()
 	{
-		ASSERT (m_pDevice);
-		return (libusb_speed) libusb_get_device_speed (m_pDevice);
+		ASSERT (m_device);
+		return (libusb_speed) libusb_get_device_speed (m_device);
 	}
 
 	size_t
-	GetMaxPacketSize (uint_t Endpoint);
+	getMaxPacketSize (uint_t endpoint);
 
 	size_t
-	GetMaxIsoPacketSize (uint_t Endpoint);
+	getMaxIsoPacketSize (uint_t endpoint);
 	
 	// open-close
 
 	void
-	RefDevice ()
+	refDevice ()
 	{
-		ASSERT (m_pDevice);
-		libusb_ref_device (m_pDevice);
+		ASSERT (m_device);
+		libusb_ref_device (m_device);
 	}
 
 	void
-	UnrefDevice ()
+	unrefDevice ()
 	{
-		ASSERT (m_pDevice);
-		libusb_unref_device (m_pDevice);
+		ASSERT (m_device);
+		libusb_unref_device (m_device);
 	}
 
 	void
-	SetDevice (libusb_device* pDevice);
+	setDevice (libusb_device* device);
 
 	void
-	Close ();
+	close ();
 
 	bool
-	Open ();
+	open ();
 
 	bool
-	Open (libusb_device* pDevice)
+	open (libusb_device* device)
 	{
-		SetDevice (pDevice);
-		return Open ();
+		setDevice (device);
+		return open ();
 	}
 
 	bool
-	Open (
-		uint_t VendorId,
-		uint_t ProductId
+	open (
+		uint_t vendorId,
+		uint_t productId
 		);
 
 	int
-	GetConfiguration ();
+	getConfiguration ();
 
 	bool
-	SetConfiguration (int Configuration);
+	setConfiguration (int configuration);
 
 	bool
-	ClaimInterface (int Interface);
+	claimInterface (int interface);
 
 	bool
-	ReleaseInterface (int Interface);
+	releaseInterface (int interface);
 
 	bool
-	SetInterfaceAltSetting (
-		int Interface,
-		int AltSetting
+	setInterfaceAltSetting (
+		int interface,
+		int altSetting
 		);
 
 	bool
-	ClearHalt (uint_t Endpoint);
+	clearHalt (uint_t endpoint);
 
 	bool
-	ResetDevice ();
+	resetDevice ();
 
 	bool
-	IsKernelDriverActive (int Interface);
+	isKernelDriverActive (int interface);
 
 	bool
-	AttachKernelDriver (int Interface);
+	attachKernelDriver (int interface);
 
 	bool
-	DetachKernelDriver (int Interface);
+	detachKernelDriver (int interface);
 
 	// descriptors
 
 	rtl::CArrayT <char>
-	GetDesrciptor (
-		libusb_descriptor_type Type, 
-		size_t Index
+	getDesrciptor (
+		libusb_descriptor_type type, 
+		size_t index
 		)
 	{
-		rtl::CArrayT <char> Descriptor;
-		GetDesrciptor (Type, Index, &Descriptor);
-		return Descriptor;
+		rtl::CArrayT <char> descriptor;
+		getDesrciptor (type, index, &descriptor);
+		return descriptor;
 	}
 	
 	bool
-	GetDesrciptor (
-		libusb_descriptor_type Type, 
-		size_t Index,
-		rtl::CArrayT <char>* pDescriptor
+	getDesrciptor (
+		libusb_descriptor_type type, 
+		size_t index,
+		rtl::CArrayT <char>* descriptor
 		);
 
 	bool
-	GetDeviceDescriptor (libusb_device_descriptor* pDescriptor);
+	getDeviceDescriptor (libusb_device_descriptor* descriptor);
 
 	bool
-	GetConfigDescriptor (
-		int Configuration,
-		libusb_config_descriptor** pDescriptor
+	getConfigDescriptor (
+		int configuration,
+		libusb_config_descriptor** descriptor
 		);
 
 	bool
-	GetActiveConfigDescriptor (libusb_config_descriptor** pDescriptor);
+	getActiveConfigDescriptor (libusb_config_descriptor** descriptor);
 
 	rtl::CString 
-	GetStringDesrciptor (
-		size_t Index,
-		uint_t LangId
+	getStringDesrciptor (
+		size_t index,
+		uint_t langId
 		)
 	{
-		rtl::CString String;
-		GetStringDesrciptor (Index, LangId, &String);
-		return String;
+		rtl::CString string;
+		getStringDesrciptor (index, langId, &string);
+		return string;
 	}
 
 	bool
-	GetStringDesrciptor (
-		size_t Index,
-		uint_t LangId,
-		rtl::CString* pString
+	getStringDesrciptor (
+		size_t index,
+		uint_t langId,
+		rtl::CString* string
 		);
 
 	rtl::CString 
-	GetStringDesrciptor (size_t Index)
+	getStringDesrciptor (size_t index)
 	{
-		rtl::CString String;
-		GetStringDesrciptor (Index, &String);
-		return String;
+		rtl::CString string;
+		getStringDesrciptor (index, &string);
+		return string;
 	}
 
 	bool
-	GetStringDesrciptor (
-		size_t Index,
-		rtl::CString* pString
+	getStringDesrciptor (
+		size_t index,
+		rtl::CString* string
 		);
 
 	// synchronous transfers
 
 	size_t 
-	ControlTransfer (
-		uint_t RequestType,
-		uint_t Request,
-		uint_t Value,
-		size_t Index,
+	controlTransfer (
+		uint_t requestType,
+		uint_t request,
+		uint_t value,
+		size_t index,
 		void* p,
-		size_t Size,
-		uint_t Timeout = -1
+		size_t size,
+		uint_t timeout = -1
 		);
 
 	size_t 
-	BulkTransfer (
-		uint_t Endpoint,
+	bulkTransfer (
+		uint_t endpoint,
 		void* p,
-		size_t Size,
-		uint_t Timeout = -1
+		size_t size,
+		uint_t timeout = -1
 		);
 
 	size_t 
-	InterruptTransfer (
-		uint_t Endpoint,
+	interruptTransfer (
+		uint_t endpoint,
 		void* p,
-		size_t Size,
-		uint_t Timeout = -1
+		size_t size,
+		uint_t timeout = -1
 		);
 };
 

@@ -103,11 +103,11 @@ inline
 const char*
 strchr_e (
 	const char* p,
-	const char* pEnd,
+	const char* end,
 	char c
 	)
 {
-	while (p < pEnd)
+	while (p < end)
 	{
 		if (*p == c)
 			return p;
@@ -122,11 +122,11 @@ inline
 char*
 strchr_e (
 	char* p,
-	char* pEnd,
+	char* end,
 	char c
 	)
 {
-	while (p < pEnd)
+	while (p < end)
 	{
 		if (*p == c)
 			return p;
@@ -141,11 +141,11 @@ inline
 const wchar_t*
 wcschr_e (
 	const wchar_t* p,
-	const wchar_t* pEnd,
+	const wchar_t* end,
 	wchar_t c
 	)
 {
-	while (p < pEnd)
+	while (p < end)
 	{
 		if (*p == c)
 			return p;
@@ -160,11 +160,11 @@ inline
 wchar_t*
 wcschr_e (
 	wchar_t* p,
-	wchar_t* pEnd,
+	wchar_t* end,
 	wchar_t c
 	)
 {
-	while (p < pEnd)
+	while (p < end)
 	{
 		if (*p == c)
 			return p;
@@ -181,44 +181,44 @@ inline
 const char*
 strnchr (
 	const char* p,
-	size_t Length,
+	size_t length,
 	char c
 	)
 {
-	return strchr_e (p, p + Length, c);
+	return strchr_e (p, p + length, c);
 }
 
 inline
 char*
 strnchr (
 	char* p,
-	size_t Length,
+	size_t length,
 	char c
 	)
 {
-	return strchr_e (p, p + Length, c);
+	return strchr_e (p, p + length, c);
 }
 
 inline
 const wchar_t*
 wcsnchr (
 	const wchar_t* p,
-	size_t Length,
+	size_t length,
 	wchar_t c
 	)
 {
-	return wcschr_e (p, p + Length, c);
+	return wcschr_e (p, p + length, c);
 }
 
 inline
 wchar_t*
 wcsnchr (
 	wchar_t* p,
-	size_t Length,
+	size_t length,
 	wchar_t c
 	)
 {
-	return wcschr_e (p, p + Length, c);
+	return wcschr_e (p, p + length, c);
 }
 
 //.............................................................................

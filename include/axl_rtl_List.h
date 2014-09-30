@@ -16,15 +16,15 @@ namespace rtl {
 
 struct TListLink
 {
-	TListLink* m_pNext;
-	TListLink* m_pPrev;
+	TListLink* m_next;
+	TListLink* m_prev;
 };
 
 struct TList
 {
-	TListLink* m_pHead;
-	TListLink* m_pTail;
-	size_t m_Count;
+	TListLink* m_head;
+	TListLink* m_tail;
+	size_t m_count;
 };
 
 //.............................................................................
@@ -49,119 +49,119 @@ public:
 	T& 
 	operator ++ ()
 	{ 
-		return Next ();
+		return next ();
 	}
 
 	T& 
 	operator -- ()
 	{ 
-		return Prev ();
+		return prev ();
 	}
 
 	T
 	operator ++ (int) // post increment
 	{ 
-		T Old = *(T*) this;
-		Next ();
-		return Old;
+		T old = *(T*) this;
+		next ();
+		return old;
 	}
 
 	T
 	operator -- (int) // post decrement
 	{ 
-		T Old = *(T*) this;
-		Prev ();
-		return Old;
+		T old = *(T*) this;
+		prev ();
+		return old;
 	}
 
 	T& 
-	operator += (size_t Count)
+	operator += (size_t count)
 	{ 
-		return Inc (Count); 
+		return inc (count); 
 	}
 
 	T& 
-	operator -= (size_t Count)
+	operator -= (size_t count)
 	{ 
-		return Inc (-Count); 
+		return inc (-count); 
 	}
 
 	T
-	operator + (size_t Count) const
+	operator + (size_t count) const
 	{ 
-		return GetInc (Count); 
+		return getInc (count); 
 	}
 
 	T
-	operator - (size_t Count) const
+	operator - (size_t count) const
 	{ 
-		return GetInc (-Count); 
+		return getInc (-count); 
 	}
 
 	T& 
-	Next ()
+	next ()
 	{	
 		if (m_p) 
-			m_p = m_p->m_pNext; 
+			m_p = m_p->m_next; 
 
 		return *(T*) this;
 	}
 
 	T& 
-	Prev ()
+	prev ()
 	{	
 		if (m_p) 
-			m_p = m_p->m_pPrev; 
+			m_p = m_p->m_prev; 
 
 		return *(T*) this;
 	}
 
 	T& 
-	Inc (intptr_t Count)
+	inc (intptr_t count)
 	{	
 		intptr_t i;
 
-		if (Count > 0)
-			for (i = 0; i < Count && m_p; i++)
-				m_p = m_p->m_pNext;
+		if (count > 0)
+			for (i = 0; i < count && m_p; i++)
+				m_p = m_p->m_next;
 		else
-			for (i = 0; i > Count && m_p; i--)
-				m_p = m_p->m_pPrev;
+			for (i = 0; i > count && m_p; i--)
+				m_p = m_p->m_prev;
 
 		return *(T*) this;
 	}
 
 	T 
-	GetNext () const
+	getNext () const
 	{ 
-		return CIteratorBaseT (*this).Next (); 
+		return CIteratorBaseT (*this).next (); 
 	}
 
 	T 
-	GetPrev () const
+	getPrev () const
 	{ 
-		return CIteratorBaseT (*this).Prev (); 
+		return CIteratorBaseT (*this).prev (); 
 	}
 
 	T 
-	GetInc (intptr_t Count) const
+	getInc (intptr_t count) const
 	{ 
-		return CIteratorBaseT (*this).Inc (Count); 
+		return CIteratorBaseT (*this).inc (count); 
 	}
 
 	const TListLink* 
-	GetLink () const
+	getLink () const
 	{ 
 		return m_p; 
 	}
 
 	static 
 	T
-	FromLink (const TListLink* p)
+	fromLink (const TListLink* p)
 	{ 
-		T It;
-		It.m_p = p;
-		return It;
+		T it;
+		it.m_p = p;
+		return it;
 	}
 };
 
@@ -185,9 +185,9 @@ public:
 		typename T2, 
 		typename TLink2
 		>
-	CIteratorT (const CIteratorT <T2, TLink2>& Src)
+	CIteratorT (const CIteratorT <T2, TLink2>& src)
 	{ 
-		operator = (*Src); 
+		operator = (*src); 
 	}
 
 	CIteratorT (T* p)
@@ -198,13 +198,13 @@ public:
 	T*
 	operator * () const
 	{ 
-		return GetObject (); 
+		return getObject (); 
 	}
 
 	T* 
 	operator -> () const
 	{ 
-		return GetObject (); 
+		return getObject (); 
 	}
 
 	CIteratorT&
@@ -227,30 +227,30 @@ public:
 	}
 
 	T*
-	GetEntry () const
+	getEntry () const
 	{
-		return GetEntryFromLink (this->m_p); 
+		return getEntryFromLink (this->m_p); 
 	}
 
 	static
 	T*
-	GetEntryFromLink (const TListLink* p)
+	getEntryFromLink (const TListLink* p)
 	{ 
-		return GetObjectFromLink (p);
+		return getObjectFromLink (p);
 	}
 
 	T* 
-	GetObject () const
+	getObject () const
 	{ 
-		return GetObjectFromLink (this->m_p); 
+		return getObjectFromLink (this->m_p); 
 	}
 
 	static 
 	T*
-	GetObjectFromLink (const TListLink* p)
+	getObjectFromLink (const TListLink* p)
 	{ 
-		size_t Offset = (size_t) CLink () ((T*) 1) - 1;
-		return p ? (T*) ((uchar_t*) p - Offset) : NULL; 
+		size_t offset = (size_t) CLink () ((T*) 1) - 1;
+		return p ? (T*) ((uchar_t*) p - offset) : NULL; 
 	}
 };
 
@@ -265,314 +265,314 @@ class CListBaseT: protected TList
 {
 public:
 	typedef TIterator CIterator;
-	typedef TDelete CDelete;
+	typedef TDelete COperatorDelete;
 	typedef typename CIterator::CLink CLink;
 
 public:
 	CListBaseT ()
 	{ 
-		Construct ();
+		construct ();
 	}
 	
 	~CListBaseT ()
 	{ 
-		Clear (); 
+		clear (); 
 	}
 
 	bool 
-	IsEmpty () const
+	isEmpty () const
 	{ 
-		return m_pHead == NULL; 
+		return m_head == NULL; 
 	}
 
 	const TList*
-	GetList () const
+	getList () const
 	{
 		return this;
 	}
 
 	size_t 
-	GetCount () const
+	getCount () const
 	{ 
-		return m_Count; 
+		return m_count; 
 	}
 
 	CIterator 
-	GetHead () const
+	getHead () const
 	{ 
-		return CIterator::FromLink (m_pHead); 
+		return CIterator::fromLink (m_head); 
 	}
 
 	CIterator 
-	GetTail () const
+	getTail () const
 	{ 
-		return CIterator::FromLink (m_pTail); 
+		return CIterator::fromLink (m_tail); 
 	}
 
 	T* 
-	Remove (CIterator It)
+	remove (CIterator it)
 	{ 
-		TListLink* pLink = (TListLink*) It.GetLink ();
-		TListLink* pNext = pLink->m_pNext;
-		TListLink* pPrev = pLink->m_pPrev;
+		TListLink* link = (TListLink*) it.getLink ();
+		TListLink* next = link->m_next;
+		TListLink* prev = link->m_prev;
 
-		if (pPrev)
-			pPrev->m_pNext = pNext;
+		if (prev)
+			prev->m_next = next;
 		else
-			m_pHead = pNext;
+			m_head = next;
 		
-		if (pNext)
-			pNext->m_pPrev = pPrev;
+		if (next)
+			next->m_prev = prev;
 		else
-			m_pTail = pPrev;
+			m_tail = prev;
 
-		m_Count--;
-		return It.GetEntry ();
+		m_count--;
+		return it.getEntry ();
 	}
 
 	T* 
-	RemoveHead ()
+	removeHead ()
 	{ 
-		return m_pHead ? Remove (CIterator::FromLink (m_pHead)) : NULL; 
+		return m_head ? remove (CIterator::fromLink (m_head)) : NULL; 
 	}
 
 	T* 
-	RemoveTail ()
+	removeTail ()
 	{ 
-		return m_pTail ? Remove (CIterator::FromLink (m_pTail)) : NULL; 
+		return m_tail ? remove (CIterator::fromLink (m_tail)) : NULL; 
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{ 
-		TListLink* pLink = m_pHead;
-		while (pLink)
+		TListLink* link = m_head;
+		while (link)
 		{
-			T* p = CIterator::GetEntryFromLink (pLink);
-			pLink = pLink->m_pNext;
-			CDelete () (p);
+			T* p = CIterator::getEntryFromLink (link);
+			link = link->m_next;
+			COperatorDelete () (p);
 		}
 
-		Construct ();
+		construct ();
 	}
 
 	bool 
-	ClearButHead ()
+	clearButHead ()
 	{ 
-		if (IsEmpty ())
+		if (isEmpty ())
 			return false;
 
-		T* p = RemoveHead ();
-		Clear ();
-		InsertHead (p);
+		T* p = removeHead ();
+		clear ();
+		insertHead (p);
 		return true;
 	}
 
 	bool 
-	ClearButTail ()
+	clearButTail ()
 	{ 
-		if (IsEmpty ())
+		if (isEmpty ())
 			return false;
 
-		T* p = RemoveTail ();
-		Clear ();
-		InsertTail (p);
+		T* p = removeTail ();
+		clear ();
+		insertTail (p);
 		return true;
 	}
 
 	CIterator 
-	InsertHead (T* p)
+	insertHead (T* p)
 	{ 
-		TListLink* pLink = CLink () (p);
+		TListLink* link = CLink () (p);
 
-		pLink->m_pPrev = NULL;
-		pLink->m_pNext = m_pHead;
+		link->m_prev = NULL;
+		link->m_next = m_head;
 
-		if (m_pHead)
-			m_pHead->m_pPrev = pLink;
+		if (m_head)
+			m_head->m_prev = link;
 		else
-			m_pTail = pLink;
+			m_tail = link;
 
-		m_pHead = pLink;
-		m_Count++;
+		m_head = link;
+		m_count++;
 
-		return CIterator::FromLink (pLink);
+		return CIterator::fromLink (link);
 	}
 
 	CIterator 
-	InsertTail (T* p)
+	insertTail (T* p)
 	{ 
-		TListLink* pLink = CLink () (p);
+		TListLink* link = CLink () (p);
 
-		pLink->m_pNext = NULL;
-		pLink->m_pPrev = m_pTail;
+		link->m_next = NULL;
+		link->m_prev = m_tail;
 		
-		if (m_pTail)
-			m_pTail->m_pNext = pLink;
+		if (m_tail)
+			m_tail->m_next = link;
 		else
-			m_pHead = pLink;
+			m_head = link;
 
-		m_pTail = pLink;
-		m_Count++;
+		m_tail = link;
+		m_count++;
 
-		return CIterator::FromLink (pLink);
+		return CIterator::fromLink (link);
 	}
 
 	CIterator 
-	InsertBefore (
+	insertBefore (
 		T* p, 
-		CIterator Before
+		CIterator before
 		)
 	{ 
-		if (!Before)
-			return InsertTail (p);
+		if (!before)
+			return insertTail (p);
 
-		TListLink* pLink = CLink () (p);
-		TListLink* pBeforeLink = (TListLink*) Before.GetLink ();
-		TListLink* pPrev = pBeforeLink->m_pPrev;
+		TListLink* link = CLink () (p);
+		TListLink* beforeLink = (TListLink*) before.getLink ();
+		TListLink* prev = beforeLink->m_prev;
 
-		pLink->m_pNext = pBeforeLink;
-		pLink->m_pPrev = pPrev;
-		pBeforeLink->m_pPrev = pLink;
+		link->m_next = beforeLink;
+		link->m_prev = prev;
+		beforeLink->m_prev = link;
 
-		if (pPrev)
-			pPrev->m_pNext = pLink;
+		if (prev)
+			prev->m_next = link;
 		else
-			m_pHead = pLink;
+			m_head = link;
 
-		m_Count++;
+		m_count++;
 
-		return CIterator::FromLink (pLink);
+		return CIterator::fromLink (link);
 	}
 
 	CIterator 
-	InsertAfter (
+	insertAfter (
 		T* p, 
-		CIterator After
+		CIterator after
 		)
 	{ 
-		if (!After)
-			return InsertHead (p);
+		if (!after)
+			return insertHead (p);
 
-		TListLink* pLink = CLink () (p);
-		TListLink* pAfterLink = (TListLink*) After.GetLink ();
-		TListLink* pNext = pAfterLink->m_pNext;
+		TListLink* link = CLink () (p);
+		TListLink* afterLink = (TListLink*) after.getLink ();
+		TListLink* next = afterLink->m_next;
 
-		pLink->m_pPrev = pAfterLink;
-		pLink->m_pNext = pNext;
-		pAfterLink->m_pNext = pLink;
+		link->m_prev = afterLink;
+		link->m_next = next;
+		afterLink->m_next = link;
 
-		if (pNext)
-			pNext->m_pPrev = pLink;
+		if (next)
+			next->m_prev = link;
 		else
-			m_pTail = pLink;
+			m_tail = link;
 
-		m_Count++;
+		m_count++;
 
-		return CIterator::FromLink (pLink);
+		return CIterator::fromLink (link);
 	}
 
 	void 
-	InsertListHead (CListBaseT* pSrc)
+	insertListHead (CListBaseT* src)
 	{
-		if (pSrc->IsEmpty ())
+		if (src->isEmpty ())
 			return;
 
-		if (IsEmpty ())
+		if (isEmpty ())
 		{
-			TakeOver (pSrc);
+			takeOver (src);
 			return;
 		}
 
-		m_pHead->m_pPrev = pSrc->m_pTail;
-		pSrc->m_pTail->m_pNext = m_pHead;
-		m_pHead = pSrc->m_pHead;
-		m_Count += pSrc->m_Count;
+		m_head->m_prev = src->m_tail;
+		src->m_tail->m_next = m_head;
+		m_head = src->m_head;
+		m_count += src->m_count;
 
-		pSrc->m_pHead = NULL;
-		pSrc->m_pTail = NULL;
-		pSrc->m_Count = 0;
+		src->m_head = NULL;
+		src->m_tail = NULL;
+		src->m_count = 0;
 	}
 
 	void 
-	InsertListTail (CListBaseT* pSrc)
+	insertListTail (CListBaseT* src)
 	{
-		if (pSrc->IsEmpty ())
+		if (src->isEmpty ())
 			return;
 
-		if (IsEmpty ())
+		if (isEmpty ())
 		{
-			TakeOver (pSrc);
+			takeOver (src);
 			return;
 		}
 
-		m_pTail->m_pNext = pSrc->m_pHead;
-		pSrc->m_pHead->m_pPrev = m_pTail;
-		m_pTail = pSrc->m_pTail;
-		m_Count += pSrc->m_Count;
+		m_tail->m_next = src->m_head;
+		src->m_head->m_prev = m_tail;
+		m_tail = src->m_tail;
+		m_count += src->m_count;
 
-		pSrc->m_pHead = NULL;
-		pSrc->m_pTail = NULL;
-		pSrc->m_Count = 0;
+		src->m_head = NULL;
+		src->m_tail = NULL;
+		src->m_count = 0;
 	}
 
 	void 
-	MoveBefore (
-		CIterator It, 
-		CIterator Before
+	moveBefore (
+		CIterator it, 
+		CIterator before
 		)
 	{ 
-		T* p = *It;
-		Remove (It);
-		InsertBefore (p, Before);
+		T* p = *it;
+		remove (it);
+		insertBefore (p, before);
 	}
 
 	void 
-	MoveAfter (
-		CIterator It, 
-		CIterator After
+	moveAfter (
+		CIterator it, 
+		CIterator after
 		)
 	{ 
-		T* p = *It;
-		Remove (It);
-		InsertAfter (p, After);
+		T* p = *it;
+		remove (it);
+		insertAfter (p, after);
 	}
 
 	void 
-	MoveToHead (CIterator It)
+	moveToHead (CIterator it)
 	{
-		T* p = *It;
-		Remove (It);
-		InsertHead (p);
+		T* p = *it;
+		remove (it);
+		insertHead (p);
 	}
 
 	void 
-	MoveToTail (CIterator It)
+	moveToTail (CIterator it)
 	{
-		T* p = *It;
-		Remove (It);
-		InsertTail (p);
+		T* p = *it;
+		remove (it);
+		insertTail (p);
 	}
 
 	void 
-	TakeOver (CListBaseT* pList)
+	takeOver (CListBaseT* list)
 	{
-		Clear ();
+		clear ();
 		
-		m_pHead = pList->m_pHead;
-		m_pTail = pList->m_pTail;
-		m_Count = pList->m_Count;
+		m_head = list->m_head;
+		m_tail = list->m_tail;
+		m_count = list->m_count;
 
-		pList->Construct ();
+		list->construct ();
 	}
 
 protected:
 	void
-	Construct ()
+	construct ()
 	{
-		m_pHead = NULL;
-		m_pTail = NULL;
-		m_Count = 0;
+		m_head = NULL;
+		m_tail = NULL;
+		m_count = 0;
 	}
 };
 
@@ -589,36 +589,36 @@ public:
 	typedef typename CIterator::CLink CLink;
 
 protected:
-	const TList* m_pList;
+	const TList* m_list;
 
 public:
 	CConstListBaseT ()
 	{ 
-		m_pList = NULL;
+		m_list = NULL;
 	}
 
 	bool 
-	IsEmpty () const
+	isEmpty () const
 	{ 
-		return m_pList ? m_pList->m_pHead == NULL : true;  
+		return m_list ? m_list->m_head == NULL : true;  
 	}
 
 	size_t 
-	GetCount () const
+	getCount () const
 	{ 
-		return m_pList ? m_pList->m_Count : 0; 
+		return m_list ? m_list->m_count : 0; 
 	}
 
 	CIterator 
-	GetHead () const
+	getHead () const
 	{ 
-		return m_pList ? CIterator::FromLink (m_pList->m_pHead) : CIterator ();  
+		return m_list ? CIterator::fromLink (m_list->m_head) : CIterator ();  
 	}
 
 	CIterator 
-	GetTail () const
+	getTail () const
 	{ 
-		return m_pList ? CIterator::FromLink (m_pList->m_pTail) : CIterator (); 
+		return m_list ? CIterator::fromLink (m_list->m_tail) : CIterator (); 
 	}
 };
 
@@ -633,10 +633,10 @@ class CListT: public CListBaseT <T, CIteratorT <T, TLink>, TDelete>
 {
 public:
 	void 
-	Delete (typename CListT::CIterator It)
+	erase (typename CListT::CIterator it)
 	{ 
-		T* p = this->Remove (It); 
-		typename CListT::CDelete () (p); 
+		T* p = this->remove (it); 
+		typename CListT::COperatorDelete () (p); 
 	}
 };
 
@@ -647,7 +647,7 @@ template <
 	typename T, 
 	typename TLink = CImplicitCastT <T*, TListLink*> 
 	>
-class CStdListT: public CListT <T, typename mem::CStdFactoryT <T>::CDelete, TLink>
+class CStdListT: public CListT <T, typename mem::CStdFactoryT <T>::COperatorDelete, TLink>
 {
 };
 
@@ -657,7 +657,7 @@ template <
 	typename T, 
 	typename TLink = CImplicitCastT <T*, TListLink*> 
 	>
-class CCppListT: public CListT <T, typename mem::CCppFactoryT <T>::CDelete, TLink>
+class CCppListT: public CListT <T, typename mem::CCppFactoryT <T>::COperatorDelete, TLink>
 {
 };
 
@@ -672,13 +672,13 @@ class CAuxListT: public CListT <T, rtl::CVoidT <T*>,  TLink>
 public:
 	CAuxListT ()
 	{
-		this->Construct (); 
+		this->construct (); 
 	}
 
 	void
-	Clear ()
+	clear ()
 	{
-		this->Construct (); 
+		this->construct (); 
 	}
 };
 
@@ -696,9 +696,9 @@ public:
 	}
 
 	template <typename TDelete>
-	CConstListT (const CListT <T, TDelete, TLink>& List)
+	CConstListT (const CListT <T, TDelete, TLink>& list)
 	{ 
-		this->m_pList = List.GetList (); 
+		this->m_list = list.getList (); 
 	}
 };
 

@@ -9,174 +9,174 @@ namespace gui {
 
 CQtCanvas::CQtCanvas ()
 {
-	m_pEngine = CQtEngine::GetSingleton ();
+	m_engine = CQtEngine::getSingleton ();
 }
 
 bool
-CQtCanvas::DrawRect (
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t Color
+CQtCanvas::drawRect (
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t color
 	)
 {
-	Color = OverlayColor (m_BaseTextAttr.m_BackColor, Color);
+	color = overlayColor (m_baseTextAttr.m_backColor, color);
 
-	if (!(Color & EColorFlag_Transparent))
-		m_h->fillRect (Left, Top, Right - Left, Bottom - Top, m_Palette.GetColorRgb (Color));
+	if (!(color & EColorFlag_Transparent))
+		m_h->fillRect (left, top, right - left, bottom - top, m_palette.getColorRgb (color));
 
 	return true;
 }
 
 bool
-CQtCanvas::DrawText_qt (
+CQtCanvas::drawText_qt (
 	int x,
 	int y,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t TextColor,
-	uint_t BackColor,
-	uint_t FontFlags,
-	const QString& String
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
+	const QString& string
 	)
 {
-	TextColor = OverlayColor (m_BaseTextAttr.m_ForeColor, TextColor);
-	BackColor = OverlayColor (m_BaseTextAttr.m_BackColor, BackColor);
-	FontFlags = OverlayFontFlags (m_BaseTextAttr.m_FontFlags, FontFlags);
+	textColor = overlayColor (m_baseTextAttr.m_foreColor, textColor);
+	backColor = overlayColor (m_baseTextAttr.m_backColor, backColor);
+	fontFlags = overlayFontFlags (m_baseTextAttr.m_fontFlags, fontFlags);
 
-	CFont* pFont = m_pBaseFont->GetFontMod (FontFlags);
+	CFont* font = m_baseFont->getFontMod (fontFlags);
 
-	if (m_pFont != pFont)
+	if (m_font != font)
 	{
-		ASSERT (pFont->GetEngine ()->GetEngineKind () == EEngine_Qt);
-		CQtFont* pQtFont = (CQtFont*) pFont;
+		ASSERT (font->getEngine ()->getEngineKind () == EEngine_Qt);
+		CQtFont* qtFont = (CQtFont*) font;
 
-		m_pFont = pFont;
-		m_h->setFont (pQtFont->m_QtFont);
+		m_font = font;
+		m_h->setFont (qtFont->m_qtFont);
 	}
 
-	if (m_ColorAttr.m_ForeColor != TextColor)
+	if (m_colorAttr.m_foreColor != textColor)
 	{
-		m_ColorAttr.m_ForeColor = TextColor;
+		m_colorAttr.m_foreColor = textColor;
 
-		if (!(TextColor & EColorFlag_Transparent))
-			m_h->setPen (m_Palette.GetColorRgb (TextColor));
+		if (!(textColor & EColorFlag_Transparent))
+			m_h->setPen (m_palette.getColorRgb (textColor));
 	}
 
-	DrawRect (Left, Top, Right, Bottom, BackColor);
+	drawRect (left, top, right, bottom, backColor);
 
-	m_h->drawText (x, y, Right - x, Bottom - y, 0, String);
+	m_h->drawText (x, y, right - x, bottom - y, 0, string);
 	return true;
 }
 
 bool
-CQtCanvas::DrawText_utf8 (
+CQtCanvas::drawText_utf8 (
 	int x,
 	int y,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t TextColor,
-	uint_t BackColor,
-	uint_t FontFlags,
-	const utf8_t* pText,
-	size_t Length
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
+	const utf8_t* text,
+	size_t length
 	)
 {
-	char Buffer [256];
-	rtl::CString_utf16 String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	String.Copy (pText, Length);
+	char buffer [256];
+	rtl::CString_utf16 string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	string.copy (text, length);
 
-	return DrawText_qt (
+	return drawText_qt (
 		x,
 		y,
-		Left,
-		Top,
-		Right,
-		Bottom,
-		TextColor,
-		BackColor,
-		FontFlags,
-		QString ((const QChar*) String.cc (), String.GetLength ())
+		left,
+		top,
+		right,
+		bottom,
+		textColor,
+		backColor,
+		fontFlags,
+		QString ((const QChar*) string.cc (), string.getLength ())
 		);
 }
 
 bool
-CQtCanvas::DrawText_utf32 (
+CQtCanvas::drawText_utf32 (
 	int x,
 	int y,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom,
-	uint_t TextColor,
-	uint_t BackColor,
-	uint_t FontFlags,
-	const utf32_t* pText,
-	size_t Length
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
+	const utf32_t* text,
+	size_t length
 	)
 {
-	char Buffer [256];
-	rtl::CString_utf16 String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	String.Copy (pText, Length);
+	char buffer [256];
+	rtl::CString_utf16 string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	string.copy (text, length);
 
-	return DrawText_qt (
+	return drawText_qt (
 		x,
 		y,
-		Left,
-		Top,
-		Right,
-		Bottom,
-		TextColor,
-		BackColor,
-		FontFlags,
-		QString ((const QChar*) String.cc (), String.GetLength ())
+		left,
+		top,
+		right,
+		bottom,
+		textColor,
+		backColor,
+		fontFlags,
+		QString ((const QChar*) string.cc (), string.getLength ())
 		);
 }
 
 
 bool
-CQtCanvas::DrawImage (
+CQtCanvas::drawImage (
 	int x,
 	int y,
-	CImage* pImage,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom
+	CImage* image,
+	int left,
+	int top,
+	int right,
+	int bottom
 	)
 {
-	ASSERT (pImage->GetEngine ()->GetEngineKind () == EEngine_Qt);
-	CQtImage* pQtImage = (CQtImage*) pImage;
-	m_h->drawPixmap (x, y, pQtImage->m_QtPixmap);
+	ASSERT (image->getEngine ()->getEngineKind () == EEngine_Qt);
+	CQtImage* qtImage = (CQtImage*) image;
+	m_h->drawPixmap (x, y, qtImage->m_qtPixmap);
 	return true;
 }
 
 bool
-CQtCanvas::CopyRect (
-	CCanvas* pSrcCanvas,
+CQtCanvas::copyRect (
+	CCanvas* srcCanvas,
 	int xDst,
 	int yDst,
 	int xSrc,
 	int ySrc,
-	int Width,
-	int Height
+	int width,
+	int height
 	)
 {
-	ASSERT (pSrcCanvas->GetEngine ()->GetEngineKind () == EEngine_Qt);
-/*	CPainter* pDc = (CPainter*) pSrcCanvas;
+	ASSERT (srcCanvas->getEngine ()->getEngineKind () == EEngine_Qt);
+/*	CPainter* dc = (CPainter*) srcCanvas;
 
 	::BitBlt (
 		m_h,
 		xDst,
 		yDst,
-		Width,
-		Height,
-		pDc->m_h,
+		width,
+		height,
+		dc->m_h,
 		xSrc,
 		ySrc,
 		SRCCOPY

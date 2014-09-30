@@ -26,7 +26,7 @@ public:
 public:
 	virtual 
 	void 
-	Finalize ()
+	finalize ()
 	{
 		m_p->~T ();
 	}
@@ -45,9 +45,9 @@ public:
 	operator () (void* p)
 	{
 		new (p) T;			
-		ref::CPtrT <CDestruct> Destruct = AXL_REF_NEW (CDestruct);
-		Destruct->m_p = (T*) p;
-		g::GetModule ()->AddFinalizer (Destruct);
+		ref::CPtrT <CDestruct> destruct = AXL_REF_NEW (CDestruct);
+		destruct->m_p = (T*) p;
+		g::getModule ()->addFinalizer (destruct);
 	}
 };
 
@@ -55,10 +55,10 @@ public:
 
 template <typename T>
 T*
-GetSingleton (volatile int32_t* pFlag = NULL)
+getSingleton (volatile int32_t* flag = NULL)
 {
 	static uchar_t _Buffer [sizeof (T)] = { 0 };
-	mt::CallOnce (CConstructSingletonT <T> (), _Buffer, pFlag);
+	mt::callOnce (CConstructSingletonT <T> (), _Buffer, flag);
 	return (T*) _Buffer;
 }
 

@@ -8,12 +8,12 @@ namespace win {
 //.............................................................................
 
 bool 
-CIocp::Create (dword_t ThreadCount)
+CIocp::create (dword_t threadCount)
 {
-	Close ();
+	close ();
 
-	m_h = ::CreateIoCompletionPort (INVALID_HANDLE_VALUE, NULL, 0, ThreadCount);
-	return err::Complete (m_h != NULL);
+	m_h = ::CreateIoCompletionPort (INVALID_HANDLE_VALUE, NULL, 0, threadCount);
+	return err::complete (m_h != NULL);
 }
 
 //.............................................................................

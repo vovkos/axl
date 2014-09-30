@@ -7,21 +7,21 @@ namespace io {
 //.............................................................................
 
 bool
-CSocket::Accept (
-	CSocket* pSocket,
-	sockaddr* pAddr
+CSocket::accept (
+	CSocket* socket,
+	sockaddr* addr
 	)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	SOCKET Socket = m_Socket.Accept (pAddr);
+	SOCKET h = m_socket.accept (addr);
 #else 
-	int Socket = m_Socket.Accept (pAddr);
+	int h = m_socket.accept (addr);
 #endif
 
-	if (Socket == -1)
+	if (h == -1)
 		return false;
 
-	pSocket->m_Socket.Attach (Socket);
+	socket->m_socket.attach (h);
 	return true;
 }
 
@@ -29,4 +29,3 @@ CSocket::Accept (
 
 } // namespace io
 } // namespace axl
-

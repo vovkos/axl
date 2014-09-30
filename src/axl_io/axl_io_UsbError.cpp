@@ -7,16 +7,16 @@ namespace io {
 //.............................................................................
 
 err::TError*
-CUsbError::Create (int Error)
+CUsbError::create (int code)
 {
-	err::TError* pError = GetBuffer (sizeof (err::TError));
-	if (!pError)
+	err::TError* error = getBuffer (sizeof (err::TError));
+	if (!error)
 		return NULL;
 
-	pError->m_Size = sizeof (err::TError);
-	pError->m_Guid = GUID_UsbError;
-	pError->m_Code = Error;
-	return pError;
+	error->m_size = sizeof (err::TError);
+	error->m_guid = GUID_UsbError;
+	error->m_code = code;
+	return error;
 }
 
 //.............................................................................

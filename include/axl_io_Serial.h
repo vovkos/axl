@@ -71,48 +71,48 @@ enum ESerialSetting
 
 struct TSerialSettings
 {
-	uint_t m_BaudRate;
-	ESerialFlowControl m_FlowControl;
-	uint_t m_DataBits;
-	ESerialStopBits m_StopBits;
-	ESerialParity m_Parity;
-	uint_t m_ReadInterval; // inverse of COMMTIMEOUTS.ReadIntervalTimeout (which always makes me confused):
+	uint_t m_baudRate;
+	ESerialFlowControl m_flowControl;
+	uint_t m_dataBits;
+	ESerialStopBits m_stopBits;
+	ESerialParity m_parity;
+	uint_t m_readInterval; // inverse of COMMTIMEOUTS.ReadIntervalTimeout (which always makes me confused):
 	                       // 0  -- return immediatly
 	                       // -1 -- wait for the buffer to fill completely
 
 	TSerialSettings ()
 	{
-		Setup (38400);
+		setup (38400);
 	}
 
 	TSerialSettings (
-		uint_t BaudRate,
-		ESerialFlowControl FlowControl = ESerialFlowControl_None,
-		uint_t DataBits = 8,
-		ESerialStopBits StopBits = ESerialStopBits_1,
-		ESerialParity Parity = ESerialParity_None,
-		uint_t ReadInterval = 10 // 10ms can be used in general case
+		uint_t baudRate,
+		ESerialFlowControl flowControl = ESerialFlowControl_None,
+		uint_t dataBits = 8,
+		ESerialStopBits stopBits = ESerialStopBits_1,
+		ESerialParity parity = ESerialParity_None,
+		uint_t readInterval = 10 // 10ms can be used in general case
 		)
 	{
-		Setup (BaudRate, FlowControl, DataBits, StopBits, Parity, ReadInterval);
+		setup (baudRate, flowControl, dataBits, stopBits, parity, readInterval);
 	}
 
 	void 
-	Setup (
-		uint_t BaudRate,
-		ESerialFlowControl FlowControl = ESerialFlowControl_None,
-		uint_t DataBits = 8,
-		ESerialStopBits StopBits = ESerialStopBits_1,
-		ESerialParity Parity = ESerialParity_None,
-		uint_t ReadInterval = 10
+	setup (
+		uint_t baudRate,
+		ESerialFlowControl flowControl = ESerialFlowControl_None,
+		uint_t dataBits = 8,
+		ESerialStopBits stopBits = ESerialStopBits_1,
+		ESerialParity parity = ESerialParity_None,
+		uint_t readInterval = 10
 		)
 	{
-		m_BaudRate = BaudRate;
-		m_FlowControl = FlowControl;
-		m_DataBits = DataBits;
-		m_StopBits = StopBits;
-		m_Parity = Parity;
-		m_ReadInterval = ReadInterval;
+		m_baudRate = baudRate;
+		m_flowControl = flowControl;
+		m_dataBits = dataBits;
+		m_stopBits = stopBits;
+		m_parity = parity;
+		m_readInterval = readInterval;
 	}
 };
 
@@ -122,87 +122,87 @@ class CSerial
 {
 public:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CSerial m_Serial;
+	win::CSerial m_serial;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CSerial m_Serial;
+	psx::CSerial m_serial;
 #endif
 
 public:
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_Serial.IsOpen ();
+		return m_serial.isOpen ();
 	}
 
 	bool
-	Open (const char* pName)
+	open (const char* name)
 	{
 #if (_AXL_ENV == AXL_ENV_WIN)
-		return m_Serial.Open (pName, FILE_FLAG_OVERLAPPED);
+		return m_serial.open (name, FILE_FLAG_OVERLAPPED);
 #else
-		return m_Serial.Open (pName);
+		return m_serial.open (name);
 #endif
 	}
 
 	void
-	Close ()
+	close ()
 	{
-		return m_Serial.Close ();
+		return m_serial.close ();
 	}
 
 	bool
-	SetSettings (
-		const TSerialSettings* pSettings,
-		uint_t Mask = -1
+	setSettings (
+		const TSerialSettings* settings,
+		uint_t mask = -1
 		);
 
 	bool
-	GetSettings (TSerialSettings* pSettings);
+	getSettings (TSerialSettings* settings);
 
 	bool
-	SetDtr (bool IsSet)
+	setDtr (bool isSet)
 	{
-		return m_Serial.SetDtr (IsSet);
+		return m_serial.setDtr (isSet);
 	}
 
 	bool
-	SetRts (bool IsSet)
+	setRts (bool isSet)
 	{
-		return m_Serial.SetRts (IsSet);
+		return m_serial.setRts (isSet);
 	}
 
 	uint_t
-	GetStatusLines ();
+	getStatusLines ();
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	size_t
-	Read (
+	read (
 		void* p,
-		size_t Size
+		size_t size
 		);
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	size_t
-	Read (
+	read (
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_Serial.Read (p, Size);
+		return m_serial.read (p, size);
 	}
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_Serial.Write (p, Size);
+		return m_serial.write (p, size);
 	}
 #endif
 

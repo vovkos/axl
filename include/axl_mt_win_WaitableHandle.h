@@ -28,33 +28,33 @@ class CWaitableHandle: public g::win::CHandle
 {
 public:
 	EWaitResult
-	Wait (
-		uint_t Timeout = -1, 
-		bool IsAlertable = false
+	wait (
+		uint_t timeout = -1, 
+		bool isAlertable = false
 		)
 	{
-		dword_t Result = ::WaitForSingleObjectEx (m_h, Timeout, IsAlertable);
-		return CompleteWait (Result);
+		dword_t result = ::WaitForSingleObjectEx (m_h, timeout, isAlertable);
+		return completeWait (result);
 	}
 	
 	static 
 	EWaitResult
-	MultiWait (
-		HANDLE* pWaitArray, 
-		dword_t Count, 
-		bool DoWaitAll = false,
-		uint_t Timeout = -1, 
-		bool IsAlertable = false
+	multiWait (
+		HANDLE* waitArray, 
+		dword_t count, 
+		bool doWaitAll = false,
+		uint_t timeout = -1, 
+		bool isAlertable = false
 		)
 	{
-		dword_t Result = ::WaitForMultipleObjectsEx (Count, pWaitArray, DoWaitAll, Timeout, IsAlertable);
-		return CompleteWait (Result);
+		dword_t result = ::WaitForMultipleObjectsEx (count, waitArray, doWaitAll, timeout, isAlertable);
+		return completeWait (result);
 	}
 
 protected:
 	static
 	EWaitResult 
-	CompleteWait (dword_t Result);
+	completeWait (dword_t result);
 };
 
 //.............................................................................

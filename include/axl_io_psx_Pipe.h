@@ -17,36 +17,36 @@ namespace psx {
 class CPipe
 {
 public:
-	CFile m_ReadFile;
-	CFile m_WriteFile;
+	CFile m_readFile;
+	CFile m_writeFile;
 
 public:
 	bool
-	Create ();
+	create ();
 
 	void
-	Close ()
+	close ()
 	{
-		m_ReadFile.Close ();
-		m_WriteFile.Close ();
+		m_readFile.close ();
+		m_writeFile.close ();
 	}
 
 	size_t
-	Read (
+	read (
 		void* p,
-		size_t Size
+		size_t size
 		) const
 	{
-		return m_ReadFile.Read (p, Size);
+		return m_readFile.read (p, size);
 	}
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_WriteFile.Write (p, Size);
+		return m_writeFile.write (p, size);
 	}
 };
 

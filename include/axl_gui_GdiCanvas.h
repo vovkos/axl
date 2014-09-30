@@ -54,7 +54,7 @@ protected:
 	};
 
 protected:
-	EDestruct m_DestructKind;
+	EDestruct m_destructKind;
 
 	HWND m_hWnd;
 	HDC m_hCompatibleDc;
@@ -67,101 +67,101 @@ public:
 
 	~CGdiCanvas ()
 	{
-		Release ();
+		release ();
 	}
 
 	void
-	Attach (
+	attach (
 		HDC hdc,
 		HWND hWnd,
-		EDestruct DestructKind
+		EDestruct destructKind
 		);
 
 	virtual
 	bool
-	DrawRect (
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t Color
+	drawRect (
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color
 		);
 
 	virtual
 	bool
-	DrawText_utf8 (
+	drawText_utf8 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf8_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf8_t* text,
+		size_t length = -1
 		);
 
 	virtual
 	bool
-	DrawText_utf16 (
+	drawText_utf16 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf16_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf16_t* text,
+		size_t length = -1
 		);
 
 	virtual
 	bool
-	DrawText_utf32 (
+	drawText_utf32 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf32_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf32_t* text,
+		size_t length = -1
 		);
 
 	virtual
 	bool
-	DrawImage (
+	drawImage (
 		int x,
 		int y,
-		CImage* pImage,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+		CImage* image,
+		int left,
+		int top,
+		int right,
+		int bottom
 		);
 
 	virtual
 	bool
-	CopyRect (
-		CCanvas* pSrcCanvas,
+	copyRect (
+		CCanvas* srcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,
 		int ySrc,
-		int Width,
-		int Height
+		int width,
+		int height
 		);
 
 protected:
 	void
-	Release ();
+	release ();
 };
 
 //.............................................................................

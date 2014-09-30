@@ -22,11 +22,11 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		*pSize = sizeof (T);
+		*size = sizeof (T);
 
 		if (p)
 			*(T*) p = AXL_VA_ARG (va, T);
@@ -46,11 +46,11 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		*pSize = sizeof (T);
+		*size = sizeof (T);
 
 		if (p)
 			*(T*) p = (T) AXL_VA_ARG (va, int);
@@ -102,21 +102,21 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		T* pString = AXL_VA_ARG (va, T*);
+		T* string = AXL_VA_ARG (va, T*);
 
-		size_t Length = pString ? CStringDetailsT <T>::CalcLength (pString) : 0;			
-		size_t Size = (Length + 1) * sizeof (T);
+		size_t length = string ? CStringDetailsT <T>::calcLength (string) : 0;			
+		size_t stringSize = (length + 1) * sizeof (T);
 
-		*pSize = Size;
+		*size = stringSize;
 
 		if (p)
 		{
-			if (pString)
-				memcpy (p, pString, Size);
+			if (string)
+				memcpy (p, string, stringSize);
 			else
 				*(T**) p = NULL;
 		}
@@ -163,18 +163,18 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		T* pObj = AXL_VA_ARG (va, T*);
+		T* obj = AXL_VA_ARG (va, T*);
 
-		*pSize = sizeof (T);
+		*size = sizeof (T);
 
 		if (p)
 		{
-			if (pObj)
-				memcpy (p, pObj, sizeof (T));
+			if (obj)
+				memcpy (p, obj, sizeof (T));
 			else
 				memset (p, 0, sizeof (T));
 		}
@@ -197,22 +197,22 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		T* pObj = AXL_VA_ARG (va, T*);
+		T* obj = AXL_VA_ARG (va, T*);
 
-		size_t Size = pObj ? TGetSize () (*pObj) : sizeof (T);
+		size_t objSize = obj ? TGetSize () (*obj) : sizeof (T);
 
-		*pSize = Size;
+		*size = objSize;
 
 		if (p)
 		{
-			if (pObj)
-				memcpy (p, pObj, Size);
+			if (obj)
+				memcpy (p, obj, objSize);
 			else
-				memset (p, 0, Size);
+				memset (p, 0, objSize);
 		}
 
 		return va;
@@ -229,16 +229,16 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		err::CError Error = err::GetError ();
+		err::CError error = err::getError ();
 
-		*pSize = Error->m_Size;
+		*size = error->m_size;
 
 		if (p)
-			memcpy (p, Error, Error->m_Size);
+			memcpy (p, error, error->m_size);
 
 		return va;
 	}
@@ -260,7 +260,7 @@ class CPackT <const err::TError*>: public CPackVsoPtrT <err::TError, err::CGetEr
 
 //.............................................................................
 
-// pack block referenced by (void* p, size_t Size) pair
+// pack object referenced by (void* p, size_t Size) pair
 
 class CPackPtrSize
 {
@@ -268,21 +268,21 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		void* pPtr = AXL_VA_ARG (va, void*);
-		size_t Size = AXL_VA_ARG (va, size_t);
+		void* obj = AXL_VA_ARG (va, void*);
+		size_t objSize = AXL_VA_ARG (va, size_t);
 	
-		*pSize = Size;
+		*size = objSize;
 
 		if (p)
 		{
-			if (pPtr)
-				memcpy (p, pPtr, Size);
+			if (obj)
+				memcpy (p, obj, objSize);
 			else
-				memset (p, 0, Size);
+				memset (p, 0, objSize);
 		}
 
 		return va;
@@ -303,25 +303,25 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
+		size_t* size,
 		axl_va_list va
 		)
 	{
-		size_t Size1 = 0;
-		size_t Size2 = 0;
+		size_t size1 = 0;
+		size_t size2 = 0;
 
 		if (!p)
 		{
-			va = TPack1 () (NULL, &Size1, va);
-			va = TPack2 () (NULL, &Size2, va);
+			va = TPack1 () (NULL, &size1, va);
+			va = TPack2 () (NULL, &size2, va);
 		}
 		else
 		{
-			va = TPack1 () (p, &Size1, va);
-			va = TPack2 () ((uchar_t*) p + Size1, &Size2, va);
+			va = TPack1 () (p, &size1, va);
+			va = TPack2 () ((uchar_t*) p + size1, &size2, va);
 		}
 
-		*pSize = Size1 + Size2;
+		*size = size1 + size2;
 		return va;
 	}
 };
@@ -479,33 +479,33 @@ class CPackSeqT_6: public CPackSeqExT_6 <
 
 template <typename T>
 ref::CPtrT <mem::TBlock> 
-CreatePackage_va (axl_va_list va)
+createPackage_va (axl_va_list va)
 {
-	size_t Size = 0;
-	T () (NULL, &Size, va);
+	size_t size = 0;
+	T () (NULL, &size, va);
 
 	typedef ref::CBoxT <mem::TBlock> CPackage;
 
-	ref::CPtrT <CPackage> Package = AXL_REF_NEW_EXTRA (CPackage, Size);
-	Package->m_p = Package + 1;
-	Package->m_Size = Size;
+	ref::CPtrT <CPackage> package = AXL_REF_NEW_EXTRA (CPackage, size);
+	package->m_p = package + 1;
+	package->m_size = size;
 	
-	T () (Package + 1, &Size, va);
+	T () (package + 1, &size, va);
 	
-	return Package;			
+	return package;			
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 ref::CPtrT <mem::TBlock> 
-CreatePackage (
-	int Unused,
+createPackage (
+	int unused,
 	...
 	)
 {
-	AXL_VA_DECL (va, Unused);
-	return CreatePackage_va <T> (va);
+	AXL_VA_DECL (va, unused);
+	return createPackage_va <T> (va);
 }
 
 //.............................................................................

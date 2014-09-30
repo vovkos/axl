@@ -25,112 +25,112 @@ public:
 
 	virtual
 	bool
-	DrawRect (
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t Color
+	drawRect (
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color
 		);
 
 	bool
-	DrawText_qt (
+	drawText_qt (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const QString& String
-		);
-
-	virtual
-	bool
-	DrawText_utf8 (
-		int x,
-		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf8_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const QString& string
 		);
 
 	virtual
 	bool
-	DrawText_utf16 (
+	drawText_utf8 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf16_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf8_t* text,
+		size_t length = -1
+		);
+
+	virtual
+	bool
+	drawText_utf16 (
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf16_t* text,
+		size_t length = -1
 		)
 	{
-		return DrawText_qt (
+		return drawText_qt (
 			x,
 			y,
-			Left,
-			Top,
-			Right,
-			Bottom,
-			TextColor,
-			BackColor,
-			FontFlags,
-			QString ((const QChar*) pText, Length)
+			left,
+			top,
+			right,
+			bottom,
+			textColor,
+			backColor,
+			fontFlags,
+			QString ((const QChar*) text, length)
 			);
 	}
 
 	virtual
 	bool
-	DrawText_utf32 (
+	drawText_utf32 (
 		int x,
 		int y,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom,
-		uint_t TextColor,
-		uint_t BackColor,
-		uint_t FontFlags,
-		const utf32_t* pText,
-		size_t Length = -1
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf32_t* text,
+		size_t length = -1
 		);
 
 	virtual
 	bool
-	DrawImage (
+	drawImage (
 		int x,
 		int y,
-		CImage* pImage,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+		CImage* image,
+		int left,
+		int top,
+		int right,
+		int bottom
 		);
 
 	virtual
 	bool
-	CopyRect (
-		CCanvas* pSrcCanvas,
+	copyRect (
+		CCanvas* srcCanvas,
 		int xDst,
 		int yDst,
 		int xSrc,
 		int ySrc,
-		int Width,
-		int Height
+		int width,
+		int height
 		);
 };
 

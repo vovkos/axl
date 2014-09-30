@@ -19,77 +19,77 @@ class CNamedPipe: public g::win::CFileHandle
 {
 public:
 	bool 
-	Create (
-		const wchar_t* pName,
-		uint_t OpenMode,
-		uint_t PipeMode,
-		dword_t MaxInstanceCount,
-		dword_t TxBufferSize,
-		dword_t RxBufferSize,
-		uint_t Timeout,
-		SECURITY_ATTRIBUTES* pSecAttr
+	create (
+		const wchar_t* name,
+		uint_t openMode,
+		uint_t pipeMode,
+		dword_t maxInstanceCount,
+		dword_t txBufferSize,
+		dword_t rxBufferSize,
+		uint_t timeout,
+		SECURITY_ATTRIBUTES* secAttr
 		);
 
 	bool 
-	Open (
-		const wchar_t* pName,
-		uint_t Access = GENERIC_READ | GENERIC_WRITE,
-		uint_t Flags = FILE_FLAG_OVERLAPPED
+	open (
+		const wchar_t* name,
+		uint_t access = GENERIC_READ | GENERIC_WRITE,
+		uint_t flags = FILE_FLAG_OVERLAPPED
 		);
 
 	bool 
-	Connect (OVERLAPPED* pOverlapped = NULL)
+	connect (OVERLAPPED* overlapped = NULL)
 	{
-		bool_t Result = ::ConnectNamedPipe (m_h, pOverlapped);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::ConnectNamedPipe (m_h, overlapped);
+		return completeAsyncRequest (result, overlapped);
 	}
 
 	bool 
-	Read (
+	read (
 		void* p, 
-		dword_t Size, 
-		dword_t* pActualSize,
-		OVERLAPPED* pOverlapped = NULL
+		dword_t size, 
+		dword_t* actualSize,
+		OVERLAPPED* overlapped = NULL
 		) const
 	{
-		bool_t Result = ::ReadFile (m_h, p, Size, pActualSize, pOverlapped);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::ReadFile (m_h, p, size, actualSize, overlapped);
+		return completeAsyncRequest (result, overlapped);
 	}
 
 	bool 
-	Write (
+	write (
 		const void* p, 
-		dword_t Size,
-		dword_t* pActualSize,
-		OVERLAPPED* pOverlapped = NULL
+		dword_t size,
+		dword_t* actualSize,
+		OVERLAPPED* overlapped = NULL
 		)
 	{
-		bool_t Result = ::WriteFile (m_h, p, Size, pActualSize, pOverlapped);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::WriteFile (m_h, p, size, actualSize, overlapped);
+		return completeAsyncRequest (result, overlapped);
 	}
 
 	bool 
-	ReadEx (
+	readEx (
 		void* p, 
-		dword_t Size, 
-		OVERLAPPED* pOverlapped,
+		dword_t size, 
+		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		) const
 	{
-		bool_t Result = ::ReadFileEx (m_h, p, Size, pOverlapped, pfOnComplete);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::ReadFileEx (m_h, p, size, overlapped, pfOnComplete);
+		return completeAsyncRequest (result, overlapped);
 	}
 
 	bool 
-	WriteEx (
+	writeEx (
 		const void* p, 
-		dword_t Size,
-		OVERLAPPED* pOverlapped,
+		dword_t size,
+		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		)
 	{
-		bool_t Result = ::WriteFileEx (m_h, p, Size, pOverlapped, pfOnComplete);
-		return CompleteAsyncRequest (Result, pOverlapped);
+		bool_t result = ::WriteFileEx (m_h, p, size, overlapped, pfOnComplete);
+		return completeAsyncRequest (result, overlapped);
 	}
 };
 

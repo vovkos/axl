@@ -24,19 +24,19 @@ namespace mt {
 class CLock
 {
 public:
-	win::CCriticalSection m_CriticalSection;
+	win::CCriticalSection m_criticalSection;
 
 public:
 	void 
-	Lock ()
+	lock ()
 	{
-		m_CriticalSection.Enter ();
+		m_criticalSection.enter ();
 	}
 
 	void 
-	Unlock ()
+	unlock ()
 	{
-		m_CriticalSection.Leave ();
+		m_criticalSection.leave ();
 	}
 };
 
@@ -45,19 +45,19 @@ public:
 class CLock
 {
 public:
-	psx::CMutex m_Mutex;
+	psx::CMutex m_mutex;
 
 public:
 	void 
-	Lock ()
+	lock ()
 	{
-		m_Mutex.Lock ();
+		m_mutex.lock ();
 	}
 
 	void 
-	Unlock ()
+	unlock ()
 	{
-		m_Mutex.Unlock ();
+		m_mutex.unlock ();
 	}
 };
 
@@ -68,18 +68,18 @@ public:
 class CScopeLock 
 {
 protected:
-	CLock* m_pLock;
+	CLock* m_lock;
 
 public:
-	CScopeLock (CLock* pLock)
+	CScopeLock (CLock* lock)
 	{
-		m_pLock = pLock;		
-		pLock->Lock ();
+		m_lock = lock;		
+		lock->lock ();
 	}
 
 	~CScopeLock ()
 	{
-		m_pLock->Unlock ();
+		m_lock->unlock ();
 	}
 };
 

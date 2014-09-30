@@ -7,47 +7,47 @@ namespace rtl {
 //.............................................................................
 
 axl_va_list
-CPackerSeq::Pack_va (
+CPackerSeq::pack_va (
 	void* _p,
-	size_t* pSize,
+	size_t* size,
 	axl_va_list va
 	)
 {
-	size_t Count = m_Sequence.GetCount ();
-	size_t TotalSize = 0;
+	size_t count = m_sequence.getCount ();
+	size_t totalSize = 0;
 
 	if (!_p)
 	{
-		for (size_t i = 0; i < Count; i++)
+		for (size_t i = 0; i < count; i++)
 		{
-			size_t Size = 0;
-			va = m_Sequence [i]->Pack_va (NULL, &Size, va);
-			TotalSize += Size;
+			size_t size = 0;
+			va = m_sequence [i]->pack_va (NULL, &size, va);
+			totalSize += size;
 		}
 	}
 	else
 	{
 		uchar_t* p = (uchar_t*) _p;
 
-		for (size_t i = 0; i < Count; i++)
+		for (size_t i = 0; i < count; i++)
 		{
-			size_t Size = 0;
+			size_t size = 0;
 
-			va = m_Sequence [i]->Pack_va (p, &Size, va);
+			va = m_sequence [i]->pack_va (p, &size, va);
 
-			p += Size;
-			TotalSize += Size;
+			p += size;
+			totalSize += size;
 		}
 	}
 
-	*pSize = TotalSize;
+	*size = totalSize;
 	return va;
 }
 
 size_t
-CPackerSeq::AppendFormat (const char* pFormat)
+CPackerSeq::appendFormat (const char* formatString)
 {
-	const char* pF = pFormat;
+	const char* pF = formatString;
 	
 	for (; *pF; pF++)
 	{
@@ -64,7 +64,7 @@ CPackerSeq::AppendFormat (const char* pFormat)
 		case 'u':
 		case 'x':
 		case 'X':
-			Append <CPackT <int> > ();
+			append <CPackT <int> > ();
 			break;
 
 		case 'e': 
@@ -72,99 +72,99 @@ CPackerSeq::AppendFormat (const char* pFormat)
 		case 'f':
 		case 'g':
 		case 'G':
-			Append <CPackT <double> > ();
+			append <CPackT <double> > ();
 			break;
 
 		case 'p':
-			Append <CPackT <size_t> > ();
+			append <CPackT <size_t> > ();
 			break;
 			
 		case 's': 
-			Append <CPackString> ();
+			append <CPackString> ();
 			break;
 
 		case 'c': 
-			Append <CPackT <char> > ();
+			append <CPackT <char> > ();
 			break;
 
 		case 'S': 
-			Append <CPackString_w> ();
+			append <CPackString_w> ();
 			break;
 
 		case 'C': 
-			Append <CPackT <wchar_t> > ();
+			append <CPackT <wchar_t> > ();
 			break;
 
 		case 'B':
-			Append <CPackT <uint8_t> > ();
+			append <CPackT <uint8_t> > ();
 			break;
 
 		case 'W':
-			Append <CPackT <uint16_t> > ();
+			append <CPackT <uint16_t> > ();
 			break;
 
 		case 'D':
-			Append <CPackT <uint32_t> > ();
+			append <CPackT <uint32_t> > ();
 			break;
 
 		case 'Z':
-			Append <CPackT <size_t> > ();
+			append <CPackT <size_t> > ();
 			break;
 
 		case 'P':
-			Append <CPackPtrSize> ();
+			append <CPackPtrSize> ();
 			break;
 
 		case 'R':
-			Append <CPackLastError> ();
+			append <CPackLastError> ();
 			break;
 		}
 	}
 
-	return m_Sequence.GetCount ();
+	return m_sequence.getCount ();
 }
 
 //.............................................................................
 	
 size_t
-CPackage::Append_va (
-	CPacker* pPacker,
+CPackage::append_va (
+	CPacker* packer,
 	axl_va_list va
 	)
 {
-	bool Result;
+	bool result;
 
-	size_t Size;
-	pPacker->Pack_va (NULL, &Size, va);
+	size_t size;
+	packer->pack_va (NULL, &size, va);
 
-	size_t OldSize = m_Buffer.GetCount ();
-	size_t NewSize = OldSize + Size;
+	size_t oldSize = m_buffer.getCount ();
+	size_t newSize = oldSize + size;
 
-	Result = m_Buffer.SetCount (NewSize);
-	if (!Result)
-		return OldSize;
+	result = m_buffer.setCount (newSize);
+	if (!result)
+		return oldSize;
 	
-	pPacker->Pack_va (m_Buffer + OldSize, &Size, va);
-	return NewSize;
+	packer->pack_va (m_buffer + oldSize, &size, va);
+	return newSize;
 }
 
 size_t
-CPackage::Append (
+CPackage::append (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	bool Result;
+	bool result;
 
-	size_t OldSize = m_Buffer.GetCount ();
-	size_t NewSize = OldSize + Size;
+	size_t oldSize = m_buffer.getCount ();
+	size_t newSize = oldSize + size;
 
-	Result = m_Buffer.SetCount (NewSize);
-	if (!Result)
-		return OldSize;
+	result = m_buffer.setCount (newSize);
+	if (!result)
+		return oldSize;
 
-	memcpy (m_Buffer + OldSize, p, Size);
-	return NewSize;
+	memcpy (m_buffer + oldSize, p, size);
+	return newSize;
 }
 
 //.............................................................................

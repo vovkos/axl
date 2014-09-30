@@ -22,52 +22,52 @@ class CStdFactoryT
 public:
 	typedef TAlloc CAlloc;
 
-	class CNew
+	class COperatorNew
 	{
 	public:
 #ifdef _DEBUG
 		T* 
 		operator () (
-			const char* pFilePath,
-			int Line,
-			size_t Extra = 0
+			const char* filePath,
+			int line,
+			size_t extra = 0
 			)
 		{
-			size_t Size = sizeof (T) + Extra;
+			size_t size = sizeof (T) + extra;
 
-			void* p = TAlloc::Alloc (Size, typeid (T).name (), pFilePath, Line);
+			void* p = TAlloc::alloc (size, typeid (T).name (), filePath, line);
 			if (!p)
 				return NULL;
 
-			memset (p, 0, Size); // zero memory before construction
+			memset (p, 0, size); // zero memory before construction
 			new (p) T;
 			return (T*) p;
 		}
 #else
 		T* 
-		operator () (size_t Extra = 0)
+		operator () (size_t extra = 0)
 		{
-			size_t Size = sizeof (T) + Extra;
+			size_t size = sizeof (T) + extra;
 
-			void* p = TAlloc::Alloc (Size);
+			void* p = TAlloc::alloc (size);
 			if (!p)
 				return NULL;
 
-			memset (p, 0, Size);
+			memset (p, 0, size);
 			new (p) T;
 			return (T*) p;
 		}
 #endif
 	};
 
-	class CDelete
+	class COperatorDelete
 	{
 	public:
 		void 
 		operator () (T* p)
 		{
 			p->~T ();
-			TAlloc::Free (p);
+			TAlloc::free (p);
 		}
 	};
 
@@ -75,28 +75,28 @@ public:
 #ifdef _DEBUG
 	static
 	T* 
-	New (
-		const char* pFilePath,
-		int Line,
-		size_t Extra = 0
+	operatorNew (
+		const char* filePath,
+		int line,
+		size_t extra = 0
 		)
 	{
-		return CNew () (pFilePath, Line, Extra);
+		return COperatorNew () (filePath, line, extra);
 	}
 #else
 	static
 	T* 
-	New (size_t Extra = 0)
+	operatorNew (size_t extra = 0)
 	{
-		return CNew () (Extra);
+		return COperatorNew () (extra);
 	}
 #endif
 
 	static
 	void 
-	Delete (T* p)
+	operatorDelete (T* p)
 	{
-		return CDelete () (p);
+		return COperatorDelete () (p);
 	}
 };
 
@@ -106,7 +106,7 @@ template <typename T>
 class CCppFactoryT
 {
 public:
-	class CNew
+	class COperatorNew
 	{
 	public:
 		T* 
@@ -116,7 +116,7 @@ public:
 		}
 	};
 
-	class CDelete
+	class COperatorDelete
 	{
 	public:
 		void 
@@ -129,61 +129,61 @@ public:
 public:
 	static
 	T* 
-	New (size_t Extra = 0)
+	operatorNew (size_t extra = 0)
 	{
-		return CNew () (Extra);
+		return COperatorNew () (extra);
 	}
 
 	static
 	void 
-	Delete (T* p)
+	operatorDelete (T* p)
 	{
-		return CDelete () (p);
+		return COperatorDelete () (p);
 	}
 };
 
 //.............................................................................
 
-// decoupling New & Delete is not good, but templated function is necessary for AXL_MEM_DELETE (p)
+// decoupling OperatorNew & OperatorDelete is not good, but templated function is necessary for AXL_MEM_DELETE (p)
 
 template <typename T>
 void
-StdDelete (T* p)
+stdOperatorDelete (T* p)
 {
-	typename CStdFactoryT <T>::CDelete () (p);
+	typename CStdFactoryT <T>::COperatorDelete () (p);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 void
-CppDelete (T* p)
+cppOperatorDelete (T* p)
 {
-	typename CCppFactoryT <T>::CDelete () (p);
+	typename CCppFactoryT <T>::COperatorDelete () (p);
 }
 
 //.............................................................................
 
 #ifdef _DEBUG
 
-#define AXL_MEM_NEW(Class) \
-	axl::mem::CStdFactoryT <Class>::New (__FILE__, __LINE__)
+#define AXL_MEM_NEW(class) \
+	axl::mem::CStdFactoryT <class>::operatorNew (__FILE__, __LINE__)
 
-#define AXL_MEM_NEW_EXTRA(Class, Extra) \
-	axl::mem::CStdFactoryT <Class>::New (__FILE__, __LINE__, Extra)
+#define AXL_MEM_NEW_EXTRA(class, extra) \
+	axl::mem::CStdFactoryT <class>::operatorNew (__FILE__, __LINE__, extra)
 
 #else
 
-#define AXL_MEM_NEW(Class) \
-	axl::mem::CStdFactoryT <Class>::New ()
+#define AXL_MEM_NEW(class) \
+	axl::mem::CStdFactoryT <class>::operatorNew ()
 
-#define AXL_MEM_NEW_EXTRA(Class, Extra) \
-	axl::mem::CStdFactoryT <Class>::New (Extra)
+#define AXL_MEM_NEW_EXTRA(class, extra) \
+	axl::mem::CStdFactoryT <class>::operatorNew (extra)
 
 #endif
 
 #define AXL_MEM_DELETE(p) \
-	axl::mem::StdDelete (p)
+	axl::mem::stdOperatorDelete (p)
 
 //.............................................................................
 

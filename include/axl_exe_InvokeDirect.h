@@ -15,9 +15,9 @@ intptr_t
 AXL_STDCALL
 axl_exe_InvokeDirect (
 	void* pf,
-	intptr_t CallConv,
-	axl::mem::TBlock* pStack,
-	size_t Count
+	intptr_t callConv,
+	axl::mem::TBlock* stack,
+	size_t count
 	);
 
 namespace axl {
@@ -35,14 +35,14 @@ enum ECallConv
 
 inline
 intptr_t
-InvokeDirect (
+invokeDirect (
 	void* pf,
-	ECallConv CallConv,
-	mem::TBlock* pStack,
-	size_t Count
+	ECallConv callConv,
+	mem::TBlock* stack,
+	size_t count
 	)
 {
-	return axl_exe_InvokeDirect (pf, CallConv, pStack, Count);
+	return axl_exe_InvokeDirect (pf, callConv, stack, count);
 }
 
 //.............................................................................

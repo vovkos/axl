@@ -36,103 +36,103 @@ public:
 
 	static
 	const C*
-	GetEmptyString ()
+	getEmptyString ()
 	{
 		return "";
 	}
 
 	static
 	const C*
-	GetCrLf ()
+	getCrLf ()
 	{
 		return "\r\n";
 	}
 
 	static
 	size_t
-	CalcLength (const C* p)
+	calcLength (const C* p)
 	{
 		return strlen (p);
 	}
 
 	static
 	int
-	Cmp (
+	cmp (
 		const C* p1,
 		const C* p2,
-		size_t Length
+		size_t length
 		)
 	{
-		return memcmp (p1, p2, Length);
+		return memcmp (p1, p2, length);
 	}
 
 	static
 	void
-	Fill (
+	fill (
 		C* p,
 		C c,
-		size_t Count
+		size_t count
 		)
 	{
-		memset (p, c, Count);
+		memset (p, c, count);
 	}
 
 	static
 	void
-	Copy (
-		C* pDst,
-		const C* pSrc,
-		size_t Count
+	copy (
+		C* dst,
+		const C* src,
+		size_t count
 		)
 	{
-		memcpy (pDst, pSrc, Count);
+		memcpy (dst, src, count);
 	}
 
 #if (_AXL_CPP == AXL_CPP_MSC)
 	static
 	size_t
-	CalcFormatLength_va (
-		const C* pFormat,
+	calcFormatLength_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		return _vscprintf (pFormat, va.m_va);
+		return _vscprintf (formatString, va.m_va);
 	}
 
 	static
 	void
-	Format_va (
-		C* pBuffer,
-		size_t BufferLength,
-		const C* pFormat,
+	format_va (
+		C* buffer,
+		size_t bufferLength,
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		_vsnprintf (pBuffer, BufferLength, pFormat, va.m_va);
-		if (BufferLength)
-			pBuffer [BufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
+		_vsnprintf (buffer, bufferLength, formatString, va.m_va);
+		if (bufferLength)
+			buffer [bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
 	}
 #else
 	static
 	size_t
-	CalcFormatLength_va (
-		const C* pFormat,
+	calcFormatLength_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		return vsnprintf (NULL, 0, pFormat, va.m_va);
+		return vsnprintf (NULL, 0, formatString, va.m_va);
 	}
 
 	static
 	size_t
-	Format_va (
-		C* pBuffer,
-		size_t BufferLength,
-		const C* pFormat,
+	format_va (
+		C* buffer,
+		size_t bufferLength,
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		return vsnprintf (pBuffer, BufferLength, pFormat, va.m_va);
+		return vsnprintf (buffer, bufferLength, formatString, va.m_va);
 	}
 #endif
 };
@@ -145,23 +145,23 @@ class CStringDetailsImplT
 public:
 	static
 	const T*
-	GetEmptyString ()
+	getEmptyString ()
 	{
-		static T EmptyString [1] = { 0 };
-		return EmptyString;
+		static T emptyString [1] = { 0 };
+		return emptyString;
 	}
 
 	static
 	const T*
-	GetCrLf ()
+	getCrLf ()
 	{
-		static T CrLf [2] = { '\r', '\n' };
-		return CrLf;
+		static T crLf [2] = { '\r', '\n' };
+		return crLf;
 	}
 
 	static
 	size_t
-	CalcLength (const T* p)
+	calcLength (const T* p)
 	{
 		const T* p0 = p;
 		while (*p)
@@ -172,14 +172,14 @@ public:
 
 	static
 	int
-	Cmp (
+	cmp (
 		const T* p1,
 		const T* p2,
-		size_t Length
+		size_t length
 		)
 	{
-		const T* pEnd = p1 + Length;
-		for (; p1 < pEnd; p1++, p2++)
+		const T* end = p1 + length;
+		for (; p1 < end; p1++, p2++)
 			if (*p1 < *p2)
 				return -1;
 			else if (*p1 > *p2)
@@ -190,26 +190,26 @@ public:
 
 	static
 	void
-	Fill (
+	fill (
 		T* p,
 		T c,
-		size_t Count
+		size_t count
 		)
 	{
-		const T* pEnd = p + Count;
-		for (; p < pEnd; p++)
+		const T* end = p + count;
+		for (; p < end; p++)
 			*p = c;
 	}
 
 	static
 	void
-	Copy (
-		T* pDst,
-		const T* pSrc,
-		size_t Count
+	copy (
+		T* dst,
+		const T* src,
+		size_t count
 		)
 	{
-		memcpy (pDst, pSrc, Count * sizeof (T));
+		memcpy (dst, src, count * sizeof (T));
 	}
 };
 
@@ -230,32 +230,32 @@ public:
 #if (_AXL_CPP == AXL_CPP_MSC)
 	static
 	size_t
-	CalcFormatLength_va (
-		const C* pFormat,
+	calcFormatLength_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		return _vscwprintf (pFormat, va.m_va);
+		return _vscwprintf (formatString, va.m_va);
 	}
 
 	static
 	void
-	Format_va (
-		C* pBuffer,
-		size_t BufferLength,
-		const C* pFormat,
+	format_va (
+		C* buffer,
+		size_t bufferLength,
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		_vsnwprintf (pBuffer, BufferLength, pFormat, va.m_va);
-		if (BufferLength)
-			pBuffer [BufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
+		_vsnwprintf (buffer, bufferLength, formatString, va.m_va);
+		if (bufferLength)
+			buffer [bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
 	}
 #else
 	static
 	size_t
-	CalcFormatLength_va (
-		const C* pFormat,
+	calcFormatLength_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
@@ -265,10 +265,10 @@ public:
 
 	static
 	void
-	Format_va (
-		C* pBuffer,
-		size_t BufferLength,
-		const C* pFormat,
+	format_va (
+		C* buffer,
+		size_t bufferLength,
+		const C* formatString,
 		axl_va_list va
 		)
 	{
@@ -294,8 +294,8 @@ public:
 #if (_AXL_CPP == AXL_CPP_MSC)
 	static
 	size_t
-	CalcFormatLength_va (
-		const C* pFormat,
+	calcFormatLength_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
@@ -305,10 +305,10 @@ public:
 
 	static
 	void
-	Format_va (
-		C* pBuffer,
-		size_t BufferLength,
-		const C* pFormat,
+	format_va (
+		C* buffer,
+		size_t bufferLength,
+		const C* formatString,
 		axl_va_list va
 		)
 	{
@@ -317,24 +317,24 @@ public:
 #else
 	static
 	size_t
-	CalcFormatLength_va (
-		const C* pFormat,
+	calcFormatLength_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		return vswprintf (NULL, 0, pFormat, va.m_va);
+		return vswprintf (NULL, 0, formatString, va.m_va);
 	}
 
 	static
 	void
-	Format_va (
-		C* pBuffer,
-		size_t BufferLength,
-		const C* pFormat,
+	format_va (
+		C* buffer,
+		size_t bufferLength,
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		vswprintf (pBuffer, BufferLength, pFormat, va.m_va);
+		vswprintf (buffer, bufferLength, formatString, va.m_va);
 	}
 #endif
 };
@@ -363,8 +363,8 @@ public:
 	class CHdr: public ref::CRefCount
 	{
 	public:
-		size_t m_MaxLength;
-		size_t m_Length;
+		size_t m_maxLength;
+		size_t m_length;
 	};
 
 	typedef CStringDetailsT <T> CDetails;
@@ -391,79 +391,79 @@ public:
 		m_p = NULL;
 	}
 
-	CStringT (EString StringKind)
+	CStringT (EString stringKind)
 	{
-		ASSERT (StringKind == EString_Empty);
+		ASSERT (stringKind == EString_Empty);
 		m_p = NULL;
 	}
 
-	CStringT (const CStringT& Src)
+	CStringT (const CStringT& src)
 	{
 		m_p = NULL;
-		Copy (Src);
+		copy (src);
 	}
 
-	CStringT (const CString2& Src)
+	CStringT (const CString2& src)
 	{
 		m_p = NULL;
-		Copy (Src);
+		copy (src);
 	}
 
-	CStringT (const CString3& Src)
+	CStringT (const CString3& src)
 	{
 		m_p = NULL;
-		Copy (Src);
+		copy (src);
 	}
 
 	CStringT (
 		const C* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
 		m_p = NULL;
-		Copy (p, Length);
+		copy (p, length);
 	}
 
 	CStringT (
 		const C2* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
 		m_p = NULL;
-		Copy (p, Length);
+		copy (p, length);
 	}
 
 	CStringT (
 		const C3* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
 		m_p = NULL;
-		Copy (p, Length);
+		copy (p, length);
 	}
 
 	CStringT (
 		utf32_t x,
-		size_t Count = 1
+		size_t count = 1
 		)
 	{
 		m_p = NULL;
-		Copy (x, Count);
+		copy (x, count);
 	}
 
 	CStringT (
-		ref::EBuf Kind,
+		ref::EBuf kind,
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
 		m_p = NULL;
-		SetBuffer (Kind, p, Size);
+		setBuffer (kind, p, size);
 	}
 
 	~CStringT ()
 	{
-		Release ();
+		release ();
 	}
 
 	operator const C* () const
@@ -472,768 +472,768 @@ public:
 	}
 
 	bool
-	operator == (const CStringT& String) const
+	operator == (const CStringT& string) const
 	{
-		return Cmp (String) == 0;
+		return cmp (string) == 0;
 	}
 
 	bool
 	operator == (const C* p) const
 	{
-		return Cmp (p) == 0;
+		return cmp (p) == 0;
 	}
 
 	bool
-	operator != (const CStringT& String) const
+	operator != (const CStringT& string) const
 	{
-		return Cmp (String) != 0;
+		return cmp (string) != 0;
 	}
 
 	bool
 	operator != (const C* p) const
 	{
-		return Cmp (p) != 0;
+		return cmp (p) != 0;
 	}
 
 	CStringT&
-	operator = (EString StringKind)
+	operator = (EString stringKind)
 	{
-		ASSERT (StringKind == EString_Empty);
-		Clear ();
+		ASSERT (stringKind == EString_Empty);
+		clear ();
 		return *this;
 	}
 
 	CStringT&
-	operator = (const CStringT& Src)
+	operator = (const CStringT& src)
 	{
-		Copy (Src);
+		copy (src);
 		return *this;
 	}
 
 	CStringT&
-	operator = (const CString2& Src)
+	operator = (const CString2& src)
 	{
-		Copy (Src);
+		copy (src);
 		return *this;
 	}
 
 	CStringT&
-	operator = (const CString3& Src)
+	operator = (const CString3& src)
 	{
-		Copy (Src);
+		copy (src);
 		return *this;
 	}
 
 	CStringT&
 	operator = (const C* p)
 	{
-		Copy (p, -1);
+		copy (p, -1);
 		return *this;
 	}
 
 	CStringT&
 	operator = (const C2* p)
 	{
-		Copy (p, -1);
+		copy (p, -1);
 		return *this;
 	}
 
 	CStringT&
 	operator = (const C3* p)
 	{
-		Copy (p, -1);
+		copy (p, -1);
 		return *this;
 	}
 
 	CStringT&
 	operator = (utf32_t x)
 	{
-		Copy (x, 1);
+		copy (x, 1);
 		return *this;
 	}
 
 	CStringT&
 	operator += (const C* p)
 	{
-		Append (p, -1);
+		append (p, -1);
 		return *this;
 	}
 
 	CStringT&
 	operator += (const C2* p)
 	{
-		Append (p, -1);
+		append (p, -1);
 		return *this;
 	}
 
 	CStringT&
 	operator += (const C3* p)
 	{
-		Append (p, -1);
+		append (p, -1);
 		return *this;
 	}
 
 	CStringT&
 	operator += (utf32_t x)
 	{
-		Append (x, 1);
+		append (x, 1);
 		return *this;
 	}
 
 	CStringT
-	operator + (const CStringT& String) const
+	operator + (const CStringT& string) const
 	{
-		CStringT Result = *this;
-		Result.Append (String);
-		return Result;
+		CStringT result = *this;
+		result.append (string);
+		return result;
 	}
 
 	CStringT
 	operator + (const C* p) const
 	{
-		CStringT Result = *this;
-		Result.Append (p);
-		return Result;
+		CStringT result = *this;
+		result.append (p);
+		return result;
 	}
 
 	CStringT
 	operator + (const C2* p) const
 	{
-		CStringT Result = *this;
-		Result.Append (p);
-		return Result;
+		CStringT result = *this;
+		result.append (p);
+		return result;
 	}
 
 	CStringT
 	operator + (const C3* p) const
 	{
-		CStringT Result = *this;
-		Result.Append (p);
-		return Result;
+		CStringT result = *this;
+		result.append (p);
+		return result;
 	}
 
 	CStringT
 	operator + (utf32_t x) const
 	{
-		CStringT Result = *this;
-		Result.Append (x);
-		return Result;
+		CStringT result = *this;
+		result.append (x);
+		return result;
 	}
 
 	CStringT
-	operator + (const CString2& String) const
+	operator + (const CString2& string) const
 	{
-		CStringT Result = *this;
-		Result.Append (String);
-		return Result;
+		CStringT result = *this;
+		result.append (string);
+		return result;
 	}
 
 	CStringT
-	operator + (const CString3& String) const
+	operator + (const CString3& string) const
 	{
-		CStringT Result = *this;
-		Result.Append (String);
-		return Result;
+		CStringT result = *this;
+		result.append (string);
+		return result;
 	}
 
 	const C*
 	cc () const
 	{
-		return m_p ? m_p : CDetails::GetEmptyString ();
+		return m_p ? m_p : CDetails::getEmptyString ();
 	}
 
 	CString2
 	cc2 () const
 	{
-		return CString2 (m_p, GetLength ());
+		return CString2 (m_p, getLength ());
 	}
 
 	CString3
 	cc3 () const
 	{
-		return CString3 (m_p, GetLength ());
+		return CString3 (m_p, getLength ());
 	}
 
 	size_t
-	GetLength () const
+	getLength () const
 	{
-		return m_p ? GetHdr ()->m_Length : 0;
+		return m_p ? getHdr ()->m_length : 0;
 	}
 
 	size_t
-	GetBufferLength () const
+	getBufferLength () const
 	{
-		return m_p ? GetHdr ()->m_MaxLength : 0;
+		return m_p ? getHdr ()->m_maxLength : 0;
 	}
 
 	bool
-	IsEmpty () const
+	isEmpty () const
 	{
-		return GetLength () == 0;
+		return getLength () == 0;
 	}
 
 	void
-	Release ()
+	release ()
 	{
 		if (!m_p)
 			return;
 
-		GetHdr ()->Release ();
+		getHdr ()->release ();
 		m_p = NULL;
 	}
 
 	void
-	Clear ()
+	clear ()
 	{
-		SetLength (0, false);
+		setLength (0, false);
 	}
 
 	int
-	Cmp (
+	cmp (
 		const C* p,
-		size_t Length = -1
+		size_t length = -1
 		) const
 	{
-		size_t ThisLength = GetLength ();
+		size_t thisLength = getLength ();
 
 		if (!p)
-			return ThisLength ? 1 : 0;
+			return thisLength ? 1 : 0;
 
-		if (Length == -1)
-			Length = CDetails::CalcLength (p);
+		if (length == -1)
+			length = CDetails::calcLength (p);
 
-		int Result = CDetails::Cmp (m_p, p, AXL_MIN (Length, ThisLength));
-		return Result ? Result : rtl::CCmpT <size_t> () (ThisLength, Length);
+		int result = CDetails::cmp (m_p, p, AXL_MIN (length, thisLength));
+		return result ? result : rtl::CCmpT <size_t> () (thisLength, length);
 	}
 
 	int
-	Cmp (const CStringT& String) const
+	cmp (const CStringT& string) const
 	{
-		return Cmp (String, String.GetLength ());
+		return cmp (string, string.getLength ());
 	}
 
 	size_t
-	ForceCopy (const CStringT& Src)
+	forceCopy (const CStringT& src)
 	{
-		return Copy (Src, Src.GetLength ());
+		return copy (src, src.getLength ());
 	}
 
 	size_t
-	Copy (const CStringT& Src)
+	copy (const CStringT& src)
 	{
-		if (m_p == Src.m_p)
-			return GetLength ();
+		if (m_p == src.m_p)
+			return getLength ();
 
-		if (Src.m_p)
+		if (src.m_p)
 		{
-			if (Src.GetHdr ()->GetFree () == (mem::FFree*) -1)
-				return Copy (Src, Src.GetLength ());
+			if (src.getHdr ()->getFree () == (mem::FFree*) -1)
+				return copy (src, src.getLength ());
 
-			Src.GetHdr ()->AddRef ();
+			src.getHdr ()->addRef ();
 		}
 
 		if (m_p)
-			GetHdr ()->Release ();
+			getHdr ()->release ();
 
-		m_p = Src.m_p;
-		return GetLength ();
+		m_p = src.m_p;
+		return getLength ();
 	}
 
 	size_t
-	Copy (const CString2& Src)
+	copy (const CString2& src)
 	{
-		return Copy (Src, Src.GetLength ());
+		return copy (src, src.getLength ());
 	}
 
 	size_t
-	Copy (const CString3& Src)
+	copy (const CString3& src)
 	{
-		return Copy (Src, Src.GetLength ());
+		return copy (src, src.getLength ());
 	}
 
 	size_t
-	Copy (
+	copy (
 		const C* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
-		if (p == m_p && Length == -1)
-			return GetLength ();
+		if (p == m_p && length == -1)
+			return getLength ();
 
 		if (!p)
 		{
-			Clear ();
+			clear ();
 			return 0;
 		}
 
-		if (Length == -1)
-			Length = CDetails::CalcLength (p);
+		if (length == -1)
+			length = CDetails::calcLength (p);
 
-		if (!SetLength (Length, false))
+		if (!setLength (length, false))
 			return -1;
 
 		if (p != m_p)
-			CDetails::Copy (m_p, p, Length);
+			CDetails::copy (m_p, p, length);
 
-		return Length;
+		return length;
 	}
 
 	size_t
-	Copy (
+	copy (
 		const C2* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
 		if (!p)
 		{
-			Clear ();
+			clear ();
 			return 0;
 		}
 
-		if (Length == -1)
-			Length = CDetails2::CalcLength (p);
+		if (length == -1)
+			length = CDetails2::calcLength (p);
 
-		size_t NewLength = CUtfConvertT <CEncoding, CEncoding2>::CalcRequiredLength (p, Length);
-		if (NewLength == -1)
+		size_t newLength = CUtfConvertT <CEncoding, CEncoding2>::calcRequiredLength (p, length);
+		if (newLength == -1)
 			return -1;
 
-		if (!SetLength (NewLength, false))
+		if (!setLength (newLength, false))
 			return -1;
 
-		CUtfConvertT <CEncoding, CEncoding2>::Convert (m_p, NewLength, p, Length);
-		return Length;
+		CUtfConvertT <CEncoding, CEncoding2>::convert (m_p, newLength, p, length);
+		return length;
 	}
 
 	size_t
-	Copy (
+	copy (
 		const C3* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
 		if (!p)
 		{
-			Clear ();
+			clear ();
 			return 0;
 		}
 
-		if (Length == -1)
-			Length = CDetails3::CalcLength (p);
+		if (length == -1)
+			length = CDetails3::calcLength (p);
 
-		size_t NewLength = CUtfConvertT <CEncoding, CEncoding3>::CalcRequiredLength (p, Length);
-		if (NewLength == -1)
+		size_t newLength = CUtfConvertT <CEncoding, CEncoding3>::calcRequiredLength (p, length);
+		if (newLength == -1)
 			return -1;
 
-		if (!SetLength (NewLength, false))
+		if (!setLength (newLength, false))
 			return -1;
 
-		CUtfConvertT <CEncoding, CEncoding3>::Convert (m_p, NewLength, p, Length);
-		return Length;
+		CUtfConvertT <CEncoding, CEncoding3>::convert (m_p, newLength, p, length);
+		return length;
 	}
 
 	size_t
-	Copy (
+	copy (
 		utf32_t x,
-		size_t Count = 1
+		size_t count = 1
 		)
 	{
-		if (!Count)
+		if (!count)
 		{
-			Clear ();
+			clear ();
 			return 0;
 		}
 
-		size_t CodePointLength = CEncoding::GetEncodeCodePointLength (x);
-		if (CodePointLength == -1)
+		size_t codePointLength = CEncoding::getEncodeCodePointLength (x);
+		if (codePointLength == -1)
 			return -1;
 
-		ASSERT (CodePointLength <= 4);
+		ASSERT (codePointLength <= 4);
 
-		if (!SetLength (Count * CodePointLength, false))
+		if (!setLength (count * codePointLength, false))
 			return -1;
 
-		C Pattern [sizeof (utf32_t) / sizeof (C)];
-		CEncoding::EncodeCodePoint (Pattern, x);
-		FillWithPattern (m_p, Pattern, CodePointLength, Count);
-		return Count;
+		C pattern [sizeof (utf32_t) / sizeof (C)];
+		CEncoding::encodeCodePoint (pattern, x);
+		fillWithPattern (m_p, pattern, codePointLength, count);
+		return count;
 	}
 
 
 	size_t
-	Append (const CStringT& Src)
+	append (const CStringT& src)
 	{
-		return IsEmpty () ? Copy (Src) : Append (Src, Src.GetLength ());
+		return isEmpty () ? copy (src) : append (src, src.getLength ());
 	}
 
 	size_t
-	Append (const CString2& Src)
+	append (const CString2& src)
 	{
-		return Append (Src, Src.GetLength ());
+		return append (src, src.getLength ());
 	}
 
 	size_t
-	Append (const CString3& Src)
+	append (const CString3& src)
 	{
-		return Append (Src, Src.GetLength ());
+		return append (src, src.getLength ());
 	}
 
 	size_t
-	Append (
+	append (
 		const C* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
-		size_t OldLength = GetLength ();
+		size_t oldLength = getLength ();
 
 		if (!p)
-			return OldLength;
+			return oldLength;
 
-		if (Length == -1)
-			Length = CDetails::CalcLength (p);
+		if (length == -1)
+			length = CDetails::calcLength (p);
 
-		if (Length == 0)
-			return OldLength;
+		if (length == 0)
+			return oldLength;
 
-		size_t NewLength = OldLength + Length;
-		if (!SetLength (NewLength, true))
+		size_t newLength = oldLength + length;
+		if (!setLength (newLength, true))
 			return -1;
 
-		CDetails::Copy (m_p + OldLength, p, Length);
-		return NewLength;
+		CDetails::copy (m_p + oldLength, p, length);
+		return newLength;
 	}
 
 	size_t
-	Append (
+	append (
 		const C2* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
-		size_t OldLength = GetLength ();
+		size_t oldLength = getLength ();
 
 		if (!p)
-			return OldLength;
+			return oldLength;
 
-		if (Length == -1)
-			Length = CDetails2::CalcLength (p);
+		if (length == -1)
+			length = CDetails2::calcLength (p);
 
-		if (Length == 0)
-			return OldLength;
+		if (length == 0)
+			return oldLength;
 
-		size_t AppendLength = CUtfConvertT <CEncoding, CEncoding2>::CalcRequiredLength (p, Length);
-		if (AppendLength == -1)
+		size_t appendLength = CUtfConvertT <CEncoding, CEncoding2>::calcRequiredLength (p, length);
+		if (appendLength == -1)
 			return -1;
 
-		size_t NewLength = OldLength + AppendLength;
-		if (!SetLength (NewLength, true))
+		size_t newLength = oldLength + appendLength;
+		if (!setLength (newLength, true))
 			return -1;
 
-		CUtfConvertT <CEncoding, CEncoding2>::Convert (m_p + OldLength, AppendLength, p, Length);
-		return NewLength;
+		CUtfConvertT <CEncoding, CEncoding2>::convert (m_p + oldLength, appendLength, p, length);
+		return newLength;
 	}
 
 	size_t
-	Append (
+	append (
 		const C3* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
-		size_t OldLength = GetLength ();
+		size_t oldLength = getLength ();
 
 		if (!p)
-			return OldLength;
+			return oldLength;
 
-		if (Length == -1)
-			Length = CDetails3::CalcLength (p);
+		if (length == -1)
+			length = CDetails3::calcLength (p);
 
-		if (Length == 0)
-			return OldLength;
+		if (length == 0)
+			return oldLength;
 
-		size_t AppendLength = CUtfConvertT <CEncoding, CEncoding3>::CalcRequiredLength (p, Length);
-		if (AppendLength == -1)
+		size_t appendLength = CUtfConvertT <CEncoding, CEncoding3>::calcRequiredLength (p, length);
+		if (appendLength == -1)
 			return -1;
 
-		size_t NewLength = OldLength + AppendLength;
-		if (!SetLength (NewLength, true))
+		size_t newLength = oldLength + appendLength;
+		if (!setLength (newLength, true))
 			return -1;
 
-		CUtfConvertT <CEncoding, CEncoding3>::Convert (m_p + OldLength, AppendLength, p, Length);
-		return NewLength;
+		CUtfConvertT <CEncoding, CEncoding3>::convert (m_p + oldLength, appendLength, p, length);
+		return newLength;
 	}
 
 	size_t
-	Append (
+	append (
 		utf32_t x,
-		size_t Count = 1
+		size_t count = 1
 		)
 	{
-		size_t OldLength = GetLength ();
+		size_t oldLength = getLength ();
 
-		if (Count == 0)
-			return OldLength;
+		if (count == 0)
+			return oldLength;
 
-		size_t CodePointLength = CEncoding::GetEncodeCodePointLength (x);
-		if (CodePointLength == -1)
+		size_t codePointLength = CEncoding::getEncodeCodePointLength (x);
+		if (codePointLength == -1)
 			return -1;
 
-		ASSERT (CodePointLength <= 4);
+		ASSERT (codePointLength <= 4);
 
-		size_t NewLength = OldLength + Count * CodePointLength;
-		if (!SetLength (NewLength, true))
+		size_t newLength = oldLength + count * codePointLength;
+		if (!setLength (newLength, true))
 			return -1;
 
-		C Pattern [sizeof (utf32_t) / sizeof (C)];
-		CEncoding::EncodeCodePoint (Pattern, x);
-		FillWithPattern (m_p + OldLength, Pattern, CodePointLength, Count);
-		return NewLength;
+		C pattern [sizeof (utf32_t) / sizeof (C)];
+		CEncoding::encodeCodePoint (pattern, x);
+		fillWithPattern (m_p + oldLength, pattern, codePointLength, count);
+		return newLength;
 	}
 
 	size_t
-	AppendNewLine ()
+	appendNewLine ()
 	{
 #if (_AXL_ENV == AXL_ENV_WIN)
-		return Append (CDetails::GetCrLf (), 2);
+		return append (CDetails::getCrLf (), 2);
 #else
-		return Append ('\n');
+		return append ('\n');
 #endif
 	}
 
 	size_t
-	Format_va (
-		const C* pFormat,
+	format_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		size_t Length = CDetails::CalcFormatLength_va (pFormat, va);
-		if (!SetLength (Length, false))
+		size_t length = CDetails::calcFormatLength_va (formatString, va);
+		if (!setLength (length, false))
 			return -1;
 
-		CDetails::Format_va (m_p, Length + 1, pFormat, va);
-		return Length;
+		CDetails::format_va (m_p, length + 1, formatString, va);
+		return length;
 	}
 
 	size_t
-	Format (
-		const C* pFormat,
+	format (
+		const C* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return Format_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return format_va (formatString, va);
 	}
 
 	size_t
-	AppendFormat_va (
-		const C* pFormat,
+	appendFormat_va (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		size_t AppendLength = CDetails::CalcFormatLength_va (pFormat, va);
-		size_t OldLength = GetLength ();
-		size_t NewLength = OldLength + AppendLength;
-		if (!SetLength (NewLength, true))
+		size_t appendLength = CDetails::calcFormatLength_va (formatString, va);
+		size_t oldLength = getLength ();
+		size_t newLength = oldLength + appendLength;
+		if (!setLength (newLength, true))
 			return -1;
 
-		CDetails::Format_va (m_p + OldLength, AppendLength + 1, pFormat, va);
-		return NewLength;
+		CDetails::format_va (m_p + oldLength, appendLength + 1, formatString, va);
+		return newLength;
 	}
 
 	size_t
-	AppendFormat (
-		const C* pFormat,
+	appendFormat (
+		const C* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return AppendFormat_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return appendFormat_va (formatString, va);
 	}
 
 	static
 	CStringT
-	Format_sva (
-		const C* pFormat,
+	format_sva (
+		const C* formatString,
 		axl_va_list va
 		)
 	{
-		CStringT Result;
-		Result.Format_va (pFormat, va);
-		return Result;
+		CStringT result;
+		result.format_va (formatString, va);
+		return result;
 	}
 
 	static
 	CStringT
-	Format_s (
-		const C* pFormat,
+	format_s (
+		const C* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return Format_sva (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return format_sva (formatString, va);
 	}
 
 	size_t
-	ReduceLength (size_t Delta)
+	reduceLength (size_t delta)
 	{
-		size_t Length = GetLength ();
-		if (Length <= Delta)
+		size_t length = getLength ();
+		if (length <= delta)
 		{
-			Clear ();
+			clear ();
 			return 0;
 		}
 
-		Length -= Delta;
-		SetLength (Length, true);
-		return Length;
+		length -= delta;
+		setLength (length, true);
+		return length;
 	}
 
 	C*
-	GetBuffer ()
+	getBuffer ()
 	{
-		return EnsureExclusive () ? m_p : NULL;
+		return ensureExclusive () ? m_p : NULL;
 	}
 
 	C*
-	GetBuffer (
-		size_t Length,
-		bool SaveContents = false
+	getBuffer (
+		size_t length,
+		bool saveContents = false
 		)
 	{
-		return SetLength (Length, SaveContents) ? m_p : NULL;
+		return setLength (length, saveContents) ? m_p : NULL;
 	}
 
 	C*
-	Reserve (
-		size_t Length,
-		bool SaveContents = false
+	reserve (
+		size_t length,
+		bool saveContents = false
 		)
 	{
-		size_t OldLength = GetLength ();
+		size_t oldLength = getLength ();
 
-		if (!SetLength (Length, SaveContents))
+		if (!setLength (length, saveContents))
 			return NULL;
 
-		SetLength (OldLength, SaveContents);
+		setLength (oldLength, saveContents);
 		return m_p;
 	}
 
 	size_t
-	UpdateLength ()
+	updateLength ()
 	{
 		if (!m_p)
 			return 0;
 
-		CHdr* pHdr = GetHdr ();
-		pHdr->m_Length = CDetails::CalcLength (m_p);
-		return pHdr->m_Length;
+		CHdr* hdr = getHdr ();
+		hdr->m_length = CDetails::calcLength (m_p);
+		return hdr->m_length;
 	}
 
 	bool
-	EnsureExclusive ()
+	ensureExclusive ()
 	{
-		return m_p ? SetLength (GetLength (), true) : true;
+		return m_p ? setLength (getLength (), true) : true;
 	}
 
 	void
-	SetBuffer (
-		ref::EBuf Kind,
+	setBuffer (
+		ref::EBuf kind,
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		ASSERT (Size >= sizeof (CHdr) + sizeof (C));
+		ASSERT (size >= sizeof (CHdr) + sizeof (C));
 
-		CHdr* pOldHdr = GetHdr ();
+		CHdr* oldHdr = getHdr ();
 
-		mem::FFree* pfFree = Kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
-		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
-		NewHdr->m_Length = 0;
-		NewHdr->m_MaxLength = (Size - sizeof (CHdr)) / sizeof (C) - 1;
+		mem::FFree* pfFree = kind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
+		ref::CPtrT <CHdr> newHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
+		newHdr->m_length = 0;
+		newHdr->m_maxLength = (size - sizeof (CHdr)) / sizeof (C) - 1;
 
-		if (pOldHdr)
-			pOldHdr->Release ();
+		if (oldHdr)
+			oldHdr->release ();
 
-		m_p = (T*) (NewHdr + 1);
+		m_p = (T*) (newHdr + 1);
 		m_p [0] = 0;
 
-		NewHdr.Detach ();
+		newHdr.detach ();
 	}
 
 protected:
 	CHdr*
-	GetHdr () const
+	getHdr () const
 	{
 		return m_p ? (CHdr*) m_p - 1 : NULL;
 	}
 
 	bool
-	SetLength (
-		size_t Length,
-		bool SaveContents
+	setLength (
+		size_t length,
+		bool saveContents
 		)
 	{
-		CHdr* pOldHdr = GetHdr ();
+		CHdr* oldHdr = getHdr ();
 
-		if (pOldHdr &&
-			pOldHdr->m_MaxLength >= Length &&
-			pOldHdr->GetRefCount () == 1)
+		if (oldHdr &&
+			oldHdr->m_maxLength >= length &&
+			oldHdr->getRefCount () == 1)
 		{
-			pOldHdr->m_Length = Length;
-			m_p [Length] = 0;
+			oldHdr->m_length = length;
+			m_p [length] = 0;
 			return true;
 		}
 
-		if (Length == 0)
+		if (length == 0)
 		{
-			Release ();
+			release ();
 			return true;
 		}
 
-		size_t MaxLength = rtl::GetMinPower2Gt (Length) - 1;
-		ASSERT (MaxLength >= Length);
+		size_t maxLength = rtl::getMinPower2Gt (length) - 1;
+		ASSERT (maxLength >= length);
 
-		size_t Size = (MaxLength + 1) * sizeof (C);
-		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_EXTRA (CHdr, Size);
-		if (!NewHdr)
+		size_t size = (maxLength + 1) * sizeof (C);
+		ref::CPtrT <CHdr> newHdr = AXL_REF_NEW_EXTRA (CHdr, size);
+		if (!newHdr)
 			return false;
 
-		NewHdr->m_Length = Length;
-		NewHdr->m_MaxLength = MaxLength;
+		newHdr->m_length = length;
+		newHdr->m_maxLength = maxLength;
 
-		C* p = (C*) (NewHdr + 1);
-		p [0] = p [Length] = 0;
+		C* p = (C*) (newHdr + 1);
+		p [0] = p [length] = 0;
 
-		if (SaveContents && m_p)
+		if (saveContents && m_p)
 		{
-			size_t CopyLength = AXL_MIN (Length, pOldHdr->m_Length);
-			CDetails::Copy (p, m_p, CopyLength + 1);
+			size_t copyLength = AXL_MIN (length, oldHdr->m_length);
+			CDetails::copy (p, m_p, copyLength + 1);
 		}
 
-		if (pOldHdr)
-			pOldHdr->Release ();
+		if (oldHdr)
+			oldHdr->release ();
 
 		m_p = p;
 
-		NewHdr.Detach ();
+		newHdr.detach ();
 		return true;
 	}
 
 	static
 	void
-	FillWithPattern (
+	fillWithPattern (
 		C* p,
-		const C* pPattern,
-		size_t PatternLength,
-		size_t Count
+		const C* pattern,
+		size_t patternLength,
+		size_t count
 		)
 	{
-		if (PatternLength == 1)
+		if (patternLength == 1)
 		{
-			CDetails::Fill (p, *pPattern, Count);
+			CDetails::fill (p, *pattern, count);
 			return;
 		}
 
-		C* pEnd = p + Count * PatternLength;
+		C* end = p + count * patternLength;
 
-		for (; p < pEnd; p += PatternLength)
-			CDetails::Copy (p, pPattern, PatternLength);
+		for (; p < end; p += patternLength)
+			CDetails::copy (p, pattern, patternLength);
 	}
 };
 
@@ -1249,23 +1249,23 @@ typedef CStringT <utf32_t> CString_utf32;
 
 inline
 CString
-FormatString_va (
-	const char* pFormat,
+formatString_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	return CString::Format_sva (pFormat, va);
+	return CString::format_sva (formatString, va);
 }
 
 inline
 CString
-FormatString (
-	const char* pFormat,
+formatString (
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return CString::Format_sva (pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	return CString::format_sva (formatString, va);
 }
 
 //.............................................................................

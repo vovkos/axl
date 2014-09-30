@@ -17,124 +17,124 @@ namespace psx {
 class CThreadAttr
 {
 protected:
-	pthread_attr_t m_Attr;
+	pthread_attr_t m_attr;
 	
 public:
 	CThreadAttr ()
 	{
-		pthread_attr_init (&m_Attr);
+		pthread_attr_init (&m_attr);
 	}
 
 	~CThreadAttr ()
 	{
-		pthread_attr_destroy (&m_Attr);
+		pthread_attr_destroy (&m_attr);
 	}
 		
 	operator const pthread_attr_t* () const
 	{
-		return &m_Attr;
+		return &m_attr;
 	}
 
 	operator pthread_attr_t* ()
 	{
-		return &m_Attr;
+		return &m_attr;
 	}
 	
 	cpu_set_t
-	GetAffinity () const
+	getAffinity () const
 	{
-		cpu_set_t CpuSet = { 0 };
-		pthread_attr_getaffinity_np (&m_Attr, sizeof (cpu_set_t), &CpuSet);
-		return CpuSet;
+		cpu_set_t cpuSet = { 0 };
+		pthread_attr_getaffinity_np (&m_attr, sizeof (cpu_set_t), &cpuSet);
+		return cpuSet;
 	}
 	
 	bool
-	SetAffinity (cpu_set_t CpuSet)
+	setAffinity (cpu_set_t cpuSet)
 	{
-		int Result = pthread_attr_setaffinity_np (&m_Attr, sizeof (cpu_set_t), &CpuSet);
-		return Result == 0 ? true : err::Fail (Result);		
+		int result = pthread_attr_setaffinity_np (&m_attr, sizeof (cpu_set_t), &cpuSet);
+		return result == 0 ? true : err::fail (result);		
 	}
 	
 	size_t 
-	GetStackSize () const
+	getStackSize () const
 	{
-		size_t Size = -1;
-		pthread_attr_getstacksize (&m_Attr, &Size);
-		return Size;
+		size_t size = -1;
+		pthread_attr_getstacksize (&m_attr, &size);
+		return size;
 	}
 
 	bool
-	SetStackSize (size_t Size)
+	setStackSize (size_t size)
 	{
-		int Result = pthread_attr_setstacksize (&m_Attr, Size);
-		return Result == 0 ? true : err::Fail (Result);		
+		int result = pthread_attr_setstacksize (&m_attr, size);
+		return result == 0 ? true : err::fail (result);		
 	}
 };
 
 //.............................................................................
 
-typedef void* (FThreadProc) (void* pContext);
+typedef void* (FThreadProc) (void* context);
 
 //.............................................................................
 
 class CThread
 {
 protected:
-	pthread_t m_ThreadId;
-	bool m_IsOpen;
+	pthread_t m_threadId;
+	bool m_isOpen;
 	
 public:
 	CThread ()
 	{
-		m_IsOpen = false;
+		m_isOpen = false;
 	}
 	
 	~CThread ()
 	{
-		Detach ();
+		detach ();
 	}
 	
 	operator pthread_t ()
 	{
-		return m_ThreadId;
+		return m_threadId;
 	}
 	
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_IsOpen;
+		return m_isOpen;
 	}
 	
 	bool 
-	Create (
-		const pthread_attr_t* pAttr,
+	create (
+		const pthread_attr_t* attr,
 		FThreadProc pfThreadProc,
-		void* pContext = NULL
+		void* context = NULL
 		);
 
 	bool 
-	Create (
+	create (
 		FThreadProc pfThreadProc,
-		void* pContext = NULL
+		void* context = NULL
 		)
 	{
-		return Create (NULL, pfThreadProc, pContext);
+		return create (NULL, pfThreadProc, context);
 	}
 
 	bool
-	Join (
-		uint_t Timeout,
-		void** ppRetVal = NULL
+	join (
+		uint_t timeout,
+		void** retVal = NULL
 		);
 		
 	bool
-	Join (void** ppRetVal = NULL)
+	join (void** retVal = NULL)
 	{
-		return Join (-1, ppRetVal);
+		return join (-1, retVal);
 	}
 
 	bool
-	Detach ();
+	detach ();
 };
 
 //.............................................................................

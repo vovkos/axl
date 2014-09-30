@@ -19,273 +19,273 @@ namespace gui {
 class CTextPaint
 {
 protected:
-	CTextAttrAnchorArray m_SelOverlay;
+	CTextAttrAnchorArray m_selOverlay;
 	
 	// for bin-hex / bin-text
 	
-	rtl::CString m_StringBuffer; 
-	rtl::CArrayT <utf32_t> m_BinTextBuffer; 
+	rtl::CString m_stringBuffer; 
+	rtl::CArrayT <utf32_t> m_binTextBuffer; 
 
 	const char* m_p;
-	const char* m_pBegin;
-	const char* m_pEnd;
+	const char* m_begin;
+	const char* m_end;
 	
 	// hyper text
 
-	const TTextAttrAnchor* m_pAttr;
-	const TTextAttrAnchor* m_pAttrBegin;
-	const TTextAttrAnchor* m_pAttrEnd;
+	const TTextAttrAnchor* m_attr;
+	const TTextAttrAnchor* m_attrBegin;
+	const TTextAttrAnchor* m_attrEnd;
 
 public:
-	CCanvas* m_pCanvas;
-	TTextAttr m_SelAttr;
-	uint_t m_HexEncodingFlags;
-	char m_UnprintableChar;
+	CCanvas* m_canvas;
+	TTextAttr m_selAttr;
+	uint_t m_hexEncodingFlags;
+	char m_unprintableChar;
 
-	TPoint m_Point;
-	int m_Top;
-	int m_Bottom;
+	TPoint m_point;
+	int m_top;
+	int m_bottom;
 
 public:
 	CTextPaint ()
 	{
-		Init ();
+		init ();
 	}
 
-	CTextPaint (CCanvas* pCanvas)
+	CTextPaint (CCanvas* canvas)
 	{
-		Init (pCanvas);
+		init (canvas);
 	}
 
 	static inline
 	bool
-	IsPrintable (utf32_t c)
+	isPrintable (utf32_t c)
 	{
 		return c >= 0x20 && iswprint (c);
 	}
 
 	TPoint
-	GetPoint ()
+	getPoint ()
 	{
-		return m_Point;
+		return m_point;
 	}
 
 	// space
 
 	int
-	PaintSpace (
-		size_t Length,
-		uint_t Color
+	paintSpace (
+		size_t length,
+		uint_t color
 		);
 
 	int
-	PaintSpace (size_t Length)
+	paintSpace (size_t length)
 	{
-		return PaintSpace (Length, m_pCanvas->m_DefTextAttr.m_BackColor);
+		return paintSpace (length, m_canvas->m_defTextAttr.m_backColor);
 	}
 
 	int
-	PaintSpace_p (
-		int Width, // in pixels
-		uint_t Color
+	paintSpace_p (
+		int width, // in pixels
+		uint_t color
 		); 
 
 	int
-	PaintSpace_p (int Width) // in pixels
+	paintSpace_p (int width) // in pixels
 	{
-		return PaintSpace_p (Width, m_pCanvas->m_DefTextAttr.m_BackColor);
+		return paintSpace_p (width, m_canvas->m_defTextAttr.m_backColor);
 	}
 
 	// text
 
 	int
-	PaintText (const rtl::CString& Text)
+	paintText (const rtl::CString& text)
 	{
-		return PaintText_utf8 (Text, Text.GetLength ());
+		return paintText_utf8 (text, text.getLength ());
 	}
 
 	int
-	PaintText (
-		const char* pText, 
-		size_t Length = -1
+	paintText (
+		const char* text, 
+		size_t length = -1
 		)
 	{
-		return PaintText_utf8 (pText, Length);
+		return paintText_utf8 (text, length);
 	}
 
 	int
-	PaintText_utf8 (
-		const utf8_t* pText, 
-		size_t Length = -1
+	paintText_utf8 (
+		const utf8_t* text, 
+		size_t length = -1
 		);
 
 	int
-	PaintText_utf32 (
-		const utf32_t* pText, 
-		size_t Length = -1
+	paintText_utf32 (
+		const utf32_t* text, 
+		size_t length = -1
 		);
 
 	// hypertext
 
 	int
-	PaintHyperText (
-		const CTextAttrAnchorArray* pAttrArray,
-		const rtl::CString& Text
+	paintHyperText (
+		const CTextAttrAnchorArray* attrArray,
+		const rtl::CString& text
 		)
 	{
-		return PaintHyperText_utf8 (pAttrArray, Text, Text.GetLength ());
+		return paintHyperText_utf8 (attrArray, text, text.getLength ());
 	}
 
 	int
-	PaintHyperText (
-		const CTextAttrAnchorArray* pAttrArray,
-		const char* pText, 
-		size_t Length = -1
+	paintHyperText (
+		const CTextAttrAnchorArray* attrArray,
+		const char* text, 
+		size_t length = -1
 		)
 	{
-		return PaintHyperText_utf8 (pAttrArray, pText, Length);
+		return paintHyperText_utf8 (attrArray, text, length);
 	}
 
 	int
-	PaintHyperText_utf8 (
-		const CTextAttrAnchorArray* pAttrArray,
-		const utf8_t* pText, 
-		size_t Length = -1
+	paintHyperText_utf8 (
+		const CTextAttrAnchorArray* attrArray,
+		const utf8_t* text, 
+		size_t length = -1
 		);
 
 	int
-	PaintHyperText_utf32 (
-		const CTextAttrAnchorArray* pAttrArray,
-		const utf32_t* pText, 
-		size_t Length = -1
+	paintHyperText_utf32 (
+		const CTextAttrAnchorArray* attrArray,
+		const utf32_t* text, 
+		size_t length = -1
 		);
 
 	// hypertext with selection
 
 	int
-	PaintSelHyperText (
-		const CTextAttrAnchorArray* pAttrArray, 
-		size_t SelStart, 
-		size_t SelEnd, 
-		const rtl::CString& Text
+	paintSelHyperText (
+		const CTextAttrAnchorArray* attrArray, 
+		size_t selStart, 
+		size_t selEnd, 
+		const rtl::CString& text
 		)
 	{
-		return PaintSelHyperText_utf8 (pAttrArray, SelStart, SelEnd, Text, Text.GetLength ());
+		return paintSelHyperText_utf8 (attrArray, selStart, selEnd, text, text.getLength ());
 	}
 
 	int
-	PaintSelHyperText_utf8 (
-		const CTextAttrAnchorArray* pAttrArray, 
-		size_t SelStart, 
-		size_t SelEnd, 
-		const utf8_t* pText, 
-		size_t Length = -1
+	paintSelHyperText_utf8 (
+		const CTextAttrAnchorArray* attrArray, 
+		size_t selStart, 
+		size_t selEnd, 
+		const utf8_t* text, 
+		size_t length = -1
 		);
 
 	int
-	PaintSelHyperText_utf32 (
-		const CTextAttrAnchorArray* pAttrArray, 
-		size_t SelStart, 
-		size_t SelEnd, 
-		const utf32_t* pText, 
-		size_t Length = -1
+	paintSelHyperText_utf32 (
+		const CTextAttrAnchorArray* attrArray, 
+		size_t selStart, 
+		size_t selEnd, 
+		const utf32_t* text, 
+		size_t length = -1
 		);
 
 	// bin hex
 
 	int
-	PaintBinHex (
+	paintBinHex (
 		const void* p,	
-		size_t Size
+		size_t size
 		);
 
 	int
-	PaintHyperBinHex (
-		const CTextAttrAnchorArray* pAttrArray,
+	paintHyperBinHex (
+		const CTextAttrAnchorArray* attrArray,
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	int
-	PaintSelHyperBinHex (
-		const CTextAttrAnchorArray* pAttrArray, 
-		size_t SelStart, 
-		size_t SelEnd, 
+	paintSelHyperBinHex (
+		const CTextAttrAnchorArray* attrArray, 
+		size_t selStart, 
+		size_t selEnd, 
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	int
-	PaintHyperBinHex4BitCursor (
-		const CTextAttrAnchorArray* pAttrArray, 
-		size_t CursorPos, 
+	paintHyperBinHex4BitCursor (
+		const CTextAttrAnchorArray* attrArray, 
+		size_t cursorPos, 
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	// bin text
 
 	int
-	PaintBinText (
-		rtl::CCharCodec* pCodec,
+	paintBinText (
+		rtl::CCharCodec* codec,
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 	int
-	PaintHyperBinText (
-		rtl::CCharCodec* pCodec,
-		const CTextAttrAnchorArray* pAttrArray,
+	paintHyperBinText (
+		rtl::CCharCodec* codec,
+		const CTextAttrAnchorArray* attrArray,
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 
 	int
-	PaintSelHyperBinText (
-		rtl::CCharCodec* pCodec,
-		const CTextAttrAnchorArray* pAttrArray, 
-		size_t SelStart, 
-		size_t SelEnd, 
+	paintSelHyperBinText (
+		rtl::CCharCodec* codec,
+		const CTextAttrAnchorArray* attrArray, 
+		size_t selStart, 
+		size_t selEnd, 
 		const void* p, 
-		size_t Size
+		size_t size
 		);
 
 protected:
 	void
-	Init (CCanvas* pCanvas = NULL);
+	init (CCanvas* canvas = NULL);
 
 	TRect
-	CalcTextRect_utf8 (
-		const utf8_t* pText,
-		size_t Length = -1
+	calcTextRect_utf8 (
+		const utf8_t* text,
+		size_t length = -1
 		);
 
 	TRect
-	CalcTextRect_utf32 (
-		const utf32_t* pText,
-		size_t Length = -1
+	calcTextRect_utf32 (
+		const utf32_t* text,
+		size_t length = -1
 		);
 
 	TRect
-	CalcTextRect (utf32_t Char)
+	calcTextRect (utf32_t c)
 	{
-		return CalcTextRect_utf32 (&Char, 1);
+		return calcTextRect_utf32 (&c, 1);
 	}
 
 	int
-	PaintTextPart_utf8 (size_t Length);
+	paintTextPart_utf8 (size_t length);
 
 	int
-	PaintTextPart_utf32 (size_t Length);
+	paintTextPart_utf32 (size_t length);
 
 	int
-	PaintBinHexPart (size_t Size);
+	paintBinHexPart (size_t size);
 
 	int
-	PaintBinTextPart (
-		rtl::CCharCodec* pCodec,
-		size_t Size
+	paintBinTextPart (
+		rtl::CCharCodec* codec,
+		size_t size
 		);
 };
 

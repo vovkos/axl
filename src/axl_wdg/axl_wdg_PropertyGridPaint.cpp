@@ -8,51 +8,51 @@ AXL_API
 axl_win_TPropertyCtrl_CreatePlusMinusImageList(
 	ulong_t cx, 
 	ulong_t cy,
-	COLORREF* pPalette
+	COLORREF* palette
 	)
 {
 	HIMAGELIST hImageList;
 
-	POINT Center =  { cx / 2, cy / 2 };
+	POINT center =  { cx / 2, cy / 2 };
 
-	RECT Rect      = { 0, 0, cx, cy };
-	RECT RectInner = { 1, 1, cx - 1, cy - 1 };
-	RECT RectMinus = { 2, Center.y, cx - 2, Center.y + 1 };
-	RECT RectPlus  = { Center.x, 2, Center.x + 1, cy - 2 };
+	RECT rect      = { 0, 0, cx, cy };
+	RECT rectInner = { 1, 1, cx - 1, cy - 1 };
+	RECT rectMinus = { 2, center.y, cx - 2, center.y + 1 };
+	RECT rectPlus  = { center.x, 2, center.x + 1, cy - 2 };
 
-	HDC hWindowDC = GetDC(NULL);
-	HDC hdc = CreateCompatibleDC(hWindowDC);
-	HBITMAP hBitmap = CreateCompatibleBitmap(hWindowDC, cx, cy);
-	HBITMAP hOldBitmap = SelectObject(hdc, hBitmap);
-	ReleaseDC(NULL, hWindowDC);
+	HDC hWindowDC = getDC(NULL);
+	HDC hdc = createCompatibleDC(hWindowDC);
+	HBITMAP hBitmap = createCompatibleBitmap(hWindowDC, cx, cy);
+	HBITMAP hOldBitmap = selectObject(hdc, hBitmap);
+	releaseDC(NULL, hWindowDC);
 
-	hImageList = ImageList_Create(cx, cy, ILC_COLORDDB | ILC_MASK, 0, 1);
-	ImageList_SetBkColor(hImageList, CLR_NONE);
+	hImageList = imageList_Create(cx, cy, ILC_COLORDDB | ILC_MASK, 0, 1);
+	imageList_SetBkColor(hImageList, CLR_NONE);
 
 	// minus
 
-	axl_gr_FastRectangleEx(hdc, &Rect,      pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusRect)]);
-	axl_gr_FastRectangleEx(hdc, &RectInner, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusBack)]);
-	axl_gr_FastRectangleEx(hdc, &RectMinus, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinus)]);
+	axl_gr_FastRectangleEx(hdc, &rect,      palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusRect)]);
+	axl_gr_FastRectangleEx(hdc, &rectInner, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusBack)]);
+	axl_gr_FastRectangleEx(hdc, &rectMinus, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinus)]);
 
-	SelectObject(hdc, hOldBitmap);
-	ImageList_AddMasked(hImageList, hBitmap, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
-	SelectObject(hdc, hBitmap);
+	selectObject(hdc, hOldBitmap);
+	imageList_AddMasked(hImageList, hBitmap, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
+	selectObject(hdc, hBitmap);
 
 	// plus
 
-	axl_gr_FastRectangleEx(hdc, &Rect,      pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusRect)]);
-	axl_gr_FastRectangleEx(hdc, &RectInner, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusBack)]);
-	axl_gr_FastRectangleEx(hdc, &RectMinus, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinus)]);
-	axl_gr_FastRectangleEx(hdc, &RectPlus,  pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinus)]);
+	axl_gr_FastRectangleEx(hdc, &rect,      palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusRect)]);
+	axl_gr_FastRectangleEx(hdc, &rectInner, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinusBack)]);
+	axl_gr_FastRectangleEx(hdc, &rectMinus, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinus)]);
+	axl_gr_FastRectangleEx(hdc, &rectPlus,  palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_PlusMinus)]);
 
-	SelectObject(hdc, hOldBitmap);
-	ImageList_AddMasked(hImageList, hBitmap, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
-	SelectObject(hdc, hBitmap);
+	selectObject(hdc, hOldBitmap);
+	imageList_AddMasked(hImageList, hBitmap, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
+	selectObject(hdc, hBitmap);
 
-	SelectObject(hdc, hOldBitmap);
-	DeleteDC(hdc);
-	DeleteObject(hBitmap);
+	selectObject(hdc, hOldBitmap);
+	deleteDC(hdc);
+	deleteObject(hBitmap);
 
 	return hImageList;
 }
@@ -62,55 +62,55 @@ AXL_API
 axl_win_TPropertyCtrl_CreateGridImageList(
 	ulong_t cx, 
 	ulong_t cy,
-	COLORREF* pPalette
+	COLORREF* palette
 	)
 {
 	HIMAGELIST hImageList;
 
-	POINT Center =  { (cx / 2 - 1) | 1, (cy / 2 - 1) | 1 }; // center must be odd
+	POINT center =  { (cx / 2 - 1) | 1, (cy / 2 - 1) | 1 }; // center must be odd
 
 	RECT _GridLines[] = 
 	{
 		{ 1, 0, cx, 0 },                // H
 		{ 0, 1, 0, cy },                // V
-		{ Center.x, 1, cx, cy },        // T
-		{ Center.x, 1, cx, Center.y },  // L
+		{ center.x, 1, cx, cy },        // T
+		{ center.x, 1, cx, center.y },  // L
 	};
 
 	RECT* p = _GridLines;
-	RECT* pEnd = p + sizeof(_GridLines) / sizeof(RECT);
+	RECT* end = p + sizeof(_GridLines) / sizeof(RECT);
 
-	RECT Rect = { 0, 0, cx, cy };
+	RECT rect = { 0, 0, cx, cy };
 
-	HDC hWindowDC = GetDC(NULL);
-	HDC hdc = CreateCompatibleDC(hWindowDC);
-	HBITMAP hBitmap = CreateCompatibleBitmap(hWindowDC, cx, cy);
-	HBITMAP hOldBitmap = SelectObject(hdc, hBitmap);
-	ReleaseDC(NULL, hWindowDC);
+	HDC hWindowDC = getDC(NULL);
+	HDC hdc = createCompatibleDC(hWindowDC);
+	HBITMAP hBitmap = createCompatibleBitmap(hWindowDC, cx, cy);
+	HBITMAP hOldBitmap = selectObject(hdc, hBitmap);
+	releaseDC(NULL, hWindowDC);
 
-	hImageList = ImageList_Create(cx, cy, ILC_COLORDDB | ILC_MASK, 0, 1);
-	ImageList_SetBkColor(hImageList, CLR_NONE);
+	hImageList = imageList_Create(cx, cy, ILC_COLORDDB | ILC_MASK, 0, 1);
+	imageList_SetBkColor(hImageList, CLR_NONE);
 
-	for (; p < pEnd; p++)
+	for (; p < end; p++)
 	{
 		int i;
 
-		axl_gr_FastRectangleEx(hdc, &Rect, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
+		axl_gr_FastRectangleEx(hdc, &rect, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
 
 		for (i = p->top; i < p->bottom; i += 2)
-			SetPixel(hdc, Center.x, i, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Grid)]);
+			setPixel(hdc, center.x, i, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Grid)]);
 		
 		for (i = p->left; i < p->right; i += 2)
-			SetPixel(hdc, i, Center.y, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Grid)]);
+			setPixel(hdc, i, center.y, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Grid)]);
 
-		SelectObject(hdc, hOldBitmap);
-		ImageList_AddMasked(hImageList, hBitmap, pPalette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
-		SelectObject(hdc, hBitmap);
+		selectObject(hdc, hOldBitmap);
+		imageList_AddMasked(hImageList, hBitmap, palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Unused)]);
+		selectObject(hdc, hBitmap);
 	}
 
-	SelectObject(hdc, hOldBitmap);
-	DeleteDC(hdc);
-	DeleteObject(hBitmap);
+	selectObject(hdc, hOldBitmap);
+	deleteDC(hdc);
+	deleteObject(hBitmap);
 
 	return hImageList;
 }
@@ -118,23 +118,23 @@ axl_win_TPropertyCtrl_CreateGridImageList(
 static
 HBITMAP 
 AXL_API
-CreateColorBitmap(
+createColorBitmap(
 	ulong_t cx,
 	ulong_t cy,
-	COLORREF Color
+	COLORREF color
 	)
 {
-	HDC hdcDesktop = GetDC(NULL);
-	HDC hdc = CreateCompatibleDC(hdcDesktop);
-	HBITMAP hBitmap = CreateCompatibleBitmap(hdcDesktop, cx, cy);
-	HBITMAP hOldBitmap = SelectObject(hdc, hBitmap);
-	RECT Rect = { 0, 0, cx, cy };
+	HDC hdcDesktop = getDC(NULL);
+	HDC hdc = createCompatibleDC(hdcDesktop);
+	HBITMAP hBitmap = createCompatibleBitmap(hdcDesktop, cx, cy);
+	HBITMAP hOldBitmap = selectObject(hdc, hBitmap);
+	RECT rect = { 0, 0, cx, cy };
 
-	axl_gr_FastRectangleEx(hdc, &Rect, Color);
+	axl_gr_FastRectangleEx(hdc, &rect, color);
 
-	SelectObject(hdc, hOldBitmap);
-	DeleteDC(hdc);
-	ReleaseDC(NULL, hdcDesktop);
+	selectObject(hdc, hOldBitmap);
+	deleteDC(hdc);
+	releaseDC(NULL, hdcDesktop);
 	return hBitmap;
 }
 
@@ -143,29 +143,29 @@ HIMAGELIST
 AXL_API
 axl_win_TPropertyCtrl_CreateMenuArrowImageList()
 {
-	COLORREF Colors[] = 
+	COLORREF colors[] = 
 	{
-		GetSysColor(COLOR_WINDOWTEXT),
-		GetSysColor(COLOR_HIGHLIGHTTEXT),
-		GetSysColor(COLOR_GRAYTEXT),
+		getSysColor(COLOR_WINDOWTEXT),
+		getSysColor(COLOR_HIGHLIGHTTEXT),
+		getSysColor(COLOR_GRAYTEXT),
 	};
 
 	size_t i;
 
 	static WORD _Mask[8] = { 0xff, 0xef, 0xe7, 0xe3, 0xe1, 0xe3, 0xe7, 0xef };
-	HBITMAP hMaskBitmap = CreateBitmap(8, 8, 1, 1, _Mask);
+	HBITMAP hMaskBitmap = createBitmap(8, 8, 1, 1, _Mask);
 
-	HIMAGELIST hImageList = ImageList_Create(8, 8, ILC_COLORDDB | ILC_MASK, 0, 1);
-	ImageList_SetBkColor(hImageList, CLR_NONE);
+	HIMAGELIST hImageList = imageList_Create(8, 8, ILC_COLORDDB | ILC_MASK, 0, 1);
+	imageList_SetBkColor(hImageList, CLR_NONE);
 
-	for (i = 0; i < sizeof(Colors) / sizeof(COLORREF); i++)
+	for (i = 0; i < sizeof(colors) / sizeof(COLORREF); i++)
 	{
-		HBITMAP hBitmap = CreateColorBitmap(8, 8, Colors[i]);
-		ImageList_Add(hImageList, hBitmap, hMaskBitmap);
-		DeleteObject(hBitmap);
+		HBITMAP hBitmap = createColorBitmap(8, 8, colors[i]);
+		imageList_Add(hImageList, hBitmap, hMaskBitmap);
+		deleteObject(hBitmap);
 	}
 
-	DeleteObject(hMaskBitmap);
+	deleteObject(hMaskBitmap);
 	return hImageList;
 }
 
@@ -174,111 +174,111 @@ axl_win_TPropertyCtrl_CreateMenuArrowImageList()
 void
 AXL_API
 axl_win_TPropertyCtrl_PaintGridLines(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	const RECT* pRect,
-	axl_win_TPropertyLine* pLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	const RECT* rect,
+	axl_win_TPropertyLine* line
 	)
 { 
-	axl_gr_TTextPaint* pPaint = &pPropertyCtrl->m_TextPaint;
+	axl_gr_TTextPaint* paint = &propertyCtrl->m_textPaint;
 
 	int i;
-	long x = axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl) ? 
-		(pLine->m_Indent) * pPropertyCtrl->m_IndentWidth - pPropertyCtrl->m_FirstVisibleX :
-		(pLine->m_Level + pLine->m_Indent) * pPropertyCtrl->m_IndentWidth - pPropertyCtrl->m_FirstVisibleX;
+	long x = axl_win_TPropertyCtrl_IsMenu(propertyCtrl) ? 
+		(line->m_indent) * propertyCtrl->m_indentWidth - propertyCtrl->m_firstVisibleX :
+		(line->m_level + line->m_indent) * propertyCtrl->m_indentWidth - propertyCtrl->m_firstVisibleX;
 
-	axl_win_TPropertyLine* pParent = pLine->m_pParent;
+	axl_win_TPropertyLine* parent = line->m_parent;
  
-	if (axl_win_TPropertyLine_HasGridLines(pLine))
-		for (i = 0; i < pLine->m_Indent; i++, x -= pPropertyCtrl->m_IndentWidth)
+	if (axl_win_TPropertyLine_HasGridLines(line))
+		for (i = 0; i < line->m_indent; i++, x -= propertyCtrl->m_indentWidth)
 		{
-			ImageList_Draw(
-				pPropertyCtrl->m_hGridImageList, 
+			imageList_Draw(
+				propertyCtrl->m_hGridImageList, 
 				axl_win_EPropertyGridLineImage_H,			
-				pPaint->m_hdc, 
-				x, pRect->top, 
+				paint->m_hdc, 
+				x, rect->top, 
 				ILD_NORMAL
 				);
 		}
 
-	if (axl_win_TPropertyLine_HasGridLines(pLine))
+	if (axl_win_TPropertyLine_HasGridLines(line))
 	{
-		axl_win_TPropertyLine* pNext = axl_win_TPropertyLine_GetNextSibling(pLine);
-		int Image = pNext && !(pNext->m_Flags & axl_win_EPropertyLine_ForceNoGridLines) ? 
+		axl_win_TPropertyLine* next = axl_win_TPropertyLine_GetNextSibling(line);
+		int image = next && !(next->m_flags & axl_win_EPropertyLine_ForceNoGridLines) ? 
 			axl_win_EPropertyGridLineImage_T : 
 			axl_win_EPropertyGridLineImage_L 
 			;
 
-		ImageList_Draw(
-			pPropertyCtrl->m_hGridImageList, 
-			Image,
-			pPaint->m_hdc, 
-			x, pRect->top, 
+		imageList_Draw(
+			propertyCtrl->m_hGridImageList, 
+			image,
+			paint->m_hdc, 
+			x, rect->top, 
 			ILD_NORMAL
 			);
 	}
 
-	if (axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl))
+	if (axl_win_TPropertyCtrl_IsMenu(propertyCtrl))
 		return;
 
-	pLine = pLine->m_pParent;
+	line = line->m_parent;
 
-	while (pLine)
+	while (line)
 	{
-		x -= (pLine->m_Indent + 1) * pPropertyCtrl->m_IndentWidth;
+		x -= (line->m_indent + 1) * propertyCtrl->m_indentWidth;
 
-		if (axl_win_TPropertyLine_HasGridLines(pLine) && !axl_win_TPropertyLine_IsLastChild(pLine))
-			ImageList_Draw(
-				pPropertyCtrl->m_hGridImageList, 
+		if (axl_win_TPropertyLine_HasGridLines(line) && !axl_win_TPropertyLine_IsLastChild(line))
+			imageList_Draw(
+				propertyCtrl->m_hGridImageList, 
 				axl_win_EPropertyGridLineImage_V,
-				pPaint->m_hdc, 
-				x, pRect->top, 
+				paint->m_hdc, 
+				x, rect->top, 
 				ILD_NORMAL
 				);
 
-		pLine = pLine->m_pParent;
+		line = line->m_parent;
 	}
 }
 
 void
 AXL_API
 axl_win_TPropertyCtrl_PaintOptionBox(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	const RECT* pRect,
-	axl_win_TPropertyLine* pLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	const RECT* rect,
+	axl_win_TPropertyLine* line
 	)
 {
-	axl_gr_TTextPaint* pPaint = &pPropertyCtrl->m_TextPaint;
+	axl_gr_TTextPaint* paint = &propertyCtrl->m_textPaint;
 
-	RECT Rect;
+	RECT rect;
 
-	long x = axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl) ? 0 : pLine->m_Level * pPropertyCtrl->m_IndentWidth;
-	x += (pLine->m_Indent + 1) * pPropertyCtrl->m_IndentWidth - pPropertyCtrl->m_FirstVisibleX;
+	long x = axl_win_TPropertyCtrl_IsMenu(propertyCtrl) ? 0 : line->m_level * propertyCtrl->m_indentWidth;
+	x += (line->m_indent + 1) * propertyCtrl->m_indentWidth - propertyCtrl->m_firstVisibleX;
 
-	Rect.left = pPropertyCtrl->m_OptionBoxRect.left + x;
-	Rect.top = pPropertyCtrl->m_OptionBoxRect.top + pRect->top;
-	Rect.right = pPropertyCtrl->m_OptionBoxRect.right + x;
-	Rect.bottom = pPropertyCtrl->m_OptionBoxRect.bottom + pRect->top;
+	rect.left = propertyCtrl->m_optionBoxRect.left + x;
+	rect.top = propertyCtrl->m_optionBoxRect.top + rect->top;
+	rect.right = propertyCtrl->m_optionBoxRect.right + x;
+	rect.bottom = propertyCtrl->m_optionBoxRect.bottom + rect->top;
 
-	switch (pLine->m_OptionBoxType)
+	switch (line->m_optionBoxType)
 	{
 	case axl_win_EPropertyOptionBoxType_RadioButton:
 		axl_gr_TStockCtrlPaint_DrawRadioButton(
-			&pPropertyCtrl->m_StockCtrlPaint, 
-			pPaint->m_hdc, 
-			&Rect, 
-			pLine->m_OptionBoxCheckState, 
-			(pLine->m_Flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : pLine->m_OptionBoxVolatileState
+			&propertyCtrl->m_stockCtrlPaint, 
+			paint->m_hdc, 
+			&rect, 
+			line->m_optionBoxCheckState, 
+			(line->m_flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : line->m_optionBoxVolatileState
 			);
 
 		break;
 
 	case axl_win_EPropertyOptionBoxType_CheckBox:
 		axl_gr_TStockCtrlPaint_DrawCheckBox(
-			&pPropertyCtrl->m_StockCtrlPaint, 
-			pPaint->m_hdc, 
-			&Rect, 
-			pLine->m_OptionBoxCheckState, 
-			(pLine->m_Flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : pLine->m_OptionBoxVolatileState
+			&propertyCtrl->m_stockCtrlPaint, 
+			paint->m_hdc, 
+			&rect, 
+			line->m_optionBoxCheckState, 
+			(line->m_flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : line->m_optionBoxVolatileState
 			);
 
 		break;
@@ -288,69 +288,69 @@ axl_win_TPropertyCtrl_PaintOptionBox(
 void
 AXL_API
 axl_win_TPropertyCtrl_PaintLineImages(
-	axl_win_TPropertyCtrl* pPropertyCtrl, 
-	const RECT* pRect,
-	axl_win_TPropertyLine* pLine,
-	bool_t IsSelected
+	axl_win_TPropertyCtrl* propertyCtrl, 
+	const RECT* rect,
+	axl_win_TPropertyLine* line,
+	bool_t isSelected
 	)
 {
-	axl_gr_TTextPaint* pPaint = &pPropertyCtrl->m_TextPaint;
+	axl_gr_TTextPaint* paint = &propertyCtrl->m_textPaint;
 
-	long x = axl_win_TPropertyCtrl_IsMenu(pPropertyCtrl) ? 
-		-(long) pPropertyCtrl->m_FirstVisibleX :
-		pLine->m_Level * pPropertyCtrl->m_IndentWidth - pPropertyCtrl->m_FirstVisibleX;
+	long x = axl_win_TPropertyCtrl_IsMenu(propertyCtrl) ? 
+		-(long) propertyCtrl->m_firstVisibleX :
+		line->m_level * propertyCtrl->m_indentWidth - propertyCtrl->m_firstVisibleX;
 
-	if (axl_win_TPropertyLine_HasPlusMinus(pLine))
+	if (axl_win_TPropertyLine_HasPlusMinus(line))
 	{
-		int Image = (pLine->m_Flags & axl_win_EPropertyLine_IsExpanded) ? 
+		int image = (line->m_flags & axl_win_EPropertyLine_IsExpanded) ? 
 			axl_win_EPropertyPlusMinusImage_Minus : 
 			axl_win_EPropertyPlusMinusImage_Plus;
 
-		ImageList_Draw(
-			pPropertyCtrl->m_hPlusMinusImageList, 
-			Image,			
-			pPaint->m_hdc, 
-			x + pPropertyCtrl->m_PlusMinusRect.left, 
-			pRect->top + pPropertyCtrl->m_PlusMinusRect.top, 
+		imageList_Draw(
+			propertyCtrl->m_hPlusMinusImageList, 
+			image,			
+			paint->m_hdc, 
+			x + propertyCtrl->m_plusMinusRect.left, 
+			rect->top + propertyCtrl->m_plusMinusRect.top, 
 			ILD_NORMAL
 			); 
 	}
 
-	x += (pLine->m_Indent + 1) * pPropertyCtrl->m_IndentWidth;
+	x += (line->m_indent + 1) * propertyCtrl->m_indentWidth;
 
-	if (pLine->m_OptionBoxType)
-		x += pPropertyCtrl->m_OptionBoxWidth;
+	if (line->m_optionBoxType)
+		x += propertyCtrl->m_optionBoxWidth;
 
-	if (pLine->m_Icon != -1)
+	if (line->m_icon != -1)
 	{
-		long xIcon = x + pPropertyCtrl->m_IconRect.left;
-		long yIcon = pRect->top + pPropertyCtrl->m_IconRect.top;
+		long xIcon = x + propertyCtrl->m_iconRect.left;
+		long yIcon = rect->top + propertyCtrl->m_iconRect.top;
 
-		if (axl_win_TPropertyLine_IsButton(pLine) && pLine->m_ButtonVolatileState == axl_win_EPropertyButtonVolatileState_Pushed)
+		if (axl_win_TPropertyLine_IsButton(line) && line->m_buttonVolatileState == axl_win_EPropertyButtonVolatileState_Pushed)
 			xIcon++, yIcon++;
 
-		ImageList_Draw(
-			pPropertyCtrl->m_hImageList, 
-			pLine->m_Icon,
-			pPaint->m_hdc, 
+		imageList_Draw(
+			propertyCtrl->m_hImageList, 
+			line->m_icon,
+			paint->m_hdc, 
 			xIcon, 
 			yIcon, 
 			ILD_NORMAL
 			); 
 	}
 
-	if ((pLine->m_Flags & axl_win_EPropertyLine_Menu) && !axl_rtl_TList_IsEmpty(&pLine->m_ChildrenList))
+	if ((line->m_flags & axl_win_EPropertyLine_Menu) && !axl_rtl_TList_IsEmpty(&line->m_childrenList))
 	{
-		long xArrow = pLine->m_MenuWidth + pPropertyCtrl->m_Margins.left + pPropertyCtrl->m_Margins.right;
-		long yArrow = (pRect->top + pRect->bottom - 8) / 2;	
+		long xArrow = line->m_menuWidth + propertyCtrl->m_margins.left + propertyCtrl->m_margins.right;
+		long yArrow = (rect->top + rect->bottom - 8) / 2;	
 
-		if (axl_win_TPropertyLine_IsButton(pLine) && pLine->m_ButtonVolatileState == axl_win_EPropertyButtonVolatileState_Pushed)
+		if (axl_win_TPropertyLine_IsButton(line) && line->m_buttonVolatileState == axl_win_EPropertyButtonVolatileState_Pushed)
 			xArrow++, yArrow++;
 
-		ImageList_Draw(
-			pPropertyCtrl->m_hMenuArrowImageList, 
-			(pLine->m_Flags & axl_win_EPropertyLine_IsDisabled) ? 2 : IsSelected ? 1 : 0,
-			pPaint->m_hdc, 
+		imageList_Draw(
+			propertyCtrl->m_hMenuArrowImageList, 
+			(line->m_flags & axl_win_EPropertyLine_IsDisabled) ? 2 : isSelected ? 1 : 0,
+			paint->m_hdc, 
 			xArrow,
 			yArrow,
 			ILD_NORMAL
@@ -361,410 +361,410 @@ axl_win_TPropertyCtrl_PaintLineImages(
 void 
 AXL_API
 axl_win_TPropertyCtrl_PaintLeftPane(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	const RECT* pRect,
-	axl_win_TPropertyLine* pLine,
-	bool_t IsSelected
+	axl_win_TPropertyCtrl* propertyCtrl,
+	const RECT* rect,
+	axl_win_TPropertyLine* line,
+	bool_t isSelected
 	)
 {
-	axl_gr_TTextPaint* pPaint = &pPropertyCtrl->m_TextPaint;
-	axl_rtl_TString* pString;
+	axl_gr_TTextPaint* paint = &propertyCtrl->m_textPaint;
+	axl_rtl_TString* string;
 
-	bool_t ShouldDrawButton;
-	RECT TextRect = *pRect;
+	bool_t shouldDrawButton;
+	RECT textRect = *rect;
 
-	long x = axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Name) - pPropertyCtrl->m_FirstVisibleX + pPropertyCtrl->m_TextOrigin.x;
-	long y = pRect->top + pPropertyCtrl->m_TextOrigin.y;
+	long x = axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Name) - propertyCtrl->m_firstVisibleX + propertyCtrl->m_textOrigin.x;
+	long y = rect->top + propertyCtrl->m_textOrigin.y;
 
-	if (axl_win_TPropertyLine_HasNameDelimiter(pLine))
+	if (axl_win_TPropertyLine_HasNameDelimiter(line))
 	{
-		RECT DelimRect = *pRect;
+		RECT delimRect = *rect;
 
-		TextRect.bottom--;
-		DelimRect.top = TextRect.bottom;
+		textRect.bottom--;
+		delimRect.top = textRect.bottom;
 
-		axl_gr_TTextPaint_SetBackColor(pPaint, axl_win_EPropertyColor_NameDelimiter);
-		axl_gr_FastRectangle(pPaint->m_hdc, &DelimRect);
+		axl_gr_TTextPaint_SetBackColor(paint, axl_win_EPropertyColor_NameDelimiter);
+		axl_gr_FastRectangle(paint->m_hdc, &delimRect);
 	}
 
-	if (axl_win_TPropertyLine_IsButton(pLine) && pLine->m_ButtonVolatileState == axl_win_EPropertyButtonVolatileState_Pushed)
+	if (axl_win_TPropertyLine_IsButton(line) && line->m_buttonVolatileState == axl_win_EPropertyButtonVolatileState_Pushed)
 		x++, y++;
 
-	pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_Name;
-	pPaint->m_StdAttr.m_BackColor = axl_win_EPropertyColor_NameBack;
-	pPaint->m_StdAttr.m_FontFlags = 0;
+	paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_Name;
+	paint->m_stdAttr.m_backColor = axl_win_EPropertyColor_NameBack;
+	paint->m_stdAttr.m_fontFlags = 0;
 
-	axl_gr_TTextAttr_Overlay(&pPaint->m_StdAttr, &pLine->m_NameAttr);
+	axl_gr_TTextAttr_Overlay(&paint->m_stdAttr, &line->m_nameAttr);
 
-	if (IsSelected)
+	if (isSelected)
 	{
-		pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_SelectedName;
-		pPaint->m_StdAttr.m_BackColor = axl_win_EPropertyColor_SelectedBack;
+		paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_SelectedName;
+		paint->m_stdAttr.m_backColor = axl_win_EPropertyColor_SelectedBack;
 	}
 
-	if (pLine->m_Flags & axl_win_EPropertyLine_IsDisabled)
-		pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_DisabledText;
-	else if (pLine->m_ButtonVolatileState == axl_win_EPropertyButtonVolatileState_Hover)
-		pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_HoverButtonText;
-	else if (pLine->m_ButtonVolatileState)
-		pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_ButtonText;
+	if (line->m_flags & axl_win_EPropertyLine_IsDisabled)
+		paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_DisabledText;
+	else if (line->m_buttonVolatileState == axl_win_EPropertyButtonVolatileState_Hover)
+		paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_HoverButtonText;
+	else if (line->m_buttonVolatileState)
+		paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_ButtonText;
 
-	axl_gr_TTextPaint_SetStdAttr(pPaint);
+	axl_gr_TTextPaint_SetStdAttr(paint);
 
-	axl_gr_FastRectangle(pPaint->m_hdc, &TextRect);
+	axl_gr_FastRectangle(paint->m_hdc, &textRect);
 
-	ShouldDrawButton = 
-		axl_win_TPropertyLine_IsButton(pLine) && 
-		(pPropertyCtrl->m_DoAlwaysDrawButtons || 
-		(pLine->m_Flags & axl_win_EPropertyLine_AlwaysDrawButton) ||
-		IsSelected || 
-		pLine->m_ButtonVolatileState || 
-		pLine->m_ButtonCheckState);
+	shouldDrawButton = 
+		axl_win_TPropertyLine_IsButton(line) && 
+		(propertyCtrl->m_doAlwaysDrawButtons || 
+		(line->m_flags & axl_win_EPropertyLine_AlwaysDrawButton) ||
+		isSelected || 
+		line->m_buttonVolatileState || 
+		line->m_buttonCheckState);
 
-	if (ShouldDrawButton)
+	if (shouldDrawButton)
 	{
-		if (pLine->m_Flags & axl_win_EPropertyLine_Button)
+		if (line->m_flags & axl_win_EPropertyLine_Button)
 		{
-			RECT Rect;
-			Rect.left = axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Button);
-			Rect.right = pLine->m_SinglePaneWidth + pPropertyCtrl->m_Margins.left + 2 * pPropertyCtrl->m_Margins.right;
-			Rect.top = pRect->top;
-			Rect.bottom = pRect->bottom - 1;
+			RECT rect;
+			rect.left = axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Button);
+			rect.right = line->m_singlePaneWidth + propertyCtrl->m_margins.left + 2 * propertyCtrl->m_margins.right;
+			rect.top = rect->top;
+			rect.bottom = rect->bottom - 1;
 
-			Rect.left -= pPropertyCtrl->m_FirstVisibleX;
-			Rect.right -= pPropertyCtrl->m_FirstVisibleX;
+			rect.left -= propertyCtrl->m_firstVisibleX;
+			rect.right -= propertyCtrl->m_firstVisibleX;
 
 			axl_gr_TStockCtrlPaint_DrawPushButton(
-				&pPropertyCtrl->m_StockCtrlPaint, 
-				pPaint->m_hdc, 
-				&Rect, 
-				pLine->m_ButtonCheckState,
-				(pLine->m_Flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : pLine->m_ButtonVolatileState
+				&propertyCtrl->m_stockCtrlPaint, 
+				paint->m_hdc, 
+				&rect, 
+				line->m_buttonCheckState,
+				(line->m_flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : line->m_buttonVolatileState
 				);
 		}
-		else if (pLine->m_Flags & axl_win_EPropertyLine_Menu)
+		else if (line->m_flags & axl_win_EPropertyLine_Menu)
 		{
-			RECT Rect;
-			Rect.left = axl_win_TPropertyLine_GetPartX(pLine, axl_win_EPropertyLinePart_Button);
-			Rect.right = pLine->m_MenuWidth + pPropertyCtrl->m_Margins.left + pPropertyCtrl->m_Margins.right + GetSystemMetrics(SM_CXVSCROLL);
-			Rect.top = pRect->top;
-			Rect.bottom = pRect->bottom - 1;
+			RECT rect;
+			rect.left = axl_win_TPropertyLine_GetPartX(line, axl_win_EPropertyLinePart_Button);
+			rect.right = line->m_menuWidth + propertyCtrl->m_margins.left + propertyCtrl->m_margins.right + getSystemMetrics(SM_CXVSCROLL);
+			rect.top = rect->top;
+			rect.bottom = rect->bottom - 1;
 
-			Rect.left -= pPropertyCtrl->m_FirstVisibleX;
-			Rect.right -= pPropertyCtrl->m_FirstVisibleX;
+			rect.left -= propertyCtrl->m_firstVisibleX;
+			rect.right -= propertyCtrl->m_firstVisibleX;
 
 			axl_gr_TStockCtrlPaint_DrawToolbarButton(
-				&pPropertyCtrl->m_StockCtrlPaint, 
-				pPaint->m_hdc, 
-				&Rect, 
-				pLine->m_ButtonCheckState,
-				(pLine->m_Flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : pLine->m_ButtonVolatileState
+				&propertyCtrl->m_stockCtrlPaint, 
+				paint->m_hdc, 
+				&rect, 
+				line->m_buttonCheckState,
+				(line->m_flags & axl_win_EPropertyLine_IsDisabled) ? axl_win_EPropertyButtonVolatileState_Disabled : line->m_buttonVolatileState
 				);
 		}
 	}
 
-	pString = (pLine->m_Flags & axl_win_EPropertyLine_NameHyperText) ? &pLine->m_NameHyperText.m_Text : &pLine->m_Name;
+	string = (line->m_flags & axl_win_EPropertyLine_NameHyperText) ? &line->m_nameHyperText.m_text : &line->m_name;
 
-	SetBkMode(pPaint->m_hdc, TRANSPARENT);
-	pPaint->m_EtoFlags = 0;
-	pPaint->m_top = TextRect.top;
-	pPaint->m_bottom = TextRect.bottom;
+	setBkMode(paint->m_hdc, TRANSPARENT);
+	paint->m_etoFlags = 0;
+	paint->m_top = textRect.top;
+	paint->m_bottom = textRect.bottom;
 
-	if ((pLine->m_Flags & axl_win_EPropertyLine_NameShadow) && 
-		!(pLine->m_Flags & axl_win_EPropertyLine_IsDisabled) &&
-		!ShouldDrawButton)
+	if ((line->m_flags & axl_win_EPropertyLine_NameShadow) && 
+		!(line->m_flags & axl_win_EPropertyLine_IsDisabled) &&
+		!shouldDrawButton)
 	{
-		COLORREF Color = GetBkColor(pPaint->m_hdc);
-		Color = RGB(GetRValue(Color) * 4/ 5, GetGValue(Color) * 4 / 5, GetBValue(Color) * 4 / 5); // calc shadow color
-		SetTextColor(pPaint->m_hdc, Color);
+		COLORREF color = getBkColor(paint->m_hdc);
+		color = RGB(getRValue(color) * 4/ 5, getGValue(color) * 4 / 5, getBValue(color) * 4 / 5); // calc shadow color
+		setTextColor(paint->m_hdc, color);
 
-		pPaint->m_x = x + 2;
-		pPaint->m_y = y + 2;
+		paint->m_x = x + 2;
+		paint->m_y = y + 2;
 
-		axl_gr_TTextPaint_PaintText(pPaint, pString->m_p, axl_rtl_TString_GetLength(pString));
-		axl_gr_TTextPaint_SetStdTextColor(pPaint);
+		axl_gr_TTextPaint_PaintText(paint, string->m_p, axl_rtl_TString_GetLength(string));
+		axl_gr_TTextPaint_SetStdTextColor(paint);
 	}
 
-	pPaint->m_x = x;
-	pPaint->m_y = y;
+	paint->m_x = x;
+	paint->m_y = y;
 
-	if (pLine->m_Flags & axl_win_EPropertyLine_NameHyperText)
+	if (line->m_flags & axl_win_EPropertyLine_NameHyperText)
 		axl_gr_TTextPaint_PaintHyperText(
-			pPaint, 
-			pString->m_p, 
-			axl_rtl_TString_GetLength(pString),
-			&pLine->m_NameHyperText.m_AttrArray
+			paint, 
+			string->m_p, 
+			axl_rtl_TString_GetLength(string),
+			&line->m_nameHyperText.m_attrArray
 			);
 	else
-		axl_gr_TTextPaint_PaintText(pPaint, pString->m_p, axl_rtl_TString_GetLength(pString));
+		axl_gr_TTextPaint_PaintText(paint, string->m_p, axl_rtl_TString_GetLength(string));
 
 	// option box must be draw first to minimize flickering (BitBlt flushes DirectDraw buffer)
 
-	if (pLine->m_OptionBoxType)
-		axl_win_TPropertyCtrl_PaintOptionBox(pPropertyCtrl, &TextRect, pLine);
+	if (line->m_optionBoxType)
+		axl_win_TPropertyCtrl_PaintOptionBox(propertyCtrl, &textRect, line);
 
-	axl_win_TPropertyCtrl_PaintGridLines(pPropertyCtrl, pRect, pLine);
-	axl_win_TPropertyCtrl_PaintLineImages(pPropertyCtrl, &TextRect, pLine, IsSelected);
+	axl_win_TPropertyCtrl_PaintGridLines(propertyCtrl, rect, line);
+	axl_win_TPropertyCtrl_PaintLineImages(propertyCtrl, &textRect, line, isSelected);
 
-	if (axl_win_TPropertyLine_IsSinglePane(pLine) && axl_win_TPropertyLine_HasValueDelimiter(pLine))
+	if (axl_win_TPropertyLine_IsSinglePane(line) && axl_win_TPropertyLine_HasValueDelimiter(line))
 	{
-		RECT DelimRect = *pRect;
+		RECT delimRect = *rect;
 
-		DelimRect.top = pRect->bottom - 1;
-		DelimRect.left = pPropertyCtrl->m_SplitterPos - pPropertyCtrl->m_FirstVisibleX;
+		delimRect.top = rect->bottom - 1;
+		delimRect.left = propertyCtrl->m_splitterPos - propertyCtrl->m_firstVisibleX;
 
-		axl_gr_TTextPaint_SetBackColor(pPaint, axl_win_EPropertyColor_ValueDelimiter);
-		axl_gr_FastRectangle(pPaint->m_hdc, &DelimRect);
+		axl_gr_TTextPaint_SetBackColor(paint, axl_win_EPropertyColor_ValueDelimiter);
+		axl_gr_FastRectangle(paint->m_hdc, &delimRect);
 	}
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_PaintRightPane(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	const RECT* pRect,
-	axl_win_TPropertyLine* pLine,
-	bool_t IsSelected
+	axl_win_TPropertyCtrl* propertyCtrl,
+	const RECT* rect,
+	axl_win_TPropertyLine* line,
+	bool_t isSelected
 	)
 {
-	axl_gr_TTextPaint* pPaint = &pPropertyCtrl->m_TextPaint;
-	axl_rtl_TString* pString;
+	axl_gr_TTextPaint* paint = &propertyCtrl->m_textPaint;
+	axl_rtl_TString* string;
 
-	RECT TextRect = *pRect;
+	RECT textRect = *rect;
 
-	long x = pRect->left + pPropertyCtrl->m_TextOrigin.x;
-	long y = pRect->top + pPropertyCtrl->m_TextOrigin.y;
+	long x = rect->left + propertyCtrl->m_textOrigin.x;
+	long y = rect->top + propertyCtrl->m_textOrigin.y;
 
-	if (axl_win_TPropertyLine_HasValueDelimiter(pLine))
+	if (axl_win_TPropertyLine_HasValueDelimiter(line))
 	{
-		RECT DelimRect = *pRect;
+		RECT delimRect = *rect;
 
-		TextRect.bottom--;
-		DelimRect.top = TextRect.bottom;
+		textRect.bottom--;
+		delimRect.top = textRect.bottom;
 
-		axl_gr_TTextPaint_SetBackColor(pPaint, axl_win_EPropertyColor_ValueDelimiter);
-		axl_gr_FastRectangle(pPaint->m_hdc, &DelimRect);
+		axl_gr_TTextPaint_SetBackColor(paint, axl_win_EPropertyColor_ValueDelimiter);
+		axl_gr_FastRectangle(paint->m_hdc, &delimRect);
 	}
 
-	pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_Value;
-	pPaint->m_StdAttr.m_BackColor = axl_win_EPropertyColor_ValueBack;
-	pPaint->m_StdAttr.m_FontFlags = 0;
+	paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_Value;
+	paint->m_stdAttr.m_backColor = axl_win_EPropertyColor_ValueBack;
+	paint->m_stdAttr.m_fontFlags = 0;
 
-	axl_gr_TTextAttr_Overlay(&pPaint->m_StdAttr, &pLine->m_ValueAttr);
+	axl_gr_TTextAttr_Overlay(&paint->m_stdAttr, &line->m_valueAttr);
 
-	if (IsSelected)
+	if (isSelected)
 	{
-		pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_SelectedValue;
-		pPaint->m_StdAttr.m_BackColor = axl_win_EPropertyColor_SelectedBack;
+		paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_SelectedValue;
+		paint->m_stdAttr.m_backColor = axl_win_EPropertyColor_SelectedBack;
 	}
 
-	if (pLine->m_Flags & axl_win_EPropertyLine_IsDisabled)
-		pPaint->m_StdAttr.m_TextColor = axl_win_EPropertyColor_DisabledText;
+	if (line->m_flags & axl_win_EPropertyLine_IsDisabled)
+		paint->m_stdAttr.m_textColor = axl_win_EPropertyColor_DisabledText;
 
-	axl_gr_TTextPaint_SetStdAttr(pPaint);
+	axl_gr_TTextPaint_SetStdAttr(paint);
 
-	axl_gr_FastRectangle(pPaint->m_hdc, &TextRect);
+	axl_gr_FastRectangle(paint->m_hdc, &textRect);
 
-	pString = (pLine->m_Flags & axl_win_EPropertyLine_ValueHyperText) ? &pLine->m_ValueHyperText.m_Text : &pLine->m_Value;
+	string = (line->m_flags & axl_win_EPropertyLine_ValueHyperText) ? &line->m_valueHyperText.m_text : &line->m_value;
 
-	SetBkMode(pPaint->m_hdc, TRANSPARENT);
-	pPaint->m_EtoFlags = 0;
-	pPaint->m_x = x;
-	pPaint->m_y = y;
-	pPaint->m_top = TextRect.top;
-	pPaint->m_bottom = TextRect.bottom;
+	setBkMode(paint->m_hdc, TRANSPARENT);
+	paint->m_etoFlags = 0;
+	paint->m_x = x;
+	paint->m_y = y;
+	paint->m_top = textRect.top;
+	paint->m_bottom = textRect.bottom;
 
-	if (pLine->m_Flags & axl_win_EPropertyLine_ValueHyperText)
+	if (line->m_flags & axl_win_EPropertyLine_ValueHyperText)
 		axl_gr_TTextPaint_PaintHyperText(
-			pPaint, 
-			pString->m_p, 
-			axl_rtl_TString_GetLength(pString),
-			&pLine->m_ValueHyperText.m_AttrArray
+			paint, 
+			string->m_p, 
+			axl_rtl_TString_GetLength(string),
+			&line->m_valueHyperText.m_attrArray
 			);
 	else
-		axl_gr_TTextPaint_PaintText(pPaint, pString->m_p, axl_rtl_TString_GetLength(pString));
+		axl_gr_TTextPaint_PaintText(paint, string->m_p, axl_rtl_TString_GetLength(string));
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_PaintLine(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	const RECT* pRect,
-	axl_win_TPropertyLine* pLine,
-	bool_t IsSelected
+	axl_win_TPropertyCtrl* propertyCtrl,
+	const RECT* rect,
+	axl_win_TPropertyLine* line,
+	bool_t isSelected
 	)
 {
-	axl_gr_TTextPaint* pPaint = &pPropertyCtrl->m_TextPaint;
+	axl_gr_TTextPaint* paint = &propertyCtrl->m_textPaint;
 
-	RECT NameRect;
-	RECT ValueRect;
-	RECT SplitterRect;
+	RECT nameRect;
+	RECT valueRect;
+	RECT splitterRect;
 
 #ifndef _AXL_USE_OFFSCREEN_BUFFER
 	HRGN hRgnClip;
 	HRGN hOldRgnClip;
-	int OldClipRgn;
-	POINT ViewportOrg;
+	int oldClipRgn;
+	POINT viewportOrg;
 #endif
 
-	if (axl_win_TPropertyLine_IsSinglePane(pLine))
+	if (axl_win_TPropertyLine_IsSinglePane(line))
 	{
-		axl_win_TPropertyCtrl_PaintLeftPane(pPropertyCtrl, pRect, pLine, IsSelected);
+		axl_win_TPropertyCtrl_PaintLeftPane(propertyCtrl, rect, line, isSelected);
 		return;
 	}
 
-	NameRect = ValueRect = SplitterRect = *pRect;
-	NameRect.right = pPropertyCtrl->m_SplitterPos - pPropertyCtrl->m_FirstVisibleX;
-	SplitterRect.left = NameRect.right;
-	SplitterRect.right = SplitterRect.left + 1;
-	ValueRect.left = SplitterRect.right;
+	nameRect = valueRect = splitterRect = *rect;
+	nameRect.right = propertyCtrl->m_splitterPos - propertyCtrl->m_firstVisibleX;
+	splitterRect.left = nameRect.right;
+	splitterRect.right = splitterRect.left + 1;
+	valueRect.left = splitterRect.right;
 
 #ifndef _AXL_USE_OFFSCREEN_BUFFER
-	hOldRgnClip = CreateRectRgn(0,0,0,0);
-	OldClipRgn = GetClipRgn(pPaint->m_hdc, hOldRgnClip);
+	hOldRgnClip = createRectRgn(0,0,0,0);
+	oldClipRgn = getClipRgn(paint->m_hdc, hOldRgnClip);
 
 	// clip rgn is NOT affected by viewport org, so we have to adjust it accordingly
 	
-	GetViewportOrgEx(pPaint->m_hdc, &ViewportOrg);
-	hRgnClip = CreateRectRgn(
-		ViewportOrg.x, 
-		ViewportOrg.y + pRect->top, 
-		ViewportOrg.x + NameRect.right, 
-		ViewportOrg.y + pRect->bottom
+	getViewportOrgEx(paint->m_hdc, &viewportOrg);
+	hRgnClip = createRectRgn(
+		viewportOrg.x, 
+		viewportOrg.y + rect->top, 
+		viewportOrg.x + nameRect.right, 
+		viewportOrg.y + rect->bottom
 		);
 
-	ExtSelectClipRgn(pPaint->m_hdc, hRgnClip, RGN_AND);
+	extSelectClipRgn(paint->m_hdc, hRgnClip, RGN_AND);
 #endif
 	
-	axl_win_TPropertyCtrl_PaintLeftPane(pPropertyCtrl, &NameRect, pLine, IsSelected);
+	axl_win_TPropertyCtrl_PaintLeftPane(propertyCtrl, &nameRect, line, isSelected);
 
 #ifndef _AXL_USE_OFFSCREEN_BUFFER
-	SelectClipRgn(pPaint->m_hdc, OldClipRgn > 0 ? hOldRgnClip : NULL);	
-	DeleteObject(hRgnClip);
+	selectClipRgn(paint->m_hdc, oldClipRgn > 0 ? hOldRgnClip : NULL);	
+	deleteObject(hRgnClip);
 
 	if (hOldRgnClip)
-		DeleteObject(hOldRgnClip);
+		deleteObject(hOldRgnClip);
 #endif
 
-	axl_gr_TTextPaint_SetBackColor(pPaint, axl_win_EPropertyColor_Splitter);
-	axl_gr_FastRectangle(pPaint->m_hdc, &SplitterRect);
+	axl_gr_TTextPaint_SetBackColor(paint, axl_win_EPropertyColor_Splitter);
+	axl_gr_FastRectangle(paint->m_hdc, &splitterRect);
 
-	axl_win_TPropertyCtrl_PaintRightPane(pPropertyCtrl, &ValueRect, pLine, IsSelected);
+	axl_win_TPropertyCtrl_PaintRightPane(propertyCtrl, &valueRect, line, isSelected);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_PaintRect(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
+	axl_win_TPropertyCtrl* propertyCtrl,
 	HDC hdc,
-	const RECT* pRect
+	const RECT* rect
 	)
 {
-	axl_gr_TTextPaint* pPaint = &pPropertyCtrl->m_TextPaint;
+	axl_gr_TTextPaint* paint = &propertyCtrl->m_textPaint;
 
-	RECT LineRect;
+	RECT lineRect;
 
 #ifdef _AXL_USE_OFFSCREEN_BUFFER
-	RECT OffscreenRect;
+	RECT offscreenRect;
 	HDC hdcOffscreen;
 #endif
 
-	long FirstLine = pRect->top / pPropertyCtrl->m_LineHeight;
-	long LastLine = pRect->bottom / pPropertyCtrl->m_LineHeight;
-	size_t LineCount = axl_rtl_TPtrArray_GetCount(&pPropertyCtrl->m_VisibleLineArray);
+	long firstLine = rect->top / propertyCtrl->m_lineHeight;
+	long lastLine = rect->bottom / propertyCtrl->m_lineHeight;
+	size_t lineCount = axl_rtl_TPtrArray_GetCount(&propertyCtrl->m_visibleLineArray);
 
-	if (pRect->bottom % pPropertyCtrl->m_LineHeight)
-		LastLine++;
+	if (rect->bottom % propertyCtrl->m_lineHeight)
+		lastLine++;
 
-	ASSERT(pRect->left >= 0 && pRect->top >= 0 && pRect->left <= pRect->right && pRect->top <= pRect->bottom);
+	ASSERT(rect->left >= 0 && rect->top >= 0 && rect->left <= rect->right && rect->top <= rect->bottom);
 
-	LineRect.left = pRect->left;
-	LineRect.top = FirstLine * pPropertyCtrl->m_LineHeight;
-	LineRect.right = pRect->right;
-	LineRect.bottom = LineRect.top + pPropertyCtrl->m_LineHeight;
+	lineRect.left = rect->left;
+	lineRect.top = firstLine * propertyCtrl->m_lineHeight;
+	lineRect.right = rect->right;
+	lineRect.bottom = lineRect.top + propertyCtrl->m_lineHeight;
 
 #ifdef _AXL_USE_OFFSCREEN_BUFFER
-	OffscreenRect.left = pRect->left;
-	OffscreenRect.top = 0;
-	OffscreenRect.right = pRect->right;
-	OffscreenRect.bottom = pPropertyCtrl->m_LineHeight;
+	offscreenRect.left = rect->left;
+	offscreenRect.top = 0;
+	offscreenRect.right = rect->right;
+	offscreenRect.bottom = propertyCtrl->m_lineHeight;
 
-	hdcOffscreen = axl_gr_TOffscreenBuffer_GetBuffer(&pPropertyCtrl->m_OffscreenBuffer, hdc, pRect->right - pRect->left, pPropertyCtrl->m_LineHeight);
-	SetViewportOrgEx(hdcOffscreen, -pRect->left, 0, NULL);
+	hdcOffscreen = axl_gr_TOffscreenBuffer_GetBuffer(&propertyCtrl->m_offscreenBuffer, hdc, rect->right - rect->left, propertyCtrl->m_lineHeight);
+	setViewportOrgEx(hdcOffscreen, -rect->left, 0, NULL);
 
-	axl_gr_TTextPaint_Attach(&pPropertyCtrl->m_TextPaint, hdcOffscreen);
+	axl_gr_TTextPaint_Attach(&propertyCtrl->m_textPaint, hdcOffscreen);
 #else
-	axl_gr_TTextPaint_Attach(&pPropertyCtrl->m_TextPaint, hdc);
+	axl_gr_TTextPaint_Attach(&propertyCtrl->m_textPaint, hdc);
 #endif
 
-	FirstLine += (long) pPropertyCtrl->m_FirstVisibleLine;
-	LastLine += (long) pPropertyCtrl->m_FirstVisibleLine;
+	firstLine += (long) propertyCtrl->m_firstVisibleLine;
+	lastLine += (long) propertyCtrl->m_firstVisibleLine;
 
-	if (LastLine > (long) LineCount)
-		LastLine = (long) LineCount;
+	if (lastLine > (long) lineCount)
+		lastLine = (long) lineCount;
 
-	if (FirstLine < LastLine)
+	if (firstLine < lastLine)
 	{
-		axl_win_TPropertyLine** ppLine = (axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p + FirstLine;
-		axl_win_TPropertyLine** ppEnd = ppLine + LastLine - FirstLine;
-		axl_win_TPropertyLine* pSelectedLine = axl_win_TPropertyCtrl_GetSelectedLine(pPropertyCtrl);
+		axl_win_TPropertyLine** line = (axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p + firstLine;
+		axl_win_TPropertyLine** end = line + lastLine - firstLine;
+		axl_win_TPropertyLine* selectedLine = axl_win_TPropertyCtrl_GetSelectedLine(propertyCtrl);
 
-		while (ppLine < ppEnd)
+		while (line < end)
 		{	
-			axl_win_TPropertyLine* pLine = *ppLine;
+			axl_win_TPropertyLine* line = *line;
 
 #ifdef _AXL_USE_OFFSCREEN_BUFFER
-			axl_win_TPropertyCtrl_PaintLine(pPropertyCtrl, &OffscreenRect, pLine, pLine == pSelectedLine);
-			BitBlt(
+			axl_win_TPropertyCtrl_PaintLine(propertyCtrl, &offscreenRect, line, line == selectedLine);
+			bitBlt(
 				hdc, 
-				LineRect.left, LineRect.top, 
-				LineRect.right - LineRect.left,
-				LineRect.bottom - LineRect.top,
+				lineRect.left, lineRect.top, 
+				lineRect.right - lineRect.left,
+				lineRect.bottom - lineRect.top,
 				hdcOffscreen,
-				OffscreenRect.left, OffscreenRect.top,
+				offscreenRect.left, offscreenRect.top,
 				SRCCOPY
 				);
 #else
-			axl_win_TPropertyCtrl_PaintLine(pPropertyCtrl, &LineRect, pLine, pLine == pSelectedLine);
+			axl_win_TPropertyCtrl_PaintLine(propertyCtrl, &lineRect, line, line == selectedLine);
 #endif
 
-			ppLine++;
+			line++;
 
-			LineRect.top += pPropertyCtrl->m_LineHeight;
-			LineRect.bottom += pPropertyCtrl->m_LineHeight;
+			lineRect.top += propertyCtrl->m_lineHeight;
+			lineRect.bottom += propertyCtrl->m_lineHeight;
 		}
 	}
 
-	if (pRect->bottom > LineRect.top)
+	if (rect->bottom > lineRect.top)
 	{
-		COLORREF Color = pPropertyCtrl->m_Palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Empty)];
-		LineRect.bottom = pRect->bottom;
-		axl_gr_FastRectangleEx(hdc, &LineRect, Color);
+		COLORREF color = propertyCtrl->m_palette[axl_gr_GetColorIndex(axl_win_EPropertyColor_Empty)];
+		lineRect.bottom = rect->bottom;
+		axl_gr_FastRectangleEx(hdc, &lineRect, color);
 	}
 
-	axl_gr_TTextPaint_Detach(&pPropertyCtrl->m_TextPaint);
+	axl_gr_TTextPaint_Detach(&propertyCtrl->m_textPaint);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_InvalidateLineRange(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	size_t FromLine,
-	size_t ToLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	size_t fromLine,
+	size_t toLine
 	)
 {
-	RECT Rect;
+	RECT rect;
 
-	if (!IsWindow(pPropertyCtrl->m_hWnd))
+	if (!isWindow(propertyCtrl->m_hWnd))
 		return;
 
-	GetClientRect(pPropertyCtrl->m_hWnd, &Rect);
-	Rect.top = (long) (FromLine - pPropertyCtrl->m_FirstVisibleLine) * pPropertyCtrl->m_LineHeight;
+	getClientRect(propertyCtrl->m_hWnd, &rect);
+	rect.top = (long) (fromLine - propertyCtrl->m_firstVisibleLine) * propertyCtrl->m_lineHeight;
 
-	if (ToLine != -1)
-		Rect.bottom = (long) (ToLine - pPropertyCtrl->m_FirstVisibleLine + 1) * pPropertyCtrl->m_LineHeight;
+	if (toLine != -1)
+		rect.bottom = (long) (toLine - propertyCtrl->m_firstVisibleLine + 1) * propertyCtrl->m_lineHeight;
 
-	InvalidateRect(pPropertyCtrl->m_hWnd, &Rect, false);
+	invalidateRect(propertyCtrl->m_hWnd, &rect, false);
 }
 
 //.............................................................................

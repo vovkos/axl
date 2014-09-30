@@ -9,118 +9,118 @@ namespace io {
 //.............................................................................
 
 bool
-CListenerSock::Open (
-	ESockProto Protocol,
-	const TSockAddr* pAddr
+CListenerSock::open (
+	ESockProto protocol,
+	const TSockAddr* addr
 	)
 {
-	Close ();
+	close ();
 
-	SOCKADDR Addr;
+	SOCKADDR addr;
 
-	bool Result = 
-		pAddr->ToWinSockAddr (&Addr) &&
-		m_Sock.Open (pAddr->m_Kind, SOCK_STREAM, Protocol) &&
-		m_Sock.Bind (&Addr);
+	bool result = 
+		addr->toWinSockAddr (&addr) &&
+		m_sock.open (addr->m_kind, SOCK_STREAM, protocol) &&
+		m_sock.bind (&addr);
 
-	if (!Result)
+	if (!result)
 		return false;
 
-	exe::CFunctionT <exe::CArgT <CListenerSock*>, exe::CArgT <void> > OnEvent (
-		pvoid_cast (&CListenerSock::OnSocketEvent_wt), 
+	exe::CFunctionT <exe::CArgT <CListenerSock*>, exe::CArgT <void> > onEvent (
+		pvoid_cast (&CListenerSock::onSocketEvent_wt), 
 		this
 		);
 
-	m_WorkerThread = exe::GetWorkerThread (&m_Event, &OnEvent, &m_hWorkerThreadEvent);
-	if (!m_WorkerThread)
+	m_workerThread = exe::getWorkerThread (&m_event, &onEvent, &m_hWorkerThreadEvent);
+	if (!m_workerThread)
 		return false;
 
 	return true;
 }
 
 void
-CListenerSock::Close ()
+CListenerSock::close ()
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return;
 
-	m_WorkerThread->SyncSchedule <exe::CArgT <CListenerSock*> > (
-		pvoid_cast (&CListenerSock::Close_wt),
+	m_workerThread->syncSchedule <exe::CArgT <CListenerSock*> > (
+		pvoid_cast (&CListenerSock::close_wt),
 		this
 		);
 }
 
 bool
-CListenerSock::Listen (
-	size_t BackLog,
-	const exe::CFunction& OnAccept
+CListenerSock::listen (
+	size_t backLog,
+	const exe::CFunction& onAccept
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_3 <CListenerSock*, size_t, exe::IFunction*> > (
-		pvoid_cast (&CListenerSock::Listen_wt),
+	return m_workerThread->syncSchedule <exe::CArgSeqT_3 <CListenerSock*, size_t, exe::IFunction*> > (
+		pvoid_cast (&CListenerSock::listen_wt),
 		this,
-		BackLog,
-		pOnAccept
+		backLog,
+		onAccept
 		) != 0;
 }
 
 void
-CListenerSock::Close_wt ()
+CListenerSock::close_wt ()
 {
-	m_Sock.Close ();
-	m_OnAccept.Clear ();
-	m_Event.Reset ();
-	m_WorkerThread->RemoveEvent (m_hWorkerThreadEvent);
-	m_WorkerThread = ref::EPtr_Null;
+	m_sock.close ();
+	m_onAccept.clear ();
+	m_event.reset ();
+	m_workerThread->removeEvent (m_hWorkerThreadEvent);
+	m_workerThread = ref::EPtr_Null;
 	m_hWorkerThreadEvent = NULL;
 }
 
 bool
-CListenerSock::Listen_wt (
-	size_t BackLog,
-	const exe::CFunction& OnAccept
+CListenerSock::listen_wt (
+	size_t backLog,
+	const exe::CFunction& onAccept
 	)
 {
-	bool Result = 
-		m_Sock.Select (m_Event.m_Event, FD_ACCEPT) &&
-		m_Sock.Listen (BackLog);	
+	bool result = 
+		m_sock.select (m_event.m_event, FD_ACCEPT) &&
+		m_sock.listen (backLog);	
 
-	if (!Result)
+	if (!result)
 		return false;
 
-	m_OnAccept = ref::GetPtrOrClone (pOnAccept);
+	m_onAccept = ref::getPtrOrClone (onAccept);
 	return true;
 }
 
 void
-CListenerSock::OnSocketEvent_wt ()
+CListenerSock::onSocketEvent_wt ()
 {
-	WSANETWORKEVENTS Events = { 0 };
+	WSANETWORKEVENTS events = { 0 };
 
-	int Result = WSAEnumNetworkEvents (m_Sock, NULL, &Events);
-	if (Result == SOCKET_ERROR)
+	int result = WSAEnumNetworkEvents (m_sock, NULL, &events);
+	if (result == SOCKET_ERROR)
 		return ;
 
-	if (!(Events.lNetworkEvents & FD_ACCEPT))
+	if (!(events.lNetworkEvents & FD_ACCEPT))
 		return;
 
-	Result = Events.iErrorCode [FD_ACCEPT_BIT];
-	if (Result != ERROR_SUCCESS)
+	result = events.iErrorCode [FD_ACCEPT_BIT];
+	if (result != ERROR_SUCCESS)
 		return;
 
-	SOCKET s = m_Sock.Accept ();
+	SOCKET s = m_sock.accept ();
 	if (s == INVALID_SOCKET)
 		return;
 
-	ref::CPtrT <CConnectionSock> Socket = AXL_REF_NEW (ref::CBoxT <CConnectionSock>);
-	Socket->m_Sock.Attach (s);
+	ref::CPtrT <CConnectionSock> socket = AXL_REF_NEW (ref::CBoxT <CConnectionSock>);
+	socket->m_sock.attach (s);
 
-	TSockAddrU Addr;
-	Socket->GetPeerAddress (&Addr);
+	TSockAddrU addr;
+	socket->getPeerAddress (&addr);
 
-	m_OnAccept->Invoke (0, Socket);
+	m_onAccept->invoke (0, socket);
 }
 
 //.............................................................................

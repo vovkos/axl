@@ -9,134 +9,134 @@ namespace io {
 //.............................................................................
 
 void*
-CMappedViewMgr::Find (
-	uint64_t Begin,
-	uint64_t End
+CMappedViewMgr::find (
+	uint64_t begin,
+	uint64_t end
 	)
 {
 	// first check the last view
 
-	TViewEntry* pViewEntry = *m_ViewList.GetHead ();
-	if (!pViewEntry)
+	TViewEntry* viewEntry = *m_viewList.getHead ();
+	if (!viewEntry)
 		return NULL;
 		
-	if (pViewEntry->m_Begin <= Begin && pViewEntry->m_End >= End)
-		return (uchar_t*) (void*) pViewEntry->m_View + Begin - pViewEntry->m_Begin;
+	if (viewEntry->m_begin <= begin && viewEntry->m_end >= end)
+		return (uchar_t*) (void*) viewEntry->m_view + begin - viewEntry->m_begin;
 
 	// ok, now try to find existing view using the view map...
 
-	CViewMap::CIterator It = m_ViewMap.FindEx (Begin, rtl::EBinTreeFindEx_Le);
-	if (!It)
+	CViewMap::CIterator it = m_viewMap.findEx (begin, rtl::EBinTreeFindEx_Le);
+	if (!it)
 		return NULL;
 
-	pViewEntry = It->m_Value;
-	if (pViewEntry->m_End < End)
+	viewEntry = it->m_value;
+	if (viewEntry->m_end < end)
 		return NULL;
 
 	// ok, this view covers it.
 	// move it to the head to mark as recently used and return
 
-	m_ViewList.MoveToHead (pViewEntry);
-	return (uchar_t*) (void*) pViewEntry->m_View + Begin - pViewEntry->m_Begin;
+	m_viewList.moveToHead (viewEntry);
+	return (uchar_t*) (void*) viewEntry->m_view + begin - viewEntry->m_begin;
 }
 
 void*
-CMappedViewMgr::View (
-	uint64_t Begin,
-	uint64_t End,
-	uint64_t OrigBegin,
-	uint64_t OrigEnd
+CMappedViewMgr::view (
+	uint64_t begin,
+	uint64_t end,
+	uint64_t origBegin,
+	uint64_t origEnd
 	)
 {
-	TViewEntry* pViewEntry = AXL_MEM_NEW (TViewEntry);
+	TViewEntry* viewEntry = AXL_MEM_NEW (TViewEntry);
 
 	void* p;
-	size_t Size = (size_t) (End - Begin);
+	size_t size = (size_t) (end - begin);
 	
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t Access = (m_pMappedFile->m_FileFlags & EFileFlag_ReadOnly) ? 
+	uint_t access = (m_mappedFile->m_fileFlags & EFileFlag_ReadOnly) ? 
 		FILE_MAP_READ : 
 		FILE_MAP_READ | FILE_MAP_WRITE;	
 
-	p = pViewEntry->m_View.View (m_pMappedFile->m_Mapping, Access, Begin, Size);
+	p = viewEntry->m_view.view (m_mappedFile->m_mapping, access, begin, size);
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int Protection = (m_pMappedFile->m_FileFlags & EFileFlag_ReadOnly) ? 
+	int protection = (m_mappedFile->m_fileFlags & EFileFlag_ReadOnly) ? 
 		PROT_READ : 
 		PROT_READ | PROT_WRITE;	
 	
-	p = pViewEntry->m_View.Map (
+	p = viewEntry->m_view.map (
 			NULL, 
-			Size, 
-			Protection, 
+			size, 
+			protection, 
 			MAP_SHARED, 
-			m_pMappedFile->m_File.m_File, 
-			Begin
+			m_mappedFile->m_file.m_file, 
+			begin
 			);
 #endif
 	
 	if (!p)
 	{
-		AXL_MEM_DELETE (pViewEntry);
+		AXL_MEM_DELETE (viewEntry);
 		return NULL;
 	}
 
-	pViewEntry->m_Begin = Begin;
-	pViewEntry->m_End = End;
+	viewEntry->m_begin = begin;
+	viewEntry->m_end = end;
 
-	m_ViewList.InsertHead (pViewEntry);
+	m_viewList.insertHead (viewEntry);
 
 	// update viewmap
 
-	CViewMap::CIterator It = m_ViewMap.Goto (Begin);
-	if (It->m_Value) 
+	CViewMap::CIterator it = m_viewMap.visit (begin);
+	if (it->m_value) 
 	{
-		TViewEntry* pOldViewEntry = It->m_Value;
+		TViewEntry* oldViewEntry = it->m_value;
 		
-		ASSERT (pOldViewEntry->m_MapIt == It);
-		ASSERT (pOldViewEntry->m_End < End); // otherwise, we should have just used this view!
+		ASSERT (oldViewEntry->m_mapIt == it);
+		ASSERT (oldViewEntry->m_end < end); // otherwise, we should have just used this view!
 
-		pOldViewEntry->m_MapIt = NULL; // this view is removed from the map
+		oldViewEntry->m_mapIt = NULL; // this view is removed from the map
 	}
 
-	pViewEntry->m_MapIt = It;
-	It->m_Value = pViewEntry;
+	viewEntry->m_mapIt = it;
+	it->m_value = viewEntry;
 
 	// now, for all the old views that are completely overlapped by this new view --
 	// remove them from the map (but do not unmap yet, so recent View () results still valid)
 
-	It++;
-	while (It)
+	it++;
+	while (it)
 	{
-		TViewEntry* pOldViewEntry = It->m_Value;
-		if (pOldViewEntry->m_End > End) // nope, not overlapped
+		TViewEntry* oldViewEntry = it->m_value;
+		if (oldViewEntry->m_end > end) // nope, not overlapped
 			break;
 
-		ASSERT (pOldViewEntry->m_MapIt == It);
+		ASSERT (oldViewEntry->m_mapIt == it);
 
 		// this view is completely overlapped and is not needed for new view requests
 		// remove it from map but do not delete it to make sure last N view request are still valid
 
-		CViewMap::CIterator Next = It.GetInc (1);
-		m_ViewMap.Delete (It);
-		pOldViewEntry->m_MapIt = NULL;
+		CViewMap::CIterator next = it.getInc (1);
+		m_viewMap.erase (it);
+		oldViewEntry->m_mapIt = NULL;
 
-		It = Next;
+		it = next;
 	}
 
 	return p;
 }
 
 void
-CMappedViewMgr::LimitViewCount (size_t MaxViewCount)
+CMappedViewMgr::limitViewCount (size_t maxViewCount)
 {
-	while (m_ViewList.GetCount () > MaxViewCount)
+	while (m_viewList.getCount () > maxViewCount)
 	{
-		TViewEntry* pView = m_ViewList.RemoveTail ();
+		TViewEntry* view = m_viewList.removeTail ();
 	
-		if (pView->m_MapIt)
-			m_ViewMap.Delete (pView->m_MapIt);
+		if (view->m_mapIt)
+			m_viewMap.erase (view->m_mapIt);
 
-		AXL_MEM_DELETE (pView);
+		AXL_MEM_DELETE (view);
 	}
 }
 
@@ -144,133 +144,133 @@ CMappedViewMgr::LimitViewCount (size_t MaxViewCount)
 
 CMappedFile::CMappedFile ()
 {
-	m_FileFlags = 0;
-	m_FileSize = 0;
-	m_ReadAheadSize = EDefaults_ReadAheadSize;
-	m_MaxDynamicViewCount = EDefaults_MaxDynamicViewCount;
-	m_DynamicViewMgr.m_pMappedFile = this;
-	m_PermanentViewMgr.m_pMappedFile = this;
+	m_fileFlags = 0;
+	m_fileSize = 0;
+	m_readAheadSize = EDefaults_ReadAheadSize;
+	m_maxDynamicViewCount = EDefaults_MaxDynamicViewCount;
+	m_dynamicViewMgr.m_mappedFile = this;
+	m_permanentViewMgr.m_mappedFile = this;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	m_MappedSize = 0;
+	m_mappedSize = 0;
 #endif
 }
 
 bool
-CMappedFile::Open (
-	const char* pFileName,
-	uint_t Flags
+CMappedFile::open (
+	const char* fileName,
+	uint_t flags
 	)
 {
-	Close ();
+	close ();
 	
-	bool Result = m_File.Open (pFileName, Flags);
-	if (!Result)
+	bool result = m_file.open (fileName, flags);
+	if (!result)
 		return false;
 
-	m_FileFlags = Flags;
-	m_FileSize = m_File.GetSize ();
+	m_fileFlags = flags;
+	m_fileSize = m_file.getSize ();
 	return true;
 }
 
 void
-CMappedFile::Close ()
+CMappedFile::close ()
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return;
 
-	UnmapAllViews ();
+	unmapAllViews ();
 
 	// now that all the views are unmapped, we can update file size
 
-	if (m_FileSize != m_File.GetSize ())
-		m_File.SetSize (m_FileSize);
+	if (m_fileSize != m_file.getSize ())
+		m_file.setSize (m_fileSize);
 
-	m_File.Close ();
+	m_file.close ();
 	
-	m_FileFlags = 0;
-	m_FileSize = 0;
+	m_fileFlags = 0;
+	m_fileSize = 0;
 }
 
 bool
-CMappedFile::SetSize (
-	uint64_t Size,
-	bool UnmapAndApplyNow
+CMappedFile::setSize (
+	uint64_t size,
+	bool unmapAndApplyNow
 	)
 {
-	if (m_FileFlags & EFileFlag_ReadOnly)
-		return err::Fail (err::EStatus_InvalidDeviceRequest);
+	if (m_fileFlags & EFileFlag_ReadOnly)
+		return err::fail (err::EStatus_InvalidDeviceRequest);
 
-	m_FileSize = Size;
+	m_fileSize = size;
 
-	if (!UnmapAndApplyNow || m_FileSize == m_File.GetSize ())
+	if (!unmapAndApplyNow || m_fileSize == m_file.getSize ())
 		return true;
 
-	UnmapAllViews ();
-	return m_File.SetSize (m_FileSize);
+	unmapAllViews ();
+	return m_file.setSize (m_fileSize);
 }
 
 bool
-CMappedFile::Setup (
-	size_t MaxDynamicViewCount,
-	size_t ReadAheadSize
+CMappedFile::setup (
+	size_t maxDynamicViewCount,
+	size_t readAheadSize
 	)
 {
-	if (!MaxDynamicViewCount)
-		return err::Fail (err::EStatus_InvalidParameter);
+	if (!maxDynamicViewCount)
+		return err::fail (err::EStatus_InvalidParameter);
 
-	m_MaxDynamicViewCount = MaxDynamicViewCount;
-	m_ReadAheadSize = ReadAheadSize;
+	m_maxDynamicViewCount = maxDynamicViewCount;
+	m_readAheadSize = readAheadSize;
 
-	m_DynamicViewMgr.LimitViewCount (MaxDynamicViewCount);
+	m_dynamicViewMgr.limitViewCount (maxDynamicViewCount);
 	return true;
 }
 
 void*
-CMappedFile::View (
-	uint64_t Offset,
-	size_t Size,
-	bool IsPermanent
+CMappedFile::view (
+	uint64_t offset,
+	size_t size,
+	bool isPermanent
 	)
 {
-	uint64_t End = Size ? Offset + Size : m_FileSize; 
+	uint64_t end = size ? offset + size : m_fileSize; 
 
-	if (End > m_FileSize)
+	if (end > m_fileSize)
 	{	
-		if (m_FileFlags & EFileFlag_ReadOnly)
-			return err::Fail ((void*) NULL, err::EStatus_InvalidDeviceRequest);
+		if (m_fileFlags & EFileFlag_ReadOnly)
+			return err::fail ((void*) NULL, err::EStatus_InvalidDeviceRequest);
 		
-		m_FileSize = End;
+		m_fileSize = end;
 		
 #if (_AXL_ENV == AXL_ENV_POSIX)
-		bool Result = m_File.SetSize (End);
-		if (!Result)
+		bool result = m_file.setSize (end);
+		if (!result)
 			return NULL;
 #endif
 	}
 	
-	return ViewImpl (Offset, End, IsPermanent);
+	return viewImpl (offset, end, isPermanent);
 }
 
 void*
-CMappedFile::ViewImpl (
-	uint64_t Offset,
-	uint64_t End,
-	bool IsPermanent
+CMappedFile::viewImpl (
+	uint64_t offset,
+	uint64_t end,
+	bool isPermanent
 	) const
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return NULL;
 	
 	// first, try to find existing view...
 
-	void* p = m_PermanentViewMgr.Find (Offset, End);
+	void* p = m_permanentViewMgr.find (offset, end);
 	if (p)
 		return p;
 
-	if (!IsPermanent)
+	if (!isPermanent)
 	{
-		p = m_DynamicViewMgr.Find (Offset, End);
+		p = m_dynamicViewMgr.find (offset, end);
 		if (p)
 			return p;
 	}
@@ -279,94 +279,94 @@ CMappedFile::ViewImpl (
 
 	// align view base on system allocation granularity
 
-	g::TSystemInfo* pSystemInfo = g::GetModule ()->GetSystemInfo ();
+	g::TSystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 
-	uint64_t ViewBegin = Offset - Offset % pSystemInfo->m_MappingAlignFactor;
-	uint64_t ViewEnd = End + m_ReadAheadSize;
+	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
+	uint64_t viewEnd = end + m_readAheadSize;
 
 	// align view region size on system page size
 
-	if (ViewEnd % pSystemInfo->m_PageSize)
-		ViewEnd = ViewEnd - ViewEnd % pSystemInfo->m_PageSize + pSystemInfo->m_PageSize;
+	if (viewEnd % systemInfo->m_pageSize)
+		viewEnd = viewEnd - viewEnd % systemInfo->m_pageSize + systemInfo->m_pageSize;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	// ensure mapping covers the view
 
-	if (!m_Mapping.IsOpen () || ViewEnd > m_MappedSize)
+	if (!m_mapping.isOpen () || viewEnd > m_mappedSize)
 	{
-		uint_t Protection;
+		uint_t protection;
 
-		if (m_FileFlags & EFileFlag_ReadOnly)
+		if (m_fileFlags & EFileFlag_ReadOnly)
 		{
-			if (End > m_FileSize)
+			if (end > m_fileSize)
 			{
-				err::SetError (err::EStatus_InvalidAddress);
+				err::setError (err::EStatus_InvalidAddress);
 				return NULL;
 			}
 
-			if (ViewEnd > m_FileSize)
-				ViewEnd = m_FileSize;
+			if (viewEnd > m_fileSize)
+				viewEnd = m_fileSize;
 
-			Protection = PAGE_READONLY;
+			protection = PAGE_READONLY;
 		}
 		else
 		{
-			Protection = PAGE_READWRITE;
+			protection = PAGE_READWRITE;
 		}
 		
-		bool Result = m_Mapping.Create (m_File.m_File, NULL, Protection, ViewEnd);
-		if (!Result)
+		bool result = m_mapping.create (m_file.m_file, NULL, protection, viewEnd);
+		if (!result)
 			return false;
 
-		m_MappedSize = ViewEnd;
+		m_mappedSize = viewEnd;
 	}
 #endif
 	
 	// map the view
 
-	if (IsPermanent)
+	if (isPermanent)
 	{
-		p = m_PermanentViewMgr.View (ViewBegin, ViewEnd, Offset, End);
+		p = m_permanentViewMgr.view (viewBegin, viewEnd, offset, end);
 	}
 	else
 	{
-		p = m_DynamicViewMgr.View (ViewBegin, ViewEnd, Offset, End);
-		m_DynamicViewMgr.LimitViewCount (m_MaxDynamicViewCount);
+		p = m_dynamicViewMgr.view (viewBegin, viewEnd, offset, end);
+		m_dynamicViewMgr.limitViewCount (m_maxDynamicViewCount);
 	}
 
 	if (!p)
 		return NULL;
 
-	return (uchar_t*) p + Offset - ViewBegin;
+	return (uchar_t*) p + offset - viewBegin;
 }
 
 void
-CMappedFile::UnmapAllViews ()
+CMappedFile::unmapAllViews ()
 {
-	m_PermanentViewMgr.Clear ();
-	m_DynamicViewMgr.Clear ();
+	m_permanentViewMgr.clear ();
+	m_dynamicViewMgr.clear ();
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	m_Mapping.Close ();
-	m_MappedSize = 0;
+	m_mapping.close ();
+	m_mappedSize = 0;
 #endif
 }
 
 //.............................................................................
 
 bool
-CSimpleMappedFile::Open (
-	const char* pFileName, 
-	uint64_t Offset,
-	size_t Size,
-	uint_t Flags
+CSimpleMappedFile::open (
+	const char* fileName, 
+	uint64_t offset,
+	size_t size,
+	uint_t flags
 	)
 {
-	Close ();
+	close ();
 
 	return 
-		m_File.Open (pFileName, Flags) &&
-		m_Mapping.Open (&m_File, Offset, Size, Flags);
+		m_file.open (fileName, flags) &&
+		m_mapping.open (&m_file, offset, size, flags);
 }
 
 //.............................................................................

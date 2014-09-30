@@ -28,16 +28,16 @@ class CUsbErrorProvider: public err::CErrorProvider
 public:
 	static
 	rtl::CString 
-	GetErrorDescription (int Error)
+	getErrorDescription (int code)
 	{
-		return libusb_error_name (Error);
+		return libusb_error_name (code);
 	}
 
 	virtual 
 	rtl::CString 
-	GetErrorDescription (const err::TError* pError)
+	getErrorDescription (const err::TError* error)
 	{
-		return GetErrorDescription (pError->m_Code);
+		return getErrorDescription (error->m_code);
 	}
 };
 
@@ -50,22 +50,22 @@ public:
 	{
 	}
 
-	CUsbError (int Error)
+	CUsbError (int code)
 	{
-		Create (Error);
+		create (code);
 	}
 
 	err::TError* 
-	Create (int Error);
+	create (int code);
 };
 
 //.............................................................................
 
 inline
 err::CError
-SetUsbError (int Error)
+setUsbError (int code)
 {
-	SetError (CUsbError (Error));
+	setError (CUsbError (code));
 }
 
 //.............................................................................

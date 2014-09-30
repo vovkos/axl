@@ -19,65 +19,65 @@ class CSerial: public CFd
 {
 public:
 	bool
-	Open (const char* pName)
+	open (const char* name)
 	{
 		return
-			CFd::Open (pName, O_RDWR | O_NONBLOCK | O_NOCTTY, 0) &&
-			SetBlockingMode (true);
+			CFd::open (name, O_RDWR | O_NONBLOCK | O_NOCTTY, 0) &&
+			setBlockingMode (true);
 	}
 
 	bool
-	GetAttr (termios* pAttr) const
+	getAttr (termios* attr) const
 	{
-		int Result = tcgetattr (m_h, pAttr);
-		return err::Complete (Result != -1);
+		int result = tcgetattr (m_h, attr);
+		return err::complete (result != -1);
 	}
 
 	bool
-	SetAttr (
-		const termios* pAttr,
-		int Action = TCSANOW
+	setAttr (
+		const termios* attr,
+		int action = TCSANOW
 		)
 	{
-		int Result = tcsetattr (m_h, Action, pAttr);
-		return err::Complete (Result != -1);
+		int result = tcsetattr (m_h, action, attr);
+		return err::complete (result != -1);
 	}
 
 	bool
-	Drain ()
+	drain ()
 	{
-		int Result = tcdrain (m_h);
-		return err::Complete (Result != -1);
+		int result = tcdrain (m_h);
+		return err::complete (result != -1);
 	}
 
 	bool
-	Flush (int QueueSelector = TCIOFLUSH)
+	flush (int queueSelector = TCIOFLUSH)
 	{
-		int Result = tcflush (m_h, QueueSelector);
-		return err::Complete (Result != -1);
+		int result = tcflush (m_h, queueSelector);
+		return err::complete (result != -1);
 	}
 
 	bool
-	Flow (int Action)
+	flow (int action)
 	{
-		int Result = tcflow (m_h, Action);
-		return err::Complete (Result != -1);
+		int result = tcflow (m_h, action);
+		return err::complete (result != -1);
 	}
 
 	uint_t
-	GetStatusLines () const;
+	getStatusLines () const;
 
 	bool
-	SetDtr (bool IsSet);
+	setDtr (bool isSet);
 
 	bool
-	SetRts (bool IsSet);
+	setRts (bool isSet);
 
 	bool
-	Wait (uint_t Mask)
+	wait (uint_t mask)
 	{
-		int Result = ioctl (m_h, TIOCMIWAIT, Mask);
-		return err::Complete (Result != -1);
+		int result = ioctl (m_h, TIOCMIWAIT, mask);
+		return err::complete (result != -1);
 	}
 };
 

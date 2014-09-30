@@ -14,9 +14,9 @@ namespace gui {
 //.............................................................................
 
 bool
-GetFontDescFromFontInfo (
-	const QFontInfo& FontInfo,
-	TFontDesc* pFontDesc
+getFontDescFromFontInfo (
+	const QFontInfo& fontInfo,
+	TFontDesc* fontDesc
 	);
 
 //.............................................................................
@@ -26,43 +26,43 @@ class CQtFont: public CFont
 	friend class CQtEngine;
 
 public:
-	QFont m_QtFont;
+	QFont m_qtFont;
 	
 public:
 	CQtFont ();
 
 	virtual
 	bool
-	IsMonospace ()
+	isMonospace ()
 	{
-		return QFontInfo (m_QtFont).fixedPitch ();
+		return QFontInfo (m_qtFont).fixedPitch ();
 	}
 
 	TSize
-	CalcTextSize_qt (const QString& String);
+	calcTextSize_qt (const QString& string);
 
 	virtual
 	TSize
-	CalcTextSize_utf8 (
-		const utf8_t* pText,
-		size_t Length = -1
+	calcTextSize_utf8 (
+		const utf8_t* text,
+		size_t length = -1
 		);
 
 	virtual
 	TSize
-	CalcTextSize_utf16 (
-		const utf16_t* pText,
-		size_t Length = -1
+	calcTextSize_utf16 (
+		const utf16_t* text,
+		size_t length = -1
 		)
 	{
-		return CalcTextSize_qt (QString ((const QChar*) pText, Length));
+		return calcTextSize_qt (QString ((const QChar*) text, length));
 	}
 
 	virtual
 	TSize
-	CalcTextSize_utf32 (
-		const utf32_t* pText,
-		size_t Length = -1
+	calcTextSize_utf32 (
+		const utf32_t* text,
+		size_t length = -1
 		);
 };
 

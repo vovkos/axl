@@ -30,152 +30,152 @@ class CSocket
 {
 public:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CSocket m_Socket;
+	win::CSocket m_socket;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CSocket m_Socket;
+	psx::CSocket m_socket;
 #endif
 
 public:
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_Socket.IsOpen ();
+		return m_socket.isOpen ();
 	}
 
 	bool
-	Open (
-		int AddressFamily,
-		int SockKind,
-		int Protocol
+	open (
+		int addressFamily,
+		int sockKind,
+		int protocol
 		)
 	{
-		return m_Socket.Open (AddressFamily, SockKind, Protocol);
+		return m_socket.open (addressFamily, sockKind, protocol);
 	}
 
 	void
-	Close ()
+	close ()
 	{
-		m_Socket.Close ();
+		m_socket.close ();
 	}
 
 	int
-	GetError ()
+	getError ()
 	{
-		return m_Socket.GetError ();
+		return m_socket.getError ();
 	}
 
 	bool
-	SetBlockingMode (bool IsBlocking)
+	setBlockingMode (bool isBlocking)
 	{
-		return m_Socket.SetBlockingMode (IsBlocking);
+		return m_socket.setBlockingMode (isBlocking);
 	}
 
 	size_t
-	GetIncomingDataSize ()
+	getIncomingDataSize ()
 	{
-		return m_Socket.GetIncomingDataSize ();
+		return m_socket.getIncomingDataSize ();
 	}
 
 	bool
-	Bind (const sockaddr* pAddr)
+	bind (const sockaddr* addr)
 	{
-		return m_Socket.Bind (pAddr);
+		return m_socket.bind (addr);
 	}
 
 	bool
-	GetAddress (sockaddr* pAddr)
+	getAddress (sockaddr* addr)
 	{
-		return m_Socket.GetAddress (pAddr);
+		return m_socket.getAddress (addr);
 	}
 
 	bool
-	GetPeerAddress (sockaddr* pAddr)
+	getPeerAddress (sockaddr* addr)
 	{
-		return m_Socket.GetPeerAddress (pAddr);
+		return m_socket.getPeerAddress (addr);
 	}
 
 	bool
-	GetOption (
-		int Level,
-		int Option,
+	getOption (
+		int level,
+		int option,
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_Socket.GetOption (Level, Option, p, Size);
+		return m_socket.getOption (level, option, p, size);
 	}
 
 	bool
-	SetOption (
-		int Level,
-		int Option,
+	setOption (
+		int level,
+		int option,
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_Socket.SetOption (Level, Option, p, Size);
+		return m_socket.setOption (level, option, p, size);
 	}
 
 	bool
-	Listen (size_t BackLog)
+	listen (size_t backLog)
 	{
-		return m_Socket.Listen (BackLog);
+		return m_socket.listen (backLog);
 	}
 
 	bool
-	Accept (
-		CSocket* pSocket,
-		sockaddr* pAddr = NULL
+	accept (
+		CSocket* socket,
+		sockaddr* addr = NULL
 		);
 
 	bool
-	Connect (const sockaddr* pAddr)
+	connect (const sockaddr* addr)
 	{
-		return m_Socket.Connect (pAddr);
+		return m_socket.connect (addr);
 	}
 
 	bool
-	Shutdown (ESocketShutdown ShutdownKind = ESocketShutdown_All)
+	shutdown (ESocketShutdown shutdownKind = ESocketShutdown_All)
 	{
-		return m_Socket.Shutdown (ShutdownKind);
+		return m_socket.shutdown (shutdownKind);
 	}
 
 	size_t
-	Send (
+	send (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_Socket.Send (p, Size);
+		return m_socket.send (p, size);
 	}
 
 	size_t
-	Recv (
+	recv (
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return m_Socket.Recv (p, Size);
+		return m_socket.recv (p, size);
 	}
 
 	size_t
-	SendTo (
+	sendTo (
 		void* p,
-		size_t Size,
-		const sockaddr* pAddr
+		size_t size,
+		const sockaddr* addr
 		)
 	{
-		return m_Socket.SendTo (p, Size, pAddr);
+		return m_socket.sendTo (p, size, addr);
 	}
 
 	size_t
-	RecvFrom (
+	recvFrom (
 		void* p,
-		size_t Size,
-		sockaddr* pAddr
+		size_t size,
+		sockaddr* addr
 		)
 	{
-		return m_Socket.RecvFrom (p, Size, pAddr);
+		return m_socket.recvFrom (p, size, addr);
 	}
 };
 

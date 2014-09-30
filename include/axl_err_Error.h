@@ -37,27 +37,27 @@ enum EErrorMode
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 EErrorMode
-GetErrorMode ();
+getErrorMode ();
 
 EErrorMode // returns previous one
-SetErrorMode (EErrorMode Mode);
+setErrorMode (EErrorMode mode);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CScopeErrorMode
 {
 protected:
-	EErrorMode m_OldMode;
+	EErrorMode m_oldMode;
 
 public:
-	CScopeErrorMode (EErrorMode Mode)
+	CScopeErrorMode (EErrorMode mode)
 	{
-		m_OldMode = SetErrorMode (Mode);
+		m_oldMode = setErrorMode (mode);
 	}
 
 	~CScopeErrorMode ()
 	{
-		SetErrorMode (m_OldMode);
+		setErrorMode (m_oldMode);
 	}
 };
 
@@ -130,7 +130,7 @@ enum EStatus
 
 inline
 uint_t
-GetLastSystemErrorCode ()
+getLastSystemErrorCode ()
 {
 	return ::GetLastError ();
 }
@@ -236,7 +236,7 @@ enum EStatus
 
 inline
 uint_t
-GetLastSystemErrorCode ()
+getLastSystemErrorCode ()
 {
 	return errno;
 }
@@ -249,19 +249,19 @@ GetLastSystemErrorCode ()
 
 struct TError
 {
-	uint32_t m_Size;
-	rtl::TGuid m_Guid;
-	uint32_t m_Code;
+	uint32_t m_size;
+	rtl::TGuid m_guid;
+	uint32_t m_code;
 
 	// possibly followed by error data
 
 	rtl::CString
-	GetDescription () const;
+	getDescription () const;
 
 	bool
-	IsKind (
-		const rtl::TGuid& Guid,
-		uint_t Code
+	isKind (
+		const rtl::TGuid& guid,
+		uint_t code
 		) const;
 };
 
@@ -269,7 +269,7 @@ struct TError
 
 extern
 AXL_SELECT_ANY
-const TError NoError =
+const TError noError =
 {
 	sizeof (TError),
 	GUID_StdError,
@@ -284,8 +284,8 @@ public:
 	size_t
 	operator () (const TError& x)
 	{
-		ASSERT (x.m_Size >= sizeof (TError));
-		return AXL_MAX (x.m_Size, sizeof (TError));
+		ASSERT (x.m_size >= sizeof (TError));
+		return AXL_MAX (x.m_size, sizeof (TError));
 	}
 };
 
@@ -300,272 +300,272 @@ public:
 	{
 	}
 
-	CError (const TError& Src)
+	CError (const TError& src)
 	{
-		Copy (Src);
+		copy (src);
 	}
 
 	CError (
-		ref::EBuf Kind,
+		ref::EBuf kind,
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		SetBuffer (Kind, p, Size);
+		setBuffer (kind, p, size);
 	}
 
 	CError (
-		const rtl::TGuid& Guid,
-		uint_t Code,
-		ref::EBuf Kind = ref::EBuf_Stack,
-		TError* p = (TError*) _alloca (MinBufSize),
-		size_t Size = MinBufSize
+		const rtl::TGuid& guid,
+		uint_t code,
+		ref::EBuf kind = ref::EBuf_Stack,
+		TError* p = (TError*) _alloca (minBufSize),
+		size_t size = minBufSize
 		)
 	{
 		if (p)
-			SetBuffer (Kind, p, Size);
+			setBuffer (kind, p, size);
 
-		CreateSimpleError (Guid, Code);
+		createSimpleError (guid, code);
 	}
 
 	CError (
-		uint_t Code,
-		ref::EBuf Kind = ref::EBuf_Stack,
-		TError* p = (TError*) _alloca (MinBufSize),
-		size_t Size = MinBufSize
+		uint_t code,
+		ref::EBuf kind = ref::EBuf_Stack,
+		TError* p = (TError*) _alloca (minBufSize),
+		size_t size = minBufSize
 		)
 	{
 		if (p)
-			SetBuffer (Kind, p, Size);
+			setBuffer (kind, p, size);
 
-		CreateSystemError (Code);
+		createSystemError (code);
 	}
 
 	bool
-	IsKind (
-		const rtl::TGuid& Guid,
-		uint_t Code
+	isKind (
+		const rtl::TGuid& guid,
+		uint_t code
 		) const
 	{
-		return m_p && m_p->IsKind (Guid, Code);
+		return m_p && m_p->isKind (guid, code);
 	}
 
 	rtl::CString
-	GetDescription () const;
+	getDescription () const;
 
 	TError*
-	Copy (const TError& Src);
+	copy (const TError& src);
 
 	TError*
-	Push (const TError& Error);
+	push (const TError& error);
 
 	// pack
 
 	template <typename TPack>
 	TError*
-	Pack_va (
-		const rtl::TGuid& Guid,
-		uint_t Code,
+	pack_va (
+		const rtl::TGuid& guid,
+		uint_t code,
 		axl_va_list va
 		)
 	{
-		size_t PackSize;
-		TPack () (NULL, &PackSize, va);
+		size_t packSize;
+		TPack () (NULL, &packSize, va);
 
-		size_t Size = sizeof (TError) + PackSize;
-		GetBuffer (Size);
+		size_t size = sizeof (TError) + packSize;
+		getBuffer (size);
 		if (!m_p)
 			return NULL;
 
-		m_p->m_Size = Size;
-		m_p->m_Guid = Guid;
-		m_p->m_Code = Code;
+		m_p->m_size = size;
+		m_p->m_guid = guid;
+		m_p->m_code = code;
 
-		TPack () (m_p + 1, &PackSize, va);
+		TPack () (m_p + 1, &packSize, va);
 		return m_p;
 	}
 
 	template <typename TPack>
 	TError*
-	Pack (
-		const rtl::TGuid& Guid,
-		uint_t Code,
+	pack (
+		const rtl::TGuid& guid,
+		uint_t code,
 		...
 		)
 	{
-		AXL_VA_DECL (va, Code);
-		return Pack_va <TPack> (Guid, Code, va);
+		AXL_VA_DECL (va, code);
+		return pack_va <TPack> (guid, code, va);
 	}
 
 	template <typename TPack>
 	TError*
-	PushPack_va (
-		const rtl::TGuid& Guid,
-		uint_t Code,
+	pushPack_va (
+		const rtl::TGuid& guid,
+		uint_t code,
 		axl_va_list va
 		)
 	{
 		if (!m_p)
-			return Pack_va <TPack> (Guid, Code, va);
+			return pack_va <TPack> (guid, code, va);
 
-		CError Error;
-		Error.Pack_va <TPack> (Guid, Code, va);
-		return Push (*Error);
+		CError error;
+		error.pack_va <TPack> (guid, code, va);
+		return push (*error);
 	}
 
 	template <typename TPack>
 	TError*
-	PushPack (
-		const rtl::TGuid& Guid,
-		uint_t Code,
+	pushPack (
+		const rtl::TGuid& guid,
+		uint_t code,
 		...
 		)
 	{
-		AXL_VA_DECL (va, Code);
-		return PushPack_va <TPack> (Guid, Code, va);
+		AXL_VA_DECL (va, code);
+		return pushPack_va <TPack> (guid, code, va);
 	}
 
 	// format
 
 	TError*
-	Format_va (
-		const rtl::TGuid& Guid,
-		uint_t Code,
-		const char* pFormat,
+	format_va (
+		const rtl::TGuid& guid,
+		uint_t code,
+		const char* formatString,
 		axl_va_list va
 		);
 
 	TError*
-	Format (
-		const rtl::TGuid& Guid,
-		uint_t Code,
-		const char* pFormat,
+	format (
+		const rtl::TGuid& guid,
+		uint_t code,
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return Format_va (Guid, Code, pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return format_va (guid, code, formatString, va);
 	}
 
 	TError*
-	PushFormat_va (
-		const rtl::TGuid& Guid,
-		uint_t Code,
-		const char* pFormat,
+	pushFormat_va (
+		const rtl::TGuid& guid,
+		uint_t code,
+		const char* formatString,
 		axl_va_list va
 		)
 	{
 		if (!m_p)
-			return Format_va (Guid, Code, pFormat, va);
+			return format_va (guid, code, formatString, va);
 
-		CError Error;
-		Error.Format_va (Guid, Code, pFormat, va);
-		return Push (*Error);
+		CError error;
+		error.format_va (guid, code, formatString, va);
+		return push (*error);
 	}
 
 	TError*
-	PushFormat (
-		const rtl::TGuid& Guid,
-		uint_t Code,
-		const char* pFormat,
+	pushFormat (
+		const rtl::TGuid& guid,
+		uint_t code,
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return PushFormat_va (Guid, Code, pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return pushFormat_va (guid, code, formatString, va);
 	}
 
 	// simple error
 
 	TError*
-	CreateSimpleError (
-		const rtl::TGuid& Guid,
-		uint_t Code
+	createSimpleError (
+		const rtl::TGuid& guid,
+		uint_t code
 		);
 
 	TError*
-	PushSimpleError (
-		const rtl::TGuid& Guid,
-		uint_t Code
+	pushSimpleError (
+		const rtl::TGuid& guid,
+		uint_t code
 		)
 	{
 		if (!m_p)
-			return CreateSimpleError (Guid, Code);
+			return createSimpleError (guid, code);
 
-		CError Error;
-		Error.CreateSimpleError (Guid, Code);
-		return Push (*Error);
+		CError error;
+		error.createSimpleError (guid, code);
+		return push (*error);
 	}
 
 	// system error (push is irrelevant for system errors)
 
 	TError*
-	CreateSystemError (uint_t Code)
+	createSystemError (uint_t code)
 	{
-		return CreateSimpleError (GUID_SystemError, Code);
+		return createSimpleError (GUID_SystemError, code);
 	}
 
 	// string error
 
 	TError*
-	CreateStringError (
+	createStringError (
 		const char* p,
-		size_t Length = -1
+		size_t length = -1
 		);
 
 	TError*
-	PushStringError (
+	pushStringError (
 		const char* p,
-		size_t Length = -1
+		size_t length = -1
 		)
 	{
 		if (!m_p)
-			return CreateStringError (p, Length);
+			return createStringError (p, length);
 
-		CError Error;
-		Error.CreateStringError (p, Length);
-		return Push (*Error);
+		CError error;
+		error.createStringError (p, length);
+		return push (*error);
 	}
 
 	TError*
-	FormatStringError_va (
-		const char* pFormat,
+	formatStringError_va (
+		const char* formatString,
 		axl_va_list va
 		);
 
 	TError*
-	FormatStringError (
-		const char* pFormat,
+	formatStringError (
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return FormatStringError_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return formatStringError_va (formatString, va);
 	}
 
 	TError*
-	PushFormatStringError_va (
-		const char* pFormat,
+	pushFormatStringError_va (
+		const char* formatString,
 		axl_va_list va
 		)
 	{
 		if (!m_p)
-			return FormatStringError_va (pFormat, va);
+			return formatStringError_va (formatString, va);
 
-		CError Error;
-		Error.FormatStringError_va (pFormat, va);
-		return Push (*Error);
+		CError error;
+		error.formatStringError_va (formatString, va);
+		return push (*error);
 	}
 
 
 	TError*
-	PushFormatStringError (
-		const char* pFormat,
+	pushFormatStringError (
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return PushFormatStringError_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return pushFormatStringError_va (formatString, va);
 	}
 };
 
@@ -574,18 +574,18 @@ public:
 // utility functions
 
 CError
-GetError ();
+getError ();
 
 CError
-SetError (const CError& Error);
+setError (const CError& error);
 
 inline
 CError
-PushError (const CError& Error)
+pushError (const CError& error)
 {
-	CError Stack = GetError ();
-	Stack.Push (*Error);
-	return SetError (Stack);
+	CError stack = getError ();
+	stack.push (*error);
+	return setError (stack);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -594,52 +594,52 @@ PushError (const CError& Error)
 
 template <typename TPack>
 CError
-SetPackError_va (
-	const rtl::TGuid& Guid,
-	uint_t Code,
+setPackError_va (
+	const rtl::TGuid& guid,
+	uint_t code,
 	axl_va_list va
 	)
 {
-	CError Error;
-	Error.Pack_va <TPack> (Guid, Code, va);
-	return SetError (Error);
+	CError error;
+	error.pack_va <TPack> (guid, code, va);
+	return setError (error);
 }
 
 template <typename TPack>
 CError
-SetPackError (
-	const rtl::TGuid& Guid,
-	uint_t Code,
+setPackError (
+	const rtl::TGuid& guid,
+	uint_t code,
 	...
 	)
 {
-	AXL_VA_DECL (va, Code);
-	return SetPackError_va <TPack> (Guid, Code, va);
+	AXL_VA_DECL (va, code);
+	return setPackError_va <TPack> (guid, code, va);
 }
 
 template <typename TPack>
 CError
-PushPackError_va (
-	const rtl::TGuid& Guid,
-	uint_t Code,
+pushPackError_va (
+	const rtl::TGuid& guid,
+	uint_t code,
 	axl_va_list va
 	)
 {
-	CError Error;
-	Error.Pack_va <TPack> (Guid, Code, va);
-	return PushError (Error);
+	CError error;
+	error.pack_va <TPack> (guid, code, va);
+	return pushError (error);
 }
 
 template <typename TPack>
 CError
-PushPackError (
-	const rtl::TGuid& Guid,
-	uint_t Code,
+pushPackError (
+	const rtl::TGuid& guid,
+	uint_t code,
 	...
 	)
 {
-	AXL_VA_DECL (va, Code);
-	return PushPackError_va <TPack> (Guid, Code, va);
+	AXL_VA_DECL (va, code);
+	return pushPackError_va <TPack> (guid, code, va);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -648,56 +648,56 @@ PushPackError (
 
 inline
 CError
-SetFormatError_va (
-	const rtl::TGuid& Guid,
-	uint_t Code,
-	const char* pFormat,
+setFormatError_va (
+	const rtl::TGuid& guid,
+	uint_t code,
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError Error;
-	Error.Format_va (Guid, Code, pFormat, va);
-	return SetError (Error);
+	CError error;
+	error.format_va (guid, code, formatString, va);
+	return setError (error);
 }
 
 inline
 CError
-SetFormatError (
-	const rtl::TGuid& Guid,
-	uint_t Code,
-	const char* pFormat,
+setFormatError (
+	const rtl::TGuid& guid,
+	uint_t code,
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return SetFormatError_va (Guid, Code, pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	return setFormatError_va (guid, code, formatString, va);
 }
 
 inline
 CError
-PushFormatError_va (
-	const rtl::TGuid& Guid,
-	uint_t Code,
-	const char* pFormat,
+pushFormatError_va (
+	const rtl::TGuid& guid,
+	uint_t code,
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError Error;
-	Error.Format_va (Guid, Code, pFormat, va);
-	return PushError (Error);
+	CError error;
+	error.format_va (guid, code, formatString, va);
+	return pushError (error);
 }
 
 inline
 CError
-PushFormatError (
-	const rtl::TGuid& Guid,
-	uint_t Code,
-	const char* pFormat,
+pushFormatError (
+	const rtl::TGuid& guid,
+	uint_t code,
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return PushFormatError_va (Guid, Code, pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	return pushFormatError_va (guid, code, formatString, va);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -707,22 +707,22 @@ PushFormatError (
 
 inline
 CError
-SetError (
-	const rtl::TGuid& Guid,
-	uint_t Code
+setError (
+	const rtl::TGuid& guid,
+	uint_t code
 	)
 {
-	return SetError (CError (Guid, Code));
+	return setError (CError (guid, code));
 }
 
 inline
 CError
-PushError (
-	const rtl::TGuid& Guid,
-	uint_t Code
+pushError (
+	const rtl::TGuid& guid,
+	uint_t code
 	)
 {
-	return PushError (CError (Guid, Code));
+	return pushError (CError (guid, code));
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -731,103 +731,103 @@ PushError (
 
 inline
 CError
-CreateStringError (
+createStringError (
 	const char* p,
-	size_t Length = -1
+	size_t length = -1
 	)
 {
-	CError Error;
-	Error.CreateStringError (p, Length);
-	return Error;
+	CError error;
+	error.createStringError (p, length);
+	return error;
 }
 
 inline
 CError
-SetStringError (
+setStringError (
 	const char* p,
-	size_t Length = -1
+	size_t length = -1
 	)
 {
-	return SetError (CreateStringError (p, Length));
+	return setError (createStringError (p, length));
 }
 
 inline
 CError
-PushStringError (
+pushStringError (
 	const char* p,
-	size_t Length = -1
+	size_t length = -1
 	)
 {
-	CError Error;
-	Error.CreateStringError (p, -1);
-	return SetError (Error);
+	CError error;
+	error.createStringError (p, -1);
+	return setError (error);
 }
 
 inline
 CError
-FormatStringError_va (
-	const char* pFormat,
+formatStringError_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError Error;
-	Error.FormatStringError_va (pFormat, va);
-	return Error;
+	CError error;
+	error.formatStringError_va (formatString, va);
+	return error;
 }
 
 inline
 CError
-FormatStringError (
-	const char* pFormat,
+formatStringError (
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return FormatStringError_va (pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	return formatStringError_va (formatString, va);
 }
 
 inline
 CError
-SetFormatStringError_va (
-	const char* pFormat,
+setFormatStringError_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	return SetError (FormatStringError_va (pFormat, va));
+	return setError (formatStringError_va (formatString, va));
 }
 
 inline
 CError
-SetFormatStringError (
-	const char* pFormat,
+setFormatStringError (
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return SetFormatStringError_va (pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	return setFormatStringError_va (formatString, va);
 }
 
 inline
 CError
-PushFormatStringError_va (
-	const char* pFormat,
+pushFormatStringError_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	CError Error;
-	Error.FormatStringError_va (pFormat, va);
-	return PushError (Error);
+	CError error;
+	error.formatStringError_va (formatString, va);
+	return pushError (error);
 }
 
 inline
 CError
-PushFormatStringError (
-	const char* pFormat,
+pushFormatStringError (
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return PushFormatStringError_va (pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	return pushFormatStringError_va (formatString, va);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -836,75 +836,75 @@ PushFormatStringError (
 
 template <typename T>
 T
-Fail (
-	T FailResult,
-	CError Error
+fail (
+	T failResult,
+	CError error
 	)
 {
-	SetError (Error);
-	return FailResult;
+	setError (error);
+	return failResult;
 }
 
 inline
 bool
-Fail (CError Error)
+fail (CError error)
 {
-	return Fail <bool> (false, Error);
+	return fail <bool> (false, error);
 }
 
 inline
 CError
-SetLastSystemError ()
+setLastSystemError ()
 {
-	return SetError (GetLastSystemErrorCode ());
+	return setError (getLastSystemErrorCode ());
 }
 
 template <typename T>
 T
-FailWithLastSystemError (T FailResult)
+failWithLastSystemError (T failResult)
 {
-	return Fail (FailResult, GetLastSystemErrorCode ());
+	return fail (failResult, getLastSystemErrorCode ());
 }
 
 inline
 bool
-FailWithLastSystemError ()
+failWithLastSystemError ()
 {
-	return FailWithLastSystemError <bool> (false);
+	return failWithLastSystemError <bool> (false);
 }
 
 template <typename T>
 T
-CompleteWithSystemError (
-	T Result,
-	T FailResult,
-	uint_t ErrorCode
+completeWithSystemError (
+	T result,
+	T failResult,
+	uint_t errorCode
 	)
 {
-	if (Result == FailResult)
-		SetError (ErrorCode);
+	if (result == failResult)
+		setError (errorCode);
 
-	return Result;
+	return result;
 }
 
 template <typename T>
 T
-Complete (
-	T Result,
-	T FailResult
+complete (
+	T result,
+	T failResult
 	)
 {
-	if (Result == FailResult)
-		SetLastSystemError ();
+	if (result == failResult)
+		setLastSystemError ();
 
-	return Result;
+	return result;
 }
 
 inline
 bool
-Complete (int Result)
+complete (int result)
 {
-	return Complete <bool> (Result != 0, false);
+	return complete <bool> (result != 0, false);
 }
 
 //.............................................................................
@@ -916,7 +916,7 @@ class CErrorProvider
 public:
 	virtual
 	rtl::CString
-	GetErrorDescription (const TError* pError) = 0;
+	getErrorDescription (const TError* error) = 0;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -926,11 +926,11 @@ class CStdErrorProvider: public CErrorProvider
 public:
 	virtual
 	rtl::CString
-	GetErrorDescription (const TError* pError);
+	getErrorDescription (const TError* error);
 
 protected:
 	rtl::CString
-	GetStackErrorDescription (const TError* pError);
+	getStackErrorDescription (const TError* error);
 };
 
 //.............................................................................

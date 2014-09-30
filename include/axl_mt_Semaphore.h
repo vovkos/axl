@@ -16,42 +16,42 @@ namespace mt {
 class CSemaphore
 {
 public:
-	win::CSemaphore m_Semaphore;
+	win::CSemaphore m_semaphore;
 
 public:
-	CSemaphore (size_t InitialCount = 0)
+	CSemaphore (size_t initialCount = 0)
 	{
-		Create (InitialCount);
+		create (initialCount);
 	}
 
 	bool 
-	IsOpen ()
+	isOpen ()
 	{
-		return m_Semaphore.IsOpen ();
+		return m_semaphore.isOpen ();
 	}
 
 	void 
-	Close ()
+	close ()
 	{
-		m_Semaphore.Close ();
+		m_semaphore.close ();
 	}
 
 	bool 
-	Create (size_t InitialCount = 0)
+	create (size_t initialCount = 0)
 	{
-		return m_Semaphore.Create (NULL, (uint_t) InitialCount, MAXLONG, NULL);
+		return m_semaphore.create (NULL, (uint_t) initialCount, MAXLONG, NULL);
 	}
 
 	bool
-	Signal (size_t Count = 1)
+	signal (size_t count = 1)
 	{
-		return m_Semaphore.Signal ((uint_t) Count);
+		return m_semaphore.signal ((uint_t) count);
 	}
 
 	bool
-	Wait (uint_t Timeout = -1)
+	wait (uint_t timeout = -1)
 	{
-		return m_Semaphore.Wait (Timeout) == win::EWaitResult_Object0;
+		return m_semaphore.wait (timeout) == win::EWaitResult_Object0;
 	}
 };
 

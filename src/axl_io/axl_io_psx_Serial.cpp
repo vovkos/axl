@@ -9,33 +9,33 @@ namespace psx {
 //.............................................................................
 
 uint_t
-CSerial::GetStatusLines () const
+CSerial::getStatusLines () const
 {
-	int Lines = 0;
-	int Result = ioctl (m_h, TIOCMGET, &Lines);
-	if (Result == -1)
+	int lines = 0;
+	int result = ioctl (m_h, TIOCMGET, &lines);
+	if (result == -1)
 	{
-		err::SetLastSystemError ();
+		err::setLastSystemError ();
 		return -1;
 	}
 
-	return Lines;
+	return lines;
 }
 
 bool
-CSerial::SetDtr (bool IsSet)
+CSerial::setDtr (bool isSet)
 {
-	int Lines = TIOCM_DTR;
-	int Result = ioctl (m_h, IsSet ? TIOCMBIS : TIOCMBIC, &Lines);
-	return err::Complete (Result != -1);
+	int lines = TIOCM_DTR;
+	int result = ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
+	return err::complete (result != -1);
 }
 
 bool
-CSerial::SetRts (bool IsSet)
+CSerial::setRts (bool isSet)
 {
-	int Lines = TIOCM_RTS;
-	int Result = ioctl (m_h, IsSet ? TIOCMBIS : TIOCMBIC, &Lines);
-	return err::Complete (Result != -1);
+	int lines = TIOCM_RTS;
+	int result = ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
+	return err::complete (result != -1);
 }
 
 //.............................................................................

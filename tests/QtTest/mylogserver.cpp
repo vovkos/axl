@@ -3,7 +3,7 @@
 
 //.............................................................................
 
-bool MyLogServer::start (
+bool myLogServer::start (
 	log::CClientPeer* client,
 	const char* logPacketFilePath,
 	const char* logMergeFilePath,
@@ -23,7 +23,7 @@ bool MyLogServer::start (
 		return false;
 #endif
 
-	return Create (
+	return create (
 		client,
 		&m_logRepresenter,
 		&m_logColorizer,
@@ -35,129 +35,129 @@ bool MyLogServer::start (
 
 #ifdef _JANCY_REPRESENTER
 
-bool MyLogServer::compile (
+bool myLogServer::compile (
 	const char* representerClassName,
-	size_t FileCount,
+	size_t fileCount,
 	...
 	)
 {
-	AXL_VA_DECL (va, FileCount);
+	AXL_VA_DECL (va, fileCount);
 
 	qApp->setCursorFlashTime (0);
 
 	bool result;
 
 	llvm::LLVMContext* llvmContext = new llvm::LLVMContext;
-	llvm::Module* llvmModule = new llvm::Module ("llvmMainModule", *llvmContext);
-	m_module.Create ("jncMainModule", llvmModule);
+	llvm::module* llvmModule = new llvm::module ("llvmMainModule", *llvmContext);
+	m_module.create ("jncMainModule", llvmModule);
 
-	jnc::CScopeThreadModule ScopeModule (&m_module);
+	jnc::CScopeThreadModule scopeModule (&m_module);
 
-	for (size_t i = 0; i < FileCount; i++)
+	for (size_t i = 0; i < fileCount; i++)
 	{
 		const char* filePath = AXL_VA_ARG (va, const char*);
 
 		printf("Parsing %s...\n", filePath);
 
 		io::CMappedFile file;
-		result = file.Open (filePath, io::EFileFlag_ReadOnly);
+		result = file.open (filePath, io::EFileFlag_ReadOnly);
 		if (!result)
 			return false;
 
-		jnc::CLexer Lexer;
-		Lexer.Create (
+		jnc::CLexer lexer;
+		lexer.create (
 			filePath,
-			(const char*) file.View (),
-			file.GetSize ()
+			(const char*) file.view (),
+			file.getSize ()
 			);
 
-		jnc::CParser Parser;
-		Parser.Create (jnc::CParser::StartSymbol, true);
+		jnc::CParser parser;
+		parser.create (jnc::CParser::startSymbol, true);
 
 		for (;;)
 		{
-			const jnc::CToken* pToken = Lexer.GetToken ();
-			if (pToken->m_Token == jnc::EToken_Eof)
+			const jnc::CToken* token = lexer.getToken ();
+			if (token->m_token == jnc::EToken_Eof)
 				break;
 
-			result = Parser.ParseToken (pToken);
+			result = parser.parseToken (token);
 			if (!result)
 			{
-				rtl::CString Text = err::GetError ()->GetDescription ();
+				rtl::CString text = err::getError ()->getDescription ();
 
 				printf(
 					"%s(%d,%d): %s\n",
 					filePath,
-					pToken->m_Pos.m_Line + 1,
-					pToken->m_Pos.m_Col + 1,
-					Text.cc ()
+					token->m_pos.m_line + 1,
+					token->m_pos.m_col + 1,
+					text.cc ()
 					);
 				return false;
 			}
 
-			Lexer.NextToken ();
+			lexer.nextToken ();
 		}
 	}
 
 	printf("Compiling...\n");
 
-	result = m_module.Compile ();
+	result = m_module.compile ();
 	if (!result)
 	{
-		printf("%s\n", err::GetError ()->GetDescription ().cc ());
+		printf("%s\n", err::getError ()->getDescription ().cc ());
 		return false;
 	}
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	jnc::EJit JitKind = jnc::EJit_Normal;
+	jnc::EJit jitKind = jnc::EJit_Normal;
 #else
-	jnc::EJit JitKind = jnc::EJit_McJit;
+	jnc::EJit jitKind = jnc::EJit_McJit;
 #endif
 
-	printf("JITting with '%s'...\n", jnc::GetJitKindString (JitKind));
+	printf("JITting with '%s'...\n", jnc::getJitKindString (jitKind));
 
-	result = m_runtime.Create (&m_module, &m_stdlib, JitKind, 16, 1, 8);
+	result = m_runtime.create (&m_module, &m_stdlib, jitKind, 16, 1, 8);
 	if (!result)
 	{
-		printf("%s\n", err::GetError ()->GetDescription ().cc ());
+		printf("%s\n", err::getError ()->getDescription ().cc ());
 		return false;
 	}
 
-	if (JitKind == jnc::EJit_Normal)
+	if (jitKind == jnc::EJit_Normal)
 	{
-		llvm::ExecutionEngine* llvmExecutionEngine = m_runtime.GetLlvmExecutionEngine ();
-		jnc::CStdLib::Export (&m_module, llvmExecutionEngine);
-		m_module.SetFunctionPointer (llvmExecutionEngine, "printf", (void*) StdLib::Printf);
-		m_module.SetFunctionPointer (llvmExecutionEngine, "rand", (void*) rand);
+		llvm::executionEngine* llvmExecutionEngine = m_runtime.getLlvmExecutionEngine ();
+		jnc::CStdLib::export (&m_module, llvmExecutionEngine);
+		m_module.setFunctionPointer (llvmExecutionEngine, "printf", (void*) stdLib::printf);
+		m_module.setFunctionPointer (llvmExecutionEngine, "rand", (void*) rand);
 	}
 
-	result = m_module.m_FunctionMgr.JitFunctions (m_runtime.GetLlvmExecutionEngine ());
+	result = m_module.m_functionMgr.jitFunctions (m_runtime.getLlvmExecutionEngine ());
 	if (!result)
 	{
-		printf("%s\n", err::GetError ()->GetDescription ().cc ());
+		printf("%s\n", err::getError ()->getDescription ().cc ());
 		return false;
 	}
 
 	printf ("Creating representer '%s'...\n", representerClassName);
 
-	jnc::CModuleItem* representerTypeItem = m_module.m_NamespaceMgr.GetGlobalNamespace ()->FindItem (representerClassName);
+	jnc::CModuleItem* representerTypeItem = m_module.m_namespaceMgr.getGlobalNamespace ()->findItem (representerClassName);
 	if (!representerTypeItem)
 	{
 		printf ("'%s' is not found\n", representerClassName);
 		return false;
 	}
 
-	if (representerTypeItem->GetItemKind () != jnc::EModuleItem_Type ||
-		((jnc::CType*) representerTypeItem)->GetTypeKind () != jnc::EType_Class)
+	if (representerTypeItem->getItemKind () != jnc::EModuleItem_Type ||
+		((jnc::CType*) representerTypeItem)->getTypeKind () != jnc::EType_Class)
 	{
 		printf ("'%s' is not a class\n", representerClassName);
 		return false;
 	}
 
-	result = m_logRepresenter.Create ((jnc::CClassType*) representerTypeItem, &m_runtime);
+	result = m_logRepresenter.create ((jnc::CClassType*) representerTypeItem, &m_runtime);
 	if (!result)
 	{
-		printf ("%s\n", err::GetError ()->GetDescription ().cc ());
+		printf ("%s\n", err::getError ()->getDescription ().cc ());
 		return false;
 	}
 

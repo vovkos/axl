@@ -39,28 +39,28 @@ public:
 	}
 
 	bool
-	Open (
-		const char* pFileName,
-		uint_t OpenFlags = O_RDWR | O_CREAT,
-		mode_t Mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
+	open (
+		const char* fileName,
+		uint_t openFlags = O_RDWR | O_CREAT,
+		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
 
 	bool
-	SetBlockingMode (bool IsBlocking);
+	setBlockingMode (bool isBlocking);
 
 	size_t
-	GetIncomingDataSize ();
+	getIncomingDataSize ();
 
 	size_t
-	Read (
+	read (
 		void* p,
-		size_t Size
+		size_t size
 		) const;
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		);
 };
 

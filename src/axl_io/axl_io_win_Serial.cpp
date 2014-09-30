@@ -9,78 +9,78 @@ namespace win {
 //.............................................................................
 
 bool 
-CSerial::Open (
-	const char* pName,
-	uint_t Flags
+CSerial::open (
+	const char* name,
+	uint_t flags
 	)
 {
-	Close ();
+	close ();
 
-	if (strncmp (pName, "\\\\.\\", 4) == 0)
-		pName += 4;
+	if (strncmp (name, "\\\\.\\", 4) == 0)
+		name += 4;
 	
-	char Buffer [256];
-	rtl::CString_w DeviceName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	DeviceName.Format (L"\\\\.\\%S", pName);
+	char buffer [256];
+	rtl::CString_w deviceName (ref::EBuf_Stack, buffer, sizeof (buffer));
+	deviceName.format (L"\\\\.\\%S", name);
 
 	m_h = ::CreateFileW (
-		DeviceName, 
+		deviceName, 
 		GENERIC_READ | GENERIC_WRITE, 
 		0, NULL, 
 		OPEN_EXISTING, 
-		Flags, 
+		flags, 
 		NULL
 		);
 
-	return err::Complete (m_h != INVALID_HANDLE_VALUE);
+	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 
 dword_t
-CSerial::GetStatusLines ()
+CSerial::getStatusLines ()
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	dword_t Lines;
+	dword_t lines;
 		
-	bool_t Result = ::GetCommModemStatus (m_h, &Lines);
-	if (!Result)
-		return err::FailWithLastSystemError (-1);
+	bool_t result = ::GetCommModemStatus (m_h, &lines);
+	if (!result)
+		return err::failWithLastSystemError (-1);
 
-	return Lines;
+	return lines;
 }
 
 dword_t
-CSerial::GetWaitMask ()
+CSerial::getWaitMask ()
 {
-	dword_t Mask;
+	dword_t mask;
 
-	bool_t Result = ::GetCommMask (m_h, &Mask);
-	if (!Result)
-		return err::FailWithLastSystemError (-1);
+	bool_t result = ::GetCommMask (m_h, &mask);
+	if (!result)
+		return err::failWithLastSystemError (-1);
 
-	return Mask;
+	return mask;
 }
 
 size_t
-CSerial::Read (
+CSerial::read (
 	void* p, 
-	size_t Size 
+	size_t size 
 	)
 {
-	dword_t ActualSize;
-	bool_t Result = Read (p, (dword_t) Size, &ActualSize, NULL);
-	return Result ? (size_t) ActualSize : -1;
+	dword_t actualSize;
+	bool_t result = read (p, (dword_t) size, &actualSize, NULL);
+	return result ? (size_t) actualSize : -1;
 }
 
 size_t
-CSerial::Write (
+CSerial::write (
 	const void* p, 
-	size_t Size
+	size_t size
 	)
 {
-	dword_t ActualSize;
-	bool_t Result = Write (p, (dword_t) Size, &ActualSize, NULL);
-	return Result ? (size_t) ActualSize : -1;
+	dword_t actualSize;
+	bool_t result = write (p, (dword_t) size, &actualSize, NULL);
+	return result ? (size_t) actualSize : -1;
 }
 
 //.............................................................................

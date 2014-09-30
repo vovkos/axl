@@ -9,54 +9,54 @@ namespace io {
 //.............................................................................
 
 rtl::CString
-GetCurrentDir ()
+getCurrentDir ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	wchar_t Dir [1024] = { 0 };
-	GetCurrentDirectoryW (countof (Dir) - 1, Dir);
-	return Dir;
+	wchar_t dir [1024] = { 0 };
+	::GetCurrentDirectoryW (countof (dir) - 1, dir);
+	return dir;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	char* p = get_current_dir_name ();
-	rtl::CString Dir = p;
+	rtl::CString dir = p;
 	free (p);
-	return Dir;
+	return dir;
 #endif
 }
 
 bool
-DoesFileExist (const char* pFileName)
+doesFileExist (const char* fileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	char Buffer [256];
-	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	FileName = pFileName;
-	dword_t Attributes = GetFileAttributesW (FileName);
-	return Attributes != INVALID_FILE_ATTRIBUTES;
+	char buffer [256];
+	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	fileName_w = fileName;
+	dword_t attributes = ::GetFileAttributesW (fileName_w);
+	return attributes != INVALID_FILE_ATTRIBUTES;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	return access (pFileName, F_OK) != -1;
+	return access (fileName, F_OK) != -1;
 #endif
 }
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 inline
 bool
-IsDir (const wchar_t* pFileName)
+isDir (const wchar_t* fileName)
 {
-	dword_t Attributes = GetFileAttributesW (pFileName);
-	return Attributes != INVALID_FILE_ATTRIBUTES && (Attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+	dword_t attributes = ::GetFileAttributesW (fileName);
+	return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 bool
-EnsureDirExists (const char* pFileName)
+ensureDirExists (const char* fileName)
 {
-	char Buffer [256] = { 0 };
-	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	FileName = pFileName;
+	char buffer [256] = { 0 };
+	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	fileName_w = fileName;
 
-	if (FileName.IsEmpty () || IsDir (FileName))
+	if (fileName_w.isEmpty () || isDir (fileName_w))
 		return true;
 
-	const wchar_t* p = FileName;
+	const wchar_t* p = fileName_w;
 	if (p [1] == ':')
 		p += 2;
 
@@ -72,11 +72,11 @@ EnsureDirExists (const char* pFileName)
 		wchar_t c = *p2; // save
 		*(wchar_t*) p2 = 0;
 
-		if (!IsDir (FileName))
+		if (!isDir (fileName_w))
 		{
-			bool_t Result = CreateDirectoryW (FileName, NULL);
-			if (!Result)
-				return err::FailWithLastSystemError ();
+			bool_t result = ::CreateDirectoryW (fileName_w, NULL);
+			if (!result)
+				return err::failWithLastSystemError ();
 		}
 
 		*(wchar_t*) p2 = c; // restore
@@ -93,21 +93,21 @@ EnsureDirExists (const char* pFileName)
 
 inline
 bool
-IsDir (const char* pFileName)
+isDir (const char* fileName)
 {
-	struct stat Stat;
+	struct stat stat;
 
-	int Result = stat (pFileName, &Stat);
-	return Result == 0 && S_ISDIR (Stat.st_mode);
+	int result = stat (fileName, &stat);
+	return result == 0 && S_ISDIR (stat.st_mode);
 }
 
 bool
-EnsureDirExists (const char* pFileName)
+ensureDirExists (const char* fileName)
 {
-	if (IsDir (pFileName))
+	if (isDir (fileName))
 		return true;
 
-	const char* p = pFileName;
+	const char* p = fileName;
 	while (*p == '/') // skip root
 		p++;
 
@@ -120,11 +120,11 @@ EnsureDirExists (const char* pFileName)
 		char c = *p2; // save
 		*(char*) p2 = 0;
 
-		if (!IsDir (pFileName))
+		if (!isDir (fileName))
 		{
-			int Result = mkdir (pFileName, S_IRWXU);
-			if (Result != 0)
-				return err::FailWithLastSystemError ();
+			int result = mkdir (fileName, S_IRWXU);
+			if (result != 0)
+				return err::failWithLastSystemError ();
 		}
 
 		*(char*) p2 = c; // restore
@@ -140,150 +140,150 @@ EnsureDirExists (const char* pFileName)
 #endif
 
 rtl::CString
-GetFullFilePath (const char* pFileName)
+getFullFilePath (const char* fileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	char Buffer [256];
-	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	FileName = pFileName;
+	char buffer [256];
+	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	fileName_w = fileName;
 
-	size_t Length = GetFullPathNameW (FileName, 0, NULL, NULL);
-	if (!Length)
-		return err::FailWithLastSystemError (NULL);
+	size_t length = ::GetFullPathNameW (fileName_w, 0, NULL, NULL);
+	if (!length)
+		return err::failWithLastSystemError (NULL);
 
-	rtl::CString_w FilePath;
-	wchar_t* p = FilePath.GetBuffer (Length);
-	GetFullPathNameW (FileName, Length, p, NULL);
-	return FilePath;
+	rtl::CString_w filePath;
+	wchar_t* p = filePath.getBuffer (length);
+	::GetFullPathNameW (fileName_w, length, p, NULL);
+	return filePath;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	char FullPath [PATH_MAX] = { 0 };
-	realpath (pFileName, FullPath);
-	return FullPath;
+	char fullPath [PATH_MAX] = { 0 };
+	realpath (fileName, fullPath);
+	return fullPath;
 #endif
 }
 
 rtl::CString
-GetDir (const char* pFilePath)
+getDir (const char* filePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	char Buffer [256];
-	rtl::CString_w FilePath (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	FilePath = pFilePath;
+	char buffer [256];
+	rtl::CString_w filePath_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	filePath_w = filePath;
 
-	wchar_t Drive [4] = { 0 };
-	wchar_t Dir [1024] = { 0 };
+	wchar_t drive [4] = { 0 };
+	wchar_t dir [1024] = { 0 };
 
 	_wsplitpath_s (
-		FilePath,
-		Drive, countof (Drive) - 1,
-		Dir, countof (Dir) - 1,
+		filePath_w,
+		drive, countof (drive) - 1,
+		dir, countof (dir) - 1,
 		NULL, 0,
 		NULL, 0
 		);
 
-	rtl::CString String = Drive;
-	String.Append (Dir);
-	return String;
+	rtl::CString string = drive;
+	string.append (dir);
+	return string;
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	rtl::CString String = pFilePath;
-	dirname (String.GetBuffer ());
-	String.UpdateLength ();
-	return String;
+	rtl::CString string = filePath;
+	dirname (string.getBuffer ());
+	string.updateLength ();
+	return string;
 #endif
 }
 
 rtl::CString
-GetFileName (const char* pFilePath)
+getFileName (const char* filePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	char Buffer [256];
-	rtl::CString_w FilePath (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	FilePath = pFilePath;
+	char buffer [256];
+	rtl::CString_w filePath_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	filePath_w = filePath;
 
-	wchar_t FileName [1024] = { 0 };
-	wchar_t Extension [1024] = { 0 };
+	wchar_t fileName [1024] = { 0 };
+	wchar_t extension [1024] = { 0 };
 
 	_wsplitpath_s (
-		FilePath,
+		filePath_w,
 		NULL, 0,
 		NULL, 0,
-		FileName, countof (FileName) - 1,
-		Extension, countof (Extension) - 1
+		fileName, countof (fileName) - 1,
+		extension, countof (extension) - 1
 		);
 
-	rtl::CString String = FileName;
-	String.Append (Extension);
-	return String;
+	rtl::CString string = fileName;
+	string.append (extension);
+	return string;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	const char *p = strrchr (pFilePath, '/');
-	return p ? p + 1 : pFilePath;
+	const char *p = strrchr (filePath, '/');
+	return p ? p + 1 : filePath;
 #endif
 }
 
 rtl::CString
-GetExtension (const char* pFilePath)
+getExtension (const char* filePath)
 {
-	const char *p = strchr (pFilePath, '.');
+	const char *p = strchr (filePath, '.');
 	return p ? p + 1 : NULL;
 }
 
 rtl::CString
-ConcatFilePath (
-	rtl::CString* pFilePath,
-	const char* pFileName
+concatFilePath (
+	rtl::CString* filePath,
+	const char* fileName
 	)
 {
-	if (pFilePath->IsEmpty ())
+	if (filePath->isEmpty ())
 	{
-		*pFilePath = pFileName;
-		return *pFilePath;
+		*filePath = fileName;
+		return *filePath;
 	}
 
-	char Last = (*pFilePath) [pFilePath->GetLength () - 1];
+	char last = (*filePath) [filePath->getLength () - 1];
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	if (Last != '\\' && Last != '/')
-		pFilePath->Append ('\\');
+	if (last != '\\' && last != '/')
+		filePath->append ('\\');
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	if (Last != '/')
-		pFilePath->Append ('/');
+	if (last != '/')
+		filePath->append ('/');
 #endif
 
-	pFilePath->Append (pFileName);
-	return *pFilePath;
+	filePath->append (fileName);
+	return *filePath;
 }
 
 rtl::CString
-FindFilePath (
-	const char* pFileName,
-	const char* pFirstDir,
-	const rtl::CBoxListT <rtl::CString>* pDirList,
-	bool DoFindInCurrentDir
+findFilePath (
+	const char* fileName,
+	const char* firstDir,
+	const rtl::CBoxListT <rtl::CString>* dirList,
+	bool doFindInCurrentDir
 	)
 {
-	rtl::CString FilePath;
+	rtl::CString filePath;
 
-	if (pFirstDir)
+	if (firstDir)
 	{
-		FilePath = ConcatFilePath (pFirstDir, pFileName);
-		if (DoesFileExist (FilePath))
-			return GetFullFilePath (FilePath);
+		filePath = concatFilePath (firstDir, fileName);
+		if (doesFileExist (filePath))
+			return getFullFilePath (filePath);
 	}
 
-	if (DoFindInCurrentDir)
-		if (DoesFileExist (pFileName))
-			return GetFullFilePath (pFileName);
+	if (doFindInCurrentDir)
+		if (doesFileExist (fileName))
+			return getFullFilePath (fileName);
 
-	if (pDirList)
+	if (dirList)
 	{
-		rtl::CBoxIteratorT <rtl::CString> Dir = pDirList->GetHead ();
-		for (; Dir; Dir++)
+		rtl::CBoxIteratorT <rtl::CString> dir = dirList->getHead ();
+		for (; dir; dir++)
 		{
-			FilePath.ForceCopy (*Dir);
-			ConcatFilePath (&FilePath, pFileName);
-			if (DoesFileExist (FilePath))
-				return GetFullFilePath (FilePath);
+			filePath.forceCopy (*dir);
+			concatFilePath (&filePath, fileName);
+			if (doesFileExist (filePath))
+				return getFullFilePath (filePath);
 		}
 	}
 

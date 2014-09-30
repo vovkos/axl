@@ -19,13 +19,13 @@ public:
 	typedef exe::CArgT <ref::CPtrT <CConnectionSock> > COnAcceptArg;
 
 public:
-	win::CSock m_Sock;
+	win::CSock m_sock;
 
 protected:
-	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
-	mt::CEvent m_Event;
+	ref::CPtrT <exe::CWorkerThread> m_workerThread;
+	mt::CEvent m_event;
 	handle_t m_hWorkerThreadEvent;
-	exe::CFunction m_OnAccept;
+	exe::CFunction m_onAccept;
 
 public:
 	CListenerSock ()
@@ -35,54 +35,54 @@ public:
 
 	~CListenerSock ()
 	{
-		Close ();
+		close ();
 	}
 
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_WorkerThread != NULL;
+		return m_workerThread != NULL;
 	}
 
 	bool
-	GetLocalAddress (TSockAddrU* pAddr)
+	getLocalAddress (TSockAddrU* addr)
 	{
-		SOCKADDR Addr;
+		SOCKADDR addr;
 		return 
-			m_Sock.GetLocalAddress (&Addr) &&
-			pAddr->FromWinSockAddr (&Addr);
+			m_sock.getLocalAddress (&addr) &&
+			addr->fromWinSockAddr (&addr);
 	}
 
 	bool
-	Open (
-		ESockProto Protocol,
-		const TSockAddr* pAddr
+	open (
+		ESockProto protocol,
+		const TSockAddr* addr
 		);
 
 	void
-	Close ();
+	close ();
 
 	bool
-	Listen (
-		size_t BackLog,
-		const exe::CFunction& OnAccept // void OnAccept (ref::CPtrT <CConnectionSocket> Socket)
+	listen (
+		size_t backLog,
+		const exe::CFunction& onAccept // void OnAccept (ref::CPtrT <CConnectionSocket> Socket)
 		);
 
 protected:
 	void
 	AXL_CDECL
-	Close_wt ();
+	close_wt ();
 
 	bool
 	AXL_CDECL
-	Listen_wt (
-		size_t BackLog,
-		const exe::CFunction& OnAccept
+	listen_wt (
+		size_t backLog,
+		const exe::CFunction& onAccept
 		);
 
 	void
 	AXL_CDECL
-	OnSocketEvent_wt ();
+	onSocketEvent_wt ();
 };
 
 //.............................................................................

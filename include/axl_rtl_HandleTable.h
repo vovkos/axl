@@ -23,14 +23,14 @@ public:
 		friend class CHandleTableT;
 
 	protected:
-		handle_t m_Handle;
+		handle_t m_handle;
 
 	public:
-		T m_Value;
+		T m_value;
 
-		handle_t GetHandle ()
+		handle_t getHandle ()
 		{
-			return m_Handle;
+			return m_handle;
 		}
 	};
 
@@ -38,102 +38,102 @@ public:
 	typedef CHashTableMapIteratorT <handle_t, CListIterator> CMapIterator;
 	
 protected:
-	CStdListT <CEntry> m_List;
-	CHashTableMapT <handle_t, CListIterator, CHashIdT <handle_t> > m_HashTable;
-	uintptr_t m_Seed;
+	CStdListT <CEntry> m_list;
+	CHashTableMapT <handle_t, CListIterator, CHashIdT <handle_t> > m_hashTable;
+	uintptr_t m_seed;
 
 public:
 	CHandleTableT ()
 	{
-		m_Seed = 1;
+		m_seed = 1;
 	}
 
-	CHandleTableT (uintptr_t Seed)
+	CHandleTableT (uintptr_t seed)
 	{
-		m_Seed = Seed ? Seed : 1; // never 0
+		m_seed = seed ? seed : 1; // never 0
 	}
 
 	bool
-	IsEmpty () const
+	isEmpty () const
 	{
-		return m_List.IsEmpty ();
+		return m_list.isEmpty ();
 	}
 
 	CConstListT <CEntry> 
-	GetList () const
+	getList () const
 	{
-		return m_List;
+		return m_list;
 	}
 
 	bool
-	Create (uintptr_t Seed = 1)
+	create (uintptr_t seed = 1)
 	{
-		Clear ();
-		m_Seed = Seed ? Seed : 1; // never 0
+		clear ();
+		m_seed = seed ? seed : 1; // never 0
 	}
 
 	void
-	Clear ()
+	clear ()
 	{
-		m_List.Clear ();
-		m_HashTable.Clear ();
+		m_list.clear ();
+		m_hashTable.clear ();
 	}
 
 	CMapIterator
-	Find (handle_t Handle) const
+	find (handle_t handle) const
 	{
-		return m_HashTable.Find (Handle);
+		return m_hashTable.find (handle);
 	}
 	
 	bool
-	Find (
-		handle_t Handle,
-		T* pValue
+	find (
+		handle_t handle,
+		T* value
 		) const
 	{
-		CMapIterator It = m_HashTable.Find (Handle);
-		if (!It)
+		CMapIterator it = m_hashTable.find (handle);
+		if (!it)
 			return false;
 
-		*pValue = It->m_Value->m_Value;
+		*value = it->m_value->m_value;
 		return true;			
 	}
 
 	handle_t
-	Add (T Value)
+	add (T value)
 	{
-		ASSERT (m_Seed);
-		handle_t Handle = (handle_t) m_Seed;
+		ASSERT (m_seed);
+		handle_t handle = (handle_t) m_seed;
 
-		CEntry* pEntry = AXL_MEM_NEW (CEntry);
-		pEntry->m_Handle = Handle;
-		pEntry->m_Value = Value;
+		CEntry* entry = AXL_MEM_NEW (CEntry);
+		entry->m_handle = handle;
+		entry->m_value = value;
 		
-		CListIterator It = m_List.InsertTail (pEntry);
-		m_HashTable [Handle] = It;
+		CListIterator it = m_list.insertTail (entry);
+		m_hashTable [handle] = it;
 
-		m_Seed++;
-		if (!m_Seed)
-			m_Seed = 1; // never 0
+		m_seed++;
+		if (!m_seed)
+			m_seed = 1; // never 0
 
-		return Handle;
+		return handle;
 	}
 
 	void
-	Remove (CMapIterator It)
+	remove (CMapIterator it)
 	{
-		m_List.Delete (It->m_Value);
-		m_HashTable.Delete (It);
+		m_list.erase (it->m_value);
+		m_hashTable.erase (it);
 	}
 
 	bool
-	Remove (handle_t Handle)
+	remove (handle_t handle)
 	{
-		CMapIterator It = m_HashTable.Find (Handle);
-		if (!It)
+		CMapIterator it = m_hashTable.find (handle);
+		if (!it)
 			return false;
 
-		Remove (It);
+		remove (it);
 		return true;			
 	}
 };

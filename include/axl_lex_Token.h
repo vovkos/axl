@@ -18,30 +18,30 @@ namespace lex {
 class CLineCol
 {
 public:
-	int m_Line;
-	int m_Col;
+	int m_line;
+	int m_col;
 
 public:
 	CLineCol ()
 	{
-		m_Line = 0;
-		m_Col = 0;
+		m_line = 0;
+		m_col = 0;
 	}
 
 	CLineCol (
-		int Line,
-		int Col
+		int line,
+		int col
 		)
 	{
-		m_Line = Line;
-		m_Col = Col;
+		m_line = line;
+		m_col = col;
 	}
 
 	void
-	Clear ()
+	clear ()
 	{
-		m_Line = 0;
-		m_Col = 0;
+		m_line = 0;
+		m_col = 0;
 	}
 };
 
@@ -50,7 +50,7 @@ public:
 class CSrcPos: public CLineCol
 {
 public:
-	rtl::CString m_FilePath;
+	rtl::CString m_filePath;
 
 public:
 	CSrcPos ()
@@ -58,29 +58,29 @@ public:
 	}
 
 	CSrcPos (
-		const rtl::CString& FilePath,
-		const CLineCol& LineCol
+		const rtl::CString& filePath,
+		const CLineCol& lineCol
 		):
-		CLineCol (LineCol)
+		CLineCol (lineCol)
 	{
-		m_FilePath = FilePath;
+		m_filePath = filePath;
 	}
 
 	CSrcPos (
-		const rtl::CString& FilePath,
-		int Line,
-		int Col
+		const rtl::CString& filePath,
+		int line,
+		int col
 		):
-		CLineCol (Line, Col)
+		CLineCol (line, col)
 	{
-		m_FilePath = FilePath;
+		m_filePath = filePath;
 	}
 
 	CSrcPos&
-	operator = (const CLineCol& LineCol)
+	operator = (const CLineCol& lineCol)
 	{
-		m_Line = LineCol.m_Line;
-		m_Col = LineCol.m_Col;
+		m_line = lineCol.m_line;
+		m_col = lineCol.m_col;
 		return *this;
 	}
 };
@@ -94,21 +94,21 @@ class CStdTokenData
 public:
 	union
 	{
-		int m_Integer;
-		int32_t m_Int32;
-		uint32_t m_Int32_u;
-		int64_t m_Int64;
-		uint64_t m_Int64_u;
-		float m_Float;
-		double m_Double;
+		int m_integer;
+		int32_t m_int32;
+		uint32_t m_int32_u;
+		int64_t m_int64;
+		uint64_t m_int64_u;
+		float m_float;
+		double m_double;
 	};
 
-	rtl::CString m_String;
+	rtl::CString m_string;
 
 public:
 	CStdTokenData ()
 	{ 
-		m_Int64 = 0;
+		m_int64 = 0;
 	}
 };
 
@@ -131,58 +131,58 @@ public:
 public:
 	union // it's nice to see it in debugger
 	{
-		int m_Token;
-		EToken m_EnumToken;
-		char m_CharToken;
+		int m_token;
+		EToken m_enumToken;
+		char m_charToken;
 		wchar_t m_WCharToken;
 	};
 
-	size_t m_Channel;
-	CData m_Data;
-	CPos m_Pos;
+	size_t m_channel;
+	CData m_data;
+	CPos m_pos;
 	
 	// define token value in derived class
 
 public:
 	CTokenT ()
 	{ 
-		m_Token = 0;
-		m_Channel = 0;
+		m_token = 0;
+		m_channel = 0;
 	}
 		
 	static
 	const char*
-	GetName (int Token)
+	getName (int token)
 	{
-		return CName () (Token);
+		return CName () (token);
 	}
 
 	const char*
-	GetName () const
+	getName () const
 	{
-		return GetName (m_Token);
+		return getName (m_token);
 	}
 };
 
 //.............................................................................
 
-#define AXL_LEX_BEGIN_TOKEN_NAME_MAP(Class) \
-class Class \
+#define AXL_LEX_BEGIN_TOKEN_NAME_MAP(CClass) \
+class CClass \
 { \
 public: \
 	const char* \
-	operator () (int Token) \
+	operator () (int tokenKind) \
 	{ \
-		switch (Token) \
+		switch (tokenKind) \
 		{
 
-#define AXL_LEX_TOKEN_NAME(Token, Name) \
-		case Token: \
-			return Name; 
+#define AXL_LEX_TOKEN_NAME(tokenKind, name) \
+		case tokenKind: \
+			return name; 
 
-#define AXL_LEX_END_TOKEN_NAME_MAP_EX(Default) \
+#define AXL_LEX_END_TOKEN_NAME_MAP_EX(unknownName) \
 		default: \
-			return isprint ((uchar_t) Token) ? axl::rtl::GetCharLiteral ((uchar_t) Token) : Default; \
+			return isprint ((uchar_t) tokenKind) ? axl::rtl::getCharLiteral ((uchar_t) tokenKind) : unknownName; \
 		} \
 	} \
 };

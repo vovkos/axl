@@ -8,69 +8,69 @@ namespace test_WorkerThread {
 
 //.............................................................................
 
-void Foo (int i, int j, char* p)
+void foo (int i, int j, char* p)
 {
-	printf ("Foo TID: %x, i: %d, j: %d, p: %s\n", GetCurrentThreadId (), i, j, p);
+	printf ("Foo TID: %x, i: %d, j: %d, p: %s\n", getCurrentThreadId (), i, j, p);
 }
 
-void OnEvent (int i)
+void onEvent (int i)
 {
-	printf ("OnEvent TID: %x, i: %d\n", GetCurrentThreadId (), i);
+	printf ("OnEvent TID: %x, i: %d\n", getCurrentThreadId (), i);
 }
 
 void 
-Run ()
+run ()
 {
-	ref::CPtrT <exe::CWorkerThread> WorkerThread = exe::GetWorkerThread (2);
+	ref::CPtrT <exe::CWorkerThread> workerThread = exe::getWorkerThread (2);
 
-	printf ("Main thread TID: %x\n", GetCurrentThreadId ());
+	printf ("Main thread TID: %x\n", getCurrentThreadId ());
 
-	WorkerThread->Schedule <exe::CArgSeqT_3 < 
+	workerThread->schedule <exe::CArgSeqT_3 < 
 		char,
 		char,
 		const char*
-		> > (Foo, 100, 101, rtl::CString ("hui"));
+		> > (foo, 100, 101, rtl::CString ("hui"));
 
-	WorkerThread->Schedule <exe::CArgSeqT_3 < 
+	workerThread->schedule <exe::CArgSeqT_3 < 
 		short,
 		short,
 		const char*
-		> > (Foo, 200, 201, rtl::CString ("govno"));
+		> > (foo, 200, 201, rtl::CString ("govno"));
 
-	WorkerThread->Schedule <exe::CArgSeqT_3 < 
+	workerThread->schedule <exe::CArgSeqT_3 < 
 		int,
 		int,
 		const char*
-		> > (Foo, 300, 301, rtl::CString ("muravei"));
+		> > (foo, 300, 301, rtl::CString ("muravei"));
 
-	mt::CEvent Event1;
+	mt::CEvent event1;
 
-	WorkerThread->AddEvent (
-		&Event1, 
+	workerThread->addEvent (
+		&event1, 
 		&exe::CFunctionT <
 			exe::CArgT <int>,  
 			exe::CArgT <void>
-			> (OnEvent, 1)
+			> (onEvent, 1)
 		);
 
-	mt::CEvent Event2;
+	mt::CEvent event2;
 
-	WorkerThread->AddEvent (
-		&Event2, 
+	workerThread->addEvent (
+		&event2, 
 		&exe::CFunctionT <
 			exe::CArgT <int>,  
 			exe::CArgT <void>
-			> (OnEvent, 2)
+			> (onEvent, 2)
 		);
 
 
-	Event1.Signal ();
+	event1.signal ();
 
-	Sleep (1000);  
+	sleep (1000);  
 
-	Event2.Signal ();
+	event2.signal ();
 
-	Sleep (1000);  
+	sleep (1000);  
 }
 
 */

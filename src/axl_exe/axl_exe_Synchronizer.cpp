@@ -8,50 +8,50 @@ namespace exe {
 
 //.............................................................................
 
-CSynchronizer::CSynchronizer (int Flags)
+CSynchronizer::CSynchronizer (int flags)
 {
-	m_InvokeThreadId = -1;
-	m_Flags = Flags;
+	m_invokeThreadId = -1;
+	m_flags = flags;
 }
 
 CSynchronizer::EScheduleResult
-CSynchronizer::ScheduleV (
-	IFunction* pFunction, 
+CSynchronizer::scheduleV (
+	IFunction* function, 
 	axl_va_list va
 	)
 {
-	ulong_t CurrentThreadId = mt::GetCurrentThreadId ();
+	ulong_t currentThreadId = mt::getCurrentThreadId ();
 
-	m_Lock.Lock ();
+	m_lock.lock ();
 
-	if (m_InvokeThreadId != -1 &&
-		((m_Flags & EFlags_AlwaysEnqueue) ||  m_InvokeThreadId != CurrentThreadId))
+	if (m_invokeThreadId != -1 &&
+		((m_flags & EFlags_AlwaysEnqueue) ||  m_invokeThreadId != currentThreadId))
 	{
-		m_InvokeList.AddV (pFunction, va);
-		m_Lock.Unlock ();
+		m_invokeList.addV (function, va);
+		m_lock.unlock ();
 		
 		return EScheduleResult_Pending;
 	}
 
-	m_InvokeThreadId = CurrentThreadId;
-	m_Lock.Unlock ();
+	m_invokeThreadId = currentThreadId;
+	m_lock.unlock ();
 
-	pFunction->InvokeV (va);
+	function->invokeV (va);
 
-	m_Lock.Lock ();
-	while (!m_InvokeList.IsEmpty ())
+	m_lock.lock ();
+	while (!m_invokeList.isEmpty ())
 	{
-		CInvokeList InvokeList;
-		InvokeList.TakeOver (&m_InvokeList);
-		m_Lock.Unlock ();
+		CInvokeList invokeList;
+		invokeList.takeOver (&m_invokeList);
+		m_lock.unlock ();
 		
-		InvokeList.Process ();
-		ASSERT (InvokeList.IsEmpty ());
+		invokeList.process ();
+		ASSERT (invokeList.isEmpty ());
 		
-		m_Lock.Lock ();
+		m_lock.lock ();
 	}
 
-	m_Lock.Unlock ();
+	m_lock.unlock ();
 
 	return EScheduleResult_Invoke;
 }

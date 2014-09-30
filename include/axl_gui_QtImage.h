@@ -18,19 +18,19 @@ class CQtImage: public CImage
 	friend class CQtEngine;
 
 public:
-	QPixmap m_QtPixmap;
+	QPixmap m_qtPixmap;
 
 public:
 	CQtImage ();
 
 	virtual
 	bool
-	GetData (
-		void* pData,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+	getData (
+		void* data,
+		int left,
+		int top,
+		int right,
+		int bottom
 		);
 };
 

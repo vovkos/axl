@@ -17,38 +17,38 @@ namespace gui {
 //.............................................................................
 
 bool
-BuildLogFont (
-	LOGFONTW* pLogFont,
-	const wchar_t* pFaceName,
-	size_t PointSize,
-	uint_t Flags = 0
+buildLogFont (
+	LOGFONTW* logFont,
+	const wchar_t* faceName,
+	size_t pointSize,
+	uint_t flags = 0
 	);
 
 inline
 bool
-GetLogFontFromFontDesc (
-	const TFontDesc& FontDesc,
-	LOGFONTW* pLogFont
+getLogFontFromFontDesc (
+	const TFontDesc& fontDesc,
+	LOGFONTW* logFont
 	)
 {
-	return BuildLogFont (
-		pLogFont,
-		rtl::CString_w (FontDesc.m_FaceName), 
-		FontDesc.m_PointSize, 
-		FontDesc.m_Flags
+	return buildLogFont (
+		logFont,
+		rtl::CString_w (fontDesc.m_faceName), 
+		fontDesc.m_pointSize, 
+		fontDesc.m_flags
 		);
 }
 
 void
-ModifyLogFont (
-	LOGFONTW* pLogFont,
-	uint_t Flags
+modifyLogFont (
+	LOGFONTW* logFont,
+	uint_t flags
 	);
 
 bool
-GetFontDescFromLogFont (
-	const LOGFONTW* pLogFont,
-	TFontDesc* pFontDesc
+getFontDescFromLogFont (
+	const LOGFONTW* logFont,
+	TFontDesc* fontDesc
 	);
 
 //.............................................................................
@@ -63,31 +63,31 @@ public:
 	CGdiFont ();
 
 	bool
-	GetLogFont (LOGFONTW* pLogFont);
+	getLogFont (LOGFONTW* logFont);
 
 	virtual
 	bool
-	IsMonospace ();
+	isMonospace ();
 
 	virtual
 	TSize
-	CalcTextSize_utf8 (
-		const utf8_t* pText,
-		size_t Length = -1
+	calcTextSize_utf8 (
+		const utf8_t* text,
+		size_t length = -1
 		);
 
 	virtual
 	TSize
-	CalcTextSize_utf16 (
-		const utf16_t* pText,
-		size_t Length = -1
+	calcTextSize_utf16 (
+		const utf16_t* text,
+		size_t length = -1
 		);
 
 	virtual
 	TSize
-	CalcTextSize_utf32 (
-		const utf32_t* pText,
-		size_t Length = -1
+	calcTextSize_utf32 (
+		const utf32_t* text,
+		size_t length = -1
 		);
 };
 

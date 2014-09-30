@@ -6,31 +6,31 @@
 #include "mylogserver.h"
 #include "mylogproxy.h"
 
-namespace Ui {
-class MainWindow;
+namespace ui {
+class mainWindow;
 }
 
-class MainWindow : public QMainWindow
+class mainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 public:	
-	gui::QtWidget <MyLogWidget>* m_logWidget;
-	MyLogServer m_logServer;
+	gui::qtWidget <myLogWidget>* m_logWidget;
+	myLogServer m_logServer;
 	
 	log::CMemoryServer m_memoryServer;
 
-	MyLogProxy m_logServerProxy;
-	MyLogProxy m_logWidgetProxy;
+	myLogProxy m_logServerProxy;
+	myLogProxy m_logWidgetProxy;
 
 public:
-	explicit MainWindow(QWidget *parent = 0);
-	~MainWindow();
+	explicit mainWindow(QWidget *parent = 0);
+	~mainWindow();
 
 	bool initialize ();
 	virtual void resizeEvent (QResizeEvent* e);
 	
 private:
-	Ui::MainWindow *ui;
+	ui::mainWindow *ui;
 };
 

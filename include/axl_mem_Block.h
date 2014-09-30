@@ -18,29 +18,29 @@ namespace mem {
 struct TBlock
 {
 	void* m_p;
-	size_t m_Size;
+	size_t m_size;
 
 	TBlock ()
 	{
-		Setup (NULL, 0);
+		setup (NULL, 0);
 	}
 
 	TBlock (
 		void* p, 
-		size_t Size
+		size_t size
 		)
 	{
-		Setup (p, Size);
+		setup (p, size);
 	}
 
 	void
-	Setup (
+	setup (
 		void* p, 
-		size_t Size
+		size_t size
 		)
 	{
 		m_p = p;
-		m_Size = Size;
+		m_size = size;
 	}
 };
 

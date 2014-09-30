@@ -52,28 +52,28 @@ class CLexer: public lex::CRagelLexerT <CLexer, CToken>
 public:
 	static
 	int
-	GetMachineState (ELexerMachine Machine);
+	getMachineState (ELexerMachine machine);
 
 protected:
 	CToken*
-	CreateStringToken (
-		int Token,
-		int Left = 0,
-		int Right = 0
+	createStringToken (
+		int tokenKind,
+		int left = 0,
+		int right = 0
 		)
 	{
-		CToken* pToken = CreateToken (Token);
-		pToken->m_Data.m_String.Copy (ts + Left, pToken->m_Pos.m_Length - (Left + Right));
-		return pToken;
+		CToken* token = createToken (tokenKind);
+		token->m_data.m_string.copy (ts + left, token->m_pos.m_length - (left + right));
+		return token;
 	}
 
 	// implemented in *.rl
 
 	void 
-	Init ();
+	init ();
 
 	void
-	Exec ();
+	exec ();
 };
 
 //.............................................................................

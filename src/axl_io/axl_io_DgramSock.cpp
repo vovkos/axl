@@ -8,60 +8,60 @@ namespace io {
 //.............................................................................
 
 bool
-CDgramSock::Open (
-	ESockProto Protocol,
-	ESockAddr AddrKind,
-	const TSockAddr* pAddr
+CDgramSock::open (
+	ESockProto protocol,
+	ESockAddr addrKind,
+	const TSockAddr* addr
 	)
 {
-	Close ();
+	close ();
 
-	bool Result = m_Sock.Open (AddrKind, SOCK_DGRAM, Protocol);
-	if (!Result)
+	bool result = m_sock.open (addrKind, SOCK_DGRAM, protocol);
+	if (!result)
 		return false;
 
-	if (pAddr)
+	if (addr)
 	{
-		SOCKADDR Addr;
+		SOCKADDR addr;
 		
-		Result = 
-			pAddr->ToWinSockAddr (&Addr) &&
-			m_Sock.Bind (&Addr);
+		result = 
+			addr->toWinSockAddr (&addr) &&
+			m_sock.bind (&addr);
 
-		if (!Result)
+		if (!result)
 			return false;
 	}
 
-	m_WorkerThread = exe::GetWorkerThread ();
-	if (!m_WorkerThread)
+	m_workerThread = exe::getWorkerThread ();
+	if (!m_workerThread)
 		return false;
 
 	return true;
 }
 
 void
-CDgramSock::Close ()
+CDgramSock::close ()
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return;
 
-	m_WorkerThread->SyncSchedule <exe::CArgT <CDgramSock*> > (
-		pvoid_cast (&CDgramSock::Close_wt),
+	m_workerThread->syncSchedule <exe::CArgT <CDgramSock*> > (
+		pvoid_cast (&CDgramSock::close_wt),
 		this
 		);
 }
 
 bool 
-CDgramSock::SendTo (
+CDgramSock::sendTo (
 	const void* p,
-	size_t Size,
-	const TSockAddr* pAddr,
-	const exe::CFunction& OnComplete
+	size_t size,
+	const TSockAddr* addr,
+	const exe::CFunction& onComplete
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_5 <
+	return m_workerThread->syncSchedule <exe::CArgSeqT_5 <
 		CDgramSock*,
 		void*,
 		size_t,
@@ -69,200 +69,200 @@ CDgramSock::SendTo (
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CDgramSock::SendTo_wt),
+		pvoid_cast (&CDgramSock::sendTo_wt),
 		this,
 		p,
-		Size,
-		pAddr,
-		pOnComplete
+		size,
+		addr,
+		onComplete
 		) != 0;
 }
 
 bool 
-CDgramSock::RecvFrom (
+CDgramSock::recvFrom (
 	void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete
+	size_t size,
+	const exe::CFunction& onComplete
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_4 <
+	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
 		CDgramSock*,
 		void*,
 		size_t,
 		exe::IFunction*
 		> > (
 		
-		pvoid_cast (&CDgramSock::RecvFrom_wt),
+		pvoid_cast (&CDgramSock::recvFrom_wt),
 		this,
 		p,
-		Size,
-		pOnComplete
+		size,
+		onComplete
 		) != 0;
 }
 
 void 
-OnSyncSendRecvComplete (
-	mt::CEvent* pEvent,
-	err::CError* pError,
-	TSockAddrU* pAddrFromBuf,
-	size_t* pActualSize,
+onSyncSendRecvComplete (
+	mt::CEvent* event,
+	err::CError* error,
+	TSockAddrU* addrFromBuf,
+	size_t* actualSize,
 	
-	const err::CError& Error,
-	const TSockAddrU* pAddrFrom,
-	size_t ActualSize
+	const err::CError& error,
+	const TSockAddrU* addrFrom,
+	size_t actualSize
 	)
 {
-	if (pError)
-		*pError = Error;
+	if (error)
+		*error = error;
 	
-	if (pAddrFromBuf)
-		*pAddrFromBuf = *pAddrFrom;
+	if (addrFromBuf)
+		*addrFromBuf = *addrFrom;
 	
-	*pActualSize = ActualSize;
-	pEvent->Signal ();
+	*actualSize = actualSize;
+	event->signal ();
 }
 
 size_t 
-CDgramSock::SyncSendTo (
+CDgramSock::syncSendTo (
 	const void* p,
-	size_t Size,
-	const TSockAddr* pAddr
+	size_t size,
+	const TSockAddr* addr
 	)
 {
-	mt::CEvent Event;
-	err::CError Error;
-	size_t ActualSize;
+	mt::CEvent event;
+	err::CError error;
+	size_t actualSize;
 	
 	exe::CFunctionT <
 		exe::CArgSeqT_4 <mt::CEvent*, err::CError*, TSockAddrU*, size_t*>,
 		COnSendRecvCompleteArg
-		> OnComplete (OnSyncSendRecvComplete, &Event, &Error, NULL, &ActualSize);
+		> onComplete (onSyncSendRecvComplete, &event, &error, NULL, &actualSize);
 
-	SendTo (p, Size, pAddr, &OnComplete);
-	Event.Wait ();
+	sendTo (p, size, addr, &onComplete);
+	event.wait ();
 
-	if (Error)
+	if (error)
 	{
-		err::SetError (Error);
+		err::setError (error);
 		return -1;
 	}
 
-	return ActualSize;
+	return actualSize;
 }
 
 size_t
-CDgramSock::SyncRecvFrom (
+CDgramSock::syncRecvFrom (
 	void* p,
-	size_t Size,
-	TSockAddrU* pFrom
+	size_t size,
+	TSockAddrU* from
 	)
 {
-	mt::CEvent Event;
-	err::CError Error;
-	size_t ActualSize;
+	mt::CEvent event;
+	err::CError error;
+	size_t actualSize;
 	
 	exe::CFunctionT <
 		exe::CArgSeqT_4 <mt::CEvent*, err::CError*, TSockAddrU*, size_t*>,
 		COnSendRecvCompleteArg
-		> OnComplete (OnSyncSendRecvComplete, &Event, &Error, pFrom, &ActualSize);
+		> onComplete (onSyncSendRecvComplete, &event, &error, from, &actualSize);
 
-	RecvFrom (p, Size, &OnComplete);
-	Event.Wait ();
+	recvFrom (p, size, &onComplete);
+	event.wait ();
 
-	if (Error)
+	if (error)
 	{
-		err::SetError (Error);
+		err::setError (error);
 		return -1;
 	}
 
-	return ActualSize;
+	return actualSize;
 }
 
 void
-CDgramSock::Close_wt ()
+CDgramSock::close_wt ()
 {
-	m_Sock.Close ();
+	m_sock.close ();
 	
-	while (!m_SendRecvList.IsEmpty ())
+	while (!m_sendRecvList.isEmpty ())
 		::SleepEx (0, true);
 
-	m_WorkerThread = ref::EPtr_Null;
+	m_workerThread = ref::EPtr_Null;
 }
 
 bool
-CDgramSock::SendTo_wt (
+CDgramSock::sendTo_wt (
 	const void* p,
-	size_t Size,
-	const TSockAddr* pAddr,
-	const exe::CFunction& OnComplete
+	size_t size,
+	const TSockAddr* addr,
+	const exe::CFunction& onComplete
 	)
 {
-	TSendRecv* pSend = AXL_MEM_NEW (TSendRecv);
-	pSend->m_pSock = this;
-	pSend->m_OnComplete = ref::GetPtrOrClone (pOnComplete);
-	pSend->m_Overlapped.hEvent = pSend;
-	m_SendRecvList.InsertTail (pSend);
+	TSendRecv* send = AXL_MEM_NEW (TSendRecv);
+	send->m_sock = this;
+	send->m_onComplete = ref::getPtrOrClone (onComplete);
+	send->m_overlapped.hEvent = send;
+	m_sendRecvList.insertTail (send);
 
-	bool Result = 
-		pAddr->ToWinSockAddr (&pSend->m_Address) &&
-		m_Sock.SendTo (p, Size, &pSend->m_Address, &pSend->m_Overlapped, OnSendRecvComplete_wt);
+	bool result = 
+		addr->toWinSockAddr (&send->m_address) &&
+		m_sock.sendTo (p, size, &send->m_address, &send->m_overlapped, onSendRecvComplete_wt);
 	
-	if (!Result)
-		CompleteSendRecv_wt (pSend, err::GetError (), 0);
+	if (!result)
+		completeSendRecv_wt (send, err::getError (), 0);
 
-	return Result;
+	return result;
 }
 
 bool
-CDgramSock::RecvFrom_wt (
+CDgramSock::recvFrom_wt (
 	void* p,
-	size_t Size,
-	const exe::CFunction& OnComplete
+	size_t size,
+	const exe::CFunction& onComplete
 	)
 {
-	TSendRecv* pRecv = AXL_MEM_NEW (TSendRecv);
-	pRecv->m_pSock = this;
-	pRecv->m_OnComplete = ref::GetPtrOrClone (pOnComplete);
-	pRecv->m_Overlapped.hEvent = pRecv;
-	pRecv->m_AddressSize = sizeof (SOCKADDR);
-	m_SendRecvList.InsertTail (pRecv);
+	TSendRecv* recv = AXL_MEM_NEW (TSendRecv);
+	recv->m_sock = this;
+	recv->m_onComplete = ref::getPtrOrClone (onComplete);
+	recv->m_overlapped.hEvent = recv;
+	recv->m_addressSize = sizeof (SOCKADDR);
+	m_sendRecvList.insertTail (recv);
 
-	bool Result = m_Sock.RecvFrom (
-		p, Size, 
-		&pRecv->m_Address, 
-		&pRecv->m_AddressSize, 
-		&pRecv->m_Overlapped, 
-		OnSendRecvComplete_wt
+	bool result = m_sock.recvFrom (
+		p, size, 
+		&recv->m_address, 
+		&recv->m_addressSize, 
+		&recv->m_overlapped, 
+		onSendRecvComplete_wt
 		);
 
-	if (!Result)	
-		CompleteSendRecv_wt (pRecv, err::GetError (), 0); 
+	if (!result)	
+		completeSendRecv_wt (recv, err::getError (), 0); 
 
-	return Result;
+	return result;
 }
 
 void
-CDgramSock::CompleteSendRecv_wt (
-	TSendRecv* pSendRecv,
-	const err::CError& Error,
-	size_t ActualSize
+CDgramSock::completeSendRecv_wt (
+	TSendRecv* sendRecv,
+	const err::CError& error,
+	size_t actualSize
 	)
 {
-	if (Error)
+	if (error)
 	{
-		pSendRecv->m_OnComplete->Invoke (0, &Error, NULL, 0);
+		sendRecv->m_onComplete->invoke (0, &error, NULL, 0);
 	}
 	else
 	{
-		TSockAddrU Address;
-		Address.FromWinSockAddr (&pSendRecv->m_Address);
-		pSendRecv->m_OnComplete->Invoke (0, &Error, &Address, ActualSize);
+		TSockAddrU address;
+		address.fromWinSockAddr (&sendRecv->m_address);
+		sendRecv->m_onComplete->invoke (0, &error, &address, actualSize);
 	}
 
-	m_SendRecvList.Remove (pSendRecv);
-	AXL_MEM_DELETE (pSendRecv);
+	m_sendRecvList.remove (sendRecv);
+	AXL_MEM_DELETE (sendRecv);
 }
 
 //.............................................................................

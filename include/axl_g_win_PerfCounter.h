@@ -15,31 +15,31 @@ namespace win {
 class CPerfCounter
 {
 protected:
-	LARGE_INTEGER m_Frequency;
-	LARGE_INTEGER m_StartTime;
+	LARGE_INTEGER m_frequency;
+	LARGE_INTEGER m_startTime;
 
 public:
 	CPerfCounter ()
 	{
-		Start ();
+		start ();
 	}
 
 	bool
-	Start ()
+	start ()
 	{ 
-		bool_t Result = 
-			::QueryPerformanceFrequency (&m_Frequency) &&
-			::QueryPerformanceCounter (&m_StartTime);
+		bool_t result = 
+			::QueryPerformanceFrequency (&m_frequency) &&
+			::QueryPerformanceCounter (&m_startTime);
 
-		return err::Complete (Result);
+		return err::complete (result);
 	}
 
 	uint64_t 
-	GetElapsedTime ()
+	getElapsedTime ()
 	{ 
-		LARGE_INTEGER Time;
-		::QueryPerformanceCounter (&Time);
-		return ((Time.QuadPart - m_StartTime.QuadPart) * 1000000 / m_Frequency.QuadPart);
+		LARGE_INTEGER time;
+		::QueryPerformanceCounter (&time);
+		return ((time.QuadPart - m_startTime.QuadPart) * 1000000 / m_frequency.QuadPart);
 	}
 };
 

@@ -23,15 +23,15 @@ enum EPixelFormat
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char* 
-GetPixelFormatString (EPixelFormat PixelFormat);
+getPixelFormatString (EPixelFormat pixelFormat);
 
 //.............................................................................
 
 struct TImageDesc
 {
-	TSize m_Size;
-	EPixelFormat m_PixelFormat;
-	void* m_pData;
+	TSize m_size;
+	EPixelFormat m_pixelFormat;
+	void* m_data;
 
 	TImageDesc ()
 	{
@@ -39,27 +39,27 @@ struct TImageDesc
 	}
 
 	TImageDesc (
-		int Width,
-		int Height,
-		EPixelFormat PixelFormat,
-		void* pData
+		int width,
+		int height,
+		EPixelFormat pixelFormat,
+		void* data
 		)
 	{
-		m_Size.m_Width = Width;
-		m_Size.m_Height = Height;
-		m_PixelFormat = PixelFormat;
-		m_pData = pData;
+		m_size.m_width = width;
+		m_size.m_height = height;
+		m_pixelFormat = pixelFormat;
+		m_data = data;
 	}
 
 	TImageDesc (
-		const TSize& Size,
-		EPixelFormat PixelFormat,
-		void* pData
+		const TSize& size,
+		EPixelFormat pixelFormat,
+		void* data
 		)
 	{
-		m_Size = Size;
-		m_PixelFormat = PixelFormat;
-		m_pData = pData;
+		m_size = size;
+		m_pixelFormat = pixelFormat;
+		m_data = data;
 	}
 };
 
@@ -68,53 +68,53 @@ struct TImageDesc
 class CImage: public CGuiItem
 {
 protected:
-	TSize m_Size;
+	TSize m_size;
 
 public:
 	TSize
-	GetSize ()
+	getSize ()
 	{
-		return m_Size;
+		return m_size;
 	}
 
 	// data is returned in EPixelFormat_Rgba
 
 	virtual
 	bool
-	GetData (
-		void* pData, 
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+	getData (
+		void* data, 
+		int left,
+		int top,
+		int right,
+		int bottom
 		) = 0;
 
 	bool
-	GetData (
-		void* pData,
-		const TRect& Rect
+	getData (
+		void* data,
+		const TRect& rect
 		)
 	{
-		return GetData (
-			pData, 
-			Rect.m_Left,
-			Rect.m_Top,
-			Rect.m_Right,
-			Rect.m_Bottom			
+		return getData (
+			data, 
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom			
 			);
 	}
 
 	bool
-	GetData (
-		void* pData,
-		const TSize& Size
+	getData (
+		void* data,
+		const TSize& size
 		)
 	{
-		return GetData (
-			pData, 
+		return getData (
+			data, 
 			0, 0, 
-			Size.m_Width,
-			Size.m_Height
+			size.m_width,
+			size.m_height
 			);
 	}
 };

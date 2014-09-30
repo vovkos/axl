@@ -39,7 +39,7 @@ public:
 
 	~CHandleT ()
 	{
-		Close ();
+		close ();
 	}
 
 	operator H () const
@@ -50,20 +50,20 @@ public:
 	const CHandleT&
 	operator = (H h)
 	{
-		Attach (h);
+		attach (h);
 		return *this;
 	}
 
 	bool
-	IsOpen () const
+	isOpen () const
 	{
 		return m_h != TGetInvalidHandle () ();
 	}
 
 	void
-	Close ()
+	close ()
 	{
-		if (IsOpen ())
+		if (isOpen ())
 		{
 			TClose () (m_h);
 			m_h = TGetInvalidHandle () ();
@@ -71,14 +71,14 @@ public:
 	}
 
 	void
-	Attach (H h)
+	attach (H h)
 	{
-		Close ();
+		close ();
 		m_h = h;
 	}
 
 	H
-	Detach ()
+	detach ()
 	{
 		H h = m_h;
 		m_h = TGetInvalidHandle () ();
@@ -86,7 +86,7 @@ public:
 	}
 
 	H*
-	GetHandlePtr ()
+	getHandlePtr ()
 	{
 		return &m_h;
 	}

@@ -33,9 +33,9 @@ enum ESockProto
 
 inline
 const char* 
-GetProtocolString (ESockProto Protocol)
+getProtocolString (ESockProto protocol)
 {
-	switch (Protocol)
+	switch (protocol)
 	{
 	case ESockProto_Icmp:
 		return "ICMP";
@@ -55,8 +55,8 @@ GetProtocolString (ESockProto Protocol)
 
 union TSockAddr
 {
-	sockaddr_in m_Ip4;
-	sockaddr_in6 m_Ip6;
+	sockaddr_in m_ip4;
+	sockaddr_in6 m_ip6;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -65,56 +65,56 @@ struct TSockAddrIp: TSockAddr
 {
 	union
 	{
-		uint32_t m_Ip;
-		uint8_t m_IpBytes [4];
+		uint32_t m_ip;
+		uint8_t m_ipBytes [4];
 	};
 
-	uint16_t m_Port;
+	uint16_t m_port;
 
 	void
-	Setup (
-		uint32_t Ip, 
-		uint16_t Port
+	setup (
+		uint32_t ip, 
+		uint16_t port
 		)
 	{
-		m_Kind = ESockAddr_Ip;
-		m_Size = sizeof (TSockAddrIp);
-		m_Ip   = Ip;
-		m_Port = Port;
+		m_kind = ESockAddr_Ip;
+		m_size = sizeof (TSockAddrIp);
+		m_ip   = ip;
+		m_port = port;
 	}
 
 	void
-	FromWinSockAddr (const SOCKADDR_IN* pAddr)
+	fromWinSockAddr (const SOCKADDR_IN* addr)
 	{
-		Setup (ntohl (pAddr->sin_addr.S_un.S_addr), ntohs (pAddr->sin_port));
+		setup (ntohl (addr->sin_addr.S_un.S_addr), ntohs (addr->sin_port));
 	}
 
 	void
-	ToWinSockAddr (SOCKADDR_IN* pAddr) const
+	toWinSockAddr (SOCKADDR_IN* addr) const
 	{
-		memset (pAddr, 0, sizeof (SOCKADDR_IN));
-		pAddr->sin_family = AF_INET;
-		pAddr->sin_addr.S_un.S_addr = htonl (m_Ip);
-		pAddr->sin_port = htons (m_Port);
+		memset (addr, 0, sizeof (SOCKADDR_IN));
+		addr->sin_family = AF_INET;
+		addr->sin_addr.S_un.S_addr = htonl (m_ip);
+		addr->sin_port = htons (m_port);
 	}
 
 	rtl::CString
-	ToString () const
+	toString () const
 	{
-		rtl::CString String;
+		rtl::CString string;
 
-		if (m_Ip)
-			String.Format ("%d.%d.%d.%d:%d", 
-				m_IpBytes [3], 
-				m_IpBytes [2], 
-				m_IpBytes [1], 
-				m_IpBytes [0], 
-				m_Port
+		if (m_ip)
+			string.format ("%d.%d.%d.%d:%d", 
+				m_ipBytes [3], 
+				m_ipBytes [2], 
+				m_ipBytes [1], 
+				m_ipBytes [0], 
+				m_port
 				);
 		else
-			String.Format ("%d", m_Port);
+			string.format ("%d", m_port);
 
-		return String;
+		return string;
 	}
 };
 
@@ -122,49 +122,49 @@ struct TSockAddrIp: TSockAddr
 
 struct TSockAddrIp6: TSockAddr
 {
-	uint16_t m_Ip6 [8];
-	uint16_t m_Port;
+	uint16_t m_ip6 [8];
+	uint16_t m_port;
 
 	void
-	Setup (
-		const uint16_t* pIp6, 
-		uint16_t Port
+	setup (
+		const uint16_t* ip6, 
+		uint16_t port
 		)
 	{
-		m_Kind = ESockAddr_Ip;
-		m_Size = sizeof (TSockAddrIp6);
-		memcpy (m_Ip6, pIp6, sizeof (m_Ip6));
-		m_Port = Port;
+		m_kind = ESockAddr_Ip;
+		m_size = sizeof (TSockAddrIp6);
+		memcpy (m_ip6, ip6, sizeof (m_ip6));
+		m_port = port;
 	}
 
 	void
-	FromWinSockAddr (const SOCKADDR_IN6* pAddr)
+	fromWinSockAddr (const SOCKADDR_IN6* addr)
 	{
-		Setup (pAddr->sin6_addr.u.Word, ntohs (pAddr->sin6_port));
+		setup (addr->sin6_addr.u.Word, ntohs (addr->sin6_port));
 	}
 
 	void
-	ToWinSockAddr (SOCKADDR_IN6* pAddr) const
+	toWinSockAddr (SOCKADDR_IN6* addr) const
 	{
-		memset (pAddr, 0, sizeof (SOCKADDR_IN6));
-		pAddr->sin6_family = AF_INET6;
-		memcpy (pAddr->sin6_addr.u.Word, m_Ip6, sizeof (m_Ip6));
-		pAddr->sin6_port = htons (m_Port);
+		memset (addr, 0, sizeof (SOCKADDR_IN6));
+		addr->sin6_family = AF_INET6;
+		memcpy (addr->sin6_addr.u.Word, m_ip6, sizeof (m_ip6));
+		addr->sin6_port = htons (m_port);
 	}
 
 	rtl::CString
-	ToString () const
+	toString () const
 	{
-		rtl::CString String;
+		rtl::CString string;
 
-		String.Format ("%04x", m_Ip6 [0]);
+		string.format ("%04x", m_ip6 [0]);
 
 		for (size_t i = 1; i < 8; i++)
-			if (m_Ip6 [i])
-				String.AppendFormat ("::%04x", m_Ip6 [i]);
+			if (m_ip6 [i])
+				string.appendFormat ("::%04x", m_ip6 [i]);
 
-		String.AppendFormat (".%d", m_Port);
-		return String;
+		string.appendFormat (".%d", m_port);
+		return string;
 	}
 };
 
@@ -172,63 +172,63 @@ struct TSockAddrIp6: TSockAddr
 
 union TSockAddrU
 {
-	TSockAddr m_Hdr;
-	TSockAddrIp m_Ip;
-	TSockAddrIp6 m_Ip6;
+	TSockAddr m_hdr;
+	TSockAddrIp m_ip;
+	TSockAddrIp6 m_ip6;
 
 	bool
-	FromWinSockAddr (const SOCKADDR* pAddr)
+	fromWinSockAddr (const SOCKADDR* addr)
 	{
-		switch (pAddr->sa_family)
+		switch (addr->sa_family)
 		{
 		case AF_INET:
-			m_Ip.FromWinSockAddr ((SOCKADDR_IN*) pAddr);
+			m_ip.fromWinSockAddr ((SOCKADDR_IN*) addr);
 			break;
 
 		case AF_INET6:
-			m_Ip6.FromWinSockAddr ((SOCKADDR_IN6*) pAddr);
+			m_ip6.fromWinSockAddr ((SOCKADDR_IN6*) addr);
 			break;
 
 		default:
-			return err::Fail (err::EStatus_InvalidParameter);
+			return err::fail (err::EStatus_InvalidParameter);
 		}
 
 		return true;
 	}
 
 	bool
-	ToWinSockAddr (SOCKADDR* pAddr) const
+	toWinSockAddr (SOCKADDR* addr) const
 	{
-		switch (m_Hdr.m_Kind)
+		switch (m_hdr.m_kind)
 		{
 		case ESockAddr_Ip:
-			m_Ip.ToWinSockAddr ((SOCKADDR_IN*) pAddr);
+			m_ip.toWinSockAddr ((SOCKADDR_IN*) addr);
 			break;
 
 		case ESockAddr_Ip6:
-			m_Ip6.ToWinSockAddr ((SOCKADDR_IN6*) pAddr);
+			m_ip6.toWinSockAddr ((SOCKADDR_IN6*) addr);
 			break;
 
 		default:
-			return err::Fail (err::EStatus_InvalidParameter);
+			return err::fail (err::EStatus_InvalidParameter);
 		}
 
 		return true;
 	}
 
 	rtl::CString
-	ToString () const
+	toString () const
 	{
-		switch (m_Hdr.m_Kind)
+		switch (m_hdr.m_kind)
 		{
 		case ESockAddr_Ip:
-			return m_Ip.ToString ();
+			return m_ip.toString ();
 
 		case ESockAddr_Ip6:
-			return m_Ip6.ToString ();
+			return m_ip6.toString ();
 
 		default:
-			return rtl::CString::Format_s ("<address-kind=%d>", m_Hdr.m_Kind);
+			return rtl::CString::format_s ("<address-kind=%d>", m_hdr.m_kind);
 		}
 	}
 };
@@ -237,16 +237,16 @@ union TSockAddrU
 
 inline
 bool
-TSockAddr::ToWinSockAddr (SOCKADDR* pAddr) const
+TSockAddr::toWinSockAddr (SOCKADDR* addr) const
 {
-	return ((TSockAddrU*) this)->ToWinSockAddr (pAddr);
+	return ((TSockAddrU*) this)->toWinSockAddr (addr);
 }
 
 inline
 rtl::CString
-TSockAddr::ToString () const
+TSockAddr::toString () const
 {
-	return ((TSockAddrU*) this)->ToString ();
+	return ((TSockAddrU*) this)->toString ();
 }
 
 //.............................................................................
@@ -254,17 +254,17 @@ TSockAddr::ToString () const
 class CSockAddrIp: public TSockAddrIp
 {
 public:
-	CSockAddrIp (uint16_t Port = 0)
+	CSockAddrIp (uint16_t port = 0)
 	{
-		Setup (0, Port);
+		setup (0, port);
 	}
 
 	CSockAddrIp (
-		uint32_t Ip, 
-		uint16_t Port
+		uint32_t ip, 
+		uint16_t port
 		)
 	{
-		Setup (Ip, Port);
+		setup (ip, port);
 	}
 
 	// this operator is needed to pass CSockAddrIp to functions accepting TSockAddr*

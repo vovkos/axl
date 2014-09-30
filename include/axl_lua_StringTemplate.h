@@ -19,59 +19,59 @@ class CStringTemplate
 protected:
 	struct TEmitContext
 	{
-		CStringTemplate* m_pThis;
-		rtl::CString* m_pResult;
-		const char* m_pTemplate;
+		CStringTemplate* m_this;
+		rtl::CString* m_output;
+		const char* m_source;
 	};
 
 protected:
-	lex::CLineCol m_LineCol;
+	lex::CLineCol m_lineCol;
 
 public:
-	CLuaState m_LuaState;
+	CLuaState m_luaState;
 	
 public:
 	void
-	Reset ();
+	reset ();
 
 	bool
-	Process (
-		rtl::CString* pResult,
-		const rtl::CString& FilePath,
-		const char* pTemplate,
-		size_t Length = -1
+	process (
+		rtl::CString* output,
+		const rtl::CString& filePath,
+		const char* source,
+		size_t length = -1
 		);
 
 protected:
 	bool
-	ExtractLuaSource (
-		rtl::CString* pLuaSource,
-		const rtl::CString& FilePath,
-		const char* pTemplate,
-		size_t Length = -1
+	extractLuaSource (
+		rtl::CString* luaSource,
+		const rtl::CString& filePath,
+		const char* source,
+		size_t length = -1
 		);
 
 	void
-	CountLineCol (
+	countLineCol (
 		const char* p,
-		size_t Length = -1
+		size_t length = -1
 		);
 
 	static
 	int 
-	GetLine_lua (lua_State* pLuaState);
+	getLine_lua (lua_State* h);
 
 	static
 	int 
-	GetCol_lua (lua_State* pLuaState);
+	getCol_lua (lua_State* h);
 
 	static
 	int 
-	Emit_lua (lua_State* pLuaState);
+	emit_lua (lua_State* h);
 
 	static
 	int 
-	Passthrough_lua (lua_State* pLuaState);
+	passthrough_lua (lua_State* h);
 };
 
 //.............................................................................

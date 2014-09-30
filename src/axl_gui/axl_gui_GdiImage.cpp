@@ -11,52 +11,52 @@ namespace gui {
 
 CGdiImage::CGdiImage ()
 {
-	m_pEngine = CGdiEngine::GetSingleton ();
+	m_engine = CGdiEngine::getSingleton ();
 }
 
 bool
-CGdiImage::GetData (
-	void* pData,
-	int Left,
-	int Top,
-	int Right,
-	int Bottom
+CGdiImage::getData (
+	void* data,
+	int left,
+	int top,
+	int right,
+	int bottom
 	)
 {
-	bool_t Result;
+	bool_t result;
 
-	int Width = Right - Left;
-	int Height = Bottom - Top;
+	int width = right - left;
+	int height = bottom - top;
 
-	BITMAPINFO BitmapInfo = { 0 };
-	BitmapInfo.bmiHeader.biSize = sizeof (BitmapInfo.bmiHeader);
-	BitmapInfo.bmiHeader.biPlanes = 1;
-	BitmapInfo.bmiHeader.biBitCount = 32;
-	BitmapInfo.bmiHeader.biCompression = BI_RGB;
-	BitmapInfo.bmiHeader.biWidth = m_Size.m_Width;
-	BitmapInfo.bmiHeader.biHeight = m_Size.m_Height;
+	BITMAPINFO bitmapInfo = { 0 };
+	bitmapInfo.bmiHeader.biSize = sizeof (bitmapInfo.bmiHeader);
+	bitmapInfo.bmiHeader.biPlanes = 1;
+	bitmapInfo.bmiHeader.biBitCount = 32;
+	bitmapInfo.bmiHeader.biCompression = BI_RGB;
+	bitmapInfo.bmiHeader.biWidth = m_size.m_width;
+	bitmapInfo.bmiHeader.biHeight = m_size.m_height;
 
-	CScreenDc ScreenDc;
+	CScreenDc screenDc;
 
-	if (Width == m_Size.m_Width)
+	if (width == m_size.m_width)
 	{
-		Result = GetDIBits (ScreenDc, m_h, Top, Height, pData, &BitmapInfo, DIB_RGB_COLORS);
-		return err::Complete (Result);
+		result = ::GetDIBits (screenDc, m_h, top, height, data, &bitmapInfo, DIB_RGB_COLORS);
+		return err::complete (result);
 	}
 	
-	char Buffer [1024];
-	rtl::CArrayT <uint_t> ColorBuffer (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	ColorBuffer.SetCount (m_Size.m_Width * Height);
+	char buffer [1024];
+	rtl::CArrayT <uint_t> colorBuffer (ref::EBuf_Stack, buffer, sizeof (buffer));
+	colorBuffer.setCount (m_size.m_width * height);
 
-	Result = GetDIBits (ScreenDc, m_h, Top, Height, ColorBuffer, &BitmapInfo, DIB_RGB_COLORS);
-	if (!Result)
-		return err::FailWithLastSystemError ();
+	result = ::GetDIBits (screenDc, m_h, top, height, colorBuffer, &bitmapInfo, DIB_RGB_COLORS);
+	if (!result)
+		return err::failWithLastSystemError ();
 
-	uint_t* pDst = (uint_t*) pData;
-	const uint_t* pSrc = ColorBuffer;
+	uint_t* dst = (uint_t*) data;
+	const uint_t* src = colorBuffer;
 
-	for (int i = 0; i < Height; i++, pDst += Width, pSrc += m_Size.m_Width)
-		memcpy (pDst, pSrc, Width * sizeof (uint_t));
+	for (int i = 0; i < height; i++, dst += width, src += m_size.m_width)
+		memcpy (dst, src, width * sizeof (uint_t));
 
 	return true;
 }

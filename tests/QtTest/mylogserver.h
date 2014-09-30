@@ -9,15 +9,15 @@
 
 #ifdef _JANCY_REPRESENTER
 
-class StdLib: public jnc::CStdLib
+class stdLib: public jnc::CStdLib
 {
 public:
-	StdLib ();
+	stdLib ();
 	
 	static
 	int
-	Printf (
-		const char* pFormat,
+	printf (
+		const char* format,
 		...
 		);	
 };
@@ -26,20 +26,20 @@ public:
 
 //.............................................................................
 
-class MyLogServer: public log::CServer
+class myLogServer: public log::CServer
 {
 protected:
 #ifdef _JANCY_REPRESENTER
 	jnc::CModule m_module;
 	jnc::CRuntime m_runtime;
-	StdLib m_stdlib;
+	stdLib m_stdlib;
 
 	log::CJancyRepresenter m_logRepresenter;
 #else
-	MyLogRepresenter m_logRepresenter;
+	myLogRepresenter m_logRepresenter;
 #endif
 
-	JancyColorizer m_logColorizer;	
+	jancyColorizer m_logColorizer;	
 
 public:
 	bool start (
@@ -51,7 +51,7 @@ public:
 
 protected:
 #ifdef _JANCY_REPRESENTER
-	bool compile (const char* representerClassName, size_t FileCount, ...);
+	bool compile (const char* representerClassName, size_t fileCount, ...);
 #endif
 };
 

@@ -7,240 +7,240 @@ namespace gui {
 //.............................................................................
 
 void
-CHyperText::Clear ()
+CHyperText::clear ()
 {
-	m_Source.Clear ();
-	m_Text.Clear ();
-	m_AttrArray.Clear ();
-	m_HyperlinkArray.Clear ();
-	m_HyperlinkXMap.Clear ();
+	m_source.clear ();
+	m_text.clear ();
+	m_attrArray.clear ();
+	m_hyperlinkArray.clear ();
+	m_hyperlinkXMap.clear ();
 }
 
 size_t
-CHyperText::Backspace (size_t BackLength)
+CHyperText::backspace (size_t backLength)
 {
 	// don't touch m_Source!
 
 	// TODO: backspace attributes and hyperlinks
 
-	size_t Length = m_Text.GetLength ();
-	if (BackLength >= Length)
+	size_t length = m_text.getLength ();
+	if (backLength >= length)
 	{
-		m_Text.Clear ();
+		m_text.clear ();
 		return 0;
 	}
 
-	m_Text.ReduceLength (BackLength);
-	return Length - BackLength;
+	m_text.reduceLength (backLength);
+	return length - backLength;
 }
 
 size_t 
-CHyperText::AppendPlainText (
-	const char* pText, 
-	size_t Length
+CHyperText::appendPlainText (
+	const char* text, 
+	size_t length
 	)
 {
-	if (Length == -1)
-		Length = strlen (pText);
+	if (length == -1)
+		length = strlen (text);
 
-	m_Source.Append (pText, Length);
-	return m_Text.Append (pText, Length);
+	m_source.append (text, length);
+	return m_text.append (text, length);
 }
 
 size_t 
-CHyperText::AppendPlainText (
-	char Char, 
-	size_t Count
+CHyperText::appendPlainText (
+	char c, 
+	size_t count
 	)
 {
-	m_Source.Append (Char, Count);
-	return m_Text.Append (Char, Count);
+	m_source.append (c, count);
+	return m_text.append (c, count);
 }
 
 size_t
-CHyperText::AppendHyperText (
-	const TTextAttr& BaseAttr,
-	const char* pText,
-	size_t Length
+CHyperText::appendHyperText (
+	const TTextAttr& baseAttr,
+	const char* text,
+	size_t length
 	)
 {
-	TTextAttr Attr = BaseAttr;
+	TTextAttr attr = baseAttr;
 
-	const char* p = pText;
-	const char* pEnd;
+	const char* p = text;
+	const char* end;
 	
-	size_t LastLength = m_Text.GetLength ();
+	size_t lastLength = m_text.getLength ();
 	
-	if (Length == -1)
-		Length = strlen (pText);
+	if (length == -1)
+		length = strlen (text);
 
-	pEnd = p + Length;
+	end = p + length;
 
-	m_Source.Append (p, Length);
+	m_source.append (p, length);
 
 	for (;;)
 	{
-		const char* pTag;
-		const char* pTagEnd;
-		const char* pParam;
+		const char* tag;
+		const char* tagEnd;
+		const char* param;
 
-		pTag = strchr_e (p, pEnd, '<');
-		if (!pTag)
+		tag = strchr_e (p, end, '<');
+		if (!tag)
 		{
-			m_Text.Append (p, pEnd - p);
+			m_text.append (p, end - p);
 			break;
 		}
 
-		m_Text.Append (p, pTag - p);
+		m_text.append (p, tag - p);
 
-		pTagEnd = strchr_e (pTag + 1, pEnd, '>');
-		if (!pTagEnd)
+		tagEnd = strchr_e (tag + 1, end, '>');
+		if (!tagEnd)
 			break;
 
-		Length = m_Text.GetLength ();
-		m_AttrArray.SetAttr (LastLength, Length, Attr);
-		LastLength = Length;
+		length = m_text.getLength ();
+		m_attrArray.setAttr (lastLength, length, attr);
+		lastLength = length;
 
-		pParam = strchr_e (pTag + 1, pTagEnd, '=');
-		if (pParam)
+		param = strchr_e (tag + 1, tagEnd, '=');
+		if (param)
 		{
-			Attr.Parse (pTag + 1);
-			m_HyperlinkArray.OpenHyperlink (Length, pParam + 1, pTagEnd - pParam - 1);
+			attr.parse (tag + 1);
+			m_hyperlinkArray.openHyperlink (length, param + 1, tagEnd - param - 1);
 		}
-		else if (pTag[1] == '\b') // backspace
+		else if (tag[1] == '\b') // backspace
 		{
-			size_t BackLength = pTag[2] != '*' ? (size_t) strtoul (pTag + 2, NULL, 10) : -1;
-			Backspace (BackLength ? BackLength : 1);
+			size_t backLength = tag[2] != '*' ? (size_t) strtoul (tag + 2, NULL, 10) : -1;
+			backspace (backLength ? backLength : 1);
 		}
 		else 
 		{
-			Attr.Parse (pTag + 1);
-			m_HyperlinkArray.CloseHyperlink (Length);
+			attr.parse (tag + 1);
+			m_hyperlinkArray.closeHyperlink (length);
 		}
 
-		p = pTagEnd + 1;
+		p = tagEnd + 1;
 	}
 
-	Length = m_Text.GetLength ();
-	m_AttrArray.SetAttr (LastLength, Length, Attr);
-	return Length;
+	length = m_text.getLength ();
+	m_attrArray.setAttr (lastLength, length, attr);
+	return length;
 }
 
 THyperlinkAnchor*
-CHyperText::FindHyperlinkByX (int x) const
+CHyperText::findHyperlinkByX (int x) const
 {
-	THyperlinkAnchor* pResult = NULL;
+	THyperlinkAnchor* result = NULL;
 
-	size_t Begin = 0;
-	size_t End = m_HyperlinkXMap.GetCount ();
+	size_t begin = 0;
+	size_t end = m_hyperlinkXMap.getCount ();
 
-	while (Begin < End)
+	while (begin < end)
 	{
-		size_t Mid = (Begin + End) / 2;
+		size_t mid = (begin + end) / 2;
 
-		const THyperlinkXMapEntry* pMapEntry = &m_HyperlinkXMap [Mid];
-		if (pMapEntry->m_x == x)
-			return pMapEntry->m_pAnchor;
+		const THyperlinkXMapEntry* mapEntry = &m_hyperlinkXMap [mid];
+		if (mapEntry->m_x == x)
+			return mapEntry->m_anchor;
 
-		if (pMapEntry->m_x < x)
+		if (mapEntry->m_x < x)
 		{
-			pResult = pMapEntry->m_pAnchor;
-			Begin = Mid + 1;
+			result = mapEntry->m_anchor;
+			begin = mid + 1;
 		}
 		else
 		{
-			End = Mid;
+			end = mid;
 		}
 	}
 
-	return pResult;
+	return result;
 }
 
 void
-CHyperText::CalcHyperlinkXMap (CFont* pBaseFont)
+CHyperText::calcHyperlinkXMap (CFont* baseFont)
 {
 	int x = 0;
-	size_t Offset = 0;
-	size_t Length = m_Text.GetLength ();
-	size_t AttrCount = m_AttrArray.GetCount ();
-	size_t HyperlinkCount = m_HyperlinkArray.GetCount ();
+	size_t offset = 0;
+	size_t length = m_text.getLength ();
+	size_t attrCount = m_attrArray.getCount ();
+	size_t hyperlinkCount = m_hyperlinkArray.getCount ();
 
-	const TTextAttrAnchor* pAttrAnchor = m_AttrArray;
-	const TTextAttrAnchor* pAttrEnd = pAttrAnchor + AttrCount;
-	THyperlinkXMapEntry* pHyperlinkXMapEntry;
+	const TTextAttrAnchor* attrAnchor = m_attrArray;
+	const TTextAttrAnchor* attrEnd = attrAnchor + attrCount;
+	THyperlinkXMapEntry* hyperlinkXMapEntry;
 	
-	uint_t FontFlags = 0;
-	CFont* pFont = pBaseFont->GetFontMod (FontFlags);
+	uint_t fontFlags = 0;
+	CFont* font = baseFont->getFontMod (fontFlags);
 
-	m_HyperlinkXMap.SetCount (HyperlinkCount);
-	pHyperlinkXMapEntry = m_HyperlinkXMap;
+	m_hyperlinkXMap.setCount (hyperlinkCount);
+	hyperlinkXMapEntry = m_hyperlinkXMap;
 
-	rtl::CIteratorT <THyperlinkAnchor> HyperlinkAnchor = m_HyperlinkArray.GetHead ();
-	for (; HyperlinkAnchor; HyperlinkAnchor++)
+	rtl::CIteratorT <THyperlinkAnchor> it = m_hyperlinkArray.getHead ();
+	for (; it; it++)
 	{
-		THyperlinkAnchor* pHyperlinkAnchor = *HyperlinkAnchor;
-		TSize Size;
+		THyperlinkAnchor* hyperlinkAnchor = *it;
+		TSize size;
 
-		for (; pAttrAnchor < pAttrEnd && pAttrAnchor->m_Offset < pHyperlinkAnchor->m_Offset; pAttrAnchor++)
+		for (; attrAnchor < attrEnd && attrAnchor->m_offset < hyperlinkAnchor->m_offset; attrAnchor++)
 		{
-			if (pAttrAnchor->m_Attr.m_FontFlags == FontFlags)
+			if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 				continue;
 
-			Size = pFont->CalcTextSize (m_Text.cc () + Offset, pAttrAnchor->m_Offset - Offset);			
+			size = font->calcTextSize (m_text.cc () + offset, attrAnchor->m_offset - offset);			
 			
-			x += Size.m_Width;
-			Offset = pAttrAnchor->m_Offset;
+			x += size.m_width;
+			offset = attrAnchor->m_offset;
 
-			FontFlags = pAttrAnchor->m_Attr.m_FontFlags;
-			pFont = pBaseFont->GetFontMod (FontFlags);
+			fontFlags = attrAnchor->m_attr.m_fontFlags;
+			font = baseFont->getFontMod (fontFlags);
 		}
 
-		Size = pFont->CalcTextSize (m_Text.cc () + Offset, pHyperlinkAnchor->m_Offset - Offset);
+		size = font->calcTextSize (m_text.cc () + offset, hyperlinkAnchor->m_offset - offset);
 		
-		x += Size.m_Width;
-		Offset = pHyperlinkAnchor->m_Offset;
+		x += size.m_width;
+		offset = hyperlinkAnchor->m_offset;
 
-		pHyperlinkXMapEntry->m_x = x;
-		pHyperlinkXMapEntry->m_pAnchor = pHyperlinkAnchor;
+		hyperlinkXMapEntry->m_x = x;
+		hyperlinkXMapEntry->m_anchor = hyperlinkAnchor;
 
-		pHyperlinkAnchor++; 
-		pHyperlinkXMapEntry++;
+		hyperlinkAnchor++; 
+		hyperlinkXMapEntry++;
 	}
 }
 
 TSize
-CHyperText::CalcTextSize (CFont* pBaseFont) const
+CHyperText::calcTextSize (CFont* baseFont) const
 {
-	TSize Size;
+	TSize size;
 
 	int x = 0;
-	size_t Offset = 0;
-	size_t Length = m_Text.GetLength ();
-	size_t AttrCount = m_AttrArray.GetCount ();
+	size_t offset = 0;
+	size_t length = m_text.getLength ();
+	size_t attrCount = m_attrArray.getCount ();
 
-	uint_t FontFlags = 0;
-	CFont* pFont = pBaseFont->GetFontMod (FontFlags);
+	uint_t fontFlags = 0;
+	CFont* font = baseFont->getFontMod (fontFlags);
 
-	for (size_t i = 0; i < AttrCount; i++)
+	for (size_t i = 0; i < attrCount; i++)
 	{
-		const TTextAttrAnchor* pAttrAnchor = &m_AttrArray [i];
+		const TTextAttrAnchor* attrAnchor = &m_attrArray [i];
 
-		if (pAttrAnchor->m_Attr.m_FontFlags == FontFlags)
+		if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 			continue;
 
-		Size = pFont->CalcTextSize (m_Text.cc () + Offset, pAttrAnchor->m_Offset - Offset);
+		size = font->calcTextSize (m_text.cc () + offset, attrAnchor->m_offset - offset);
 		
-		x += Size.m_Width;
-		Offset = pAttrAnchor->m_Offset;
+		x += size.m_width;
+		offset = attrAnchor->m_offset;
 
-		FontFlags = pAttrAnchor->m_Attr.m_FontFlags;
-		pFont = pBaseFont->GetFontMod (FontFlags);
+		fontFlags = attrAnchor->m_attr.m_fontFlags;
+		font = baseFont->getFontMod (fontFlags);
 	}
 
-	Size = pFont->CalcTextSize (m_Text.cc () + Offset, Length - Offset);
-	Size.m_Width += x;
+	size = font->calcTextSize (m_text.cc () + offset, length - offset);
+	size.m_width += x;
 
-	return Size;
+	return size;
 }
 
 //.............................................................................

@@ -8,9 +8,9 @@ namespace gui {
 //.............................................................................
 
 const char* 
-GetFontFlagString (EFontFlag Flag)
+getFontFlagString (EFontFlag flag)
 {
-	static const char* StringTable [] = 
+	static const char* stringTable [] = 
 	{
 		"bold",      // EFontFlag_Bold      = 0x01,
 		"italic",    // EFontFlag_Italic    = 0x02,
@@ -18,135 +18,135 @@ GetFontFlagString (EFontFlag Flag)
 		"strikeout", // EFontFlag_Strikeout = 0x08,
 	};
 
-	size_t i = rtl::GetLoBitIdx32 (Flag >> 8);
+	size_t i = rtl::getLoBitIdx32 (flag >> 8);
 
-	return i < countof (StringTable) ? 
-		StringTable [i] : 
+	return i < countof (stringTable) ? 
+		stringTable [i] : 
 		"undefined-font-flag";
 }
 
 uint_t
-ParseFontFlagString (
-	const char* pString,
-	const char** ppEnd
+parseFontFlagString (
+	const char* string,
+	const char** end
 	)
 {
-	if (!pString)
+	if (!string)
 	{
-		if (ppEnd)
-			*ppEnd = NULL;
+		if (end)
+			*end = NULL;
 
 		return EFontFlag_Transparent;
 	}
 
-	uint_t Flags = 0;
+	uint_t flags = 0;
 
-	const char* p = pString;
+	const char* p = string;
 
 	for (;;)
 	{
-		int Mod = 0;
+		int mod = 0;
 
 		switch (*p)
 		{
 		case 'b': 
 		case 'B':
-			Mod = EFontFlag_Bold;
+			mod = EFontFlag_Bold;
 			break;
 
 		case 'i': 
 		case 'I':
-			Mod = EFontFlag_Italic;
+			mod = EFontFlag_Italic;
 			break;
 
 		case 'u': 
 		case 'U':
-			Mod = EFontFlag_Underline;
+			mod = EFontFlag_Underline;
 			break;
 
 		case 's': 
 		case 'S':
-			Mod = EFontFlag_Strikeout;
+			mod = EFontFlag_Strikeout;
 			break;
 		}
 
-		if (!Mod)
+		if (!mod)
 			break;
 
-		Flags |= Mod;
+		flags |= mod;
 		p++;
 	}
 
-	if (ppEnd)
-		*ppEnd = p;
+	if (end)
+		*end = p;
 
-	return Flags;
+	return flags;
 }
 
 //.............................................................................
 
 void
-TFontDesc::Setup (
-	const char* pFaceName, 
-	size_t PointSize,
-	uint_t Flags
+TFontDesc::setup (
+	const char* faceName, 
+	size_t pointSize,
+	uint_t flags
 	)
 {
-	size_t Length = strlen (pFaceName);
-	if (Length >= countof (m_FaceName))
-		Length = countof (m_FaceName) - 1;
+	size_t length = strlen (faceName);
+	if (length >= countof (m_faceName))
+		length = countof (m_faceName) - 1;
 	
-	memcpy (m_FaceName, pFaceName, Length * sizeof (char));
-	m_FaceName [Length] = 0;
-	m_PointSize = PointSize;
-	m_Flags = Flags;
+	memcpy (m_faceName, faceName, length * sizeof (char));
+	m_faceName [length] = 0;
+	m_pointSize = pointSize;
+	m_flags = flags;
 }
 
 //.............................................................................
 
 CFont*
-CFont::GetFontMod (uint_t Flags)
+CFont::getFontMod (uint_t flags)
 {
-	if (Flags & EFontFlag_Transparent)
+	if (flags & EFontFlag_Transparent)
 		return this;
 
-	Flags &= (countof (m_pTuple->m_FontModArray) - 1);
+	flags &= (countof (m_tuple->m_fontModArray) - 1);
 	
-	return m_pTuple->m_FontModArray [Flags] ?
-		m_pTuple->m_FontModArray [Flags] :
-		m_pEngine->GetFontMod (this, Flags);
+	return m_tuple->m_fontModArray [flags] ?
+		m_tuple->m_fontModArray [flags] :
+		m_engine->getFontMod (this, flags);
 }
 
 //.............................................................................
 
 void
-TTextAttr::Parse (
-	const char* pString,
-	const char** ppEnd
+TTextAttr::parse (
+	const char* string,
+	const char** end
 	)
 {
-	TColorAttr::Parse (pString, &pString);
+	TColorAttr::parse (string, &string);
 
-	while (isspace (*pString))
-		pString++;
+	while (isspace (*string))
+		string++;
 
-	if (*pString == '+')
-		m_FontFlags = ParseFontFlagString (pString + 1, &pString);
+	if (*string == '+')
+		m_fontFlags = parseFontFlagString (string + 1, &string);
 
-	if (ppEnd)
-		*ppEnd = pString;
+	if (end)
+		*end = string;
 }
 
 void
-TTextAttr::ParseOverlay (
-	const TTextAttr& BaseAttr,
-	const char* pString,
-	const char** ppEnd
+TTextAttr::parseOverlay (
+	const TTextAttr& baseAttr,
+	const char* string,
+	const char** end
 	)
 {
-	TTextAttr OverlayAttr;
-	OverlayAttr.Parse (pString, ppEnd);
-	Overlay (BaseAttr, OverlayAttr);
+	TTextAttr overlayAttr;
+	overlayAttr.parse (string, end);
+	overlay (baseAttr, overlayAttr);
 }
 
 //.............................................................................

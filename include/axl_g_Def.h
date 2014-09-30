@@ -38,7 +38,7 @@
 #	elif (defined __GNUC__)
 #		define _AXL_CPP AXL_CPP_GCC
 #	else
-#		error Unsupported compiler
+#		error unsupported compiler
 #	endif
 #elif (_AXL_CPP != AXL_CPP_MSC && _AXL_CPP != AXL_CPP_GCC)
 #	error _AXL_CPP is set to unknown C++ compiler id
@@ -258,27 +258,27 @@ pvoid_cast (T x)
 #endif
 
 #ifndef offsetof
-#	define offsetof(Type, Field) ((size_t) &((Type*) 0)->Field)
+#	define offsetof(type, field) ((size_t) &((type*) 0)->Field)
 #endif
 
 #define AXL_MIN(a, b)  (((a) < (b)) ? (a) : (b))
 #define AXL_MAX(a, b)  (((a) > (b)) ? (a) : (b))
 
-#define AXL_OFFSETOF(Type, Field) \
-	((size_t) &((Type*) 1)->Field - 1)
+#define AXL_OFFSETOF(type, field) \
+	((size_t) &((type*) 1)->Field - 1)
 
-#define AXL_CONTAINING_RECORD(Address, Type, Field) \
-	((Type*) ((char*) (Address) - AXL_OFFSETOF (Type, Field)))
+#define AXL_CONTAINING_RECORD(address, type, field) \
+	((type*) ((char*) (address) - AXL_OFFSETOF (type, field)))
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // ensure class is never accidentally copied
 
-#define AXL_DISABLE_COPY(Class) \
+#define AXL_DISABLE_COPY(class) \
 private: \
-	Class (const Class&);  \
+	class (const class&);  \
 	void \
-	operator = (const Class&); \
+	operator = (const class&); \
 
 //.............................................................................
 
@@ -290,23 +290,5 @@ private: \
 #define AXL_LTOA(l)  AXL_LTOA2 (l)
 #define AXL_MSG(s)   message (__FILE__ "(" AXL_LTOA (__LINE__) ") : " s)
 #define AXL_TODO(s)  AXL_MSG ("TODO : " s)
-
-//.............................................................................
-
-// axl subsystems identifiers
-
-#define AXL_SUBSYS_G    0
-#define AXL_SUBSYS_MEM  1
-#define AXL_SUBSYS_OBJ  2
-#define AXL_SUBSYS_REF  3
-#define AXL_SUBSYS_RTL  4
-#define AXL_SUBSYS_EXE  5
-#define AXL_SUBSYS_IO   8
-#define AXL_SUBSYS_GUI  9
-#define AXL_SUBSYS_LOG  10
-#define AXL_SUBSYS_JNC  12
-
-#define AXL_SUBSYS_MASK(SubSys) (1 << (SubSys))
-#define AXL_SUBSYS_MASK_ALL (-1)
 
 //.............................................................................

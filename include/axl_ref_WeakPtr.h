@@ -33,126 +33,126 @@ class CWeakPtrT
 
 protected:
 	T* m_p;
-	CRefCount* m_pRefCount;
+	CRefCount* m_refCount;
 
 public:
 	CWeakPtrT (int i = 0)
 	{ 
 		m_p = NULL;
-		m_pRefCount = NULL; 
+		m_refCount = NULL; 
 	}
 
-	CWeakPtrT (const CWeakPtrT& Src)
+	CWeakPtrT (const CWeakPtrT& src)
 	{ 
-		m_p = NULL, m_pRefCount = NULL;
-		Copy (Src.m_p, Src.m_pRefCount);
+		m_p = NULL, m_refCount = NULL;
+		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	CWeakPtrT (const CWeakPtrT <T2>& Src)
+	CWeakPtrT (const CWeakPtrT <T2>& src)
 	{
-		m_p = NULL, m_pRefCount = NULL;
-		Copy (Src.m_p, Src.m_pRefCount);
+		m_p = NULL, m_refCount = NULL;
+		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	CWeakPtrT (const CPtrT <T2>& Src)
+	CWeakPtrT (const CPtrT <T2>& src)
 	{ 
-		m_p = NULL, m_pRefCount = NULL;
-		Copy (Src.m_p, Src.m_pRefCount);
+		m_p = NULL, m_refCount = NULL;
+		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
 	CWeakPtrT (T2* p)
 	{
-		m_p = NULL, m_pRefCount = NULL;
-		Copy (p, p);
+		m_p = NULL, m_refCount = NULL;
+		copy (p, p);
 	}
 
 	CWeakPtrT (
 		T* p, 
-		CRefCount* pRefCount
+		CRefCount* refCount
 		)
 	{ 
-		m_p = NULL, m_pRefCount = NULL;
-		Copy (p, pRefCount);
+		m_p = NULL, m_refCount = NULL;
+		copy (p, refCount);
 	}
 
 	~CWeakPtrT ()
 	{ 
-		Clear (); 
+		clear (); 
 	}
 
 	CWeakPtrT& 
-	operator = (const CWeakPtrT& Src)
+	operator = (const CWeakPtrT& src)
 	{ 
-		Copy (Src.m_p, Src.m_pRefCount);
+		copy (src.m_p, src.m_refCount);
 		return *this;
 	}
 
 	void 
-	Copy (
+	copy (
 		T* p, 
-		CRefCount* pRefCount
+		CRefCount* refCount
 		)
 	{
 		m_p = p;
 
-		if (m_pRefCount == pRefCount)
+		if (m_refCount == refCount)
 			return;
 
-		if (pRefCount)
-			pRefCount->AddWeakRef (); 
+		if (refCount)
+			refCount->addWeakRef (); 
 
-		if (m_pRefCount)
-			m_pRefCount->WeakRelease ();
+		if (m_refCount)
+			m_refCount->weakRelease ();
 
-		m_pRefCount = pRefCount;
+		m_refCount = refCount;
 	}
 
 	void 
-	Attach (
+	attach (
 		T* p, 
-		CRefCount* pRefCount
+		CRefCount* refCount
 		)
 	{
-		if (m_pRefCount)
-			m_pRefCount->WeakRelease ();
+		if (m_refCount)
+			m_refCount->weakRelease ();
 
 		m_p = p;
-		m_pRefCount = pRefCount;
+		m_refCount = refCount;
 	}
 
 	void 
-	Detach (
-		T** pp = NULL, 
-		CRefCount** ppRefCount = NULL
+	detach (
+		T** pp_o = NULL, 
+		CRefCount** refCount_o = NULL
 		)
 	{ 
-		if (pp)
-			*pp = m_p;
+		if (pp_o)
+			*pp_o = m_p;
 		
-		if (ppRefCount)
-			*ppRefCount = m_pRefCount;
+		if (refCount_o)
+			*refCount_o = m_refCount;
 
 		m_p = NULL;
-		m_pRefCount = NULL; 
+		m_refCount = NULL; 
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{ 
-		if (m_pRefCount)
-			m_pRefCount->WeakRelease ();
+		if (m_refCount)
+			m_refCount->weakRelease ();
 
 		m_p = NULL;
-		m_pRefCount = NULL;
+		m_refCount = NULL;
 	}
 
 	CRefCount* 
-	GetRefCount () const
+	getRefCount () const
 	{
-		return m_pRefCount;
+		return m_refCount;
 	}
 };
 

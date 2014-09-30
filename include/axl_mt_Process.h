@@ -15,11 +15,11 @@ namespace mt {
 
 inline
 bool
-CreateProcess (const char* pCommandLine)
+createProcess (const char* commandLine)
 {	
 #if (_AXL_ENV == AXL_ENV_WIN)
-	HINSTANCE hProcess = ::ShellExecuteW (0, L"open", rtl::CString_w (pCommandLine), 0, 0, SW_SHOWNORMAL);
-	return err::Complete (hProcess != NULL);
+	HINSTANCE hProcess = ::ShellExecuteW (0, L"open", rtl::CString_w (commandLine), 0, 0, SW_SHOWNORMAL);
+	return err::complete (hProcess != NULL);
 #else
 	// TODO	
 	return true;

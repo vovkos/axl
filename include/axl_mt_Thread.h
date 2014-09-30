@@ -23,46 +23,46 @@ template <typename T>
 class CThreadImplT
 {
 public:
-	win::CThread m_Thread;
+	win::CThread m_thread;
 
 public:
 	~CThreadImplT ()
 	{
-		WaitAndClose ();
+		waitAndClose ();
 	}
 
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_Thread.IsOpen ();
+		return m_thread.isOpen ();
 	}
 
 	uint64_t
-	GetThreadId ()
+	getThreadId ()
 	{
-		return m_Thread.GetThreadId ();
+		return m_thread.getThreadId ();
 	}
 
 	bool
-	Start ()
+	start ()
 	{
-		return m_Thread.Create (NULL, 0, ThreadProc, (T*) this, 0);
+		return m_thread.create (NULL, 0, threadProc, (T*) this, 0);
 	}
 
 	void
-	WaitAndClose (uint_t Timeout = -1)
+	waitAndClose (uint_t timeout = -1)
 	{
-		if (!m_Thread.IsOpen ())
+		if (!m_thread.isOpen ())
 			return;
 
-		win::EWaitResult Result = m_Thread.Wait (Timeout);
-		if (Result != win::EWaitResult_Object0)
+		win::EWaitResult result = m_thread.wait (timeout);
+		if (result != win::EWaitResult_Object0)
 		{
 			ASSERT (false); // terminating thread
-			m_Thread.Terminate (err::EStatus_IoTimeout);
+			m_thread.terminate (err::EStatus_IoTimeout);
 		}
 
-		m_Thread.Close ();
+		m_thread.close ();
 	}
 
 
@@ -70,9 +70,9 @@ protected:
 	static
 	dword_t
 	WINAPI
-	ThreadProc (void* pContext)
+	threadProc (void* context)
 	{
-		((T*) pContext)->ThreadProc ();
+		((T*) context)->threadProc ();
 		return 0;
 	}
 };
@@ -81,7 +81,7 @@ protected:
 
 inline
 uint64_t
-GetCurrentThreadId ()
+getCurrentThreadId ()
 {
 	return ::GetCurrentThreadId ();
 }
@@ -94,56 +94,56 @@ template <typename T>
 class CThreadImplT
 {
 public:
-	psx::CThread m_Thread;
+	psx::CThread m_thread;
 
 public:
 	~CThreadImplT ()
 	{
-		WaitAndClose ();
+		waitAndClose ();
 	}
 
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_Thread.IsOpen ();
+		return m_thread.isOpen ();
 	}
 
 	uint64_t
-	GetThreadId ()
+	getThreadId ()
 	{
-		return m_Thread;
+		return m_thread;
 	}
 
 	bool
-	Start ()
+	start ()
 	{
-		return m_Thread.Create (ThreadProc, (T*) this);
+		return m_thread.create (threadProc, (T*) this);
 	}
 
 	void
-	WaitAndClose (uint_t Timeout = -1)
+	waitAndClose (uint_t timeout = -1)
 	{
-		if (!m_Thread.IsOpen ())
+		if (!m_thread.isOpen ())
 			return;
 
-		if (!m_Thread.Join (Timeout))
-			m_Thread.Detach ();
+		if (!m_thread.join (timeout))
+			m_thread.detach ();
 	}
 
 
 protected:
 	static
 	void*
-	ThreadProc (void* pContext)
+	threadProc (void* context)
 	{
-		((T*) pContext)->ThreadProc ();
+		((T*) context)->threadProc ();
 		return NULL;
 	}
 };
 
 inline
 uint64_t
-GetCurrentThreadId ()
+getCurrentThreadId ()
 {
 	return pthread_self ();
 }

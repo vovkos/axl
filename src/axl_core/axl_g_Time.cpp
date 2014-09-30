@@ -7,136 +7,136 @@ namespace g {
 //.............................................................................
 
 uint64_t
-GetTimestamp ()
+getTimestamp ()
 {
-	uint64_t Timestamp;
+	uint64_t timestamp;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	GetSystemTimeAsFileTime ((FILETIME*) &Timestamp);
+	::GetSystemTimeAsFileTime ((FILETIME*) &timestamp);
 #else
-	timespec Time;
-	clock_gettime (CLOCK_REALTIME, &Time);
-	Timestamp = (uint64_t) Time.tv_sec * 10000000 + Time.tv_nsec / 100;
+	timespec time;
+	clock_gettime (CLOCK_REALTIME, &time);
+	timestamp = (uint64_t) time.tv_sec * 10000000 + time.tv_nsec / 100;
 #endif
 
-	return Timestamp;
+	return timestamp;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-Sleep (uint32_t MsCount)
+sleep (uint32_t msCount)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	::Sleep (MsCount);
+	::Sleep (msCount);
 #else
-	timespec Timespec;
-	g::GetTimespecFromTimeout (MsCount, &Timespec);
-	nanosleep (&Timespec, NULL);
+	timespec timespec;
+	g::getTimespecFromTimeout (msCount, &timespec);
+	nanosleep (&timespec, NULL);
 #endif
 }
 
 //.............................................................................
 
 uint64_t
-TTime::GetTimestampImpl (
-	bool IsLocal,
-	int TimeZone
+TTime::getTimestampImpl (
+	bool isLocal,
+	int timeZone
 	) const
 {
-	uint64_t Timestamp = 0;
+	uint64_t timestamp = 0;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	SYSTEMTIME SysTime = { 0 };
-	SysTime.wYear   = m_Year;
-	SysTime.wMonth  = m_Month + 1;
-	SysTime.wDay    = m_MonthDay;
-	SysTime.wHour   = m_Hour;
-	SysTime.wMinute = m_Minute;
-	SysTime.wSecond = m_Second;
+	SYSTEMTIME sysTime = { 0 };
+	sysTime.wYear   = m_year;
+	sysTime.wMonth  = m_month + 1;
+	sysTime.wDay    = m_monthDay;
+	sysTime.wHour   = m_hour;
+	sysTime.wMinute = m_minute;
+	sysTime.wSecond = m_second;
 
-	SystemTimeToFileTime (&SysTime, (FILETIME*) &Timestamp);
+	::SystemTimeToFileTime (&sysTime, (FILETIME*) &timestamp);
 
-	if (IsLocal)
-		FileTimeToLocalFileTime ((const FILETIME*) &Timestamp, (FILETIME*) &Timestamp);
+	if (isLocal)
+		::FileTimeToLocalFileTime ((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
 	else
-		Timestamp += (int64_t) GetTimeZoneOffsetInMinutes (TimeZone) * 60 * 10000000;
+		timestamp += (int64_t) getTimeZoneOffsetInMinutes (timeZone) * 60 * 10000000;
 
 #else
-	tm TmStruct = { 0 };
-	TmStruct.tm_year = m_Year - 1900;
-	TmStruct.tm_mon  = m_Month;
-	TmStruct.tm_mday = m_MonthDay;
-	TmStruct.tm_hour = m_Hour;
-	TmStruct.tm_min  = m_Minute;
-	TmStruct.tm_sec  = m_Second;
+	tm tmStruct = { 0 };
+	tmStruct.tm_year = m_year - 1900;
+	tmStruct.tm_mon  = m_month;
+	tmStruct.tm_mday = m_monthDay;
+	tmStruct.tm_hour = m_hour;
+	tmStruct.tm_min  = m_minute;
+	tmStruct.tm_sec  = m_second;
 
-	time_t PosixTime = IsLocal ?
-		mktime (&TmStruct) :
-		timegm (&TmStruct) + GetTimeZoneOffsetInMinutes (TimeZone) * 60;
+	time_t posixTime = isLocal ?
+		mktime (&tmStruct) :
+		timegm (&tmStruct) + getTimeZoneOffsetInMinutes (timeZone) * 60;
 
-	Timestamp = (uint64_t) PosixTime * 10000000;
+	timestamp = (uint64_t) posixTime * 10000000;
 #endif
 
 	return
-		Timestamp +
-		m_MilliSecond * 10000 +
-		m_MicroSecond * 10 +
-		m_NanoSecond / 100;
+		timestamp +
+		m_milliSecond * 10000 +
+		m_microSecond * 10 +
+		m_nanoSecond / 100;
 }
 
 void
-TTime::SetTimestampImpl (
-	uint64_t Timestamp,
-	bool IsLocal,
-	int TimeZone
+TTime::setTimestampImpl (
+	uint64_t timestamp,
+	bool isLocal,
+	int timeZone
 	)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	SYSTEMTIME SysTime = { 0 };
+	SYSTEMTIME sysTime = { 0 };
 
-	if (IsLocal)
-		FileTimeToLocalFileTime ((const FILETIME*) &Timestamp, (FILETIME*) &Timestamp);
+	if (isLocal)
+		::FileTimeToLocalFileTime ((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
 	else
-		Timestamp += (int64_t) GetTimeZoneOffsetInMinutes (TimeZone) * 60 * 10000000;
+		timestamp += (int64_t) getTimeZoneOffsetInMinutes (timeZone) * 60 * 10000000;
 
-	FileTimeToSystemTime ((const FILETIME*) &Timestamp, &SysTime);
+	::FileTimeToSystemTime ((const FILETIME*) &timestamp, &sysTime);
 
-	m_Year        = SysTime.wYear;
-	m_Month       = SysTime.wMonth - 1;
-	m_MonthDay    = SysTime.wDay;
-	m_DayOfWeek   = SysTime.wDayOfWeek;
-	m_Hour        = SysTime.wHour;
-	m_Minute      = SysTime.wMinute;
-	m_Second      = SysTime.wSecond;
+	m_year        = sysTime.wYear;
+	m_month       = sysTime.wMonth - 1;
+	m_monthDay    = sysTime.wDay;
+	m_dayOfWeek   = sysTime.wDayOfWeek;
+	m_hour        = sysTime.wHour;
+	m_minute      = sysTime.wMinute;
+	m_second      = sysTime.wSecond;
 
 #else
-	tm* pTmStruct;
+	tm* tmStruct;
 
-	time_t PosixTime = Timestamp / 10000000;
+	time_t posixTime = timestamp / 10000000;
 
-	if (IsLocal)
+	if (isLocal)
 	{
-		pTmStruct = localtime (&PosixTime);
+		tmStruct = localtime (&posixTime);
 	}
 	else
 	{
-		PosixTime += GetTimeZoneOffsetInMinutes (TimeZone) * 60;
-		pTmStruct = gmtime (&PosixTime);
+		posixTime += getTimeZoneOffsetInMinutes (timeZone) * 60;
+		tmStruct = gmtime (&posixTime);
 	}
 
-	m_Year        = pTmStruct->tm_year + 1900;
-	m_Month       = pTmStruct->tm_mon;
-	m_MonthDay    = pTmStruct->tm_mday;
-	m_DayOfWeek   = pTmStruct->tm_wday;
-	m_Hour        = pTmStruct->tm_hour;
-	m_Minute      = pTmStruct->tm_min;
-	m_Second      = pTmStruct->tm_sec;
+	m_year        = tmStruct->tm_year + 1900;
+	m_month       = tmStruct->tm_mon;
+	m_monthDay    = tmStruct->tm_mday;
+	m_dayOfWeek   = tmStruct->tm_wday;
+	m_hour        = tmStruct->tm_hour;
+	m_minute      = tmStruct->tm_min;
+	m_second      = tmStruct->tm_sec;
 #endif
 
-	m_MilliSecond = (Timestamp / 10000) % 1000;
-	m_MicroSecond = (Timestamp / 10) % 1000;
-	m_NanoSecond  = (Timestamp % 10) * 100;
+	m_milliSecond = (timestamp / 10000) % 1000;
+	m_microSecond = (timestamp / 10) % 1000;
+	m_nanoSecond  = (timestamp % 10) * 100;
 
 }
 
@@ -162,12 +162,12 @@ TTime::SetTimestampImpl (
 */
 
 size_t
-TTime::Format (
-	rtl::CString* pString,
-	const char* pFormat
+TTime::format (
+	rtl::CString* string,
+	const char* formatString
 	) const
 {
-	static const char* WeekDayShortNameTable [7] =
+	static const char* weekDayShortNameTable [7] =
 	{
 		"Sun",
 		"Mon",
@@ -178,7 +178,7 @@ TTime::Format (
 		"Sat",
 	};
 
-	static const char* WeekDayFullNameTable [7] =
+	static const char* weekDayFullNameTable [7] =
 	{
 		"Sunday",
 		"Monday",
@@ -189,7 +189,7 @@ TTime::Format (
 		"Saturday",
 	};
 
-	static const char* MonthShortNameTable [12] =
+	static const char* monthShortNameTable [12] =
 	{
 		"Jan",
 		"Feb",
@@ -205,7 +205,7 @@ TTime::Format (
 		"Dec",
 	};
 
-	static const char* MonthFullNameTable [12] =
+	static const char* monthFullNameTable [12] =
 	{
 		"January",
 		"February",
@@ -221,9 +221,9 @@ TTime::Format (
 		"December",
 	};
 
-	pString->Clear ();
+	string->clear ();
 
-	const char* p = pFormat;
+	const char* p = formatString;
 	const char* p0 = p;
 
 	for (; *p; p++)
@@ -231,98 +231,98 @@ TTime::Format (
 		if (*p != '%')
 			continue;
 
-		pString->Append (p0, p - p0);
+		string->append (p0, p - p0);
 
 		p++;
 		if (!*p)
-			return pString->GetLength ();
+			return string->getLength ();
 
 		int h12;
 
 		switch (*p)
 		{
 		case 'h':
-			pString->AppendFormat ("%02d", m_Hour);
+			string->appendFormat ("%02d", m_hour);
 			break;
 
 		case 'H':
-			h12 = m_Hour % 12;
-			pString->AppendFormat ("%d", h12 ? h12 : 12);
+			h12 = m_hour % 12;
+			string->appendFormat ("%d", h12 ? h12 : 12);
 			break;
 
 		case 'm':
-			pString->AppendFormat ("%02d", m_Minute);
+			string->appendFormat ("%02d", m_minute);
 			break;
 
 		case 's':
-			pString->AppendFormat ("%02d", m_Second);
+			string->appendFormat ("%02d", m_second);
 			break;
 
 		case 'l':
-			pString->AppendFormat ("%03d", m_MilliSecond);
+			string->appendFormat ("%03d", m_milliSecond);
 			break;
 
 		case 'c':
-			pString->AppendFormat ("%03d", m_MicroSecond);
+			string->appendFormat ("%03d", m_microSecond);
 			break;
 
 		case 'p':
-			pString->Append (m_Hour >= 12 ? 'p' : 'a');
+			string->append (m_hour >= 12 ? 'p' : 'a');
 			break;
 
 		case 'P':
-			pString->Append (m_Hour >= 12 ? 'P' : 'A');
+			string->append (m_hour >= 12 ? 'P' : 'A');
 			break;
 
 		case 'y':
-			pString->AppendFormat ("%02d", m_Year % 100);
+			string->appendFormat ("%02d", m_year % 100);
 			break;
 
 		case 'Y':
-			pString->AppendFormat ("%04d", m_Year);
+			string->appendFormat ("%04d", m_year);
 			break;
 
 		case 'D':
-			pString->AppendFormat ("%02d", m_MonthDay);
+			string->appendFormat ("%02d", m_monthDay);
 			break;
 
 		case 'd':
-			pString->AppendFormat ("%d", m_MonthDay);
+			string->appendFormat ("%d", m_monthDay);
 			break;
 
 		case 'M':
-			pString->AppendFormat ("%02d", m_Month);
+			string->appendFormat ("%02d", m_month);
 			break;
 
 		case 'o':
-			pString->AppendFormat ("%d", m_Month);
+			string->appendFormat ("%d", m_month);
 			break;
 
 		case 'n':
-			pString->Append (MonthShortNameTable [m_Month % 12]);
+			string->append (monthShortNameTable [m_month % 12]);
 			break;
 
 		case 'N':
-			pString->Append (MonthFullNameTable [m_Month % 12]);
+			string->append (monthFullNameTable [m_month % 12]);
 			break;
 
 		case 'w':
-			pString->Append (WeekDayShortNameTable [m_DayOfWeek % 7]);
+			string->append (weekDayShortNameTable [m_dayOfWeek % 7]);
 			break;
 
 		case 'W':
-			pString->Append (WeekDayFullNameTable [m_DayOfWeek % 7]);
+			string->append (weekDayFullNameTable [m_dayOfWeek % 7]);
 			break;
 
 		default:
-			pString->Append (*p);
+			string->append (*p);
 		}
 
 		p0 = p + 1;
 	}
 
-	pString->Append (p0, p - p0);
-	return pString->GetLength ();
+	string->append (p0, p - p0);
+	return string->getLength ();
 }
 
 //.............................................................................

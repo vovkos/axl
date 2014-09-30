@@ -17,42 +17,42 @@ namespace mt {
 class CInvSemaphore: public CEvent
 {
 protected:
-	CLock m_Lock;
-	intptr_t m_Count;
+	CLock m_lock;
+	intptr_t m_count;
 
 public:
-	CInvSemaphore (intptr_t Count = 0):
+	CInvSemaphore (intptr_t count = 0):
 		CEvent (CEvent::EKind_Notification)
 	{
-		SetImpl (Count);
+		setImpl (count);
 	}
 
 	void
-	Set (intptr_t Count)
+	set (intptr_t count)
 	{
-		m_Lock.Lock ();
-		SetImpl (Count);
-		m_Lock.Unlock ();
+		m_lock.lock ();
+		setImpl (count);
+		m_lock.unlock ();
 	}
 
 	void
-	Add (intptr_t Delta)
+	add (intptr_t delta)
 	{
-		m_Lock.Lock ();
-		SetImpl (m_Count + Delta);
-		m_Lock.Unlock ();
+		m_lock.lock ();
+		setImpl (m_count + delta);
+		m_lock.unlock ();
 	}
 
 protected:
 	void
-	SetImpl (intptr_t Count) // called under lock
+	setImpl (intptr_t count) // called under lock
 	{
-		m_Count = Count;
+		m_count = count;
 		
-		if (m_Count)
-			Reset ();
+		if (m_count)
+			reset ();
 		else
-			Signal ();
+			signal ();
 	}
 
 };

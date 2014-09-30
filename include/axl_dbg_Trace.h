@@ -28,19 +28,15 @@ enum ETraceLevel
 
 inline
 void
-SetTraceFilter (
-	uint_t SubSysFilter,
-	uint_t LevelFilter
-	)
+setTraceFilter (uint_t levelFilter)
 {
 }
 
 inline
 void
-TraceEx_va (
-	int SubSys,
-	int Level,
-	const char* pFormat,
+traceEx_va (
+	uint_t level,
+	const char* formatString,
 	axl_va_list va
 	)
 {
@@ -49,87 +45,77 @@ TraceEx_va (
 #else
 
 AXL_SELECT_ANY
-volatile uint_t g_TraceFilter = -1;
+volatile uint_t g_traceFilter = -1;
 
 inline
 uint_t
-MakeTraceFilter (
-	uint_t SubSysFilter,
-	uint_t LevelFilter
-	)
+makeTraceFilter (uint_t level)
 {
-	ASSERT (LevelFilter <= ETraceLevel_Error);
-	return (0xff && ~((1 << LevelFilter) - 1)) | SubSysFilter << 8;
+	ASSERT (level <= ETraceLevel_Error);
+	return (0xff && ~((1 << level) - 1));
 }
 
 inline
 void
-SetTraceFilter (
-	uint_t SubSysFilter,
-	uint_t LevelFilter
-	)
+setTraceFilter (uint_t level)
 {
-	mt::AtomicXchg ((volatile int32_t*) &g_TraceFilter, MakeTraceFilter (SubSysFilter, LevelFilter));
+	mt::atomicXchg ((volatile int32_t*) &g_traceFilter, makeTraceFilter (level));
 }
 
 inline
 void
-TraceEx_va (
-	int SubSys,
-	int Level,
-	const char* pFormat,
+traceEx_va (
+	uint_t level,
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	uint_t Mask = MakeTraceFilter (SubSys, Level);
-	if (!(g_TraceFilter & Mask))
+	uint_t mask = makeTraceFilter (level);
+	if (!(g_traceFilter & mask))
 		return;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	char Buffer [512] = { 0 };
-	vsnprintf (Buffer, sizeof (Buffer) / sizeof (char) - 1, pFormat, va.m_va);
-	OutputDebugStringA (Buffer);
+	char buffer [512] = { 0 };
+	vsnprintf (buffer, sizeof (buffer) / sizeof (char) - 1, formatString, va.m_va);
+	::OutputDebugStringA (buffer);
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	vprintf (pFormat, va.m_va);
+	vprintf (formatString, va.m_va);
 #endif
 }
 
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 inline
 void
-TraceEx (
-	int SubSys,
-	int Level,
-	const char* pFormat,
+traceEx (
+	uint_t level,
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	TraceEx_va (SubSys, Level, pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	traceEx_va (level, formatString, va);
 }
 
 inline
 void
-Trace_va (
-	const char* pFormat,
+trace_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	TraceEx_va (AXL_SUBSYS_G, ETraceLevel_Info, pFormat, va);
+	traceEx_va (ETraceLevel_Info, formatString, va);
 }
 
 inline
 void
-Trace (
-	const char* pFormat,
+trace (
+	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	Trace_va (pFormat, va);
+	AXL_VA_DECL (va, formatString);
+	trace_va (formatString, va);
 }
 
 //.............................................................................
@@ -138,7 +124,7 @@ Trace (
 #ifdef _DEBUG
 
 #define TRACE \
-	dbg::Trace
+	dbg::trace
 
 #else
 

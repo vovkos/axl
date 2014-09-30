@@ -9,19 +9,19 @@ namespace win {
 //.............................................................................
 
 bool 
-CThread::Create (
-	SECURITY_ATTRIBUTES* pSecAttr,
-	size_t StackSize,
+CThread::create (
+	SECURITY_ATTRIBUTES* secAttr,
+	size_t stackSize,
 	PTHREAD_START_ROUTINE pfThreadProc,
-	void* pContext,
-	uint_t Flags
+	void* context,
+	uint_t flags
 	)
 {
-	Close ();
+	close ();
 
-	dword_t ThreadId;
-	m_h = ::CreateThread (pSecAttr, StackSize, pfThreadProc, pContext, Flags, &ThreadId);
-	return err::Complete (m_h != NULL);
+	dword_t threadId;
+	m_h = ::CreateThread (secAttr, stackSize, pfThreadProc, context, flags, &threadId);
+	return err::complete (m_h != NULL);
 }
 
 //.............................................................................

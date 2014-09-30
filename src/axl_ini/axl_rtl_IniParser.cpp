@@ -7,49 +7,49 @@ namespace rtl {
 //.............................................................................
 
 bool
-CIniParserRoot::ParseLine (
+CIniParserRoot::parseLine (
 	const char* p0,
-	size_t Length,
-	rtl::CString* pName,
-	rtl::CString* pValue,
-	bool* pIsSection,
-	size_t* pLineLength
+	size_t length,
+	rtl::CString* name,
+	rtl::CString* value,
+	bool* isSection,
+	size_t* lineLength
 	)
 {
-	ASSERT (Length != -1);
+	ASSERT (length != -1);
 
 	const char* p = p0;
-	const char* pEnd = p + Length;
+	const char* end = p + length;
 
-	EState State = EState_Space;
-	EState PrevState = EState_Space;
+	EState state = EState_Space;
+	EState prevState = EState_Space;
 	
-	pName->Clear ();
-	pValue->Clear ();
-	*pIsSection = false;
+	name->clear ();
+	value->clear ();
+	*isSection = false;
 
-	for (; p < pEnd; p++)
+	for (; p < end; p++)
 	{
 		char x = *p;
 		if (x == '\r') // ignore CR
 			continue;
 
-		switch (State)
+		switch (state)
 		{
 		case EState_Space:
 			switch (x)
 			{
 			case '\'': case '#': case ';':
-				State = EState_Comment;
+				state = EState_Comment;
 				break;
 
 			case '[':
-				State = EState_Section;
-				pName
+				state = EState_Section;
+				name
 				break;
 
 			case '\n':
-				m_Line++;
+				m_line++;
 
 				break;
 
@@ -59,83 +59,83 @@ CIniParserRoot::ParseLine (
 
 				p--; // re-read
 
-				if (PrevState != EState_Space)
-					State = PrevState;
+				if (prevState != EState_Space)
+					state = prevState;
 				else
-					State = EState_Key, KeyLine = Line, KeyName.Clear();
+					state = EState_Key, keyLine = line, keyName.clear();
 			};
 
 			break;
 
 		case EState_Comment:
 			if (x == '\n')
-				State = PrevState, Line++;
+				state = prevState, line++;
 			break;
 
 		case EState_Section:
 			if (x == '\n')
 			{
-				State = EState_Error; 
+				state = EState_Error; 
 				break;
 			}
 			else if (x != ']')
 			{
-				SectionName += (char) x; 
+				sectionName += (char) x; 
 				break;
 			}
 
 			if (pfnOnSection != NULL)
-				pSectionContext = pfnOnSection(pContext, SectionName);
+				sectionContext = pfnOnSection(context, sectionName);
 
-			State = PrevState = EState_Space;
+			state = prevState = EState_Space;
 			break;
 
 		case EState_Key:
-			if (x == '\n' || Line != KeyLine)
+			if (x == '\n' || line != keyLine)
 			{
-				State = EState_Error;
+				state = EState_Error;
 				break;
 			}
 
 			if (isspace(x))
 			{
-				PrevState = State;
-				State = EState_Space;
+				prevState = state;
+				state = EState_Space;
 				break;
 			}
 
 			if (x != '=')
-				KeyName += (char) x;
+				keyName += (char) x;
 			else
-				State = EState_Value, Value.Clear();
+				state = EState_Value, value.clear();
 
 			break;
 
 		case EState_Value:
-			if (x == '\n' || Line != KeyLine)
+			if (x == '\n' || line != keyLine)
 			{
-				pfnOnKeyValue(pContext, pSectionContext, SectionName, KeyName, Value);
-				State = PrevState = EState_Space;
+				pfnOnKeyValue(context, sectionContext, sectionName, keyName, value);
+				state = prevState = EState_Space;
 				p--;
 				break;
 			}
 
-			if (Value.IsEmpty() && isspace(x))
+			if (value.isEmpty() && isspace(x))
 			{
-				PrevState = State;
-				State = EState_Space;
+				prevState = state;
+				state = EState_Space;
 				break;
 			}
 
-			Value += (char) x;
+			value += (char) x;
 			break;
 		}
 	}
 
 	// if there was no \n on the last line
 
-	if (State == EState_Value)
-		pfnOnKeyValue(pContext, pSectionContext, SectionName, KeyName, Value);
+	if (state == EState_Value)
+		pfnOnKeyValue(context, sectionContext, sectionName, keyName, value);
 
 	return true;
 }
@@ -147,147 +147,147 @@ namespace ini {
 
 struct EState { enum 
 {
-	Error = -1,
-	Space = 0,
-	Comment,
-	Section,
-	Key,
-	Value,
+	error = -1,
+	space = 0,
+	comment,
+	section,
+	key,
+	value,
 };};
 
 } // namespace ini
 
 bool
-ini::ParseIniA(
-	const char* pSource,
-	size_t Length,
+ini::parseIniA(
+	const char* source,
+	size_t length,
 	FOnSectionA pfnOnSection,
 	FOnKeyValueA pfnOnKeyValue,
-	void* pContext
+	void* context
 	)
 {
 	ASSERT(pfnOnKeyValue);
 
-	if (Length == -1)
-		Length = strlen(pSource);
+	if (length == -1)
+		length = strlen(source);
 
-	const char* p = pSource;
-	const char* pEnd = p + Length;
+	const char* p = source;
+	const char* end = p + length;
 
 //.............................................................................
 
-void ini::CIniParser::SetSection(const TCHAR* pSectionName, void* pContext)
+void ini::CIniParser::setSection(const TCHAR* sectionName, void* context)
 {
-	rtl::TBinTreeNode* pNode = m_SectionMap.Find((intptr_t) pSectionName);
-	if (pNode)
+	rtl::TBinTreeNode* node = m_sectionMap.find((intptr_t) sectionName);
+	if (node)
 	{
-		m_pCurrentSection = (TSection*) pNode->m_Value;
-		m_pCurrentSection->m_pContext = pContext;
+		m_currentSection = (TSection*) node->m_value;
+		m_currentSection->m_context = context;
 		return;
 	}
 
-	m_pCurrentSection = new TSection;
-	m_pCurrentSection->m_SectionName = pSectionName;
-	m_pCurrentSection->m_pContext = pContext;
-	m_SectionList.InsertTail(m_pCurrentSection);
+	m_currentSection = new TSection;
+	m_currentSection->m_sectionName = sectionName;
+	m_currentSection->m_context = context;
+	m_sectionList.insertTail(m_currentSection);
 	
-	pNode = m_SectionMap.Goto((intptr_t) (const TCHAR*) m_pCurrentSection->m_SectionName);
-	pNode->m_Value = (intptr_t) m_pCurrentSection;
+	node = m_sectionMap.goto((intptr_t) (const TCHAR*) m_currentSection->m_sectionName);
+	node->m_value = (intptr_t) m_currentSection;
 }
 
-void ini::CIniParser::SetKeyHandler(const TCHAR* pKeyName, FOnKeyValue pfnOnKeyValue, void* pContext)
+void ini::CIniParser::setKeyHandler(const TCHAR* keyName, FOnKeyValue pfnOnKeyValue, void* context)
 {
-	rtl::TBinTreeNode* pNode;
+	rtl::TBinTreeNode* node;
 
-	if (!m_pCurrentSection)
+	if (!m_currentSection)
 	{
-		m_pCurrentSection = new TSection;
-		m_SectionList.InsertTail(m_pCurrentSection);
+		m_currentSection = new TSection;
+		m_sectionList.insertTail(m_currentSection);
 
-		pNode = m_SectionMap.Goto(NULL);
-		pNode->m_Value = (intptr_t) m_pCurrentSection;
+		node = m_sectionMap.goto(NULL);
+		node->m_value = (intptr_t) m_currentSection;
 	}
 
-	TKeyHandler* pHandler;
+	TKeyHandler* handler;
 
-	pNode = m_SectionMap.Find((intptr_t) pKeyName);
-	if (pNode)
+	node = m_sectionMap.find((intptr_t) keyName);
+	if (node)
 	{
-		pHandler = (TKeyHandler*) pNode->m_Value;
-		pHandler->m_pfnOnKeyValue = pfnOnKeyValue;
-		pHandler->m_pContext = pContext;
+		handler = (TKeyHandler*) node->m_value;
+		handler->m_pfnOnKeyValue = pfnOnKeyValue;
+		handler->m_context = context;
 		return;
 	}
 
-	pHandler = new TKeyHandler;
-	pHandler->m_KeyName = pKeyName;
-	pHandler->m_pfnOnKeyValue = pfnOnKeyValue;
-	pHandler->m_pContext = pContext;
-	m_pCurrentSection->m_KeyHandlerList.InsertTail(pHandler);
+	handler = new TKeyHandler;
+	handler->m_keyName = keyName;
+	handler->m_pfnOnKeyValue = pfnOnKeyValue;
+	handler->m_context = context;
+	m_currentSection->m_keyHandlerList.insertTail(handler);
 
-	pNode = m_pCurrentSection->m_KeyHandlerMap.Goto((intptr_t) (const TCHAR*) pHandler->m_KeyName);
-	pNode->m_Value = (intptr_t) pHandler;
+	node = m_currentSection->m_keyHandlerMap.goto((intptr_t) (const TCHAR*) handler->m_keyName);
+	node->m_value = (intptr_t) handler;
 }
 
-void ini::CIniParser::Clear()
+void ini::CIniParser::clear()
 {
-	m_SectionList.Clear();
-	m_SectionMap.Clear();
-	m_pCurrentSection = NULL;
+	m_sectionList.clear();
+	m_sectionMap.clear();
+	m_currentSection = NULL;
 }
 
-bool ini::CIniParser::Parse(const TCHAR* pSource, size_t Length)
+bool ini::CIniParser::parse(const TCHAR* source, size_t length)
 {
-	return ini::ParseIni(pSource, Length, _OnSection, _OnKeyValue, this);
+	return ini::parseIni(source, length, _OnSection, _OnKeyValue, this);
 }
 
 void* ini::CIniParser::_OnSection(
-	void* pContext,
-	const TCHAR* pSectionName
+	void* context,
+	const TCHAR* sectionName
 	)
 {
-	CIniParser* pThis = (CIniParser*) pContext;
-	rtl::TBinTreeNode* pNode = pThis->m_SectionMap.Find((intptr_t) pSectionName);
-	return pNode ? (TSection*) pNode->m_Value : NULL;
+	CIniParser* this = (CIniParser*) context;
+	rtl::TBinTreeNode* node = this->m_sectionMap.find((intptr_t) sectionName);
+	return node ? (TSection*) node->m_value : NULL;
 }
 
 void ini::CIniParser::_OnKeyValue(
-	void* pContext,
-	void* pSectionContext,
-	const TCHAR* pSectionName,
-	const TCHAR* pKeyName,
-	const TCHAR* pValue
+	void* context,
+	void* sectionContext,
+	const TCHAR* sectionName,
+	const TCHAR* keyName,
+	const TCHAR* value
 	)
 {
-	CIniParser* pThis = (CIniParser*) pContext;
+	CIniParser* this = (CIniParser*) context;
 	
-	rtl::TBinTreeNode* pNode;
-	TSection* pSection;
+	rtl::TBinTreeNode* node;
+	TSection* section;
 
-	if (pSectionContext)
+	if (sectionContext)
 	{
-		pSection = (TSection*) pSectionContext;
+		section = (TSection*) sectionContext;
 	}
 	else
 	{
-		pNode = pThis->m_SectionMap.Find(NULL);
-		if (!pNode)
+		node = this->m_sectionMap.find(NULL);
+		if (!node)
 			return;
 
-		pSection = (TSection*) pNode->m_Value;
+		section = (TSection*) node->m_value;
 	}
 	
-	pNode = pSection->m_KeyHandlerMap.Find((intptr_t) pKeyName);
-	if (!pNode)
+	node = section->m_keyHandlerMap.find((intptr_t) keyName);
+	if (!node)
 		return;
 
-	TKeyHandler* pHandler = (TKeyHandler*) pNode->m_Value;
-	return pHandler->m_pfnOnKeyValue(
-		pHandler->m_pContext, 
-		pSection->m_pContext,
-		pSectionName,
-		pKeyName,
-		pValue
+	TKeyHandler* handler = (TKeyHandler*) node->m_value;
+	return handler->m_pfnOnKeyValue(
+		handler->m_context, 
+		section->m_context,
+		sectionName,
+		keyName,
+		value
 		);
 }
 

@@ -17,7 +17,7 @@ namespace rtl {
 
 inline
 uint8_t
-GetLoBitIdx8 (uint8_t x)
+getLoBitIdx8 (uint8_t x)
 {
 	return (x & 0x0f) ?
 		(x & 0x03) ?
@@ -30,29 +30,29 @@ GetLoBitIdx8 (uint8_t x)
 
 inline
 uint8_t
-GetLoBitIdx16 (uint16_t x)
+getLoBitIdx16 (uint16_t x)
 {
 	return (x & 0x00ff) ?
-		GetLoBitIdx8 ((uint8_t) x) :
-		(8 + GetLoBitIdx8 ((uint8_t) (x >> 8)));
+		getLoBitIdx8 ((uint8_t) x) :
+		(8 + getLoBitIdx8 ((uint8_t) (x >> 8)));
 }
 
 inline
 uint8_t
-GetLoBitIdx32 (uint32_t x)
+getLoBitIdx32 (uint32_t x)
 {
 	return (x & 0x0000ffff) ?
-		GetLoBitIdx16 ((uint16_t) x) :
-		(16 + GetLoBitIdx16 ((uint16_t) (x >> 16)));
+		getLoBitIdx16 ((uint16_t) x) :
+		(16 + getLoBitIdx16 ((uint16_t) (x >> 16)));
 }
 
 inline
 uint8_t
-GetLoBitIdx64 (uint64_t x)
+getLoBitIdx64 (uint64_t x)
 {
 	return (x & 0x00000000ffffffffLL) ?
-		GetLoBitIdx32 ((uint32_t) x) :
-		(32 + GetLoBitIdx32 ((uint32_t) (x >> 32)));
+		getLoBitIdx32 ((uint32_t) x) :
+		(32 + getLoBitIdx32 ((uint32_t) (x >> 32)));
 }
 
 //.............................................................................
@@ -61,7 +61,7 @@ GetLoBitIdx64 (uint64_t x)
 
 inline
 uint8_t
-GetHiBitIdx8 (uint8_t x)
+getHiBitIdx8 (uint8_t x)
 {
 	return (x & 0xf0) ?
 		(x & 0xc0) ?
@@ -74,42 +74,42 @@ GetHiBitIdx8 (uint8_t x)
 
 inline
 uint8_t
-GetHiBitIdx16 (uint16_t x)
+getHiBitIdx16 (uint16_t x)
 {
 	return (x & 0xff00) ?
-		(8 + GetHiBitIdx8 ((uint8_t) (x >> 8))) :
-		GetHiBitIdx8 ((uint8_t) x);
+		(8 + getHiBitIdx8 ((uint8_t) (x >> 8))) :
+		getHiBitIdx8 ((uint8_t) x);
 }
 
 inline
 uint8_t
-GetHiBitIdx32 (uint32_t x)
+getHiBitIdx32 (uint32_t x)
 {
 	return (x & 0xffff0000) ?
-		(16 + GetHiBitIdx16 ((uint16_t) (x >> 16))) :
-		GetHiBitIdx16 ((uint16_t) x);
+		(16 + getHiBitIdx16 ((uint16_t) (x >> 16))) :
+		getHiBitIdx16 ((uint16_t) x);
 }
 
 inline
 uint8_t
-GetHiBitIdx64 (uint64_t x)
+getHiBitIdx64 (uint64_t x)
 {
 	return (x & 0xffffffff00000000LL) ?
-		(32 + GetHiBitIdx32 ((uint32_t) (x >> 32))) :
-		GetHiBitIdx32 ((uint32_t) x);
+		(32 + getHiBitIdx32 ((uint32_t) (x >> 32))) :
+		getHiBitIdx32 ((uint32_t) x);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (_AXL_PTR_BITNESS == 64)
 
-#define GetLoBitIdx  GetLoBitIdx64
-#define GetHiBitIdx  GetHiBitIdx64
+#define getLoBitIdx  getLoBitIdx64
+#define getHiBitIdx  getHiBitIdx64
 
 #else
 
-#define GetLoBitIdx  GetLoBitIdx32
-#define GetHiBitIdx  GetHiBitIdx32
+#define getLoBitIdx  getLoBitIdx32
+#define getHiBitIdx  getHiBitIdx32
 
 #endif
 
@@ -119,119 +119,119 @@ GetHiBitIdx64 (uint64_t x)
 
 inline
 uint8_t
-GetLoBitmask8 (size_t To)
+getLoBitmask8 (size_t to)
 {
-	return To >= 8 ? (uint8_t) -1 : ((uint8_t) 1 << (uint8_t) To) - 1;
+	return to >= 8 ? (uint8_t) -1 : ((uint8_t) 1 << (uint8_t) to) - 1;
 }
 
 inline
 uint8_t
-GetHiBitmask8 (size_t From)
+getHiBitmask8 (size_t from)
 {
-	return From >= 8 ? 0 : ~(((uint8_t) 1 << (uint8_t) From) - 1);
+	return from >= 8 ? 0 : ~(((uint8_t) 1 << (uint8_t) from) - 1);
 }
 
 inline
 uint8_t
-GetBitmask8 (
-	size_t From,
-	size_t To
+getBitmask8 (
+	size_t from,
+	size_t to
 	)
 {
-	return GetLoBitmask8 (To) & GetHiBitmask8 (From);
+	return getLoBitmask8 (to) & getHiBitmask8 (from);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint16_t
-GetLoBitmask16 (size_t To)
+getLoBitmask16 (size_t to)
 {
-	return To >= 16 ? (uint16_t) -1 : ((uint16_t) 1 << (uint16_t) To) - 1;
+	return to >= 16 ? (uint16_t) -1 : ((uint16_t) 1 << (uint16_t) to) - 1;
 }
 
 inline
 uint16_t
-GetHiBitmask16 (size_t From)
+getHiBitmask16 (size_t from)
 {
-	return From >= 16 ? 0 : ~(((uint16_t) 1 << (uint16_t) From) - 1);
+	return from >= 16 ? 0 : ~(((uint16_t) 1 << (uint16_t) from) - 1);
 }
 
 inline
 uint16_t
-GetBitmask16 (
-	size_t From,
-	size_t To
+getBitmask16 (
+	size_t from,
+	size_t to
 	)
 {
-	return GetLoBitmask16 (To) & GetHiBitmask16 (From);
+	return getLoBitmask16 (to) & getHiBitmask16 (from);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint32_t
-GetLoBitmask32 (size_t To)
+getLoBitmask32 (size_t to)
 {
-	return To >= 32 ? (uint32_t) -1 : ((uint32_t) 1 << (uint32_t) To) - 1;
+	return to >= 32 ? (uint32_t) -1 : ((uint32_t) 1 << (uint32_t) to) - 1;
 }
 
 inline
 uint32_t
-GetHiBitmask32 (size_t From)
+getHiBitmask32 (size_t from)
 {
-	return From >= 32 ? 0 : ~(((uint32_t) 1 << (uint32_t) From) - 1);
+	return from >= 32 ? 0 : ~(((uint32_t) 1 << (uint32_t) from) - 1);
 }
 
 inline
 uint32_t
-GetBitmask32 (
-	size_t From,
-	size_t To
+getBitmask32 (
+	size_t from,
+	size_t to
 	)
 {
-	return GetLoBitmask32 (To) & GetHiBitmask32 (From);
+	return getLoBitmask32 (to) & getHiBitmask32 (from);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint64_t
-GetLoBitmask64 (size_t To)
+getLoBitmask64 (size_t to)
 {
-	return To >= 64 ? (uint64_t) -1 : ((uint64_t) 1 << (uint64_t) To) - 1;
+	return to >= 64 ? (uint64_t) -1 : ((uint64_t) 1 << (uint64_t) to) - 1;
 }
 
 inline
 uint64_t
-GetHiBitmask64 (size_t From)
+getHiBitmask64 (size_t from)
 {
-	return From >= 64 ? 0 : ~(((uint64_t) 1 << (uint64_t) From) - 1);
+	return from >= 64 ? 0 : ~(((uint64_t) 1 << (uint64_t) from) - 1);
 }
 
 inline
 uint64_t
-GetBitmask64 (
-	size_t From,
-	size_t To
+getBitmask64 (
+	size_t from,
+	size_t to
 	)
 {
-	return GetLoBitmask64 (To) & GetHiBitmask64 (From);
+	return getLoBitmask64 (to) & getHiBitmask64 (from);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (_AXL_PTR_BITNESS == 64)
 
-#define GetBitmask   GetBitmask64
-#define GetLoBitmask GetLoBitmask64
-#define GetHiBitmask GetHiBitmask64
+#define getBitmask   getBitmask64
+#define getLoBitmask getLoBitmask64
+#define getHiBitmask getHiBitmask64
 
 #else
 
-#define GetBitmask   GetBitmask32
-#define GetLoBitmask GetLoBitmask32
-#define GetHiBitmask GetHiBitmask32
+#define getBitmask   getBitmask32
+#define getLoBitmask getLoBitmask32
+#define getHiBitmask getHiBitmask32
 
 #endif
 
@@ -243,17 +243,17 @@ GetBitmask64 (
 
 inline
 size_t
-GetMinPower2Gt (size_t Size)
+getMinPower2Gt (size_t size)
 {
-	size_t HiBitIdx = GetHiBitIdx (Size);
-	return 2 << HiBitIdx;
+	size_t hiBitIdx = getHiBitIdx (size);
+	return 2 << hiBitIdx;
 }
 
 inline
 size_t
-GetMinPower2Ge (size_t Size)
+getMinPower2Ge (size_t size)
 {
-	return Size && !(Size & (Size - 1)) ? Size : GetMinPower2Gt (Size);
+	return size && !(size & (size - 1)) ? size : getMinPower2Gt (size);
 }
 
 //.............................................................................

@@ -42,20 +42,20 @@ enum ESharedMemoryTransportFlag
 
 struct TSharedMemoryTransportHdr
 {
-	uint32_t m_Signature;
-	int32_t m_Lock;
-	uint32_t m_State;
-	uint32_t m_ReadOffset;   // only modified by reader
-	uint32_t m_WriteOffset;  // only modified by writer
-	uint32_t m_EndOffset;    // only modified by writer
-	uint32_t m_DataSize;     // modified by both reader and writer
-	uint32_t m_Padding;
+	uint32_t m_signature;
+	int32_t m_lock;
+	uint32_t m_state;
+	uint32_t m_readOffset;   // only modified by reader
+	uint32_t m_writeOffset;  // only modified by writer
+	uint32_t m_endOffset;    // only modified by writer
+	uint32_t m_dataSize;     // modified by both reader and writer
+	uint32_t m_padding;
 };
 
 struct TSharedMemoryTransportMessageHdr
 {
-	uint32_t m_Signature;
-	uint32_t m_Size;
+	uint32_t m_signature;
+	uint32_t m_size;
 };
 
 //.............................................................................
@@ -63,21 +63,21 @@ struct TSharedMemoryTransportMessageHdr
 class CSharedMemoryTransportBase
 {
 protected:
-	uint_t m_Flags;
-	CMappedFile m_File;
-	TSharedMemoryTransportHdr* m_pHdr;
-	char* m_pData;
-	size_t m_MappingSize;
-	int32_t m_PendingReqCount;
+	uint_t m_flags;
+	CMappedFile m_file;
+	TSharedMemoryTransportHdr* m_hdr;
+	char* m_data;
+	size_t m_mappingSize;
+	int32_t m_pendingReqCount;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	mt::win::CEvent m_ReadEvent;
-	mt::win::CEvent m_WriteEvent;
+	mt::win::CEvent m_readEvent;
+	mt::win::CEvent m_writeEvent;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	mt::psx::CSem m_ReadEvent;
-	mt::psx::CSem m_WriteEvent;
-	rtl::CString m_ReadEventName;
-	rtl::CString m_WriteEventName;
+	mt::psx::CSem m_readEvent;
+	mt::psx::CSem m_writeEvent;
+	rtl::CString m_readEventName;
+	rtl::CString m_writeEventName;
 #endif
 
 protected:
@@ -85,39 +85,39 @@ protected:
 
 public:
 	uint_t
-	GetFlags ()
+	getFlags ()
 	{
-		return m_Flags;
+		return m_flags;
 	}
 
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_pHdr != NULL;
+		return m_hdr != NULL;
 	}
 
 	void
-	Close ();
+	close ();
 
 	bool
-	Open (
-		const char* pFileName,
-		const char* pReadEventName,
-		const char* pWriteEventName,
-		uint_t Flags
+	open (
+		const char* fileName,
+		const char* readEventName,
+		const char* writeEventName,
+		uint_t flags
 		);
 
 	void
-	Disconnect ();
+	disconnect ();
 
 protected:
 	bool
-	EnsureMappingSize (size_t Size);
+	ensureMappingSize (size_t size);
 
 	bool
-	EnsureOffsetMapped (size_t Offset)
+	ensureOffsetMapped (size_t offset)
 	{
-		return EnsureMappingSize (Offset + sizeof (TSharedMemoryTransportHdr));
+		return ensureMappingSize (offset + sizeof (TSharedMemoryTransportHdr));
 	}
 };
 
@@ -127,10 +127,10 @@ class CSharedMemoryReader: public CSharedMemoryTransportBase
 {
 public:
 	size_t
-	Read (rtl::CArrayT <char>* pBuffer);
+	read (rtl::CArrayT <char>* buffer);
 
 	rtl::CArrayT <char>
-	Read ();
+	read ();
 };
 
 //.............................................................................
@@ -138,48 +138,48 @@ public:
 class CSharedMemoryWriter: public CSharedMemoryTransportBase
 {
 protected:
-	size_t m_SizeLimitHint;
-	mt::CLock m_WriteLock; // make write operations atomic
+	size_t m_sizeLimitHint;
+	mt::CLock m_writeLock; // make write operations atomic
 
 public:
 	CSharedMemoryWriter ()
 	{
-		m_SizeLimitHint = ESharedMemoryTransport_DefSizeLimitHint;
+		m_sizeLimitHint = ESharedMemoryTransport_DefSizeLimitHint;
 	}
 
 	bool
-	Open (
-		const char* pFileName,
-		const char* pReadEventName,
-		const char* pWriteEventName,
-		uint_t Flags,
-		size_t SizeLimitHint = ESharedMemoryTransport_DefSizeLimitHint
+	open (
+		const char* fileName,
+		const char* readEventName,
+		const char* writeEventName,
+		uint_t flags,
+		size_t sizeLimitHint = ESharedMemoryTransport_DefSizeLimitHint
 		);
 
 	size_t
-	Write (
+	write (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		return Write (&p, &Size, 1);
+		return write (&p, &size, 1);
 	}
 
 	size_t
-	Write (
-		const void* const* pBlockArray,
-		const size_t* pSizeArray,
-		size_t Count
+	write (
+		const void* const* blockArray,
+		const size_t* sizeArray,
+		size_t count
 		);
 
 protected:
 	static
 	void
-	CopyWriteChain (
-		void* pDst,
-		const void* const* pBlockArray,
-		const size_t* pSizeArray,
-		size_t Count
+	copyWriteChain (
+		void* dst,
+		const void* const* blockArray,
+		const size_t* sizeArray,
+		size_t count
 		);
 };
 //.............................................................................

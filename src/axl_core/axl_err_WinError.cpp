@@ -7,45 +7,45 @@ namespace err {
 //.............................................................................
 
 rtl::CString 
-CWinErrorProvider::GetErrorDescription (dword_t Error)
+CWinErrorProvider::getErrorDescription (dword_t code)
 {
-	wchar_t* pMessage = NULL;
+	wchar_t* message = NULL;
 	
-	FormatMessageW ( 
+	::FormatMessageW ( 
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
 		FORMAT_MESSAGE_FROM_SYSTEM | 
 		FORMAT_MESSAGE_IGNORE_INSERTS |
 		FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
 		NULL,
-		Error,
+		code,
 		MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPWSTR) &pMessage, 
+		(LPWSTR) &message, 
 		0, 
 		NULL
 		);
 
-	if (!pMessage)
-		return rtl::CString::Format_s ("winerror #%d", Error);
+	if (!message)
+		return rtl::CString::format_s ("winerror #%d", code);
 
-	rtl::CString Description = pMessage;
-	LocalFree (pMessage);
+	rtl::CString description = message;
+	::LocalFree (message);
 	
-	return Description; 
+	return description; 
 }
 
 //.............................................................................
 
 TError*
-CWinError::Create (dword_t Error)
+CWinError::create (dword_t code)
 {
-	TError* pError = GetBuffer (sizeof (TError));
-	if (!pError)
+	TError* error = getBuffer (sizeof (TError));
+	if (!error)
 		return NULL;
 
-	pError->m_Size = sizeof (TError);
-	pError->m_Guid = GUID_WinError;
-	pError->m_Code = Error;
-	return pError;
+	error->m_size = sizeof (TError);
+	error->m_guid = GUID_WinError;
+	error->m_code = code;
+	return error;
 }
 
 //.............................................................................

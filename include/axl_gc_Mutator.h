@@ -24,9 +24,9 @@ typedef struct _axl_gc_TType axl_gc_TType;
 
 struct _axl_gc_TType
 {
-	size_t m_Size;
-	ulong_t m_Type;
-	void* m_pTypeDesc;
+	size_t m_size;
+	ulong_t m_type;
+	void* m_typeDesc;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -36,7 +36,7 @@ typedef struct _axl_gc_TValue axl_gc_TValue;
 struct _axl_gc_TValue
 {
 	void* m_p;
-	axl_gc_TType m_Type;
+	axl_gc_TType m_type;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -45,7 +45,7 @@ typedef struct _axl_gc_TValueEntry axl_gc_TValueEntry;
 
 struct _axl_gc_TValueEntry: rtl::TListLink
 {
-	axl_gc_TValue m_Value;
+	axl_gc_TValue m_value;
 };
 
 //.............................................................................
@@ -57,18 +57,18 @@ struct IMutator: obj::IRoot
 {
 	virtual 
 	void 
-	GetRootSet (CCollector* pCollector) = 0;
+	getRootSet (CCollector* collector) = 0;
 
 	virtual 
 	void 
-	TraceValue (
-		CCollector* pCollector, 
-		axl_gc_TValue* pValue
+	traceValue (
+		CCollector* collector, 
+		axl_gc_TValue* value
 		) = 0;
 
 	virtual 
 	void 
-	DestructValue (axl_gc_TValue* pValue) = 0;
+	destructValue (axl_gc_TValue* value) = 0;
 };
 
 //.............................................................................

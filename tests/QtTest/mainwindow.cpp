@@ -7,40 +7,40 @@
 
 #ifdef _JANCY_REPRESENTER
 
-StdLib::StdLib ()
+stdLib::stdLib ()
 {
-	m_FunctionMap ["printf"] = (void*) Printf;
-	m_FunctionMap ["rand"]   = (void*) rand;
+	m_functionMap ["printf"] = (void*) printf;
+	m_functionMap ["rand"]   = (void*) rand;
 }
 
 int
-StdLib::Printf (
-	const char* pFormat,
+stdLib::printf (
+	const char* format,
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return vprintf (pFormat, va.m_va);
+	AXL_VA_DECL (va, format);
+	return vprintf (format, va.m_va);
 }
 
 #endif
 
 //.............................................................................
 
-MainWindow::MainWindow(QWidget *parent) :
+mainWindow::mainWindow(QWidget *parent) :
 	QMainWindow(parent),
-	ui(new Ui::MainWindow)
+	ui(new ui::mainWindow)
 {
 	ui->setupUi(this);
-	m_logWidget = new gui::QtWidget <MyLogWidget> (ui->centralWidget);
+	m_logWidget = new gui::qtWidget <myLogWidget> (ui->centralWidget);
 }
 
-MainWindow::~MainWindow()
+mainWindow::~mainWindow()
 {
 	delete ui;
 }
 
-bool MainWindow::initialize ()
+bool mainWindow::initialize ()
 {
 	bool result;
 
@@ -55,7 +55,7 @@ bool MainWindow::initialize ()
 	// create widget first, then server (cause server will start populating index immediatly)
 #if 0
 	result = 
-		m_logWidget->w ()->Create (
+		m_logWidget->w ()->create (
 			(log::CServerPeer*) &m_logServerProxy, 
 			"d:/test_log.njidx"
 			) &&
@@ -66,13 +66,13 @@ bool MainWindow::initialize ()
 			"d:/test_log.njcol"
 			);
 #else
-	result = m_logWidget->w ()->Create (
+	result = m_logWidget->w ()->create (
 		&m_memoryServer, 
 		"d:/test_log.njidx"
 		);
 
-	log::TBinDataConfig BinDataConfig;
-	BinDataConfig.m_BinViewKind = log::EBinView_Text;
+	log::TBinDataConfig binDataConfig;
+	binDataConfig.m_binViewKind = log::EBinView_Text;
 
 	static const char data [] = 
 		"suka bla\n"
@@ -80,11 +80,11 @@ bool MainWindow::initialize ()
 		"huicov poesh\n"
 		"pidaras\n";
 
-	m_memoryServer.Create (
+	m_memoryServer.create (
 		(log::CClientPeer*) &m_logWidgetProxy, 
-		&BinDataConfig,
+		&binDataConfig,
 		data, sizeof (data) - 1,
-		g::GetTimestamp ()
+		g::getTimestamp ()
 		);
 
 #endif
@@ -94,7 +94,7 @@ bool MainWindow::initialize ()
 	return true;
 }
 
-void MainWindow::resizeEvent (QResizeEvent* e)
+void mainWindow::resizeEvent (QResizeEvent* e)
 {
 	m_logWidget->setGeometry (ui->centralWidget->geometry ());
 }

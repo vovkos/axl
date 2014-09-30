@@ -8,46 +8,46 @@ namespace exe {
 //.............................................................................
 
 CWorkerWindow::EScheduleResult
-CWorkerWindow::ScheduleV (
-	exe::IFunction* pFunction, 
+CWorkerWindow::scheduleV (
+	exe::IFunction* function, 
 	axl_va_list va
 	)
 {
 	// check if we are already in worker thread
 
-	if (m_ThreadId == ::GetCurrentThreadId ())
+	if (m_threadId == ::GetCurrentThreadId ())
 	{
-		pFunction->InvokeV (va);
+		function->invokeV (va);
 		return EScheduleResult_Invoke;
 	}
 
-	m_Lock.Lock ();
+	m_lock.lock ();
 
-	m_InvokeList.AddV (pFunction, va);
+	m_invokeList.addV (function, va);
 
-	if (m_InvokeList.GetCount () == 1) // post msg only once
-		PostMessage (WM_PROCESS_INVOKE_LIST);
+	if (m_invokeList.getCount () == 1) // post msg only once
+		postMessage (WM_PROCESS_INVOKE_LIST);
 
-	m_Lock.Unlock ();
+	m_lock.unlock ();
 
 	return EScheduleResult_Pending;
 }
 
 LRESULT
-CWorkerWindow::OnProcessInvokeList (
-	UINT Msg,
+CWorkerWindow::onProcessInvokeList (
+	UINT msg,
 	WPARAM wParam,
 	LPARAM lParam,
-	bool* pIsHandled
+	bool* isHandled
 	)
 {
-	exe::CInvokeList InvokeList;
+	exe::CInvokeList invokeList;
 
-	m_Lock.Lock ();
-	InvokeList.TakeOver (&m_InvokeList);
-	m_Lock.Unlock ();
+	m_lock.lock ();
+	invokeList.takeOver (&m_invokeList);
+	m_lock.unlock ();
 
-	InvokeList.Process ();
+	invokeList.process ();
 
 	return 0;
 }

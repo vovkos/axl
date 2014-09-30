@@ -32,7 +32,7 @@ enum EEngine
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char*
-GetEngineKindString (EEngine EngineKind);
+getEngineKindString (EEngine engineKind);
 
 //.............................................................................
 
@@ -41,84 +41,84 @@ class CEngine
 protected:
 	struct TSharedOffscreenCanvas
 	{
-		TSize m_Size;
-		ref::CPtrT <CCanvas> m_Canvas;
+		TSize m_size;
+		ref::CPtrT <CCanvas> m_canvas;
 	};
 
 protected:
-	EEngine m_EngineKind;
-	ref::CPtrT <CFont> m_StdFontArray [EStdFont__Count];
-	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
-	TSharedOffscreenCanvas m_SharedOffscreenCanvasArray [EFormFactor__Count];
+	EEngine m_engineKind;
+	ref::CPtrT <CFont> m_stdFontArray [EStdFont__Count];
+	ref::CPtrT <CCursor> m_stdCursorArray [EStdCursor__Count];
+	TSharedOffscreenCanvas m_sharedOffscreenCanvasArray [EFormFactor__Count];
 
 public:
 	CEngine ()
 	{
-		m_EngineKind = EEngine_Undefined;
+		m_engineKind = EEngine_Undefined;
 	}
 
 	EEngine
-	GetEngineKind ()
+	getEngineKind ()
 	{
-		return m_EngineKind;
+		return m_engineKind;
 	}
 
 	// fonts
 
 	CFont*
-	GetStdFont (EStdFont FontKind);
+	getStdFont (EStdFont fontKind);
 
 	virtual
 	ref::CPtrT <CFont>
-	CreateFont (
-		const char* pFaceName,
-		size_t PointSize,
-		uint_t Flags = 0
+	createFont (
+		const char* faceName,
+		size_t pointSize,
+		uint_t flags = 0
 		) = 0;
 
 	ref::CPtrT <CFont>
-	CreateFont (const TFontDesc& FontDesc)
+	createFont (const TFontDesc& fontDesc)
 	{
-		return CreateFont (
-			FontDesc.m_FaceName,
-			FontDesc.m_PointSize,
-			FontDesc.m_Flags
+		return createFont (
+			fontDesc.m_faceName,
+			fontDesc.m_pointSize,
+			fontDesc.m_flags
 			);
 	}
 
 	// cursors
 
 	CCursor*
-	GetStdCursor (EStdCursor CursorKind);
+	getStdCursor (EStdCursor cursorKind);
 
 	// images
 
 	virtual
 	ref::CPtrT <CImage>
-	CreateImage () = 0;
+	createImage () = 0;
 
 	virtual
 	ref::CPtrT <CImage>
-	CreateImage (
-		int Width,
-		int Height,
-		EPixelFormat PixelFormat,
-		const void* pData,
-		bool IsScreenCompatible = true
+	createImage (
+		int width,
+		int height,
+		EPixelFormat pixelFormat,
+		const void* data,
+		bool isScreenCompatible = true
 		) = 0;
 
 	ref::CPtrT <CImage>
-	CreateImage (
-		const TImageDesc& ImageDesc,
-		bool IsScreenCompatible = true
+	createImage (
+		const TImageDesc& imageDesc,
+		bool isScreenCompatible = true
 		)
 	{
-		return CreateImage (
-			ImageDesc.m_Size.m_Width,
-			ImageDesc.m_Size.m_Height,
-			ImageDesc.m_PixelFormat,
-			ImageDesc.m_pData,
-			IsScreenCompatible
+		return createImage (
+			imageDesc.m_size.m_width,
+			imageDesc.m_size.m_height,
+			imageDesc.m_pixelFormat,
+			imageDesc.m_data,
+			isScreenCompatible
 			);
 	}
 
@@ -126,135 +126,135 @@ public:
 
 	virtual
 	ref::CPtrT <CCanvas>
-	CreateOffscreenCanvas (
-		int Width,
-		int Height
+	createOffscreenCanvas (
+		int width,
+		int height
 		) = 0;
 
 	ref::CPtrT <CCanvas>
-	CreateOffscreenCanvas (const TSize& Size)
+	createOffscreenCanvas (const TSize& size)
 	{
-		return CreateOffscreenCanvas (
-			Size.m_Width,
-			Size.m_Height
+		return createOffscreenCanvas (
+			size.m_width,
+			size.m_height
 			);
 	}
 
 	CCanvas*
-	GetSharedOffscreenCanvas (
-		int Width,
-		int Height
+	getSharedOffscreenCanvas (
+		int width,
+		int height
 		);
 
 	CCanvas*
-	GetSharedOffscreenCanvas (const TSize& Size)
+	getSharedOffscreenCanvas (const TSize& size)
 	{
-		return GetSharedOffscreenCanvas (
-			Size.m_Width,
-			Size.m_Height
+		return getSharedOffscreenCanvas (
+			size.m_width,
+			size.m_height
 			);
 	}
 
 	void
-	DeleteAllSharedOffscreenCanvases ();
+	deleteAllSharedOffscreenCanvases ();
 
 	// clipboard
 
 	virtual
 	uintptr_t 
-	RegisterClipboardFormat (const rtl::CString& FormatName) = 0;
+	registerClipboardFormat (const rtl::CString& formatName) = 0;
 
 	virtual
 	bool
-	ReadClipboard (rtl::CString* pString) = 0;
+	readClipboard (rtl::CString* string) = 0;
 
 	virtual
 	bool
-	ReadClipboard (
-		uintptr_t Format,
-		rtl::CArrayT <char>* pData
+	readClipboard (
+		uintptr_t format,
+		rtl::CArrayT <char>* data
 		) = 0;
 
 	rtl::CString
-	ReadClipboard ()
+	readClipboard ()
 	{
-		rtl::CString String;
-		ReadClipboard (&String);
-		return String;
+		rtl::CString string;
+		readClipboard (&string);
+		return string;
 	}
 
 	rtl::CArrayT <char>
-	ReadClipboard (uintptr_t Format)
+	readClipboard (uintptr_t format)
 	{
-		rtl::CArrayT <char> Data;
-		ReadClipboard (Format, &Data);
-		return Data;
+		rtl::CArrayT <char> data;
+		readClipboard (format, &data);
+		return data;
 	}
 
 	virtual
 	bool
-	WriteClipboard (
-		const char* pString,
-		size_t Length = -1
+	writeClipboard (
+		const char* string,
+		size_t length = -1
 		) = 0;
 
 	virtual
 	bool
-	WriteClipboard (
-		uintptr_t Format,
-		const void* pData,
-		size_t Size
+	writeClipboard (
+		uintptr_t format,
+		const void* data,
+		size_t size
 		) = 0;
 
 	bool
-	WriteClipboard (const rtl::CString& String)
+	writeClipboard (const rtl::CString& string)
 	{
-		return WriteClipboard (String, String.GetLength ());
+		return writeClipboard (string, string.getLength ());
 	}
 
 	bool
-	WriteClipboard (
-		uintptr_t Format,
-		const rtl::CArrayT <char>& Data
+	writeClipboard (
+		uintptr_t format,
+		const rtl::CArrayT <char>& data
 		)
 	{
-		return WriteClipboard (Format, Data, Data.GetCount ());
+		return writeClipboard (format, data, data.getCount ());
 	}
 
 	virtual
 	bool
-	CommitClipboard () = 0;
+	commitClipboard () = 0;
 
 	// caret
 
 	virtual
 	bool
-	ShowCaret (
-		CWidget* pWidget,
-		const TRect& Rect
+	showCaret (
+		CWidget* widget,
+		const TRect& rect
 		) = 0;
 
 	virtual
 	void
-	HideCaret () = 0;
+	hideCaret () = 0;
 
 protected:
 	friend class CFont;
 
 	virtual
 	CFont*
-	GetFontMod (
-		CFont* pBaseFont,
-		uint_t Flags
+	getFontMod (
+		CFont* baseFont,
+		uint_t flags
 		) = 0;
 
 	virtual
 	ref::CPtrT <CFont>
-	CreateStdFont (EStdFont FontKind) = 0;
+	createStdFont (EStdFont fontKind) = 0;
 
 	virtual
 	ref::CPtrT <CCursor>
-	CreateStdCursor (EStdCursor CursorKind) = 0;
+	createStdCursor (EStdCursor cursorKind) = 0;
 };
 
 //.............................................................................

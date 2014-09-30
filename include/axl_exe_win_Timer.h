@@ -18,37 +18,37 @@ class CTimer: public CWaitableHandle
 {
 public:
 	bool
-	Create (
-		SECURITY_ATTRIBUTES* pSecAttr,
-		bool IsManualReset,
-		const tchar_t* pName
+	create (
+		SECURITY_ATTRIBUTES* secAttr,
+		bool isManualReset,
+		const tchar_t* name
 		);
 
 	bool
-	Open (
-		ulong_t Access,
-		bool DoInheritHandle,
-		const tchar_t* pName
+	open (
+		ulong_t access,
+		bool doInheritHandle,
+		const tchar_t* name
 		);
 
 	bool 
-	SetTimer (	
+	setTimer (	
 		uint64_t _DueTime,
-		ulong_t Period, 
+		ulong_t period, 
 		PTIMERAPCROUTINE pfTimerProc,
-		void* pContext
+		void* context
 		);
 
 	void
-	Cancel ()
+	cancel ()
 	{
-		ASSERT (IsOpen ());
+		ASSERT (isOpen ());
 		::CancelWaitableTimer (m_h);
 	}
 
 	static
 	ulong_t 
-	GetTickCount ()
+	getTickCount ()
 	{
 		return ::GetTickCount ();
 	}

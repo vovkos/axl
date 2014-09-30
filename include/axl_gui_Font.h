@@ -42,44 +42,44 @@ enum EFontFlag
 
 inline
 EFontFlag
-GetFirstFontFlag (uint_t Flags)
+getFirstFontFlag (uint_t flags)
 {
-	return (EFontFlag) (1 << rtl::GetLoBitIdx (Flags));
+	return (EFontFlag) (1 << rtl::getLoBitIdx (flags));
 }
 
 const char* 
-GetFontFlagString (EFontFlag Flag);
+getFontFlagString (EFontFlag flag);
 
 inline
 const char* 
-GetFontFlagString (uint_t Flags)
+getFontFlagString (uint_t flags)
 {
-	return GetFontFlagString (GetFirstFontFlag (Flags));
+	return getFontFlagString (getFirstFontFlag (flags));
 }
 
 inline
 int
-OverlayFontFlags (
-	uint_t BaseFontFlags,
-	uint_t OverlayFontFlags
+overlayFontFlags (
+	uint_t baseFontFlags,
+	uint_t overlayFontFlags
 	)
 {
-	return (OverlayFontFlags & EFontFlag_Transparent) ? BaseFontFlags : OverlayFontFlags;
+	return (overlayFontFlags & EFontFlag_Transparent) ? baseFontFlags : overlayFontFlags;
 }
 
 uint_t
-ParseFontFlagString (
-	const char* pString,
-	const char** ppEnd = NULL
+parseFontFlagString (
+	const char* string,
+	const char** end = NULL
 	);
 
 //.............................................................................
 
 struct TFontDesc
 {
-	char m_FaceName [32];
-	size_t m_PointSize;
-	uint_t m_Flags;
+	char m_faceName [32];
+	size_t m_pointSize;
+	uint_t m_flags;
 
 	TFontDesc ()
 	{
@@ -87,19 +87,19 @@ struct TFontDesc
 	}
 
 	TFontDesc (
-		const char* pFaceName, 
-		size_t PointSize = 0,
-		uint_t Flags = 0
+		const char* faceName, 
+		size_t pointSize = 0,
+		uint_t flags = 0
 		)
 	{
-		Setup (pFaceName, PointSize, Flags);
+		setup (faceName, pointSize, flags);
 	}
 
 	void
-	Setup (
-		const char* pFaceName, 
-		size_t PointSize = 0,
-		uint_t Flags = 0
+	setup (
+		const char* faceName, 
+		size_t pointSize = 0,
+		uint_t flags = 0
 		);
 };
 
@@ -107,15 +107,15 @@ struct TFontDesc
 
 struct TFontTuple
 {
-	TFontDesc m_FontDesc;
+	TFontDesc m_fontDesc;
 	
-	CFont* m_pBaseFont;
-	CFont* m_FontModArray [0x10];
+	CFont* m_baseFont;
+	CFont* m_fontModArray [0x10];
 
 	TFontTuple ()
 	{
-		m_pBaseFont = NULL;
-		memset (m_FontModArray, 0, sizeof (m_FontModArray));
+		m_baseFont = NULL;
+		memset (m_fontModArray, 0, sizeof (m_fontModArray));
 	}
 };
 
@@ -129,11 +129,11 @@ class CFontTupleT:
 public:
 	~CFontTupleT ()
 	{
-		for (size_t i = 0; i < countof (m_FontModArray); i++)
+		for (size_t i = 0; i < countof (m_fontModArray); i++)
 		{
-			T* pFont = static_cast <T*> (m_FontModArray [i]);
-			if (pFont)
-				AXL_MEM_DELETE (pFont);
+			T* font = static_cast <T*> (m_fontModArray [i]);
+			if (font)
+				AXL_MEM_DELETE (font);
 		}
 	}
 };
@@ -143,62 +143,62 @@ public:
 class CFont: public CGuiItem
 {
 protected:
-	TFontTuple* m_pTuple;
-	TFontDesc m_FontDesc;
+	TFontTuple* m_tuple;
+	TFontDesc m_fontDesc;
 
 public:
 	CFont ()
 	{
-		m_pTuple = NULL;
+		m_tuple = NULL;
 	}
 
 	const TFontDesc*
-	GetFontDesc ()
+	getFontDesc ()
 	{
-		return &m_FontDesc;
+		return &m_fontDesc;
 	}
 
 	CFont*
-	GetFontMod (uint_t Flags);
+	getFontMod (uint_t flags);
 
 	virtual
 	bool
-	IsMonospace () = 0;
+	isMonospace () = 0;
 
 	TSize
-	CalcTextSize (
-		const char* pText,
-		size_t Length = -1
+	calcTextSize (
+		const char* text,
+		size_t length = -1
 		)
 	{
-		return CalcTextSize_utf8 (pText, Length);
+		return calcTextSize_utf8 (text, length);
 	}
 
 	virtual
 	TSize
-	CalcTextSize_utf8 (
-		const utf8_t* pText,
-		size_t Length = -1
+	calcTextSize_utf8 (
+		const utf8_t* text,
+		size_t length = -1
 		) = 0;
 
 	virtual
 	TSize
-	CalcTextSize_utf16 (
-		const utf16_t* pText,
-		size_t Length = -1
+	calcTextSize_utf16 (
+		const utf16_t* text,
+		size_t length = -1
 		) = 0;
 
 	virtual
 	TSize
-	CalcTextSize_utf32 (
-		const utf32_t* pText,
-		size_t Length = -1
+	calcTextSize_utf32 (
+		const utf32_t* text,
+		size_t length = -1
 		) = 0;
 
 	TSize
-	CalcTextSize (utf32_t Char)
+	calcTextSize (utf32_t c)
 	{
-		return CalcTextSize_utf32 (&Char, 1);
+		return calcTextSize_utf32 (&c, 1);
 	}
 };
 
@@ -206,107 +206,107 @@ public:
 
 struct TTextAttr: public TColorAttr
 {
-	uint_t m_FontFlags;
+	uint_t m_fontFlags;
 
 	TTextAttr ()
 	{
-		m_FontFlags = EFontFlag_Transparent;
+		m_fontFlags = EFontFlag_Transparent;
 	}
 
 	TTextAttr (
-		uint_t ForeColor,
-		uint_t BackColor = EColorFlag_Transparent,
-		uint_t FontFlags = EFontFlag_Transparent
+		uint_t foreColor,
+		uint_t backColor = EColorFlag_Transparent,
+		uint_t fontFlags = EFontFlag_Transparent
 		)
 	{
-		Setup (ForeColor, BackColor, FontFlags);
+		setup (foreColor, backColor, fontFlags);
 	}
 
 	TTextAttr (
-		const TColorAttr& ColorAttr,
-		uint_t FontFlags = EFontFlag_Transparent
+		const TColorAttr& colorAttr,
+		uint_t fontFlags = EFontFlag_Transparent
 		)
 	{
-		Setup (ColorAttr, FontFlags);
+		setup (colorAttr, fontFlags);
 	}
 
-	TTextAttr (const char* pString)
+	TTextAttr (const char* string)
 	{
-		Parse (pString);
+		parse (string);
 	}
 
 	int 
-	Cmp (const TTextAttr& Attr)
+	cmp (const TTextAttr& attr)
 	{
-		return memcmp (this, &Attr, sizeof (TTextAttr));
+		return memcmp (this, &attr, sizeof (TTextAttr));
 	}
 
 	void
-	Clear ()
+	clear ()
 	{
-		TColorAttr::Clear ();
-		m_FontFlags = EFontFlag_Transparent;
+		TColorAttr::clear ();
+		m_fontFlags = EFontFlag_Transparent;
 	}
 
 	void
-	Setup (
-		uint_t ForeColor,
-		uint_t BackColor,
-		uint_t FontFlags
+	setup (
+		uint_t foreColor,
+		uint_t backColor,
+		uint_t fontFlags
 		)
 	{
-		m_ForeColor = ForeColor;
-		m_BackColor = BackColor;
-		m_FontFlags = FontFlags;
+		m_foreColor = foreColor;
+		m_backColor = backColor;
+		m_fontFlags = fontFlags;
 	}
 
 	void
-	Setup (
-		const TColorAttr& ColorAttr,
-		uint_t FontFlags
+	setup (
+		const TColorAttr& colorAttr,
+		uint_t fontFlags
 		)
 	{
 
-		*(TColorAttr*) this = ColorAttr;
-		m_FontFlags = FontFlags;
+		*(TColorAttr*) this = colorAttr;
+		m_fontFlags = fontFlags;
 	}
 
 	void
-	Overlay (
-		const TTextAttr& BaseAttr,
-		const TTextAttr& OverlayAttr
+	overlay (
+		const TTextAttr& baseAttr,
+		const TTextAttr& overlayAttr
 		)
 	{
-		TColorAttr::Overlay (BaseAttr, OverlayAttr);	
-		m_FontFlags = OverlayFontFlags (BaseAttr.m_FontFlags, OverlayAttr.m_FontFlags);
+		TColorAttr::overlay (baseAttr, overlayAttr);	
+		m_fontFlags = overlayFontFlags (baseAttr.m_fontFlags, overlayAttr.m_fontFlags);
 	}
 
 	void
-	Overlay (const TTextAttr& OverlayAttr)
+	overlay (const TTextAttr& overlayAttr)
 	{
-		Overlay (*this, OverlayAttr);
+		overlay (*this, overlayAttr);
 	}
 
 	void
-	Parse (
-		const char* String,
-		const char** ppEnd = NULL
+	parse (
+		const char* string,
+		const char** end = NULL
 		);
 
 	void
-	ParseOverlay (
-		const TTextAttr& BaseAttr,
-		const char* pString,
-		const char** ppEnd = NULL
+	parseOverlay (
+		const TTextAttr& baseAttr,
+		const char* string,
+		const char** end = NULL
 		);
 
 	void
-	ParseOverlay (
-		const char* pString,
-		const char** ppEnd = NULL
+	parseOverlay (
+		const char* string,
+		const char** end = NULL
 		)
 	{
-		ParseOverlay (*this, pString, ppEnd);
+		parseOverlay (*this, string, end);
 	}
 };
 

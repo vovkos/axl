@@ -15,68 +15,68 @@ namespace err {
 
 CErrorMgr::CErrorMgr ()
 {
-	m_TlsSlot = mt::GetTlsMgr ()->CreateSlot ();
+	m_tlsSlot = mt::getTlsMgr ()->createSlot ();
 
-	RegisterProvider (GUID_StdError, rtl::GetSimpleSingleton <CStdErrorProvider> ());
-	RegisterProvider (GUID_Errno, rtl::GetSimpleSingleton <CErrnoProvider> ());
+	registerProvider (GUID_StdError, rtl::getSimpleSingleton <CStdErrorProvider> ());
+	registerProvider (GUID_Errno, rtl::getSimpleSingleton <CErrnoProvider> ());
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	RegisterProvider (GUID_WinError, rtl::GetSimpleSingleton <CWinErrorProvider> ());
-	RegisterProvider (GUID_NtError, rtl::GetSimpleSingleton <CNtErrorProvider> ());
+	registerProvider (GUID_WinError, rtl::getSimpleSingleton <CWinErrorProvider> ());
+	registerProvider (GUID_NtError, rtl::getSimpleSingleton <CNtErrorProvider> ());
 #endif
 }
 
 void
-CErrorMgr::RegisterProvider (
-	const rtl::TGuid& Guid,
-	CErrorProvider* pProvider
+CErrorMgr::registerProvider (
+	const rtl::TGuid& guid,
+	CErrorProvider* provider
 	)
 {
-	mt::CScopeLock ScopeLock (&m_Lock);
-	m_ProviderMap.Goto (Guid)->m_Value = pProvider;
+	mt::CScopeLock scopeLock (&m_lock);
+	m_providerMap.visit (guid)->m_value = provider;
 }
 
 CErrorProvider* 
-CErrorMgr::FindProvider (const rtl::TGuid& Guid)
+CErrorMgr::findProvider (const rtl::TGuid& guid)
 {
-	mt::CScopeLock ScopeLock (&m_Lock);
-	rtl::CHashTableMapIteratorT <rtl::TGuid, CErrorProvider*> It = m_ProviderMap.Find (Guid);
-	return It ? It->m_Value : NULL;
+	mt::CScopeLock scopeLock (&m_lock);
+	rtl::CHashTableMapIteratorT <rtl::TGuid, CErrorProvider*> it = m_providerMap.find (guid);
+	return it ? it->m_value : NULL;
 }
 
 EErrorMode
-CErrorMgr::SetErrorMode (EErrorMode Mode)
+CErrorMgr::setErrorMode (EErrorMode mode)
 {
-	TThreadEntry* pEntry = GetThreadEntry ();
-	EErrorMode OldMode = pEntry->m_Mode;
-	pEntry->m_Mode = Mode;
-	return OldMode;
+	TThreadEntry* entry = getThreadEntry ();
+	EErrorMode oldMode = entry->m_mode;
+	entry->m_mode = mode;
+	return oldMode;
 }
 
 CError
-CErrorMgr::GetError ()
+CErrorMgr::getError ()
 {
-	TThreadEntry* pEntry = FindThreadEntry ();
-	if (pEntry && pEntry->m_Error)
-		return pEntry->m_Error;
+	TThreadEntry* entry = findThreadEntry ();
+	if (entry && entry->m_error)
+		return entry->m_error;
 
-	return NoError;
+	return noError;
 }
 
 void
-CErrorMgr::SetError (const CError& Error)
+CErrorMgr::setError (const CError& error)
 {	
-	TThreadEntry* pEntry = GetThreadEntry ();
-	pEntry->m_Error = Error;
-	TThreadEntry* pEntry2 = FindThreadEntry ();
+	TThreadEntry* entry = getThreadEntry ();
+	entry->m_error = error;
+	TThreadEntry* entry2 = findThreadEntry ();
 	
-	switch (pEntry->m_Mode)
+	switch (entry->m_mode)
 	{
 	case EErrorMode_NoThrow:
 		break;
 
 	case EErrorMode_CppException:
-		throw Error;
+		throw error;
 
 	case EErrorMode_SehException:
 	case EErrorMode_SetJmpLongJmp:
@@ -88,15 +88,15 @@ CErrorMgr::SetError (const CError& Error)
 }
 
 CErrorMgr::TThreadEntry*
-CErrorMgr::GetThreadEntry ()
+CErrorMgr::getThreadEntry ()
 {
-	TThreadEntry* pEntry = FindThreadEntry ();
-	if (pEntry)
-		return pEntry;
+	TThreadEntry* entry = findThreadEntry ();
+	if (entry)
+		return entry;
 
-	ref::CPtrT <TThreadEntry> Entry = AXL_REF_NEW (ref::CBoxT <TThreadEntry>);
-	mt::GetTlsMgr ()->SetSlotValue (m_TlsSlot, Entry);
-	return Entry;
+	ref::CPtrT <TThreadEntry> newEntry = AXL_REF_NEW (ref::CBoxT <TThreadEntry>);
+	mt::getTlsMgr ()->setSlotValue (m_tlsSlot, newEntry);
+	return newEntry;
 }
 
 //.............................................................................

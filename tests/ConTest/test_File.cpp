@@ -7,12 +7,12 @@ namespace test_File {
 //.............................................................................
 
 void
-Run ()
+run ()
 {
 	io::CFile f;
-	f.Open ("d:\\hui", io::EFileFlag_ReadOnly);
-	rtl::CString Text = err::GetError ()->GetDescription ();
-	printf ("error: %s\n", Text);
+	f.open ("d:\\hui", io::EFileFlag_ReadOnly);
+	rtl::CString text = err::getError ()->getDescription ();
+	printf ("error: %s\n", text);
 }
 
 //.............................................................................

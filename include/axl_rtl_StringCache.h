@@ -19,20 +19,20 @@ template <typename C>
 class CStringCacheT
 {
 protected:
-	rtl::CBoxListT <rtl::CStringT <C> > m_SymbolList;
-	rtl::CStringHashTableT <C> m_SymbolMap;
+	rtl::CBoxListT <rtl::CStringT <C> > m_symbolList;
+	rtl::CStringHashTableT <C> m_symbolMap;
 	
 public:
 	const C*
-	GetString (const C* p)
+	getString (const C* p)
 	{
-		rtl::CHashTableIteratorT <const C*> It = m_SymbolMap.Find (p);
-		if (It)
-			return It->m_Key;
+		rtl::CHashTableIteratorT <const C*> it = m_symbolMap.find (p);
+		if (it)
+			return it->m_key;
 
-		rtl::CStringT <C>& String = *m_SymbolList.InsertTail (p);
-		m_SymbolMap.Goto (String);
-		return String;
+		rtl::CStringT <C>& string = *m_symbolList.insertTail (p);
+		m_symbolMap.visit (string);
+		return string;
 	}
 };
 

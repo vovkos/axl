@@ -17,58 +17,58 @@ namespace psx {
 class CMutexAttr
 {
 protected:
-	pthread_mutexattr_t m_Attr;
+	pthread_mutexattr_t m_attr;
 
 public:
 	CMutexAttr ()
 	{
-		pthread_mutexattr_init (&m_Attr);
+		pthread_mutexattr_init (&m_attr);
 	}
 
 	~CMutexAttr ()
 	{
-		pthread_mutexattr_destroy (&m_Attr);
+		pthread_mutexattr_destroy (&m_attr);
 	}
 
 	operator const pthread_mutexattr_t* () const
 	{
-		return &m_Attr;
+		return &m_attr;
 	}
 
 	operator pthread_mutexattr_t* ()
 	{
-		return &m_Attr;
+		return &m_attr;
 	}
 
 	int
-	GetType () const
+	getType () const
 	{
-		int Type = PTHREAD_MUTEX_NORMAL;
-		pthread_mutexattr_gettype (&m_Attr, &Type);
-		return Type;
+		int type = PTHREAD_MUTEX_NORMAL;
+		pthread_mutexattr_gettype (&m_attr, &type);
+		return type;
 	}
 
 	bool
-	SetType (int Type)
+	setType (int type)
 	{
-		int Result = pthread_mutexattr_settype (&m_Attr, Type);
-		return Result == 0 ? true : err::Fail (Result);
+		int result = pthread_mutexattr_settype (&m_attr, type);
+		return result == 0 ? true : err::fail (result);
 	}
 
 #if (0)
 	int
-	GetRobust () const
+	getRobust () const
 	{
-		int Robust = PTHREAD_MUTEX_STALLED;
-		pthread_mutexattr_getrobust (&m_Attr, &Robust);
-		return Robust;
+		int robust = PTHREAD_MUTEX_STALLED;
+		pthread_mutexattr_getrobust (&m_attr, &robust);
+		return robust;
 	}
 
 	bool
-	SetRobust (int Robust)
+	setRobust (int robust)
 	{
-		int Result = pthread_mutexattr_setrobust (&m_Attr, Robust);
-		return Result == 0 ? true : err::Fail (Result);
+		int result = pthread_mutexattr_setrobust (&m_attr, robust);
+		return result == 0 ? true : err::fail (result);
 	}
 #endif
 };
@@ -78,37 +78,37 @@ public:
 class CMutex
 {
 protected:
-	pthread_mutex_t m_Mutex;
+	pthread_mutex_t m_mutex;
 
 public:
-	CMutex (pthread_mutexattr_t* pAttr = NULL)
+	CMutex (pthread_mutexattr_t* attr = NULL)
 	{
-		pthread_mutex_init (&m_Mutex, pAttr);
+		pthread_mutex_init (&m_mutex, attr);
 	}
 
 	~CMutex ()
 	{
-		pthread_mutex_destroy (&m_Mutex);
+		pthread_mutex_destroy (&m_mutex);
 	}
 
 	operator pthread_mutex_t* ()
 	{
-		return &m_Mutex;
+		return &m_mutex;
 	}
 
 	void
-	Lock ()
+	lock ()
 	{
-		pthread_mutex_lock (&m_Mutex);
+		pthread_mutex_lock (&m_mutex);
 	}
 
 	bool
-	Lock (uint_t Timeout);
+	lock (uint_t timeout);
 
 	void
-	Unlock ()
+	unlock ()
 	{
-		pthread_mutex_unlock (&m_Mutex);
+		pthread_mutex_unlock (&m_mutex);
 	}
 };
 

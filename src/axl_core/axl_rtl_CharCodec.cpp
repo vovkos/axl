@@ -7,365 +7,365 @@ namespace rtl {
 //.............................................................................
 
 CCharCodec* 
-GetCharCodec (ECharCodec CodecKind)
+getCharCodec (ECharCodec codecKind)
 {
-	static CAsciiCodec AsciiCodec; 
-	static CUtfCodecT <rtl::CUtf8>     Utf8Codec; 
-	static CUtfCodecT <rtl::CUtf16>    Utf16Codec; 
-	static CUtfCodecT <rtl::CUtf16_be> Utf16Codec_be; 
-	static CUtfCodecT <rtl::CUtf32>    Utf32Codec; 
-	static CUtfCodecT <rtl::CUtf32_be> Utf32Codec_be; 
+	static CAsciiCodec asciiCodec; 
+	static CUtfCodecT <rtl::CUtf8>     utf8Codec; 
+	static CUtfCodecT <rtl::CUtf16>    utf16Codec; 
+	static CUtfCodecT <rtl::CUtf16_be> utf16Codec_be; 
+	static CUtfCodecT <rtl::CUtf32>    utf32Codec; 
+	static CUtfCodecT <rtl::CUtf32_be> utf32Codec_be; 
 	
-	static CCharCodec* CodecTable [] = 
+	static CCharCodec* codecTable [] = 
 	{
-		&AsciiCodec,
-		&Utf8Codec,
-		&Utf16Codec,
-		&Utf16Codec_be,
-		&Utf32Codec,
-		&Utf32Codec_be,
+		&asciiCodec,
+		&utf8Codec,
+		&utf16Codec,
+		&utf16Codec_be,
+		&utf32Codec,
+		&utf32Codec_be,
 	};
 
-	return (size_t) CodecKind < countof (CodecTable) ? CodecTable [CodecKind] : NULL;
+	return (size_t) codecKind < countof (codecTable) ? codecTable [codecKind] : NULL;
 }
 
 //.............................................................................
 
 void
-CCharCodec::EncodeFromUtf8 (
-	rtl::CArrayT <char>* pBuffer,
+CCharCodec::encodeFromUtf8 (
+	rtl::CArrayT <char>* buffer,
 	const utf8_t* p,
-	size_t Length
+	size_t length
 	)
 {
-	pBuffer->Clear ();
+	buffer->clear ();
 
-	const utf8_t* pEnd = p + Length;
-	while (p < pEnd)
+	const utf8_t* end = p + length;
+	while (p < end)
 	{
-		char Buffer [256];
+		char tmpBuffer [256];
 		
-		size_t TakenBufferSize;
-		size_t TakenLength;
+		size_t takenBufferSize;
+		size_t takenLength;
 
-		EncodeFromUtf8 (Buffer, sizeof (Buffer), p, pEnd - p, &TakenBufferSize, &TakenLength);
-		if (!TakenLength)
+		encodeFromUtf8 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		if (!takenLength)
 			break;
 
-		pBuffer->Append (Buffer, TakenBufferSize);
-		p += TakenLength;
+		buffer->append (tmpBuffer, takenBufferSize);
+		p += takenLength;
 	}
 }
 
 void
-CCharCodec::EncodeFromUtf16 (
-	rtl::CArrayT <char>* pBuffer,
+CCharCodec::encodeFromUtf16 (
+	rtl::CArrayT <char>* buffer,
 	const utf16_t* p,
-	size_t Length
+	size_t length
 	)
 {
-	pBuffer->Clear ();
+	buffer->clear ();
 
-	const utf16_t* pEnd = p + Length;
-	while (p < pEnd)
+	const utf16_t* end = p + length;
+	while (p < end)
 	{
-		char Buffer [256];
+		char tmpBuffer [256];
 		
-		size_t TakenBufferSize;
-		size_t TakenLength;
+		size_t takenBufferSize;
+		size_t takenLength;
 
-		EncodeFromUtf16 (Buffer, sizeof (Buffer), p, pEnd - p, &TakenBufferSize, &TakenLength);
-		if (!TakenLength)
+		encodeFromUtf16 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		if (!takenLength)
 			break;
 
-		pBuffer->Append (Buffer, TakenBufferSize);
-		p += TakenLength;
+		buffer->append (tmpBuffer, takenBufferSize);
+		p += takenLength;
 	}
 }
 
 void
-CCharCodec::EncodeFromUtf32 (
-	rtl::CArrayT <char>* pBuffer,
+CCharCodec::encodeFromUtf32 (
+	rtl::CArrayT <char>* buffer,
 	const utf32_t* p,
-	size_t Length
+	size_t length
 	)
 {
-	pBuffer->Clear ();
+	buffer->clear ();
 
-	const utf32_t* pEnd = p + Length;
-	while (p < pEnd)
+	const utf32_t* end = p + length;
+	while (p < end)
 	{
-		char Buffer [256];
+		char tmpBuffer [256];
 		
-		size_t TakenBufferSize;
-		size_t TakenLength;
+		size_t takenBufferSize;
+		size_t takenLength;
 
-		EncodeFromUtf32 (Buffer, sizeof (Buffer), p, pEnd - p, &TakenBufferSize, &TakenLength);
-		if (!TakenLength)
+		encodeFromUtf32 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		if (!takenLength)
 			break;
 
-		pBuffer->Append (Buffer, TakenBufferSize);
-		p += TakenLength;
+		buffer->append (tmpBuffer, takenBufferSize);
+		p += takenLength;
 	}
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 rtl::CArrayT <char>
-CCharCodec::EncodeFromUtf8 (
+CCharCodec::encodeFromUtf8 (
 	const utf8_t* p,
-	size_t Length
+	size_t length
 	)
 {
-	rtl::CArrayT <char> Buffer;
-	EncodeFromUtf8 (&Buffer, p, Length);
-	return Buffer;
+	rtl::CArrayT <char> buffer;
+	encodeFromUtf8 (&buffer, p, length);
+	return buffer;
 }
 
 rtl::CArrayT <char>
-CCharCodec::EncodeFromUtf16 (
+CCharCodec::encodeFromUtf16 (
 	const utf16_t* p,
-	size_t Length
+	size_t length
 	)
 {
-	rtl::CArrayT <char> Buffer;
-	EncodeFromUtf16 (&Buffer, p, Length);
-	return Buffer;
+	rtl::CArrayT <char> buffer;
+	encodeFromUtf16 (&buffer, p, length);
+	return buffer;
 }
 
 rtl::CArrayT <char>
-CCharCodec::EncodeFromUtf32 (
+CCharCodec::encodeFromUtf32 (
 	const utf32_t* p,
-	size_t Length
+	size_t length
 	)
 {
-	rtl::CArrayT <char> Buffer;
-	EncodeFromUtf32 (&Buffer, p, Length);
-	return Buffer;
+	rtl::CArrayT <char> buffer;
+	encodeFromUtf32 (&buffer, p, length);
+	return buffer;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-CCharCodec::DecodeToUtf8 (
-	rtl::CArrayT <utf8_t>* pBuffer,
+CCharCodec::decodeToUtf8 (
+	rtl::CArrayT <utf8_t>* buffer,
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
-	pBuffer->Clear ();
+	buffer->clear ();
 
 	const char* p = (const char*) _p;
-	const char* pEnd = p + Size;
-	while (p < pEnd)
+	const char* end = p + size;
+	while (p < end)
 	{
-		utf8_t Buffer [256];
+		utf8_t tmpBuffer [256];
 		
-		size_t TakenBufferSize;
-		size_t TakenLength;
+		size_t takenBufferSize;
+		size_t takenLength;
 
-		DecodeToUtf8 (Buffer, sizeof (Buffer), p, pEnd - p, &TakenBufferSize, &TakenLength);
-		if (!TakenLength)
+		decodeToUtf8 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		if (!takenLength)
 			break;
 
-		pBuffer->Append (Buffer, TakenBufferSize);
-		p += TakenLength;
+		buffer->append (tmpBuffer, takenBufferSize);
+		p += takenLength;
 	}
 }
 
 void
-CCharCodec::DecodeToUtf16 (
-	rtl::CArrayT <utf16_t>* pBuffer,
+CCharCodec::decodeToUtf16 (
+	rtl::CArrayT <utf16_t>* buffer,
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
-	pBuffer->Clear ();
+	buffer->clear ();
 
 	const char* p = (const char*) _p;
-	const char* pEnd = p + Size;
-	while (p < pEnd)
+	const char* end = p + size;
+	while (p < end)
 	{
-		utf16_t Buffer [256];
+		utf16_t tmpBuffer [256];
 		
-		size_t TakenBufferSize;
-		size_t TakenLength;
+		size_t takenBufferSize;
+		size_t takenLength;
 
-		DecodeToUtf16 (Buffer, sizeof (Buffer), p, pEnd - p, &TakenBufferSize, &TakenLength);
-		if (!TakenLength)
+		decodeToUtf16 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		if (!takenLength)
 			break;
 
-		pBuffer->Append (Buffer, TakenBufferSize);
-		p += TakenLength;
+		buffer->append (tmpBuffer, takenBufferSize);
+		p += takenLength;
 	}
 }
 
 void
-CCharCodec::DecodeToUtf32 (
-	rtl::CArrayT <utf32_t>* pBuffer,
+CCharCodec::decodeToUtf32 (
+	rtl::CArrayT <utf32_t>* buffer,
 	const void* _p,
-	size_t Size
+	size_t size
 	)
 {
-	pBuffer->Clear ();
+	buffer->clear ();
 
 	const char* p = (const char*) _p;
-	const char* pEnd = p + Size;
-	while (p < pEnd)
+	const char* end = p + size;
+	while (p < end)
 	{
-		utf32_t Buffer [256];
+		utf32_t tmpBuffer [256];
 		
-		size_t TakenBufferSize;
-		size_t TakenLength;
+		size_t takenBufferSize;
+		size_t takenLength;
 
-		DecodeToUtf32 (Buffer, sizeof (Buffer), p, pEnd - p, &TakenBufferSize, &TakenLength);
-		if (!TakenLength)
+		decodeToUtf32 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		if (!takenLength)
 			break;
 
-		pBuffer->Append (Buffer, TakenBufferSize);
-		p += TakenLength;
+		buffer->append (tmpBuffer, takenBufferSize);
+		p += takenLength;
 	}
 }
 
 rtl::CArrayT <utf8_t>
-CCharCodec::DecodeToUtf8 (
+CCharCodec::decodeToUtf8 (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	rtl::CArrayT <utf8_t> Buffer;
-	DecodeToUtf8 (&Buffer, p, Size);
-	return Buffer;
+	rtl::CArrayT <utf8_t> buffer;
+	decodeToUtf8 (&buffer, p, size);
+	return buffer;
 }
 
 rtl::CArrayT <utf16_t>
-CCharCodec::DecodeToUtf16 (
+CCharCodec::decodeToUtf16 (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	rtl::CArrayT <utf16_t> Buffer;
-	DecodeToUtf16 (&Buffer, p, Size);
-	return Buffer;
+	rtl::CArrayT <utf16_t> buffer;
+	decodeToUtf16 (&buffer, p, size);
+	return buffer;
 }
 
 rtl::CArrayT <utf32_t>
-CCharCodec::DecodeToUtf32 (
+CCharCodec::decodeToUtf32 (
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	rtl::CArrayT <utf32_t> Buffer;
-	DecodeToUtf32 (&Buffer, p, Size);
-	return Buffer;
+	rtl::CArrayT <utf32_t> buffer;
+	decodeToUtf32 (&buffer, p, size);
+	return buffer;
 }
 
 //.............................................................................
 
 void
-CCodePointDecoder::LoadState (uint32_t State)
+CCodePointDecoder::loadState (uint32_t state)
 {
-	*((uint32_t*) m_Accumulator) = State;
-	m_AccumulatorCurrentSize = (State & 0x0f000000) >> 24;
-	m_AccumulatorExpectedSize = (State & 0xf0000000) >> 28;
+	*((uint32_t*) m_accumulator) = state;
+	m_accumulatorCurrentSize = (state & 0x0f000000) >> 24;
+	m_accumulatorExpectedSize = (state & 0xf0000000) >> 28;
 
-	ASSERT (m_AccumulatorCurrentSize <= 3 && m_AccumulatorExpectedSize <= 4);
+	ASSERT (m_accumulatorCurrentSize <= 3 && m_accumulatorExpectedSize <= 4);
 }
 
 uint32_t
-CCodePointDecoder::SaveState ()
+CCodePointDecoder::saveState ()
 {
-	uint32_t State = *((const uint32_t*) m_Accumulator) & 0x00ffffff;
-	State |= (m_AccumulatorCurrentSize & 0x0f) << 24;
-	State |= (m_AccumulatorExpectedSize & 0x0f) << 28;
+	uint32_t state = *((const uint32_t*) m_accumulator) & 0x00ffffff;
+	state |= (m_accumulatorCurrentSize & 0x0f) << 24;
+	state |= (m_accumulatorExpectedSize & 0x0f) << 28;
 
-	return State;
+	return state;
 }
 
 size_t
-CCodePointDecoder::Decode (
-	utf32_t* pCodePoint,
+CCodePointDecoder::decode (
+	utf32_t* codePoint,
 	const void* p,
-	size_t Size
+	size_t size
 	)
 {
-	size_t UnitSize = m_pCharCodec->GetUnitSize ();
-	ASSERT (UnitSize <= sizeof (m_Accumulator));
+	size_t unitSize = m_charCodec->getUnitSize ();
+	ASSERT (unitSize <= sizeof (m_accumulator));
 
-	size_t TakenBufferLength;
-	size_t TakenSize;
-	size_t ExpectedSize;
+	size_t takenBufferLength;
+	size_t takenSize;
+	size_t expectedSize;
 
-	if (m_AccumulatorExpectedSize)
+	if (m_accumulatorExpectedSize)
 	{
-		size_t AccumulatorMissingSize = m_AccumulatorExpectedSize - m_AccumulatorCurrentSize;		
+		size_t accumulatorMissingSize = m_accumulatorExpectedSize - m_accumulatorCurrentSize;		
 
-		if (Size < AccumulatorMissingSize) // not yet
+		if (size < accumulatorMissingSize) // not yet
 		{
-			memcpy (m_Accumulator + m_AccumulatorCurrentSize, p, Size);
-			m_AccumulatorCurrentSize += Size;
+			memcpy (m_accumulator + m_accumulatorCurrentSize, p, size);
+			m_accumulatorCurrentSize += size;
 			return -1;
 		}
 
-		memcpy (m_Accumulator + m_AccumulatorCurrentSize, p, AccumulatorMissingSize);
+		memcpy (m_accumulator + m_accumulatorCurrentSize, p, accumulatorMissingSize);
 
-		m_pCharCodec->DecodeToUtf32 (
-			pCodePoint, 
+		m_charCodec->decodeToUtf32 (
+			codePoint, 
 			1, 
-			m_Accumulator, 
-			m_AccumulatorExpectedSize, 
-			&TakenBufferLength,
-			&TakenSize,
-			&ExpectedSize
+			m_accumulator, 
+			m_accumulatorExpectedSize, 
+			&takenBufferLength,
+			&takenSize,
+			&expectedSize
 			);
 
-		if (!TakenBufferLength) // still not yet (rare, but might actually happen with UTF-16)
+		if (!takenBufferLength) // still not yet (rare, but might actually happen with UTF-16)
 		{
 			ASSERT (
-				m_AccumulatorCurrentSize == 1 && 
-				m_AccumulatorExpectedSize == 2 && 
-				ExpectedSize == 4
+				m_accumulatorCurrentSize == 1 && 
+				m_accumulatorExpectedSize == 2 && 
+				expectedSize == 4
 				);
 
-			m_AccumulatorCurrentSize += AccumulatorMissingSize;
-			m_AccumulatorExpectedSize = ExpectedSize;
+			m_accumulatorCurrentSize += accumulatorMissingSize;
+			m_accumulatorExpectedSize = expectedSize;
 			return -1;
 		}
 
-		m_AccumulatorExpectedSize = 0;
-		m_AccumulatorCurrentSize = 0;
-		return AccumulatorMissingSize;
+		m_accumulatorExpectedSize = 0;
+		m_accumulatorCurrentSize = 0;
+		return accumulatorMissingSize;
 	}
 
-	if (Size < UnitSize) // wait for the whole unit
+	if (size < unitSize) // wait for the whole unit
 	{
-		memcpy (m_Accumulator, p, Size);
-		m_AccumulatorCurrentSize = Size;
-		m_AccumulatorExpectedSize = UnitSize;
+		memcpy (m_accumulator, p, size);
+		m_accumulatorCurrentSize = size;
+		m_accumulatorExpectedSize = unitSize;
 		return -1;
 	}
 
-	m_pCharCodec->DecodeToUtf32 (
-		pCodePoint, 
+	m_charCodec->decodeToUtf32 (
+		codePoint, 
 		1, 
 		p, 
-		Size,
-		&TakenBufferLength,
-		&TakenSize,
-		&ExpectedSize
+		size,
+		&takenBufferLength,
+		&takenSize,
+		&expectedSize
 		);
 
-	if (!TakenBufferLength)
+	if (!takenBufferLength)
 	{
-		ASSERT (!TakenSize && Size < ExpectedSize);
+		ASSERT (!takenSize && size < expectedSize);
 
-		memcpy (m_Accumulator, p, Size);
-		m_AccumulatorCurrentSize = Size;
-		m_AccumulatorExpectedSize = ExpectedSize;
+		memcpy (m_accumulator, p, size);
+		m_accumulatorCurrentSize = size;
+		m_accumulatorExpectedSize = expectedSize;
 		return -1;
 	}
 
-	return TakenSize;
+	return takenSize;
 }
 
 //.............................................................................

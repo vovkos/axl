@@ -10,102 +10,102 @@ namespace exe {
 
 CWorkerThread::CWorkerThread ()
 {
-	m_TerminateFlag = false;
+	m_terminateFlag = false;
 
-	m_WaitArray.SetCount (1);
-	m_WaitArray [0] = &m_Event;
+	m_waitArray.setCount (1);
+	m_waitArray [0] = &m_event;
 }
 
 bool 
-CWorkerThread::Start ()
+CWorkerThread::start ()
 {
-	ASSERT (!IsOpen ());
+	ASSERT (!isOpen ());
 
-	m_TerminateFlag = false;
-	return CThreadImplT <CWorkerThread>::Start ();
+	m_terminateFlag = false;
+	return CThreadImplT <CWorkerThread>::start ();
 }
 
 void 
-CWorkerThread::Stop (
-	bool DoWaitAndClose,
-	ulong_t Timeout
+CWorkerThread::stop (
+	bool doWaitAndClose,
+	ulong_t timeout
 	)
 {
-	SignalStop ();
+	signalStop ();
 	
-	if (DoWaitAndClose)
-		WaitAndClose (Timeout);
+	if (doWaitAndClose)
+		waitAndClose (timeout);
 }
 
 void 
-CWorkerThread::SignalStop ()
+CWorkerThread::signalStop ()
 {
-	if (m_TerminateFlag)
+	if (m_terminateFlag)
 		return;
 
-	m_Lock.Lock ();
-	m_TerminateFlag = true;
-	m_Event.Signal ();
-	m_Lock.Unlock ();
+	m_lock.lock ();
+	m_terminateFlag = true;
+	m_event.signal ();
+	m_lock.unlock ();
 }
 
 // AddEvent / RemoveEvent should only be called once the thread is running
 
 handle_t
-CWorkerThread::AddEvent (
-	mt::CEvent* pEvent, 
-	exe::IFunction* pOnEvent
+CWorkerThread::addEvent (
+	mt::CEvent* event, 
+	exe::IFunction* onEvent
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	return (handle_t) SyncSchedule <exe::CArgSeqT_3 <
+	return (handle_t) syncSchedule <exe::CArgSeqT_3 <
 		CWorkerThread*,
 		mt::CEvent*, 
 		exe::IFunction*
-		> > (pvoid_cast (&CWorkerThread::AddEvent_wt), this, pEvent, pOnEvent);
+		> > (pvoid_cast (&CWorkerThread::addEvent_wt), this, event, onEvent);
 }
 
 void 
-CWorkerThread::RemoveEvent (handle_t hEvent)
+CWorkerThread::removeEvent (handle_t hEvent)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	SyncSchedule <exe::CArgSeqT_2 <
+	syncSchedule <exe::CArgSeqT_2 <
 		CWorkerThread*,
 		mt::CEvent*
-		> > (pvoid_cast (&CWorkerThread::RemoveEvent_wt), this, hEvent);
+		> > (pvoid_cast (&CWorkerThread::removeEvent_wt), this, hEvent);
 }
 
 inline
 bool 
-CWorkerThread::CanInvokeNow ()
+CWorkerThread::canInvokeNow ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	return GetThreadId () == mt::GetCurrentThreadId ();
+	return getThreadId () == mt::getCurrentThreadId ();
 #elif (_AXL_ENV == AXL_ENV_NT)
-	return GetThreadId () == mt::GetCurrentThreadId () && KeGetCurrentIrql () == PASSIVE_LEVEL;
+	return getThreadId () == mt::getCurrentThreadId () && keGetCurrentIrql () == PASSIVE_LEVEL;
 #endif
 }
 
 CWorkerThread::EScheduleResult
-CWorkerThread::ScheduleV (
-	exe::IFunction* pFunction, 
+CWorkerThread::scheduleV (
+	exe::IFunction* function, 
 	axl_va_list va
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	if (CanInvokeNow ())
+	if (canInvokeNow ())
 	{
-		pFunction->InvokeV (va);
+		function->invokeV (va);
 		return EScheduleResult_Invoke;
 	}
 
-	m_Lock.Lock ();
-	m_InvokeList.AddV (pFunction, va);
-	m_Event.Signal ();
-	m_Lock.Unlock ();
+	m_lock.lock ();
+	m_invokeList.addV (function, va);
+	m_event.signal ();
+	m_lock.unlock ();
 
 	return EScheduleResult_Pending;
 }
@@ -115,123 +115,123 @@ CWorkerThread::ScheduleV (
 // everything below runs in worker thread
 
 ulong_t 
-CWorkerThread::ThreadProc ()
+CWorkerThread::threadProc ()
 {
-	bool TerminateFlag = false;
+	bool terminateFlag = false;
 
-	HANDLE WaitArray [MAXIMUM_WAIT_OBJECTS];
+	HANDLE waitArray [MAXIMUM_WAIT_OBJECTS];
 
 	do
 	{
-		size_t Count = m_WaitArray.GetCount ();
-		ASSERT (Count > 0 && Count <= MAXIMUM_WAIT_OBJECTS);
+		size_t count = m_waitArray.getCount ();
+		ASSERT (count > 0 && count <= MAXIMUM_WAIT_OBJECTS);
 
-		for (size_t i = 0; i < Count; i++)
-			WaitArray [i] = *m_WaitArray [i];
+		for (size_t i = 0; i < count; i++)
+			waitArray [i] = *m_waitArray [i];
 
-		ulong_t Result = win::CWaitableHandle::MultiWait (WaitArray, Count, false, -1, true);
-		switch (Result)
+		ulong_t result = win::CWaitableHandle::multiWait (waitArray, count, false, -1, true);
+		switch (result)
 		{
 		case 0: 
-			TerminateFlag = Process_wt ();
+			terminateFlag = process_wt ();
 			break;
 
 		default:
-			if (Result >= 1 && (size_t) Result < Count)
+			if (result >= 1 && (size_t) result < count)
 			{
-				size_t Index = Result - 1;
-				ASSERT (Index < m_FunctionArray.GetCount ());
-				m_FunctionArray [Index]->Invoke (0);
+				size_t index = result - 1;
+				ASSERT (index < m_functionArray.getCount ());
+				m_functionArray [index]->invoke (0);
 			}
 		}
-	} while (!TerminateFlag);
+	} while (!terminateFlag);
 
 	return 0;
 }
 
 CWorkerThread::TUserEvent*
-CWorkerThread::AddEvent_wt (
-	mt::CEvent* pEvent,
-	exe::IFunction* pOnEvent
+CWorkerThread::addEvent_wt (
+	mt::CEvent* event,
+	exe::IFunction* onEvent
 	)
 {
-	size_t Count = m_WaitArray.GetCount ();
-	if (Count >= MAXIMUM_WAIT_OBJECTS)
+	size_t count = m_waitArray.getCount ();
+	if (count >= MAXIMUM_WAIT_OBJECTS)
 		return NULL;
 
-	TUserEvent* pUserEvent = AXL_MEM_NEW (TUserEvent);
-	pUserEvent->m_pEvent = pEvent;
-	pUserEvent->m_OnEvent = ref::Clone (pOnEvent);
-	m_UserEventList.InsertTail (pUserEvent);
+	TUserEvent* userEvent = AXL_MEM_NEW (TUserEvent);
+	userEvent->m_event = event;
+	userEvent->m_onEvent = ref::clone (onEvent);
+	m_userEventList.insertTail (userEvent);
 
-	m_WaitArray.Append (pEvent);
-	m_FunctionArray.Append (pUserEvent->m_OnEvent);
+	m_waitArray.append (event);
+	m_functionArray.append (userEvent->m_onEvent);
 
-	return pUserEvent;
+	return userEvent;
 }
 
 void
-CWorkerThread::RemoveEvent_wt (TUserEvent* pUserEvent)
+CWorkerThread::removeEvent_wt (TUserEvent* userEvent)
 {
-	m_UserEventList.Delete (pUserEvent);
+	m_userEventList.delete (userEvent);
 
-	size_t Count = m_UserEventList.GetCount ();
+	size_t count = m_userEventList.getCount ();
 
-	m_WaitArray.SetCount (Count + 1);
-	m_FunctionArray.SetCount (Count);
+	m_waitArray.setCount (count + 1);
+	m_functionArray.setCount (count);
 
-	rtl::CIteratorT <TUserEvent> It = m_UserEventList.GetHead ();
-	mt::CEvent** ppEvent = m_WaitArray.GetBuffer () + 1;
-	exe::IFunction** ppOnEvent = m_FunctionArray.GetBuffer ();
+	rtl::CIteratorT <TUserEvent> it = m_userEventList.getHead ();
+	mt::CEvent** event = m_waitArray.getBuffer () + 1;
+	exe::IFunction** onEvent = m_functionArray.getBuffer ();
 
-	for (; It; It++, ppEvent++, ppOnEvent++)
+	for (; it; it++, event++, onEvent++)
 	{
-		*ppEvent = It->m_pEvent;
-		*ppOnEvent = It->m_OnEvent;
+		*event = it->m_event;
+		*onEvent = it->m_onEvent;
 	}
 }
 
 bool
-CWorkerThread::Process_wt ()
+CWorkerThread::process_wt ()
 {
-	exe::CInvokeList InvokeList;
+	exe::CInvokeList invokeList;
 
-	m_Lock.Lock ();
-	InvokeList.TakeOver (&m_InvokeList);
-	bool TerminateFlag = m_TerminateFlag;
-	m_Lock.Unlock ();
+	m_lock.lock ();
+	invokeList.takeOver (&m_invokeList);
+	bool terminateFlag = m_terminateFlag;
+	m_lock.unlock ();
 
-	InvokeList.Process ();
-	return TerminateFlag;
+	invokeList.process ();
+	return terminateFlag;
 }
 
 //.............................................................................
 
 ref::CPtrT <CWorkerThread>
-GetWorkerThread (size_t ReserveEventCount)
+getWorkerThread (size_t reserveEventCount)
 {
-	exe::CWorkerThreadPool* pPool = rtl::GetSingleton <exe::CWorkerThreadPool> ();
-	return pPool->GetThread (ReserveEventCount);
+	exe::CWorkerThreadPool* pool = rtl::getSingleton <exe::CWorkerThreadPool> ();
+	return pool->getThread (reserveEventCount);
 }
 
 ref::CPtrT <CWorkerThread>
-GetWorkerThread (
-	mt::CEvent* pEvent,
-	exe::IFunction* pOnEvent,
+getWorkerThread (
+	mt::CEvent* event,
+	exe::IFunction* onEvent,
 	handle_t* phEvent
 	)
 {
-	exe::CWorkerThreadPool* pPool = rtl::GetSingleton <exe::CWorkerThreadPool> ();
-	ref::CPtrT <CWorkerThread> Thread = pPool->GetThread (1);
-	if (!Thread)
+	exe::CWorkerThreadPool* pool = rtl::getSingleton <exe::CWorkerThreadPool> ();
+	ref::CPtrT <CWorkerThread> thread = pool->getThread (1);
+	if (!thread)
 		return ref::EPtr_Null;
 
-	handle_t hEvent = Thread->AddEvent (pEvent, pOnEvent);
+	handle_t hEvent = thread->addEvent (event, onEvent);
 	if (!hEvent)
 		return ref::EPtr_Null;
 
 	*phEvent = hEvent;
-	return Thread;
+	return thread;
 }
 
 //.............................................................................

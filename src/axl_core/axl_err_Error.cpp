@@ -9,237 +9,237 @@ namespace err {
 //.............................................................................
 
 bool
-TError::IsKind (
-	const rtl::TGuid& Guid,
-	uint_t Code
+TError::isKind (
+	const rtl::TGuid& guid,
+	uint_t code
 	) const
 {
-	const TError* pError = this;
+	const TError* error = this;
 
-	if (m_Guid == rtl::GUID_Null && m_Code == EStdError_Stack)
-		pError++;
+	if (m_guid == rtl::GUID_Null && m_code == EStdError_Stack)
+		error++;
 
-	return pError->m_Guid == Guid && pError->m_Code == Code;
+	return error->m_guid == guid && error->m_code == code;
 }
 
 rtl::CString
-TError::GetDescription () const
+TError::getDescription () const
 {
-	CErrorProvider* pProvider = GetErrorMgr ()->FindProvider (m_Guid);
+	CErrorProvider* provider = getErrorMgr ()->findProvider (m_guid);
 
-	return pProvider ?
-		pProvider->GetErrorDescription (this) :
-		rtl::CString::Format_s ("%s::%d", m_Guid.GetGuidString ().cc (), m_Code); // thanks a lot gcc
+	return provider ?
+		provider->getErrorDescription (this) :
+		rtl::CString::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code); // thanks a lot gcc
 }
 
 //.............................................................................
 
 rtl::CString
-CError::GetDescription () const
+CError::getDescription () const
 {
 	return m_p ?
-		m_p->GetDescription () :
-		NoError.GetDescription ();
+		m_p->getDescription () :
+		noError.getDescription ();
 }
 
 TError*
-CError::Copy (const TError& Src)
+CError::copy (const TError& src)
 {
-	TError* pError = GetBuffer (Src.m_Size);
-	if (!pError)
+	TError* error = getBuffer (src.m_size);
+	if (!error)
 		return NULL;
 
-	memcpy (pError, &Src, Src.m_Size);
-	return pError;
+	memcpy (error, &src, src.m_size);
+	return error;
 }
 
 TError*
-CError::Push (const TError& Error)
+CError::push (const TError& error)
 {
 	if (!m_p)
-		return Copy (Error);
+		return copy (error);
 
-	size_t Base = 0;
-	size_t BaseSize = m_p->m_Size;
+	size_t base = 0;
+	size_t baseSize = m_p->m_size;
 
-	if (m_p->IsKind (GUID_StdError, EStdError_Stack))
+	if (m_p->isKind (GUID_StdError, EStdError_Stack))
 	{
-		Base += sizeof (TError);
-		BaseSize -= sizeof (TError);
+		base += sizeof (TError);
+		baseSize -= sizeof (TError);
 	}
 
-	size_t Size = sizeof (TError) + Error.m_Size + BaseSize;
+	size_t size = sizeof (TError) + error.m_size + baseSize;
 
-	GetBuffer (Size, true);
+	getBuffer (size, true);
 	if (!m_p)
 		return NULL;
 
 	memmove (
-		(uchar_t*) m_p + sizeof (TError) + Error.m_Size,
-		(uchar_t*) m_p + Base,
-		BaseSize
+		(uchar_t*) m_p + sizeof (TError) + error.m_size,
+		(uchar_t*) m_p + base,
+		baseSize
 		);
 
-	m_p->m_Size = (uint32_t) Size;
-	m_p->m_Guid = GUID_StdError;
-	m_p->m_Code = EStdError_Stack;
+	m_p->m_size = (uint32_t) size;
+	m_p->m_guid = GUID_StdError;
+	m_p->m_code = EStdError_Stack;
 
-	memcpy (m_p + 1, &Error, Error.m_Size);
+	memcpy (m_p + 1, &error, error.m_size);
 	return m_p;
 }
 
 TError*
-CError::CreateSimpleError (
-	const rtl::TGuid& Guid,
-	uint_t Code
+CError::createSimpleError (
+	const rtl::TGuid& guid,
+	uint_t code
 	)
 {
-	GetBuffer (sizeof (TError));
+	getBuffer (sizeof (TError));
 	if (!m_p)
 		return NULL;
 
-	m_p->m_Size = sizeof (TError);
-	m_p->m_Guid = Guid;
-	m_p->m_Code = Code;
+	m_p->m_size = sizeof (TError);
+	m_p->m_guid = guid;
+	m_p->m_code = code;
 
 	return m_p;
 }
 
 TError*
-CError::Format_va (
-	const rtl::TGuid& Guid,
-	uint_t Code,
-	const char* pFormat,
+CError::format_va (
+	const rtl::TGuid& guid,
+	uint_t code,
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	rtl::CPackerSeq Packer;
-	Packer.Format (pFormat);
+	rtl::CPackerSeq packer;
+	packer.format (formatString);
 
-	size_t PackSize;
-	Packer.Pack_va (NULL, &PackSize, va);
+	size_t packSize;
+	packer.pack_va (NULL, &packSize, va);
 
-	size_t Size = sizeof (TError) + PackSize;
+	size_t size = sizeof (TError) + packSize;
 
-	GetBuffer (Size);
+	getBuffer (size);
 	if (!m_p)
 		return NULL;
 
-	m_p->m_Size = (uint32_t) Size;
-	m_p->m_Guid = Guid;
-	m_p->m_Code = Code;
+	m_p->m_size = (uint32_t) size;
+	m_p->m_guid = guid;
+	m_p->m_code = code;
 
-	Packer.Pack_va (m_p + 1, &PackSize, va);
+	packer.pack_va (m_p + 1, &packSize, va);
 	return m_p;
 }
 
 TError*
-CError::CreateStringError (
+CError::createStringError (
 	const char* p,
-	size_t Length
+	size_t length
 	)
 {
-	if (Length == -1)
-		Length = strlen (p);
+	if (length == -1)
+		length = strlen (p);
 
-	size_t Size = sizeof (TError) + Length + 1;
+	size_t size = sizeof (TError) + length + 1;
 
-	TError* pError = GetBuffer (Size);
-	if (!pError)
+	TError* error = getBuffer (size);
+	if (!error)
 		return NULL;
 
-	pError->m_Size = (uint32_t) Size;
-	pError->m_Guid = GUID_StdError;
-	pError->m_Code = EStdError_String;
+	error->m_size = (uint32_t) size;
+	error->m_guid = GUID_StdError;
+	error->m_code = EStdError_String;
 
-	char* pDst = (char*) (pError + 1);
+	char* dst = (char*) (error + 1);
 
-	memcpy (pDst, p, Length);
-	pDst [Length] = 0;
+	memcpy (dst, p, length);
+	dst [length] = 0;
 
-	return pError;
+	return error;
 }
 
 TError*
-CError::FormatStringError_va (
-	const char* pFormat,
+CError::formatStringError_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	char Buffer [256];
-	rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	String.Format_va (pFormat, va);
-	return CreateStringError (String, String.GetLength ());
+	char buffer [256];
+	rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	string.format_va (formatString, va);
+	return createStringError (string, string.getLength ());
 }
 
 //.............................................................................
 
 EErrorMode
-SetErrorMode (EErrorMode Mode)
+setErrorMode (EErrorMode mode)
 {
-	return GetErrorMgr ()->SetErrorMode (Mode);
+	return getErrorMgr ()->setErrorMode (mode);
 }
 
 CError
-GetError ()
+getError ()
 {
-	return GetErrorMgr ()->GetError ();
+	return getErrorMgr ()->getError ();
 }
 
 CError
-SetError (const CError& Error)
+setError (const CError& error)
 {
-	GetErrorMgr ()->SetError (Error);
-	return Error;
+	getErrorMgr ()->setError (error);
+	return error;
 }
 
 //.............................................................................
 
 rtl::CString
-CStdErrorProvider::GetErrorDescription (const TError* pError)
+CStdErrorProvider::getErrorDescription (const TError* error)
 {
-	if (pError->m_Size < sizeof (TError))
+	if (error->m_size < sizeof (TError))
 		return rtl::CString ();
 
-	size_t Length;
+	size_t length;
 
-	switch (pError->m_Code)
+	switch (error->m_code)
 	{
 	case EStdError_NoError:
 		return "no error";
 
 	case EStdError_String:
-		Length = (pError->m_Size - sizeof (TError)) / sizeof (char);
-		return rtl::CString ((char*) (pError + 1), Length);
+		length = (error->m_size - sizeof (TError)) / sizeof (char);
+		return rtl::CString ((char*) (error + 1), length);
 
 	case EStdError_Stack:
-		return GetStackErrorDescription (pError);
+		return getStackErrorDescription (error);
 
 	default:
-		return rtl::CString::Format_s ("error #%d");
+		return rtl::CString::format_s ("error #%d");
 	}
 }
 
 rtl::CString
-CStdErrorProvider::GetStackErrorDescription (const TError* pError)
+CStdErrorProvider::getStackErrorDescription (const TError* error)
 {
-	rtl::CString String;
+	rtl::CString string;
 
-	void* pEnd = (uchar_t*) pError + (pError->m_Size);
-	const TError* p = pError + 1;
+	void* end = (uchar_t*) error + (error->m_size);
+	const TError* p = error + 1;
 
-	while (p < pEnd)
+	while (p < end)
 	{
-		ASSERT (p->m_Size >= sizeof (TError));
+		ASSERT (p->m_size >= sizeof (TError));
 
-		if (!String.IsEmpty ())
-			String += ": ";
+		if (!string.isEmpty ())
+			string += ": ";
 
-		String += p->GetDescription ();
-		p = (TError*) ((uchar_t*) p + p->m_Size);
+		string += p->getDescription ();
+		p = (TError*) ((uchar_t*) p + p->m_size);
 	}
 
-	return String;
+	return string;
 }
 
 //.............................................................................

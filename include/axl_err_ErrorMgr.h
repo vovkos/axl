@@ -22,68 +22,68 @@ class CErrorMgr
 protected:
 	struct TThreadEntry
 	{
-		EErrorMode m_Mode;
-		CError m_Error;
+		EErrorMode m_mode;
+		CError m_error;
 	};
 
 protected:
-	mt::CLock m_Lock;
+	mt::CLock m_lock;
 
-	size_t m_TlsSlot;
+	size_t m_tlsSlot;
 
 	rtl::CHashTableMapT <
 		rtl::TGuid, 
 		CErrorProvider*, 
 		rtl::CHashDjb2T <rtl::TGuid>,
 		rtl::CCmpBinT <rtl::TGuid>
-		> m_ProviderMap;
+		> m_providerMap;
 
 public:
 	CErrorMgr ();
 
 	void
-	RegisterProvider (
-		const rtl::TGuid& Guid,
-		CErrorProvider* pProvider
+	registerProvider (
+		const rtl::TGuid& guid,
+		CErrorProvider* provider
 		);
 
 	CErrorProvider* 
-	FindProvider (const rtl::TGuid& Guid);
+	findProvider (const rtl::TGuid& guid);
 
 	EErrorMode
-	GetErrorMode ()
+	getErrorMode ()
 	{
-		TThreadEntry* pEntry = FindThreadEntry ();
-		return pEntry ? pEntry->m_Mode : EErrorMode_NoThrow;
+		TThreadEntry* entry = findThreadEntry ();
+		return entry ? entry->m_mode : EErrorMode_NoThrow;
 	}
 
 	EErrorMode
-	SetErrorMode (EErrorMode Mode);
+	setErrorMode (EErrorMode mode);
 
 	CError
-	GetError ();
+	getError ();
 
 	void
-	SetError (const CError& Error);
+	setError (const CError& error);
 
 protected:
 	TThreadEntry*
-	FindThreadEntry ()
+	findThreadEntry ()
 	{
-		return (TThreadEntry*) (void*) mt::GetTlsMgr ()->GetSlotValue (m_TlsSlot);
+		return (TThreadEntry*) (void*) mt::getTlsMgr ()->getSlotValue (m_tlsSlot);
 	}
 
 	TThreadEntry*
-	GetThreadEntry ();
+	getThreadEntry ();
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 CErrorMgr* 
-GetErrorMgr ()
+getErrorMgr ()
 {
-	return rtl::GetSingleton <CErrorMgr> ();
+	return rtl::getSingleton <CErrorMgr> ();
 }
 
 //.............................................................................

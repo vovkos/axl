@@ -21,19 +21,19 @@ class CGdiImage:
 	friend class CGdiEngine;
 
 protected:
-	TSize m_Size;
+	TSize m_size;
 
 public:
 	CGdiImage ();
 
 	virtual
 	bool
-	GetData (
-		void* pData,
-		int Left,
-		int Top,
-		int Right,
-		int Bottom
+	getData (
+		void* data,
+		int left,
+		int top,
+		int right,
+		int bottom
 		);
 };
 

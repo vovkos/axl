@@ -31,62 +31,62 @@ protected:
 	typedef rtl::CBoxListEntryT <CToken> CTokenEntry;
 
 protected:
-	CTokenList m_TokenList;
-	CTokenList m_FreeTokenList;
-	size_t m_ChannelMask;
+	CTokenList m_tokenList;
+	CTokenList m_freeTokenList;
+	size_t m_channelMask;
 	
-	CPos m_LastTokenPos;
+	CPos m_lastTokenPos;
 
 public:
 	void
-	Reset ()
+	reset ()
 	{
-		m_FreeTokenList.InsertListTail (&m_TokenList);
-		m_ChannelMask = 1;
-		m_LastTokenPos.Clear ();
+		m_freeTokenList.insertListTail (&m_tokenList);
+		m_channelMask = 1;
+		m_lastTokenPos.clear ();
 
-		static_cast <T*> (this)->OnReset ();
+		static_cast <T*> (this)->onReset ();
 	}
 
 	size_t 
-	GetChannelMask ()
+	getChannelMask ()
 	{
-		return m_ChannelMask;
+		return m_channelMask;
 	}	
 
 	void
-	SetChannelMask (size_t Mask)
+	setChannelMask (size_t mask)
 	{
-		m_ChannelMask = Mask;
+		m_channelMask = mask;
 	}	
 
 	const CToken*
-	GetChannelToken (
-		size_t ChannelMask, 
-		size_t Index = 0
+	getChannelToken (
+		size_t channelMask, 
+		size_t index = 0
 		)
 	{
-		ChannelMask |= 1; // ensure channel 0 is ALWAYS in the mask
+		channelMask |= 1; // ensure channel 0 is ALWAYS in the mask
 
 		size_t i = 0;
-		rtl::CBoxIteratorT <CToken> It = m_TokenList.GetHead ();
+		rtl::CBoxIteratorT <CToken> it = m_tokenList.getHead ();
 
 		for (;;)
 		{
 			// check prefetched list first ...
 
-			for (; It; It++)
+			for (; it; it++)
 			{
-				if (It->m_Token <= 0)
-					return &*It;
+				if (it->m_token <= 0)
+					return &*it;
 				
-				bool IsMatch = (ChannelMask & ((size_t) 1 << It->m_Channel)) != 0;
-				if (IsMatch)
+				bool isMatch = (channelMask & ((size_t) 1 << it->m_channel)) != 0;
+				if (isMatch)
 				{
-					if (i >= Index)
+					if (i >= index)
 					{
-						m_LastTokenPos = It->m_Pos;
-						return &*It;
+						m_lastTokenPos = it->m_pos;
+						return &*it;
 					}
 
 					i++;
@@ -95,75 +95,75 @@ public:
 			
 			// ...nope, need to fetch more tokens
 
-			rtl::CBoxIteratorT <CToken> Tail = m_TokenList.GetTail ();
+			rtl::CBoxIteratorT <CToken> tail = m_tokenList.getTail ();
 
-			size_t OldCount = m_TokenList.GetCount ();
+			size_t oldCount = m_tokenList.getCount ();
 			do 
 			{			
-				((T*) (this))->Tokenize ();
-			} while (m_TokenList.GetCount () == OldCount);
+				((T*) (this))->tokenize ();
+			} while (m_tokenList.getCount () == oldCount);
 
-			It = Tail ? Tail + 1 : m_TokenList.GetHead ();
+			it = tail ? tail + 1 : m_tokenList.getHead ();
 		}
 	}
 
 	void 
-	NextChannelToken (
-		size_t ChannelMask,
-		size_t Count = 1
+	nextChannelToken (
+		size_t channelMask,
+		size_t count = 1
 		)
 	{
-		ChannelMask |= 1; // ensure channel 0 is ALWAYS in the mask
+		channelMask |= 1; // ensure channel 0 is ALWAYS in the mask
 
-		for (size_t i = 0; i < Count; i++)
+		for (size_t i = 0; i < count; i++)
 		{
-			while (!m_TokenList.IsEmpty ())
+			while (!m_tokenList.isEmpty ())
 			{
-				rtl::CBoxIteratorT <CToken> It = m_TokenList.GetHead ();
+				rtl::CBoxIteratorT <CToken> it = m_tokenList.getHead ();
 
-				if (It->m_Token <= 0) // done! but don't remove it!
+				if (it->m_token <= 0) // done! but don't remove it!
 					return;
 
-				bool IsMatch = (ChannelMask & ((size_t) 1 << It->m_Channel)) != 0;
+				bool isMatch = (channelMask & ((size_t) 1 << it->m_channel)) != 0;
 
-				CTokenEntry* pEntry = It.GetEntry ();
+				CTokenEntry* entry = it.getEntry ();
 				
-				m_TokenList.RemoveEntry (pEntry);
-				m_FreeTokenList.InsertHeadEntry (pEntry);
+				m_tokenList.removeEntry (entry);
+				m_freeTokenList.insertHeadEntry (entry);
 
-				if (IsMatch)
+				if (isMatch)
 					break;	
 			}
 		}
 	}
 
 	const CToken*
-	GetToken (size_t Index = 0)
+	getToken (size_t index = 0)
 	{
-		return GetChannelToken (m_ChannelMask, Index);
+		return getChannelToken (m_channelMask, index);
 	}
 
 	void
-	NextToken (size_t Count = 1)
+	nextToken (size_t count = 1)
 	{
-		return NextChannelToken (m_ChannelMask, Count);
+		return nextChannelToken (m_channelMask, count);
 	}
 
 protected:
 	void
-	OnReset ()
+	onReset ()
 	{
 	}
 
 	CToken*
-	AllocateToken ()
+	allocateToken ()
 	{
-		CTokenEntry* pEntry = !m_FreeTokenList.IsEmpty () ? 
-			m_FreeTokenList.RemoveHeadEntry () :
+		CTokenEntry* entry = !m_freeTokenList.isEmpty () ? 
+			m_freeTokenList.removeHeadEntry () :
 			AXL_MEM_NEW (CTokenEntry);
 
-		m_TokenList.InsertTailEntry (pEntry);
-		return &pEntry->m_Value;
+		m_tokenList.insertTailEntry (entry);
+		return &entry->m_value;
 	}
 };
 

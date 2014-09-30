@@ -20,28 +20,28 @@ public:
 	size_t
 	operator () (
 		const void* p,
-		size_t Size,
-		const T** ppValue
+		size_t size,
+		const T** value
 		)
 	{
-		size_t Length = CStringDetailsT <T>::CalcLength ((T*) p);
-		size_t StringSize = (Length + 1) * sizeof (T);
+		size_t length = CStringDetailsT <T>::calcLength ((T*) p);
+		size_t stringSize = (length + 1) * sizeof (T);
 
-		if (Size < StringSize)
+		if (size < stringSize)
 			return -1;
 
-		*ppValue = (T*) p;
-		return (Length + 1) * sizeof (T);
+		*value = (T*) p;
+		return (length + 1) * sizeof (T);
 	}
 
 	size_t
 	operator () (
 		const void* p,
-		size_t Size,
-		T** ppValue
+		size_t size,
+		T** value
 		)
 	{
-		return operator () (p, Size, (const T**) ppValue);
+		return operator () (p, size, (const T**) value);
 	}
 };
 
@@ -54,14 +54,14 @@ public:
 	size_t
 	operator () (
 		const void* p,
-		size_t Size,
-		T** ppValue
+		size_t size,
+		T** value
 		)
 	{
-		if (Size < sizeof (T))
+		if (size < sizeof (T))
 			return -1;
 
-		*ppValue = (T*) p;
+		*value = (T*) p;
 		return sizeof (T);
 	}
 };
@@ -83,14 +83,14 @@ public:
 	size_t
 	operator () (
 		const void* p,
-		size_t Size,
-		T* pValue
+		size_t size,
+		T* value
 		)
 	{
-		if (Size < sizeof (T))
+		if (size < sizeof (T))
 			return -1;
 
-		*pValue = *(T*) p;
+		*value = *(T*) p;
 		return sizeof (T);
 	}
 };
@@ -133,57 +133,57 @@ class CUnpackT <T*>: public CUnpackPtrT <T>
 class CUnpacker
 {
 protected:
-	const void* m_pBegin;
-	const void* m_pCurrent;
-	size_t m_Size;
+	const void* m_begin;
+	const void* m_current;
+	size_t m_size;
 
 public:
 	CUnpacker ()
 	{
-		Setup (NULL, 0);
+		setup (NULL, 0);
 	}
 
 	CUnpacker (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		Setup (p, Size);
+		setup (p, size);
 	}
 
 	void 
-	Setup (
+	setup (
 		const void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		m_pBegin = p;
-		m_pCurrent = p;
-		m_Size = Size;
+		m_begin = p;
+		m_current = p;
+		m_size = size;
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{
-		Setup (NULL, 0);
+		setup (NULL, 0);
 	}
 
 	void 
-	Rewind ()
+	rewind ()
 	{
-		m_pCurrent = m_pBegin;
+		m_current = m_begin;
 	}
 
 	size_t
-	GetLeftoverSize ()
+	getLeftoverSize ()
 	{
-		return m_Size - ((uchar_t*) m_pCurrent - (uchar_t*) m_pBegin);
+		return m_size - ((uchar_t*) m_current - (uchar_t*) m_begin);
 	}
 
 	bool
-	Unpack (
+	unpack (
 		void* p,
-		size_t Size
+		size_t size
 		);
 
 	template <
@@ -191,38 +191,38 @@ public:
 		typename TUnpack
 		>
 	bool
-	Unpack (T* pValue)
+	unpack (T* value)
 	{
-		size_t LeftoverSize = GetLeftoverSize ();
-		size_t Size = TUnpack () (m_pCurrent, LeftoverSize, pValue);
-		if (Size > LeftoverSize)
+		size_t leftoverSize = getLeftoverSize ();
+		size_t size = TUnpack () (m_current, leftoverSize, value);
+		if (size > leftoverSize)
 			return false;
 
-		m_pCurrent = (uchar_t*) m_pCurrent + Size;
+		m_current = (uchar_t*) m_current + size;
 		return true;
 	}
 
 	template <typename T>
 	bool
-	Unpack (T* pValue)
+	unpack (T* value)
 	{
-		return Unpack <T, CUnpackT <T> > (pValue);
+		return unpack <T, CUnpackT <T> > (value);
 	}
 
 	size_t
-	Scan_va (
-		const char* pFormat,
+	scan_va (
+		const char* formatString,
 		axl_va_list va
 		);
 
 	size_t
-	Scan (
-		const char* pFormat,
+	scan (
+		const char* formatString,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pFormat);
-		return Scan_va (pFormat, va);
+		AXL_VA_DECL (va, formatString);
+		return scan_va (formatString, va);
 	}
 };
 

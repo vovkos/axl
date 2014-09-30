@@ -24,22 +24,22 @@ class CMapping
 {
 protected:
 	void* m_p;
-	size_t m_Size;
+	size_t m_size;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::CMapping m_Mapping;
-	win::CMappedView m_View;
+	win::CMapping m_mapping;
+	win::CMappedView m_view;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::CMapping m_Mapping;
-	psx::CSharedMemory m_SharedMemory;
-	rtl::CString m_SharedMemoryName;
+	psx::CMapping m_mapping;
+	psx::CSharedMemory m_sharedMemory;
+	rtl::CString m_sharedMemoryName;
 #endif
 
 public:
 	CMapping ()
 	{
 		m_p = NULL;
-		m_Size = 0;
+		m_size = 0;
 	}
 
 	operator void* ()
@@ -48,7 +48,7 @@ public:
 	}
 
 	bool
-	IsOpen ()
+	isOpen ()
 	{
 		return m_p != NULL;
 	}
@@ -60,37 +60,37 @@ public:
 	}
 
 	size_t
-	GetSize ()
+	getSize ()
 	{
-		return m_Size;
+		return m_size;
 	}
 
 	void*
-	Open (
-		CFile* pFile,
-		uint64_t Offset,
-		size_t Size,
-		uint_t Flags = 0 // EFileFlag
+	open (
+		CFile* file,
+		uint64_t offset,
+		size_t size,
+		uint_t flags = 0 // EFileFlag
 		);
 
 	void*
-	Open (
-		CFile* pFile,
-		uint_t Flags = 0 // EFileFlag
+	open (
+		CFile* file,
+		uint_t flags = 0 // EFileFlag
 		)
 	{
-		return Open (pFile, 0, -1, Flags);
+		return open (file, 0, -1, flags);
 	}
 
 	void*
-	Open (
-		const char* pName,
-		size_t Size,
-		uint_t Flags = 0 // EFileFlag
+	open (
+		const char* name,
+		size_t size,
+		uint_t flags = 0 // EFileFlag
 		);
 
 	void
-	Close ();
+	close ();
 };
 
 //.............................................................................

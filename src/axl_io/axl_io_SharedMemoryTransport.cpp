@@ -10,399 +10,399 @@ namespace io {
 
 CSharedMemoryTransportBase::CSharedMemoryTransportBase ()
 {
-	m_Flags = 0;
-	m_pHdr = NULL;
-	m_pData = NULL;
-	m_MappingSize = 0;
-	m_PendingReqCount = 0;
+	m_flags = 0;
+	m_hdr = NULL;
+	m_data = NULL;
+	m_mappingSize = 0;
+	m_pendingReqCount = 0;
 }
 
 bool
-CSharedMemoryTransportBase::Open (
-	const char* pFileName,
-	const char* pReadEventName,
-	const char* pWriteEventName,
-	uint_t Flags
+CSharedMemoryTransportBase::open (
+	const char* fileName,
+	const char* readEventName,
+	const char* writeEventName,
+	uint_t flags
 	)
 {
-	Close ();
+	close ();
 
-	uint_t FileFlags = io::EFileFlag_ShareWrite;
-	if (Flags & ESharedMemoryTransportFlag_Create)
-		FileFlags |= io::EFileFlag_DeleteOnClose;
+	uint_t fileFlags = io::EFileFlag_ShareWrite;
+	if (flags & ESharedMemoryTransportFlag_Create)
+		fileFlags |= io::EFileFlag_DeleteOnClose;
 
-	bool Result = m_File.Open (pFileName, FileFlags);
-	if (!Result)
+	bool result = m_file.open (fileName, fileFlags);
+	if (!result)
 		return false;
 
-	Result = EnsureMappingSize (ESharedMemoryTransport_DefMappingSize);
-	if (!Result)
+	result = ensureMappingSize (ESharedMemoryTransport_DefMappingSize);
+	if (!result)
 	{
-		m_File.Close ();
+		m_file.close ();
 		return false;
 	}
 
-	if (Flags & ESharedMemoryTransportFlag_Create)
+	if (flags & ESharedMemoryTransportFlag_Create)
 	{
-		m_pHdr->m_Signature = ESharedMemoryTransport_FileSignature;
-		m_pHdr->m_Lock = 0;
-		m_pHdr->m_State = ESharedMemoryTransportState_MasterConnected;
-		m_pHdr->m_ReadOffset = 0;
-		m_pHdr->m_WriteOffset = 0;
-		m_pHdr->m_EndOffset = 0;
-		m_pHdr->m_DataSize = 0;
+		m_hdr->m_signature = ESharedMemoryTransport_FileSignature;
+		m_hdr->m_lock = 0;
+		m_hdr->m_state = ESharedMemoryTransportState_MasterConnected;
+		m_hdr->m_readOffset = 0;
+		m_hdr->m_writeOffset = 0;
+		m_hdr->m_endOffset = 0;
+		m_hdr->m_dataSize = 0;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-		Result =
-			m_ReadEvent.Create (NULL, false, false, rtl::CString_utf16 (pReadEventName)) &&
-			m_WriteEvent.Create (NULL, false, false, rtl::CString_utf16 (pWriteEventName));
+		result =
+			m_readEvent.create (NULL, false, false, rtl::CString_utf16 (readEventName)) &&
+			m_writeEvent.create (NULL, false, false, rtl::CString_utf16 (writeEventName));
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-		Result = m_ReadEvent.Open (pReadEventName, O_CREAT);
-		if (Result)
+		result = m_readEvent.open (readEventName, O_CREAT);
+		if (result)
 		{
-			m_ReadEventName = pReadEventName;
+			m_readEventName = readEventName;
 
-			Result = m_WriteEvent.Open (pWriteEventName, O_CREAT);
-			if (Result)
-				m_WriteEventName = pWriteEventName;
+			result = m_writeEvent.open (writeEventName, O_CREAT);
+			if (result)
+				m_writeEventName = writeEventName;
 		}
 #endif
 	}
 	else
 	{
-		if (m_pHdr->m_Signature != ESharedMemoryTransport_FileSignature)
+		if (m_hdr->m_signature != ESharedMemoryTransport_FileSignature)
 		{
-			err::SetError (err::EStatus_InvalidParameter);
+			err::setError (err::EStatus_InvalidParameter);
 			return false;
 		}
 
-		mt::AtomicLock (&m_pHdr->m_Lock);
+		mt::atomicLock (&m_hdr->m_lock);
 
-		if (m_pHdr->m_State != ESharedMemoryTransportState_MasterConnected ||
-			m_pHdr->m_ReadOffset != 0)
+		if (m_hdr->m_state != ESharedMemoryTransportState_MasterConnected ||
+			m_hdr->m_readOffset != 0)
 		{
-			err::SetError (err::EStatus_InvalidDeviceState);
+			err::setError (err::EStatus_InvalidDeviceState);
 			return false;
 		}
 
-		m_pHdr->m_State = ESharedMemoryTransportState_SlaveConnected;
+		m_hdr->m_state = ESharedMemoryTransportState_SlaveConnected;
 
-		mt::AtomicUnlock (&m_pHdr->m_Lock);
+		mt::atomicUnlock (&m_hdr->m_lock);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-		Result =
-			m_ReadEvent.Open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (pReadEventName)) &&
-			m_WriteEvent.Open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (pWriteEventName));
+		result =
+			m_readEvent.open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (readEventName)) &&
+			m_writeEvent.open (EVENT_ALL_ACCESS, false, rtl::CString_utf16 (writeEventName));
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-		Result =
-			m_ReadEvent.Open (pReadEventName, 0) &&
-			m_WriteEvent.Open (pWriteEventName, 0);
+		result =
+			m_readEvent.open (readEventName, 0) &&
+			m_writeEvent.open (writeEventName, 0);
 #endif
 	}
 
-	if (!Result)
+	if (!result)
 	{
-		Close ();
+		close ();
 		return false;
 	}
 
-	m_Flags = Flags;
+	m_flags = flags;
 	return true;
 }
 
 void
-CSharedMemoryTransportBase::Close ()
+CSharedMemoryTransportBase::close ()
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return;
 
-	Disconnect ();
+	disconnect ();
 
-	m_File.Close ();
-	m_ReadEvent.Close ();
-	m_WriteEvent.Close ();
-	m_pHdr = NULL;
-	m_pData = NULL;
-	m_MappingSize = 0;
-	m_PendingReqCount = 0;
+	m_file.close ();
+	m_readEvent.close ();
+	m_writeEvent.close ();
+	m_hdr = NULL;
+	m_data = NULL;
+	m_mappingSize = 0;
+	m_pendingReqCount = 0;
 
 #if (_AXL_ENV == AXL_ENV_POSIX)
-	if (!m_ReadEventName.IsEmpty ())
+	if (!m_readEventName.isEmpty ())
 	{
-		mt::psx::CSem::Unlink (m_ReadEventName);
-		m_ReadEventName.Clear ();
+		mt::psx::CSem::unlink (m_readEventName);
+		m_readEventName.clear ();
 	}
 
-	if (!m_WriteEventName.IsEmpty ())
+	if (!m_writeEventName.isEmpty ())
 	{
-		mt::psx::CSem::Unlink (m_WriteEventName);
-		m_WriteEventName.Clear ();
+		mt::psx::CSem::unlink (m_writeEventName);
+		m_writeEventName.clear ();
 	}
 #endif
 }
 
 void
-CSharedMemoryTransportBase::Disconnect ()
+CSharedMemoryTransportBase::disconnect ()
 {
-	mt::AtomicLock (&m_pHdr->m_Lock);
-	m_pHdr->m_State = ESharedMemoryTransportState_Disconnected;
+	mt::atomicLock (&m_hdr->m_lock);
+	m_hdr->m_state = ESharedMemoryTransportState_Disconnected;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	m_ReadEvent.Signal ();
-	m_WriteEvent.Signal ();
+	m_readEvent.signal ();
+	m_writeEvent.signal ();
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	m_ReadEvent.Post ();
-	m_WriteEvent.Post ();
+	m_readEvent.post ();
+	m_writeEvent.post ();
 #endif
 
-	mt::AtomicUnlock (&m_pHdr->m_Lock);
+	mt::atomicUnlock (&m_hdr->m_lock);
 }
 
 bool
-CSharedMemoryTransportBase::EnsureMappingSize (size_t Size)
+CSharedMemoryTransportBase::ensureMappingSize (size_t size)
 {
-	if (Size <= m_MappingSize)
+	if (size <= m_mappingSize)
 		return true;
 
-	void* p = m_File.View (0, Size);
+	void* p = m_file.view (0, size);
 	if (!p)
 		return false;
 
-	m_pHdr = (TSharedMemoryTransportHdr*) p;
-	m_pData = (char*) (m_pHdr + 1);
-	m_MappingSize = Size;
+	m_hdr = (TSharedMemoryTransportHdr*) p;
+	m_data = (char*) (m_hdr + 1);
+	m_mappingSize = size;
 	return true;
 }
 
 //.............................................................................
 
 rtl::CArrayT <char>
-CSharedMemoryReader::Read ()
+CSharedMemoryReader::read ()
 {
-	rtl::CArrayT <char> Buffer;
-	Read (&Buffer);
-	return Buffer;
+	rtl::CArrayT <char> buffer;
+	read (&buffer);
+	return buffer;
 }
 
 size_t
-CSharedMemoryReader::Read (rtl::CArrayT <char>* pBuffer)
+CSharedMemoryReader::read (rtl::CArrayT <char>* buffer)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	mt::AtomicLock (&m_pHdr->m_Lock);
+	mt::atomicLock (&m_hdr->m_lock);
 
 	// if buffer is empty, then wait until we have any data
 
 	while (
-		!m_pHdr->m_DataSize &&
-		m_pHdr->m_State != ESharedMemoryTransportState_Disconnected)
+		!m_hdr->m_dataSize &&
+		m_hdr->m_state != ESharedMemoryTransportState_Disconnected)
 	{
-		mt::AtomicUnlock (&m_pHdr->m_Lock);
-		m_WriteEvent.Wait ();
-		mt::AtomicLock (&m_pHdr->m_Lock);
+		mt::atomicUnlock (&m_hdr->m_lock);
+		m_writeEvent.wait ();
+		mt::atomicLock (&m_hdr->m_lock);
 	}
 
-	if (m_pHdr->m_State == ESharedMemoryTransportState_Disconnected)
+	if (m_hdr->m_state == ESharedMemoryTransportState_Disconnected)
 	{
-		mt::AtomicUnlock (&m_pHdr->m_Lock);
-		err::SetError (err::EStatus_InvalidDeviceState);
+		mt::atomicUnlock (&m_hdr->m_lock);
+		err::setError (err::EStatus_InvalidDeviceState);
 		return -1;
 	}
 
-	size_t ReadOffset = m_pHdr->m_ReadOffset;
-	size_t WriteOffset = m_pHdr->m_WriteOffset;
-	size_t EndOffset = m_pHdr->m_EndOffset;
-	mt::AtomicUnlock (&m_pHdr->m_Lock);
+	size_t readOffset = m_hdr->m_readOffset;
+	size_t writeOffset = m_hdr->m_writeOffset;
+	size_t endOffset = m_hdr->m_endOffset;
+	mt::atomicUnlock (&m_hdr->m_lock);
 
-	bool Result = EnsureOffsetMapped (EndOffset);
-	if (!Result)
+	bool result = ensureOffsetMapped (endOffset);
+	if (!result)
 		return -1;
 
-	size_t ReadSize = 0;
+	size_t readSize = 0;
 
-	if (m_Flags & ESharedMemoryTransportFlag_Message)
+	if (m_flags & ESharedMemoryTransportFlag_Message)
 	{
-		TSharedMemoryTransportMessageHdr* pMsgHdr = (TSharedMemoryTransportMessageHdr*) (m_pData + ReadOffset);
-		ReadSize = pMsgHdr->m_Size;
-		size_t ReadEndOffset = ReadOffset + sizeof (TSharedMemoryTransportMessageHdr) + pMsgHdr->m_Size;
+		TSharedMemoryTransportMessageHdr* msgHdr = (TSharedMemoryTransportMessageHdr*) (m_data + readOffset);
+		readSize = msgHdr->m_size;
+		size_t readEndOffset = readOffset + sizeof (TSharedMemoryTransportMessageHdr) + msgHdr->m_size;
 
-		if (pMsgHdr->m_Signature != ESharedMemoryTransport_MessageSignature || ReadEndOffset > EndOffset)
+		if (msgHdr->m_signature != ESharedMemoryTransport_MessageSignature || readEndOffset > endOffset)
 		{
-			err::SetError (err::EStatus_InvalidParameter);
+			err::setError (err::EStatus_InvalidParameter);
 			return -1;
 		}
 
-		pBuffer->Copy ((const char*) (pMsgHdr + 1), ReadSize);
+		buffer->copy ((const char*) (msgHdr + 1), readSize);
 
-		mt::AtomicLock (&m_pHdr->m_Lock);
-		ASSERT (ReadEndOffset <= m_pHdr->m_EndOffset);
+		mt::atomicLock (&m_hdr->m_lock);
+		ASSERT (readEndOffset <= m_hdr->m_endOffset);
 
-		m_pHdr->m_ReadOffset = m_pHdr->m_EndOffset != m_pHdr->m_WriteOffset && ReadEndOffset >= m_pHdr->m_EndOffset ?
-			0 : ReadEndOffset; // wrap : no wrap
+		m_hdr->m_readOffset = m_hdr->m_endOffset != m_hdr->m_writeOffset && readEndOffset >= m_hdr->m_endOffset ?
+			0 : readEndOffset; // wrap : no wrap
 	}
 	else
 	{
-		if (ReadOffset < WriteOffset)
+		if (readOffset < writeOffset)
 		{
-			ReadSize = WriteOffset - ReadOffset;
-			pBuffer->Copy (m_pData + ReadOffset, ReadSize);
+			readSize = writeOffset - readOffset;
+			buffer->copy (m_data + readOffset, readSize);
 		}
 		else
 		{
-			size_t Size1 = EndOffset - ReadOffset;
-			size_t Size2 = WriteOffset;
-			ReadSize = Size1 + Size2;
+			size_t size1 = endOffset - readOffset;
+			size_t size2 = writeOffset;
+			readSize = size1 + size2;
 
-			pBuffer->SetCount (ReadSize);
+			buffer->setCount (readSize);
 
-			if (Size1)
-				memcpy (*pBuffer, m_pData + ReadOffset, Size1);
+			if (size1)
+				memcpy (*buffer, m_data + readOffset, size1);
 
-			if (Size2)
-				memcpy (*pBuffer + Size1, m_pData + 1, Size2);
+			if (size2)
+				memcpy (*buffer + size1, m_data + 1, size2);
 		}
 
-		mt::AtomicLock (&m_pHdr->m_Lock);
-		m_pHdr->m_ReadOffset = WriteOffset;
+		mt::atomicLock (&m_hdr->m_lock);
+		m_hdr->m_readOffset = writeOffset;
 	}
 
-	m_pHdr->m_DataSize -= ReadSize;
-	mt::AtomicUnlock (&m_pHdr->m_Lock);
+	m_hdr->m_dataSize -= readSize;
+	mt::atomicUnlock (&m_hdr->m_lock);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	m_ReadEvent.Signal ();
+	m_readEvent.signal ();
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	m_ReadEvent.Post ();
+	m_readEvent.post ();
 #endif
 
-	return ReadSize;
+	return readSize;
 }
 
 //.............................................................................
 
 bool
-CSharedMemoryWriter::Open (
-	const char* pFileName,
-	const char* pReadEventName,
-	const char* pWriteEventName,
-	uint_t Flags,
-	size_t SizeLimitHint
+CSharedMemoryWriter::open (
+	const char* fileName,
+	const char* readEventName,
+	const char* writeEventName,
+	uint_t flags,
+	size_t sizeLimitHint
 	)
 {
-	Close ();
-	m_SizeLimitHint = SizeLimitHint;
-	return CSharedMemoryTransportBase::Open (pFileName, pReadEventName, pWriteEventName, Flags);
+	close ();
+	m_sizeLimitHint = sizeLimitHint;
+	return CSharedMemoryTransportBase::open (fileName, readEventName, writeEventName, flags);
 }
 
 size_t
-CSharedMemoryWriter::Write (
-	const void* const* pBlockArray,
-	const size_t* pSizeArray,
-	size_t Count
+CSharedMemoryWriter::write (
+	const void* const* blockArray,
+	const size_t* sizeArray,
+	size_t count
 	)
 {
-	ASSERT (IsOpen ());
+	ASSERT (isOpen ());
 
-	size_t ChainSize = 0;
+	size_t chainSize = 0;
 
-	for (size_t i = 0; i < Count; i++)
-		ChainSize += pSizeArray [i];
+	for (size_t i = 0; i < count; i++)
+		chainSize += sizeArray [i];
 
-	if (!ChainSize)
+	if (!chainSize)
 		return 0;
 
-	size_t WriteSize = ChainSize;
+	size_t writeSize = chainSize;
 
-	if (m_Flags & ESharedMemoryTransportFlag_Message)
-		WriteSize += sizeof (TSharedMemoryTransportMessageHdr);
+	if (m_flags & ESharedMemoryTransportFlag_Message)
+		writeSize += sizeof (TSharedMemoryTransportMessageHdr);
 
-	mt::CScopeLock ScopeLock (&m_WriteLock); // ensure atomic write
+	mt::CScopeLock scopeLock (&m_writeLock); // ensure atomic write
 
-	mt::AtomicLock (&m_pHdr->m_Lock);
+	mt::atomicLock (&m_hdr->m_lock);
 
 	// if buffer is wrapped, then wait until we have enough space
 
 	while (
-		m_pHdr->m_WriteOffset <= m_pHdr->m_ReadOffset && m_pHdr->m_DataSize && // wrapped
-		m_pHdr->m_WriteOffset + WriteSize > m_pHdr->m_ReadOffset &&
-		m_pHdr->m_State != ESharedMemoryTransportState_Disconnected
+		m_hdr->m_writeOffset <= m_hdr->m_readOffset && m_hdr->m_dataSize && // wrapped
+		m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset &&
+		m_hdr->m_state != ESharedMemoryTransportState_Disconnected
 		)
 	{
-		mt::AtomicUnlock (&m_pHdr->m_Lock);
-		m_ReadEvent.Wait ();
-		mt::AtomicLock (&m_pHdr->m_Lock);
+		mt::atomicUnlock (&m_hdr->m_lock);
+		m_readEvent.wait ();
+		mt::atomicLock (&m_hdr->m_lock);
 	}
 
-	if (m_pHdr->m_State == ESharedMemoryTransportState_Disconnected)
+	if (m_hdr->m_state == ESharedMemoryTransportState_Disconnected)
 	{
-		mt::AtomicUnlock (&m_pHdr->m_Lock);
-		err::SetError (err::EStatus_InvalidDeviceState);
+		mt::atomicUnlock (&m_hdr->m_lock);
+		err::setError (err::EStatus_InvalidDeviceState);
 		return -1;
 	}
 
-	size_t ReadOffset = m_pHdr->m_ReadOffset;
-	size_t WriteOffset = m_pHdr->m_WriteOffset;
-	size_t DataSize = m_pHdr->m_DataSize;
+	size_t readOffset = m_hdr->m_readOffset;
+	size_t writeOffset = m_hdr->m_writeOffset;
+	size_t dataSize = m_hdr->m_dataSize;
 
-	mt::AtomicUnlock (&m_pHdr->m_Lock);
+	mt::atomicUnlock (&m_hdr->m_lock);
 
-	size_t WriteEndOffset = WriteOffset + WriteSize;
+	size_t writeEndOffset = writeOffset + writeSize;
 
-	EnsureOffsetMapped (WriteEndOffset);
+	ensureOffsetMapped (writeEndOffset);
 
-	if (m_Flags & ESharedMemoryTransportFlag_Message)
+	if (m_flags & ESharedMemoryTransportFlag_Message)
 	{
-		TSharedMemoryTransportMessageHdr* pMsgHdr = (TSharedMemoryTransportMessageHdr*) (m_pData + WriteOffset);
-		pMsgHdr->m_Signature = ESharedMemoryTransport_MessageSignature;
-		pMsgHdr->m_Size = ChainSize;
-		CopyWriteChain (pMsgHdr + 1, pBlockArray, pSizeArray, Count);
+		TSharedMemoryTransportMessageHdr* msgHdr = (TSharedMemoryTransportMessageHdr*) (m_data + writeOffset);
+		msgHdr->m_signature = ESharedMemoryTransport_MessageSignature;
+		msgHdr->m_size = chainSize;
+		copyWriteChain (msgHdr + 1, blockArray, sizeArray, count);
 	}
 	else
 	{
-		CopyWriteChain (m_pData + WriteOffset, pBlockArray, pSizeArray, Count);
+		copyWriteChain (m_data + writeOffset, blockArray, sizeArray, count);
 	}
 
-	mt::AtomicLock (&m_pHdr->m_Lock);
+	mt::atomicLock (&m_hdr->m_lock);
 
-	if (m_pHdr->m_WriteOffset <= m_pHdr->m_ReadOffset && m_pHdr->m_DataSize) // wrapped
+	if (m_hdr->m_writeOffset <= m_hdr->m_readOffset && m_hdr->m_dataSize) // wrapped
 	{
-		m_pHdr->m_WriteOffset = WriteEndOffset;
+		m_hdr->m_writeOffset = writeEndOffset;
 	}
 	else
 	{
-		m_pHdr->m_WriteOffset = m_pHdr->m_DataSize > m_SizeLimitHint ? 0 : WriteEndOffset;
-		m_pHdr->m_EndOffset = WriteEndOffset;
+		m_hdr->m_writeOffset = m_hdr->m_dataSize > m_sizeLimitHint ? 0 : writeEndOffset;
+		m_hdr->m_endOffset = writeEndOffset;
 	}
 
-	m_pHdr->m_DataSize += ChainSize;
-	mt::AtomicUnlock (&m_pHdr->m_Lock);
+	m_hdr->m_dataSize += chainSize;
+	mt::atomicUnlock (&m_hdr->m_lock);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	m_WriteEvent.Signal ();
+	m_writeEvent.signal ();
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	m_WriteEvent.Post ();
+	m_writeEvent.post ();
 #endif
 
-	return ChainSize;
+	return chainSize;
 }
 
 void
-CSharedMemoryWriter::CopyWriteChain (
+CSharedMemoryWriter::copyWriteChain (
 	void* _pDst,
-	const void* const* pBlockArray,
-	const size_t* pSizeArray,
-	size_t Count
+	const void* const* blockArray,
+	const size_t* sizeArray,
+	size_t count
 	)
 {
-	char* pDst = (char*) _pDst;
+	char* dst = (char*) _pDst;
 
-	for (size_t i = 0; i < Count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
-		const void* pSrc = pBlockArray [i];
-		size_t Size = pSizeArray [i];
+		const void* src = blockArray [i];
+		size_t size = sizeArray [i];
 
-		memcpy (pDst, pSrc, Size);
-		pDst += Size;
+		memcpy (dst, src, size);
+		dst += size;
 	}
 }
 

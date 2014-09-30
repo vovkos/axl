@@ -8,91 +8,91 @@ namespace mt {
 //.............................................................................
 
 bool
-CTimer::SetTimer (	
-	ulong_t Timeout,
-	exe::IFunction* pOnTimer,
-	int Flags
+CTimer::setTimer (	
+	ulong_t timeout,
+	exe::IFunction* onTimer,
+	int flags
 	)
 {
-	if (!m_WorkerThread)
+	if (!m_workerThread)
 	{
-		m_WorkerThread = exe::GetWorkerThread ();
-		if (!m_WorkerThread)
+		m_workerThread = exe::getWorkerThread ();
+		if (!m_workerThread)
 			return false;
 	}
 
-	return m_WorkerThread->SyncSchedule <exe::CArgSeqT_4 <
+	return m_workerThread->syncSchedule <exe::CArgSeqT_4 <
 		CTimer*, 
 		ulong_t, 
 		exe::IFunction*, 
 		int > > (
 
-		pvoid_cast (&CTimer::SetTimer_wt),
+		pvoid_cast (&CTimer::setTimer_wt),
 		this, 
-		Timeout, 
-		pOnTimer,
-		Flags
+		timeout, 
+		onTimer,
+		flags
 		) != 0;
 }
 
 void
-CTimer::Cancel ()
+CTimer::cancel ()
 {
-	if (m_WorkerThread)
-		m_WorkerThread->SyncSchedule <exe::CArgT <CTimer*> > (
-		pvoid_cast (&CTimer::Cancel_wt),
+	if (m_workerThread)
+		m_workerThread->syncSchedule <exe::CArgT <CTimer*> > (
+		pvoid_cast (&CTimer::cancel_wt),
 		this
 		);
 }
 
 bool 
-CTimer::SetTimer_wt (	
-	ulong_t Timeout,
-	exe::IFunction* pOnTimer,
-	int Flags
+CTimer::setTimer_wt (	
+	ulong_t timeout,
+	exe::IFunction* onTimer,
+	int flags
 	)
 {
-	bool Result;
+	bool result;
 
-	if (!m_Timer.IsOpen ())
+	if (!m_timer.isOpen ())
 	{
-		Result = m_Timer.Create (NULL, (Flags & ETimer_ManualReset) != 0, NULL);
-		if (!Result)
+		result = m_timer.create (NULL, (flags & ETimer_ManualReset) != 0, NULL);
+		if (!result)
 			return false;
 	}
 
-	uint64_t DueTime = Int32x32To64(Timeout, -10000);
-	ulong_t Period = (Flags & ETimer_Periodic) ? Timeout : 0;
+	uint64_t dueTime = int32x32To64(timeout, -10000);
+	ulong_t period = (flags & ETimer_Periodic) ? timeout : 0;
 
-	Result = m_Timer.SetTimer (DueTime, Period, TimerProc, this);
-	if (!Result)
+	result = m_timer.setTimer (dueTime, period, timerProc, this);
+	if (!result)
 		return false;
 
-	m_OnTimer = ref::GetPtrOrClone (pOnTimer);
+	m_onTimer = ref::getPtrOrClone (onTimer);
 	return true;
 }
 
 void
-CTimer::Cancel_wt ()
+CTimer::cancel_wt ()
 {
-	if (m_Timer.IsOpen ())
-		m_Timer.Cancel ();
+	if (m_timer.isOpen ())
+		m_timer.cancel ();
 
-	m_OnTimer = ref::EPtr_Null;
+	m_onTimer = ref::EPtr_Null;
 }
 
 VOID 
 CALLBACK
-CTimer::TimerProc (
-	LPVOID pContext,
-	DWORD TimerLo,
-	DWORD TimerHi
+CTimer::timerProc (
+	LPVOID context,
+	DWORD timerLo,
+	DWORD timerHi
 	)
 {
-	CTimer* pThis = (CTimer*) pContext;
+	CTimer* this = (CTimer*) context;
 	
-	if (pThis->m_OnTimer)
-		pThis->m_OnTimer->Invoke (0);
+	if (this->m_onTimer)
+		this->m_onTimer->invoke (0);
 }
 
 //.............................................................................

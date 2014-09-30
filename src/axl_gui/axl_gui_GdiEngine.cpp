@@ -16,24 +16,24 @@ CGdiEngine::~CGdiEngine ()
 }
 
 ref::CPtrT <CFont>
-CGdiEngine::CreateStdFont (EStdFont FontKind)
+CGdiEngine::createStdFont (EStdFont fontKind)
 {
-	LOGFONTW LogFont;
+	LOGFONTW logFont;
 	HFONT hFont;
 
-	switch (FontKind)
+	switch (fontKind)
 	{
 	case EStdFont_Gui:
-		return CreateStockFont (DEFAULT_GUI_FONT);
+		return createStockFont (DEFAULT_GUI_FONT);
 
 	case EStdFont_Monospace:
-		BuildLogFont (&LogFont, L"Courier New", 10);
-		LogFont.lfPitchAndFamily = FIXED_PITCH;
+		buildLogFont (&logFont, L"Courier New", 10);
+		logFont.lfPitchAndFamily = FIXED_PITCH;
 
-		hFont = ::CreateFontIndirectW (&LogFont);
+		hFont = ::CreateFontIndirectW (&logFont);
 		ASSERT (hFont);
 		
-		return CreateFont (hFont);
+		return createFont (hFont);
 
 	default:
 		return ref::EPtr_Null;
@@ -41,102 +41,102 @@ CGdiEngine::CreateStdFont (EStdFont FontKind)
 }
 
 ref::CPtrT <CFont>
-CGdiEngine::CreateFont (
-	const char* pFaceName,
-	size_t PointSize,
-	uint_t Flags
+CGdiEngine::createFont (
+	const char* faceName,
+	size_t pointSize,
+	uint_t flags
 	)
 {
-	LOGFONTW LogFont;
-	BuildLogFont (&LogFont, rtl::CString_w (pFaceName), PointSize, Flags);
+	LOGFONTW logFont;
+	buildLogFont (&logFont, rtl::CString_w (faceName), pointSize, flags);
 
-	HFONT hFont = ::CreateFontIndirect (&LogFont);
+	HFONT hFont = ::CreateFontIndirect (&logFont);
 	if (!hFont)
-		return err::FailWithLastSystemError (ref::EPtr_Null);
+		return err::failWithLastSystemError (ref::EPtr_Null);
 
-	return CreateFont (hFont);
+	return createFont (hFont);
 }
 
 ref::CPtrT <CFont>
-CGdiEngine::CreateStockFont (int StockFontKind)
+CGdiEngine::createStockFont (int stockFontKind)
 {
-	HGDIOBJ h = ::GetStockObject (StockFontKind);
-	dword_t GdiObjectType = ::GetObjectType (h);
-	if (GdiObjectType != OBJ_FONT)
+	HGDIOBJ h = ::GetStockObject (stockFontKind);
+	dword_t gdiObjectType = ::GetObjectType (h);
+	if (gdiObjectType != OBJ_FONT)
 	{
-		err::SetError (err::EStatus_InvalidHandle);
+		err::setError (err::EStatus_InvalidHandle);
 		return ref::EPtr_Null;
 	}
 
-	return CreateFont ((HFONT) h);
+	return createFont ((HFONT) h);
 }
 
 ref::CPtrT <CFont>
-CGdiEngine::CreateFont (HFONT hFont)
+CGdiEngine::createFont (HFONT hFont)
 {
-	CGdiFont* pFont = AXL_MEM_NEW (CGdiFont);
+	CGdiFont* font = AXL_MEM_NEW (CGdiFont);
 
-	LOGFONTW LogFont;
-	::GetObjectW (hFont, sizeof (LogFont), &LogFont);
-	GetFontDescFromLogFont (&LogFont, &pFont->m_FontDesc);
+	LOGFONTW logFont;
+	::GetObjectW (hFont, sizeof (logFont), &logFont);
+	getFontDescFromLogFont (&logFont, &font->m_fontDesc);
 
-	ref::CPtrT <CGdiFontTuple> FontTuple = AXL_REF_NEW (CGdiFontTuple);
-	FontTuple->m_pBaseFont = pFont;
-	FontTuple->m_FontModArray [pFont->m_FontDesc.m_Flags] = pFont;
+	ref::CPtrT <CGdiFontTuple> fontTuple = AXL_REF_NEW (CGdiFontTuple);
+	fontTuple->m_baseFont = font;
+	fontTuple->m_fontModArray [font->m_fontDesc.m_flags] = font;
 
-	pFont->m_h = hFont;
-	pFont->m_pTuple = FontTuple;
+	font->m_h = hFont;
+	font->m_tuple = fontTuple;
 
-	return ref::CPtrT <CFont> (pFont, FontTuple);
+	return ref::CPtrT <CFont> (font, fontTuple);
 }
 
 CFont*
-CGdiEngine::GetFontMod (
+CGdiEngine::getFontMod (
 	CFont* _pBaseFont,
-	uint_t Flags
+	uint_t flags
 	)
 {
-	ASSERT (_pBaseFont->GetEngine () == this);
+	ASSERT (_pBaseFont->getEngine () == this);
 
-	CGdiFont* pBaseFont = (CGdiFont*) _pBaseFont;
-	CGdiFontTuple* pFontTuple = (CGdiFontTuple*) pBaseFont->m_pTuple;
+	CGdiFont* baseFont = (CGdiFont*) _pBaseFont;
+	CGdiFontTuple* fontTuple = (CGdiFontTuple*) baseFont->m_tuple;
 
-	LOGFONTW LogFont;
-	GetLogFontFromFontDesc (*pFontTuple->m_pBaseFont->GetFontDesc (), &LogFont);
-	ModifyLogFont (&LogFont, Flags);
+	LOGFONTW logFont;
+	getLogFontFromFontDesc (*fontTuple->m_baseFont->getFontDesc (), &logFont);
+	modifyLogFont (&logFont, flags);
 
-	HFONT hFont = ::CreateFontIndirect (&LogFont);
+	HFONT hFont = ::CreateFontIndirect (&logFont);
 	if (!hFont)
-		return err::FailWithLastSystemError ((CFont*) NULL);
+		return err::failWithLastSystemError ((CFont*) NULL);
 
-	CGdiFont* pFont = AXL_MEM_NEW (CGdiFont);
-	pFont->m_FontDesc = pBaseFont->m_FontDesc;
-	pFont->m_FontDesc.m_Flags = Flags;
-	pFont->m_h = hFont;
+	CGdiFont* font = AXL_MEM_NEW (CGdiFont);
+	font->m_fontDesc = baseFont->m_fontDesc;
+	font->m_fontDesc.m_flags = flags;
+	font->m_h = hFont;
 
-	ASSERT (!(Flags & EFontFlag_Transparent) && Flags < countof (pFontTuple->m_FontModArray));
-	ASSERT (!pFontTuple->m_FontModArray [Flags]);
+	ASSERT (!(flags & EFontFlag_Transparent) && flags < countof (fontTuple->m_fontModArray));
+	ASSERT (!fontTuple->m_fontModArray [flags]);
 
-	pFontTuple->m_FontModArray [Flags] = pFont;
-	return pFont;
+	fontTuple->m_fontModArray [flags] = font;
+	return font;
 }
 
 ref::CPtrT <CCursor>
-CGdiEngine::CreateStockCursor (LPCTSTR pStockCursorRes)
+CGdiEngine::createStockCursor (LPCTSTR stockCursorRes)
 {
-	HCURSOR h = ::LoadCursor (NULL, pStockCursorRes);
+	HCURSOR h = ::LoadCursor (NULL, stockCursorRes);
 	if (!h)
-		return err::FailWithLastSystemError (ref::EPtr_Null);
+		return err::failWithLastSystemError (ref::EPtr_Null);
 
-	ref::CPtrT <CGdiCursor> Cursor = AXL_REF_NEW (ref::CBoxT <CGdiCursor>);
-	Cursor->m_h = h;
-	return Cursor;
+	ref::CPtrT <CGdiCursor> cursor = AXL_REF_NEW (ref::CBoxT <CGdiCursor>);
+	cursor->m_h = h;
+	return cursor;
 }
 
 ref::CPtrT <CCursor>
-CGdiEngine::CreateStdCursor (EStdCursor CursorKind)
+CGdiEngine::createStdCursor (EStdCursor cursorKind)
 {
-	static LPCTSTR StockCursorResTable [EStdCursor__Count] =
+	static LPCTSTR stockCursorResTable [EStdCursor__Count] =
 	{
 		IDC_ARROW,    // EStdCursor_Arrow = 0,
 		IDC_WAIT,     // EStdCursor_Wait,
@@ -149,130 +149,130 @@ CGdiEngine::CreateStdCursor (EStdCursor CursorKind)
 		IDC_SIZEALL,  // EStdCursor_SizeAll,
 	};
 
-	ASSERT (CursorKind < EStdCursor__Count);
-	return CreateStockCursor (StockCursorResTable [CursorKind]);
+	ASSERT (cursorKind < EStdCursor__Count);
+	return createStockCursor (stockCursorResTable [cursorKind]);
 }
 
 ref::CPtrT <CImage>
-CGdiEngine::CreateImage ()
+CGdiEngine::createImage ()
 {
-	ref::CPtrT <CGdiImage> Image = AXL_REF_NEW (ref::CBoxT <CGdiImage>);
-	return Image;
+	ref::CPtrT <CGdiImage> image = AXL_REF_NEW (ref::CBoxT <CGdiImage>);
+	return image;
 }
 
 ref::CPtrT <CImage>
-CGdiEngine::CreateImage (
-	int Width,
-	int Height,
-	EPixelFormat PixelFormat,
-	const void* pData,
-	bool IsScreenCompatible
+CGdiEngine::createImage (
+	int width,
+	int height,
+	EPixelFormat pixelFormat,
+	const void* data,
+	bool isScreenCompatible
 	)
 {
-	uint_t BitCount;
+	uint_t bitCount;
 
-	switch (PixelFormat)
+	switch (pixelFormat)
 	{
 	case EPixelFormat_Rgba:
-		BitCount = 32;
+		bitCount = 32;
 		break;
 
 	case EPixelFormat_Rgb:
-		BitCount = 24;
+		bitCount = 24;
 		break;
 
 	default:
-		err::SetFormatStringError ("unsupported pixel format '%s'", GetPixelFormatString (PixelFormat));
+		err::setFormatStringError ("unsupported pixel format '%s'", getPixelFormatString (pixelFormat));
 	};
 
 	HBITMAP hBitmap;
 
-	if (!IsScreenCompatible)
+	if (!isScreenCompatible)
 	{
 		hBitmap = ::CreateBitmap (
-			Width,
-			Height,
+			width,
+			height,
 			1,
-			BitCount,
-			pData
+			bitCount,
+			data
 			);
 
 		if (!hBitmap)
-			return err::FailWithLastSystemError (ref::EPtr_Null);
+			return err::failWithLastSystemError (ref::EPtr_Null);
 	}
 	else
 	{
-		BITMAPINFO BitmapInfo = { 0 };
-		BitmapInfo.bmiHeader.biSize = sizeof (BitmapInfo.bmiHeader);
-		BitmapInfo.bmiHeader.biPlanes = 1;
-		BitmapInfo.bmiHeader.biBitCount = BitCount;
-		BitmapInfo.bmiHeader.biCompression = BI_RGB;
-		BitmapInfo.bmiHeader.biWidth = Width;
-		BitmapInfo.bmiHeader.biHeight = Height;
+		BITMAPINFO bitmapInfo = { 0 };
+		bitmapInfo.bmiHeader.biSize = sizeof (bitmapInfo.bmiHeader);
+		bitmapInfo.bmiHeader.biPlanes = 1;
+		bitmapInfo.bmiHeader.biBitCount = bitCount;
+		bitmapInfo.bmiHeader.biCompression = BI_RGB;
+		bitmapInfo.bmiHeader.biWidth = width;
+		bitmapInfo.bmiHeader.biHeight = height;
 
-		CScreenDc ScreenDc;
+		CScreenDc screenDc;
 
 		hBitmap = ::CreateCompatibleBitmap (
-			ScreenDc,
-			Width,
-			Height
+			screenDc,
+			width,
+			height
 			);
 
 		if (!hBitmap)
-			return err::FailWithLastSystemError (ref::EPtr_Null);
+			return err::failWithLastSystemError (ref::EPtr_Null);
 
-		bool_t Result = SetDIBits (
-			ScreenDc,
+		bool_t result = ::SetDIBits (
+			screenDc,
 			hBitmap,
 			0,
-			Height,
-			pData,
-			&BitmapInfo,
+			height,
+			data,
+			&bitmapInfo,
 			DIB_RGB_COLORS
 			);
 
-		if (!Result)
-			return err::FailWithLastSystemError (ref::EPtr_Null);
+		if (!result)
+			return err::failWithLastSystemError (ref::EPtr_Null);
 	}
 
-	ref::CPtrT <CGdiImage> Image = AXL_REF_NEW (ref::CBoxT <CGdiImage>);
-	Image->m_h = hBitmap;
-	return Image;
+	ref::CPtrT <CGdiImage> image = AXL_REF_NEW (ref::CBoxT <CGdiImage>);
+	image->m_h = hBitmap;
+	return image;
 }
 
 ref::CPtrT <CCanvas>
-CGdiEngine::CreateOffscreenCanvas (
-	int Width,
-	int Height
+CGdiEngine::createOffscreenCanvas (
+	int width,
+	int height
 	)
 {
-	CScreenDc ScreenDc;
-	HBITMAP hBitmap = ::CreateCompatibleBitmap (ScreenDc, Width, Height);
+	CScreenDc screenDc;
+	HBITMAP hBitmap = ::CreateCompatibleBitmap (screenDc, width, height);
 	if (!hBitmap)
-		return err::FailWithLastSystemError (ref::EPtr_Null);
+		return err::failWithLastSystemError (ref::EPtr_Null);
 
-	HDC hdc = ::CreateCompatibleDC (ScreenDc);
+	HDC hdc = ::CreateCompatibleDC (screenDc);
 
-	ref::CPtrT <CGdiCanvas> Dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);
-	Dc->Attach (hdc, NULL, CGdiCanvas::EDestruct_DeleteDc);
-	Dc->m_hBitmap = hBitmap;
-	Dc->m_hPrevBitmap = (HBITMAP) ::SelectObject (hdc, hBitmap);
+	ref::CPtrT <CGdiCanvas> dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);
+	dc->attach (hdc, NULL, CGdiCanvas::EDestruct_DeleteDc);
+	dc->m_hBitmap = hBitmap;
+	dc->m_hPrevBitmap = (HBITMAP) ::SelectObject (hdc, hBitmap);
 
-	return Dc;
+	return dc;
 }
 
 uintptr_t 
-CGdiEngine::RegisterClipboardFormat (const rtl::CString& FormatName)
+CGdiEngine::registerClipboardFormat (const rtl::CString& formatName)
 {
-	err::SetError (err::EStatus_NotImplemented);
+	err::setError (err::EStatus_NotImplemented);
 	return -1;
 }
 
 bool
-CGdiEngine::ReadClipboard (rtl::CString* pString)
+CGdiEngine::readClipboard (rtl::CString* string)
 {
-	bool Result = OpenClipboard ();
-	if (!Result)
+	bool result = openClipboard ();
+	if (!result)
 		return false;
 
 	HANDLE hData = ::GetClipboardData (CF_TEXT);
@@ -280,55 +280,55 @@ CGdiEngine::ReadClipboard (rtl::CString* pString)
 	{
 		::CloseClipboard();
 
-		err::SetError (err::EStatus_InvalidDeviceRequest);
+		err::setError (err::EStatus_InvalidDeviceRequest);
 		return false;
 	}
 
-	pString->Clear ();
+	string->clear ();
 
-	size_t Size = GlobalSize (hData);
-	if (!Size)
+	size_t size = ::GlobalSize (hData);
+	if (!size)
 	{
 		::CloseClipboard();
 		return true;
 	}
 
-	void* pData = GlobalLock (hData);
-	ASSERT (pData);
+	void* data = ::GlobalLock (hData);
+	ASSERT (data);
 
-	pString->Copy ((char*) pData);
+	string->copy ((char*) data);
 
-	GlobalUnlock(pData);
+	::GlobalUnlock(data);
 
 	::CloseClipboard ();
 	return true;
 }
 
 bool
-CGdiEngine::ReadClipboard (
-	uintptr_t Format,
-	rtl::CArrayT <char>* pData
+CGdiEngine::readClipboard (
+	uintptr_t format,
+	rtl::CArrayT <char>* data
 	)
 {
-	err::SetError (err::EStatus_NotImplemented);
+	err::setError (err::EStatus_NotImplemented);
 	return false;
 }
 
 bool
-CGdiEngine::WriteClipboard (
-	const char* pString,
-	size_t Length
+CGdiEngine::writeClipboard (
+	const char* string,
+	size_t length
 	)
 {
-	bool Result = OpenClipboard ();
-	if (!Result)
+	bool result = openClipboard ();
+	if (!result)
 		return false;
 
-	HGLOBAL hData = GlobalAlloc (GMEM_MOVEABLE | GMEM_ZEROINIT, Length + 1);
-	void* p = GlobalLock (hData);
-	memcpy (p, pString, Length);
-	((char*) p) [Length] = 0;
-	GlobalUnlock (hData);
+	HGLOBAL hData = ::GlobalAlloc (GMEM_MOVEABLE | GMEM_ZEROINIT, length + 1);
+	void* p = ::GlobalLock (hData);
+	memcpy (p, string, length);
+	((char*) p) [length] = 0;
+	::GlobalUnlock (hData);
 
 	::SetClipboardData (CF_TEXT, hData);
 	::CloseClipboard ();
@@ -336,20 +336,20 @@ CGdiEngine::WriteClipboard (
 }
 
 bool
-CGdiEngine::WriteClipboard (
-	uintptr_t Format,
-	const void* pData,
-	size_t Size
+CGdiEngine::writeClipboard (
+	uintptr_t format,
+	const void* data,
+	size_t size
 	)
 {
-	err::SetError (err::EStatus_NotImplemented);
+	err::setError (err::EStatus_NotImplemented);
 	return false;
 }
 
 bool
-CGdiEngine::OpenClipboard ()
+CGdiEngine::openClipboard ()
 {
-	bool_t Result;
+	bool_t result;
 
 	if (!m_hWndClipboardOwner)
 	{
@@ -364,29 +364,29 @@ CGdiEngine::OpenClipboard ()
 			CW_USEDEFAULT,
 			NULL,
 			NULL,
-			g::GetModule ()->GetModuleHandle (),
+			g::getModule ()->getModuleHandle (),
 			NULL
 			);
 
 		if (!m_hWndClipboardOwner)
-			return err::FailWithLastSystemError ();
+			return err::failWithLastSystemError ();
 	}
 
-	Result = ::OpenClipboard (m_hWndClipboardOwner);
-	return err::Complete (Result);
+	result = ::OpenClipboard (m_hWndClipboardOwner);
+	return err::complete (result);
 }
 
 bool
-CGdiEngine::ShowCaret (
-	CWidget* pWidget,
-	const TRect& Rect
+CGdiEngine::showCaret (
+	CWidget* widget,
+	const TRect& rect
 	)
 {
 	return true;
 }
 
 void
-CGdiEngine::HideCaret ()
+CGdiEngine::hideCaret ()
 {
 }
 

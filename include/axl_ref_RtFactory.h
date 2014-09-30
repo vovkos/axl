@@ -23,35 +23,35 @@ protected:
 		public obj::ITypeSimpleImplT <CBox>
 	{
 	protected:
-		obj::IType* m_pType;
+		obj::IType* m_type;
 
 	public:
 		CBox ()
 		{
-			m_pType = NULL;
+			m_type = NULL;
 		}
 
 		~CBox ()
 		{
-			ASSERT (m_pType);
-			m_pType->Destruct (this + 1);
+			ASSERT (m_type);
+			m_type->destruct (this + 1);
 		}
 
 		void
-		SetType (obj::IType* pType)
+		setType (obj::IType* type)
 		{
-			m_pType = pType;
-			m_pGuid = pType->GetGuid ();
+			m_type = type;
+			m_guid = type->getGuid ();
 		}
 			
 		// IRoot
 
 		virtual
 		void*
-		GetObject (obj::IType** ppType)
+		getObject (obj::IType** type_o)
 		{
-			if (ppType)
-				*ppType = this;
+			if (type_o)
+				*type_o = this;
 
 			return this;
 		}
@@ -60,77 +60,77 @@ protected:
 
 		virtual
 		size_t
-		GetInterfaceOffset (const rtl::TGuid& Guid)
+		getInterfaceOffset (const rtl::TGuid& guid)
 		{
-			ASSERT (m_pType);
+			ASSERT (m_type);
 
-			if (Guid == AXL_OBJ_GUIDOF (CRefCount))
+			if (guid == AXL_OBJ_GUIDOF (CRefCount))
 				return 0;
 
-			size_t Offset = m_pType->GetInterfaceOffset (Guid);
-			return Offset != -1 ? Offset + sizeof (CBox) : -1;
+			size_t offset = m_type->getInterfaceOffset (guid);
+			return offset != -1 ? offset + sizeof (CBox) : -1;
 		}
 	};
 
 public:
 	typedef TAlloc CAlloc;
 
-	class CNew
+	class COperatorNew
 	{
 	public:
 #ifdef _DEBUG
 		CPtrT <void> 
 		operator () (
-			obj::IType* pType,
-			const char* pFilePath,
-			int Line,
-			size_t Extra = 0
+			obj::IType* type,
+			const char* filePath,
+			int line,
+			size_t extra = 0
 			)
 		{
-			size_t Size = pType->GetSize () + Extra;			
-			size_t RefCountOffset = pType->GetInterfaceOffset (AXL_OBJ_GUIDOF (CRefCount));
+			size_t size = type->getSize () + extra;			
+			size_t refCountOffset = type->getInterfaceOffset (AXL_OBJ_GUIDOF (CRefCount));
 
-			if (RefCountOffset != -1)
+			if (refCountOffset != -1)
 			{
-				void* p = TAlloc::Alloc (Size, pType->GetName (), pFilePath, Line);
-				pType->Construct (p);
-				CRefCount* pRefCount = (CRefCount*) ((uchar_t*) p + RefCountOffset);
-				pRefCount->SetFree (&TAlloc::Free);
-				return CPtrT <void> (p, pRefCount);
+				void* p = TAlloc::alloc (size, type->getName (), filePath, line);
+				type->construct (p);
+				CRefCount* refCount = (CRefCount*) ((uchar_t*) p + refCountOffset);
+				refCount->setFree (&TAlloc::free);
+				return CPtrT <void> (p, refCount);
 			}
 			else
 			{
-				CPtrT <CBox> Box = mem::CStdFactoryT <CBox, TAlloc>::New (pFilePath, Line, Size);
-				pType->Construct (Box + 1);
-				Box->SetType (pType);
-				Box->SetFree (&TAlloc::Free);
-				return CPtrT <void> (Box + 1, Box.GetRefCount ());
+				CPtrT <CBox> box = mem::CStdFactoryT <CBox, TAlloc>::operatorNew (filePath, line, size);
+				type->construct (box + 1);
+				box->setType (type);
+				box->setFree (&TAlloc::free);
+				return CPtrT <void> (box + 1, box.getRefCount ());
 			}
 		}
 #else
 		CPtrT <void> 
 		operator () (
-			obj::IType* pType,
-			size_t Extra = 0
+			obj::IType* type,
+			size_t extra = 0
 			)
 		{
-			size_t Size = pType->GetSize () + Extra;			
-			size_t RefCountOffset = pType->GetInterfaceOffset (AXL_OBJ_GUIDOF (CRefCount));
+			size_t size = type->getSize () + extra;			
+			size_t refCountOffset = type->getInterfaceOffset (AXL_OBJ_GUIDOF (CRefCount));
 
-			if (RefCountOffset != -1)
+			if (refCountOffset != -1)
 			{
-				void* p = TAlloc::Alloc (Size);
-				pType->Construct (p);
-				CRefCount* pRefCount = (CRefCount*) ((uchar_t*) p + RefCountOffset);
-				pRefCount->SetFree (&TAlloc::Free);
-				return CPtrT <void> (p, pRefCount);
+				void* p = TAlloc::alloc (size);
+				type->construct (p);
+				CRefCount* refCount = (CRefCount*) ((uchar_t*) p + refCountOffset);
+				refCount->setFree (&TAlloc::free);
+				return CPtrT <void> (p, refCount);
 			}
 			else
 			{
-				CPtrT <CBox> Box = mem::CStdFactoryT <CBox, TAlloc>::New (Size);
-				Box->SetClass (pType);
-				Box->SetFree (&TAlloc::Free);
-				return CPtrT <void> (Box + 1, Box.GetRefCount ());
+				CPtrT <CBox> box = mem::CStdFactoryT <CBox, TAlloc>::operatorNew (size);
+				box->setClass (type);
+				box->setFree (&TAlloc::free);
+				return CPtrT <void> (box + 1, box.getRefCount ());
 			}
 		}
 #endif
@@ -141,24 +141,24 @@ public:
 #ifdef _DEBUG
 	static
 	CPtrT <void> 
-	New (
-		obj::IType* pType,
-		const char* pFilePath,
-		int Line,
-		size_t Extra = 0
+	operatorNew (
+		obj::IType* type,
+		const char* filePath,
+		int line,
+		size_t extra = 0
 		)
 	{
-		return CNew () (pType, pFilePath, Line, Extra);
+		return COperatorNew () (type, filePath, line, extra);
 	}
 #else
 	static
 	CPtrT <void> 
-	New (
-		obj::IType* pType,
-		size_t Extra = 0
+	operatorNew (
+		obj::IType* type,
+		size_t extra = 0
 		)
 	{
-		return CNew () (pType, Extra);
+		return COperatorNew () (type, extra);
 	}
 #endif
 };
@@ -169,19 +169,19 @@ typedef CRtFactoryT <mem::CStdAlloc> CRtFactory;
 
 #ifdef _DEBUG
 
-#define AXL_REF_RT_NEW(pType) \
-	ref::CRtFactory::New (pType, __FILE__, __LINE__)
+#define AXL_REF_RT_NEW(type) \
+	ref::CRtFactory::operatorNew (type, __FILE__, __LINE__)
 
-#define AXL_REF_RT_NEW_EXTRA(pType, Extra) \
-	ref::CRtFactory::New (pType, __FILE__, __LINE__, Extra)
+#define AXL_REF_RT_NEW_EXTRA(type, extra) \
+	ref::CRtFactory::operatorNew (type, __FILE__, __LINE__, extra)
 
 #else
 
-#define AXL_REF_RT_NEW(pType) \
-	ref::CRtFactory::New (pType)
+#define AXL_REF_RT_NEW(type) \
+	ref::CRtFactory::operatorNew (type)
 
-#define AXL_REF_RT_NEW_EXTRA(pType, Extra) \
-	ref::CRtFactory::New (pType, Extra)
+#define AXL_REF_RT_NEW_EXTRA(type, extra) \
+	ref::CRtFactory::operatorNew (type, extra)
 
 #endif
 

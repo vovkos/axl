@@ -8,77 +8,77 @@ namespace err {
 //.............................................................................
 
 rtl::CString 
-CParseErrorProvider::GetErrorDescription (const TError* pError)
+CParseErrorProvider::getErrorDescription (const TError* error)
 {
-	rtl::CUnpacker Unpacker (pError + 1, pError->m_Size - sizeof (TError));
+	rtl::CUnpacker unpacker (error + 1, error->m_size - sizeof (TError));
 
-	rtl::CString String;
+	rtl::CString string;
 
-	switch (pError->m_Code)
+	switch (error->m_code)
 	{
 	case EParseError_SrcPos:
 		{
-		const char* pFilePath;
-		int Line;
-		int Col;
+		const char* filePath;
+		int line;
+		int col;
 
-		Unpacker.Unpack (&pFilePath);
-		Unpacker.Unpack (&Line);
-		Unpacker.Unpack (&Col);
+		unpacker.unpack (&filePath);
+		unpacker.unpack (&line);
+		unpacker.unpack (&col);
 
-		String.Format("%s(%d,%d)", pFilePath, Line + 1, Col + 1);
+		string.format("%s(%d,%d)", filePath, line + 1, col + 1);
 		}
 		break; 
 
 	case EParseError_InvalidSyntax:
-		String = "syntax error";
+		string = "syntax error";
 		break;
 
 	case EParseError_InvalidSyntaxIn:
 		{
-		const char* pLocation;
+		const char* location;
 		
-		Unpacker.Unpack (&pLocation);
-		String.Format ("invalid syntax in '%s'", pLocation);
+		unpacker.unpack (&location);
+		string.format ("invalid syntax in '%s'", location);
 		}
 		break;
 
 	case EParseError_ExpectedToken:
 		{
-		const char* pExpectedToken;
-		const char* pActualToken;
+		const char* expectedToken;
+		const char* actualToken;
 		
-		Unpacker.Unpack (&pExpectedToken);
-		Unpacker.Unpack (&pActualToken);
-		String.Format ("expected '%s' before '%s'", pExpectedToken, pActualToken);
+		unpacker.unpack (&expectedToken);
+		unpacker.unpack (&actualToken);
+		string.format ("expected '%s' before '%s'", expectedToken, actualToken);
 		}
 		break;
 
 	case EParseError_UnexpectedToken:
 		{
-		const char* pToken;
+		const char* token;
 		
-		Unpacker.Unpack (&pToken);
-		String.Format ("unexpected '%s'", pToken);
+		unpacker.unpack (&token);
+		string.format ("unexpected '%s'", token);
 		}
 		break;
 
 	case EParseError_UnexpectedTokenIn:
 		{
-		const char* pToken;
-		const char* pLocation;
+		const char* token;
+		const char* location;
 		
-		Unpacker.Unpack (&pToken);
-		Unpacker.Unpack (&pLocation);
-		String.Format ("unexpected '%s' in '%s'", pToken, pLocation);
+		unpacker.unpack (&token);
+		unpacker.unpack (&location);
+		string.format ("unexpected '%s' in '%s'", token, location);
 		}
 		break;
 
 	default:
-		String = "parsing error";
+		string = "parsing error";
 	}
 
-	return String;
+	return string;
 }
 
 //.............................................................................

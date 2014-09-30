@@ -11,23 +11,23 @@ main (
 #ifdef _JANCY_REPRESENTER
 	atexit (llvm::llvm_shutdown);
 	
-	llvm::InitializeNativeTarget ();
-	llvm::InitializeNativeTargetAsmParser ();
-	llvm::InitializeNativeTargetAsmPrinter ();
-	llvm::InitializeNativeTargetDisassembler ();
+	llvm::initializeNativeTarget ();
+	llvm::initializeNativeTargetAsmParser ();
+	llvm::initializeNativeTargetAsmPrinter ();
+	llvm::initializeNativeTargetDisassembler ();
 
-	err::CParseErrorProvider::Register ();
-	srand ((int) axl::g::GetTimestamp ());
+	err::CParseErrorProvider::register ();
+	srand ((int) axl::g::getTimestamp ());
 #endif
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	WSADATA WsaData;
-	WSAStartup (0x0202, &WsaData);
+	WSADATA wsaData;
+	WSAStartup (0x0202, &wsaData);
 #endif
 
 	QApplication ab (argc, argv);
 
-	MainWindow w;
+	mainWindow w;
 	w.initialize ();
 	w.show ();
 

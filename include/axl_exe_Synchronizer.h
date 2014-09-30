@@ -26,19 +26,19 @@ public:
 	};
 
 protected:
-	mt::CLock m_Lock;
-	CInvokeList m_InvokeList;
+	mt::CLock m_lock;
+	CInvokeList m_invokeList;
 
-	ulong_t m_InvokeThreadId;
-	int m_Flags;
+	ulong_t m_invokeThreadId;
+	int m_flags;
 
 public:
-	CSynchronizer (int Flags = 0);
+	CSynchronizer (int flags = 0);
 
 	virtual 
 	EScheduleResult
-	ScheduleV (
-		IFunction* pFunction, 
+	scheduleV (
+		IFunction* function, 
 		axl_va_list va
 		);
 };

@@ -33,50 +33,50 @@ protected:
 	struct TViewEntry: rtl::TListLink 
 	{
 #if (_AXL_ENV == AXL_ENV_WIN)
-		win::CMappedView m_View;
+		win::CMappedView m_view;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-		psx::CMapping m_View;
+		psx::CMapping m_view;
 #endif
-		uint64_t m_Begin;
-		uint64_t m_End;
-		CViewMap::CIterator m_MapIt; // to optimize deletion
+		uint64_t m_begin;
+		uint64_t m_end;
+		CViewMap::CIterator m_mapIt; // to optimize deletion
 	};
 
 protected:	
-	CMappedFile* m_pMappedFile;
-	rtl::CStdListT <TViewEntry> m_ViewList;
-	CViewMap m_ViewMap; 
+	CMappedFile* m_mappedFile;
+	rtl::CStdListT <TViewEntry> m_viewList;
+	CViewMap m_viewMap; 
 
 protected:
 	CMappedViewMgr () // protected construction only
 	{		
-		m_pMappedFile = NULL;
+		m_mappedFile = NULL;
 	}
 	
 public:
 	void*
-	Find (
-		uint64_t Begin,
-		uint64_t End
+	find (
+		uint64_t begin,
+		uint64_t end
 		);
 
 	void*
-	View (
-		uint64_t Begin,
-		uint64_t End,
-		uint64_t OrigBegin,
-		uint64_t OrigEnd
+	view (
+		uint64_t begin,
+		uint64_t end,
+		uint64_t origBegin,
+		uint64_t origEnd
 		);	
 
 	void
-	Clear ()
+	clear ()
 	{
-		m_ViewList.Clear ();
-		m_ViewMap.Clear ();
+		m_viewList.clear ();
+		m_viewMap.clear ();
 	}
 
 	void
-	LimitViewCount (size_t MaxViewCount);
+	limitViewCount (size_t maxViewCount);
 };
 
 //.............................................................................
@@ -93,89 +93,89 @@ public:
 	};
 
 protected:
-	CFile m_File;
+	CFile m_file;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	mutable win::CMapping m_Mapping;
-	mutable uint64_t m_MappedSize;
+	mutable win::CMapping m_mapping;
+	mutable uint64_t m_mappedSize;
 #endif
 	
-	mutable CMappedViewMgr m_DynamicViewMgr;
-	mutable CMappedViewMgr m_PermanentViewMgr;
+	mutable CMappedViewMgr m_dynamicViewMgr;
+	mutable CMappedViewMgr m_permanentViewMgr;
 	
-	size_t m_ReadAheadSize;
-	size_t m_MaxDynamicViewCount;
+	size_t m_readAheadSize;
+	size_t m_maxDynamicViewCount;
 
-	uint_t m_FileFlags;
-	uint64_t m_FileSize;
+	uint_t m_fileFlags;
+	uint64_t m_fileSize;
 
 public:
 	CMappedFile ();
 
 	~CMappedFile ()
 	{
-		Close ();
+		close ();
 	}
 
 	bool
-	IsOpen () const
+	isOpen () const
 	{
-		return m_File.IsOpen ();
+		return m_file.isOpen ();
 	}
 
 	bool 
-	Open (
-		const char* pFileName, 
-		uint_t Flags = 0 // EFileFlag 
+	open (
+		const char* fileName, 
+		uint_t flags = 0 // EFileFlag 
 		);
 
 	void 
-	Close ();
+	close ();
 
 	bool
-	Setup (
-		size_t MaxDynamicViewCount,
-		size_t ReadAheadSize
+	setup (
+		size_t maxDynamicViewCount,
+		size_t readAheadSize
 		);
 
 	uint64_t
-	GetSize () const
+	getSize () const
 	{
-		return m_FileSize;
+		return m_fileSize;
 	}
 
 	bool 
-	SetSize (
-		uint64_t Size, 
-		bool UnmapAndApplyNow = false
+	setSize (
+		uint64_t size, 
+		bool unmapAndApplyNow = false
 		);
 
 	const void* 
-	View (
-		uint64_t Offset = 0, 
-		size_t Size = 0, 
-		bool IsPermanent = false
+	view (
+		uint64_t offset = 0, 
+		size_t size = 0, 
+		bool isPermanent = false
 		) const
 	{
-		return ViewImpl (Offset, Size ? Offset + Size : m_FileSize, IsPermanent);
+		return viewImpl (offset, size ? offset + size : m_fileSize, isPermanent);
 	}
 	
 	void* 
-	View (
-		uint64_t Offset = 0, 
-		size_t Size = 0, 
-		bool IsPermanent = false
+	view (
+		uint64_t offset = 0, 
+		size_t size = 0, 
+		bool isPermanent = false
 		);
 	
 	void 
-	UnmapAllViews ();
+	unmapAllViews ();
 	
 protected:
 	void*
-	ViewImpl (
-		uint64_t Offset,
-		uint64_t End,
-		bool IsPermanent
+	viewImpl (
+		uint64_t offset,
+		uint64_t end,
+		bool isPermanent
 		) const;	
 };
 
@@ -184,55 +184,55 @@ protected:
 class CSimpleMappedFile
 {
 protected:
-	CFile m_File;
-	CMapping m_Mapping;
+	CFile m_file;
+	CMapping m_mapping;
 
 public:
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_Mapping.IsOpen ();
+		return m_mapping.isOpen ();
 	}
 
 	void*
 	p ()
 	{
-		return m_Mapping.p ();
+		return m_mapping.p ();
 	}
 
 	operator void* ()
 	{
-		return m_Mapping;
+		return m_mapping;
 	}
 
 	size_t 
-	GetSize ()
+	getSize ()
 	{
-		return m_Mapping.GetSize ();
+		return m_mapping.getSize ();
 	}
 
 	bool
-	Open (
-		const char* pFileName, 
-		uint64_t Offset,
-		size_t Size,
-		uint_t Flags = 0 // EFileFlag 
+	open (
+		const char* fileName, 
+		uint64_t offset,
+		size_t size,
+		uint_t flags = 0 // EFileFlag 
 		);
 
 	bool
-	Open (
-		const char* pFileName, 
-		uint_t Flags = 0 // EFileFlag 
+	open (
+		const char* fileName, 
+		uint_t flags = 0 // EFileFlag 
 		)
 	{
-		return Open (pFileName, 0, -1, Flags);
+		return open (fileName, 0, -1, flags);
 	}
 
 	void 
-	Close ()
+	close ()
 	{
-		m_File.Close ();
-		m_Mapping.Close ();
+		m_file.close ();
+		m_mapping.close ();
 	}
 };
 

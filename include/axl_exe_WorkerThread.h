@@ -28,93 +28,93 @@ public:
 protected:
 	struct TUserEvent: rtl::TListLink
 	{
-		mt::CEvent* m_pEvent;
-		ref::CPtrT <exe::IFunction> m_OnEvent;
+		mt::CEvent* m_event;
+		ref::CPtrT <exe::IFunction> m_onEvent;
 	};
 
 protected:
-	mt::CLock m_Lock;
-	mt::CEvent m_Event; 
-	exe::CInvokeList m_InvokeList;
-	bool m_TerminateFlag;
+	mt::CLock m_lock;
+	mt::CEvent m_event; 
+	exe::CInvokeList m_invokeList;
+	bool m_terminateFlag;
 
 	// these are touched only within the worker thread
 
-	rtl::CStdListT <TUserEvent> m_UserEventList;
-	rtl::CArrayT <mt::CEvent*> m_WaitArray;
-	rtl::CArrayT <exe::IFunction*> m_FunctionArray;
+	rtl::CStdListT <TUserEvent> m_userEventList;
+	rtl::CArrayT <mt::CEvent*> m_waitArray;
+	rtl::CArrayT <exe::IFunction*> m_functionArray;
 
 public:
 	CWorkerThread ();
 	
 	~CWorkerThread ()
 	{
-		Stop ();
+		stop ();
 	}
 
 	bool 
-	Start ();
+	start ();
 
 	void
-	Stop (
-		bool DoWaitAndClose = true,
-		ulong_t Timeout = -1
+	stop (
+		bool doWaitAndClose = true,
+		ulong_t timeout = -1
 		);
 
 	handle_t
-	AddEvent (
-		mt::CEvent* pEvent, 
-		exe::IFunction* pOnEvent
+	addEvent (
+		mt::CEvent* event, 
+		exe::IFunction* onEvent
 		);
 
 	void 
-	RemoveEvent (handle_t hEvent);
+	removeEvent (handle_t hEvent);
 
 	// IScheduler
 
 	virtual 
 	EScheduleResult
-	ScheduleV (
-		exe::IFunction* pFunction, 
+	scheduleV (
+		exe::IFunction* function, 
 		axl_va_list va
 		);
 
 	// CThreadImpl
 
 	ulong_t 
-	ThreadProc ();
+	threadProc ();
 
 protected:
 	TUserEvent*
 	AXL_CDECL
-	AddEvent_wt (
-		mt::CEvent* pEvent,
-		exe::IFunction* pOnEvent
+	addEvent_wt (
+		mt::CEvent* event,
+		exe::IFunction* onEvent
 		);
 
 	void
 	AXL_CDECL
-	RemoveEvent_wt (TUserEvent* pUserEvent);
+	removeEvent_wt (TUserEvent* userEvent);
 
 	bool
-	Process_wt ();
+	process_wt ();
 
 	bool 
-	CWorkerThread::CanInvokeNow ();
+	CWorkerThread::canInvokeNow ();
 
 	void
-	SignalStop ();
+	signalStop ();
 };
 
 //.............................................................................
 
 ref::CPtrT <CWorkerThread>
-GetWorkerThread (size_t ReserveEventCount = 0);
+getWorkerThread (size_t reserveEventCount = 0);
 
 ref::CPtrT <CWorkerThread>
-GetWorkerThread (
-	mt::CEvent* pEvent,
-	exe::IFunction* pOnEvent,
+getWorkerThread (
+	mt::CEvent* event,
+	exe::IFunction* onEvent,
 	handle_t* phEvent
 	);
 

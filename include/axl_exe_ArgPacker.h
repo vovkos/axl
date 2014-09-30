@@ -24,65 +24,65 @@ struct IArgPacker: obj::IRoot
 
 	virtual
 	axl_va_list
-	PackV (
+	packV (
 		void* p,
-		size_t* pSize,
-		ref::CPtrT <obj::IType>* pAgent,
+		size_t* size,
+		ref::CPtrT <obj::IType>* agent,
 		axl_va_list va
 		) = 0;
 	
 	void
-	Pack (
+	pack (
 		void* p,
-		size_t* pSize,
-		ref::CPtrT <obj::IType>* pAgent,
+		size_t* size,
+		ref::CPtrT <obj::IType>* agent,
 		...
 		)
 	{
-		AXL_VA_DECL (va, pAgent);
-		PackV (p, pSize, pAgent, va);
+		AXL_VA_DECL (va, agent);
+		packV (p, size, agent, va);
 	}
 
 	size_t
-	CountV (axl_va_list va)
+	countV (axl_va_list va)
 	{
-		size_t Size = 0;
-		PackV (NULL, &Size, NULL, va);
-		return Size;
+		size_t size = 0;
+		packV (NULL, &size, NULL, va);
+		return size;
 	}
 
 	size_t
-	Count (
-		int Unused,
+	count (
+		int unused,
 		...
 		)
 	{
-		AXL_VA_DECL (va, Unused);
-		return CountV (va);
+		AXL_VA_DECL (va, unused);
+		return countV (va);
 	}
 
 	ref::CPtrT <CArgBlock>
-	CreateArgBlockV (axl_va_list va)
+	createArgBlockV (axl_va_list va)
 	{
-		size_t Size = CountV (va);
+		size_t size = countV (va);
 
-		ref::CPtrT <CArgBlock> Block = AXL_REF_NEW_EXTRA (CArgBlock, Size);
-		Block->m_p = Block + 1;
-		Block->m_Size = Size;
+		ref::CPtrT <CArgBlock> block = AXL_REF_NEW_EXTRA (CArgBlock, size);
+		block->m_p = block + 1;
+		block->m_size = size;
 
-		PackV (Block + 1, &Size, &Block->m_Agent, va);
+		packV (block + 1, &size, &block->m_agent, va);
 
-		return Block;
+		return block;
 	}
 
 	ref::CPtrT <CArgBlock>
-	CreateArgBlock (
-		int Unused,
+	createArgBlock (
+		int unused,
 		...
 		)
 	{
-		AXL_VA_DECL (va, Unused);
-		return CreateArgBlockV (va);
+		AXL_VA_DECL (va, unused);
+		return createArgBlockV (va);
 	}
 };
 
@@ -100,28 +100,28 @@ protected:
 public:
 	virtual
 	axl_va_list
-	PackV (
+	packV (
 		void* p,
-		size_t* pSize,
-		ref::CPtrT <obj::IType>* pAgent,
+		size_t* size,
+		ref::CPtrT <obj::IType>* agent,
 		axl_va_list va
 		)
 	{
-		if (!p || !T::HasShadow)
-			return T () (p, pSize, NULL, va);
+		if (!p || !T::hasShadow)
+			return T () (p, size, NULL, va);
 	
-		obj::IType* pType = AXL_OBJ_TYPEOF (T::CType);
-		ref::CPtrT <CShadow> Shadow = AXL_REF_NEW (CShadow);		
-		pAgent->Copy (pType, Shadow.GetRefCount ());
+		obj::IType* type = AXL_OBJ_TYPEOF (T::CType);
+		ref::CPtrT <CShadow> shadow = AXL_REF_NEW (CShadow);		
+		agent->copy (type, shadow.getRefCount ());
 
-		return T () (p, pSize, Shadow, va);
+		return T () (p, size, shadow, va);
 	}
 
 	static
 	IArgPackerImplT*
-	GetSingleton ()
+	getSingleton ()
 	{
-		return rtl::GetSimpleSingleton <IArgPackerImplT> ();
+		return rtl::getSimpleSingleton <IArgPackerImplT> ();
 	}
 };
 
@@ -140,75 +140,75 @@ protected:
 		public obj::IType
 	{
 	public:
-		rtl::CArrayT <ref::CPtrT <obj::IType> > m_Sequence;
+		rtl::CArrayT <ref::CPtrT <obj::IType> > m_sequence;
 
 	public:
 		virtual
 		void
-		Construct (void* p);
+		construct (void* p);
 
 		virtual
 		void
-		Destruct (void* p);
+		destruct (void* p);
 
 		virtual
 		void
-		Copy (
+		copy (
 			void* p,
-			const void* pSrc
+			const void* src
 			);
 
 		virtual
 		size_t
-		GetInterfaceOffset (const rtl::TGuid& Guid)
+		getInterfaceOffset (const rtl::TGuid& guid)
 		{
 			return -1; // not used in packing
 		}
 	};
 
 protected:
-	rtl::CArrayT <IArgPacker*> m_Sequence;
+	rtl::CArrayT <IArgPacker*> m_sequence;
 
 public:
 	virtual
 	axl_va_list
-	PackV (
+	packV (
 		void* p,
-		size_t* pSize,
-		ref::CPtrT <obj::IType>* pAgent,
+		size_t* size,
+		ref::CPtrT <obj::IType>* agent,
 		axl_va_list va
 		);
 
 	void
-	Clear ()
+	clear ()
 	{
-		m_Sequence.Clear ();
+		m_sequence.clear ();
 	}
 
 	size_t
-	Append (IArgPacker* pArgPacker)
+	append (IArgPacker* argPacker)
 	{
-		m_Sequence.Append (pArgPacker);
-		return m_Sequence.GetCount ();
+		m_sequence.append (argPacker);
+		return m_sequence.getCount ();
 	}
 
 	template <typename T>
 	size_t
-	Append ()
+	append ()
 	{
-		return Append (IArgPackerImplT <T>::GetSingleton ());
+		return append (IArgPackerImplT <T>::getSingleton ());
 	}
 
 	// often times it is more convenient to use printf-like format string for sequencing
 
 	size_t
-	AppendFormat (const char* pFormat);
+	appendFormat (const char* format);
 
 	size_t
-	Format (const char* pFormat)
+	format (const char* format)
 	{
-		Clear ();
-		return AppendFormat (pFormat);
+		clear ();
+		return appendFormat (format);
 	}
 };
 
@@ -216,27 +216,27 @@ public:
 
 inline
 ref::CPtrT <CArgBlock> 
-FormatArgBlockV (
-	const char* pFormat, 
+formatArgBlockV (
+	const char* format, 
 	axl_va_list va
 	)
 {
-	CArgPackerSeq Packer;
-	Packer.Format (pFormat);
-	return Packer.CreateArgBlockV (va);
+	CArgPackerSeq packer;
+	packer.format (format);
+	return packer.createArgBlockV (va);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 ref::CPtrT <CArgBlock> 
-FormatArgBlock (
-	const char* pFormat, 
+formatArgBlock (
+	const char* format, 
 	...
 	)
 {
-	AXL_VA_DECL (va, pFormat);
-	return FormatArgBlockV (pFormat, va);
+	AXL_VA_DECL (va, format);
+	return formatArgBlockV (format, va);
 }
 
 //.............................................................................

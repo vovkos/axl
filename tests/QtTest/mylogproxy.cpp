@@ -3,13 +3,13 @@
 
 //.............................................................................
 
-MyLogProxy::MyLogProxy ()
+myLogProxy::myLogProxy ()
 {
 	m_listenSocket = INVALID_SOCKET;
 	m_connectSocket = INVALID_SOCKET;
 }
 
-void MyLogProxy::close ()
+void myLogProxy::close ()
 {
 	if (m_listenSocket != INVALID_SOCKET)
 		closesocket (m_listenSocket);
@@ -17,14 +17,14 @@ void MyLogProxy::close ()
 	if (m_connectSocket != INVALID_SOCKET)
 			closesocket (m_connectSocket);
 	
-	m_socketThread.WaitAndClose ();
-	m_packetizer.Reset ();
+	m_socketThread.waitAndClose ();
+	m_packetizer.reset ();
 	m_target = NULL;
 	m_listenSocket = INVALID_SOCKET;
 	m_connectSocket = INVALID_SOCKET;
 }
 
-bool MyLogProxy::listen (log::CPeer* target, int port)
+bool myLogProxy::listen (log::CPeer* target, int port)
 {
 	int result;
 
@@ -47,10 +47,10 @@ bool MyLogProxy::listen (log::CPeer* target, int port)
 		return false;
 
 	m_target = target;
-	return m_socketThread.Start ();
+	return m_socketThread.start ();
 }
 
-bool MyLogProxy::connect (log::CPeer* target, int ip, int port)
+bool myLogProxy::connect (log::CPeer* target, int ip, int port)
 {
 	int result;
 
@@ -70,27 +70,27 @@ bool MyLogProxy::connect (log::CPeer* target, int ip, int port)
 		return false;
 
 	m_target = target;
-	return m_socketThread.Start ();
+	return m_socketThread.start ();
 }
 
-void MyLogProxy::SendMsg (const log::TMsg* msg)
+void myLogProxy::sendMsg (const log::TMsg* msg)
 {
 	ASSERT (m_connectSocket != INVALID_SOCKET);
 
-	uint64_t hdr = m_packetizer.CreateHdr (msg->m_MsgSize);
+	uint64_t hdr = m_packetizer.createHdr (msg->m_msgSize);
 	::send (m_connectSocket, (char*) &hdr, sizeof (hdr), 0);
-	::send (m_connectSocket, (char*) msg, msg->m_MsgSize, 0);
+	::send (m_connectSocket, (char*) msg, msg->m_msgSize, 0);
 }
 
-void MyLogProxy::onPacket (const void* p, size_t size)
+void myLogProxy::onPacket (const void* p, size_t size)
 {
 	log::TMsg* msg = (log::TMsg*) p;
-	ASSERT (size >= sizeof (log::TMsg) && size >= msg->m_MsgSize);	
+	ASSERT (size >= sizeof (log::TMsg) && size >= msg->m_msgSize);	
 
-	m_target->SendMsg (msg);
+	m_target->sendMsg (msg);
 }
 
-void MyLogProxy::socketThreadProc ()
+void myLogProxy::socketThreadProc ()
 {
 	int result;
 	char buffer [256] = { 0 };
@@ -110,7 +110,7 @@ void MyLogProxy::socketThreadProc ()
 		if (result <= 0)
 			break;
 
-		m_packetizer.Write (buffer, result);				
+		m_packetizer.write (buffer, result);				
 	}
 }
 

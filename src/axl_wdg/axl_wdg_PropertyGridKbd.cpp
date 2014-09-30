@@ -6,241 +6,241 @@
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_Home(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyCtrl_AdvanceSelection(pPropertyCtrl, MINLONG, true);
+	axl_win_TPropertyCtrl_AdvanceSelection(propertyCtrl, MINLONG, true);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_End(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyCtrl_AdvanceSelection(pPropertyCtrl, MAXLONG, true);
+	axl_win_TPropertyCtrl_AdvanceSelection(propertyCtrl, MAXLONG, true);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_Left(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyLine* pLine;
+	axl_win_TPropertyLine* line;
 
-	if (Ctrl)
+	if (ctrl)
 	{
-		axl_win_TPropertyCtrl_OnScroll(pPropertyCtrl, SB_HORZ, SB_LINELEFT);
+		axl_win_TPropertyCtrl_OnScroll(propertyCtrl, SB_HORZ, SB_LINELEFT);
 		return;
 	}
 
-	if (pPropertyCtrl->m_SelectedLine == -1)
+	if (propertyCtrl->m_selectedLine == -1)
 		return;
 
-	pLine = ((axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p)[pPropertyCtrl->m_SelectedLine]; 
-	if (!axl_rtl_TList_IsEmpty(&pLine->m_ChildrenList))
-		axl_win_TPropertyCtrl_Collapse(pPropertyCtrl, pLine);
+	line = ((axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p)[propertyCtrl->m_selectedLine]; 
+	if (!axl_rtl_TList_IsEmpty(&line->m_childrenList))
+		axl_win_TPropertyCtrl_Collapse(propertyCtrl, line);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_Right(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyLine* pLine;
+	axl_win_TPropertyLine* line;
 
-	if (Ctrl)
+	if (ctrl)
 	{
-		axl_win_TPropertyCtrl_OnScroll(pPropertyCtrl, SB_HORZ, SB_LINERIGHT);
+		axl_win_TPropertyCtrl_OnScroll(propertyCtrl, SB_HORZ, SB_LINERIGHT);
 		return;
 	}
 
-	if (pPropertyCtrl->m_SelectedLine == -1)
+	if (propertyCtrl->m_selectedLine == -1)
 		return;
 
-	pLine = ((axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p)[pPropertyCtrl->m_SelectedLine]; 
-	if (!axl_rtl_TList_IsEmpty(&pLine->m_ChildrenList))
-		axl_win_TPropertyCtrl_Expand(pPropertyCtrl, pLine);
+	line = ((axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p)[propertyCtrl->m_selectedLine]; 
+	if (!axl_rtl_TList_IsEmpty(&line->m_childrenList))
+		axl_win_TPropertyCtrl_Expand(propertyCtrl, line);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_Up(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	if (Ctrl)
-		axl_win_TPropertyCtrl_OnScroll(pPropertyCtrl, SB_VERT, SB_LINEUP);
+	if (ctrl)
+		axl_win_TPropertyCtrl_OnScroll(propertyCtrl, SB_VERT, SB_LINEUP);
 	else
-		axl_win_TPropertyCtrl_AdvanceSelection(pPropertyCtrl, -1, true);
+		axl_win_TPropertyCtrl_AdvanceSelection(propertyCtrl, -1, true);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_Down(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	if (Ctrl)
-		axl_win_TPropertyCtrl_OnScroll(pPropertyCtrl, SB_VERT, SB_LINEDOWN);
+	if (ctrl)
+		axl_win_TPropertyCtrl_OnScroll(propertyCtrl, SB_VERT, SB_LINEDOWN);
 	else
-		axl_win_TPropertyCtrl_AdvanceSelection(pPropertyCtrl, 1, true);
+		axl_win_TPropertyCtrl_AdvanceSelection(propertyCtrl, 1, true);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_PageUp(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyCtrl_AdvanceSelection(pPropertyCtrl, - (long) pPropertyCtrl->m_VisibleLineCount, true);
+	axl_win_TPropertyCtrl_AdvanceSelection(propertyCtrl, - (long) propertyCtrl->m_visibleLineCount, true);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_PageDown(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift, 
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift, 
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyCtrl_AdvanceSelection(pPropertyCtrl, (long) pPropertyCtrl->m_VisibleLineCount, true);
+	axl_win_TPropertyCtrl_AdvanceSelection(propertyCtrl, (long) propertyCtrl->m_visibleLineCount, true);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown_Space(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift,
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift,
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyLine* pLine;
+	axl_win_TPropertyLine* line;
 
-	if (pPropertyCtrl->m_SelectedLine == -1)
+	if (propertyCtrl->m_selectedLine == -1)
 		return;
 
-	pLine = ((axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p)[pPropertyCtrl->m_SelectedLine]; 
+	line = ((axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p)[propertyCtrl->m_selectedLine]; 
 	
-	if (pLine->m_OptionBoxType)
-		axl_win_TPropertyLine_SetOptionBoxVolatileState(pLine, axl_win_EPropertyButtonVolatileState_Pushed);
-	else if (axl_win_TPropertyLine_IsButton(pLine))
-		axl_win_TPropertyLine_SetButtonVolatileState(pLine, axl_win_EPropertyButtonVolatileState_Pushed);
-	else if (!axl_rtl_TList_IsEmpty(&pLine->m_ChildrenList))
-		axl_win_TPropertyCtrl_ExpandCollapse(pPropertyCtrl, pLine, (pLine->m_Flags & axl_win_EPropertyLine_IsExpanded) == 0);
+	if (line->m_optionBoxType)
+		axl_win_TPropertyLine_SetOptionBoxVolatileState(line, axl_win_EPropertyButtonVolatileState_Pushed);
+	else if (axl_win_TPropertyLine_IsButton(line))
+		axl_win_TPropertyLine_SetButtonVolatileState(line, axl_win_EPropertyButtonVolatileState_Pushed);
+	else if (!axl_rtl_TList_IsEmpty(&line->m_childrenList))
+		axl_win_TPropertyCtrl_ExpandCollapse(propertyCtrl, line, (line->m_flags & axl_win_EPropertyLine_IsExpanded) == 0);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_ClickFirstHyperlink(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	axl_win_TPropertyLine* pLine
+	axl_win_TPropertyCtrl* propertyCtrl,
+	axl_win_TPropertyLine* line
 	)
 {
-	axl_win_TPropertyHitTest HitTest = {0};
+	axl_win_TPropertyHitTest hitTest = {0};
 
-	if ((pLine->m_Flags & axl_win_EPropertyLine_NameHyperText) && !axl_rtl_TArray_IsEmpty(&pLine->m_NameHyperText.m_HyperlinkArray))
+	if ((line->m_flags & axl_win_EPropertyLine_NameHyperText) && !axl_rtl_TArray_IsEmpty(&line->m_nameHyperText.m_hyperlinkArray))
 	{
-		HitTest.m_HitTest =  axl_win_EPropertyHitTest_Button;
-		HitTest.m_pLine = pLine;
-		HitTest.m_pHyperlink = (axl_gr_THyperlinkAnchor*) pLine->m_NameHyperText.m_HyperlinkArray.m_p;
-		axl_win_TPropertyCtrl_Notify(pPropertyCtrl, axl_win_EPropertyNotify_HyperlinkClick, &HitTest);
+		hitTest.m_hitTest =  axl_win_EPropertyHitTest_Button;
+		hitTest.m_line = line;
+		hitTest.m_hyperlink = (axl_gr_THyperlinkAnchor*) line->m_nameHyperText.m_hyperlinkArray.m_p;
+		axl_win_TPropertyCtrl_Notify(propertyCtrl, axl_win_EPropertyNotify_HyperlinkClick, &hitTest);
 	}
-	else if ((pLine->m_Flags & axl_win_EPropertyLine_ValueHyperText) && !axl_rtl_TArray_IsEmpty(&pLine->m_ValueHyperText.m_HyperlinkArray))
+	else if ((line->m_flags & axl_win_EPropertyLine_ValueHyperText) && !axl_rtl_TArray_IsEmpty(&line->m_valueHyperText.m_hyperlinkArray))
 	{
-		HitTest.m_HitTest =  axl_win_EPropertyHitTest_Button;
-		HitTest.m_pLine = pLine;
-		HitTest.m_pHyperlink = (axl_gr_THyperlinkAnchor*) pLine->m_ValueHyperText.m_HyperlinkArray.m_p;
-		axl_win_TPropertyCtrl_Notify(pPropertyCtrl, axl_win_EPropertyNotify_HyperlinkClick, &HitTest);
+		hitTest.m_hitTest =  axl_win_EPropertyHitTest_Button;
+		hitTest.m_line = line;
+		hitTest.m_hyperlink = (axl_gr_THyperlinkAnchor*) line->m_valueHyperText.m_hyperlinkArray.m_p;
+		axl_win_TPropertyCtrl_Notify(propertyCtrl, axl_win_EPropertyNotify_HyperlinkClick, &hitTest);
 	}
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyUp_F4(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift,
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift,
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyLine* pLine;
+	axl_win_TPropertyLine* line;
 
-	if (pPropertyCtrl->m_SelectedLine == -1)
+	if (propertyCtrl->m_selectedLine == -1)
 		return;
 
-	pLine = ((axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p)[pPropertyCtrl->m_SelectedLine]; 
-	axl_win_TPropertyCtrl_ClickFirstHyperlink(pPropertyCtrl, pLine);
+	line = ((axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p)[propertyCtrl->m_selectedLine]; 
+	axl_win_TPropertyCtrl_ClickFirstHyperlink(propertyCtrl, line);
 }
 
 void 
 AXL_API
 axl_win_TPropertyCtrl_OnKeyUp_Space(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	bool_t Shift,
-	bool_t Ctrl
+	axl_win_TPropertyCtrl* propertyCtrl,
+	bool_t shift,
+	bool_t ctrl
 	)
 {
-	axl_win_TPropertyLine* pLine;
-	axl_win_TPropertyHitTest HitTest = {0};
+	axl_win_TPropertyLine* line;
+	axl_win_TPropertyHitTest hitTest = {0};
 
-	if (pPropertyCtrl->m_SelectedLine == -1)
+	if (propertyCtrl->m_selectedLine == -1)
 		return;
 
-	pLine = ((axl_win_TPropertyLine**) pPropertyCtrl->m_VisibleLineArray.m_p)[pPropertyCtrl->m_SelectedLine]; 
+	line = ((axl_win_TPropertyLine**) propertyCtrl->m_visibleLineArray.m_p)[propertyCtrl->m_selectedLine]; 
 	
-	if (pLine->m_OptionBoxType)
+	if (line->m_optionBoxType)
 	{
-		if (pLine->m_OptionBoxVolatileState != axl_win_EPropertyButtonVolatileState_Pushed)
+		if (line->m_optionBoxVolatileState != axl_win_EPropertyButtonVolatileState_Pushed)
 			return;
 
-		HitTest.m_HitTest =  axl_win_EPropertyHitTest_OptionBox;
-		HitTest.m_pLine = pLine;
+		hitTest.m_hitTest =  axl_win_EPropertyHitTest_OptionBox;
+		hitTest.m_line = line;
 
-		axl_win_TPropertyLine_SetOptionBoxVolatileState(pLine, 0);
+		axl_win_TPropertyLine_SetOptionBoxVolatileState(line, 0);
 
-		switch (pLine->m_OptionBoxType)
+		switch (line->m_optionBoxType)
 		{
 		case axl_win_EPropertyOptionBoxType_RadioButton:
-			axl_win_TPropertyLine_SetOptionBoxCheckState(pLine, true);
+			axl_win_TPropertyLine_SetOptionBoxCheckState(line, true);
 			break;
 
 		case axl_win_EPropertyOptionBoxType_CheckBox:
-			axl_win_TPropertyLine_SetOptionBoxCheckState(pLine, !pLine->m_OptionBoxCheckState);
+			axl_win_TPropertyLine_SetOptionBoxCheckState(line, !line->m_optionBoxCheckState);
 			break;
 		}
 
-		axl_win_TPropertyCtrl_Notify(pPropertyCtrl, axl_win_EPropertyNotify_OptionBoxClick, &HitTest);
+		axl_win_TPropertyCtrl_Notify(propertyCtrl, axl_win_EPropertyNotify_OptionBoxClick, &hitTest);
 	}
-	else if (axl_win_TPropertyLine_IsButton(pLine))
+	else if (axl_win_TPropertyLine_IsButton(line))
 	{
-		if (pLine->m_ButtonVolatileState != axl_win_EPropertyButtonVolatileState_Pushed)
+		if (line->m_buttonVolatileState != axl_win_EPropertyButtonVolatileState_Pushed)
 			return;
 
-		HitTest.m_HitTest =  axl_win_EPropertyHitTest_Button;
-		HitTest.m_pLine = pLine;
+		hitTest.m_hitTest =  axl_win_EPropertyHitTest_Button;
+		hitTest.m_line = line;
 
-		axl_win_TPropertyLine_SetButtonVolatileState(pLine, 0);
-		axl_win_TPropertyCtrl_Notify(pPropertyCtrl, axl_win_EPropertyNotify_ButtonClick, &HitTest);
+		axl_win_TPropertyLine_SetButtonVolatileState(line, 0);
+		axl_win_TPropertyCtrl_Notify(propertyCtrl, axl_win_EPropertyNotify_ButtonClick, &hitTest);
 	}
 	else
 	{
-		axl_win_TPropertyCtrl_ClickFirstHyperlink(pPropertyCtrl, pLine);
+		axl_win_TPropertyCtrl_ClickFirstHyperlink(propertyCtrl, line);
 	}
 }
 
@@ -250,50 +250,50 @@ axl_win_TPropertyCtrl_OnKeyUp_Space(
 void
 AXL_API
 axl_win_TPropertyCtrl_OnKeyDown(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	int VkCode
+	axl_win_TPropertyCtrl* propertyCtrl,
+	int vkCode
 	)
 {
-	bool_t Shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
-	bool_t Ctrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+	bool_t shift = (getAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+	bool_t ctrl = (getAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
 
-	switch (VkCode)
+	switch (vkCode)
 	{
 	case VK_HOME:
-		axl_win_TPropertyCtrl_OnKeyDown_Home(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_Home(propertyCtrl, shift, ctrl);
 		break;
 
 	case VK_END:
-		axl_win_TPropertyCtrl_OnKeyDown_End(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_End(propertyCtrl, shift, ctrl);
 		break;
 
 	case VK_LEFT:
-		axl_win_TPropertyCtrl_OnKeyDown_Left(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_Left(propertyCtrl, shift, ctrl);
 		break;
 
 	case VK_RIGHT:
-		axl_win_TPropertyCtrl_OnKeyDown_Right(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_Right(propertyCtrl, shift, ctrl);
 		break;
 
 	case VK_UP:
-		axl_win_TPropertyCtrl_OnKeyDown_Up(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_Up(propertyCtrl, shift, ctrl);
 		break;
 
 	case VK_DOWN:
-		axl_win_TPropertyCtrl_OnKeyDown_Down(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_Down(propertyCtrl, shift, ctrl);
 		break;
 
 	case VK_PRIOR:
-		axl_win_TPropertyCtrl_OnKeyDown_PageUp(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_PageUp(propertyCtrl, shift, ctrl);
 		break;
 
 	case VK_NEXT:
-		axl_win_TPropertyCtrl_OnKeyDown_PageDown(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyDown_PageDown(propertyCtrl, shift, ctrl);
 		break; 
 
 	case VK_SPACE:
 	case VK_RETURN:
- 		axl_win_TPropertyCtrl_OnKeyDown_Space(pPropertyCtrl, Shift, Ctrl);
+ 		axl_win_TPropertyCtrl_OnKeyDown_Space(propertyCtrl, shift, ctrl);
 		break;
 	}; 
 }
@@ -301,22 +301,22 @@ axl_win_TPropertyCtrl_OnKeyDown(
 void
 AXL_API
 axl_win_TPropertyCtrl_OnKeyUp(
-	axl_win_TPropertyCtrl* pPropertyCtrl,
-	int VkCode
+	axl_win_TPropertyCtrl* propertyCtrl,
+	int vkCode
 	)
 {
-	bool_t Shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
-	bool_t Ctrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+	bool_t shift = (getAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+	bool_t ctrl = (getAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
 
-	switch (VkCode)
+	switch (vkCode)
 	{
 	case VK_F4:
-		axl_win_TPropertyCtrl_OnKeyUp_F4(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyUp_F4(propertyCtrl, shift, ctrl);
 		break; 
 
 	case VK_SPACE:
 	case VK_RETURN:
-		axl_win_TPropertyCtrl_OnKeyUp_Space(pPropertyCtrl, Shift, Ctrl);
+		axl_win_TPropertyCtrl_OnKeyUp_Space(propertyCtrl, shift, ctrl);
 		break;
 	}; 
 }

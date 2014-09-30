@@ -19,51 +19,51 @@ class CEvent: public CWaitableHandle
 {
 public:
 	bool 
-	Create (
-		SECURITY_ATTRIBUTES* pSecAttr,
-		bool IsManualReset,
-		bool IsSignalled,
-		const wchar_t* pName
+	create (
+		SECURITY_ATTRIBUTES* secAttr,
+		bool isManualReset,
+		bool isSignalled,
+		const wchar_t* name
 		)
 	{
-		Close ();
+		close ();
 
-		m_h = ::CreateEventW (pSecAttr, IsManualReset, IsSignalled, pName);
-		return err::Complete (m_h != NULL);
+		m_h = ::CreateEventW (secAttr, isManualReset, isSignalled, name);
+		return err::complete (m_h != NULL);
 	}
 
 	bool 
-	Open (
-		uint_t Access,
-		bool DoInheritHandle,
-		const wchar_t* pName
+	open (
+		uint_t access,
+		bool doInheritHandle,
+		const wchar_t* name
 		)
 	{
-		Close ();
+		close ();
 
-		m_h = ::OpenEventW (Access, DoInheritHandle, pName);
-		return err::Complete (m_h != NULL);
+		m_h = ::OpenEventW (access, doInheritHandle, name);
+		return err::complete (m_h != NULL);
 	}
 
 	bool
-	Signal ()
+	signal ()
 	{ 
-		bool_t Result = ::SetEvent (m_h);
-		return err::Complete (Result);
+		bool_t result = ::SetEvent (m_h);
+		return err::complete (result);
 	}
 
 	bool
-	Reset ()
+	reset ()
 	{ 
-		bool_t Result = ::ResetEvent (m_h); 
-		return err::Complete (Result);
+		bool_t result = ::ResetEvent (m_h); 
+		return err::complete (result);
 	}
 
 	bool
-	Pulse ()
+	pulse ()
 	{ 
-		bool_t Result = ::PulseEvent (m_h); 
-		return err::Complete (Result);
+		bool_t result = ::PulseEvent (m_h); 
+		return err::complete (result);
 	}
 };
 

@@ -17,49 +17,49 @@ namespace psx {
 class CCond
 {
 protected:	
-	pthread_cond_t m_Cond;
+	pthread_cond_t m_cond;
 	
 public:
 	CCond ()
 	{		
-		pthread_cond_init (&m_Cond, NULL);
+		pthread_cond_init (&m_cond, NULL);
 	}
 
 	~CCond ()
 	{
-		pthread_cond_destroy (&m_Cond);
+		pthread_cond_destroy (&m_cond);
 	}
 
 	operator pthread_cond_t* ()
 	{
-		return &m_Cond;
+		return &m_cond;
 	}	
 	
 	bool 
-	Signal ()
+	signal ()
 	{
-		int Result = pthread_cond_signal (&m_Cond);
-		return Result == 0 ? true : err::Fail (Result);
+		int result = pthread_cond_signal (&m_cond);
+		return result == 0 ? true : err::fail (result);
 	}
 
 	bool 
-	Broadcast ()
+	broadcast ()
 	{
-		int Result = pthread_cond_broadcast (&m_Cond);
-		return Result == 0 ? true : err::Fail (Result);
+		int result = pthread_cond_broadcast (&m_cond);
+		return result == 0 ? true : err::fail (result);
 	}	
 
 	bool 
-	Wait (pthread_mutex_t* pMutex)
+	wait (pthread_mutex_t* mutex)
 	{
-		int Result = pthread_cond_wait (&m_Cond, pMutex);
-		return Result == 0 ? true : err::Fail (Result);	
+		int result = pthread_cond_wait (&m_cond, mutex);
+		return result == 0 ? true : err::fail (result);	
 	}
 	
 	bool 
-	Wait (
-		pthread_mutex_t* pMutex,
-		uint_t Timeout
+	wait (
+		pthread_mutex_t* mutex,
+		uint_t timeout
 		);
 };
 
@@ -68,46 +68,46 @@ public:
 class CCondMutexPair
 {
 protected:
-	CCond m_Cond;
-	CMutex m_Mutex;
+	CCond m_cond;
+	CMutex m_mutex;
 	
 public:
 	void
-	Lock ()
+	lock ()
 	{
-		m_Mutex.Lock ();
+		m_mutex.lock ();
 	}
 
 	void
-	Unlock ()
+	unlock ()
 	{
-		m_Mutex.Unlock ();
+		m_mutex.unlock ();
 	}
 
 	bool 
-	Signal ()
+	signal ()
 	{
-		return m_Cond.Signal ();
+		return m_cond.signal ();
 	}
 
 	bool 
-	Broadcast ()
+	broadcast ()
 	{
-		return m_Cond.Broadcast ();
+		return m_cond.broadcast ();
 	}
 
 	bool 
-	Wait ()
+	wait ()
 	{
-		Lock ();
-		return m_Cond.Wait (m_Mutex);
+		lock ();
+		return m_cond.wait (m_mutex);
 	}	
 	
 	bool 
-	Wait (uint_t Timeout)
+	wait (uint_t timeout)
 	{
-		Lock ();
-		return m_Cond.Wait (m_Mutex, Timeout);
+		lock ();
+		return m_cond.wait (m_mutex, timeout);
 	}	
 };
 

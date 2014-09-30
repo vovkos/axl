@@ -17,10 +17,10 @@ class CInitCharLiteralTable
 {
 public:
 	void
-	operator () (char LiteralTable [] [4])
+	operator () (char literalTable [] [4])
 	{
 		for (int i = 0; i < 256; i++)
-			_snprintf (LiteralTable [i], 4, "%c", i);
+			_snprintf (literalTable [i], 4, "%c", i);
 	}
 };
 
@@ -28,11 +28,11 @@ public:
 
 inline
 const char*
-GetCharLiteral (uchar_t Char)
+getCharLiteral (uchar_t c)
 {
 	static char _LiteralTable [256] [4];
-	mt::CallOnce (CInitCharLiteralTable (), _LiteralTable);
-	return _LiteralTable [Char];
+	mt::callOnce (CInitCharLiteralTable (), _LiteralTable);
+	return _LiteralTable [c];
 }
 
 //.............................................................................
@@ -41,10 +41,10 @@ class CInitCharCodeTable
 {
 public:
 	void
-	operator () (char LiteralTable [] [4])
+	operator () (char literalTable [] [4])
 	{
 		for (int i = 0; i < 256; i++)
-			_snprintf (LiteralTable [i], 4, "\\%02x", i);
+			_snprintf (literalTable [i], 4, "\\%02x", i);
 	}
 };
 
@@ -52,11 +52,11 @@ public:
 
 inline
 const char*
-GetCharCodeLiteral (uchar_t Char)
+getCharCodeLiteral (uchar_t c)
 {
 	static char _LiteralTable [256] [4];
-	mt::CallOnce (CInitCharCodeTable (), _LiteralTable);
-	return _LiteralTable [Char];
+	mt::callOnce (CInitCharCodeTable (), _LiteralTable);
+	return _LiteralTable [c];
 }
 
 //.............................................................................

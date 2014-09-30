@@ -21,92 +21,92 @@ class CArrayDetailsT
 public:
 	static 
 	void 
-	Construct (
+	construct (
 		T* p, 
-		size_t Count
+		size_t count
 		)
 	{ 
-		memset (p, 0, Count * sizeof (T)); // zero memory before construction
+		memset (p, 0, count * sizeof (T)); // zero memory before construction
 
-		T* pEnd = p + Count;
-		for (; p < pEnd; p++)
+		T* end = p + count;
+		for (; p < end; p++)
 			new (p) T;
 	}
 
 	static 
 	void 
-	ConstructCopy (
-		T* pDst, 
-		const T* pSrc, 
-		size_t Count
+	constructCopy (
+		T* dst, 
+		const T* src, 
+		size_t count
 		)
 	{ 
-		memset (pDst, 0, Count * sizeof (T)); // zero memory before construction
+		memset (dst, 0, count * sizeof (T)); // zero memory before construction
 
-		T* pEnd = pDst + Count;
-		for (; pDst < pEnd; pDst++, pSrc++)
-			new (pDst) T (*pSrc);
+		T* end = dst + count;
+		for (; dst < end; dst++, src++)
+			new (dst) T (*src);
 	}
 
 	static 
 	void 
-	Destruct (
+	destruct (
 		T* p, 
-		size_t Count
+		size_t count
 		)
 	{ 
-		T* pEnd = p + Count;
-		for (; p < pEnd; p++)
+		T* end = p + count;
+		for (; p < end; p++)
 			p->~T ();
 	}
 
 	static 
 	void 
-	Copy (
-		T* pDst, 
-		const T* pSrc, 
-		size_t Count
+	copy (
+		T* dst, 
+		const T* src, 
+		size_t count
 		)
 	{ 
-		if (pSrc > pDst || pSrc + Count <= pDst)
+		if (src > dst || src + count <= dst)
 		{
-			T* pEnd = pDst + Count;
-			for (; pDst < pEnd; pDst++, pSrc++)
-				*pDst = *pSrc;
+			T* end = dst + count;
+			for (; dst < end; dst++, src++)
+				*dst = *src;
 		}
 		else
 		{
-			T* pEnd = pDst;
+			T* end = dst;
 
-			pDst += Count;
-			pSrc += Count;
+			dst += count;
+			src += count;
 
-			while (pDst > pEnd)
+			while (dst > end)
 			{
-				pDst--;
-				pSrc--;
-				*pDst = *pSrc;
+				dst--;
+				src--;
+				*dst = *src;
 			}
 		}
 	}
 
 	static 
 	void 
-	Clear (
+	clear (
 		T* p, 
-		size_t Count
+		size_t count
 		)
 	{
-		T* pBegin = p;
-		T* pEnd = p + Count;
+		T* begin = p;
+		T* end = p + count;
 
-		for (; p < pEnd; p++)
+		for (; p < end; p++)
 			p->~T ();
 		
-		p = pBegin; 
-		memset (p, 0, Count * sizeof (T)); 
+		p = begin; 
+		memset (p, 0, count * sizeof (T)); 
 		
-		for (; p < pEnd; p++)
+		for (; p < end; p++)
 			new (p) T;
 	}	
 };
@@ -121,53 +121,53 @@ class CSimpleArrayDetailsT
 public:
 	static 
 	void 
-	Construct (
+	construct (
 		T* p, 
-		size_t Count
+		size_t count
 		)
 	{ 
-		memset (p, 0, Count * sizeof (T)); 
+		memset (p, 0, count * sizeof (T)); 
 	}
 
 	static 
 	void 
-	ConstructCopy (
-		T* pDst, 
-		const T* pSrc, 
-		size_t Count
+	constructCopy (
+		T* dst, 
+		const T* src, 
+		size_t count
 		)
 	{ 
-		memcpy (pDst, pSrc, Count * sizeof (T)); 
+		memcpy (dst, src, count * sizeof (T)); 
 	}
 
 	static 
 	void 
-	Destruct (
+	destruct (
 		T* p, 
-		size_t Count
+		size_t count
 		)
 	{
 	}
 
 	static 
 	void 
-	Copy (
-		T* pDst, 
-		const T* pSrc, 
-		size_t Count
+	copy (
+		T* dst, 
+		const T* src, 
+		size_t count
 		)
 	{ 
-		memmove (pDst, pSrc, Count * sizeof (T)); 
+		memmove (dst, src, count * sizeof (T)); 
 	}
 
 	static 
 	void 
-	Clear (
+	clear (
 		T* p, 
-		size_t Count
+		size_t count
 		)
 	{ 
-		memset (p, 0, Count * sizeof (T)); 
+		memset (p, 0, count * sizeof (T)); 
 	}	
 };
 
@@ -258,12 +258,12 @@ public:
 	class CHdr: public ref::CRefCount
 	{
 	public:
-		size_t m_MaxCount;
-		size_t m_Count;
+		size_t m_maxCount;
+		size_t m_count;
 
 		~CHdr ()
 		{
-			CDetails::Destruct ((T*) (this + 1), m_Count);
+			CDetails::destruct ((T*) (this + 1), m_count);
 		}
 	};
 
@@ -279,37 +279,37 @@ public:
 	CArrayT (T e)
 	{ 
 		m_p = NULL;
-		Copy (&e, 1);
+		copy (&e, 1);
 	}
 
-	CArrayT (const CArrayT& Src)
+	CArrayT (const CArrayT& src)
 	{   
 		m_p = NULL;
-		Copy (Src); 
+		copy (src); 
 	}
 
 	CArrayT (
 		const T* p, 
-		size_t Count
+		size_t count
 		)
 	{ 
 		m_p = NULL;
-		Copy (p, Count); 
+		copy (p, count); 
 	}
 
 	CArrayT (
-		ref::EBuf BufKind,
+		ref::EBuf bufKind,
 		void* p, 
-		size_t Size
+		size_t size
 		)
 	{
 		m_p = NULL;
-		SetBuffer (BufKind, p, Size);
+		setBuffer (bufKind, p, size);
 	}
 
 	~CArrayT ()
 	{
-		Release ();
+		release ();
 	}
 
 	operator const T* () const
@@ -323,9 +323,9 @@ public:
 	}
 
 	CArrayT& 
-	operator = (const CArrayT& Src)
+	operator = (const CArrayT& src)
 	{ 
-		Copy (Src);
+		copy (src);
 		return *this;
 	}
 
@@ -345,315 +345,315 @@ public:
 	}
 	
 	size_t 
-	GetCount () const
+	getCount () const
 	{ 
-		return m_p ? GetHdr ()->m_Count : 0; 
+		return m_p ? getHdr ()->m_count : 0; 
 	}
 
 	size_t 
-	GetReservedCount () const
+	getReservedCount () const
 	{ 
-		return m_p ? GetHdr ()->m_MaxCount : 0; 
+		return m_p ? getHdr ()->m_maxCount : 0; 
 	}
 
 	bool 
-	IsEmpty () const
+	isEmpty () const
 	{ 
-		return GetCount () == 0; 
+		return getCount () == 0; 
 	}
 
 	const T&
-	GetFront () const
+	getFront () const
 	{
-		ASSERT (!IsEmpty ());
+		ASSERT (!isEmpty ());
 		return m_p [0];
 	}
 
 	T&
-	GetFront () 
+	getFront () 
 	{
-		ASSERT (!IsEmpty ());
+		ASSERT (!isEmpty ());
 		return m_p [0];
 	}
 
 	const T&
-	GetBack () const
+	getBack () const
 	{
-		ASSERT (!IsEmpty ());
-		return m_p [GetCount () - 1];
+		ASSERT (!isEmpty ());
+		return m_p [getCount () - 1];
 	}
 
 	T&
-	GetBack () 
+	getBack () 
 	{
-		ASSERT (!IsEmpty ());
-		return m_p [GetCount () - 1];
+		ASSERT (!isEmpty ());
+		return m_p [getCount () - 1];
 	}
 
 	void 
-	Release ()
+	release ()
 	{
 		if (!m_p)
 			return;
 
-		GetHdr ()->Release ();
+		getHdr ()->release ();
 		m_p = NULL;
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{ 
-		SetCount (0); 
+		setCount (0); 
 	}
 
 	bool
-	Copy (const CArrayT& Src)
+	copy (const CArrayT& src)
 	{ 
-		if (m_p == Src.m_p)
+		if (m_p == src.m_p)
 			return true;
 
-		if (!Src.m_p)
+		if (!src.m_p)
 		{
-			Release ();
+			release ();
 			return true; 
 		}
 
-		if (Src.GetHdr ()->GetFree () == (mem::FFree*) -1)
-			return Copy (Src, Src.GetCount ()); 
+		if (src.getHdr ()->getFree () == (mem::FFree*) -1)
+			return copy (src, src.getCount ()); 
 
-		if (Src.m_p)
-			Src.GetHdr ()->AddRef ();
+		if (src.m_p)
+			src.getHdr ()->addRef ();
 
 		if (m_p)
-			GetHdr ()->Release ();
+			getHdr ()->release ();
 
-		m_p = Src.m_p;
+		m_p = src.m_p;
 		return true;
 	}
 
 	bool 
-	Copy (
+	copy (
 		const T* p, 
-		size_t Count
+		size_t count
 		)
 	{
-		if (Count == 0)
+		if (count == 0)
 		{
-			Clear ();
+			clear ();
 			return true;
 		}
 
-		bool Result = SetCount (Count);
-		if (!Result)
+		bool result = setCount (count);
+		if (!result)
 			return false;
 
-		CDetails::Copy (m_p, p, Count);
+		CDetails::copy (m_p, p, count);
 		return true;
 	}
 
 	bool 
-	Copy (T e)
+	copy (T e)
 	{
-		return Copy (&e, 1);
+		return copy (&e, 1);
 	}
 
 	T* 
-	Append (
+	append (
 		const T* p, 
-		size_t Count
+		size_t count
 		)
 	{ 
-		return Insert (-1, p, Count); 
+		return insert (-1, p, count); 
 	}
 
 	T*
-	Append (T e)
+	append (T e)
 	{ 
-		return Insert (-1, e); 
+		return insert (-1, e); 
 	}
 
 	T*
-	AppendMultiply (
+	appendMultiply (
 		T e,
-		size_t Count
+		size_t count
 		)
 	{ 
-		return InsertMultiply (-1, e, Count); 
+		return insertMultiply (-1, e, count); 
 	}
 
 	T*
-	Append (const CArrayT& Src)
+	append (const CArrayT& src)
 	{ 
-		return Insert (-1, Src, Src.GetCount ()); 
+		return insert (-1, src, src.getCount ()); 
 	}
 
 	T*
-	InsertSpace (
-		size_t Index, 
-		size_t Count
+	insertSpace (
+		size_t index, 
+		size_t count
 		)
 	{
-		size_t OldCount = GetCount ();
-		bool Result = SetCount (OldCount + Count);
-		if (!Result)
+		size_t oldCount = getCount ();
+		bool result = setCount (oldCount + count);
+		if (!result)
 			return NULL;
 
-		if (Index > OldCount)
-			Index = OldCount;
+		if (index > oldCount)
+			index = oldCount;
 
-		T* pDst = m_p + Index;
+		T* dst = m_p + index;
 
-		if (Count && Index < OldCount)
-			CDetails::Copy (pDst + Count, pDst, OldCount - Index);
+		if (count && index < oldCount)
+			CDetails::copy (dst + count, dst, oldCount - index);
 
-		return pDst;
+		return dst;
 	}
 
 	T*
-	Insert (
-		size_t Index, 
+	insert (
+		size_t index, 
 		const T* p, 
-		size_t Count
+		size_t count
 		)
 	{
-		T* pDst = InsertSpace (Index, Count);
+		T* dst = insertSpace (index, count);
 
 		if (p)
-			CDetails::Copy (pDst, p, Count);
+			CDetails::copy (dst, p, count);
 		else
-			CDetails::Clear (pDst, Count);
+			CDetails::clear (dst, count);
 
-		return pDst;
+		return dst;
 	}
 
 	T*
-	Insert (
-		size_t Index, 
+	insert (
+		size_t index, 
 		T e
 		)
 	{
-		T* pDst = InsertSpace (Index, 1);
-		*pDst = e;
-		return pDst;
+		T* dst = insertSpace (index, 1);
+		*dst = e;
+		return dst;
 	}
 
 	T*
-	InsertMultiply (
-		size_t Index, 
+	insertMultiply (
+		size_t index, 
 		T e, 
-		size_t Count
+		size_t count
 		)
 	{
-		T* pDst = InsertSpace (Index, Count);
-		T* pEnd = pDst + Count;
+		T* dst = insertSpace (index, count);
+		T* end = dst + count;
 
-		for (; pDst < pEnd; pDst++)
-			*pDst = e;
+		for (; dst < end; dst++)
+			*dst = e;
 
-		return pDst;
+		return dst;
 	}
 
 	T* 
-	Insert (
-		size_t Index, 
-		const CArrayT& Src
+	insert (
+		size_t index, 
+		const CArrayT& src
 		)
 	{ 
-		return Insert (Index, Src, Src.GetCount ()); 
+		return insert (index, src, src.getCount ()); 
 	}
 
 	bool 
-	Remove (
-		size_t Index, 
-		size_t Count = 1
+	remove (
+		size_t index, 
+		size_t count = 1
 		)
 	{
-		if (Count == 0)
+		if (count == 0)
 			return true;
 
-		size_t OldCount = GetCount ();
-		if (Index >= OldCount)
+		size_t oldCount = getCount ();
+		if (index >= oldCount)
 			return true;
 
-		if (Index + Count >= OldCount)
-			return SetCount (Index);
+		if (index + count >= oldCount)
+			return setCount (index);
 
-		bool Result = EnsureExclusive ();
-		if (!Result)
+		bool result = ensureExclusive ();
+		if (!result)
 			return false;
 
-		size_t NewCount = OldCount - Count;
+		size_t newCount = oldCount - count;
 
-		T* pDst = m_p + Index;
-		CDetails::Copy (pDst, pDst + Count, NewCount - Index);
+		T* dst = m_p + index;
+		CDetails::copy (dst, dst + count, newCount - index);
 
-		return SetCount (NewCount);
+		return setCount (newCount);
 	}
 
 	size_t
-	Pop (size_t Count = 1)
+	pop (size_t count = 1)
 	{
-		size_t OldCount = GetCount ();
-		if (Count >= OldCount)
-			Count = OldCount;
+		size_t oldCount = getCount ();
+		if (count >= oldCount)
+			count = oldCount;
 
-		SetCount (OldCount - Count);
-		return Count;
+		setCount (oldCount - count);
+		return count;
 	}
 
 	T 
-	GetBackAndPop ()
+	getBackAndPop ()
 	{
-		T e = GetBack ();
-		Pop ();
+		T e = getBack ();
+		pop ();
 		return e;
 	}
 
 	bool 
-	Move (
-		size_t IndexDst, 
-		size_t IndexSrc, 
-		size_t Count = 1
+	move (
+		size_t indexDst, 
+		size_t indexSrc, 
+		size_t count = 1
 		)
 	{
-		if (Count == 0 || IndexDst == IndexSrc)
+		if (count == 0 || indexDst == indexSrc)
 			return true;
 
-		size_t OldCount = GetCount ();
+		size_t oldCount = getCount ();
 
-		if (IndexDst + Count > OldCount || IndexSrc + Count > OldCount)
+		if (indexDst + count > oldCount || indexSrc + count > oldCount)
 		{
-			err::SetError (err::EStatus_InvalidParameter);
+			err::setError (err::EStatus_InvalidParameter);
 			return false;
 		}
 
-		T* pTemp = (T*) AXL_MEM_ALLOC (Count * sizeof (T));
-		if (!pTemp)
+		T* temp = (T*) AXL_MEM_ALLOC (count * sizeof (T));
+		if (!temp)
 			return false;
 
-		T* pDst = m_p + IndexDst;
-		T* pSrc = m_p + IndexSrc;
+		T* dst = m_p + indexDst;
+		T* src = m_p + indexSrc;
 
-		CDetails::ConstructCopy (pTemp, pSrc, Count);
+		CDetails::constructCopy (temp, src, count);
 
-		if (IndexSrc < IndexDst)
-			CDetails::Copy (pSrc, pSrc + Count, IndexDst - IndexSrc);
+		if (indexSrc < indexDst)
+			CDetails::copy (src, src + count, indexDst - indexSrc);
 		else
-			CDetails::Copy (pDst + Count, pDst, IndexSrc - IndexDst);
+			CDetails::copy (dst + count, dst, indexSrc - indexDst);
 
-		CDetails::Copy (pDst, pTemp, Count);
+		CDetails::copy (dst, temp, count);
 
-		CDetails::Destruct (pTemp, Count);
-		AXL_MEM_FREE (pTemp);
+		CDetails::destruct (temp, count);
+		AXL_MEM_FREE (temp);
 
 		return true;
 	}
 
 	size_t
-	Find (T e)
+	find (T e)
 	{
-		size_t Count = GetCount ();
-		for (size_t i = 0; i < Count; i++)
+		size_t count = getCount ();
+		for (size_t i = 0; i < count; i++)
 			if (m_p [i] == e)
 				return i;
 
@@ -661,10 +661,10 @@ public:
 	}
 
 	size_t
-	FindReverse (T e)
+	findReverse (T e)
 	{
-		size_t Count = GetCount ();
-		for (intptr_t i = Count - 1; i >= 0; i--)
+		size_t count = getCount ();
+		for (intptr_t i = count - 1; i >= 0; i--)
 			if (m_p [i] == e)
 				return i;
 
@@ -672,161 +672,161 @@ public:
 	}
 
 	T* 
-	GetBuffer ()
+	getBuffer ()
 	{ 
-		return EnsureExclusive () ? m_p : NULL; 
+		return ensureExclusive () ? m_p : NULL; 
 	}
 
 	T* 
-	GetBuffer (size_t Count)
+	getBuffer (size_t count)
 	{ 
-		return SetCount (Count) ? m_p : NULL; 
+		return setCount (count) ? m_p : NULL; 
 	}
 
 	bool 
-	Reserve (size_t Count)
+	reserve (size_t count)
 	{
-		if (Count <= GetReservedCount ())
-			return EnsureExclusive ();
+		if (count <= getReservedCount ())
+			return ensureExclusive ();
 
-		size_t MaxCount = rtl::GetMinPower2Ge (Count);
-		size_t Size = MaxCount * sizeof (T);
+		size_t maxCount = rtl::getMinPower2Ge (count);
+		size_t size = maxCount * sizeof (T);
 
-		ref::CPtrT<CHdr> NewHdr = AXL_REF_NEW_EXTRA (CHdr, Size);
-		if (!NewHdr)
+		ref::CPtrT<CHdr> newHdr = AXL_REF_NEW_EXTRA (CHdr, size);
+		if (!newHdr)
 			return false;
 
-		size_t OldCount = GetCount ();
+		size_t oldCount = getCount ();
 
-		NewHdr->m_Count = OldCount;
-		NewHdr->m_MaxCount = MaxCount;
+		newHdr->m_count = oldCount;
+		newHdr->m_maxCount = maxCount;
 
-		T* p = (T*) (NewHdr + 1);
+		T* p = (T*) (newHdr + 1);
 
-		if (OldCount)
+		if (oldCount)
 		{
-			CDetails::ConstructCopy (p, m_p, OldCount);
-			GetHdr ()->Release ();
+			CDetails::constructCopy (p, m_p, oldCount);
+			getHdr ()->release ();
 		}
 
 		m_p = p;
 
-		NewHdr.Detach ();
+		newHdr.detach ();
 		return true;
 	}
 
 	size_t 
-	EnsureCount (size_t Count)
+	ensureCount (size_t count)
 	{
-		if (GetCount () < Count)
-			SetCount (Count);
+		if (getCount () < count)
+			setCount (count);
 
-		return GetCount ();
+		return getCount ();
 	}
 
 	bool 
-	SetCount (size_t Count)
+	setCount (size_t count)
 	{
-		CHdr* pOldHdr = GetHdr ();
+		CHdr* oldHdr = getHdr ();
 
-		if (pOldHdr && pOldHdr->GetRefCount () == 1)
+		if (oldHdr && oldHdr->getRefCount () == 1)
 		{
-			if (pOldHdr->m_Count == Count)
+			if (oldHdr->m_count == count)
 				return true;
 
-			if (pOldHdr->m_MaxCount >= Count)
+			if (oldHdr->m_maxCount >= count)
 			{
-				size_t OldCount = pOldHdr->m_Count;
-				if (Count > OldCount)
-					CDetails::Construct (m_p + OldCount, Count - OldCount);
+				size_t oldCount = oldHdr->m_count;
+				if (count > oldCount)
+					CDetails::construct (m_p + oldCount, count - oldCount);
 				else
-					CDetails::Destruct (m_p + Count, OldCount - Count);
+					CDetails::destruct (m_p + count, oldCount - count);
 
-				pOldHdr->m_Count = Count;
+				oldHdr->m_count = count;
 				return true;
 			}
 		}
 
-		if (Count == 0)
+		if (count == 0)
 		{
-			Release ();
+			release ();
 			return true;
 		}
 
-		if (!pOldHdr)
+		if (!oldHdr)
 		{
-			bool Result = Reserve (Count);
-			if (!Result)
+			bool result = reserve (count);
+			if (!result)
 				return false;
 
-			CDetails::Construct (m_p, Count);
-			GetHdr ()->m_Count = Count;
+			CDetails::construct (m_p, count);
+			getHdr ()->m_count = count;
 			return true;
 		}
 
-		size_t MaxCount = rtl::GetMinPower2Gt (Count); // make a room
-		size_t Size = MaxCount * sizeof (T);
+		size_t maxCount = rtl::getMinPower2Gt (count); // make a room
+		size_t size = maxCount * sizeof (T);
 
-		ref::CPtrT<CHdr> NewHdr = AXL_REF_NEW_EXTRA (CHdr, Size);
-		if (!NewHdr)
+		ref::CPtrT<CHdr> newHdr = AXL_REF_NEW_EXTRA (CHdr, size);
+		if (!newHdr)
 			return false;
 
-		NewHdr->m_Count = Count;
-		NewHdr->m_MaxCount = MaxCount;
+		newHdr->m_count = count;
+		newHdr->m_maxCount = maxCount;
 
-		T* p = (T*) (NewHdr + 1);
+		T* p = (T*) (newHdr + 1);
 
-		if (Count <= pOldHdr->m_Count)
+		if (count <= oldHdr->m_count)
 		{
-			CDetails::ConstructCopy (p, m_p, Count);
+			CDetails::constructCopy (p, m_p, count);
 		}
 		else
 		{
-			CDetails::ConstructCopy (p, m_p, pOldHdr->m_Count);
-			CDetails::Construct (p + pOldHdr->m_Count, Count - pOldHdr->m_Count);
+			CDetails::constructCopy (p, m_p, oldHdr->m_count);
+			CDetails::construct (p + oldHdr->m_count, count - oldHdr->m_count);
 		}
 		
-		pOldHdr->Release ();
+		oldHdr->release ();
 
 		m_p = p;
 
-		NewHdr.Detach ();
+		newHdr.detach ();
 		return true;
 	}
 
 	bool 
-	EnsureExclusive ()
+	ensureExclusive ()
 	{ 
-		return m_p ? SetCount (GetCount ()) : true; 
+		return m_p ? setCount (getCount ()) : true; 
 	}
 
 	void
-	SetBuffer (
-		ref::EBuf BufKind,
+	setBuffer (
+		ref::EBuf bufKind,
 		void* p,
-		size_t Size
+		size_t size
 		)
 	{
-		ASSERT (Size >= sizeof (CHdr) + sizeof (T));
+		ASSERT (size >= sizeof (CHdr) + sizeof (T));
 
-		CHdr* pOldHdr = GetHdr ();
+		CHdr* oldHdr = getHdr ();
 		
-		mem::FFree* pfFree = BufKind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
-		ref::CPtrT <CHdr> NewHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
-		NewHdr->m_Count = 0;
-		NewHdr->m_MaxCount = (Size - sizeof (CHdr)) / sizeof (T);
+		mem::FFree* pfFree = bufKind == ref::EBuf_Static ? NULL : (mem::FFree*) -1;
+		ref::CPtrT <CHdr> newHdr = AXL_REF_NEW_INPLACE (CHdr, p, pfFree);
+		newHdr->m_count = 0;
+		newHdr->m_maxCount = (size - sizeof (CHdr)) / sizeof (T);
 
-		if (pOldHdr)
-			pOldHdr->Release ();
+		if (oldHdr)
+			oldHdr->release ();
 
-		m_p = (T*) (NewHdr + 1);
+		m_p = (T*) (newHdr + 1);
 
-		NewHdr.Detach ();
+		newHdr.detach ();
 	}
 
 protected:
 	CHdr*
-	GetHdr () const
+	getHdr () const
 	{
 		return m_p ? (CHdr*) m_p - 1 : NULL;
 	}

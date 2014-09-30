@@ -4,44 +4,44 @@
 
 //.............................................................................
 
-class MyLogProxy: public log::CPeer
+class myLogProxy: public log::CPeer
 {
 protected:
-	friend class SocketThread;
-	friend class Packetizer;
+	friend class socketThread;
+	friend class packetizer;
 
-	class SocketThread: public mt::CThreadImplT <SocketThread>
+	class socketThread: public mt::CThreadImplT <socketThread>
 	{
 	public:
-		void ThreadProc ()
+		void threadProc ()
 		{
-			AXL_CONTAINING_RECORD (this, MyLogProxy, m_socketThread)->socketThreadProc ();
+			AXL_CONTAINING_RECORD (this, myLogProxy, m_socketThread)->socketThreadProc ();
 		}
 	};
 
-	class Packetizer: public rtl::CPacketizerT <Packetizer>
+	class packetizer: public rtl::CPacketizerT <packetizer>
 	{
 	public:
-		void OnPacket (const void* p, size_t size)
+		void onPacket (const void* p, size_t size)
 		{
-			AXL_CONTAINING_RECORD (this, MyLogProxy, m_packetizer)->onPacket (p, size);
+			AXL_CONTAINING_RECORD (this, myLogProxy, m_packetizer)->onPacket (p, size);
 		}
 	};
 
 protected:
 	log::CPeer* m_target;
-	SocketThread m_socketThread;
-	Packetizer m_packetizer;
+	socketThread m_socketThread;
+	packetizer m_packetizer;
 	SOCKET m_listenSocket;
 	SOCKET m_connectSocket;
 	
 public:
-	rtl::CString m_Tag;
+	rtl::CString m_tag;
 
 public:
-	MyLogProxy ();
+	myLogProxy ();
 	
-	~MyLogProxy ()
+	~myLogProxy ()
 	{
 		close ();
 	}
@@ -51,7 +51,7 @@ public:
 	bool listen (log::CPeer* target, int port);
 	bool connect (log::CPeer* target, int ip, int port);
 
-	virtual void SendMsg (const log::TMsg* msg);
+	virtual void sendMsg (const log::TMsg* msg);
 
 protected:
 	void onPacket (const void* p, size_t size);

@@ -8,7 +8,7 @@ namespace rtl {
 //.............................................................................
 
 char
-CEscapeEncoding::FindEscapeChar (char x)
+CEscapeEncoding::findEscapeChar (char x)
 {
 	switch (x)
 	{
@@ -42,7 +42,7 @@ CEscapeEncoding::FindEscapeChar (char x)
 }
 
 char
-CEscapeEncoding::FindEscapeReplaceChar (char x)
+CEscapeEncoding::findEscapeReplaceChar (char x)
 {
 	switch (x)
 	{
@@ -76,54 +76,54 @@ CEscapeEncoding::FindEscapeReplaceChar (char x)
 }
 
 size_t
-CEscapeEncoding::Encode (
-	CString* pString,
+CEscapeEncoding::encode (
+	CString* string,
 	const char* p, 
-	size_t Length
+	size_t length
 	)
 {
 
-	if (Length == -1)
-		Length = CStringDetails::CalcLength (p);
+	if (length == -1)
+		length = CStringDetails::calcLength (p);
 
-	const char* pBase = p;
-	const char* pEnd = p + Length;
-	for (; p < pEnd; p++)
+	const char* base = p;
+	const char* end = p + length;
+	for (; p < end; p++)
 	{
 		if (isprint (*p))
 			continue;
 
-		char EscapeSequence [4] = { '\\' };
+		char escapeSequence [4] = { '\\' };
 
-		pString->Append (pBase, p - pBase);
+		string->append (base, p - base);
 
-		char Escape = FindEscapeChar (*p);		
-		if (Escape != *p)
+		char escape = findEscapeChar (*p);		
+		if (escape != *p)
 		{
-			EscapeSequence [1] = Escape;
-			pString->Append (EscapeSequence, 2);
+			escapeSequence [1] = escape;
+			string->append (escapeSequence, 2);
 		}
 		else
 		{
-			EscapeSequence [1] = 'x';
-			EscapeSequence [2] = CHexEncoding::GetHexChar_l (*p >> 4);
-			EscapeSequence [3] = CHexEncoding::GetHexChar_l (*p);
-			pString->Append (EscapeSequence, 4);
+			escapeSequence [1] = 'x';
+			escapeSequence [2] = CHexEncoding::getHexChar_l (*p >> 4);
+			escapeSequence [3] = CHexEncoding::getHexChar_l (*p);
+			string->append (escapeSequence, 4);
 		}
 
-		pBase = p + 1;
+		base = p + 1;
 	}
 
-	pString->Append (pBase, p - pBase);
+	string->append (base, p - base);
 
-	return pString->GetLength ();
+	return string->getLength ();
 }
 
 size_t
-CEscapeEncoding::Decode (
-	CString* pString,
+CEscapeEncoding::decode (
+	CString* string,
 	const char* p, 
-	size_t Length
+	size_t length
 	)
 {
 	enum EState
@@ -133,29 +133,29 @@ CEscapeEncoding::Decode (
 		EState_Hex
 	};
 
-	EState State = EState_Normal;	
+	EState state = EState_Normal;	
 
-	if (Length == -1)
-		Length = CStringDetails::CalcLength (p);
+	if (length == -1)
+		length = CStringDetails::calcLength (p);
 
-	char HexCodeString [4] = { 0 };
-	char* pHexCodeEnd;
-	size_t HexCodeLen;
-	ulong_t HexCode;
+	char hexCodeString [4] = { 0 };
+	char* hexCodeEnd;
+	size_t hexCodeLen;
+	ulong_t hexCode;
 
-	char Replace;
+	char replace;
 
-	const char* pEnd = p + Length;
-	const char* pBase = p;
-	for (; p < pEnd; p++)
+	const char* end = p + length;
+	const char* base = p;
+	for (; p < end; p++)
 	{
-		switch (State)
+		switch (state)
 		{
 		case EState_Normal:
 			if (*p == '\\')
 			{
-				pString->Append (pBase, p - pBase);
-				State = EState_Escape;
+				string->append (base, p - base);
+				state = EState_Escape;
 			}
 
 			break;
@@ -163,43 +163,43 @@ CEscapeEncoding::Decode (
 		case EState_Escape:
 			if (*p == 'x')
 			{
-				State = EState_Hex;
-				HexCodeLen = 0;
+				state = EState_Hex;
+				hexCodeLen = 0;
 				break;
 			}
 
-			Replace = FindEscapeReplaceChar (*p);
-			if (Replace != *p)
+			replace = findEscapeReplaceChar (*p);
+			if (replace != *p)
 			{
-				pString->Append (Replace);
-				pBase = p + 1;
+				string->append (replace);
+				base = p + 1;
 			}
 			else
 			{
-				pBase = p;
+				base = p;
 			}
 
-			State = EState_Normal;
+			state = EState_Normal;
 			break;
 		
 		case EState_Hex:			
-			HexCodeString [HexCodeLen++] = *p;
-			if (HexCodeLen < 2)
+			hexCodeString [hexCodeLen++] = *p;
+			if (hexCodeLen < 2)
 				break;
 
-			HexCode = strtoul (HexCodeString, &pHexCodeEnd, 16);
-			if (pHexCodeEnd != &HexCodeString [HexCodeLen])
-				HexCode = '?';
+			hexCode = strtoul (hexCodeString, &hexCodeEnd, 16);
+			if (hexCodeEnd != &hexCodeString [hexCodeLen])
+				hexCode = '?';
 
-			pString->Append ((char const*) &HexCode, 1);
-			State = EState_Normal;
-			pBase = p + 1;
+			string->append ((char const*) &hexCode, 1);
+			state = EState_Normal;
+			base = p + 1;
 			break;
 		}
 	}
 
-	pString->Append (pBase, p - pBase);
-	return pString->GetLength ();
+	string->append (base, p - base);
+	return string->getLength ();
 }
 
 //.............................................................................

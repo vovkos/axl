@@ -10,74 +10,74 @@ namespace io {
 #if (_AXL_ENV == AXL_ENV_WIN)
 
 bool
-CFile::Open (
-	const char* pFileName,
-	uint_t Flags
+CFile::open (
+	const char* fileName,
+	uint_t flags
 	)
 {
-	uint_t AccessMode = (Flags & EFileFlag_ReadOnly) ?
+	uint_t accessMode = (flags & EFileFlag_ReadOnly) ?
 		GENERIC_READ :
 		GENERIC_READ | GENERIC_WRITE;
 
-	uint_t ShareMode = (Flags & EFileFlag_Exclusive) ?
+	uint_t shareMode = (flags & EFileFlag_Exclusive) ?
 		0 :
-		(Flags & EFileFlag_ReadOnly) || (Flags & EFileFlag_ShareWrite) ?
+		(flags & EFileFlag_ReadOnly) || (flags & EFileFlag_ShareWrite) ?
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE :
 			FILE_SHARE_READ;
 
-	uint_t CreationDisposition = (Flags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)) ?
+	uint_t creationDisposition = (flags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)) ?
 		OPEN_EXISTING :
 		OPEN_ALWAYS;
 
-	uint_t FlagsAttributes = (Flags & EFileFlag_DeleteOnClose) ?
+	uint_t flagsAttributes = (flags & EFileFlag_DeleteOnClose) ?
 		FILE_FLAG_DELETE_ON_CLOSE :
 		0;
 
-	if (Flags & EFileFlag_Asynchronous)
-		FlagsAttributes |= FILE_FLAG_OVERLAPPED;
+	if (flags & EFileFlag_Asynchronous)
+		flagsAttributes |= FILE_FLAG_OVERLAPPED;
 
-	char Buffer [256];
-	rtl::CString_w FileName (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	FileName = pFileName;
+	char buffer [256];
+	rtl::CString_w fileName_w (ref::EBuf_Stack, buffer, sizeof (buffer));
+	fileName_w = fileName;
 
-	return m_File.Create (
-		FileName,
-		AccessMode,
-		ShareMode,
+	return m_file.create (
+		fileName_w,
+		accessMode,
+		shareMode,
 		NULL,
-		CreationDisposition,
-		FlagsAttributes
+		creationDisposition,
+		flagsAttributes
 		);
 }
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
 uint_t
-GetPosixOpenFlags (uint_t FileFlags)
+getPosixOpenFlags (uint_t fileFlags)
 {
-	uint_t PosixFlags = (FileFlags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
+	uint_t posixFlags = (fileFlags & EFileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
 
-	if (!(FileFlags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)))
-		PosixFlags |= O_CREAT;
+	if (!(fileFlags & (EFileFlag_ReadOnly | EFileFlag_OpenExisting)))
+		posixFlags |= O_CREAT;
 
-	if (FileFlags & EFileFlag_Asynchronous)
-		PosixFlags |= O_NONBLOCK;
+	if (fileFlags & EFileFlag_Asynchronous)
+		posixFlags |= O_NONBLOCK;
 
-	return PosixFlags;
+	return posixFlags;
 }
 
 bool
-CFile::Open (
-	const char* pFileName,
-	uint_t Flags
+CFile::open (
+	const char* fileName,
+	uint_t flags
 	)
 {
-	uint_t PosixFlags = GetPosixOpenFlags (Flags);
+	uint_t posixFlags = getPosixOpenFlags (flags);
 
 	// TODO: handle exclusive and share write flags with fcntl locks
 
-	bool Result = m_File.Open (pFileName, PosixFlags);
-	if (!Result)
+	bool result = m_file.open (fileName, posixFlags);
+	if (!result)
 		return false;
 
 	// if (Flags & EFileFlag_DeleteOnClose)
@@ -89,16 +89,16 @@ CFile::Open (
 #endif
 
 size_t
-CFile::WriteFormat_va (
-	const char* pFormat,
+CFile::writeFormat_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {
-	char Buffer [256];
-	rtl::CString String (ref::EBuf_Stack, Buffer, sizeof (Buffer));
-	String.Format_va (pFormat, va);
+	char buffer [256];
+	rtl::CString string (ref::EBuf_Stack, buffer, sizeof (buffer));
+	string.format_va (formatString, va);
 
-	return Write (String, String.GetLength ());
+	return write (string, string.getLength ());
 }
 
 //.............................................................................

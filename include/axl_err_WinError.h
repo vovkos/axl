@@ -27,13 +27,13 @@ class CWinErrorProvider: public CErrorProvider
 public:
 	static
 	rtl::CString 
-	GetErrorDescription (dword_t Error);
+	getErrorDescription (dword_t code);
 
 	virtual 
 	rtl::CString 
-	GetErrorDescription (const TError* pError)
+	getErrorDescription (const TError* error)
 	{
-		return GetErrorDescription (pError->m_Code);
+		return getErrorDescription (error->m_code);
 	}
 };
 
@@ -46,22 +46,22 @@ public:
 	{
 	}
 
-	CWinError (dword_t Error)
+	CWinError (dword_t code)
 	{
-		Create (Error);
+		create (code);
 	}
 
 	TError* 
-	Create (dword_t Error);
+	create (dword_t code);
 };
 
 //.............................................................................
 
 inline
 CError
-SetWinError (dword_t Error)
+setWinError (dword_t code)
 {
-	SetError (CWinError (Error));
+	setError (CWinError (code));
 }
 
 //.............................................................................

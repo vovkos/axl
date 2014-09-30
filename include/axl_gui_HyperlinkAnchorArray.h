@@ -17,12 +17,12 @@ namespace gui {
 
 struct THyperlinkAnchor: rtl::TListLink
 {
-	size_t m_Offset;
-	rtl::CString m_Hyperlink;
+	size_t m_offset;
+	rtl::CString m_hyperlink;
 
 	THyperlinkAnchor ()
 	{
-		m_Offset = 0;
+		m_offset = 0;
 	}
 };
 
@@ -31,55 +31,55 @@ struct THyperlinkAnchor: rtl::TListLink
 class CHyperlinkAnchorArray
 {
 protected:
-	rtl::CStdListT <THyperlinkAnchor> m_List;
-	rtl::CArrayT <THyperlinkAnchor*> m_Array;
+	rtl::CStdListT <THyperlinkAnchor> m_list;
+	rtl::CArrayT <THyperlinkAnchor*> m_array;
 
 public:
 	bool
-	IsEmpty () const
+	isEmpty () const
 	{
-		return m_List.IsEmpty ();
+		return m_list.isEmpty ();
 	}
 
 	size_t 
-	GetCount () const
+	getCount () const
 	{
-		return m_List.GetCount ();
+		return m_list.getCount ();
 	}
 
 	rtl::CIteratorT <THyperlinkAnchor> 
-	GetHead () const
+	getHead () const
 	{
-		return m_List.GetHead ();
+		return m_list.getHead ();
 	}
 
 	rtl::CIteratorT <THyperlinkAnchor> 
-	GetTail () const
+	getTail () const
 	{
-		return m_List.GetHead ();
+		return m_list.getHead ();
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{ 
-		m_List.Clear ();
-		m_Array.Clear ();	
+		m_list.clear ();
+		m_array.clear ();	
 	}
 
 	THyperlinkAnchor* 
-	Find (size_t Offset) const;
+	find (size_t offset) const;
 
 	THyperlinkAnchor* 
-	OpenHyperlink (
-		size_t Offset, 
-		const char* pHyperlink, 
-		size_t Length = -1
+	openHyperlink (
+		size_t offset, 
+		const char* hyperlink, 
+		size_t length = -1
 		);
 
 	THyperlinkAnchor* 
-	CloseHyperlink (size_t Offset)
+	closeHyperlink (size_t offset)
 	{
-		return OpenHyperlink (Offset, NULL, 0);
+		return openHyperlink (offset, NULL, 0);
 	}
 };
 

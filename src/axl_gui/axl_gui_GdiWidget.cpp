@@ -8,346 +8,346 @@ namespace gui {
 //.............................................................................
 
 void
-BuildScrollInfo (
-	SCROLLINFO* pScrollInfo,
-	size_t Max,
-	size_t Page,
-	size_t Pos
+buildScrollInfo (
+	SCROLLINFO* scrollInfo,
+	size_t max,
+	size_t page,
+	size_t pos
 	)
 {
-	memset (pScrollInfo, 0, sizeof (SCROLLINFO));
-	pScrollInfo->cbSize = sizeof (SCROLLINFO);
-	pScrollInfo->fMask = SIF_ALL;
-	pScrollInfo->nMin  = 0;
-	pScrollInfo->nMax  = Max;
-	pScrollInfo->nPage = Page;
-	pScrollInfo->nPos  = Pos;
+	memset (scrollInfo, 0, sizeof (SCROLLINFO));
+	scrollInfo->cbSize = sizeof (SCROLLINFO);
+	scrollInfo->fMask = SIF_ALL;
+	scrollInfo->nMin  = 0;
+	scrollInfo->nMax  = max;
+	scrollInfo->nPage = page;
+	scrollInfo->nPos  = pos;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint_t 
-GetModifierKeys ()
+getModifierKeys ()
 {
-	uint_t ModifierKeys = 0;
+	uint_t modifierKeys = 0;
 
-	if (GetAsyncKeyState (VK_SHIFT) & 0x8000)
-		ModifierKeys |= EModifierKey_Shift;
+	if (::GetAsyncKeyState (VK_SHIFT) & 0x8000)
+		modifierKeys |= EModifierKey_Shift;
 
-	if (GetAsyncKeyState (VK_CONTROL) & 0x8000)
-		ModifierKeys |= EModifierKey_Ctrl;
+	if (::GetAsyncKeyState (VK_CONTROL) & 0x8000)
+		modifierKeys |= EModifierKey_Ctrl;
 
-	if (GetAsyncKeyState (VK_MENU) & 0x8000)
-		ModifierKeys |= EModifierKey_Alt;
+	if (::GetAsyncKeyState (VK_MENU) & 0x8000)
+		modifierKeys |= EModifierKey_Alt;
 
-	return ModifierKeys;
+	return modifierKeys;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint_t 
-GetMouseButtons ()
+getMouseButtons ()
 {
-	uint_t Buttons = 0;
+	uint_t buttons = 0;
 
-	if (GetAsyncKeyState (VK_LBUTTON) & 0x8000)
-		Buttons |= EMouseButton_Left;
+	if (::GetAsyncKeyState (VK_LBUTTON) & 0x8000)
+		buttons |= EMouseButton_Left;
 
-	if (GetAsyncKeyState (VK_RBUTTON) & 0x8000)
-		Buttons |= EMouseButton_Right;
+	if (::GetAsyncKeyState (VK_RBUTTON) & 0x8000)
+		buttons |= EMouseButton_Right;
 
-	if (GetAsyncKeyState (VK_MBUTTON) & 0x8000)
-		Buttons |= EMouseButton_Medium;
+	if (::GetAsyncKeyState (VK_MBUTTON) & 0x8000)
+		buttons |= EMouseButton_Medium;
 
-	return Buttons;
+	return buttons;
 }
 
 //.............................................................................
 
 ref::CPtrT <CCanvas>
-CGdiWidgetImpl::GetCanvas (HWND hWnd)
+CGdiWidgetImpl::getCanvas (HWND hWnd)
 {
 	HDC hdc = ::GetDC (hWnd);
 
-	ref::CPtrT <CGdiCanvas> Dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);	
-	Dc->Attach (hdc, hWnd, CGdiCanvas::EDestruct_ReleaseDc);
-	return Dc;
+	ref::CPtrT <CGdiCanvas> dc = AXL_REF_NEW (ref::CBoxT <CGdiCanvas>);	
+	dc->attach (hdc, hWnd, CGdiCanvas::EDestruct_ReleaseDc);
+	return dc;
 }
 
 LRESULT 
-CGdiWidgetImpl::WindowProc (
+CGdiWidgetImpl::windowProc (
 	HWND hWnd,
-	UINT WmMsg, 
+	UINT wmMsg, 
 	WPARAM wParam, 
 	LPARAM lParam, 
-	bool* pIsHandled
+	bool* isHandled_o
 	)
 {
-	ASSERT (m_pEngine->GetEngineKind () == EEngine_Gdi);
+	ASSERT (m_engine->getEngineKind () == EEngine_Gdi);
 
-	if (CheckMsgMask (EWidgetMsg_Gdi))
+	if (checkMsgMask (EWidgetMsg_Gdi))
 	{
-		TWidgetGdiMsg Msg (WmMsg, wParam, lParam);
+		TWidgetGdiMsg msg (wmMsg, wParam, lParam);
 		
-		bool IsHandled = true;
-		ProcessWidgetMsg (&Msg, &IsHandled);
-		if (IsHandled)
-			return Msg.m_lResult;
+		bool isHandled = true;
+		processWidgetMsg (&msg, &isHandled);
+		if (isHandled)
+			return msg.m_lResult;
 	}
 
 	LRESULT lResult = 0;
-	switch (WmMsg)
+	switch (wmMsg)
 	{
 	case WM_DESTROY:
-		if (CheckMsgMask (EWidgetMsg_Close))
-			ProcessWidgetMsg (&TWidgetMsg (EWidgetMsg_Close), pIsHandled);
+		if (checkMsgMask (EWidgetMsg_Close))
+			processWidgetMsg (&TWidgetMsg (EWidgetMsg_Close), isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_SETFOCUS:
-		if (CheckMsgMask (EWidgetMsg_SetFocus))
-			ProcessWidgetMsg (&TWidgetMsg (EWidgetMsg_SetFocus), pIsHandled);
+		if (checkMsgMask (EWidgetMsg_SetFocus))
+			processWidgetMsg (&TWidgetMsg (EWidgetMsg_SetFocus), isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_KILLFOCUS:
-		if (CheckMsgMask (EWidgetMsg_KillFocus))
-			ProcessWidgetMsg (&TWidgetMsg (EWidgetMsg_KillFocus), pIsHandled);
+		if (checkMsgMask (EWidgetMsg_KillFocus))
+			processWidgetMsg (&TWidgetMsg (EWidgetMsg_KillFocus), isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_SIZE:
-		if (CheckMsgMask (EWidgetMsg_Size))
-			ProcessWmSize (hWnd, pIsHandled);
+		if (checkMsgMask (EWidgetMsg_Size))
+			processWmSize (hWnd, isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_HSCROLL:
-		if (CheckMsgMask (EWidgetMsg_Scroll))
-			ProcessWmScroll (hWnd, EWidgetOrientation_Horizontal, LOWORD (wParam), pIsHandled);
+		if (checkMsgMask (EWidgetMsg_Scroll))
+			processWmScroll (hWnd, EWidgetOrientation_Horizontal, LOWORD (wParam), isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_VSCROLL:
-		if (CheckMsgMask (EWidgetMsg_Scroll))
-			ProcessWmScroll (hWnd, EWidgetOrientation_Vertical, LOWORD (wParam), pIsHandled);
+		if (checkMsgMask (EWidgetMsg_Scroll))
+			processWmScroll (hWnd, EWidgetOrientation_Vertical, LOWORD (wParam), isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_PAINT:
-		if (CheckMsgMask (EWidgetMsg_Paint))
-			ProcessWmPaint (hWnd, pIsHandled);
+		if (checkMsgMask (EWidgetMsg_Paint))
+			processWmPaint (hWnd, isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	// mouse messages
 
 	case WM_SETCURSOR:
-		lResult = ProcessWmSetCursor (hWnd, pIsHandled);
+		lResult = processWmSetCursor (hWnd, isHandled_o);
 		break;
 
 	case WM_MOUSEMOVE:
-		if (CheckMsgMask (EWidgetMsg_MouseMove))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseMove))
+			processWmMouse (
 				EWidgetMsg_MouseMove, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_None,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_MOUSELEAVE:
-		if (CheckMsgMask (EWidgetMsg_MouseLeave))
-			ProcessWidgetMsg (&TWidgetMsg (EWidgetMsg_MouseLeave), pIsHandled);
+		if (checkMsgMask (EWidgetMsg_MouseLeave))
+			processWidgetMsg (&TWidgetMsg (EWidgetMsg_MouseLeave), isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_CAPTURECHANGED:
-		if (CheckMsgMask (EWidgetMsg_MouseCaptureLost))
-			ProcessWidgetMsg (&TWidgetMsg (EWidgetMsg_MouseCaptureLost), pIsHandled);
+		if (checkMsgMask (EWidgetMsg_MouseCaptureLost))
+			processWidgetMsg (&TWidgetMsg (EWidgetMsg_MouseCaptureLost), isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_LBUTTONDOWN:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonDown))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonDown))
+			processWmMouse (
 				EWidgetMsg_MouseButtonDown, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Left,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_LBUTTONUP:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonUp))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonUp))
+			processWmMouse (
 				EWidgetMsg_MouseButtonUp, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Left,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_LBUTTONDBLCLK:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonDoubleClick))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonDoubleClick))
+			processWmMouse (
 				EWidgetMsg_MouseButtonDoubleClick, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Left,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;		
 
 	case WM_RBUTTONDOWN:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonDown))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonDown))
+			processWmMouse (
 				EWidgetMsg_MouseButtonDown, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Right,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_RBUTTONUP:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonUp))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonUp))
+			processWmMouse (
 				EWidgetMsg_MouseButtonUp, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Right,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_RBUTTONDBLCLK:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonDoubleClick))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonDoubleClick))
+			processWmMouse (
 				EWidgetMsg_MouseButtonDoubleClick,
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Right,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;		
 
 	case WM_MBUTTONDOWN:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonDown))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonDown))
+			processWmMouse (
 				EWidgetMsg_MouseButtonDown, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Medium,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_MBUTTONUP:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonUp))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonUp))
+			processWmMouse (
 				EWidgetMsg_MouseButtonUp, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Medium,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_MBUTTONDBLCLK:
-		if (CheckMsgMask (EWidgetMsg_MouseButtonDoubleClick))
-			ProcessWmMouse (
+		if (checkMsgMask (EWidgetMsg_MouseButtonDoubleClick))
+			processWmMouse (
 				EWidgetMsg_MouseButtonDoubleClick, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
 				EMouseButton_Medium,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;		
 
 	case WM_MOUSEWHEEL:
-		if (CheckMsgMask (EWidgetMsg_MouseWheel))
-			ProcessWmMouseWheel (
+		if (checkMsgMask (EWidgetMsg_MouseWheel))
+			processWmMouseWheel (
 				hWnd,
 				(short) HIWORD(wParam) / WHEEL_DELTA,
-				pIsHandled
+				isHandled_o
 				);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	// keyboard
 		
 	case WM_KEYDOWN:
-		if (CheckMsgMask (EWidgetMsg_KeyDown))
-			ProcessWmKey (EWidgetMsg_KeyDown, (uint_t) wParam, pIsHandled);
+		if (checkMsgMask (EWidgetMsg_KeyDown))
+			processWmKey (EWidgetMsg_KeyDown, (uint_t) wParam, isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 	case WM_KEYUP:
-		if (CheckMsgMask (EWidgetMsg_KeyUp))
-			ProcessWmKey (EWidgetMsg_KeyUp, (uint_t) wParam, pIsHandled);
+		if (checkMsgMask (EWidgetMsg_KeyUp))
+			processWmKey (EWidgetMsg_KeyUp, (uint_t) wParam, isHandled_o);
 		else
-			*pIsHandled = false;
+			*isHandled_o = false;
 
 		break;
 
 /*	case WM_MOUSEACTIVATE:
-		lResult = axl_win_TPropertyCtrl_IsMenu (pPropertyCtrl) ? MA_NOACTIVATE : DefWindowProc (hWnd, Msg, wParam, lParam);
+		lResult = axl_win_TPropertyCtrl_IsMenu (propertyCtrl) ? MA_NOACTIVATE : defWindowProc (hWnd, msg, wParam, lParam);
 		break;
 
 	case WM_GETDLGCODE:
@@ -355,231 +355,231 @@ CGdiWidgetImpl::WindowProc (
 		break;
 
 	case WM_THEMECHANGED:
-		TStockCtrlPaint_CloseThemes (&pPropertyCtrl->m_StockCtrlPaint);
+		TStockCtrlPaint_CloseThemes (&propertyCtrl->m_stockCtrlPaint);
 		break;
 
 	case WM_NCPAINT:
-		TStockCtrlPaint_NcPaintEdge (&pPropertyCtrl->m_StockCtrlPaint, hWnd, (HRGN) wParam);
+		TStockCtrlPaint_NcPaintEdge (&propertyCtrl->m_stockCtrlPaint, hWnd, (HRGN) wParam);
 		break;
 
 	case WM_TIMER:
-		lResult = axl_win_TPropertyCtrl_OnTimer (pPropertyCtrl, (int) wParam);
+		lResult = axl_win_TPropertyCtrl_OnTimer (propertyCtrl, (int) wParam);
 		break;
 */
 
 	default:
-		*pIsHandled = false;
+		*isHandled_o = false;
 	}
 
 	return lResult;
 }
 
 void
-CGdiWidgetImpl::ProcessWmMouse (
-	EWidgetMsg MsgKind,
+CGdiWidgetImpl::processWmMouse (
+	EWidgetMsg msgKind,
 	int x,
 	int y,
-	EMouseButton Button,
-	bool* pIsHandled
+	EMouseButton button,
+	bool* isHandled_o
 	)
 {
-	TWidgetMouseMsg Msg;
-	Msg.m_MsgKind = MsgKind;
-	Msg.m_Point.m_x = x;
-	Msg.m_Point.m_y = y;
-	Msg.m_ModifierKeys = GetModifierKeys ();
-	Msg.m_Button = Button;
-	Msg.m_Buttons = GetMouseButtons ();
+	TWidgetMouseMsg msg;
+	msg.m_msgKind = msgKind;
+	msg.m_point.m_x = x;
+	msg.m_point.m_y = y;
+	msg.m_modifierKeys = getModifierKeys ();
+	msg.m_button = button;
+	msg.m_buttons = getMouseButtons ();
 
-	ProcessWidgetMsg (&Msg, pIsHandled);
+	processWidgetMsg (&msg, isHandled_o);
 };
 
 void
-CGdiWidgetImpl::ProcessWmKey (
-	EWidgetMsg MsgKind,
-	int Key,
-	bool* pIsHandled
+CGdiWidgetImpl::processWmKey (
+	EWidgetMsg msgKind,
+	int key,
+	bool* isHandled_o
 	)
 {
-	TWidgetKeyMsg Msg;
-	Msg.m_MsgKind = MsgKind;
-	Msg.m_Key = Key;
-	Msg.m_ModifierKeys = GetModifierKeys ();
+	TWidgetKeyMsg msg;
+	msg.m_msgKind = msgKind;
+	msg.m_key = key;
+	msg.m_modifierKeys = getModifierKeys ();
 
-	ProcessWidgetMsg (&Msg, pIsHandled);
+	processWidgetMsg (&msg, isHandled_o);
 }
 
 void
-CGdiWidgetImpl::ProcessWmMouseWheel (
+CGdiWidgetImpl::processWmMouseWheel (
 	HWND hWnd,
-	int WheelDelta,
-	bool* pIsHandled
+	int wheelDelta,
+	bool* isHandled_o
 	)
 {
-	POINT Point;
-	::GetCursorPos (&Point);
-	::ScreenToClient (hWnd, &Point);
+	POINT point;
+	::GetCursorPos (&point);
+	::ScreenToClient (hWnd, &point);
 
-	TWidgetMouseWheelMsg Msg;
-	Msg.m_MsgKind = EWidgetMsg_MouseWheel;
-	Msg.m_Point.m_x = Point.x;
-	Msg.m_Point.m_y = Point.y;
-	Msg.m_ModifierKeys = GetModifierKeys ();
-	Msg.m_Button = EMouseButton_Medium;
-	Msg.m_Buttons = GetMouseButtons ();
-	Msg.m_WheelDelta = WheelDelta;
+	TWidgetMouseWheelMsg msg;
+	msg.m_msgKind = EWidgetMsg_MouseWheel;
+	msg.m_point.m_x = point.x;
+	msg.m_point.m_y = point.y;
+	msg.m_modifierKeys = getModifierKeys ();
+	msg.m_button = EMouseButton_Medium;
+	msg.m_buttons = getMouseButtons ();
+	msg.m_wheelDelta = wheelDelta;
 
-	ProcessWidgetMsg (&Msg, pIsHandled);
+	processWidgetMsg (&msg, isHandled_o);
 };
 
 void
-CGdiWidgetImpl::ProcessWmSize (
+CGdiWidgetImpl::processWmSize (
 	HWND hWnd,
-	bool* pIsHandled
+	bool* isHandled_o
 	)
 {
-	RECT Rect;
-	GetClientRect (hWnd, &Rect);
+	RECT rect;
+	::GetClientRect (hWnd, &rect);
 
-	TSize Size (Rect.right - Rect.left, Rect.bottom - Rect.top);
+	TSize size (rect.right - rect.left, rect.bottom - rect.top);
 
-	uint_t Mask = 0;
-	if (m_Size.m_Width != Size.m_Width)
-		Mask |= 1 << EWidgetOrientation_Horizontal;
+	uint_t mask = 0;
+	if (m_size.m_width != size.m_width)
+		mask |= 1 << EWidgetOrientation_Horizontal;
 
-	if (m_Size.m_Height != Size.m_Height)
-		Mask |= 1 << EWidgetOrientation_Vertical;
+	if (m_size.m_height != size.m_height)
+		mask |= 1 << EWidgetOrientation_Vertical;
 
-	m_Size = Size;
+	m_size = size;
 
-	ProcessWidgetMsg (&TWidgetMsgT <uint_t> (EWidgetMsg_Size, Mask), pIsHandled);
+	processWidgetMsg (&TWidgetMsgT <uint_t> (EWidgetMsg_Size, mask), isHandled_o);
 }
 
 void
-CGdiWidgetImpl::ProcessWmScroll (
+CGdiWidgetImpl::processWmScroll (
 	HWND hWnd,
-	EWidgetOrientation Orientation,
-	int Code,
-	bool* pIsHandled
+	EWidgetOrientation orientation,
+	int code,
+	bool* isHandled_o
 	)
 {
-	ASSERT ((size_t) Orientation < 2);
+	ASSERT ((size_t) orientation < 2);
 
-	TWidgetScrollBar* pScrollBar = &m_ScrollBarArray [Orientation];
+	TWidgetScrollBar* scrollBar = &m_scrollBarArray [orientation];
 
-	int Bar = GetScrollBarFromOrientation (Orientation);
+	int bar = getScrollBarFromOrientation (orientation);
 
-	SCROLLINFO ScrollInfo = { 0 };
-	ScrollInfo.cbSize = sizeof (ScrollInfo);
-	ScrollInfo.fMask = SIF_POS | SIF_TRACKPOS;
+	SCROLLINFO scrollInfo = { 0 };
+	scrollInfo.cbSize = sizeof (scrollInfo);
+	scrollInfo.fMask = SIF_POS | SIF_TRACKPOS;
 	
-	GetScrollInfo (hWnd, Bar, &ScrollInfo);
+	::GetScrollInfo (hWnd, bar, &scrollInfo);
 
-	intptr_t NewPos = ScrollInfo.nPos;
-	intptr_t MaxPos = pScrollBar->GetMaxPos ();
+	intptr_t newPos = scrollInfo.nPos;
+	intptr_t maxPos = scrollBar->getMaxPos ();
 	
-	switch (Code)
+	switch (code)
 	{
 	case SB_TOP:
-		NewPos = 0;
+		newPos = 0;
 		break;
 
 	case SB_LINEUP:
-		NewPos--;
+		newPos--;
 		break;
 
 	case SB_LINEDOWN:
-		NewPos++;
+		newPos++;
 		break;
 
 	case SB_PAGEUP:
-		NewPos -= pScrollBar->m_Page; 
+		newPos -= scrollBar->m_page; 
 		break;
 
 	case SB_PAGEDOWN:
-		NewPos += pScrollBar->m_Page; 
+		newPos += scrollBar->m_page; 
 		break;
 
 	case SB_THUMBPOSITION:
 	case SB_THUMBTRACK:
-		NewPos = ScrollInfo.nTrackPos; 
+		newPos = scrollInfo.nTrackPos; 
 		break;
 	}
 
-	if (NewPos < 0)
-		NewPos = 0;
+	if (newPos < 0)
+		newPos = 0;
 	
-	if (NewPos > MaxPos)
-		NewPos = MaxPos;
+	if (newPos > maxPos)
+		newPos = maxPos;
 
-	if (NewPos != ScrollInfo.nPos)
+	if (newPos != scrollInfo.nPos)
 	{
-		ScrollInfo.fMask = SIF_POS;
-		ScrollInfo.nPos = (int) NewPos;
-		SetScrollInfo (hWnd, Bar, &ScrollInfo, TRUE);
+		scrollInfo.fMask = SIF_POS;
+		scrollInfo.nPos = (int) newPos;
+		::SetScrollInfo (hWnd, bar, &scrollInfo, TRUE);
 	}
 
-	pScrollBar->m_Pos = NewPos;
+	scrollBar->m_pos = newPos;
 
-	ProcessWidgetMsg (&TWidgetMsgT <uint_t> (EWidgetMsg_Scroll, 1 << Orientation), pIsHandled);
+	processWidgetMsg (&TWidgetMsgT <uint_t> (EWidgetMsg_Scroll, 1 << orientation), isHandled_o);
 }
 
 void
-CGdiWidgetImpl::ProcessWmPaint (
+CGdiWidgetImpl::processWmPaint (
 	HWND hWnd,
-	bool* pIsHandled
+	bool* isHandled_o
 	)
 {
-	PAINTSTRUCT PaintStruct;
-	HDC hdc = BeginPaint (hWnd, &PaintStruct);
+	PAINTSTRUCT paintStruct;
+	HDC hdc = ::BeginPaint (hWnd, &paintStruct);
 
-	CGdiCanvas Dc;
-	Dc.Attach (hdc, NULL, CGdiCanvas::EDestruct_None);
-	Dc.m_pBaseFont = m_pBaseFont;
-	Dc.m_BaseTextAttr = m_BaseTextAttr;
-	Dc.m_Palette = m_Palette;
+	CGdiCanvas dc;
+	dc.attach (hdc, NULL, CGdiCanvas::EDestruct_None);
+	dc.m_baseFont = m_baseFont;
+	dc.m_baseTextAttr = m_baseTextAttr;
+	dc.m_palette = m_palette;
 
-	TRect Rect (
-		PaintStruct.rcPaint.left, 
-		PaintStruct.rcPaint.top, 
-		PaintStruct.rcPaint.right, 
-		PaintStruct.rcPaint.bottom
+	TRect rect (
+		paintStruct.rcPaint.left, 
+		paintStruct.rcPaint.top, 
+		paintStruct.rcPaint.right, 
+		paintStruct.rcPaint.bottom
 		);
 
-	bool IsHandled = true; // ignore it
-	ProcessWidgetMsg (&TWidgetPaintMsg (&Dc, Rect), &IsHandled);
+	bool isHandled = true; // ignore it
+	processWidgetMsg (&TWidgetPaintMsg (&dc, rect), &isHandled);
 
-	EndPaint (hWnd, &PaintStruct);
+	::EndPaint (hWnd, &paintStruct);
 }
 
 LRESULT
-CGdiWidgetImpl::ProcessWmSetCursor (
+CGdiWidgetImpl::processWmSetCursor (
 	HWND hWnd,
-	bool* pIsHandled
+	bool* isHandled_o
 	)
 {
-	POINT MousePos;
-	RECT ClientRect;
+	POINT mousePos;
+	RECT clientRect;
 	
-	::GetCursorPos (&MousePos);
-	::ScreenToClient (hWnd, &MousePos);
-	::GetClientRect (hWnd, &ClientRect);
+	::GetCursorPos (&mousePos);
+	::ScreenToClient (hWnd, &mousePos);
+	::GetClientRect (hWnd, &clientRect);
 	
-	bool_t IsOnClientRect = ::PtInRect (&ClientRect, MousePos);	
-	if (!IsOnClientRect)
+	bool_t isOnClientRect = ::PtInRect (&clientRect, mousePos);	
+	if (!isOnClientRect)
 	{
-		*pIsHandled = false; 
+		*isHandled_o = false; 
 		return 0;
 	}
 
-	if (!m_pCursor)
+	if (!m_cursor)
 	{
 		::SetCursor (NULL);
 	}
 	else
 	{
-		ASSERT (m_pCursor->GetEngine ()->GetEngineKind () == EEngine_Gdi);
-		::SetCursor (*(CGdiCursor*) m_pCursor);
+		ASSERT (m_cursor->getEngine ()->getEngineKind () == EEngine_Gdi);
+		::SetCursor (*(CGdiCursor*) m_cursor);
 	}
 
 	return TRUE;

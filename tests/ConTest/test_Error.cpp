@@ -7,11 +7,11 @@ namespace test_Error {
 //.............................................................................
 
 void 
-Run ()
+run ()
 {
-	err::CError Error;
+	err::CError error;
 	
-	Error.Pack <rtl::CPackSeqT_4 <
+	error.pack <rtl::CPackSeqT_4 <
 		const char*,
 		int,
 		const char*,
@@ -22,8 +22,8 @@ Run ()
 		"hui", 0xdead, "govno", 0xbeaf
 		);
 
-	err::CError Error2;
-	Error2.Format (
+	err::CError error2;
+	error2.format (
 		rtl::GUID_Null, 
 		12345, 
 		"%s %d %s %d",

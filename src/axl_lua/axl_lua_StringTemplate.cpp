@@ -8,124 +8,124 @@ namespace lua {
 //.............................................................................
 
 void
-CStringTemplate::Reset ()
+CStringTemplate::reset ()
 {
-	m_LuaState.Create ();
-	m_LineCol.Clear ();
+	m_luaState.create ();
+	m_lineCol.clear ();
 }
 
 bool
-CStringTemplate::Process (
-	rtl::CString* pResult,
-	const rtl::CString& FilePath,
-	const char* pTemplate,
-	size_t Length
+CStringTemplate::process (
+	rtl::CString* output,
+	const rtl::CString& filePath,
+	const char* source,
+	size_t length
 	)
 {
-	bool Result;
+	bool result;
 
-	pResult->Clear ();
+	output->clear ();
 
-	rtl::CString LuaSource;
-	Result = ExtractLuaSource (&LuaSource, FilePath, pTemplate, Length);
-	if (!Result)
+	rtl::CString luaSource;
+	result = extractLuaSource (&luaSource, filePath, source, length);
+	if (!result)
 		return false;
 
-	if (LuaSource.IsEmpty ())
+	if (luaSource.isEmpty ())
 	{
-		pResult->Copy (pTemplate, Length);
+		output->copy (source, length);
 		return true;
 	}
 
-	luaL_openlibs (m_LuaState);
+	luaL_openlibs (m_luaState);
 
-	Result = m_LuaState.Load (FilePath, LuaSource, LuaSource.GetLength ());
-	if (!Result)
+	result = m_luaState.load (filePath, luaSource, luaSource.getLength ());
+	if (!result)
 		return false;
 			
-	TEmitContext EmitContext;
-	EmitContext.m_pThis = this;
-	EmitContext.m_pResult = pResult;
-	EmitContext.m_pTemplate = pTemplate;
+	TEmitContext emitContext;
+	emitContext.m_this = this;
+	emitContext.m_output = output;
+	emitContext.m_source = source;
 
-	m_LuaState.RegisterFunction ("GetLine", GetLine_lua, (intptr_t) this);
-	m_LuaState.RegisterFunction ("GetCol", GetCol_lua, (intptr_t) this);
-	m_LuaState.RegisterFunction ("Emit", Emit_lua, (intptr_t) &EmitContext);
-	m_LuaState.RegisterFunction ("Passthrough", Passthrough_lua, (intptr_t) &EmitContext);
+	m_luaState.registerFunction ("GetLine", getLine_lua, (intptr_t) this);
+	m_luaState.registerFunction ("GetCol", getCol_lua, (intptr_t) this);
+	m_luaState.registerFunction ("Emit", emit_lua, (intptr_t) &emitContext);
+	m_luaState.registerFunction ("Passthrough", passthrough_lua, (intptr_t) &emitContext);
 
-	Result = m_LuaState.PCall (0, 0);
-	if (!Result)
+	result = m_luaState.PCall (0, 0);
+	if (!result)
 		return false;
 	
-	m_LuaState.ClearStack ();
+	m_luaState.clearStack ();
 	return true;
 }
 
 bool 
-ExtractUserCode (
-	CLexer* pLexer,
-	lex::CRagelTokenPos* pEndPos
+extractUserCode (
+	CLexer* lexer,
+	lex::CRagelTokenPos* endPos_o
 	)
 {
-	const CToken* pToken = pLexer->GetToken ();
-	ASSERT (pToken->m_Token == EToken_OpenCode || pToken->m_Token == EToken_OpenData);
+	const CToken* token = lexer->getToken ();
+	ASSERT (token->m_token == EToken_OpenCode || token->m_token == EToken_OpenData);
 
-	int OpenBracket;
-	int CloseBracket;
-	ELexerMachine Machine;
+	int openBracket;
+	int closeBracket;
+	ELexerMachine machine;
 
-	if (pToken->m_Token == EToken_OpenData)
+	if (token->m_token == EToken_OpenData)
 	{
-		OpenBracket = '(';
-		CloseBracket = ')';
-		Machine = ELexerMachine_UserData;
+		openBracket = '(';
+		closeBracket = ')';
+		machine = ELexerMachine_UserData;
 	}
 	else
 	{
-		OpenBracket = '{';
-		CloseBracket = '}';
-		Machine = ELexerMachine_UserCode;
+		openBracket = '{';
+		closeBracket = '}';
+		machine = ELexerMachine_UserCode;
 	}
 
-	pLexer->GotoState (
-		CLexer::GetMachineState (Machine), 
-		pToken, 
+	lexer->gotoState (
+		CLexer::getMachineState (machine), 
+		token, 
 		CLexer::EGotoState_EatToken
 		);
 
-	int Level = 1;
+	int level = 1;
 	for (;;)
 	{
-		pToken = pLexer->GetToken ();
-		if (pToken->m_Token == EToken_Error)
+		token = lexer->getToken ();
+		if (token->m_token == EToken_Error)
 		{
-			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
+			err::setFormatStringError ("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 			return false;
 		}
-		else if (pToken->m_Token == EToken_Eof)
+		else if (token->m_token == EToken_Eof)
 		{
-			err::SetUnexpectedTokenError ("eof", "user-code");
+			err::setUnexpectedTokenError ("eof", "user-code");
 			return false;
 		}
-		else if (pToken->m_Token == OpenBracket)
+		else if (token->m_token == openBracket)
 		{
-			Level++;
+			level++;
 		}
-		else if (pToken->m_Token == CloseBracket)
+		else if (token->m_token == closeBracket)
 		{
-			Level--;
-			if (Level <= 0)
+			level--;
+			if (level <= 0)
 				break;
 		}
 
-		pLexer->NextToken ();
+		lexer->nextToken ();
 	}
 
-	*pEndPos = pToken->m_Pos;
+	*endPos_o = token->m_pos;
 
-	pLexer->GotoState (
-		CLexer::GetMachineState (ELexerMachine_Main), 
-		pToken, 
+	lexer->gotoState (
+		CLexer::getMachineState (ELexerMachine_Main), 
+		token, 
 		CLexer::EGotoState_EatToken
 		);
 
@@ -133,170 +133,170 @@ ExtractUserCode (
 }
 
 bool
-CStringTemplate::ExtractLuaSource (
-	rtl::CString* pLuaSource,
-	const rtl::CString& FilePath,
-	const char* pTemplate,
-	size_t Length
+CStringTemplate::extractLuaSource (
+	rtl::CString* luaSource,
+	const rtl::CString& filePath,
+	const char* source,
+	size_t length
 	)
 {
-	bool Result;
+	bool result;
 
-	CLexer Lexer;
-	Lexer.Create (FilePath, pTemplate, Length);
+	CLexer lexer;
+	lexer.create (filePath, source, length);
 
-	pLuaSource->Clear ();
+	luaSource->clear ();
 	
-	size_t Offset = 0;
-	CToken::CPos Pos;
+	size_t offset = 0;
+	CToken::CPos pos;
 
-	int Line = 0;
+	int line = 0;
 
 	for (;;)
 	{
-		const CToken* pToken = Lexer.GetToken ();
+		const CToken* token = lexer.getToken ();
 		
-		if (pToken->m_Token == EToken_Error)
+		if (token->m_token == EToken_Error)
 		{
-			err::SetFormatStringError ("invalid character '\\x%02x'", (uchar_t) pToken->m_Data.m_Integer);
+			err::setFormatStringError ("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 			return false;
 		}
 
-		if (pToken->m_Pos.m_Offset > Offset)
-			pLuaSource->AppendFormat ("Passthrough (%d, %d);", Offset, pToken->m_Pos.m_Offset - Offset);
+		if (token->m_pos.m_offset > offset)
+			luaSource->appendFormat ("Passthrough (%d, %d);", offset, token->m_pos.m_offset - offset);
 
-		if (pToken->m_Token == EToken_Eof)
+		if (token->m_token == EToken_Eof)
 			return true;
 
-		if (pToken->m_Pos.m_Line > Line)
-			pLuaSource->Append ('\n', pToken->m_Pos.m_Line - Line);
+		if (token->m_pos.m_line > line)
+			luaSource->append ('\n', token->m_pos.m_line - line);
 
-		Offset = pToken->m_Pos.m_Offset + pToken->m_Pos.m_Length;
+		offset = token->m_pos.m_offset + token->m_pos.m_length;
 
-		switch (pToken->m_Token)
+		switch (token->m_token)
 		{
 		case EToken_Data:
-			pLuaSource->AppendFormat ("Emit (%s);", pToken->m_Data.m_String.cc ()); // thanks a lot gcc
-			Pos = pToken->m_Pos;
-			Lexer.NextToken ();
+			luaSource->appendFormat ("Emit (%s);", token->m_data.m_string.cc ()); // thanks a lot gcc
+			pos = token->m_pos;
+			lexer.nextToken ();
 			break;
 
 		case EToken_OpenCode:
-			Result = ExtractUserCode (&Lexer, &Pos);
-			if (!Result)
+			result = extractUserCode (&lexer, &pos);
+			if (!result)
 				return false;
 
-			pLuaSource->Append (pTemplate + Offset, Pos.m_Offset - Offset);
-			pLuaSource->Append (";");
+			luaSource->append (source + offset, pos.m_offset - offset);
+			luaSource->append (";");
 			break;
 
 		case EToken_OpenData:
-			Result = ExtractUserCode (&Lexer, &Pos);
-			if (!Result)
+			result = extractUserCode (&lexer, &pos);
+			if (!result)
 				return false;
 
-			pLuaSource->Append ("Emit (");
-			pLuaSource->Append (pTemplate + Offset, Pos.m_Offset - Offset);
-			pLuaSource->Append (");");
+			luaSource->append ("Emit (");
+			luaSource->append (source + offset, pos.m_offset - offset);
+			luaSource->append (");");
 			break;
 
 		default:
 			ASSERT (false);
 		}
 
-		Offset = Pos.m_Offset + Pos.m_Length;
-		Line = Pos.m_Line;
+		offset = pos.m_offset + pos.m_length;
+		line = pos.m_line;
 	}
 }
 
 void
-CStringTemplate::CountLineCol (
+CStringTemplate::countLineCol (
 	const char* p,
-	size_t Length
+	size_t length
 	)
 {
 	if (!p)
 		return;
 
-	if (Length == -1)
-		Length = strlen (p);
+	if (length == -1)
+		length = strlen (p);
 
-	const char* pEnd = p + Length;
-	const char* pLine = p;
+	const char* end = p + length;
+	const char* line = p;
 
-	for (; p < pEnd; p++)
+	for (; p < end; p++)
 		if (*p == '\n')
 		{
-			m_LineCol.m_Line++;
-			pLine = p + 1;
+			m_lineCol.m_line++;
+			line = p + 1;
 		}
 
-	m_LineCol.m_Col = (int) (p - pLine);
+	m_lineCol.m_col = (int) (p - line);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
-CStringTemplate::GetLine_lua (lua_State* pLuaState)
+CStringTemplate::getLine_lua (lua_State* h)
 {
-	CLuaState LuaState = pLuaState;
+	CLuaState luaState = h;
 
-	CStringTemplate* pThis = (CStringTemplate*) LuaState.GetContext ();
+	CStringTemplate* self = (CStringTemplate*) luaState.getContext ();
 
-	LuaState.PushInteger (pThis->m_LineCol.m_Line);
+	luaState.pushInteger (self->m_lineCol.m_line);
 
-	LuaState.Detach ();
+	luaState.detach ();
 	return 1;
 }
 
 int 
-CStringTemplate::GetCol_lua (lua_State* pLuaState)
+CStringTemplate::getCol_lua (lua_State* h)
 {
-	CLuaState LuaState = pLuaState;
+	CLuaState luaState = h;
 
-	CStringTemplate* pThis = (CStringTemplate*) LuaState.GetContext ();
+	CStringTemplate* self = (CStringTemplate*) luaState.getContext ();
 
-	LuaState.PushInteger (pThis->m_LineCol.m_Col);
+	luaState.pushInteger (self->m_lineCol.m_col);
 
-	LuaState.Detach ();
+	luaState.detach ();
 	return 1;
 }
 
 int 
-CStringTemplate::Emit_lua (lua_State* pLuaState)
+CStringTemplate::emit_lua (lua_State* h)
 {
-	CLuaState LuaState = pLuaState;
+	CLuaState luaState = h;
 
-	TEmitContext* pContext = (TEmitContext*) LuaState.GetContext ();
+	TEmitContext* context = (TEmitContext*) luaState.getContext ();
 
-	size_t Count = lua_gettop (pLuaState);
-	for (size_t i = 1; i <= Count; i++)
+	size_t count = luaState.getTop ();
+	for (size_t i = 1; i <= count; i++)
 	{
-		const char* p = LuaState.GetString (i);
-		pContext->m_pResult->Append (p);
-		pContext->m_pThis->CountLineCol (p);
+		const char* p = luaState.getString (i);
+		context->m_output->append (p);
+		context->m_this->countLineCol (p);
 	}
 
-	LuaState.Detach ();
+	luaState.detach ();
 	return 0;
 }
 
 int 
-CStringTemplate::Passthrough_lua (lua_State* pLuaState)
+CStringTemplate::passthrough_lua (lua_State* h)
 {
-	CLuaState LuaState = pLuaState;
+	CLuaState luaState = h;
 
-	TEmitContext* pContext = (TEmitContext*) LuaState.GetContext ();
+	TEmitContext* context = (TEmitContext*) luaState.getContext ();
 
-	size_t Offset = LuaState.GetInteger (1);
-	size_t Length = LuaState.GetInteger (2);
+	size_t offset = luaState.getInteger (1);
+	size_t length = luaState.getInteger (2);
 
-	const char* p = pContext->m_pTemplate + Offset;
+	const char* p = context->m_source + offset;
 
-	pContext->m_pResult->Append (p, Length);
-	pContext->m_pThis->CountLineCol (p, Length);
+	context->m_output->append (p, length);
+	context->m_this->countLineCol (p, length);
 
-	LuaState.Detach ();
+	luaState.detach ();
 	return 0;
 }
 

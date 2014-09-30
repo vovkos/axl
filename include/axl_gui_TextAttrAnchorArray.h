@@ -16,25 +16,25 @@ namespace gui {
 
 struct TTextAttrAnchor
 {
-	size_t m_Offset;
-	size_t m_Metric; // attributes with higher metric overlay lower metric
-	TTextAttr m_Attr;
+	size_t m_offset;
+	size_t m_metric; // attributes with higher metric overlay lower metric
+	TTextAttr m_attr;
 
 	TTextAttrAnchor ()
 	{
-		m_Offset = 0;
-		m_Metric = 0;
+		m_offset = 0;
+		m_metric = 0;
 	}
 
 	TTextAttrAnchor (
-		size_t Offset,
-		const TTextAttr& Attr,
-		size_t Metric = 0
+		size_t offset,
+		const TTextAttr& attr,
+		size_t metric = 0
 		)
 	{
-		m_Offset = Offset;
-		m_Attr = Attr;
-		m_Metric = Metric;
+		m_offset = offset;
+		m_attr = attr;
+		m_metric = metric;
 	}
 };
 
@@ -43,85 +43,85 @@ struct TTextAttrAnchor
 class CTextAttrAnchorArray
 {
 protected:
-	rtl::CArrayT <TTextAttrAnchor> m_Array;
+	rtl::CArrayT <TTextAttrAnchor> m_array;
 
 public:
 	operator const TTextAttrAnchor* () const
 	{
-		return m_Array;
+		return m_array;
 	}
 
 	bool
-	IsEmpty () const
+	isEmpty () const
 	{
-		return m_Array.IsEmpty ();
+		return m_array.isEmpty ();
 	}
 
 	size_t 
-	GetCount () const
+	getCount () const
 	{
-		return m_Array.GetCount ();
+		return m_array.getCount ();
 	}
 
 	const TTextAttrAnchor*
 	ca () const
 	{
-		return m_Array.ca ();
+		return m_array.ca ();
 	}
 
 	void 
-	Clear ()
+	clear ()
 	{
-		m_Array.Clear ();
+		m_array.clear ();
 	}
 
 	void 
-	ClearBefore (size_t Offset);
+	clearBefore (size_t offset);
 
 	void
-	Copy (
-		const TTextAttrAnchor* pAttrAnchorArray,
-		size_t AttrAnchorCount
+	copy (
+		const TTextAttrAnchor* attrAnchorArray,
+		size_t attrAnchorCount
 		)
 	{
-		m_Array.Copy (pAttrAnchorArray, AttrAnchorCount);
+		m_array.copy (attrAnchorArray, attrAnchorCount);
 	}
 
 	TTextAttr
-	GetAttr (size_t Offset) const
+	getAttr (size_t offset) const
 	{
-		size_t Anchor = FindAnchor (Offset);
-		return Anchor == -1 ? m_Array [Anchor].m_Attr : TTextAttr ();
+		size_t anchor = findAnchor (offset);
+		return anchor == -1 ? m_array [anchor].m_attr : TTextAttr ();
 	}
 
 	void 
-	SetAttr (
-		size_t BeginOffset, 
-		size_t EndOffset, 
-		const TTextAttr& Attr, 
-		size_t Metric = 0
+	setAttr (
+		size_t beginOffset, 
+		size_t endOffset, 
+		const TTextAttr& attr, 
+		size_t metric = 0
 		);
 
 protected:
 	size_t
-	FindAnchor (size_t Offset) const;
+	findAnchor (size_t offset) const;
 
 	size_t
-	GetStartAnchor (
-		size_t Offset,
-		size_t Metric
+	getStartAnchor (
+		size_t offset,
+		size_t metric
 		);
 
 	size_t
-	GetEndAnchor (
-		size_t Offset,
-		size_t Metric
+	getEndAnchor (
+		size_t offset,
+		size_t metric
 		);
 
 	void
-	Normalize (
-		size_t Start,
-		size_t End
+	normalize (
+		size_t start,
+		size_t end
 		);
 };
 

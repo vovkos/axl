@@ -15,34 +15,34 @@ namespace axl {
 
 inline
 uint16_t
-SwapByteOrder16 (uint16_t Value)
+swapByteOrder16 (uint16_t value)
 {
 #if (_AXL_CPP == AXL_CPP_MSC)
-	return _byteswap_ushort (Value);
+	return _byteswap_ushort (value);
 #elif (_AXL_CPP == AXL_CPP_GCC)
-	return bswap_16 (Value);
+	return bswap_16 (value);
 #endif
 }
 
 inline
 uint32_t
-SwapByteOrder32 (uint32_t Value)
+swapByteOrder32 (uint32_t value)
 {
 #if (_AXL_CPP == AXL_CPP_MSC)
-	return _byteswap_ulong (Value);
+	return _byteswap_ulong (value);
 #elif (_AXL_CPP == AXL_CPP_GCC)
-	return bswap_32 (Value);
+	return bswap_32 (value);
 #endif
 }
 
 inline
 uint64_t
-SwapByteOrder64 (uint64_t Value)
+swapByteOrder64 (uint64_t value)
 {
 #if (_AXL_CPP == AXL_CPP_MSC)
-	return _byteswap_uint64 (Value);
+	return _byteswap_uint64 (value);
 #elif (_AXL_CPP == AXL_CPP_GCC)
-	return bswap_64 (Value);
+	return bswap_64 (value);
 #endif
 }
 
@@ -50,24 +50,24 @@ SwapByteOrder64 (uint64_t Value)
 
 inline
 void
-SwapByteOrder (
-	void* pDst,
-	const void* pSrc,
-	size_t Size
+swapByteOrder (
+	void* dst,
+	const void* src,
+	size_t size
 	)
 {
-	switch (Size)
+	switch (size)
 	{
 	case 2:
-		*(uint16_t*) pDst = SwapByteOrder16 (*(uint16_t*)  pSrc);
+		*(uint16_t*) dst = swapByteOrder16 (*(uint16_t*)  src);
 		break;
 
 	case 4:
-		*(uint32_t*) pDst = SwapByteOrder32 (*(uint32_t*)  pSrc);
+		*(uint32_t*) dst = swapByteOrder32 (*(uint32_t*)  src);
 		break;
 
 	case 8:
-		*(uint64_t*) pDst = SwapByteOrder64 (*(uint64_t*)  pSrc);
+		*(uint64_t*) dst = swapByteOrder64 (*(uint64_t*)  src);
 		break;
 
 	default:

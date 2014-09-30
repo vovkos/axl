@@ -11,51 +11,51 @@ CModule::CModule ()
 {	
 #ifdef _DEBUG
 #	ifdef _AXL_MODULE_TAG
-	m_pTag = _AXL_MODULE_TAG;
+	m_tag = _AXL_MODULE_TAG;
 #	else
-	m_pTag = "UNK_MOD";
+	m_tag = "UNK_MOD";
 #	endif
 #endif
 
 #if (_AXL_ENV == AXL_ENV_WIN)	
 	m_hModule = ::GetModuleHandle (NULL);
 
-	SYSTEM_INFO SystemInfo;
-	::GetSystemInfo (&SystemInfo);
-	m_SystemInfo.m_ProcessorCount     = SystemInfo.dwNumberOfProcessors;
-	m_SystemInfo.m_PageSize           = SystemInfo.dwPageSize;
-	m_SystemInfo.m_MappingAlignFactor = SystemInfo.dwAllocationGranularity;
+	SYSTEM_INFO systemInfo;
+	::GetSystemInfo (&systemInfo);
+	m_systemInfo.m_processorCount     = systemInfo.dwNumberOfProcessors;
+	m_systemInfo.m_pageSize           = systemInfo.dwPageSize;
+	m_systemInfo.m_mappingAlignFactor = systemInfo.dwAllocationGranularity;
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-	m_SystemInfo.m_ProcessorCount     = sysconf (_SC_NPROCESSORS_ONLN);
-	m_SystemInfo.m_PageSize           = sysconf (_SC_PAGE_SIZE);
-	m_SystemInfo.m_MappingAlignFactor = sysconf (_SC_PAGE_SIZE);
+	m_systemInfo.m_processorCount     = sysconf (_SC_NPROCESSORS_ONLN);
+	m_systemInfo.m_pageSize           = sysconf (_SC_PAGE_SIZE);
+	m_systemInfo.m_mappingAlignFactor = sysconf (_SC_PAGE_SIZE);
 		
 #endif	
 }
 
 CModule::~CModule ()
 {
-	while (!m_FinalizerList.IsEmpty ())
+	while (!m_finalizerList.isEmpty ())
 	{
-		CFinalizerEntry* pFinalizerEntry = m_FinalizerList.RemoveTail ();
-		pFinalizerEntry->m_Finalizer->Finalize ();
-		AXL_MEM_DELETE (pFinalizerEntry);
+		CFinalizerEntry* finalizerEntry = m_finalizerList.removeTail ();
+		finalizerEntry->m_finalizer->finalize ();
+		AXL_MEM_DELETE (finalizerEntry);
 	}
 
-	m_MemTracker.Trace ();
+	m_memTracker.trace ();
 }
 
 bool 
-CModule::AddFinalizer (const ref::CPtrT <CFinalizer>& Finalizer)
+CModule::addFinalizer (const ref::CPtrT <CFinalizer>& finalizer)
 {
-	CFinalizerEntry* pFinalizerEntry = AXL_MEM_NEW (CFinalizerEntry);
-	pFinalizerEntry->m_Finalizer = Finalizer;
+	CFinalizerEntry* finalizerEntry = AXL_MEM_NEW (CFinalizerEntry);
+	finalizerEntry->m_finalizer = finalizer;
 
-	m_FinalizerListLock.Lock ();
-	m_FinalizerList.InsertTail (pFinalizerEntry);
-	m_FinalizerListLock.Unlock ();
+	m_finalizerListLock.lock ();
+	m_finalizerList.insertTail (finalizerEntry);
+	m_finalizerListLock.unlock ();
 	return true;
 }
 

@@ -11,67 +11,67 @@ namespace psx {
 //.............................................................................
 
 bool
-CThread::Create (
-	const pthread_attr_t* pAttr,
+CThread::create (
+	const pthread_attr_t* attr,
 	FThreadProc pfThreadProc,
-	void* pContext
+	void* context
 	)
 {
-	Detach ();
+	detach ();
 
-	int Result = pthread_create (&m_ThreadId, pAttr, pfThreadProc, pContext);
-	if (Result != 0)
-		return err::Fail (Result);
+	int result = pthread_create (&m_threadId, attr, pfThreadProc, context);
+	if (result != 0)
+		return err::fail (result);
 
-	m_IsOpen = true;
+	m_isOpen = true;
 	return true;
 }
 
 bool
-CThread::Join (
-	uint_t Timeout,
-	void** ppRetVal
+CThread::join (
+	uint_t timeout,
+	void** retVal
 	)
 {
-	if (!m_IsOpen)
+	if (!m_isOpen)
 		return true;
 
-	int Result;
+	int result;
 
-	switch (Timeout)
+	switch (timeout)
 	{
 	case 0:
-		Result = pthread_tryjoin_np (m_ThreadId, ppRetVal);
+		result = pthread_tryjoin_np (m_threadId, retVal);
 		break;
 
 	case -1:
-		Result = pthread_join (m_ThreadId, ppRetVal);
+		result = pthread_join (m_threadId, retVal);
 		break;
 
 	default:
-		timespec Timespec = { 0 };
-		g::GetAbsTimespecFromTimeout (Timeout, &Timespec);
-		Result = pthread_timedjoin_np (m_ThreadId, ppRetVal, &Timespec);
+		timespec timespec = { 0 };
+		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		result = pthread_timedjoin_np (m_threadId, retVal, &timespec);
 	}
 
-	if (Result != 0)
-		return err::Fail (Result);
+	if (result != 0)
+		return err::fail (result);
 
-	m_IsOpen = false;
+	m_isOpen = false;
 	return true;
 }
 
 bool
-CThread::Detach ()
+CThread::detach ()
 {
-	if (!m_IsOpen)
+	if (!m_isOpen)
 		return true;
 
-	int Result = pthread_detach (m_ThreadId);
-	if (Result != 0)
-		return err::Fail (Result);
+	int result = pthread_detach (m_threadId);
+	if (result != 0)
+		return err::fail (result);
 
-	m_IsOpen = false;
+	m_isOpen = false;
 	return true;
 }
 

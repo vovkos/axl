@@ -19,12 +19,12 @@ main (
 	)
 #endif
 {
-	WSADATA WsaData;
-	WORD VersionRequested = MAKEWORD (2, 2);
+	WSADATA wsaData;
+	WORD versionRequested = MAKEWORD (2, 2);
 
-	WSAStartup (VersionRequested, &WsaData);
+	WSAStartup (versionRequested, &wsaData);
 
-	err::CParseErrorProvider::Register ();
+	err::CParseErrorProvider::register ();
 		
 	//test_Error::Run ();
 	//test_File::Run ();
@@ -54,7 +54,7 @@ main (
 	//test_Packetizer::Run ();
 	//test_CmdLineParser::Run ();
 
-	test_Usb::Run ();
+	test_Usb::run ();
 
 	return 0;
 }

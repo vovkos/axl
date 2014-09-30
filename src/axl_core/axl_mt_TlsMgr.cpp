@@ -8,143 +8,143 @@ namespace mt {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-bool CTlsMgr::m_IsDead = false;
+bool CTlsMgr::m_isDead = false;
 
 CTlsMgr::CTlsMgr ()
 {
-	m_TlsIdx = TlsAlloc ();
-	m_SlotCount = 0;
+	m_tlsIdx = ::TlsAlloc ();
+	m_slotCount = 0;
 }
 
 CTlsMgr::~CTlsMgr ()
 {
-	TPage* pPage = FindCurrentThreadPage ();
-	if (pPage)
+	TPage* page = findCurrentThreadPage ();
+	if (page)
 	{
-		AXL_MEM_DELETE (pPage);
-		SetCurrentThreadPage (NULL);
+		AXL_MEM_DELETE (page);
+		setCurrentThreadPage (NULL);
 	}
 
-	TlsFree (m_TlsIdx);
-	m_IsDead = true;
+	::TlsFree (m_tlsIdx);
+	m_isDead = true;
 }
 
 void
 NTAPI
-CTlsMgr::TlsCallback (
+CTlsMgr::tlsCallback (
 	HANDLE hModule,
-	dword_t Reason,
-	void* pReserved
+	dword_t reason,
+	void* reserved
 	)
 {
-	if (Reason != DLL_THREAD_DETACH || m_IsDead)
+	if (reason != DLL_THREAD_DETACH || m_isDead)
 		return;
 
-	CTlsMgr* pThis = GetTlsMgr ();
+	CTlsMgr* self = getTlsMgr ();
 
-	TPage* pPage = pThis->FindCurrentThreadPage ();
-	if (!pPage)
+	TPage* page = self->findCurrentThreadPage ();
+	if (!page)
 		return;
 
-	AXL_MEM_DELETE (pPage);
+	AXL_MEM_DELETE (page);
 
-	TlsSetValue (pThis->m_TlsIdx, NULL);
+	::TlsSetValue (self->m_tlsIdx, NULL);
 }
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
 CTlsMgr::CTlsMgr ()
 {
-	pthread_key_create (&m_TlsKey, TlsDestructor);
-	m_SlotCount = 0;
+	pthread_key_create (&m_tlsKey, tlsDestructor);
+	m_slotCount = 0;
 }
 
 CTlsMgr::~CTlsMgr ()
 {
-	TPage* pPage = FindCurrentThreadPage ();
-	if (pPage)
+	TPage* page = findCurrentThreadPage ();
+	if (page)
 	{
-		AXL_MEM_DELETE (pPage);
-		SetCurrentThreadPage (NULL);
+		AXL_MEM_DELETE (page);
+		setCurrentThreadPage (NULL);
 	}
 
-	pthread_key_delete (m_TlsKey);
+	pthread_key_delete (m_tlsKey);
 }
 
 #endif
 
 CTlsValue
-CTlsMgr::GetSlotValue (size_t Slot)
+CTlsMgr::getSlotValue (size_t slot)
 {
-	TPage* pPage = FindCurrentThreadPage ();
-	if (!pPage)
+	TPage* page = findCurrentThreadPage ();
+	if (!page)
 		return ref::EPtr_Null;
 
-	size_t Count = pPage->m_Array.GetCount ();
-	if (Slot >= Count)
+	size_t count = page->m_array.getCount ();
+	if (slot >= count)
 		return ref::EPtr_Null;
 
-	rtl::CBoxListEntryT <CTlsValue>* pEntry = pPage->m_Array [Slot];
-	if (!pEntry)
+	rtl::CBoxListEntryT <CTlsValue>* entry = page->m_array [slot];
+	if (!entry)
 		return ref::EPtr_Null;
 
-	return pEntry->m_Value;
+	return entry->m_value;
 }
 
 CTlsValue
-CTlsMgr::SetSlotValue (
-	size_t Slot,
-	const CTlsValue& Value
+CTlsMgr::setSlotValue (
+	size_t slot,
+	const CTlsValue& value
 	)
 {
-	TPage* pPage = GetCurrentThreadPage ();
+	TPage* page = getCurrentThreadPage ();
 
-	size_t Count = pPage->m_Array.GetCount ();
-	if (Slot >= Count)
+	size_t count = page->m_array.getCount ();
+	if (slot >= count)
 	{
-		if (!Value)
+		if (!value)
 			return CTlsValue ();
 
-		pPage->m_Array.SetCount (Slot + 1);
+		page->m_array.setCount (slot + 1);
 	}
 
-	rtl::CBoxListEntryT <CTlsValue>* pEntry = pPage->m_Array [Slot];
+	rtl::CBoxListEntryT <CTlsValue>* entry = page->m_array [slot];
 
-	CTlsValue OldValue;
+	CTlsValue oldValue;
 
-	if (pEntry)
+	if (entry)
 	{
-		OldValue = pEntry->m_Value;
+		oldValue = entry->m_value;
 
-		if (Value)
+		if (value)
 		{
-			pEntry->m_Value = Value;
+			entry->m_value = value;
 		}
 		else
 		{
-			pPage->m_ValueList.Remove (pEntry);
-			pPage->m_Array [Slot] = NULL;
+			page->m_valueList.remove (entry);
+			page->m_array [slot] = NULL;
 		}
 	}
-	else if (Value)
+	else if (value)
 	{
-		pEntry = pPage->m_ValueList.InsertTail (Value).GetEntry ();
-		pPage->m_Array [Slot] = pEntry;
+		entry = page->m_valueList.insertTail (value).getEntry ();
+		page->m_array [slot] = entry;
 	}
 
-	return OldValue;
+	return oldValue;
 }
 
 CTlsMgr::TPage*
-CTlsMgr::GetCurrentThreadPage ()
+CTlsMgr::getCurrentThreadPage ()
 {
-	TPage* pPage = FindCurrentThreadPage ();
-	if (pPage)
-		return pPage;
+	TPage* page = findCurrentThreadPage ();
+	if (page)
+		return page;
 
-	pPage = AXL_MEM_NEW (TPage);
-	SetCurrentThreadPage (pPage);
-	return pPage;
+	page = AXL_MEM_NEW (TPage);
+	setCurrentThreadPage (page);
+	return page;
 }
 
 //.............................................................................
@@ -160,7 +160,7 @@ CTlsMgr::GetCurrentThreadPage ()
 
 extern "C"
 __declspec(allocate (AXL_MT_TLS_CALLBACK_SECTION))
-PIMAGE_TLS_CALLBACK g_axl_mt_pfTlsCallback = axl::mt::CTlsMgr::TlsCallback;
+PIMAGE_TLS_CALLBACK g_axl_mt_pfTlsCallback = axl::mt::CTlsMgr::tlsCallback;
 
 #ifdef _WIN64
 #	pragma comment (linker, "/INCLUDE:_tls_used")

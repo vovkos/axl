@@ -36,13 +36,13 @@ class CFileHandle: public rtl::CHandleT <HANDLE, CCloseHandle, rtl::CMinusOneT <
 public:
 	static
 	bool
-	CompleteAsyncRequest (
-		bool_t Result,
-		OVERLAPPED* pOverlapped
+	completeAsyncRequest (
+		bool_t result,
+		OVERLAPPED* overlapped
 		);
 
 	size_t
-	GetOverlappedResult (OVERLAPPED* pOverlapped);
+	getOverlappedResult (OVERLAPPED* overlapped);
 };
 
 //.............................................................................

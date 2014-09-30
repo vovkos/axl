@@ -7,86 +7,86 @@ namespace gui {
 //.............................................................................
 
 THyperlinkAnchor* 
-CHyperlinkAnchorArray::Find (size_t Offset) const
+CHyperlinkAnchorArray::find (size_t offset) const
 {
-	THyperlinkAnchor* pResult = NULL;
+	THyperlinkAnchor* result = NULL;
 
-	size_t Begin = 0;
-	size_t End = m_Array.GetCount ();
+	size_t begin = 0;
+	size_t end = m_array.getCount ();
 
-	while (Begin < End)
+	while (begin < end)
 	{
-		size_t Mid = (Begin + End) / 2;
+		size_t mid = (begin + end) / 2;
 
-		THyperlinkAnchor* pAnchor = m_Array [Mid];
-		if (pAnchor->m_Offset == Offset)
-			return pAnchor;
+		THyperlinkAnchor* anchor = m_array [mid];
+		if (anchor->m_offset == offset)
+			return anchor;
 
-		if (pAnchor->m_Offset < Offset)
+		if (anchor->m_offset < offset)
 		{
-			pResult = pAnchor;
-			Begin = Mid + 1;
+			result = anchor;
+			begin = mid + 1;
 		}
 		else
 		{
-			End = Mid;
+			end = mid;
 		}
 	}
 
-	return pResult;
+	return result;
 }
 
 THyperlinkAnchor* 
-CHyperlinkAnchorArray::OpenHyperlink (
-	size_t Offset,
-	const char* pHyperlink,
-	size_t Length
+CHyperlinkAnchorArray::openHyperlink (
+	size_t offset,
+	const char* hyperlink,
+	size_t length
 	)
 {
-	THyperlinkAnchor* pAnchor;
+	THyperlinkAnchor* anchor;
 
-	size_t Count = m_Array.GetCount ();
-	if (Count)
+	size_t count = m_array.getCount ();
+	if (count)
 	{
-		pAnchor = m_Array [Count - 1];
+		anchor = m_array [count - 1];
 		
-		if (pAnchor->m_Hyperlink.Cmp (pHyperlink, Length) == 0)
-			return pAnchor; // same attr
+		if (anchor->m_hyperlink.cmp (hyperlink, length) == 0)
+			return anchor; // same attr
 		
-		if (pAnchor->m_Offset == Offset)
+		if (anchor->m_offset == offset)
 		{
-			if (Count >= 2)
+			if (count >= 2)
 			{
-				THyperlinkAnchor* pPrevAnchor = m_Array [Count - 2];
-				if (pPrevAnchor->m_Hyperlink.Cmp (pHyperlink, Length) == 0)
+				THyperlinkAnchor* prevAnchor = m_array [count - 2];
+				if (prevAnchor->m_hyperlink.cmp (hyperlink, length) == 0)
 				{
 					// remove last anchor to normalize array
 
-					m_List.RemoveTail ();
-					m_Array.Pop ();
+					m_list.removeTail ();
+					m_array.pop ();
 
-					AXL_MEM_DELETE (pAnchor);
+					AXL_MEM_DELETE (anchor);
 
-					return pPrevAnchor; 
+					return prevAnchor; 
 				}
 			}
 
 			// modify last anchor
 
-			pAnchor->m_Hyperlink.Copy (pHyperlink, Length);
-			return pAnchor;
+			anchor->m_hyperlink.copy (hyperlink, length);
+			return anchor;
 		}
 	}
 
 	// create new anchor
 
-	pAnchor = AXL_MEM_NEW (THyperlinkAnchor);
-	pAnchor->m_Offset = Offset;
-	pAnchor->m_Hyperlink.Copy (pHyperlink, Length);
-	m_List.InsertTail (pAnchor);
-	m_Array.Append (pAnchor);
+	anchor = AXL_MEM_NEW (THyperlinkAnchor);
+	anchor->m_offset = offset;
+	anchor->m_hyperlink.copy (hyperlink, length);
+	m_list.insertTail (anchor);
+	m_array.append (anchor);
 
-	return pAnchor;
+	return anchor;
 }
 
 //.............................................................................

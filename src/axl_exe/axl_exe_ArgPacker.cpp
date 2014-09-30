@@ -7,105 +7,105 @@ namespace exe {
 //.............................................................................
 	
 void
-CArgPackerSeq::CAgent::Construct (void* _p)
+CArgPackerSeq::CAgent::construct (void* _p)
 {
-	size_t Count = m_Sequence.GetCount ();
+	size_t count = m_sequence.getCount ();
 
 	uchar_t* p = (uchar_t*) _p;
 
-	for (size_t i = 0; i < Count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
-		m_Sequence [i]->Construct (p);
-		p += m_Sequence [i]->GetSize ();
+		m_sequence [i]->construct (p);
+		p += m_sequence [i]->getSize ();
 	}
 }
 
 void
-CArgPackerSeq::CAgent::Destruct (void* _p)
+CArgPackerSeq::CAgent::destruct (void* _p)
 {
-	size_t Count = m_Sequence.GetCount ();
+	size_t count = m_sequence.getCount ();
 
 	uchar_t* p = (uchar_t*) _p;
 
-	for (size_t i = 0; i < Count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
-		m_Sequence [i]->Destruct (p);
-		p += m_Sequence [i]->GetSize ();
+		m_sequence [i]->destruct (p);
+		p += m_sequence [i]->getSize ();
 	}
 }
 
 void
-CArgPackerSeq::CAgent::Copy (
+CArgPackerSeq::CAgent::copy (
 	void* _p,
 	const void* _pSrc
 	)
 {
-	size_t Count = m_Sequence.GetCount ();
+	size_t count = m_sequence.getCount ();
 
 	uchar_t* p = (uchar_t*) _p;
-	uchar_t* pSrc = (uchar_t*) _pSrc;
+	uchar_t* src = (uchar_t*) _pSrc;
 
-	for (size_t i = 0; i < Count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
-		m_Sequence [i]->Copy (p, pSrc);
+		m_sequence [i]->copy (p, src);
 
-		p += m_Sequence [i]->GetSize ();
-		pSrc += m_Sequence [i]->GetSize ();
+		p += m_sequence [i]->getSize ();
+		src += m_sequence [i]->getSize ();
 	}
 }
 
 //.............................................................................
 
 axl_va_list
-CArgPackerSeq::PackV (
+CArgPackerSeq::packV (
 	void* _p,
-	size_t* pSize,
-	ref::CPtrT <obj::IType>* pAgent,
+	size_t* size,
+	ref::CPtrT <obj::IType>* agent,
 	axl_va_list va
 	)
 {
-	size_t Count = m_Sequence.GetCount ();
-	size_t TotalSize = 0;
+	size_t count = m_sequence.getCount ();
+	size_t totalSize = 0;
 	uchar_t* p = (uchar_t*) _p;
 
 	if (!p)
 	{
-		for (size_t i = 0; i < Count; i++)
+		for (size_t i = 0; i < count; i++)
 		{
-			size_t Size = 0;
-			va = m_Sequence [i]->PackV (NULL, &Size, NULL, va);
-			TotalSize += Size;
+			size_t size = 0;
+			va = m_sequence [i]->packV (NULL, &size, NULL, va);
+			totalSize += size;
 		}
 	}
 	else
 	{
-		ref::CPtrT <CAgent> Agent = AXL_REF_NEW (CAgent);
-		Agent->m_Sequence.Reserve (Count);
+		ref::CPtrT <CAgent> agent = AXL_REF_NEW (CAgent);
+		agent->m_sequence.reserve (count);
 
-		for (size_t i = 0; i < Count; i++)
+		for (size_t i = 0; i < count; i++)
 		{
-			size_t Size = 0;
-			ref::CPtrT <obj::IType> SubAgent;
+			size_t size = 0;
+			ref::CPtrT <obj::IType> subAgent;
 
-			va = m_Sequence [i]->PackV (p, &Size, &SubAgent, va);
+			va = m_sequence [i]->packV (p, &size, &subAgent, va);
 
-			Agent->m_Sequence.Append (SubAgent);
+			agent->m_sequence.append (subAgent);
 
-			p += Size;
-			TotalSize += Size;
+			p += size;
+			totalSize += size;
 		}
 
-		*pAgent = Agent;
+		*agent = agent;
 	}
 
-	*pSize = TotalSize;
+	*size = totalSize;
 	return va;
 }
 
 size_t
-CArgPackerSeq::AppendFormat (const char* pFormat)
+CArgPackerSeq::appendFormat (const char* format)
 {
-	const char* pF = pFormat;
+	const char* pF = format;
 	
 	for (; *pF; pF++)
 	{
@@ -122,7 +122,7 @@ CArgPackerSeq::AppendFormat (const char* pFormat)
 		case 'u':
 		case 'x':
 		case 'X':
-			Append <CArgT <intptr_t> > ();
+			append <CArgT <intptr_t> > ();
 			break;
 
 		case 'e': 
@@ -130,54 +130,54 @@ CArgPackerSeq::AppendFormat (const char* pFormat)
 		case 'f':
 		case 'g':
 		case 'G':
-			Append <CArgT <double> > ();
+			append <CArgT <double> > ();
 			break;
 
 		case 'p':
-			Append <CArgT <void*> > ();
+			append <CArgT <void*> > ();
 			break;
 			
 #ifdef _UNICODE
 
 		case 's': 
-			Append <CArgStringW> ();
+			append <CArgStringW> ();
 			break;
 
 		case 'S': 
-			Append <CArgStringA> ();
+			append <CArgStringA> ();
 			break;
 
 		case 'c': 
-			Append <CArgT <wchar_t> > ();
+			append <CArgT <wchar_t> > ();
 			break;
 
 		case 'C': 
-			Append <CArgT <char> > ();
+			append <CArgT <char> > ();
 			break;
 
 #else // _UNICODE
 
 		case 's': 
-			Append <CArgStringA> ();
+			append <CArgStringA> ();
 			break;
 
 		case 'S': 
-			Append <CArgStringW> ();
+			append <CArgStringW> ();
 			break;
 
 		case 'c': 
-			Append <CArgT <char> > ();
+			append <CArgT <char> > ();
 			break;
 
 		case 'C': 
-			Append <CArgT <wchar_t> > ();
+			append <CArgT <wchar_t> > ();
 			break;
 
 #endif // _UNICODE
 		}
 	}
 
-	return m_Sequence.GetCount ();
+	return m_sequence.getCount ();
 }
 
 //.............................................................................

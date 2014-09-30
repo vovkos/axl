@@ -7,8 +7,8 @@ namespace rtl {
 //.............................................................................
 	
 size_t
-CUnpacker::Scan_va (
-	const char* pFormat,
+CUnpacker::scan_va (
+	const char* formatString,
 	axl_va_list va
 	)
 {

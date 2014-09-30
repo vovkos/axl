@@ -9,20 +9,20 @@ namespace test_Timer {
 /*
 
 void 
-Run ()
+run ()
 {
-	mt::CTimer Timer;
+	mt::CTimer timer;
 
-	Timer.SetTimer (
+	timer.setTimer (
 		1000, 
 		&exe::CFunctionT <
 			exe::CArgT <int>,  
 			exe::CArgT <void>
-			> (OnEvent, 5),
+			> (onEvent, 5),
 		mt::CTimer::ETimer_Periodic
 		);
 
-	Sleep (10000);
+	sleep (10000);
 }
 
 */

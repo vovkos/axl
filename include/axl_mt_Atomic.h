@@ -17,142 +17,142 @@ namespace mt {
 
 inline
 int32_t
-AtomicXchg (
+atomicXchg (
 	volatile int32_t* p,
-	int32_t Value
+	int32_t value
 	)	
 {
-	return InterlockedExchange ((long*) p, Value);
+	return ::InterlockedExchange ((long*) p, value);
 }
 
 inline
 int64_t
-AtomicXchg (
+atomicXchg (
 	volatile int64_t* p,
-	int64_t Value
+	int64_t value
 	)	
 {
-	return InterlockedExchange64 (p, Value);
+	return ::InterlockedExchange64 (p, value);
 }
 
 inline
 int32_t
-AtomicCmpXchg (
+atomicCmpXchg (
 	volatile int32_t* p,
-	int32_t CmpValue,
-	int32_t NewValue
+	int32_t cmpValue,
+	int32_t newValue
 	)	
 {
-	return InterlockedCompareExchange ((long*) p, NewValue, CmpValue); // inverse order!
+	return ::InterlockedCompareExchange ((long*) p, newValue, cmpValue); // inverse order!
 }
 
 inline
 int64_t
-AtomicCmpXchg (
+atomicCmpXchg (
 	volatile int64_t* p,
-	int64_t CmpValue,
-	int64_t NewValue
+	int64_t cmpValue,
+	int64_t newValue
 	)	
 {
-	return InterlockedCompareExchange64 (p, NewValue, CmpValue); // inverse order!
+	return ::InterlockedCompareExchange64 (p, newValue, cmpValue); // inverse order!
 }
 
 inline
 int32_t
-AtomicInc (volatile int32_t* p)	
+atomicInc (volatile int32_t* p)	
 {
-	return InterlockedIncrement ((long*) p);
+	return ::InterlockedIncrement ((long*) p);
 }
 
 inline
 int64_t
-AtomicInc (volatile int64_t* p)	
+atomicInc (volatile int64_t* p)	
 {
-	return InterlockedIncrement64 (p);
+	return ::InterlockedIncrement64 (p);
 }
 
 inline
 int32_t
-AtomicDec (volatile int32_t* p)	
+atomicDec (volatile int32_t* p)	
 {
-	return InterlockedDecrement ((long*) p);
+	return ::InterlockedDecrement ((long*) p);
 }
 
 inline
 int64_t
-AtomicDec (volatile int64_t* p)	
+atomicDec (volatile int64_t* p)	
 {
-	return InterlockedDecrement64 (p);
+	return ::InterlockedDecrement64 (p);
 }
 
 #elif (_AXL_CPP == AXL_CPP_GCC)
 
 inline
 int32_t
-AtomicXchg (
+atomicXchg (
 	volatile int32_t* p,
-	int32_t Value
+	int32_t value
 	)	
 {
-	return __sync_lock_test_and_set (p, Value);
+	return __sync_lock_test_and_set (p, value);
 }
 
 inline
 int64_t
-AtomicXchg (
+atomicXchg (
 	volatile int64_t* p,
-	int64_t Value
+	int64_t value
 	)	
 {
-	return __sync_lock_test_and_set (p, Value);
+	return __sync_lock_test_and_set (p, value);
 }
 
 inline
 int32_t
-AtomicCmpXchg (
+atomicCmpXchg (
 	volatile int32_t* p,
-	int32_t CmpValue,
-	int32_t NewValue
+	int32_t cmpValue,
+	int32_t newValue
 	)	
 {
-	return __sync_val_compare_and_swap (p, CmpValue, NewValue);
+	return __sync_val_compare_and_swap (p, cmpValue, newValue);
 }
 
 inline
 int64_t
-AtomicCmpXchg (
+atomicCmpXchg (
 	volatile int64_t* p,
-	int64_t CmpValue,
-	int64_t NewValue
+	int64_t cmpValue,
+	int64_t newValue
 	)	
 {
-	return __sync_val_compare_and_swap (p, CmpValue, NewValue);
+	return __sync_val_compare_and_swap (p, cmpValue, newValue);
 }
 
 inline
 int32_t
-AtomicInc (volatile int32_t* p)	
+atomicInc (volatile int32_t* p)	
 {
 	return __sync_add_and_fetch (p, 1);
 }
 
 inline
 int64_t
-AtomicInc (volatile int64_t* p)	
+atomicInc (volatile int64_t* p)	
 {
 	return __sync_add_and_fetch (p, 1);
 }
 
 inline
 int32_t
-AtomicDec (volatile int32_t* p)	
+atomicDec (volatile int32_t* p)	
 {
 	return __sync_sub_and_fetch (p, 1);
 }
 
 inline
 int64_t
-AtomicDec (volatile int64_t* p)	
+atomicDec (volatile int64_t* p)	
 {
 	return __sync_sub_and_fetch (p, 1);
 }
@@ -163,26 +163,26 @@ AtomicDec (volatile int64_t* p)
 
 inline
 void
-AtomicUpdatePeak (
-	volatile int32_t* pPeak,
-	int32_t Current
+atomicUpdatePeak (
+	volatile int32_t* peak,
+	int32_t current
 	)
 {
 	for (;;)
 	{
-		int32_t Old = *pPeak;
+		int32_t old = *peak;
 		
-		if (Current <= Old)
+		if (current <= old)
 			break;
 
-		if (AtomicCmpXchg (pPeak, Old, Current) == Old)
+		if (atomicCmpXchg (peak, old, current) == old)
 			break;
 	}
 }
 
 inline
 void
-YieldProcessor ()
+yieldProcessor ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN || _AXL_ENV == AXL_ENV_NT)
 	::YieldProcessor ();
@@ -195,23 +195,23 @@ YieldProcessor ()
 
 inline
 void 
-AtomicLock (volatile int32_t* pLock)
+atomicLock (volatile int32_t* lock)
 {
 	for (;;)
 	{
-		uint32_t Lock = mt::AtomicCmpXchg (pLock, 0, 1);
-		if (Lock == 0)
+		uint32_t result = mt::atomicCmpXchg (lock, 0, 1);
+		if (result == 0)
 			break;
 
-		mt::YieldProcessor ();
+		mt::yieldProcessor ();
 	}
 }
 
 inline
 void 
-AtomicUnlock (volatile int32_t* pLock)
+atomicUnlock (volatile int32_t* lock)
 {
-	*pLock = 0;
+	*lock = 0;
 }
 
 //.............................................................................

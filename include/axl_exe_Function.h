@@ -25,20 +25,20 @@ struct IFunction: obj::IRoot
 
 	virtual 
 	IArgPacker*
-	GetArgPacker () = 0;
+	getArgPacker () = 0;
 
 	virtual 
 	intptr_t 
-	InvokeV (axl_va_list va) = 0;
+	invokeV (axl_va_list va) = 0;
 
 	intptr_t 
-	Invoke (
-		int Unused,
+	invoke (
+		int unused,
 		...
 		)
 	{
-		AXL_VA_DECL (va, Unused);
-		return InvokeV (va);
+		AXL_VA_DECL (va, unused);
+		return invokeV (va);
 	}
 };
 
@@ -55,24 +55,24 @@ public:
 
 protected:
 	void* m_pf;
-	ECallConv m_Convention;
-	ref::CPtrT <CArgBlock> m_Context;
+	ECallConv m_convention;
+	ref::CPtrT <CArgBlock> m_context;
 
 public:
 	CFunctionT ()
 	{
 		m_pf = NULL;
-		m_Convention = ECallConv_Cdecl;
+		m_convention = ECallConv_Cdecl;
 	}
 
 	CFunctionT (
-		ECallConv Convention,
+		ECallConv convention,
 		void* pf,
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (Convention, pf, va);
+		setupV (convention, pf, va);
 	}
 
 	CFunctionT (
@@ -81,73 +81,73 @@ public:
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (pf, va);
+		setupV (pf, va);
 	}
 
 	void
-	SetupV (
-		ECallConv Convention,
+	setupV (
+		ECallConv convention,
 		void* pf,
 		axl_va_list va
 		)
 	{
-		m_Convention = Convention;
+		m_convention = convention;
 		m_pf = pf;
-		m_Context = CreateArgBlockV <TCtxArg> (va);
+		m_context = createArgBlockV <TCtxArg> (va);
 	}
 
 	void
-	SetupV (
+	setupV (
 		void* pf,
 		axl_va_list va
 		)
 	{
-		SetupV (ECallConv_Cdecl, pf, va);
+		setupV (ECallConv_Cdecl, pf, va);
 	}
 
 	void
-	Setup (
-		ECallConv Convention,
+	setup (
+		ECallConv convention,
 		void* pf,
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (Convention, pf, va);
+		setupV (convention, pf, va);
 	}
 
 	void
-	Setup (
+	setup (
 		void* pf,
 		...
 		)
 	{
 		AXL_VA_DECL (va, pf);
-		SetupV (pf, va);
+		setupV (pf, va);
 	}
 
 	virtual 
 	IArgPacker* 
-	GetArgPacker ()
+	getArgPacker ()
 	{
-		return IArgPackerImplT <TParArg>::GetSingleton ();
+		return IArgPackerImplT <TParArg>::getSingleton ();
 	}
 
 	virtual 
 	intptr_t 
-	InvokeV (axl_va_list va)
+	invokeV (axl_va_list va)
 	{
-		size_t Size;
-		TParArg () (NULL, &Size, NULL, va);
+		size_t size;
+		TParArg () (NULL, &size, NULL, va);
 
-		mem::TBlock Stack [2];
+		mem::TBlock stack [2];
 
-		if (m_Context)
-			Stack [0] = *m_Context;
+		if (m_context)
+			stack [0] = *m_context;
 
-		Stack [1].Setup (va.m_va, Size);
+		stack [1].setup (va.m_va, size);
 
-		return exe::InvokeDirect (m_pf, m_Convention, Stack, 2);
+		return exe::invokeDirect (m_pf, m_convention, stack, 2);
 	}
 };
 

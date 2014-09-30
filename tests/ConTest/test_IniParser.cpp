@@ -43,50 +43,50 @@ protected:
 
 public:
 	bool 
-	OnSection (const char* pName)
+	onSection (const char* name)
 	{
-		CSectionNameMap::CIterator It = CSectionNameMap::Find (pName);
-		ESection Section = It ? It->m_Value : ESection_Undefined;
-		printf ("OnSection '%s'\n", pName);
+		CSectionNameMap::CIterator it = CSectionNameMap::find (name);
+		ESection section = it ? it->m_value : ESection_Undefined;
+		printf ("OnSection '%s'\n", name);
 		return true;
 	}
 
 	bool
-	OnKeyValue (
-		const char* pName,
-		const char* pValue
+	onKeyValue (
+		const char* name,
+		const char* value
 		)
 	{
-		CKeyNameMap::CIterator It = CKeyNameMap::Find (pName);
-		EKey Key = It ? It->m_Value : EKey_Undefined;
-		printf ("OnKeyValue '%s' = '%s'\n", pName, pValue);
+		CKeyNameMap::CIterator it = CKeyNameMap::find (name);
+		EKey key = it ? it->m_value : EKey_Undefined;
+		printf ("OnKeyValue '%s' = '%s'\n", name, value);
 		return true;
 	}
 };
 
 void
-Run ()
+run ()
 {
-	bool Result;
+	bool result;
 
-	const char* pFilePath = "D:/Prj/Ninja/ioninja/scripts/nj_ssn/nj_ssn_Serial/nj_ssn_Serial.njini";
+	const char* filePath = "D:/Prj/Ninja/ioninja/scripts/nj_ssn/nj_ssn_Serial/nj_ssn_Serial.njini";
 
-	io::CMappedFile File;
-	Result = File.Open (pFilePath, io::EFileFlag_ReadOnly);
-	if (!Result)
+	io::CMappedFile file;
+	result = file.open (filePath, io::EFileFlag_ReadOnly);
+	if (!result)
 	{
-		printf ("error opening file: %s\n", err::GetError ()->GetDescription ().cc ());
+		printf ("error opening file: %s\n", err::getError ()->getDescription ().cc ());
 		return;
 	}
 
-	const char* p = (const char*) File.View ();
-	uint64_t Size = File.GetSize ();
+	const char* p = (const char*) file.view ();
+	uint64_t size = file.getSize ();
 
-	CMyParser Parser;
-	Result = Parser.Parse (pFilePath, p, (size_t) Size);
-	if (!Result)
+	CMyParser parser;
+	result = parser.parse (filePath, p, (size_t) size);
+	if (!result)
 	{
-		printf ("error parsing file: %s\n", err::GetError ()->GetDescription ().cc ());
+		printf ("error parsing file: %s\n", err::getError ()->getDescription ().cc ());
 		return;
 	}	
 }

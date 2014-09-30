@@ -24,7 +24,7 @@ public:
 
 	enum
 	{
-		HasShadow = false
+		hasShadow = false
 	};
 
 	class CShadow
@@ -34,8 +34,8 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
-		void* pShadow,
+		size_t* size,
+		void* shadow,
 		axl_va_list va
 		);
 };
@@ -55,16 +55,16 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
-		CShadow* pShadow,
+		size_t* size,
+		CShadow* shadow,
 		axl_va_list va
 		)
 	{
-		T* pSrc = &AXL_VA_ARG (va, T);
-		*pSize = (sizeof (T) + 3) & ~3; // round to sizeof (int)
+		T* src = &AXL_VA_ARG (va, T);
+		*size = (sizeof (T) + 3) & ~3; // round to sizeof (int)
 
 		if (p)
-			new (p) T (*pSrc);
+			new (p) T (*src);
 
 		return va;
 	}
@@ -87,12 +87,12 @@ public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
-		void* pShadow,
+		size_t* size,
+		void* shadow,
 		axl_va_list va
 		)
 	{
-		*pSize = 0;
+		*size = 0;
 		return va;
 	}
 };
@@ -107,31 +107,31 @@ class CArgStringT: public CArgRootT <T*>
 public:
 	enum
 	{
-		HasShadow = true
+		hasShadow = true
 	};
 
 	class CShadow
 	{
 	public:
-		rtl::CStringT <T> m_String;
+		rtl::CStringT <T> m_string;
 	};
 
 public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
-		CShadow* pShadow,
+		size_t* size,
+		CShadow* shadow,
 		axl_va_list va
 		)
 	{
-		T* pString = AXL_VA_ARG (va, T*);
-		*pSize = sizeof (T*);
+		T* string = AXL_VA_ARG (va, T*);
+		*size = sizeof (T*);
 
 		if (p)
 		{
-			pShadow->m_String = pString;
-			*(const T**) p = (const T*) pShadow->m_String;
+			shadow->m_string = string;
+			*(const T**) p = (const T*) shadow->m_string;
 		}
 
 		return va;
@@ -179,33 +179,33 @@ class CArgObjPtrT: public CArgRootT <T*>
 public:
 	enum
 	{
-		HasShadow = true
+		hasShadow = true
 	};
 
 	class CShadow
 	{
 	public:
-		T m_Object;
+		T m_object;
 	};
 
 public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
-		CShadow* pShadow,
+		size_t* size,
+		CShadow* shadow,
 		axl_va_list va
 		)
 	{
-		T* pObject = AXL_VA_ARG (va, T*);
-		*pSize = sizeof (T*);
+		T* object = AXL_VA_ARG (va, T*);
+		*size = sizeof (T*);
 
 		if (p)
 		{
-			if (pObject)
+			if (object)
 			{
-				pShadow->m_Object = *pObject;
-				*(T**) p = &pShadow->m_Object;
+				shadow->m_object = *object;
+				*(T**) p = &shadow->m_object;
 			}
 			else
 			{
@@ -230,33 +230,33 @@ class CArgVsoPtrT: public CArgRootT <T*>
 public:
 	enum
 	{
-		HasShadow = true
+		hasShadow = true
 	};
 
 	class CShadow
 	{
 	public:
-		ref::CBufT <T, TGetSize> m_Object;
+		ref::CBufT <T, TGetSize> m_object;
 	};
 
 public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
-		CShadow* pShadow,
+		size_t* size,
+		CShadow* shadow,
 		axl_va_list va
 		)
 	{
-		T* pObject = AXL_VA_ARG (va, T*);
-		*pSize = sizeof (T*);
+		T* object = AXL_VA_ARG (va, T*);
+		*size = sizeof (T*);
 
 		if (p)
 		{
-			if (pObject)
+			if (object)
 			{
-				pShadow->m_Object = *pObject;
-				*(T**) p = pShadow->m_Object;
+				shadow->m_object = *object;
+				*(T**) p = shadow->m_object;
 			}
 			else
 			{
@@ -296,8 +296,8 @@ public:
 	class CArg
 	{
 	public:
-		typename TArg1::CArg m_Arg1;
-		typename TArg2::CArg m_Arg2;
+		typename TArg1::CArg m_arg1;
+		typename TArg2::CArg m_arg2;
 	};
 
 	typedef g::CTypeT <CArg> CType;
@@ -305,39 +305,39 @@ public:
 	class CShadow
 	{
 	public:
-		typename TArg1::CShadow m_Shadow1;
-		typename TArg2::CShadow m_Shadow2;
+		typename TArg1::CShadow m_shadow1;
+		typename TArg2::CShadow m_shadow2;
 	};
 
 	enum
 	{
-		HasShadow = TArg1::HasShadow || TArg2::HasShadow
+		hasShadow = TArg1::hasShadow || TArg2::hasShadow
 	};
 
 public:
 	axl_va_list
 	operator () (
 		void* p,
-		size_t* pSize,
-		CShadow* pShadow,
+		size_t* size,
+		CShadow* shadow,
 		axl_va_list va
 		)
 	{
-		size_t Size1 = 0;
-		size_t Size2 = 0;
+		size_t size1 = 0;
+		size_t size2 = 0;
 
 		if (!p)
 		{
-			va = TArg1 () (NULL, &Size1, NULL, va);
-			va = TArg2 () (NULL, &Size2, NULL, va);
+			va = TArg1 () (NULL, &size1, NULL, va);
+			va = TArg2 () (NULL, &size2, NULL, va);
 		}
 		else
 		{
-			va = TArg1 () (p, &Size1, &pShadow->m_Shadow1, va);
-			va = TArg2 () ((uchar_t*) p + Size1, &Size2, &pShadow->m_Shadow2, va);
+			va = TArg1 () (p, &size1, &shadow->m_shadow1, va);
+			va = TArg2 () ((uchar_t*) p + size1, &size2, &shadow->m_shadow2, va);
 		}
 
-		*pSize = Size1 + Size2;
+		*size = size1 + size2;
 
 		return va;
 	}
@@ -499,12 +499,12 @@ class CArgBlock:
 	public mem::TBlock
 {
 public:
-	ref::CPtrT <obj::IType> m_Agent;
+	ref::CPtrT <obj::IType> m_agent;
 
 	~CArgBlock ()
 	{
-		if (m_Agent && m_p)
-			m_Agent->Destruct (m_p);
+		if (m_agent && m_p)
+			m_agent->destruct (m_p);
 	}
 };
 
@@ -512,44 +512,44 @@ public:
 
 template <typename T>
 ref::CPtrT <CArgBlock> 
-CreateArgBlockV (axl_va_list va)
+createArgBlockV (axl_va_list va)
 {
-	size_t Size = 0;
-	T () (NULL, &Size, NULL, va);
+	size_t size = 0;
+	T () (NULL, &size, NULL, va);
 
-	ref::CPtrT <CArgBlock> Package = AXL_REF_NEW_EXTRA (CArgBlock, Size);
-	Package->m_p = Package + 1;
-	Package->m_Size = Size;
+	ref::CPtrT <CArgBlock> package = AXL_REF_NEW_EXTRA (CArgBlock, size);
+	package->m_p = package + 1;
+	package->m_size = size;
 
-	obj::IType* pType = AXL_OBJ_TYPEOF (T::CType);
+	obj::IType* type = AXL_OBJ_TYPEOF (T::CType);
 
-	if (T::HasShadow)
+	if (T::hasShadow)
 	{
 		typedef ref::CBoxT <typename T::CShadow> CShadow;
-		ref::CPtrT <CShadow> Shadow = AXL_REF_NEW (CShadow);		
-		T () (Package + 1, &Size, Shadow, va);
-		Package->m_Agent.Copy (pType, Shadow.GetRefCount ());
+		ref::CPtrT <CShadow> shadow = AXL_REF_NEW (CShadow);		
+		T () (package + 1, &size, shadow, va);
+		package->m_agent.copy (type, shadow.getRefCount ());
 	}
 	else
 	{
-		T () (Package + 1, &Size, NULL, va);
-		Package->m_Agent.Copy (pType, NULL);
+		T () (package + 1, &size, NULL, va);
+		package->m_agent.copy (type, NULL);
 	}
 	
-	return Package;
+	return package;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 ref::CPtrT <CArgBlock> 
-CreateArgBlock (
-	int Unused,
+createArgBlock (
+	int unused,
 	...
 	)
 {
-	AXL_VA_DECL (va, Unused);
-	return CreateArgBlockV <T> (va);
+	AXL_VA_DECL (va, unused);
+	return createArgBlockV <T> (va);
 }
 
 //.............................................................................

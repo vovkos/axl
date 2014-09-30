@@ -17,50 +17,50 @@ namespace exe {
 class CProxyFunction: public IFunction
 {
 public:
-	IScheduler* m_pScheduler;
-	IFunction* m_pFunction;
+	IScheduler* m_scheduler;
+	IFunction* m_function;
 
-	ref::CPtrT <void> m_KeepAlive;
+	ref::CPtrT <void> m_keepAlive;
 
 public:
 	CProxyFunction (
-		IScheduler* pScheduler = NULL,
-		IFunction* pFunction = NULL,
-		ref::CPtrT <void> KeepAlive = ref::CPtrT <void> ()
+		IScheduler* scheduler = NULL,
+		IFunction* function = NULL,
+		ref::CPtrT <void> keepAlive = ref::CPtrT <void> ()
 		)
 	{
-		m_pFunction = pFunction;
-		m_pScheduler = pScheduler;
-		m_KeepAlive = KeepAlive;
+		m_function = function;
+		m_scheduler = scheduler;
+		m_keepAlive = keepAlive;
 	}
 
-	CProxyFunction (const CProxyFunction& Src)
+	CProxyFunction (const CProxyFunction& src)
 	{
-		Copy (Src);
+		copy (src);
 	}
 
 	CProxyFunction& 
-	operator = (const CProxyFunction& Src)
+	operator = (const CProxyFunction& src)
 	{
-		Copy (Src);
+		copy (src);
 		return *this;
 	}
 
 	virtual 
 	IArgPacker* 
-	GetArgPacker ()
+	getArgPacker ()
 	{
-		return m_pFunction->GetArgPacker ();
+		return m_function->getArgPacker ();
 	}
 
 	virtual 
 	intptr_t 
-	InvokeV (axl_va_list va)
+	invokeV (axl_va_list va)
 	{
-		if (!m_pScheduler)
-			return m_pFunction->InvokeV (va);
+		if (!m_scheduler)
+			return m_function->invokeV (va);
 
-		m_pScheduler->ScheduleV (m_pFunction, va);
+		m_scheduler->scheduleV (m_function, va);
 		return 0;
 	}
 };

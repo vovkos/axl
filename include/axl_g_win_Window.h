@@ -24,152 +24,152 @@ public:
 
 	enum
 	{
-		ClassStyle      = CS_DBLCLKS,
-		ClassCursor     = (int) IDC_ARROW,
-		ClassBackground = COLOR_WINDOW,
+		classStyle      = CS_DBLCLKS,
+		classCursor     = (int) IDC_ARROW,
+		classBackground = COLOR_WINDOW,
 	};
 
 public:
 	// Win32 wrappers
 
 	bool
-	Create (
-		const wchar_t* pClassName, 
+	create (
+		const wchar_t* className, 
 		HWND hWndParent,
-		const RECT* pRect = NULL,
-		const wchar_t* pWindowName = NULL,
-		uint_t Style = 0,
-		uint_t StyleEx = 0,
+		const RECT* rect = NULL,
+		const wchar_t* windowName = NULL,
+		uint_t style = 0,
+		uint_t styleEx = 0,
 		uint_t ID = 0,
-		void* pParam = NULL
+		void* param = NULL
 		)
 	{
 		static RECT _DefaultRect = { CW_USEDEFAULT, CW_USEDEFAULT, 0, 0 };
 
-		if (!pRect)
-			pRect = &_DefaultRect;
+		if (!rect)
+			rect = &_DefaultRect;
 
 		m_h = ::CreateWindowExW (
-			StyleEx, 
-			pClassName,
-			pWindowName, 
-			Style,
-			pRect->left,
-			pRect->top,
-			pRect->right - pRect->left,
-			pRect->bottom - pRect->top,
+			styleEx, 
+			className,
+			windowName, 
+			style,
+			rect->left,
+			rect->top,
+			rect->right - rect->left,
+			rect->bottom - rect->top,
 			hWndParent,
 			(HMENU) ID,
-			g::GetModule ()->GetModuleHandle (),
-			pParam
+			g::getModule ()->getModuleHandle (),
+			param
 			);
 
-		return err::Complete (m_h != NULL);
+		return err::complete (m_h != NULL);
 	}
 
 	bool 
-	DestroyWindow ()
+	destroyWindow ()
 	{
-		bool_t Result = ::DestroyWindow (m_h);
-		return err::Complete (Result);
+		bool_t result = ::DestroyWindow (m_h);
+		return err::complete (result);
 	}
 
 	LONG_PTR
-	GetClassLongPtr (int Index)
+	getClassLongPtr (int index)
 	{
-		return ::GetClassLongPtr (m_h, Index);
+		return ::GetClassLongPtr (m_h, index);
 	}
 
 	LONG_PTR
-	SetClassLongPtr (
-		int Index, 
-		LONG_PTR Value
+	setClassLongPtr (
+		int index, 
+		LONG_PTR value
 		)
 	{
-		return ::SetClassLongPtr (m_h, Index, Value);
+		return ::SetClassLongPtr (m_h, index, value);
 	}
 
 	LONG_PTR
-	GetWindowLongPtr (int Index)
+	getWindowLongPtr (int index)
 	{
-		return ::GetWindowLongPtr (m_h, Index);
+		return ::GetWindowLongPtr (m_h, index);
 	}
 
 	LONG_PTR
-	SetWindowLongPtr (
-		int Index, 
-		LONG_PTR Value
+	setWindowLongPtr (
+		int index, 
+		LONG_PTR value
 		)
 	{
-		return ::SetWindowLongPtr (m_h, Index, Value);
+		return ::SetWindowLongPtr (m_h, index, value);
 	}
 
 	LRESULT
-	SendMessage (
-		UINT Msg, 
+	sendMessage (
+		UINT msg, 
 		WPARAM wParam = 0,
 		LPARAM lParam = 0
 		)
 	{
-		return ::SendMessage (m_h, Msg, wParam, lParam);
+		return ::SendMessage (m_h, msg, wParam, lParam);
 	}
 
 	LRESULT
-	PostMessage (
-		UINT Msg, 
+	postMessage (
+		UINT msg, 
 		WPARAM wParam = 0,
 		LPARAM lParam = 0
 		)
 	{
-		return ::PostMessage (m_h, Msg, wParam, lParam);
+		return ::PostMessage (m_h, msg, wParam, lParam);
 	}
 
 	bool 
-	ShowWindow (int Show = SW_SHOW)
+	showWindow (int show = SW_SHOW)
 	{
-		bool_t Result = ::ShowWindow (m_h, Show);
-		return err::Complete (Result);
+		bool_t result = ::ShowWindow (m_h, show);
+		return err::complete (result);
 	}
 
 	bool 
-	SetWindowPos (
+	setWindowPos (
 		HWND hWndInsertAfter,
 		int x,
 		int y,
-		int Width,
-		int Height,
-		uint_t Flags
+		int width,
+		int height,
+		uint_t flags
 		)
 	{
-		bool_t Result = ::SetWindowPos (m_h, hWndInsertAfter, x, y, Width, Height, Flags);
-		return err::Complete (Result);
+		bool_t result = ::SetWindowPos (m_h, hWndInsertAfter, x, y, width, height, flags);
+		return err::complete (result);
 	}
 
 	HDWP 
-	DeferWindowPos (
+	deferWindowPos (
 		HDWP hDwp,
 		HWND hWndInsertAfter,
 		int x,
 		int y,
-		int Width,
-		int Height,
-		uint_t Flags
+		int width,
+		int height,
+		uint_t flags
 		)
 	{
-		return ::DeferWindowPos (hDwp, m_h, hWndInsertAfter, x, y, Width, Height, Flags);
+		return ::DeferWindowPos (hDwp, m_h, hWndInsertAfter, x, y, width, height, flags);
 	}
 
 	// CWindowImplT <> overridable WindowProc
 
 	LRESULT 
-	WindowProc (
-		UINT Msg, 
+	windowProc (
+		UINT msg, 
 		WPARAM wParam, 
 		LPARAM lParam, 
-		bool* pIsHandled
+		bool* isHandled_o
 		) 
 	{
-		*pIsHandled = false;
+		*isHandled_o = false;
 		return 0;
 	} 
 };
@@ -186,7 +186,7 @@ public:
 
 extern
 AXL_SELECT_ANY
-const uint_t g_CreateWindowTls = TlsAlloc ();
+const uint_t g_createWindowTls = ::TlsAlloc ();
 
 template <
 	class T, 
@@ -204,52 +204,52 @@ protected:
 		EWindowState_Subclassed
 	};
 
-	class CRegisterWindowClass
+	class CRegisterWndClass
 	{
 	public:
 		void 
-		operator () (WNDCLASSW** ppWndClass)
+		operator () (WNDCLASSW** wndClass_o)
 		{
-			static WNDCLASSW WndClass = { 0 };
-			WndClass.style = T::ClassStyle;
-			WndClass.hCursor = ::LoadCursor (NULL, MAKEINTRESOURCE (T::ClassCursor));
-			WndClass.hbrBackground = (HBRUSH) (T::ClassBackground + 1);
-			WndClass.hInstance = g::GetModule ()->GetModuleHandle ();
-			WndClass.lpfnWndProc = &_WindowProc;
-			WndClass.cbWndExtra = sizeof (T*);				
-			WndClass.lpszClassName = T::GetClassName ();
+			static WNDCLASSW wndClass = { 0 };
+			wndClass.style = T::classStyle;
+			wndClass.hCursor = ::LoadCursor (NULL, MAKEINTRESOURCE (T::classCursor));
+			wndClass.hbrBackground = (HBRUSH) (T::classBackground + 1);
+			wndClass.hInstance = g::getModule ()->getModuleHandle ();
+			wndClass.lpfnWndProc = &_WindowProc;
+			wndClass.cbWndExtra = sizeof (T*);				
+			wndClass.lpszClassName = T::getClassName ();
 
-			if (!WndClass.lpszClassName)
+			if (!wndClass.lpszClassName)
 			{
-				static wchar_t ClassName [64] = { 0 };
-				_snwprintf (ClassName, countof (ClassName) - 1, L"axl:%x", &_WindowProc);
-				WndClass.lpszClassName = ClassName;
+				static wchar_t className [64] = { 0 };
+				_snwprintf (className, countof (className) - 1, L"axl:%x", &_WindowProc);
+				wndClass.lpszClassName = className;
 			}; 
 
-			bool_t Result = ::RegisterClass (&WndClass);
-			if (!Result)
+			bool_t result = ::RegisterClass (&wndClass);
+			if (!result)
 			{
-				err::SetLastSystemError ();
+				err::setLastSystemError ();
 				return;
 			}
 
-			*ppWndClass = &WndClass;
+			*wndClass_o = &wndClass;
 		}
 	};
 
 protected:
-	int m_WindowState;
+	int m_windowState;
 
 	// subclass
 
-	exe::TThunk* m_pSubclassWindowThunk;
+	exe::TThunk* m_subclassWindowThunk;
 	WNDPROC m_pfOriginalWindowProc;
 
 public:
 	CWindowImplT ()
 	{		
-		m_WindowState = EWindowState_Idle;
-		m_pSubclassWindowThunk = NULL;
+		m_windowState = EWindowState_Idle;
+		m_subclassWindowThunk = NULL;
 		m_pfOriginalWindowProc = NULL;
 	}
 
@@ -258,127 +258,127 @@ public:
 #ifndef _AXL_DISABLE_PREMATURE_WINDOW_DESTRUCTION_CHECK
 		ASSERT (!m_h);
 #endif
-		Detach ();
+		detach ();
 	}
 
 	// reset wndclass name every time
 
 	static 
 	const wchar_t*
-	GetClassName ()
+	getWndClassName ()
 	{ 
 		return NULL;
 	}
 
 	static 
 	bool
-	Register ()
+	registerWndClass ()
 	{
-		return GetWndClass () != NULL;
+		return getWndClass () != NULL;
 	}
 
 	static
 	const WNDCLASS*
-	GetWndClass ()
+	getWndClass ()
 	{
-		static WNDCLASS* pWndClass = NULL;
-		mt::CallOnce (CRegisterWindowClass (), &pWndClass);
-		return pWndClass;
+		static WNDCLASS* wndClass = NULL;
+		mt::callOnce (CRegisterWndClass (), &wndClass);
+		return wndClass;
 	}
 
 	void
-	Attach (HWND hWnd)
+	attach (HWND hWnd)
 	{
-		Detach ();
+		detach ();
 
 		m_h = hWnd;
-		m_WindowState = EWindowState_Attached;
+		m_windowState = EWindowState_Attached;
 	}
 
 	HWND 
-	Detach ()
+	detach ()
 	{
-		return DetachEx (false);
+		return detachEx (false);
 	}
 
 	bool 
-	Create (
+	create (
 		HWND hWndParent,
-		const RECT* pRect = NULL,
-		const wchar_t* pWindowName = NULL,
-		uint_t Style = 0,
-		uint_t StyleEx = 0,
+		const RECT* rect = NULL,
+		const wchar_t* windowName = NULL,
+		uint_t style = 0,
+		uint_t styleEx = 0,
 		uint_t ID = 0,
-		void* pParam = NULL
+		void* param = NULL
 		)
 	{ 
-		Detach ();
+		detach ();
 
-		TlsSetValue (g_CreateWindowTls, static_cast <T*> (this));
+		::TlsSetValue (g_createWindowTls, static_cast <T*> (this));
 
-		const WNDCLASS* pWndClass = GetWndClass ();
-		if (!pWndClass)
+		const WNDCLASS* wndClass = getWndClass ();
+		if (!wndClass)
 			return false;
 
-		bool Result = CWindow::Create (
-			pWndClass->lpszClassName, 
+		bool result = CWindow::create (
+			wndClass->lpszClassName, 
 			hWndParent, 
-			pRect, 
-			pWindowName, 
-			Style, 
-			StyleEx, 
+			rect, 
+			windowName, 
+			style, 
+			styleEx, 
 			ID, 
-			pParam
+			param
 			); 
 
-		TlsSetValue (g_CreateWindowTls, NULL);
+		::TlsSetValue (g_createWindowTls, NULL);
 
-		return Result;
+		return result;
 	}
 
 	bool 
-	Subclass (HWND hWnd)
+	subclass (HWND hWnd)
 	{
-		Detach ();
+		detach ();
 
-		m_pSubclassWindowThunk = exe::CreateThunk (_SubclassWindowProc, static_cast <T*> (this));
-		if (!m_pSubclassWindowThunk)
+		m_subclassWindowThunk = exe::createThunk (_SubclassWindowProc, static_cast <T*> (this));
+		if (!m_subclassWindowThunk)
 			return false;
 
 		m_h = hWnd;
-		m_WindowState = EWindowState_Subclassed;
-		m_pfOriginalWindowProc = (WNDPROC) ::SetWindowLongPtr (hWnd, GWLP_WNDPROC, (LONG_PTR) m_pSubclassWindowThunk);	
+		m_windowState = EWindowState_Subclassed;
+		m_pfOriginalWindowProc = (WNDPROC) ::SetWindowLongPtr (hWnd, GWLP_WNDPROC, (LONG_PTR) m_subclassWindowThunk);	
 		return true;
 	}
 	
 	static 
 	T* 
-	FromHandle (HWND hWnd)
+	fromHandle (HWND hWnd)
 	{
 		return (T*) (CWindow*) ::GetWindowLongPtr (hWnd, 0);
 	}
 
 	LRESULT 
-	DefWindowProc (
-		UINT Msg, 
+	defWindowProc (
+		UINT msg, 
 		WPARAM wParam, 
 		LPARAM lParam
 		)
 	{
-		return m_WindowState == EWindowState_Subclassed ? 
-			::CallWindowProc (m_pfOriginalWindowProc, m_h, Msg, wParam, lParam) :
-			::DefWindowProc (m_h, Msg, wParam, lParam);
+		return m_windowState == EWindowState_Subclassed ? 
+			::CallWindowProc (m_pfOriginalWindowProc, m_h, msg, wParam, lParam) :
+			::DefWindowProc (m_h, msg, wParam, lParam);
 	}
 
 protected:	
 	HWND 
-	DetachEx (bool DoDrop)
+	detachEx (bool doDrop)
 	{
 		HWND hWnd = m_h;
 
 		WNDPROC pfPrev;
 
-		switch (m_WindowState)
+		switch (m_windowState)
 		{
 		case EWindowState_Idle:
 			return NULL;
@@ -387,53 +387,53 @@ protected:
 			break;
 
 		case EWindowState_Internal:
-			ASSERT (DoDrop); // should only be called from _WindowProc::WM_NCDESTROY
+			ASSERT (doDrop); // should only be called from _WindowProc::WM_NCDESTROY
 			break;
 
 		case EWindowState_Normal:
-			if (!DoDrop)
+			if (!doDrop)
 			{
-				pfPrev = (WNDPROC) SetWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) ::DefWindowProc);
+				pfPrev = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) ::defWindowProc);
 				ASSERT (pfPrev == (WNDPROC) &_WindowProc); // check if anybody has subclassed us
-				SetWindowLongPtr (0, NULL);
+				setWindowLongPtr (0, NULL);
 			}
 
 			break;
 
 		case EWindowState_Subclassed:
-			ASSERT (m_pSubclassWindowThunk);
+			ASSERT (m_subclassWindowThunk);
 
-			if (!DoDrop)
+			if (!doDrop)
 			{
-				pfPrev = (WNDPROC) SetWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) m_pfOriginalWindowProc);
-				ASSERT (pfPrev == (WNDPROC) m_pSubclassWindowThunk); // check if anybody has over-subclassed us
+				pfPrev = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) m_pfOriginalWindowProc);
+				ASSERT (pfPrev == (WNDPROC) m_subclassWindowThunk); // check if anybody has over-subclassed us
 			}
 
-			AXL_MEM_FREE (m_pSubclassWindowThunk);
-			m_pSubclassWindowThunk = NULL;
+			AXL_MEM_FREE (m_subclassWindowThunk);
+			m_subclassWindowThunk = NULL;
 			m_pfOriginalWindowProc = NULL;
 			break;
 		}
 
 		m_h = NULL;
-		m_WindowState = EWindowState_Idle;
+		m_windowState = EWindowState_Idle;
 		return hWnd;
 	}
 
 	LRESULT 
-	ProcessMessage (
-		UINT Msg, 
+	processMessage (
+		UINT msg, 
 		WPARAM wParam, 
 		LPARAM lParam
 		)
 	{
-		bool IsHandled = true;
-		LRESULT Result = static_cast <T*> (this)->WindowProc (Msg, wParam, lParam, &IsHandled);
+		bool isHandled = true;
+		LRESULT result = static_cast <T*> (this)->windowProc (msg, wParam, lParam, &isHandled);
 		
-		if (!IsHandled)
-			Result = DefWindowProc (Msg, wParam, lParam);
+		if (!isHandled)
+			result = defWindowProc (msg, wParam, lParam);
 
-		return Result;
+		return result;
 	}
 
 	// actual WNDPROC procedures
@@ -443,69 +443,69 @@ protected:
 	WINAPI
 	_WindowProc (
 		HWND hWnd,
-		UINT Msg, 
+		UINT msg, 
 		WPARAM wParam, 
 		LPARAM lParam
 		)
 	{
-		if (Msg == WM_NCCREATE)
+		if (msg == WM_NCCREATE)
 		{
-			T* pThis = (T*) TlsGetValue (g_CreateWindowTls);
-			if (pThis)
+			T* self = (T*) ::TlsGetValue (g_createWindowTls);
+			if (self)
 			{
-				pThis->m_WindowState = EWindowState_Normal;
+				self->m_windowState = EWindowState_Normal;
 			}
 			else
 			{
-				pThis = AXL_MEM_NEW (T);
-				pThis->m_WindowState = EWindowState_Internal;
+				self = AXL_MEM_NEW (T);
+				self->m_windowState = EWindowState_Internal;
 			}
 
-			pThis->m_h = hWnd;
-			::SetWindowLongPtr (hWnd, 0, (LONG_PTR) pThis);
+			self->m_h = hWnd;
+			::SetWindowLongPtr (hWnd, 0, (LONG_PTR) self);
 
-			return pThis->ProcessMessage (Msg, wParam, lParam);
+			return self->processMessage (msg, wParam, lParam);
 		}
 
-		T* pThis = (T*) ::GetWindowLongPtr (hWnd, 0);
-		if (!pThis)
-			return ::DefWindowProc (hWnd, Msg, wParam, lParam);
+		T* self = (T*) ::GetWindowLongPtr (hWnd, 0);
+		if (!self)
+			return ::DefWindowProc (hWnd, msg, wParam, lParam);
 
-		ASSERT (pThis->m_WindowState == EWindowState_Normal || pThis->m_WindowState == EWindowState_Internal);
+		ASSERT (self->m_windowState == EWindowState_Normal || self->m_windowState == EWindowState_Internal);
 
-		LRESULT Result = pThis->ProcessMessage (Msg, wParam, lParam);
+		LRESULT result = self->processMessage (msg, wParam, lParam);
 
-		if (Msg == WM_NCDESTROY)
+		if (msg == WM_NCDESTROY)
 		{
-			bool DoDelete = pThis->m_WindowState == EWindowState_Internal;
+			bool doDelete = self->m_windowState == EWindowState_Internal;
 
-			pThis->DetachEx (true);
+			self->detachEx (true);
 
-			if (DoDelete)
-				AXL_MEM_DELETE (pThis);
+			if (doDelete)
+				AXL_MEM_DELETE (self);
 		}
 
-		return Result;
+		return result;
 	}
 
 	static 
 	LRESULT 
 	WINAPI
 	_SubclassWindowProc (
-		T* pThis, // HWND gonna be replaced with T* by thunk proc
-		UINT Msg, 
+		T* self, // HWND gonna be replaced with T* by thunk proc
+		UINT msg, 
 		WPARAM wParam, 
 		LPARAM lParam
 		)
 	{
-		ASSERT (pThis->m_WindowState == EWindowState_Subclassed);
+		ASSERT (self->m_windowState == EWindowState_Subclassed);
 
-		LRESULT Result = pThis->ProcessMessage (Msg, wParam, lParam);
+		LRESULT result = self->processMessage (msg, wParam, lParam);
 
-		if (Msg == WM_NCDESTROY)
-			pThis->DetachEx (true);
+		if (msg == WM_NCDESTROY)
+			self->detachEx (true);
 
-		return Result;
+		return result;
 	}
 };
 
@@ -513,43 +513,43 @@ protected:
 
 // convenient macros
 
-#define AXL_G_WINDOW_CLASS(pName) \
+#define AXL_G_WINDOW_CLASS(name) \
 static \
 const wchar_t* \
-GetClassName () \
+getClassName () \
 { \
-	return pName; \
+	return name; \
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_G_WINDOW_MSG_MAP_BEGIN() \
 LRESULT \
-WindowProc ( \
-	UINT Msg, \
+windowProc ( \
+	UINT msg, \
 	WPARAM wParam, \
 	LPARAM lParam, \
-	bool* pIsHandled \
+	bool* isHandled_o \
 	) \
 { \
-	LRESULT Result = 0; \
-	switch (Msg) \
+	LRESULT result = 0; \
+	switch (msg) \
 	{
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_G_WINDOW_MSG_HANDLER(MsgCode, Handler) \
-	case MsgCode: \
-		Result = Handler (Msg, wParam, lParam, pIsHandled); \
+#define AXL_G_WINDOW_MSG_HANDLER(msgCode, handler) \
+	case msgCode: \
+		result = handler (msg, wParam, lParam, isHandled_o); \
 		break; \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_G_WINDOW_MSG_MAP_END() \
 	default: \
-		*pIsHandled = false; \
+		*isHandled_o = false; \
 	} \
-	return Result; \
+	return result; \
 } 
 
 //.............................................................................

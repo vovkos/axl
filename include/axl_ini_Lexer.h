@@ -27,15 +27,15 @@ public:
 	};
 
 protected:
-	rtl::CString m_FilePath;
+	rtl::CString m_filePath;
 
-	char* m_pBegin;
-	int m_Line;
-	size_t m_LineOffset;
+	char* m_begin;
+	int m_line;
+	size_t m_lineOffset;
 
-	rtl::CString m_SectionName;
-	rtl::CString m_KeyName;
-	rtl::CString m_Value;
+	rtl::CString m_sectionName;
+	rtl::CString m_keyName;
+	rtl::CString m_value;
 
 	// ragel interface variables
 
@@ -50,148 +50,148 @@ protected:
 protected: // should only be used as part of ini::CParser
 	CLexer ()
 	{
-		Reset ();
+		reset ();
 	}
 
 	bool
-	Create (
-		const rtl::CString& FilePath,
-		const rtl::CString& Source
+	create (
+		const rtl::CString& filePath,
+		const rtl::CString& source
 		)
 	{
-		return Create (FilePath, Source, Source.GetLength ());
+		return create (filePath, source, source.getLength ());
 	}
 
 	bool
-	Create (
-		const rtl::CString& FilePath,
-		const char* pSource,
-		size_t Length = -1
+	create (
+		const rtl::CString& filePath,
+		const char* source,
+		size_t length = -1
 		)
 	{
-		this->Reset (); 
+		this->reset (); 
 		
-		Init ();
+		init ();
 
-		p   = (char*) pSource;
-		eof = (char*) pSource + Length;
+		p   = (char*) source;
+		eof = (char*) source + length;
 
-		m_FilePath = FilePath;
-		m_pBegin = p;
+		m_filePath = filePath;
+		m_begin = p;
 
 		return true;
 	}
 
 	void
-	ParseSection (
+	parseSection (
 		const char* p,
-		const char* pEnd
+		const char* end
 		)
 	{
 		ASSERT (*p == '[');
 		
-		if (pEnd [-1] != ']')
+		if (end [-1] != ']')
 			return;
 
 		p++;
-		pEnd--;
+		end--;
 
-		while (p < pEnd && isspace (*p))
+		while (p < end && isspace (*p))
 			p++;
 
-		while (p < pEnd && isspace (pEnd [-1]))
-			pEnd--;
+		while (p < end && isspace (end [-1]))
+			end--;
 
-		if (p < pEnd)
+		if (p < end)
 		{
-			m_SectionName.Copy (p, pEnd - p);
-			Break ();
+			m_sectionName.copy (p, end - p);
+			stop ();
 		}
 	}
 
 	void
-	ParseKeyValue (
+	parseKeyValue (
 		const char* p,
-		const char* pEnd
+		const char* end
 		)
 	{
 		ASSERT (!isspace (*p));
 
 		const char* p0 = p;
 
-		while (p < pEnd && !isspace (*p))
+		while (p < end && !isspace (*p))
 			p++;
 
-		m_KeyName.Copy (p0, p - p0);
+		m_keyName.copy (p0, p - p0);
 
-		while (p < pEnd && isspace (*p))
+		while (p < end && isspace (*p))
 			p++;
 
 		if (*p == '=')
 		{
 			p++;
 
-			while (p < pEnd && isspace (*p))
+			while (p < end && isspace (*p))
 				p++;
 
-			while (p < pEnd && isspace (pEnd [-1]))
-				pEnd--;
+			while (p < end && isspace (end [-1]))
+				end--;
 
-			if (p < pEnd)
+			if (p < end)
 			{
-				size_t Length = pEnd - p;
-				m_Value.Copy (p, Length);					
+				size_t length = end - p;
+				m_value.copy (p, length);					
 
-				if (m_Value [0] == '"' && m_Value [Length - 1] == '"')
-					m_Value = rtl::CEscapeEncoding::Decode (m_Value.cc () + 1, Length - 2);
+				if (m_value [0] == '"' && m_value [length - 1] == '"')
+					m_value = rtl::CEscapeEncoding::decode (m_value.cc () + 1, length - 2);
 			}	
 		}
 
-		Break ();
+		stop ();
 	}
 
 	EScanResult
-	ScanLine ()
+	scanLine ()
 	{
 		if (p == eof) 
 			return EScanResult_Eof;
 
 		pe = eof;
-		m_SectionName.Clear ();
-		m_KeyName.Clear ();
-		m_Value.Clear ();
+		m_sectionName.clear ();
+		m_keyName.clear ();
+		m_value.clear ();
 
-		bool Result = Exec ();
-		if (!Result)
+		bool result = exec ();
+		if (!result)
 		{
-			err::SetStringError ("invalid syntax");
-			err::PushSrcPosError (m_FilePath, m_Line, p - m_pBegin - m_LineOffset);
+			err::setStringError ("invalid syntax");
+			err::pushSrcPosError (m_filePath, m_line, p - m_begin - m_lineOffset);
 			return EScanResult_Error;
 		}
 		
 		return 
-			!m_SectionName.IsEmpty () ? EScanResult_Section : 
-			!m_KeyName.IsEmpty () ? EScanResult_KeyValue : EScanResult_Eof;
+			!m_sectionName.isEmpty () ? EScanResult_Section : 
+			!m_keyName.isEmpty () ? EScanResult_KeyValue : EScanResult_Eof;
 	}
 
 	void
-	SetLineCol (
-		int Line,
-		int Col
+	setLineCol (
+		int line,
+		int col
 		)
 	{
-		m_Line = Line;
-		m_LineOffset = p - m_pBegin - Col;
+		m_line = line;
+		m_lineOffset = p - m_begin - col;
 	}
 
 	void
-	SetLineCol (const lex::CLineCol& LineCol)
+	setLineCol (const lex::CLineCol& lineCol)
 	{
-		SetLineCol (LineCol.m_Line, LineCol.m_Col);
+		setLineCol (lineCol.m_line, lineCol.m_col);
 	}
 
 	void 
-	Reset ()
+	reset ()
 	{
 		p = NULL;
 		pe = NULL;
@@ -201,30 +201,30 @@ protected: // should only be used as part of ini::CParser
 		act = 0;
 		cs = 0;
 
-		m_pBegin = NULL;
-		m_Line = 0;
-		m_LineOffset = 0;
+		m_begin = NULL;
+		m_line = 0;
+		m_lineOffset = 0;
 
-		m_FilePath.Clear ();
-		m_SectionName.Clear ();
-		m_KeyName.Clear ();
-		m_Value.Clear ();
+		m_filePath.clear ();
+		m_sectionName.clear ();
+		m_keyName.clear ();
+		m_value.clear ();
 	}
 
 protected:
 	// these are to be called from withing ragel scanner (*.rl)
 	
 	void 
-	NewLine (char* pLine)
+	newLine (char* line)
 	{ 
-		ASSERT (pLine [-1] == '\n');
+		ASSERT (line [-1] == '\n');
 
-		m_LineOffset = pLine - m_pBegin;
-		m_Line++;
+		m_lineOffset = line - m_begin;
+		m_line++;
 	}
 
 	void
-	Break ()
+	stop ()
 	{
 		pe = p + 1;
 	}
@@ -232,10 +232,10 @@ protected:
 	// implemented in lexer.rl
 
 	void
-	Init ();
+	init ();
 
 	bool
-	Exec ();
+	exec ();
 };
 
 //.............................................................................

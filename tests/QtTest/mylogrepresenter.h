@@ -17,17 +17,17 @@ enum EMyLog
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyLogRepresenter: public log::CRepresenter
+class myLogRepresenter: public log::CRepresenter
 {
 public:
 	virtual 
 	bool 
-	Represent (
-		log::CRepresenterTarget* pTarget, 
-		uint_t PacketCode, 
+	represent (
+		log::CRepresenterTarget* target, 
+		uint_t packetCode, 
 		const void* p, 
-		size_t Size, 
-		uint64_t FoldFlags
+		size_t size, 
+		uint64_t foldFlags
 		);
 };
 

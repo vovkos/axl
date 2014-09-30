@@ -29,139 +29,139 @@ public:
 protected:
 	struct TSendRecv: rtl::TListLink
 	{
-		CDgramSock* m_pSock;
-		SOCKADDR m_Address;
-		int m_AddressSize;
-		OVERLAPPED m_Overlapped;
-		exe::CFunction m_OnComplete;		
+		CDgramSock* m_sock;
+		SOCKADDR m_address;
+		int m_addressSize;
+		OVERLAPPED m_overlapped;
+		exe::CFunction m_onComplete;		
 	};
 
 public:
-	win::CSock m_Sock;
+	win::CSock m_sock;
 
 protected:
-	ref::CPtrT <exe::CWorkerThread> m_WorkerThread;
-	rtl::CStdListT <TSendRecv> m_SendRecvList;
+	ref::CPtrT <exe::CWorkerThread> m_workerThread;
+	rtl::CStdListT <TSendRecv> m_sendRecvList;
 
 public:
 	~CDgramSock ()
 	{
-		Close ();
+		close ();
 	}
 
 	bool
-	IsOpen ()
+	isOpen ()
 	{
-		return m_Sock.IsOpen ();
+		return m_sock.isOpen ();
 	}
 
 	void
-	Close ();
+	close ();
 
 	bool
-	GetLocalAddress (TSockAddrU* pAddr)
+	getLocalAddress (TSockAddrU* addr)
 	{
-		SOCKADDR Addr;
+		SOCKADDR addr;
 		return 
-			m_Sock.GetLocalAddress (&Addr) &&
-			pAddr->FromWinSockAddr (&Addr);
+			m_sock.getLocalAddress (&addr) &&
+			addr->fromWinSockAddr (&addr);
 	}
 
 	bool
-	Open (
-		ESockProto Protocol,
-		const TSockAddr* pAddr
+	open (
+		ESockProto protocol,
+		const TSockAddr* addr
 		)
 	{
-		return Open (Protocol, (ESockAddr) pAddr->m_Kind, pAddr);
+		return open (protocol, (ESockAddr) addr->m_kind, addr);
 	}
 
 	bool
-	Open (
-		ESockProto Protocol,
-		ESockAddr AddrKind
+	open (
+		ESockProto protocol,
+		ESockAddr addrKind
 		)
 	{
-		return Open (Protocol, AddrKind, NULL);
+		return open (protocol, addrKind, NULL);
 	}
 
 	bool 
-	SendTo (
+	sendTo (
 		const void* p,
-		size_t Size,
-		const TSockAddr* pAddr,
-		const exe::CFunction& OnComplete
+		size_t size,
+		const TSockAddr* addr,
+		const exe::CFunction& onComplete
 		);
 
 	bool 
-	RecvFrom (
+	recvFrom (
 		void* p,
-		size_t Size,
-		const exe::CFunction& OnComplete
+		size_t size,
+		const exe::CFunction& onComplete
 		);
 
 	size_t
-	SyncSendTo (
+	syncSendTo (
 		const void* p,
-		size_t Size,
-		const TSockAddr* pAddr
+		size_t size,
+		const TSockAddr* addr
 		);
 
 	size_t 
-	SyncRecvFrom (
+	syncRecvFrom (
 		void* p,
-		size_t Size,
-		TSockAddrU* pFrom
+		size_t size,
+		TSockAddrU* from
 		);
 
 protected:
 	bool
-	Open (
-		ESockProto Protocol,
-		ESockAddr AddrKind,
-		const TSockAddr* pAddr
+	open (
+		ESockProto protocol,
+		ESockAddr addrKind,
+		const TSockAddr* addr
 		);
 
 	void
 	AXL_CDECL
-	Close_wt ();
+	close_wt ();
 
 	bool 
 	AXL_CDECL
-	SendTo_wt (
+	sendTo_wt (
 		const void* p,
-		size_t Size,
-		const TSockAddr* pAddr,
-		const exe::CFunction& OnComplete
+		size_t size,
+		const TSockAddr* addr,
+		const exe::CFunction& onComplete
 		);
 
 	bool 
 	AXL_CDECL
-	RecvFrom_wt (
+	recvFrom_wt (
 		void* p,
-		size_t Size,
-		const exe::CFunction& OnComplete
+		size_t size,
+		const exe::CFunction& onComplete
 		);
 
 	static 
 	void 
 	CALLBACK 
-	OnSendRecvComplete_wt (
-		dword_t Error, 
-		dword_t ActualSize, 
-		WSAOVERLAPPED* pOverlapped, 
-		dword_t Flags
+	onSendRecvComplete_wt (
+		dword_t error, 
+		dword_t actualSize, 
+		WSAOVERLAPPED* overlapped, 
+		dword_t flags
 		)
 	{
-		TSendRecv* pSendRecv = (TSendRecv*) pOverlapped->hEvent;
-		pSendRecv->m_pSock->CompleteSendRecv_wt (pSendRecv, Error, ActualSize);
+		TSendRecv* sendRecv = (TSendRecv*) overlapped->hEvent;
+		sendRecv->m_sock->completeSendRecv_wt (sendRecv, error, actualSize);
 	}
 	
 	void
-	CompleteSendRecv_wt (
-		TSendRecv* pSendRecv,
-		const err::CError& Error,
-		size_t ActualSize
+	completeSendRecv_wt (
+		TSendRecv* sendRecv,
+		const err::CError& error,
+		size_t actualSize
 		);
 };
 

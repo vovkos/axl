@@ -23,32 +23,32 @@ namespace gui {
 class CQtCaret: public QTimer
 {
 protected:
-	CWidget* m_pWidget;
-	bool m_IsVisible;
-	TRect m_Rect;
+	CWidget* m_widget;
+	bool m_isVisible;
+	TRect m_rect;
 
 public:
 	CQtCaret ()
 	{
-		m_IsVisible = false;
-		m_pWidget = NULL;
+		m_isVisible = false;
+		m_widget = NULL;
 	}
 
 	bool
-	IsVisible ()
+	isVisible ()
 	{
-		return m_IsVisible;
+		return m_isVisible;
 	}
 
 	bool
-	Show (
-		CWidget* pWidget,
-		const TRect& Rect
+	show (
+		CWidget* widget,
+		const TRect& rect
 		);
 
 	virtual
 	void
-	Hide ();
+	hide ();
 
 protected:
 	virtual void timerEvent (QTimerEvent* e);
@@ -59,165 +59,165 @@ protected:
 class CQtEngine: public CEngine
 {
 protected:
-	ref::CPtrT <CFont> m_StdFontArray [EStdFont__Count];
-	ref::CPtrT <CCursor> m_StdCursorArray [EStdCursor__Count];
-	CQtCaret m_QtCaret;
+	ref::CPtrT <CFont> m_stdFontArray [EStdFont__Count];
+	ref::CPtrT <CCursor> m_stdCursorArray [EStdCursor__Count];
+	CQtCaret m_qtCaret;
 
-	rtl::CStringHashTableMapT <uintptr_t> m_ClipboardFormatNameMap;
-	rtl::CArrayT <rtl::CString> m_ClipboardFormatTable;
-	QMimeData* m_pQtClipboardMimeData;
+	rtl::CStringHashTableMapT <uintptr_t> m_clipboardFormatNameMap;
+	rtl::CArrayT <rtl::CString> m_clipboardFormatNameTable;
+	QMimeData* m_qtClipboardMimeData;
 
 public:
 	CQtEngine ()
 	{
-		m_EngineKind = EEngine_Qt;
-		m_pQtClipboardMimeData = NULL;
+		m_engineKind = EEngine_Qt;
+		m_qtClipboardMimeData = NULL;
 	}
 
 	~CQtEngine ()
 	{
-		if (m_pQtClipboardMimeData)
-			delete m_pQtClipboardMimeData;
+		if (m_qtClipboardMimeData)
+			delete m_qtClipboardMimeData;
 	}
 
 	// font
 
 	static
 	CQtEngine*
-	GetSingleton ()
+	getSingleton ()
 	{
-		return rtl::GetSingleton <CQtEngine> ();
+		return rtl::getSingleton <CQtEngine> ();
 	}
 
 	virtual
 	ref::CPtrT <CFont>
-	CreateFont (
-		const char* pFaceName,
-		size_t PointSize = 0,
-		uint_t Flags = 0
+	createFont (
+		const char* faceName,
+		size_t pointSize = 0,
+		uint_t flags = 0
 		)
 	{
-		return CreateFont (CreateQtFont (pFaceName, PointSize, Flags));
+		return createFont (createQtFont (faceName, pointSize, flags));
 	}
 
 	ref::CPtrT <CFont>
-	CreateFont (const QFont& QtFont);
+	createFont (const QFont& qtFont);
 
 	// cursors
 
 	ref::CPtrT <CCursor>
-	CreateCursor (const QCursor& QtCursor);
+	createCursor (const QCursor& qtCursor);
 
 	// image
 
 	virtual
 	ref::CPtrT <CImage>
-	CreateImage ();
+	createImage ();
 
 	virtual
 	ref::CPtrT <CImage>
-	CreateImage (
-		int Width,
-		int Height,
-		EPixelFormat PixelFormat,
-		const void* pData,
-		bool IsScreenCompatible = true
+	createImage (
+		int width,
+		int height,
+		EPixelFormat pixelFormat,
+		const void* data,
+		bool isScreenCompatible = true
 		);
 
 	virtual
 	ref::CPtrT <CCanvas>
-	CreateOffscreenCanvas (
-		int Width,
-		int Height
+	createOffscreenCanvas (
+		int width,
+		int height
 		);
 
 	// clipboard
 
 	virtual
 	uintptr_t 
-	RegisterClipboardFormat (const rtl::CString& FormatName);
+	registerClipboardFormat (const rtl::CString& formatName);
 
 	virtual
 	bool
-	ReadClipboard (rtl::CString* pString);
+	readClipboard (rtl::CString* string);
 
 	virtual
 	bool
-	ReadClipboard (
-		uintptr_t Format,
-		rtl::CArrayT <char>* pData
+	readClipboard (
+		uintptr_t format,
+		rtl::CArrayT <char>* data
 		);
 
 	virtual
 	bool
-	WriteClipboard (
-		const char* pString,
-		size_t Length = -1
+	writeClipboard (
+		const char* string,
+		size_t length = -1
 		);
 
 	virtual
 	bool
-	WriteClipboard (
-		uintptr_t Format,
-		const void* pData,
-		size_t Size
+	writeClipboard (
+		uintptr_t format,
+		const void* data,
+		size_t size
 		);
 
 	virtual
 	bool
-	CommitClipboard ();
+	commitClipboard ();
 
 	// caret
 
 	virtual
 	bool
-	ShowCaret (
-		CWidget* pWidget,
-		const TRect& Rect
+	showCaret (
+		CWidget* widget,
+		const TRect& rect
 		)
 	{
-		return m_QtCaret.Show (pWidget, Rect);
+		return m_qtCaret.show (widget, rect);
 	}
 
 	virtual
 	void
-	HideCaret ()
+	hideCaret ()
 	{
-		m_QtCaret.Hide ();
+		m_qtCaret.hide ();
 	}
 
 	bool
-	IsCaretVisible ()
+	isCaretVisible ()
 	{
-		return m_QtCaret.IsVisible ();
+		return m_qtCaret.isVisible ();
 	}
 
 private slots:
 	void
-	CaretTimer_Timeout ();
+	caretTimer_Timeout ();
 
 protected:
 	QFont
-	CreateQtFont (
-		const char* pFaceName,
-		size_t PointSize,
-		uint_t Flags
+	createQtFont (
+		const char* faceName,
+		size_t pointSize,
+		uint_t flags
 		);
 
 	virtual
 	CFont*
-	GetFontMod (
-		CFont* pBaseFont,
-		uint_t Flags
+	getFontMod (
+		CFont* baseFont,
+		uint_t flags
 		);
 
 	virtual
 	ref::CPtrT <CFont>
-	CreateStdFont (EStdFont FontKind);
+	createStdFont (EStdFont fontKind);
 
 	virtual
 	ref::CPtrT <CCursor>
-	CreateStdCursor (EStdCursor CursorKind);
+	createStdCursor (EStdCursor cursorKind);
 };
 
 //.............................................................................

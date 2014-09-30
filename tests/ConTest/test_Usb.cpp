@@ -7,55 +7,55 @@ namespace test_Usb {
 //.............................................................................
 
 void 
-Run ()
+run ()
 {
-	bool Result;
+	bool result;
 
-	io::CUsbContext Context;
+	io::CUsbContext context;
 
-	io::CUsbDeviceList DeviceList;
-	size_t Count = DeviceList.EnumerateDevices (Context);
-	if (Count == -1)
+	io::CUsbDeviceList deviceList;
+	size_t count = deviceList.enumerateDevices (context);
+	if (count == -1)
 	{
-		printf ("Cannot enumerate USB devices (%s)\n", err::GetError ()->GetDescription ().cc ());
+		printf ("Cannot enumerate USB devices (%s)\n", err::getError ()->getDescription ().cc ());
 		return;
 	}
 
-	rtl::CString BufferString;
-	BufferString.GetBuffer (4096);
+	rtl::CString bufferString;
+	bufferString.getBuffer (4096);
 
-	libusb_device** pp = DeviceList;
+	libusb_device** pp = deviceList;
 	for (; *pp; pp++)
 	{
-		io::CUsbDevice Device;
-		Device.SetDevice (*pp);
+		io::CUsbDevice device;
+		device.setDevice (*pp);
 
-		libusb_device_descriptor Descriptor;
-		Device.GetDeviceDescriptor (&Descriptor);
+		libusb_device_descriptor descriptor;
+		device.getDeviceDescriptor (&descriptor);
 
 		printf (
 			"VID_%04x&PID_%04x (Bus: %d Address: %d)\n", 
-			Descriptor.idVendor,
-			Descriptor.idProduct,
-			Device.GetBusNumber (), 
-			Device.GetDeviceAddress ()
+			descriptor.idVendor,
+			descriptor.idProduct,
+			device.getBusNumber (), 
+			device.getDeviceAddress ()
 			);
 
-		Result = Device.Open ();
-		if (!Result)
+		result = device.open ();
+		if (!result)
 			continue;
 
-		Result = Device.GetStringDesrciptor (Descriptor.iManufacturer, &BufferString);
-		if (Result)
-			printf ("\tManufacturer:  %s\n", BufferString.cc ());
+		result = device.getStringDesrciptor (descriptor.iManufacturer, &bufferString);
+		if (result)
+			printf ("\tManufacturer:  %s\n", bufferString.cc ());
 
-		Result = Device.GetStringDesrciptor (Descriptor.iProduct, &BufferString);
-		if (Result)
-			printf ("\tProduct name:  %s\n", BufferString.cc ());
+		result = device.getStringDesrciptor (descriptor.iProduct, &bufferString);
+		if (result)
+			printf ("\tProduct name:  %s\n", bufferString.cc ());
 
-		Result = Device.GetStringDesrciptor (Descriptor.iSerialNumber, &BufferString);
-		if (Result)
-			printf ("\tSerial number: %s\n", BufferString.cc ());
+		result = device.getStringDesrciptor (descriptor.iSerialNumber, &bufferString);
+		if (result)
+			printf ("\tSerial number: %s\n", bufferString.cc ());
 	}
 
 }

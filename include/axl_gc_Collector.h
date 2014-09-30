@@ -67,41 +67,41 @@ protected:
 	};
 
 protected:
-	IMutator* m_pMutator;
+	IMutator* m_mutator;
 	
-	mt::CLock m_Lock;
-	mt::CEvent m_IdleEvent;
-	mt::CEvent m_WakeUpEvent;
+	mt::CLock m_lock;
+	mt::CEvent m_idleEvent;
+	mt::CEvent m_wakeUpEvent;
 
-	volatile EState m_State;
-	volatile bool m_TerminateThread;
+	volatile EState m_state;
+	volatile bool m_terminateThread;
 
-	rtl::CStdListT <axl_gc_TValueEntry> m_ValueFreeList;
-	rtl::CStdListT <axl_gc_TValueEntry> m_DestructList;
-	rtl::CStdListT <axl_gc_TValueEntry> m_GreenList; 
-	rtl::CStdListT <axl_gc_TValueEntry> m_MutatorGrayList; 
+	rtl::CStdListT <axl_gc_TValueEntry> m_valueFreeList;
+	rtl::CStdListT <axl_gc_TValueEntry> m_destructList;
+	rtl::CStdListT <axl_gc_TValueEntry> m_greenList; 
+	rtl::CStdListT <axl_gc_TValueEntry> m_mutatorGrayList; 
 
-	rtl::CArrayT <axl_gc_TValue> m_TraceSetArray [2]; // array of axl_gc_TValue
-	size_t m_CurrentTraceSet;
+	rtl::CArrayT <axl_gc_TValue> m_traceSetArray [2]; // array of axl_gc_TValue
+	size_t m_currentTraceSet;
 
-	rtl::CBuddyAllocMap m_MapArray [2];
-	size_t m_AllocateMap; 
+	rtl::CBuddyAllocMap m_mapArray [2];
+	size_t m_allocateMap; 
 
-	rtl::CBitMap m_MutatorGrayMap;
-	rtl::CBitMap m_CollectorGrayMap;
+	rtl::CBitMap m_mutatorGrayMap;
+	rtl::CBitMap m_collectorGrayMap;
 		 
-	ulong_t m_GreenSlotTls;
+	ulong_t m_greenSlotTls;
 
 	// black map is m_MapArray [!m_AllocateMap] and is only touched within collector thread
 
-	void* m_pPool;
-	size_t m_PoolSize; // == ClusterMap::m_TotalSize * AXL_GC_CLUSTER_SIZE, but it's nice to have it plain text
-	size_t m_Trigger;  // if allocation map's FreeSizeTop drops below trigger, collection cycle is started 
+	void* m_pool;
+	size_t m_poolSize; // == ClusterMap::m_TotalSize * AXL_GC_CLUSTER_SIZE, but it's nice to have it plain text
+	size_t m_trigger;  // if allocation map's FreeSizeTop drops below trigger, collection cycle is started 
 
 #ifdef _DEBUG
-	size_t m_CycleCount;
-	size_t m_GreenHitCount;
-	size_t m_SecondChanceCount;
+	size_t m_cycleCount;
+	size_t m_greenHitCount;
+	size_t m_secondChanceCount;
 #endif
 
 public:
@@ -109,94 +109,94 @@ public:
 
 	~CCollector ()
 	{
-		Close ();
+		close ();
 	}
 
 	bool 
-	Create (
-		IMutator* pMutator, 
-		size_t Width, 
-		size_t Height, 
-		uint_t TriggerPercent = 25
+	create (
+		IMutator* mutator, 
+		size_t width, 
+		size_t height, 
+		uint_t triggerPercent = 25
 		// when free size drops below the trigger, collection cycle is started 
 		// zero enforces 'stop-the-world' semantics -- collection is initated on failed allocation and is waited upon
 		);
 
 	void 
-	Close();
+	close();
 
 	void 
-	Collect ();
+	collect ();
 
 	void* 
-	Allocate (const axl_gc_TType* pType);
+	allocate (const axl_gc_TType* type);
 
 	void 
-	OnPointerAssign (axl_gc_TValue* pTarget);
+	onPointerAssign (axl_gc_TValue* target);
 
 	void 
-	DiscardLastAllocate (axl_gc_TValue* pValue); // pValue is just for debug assert
+	discardLastAllocate (axl_gc_TValue* value); // pValue is just for debug assert
 
 	// it is recommended to use PushBulk() during IMutator::GetRootSet() and Push() during IMutator::Trace()
 	// however they could be used interchangebly
 
 	bool 
-	Push (const axl_gc_TValue* pValue);
+	push (const axl_gc_TValue* value);
 
 	bool 
-	PushBulk (
-		const axl_gc_TValue* pValue, 
-		size_t Count
+	pushBulk (
+		const axl_gc_TValue* value, 
+		size_t count
 		);
 
 protected:
 	bool
-	IsInPool (const axl_gc_TValue* pValue);
+	isInPool (const axl_gc_TValue* value);
 
 	size_t
-	GetClusterAddress (const axl_gc_TValue* pValue);
+	getClusterAddress (const axl_gc_TValue* value);
 
 	static
 	size_t
-	GetClusterCount (const axl_gc_TValue* pValue);
+	getClusterCount (const axl_gc_TValue* value);
 
 	void
-	CCollector::StartCycle_l ();
+	CCollector::startCycle_l ();
 
 	void*
-	TryAllocate_l (const axl_gc_TType* pType);
+	tryAllocate_l (const axl_gc_TType* type);
 
 	rtl::CArrayT <axl_gc_TValue>*
-	GetCurrentTraceSet ()
+	getCurrentTraceSet ()
 	{
-		return &m_TraceSetArray [m_CurrentTraceSet];
+		return &m_traceSetArray [m_currentTraceSet];
 	}
 
 	rtl::CArrayT <axl_gc_TValue>*
-	FlipTraceSet ();
+	flipTraceSet ();
 
 	rtl::CArrayT <axl_gc_TValue>*
-	Mark (rtl::CBuddyAllocMap* pBlackMap);
+	mark (rtl::CBuddyAllocMap* blackMap);
 
 	rtl::CArrayT <axl_gc_TValue>*
-	Trace ();
+	trace ();
 
 	void
-	Cycle ();
+	cycle ();
 
 	void
-	GetUnmarkedDestructors_l (
-		rtl::CBuddyAllocMap* pBlackMap,
-		rtl::CStdListT <axl_gc_TValueEntry>* pList
+	getUnmarkedDestructors_l (
+		rtl::CBuddyAllocMap* blackMap,
+		rtl::CStdListT <axl_gc_TValueEntry>* list
 		);
 
 	axl_gc_TValueEntry* 
-	AllocateValueEntry ();
+	allocateValueEntry ();
 
 	friend class mt::CThreadImplT <CCollector>;
 
 	ulong_t
-	ThreadProc ();
+	threadProc ();
 };
 
 //.............................................................................

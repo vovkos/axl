@@ -19,18 +19,18 @@ class CMapping
 {
 protected:
 	void* m_p;
-	size_t m_Size;
+	size_t m_size;
 
 public:
 	CMapping ()
 	{
 		m_p = NULL;
-		m_Size = 0;
+		m_size = 0;
 	}
 
 	~CMapping ()
 	{
-		Close ();
+		close ();
 	}
 
 	operator void* () const
@@ -39,29 +39,29 @@ public:
 	}
 
 	bool
-	IsOpen () const
+	isOpen () const
 	{
 		return m_p != NULL;
 	}
 
 	void
-	Close ()
+	close ()
 	{
-		Unmap ();
+		unmap ();
 	}
 
 	void*
-	Map (
-		void* pAddrHint,
-		size_t Size,
-		int Protection,
-		uint_t Flags,
+	map (
+		void* addrHint,
+		size_t size,
+		int protection,
+		uint_t flags,
 		int fd,
-		size_t Offset = 0
+		size_t offset = 0
 		);
 
 	void
-	Unmap (size_t Size = -1);
+	unmap (size_t size = -1);
 };
 
 //.............................................................................
@@ -70,18 +70,18 @@ class CSharedMemory: public CFd
 {
 public:
 	bool
-	Open (
-		const char* pName,
-		uint_t Flags = O_RDWR,
-		mode_t Mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
+	open (
+		const char* name,
+		uint_t flags = O_RDWR,
+		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
 
 	static
 	bool
-	Unlink (const char* pName)
+	unlink (const char* name)
 	{
-		int Result = shm_unlink (pName);
-		return err::Complete (Result != -1);
+		int result = shm_unlink (name);
+		return err::complete (result != -1);
 	}
 };
 

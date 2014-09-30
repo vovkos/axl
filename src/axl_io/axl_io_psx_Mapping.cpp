@@ -9,52 +9,52 @@ namespace psx {
 //.............................................................................
 
 void*
-CMapping::Map (
-	void* pAddrHint,
-	size_t Size,
-	int Protection,
-	uint_t Flags,
+CMapping::map (
+	void* addrHint,
+	size_t size,
+	int protection,
+	uint_t flags,
 	int fd,
-	size_t Offset
+	size_t offset
 	)
 {
-	Close ();
+	close ();
 
-	m_p = mmap (pAddrHint, Size, Protection, Flags, fd, Offset);
+	m_p = mmap (addrHint, size, protection, flags, fd, offset);
 	if (m_p == (void*) -1)
 	{
-		err::SetLastSystemError ();
+		err::setLastSystemError ();
 		return NULL;
 	}
 
-	m_Size = Size;
+	m_size = size;
 	return m_p;
 }
 
 void
-CMapping::Unmap (size_t Size)
+CMapping::unmap (size_t size)
 {
-	if (!IsOpen ())
+	if (!isOpen ())
 		return;
 
-	munmap (m_p, Size);
+	munmap (m_p, size);
 	m_p = NULL;
-	m_Size = 0;
+	m_size = 0;
 }
 
 //.............................................................................
 
 bool
-CSharedMemory::Open (
-	const char* pName,
-	uint_t Flags,
-	mode_t Mode
+CSharedMemory::open (
+	const char* name,
+	uint_t flags,
+	mode_t mode
 	)
 {
-	Close ();
+	close ();
 
-	m_h = shm_open (pName, Flags, Mode);
-	return err::Complete (m_h != -1);
+	m_h = shm_open (name, flags, mode);
+	return err::complete (m_h != -1);
 }
 
 //.............................................................................
