@@ -169,19 +169,19 @@ typedef RtFactory <mem::StdAlloc> RtFactory;
 
 #ifdef _DEBUG
 
-#define AXL_REF_RT_NEW(type) \
-	ref::RtFactory::operatorNew (type, __FILE__, __LINE__)
+#define AXL_REF_RT_NEW(Type) \
+	ref::RtFactory::operatorNew (Type, __FILE__, __LINE__)
 
-#define AXL_REF_RT_NEW_EXTRA(type, extra) \
-	ref::RtFactory::operatorNew (type, __FILE__, __LINE__, extra)
+#define AXL_REF_RT_NEW_EXTRA(Type, extra) \
+	ref::RtFactory::operatorNew (Type, __FILE__, __LINE__, extra)
 
 #else
 
-#define AXL_REF_RT_NEW(type) \
-	ref::RtFactory::operatorNew (type)
+#define AXL_REF_RT_NEW(Type) \
+	ref::RtFactory::operatorNew (Type)
 
-#define AXL_REF_RT_NEW_EXTRA(type, extra) \
-	ref::RtFactory::operatorNew (type, extra)
+#define AXL_REF_RT_NEW_EXTRA(Type, extra) \
+	ref::RtFactory::operatorNew (Type, extra)
 
 #endif
 

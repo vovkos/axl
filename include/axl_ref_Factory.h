@@ -110,24 +110,24 @@ public:
 
 #ifdef _DEBUG
 
-#define AXL_REF_NEW(class) \
-	axl::ref::Factory <class>::operatorNew (__FILE__, __LINE__)
+#define AXL_REF_NEW(Class) \
+	axl::ref::Factory <Class>::operatorNew (__FILE__, __LINE__)
 
-#define AXL_REF_NEW_EXTRA(class, extra) \
-	axl::ref::Factory <class>::operatorNew (__FILE__, __LINE__, extra)
+#define AXL_REF_NEW_EXTRA(Class, extra) \
+	axl::ref::Factory <Class>::operatorNew (__FILE__, __LINE__, extra)
 
 #else
 
-#define AXL_REF_NEW(class) \
-	axl::ref::Factory <class>::operatorNew ()
+#define AXL_REF_NEW(Class) \
+	axl::ref::Factory <Class>::operatorNew ()
 
-#define AXL_REF_NEW_EXTRA(class, extra) \
-	axl::ref::Factory <class>::operatorNew (extra)
+#define AXL_REF_NEW_EXTRA(Class, extra) \
+	axl::ref::Factory <Class>::operatorNew (extra)
 
 #endif
 
-#define AXL_REF_NEW_INPLACE(class, p, pfFree) \
-	axl::ref::InPlaceFactory <class>::operatorNew (p, pfFree)
+#define AXL_REF_NEW_INPLACE(Class, p, pfFree) \
+	axl::ref::InPlaceFactory <Class>::operatorNew (p, pfFree)
 
 //.............................................................................
 

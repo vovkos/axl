@@ -46,12 +46,12 @@ enum CmdLineSwitchFlagKind
 
 template <
 	typename T,
-	typename Switchable
+	typename SwitchTable
 	>
 class CmdLineParser: protected CmdLineParserRoot
 {
 public:
-	typedef typename Switchable::SwitchKind SwitchKind;
+	typedef typename SwitchTable::SwitchKind SwitchKind;
 
 protected:
 	enum FlagKind
@@ -60,14 +60,14 @@ protected:
 	};
 
 protected:
-	SwitchKind m_valueSwitch;
+	SwitchKind m_valueSwitchKind;
 	rtl::String m_valueSwitchName;
 	uint_t m_flags;
 
 public:
 	CmdLineParser ()
 	{
-		m_valueSwitch = (SwitchKind) 0;
+		m_valueSwitchKind = (SwitchKind) 0;
 		m_flags = 0;
 	}
 
@@ -89,7 +89,7 @@ public:
 		rtl::String switchName;
 		rtl::String value;
 
-		m_valueSwitch = (SwitchKind) 0;
+		m_valueSwitchKind = (SwitchKind) 0;
 
 		for (int i = 0; p < end; i++)
 		{
@@ -207,7 +207,7 @@ protected:
 	bool
 	checkMissingValue ()
 	{
-		if (!m_valueSwitch)
+		if (!m_valueSwitchKind)
 			return true;
 
 		err::setFormatStringError ("missing value for switch '%s'", m_valueSwitchName.cc ());
@@ -227,14 +227,14 @@ protected:
 
 		if (switchName.isEmpty ())
 		{
-			if (!m_valueSwitch)
+			if (!m_valueSwitchKind)
 				return i == 0 ? self->onValue0 (value) : self->onValue (value);
 
-			result = self->onSwitch (m_valueSwitch, value);
+			result = self->onSwitch (m_valueSwitchKind, value);
 			if (!result)
 				return false;
 
-			m_valueSwitch = (SwitchKind) 0;
+			m_valueSwitchKind = (SwitchKind) 0;
 			return true;
 		}
 
@@ -242,21 +242,21 @@ protected:
 		if (!result)
 			return false;
 
-		SwitchKind switch = Switchable::findSwitch (switchName);
-		if (!switch)
+		SwitchKind switchKind = SwitchTable::findSwitch (switchName);
+		if (!switchKind)
 		{
 			err::setFormatStringError ("unknown switch '%s'", switchName.cc ());
 			return false;
 		}
 
-		if ((switch & CmdLineSwitchFlagKind_HasValue) && value.isEmpty ())
+		if ((switchKind & CmdLineSwitchFlagKind_HasValue) && value.isEmpty ())
 		{
-			m_valueSwitch = switch;
+			m_valueSwitchKind = switchKind;
 			m_valueSwitchName = switchName;
 			return true;
 		}
 
-		return self->onSwitch (switch, value);
+		return self->onSwitch (switchKind, value);
 	}
 };
 
@@ -264,7 +264,7 @@ protected:
 
 struct SwitchInfo: rtl::ListLink
 {
-	int m_switch;
+	int m_switchKind;
 	const char* m_nameTable [4]; // up to 4 alternative names
 	const char* m_value;
 	const char* m_description;
@@ -277,11 +277,11 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList);
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE(class, switch) \
-class class \
+#define AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE(Class, SwitchKindEnum) \
+class Class \
 { \
 public: \
-	typedef switch SwitchKind; \
+	typedef SwitchKindEnum SwitchKind; \
 	typedef axl::rtl::HashTableMap <char, SwitchKind, axl::rtl::HashId <char> > CharMap; \
 	typedef axl::rtl::StringHashTableMap <SwitchKind> StringMap; \
 protected: \
@@ -303,10 +303,10 @@ protected: \
 	} \
 public: \
 	static \
-	class* \
+	Class* \
 	getSingleton () \
 	{ \
-		return axl::rtl::getSingleton <class> (); \
+		return axl::rtl::getSingleton <Class> (); \
 	} \
 	static \
 	const axl::rtl::ConstList <axl::rtl::SwitchInfo> \
@@ -328,13 +328,13 @@ public: \
 	{ \
 		return axl::rtl::getCmdLineHelpString (getSingleton ()->m_switchInfoList); \
 	} \
-	class () \
+	Class () \
 	{
 
-#define AXL_RTL_CMD_LINE_ADD_SWITCH_INFO(switch, name0, name1, name2, name3, value, description) \
+#define AXL_RTL_CMD_LINE_ADD_SWITCH_INFO(switchKind, name0, name1, name2, name3, value, description) \
 		{ \
 			static axl::rtl::SwitchInfo switchInfo; \
-			switchInfo.m_switch = switch; \
+			switchInfo.m_switchKind = switchKind; \
 			switchInfo.m_nameTable [0] = name0; \
 			switchInfo.m_nameTable [1] = name1; \
 			switchInfo.m_nameTable [2] = name2; \
@@ -344,37 +344,37 @@ public: \
 			m_switchInfoList.insertTail (&switchInfo); \
 		}
 
-#define AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name) \
+#define AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name) \
 		ASSERT (name); \
 		if (name [1]) \
-			m_nameMap.visit (name)->m_value = switch; \
+			m_nameMap.visit (name)->m_value = switchKind; \
 		else \
-			m_codeMap.visit (name [0])->m_value = switch; \
+			m_codeMap.visit (name [0])->m_value = switchKind; \
 
 #define AXL_RTL_CMD_LINE_SWITCH_GROUP(description) \
 		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (0, NULL, NULL, NULL, NULL, NULL, description)
 
-#define AXL_RTL_CMD_LINE_SWITCH_1(switch, name, value, description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name, NULL, NULL, NULL, value, description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name)
+#define AXL_RTL_CMD_LINE_SWITCH_1(switchKind, name, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name, NULL, NULL, NULL, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name)
 
-#define AXL_RTL_CMD_LINE_SWITCH_2(switch, name0, name1, value, description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name0, name1, NULL, NULL, value, description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name0) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name1) \
+#define AXL_RTL_CMD_LINE_SWITCH_2(switchKind, name0, name1, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name0, name1, NULL, NULL, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name0) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name1) \
 
-#define AXL_RTL_CMD_LINE_SWITCH_3(switch, name0, name1, name2, value, description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name0, name1, name2, NULL, value, description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name0) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name1) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name2) \
+#define AXL_RTL_CMD_LINE_SWITCH_3(switchKind, name0, name1, name2, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name0, name1, name2, NULL, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name0) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name1) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name2) \
 
-#define AXL_RTL_CMD_LINE_SWITCH_4(switch, name0, name1, name2, name3, value, description) \
-		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switch, name0, name1, name2, name3, value, description) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name0) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name1) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name2) \
-		AXL_RTL_CMD_LINE_MAP_SWITCH(switch, name3)
+#define AXL_RTL_CMD_LINE_SWITCH_4(switchKind, name0, name1, name2, name3, value, description) \
+		AXL_RTL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name0, name1, name2, name3, value, description) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name0) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name1) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name2) \
+		AXL_RTL_CMD_LINE_MAP_SWITCH(switchKind, name3)
 
 #define AXL_RTL_CMD_LINE_SWITCH AXL_RTL_CMD_LINE_SWITCH_1
 

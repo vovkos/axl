@@ -141,7 +141,6 @@ public:
 	}
 
 	// .ca () is mostly for passing through vararg
-	// thanks a lot gcc
 	
 	const T** 
 	ca () const

@@ -29,7 +29,7 @@ ErrorData::getDescription () const
 
 	return provider ?
 		provider->getErrorDescription (this) :
-		rtl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code); // thanks a lot gcc
+		rtl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code);
 }
 
 //.............................................................................

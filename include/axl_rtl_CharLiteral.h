@@ -54,9 +54,9 @@ inline
 const char*
 getCharCodeLiteral (uchar_t c)
 {
-	static char _LiteralTable [256] [4];
-	mt::callOnce (InitCharCodeable (), _LiteralTable);
-	return _LiteralTable [c];
+	static char literalTable [256] [4];
+	mt::callOnce (InitCharCodeable (), literalTable);
+	return literalTable [c];
 }
 
 //.............................................................................

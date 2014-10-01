@@ -210,7 +210,7 @@ public:
 	Iterator&
 	operator = (T* p)
 	{
-		this->m_p = p ? Link () (p) : NULL; // thanks a lot gcc
+		this->m_p = p ? Link () (p) : NULL;
 		return *this;
 	}
 

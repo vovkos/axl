@@ -45,7 +45,7 @@ public:
 
 	BoxIterator (BoxListEntry <T>* p)
 	{
-		this->m_p = p; // thanks a lot gcc
+		this->m_p = p;
 	}
 
 	T&

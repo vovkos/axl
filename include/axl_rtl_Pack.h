@@ -37,7 +37,7 @@ public:
 
 //.............................................................................
 
-// thanks a lot gcc
+
 
 template <typename T>
 class PackIntTrunc

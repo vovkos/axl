@@ -92,7 +92,7 @@ QtWidgetImpl::onEvent (
 		return;
 	}
 
-	WidgetMsg msg (msgKind); // thanks a lot gcc
+	WidgetMsg msg (msgKind);
 
 	bool isHandled = true;
 	processWidgetMsg (&msg, &isHandled);			
@@ -294,7 +294,7 @@ QtWidgetImpl::onScroll (
 //.............................................................................
 
 void 
-qtWidgetBase::mouseMoveEvent (QMouseEvent* e)
+QtWidgetBase::mouseMoveEvent (QMouseEvent* e)
 {
 	if (!m_mouseMoveEventFlag)
 	{	

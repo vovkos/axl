@@ -8,14 +8,14 @@ namespace lua {
 //.............................................................................
 
 void
-Stringemplate::reset ()
+StringTemplate::reset ()
 {
 	m_luaState.create ();
 	m_lineCol.clear ();
 }
 
 bool
-Stringemplate::process (
+StringTemplate::process (
 	rtl::String* output,
 	const rtl::String& filePath,
 	const char* source,
@@ -44,7 +44,7 @@ Stringemplate::process (
 		return false;
 			
 	EmitContext emitContext;
-	emitContext.m_this = this;
+	emitContext.m_self = this;
 	emitContext.m_output = output;
 	emitContext.m_source = source;
 
@@ -64,7 +64,7 @@ Stringemplate::process (
 bool 
 extractUserCode (
 	Lexer* lexer,
-	lex::RagelokenPos* endPos_o
+	lex::RagelTokenPos* endPos_o
 	)
 {
 	const Token* token = lexer->getToken ();
@@ -133,7 +133,7 @@ extractUserCode (
 }
 
 bool
-Stringemplate::extractLuaSource (
+StringTemplate::extractLuaSource (
 	rtl::String* luaSource,
 	const rtl::String& filePath,
 	const char* source,
@@ -176,7 +176,7 @@ Stringemplate::extractLuaSource (
 		switch (token->m_token)
 		{
 		case TokenKind_Data:
-			luaSource->appendFormat ("Emit (%s);", token->m_data.m_string.cc ()); // thanks a lot gcc
+			luaSource->appendFormat ("Emit (%s);", token->m_data.m_string.cc ());
 			pos = token->m_pos;
 			lexer.nextToken ();
 			break;
@@ -210,7 +210,7 @@ Stringemplate::extractLuaSource (
 }
 
 void
-Stringemplate::countLineCol (
+StringTemplate::countLineCol (
 	const char* p,
 	size_t length
 	)
@@ -237,11 +237,11 @@ Stringemplate::countLineCol (
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 int 
-Stringemplate::getLine_lua (lua_State* h)
+StringTemplate::getLine_lua (lua_State* h)
 {
 	LuaState luaState = h;
 
-	Stringemplate* self = (Stringemplate*) luaState.getContext ();
+	StringTemplate* self = (StringTemplate*) luaState.getContext ();
 
 	luaState.pushInteger (self->m_lineCol.m_line);
 
@@ -250,11 +250,11 @@ Stringemplate::getLine_lua (lua_State* h)
 }
 
 int 
-Stringemplate::getCol_lua (lua_State* h)
+StringTemplate::getCol_lua (lua_State* h)
 {
 	LuaState luaState = h;
 
-	Stringemplate* self = (Stringemplate*) luaState.getContext ();
+	StringTemplate* self = (StringTemplate*) luaState.getContext ();
 
 	luaState.pushInteger (self->m_lineCol.m_col);
 
@@ -263,7 +263,7 @@ Stringemplate::getCol_lua (lua_State* h)
 }
 
 int 
-Stringemplate::emit_lua (lua_State* h)
+StringTemplate::emit_lua (lua_State* h)
 {
 	LuaState luaState = h;
 
@@ -274,7 +274,7 @@ Stringemplate::emit_lua (lua_State* h)
 	{
 		const char* p = luaState.getString (i);
 		context->m_output->append (p);
-		context->m_this->countLineCol (p);
+		context->m_self->countLineCol (p);
 	}
 
 	luaState.detach ();
@@ -282,7 +282,7 @@ Stringemplate::emit_lua (lua_State* h)
 }
 
 int 
-Stringemplate::passthrough_lua (lua_State* h)
+StringTemplate::passthrough_lua (lua_State* h)
 {
 	LuaState luaState = h;
 
@@ -294,7 +294,7 @@ Stringemplate::passthrough_lua (lua_State* h)
 	const char* p = context->m_source + offset;
 
 	context->m_output->append (p, length);
-	context->m_this->countLineCol (p, length);
+	context->m_self->countLineCol (p, length);
 
 	luaState.detach ();
 	return 0;

@@ -88,7 +88,7 @@ public:
 
 	HashTableIterator (const Iterator <HashTableEntry <Key> >& src)
 	{ 
-		this->m_p = src.getLink (); // thanks a lot gcc
+		this->m_p = src.getLink ();
 	}
 
 	HashTableIterator (Entry* p)

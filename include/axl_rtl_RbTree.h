@@ -126,7 +126,7 @@ public:
 	void 
 	assertValid ()
 	{ 
-		Node::assertValid (this->m_root); // thanks a lot gcc
+		Node::assertValid (this->m_root);
 	}
 #endif
 

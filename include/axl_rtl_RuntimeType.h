@@ -195,7 +195,7 @@ class ITypeClassImplT: public ITypeSimpleImplT <T>
 public:
 	ITypeClassImplT ()
 	{
-		this->m_guid = T::__GetGuid (); // thanks a lot gcc
+		this->m_guid = T::__GetGuid ();
 	}
 
 	virtual

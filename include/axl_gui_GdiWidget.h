@@ -278,7 +278,7 @@ public:
 		const ref::Ptr <void>& params
 		)
 	{
-		WidgethreadMsg* msg = AXL_MEM_NEW (WidgethreadMsg);
+		WidgetThreadMsg* msg = AXL_MEM_NEW (WidgetThreadMsg);
 		msg->m_msgKind = WidgetMsgKind_ThreadMsg;
 		msg->m_code = code;
 		msg->m_params = params;

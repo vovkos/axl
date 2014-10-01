@@ -15,7 +15,7 @@ namespace rtl {
 //.............................................................................
 
 template <typename C>
-class StringHashTable: public HashTable <
+class StringHashTableBase: public HashTable <
 	const C*,
 	rtl::HashStringBase <C>, 
 	rtl::CmpStringBase <C>
@@ -25,19 +25,25 @@ class StringHashTable: public HashTable <
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef StringHashTable <char>    StringHashable;
-typedef StringHashTable <wchar_t> StringHashable_w;
+typedef StringHashTableBase <char>      StringHashTable;
+typedef StringHashTableBase <wchar_t>   StringHashTable_w;
+typedef StringHashTableBase <utf8_t>    StringHashTable_utf8;
+typedef StringHashTableBase <utf16_t>   StringHashTable_utf16;
+typedef StringHashTableBase <utf32_t>   StringHashTable_utf32;
 
-typedef StringHashable::Iterator   StringHashableIterator;
-typedef StringHashable_w::Iterator StringHashableIterator_w;
+typedef StringHashTable::Iterator       StringHashTableIterator;
+typedef StringHashTable_w::Iterator     StringHashTableIterator_w;
+typedef StringHashTable_utf8::Iterator  StringHashTableIterator_utf8;
+typedef StringHashTable_utf16::Iterator StringHashTableIterator_utf16;
+typedef StringHashTable_utf32::Iterator StringHashTableIterator_utf32;
 
 //.............................................................................
 
 template <
 	typename Value,
-	typename C = char
+	typename C
 	>
-class StringHashTableMap: public HashTableMap <
+class StringHashTableMapBase: public HashTableMap <
 	const C*,
 	Value,
 	rtl::HashStringBase <C>, 
@@ -49,7 +55,27 @@ class StringHashTableMap: public HashTableMap <
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Value>
-class StringHashTableMap_w: public StringHashTableMap <Value, wchar_t>
+class StringHashTableMap: public StringHashTableMapBase <Value, char>
+{
+};
+
+template <typename Value>
+class StringHashTableMap_w: public StringHashTableMapBase <Value, wchar_t>
+{
+};
+
+template <typename Value>
+class StringHashTableMap_utf8: public StringHashTableMapBase <Value, utf8_t>
+{
+};
+
+template <typename Value>
+class StringHashTableMap_utf16: public StringHashTableMapBase <Value, utf16_t>
+{
+};
+
+template <typename Value>
+class StringHashTableMap_utf32: public StringHashTableMapBase <Value, utf32_t>
 {
 };
 
@@ -68,7 +94,7 @@ public:
 
 	StringHashTableMapIterator (const Iterator <typename StringHashTableMapIterator::Entry>& src)
 	{ 
-		this->m_p = src.getLink (); // thanks a lot gcc
+		this->m_p = src.getLink ();
 	}
 
 	StringHashTableMapIterator (typename StringHashTableMapIterator::Entry* p)

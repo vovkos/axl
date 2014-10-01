@@ -191,7 +191,7 @@ typedef wchar_t          utf32_t;
 // this struct wrap serves two purposes:
 // first, makes sure va_list isn't get modified if passed as argument
 // second, makes it possible to simply assign one to another
-// thanks a lot gcc
+
 
 struct axl_va_list
 {
@@ -264,21 +264,21 @@ pvoid_cast (T x)
 #define AXL_MIN(a, b)  (((a) < (b)) ? (a) : (b))
 #define AXL_MAX(a, b)  (((a) > (b)) ? (a) : (b))
 
-#define AXL_OFFSETOF(type, field) \
-	((size_t) &((type*) 1)->Field - 1)
+#define AXL_OFFSETOF(Type, m_field) \
+	((size_t) &((Type*) 1)->m_field - 1)
 
-#define AXL_CONTAINING_RECORD(address, type, field) \
-	((type*) ((char*) (address) - AXL_OFFSETOF (type, field)))
+#define AXL_CONTAINING_RECORD(address, Type, m_field) \
+	((Type*) ((char*) (address) - AXL_OFFSETOF (Type, m_field)))
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // ensure class is never accidentally copied
 
-#define AXL_DISABLE_COPY(class) \
+#define AXL_DISABLE_COPY(Class) \
 private: \
-	class (const class&);  \
+	Class (const Class&);  \
 	void \
-	operator = (const class&); \
+	operator = (const Class&); \
 
 //.............................................................................
 

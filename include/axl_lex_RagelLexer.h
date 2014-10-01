@@ -13,7 +13,7 @@ namespace lex {
 
 //.............................................................................
 	
-class RagelokenPos: public LineCol
+class RagelTokenPos: public LineCol
 {
 public:
 	size_t m_offset;
@@ -22,7 +22,7 @@ public:
 	char* m_p;
 
 public:
-	RagelokenPos ()
+	RagelTokenPos ()
 	{
 		m_offset = 0;
 		m_length = 0;
@@ -35,15 +35,15 @@ public:
 template <
 	typename Enum,
 	typename GetName,
-	typename Data = StdokenData
+	typename Data = StdTokenData
 	>
-class RagelToken: public Token <Enum, GetName, Data, RagelokenPos>
+class RagelToken: public Token <Enum, GetName, Data, RagelTokenPos>
 {
 public:
 	rtl::String
 	getText () const
 	{
-		return rtl::String (this->m_pos.m_p, this->m_pos.m_length); // thanks a lot gcc
+		return rtl::String (this->m_pos.m_p, this->m_pos.m_length);
 	}
 
 	static
@@ -67,7 +67,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef RagelToken <int, StdokenData> StdRageloken;
+typedef RagelToken <int, StdTokenData> StdRageloken;
 
 //.............................................................................
 
@@ -181,7 +181,7 @@ public:
 		if (token->m_token == tokenKind)
 			return token;
 
-		err::setExpectedTokenError (Token::getName (token), token->getName ());
+		err::setExpectedTokenError (Token::getName (tokenKind), token->getName ());
 		return NULL;
 	}
 

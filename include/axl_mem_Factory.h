@@ -166,19 +166,19 @@ cppOperatorDelete (T* p)
 
 #ifdef _DEBUG
 
-#define AXL_MEM_NEW(class) \
-	axl::mem::StdFactory <class>::operatorNew (__FILE__, __LINE__)
+#define AXL_MEM_NEW(Class) \
+	axl::mem::StdFactory <Class>::operatorNew (__FILE__, __LINE__)
 
-#define AXL_MEM_NEW_EXTRA(class, extra) \
-	axl::mem::StdFactory <class>::operatorNew (__FILE__, __LINE__, extra)
+#define AXL_MEM_NEW_EXTRA(Class, extra) \
+	axl::mem::StdFactory <Class>::operatorNew (__FILE__, __LINE__, extra)
 
 #else
 
-#define AXL_MEM_NEW(class) \
-	axl::mem::StdFactory <class>::operatorNew ()
+#define AXL_MEM_NEW(Class) \
+	axl::mem::StdFactory <Class>::operatorNew ()
 
-#define AXL_MEM_NEW_EXTRA(class, extra) \
-	axl::mem::StdFactory <class>::operatorNew (extra)
+#define AXL_MEM_NEW_EXTRA(Class, extra) \
+	axl::mem::StdFactory <Class>::operatorNew (extra)
 
 #endif
 

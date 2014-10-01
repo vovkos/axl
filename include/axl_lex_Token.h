@@ -89,7 +89,7 @@ public:
 
 // std token should be enough for most implementations
 
-class StdokenData
+class StdTokenData
 {
 public:
 	union
@@ -106,7 +106,7 @@ public:
 	rtl::String m_string;
 
 public:
-	StdokenData ()
+	StdTokenData ()
 	{ 
 		m_int64 = 0;
 	}
@@ -117,7 +117,7 @@ public:
 template <
 	typename Enum,
 	typename Name,
-	typename Data = StdokenData,
+	typename Data = StdTokenData,
 	typename Pos = LineCol
 	>
 class Token

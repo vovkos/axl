@@ -81,7 +81,7 @@ public:
 
 	size_t 
 	reverseIncrementalFind (
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 

@@ -182,7 +182,7 @@ struct WidgetKeyMsg: WidgetMsg
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct WidgethreadMsg: WidgetMsg
+struct WidgetThreadMsg: WidgetMsg
 {
 	uint_t m_code;
 	ref::Ptr <void> m_params;

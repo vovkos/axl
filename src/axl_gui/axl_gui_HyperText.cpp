@@ -7,7 +7,7 @@ namespace gui {
 //.............................................................................
 
 void
-Hyperext::clear ()
+HyperText::clear ()
 {
 	m_source.clear ();
 	m_text.clear ();
@@ -17,7 +17,7 @@ Hyperext::clear ()
 }
 
 size_t
-Hyperext::backspace (size_t backLength)
+HyperText::backspace (size_t backLength)
 {
 	// don't touch m_Source!
 
@@ -35,7 +35,7 @@ Hyperext::backspace (size_t backLength)
 }
 
 size_t 
-Hyperext::appendPlainText (
+HyperText::appendPlainText (
 	const char* text, 
 	size_t length
 	)
@@ -48,7 +48,7 @@ Hyperext::appendPlainText (
 }
 
 size_t 
-Hyperext::appendPlainText (
+HyperText::appendPlainText (
 	char c, 
 	size_t count
 	)
@@ -58,7 +58,7 @@ Hyperext::appendPlainText (
 }
 
 size_t
-Hyperext::appendHyperText (
+HyperText::appendHyperText (
 	const TextAttr& baseAttr,
 	const char* text,
 	size_t length
@@ -127,7 +127,7 @@ Hyperext::appendHyperText (
 }
 
 HyperlinkAnchor*
-Hyperext::findHyperlinkByX (int x) const
+HyperText::findHyperlinkByX (int x) const
 {
 	HyperlinkAnchor* result = NULL;
 
@@ -157,7 +157,7 @@ Hyperext::findHyperlinkByX (int x) const
 }
 
 void
-Hyperext::calcHyperlinkXMap (Font* baseFont)
+HyperText::calcHyperlinkXMap (Font* baseFont)
 {
 	int x = 0;
 	size_t offset = 0;
@@ -209,7 +209,7 @@ Hyperext::calcHyperlinkXMap (Font* baseFont)
 }
 
 Size
-Hyperext::calcTextSize (Font* baseFont) const
+HyperText::calcTextSize (Font* baseFont) const
 {
 	Size size;
 

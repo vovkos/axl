@@ -16,26 +16,26 @@ namespace axl {
 namespace gui {
 
 class QtEngine;
-class qtWidgetBase;
+class QtWidgetBase;
 
 QtEngine*
-getQtEngineSingleton (); // thanks a lot gcc
+getQtEngineSingleton ();
 
 //.............................................................................
 
-class qtNotifyEvent: public QEvent
+class QtNotifyEvent: public QEvent
 {
 public:
 	enum
 	{
-		qtType = QEvent::User + 0x200, // reserve 512 codes just in case
+		QtEventType = QEvent::User + 0x200, // reserve 512 codes just in case
 	};
 
 public:
-	qtNotifyEvent (
+	QtNotifyEvent (
 		uint_t code,
 		const void* params
-		): QEvent ((QEvent::Type) qtType)
+		): QEvent ((QEvent::Type) QtEventType)
 	{
 		m_code = code;
 		m_params = params;
@@ -123,7 +123,7 @@ public:
 
 // use QT naming conventions in this portion
 
-class qtWidgetBase: public QAbstractScrollArea
+class QtWidgetBase: public QAbstractScrollArea
 {
 	Q_OBJECT
 
@@ -132,7 +132,7 @@ protected:
 	bool m_mouseMoveEventFlag;
 
 public:
-	qtWidgetBase (
+	QtWidgetBase (
 		QtWidgetImpl* qtWidget,
 		QWidget* parent
 		):
@@ -142,8 +142,8 @@ public:
 		m_mouseMoveEventFlag = false;
 
 		connect(
-			this, &qtWidgetBase::threadMsgSignal,
-			this, &qtWidgetBase::threadMsgSlot,
+			this, &QtWidgetBase::threadMsgSignal,
+			this, &QtWidgetBase::threadMsgSlot,
 			Qt::QueuedConnection
 			);
 	}
@@ -154,7 +154,7 @@ public:
 		const ref::Ptr <void>& params
 		)
 	{
-		WidgethreadMsg* msg = AXL_MEM_NEW (WidgethreadMsg);
+		WidgetThreadMsg* msg = AXL_MEM_NEW (WidgetThreadMsg);
 		msg->m_msgKind = WidgetMsgKind_ThreadMsg;
 		msg->m_code = code;
 		msg->m_params = params;
@@ -163,7 +163,7 @@ public:
 	}
 
 private slots:
-	void threadMsgSlot (WidgethreadMsg* msg)
+	void threadMsgSlot (WidgetThreadMsg* msg)
 	{
 		bool isHandled = true;
 		m_qtWidget->processWidgetMsg (msg, &isHandled);
@@ -171,24 +171,24 @@ private slots:
 	}
 
 signals:
-	void threadMsgSignal (WidgethreadMsg* msg);
+	void threadMsgSignal (WidgetThreadMsg* msg);
 
 public:
 	virtual
 	bool
 	event (QEvent* e)
 	{
-		if (e->type () != (QEvent::Type) qtNotifyEvent::qtType)
+		if (e->type () != (QEvent::Type) QtNotifyEvent::QtEventType)
 			return QAbstractScrollArea::event (e);
 
-		notifyEvent ((qtNotifyEvent*) e);
+		notifyEvent ((QtNotifyEvent*) e);
 		return e->isAccepted ();
 	}
 
 protected:
 	virtual
 	void
-	notifyEvent (qtNotifyEvent* e)
+	notifyEvent (QtNotifyEvent* e)
 	{
 	}
 
@@ -303,7 +303,7 @@ class QtWidget: public T
 	friend class QtEngine;
 
 public:
-	qtWidgetBase* m_qtScrollArea;
+	QtWidgetBase* m_qtScrollArea;
 	QWidget* m_qtWidget;
 	bool m_mouseMoveFlag;
 
@@ -362,7 +362,7 @@ public:
 	{
 		ASSERT (cursor->getEngine ()->getEngineKind () == EngineKind_Qt);
 		m_qtWidget->setCursor (((QtCursor*) cursor)->m_qtCursor);
-		this->m_cursor = cursor; // thanks a lot gcc
+		this->m_cursor = cursor;
 		return true;
 	}
 
@@ -411,7 +411,7 @@ public:
 		void* param = NULL
 		)
 	{
-		qtNotifyEvent e (notifyCode, param);
+		QtNotifyEvent e (notifyCode, param);
 		return m_qtScrollArea->event (&e);
 	}
 
@@ -429,14 +429,14 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class qtWidget: public qtWidgetBase
+class qtWidget: public QtWidgetBase
 {
 protected:
 	QtWidget <T> m_widget;
 
 public:
 	qtWidget (QWidget* parent = 0):
-		qtWidgetBase ((QtWidgetImpl*) (Widget*) &m_widget, parent)
+		QtWidgetBase ((QtWidgetImpl*) (Widget*) &m_widget, parent)
 	{
 		m_widget.m_qtScrollArea = this;
 		m_widget.m_qtWidget = viewport ();

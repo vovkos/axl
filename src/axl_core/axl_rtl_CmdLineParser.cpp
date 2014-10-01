@@ -142,12 +142,12 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 	for (; it; it++)
 	{
 		SwitchInfo* switchInfo = *it;
-		if (!switchInfo->m_switch) // group
+		if (!switchInfo->m_switchKind) // group
 			continue;
 
 		size_t switchLength = 0;
 
-		bool hasValue = (switchInfo->m_switch & CmdLineSwitchFlagKind_HasValue) != 0;
+		bool hasValue = (switchInfo->m_switchKind & CmdLineSwitchFlagKind_HasValue) != 0;
 
 		size_t i = 0;
 		for (; i < countof (switchInfo->m_nameTable); i++)
@@ -192,7 +192,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 	for (; it; it++)
 	{
 		SwitchInfo* switchInfo = *it;
-		if (!switchInfo->m_switch) // group
+		if (!switchInfo->m_switchKind) // group
 		{
 			if (!string.isEmpty ())
 				string.appendNewLine ();
@@ -203,7 +203,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 		{
 			lineString.copy (' ', indentSize);
 
-			bool hasValue = (switchInfo->m_switch & CmdLineSwitchFlagKind_HasValue) != 0;
+			bool hasValue = (switchInfo->m_switchKind & CmdLineSwitchFlagKind_HasValue) != 0;
 
 			ASSERT (switchInfo->m_nameTable [0]);
 			if (switchInfo->m_nameTable [0] [1])

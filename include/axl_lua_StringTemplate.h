@@ -14,12 +14,12 @@ namespace lua {
 
 //.............................................................................
 
-class Stringemplate
+class StringTemplate
 {
 protected:
 	struct EmitContext
 	{
-		Stringemplate* m_this;
+		StringTemplate* m_self;
 		rtl::String* m_output;
 		const char* m_source;
 	};

@@ -15,7 +15,7 @@ namespace gui {
 
 //.............................................................................
 
-class Hyperext
+class HyperText
 {
 protected:
 	struct HyperlinkXMapEntry
