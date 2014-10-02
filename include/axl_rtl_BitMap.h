@@ -76,7 +76,7 @@ findBit (
 //.............................................................................
 
 template <size_t bitCount> 
-class BitMap_n
+class BitMapN
 {
 public:
 	enum
@@ -88,12 +88,12 @@ protected:
 	size_t m_map [pageCount];
 
 public:
-	BitMap_n ()
+	BitMapN ()
 	{
 		clear ();
 	}
 
-	BitMap_n (const BitMap_n& src)
+	BitMapN (const BitMapN& src)
 	{
 		copy (src);
 	}
@@ -105,13 +105,13 @@ public:
 	}
 
 	void
-	copy (const BitMap_n& src)
+	copy (const BitMapN& src)
 	{
 		memcpy (m_map, src.m_map, sizeof (m_map));
 	}
 
 	int 
-	cmp (const BitMap_n& src)
+	cmp (const BitMapN& src)
 	{
 		return memcmp (m_map, src.m_map, sizeof (m_map));
 	}
@@ -161,7 +161,7 @@ public:
 
 	bool
 	merge ( 
-		const BitMap_n& bitMap2,
+		const BitMapN& bitMap2,
 		BitOpKind op
 		)
 	{

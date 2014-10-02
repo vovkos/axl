@@ -22,7 +22,7 @@ public:
 		void* 
 		operator () (size_t size)
 		{
-			return malloc (size);
+			return ::malloc (size);
 		}
 	};
 
@@ -32,7 +32,7 @@ public:
 		void 
 		operator () (void* p)
 		{
-			return free (p);
+			return ::free (p);
 		}
 	};
 
