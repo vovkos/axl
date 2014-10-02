@@ -81,7 +81,7 @@ getKeyFromQtKey (int qtKey)
 }
 
 void 
-QtWidgetImpl::onEvent (
+QtWidgetEventHandler::onEvent (
 	QEvent* event,
 	WidgetMsgKind msgKind
 	)
@@ -102,7 +102,7 @@ QtWidgetImpl::onEvent (
 }
 
 void 
-QtWidgetImpl::onMouseEvent (
+QtWidgetEventHandler::onMouseEvent (
 	QMouseEvent* event,
 	WidgetMsgKind msgKind
 	)
@@ -128,7 +128,7 @@ QtWidgetImpl::onMouseEvent (
 }
 
 void 
-QtWidgetImpl::onMouseWheelEvent (QWheelEvent* event)
+QtWidgetEventHandler::onMouseWheelEvent (QWheelEvent* event)
 {	
 	if (!checkMsgMask (WidgetMsgKind_MouseWheel))
 	{
@@ -150,7 +150,7 @@ QtWidgetImpl::onMouseWheelEvent (QWheelEvent* event)
 }
 
 void 
-QtWidgetImpl::onKeyEvent (
+QtWidgetEventHandler::onKeyEvent (
 	QKeyEvent* event,
 	WidgetMsgKind msgKind
 	)
@@ -187,7 +187,7 @@ QtWidgetImpl::onKeyEvent (
 }
 
 void
-QtWidgetImpl::onPaintEvent (
+QtWidgetEventHandler::onPaintEvent (
 	QPaintEvent* event,
 	QPainter* qtPainter
 	)		
@@ -233,7 +233,7 @@ QtWidgetImpl::onPaintEvent (
 }
 
 void
-QtWidgetImpl::onResizeEvent (QResizeEvent* event)
+QtWidgetEventHandler::onResizeEvent (QResizeEvent* event)
 {
 	if (!checkMsgMask (WidgetMsgKind_Size))
 	{
@@ -263,7 +263,7 @@ QtWidgetImpl::onResizeEvent (QResizeEvent* event)
 }		
 
 void
-QtWidgetImpl::onScroll (
+QtWidgetEventHandler::onScroll (
 	QScrollBar* verticalScrollBar,
 	QScrollBar* horizontalScrollBar
 	)

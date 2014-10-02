@@ -344,8 +344,8 @@ public:
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP(class, Key, Value, Hash, Cmp) \
-class class \
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP(Class, Key, Value, Hash, Cmp) \
+class Class \
 { \
 public: \
 	typedef axl::rtl::HashTableMap <Key, Value, Hash, Cmp> MapBase; \
@@ -378,13 +378,13 @@ protected: \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT(class, Value) \
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(class, int, Value)
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT(Class, Value) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, int, Value)
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_CHAR(class, Value) \
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(class, char, Value)
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_CHAR(Class, Value) \
+	AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, char, Value)
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(class, Key, Value) \
+#define AXL_RTL_BEGIN_HASH_TABLE_MAP_INT_T(Class, Key, Value) \
 	AXL_RTL_BEGIN_HASH_TABLE_MAP ( \
 		class, \
 		Key, \

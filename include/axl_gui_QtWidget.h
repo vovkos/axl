@@ -58,24 +58,27 @@ private:
 
 //.............................................................................
 
-class QtWidgetImpl: public Widget
+class QtWidgetEventHandler: public Widget
 {
 public:
 	// this class is needed to get access to protected members in CWidget
 	// also to put part of implementation into .cpp instead of having one huge CQtWidgetT <>
 
+	static
 	MouseButtonKind
 	getMouseButtonFromQtButton (Qt::MouseButton qtButton)
 	{
 		return (MouseButtonKind) (qtButton & 0x7);
 	}
 
+	static
 	uint_t
 	getMouseButtonsFromQtButtons (int qtButtons)
 	{
 		return qtButtons & 0x7;
 	}
 
+	static
 	uint_t
 	getModifierKeysFromQtModifiers (int qtModifiers)
 	{
@@ -128,12 +131,12 @@ class QtWidgetBase: public QAbstractScrollArea
 	Q_OBJECT
 
 protected:
-	QtWidgetImpl* m_qtWidget;
+	QtWidgetEventHandler* m_qtWidget;
 	bool m_mouseMoveEventFlag;
 
 public:
 	QtWidgetBase (
-		QtWidgetImpl* qtWidget,
+		QtWidgetEventHandler* qtWidget,
 		QWidget* parent
 		):
 		QAbstractScrollArea (parent)
@@ -298,7 +301,7 @@ protected:
 //.............................................................................
 
 template <typename T>
-class QtWidget: public T
+class QtWidgetImpl: public T
 {
 	friend class QtEngine;
 
@@ -308,7 +311,7 @@ public:
 	bool m_mouseMoveFlag;
 
 public:
-	QtWidget (): T (getQtEngineSingleton ())
+	QtWidgetImpl (): T (getQtEngineSingleton ())
 	{
 		m_qtScrollArea = NULL;
 		m_qtWidget = NULL;
@@ -429,14 +432,14 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class qtWidget: public QtWidgetBase
+class QtWidget: public QtWidgetBase
 {
 protected:
-	QtWidget <T> m_widget;
+	QtWidgetImpl <T> m_widget;
 
 public:
-	qtWidget (QWidget* parent = 0):
-		QtWidgetBase ((QtWidgetImpl*) (Widget*) &m_widget, parent)
+	QtWidget (QWidget* parent = 0):
+		QtWidgetBase ((QtWidgetEventHandler*) (Widget*) &m_widget, parent)
 	{
 		m_widget.m_qtScrollArea = this;
 		m_widget.m_qtWidget = viewport ();
