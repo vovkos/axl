@@ -767,7 +767,7 @@ djb2 (
 	);
 
 uint16_t
-crc16(
+checksum16 (
 	const void* p, 
 	size_t size
 	);
@@ -788,13 +788,13 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class HashCrc16
+class HashChecksum16
 {
 public:
 	size_t 
 	operator () (const T& key) const
 	{ 
-		return crc16 (&key, sizeof (key)); 
+		return checksum16 (&key, sizeof (key)); 
 	}
 };
 

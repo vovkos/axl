@@ -24,7 +24,7 @@ djb2 (
 }
 
 uint16_t
-crc16 (
+checksum16 (
 	const void* _p,
 	size_t size
 	)
@@ -32,18 +32,18 @@ crc16 (
 	ushort_t* p = (ushort_t*) _p;
 	uchar_t* last = (uchar_t*) _p + size - 1;
 
-	uintptr_t checkSum = 0;
+	uintptr_t sum = 0;
 
 	for (; (uchar_t*) p < last; p++)
-		checkSum += *p;
+		sum += *p;
 
 	if (size & 1)
-		checkSum += *last;
+		sum += *last;
 
-	checkSum = (checkSum >> 16) + (checkSum & 0xffff);
-	checkSum += (checkSum >>16);
+	sum = (sum >> 16) + (sum & 0xffff);
+	sum += (sum >> 16);
 
-	return (ushort_t) ~checkSum;
+	return (ushort_t) ~sum;
 }
 
 //.............................................................................

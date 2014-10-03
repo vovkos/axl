@@ -93,7 +93,7 @@ LegacyPacketizerRoot::createHdr (size_t size)
 	hdr.m_signature = PacketHdrSignature;
 	hdr.m_dataSize = (uint16_t) size;
 	hdr.m_checksum = 0;	
-	hdr.m_checksum = crc16 (&hdr, sizeof (hdr));
+	hdr.m_checksum = checksum16 (&hdr, sizeof (hdr));
 	
 	return *(uint64_t*) &hdr;
 }
@@ -152,7 +152,7 @@ LegacyPacketizerRoot::writeImpl (
 		p += chunkSize;
 		size -= chunkSize;
 
-		uint16_t checksum = crc16 (m_buffer, sizeof (uint64_t));
+		uint16_t checksum = checksum16 (m_buffer, sizeof (uint64_t));
 		if (checksum)
 			return size0 - size; // ignore broken packet hdr
 
