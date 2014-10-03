@@ -89,7 +89,7 @@ public:
 		this->m_p = src.getEntry ();
 	}
 
-	HashTableIterator (Entry* p)
+	HashTableIterator (HashTableEntry <Key>* p)
 	{
 		this->m_p = p;
 	}
@@ -113,7 +113,7 @@ public:
 		this->m_p = src.getEntry ();
 	}
 
-	HashTableMapIterator (Entry* p)
+	HashTableMapIterator (HashTableMapEntry <Key, Value>* p)
 	{
 		this->m_p = p;
 	}
