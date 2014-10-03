@@ -7,18 +7,18 @@ namespace io {
 
 //.............................................................................
 
-void 
+void
 onSyncSendRecvComplete (
 	mt::Event* event,
-	err::Error* error,
+	err::Error* error_o,
 	size_t* actualSize,
-	
+
 	const err::Error& error,
 	size_t actualSize
 	)
 {
 	if (error)
-		*error = error,
+		*error_o = error,
 
 	*actualSize = actualSize;
 	event->signal ();
@@ -35,7 +35,7 @@ Asyncransport::syncSend (
 	mt::Event event;
 	err::Error error;
 	size_t actualSize;
-	
+
 	exe::Function <
 		exe::ArgSeq_3 <mt::Event*, err::Error*, size_t*>,
 		OnRecvCompleteArg
@@ -62,7 +62,7 @@ Asyncransport::syncRecv (
 	mt::Event event;
 	err::Error error;
 	size_t actualSize;
-	
+
 	exe::Function <
 		exe::ArgSeq_3 <mt::Event*, err::Error*, size_t*>,
 		OnRecvCompleteArg

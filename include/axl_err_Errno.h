@@ -34,7 +34,7 @@ public:
 		strerror_s (buffer, countof (buffer) - 1, code);
 		return buffer;
 #else
-		return strerror_r (error, buffer, countof (buffer) - 1);
+		return strerror_r (code, buffer, countof (buffer) - 1);
 #endif
 	}
 

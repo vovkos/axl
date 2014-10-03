@@ -23,14 +23,14 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Key, 
+	typename Key,
 	typename Value
 	>
 class KeyValueNodeData: public KeyNodeData <Key>
 {
 public:
 	Value m_value;
-};  
+};
 
 //.............................................................................
 
@@ -38,7 +38,7 @@ template <
 	typename T,
 	typename NodeData
 	>
-class BinTreeNodeBase: 
+class BinTreeNodeBase:
 	public rtl::ListLink,
 	public NodeData
 {
@@ -51,15 +51,15 @@ public:
 	{
 		m_parent = NULL;
 		m_left = NULL;
-		m_right = NULL; 
+		m_right = NULL;
 	}
 
 	// overridable
 
-	static 
-	void 
+	static
+	void
 	onXcg (
-		T* node1, 
+		T* node1,
 		T* node2
 		)
 	{
@@ -81,18 +81,18 @@ enum BinTreeFindExKind
 
 template <
 	typename T,
-	typename Key,
-	typename Cmp,
-	typename Node
+	typename Key_0,
+	typename Cmp_0,
+	typename Node_0
 	>
 class BinTreeBase
 {
 public:
-	typedef Key Key;
-	typedef Cmp Cmp;
-	typedef Node Node;
+	typedef Key_0 Key;
+	typedef Cmp_0 Cmp;
+	typedef Node_0 Node;
 
-	typedef Iterator <Node> Iterator;
+	typedef rtl::Iterator <Node> Iterator;
 
 protected:
 	StdList <Node> m_nodeList;
@@ -100,43 +100,43 @@ protected:
 
 public:
 	BinTreeBase ()
-	{ 
-		m_root = NULL; 
+	{
+		m_root = NULL;
 	}
-	
-	bool 
+
+	bool
 	isEmpty () const
-	{ 
-		return m_nodeList.isEmpty (); 
+	{
+		return m_nodeList.isEmpty ();
 	}
 
-	size_t 
+	size_t
 	getCount () const
-	{ 
-		return m_nodeList.getCount (); 
+	{
+		return m_nodeList.getCount ();
 	}
 
-	Iterator 
+	Iterator
 	getHead () const
-	{ 
-		return m_nodeList.getHead (); 
+	{
+		return m_nodeList.getHead ();
 	}
 
-	Iterator 
+	Iterator
 	getTail () const
-	{ 
-		return m_nodeList.getTail (); 
+	{
+		return m_nodeList.getTail ();
 	}
 
-	Iterator 
+	Iterator
 	find (const Key& key) const
 	{
 		Node* node = m_root;
 
-		while (node) 
+		while (node)
 		{
 			int cmp = Cmp () (key, node->m_key);
-			if (cmp == 0) 
+			if (cmp == 0)
 				return node;
 
 			node = cmp < 0 ? node->m_left : node->m_right;
@@ -145,7 +145,7 @@ public:
 		return NULL;
 	}
 
-	Iterator 
+	Iterator
 	findEx (
 		const Key& key,
 		BinTreeFindExKind findExKind
@@ -158,10 +158,10 @@ public:
 		if (isEmpty ())
 			return NULL;
 
-		while (node) 
+		while (node)
 		{
-			int cmp = Cmp () (key, node->m_key);			
-			if (cmp == 0) 
+			int cmp = Cmp () (key, node->m_key);
+			if (cmp == 0)
 				break; // exact match
 
 			prevNode = node;
@@ -184,14 +184,14 @@ public:
 
 		case BinTreeFindExKind_Ge:
 			return node ? node : prevCmp < 0 ? prevNode : Iterator (prevNode).getNext ();
-		
+
 		case BinTreeFindExKind_Eq:
 		default:
 			return node;
-		}		
+		}
 	}
 
-	Iterator 
+	Iterator
 	visit (const Key& key)
 	{
 		Node* parent = NULL;
@@ -201,10 +201,10 @@ public:
 
 		int cmp;
 
-		while (node) 
+		while (node)
 		{
 			cmp = Cmp () (key, node->m_key);
-			if (cmp == 0) 
+			if (cmp == 0)
 				return node;
 
 			parent = node;
@@ -239,12 +239,12 @@ public:
 		return node;
 	}
 
-	void 
+	void
 	erase (Iterator it)
 	{
 		Node* node = *it;
 
-		if (node->m_left && node->m_right) 
+		if (node->m_left && node->m_right)
 		{
 			Node* next = (Node*) node->m_next;
 			ASSERT (next == getLeftmostChild (node->m_right));
@@ -255,7 +255,7 @@ public:
 		m_nodeList.erase (node);
 	}
 
-	bool 
+	bool
 	eraseByKey (const Key& key)
 	{
 		Iterator it = find (key);
@@ -266,35 +266,35 @@ public:
 		return true;
 	}
 
-	void 
+	void
 	clear ()
-	{ 
+	{
 		m_nodeList.clear ();
 		m_root = NULL;
 	}
 
 protected:
-	Node* 
+	Node*
 	getLeftmostChild (Node* node)
 	{
 		while (node->m_left)
 			node = node->m_left;
-		
+
 		return node;
 	}
 
-	Node* 
+	Node*
 	getRightmostChild (Node* node)
 	{
 		while (node->m_right)
 			node = node->m_right;
-		
+
 		return node;
 	}
 
-	void 
+	void
 	xcg (
-		Node* node1, 
+		Node* node1,
 		Node* node2
 		)
 	{
@@ -344,7 +344,7 @@ protected:
 			node2->m_right = node1;
 			node2->m_parent = oldParent;
 		}
-		else 
+		else
 		{
 			node1->m_left = node2->m_left;
 			node1->m_right = node2->m_right;
@@ -388,11 +388,11 @@ protected:
 		Node::onXcg (node1, node2);
 	}
 
-	Node* 
+	Node*
 	replaceWithChild (Node* node)
-	{		
+	{
 		Node* child = node->m_right ? node->m_right : node->m_left;
-		 
+
 		if (!node->m_parent)
 		{
 			ASSERT (node == m_root);
@@ -409,7 +409,7 @@ protected:
 		return child;
 	}
 
-	void 
+	void
 	rotateLeft (Node* x)
 	{
 		Node* y = x->m_right;
@@ -417,12 +417,12 @@ protected:
 
 		x->m_right = y->m_left;
 
-		if (y->m_left) 
+		if (y->m_left)
 			y->m_left->m_parent = x;
 
 		y->m_parent = x->m_parent;
-	    
-		if (!x->m_parent) 
+
+		if (!x->m_parent)
 			m_root = y;
 		else if (x == x->m_parent->m_left)
 			x->m_parent->m_left = y;
@@ -433,7 +433,7 @@ protected:
 		x->m_parent = y;
 	}
 
-	void 
+	void
 	rotateRight (Node* x)
 	{
 		Node* y = x->m_left;
@@ -441,12 +441,12 @@ protected:
 
 		x->m_left = y->m_right;
 
-		if (y->m_right) 
+		if (y->m_right)
 			y->m_right->m_parent = x;
 
 		y->m_parent = x->m_parent;
-	    
-		if (!x->m_parent) 
+
+		if (!x->m_parent)
 			m_root = y;
 		else if (x == x->m_parent->m_right)
 			x->m_parent->m_right = y;
@@ -459,15 +459,15 @@ protected:
 
 	// overridables: tree rebalancing on insert/delete
 
-	void 
+	void
 	onInsert (Node* node)
 	{
 	}
 
-	void 
+	void
 	onErase (Node* node)
-	{ 
-		replaceWithChild (node); 
+	{
+		replaceWithChild (node);
 	}
 };
 

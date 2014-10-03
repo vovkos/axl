@@ -17,18 +17,18 @@ namespace ref {
 
 template <
 	typename T,
-	typename Alloc = mem::StdAlloc
+	typename Alloc_0 = mem::StdAlloc
 	>
 class Factory
 {
 public:
-	typedef Alloc Alloc;
+	typedef Alloc_0 Alloc;
 
-	class OperatorNew
+	class New
 	{
 	public:
 #ifdef _DEBUG
-		Ptr <T> 
+		Ptr <T>
 		operator () (
 			const char* filePath,
 			int line,
@@ -40,7 +40,7 @@ public:
 			return object;
 		}
 #else
-		Ptr <T> 
+		Ptr <T>
 		operator () (size_t extra = 0)
 		{
 			Ptr <T> object = mem::StdFactory <T, Alloc>::operatorNew (extra);
@@ -54,21 +54,21 @@ public:
 
 #ifdef _DEBUG
 	static
-	Ptr <T> 
+	Ptr <T>
 	operatorNew (
 		const char* filePath,
 		int line,
 		size_t extra = 0
 		)
 	{
-		return OperatorNew () (filePath, line, extra);
+		return New () (filePath, line, extra);
 	}
 #else
 	static
-	Ptr <T> 
+	Ptr <T>
 	operatorNew (size_t extra = 0)
 	{
-		return OperatorNew () (extra);
+		return New () (extra);
 	}
 #endif
 };
@@ -79,30 +79,30 @@ template <typename T>
 class InPlaceFactory
 {
 public:
-	class OperatorNew
+	class New
 	{
 	public:
-		Ptr <T> 
+		Ptr <T>
 		operator () (
 			void* p,
 			mem::FFree* pfFree
 			)
 		{
 			new (p) T;
-			((T*) p)->setTarget (p, &rtl::Type <T>::destruct, pfFree); 
+			((T*) p)->setTarget (p, &rtl::Type <T>::destruct, pfFree);
 			return (T*) p;
 		}
 	};
 
 public:
 	static
-	Ptr <T> 
+	Ptr <T>
 	operatorNew (
 		void* p,
 		mem::FFree* pfFree
 		)
 	{
-		return OperatorNew () (p, pfFree);
+		return New () (p, pfFree);
 	}
 };
 

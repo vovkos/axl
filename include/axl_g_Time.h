@@ -156,25 +156,25 @@ inline
 void
 getTimespecFromTimeout (
 	uint_t timeout,
-	timespec* timespec
+	timespec* tspec
 	)
 {
-	timespec->tv_sec = timeout / 1000;
-	timespec->tv_nsec = (timeout % 1000) * 1000000;
+	tspec->tv_sec = timeout / 1000;
+	tspec->tv_nsec = (timeout % 1000) * 1000000;
 }
 
 inline
 void
 getAbsTimespecFromTimeout (
 	uint_t timeout,
-	timespec* timespec
+	timespec* tspec
 	)
 {
-	int result = clock_gettime (CLOCK_REALTIME, timespec);
+	int result = clock_gettime (CLOCK_REALTIME, tspec);
 	ASSERT (result == 0);
 
-	timespec->tv_sec += timeout / 1000;
-	timespec->tv_nsec += (timeout % 1000) * 1000000;
+	tspec->tv_sec += timeout / 1000;
+	tspec->tv_nsec += (timeout % 1000) * 1000000;
 }
 
 #endif

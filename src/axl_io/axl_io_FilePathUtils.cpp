@@ -95,10 +95,10 @@ inline
 bool
 isDir (const char* fileName)
 {
-	struct stat stat;
+	struct stat st;
 
-	int result = stat (fileName, &stat);
-	return result == 0 && S_ISDIR (stat.st_mode);
+	int result = stat (fileName, &st);
+	return result == 0 && S_ISDIR (st.st_mode);
 }
 
 bool

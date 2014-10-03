@@ -122,8 +122,8 @@ public:
 		size_t length = -1
 		)
 	{
-		rtl::String cmdLine (cmdLine, length);
-		return parse (cmdLine, cmdLine.getLength ());
+		rtl::String cmdLine_utf8 (cmdLine, length);
+		return parse (cmdLine_utf8, cmdLine_utf8.getLength ());
 	}
 
 	bool

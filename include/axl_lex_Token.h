@@ -107,7 +107,7 @@ public:
 
 public:
 	StdTokenData ()
-	{ 
+	{
 		m_int64 = 0;
 	}
 };
@@ -115,18 +115,18 @@ public:
 //.............................................................................
 
 template <
-	typename Enum,
-	typename Name,
-	typename Data = StdTokenData,
-	typename Pos = LineCol
+	typename TokenKind_0,
+	typename Name_0,
+	typename Data_0 = StdTokenData,
+	typename Pos_0 = LineCol
 	>
 class Token
 {
 public:
-	typedef Enum TokenKind;
-	typedef Name Name;
-	typedef Data Data;
-	typedef Pos Pos;
+	typedef TokenKind_0 TokenKind;
+	typedef Name_0 Name;
+	typedef Data_0 Data;
+	typedef Pos_0 Pos;
 
 public:
 	union // it's nice to see it in debugger
@@ -140,16 +140,16 @@ public:
 	size_t m_channel;
 	Data m_data;
 	Pos m_pos;
-	
+
 	// define token value in derived class
 
 public:
 	Token ()
-	{ 
+	{
 		m_token = 0;
 		m_channel = 0;
 	}
-		
+
 	static
 	const char*
 	getName (int token)
@@ -178,7 +178,7 @@ public: \
 
 #define AXL_LEX_TOKEN_NAME(tokenKind, name) \
 		case tokenKind: \
-			return name; 
+			return name;
 
 #define AXL_LEX_END_TOKEN_NAME_MAP_EX(unknownName) \
 		default: \

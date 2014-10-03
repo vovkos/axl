@@ -17,7 +17,7 @@ Fd::open (
 {
 	close ();
 
-	m_h = open (fileName, openFlags, mode);
+	m_h = ::open (fileName, openFlags, mode);
 	return err::complete (m_h != -1);
 }
 
@@ -58,7 +58,7 @@ Fd::read (
 	size_t size
 	) const
 {
-	size_t actualSize = read (m_h, p, size);
+	size_t actualSize = ::read (m_h, p, size);
 	if (actualSize == -1)
 		err::setLastSystemError ();
 
@@ -71,7 +71,7 @@ Fd::write (
 	size_t size
 	)
 {
-	size_t actualSize = write (m_h, p, size);
+	size_t actualSize = ::write (m_h, p, size);
 	if (actualSize == -1)
 		err::setLastSystemError ();
 

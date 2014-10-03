@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_RTL_HASHTABLE_H
 
@@ -22,7 +22,7 @@ public:
 	class BucketLink
 	{
 	public:
-		rtl::ListLink* 
+		rtl::ListLink*
 		operator () (T* entry)
 		{
 			return &entry->m_bucketLink;
@@ -83,17 +83,17 @@ public:
 	typedef HashTableEntry <Key> Entry;
 
 	HashTableIterator ()
-	{ 
+	{
 	}
 
 	HashTableIterator (const Iterator <HashTableEntry <Key> >& src)
-	{ 
+	{
 		this->m_p = src.getLink ();
 	}
 
 	HashTableIterator (Entry* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 };
 
@@ -109,27 +109,27 @@ public:
 	typedef HashTableMapEntry <Key, Value> Entry;
 
 	HashTableMapIterator ()
-	{ 
+	{
 	}
 
 	HashTableMapIterator (const Iterator <HashTableMapEntry <Key, Value> >& src)
-	{ 
+	{
 		this->m_p = src.getLink ();
 	}
 
 	HashTableMapIterator (Entry* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 };
 
 //.............................................................................
 
 template <
-	typename Key,
-	typename Hash,
-	typename Cmp = Cmp <Key>,
-	typename Entry = HashTableEntry <Key>
+	typename Key_0,
+	typename Hash_0,
+	typename Cmp_0 = Cmp <Key_0>,
+	typename Entry_0 = HashTableEntry <Key_0>
 	>
 class HashTable
 {
@@ -140,14 +140,14 @@ public:
 		DefKind_ResizeThreshold    = 75,
 	};
 
-	typedef Key Key;
-	typedef Hash Hash;
-	typedef Cmp Cmp;
-	typedef Entry Entry;
+	typedef Key_0 Key;
+	typedef Hash_0 Hash;
+	typedef Cmp_0 Cmp;
+	typedef Entry_0 Entry;
 	typedef typename Entry::Bucket Bucket;
 
 	typedef rtl::Iterator <Entry> Iterator;
-	
+
 protected:
 	rtl::StdList <Entry> m_list;
 	rtl::Array <Bucket> m_table;
@@ -159,44 +159,44 @@ public:
 		m_resizeThreshold = DefKind_ResizeThreshold;
 	}
 
-	void 
+	void
 	clear ()
 	{
 		m_table.clear ();
 		m_list.clear ();
 	}
 
-	bool 
+	bool
 	isEmpty () const
-	{ 
-		return m_list.isEmpty (); 
+	{
+		return m_list.isEmpty ();
 	}
 
-	Iterator 
+	Iterator
 	getHead () const
-	{ 
-		return m_list.getHead (); 
-	}	
-
-	Iterator 
-	getTail () const
-	{ 
-		return m_list.getHead (); 
-	}	
-
-	size_t 
-	getCount () const
-	{ 
-		return m_list.getCount (); 
-	}	
-
-	size_t 
-	getBucketCount () const
-	{ 
-		return m_table.getCount (); 
+	{
+		return m_list.getHead ();
 	}
 
-	bool 
+	Iterator
+	getTail () const
+	{
+		return m_list.getHead ();
+	}
+
+	size_t
+	getCount () const
+	{
+		return m_list.getCount ();
+	}
+
+	size_t
+	getBucketCount () const
+	{
+		return m_table.getCount ();
+	}
+
+	bool
 	setBucketCount (size_t bucketCount)
 	{
 		rtl::Array <Bucket> newTable;
@@ -212,7 +212,7 @@ public:
 			{
 				Entry* entry = oldBucket->removeHead ();
 				size_t hash = Hash () (entry->m_key);
-				
+
 				Bucket* newBucket = &newTable [hash % bucketCount];
 				entry->m_bucket = newBucket;
 				newBucket->insertTail (entry);
@@ -223,26 +223,26 @@ public:
 		return true;
 	}
 
-	size_t 
+	size_t
 	getResizeThreshold () const
-	{ 
-		return m_resizeThreshold; 
-	}	
-
-	void 
-	setResizeThreshold (size_t resizeThreshold)
-	{ 
-		m_resizeThreshold = resizeThreshold; 
+	{
+		return m_resizeThreshold;
 	}
 
-	Iterator 
+	void
+	setResizeThreshold (size_t resizeThreshold)
+	{
+		m_resizeThreshold = resizeThreshold;
+	}
+
+	Iterator
 	find (const Key& key) const
-	{ 
+	{
 		size_t bucketCount = m_table.getCount ();
 		if (!bucketCount)
 			return NULL;
 
-		size_t hash = Hash () (key);	
+		size_t hash = Hash () (key);
 		const Bucket* bucket = &m_table [hash % bucketCount];
 
 		typename Bucket::Iterator it = bucket->getHead ();
@@ -258,12 +258,12 @@ public:
 
 	Iterator
 	visit (const Key& key)
-	{ 
+	{
 		size_t bucketCount = m_table.getCount ();
 		if (!bucketCount)
 		{
 			bucketCount = DefKind_InitialBucketCount;
-			
+
 			bool result = m_table.setCount (bucketCount);
 			if (!result)
 				return NULL;
@@ -298,7 +298,7 @@ public:
 		return entry;
 	}
 
-	void 
+	void
 	erase (Iterator it)
 	{
 		Entry* entry = *it;
@@ -307,35 +307,35 @@ public:
 		AXL_MEM_DELETE (entry);
 	}
 
-	bool 
+	bool
 	eraseByKey (const Key& key)
-	{ 
+	{
 		Iterator it = find (key);
 		if (!it)
 			return false;
 
 		erase (it);
-		return true; 
+		return true;
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Key, 
-	typename Value, 
+	typename Key,
+	typename Value,
 	typename Hash,
 	typename Cmp = Cmp <Key>
 	>
 class HashTableMap: public HashTable <
 	Key,
-	Hash, 
+	Hash,
 	Cmp,
 	HashTableMapEntry <Key, Value>
 	>
 {
 public:
-	Value& 
+	Value&
 	operator [] (const Key& key)
 	{
 		return this->visit (key)->m_value;

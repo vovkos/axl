@@ -16,47 +16,47 @@ namespace psx {
 
 class Cond
 {
-protected:	
+protected:
 	pthread_cond_t m_cond;
-	
+
 public:
 	Cond ()
-	{		
-		pthread_cond_init (&m_cond, NULL);
+	{
+		::pthread_cond_init (&m_cond, NULL);
 	}
 
 	~Cond ()
 	{
-		pthread_cond_destroy (&m_cond);
+		::pthread_cond_destroy (&m_cond);
 	}
 
 	operator pthread_cond_t* ()
 	{
 		return &m_cond;
-	}	
-	
-	bool 
+	}
+
+	bool
 	signal ()
 	{
-		int result = pthread_cond_signal (&m_cond);
+		int result = ::pthread_cond_signal (&m_cond);
 		return result == 0 ? true : err::fail (result);
 	}
 
-	bool 
+	bool
 	broadcast ()
 	{
-		int result = pthread_cond_broadcast (&m_cond);
+		int result = ::pthread_cond_broadcast (&m_cond);
 		return result == 0 ? true : err::fail (result);
-	}	
+	}
 
-	bool 
+	bool
 	wait (pthread_mutex_t* mutex)
 	{
-		int result = pthread_cond_wait (&m_cond, mutex);
-		return result == 0 ? true : err::fail (result);	
+		int result = ::pthread_cond_wait (&m_cond, mutex);
+		return result == 0 ? true : err::fail (result);
 	}
-	
-	bool 
+
+	bool
 	wait (
 		pthread_mutex_t* mutex,
 		uint_t timeout
@@ -70,7 +70,7 @@ class CondMutexPair
 protected:
 	Cond m_cond;
 	Mutex m_mutex;
-	
+
 public:
 	void
 	lock ()
@@ -84,35 +84,35 @@ public:
 		m_mutex.unlock ();
 	}
 
-	bool 
+	bool
 	signal ()
 	{
 		return m_cond.signal ();
 	}
 
-	bool 
+	bool
 	broadcast ()
 	{
 		return m_cond.broadcast ();
 	}
 
-	bool 
+	bool
 	wait ()
 	{
 		lock ();
 		return m_cond.wait (m_mutex);
-	}	
-	
-	bool 
+	}
+
+	bool
 	wait (uint_t timeout)
 	{
 		lock ();
 		return m_cond.wait (m_mutex, timeout);
-	}	
+	}
 };
 
 //.............................................................................
 
 } // namespace psx
-} // namespace mt 
+} // namespace mt
 } // namespace axl

@@ -15,18 +15,18 @@ namespace mem {
 
 template <
 	typename T,
-	typename Alloc = StdAlloc
+	typename Alloc_0 = StdAlloc
 	>
 class StdFactory
 {
 public:
-	typedef Alloc Alloc;
+	typedef Alloc_0 Alloc;
 
-	class OperatorNew
+	class New
 	{
 	public:
 #ifdef _DEBUG
-		T* 
+		T*
 		operator () (
 			const char* filePath,
 			int line,
@@ -44,7 +44,7 @@ public:
 			return (T*) p;
 		}
 #else
-		T* 
+		T*
 		operator () (size_t extra = 0)
 		{
 			size_t size = sizeof (T) + extra;
@@ -60,10 +60,10 @@ public:
 #endif
 	};
 
-	class OperatorDelete
+	class Delete
 	{
 	public:
-		void 
+		void
 		operator () (T* p)
 		{
 			p->~T ();
@@ -74,29 +74,29 @@ public:
 public:
 #ifdef _DEBUG
 	static
-	T* 
+	T*
 	operatorNew (
 		const char* filePath,
 		int line,
 		size_t extra = 0
 		)
 	{
-		return OperatorNew () (filePath, line, extra);
+		return New () (filePath, line, extra);
 	}
 #else
 	static
-	T* 
+	T*
 	operatorNew (size_t extra = 0)
 	{
-		return OperatorNew () (extra);
+		return New () (extra);
 	}
 #endif
 
 	static
-	void 
+	void
 	operatorDelete (T* p)
 	{
-		return OperatorDelete () (p);
+		return Delete () (p);
 	}
 };
 
@@ -106,20 +106,20 @@ template <typename T>
 class CppFactory
 {
 public:
-	class OperatorNew
+	class New
 	{
 	public:
-		T* 
+		T*
 		operator () ()
 		{
 			return new T;
 		}
 	};
 
-	class OperatorDelete
+	class Delete
 	{
 	public:
-		void 
+		void
 		operator () (T* p)
 		{
 			delete p;
@@ -128,29 +128,29 @@ public:
 
 public:
 	static
-	T* 
+	T*
 	operatorNew (size_t extra = 0)
 	{
-		return OperatorNew () (extra);
+		return New () (extra);
 	}
 
 	static
-	void 
+	void
 	operatorDelete (T* p)
 	{
-		return OperatorDelete () (p);
+		return Delete () (p);
 	}
 };
 
 //.............................................................................
 
-// decoupling OperatorNew & OperatorDelete is not good, but templated function is necessary for AXL_MEM_DELETE (p)
+// decoupling new & delete is not good, but templated function is necessary for AXL_MEM_DELETE (p)
 
 template <typename T>
 void
 stdOperatorDelete (T* p)
 {
-	typename StdFactory <T>::OperatorDelete () (p);
+	typename StdFactory <T>::Delete () (p);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -159,7 +159,7 @@ template <typename T>
 void
 cppOperatorDelete (T* p)
 {
-	typename CppFactory <T>::OperatorDelete () (p);
+	typename CppFactory <T>::Delete () (p);
 }
 
 //.............................................................................

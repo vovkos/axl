@@ -92,13 +92,13 @@ protected:
 	Page*
 	findCurrentThreadPage ()
 	{
-		return (Page*) pthread_getspecific (m_tlsKey);
+		return (Page*) ::pthread_getspecific (m_tlsKey);
 	}
 
 	void
 	setCurrentThreadPage (Page* page)
 	{
-		pthread_setspecific (m_tlsKey, page);
+		::pthread_setspecific (m_tlsKey, page);
 	}
 
 	static

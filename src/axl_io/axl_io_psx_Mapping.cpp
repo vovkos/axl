@@ -20,7 +20,7 @@ Mapping::map (
 {
 	close ();
 
-	m_p = mmap (addrHint, size, protection, flags, fd, offset);
+	m_p = ::mmap (addrHint, size, protection, flags, fd, offset);
 	if (m_p == (void*) -1)
 	{
 		err::setLastSystemError ();
@@ -37,7 +37,7 @@ Mapping::unmap (size_t size)
 	if (!isOpen ())
 		return;
 
-	munmap (m_p, size);
+	::munmap (m_p, size);
 	m_p = NULL;
 	m_size = 0;
 }
@@ -53,7 +53,7 @@ SharedMemory::open (
 {
 	close ();
 
-	m_h = shm_open (name, flags, mode);
+	m_h = ::shm_open (name, flags, mode);
 	return err::complete (m_h != -1);
 }
 

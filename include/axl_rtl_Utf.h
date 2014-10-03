@@ -478,14 +478,14 @@ public:
 //.............................................................................
 
 template <
-	typename DstEncoding,
-	typename SrcEncoding
+	typename DstEncoding_0,
+	typename SrcEncoding_0
 	>
 class UtfConvert
 {
 public:
-	typedef DstEncoding DstEncoding;
-	typedef SrcEncoding SrcEncoding;
+	typedef DstEncoding_0 DstEncoding;
+	typedef SrcEncoding_0 SrcEncoding;
 	typedef typename DstEncoding::C DstUnit;
 	typedef typename SrcEncoding::C SrcUnit;
 
@@ -568,11 +568,11 @@ public:
 
 //.............................................................................
 
-template <typename SrcEncoding>
+template <typename SrcEncoding_0>
 class UtfToAsciiConvert
 {
 public:
-	typedef SrcEncoding SrcEncoding;
+	typedef SrcEncoding_0 SrcEncoding;
 	typedef typename SrcEncoding::C SrcUnit;
 
 public:
@@ -648,11 +648,11 @@ public:
 
 //.............................................................................
 
-template <typename DstEncoding>
+template <typename DstEncoding_0>
 class AsciiToUtfConvert
 {
 public:
-	typedef DstEncoding DstEncoding;
+	typedef DstEncoding_0 DstEncoding;
 	typedef typename DstEncoding::C DstUnit;
 
 public:

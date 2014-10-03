@@ -75,7 +75,7 @@ protected:
 public:
 	typedef Alloc Alloc;
 
-	class OperatorNew
+	class New
 	{
 	public:
 #ifdef _DEBUG
@@ -148,7 +148,7 @@ public:
 		size_t extra = 0
 		)
 	{
-		return OperatorNew () (type, filePath, line, extra);
+		return New () (type, filePath, line, extra);
 	}
 #else
 	static
@@ -158,7 +158,7 @@ public:
 		size_t extra = 0
 		)
 	{
-		return OperatorNew () (type, extra);
+		return New () (type, extra);
 	}
 #endif
 };

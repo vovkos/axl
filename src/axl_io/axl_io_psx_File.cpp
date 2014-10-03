@@ -11,7 +11,7 @@ uint64_t
 File::getSize () const
 {
 	struct stat64 stat;
-	int result = fstat64 (m_h, &stat);
+	int result = ::fstat64 (m_h, &stat);
 	if (result == -1)
 	{
 		err::setLastSystemError ();
@@ -24,7 +24,7 @@ File::getSize () const
 uint64_t
 File::getPosition () const
 {
-	uint64_t offset = lseek64 (m_h, 0, SEEK_CUR);
+	uint64_t offset = ::lseek64 (m_h, 0, SEEK_CUR);
 	if (offset == -1)
 		err::setLastSystemError ();
 

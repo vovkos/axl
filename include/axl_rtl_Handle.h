@@ -14,14 +14,14 @@ namespace rtl {
 //.............................................................................
 
 template <
-	typename T,
-	typename Close	= Void <T>,
-	typename GetInvalidHandle = Zero <T>
+	typename T_0,
+	typename Close	= Void <T_0>,
+	typename GetInvalidHandle = Zero <T_0>
 	>
 class Handle
 {
 public:
-	typedef T T;
+	typedef T_0 T;
 
 protected:
 	T m_h;

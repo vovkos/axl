@@ -22,12 +22,12 @@ protected:
 public:
 	MutexAttr ()
 	{
-		pthread_mutexattr_init (&m_attr);
+		::pthread_mutexattr_init (&m_attr);
 	}
 
 	~MutexAttr ()
 	{
-		pthread_mutexattr_destroy (&m_attr);
+		::pthread_mutexattr_destroy (&m_attr);
 	}
 
 	operator const pthread_mutexattr_t* () const
@@ -44,14 +44,14 @@ public:
 	getType () const
 	{
 		int type = PTHREAD_MUTEX_NORMAL;
-		pthread_mutexattr_gettype (&m_attr, &type);
+		::pthread_mutexattr_gettype (&m_attr, &type);
 		return type;
 	}
 
 	bool
 	setType (int type)
 	{
-		int result = pthread_mutexattr_settype (&m_attr, type);
+		int result = ::pthread_mutexattr_settype (&m_attr, type);
 		return result == 0 ? true : err::fail (result);
 	}
 
@@ -60,14 +60,14 @@ public:
 	getRobust () const
 	{
 		int robust = PTHREAD_MUTEX_STALLED;
-		pthread_mutexattr_getrobust (&m_attr, &robust);
+		::pthread_mutexattr_getrobust (&m_attr, &robust);
 		return robust;
 	}
 
 	bool
 	setRobust (int robust)
 	{
-		int result = pthread_mutexattr_setrobust (&m_attr, robust);
+		int result = ::pthread_mutexattr_setrobust (&m_attr, robust);
 		return result == 0 ? true : err::fail (result);
 	}
 #endif
@@ -83,12 +83,12 @@ protected:
 public:
 	Mutex (pthread_mutexattr_t* attr = NULL)
 	{
-		pthread_mutex_init (&m_mutex, attr);
+		::pthread_mutex_init (&m_mutex, attr);
 	}
 
 	~Mutex ()
 	{
-		pthread_mutex_destroy (&m_mutex);
+		::pthread_mutex_destroy (&m_mutex);
 	}
 
 	operator pthread_mutex_t* ()
@@ -99,7 +99,7 @@ public:
 	void
 	lock ()
 	{
-		pthread_mutex_lock (&m_mutex);
+		::pthread_mutex_lock (&m_mutex);
 	}
 
 	bool
@@ -108,7 +108,7 @@ public:
 	void
 	unlock ()
 	{
-		pthread_mutex_unlock (&m_mutex);
+		::pthread_mutex_unlock (&m_mutex);
 	}
 };
 

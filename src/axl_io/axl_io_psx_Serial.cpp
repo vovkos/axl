@@ -12,7 +12,7 @@ uint_t
 Serial::getStatusLines () const
 {
 	int lines = 0;
-	int result = ioctl (m_h, TIOCMGET, &lines);
+	int result = ::ioctl (m_h, TIOCMGET, &lines);
 	if (result == -1)
 	{
 		err::setLastSystemError ();
@@ -26,7 +26,7 @@ bool
 Serial::setDtr (bool isSet)
 {
 	int lines = TIOCM_DTR;
-	int result = ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
+	int result = ::ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
 	return err::complete (result != -1);
 }
 
@@ -34,7 +34,7 @@ bool
 Serial::setRts (bool isSet)
 {
 	int lines = TIOCM_RTS;
-	int result = ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
+	int result = ::ioctl (m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
 	return err::complete (result != -1);
 }
 

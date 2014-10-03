@@ -13,7 +13,7 @@ Pipe::create ()
 	close ();
 
 	int fd [2];
-	int result = pipe (fd);
+	int result = ::pipe (fd);
 	if (result == -1)
 		return err::failWithLastSystemError ();
 

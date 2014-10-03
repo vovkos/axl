@@ -17,12 +17,12 @@ namespace lex {
 
 template <
 	typename T,
-	typename Token
+	typename Token_0
 	>
 class Lexer
 {
 public:
-	typedef Token Token;
+	typedef Token_0 Token;
 	typedef typename Token::TokenKind TokenKind;
 	typedef typename Token::Pos Pos;
 
@@ -34,7 +34,7 @@ protected:
 	TokenList m_tokenList;
 	TokenList m_freeTokenList;
 	size_t m_channelMask;
-	
+
 	Pos m_lastTokenPos;
 
 public:
@@ -48,21 +48,21 @@ public:
 		static_cast <T*> (this)->onReset ();
 	}
 
-	size_t 
+	size_t
 	getChannelMask ()
 	{
 		return m_channelMask;
-	}	
+	}
 
 	void
 	setChannelMask (size_t mask)
 	{
 		m_channelMask = mask;
-	}	
+	}
 
 	const Token*
 	getChannelToken (
-		size_t channelMask, 
+		size_t channelMask,
 		size_t index = 0
 		)
 	{
@@ -79,7 +79,7 @@ public:
 			{
 				if (it->m_token <= 0)
 					return &*it;
-				
+
 				bool isMatch = (channelMask & ((size_t) 1 << it->m_channel)) != 0;
 				if (isMatch)
 				{
@@ -92,14 +92,14 @@ public:
 					i++;
 				}
 			}
-			
+
 			// ...nope, need to fetch more tokens
 
 			rtl::BoxIterator <Token> tail = m_tokenList.getTail ();
 
 			size_t oldCount = m_tokenList.getCount ();
-			do 
-			{			
+			do
+			{
 				((T*) (this))->tokenize ();
 			} while (m_tokenList.getCount () == oldCount);
 
@@ -107,7 +107,7 @@ public:
 		}
 	}
 
-	void 
+	void
 	nextChannelToken (
 		size_t channelMask,
 		size_t count = 1
@@ -127,12 +127,12 @@ public:
 				bool isMatch = (channelMask & ((size_t) 1 << it->m_channel)) != 0;
 
 				TokenEntry* entry = it.getEntry ();
-				
+
 				m_tokenList.removeEntry (entry);
 				m_freeTokenList.insertHeadEntry (entry);
 
 				if (isMatch)
-					break;	
+					break;
 			}
 		}
 	}
@@ -158,7 +158,7 @@ protected:
 	Token*
 	allocateToken ()
 	{
-		TokenEntry* entry = !m_freeTokenList.isEmpty () ? 
+		TokenEntry* entry = !m_freeTokenList.isEmpty () ?
 			m_freeTokenList.removeHeadEntry () :
 			AXL_MEM_NEW (TokenEntry);
 

@@ -145,7 +145,7 @@ inline
 uint64_t
 getCurrentThreadId ()
 {
-	return pthread_self ();
+	return ::pthread_self ();
 }
 
 #endif

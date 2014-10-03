@@ -55,7 +55,7 @@ TlsMgr::tlsCallback (
 
 TlsMgr::TlsMgr ()
 {
-	pthread_key_create (&m_tlsKey, tlsDestructor);
+	::pthread_key_create (&m_tlsKey, tlsDestructor);
 	m_slotCount = 0;
 }
 
@@ -68,7 +68,7 @@ TlsMgr::~TlsMgr ()
 		setCurrentThreadPage (NULL);
 	}
 
-	pthread_key_delete (m_tlsKey);
+	::pthread_key_delete (m_tlsKey);
 }
 
 #endif

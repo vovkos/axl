@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_RTL_ARRAY_H
 
@@ -19,13 +19,13 @@ template <typename T>
 class ArrayDetails
 {
 public:
-	static 
-	void 
+	static
+	void
 	construct (
-		T* p, 
+		T* p,
 		size_t count
 		)
-	{ 
+	{
 		memset (p, 0, count * sizeof (T)); // zero memory before construction
 
 		T* end = p + count;
@@ -33,14 +33,14 @@ public:
 			new (p) T;
 	}
 
-	static 
-	void 
+	static
+	void
 	constructCopy (
-		T* dst, 
-		const T* src, 
+		T* dst,
+		const T* src,
 		size_t count
 		)
-	{ 
+	{
 		memset (dst, 0, count * sizeof (T)); // zero memory before construction
 
 		T* end = dst + count;
@@ -48,26 +48,26 @@ public:
 			new (dst) T (*src);
 	}
 
-	static 
-	void 
+	static
+	void
 	destruct (
-		T* p, 
+		T* p,
 		size_t count
 		)
-	{ 
+	{
 		T* end = p + count;
 		for (; p < end; p++)
 			p->~T ();
 	}
 
-	static 
-	void 
+	static
+	void
 	copy (
-		T* dst, 
-		const T* src, 
+		T* dst,
+		const T* src,
 		size_t count
 		)
-	{ 
+	{
 		if (src > dst || src + count <= dst)
 		{
 			T* end = dst + count;
@@ -90,10 +90,10 @@ public:
 		}
 	}
 
-	static 
-	void 
+	static
+	void
 	clear (
-		T* p, 
+		T* p,
 		size_t count
 		)
 	{
@@ -102,13 +102,13 @@ public:
 
 		for (; p < end; p++)
 			p->~T ();
-		
-		p = begin; 
-		memset (p, 0, count * sizeof (T)); 
-		
+
+		p = begin;
+		memset (p, 0, count * sizeof (T));
+
 		for (; p < end; p++)
 			new (p) T;
-	}	
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -119,56 +119,56 @@ template <typename T>
 class SimpleArrayDetails
 {
 public:
-	static 
-	void 
+	static
+	void
 	construct (
-		T* p, 
+		T* p,
 		size_t count
 		)
-	{ 
-		memset (p, 0, count * sizeof (T)); 
+	{
+		memset (p, 0, count * sizeof (T));
 	}
 
-	static 
-	void 
+	static
+	void
 	constructCopy (
-		T* dst, 
-		const T* src, 
+		T* dst,
+		const T* src,
 		size_t count
 		)
-	{ 
-		memcpy (dst, src, count * sizeof (T)); 
+	{
+		memcpy (dst, src, count * sizeof (T));
 	}
 
-	static 
-	void 
+	static
+	void
 	destruct (
-		T* p, 
+		T* p,
 		size_t count
 		)
 	{
 	}
 
-	static 
-	void 
+	static
+	void
 	copy (
-		T* dst, 
-		const T* src, 
+		T* dst,
+		const T* src,
 		size_t count
 		)
-	{ 
-		memmove (dst, src, count * sizeof (T)); 
+	{
+		memmove (dst, src, count * sizeof (T));
 	}
 
-	static 
-	void 
+	static
+	void
 	clear (
-		T* p, 
+		T* p,
 		size_t count
 		)
-	{ 
-		memset (p, 0, count * sizeof (T)); 
-	}	
+	{
+		memset (p, 0, count * sizeof (T));
+	}
 };
 
 //.............................................................................
@@ -248,13 +248,13 @@ class ArrayDetails <T*>: public SimpleArrayDetails <T*>
 
 template <
 	typename T,
-	typename Details = ArrayDetails <T>
+	typename Details_0 = ArrayDetails <T>
 	>
 class Array
 {
 public:
-	typedef Details Details;
-	
+	typedef Details_0 Details;
+
 	class Hdr: public ref::RefCount
 	{
 	public:
@@ -272,34 +272,34 @@ protected:
 
 public:
 	Array ()
-	{ 
+	{
 		m_p = NULL;
 	}
 
 	Array (T e)
-	{ 
+	{
 		m_p = NULL;
 		copy (&e, 1);
 	}
 
 	Array (const Array& src)
-	{   
+	{
 		m_p = NULL;
-		copy (src); 
+		copy (src);
 	}
 
 	Array (
-		const T* p, 
+		const T* p,
 		size_t count
 		)
-	{ 
+	{
 		m_p = NULL;
-		copy (p, count); 
+		copy (p, count);
 	}
 
 	Array (
 		ref::BufKind bufKind,
-		void* p, 
+		void* p,
 		size_t size
 		)
 	{
@@ -313,52 +313,52 @@ public:
 	}
 
 	operator const T* () const
-	{ 
-		return m_p; 
+	{
+		return m_p;
 	}
 
-	operator T* () 
-	{ 
-		return m_p; 
+	operator T* ()
+	{
+		return m_p;
 	}
 
-	Array& 
+	Array&
 	operator = (const Array& src)
-	{ 
+	{
 		copy (src);
 		return *this;
 	}
 
 	// .ca () is mostly for passing through vararg
-	
-	const T* 
+
+	const T*
 	ca () const
-	{ 
-		return m_p; 
+	{
+		return m_p;
 	}
 
-	T* 
-	a () 
-	{ 
-		return m_p; 
+	T*
+	a ()
+	{
+		return m_p;
 	}
-	
-	size_t 
+
+	size_t
 	getCount () const
-	{ 
-		return m_p ? getHdr ()->m_count : 0; 
+	{
+		return m_p ? getHdr ()->m_count : 0;
 	}
 
-	size_t 
+	size_t
 	getReservedCount () const
-	{ 
-		return m_p ? getHdr ()->m_maxCount : 0; 
+	{
+		return m_p ? getHdr ()->m_maxCount : 0;
 	}
 
-	bool 
+	bool
 	isEmpty () const
-	{ 
-		return getCount () == 0; 
+	{
+		return getCount () == 0;
 	}
 
 	const T&
@@ -369,7 +369,7 @@ public:
 	}
 
 	T&
-	getFront () 
+	getFront ()
 	{
 		ASSERT (!isEmpty ());
 		return m_p [0];
@@ -383,13 +383,13 @@ public:
 	}
 
 	T&
-	getBack () 
+	getBack ()
 	{
 		ASSERT (!isEmpty ());
 		return m_p [getCount () - 1];
 	}
 
-	void 
+	void
 	release ()
 	{
 		if (!m_p)
@@ -399,26 +399,26 @@ public:
 		m_p = NULL;
 	}
 
-	void 
+	void
 	clear ()
-	{ 
-		setCount (0); 
+	{
+		setCount (0);
 	}
 
 	bool
 	copy (const Array& src)
-	{ 
+	{
 		if (m_p == src.m_p)
 			return true;
 
 		if (!src.m_p)
 		{
 			release ();
-			return true; 
+			return true;
 		}
 
 		if (src.getHdr ()->getFree () == (mem::FFree*) -1)
-			return copy (src, src.getCount ()); 
+			return copy (src, src.getCount ());
 
 		if (src.m_p)
 			src.getHdr ()->addRef ();
@@ -430,9 +430,9 @@ public:
 		return true;
 	}
 
-	bool 
+	bool
 	copy (
-		const T* p, 
+		const T* p,
 		size_t count
 		)
 	{
@@ -450,25 +450,25 @@ public:
 		return true;
 	}
 
-	bool 
+	bool
 	copy (T e)
 	{
 		return copy (&e, 1);
 	}
 
-	T* 
+	T*
 	append (
-		const T* p, 
+		const T* p,
 		size_t count
 		)
-	{ 
-		return insert (-1, p, count); 
+	{
+		return insert (-1, p, count);
 	}
 
 	T*
 	append (T e)
-	{ 
-		return insert (-1, e); 
+	{
+		return insert (-1, e);
 	}
 
 	T*
@@ -476,19 +476,19 @@ public:
 		T e,
 		size_t count
 		)
-	{ 
-		return insertMultiply (-1, e, count); 
+	{
+		return insertMultiply (-1, e, count);
 	}
 
 	T*
 	append (const Array& src)
-	{ 
-		return insert (-1, src, src.getCount ()); 
+	{
+		return insert (-1, src, src.getCount ());
 	}
 
 	T*
 	insertSpace (
-		size_t index, 
+		size_t index,
 		size_t count
 		)
 	{
@@ -510,8 +510,8 @@ public:
 
 	T*
 	insert (
-		size_t index, 
-		const T* p, 
+		size_t index,
+		const T* p,
 		size_t count
 		)
 	{
@@ -527,7 +527,7 @@ public:
 
 	T*
 	insert (
-		size_t index, 
+		size_t index,
 		T e
 		)
 	{
@@ -538,8 +538,8 @@ public:
 
 	T*
 	insertMultiply (
-		size_t index, 
-		T e, 
+		size_t index,
+		T e,
 		size_t count
 		)
 	{
@@ -552,18 +552,18 @@ public:
 		return dst;
 	}
 
-	T* 
+	T*
 	insert (
-		size_t index, 
+		size_t index,
 		const Array& src
 		)
-	{ 
-		return insert (index, src, src.getCount ()); 
+	{
+		return insert (index, src, src.getCount ());
 	}
 
-	bool 
+	bool
 	remove (
-		size_t index, 
+		size_t index,
 		size_t count = 1
 		)
 	{
@@ -600,7 +600,7 @@ public:
 		return count;
 	}
 
-	T 
+	T
 	getBackAndPop ()
 	{
 		T e = getBack ();
@@ -608,10 +608,10 @@ public:
 		return e;
 	}
 
-	bool 
+	bool
 	move (
-		size_t indexDst, 
-		size_t indexSrc, 
+		size_t indexDst,
+		size_t indexSrc,
 		size_t count = 1
 		)
 	{
@@ -670,19 +670,19 @@ public:
 		return -1;
 	}
 
-	T* 
+	T*
 	getBuffer ()
-	{ 
-		return ensureExclusive () ? m_p : NULL; 
+	{
+		return ensureExclusive () ? m_p : NULL;
 	}
 
-	T* 
+	T*
 	getBuffer (size_t count)
-	{ 
-		return setCount (count) ? m_p : NULL; 
+	{
+		return setCount (count) ? m_p : NULL;
 	}
 
-	bool 
+	bool
 	reserve (size_t count)
 	{
 		if (count <= getReservedCount ())
@@ -714,7 +714,7 @@ public:
 		return true;
 	}
 
-	size_t 
+	size_t
 	ensureCount (size_t count)
 	{
 		if (getCount () < count)
@@ -723,7 +723,7 @@ public:
 		return getCount ();
 	}
 
-	bool 
+	bool
 	setCount (size_t count)
 	{
 		Hdr* oldHdr = getHdr ();
@@ -784,7 +784,7 @@ public:
 			Details::constructCopy (p, m_p, oldHdr->m_count);
 			Details::construct (p + oldHdr->m_count, count - oldHdr->m_count);
 		}
-		
+
 		oldHdr->release ();
 
 		m_p = p;
@@ -793,10 +793,10 @@ public:
 		return true;
 	}
 
-	bool 
+	bool
 	ensureExclusive ()
-	{ 
-		return m_p ? setCount (getCount ()) : true; 
+	{
+		return m_p ? setCount (getCount ()) : true;
 	}
 
 	void
@@ -809,7 +809,7 @@ public:
 		ASSERT (size >= sizeof (Hdr) + sizeof (T));
 
 		Hdr* oldHdr = getHdr ();
-		
+
 		mem::FFree* pfFree = bufKind == ref::BufKind_Static ? NULL : (mem::FFree*) -1;
 		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, pfFree);
 		newHdr->m_count = 0;

@@ -61,28 +61,28 @@ public:
 	bool
 	unlink (const char* name)
 	{
-		int result = sem_unlink (name);
+		int result = ::sem_unlink (name);
 		return err::complete (result == 0);
 	}
 
 	bool
 	post ()
 	{
-		int result = sem_post (m_sem);
+		int result = ::sem_post (m_sem);
 		return err::complete (result == 0);
 	}
 
 	bool
 	wait ()
 	{
-		int result = sem_wait (m_sem);
+		int result = ::sem_wait (m_sem);
 		return err::complete (result == 0);
 	}
 
 	bool
 	getValue (int* value)
 	{
-		int result = sem_getvalue (m_sem, value);
+		int result = ::sem_getvalue (m_sem, value);
 		return err::complete (result == 0);
 	}
 

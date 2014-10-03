@@ -23,8 +23,8 @@ ConnectionSock::open (
 	if (addr)
 	{
 		SOCKADDR addr;
-		
-		result = 
+
+		result =
 			addr->toWinSockAddr (&addr) &&
 			m_sock.bind (&addr);
 
@@ -33,7 +33,7 @@ ConnectionSock::open (
 	}
 
 	exe::Function <exe::Arg <ConnectionSock*>, exe::Arg <void> > onEvent (
-		pvoid_cast (&ConnectionSock::onSocketEvent_wt), 
+		pvoid_cast (&ConnectionSock::onSocketEvent_wt),
 		this
 		);
 
@@ -56,7 +56,7 @@ ConnectionSock::close ()
 		);
 }
 
-bool 
+bool
 ConnectionSock::connect (
 	const SockAddr* addr,
 	uint_t timeout,
@@ -71,7 +71,7 @@ ConnectionSock::connect (
 		uint_t,
 		exe::IFunction*
 		> > (
-		
+
 		pvoid_cast (&ConnectionSock::connect_wt),
 		this,
 		addr,
@@ -80,7 +80,7 @@ ConnectionSock::connect (
 		) != 0;
 }
 
-bool 
+bool
 ConnectionSock::disconnect (
 	uint_t timeout,
 	const exe::Function& onComplete
@@ -93,7 +93,7 @@ ConnectionSock::disconnect (
 		uint_t,
 		exe::IFunction*
 		> > (
-		
+
 		pvoid_cast (&ConnectionSock::disconnect_wt),
 		this,
 		timeout,
@@ -101,10 +101,10 @@ ConnectionSock::disconnect (
 		) != 0;
 }
 
-void 
+void
 onSyncConnectDisconnectComplete (
 	mt::Event* event,
-	err::Error* error,
+	err::ErrorData* error,
 	const err::Error& error
 	)
 {
@@ -114,7 +114,7 @@ onSyncConnectDisconnectComplete (
 	event->signal ();
 }
 
-bool 
+bool
 ConnectionSock::syncConnect (
 	const SockAddr* addr,
 	uint_t timeout
@@ -122,7 +122,7 @@ ConnectionSock::syncConnect (
 {
 	mt::Event event;
 	err::Error error;
-	
+
 	exe::Function <
 		exe::ArgSeq_2 <mt::Event*, err::Error*>,
 		OnConnectCompleteArg
@@ -140,7 +140,7 @@ ConnectionSock::syncConnect (
 	return true;
 }
 
-bool 
+bool
 ConnectionSock::syncDisconnect (uint_t timeout)
 {
 	mt::Event event;
@@ -178,7 +178,7 @@ ConnectionSock::send (
 		size_t,
 		exe::IFunction*
 		> > (
-		
+
 		pvoid_cast (&ConnectionSock::send_wt),
 		this,
 		p,
@@ -202,7 +202,7 @@ ConnectionSock::recv (
 		size_t,
 		exe::IFunction*
 		> > (
-		
+
 		pvoid_cast (&ConnectionSock::recv_wt),
 		this,
 		p,
@@ -215,7 +215,7 @@ void
 ConnectionSock::close_wt ()
 {
 	m_sock.close ();
-	
+
 	if (m_onConnectComplete)
 		m_onConnectComplete->invoke (0, &err::Error (err::StatusKind_Cancelled));
 
@@ -233,7 +233,7 @@ ConnectionSock::close_wt ()
 	m_hWorkerThreadEvent = NULL;
 }
 
-bool 
+bool
 ConnectionSock::connect_wt (
 	const SockAddr* addr,
 	uint_t timeout,
@@ -242,8 +242,8 @@ ConnectionSock::connect_wt (
 {
 	SOCKADDR addr;
 
-	bool result = 
-		addr->toWinSockAddr (&addr) && 
+	bool result =
+		addr->toWinSockAddr (&addr) &&
 		m_sock.select (m_event.m_event, FD_CONNECT) &&
 		m_sock.connect (&addr);
 
@@ -257,13 +257,13 @@ ConnectionSock::connect_wt (
 	return true;
 }
 
-bool 
+bool
 ConnectionSock::disconnect_wt (
 	uint_t timeout,
 	const exe::Function& onComplete
 	)
 {
-	bool result = 
+	bool result =
 		m_sock.select (m_event.m_event, FD_CLOSE) &&
 		m_sock.shutdown (SD_BOTH);
 
@@ -322,8 +322,8 @@ ConnectionSock::send_wt (
 	m_sendRecvList.insertTail (send);
 
 	bool result = m_sock.send (p, size, &send->m_overlapped, onSendRecvComplete_wt);
-	if (!result)	
-		completeSendRecv_wt (send, err::getError (), 0); 
+	if (!result)
+		completeSendRecv_wt (send, err::getError (), 0);
 
 	return result;
 }
@@ -342,8 +342,8 @@ ConnectionSock::recv_wt (
 	m_sendRecvList.insertTail (recv);
 
 	bool result = m_sock.recv (p, size, &recv->m_overlapped, onSendRecvComplete_wt);
-	if (!result)	
-		completeSendRecv_wt (recv, err::getError (), 0); 
+	if (!result)
+		completeSendRecv_wt (recv, err::getError (), 0);
 
 	return result;
 }

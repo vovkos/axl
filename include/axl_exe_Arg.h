@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2013. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_EXE_ARG_H
 
@@ -273,12 +273,12 @@ public:
 // specialization for TError
 
 template <>
-class Arg <const err::Error*>: public ArgVsoPtr <err::Error, err::GetErrorSize>
+class Arg <const err::ErrorData*>: public ArgVsoPtr <err::ErrorData, err::ErrorData::GetSize>
 {
 };
 
 template <>
-class Arg <err::Error*>: public ArgVsoPtr <err::Error, err::GetErrorSize>
+class Arg <err::ErrorData*>: public ArgVsoPtr <err::ErrorData, err::ErrorData::GetSize>
 {
 };
 
@@ -287,7 +287,7 @@ class Arg <err::Error*>: public ArgVsoPtr <err::Error, err::GetErrorSize>
 // compile-time sequencing
 
 template <
-	typename Arg1, 
+	typename Arg1,
 	typename Arg2
 	>
 class ArgSeqEx
@@ -348,7 +348,7 @@ public:
 //  helper typedefs for packing up to 6 arguments
 
 template <
-	typename Arg1, 
+	typename Arg1,
 	typename Arg2
 	>
 class ArgSeqEx_2: public ArgSeqEx <Arg1, Arg2>
@@ -358,8 +358,8 @@ class ArgSeqEx_2: public ArgSeqEx <Arg1, Arg2>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Arg1, 
-	typename Arg2, 
+	typename Arg1,
+	typename Arg2,
 	typename Arg3
 	>
 class ArgSeqEx_3: public ArgSeqEx <ArgSeqEx <Arg1, Arg2>, Arg3>
@@ -369,9 +369,9 @@ class ArgSeqEx_3: public ArgSeqEx <ArgSeqEx <Arg1, Arg2>, Arg3>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Arg1, 
-	typename Arg2, 
-	typename Arg3, 
+	typename Arg1,
+	typename Arg2,
+	typename Arg3,
 	typename Arg4
 	>
 class ArgSeqEx_4: public ArgSeqEx <ArgSeqEx_3 <Arg1, Arg2, Arg3>, Arg4>
@@ -381,10 +381,10 @@ class ArgSeqEx_4: public ArgSeqEx <ArgSeqEx_3 <Arg1, Arg2, Arg3>, Arg4>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Arg1, 
-	typename Arg2, 
-	typename Arg3, 
-	typename Arg4, 
+	typename Arg1,
+	typename Arg2,
+	typename Arg3,
+	typename Arg4,
 	typename Arg5
 	>
 class ArgSeqEx_5: public ArgSeqEx <ArgSeqEx_4 <Arg1, Arg2, Arg3, Arg4>, Arg5>
@@ -394,11 +394,11 @@ class ArgSeqEx_5: public ArgSeqEx <ArgSeqEx_4 <Arg1, Arg2, Arg3, Arg4>, Arg5>
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Arg1, 
-	typename Arg2, 
-	typename Arg3, 
-	typename Arg4, 
-	typename Arg5, 
+	typename Arg1,
+	typename Arg2,
+	typename Arg3,
+	typename Arg4,
+	typename Arg5,
 	typename Arg6
 	>
 class ArgSeqEx_6: public ArgSeqEx <ArgSeqEx_5 <Arg1, Arg2, Arg3, Arg4, Arg5>, Arg6>
@@ -410,11 +410,11 @@ class ArgSeqEx_6: public ArgSeqEx <ArgSeqEx_5 <Arg1, Arg2, Arg3, Arg4, Arg5>, Ar
 //  helper typedefs for packing up to 6 simple arguments
 
 template <
-	typename T1, 
+	typename T1,
 	typename T2
 	>
 class ArgSeq_2: public ArgSeqEx <
-	Arg <T1>, 
+	Arg <T1>,
 	Arg <T2>
 	>
 {
@@ -423,12 +423,12 @@ class ArgSeq_2: public ArgSeqEx <
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
+	typename T1,
+	typename T2,
 	typename T3
 	>
 class ArgSeq_3: public ArgSeqEx_3 <
-	Arg <T1>, 
+	Arg <T1>,
 	Arg <T2>,
 	Arg <T3>
 	>
@@ -438,13 +438,13 @@ class ArgSeq_3: public ArgSeqEx_3 <
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
-	typename T3, 
+	typename T1,
+	typename T2,
+	typename T3,
 	typename T4
 	>
 class ArgSeq_4: public ArgSeqEx_4 <
-	Arg <T1>, 
+	Arg <T1>,
 	Arg <T2>,
 	Arg <T3>,
 	Arg <T4>
@@ -455,14 +455,14 @@ class ArgSeq_4: public ArgSeqEx_4 <
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
-	typename T3, 
-	typename T4, 
+	typename T1,
+	typename T2,
+	typename T3,
+	typename T4,
 	typename T5
 	>
 class ArgSeq_5: public ArgSeqEx_5 <
-	Arg <T1>, 
+	Arg <T1>,
 	Arg <T2>,
 	Arg <T3>,
 	Arg <T4>,
@@ -474,15 +474,15 @@ class ArgSeq_5: public ArgSeqEx_5 <
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
-	typename T3, 
-	typename T4, 
-	typename T5, 
+	typename T1,
+	typename T2,
+	typename T3,
+	typename T4,
+	typename T5,
 	typename T6
 	>
 class ArgSeq_6: public ArgSeqEx_6 <
-	Arg <T1>, 
+	Arg <T1>,
 	Arg <T2>,
 	Arg <T3>,
 	Arg <T4>,
@@ -494,7 +494,7 @@ class ArgSeq_6: public ArgSeqEx_6 <
 
 //.............................................................................
 
-class ArgBlock: 
+class ArgBlock:
 	public ref::IRefCount,
 	public mem::Block
 {
@@ -511,7 +511,7 @@ public:
 //.............................................................................
 
 template <typename T>
-ref::Ptr <ArgBlock> 
+ref::Ptr <ArgBlock>
 createArgBlockV (axl_va_list va)
 {
 	size_t size = 0;
@@ -526,7 +526,7 @@ createArgBlockV (axl_va_list va)
 	if (T::hasShadow)
 	{
 		typedef ref::Box <typename T::Shadow> Shadow;
-		ref::Ptr <Shadow> shadow = AXL_REF_NEW (Shadow);		
+		ref::Ptr <Shadow> shadow = AXL_REF_NEW (Shadow);
 		T () (package + 1, &size, shadow, va);
 		package->m_agent.copy (type, shadow.getRefCount ());
 	}
@@ -535,14 +535,14 @@ createArgBlockV (axl_va_list va)
 		T () (package + 1, &size, NULL, va);
 		package->m_agent.copy (type, NULL);
 	}
-	
+
 	return package;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-ref::Ptr <ArgBlock> 
+ref::Ptr <ArgBlock>
 createArgBlock (
 	int unused,
 	...

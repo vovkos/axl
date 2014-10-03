@@ -80,7 +80,7 @@ public:
 	bool
 	unlink (const char* name)
 	{
-		int result = shm_unlink (name);
+		int result = ::shm_unlink (name);
 		return err::complete (result != -1);
 	}
 };

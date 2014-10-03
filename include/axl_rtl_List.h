@@ -37,8 +37,8 @@ protected:
 
 public:
 	IteratorBase ()
-	{ 
-		m_p = NULL; 
+	{
+		m_p = NULL;
 	}
 
 	operator const void* () const
@@ -46,21 +46,21 @@ public:
 		return m_p;
 	}
 
-	T& 
+	T&
 	operator ++ ()
-	{ 
+	{
 		return next ();
 	}
 
-	T& 
+	T&
 	operator -- ()
-	{ 
+	{
 		return prev ();
 	}
 
 	T
 	operator ++ (int) // post increment
-	{ 
+	{
 		T old = *(T*) this;
 		next ();
 		return old;
@@ -68,57 +68,57 @@ public:
 
 	T
 	operator -- (int) // post decrement
-	{ 
+	{
 		T old = *(T*) this;
 		prev ();
 		return old;
 	}
 
-	T& 
+	T&
 	operator += (size_t count)
-	{ 
-		return inc (count); 
+	{
+		return inc (count);
 	}
 
-	T& 
+	T&
 	operator -= (size_t count)
-	{ 
-		return inc (-count); 
+	{
+		return inc (-count);
 	}
 
 	T
 	operator + (size_t count) const
-	{ 
-		return getInc (count); 
+	{
+		return getInc (count);
 	}
 
 	T
 	operator - (size_t count) const
-	{ 
-		return getInc (-count); 
+	{
+		return getInc (-count);
 	}
 
-	T& 
+	T&
 	next ()
-	{	
-		if (m_p) 
-			m_p = m_p->m_next; 
+	{
+		if (m_p)
+			m_p = m_p->m_next;
 
 		return *(T*) this;
 	}
 
-	T& 
+	T&
 	prev ()
-	{	
-		if (m_p) 
-			m_p = m_p->m_prev; 
+	{
+		if (m_p)
+			m_p = m_p->m_prev;
 
 		return *(T*) this;
 	}
 
-	T& 
+	T&
 	inc (intptr_t count)
-	{	
+	{
 		intptr_t i;
 
 		if (count > 0)
@@ -131,34 +131,34 @@ public:
 		return *(T*) this;
 	}
 
-	T 
+	T
 	getNext () const
-	{ 
-		return IteratorBase (*this).next (); 
+	{
+		return IteratorBase (*this).next ();
 	}
 
-	T 
+	T
 	getPrev () const
-	{ 
-		return IteratorBase (*this).prev (); 
+	{
+		return IteratorBase (*this).prev ();
 	}
 
-	T 
+	T
 	getInc (intptr_t count) const
-	{ 
-		return IteratorBase (*this).inc (count); 
+	{
+		return IteratorBase (*this).inc (count);
 	}
 
-	const ListLink* 
+	const ListLink*
 	getLink () const
-	{ 
-		return m_p; 
+	{
+		return m_p;
 	}
 
-	static 
+	static
 	T
 	fromLink (const ListLink* p)
-	{ 
+	{
 		T it;
 		it.m_p = p;
 		return it;
@@ -168,43 +168,43 @@ public:
 //.............................................................................
 
 template <
-	typename T, 
-	typename Link = ImplicitCast <T*, ListLink*> 
+	typename T,
+	typename Link_0 = ImplicitCast <T*, ListLink*>
 	>
-class Iterator: public IteratorBase <Iterator <T, Link> >
+class Iterator: public IteratorBase <Iterator <T, Link_0> >
 {
 public:
-	typedef Link Link;
+	typedef Link_0 Link;
 
 public:
 	Iterator ()
-	{ 
+	{
 	}
 
 	template <
-		typename T2, 
+		typename T2,
 		typename Link2
 		>
 	Iterator (const Iterator <T2, Link2>& src)
-	{ 
-		operator = (*src); 
+	{
+		operator = (*src);
 	}
 
 	Iterator (T* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 
 	T*
 	operator * () const
-	{ 
-		return getObject (); 
+	{
+		return getObject ();
 	}
 
-	T* 
+	T*
 	operator -> () const
-	{ 
-		return getObject (); 
+	{
+		return getObject ();
 	}
 
 	Iterator&
@@ -214,75 +214,75 @@ public:
 		return *this;
 	}
 
-	bool 
+	bool
 	operator == (T* p) const
-	{ 
-		return this->m_p == (p ? Link () (p) : NULL); 
+	{
+		return this->m_p == (p ? Link () (p) : NULL);
 	}
 
-	bool 
+	bool
 	operator != (T* p) const
-	{ 
-		return !operator == (p); 
+	{
+		return !operator == (p);
 	}
 
 	T*
 	getEntry () const
 	{
-		return getEntryFromLink (this->m_p); 
+		return getEntryFromLink (this->m_p);
 	}
 
 	static
 	T*
 	getEntryFromLink (const ListLink* p)
-	{ 
+	{
 		return getObjectFromLink (p);
 	}
 
-	T* 
+	T*
 	getObject () const
-	{ 
-		return getObjectFromLink (this->m_p); 
+	{
+		return getObjectFromLink (this->m_p);
 	}
 
-	static 
+	static
 	T*
 	getObjectFromLink (const ListLink* p)
-	{ 
+	{
 		size_t offset = (size_t) Link () ((T*) 1) - 1;
-		return p ? (T*) ((uchar_t*) p - offset) : NULL; 
+		return p ? (T*) ((uchar_t*) p - offset) : NULL;
 	}
 };
 
 //.............................................................................
 
 template <
-	typename T, 
-	typename Iterator, 
-	typename Delete
+	typename T,
+	typename Iterator_0,
+	typename Delete_0
 	>
 class ListBase: protected ListData
 {
 public:
-	typedef Iterator Iterator;
-	typedef Delete OperatorDelete;
+	typedef Iterator_0 Iterator;
+	typedef Delete_0 Delete;
 	typedef typename Iterator::Link Link;
 
 public:
 	ListBase ()
-	{ 
+	{
 		construct ();
 	}
-	
+
 	~ListBase ()
-	{ 
-		clear (); 
+	{
+		clear ();
 	}
 
-	bool 
+	bool
 	isEmpty () const
-	{ 
-		return m_head == NULL; 
+	{
+		return m_head == NULL;
 	}
 
 	const ListData*
@@ -291,27 +291,27 @@ public:
 		return this;
 	}
 
-	size_t 
+	size_t
 	getCount () const
-	{ 
-		return m_count; 
+	{
+		return m_count;
 	}
 
-	Iterator 
+	Iterator
 	getHead () const
-	{ 
-		return Iterator::fromLink (m_head); 
+	{
+		return Iterator::fromLink (m_head);
 	}
 
-	Iterator 
+	Iterator
 	getTail () const
-	{ 
-		return Iterator::fromLink (m_tail); 
+	{
+		return Iterator::fromLink (m_tail);
 	}
 
-	T* 
+	T*
 	remove (Iterator it)
-	{ 
+	{
 		ListLink* link = (ListLink*) it.getLink ();
 		ListLink* next = link->m_next;
 		ListLink* prev = link->m_prev;
@@ -320,7 +320,7 @@ public:
 			prev->m_next = next;
 		else
 			m_head = next;
-		
+
 		if (next)
 			next->m_prev = prev;
 		else
@@ -330,35 +330,35 @@ public:
 		return it.getEntry ();
 	}
 
-	T* 
+	T*
 	removeHead ()
-	{ 
-		return m_head ? remove (Iterator::fromLink (m_head)) : NULL; 
+	{
+		return m_head ? remove (Iterator::fromLink (m_head)) : NULL;
 	}
 
-	T* 
+	T*
 	removeTail ()
-	{ 
-		return m_tail ? remove (Iterator::fromLink (m_tail)) : NULL; 
+	{
+		return m_tail ? remove (Iterator::fromLink (m_tail)) : NULL;
 	}
 
-	void 
+	void
 	clear ()
-	{ 
+	{
 		ListLink* link = m_head;
 		while (link)
 		{
 			T* p = Iterator::getEntryFromLink (link);
 			link = link->m_next;
-			OperatorDelete () (p);
+			Delete () (p);
 		}
 
 		construct ();
 	}
 
-	bool 
+	bool
 	clearButHead ()
-	{ 
+	{
 		if (isEmpty ())
 			return false;
 
@@ -368,9 +368,9 @@ public:
 		return true;
 	}
 
-	bool 
+	bool
 	clearButTail ()
-	{ 
+	{
 		if (isEmpty ())
 			return false;
 
@@ -380,9 +380,9 @@ public:
 		return true;
 	}
 
-	Iterator 
+	Iterator
 	insertHead (T* p)
-	{ 
+	{
 		ListLink* link = Link () (p);
 
 		link->m_prev = NULL;
@@ -399,14 +399,14 @@ public:
 		return Iterator::fromLink (link);
 	}
 
-	Iterator 
+	Iterator
 	insertTail (T* p)
-	{ 
+	{
 		ListLink* link = Link () (p);
 
 		link->m_next = NULL;
 		link->m_prev = m_tail;
-		
+
 		if (m_tail)
 			m_tail->m_next = link;
 		else
@@ -418,12 +418,12 @@ public:
 		return Iterator::fromLink (link);
 	}
 
-	Iterator 
+	Iterator
 	insertBefore (
-		T* p, 
+		T* p,
 		Iterator before
 		)
-	{ 
+	{
 		if (!before)
 			return insertTail (p);
 
@@ -445,12 +445,12 @@ public:
 		return Iterator::fromLink (link);
 	}
 
-	Iterator 
+	Iterator
 	insertAfter (
-		T* p, 
+		T* p,
 		Iterator after
 		)
-	{ 
+	{
 		if (!after)
 			return insertHead (p);
 
@@ -472,7 +472,7 @@ public:
 		return Iterator::fromLink (link);
 	}
 
-	void 
+	void
 	insertListHead (ListBase* src)
 	{
 		if (src->isEmpty ())
@@ -494,7 +494,7 @@ public:
 		src->m_count = 0;
 	}
 
-	void 
+	void
 	insertListTail (ListBase* src)
 	{
 		if (src->isEmpty ())
@@ -516,29 +516,29 @@ public:
 		src->m_count = 0;
 	}
 
-	void 
+	void
 	moveBefore (
-		Iterator it, 
+		Iterator it,
 		Iterator before
 		)
-	{ 
+	{
 		T* p = *it;
 		remove (it);
 		insertBefore (p, before);
 	}
 
-	void 
+	void
 	moveAfter (
-		Iterator it, 
+		Iterator it,
 		Iterator after
 		)
-	{ 
+	{
 		T* p = *it;
 		remove (it);
 		insertAfter (p, after);
 	}
 
-	void 
+	void
 	moveToHead (Iterator it)
 	{
 		T* p = *it;
@@ -546,7 +546,7 @@ public:
 		insertHead (p);
 	}
 
-	void 
+	void
 	moveToTail (Iterator it)
 	{
 		T* p = *it;
@@ -554,11 +554,11 @@ public:
 		insertTail (p);
 	}
 
-	void 
+	void
 	takeOver (ListBase* list)
 	{
 		clear ();
-		
+
 		m_head = list->m_head;
 		m_tail = list->m_tail;
 		m_count = list->m_count;
@@ -579,13 +579,13 @@ protected:
 //.............................................................................
 
 template <
-	typename T, 
-	typename Iterator
+	typename T,
+	typename Iterator_0
 	>
 class ConstListBase
 {
 public:
-	typedef Iterator Iterator;
+	typedef Iterator_0 Iterator;
 	typedef typename Iterator::Link Link;
 
 protected:
@@ -593,50 +593,50 @@ protected:
 
 public:
 	ConstListBase ()
-	{ 
+	{
 		m_listData = NULL;
 	}
 
-	bool 
+	bool
 	isEmpty () const
-	{ 
-		return m_listData ? m_listData->m_head == NULL : true;  
+	{
+		return m_listData ? m_listData->m_head == NULL : true;
 	}
 
-	size_t 
+	size_t
 	getCount () const
-	{ 
-		return m_listData ? m_listData->m_count : 0; 
+	{
+		return m_listData ? m_listData->m_count : 0;
 	}
 
-	Iterator 
+	Iterator
 	getHead () const
-	{ 
-		return m_listData ? Iterator::fromLink (m_listData->m_head) : Iterator ();  
+	{
+		return m_listData ? Iterator::fromLink (m_listData->m_head) : Iterator ();
 	}
 
-	Iterator 
+	Iterator
 	getTail () const
-	{ 
-		return m_listData ? Iterator::fromLink (m_listData->m_tail) : Iterator (); 
+	{
+		return m_listData ? Iterator::fromLink (m_listData->m_tail) : Iterator ();
 	}
 };
 
 //.............................................................................
 
 template <
-	typename T, 
-	typename Delete, 
-	typename Link = ImplicitCast <T*, ListLink*> 
+	typename T,
+	typename Delete,
+	typename Link = ImplicitCast <T*, ListLink*>
 	>
-class List: public ListBase <T, Iterator <T, Link>, Delete> 
+class List: public ListBase <T, Iterator <T, Link>, Delete>
 {
 public:
-	void 
+	void
 	erase (typename List::Iterator it)
-	{ 
-		T* p = this->remove (it); 
-		typename List::OperatorDelete () (p); 
+	{
+		T* p = this->remove (it);
+		typename List::Delete () (p);
 	}
 };
 
@@ -644,61 +644,61 @@ public:
 
 
 template <
-	typename T, 
-	typename Link = ImplicitCast <T*, ListLink*> 
+	typename T,
+	typename Link = ImplicitCast <T*, ListLink*>
 	>
-class StdList: public List <T, typename mem::StdFactory <T>::OperatorDelete, Link>
+class StdList: public List <T, typename mem::StdFactory <T>::Delete, Link>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T, 
-	typename Link = ImplicitCast <T*, ListLink*> 
+	typename T,
+	typename Link = ImplicitCast <T*, ListLink*>
 	>
-class CppList: public List <T, typename mem::CppFactory <T>::OperatorDelete, Link>
+class CppList: public List <T, typename mem::CppFactory <T>::Delete, Link>
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T, 
-	typename Link = ImplicitCast <T*, ListLink*> 
+	typename T,
+	typename Link = ImplicitCast <T*, ListLink*>
 	>
 class AuxList: public List <T, rtl::Void <T*>,  Link>
 {
 public:
 	AuxList ()
 	{
-		this->construct (); 
+		this->construct ();
 	}
 
 	void
 	clear ()
 	{
-		this->construct (); 
+		this->construct ();
 	}
 };
 
 //.............................................................................
 
 template <
-	typename T, 
-	typename Link = ImplicitCast <T*, ListLink*> 
+	typename T,
+	typename Link = ImplicitCast <T*, ListLink*>
 	>
-class ConstList: public ConstListBase <T, Iterator <T, Link> > 
+class ConstList: public ConstListBase <T, Iterator <T, Link> >
 {
 public:
 	ConstList ()
-	{ 
+	{
 	}
 
 	template <typename Delete>
 	ConstList (const List <T, Delete, Link>& list)
-	{ 
-		this->m_listData = list.getListData (); 
+	{
+		this->m_listData = list.getListData ();
 	}
 };
 

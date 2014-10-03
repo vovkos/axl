@@ -29,7 +29,7 @@ public:
 	bool
 	getAttr (termios* attr) const
 	{
-		int result = tcgetattr (m_h, attr);
+		int result = ::tcgetattr (m_h, attr);
 		return err::complete (result != -1);
 	}
 
@@ -39,28 +39,28 @@ public:
 		int action = TCSANOW
 		)
 	{
-		int result = tcsetattr (m_h, action, attr);
+		int result = ::tcsetattr (m_h, action, attr);
 		return err::complete (result != -1);
 	}
 
 	bool
 	drain ()
 	{
-		int result = tcdrain (m_h);
+		int result = ::tcdrain (m_h);
 		return err::complete (result != -1);
 	}
 
 	bool
 	flush (int queueSelector = TCIOFLUSH)
 	{
-		int result = tcflush (m_h, queueSelector);
+		int result = ::tcflush (m_h, queueSelector);
 		return err::complete (result != -1);
 	}
 
 	bool
 	flow (int action)
 	{
-		int result = tcflow (m_h, action);
+		int result = ::tcflow (m_h, action);
 		return err::complete (result != -1);
 	}
 
@@ -76,7 +76,7 @@ public:
 	bool
 	wait (uint_t mask)
 	{
-		int result = ioctl (m_h, TIOCMIWAIT, mask);
+		int result = ::ioctl (m_h, TIOCMIWAIT, mask);
 		return err::complete (result != -1);
 	}
 };

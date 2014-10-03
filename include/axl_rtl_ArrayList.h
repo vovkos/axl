@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2014. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_RTL_ARRAYLIST_H
 
@@ -18,7 +18,7 @@ template <typename T>
 class StdArrayList
 {
 public:
-	typedef Iterator <T> Iterator;
+	typedef rtl::Iterator <T> Iterator;
 
 protected:
 	rtl::StdList <T> m_list;
@@ -31,7 +31,7 @@ public:
 		return m_list.isEmpty ();
 	}
 
-	size_t 
+	size_t
 	getCount () const
 	{
 		ASSERT (m_list.getCount () == m_array.getCount ());
@@ -55,7 +55,7 @@ public:
 	{
 		T* p = AXL_MEM_NEW (T);
 		m_list.insertTail (p);
-		
+
 		size_t count = m_array.getCount ();
 		m_array.setCount (count + 1);
 		m_array [count] = p;
@@ -70,7 +70,7 @@ public:
 			return m_array [index];
 
 		m_array.setCount (index + 1);
-			
+
 		for (size_t i = count; i <= index; i++)
 		{
 			T* p = AXL_MEM_NEW (T);

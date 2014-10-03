@@ -24,7 +24,7 @@ public:
 	bool
 	setSize (uint64_t size)
 	{
-		int result = ftruncate64 (m_h, size);
+		int result = ::ftruncate64 (m_h, size);
 		return err::complete (result != -1);
 	}
 
@@ -34,14 +34,14 @@ public:
 	bool
 	setPosition (off64_t offset) const
 	{
-		uint64_t actualOffset = lseek64 (m_h, offset, SEEK_SET);
+		uint64_t actualOffset = ::lseek64 (m_h, offset, SEEK_SET);
 		return err::complete (actualOffset != -1);
 	}
 
 	bool
 	flush ()
 	{
-		int result = fdatasync (m_h);
+		int result = ::fdatasync (m_h);
 		return err::complete (result != -1);
 	}
 };

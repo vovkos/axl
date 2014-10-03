@@ -96,7 +96,7 @@ public:
 
 template <
 	typename T,
-	typename Delete = mem::StdFactory <T>::OperatorDelete
+	typename Delete = mem::StdFactory <T>::Delete
 	>
 class AutoPtrArray: public rtl::Array <T*, AutoPtrArrayDetails <T, Delete> >
 {

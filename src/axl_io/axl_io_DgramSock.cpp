@@ -23,8 +23,8 @@ DgramSock::open (
 	if (addr)
 	{
 		SOCKADDR addr;
-		
-		result = 
+
+		result =
 			addr->toWinSockAddr (&addr) &&
 			m_sock.bind (&addr);
 
@@ -51,7 +51,7 @@ DgramSock::close ()
 		);
 }
 
-bool 
+bool
 DgramSock::sendTo (
 	const void* p,
 	size_t size,
@@ -68,7 +68,7 @@ DgramSock::sendTo (
 		SockAddr*,
 		exe::IFunction*
 		> > (
-		
+
 		pvoid_cast (&DgramSock::sendTo_wt),
 		this,
 		p,
@@ -78,7 +78,7 @@ DgramSock::sendTo (
 		) != 0;
 }
 
-bool 
+bool
 DgramSock::recvFrom (
 	void* p,
 	size_t size,
@@ -93,7 +93,7 @@ DgramSock::recvFrom (
 		size_t,
 		exe::IFunction*
 		> > (
-		
+
 		pvoid_cast (&DgramSock::recvFrom_wt),
 		this,
 		p,
@@ -102,13 +102,13 @@ DgramSock::recvFrom (
 		) != 0;
 }
 
-void 
+void
 onSyncSendRecvComplete (
 	mt::Event* event,
-	err::Error* error,
+	err::ErrorData* error,
 	SockAddrU* addrFromBuf,
 	size_t* actualSize,
-	
+
 	const err::Error& error,
 	const SockAddrU* addrFrom,
 	size_t actualSize
@@ -116,15 +116,15 @@ onSyncSendRecvComplete (
 {
 	if (error)
 		*error = error;
-	
+
 	if (addrFromBuf)
 		*addrFromBuf = *addrFrom;
-	
+
 	*actualSize = actualSize;
 	event->signal ();
 }
 
-size_t 
+size_t
 DgramSock::syncSendTo (
 	const void* p,
 	size_t size,
@@ -134,7 +134,7 @@ DgramSock::syncSendTo (
 	mt::Event event;
 	err::Error error;
 	size_t actualSize;
-	
+
 	exe::Function <
 		exe::ArgSeq_4 <mt::Event*, err::Error*, SockAddrU*, size_t*>,
 		OnSendRecvCompleteArg
@@ -162,7 +162,7 @@ DgramSock::syncRecvFrom (
 	mt::Event event;
 	err::Error error;
 	size_t actualSize;
-	
+
 	exe::Function <
 		exe::ArgSeq_4 <mt::Event*, err::Error*, SockAddrU*, size_t*>,
 		OnSendRecvCompleteArg
@@ -184,7 +184,7 @@ void
 DgramSock::close_wt ()
 {
 	m_sock.close ();
-	
+
 	while (!m_sendRecvList.isEmpty ())
 		::SleepEx (0, true);
 
@@ -205,10 +205,10 @@ DgramSock::sendTo_wt (
 	send->m_overlapped.hEvent = send;
 	m_sendRecvList.insertTail (send);
 
-	bool result = 
+	bool result =
 		addr->toWinSockAddr (&send->m_address) &&
 		m_sock.sendTo (p, size, &send->m_address, &send->m_overlapped, onSendRecvComplete_wt);
-	
+
 	if (!result)
 		completeSendRecv_wt (send, err::getError (), 0);
 
@@ -230,15 +230,15 @@ DgramSock::recvFrom_wt (
 	m_sendRecvList.insertTail (recv);
 
 	bool result = m_sock.recvFrom (
-		p, size, 
-		&recv->m_address, 
-		&recv->m_addressSize, 
-		&recv->m_overlapped, 
+		p, size,
+		&recv->m_address,
+		&recv->m_addressSize,
+		&recv->m_overlapped,
 		onSendRecvComplete_wt
 		);
 
-	if (!result)	
-		completeSendRecv_wt (recv, err::getError (), 0); 
+	if (!result)
+		completeSendRecv_wt (recv, err::getError (), 0);
 
 	return result;
 }
