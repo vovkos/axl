@@ -33,11 +33,12 @@ public:
 //.............................................................................
 
 template <typename T>
-class BoxIterator: public IteratorBase <BoxIterator <T> >
+class BoxIterator: public IteratorBase <
+	BoxIterator <T>, 
+	BoxListEntry <T>, 
+	ImplicitCast <BoxListEntry <T>*, ListLink*>
+	>
 {
-public:
-	typedef ImplicitCast <BoxListEntry <T>*, ListLink*> Link;
-
 public:
 	BoxIterator ()
 	{
@@ -51,39 +52,26 @@ public:
 	T&
 	operator * () const
 	{
-		return *getObject ();
+		return r ();
 	}
 
 	T*
 	operator -> () const
 	{
-		return getObject ();
+		return p ();
 	}
 
-	BoxListEntry <T>*
-	getEntry () const
+	T&
+	r () const
 	{
-		return getEntryFromLink (this->m_p);
-	}
-
-	static
-	BoxListEntry <T>*
-	getEntryFromLink (const ListLink* p)
-	{
-		return (BoxListEntry <T>*) p;
+		ASSERT (this->m_p);
+		return *p ();
 	}
 
 	T*
-	getObject () const
+	p () const
 	{
-		return getObjectFromLink (this->m_p);
-	}
-
-	static
-	T*
-	getObjectFromLink (const ListLink* p)
-	{
-		return p ? &getEntryFromLink (p)->m_value : NULL;
+		return this->m_p ? &this->m_p->m_value : NULL;
 	}
 };
 

@@ -80,20 +80,18 @@ template <typename Key>
 class HashTableIterator: public Iterator <HashTableEntry <Key> >
 {
 public:
-	typedef HashTableEntry <Key> Entry;
-
 	HashTableIterator ()
 	{
 	}
 
 	HashTableIterator (const Iterator <HashTableEntry <Key> >& src)
 	{
-		this->m_p = src.getLink ();
+		this->m_p = src.getEntry ();
 	}
 
 	HashTableIterator (Entry* p)
 	{
-		operator = (p);
+		this->m_p = p;
 	}
 };
 
@@ -106,20 +104,18 @@ template <
 class HashTableMapIterator: public Iterator <HashTableMapEntry <Key, Value> >
 {
 public:
-	typedef HashTableMapEntry <Key, Value> Entry;
-
 	HashTableMapIterator ()
 	{
 	}
 
 	HashTableMapIterator (const Iterator <HashTableMapEntry <Key, Value> >& src)
 	{
-		this->m_p = src.getLink ();
+		this->m_p = src.getEntry ();
 	}
 
 	HashTableMapIterator (Entry* p)
 	{
-		operator = (p);
+		this->m_p = p;
 	}
 };
 

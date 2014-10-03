@@ -94,7 +94,7 @@ public:
 
 	StringHashTableMapIterator (const Iterator <typename StringHashTableMapIterator::Entry>& src)
 	{ 
-		this->m_p = src.getLink ();
+		this->m_p = src.getEntry ();
 	}
 
 	StringHashTableMapIterator (typename StringHashTableMapIterator::Entry* p)

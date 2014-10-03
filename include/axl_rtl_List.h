@@ -29,17 +29,27 @@ struct ListData
 
 //.............................................................................
 
-template <typename T>
+template <
+	typename T,
+	typename Entry_0,
+	typename GetLink_0
+	>
 class IteratorBase
 {
+public:
+	typedef Entry_0 Entry;
+	typedef GetLink_0 GetLink;
+
 protected:
-	const ListLink* m_p;
+	Entry* m_p;
 
 public:
 	IteratorBase ()
 	{
 		m_p = NULL;
 	}
+
+	// operator bool () might seem more logical, but then '+' and '-' will not work
 
 	operator const void* () const
 	{
@@ -102,7 +112,7 @@ public:
 	next ()
 	{
 		if (m_p)
-			m_p = m_p->m_next;
+			m_p = getEntryFromLink (getLink ()->m_next);
 
 		return *(T*) this;
 	}
@@ -111,7 +121,7 @@ public:
 	prev ()
 	{
 		if (m_p)
-			m_p = m_p->m_prev;
+			m_p = getEntryFromLink (getLink ()->m_prev);
 
 		return *(T*) this;
 	}
@@ -119,15 +129,16 @@ public:
 	T&
 	inc (intptr_t count)
 	{
-		intptr_t i;
+		const ListLink* link = getLink ();
 
 		if (count > 0)
-			for (i = 0; i < count && m_p; i++)
-				m_p = m_p->m_next;
+			for (intptr_t i = 0; i < count && link; i++)
+				link = link->m_next;
 		else
-			for (i = 0; i > count && m_p; i--)
-				m_p = m_p->m_prev;
+			for (intptr_t i = 0; i > count && link; i--)
+				link = link->m_prev;
 
+		m_p = getEntryFromLink (link);
 		return *(T*) this;
 	}
 
@@ -149,10 +160,30 @@ public:
 		return IteratorBase (*this).inc (count);
 	}
 
+	Entry*
+	getEntry () const
+	{
+		return m_p;
+	}
+
 	const ListLink*
 	getLink () const
 	{
-		return m_p;
+		return m_p ? GetLink () (m_p) : NULL;
+	}
+
+	static
+	Entry*
+	getEntryFromLink (const ListLink* p)
+	{
+		return p ? (Entry*) ((char*) p  + 1 - (size_t) GetLink () ((Entry*) 1)) : NULL;
+	}
+
+	static
+	const ListLink*
+	getLinkFromEntry (Entry* p)
+	{
+		return p ? GetLink () (p) : NULL;
 	}
 
 	static
@@ -160,7 +191,7 @@ public:
 	fromLink (const ListLink* p)
 	{
 		T it;
-		it.m_p = p;
+		it.m_p = getEntryFromLink (p);
 		return it;
 	}
 };
@@ -169,13 +200,10 @@ public:
 
 template <
 	typename T,
-	typename Link_0 = ImplicitCast <T*, ListLink*>
+	typename GetLink = ImplicitCast <T*, ListLink*>
 	>
-class Iterator: public IteratorBase <Iterator <T, Link_0> >
+class Iterator: public IteratorBase <Iterator <T, GetLink>, T, GetLink>
 {
-public:
-	typedef Link_0 Link;
-
 public:
 	Iterator ()
 	{
@@ -183,41 +211,41 @@ public:
 
 	template <
 		typename T2,
-		typename Link2
+		typename GetLink2
 		>
-	Iterator (const Iterator <T2, Link2>& src)
+	Iterator (const Iterator <T2, GetLink2>& src)
 	{
 		operator = (*src);
 	}
 
 	Iterator (T* p)
 	{
-		operator = (p);
+		this->m_p = p;
 	}
 
 	T*
 	operator * () const
 	{
-		return getObject ();
+		return this->m_p;
 	}
 
 	T*
 	operator -> () const
 	{
-		return getObject ();
+		return this->m_p;
 	}
 
 	Iterator&
 	operator = (T* p)
 	{
-		this->m_p = p ? Link () (p) : NULL;
+		this->m_p = p;
 		return *this;
 	}
 
 	bool
 	operator == (T* p) const
 	{
-		return this->m_p == (p ? Link () (p) : NULL);
+		return this->m_p == p;
 	}
 
 	bool
@@ -226,31 +254,9 @@ public:
 		return !operator == (p);
 	}
 
-	T*
-	getEntry () const
+	T* p () const
 	{
-		return getEntryFromLink (this->m_p);
-	}
-
-	static
-	T*
-	getEntryFromLink (const ListLink* p)
-	{
-		return getObjectFromLink (p);
-	}
-
-	T*
-	getObject () const
-	{
-		return getObjectFromLink (this->m_p);
-	}
-
-	static
-	T*
-	getObjectFromLink (const ListLink* p)
-	{
-		size_t offset = (size_t) Link () ((T*) 1) - 1;
-		return p ? (T*) ((uchar_t*) p - offset) : NULL;
+		return this->m_p;
 	}
 };
 
@@ -266,7 +272,7 @@ class ListBase: protected ListData
 public:
 	typedef Iterator_0 Iterator;
 	typedef Delete_0 Delete;
-	typedef typename Iterator::Link Link;
+	typedef typename Iterator::GetLink GetLink;
 
 public:
 	ListBase ()
@@ -383,7 +389,7 @@ public:
 	Iterator
 	insertHead (T* p)
 	{
-		ListLink* link = Link () (p);
+		ListLink* link = GetLink () (p);
 
 		link->m_prev = NULL;
 		link->m_next = m_head;
@@ -402,7 +408,7 @@ public:
 	Iterator
 	insertTail (T* p)
 	{
-		ListLink* link = Link () (p);
+		ListLink* link = GetLink () (p);
 
 		link->m_next = NULL;
 		link->m_prev = m_tail;
@@ -427,7 +433,7 @@ public:
 		if (!before)
 			return insertTail (p);
 
-		ListLink* link = Link () (p);
+		ListLink* link = GetLink () (p);
 		ListLink* beforeLink = (ListLink*) before.getLink ();
 		ListLink* prev = beforeLink->m_prev;
 
@@ -454,7 +460,7 @@ public:
 		if (!after)
 			return insertHead (p);
 
-		ListLink* link = Link () (p);
+		ListLink* link = GetLink () (p);
 		ListLink* afterLink = (ListLink*) after.getLink ();
 		ListLink* next = afterLink->m_next;
 
@@ -586,7 +592,7 @@ class ConstListBase
 {
 public:
 	typedef Iterator_0 Iterator;
-	typedef typename Iterator::Link Link;
+	typedef typename Iterator::GetLink GetLink;
 
 protected:
 	const ListData* m_listData;
@@ -627,9 +633,9 @@ public:
 template <
 	typename T,
 	typename Delete,
-	typename Link = ImplicitCast <T*, ListLink*>
+	typename GetLink = ImplicitCast <T*, ListLink*>
 	>
-class List: public ListBase <T, Iterator <T, Link>, Delete>
+class List: public ListBase <T, Iterator <T, GetLink>, Delete>
 {
 public:
 	void
@@ -645,9 +651,9 @@ public:
 
 template <
 	typename T,
-	typename Link = ImplicitCast <T*, ListLink*>
+	typename GetLink = ImplicitCast <T*, ListLink*>
 	>
-class StdList: public List <T, typename mem::StdFactory <T>::Delete, Link>
+class StdList: public List <T, typename mem::StdFactory <T>::Delete, GetLink>
 {
 };
 
@@ -655,9 +661,9 @@ class StdList: public List <T, typename mem::StdFactory <T>::Delete, Link>
 
 template <
 	typename T,
-	typename Link = ImplicitCast <T*, ListLink*>
+	typename GetLink = ImplicitCast <T*, ListLink*>
 	>
-class CppList: public List <T, typename mem::CppFactory <T>::Delete, Link>
+class CppList: public List <T, typename mem::CppFactory <T>::Delete, GetLink>
 {
 };
 
@@ -665,9 +671,9 @@ class CppList: public List <T, typename mem::CppFactory <T>::Delete, Link>
 
 template <
 	typename T,
-	typename Link = ImplicitCast <T*, ListLink*>
+	typename GetLink = ImplicitCast <T*, ListLink*>
 	>
-class AuxList: public List <T, rtl::Void <T*>,  Link>
+class AuxList: public List <T, rtl::Void <T*>,  GetLink>
 {
 public:
 	AuxList ()
@@ -686,9 +692,9 @@ public:
 
 template <
 	typename T,
-	typename Link = ImplicitCast <T*, ListLink*>
+	typename GetLink = ImplicitCast <T*, ListLink*>
 	>
-class ConstList: public ConstListBase <T, Iterator <T, Link> >
+class ConstList: public ConstListBase <T, Iterator <T, GetLink> >
 {
 public:
 	ConstList ()
@@ -696,7 +702,7 @@ public:
 	}
 
 	template <typename Delete>
-	ConstList (const List <T, Delete, Link>& list)
+	ConstList (const List <T, Delete, GetLink>& list)
 	{
 		this->m_listData = list.getListData ();
 	}
