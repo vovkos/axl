@@ -64,7 +64,7 @@ GdiEngine::createStockFont (int stockFontKind)
 	dword_t gdiObjectType = ::GetObjectType (h);
 	if (gdiObjectType != OBJ_FONT)
 	{
-		err::setError (err::StatusKind_InvalidHandle);
+		err::setError (err::SystemErrorCode_InvalidHandle);
 		return ref::PtrKind_Null;
 	}
 
@@ -114,7 +114,7 @@ GdiEngine::getFontMod (
 	font->m_fontDesc.m_flags = flags;
 	font->m_h = hFont;
 
-	ASSERT (!(flags & FontFlagKind_Transparent) && flags < countof (fontTuple->m_fontModArray));
+	ASSERT (!(flags & FontFlag_Transparent) && flags < countof (fontTuple->m_fontModArray));
 	ASSERT (!fontTuple->m_fontModArray [flags]);
 
 	fontTuple->m_fontModArray [flags] = font;
@@ -164,7 +164,7 @@ ref::Ptr <Image>
 GdiEngine::createImage (
 	int width,
 	int height,
-	PixelFormatKind pixelFormat,
+	PixelFormat pixelFormat,
 	const void* data,
 	bool isScreenCompatible
 	)
@@ -173,11 +173,11 @@ GdiEngine::createImage (
 
 	switch (pixelFormat)
 	{
-	case PixelFormatKind_Rgba:
+	case PixelFormat_Rgba:
 		bitCount = 32;
 		break;
 
-	case PixelFormatKind_Rgb:
+	case PixelFormat_Rgb:
 		bitCount = 24;
 		break;
 
@@ -264,7 +264,7 @@ GdiEngine::createOffscreenCanvas (
 uintptr_t 
 GdiEngine::registerClipboardFormat (const rtl::String& formatName)
 {
-	err::setError (err::StatusKind_NotImplemented);
+	err::setError (err::SystemErrorCode_NotImplemented);
 	return -1;
 }
 
@@ -280,7 +280,7 @@ GdiEngine::readClipboard (rtl::String* string)
 	{
 		::CloseClipboard();
 
-		err::setError (err::StatusKind_InvalidDeviceRequest);
+		err::setError (err::SystemErrorCode_InvalidDeviceRequest);
 		return false;
 	}
 
@@ -310,7 +310,7 @@ GdiEngine::readClipboard (
 	rtl::Array <char>* data
 	)
 {
-	err::setError (err::StatusKind_NotImplemented);
+	err::setError (err::SystemErrorCode_NotImplemented);
 	return false;
 }
 
@@ -342,7 +342,7 @@ GdiEngine::writeClipboard (
 	size_t size
 	)
 {
-	err::setError (err::StatusKind_NotImplemented);
+	err::setError (err::SystemErrorCode_NotImplemented);
 	return false;
 }
 

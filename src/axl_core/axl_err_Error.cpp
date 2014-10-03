@@ -16,7 +16,7 @@ ErrorData::isKind (
 {
 	const ErrorData* error = this;
 
-	if (m_guid == rtl::GUID_Null && m_code == StdErrorKind_Stack)
+	if (m_guid == rtl::GUID_Null && m_code == StdErrorCode_Stack)
 		error++;
 
 	return error->m_guid == guid && error->m_code == code;
@@ -62,7 +62,7 @@ Error::push (const ErrorData& error)
 	size_t base = 0;
 	size_t baseSize = m_p->m_size;
 
-	if (m_p->isKind (GUID_StdError, StdErrorKind_Stack))
+	if (m_p->isKind (GUID_StdError, StdErrorCode_Stack))
 	{
 		base += sizeof (ErrorData);
 		baseSize -= sizeof (ErrorData);
@@ -82,7 +82,7 @@ Error::push (const ErrorData& error)
 
 	m_p->m_size = (uint32_t) size;
 	m_p->m_guid = GUID_StdError;
-	m_p->m_code = StdErrorKind_Stack;
+	m_p->m_code = StdErrorCode_Stack;
 
 	memcpy (m_p + 1, &error, error.m_size);
 	return m_p;
@@ -150,7 +150,7 @@ Error::createStringError (
 
 	error->m_size = (uint32_t) size;
 	error->m_guid = GUID_StdError;
-	error->m_code = StdErrorKind_String;
+	error->m_code = StdErrorCode_String;
 
 	char* dst = (char*) (error + 1);
 
@@ -174,8 +174,8 @@ Error::formatStringError_va (
 
 //.............................................................................
 
-ErrorModeKind
-setErrorMode (ErrorModeKind mode)
+ErrorMode
+setErrorMode (ErrorMode mode)
 {
 	return getErrorMgr ()->setErrorMode (mode);
 }
@@ -205,14 +205,14 @@ StdErrorProvider::getErrorDescription (const ErrorData* error)
 
 	switch (error->m_code)
 	{
-	case StdErrorKind_NoError:
+	case StdErrorCode_NoError:
 		return "no error";
 
-	case StdErrorKind_String:
+	case StdErrorCode_String:
 		length = (error->m_size - sizeof (ErrorData)) / sizeof (char);
 		return rtl::String ((char*) (error + 1), length);
 
-	case StdErrorKind_Stack:
+	case StdErrorCode_Stack:
 		return getStackErrorDescription (error);
 
 	default:

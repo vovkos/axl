@@ -15,7 +15,7 @@ LuaState::create ()
 	m_h = luaL_newstate ();
 	if (!m_h)
 	{
-		err::setError (err::StatusKind_InsufficientResources);
+		err::setError (err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
 

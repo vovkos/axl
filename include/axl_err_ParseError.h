@@ -18,14 +18,14 @@ AXL_RTL_DEFINE_GUID (GUID_ParseError, 0x56fc601e, 0x5d2c, 0x4bbe, 0xb4, 0x55, 0x
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ParseErrorKind
+enum ParseErrorCode
 {
-	ParseErrorKind_SrcPos,
-	ParseErrorKind_InvalidSyntax,
-	ParseErrorKind_InvalidSyntaxIn,
-	ParseErrorKind_ExpectedToken,
-	ParseErrorKind_UnexpectedToken,
-	ParseErrorKind_UnexpectedTokenIn,
+	ParseErrorCode_SrcPos,
+	ParseErrorCode_InvalidSyntax,
+	ParseErrorCode_InvalidSyntaxIn,
+	ParseErrorCode_ExpectedToken,
+	ParseErrorCode_UnexpectedToken,
+	ParseErrorCode_UnexpectedTokenIn,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -62,7 +62,7 @@ pushSrcPosError (
 {
 	return pushPackError <rtl::PackSeq_3 <const char*, int, int> > (
 		GUID_ParseError,
-		ParseErrorKind_SrcPos, 
+		ParseErrorCode_SrcPos, 
 		filePath, 
 		line, 
 		col
@@ -95,7 +95,7 @@ ensureSrcPosError (
 	)
 {
 	Error error = getError ();
-	return error->isKind (GUID_ParseError, ParseErrorKind_SrcPos) ? error : pushSrcPosError (filePath, line, col);
+	return error->isKind (GUID_ParseError, ParseErrorCode_SrcPos) ? error : pushSrcPosError (filePath, line, col);
 }
 
 inline
@@ -119,7 +119,7 @@ inline
 Error
 setSyntaxError ()
 {
-	return setError (GUID_ParseError, ParseErrorKind_InvalidSyntax);
+	return setError (GUID_ParseError, ParseErrorCode_InvalidSyntax);
 }
 
 inline
@@ -128,7 +128,7 @@ setSyntaxError (const char* location)
 {
 	return setPackError <rtl::Pack <const char*> > (
 		GUID_ParseError,
-		ParseErrorKind_InvalidSyntaxIn, 
+		ParseErrorCode_InvalidSyntaxIn, 
 		location
 		);
 }
@@ -142,7 +142,7 @@ setExpectedTokenError (
 {
 	return setPackError <rtl::PackSeq_2 <const char*, const char*> > (
 		GUID_ParseError,
-		ParseErrorKind_ExpectedToken, 
+		ParseErrorCode_ExpectedToken, 
 		expectedToken,
 		actualToken
 		);
@@ -154,7 +154,7 @@ setUnexpectedTokenError (const char* token)
 {
 	return setPackError <rtl::Pack <const char*> > (
 		GUID_ParseError,
-		ParseErrorKind_UnexpectedToken, 
+		ParseErrorCode_UnexpectedToken, 
 		token
 		);
 }
@@ -168,7 +168,7 @@ setUnexpectedTokenError (
 {
 	return setPackError <rtl::PackSeq_2 <const char*, const char*> > (
 		GUID_ParseError,
-		ParseErrorKind_UnexpectedTokenIn, 
+		ParseErrorCode_UnexpectedTokenIn, 
 		token,
 		location
 		);

@@ -25,7 +25,7 @@ MappedViewMgr::find (
 
 	// ok, now try to find existing view using the view map...
 
-	ViewMap::Iterator it = m_viewMap.findEx (begin, rtl::BinTreeFindExKind_Le);
+	ViewMap::Iterator it = m_viewMap.find (begin, rtl::BinTreeFindRelOp_Le);
 	if (!it)
 		return NULL;
 
@@ -54,13 +54,13 @@ MappedViewMgr::view (
 	size_t size = (size_t) (end - begin);
 	
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t access = (m_mappedFile->m_fileFlags & FileFlagKind_ReadOnly) ? 
+	uint_t access = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ? 
 		FILE_MAP_READ : 
 		FILE_MAP_READ | FILE_MAP_WRITE;	
 
 	p = viewEntry->m_view.view (m_mappedFile->m_mapping, access, begin, size);
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int protection = (m_mappedFile->m_fileFlags & FileFlagKind_ReadOnly) ? 
+	int protection = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ? 
 		PROT_READ : 
 		PROT_READ | PROT_WRITE;	
 	
@@ -198,8 +198,8 @@ MappedFile::setSize (
 	bool unmapAndApplyNow
 	)
 {
-	if (m_fileFlags & FileFlagKind_ReadOnly)
-		return err::fail (err::StatusKind_InvalidDeviceRequest);
+	if (m_fileFlags & FileFlag_ReadOnly)
+		return err::fail (err::SystemErrorCode_InvalidDeviceRequest);
 
 	m_fileSize = size;
 
@@ -217,7 +217,7 @@ MappedFile::setup (
 	)
 {
 	if (!maxDynamicViewCount)
-		return err::fail (err::StatusKind_InvalidParameter);
+		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	m_maxDynamicViewCount = maxDynamicViewCount;
 	m_readAheadSize = readAheadSize;
@@ -237,8 +237,8 @@ MappedFile::view (
 
 	if (end > m_fileSize)
 	{	
-		if (m_fileFlags & FileFlagKind_ReadOnly)
-			return err::fail ((void*) NULL, err::StatusKind_InvalidDeviceRequest);
+		if (m_fileFlags & FileFlag_ReadOnly)
+			return err::fail ((void*) NULL, err::SystemErrorCode_InvalidDeviceRequest);
 		
 		m_fileSize = end;
 		
@@ -296,11 +296,11 @@ MappedFile::viewImpl (
 	{
 		uint_t protection;
 
-		if (m_fileFlags & FileFlagKind_ReadOnly)
+		if (m_fileFlags & FileFlag_ReadOnly)
 		{
 			if (end > m_fileSize)
 			{
-				err::setError (err::StatusKind_InvalidAddress);
+				err::setError (err::SystemErrorCode_InvalidAddress);
 				return NULL;
 			}
 

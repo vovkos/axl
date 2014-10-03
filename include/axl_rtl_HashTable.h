@@ -130,10 +130,10 @@ template <
 class HashTable
 {
 public:
-	enum DefKind
+	enum Def
 	{
-		DefKind_InitialBucketCount = 32,
-		DefKind_ResizeThreshold    = 75,
+		Def_InitialBucketCount = 32,
+		Def_ResizeThreshold    = 75,
 	};
 
 	typedef Key_0 Key;
@@ -152,7 +152,7 @@ protected:
 public:
 	HashTable ()
 	{
-		m_resizeThreshold = DefKind_ResizeThreshold;
+		m_resizeThreshold = Def_ResizeThreshold;
 	}
 
 	void
@@ -258,7 +258,7 @@ public:
 		size_t bucketCount = m_table.getCount ();
 		if (!bucketCount)
 		{
-			bucketCount = DefKind_InitialBucketCount;
+			bucketCount = Def_InitialBucketCount;
 
 			bool result = m_table.setCount (bucketCount);
 			if (!result)

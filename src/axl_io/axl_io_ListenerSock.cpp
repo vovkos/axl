@@ -10,7 +10,7 @@ namespace io {
 
 bool
 ListenerSock::open (
-	SockProtoKind protocol,
+	SockProto protocol,
 	const SockAddr* addr
 	)
 {

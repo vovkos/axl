@@ -13,10 +13,10 @@ namespace rtl {
 
 //.............................................................................
 
-enum RbColorKind
+enum RbColor
 {
-	RbColorKind_Black = 0,
-	RbColorKind_Red   = 1
+	RbColor_Black = 0,
+	RbColor_Red   = 1
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -28,11 +28,11 @@ template <
 class RbTreeNodeBase: public BinTreeNodeBase <T, NodeData>
 {
 public:
-	RbColorKind m_color;
+	RbColor m_color;
 
 	RbTreeNodeBase ()
 	{ 
-		m_color = RbColorKind_Black; 
+		m_color = RbColor_Black; 
 	}
 
 	static 
@@ -42,7 +42,7 @@ public:
 		T* node2
 		)
 	{
-		RbColorKind oldColor = node1->m_color;
+		RbColor oldColor = node1->m_color;
 		node1->m_color = node2->m_color;
 		node2->m_color = oldColor;
 	}
@@ -51,7 +51,7 @@ public:
 	int 
 	getColor (T* node)
 	{ 
-		return node ? node->m_color : RbColorKind_Black; 
+		return node ? node->m_color : RbColor_Black; 
 	}
 
 #ifdef _DEBUG
@@ -69,14 +69,14 @@ public:
 
 		ASSERT (leftCount == rightCount);
 
-		if (node->m_color == RbColorKind_Black)
+		if (node->m_color == RbColor_Black)
 		{
 			leftCount++;
 		}
 		else // red color cannot have red children
 		{
-			ASSERT (getColor (node->m_left) == RbColorKind_Black);
-			ASSERT (getColor (node->m_right) == RbColorKind_Black);
+			ASSERT (getColor (node->m_left) == RbColor_Black);
+			ASSERT (getColor (node->m_right) == RbColor_Black);
 		}
 
 		return leftCount;
@@ -133,21 +133,21 @@ public:
 	void 
 	onInsert (Node* x)
 	{
-		x->m_color = RbColorKind_Red; // make new node red
+		x->m_color = RbColor_Red; // make new node red
 
 		// check Red-Black properties 
-		while (x != this->m_root && x->m_parent->m_color == RbColorKind_Red) 
+		while (x != this->m_root && x->m_parent->m_color == RbColor_Red) 
 		{
 			// we have a violation 
 			if (x->m_parent == x->m_parent->m_parent->m_left) 
 			{
 				Node *y = x->m_parent->m_parent->m_right;
-				if (Node::getColor (y) == RbColorKind_Red) 
+				if (Node::getColor (y) == RbColor_Red) 
 				{
 					// uncle is red 
-					x->m_parent->m_color = RbColorKind_Black;
-					y->m_color = RbColorKind_Black;
-					x->m_parent->m_parent->m_color = RbColorKind_Red;
+					x->m_parent->m_color = RbColor_Black;
+					y->m_color = RbColor_Black;
+					x->m_parent->m_parent->m_color = RbColor_Red;
 					x = x->m_parent->m_parent;
 				} 
 				else 
@@ -161,8 +161,8 @@ public:
 					}
 
 					// recolor and rotate
-					x->m_parent->m_color = RbColorKind_Black;
-					x->m_parent->m_parent->m_color = RbColorKind_Red;
+					x->m_parent->m_color = RbColor_Black;
+					x->m_parent->m_parent->m_color = RbColor_Red;
 					this->rotateRight (x->m_parent->m_parent);
 				}
 			} 
@@ -170,12 +170,12 @@ public:
 			{
 				// mirror image of above code
 				Node *y = x->m_parent->m_parent->m_left;
-				if (Node::getColor (y) == RbColorKind_Red) 
+				if (Node::getColor (y) == RbColor_Red) 
 				{
 					// uncle is red
-					x->m_parent->m_color = RbColorKind_Black;
-					y->m_color = RbColorKind_Black;
-					x->m_parent->m_parent->m_color = RbColorKind_Red;
+					x->m_parent->m_color = RbColor_Black;
+					y->m_color = RbColor_Black;
+					x->m_parent->m_parent->m_color = RbColor_Red;
 					x = x->m_parent->m_parent;
 				} 
 				else 
@@ -187,14 +187,14 @@ public:
 						this->rotateRight (x);
 					}
 
-					x->m_parent->m_color = RbColorKind_Black;
-					x->m_parent->m_parent->m_color = RbColorKind_Red;
+					x->m_parent->m_color = RbColor_Black;
+					x->m_parent->m_parent->m_color = RbColor_Red;
 					this->rotateLeft (x->m_parent->m_parent);
 				}
 			}
 		}
 
-		this->m_root->m_color = RbColorKind_Black;
+		this->m_root->m_color = RbColor_Black;
 
 	#if (_AXL_RTL_RBTREE_ASSERT_VALID)
 		assertValid ();
@@ -208,10 +208,10 @@ public:
 		Node* p = node->m_parent;
 
 		// no need to fixup red node deletion
-		if (node->m_color == RbColorKind_Red) 
+		if (node->m_color == RbColor_Red) 
 			return;
 
-		while (x != this->m_root && Node::getColor (x) == RbColorKind_Black) 
+		while (x != this->m_root && Node::getColor (x) == RbColor_Black) 
 		{
 			// due to invariants of RB-tree black node must have a non-null sibling 
 			// if this sibling is red, both of its children are non-null black 
@@ -220,36 +220,36 @@ public:
 			{
 				Node *w = p->m_right; // non-null, see above
 
-				if (w->m_color == RbColorKind_Red) 
+				if (w->m_color == RbColor_Red) 
 				{
-					w->m_color = RbColorKind_Black;
-					p->m_color = RbColorKind_Red;
+					w->m_color = RbColor_Black;
+					p->m_color = RbColor_Red;
 					this->rotateLeft (p); 
 					w = p->m_right; // non-null black, see above
 				}
 
 				// w is non-null black
 
-				if (Node::getColor (w->m_left) == RbColorKind_Black && 
-					Node::getColor (w->m_right) == RbColorKind_Black) 
+				if (Node::getColor (w->m_left) == RbColor_Black && 
+					Node::getColor (w->m_right) == RbColor_Black) 
 				{
-					w->m_color = RbColorKind_Red;
+					w->m_color = RbColor_Red;
 					x = p;
 				} 
 				else // at least one of w children is red 
 				{
-					if (Node::getColor (w->m_right) == RbColorKind_Black) 
+					if (Node::getColor (w->m_right) == RbColor_Black) 
 					{
 						// w->m_pLeft is red
-						w->m_left->m_color = RbColorKind_Black; 
-						w->m_color = RbColorKind_Red;
+						w->m_left->m_color = RbColor_Black; 
+						w->m_color = RbColor_Red;
 						this->rotateRight (w); 
 						w = p->m_right; // non-null black (just rotated here)
 					}
 	                
 					w->m_color = p->m_color;
-					p->m_color = RbColorKind_Black;
-					w->m_right->m_color = RbColorKind_Black; // w->m_pRight is non-null
+					p->m_color = RbColor_Black;
+					w->m_right->m_color = RbColor_Black; // w->m_pRight is non-null
 
 					this->rotateLeft (p); 
 					x = this->m_root; 
@@ -259,36 +259,36 @@ public:
 			{
 				Node *w = p->m_left; // non-null, see above
 
-				if (w->m_color == RbColorKind_Red) 
+				if (w->m_color == RbColor_Red) 
 				{
-					w->m_color = RbColorKind_Black;
-					p->m_color = RbColorKind_Red;
+					w->m_color = RbColor_Black;
+					p->m_color = RbColor_Red;
 					this->rotateRight (p); 
 					w = p->m_left; // non-null black, see above
 				}
 	            
 				// w is non-null black
 
-				if (Node::getColor (w->m_left) == RbColorKind_Black && 
-					Node::getColor (w->m_right) == RbColorKind_Black) 
+				if (Node::getColor (w->m_left) == RbColor_Black && 
+					Node::getColor (w->m_right) == RbColor_Black) 
 				{
-					w->m_color = RbColorKind_Red;
+					w->m_color = RbColor_Red;
 					x = p;
 				} 
 				else // at least one of w children is red 
 				{
-					if (Node::getColor (w->m_left) == RbColorKind_Black) 
+					if (Node::getColor (w->m_left) == RbColor_Black) 
 					{
 						// w->m_pRight is red
-						w->m_right->m_color = RbColorKind_Black;
-						w->m_color = RbColorKind_Red;
+						w->m_right->m_color = RbColor_Black;
+						w->m_color = RbColor_Red;
 						this->rotateLeft (w); 
 						w = p->m_left; // non-null black (just rotated)
 					}
 
 					w->m_color = p->m_color;
-					p->m_color = RbColorKind_Black;
-					w->m_left->m_color = RbColorKind_Black; // w->m_pLeft is non-null
+					p->m_color = RbColor_Black;
+					w->m_left->m_color = RbColor_Black; // w->m_pLeft is non-null
 
 					this->rotateRight (p); 
 					x = this->m_root; 
@@ -299,7 +299,7 @@ public:
 		}
 	 
 		if (x)
-			x->m_color = RbColorKind_Black;
+			x->m_color = RbColor_Black;
 
 	#if (_AXL_RTL_RBTREE_ASSERT_VALID)
 		assertValid ();

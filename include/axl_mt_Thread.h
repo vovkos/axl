@@ -55,11 +55,11 @@ public:
 		if (!m_thread.isOpen ())
 			return;
 
-		win::WaitResultKind result = m_thread.wait (timeout);
-		if (result != win::WaitResultKind_Object0)
+		win::WaitResult result = m_thread.wait (timeout);
+		if (result != win::WaitResult_Object0)
 		{
 			ASSERT (false); // terminating thread
-			m_thread.terminate (err::StatusKind_IoTimeout);
+			m_thread.terminate (err::SystemErrorCode_IoTimeout);
 		}
 
 		m_thread.close ();

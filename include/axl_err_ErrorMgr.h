@@ -22,7 +22,7 @@ class ErrorMgr
 protected:
 	struct ThreadEntry
 	{
-		ErrorModeKind m_mode;
+		ErrorMode m_mode;
 		Error m_error;
 	};
 
@@ -50,15 +50,15 @@ public:
 	ErrorProvider* 
 	findProvider (const rtl::Guid& guid);
 
-	ErrorModeKind
+	ErrorMode
 	getErrorMode ()
 	{
 		ThreadEntry* entry = findThreadEntry ();
-		return entry ? entry->m_mode : ErrorModeKind_NoThrow;
+		return entry ? entry->m_mode : ErrorMode_NoThrow;
 	}
 
-	ErrorModeKind
-	setErrorMode (ErrorModeKind mode);
+	ErrorMode
+	setErrorMode (ErrorMode mode);
 
 	Error
 	getError ();

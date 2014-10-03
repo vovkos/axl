@@ -27,8 +27,8 @@ Mapping::open (
 	void* p;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t protection = (flags & FileFlagKind_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
-	uint_t access = (flags & FileFlagKind_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
+	uint_t protection = (flags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
+	uint_t access = (flags & FileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
 	bool result = m_mapping.create (file->m_file, NULL, protection, offset + size);
 	if (!result)
@@ -41,7 +41,7 @@ Mapping::open (
 		return NULL;
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int protection = (flags & FileFlagKind_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
+	int protection = (flags & FileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
 	p = m_mapping.map (NULL, size, protection, MAP_SHARED, file->m_file, offset);
 	if (!p)
@@ -67,12 +67,12 @@ Mapping::open (
 	void* p;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint_t protection = (flags & FileFlagKind_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
-	uint_t access = (flags & FileFlagKind_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
+	uint_t protection = (flags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
+	uint_t access = (flags & FileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
 	rtl::String_w name_w = name;
 
-	bool result = (flags & FileFlagKind_OpenExisting) ?
+	bool result = (flags & FileFlag_OpenExisting) ?
 		m_mapping.open (access, false, name_w):
 		m_mapping.create (INVALID_HANDLE_VALUE, NULL, protection, size, name_w);
 
@@ -86,10 +86,10 @@ Mapping::open (
 		return NULL;
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	int shmFlags = (flags & FileFlagKind_ReadOnly) ? O_RDONLY : O_RDWR;
-	int protection = (flags & FileFlagKind_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
+	int shmFlags = (flags & FileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
+	int protection = (flags & FileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
-	if (!(flags & FileFlagKind_OpenExisting))
+	if (!(flags & FileFlag_OpenExisting))
 	{
 		shmFlags |= O_CREAT;
 		m_sharedMemoryName = name;
@@ -107,7 +107,7 @@ Mapping::open (
 		return NULL;
 	}
 
-	if (!(flags & FileFlagKind_OpenExisting))
+	if (!(flags & FileFlag_OpenExisting))
 		m_sharedMemoryName = name;
 #endif
 

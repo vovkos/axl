@@ -68,13 +68,13 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum BinTreeFindExKind
+enum BinTreeFindRelOp
 {
-	BinTreeFindExKind_Eq = 0,
-	BinTreeFindExKind_Lt,
-	BinTreeFindExKind_Le,
-	BinTreeFindExKind_Gt,
-	BinTreeFindExKind_Ge,
+	BinTreeFindRelOp_Eq = 0,
+	BinTreeFindRelOp_Lt,
+	BinTreeFindRelOp_Le,
+	BinTreeFindRelOp_Gt,
+	BinTreeFindRelOp_Ge,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -146,9 +146,9 @@ public:
 	}
 
 	Iterator
-	findEx (
+	find (
 		const Key& key,
-		BinTreeFindExKind findExKind
+		BinTreeFindRelOp relOp
 		) const
 	{
 		Node* node = m_root;
@@ -171,21 +171,21 @@ public:
 		}
 
 		ASSERT (node || prevNode);
-		switch (findExKind)
+		switch (relOp)
 		{
-		case BinTreeFindExKind_Lt:
+		case BinTreeFindRelOp_Lt:
 			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator (prevNode).getPrev ();
 
-		case BinTreeFindExKind_Le:
+		case BinTreeFindRelOp_Le:
 			return node ? node : prevCmp > 0 ? prevNode : Iterator (prevNode).getPrev ();
 
-		case BinTreeFindExKind_Gt:
+		case BinTreeFindRelOp_Gt:
 			return node ? node->m_right : prevCmp < 0 ? prevNode : Iterator (prevNode).getNext ();
 
-		case BinTreeFindExKind_Ge:
+		case BinTreeFindRelOp_Ge:
 			return node ? node : prevCmp < 0 ? prevNode : Iterator (prevNode).getNext ();
 
-		case BinTreeFindExKind_Eq:
+		case BinTreeFindRelOp_Eq:
 		default:
 			return node;
 		}

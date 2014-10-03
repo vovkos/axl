@@ -7,7 +7,7 @@ namespace gui {
 
 //.............................................................................
 
-static uint_t g_stdPalColorArray [StdPalColorKind__Count] =
+static uint_t g_stdPalColorArray [StdPalColor__Count] =
 {
 	0, // EStdPalColor_Widget,
 	0, // EStdPalColor_Text,
@@ -20,27 +20,27 @@ static uint_t g_stdPalColorArray [StdPalColorKind__Count] =
 	0, // EStdPalColor_3DLight,
 	0, // EStdPalColor_3DHiLight,
 
-	StdColorKind_Black,
-	StdColorKind_White,
-	StdColorKind_Gray,
-	StdColorKind_Red,
-	StdColorKind_Green,
-	StdColorKind_Blue,
-	StdColorKind_Purple,
-	StdColorKind_Cyan,
-	StdColorKind_LightRed,
-	StdColorKind_LightGreen,
-	StdColorKind_LightBlue,
-	StdColorKind_LightPurple,
-	StdColorKind_LightCyan,
-	StdColorKind_PastelGray,
-	StdColorKind_PastelRed,
-	StdColorKind_PastelOrange,
-	StdColorKind_PastelYellow,
-	StdColorKind_PastelGreen,
-	StdColorKind_PastelCyan,
-	StdColorKind_PastelBlue,
-	StdColorKind_PastelPurple,
+	StdColor_Black,
+	StdColor_White,
+	StdColor_Gray,
+	StdColor_Red,
+	StdColor_Green,
+	StdColor_Blue,
+	StdColor_Purple,
+	StdColor_Cyan,
+	StdColor_LightRed,
+	StdColor_LightGreen,
+	StdColor_LightBlue,
+	StdColor_LightPurple,
+	StdColor_LightCyan,
+	StdColor_PastelGray,
+	StdColor_PastelRed,
+	StdColor_PastelOrange,
+	StdColor_PastelYellow,
+	StdColor_PastelGreen,
+	StdColor_PastelCyan,
+	StdColor_PastelBlue,
+	StdColor_PastelPurple,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -55,27 +55,27 @@ void
 updateStdPalSystemColors ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_WidgetText]    = inverseRgb (::GetSysColor (COLOR_WINDOWTEXT));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_WidgetBack]    = inverseRgb (::GetSysColor (COLOR_WINDOW));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_GrayText]      = inverseRgb (::GetSysColor (COLOR_GRAYTEXT));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_SelectionText] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHTTEXT));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_SelectionBack] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHT));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DFace]        = inverseRgb (::GetSysColor (COLOR_3DFACE));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DShadow]      = inverseRgb (::GetSysColor (COLOR_3DSHADOW));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DDarkShadow]  = inverseRgb (::GetSysColor (COLOR_3DDKSHADOW));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DLight]       = inverseRgb (::GetSysColor (COLOR_3DLIGHT));
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DHiLight]     = inverseRgb (::GetSysColor (COLOR_3DHILIGHT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetText]    = inverseRgb (::GetSysColor (COLOR_WINDOWTEXT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetBack]    = inverseRgb (::GetSysColor (COLOR_WINDOW));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_GrayText]      = inverseRgb (::GetSysColor (COLOR_GRAYTEXT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionText] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHTTEXT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionBack] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DFace]        = inverseRgb (::GetSysColor (COLOR_3DFACE));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DShadow]      = inverseRgb (::GetSysColor (COLOR_3DSHADOW));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DDarkShadow]  = inverseRgb (::GetSysColor (COLOR_3DDKSHADOW));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DLight]       = inverseRgb (::GetSysColor (COLOR_3DLIGHT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DHiLight]     = inverseRgb (::GetSysColor (COLOR_3DHILIGHT));
 #else
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_WidgetText]    = 0x000000;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_WidgetBack]    = 0xffffff;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_GrayText]      = 0x808080;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_SelectionText] = 0xffffff;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_SelectionBack] = 0x000080;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DFace]        = 0xc0c0c0;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DShadow]      = 0x808080;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DDarkShadow]  = 0x000000;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DLight]       = 0xe0e0e0;
-	g_stdPalColorArray [~ColorFlagKind_Index & StdPalColorKind_3DHiLight]     = 0xffffff;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetText]    = 0x000000;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetBack]    = 0xffffff;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_GrayText]      = 0x808080;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionText] = 0xffffff;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionBack] = 0x000080;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DFace]        = 0xc0c0c0;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DShadow]      = 0x808080;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DDarkShadow]  = 0x000000;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DLight]       = 0xe0e0e0;
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DHiLight]     = 0xffffff;
 #endif
 }
 
@@ -102,10 +102,10 @@ parseColorString (
 		if (end_o)
 			*end_o = NULL;
 
-		return ColorFlagKind_Transparent;
+		return ColorFlag_Transparent;
 	}
 
-	uint_t color = ColorFlagKind_Transparent;
+	uint_t color = ColorFlag_Transparent;
 
 	char* end;
 
@@ -119,7 +119,7 @@ parseColorString (
 	{
 		uint_t index = strtol (string, &end, 10);
 		if (end != string)
-			color = ColorFlagKind_Index | index;
+			color = ColorFlag_Index | index;
 	}
 
 	if (end_o)
@@ -137,7 +137,7 @@ ColorAttr::parse (
 	)
 {
 	m_foreColor = parseColorString (string, &string);
-	m_backColor = ColorFlagKind_Transparent;
+	m_backColor = ColorFlag_Transparent;
 
 	while (isspace (*string))
 		string++;

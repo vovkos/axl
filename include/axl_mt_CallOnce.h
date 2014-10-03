@@ -14,41 +14,41 @@ namespace mt {
 //.............................................................................
 
 template <
-	typename Function,
+	typename Functor,
 	typename Argument
 	>
 void 
 callOnce (
-	Function functor,
+	Functor functor,
 	Argument argument,
 	volatile int32_t* flag = NULL
 	)
 {
-	enum OnceKind
+	enum OnceFlag
 	{
-		OnceKind_Uninitialized = 0,
-		OnceKind_Initializing  = 1,
-		OnceKind_Initialized   = 2,
+		OnceFlag_Uninitialized = 0,
+		OnceFlag_Initializing  = 1,
+		OnceFlag_Initialized   = 2,
 	};
 
-	static volatile int32_t _Flag = 0;
+	static volatile int32_t defaultFlag = 0;
 	if (!flag)
-		flag = &_Flag;
+		flag = &defaultFlag;
 
 	int32_t value = *flag;
-	if (value == OnceKind_Initialized)
+	if (value == OnceFlag_Initialized)
 		return;
 
-	if (value == OnceKind_Uninitialized && // try to save one interlocked cmpxcg
-		mt::atomicCmpXchg (flag, OnceKind_Uninitialized, OnceKind_Initializing) == OnceKind_Uninitialized)
+	if (value == OnceFlag_Uninitialized && // try to save one interlocked cmpxcg
+		mt::atomicCmpXchg (flag, OnceFlag_Uninitialized, OnceFlag_Initializing) == OnceFlag_Uninitialized)
 	{
 		functor (argument);
-		mt::atomicXchg (flag, OnceKind_Initialized);
+		mt::atomicXchg (flag, OnceFlag_Initialized);
 	}
 	else do
 	{
 		mt::yieldProcessor ();
-	} while (*flag != OnceKind_Initialized);
+	} while (*flag != OnceFlag_Initialized);
 }
 
 //.............................................................................

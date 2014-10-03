@@ -23,34 +23,34 @@ namespace err {
 
 //.............................................................................
 
-enum ErrorModeKind
+enum ErrorMode
 {
-	ErrorModeKind_NoThrow       = 0,
-	ErrorModeKind_CppException  = 1,
+	ErrorMode_NoThrow       = 0,
+	ErrorMode_CppException  = 1,
 
 	// these 2 are almost useless unless in C-style code without classes
 
-	ErrorModeKind_SehException  = 2,
-	ErrorModeKind_SetJmpLongJmp = 4,
+	ErrorMode_SehException  = 2,
+	ErrorMode_SetJmpLongJmp = 4,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-ErrorModeKind
+ErrorMode
 getErrorMode ();
 
-ErrorModeKind // returns previous one
-setErrorMode (ErrorModeKind mode);
+ErrorMode // returns previous one
+setErrorMode (ErrorMode mode);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class ScopeErrorMode
 {
 protected:
-	ErrorModeKind m_oldMode;
+	ErrorMode m_oldMode;
 
 public:
-	ScopeErrorMode (ErrorModeKind mode)
+	ScopeErrorMode (ErrorMode mode)
 	{
 		m_oldMode = setErrorMode (mode);
 	}
@@ -69,11 +69,11 @@ extern
 AXL_SELECT_ANY
 const rtl::Guid GUID_StdError = rtl::GUID_Null;
 
-enum StdErrorKind
+enum StdErrorCode
 {
-	StdErrorKind_NoError,
-	StdErrorKind_String,
-	StdErrorKind_Stack,
+	StdErrorCode_NoError,
+	StdErrorCode_String,
+	StdErrorCode_Stack,
 };
 
 //.............................................................................
@@ -86,46 +86,46 @@ extern const rtl::Guid GUID_WinError;
 
 #define GUID_SystemError GUID_WinError
 
-enum StatusKind
+enum SystemErrorCode
 {
-	StatusKind_Success                  = ERROR_SUCCESS,
-	StatusKind_Pending                  = ERROR_IO_PENDING,
-	StatusKind_Cancelled                = ERROR_OPERATION_ABORTED,
-	StatusKind_Unsuccessful             = ERROR_GEN_FAILURE,
-	StatusKind_InsufficientResources    = ERROR_NO_SYSTEM_RESOURCES,
-	StatusKind_NotImplemented           = ERROR_INVALID_FUNCTION,
-	StatusKind_InvalidHandle            = ERROR_INVALID_HANDLE,
-	StatusKind_AddressAlreadyExists     = ERROR_DUP_NAME,
-	StatusKind_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
-	StatusKind_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
-	StatusKind_InvalidAddress           = ERROR_UNEXP_NET_ERR,
-	StatusKind_AddressClosed            = ERROR_NETNAME_DELETED,
-	StatusKind_BufferOverflow           = ERROR_MORE_DATA,
-	StatusKind_InvalidParameter         = ERROR_INVALID_PARAMETER,
-	StatusKind_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
-	StatusKind_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
-	StatusKind_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
-	StatusKind_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
-	StatusKind_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
-	StatusKind_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
-	StatusKind_ConnectionReset          = ERROR_NETNAME_DELETED,
-	StatusKind_IoTimeout                = ERROR_SEM_TIMEOUT,
-	StatusKind_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
-	StatusKind_DataNotAccepted          = ERROR_INVALID_DATA,
-	StatusKind_MoreProcessingRequired   = ERROR_MORE_DATA,
-	StatusKind_InvalidDeviceState       = ERROR_BAD_COMMAND,
-	StatusKind_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
-	StatusKind_HostUnreachable          = ERROR_HOST_UNREACHABLE,
-	StatusKind_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
-	StatusKind_PortUnreachable          = ERROR_PORT_UNREACHABLE,
-	StatusKind_InvalidDeviceRequest     = ERROR_INVALID_FUNCTION,
-	StatusKind_RequestAborted           = ERROR_REQUEST_ABORTED,
-	StatusKind_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
-	StatusKind_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
-	StatusKind_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
-	StatusKind_AccessDenied             = ERROR_ACCESS_DENIED,
-	StatusKind_SharingViolation         = ERROR_SHARING_VIOLATION,
-	StatusKind_NoMoreEntries            = ERROR_NO_MORE_ITEMS,
+	SystemErrorCode_Success                  = ERROR_SUCCESS,
+	SystemErrorCode_Pending                  = ERROR_IO_PENDING,
+	SystemErrorCode_Cancelled                = ERROR_OPERATION_ABORTED,
+	SystemErrorCode_Unsuccessful             = ERROR_GEN_FAILURE,
+	SystemErrorCode_InsufficientResources    = ERROR_NO_SYSTEM_RESOURCES,
+	SystemErrorCode_NotImplemented           = ERROR_INVALID_FUNCTION,
+	SystemErrorCode_InvalidHandle            = ERROR_INVALID_HANDLE,
+	SystemErrorCode_AddressAlreadyExists     = ERROR_DUP_NAME,
+	SystemErrorCode_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
+	SystemErrorCode_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
+	SystemErrorCode_InvalidAddress           = ERROR_UNEXP_NET_ERR,
+	SystemErrorCode_AddressClosed            = ERROR_NETNAME_DELETED,
+	SystemErrorCode_BufferOverflow           = ERROR_MORE_DATA,
+	SystemErrorCode_InvalidParameter         = ERROR_INVALID_PARAMETER,
+	SystemErrorCode_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
+	SystemErrorCode_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
+	SystemErrorCode_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
+	SystemErrorCode_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
+	SystemErrorCode_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
+	SystemErrorCode_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
+	SystemErrorCode_ConnectionReset          = ERROR_NETNAME_DELETED,
+	SystemErrorCode_IoTimeout                = ERROR_SEM_TIMEOUT,
+	SystemErrorCode_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
+	SystemErrorCode_DataNotAccepted          = ERROR_INVALID_DATA,
+	SystemErrorCode_MoreProcessingRequired   = ERROR_MORE_DATA,
+	SystemErrorCode_InvalidDeviceState       = ERROR_BAD_COMMAND,
+	SystemErrorCode_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
+	SystemErrorCode_HostUnreachable          = ERROR_HOST_UNREACHABLE,
+	SystemErrorCode_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
+	SystemErrorCode_PortUnreachable          = ERROR_PORT_UNREACHABLE,
+	SystemErrorCode_InvalidDeviceRequest     = ERROR_INVALID_FUNCTION,
+	SystemErrorCode_RequestAborted           = ERROR_REQUEST_ABORTED,
+	SystemErrorCode_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
+	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
+	SystemErrorCode_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
+	SystemErrorCode_AccessDenied             = ERROR_ACCESS_DENIED,
+	SystemErrorCode_SharingViolation         = ERROR_SHARING_VIOLATION,
+	SystemErrorCode_NoMoreEntries            = ERROR_NO_MORE_ITEMS,
 };
 
 inline
@@ -143,46 +143,46 @@ extern const rtl::Guid GUID_NtError;
 
 #define GUID_SystemError GUID_NtError
 
-enum StatusKind
+enum SystemErrorCode
 {
-	StatusKind_Success                  = STATUS_SUCCESS,
-	StatusKind_Pending                  = STATUS_PENDING,
-	StatusKind_Cancelled                = STATUS_CANCELLED,
-	StatusKind_Unsuccessful             = STATUS_UNSUCCESSFUL,
-	StatusKind_InsufficientResources    = STATUS_INSUFFICIENT_RESOURCES,
-	StatusKind_NotImplemented           = STATUS_NOT_IMPLEMENTED,
-	StatusKind_InvalidHandle            = STATUS_INVALID_HANDLE,
-	StatusKind_AddressAlreadyExists     = STATUS_ADDRESS_ALREADY_EXISTS,
-	StatusKind_InvalidAddressComponent  = STATUS_INVALID_ADDRESS_COMPONENT,
-	StatusKind_TooManyAddresses         = STATUS_TOO_MANY_ADDRESSES,
-	StatusKind_InvalidAddress           = STATUS_INVALID_ADDRESS,
-	StatusKind_AddressClosed            = STATUS_ADDRESS_CLOSED,
-	StatusKind_BufferOverflow           = STATUS_BUFFER_OVERFLOW,
-	StatusKind_InvalidParameter         = STATUS_INVALID_PARAMETER,
-	StatusKind_ConnectionRefused        = STATUS_CONNECTION_REFUSED,
-	StatusKind_ConnectionInvalid        = STATUS_CONNECTION_INVALID,
-	StatusKind_AddressAlreadyAssociated = STATUS_ADDRESS_ALREADY_ASSOCIATED,
-	StatusKind_AddressNotAssociated     = STATUS_ADDRESS_NOT_ASSOCIATED,
-	StatusKind_ConnectionActive         = STATUS_CONNECTION_ACTIVE,
-	StatusKind_ConnectionAborted        = STATUS_CONNECTION_ABORTED,
-	StatusKind_ConnectionReset          = STATUS_CONNECTION_RESET,
-	StatusKind_IoTimeout                = STATUS_IO_TIMEOUT,
-	StatusKind_GracefulDisconnect       = STATUS_GRACEFUL_DISCONNECT,
-	StatusKind_DataNotAccepted          = STATUS_DATA_NOT_ACCEPTED,
-	StatusKind_MoreProcessingRequired   = STATUS_MORE_PROCESSING_REQUIRED,
-	StatusKind_InvalidDeviceState       = STATUS_INVALID_DEVICE_STATE,
-	StatusKind_NetworkUnreachable       = STATUS_NETWORK_UNREACHABLE,
-	StatusKind_HostUnreachable          = STATUS_HOST_UNREACHABLE,
-	StatusKind_ProtocolUnreachable      = STATUS_PROTOCOL_UNREACHABLE,
-	StatusKind_PortUnreachable          = STATUS_PORT_UNREACHABLE,
-	StatusKind_InvalidDeviceRequest     = STATUS_INVALID_DEVICE_REQUEST,
-	StatusKind_RequestAborted           = STATUS_REQUEST_ABORTED,
-	StatusKind_BufferTooSmall           = STATUS_BUFFER_TOO_SMALL,
-	StatusKind_InvalidBufferSize        = STATUS_INVALID_BUFFER_SIZE,
-	StatusKind_ObjectNameNotFound       = STATUS_OBJECT_NAME_NOT_FOUND,
-	StatusKind_AccessDenied             = STATUS_ACCESS_DENIED,
-	StatusKind_SharingViolation         = STATUS_SHARING_VIOLATION,
-	StatusKind_NoMoreEntries            = STATUS_NO_MORE_ENTRIES,
+	SystemErrorCode_Success                  = STATUS_SUCCESS,
+	SystemErrorCode_Pending                  = STATUS_PENDING,
+	SystemErrorCode_Cancelled                = STATUS_CANCELLED,
+	SystemErrorCode_Unsuccessful             = STATUS_UNSUCCESSFUL,
+	SystemErrorCode_InsufficientResources    = STATUS_INSUFFICIENT_RESOURCES,
+	SystemErrorCode_NotImplemented           = STATUS_NOT_IMPLEMENTED,
+	SystemErrorCode_InvalidHandle            = STATUS_INVALID_HANDLE,
+	SystemErrorCode_AddressAlreadyExists     = STATUS_ADDRESS_ALREADY_EXISTS,
+	SystemErrorCode_InvalidAddressComponent  = STATUS_INVALID_ADDRESS_COMPONENT,
+	SystemErrorCode_TooManyAddresses         = STATUS_TOO_MANY_ADDRESSES,
+	SystemErrorCode_InvalidAddress           = STATUS_INVALID_ADDRESS,
+	SystemErrorCode_AddressClosed            = STATUS_ADDRESS_CLOSED,
+	SystemErrorCode_BufferOverflow           = STATUS_BUFFER_OVERFLOW,
+	SystemErrorCode_InvalidParameter         = STATUS_INVALID_PARAMETER,
+	SystemErrorCode_ConnectionRefused        = STATUS_CONNECTION_REFUSED,
+	SystemErrorCode_ConnectionInvalid        = STATUS_CONNECTION_INVALID,
+	SystemErrorCode_AddressAlreadyAssociated = STATUS_ADDRESS_ALREADY_ASSOCIATED,
+	SystemErrorCode_AddressNotAssociated     = STATUS_ADDRESS_NOT_ASSOCIATED,
+	SystemErrorCode_ConnectionActive         = STATUS_CONNECTION_ACTIVE,
+	SystemErrorCode_ConnectionAborted        = STATUS_CONNECTION_ABORTED,
+	SystemErrorCode_ConnectionReset          = STATUS_CONNECTION_RESET,
+	SystemErrorCode_IoTimeout                = STATUS_IO_TIMEOUT,
+	SystemErrorCode_GracefulDisconnect       = STATUS_GRACEFUL_DISCONNECT,
+	SystemErrorCode_DataNotAccepted          = STATUS_DATA_NOT_ACCEPTED,
+	SystemErrorCode_MoreProcessingRequired   = STATUS_MORE_PROCESSING_REQUIRED,
+	SystemErrorCode_InvalidDeviceState       = STATUS_INVALID_DEVICE_STATE,
+	SystemErrorCode_NetworkUnreachable       = STATUS_NETWORK_UNREACHABLE,
+	SystemErrorCode_HostUnreachable          = STATUS_HOST_UNREACHABLE,
+	SystemErrorCode_ProtocolUnreachable      = STATUS_PROTOCOL_UNREACHABLE,
+	SystemErrorCode_PortUnreachable          = STATUS_PORT_UNREACHABLE,
+	SystemErrorCode_InvalidDeviceRequest     = STATUS_INVALID_DEVICE_REQUEST,
+	SystemErrorCode_RequestAborted           = STATUS_REQUEST_ABORTED,
+	SystemErrorCode_BufferTooSmall           = STATUS_BUFFER_TOO_SMALL,
+	SystemErrorCode_InvalidBufferSize        = STATUS_INVALID_BUFFER_SIZE,
+	SystemErrorCode_ObjectNameNotFound       = STATUS_OBJECT_NAME_NOT_FOUND,
+	SystemErrorCode_AccessDenied             = STATUS_ACCESS_DENIED,
+	SystemErrorCode_SharingViolation         = STATUS_SHARING_VIOLATION,
+	SystemErrorCode_NoMoreEntries            = STATUS_NO_MORE_ENTRIES,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -193,45 +193,45 @@ extern const rtl::Guid GUID_Errno;
 
 #define GUID_SystemError GUID_Errno
 
-enum StatusKind
+enum SystemErrorCode
 {
-	StatusKind_Success                  = 0,
-	StatusKind_Cancelled                = EINTR,
-	StatusKind_Unsuccessful             = EIO,
-	StatusKind_InsufficientResources    = ENOMEM,
-	StatusKind_NotImplemented           = ENOSYS,
-	StatusKind_InvalidHandle            = EBADF,
-	StatusKind_AddressAlreadyExists     = EEXIST,
-/*	StatusKind_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
-	StatusKind_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
-	StatusKind_InvalidAddress           = ERROR_UNEXP_NET_ERR,
-	StatusKind_AddressClosed            = ERROR_NETNAME_DELETED,
-	StatusKind_BufferOverflow           = ERROR_MORE_DATA,*/
-	StatusKind_InvalidParameter         = EINVAL,
-/*	StatusKind_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
-	StatusKind_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
-	StatusKind_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
-	StatusKind_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
-	StatusKind_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
-	StatusKind_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
-	StatusKind_ConnectionReset          = ERROR_NETNAME_DELETED,
-	StatusKind_IoTimeout                = ERROR_SEM_TIMEOUT,
-	StatusKind_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
-	StatusKind_DataNotAccepted          = ERROR_INVALID_DATA,
-	StatusKind_MoreProcessingRequired   = ERROR_MORE_DATA, */
-	StatusKind_InvalidDeviceState       = EBUSY,
-/*	StatusKind_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
-	StatusKind_HostUnreachable          = ERROR_HOST_UNREACHABLE,
-	StatusKind_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
-	StatusKind_PortUnreachable          = ERROR_PORT_UNREACHABLE,*/
-	StatusKind_InvalidDeviceRequest     = ENOSYS,
-/*	StatusKind_RequestAborted           = ERROR_REQUEST_ABORTED,
-	StatusKind_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
-	StatusKind_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
-	StatusKind_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
-	StatusKind_AccessDenied             = ERROR_ACCESS_DENIED,
-	StatusKind_SharingViolation         = ERROR_SHARING_VIOLATION,
-	StatusKind_NoMoreEntries            = ERROR_NO_MORE_ITEMS, */
+	SystemErrorCode_Success                  = 0,
+	SystemErrorCode_Cancelled                = EINTR,
+	SystemErrorCode_Unsuccessful             = EIO,
+	SystemErrorCode_InsufficientResources    = ENOMEM,
+	SystemErrorCode_NotImplemented           = ENOSYS,
+	SystemErrorCode_InvalidHandle            = EBADF,
+	SystemErrorCode_AddressAlreadyExists     = EEXIST,
+/*	SystemErrorCode_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
+	SystemErrorCode_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
+	SystemErrorCode_InvalidAddress           = ERROR_UNEXP_NET_ERR,
+	SystemErrorCode_AddressClosed            = ERROR_NETNAME_DELETED,
+	SystemErrorCode_BufferOverflow           = ERROR_MORE_DATA,*/
+	SystemErrorCode_InvalidParameter         = EINVAL,
+/*	SystemErrorCode_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
+	SystemErrorCode_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
+	SystemErrorCode_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
+	SystemErrorCode_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
+	SystemErrorCode_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
+	SystemErrorCode_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
+	SystemErrorCode_ConnectionReset          = ERROR_NETNAME_DELETED,
+	SystemErrorCode_IoTimeout                = ERROR_SEM_TIMEOUT,
+	SystemErrorCode_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
+	SystemErrorCode_DataNotAccepted          = ERROR_INVALID_DATA,
+	SystemErrorCode_MoreProcessingRequired   = ERROR_MORE_DATA, */
+	SystemErrorCode_InvalidDeviceState       = EBUSY,
+/*	SystemErrorCode_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
+	SystemErrorCode_HostUnreachable          = ERROR_HOST_UNREACHABLE,
+	SystemErrorCode_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
+	SystemErrorCode_PortUnreachable          = ERROR_PORT_UNREACHABLE,*/
+	SystemErrorCode_InvalidDeviceRequest     = ENOSYS,
+/*	SystemErrorCode_RequestAborted           = ERROR_REQUEST_ABORTED,
+	SystemErrorCode_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
+	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
+	SystemErrorCode_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
+	SystemErrorCode_AccessDenied             = ERROR_ACCESS_DENIED,
+	SystemErrorCode_SharingViolation         = ERROR_SHARING_VIOLATION,
+	SystemErrorCode_NoMoreEntries            = ERROR_NO_MORE_ITEMS, */
 };
 
 inline
@@ -284,7 +284,7 @@ const ErrorData g_noError =
 {
 	sizeof (ErrorData),
 	GUID_StdError,
-	StatusKind_Success,
+	SystemErrorCode_Success,
 };
 
 //.............................................................................

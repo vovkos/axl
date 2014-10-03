@@ -16,10 +16,10 @@ typedef StringBase <char> String;
 
 //.............................................................................
 
-enum GuidStringFlagKind
+enum GuidStringFlag
 {
-	GuidStringFlagKind_UpperCase   = 0x01,
-	GuidStringFlagKind_CurlyBraces = 0x02,
+	GuidStringFlag_UpperCase   = 0x01,
+	GuidStringFlag_CurlyBraces = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

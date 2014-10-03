@@ -9,7 +9,7 @@ namespace io {
 
 bool
 ConnectionSock::open (
-	SockProtoKind protocol,
+	SockProto protocol,
 	SockAddrKind addrKind,
 	const SockAddr* addr
 	)
@@ -217,10 +217,10 @@ ConnectionSock::close_wt ()
 	m_sock.close ();
 
 	if (m_onConnectComplete)
-		m_onConnectComplete->invoke (0, &err::Error (err::StatusKind_Cancelled));
+		m_onConnectComplete->invoke (0, &err::Error (err::SystemErrorCode_Cancelled));
 
 	if (m_onDisconnectComplete)
-		m_onDisconnectComplete->invoke (0, &err::Error (err::StatusKind_Cancelled));
+		m_onDisconnectComplete->invoke (0, &err::Error (err::SystemErrorCode_Cancelled));
 
 	while (!m_sendRecvList.isEmpty ())
 		::SleepEx (0, true);

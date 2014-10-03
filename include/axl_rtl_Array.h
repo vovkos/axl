@@ -622,7 +622,7 @@ public:
 
 		if (indexDst + count > oldCount || indexSrc + count > oldCount)
 		{
-			err::setError (err::StatusKind_InvalidParameter);
+			err::setError (err::SystemErrorCode_InvalidParameter);
 			return false;
 		}
 

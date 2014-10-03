@@ -55,7 +55,7 @@ public:
 
 	bool
 	open (
-		SockProtoKind protocol,
+		SockProto protocol,
 		const SockAddr* addr
 		);
 

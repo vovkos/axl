@@ -49,7 +49,7 @@ protected:
 	EngineKind m_engineKind;
 	ref::Ptr <Font> m_stdFontArray [StdFontKind__Count];
 	ref::Ptr <Cursor> m_stdCursorArray [StdCursorKind__Count];
-	SharedOffscreenCanvas m_sharedOffscreenCanvasArray [FormFactorKind__Count];
+	SharedOffscreenCanvas m_sharedOffscreenCanvasArray [FormFactor__Count];
 
 public:
 	Engine ()
@@ -102,7 +102,7 @@ public:
 	createImage (
 		int width,
 		int height,
-		PixelFormatKind pixelFormat,
+		PixelFormat pixelFormat,
 		const void* data,
 		bool isScreenCompatible = true
 		) = 0;

@@ -14,23 +14,23 @@ namespace gui {
 
 //.............................................................................
 
-enum PixelFormatKind
+enum PixelFormat
 {
-	PixelFormatKind_Rgba = 0,
-	PixelFormatKind_Rgb,
+	PixelFormat_Rgba = 0,
+	PixelFormat_Rgb,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char* 
-getPixelFormatString (PixelFormatKind pixelFormat);
+getPixelFormatString (PixelFormat pixelFormat);
 
 //.............................................................................
 
 struct ImageDesc
 {
 	Size m_size;
-	PixelFormatKind m_pixelFormat;
+	PixelFormat m_pixelFormat;
 	void* m_data;
 
 	ImageDesc ()
@@ -41,7 +41,7 @@ struct ImageDesc
 	ImageDesc (
 		int width,
 		int height,
-		PixelFormatKind pixelFormat,
+		PixelFormat pixelFormat,
 		void* data
 		)
 	{
@@ -53,7 +53,7 @@ struct ImageDesc
 
 	ImageDesc (
 		const Size& size,
-		PixelFormatKind pixelFormat,
+		PixelFormat pixelFormat,
 		void* data
 		)
 	{

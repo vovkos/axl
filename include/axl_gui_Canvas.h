@@ -33,7 +33,7 @@ public:
 	{
 		m_font = NULL;
 		m_baseFont = NULL;
-		m_baseTextAttr.setup (StdPalColorKind_WidgetText, StdPalColorKind_WidgetBack, 0);
+		m_baseTextAttr.setup (StdPalColor_WidgetText, StdPalColor_WidgetBack, 0);
 	}
 
 	// rect drawing

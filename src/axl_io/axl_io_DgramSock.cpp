@@ -9,7 +9,7 @@ namespace io {
 
 bool
 DgramSock::open (
-	SockProtoKind protocol,
+	SockProto protocol,
 	SockAddrKind addrKind,
 	const SockAddr* addr
 	)

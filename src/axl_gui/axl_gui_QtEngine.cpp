@@ -93,15 +93,15 @@ QtEngine::createQtFont (
 {
 	QString familyName = QString::fromUtf8 (faceName);
 
-	int weight = (flags & FontFlagKind_Bold) ? QFont::Bold : QFont::Normal;
-	bool isItalic = (flags & FontFlagKind_Italic) != 0;
+	int weight = (flags & FontFlag_Bold) ? QFont::Bold : QFont::Normal;
+	bool isItalic = (flags & FontFlag_Italic) != 0;
 
 	QFont qtFont (familyName, pointSize, weight, isItalic);
 
-	if (flags & FontFlagKind_Underline)
+	if (flags & FontFlag_Underline)
 		qtFont.setUnderline (true);
 
-	if (flags & FontFlagKind_Strikeout)
+	if (flags & FontFlag_Strikeout)
 		qtFont.setStrikeOut (true);
 
 	return qtFont;
@@ -142,7 +142,7 @@ QtEngine::getFontMod (
 	font->m_fontDesc.m_flags = flags;
 	font->m_qtFont = createQtFont (fontDesc.m_faceName, fontDesc.m_pointSize, flags);
 
-	ASSERT (!(flags & FontFlagKind_Transparent) && flags < countof (fontTuple->m_fontModArray));
+	ASSERT (!(flags & FontFlag_Transparent) && flags < countof (fontTuple->m_fontModArray));
 	ASSERT (!fontTuple->m_fontModArray [flags]);
 
 	fontTuple->m_fontModArray [flags] = font;
@@ -188,7 +188,7 @@ ref::Ptr <Image>
 QtEngine::createImage (
 	int width,
 	int height,
-	PixelFormatKind pixelFormat,
+	PixelFormat pixelFormat,
 	const void* data,
 	bool isScreenCompatible
 	)
@@ -197,11 +197,11 @@ QtEngine::createImage (
 
 	switch (pixelFormat)
 	{
-	case PixelFormatKind_Rgba:
+	case PixelFormat_Rgba:
 		bitCount = 32;
 		break;
 
-	case PixelFormatKind_Rgb:
+	case PixelFormat_Rgb:
 		bitCount = 24;
 		break;
 
@@ -306,7 +306,7 @@ QtEngine::readClipboard (
 	size_t count = m_clipboardFormatNameTable.getCount ();
 	if (format >= count)
 	{
-		err::setError (err::StatusKind_InvalidParameter);
+		err::setError (err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
 
@@ -344,7 +344,7 @@ QtEngine::writeClipboard (
 	size_t count = m_clipboardFormatNameTable.getCount ();
 	if (format >= count)
 	{
-		err::setError (err::StatusKind_InvalidParameter);
+		err::setError (err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
 

@@ -266,7 +266,7 @@ BuddyAllocMap::allocate (size_t size)
 
 	if (size > m_maxAllocSize)
 	{
-		err::setError (err::StatusKind_InvalidParameter);
+		err::setError (err::SystemErrorCode_InvalidParameter);
 		return -1;
 	}
 
@@ -281,7 +281,7 @@ BuddyAllocMap::allocate (size_t size)
 	page = level->getFirstAvailablePage ();
 	if (!page)
 	{
-		err::setError(err::StatusKind_InsufficientResources);
+		err::setError(err::SystemErrorCode_InsufficientResources);
 		return -1;
 	}
 

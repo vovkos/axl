@@ -69,7 +69,7 @@ public:
 
 	bool
 	open (
-		SockProtoKind protocol,
+		SockProto protocol,
 		const SockAddr* addr
 		)
 	{
@@ -78,7 +78,7 @@ public:
 
 	bool
 	open (
-		SockProtoKind protocol,
+		SockProto protocol,
 		SockAddrKind addrKind
 		)
 	{
@@ -117,7 +117,7 @@ public:
 protected:
 	bool
 	open (
-		SockProtoKind protocol,
+		SockProto protocol,
 		SockAddrKind addrKind,
 		const SockAddr* addr
 		);

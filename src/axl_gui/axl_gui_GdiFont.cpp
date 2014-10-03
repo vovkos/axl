@@ -43,10 +43,10 @@ modifyLogFont (
 	uint_t flags
 	)
 {
-	logFont->lfWeight    = (flags & FontFlagKind_Bold) ? FW_BOLD : FW_NORMAL;
-	logFont->lfItalic    = (flags & FontFlagKind_Italic) != 0;
-	logFont->lfUnderline = (flags & FontFlagKind_Underline) != 0;
-	logFont->lfStrikeOut = (flags & FontFlagKind_Strikeout) != 0;
+	logFont->lfWeight    = (flags & FontFlag_Bold) ? FW_BOLD : FW_NORMAL;
+	logFont->lfItalic    = (flags & FontFlag_Italic) != 0;
+	logFont->lfUnderline = (flags & FontFlag_Underline) != 0;
+	logFont->lfStrikeOut = (flags & FontFlag_Strikeout) != 0;
 }
 
 bool
@@ -71,16 +71,16 @@ getFontDescFromLogFont (
 		::MulDiv (-logFont->lfHeight, 72, ::GetDeviceCaps (screenDc, LOGPIXELSY));
 
 	if (logFont->lfWeight >= FW_BOLD)
-		fontDesc->m_flags |= FontFlagKind_Bold;
+		fontDesc->m_flags |= FontFlag_Bold;
 
 	if (logFont->lfItalic)
-		fontDesc->m_flags |= FontFlagKind_Italic;
+		fontDesc->m_flags |= FontFlag_Italic;
 
 	if (logFont->lfUnderline)
-		fontDesc->m_flags |= FontFlagKind_Underline;
+		fontDesc->m_flags |= FontFlag_Underline;
 
 	if (logFont->lfStrikeOut)
-		fontDesc->m_flags |= FontFlagKind_Strikeout;
+		fontDesc->m_flags |= FontFlag_Strikeout;
 
 	return true;
 }

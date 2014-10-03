@@ -93,7 +93,7 @@ UsbDevice::open (
 	setDevice (NULL);
 
 	m_openHandle = libusb_open_device_with_vid_pid (NULL, (uint16_t) vendorId, (uint16_t) productId);
-	return m_openHandle ? true : err::fail (err::Error (err::StatusKind_ObjectNameNotFound));
+	return m_openHandle ? true : err::fail (err::Error (err::SystemErrorCode_ObjectNameNotFound));
 }
 
 int
@@ -200,7 +200,7 @@ UsbDevice::getDesrciptor (
 	ASSERT (m_openHandle);
 
 	size_t size = descriptor->getCount ();
-	size = size < DefKind_BufferSize ? DefKind_BufferSize : rtl::getMinPower2Ge (size);
+	size = size < Def_BufferSize ? Def_BufferSize : rtl::getMinPower2Ge (size);
 
 	descriptor->setCount (size);
 
@@ -273,9 +273,9 @@ UsbDevice::getStringDesrciptor (
 	char* p = string->getBuffer ();
 	size_t length = string->getBufferLength ();
 
-	if (length < DefKind_BufferSize)
+	if (length < Def_BufferSize)
 	{
-		length = DefKind_BufferSize;
+		length = Def_BufferSize;
 		p = string->getBuffer (length - 1, false);
 	}
 
@@ -317,9 +317,9 @@ UsbDevice::getStringDesrciptor (
 	char* p = string->getBuffer ();
 	size_t length = string->getBufferLength ();
 
-	if (length < DefKind_BufferSize)
+	if (length < Def_BufferSize)
 	{
-		length = DefKind_BufferSize;
+		length = Def_BufferSize;
 		p = string->getBuffer (length - 1, false);
 	}
 

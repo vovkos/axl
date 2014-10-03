@@ -83,9 +83,9 @@ class UsbConfigDescriptor: public rtl::Handle <libusb_config_descriptor*, FreeUs
 class UsbDevice
 {
 public:
-	enum DefKind
+	enum Def
 	{
-		DefKind_BufferSize = 256,
+		Def_BufferSize = 256,
 	};
 
 protected:

@@ -7,7 +7,7 @@ namespace gui {
 //.............................................................................
 
 const char* 
-getPixelFormatString (PixelFormatKind pixelFormat)
+getPixelFormatString (PixelFormat pixelFormat)
 {
 	static const char* stringTable [] = 
 	{

@@ -25,16 +25,16 @@ getFontDescFromFontInfo (
 	fontDesc->m_pointSize = fontInfo.pointSize ();
 	
 	if (fontInfo.weight () >= QFont::Bold)
-		fontDesc->m_flags |= FontFlagKind_Bold;
+		fontDesc->m_flags |= FontFlag_Bold;
 	
 	if (fontInfo.italic ())
-		fontDesc->m_flags |= FontFlagKind_Italic;
+		fontDesc->m_flags |= FontFlag_Italic;
 	
 	if (fontInfo.underline ())
-		fontDesc->m_flags |= FontFlagKind_Underline;
+		fontDesc->m_flags |= FontFlag_Underline;
 
 	if (fontInfo.strikeOut ())
-		fontDesc->m_flags |= FontFlagKind_Strikeout;
+		fontDesc->m_flags |= FontFlag_Strikeout;
 
 	return true;
 }

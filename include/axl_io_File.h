@@ -17,14 +17,14 @@ namespace io {
 
 //.............................................................................
 
-enum FileFlagKind
+enum FileFlag
 {
-	FileFlagKind_ReadOnly      = 0x01,
-	FileFlagKind_OpenExisting  = 0x02,
-	FileFlagKind_Exclusive     = 0x04,
-	FileFlagKind_ShareWrite    = 0x08,
-	FileFlagKind_DeleteOnClose = 0x10,
-	FileFlagKind_Asynchronous  = 0x20,
+	FileFlag_ReadOnly      = 0x01,
+	FileFlag_OpenExisting  = 0x02,
+	FileFlag_Exclusive     = 0x04,
+	FileFlag_ShareWrite    = 0x08,
+	FileFlag_DeleteOnClose = 0x10,
+	FileFlag_Asynchronous  = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

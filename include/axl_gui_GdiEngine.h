@@ -79,7 +79,7 @@ public:
 	createImage (
 		int width,
 		int height,
-		PixelFormatKind pixelFormat,
+		PixelFormat pixelFormat,
 		const void* data,
 		bool isScreenCompatible = true
 		);

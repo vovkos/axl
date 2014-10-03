@@ -130,13 +130,13 @@ HexEncoding::decode (
 	size_t length
 	)
 {
-	enum StateKind
+	enum State
 	{
-		StateKind_Normal = 0,
-		StateKind_Hex
+		State_Normal = 0,
+		State_Hex
 	};
 
-	StateKind state = StateKind_Normal;
+	State state = State_Normal;
 
 	if (length == -1)
 		length = StringDetails::calcLength (p);
@@ -156,16 +156,16 @@ HexEncoding::decode (
 
 		switch (state)
 		{
-		case StateKind_Normal:
+		case State_Normal:
 			if (isSpace)
 				break;
 
 			hexCodeLen = 0;
 			hexCodeString [hexCodeLen++] = *p;
-			state = StateKind_Hex;
+			state = State_Hex;
 			break;
 
-		case StateKind_Hex:
+		case State_Hex:
 			if (!isSpace)
 			{
 				hexCodeString [hexCodeLen++] = *p;
@@ -181,12 +181,12 @@ HexEncoding::decode (
 			else
 				p = end; // not a hex string anymore, break the loop
 
-			state = StateKind_Normal;
+			state = State_Normal;
 			break;
 		}
 	}
 
-	if (state == StateKind_Hex)
+	if (state == State_Hex)
 	{
 		hexCodeString [hexCodeLen] = 0;
 		x = (uchar_t) strtoul (hexCodeString, &hexCodeEnd, 16);

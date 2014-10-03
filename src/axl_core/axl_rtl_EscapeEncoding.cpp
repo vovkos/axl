@@ -126,14 +126,14 @@ EscapeEncoding::decode (
 	size_t length
 	)
 {
-	enum StateKind
+	enum State
 	{
-		StateKind_Normal = 0,
-		StateKind_Escape,
-		StateKind_Hex
+		State_Normal = 0,
+		State_Escape,
+		State_Hex
 	};
 
-	StateKind state = StateKind_Normal;	
+	State state = State_Normal;	
 
 	if (length == -1)
 		length = StringDetails::calcLength (p);
@@ -151,19 +151,19 @@ EscapeEncoding::decode (
 	{
 		switch (state)
 		{
-		case StateKind_Normal:
+		case State_Normal:
 			if (*p == '\\')
 			{
 				string->append (base, p - base);
-				state = StateKind_Escape;
+				state = State_Escape;
 			}
 
 			break;
 
-		case StateKind_Escape:
+		case State_Escape:
 			if (*p == 'x')
 			{
-				state = StateKind_Hex;
+				state = State_Hex;
 				hexCodeLen = 0;
 				break;
 			}
@@ -179,10 +179,10 @@ EscapeEncoding::decode (
 				base = p;
 			}
 
-			state = StateKind_Normal;
+			state = State_Normal;
 			break;
 		
-		case StateKind_Hex:			
+		case State_Hex:			
 			hexCodeString [hexCodeLen++] = *p;
 			if (hexCodeLen < 2)
 				break;
@@ -192,7 +192,7 @@ EscapeEncoding::decode (
 				hexCode = '?';
 
 			string->append ((char const*) &hexCode, 1);
-			state = StateKind_Normal;
+			state = State_Normal;
 			base = p + 1;
 			break;
 		}

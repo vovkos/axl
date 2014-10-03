@@ -18,7 +18,7 @@ class PacketizerRoot
 protected:
 	enum
 	{
-		PacketHdrKind_Signature = 'kap\x02',
+		PacketHdrSignature = 'kap\x02',
 	};
 
 protected:
@@ -35,7 +35,7 @@ public:
 	uint64_t
 	createHdr (size_t size)
 	{
-		return ((uint64_t) size << 32) | PacketHdrKind_Signature;
+		return ((uint64_t) size << 32) | PacketHdrSignature;
 	}
 
 protected:
@@ -86,7 +86,7 @@ class LegacyPacketizerRoot
 protected:
 	enum
 	{
-		PacketHdrKind_Signature = '.GSM',
+		PacketHdrSignature = '.GSM',
 	};
 
 	struct PacketHdr

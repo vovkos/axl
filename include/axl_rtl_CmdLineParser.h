@@ -37,9 +37,9 @@ protected:
 
 //.............................................................................
 
-enum CmdLineSwitchFlagKind
+enum CmdLineSwitchFlag
 {
-	CmdLineSwitchFlagKind_HasValue = 0x80000000,
+	CmdLineSwitchFlag_HasValue = 0x80000000,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -54,9 +54,9 @@ public:
 	typedef typename SwitchTable::SwitchKind SwitchKind;
 
 protected:
-	enum FlagKind
+	enum Flag
 	{
-		FlagKind_Forward = 0x01,
+		Flag_Forward = 0x01,
 	};
 
 protected:
@@ -100,7 +100,7 @@ public:
 			if (arg.isEmpty ())
 				break;
 
-			result = (m_flags & FlagKind_Forward) ?
+			result = (m_flags & Flag_Forward) ?
 				static_cast <T*> (this)->onValue (arg) :
 				parseArg (arg, &switchName, &value) &&
 				processArg (i, switchName, value);
@@ -141,7 +141,7 @@ public:
 		{
 			const char* arg = argv [i];
 
-			result = (m_flags & FlagKind_Forward) ?
+			result = (m_flags & Flag_Forward) ?
 				static_cast <T*> (this)->onValue (arg) :
 				parseArg (arg, &switchName, &value) &&
 				processArg (i, switchName, value);
@@ -162,16 +162,16 @@ public:
 		bool result;
 
 		rtl::String switchName;
-		rtl::String value;
+		rtl::String switchValue;
 
 		for (int i = 0; i < argc; i++)
 		{
 			rtl::String arg = argv [i];
 
-			result = (m_flags & FlagKind_Forward) ?
+			result = (m_flags & Flag_Forward) ?
 				static_cast <T*> (this)->onValue (arg) :
-				parseArg (arg, &switchName, &value) &&
-				processArg (i, switchName, value);
+				parseArg (arg, &switchName, &switchValue) &&
+				processArg (i, switchName, switchValue);
 
 			if (!result)
 				return false;
@@ -249,7 +249,7 @@ protected:
 			return false;
 		}
 
-		if ((switchKind & CmdLineSwitchFlagKind_HasValue) && value.isEmpty ())
+		if ((switchKind & CmdLineSwitchFlag_HasValue) && value.isEmpty ())
 		{
 			m_valueSwitchKind = switchKind;
 			m_valueSwitchName = switchName;
@@ -277,11 +277,11 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList);
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE(Class, SwitchKindEnum) \
+#define AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE(Class, SwitchKind_0) \
 class Class \
 { \
 public: \
-	typedef SwitchKindEnum SwitchKind; \
+	typedef SwitchKind_0 SwitchKind; \
 	typedef axl::rtl::HashTableMap <char, SwitchKind, axl::rtl::HashId <char> > CharMap; \
 	typedef axl::rtl::StringHashTableMap <SwitchKind> StringMap; \
 protected: \

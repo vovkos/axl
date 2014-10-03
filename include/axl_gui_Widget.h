@@ -18,74 +18,74 @@ class Canvas;
 
 //.............................................................................
 
-enum WidgetStyleKind
+enum WidgetStyleFlag
 {
-	WidgetStyleKind_Disabled      = 0x0001,	
-	WidgetStyleKind_HSizeRepaint  = 0x0010,
-	WidgetStyleKind_VSizeRepaint  = 0x0020,	
-	WidgetStyleKind_HScrollAlways = 0x0040,
-	WidgetStyleKind_VScrollAlways = 0x0080,
+	WidgetStyleFlag_Disabled      = 0x0001,	
+	WidgetStyleFlag_HSizeRepaint  = 0x0010,
+	WidgetStyleFlag_VSizeRepaint  = 0x0020,	
+	WidgetStyleFlag_HScrollAlways = 0x0040,
+	WidgetStyleFlag_VScrollAlways = 0x0080,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum WidgetOrientationKind
+enum WidgetOrientation
 {
-	WidgetOrientationKind_Vertical = 0,
-	WidgetOrientationKind_Horizontal,
-	WidgetOrientationKind__Count
+	WidgetOrientation_Vertical = 0,
+	WidgetOrientation_Horizontal,
+	WidgetOrientation__Count
 };
 
 //.............................................................................
 
 // master message structure
 
-enum WidgetMsgKind
+enum WidgetMsgCode
 {
-	WidgetMsgKind_Undefined = 0,
+	WidgetMsgCode_Undefined = 0,
 
-	WidgetMsgKind_Close,                   // TWidgetMsg
-	WidgetMsgKind_SetFocus,                // TWidgetMsg
-	WidgetMsgKind_KillFocus,               // TWidgetMsg
-	WidgetMsgKind_Size,                    // TWidgetMsgParamT <uint_t OrientationMask> 
-	WidgetMsgKind_Scroll,                  // TWidgetMsgParamT <uint_t OrientationMask>
-	WidgetMsgKind_Paint,                   // TWidgetPaintMsg
+	WidgetMsgCode_Close,                   // TWidgetMsg
+	WidgetMsgCode_SetFocus,                // TWidgetMsg
+	WidgetMsgCode_KillFocus,               // TWidgetMsg
+	WidgetMsgCode_Size,                    // TWidgetMsgParamT <uint_t OrientationMask> 
+	WidgetMsgCode_Scroll,                  // TWidgetMsgParamT <uint_t OrientationMask>
+	WidgetMsgCode_Paint,                   // TWidgetPaintMsg
 
-	WidgetMsgKind_MouseMove,               // TWidgetMouseMsg
-	WidgetMsgKind_MouseLeave,              // TWidgetMsg
-	WidgetMsgKind_MouseButtonDown,         // TWidgetMouseButtonMsg
-	WidgetMsgKind_MouseButtonUp,           // TWidgetMouseButtonMsg
-	WidgetMsgKind_MouseButtonDoubleClick,  // TWidgetMouseButtonMsg
-	WidgetMsgKind_MouseWheel,              // TWidgetMouseWheelMsg
-	WidgetMsgKind_MouseCaptureLost,        // TWidgetMsg
+	WidgetMsgCode_MouseMove,               // TWidgetMouseMsg
+	WidgetMsgCode_MouseLeave,              // TWidgetMsg
+	WidgetMsgCode_MouseButtonDown,         // TWidgetMouseButtonMsg
+	WidgetMsgCode_MouseButtonUp,           // TWidgetMouseButtonMsg
+	WidgetMsgCode_MouseButtonDoubleClick,  // TWidgetMouseButtonMsg
+	WidgetMsgCode_MouseWheel,              // TWidgetMouseWheelMsg
+	WidgetMsgCode_MouseCaptureLost,        // TWidgetMsg
 
-	WidgetMsgKind_KeyDown,                 // TWidgetKeyMsg
-	WidgetMsgKind_KeyUp,                   // TWidgetKeyMsg
+	WidgetMsgCode_KeyDown,                 // TWidgetKeyMsg
+	WidgetMsgCode_KeyUp,                   // TWidgetKeyMsg
 
-	WidgetMsgKind_ThreadMsg,               // TWidgetThreadMsg
+	WidgetMsgCode_ThreadMsg,               // TWidgetThreadMsg
 
-	WidgetMsgKind_Gdi,                     // TWidgetGdiMsg
-	WidgetMsgKind_Qt,                      // TWidgetQtMsg
-	WidgetMsgKind_Gtk,                     // TWidgetGtkMsg
-	WidgetMsgKind_User,                    // TWidgetMsg
+	WidgetMsgCode_Gdi,                     // TWidgetGdiMsg
+	WidgetMsgCode_Qt,                      // TWidgetQtMsg
+	WidgetMsgCode_Gtk,                     // TWidgetGtkMsg
+	WidgetMsgCode_User,                    // TWidgetMsg
 
-	WidgetMsgKind__Count,
+	WidgetMsgCode__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct WidgetMsg
 {
-	WidgetMsgKind m_msgKind;
+	WidgetMsgCode m_msgCode;
 
 	WidgetMsg ()
 	{
-		m_msgKind = WidgetMsgKind_Undefined;
+		m_msgCode = WidgetMsgCode_Undefined;
 	}
 	
-	WidgetMsg (WidgetMsgKind msgKind)
+	WidgetMsg (WidgetMsgCode msgCode)
 	{
-		m_msgKind = msgKind;
+		m_msgCode = msgCode;
 	}
 };
 
@@ -101,11 +101,11 @@ struct WidgetMsgParam: WidgetMsg
 	}
 	
 	WidgetMsgParam (
-		WidgetMsgKind msgKind,
+		WidgetMsgCode msgCode,
 		const T& param	
 		)
 	{
-		m_msgKind = msgKind;
+		m_msgCode = msgCode;
 		m_param = param;
 	}
 };
@@ -119,7 +119,7 @@ struct WidgetPaintMsg: WidgetMsg
 
 	WidgetPaintMsg ()
 	{		
-		m_msgKind = WidgetMsgKind_Paint;
+		m_msgCode = WidgetMsgCode_Paint;
 		m_canvas = NULL;
 	}
 
@@ -128,7 +128,7 @@ struct WidgetPaintMsg: WidgetMsg
 		const Rect& rect
 		)
 	{
-		m_msgKind = WidgetMsgKind_Paint;
+		m_msgCode = WidgetMsgCode_Paint;
 		m_canvas = canvas;
 		m_rect = rect;
 	}
@@ -141,13 +141,13 @@ struct WidgetMouseMsg: WidgetMsg
 	Point m_point;
 	uint_t m_buttons;
 	uint_t m_modifierKeys;
-	MouseButtonKind m_button;
+	MouseButton m_button;
 
 	WidgetMouseMsg ()
 	{
 		m_buttons = 0;
 		m_modifierKeys = 0;		
-		m_button = MouseButtonKind_None;
+		m_button = MouseButton_None;
 	}
 };
 
@@ -159,7 +159,7 @@ struct WidgetMouseWheelMsg: WidgetMouseMsg
 
 	WidgetMouseWheelMsg ()
 	{
-		m_msgKind = WidgetMsgKind_MouseWheel;
+		m_msgCode = WidgetMsgCode_MouseWheel;
 		m_wheelDelta = 0;
 	}
 };
@@ -206,7 +206,7 @@ struct WidgetGdiMsg: WidgetMsg
 		intptr_t wParam = 0,
 		intptr_t lParam = 0
 		):
-		WidgetMsg (WidgetMsgKind_Gdi)
+		WidgetMsg (WidgetMsgCode_Gdi)
 	{
 		m_wmMsg = wmMsg;
 		m_wParam = wParam;
@@ -226,7 +226,7 @@ struct WidgetQtMsg: WidgetMsg
 	QEvent* m_event;
 
 	WidgetQtMsg ():
-		WidgetMsg (WidgetMsgKind_Qt)
+		WidgetMsg (WidgetMsgCode_Qt)
 	{
 	}
 };
@@ -242,7 +242,7 @@ struct WidgetGtkMsg: WidgetMsg
 	// not yet
 
 	WidgetGtkMsg ():
-		WidgetMsg (WidgetMsgKind_Gtk)
+		WidgetMsg (WidgetMsgCode_Gtk)
 	{
 	}
 };
@@ -356,9 +356,9 @@ public:
 	}
 	
 	bool
-	checkMsgMask (WidgetMsgKind msgKind)
+	checkMsgMask (WidgetMsgCode msgCode)
 	{
-		return (m_msgMask & (1 << msgKind)) != 0;
+		return (m_msgMask & (1 << msgCode)) != 0;
 	}
 
 	virtual
@@ -453,7 +453,7 @@ public:
 	}
 		
 	WidgetScrollBar*
-	getScrollBar (WidgetOrientationKind orientation)
+	getScrollBar (WidgetOrientation orientation)
 	{
 		ASSERT (orientation < countof (m_scrollBarArray));
 		return &m_scrollBarArray [orientation];
@@ -461,14 +461,14 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (WidgetOrientationKind orientation) = 0;
+	updateScrollBar (WidgetOrientation orientation) = 0;
 
 	bool
 	updateScrollBars ()
 	{
 		return 
-			updateScrollBar (WidgetOrientationKind_Vertical) &&
-			updateScrollBar (WidgetOrientationKind_Horizontal);
+			updateScrollBar (WidgetOrientation_Vertical) &&
+			updateScrollBar (WidgetOrientation_Horizontal);
 	}
 
 	virtual
@@ -505,13 +505,13 @@ processWidgetMsg ( \
 	bool* isHandled_o \
 	) \
 { \
-	switch (msg->m_msgKind) \
+	switch (msg->m_msgCode) \
 	{
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_GUI_WIDGET_MSG_HANDLER(msgKind, handler) \
-	case msgKind: \
+#define AXL_GUI_WIDGET_MSG_HANDLER(msgCode, handler) \
+	case msgCode: \
 		handler (msg, isHandled_o); \
 		break; \
 

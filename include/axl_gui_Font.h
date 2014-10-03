@@ -29,26 +29,26 @@ enum StdFontKind
 
 //.............................................................................
 
-enum FontFlagKind
+enum FontFlag
 {
-	FontFlagKind_Bold        = 0x01,
-	FontFlagKind_Italic      = 0x02,
-	FontFlagKind_Underline   = 0x04,
-	FontFlagKind_Strikeout   = 0x08,
-	FontFlagKind_Transparent = 0x10,
+	FontFlag_Bold        = 0x01,
+	FontFlag_Italic      = 0x02,
+	FontFlag_Underline   = 0x04,
+	FontFlag_Strikeout   = 0x08,
+	FontFlag_Transparent = 0x10,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-FontFlagKind
+FontFlag
 getFirstFontFlag (uint_t flags)
 {
-	return (FontFlagKind) (1 << rtl::getLoBitIdx (flags));
+	return (FontFlag) (1 << rtl::getLoBitIdx (flags));
 }
 
 const char* 
-getFontFlagString (FontFlagKind flag);
+getFontFlagString (FontFlag flag);
 
 inline
 const char* 
@@ -64,7 +64,7 @@ overlayFontFlags (
 	uint_t overlayFontFlags
 	)
 {
-	return (overlayFontFlags & FontFlagKind_Transparent) ? baseFontFlags : overlayFontFlags;
+	return (overlayFontFlags & FontFlag_Transparent) ? baseFontFlags : overlayFontFlags;
 }
 
 uint_t
@@ -210,13 +210,13 @@ struct TextAttr: public ColorAttr
 
 	TextAttr ()
 	{
-		m_fontFlags = FontFlagKind_Transparent;
+		m_fontFlags = FontFlag_Transparent;
 	}
 
 	TextAttr (
 		uint_t foreColor,
-		uint_t backColor = ColorFlagKind_Transparent,
-		uint_t fontFlags = FontFlagKind_Transparent
+		uint_t backColor = ColorFlag_Transparent,
+		uint_t fontFlags = FontFlag_Transparent
 		)
 	{
 		setup (foreColor, backColor, fontFlags);
@@ -224,7 +224,7 @@ struct TextAttr: public ColorAttr
 
 	TextAttr (
 		const ColorAttr& colorAttr,
-		uint_t fontFlags = FontFlagKind_Transparent
+		uint_t fontFlags = FontFlag_Transparent
 		)
 	{
 		setup (colorAttr, fontFlags);
@@ -245,7 +245,7 @@ struct TextAttr: public ColorAttr
 	clear ()
 	{
 		ColorAttr::clear ();
-		m_fontFlags = FontFlagKind_Transparent;
+		m_fontFlags = FontFlag_Transparent;
 	}
 
 	void

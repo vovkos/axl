@@ -65,10 +65,10 @@ public:
 	// also to put part of implementation into .cpp instead of having one huge CQtWidgetT <>
 
 	static
-	MouseButtonKind
+	MouseButton
 	getMouseButtonFromQtButton (Qt::MouseButton qtButton)
 	{
-		return (MouseButtonKind) (qtButton & 0x7);
+		return (MouseButton) (qtButton & 0x7);
 	}
 
 	static
@@ -88,13 +88,13 @@ public:
 	void
 	onEvent (
 		QEvent* event,
-		WidgetMsgKind msgKind
+		WidgetMsgCode msgCode
 		);
 
 	void
 	onMouseEvent (
 		QMouseEvent* event,
-		WidgetMsgKind msgKind
+		WidgetMsgCode msgCode
 		);
 
 	void
@@ -103,7 +103,7 @@ public:
 	void
 	onKeyEvent (
 		QKeyEvent* event,
-		WidgetMsgKind msgKind
+		WidgetMsgCode msgCode
 		);
 
 	void
@@ -158,7 +158,7 @@ public:
 		)
 	{
 		WidgetThreadMsg* msg = AXL_MEM_NEW (WidgetThreadMsg);
-		msg->m_msgKind = WidgetMsgKind_ThreadMsg;
+		msg->m_msgCode = WidgetMsgCode_ThreadMsg;
 		msg->m_code = code;
 		msg->m_params = params;
 
@@ -199,21 +199,21 @@ protected:
 	void
 	mousePressEvent (QMouseEvent* e)
 	{
-		m_qtWidget->onMouseEvent (e, WidgetMsgKind_MouseButtonDown);
+		m_qtWidget->onMouseEvent (e, WidgetMsgCode_MouseButtonDown);
 	}
 
 	virtual
 	void
 	mouseReleaseEvent (QMouseEvent* e)
 	{
-		m_qtWidget->onMouseEvent (e, WidgetMsgKind_MouseButtonUp);
+		m_qtWidget->onMouseEvent (e, WidgetMsgCode_MouseButtonUp);
 	}
 
 	virtual
 	void
 	mouseDoubleClickEvent (QMouseEvent* e)
 	{
-		m_qtWidget->onMouseEvent (e, WidgetMsgKind_MouseButtonDoubleClick);
+		m_qtWidget->onMouseEvent (e, WidgetMsgCode_MouseButtonDoubleClick);
 	}
 
 	virtual
@@ -231,35 +231,35 @@ protected:
 	void
 	keyPressEvent (QKeyEvent* e)
 	{
-		m_qtWidget->onKeyEvent (e, WidgetMsgKind_KeyDown);
+		m_qtWidget->onKeyEvent (e, WidgetMsgCode_KeyDown);
 	}
 
 	virtual
 	void
 	keyReleaseEvent (QKeyEvent* e)
 	{
-		m_qtWidget->onKeyEvent (e, WidgetMsgKind_KeyUp);
+		m_qtWidget->onKeyEvent (e, WidgetMsgCode_KeyUp);
 	}
 
 	virtual
 	void
 	focusInEvent (QFocusEvent* e)
 	{
-		m_qtWidget->onEvent (e, WidgetMsgKind_SetFocus);
+		m_qtWidget->onEvent (e, WidgetMsgCode_SetFocus);
 	}
 
 	virtual
 	void
 	focusOutEvent (QFocusEvent* e)
 	{
-		m_qtWidget->onEvent (e, WidgetMsgKind_KillFocus);
+		m_qtWidget->onEvent (e, WidgetMsgCode_KillFocus);
 	}
 
 	virtual
 	void
 	leaveEvent (QEvent* e)
 	{
-		m_qtWidget->onEvent (e, WidgetMsgKind_MouseLeave);
+		m_qtWidget->onEvent (e, WidgetMsgCode_MouseLeave);
 	}
 
 	virtual
@@ -281,7 +281,7 @@ protected:
 	void
 	closeEvent (QCloseEvent* e)
 	{
-		m_qtWidget->onEvent (e, WidgetMsgKind_Close);
+		m_qtWidget->onEvent (e, WidgetMsgCode_Close);
 	}
 
 	virtual
@@ -387,13 +387,13 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (WidgetOrientationKind orientation)
+	updateScrollBar (WidgetOrientation orientation)
 	{
-		ASSERT (orientation < WidgetOrientationKind__Count);
+		ASSERT (orientation < WidgetOrientation__Count);
 
 		const WidgetScrollBar* scrollBar = &this->m_scrollBarArray [orientation];
 
-		QScrollBar* qtScrollBar = orientation == WidgetOrientationKind_Horizontal ?
+		QScrollBar* qtScrollBar = orientation == WidgetOrientation_Horizontal ?
 			m_qtScrollArea->horizontalScrollBar () :
 			m_qtScrollArea->verticalScrollBar ();
 

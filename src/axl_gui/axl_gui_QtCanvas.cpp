@@ -23,7 +23,7 @@ QtCanvas::drawRect (
 {
 	color = overlayColor (m_baseTextAttr.m_backColor, color);
 
-	if (!(color & ColorFlagKind_Transparent))
+	if (!(color & ColorFlag_Transparent))
 		m_h->fillRect (left, top, right - left, bottom - top, m_palette.getColorRgb (color));
 
 	return true;
@@ -62,7 +62,7 @@ QtCanvas::drawText_qt (
 	{
 		m_colorAttr.m_foreColor = textColor;
 
-		if (!(textColor & ColorFlagKind_Transparent))
+		if (!(textColor & ColorFlag_Transparent))
 			m_h->setPen (m_palette.getColorRgb (textColor));
 	}
 

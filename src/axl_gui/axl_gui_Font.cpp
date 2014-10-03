@@ -8,7 +8,7 @@ namespace gui {
 //.............................................................................
 
 const char* 
-getFontFlagString (FontFlagKind flag)
+getFontFlagString (FontFlag flag)
 {
 	static const char* stringTable [] = 
 	{
@@ -36,7 +36,7 @@ parseFontFlagString (
 		if (end)
 			*end = NULL;
 
-		return FontFlagKind_Transparent;
+		return FontFlag_Transparent;
 	}
 
 	uint_t flags = 0;
@@ -51,22 +51,22 @@ parseFontFlagString (
 		{
 		case 'b': 
 		case 'B':
-			mod = FontFlagKind_Bold;
+			mod = FontFlag_Bold;
 			break;
 
 		case 'i': 
 		case 'I':
-			mod = FontFlagKind_Italic;
+			mod = FontFlag_Italic;
 			break;
 
 		case 'u': 
 		case 'U':
-			mod = FontFlagKind_Underline;
+			mod = FontFlag_Underline;
 			break;
 
 		case 's': 
 		case 'S':
-			mod = FontFlagKind_Strikeout;
+			mod = FontFlag_Strikeout;
 			break;
 		}
 
@@ -107,7 +107,7 @@ FontDesc::setup (
 Font*
 Font::getFontMod (uint_t flags)
 {
-	if (flags & FontFlagKind_Transparent)
+	if (flags & FontFlag_Transparent)
 		return this;
 
 	flags &= (countof (m_tuple->m_fontModArray) - 1);

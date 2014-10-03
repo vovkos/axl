@@ -16,7 +16,7 @@ PacketizerRoot::writeImpl (
 	size_t size = size0;
 	size_t bufferSize = m_buffer.getCount ();
 
-	static uint32_t signatureBuffer = PacketHdrKind_Signature;
+	static uint32_t signatureBuffer = PacketHdrSignature;
 	const char* signature = (char*) &signatureBuffer;
 
 	while (bufferSize < sizeof (uint32_t)) // append signature byte-by-byte
@@ -90,7 +90,7 @@ uint64_t
 LegacyPacketizerRoot::createHdr (size_t size)
 {
 	PacketHdr hdr;
-	hdr.m_signature = PacketHdrKind_Signature;
+	hdr.m_signature = PacketHdrSignature;
 	hdr.m_dataSize = (uint16_t) size;
 	hdr.m_checksum = 0;	
 	hdr.m_checksum = crc16 (&hdr, sizeof (hdr));
@@ -108,7 +108,7 @@ LegacyPacketizerRoot::writeImpl (
 	size_t size = size0;
 	size_t bufferSize = m_buffer.getCount ();
 
-	static uint32_t signatureBuffer = PacketHdrKind_Signature;
+	static uint32_t signatureBuffer = PacketHdrSignature;
 	const char* signature = (char*) &signatureBuffer;
 
 	while (bufferSize < sizeof (uint32_t)) // append signature byte-by-byte

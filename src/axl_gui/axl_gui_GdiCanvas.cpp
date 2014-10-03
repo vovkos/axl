@@ -84,7 +84,7 @@ GdiCanvas::drawRect (
 	{
 		m_colorAttr.m_backColor = color;
 
-		if (!(color & ColorFlagKind_Transparent))
+		if (!(color & ColorFlag_Transparent))
 			::SetBkColor (m_h, m_palette.getColorRgb (color));
 	}
 
@@ -164,7 +164,7 @@ GdiCanvas::drawText_utf16 (
 	{
 		m_colorAttr.m_foreColor = textColor;
 
-		if (!(textColor & ColorFlagKind_Transparent))
+		if (!(textColor & ColorFlag_Transparent))
 			::SetTextColor (m_h, m_palette.getColorRgb (textColor));
 	}
 
@@ -172,7 +172,7 @@ GdiCanvas::drawText_utf16 (
 	{
 		m_colorAttr.m_backColor = backColor;
 
-		if (!(backColor & ColorFlagKind_Transparent))
+		if (!(backColor & ColorFlag_Transparent))
 			::SetBkColor (m_h, m_palette.getColorRgb (backColor));
 	}
 

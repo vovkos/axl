@@ -29,9 +29,9 @@ struct Notify: NMHDR
 
 inline
 int 
-getScrollBarFromOrientation (WidgetOrientationKind orientation)
+getScrollBarFromOrientation (WidgetOrientation orientation)
 {
-	return orientation == WidgetOrientationKind_Horizontal ? SB_HORZ : SB_VERT;
+	return orientation == WidgetOrientation_Horizontal ? SB_HORZ : SB_VERT;
 }
 
 void
@@ -76,10 +76,10 @@ public:
 protected:
 	void
 	processWmMouse (
-		WidgetMsgKind msgKind,
+		WidgetMsgCode msgCode,
 		int x,
 		int y,
-		MouseButtonKind button,
+		MouseButton button,
 		bool* isHandled_o
 		);
 
@@ -92,7 +92,7 @@ protected:
 
 	void
 	processWmKey (
-		WidgetMsgKind msgKind,
+		WidgetMsgCode msgCode,
 		int key,
 		bool* isHandled_o
 		);
@@ -106,7 +106,7 @@ protected:
 	void
 	processWmScroll (
 		HWND hWnd,
-		WidgetOrientationKind orientation,
+		WidgetOrientation orientation,
 		int code,
 		bool* isHandled_o
 		);
@@ -241,7 +241,7 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (WidgetOrientationKind orientation)
+	updateScrollBar (WidgetOrientation orientation)
 	{
 		ASSERT (orientation < countof (m_scrollBarArray));
 
@@ -279,7 +279,7 @@ public:
 		)
 	{
 		WidgetThreadMsg* msg = AXL_MEM_NEW (WidgetThreadMsg);
-		msg->m_msgKind = WidgetMsgKind_ThreadMsg;
+		msg->m_msgCode = WidgetMsgCode_ThreadMsg;
 		msg->m_code = code;
 		msg->m_params = params;
 

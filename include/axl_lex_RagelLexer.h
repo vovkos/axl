@@ -189,7 +189,7 @@ public:
 	ensureSrcPosError ()
 	{
 		err::Error error = err::getError ();
-		if (!error->isKind (err::GUID_ParseError, err::ParseErrorKind_SrcPos))
+		if (!error->isKind (err::GUID_ParseError, err::ParseErrorCode_SrcPos))
 			err::pushSrcPosError (
 				m_filePath, 
 				this->m_lastTokenPos.m_line, 

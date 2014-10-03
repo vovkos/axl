@@ -32,13 +32,13 @@ getModifierKeys ()
 	uint_t modifierKeys = 0;
 
 	if (::GetAsyncKeyState (VK_SHIFT) & 0x8000)
-		modifierKeys |= ModifierKeyKind_Shift;
+		modifierKeys |= ModifierKey_Shift;
 
 	if (::GetAsyncKeyState (VK_CONTROL) & 0x8000)
-		modifierKeys |= ModifierKeyKind_Ctrl;
+		modifierKeys |= ModifierKey_Ctrl;
 
 	if (::GetAsyncKeyState (VK_MENU) & 0x8000)
-		modifierKeys |= ModifierKeyKind_Alt;
+		modifierKeys |= ModifierKey_Alt;
 
 	return modifierKeys;
 }
@@ -51,13 +51,13 @@ getMouseButtons ()
 	uint_t buttons = 0;
 
 	if (::GetAsyncKeyState (VK_LBUTTON) & 0x8000)
-		buttons |= MouseButtonKind_Left;
+		buttons |= MouseButton_Left;
 
 	if (::GetAsyncKeyState (VK_RBUTTON) & 0x8000)
-		buttons |= MouseButtonKind_Right;
+		buttons |= MouseButton_Right;
 
 	if (::GetAsyncKeyState (VK_MBUTTON) & 0x8000)
-		buttons |= MouseButtonKind_Medium;
+		buttons |= MouseButton_Medium;
 
 	return buttons;
 }
@@ -85,7 +85,7 @@ GdiWidgetImpl::windowProc (
 {
 	ASSERT (m_engine->getEngineKind () == EngineKind_Gdi);
 
-	if (checkMsgMask (WidgetMsgKind_Gdi))
+	if (checkMsgMask (WidgetMsgCode_Gdi))
 	{
 		WidgetGdiMsg msg (wmMsg, wParam, lParam);
 		
@@ -99,31 +99,31 @@ GdiWidgetImpl::windowProc (
 	switch (wmMsg)
 	{
 	case WM_DESTROY:
-		if (checkMsgMask (WidgetMsgKind_Close))
-			processWidgetMsg (&WidgetMsg (WidgetMsgKind_Close), isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_Close))
+			processWidgetMsg (&WidgetMsg (WidgetMsgCode_Close), isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_SETFOCUS:
-		if (checkMsgMask (WidgetMsgKind_SetFocus))
-			processWidgetMsg (&WidgetMsg (WidgetMsgKind_SetFocus), isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_SetFocus))
+			processWidgetMsg (&WidgetMsg (WidgetMsgCode_SetFocus), isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_KILLFOCUS:
-		if (checkMsgMask (WidgetMsgKind_KillFocus))
-			processWidgetMsg (&WidgetMsg (WidgetMsgKind_KillFocus), isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_KillFocus))
+			processWidgetMsg (&WidgetMsg (WidgetMsgCode_KillFocus), isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_SIZE:
-		if (checkMsgMask (WidgetMsgKind_Size))
+		if (checkMsgMask (WidgetMsgCode_Size))
 			processWmSize (hWnd, isHandled_o);
 		else
 			*isHandled_o = false;
@@ -131,23 +131,23 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_HSCROLL:
-		if (checkMsgMask (WidgetMsgKind_Scroll))
-			processWmScroll (hWnd, WidgetOrientationKind_Horizontal, LOWORD (wParam), isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_Scroll))
+			processWmScroll (hWnd, WidgetOrientation_Horizontal, LOWORD (wParam), isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_VSCROLL:
-		if (checkMsgMask (WidgetMsgKind_Scroll))
-			processWmScroll (hWnd, WidgetOrientationKind_Vertical, LOWORD (wParam), isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_Scroll))
+			processWmScroll (hWnd, WidgetOrientation_Vertical, LOWORD (wParam), isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_PAINT:
-		if (checkMsgMask (WidgetMsgKind_Paint))
+		if (checkMsgMask (WidgetMsgCode_Paint))
 			processWmPaint (hWnd, isHandled_o);
 		else
 			*isHandled_o = false;
@@ -161,12 +161,12 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_MOUSEMOVE:
-		if (checkMsgMask (WidgetMsgKind_MouseMove))
+		if (checkMsgMask (WidgetMsgCode_MouseMove))
 			processWmMouse (
-				WidgetMsgKind_MouseMove, 
+				WidgetMsgCode_MouseMove, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_None,
+				MouseButton_None,
 				isHandled_o
 				);
 		else
@@ -175,28 +175,28 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_MOUSELEAVE:
-		if (checkMsgMask (WidgetMsgKind_MouseLeave))
-			processWidgetMsg (&WidgetMsg (WidgetMsgKind_MouseLeave), isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_MouseLeave))
+			processWidgetMsg (&WidgetMsg (WidgetMsgCode_MouseLeave), isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_CAPTURECHANGED:
-		if (checkMsgMask (WidgetMsgKind_MouseCaptureLost))
-			processWidgetMsg (&WidgetMsg (WidgetMsgKind_MouseCaptureLost), isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_MouseCaptureLost))
+			processWidgetMsg (&WidgetMsg (WidgetMsgCode_MouseCaptureLost), isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_LBUTTONDOWN:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonDown))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonDown))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonDown, 
+				WidgetMsgCode_MouseButtonDown, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Left,
+				MouseButton_Left,
 				isHandled_o
 				);
 		else
@@ -205,12 +205,12 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_LBUTTONUP:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonUp))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonUp))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonUp, 
+				WidgetMsgCode_MouseButtonUp, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Left,
+				MouseButton_Left,
 				isHandled_o
 				);
 		else
@@ -219,12 +219,12 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_LBUTTONDBLCLK:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonDoubleClick))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonDoubleClick))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonDoubleClick, 
+				WidgetMsgCode_MouseButtonDoubleClick, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Left,
+				MouseButton_Left,
 				isHandled_o
 				);
 		else
@@ -233,12 +233,12 @@ GdiWidgetImpl::windowProc (
 		break;		
 
 	case WM_RBUTTONDOWN:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonDown))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonDown))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonDown, 
+				WidgetMsgCode_MouseButtonDown, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Right,
+				MouseButton_Right,
 				isHandled_o
 				);
 		else
@@ -247,12 +247,12 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_RBUTTONUP:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonUp))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonUp))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonUp, 
+				WidgetMsgCode_MouseButtonUp, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Right,
+				MouseButton_Right,
 				isHandled_o
 				);
 		else
@@ -261,12 +261,12 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_RBUTTONDBLCLK:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonDoubleClick))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonDoubleClick))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonDoubleClick,
+				WidgetMsgCode_MouseButtonDoubleClick,
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Right,
+				MouseButton_Right,
 				isHandled_o
 				);
 		else
@@ -275,12 +275,12 @@ GdiWidgetImpl::windowProc (
 		break;		
 
 	case WM_MBUTTONDOWN:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonDown))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonDown))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonDown, 
+				WidgetMsgCode_MouseButtonDown, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Medium,
+				MouseButton_Medium,
 				isHandled_o
 				);
 		else
@@ -289,12 +289,12 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_MBUTTONUP:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonUp))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonUp))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonUp, 
+				WidgetMsgCode_MouseButtonUp, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Medium,
+				MouseButton_Medium,
 				isHandled_o
 				);
 		else
@@ -303,12 +303,12 @@ GdiWidgetImpl::windowProc (
 		break;
 
 	case WM_MBUTTONDBLCLK:
-		if (checkMsgMask (WidgetMsgKind_MouseButtonDoubleClick))
+		if (checkMsgMask (WidgetMsgCode_MouseButtonDoubleClick))
 			processWmMouse (
-				WidgetMsgKind_MouseButtonDoubleClick, 
+				WidgetMsgCode_MouseButtonDoubleClick, 
 				(short) LOWORD(lParam), 
 				(short) HIWORD(lParam), 
-				MouseButtonKind_Medium,
+				MouseButton_Medium,
 				isHandled_o
 				);
 		else
@@ -317,7 +317,7 @@ GdiWidgetImpl::windowProc (
 		break;		
 
 	case WM_MOUSEWHEEL:
-		if (checkMsgMask (WidgetMsgKind_MouseWheel))
+		if (checkMsgMask (WidgetMsgCode_MouseWheel))
 			processWmMouseWheel (
 				hWnd,
 				(short) HIWORD(wParam) / WHEEL_DELTA,
@@ -331,16 +331,16 @@ GdiWidgetImpl::windowProc (
 	// keyboard
 		
 	case WM_KEYDOWN:
-		if (checkMsgMask (WidgetMsgKind_KeyDown))
-			processWmKey (WidgetMsgKind_KeyDown, (uint_t) wParam, isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_KeyDown))
+			processWmKey (WidgetMsgCode_KeyDown, (uint_t) wParam, isHandled_o);
 		else
 			*isHandled_o = false;
 
 		break;
 
 	case WM_KEYUP:
-		if (checkMsgMask (WidgetMsgKind_KeyUp))
-			processWmKey (WidgetMsgKind_KeyUp, (uint_t) wParam, isHandled_o);
+		if (checkMsgMask (WidgetMsgCode_KeyUp))
+			processWmKey (WidgetMsgCode_KeyUp, (uint_t) wParam, isHandled_o);
 		else
 			*isHandled_o = false;
 
@@ -376,15 +376,15 @@ GdiWidgetImpl::windowProc (
 
 void
 GdiWidgetImpl::processWmMouse (
-	WidgetMsgKind msgKind,
+	WidgetMsgCode msgCode,
 	int x,
 	int y,
-	MouseButtonKind button,
+	MouseButton button,
 	bool* isHandled_o
 	)
 {
 	WidgetMouseMsg msg;
-	msg.m_msgKind = msgKind;
+	msg.m_msgCode = msgCode;
 	msg.m_point.m_x = x;
 	msg.m_point.m_y = y;
 	msg.m_modifierKeys = getModifierKeys ();
@@ -396,13 +396,13 @@ GdiWidgetImpl::processWmMouse (
 
 void
 GdiWidgetImpl::processWmKey (
-	WidgetMsgKind msgKind,
+	WidgetMsgCode msgCode,
 	int key,
 	bool* isHandled_o
 	)
 {
 	WidgetKeyMsg msg;
-	msg.m_msgKind = msgKind;
+	msg.m_msgCode = msgCode;
 	msg.m_key = key;
 	msg.m_modifierKeys = getModifierKeys ();
 
@@ -421,11 +421,11 @@ GdiWidgetImpl::processWmMouseWheel (
 	::ScreenToClient (hWnd, &point);
 
 	WidgetMouseWheelMsg msg;
-	msg.m_msgKind = WidgetMsgKind_MouseWheel;
+	msg.m_msgCode = WidgetMsgCode_MouseWheel;
 	msg.m_point.m_x = point.x;
 	msg.m_point.m_y = point.y;
 	msg.m_modifierKeys = getModifierKeys ();
-	msg.m_button = MouseButtonKind_Medium;
+	msg.m_button = MouseButton_Medium;
 	msg.m_buttons = getMouseButtons ();
 	msg.m_wheelDelta = wheelDelta;
 
@@ -445,20 +445,20 @@ GdiWidgetImpl::processWmSize (
 
 	uint_t mask = 0;
 	if (m_size.m_width != size.m_width)
-		mask |= 1 << WidgetOrientationKind_Horizontal;
+		mask |= 1 << WidgetOrientation_Horizontal;
 
 	if (m_size.m_height != size.m_height)
-		mask |= 1 << WidgetOrientationKind_Vertical;
+		mask |= 1 << WidgetOrientation_Vertical;
 
 	m_size = size;
 
-	processWidgetMsg (&WidgetMsgParam <uint_t> (WidgetMsgKind_Size, mask), isHandled_o);
+	processWidgetMsg (&WidgetMsgParam <uint_t> (WidgetMsgCode_Size, mask), isHandled_o);
 }
 
 void
 GdiWidgetImpl::processWmScroll (
 	HWND hWnd,
-	WidgetOrientationKind orientation,
+	WidgetOrientation orientation,
 	int code,
 	bool* isHandled_o
 	)
@@ -521,7 +521,7 @@ GdiWidgetImpl::processWmScroll (
 
 	scrollBar->m_pos = newPos;
 
-	processWidgetMsg (&WidgetMsgParam <uint_t> (WidgetMsgKind_Scroll, 1 << orientation), isHandled_o);
+	processWidgetMsg (&WidgetMsgParam <uint_t> (WidgetMsgCode_Scroll, 1 << orientation), isHandled_o);
 }
 
 void

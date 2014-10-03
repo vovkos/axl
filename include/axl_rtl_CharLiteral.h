@@ -30,9 +30,9 @@ inline
 const char*
 getCharLiteral (uchar_t c)
 {
-	static char _LiteralTable [256] [4];
-	mt::callOnce (InitCharLiteralable (), _LiteralTable);
-	return _LiteralTable [c];
+	static char literalTable [256] [4];
+	mt::callOnce (InitCharLiteralable (), literalTable);
+	return literalTable [c];
 }
 
 //.............................................................................

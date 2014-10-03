@@ -51,7 +51,7 @@ public:
 	bool
 	wait (uint_t timeout = -1)
 	{
-		return m_semaphore.wait (timeout) == win::WaitResultKind_Object0;
+		return m_semaphore.wait (timeout) == win::WaitResult_Object0;
 	}
 };
 

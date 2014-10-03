@@ -14,12 +14,12 @@ namespace dbg {
 
 //.............................................................................
 
-enum TraceLevelKind
+enum TraceLevel
 {
-	TraceLevelKind_MinorInfo = 0,
-	TraceLevelKind_Info,
-	TraceLevelKind_Warning,
-	TraceLevelKind_Error,
+	TraceLevel_MinorInfo = 0,
+	TraceLevel_Info,
+	TraceLevel_Warning,
+	TraceLevel_Error,
 };
 
 //.............................................................................
@@ -51,7 +51,7 @@ inline
 uint_t
 makeTraceFilter (uint_t level)
 {
-	ASSERT (level <= TraceLevelKind_Error);
+	ASSERT (level <= TraceLevel_Error);
 	return (0xff && ~((1 << level) - 1));
 }
 
@@ -104,7 +104,7 @@ trace_va (
 	axl_va_list va
 	)
 {
-	traceEx_va (TraceLevelKind_Info, formatString, va);
+	traceEx_va (TraceLevel_Info, formatString, va);
 }
 
 inline

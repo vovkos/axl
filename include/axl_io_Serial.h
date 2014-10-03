@@ -17,54 +17,54 @@ namespace io {
 
 //.............................................................................
 
-enum SerialFlowControlKind
+enum SerialFlowControl
 {
-	SerialFlowControlKind_None = 0,
-	SerialFlowControlKind_RtsCts,
-	SerialFlowControlKind_XonXoff,
+	SerialFlowControl_None = 0,
+	SerialFlowControl_RtsCts,
+	SerialFlowControl_XonXoff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialStopBitsKind
+enum SerialStopBits
 {
-	SerialStopBitsKind_1  = 0,
-	SerialStopBitsKind_15 = 1,
-	SerialStopBitsKind_2  = 2,
+	SerialStopBits_1  = 0,
+	SerialStopBits_15 = 1,
+	SerialStopBits_2  = 2,
 };
 
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialParityKind
+enum SerialParity
 {
-	SerialParityKind_None  = 0,
-	SerialParityKind_Odd   = 1,
-	SerialParityKind_Even  = 2,
-	SerialParityKind_Mark  = 3,
-	SerialParityKind_Space = 4,
+	SerialParity_None  = 0,
+	SerialParity_Odd   = 1,
+	SerialParity_Even  = 2,
+	SerialParity_Mark  = 3,
+	SerialParity_Space = 4,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialStatusLineKind
+enum SerialStatusLine
 {
-	SerialStatusLineKind_Cts  = 0x01,
-	SerialStatusLineKind_Dsr  = 0x02,
-	SerialStatusLineKind_Ring = 0x04,
-	SerialStatusLineKind_Dcd  = 0x08,
+	SerialStatusLine_Cts  = 0x01,
+	SerialStatusLine_Dsr  = 0x02,
+	SerialStatusLine_Ring = 0x04,
+	SerialStatusLine_Dcd  = 0x08,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialSettingKind
+enum SerialSettingId
 {
-	SerialSettingKind_BaudRate     = 0x01,
-	SerialSettingKind_FlowControl  = 0x02,
-	SerialSettingKind_DataBits     = 0x04,
-	SerialSettingKind_StopBits     = 0x08,
-	SerialSettingKind_Parity       = 0x10,
-	SerialSettingKind_ReadInterval = 0x20,
+	SerialSettingId_BaudRate     = 0x01,
+	SerialSettingId_FlowControl  = 0x02,
+	SerialSettingId_DataBits     = 0x04,
+	SerialSettingId_StopBits     = 0x08,
+	SerialSettingId_Parity       = 0x10,
+	SerialSettingId_ReadInterval = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -72,10 +72,10 @@ enum SerialSettingKind
 struct SerialSettings
 {
 	uint_t m_baudRate;
-	SerialFlowControlKind m_flowControl;
+	SerialFlowControl m_flowControl;
 	uint_t m_dataBits;
-	SerialStopBitsKind m_stopBits;
-	SerialParityKind m_parity;
+	SerialStopBits m_stopBits;
+	SerialParity m_parity;
 	uint_t m_readInterval; // inverse of COMMTIMEOUTS.ReadIntervalTimeout (which always makes me confused):
 	                       // 0  -- return immediatly
 	                       // -1 -- wait for the buffer to fill completely
@@ -87,10 +87,10 @@ struct SerialSettings
 
 	SerialSettings (
 		uint_t baudRate,
-		SerialFlowControlKind flowControl = SerialFlowControlKind_None,
+		SerialFlowControl flowControl = SerialFlowControl_None,
 		uint_t dataBits = 8,
-		SerialStopBitsKind stopBits = SerialStopBitsKind_1,
-		SerialParityKind parity = SerialParityKind_None,
+		SerialStopBits stopBits = SerialStopBits_1,
+		SerialParity parity = SerialParity_None,
 		uint_t readInterval = 10 // 10ms can be used in general case
 		)
 	{
@@ -100,10 +100,10 @@ struct SerialSettings
 	void 
 	setup (
 		uint_t baudRate,
-		SerialFlowControlKind flowControl = SerialFlowControlKind_None,
+		SerialFlowControl flowControl = SerialFlowControl_None,
 		uint_t dataBits = 8,
-		SerialStopBitsKind stopBits = SerialStopBitsKind_1,
-		SerialParityKind parity = SerialParityKind_None,
+		SerialStopBits stopBits = SerialStopBits_1,
+		SerialParity parity = SerialParity_None,
 		uint_t readInterval = 10
 		)
 	{

@@ -16,8 +16,8 @@ Widget::Widget (Engine* engine)
 	m_baseFont = engine->getStdFont (StdFontKind_Monospace);
 	m_style = 0;
 	m_msgMask = -1;	
-	m_baseTextAttr.m_foreColor = StdPalColorKind_WidgetText;
-	m_baseTextAttr.m_backColor = StdPalColorKind_WidgetBack;
+	m_baseTextAttr.m_foreColor = StdPalColor_WidgetText;
+	m_baseTextAttr.m_backColor = StdPalColor_WidgetBack;
 	m_baseTextAttr.m_fontFlags = 0;
 	m_caretSize.m_width = 2;
 	m_caretSize.m_height = 16;

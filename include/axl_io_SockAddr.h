@@ -22,28 +22,28 @@ enum SockAddrKind
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SockProtoKind
+enum SockProto
 {
-	SockProtoKind_Icmp = 1,
-	SockProtoKind_Udp  = 17,
-	SockProtoKind_Tcp  = 6,
+	SockProto_Icmp = 1,
+	SockProto_Udp  = 17,
+	SockProto_Tcp  = 6,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 const char* 
-getProtocolString (SockProtoKind protocol)
+getProtocolString (SockProto protocol)
 {
 	switch (protocol)
 	{
-	case SockProtoKind_Icmp:
+	case SockProto_Icmp:
 		return "ICMP";
 
-	case SockProtoKind_Udp:
+	case SockProto_Udp:
 		return "UDP";
 
-	case SockProtoKind_Tcp:
+	case SockProto_Tcp:
 		return "TCP";
 
 	default:
@@ -190,7 +190,7 @@ union SockAddrU
 			break;
 
 		default:
-			return err::fail (err::StatusKind_InvalidParameter);
+			return err::fail (err::SystemErrorCode_InvalidParameter);
 		}
 
 		return true;
@@ -210,7 +210,7 @@ union SockAddrU
 			break;
 
 		default:
-			return err::fail (err::StatusKind_InvalidParameter);
+			return err::fail (err::SystemErrorCode_InvalidParameter);
 		}
 
 		return true;

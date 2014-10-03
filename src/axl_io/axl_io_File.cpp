@@ -15,25 +15,25 @@ File::open (
 	uint_t flags
 	)
 {
-	uint_t accessMode = (flags & FileFlagKind_ReadOnly) ?
+	uint_t accessMode = (flags & FileFlag_ReadOnly) ?
 		GENERIC_READ :
 		GENERIC_READ | GENERIC_WRITE;
 
-	uint_t shareMode = (flags & FileFlagKind_Exclusive) ?
+	uint_t shareMode = (flags & FileFlag_Exclusive) ?
 		0 :
-		(flags & FileFlagKind_ReadOnly) || (flags & FileFlagKind_ShareWrite) ?
+		(flags & FileFlag_ReadOnly) || (flags & FileFlag_ShareWrite) ?
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE :
 			FILE_SHARE_READ;
 
-	uint_t creationDisposition = (flags & (FileFlagKind_ReadOnly | FileFlagKind_OpenExisting)) ?
+	uint_t creationDisposition = (flags & (FileFlag_ReadOnly | FileFlag_OpenExisting)) ?
 		OPEN_EXISTING :
 		OPEN_ALWAYS;
 
-	uint_t flagsAttributes = (flags & FileFlagKind_DeleteOnClose) ?
+	uint_t flagsAttributes = (flags & FileFlag_DeleteOnClose) ?
 		FILE_FLAG_DELETE_ON_CLOSE :
 		0;
 
-	if (flags & FileFlagKind_Asynchronous)
+	if (flags & FileFlag_Asynchronous)
 		flagsAttributes |= FILE_FLAG_OVERLAPPED;
 
 	char buffer [256];
@@ -55,12 +55,12 @@ File::open (
 uint_t
 getPosixOpenFlags (uint_t fileFlags)
 {
-	uint_t posixFlags = (fileFlags & FileFlagKind_ReadOnly) ? O_RDONLY : O_RDWR;
+	uint_t posixFlags = (fileFlags & FileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
 
-	if (!(fileFlags & (FileFlagKind_ReadOnly | FileFlagKind_OpenExisting)))
+	if (!(fileFlags & (FileFlag_ReadOnly | FileFlag_OpenExisting)))
 		posixFlags |= O_CREAT;
 
-	if (fileFlags & FileFlagKind_Asynchronous)
+	if (fileFlags & FileFlag_Asynchronous)
 		posixFlags |= O_NONBLOCK;
 
 	return posixFlags;

@@ -195,13 +195,13 @@ template <
 class WindowImpl: public B
 {
 protected:
-	enum WindowStateKind
+	enum WindowState
 	{
-		WindowStateKind_Idle = 0,
-		WindowStateKind_Normal,
-		WindowStateKind_Internal,
-		WindowStateKind_Attached,
-		WindowStateKind_Subclassed
+		WindowState_Idle = 0,
+		WindowState_Normal,
+		WindowState_Internal,
+		WindowState_Attached,
+		WindowState_Subclassed
 	};
 
 	class RegisterWndClass
@@ -248,7 +248,7 @@ protected:
 public:
 	WindowImpl ()
 	{		
-		m_windowState = WindowStateKind_Idle;
+		m_windowState = WindowState_Idle;
 		m_subclassWindowThunk = NULL;
 		m_pfOriginalWindowProc = NULL;
 	}
@@ -292,7 +292,7 @@ public:
 		detach ();
 
 		m_h = hWnd;
-		m_windowState = WindowStateKind_Attached;
+		m_windowState = WindowState_Attached;
 	}
 
 	HWND 
@@ -346,7 +346,7 @@ public:
 			return false;
 
 		m_h = hWnd;
-		m_windowState = WindowStateKind_Subclassed;
+		m_windowState = WindowState_Subclassed;
 		m_pfOriginalWindowProc = (WNDPROC) ::SetWindowLongPtr (hWnd, GWLP_WNDPROC, (LONG_PTR) m_subclassWindowThunk);	
 		return true;
 	}
@@ -365,7 +365,7 @@ public:
 		LPARAM lParam
 		)
 	{
-		return m_windowState == WindowStateKind_Subclassed ? 
+		return m_windowState == WindowState_Subclassed ? 
 			::CallWindowProc (m_pfOriginalWindowProc, m_h, msg, wParam, lParam) :
 			::DefWindowProc (m_h, msg, wParam, lParam);
 	}
@@ -380,17 +380,17 @@ protected:
 
 		switch (m_windowState)
 		{
-		case WindowStateKind_Idle:
+		case WindowState_Idle:
 			return NULL;
 
-		case WindowStateKind_Attached:
+		case WindowState_Attached:
 			break;
 
-		case WindowStateKind_Internal:
+		case WindowState_Internal:
 			ASSERT (doDrop); // should only be called from _WindowProc::WM_NCDESTROY
 			break;
 
-		case WindowStateKind_Normal:
+		case WindowState_Normal:
 			if (!doDrop)
 			{
 				pfPrev = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) ::defWindowProc);
@@ -400,7 +400,7 @@ protected:
 
 			break;
 
-		case WindowStateKind_Subclassed:
+		case WindowState_Subclassed:
 			ASSERT (m_subclassWindowThunk);
 
 			if (!doDrop)
@@ -416,7 +416,7 @@ protected:
 		}
 
 		m_h = NULL;
-		m_windowState = WindowStateKind_Idle;
+		m_windowState = WindowState_Idle;
 		return hWnd;
 	}
 
@@ -453,12 +453,12 @@ protected:
 			T* self = (T*) ::TlsGetValue (g_createWindowTls);
 			if (self)
 			{
-				self->m_windowState = WindowStateKind_Normal;
+				self->m_windowState = WindowState_Normal;
 			}
 			else
 			{
 				self = AXL_MEM_NEW (T);
-				self->m_windowState = WindowStateKind_Internal;
+				self->m_windowState = WindowState_Internal;
 			}
 
 			self->m_h = hWnd;
@@ -471,13 +471,13 @@ protected:
 		if (!self)
 			return ::DefWindowProc (hWnd, msg, wParam, lParam);
 
-		ASSERT (self->m_windowState == WindowStateKind_Normal || self->m_windowState == WindowStateKind_Internal);
+		ASSERT (self->m_windowState == WindowState_Normal || self->m_windowState == WindowState_Internal);
 
 		LRESULT result = self->processMessage (msg, wParam, lParam);
 
 		if (msg == WM_NCDESTROY)
 		{
-			bool doDelete = self->m_windowState == WindowStateKind_Internal;
+			bool doDelete = self->m_windowState == WindowState_Internal;
 
 			self->detachEx (true);
 
@@ -498,7 +498,7 @@ protected:
 		LPARAM lParam
 		)
 	{
-		ASSERT (self->m_windowState == WindowStateKind_Subclassed);
+		ASSERT (self->m_windowState == WindowState_Subclassed);
 
 		LRESULT result = self->processMessage (msg, wParam, lParam);
 

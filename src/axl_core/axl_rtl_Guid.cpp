@@ -32,31 +32,31 @@ Guid::parse (const char* string)
 
 	uint32_t a = (uint32_t) strtoul (p, &end, 16);
 	if (end != p + 8 || *end != '-')
-		return err::fail (err::StatusKind_InvalidParameter);
+		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	p = end + 1;
 
 	uint32_t b = (uint16_t) strtoul (p, &end, 16);
 	if (end != p + 4 || *end != '-')
-		return err::fail (err::StatusKind_InvalidParameter);
+		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	p = end + 1;
 
 	uint32_t c = (uint16_t) strtoul (p, &end, 16);
 	if (end != p + 4 || *end != '-')
-		return err::fail (err::StatusKind_InvalidParameter);
+		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	p = end + 1;
 
 	uint16_t d = (uint16_t) strtoul (p, &end, 16);
 	if (end != p + 4 || *end != '-')
-		return err::fail (err::StatusKind_InvalidParameter);
+		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	p = end + 1;
 
 	uint64_t e = _strtoui64 (p, &end, 16);
 	if (end != p + 12 || *end != terminatorChar)
-		return err::fail (err::StatusKind_InvalidParameter);
+		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	memset (this, 0, sizeof (Guid));
 	m_data1 = a;
@@ -88,8 +88,8 @@ Guid::getGuidString (uint_t flags) const
 		}
 	};
 
-	size_t i1 = (flags & GuidStringFlagKind_CurlyBraces) ? 1 : 0;
-	size_t i2 = (flags & GuidStringFlagKind_UpperCase) ? 1 : 0;
+	size_t i1 = (flags & GuidStringFlag_CurlyBraces) ? 1 : 0;
+	size_t i2 = (flags & GuidStringFlag_UpperCase) ? 1 : 0;
 
 	return rtl::String::format_s (
 		formatTable [i1] [i2],

@@ -14,12 +14,12 @@ namespace win {
 
 //.............................................................................
 
-enum WaitResultKind
+enum WaitResult
 {
-	WaitResultKind_Fail         = -1,
-	WaitResultKind_Timeout      = -2,		
-	WaitResultKind_Object0      = 0,
-	WaitResultKind_IoCompletion = 0x100,
+	WaitResult_Fail         = -1,
+	WaitResult_Timeout      = -2,		
+	WaitResult_Object0      = 0,
+	WaitResult_IoCompletion = 0x100,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -27,7 +27,7 @@ enum WaitResultKind
 class WaitableHandle: public g::win::Handle
 {
 public:
-	WaitResultKind
+	WaitResult
 	wait (
 		uint_t timeout = -1, 
 		bool isAlertable = false
@@ -38,7 +38,7 @@ public:
 	}
 	
 	static 
-	WaitResultKind
+	WaitResult
 	multiWait (
 		HANDLE* waitArray, 
 		dword_t count, 
@@ -53,7 +53,7 @@ public:
 
 protected:
 	static
-	WaitResultKind 
+	WaitResult 
 	completeWait (dword_t result);
 };
 

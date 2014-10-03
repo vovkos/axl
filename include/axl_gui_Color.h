@@ -15,9 +15,9 @@ namespace gui {
 
 enum
 {
-	ColorFlagKind_Transparent = 0x80000000,
-	ColorFlagKind_Index       = 0x40000000,
-	ColorFlagKind_IndexMask   = 0x0fffffff,
+	ColorFlag_Transparent = 0x80000000,
+	ColorFlag_Index       = 0x40000000,
+	ColorFlag_IndexMask   = 0x0fffffff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -26,85 +26,85 @@ inline
 uint_t 
 getColorIndex (uint_t color)
 { 
-	ASSERT ((color & ColorFlagKind_Index) && !(color & ColorFlagKind_Transparent));
+	ASSERT ((color & ColorFlag_Index) && !(color & ColorFlag_Transparent));
 	
-	return color & ColorFlagKind_IndexMask;
+	return color & ColorFlag_IndexMask;
 }
 
 //.............................................................................
 
-enum StdColorKind
+enum StdColor
 {
-	StdColorKind_Black        = 0x000000,
-	StdColorKind_White        = 0xffffff,
-	StdColorKind_Gray         = 0x808080,
-	StdColorKind_Red          = 0x800000,
-	StdColorKind_Green        = 0x008000,
-	StdColorKind_Blue         = 0x000080,
-	StdColorKind_Purple       = 0x800080,
-	StdColorKind_Cyan         = 0x008080,
+	StdColor_Black        = 0x000000,
+	StdColor_White        = 0xffffff,
+	StdColor_Gray         = 0x808080,
+	StdColor_Red          = 0x800000,
+	StdColor_Green        = 0x008000,
+	StdColor_Blue         = 0x000080,
+	StdColor_Purple       = 0x800080,
+	StdColor_Cyan         = 0x008080,
 
-	StdColorKind_LightRed     = 0xff0000,
-	StdColorKind_LightGreen   = 0x00ff00,
-	StdColorKind_LightBlue    = 0x0000ff,
-	StdColorKind_LightPurple  = 0xff00ff,
-	StdColorKind_LightCyan    = 0x00ffff,
+	StdColor_LightRed     = 0xff0000,
+	StdColor_LightGreen   = 0x00ff00,
+	StdColor_LightBlue    = 0x0000ff,
+	StdColor_LightPurple  = 0xff00ff,
+	StdColor_LightCyan    = 0x00ffff,
 
-	StdColorKind_PastelGray   = 0xefefef,
-	StdColorKind_PastelRed    = 0xffe4e1,
-	StdColorKind_PastelOrange = 0xfffacd,
-	StdColorKind_PastelYellow = 0xffffc0,
-	StdColorKind_PastelGreen  = 0xe1fada,
-	StdColorKind_PastelCyan   = 0xcdfaff,
-	StdColorKind_PastelBlue   = 0xe2edff,
-	StdColorKind_PastelPurple = 0xe2dafd,
+	StdColor_PastelGray   = 0xefefef,
+	StdColor_PastelRed    = 0xffe4e1,
+	StdColor_PastelOrange = 0xfffacd,
+	StdColor_PastelYellow = 0xffffc0,
+	StdColor_PastelGreen  = 0xe1fada,
+	StdColor_PastelCyan   = 0xcdfaff,
+	StdColor_PastelBlue   = 0xe2edff,
+	StdColor_PastelPurple = 0xe2dafd,
 };
 
 //.............................................................................
 
-enum StdPalColorKind
+enum StdPalColor
 {
 	// system widget colors
 
-	StdPalColorKind_WidgetText = ColorFlagKind_Index | 0,
-	StdPalColorKind_WidgetBack,     // 1
-	StdPalColorKind_GrayText,       // 2
-	StdPalColorKind_SelectionText,  // 3
-	StdPalColorKind_SelectionBack,  // 4
-	StdPalColorKind_3DFace,         // 5
-	StdPalColorKind_3DShadow,       // 6
-	StdPalColorKind_3DDarkShadow,   // 7
-	StdPalColorKind_3DLight,        // 8
-	StdPalColorKind_3DHiLight,      // 9
+	StdPalColor_WidgetText = ColorFlag_Index | 0,
+	StdPalColor_WidgetBack,     // 1
+	StdPalColor_GrayText,       // 2
+	StdPalColor_SelectionText,  // 3
+	StdPalColor_SelectionBack,  // 4
+	StdPalColor_3DFace,         // 5
+	StdPalColor_3DShadow,       // 6
+	StdPalColor_3DDarkShadow,   // 7
+	StdPalColor_3DLight,        // 8
+	StdPalColor_3DHiLight,      // 9
 
 	// std colors
 
-	StdPalColorKind_Black,          // 10
-	StdPalColorKind_White,          // 11
-	StdPalColorKind_Gray,           // 12
-	StdPalColorKind_Red,            // 13
-	StdPalColorKind_Green,          // 14
-	StdPalColorKind_Blue,           // 15
-	StdPalColorKind_Purple,         // 16
-	StdPalColorKind_Cyan,           // 17
+	StdPalColor_Black,          // 10
+	StdPalColor_White,          // 11
+	StdPalColor_Gray,           // 12
+	StdPalColor_Red,            // 13
+	StdPalColor_Green,          // 14
+	StdPalColor_Blue,           // 15
+	StdPalColor_Purple,         // 16
+	StdPalColor_Cyan,           // 17
 
-	StdPalColorKind_LightRed,       // 18
-	StdPalColorKind_LightGreen,     // 19
-	StdPalColorKind_LightBlue,      // 20
-	StdPalColorKind_LightPurple,    // 21
-	StdPalColorKind_LightCyan,      // 22
+	StdPalColor_LightRed,       // 18
+	StdPalColor_LightGreen,     // 19
+	StdPalColor_LightBlue,      // 20
+	StdPalColor_LightPurple,    // 21
+	StdPalColor_LightCyan,      // 22
 	
-	StdPalColorKind_PastelGray,     // 23
-	StdPalColorKind_PastelRed,      // 24
-	StdPalColorKind_PastelOrange,   // 25
-	StdPalColorKind_PastelYellow,   // 26
-	StdPalColorKind_PastelGreen,    // 27
-	StdPalColorKind_PastelCyan,     // 28
-	StdPalColorKind_PastelBlue,     // 29
-	StdPalColorKind_PastelPurple,   // 30
+	StdPalColor_PastelGray,     // 23
+	StdPalColor_PastelRed,      // 24
+	StdPalColor_PastelOrange,   // 25
+	StdPalColor_PastelYellow,   // 26
+	StdPalColor_PastelGreen,    // 27
+	StdPalColor_PastelCyan,     // 28
+	StdPalColor_PastelBlue,     // 29
+	StdPalColor_PastelPurple,   // 30
 
-	StdPalColorKind__SystemColorCount = ~ColorFlagKind_Index & (StdPalColorKind_3DHiLight + 1),
-	StdPalColorKind__Count            = ~ColorFlagKind_Index & (StdPalColorKind_PastelPurple + 1)
+	StdPalColor__SystemColorCount = ~ColorFlag_Index & (StdPalColor_3DHiLight + 1),
+	StdPalColor__Count            = ~ColorFlag_Index & (StdPalColor_PastelPurple + 1)
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -132,7 +132,7 @@ struct Palette
 	Palette ()
 	{
 		m_colorArray = getStdPalColorArray ();
-		m_count = StdPalColorKind__Count;
+		m_count = StdPalColor__Count;
 	}
 
 	Palette (
@@ -147,19 +147,19 @@ struct Palette
 	uint_t
 	getColorRgb (uint_t color)
 	{
-		ASSERT (!(color & ColorFlagKind_Transparent));
+		ASSERT (!(color & ColorFlag_Transparent));
 		
-		if (!(color & ColorFlagKind_Index))
+		if (!(color & ColorFlag_Index))
 			return color;
 
-		size_t i = color & ColorFlagKind_IndexMask;
-		color = i < m_count ? m_colorArray [i] : ColorFlagKind_Transparent;
+		size_t i = color & ColorFlag_IndexMask;
+		color = i < m_count ? m_colorArray [i] : ColorFlag_Transparent;
 			
-		if (color & ColorFlagKind_Index) // allow two-staged index lookup
+		if (color & ColorFlag_Index) // allow two-staged index lookup
 		{
-			i = color & ColorFlagKind_IndexMask;
-			color = i < m_count ? m_colorArray [i] : ColorFlagKind_Transparent;
-			ASSERT (!(color & ColorFlagKind_Index)); // bad palette!
+			i = color & ColorFlag_IndexMask;
+			color = i < m_count ? m_colorArray [i] : ColorFlag_Transparent;
+			ASSERT (!(color & ColorFlag_Index)); // bad palette!
 		}
 
 		return color;
@@ -175,7 +175,7 @@ overlayColor (
 	uint_t overlayColor
 	)
 {
-	return (overlayColor & ColorFlagKind_Transparent) ? baseColor : overlayColor;
+	return (overlayColor & ColorFlag_Transparent) ? baseColor : overlayColor;
 }
 
 uint_t
@@ -193,13 +193,13 @@ struct ColorAttr
 
 	ColorAttr ()
 	{
-		m_foreColor = ColorFlagKind_Transparent;
-		m_backColor = ColorFlagKind_Transparent;
+		m_foreColor = ColorFlag_Transparent;
+		m_backColor = ColorFlag_Transparent;
 	}
 
 	ColorAttr (
 		uint_t foreColor,
-		uint_t backColor = ColorFlagKind_Transparent
+		uint_t backColor = ColorFlag_Transparent
 		)
 	{
 		setup (foreColor, backColor);
@@ -219,8 +219,8 @@ struct ColorAttr
 	void
 	clear ()
 	{
-		m_foreColor = ColorFlagKind_Transparent;
-		m_backColor = ColorFlagKind_Transparent;
+		m_foreColor = ColorFlag_Transparent;
+		m_backColor = ColorFlag_Transparent;
 	}
 
 	void

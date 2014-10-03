@@ -15,87 +15,87 @@ class Engine;
 
 //.............................................................................
 
-enum MouseButtonKind
+enum MouseButton
 {
-	MouseButtonKind_None   = 0x00,
-	MouseButtonKind_Left   = 0x01,
-	MouseButtonKind_Right  = 0x02,
-	MouseButtonKind_Medium = 0x04,
+	MouseButton_None   = 0x00,
+	MouseButton_Left   = 0x01,
+	MouseButton_Right  = 0x02,
+	MouseButton_Medium = 0x04,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-MouseButtonKind
+MouseButton
 getFirstMouseButton (uint_t buttons)
 {
-	return (MouseButtonKind) rtl::getLoBitIdx32 (buttons);
+	return (MouseButton) rtl::getLoBitIdx32 (buttons);
 }
 
 //.............................................................................
 
-enum ModifierKeyKind
+enum ModifierKey
 {
-	ModifierKeyKind_None   = 0x00,
-	ModifierKeyKind_Shift  = 0x01,
-	ModifierKeyKind_Ctrl   = 0x02,
-	ModifierKeyKind_Alt    = 0x04,
+	ModifierKey_None   = 0x00,
+	ModifierKey_Shift  = 0x01,
+	ModifierKey_Ctrl   = 0x02,
+	ModifierKey_Alt    = 0x04,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-ModifierKeyKind
+ModifierKey
 getFirstModifierKey (uint_t modifierKeys)
 {
-	return (ModifierKeyKind) rtl::getLoBitIdx32 (modifierKeys);
+	return (ModifierKey) rtl::getLoBitIdx32 (modifierKeys);
 }
 
 //.............................................................................
 
-enum KeyKind
+enum Key
 {
-	KeyKind_Backspace   = 0x08,
-	KeyKind_Tab         = 0x09,
-	KeyKind_Enter       = 0x0d,	
-	KeyKind_Esc         = 0x1b,
+	Key_Backspace   = 0x08,
+	Key_Tab         = 0x09,
+	Key_Enter       = 0x0d,	
+	Key_Esc         = 0x1b,
 
-	KeyKind_Pause       = 0x10000013,	
-	KeyKind_Print       = 0x1000002a,	
+	Key_Pause       = 0x10000013,	
+	Key_Print       = 0x1000002a,	
 
-	KeyKind_CapsLock    = 0x10000014,
-	KeyKind_NumLock     = 0x10000090,
-	KeyKind_ScrollLock  = 0x10000091,
+	Key_CapsLock    = 0x10000014,
+	Key_NumLock     = 0x10000090,
+	Key_ScrollLock  = 0x10000091,
 
-	KeyKind_Shift       = 0x10000010,
-	KeyKind_Ctrl        = 0x10000011,
-	KeyKind_Alt         = 0x10000012,
+	Key_Shift       = 0x10000010,
+	Key_Ctrl        = 0x10000011,
+	Key_Alt         = 0x10000012,
 
-	KeyKind_PageUp      = 0x10000021,
-	KeyKind_PageDown    = 0x10000022,
-	KeyKind_End         = 0x10000023,
-	KeyKind_Home        = 0x10000024,
+	Key_PageUp      = 0x10000021,
+	Key_PageDown    = 0x10000022,
+	Key_End         = 0x10000023,
+	Key_Home        = 0x10000024,
 
-	KeyKind_Left        = 0x10000025,
-	KeyKind_Up          = 0x10000026,
-	KeyKind_Right       = 0x10000027,
-	KeyKind_Down        = 0x10000028,
+	Key_Left        = 0x10000025,
+	Key_Up          = 0x10000026,
+	Key_Right       = 0x10000027,
+	Key_Down        = 0x10000028,
 
-	KeyKind_Insert      = 0x1000002d,
-	KeyKind_Delete      = 0x1000002e,
+	Key_Insert      = 0x1000002d,
+	Key_Delete      = 0x1000002e,
 
-	KeyKind_F1          = 0x10000070,
-	KeyKind_F2          = 0x10000071,
-	KeyKind_F3          = 0x10000072,
-	KeyKind_F4          = 0x10000073,
-	KeyKind_F5          = 0x10000074,
-	KeyKind_F6          = 0x10000075,
-	KeyKind_F7          = 0x10000076,
-	KeyKind_F8          = 0x10000077,
-	KeyKind_F9          = 0x10000078,
-	KeyKind_F10         = 0x10000079,
-	KeyKind_F11         = 0x1000007a,
-	KeyKind_F12         = 0x1000007b,
+	Key_F1          = 0x10000070,
+	Key_F2          = 0x10000071,
+	Key_F3          = 0x10000072,
+	Key_F4          = 0x10000073,
+	Key_F5          = 0x10000074,
+	Key_F6          = 0x10000075,
+	Key_F7          = 0x10000076,
+	Key_F8          = 0x10000077,
+	Key_F9          = 0x10000078,
+	Key_F10         = 0x10000079,
+	Key_F11         = 0x1000007a,
+	Key_F12         = 0x1000007b,
 };
 
 //.............................................................................
@@ -234,19 +234,19 @@ struct Size
 
 //.............................................................................
 
-enum FormFactorKind
+enum FormFactor
 {
-	FormFactorKind_Landscape,
-	FormFactorKind_Portrait,
-	FormFactorKind_LineStrip,
-	FormFactorKind_ColumnStrip,
-	FormFactorKind__Count,
+	FormFactor_Landscape,
+	FormFactor_Portrait,
+	FormFactor_LineStrip,
+	FormFactor_ColumnStrip,
+	FormFactor__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-FormFactorKind
+FormFactor
 getFormFactor (
 	int width,
 	int height, 
@@ -254,13 +254,13 @@ getFormFactor (
 	)
 {
 	return 
-		height > width * stripThreshold ? FormFactorKind_LineStrip :
-		width > height * stripThreshold ? FormFactorKind_ColumnStrip :
-		height > width ? FormFactorKind_Portrait : FormFactorKind_Landscape;
+		height > width * stripThreshold ? FormFactor_LineStrip :
+		width > height * stripThreshold ? FormFactor_ColumnStrip :
+		height > width ? FormFactor_Portrait : FormFactor_Landscape;
 }
 
 inline
-FormFactorKind
+FormFactor
 getFormFactor (
 	const Size& size, 
 	int stripThreshold = 32

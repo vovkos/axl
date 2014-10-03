@@ -16,30 +16,30 @@ getKeyFromQtKey (int qtKey)
 
 	static uint_t keyTable [] = 
 	{
-		KeyKind_Esc,         // 0x00
-		KeyKind_Tab,         // 0x01
+		Key_Esc,         // 0x00
+		Key_Tab,         // 0x01
 		0,                // 0x02
-		KeyKind_Backspace,   // 0x03
-		KeyKind_Enter,       // 0x04
-		KeyKind_Enter,       // 0x05
-		KeyKind_Insert,      // 0x06
-		KeyKind_Delete,      // 0x07
-		KeyKind_Pause,       // 0x08
-		KeyKind_Print,       // 0x09
+		Key_Backspace,   // 0x03
+		Key_Enter,       // 0x04
+		Key_Enter,       // 0x05
+		Key_Insert,      // 0x06
+		Key_Delete,      // 0x07
+		Key_Pause,       // 0x08
+		Key_Print,       // 0x09
 		0,                // 0x0a
 		0,                // 0x0b
 		0,                // 0x0c
 		0,                // 0x0d
 		0,                // 0x0e
 		0,                // 0x0f
-		KeyKind_Home,        // 0x10
-		KeyKind_End,         // 0x11
-		KeyKind_Left,        // 0x12
-		KeyKind_Up,          // 0x13
-		KeyKind_Right,       // 0x14
-		KeyKind_Down,        // 0x15
-		KeyKind_PageUp,      // 0x16
-		KeyKind_PageDown,    // 0x17
+		Key_Home,        // 0x10
+		Key_End,         // 0x11
+		Key_Left,        // 0x12
+		Key_Up,          // 0x13
+		Key_Right,       // 0x14
+		Key_Down,        // 0x15
+		Key_PageUp,      // 0x16
+		Key_PageDown,    // 0x17
 		0,                // 0x18
 		0,                // 0x19
 		0,                // 0x1a
@@ -48,13 +48,13 @@ getKeyFromQtKey (int qtKey)
 		0,                // 0x1d
 		0,                // 0x1e
 		0,                // 0x1f
-		KeyKind_Shift,       // 0x20
-		KeyKind_Ctrl,        // 0x21
+		Key_Shift,       // 0x20
+		Key_Ctrl,        // 0x21
 		0,                // 0x22
-		KeyKind_Alt,         // 0x23
-		KeyKind_CapsLock,    // 0x24
-		KeyKind_NumLock,     // 0x25
-		KeyKind_ScrollLock,  // 0x26
+		Key_Alt,         // 0x23
+		Key_CapsLock,    // 0x24
+		Key_NumLock,     // 0x25
+		Key_ScrollLock,  // 0x26
 		0,                // 0x27
 		0,                // 0x28
 		0,                // 0x29
@@ -63,18 +63,18 @@ getKeyFromQtKey (int qtKey)
 		0,                // 0x2c
 		0,                // 0x2e
 		0,                // 0x2f
-		KeyKind_F1,          // 0x30
-		KeyKind_F2,          // 0x31
-		KeyKind_F3,          // 0x32
-		KeyKind_F4,          // 0x33
-		KeyKind_F5,          // 0x34
-		KeyKind_F6,          // 0x35
-		KeyKind_F7,          // 0x36
-		KeyKind_F8,          // 0x37
-		KeyKind_F9,          // 0x38
-		KeyKind_F10,         // 0x39
-		KeyKind_F11,         // 0x3a
-		KeyKind_F12,         // 0x3b
+		Key_F1,          // 0x30
+		Key_F2,          // 0x31
+		Key_F3,          // 0x32
+		Key_F4,          // 0x33
+		Key_F5,          // 0x34
+		Key_F6,          // 0x35
+		Key_F7,          // 0x36
+		Key_F8,          // 0x37
+		Key_F9,          // 0x38
+		Key_F10,         // 0x39
+		Key_F11,         // 0x3a
+		Key_F12,         // 0x3b
 	};
 
 	return index < countof (keyTable) ? keyTable [index] : 0;
@@ -83,16 +83,16 @@ getKeyFromQtKey (int qtKey)
 void 
 QtWidgetEventHandler::onEvent (
 	QEvent* event,
-	WidgetMsgKind msgKind
+	WidgetMsgCode msgCode
 	)
 {
-	if (!checkMsgMask (msgKind))
+	if (!checkMsgMask (msgCode))
 	{
 		event->ignore ();	
 		return;
 	}
 
-	WidgetMsg msg (msgKind);
+	WidgetMsg msg (msgCode);
 
 	bool isHandled = true;
 	processWidgetMsg (&msg, &isHandled);			
@@ -104,17 +104,17 @@ QtWidgetEventHandler::onEvent (
 void 
 QtWidgetEventHandler::onMouseEvent (
 	QMouseEvent* event,
-	WidgetMsgKind msgKind
+	WidgetMsgCode msgCode
 	)
 {	
-	if (!checkMsgMask (msgKind))
+	if (!checkMsgMask (msgCode))
 	{
 		event->ignore ();	
 		return;
 	}
 
 	WidgetMouseMsg msg;
-	msg.m_msgKind = msgKind;
+	msg.m_msgCode = msgCode;
 	msg.m_point.setup (event->x (), event->y ());
 	msg.m_buttons = getMouseButtonsFromQtButtons (event->buttons ());
 	msg.m_modifierKeys = getModifierKeysFromQtModifiers (event->modifiers ());
@@ -130,7 +130,7 @@ QtWidgetEventHandler::onMouseEvent (
 void 
 QtWidgetEventHandler::onMouseWheelEvent (QWheelEvent* event)
 {	
-	if (!checkMsgMask (WidgetMsgKind_MouseWheel))
+	if (!checkMsgMask (WidgetMsgCode_MouseWheel))
 	{
 		event->ignore ();	
 		return;
@@ -152,17 +152,17 @@ QtWidgetEventHandler::onMouseWheelEvent (QWheelEvent* event)
 void 
 QtWidgetEventHandler::onKeyEvent (
 	QKeyEvent* event,
-	WidgetMsgKind msgKind
+	WidgetMsgCode msgCode
 	)
 {	
-	if (!checkMsgMask (msgKind))
+	if (!checkMsgMask (msgCode))
 	{
 		event->ignore ();	
 		return;
 	}
 
 	WidgetKeyMsg msg;
-	msg.m_msgKind = msgKind;
+	msg.m_msgCode = msgCode;
 
 	int qtKey = event->key ();
 	if (qtKey & 0x01000000)
@@ -192,7 +192,7 @@ QtWidgetEventHandler::onPaintEvent (
 	QPainter* qtPainter
 	)		
 {
-	if (!checkMsgMask (WidgetMsgKind_Paint))
+	if (!checkMsgMask (WidgetMsgCode_Paint))
 	{
 		event->ignore ();
 		return;
@@ -235,7 +235,7 @@ QtWidgetEventHandler::onPaintEvent (
 void
 QtWidgetEventHandler::onResizeEvent (QResizeEvent* event)
 {
-	if (!checkMsgMask (WidgetMsgKind_Size))
+	if (!checkMsgMask (WidgetMsgCode_Size))
 	{
 		event->ignore ();
 		return;
@@ -246,14 +246,14 @@ QtWidgetEventHandler::onResizeEvent (QResizeEvent* event)
 
 	uint_t mask = 0;
 	if (m_size.m_width != size.m_width)
-		mask |= 1 << WidgetOrientationKind_Horizontal;
+		mask |= 1 << WidgetOrientation_Horizontal;
 
 	if (m_size.m_height != size.m_height)
-		mask |= 1 << WidgetOrientationKind_Vertical;
+		mask |= 1 << WidgetOrientation_Vertical;
 
 	m_size = size;
 
-	WidgetMsgParam <uint_t> msg (WidgetMsgKind_Size, mask);
+	WidgetMsgParam <uint_t> msg (WidgetMsgCode_Size, mask);
 	
 	bool isHandled = true;
 	processWidgetMsg (&msg, &isHandled);
@@ -272,20 +272,20 @@ QtWidgetEventHandler::onScroll (
 	
 	if (verticalScrollBar)
 	{
-		m_scrollBarArray [WidgetOrientationKind_Vertical].m_pos = verticalScrollBar->value ();
-		mask |= 1 << WidgetOrientationKind_Vertical;
+		m_scrollBarArray [WidgetOrientation_Vertical].m_pos = verticalScrollBar->value ();
+		mask |= 1 << WidgetOrientation_Vertical;
 	}
 
 	if (horizontalScrollBar)
 	{
-		m_scrollBarArray [WidgetOrientationKind_Horizontal].m_pos = horizontalScrollBar->value ();
-		mask |= 1 << WidgetOrientationKind_Horizontal;
+		m_scrollBarArray [WidgetOrientation_Horizontal].m_pos = horizontalScrollBar->value ();
+		mask |= 1 << WidgetOrientation_Horizontal;
 	}
 
-	if (!checkMsgMask (WidgetMsgKind_Size))
+	if (!checkMsgMask (WidgetMsgCode_Size))
 		return;
 
-	WidgetMsgParam <uint_t> msg (WidgetMsgKind_Scroll, mask);
+	WidgetMsgParam <uint_t> msg (WidgetMsgCode_Scroll, mask);
 	
 	bool isHandled = true;
 	processWidgetMsg (&msg, &isHandled);	
@@ -311,7 +311,7 @@ QtWidgetBase::mouseMoveEvent (QMouseEvent* e)
 		m_mouseMoveEventFlag = true;
 	}
 
-	m_qtWidget->onMouseEvent (e, WidgetMsgKind_MouseMove);
+	m_qtWidget->onMouseEvent (e, WidgetMsgCode_MouseMove);
 }
 
 //.............................................................................

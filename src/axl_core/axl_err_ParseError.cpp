@@ -16,7 +16,7 @@ ParseErrorProvider::getErrorDescription (const ErrorData* error)
 
 	switch (error->m_code)
 	{
-	case ParseErrorKind_SrcPos:
+	case ParseErrorCode_SrcPos:
 		{
 		const char* filePath;
 		int line;
@@ -30,11 +30,11 @@ ParseErrorProvider::getErrorDescription (const ErrorData* error)
 		}
 		break; 
 
-	case ParseErrorKind_InvalidSyntax:
+	case ParseErrorCode_InvalidSyntax:
 		string = "syntax error";
 		break;
 
-	case ParseErrorKind_InvalidSyntaxIn:
+	case ParseErrorCode_InvalidSyntaxIn:
 		{
 		const char* location;
 		
@@ -43,7 +43,7 @@ ParseErrorProvider::getErrorDescription (const ErrorData* error)
 		}
 		break;
 
-	case ParseErrorKind_ExpectedToken:
+	case ParseErrorCode_ExpectedToken:
 		{
 		const char* expectedToken;
 		const char* actualToken;
@@ -54,7 +54,7 @@ ParseErrorProvider::getErrorDescription (const ErrorData* error)
 		}
 		break;
 
-	case ParseErrorKind_UnexpectedToken:
+	case ParseErrorCode_UnexpectedToken:
 		{
 		const char* token;
 		
@@ -63,7 +63,7 @@ ParseErrorProvider::getErrorDescription (const ErrorData* error)
 		}
 		break;
 
-	case ParseErrorKind_UnexpectedTokenIn:
+	case ParseErrorCode_UnexpectedTokenIn:
 		{
 		const char* token;
 		const char* location;

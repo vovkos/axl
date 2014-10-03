@@ -17,30 +17,30 @@ namespace io {
 
 //.............................................................................
 
-enum SharedMemoryTransportKind
+enum SharedMemoryTransportConst
 {
-	SharedMemoryTransportKind_FileSignature    = ':mhs',
-	SharedMemoryTransportKind_MessageSignature = ':sm\n',
-	SharedMemoryTransportKind_DefMappingSize   = 64 * 1024,   // 64 KB
-	SharedMemoryTransportKind_DefSizeLimitHint = 1024 * 1024, // 1 MB
+	SharedMemoryTransportConst_FileSignature    = ':mhs',
+	SharedMemoryTransportConst_MessageSignature = ':sm\n',
+	SharedMemoryTransportConst_DefMappingSize   = 64 * 1024,   // 64 KB
+	SharedMemoryTransportConst_DefSizeLimitHint = 1024 * 1024, // 1 MB
 };
 
-enum SharedMemoryTransportStateKind
+enum SharedMemoryTransportState
 {
-	SharedMemoryTransportStateKind_MasterConnected,
-	SharedMemoryTransportStateKind_SlaveConnected,
-	SharedMemoryTransportStateKind_Disconnected,
+	SharedMemoryTransportState_MasterConnected,
+	SharedMemoryTransportState_SlaveConnected,
+	SharedMemoryTransportState_Disconnected,
 };
 
-enum SharedMemoryTransportFlagKind
+enum SharedMemoryTransportFlag
 {
-	SharedMemoryTransportFlagKind_Create  = 0x01,
-	SharedMemoryTransportFlagKind_Message = 0x02,
+	SharedMemoryTransportFlag_Create  = 0x01,
+	SharedMemoryTransportFlag_Message = 0x02,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct SharedMemoryransportHdr
+struct SharedMemoryTransportHdr
 {
 	uint32_t m_signature;
 	int32_t m_lock;
@@ -60,12 +60,12 @@ struct SharedMemoryransportMessageHdr
 
 //.............................................................................
 
-class SharedMemoryransportBase
+class SharedMemoryTransportBase
 {
 protected:
 	uint_t m_flags;
 	MappedFile m_file;
-	SharedMemoryransportHdr* m_hdr;
+	SharedMemoryTransportHdr* m_hdr;
 	char* m_data;
 	size_t m_mappingSize;
 	int32_t m_pendingReqCount;
@@ -81,7 +81,7 @@ protected:
 #endif
 
 protected:
-	SharedMemoryransportBase ();
+	SharedMemoryTransportBase ();
 
 public:
 	uint_t
@@ -117,13 +117,13 @@ protected:
 	bool
 	ensureOffsetMapped (size_t offset)
 	{
-		return ensureMappingSize (offset + sizeof (SharedMemoryransportHdr));
+		return ensureMappingSize (offset + sizeof (SharedMemoryTransportHdr));
 	}
 };
 
 //.............................................................................
 
-class SharedMemoryReader: public SharedMemoryransportBase
+class SharedMemoryReader: public SharedMemoryTransportBase
 {
 public:
 	size_t
@@ -135,7 +135,7 @@ public:
 
 //.............................................................................
 
-class SharedMemoryWriter: public SharedMemoryransportBase
+class SharedMemoryWriter: public SharedMemoryTransportBase
 {
 protected:
 	size_t m_sizeLimitHint;
@@ -144,7 +144,7 @@ protected:
 public:
 	SharedMemoryWriter ()
 	{
-		m_sizeLimitHint = SharedMemoryTransportKind_DefSizeLimitHint;
+		m_sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint;
 	}
 
 	bool
@@ -153,7 +153,7 @@ public:
 		const char* readEventName,
 		const char* writeEventName,
 		uint_t flags,
-		size_t sizeLimitHint = SharedMemoryTransportKind_DefSizeLimitHint
+		size_t sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint
 		);
 
 	size_t

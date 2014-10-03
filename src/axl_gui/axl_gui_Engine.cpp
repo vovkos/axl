@@ -54,7 +54,7 @@ Engine::getSharedOffscreenCanvas (
 	int height
 	)
 {
-	FormFactorKind formFactor = getFormFactor (width, height);
+	FormFactor formFactor = getFormFactor (width, height);
 	ASSERT (formFactor < countof (m_sharedOffscreenCanvasArray));
 	
 	SharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [formFactor];
@@ -76,7 +76,7 @@ Engine::getSharedOffscreenCanvas (
 void 
 Engine::deleteAllSharedOffscreenCanvases ()
 {
-	for (size_t i = 0; i < FormFactorKind__Count; i++)
+	for (size_t i = 0; i < FormFactor__Count; i++)
 	{
 		SharedOffscreenCanvas* offscreenCanvas = &m_sharedOffscreenCanvasArray [i];
 		offscreenCanvas->m_canvas = ref::PtrKind_Null;

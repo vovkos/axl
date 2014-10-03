@@ -44,11 +44,11 @@ ErrorMgr::findProvider (const rtl::Guid& guid)
 	return it ? it->m_value : NULL;
 }
 
-ErrorModeKind
-ErrorMgr::setErrorMode (ErrorModeKind mode)
+ErrorMode
+ErrorMgr::setErrorMode (ErrorMode mode)
 {
 	ThreadEntry* entry = getThreadEntry ();
-	ErrorModeKind oldMode = entry->m_mode;
+	ErrorMode oldMode = entry->m_mode;
 	entry->m_mode = mode;
 	return oldMode;
 }
@@ -72,14 +72,14 @@ ErrorMgr::setError (const Error& error)
 	
 	switch (entry->m_mode)
 	{
-	case ErrorModeKind_NoThrow:
+	case ErrorMode_NoThrow:
 		break;
 
-	case ErrorModeKind_CppException:
+	case ErrorMode_CppException:
 		throw error;
 
-	case ErrorModeKind_SehException:
-	case ErrorModeKind_SetJmpLongJmp:
+	case ErrorMode_SehException:
+	case ErrorMode_SetJmpLongJmp:
 		TRACE ("*** unsupported error mode\n");
 
 	default:
