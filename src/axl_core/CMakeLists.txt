@@ -415,4 +415,12 @@ set_pch (
 	${PCH_CPP}
 	)
 
+if (WIN32)
+	add_target_string_property (
+		axl_core
+		STATIC_LIBRARY_FLAGS 
+		"/IGNORE:4221"
+		)
+endif ()
+
 #..............................................................................
