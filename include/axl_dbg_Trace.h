@@ -42,6 +42,35 @@ traceEx_va (
 {
 }
 
+inline
+void
+traceEx (
+	uint_t level,
+	const char* formatString,
+	...
+	)
+{
+}
+
+inline
+void
+trace_va (
+	const char* formatString,
+	axl_va_list va
+	)
+{
+}
+
+inline
+void
+trace (
+	const char* formatString,
+	...
+	)
+{
+}
+
+
 #else
 
 AXL_SELECT_ANY
@@ -62,28 +91,12 @@ setTraceFilter (uint_t level)
 	mt::atomicXchg ((volatile int32_t*) &g_traceFilter, makeTraceFilter (level));
 }
 
-inline
 void
 traceEx_va (
 	uint_t level,
 	const char* formatString,
 	axl_va_list va
-	)
-{
-	uint_t mask = makeTraceFilter (level);
-	if (!(g_traceFilter & mask))
-		return;
-
-#if (_AXL_ENV == AXL_ENV_WIN)
-	char buffer [512] = { 0 };
-	vsnprintf (buffer, sizeof (buffer) / sizeof (char) - 1, formatString, va.m_va);
-	::OutputDebugStringA (buffer);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-	vprintf (formatString, va.m_va);
-#endif
-}
-
-#endif
+	);
 
 inline
 void
@@ -117,6 +130,8 @@ trace (
 	AXL_VA_DECL (va, formatString);
 	trace_va (formatString, va);
 }
+
+#endif
 
 //.............................................................................
 
