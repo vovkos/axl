@@ -94,9 +94,6 @@ public:
 		typename mem::StdFactory <BoxListEntry <T> >::Delete
 		> BaseType;
 
-	typedef BoxListEntry <T> Entry;
-	typedef BoxIterator <T> Iterator;
-
 public:
 	T
 	remove (Iterator it)
@@ -111,13 +108,13 @@ public:
 	T
 	removeHead ()
 	{
-		return this->m_head ? remove (Iterator::fromLink (this->m_head)) : T ();
+		return this->m_head ? remove (this->m_head) : T ();
 	}
 
 	T
 	removeTail ()
 	{
-		return this->m_tail ? remove (Iterator::fromLink (this->m_tail)) : T ();
+		return this->m_tail ? remove (this->m_tail) : T ();
 	}
 
 	Iterator
