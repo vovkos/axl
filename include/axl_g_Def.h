@@ -257,8 +257,12 @@ pvoid_cast (T x)
 #	define countof(a) (sizeof (a) / sizeof (a [0]))
 #endif
 
+#ifndef lengthof
+#	define lengthof(s) (sizeof (s) / sizeof (s [0]) - 1)
+#endif
+
 #ifndef offsetof
-#	define offsetof(type, field) ((size_t) &((type*) 0)->Field)
+#	define offsetof(Type, m_field) ((size_t) &((Type*) 1)->m_field - 1)
 #endif
 
 #define AXL_MIN(a, b)  (((a) < (b)) ? (a) : (b))
