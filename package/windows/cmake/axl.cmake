@@ -4,6 +4,7 @@
 
 #..............................................................................
 
-include (@CMAKE_CURRENT_LIST_DIR@/latest/axl-${TARGET_CPU}.cmake)
+set (AXL_INC_DIR "@AXL_ROOT_DIR@/include")
+set (AXL_LIB_DIR "@CMAKE_CURRENT_BINARY_DIR@/lib/${CONFIGURATION_SUFFIX}")
 
 #..............................................................................

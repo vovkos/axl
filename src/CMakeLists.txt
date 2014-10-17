@@ -34,6 +34,8 @@ if (${QT_FOUND})
 		"Build QT drivers for axl_gui library"
 		ON
 		)
+else ()
+	unset (AXL_BUILD_GUI_QT CACHE)
 endif ()
 
 option (
@@ -48,11 +50,15 @@ endif ()
 
 #..............................................................................
 
-option (
-	AXL_BUILD_INI_LIB
-	"Build axl_ini library"
-	ON
-	)
+if (${RAGEL_FOUND})
+	option (
+		AXL_BUILD_INI_LIB
+		"Build axl_ini library"
+		ON
+		)
+else ()
+	unset (AXL_BUILD_INI_LIB CACHE)
+endif ()
 
 if (AXL_BUILD_INI_LIB)
 	add_subdirectory (axl_ini)
@@ -72,6 +78,8 @@ if (${PCAP_FOUND})
 		"Build PCap wrappers for axl_io library"
 		ON
 		)
+else ()
+	unset (AXL_BUILD_IO_PCAP CACHE)
 endif ()
 
 if (${LIBUSB_FOUND})
@@ -80,6 +88,8 @@ if (${LIBUSB_FOUND})
 		"Build LibUSB wrappers for axl_io library"
 		ON
 		)
+else ()
+	unset (AXL_BUILD_IO_USB CACHE)
 endif ()
 
 if (AXL_BUILD_IO_LIB)
@@ -88,11 +98,15 @@ endif ()
 
 #..............................................................................
 
-option (
-	AXL_BUILD_LUA_LIB
-	"Build axl_lua library"
-	ON
-	)
+if (${RAGEL_FOUND} AND ${LUA_FOUND})
+	option (
+		AXL_BUILD_LUA_LIB
+		"Build axl_lua library"
+		ON
+		)
+else ()
+	unset (AXL_BUILD_LUA_LIB CACHE)
+endif ()
 
 if (AXL_BUILD_LUA_LIB)
 	add_subdirectory (axl_lua)
