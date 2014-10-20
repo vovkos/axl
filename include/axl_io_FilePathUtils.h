@@ -17,6 +17,12 @@ namespace io {
 rtl::String
 getCurrentDir ();
 
+rtl::String
+getExeFilePath ();
+
+rtl::String
+getExeDir ();
+
 bool
 doesFileExist (const char* fileName);
 

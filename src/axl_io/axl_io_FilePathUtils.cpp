@@ -23,6 +23,27 @@ getCurrentDir ()
 #endif
 }
 
+rtl::String
+getExeFilePath ()
+{
+	char buffer [1024];
+	buffer [countof (buffer) - 1] = 0;
+	
+#if (_AXL_ENV == AXL_ENV_WIN)
+	::GetModuleFileNameA (::GetModuleHandle (NULL), buffer, countof (buffer) - 1);
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	readlink ("/proc/self/exe", buffer, countof (buffer) - 1);
+#endif
+
+	return buffer;
+}
+
+rtl::String
+getExeDir ()
+{
+	return io::getDir (io::getExeFilePath ());
+}
+
 bool
 doesFileExist (const char* fileName)
 {
