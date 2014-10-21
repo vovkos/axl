@@ -26,14 +26,16 @@ mkdir %CONTENTS_DIR%\include || exit
 mkdir %CONTENTS_DIR%\src || exit
 if not exist "%OUT_DIR%" (mkdir "%OUT_DIR%" || exit)
 
-xcopy /Y /Q %ROOT_DIR%\cmake\*.* %CONTENTS_DIR%\cmake
-xcopy /Y /Q %ROOT_DIR%\..\cmake\*.* %CONTENTS_DIR%\cmake\std
-xcopy /Y /Q %ROOT_DIR%\include\*.* %CONTENTS_DIR%\include
-xcopy /Y /Q /E %ROOT_DIR%\src\*.* %CONTENTS_DIR%\src
-xcopy /Y /Q %ROOT_DIR%\CMakeLists.txt %CONTENTS_DIR%\
-xcopy /Y /Q %ROOT_DIR%\version.cmake %CONTENTS_DIR%\
-
-del %CONTENTS_DIR%\cmake\std\paths.cmake
+copy /Y %ROOT_DIR%\cmake\*.* %CONTENTS_DIR%\cmake || exit
+copy /Y %ROOT_DIR%\..\cmake\master.cmake %CONTENTS_DIR%\cmake\std || exit
+copy /Y %ROOT_DIR%\..\cmake\utils.cmake %CONTENTS_DIR%\cmake\std || exit
+copy /Y %ROOT_DIR%\..\cmake\libs.cmake %CONTENTS_DIR%\cmake\std || exit
+copy /Y %ROOT_DIR%\..\cmake\settings.cmake %CONTENTS_DIR%\cmake\std || exit
+copy /Y %ROOT_DIR%\package\cmake\*.* %CONTENTS_DIR%\cmake\std || exit
+copy /Y %ROOT_DIR%\include\*.* %CONTENTS_DIR%\include || exit
+xcopy /Y /E %ROOT_DIR%\src\*.* %CONTENTS_DIR%\src || exit
+copy /Y %ROOT_DIR%\CMakeLists.txt %CONTENTS_DIR% || exit
+copy /Y %ROOT_DIR%\version.cmake %CONTENTS_DIR% || exit
 
 set PREV_DIR=%CD%
 cd %ZIP_DIR% || exit
