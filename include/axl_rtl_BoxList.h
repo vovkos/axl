@@ -34,8 +34,8 @@ public:
 
 template <typename T>
 class BoxIterator: public IteratorBase <
-	BoxIterator <T>, 
-	BoxListEntry <T>, 
+	BoxIterator <T>,
+	BoxListEntry <T>,
 	ImplicitCast <BoxListEntry <T>*, ListLink*>
 	>
 {
@@ -93,6 +93,9 @@ public:
 		BoxIterator <T>,
 		typename mem::StdFactory <BoxListEntry <T> >::Delete
 		> BaseType;
+
+	typedef typename BaseType::Entry Entry;
+	typedef typename BaseType::Iterator Iterator;
 
 public:
 	T
@@ -207,7 +210,7 @@ public:
 
 	Iterator
 	insertHeadEntry (Entry* entry)
-	{ 
+	{
 		return BaseType::insertHead (entry);
 	}
 

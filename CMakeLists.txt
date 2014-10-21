@@ -19,11 +19,12 @@ endif ()
 print_std_settings ()
 
 check_and_print_libs (
-	RAGEL
-	LUA
-	PCAP
-	LIBUSB
-	QT
+	OPTIONAL
+		RAGEL
+		LUA
+		PCAP
+		LIBUSB
+		QT
 	)
 
 if (QT_FOUND)
@@ -37,8 +38,9 @@ endif ()
 
 #..............................................................................
 
-set (AXL_ROOT_DIR    ${CMAKE_CURRENT_LIST_DIR})
-set (AXL_PACKAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/package)
+set (AXL_ROOT_DIR     ${CMAKE_CURRENT_LIST_DIR})
+set (AXL_LIB_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set (AXL_PACKAGE_DIR  ${CMAKE_CURRENT_BINARY_DIR}/package)
 
 add_subdirectory (cmake)
 

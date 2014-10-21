@@ -275,7 +275,7 @@ public:
 	typedef Delete_0 Delete;
 	typedef typename Iterator::Entry Entry;
 	typedef typename Iterator::GetLink GetLink;
-	typedef ListData <Entry> ListData;
+	typedef rtl::ListData <Entry> ListData;
 
 public:
 	ListBase ()
@@ -291,7 +291,7 @@ public:
 	bool
 	isEmpty () const
 	{
-		return m_head == NULL;
+		return this->m_head == NULL;
 	}
 
 	const ListData*
@@ -303,19 +303,19 @@ public:
 	size_t
 	getCount () const
 	{
-		return m_count;
+		return this->m_count;
 	}
 
 	Iterator
 	getHead () const
 	{
-		return m_head;
+		return this->m_head;
 	}
 
 	Iterator
 	getTail () const
 	{
-		return m_tail;
+		return this->m_tail;
 	}
 
 	T*
@@ -328,36 +328,36 @@ public:
 		if (prev)
 			prev->m_next = next;
 		else
-			m_head = Iterator::getEntryFromLink (next);
+			this->m_head = Iterator::getEntryFromLink (next);
 
 		if (next)
 			next->m_prev = prev;
 		else
-			m_tail = Iterator::getEntryFromLink (prev);
+			this->m_tail = Iterator::getEntryFromLink (prev);
 
-		m_count--;
+		this->m_count--;
 		return it.getEntry ();
 	}
 
 	T*
 	removeHead ()
 	{
-		return m_head ? remove (m_head) : NULL;
+		return this->m_head ? remove (this->m_head) : NULL;
 	}
 
 	T*
 	removeTail ()
 	{
-		return m_tail ? remove (m_tail) : NULL;
+		return this->m_tail ? remove (this->m_tail) : NULL;
 	}
 
 	void
 	clear ()
 	{
-		if (!m_head)
+		if (!this->m_head)
 			return;
 
-		ListLink* link = GetLink () (m_head);
+		ListLink* link = GetLink () (this->m_head);
 		while (link)
 		{
 			T* p = Iterator::getEntryFromLink (link);
@@ -396,7 +396,7 @@ public:
 	insertHead (T* p)
 	{
 		ListLink* link = GetLink () (p);
-		ListLink* headLink = Iterator::getLinkFromEntry (m_head);
+		ListLink* headLink = Iterator::getLinkFromEntry (this->m_head);
 
 		link->m_prev = NULL;
 		link->m_next = headLink;
@@ -404,10 +404,10 @@ public:
 		if (headLink)
 			headLink->m_prev = link;
 		else
-			m_tail = p;
+			this->m_tail = p;
 
-		m_head = p;
-		m_count++;
+		this->m_head = p;
+		this->m_count++;
 
 		return p;
 	}
@@ -416,7 +416,7 @@ public:
 	insertTail (T* p)
 	{
 		ListLink* link = GetLink () (p);
-		ListLink* tailLink = Iterator::getLinkFromEntry (m_tail);
+		ListLink* tailLink = Iterator::getLinkFromEntry (this->m_tail);
 
 		link->m_next = NULL;
 		link->m_prev = tailLink;
@@ -424,10 +424,10 @@ public:
 		if (tailLink)
 			tailLink->m_next = link;
 		else
-			m_head = p;
+			this->m_head = p;
 
-		m_tail = p;
-		m_count++;
+		this->m_tail = p;
+		this->m_count++;
 
 		return p;
 	}
@@ -452,9 +452,9 @@ public:
 		if (prev)
 			prev->m_next = link;
 		else
-			m_head = p;
+			this->m_head = p;
 
-		m_count++;
+		this->m_count++;
 
 		return Iterator::fromLink (link);
 	}
@@ -479,9 +479,9 @@ public:
 		if (next)
 			next->m_prev = link;
 		else
-			m_tail = p;
+			this->m_tail = p;
 
-		m_count++;
+		this->m_count++;
 
 		return Iterator::fromLink (link);
 	}
@@ -498,13 +498,13 @@ public:
 			return;
 		}
 
-		ListLink* headLink = GetLink () (m_head);
+		ListLink* headLink = GetLink () (this->m_head);
 		ListLink* srcTailLink = GetLink () (src->m_tail);
 
 		headLink->m_prev = srcTailLink;
 		srcTailLink->m_next = headLink;
-		m_head = src->m_head;
-		m_count += src->m_count;
+		this->m_head = src->m_head;
+		this->m_count += src->m_count;
 
 		src->m_head = NULL;
 		src->m_tail = NULL;
@@ -523,13 +523,13 @@ public:
 			return;
 		}
 
-		ListLink* tailLink = GetLink () (m_tail);
+		ListLink* tailLink = GetLink () (this->m_tail);
 		ListLink* srcHeadLink = GetLink () (src->m_head);
 
 		tailLink->m_next = srcHeadLink;
 		srcHeadLink->m_prev = tailLink;
-		m_tail = src->m_tail;
-		m_count += src->m_count;
+		this->m_tail = src->m_tail;
+		this->m_count += src->m_count;
 
 		src->m_head = NULL;
 		src->m_tail = NULL;
@@ -579,9 +579,9 @@ public:
 	{
 		clear ();
 
-		m_head = list->m_head;
-		m_tail = list->m_tail;
-		m_count = list->m_count;
+		this->m_head = list->m_head;
+		this->m_tail = list->m_tail;
+		this->m_count = list->m_count;
 
 		list->construct ();
 	}
@@ -590,9 +590,9 @@ protected:
 	void
 	construct ()
 	{
-		m_head = NULL;
-		m_tail = NULL;
-		m_count = 0;
+		this->m_head = NULL;
+		this->m_tail = NULL;
+		this->m_count = 0;
 	}
 };
 
@@ -608,7 +608,7 @@ public:
 	typedef Iterator_0 Iterator;
 	typedef typename Iterator::Entry Entry;
 	typedef typename Iterator::GetLink GetLink;
-	typedef ListData <Entry> ListData;
+	typedef rtl::ListData <Entry> ListData;
 
 protected:
 	const ListData* m_listData;
