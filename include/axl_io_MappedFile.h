@@ -117,20 +117,32 @@ public:
 		close ();
 	}
 
+	File::Handle
+	getFileHandle () const
+	{
+		return m_file.getHandle ();
+	}
+
 	bool
 	isOpen () const
 	{
 		return m_file.isOpen ();
 	}
 
+	void
+	close ();
+
 	bool 
 	open (
 		const char* fileName, 
-		uint_t flags = 0 // EFileFlag 
+		uint_t flags = 0 // FileFlag
 		);
 
-	void 
-	close ();
+	void
+	attach (
+		File::Handle fileHandle,
+		uint_t flags = 0 // FileFlag
+		);
 
 	bool
 	setup (

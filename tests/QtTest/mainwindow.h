@@ -2,35 +2,22 @@
 
 #define MAINWINDOW_H
 
-#include "mylogwidget.h"
-#include "mylogserver.h"
-#include "mylogproxy.h"
+//.............................................................................
 
-namespace ui {
-class mainWindow;
-}
-
-class mainWindow : public QMainWindow
+class MainWindow: public QMainWindow
 {
 	Q_OBJECT
 
-public:	
-	gui::qtWidget <myLogWidget>* m_logWidget;
-	myLogServer m_logServer;
-	
-	log::MemoryServer m_memoryServer;
-
-	myLogProxy m_logServerProxy;
-	myLogProxy m_logWidgetProxy;
-
 public:
-	explicit mainWindow(QWidget *parent = 0);
-	~mainWindow();
+	MainWindow (QWidget* parent = NULL);
 
-	bool initialize ();
-	virtual void resizeEvent (QResizeEvent* e);
-	
+	virtual QSize sizeHint () const
+	{
+		return QSize (640, 480);
+	}
+
 private:
-	ui::mainWindow *ui;
+	QTextEdit m_editWidget;
 };
 
+//.............................................................................

@@ -33,12 +33,28 @@ class File
 {
 public:
 #if (_AXL_ENV == AXL_ENV_WIN)
-	win::File m_file;
+	typedef win::File FileImpl;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	psx::File m_file;
+	typedef psx::File FileImpl;
 #endif
+	
+	typedef FileImpl::T Handle;
+	FileImpl m_file;
 
 public:
+	static
+	Handle
+	getInvalidHandle ()
+	{
+		return FileImpl::getInvalidHandle ();
+	}
+
+	Handle
+	getHandle () const
+	{
+		return m_file;
+	}
+
 	bool
 	isOpen () const
 	{

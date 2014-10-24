@@ -1,8 +1,8 @@
 #pragma once
 
 // The following macros define the minimum required platform.  The minimum required platform
-// is the earliest version of Windows, Internet Explorer etc. that has the necessary features to run 
-// your application.  The macros work by enabling all features available on platform versions up to and 
+// is the earliest version of Windows, Internet Explorer etc. that has the necessary features to run
+// your application.  The macros work by enabling all features available on platform versions up to and
 // including the version specified.
 
 // Modify the following defines if you have to target a platform prior to the ones specified below.
@@ -24,25 +24,25 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <crtdbg.h>
 
-#define ASSERT _ASSERTE
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include <tchar.h>
+#	include <winsock2.h>
+#	include <ws2ipdef.h>
+#	include <commctrl.h>
 
-#include <tchar.h>
-
-#include <winsock2.h>
-#include <ws2ipdef.h>
-#include <commctrl.h>
-
-#pragma comment (lib, "ws2_32.lib")
-#pragma comment (lib, "comctl32.lib")
+#	pragma comment (lib, "ws2_32.lib")
+#	pragma comment (lib, "comctl32.lib")
+#endif
 
 //.............................................................................
 
 // atl
 
-#include <atlbase.h>
-#include <atlwin.h>
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include <atlbase.h>
+#	include <atlwin.h>
+#endif
 
 //.............................................................................
 
@@ -53,18 +53,6 @@ extern "C" {
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-
-} // extern "C" {
-
-//.............................................................................
-
-// USB
-
-extern "C" {
-
-#pragma warning (disable: 4200)
-#include <libusb.h>
-#pragma comment (lib, "libusb-1.0.lib")
 
 } // extern "C" {
 

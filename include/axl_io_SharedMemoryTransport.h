@@ -34,8 +34,9 @@ enum SharedMemoryTransportState
 
 enum SharedMemoryTransportFlag
 {
-	SharedMemoryTransportFlag_Create  = 0x01,
-	SharedMemoryTransportFlag_Message = 0x02,
+	SharedMemoryTransportFlag_Create        = 0x01,
+	SharedMemoryTransportFlag_Message       = 0x02,
+	SharedMemoryTransportFlag_DeleteOnClose = 0x04,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -83,11 +84,22 @@ protected:
 protected:
 	SharedMemoryTransportBase ();
 
+	~SharedMemoryTransportBase ()
+	{
+		close ();
+	}
+
 public:
 	uint_t
 	getFlags ()
 	{
 		return m_flags;
+	}
+
+	File::Handle
+	getFileHandle () const
+	{
+		return m_file.getFileHandle ();
 	}
 
 	bool
@@ -102,6 +114,14 @@ public:
 	bool
 	open (
 		const char* fileName,
+		const char* readEventName,
+		const char* writeEventName,
+		uint_t flags
+		);
+
+	bool
+	attach (
+		File::Handle fileHandle,
 		const char* readEventName,
 		const char* writeEventName,
 		uint_t flags
@@ -150,6 +170,15 @@ public:
 	bool
 	open (
 		const char* fileName,
+		const char* readEventName,
+		const char* writeEventName,
+		uint_t flags,
+		size_t sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint
+		);
+
+	bool
+	attach (
+		File::Handle fileHandle,
 		const char* readEventName,
 		const char* writeEventName,
 		uint_t flags,

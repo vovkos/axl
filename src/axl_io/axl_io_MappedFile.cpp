@@ -156,23 +156,6 @@ MappedFile::MappedFile ()
 #endif
 }
 
-bool
-MappedFile::open (
-	const char* fileName,
-	uint_t flags
-	)
-{
-	close ();
-	
-	bool result = m_file.open (fileName, flags);
-	if (!result)
-		return false;
-
-	m_fileFlags = flags;
-	m_fileSize = m_file.getSize ();
-	return true;
-}
-
 void
 MappedFile::close ()
 {
@@ -187,9 +170,38 @@ MappedFile::close ()
 		m_file.setSize (m_fileSize);
 
 	m_file.close ();
-	
+
 	m_fileFlags = 0;
 	m_fileSize = 0;
+}
+
+bool
+MappedFile::open (
+	const char* fileName,
+	uint_t flags
+	)
+{
+	io::File file;
+
+	bool result = file.open (fileName, flags);
+	if (!result)
+		return false;
+
+	attach (file.m_file.detach (), flags);
+	return true;
+}
+
+void
+MappedFile::attach (
+	File::Handle fileHandle,
+	uint_t flags
+	)
+{
+	close ();
+
+	m_file.m_file.attach (fileHandle);
+	m_fileFlags = flags;
+	m_fileSize = m_file.getSize ();
 }
 
 bool

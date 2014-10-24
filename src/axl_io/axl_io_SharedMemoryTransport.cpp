@@ -25,15 +25,36 @@ SharedMemoryTransportBase::open (
 	uint_t flags
 	)
 {
-	close ();
-
 	uint_t fileFlags = io::FileFlag_ShareWrite;
-	if (flags & SharedMemoryTransportFlag_Create)
+	if (flags & SharedMemoryTransportFlag_DeleteOnClose)
 		fileFlags |= io::FileFlag_DeleteOnClose;
 
-	bool result = m_file.open (fileName, fileFlags);
+	io::File file;
+	bool result = file.open (fileName, fileFlags);
 	if (!result)
 		return false;
+
+	return attach (
+		file.m_file.detach (),
+		readEventName,
+		writeEventName,
+		flags
+		);
+}
+
+bool
+SharedMemoryTransportBase::attach (
+	File::Handle fileHandle,
+	const char* readEventName,
+	const char* writeEventName,
+	uint_t flags
+	)
+{
+	bool result;
+
+	close ();
+
+	m_file.attach (fileHandle);
 
 	result = ensureMappingSize (SharedMemoryTransportConst_DefMappingSize);
 	if (!result)
@@ -289,9 +310,29 @@ SharedMemoryWriter::open (
 	size_t sizeLimitHint
 	)
 {
-	close ();
+	bool result = SharedMemoryTransportBase::open (fileName, readEventName, writeEventName, flags);
+	if (!result)
+		return false;
+
 	m_sizeLimitHint = sizeLimitHint;
-	return SharedMemoryTransportBase::open (fileName, readEventName, writeEventName, flags);
+	return true;
+}
+
+bool
+SharedMemoryWriter::attach (
+	File::Handle fileHandle,
+	const char* readEventName,
+	const char* writeEventName,
+	uint_t flags,
+	size_t sizeLimitHint
+	)
+{
+	bool result = SharedMemoryTransportBase::attach (fileHandle, readEventName, writeEventName, flags);
+	if (!result)
+		return false;
+
+	m_sizeLimitHint = sizeLimitHint;
+	return true;
 }
 
 size_t

@@ -42,6 +42,21 @@ public:
 		close ();
 	}
 
+	static
+	T
+	getInvalidHandle ()
+	{
+		return GetInvalidHandle () ();
+	}
+
+	static
+	void
+	closeHandle (T h)
+	{
+		if (h != GetInvalidHandle () ())
+			Close () (h);
+	}
+
 	operator T () const
 	{
 		return m_h;

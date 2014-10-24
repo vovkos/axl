@@ -2,8 +2,6 @@
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
 
-set (VIRTUAL_FOLDER_SUB_DIR axl_exe)
-
 #..............................................................................
 #
 # exe folder
@@ -46,8 +44,9 @@ set (
 	axl_exe_InvokeDirect_x86.asm
 	)
 
-virtual_folder (
+source_group (
 	exe
+	FILES
 	${EXE_H_LIST}
 	${EXE_CPP_LIST}
 	${EXE_ASM_LIST}
@@ -61,8 +60,9 @@ virtual_folder (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-virtual_folder (
+source_group (
 	pch
+	FILES
 	${PCH_H}
 	${PCH_CPP}
 	)

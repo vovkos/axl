@@ -80,8 +80,8 @@ File::open (
 	if (!result)
 		return false;
 
-	// if (Flags & EFileFlag_DeleteOnClose)
-	//	unlink (pFileName);
+	if (flags & FileFlag_DeleteOnClose)
+		unlink (fileName);
 
 	return true;
 }

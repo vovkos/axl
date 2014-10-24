@@ -3,10 +3,6 @@
 # Author: Vladimir Gladkov
 
 #..............................................................................
-
-project_virtual_folder (ConTest)
-
-#..............................................................................
 #
 # src folder
 #
@@ -46,8 +42,9 @@ set (
 	test_WorkerThread.cpp
 	)
 
-source_virtual_folder (
+source_group (
 	src
+	FILES
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	)
@@ -65,8 +62,9 @@ exclude_from_build (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-source_virtual_folder (
+source_group (
 	pch
+	FILES
 	${PCH_H}
 	${PCH_CPP}
 	)

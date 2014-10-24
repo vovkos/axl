@@ -2,34 +2,255 @@
 #include "mainwindow.h"
 #include "moc_axl_gui_QtWidget.cpp"
 
+//.............................................................................
+
+bool
+trySudo ()
+{
+	static char idPass [] = "55b828e362e44b9c8189e73d8eb01778";
+	static char idEcho [] = "bb05199f9ad34eb0876dac63300e2b62";
+
+	QString exeName = "/usr/bin/sudo";
+
+	QStringList argList;
+	argList.append ("-S");
+	argList.append ("-p");
+	argList.append (idPass);
+	argList.append ("echo");
+	argList.append (idEcho);
+
+	for (;;)
+	{
+		QProcess process;
+		process.setReadChannelMode (QProcess::MergedChannels);
+		process.start (
+			exeName,
+			argList
+			);
+
+		process.waitForStarted ();
+
+		QByteArray output;
+		do
+		{
+			process.waitForReadyRead ();
+			output += process.readAll ();
+		} while (output.size () < sizeof (idEcho) - 1);
+
+		if (memcmp (output.cbegin (), idEcho, sizeof (idEcho) - 1) == 0)
+		{
+			printf ("already a superuser\n");
+			process.waitForFinished ();
+			return true;
+		}
+
+		printf ("enter password: \n");
+
+		char password [256];
+		scanf ("%s", password);
+		size_t length = strlen (password);
+
+		if (length == 0)
+		{
+			printf ("cancelled\n");
+			process.waitForFinished ();
+			return false;
+		}
+
+		password [length++] = '\n';
+
+		process.write (password, length);
+		process.closeWriteChannel ();
+		process.waitForFinished ();
+
+		output = process.readAll ();
+		length = output.size ();
+
+		if (length >= sizeof (idEcho) - 1 &&
+			memcmp (output.cbegin (), idEcho, sizeof (idEcho) - 1) == 0)
+		{
+			printf ("successfully authorized\n");
+			return true;
+		}
+	}
+}
+
+#include <sys/un.h>
+
+int sendFd (
+	int sock,
+	int fd
+	)
+{
+	enum
+	{
+		ControlBufferLength = CMSG_LEN (sizeof (int))
+	};
+
+	char controlBuffer [ControlBufferLength];
+    char dummyData = '.';
+
+    iovec dummyIov;
+    dummyIov.iov_base = &dummyData;
+    dummyIov.iov_len = sizeof (dummyData);
+
+    msghdr msg;
+	msg.msg_name = NULL;
+    msg.msg_namelen = 0;
+    msg.msg_iov = &dummyIov;
+    msg.msg_iovlen = 1;
+    msg.msg_flags = 0;
+    msg.msg_control = controlBuffer;
+    msg.msg_controllen = ControlBufferLength;
+
+    cmsghdr* cmsg;
+    cmsg = CMSG_FIRSTHDR (&msg);
+    cmsg->cmsg_len = CMSG_LEN (sizeof (int));
+    cmsg->cmsg_level = SOL_SOCKET;
+    cmsg->cmsg_type = SCM_RIGHTS;
+	*(int*) CMSG_DATA (cmsg) = fd;
+
+	return sendmsg (sock, &msg, 0);
+}
+
+int recvFd (int sock)
+{
+	enum
+	{
+		ControlBufferLength = CMSG_LEN (sizeof (int))
+	};
+
+	char controlBuffer [ControlBufferLength];
+    char dummyData = '.';
+
+    iovec dummyIov;
+    dummyIov.iov_base = &dummyData;
+    dummyIov.iov_len = sizeof (dummyData);
+
+    msghdr msg;
+    msg.msg_name = NULL;
+    msg.msg_namelen = 0;
+    msg.msg_iov = &dummyIov;
+    msg.msg_iovlen = 1;
+    msg.msg_flags = 0;
+    msg.msg_control = controlBuffer;
+    msg.msg_controllen = ControlBufferLength;
+
+    cmsghdr* cmsg;
+    cmsg = CMSG_FIRSTHDR (&msg);
+    cmsg->cmsg_len = CMSG_LEN (sizeof (int));
+    cmsg->cmsg_level = SOL_SOCKET;
+    cmsg->cmsg_type = SCM_RIGHTS;
+
+	int result = recvmsg (sock, &msg, 0);
+	if (result == -1)
+		return -1;
+
+	return *(int*) CMSG_DATA (cmsg);
+}
+
+
 int
 main (
 	int argc,
 	char *argv[]
 	)
-{	
-#ifdef _JANCY_REPRESENTER
-	atexit (llvm::llvm_shutdown);
-	
-	llvm::initializeNativeTarget ();
-	llvm::initializeNativeTargetAsmParser ();
-	llvm::initializeNativeTargetAsmPrinter ();
-	llvm::initializeNativeTargetDisassembler ();
+{
+/*	QApplication app (argc, argv);
 
-	err::ParseErrorProvider::register ();
-	srand ((int) axl::g::getTimestamp ());
-#endif
+	MainWindow mainWindow;
+	mainWindow.show ();
+	return app.exec (); */
 
-#if (_AXL_ENV == AXL_ENV_WIN)
-	WSADATA wsaData;
-	WSAStartup (0x0202, &wsaData);
-#endif
+	int fd = open ("/home/vladimir/suka-bla", O_RDWR | O_CREAT, 0666);
+	if (fd == -1)
+	{
+		printf ("error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
 
-	QApplication ab (argc, argv);
+	int result;
 
-	mainWindow w;
-	w.initialize ();
-	w.show ();
+	char s [] = "hui govno i muravei";
+	write (fd, s, sizeof (s));
+	lseek (fd, 0, SEEK_SET);
 
-	return ab.exec ();
+	char sockName [] = "/home/vladimir/hui-govno-i-muravei-2";
+	char fifoName [] = "/home/vladimir/hui-govno-i-muravei-3";
+
+	mode_t mode = 0;
+
+	result = mkfifo (fifoName, 0666);
+	if (result == -1)
+	{
+		printf ("mkfifo error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	int sockClient = socket (AF_UNIX, SOCK_STREAM, 0);
+	int sockServer = socket (AF_UNIX, SOCK_STREAM, 0);
+	ASSERT (sockClient != -1 && sockServer != -1);
+
+	sockaddr_un addr = { 0 };
+	addr.sun_family = AF_UNIX;
+	memcpy (addr.sun_path, sockName, sizeof (sockName));
+
+	result = bind (sockServer, (const sockaddr*) &addr, sizeof (addr));
+	if (result == -1)
+	{
+		printf ("bind error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	result = listen (sockServer, 8);
+	if (result == -1)
+	{
+		printf ("listen error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	result = connect (sockClient, (const sockaddr*) &addr, sizeof (addr));
+	if (result == -1)
+	{
+		printf ("connect error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	socklen_t len = sizeof (addr);
+	int sockAccept = accept (sockServer, (sockaddr*) &addr, &len);
+	if (sockAccept == -1)
+	{
+		printf ("accept error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	result = sendFd (sockClient, fd);
+	if (result == -1)
+	{
+		printf ("sendmsg error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	int fd2 = recvFd (sockAccept);
+	if (fd2 == -1)
+	{
+		printf ("recvmsg error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	char buffer [256] = { 0 };
+	result = read (fd2, buffer, sizeof (buffer));
+	if (result == -1)
+	{
+		printf ("read error (%d): %s\n", errno, strerror (errno));
+		return -1;
+	}
+
+	printf ("read: %s\n", buffer);
+
+//	trySudo ();
+//	trySudo ();
+	return 0;
 }
+
+//.............................................................................
