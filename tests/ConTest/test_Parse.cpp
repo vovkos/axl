@@ -2,8 +2,6 @@
 // #include "TestLexer.h"
 // #include "TestParser.h"
 
-using namespace axl;
-
 //.............................................................................
 
 namespace test_Parse
@@ -17,7 +15,7 @@ run (const char* fileName)
 	bool result;
 
 	io::MappedFile file;
-	result = file.open (fileName, io::FileFlagKind_ReadOnly);
+	result = file.open (fileName, io::FileFlag_ReadOnly);
 	if (!result)
 	{
 		printf ("%s\n", err::getError ()->getDescription ());

@@ -303,6 +303,7 @@ set (
 	${AXL_INC_DIR}/axl_rtl_BitIdx.h
 	${AXL_INC_DIR}/axl_rtl_BitMap.h
 	${AXL_INC_DIR}/axl_rtl_BmhFind.h
+	${AXL_INC_DIR}/axl_rtl_BoyerMooreFind.h
 	${AXL_INC_DIR}/axl_rtl_BoxList.h
 	${AXL_INC_DIR}/axl_rtl_BuddyAllocMap.h
 	${AXL_INC_DIR}/axl_rtl_ByteOrder.h
@@ -336,7 +337,9 @@ set (
 
 set (
 	RTL_CPP_LIST
-	axl_rtl_BitMap.cpp
+	axl_rtl_BitMap.cpp	
+	axl_rtl_BoyerMooreAccessor.h
+	axl_rtl_BoyerMooreFind.cpp
 	axl_rtl_BmhFind.cpp
 	axl_rtl_BuddyAllocMap.cpp
 	axl_rtl_CharCodec.cpp

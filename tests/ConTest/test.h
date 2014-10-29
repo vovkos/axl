@@ -2,6 +2,13 @@
 
 //.............................................................................
 
+namespace test_BoyerMooreFind {
+
+void
+run ();
+
+}
+
 namespace test_CmdLineParser {
 
 void

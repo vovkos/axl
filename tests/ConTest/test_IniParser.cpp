@@ -1,7 +1,5 @@
 #include "pch.h"
 
-using namespace axl;
-
 namespace test_IniParser { 
 
 //.............................................................................
@@ -72,7 +70,7 @@ run ()
 	const char* filePath = "D:/Prj/Ninja/ioninja/scripts/nj_ssn/nj_ssn_Serial/nj_ssn_Serial.njini";
 
 	io::MappedFile file;
-	result = file.open (filePath, io::FileFlagKind_ReadOnly);
+	result = file.open (filePath, io::FileFlag_ReadOnly);
 	if (!result)
 	{
 		printf ("error opening file: %s\n", err::getError ()->getDescription ().cc ());

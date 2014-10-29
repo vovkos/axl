@@ -29,7 +29,7 @@ protected:
 	size_t m_nextBadCharTable [256];
 	size_t m_prevBadCharTable [256];
 	bool m_doMatchCase;
-
+	
 public:
 	BmhFind ();
 

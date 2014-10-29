@@ -58,6 +58,13 @@ extern "C" {
 
 //.............................................................................
 
+// libusb
+
+#pragma warning (disable: 4200)
+#include <libusb.h>
+
+//.............................................................................
+
 // axl
 
 #define _AXL_DISABLE_PREMATURE_WINDOW_DESTRUCTION_CHECK
@@ -70,32 +77,24 @@ extern "C" {
 #include <axl_rtl_HandleTable.h>
 #include <axl_rtl_Packetizer.h>
 #include <axl_rtl_StringHashTable.h>
-
-// #include <axl_exe_WorkerThread.h>
-// #include <axl_exe_WorkerWindow.h>
-// #include <axl_exe_ScheduledFunction.h>
-
-#include <axl_g_win_Window.h>
-// #include <axl_mt_Timer.h>
-#include <axl_io_File.h>
-#include <axl_io_MappedFile.h>
-
-#include <axl_ref_Buf.h>
+#include <axl_rtl_ForEach.h>
+#include <axl_rtl_CmdLineParser.h>
+#include <axl_rtl_BoyerMooreFind.h>
 #include <axl_ref_WeakPtr.h>
 #include <axl_ref_Child.h>
-
-// #include <axl_io_ListenerSock.h>
-// #include <axl_io_DgramSock.h>
-
+#include <axl_io_File.h>
+#include <axl_io_MappedFile.h>
+#include <axl_io_UsbDevice.h>
 #include <axl_lex_RagelLexer.h>
-
 #include <axl_lua_StringTemplate.h>
 #include <axl_gui_GdiEngine.h>
-
-#include <axl_rtl_ForEach.h>
 #include <axl_ini_Parser.h>
-#include <axl_rtl_CmdLineParser.h>
+#include <axl_g_Time.h>
 
-#include <axl_io_UsbDevice.h>
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include <axl_g_win_Window.h>
+#endif
+
+using namespace axl;
 
 //.............................................................................

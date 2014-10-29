@@ -1,7 +1,5 @@
 #include "pch.h"
 
-using namespace axl;
-
 namespace test_HashTable { 
 
 //.............................................................................
@@ -11,12 +9,12 @@ void run ()
 	rtl::HashTableMap <int, int, rtl::HashId <int> > map;
 	rtl::Iterator <rtl::HashTableMapEntry <int, int> > it;
 
-	srand (getTickCount ());
+	srand (::GetTickCount ());
 
 	for (size_t i = 0; i < 50; i++)
 	{
 		int key = rand () % 50;
-		it = map.goto (key);
+		it = map.visit (key);
 		it->m_value = key * 10;
 	}
 

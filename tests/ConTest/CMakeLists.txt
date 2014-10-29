@@ -15,6 +15,7 @@ set (
 set (
 	SRC_CPP_LIST
 	main.cpp
+	test_BoyerMooreFind.cpp
 	test_CmdLineParser.cpp
 	test_Error.cpp
 	test_File.cpp
@@ -101,6 +102,13 @@ target_link_libraries (
 	axl_lua
 	lua
 	)
+
+if (WIN32)
+	target_link_libraries (
+		ConTest
+		libusb-1.0
+		)
+endif ()
 
 set_pch (
 	ConTest

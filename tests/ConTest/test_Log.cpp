@@ -1,7 +1,5 @@
 #include "pch.h"
 
-using namespace axl;
-
 namespace test_Log { 
 
 //.............................................................................
@@ -9,11 +7,11 @@ namespace test_Log {
 enum MsgKind
 {
 	MsgKind_DeviceOpened     = 1,
-	MsgKind_DeviceClosed     = 2 | log::PacketCodeFlagKind_Foldable,
+	MsgKind_DeviceClosed     = 2 | log::PacketCodeFlag_Foldable,
 	MsgKind_Connect          = 3,
 	MsgKind_ConnectComplete  = 4,
 	MsgKind_ConnectError     = 5,	
-	MsgKind_Bin              = 6 | log::PacketCodeFlagKind_Mergeable,
+	MsgKind_Bin              = 6 | log::PacketCodeFlag_Mergeable,
 };
 
 class LogWidget: public log::Widget
@@ -102,17 +100,17 @@ public:
 			target->m_lineAttr.m_icon = 3;
 
 			target->addHyperText(
-				log::MergeFlagKind_MergeableForward,
+				log::MergeFlag_MergeableForward,
 				"Device <#0000ff>COM3<> is..."
 				);
 
 			target->addHyperText(
-				log::MergeFlagKind_Mergeable,
+				log::MergeFlag_Mergeable,
 				"<+b>opened<> <=!5,3>nahui!<>\n"
 				);
 
 			target->addHyperText(
-				log::MergeFlagKind_Mergeable,
+				log::MergeFlag_Mergeable,
 				"Vot <+is>tak<> vot!!"
 				);
 
@@ -137,7 +135,7 @@ public:
 			target->m_lineAttr.m_backColor = gui::StdColorKind_PastelGreen;
 
 			target->addHyperText(
-				log::MergeFlagKind_MergeableForward,
+				log::MergeFlag_MergeableForward,
 				"Connecting..."
 				);
 			break;
@@ -148,7 +146,7 @@ public:
 
 			target->addHyperText(
 				MsgKind_Connect,
-				log::MergeFlagKind_MergeableBackward,
+				log::MergeFlag_MergeableBackward,
 				"OK!"
 				);
 			break;
@@ -158,14 +156,14 @@ public:
 			target->m_lineAttr.m_backColor = gui::StdColorKind_PastelRed;
 			target->addHyperText(
 				MsgKind_Connect,
-				log::MergeFlagKind_MergeableBackward,
+				log::MergeFlag_MergeableBackward,
 				"<\b*>FAIL!"
 				);
 			break;
 
 		case MsgKind_Bin:
 			target->m_lineAttr.m_icon = 8;
-			target->m_lineAttr.m_flags |= log::LineAttrFlagKind_TileIcon;
+			target->m_lineAttr.m_flags |= log::LineAttrFlag_TileIcon;
 			target->addBin(p, size);
 			break;
 

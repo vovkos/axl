@@ -1,7 +1,5 @@
 #include "pch.h"
 
-using namespace axl;
-
 namespace test_String { 
 
 //.............................................................................

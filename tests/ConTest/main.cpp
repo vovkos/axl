@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "test.h"
 
-using namespace axl;
-
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -23,8 +21,9 @@ main (
 	WORD versionRequested = MAKEWORD (2, 2);
 
 	WSAStartup (versionRequested, &wsaData);
+	srand ((uint_t) g::getTimestamp ());
 
-	err::ParseErrorProvider::register ();
+	err::registerParseErrorProvider ();
 		
 	//test_Error::Run ();
 	//test_File::Run ();
@@ -53,8 +52,9 @@ main (
 	//test_WorkerThread::Run ();
 	//test_Packetizer::Run ();
 	//test_CmdLineParser::Run ();
-
-	test_Usb::run ();
+	//test_Usb::run ();
+	
+	test_BoyerMooreFind::run ();
 
 	return 0;
 }

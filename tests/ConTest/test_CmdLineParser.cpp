@@ -1,7 +1,5 @@
 #include "pch.h"
 
-using namespace axl;
-
 namespace test_CmdLineParser {
 
 //.............................................................................
@@ -37,11 +35,11 @@ public:
 
 	bool 
 	onSwitch (
-		SwitchKind switch,
+		SwitchKind switchKind,
 		const char* value
 		)
 	{
-		printf ("OnSwitch #%d = '%s'\n", switch, value);
+		printf ("OnSwitch #%d = '%s'\n", switchKind, value);
 		return true;
 	}
 };

@@ -47,21 +47,21 @@ public:
 		return m_unitSize;
 	}
 
-	void
+	size_t
 	encodeFromUtf8 (
 		rtl::Array <char>* buffer,
 		const utf8_t* p,
 		size_t length
 		);
 
-	void
+	size_t
 	encodeFromUtf16 (
 		rtl::Array <char>* buffer,
 		const utf16_t* p,
 		size_t length
 		);
 
-	void
+	size_t
 	encodeFromUtf32 (
 		rtl::Array <char>* buffer,
 		const utf32_t* p,
@@ -119,21 +119,21 @@ public:
 		size_t* takenLength_o = NULL
 		) = 0;
 
-	void
+	size_t
 	decodeToUtf8 (
 		rtl::Array <utf8_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
-	void
+	size_t
 	decodeToUtf16 (
 		rtl::Array <utf16_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
-	void
+	size_t
 	decodeToUtf32 (
 		rtl::Array <utf32_t>* buffer,
 		const void* p,

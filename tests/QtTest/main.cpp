@@ -75,6 +75,8 @@ trySudo ()
 	}
 }
 
+/*
+
 #include <sys/un.h>
 
 int sendFd (
@@ -148,7 +150,7 @@ int recvFd (int sock)
 
 	return *(int*) CMSG_DATA (cmsg);
 }
-
+*/
 
 int
 main (
@@ -161,7 +163,7 @@ main (
 	MainWindow mainWindow;
 	mainWindow.show ();
 	return app.exec (); */
-
+/*
 	int fd = open ("/home/vladimir/suka-bla", O_RDWR | O_CREAT, 0666);
 	if (fd == -1)
 	{
@@ -247,9 +249,10 @@ main (
 	}
 
 	printf ("read: %s\n", buffer);
+*/
+//	trySudo ();
+//	trySudo ();
 
-//	trySudo ();
-//	trySudo ();
 	return 0;
 }
 

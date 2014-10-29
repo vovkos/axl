@@ -31,7 +31,7 @@ getCharCodec (CharCodecKind codecKind)
 
 //.............................................................................
 
-void
+size_t
 CharCodec::encodeFromUtf8 (
 	rtl::Array <char>* buffer,
 	const utf8_t* p,
@@ -39,6 +39,9 @@ CharCodec::encodeFromUtf8 (
 	)
 {
 	buffer->clear ();
+	bool result = buffer->reserve (length * m_unitSize);
+	if (!result)
+		return -1;
 
 	const utf8_t* end = p + length;
 	while (p < end)
@@ -52,12 +55,17 @@ CharCodec::encodeFromUtf8 (
 		if (!takenLength)
 			break;
 
-		buffer->append (tmpBuffer, takenBufferSize);
+		char* p2 = buffer->append (tmpBuffer, takenBufferSize);
+		if (!p2)
+			return -1;
+
 		p += takenLength;
 	}
+
+	return buffer->getCount ();
 }
 
-void
+size_t
 CharCodec::encodeFromUtf16 (
 	rtl::Array <char>* buffer,
 	const utf16_t* p,
@@ -65,6 +73,9 @@ CharCodec::encodeFromUtf16 (
 	)
 {
 	buffer->clear ();
+	bool result = buffer->reserve (length * m_unitSize);
+	if (!result)
+		return -1;
 
 	const utf16_t* end = p + length;
 	while (p < end)
@@ -78,12 +89,17 @@ CharCodec::encodeFromUtf16 (
 		if (!takenLength)
 			break;
 
-		buffer->append (tmpBuffer, takenBufferSize);
+		char* p2 = buffer->append (tmpBuffer, takenBufferSize);
+		if (!p2)
+			return -1;
+
 		p += takenLength;
 	}
+
+	return buffer->getCount ();
 }
 
-void
+size_t
 CharCodec::encodeFromUtf32 (
 	rtl::Array <char>* buffer,
 	const utf32_t* p,
@@ -91,6 +107,9 @@ CharCodec::encodeFromUtf32 (
 	)
 {
 	buffer->clear ();
+	bool result = buffer->reserve (length * m_unitSize);
+	if (!result)
+		return -1;
 
 	const utf32_t* end = p + length;
 	while (p < end)
@@ -104,9 +123,14 @@ CharCodec::encodeFromUtf32 (
 		if (!takenLength)
 			break;
 
-		buffer->append (tmpBuffer, takenBufferSize);
+		char* p2 = buffer->append (tmpBuffer, takenBufferSize);
+		if (!p2)
+			return -1;
+
 		p += takenLength;
 	}
+
+	return buffer->getCount ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -146,17 +170,23 @@ CharCodec::encodeFromUtf32 (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-void
+size_t
 CharCodec::decodeToUtf8 (
 	rtl::Array <utf8_t>* buffer,
 	const void* _p,
 	size_t size
 	)
 {
+	size_t length = size / m_unitSize;
+	size_t leftover = size % m_unitSize;
+
 	buffer->clear ();
+	bool result = buffer->reserve (length);
+	if (!result)
+		return -1;
 
 	const char* p = (const char*) _p;
-	const char* end = p + size;
+	const char* end = p + size - leftover;
 	while (p < end)
 	{
 		utf8_t tmpBuffer [256];
@@ -168,22 +198,33 @@ CharCodec::decodeToUtf8 (
 		if (!takenLength)
 			break;
 
-		buffer->append (tmpBuffer, takenBufferSize);
+		utf8_t* p2 = buffer->append (tmpBuffer, takenBufferSize);
+		if (!p2)
+			return -1;
+
 		p += takenLength;
 	}
+
+	return buffer->getCount ();
 }
 
-void
+size_t
 CharCodec::decodeToUtf16 (
 	rtl::Array <utf16_t>* buffer,
 	const void* _p,
 	size_t size
 	)
 {
+	size_t length = size / m_unitSize;
+	size_t leftover = size % m_unitSize;
+
 	buffer->clear ();
+	bool result = buffer->reserve (length);
+	if (!result)
+		return -1;
 
 	const char* p = (const char*) _p;
-	const char* end = p + size;
+	const char* end = p + size - leftover;
 	while (p < end)
 	{
 		utf16_t tmpBuffer [256];
@@ -195,22 +236,33 @@ CharCodec::decodeToUtf16 (
 		if (!takenLength)
 			break;
 
-		buffer->append (tmpBuffer, takenBufferSize);
+		utf16_t* p2 = buffer->append (tmpBuffer, takenBufferSize);
+		if (!p2)
+			return -1;
+
 		p += takenLength;
 	}
+
+	return buffer->getCount ();
 }
 
-void
+size_t
 CharCodec::decodeToUtf32 (
 	rtl::Array <utf32_t>* buffer,
 	const void* _p,
 	size_t size
 	)
 {
+	size_t length = size / m_unitSize;
+	size_t leftover = size % m_unitSize;
+
 	buffer->clear ();
+	bool result = buffer->reserve (length);
+	if (!result)
+		return -1;
 
 	const char* p = (const char*) _p;
-	const char* end = p + size;
+	const char* end = p + size - leftover;
 	while (p < end)
 	{
 		utf32_t tmpBuffer [256];
@@ -222,9 +274,14 @@ CharCodec::decodeToUtf32 (
 		if (!takenLength)
 			break;
 
-		buffer->append (tmpBuffer, takenBufferSize);
+		utf32_t* p2 = buffer->append (tmpBuffer, takenBufferSize);
+		if (!p2)
+			return -1;
+
 		p += takenLength;
 	}
+
+	return buffer->getCount ();
 }
 
 rtl::Array <utf8_t>

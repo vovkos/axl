@@ -1,7 +1,5 @@
 #include "pch.h"
 
-using namespace axl;
-
 namespace test_RbTree {
 
 //.............................................................................
@@ -27,10 +25,8 @@ run ()
 	rtl::RbTreeMap <int, int> tree;
 	rtl::RbTreeMap <int, int>::Iterator it;
 
-	srand (getTickCount ());
-
 	for (size_t i = 0; i < 50; i++)
-		tree.goto (rand () % 50);
+		tree.visit (rand () % 50);
 
 	it = tree.getHead ();
 	for (; it; it++)
@@ -39,7 +35,7 @@ run ()
 	printf (".........\n");
 
 	for (size_t i = 0; i < 50; i++)
-		tree.deleteByKey (rand () % 50);
+		tree.eraseByKey (rand () % 50);
 
 	it = tree.getHead ();
 	for (; it; it++)

@@ -13,10 +13,67 @@ namespace rtl {
 
 //.............................................................................
 
+template <typename T, typename Details>
+class CopyReverse
+{
+public:
+	static
+	void
+	reverse (
+		T* dst,
+		size_t count
+		)
+	{
+		T* back = dst + count - 1;
+		T* end = dst + count / 2;			
+		T tmp;
+
+		for (; dst < end; dst++, back--)
+		{
+			tmp = *dst;
+			*dst = *back;
+			*back = tmp;
+		}
+	}
+
+	static
+	void
+	copyReverse (
+		T* dst,
+		const T* src,
+		size_t count
+		)
+	{
+		if (src == dst) // in-place
+		{
+			reverse (dst, count);
+		}
+		else if (src + count <= dst || dst + count <= src)
+		{
+			const T* back = src + count - 1;
+			T* end = dst + count;
+			for (; dst < end; dst++, back--)
+				*dst = *back;	
+		}
+		else // random overlap
+		{
+			T* tmp = (T*) AXL_MEM_ALLOC (count * sizeof (T));
+
+			Details::constructCopy (tmp, src, count);
+			copyReverse (dst, tmp, count);
+			Details::destruct (tmp, count);
+
+			AXL_MEM_FREE (tmp);
+		}
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 // general case: full cycle of construction, copy, destruction
 
 template <typename T>
-class ArrayDetails
+class ArrayDetails: public CopyReverse <T, ArrayDetails <T> >
 {
 public:
 	static
@@ -116,7 +173,7 @@ public:
 // fast memory block operations for types that do not need ctor/dtor
 
 template <typename T>
-class SimpleArrayDetails
+class SimpleArrayDetails: public CopyReverse <T, ArrayDetails <T> >
 {
 public:
 	static
@@ -431,6 +488,12 @@ public:
 	}
 
 	bool
+	copyReverse (const Array& src)
+	{
+		return copyReverse (src, src.getCount ());
+	}
+
+	bool
 	copy (
 		const T* p,
 		size_t count
@@ -451,6 +514,26 @@ public:
 	}
 
 	bool
+	copyReverse (
+		const T* p,
+		size_t count
+		)
+	{
+		if (count == 0)
+		{
+			clear ();
+			return true;
+		}
+
+		bool result = setCount (count);
+		if (!result)
+			return false;
+
+		Details::copyReverse (m_p, p, count);
+		return true;
+	}
+
+	bool
 	copy (T e)
 	{
 		return copy (&e, 1);
@@ -463,6 +546,15 @@ public:
 		)
 	{
 		return insert (-1, p, count);
+	}
+
+	T*
+	appendReverse (
+		const T* p,
+		size_t count
+		)
+	{
+		return insertReverse (-1, p, count);
 	}
 
 	T*
@@ -484,6 +576,12 @@ public:
 	append (const Array& src)
 	{
 		return insert (-1, src, src.getCount ());
+	}
+
+	T*
+	appendReverse (const Array& src)
+	{
+		return insertReverse (-1, src, src.getCount ());
 	}
 
 	T*
@@ -509,6 +607,20 @@ public:
 	}
 
 	T*
+	insertEmptySpace (
+		size_t index,
+		size_t count
+		)
+	{
+		T* dst = insertSpace (index, count);
+		if (!dst)
+			return NULL;
+
+		Details::clear (dst, count);
+		return dst;
+	}
+
+	T*
 	insert (
 		size_t index,
 		const T* p,
@@ -516,9 +628,30 @@ public:
 		)
 	{
 		T* dst = insertSpace (index, count);
+		if (!dst)
+			return NULL;
 
 		if (p)
 			Details::copy (dst, p, count);
+		else
+			Details::clear (dst, count);
+
+		return dst;
+	}
+
+	T*
+	insertReverse (
+		size_t index,
+		const T* p,
+		size_t count
+		)
+	{
+		T* dst = insertSpace (index, count);
+		if (!dst)
+			return NULL;
+
+		if (p)
+			Details::copyReverse (dst, p, count);
 		else
 			Details::clear (dst, count);
 
@@ -532,6 +665,9 @@ public:
 		)
 	{
 		T* dst = insertSpace (index, 1);
+		if (!dst)
+			return NULL;
+
 		*dst = e;
 		return dst;
 	}
@@ -544,6 +680,9 @@ public:
 		)
 	{
 		T* dst = insertSpace (index, count);
+		if (!dst)
+			return NULL;
+
 		T* end = dst + count;
 
 		for (; dst < end; dst++)
@@ -559,6 +698,15 @@ public:
 		)
 	{
 		return insert (index, src, src.getCount ());
+	}
+
+	T*
+	insertReverse (
+		size_t index,
+		const Array& src
+		)
+	{
+		return insertReverse (index, src, src.getCount ());
 	}
 
 	bool
@@ -646,6 +794,41 @@ public:
 		AXL_MEM_FREE (temp);
 
 		return true;
+	}
+
+	void
+	reverse (
+		size_t index,
+		size_t count
+		)
+	{
+		size_t thisCount = getCount ();
+
+		if (index >= thisCount)
+			return;
+
+		if (index + count > thisCount)
+			count = thisCount - index;
+
+		Details::reverse (m_p + index, count);
+	}
+
+	void
+	reverse ()
+	{
+		reverse (0, -1);
+	}
+
+	void
+	reverseFrom (size_t index)
+	{
+		reverse (index, -1);
+	}
+
+	void
+	reverseUntil (size_t index)
+	{
+		reverse (0, index);
 	}
 
 	size_t

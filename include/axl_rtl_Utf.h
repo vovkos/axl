@@ -27,7 +27,62 @@ enum UtfKind
 const char*
 getUtfKindString (UtfKind utfKind);
 
+//.............................................................................
+
+struct UtfCodePointAttr
+{
+    uint16_t m_category           : 8; /* 5 used */
+    uint16_t m_direction          : 8; /* 5 used */
+    uint16_t m_combiningClass     : 8;
+    uint16_t m_joining            : 2;
+    int16_t m_digitValue          : 6; /* 5 used */
+    int16_t m_mirrorDiff          : 16;
+    int16_t m_lowerCaseDiff       : 16;
+    int16_t m_upperCaseDiff       : 16;
+    int16_t m_titleCaseDiff       : 16;
+    int16_t m_caseFoldDiff        : 16;
+    uint16_t m_lowerCaseSpecial   : 1;
+    uint16_t m_upperCaseSpecial   : 1;
+    uint16_t m_titleCaseSpecial   : 1;
+    uint16_t m_caseFoldSpecial    : 1;
+    uint16_t m_unicodeVersion     : 4;
+    uint16_t m_graphemeBreakClass : 8; /* 4 used */
+    uint16_t m_wordBreakClass     : 8; /* 4 used */
+    uint16_t m_sentenceBreakClass : 8; /* 4 used */
+    uint16_t m_lineBreakClass     : 8; /* 6 used */
+    uint16_t m_script             : 8; /* 5 used */
+};
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const UtfCodePointAttr*
+getUtfCodePointAttr (utf32_t c);
+
+inline
+utf32_t
+utfToLower (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return attr->m_lowerCaseDiff && !attr->m_lowerCaseSpecial ? c + attr->m_lowerCaseDiff : c;
+}
+
+inline
+utf32_t
+utfToUpper (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return attr->m_upperCaseDiff && !attr->m_upperCaseSpecial ? c + attr->m_upperCaseDiff : c;
+}
+
+inline
+utf32_t
+utfToCaseFold (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return attr->m_caseFoldDiff && !attr->m_caseFoldSpecial ? c + attr->m_caseFoldDiff : c;
+}
+
+//.............................................................................
 
 template <typename T>
 size_t
