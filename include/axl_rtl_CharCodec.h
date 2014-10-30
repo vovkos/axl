@@ -47,6 +47,27 @@ public:
 		return m_unitSize;
 	}
 
+	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf8 (
+		const utf8_t* p,
+		size_t length
+		) = 0;
+
+	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf16 (
+		const utf16_t* p,
+		size_t length
+		) = 0;
+
+	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf32 (
+		const utf32_t* p,
+		size_t length
+		) = 0;
+
 	size_t
 	encodeFromUtf8 (
 		rtl::Array <char>* buffer,
@@ -117,6 +138,27 @@ public:
 		size_t length,
 		size_t* takenBufferSize_o = NULL,
 		size_t* takenLength_o = NULL
+		) = 0;
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf8 (
+		const void* p,
+		size_t size
+		) = 0;
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf16 (
+		const void* p,
+		size_t size
+		) = 0;
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf32 (
+		const void* p,
+		size_t size
 		) = 0;
 
 	size_t
@@ -211,6 +253,36 @@ public:
 	}
 
 	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf8 (
+		const utf8_t* p,
+		size_t length
+		)
+	{
+		return rtl::UtfToAsciiConvert <rtl::Utf8>::calcRequiredLength (p, length);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf16 (
+		const utf16_t* p,
+		size_t length
+		)
+	{
+		return rtl::UtfToAsciiConvert <rtl::Utf16>::calcRequiredLength (p, length);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf32 (
+		const utf32_t* p,
+		size_t length
+		)
+	{
+		return rtl::UtfToAsciiConvert <rtl::Utf32>::calcRequiredLength (p, length);
+	}
+
+	virtual
 	void
 	encodeFromUtf8 (
 		void* buffer,
@@ -271,6 +343,36 @@ public:
 			takenBufferSize_o,
 			takenLength_o
 			);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf8 (
+		const void* p,
+		size_t size
+		)
+	{
+		return rtl::AsciiToUtfConvert <rtl::Utf8>::calcRequiredLength ((const char*) p, size);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf16 (
+		const void* p,
+		size_t size
+		)
+	{
+		return rtl::AsciiToUtfConvert <rtl::Utf16>::calcRequiredLength ((const char*) p, size);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf32 (
+		const void* p,
+		size_t size
+		)
+	{
+		return rtl::AsciiToUtfConvert <rtl::Utf32>::calcRequiredLength ((const char*) p, size);
 	}
 
 	virtual
@@ -358,6 +460,36 @@ public:
 	}
 
 	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf8 (
+		const utf8_t* p,
+		size_t length
+		)
+	{
+		return rtl::UtfConvert <T, rtl::Utf8>::calcRequiredLength (p, length) * sizeof (C);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf16 (
+		const utf16_t* p,
+		size_t length
+		)
+	{
+		return rtl::UtfConvert <T, rtl::Utf16>::calcRequiredLength (p, length) * sizeof (C);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferSizeToEncodeFromUtf32 (
+		const utf32_t* p,
+		size_t length
+		)
+	{
+		return rtl::UtfConvert <T, rtl::Utf32>::calcRequiredLength (p, length) * sizeof (C);
+	}
+
+	virtual
 	void
 	encodeFromUtf8 (
 		void* buffer,
@@ -439,6 +571,39 @@ public:
 	}
 
 	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf8 (
+		const void* p,
+		size_t size
+		)
+	{
+		size_t length = size / sizeof (C);
+		return rtl::UtfConvert <rtl::Utf8, T>::calcRequiredLength ((const C*) p, length);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf16 (
+		const void* p,
+		size_t size
+		)
+	{
+		size_t length = size / sizeof (C);
+		return rtl::UtfConvert <rtl::Utf16, T>::calcRequiredLength ((const C*) p, length);
+	}
+
+	virtual
+	size_t
+	calcRequiredBufferLengthToDecodeToUtf32 (
+		const void* p,
+		size_t size
+		)
+	{
+		size_t length = size / sizeof (C);
+		return rtl::UtfConvert <rtl::Utf32, T>::calcRequiredLength ((const C*) p, length);
+	}
+
+	virtual
 	void
 	decodeToUtf8 (
 		utf8_t* buffer,
@@ -459,7 +624,7 @@ public:
 		rtl::UtfConvert <rtl::Utf8, T>::convert (
 			buffer,
 			bufferLength,
-			(C*) p,
+			(const C*) p,
 			length,
 			takenBufferLength_o,
 			&takenLength,
@@ -494,7 +659,7 @@ public:
 		rtl::UtfConvert <rtl::Utf16, T>::convert (
 			buffer,
 			bufferLength,
-			(C*) p,
+			(const C*) p,
 			length,
 			takenBufferLength_o,
 			&takenLength,
@@ -529,7 +694,7 @@ public:
 		rtl::UtfConvert <rtl::Utf32, T>::convert (
 			buffer,
 			bufferLength,
-			(C*) p,
+			(const C*) p,
 			length,
 			takenBufferLength_o,
 			&takenLength,

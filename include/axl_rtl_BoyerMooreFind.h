@@ -19,19 +19,19 @@ class BoyerMooreIncrementalContext
 {
 public:
 	Array <T> m_tail;
-	size_t m_offset;
+	utf32_t m_prefix;
 
 public:
 	BoyerMooreIncrementalContext ()
 	{
-		m_offset = 0;
+		m_prefix = ' ';
 	}
 
 	void 
 	reset ()
 	{
 		m_tail.clear ();
-		m_offset = 0;
+		m_prefix = ' ';
 	}
 };
 
@@ -182,6 +182,7 @@ public:
 	size_t 
 	find (
 		IncrementalContext* incrementalContext,
+		size_t offset,
 		const void* p, 
 		size_t size
 		);
@@ -213,7 +214,10 @@ public:
 	{
 		Def_BadSkipTableSize = 256, // any number will do, actually (code points are hashed)
 	};
-	
+
+protected:
+	Array <utf32_t> m_buffer;
+
 public:
 	bool
 	setPattern (
@@ -304,6 +308,7 @@ public:
 	find (
 		IncrementalContext* incrementalContext,
 		CharCodec* codec,
+		size_t offset,
 		const void* p, 
 		size_t size
 		);
@@ -312,21 +317,23 @@ public:
 	find (
 		IncrementalContext* incrementalContext,
 		CharCodecKind codecKind,
+		size_t offset,
 		const void* p, 
 		size_t size
 		)
 	{
-		return find (incrementalContext, getCharCodec (codecKind), p, size);
+		return find (incrementalContext, getCharCodec (codecKind), offset, p, size);
 	}
 
 	size_t 
 	find (
 		IncrementalContext* incrementalContext,
+		size_t offset,
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		return find (incrementalContext, CharCodecKind_Utf8, p, length != -1 ? length : strlen (p));
+		return find (incrementalContext, CharCodecKind_Utf8, offset, p, length != -1 ? length : strlen (p));
 	}
 
 protected:
@@ -337,6 +344,7 @@ protected:
 	size_t 
 	findImpl (
 		const Accessor& accessor,
+		size_t end,
 		size_t size
 		);
 };

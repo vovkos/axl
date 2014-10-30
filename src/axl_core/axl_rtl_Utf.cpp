@@ -6296,7 +6296,9 @@ static const UtfCodePointAttr g_utfCodePointAttrTable [] =
     { 13, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 12, 0 },
     { 18, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 8, 14, 0 },
     { 0, 17, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 4, 4, 4, 21, 28 },
-    { 12, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 12, 0 }
+    { 12, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 12, 0 },
+
+    { UtfCategory_Other_NotAssigned },
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -6306,9 +6308,10 @@ getUtfCodePointAttr (utf32_t c)
 {
 	uint32_t uc = (uint32_t) c;
 
-	size_t index = uc < 0x11000 ? 
-		g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [uc >> 5] + (uc & 0x1f)] : 
-		g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [((uc - 0x11000) >> 8) + 0x880] + (uc & 0xff)];
+	size_t index = 
+		uc < 0x11000 ? g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [uc >> 5] + (uc & 0x1f)] : 
+		uc < 0x10ffff ? g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [((uc - 0x11000) >> 8) + 0x880] + (uc & 0xff)] : 
+		countof (g_utfCodePointAttrTable) - 1;
 
     return g_utfCodePointAttrTable + index;
 }

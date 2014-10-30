@@ -82,8 +82,6 @@ public:
 		size_t size
 		) const
 	{
-		m_incrementalContext->m_offset += i;
-
 		if (!size)
 		{
 			m_incrementalContext->m_tail.clear ();
@@ -132,8 +130,6 @@ public:
 		size_t size
 		) const
 	{
-		m_incrementalContext->m_offset += i;
-
 		if (!size)
 		{
 			m_incrementalContext->m_tail.clear ();
@@ -159,11 +155,61 @@ public:
 //.............................................................................
 
 template <typename Base>
-class TextBoyerMooreCaseFoldAccessorImpl: public Base
+class TextBoyerMooreAccessorImpl: public Base
+{
+public:
+	TextBoyerMooreAccessorImpl (const utf32_t* p):
+		Base (p)			
+	{
+	}
+
+	bool
+	isDelimChar (size_t i) const
+	{
+		return i == -1 ? true : !rtl::utfIsLetterOrNumber (Base::getChar (i));
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename Base>
+class TextBoyerMooreIncrementalAccessorImpl: public Base
+{
+public:
+	TextBoyerMooreIncrementalAccessorImpl (
+		const utf32_t* p,
+		BoyerMooreIncrementalContext <utf32_t>* incrementalContext
+		): Base  (p, incrementalContext)
+	{
+	}
+
+	bool
+	isDelimChar (size_t i) const
+	{
+		utf32_t c = i != -1 ? Base::getChar (i) : m_incrementalContext->m_prefix;
+		return !rtl::utfIsLetterOrNumber (c);
+	}
+
+	void
+	saveTail (
+		size_t i,
+		size_t size
+		) const
+	{
+		ASSERT (i);
+		m_incrementalContext->m_prefix = Base::getChar (i - 1);
+		Base::saveTail (i, size);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename Base>
+class TextBoyerMooreCaseFoldAccessorImpl: public TextBoyerMooreAccessorImpl <Base>
 {
 public:
 	TextBoyerMooreCaseFoldAccessorImpl (const utf32_t* p):
-		Base (p)			
+		TextBoyerMooreAccessorImpl <Base> (p)			
 	{
 	}
 
@@ -177,13 +223,13 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
-class TextBoyerMooreCaseFoldIncrementalAccessorImpl: public Base
+class TextBoyerMooreCaseFoldIncrementalAccessorImpl: public TextBoyerMooreIncrementalAccessorImpl <Base>
 {
 public:
 	TextBoyerMooreCaseFoldIncrementalAccessorImpl (
 		const utf32_t* p,
 		BoyerMooreIncrementalContext <utf32_t>* incrementalContext
-		): Base  (p, incrementalContext)
+		): TextBoyerMooreIncrementalAccessorImpl <Base> (p, incrementalContext)
 	{
 	}
 
@@ -201,10 +247,23 @@ typedef BoyerMooreReverseAccessor <char> BinaryBoyerMooreReverseAccessor;
 typedef BoyerMooreIncrementalAccessor <char> BinaryBoyerMooreIncrementalAccessor;
 typedef BoyerMooreIncrementalReverseAccessor <char> BinaryBoyerMooreIncrementalReverseAccessor;
 
-typedef BoyerMooreAccessor <utf32_t> TextBoyerMooreAccessor;
-typedef BoyerMooreReverseAccessor <utf32_t> TextBoyerMooreReverseAccessor;
-typedef BoyerMooreIncrementalAccessor <utf32_t> TextBoyerMooreIncrementalAccessor;
-typedef BoyerMooreIncrementalReverseAccessor <utf32_t> TextBoyerMooreIncrementalReverseAccessor;
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef 
+TextBoyerMooreAccessorImpl <BoyerMooreAccessor <utf32_t> >
+TextBoyerMooreAccessor;
+
+typedef 
+TextBoyerMooreAccessorImpl <BoyerMooreReverseAccessor <utf32_t> >
+TextBoyerMooreReverseAccessor;
+
+typedef 
+TextBoyerMooreIncrementalAccessorImpl <BoyerMooreIncrementalAccessor <utf32_t> >
+TextBoyerMooreIncrementalAccessor;
+
+typedef 
+TextBoyerMooreIncrementalAccessorImpl <BoyerMooreIncrementalReverseAccessor <utf32_t> >
+TextBoyerMooreIncrementalReverseAccessor;
 
 typedef 
 TextBoyerMooreCaseFoldAccessorImpl <BoyerMooreAccessor <utf32_t> >

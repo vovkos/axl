@@ -29,6 +29,87 @@ getUtfKindString (UtfKind utfKind);
 
 //.............................................................................
 
+enum UtfCategory
+{
+    UtfCategory_Mark_NonSpacing,          //   Mn
+    UtfCategory_Mark_SpacingCombining,    //   Mc
+    UtfCategory_Mark_Enclosing,           //   Me
+
+    UtfCategory_Number_DecimalDigit,      //   Nd
+    UtfCategory_Number_Letter,            //   Nl
+    UtfCategory_Number_Other,             //   No
+
+    UtfCategory_Separator_Space,          //   Zs
+    UtfCategory_Separator_Line,           //   Zl
+    UtfCategory_Separator_Paragraph,      //   Zp
+
+    UtfCategory_Other_Control,            //   Cc
+    UtfCategory_Other_Format,             //   Cf
+    UtfCategory_Other_Surrogate,          //   Cs
+    UtfCategory_Other_PrivateUse,         //   Co
+    UtfCategory_Other_NotAssigned,        //   Cn
+
+    UtfCategory_Letter_Uppercase,         //   Lu
+    UtfCategory_Letter_Lowercase,         //   Ll
+    UtfCategory_Letter_Titlecase,         //   Lt
+    UtfCategory_Letter_Modifier,          //   Lm
+    UtfCategory_Letter_Other,             //   Lo
+
+    UtfCategory_Punctuation_Connector,    //   Pc
+    UtfCategory_Punctuation_Dash,         //   Pd
+    UtfCategory_Punctuation_Open,         //   Ps
+    UtfCategory_Punctuation_Close,        //   Pe
+    UtfCategory_Punctuation_InitialQuote, //   Pi
+    UtfCategory_Punctuation_FinalQuote,   //   Pf
+    UtfCategory_Punctuation_Other,        //   Po
+
+    UtfCategory_Symbol_Math,              //   Sm
+    UtfCategory_Symbol_Currency,          //   Sc
+    UtfCategory_Symbol_Modifier,          //   Sk
+    UtfCategory_Symbol_Other              //   So
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum UtfCategoryMask
+{
+	UtfCategoryMask_NonPrintable = 
+		(1 << UtfCategory_Other_Control) |
+		(1 << UtfCategory_Other_Format) |
+		(1 << UtfCategory_Other_Surrogate) |
+		(1 << UtfCategory_Other_PrivateUse) |
+		(1 << UtfCategory_Other_NotAssigned),
+
+	UtfCategoryMask_Space = 
+		(1 << UtfCategory_Separator_Space) |
+		(1 << UtfCategory_Separator_Line) |
+		(1 << UtfCategory_Separator_Paragraph),
+
+	UtfCategoryMask_Number = 
+	    (1 << UtfCategory_Number_DecimalDigit) |
+		(1 << UtfCategory_Number_Letter) |
+		(1 << UtfCategory_Number_Other),
+
+	UtfCategoryMask_Letter = 
+		(1 << UtfCategory_Letter_Uppercase) |
+		(1 << UtfCategory_Letter_Uppercase) |
+		(1 << UtfCategory_Letter_Lowercase) |
+		(1 << UtfCategory_Letter_Titlecase) |
+		(1 << UtfCategory_Letter_Modifier) |
+		(1 << UtfCategory_Letter_Other),
+
+	UtfCategoryMask_Punctuation = 
+		(1 << UtfCategory_Punctuation_Connector) |
+		(1 << UtfCategory_Punctuation_Dash) |
+		(1 << UtfCategory_Punctuation_Open) |
+		(1 << UtfCategory_Punctuation_Close) |
+		(1 << UtfCategory_Punctuation_InitialQuote) |
+		(1 << UtfCategory_Punctuation_FinalQuote) |
+		(1 << UtfCategory_Punctuation_Other),
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 struct UtfCodePointAttr
 {
     uint16_t m_category           : 8; /* 5 used */
@@ -80,6 +161,46 @@ utfToCaseFold (utf32_t c)
 {
 	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
 	return attr->m_caseFoldDiff && !attr->m_caseFoldSpecial ? c + attr->m_caseFoldDiff : c;
+}
+
+inline
+utf32_t
+utfIsSpace (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return ((1 << attr->m_category) & UtfCategoryMask_Space) != 0;
+}
+
+inline
+utf32_t
+utfIsPunctuation (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return ((1 << attr->m_category) & UtfCategoryMask_Punctuation) != 0;
+}
+
+inline
+utf32_t
+utfIsLetter (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return ((1 << attr->m_category) & UtfCategoryMask_Letter) != 0;
+}
+
+inline
+utf32_t
+utfIsNumber (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return ((1 << attr->m_category) & UtfCategoryMask_Number) != 0;
+}
+
+inline
+utf32_t
+utfIsLetterOrNumber (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return ((1 << attr->m_category) & (UtfCategoryMask_Letter | UtfCategoryMask_Number)) != 0;
 }
 
 //.............................................................................

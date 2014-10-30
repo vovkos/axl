@@ -49,23 +49,37 @@ BinaryBoyerMooreFind::find (
 	size_t size
 	)
 {
-	if (size < m_pattern.getCount ())
+	size_t patternSize = m_pattern.getCount ();
+
+	if (size < patternSize)
 		return -1;
 
-	return (m_flags & Flag_Reverse) ? 
+	size_t result = (m_flags & Flag_Reverse) ? 
 		findImpl (BinaryBoyerMooreReverseAccessor ((const char*) p + size - 1), size) : 
 		findImpl (BinaryBoyerMooreAccessor ((const char*) p), size);
+
+	if (result == -1)
+		return -1;
+
+	if (m_flags & Flag_Reverse)
+		result = size - result - patternSize;
+
+	return result;
 }
 
 size_t 
 BinaryBoyerMooreFind::find (
 	IncrementalContext* incrementalContext,
+	size_t offset,
 	const void* p, 
 	size_t size
 	)
 {
-	size_t fullSize = size + incrementalContext->m_tail.getCount ();
-	if (fullSize < m_pattern.getCount ())
+	size_t patternSize = m_pattern.getCount ();
+	size_t tailSize = incrementalContext->m_tail.getCount ();
+	size_t fullSize = size + tailSize;
+
+	if (fullSize < patternSize)
 	{
 		if (m_flags & Flag_Reverse)
 			incrementalContext->m_tail.appendReverse ((const char*) p, size);
@@ -79,14 +93,17 @@ BinaryBoyerMooreFind::find (
 		findImpl (BinaryBoyerMooreIncrementalReverseAccessor ((const char*) p + size - 1, incrementalContext), fullSize) : 
 		findImpl (BinaryBoyerMooreIncrementalAccessor ((const char*) p, incrementalContext), fullSize);
 
-	if (result != -1)
-	{
-		result += incrementalContext->m_offset;
-		incrementalContext->reset ();
-		return result;
-	}
+	if (result == -1)
+		return -1;
+	
+	incrementalContext->reset ();
 
-	return -1;
+	result -= tailSize;
+
+	if (m_flags & Flag_Reverse)
+		result = size - result - patternSize;
+
+	return offset + result;
 }
 
 template <typename Accessor>
@@ -153,8 +170,10 @@ BinaryBoyerMooreFind::findImpl (
 			i += AXL_MAX (badSkip, goodSkip);
 		}
 
-	ASSERT (i - size <= last);
-	accessor.saveTail (i - last, last - (i - size));
+	ASSERT (i > last && i - last <= size);
+
+	i -= last;
+	accessor.saveTail (i, size - i);
 
 	return -1;
 }
@@ -225,88 +244,122 @@ TextBoyerMooreFind::find (
 	size_t size
 	)
 {
-	char buffer [256];
-	rtl::Array <utf32_t> text (ref::BufKind_Stack, buffer, sizeof (buffer));
-	
-	size_t length = codec->decodeToUtf32 (&text, p, size);
+	size_t length = codec->decodeToUtf32 (&m_buffer, p, size);
 	if (length == -1)
 		return -1;
 
-	if (length < m_pattern.getCount ())
+	size_t patternLength = m_pattern.getCount ();
+	if (length < patternLength)
 		return -1;
 
-	return (m_flags & Flag_CaseInsensitive) ? 
-		(m_flags & Flag_Reverse) ? 
-			findImpl (TextBoyerMooreCaseFoldReverseAccessor (text + length - 1), length) : 
-			findImpl (TextBoyerMooreCaseFoldAccessor (text), length) :
-		(m_flags & Flag_Reverse) ? 
-			findImpl (TextBoyerMooreReverseAccessor (text + length - 1), length) : 
-			findImpl (TextBoyerMooreAccessor (text), length);
+	if (m_flags & Flag_WholeWord)
+		m_buffer.append (' ');
 
-	return 0;
+	size_t result = (m_flags & Flag_CaseInsensitive) ? 
+		(m_flags & Flag_Reverse) ? 
+			findImpl (TextBoyerMooreCaseFoldReverseAccessor (m_buffer + length - 1), length, length) : 
+			findImpl (TextBoyerMooreCaseFoldAccessor (m_buffer), length, length) :
+		(m_flags & Flag_Reverse) ? 
+			findImpl (TextBoyerMooreReverseAccessor (m_buffer + length - 1), length, length) : 
+			findImpl (TextBoyerMooreAccessor (m_buffer), length, length);
+
+	if (result == -1)
+		return -1;
+	
+	if (m_flags & Flag_Reverse)
+		result = size - result - patternLength;
+
+	ASSERT (result <= length);
+	return codec->calcRequiredBufferSizeToEncodeFromUtf32 (m_buffer, result);
 }
 
 size_t 
 TextBoyerMooreFind::find (
 	IncrementalContext* incrementalContext,
 	CharCodec* codec,
+	size_t offset,
 	const void* p, 
 	size_t size
 	)
 {
-	char buffer [256];
-	rtl::Array <utf32_t> text (ref::BufKind_Stack, buffer, sizeof (buffer));
-	
-	size_t length = codec->decodeToUtf32 (&text, p, size);
-	if (length == -1)
+	size_t chunkLength = codec->decodeToUtf32 (&m_buffer, p, size);
+	if (chunkLength == -1 || chunkLength == 0)
 		return -1;
 
-	size_t fullLength = length + incrementalContext->m_tail.getCount ();
-	if (fullLength < m_pattern.getCount ())
+	size_t patternLength = m_pattern.getCount ();
+	size_t tailLength = incrementalContext->m_tail.getCount ();
+	size_t fullLength = chunkLength + tailLength;
+	size_t end = fullLength;
+
+	if (m_flags & Flag_WholeWord)
+		end--;
+
+	if (end < patternLength)
 	{
 		if (m_flags & Flag_Reverse)
-			incrementalContext->m_tail.appendReverse (text, length);
+			incrementalContext->m_tail.appendReverse (m_buffer, chunkLength);
 		else
-			incrementalContext->m_tail.append (text, length);
+			incrementalContext->m_tail.append (m_buffer, chunkLength);
 
 		return -1;
 	}
 
 	size_t result = (m_flags & Flag_CaseInsensitive) ? 
 		(m_flags & Flag_Reverse) ? 
-			findImpl (TextBoyerMooreCaseFoldIncrementalReverseAccessor (text + length - 1, incrementalContext), fullLength) : 
-			findImpl (TextBoyerMooreCaseFoldIncrementalAccessor (text, incrementalContext), fullLength) :
+			findImpl (
+				TextBoyerMooreCaseFoldIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
+				end,
+				fullLength
+				) : 
+			findImpl (
+				TextBoyerMooreCaseFoldIncrementalAccessor (m_buffer, incrementalContext), 
+				end,
+				fullLength
+				) :
 		(m_flags & Flag_Reverse) ? 
-			findImpl (TextBoyerMooreIncrementalReverseAccessor (text + length - 1, incrementalContext), fullLength) : 
-			findImpl (TextBoyerMooreIncrementalAccessor (text, incrementalContext), fullLength);
+			findImpl (
+				TextBoyerMooreIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
+				end,
+				fullLength
+				) : 
+			findImpl (
+				TextBoyerMooreIncrementalAccessor (m_buffer, incrementalContext), 
+				end,
+				fullLength
+				);
 
-	if (result != -1)
-	{
-		result += incrementalContext->m_offset;
-		incrementalContext->reset ();
-		return result;
-	}
+	if (result == -1)
+		return -1;
 
-	return -1;
+	incrementalContext->reset ();
+
+	result -= tailLength;
+
+	if (m_flags & Flag_Reverse)
+		result = size - result - patternLength;
+
+	ASSERT (result <= chunkLength);
+	return offset + codec->calcRequiredBufferSizeToEncodeFromUtf32 (m_buffer, result);
 }
 
 template <typename Accessor>
 size_t 
 TextBoyerMooreFind::findImpl (
 	const Accessor& accessor, 
+	size_t end,
 	size_t size
 	)
 {
 	size_t badSkipTableSize = m_badSkipTable.getCount ();
 	size_t patternSize = m_pattern.getCount ();
-	ASSERT (patternSize && size >= patternSize);
+	ASSERT (patternSize && end >= patternSize);
 
 	size_t last = patternSize - 1;
 
 	size_t i = last;
 
 	if (m_flags & Flag_Horspool)
-		while (i < size)
+		while (i < end)
 		{
 			intptr_t j = last;
 		
@@ -320,7 +373,15 @@ TextBoyerMooreFind::findImpl (
 					break;
 
 				if (j == 0)
+				{
+					if ((m_flags & Flag_WholeWord) && 
+						(!accessor.isDelimChar (i - 1)) || !accessor.isDelimChar (i + patternSize))
+					{
+						break;
+					}
+
 					return i;
+				}
 
 				i--;
 				j--;
@@ -329,7 +390,7 @@ TextBoyerMooreFind::findImpl (
 			i += m_badSkipTable [c % badSkipTableSize];
 		}
 	else
-		while (i < size)
+		while (i < end)
 		{
 			intptr_t j = last;
 		
@@ -343,7 +404,15 @@ TextBoyerMooreFind::findImpl (
 					break;
 
 				if (j == 0)
+				{
+					if ((m_flags & Flag_WholeWord) && 
+						(!accessor.isDelimChar (i - 1)) || !accessor.isDelimChar (i + patternSize))
+					{
+						break;
+					}
+
 					return i;
+				}
 
 				i--;
 				j--;
@@ -355,8 +424,10 @@ TextBoyerMooreFind::findImpl (
 			i += AXL_MAX (badSkip, goodSkip);
 		}
 
-	ASSERT (i - size <= last);
-	accessor.saveTail (i - last, last - (i - size));
+	ASSERT (i > last && i - last <= size);
+
+	i -= last;
+	accessor.saveTail (i, size - i);
 
 	return -1;
 }
