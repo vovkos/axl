@@ -199,14 +199,14 @@ source_group (
 # axl_io library
 #
 
-if (AXL_BUILD_IO_PCAP)
+if (BUILD_AXL_IO_PCAP)
 	include_directories (${PCAP_INC_DIR})
 	add_definitions (-D_AXL_IO_PCAP)
 else ()
 	exclude_from_build (${IO_PCAP_CPP_LIST})
 endif ()
 
-if (AXL_BUILD_IO_USB)
+if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
 	add_definitions (-D_AXL_IO_USB)
 else ()

@@ -9,12 +9,12 @@ add_subdirectory (axl_core)
 #..............................................................................
 
 option (
-	AXL_BUILD_EXE_LIB
+	BUILD_AXL_EXE
 	"Build axl_exe library"
 	OFF
 	)
 
-if (AXL_BUILD_EXE_LIB)
+if (BUILD_AXL_EXE)
 	add_subdirectory (axl_exe)
 endif ()
 
@@ -22,7 +22,7 @@ endif ()
 
 if (WIN32)
 	option (
-		AXL_BUILD_GUI_GDI
+		BUILD_AXL_GUI_GDI
 		"Build GDI drivers for axl_gui library"
 		ON
 		)
@@ -30,21 +30,21 @@ endif ()
 
 if (${QT_FOUND})
 	option (
-		AXL_BUILD_GUI_QT
+		BUILD_AXL_GUI_QT
 		"Build QT drivers for axl_gui library"
 		ON
 		)
 else ()
-	unset (AXL_BUILD_GUI_QT CACHE)
+	unset (BUILD_AXL_GUI_QT CACHE)
 endif ()
 
 option (
-	AXL_BUILD_GUI_LIB
+	BUILD_AXL_GUI
 	"Build axl_gui library"
 	ON
 	)
 
-if (AXL_BUILD_GUI_LIB)
+if (BUILD_AXL_GUI)
 	add_subdirectory (axl_gui)
 endif ()
 
@@ -52,47 +52,47 @@ endif ()
 
 if (${RAGEL_FOUND})
 	option (
-		AXL_BUILD_INI_LIB
+		BUILD_AXL_INI
 		"Build axl_ini library"
 		ON
 		)
 else ()
-	unset (AXL_BUILD_INI_LIB CACHE)
+	unset (BUILD_AXL_INI CACHE)
 endif ()
 
-if (AXL_BUILD_INI_LIB)
+if (BUILD_AXL_INI)
 	add_subdirectory (axl_ini)
 endif ()
 
 #..............................................................................
 
 option (
-	AXL_BUILD_IO_LIB
+	BUILD_AXL_IO
 	"Build axl_io library"
 	ON
 	)
 
 if (${PCAP_FOUND})
 	option (
-		AXL_BUILD_IO_PCAP
+		BUILD_AXL_IO_PCAP
 		"Build PCap wrappers for axl_io library"
 		ON
 		)
 else ()
-	unset (AXL_BUILD_IO_PCAP CACHE)
+	unset (BUILD_AXL_IO_PCAP CACHE)
 endif ()
 
 if (${LIBUSB_FOUND})
 	option (
-		AXL_BUILD_IO_USB
+		BUILD_AXL_IO_USB
 		"Build LibUSB wrappers for axl_io library"
 		ON
 		)
 else ()
-	unset (AXL_BUILD_IO_USB CACHE)
+	unset (BUILD_AXL_IO_USB CACHE)
 endif ()
 
-if (AXL_BUILD_IO_LIB)
+if (BUILD_AXL_IO)
 	add_subdirectory (axl_io)
 endif ()
 
@@ -100,15 +100,15 @@ endif ()
 
 if (${RAGEL_FOUND} AND ${LUA_FOUND})
 	option (
-		AXL_BUILD_LUA_LIB
+		BUILD_AXL_LUA
 		"Build axl_lua library"
 		ON
 		)
 else ()
-	unset (AXL_BUILD_LUA_LIB CACHE)
+	unset (BUILD_AXL_LUA CACHE)
 endif ()
 
-if (AXL_BUILD_LUA_LIB)
+if (BUILD_AXL_LUA)
 	add_subdirectory (axl_lua)
 endif ()
 

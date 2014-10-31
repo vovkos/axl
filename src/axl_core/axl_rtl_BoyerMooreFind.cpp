@@ -14,6 +14,12 @@ BinaryBoyerMooreFind::setPattern (
 	uint_t flags
 	)
 {
+	if (!size)
+	{
+		clear ();
+		return true;
+	}
+
 	bool result = (flags & Flag_Reverse) ?
 		m_pattern.copyReverse ((const char*) p, size) :
 		m_pattern.copy ((const char*) p, size);
@@ -50,8 +56,7 @@ BinaryBoyerMooreFind::find (
 	)
 {
 	size_t patternSize = m_pattern.getCount ();
-
-	if (size < patternSize)
+	if (!patternSize || size < patternSize)
 		return -1;
 
 	size_t result = (m_flags & Flag_Reverse) ? 
@@ -76,6 +81,9 @@ BinaryBoyerMooreFind::find (
 	)
 {
 	size_t patternSize = m_pattern.getCount ();
+	if (!patternSize)
+		return -1;
+
 	size_t tailSize = incrementalContext->m_tail.getCount ();
 	size_t fullSize = size + tailSize;
 
@@ -190,6 +198,11 @@ TextBoyerMooreFind::setPattern (
 	)
 {
 	size_t length = codec->decodeToUtf32 (&m_pattern, p, size);
+	if (!length)
+	{
+		clear ();
+		return true;
+	}
 
 	if (flags & Flag_CaseInsensitive)
 		for (size_t i = 0; i < length; i++)
@@ -244,11 +257,14 @@ TextBoyerMooreFind::find (
 	size_t size
 	)
 {
+	size_t patternLength = m_pattern.getCount ();
+	if (!patternLength)
+		return -1;
+
 	size_t length = codec->decodeToUtf32 (&m_buffer, p, size);
 	if (length == -1)
 		return -1;
 
-	size_t patternLength = m_pattern.getCount ();
 	if (length < patternLength)
 		return -1;
 
@@ -282,11 +298,14 @@ TextBoyerMooreFind::find (
 	size_t size
 	)
 {
+	size_t patternLength = m_pattern.getCount ();
+	if (!patternLength)
+		return -1;
+
 	size_t chunkLength = codec->decodeToUtf32 (&m_buffer, p, size);
 	if (chunkLength == -1 || chunkLength == 0)
 		return -1;
 
-	size_t patternLength = m_pattern.getCount ();
 	size_t tailLength = incrementalContext->m_tail.getCount ();
 	size_t fullLength = chunkLength + tailLength;
 	size_t end = fullLength;
@@ -331,15 +350,24 @@ TextBoyerMooreFind::find (
 	if (result == -1)
 		return -1;
 
-	incrementalContext->reset ();
-
 	result -= tailLength;
 
 	if (m_flags & Flag_Reverse)
 		result = size - result - patternLength;
 
-	ASSERT (result <= chunkLength);
-	return offset + codec->calcRequiredBufferSizeToEncodeFromUtf32 (m_buffer, result);
+	if ((intptr_t) result < 0)
+	{
+		ASSERT (-result <= tailLength);
+		result = -codec->calcRequiredBufferSizeToEncodeFromUtf32 (incrementalContext->m_tail, -result);
+	}
+	else if (result)
+	{	
+		ASSERT (result <= chunkLength);
+		result = codec->calcRequiredBufferSizeToEncodeFromUtf32 (m_buffer, result);
+	}
+
+	incrementalContext->reset ();
+	return offset + result;
 }
 
 template <typename Accessor>
@@ -375,7 +403,7 @@ TextBoyerMooreFind::findImpl (
 				if (j == 0)
 				{
 					if ((m_flags & Flag_WholeWord) && 
-						(!accessor.isDelimChar (i - 1)) || !accessor.isDelimChar (i + patternSize))
+						(!accessor.isDelimChar (i - 1) || !accessor.isDelimChar (i + patternSize)))
 					{
 						break;
 					}
@@ -406,7 +434,7 @@ TextBoyerMooreFind::findImpl (
 				if (j == 0)
 				{
 					if ((m_flags & Flag_WholeWord) && 
-						(!accessor.isDelimChar (i - 1)) || !accessor.isDelimChar (i + patternSize))
+						(!accessor.isDelimChar (i - 1) || !accessor.isDelimChar (i + patternSize)))
 					{
 						break;
 					}

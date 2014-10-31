@@ -5,26 +5,26 @@
 #..............................................................................
 
 option (
-	AXL_BUILD_CON_TEST
-	"Build ConTest"
+	BUILD_TEST_CON
+	"Build test_con"
 	OFF
 	)
 
-if (AXL_BUILD_CON_TEST)
-	add_subdirectory (ConTest)
+if (BUILD_TEST_CON)
+	add_subdirectory (test_con)
 endif ()
 
 #..............................................................................
 
 if (${QT_FOUND})
 	option (
-		AXL_BUILD_QT_TEST
-		"Build QtTest"
+		BUILD_TEST_QT
+		"Build test_qt"
 		OFF
 		)
 
-	if (AXL_BUILD_QT_TEST)
-		add_subdirectory (QtTest)
+	if (BUILD_TEST_QT)
+		add_subdirectory (test_qt)
 	endif ()
 endif ()
 

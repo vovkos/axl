@@ -9,38 +9,13 @@
 
 set (
 	SRC_H_LIST
-	test.h
+	mainwindow.h
 	)
 
 set (
 	SRC_CPP_LIST
 	main.cpp
-	test_BoyerMooreFind.cpp
-	test_CmdLineParser.cpp
-	test_Error.cpp
-	test_File.cpp
-	test_Finalizer.cpp
-	test_ForEach.cpp
-	test_Function.cpp
-	test_HandleTable.cpp
-	test_HashTable.cpp
-	test_IniParser.cpp
-	test_List.cpp
-	test_Log.cpp
-	test_Packer.cpp
-	test_Packetizer.cpp
-	test_Parse.cpp
-	test_RbTree.cpp
-	test_Ref.cpp
-	test_Scheduler.cpp
-	test_Sock.cpp
-	test_String.cpp
-	test_StringTemplate.cpp
-	test_Timer.cpp
-	test_Usb.cpp
-	test_Vso.cpp
-	test_Window.cpp
-	test_WorkerThread.cpp
+	mainwindow.cpp
 	)
 
 source_group (
@@ -48,11 +23,38 @@ source_group (
 	FILES
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
+	${SRC_RL_LIST}
 	)
 
-exclude_from_build (
-	test_Log.cpp
-	test_Packer.cpp
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# gen folder
+#
+
+set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+file (MAKE_DIRECTORY ${GEN_DIR})
+
+push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
+
+set (
+	MOC_H_LIST
+	mainwindow.h
+	${AXL_INC_DIR}/axl_gui_QtWidget.h
+	)
+
+qt5_wrap_cpp_alt (
+	GEN_MOC_CPP_LIST
+	${MOC_H_LIST}
+	)
+
+pop (CMAKE_CURRENT_BINARY_DIR)
+
+exclude_from_build (${GEN_MOC_CPP_LIST}) # include "moc_*.cpp" manually
+
+source_group (
+	gen
+	FILES
+	${GEN_MOC_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -72,54 +74,57 @@ source_group (
 
 #..............................................................................
 #
-# ConTest compiler test
+# QtTest compiler test
 #
 
 include_directories (
-	${LUA_INC_DIR}
-	${LIBUSB_INC_DIR}
+	${AXL_INC_DIR}
+	${GEN_DIR}
 	)
 
-link_directories (
-	${LUA_LIB_DIR}
-	${LIBUSB_LIB_DIR}
-	)
+link_directories (${AXL_LIB_DIR})
 
 add_executable (
-	ConTest
+	QtTest
 	${PCH_H}
 	${PCH_CPP}
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
+	${GEN_MOC_CPP_LIST}
 	)
 
 target_link_libraries (
-	ConTest
-	axl_core
+	QtTest
 	axl_gui
-	axl_ini
 	axl_io
-	axl_lua
-	lua
+	axl_core
 	)
 
-if (WIN32)
+if (UNIX)
 	target_link_libraries (
-		ConTest
-		libusb-1.0
+		QtTest
+		rt
+		pthread
 		)
 endif ()
 
+qt5_use_modules (QtTest Widgets)
+
+if (WIN32)
+	copy_qt_dll_files (QtTest Core Gui Widgets)
+endif ()
+
 set_pch (
-	ConTest
+	QtTest
 	${PCH_H}
 	${PCH_CPP}
+	${Qt5Core_EXECUTABLE_COMPILE_FLAGS}
 	)
 
 set_target_properties (
-	ConTest
+	QtTest
 	PROPERTIES
-	FOLDER tests
+	FOLDER test
 	)
 
 #..............................................................................

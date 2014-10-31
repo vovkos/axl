@@ -77,7 +77,7 @@ source_group (
 	${GUI_GDI_CPP_LIST}
 	)
 
-if (NOT AXL_BUILD_GUI_GDI)
+if (NOT BUILD_AXL_GUI_GDI)
 	exclude_from_build (${GUI_GDI_CPP_LIST})
 endif ()
 
@@ -113,7 +113,7 @@ source_group (
 	${GUI_QT_CPP_LIST}
 	)
 
-if (NOT AXL_BUILD_GUI_QT)
+if (NOT BUILD_AXL_GUI_QT)
 	exclude_from_build (${GUI_QT_CPP_LIST})
 endif ()
 
@@ -137,7 +137,7 @@ source_group (
 # axl_gui library
 #
 
-if (AXL_BUILD_GUI_QT)
+if (BUILD_AXL_GUI_QT)
 	add_definitions (-D_AXL_GUI_QT)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 endif ()
@@ -154,7 +154,7 @@ add_library (
 	${GUI_QT_CPP_LIST}
 	)
 
-if (AXL_BUILD_GUI_QT)
+if (BUILD_AXL_GUI_QT)
 	qt5_use_modules (axl_gui Widgets)
 endif ()
 

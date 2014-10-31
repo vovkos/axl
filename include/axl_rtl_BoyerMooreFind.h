@@ -67,6 +67,12 @@ public:
 		return m_pattern.isEmpty ();
 	}
 
+	Array <T>
+	getPattern ()
+	{
+		return m_pattern;
+	}
+
 	uint_t 
 	getFlags ()
 	{
