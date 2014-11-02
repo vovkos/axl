@@ -140,7 +140,7 @@ QtWidgetEventHandler::onMouseWheelEvent (QWheelEvent* event)
 	msg.m_point.setup (event->x (), event->y ());
 	msg.m_buttons = getMouseButtonsFromQtButtons (event->buttons ());
 	msg.m_modifierKeys = getModifierKeysFromQtModifiers (event->modifiers ());
-	msg.m_wheelDelta = event->delta () / 120;
+	msg.m_wheelDelta = event->delta ();
 
 	bool isHandled = true;
 	processWidgetMsg (&msg, &isHandled);			
