@@ -48,7 +48,7 @@ public:
 	T
 	getChar (size_t i) const
 	{
-		return m_p [-i];
+		return this->m_p [-i];
 	}
 };
 
@@ -73,7 +73,9 @@ public:
 	getChar (size_t i) const
 	{
 		size_t tailLength = m_incrementalContext->m_tail.getCount ();
-		return i < tailLength ? m_incrementalContext->m_tail [i] : m_p [i - tailLength];
+		return i < tailLength ? 
+			this->m_incrementalContext->m_tail [i] :
+			this->m_p [i - tailLength];
 	}
 
 	void
@@ -95,11 +97,11 @@ public:
 
 			size_t copySize = size - (tailLength - i);
 			m_incrementalContext->m_tail.remove (0, i);
-			m_incrementalContext->m_tail.append (m_p, copySize);
+			m_incrementalContext->m_tail.append (this->m_p, copySize);
 		}
 		else
 		{
-			m_incrementalContext->m_tail.copy (m_p + i - tailLength, size);
+			m_incrementalContext->m_tail.copy (this->m_p + i - tailLength, size);
 		}
 	}
 };
@@ -120,8 +122,10 @@ public:
 	T
 	getChar (size_t i) const
 	{
-		size_t tailLength = m_incrementalContext->m_tail.getCount ();
-		return i < tailLength ? m_incrementalContext->m_tail [i] : m_p [-(i - tailLength)]; // tail is already reversed
+		size_t tailLength = this->m_incrementalContext->m_tail.getCount ();
+		return i < tailLength ?
+			this->m_incrementalContext->m_tail [i] :
+			this->m_p [-(i - tailLength)]; // tail is already reversed
 	}
 
 	void
@@ -132,22 +136,22 @@ public:
 	{
 		if (!size)
 		{
-			m_incrementalContext->m_tail.clear ();
+			this->m_incrementalContext->m_tail.clear ();
 			return;
 		}
 
-		size_t tailLength = m_incrementalContext->m_tail.getCount ();
+		size_t tailLength = this->m_incrementalContext->m_tail.getCount ();
 		if (i < tailLength)
 		{
 			ASSERT (size > tailLength - i);
 		
 			size_t copySize = size - (tailLength - i);
-			m_incrementalContext->m_tail.remove (0, i);
-			m_incrementalContext->m_tail.appendReverse (m_p - copySize + 1, copySize);
+			this->m_incrementalContext->m_tail.remove (0, i);
+			this->m_incrementalContext->m_tail.appendReverse (this->m_p - copySize + 1, copySize);
 		}
 		else
 		{
-			m_incrementalContext->m_tail.copyReverse (m_p - size + i - tailLength + 1, size);
+			this->m_incrementalContext->m_tail.copyReverse (this->m_p - size + i - tailLength + 1, size);
 		}
 	}
 };
@@ -186,7 +190,7 @@ public:
 	bool
 	isDelimChar (size_t i) const
 	{
-		utf32_t c = i != -1 ? Base::getChar (i) : m_incrementalContext->m_prefix;
+		utf32_t c = i != -1 ? Base::getChar (i) : this->m_incrementalContext->m_prefix;
 		return !rtl::utfIsLetterOrNumber (c);
 	}
 
@@ -197,7 +201,7 @@ public:
 		) const
 	{
 		ASSERT (i);
-		m_incrementalContext->m_prefix = Base::getChar (i - 1);
+		this->m_incrementalContext->m_prefix = Base::getChar (i - 1);
 		Base::saveTail (i, size);
 	}
 };
