@@ -16,6 +16,7 @@ set (
 	SRC_CPP_LIST
 	main.cpp
 	test_BoyerMooreFind.cpp
+	test_Crypto.cpp
 	test_CmdLineParser.cpp
 	test_Error.cpp
 	test_File.cpp

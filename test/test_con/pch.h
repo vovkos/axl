@@ -89,6 +89,7 @@ extern "C" {
 #include <axl_lua_StringTemplate.h>
 #include <axl_gui_GdiEngine.h>
 #include <axl_ini_Parser.h>
+#include <axl_enc_Base32Encoding.h>
 #include <axl_g_Time.h>
 
 #if (_AXL_ENV == AXL_ENV_WIN)

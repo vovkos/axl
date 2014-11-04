@@ -4,13 +4,13 @@
 
 #pragma once
 
-#define _AXL_RTL_CHARCODEC_H
+#define _AXL_ENC_CHARCODEC_H
 
-#include "axl_rtl_Utf.h"
+#include "axl_enc_Utf.h"
 #include "axl_rtl_Array.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
@@ -259,7 +259,7 @@ public:
 		size_t length
 		)
 	{
-		return rtl::UtfToAsciiConvert <rtl::Utf8>::calcRequiredLength (p, length);
+		return UtfToAsciiConvert <Utf8>::calcRequiredLength (p, length);
 	}
 
 	virtual
@@ -269,7 +269,7 @@ public:
 		size_t length
 		)
 	{
-		return rtl::UtfToAsciiConvert <rtl::Utf16>::calcRequiredLength (p, length);
+		return UtfToAsciiConvert <Utf16>::calcRequiredLength (p, length);
 	}
 
 	virtual
@@ -279,7 +279,7 @@ public:
 		size_t length
 		)
 	{
-		return rtl::UtfToAsciiConvert <rtl::Utf32>::calcRequiredLength (p, length);
+		return UtfToAsciiConvert <Utf32>::calcRequiredLength (p, length);
 	}
 
 	virtual
@@ -293,7 +293,7 @@ public:
 		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::UtfToAsciiConvert <rtl::Utf8>::convert (
+		UtfToAsciiConvert <Utf8>::convert (
 			(char*) buffer,
 			bufferSize,
 			p,
@@ -314,7 +314,7 @@ public:
 		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::UtfToAsciiConvert <rtl::Utf16>::convert (
+		UtfToAsciiConvert <Utf16>::convert (
 			(char*) buffer,
 			bufferSize,
 			p,
@@ -335,7 +335,7 @@ public:
 		size_t* takenLength_o = NULL
 		)
 	{
-		rtl::UtfToAsciiConvert <rtl::Utf32>::convert (
+		UtfToAsciiConvert <Utf32>::convert (
 			(char*) buffer,
 			bufferSize,
 			p,
@@ -352,7 +352,7 @@ public:
 		size_t size
 		)
 	{
-		return rtl::AsciiToUtfConvert <rtl::Utf8>::calcRequiredLength ((const char*) p, size);
+		return AsciiToUtfConvert <Utf8>::calcRequiredLength ((const char*) p, size);
 	}
 
 	virtual
@@ -362,7 +362,7 @@ public:
 		size_t size
 		)
 	{
-		return rtl::AsciiToUtfConvert <rtl::Utf16>::calcRequiredLength ((const char*) p, size);
+		return AsciiToUtfConvert <Utf16>::calcRequiredLength ((const char*) p, size);
 	}
 
 	virtual
@@ -372,7 +372,7 @@ public:
 		size_t size
 		)
 	{
-		return rtl::AsciiToUtfConvert <rtl::Utf32>::calcRequiredLength ((const char*) p, size);
+		return AsciiToUtfConvert <Utf32>::calcRequiredLength ((const char*) p, size);
 	}
 
 	virtual
@@ -387,7 +387,7 @@ public:
 		size_t* expectedSize_o
 		)
 	{
-		rtl::AsciiToUtfConvert <rtl::Utf8>::convert (
+		AsciiToUtfConvert <Utf8>::convert (
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -410,7 +410,7 @@ public:
 		size_t* expectedSize_o = NULL
 		)
 	{
-		rtl::AsciiToUtfConvert <rtl::Utf16>::convert (
+		AsciiToUtfConvert <Utf16>::convert (
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -433,7 +433,7 @@ public:
 		size_t* expectedSize_o = NULL
 		)
 	{
-		rtl::AsciiToUtfConvert <rtl::Utf32>::convert (
+		AsciiToUtfConvert <Utf32>::convert (
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -466,7 +466,7 @@ public:
 		size_t length
 		)
 	{
-		return rtl::UtfConvert <T, rtl::Utf8>::calcRequiredLength (p, length) * sizeof (C);
+		return UtfConvert <T, Utf8>::calcRequiredLength (p, length) * sizeof (C);
 	}
 
 	virtual
@@ -476,7 +476,7 @@ public:
 		size_t length
 		)
 	{
-		return rtl::UtfConvert <T, rtl::Utf16>::calcRequiredLength (p, length) * sizeof (C);
+		return UtfConvert <T, Utf16>::calcRequiredLength (p, length) * sizeof (C);
 	}
 
 	virtual
@@ -486,7 +486,7 @@ public:
 		size_t length
 		)
 	{
-		return rtl::UtfConvert <T, rtl::Utf32>::calcRequiredLength (p, length) * sizeof (C);
+		return UtfConvert <T, Utf32>::calcRequiredLength (p, length) * sizeof (C);
 	}
 
 	virtual
@@ -503,7 +503,7 @@ public:
 		size_t bufferLength = bufferSize / sizeof (C);
 		size_t takenDstLength;
 
-		rtl::UtfConvert <T, rtl::Utf8>::convert (
+		UtfConvert <T, Utf8>::convert (
 			(C*) buffer,
 			bufferLength,
 			p,
@@ -530,7 +530,7 @@ public:
 		size_t bufferLength = bufferSize / sizeof (C);
 		size_t takenDstLength;
 
-		rtl::UtfConvert <T, rtl::Utf16>::convert (
+		UtfConvert <T, Utf16>::convert (
 			(C*) buffer,
 			bufferLength,
 			p,
@@ -557,7 +557,7 @@ public:
 		size_t bufferLength = bufferSize / sizeof (C);
 		size_t takenDstLength;
 
-		rtl::UtfConvert <T, rtl::Utf32>::convert (
+		UtfConvert <T, Utf32>::convert (
 			(C*) buffer,
 			bufferLength,
 			p,
@@ -578,7 +578,7 @@ public:
 		)
 	{
 		size_t length = size / sizeof (C);
-		return rtl::UtfConvert <rtl::Utf8, T>::calcRequiredLength ((const C*) p, length);
+		return UtfConvert <Utf8, T>::calcRequiredLength ((const C*) p, length);
 	}
 
 	virtual
@@ -589,7 +589,7 @@ public:
 		)
 	{
 		size_t length = size / sizeof (C);
-		return rtl::UtfConvert <rtl::Utf16, T>::calcRequiredLength ((const C*) p, length);
+		return UtfConvert <Utf16, T>::calcRequiredLength ((const C*) p, length);
 	}
 
 	virtual
@@ -600,7 +600,7 @@ public:
 		)
 	{
 		size_t length = size / sizeof (C);
-		return rtl::UtfConvert <rtl::Utf32, T>::calcRequiredLength ((const C*) p, length);
+		return UtfConvert <Utf32, T>::calcRequiredLength ((const C*) p, length);
 	}
 
 	virtual
@@ -621,7 +621,7 @@ public:
 		size_t takenLength;
 		size_t expectedLength;
 
-		rtl::UtfConvert <rtl::Utf8, T>::convert (
+		UtfConvert <Utf8, T>::convert (
 			buffer,
 			bufferLength,
 			(const C*) p,
@@ -656,7 +656,7 @@ public:
 		size_t takenLength;
 		size_t expectedLength;
 
-		rtl::UtfConvert <rtl::Utf16, T>::convert (
+		UtfConvert <Utf16, T>::convert (
 			buffer,
 			bufferLength,
 			(const C*) p,
@@ -691,7 +691,7 @@ public:
 		size_t takenLength;
 		size_t expectedLength;
 
-		rtl::UtfConvert <rtl::Utf32, T>::convert (
+		UtfConvert <Utf32, T>::convert (
 			buffer,
 			bufferLength,
 			(const C*) p,
@@ -741,7 +741,7 @@ public:
 		uint32_t state = 0
 		)
 	{
-		setup (rtl::getCharCodec (codecKind), state);
+		setup (enc::getCharCodec (codecKind), state);
 	}
 
 	void
@@ -786,5 +786,5 @@ public:
 
 //.............................................................................
 
-} // namespace rtl
+} // namespace enc
 } // namespace axl

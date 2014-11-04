@@ -6,17 +6,16 @@ namespace err {
 
 //.............................................................................
 
-ErrorData*
-Errno::create (int code)
+rtl::String
+ErrnoProvider::getErrorDescription (int code)
 {
-	ErrorData* error = getBuffer (sizeof (ErrorData));
-	if (!error)
-		return NULL;
-
-	error->m_size = sizeof (ErrorData);
-	error->m_guid = GUID_Errno;
-	error->m_code = code;
-	return error;
+	char buffer [512] = { 0 };
+#if (_AXL_ENV == AXL_ENV_WIN)
+	strerror_s (buffer, countof (buffer) - 1, code);
+	return buffer;
+#else
+	return strerror_r (code, buffer, countof (buffer) - 1);
+#endif
 }
 
 //.............................................................................

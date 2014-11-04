@@ -9,6 +9,13 @@ run ();
 
 }
 
+namespace test_Crypto {
+
+void
+run ();
+
+}
+
 namespace test_CmdLineParser {
 
 void

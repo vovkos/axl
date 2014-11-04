@@ -24,6 +24,7 @@ check_and_print_libs (
 		LUA
 		PCAP
 		LIBUSB
+		OPENSSL
 		QT
 	)
 

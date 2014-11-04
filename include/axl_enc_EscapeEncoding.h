@@ -4,12 +4,12 @@
 
 #pragma once
 
-#define _AXL_RTL_ESCAPEENCODING_H
+#define _AXL_ENC_ESCAPEENCODING_H
 
-#include "axl_rtl_HexEncoding.h"
+#include "axl_enc_HexEncoding.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
@@ -27,19 +27,19 @@ public:
 	static
 	size_t
 	encode (
-		String* string,
+		rtl::String* string,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	String
+	rtl::String
 	encode (
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		String string;
+		rtl::String string;
 		encode (&string, p, length);
 		return string;
 	}
@@ -47,16 +47,16 @@ public:
 	static
 	size_t
 	encode (
-		String* dstString,
-		const String& srcString
+		rtl::String* dstString,
+		const rtl::String& srcString
 		)
 	{
 		return encode (dstString, srcString, srcString.getLength ());
 	}
 
 	static
-	String
-	encode (const String& string)
+	rtl::String
+	encode (const rtl::String& string)
 	{
 		return encode (string, string.getLength ());
 	}
@@ -64,19 +64,19 @@ public:
 	static
 	size_t
 	decode (
-		String* string,
+		rtl::String* string,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	String
+	rtl::String
 	decode (		
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		String string;
+		rtl::String string;
 		decode (&string, p, length);
 		return string;
 	}
@@ -84,16 +84,16 @@ public:
 	static
 	size_t
 	decode (
-		String* dstString,
-		const String& srcString
+		rtl::String* dstString,
+		const rtl::String& srcString
 		)
 	{
 		return decode (dstString, srcString, srcString.getLength ());
 	}
 
 	static
-	String
-	decode (const String& string)
+	rtl::String
+	decode (const rtl::String& string)
 	{
 		return decode (string, string.getLength ());
 	}
@@ -101,6 +101,5 @@ public:
 
 //.............................................................................
 
-} // namespace rtl
+} // namespace enc
 } // namespace axl
-

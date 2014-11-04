@@ -113,3 +113,19 @@ if (BUILD_AXL_LUA)
 endif ()
 
 #..............................................................................
+
+if (${OPENSSL_FOUND})
+	option (
+		BUILD_AXL_CRY
+		"Build axl_cry library"
+		ON
+		)
+else ()
+	unset (BUILD_AXL_CRY CACHE)
+endif ()
+
+if (BUILD_AXL_CRY)
+	add_subdirectory (axl_cry)
+endif ()
+
+#..............................................................................

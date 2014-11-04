@@ -52,9 +52,10 @@ main (
 	//test_WorkerThread::Run ();
 	//test_Packetizer::Run ();
 	//test_CmdLineParser::Run ();
-	//test_Usb::run ();
-	
-	test_BoyerMooreFind::run ();
+	//test_Usb::run ();		
+	//test_BoyerMooreFind::run ();
+
+	test_Crypto::run ();
 
 	return 0;
 }

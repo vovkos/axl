@@ -101,7 +101,6 @@ Error::createSimpleError (
 	m_p->m_size = sizeof (ErrorData);
 	m_p->m_guid = guid;
 	m_p->m_code = code;
-
 	return m_p;
 }
 

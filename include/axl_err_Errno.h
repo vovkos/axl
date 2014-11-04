@@ -27,16 +27,7 @@ class ErrnoProvider: public ErrorProvider
 public:
 	static
 	rtl::String
-	getErrorDescription (int code)
-	{
-		char buffer [512] = { 0 };
-#if (_AXL_ENV == AXL_ENV_WIN)
-		strerror_s (buffer, countof (buffer) - 1, code);
-		return buffer;
-#else
-		return strerror_r (code, buffer, countof (buffer) - 1);
-#endif
-	}
+	getErrorDescription (int code);
 
 	virtual
 	rtl::String
@@ -61,7 +52,10 @@ public:
 	}
 
 	ErrorData*
-	create (int code);
+	create (int code)
+	{
+		return createSimpleError (GUID_Errno, code);
+	}
 };
 
 //.............................................................................

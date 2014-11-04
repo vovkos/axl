@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "axl_rtl_Utf.h"
+#include "axl_enc_Utf.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
@@ -6318,5 +6318,5 @@ getUtfCodePointAttr (utf32_t c)
 
 //.............................................................................
 
-} // namespace rtl
+} // namespace enc
 } // namespace axl

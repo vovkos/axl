@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "axl_rtl_EscapeEncoding.h"
-#include "axl_rtl_HexEncoding.h"
+#include "axl_enc_EscapeEncoding.h"
+#include "axl_enc_HexEncoding.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
@@ -77,14 +77,14 @@ EscapeEncoding::findEscapeReplaceChar (char x)
 
 size_t
 EscapeEncoding::encode (
-	String* string,
+	rtl::String* string,
 	const char* p, 
 	size_t length
 	)
 {
 
 	if (length == -1)
-		length = StringDetails::calcLength (p);
+		length = rtl::StringDetails::calcLength (p);
 
 	const char* base = p;
 	const char* end = p + length;
@@ -121,7 +121,7 @@ EscapeEncoding::encode (
 
 size_t
 EscapeEncoding::decode (
-	String* string,
+	rtl::String* string,
 	const char* p, 
 	size_t length
 	)
@@ -136,7 +136,7 @@ EscapeEncoding::decode (
 	State state = State_Normal;	
 
 	if (length == -1)
-		length = StringDetails::calcLength (p);
+		length = rtl::StringDetails::calcLength (p);
 
 	char hexCodeString [4] = { 0 };
 	char* hexCodeEnd;
@@ -204,5 +204,5 @@ EscapeEncoding::decode (
 
 //.............................................................................
 
-} // namespace err
+} // namespace enc
 } // namespace axl

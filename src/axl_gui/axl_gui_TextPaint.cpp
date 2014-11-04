@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_gui_TextPaint.h"
-#include "axl_rtl_HexEncoding.h"
+#include "axl_enc_HexEncoding.h"
 
 namespace axl {
 namespace gui {
@@ -350,7 +350,7 @@ TextPaint::paintBinHexPart (size_t size)
 	if (!size)
 		return m_point.m_x;
 
-	rtl::HexEncoding::encode (&m_stringBuffer, m_p, size, 0);
+	enc::HexEncoding::encode (&m_stringBuffer, m_p, size, 0);
 	m_stringBuffer.append (' ');
 	
 	size_t length = m_stringBuffer.getLength ();
@@ -483,7 +483,7 @@ TextPaint::paintHyperBinHex4BitCursor (
 	
 	gui::TextAttr attr = m_canvas->m_defTextAttr;
 
-	char c = rtl::HexEncoding::getHexChar_l (*cursor & 0xf);
+	char c = enc::HexEncoding::getHexChar_l (*cursor & 0xf);
 	char charBuffer [8] = { c, ' ', ' ', 0 };
 	Rect rect = calcTextRect_utf8 (charBuffer, 3);
 	m_canvas->m_defTextAttr.overlay (m_selAttr);
@@ -517,7 +517,7 @@ TextPaint::paintHyperBinHex4BitCursor (
 
 int
 TextPaint::paintBinTextPart (
-	rtl::CharCodec* codec,
+	enc::CharCodec* codec,
 	size_t size
 	)
 {
@@ -607,7 +607,7 @@ TextPaint::paintBinTextPart (
 
 int
 TextPaint::paintBinText (
-	rtl::CharCodec* codec,
+	enc::CharCodec* codec,
 	const void* p,
 	size_t size
 	)
@@ -621,7 +621,7 @@ TextPaint::paintBinText (
 
 int
 TextPaint::paintHyperBinText (
-	rtl::CharCodec* codec,
+	enc::CharCodec* codec,
 	const TextAttrAnchorArray* attrArray,
 	const void* _p,
 	size_t size
@@ -691,7 +691,7 @@ TextPaint::paintHyperBinText (
 
 int
 TextPaint::paintSelHyperBinText (
-	rtl::CharCodec* codec,
+	enc::CharCodec* codec,
 	const TextAttrAnchorArray* attrArray,
 	size_t selStart,
 	size_t selEnd,

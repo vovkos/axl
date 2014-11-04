@@ -8,7 +8,7 @@
 
 #include "axl_ref_Buf.h"
 #include "axl_rtl_BitIdx.h"
-#include "axl_rtl_Utf.h"
+#include "axl_enc_Utf.h"
 
 namespace axl {
 namespace rtl {
@@ -30,7 +30,7 @@ public:
 	typedef utf16_t C2;
 	typedef utf32_t C3;
 
-	typedef Utf8 Encoding;
+	typedef enc::Utf8 Encoding;
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
 
@@ -223,7 +223,7 @@ public:
 	typedef utf8_t  C2;
 	typedef utf32_t C3;
 
-	typedef Utf16 Encoding;
+	typedef enc::Utf16 Encoding;
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
 
@@ -287,7 +287,7 @@ public:
 	typedef utf8_t  C2;
 	typedef utf16_t C3;
 
-	typedef Utf32 Encoding;
+	typedef enc::Utf32 Encoding;
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
 
@@ -793,14 +793,14 @@ public:
 		if (length == -1)
 			length = Details2::calcLength (p);
 
-		size_t newLength = UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
+		size_t newLength = enc::UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
 		if (newLength == -1)
 			return -1;
 
 		if (!setLength (newLength, false))
 			return -1;
 
-		UtfConvert <Encoding, Encoding2>::convert (m_p, newLength, p, length);
+		enc::UtfConvert <Encoding, Encoding2>::convert (m_p, newLength, p, length);
 		return length;
 	}
 
@@ -819,14 +819,14 @@ public:
 		if (length == -1)
 			length = Details3::calcLength (p);
 
-		size_t newLength = UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
+		size_t newLength = enc::UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
 		if (newLength == -1)
 			return -1;
 
 		if (!setLength (newLength, false))
 			return -1;
 
-		UtfConvert <Encoding, Encoding3>::convert (m_p, newLength, p, length);
+		enc::UtfConvert <Encoding, Encoding3>::convert (m_p, newLength, p, length);
 		return length;
 	}
 
@@ -918,7 +918,7 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		size_t appendLength = UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
+		size_t appendLength = enc::UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
 		if (appendLength == -1)
 			return -1;
 
@@ -926,7 +926,7 @@ public:
 		if (!setLength (newLength, true))
 			return -1;
 
-		UtfConvert <Encoding, Encoding2>::convert (m_p + oldLength, appendLength, p, length);
+		enc::UtfConvert <Encoding, Encoding2>::convert (m_p + oldLength, appendLength, p, length);
 		return newLength;
 	}
 
@@ -947,7 +947,7 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		size_t appendLength = UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
+		size_t appendLength = enc::UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
 		if (appendLength == -1)
 			return -1;
 
@@ -955,7 +955,7 @@ public:
 		if (!setLength (newLength, true))
 			return -1;
 
-		UtfConvert <Encoding, Encoding3>::convert (m_p + oldLength, appendLength, p, length);
+		enc::UtfConvert <Encoding, Encoding3>::convert (m_p + oldLength, appendLength, p, length);
 		return newLength;
 	}
 

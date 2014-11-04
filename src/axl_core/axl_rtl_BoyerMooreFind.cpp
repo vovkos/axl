@@ -191,7 +191,7 @@ BinaryBoyerMooreFind::findImpl (
 bool
 TextBoyerMooreFind::setPattern (
 	size_t badSkipTableSize,
-	CharCodec* codec,
+	enc::CharCodec* codec,
 	const void* p, 
 	size_t size,
 	uint_t flags
@@ -206,7 +206,7 @@ TextBoyerMooreFind::setPattern (
 
 	if (flags & Flag_CaseInsensitive)
 		for (size_t i = 0; i < length; i++)
-			m_pattern [i] = utfToCaseFold (m_pattern [i]);
+			m_pattern [i] = enc::utfToCaseFold (m_pattern [i]);
 
 	if (flags & Flag_Reverse)
 		m_pattern.reverse ();
@@ -237,7 +237,7 @@ TextBoyerMooreFind::buildBadSkipTable (size_t tableSize)
 	if (m_flags & Flag_CaseInsensitive)
 		for (size_t i = 0, j = last; i < last; i++, j--)
 		{
-			uint32_t c = utfToLower (m_pattern [i]);
+			uint32_t c = enc::utfToCaseFold (m_pattern [i]);
 			m_badSkipTable [c % tableSize] = j;
 		}
 	else
@@ -252,7 +252,7 @@ TextBoyerMooreFind::buildBadSkipTable (size_t tableSize)
 
 size_t 
 TextBoyerMooreFind::find (
-	CharCodec* codec,
+	enc::CharCodec* codec,
 	const void* p, 
 	size_t size
 	)
@@ -292,7 +292,7 @@ TextBoyerMooreFind::find (
 size_t 
 TextBoyerMooreFind::find (
 	IncrementalContext* incrementalContext,
-	CharCodec* codec,
+	enc::CharCodec* codec,
 	size_t offset,
 	const void* p, 
 	size_t size

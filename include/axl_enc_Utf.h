@@ -4,12 +4,12 @@
 
 #pragma once
 
-#define _AXL_RTL_UTF_H
+#define _AXL_ENC_UTF_H
 
 #include "axl_rtl_ByteOrder.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
@@ -31,42 +31,42 @@ getUtfKindString (UtfKind utfKind);
 
 enum UtfCategory
 {
-    UtfCategory_Mark_NonSpacing,          //   Mn
-    UtfCategory_Mark_SpacingCombining,    //   Mc
-    UtfCategory_Mark_Enclosing,           //   Me
+    UtfCategory_Mark_NonSpacing,          // Mn
+    UtfCategory_Mark_SpacingCombining,    // Mc
+    UtfCategory_Mark_Enclosing,           // Me
 
-    UtfCategory_Number_DecimalDigit,      //   Nd
-    UtfCategory_Number_Letter,            //   Nl
-    UtfCategory_Number_Other,             //   No
+    UtfCategory_Number_DecimalDigit,      // Nd
+    UtfCategory_Number_Letter,            // Nl
+    UtfCategory_Number_Other,             // No
 
-    UtfCategory_Separator_Space,          //   Zs
-    UtfCategory_Separator_Line,           //   Zl
-    UtfCategory_Separator_Paragraph,      //   Zp
+    UtfCategory_Separator_Space,          // Zs
+    UtfCategory_Separator_Line,           // Zl
+    UtfCategory_Separator_Paragraph,      // Zp
 
-    UtfCategory_Other_Control,            //   Cc
-    UtfCategory_Other_Format,             //   Cf
-    UtfCategory_Other_Surrogate,          //   Cs
-    UtfCategory_Other_PrivateUse,         //   Co
-    UtfCategory_Other_NotAssigned,        //   Cn
+    UtfCategory_Other_Control,            // Cc
+    UtfCategory_Other_Format,             // Cf
+    UtfCategory_Other_Surrogate,          // Cs
+    UtfCategory_Other_PrivateUse,         // Co
+    UtfCategory_Other_NotAssigned,        // Cn
 
-    UtfCategory_Letter_Uppercase,         //   Lu
-    UtfCategory_Letter_Lowercase,         //   Ll
-    UtfCategory_Letter_Titlecase,         //   Lt
-    UtfCategory_Letter_Modifier,          //   Lm
-    UtfCategory_Letter_Other,             //   Lo
+    UtfCategory_Letter_Uppercase,         // Lu
+    UtfCategory_Letter_Lowercase,         // Ll
+    UtfCategory_Letter_Titlecase,         // Lt
+    UtfCategory_Letter_Modifier,          // Lm
+    UtfCategory_Letter_Other,             // Lo
 
-    UtfCategory_Punctuation_Connector,    //   Pc
-    UtfCategory_Punctuation_Dash,         //   Pd
-    UtfCategory_Punctuation_Open,         //   Ps
-    UtfCategory_Punctuation_Close,        //   Pe
-    UtfCategory_Punctuation_InitialQuote, //   Pi
-    UtfCategory_Punctuation_FinalQuote,   //   Pf
-    UtfCategory_Punctuation_Other,        //   Po
+    UtfCategory_Punctuation_Connector,    // Pc
+    UtfCategory_Punctuation_Dash,         // Pd
+    UtfCategory_Punctuation_Open,         // Ps
+    UtfCategory_Punctuation_Close,        // Pe
+    UtfCategory_Punctuation_InitialQuote, // Pi
+    UtfCategory_Punctuation_FinalQuote,   // Pf
+    UtfCategory_Punctuation_Other,        // Po
 
-    UtfCategory_Symbol_Math,              //   Sm
-    UtfCategory_Symbol_Currency,          //   Sc
-    UtfCategory_Symbol_Modifier,          //   Sk
-    UtfCategory_Symbol_Other              //   So
+    UtfCategory_Symbol_Math,              // Sm
+    UtfCategory_Symbol_Currency,          // Sc
+    UtfCategory_Symbol_Modifier,          // Sk
+    UtfCategory_Symbol_Other              // So
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -899,5 +899,5 @@ public:
 
 //.............................................................................
 
-} // namespace rtl
+} // namespace enc
 } // namespace axl

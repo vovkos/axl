@@ -1,8 +1,5 @@
 #include "pch.h"
 
-#include <stdint.h>
-#include <stdlib.h>
-
 namespace test_BoyerMooreFind { 
 
 //.............................................................................

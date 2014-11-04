@@ -307,17 +307,14 @@ set (
 	${AXL_INC_DIR}/axl_rtl_BoxList.h
 	${AXL_INC_DIR}/axl_rtl_BuddyAllocMap.h
 	${AXL_INC_DIR}/axl_rtl_ByteOrder.h
-	${AXL_INC_DIR}/axl_rtl_CharCodec.h
 	${AXL_INC_DIR}/axl_rtl_CharLiteral.h
 	${AXL_INC_DIR}/axl_rtl_CmdLineParser.h
-	${AXL_INC_DIR}/axl_rtl_EscapeEncoding.h
 	${AXL_INC_DIR}/axl_rtl_ForEach.h
 	${AXL_INC_DIR}/axl_rtl_Func.h
 	${AXL_INC_DIR}/axl_rtl_Guid.h
 	${AXL_INC_DIR}/axl_rtl_Handle.h
 	${AXL_INC_DIR}/axl_rtl_HandleTable.h
 	${AXL_INC_DIR}/axl_rtl_HashTable.h
-	${AXL_INC_DIR}/axl_rtl_HexEncoding.h
 	${AXL_INC_DIR}/axl_rtl_List.h
 	${AXL_INC_DIR}/axl_rtl_Pack.h
 	${AXL_INC_DIR}/axl_rtl_Packer.h
@@ -332,7 +329,6 @@ set (
 	${AXL_INC_DIR}/axl_rtl_StringHashTable.h
 	${AXL_INC_DIR}/axl_rtl_Type.h
 	${AXL_INC_DIR}/axl_rtl_Unpacker.h
-	${AXL_INC_DIR}/axl_rtl_Utf.h
 	)
 
 set (
@@ -342,16 +338,12 @@ set (
 	axl_rtl_BoyerMooreFind.cpp
 	axl_rtl_BmhFind.cpp
 	axl_rtl_BuddyAllocMap.cpp
-	axl_rtl_CharCodec.cpp
 	axl_rtl_CmdLineParser.cpp
-	axl_rtl_EscapeEncoding.cpp
 	axl_rtl_Func.cpp
 	axl_rtl_Guid.cpp
-	axl_rtl_HexEncoding.cpp
 	axl_rtl_Packer.cpp
 	axl_rtl_Packetizer.cpp
 	axl_rtl_Unpacker.cpp
-	axl_rtl_Utf.cpp
 	)
 
 source_group (
@@ -359,6 +351,36 @@ source_group (
 	FILES
 	${RTL_H_LIST}
 	${RTL_CPP_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# enc folder
+#
+
+set (
+	ENC_H_LIST
+	${AXL_INC_DIR}/axl_enc_Base32Encoding.h
+	${AXL_INC_DIR}/axl_enc_CharCodec.h
+	${AXL_INC_DIR}/axl_enc_EscapeEncoding.h
+	${AXL_INC_DIR}/axl_enc_HexEncoding.h
+	${AXL_INC_DIR}/axl_enc_Utf.h
+	)
+
+set (
+	ENC_CPP_LIST
+	axl_enc_Base32Encoding.cpp
+	axl_enc_CharCodec.cpp
+	axl_enc_EscapeEncoding.cpp
+	axl_enc_HexEncoding.cpp
+	axl_enc_Utf.cpp
+	)
+
+source_group (
+	enc
+	FILES
+	${ENC_H_LIST}
+	${ENC_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -410,6 +432,8 @@ add_library (
 	${REF_CPP_LIST}
 	${RTL_H_LIST}
 	${RTL_CPP_LIST}
+	${ENC_H_LIST}
+	${ENC_CPP_LIST}
 	)
 
 set_pch (

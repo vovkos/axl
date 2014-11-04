@@ -1,34 +1,37 @@
 #include "pch.h"
-#include "axl_rtl_HexEncoding.h"
+#include "axl_enc_HexEncoding.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
 size_t
 HexEncoding::encode (
-	String* string,
+	rtl::String* string,
 	const void* p,
 	size_t size,
 	uint_t flags
 	)
 {
 	if (!size)
+	{
+		string->clear ();
 		return 0;
+	}
 
 	const uchar_t* src = (const uchar_t*) p;
 	const uchar_t* srcEnd = src + size;
 
 	size_t length;
-	if ((flags & HexEncodeKind_NoSpace))
+	if ((flags & Flag_NoSpace))
 	{
 		length = size * 2;
 		char* dst = string->getBuffer (length, false);
 		if (!dst)
 			return -1;
 
-		if (flags & HexEncodeKind_UpperCase)
+		if (flags & Flag_UpperCase)
 			encode_nsu (dst, src, srcEnd);
 		else
 			encode_nsl (dst, src, srcEnd);
@@ -40,7 +43,7 @@ HexEncoding::encode (
 		if (!dst)
 			return -1;
 
-		if (flags & HexEncodeKind_UpperCase)
+		if (flags & Flag_UpperCase)
 			encode_u (dst, src, srcEnd);
 		else
 			encode_l (dst, src, srcEnd);
@@ -125,7 +128,7 @@ HexEncoding::encode_nsu (
 
 size_t
 HexEncoding::decode (
-	Array <uchar_t>* buffer,
+	rtl::Array <uchar_t>* buffer,
 	const char* p,
 	size_t length
 	)
@@ -139,7 +142,7 @@ HexEncoding::decode (
 	State state = State_Normal;
 
 	if (length == -1)
-		length = StringDetails::calcLength (p);
+		length = rtl::StringDetails::calcLength (p);
 
 	buffer->reserve (length / 2);
 
@@ -200,5 +203,5 @@ HexEncoding::decode (
 
 //.............................................................................
 
-} // namespace err
+} // namespace enc
 } // namespace axl

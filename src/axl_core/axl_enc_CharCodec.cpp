@@ -1,20 +1,20 @@
 #include "pch.h"
-#include "axl_rtl_CharCodec.h"
+#include "axl_enc_CharCodec.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
 CharCodec* 
 getCharCodec (CharCodecKind codecKind)
 {
-	static AsciiCodec asciiCodec; 
-	static UtfCodec <rtl::Utf8>     utf8Codec; 
-	static UtfCodec <rtl::Utf16>    utf16Codec; 
-	static UtfCodec <rtl::Utf16_be> utf16Codec_be; 
-	static UtfCodec <rtl::Utf32>    utf32Codec; 
-	static UtfCodec <rtl::Utf32_be> utf32Codec_be; 
+	static AsciiCodec          asciiCodec; 
+	static UtfCodec <Utf8>     utf8Codec; 
+	static UtfCodec <Utf16>    utf16Codec; 
+	static UtfCodec <Utf16_be> utf16Codec_be; 
+	static UtfCodec <Utf32>    utf32Codec; 
+	static UtfCodec <Utf32_be> utf32Codec_be; 
 	
 	static CharCodec* codecTable [] = 
 	{
@@ -427,5 +427,5 @@ CodePointDecoder::decode (
 
 //.............................................................................
 
-} // namespace rtl
+} // namespace enc
 } // namespace axl

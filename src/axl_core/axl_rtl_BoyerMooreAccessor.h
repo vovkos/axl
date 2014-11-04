@@ -170,7 +170,7 @@ public:
 	bool
 	isDelimChar (size_t i) const
 	{
-		return i == -1 ? true : !rtl::utfIsLetterOrNumber (Base::getChar (i));
+		return i == -1 ? true : !enc::utfIsLetterOrNumber (Base::getChar (i));
 	}
 };
 
@@ -191,7 +191,7 @@ public:
 	isDelimChar (size_t i) const
 	{
 		utf32_t c = i != -1 ? Base::getChar (i) : this->m_incrementalContext->m_prefix;
-		return !rtl::utfIsLetterOrNumber (c);
+		return !enc::utfIsLetterOrNumber (c);
 	}
 
 	void
@@ -220,7 +220,7 @@ public:
 	utf32_t
 	getChar (size_t i) const
 	{
-		return utfToCaseFold (Base::getChar (i));
+		return enc::utfToCaseFold (Base::getChar (i));
 	}
 };
 
@@ -240,7 +240,7 @@ public:
 	utf32_t
 	getChar (size_t i) const
 	{
-		return utfToCaseFold (Base::getChar (i));
+		return enc::utfToCaseFold (Base::getChar (i));
 	}
 };
 

@@ -9,7 +9,7 @@
 #include "axl_gui_Canvas.h"
 #include "axl_gui_TextAttrAnchorArray.h"
 #include "axl_rtl_String.h"
-#include "axl_rtl_CharCodec.h"
+#include "axl_enc_CharCodec.h"
 
 namespace axl {
 namespace gui {
@@ -227,14 +227,14 @@ public:
 
 	int
 	paintBinText (
-		rtl::CharCodec* codec,
+		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
 		);
 
 	int
 	paintHyperBinText (
-		rtl::CharCodec* codec,
+		enc::CharCodec* codec,
 		const TextAttrAnchorArray* attrArray,
 		const void* p, 
 		size_t size
@@ -243,7 +243,7 @@ public:
 
 	int
 	paintSelHyperBinText (
-		rtl::CharCodec* codec,
+		enc::CharCodec* codec,
 		const TextAttrAnchorArray* attrArray, 
 		size_t selStart, 
 		size_t selEnd, 
@@ -284,7 +284,7 @@ protected:
 
 	int
 	paintBinTextPart (
-		rtl::CharCodec* codec,
+		enc::CharCodec* codec,
 		size_t size
 		);
 };

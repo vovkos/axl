@@ -8,7 +8,7 @@
 
 #include "axl_lex_Token.h"
 #include "axl_err_ParseError.h"
-#include "axl_rtl_EscapeEncoding.h"
+#include "axl_enc_EscapeEncoding.h"
 
 namespace axl {
 namespace ini {
@@ -143,7 +143,7 @@ protected: // should only be used as part of ini::CParser
 				m_value.copy (p, length);					
 
 				if (m_value [0] == '"' && m_value [length - 1] == '"')
-					m_value = rtl::EscapeEncoding::decode (m_value.cc () + 1, length - 2);
+					m_value = enc::EscapeEncoding::decode (m_value.cc () + 1, length - 2);
 			}	
 		}
 

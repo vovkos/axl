@@ -4,26 +4,25 @@
 
 #pragma once
 
-#define _AXL_RTL_HEXENCODING_H
+#define _AXL_ENC_HEXENCODING_H
 
 #include "axl_rtl_String.h"
 #include "axl_rtl_Array.h"
 
 namespace axl {
-namespace rtl {
+namespace enc {
 
 //.............................................................................
 
-enum HexEncodeKind
-{
-	HexEncodeKind_UpperCase = 1,
-	HexEncodeKind_NoSpace   = 2,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class HexEncoding
 {
+public:
+	enum Flag
+	{
+		Flag_UpperCase = 1,
+		Flag_NoSpace   = 2,
+	};
+
 public:
 	static 
 	char
@@ -54,21 +53,21 @@ public:
 	static
 	size_t
 	encode (
-		String* string,
+		rtl::String* string,
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
 		);
 
 	static
-	String
+	rtl::String
 	encode (
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
 		)
 	{
-		String string;
+		rtl::String string;
 		encode (&string, p, size, flags);
 		return string;
 	}
@@ -76,19 +75,19 @@ public:
 	static
 	size_t
 	decode (
-		Array <uchar_t>* buffer,
+		rtl::Array <uchar_t>* buffer,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	Array <uchar_t>
+	rtl::Array <uchar_t>
 	decode (
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		Array <uchar_t> buffer;
+		rtl::Array <uchar_t> buffer;
 		decode (&buffer, p, length);
 		return buffer;
 	}
@@ -96,16 +95,16 @@ public:
 	static
 	size_t
 	decode (
-		Array <uchar_t>* buffer,
-		const String& string
+		rtl::Array <uchar_t>* buffer,
+		const rtl::String& string
 		)
 	{
 		return decode (buffer, string, string.getLength ());
 	}
 
 	static
-	Array <uchar_t>
-	decode (const String& string)
+	rtl::Array <uchar_t>
+	decode (const rtl::String& string)
 	{
 		return decode (string, string.getLength ());
 	}
@@ -146,5 +145,5 @@ protected:
 
 //.............................................................................
 
-} // namespace rtl
+} // namespace enc
 } // namespace axl

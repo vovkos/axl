@@ -7,7 +7,7 @@
 #define _AXL_RTL_BOYERMOOREFIND_H
 
 #include "axl_rtl_Array.h"
-#include "axl_rtl_CharCodec.h"
+#include "axl_enc_CharCodec.h"
 
 namespace axl {
 namespace rtl {
@@ -228,7 +228,7 @@ public:
 	bool
 	setPattern (
 		size_t badSkipTableSize,
-		CharCodec* codec,
+		enc::CharCodec* codec,
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
@@ -237,18 +237,18 @@ public:
 	bool
 	setPattern (
 		size_t badSkipTableSize,
-		CharCodecKind codecKind,
+		enc::CharCodecKind codecKind,
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
 		)
 	{
-		return setPattern (badSkipTableSize, getCharCodec (codecKind), p, size, flags);
+		return setPattern (badSkipTableSize, enc::getCharCodec (codecKind), p, size, flags);
 	}
 
 	bool
 	setPattern (
-		CharCodec* codec,
+		enc::CharCodec* codec,
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
@@ -259,7 +259,7 @@ public:
 
 	bool
 	setPattern (
-		CharCodecKind codecKind,
+		enc::CharCodecKind codecKind,
 		const void* p, 
 		size_t size,
 		uint_t flags = 0
@@ -277,7 +277,7 @@ public:
 	{
 		return setPattern (
 			Def_BadSkipTableSize, 
-			CharCodecKind_Utf8, 
+			enc::CharCodecKind_Utf8, 
 			p, 
 			length != -1 ? length : strlen (p),
 			flags
@@ -286,19 +286,19 @@ public:
 
 	size_t 
 	find (
-		CharCodec* codec,
+		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
 		);
 
 	size_t 
 	find (
-		CharCodecKind codecKind,
+		enc::CharCodecKind codecKind,
 		const void* p, 
 		size_t size
 		)
 	{
-		return find (getCharCodec (codecKind), p, size);
+		return find (enc::getCharCodec (codecKind), p, size);
 	}
 
 	size_t 
@@ -307,13 +307,13 @@ public:
 		size_t length = -1
 		)
 	{
-		return find (CharCodecKind_Utf8, p, length != -1 ? length : strlen (p));
+		return find (enc::CharCodecKind_Utf8, p, length != -1 ? length : strlen (p));
 	}
 
 	size_t 
 	find (
 		IncrementalContext* incrementalContext,
-		CharCodec* codec,
+		enc::CharCodec* codec,
 		size_t offset,
 		const void* p, 
 		size_t size
@@ -322,13 +322,13 @@ public:
 	size_t 
 	find (
 		IncrementalContext* incrementalContext,
-		CharCodecKind codecKind,
+		enc::CharCodecKind codecKind,
 		size_t offset,
 		const void* p, 
 		size_t size
 		)
 	{
-		return find (incrementalContext, getCharCodec (codecKind), offset, p, size);
+		return find (incrementalContext, enc::getCharCodec (codecKind), offset, p, size);
 	}
 
 	size_t 
@@ -339,7 +339,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return find (incrementalContext, CharCodecKind_Utf8, offset, p, length != -1 ? length : strlen (p));
+		return find (incrementalContext, enc::CharCodecKind_Utf8, offset, p, length != -1 ? length : strlen (p));
 	}
 
 protected:
