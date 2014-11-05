@@ -59,7 +59,7 @@ EcKey::setPublicKeyData (
 }
 
 bool
-EcKey::setPublicDecString (
+EcKey::setPublicKeyDecString (
 	const char* string,
 	BN_CTX* ctx
 	)
@@ -73,7 +73,7 @@ EcKey::setPublicDecString (
 }
 
 bool
-EcKey::setPublicHexString (
+EcKey::setPublicKeyHexString (
 	const char* string,
 	BN_CTX* ctx
 	)

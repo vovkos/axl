@@ -165,13 +165,13 @@ public:
 		);
 
 	bool
-	setPublicDecString (
+	setPublicKeyDecString (
 		const char* string,
 		BN_CTX* ctx = NULL
 		);
 
 	bool
-	setPublicHexString (
+	setPublicKeyHexString (
 		const char* string,
 		BN_CTX* ctx = NULL
 		);
