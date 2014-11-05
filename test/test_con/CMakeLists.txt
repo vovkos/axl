@@ -79,11 +79,13 @@ source_group (
 include_directories (
 	${LUA_INC_DIR}
 	${LIBUSB_INC_DIR}
+	${OPENSSL_INC_DIR}
 	)
 
 link_directories (
 	${LUA_LIB_DIR}
 	${LIBUSB_LIB_DIR}
+	${OPENSSL_LIB_DIR}
 	)
 
 add_executable (
@@ -101,7 +103,9 @@ target_link_libraries (
 	axl_ini
 	axl_io
 	axl_lua
+	axl_cry
 	lua
+	libeay32MTd
 	)
 
 if (WIN32)

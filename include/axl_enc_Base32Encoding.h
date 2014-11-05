@@ -17,12 +17,6 @@ namespace enc {
 class Base32Encoding
 {
 public:
-	enum Flag
-	{
-		Flag_UpperCase = 1,
-	};
-
-public:
 	static
 	size_t
 	encode (

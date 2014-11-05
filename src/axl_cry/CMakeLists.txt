@@ -13,7 +13,6 @@ set (
 	${AXL_INC_DIR}/axl_cry_BigNum.h
 	${AXL_INC_DIR}/axl_cry_EcKey.h
 	${AXL_INC_DIR}/axl_cry_EcPoint.h
-	${AXL_INC_DIR}/axl_cry_EcProductKey.h
 	)
 
 set (
@@ -22,7 +21,6 @@ set (
 	axl_cry_BigNum.cpp
 	axl_cry_EcKey.cpp
 	axl_cry_EcPoint.cpp
-	axl_cry_EcProductKey.cpp
 	)
 
 source_group (

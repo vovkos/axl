@@ -7,7 +7,7 @@ namespace cry {
 //.............................................................................
 
 bool
-EcPoint::create (const EC_GROUP* group)
+EcPoint::create (EC_GROUP* group)
 {
 	close ();
 
@@ -17,8 +17,8 @@ EcPoint::create (const EC_GROUP* group)
 
 bool
 EcPoint::createCopy (
-	const EC_POINT* src,
-	const EC_GROUP* group
+	EC_POINT* src,
+	EC_GROUP* group
 	)
 {
 	close ();
@@ -30,7 +30,7 @@ EcPoint::createCopy (
 bool
 EcPoint::getData (
 	rtl::Array <char>* data,
-	const EC_GROUP* group,
+	EC_GROUP* group,
 	point_conversion_form_t form,
 	BN_CTX* ctx
 	)
@@ -58,7 +58,7 @@ EcPoint::getData (
 bool
 EcPoint::getHexString (
 	rtl::String* string,
-	const EC_GROUP* group,
+	EC_GROUP* group,
 	point_conversion_form_t form,
 	BN_CTX* ctx
 	)

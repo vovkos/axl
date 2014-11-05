@@ -7,6 +7,7 @@
 #define _AXL_CRY_ECKEY_H
 
 #include "axl_cry_BigNum.h"
+#include "axl_cry_EcPoint.h"
 #include "axl_cry_CryptoError.h"
 
 namespace axl {
@@ -31,6 +32,12 @@ class EcKey: public rtl::Handle <EC_KEY*, FreeEcKey>
 public:
 	EcKey ()
 	{
+		create ();
+	}
+
+	EcKey (uint_t curveId)
+	{
+		create (curveId);
 	}
 
 	EcKey (EC_KEY* h):
@@ -45,10 +52,10 @@ public:
 	create (uint_t curveId);
 	
 	bool
-	createCopy (const EC_KEY* src);
+	createCopy (EC_KEY* src);
 
 	bool
-	copy (const EC_KEY* src)
+	copy (EC_KEY* src)
 	{
 		EC_KEY* result = EC_KEY_copy (m_h, src);
 		return completeWithLastCryptoError (result != NULL);
@@ -87,44 +94,87 @@ public:
 		EC_KEY_set_enc_flags (m_h, flags);
 	}
 
-	const EC_GROUP*
+	EC_GROUP*
 	getGroup ()
 	{
-		return EC_KEY_get0_group (m_h);
+		return (EC_GROUP*) EC_KEY_get0_group (m_h);
 	}
 
 	bool
-	setGroup (const EC_GROUP* group)
+	setGroup (EC_GROUP* group)
 	{
 		int result = EC_KEY_set_group (m_h, group);
 		return completeWithLastCryptoError (result);
 	}
 
-	const BIGNUM*
+	BIGNUM*
 	getPrivateKey ()
 	{
-		return EC_KEY_get0_private_key (m_h);
+		return (BIGNUM*) EC_KEY_get0_private_key (m_h);
 	}
 
 	bool
-	setPrivateKey (const BIGNUM* privateKey)
+	setPrivateKey (BIGNUM* key)
 	{
-		int result = EC_KEY_set_private_key (m_h, privateKey);
+		int result = EC_KEY_set_private_key (m_h, key);
 		return completeWithLastCryptoError (result);
 	}
 
-	const EC_POINT*
+	bool
+	setPrivateKeyData (
+		const void* p,
+		size_t size
+		)
+	{
+		BigNum key;
+		return key.setData (p, size) && setPrivateKey (key);
+	}
+
+	bool
+	setPrivateKeyDecString (const char* string)
+	{
+		BigNum key;
+		return key.setDecString (string) && setPrivateKey (key);
+	}
+
+	bool
+	setPrivateKeyHexString (const char* string)
+	{
+		BigNum key;
+		return key.setHexString (string) && setPrivateKey (key);
+	}
+
+	EC_POINT*
 	getPublicKey ()
 	{
-		return EC_KEY_get0_public_key (m_h);
+		return (EC_POINT*) EC_KEY_get0_public_key (m_h);
 	}
 
 	bool
-	setPublicKey (const EC_POINT* publicKey)
+	setPublicKey (EC_POINT* key)
 	{
-		int result = EC_KEY_set_public_key (m_h, publicKey);
+		int result = EC_KEY_set_public_key (m_h, key);
 		return completeWithLastCryptoError (result);
 	}
+
+	bool
+	setPublicKeyData (
+		const void* p,
+		size_t size,
+		BN_CTX* ctx = NULL
+		);
+
+	bool
+	setPublicDecString (
+		const char* string,
+		BN_CTX* ctx = NULL
+		);
+
+	bool
+	setPublicHexString (
+		const char* string,
+		BN_CTX* ctx = NULL
+		);
 
 	bool
 	generateKey ()
@@ -155,7 +205,7 @@ public:
 		)
 	{
 		size_t signatureSize = getSignatureSize ();
-		return signature->setCount (signatureSize) && signHash (signature, signatureSize, hash, hashSize);
+		return signature->setCount (signatureSize) && signHash (*signature, signatureSize, hash, hashSize);
 	}
 
 	bool
@@ -194,10 +244,10 @@ public:
 
 	bool
 	verifyHash (
-		const void* signature,
-		size_t signatureSize,
 		const void* hash,
-		size_t hashSize
+		size_t hashSize,
+		const void* signature,
+		size_t signatureSize
 		)
 	{
 		return ECDSA_verify (
@@ -212,17 +262,47 @@ public:
 
 	bool
 	verify (
-		const void* signature,
-		size_t signatureSize,
 		const void* p,
-		size_t size
+		size_t size,
+		const void* signature,
+		size_t signatureSize
 		)
 	{
 		char hash [MD5_DIGEST_LENGTH];
 		MD5 ((const uchar_t*) p, size, (uchar_t*) hash);
-		return verifyHash (signature, signatureSize, hash, sizeof (hash));
+		return verifyHash (hash, sizeof (hash), signature, signatureSize);
 	}
 };
+
+//.............................................................................
+
+bool
+generateEcProductKey (
+	EC_KEY* ecKey,
+	rtl::String* productKey,
+	const char* userName,
+	size_t hyphenDistance = 6
+	);
+
+inline
+rtl::String 
+generateEcProductKey (
+	EC_KEY* ecKey,
+	const char* userName,
+	size_t hyphenDistance = 6
+	)
+{
+	rtl::String productKey;
+	generateEcProductKey (ecKey, &productKey, userName, hyphenDistance);
+	return productKey;
+}
+
+bool
+verifyEcProductKey (
+	EC_KEY* ecKey,
+	const char* userName,
+	const char* productKey
+	);
 
 //.............................................................................
 

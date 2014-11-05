@@ -74,7 +74,8 @@ class BigNum: public rtl::Handle <BIGNUM*, FreeBigNum>
 public:
 	BigNum ()
 	{		
-		m_h = BN_new ();
+		m_h = NULL;
+		create ();
 	}
 
 	BigNum (BIGNUM* h):
@@ -84,6 +85,16 @@ public:
 
 	bool
 	create ();
+
+	bool
+	createCopy (BIGNUM* src);
+
+	bool
+	copy (BIGNUM* src)
+	{
+		BIGNUM* result = BN_copy (m_h, src);
+		return completeWithLastCryptoError (result != NULL);
+	}
 
 	size_t 
 	getBitCount ()

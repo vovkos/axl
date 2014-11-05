@@ -30,6 +30,15 @@ BigNum::create ()
 	return completeWithLastCryptoError (m_h != NULL);
 }
 
+bool
+BigNum::createCopy (BIGNUM* src)
+{
+	close ();
+
+	m_h = BN_dup (src);
+	return completeWithLastCryptoError (m_h != NULL);
+}
+
 size_t
 BigNum::getData (
 	void* p,

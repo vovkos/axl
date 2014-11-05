@@ -29,8 +29,9 @@ public:
 class EcPoint: public rtl::Handle <EC_POINT*, FreeEcPoint>
 {
 public:
-	EcPoint ()
+	EcPoint (EC_GROUP* group)
 	{
+		create (group);
 	}
 
 	EcPoint (EC_POINT* h):
@@ -39,16 +40,16 @@ public:
 	}
 
 	bool
-	create (const EC_GROUP* group);
+	create (EC_GROUP* group);
 
 	bool
 	createCopy (
-		const EC_POINT* src,
-		const EC_GROUP* group
+		EC_POINT* src,
+		EC_GROUP* group
 		);
 
 	bool
-	copy (const EC_POINT* src)
+	copy (EC_POINT* src)
 	{
 		int result = EC_POINT_copy (m_h, src);
 		return completeWithLastCryptoError (result);
@@ -57,14 +58,14 @@ public:
 	bool
 	getData (
 		rtl::Array <char>* data,
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
 		);
 
 	rtl::Array <char>
 	getData (
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
 		)
@@ -76,7 +77,7 @@ public:
 
 	bool
 	setData (
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		const void* p,
 		size_t size,
 		BN_CTX* ctx = NULL
@@ -87,39 +88,8 @@ public:
 	}
 
 	bool
-	getHexString (
-		rtl::String* string,
-		const EC_GROUP* group,
-		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
-		BN_CTX* ctx = NULL
-		);
-
-	rtl::String
-	getHexString (
-		const EC_GROUP* group,
-		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
-		BN_CTX* ctx = NULL
-		)
-	{
-		rtl::String string;
-		getHexString (&string, group, form, ctx);
-		return string;
-	}
-
-	bool
-	setHexString (
-		const EC_GROUP* group,
-		const char* string,
-		BN_CTX* ctx = NULL
-		)
-	{
-		EC_POINT* result = EC_POINT_hex2point (group, string, m_h, ctx);
-		return completeWithLastCryptoError (result != NULL);
-	}
-
-	bool
 	getBigNum (
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		BIGNUM* bigNum,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
@@ -131,7 +101,7 @@ public:
 
 	bool
 	setBigNum (
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		const BIGNUM* bigNum,
 		BN_CTX* ctx = NULL
 		)
@@ -141,14 +111,80 @@ public:
 	}
 
 	bool
-	isAtInfinity (const EC_GROUP* group)
+	getDecString (
+		rtl::String* string,
+		EC_GROUP* group,
+		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
+		BN_CTX* ctx = NULL
+		)
+	{
+		BigNum bigNum;
+		return getBigNum (group, bigNum, form, ctx) && bigNum.getDecString (string);
+	}
+
+	rtl::String
+	getDecString (
+		EC_GROUP* group,
+		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
+		BN_CTX* ctx = NULL
+		)
+	{
+		rtl::String string;
+		getDecString (&string, group, form, ctx);
+		return string;
+	}
+
+	bool
+	setDecString (
+		EC_GROUP* group,
+		const char* string,
+		BN_CTX* ctx = NULL
+		)
+	{
+		BigNum bigNum;
+		return bigNum.setDecString (string) && setBigNum (group, bigNum, ctx);
+	}
+
+	bool
+	getHexString (
+		rtl::String* string,
+		EC_GROUP* group,
+		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
+		BN_CTX* ctx = NULL
+		);
+
+	rtl::String
+	getHexString (
+		EC_GROUP* group,
+		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
+		BN_CTX* ctx = NULL
+		)
+	{
+		rtl::String string;
+		getHexString (&string, group, form, ctx);
+		return string;
+	}
+
+	bool
+	setHexString (
+		EC_GROUP* group,
+		const char* string,
+		BN_CTX* ctx = NULL
+		)
+	{
+		EC_POINT* result = EC_POINT_hex2point (group, string, m_h, ctx);
+		return completeWithLastCryptoError (result != NULL);
+	}
+
+	bool
+	isAtInfinity (EC_GROUP* group)
 	{
 		return EC_POINT_is_at_infinity (group, m_h) == 1;
 	}
 
 	bool
 	isOnCurve (
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -157,8 +193,8 @@ public:
 
 	bool
 	isEqual (
-		const EC_GROUP* group,
-		const EC_POINT* op, 
+		EC_GROUP* group,
+		EC_POINT* op, 
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -167,9 +203,9 @@ public:
 
 	bool
 	add (
-		const EC_GROUP* group,
-		const EC_POINT* op1, 
-		const EC_POINT* op2, 
+		EC_GROUP* group,
+		EC_POINT* op1, 
+		EC_POINT* op2, 
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -178,9 +214,33 @@ public:
 	}
 
 	bool
+	mul (
+		EC_GROUP* group,
+		BIGNUM* op1, 
+		EC_POINT* op2, 
+		BIGNUM* op3, 
+		BN_CTX* ctx = NULL
+		)
+	{
+		int result = EC_POINT_mul (group, m_h, op1, op2, op3, ctx);
+		return completeWithLastCryptoError (result);
+	}
+
+	bool
+	mul (
+		EC_GROUP* group,
+		BIGNUM* op, 
+		BN_CTX* ctx = NULL
+		)
+	{
+		int result = EC_POINT_mul (group, m_h, op, NULL, NULL, ctx);
+		return completeWithLastCryptoError (result);
+	}
+
+	bool
 	dbl (
-		const EC_GROUP* group,
-		const EC_POINT* op, 
+		EC_GROUP* group,
+		EC_POINT* op, 
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -190,7 +250,7 @@ public:
 
 	bool
 	invert (
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -200,7 +260,7 @@ public:
 
 	bool
 	makeAffine (
-		const EC_GROUP* group,
+		EC_GROUP* group,
 		BN_CTX* ctx = NULL
 		)
 	{

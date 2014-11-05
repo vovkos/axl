@@ -65,6 +65,16 @@ extern "C" {
 
 //.............................................................................
 
+// openssl 
+
+#include <openssl/ec.h>
+#include <openssl/obj_mac.h>
+#include <openssl/err.h>
+#include <openssl/md5.h>
+#include <openssl/ecdsa.h>
+
+//.............................................................................
+
 // axl
 
 #define _AXL_DISABLE_PREMATURE_WINDOW_DESTRUCTION_CHECK
@@ -91,6 +101,8 @@ extern "C" {
 #include <axl_ini_Parser.h>
 #include <axl_enc_Base32Encoding.h>
 #include <axl_g_Time.h>
+#include <axl_cry_EcKey.h>
+#include <axl_cry_EcPoint.h>
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include <axl_g_win_Window.h>

@@ -99,6 +99,9 @@ Base32Encoding::encode (
 	}
 
 	char* dst = string->getBuffer (length);
+	if (!dst)
+		return -1;
+
 	Base32Writer writer (dst, length, hyphenDistance);
 
 	uchar_t x = 0;
@@ -164,8 +167,12 @@ Base32Encoding::decode (
 	size_t length
 	)
 {
+	if (length == -1)
+		length = strlen (p);
+
 	size_t sizeGuess = (length * 5) / 8;
 	buffer->reserve (sizeGuess);
+	buffer->clear ();
 	
 	uchar_t x = 0;
 	size_t i = 0;
