@@ -27,6 +27,18 @@ public:
 	getErrorDescription (const err::ErrorData* error);
 };
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline 
+void 
+registerCryptoErrorProvider ()
+{
+	err::getErrorMgr ()->registerProvider (
+		GUID_CryptoError, 
+		rtl::getSimpleSingleton <CryptoErrorProvider> ()
+		);
+}
+
 //.............................................................................
 
 class CryptoError: public err::Error
