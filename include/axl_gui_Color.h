@@ -15,26 +15,17 @@ namespace gui {
 
 enum
 {
-	ColorFlag_Transparent = 0x80000000,
+	ColorFlag_Undefined   = 0x80000000,
 	ColorFlag_Index       = 0x40000000,
-	ColorFlag_IndexMask   = 0x0fffffff,
+	ColorFlag_IndexMask   = 0x3fffffff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-inline 
-uint_t 
-getColorIndex (uint_t color)
-{ 
-	ASSERT ((color & ColorFlag_Index) && !(color & ColorFlag_Transparent));
-	
-	return color & ColorFlag_IndexMask;
-}
-
-//.............................................................................
-
 enum StdColor
 {
+	StdColor_Undefined    = ColorFlag_Undefined,
+
 	StdColor_Black        = 0x000000,
 	StdColor_White        = 0xffffff,
 	StdColor_Gray         = 0x808080,
@@ -60,7 +51,7 @@ enum StdColor
 	StdColor_PastelPurple = 0xe2dafd,
 };
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum StdPalColor
 {
@@ -107,7 +98,30 @@ enum StdPalColor
 	StdPalColor__Count            = ~ColorFlag_Index & (StdPalColor_PastelPurple + 1)
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
+
+inline 
+uint_t 
+getColorIndex (uint_t color)
+{ 
+	return (color & ColorFlag_Index) ? color & ColorFlag_IndexMask : -1;
+}
+
+inline
+uint_t
+overlayColor (
+	uint_t baseColor,
+	uint_t overlayColor
+	)
+{
+	return (overlayColor & ColorFlag_Undefined) ? baseColor : overlayColor;
+}
+
+uint_t
+parseColorString (
+	const char* string,
+	const char** end = NULL
+	);
 
 inline
 uint_t 
@@ -131,8 +145,7 @@ struct Palette
 
 	Palette ()
 	{
-		m_colorArray = getStdPalColorArray ();
-		m_count = StdPalColor__Count;
+		setup (getStdPalColorArray (), StdPalColor__Count);
 	}
 
 	Palette (
@@ -145,135 +158,20 @@ struct Palette
 	}
 
 	uint_t
-	getColorRgb (uint_t color)
-	{
-		ASSERT (!(color & ColorFlag_Transparent));
-		
-		if (!(color & ColorFlag_Index))
-			return color;
-
-		size_t i = color & ColorFlag_IndexMask;
-		color = i < m_count ? m_colorArray [i] : ColorFlag_Transparent;
-			
-		if (color & ColorFlag_Index) // allow two-staged index lookup
-		{
-			i = color & ColorFlag_IndexMask;
-			color = i < m_count ? m_colorArray [i] : ColorFlag_Transparent;
-			ASSERT (!(color & ColorFlag_Index)); // bad palette!
-		}
-
-		return color;
-	}
-};
-
-//.............................................................................
-
-inline
-uint_t
-overlayColor (
-	uint_t baseColor,
-	uint_t overlayColor
-	)
-{
-	return (overlayColor & ColorFlag_Transparent) ? baseColor : overlayColor;
-}
-
-uint_t
-parseColorString (
-	const char* string,
-	const char** end = NULL
-	);
-
-//.............................................................................
-
-struct ColorAttr
-{
-	uint_t m_foreColor;
-	uint_t m_backColor;
-
-	ColorAttr ()
-	{
-		m_foreColor = ColorFlag_Transparent;
-		m_backColor = ColorFlag_Transparent;
-	}
-
-	ColorAttr (
-		uint_t foreColor,
-		uint_t backColor = ColorFlag_Transparent
-		)
-	{
-		setup (foreColor, backColor);
-	}
-
-	ColorAttr (const char* string)
-	{
-		parse (string);
-	}
-
-	int 
-	cmp (const ColorAttr& attr)
-	{
-		return memcmp (this, &attr, sizeof (ColorAttr));
-	}
-
-	void
-	clear ()
-	{
-		m_foreColor = ColorFlag_Transparent;
-		m_backColor = ColorFlag_Transparent;
-	}
+	getColorRgb (uint_t color);
 
 	void
 	setup (
-		uint_t foreColor,
-		uint_t backColor
+		const uint_t* colorArray,
+		size_t count
 		)
 	{
-		m_foreColor = foreColor;
-		m_backColor = backColor;
-	}
-
-	void
-	overlay (
-		const ColorAttr& baseAttr,
-		const ColorAttr& overlayAttr
-		)
-	{
-		m_foreColor = overlayColor (baseAttr.m_foreColor, overlayAttr.m_foreColor);
-		m_backColor = overlayColor (baseAttr.m_backColor, overlayAttr.m_backColor);
-	}
-
-	void
-	overlay (const ColorAttr& overlayAttr)
-	{
-		overlay (*this, overlayAttr);
-	}
-
-	void
-	parse (
-		const char* string,
-		const char** end = NULL
-		);
-
-	void
-	parseOverlay (
-		const ColorAttr& baseAttr,
-		const char* string,
-		const char** end = NULL
-		);
-
-	void
-	parseOverlay (
-		const char* string,
-		const char** end = NULL
-		)
-	{
-		parseOverlay (*this, string, end);
+		m_colorArray = colorArray;
+		m_count = count;
 	}
 };
 
 //.............................................................................
-
 
 } // namespace gui
 } // namespace axl

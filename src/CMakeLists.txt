@@ -24,7 +24,7 @@ if (WIN32)
 	option (
 		BUILD_AXL_GUI_GDI
 		"Build GDI drivers for axl_gui library"
-		ON
+		OFF
 		)
 endif ()
 

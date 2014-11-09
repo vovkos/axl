@@ -234,43 +234,6 @@ struct Size
 
 //.............................................................................
 
-enum FormFactor
-{
-	FormFactor_Landscape,
-	FormFactor_Portrait,
-	FormFactor_LineStrip,
-	FormFactor_ColumnStrip,
-	FormFactor__Count,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-FormFactor
-getFormFactor (
-	int width,
-	int height, 
-	int stripThreshold = 32
-	)
-{
-	return 
-		height > width * stripThreshold ? FormFactor_LineStrip :
-		width > height * stripThreshold ? FormFactor_ColumnStrip :
-		height > width ? FormFactor_Portrait : FormFactor_Landscape;
-}
-
-inline
-FormFactor
-getFormFactor (
-	const Size& size, 
-	int stripThreshold = 32
-	)
-{
-	return getFormFactor (size.m_width, size.m_height, stripThreshold);
-}
-
-//.............................................................................
-
 struct Rect
 {
 	union 
@@ -411,7 +374,7 @@ struct Rect
 
 //.............................................................................
 
-struct CursorPos
+struct CaretPos
 {
 	union
 	{
@@ -428,13 +391,13 @@ struct CursorPos
 		};
 	};
 
-	CursorPos ()
+	CaretPos ()
 	{
 		m_line = 0;
 		m_col = 0;
 	}
 
-	CursorPos (
+	CaretPos (
 		int line,
 		int col
 		)
@@ -443,43 +406,43 @@ struct CursorPos
 	}
 
 	bool
-	operator == (const CursorPos& pos2) const
+	operator == (const CaretPos& pos2) const
 	{
 		return cmp (pos2) == 0;
 	}
 
 	bool
-	operator != (const CursorPos& pos2) const
+	operator != (const CaretPos& pos2) const
 	{
 		return cmp (pos2) != 0;
 	}
 
 	bool
-	operator < (const CursorPos& pos2) const
+	operator < (const CaretPos& pos2) const
 	{
 		return cmp (pos2) < 0;
 	}
 
 	bool
-	operator <= (const CursorPos& pos2) const
+	operator <= (const CaretPos& pos2) const
 	{
 		return cmp (pos2) <= 0;
 	}
 
 	bool
-	operator > (const CursorPos& pos2) const
+	operator > (const CaretPos& pos2) const
 	{
 		return cmp (pos2) > 0;
 	}
 
 	bool
-	operator >= (const CursorPos& pos2) const
+	operator >= (const CaretPos& pos2) const
 	{
 		return cmp (pos2) >= 0;
 	}
 
 	int
-	cmp (const CursorPos& pos2) const
+	cmp (const CaretPos& pos2) const
 	{
 		return 
 			m_line < pos2.m_line ? -1 : 
@@ -489,7 +452,7 @@ struct CursorPos
 	}
 
 	int
-	cmp_u (const CursorPos& pos2) const
+	cmp_u (const CaretPos& pos2) const
 	{
 		return 
 			m_line_u < pos2.m_line_u ? -1 : 
@@ -521,15 +484,60 @@ struct CursorPos
 
 //.............................................................................
 
+enum Orientation
+{
+	Orientation_Vertical = 0,
+	Orientation_Horizontal,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum FormFactor
+{
+	FormFactor_Landscape,
+	FormFactor_Portrait,
+	FormFactor_LineStrip,
+	FormFactor_ColumnStrip,
+	FormFactor__Count,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+FormFactor
+getFormFactor (
+	int width,
+	int height, 
+	int stripThreshold = 8
+	)
+{
+	return 
+		height > width * stripThreshold ? FormFactor_LineStrip :
+		width > height * stripThreshold ? FormFactor_ColumnStrip :
+		height > width ? FormFactor_Portrait : FormFactor_Landscape;
+}
+
+inline
+FormFactor
+getFormFactor (
+	const Size& size, 
+	int stripThreshold = 8
+	)
+{
+	return getFormFactor (size.m_width, size.m_height, stripThreshold);
+}
+
+//.............................................................................
+
 class GuiItem
 {
 protected:
 	Engine* m_engine;
 
 public:
-	GuiItem ()
+	GuiItem (Engine* engine)
 	{
-		m_engine = NULL;
+		m_engine = engine;
 	}
 
 	Engine* 
@@ -543,4 +551,3 @@ public:
 
 } // namespace gui
 } // namespace axl
-

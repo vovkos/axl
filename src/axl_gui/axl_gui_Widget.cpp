@@ -1,31 +1,40 @@
 #include "pch.h"
 #include "axl_gui_Widget.h"
 #include "axl_gui_Engine.h"
+#include "axl_gui_Font.h"
 
 namespace axl {
 namespace gui {
 
 //.............................................................................
 
-Widget::Widget (Engine* engine)
+WidgetDriver::WidgetDriver (const WidgetConstructParam& param):
+	GuiItem (param.m_engine)
 {
-	ASSERT (engine);
-
-	m_engine = engine;
-	m_cursor = engine->getStdCursor (StdCursorKind_Arrow);
-	m_baseFont = engine->getStdFont (StdFontKind_Monospace);
-	m_style = 0;
-	m_msgMask = -1;	
-	m_baseTextAttr.m_foreColor = StdPalColor_WidgetText;
-	m_baseTextAttr.m_backColor = StdPalColor_WidgetBack;
-	m_baseTextAttr.m_fontFlags = 0;
+	m_engineWidget = param.m_engineWidget;
+	m_cursor = m_engine->getStdCursor (StdCursorKind_Arrow);
+	m_font = m_engine->getStdFont (StdFontKind_Monospace);
+	m_msgMap = NULL;	
+	m_colorAttr.m_foreColor = StdPalColor_WidgetText;
+	m_colorAttr.m_backColor = StdPalColor_WidgetBack;
 	m_caretSize.m_width = 2;
-	m_caretSize.m_height = 16;
+	m_caretSize.m_height = m_font->calcTextSize ('|').m_height;
 	m_isCaretVisible = false;
 }
 
 bool
-Widget::setCaretVisible (bool isVisible)
+WidgetDriver::setFont (Font* font)
+{
+	if (m_font == font)
+		return true;
+
+	m_font = font;
+	m_caretSize.m_height = m_font->calcTextSize ('|').m_height;
+	return true;
+}
+
+bool
+WidgetDriver::setCaretVisible (bool isVisible)
 {
 	if (m_isCaretVisible == isVisible)
 		return true;
@@ -35,12 +44,12 @@ Widget::setCaretVisible (bool isVisible)
 	if (isVisible)
 		return m_engine->showCaret (this, Rect (m_caretPos, m_caretSize));
 
-	m_engine->hideCaret ();
+	m_engine->hideCaret (this);
 	return true;
 }
 
 bool
-Widget::setCaretSize (
+WidgetDriver::setCaretSize (
 	uint_t width,
 	uint_t height
 	)
@@ -53,7 +62,7 @@ Widget::setCaretSize (
 }
 
 bool
-Widget::setCaretPos (
+WidgetDriver::setCaretPos (
 	int x, 
 	int y
 	)
@@ -63,6 +72,49 @@ Widget::setCaretPos (
 
 	m_caretPos.setup (x, y);
 	return m_isCaretVisible ? m_engine->showCaret (this, Rect (m_caretPos, m_caretSize)) : true;
+}
+
+bool
+WidgetDriver::updateScrollBars (uint_t mask)
+{
+	bool result = true;
+
+	if (mask & Orientation_Vertical)
+		result = updateScrollBar (Orientation_Vertical);
+
+	if (mask & Orientation_Horizontal)
+		result = updateScrollBar (Orientation_Horizontal) || result;
+
+	return true;
+}
+
+void
+WidgetDriver::processMsg (
+	const WidgetMsg* msg,
+	bool* isHandled
+	)
+{
+	ASSERT (msg->m_msgCode < WidgetMsgCode__Count);
+
+	Widget* widget = AXL_CONTAINING_RECORD (this, Widget, m_widgetDriver);
+	if (!m_msgMap)
+		m_msgMap = widget->getWidgetMsgMap ();
+
+	bool result = false;
+
+	WidgetMsgMap* msgMap = m_msgMap;
+	for (; msgMap; msgMap = msgMap->m_baseMap)
+	{
+		WidgetMsgProc proc = msgMap->m_msgProcTable [msg->m_msgCode];
+		if (!proc)
+			break;
+
+		(widget->*proc) (msg, &result);
+		if (result)
+			break;
+	}
+
+	*isHandled = result;
 }
 
 //.............................................................................

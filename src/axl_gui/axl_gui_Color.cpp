@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "axl_gui_Color.h"
-#include "axl_rtl_ByteOrder.h"
+#include "axl_mt_CallOnce.h"
+
+#include "axl_gui_Font.h"
 
 namespace axl {
 namespace gui {
@@ -45,12 +47,6 @@ static uint_t g_stdPalColorArray [StdPalColor__Count] =
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const uint_t*
-getStdPalColorArray ()
-{
-	return g_stdPalColorArray;
-}
-
 void
 updateStdPalSystemColors ()
 {
@@ -79,15 +75,45 @@ updateStdPalSystemColors ()
 #endif
 }
 
-static
-class InitStdPalSystemColors 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class UpdateStdPalSystemColors
 {
 public:
-	InitStdPalSystemColors ()
+	void
+	operator () (int)
 	{
 		updateStdPalSystemColors ();
 	}
-} g_initStdColors;
+};
+
+const uint_t*
+getStdPalColorArray ()
+{
+	mt::callOnce (UpdateStdPalSystemColors (), 0);
+	return g_stdPalColorArray;
+}
+
+//.............................................................................
+
+uint_t
+Palette::getColorRgb (uint_t color)
+{
+	if (!(color & ColorFlag_Index))
+		return color;
+
+	size_t i = color & ColorFlag_IndexMask;
+	color = i < m_count ? m_colorArray [i] : StdColor_Undefined;
+			
+	if (color & ColorFlag_Index) // allow two-staged index lookups
+	{
+		i = color & ColorFlag_IndexMask;
+		color = i < m_count ? m_colorArray [i] : StdColor_Undefined;
+		ASSERT (!(color & ColorFlag_Index)); // bad palette -- more than two-staged index
+	}
+
+	return color;
+}
 
 //.............................................................................
 
@@ -102,10 +128,10 @@ parseColorString (
 		if (end_o)
 			*end_o = NULL;
 
-		return ColorFlag_Transparent;
+		return StdColor_Black;
 	}
 
-	uint_t color = ColorFlag_Transparent;
+	uint_t color = StdColor_Black;
 
 	char* end;
 
@@ -126,39 +152,6 @@ parseColorString (
 		*end_o = end;
 
 	return color;
-}
-
-//.............................................................................
-
-void
-ColorAttr::parse (
-	const char* string,
-	const char** end
-	)
-{
-	m_foreColor = parseColorString (string, &string);
-	m_backColor = ColorFlag_Transparent;
-
-	while (isspace (*string))
-		string++;
-
-	if (*string == '|')
-		m_backColor = parseColorString (string + 1, &string);
-
-	if (end)
-		*end = string;
-}
-
-void
-ColorAttr::parseOverlay (
-	const ColorAttr& baseAttr,
-	const char* string,
-	const char** end
-	)
-{
-	ColorAttr overlayAttr;
-	overlayAttr.parse (string, end);
-	overlay (baseAttr, overlayAttr);
 }
 
 //.............................................................................

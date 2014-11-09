@@ -29,9 +29,9 @@ struct Notify: NMHDR
 
 inline
 int 
-getScrollBarFromOrientation (WidgetOrientation orientation)
+getScrollBarFromOrientation (Orientation orientation)
 {
-	return orientation == WidgetOrientation_Horizontal ? SB_HORZ : SB_VERT;
+	return orientation == Orientation_Horizontal ? SB_HORZ : SB_VERT;
 }
 
 void
@@ -106,7 +106,7 @@ protected:
 	void
 	processWmScroll (
 		HWND hWnd,
-		WidgetOrientation orientation,
+		Orientation orientation,
 		int code,
 		bool* isHandled_o
 		);
@@ -241,7 +241,7 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (WidgetOrientation orientation)
+	updateScrollBar (Orientation orientation)
 	{
 		ASSERT (orientation < countof (m_scrollBarArray));
 

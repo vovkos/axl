@@ -4,14 +4,14 @@
 
 #pragma once
 
-#define _AXL_GUI_TEXTATTRANCHORARRAY_H
+#define _AXL_GUI_TEXTATTR_H
 
-#include "axl_gui_Font.h"
 #include "axl_rtl_Array.h"
+#include "axl_gui_TextAttr.h"
 
 namespace axl {
 namespace gui {
-	
+
 //.............................................................................
 
 struct TextAttrAnchor

@@ -42,13 +42,13 @@ GdiEngine::createStdFont (StdFontKind fontKind)
 
 ref::Ptr <Font>
 GdiEngine::createFont (
-	const char* faceName,
+	const char* family,
 	size_t pointSize,
 	uint_t flags
 	)
 {
 	LOGFONTW logFont;
-	buildLogFont (&logFont, rtl::String_w (faceName), pointSize, flags);
+	buildLogFont (&logFont, rtl::String_w (family), pointSize, flags);
 
 	HFONT hFont = ::CreateFontIndirect (&logFont);
 	if (!hFont)

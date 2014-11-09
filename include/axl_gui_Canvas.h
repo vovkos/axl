@@ -6,39 +6,49 @@
 
 #define _AXL_GUI_CANVAS_H
 
-#include "axl_gui_Def.h"
-#include "axl_gui_Color.h"
+#include "axl_gui_Engine.h"
+#include "axl_gui_ColorAttr.h"
+#include "axl_gui_TextAttr.h"
 #include "axl_gui_Font.h"
-#include "axl_gui_Image.h"
 
 namespace axl {
 namespace gui {
+
+class Image;
 
 //.............................................................................
 
 class Canvas: public GuiItem
 {
 protected:
+	Font* m_driverFont;
+	ColorAttr m_driverColorAttr;
+
+public:
 	Font* m_font;
 	ColorAttr m_colorAttr;
-
-public:
-	Font* m_baseFont;
-	TextAttr m_baseTextAttr;
-	TextAttr m_defTextAttr;
 	Palette m_palette;
 
-public:
-	Canvas ()
+protected:
+	Canvas (Engine* engine):
+		GuiItem (engine)
 	{
-		m_font = NULL;
-		m_baseFont = NULL;
-		m_baseTextAttr.setup (StdPalColor_WidgetText, StdPalColor_WidgetBack, 0);
+		m_font = engine->getStdFont (StdFontKind_Gui);
+		m_driverFont = NULL;
+		m_colorAttr.setup (StdPalColor_WidgetText, StdPalColor_WidgetBack);
+		m_driverColorAttr.setup (StdColor_Undefined, StdColor_Undefined);
+	}
+
+public:
+	void
+	setTextAttr (const TextAttr& attr)
+	{
+		m_colorAttr = attr;
+		m_font = m_font->getFontMod (attr.m_fontFlags);
 	}
 
 	// rect drawing
 
-	virtual
 	bool
 	drawRect (
 		int left,
@@ -46,7 +56,10 @@ public:
 		int right,
 		int bottom,
 		uint_t color
-		) = 0;
+		)
+	{
+		return m_engine->drawRect (this, left, top, right, bottom, color);
+	}
 
 	bool
 	drawRect (
@@ -56,7 +69,7 @@ public:
 		int bottom
 		)
 	{
-		return drawRect (left, top, right, bottom, m_defTextAttr.m_backColor);
+		return drawRect (left, top, right, bottom, m_colorAttr.m_backColor);
 	}
 
 	bool
@@ -82,7 +95,7 @@ public:
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom,
-			m_defTextAttr.m_backColor
+			m_colorAttr.m_backColor
 			);
 	}
 
@@ -158,7 +171,6 @@ public:
 
 	// utf8 text drawing
 
-	virtual
 	bool
 	drawText_utf8 (
 		int x,
@@ -172,7 +184,23 @@ public:
 		uint_t fontFlags,
 		const utf8_t* text,
 		size_t length = -1
-		) = 0;
+		)
+	{
+		return m_engine->drawText_utf8 (
+			this,
+			x,
+			y,
+			left,
+			top,
+			right,
+			bottom,
+			textColor,
+			backColor,
+			fontFlags,
+			text,
+			length
+			);
+	}
 
 	bool
 	drawText_utf8 (
@@ -193,9 +221,9 @@ public:
 			top,
 			right,
 			bottom,
-			m_defTextAttr.m_foreColor,
-			m_defTextAttr.m_backColor,
-			m_defTextAttr.m_fontFlags,
+			m_colorAttr.m_foreColor,
+			m_colorAttr.m_backColor,
+			0,
 			text,
 			length
 			);
@@ -240,9 +268,9 @@ public:
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom,
-			m_defTextAttr.m_foreColor,
-			m_defTextAttr.m_backColor,
-			m_defTextAttr.m_fontFlags,
+			m_colorAttr.m_foreColor,
+			m_colorAttr.m_backColor,
+			0,
 			text,
 			length
 			);
@@ -250,7 +278,6 @@ public:
 
 	// utf16 text drawing
 
-	virtual
 	bool
 	drawText_utf16 (
 		int x,
@@ -264,7 +291,23 @@ public:
 		uint_t fontFlags,
 		const utf16_t* text,
 		size_t length = -1
-		) = 0;
+		)
+	{
+		return m_engine->drawText_utf16 (
+			this, 
+			x,
+			y,
+			left,
+			top,
+			right,
+			bottom,
+			textColor,
+			backColor,
+			fontFlags,
+			text,
+			length
+			);
+	}
 
 	bool
 	drawText_utf16 (
@@ -285,9 +328,9 @@ public:
 			top,
 			right,
 			bottom,
-			m_defTextAttr.m_foreColor,
-			m_defTextAttr.m_backColor,
-			m_defTextAttr.m_fontFlags,
+			m_colorAttr.m_foreColor,
+			m_colorAttr.m_backColor,
+			0,
 			text,
 			length
 			);
@@ -332,9 +375,9 @@ public:
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom,
-			m_defTextAttr.m_foreColor,
-			m_defTextAttr.m_backColor,
-			m_defTextAttr.m_fontFlags,
+			m_colorAttr.m_foreColor,
+			m_colorAttr.m_backColor,
+			0,
 			text,
 			length
 			);
@@ -342,7 +385,6 @@ public:
 
 	// utf32 text drawing
 
-	virtual
 	bool
 	drawText_utf32 (
 		int x,
@@ -356,7 +398,23 @@ public:
 		uint_t fontFlags,
 		const utf32_t* text,
 		size_t length = -1
-		) = 0;
+		)
+	{
+		return m_engine->drawText_utf32 (
+			this,
+			x,
+			y,
+			left,
+			top,
+			right,
+			bottom,
+			textColor,
+			backColor,
+			fontFlags,
+			text,
+			length
+			);
+	}
 
 	bool
 	drawText_utf32 (
@@ -377,9 +435,9 @@ public:
 			top,
 			right,
 			bottom,
-			m_defTextAttr.m_foreColor,
-			m_defTextAttr.m_backColor,
-			m_defTextAttr.m_fontFlags,
+			m_colorAttr.m_foreColor,
+			m_colorAttr.m_backColor,
+			0,
 			text,
 			length
 			);
@@ -424,9 +482,9 @@ public:
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom,
-			m_defTextAttr.m_foreColor,
-			m_defTextAttr.m_backColor,
-			m_defTextAttr.m_fontFlags,
+			m_colorAttr.m_foreColor,
+			m_colorAttr.m_backColor,
+			0,
 			text,
 			length
 			);
@@ -434,7 +492,6 @@ public:
 
 	// image drawing
 
-	virtual
 	bool
 	drawImage (
 		int x,
@@ -444,7 +501,19 @@ public:
 		int top,
 		int right,
 		int bottom
-		) = 0;
+		)
+	{
+		return m_engine->drawImage (
+			this,
+			x,
+			y,
+			image,
+			left,
+			top,
+			right,
+			bottom
+			);
+	}
 
 	bool
 	drawImage (
@@ -466,35 +535,127 @@ public:
 
 	// bitblt
 
-	virtual
 	bool
 	copyRect (
+		int x,
+		int y,
 		Canvas* srcCanvas,
-		int xDst,
-		int yDst,
-		int xSrc,
-		int ySrc,
-		int width,
-		int height
-		) = 0;
+		int left,
+		int top,
+		int right,
+		int bottom
+		)
+	{
+		return m_engine->copyRect (
+			this,
+			x,
+			y,
+			srcCanvas,
+			left,
+			right,
+			top,
+			bottom
+			);
+	}
 
 	bool
 	copyRect (
+		const Point& point,
 		Canvas* srcCanvas,
-		const Point& dstPoint,
-		const Point& srcPoint,
-		const Size& size
+		const Rect& srcRect
 		)
 	{
 		return copyRect (
+			point.m_x,
+			point.m_y,
 			srcCanvas,
-			dstPoint.m_x,
-			dstPoint.m_y,
-			srcPoint.m_x,
-			srcPoint.m_y,
-			size.m_width,
-			size.m_height
+			srcRect.m_left,
+			srcRect.m_top,
+			srcRect.m_right,
+			srcRect.m_bottom
 			);
+	}
+};
+
+//.............................................................................
+
+template <typename T>
+class OffscreenCanvasCache
+{
+protected:
+	struct Entry
+	{
+		Size m_size;
+		T m_canvas;
+	};
+
+protected:
+	Engine* m_engine;
+	Entry* m_canvasTable [FormFactor__Count];
+
+public:
+	OffscreenCanvasCache (Engine* engine)
+	{
+		m_engine = engine;
+		memset (m_canvasTable, 0, sizeof (m_canvasTable));
+	}
+
+	~OffscreenCanvasCache ()
+	{
+		clear ();
+	}
+
+	void 
+	clear ()
+	{
+		for (size_t i = 0; i < countof (m_canvasTable); i++)
+			if (m_canvasTable [i])
+				AXL_MEM_DELETE (m_canvasTable [i]);
+
+		memset (m_canvasTable, 0, sizeof (m_canvasTable));
+	}
+
+	T*
+	getCanvas (
+		uint_t width,
+		uint_t height
+		)
+	{
+		FormFactor formFactor = getFormFactor (width, height);
+		ASSERT (formFactor < countof (m_canvasTable));
+	
+		Entry* entry = m_canvasTable [formFactor];
+		if (!entry)
+		{
+			entry = AXL_MEM_NEW (Entry);
+			m_canvasTable [formFactor] = entry;
+		}
+
+		if (entry->m_size.m_width_u >= width && 
+			entry->m_size.m_height_u >= height)
+			return &entry->m_canvas;
+
+		width = width < entry->m_size.m_width_u ? 
+			entry->m_size.m_width_u :
+			rtl::getMinPower2Ge (width);
+
+		height = entry->m_size.m_height_u < height ?
+			entry->m_size.m_height_u :
+			rtl::getMinPower2Ge (height);
+
+		bool result = m_engine->createOffscreenCanvas (&entry->m_canvas, width, height);
+		if (!result)
+			return NULL;
+
+		entry->m_size.m_width_u = width;
+		entry->m_size.m_height_u = height;
+		return &entry->m_canvas;
+	}
+
+	T*
+	getCanvas (const Size& size)
+	{
+		return getCanvas (size.m_width, size.m_height);
 	}
 };
 

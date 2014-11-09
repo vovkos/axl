@@ -19,7 +19,7 @@ namespace gui {
 bool
 buildLogFont (
 	LOGFONTW* logFont,
-	const wchar_t* faceName,
+	const wchar_t* family,
 	size_t pointSize,
 	uint_t flags = 0
 	);
@@ -33,7 +33,7 @@ getLogFontFromFontDesc (
 {
 	return buildLogFont (
 		logFont,
-		rtl::String_w (fontDesc.m_faceName), 
+		rtl::String_w (fontDesc.m_family), 
 		fontDesc.m_pointSize, 
 		fontDesc.m_flags
 		);

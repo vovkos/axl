@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_gui_TextPaint.h"
+#include "axl_gui_Font.h"
 #include "axl_enc_HexEncoding.h"
 
 namespace axl {
@@ -31,8 +32,7 @@ TextPaint::calcTextRect_utf8 (
 	size_t length
 	)
 {
-	Font* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
-	Size size = font->calcTextSize_utf8 (text, length);
+	Size size = m_canvas->m_font->calcTextSize_utf8 (text, length);
 	return Rect (m_point.m_x, m_top, m_point.m_x + size.m_width, m_bottom);
 }
 
@@ -42,8 +42,7 @@ TextPaint::calcTextRect_utf32 (
 	size_t length
 	)
 {
-	Font* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
-	Size size = font->calcTextSize_utf32 (text, length);
+	Size size = m_canvas->m_font->calcTextSize_utf32 (text, length);
 	return Rect (m_point.m_x, m_top, m_point.m_x + size.m_width, m_bottom);
 }
 
@@ -73,8 +72,7 @@ TextPaint::paintSpace (
 	uint_t color
 	)
 {
-	Font* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
-	Size size = font->calcTextSize (" ", 1);
+	Size size = m_canvas->m_font->calcTextSize (" ", 1);
 	return paintSpace_p (length * size.m_width, color);
 }
 
@@ -174,21 +172,17 @@ TextPaint::paintHyperText_utf8 (
 		return m_point.m_x;
 
 	if (!attrCount)
-	{
-		m_canvas->m_defTextAttr.clear ();
 		return paintTextPart_utf8 (length);
-	}
 
 	const TextAttrAnchor* nextAttr;
 
 	if (m_attr->m_offset <= offset)
 	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
+		m_canvas->setTextAttr (m_attr->m_attr);
 		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_canvas->m_defTextAttr.clear ();
 		nextAttr = m_attr;
 	}
 
@@ -205,7 +199,7 @@ TextPaint::paintHyperText_utf8 (
 
 		paintTextPart_utf8 (length);
 
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_canvas->setTextAttr (nextAttr->m_attr);
 		m_attr = nextAttr;
 		nextAttr++;
 
@@ -245,21 +239,17 @@ TextPaint::paintHyperText_utf32 (
 		return m_point.m_x;
 
 	if (!attrCount)
-	{
-		m_canvas->m_defTextAttr.clear ();
 		return paintTextPart_utf32 (length);
-	}
 
 	const TextAttrAnchor* nextAttr;
 
 	if (m_attr->m_offset <= offset)
 	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
+		m_canvas->setTextAttr (m_attr->m_attr);
 		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_canvas->m_defTextAttr.clear ();
 		nextAttr = m_attr;
 	}
 
@@ -276,7 +266,7 @@ TextPaint::paintHyperText_utf32 (
 
 		paintTextPart_utf32 (length);
 
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_canvas->setTextAttr (nextAttr->m_attr);
 		m_attr = nextAttr;
 		nextAttr++;
 
@@ -402,21 +392,17 @@ TextPaint::paintHyperBinHex (
 		return m_point.m_x;
 
 	if (!attrCount)
-	{
-		m_canvas->m_defTextAttr.clear ();
 		return paintBinHexPart (size);
-	}
 
 	const TextAttrAnchor* nextAttr;
 
 	if (m_attr->m_offset <= offset)
 	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
+		m_canvas->setTextAttr (m_attr->m_attr);
 		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_canvas->m_defTextAttr.clear ();
 		nextAttr = m_attr;
 	}
 
@@ -434,7 +420,7 @@ TextPaint::paintHyperBinHex (
 		p = m_p;
 		offset = p - m_begin;
 
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_canvas->setTextAttr (nextAttr->m_attr);
 		m_attr = nextAttr;
 		nextAttr++;
 	}
@@ -481,12 +467,12 @@ TextPaint::paintHyperBinHex4BitCursor (
 
 	char* cursor = (char*) p + cursorPos;
 	
-	gui::TextAttr attr = m_canvas->m_defTextAttr;
+	ColorAttr attr = m_canvas->m_colorAttr;
 
 	char c = enc::HexEncoding::getHexChar_l (*cursor & 0xf);
 	char charBuffer [8] = { c, ' ', ' ', 0 };
 	Rect rect = calcTextRect_utf8 (charBuffer, 3);
-	m_canvas->m_defTextAttr.overlay (m_selAttr);
+	m_canvas->m_colorAttr.overlay (m_selAttr);
 	m_canvas->drawText (m_point, rect, charBuffer, 3);
 
 	m_point.m_x = rect.m_right;
@@ -496,7 +482,7 @@ TextPaint::paintHyperBinHex4BitCursor (
 		size_t leftover = size - cursorPos - 1;
 
 		m_p = m_p + cursorPos + 1;
-		m_canvas->m_defTextAttr = attr;
+		m_canvas->setTextAttr (attr);
 
 		if (!attrArray)
 		{
@@ -646,21 +632,17 @@ TextPaint::paintHyperBinText (
 		return m_point.m_x;
 
 	if (!attrCount)
-	{
-		m_canvas->m_defTextAttr.clear ();
 		return paintBinTextPart (codec, size);
-	}
 
 	const TextAttrAnchor* nextAttr;
 
 	if (m_attr->m_offset <= offset)
 	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
+		m_canvas->setTextAttr (m_attr->m_attr);
 		nextAttr = m_attr + 1;
 	}
 	else
 	{
-		m_canvas->m_defTextAttr.clear ();
 		nextAttr = m_attr;
 	}
 
@@ -678,7 +660,7 @@ TextPaint::paintHyperBinText (
 		p = m_p;
 		offset = p - m_begin;
 
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
+		m_canvas->setTextAttr (nextAttr->m_attr);
 		m_attr = nextAttr;
 		nextAttr++;
 	}

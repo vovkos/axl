@@ -38,7 +38,7 @@ protected:
 
 public:
 	Canvas* m_canvas;
-	TextAttr m_selAttr;
+	ColorAttr m_selAttr;
 	uint_t m_hexEncodingFlags;
 	char m_unprintableChar;
 
@@ -81,7 +81,7 @@ public:
 	int
 	paintSpace (size_t length)
 	{
-		return paintSpace (length, m_canvas->m_defTextAttr.m_backColor);
+		return paintSpace (length, m_canvas->m_colorAttr.m_backColor);
 	}
 
 	int
@@ -93,7 +93,7 @@ public:
 	int
 	paintSpace_p (int width) // in pixels
 	{
-		return paintSpace_p (width, m_canvas->m_defTextAttr.m_backColor);
+		return paintSpace_p (width, m_canvas->m_colorAttr.m_backColor);
 	}
 
 	// text

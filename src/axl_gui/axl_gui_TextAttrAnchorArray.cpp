@@ -147,7 +147,7 @@ traceAttrArray (const TextAttrAnchorArray& array)
 
 	for (size_t i = 0; i < count; i++)
 	{
-		const gui::TextAttrAnchor* anchor = &(array [i]);
+		const TextAttrAnchor* anchor = &(array [i]);
 		dbg::trace ("[%d] ofs:%02x m:%d fc:%x\n", i, anchor->m_offset, anchor->m_metric, anchor->m_attr.m_foreColor);
 	}
 }
@@ -183,7 +183,7 @@ TextAttrAnchorArray::setAttr (
 		if (anchor->m_metric <= metric)
 		{
 			anchor->m_metric = metric;
-			anchor->m_attr.overlay (attr);
+			anchor->m_attr = attr;
 		}
 	}
 

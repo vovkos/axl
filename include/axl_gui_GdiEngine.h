@@ -27,7 +27,6 @@ protected:
 public:
 	GdiEngine ()
 	{
-		m_engineKind = EngineKind_Gdi;
 		m_hWndClipboardOwner = NULL;
 	}
 
@@ -52,7 +51,7 @@ public:
 	virtual
 	ref::Ptr <Font>
 	createFont (
-		const char* faceName,
+		const char* family,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		);
