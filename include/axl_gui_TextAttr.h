@@ -25,8 +25,8 @@ struct TextAttr: public ColorAttr
 
 	TextAttr (
 		uint_t foreColor,
-		uint_t backColor = -1,
-		uint_t fontFlags = -1
+		uint_t backColor = StdColor_Undefined,
+		uint_t fontFlags = 0
 		)
 	{
 		setup (foreColor, backColor, fontFlags);
@@ -34,7 +34,7 @@ struct TextAttr: public ColorAttr
 
 	TextAttr (
 		const ColorAttr& colorAttr,
-		uint_t fontFlags = -1
+		uint_t fontFlags = 0
 		)
 	{
 		setup (colorAttr, fontFlags);
