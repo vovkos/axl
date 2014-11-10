@@ -403,9 +403,10 @@ source_group (
 # axl_core library
 #
 
+include_directories (${AXL_INC_DIR})
+
 add_library (
 	axl_core
-
 	${PCH_H}
 	${PCH_CPP}
 	${DBG_H_LIST}

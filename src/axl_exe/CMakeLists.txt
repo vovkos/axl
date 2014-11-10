@@ -72,6 +72,8 @@ source_group (
 # axl_exe library
 #
 
+include_directories (${AXL_INC_DIR})
+
 add_library (
 	axl_exe
 	${PCH_H}

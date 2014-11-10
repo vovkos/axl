@@ -83,7 +83,10 @@ source_group (
 # axl_ini library
 #
 
-include_directories (${GEN_DIR})
+include_directories (
+	${AXL_INC_DIR}
+	${GEN_DIR}
+	)
 
 add_library (
 	axl_ini

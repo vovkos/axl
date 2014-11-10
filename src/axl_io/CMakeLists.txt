@@ -199,6 +199,8 @@ source_group (
 # axl_io library
 #
 
+include_directories (${AXL_INC_DIR})
+
 if (BUILD_AXL_IO_PCAP)
 	include_directories (${PCAP_INC_DIR})
 	add_definitions (-D_AXL_IO_PCAP)

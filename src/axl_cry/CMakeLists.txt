@@ -50,7 +50,10 @@ source_group (
 # axl_cry library
 #
 
-include_directories (${OPENSSL_INC_DIR})
+include_directories (
+	${OPENSSL_INC_DIR}
+	${AXL_INC_DIR}
+	)
 
 add_library (
 	axl_cry

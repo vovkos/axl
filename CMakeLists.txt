@@ -48,8 +48,6 @@ add_subdirectory (cmake)
 include (${CMAKE_CURRENT_BINARY_DIR}/cmake/axl.cmake)
 include (version.cmake)
 
-include_directories (${AXL_INC_DIR})
-
 add_subdirectory (src)
 
 if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt")
