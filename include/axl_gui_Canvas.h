@@ -36,7 +36,6 @@ protected:
 		m_font = engine->getStdFont (StdFontKind_Gui);
 		m_driverFont = NULL;
 		m_colorAttr.setup (StdPalColor_WidgetText, StdPalColor_WidgetBack);
-		m_driverColorAttr.setup (StdColor_Undefined, StdColor_Undefined);
 	}
 
 public:
@@ -223,7 +222,7 @@ public:
 			bottom,
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
-			0,
+			-1,
 			text,
 			length
 			);
@@ -330,7 +329,7 @@ public:
 			bottom,
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
-			0,
+			-1,
 			text,
 			length
 			);
@@ -377,7 +376,7 @@ public:
 			rect.m_bottom,
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
-			0,
+			-1,
 			text,
 			length
 			);
@@ -437,7 +436,7 @@ public:
 			bottom,
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
-			0,
+			-1,
 			text,
 			length
 			);

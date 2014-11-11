@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_GUI_TEXTATTR_H
+#define _AXL_GUI_TEXTATTRANCHORARRAY_H
 
 #include "axl_rtl_Array.h"
 #include "axl_gui_TextAttr.h"
@@ -17,24 +17,20 @@ namespace gui {
 struct TextAttrAnchor
 {
 	size_t m_offset;
-	size_t m_metric; // attributes with higher metric overlay lower metric
 	TextAttr m_attr;
 
 	TextAttrAnchor ()
 	{
 		m_offset = 0;
-		m_metric = 0;
 	}
 
 	TextAttrAnchor (
 		size_t offset,
-		const TextAttr& attr,
-		size_t metric = 0
+		const TextAttr& attr
 		)
 	{
 		m_offset = offset;
 		m_attr = attr;
-		m_metric = metric;
 	}
 };
 
@@ -98,8 +94,7 @@ public:
 	setAttr (
 		size_t beginOffset, 
 		size_t endOffset, 
-		const TextAttr& attr, 
-		size_t metric = 0
+		const TextAttr& attr
 		);
 
 protected:
@@ -107,21 +102,15 @@ protected:
 	findAnchor (size_t offset) const;
 
 	size_t
-	getStartAnchor (
-		size_t offset,
-		size_t metric
-		);
+	getStartAnchor (size_t offset);
 
 	size_t
-	getEndAnchor (
-		size_t offset,
-		size_t metric
-		);
+	getEndAnchor (size_t offset);
 
 	void
 	normalize (
 		size_t start,
-		size_t end
+		size_t end		
 		);
 };
 

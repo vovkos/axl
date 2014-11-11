@@ -24,8 +24,6 @@ enum
 
 enum StdColor
 {
-	StdColor_Undefined    = ColorFlag_Undefined,
-
 	StdColor_Black        = 0x000000,
 	StdColor_White        = 0xffffff,
 	StdColor_Gray         = 0x808080,
@@ -94,6 +92,7 @@ enum StdPalColor
 	StdPalColor_PastelBlue,     // 29
 	StdPalColor_PastelPurple,   // 30
 
+	StdPalColor__End, 
 	StdPalColor__SystemColorCount = ~ColorFlag_Index & (StdPalColor_3DHiLight + 1),
 	StdPalColor__Count            = ~ColorFlag_Index & (StdPalColor_PastelPurple + 1)
 };

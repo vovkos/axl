@@ -164,6 +164,14 @@ utfToCaseFold (utf32_t c)
 }
 
 inline
+bool
+utfIsPrintable (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return ((1 << attr->m_category) & UtfCategoryMask_NonPrintable) == 0;
+}
+
+inline
 utf32_t
 utfIsSpace (utf32_t c)
 {

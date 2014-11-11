@@ -19,32 +19,17 @@ namespace gui {
 class TextPaint
 {
 protected:
-	TextAttrAnchorArray m_selOverlay;
-	
-	// for bin-hex / bin-text
-	
+	TextAttrAnchorArray m_selOverlayBuffer;
 	rtl::String m_stringBuffer; 
 	rtl::Array <utf32_t> m_binTextBuffer; 
 
-	const char* m_p;
-	const char* m_begin;
-	const char* m_end;
-	
-	// hyper text
-
-	const TextAttrAnchor* m_attr;
-	const TextAttrAnchor* m_attrBegin;
-	const TextAttrAnchor* m_attrEnd;
-
 public:
 	Canvas* m_canvas;
-	ColorAttr m_selAttr;
-	uint_t m_hexEncodingFlags;
-	char m_unprintableChar;
-
 	Point m_point;
 	int m_top;
 	int m_bottom;
+	uint_t m_hexEncodingFlags;
+	char m_unprintableChar;
 
 public:
 	TextPaint ()
@@ -55,13 +40,6 @@ public:
 	TextPaint (Canvas* canvas)
 	{
 		init (canvas);
-	}
-
-	static inline
-	bool
-	isPrintable (utf32_t c)
-	{
-		return c >= 0x20 && iswprint (c);
 	}
 
 	Point
@@ -99,9 +77,25 @@ public:
 	// text
 
 	int
-	paintText (const rtl::String& text)
+	paintText (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const char* text, 
+		size_t length = -1
+		)
 	{
-		return paintText_utf8 (text, text.getLength ());
+		return paintText_utf8 (textColor, backColor, fontFlags, text, length);
+	}
+
+	int
+	paintText (
+		const TextAttr& attr,
+		const char* text, 
+		size_t length = -1
+		)
+	{
+		return paintText_utf8 (attr, text, length);
 	}
 
 	int
@@ -115,25 +109,114 @@ public:
 
 	int
 	paintText_utf8 (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
 		const utf8_t* text, 
 		size_t length = -1
 		);
 
 	int
+	paintText_utf8 (
+		const TextAttr& attr,
+		const utf8_t* text,
+		size_t length = -1
+		)
+	{
+		return paintText_utf8 (
+			attr.m_foreColor, 
+			attr.m_backColor, 
+			attr.m_fontFlags, 
+			text, 
+			length
+			);
+	}
+
+	int
+	paintText_utf8 (
+		const utf8_t* text,
+		size_t length = -1
+		)
+	{
+		return paintText_utf8 (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			text, 
+			length
+			);
+	}
+
+	int
 	paintText_utf32 (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
 		const utf32_t* text, 
 		size_t length = -1
 		);
+
+	int
+	paintText_utf32 (
+		const TextAttr& attr,
+		const utf32_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintText_utf32 (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags, 
+			text, 
+			length
+			);
+	}
+
+	int
+	paintText_utf32 (
+		const utf32_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintText_utf32 (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			text, 
+			length
+			);
+	}
 
 	// hypertext
 
 	int
 	paintHyperText (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
 		const rtl::String& text
 		)
 	{
-		return paintHyperText_utf8 (attrArray, text, text.getLength ());
+		return paintHyperText_utf8 (
+			textColor, 
+			backColor,
+			fontFlags,
+			attrArray, 
+			text, 
+			text.getLength ()
+			);
+	}
+
+	int
+	paintHyperText (
+		const TextAttr& attr,
+		const TextAttrAnchorArray* attrArray,
+		const char* text, 
+		size_t length = -1
+		)
+	{
+		return paintHyperText_utf8 (attr, attrArray, text, length);
 	}
 
 	int
@@ -148,34 +231,171 @@ public:
 
 	int
 	paintHyperText_utf8 (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
 		const utf8_t* text, 
 		size_t length = -1
 		);
+
+	int
+	paintHyperText_utf8 (
+		const TextAttr& attr,
+		const TextAttrAnchorArray* attrArray,
+		const utf8_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintHyperText_utf8 (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray,
+			text, 
+			length
+			);
+	}
+
+	int
+	paintHyperText_utf8 (
+		const TextAttrAnchorArray* attrArray,
+		const utf8_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintHyperText_utf8 (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray,
+			text, 
+			length
+			);
+	}
+
+	int
+	paintHyperText_utf32 (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const TextAttrAnchorArray* attrArray,
+		const utf32_t* text, 
+		size_t length = -1
+		);
+
+	int
+	paintHyperText_utf32 (
+		const TextAttr& attr,
+		const TextAttrAnchorArray* attrArray,
+		const utf32_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintHyperText_utf32 (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray,
+			text, 
+			length
+			);
+	}
 
 	int
 	paintHyperText_utf32 (
 		const TextAttrAnchorArray* attrArray,
 		const utf32_t* text, 
 		size_t length = -1
-		);
+		)
+	{
+		return paintHyperText_utf32 (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray,
+			text, 
+			length
+			);
+	}
 
 	// hypertext with selection
 
 	int
 	paintSelHyperText (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const rtl::String& text
+		const char* text,
+		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf8 (attrArray, selStart, selEnd, text, text.getLength ());
+		return paintSelHyperText_utf8 (
+			textColor,
+			backColor,
+			fontFlags,
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			text, 
+			length
+			);
+	}
+
+	int
+	paintSelHyperText (
+		const TextAttr& attr,
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		const char* text,
+		size_t length = -1
+		)
+	{
+		return paintSelHyperText_utf8 (
+			attr,
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			text, 
+			length
+			);
+	}
+
+	int
+	paintSelHyperText (
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		const char* text,
+		size_t length = -1
+		)
+	{
+		return paintSelHyperText_utf8 (
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			text, 
+			length
+			);
 	}
 
 	int
 	paintSelHyperText_utf8 (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
 		const utf8_t* text, 
@@ -183,50 +403,327 @@ public:
 		);
 
 	int
-	paintSelHyperText_utf32 (
+	paintSelHyperText_utf8 (
+		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		const utf8_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintSelHyperText_utf8 (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			text, 
+			length
+			);
+	}
+
+	int
+	paintSelHyperText_utf8 (
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		const utf8_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintSelHyperText_utf8 (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			text, 
+			length
+			);
+	}
+
+	int
+	paintSelHyperText_utf32 (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
 		const utf32_t* text, 
 		size_t length = -1
 		);
 
+	int
+	paintSelHyperText_utf32 (
+		const TextAttr& attr,
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		const utf32_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintSelHyperText_utf32 (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			text, 
+			length
+			);
+	}
+
+	int
+	paintSelHyperText_utf32 (
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		const utf32_t* text, 
+		size_t length = -1
+		)
+	{
+		return paintSelHyperText_utf32 (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			text, 
+			length
+			);
+	}
+
 	// bin hex
 
 	int
 	paintBinHex (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		size_t halfBitOffset,
 		const void* p,	
 		size_t size
 		);
 
 	int
+	paintBinHex (
+		const TextAttr& attr,
+		size_t halfBitOffset,
+		const void* p,	
+		size_t size
+		)
+	{
+		return paintBinHex (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			halfBitOffset,
+			p,	
+			size
+			);
+	}
+
+	int
+	paintBinHex (
+		size_t halfBitOffset,
+		const void* p,	
+		size_t size
+		)
+	{
+		return paintBinHex (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			halfBitOffset,
+			p,	
+			size
+			);
+	}
+
+	int
+	paintHyperBinHex (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const TextAttrAnchorArray* attrArray,
+		size_t halfBitOffset,
+		const void* p, 
+		size_t size
+		);
+
+	int
+	paintHyperBinHex (
+		const TextAttr& attr,
+		const TextAttrAnchorArray* attrArray,
+		size_t halfBitOffset,
+		const void* p, 
+		size_t size
+		)
+	{
+		return paintHyperBinHex (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray,
+			halfBitOffset,
+			p, 
+			size
+			);
+	}
+
+	int
 	paintHyperBinHex (
 		const TextAttrAnchorArray* attrArray,
+		size_t halfBitOffset,
+		const void* p, 
+		size_t size
+		)
+	{
+		return paintHyperBinHex (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray,
+			halfBitOffset,
+			p, 
+			size
+			);
+	}
+
+	int
+	paintSelHyperBinHex (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		size_t halfBitOffset,
 		const void* p, 
 		size_t size
 		);
 
 	int
 	paintSelHyperBinHex (
+		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
+		size_t halfBitOffset,
 		const void* p, 
 		size_t size
-		);
+		)
+	{
+		return paintSelHyperBinHex (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			halfBitOffset,
+			p, 
+			size
+			);
+	}
 
 	int
-	paintHyperBinHex4BitCursor (
+	paintSelHyperBinHex (
 		const TextAttrAnchorArray* attrArray, 
-		size_t cursorPos, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		size_t halfBitOffset,
 		const void* p, 
 		size_t size
-		);
+		)
+	{
+		return paintSelHyperBinHex (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			halfBitOffset,
+			p, 
+			size
+			);
+	}
 
 	// bin text
 
 	int
 	paintBinText (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		enc::CharCodec* codec,
+		const void* p, 
+		size_t size
+		);
+
+	int
+	paintBinText (
+		const TextAttr& attr,
+		enc::CharCodec* codec,
+		const void* p, 
+		size_t size
+		)
+	{
+		return paintBinText (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			codec,
+			p, 
+			size
+			);
+	}
+
+	int
+	paintBinText (
+		enc::CharCodec* codec,
+		const void* p, 
+		size_t size
+		)
+	{
+		paintBinText (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			codec,
+			p, 
+			size
+			);
+	}
+
+	int
+	paintHyperBinText (
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
@@ -234,57 +731,116 @@ public:
 
 	int
 	paintHyperBinText (
-		enc::CharCodec* codec,
+		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
+		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
-		);
+		)
+	{
+		return paintHyperBinText (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray,
+			codec,
+			p, 
+			size
+			);
+	}
 
+	int
+	paintHyperBinText (
+		const TextAttrAnchorArray* attrArray,
+		enc::CharCodec* codec,
+		const void* p, 
+		size_t size
+		)
+	{
+		return paintHyperBinText (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray,
+			codec,
+			p, 
+			size
+			);
+	}
 
 	int
 	paintSelHyperBinText (
-		enc::CharCodec* codec,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
+		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
 		);
+
+	int
+	paintSelHyperBinText (
+		const TextAttr& attr,
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		enc::CharCodec* codec,
+		const void* p, 
+		size_t size
+		)
+	{
+		return paintSelHyperBinText (
+			attr.m_foreColor,
+			attr.m_backColor,
+			attr.m_fontFlags,
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			codec,
+			p, 
+			size
+			);
+	}
+
+	int
+	paintSelHyperBinText (
+		const TextAttrAnchorArray* attrArray, 
+		const TextAttr& selAttr,
+		size_t selStart, 
+		size_t selEnd, 
+		enc::CharCodec* codec,
+		const void* p, 
+		size_t size
+		)
+	{
+		return paintSelHyperBinText (
+			m_canvas->m_colorAttr.m_foreColor,
+			m_canvas->m_colorAttr.m_backColor,
+			-1, 
+			attrArray, 
+			selAttr,
+			selStart, 
+			selEnd, 
+			codec,
+			p, 
+			size
+			);
+	}
 
 protected:
 	void
 	init (Canvas* canvas = NULL);
 
-	Rect
-	calcTextRect_utf8 (
-		const utf8_t* text,
-		size_t length = -1
-		);
-
-	Rect
-	calcTextRect_utf32 (
-		const utf32_t* text,
-		size_t length = -1
-		);
-
-	Rect
-	calcTextRect (utf32_t c)
-	{
-		return calcTextRect_utf32 (&c, 1);
-	}
-
-	int
-	paintTextPart_utf8 (size_t length);
-
-	int
-	paintTextPart_utf32 (size_t length);
-
-	int
-	paintBinHexPart (size_t size);
-
-	int
-	paintBinTextPart (
+	void
+	buildBinTextBuffer (
 		enc::CharCodec* codec,
+		const void* p,
 		size_t size
 		);
 };

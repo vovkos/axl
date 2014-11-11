@@ -71,10 +71,8 @@ QtEngine::drawRect (
 	ASSERT (canvas->getEngine () == this);
 	QtCanvas* qtCanvas = (QtCanvas*) canvas;
 
+	ASSERT (!(color & ColorFlag_Undefined));
 	color = qtCanvas->m_palette.getColorRgb (color);
-	if (color & ColorFlag_Undefined)
-		return true;
-
 	qtCanvas->m_qtPainter.fillRect (left, top, right - left, bottom - top, color);
 	return true;
 }
@@ -107,16 +105,26 @@ QtEngine::drawText_qt (
 		qtCanvas->m_qtPainter.setFont (qtFont->m_qtFont);
 	}
 
-	textColor = qtCanvas->m_palette.getColorRgb (textColor);
-	if (qtCanvas->m_driverColorAttr.m_foreColor != textColor)
-	{
-		qtCanvas->m_driverColorAttr.m_foreColor = textColor;
+	if (textColor & ColorFlag_Undefined)
+		textColor = qtCanvas->m_colorAttr.m_foreColor;
 
-		if (!(textColor & ColorFlag_Undefined))
+	if (!(textColor & ColorFlag_Undefined))
+	{
+		textColor = qtCanvas->m_palette.getColorRgb (textColor);
+
+		if (qtCanvas->m_driverColorAttr.m_foreColor != textColor)
+		{
 			qtCanvas->m_qtPainter.setPen (textColor);
+			qtCanvas->m_driverColorAttr.m_foreColor = textColor;
+		}
 	}
 
-	drawRect (canvas, left, top, right, bottom, backColor);
+	if (backColor & ColorFlag_Undefined)
+		backColor = qtCanvas->m_colorAttr.m_backColor;
+
+	if (!(backColor & ColorFlag_Undefined))
+		drawRect (canvas, left, top, right, bottom, backColor);
+
 	qtCanvas->m_qtPainter.drawText (x, y, right - x, bottom - y, 0, string);
 	return true;
 }

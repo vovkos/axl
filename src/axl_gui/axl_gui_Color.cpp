@@ -103,13 +103,12 @@ Palette::getColorRgb (uint_t color)
 		return color;
 
 	size_t i = color & ColorFlag_IndexMask;
-	color = i < m_count ? m_colorArray [i] : StdColor_Undefined;
+	color = i < m_count ? m_colorArray [i] : -1;
 			
 	if (color & ColorFlag_Index) // allow two-staged index lookups
 	{
 		i = color & ColorFlag_IndexMask;
-		color = i < m_count ? m_colorArray [i] : StdColor_Undefined;
-		ASSERT (!(color & ColorFlag_Index)); // bad palette -- more than two-staged index
+		color = i < m_count ? m_colorArray [i] : -1;
 	}
 
 	return color;

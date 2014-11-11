@@ -20,12 +20,12 @@ struct ColorAttr
 
 	ColorAttr ()
 	{
-		clear ();
+		setup (-1, -1);
 	}
 
 	ColorAttr (
 		uint_t foreColor,
-		uint_t backColor = StdColor_Undefined
+		uint_t backColor = -1
 		)
 	{
 		setup (foreColor, backColor);
@@ -45,13 +45,13 @@ struct ColorAttr
 	void
 	clear ()
 	{
-		setup (StdColor_Black);
+		setup (-1, -1);
 	}
 
 	void
 	setup (
 		uint_t foreColor,
-		uint_t backColor = StdColor_Undefined
+		uint_t backColor = -1
 		)
 	{
 		m_foreColor = foreColor;

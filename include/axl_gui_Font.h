@@ -36,7 +36,7 @@ public:
 	Font* 
 	getFont (uint_t flags = 0)
 	{
-		flags &= 0x0f;
+		flags = (flags & FontFlag_Undefined) ? 0 : (flags & 0x0f);
 		return m_fontModArray [flags] ? m_fontModArray [flags] : m_engine->getFontMod (this, flags);
 	}
 
@@ -65,7 +65,7 @@ public:
 	Font* 
 	getFontMod (uint_t flags)
 	{
-		return m_tuple->getFont (flags);
+		return (flags & FontFlag_Undefined) ? this : m_tuple->getFont (flags);
 	}
 
 	bool

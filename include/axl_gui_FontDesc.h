@@ -15,16 +15,11 @@ namespace gui {
 
 enum FontFlag
 {
-	FontFlag_Bold           = 0x01,
-	FontFlag_Italic         = 0x02,
-	FontFlag_Underline      = 0x04,
-	FontFlag_Strikeout      = 0x08,
-
-	FontFlag_ClearBold      = 0x10,
-	FontFlag_ClearItalic    = 0x20,
-	FontFlag_ClearUnderline = 0x40,
-	FontFlag_ClearStrikeout = 0x80,
-	FontFlag_Clear          = 0xf0,
+	FontFlag_Undefined = 0x10,
+	FontFlag_Bold      = 0x01,
+	FontFlag_Italic    = 0x02,
+	FontFlag_Underline = 0x04,
+	FontFlag_Strikeout = 0x08,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -47,14 +42,13 @@ getFontFlagString (uint_t flags)
 }
 
 inline
-int
+uint_t
 overlayFontFlags (
 	uint_t baseFontFlags,
 	uint_t overlayFontFlags
 	)
 {	
-	uint_t clearMask = ~(overlayFontFlags & FontFlag_Clear);
-	return baseFontFlags & clearMask | overlayFontFlags & clearMask;
+	return (overlayFontFlags & FontFlag_Undefined) ? baseFontFlags : overlayFontFlags;
 }
 
 uint_t
