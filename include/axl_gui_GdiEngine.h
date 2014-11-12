@@ -25,11 +25,7 @@ protected:
 	HWND m_hWndClipboardOwner;
 
 public:
-	GdiEngine ()
-	{
-		m_hWndClipboardOwner = NULL;
-	}
-
+	GdiEngine ();
 	~GdiEngine ();
 
 	static

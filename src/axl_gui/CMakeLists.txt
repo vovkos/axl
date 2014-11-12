@@ -30,6 +30,7 @@ set (
 	GUI_CPP_LIST
 	axl_gui_Color.cpp
 	axl_gui_ColorAttr.cpp
+	axl_gui_Engine.cpp
 	axl_gui_FontDesc.cpp
 	axl_gui_FontDesc.cpp
 	axl_gui_HyperlinkAnchorArray.cpp

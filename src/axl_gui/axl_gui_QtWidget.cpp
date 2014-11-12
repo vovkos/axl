@@ -184,7 +184,6 @@ QtWidgetBase::wheelEvent (QWheelEvent* e)
 		e->ignore ();
 }
 
-
 void
 QtWidgetBase::paintEvent (QPaintEvent* e)
 {

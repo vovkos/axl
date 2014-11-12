@@ -158,11 +158,12 @@ main (
 	char *argv[]
 	)
 {
-/*	QApplication app (argc, argv);
+	QApplication app (argc, argv);
 
 	MainWindow mainWindow;
 	mainWindow.show ();
-	return app.exec (); */
+	return app.exec ();
+	
 /*
 	int fd = open ("/home/vladimir/suka-bla", O_RDWR | O_CREAT, 0666);
 	if (fd == -1)

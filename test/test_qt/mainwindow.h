@@ -4,6 +4,18 @@
 
 //.............................................................................
 
+class MyWidget: public QWidget
+{
+public:
+	MyWidget (QWidget* parent = NULL);
+	
+	virtual
+	void
+	paintEvent (QPaintEvent* e);
+};
+
+//.............................................................................
+
 class MainWindow: public QMainWindow
 {
 	Q_OBJECT
@@ -18,6 +30,7 @@ public:
 
 private:
 	QTextEdit m_editWidget;
+	MyWidget m_myWidget;
 };
 
 //.............................................................................

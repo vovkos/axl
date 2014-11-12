@@ -6,7 +6,7 @@
 
 #define _AXL_GUI_ENGINE_H
 
-#include "axl_gui_Def.h"
+#include "axl_gui_Color.h"
 #include "axl_gui_ImageDesc.h"
 #include "axl_gui_FontDesc.h"
 #include "axl_ref_Ptr.h"
@@ -54,8 +54,24 @@ enum StdCursorKind
 
 class Engine
 {
+protected:
+	uint_t m_stdPalColorTable [StdPalColor__Count];
+
 public:
+	Engine ();
+
+	Palette
+	getStdPalette ()
+	{
+		return Palette (m_stdPalColorTable, countof (m_stdPalColorTable));
+	}
+
+	virtual
+	void
+	updateStdPalette () = 0;
+
 	// canvas
+
 
 	virtual
 	bool

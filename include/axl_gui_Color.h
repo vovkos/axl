@@ -129,12 +129,6 @@ inverseRgb (uint_t rgb)
 	return ((rgb & 0x0000ff) << 16) | ((rgb & 0xff0000) >> 16) | rgb & 0x00ff00;
 }
 
-const uint_t*
-getStdPalColorArray ();
-
-void
-updateStdPalSystemColors (); // call this upon theme change
-
 //.............................................................................
 
 struct Palette
@@ -144,15 +138,15 @@ struct Palette
 
 	Palette ()
 	{
-		setup (getStdPalColorArray (), StdPalColor__Count);
+		setup (NULL, 0);
 	}
 
 	Palette (
-		const uint_t* colorArray,
+		const uint_t* colorTable,
 		size_t count
 		)
 	{
-		m_colorArray = colorArray;
+		m_colorArray = colorTable;
 		m_count = count;
 	}
 
@@ -161,11 +155,11 @@ struct Palette
 
 	void
 	setup (
-		const uint_t* colorArray,
+		const uint_t* colorTable,
 		size_t count
 		)
 	{
-		m_colorArray = colorArray;
+		m_colorArray = colorTable;
 		m_count = count;
 	}
 };

@@ -121,6 +121,10 @@ public:
 	// canvas
 
 	virtual
+	void
+	updateStdPalette ();
+
+	virtual
 	bool
 	createOffscreenCanvas (
 		Canvas* canvas,
