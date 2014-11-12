@@ -18,6 +18,7 @@ enum
 	ColorFlag_Undefined   = 0x80000000,
 	ColorFlag_Index       = 0x40000000,
 	ColorFlag_IndexMask   = 0x3fffffff,
+	ColorFlag_RgbMask     = 0x00ffffff,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -37,16 +37,16 @@ QtEngine::updateStdPalette ()
 {
 	QPalette palette = QApplication::palette ();
 
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_WidgetText]    = palette.color (QPalette::Text).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_WidgetBack]    = palette.color (QPalette::Base).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_GrayText]      = palette.color (QPalette::Disabled, QPalette::WindowText).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_SelectionText] = palette.color (QPalette::HighlightedText).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_SelectionBack] = palette.color (QPalette::Highlight).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DFace]        = palette.color (QPalette::Button).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DShadow]      = palette.color (QPalette::Dark).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DDarkShadow]  = palette.color (QPalette::Shadow).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DLight]       = palette.color (QPalette::Midlight).rgb();
-	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DHiLight]     = palette.color (QPalette::Light).rgb();
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_WidgetText]    = palette.color (QPalette::Text).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_WidgetBack]    = palette.color (QPalette::Base).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_GrayText]      = palette.color (QPalette::Disabled, QPalette::WindowText).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_SelectionText] = palette.color (QPalette::HighlightedText).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_SelectionBack] = palette.color (QPalette::Highlight).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DFace]        = palette.color (QPalette::Button).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DShadow]      = palette.color (QPalette::Dark).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DDarkShadow]  = palette.color (QPalette::Shadow).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DLight]       = palette.color (QPalette::Midlight).rgb() & ColorFlag_RgbMask;
+	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DHiLight]     = palette.color (QPalette::Light).rgb() & ColorFlag_RgbMask;
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

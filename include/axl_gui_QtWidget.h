@@ -28,6 +28,11 @@ public:
 		QWidget* parent = NULL
 		);
 
+	~QtWidgetBase ()
+	{
+		m_widgetDriver->setCaretVisible (false); // important for QT
+	}
+
 	void
 	postThreadMsg (
 		uint_t code,
