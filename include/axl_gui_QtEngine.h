@@ -6,52 +6,98 @@
 
 #define _AXL_GUI_QTENGINE_H
 
-#include "axl_gui_Engine.h"
+#include "axl_gui_Canvas.h"
+#include "axl_gui_Font.h"
+#include "axl_gui_Image.h"
+#include "axl_gui_QtCaret.h"
 #include "axl_rtl_Singleton.h"
 #include "axl_rtl_StringHashTable.h"
-#include "axl_gui_QtCanvas.h"
-#include "axl_gui_QtCursor.h"
-#include "axl_gui_QtFont.h"
-#include "axl_gui_QtImage.h"
-#include "axl_gui_QtWidget.h"
 
 namespace axl {
 namespace gui {
 
+class QtEngine;
+
+inline 
+Engine* 
+getQtEngine ();
+
 //.............................................................................
 
-class QtCaret: public QTimer
+class QtCanvas: public Canvas
 {
-protected:
-	Widget* m_widget;
-	bool m_isVisible;
-	Rect m_rect;
+	friend class QtEngine;
 
 public:
-	QtCaret ()
+	QPainter m_qtPainter;
+	QPixmap m_qtPixmap;
+
+public:
+	QtCanvas ():
+		Canvas (getQtEngine ()) 
 	{
-		m_isVisible = false;
-		m_widget = NULL;
 	}
+};
 
-	bool
-	isVisible ()
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class QtFontTuple: public FontTuple
+{
+	friend class QtEngine;
+
+public:
+	QtFontTuple ():
+		FontTuple (getQtEngine ()) 
 	{
-		return m_isVisible;
 	}
+};
 
-	bool
-	show (
-		Widget* widget,
-		const Rect& rect
-		);
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-	virtual
-	void
-	hide ();
+class QtFont: public Font
+{
+	friend class QtEngine;
 
-protected:
-	virtual void timerEvent (QTimerEvent* e);
+public:
+	QFont m_qtFont;
+
+public:
+	QtFont ():
+		Font (getQtEngine ()) 
+	{
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class QtImage: public Image
+{
+	friend class QtEngine;
+
+public:
+	QImage m_qtImage;
+
+public:
+	QtImage ():
+		Image (getQtEngine ()) 
+	{
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class QtCursor: public Cursor
+{
+	friend class QtEngine;
+
+public:
+	QCursor m_qtCursor;
+
+public:
+	QtCursor ():
+		Cursor (getQtEngine ()) 
+	{
+	}
 };
 
 //.............................................................................
@@ -59,8 +105,9 @@ protected:
 class QtEngine: public Engine
 {
 protected:
-	ref::Ptr <Font> m_stdFontArray [StdFontKind__Count];
-	ref::Ptr <Cursor> m_stdCursorArray [StdCursorKind__Count];
+	OffscreenCanvasCache <QtCanvas> m_sharedOffscreenCanvasCache;
+	QtFontTuple* m_stdFontTupleArray [StdFontKind__Count];
+	QtCursor* m_stdCursorArray [StdCursorKind__Count];
 	QtCaret m_qtCaret;
 
 	rtl::StringHashTableMap <uintptr_t> m_clipboardFormatNameMap;
@@ -68,69 +115,236 @@ protected:
 	QMimeData* m_qtClipboardMimeData;
 
 public:
-	QtEngine ()
-	{
-		m_engineKind = EngineKind_Qt;
-		m_qtClipboardMimeData = NULL;
-	}
+	QtEngine ();
+	~QtEngine ();
 
-	~QtEngine ()
-	{
-		if (m_qtClipboardMimeData)
-			delete m_qtClipboardMimeData;
-	}
-
-	// font
-
-	static
-	QtEngine*
-	getSingleton ()
-	{
-		return rtl::getSingleton <QtEngine> ();
-	}
+	// canvas
 
 	virtual
-	ref::Ptr <Font>
-	createFont (
-		const char* faceName,
-		size_t pointSize = 0,
-		uint_t flags = 0
+	void
+	updateStdPalette ();
+
+	virtual
+	bool
+	createOffscreenCanvas (
+		Canvas* canvas,
+		uint_t width,
+		uint_t height
+		);
+
+	virtual
+	bool
+	releaseOffscreenCanvas (Canvas* canvas);
+
+	virtual
+	Canvas*
+	getSharedOffscreenCanvas (
+		uint_t width,
+		uint_t height
 		)
 	{
-		return createFont (createQtFont (faceName, pointSize, flags));
+		return m_sharedOffscreenCanvasCache.getCanvas (width, height);
 	}
 
-	ref::Ptr <Font>
-	createFont (const QFont& qtFont);
-
-	// cursors
-
-	ref::Ptr <Cursor>
-	createCursor (const QCursor& qtCursor);
-
-	// image
+	virtual
+	void
+	releaseAllSharedOffscreenCanvases ()
+	{
+		return m_sharedOffscreenCanvasCache.clear ();
+	}
 
 	virtual
-	ref::Ptr <Image>
-	createImage ();
+	bool
+	drawRect (
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color
+		);
+
+	bool
+	drawText_qt (
+		Canvas* canvas,
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const QString& string
+		);
 
 	virtual
-	ref::Ptr <Image>
+	bool
+	drawText_utf8 (
+		Canvas* canvas,
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf8_t* text,
+		size_t length = -1
+		);
+
+	virtual
+	bool
+	drawText_utf16 (
+		Canvas* canvas,
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf16_t* text,
+		size_t length = -1
+		);
+
+	virtual
+	bool
+	drawText_utf32 (
+		Canvas* canvas,
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf32_t* text,
+		size_t length = -1
+		);
+
+	virtual
+	bool
+	drawImage (
+		Canvas* canvas,
+		int x,
+		int y,
+		Image* image,
+		int left,
+		int top,
+		int right,
+		int bottom
+		);
+
+	virtual
+	bool
+	copyRect (
+		Canvas* canvas,
+		int x,
+		int y,
+		Canvas* srcCanvas,
+		int left,
+		int top,
+		int right,
+		int bottom
+		);
+
+	// fonts
+
+	virtual
+	void
+	clearFontTuple (FontTuple* fontTuple);
+
+	virtual
+	FontTuple*
+	getStdFontTuple (StdFontKind fontKind);
+
+	virtual
+	Font*
+	createFont (
+		FontTuple* fontTuple,
+		const char* family,
+		size_t pointSize,
+		uint_t flags = 0
+		);
+
+	virtual
+	Font*
+	getFontMod (
+		FontTuple* fontTuple,
+		uint_t flags
+		);
+
+	virtual
+	bool
+	getFontDesc (
+		Font* font,
+		FontDesc* fontDesc
+		);
+
+	virtual
+	bool
+	isMonospaceFont (Font* font);
+
+	Size
+	calcTextSize_qt (
+		Font* font,
+		const QString& string
+		);
+
+	virtual
+	Size
+	calcTextSize_utf8 (
+		Font* font,
+		const utf8_t* text,
+		size_t length = -1
+		);
+
+	virtual
+	Size
+	calcTextSize_utf16 (
+		Font* font,
+		const utf16_t* text,
+		size_t length = -1
+		);
+
+	virtual
+	Size
+	calcTextSize_utf32 (
+		Font* font,
+		const utf32_t* text,
+		size_t length = -1
+		);
+
+	// images
+
+	virtual
+	bool
 	createImage (
-		int width,
-		int height,
-		PixelFormat pixelFormat,
-		const void* data,
-		bool isScreenCompatible = true
+		Image* image,
+		uint_t width,
+		uint_t height,
+		PixelFormat pixelFormat
 		);
 
 	virtual
-	ref::Ptr <Canvas>
-	createOffscreenCanvas (
-		int width,
-		int height
+	bool
+	getImageDesc (
+		Image* image,
+		ImageDesc* imageDesc
 		);
 
+	virtual
+	Cursor*
+	getStdCursor (StdCursorKind cursorKind);
+	
 	// clipboard
 
 	virtual
@@ -167,21 +381,77 @@ public:
 	bool
 	commitClipboard ();
 
-	// caret
+	// widget
+
+	virtual
+	bool
+	isWidgetFocused (WidgetDriver* widgetDriver);
+
+	virtual
+	bool
+	setWidgetFocus (WidgetDriver* widgetDriver);
+
+	virtual
+	bool
+	redrawWidget (
+		WidgetDriver* widgetDriver,
+		int left, 
+		int top, 
+		int right, 
+		int bottom
+		);
+
+	virtual
+	bool
+	setWidgetCursor (
+		WidgetDriver* widgetDriver,
+		Cursor* cursor
+		);
+
+	virtual
+	bool
+	setMouseCapture (WidgetDriver* widgetDriver);
+
+	virtual
+	bool
+	releaseMouse (WidgetDriver* widgetDriver);
+
+	virtual
+	bool
+	updateWidgetScrollBar (
+		WidgetDriver* widgetDriver,
+		Orientation orientation
+		);
+
+	virtual
+	void
+	sendWidgetNotification (
+		WidgetDriver* widgetDriver,
+		uint_t code,
+		void* param = NULL
+		);
+
+	virtual
+	bool
+	postWidgetThreadMsg (
+		WidgetDriver* widgetDriver,
+		uint_t code,
+		const ref::Ptr <void>& params
+		);
 
 	virtual
 	bool
 	showCaret (
-		Widget* widget,
+		WidgetDriver* widgetDriver,
 		const Rect& rect
 		)
 	{
-		return m_qtCaret.show (widget, rect);
+		return m_qtCaret.show (widgetDriver, rect);
 	}
 
 	virtual
 	void
-	hideCaret ()
+	hideCaret (WidgetDriver* widgetDriver)
 	{
 		m_qtCaret.hide ();
 	}
@@ -191,34 +461,16 @@ public:
 	{
 		return m_qtCaret.isVisible ();
 	}
-
-private slots:
-	void
-	caretTimer_Timeout ();
-
-protected:
-	QFont
-	createQtFont (
-		const char* faceName,
-		size_t pointSize,
-		uint_t flags
-		);
-
-	virtual
-	Font*
-	getFontMod (
-		Font* baseFont,
-		uint_t flags
-		);
-
-	virtual
-	ref::Ptr <Font>
-	createStdFont (StdFontKind fontKind);
-
-	virtual
-	ref::Ptr <Cursor>
-	createStdCursor (StdCursorKind cursorKind);
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline 
+Engine* 
+getQtEngine ()
+{
+	return rtl::getSingleton <QtEngine> ();
+}
 
 //.............................................................................
 

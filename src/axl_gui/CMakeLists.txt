@@ -11,13 +11,16 @@ set (
 	GUI_H_LIST
 	${AXL_INC_DIR}/axl_gui_Canvas.h
 	${AXL_INC_DIR}/axl_gui_Color.h
-	${AXL_INC_DIR}/axl_gui_Cursor.h
+	${AXL_INC_DIR}/axl_gui_ColorAttr.h
 	${AXL_INC_DIR}/axl_gui_Def.h
 	${AXL_INC_DIR}/axl_gui_Engine.h
 	${AXL_INC_DIR}/axl_gui_Font.h
+	${AXL_INC_DIR}/axl_gui_FontDesc.h
 	${AXL_INC_DIR}/axl_gui_HyperlinkAnchorArray.h
 	${AXL_INC_DIR}/axl_gui_HyperText.h
 	${AXL_INC_DIR}/axl_gui_Image.h
+	${AXL_INC_DIR}/axl_gui_ImageDesc.h
+	${AXL_INC_DIR}/axl_gui_TextAttr.h
 	${AXL_INC_DIR}/axl_gui_TextAttrAnchorArray.h
 	${AXL_INC_DIR}/axl_gui_TextPaint.h
 	${AXL_INC_DIR}/axl_gui_Widget.h
@@ -25,13 +28,15 @@ set (
 
 set (
 	GUI_CPP_LIST
-	axl_gui_Canvas.cpp
 	axl_gui_Color.cpp
+	axl_gui_ColorAttr.cpp
 	axl_gui_Engine.cpp
-	axl_gui_Font.cpp
+	axl_gui_FontDesc.cpp
+	axl_gui_FontDesc.cpp
 	axl_gui_HyperlinkAnchorArray.cpp
 	axl_gui_HyperText.cpp
-	axl_gui_Image.cpp
+	axl_gui_ImageDesc.cpp
+	axl_gui_TextAttr.cpp
 	axl_gui_TextAttrAnchorArray.cpp
 	axl_gui_TextPaint.cpp
 	axl_gui_Widget.cpp
@@ -88,21 +93,15 @@ endif ()
 
 set (
 	GUI_QT_H_LIST
-	${AXL_INC_DIR}/axl_gui_QtCanvas.h
-	${AXL_INC_DIR}/axl_gui_QtCursor.h
+	${AXL_INC_DIR}/axl_gui_QtCaret.h
 	${AXL_INC_DIR}/axl_gui_QtEngine.h
-	${AXL_INC_DIR}/axl_gui_QtFont.h
-	${AXL_INC_DIR}/axl_gui_QtImage.h
 	${AXL_INC_DIR}/axl_gui_QtWidget.h
 	)
 
 set (
 	GUI_QT_CPP_LIST
-	axl_gui_QtCanvas.cpp
-	axl_gui_QtCursor.cpp
+	axl_gui_QtCaret.cpp
 	axl_gui_QtEngine.cpp
-	axl_gui_QtFont.cpp
-	axl_gui_QtImage.cpp
 	axl_gui_QtWidget.cpp
 	)
 

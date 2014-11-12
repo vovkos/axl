@@ -12,18 +12,18 @@ namespace gui {
 bool
 buildLogFont (
 	LOGFONTW* logFont,
-	const wchar_t* faceName,
+	const wchar_t* family,
 	size_t pointSize,
 	uint_t flags
 	)
 {
 	memset (logFont, 0, sizeof (LOGFONT));
 
-	size_t length = wcslen (faceName);
+	size_t length = wcslen (family);
 
 	memcpy (
 		logFont->lfFaceName, 
-		faceName, 
+		family, 
 		AXL_MIN (countof (logFont->lfFaceName), length) * sizeof (wchar_t)
 		);
 
@@ -58,9 +58,9 @@ getFontDescFromLogFont (
 	memset (fontDesc, 0, sizeof (FontDesc));
 
 	memcpy (
-		fontDesc->m_faceName, 
+		fontDesc->m_family, 
 		logFont->lfFaceName, 
-		(AXL_MIN (countof (logFont->lfFaceName), countof (fontDesc->m_faceName)) - 1) * sizeof (char)
+		(AXL_MIN (countof (logFont->lfFaceName), countof (fontDesc->m_family)) - 1) * sizeof (char)
 		);
 
 	ScreenDc screenDc;

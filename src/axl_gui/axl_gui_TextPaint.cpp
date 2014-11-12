@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_gui_TextPaint.h"
+#include "axl_gui_Font.h"
 #include "axl_enc_HexEncoding.h"
 
 namespace axl {
@@ -11,40 +12,10 @@ void
 TextPaint::init (Canvas* canvas)
 {
 	m_canvas = canvas;
-	m_p = NULL;
-	m_begin = NULL;
-	m_end = NULL;
-	m_attr = NULL;
-	m_attrBegin = NULL;
-	m_attrEnd = NULL;
 	m_top = 0;
 	m_bottom = 0;
 	m_hexEncodingFlags = 0; 
 	m_unprintableChar = '.';
-}
-
-// calc monospace/proportional text rect
-
-Rect
-TextPaint::calcTextRect_utf8 (
-	const utf8_t* text,
-	size_t length
-	)
-{
-	Font* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
-	Size size = font->calcTextSize_utf8 (text, length);
-	return Rect (m_point.m_x, m_top, m_point.m_x + size.m_width, m_bottom);
-}
-
-Rect
-TextPaint::calcTextRect_utf32 (
-	const utf32_t* text,
-	size_t length
-	)
-{
-	Font* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
-	Size size = font->calcTextSize_utf32 (text, length);
-	return Rect (m_point.m_x, m_top, m_point.m_x + size.m_width, m_bottom);
 }
 
 // space
@@ -73,8 +44,7 @@ TextPaint::paintSpace (
 	uint_t color
 	)
 {
-	Font* font = m_canvas->m_baseFont->getFontMod (m_canvas->m_defTextAttr.m_fontFlags);
-	Size size = font->calcTextSize (" ", 1);
+	Size size = m_canvas->m_font->calcTextSize (" ", 1);
 	return paintSpace_p (length * size.m_width, color);
 }
 
@@ -82,6 +52,9 @@ TextPaint::paintSpace (
 
 int
 TextPaint::paintText_utf8 (
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
 	const utf8_t* text,
 	size_t length
 	)
@@ -89,15 +62,36 @@ TextPaint::paintText_utf8 (
 	if (length == -1)
 		length = strlen (text);
 	
-	m_p = text;
-	m_begin = text;
-	m_end = text + length;
+	if (!length)
+		return m_point.m_x;
 
-	return paintTextPart_utf8 (length);
+	Font* font = m_canvas->m_font->getFontMod (fontFlags);
+	Size size = font->calcTextSize_utf8 (text, length);
+	int right = m_point.m_x + size.m_width;
+	
+	m_canvas->drawText_utf8 (
+		m_point.m_x, 
+		m_point.m_y, 
+		m_point.m_x, 
+		m_point.m_y,
+		right,
+		m_bottom,
+		textColor, 
+		backColor, 
+		fontFlags, 
+		text, 
+		length
+		);
+	
+	m_point.m_x = right;
+	return right;
 }
 
 int
 TextPaint::paintText_utf32 (
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
 	const utf32_t* text,
 	size_t length
 	)
@@ -105,194 +99,156 @@ TextPaint::paintText_utf32 (
 	if (length == -1)
 		length = rtl::StringDetails_utf32::calcLength (text);
 	
-	m_p = (char*) text;
-	m_begin = (char*) text;
-	m_end = (char*) (text + length);
-
-	return paintTextPart_utf32 (length);
-}
-
-int
-TextPaint::paintTextPart_utf8 (size_t length)
-{
-	ASSERT (length <= (size_t) (m_end - m_p));
-
 	if (!length)
 		return m_point.m_x;
 
-	Rect rect = calcTextRect_utf8 (m_p, length);
-	m_canvas->drawText_utf8 (m_point, rect, m_p, length);
+	Font* font = m_canvas->m_font->getFontMod (fontFlags);
+	Size size = font->calcTextSize_utf32 (text, length);
+	int right = m_point.m_x + size.m_width;
 	
-	m_p += length;
-	m_point.m_x = rect.m_right;
-
-	return m_point.m_x;
-}
-
-int
-TextPaint::paintTextPart_utf32 (size_t length)
-{
-	ASSERT (length <= (size_t) ((m_end - m_p) / sizeof (utf32_t)));
-
-	if (!length)
-		return m_point.m_x;
-
-	Rect rect = calcTextRect_utf32 ((utf32_t*) m_p, length);
-	m_canvas->drawText_utf32 (m_point, rect, (utf32_t*) m_p, length);
+	m_canvas->drawText_utf32 (
+		m_point.m_x, 
+		m_point.m_y, 
+		m_point.m_x, 
+		m_point.m_y, 
+		right,
+		m_bottom,
+		textColor, 
+		backColor, 
+		fontFlags, 
+		text, 
+		length
+		);
 	
-	m_p += length * sizeof (utf32_t);
-	m_point.m_x = rect.m_right;
-
-	return m_point.m_x;
+	m_point.m_x = right;
+	return right;
 }
 
 // hyper text
 
 int
 TextPaint::paintHyperText_utf8 (
+	uint_t textColor0,
+	uint_t backColor0,
+	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
 	const utf8_t* text,
 	size_t length
 	)
 {
-	const TextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
-	size_t attrCount = attrArray ? attrArray->getCount () : 0;
-
-	size_t offset = 0;
+	if (!attrArray || attrArray->isEmpty ())
+		return paintText_utf8 (textColor0, backColor0, fontFlags0, text, length);
 
 	if (length == -1)
 		length = strlen (text);
 	
-	m_p = text;
-	m_begin = text;
-	m_end = text + length;
-	m_attr = attr;
-	m_attrBegin = attr;
-	m_attrEnd = attr + attrCount;
-
 	if (!length)
 		return m_point.m_x;
+	
+	TextAttr attr0 (textColor0, backColor0, fontFlags0);
+	TextAttr attr = attr0;
 
-	if (!attrCount)
+	const TextAttrAnchor* nextAttr = attrArray->ca ();
+	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount ();
+
+	if (!nextAttr->m_offset)
 	{
-		m_canvas->m_defTextAttr.clear ();
-		return paintTextPart_utf8 (length);
-	}
-
-	const TextAttrAnchor* nextAttr;
-
-	if (m_attr->m_offset <= offset)
-	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
-		nextAttr = m_attr + 1;
-	}
-	else
-	{
-		m_canvas->m_defTextAttr.clear ();
-		nextAttr = m_attr;
-	}
-
-	const char* p = text;
-	const char* end = p + length;
-
-	while (p < end && nextAttr < m_attrEnd)
-	{	
-		size_t maxLength = end - p;
-
-		length = nextAttr->m_offset - offset;
-		if (length > maxLength)
-			return paintTextPart_utf8 (maxLength);
-
-		paintTextPart_utf8 (length);
-
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
-		m_attr = nextAttr;
+		attr.overlay (nextAttr->m_attr);
 		nextAttr++;
-
-		p = m_p;
-		offset = p - m_begin;
 	}
 
-	if (p < end)
-		paintTextPart_utf8 (end - p);
+	size_t offset = 0;
+	const utf8_t* p = text;
+
+	while (offset < length && nextAttr < attrEnd)
+	{	
+		size_t leftover = length - offset;
+		size_t chunk = nextAttr->m_offset - offset;
+		if (chunk >= leftover)
+			return paintText_utf8 (attr, p, leftover);
+
+		paintText_utf8 (attr, p, chunk);
+
+		attr.overlay (attr0, nextAttr->m_attr);
+		nextAttr++;
+		p += chunk;
+		offset += chunk;
+	}
+
+	if (offset < length)
+	{
+		size_t leftover = length - offset;
+		paintText_utf8 (attr, p, leftover);
+	}
 
 	return m_point.m_x;
 }
 
 int
 TextPaint::paintHyperText_utf32 (
+	uint_t textColor0,
+	uint_t backColor0,
+	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
 	const utf32_t* text,
 	size_t length
 	)
 {
-	const TextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
-	size_t attrCount = attrArray ? attrArray->getCount () : 0;
-
-	size_t offset = 0;
+	if (!attrArray || attrArray->isEmpty ())
+		return paintText_utf32 (textColor0, backColor0, fontFlags0, text, length);
 
 	if (length == -1)
 		length = rtl::StringDetails_utf32::calcLength (text);
 	
-	m_p = (char*) text;
-	m_begin = (char*) text;
-	m_end = (char*) (text + length);
-	m_attr = attr;
-	m_attrBegin = attr;
-	m_attrEnd = attr + attrCount;
-
 	if (!length)
 		return m_point.m_x;
+	
+	TextAttr attr0 (textColor0, backColor0, fontFlags0);
+	TextAttr attr = attr0;
 
-	if (!attrCount)
+	const TextAttrAnchor* nextAttr = attrArray->ca ();
+	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount ();
+
+	if (!nextAttr->m_offset)
 	{
-		m_canvas->m_defTextAttr.clear ();
-		return paintTextPart_utf32 (length);
-	}
-
-	const TextAttrAnchor* nextAttr;
-
-	if (m_attr->m_offset <= offset)
-	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
-		nextAttr = m_attr + 1;
-	}
-	else
-	{
-		m_canvas->m_defTextAttr.clear ();
-		nextAttr = m_attr;
-	}
-
-	const utf32_t* p = text;
-	const utf32_t* end = p + length;
-
-	while (p < end && nextAttr < m_attrEnd)
-	{	
-		size_t maxLength = end - p;
-
-		length = nextAttr->m_offset - offset;
-		if (length > maxLength)
-			return paintTextPart_utf32 (maxLength);
-
-		paintTextPart_utf32 (length);
-
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
-		m_attr = nextAttr;
+		attr.overlay (attr, nextAttr->m_attr);
 		nextAttr++;
-
-		p = (utf32_t*) m_p;
-		offset = p - (utf32_t*) m_begin;
 	}
 
-	if (p < end)
-		paintTextPart_utf32 (end - p);
+	size_t offset = 0;
+	const utf32_t* p = text;
+
+	while (offset < length && nextAttr < attrEnd)
+	{	
+		size_t leftover = length - offset;
+		size_t chunk = nextAttr->m_offset - offset;
+		if (chunk >= leftover)
+			return paintText_utf32 (attr, p, leftover);
+
+		paintText_utf32 (attr, p, chunk);
+
+		attr.overlay (attr0, nextAttr->m_attr);
+		nextAttr++;
+		p += chunk;
+		offset += chunk;
+	}
+
+	if (offset < length)
+	{
+		size_t leftover = length - offset;
+		paintText_utf32 (attr, p, leftover);
+	}
 
 	return m_point.m_x;
 }
 
 int
 TextPaint::paintSelHyperText_utf8 (
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
 	const TextAttrAnchorArray* attrArray,
+	const TextAttr& selAttr,
 	size_t selStart,
 	size_t selEnd,
 	const utf8_t* text,
@@ -300,23 +256,24 @@ TextPaint::paintSelHyperText_utf8 (
 	)
 {
 	if (selStart >= selEnd) 
-		return paintHyperText_utf8 (attrArray, text, length);
-
-	if (length == -1)
-		length = strlen (text);
+		return paintHyperText_utf8 (textColor, backColor, fontFlags, attrArray, text, length);
 
 	if (attrArray)
-		m_selOverlay.copy (*attrArray, attrArray->getCount ());
+		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
 	else
-		m_selOverlay.clear ();
+		m_selOverlayBuffer.clear ();
 
-	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
-	return paintHyperText_utf8 (&m_selOverlay, text, length);
+	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
+	return paintHyperText_utf8 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
 }
 
 int
 TextPaint::paintSelHyperText_utf32 (
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
 	const TextAttrAnchorArray* attrArray,
+	const TextAttr& selAttr,
 	size_t selStart,
 	size_t selEnd,
 	const utf32_t* text,
@@ -324,231 +281,154 @@ TextPaint::paintSelHyperText_utf32 (
 	)
 {
 	if (selStart >= selEnd) 
-		return paintHyperText_utf32 (attrArray, text, length);
-
-	if (length == -1)
-		length = rtl::StringDetails_utf32::calcLength (text);
+		return paintHyperText_utf32 (textColor, backColor, fontFlags, attrArray, text, length);
 
 	if (attrArray)
-		m_selOverlay.copy (*attrArray, attrArray->getCount ());
+		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
 	else
-		m_selOverlay.clear ();
+		m_selOverlayBuffer.clear ();
 
-	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
-	return paintHyperText_utf32 (&m_selOverlay, text, length);
+	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
+	return paintHyperText_utf32 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
 }
 
 // bin hex
 
 int
-TextPaint::paintBinHexPart (size_t size)
-{
-	size_t maxSize = m_end - m_p;
-	if (size > maxSize)
-		size = maxSize;
-
-	if (!size)
-		return m_point.m_x;
-
-	enc::HexEncoding::encode (&m_stringBuffer, m_p, size, 0);
-	m_stringBuffer.append (' ');
-	
-	size_t length = m_stringBuffer.getLength ();
-	Rect rect = calcTextRect_utf8 (m_stringBuffer, length);
-	m_canvas->drawText (m_point, rect, m_stringBuffer, length);
-
-	m_p += size;
-	m_point.m_x = rect.m_right;
-
-	return m_point.m_x;
-}
-
-int
 TextPaint::paintBinHex (
+	uint_t textColor,
+	uint_t backColor,
+	uint_t fontFlags,
+	size_t halfBitOffset,
 	const void* p,
 	size_t size
 	)
 {
-	m_p = (const char*) p;
-	m_begin = m_p;
-	m_end = m_p + size;
+	if (!size)
+		return m_point.m_x;
 
-	return paintBinHexPart (-1);
+	enc::HexEncoding::encode (&m_stringBuffer, p, size, 0);
+	m_stringBuffer.append (' ');
+
+	if (halfBitOffset < size)
+	{
+		size_t i = halfBitOffset * 3;
+		size_t j = i + 1;
+
+		ASSERT (j < m_stringBuffer.getLength ());
+
+		m_stringBuffer.getBuffer () [i] = m_stringBuffer [j];
+		m_stringBuffer.getBuffer () [j] = ' ';
+	}
+	
+	return paintText_utf8 (
+		textColor,
+		backColor,
+		fontFlags,
+		m_stringBuffer, 
+		m_stringBuffer.getLength ()
+		);
 }
 
 int
 TextPaint::paintHyperBinHex (
+	uint_t textColor0,
+	uint_t backColor0,
+	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
-	const void* _p,
+	size_t halfBitOffset,
+	const void* p0,
 	size_t size
 	)
 {
-	const TextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
-	size_t attrCount = attrArray ? attrArray->getCount () : 0;
-
-	const char* p = (char*) _p;
-	const char* end; 
-
-	size_t offset = 0;
-
-	m_p = p;
-	m_begin = p;
-	m_end = p + size;
-	m_attr = attr;
-	m_attrBegin = attr;
-	m_attrEnd = attr + attrCount;
+	if (!attrArray)
+		return paintBinHex (textColor0, backColor0, fontFlags0, halfBitOffset, p0, size);
 
 	if (!size)
 		return m_point.m_x;
+	
+	TextAttr attr0 (textColor0, backColor0, fontFlags0);
+	TextAttr attr = attr0;
 
-	if (!attrCount)
+	const TextAttrAnchor* nextAttr = attrArray->ca ();
+	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount ();
+
+	if (!nextAttr->m_offset)
 	{
-		m_canvas->m_defTextAttr.clear ();
-		return paintBinHexPart (size);
-	}
-
-	const TextAttrAnchor* nextAttr;
-
-	if (m_attr->m_offset <= offset)
-	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
-		nextAttr = m_attr + 1;
-	}
-	else
-	{
-		m_canvas->m_defTextAttr.clear ();
-		nextAttr = m_attr;
-	}
-
-	end = p + size;
-	while (p < end && nextAttr < m_attrEnd)
-	{	
-		size_t maxSize = end - p;
-
-		size = nextAttr->m_offset - offset;
-		if (size > maxSize)
-			return paintBinHexPart (maxSize);
-
-		paintBinHexPart (size);
-
-		p = m_p;
-		offset = p - m_begin;
-
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
-		m_attr = nextAttr;
+		attr.overlay (attr, nextAttr->m_attr);
 		nextAttr++;
 	}
 
-	if (p < end)
-		paintBinHexPart (end - p);
+	size_t offset = 0;
+	const char* p = (const char*) p0;
+
+	while (offset < size && nextAttr < attrEnd)
+	{	
+		size_t leftover = size - offset;
+		size_t chunk = nextAttr->m_offset - offset;
+		if (chunk >= leftover)
+			return paintBinHex (attr, halfBitOffset, p, leftover);
+
+		paintBinHex (attr, halfBitOffset, p, chunk);
+
+		attr.overlay (attr0, nextAttr->m_attr);
+		nextAttr++;
+		p += chunk;
+		offset += chunk;
+		halfBitOffset -= chunk;
+	}
+
+	if (offset < size)
+	{
+		size_t leftover = size - offset;
+		paintBinHex (attr, halfBitOffset, p, leftover);
+	}
 
 	return m_point.m_x;
 }
 
 int
 TextPaint::paintSelHyperBinHex (
+	uint_t textColor0,
+	uint_t backColor0,
+	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
+	const TextAttr& selAttr,
 	size_t selStart,
 	size_t selEnd,
+	size_t halfBitOffset,
 	const void* p,
 	size_t size
 	)
 {
 	if (selStart >= selEnd) 
-		return paintHyperBinHex (attrArray, p, size);
+		return paintHyperBinHex (textColor0, backColor0, fontFlags0, attrArray, halfBitOffset, p, size);
 
 	if (attrArray)
-		m_selOverlay.copy (*attrArray, attrArray->getCount ());
+		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
 	else
-		m_selOverlay.clear ();
+		m_selOverlayBuffer.clear ();
 
-	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
-	return paintHyperBinHex (&m_selOverlay, p, size);
-}
-
-int
-TextPaint::paintHyperBinHex4BitCursor (
-	const TextAttrAnchorArray* attrArray, 
-	size_t cursorPos, 
-	const void* p, 
-	size_t size
-	)
-{
-	if (cursorPos >= size) 
-		return paintHyperBinHex (attrArray, p, size);
-
-	paintHyperBinHex (attrArray, p, cursorPos);
-
-	char* cursor = (char*) p + cursorPos;
-	
-	gui::TextAttr attr = m_canvas->m_defTextAttr;
-
-	char c = enc::HexEncoding::getHexChar_l (*cursor & 0xf);
-	char charBuffer [8] = { c, ' ', ' ', 0 };
-	Rect rect = calcTextRect_utf8 (charBuffer, 3);
-	m_canvas->m_defTextAttr.overlay (m_selAttr);
-	m_canvas->drawText (m_point, rect, charBuffer, 3);
-
-	m_point.m_x = rect.m_right;
-
-	if (cursorPos + 1 < size)
-	{
-		size_t leftover = size - cursorPos - 1;
-
-		m_p = m_p + cursorPos + 1;
-		m_canvas->m_defTextAttr = attr;
-
-		if (!attrArray)
-		{
-			paintHyperBinHex (NULL, cursor + 1, leftover);
-		}
-		else
-		{
-			m_selOverlay = *attrArray;
-			m_selOverlay.clearBefore (cursorPos);
-			paintHyperBinHex (&m_selOverlay, cursor + 1, leftover);
-		}		
-	}
-
-	return m_point.m_x;
+	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
+	return paintHyperBinHex (textColor0, backColor0, fontFlags0, &m_selOverlayBuffer, halfBitOffset, p, size);
 }
 
 // bin text
 
-int
-TextPaint::paintBinTextPart (
+void
+TextPaint::buildBinTextBuffer (
 	enc::CharCodec* codec,
+	const void* p0,
 	size_t size
 	)
 {
-	size_t maxSize = m_end - m_p;
-	if (size > maxSize)
-		size = maxSize;
-
-	if (!size)
-		return m_point.m_x;
-
 	m_binTextBuffer.setCount (size);
 
 	size_t unitSize = codec->getUnitSize ();
 	size_t i = 0;
 
-	const char* p = m_p;
+	const char* p = (const char*) p0;
 	const char* end = p + size;
-
-	size_t unitSizeMod = (p - m_begin) % unitSize;
-	if (unitSizeMod)
-	{
-		size_t incompleteSize = unitSize - unitSizeMod;
-
-		if (incompleteSize > size)
-			incompleteSize = size;
-
-		for (; i < incompleteSize; i++)
-			m_binTextBuffer [i] = m_unprintableChar;
-
-		p += incompleteSize;
-	}
 
 	while (p < end)
 	{
@@ -565,27 +445,26 @@ TextPaint::paintBinTextPart (
 
 		if (!takenSize)
 		{
-			size_t end = i + leftover;
-
-			leftover = m_end - p;
+			leftover = end - p;
 			if (expectedSize <= leftover)
 			{
 				codec->decodeToUtf32 (&codePoint, 1, p, leftover, &takenBufferLength);
 				
 				if (takenBufferLength == 1) // might still be not enough (e.g. UTF-16)
 				{
-					m_binTextBuffer [i] = isPrintable (codePoint) ? codePoint : m_unprintableChar;
+					m_binTextBuffer [i] = enc::utfIsPrintable (codePoint) ? codePoint : m_unprintableChar;
 					i++;
 				}
 			}
 
+			size_t end = i + leftover;
 			for (; i < end; i++)
 				m_binTextBuffer [i] = m_unprintableChar;
 
 			break;
 		}
 
-		m_binTextBuffer [i] = isPrintable (codePoint) ? codePoint : m_unprintableChar;
+		m_binTextBuffer [i] = enc::utfIsPrintable (codePoint) ? codePoint : m_unprintableChar;
 
 		size_t end = i + takenSize;
 		for (i++; i < end; i++)
@@ -593,122 +472,79 @@ TextPaint::paintBinTextPart (
 
 		p += takenSize;
 	}
-
-	ASSERT (i == size);
-	
-	Rect rect = calcTextRect_utf32 (m_binTextBuffer, size);
-	m_canvas->drawText_utf32 (m_point, rect, m_binTextBuffer, size);
-
-	m_p = m_p + size;
-	m_point.m_x = rect.m_right;
-
-	return m_point.m_x;
 }
 
 int
 TextPaint::paintBinText (
+	uint_t textColor0,
+	uint_t backColor0,
+	uint_t fontFlags0,
 	enc::CharCodec* codec,
 	const void* p,
 	size_t size
 	)
 {
-	m_p = (const char*) p;
-	m_begin = m_p;
-	m_end = m_p + size;
+	if (!size)
+		return m_point.m_x;
 
-	return paintBinTextPart (codec, -1);
+	buildBinTextBuffer (codec, p, size);
+	return paintText_utf32 (m_binTextBuffer, size);
 }
 
 int
 TextPaint::paintHyperBinText (
-	enc::CharCodec* codec,
+	uint_t textColor0,
+	uint_t backColor0,
+	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
-	const void* _p,
-	size_t size
-	)
-{
-	const TextAttrAnchor* attr = attrArray ? attrArray->ca () : NULL;
-	size_t attrCount = attrArray ? attrArray->getCount () : 0;
-
-	const char* p = (const char*) _p;
-	const char* end; 
-
-	size_t offset = 0;
-
-	m_p = p;
-	m_begin = p;
-	m_end = p + size;
-	m_attr = attr;
-	m_attrBegin = attr;
-	m_attrEnd = attr + attrCount;
-
-	if (!size)
-		return m_point.m_x;
-
-	if (!attrCount)
-	{
-		m_canvas->m_defTextAttr.clear ();
-		return paintBinTextPart (codec, size);
-	}
-
-	const TextAttrAnchor* nextAttr;
-
-	if (m_attr->m_offset <= offset)
-	{
-		m_canvas->m_defTextAttr = m_attr->m_attr;
-		nextAttr = m_attr + 1;
-	}
-	else
-	{
-		m_canvas->m_defTextAttr.clear ();
-		nextAttr = m_attr;
-	}
-
-	end = p + size;
-	while (p < end && nextAttr < m_attrEnd)
-	{	
-		size_t maxSize = end - p;
-
-		size = nextAttr->m_offset - offset;
-		if (size > maxSize)
-			return paintBinTextPart (codec, maxSize);
-
-		paintBinTextPart (codec, size);
-
-		p = m_p;
-		offset = p - m_begin;
-
-		m_canvas->m_defTextAttr = nextAttr->m_attr;
-		m_attr = nextAttr;
-		nextAttr++;
-	}
-
-	if (p < end)
-		paintBinTextPart (codec, end - p);
-
-	return m_point.m_x;
-}
-
-int
-TextPaint::paintSelHyperBinText (
 	enc::CharCodec* codec,
-	const TextAttrAnchorArray* attrArray,
-	size_t selStart,
-	size_t selEnd,
 	const void* p,
 	size_t size
 	)
 {
-	if (selStart >= selEnd) 
-		return paintHyperBinText (codec, attrArray, p, size);
+	if (!size)
+		return m_point.m_x;
 
-	if (attrArray)
-		m_selOverlay.copy (*attrArray, attrArray->getCount ());
-	else
-		m_selOverlay.clear ();
+	buildBinTextBuffer (codec, p, size);
+	return paintHyperText_utf32 (
+		textColor0,
+		backColor0,
+		fontFlags0,
+		attrArray,
+		m_binTextBuffer, 
+		size
+		);
+}
 
-	m_selOverlay.setAttr (selStart, selEnd, m_selAttr, -1);
-	return paintHyperBinText (codec, &m_selOverlay, p, size);
+int
+TextPaint::paintSelHyperBinText (
+	uint_t textColor0,
+	uint_t backColor0,
+	uint_t fontFlags0,
+	const TextAttrAnchorArray* attrArray,
+	const TextAttr& selAttr,
+	size_t selStart,
+	size_t selEnd,
+	enc::CharCodec* codec,
+	const void* p,
+	size_t size
+	)
+{
+	if (!size)
+		return m_point.m_x;
+
+	buildBinTextBuffer (codec, p, size);
+	return paintSelHyperText_utf32 (
+		textColor0,
+		backColor0,
+		fontFlags0,
+		attrArray,
+		selAttr,
+		selStart,
+		selEnd,
+		m_binTextBuffer, 
+		size
+		);
 }
 
 //.............................................................................

@@ -9,10 +9,31 @@ namespace gui {
 
 //.............................................................................
 
+GdiEngine::GdiEngine ()
+{
+	m_hWndClipboardOwner = NULL;
+	updateStdPalette ();
+}
+
 GdiEngine::~GdiEngine ()
 {
 	if (m_hWndClipboardOwner)
 		::DestroyWindow (m_hWndClipboardOwner);
+}
+
+void
+GdiEngine::updateStdPalette ()
+{
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetText]    = inverseRgb (::GetSysColor (COLOR_WINDOWTEXT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetBack]    = inverseRgb (::GetSysColor (COLOR_WINDOW));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_GrayText]      = inverseRgb (::GetSysColor (COLOR_GRAYTEXT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionText] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHTTEXT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionBack] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DFace]        = inverseRgb (::GetSysColor (COLOR_3DFACE));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DShadow]      = inverseRgb (::GetSysColor (COLOR_3DSHADOW));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DDarkShadow]  = inverseRgb (::GetSysColor (COLOR_3DDKSHADOW));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DLight]       = inverseRgb (::GetSysColor (COLOR_3DLIGHT));
+	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DHiLight]     = inverseRgb (::GetSysColor (COLOR_3DHILIGHT));
 }
 
 ref::Ptr <Font>
@@ -42,13 +63,13 @@ GdiEngine::createStdFont (StdFontKind fontKind)
 
 ref::Ptr <Font>
 GdiEngine::createFont (
-	const char* faceName,
+	const char* family,
 	size_t pointSize,
 	uint_t flags
 	)
 {
 	LOGFONTW logFont;
-	buildLogFont (&logFont, rtl::String_w (faceName), pointSize, flags);
+	buildLogFont (&logFont, rtl::String_w (family), pointSize, flags);
 
 	HFONT hFont = ::CreateFontIndirect (&logFont);
 	if (!hFont)

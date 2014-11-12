@@ -6,35 +6,14 @@
 
 #define _AXL_GUI_WIDGET_H
 
-#include "axl_gui_Canvas.h"
-#include "axl_gui_Cursor.h"
-#include "axl_ref_Ptr.h"
+#include "axl_gui_Engine.h"
+#include "axl_gui_TextAttr.h"
 
 namespace axl {
 namespace gui {
 
-class Engine;
 class Canvas;
-
-//.............................................................................
-
-enum WidgetStyleFlag
-{
-	WidgetStyleFlag_Disabled      = 0x0001,	
-	WidgetStyleFlag_HSizeRepaint  = 0x0010,
-	WidgetStyleFlag_VSizeRepaint  = 0x0020,	
-	WidgetStyleFlag_HScrollAlways = 0x0040,
-	WidgetStyleFlag_VScrollAlways = 0x0080,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum WidgetOrientation
-{
-	WidgetOrientation_Vertical = 0,
-	WidgetOrientation_Horizontal,
-	WidgetOrientation__Count
-};
+class Widget;
 
 //.............................................................................
 
@@ -44,35 +23,35 @@ enum WidgetMsgCode
 {
 	WidgetMsgCode_Undefined = 0,
 
-	WidgetMsgCode_Close,                   // TWidgetMsg
-	WidgetMsgCode_SetFocus,                // TWidgetMsg
-	WidgetMsgCode_KillFocus,               // TWidgetMsg
-	WidgetMsgCode_Size,                    // TWidgetMsgParamT <uint_t OrientationMask> 
-	WidgetMsgCode_Scroll,                  // TWidgetMsgParamT <uint_t OrientationMask>
-	WidgetMsgCode_Paint,                   // TWidgetPaintMsg
+	WidgetMsgCode_Close,                   // WidgetMsg
+	WidgetMsgCode_SetFocus,                // WidgetMsg
+	WidgetMsgCode_KillFocus,               // WidgetMsg
+	WidgetMsgCode_Size,                    // WidgetMsgParamT <uint_t OrientationMask> 
+	WidgetMsgCode_Scroll,                  // WidgetMsgParamT <uint_t OrientationMask>
+	WidgetMsgCode_Paint,                   // WidgetPaintMsg
 
-	WidgetMsgCode_MouseMove,               // TWidgetMouseMsg
-	WidgetMsgCode_MouseLeave,              // TWidgetMsg
-	WidgetMsgCode_MouseButtonDown,         // TWidgetMouseButtonMsg
-	WidgetMsgCode_MouseButtonUp,           // TWidgetMouseButtonMsg
-	WidgetMsgCode_MouseButtonDoubleClick,  // TWidgetMouseButtonMsg
-	WidgetMsgCode_MouseWheel,              // TWidgetMouseWheelMsg
-	WidgetMsgCode_MouseCaptureLost,        // TWidgetMsg
+	WidgetMsgCode_MouseMove,               // WidgetMouseMsg
+	WidgetMsgCode_MouseLeave,              // WidgetMsg
+	WidgetMsgCode_MouseButtonDown,         // WidgetMouseButtonMsg
+	WidgetMsgCode_MouseButtonUp,           // WidgetMouseButtonMsg
+	WidgetMsgCode_MouseButtonDoubleClick,  // WidgetMouseButtonMsg
+	WidgetMsgCode_MouseWheel,              // WidgetMouseWheelMsg
+	WidgetMsgCode_MouseCaptureLost,        // WidgetMsg
 
-	WidgetMsgCode_KeyDown,                 // TWidgetKeyMsg
-	WidgetMsgCode_KeyUp,                   // TWidgetKeyMsg
+	WidgetMsgCode_KeyDown,                 // WidgetKeyMsg
+	WidgetMsgCode_KeyUp,                   // WidgetKeyMsg
 
-	WidgetMsgCode_ThreadMsg,               // TWidgetThreadMsg
+	WidgetMsgCode_ThreadMsg,               // WidgetThreadMsg
 
-	WidgetMsgCode_Gdi,                     // TWidgetGdiMsg
-	WidgetMsgCode_Qt,                      // TWidgetQtMsg
-	WidgetMsgCode_Gtk,                     // TWidgetGtkMsg
-	WidgetMsgCode_User,                    // TWidgetMsg
+	WidgetMsgCode_Gdi,                     // WidgetGdiMsg
+	WidgetMsgCode_Qt,                      // WidgetQtMsg
+	WidgetMsgCode_Gtk,                     // WidgetGtkMsg
+	WidgetMsgCode_User,                    // WidgetMsg
 
 	WidgetMsgCode__Count,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
 
 struct WidgetMsg
 {
@@ -89,7 +68,7 @@ struct WidgetMsg
 	}
 };
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 struct WidgetMsgParam: WidgetMsg
@@ -298,81 +277,135 @@ struct WidgetScrollBar
 
 //.............................................................................
 
-class Widget
-{
-protected:
-	friend class Engine;
+typedef 
+void 
+(Widget::*WidgetMsgProc) (
+	const WidgetMsg* msg,
+	bool* isHandled
+	);
 
+struct WidgetMsgMap
+{
+	WidgetMsgProc m_msgProcTable [WidgetMsgCode__Count];
+	WidgetMsgMap* m_baseMap;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct WidgetConstructParam
+{
 	Engine* m_engine;
+	void* m_engineWidget;
+
+	WidgetConstructParam (
+		Engine* engine,
+		void* engineWidget
+		)
+	{
+		m_engine = engine;
+		m_engineWidget = engineWidget;
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class WidgetDriver: public GuiItem
+{
+	friend class Engine;
+	friend class Widget;
+
+protected:
+	void* m_engineWidget;
 	Cursor* m_cursor;
-	Font* m_baseFont;
-	TextAttr m_baseTextAttr;
+	Font* m_font;
+	ColorAttr m_colorAttr;
 	Palette m_palette;
-	Size m_size;
 	Point m_caretPos;
 	Size m_caretSize;
 	bool m_isCaretVisible;
-	uint_t m_style;
-	uint_t m_msgMask;	
-	WidgetScrollBar m_scrollBarArray [2];	
-	
+	WidgetMsgMap* m_msgMap;
+
 public:
-	Widget (Engine* engine);
+	Size m_size;
+	WidgetScrollBar m_scrollBarArray [2];
 
-	Engine* 
-	getEngine ()
-	{
-		return m_engine;
-	}
+protected:
+	WidgetDriver (const WidgetConstructParam& param);
 
-	Cursor* 
-	getCursor ()
+public:
+	void* 
+	getEngineWidget ()
 	{
-		return m_cursor;
+		return m_engineWidget;
 	}
 
 	Font* 
-	getBaseFont ()
+	getFont ()
 	{
-		return m_baseFont;
+		return m_font;
 	}
 
-	Size
-	getSize ()
-	{
-		return m_size;
-	}
-
-	uint_t
-	getStyle ()
-	{
-		return m_style;
-	}
-
-	uint_t
-	getMsgMask ()
-	{
-		return m_msgMask;
-	}
-	
 	bool
-	checkMsgMask (WidgetMsgCode msgCode)
+	setFont (Font* font);
+	
+	ColorAttr 
+	getColorAttr ()
 	{
-		return (m_msgMask & (1 << msgCode)) != 0;
+		return m_colorAttr;
 	}
 
-	virtual
-	ref::Ptr <Canvas>
-	getCanvas () = 0;
+	bool 
+	setColorAttr (
+		uint_t foreColor,
+		uint_t backColor
+		)
+	{
+		m_colorAttr.setup (foreColor, backColor);
+		return redraw ();
+	}
 
-	virtual
+	bool 
+	setColorAttr (const ColorAttr& attr)
+	{
+		m_colorAttr = attr;
+		return redraw ();
+	}
+
+	Palette 
+	getPalette ()
+	{
+		return m_palette;
+	}
+
+	bool
+	setPalette (
+		const uint_t* colorArray,
+		size_t count
+		)
+	{
+		m_palette.setup (colorArray, count);
+		return redraw ();
+	}
+
+	bool
+	setPalette (const Palette& palette)
+	{
+		m_palette = palette;
+		return redraw ();
+	}
+
+	// redraw
+
 	bool
 	redraw (
 		int left, 
 		int top, 
 		int right, 
 		int bottom		
-		) = 0;
+		)
+	{
+		return m_engine->redrawWidget (this, left, top, right, bottom);
+	}
 
 	bool
 	redraw (const Rect& rect)
@@ -386,25 +419,48 @@ public:
 		return redraw (0, 0, 0, 0);
 	}
 
-	virtual
-	bool
-	isFocused () = 0;
+	// focus
 
-	virtual
 	bool
-	setFocus () = 0;
+	isFocused ()
+	{
+		return m_engine->isWidgetFocused (this);
+	}
 
-	virtual
 	bool
-	setCursor (Cursor* cursor) = 0;
+	setFocus ()
+	{
+		return m_engine->setWidgetFocus (this);
+	}
 
-	virtual
-	bool
-	setMouseCapture () = 0;
+	// mouse
 
-	virtual
+	Cursor* 
+	getCursor ()
+	{
+		return m_cursor;
+	}
+
 	bool
-	releaseMouseCapture () = 0;
+	setCursor (Cursor* cursor)
+	{
+		m_cursor = cursor;
+		return m_engine->setWidgetCursor (this, cursor);
+	}
+
+	bool
+	setMouseCapture ()
+	{
+		return m_engine->setMouseCapture (this);
+	}
+
+	bool
+	releaseMouseCapture ()
+	{
+		return m_engine->releaseMouse (this);
+	}
+
+	// caret
 
 	bool
 	isCaretVisible ()
@@ -414,6 +470,12 @@ public:
 
 	bool
 	setCaretVisible (bool isVisible);
+
+	Size 
+	getCaretSize ()
+	{
+		return m_caretSize;
+	}
 
 	bool
 	setCaretWidth (uint_t width)
@@ -427,7 +489,6 @@ public:
 		return setCaretSize (m_caretSize.m_width, height);
 	}
 
-	virtual
 	bool
 	setCaretSize (
 		uint_t width,
@@ -440,6 +501,12 @@ public:
 		return setCaretSize (size.m_width, size.m_height);
 	}
 
+	Point
+	getCaretPos ()
+	{
+		return m_caretPos;
+	}
+
 	bool
 	setCaretPos (
 		int x, 
@@ -447,94 +514,117 @@ public:
 		);
 
 	bool
-	setCaretPos (const gui::Point& point)
+	setCaretPos (const Point& point)
 	{
 		return setCaretPos (point.m_x, point.m_y);
 	}
-		
-	WidgetScrollBar*
-	getScrollBar (WidgetOrientation orientation)
-	{
-		ASSERT (orientation < countof (m_scrollBarArray));
-		return &m_scrollBarArray [orientation];
-	}
 
-	virtual
+	// scroll bars
+
 	bool
-	updateScrollBar (WidgetOrientation orientation) = 0;
+	updateScrollBar (Orientation orientation)
+	{
+		return m_engine->updateWidgetScrollBar (this, orientation);
+	}
 
 	bool
 	updateScrollBars ()
 	{
 		return 
-			updateScrollBar (WidgetOrientation_Vertical) &&
-			updateScrollBar (WidgetOrientation_Horizontal);
+			updateScrollBar (Orientation_Vertical) &&
+			updateScrollBar (Orientation_Horizontal);
 	}
 
-	virtual
-	intptr_t
-	notifyParent (
-		intptr_t notifyCode,
-		void* param = NULL
-		) = 0;
+	bool
+	updateScrollBars (uint_t mask);
 
-	virtual
+	// misc
+
 	void
+	notify (
+		uint_t code,
+		void* params = NULL
+		)
+	{
+		m_engine->sendWidgetNotification (this, code, params);
+	}
+
+	bool
 	postThreadMsg (
 		uint_t code,
 		const ref::Ptr <void>& params
-		) = 0;
-
-	virtual
-	void
-	processWidgetMsg (
-		WidgetMsg* msg,
-		bool* isHandled_o
 		)
 	{
+		return m_engine->postWidgetThreadMsg (this, code, params);
+	}
+
+	bool
+	checkMsgMap (WidgetMsgCode msgCode)
+	{
+		ASSERT (msgCode < WidgetMsgCode__Count);
+		return m_msgMap ? m_msgMap->m_msgProcTable [msgCode] != NULL : true;
+	}
+
+	void
+	processMsg (
+		const WidgetMsg* msg,
+		bool* isHandled
+		);
+};
+
+//.............................................................................
+
+class Widget
+{
+	friend class WidgetDriver;
+
+protected:
+	WidgetDriver m_widgetDriver;
+
+protected:
+	Widget (const WidgetConstructParam& param):
+		m_widgetDriver (param)
+	{
+	}
+
+public:
+	Engine*
+	getGuiEngine ()
+	{
+		return m_widgetDriver.getEngine ();
+	}
+
+protected:
+	virtual 
+	WidgetMsgMap*
+	getWidgetMsgMap ()
+	{
+		return NULL;
 	}
 };
 
 //.............................................................................
 
-#define AXL_GUI_WIDGET_MSG_MAP_BEGIN() \
+#define AXL_GUI_WIDGET_BEGIN_MSG_MAP(BaseClass) \
 virtual \
-void \
-processWidgetMsg ( \
-	axl::gui::WidgetMsg* msg, \
-	bool* isHandled_o \
-	) \
+axl::gui::WidgetMsgMap* \
+getWidgetMsgMap () \
 { \
-	switch (msg->m_msgCode) \
-	{
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+	static axl::gui::WidgetMsgMap map = { 0 }; \
+	static bool once = false; \
+	if (once) \
+		return &map; \
+	map.m_baseMap = BaseClass::getWidgetMsgMap (); \
+	if (map.m_baseMap) \
+		memcpy (map.m_msgProcTable, map.m_baseMap->m_msgProcTable, sizeof (map.m_msgProcTable));
 
 #define AXL_GUI_WIDGET_MSG_HANDLER(msgCode, handler) \
-	case msgCode: \
-		handler (msg, isHandled_o); \
-		break; \
+	map.m_msgProcTable [msgCode] = (axl::gui::WidgetMsgProc) handler;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#define AXL_GUI_WIDGET_MSG_MAP_END() \
-	default: \
-		*isHandled_o = false; \
-	} \
-} 
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#define AXL_GUI_WIDGET_MSG_MAP_END_CHAIN(class) \
-	default: \
-		*isHandled_o = false; \
-	} \
-	if (!*isHandled_o) \
-	{ \
-		*isHandled_o = true; \
-		class::processWidgetMsg (msg, isHandled_o); \
-	} \
-} 
+#define AXL_GUI_WIDGET_END_MSG_MAP() \
+	once = true; \
+	return &map; \
+}
 
 //.............................................................................
 

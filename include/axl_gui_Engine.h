@@ -6,145 +6,104 @@
 
 #define _AXL_GUI_ENGINE_H
 
+#include "axl_gui_Color.h"
+#include "axl_gui_ImageDesc.h"
+#include "axl_gui_FontDesc.h"
 #include "axl_ref_Ptr.h"
-#include "axl_gui_Font.h"
-#include "axl_gui_Cursor.h"
-#include "axl_gui_Image.h"
-#include "axl_gui_Canvas.h"
 #include "axl_rtl_String.h"
 #include "axl_rtl_Array.h"
 
 namespace axl {
 namespace gui {
 
-class Widget;
+class Font;
+class FontTuple;
+class Image;
+class Cursor;
+class Canvas;
+class WidgetDriver;
 
 //.............................................................................
 
-enum EngineKind
+enum StdFontKind
 {
-	EngineKind_Undefined = 0,
-	EngineKind_Gdi,
-	EngineKind_Qt,
-	EngineKind_Gtk,
+	StdFontKind_Gui = 0,
+	StdFontKind_Monospace,
+	
+	StdFontKind__Count
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const char*
-getEngineKindString (EngineKind engineKind);
+enum StdCursorKind
+{
+	StdCursorKind_Arrow = 0,
+	StdCursorKind_Wait,
+	StdCursorKind_IBeam,
+	StdCursorKind_Hyperlink,
+	StdCursorKind_SizeNS,
+	StdCursorKind_SizeWE,
+	StdCursorKind_SizeNWSE,
+	StdCursorKind_SizeNESW,
+	StdCursorKind_SizeAll,
+	
+	StdCursorKind__Count
+};
 
 //.............................................................................
 
 class Engine
 {
 protected:
-	struct SharedOffscreenCanvas
-	{
-		Size m_size;
-		ref::Ptr <Canvas> m_canvas;
-	};
-
-protected:
-	EngineKind m_engineKind;
-	ref::Ptr <Font> m_stdFontArray [StdFontKind__Count];
-	ref::Ptr <Cursor> m_stdCursorArray [StdCursorKind__Count];
-	SharedOffscreenCanvas m_sharedOffscreenCanvasArray [FormFactor__Count];
+	uint_t m_stdPalColorTable [StdPalColor__Count];
 
 public:
-	Engine ()
+	Engine ();
+
+	Palette
+	getStdPalette ()
 	{
-		m_engineKind = EngineKind_Undefined;
+		return Palette (m_stdPalColorTable, countof (m_stdPalColorTable));
 	}
-
-	EngineKind
-	getEngineKind ()
-	{
-		return m_engineKind;
-	}
-
-	// fonts
-
-	Font*
-	getStdFont (StdFontKind fontKind);
 
 	virtual
-	ref::Ptr <Font>
-	createFont (
-		const char* faceName,
-		size_t pointSize,
-		uint_t flags = 0
+	void
+	updateStdPalette () = 0;
+
+	// canvas
+
+
+	virtual
+	bool
+	createOffscreenCanvas (
+		Canvas* canvas,
+		uint_t width,
+		uint_t height
 		) = 0;
 
-	ref::Ptr <Font>
-	createFont (const FontDesc& fontDesc)
-	{
-		return createFont (
-			fontDesc.m_faceName,
-			fontDesc.m_pointSize,
-			fontDesc.m_flags
-			);
-	}
-
-	// cursors
-
-	Cursor*
-	getStdCursor (StdCursorKind cursorKind);
-
-	// images
-
-	virtual
-	ref::Ptr <Image>
-	createImage () = 0;
-
-	virtual
-	ref::Ptr <Image>
-	createImage (
-		int width,
-		int height,
-		PixelFormat pixelFormat,
-		const void* data,
-		bool isScreenCompatible = true
-		) = 0;
-
-	ref::Ptr <Image>
-	createImage (
-		const ImageDesc& imageDesc,
-		bool isScreenCompatible = true
+	bool
+	createOffscreenCanvas (
+		Canvas* canvas,
+		const Size& size
 		)
 	{
-		return createImage (
-			imageDesc.m_size.m_width,
-			imageDesc.m_size.m_height,
-			imageDesc.m_pixelFormat,
-			imageDesc.m_data,
-			isScreenCompatible
-			);
-	}
-
-	// offscreen canvas
-
-	virtual
-	ref::Ptr <Canvas>
-	createOffscreenCanvas (
-		int width,
-		int height
-		) = 0;
-
-	ref::Ptr <Canvas>
-	createOffscreenCanvas (const Size& size)
-	{
 		return createOffscreenCanvas (
+			canvas,
 			size.m_width,
 			size.m_height
 			);
 	}
 
+	virtual
+	bool
+	releaseOffscreenCanvas (Canvas* canvas) = 0;
+
+	virtual
 	Canvas*
 	getSharedOffscreenCanvas (
-		int width,
-		int height
-		);
+		uint_t width,
+		uint_t height
+		) = 0;
 
 	Canvas*
 	getSharedOffscreenCanvas (const Size& size)
@@ -155,8 +114,215 @@ public:
 			);
 	}
 
+	virtual
 	void
-	deleteAllSharedOffscreenCanvases ();
+	releaseAllSharedOffscreenCanvases () = 0;
+
+	virtual
+	bool
+	drawRect (
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color
+		) = 0;
+
+	virtual
+	bool
+	drawText_utf8 (
+		Canvas* canvas,
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf8_t* text,
+		size_t length = -1
+		) = 0;
+
+	virtual
+	bool
+	drawText_utf16 (
+		Canvas* canvas,
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf16_t* text,
+		size_t length = -1
+		) = 0;
+
+	virtual
+	bool
+	drawText_utf32 (
+		Canvas* canvas,
+		int x,
+		int y,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t textColor,
+		uint_t backColor,
+		uint_t fontFlags,
+		const utf32_t* text,
+		size_t length = -1
+		) = 0;
+
+	virtual
+	bool
+	drawImage (
+		Canvas* canvas,
+		int x,
+		int y,
+		Image* image,
+		int left,
+		int top,
+		int right,
+		int bottom
+		) = 0;
+
+	virtual
+	bool
+	copyRect (
+		Canvas* canvas,
+		int x,
+		int y,
+		Canvas* srcCanvas,
+		int left,
+		int top,
+		int right,
+		int bottom
+		) = 0;
+
+	// fonts
+
+	virtual
+	void
+	clearFontTuple (FontTuple* fontTuple) = 0;
+
+	virtual
+	FontTuple*
+	getStdFontTuple (StdFontKind fontKind) = 0;
+
+	inline
+	Font*
+	getStdFont (
+		StdFontKind fontKind,
+		uint_t flags = 0
+		);
+
+	virtual
+	Font*
+	createFont (
+		FontTuple* fontTuple,
+		const char* family,
+		size_t pointSize,
+		uint_t flags = 0
+		) = 0;
+
+	Font*
+	createFont (
+		FontTuple* fontTuple,
+		const FontDesc& fontDesc
+		)
+	{
+		return createFont (
+			fontTuple,
+			fontDesc.m_family,
+			fontDesc.m_pointSize,
+			fontDesc.m_flags
+			);
+	}
+
+	virtual
+	Font*
+	getFontMod (
+		FontTuple* fontTuple,
+		uint_t flags
+		) = 0;
+
+	virtual
+	bool
+	getFontDesc (
+		Font* font,
+		FontDesc* fontDesc
+		) = 0;
+
+	virtual
+	bool
+	isMonospaceFont (Font* font) = 0;
+
+	virtual
+	Size
+	calcTextSize_utf8 (
+		Font* font,
+		const utf8_t* text,
+		size_t length = -1
+		) = 0;
+
+	virtual
+	Size
+	calcTextSize_utf16 (
+		Font* font,
+		const utf16_t* text,
+		size_t length = -1
+		) = 0;
+
+	virtual
+	Size
+	calcTextSize_utf32 (
+		Font* font,
+		const utf32_t* text,
+		size_t length = -1
+		) = 0;
+
+	// images
+
+	virtual
+	bool
+	createImage (
+		Image* image,
+		uint_t width,
+		uint_t height,
+		PixelFormat pixelFormat
+		) = 0;
+
+	bool
+	createImage (
+		Image* image,
+		const ImageDesc& imageDesc
+		)
+	{
+		return createImage (
+			image,
+			imageDesc.m_size.m_width,
+			imageDesc.m_size.m_height,
+			imageDesc.m_pixelFormat
+			);
+	}
+
+	virtual
+	bool
+	getImageDesc (
+		Image* image,
+		ImageDesc* imageDesc
+		) = 0;
+
+	virtual
+	Cursor*
+	getStdCursor (StdCursorKind cursorKind) = 0;
 
 	// clipboard
 
@@ -225,40 +391,77 @@ public:
 	bool
 	commitClipboard () = 0;
 
-	// caret
+	// widget
+
+	virtual
+	bool
+	isWidgetFocused (WidgetDriver* widgetDriver) = 0;
+
+	virtual
+	bool
+	setWidgetFocus (WidgetDriver* widgetDriver) = 0;
+
+	virtual
+	bool
+	redrawWidget (
+		WidgetDriver* widgetDriver,
+		int left, 
+		int top, 
+		int right, 
+		int bottom
+		) = 0;
+
+	virtual
+	bool
+	setWidgetCursor (
+		WidgetDriver* widgetDriver,
+		Cursor* cursor
+		) = 0;
+
+	virtual
+	bool
+	setMouseCapture (WidgetDriver* widgetDriver) = 0;
+
+	virtual
+	bool
+	releaseMouse (WidgetDriver* widgetDriver) = 0;
+
+	virtual
+	bool
+	updateWidgetScrollBar (
+		WidgetDriver* widgetDriver,
+		Orientation orientation
+		) = 0;
+
+	virtual
+	void
+	sendWidgetNotification (
+		WidgetDriver* widgetDriver,
+		uint_t code,
+		void* params = NULL
+		) = 0;
+
+	virtual
+	bool
+	postWidgetThreadMsg (
+		WidgetDriver* widgetDriver,
+		uint_t code,
+		const ref::Ptr <void>& params
+		) = 0;
 
 	virtual
 	bool
 	showCaret (
-		Widget* widget,
+		WidgetDriver* widgetDriver,
 		const Rect& rect
 		) = 0;
 
 	virtual
 	void
-	hideCaret () = 0;
-
-protected:
-	friend class Font;
-
-	virtual
-	Font*
-	getFontMod (
-		Font* baseFont,
-		uint_t flags
-		) = 0;
-
-	virtual
-	ref::Ptr <Font>
-	createStdFont (StdFontKind fontKind) = 0;
-
-	virtual
-	ref::Ptr <Cursor>
-	createStdCursor (StdCursorKind cursorKind) = 0;
+	hideCaret (WidgetDriver* widgetDriver) = 0;
 };
 
 //.............................................................................
 
 } // namespace gui
 } // namespace axl
-

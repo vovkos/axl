@@ -6,116 +6,45 @@
 
 #define _AXL_GUI_IMAGE_H
 
-#include "axl_rtl_BitIdx.h"
-#include "axl_gui_Def.h"
+#include "axl_gui_Engine.h"
 
 namespace axl {
 namespace gui {
 
 //.............................................................................
 
-enum PixelFormat
-{
-	PixelFormat_Rgba = 0,
-	PixelFormat_Rgb,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const char* 
-getPixelFormatString (PixelFormat pixelFormat);
-
-//.............................................................................
-
-struct ImageDesc
-{
-	Size m_size;
-	PixelFormat m_pixelFormat;
-	void* m_data;
-
-	ImageDesc ()
-	{
-		memset (this, 0, sizeof (ImageDesc));
-	}
-
-	ImageDesc (
-		int width,
-		int height,
-		PixelFormat pixelFormat,
-		void* data
-		)
-	{
-		m_size.m_width = width;
-		m_size.m_height = height;
-		m_pixelFormat = pixelFormat;
-		m_data = data;
-	}
-
-	ImageDesc (
-		const Size& size,
-		PixelFormat pixelFormat,
-		void* data
-		)
-	{
-		m_size = size;
-		m_pixelFormat = pixelFormat;
-		m_data = data;
-	}
-};
-
-//.............................................................................
-
 class Image: public GuiItem
 {
 protected:
-	Size m_size;
+	Image (Engine* engine):
+		GuiItem (engine)
+	{
+	}
 
 public:
+	bool
+	getImageDesc (ImageDesc* imageDesc)
+	{
+		return m_engine->getImageDesc (this, imageDesc);
+	}
+
 	Size
 	getSize ()
 	{
-		return m_size;
+		ImageDesc imageDesc;
+		getImageDesc (&imageDesc);
+		return imageDesc.m_size;
 	}
+};
 
-	// data is returned in EPixelFormat_Rgba
+//.............................................................................
 
-	virtual
-	bool
-	getData (
-		void* data, 
-		int left,
-		int top,
-		int right,
-		int bottom
-		) = 0;
-
-	bool
-	getData (
-		void* data,
-		const Rect& rect
-		)
+class Cursor: public GuiItem
+{
+protected:
+	Cursor (Engine* engine):
+		GuiItem (engine)
 	{
-		return getData (
-			data, 
-			rect.m_left,
-			rect.m_top,
-			rect.m_right,
-			rect.m_bottom			
-			);
-	}
-
-	bool
-	getData (
-		void* data,
-		const Size& size
-		)
-	{
-		return getData (
-			data, 
-			0, 0, 
-			size.m_width,
-			size.m_height
-			);
 	}
 };
 

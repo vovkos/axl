@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_gui_Image.h"
+#include "axl_gui_ImageDesc.h"
 
 namespace axl {
 namespace gui {
@@ -11,8 +11,8 @@ getPixelFormatString (PixelFormat pixelFormat)
 {
 	static const char* stringTable [] = 
 	{
-		"RGBA", // EPixelFormat_Rgba = 0,
-		"RGB",  // EPixelFormat_Rgb,
+		"RGBA", // PixelFormat_Rgba = 0,
+		"RGB",  // PixelFormat_Rgb,
 	};
 
 	return pixelFormat < countof (stringTable) ? 
