@@ -27,44 +27,5 @@ Palette::getColorRgb (uint_t color)
 
 //.............................................................................
 
-uint_t
-parseColorString (
-	const char* string,
-	const char** end_o
-	)
-{
-	if (!string)
-	{
-		if (end_o)
-			*end_o = NULL;
-
-		return StdColor_Black;
-	}
-
-	uint_t color = StdColor_Black;
-
-	char* end;
-
-	if (string[0] == '#')
-	{
-		uint_t rgb = strtol (string + 1, &end, 16);
-		if (end != string)
-			color = rgb;
-	}
-	else
-	{
-		uint_t index = strtol (string, &end, 10);
-		if (end != string)
-			color = ColorFlag_Index | index;
-	}
-
-	if (end_o)
-		*end_o = end;
-
-	return color;
-}
-
-//.............................................................................
-
 } // namespace gui
 } // namespace axl

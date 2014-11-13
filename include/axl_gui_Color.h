@@ -25,77 +25,114 @@ enum
 
 enum StdColor
 {
-	StdColor_Black        = 0x000000,
-	StdColor_White        = 0xffffff,
-	StdColor_Gray         = 0x808080,
-	StdColor_Red          = 0x800000,
-	StdColor_Green        = 0x008000,
-	StdColor_Blue         = 0x000080,
-	StdColor_Purple       = 0x800080,
-	StdColor_Cyan         = 0x008080,
+	StdColor_AnsiBlack         = 0x000000,
+	StdColor_AnsiRed           = 0xbb0000,
+	StdColor_AnsiGreen         = 0x00bb00,
+	StdColor_AnsiYellow        = 0xbbbb00,
+	StdColor_AnsiBlue          = 0x0000bb,
+	StdColor_AnsiMagenta       = 0xbb00bb,
+	StdColor_AnsiCyan          = 0x00bbbb,
+	StdColor_AnsiWhite         = 0xbbbbbb,
 
-	StdColor_LightRed     = 0xff0000,
-	StdColor_LightGreen   = 0x00ff00,
-	StdColor_LightBlue    = 0x0000ff,
-	StdColor_LightPurple  = 0xff00ff,
-	StdColor_LightCyan    = 0x00ffff,
+	StdColor_AnsiBrightBlack   = 0x555555,
+	StdColor_AnsiBrightRed     = 0xff5555,
+	StdColor_AnsiBrightGreen   = 0x55ff55,
+	StdColor_AnsiBrightYellow  = 0xffff55,
+	StdColor_AnsiBrightBlue    = 0x5555ff,
+	StdColor_AnsiBrightMagenta = 0xff55ff,
+	StdColor_AnsiBrightCyan    = 0x55ffff,
+	StdColor_AnsiBrightWhite   = 0xffffff,
 
-	StdColor_PastelGray   = 0xefefef,
-	StdColor_PastelRed    = 0xffe4e1,
-	StdColor_PastelOrange = 0xfffacd,
-	StdColor_PastelYellow = 0xffffc0,
-	StdColor_PastelGreen  = 0xe1fada,
-	StdColor_PastelCyan   = 0xcdfaff,
-	StdColor_PastelBlue   = 0xe2edff,
-	StdColor_PastelPurple = 0xe2dafd,
+	StdColor_Black             = 0x000000,
+	StdColor_White             = 0xffffff,
+	StdColor_Gray              = 0x808080,
+	StdColor_Red               = 0x800000,
+	StdColor_Green             = 0x008000,
+	StdColor_Blue              = 0x000080,
+	StdColor_Purple            = 0x800080,
+	StdColor_Cyan              = 0x008080,
+
+	StdColor_LightRed          = 0xff0000,
+	StdColor_LightGreen        = 0x00ff00,
+	StdColor_LightBlue         = 0x0000ff,
+	StdColor_LightPurple       = 0xff00ff,
+	StdColor_LightCyan         = 0x00ffff,
+
+	StdColor_PastelGray        = 0xefefef,
+	StdColor_PastelRed         = 0xffe4e1,
+	StdColor_PastelOrange      = 0xfffacd,
+	StdColor_PastelYellow      = 0xffffc0,
+	StdColor_PastelGreen       = 0xe1fada,
+	StdColor_PastelCyan        = 0xcdfaff,
+	StdColor_PastelBlue        = 0xe2edff,
+	StdColor_PastelPurple      = 0xe2dafd,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum StdPalColor
 {
+	// ansi colors
+
+	StdPalColor_AnsiBlack          = ColorFlag_Index | 0,
+	StdPalColor_AnsiRed,           // 1
+	StdPalColor_AnsiGreen,         // 2
+	StdPalColor_AnsiYellow,        // 3
+	StdPalColor_AnsiBlue,          // 4
+	StdPalColor_AnsiMagenta,       // 5
+	StdPalColor_AnsiCyan,          // 6
+	StdPalColor_AnsiWhite,         // 7
+
+	StdPalColor_AnsiBrightBlack,   // 8
+	StdPalColor_AnsiBrightRed,     // 9
+	StdPalColor_AnsiBrightGreen,   // 10
+	StdPalColor_AnsiBrightYellow,  // 11
+	StdPalColor_AnsiBrightBlue,    // 12
+	StdPalColor_AnsiBrightMagenta, // 13
+	StdPalColor_AnsiBrightCyan,    // 14
+	StdPalColor_AnsiBrightWhite,   // 15
+
 	// system widget colors
 
-	StdPalColor_WidgetText = ColorFlag_Index | 0,
-	StdPalColor_WidgetBack,     // 1
-	StdPalColor_GrayText,       // 2
-	StdPalColor_SelectionText,  // 3
-	StdPalColor_SelectionBack,  // 4
-	StdPalColor_3DFace,         // 5
-	StdPalColor_3DShadow,       // 6
-	StdPalColor_3DDarkShadow,   // 7
-	StdPalColor_3DLight,        // 8
-	StdPalColor_3DHiLight,      // 9
+	StdPalColor_WidgetText,        // 16
+	StdPalColor_WidgetBack,        // 17
+	StdPalColor_GrayText,          // 18
+	StdPalColor_SelectionText,     // 19
+	StdPalColor_SelectionBack,     // 20
+	StdPalColor_3DFace,            // 21
+	StdPalColor_3DShadow,          // 22
+	StdPalColor_3DDarkShadow,      // 23
+	StdPalColor_3DLight,           // 24
+	StdPalColor_3DHiLight,         // 25
 
-	// std colors
+	// axl colors
 
-	StdPalColor_Black,          // 10
-	StdPalColor_White,          // 11
-	StdPalColor_Gray,           // 12
-	StdPalColor_Red,            // 13
-	StdPalColor_Green,          // 14
-	StdPalColor_Blue,           // 15
-	StdPalColor_Purple,         // 16
-	StdPalColor_Cyan,           // 17
+	StdPalColor_Black,             // 26
+	StdPalColor_White,             // 27
+	StdPalColor_Gray,              // 28
+	StdPalColor_Red,               // 29
+	StdPalColor_Green,             // 30
+	StdPalColor_Blue,              // 31
+	StdPalColor_Purple,            // 32
+	StdPalColor_Cyan,              // 33
 
-	StdPalColor_LightRed,       // 18
-	StdPalColor_LightGreen,     // 19
-	StdPalColor_LightBlue,      // 20
-	StdPalColor_LightPurple,    // 21
-	StdPalColor_LightCyan,      // 22
+	StdPalColor_LightRed,          // 34
+	StdPalColor_LightGreen,        // 35
+	StdPalColor_LightBlue,         // 36
+	StdPalColor_LightPurple,       // 37
+	StdPalColor_LightCyan,         // 38
 	
-	StdPalColor_PastelGray,     // 23
-	StdPalColor_PastelRed,      // 24
-	StdPalColor_PastelOrange,   // 25
-	StdPalColor_PastelYellow,   // 26
-	StdPalColor_PastelGreen,    // 27
-	StdPalColor_PastelCyan,     // 28
-	StdPalColor_PastelBlue,     // 29
-	StdPalColor_PastelPurple,   // 30
+	StdPalColor_PastelGray,        // 39
+	StdPalColor_PastelRed,         // 40
+	StdPalColor_PastelOrange,      // 41
+	StdPalColor_PastelYellow,      // 42
+	StdPalColor_PastelGreen,       // 43
+	StdPalColor_PastelCyan,        // 44
+	StdPalColor_PastelBlue,        // 45
+	StdPalColor_PastelPurple,      // 46
 
 	StdPalColor__End, 
-	StdPalColor__SystemColorCount = ~ColorFlag_Index & (StdPalColor_3DHiLight + 1),
-	StdPalColor__Count            = ~ColorFlag_Index & (StdPalColor_PastelPurple + 1)
+	StdPalColor__Count             = ~ColorFlag_Index & StdPalColor__End
 };
 
 //.............................................................................
@@ -116,12 +153,6 @@ overlayColor (
 {
 	return (overlayColor & ColorFlag_Undefined) ? baseColor : overlayColor;
 }
-
-uint_t
-parseColorString (
-	const char* string,
-	const char** end = NULL
-	);
 
 inline
 uint_t 

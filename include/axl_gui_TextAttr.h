@@ -40,11 +40,6 @@ struct TextAttr: public ColorAttr
 		setup (colorAttr, fontFlags);
 	}
 
-	TextAttr (const char* string)
-	{
-		parse (string);
-	}
-
 	int 
 	cmp (const TextAttr& attr)
 	{
@@ -95,28 +90,6 @@ struct TextAttr: public ColorAttr
 	overlay (const TextAttr& overlayAttr)
 	{
 		overlay (*this, overlayAttr);
-	}
-
-	void
-	parse (
-		const char* string,
-		const char** end = NULL
-		);
-
-	void
-	parseOverlay (
-		const TextAttr& baseAttr,
-		const char* string,
-		const char** end = NULL
-		);
-
-	void
-	parseOverlay (
-		const char* string,
-		const char** end = NULL
-		)
-	{
-		parseOverlay (*this, string, end);
 	}
 };
 

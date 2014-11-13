@@ -28,64 +28,6 @@ getFontFlagString (FontFlag flag)
 		"undefined-font-flag";
 }
 
-uint_t
-parseFontFlagString (
-	const char* string,
-	const char** end
-	)
-{
-	if (!string)
-	{
-		if (end)
-			*end = NULL;
-
-		return 0;
-	}
-
-	uint_t flags = 0;
-
-	const char* p = string;
-
-	for (;;)
-	{
-		int mod = 0;
-
-		switch (*p)
-		{
-		case 'b': 
-		case 'B':
-			mod = FontFlag_Bold;
-			break;
-
-		case 'i': 
-		case 'I':
-			mod = FontFlag_Italic;
-			break;
-
-		case 'u': 
-		case 'U':
-			mod = FontFlag_Underline;
-			break;
-
-		case 's': 
-		case 'S':
-			mod = FontFlag_Strikeout;
-			break;
-		}
-
-		if (!mod)
-			break;
-
-		flags |= mod;
-		p++;
-	}
-
-	if (end)
-		*end = p;
-
-	return flags;
-}
-
 //.............................................................................
 
 void

@@ -9,6 +9,7 @@
 
 set (
 	GUI_H_LIST
+	${AXL_INC_DIR}/axl_gui_AnsiAttrParser.h
 	${AXL_INC_DIR}/axl_gui_Canvas.h
 	${AXL_INC_DIR}/axl_gui_Color.h
 	${AXL_INC_DIR}/axl_gui_ColorAttr.h
@@ -28,15 +29,14 @@ set (
 
 set (
 	GUI_CPP_LIST
+	axl_gui_AnsiAttrParser.cpp
 	axl_gui_Color.cpp
-	axl_gui_ColorAttr.cpp
 	axl_gui_Engine.cpp
 	axl_gui_FontDesc.cpp
 	axl_gui_FontDesc.cpp
 	axl_gui_HyperlinkAnchorArray.cpp
 	axl_gui_HyperText.cpp
 	axl_gui_ImageDesc.cpp
-	axl_gui_TextAttr.cpp
 	axl_gui_TextAttrAnchorArray.cpp
 	axl_gui_TextPaint.cpp
 	axl_gui_Widget.cpp

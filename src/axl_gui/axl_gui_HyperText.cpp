@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_gui_HyperText.h"
+#include "axl_gui_AnsiAttrParser.h"
 
 namespace axl {
 namespace gui {
@@ -57,6 +58,15 @@ HyperText::appendPlainText (
 	return m_text.append (c, count);
 }
 
+void
+parseAnsiAttr (
+	TextAttr* attr,
+	const char* p, 
+	size_t length
+	)
+{
+}
+
 size_t
 HyperText::appendHyperText (
 	const TextAttr& baseAttr,
@@ -65,6 +75,7 @@ HyperText::appendHyperText (
 	)
 {
 	TextAttr attr = baseAttr;
+	AnsiAttrParser attrParser;
 
 	const char* p = text;
 	const char* end;
@@ -80,49 +91,83 @@ HyperText::appendHyperText (
 
 	for (;;)
 	{
-		const char* tag;
-		const char* tagEnd;
-		const char* param;
-
-		tag = strchr_e (p, end, '<');
-		if (!tag)
+		const char* esc = strchr_e (p, end, 0x1b);
+		if (!esc)
 		{
 			m_text.append (p, end - p);
 			break;
 		}
 
-		m_text.append (p, tag - p);
+		m_text.append (p, esc - p);
+		p = esc + 1;
 
-		tagEnd = strchr_e (tag + 1, end, '>');
-		if (!tagEnd)
+		if (p + 1 >= end)
 			break;
 
-		length = m_text.getLength ();
-		m_attrArray.setAttr (lastLength, length, attr);
-		lastLength = length;
+		if (*p != '[')
+			continue;
 
-		param = strchr_e (tag + 1, tagEnd, '=');
-		if (param)
-		{
-			attr.parse (tag + 1);
-			m_hyperlinkArray.openHyperlink (length, param + 1, tagEnd - param - 1);
-		}
-		else if (tag[1] == '\b') // backspace
-		{
-			size_t backLength = tag[2] != '*' ? (size_t) strtoul (tag + 2, NULL, 10) : -1;
-			backspace (backLength ? backLength : 1);
-		}
-		else 
-		{
-			attr.parse (tag + 1);
-			m_hyperlinkArray.closeHyperlink (length);
-		}
+		p++;
 
-		p = tagEnd + 1;
+		if (*p == '^') // hyperlink
+		{
+			p++;
+
+			const char* arg = p;
+			while (p < end && *p != 0x1b)
+				p++;
+
+			if (p + 1 >= end)
+				break;
+
+			const char* argEnd = p;
+
+			if (p [1] == '\\')
+				p += 2;
+
+			if (argEnd > arg)
+				m_hyperlinkArray.openHyperlink (m_text.getLength (), arg, argEnd - arg);
+			else
+				m_hyperlinkArray.closeHyperlink (m_text.getLength ());	
+		}
+		else
+		{
+			const char* arg = p;
+			while (p < end && !isalpha (*p))
+				p++;
+
+			const char* argEnd = p;
+			if (p >= end)
+				break;
+
+			switch (*p)
+			{
+			case 'm':
+				m_attrArray.setAttr (lastLength, m_text.getLength (), attr);
+				lastLength = length;
+				attrParser.parse (
+					&attr,
+					baseAttr, 
+					arg, 
+					argEnd - arg
+					);
+				break;
+
+			case 'D':				
+				backspace (argEnd == arg ? 1 : atoi (arg));
+				break;
+
+			case 'K':
+			case 'J':
+				clear ();
+				break;
+			}
+
+			p++;
+		}
 	}
 
-	length = m_text.getLength ();
-	m_attrArray.setAttr (lastLength, length, attr);
+	m_attrArray.setAttr (lastLength, m_text.getLength (), attr);
 	return length;
 }
 

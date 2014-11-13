@@ -51,12 +51,6 @@ overlayFontFlags (
 	return (overlayFontFlags & FontFlag_Undefined) ? baseFontFlags : overlayFontFlags;
 }
 
-uint_t
-parseFontFlagString (
-	const char* string,
-	const char** end = NULL
-	);
-
 //.............................................................................
 
 struct FontDesc

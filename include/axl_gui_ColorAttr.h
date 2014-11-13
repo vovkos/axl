@@ -31,11 +31,6 @@ struct ColorAttr
 		setup (foreColor, backColor);
 	}
 
-	ColorAttr (const char* string)
-	{
-		parse (string);
-	}
-
 	int 
 	cmp (const ColorAttr& attr)
 	{
@@ -72,28 +67,6 @@ struct ColorAttr
 	overlay (const ColorAttr& overlayAttr)
 	{
 		overlay (*this, overlayAttr);
-	}
-
-	void
-	parse (
-		const char* string,
-		const char** end = NULL
-		);
-
-	void
-	parseOverlay (
-		const ColorAttr& baseAttr,
-		const char* string,
-		const char** end = NULL
-		);
-
-	void
-	parseOverlay (
-		const char* string,
-		const char** end = NULL
-		)
-	{
-		parseOverlay (*this, string, end);
 	}
 };
 
