@@ -742,6 +742,38 @@ QtEngine::redrawWidget (
 }
 
 bool
+QtEngine::scrollWidget (
+	WidgetDriver* widgetDriver,
+	int dx, 
+	int dy
+	)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+
+	qtWidget->viewport ()->scroll (dx, dy);
+	return true;
+}
+
+bool
+QtEngine::scrollWidgetRect (
+	WidgetDriver* widgetDriver,
+	int left, 
+	int top,
+	int right,
+	int bottom,
+	int dx, 
+	int dy
+	)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+
+	qtWidget->viewport ()->scroll (dx, dy, QRect (left, top, right - left, bottom - top));
+	return true;
+}
+
+bool
 QtEngine::setWidgetCursor (
 	WidgetDriver* widgetDriver,
 	Cursor* cursor

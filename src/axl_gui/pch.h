@@ -1,6 +1,7 @@
 #pragma once
 
 #include "axl_g_Pch.h"
+#include "axl_dbg_Trace.h"
 
 #ifdef _AXL_GUI_QT
 #	include <QAbstractScrollArea>

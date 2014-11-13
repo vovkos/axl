@@ -413,6 +413,26 @@ public:
 
 	virtual
 	bool
+	scrollWidget (
+		WidgetDriver* widgetDriver,
+		int dx, 
+		int dy
+		) = 0;
+
+	virtual
+	bool
+	scrollWidgetRect (
+		WidgetDriver* widgetDriver,
+		int left, 
+		int top,
+		int right,
+		int bottom,
+		int dx, 
+		int dy
+		) = 0;
+
+	virtual
+	bool
 	setWidgetCursor (
 		WidgetDriver* widgetDriver,
 		Cursor* cursor

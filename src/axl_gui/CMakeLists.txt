@@ -23,7 +23,7 @@ set (
 	${AXL_INC_DIR}/axl_gui_ImageDesc.h
 	${AXL_INC_DIR}/axl_gui_TextAttr.h
 	${AXL_INC_DIR}/axl_gui_TextAttrAnchorArray.h
-	${AXL_INC_DIR}/axl_gui_TextPaint.h
+	${AXL_INC_DIR}/axl_gui_TextPainter.h
 	${AXL_INC_DIR}/axl_gui_Widget.h
 	)
 
@@ -38,7 +38,7 @@ set (
 	axl_gui_HyperText.cpp
 	axl_gui_ImageDesc.cpp
 	axl_gui_TextAttrAnchorArray.cpp
-	axl_gui_TextPaint.cpp
+	axl_gui_TextPainter.cpp
 	axl_gui_Widget.cpp
 	)
 

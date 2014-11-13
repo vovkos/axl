@@ -26,8 +26,8 @@ enum WidgetMsgCode
 	WidgetMsgCode_Close,                   // WidgetMsg
 	WidgetMsgCode_SetFocus,                // WidgetMsg
 	WidgetMsgCode_KillFocus,               // WidgetMsg
-	WidgetMsgCode_Size,                    // WidgetMsgParamT <uint_t OrientationMask> 
-	WidgetMsgCode_Scroll,                  // WidgetMsgParamT <uint_t OrientationMask>
+	WidgetMsgCode_Size,                    // WidgetMsgParam <uint_t OrientationMask> 
+	WidgetMsgCode_Scroll,                  // WidgetMsgParam <uint_t OrientationMask>
 	WidgetMsgCode_Paint,                   // WidgetPaintMsg
 
 	WidgetMsgCode_MouseMove,               // WidgetMouseMsg
@@ -95,21 +95,14 @@ struct WidgetPaintMsg: WidgetMsg
 {
 	Canvas* m_canvas;
 	Rect m_rect;
+	Rect m_region [4];
+	size_t m_regionRectCount;
 
-	WidgetPaintMsg ()
+	WidgetPaintMsg (Canvas* canvas)
 	{		
 		m_msgCode = WidgetMsgCode_Paint;
-		m_canvas = NULL;
-	}
-
-	WidgetPaintMsg (
-		Canvas* canvas,
-		const Rect& rect
-		)
-	{
-		m_msgCode = WidgetMsgCode_Paint;
 		m_canvas = canvas;
-		m_rect = rect;
+		m_regionRectCount = 0;
 	}
 };
 
@@ -417,6 +410,47 @@ public:
 	redraw ()
 	{
 		return redraw (0, 0, 0, 0);
+	}
+
+	bool
+	scroll (
+		int dx, 
+		int dy
+		)
+	{
+		return m_engine->scrollWidget (this, dx, dy);
+	}
+
+	bool
+	scrollRect (
+		int left, 
+		int top, 
+		int right, 
+		int bottom,
+		int dx, 
+		int dy
+		)
+	{
+		return m_engine->scrollWidgetRect (this, left, top, right, bottom, dx, dy);
+	}
+
+	bool
+	scrollRect (
+		const Rect& rect, 
+		int dx, 
+		int dy
+		)
+	{
+		return scrollRect (rect.m_left, rect.m_top, rect.m_right, rect.m_bottom, dx, dy);
+	}
+
+	bool
+	scrollRect (
+		int dx, 
+		int dy
+		)
+	{
+		return scrollRect (0, 0, m_size.m_width, m_size.m_height, dx, dy);
 	}
 
 	// focus

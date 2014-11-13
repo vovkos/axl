@@ -199,15 +199,37 @@ QtWidgetBase::paintEvent (QPaintEvent* e)
 	canvas.m_colorAttr = m_widgetDriver->getColorAttr ();
 	canvas.m_palette = m_widgetDriver->getPalette ();
 
-	QRect qtRect = e->rect ();
-	Rect rect (
-		qtRect.x (), 
-		qtRect.y (), 
-		qtRect.x () + qtRect.width (), 
-		qtRect.y () + qtRect.height ()
-		);
+	QRect rect = e->rect ();
+	QRegion region = e->region ();
 
-	WidgetPaintMsg msg (&canvas, rect);
+	WidgetPaintMsg msg (&canvas);
+	msg.m_rect.m_left   = rect.x ();
+	msg.m_rect.m_top    = rect.y (); 
+	msg.m_rect.m_right  = rect.x () + rect.width ();
+	msg.m_rect.m_bottom = rect.y () + rect.height ();
+
+	size_t rectCount = region.rectCount ();
+	if (rectCount > countof (msg.m_region))
+	{
+		msg.m_regionRectCount = 1;
+		msg.m_region [0] = msg.m_rect;
+	}
+	else
+	{
+		msg.m_regionRectCount = rectCount;
+
+		QVector <QRect> rectVector = region.rects ();
+
+		Rect* dst = msg.m_region;
+		const QRect* src = rectVector.constBegin ();
+		for (size_t i = 0; i < rectCount; i++, dst++, src++)
+		{			
+			dst->m_left   = src->x ();
+			dst->m_top    = src->y (); 
+			dst->m_right  = src->x () + src->width ();
+			dst->m_bottom = src->y () + src->height ();
+		}
+	}
 
 	bool isHandled = true;
 	m_widgetDriver->processMsg (&msg, &isHandled);	
@@ -280,8 +302,6 @@ QtWidgetBase::scrollContentsBy (
 		m_widgetDriver->m_scrollBarArray [Orientation_Horizontal].m_pos = horizontalScrollBar ()->value ();
 		mask |= 1 << Orientation_Horizontal;
 	}
-
-	// m_widgetDriver->updateScrollBars (mask); 
 
 	if (!m_widgetDriver->checkMsgMap (WidgetMsgCode_Size))
 		return;

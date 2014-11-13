@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_GUI_TEXTPAINT_H
+#define _AXL_GUI_TEXTPAINTER_H
 
 #include "axl_gui_Canvas.h"
 #include "axl_gui_TextAttrAnchorArray.h"
@@ -16,7 +16,7 @@ namespace gui {
 
 //.............................................................................
 
-class TextPaint
+class TextPainter
 {
 protected:
 	TextAttrAnchorArray m_selOverlayBuffer;
@@ -32,12 +32,12 @@ public:
 	char m_unprintableChar;
 
 public:
-	TextPaint ()
+	TextPainter ()
 	{
 		init ();
 	}
 
-	TextPaint (Canvas* canvas)
+	TextPainter (Canvas* canvas)
 	{
 		init (canvas);
 	}
@@ -51,33 +51,33 @@ public:
 	// space
 
 	int
-	paintSpace (
+	drawSpace (
 		size_t length,
 		uint_t color
 		);
 
 	int
-	paintSpace (size_t length)
+	drawSpace (size_t length)
 	{
-		return paintSpace (length, m_canvas->m_colorAttr.m_backColor);
+		return drawSpace (length, m_canvas->m_colorAttr.m_backColor);
 	}
 
 	int
-	paintSpace_p (
+	drawSpace_p (
 		int width, // in pixels
 		uint_t color
 		); 
 
 	int
-	paintSpace_p (int width) // in pixels
+	drawSpace_p (int width) // in pixels
 	{
-		return paintSpace_p (width, m_canvas->m_colorAttr.m_backColor);
+		return drawSpace_p (width, m_canvas->m_colorAttr.m_backColor);
 	}
 
 	// text
 
 	int
-	paintText (
+	drawText (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -85,30 +85,30 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintText_utf8 (textColor, backColor, fontFlags, text, length);
+		return drawText_utf8 (textColor, backColor, fontFlags, text, length);
 	}
 
 	int
-	paintText (
+	drawText (
 		const TextAttr& attr,
 		const char* text, 
 		size_t length = -1
 		)
 	{
-		return paintText_utf8 (attr, text, length);
+		return drawText_utf8 (attr, text, length);
 	}
 
 	int
-	paintText (
+	drawText (
 		const char* text, 
 		size_t length = -1
 		)
 	{
-		return paintText_utf8 (text, length);
+		return drawText_utf8 (text, length);
 	}
 
 	int
-	paintText_utf8 (
+	drawText_utf8 (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -117,13 +117,13 @@ public:
 		);
 
 	int
-	paintText_utf8 (
+	drawText_utf8 (
 		const TextAttr& attr,
 		const utf8_t* text,
 		size_t length = -1
 		)
 	{
-		return paintText_utf8 (
+		return drawText_utf8 (
 			attr.m_foreColor, 
 			attr.m_backColor, 
 			attr.m_fontFlags, 
@@ -133,12 +133,12 @@ public:
 	}
 
 	int
-	paintText_utf8 (
+	drawText_utf8 (
 		const utf8_t* text,
 		size_t length = -1
 		)
 	{
-		return paintText_utf8 (
+		return drawText_utf8 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -148,7 +148,7 @@ public:
 	}
 
 	int
-	paintText_utf32 (
+	drawText_utf32 (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -157,13 +157,13 @@ public:
 		);
 
 	int
-	paintText_utf32 (
+	drawText_utf32 (
 		const TextAttr& attr,
 		const utf32_t* text, 
 		size_t length = -1
 		)
 	{
-		return paintText_utf32 (
+		return drawText_utf32 (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags, 
@@ -173,12 +173,12 @@ public:
 	}
 
 	int
-	paintText_utf32 (
+	drawText_utf32 (
 		const utf32_t* text, 
 		size_t length = -1
 		)
 	{
-		return paintText_utf32 (
+		return drawText_utf32 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -190,7 +190,7 @@ public:
 	// hypertext
 
 	int
-	paintHyperText (
+	drawHyperText (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -198,7 +198,7 @@ public:
 		const rtl::String& text
 		)
 	{
-		return paintHyperText_utf8 (
+		return drawHyperText_utf8 (
 			textColor, 
 			backColor,
 			fontFlags,
@@ -209,28 +209,28 @@ public:
 	}
 
 	int
-	paintHyperText (
+	drawHyperText (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const char* text, 
 		size_t length = -1
 		)
 	{
-		return paintHyperText_utf8 (attr, attrArray, text, length);
+		return drawHyperText_utf8 (attr, attrArray, text, length);
 	}
 
 	int
-	paintHyperText (
+	drawHyperText (
 		const TextAttrAnchorArray* attrArray,
 		const char* text, 
 		size_t length = -1
 		)
 	{
-		return paintHyperText_utf8 (attrArray, text, length);
+		return drawHyperText_utf8 (attrArray, text, length);
 	}
 
 	int
-	paintHyperText_utf8 (
+	drawHyperText_utf8 (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -240,14 +240,14 @@ public:
 		);
 
 	int
-	paintHyperText_utf8 (
+	drawHyperText_utf8 (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const utf8_t* text, 
 		size_t length = -1
 		)
 	{
-		return paintHyperText_utf8 (
+		return drawHyperText_utf8 (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -258,13 +258,13 @@ public:
 	}
 
 	int
-	paintHyperText_utf8 (
+	drawHyperText_utf8 (
 		const TextAttrAnchorArray* attrArray,
 		const utf8_t* text, 
 		size_t length = -1
 		)
 	{
-		return paintHyperText_utf8 (
+		return drawHyperText_utf8 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -275,7 +275,7 @@ public:
 	}
 
 	int
-	paintHyperText_utf32 (
+	drawHyperText_utf32 (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -285,14 +285,14 @@ public:
 		);
 
 	int
-	paintHyperText_utf32 (
+	drawHyperText_utf32 (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const utf32_t* text, 
 		size_t length = -1
 		)
 	{
-		return paintHyperText_utf32 (
+		return drawHyperText_utf32 (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -303,13 +303,13 @@ public:
 	}
 
 	int
-	paintHyperText_utf32 (
+	drawHyperText_utf32 (
 		const TextAttrAnchorArray* attrArray,
 		const utf32_t* text, 
 		size_t length = -1
 		)
 	{
-		return paintHyperText_utf32 (
+		return drawHyperText_utf32 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -322,7 +322,7 @@ public:
 	// hypertext with selection
 
 	int
-	paintSelHyperText (
+	drawSelHyperText (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -334,7 +334,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf8 (
+		return drawSelHyperText_utf8 (
 			textColor,
 			backColor,
 			fontFlags,
@@ -348,7 +348,7 @@ public:
 	}
 
 	int
-	paintSelHyperText (
+	drawSelHyperText (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
@@ -358,7 +358,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf8 (
+		return drawSelHyperText_utf8 (
 			attr,
 			attrArray, 
 			selAttr,
@@ -370,7 +370,7 @@ public:
 	}
 
 	int
-	paintSelHyperText (
+	drawSelHyperText (
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
 		size_t selStart, 
@@ -379,7 +379,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf8 (
+		return drawSelHyperText_utf8 (
 			attrArray, 
 			selAttr,
 			selStart, 
@@ -390,7 +390,7 @@ public:
 	}
 
 	int
-	paintSelHyperText_utf8 (
+	drawSelHyperText_utf8 (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -403,7 +403,7 @@ public:
 		);
 
 	int
-	paintSelHyperText_utf8 (
+	drawSelHyperText_utf8 (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
@@ -413,7 +413,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf8 (
+		return drawSelHyperText_utf8 (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -427,7 +427,7 @@ public:
 	}
 
 	int
-	paintSelHyperText_utf8 (
+	drawSelHyperText_utf8 (
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
 		size_t selStart, 
@@ -436,7 +436,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf8 (
+		return drawSelHyperText_utf8 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -450,7 +450,7 @@ public:
 	}
 
 	int
-	paintSelHyperText_utf32 (
+	drawSelHyperText_utf32 (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -463,7 +463,7 @@ public:
 		);
 
 	int
-	paintSelHyperText_utf32 (
+	drawSelHyperText_utf32 (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
@@ -473,7 +473,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf32 (
+		return drawSelHyperText_utf32 (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -487,7 +487,7 @@ public:
 	}
 
 	int
-	paintSelHyperText_utf32 (
+	drawSelHyperText_utf32 (
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
 		size_t selStart, 
@@ -496,7 +496,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return paintSelHyperText_utf32 (
+		return drawSelHyperText_utf32 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -512,7 +512,7 @@ public:
 	// bin hex
 
 	int
-	paintBinHex (
+	drawBinHex (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -522,14 +522,14 @@ public:
 		);
 
 	int
-	paintBinHex (
+	drawBinHex (
 		const TextAttr& attr,
 		size_t halfBitOffset,
 		const void* p,	
 		size_t size
 		)
 	{
-		return paintBinHex (
+		return drawBinHex (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -540,13 +540,13 @@ public:
 	}
 
 	int
-	paintBinHex (
+	drawBinHex (
 		size_t halfBitOffset,
 		const void* p,	
 		size_t size
 		)
 	{
-		return paintBinHex (
+		return drawBinHex (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -557,7 +557,7 @@ public:
 	}
 
 	int
-	paintHyperBinHex (
+	drawHyperBinHex (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -568,7 +568,7 @@ public:
 		);
 
 	int
-	paintHyperBinHex (
+	drawHyperBinHex (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		size_t halfBitOffset,
@@ -576,7 +576,7 @@ public:
 		size_t size
 		)
 	{
-		return paintHyperBinHex (
+		return drawHyperBinHex (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -588,14 +588,14 @@ public:
 	}
 
 	int
-	paintHyperBinHex (
+	drawHyperBinHex (
 		const TextAttrAnchorArray* attrArray,
 		size_t halfBitOffset,
 		const void* p, 
 		size_t size
 		)
 	{
-		return paintHyperBinHex (
+		return drawHyperBinHex (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -607,7 +607,7 @@ public:
 	}
 
 	int
-	paintSelHyperBinHex (
+	drawSelHyperBinHex (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -621,7 +621,7 @@ public:
 		);
 
 	int
-	paintSelHyperBinHex (
+	drawSelHyperBinHex (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
@@ -632,7 +632,7 @@ public:
 		size_t size
 		)
 	{
-		return paintSelHyperBinHex (
+		return drawSelHyperBinHex (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -647,7 +647,7 @@ public:
 	}
 
 	int
-	paintSelHyperBinHex (
+	drawSelHyperBinHex (
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
 		size_t selStart, 
@@ -657,7 +657,7 @@ public:
 		size_t size
 		)
 	{
-		return paintSelHyperBinHex (
+		return drawSelHyperBinHex (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -674,7 +674,7 @@ public:
 	// bin text
 
 	int
-	paintBinText (
+	drawBinText (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -684,14 +684,14 @@ public:
 		);
 
 	int
-	paintBinText (
+	drawBinText (
 		const TextAttr& attr,
 		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
 		)
 	{
-		return paintBinText (
+		return drawBinText (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -702,13 +702,13 @@ public:
 	}
 
 	int
-	paintBinText (
+	drawBinText (
 		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
 		)
 	{
-		paintBinText (
+		drawBinText (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -719,7 +719,7 @@ public:
 	}
 
 	int
-	paintHyperBinText (
+	drawHyperBinText (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -730,7 +730,7 @@ public:
 		);
 
 	int
-	paintHyperBinText (
+	drawHyperBinText (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
@@ -738,7 +738,7 @@ public:
 		size_t size
 		)
 	{
-		return paintHyperBinText (
+		return drawHyperBinText (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -750,14 +750,14 @@ public:
 	}
 
 	int
-	paintHyperBinText (
+	drawHyperBinText (
 		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
 		const void* p, 
 		size_t size
 		)
 	{
-		return paintHyperBinText (
+		return drawHyperBinText (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
@@ -769,7 +769,7 @@ public:
 	}
 
 	int
-	paintSelHyperBinText (
+	drawSelHyperBinText (
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -783,7 +783,7 @@ public:
 		);
 
 	int
-	paintSelHyperBinText (
+	drawSelHyperBinText (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
@@ -794,7 +794,7 @@ public:
 		size_t size
 		)
 	{
-		return paintSelHyperBinText (
+		return drawSelHyperBinText (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -809,7 +809,7 @@ public:
 	}
 
 	int
-	paintSelHyperBinText (
+	drawSelHyperBinText (
 		const TextAttrAnchorArray* attrArray, 
 		const TextAttr& selAttr,
 		size_t selStart, 
@@ -819,7 +819,7 @@ public:
 		size_t size
 		)
 	{
-		return paintSelHyperBinText (
+		return drawSelHyperBinText (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 

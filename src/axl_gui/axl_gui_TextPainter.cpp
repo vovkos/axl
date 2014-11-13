@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_gui_TextPaint.h"
+#include "axl_gui_TextPainter.h"
 #include "axl_gui_Font.h"
 #include "axl_enc_HexEncoding.h"
 
@@ -9,7 +9,7 @@ namespace gui {
 //.............................................................................
 
 void
-TextPaint::init (Canvas* canvas)
+TextPainter::init (Canvas* canvas)
 {
 	m_canvas = canvas;
 	m_top = 0;
@@ -21,7 +21,7 @@ TextPaint::init (Canvas* canvas)
 // space
 
 int 
-TextPaint::paintSpace_p (
+TextPainter::drawSpace_p (
 	int width,
 	uint_t color
 	)
@@ -39,19 +39,19 @@ TextPaint::paintSpace_p (
 }
 
 int 
-TextPaint::paintSpace (
+TextPainter::drawSpace (
 	size_t length,
 	uint_t color
 	)
 {
 	Size size = m_canvas->m_font->calcTextSize (" ", 1);
-	return paintSpace_p (length * size.m_width, color);
+	return drawSpace_p (length * size.m_width, color);
 }
 
 // text
 
 int
-TextPaint::paintText_utf8 (
+TextPainter::drawText_utf8 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
@@ -88,7 +88,7 @@ TextPaint::paintText_utf8 (
 }
 
 int
-TextPaint::paintText_utf32 (
+TextPainter::drawText_utf32 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
@@ -127,7 +127,7 @@ TextPaint::paintText_utf32 (
 // hyper text
 
 int
-TextPaint::paintHyperText_utf8 (
+TextPainter::drawHyperText_utf8 (
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
@@ -137,7 +137,7 @@ TextPaint::paintHyperText_utf8 (
 	)
 {
 	if (!attrArray || attrArray->isEmpty ())
-		return paintText_utf8 (textColor0, backColor0, fontFlags0, text, length);
+		return drawText_utf8 (textColor0, backColor0, fontFlags0, text, length);
 
 	if (length == -1)
 		length = strlen (text);
@@ -165,9 +165,9 @@ TextPaint::paintHyperText_utf8 (
 		size_t leftover = length - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
-			return paintText_utf8 (attr, p, leftover);
+			return drawText_utf8 (attr, p, leftover);
 
-		paintText_utf8 (attr, p, chunk);
+		drawText_utf8 (attr, p, chunk);
 
 		attr.overlay (attr0, nextAttr->m_attr);
 		nextAttr++;
@@ -178,14 +178,14 @@ TextPaint::paintHyperText_utf8 (
 	if (offset < length)
 	{
 		size_t leftover = length - offset;
-		paintText_utf8 (attr, p, leftover);
+		drawText_utf8 (attr, p, leftover);
 	}
 
 	return m_point.m_x;
 }
 
 int
-TextPaint::paintHyperText_utf32 (
+TextPainter::drawHyperText_utf32 (
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
@@ -195,7 +195,7 @@ TextPaint::paintHyperText_utf32 (
 	)
 {
 	if (!attrArray || attrArray->isEmpty ())
-		return paintText_utf32 (textColor0, backColor0, fontFlags0, text, length);
+		return drawText_utf32 (textColor0, backColor0, fontFlags0, text, length);
 
 	if (length == -1)
 		length = rtl::StringDetails_utf32::calcLength (text);
@@ -223,9 +223,9 @@ TextPaint::paintHyperText_utf32 (
 		size_t leftover = length - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
-			return paintText_utf32 (attr, p, leftover);
+			return drawText_utf32 (attr, p, leftover);
 
-		paintText_utf32 (attr, p, chunk);
+		drawText_utf32 (attr, p, chunk);
 
 		attr.overlay (attr0, nextAttr->m_attr);
 		nextAttr++;
@@ -236,14 +236,14 @@ TextPaint::paintHyperText_utf32 (
 	if (offset < length)
 	{
 		size_t leftover = length - offset;
-		paintText_utf32 (attr, p, leftover);
+		drawText_utf32 (attr, p, leftover);
 	}
 
 	return m_point.m_x;
 }
 
 int
-TextPaint::paintSelHyperText_utf8 (
+TextPainter::drawSelHyperText_utf8 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
@@ -256,7 +256,7 @@ TextPaint::paintSelHyperText_utf8 (
 	)
 {
 	if (selStart >= selEnd) 
-		return paintHyperText_utf8 (textColor, backColor, fontFlags, attrArray, text, length);
+		return drawHyperText_utf8 (textColor, backColor, fontFlags, attrArray, text, length);
 
 	if (attrArray)
 		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
@@ -264,11 +264,11 @@ TextPaint::paintSelHyperText_utf8 (
 		m_selOverlayBuffer.clear ();
 
 	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
-	return paintHyperText_utf8 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
+	return drawHyperText_utf8 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
 }
 
 int
-TextPaint::paintSelHyperText_utf32 (
+TextPainter::drawSelHyperText_utf32 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
@@ -281,7 +281,7 @@ TextPaint::paintSelHyperText_utf32 (
 	)
 {
 	if (selStart >= selEnd) 
-		return paintHyperText_utf32 (textColor, backColor, fontFlags, attrArray, text, length);
+		return drawHyperText_utf32 (textColor, backColor, fontFlags, attrArray, text, length);
 
 	if (attrArray)
 		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
@@ -289,13 +289,13 @@ TextPaint::paintSelHyperText_utf32 (
 		m_selOverlayBuffer.clear ();
 
 	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
-	return paintHyperText_utf32 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
+	return drawHyperText_utf32 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
 }
 
 // bin hex
 
 int
-TextPaint::paintBinHex (
+TextPainter::drawBinHex (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
@@ -321,7 +321,7 @@ TextPaint::paintBinHex (
 		m_stringBuffer.getBuffer () [j] = ' ';
 	}
 	
-	return paintText_utf8 (
+	return drawText_utf8 (
 		textColor,
 		backColor,
 		fontFlags,
@@ -331,7 +331,7 @@ TextPaint::paintBinHex (
 }
 
 int
-TextPaint::paintHyperBinHex (
+TextPainter::drawHyperBinHex (
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
@@ -342,7 +342,7 @@ TextPaint::paintHyperBinHex (
 	)
 {
 	if (!attrArray)
-		return paintBinHex (textColor0, backColor0, fontFlags0, halfBitOffset, p0, size);
+		return drawBinHex (textColor0, backColor0, fontFlags0, halfBitOffset, p0, size);
 
 	if (!size)
 		return m_point.m_x;
@@ -367,9 +367,9 @@ TextPaint::paintHyperBinHex (
 		size_t leftover = size - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
-			return paintBinHex (attr, halfBitOffset, p, leftover);
+			return drawBinHex (attr, halfBitOffset, p, leftover);
 
-		paintBinHex (attr, halfBitOffset, p, chunk);
+		drawBinHex (attr, halfBitOffset, p, chunk);
 
 		attr.overlay (attr0, nextAttr->m_attr);
 		nextAttr++;
@@ -381,14 +381,14 @@ TextPaint::paintHyperBinHex (
 	if (offset < size)
 	{
 		size_t leftover = size - offset;
-		paintBinHex (attr, halfBitOffset, p, leftover);
+		drawBinHex (attr, halfBitOffset, p, leftover);
 	}
 
 	return m_point.m_x;
 }
 
 int
-TextPaint::paintSelHyperBinHex (
+TextPainter::drawSelHyperBinHex (
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
@@ -402,7 +402,7 @@ TextPaint::paintSelHyperBinHex (
 	)
 {
 	if (selStart >= selEnd) 
-		return paintHyperBinHex (textColor0, backColor0, fontFlags0, attrArray, halfBitOffset, p, size);
+		return drawHyperBinHex (textColor0, backColor0, fontFlags0, attrArray, halfBitOffset, p, size);
 
 	if (attrArray)
 		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
@@ -410,13 +410,13 @@ TextPaint::paintSelHyperBinHex (
 		m_selOverlayBuffer.clear ();
 
 	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
-	return paintHyperBinHex (textColor0, backColor0, fontFlags0, &m_selOverlayBuffer, halfBitOffset, p, size);
+	return drawHyperBinHex (textColor0, backColor0, fontFlags0, &m_selOverlayBuffer, halfBitOffset, p, size);
 }
 
 // bin text
 
 void
-TextPaint::buildBinTextBuffer (
+TextPainter::buildBinTextBuffer (
 	enc::CharCodec* codec,
 	const void* p0,
 	size_t size
@@ -475,7 +475,7 @@ TextPaint::buildBinTextBuffer (
 }
 
 int
-TextPaint::paintBinText (
+TextPainter::drawBinText (
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
@@ -488,11 +488,11 @@ TextPaint::paintBinText (
 		return m_point.m_x;
 
 	buildBinTextBuffer (codec, p, size);
-	return paintText_utf32 (m_binTextBuffer, size);
+	return drawText_utf32 (m_binTextBuffer, size);
 }
 
 int
-TextPaint::paintHyperBinText (
+TextPainter::drawHyperBinText (
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
@@ -506,7 +506,7 @@ TextPaint::paintHyperBinText (
 		return m_point.m_x;
 
 	buildBinTextBuffer (codec, p, size);
-	return paintHyperText_utf32 (
+	return drawHyperText_utf32 (
 		textColor0,
 		backColor0,
 		fontFlags0,
@@ -517,7 +517,7 @@ TextPaint::paintHyperBinText (
 }
 
 int
-TextPaint::paintSelHyperBinText (
+TextPainter::drawSelHyperBinText (
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
@@ -534,7 +534,7 @@ TextPaint::paintSelHyperBinText (
 		return m_point.m_x;
 
 	buildBinTextBuffer (codec, p, size);
-	return paintSelHyperText_utf32 (
+	return drawSelHyperText_utf32 (
 		textColor0,
 		backColor0,
 		fontFlags0,
