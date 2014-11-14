@@ -95,6 +95,27 @@ AnsiAttrParser::parse (
 	return attrCount;
 }
 
+void
+AnsiAttrParser::setFontFlag (uint_t flag)
+{
+	if (m_targetAttr->m_fontFlags & FontFlag_Undefined)
+		m_targetAttr->m_fontFlags = flag;
+	else
+		m_targetAttr->m_fontFlags |= flag;
+}
+
+void
+AnsiAttrParser::clearFontFlag (uint_t flag)
+{
+	if (m_targetAttr->m_fontFlags & FontFlag_Undefined)
+		return;
+
+	if (m_baseAttr.m_fontFlags & FontFlag_Undefined)
+		m_targetAttr->m_fontFlags &= ~flag;
+	else
+		m_targetAttr->m_fontFlags |= (m_baseAttr.m_fontFlags & flag);
+}
+
 //.............................................................................
 
 } // namespace gui

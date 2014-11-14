@@ -89,6 +89,26 @@ HyperlinkAnchorArray::openHyperlink (
 	return anchor;
 }
 
+HyperlinkAnchor* 
+HyperlinkAnchorArray::closeHyperlink (
+	size_t offset,
+	bool closeEmpty
+	)
+{
+	if (m_list.isEmpty ())		
+		return NULL;
+
+	HyperlinkAnchor* tail = *m_list.getTail ();
+	if (tail->m_hyperlink.isEmpty ())
+		return NULL;
+
+	if (!closeEmpty && tail->m_offset == offset)
+		return NULL;
+
+	return openHyperlink (offset, NULL, 0);
+}
+
+
 //.............................................................................
 
 } // namespace gui

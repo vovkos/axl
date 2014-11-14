@@ -97,6 +97,11 @@ public:
 		const TextAttr& attr
 		);
 
+#ifdef _DEBUG
+	void
+	trace ();
+#endif
+
 protected:
 	size_t
 	findAnchor (size_t offset) const;

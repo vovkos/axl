@@ -23,8 +23,8 @@ protected:
 	(AnsiAttrParser::*SetAttrProc) (uint_t);
 
 protected:
-	gui::TextAttr* m_targetAttr;
-	gui::TextAttr m_baseAttr;
+	TextAttr* m_targetAttr;
+	TextAttr m_baseAttr;
 
 public:
 	AnsiAttrParser ()
@@ -48,39 +48,45 @@ protected:
 	}
 
 	void
+	setFontFlag (uint_t flag);
+
+	void
+	clearFontFlag (uint_t flag);
+
+	void
 	setBoldOn (uint_t)
 	{
-		m_targetAttr->m_fontFlags |= gui::FontFlag_Bold;
+		setFontFlag (FontFlag_Bold);
 	}
 
 	void
 	setBoldOff (uint_t)
 	{
-		m_targetAttr->m_fontFlags = (m_baseAttr.m_fontFlags & gui::FontFlag_Bold);
+		clearFontFlag (FontFlag_Bold);
 	}
 
 	void
 	setItalicOn (uint_t)
 	{
-		m_targetAttr->m_fontFlags |= gui::FontFlag_Italic;
+		setFontFlag (FontFlag_Italic);
 	}
 
 	void
 	setItalicOff (uint_t)
 	{
-		m_targetAttr->m_fontFlags = (m_baseAttr.m_fontFlags & gui::FontFlag_Italic);
+		clearFontFlag (FontFlag_Italic);
 	}
 
 	void
 	setUnderlineOn (uint_t)
 	{
-		m_targetAttr->m_fontFlags |= gui::FontFlag_Underline;
+		setFontFlag (FontFlag_Underline);
 	}
 
 	void
 	setUnderlineOff (uint_t)
 	{
-		m_targetAttr->m_fontFlags = (m_baseAttr.m_fontFlags & gui::FontFlag_Underline);
+		clearFontFlag (FontFlag_Underline);
 	}
 
 	void

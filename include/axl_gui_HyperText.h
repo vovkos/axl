@@ -131,12 +131,13 @@ public:
 	calcHyperlinkXMap (Font* font);
 
 	HyperlinkAnchor* 
-	findHyperlinkByX (int x) const ;
+	findHyperlinkByX (int x) const;
 
-	HyperlinkAnchor* 
+	HyperlinkAnchor*
 	findHyperlinkByOffset (size_t offset) const 
 	{
-		return m_hyperlinkArray.find (offset);
+		HyperlinkAnchor* anchor = m_hyperlinkArray.find (offset);
+		return anchor && !anchor->m_hyperlink.isEmpty () ? anchor : NULL;
 	}
 };
 

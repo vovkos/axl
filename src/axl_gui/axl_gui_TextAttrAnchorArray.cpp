@@ -7,20 +7,23 @@ namespace gui {
 
 //.............................................................................
 
+
+#ifdef _DEBUG
+
 void
-traceAttrArray (const TextAttrAnchorArray& array)
+TextAttrAnchorArray::trace ()
 {
-	size_t count = array.getCount ();
+	size_t count = getCount ();
 	dbg::trace ("--- CTextAttrAnchorArray {%d}---\n", count);
 
 	for (size_t i = 0; i < count; i++)
 	{
-		const TextAttrAnchor* anchor = &(array [i]);
+		const TextAttrAnchor* anchor = &(m_array [i]);
 		dbg::trace ("[%d] ofs:%02x fc:%x\n", i, anchor->m_offset, anchor->m_attr.m_foreColor);
 	}
 }
 
-//.............................................................................
+#endif
 
 size_t
 TextAttrAnchorArray::findAnchor (size_t offset) const
@@ -175,7 +178,6 @@ TextAttrAnchorArray::setAttr (
 		m_array [i].m_attr.overlay (attr);
 
 	normalize (startIdx, endIdx);
-	// TraceAttrArray (*this);
 }
 
 //.............................................................................

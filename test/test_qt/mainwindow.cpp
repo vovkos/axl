@@ -2,6 +2,9 @@
 #include "mainwindow.h"
 #include "moc_mainwindow.cpp"
 
+#include "axl_gui_TextPainter.h"
+#include "axl_gui_HyperText.h"
+
 //.............................................................................
 
 MyWidget::MyWidget (QWidget* parent):
@@ -13,32 +16,35 @@ void
 MyWidget::paintEvent (QPaintEvent* e)
 {
 	char str [] = "abcdefghijklmnopqrstuvwxyz";
-
-	QPainter painter (this);
-
-	QSize s = size ();
-
-	painter.fillRect (0, 0, s.width (), s.height (), Qt::white);
-	painter.drawRect (0, 0, s.width () - 1, s.height () -1);
-	painter.drawText (0, 0, s.width (), s.height (), 0, str);
-
-	QFontMetrics fm (painter.font ());
-
-	int x = 0;
-
-	for (size_t i = 0; i < lengthof (str); i++)
-	{
-		QChar c = str [i];
-		int w = fm.width (c);
-		int h = fm.height ();
 	
-		painter.setPen (Qt::red);
-		painter.drawRect (x, 0, w, h);
-		painter.drawRect (x, 20, w, h);
-		painter.setPen (Qt::black);
-		painter.drawText (x, 20, s.width (), s.height (), 0, c);
-		x += w;
+	gui::HyperText hyperText;
+	hyperText.setHyperText ("abc \x1b^pizda\x1b[4mdef\x1b[m suka");
+	
+	const gui::TextAttrAnchorArray* attrArray = hyperText.getAttrArray ();
+	rtl::String text = hyperText.getText ();
+
+	const gui::HyperlinkAnchor* anchor = hyperText.findHyperlinkByOffset (1);
+
+	for (size_t i = 0; i < text.getLength (); i++)
+	{
+		anchor = hyperText.findHyperlinkByOffset (i);
+		if (anchor)
+			printf ("%d -- %s\n", i, anchor->m_hyperlink);
 	}
+
+	gui::QtCanvas canvas;
+	canvas.m_qtPainter.begin (this);
+	canvas.m_font = gui::getQtEngine ()->getStdFont (gui::StdFontKind_Monospace);
+	canvas.m_palette = gui::getQtEngine ()->getStdPalette ();
+
+	gui::TextPainter painter (&canvas);
+
+	QSize s = size ();	
+	painter.m_bottom = s.height ();
+
+	painter.drawHyperText (attrArray, text, text.getLength ());
+
+	canvas.m_qtPainter.end ();
 }
 
 //.............................................................................

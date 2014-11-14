@@ -98,16 +98,11 @@ HyperText::appendHyperText (
 			break;
 		}
 
-		m_text.append (p, esc - p);
+		size_t textLength = m_text.append (p, esc - p);
 		p = esc + 1;
 
 		if (p + 1 >= end)
 			break;
-
-		if (*p != '[')
-			continue;
-
-		p++;
 
 		if (*p == '^') // hyperlink
 		{
@@ -122,16 +117,15 @@ HyperText::appendHyperText (
 
 			const char* argEnd = p;
 
-			if (p [1] == '\\')
+			if (p [1] == '\\') // ST: string terminator
 				p += 2;
 
-			if (argEnd > arg)
-				m_hyperlinkArray.openHyperlink (m_text.getLength (), arg, argEnd - arg);
-			else
-				m_hyperlinkArray.closeHyperlink (m_text.getLength ());	
+			m_hyperlinkArray.openHyperlink (textLength, arg, argEnd - arg);
 		}
-		else
+		else if (*p == '[') // CSI
 		{
+			p++;
+
 			const char* arg = p;
 			while (p < end && !isalpha (*p))
 				p++;
@@ -143,8 +137,9 @@ HyperText::appendHyperText (
 			switch (*p)
 			{
 			case 'm':
-				m_attrArray.setAttr (lastLength, m_text.getLength (), attr);
-				lastLength = length;
+				m_hyperlinkArray.closeHyperlink (textLength);
+				m_attrArray.setAttr (lastLength, textLength, attr);
+				lastLength = textLength;
 				attrParser.parse (
 					&attr,
 					baseAttr, 
@@ -185,7 +180,10 @@ HyperText::findHyperlinkByX (int x) const
 
 		const HyperlinkXMapEntry* mapEntry = &m_hyperlinkXMap [mid];
 		if (mapEntry->m_x == x)
-			return mapEntry->m_anchor;
+		{
+			result = mapEntry->m_anchor;
+			break;
+		}
 
 		if (mapEntry->m_x < x)
 		{
@@ -198,7 +196,7 @@ HyperText::findHyperlinkByX (int x) const
 		}
 	}
 
-	return result;
+	return result && !result->m_hyperlink.isEmpty () ? result : NULL;
 }
 
 void

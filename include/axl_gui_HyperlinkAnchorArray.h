@@ -77,10 +77,10 @@ public:
 		);
 
 	HyperlinkAnchor* 
-	closeHyperlink (size_t offset)
-	{
-		return openHyperlink (offset, NULL, 0);
-	}
+	closeHyperlink (
+		size_t offset,
+		bool closeEmpty = false
+		);
 };
 
 //.............................................................................
