@@ -109,6 +109,7 @@ WidgetDriver::processMsg (
 		if (!proc)
 			break;
 
+		result = true;
 		(widget->*proc) (msg, &result);
 		if (result)
 			break;

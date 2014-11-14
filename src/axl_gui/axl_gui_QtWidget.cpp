@@ -110,7 +110,7 @@ QtWidgetBase::QtWidgetBase (
 	QAbstractScrollArea (parent)
 {
 	m_widgetDriver = widgetDriver;
-	m_mouseMoveEventFlag = false;
+	setMouseTracking (true);
 
 	connect(
 		this, &QtWidgetBase::threadMsgSignal,
@@ -139,27 +139,6 @@ QtWidgetBase::threadMsgSlot (WidgetThreadMsg* msg)
 	bool isHandled = true;
 	m_widgetDriver->processMsg (msg, &isHandled);
 	AXL_MEM_DELETE (msg);
-}
-
-void 
-QtWidgetBase::mouseMoveEvent (QMouseEvent* e)
-{
-	if (!m_mouseMoveEventFlag)
-	{	
-		Cursor* cursor = m_widgetDriver->getCursor ();
-		if (cursor)
-		{
-			setCursor (((QtCursor*) cursor)->m_qtCursor);
-
-			QCursor arrowCurosr (Qt::ArrowCursor);
-			horizontalScrollBar ()->setCursor (arrowCurosr);
-			verticalScrollBar ()->setCursor (arrowCurosr);
-		}
-
-		m_mouseMoveEventFlag = true;
-	}
-
-	mouseEventImpl (e, WidgetMsgCode_MouseMove);
 }
 
 void

@@ -100,14 +100,14 @@ protected:
 	setTextColor (uint_t color)
 	{
 		ASSERT (color >= 30 && color < 38);
-		m_targetAttr->m_foreColor = StdColor_AnsiBlack + (ColorFlag_Index | (color - 30));
+		m_targetAttr->m_foreColor = StdPalColor_AnsiBlack + color - 30;
 	}
 
 	void
 	setBrightTextColor (uint_t color)
 	{
 		ASSERT (color >= 90 && color < 98);
-		m_targetAttr->m_foreColor = StdColor_AnsiBrightBlack + (ColorFlag_Index | (color - 90));
+		m_targetAttr->m_foreColor = StdPalColor_AnsiBrightBlack + color - 90;
 	}
 
 	void
@@ -120,14 +120,14 @@ protected:
 	setBackColor (uint_t color)
 	{
 		ASSERT (color >= 40 && color < 48);
-		m_targetAttr->m_backColor = StdColor_AnsiBlack + (ColorFlag_Index | (color - 40));
+		m_targetAttr->m_backColor = StdPalColor_AnsiBlack + color - 40;
 	}
 
 	void
 	setBrightBackColor (uint_t color)
 	{
 		ASSERT (color >= 100 && color < 108);
-		m_targetAttr->m_backColor = StdColor_AnsiBrightBlack + (ColorFlag_Index | (color - 100));
+		m_targetAttr->m_backColor = StdPalColor_AnsiBrightBlack + color - 100;
 	}
 
 	void

@@ -91,15 +91,21 @@ HyperText::appendHyperText (
 
 	for (;;)
 	{
-		const char* esc = strchr_e (p, end, 0x1b);
-		if (!esc)
-		{
-			m_text.append (p, end - p);
-			break;
-		}
+		const char* token = p;
+		while (token < end && *token != 0x1b && *token != '\n')	
+			token++;
 
-		size_t textLength = m_text.append (p, esc - p);
-		p = esc + 1;
+		size_t textLength = m_text.append (p, token - p);
+		p = token + 1;
+
+		if (*token == '\n') // new line closes hyperlink and resets attributes
+		{
+			m_hyperlinkArray.closeHyperlink (textLength);
+			m_attrArray.setAttr (lastLength, textLength, attr);
+			lastLength = m_text.append ('\n');
+			attr = baseAttr;
+			continue;
+		}
 
 		if (p + 1 >= end)
 			break;

@@ -20,7 +20,6 @@ class QtWidgetBase: public QAbstractScrollArea
 
 protected:
 	WidgetDriver* m_widgetDriver;
-	bool m_mouseMoveEventFlag;
 
 public:
 	QtWidgetBase (
@@ -80,7 +79,10 @@ protected:
 
 	virtual
 	void
-	mouseMoveEvent (QMouseEvent* e);
+	mouseMoveEvent (QMouseEvent* e)
+	{
+		mouseEventImpl (e, WidgetMsgCode_MouseMove);
+	}
 
 	virtual
 	void

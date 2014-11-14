@@ -95,14 +95,10 @@ HyperlinkAnchorArray::closeHyperlink (
 	bool closeEmpty
 	)
 {
-	if (m_list.isEmpty ())		
+	if (!isHyperlinkOpened ())
 		return NULL;
 
-	HyperlinkAnchor* tail = *m_list.getTail ();
-	if (tail->m_hyperlink.isEmpty ())
-		return NULL;
-
-	if (!closeEmpty && tail->m_offset == offset)
+	if (!closeEmpty && m_list.getTail ()->m_offset == offset)
 		return NULL;
 
 	return openHyperlink (offset, NULL, 0);

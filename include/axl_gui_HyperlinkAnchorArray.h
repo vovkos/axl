@@ -41,6 +41,12 @@ public:
 		return m_list.isEmpty ();
 	}
 
+	bool
+	isHyperlinkOpened () const
+	{
+		return !m_list.isEmpty () && !m_list.getTail ()->m_hyperlink.isEmpty ();
+	}
+
 	size_t 
 	getCount () const
 	{
