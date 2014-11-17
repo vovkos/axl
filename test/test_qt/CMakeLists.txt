@@ -74,7 +74,7 @@ source_group (
 
 #..............................................................................
 #
-# QtTest compiler test
+# test_qt compiler test
 #
 
 include_directories (
@@ -85,7 +85,7 @@ include_directories (
 link_directories (${AXL_LIB_DIR})
 
 add_executable (
-	QtTest
+	test_qt
 	${PCH_H}
 	${PCH_CPP}
 	${SRC_H_LIST}
@@ -94,7 +94,7 @@ add_executable (
 	)
 
 target_link_libraries (
-	QtTest
+	test_qt
 	axl_gui
 	axl_io
 	axl_core
@@ -102,27 +102,27 @@ target_link_libraries (
 
 if (UNIX)
 	target_link_libraries (
-		QtTest
+		test_qt
 		rt
 		pthread
 		)
 endif ()
 
-qt5_use_modules (QtTest Widgets)
+qt5_use_modules (test_qt Widgets)
 
 if (WIN32)
-	copy_qt_dll_files (QtTest Core Gui Widgets)
+	copy_qt_dll_files (test_qt Core Gui Widgets)
 endif ()
 
 set_pch (
-	QtTest
+	test_qt
 	${PCH_H}
 	${PCH_CPP}
 	${Qt5Core_EXECUTABLE_COMPILE_FLAGS}
 	)
 
 set_target_properties (
-	QtTest
+	test_qt
 	PROPERTIES
 	FOLDER test
 	)

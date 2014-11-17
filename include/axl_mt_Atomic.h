@@ -211,7 +211,8 @@ inline
 void 
 atomicUnlock (volatile int32_t* lock)
 {
-	*lock = 0;
+	uint32_t result = mt::atomicCmpXchg (lock, 1, 0);
+	ASSERT (result == 1);
 }
 
 //.............................................................................

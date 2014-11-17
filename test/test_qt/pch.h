@@ -41,6 +41,7 @@
 // AXL
 
 #include "axl_gui_QtEngine.h"
+#include "axl_io_SharedMemoryTransport.h"
 
 using namespace axl;
 

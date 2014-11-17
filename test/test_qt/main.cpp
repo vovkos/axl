@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "mainwindow.h"
 #include "moc_axl_gui_QtWidget.cpp"
+#include "axl_mt_Thread.h"
 
 //.............................................................................
 
@@ -152,12 +153,124 @@ int recvFd (int sock)
 }
 */
 
+static char g_transmitData [] = "abcdefghijklmnopqrstuvwxyz";
+
+class ReaderThread: public mt::ThreadImpl <ReaderThread>
+{
+protected:
+	io::SharedMemoryReader m_reader;
+
+public:
+	void threadProc ()
+	{
+		bool result = m_reader.open (
+			"/home/vladimir/test-transport",
+			"test-transport-read",
+			"test-transport-write",
+			io::SharedMemoryTransportFlag_Message
+			);
+
+		if (!result)
+		{
+			printf ("cannot open reader (%s)\n", err::getError ()->getDescription ().cc ());
+			return;
+		}
+
+		size_t offset = 0;
+
+		rtl::Array <char> buffer;
+
+		for (;;)
+		{
+			size_t size = m_reader.read (&buffer);
+			if (size == -1)
+			{
+				printf ("cannot read (%s)\n", err::getError ()->getDescription ().cc ());
+				return;
+			}
+
+			int cmpResult = memcmp (g_transmitData + offset, buffer, size);
+			if (cmpResult != 0)
+			{
+				printf ("wrong data!\n");
+				return;
+			}
+
+			offset += size;
+			if (offset >= sizeof (g_transmitData))
+				offset = 0;
+		}
+	}
+};
+
+class WriterThread: public mt::ThreadImpl <WriterThread>
+{
+protected:
+	io::SharedMemoryWriter m_writer;
+
+public:
+	void threadProc ()
+	{
+		unlink ("/home/vladimir/test-transport");
+
+		bool result = m_writer.open (
+			"/home/vladimir/test-transport",
+			"test-transport-read",
+			"test-transport-write",
+			io::SharedMemoryTransportFlag_Create | io::SharedMemoryTransportFlag_Message
+			);
+
+		if (!result)
+		{
+			printf ("cannot open writer (%s)\n", err::getError ()->getDescription ().cc ());
+			return;
+		}
+
+		size_t offset = 0;
+
+		for (;;)
+		{
+			const char* p = g_transmitData + offset;
+			size_t size = 1 + rand () % (sizeof (g_transmitData) - 1);
+
+			if (offset + size < sizeof (g_transmitData))
+			{
+				offset += size;
+			}
+			else
+			{
+				size = sizeof (g_transmitData) - offset;
+				offset = 0;
+			}
+
+			size_t result = m_writer.write (p, size);
+			if (result == -1)
+			{
+				printf ("cannot write (%s)\n", err::getError ()->getDescription ().cc ());
+				return;
+			}
+		}
+	}
+};
+
 int
 main (
 	int argc,
 	char *argv[]
 	)
 {
+	printf ("main ()\n");
+
+	WriterThread writerThread;
+	writerThread.start ();
+
+	ReaderThread readerThread;
+	readerThread.start ();
+
+	char s [256];
+	scanf ("%s", s);
+	return -1;
+
 	QApplication app (argc, argv);
 
 	MainWindow mainWindow;

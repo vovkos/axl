@@ -29,7 +29,7 @@ MyWidget::paintEvent (QPaintEvent* e)
 	{
 		anchor = hyperText.findHyperlinkByOffset (i);
 		if (anchor)
-			printf ("%d -- %s\n", i, anchor->m_hyperlink);
+			printf ("%d -- %s\n", i, anchor->m_hyperlink.cc ());
 	}
 
 	gui::QtCanvas canvas;

@@ -344,8 +344,9 @@ SharedMemoryWriter::write (
 {
 	ASSERT (isOpen ());
 
-	size_t chainSize = 0;
+	bool result;
 
+	size_t chainSize = 0;
 	for (size_t i = 0; i < count; i++)
 		chainSize += sizeArray [i];
 
@@ -389,7 +390,9 @@ SharedMemoryWriter::write (
 
 	size_t writeEndOffset = writeOffset + writeSize;
 
-	ensureOffsetMapped (writeEndOffset);
+	result = ensureOffsetMapped (writeEndOffset);
+	if (!result)
+		return -1;
 
 	if (m_flags & SharedMemoryTransportFlag_Message)
 	{
@@ -411,7 +414,7 @@ SharedMemoryWriter::write (
 	}
 	else
 	{
-		m_hdr->m_writeOffset = m_hdr->m_dataSize > m_sizeLimitHint ? 0 : writeEndOffset;
+		m_hdr->m_writeOffset = writeEndOffset > m_sizeLimitHint ? 0 : writeEndOffset;
 		m_hdr->m_endOffset = writeEndOffset;
 	}
 

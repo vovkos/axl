@@ -253,12 +253,6 @@ MappedFile::view (
 			return err::fail ((void*) NULL, err::SystemErrorCode_InvalidDeviceRequest);
 		
 		m_fileSize = end;
-		
-#if (_AXL_ENV == AXL_ENV_POSIX)
-		bool result = m_file.setSize (end);
-		if (!result)
-			return NULL;
-#endif
 	}
 	
 	return viewImpl (offset, end, isPermanent);
@@ -269,8 +263,10 @@ MappedFile::viewImpl (
 	uint64_t offset,
 	uint64_t end,
 	bool isPermanent
-	) const
+	)
 {
+	bool result;
+
 	if (!isOpen ())
 		return NULL;
 	
@@ -301,39 +297,44 @@ MappedFile::viewImpl (
 	if (viewEnd % systemInfo->m_pageSize)
 		viewEnd = viewEnd - viewEnd % systemInfo->m_pageSize + systemInfo->m_pageSize;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+	// make sure we don't overextend beyond the end of read-only file
+
+	if (m_fileFlags & FileFlag_ReadOnly)
+	{
+		if (end > m_fileSize)
+		{
+			err::setError (err::SystemErrorCode_InvalidDeviceRequest);
+			return NULL;
+		}
+
+		if (viewEnd > m_fileSize)
+			viewEnd = m_fileSize;
+	}
+
 	// ensure mapping covers the view
 
+#if (_AXL_ENV == AXL_ENV_WIN)
 	if (!m_mapping.isOpen () || viewEnd > m_mappedSize)
 	{
-		uint_t protection;
+		uint_t protection = (m_fileFlags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 
-		if (m_fileFlags & FileFlag_ReadOnly)
-		{
-			if (end > m_fileSize)
-			{
-				err::setError (err::SystemErrorCode_InvalidAddress);
-				return NULL;
-			}
-
-			if (viewEnd > m_fileSize)
-				viewEnd = m_fileSize;
-
-			protection = PAGE_READONLY;
-		}
-		else
-		{
-			protection = PAGE_READWRITE;
-		}
-		
-		bool result = m_mapping.create (m_file.m_file, NULL, protection, viewEnd);
+		result = m_mapping.create (m_file.m_file, NULL, protection, viewEnd);
 		if (!result)
-			return false;
+			return NULL;
 
 		m_mappedSize = viewEnd;
 	}
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	if (viewEnd > m_file.getSize ())
+	{
+		result = m_file.setSize (viewEnd);
+		if (!result)
+			return NULL;
+
+		m_fileSize = viewEnd;
+	}
 #endif
-	
+
 	// map the view
 
 	if (isPermanent)

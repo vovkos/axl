@@ -96,12 +96,12 @@ protected:
 	File m_file;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	mutable win::Mapping m_mapping;
-	mutable uint64_t m_mappedSize;
+	win::Mapping m_mapping;
+	uint64_t m_mappedSize;
 #endif
 	
-	mutable MappedViewMgr m_dynamicViewMgr;
-	mutable MappedViewMgr m_permanentViewMgr;
+	MappedViewMgr m_dynamicViewMgr;
+	MappedViewMgr m_permanentViewMgr;
 	
 	size_t m_readAheadSize;
 	size_t m_maxDynamicViewCount;
@@ -169,7 +169,11 @@ public:
 		bool isPermanent = false
 		) const
 	{
-		return viewImpl (offset, size ? offset + size : m_fileSize, isPermanent);
+		return ((MappedFile*) this)->viewImpl (
+			offset,
+			size ? offset + size : m_fileSize,
+			isPermanent
+			);
 	}
 	
 	void* 
@@ -188,7 +192,7 @@ protected:
 		uint64_t offset,
 		uint64_t end,
 		bool isPermanent
-		) const;	
+		);
 };
 
 //.............................................................................
