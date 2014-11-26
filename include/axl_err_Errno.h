@@ -64,7 +64,7 @@ inline
 Error
 setErrno (int code)
 {
-	setError (Errno (code));
+	return setError (Errno (code));
 }
 
 //.............................................................................
