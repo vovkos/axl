@@ -58,23 +58,6 @@ public:
 		decode (&buffer, p, length);
 		return buffer;
 	}
-
-	static
-	size_t
-	decode (
-		rtl::Array <char>* buffer,
-		const rtl::String& string
-		)
-	{
-		return decode (buffer, string, string.getLength ());
-	}
-
-	static
-	rtl::Array <char>
-	decode (const rtl::String& string)
-	{
-		return decode (string, string.getLength ());
-	}
 };
 
 //.............................................................................

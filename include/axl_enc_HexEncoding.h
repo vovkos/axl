@@ -75,38 +75,21 @@ public:
 	static
 	size_t
 	decode (
-		rtl::Array <uchar_t>* buffer,
+		rtl::Array <char>* buffer,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	rtl::Array <uchar_t>
+	rtl::Array <char>
 	decode (
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		rtl::Array <uchar_t> buffer;
+		rtl::Array <char> buffer;
 		decode (&buffer, p, length);
 		return buffer;
-	}
-
-	static
-	size_t
-	decode (
-		rtl::Array <uchar_t>* buffer,
-		const rtl::String& string
-		)
-	{
-		return decode (buffer, string, string.getLength ());
-	}
-
-	static
-	rtl::Array <uchar_t>
-	decode (const rtl::String& string)
-	{
-		return decode (string, string.getLength ());
 	}
 
 protected:

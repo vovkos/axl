@@ -31,42 +31,42 @@ getUtfKindString (UtfKind utfKind);
 
 enum UtfCategory
 {
-    UtfCategory_Mark_NonSpacing,          // Mn
-    UtfCategory_Mark_SpacingCombining,    // Mc
-    UtfCategory_Mark_Enclosing,           // Me
+	UtfCategory_Mark_NonSpacing,          // Mn
+	UtfCategory_Mark_SpacingCombining,    // Mc
+	UtfCategory_Mark_Enclosing,           // Me
 
-    UtfCategory_Number_DecimalDigit,      // Nd
-    UtfCategory_Number_Letter,            // Nl
-    UtfCategory_Number_Other,             // No
+	UtfCategory_Number_DecimalDigit,      // Nd
+	UtfCategory_Number_Letter,            // Nl
+	UtfCategory_Number_Other,             // No
 
-    UtfCategory_Separator_Space,          // Zs
-    UtfCategory_Separator_Line,           // Zl
-    UtfCategory_Separator_Paragraph,      // Zp
+	UtfCategory_Separator_Space,          // Zs
+	UtfCategory_Separator_Line,           // Zl
+	UtfCategory_Separator_Paragraph,      // Zp
 
-    UtfCategory_Other_Control,            // Cc
-    UtfCategory_Other_Format,             // Cf
-    UtfCategory_Other_Surrogate,          // Cs
-    UtfCategory_Other_PrivateUse,         // Co
-    UtfCategory_Other_NotAssigned,        // Cn
+	UtfCategory_Other_Control,            // Cc
+	UtfCategory_Other_Format,             // Cf
+	UtfCategory_Other_Surrogate,          // Cs
+	UtfCategory_Other_PrivateUse,         // Co
+	UtfCategory_Other_NotAssigned,        // Cn
 
-    UtfCategory_Letter_Uppercase,         // Lu
-    UtfCategory_Letter_Lowercase,         // Ll
-    UtfCategory_Letter_Titlecase,         // Lt
-    UtfCategory_Letter_Modifier,          // Lm
-    UtfCategory_Letter_Other,             // Lo
+	UtfCategory_Letter_Uppercase,         // Lu
+	UtfCategory_Letter_Lowercase,         // Ll
+	UtfCategory_Letter_Titlecase,         // Lt
+	UtfCategory_Letter_Modifier,          // Lm
+	UtfCategory_Letter_Other,             // Lo
 
-    UtfCategory_Punctuation_Connector,    // Pc
-    UtfCategory_Punctuation_Dash,         // Pd
-    UtfCategory_Punctuation_Open,         // Ps
-    UtfCategory_Punctuation_Close,        // Pe
-    UtfCategory_Punctuation_InitialQuote, // Pi
-    UtfCategory_Punctuation_FinalQuote,   // Pf
-    UtfCategory_Punctuation_Other,        // Po
+	UtfCategory_Punctuation_Connector,    // Pc
+	UtfCategory_Punctuation_Dash,         // Pd
+	UtfCategory_Punctuation_Open,         // Ps
+	UtfCategory_Punctuation_Close,        // Pe
+	UtfCategory_Punctuation_InitialQuote, // Pi
+	UtfCategory_Punctuation_FinalQuote,   // Pf
+	UtfCategory_Punctuation_Other,        // Po
 
-    UtfCategory_Symbol_Math,              // Sm
-    UtfCategory_Symbol_Currency,          // Sc
-    UtfCategory_Symbol_Modifier,          // Sk
-    UtfCategory_Symbol_Other              // So
+	UtfCategory_Symbol_Math,              // Sm
+	UtfCategory_Symbol_Currency,          // Sc
+	UtfCategory_Symbol_Modifier,          // Sk
+	UtfCategory_Symbol_Other              // So
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -86,7 +86,7 @@ enum UtfCategoryMask
 		(1 << UtfCategory_Separator_Paragraph),
 
 	UtfCategoryMask_Number = 
-	    (1 << UtfCategory_Number_DecimalDigit) |
+		(1 << UtfCategory_Number_DecimalDigit) |
 		(1 << UtfCategory_Number_Letter) |
 		(1 << UtfCategory_Number_Other),
 
@@ -112,26 +112,26 @@ enum UtfCategoryMask
 
 struct UtfCodePointAttr
 {
-    uint16_t m_category           : 8; /* 5 used */
-    uint16_t m_direction          : 8; /* 5 used */
-    uint16_t m_combiningClass     : 8;
-    uint16_t m_joining            : 2;
-    int16_t m_digitValue          : 6; /* 5 used */
-    int16_t m_mirrorDiff          : 16;
-    int16_t m_lowerCaseDiff       : 16;
-    int16_t m_upperCaseDiff       : 16;
-    int16_t m_titleCaseDiff       : 16;
-    int16_t m_caseFoldDiff        : 16;
-    uint16_t m_lowerCaseSpecial   : 1;
-    uint16_t m_upperCaseSpecial   : 1;
-    uint16_t m_titleCaseSpecial   : 1;
-    uint16_t m_caseFoldSpecial    : 1;
-    uint16_t m_unicodeVersion     : 4;
-    uint16_t m_graphemeBreakClass : 8; /* 4 used */
-    uint16_t m_wordBreakClass     : 8; /* 4 used */
-    uint16_t m_sentenceBreakClass : 8; /* 4 used */
-    uint16_t m_lineBreakClass     : 8; /* 6 used */
-    uint16_t m_script             : 8; /* 5 used */
+	uint16_t m_category           : 8; /* 5 used */
+	uint16_t m_direction          : 8; /* 5 used */
+	uint16_t m_combiningClass     : 8;
+	uint16_t m_joining            : 2;
+	int16_t m_digitValue          : 6; /* 5 used */
+	int16_t m_mirrorDiff          : 16;
+	int16_t m_lowerCaseDiff       : 16;
+	int16_t m_upperCaseDiff       : 16;
+	int16_t m_titleCaseDiff       : 16;
+	int16_t m_caseFoldDiff        : 16;
+	uint16_t m_lowerCaseSpecial   : 1;
+	uint16_t m_upperCaseSpecial   : 1;
+	uint16_t m_titleCaseSpecial   : 1;
+	uint16_t m_caseFoldSpecial    : 1;
+	uint16_t m_unicodeVersion     : 4;
+	uint16_t m_graphemeBreakClass : 8; /* 4 used */
+	uint16_t m_wordBreakClass     : 8; /* 4 used */
+	uint16_t m_sentenceBreakClass : 8; /* 4 used */
+	uint16_t m_lineBreakClass     : 8; /* 6 used */
+	uint16_t m_script             : 8; /* 5 used */
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

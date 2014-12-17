@@ -128,7 +128,7 @@ HexEncoding::encode_nsu (
 
 size_t
 HexEncoding::decode (
-	rtl::Array <uchar_t>* buffer,
+	rtl::Array <char>* buffer,
 	const char* p,
 	size_t length
 	)

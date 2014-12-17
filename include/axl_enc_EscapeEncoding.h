@@ -46,23 +46,6 @@ public:
 
 	static
 	size_t
-	encode (
-		rtl::String* dstString,
-		const rtl::String& srcString
-		)
-	{
-		return encode (dstString, srcString, srcString.getLength ());
-	}
-
-	static
-	rtl::String
-	encode (const rtl::String& string)
-	{
-		return encode (string, string.getLength ());
-	}
-
-	static
-	size_t
 	decode (
 		rtl::String* string,
 		const char* p, 
@@ -79,23 +62,6 @@ public:
 		rtl::String string;
 		decode (&string, p, length);
 		return string;
-	}
-
-	static
-	size_t
-	decode (
-		rtl::String* dstString,
-		const rtl::String& srcString
-		)
-	{
-		return decode (dstString, srcString, srcString.getLength ());
-	}
-
-	static
-	rtl::String
-	decode (const rtl::String& string)
-	{
-		return decode (string, string.getLength ());
 	}
 };
 
