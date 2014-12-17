@@ -56,7 +56,10 @@ BinaryBoyerMooreFind::find (
 	)
 {
 	size_t patternSize = m_pattern.getCount ();
-	if (!patternSize || size < patternSize)
+	if (!patternSize)
+		return 0;
+		
+	if (size < patternSize)
 		return -1;
 
 	size_t result = (m_flags & Flag_Reverse) ? 
@@ -82,7 +85,7 @@ BinaryBoyerMooreFind::find (
 {
 	size_t patternSize = m_pattern.getCount ();
 	if (!patternSize)
-		return -1;
+		return 0;
 
 	size_t tailSize = incrementalContext->m_tail.getCount ();
 	size_t fullSize = size + tailSize;
@@ -259,7 +262,7 @@ TextBoyerMooreFind::find (
 {
 	size_t patternLength = m_pattern.getCount ();
 	if (!patternLength)
-		return -1;
+		return 0;
 
 	size_t length = codec->decodeToUtf32 (&m_buffer, p, size);
 	if (length == -1)
@@ -300,7 +303,7 @@ TextBoyerMooreFind::find (
 {
 	size_t patternLength = m_pattern.getCount ();
 	if (!patternLength)
-		return -1;
+		return 0;
 
 	size_t chunkLength = codec->decodeToUtf32 (&m_buffer, p, size);
 	if (chunkLength == -1 || chunkLength == 0)
