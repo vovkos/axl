@@ -119,6 +119,17 @@ EscapeEncoding::encode (
 	return string->getLength ();
 }
 
+static 
+inline
+bool 
+isHexChar (char c)
+{
+	return 
+		c >= '0' && c <= '9' ||
+		c >= 'a' && c <= 'f' ||
+		c >= 'A' && c <= 'F';
+}
+
 size_t
 EscapeEncoding::decode (
 	rtl::String* string,
@@ -130,7 +141,7 @@ EscapeEncoding::decode (
 	{
 		State_Normal = 0,
 		State_Escape,
-		State_Hex
+		State_Hex,
 	};
 
 	State state = State_Normal;	
@@ -139,8 +150,8 @@ EscapeEncoding::decode (
 		length = rtl::StringDetails::calcLength (p);
 
 	char hexCodeString [4] = { 0 };
-	char* hexCodeEnd;
 	size_t hexCodeLen;
+	size_t hexCodeMaxLen;
 	ulong_t hexCode;
 
 	char replace;
@@ -161,17 +172,50 @@ EscapeEncoding::decode (
 			break;
 
 		case State_Escape:
-			if (*p == 'x')
+			switch (*p)
 			{
+			case 'x':
 				state = State_Hex;
 				hexCodeLen = 0;
+				hexCodeMaxLen = 2;
 				break;
+
+			case 'u':
+				state = State_Hex;
+				hexCodeLen = 0;
+				hexCodeMaxLen = 4;
+				break;
+
+			case 'U':
+				state = State_Hex;
+				hexCodeLen = 0;
+				hexCodeMaxLen = 8;
+				break;
+
+			default:
+				replace = findEscapeReplaceChar (*p);
+				if (replace != *p)
+				{
+					string->append (replace);
+					base = p + 1;
+				}
+				else
+				{
+					base = p;
+				}
+
+				state = State_Normal;
 			}
 
-			replace = findEscapeReplaceChar (*p);
-			if (replace != *p)
+			break;
+		
+		case State_Hex:
+			if (isHexChar (*p))
 			{
-				string->append (replace);
+				hexCodeString [hexCodeLen++] = *p;
+				if (hexCodeLen < hexCodeMaxLen)
+					break;
+
 				base = p + 1;
 			}
 			else
@@ -179,21 +223,29 @@ EscapeEncoding::decode (
 				base = p;
 			}
 
-			state = State_Normal;
-			break;
-		
-		case State_Hex:			
-			hexCodeString [hexCodeLen++] = *p;
-			if (hexCodeLen < 2)
-				break;
-
-			hexCode = strtoul (hexCodeString, &hexCodeEnd, 16);
-			if (hexCodeEnd != &hexCodeString [hexCodeLen])
+			if (!hexCodeLen)
+			{
 				hexCode = '?';
+				string->append ((char const*) &hexCode, 1);
+			}
+			else 
+			{
+				hexCode = strtoul (hexCodeString, NULL, 16);				
 
-			string->append ((char const*) &hexCode, 1);
+				if (hexCodeMaxLen == 2) // \x
+				{
+					string->append ((char const*) &hexCode, 1);
+				}
+				else // \u
+				{
+					utf8_t buffer [8];
+					size_t length = enc::Utf8::getEncodeCodePointLength (hexCode);
+					enc::Utf8::encodeCodePoint (buffer, hexCode);
+					string->append (buffer, length);
+				}
+			}
+
 			state = State_Normal;
-			base = p + 1;
 			break;
 		}
 	}
