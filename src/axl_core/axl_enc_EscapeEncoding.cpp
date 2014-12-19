@@ -149,7 +149,7 @@ EscapeEncoding::decode (
 	if (length == -1)
 		length = rtl::StringDetails::calcLength (p);
 
-	char hexCodeString [4] = { 0 };
+	char hexCodeString [16];
 	size_t hexCodeLen;
 	size_t hexCodeMaxLen;
 	ulong_t hexCode;
