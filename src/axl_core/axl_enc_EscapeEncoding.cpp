@@ -230,6 +230,7 @@ EscapeEncoding::decode (
 			}
 			else 
 			{
+				hexCodeString [hexCodeLen] = 0;
 				hexCode = strtoul (hexCodeString, NULL, 16);				
 
 				if (hexCodeMaxLen == 2) // \x
