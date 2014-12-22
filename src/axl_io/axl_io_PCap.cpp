@@ -8,7 +8,7 @@ namespace io {
 //.............................................................................
 
 bool
-CPCap::open (
+PCap::open (
 	const char* device,
 	size_t snapshotSize,
 	bool isPromiscious,
@@ -36,7 +36,7 @@ CPCap::open (
 }
 
 bool
-CPCap::setFilter (const char* filter)
+PCap::setFilter (const char* filter)
 {
 	bpf_program program;
 
@@ -53,7 +53,7 @@ CPCap::setFilter (const char* filter)
 }
 
 bool
-CPCap::setBlockingMode (bool isBlocking)
+PCap::setBlockingMode (bool isBlocking)
 {
 	char errorBuffer [PCAP_ERRBUF_SIZE];
 	int result = pcap_setnonblock (m_h, !isBlocking, errorBuffer);
@@ -67,7 +67,7 @@ CPCap::setBlockingMode (bool isBlocking)
 }
 
 size_t
-CPCap::read (
+PCap::read (
 	void* p,
 	size_t size
 	)
@@ -91,7 +91,7 @@ CPCap::read (
 }
 
 size_t
-CPCap::write (
+PCap::write (
 	const void* p,
 	size_t size
 	)

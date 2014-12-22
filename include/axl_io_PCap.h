@@ -25,7 +25,7 @@ public:
 
 //.............................................................................
 
-class CPCap: public rtl::Handle <pcap_t*, ClosePCap>
+class PCap: public rtl::Handle <pcap_t*, ClosePCap>
 {
 public:
 	bool
