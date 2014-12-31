@@ -643,13 +643,13 @@ public:
 	}
 
 	String2
-	cc2 () const
+	s2 () const
 	{
 		return String2 (m_p, getLength ());
 	}
 
 	String3
-	cc3 () const
+	s3 () const
 	{
 		return String3 (m_p, getLength ());
 	}
