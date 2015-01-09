@@ -9,6 +9,8 @@
 # set (PCAP_LIB_DIR     "path-to-pcap-lib-dir")
 # set (LIBUSB_INC_DIR   "path-to-libusb-include-dir")
 # set (LIBUSB_LIB_DIR   "path-to-libusb-lib-dir")
+# set (OPENSSL_INC_DIR  "path-to-openssl-include-dir")
+# set (OPENSSL_LIB_DIR  "path-to-openssl-lib-dir")
 # set (QT_CMAKE_DIR     "path-to-qt-cmake-dir")
 
 # set (PERL_EXE         "path-to-perl-exe")
