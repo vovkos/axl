@@ -292,7 +292,7 @@ BitMap::copy (const BitMap& src)
 }
 
 int
-BitMap::cmp (const BitMap& src)
+BitMap::cmp (const BitMap& src) const
 {
 	size_t count = m_map.getCount ();
 	size_t count2 = src.m_map.getCount ();

@@ -110,8 +110,14 @@ public:
 		memcpy (m_map, src.m_map, sizeof (m_map));
 	}
 
+	intptr_t
+	getHash () const
+	{
+		return djb2 (m_map, sizeof (m_map));
+	}
+
 	int 
-	cmp (const BitMapN& src)
+	cmp (const BitMapN& src) const
 	{
 		return memcmp (m_map, src.m_map, sizeof (m_map));
 	}
@@ -230,9 +236,15 @@ public:
 	void 
 	copy (const BitMap& src);
 
+	intptr_t
+	getHash () const
+	{
+		return djb2 (m_map, m_map.getCount () * sizeof (size_t));
+	}
+
 	int
-	cmp (const BitMap& src);
-	
+	cmp (const BitMap& src) const;
+
 	bool 
 	create (size_t bitCount);
 

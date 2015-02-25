@@ -756,6 +756,31 @@ typedef CmpStringBase <wchar_t>   CmpString_w;
 typedef CmpStringBase_i <char>    CmpString_i;
 typedef CmpStringBase_i <wchar_t> CmpString_wi;
 
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class CmpDuckType
+{
+public:
+	int 
+	operator () (
+		const T* a,
+		const T* b
+		)
+	{
+		return a->cmp (*b);
+	}
+
+	int 
+	operator () (
+		const T& a,
+		const T& b
+		)
+	{
+		return a.cmp (b);
+	}
+};
+
 //.............................................................................
 
 // hash functors
@@ -851,6 +876,25 @@ typedef HashStringBase <wchar_t> HashString_w;
 typedef HashStringBase <utf8_t>  HashString_utf8;
 typedef HashStringBase <utf16_t> HashString_utf16;
 typedef HashStringBase <utf32_t> HashString_utf32;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class HashDuckType
+{
+public:
+	intptr_t
+	operator () (const T* a)
+	{
+		return a->getHash ();
+	}
+
+	intptr_t
+	operator () (const T& a)
+	{
+		return a.getHash ();
+	}
+};
 
 //.............................................................................
 

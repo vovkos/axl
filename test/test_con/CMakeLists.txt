@@ -80,6 +80,7 @@ include_directories (
 	${LUA_INC_DIR}
 	${LIBUSB_INC_DIR}
 	${OPENSSL_INC_DIR}
+	${AXL_INC_DIR}
 	)
 
 link_directories (

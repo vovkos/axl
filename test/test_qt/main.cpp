@@ -2,8 +2,11 @@
 #include "mainwindow.h"
 #include "moc_axl_gui_QtWidget.cpp"
 #include "axl_mt_Thread.h"
+#include "axl_fsm_RegExp.h"
 
 //.............................................................................
+
+#if 0
 
 bool
 trySudo ()
@@ -76,7 +79,9 @@ trySudo ()
 	}
 }
 
-/*
+#endif
+
+#if 0
 
 #include <sys/un.h>
 
@@ -91,26 +96,26 @@ int sendFd (
 	};
 
 	char controlBuffer [ControlBufferLength];
-    char dummyData = '.';
+	char dummyData = '.';
 
-    iovec dummyIov;
-    dummyIov.iov_base = &dummyData;
-    dummyIov.iov_len = sizeof (dummyData);
+	iovec dummyIov;
+	dummyIov.iov_base = &dummyData;
+	dummyIov.iov_len = sizeof (dummyData);
 
-    msghdr msg;
+	msghdr msg;
 	msg.msg_name = NULL;
-    msg.msg_namelen = 0;
-    msg.msg_iov = &dummyIov;
-    msg.msg_iovlen = 1;
-    msg.msg_flags = 0;
-    msg.msg_control = controlBuffer;
-    msg.msg_controllen = ControlBufferLength;
+	msg.msg_namelen = 0;
+	msg.msg_iov = &dummyIov;
+	msg.msg_iovlen = 1;
+	msg.msg_flags = 0;
+	msg.msg_control = controlBuffer;
+	msg.msg_controllen = ControlBufferLength;
 
-    cmsghdr* cmsg;
-    cmsg = CMSG_FIRSTHDR (&msg);
-    cmsg->cmsg_len = CMSG_LEN (sizeof (int));
-    cmsg->cmsg_level = SOL_SOCKET;
-    cmsg->cmsg_type = SCM_RIGHTS;
+	cmsghdr* cmsg;
+	cmsg = CMSG_FIRSTHDR (&msg);
+	cmsg->cmsg_len = CMSG_LEN (sizeof (int));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_RIGHTS;
 	*(int*) CMSG_DATA (cmsg) = fd;
 
 	return sendmsg (sock, &msg, 0);
@@ -124,26 +129,26 @@ int recvFd (int sock)
 	};
 
 	char controlBuffer [ControlBufferLength];
-    char dummyData = '.';
+	char dummyData = '.';
 
-    iovec dummyIov;
-    dummyIov.iov_base = &dummyData;
-    dummyIov.iov_len = sizeof (dummyData);
+	iovec dummyIov;
+	dummyIov.iov_base = &dummyData;
+	dummyIov.iov_len = sizeof (dummyData);
 
-    msghdr msg;
-    msg.msg_name = NULL;
-    msg.msg_namelen = 0;
-    msg.msg_iov = &dummyIov;
-    msg.msg_iovlen = 1;
-    msg.msg_flags = 0;
-    msg.msg_control = controlBuffer;
-    msg.msg_controllen = ControlBufferLength;
+	msghdr msg;
+	msg.msg_name = NULL;
+	msg.msg_namelen = 0;
+	msg.msg_iov = &dummyIov;
+	msg.msg_iovlen = 1;
+	msg.msg_flags = 0;
+	msg.msg_control = controlBuffer;
+	msg.msg_controllen = ControlBufferLength;
 
-    cmsghdr* cmsg;
-    cmsg = CMSG_FIRSTHDR (&msg);
-    cmsg->cmsg_len = CMSG_LEN (sizeof (int));
-    cmsg->cmsg_level = SOL_SOCKET;
-    cmsg->cmsg_type = SCM_RIGHTS;
+	cmsghdr* cmsg;
+	cmsg = CMSG_FIRSTHDR (&msg);
+	cmsg->cmsg_len = CMSG_LEN (sizeof (int));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_RIGHTS;
 
 	int result = recvmsg (sock, &msg, 0);
 	if (result == -1)
@@ -151,7 +156,9 @@ int recvFd (int sock)
 
 	return *(int*) CMSG_DATA (cmsg);
 }
-*/
+#endif
+
+#if 0
 
 static char g_transmitData [] = "abcdefghijklmnopqrstuvwxyz";
 
@@ -253,6 +260,8 @@ public:
 	}
 };
 
+#endif
+
 int
 main (
 	int argc,
@@ -261,6 +270,21 @@ main (
 {
 	printf ("main ()\n");
 
+//	char const* src = "abc";
+//	char const* src = "a*(b|cd?)+";
+	char const* src = "[ABCDefghijkl](b|c)*";
+
+	fsm::RegExp regExp;
+	bool result = regExp.compile (src);
+	if (!result)
+	{
+		printf ("error: %s\n", err::getError ().getDescription ());
+		return -1;
+	}
+
+	regExp.print ();
+
+#if 0
 	WriterThread writerThread;
 	writerThread.start ();
 
@@ -276,8 +300,9 @@ main (
 	MainWindow mainWindow;
 	mainWindow.show ();
 	return app.exec ();
-	
-/*
+#endif
+
+#if 0
 	int fd = open ("/home/vladimir/suka-bla", O_RDWR | O_CREAT, 0666);
 	if (fd == -1)
 	{
@@ -363,7 +388,8 @@ main (
 	}
 
 	printf ("read: %s\n", buffer);
-*/
+#endif
+
 //	trySudo ();
 //	trySudo ();
 
