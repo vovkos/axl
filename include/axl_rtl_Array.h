@@ -13,8 +13,8 @@ namespace rtl {
 
 //.............................................................................
 
-template <typename T, typename Details>
-class CopyReverse
+template <typename T>
+class ReverseArray
 {
 public:
 	static
@@ -50,21 +50,39 @@ public:
 		}
 		else if (src + count <= dst || dst + count <= src)
 		{
-			const T* back = src + count - 1;
-			T* end = dst + count;
-			for (; dst < end; dst++, back--)
-				*dst = *back;	
+			copyReverseImpl (dst, src, count);
 		}
-		else // random overlap
+		else if (src < dst)// random overlap
 		{
-			T* tmp = (T*) AXL_MEM_ALLOC (count * sizeof (T));
+			size_t nonOverlapCount = dst - src;
+			size_t overlapCount = count - nonOverlapCount;
 
-			Details::constructCopy (tmp, src, count);
-			copyReverse (dst, tmp, count);
-			Details::destruct (tmp, count);
-
-			AXL_MEM_FREE (tmp);
+			reverse (dst, overlapCount);
+			copyReverseImpl (dst + overlapCount, src, nonOverlapCount);
 		}
+		else
+		{
+			size_t nonOverlapCount = src - dst;
+			size_t overlapCount = count - nonOverlapCount;
+		
+			reverse (dst + nonOverlapCount, overlapCount);
+			copyReverseImpl (dst, src + overlapCount, nonOverlapCount);
+		}
+	}
+
+protected:
+	static
+	void
+	copyReverseImpl (
+		T* dst,
+		const T* src,
+		size_t count
+		)
+	{
+		const T* back = src + count - 1;
+		T* end = dst + count;
+		for (; dst < end; dst++, back--)
+			*dst = *back;	
 	}
 };
 
@@ -73,7 +91,7 @@ public:
 // general case: full cycle of construction, copy, destruction
 
 template <typename T>
-class ArrayDetails: public CopyReverse <T, ArrayDetails <T> >
+class ArrayDetails: public ReverseArray <T>
 {
 public:
 	static
@@ -173,7 +191,7 @@ public:
 // fast memory block operations for types that do not need ctor/dtor
 
 template <typename T>
-class SimpleArrayDetails: public CopyReverse <T, ArrayDetails <T> >
+class SimpleArrayDetails: public ReverseArray <T>
 {
 public:
 	static

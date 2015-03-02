@@ -17,244 +17,77 @@ namespace rtl {
 
 template <
 	typename T,
-	typename Delete
+	typename Delete_0 = mem::StdFactory <T>::Delete
 	>
-class AutoPtrArrayDetails: public SimpleArrayDetails <T*>
+class AutoPtrArray: public Array <T*>
 {
+	AXL_DISABLE_COPY (AutoPtrArray)
+
 public:
-	static 
-	void 
-	destruct (
-		T** p, 
-		size_t count
-		)
-	{ 
-		T** end = p + count;
-		for (; p < end; p++)
-			if (*p)
-				Delete () (*p);
-	}
+	typedef Array <T*> BaseType;
+	typedef Delete_0 Delete;
 
-	static 
-	void 
-	copy (
-		T** dst, 
-		T* const* src, 
-		size_t count
-		)
-	{ 
-		if (src > dst || src + count <= dst)
-		{
-			T** end = dst + count;
-			for (; dst < end; dst++, src++)
-			{
-				if (*dst)
-					Delete () (*dst);
-
-				*dst = *src;
-			}
-		}
-		else
-		{
-			T** end = dst;
-
-			dst += count;
-			src += count;
-
-			while (dst > end)
-			{
-				dst--;
-				src--;
-
-				if (*dst)
-					Delete () (*dst);
-
-				*dst = *src;
-			}
-		}
-	}
-
-	static 
-	void 
-	clear (
-		T** p, 
-		size_t count
-		)
+public:
+	AutoPtrArray ():
+		BaseType ()
 	{
-		T** begin = p;
-		T** end = p + count;
-
-		for (; p < end; p++)
-			if (*p)
-				Delete () (*p);
-		
-		memset (begin, 0, count * sizeof (T)); 
-	}	
-};
-
-//.............................................................................
-
-template <
-	typename T,
-	typename Delete = mem::StdFactory <T>::Delete
-	>
-class AutoPtrArray: public rtl::Array <T*, AutoPtrArrayDetails <T, Delete> >
-{
-public:
-	typedef rtl::Array <T*, AutoPtrArrayDetails <T, Delete> > Baseype;
-
-public:
-	AutoPtrArray ()
-	{ 
 	}
 
 	AutoPtrArray (T* e):
-		Baseype (e)
+		BaseType (e)
 	{
 	}
 
 	AutoPtrArray (
-		T* const* p, 
+		T* const* p,
 		size_t count
 		):
-		Baseype (p, count)
-	{ 
+		BaseType (p, count)
+	{
 	}
 
 	AutoPtrArray (
 		ref::BufKind bufKind,
-		void* p, 
+		void* p,
 		size_t size
 		):
-		Baseype (bufKind, p, size)
+		BaseType (bufKind, p, size)
 	{
 	}
 
-	operator const T** () const
-	{ 
-		return m_p; 
+	~AutoPtrArray ()
+	{
+		deleteElements ();
 	}
 
-	operator T** () 
-	{ 
-		return m_p; 
-	}
-
-	// .ca () is mostly for passing through vararg
-	
-	const T** 
-	ca () const
-	{ 
-		return m_p; 
-	}
-
-	T** 
-	a () 
-	{ 
-		return m_p; 
+	void
+	clear ()
+	{
+		deleteElements ();
+		BaseType::clear ();
 	}
 
 	void
 	takeOver (AutoPtrArray* src)
 	{
+		deleteElements ();
 		release ();
-		m_p = src;
+		m_p = src->m_p;
 		src->m_p = NULL;
 	}
 
-	bool 
-	copy (
-		T* const* p, 
-		size_t count
-		)
-	{
-		return Baseype::copy (p, count);
-	}
-
-	bool 
-	copy (T* e)
-	{
-		return Baseype::copy (e);
-	}
-
-	T** 
-	append (
-		T* const* p, 
-		size_t count
-		)
-	{ 
-		return Baseype::append (p, count);
-	}
-
-	T**
-	append (T* e)
-	{ 
-		return Baseype::append (e);
-	}
-
-	T**
-	insert (
-		size_t index, 
-		T* const* p, 
-		size_t count
-		)
-	{
-		return Baseype::insert (index, p, count);
-	}
-
-	T**
-	insert (
-		size_t index, 
-		T* e
-		)
-	{
-		return Baseype::insert (index, e);
-	}
-
-	size_t
-	pop (size_t count = 1)
-	{
-		size_t oldCount = getCount ();
-		if (count >= oldCount)
-			count = oldCount;
-
-		setCount (oldCount - count);
-		return count;
-	}
-
-	T* 
-	getBackAndPop ()
-	{
-		T* e = getBack ();
-		pop ();
-		return e;
-	}
-
-private:
-	AutoPtrArray (const AutoPtrArray& src)
-	{   
-	}
-
+protected:
 	void
-	operator = (const AutoPtrArray& src)
-	{ 
-	}
-
-	T**
-	appendMultiply (
-		T* e,
-		size_t count
-		)
-	{ 
-	}
-
-	T**
-	insertMultiply (
-		size_t index, 
-		T* e, 
-		size_t count
-		)
+	deleteElements ()
 	{
+		size_t count = getCount ();
+
+		for (size_t i = 0; i < count; i++)
+		{
+			T* e = m_p [i];
+			if (e)
+				Delete () (e);
+		}
 	}
 };
 
