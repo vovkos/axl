@@ -43,21 +43,23 @@ struct MatchCondition
 	
 //.............................................................................
 
-enum NfaStateKind
+enum NfaStateFlag
 {
-	NfaStateKind_Undefined = 0,
-	NfaStateKind_Match,
-	NfaStateKind_EpsilonLink,
+	NfaStateFlag_Match        = 0x01,
+	NfaStateFlag_EpsilonLink  = 0x02,
+	NfaStateFlag_Accept       = 0x04,
+	NfaStateFlag_OpenCapture  = 0x10,
+	NfaStateFlag_CloseCapture = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct NfaState: rtl::ListLink
 {
-	NfaStateKind m_stateKind;
 	uint_t m_id;
-	bool m_isAccept;	
+	uint_t m_flags;
 	void* m_acceptContext;
+	size_t m_captureId;
 
 	MatchCondition m_matchCondition;
 	NfaState* m_outState;

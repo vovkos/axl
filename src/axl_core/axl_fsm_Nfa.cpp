@@ -50,10 +50,10 @@ MatchCondition::addChar (char c)
 
 NfaState::NfaState ()
 {
-	m_stateKind = NfaStateKind_Undefined;
+	m_flags = 0;
 	m_id = -1;
-	m_isAccept = false;
 	m_acceptContext = NULL;
+	m_captureId = -1;
 	m_outState = NULL;
 	m_outState2 = NULL;
 }
@@ -61,9 +61,9 @@ NfaState::NfaState ()
 void
 NfaState::createEpsilonLink (NfaState* outState)
 {
-	ASSERT (!m_stateKind && !m_outState && !m_outState2);
+	ASSERT (!m_flags && !m_outState && !m_outState2);
 
-	m_stateKind = NfaStateKind_EpsilonLink;
+	m_flags |= NfaStateFlag_EpsilonLink;
 	m_outState = outState;
 }
 
@@ -73,9 +73,9 @@ NfaState::createEpsilonLink (
 	NfaState* outState2
 	)
 {
-	ASSERT (!m_stateKind && !m_outState && !m_outState2);
+	ASSERT (!m_flags && !m_outState && !m_outState2);
 	
-	m_stateKind = NfaStateKind_EpsilonLink;
+	m_flags |= NfaStateFlag_EpsilonLink;
 	m_outState = outState;
 	m_outState2 = outState2;
 }
@@ -109,7 +109,7 @@ NfaTransitionMgr::clear ()
 void
 NfaTransitionMgr::addMatchState (NfaState* state)
 {
-	ASSERT (state->m_stateKind == NfaStateKind_Match);
+	ASSERT (state->m_flags & NfaStateFlag_Match);
 	
 	switch (state->m_matchCondition.m_conditionKind)
 	{

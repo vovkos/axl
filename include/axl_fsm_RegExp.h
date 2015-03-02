@@ -110,6 +110,7 @@ protected:
 	RegExp* m_regExp;
 	char const* m_p;
 	Token m_lastToken;
+	size_t m_captureId;
 
 public:
 	RegExpCompiler (RegExp* regExp);
@@ -179,10 +180,7 @@ protected:
 	group ();
 
 	NfaState*
-	capturingGroup ()
-	{
-		return group ();
-	}
+	capturingGroup ();
 
 	void 
 	assignNfaIds ();

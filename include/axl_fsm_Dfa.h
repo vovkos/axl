@@ -28,8 +28,10 @@ struct DfaState: rtl::ListLink
 	bool m_isAccept;
 	uint_t m_id;
 	void* m_acceptContext;
+	rtl::Array <size_t> m_openCaptureIdArray;
+	rtl::Array <size_t> m_closeCaptureIdArray;
 
-	rtl::StdList <DfaTransition> m_transitionList;	
+	rtl::StdList <DfaTransition> m_transitionList;
 
 	NfaStateSet m_nfaStateSet;
 
