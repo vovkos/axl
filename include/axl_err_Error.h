@@ -572,7 +572,7 @@ public:
 // utility functions
 
 Error
-getError ();
+getLastError ();
 
 Error
 setError (const Error& error);
@@ -581,7 +581,7 @@ inline
 Error
 pushError (const Error& error)
 {
-	Error stack = getError ();
+	Error stack = getLastError ();
 	stack.push (*error);
 	return setError (stack);
 }

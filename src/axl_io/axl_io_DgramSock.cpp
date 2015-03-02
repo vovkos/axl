@@ -210,7 +210,7 @@ DgramSock::sendTo_wt (
 		m_sock.sendTo (p, size, &send->m_address, &send->m_overlapped, onSendRecvComplete_wt);
 
 	if (!result)
-		completeSendRecv_wt (send, err::getError (), 0);
+		completeSendRecv_wt (send, err::getLastError (), 0);
 
 	return result;
 }
@@ -238,7 +238,7 @@ DgramSock::recvFrom_wt (
 		);
 
 	if (!result)
-		completeSendRecv_wt (recv, err::getError (), 0);
+		completeSendRecv_wt (recv, err::getLastError (), 0);
 
 	return result;
 }

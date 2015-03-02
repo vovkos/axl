@@ -180,9 +180,9 @@ setErrorMode (ErrorMode mode)
 }
 
 Error
-getError ()
+getLastError ()
 {
-	return getErrorMgr ()->getError ();
+	return getErrorMgr ()->getLastError ();
 }
 
 Error

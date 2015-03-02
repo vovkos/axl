@@ -94,7 +94,7 @@ ensureSrcPosError (
 	int col = 0
 	)
 {
-	Error error = getError ();
+	Error error = getLastError ();
 	return error->isKind (GUID_ParseError, ParseErrorCode_SrcPos) ? error : pushSrcPosError (filePath, line, col);
 }
 

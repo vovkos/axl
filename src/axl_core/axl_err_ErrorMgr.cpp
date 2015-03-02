@@ -54,7 +54,7 @@ ErrorMgr::setErrorMode (ErrorMode mode)
 }
 
 Error
-ErrorMgr::getError ()
+ErrorMgr::getLastError ()
 {
 	ThreadEntry* entry = findThreadEntry ();
 	if (entry && entry->m_error)

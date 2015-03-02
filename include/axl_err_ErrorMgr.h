@@ -61,7 +61,7 @@ public:
 	setErrorMode (ErrorMode mode);
 
 	Error
-	getError ();
+	getLastError ();
 
 	void
 	setError (const Error& error);

@@ -249,7 +249,7 @@ ConnectionSock::connect_wt (
 
 	if (!result)
 	{
-		onComplete->invoke (0, err::getError ());
+		onComplete->invoke (0, err::getLastError ());
 		return false;
 	}
 
@@ -269,7 +269,7 @@ ConnectionSock::disconnect_wt (
 
 	if (!result)
 	{
-		onComplete->invoke (0, false, err::getError ());
+		onComplete->invoke (0, false, err::getLastError ());
 		return false;
 	}
 
@@ -323,7 +323,7 @@ ConnectionSock::send_wt (
 
 	bool result = m_sock.send (p, size, &send->m_overlapped, onSendRecvComplete_wt);
 	if (!result)
-		completeSendRecv_wt (send, err::getError (), 0);
+		completeSendRecv_wt (send, err::getLastError (), 0);
 
 	return result;
 }
@@ -343,7 +343,7 @@ ConnectionSock::recv_wt (
 
 	bool result = m_sock.recv (p, size, &recv->m_overlapped, onSendRecvComplete_wt);
 	if (!result)
-		completeSendRecv_wt (recv, err::getError (), 0);
+		completeSendRecv_wt (recv, err::getLastError (), 0);
 
 	return result;
 }

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_fsm_RegExp.h"
+#include "axl_rtl_AutoPtrArray.h"
 
 //.............................................................................
 
@@ -36,7 +37,7 @@ main (
 		bool result = regExpCompiler.incrementalCompile (src [i]);
 		if (!result)
 		{
-			printf ("error: %s\n", err::getError ().getDescription ().cc ());
+			printf ("error: %s\n", err::getLastError ().getDescription ().cc ());
 			return -1;
 		}
 	}

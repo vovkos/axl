@@ -188,7 +188,7 @@ public:
 	void
 	ensureSrcPosError ()
 	{
-		err::Error error = err::getError ();
+		err::Error error = err::getLastError ();
 		if (!error->isKind (err::GUID_ParseError, err::ParseErrorCode_SrcPos))
 			err::pushSrcPosError (
 				m_filePath, 

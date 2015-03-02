@@ -236,7 +236,7 @@ public:
 		axl_va_list va
 		)
 	{
-		err::Error error = err::getError ();
+		err::Error error = err::getLastError ();
 
 		*size = error->m_size;
 
