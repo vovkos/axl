@@ -17,7 +17,7 @@ namespace rtl {
 
 template <
 	typename T,
-	typename Delete_0 = mem::StdFactory <T>::Delete
+	typename Delete_0 = typename mem::StdFactory <T>::Delete
 	>
 class AutoPtrArray: public Array <T*>
 {
@@ -71,8 +71,8 @@ public:
 	takeOver (AutoPtrArray* src)
 	{
 		deleteElements ();
-		release ();
-		m_p = src->m_p;
+		this->release ();
+		this->m_p = src->m_p;
 		src->m_p = NULL;
 	}
 
@@ -80,11 +80,11 @@ protected:
 	void
 	deleteElements ()
 	{
-		size_t count = getCount ();
+		size_t count = this->getCount ();
 
 		for (size_t i = 0; i < count; i++)
 		{
-			T* e = m_p [i];
+			T* e = this->m_p [i];
 			if (e)
 				Delete () (e);
 		}

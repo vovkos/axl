@@ -897,7 +897,7 @@ RegExpCompiler::capturingGroup ()
 
 	NfaState* start = group ();
 	if (!start)
-		return false;
+		return NULL;
 
 	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
 	ASSERT (accept);

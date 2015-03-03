@@ -278,7 +278,7 @@ main (
 	bool result = regExp.compile (src);
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastError ().getDescription ());
+		printf ("error: %s\n", err::getLastError ().getDescription ().cc ());
 		return -1;
 	}
 
