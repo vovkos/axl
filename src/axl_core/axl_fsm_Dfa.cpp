@@ -12,6 +12,7 @@ DfaState::DfaState ()
 {
 	m_isAccept = false;
 	m_id = -1;
+	m_acceptNfaStateId = -1;
 	m_acceptContext = NULL;
 }
 
@@ -22,10 +23,15 @@ DfaState::addNfaState (NfaState* nfaState)
 	if (!result)
 		return false;
 
-	if ((nfaState->m_flags & NfaStateFlag_Accept) && !m_isAccept)
+	if (nfaState->m_flags & NfaStateFlag_Accept)
 	{
+		if (!m_isAccept || nfaState->m_id < m_acceptNfaStateId)
+		{
+			m_acceptContext = nfaState->m_acceptContext;
+			m_acceptNfaStateId = nfaState->m_id;
+		}
+
 		m_isAccept = true;
-		m_acceptContext = nfaState->m_acceptContext;
 	}
 
 	if (nfaState->m_flags & NfaStateFlag_OpenCapture)

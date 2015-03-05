@@ -20,13 +20,11 @@ main (
 {
 	printf ("main ()\n");
 
-//	char const* src = "[a-b]d";
-//	char const* src = "a*(b|cd?)+";
-//	char const* src = "[ABCDefghijkl](b|c)*";
-
 	char const* src [] = 
 	{
-		" \"hui\" [\\r\\n] . ",
+		"'A'",
+		"'B'",
+		".",
 	};
 
 	fsm::RegExp regExp;	

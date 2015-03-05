@@ -27,6 +27,7 @@ struct DfaState: rtl::ListLink
 {
 	bool m_isAccept;
 	uint_t m_id;
+	uint_t m_acceptNfaStateId;
 	void* m_acceptContext;
 	rtl::Array <size_t> m_openCaptureIdArray;
 	rtl::Array <size_t> m_closeCaptureIdArray;
