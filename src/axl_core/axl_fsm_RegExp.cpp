@@ -68,7 +68,10 @@ getMatchConditionString (const MatchCondition* condition)
 	switch (condition->m_conditionKind)
 	{
 	case MatchConditionKind_Char:
-		string.format ("'%c'", condition->m_char);
+		string.format (
+			isprint (condition->m_char) ? "'%c'" : "'\\x%02x'", 
+			(uchar_t) condition->m_char
+			);
 		break;
 
 	case MatchConditionKind_CharSet:
@@ -360,6 +363,48 @@ RegExpCompiler::minimizeDfa ()
 }
 
 bool
+getHexValue (
+	uint_t c,
+	uint_t* value
+	)
+{
+	if (c >= '0' && c <= '9')
+		*value = c - '0';
+	else if (c >= 'a' && c <= 'f')
+		*value = c - 'a';
+	else if (c >= 'A' && c <= 'F')
+		*value = c - 'A';
+	else
+		return false;
+
+	return true;
+}
+
+bool
+RegExpCompiler::readHexEscapeSequence (char* c)
+{
+	ASSERT (*m_p == 'x');
+	m_p++;
+
+	uint_t x1;
+	uint_t x2;
+
+	bool result = 
+		getHexValue (m_p [0], &x1) &&
+		getHexValue (m_p [1], &x2);
+
+	if (!result)
+	{
+		err::setFormatStringError ("invalid hex escape sequence");
+		return false;
+	}
+
+	*c = x2 | (x1 << 4);
+	m_p += 2;
+	return true;
+}
+
+bool
 RegExpCompiler::readEscapeSequence (char* c)
 {
 	ASSERT (*m_p == '\\');
@@ -406,6 +451,9 @@ RegExpCompiler::readEscapeSequence (char* c)
 	case 'e': 
 		*c = 0x1b; 
 		break;
+
+	case 'x':		
+		return readHexEscapeSequence (c);
 
 	default:
 		*c = *m_p;

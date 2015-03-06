@@ -132,6 +132,9 @@ public:
 
 protected:
 	bool
+	readHexEscapeSequence (char* c);
+
+	bool
 	readEscapeSequence (char* c);
 
 	bool

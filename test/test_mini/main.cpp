@@ -22,9 +22,7 @@ main (
 
 	char const* src [] = 
 	{
-		"'A'",
-		"'B'",
-		".",
+		"'\\x02' V '\\r'",
 	};
 
 	fsm::RegExp regExp;	
