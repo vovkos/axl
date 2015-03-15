@@ -29,7 +29,6 @@ struct LongJmpTry
 	{
 
 #define AXL_MT_LONG_JMP_CATCH() \
-		axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (prevLongJmpTry); \
 	} \
 	else \
 	{ \
@@ -37,6 +36,10 @@ struct LongJmpTry
 
 #define AXL_MT_END_LONG_JMP_TRY() \
 	} \
+	axl::mt::LongJmpTry* currentLongJmpTry = axl::mt::getTlsSlotValue <axl::mt::LongJmpTry> (); \
+	ASSERT (currentLongJmpTry == &longJmpTry || currentLongJmpTry == prevLongJmpTry); \
+	if (currentLongJmpTry == &longJmpTry) \
+		axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (prevLongJmpTry); \
 }
 
 #define AXL_MT_LONG_JMP_THROW() \

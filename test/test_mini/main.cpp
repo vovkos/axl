@@ -19,7 +19,13 @@ void foo ()
 	}
 	AXL_MT_LONG_JMP_CATCH ()
 	{
-		printf ("exception caught!\n");
+		printf ("exception caught\n");
+	}
+	AXL_MT_END_LONG_JMP_TRY ()
+
+	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	{
+		bar ();
 	}
 	AXL_MT_END_LONG_JMP_TRY ()
 
@@ -43,8 +49,6 @@ main (
 	printf ("main ()\n");
 
 	foo ();
-
-	return 0;
 
 	char const* src [] = 
 	{
