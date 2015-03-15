@@ -1,8 +1,30 @@
 #include "pch.h"
 #include "axl_fsm_RegExp.h"
 #include "axl_rtl_AutoPtrArray.h"
+#include "axl_mt_LongJmpTry.h"
 
 //.............................................................................
+
+void bar ()
+{
+	printf ("bar -- throwing...\n");
+	AXL_MT_LONG_JMP_THROW ();	
+}
+
+void foo ()
+{
+	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	{
+		bar ();
+	}
+	AXL_MT_LONG_JMP_CATCH ()
+	{
+		printf ("exception caught!\n");
+	}
+	AXL_MT_END_LONG_JMP_TRY ()
+
+	printf ("done\n");
+}
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
@@ -19,6 +41,10 @@ main (
 #endif
 {
 	printf ("main ()\n");
+
+	foo ();
+
+	return 0;
 
 	char const* src [] = 
 	{

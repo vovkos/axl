@@ -179,6 +179,7 @@ set (
 	${AXL_INC_DIR}/axl_mt_Event.h
 	${AXL_INC_DIR}/axl_mt_InvSemaphore.h
 	${AXL_INC_DIR}/axl_mt_Lock.h
+	${AXL_INC_DIR}/axl_mt_LongJmpTry.h
 	${AXL_INC_DIR}/axl_mt_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_Thread.h
 	${AXL_INC_DIR}/axl_mt_TlsMgr.h

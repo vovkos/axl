@@ -192,7 +192,6 @@ typedef wchar_t          utf32_t;
 // first, makes sure va_list isn't get modified if passed as argument
 // second, makes it possible to simply assign one to another
 
-
 struct axl_va_list
 {
 	va_list m_va;
