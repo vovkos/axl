@@ -904,10 +904,10 @@ public:
 		T* p = (T*) (newHdr + 1);
 
 		if (oldCount)
-		{
 			Details::constructCopy (p, m_p, oldCount);
+
+		if (m_p)
 			getHdr ()->release ();
-		}
 
 		m_p = p;
 
