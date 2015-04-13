@@ -6,7 +6,7 @@
 
 #define _AXL_MT_WIN_MODULE_H
 
-#include "axl_g_win_Handle.h"
+#include "axl_rtl_Handle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -27,15 +27,15 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Library: public Handle <HMODULE, FreeLibrary>
+class Library: public rtl::Handle <HMODULE, FreeLibrary>
 {
 public:
 	bool 
-	loadLibrary (const wchar_t* name)
+	loadLibrary (const wchar_t* fileName)
 	{
 		close ();
 
-		m_h = ::LoadLibraryW (name);
+		m_h = ::LoadLibraryW (fileName);
 		return err::complete (m_h != NULL);
 	}
 
@@ -43,7 +43,7 @@ public:
 	getProcAddress (const char* name)
 	{ 
 		void* p = ::GetProcAddress (m_h, name);
-		return err::complete (p, NULL);
+		return err::complete <void*> (p, NULL);
 	}
 };
 

@@ -7,7 +7,8 @@
 #define _AXL_MT_DYNAMICLIBRARY_H
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-#	include "axl_mt_win_Module.h"
+#	include "axl_mt_win_Library.h"
+#	include "axl_rtl_String.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_mt_psx_DynamicLibrary.h"
 #endif
@@ -28,7 +29,11 @@ public:
 	bool
 	load (const char* fileName)
 	{
-		return m_library.loadLibrary (fileName);
+		char buffer [256];
+		rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+		fileName_w = fileName;
+		
+		return m_library.loadLibrary (fileName_w);
 	}
 
 	void
