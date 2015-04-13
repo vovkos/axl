@@ -176,6 +176,7 @@ set (
 	MT_H_LIST
 	${AXL_INC_DIR}/axl_mt_Atomic.h
 	${AXL_INC_DIR}/axl_mt_CallOnce.h
+	${AXL_INC_DIR}/axl_mt_DynamicLibrary.h
 	${AXL_INC_DIR}/axl_mt_Event.h
 	${AXL_INC_DIR}/axl_mt_InvSemaphore.h
 	${AXL_INC_DIR}/axl_mt_Lock.h
@@ -206,6 +207,7 @@ source_group (
 set (
 	MT_PSX_H_LIST
 	${AXL_INC_DIR}/axl_mt_psx_Cond.h
+	${AXL_INC_DIR}/axl_mt_psx_DynamicLibrary.h
 	${AXL_INC_DIR}/axl_mt_psx_Mutex.h
 	${AXL_INC_DIR}/axl_mt_psx_Sem.h
 	${AXL_INC_DIR}/axl_mt_psx_Thread.h
@@ -214,6 +216,7 @@ set (
 set (
 	MT_PSX_CPP_LIST
 	axl_mt_psx_Cond.cpp
+	axl_mt_psx_DynamicLibrary.cpp
 	axl_mt_psx_Event.cpp
 	axl_mt_psx_Mutex.cpp
 	axl_mt_psx_Sem.cpp
@@ -240,6 +243,7 @@ set (
 	MT_WIN_H_LIST
 	${AXL_INC_DIR}/axl_mt_win_CriticalSection.h
 	${AXL_INC_DIR}/axl_mt_win_Event.h
+	${AXL_INC_DIR}/axl_mt_win_Library.h
 	${AXL_INC_DIR}/axl_mt_win_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_win_Thread.h
 	${AXL_INC_DIR}/axl_mt_win_WaitableHandle.h

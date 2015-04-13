@@ -66,6 +66,7 @@
 #	include <pthread.h>
 #	include <semaphore.h>
 #	include <fcntl.h>
+#	include <dlfcn.h>
 #	include <limits.h>
 #	include <byteswap.h>
 #	include <sys/stat.h>

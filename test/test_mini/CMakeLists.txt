@@ -74,6 +74,7 @@ if (UNIX)
 	target_link_libraries (
 		test_mini
 		pthread
+		dl
 		)
 endif ()
 

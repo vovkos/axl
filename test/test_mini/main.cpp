@@ -2,6 +2,7 @@
 #include "axl_fsm_RegExp.h"
 #include "axl_rtl_AutoPtrArray.h"
 #include "axl_mt_LongJmpTry.h"
+#include "axl_mt_DynamicLibrary.h"
 
 //.............................................................................
 
@@ -46,7 +47,28 @@ main (
 	)
 #endif
 {
+	bool result;
+
 	printf ("main ()\n");
+
+	mt::DynamicLibrary dl;
+	
+	result = dl.load ("libc.so.6");
+	if (!result)
+	{
+		printf ("dl.load failed: %s\n", err::getLastError ().getDescription ().cc ());
+		return -1;
+	}
+
+	typedef int Printf (const char*, ...);
+	Printf* prn = (Printf*) dl.getFunction ("printf");
+	if (!prn)
+	{
+		printf ("dl.load failed: %s\n", err::getLastError ().getDescription ().cc ());
+		return -1;
+	}
+
+	prn ("hui govno i muravei %d\n", 123);
 
 	foo ();
 
