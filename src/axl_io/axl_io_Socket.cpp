@@ -150,7 +150,11 @@ formatSockAddr_ip6 (
 				string->append ("::", 2);
 				isIp4 = true;
 			}
+#if (_AXL_ENV == AXL_ENV_WIN) // try to comply with WSAAddressToStringA...
+			else if (maxZeroRunLength == 5 && ip [5] == 0xffff && ip [6] != 0)
+#else // ...or with inet_ntop
 			else if (maxZeroRunLength == 5 && ip [5] == 0xffff)
+#endif
 			{
 				string->append ("::ffff:", 7);
 				isIp4 = true;
