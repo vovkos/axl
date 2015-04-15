@@ -50,51 +50,53 @@ main (
 {
 	bool result;
 
+#if (_AXL_ENV == AXL_ENV_WIN)
 	WSADATA wsaData;
-	WSAStartup (0x0202, &wsaData);
-	
-#pragma comment (lib, "ws2_32.lib")
+	WSAStartup (0x0202, &wsaData);	
+#	pragma comment (lib, "ws2_32.lib")
+#endif
 
 	printf ("main ()\n");
 
 	sockaddr_in6 addr = { 0 };
 	addr.sin6_family = AF_INET6;
 
-	for (size_t i = 0;; i++)
+	for (;;)
 	{
-		addr.sin6_addr.u.Word [0] = rand () % 2 ? rand () : 0;
-		addr.sin6_addr.u.Word [1] = rand () % 2 ? rand () : 0;
-		addr.sin6_addr.u.Word [2] = rand () % 2 ? rand () : 0;
-		addr.sin6_addr.u.Word [3] = rand () % 2 ? rand () : 0;
-		addr.sin6_addr.u.Word [4] = rand () % 2 ? rand () : 0;
-		addr.sin6_addr.u.Word [5] = rand () % 2 ? rand () : 0;
-		addr.sin6_addr.u.Word [6] = rand () % 2 ? rand () : 0;
-		addr.sin6_addr.u.Word [7] = rand () % 2 ? rand () : 0;
+		uint16_t* ip = (uint16_t*) &addr.sin6_addr;
+
+		ip [0] = rand () % 2 ? rand () : 0;
+		ip [1] = rand () % 2 ? rand () : 0;
+		ip [2] = rand () % 2 ? rand () : 0;
+		ip [3] = rand () % 2 ? rand () : 0;
+		ip [4] = rand () % 2 ? rand () : 0;
+		ip [5] = rand () % 2 ? rand () : rand () % 2 ? 0xffff : 0;
+		ip [6] = rand () % 2 ? rand () : 0;
+		ip [7] = rand () % 2 ? rand () : 0;
+#if (_AXL_ENV == AXL_ENV_WIN)
 		addr.sin6_port = rand () % 2 ? rand () : 0;
 		addr.sin6_scope_id = rand () % 2 ? rand () : 0;
+#endif
 
-		char addrString [1024] = { 0 };
-		dword_t size = sizeof (addrString);
+		rtl::String addrString = io::formatSockAddr ((const sockaddr*) &addr).cc ();
+		printf ("addr1 = %s\n", addrString.cc ());
 
-		WSAAddressToStringA ((sockaddr*) &addr, sizeof (addr), NULL, addrString, &size);
+		char addrString2 [1024] = { 0 };
+		dword_t size = sizeof (addrString2);
 
-		rtl::String addrString2 = io::formatSockAddr ((const sockaddr*) &addr).cc ();
+#if (_AXL_ENV == AXL_ENV_WIN)
+		WSAAddressToStringA ((sockaddr*) &addr, sizeof (addr), NULL, addrString2, &size);
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+		inet_ntop (AF_INET6, &addr.sin6_addr, addrString2, size);
+#endif
 
-		printf ("addr1 = %s\n", addrString);
 		printf ("addr2 = %s\n\n", addrString2);
-
-		ASSERT (addrString2.cmp (addrString) == 0);
+		ASSERT (addrString.cmp (addrString2) == 0);
 
 		sockaddr_in6 addr2;
-
-		result = io::parseSockAddr ((sockaddr*) &addr2, sizeof (addr2), addrString2);
+		result = io::parseSockAddr ((sockaddr*) &addr2, sizeof (addr2), addrString);
 		ASSERT (result && memcmp (&addr, &addr2, sizeof (addr)) == 0);
 	}
-
-	const char* s = "fe80::f075:7b94:7c50:9565%14";
-
-	int addrSize = sizeof (addr);
-	WSAStringToAddressA ("[fe80::f075:0:9565%10]:1001", AF_INET6, NULL, (sockaddr*) &addr, &addrSize);
 
 	return -1;
 

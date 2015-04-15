@@ -150,7 +150,7 @@ formatSockAddr_ip6 (
 				string->append ("::", 2);
 				isIp4 = true;
 			}
-			else if (maxZeroRunLength == 5 && ip [5] == 0xffff && ip [6] != 0)
+			else if (maxZeroRunLength == 5 && ip [5] == 0xffff)
 			{
 				string->append ("::ffff:", 7);
 				isIp4 = true;

@@ -203,9 +203,9 @@ enum SystemErrorCode
 	SystemErrorCode_InvalidHandle            = EBADF,
 	SystemErrorCode_AddressAlreadyExists     = EEXIST,
 /*	SystemErrorCode_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
-	SystemErrorCode_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
-	SystemErrorCode_InvalidAddress           = ERROR_UNEXP_NET_ERR,
-	SystemErrorCode_AddressClosed            = ERROR_NETNAME_DELETED,
+	SystemErrorCode_TooManyAddresses         = ERROR_TOO_MANY_NAMES, */
+	SystemErrorCode_InvalidAddress           = EINVAL,
+/*	SystemErrorCode_AddressClosed            = ERROR_NETNAME_DELETED,
 	SystemErrorCode_BufferOverflow           = ERROR_MORE_DATA,*/
 	SystemErrorCode_InvalidParameter         = EINVAL,
 /*	SystemErrorCode_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
@@ -225,9 +225,9 @@ enum SystemErrorCode
 	SystemErrorCode_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
 	SystemErrorCode_PortUnreachable          = ERROR_PORT_UNREACHABLE,*/
 	SystemErrorCode_InvalidDeviceRequest     = ENOSYS,
-/*	SystemErrorCode_RequestAborted           = ERROR_REQUEST_ABORTED,
-	SystemErrorCode_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
-	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
+//	SystemErrorCode_RequestAborted           = ERROR_REQUEST_ABORTED,
+	SystemErrorCode_BufferTooSmall           = ENOBUFS,
+/*	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
 	SystemErrorCode_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
 	SystemErrorCode_AccessDenied             = ERROR_ACCESS_DENIED,
 	SystemErrorCode_SharingViolation         = ERROR_SHARING_VIOLATION,
