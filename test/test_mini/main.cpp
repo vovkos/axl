@@ -3,6 +3,7 @@
 #include "axl_rtl_AutoPtrArray.h"
 #include "axl_mt_LongJmpTry.h"
 #include "axl_mt_DynamicLibrary.h"
+#include "axl_io_Socket.h"
 
 //.............................................................................
 
@@ -49,7 +50,53 @@ main (
 {
 	bool result;
 
+	WSADATA wsaData;
+	WSAStartup (0x0202, &wsaData);
+	
+#pragma comment (lib, "ws2_32.lib")
+
 	printf ("main ()\n");
+
+	sockaddr_in6 addr = { 0 };
+	addr.sin6_family = AF_INET6;
+
+	for (size_t i = 0;; i++)
+	{
+		addr.sin6_addr.u.Word [0] = rand () % 2 ? rand () : 0;
+		addr.sin6_addr.u.Word [1] = rand () % 2 ? rand () : 0;
+		addr.sin6_addr.u.Word [2] = rand () % 2 ? rand () : 0;
+		addr.sin6_addr.u.Word [3] = rand () % 2 ? rand () : 0;
+		addr.sin6_addr.u.Word [4] = rand () % 2 ? rand () : 0;
+		addr.sin6_addr.u.Word [5] = rand () % 2 ? rand () : 0;
+		addr.sin6_addr.u.Word [6] = rand () % 2 ? rand () : 0;
+		addr.sin6_addr.u.Word [7] = rand () % 2 ? rand () : 0;
+		addr.sin6_port = rand () % 2 ? rand () : 0;
+		addr.sin6_scope_id = rand () % 2 ? rand () : 0;
+
+		char addrString [1024] = { 0 };
+		dword_t size = sizeof (addrString);
+
+		WSAAddressToStringA ((sockaddr*) &addr, sizeof (addr), NULL, addrString, &size);
+
+		rtl::String addrString2 = io::formatSockAddr ((const sockaddr*) &addr).cc ();
+
+		printf ("addr1 = %s\n", addrString);
+		printf ("addr2 = %s\n\n", addrString2);
+
+		ASSERT (addrString2.cmp (addrString) == 0);
+
+		sockaddr_in6 addr2;
+
+		result = io::parseSockAddr ((sockaddr*) &addr2, sizeof (addr2), addrString2);
+		ASSERT (result && memcmp (&addr, &addr2, sizeof (addr)) == 0);
+	}
+
+	const char* s = "fe80::f075:7b94:7c50:9565%14";
+
+	int addrSize = sizeof (addr);
+	WSAStringToAddressA ("[fe80::f075:0:9565%10]:1001", AF_INET6, NULL, (sockaddr*) &addr, &addrSize);
+
+	return -1;
 
 	mt::DynamicLibrary dl;
 	

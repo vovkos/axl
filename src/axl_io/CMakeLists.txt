@@ -24,6 +24,7 @@ set (
 	${AXL_INC_DIR}/axl_io_Socket.h
 	${AXL_INC_DIR}/axl_io_SocketTransport.h
 	${AXL_INC_DIR}/axl_io_Transport.h
+	axl_io_SockAddrParser.h
 	)
 
 set (
@@ -38,6 +39,7 @@ set (
 	axl_io_Pipe.cpp
 	axl_io_Serial.cpp
 	axl_io_SharedMemoryTransport.cpp
+	axl_io_SockAddrParser.cpp
 	axl_io_Socket.cpp
 	axl_io_Transport.cpp
 	)

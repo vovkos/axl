@@ -12,6 +12,8 @@
 #	include "axl_io_psx_Socket.h"
 #endif
 
+#include "axl_rtl_String.h"
+
 namespace axl {
 namespace io {
 
@@ -178,6 +180,77 @@ public:
 		return m_socket.recvFrom (p, size, addr);
 	}
 };
+
+//.............................................................................
+
+bool
+parseSockAddr_ip4 (
+	sockaddr_in* addr,
+	const char* string,
+	size_t length = -1
+	);
+
+bool
+parseSockAddr_ip6 (
+	sockaddr_in6* addr,
+	const char* string,
+	size_t length = -1
+	);
+
+bool
+parseSockAddr (
+	sockaddr* addr,
+	size_t size,
+	const char* string,
+	size_t length = -1
+	);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+size_t
+formatSockAddr_ip4 (
+	rtl::String* string,
+	const sockaddr_in* addr
+	);
+
+inline
+rtl::String
+formatSockAddr_ip4 (const sockaddr_in* addr)
+{
+	rtl::String string;
+	formatSockAddr_ip4 (&string, addr);
+	return string;
+}
+
+size_t
+formatSockAddr_ip6 (
+	rtl::String* string,
+	const sockaddr_in6* addr
+	);
+
+inline
+rtl::String
+formatSockAddr_ip6 (const sockaddr_in6* addr)
+{
+	rtl::String string;
+	formatSockAddr_ip6 (&string, addr);
+	return string;
+}
+
+size_t
+formatSockAddr (
+	rtl::String* string,
+	const sockaddr* addr
+	);
+
+inline
+rtl::String
+formatSockAddr (const sockaddr* addr)
+{
+	rtl::String string;
+	formatSockAddr (&string, addr);
+	return string;
+}
 
 //.............................................................................
 
