@@ -292,9 +292,7 @@ main (
 	)
 #endif
 {
-	testWinNetworkAdapterList ();
 	testNetworkAdapterList ();
-
 	return 0;
 }
 

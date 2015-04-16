@@ -40,9 +40,10 @@ enum NetworkAdapterFlag
 {
 	NetworkAdapterFlag_Dhcp      = 0x01,
 	NetworkAdapterFlag_Ddns      = 0x02,
-	NetworkAdapterFlag_Multicast = 0x04,
-	NetworkAdapterFlag_Ip4       = 0x08,
-	NetworkAdapterFlag_Ip6       = 0x10,
+	NetworkAdapterFlag_Broadcast = 0x04,
+	NetworkAdapterFlag_Multicast = 0x08,
+	NetworkAdapterFlag_Ip4       = 0x10,
+	NetworkAdapterFlag_Ip6       = 0x20,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -4,6 +4,9 @@
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include <iphlpapi.h>
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include <ifaddrs.h>
+#	include <net/if.h>
 #endif
 
 #ifdef _AXL_IO_PCAP

@@ -17,8 +17,8 @@ public:
 
 protected:
 	static
-	bool
-	createAdapter (
+	void
+	setupAdapter (
 		NetworkAdapter* adapter,
 		IP_ADAPTER_ADDRESSES* srcAdapter
 		);
@@ -59,11 +59,8 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 	for (; srcAdapter; srcAdapter = srcAdapter->Next)
 	{
 		NetworkAdapter* adapter = AXL_MEM_NEW (NetworkAdapter);
-		bool result = createAdapter (adapter, srcAdapter);
-		if (!result)
-			AXL_MEM_DELETE (adapter);
-		else
-			adapterList->insertTail (adapter);
+		setupAdapter (adapter, srcAdapter);
+		adapterList->insertTail (adapter);
 	}
 
 	return adapterList->getCount ();
@@ -71,7 +68,7 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-bool
+void
 NetworkAdapterEnumerator::createAdapter (
 	NetworkAdapter* adapter,
 	IP_ADAPTER_ADDRESSES* srcAdapter
@@ -142,8 +139,6 @@ NetworkAdapterEnumerator::createAdapter (
 		memcpy (address + 1, srcAddress->Address.lpSockaddr, srcAddress->Address.iSockaddrLength);
 		adapter->m_addressList.insertTail (address);
 	}
-	
-	return true;
 }
 
 //.............................................................................

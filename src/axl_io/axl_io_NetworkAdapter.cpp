@@ -36,7 +36,8 @@ getNetworkAdapterFlagString (NetworkAdapterFlag flag)
 	{
 		"DHCP",      // NetworkAdapterFlag_Dhcp      = 0x01,
 		"DDNS",      // NetworkAdapterFlag_Ddns      = 0x02,
-		"multicast", // NetworkAdapterFlag_Multicast = 0x04,
+		"broadcast", // NetworkAdapterFlag_Broadcast = 0x04,
+		"multicast", // NetworkAdapterFlag_Multicast = 0x08,
 		"IPv4",      // NetworkAdapterFlag_Ip4       = 0x10,
 		"IPv6",      // NetworkAdapterFlag_Ip6       = 0x20,
 	};
