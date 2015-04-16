@@ -2,6 +2,10 @@
 
 #include "axl_g_Pch.h"
 
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include <iphlpapi.h>
+#endif
+
 #ifdef _AXL_IO_PCAP
 #	include <pcap/pcap.h>
 #endif

@@ -24,6 +24,7 @@ set (
 	${AXL_INC_DIR}/axl_io_Socket.h
 	${AXL_INC_DIR}/axl_io_SocketTransport.h
 	${AXL_INC_DIR}/axl_io_Transport.h
+	${AXL_INC_DIR}/axl_io_NetworkAdapter.h
 	axl_io_SockAddrParser.h
 	)
 
@@ -42,6 +43,7 @@ set (
 	axl_io_SockAddrParser.cpp
 	axl_io_Socket.cpp
 	axl_io_Transport.cpp
+	axl_io_NetworkAdapter.cpp
 	)
 
 # temporarily exclude until i port axl_exe
@@ -132,6 +134,7 @@ set (
 	axl_io_psx_Pipe.cpp
 	axl_io_psx_Serial.cpp
 	axl_io_psx_Socket.cpp
+	axl_io_psx_NetworkAdapter.cpp
 	)
 
 source_group (
@@ -168,6 +171,7 @@ set (
 	axl_io_win_NamedPipe.cpp
 	axl_io_win_Serial.cpp
 	axl_io_win_Socket.cpp
+	axl_io_win_NetworkAdapter.cpp
 	)
 
 source_group (
