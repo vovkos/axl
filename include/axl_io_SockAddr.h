@@ -168,7 +168,7 @@ struct SockAddr
 	}
 
 	SockAddr (
-		const in_addr6* addr,
+		const in6_addr* addr,
 		uint_t port = 0,
 		uint_t scope = 0
 		)
@@ -234,7 +234,7 @@ struct SockAddr
 
 	void
 	setup_ip6 (
-		const in_addr6* addr,
+		const in6_addr* addr,
 		uint_t port = 0,
 		uint_t scope = 0
 		);
@@ -246,7 +246,7 @@ struct SockAddr
 		uint_t scope = 0
 		)
 	{
-		setup_ip6 ((const in_addr6*) ip, port);
+		setup_ip6 ((const in6_addr*) ip, port);
 	}
 
 	size_t

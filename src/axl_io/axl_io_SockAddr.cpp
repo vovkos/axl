@@ -369,7 +369,7 @@ SockAddr::setup_ip4 (
 
 void
 SockAddr::setup_ip6 (
-	const in_addr6* addr,
+	const in6_addr* addr,
 	uint_t port,
 	uint_t scope
 	)

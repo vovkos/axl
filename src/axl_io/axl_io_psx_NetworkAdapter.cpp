@@ -109,8 +109,8 @@ NetworkAdapterEnumerator::addAdapterAddress (
 	)
 {
 	NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);
-	address->m_address = *addr;
-	address->m_netMaskBitCount = rtl::setB*netMask;
+	address->m_address.setup (addr);
+	address->m_netMaskBitCount = netMask ? getSockAddrNetMaskBitCount (netMask) : 0;
 	adapter->m_addressList.insertTail (address);	
 }
 
