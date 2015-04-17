@@ -8,6 +8,7 @@
 
 #include "axl_rtl_Handle.h"
 #include "axl_err_Error.h"
+#include "axl_io_SockAddr.h"
 
 namespace axl {
 namespace io {
@@ -54,10 +55,10 @@ public:
 	}
 
 	bool
-	getAddress (sockaddr* addr);
+	getAddress (SockAddr* addr);
 
 	bool
-	getPeerAddress (sockaddr* addr);
+	getPeerAddress (SockAddr* addr);
 
 	bool
 	getOption (
@@ -91,7 +92,7 @@ public:
 	}
 
 	SOCKET
-	accept (sockaddr* addr = NULL);
+	accept (SockAddr* addr = NULL);
 
 	bool
 	connect (const sockaddr* addr)
@@ -142,7 +143,7 @@ public:
 	recvFrom (
 		void* p,
 		size_t size,
-		sockaddr* addr
+		SockAddr* addr
 		);
 
 public:
@@ -182,12 +183,13 @@ public:
 	}
 
 	SOCKET
-	wsaAccept (sockaddr* addr);
+	wsaAccept (SockAddr* addr);
 
 	bool
 	wsaSend (
 		const void* p,
 		dword_t size,
+		dword_t* actualSize,
 		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		);
@@ -196,6 +198,7 @@ public:
 	wsaRecv (
 		void* p,
 		dword_t size,
+		dword_t* actualSize,
 		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		);
@@ -204,6 +207,7 @@ public:
 	wsaSendTo (
 		const void* p,
 		dword_t size,
+		dword_t* actualSize,
 		const sockaddr* addr,
 		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
@@ -213,8 +217,20 @@ public:
 	wsaRecvFrom (
 		void* p,
 		dword_t size,
-		sockaddr* addr,
-		int* addrSize,
+		dword_t* actualSize,
+		SockAddr* addr,
+		WSAOVERLAPPED* overlapped,
+		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+		);
+
+	bool
+	wsaIoctl (
+		dword_t ioctlCode,
+		const void* inBuffer,
+		dword_t inBufferSize,
+		void* outBuffer,
+		dword_t outBufferSize,
+		dword_t* actualSize,
 		WSAOVERLAPPED* overlapped,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
 		);

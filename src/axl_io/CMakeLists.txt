@@ -41,6 +41,7 @@ set (
 	axl_io_Serial.cpp
 	axl_io_SharedMemoryTransport.cpp
 	axl_io_SockAddrParser.cpp
+	axl_io_SockAddr.cpp
 	axl_io_Socket.cpp
 	axl_io_Transport.cpp
 	axl_io_NetworkAdapter.cpp

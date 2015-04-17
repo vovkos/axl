@@ -574,6 +574,9 @@ public:
 Error
 getLastError ();
 
+rtl::String
+getLastErrorDescription ();
+
 Error
 setError (const Error& error);
 

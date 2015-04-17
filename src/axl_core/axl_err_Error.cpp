@@ -185,6 +185,12 @@ getLastError ()
 	return getErrorMgr ()->getLastError ();
 }
 
+rtl::String
+getLastErrorDescription ()
+{
+	return getLastError ()->getDescription ();
+}
+
 Error
 setError (const Error& error)
 {

@@ -8,6 +8,7 @@
 
 #include "axl_io_psx_Fd.h"
 #include "axl_err_Error.h"
+#include "axl_io_SockAddr.h"
 
 namespace axl {
 namespace io {
@@ -34,15 +35,15 @@ public:
 	bool
 	bind (const sockaddr* addr)
 	{
-		int result = ::bind (m_h, addr, sizeof (sockaddr));
+		int result = ::bind (m_h, addr, getSockAddrSize (addr));
 		return err::complete (result != -1);
 	}
 
 	bool
-	getAddress (sockaddr* addr);
+	getAddress (SockAddr* addr);
 
 	bool
-	getPeerAddress (sockaddr* addr);
+	getPeerAddress (SockAddr* addr);
 
 	bool
 	getOption (
@@ -76,7 +77,7 @@ public:
 	}
 
 	int
-	accept (sockaddr* addr = NULL);
+	accept (SockAddr* addr = NULL);
 
 	bool
 	connect (const sockaddr* addr);
@@ -115,7 +116,7 @@ public:
 		const sockaddr* addr
 		)
 	{
-		int result = ::sendto (m_h, p, size, 0, addr, sizeof (sockaddr));
+		int result = ::sendto (m_h, p, size, 0, addr, getSockAddrSize (addr));
 		return err::complete (result, -1);
 	}
 
@@ -123,7 +124,7 @@ public:
 	recvFrom (
 		void* p,
 		size_t size,
-		sockaddr* addr
+		SockAddr* addr
 		);
 };
 

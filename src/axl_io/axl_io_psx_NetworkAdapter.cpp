@@ -2,6 +2,7 @@
 #include "axl_io_NetworkAdapter.h"
 #include "axl_err_Error.h"
 #include "axl_rtl_StringHashTable.h"
+#include "axl_rtl_BitMap.h"
 #include "axl_io_Socket.h"
 
 namespace axl {
@@ -28,7 +29,8 @@ protected:
 	void
 	addAdapterAddress (
 		NetworkAdapter* adapter,
-		const sockaddr* sockAddr
+		const sockaddr* addr,
+		const sockaddr* netMask
 		);
 };
 
@@ -58,7 +60,7 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 		if (it->m_value)
 		{
 			if (iface->ifa_addr)
-				addAdapterAddress (it->m_value, iface->ifa_addr);
+				addAdapterAddress (it->m_value, iface->ifa_addr, iface->ifa_netmask);
 
 			continue;
 		}
@@ -102,27 +104,13 @@ NetworkAdapterEnumerator::setupAdapter (
 void
 NetworkAdapterEnumerator::addAdapterAddress (
 	NetworkAdapter* adapter,
-	const sockaddr* sockAddr
+	const sockaddr* addr,
+	const sockaddr* netMask
 	)
 {
-	size_t sockAddrSize;
-
-	switch (sockAddr->sa_family)
-	{
-	case AF_INET:
-		sockAddrSize = sizeof (sockaddr_in);
-		break;
-
-	case AF_INET6:
-		sockAddrSize = sizeof (sockaddr_in6);
-		break;
-
-	default:
-		return;
-	}
-
-	NetworkAdapterAddress* address = AXL_MEM_NEW_EXTRA (NetworkAdapterAddress, sockAddrSize);
-	memcpy (address + 1, sockAddr, sockAddrSize);
+	NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);
+	address->m_address = *addr;
+	address->m_netMaskBitCount = rtl::setB*netMask;
 	adapter->m_addressList.insertTail (address);	
 }
 

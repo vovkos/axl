@@ -103,6 +103,103 @@ testWinNetworkAdapterList ()
 	printf ("%d adapters found\n---------------------------------\n\n", count);
 }
 
+void
+testWinNetworkAdapterList2 ()
+{
+	printf ("Using WinIoctl...\n\n");
+
+	printf (
+		"sizeof (sockaddr) = %d\n"
+		"sizeof (sockaddr_in) = %d\n"
+		"sizeof (sockaddr_in6) = %d\n"
+		"sizeof (sockaddr_storage) = %d\n"
+		"sizeof (io::SockAddr) = %d\n",
+		sizeof (sockaddr),
+		sizeof (sockaddr_in),
+		sizeof (sockaddr_in6),
+		sizeof (sockaddr_storage),
+		sizeof (io::SockAddr)
+		);
+
+	io::win::Socket socket;
+	bool result = socket.wsaOpen (AF_INET, SOCK_DGRAM, 0);
+	if (!result)
+	{
+		printf ("socket.wsaOpen failed (%s)\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	size_t size = 16 * sizeof (INTERFACE_INFO);
+	rtl::Array <char> buffer;
+	buffer.setCount (size);
+
+	dword_t actualSize;
+
+	for (;;)
+	{	
+		int result = ::WSAIoctl (
+			socket,
+			SIO_GET_INTERFACE_LIST,
+			NULL, 
+			0,
+			buffer.a (),
+			size,
+			&actualSize,
+			NULL, 
+			NULL
+			);
+
+		if (result == ERROR_SUCCESS)
+			break;
+
+		dword_t error = ::WSAGetLastError ();
+		if (error != WSAENOBUFS)
+		{
+			printf ("WSAIoctl failed (%s)\n", err::Error (error)->getDescription ().cc ());
+			return;
+		}
+
+		size *= 2;
+		buffer.setCount (size);
+	}
+
+	const INTERFACE_INFO* iface = (const INTERFACE_INFO*) buffer.ca ();
+	size_t ifaceCount = actualSize / sizeof (INTERFACE_INFO);
+	
+	for (size_t i = 0; i < ifaceCount; iface++, i++) 
+	{
+		printf ("Interface #%d\n", i);
+		printf ("  Address   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiAddress).cc ());
+		printf ("  Broadcast = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiBroadcastAddress).cc ());
+		printf ("  Netmask   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiNetmask).cc ());
+
+/*		cout << endl;
+
+		sockaddr_in *pAddress;
+		pAddress = (sockaddr_in *) & (InterfaceList[i].iiAddress);
+		cout << " " << inet_ntoa(pAddress->sin_addr);
+
+		pAddress = (sockaddr_in *) & (InterfaceList[i].iiBroadcastAddress);
+		cout << " has bcast " << inet_ntoa(pAddress->sin_addr);
+
+		pAddress = (sockaddr_in *) & (InterfaceList[i].iiNetmask);
+		cout << " and netmask " << inet_ntoa(pAddress->sin_addr) << endl;
+
+		cout << " Iface is ";
+		u_long nFlags = InterfaceList[i].iiFlags;
+		if (nFlags & IFF_UP) cout << "up";
+		else                 cout << "down";
+		if (nFlags & IFF_POINTTOPOINT) cout << ", is point-to-point";
+		if (nFlags & IFF_LOOPBACK)     cout << ", is a loopback iface";
+		cout << ", and can do: ";
+		if (nFlags & IFF_BROADCAST) cout << "bcast ";
+		if (nFlags & IFF_MULTICAST) cout << "multicast ";
+		cout << endl; */
+	}
+
+	printf ("%d adapters found\n---------------------------------\n\n", ifaceCount);
+}
+
 #endif
 
 //.............................................................................
@@ -128,9 +225,23 @@ testNetworkAdapterList ()
 		for (size_t i = 1; addressIt; addressIt++, i++)
 		{
 			io::NetworkAdapterAddress* address = *addressIt;
-			rtl::String addressString = io::formatSockAddr (address->getSockAddr ());
 			
-			printf ("Address #%-2d = %s\n", i, addressString.cc ());
+			uint_t family = address->m_address.m_addr.sa_family;
+			printf ("%-11s = %s", 
+				io::getSockAddrFamilyString (family),
+				address->m_address.getString ().cc ()
+				);
+
+			if (family == AF_INET)
+			{
+				io::SockAddr netMask;
+				netMask.createNetMask_ip4 (address->m_netMaskBitCount);
+				printf (" (mask %s)\n", netMask.getString ().cc ());
+			}
+			else
+			{
+				printf ("/%d\n", address->m_netMaskBitCount);
+			}
 		}
 
 		printf ("\n");
@@ -144,11 +255,6 @@ testNetworkAdapterList ()
 void
 testParseFormatIp6 ()
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
-	WSADATA wsaData;
-	WSAStartup (0x0202, &wsaData);	
-#endif
-
 	printf ("main ()\n");
 
 	sockaddr_in6 addr = { 0 };
@@ -171,7 +277,7 @@ testParseFormatIp6 ()
 		addr.sin6_scope_id = rand () % 2 ? rand () : 0;
 #endif
 
-		rtl::String addrString = io::formatSockAddr ((const sockaddr*) &addr).cc ();
+		rtl::String addrString = io::getSockAddrString ((const sockaddr*) &addr).cc ();
 		printf ("addr1 = %s\n", addrString.cc ());
 
 		char addrString2 [1024] = { 0 };
@@ -292,6 +398,12 @@ main (
 	)
 #endif
 {
+#if (_AXL_ENV == AXL_ENV_WIN)
+	WSADATA wsaData;
+	WSAStartup (0x0202, &wsaData);	
+#endif
+
+//	testWinNetworkAdapterList2 ();
 	testNetworkAdapterList ();
 	return 0;
 }

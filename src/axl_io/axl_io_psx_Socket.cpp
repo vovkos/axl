@@ -38,25 +38,25 @@ Socket::setBlockingMode (bool isBlocking)
 }
 
 bool
-Socket::getAddress (sockaddr* addr)
+Socket::getAddress (SockAddr* addr)
 {
-	socklen_t size = sizeof (sockaddr);
-	int result = ::getsockname (m_h, addr, &size);
+	socklen_t size = sizeof (SockAddr);
+	int result = ::getsockname (m_h, (sockaddr*) addr, &size);
 	return err::complete (result != -1);
 }
 
 bool
-Socket::getPeerAddress (sockaddr* addr)
+Socket::getPeerAddress (SockAddr* addr)
 {
-	socklen_t size = sizeof (sockaddr);
-	int result = ::getpeername (m_h, addr, &size);
+	socklen_t size = sizeof (SockAddr);
+	int result = ::getpeername (m_h, (sockaddr*) addr, &size);
 	return err::complete (result != -1);
 }
 
 bool
 Socket::connect (const sockaddr* addr)
 {
-	int result = ::connect (m_h, addr, sizeof (sockaddr));
+	int result = ::connect (m_h, addr, getSockAddrSize (addr));
 	if (result != -1)
 		return true;
 
@@ -70,10 +70,15 @@ Socket::connect (const sockaddr* addr)
 }
 
 int
-Socket::accept (sockaddr* addr)
+Socket::accept (SockAddr* addr)
 {
-	socklen_t size = sizeof (sockaddr);
-	int socket = ::accept (m_h, addr, &size);
+	socklen_t size = sizeof (SockAddr);
+	int socket = ::accept (
+		m_h, 
+		(sockaddr*) addr, 
+		addr ? &size : NULL
+		);
+
 	return err::complete (socket, -1);
 }
 
@@ -81,11 +86,19 @@ size_t
 Socket::recvFrom (
 	void* p,
 	size_t size,
-	sockaddr* addr
+	SockAddr* addr
 	)
 {
-	socklen_t sockAddrSize = sizeof (sockaddr);
-	int result = ::recvfrom (m_h, p, size, 0, addr, &sockAddrSize);
+	socklen_t addrSize = sizeof (SockAddr);
+	int result = ::recvfrom (
+		m_h, 
+		p, 
+		size, 
+		0, 
+		(sockaddr*) addr, 
+		addr ? &addrSize : NULL
+		);
+
 	return err::complete (result, -1);
 }
 

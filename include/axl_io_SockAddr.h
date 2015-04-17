@@ -6,272 +6,347 @@
 
 #define _AXL_IO_SOCKADDR_H
 
-#include "axl_io_Transport.h"
-#include "axl_err_Error.h"
+#include "axl_rtl_String.h"
 
 namespace axl {
 namespace io {
 
 //.............................................................................
 
-enum SockAddrKind
-{
-	SockAddrKind_Ip   = 2,
-	SockAddrKind_Ip6  = 23,
-};
+const char*
+getSockAddrFamilyString (uint_t family);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum SockProto
-{
-	SockProto_Icmp = 1,
-	SockProto_Udp  = 17,
-	SockProto_Tcp  = 6,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+size_t
+getSockAddrFamilySize (uint_t family);
 
 inline
-const char* 
-getProtocolString (SockProto protocol)
+size_t 
+getSockAddrSize (const sockaddr* addr)
 {
-	switch (protocol)
-	{
-	case SockProto_Icmp:
-		return "ICMP";
-
-	case SockProto_Udp:
-		return "UDP";
-
-	case SockProto_Tcp:
-		return "TCP";
-
-	default:
-		return "UNKNOWN_PROTOCOL";
-	}
+	return getSockAddrFamilySize (addr->sa_family);
 }
+
+const char*
+getSockProtoString (uint_t proto);
 
 //.............................................................................
 
-union SockAddr
-{
-	sockaddr_in m_ip4;
-	sockaddr_in6 m_ip6;
-};
+size_t
+getSockAddrNetMaskBitCount_ip4 (const sockaddr_in* addr);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+size_t
+getSockAddrNetMaskBitCount_ip6 (const sockaddr_in6* addr);
 
-struct SockAddrIp: SockAddr
-{
-	union
-	{
-		uint32_t m_ip;
-		uint8_t m_ipBytes [4];
-	};
+size_t
+getSockAddrNetMaskBitCount (const sockaddr* addr);
 
-	uint16_t m_port;
+//.............................................................................
 
-	void
-	setup (
-		uint32_t ip, 
-		uint16_t port
-		)
-	{
-		m_kind = SockAddrKind_Ip;
-		m_size = sizeof (SockAddrIp);
-		m_ip   = ip;
-		m_port = port;
-	}
+void
+createSockAddrNetMask_ip4 (
+	sockaddr_in* addr,
+	size_t bitCount
+	);
 
-	void
-	fromWinSockAddr (const SOCKADDR_IN* addr)
-	{
-		setup (ntohl (addr->sin_addr.S_un.S_addr), ntohs (addr->sin_port));
-	}
+void
+createSockAddrNetMask_ip6 (
+	sockaddr_in6* addr,
+	size_t bitCount
+	);
 
-	void
-	toWinSockAddr (SOCKADDR_IN* addr) const
-	{
-		memset (addr, 0, sizeof (SOCKADDR_IN));
-		addr->sin_family = AF_INET;
-		addr->sin_addr.S_un.S_addr = htonl (m_ip);
-		addr->sin_port = htons (m_port);
-	}
+//.............................................................................
 
-	rtl::String
-	toString () const
-	{
-		rtl::String string;
-
-		if (m_ip)
-			string.format ("%d.%d.%d.%d:%d", 
-				m_ipBytes [3], 
-				m_ipBytes [2], 
-				m_ipBytes [1], 
-				m_ipBytes [0], 
-				m_port
-				);
-		else
-			string.format ("%d", m_port);
-
-		return string;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct SockAddrIp6: SockAddr
-{
-	uint16_t m_ip6 [8];
-	uint16_t m_port;
-
-	void
-	setup (
-		const uint16_t* ip6, 
-		uint16_t port
-		)
-	{
-		m_kind = SockAddrKind_Ip;
-		m_size = sizeof (SockAddrIp6);
-		memcpy (m_ip6, ip6, sizeof (m_ip6));
-		m_port = port;
-	}
-
-	void
-	fromWinSockAddr (const SOCKADDR_IN6* addr)
-	{
-		setup (addr->sin6_addr.u.Word, ntohs (addr->sin6_port));
-	}
-
-	void
-	toWinSockAddr (SOCKADDR_IN6* addr) const
-	{
-		memset (addr, 0, sizeof (SOCKADDR_IN6));
-		addr->sin6_family = AF_INET6;
-		memcpy (addr->sin6_addr.u.Word, m_ip6, sizeof (m_ip6));
-		addr->sin6_port = htons (m_port);
-	}
-
-	rtl::String
-	toString () const
-	{
-		rtl::String string;
-
-		string.format ("%04x", m_ip6 [0]);
-
-		for (size_t i = 1; i < 8; i++)
-			if (m_ip6 [i])
-				string.appendFormat ("::%04x", m_ip6 [i]);
-
-		string.appendFormat (".%d", m_port);
-		return string;
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-union SockAddrU
-{
-	SockAddr m_hdr;
-	SockAddrIp m_ip;
-	SockAddrIp6 m_ip6;
-
-	bool
-	fromWinSockAddr (const SOCKADDR* addr)
-	{
-		switch (addr->sa_family)
-		{
-		case AF_INET:
-			m_ip.fromWinSockAddr ((SOCKADDR_IN*) addr);
-			break;
-
-		case AF_INET6:
-			m_ip6.fromWinSockAddr ((SOCKADDR_IN6*) addr);
-			break;
-
-		default:
-			return err::fail (err::SystemErrorCode_InvalidParameter);
-		}
-
-		return true;
-	}
-
-	bool
-	toWinSockAddr (SOCKADDR* addr) const
-	{
-		switch (m_hdr.m_kind)
-		{
-		case SockAddrKind_Ip:
-			m_ip.toWinSockAddr ((SOCKADDR_IN*) addr);
-			break;
-
-		case SockAddrKind_Ip6:
-			m_ip6.toWinSockAddr ((SOCKADDR_IN6*) addr);
-			break;
-
-		default:
-			return err::fail (err::SystemErrorCode_InvalidParameter);
-		}
-
-		return true;
-	}
-
-	rtl::String
-	toString () const
-	{
-		switch (m_hdr.m_kind)
-		{
-		case SockAddrKind_Ip:
-			return m_ip.toString ();
-
-		case SockAddrKind_Ip6:
-			return m_ip6.toString ();
-
-		default:
-			return rtl::String::format_s ("<address-kind=%d>", m_hdr.m_kind);
-		}
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
 bool
-SockAddr::toWinSockAddr (SOCKADDR* addr) const
-{
-	return ((SockAddrU*) this)->toWinSockAddr (addr);
-}
+parseSockAddr_ip4 (
+	sockaddr_in* addr,
+	const char* string,
+	size_t length = -1
+	);
+
+bool
+parseSockAddr_ip6 (
+	sockaddr_in6* addr,
+	const char* string,
+	size_t length = -1
+	);
+
+bool
+parseSockAddr (
+	sockaddr* addr,
+	size_t size,
+	const char* string,
+	size_t length = -1
+	);
+
+//.............................................................................
+
+size_t
+getSockAddrString_ip4 (
+	rtl::String* string,
+	const sockaddr_in* addr
+	);
 
 inline
 rtl::String
-SockAddr::toString () const
+getSockAddrString_ip4 (const sockaddr_in* addr)
 {
-	return ((SockAddrU*) this)->toString ();
+	rtl::String string;
+	getSockAddrString_ip4 (&string, addr);
+	return string;
+}
+
+size_t
+getSockAddrString_ip6 (
+	rtl::String* string,
+	const sockaddr_in6* addr
+	);
+
+inline
+rtl::String
+getSockAddrString_ip6 (const sockaddr_in6* addr)
+{
+	rtl::String string;
+	getSockAddrString_ip6 (&string, addr);
+	return string;
+}
+
+size_t
+getSockAddrString (
+	rtl::String* string,
+	const sockaddr* addr
+	);
+
+inline
+rtl::String
+getSockAddrString (const sockaddr* addr)
+{
+	rtl::String string;
+	getSockAddrString (&string, addr);
+	return string;
 }
 
 //.............................................................................
 
-class SockAddrIp: public SockAddrIp
+size_t
+getSockAddrSize (const sockaddr* addr);
+
+//.............................................................................
+
+struct SockAddr
 {
-public:
-	SockAddrIp (uint16_t port = 0)
+	union
 	{
-		setup (0, port);
+		sockaddr m_addr;
+		sockaddr_in m_addr_ip4;
+		sockaddr_in6 m_addr_ip6;
+	};
+
+	SockAddr ()
+	{
+		clear ();
 	}
 
-	SockAddrIp (
-		uint32_t ip, 
-		uint16_t port
+	SockAddr (const sockaddr* addr)
+	{
+		setup (addr);
+	}
+
+	SockAddr (
+		const in_addr* addr,
+		uint_t port = 0
 		)
 	{
-		setup (ip, port);
+		setup_ip4 (addr, port);
 	}
 
-	// this operator is needed to pass CSockAddrIp to functions accepting TSockAddr*
-
-	operator SockAddrIp* ()
+	SockAddr (
+		uint_t ip,
+		uint_t port = 0
+		)
 	{
-		return this;
+		setup_ip4 (ip, port);
+	}
+
+	SockAddr (
+		const in_addr6* addr,
+		uint_t port = 0,
+		uint_t scope = 0
+		)
+	{
+		setup_ip6 (addr, port, scope);
+	}
+
+	SockAddr (
+		const uint16_t* ip,
+		uint_t port = 0,
+		uint_t scope = 0
+		)
+	{
+		setup_ip6 (ip, port, scope);
+	}
+
+	SockAddr (
+		const char* string,
+		size_t length = -1
+		)
+	{
+		parse (string, length);
+	}
+
+	operator const sockaddr* () const
+	{
+		return &m_addr;
+	}
+
+	operator const sockaddr_in* () const
+	{
+		return &m_addr_ip4;
+	}
+
+	operator const sockaddr_in6* () const
+	{
+		return &m_addr_ip6;
+	}
+
+	void
+	clear ()
+	{
+		memset (this, 0, sizeof (SockAddr));	
+	}
+
+	void
+	setup (const sockaddr* addr);
+
+	void
+	setup_ip4 (
+		const in_addr* addr,
+		uint_t port = 0
+		);
+
+	void
+	setup_ip4 (
+		uint_t ip,
+		uint_t port = 0
+		)
+	{
+		setup_ip4 ((const in_addr*) &ip, port);
+	}
+
+	void
+	setup_ip6 (
+		const in_addr6* addr,
+		uint_t port = 0,
+		uint_t scope = 0
+		);
+
+	void
+	setup_ip6 (
+		const uint16_t* ip,
+		uint_t port = 0,
+		uint_t scope = 0
+		)
+	{
+		setup_ip6 ((const in_addr6*) ip, port);
+	}
+
+	size_t
+	getNetMaskBitCount ()
+	{
+		return getSockAddrNetMaskBitCount (&m_addr);
+	}
+
+	size_t
+	getNetMaskBitCount_ip4 ()
+	{
+		return getSockAddrNetMaskBitCount_ip4 (&m_addr_ip4);
+	}
+
+	size_t
+	getNetMaskBitCount_ip6 ()
+	{
+		return getSockAddrNetMaskBitCount_ip6 (&m_addr_ip6);
+	}
+
+	void
+	createNetMask (
+		uint_t family,
+		size_t bitCount
+		);
+
+	void
+	createNetMask_ip4 (size_t bitCount)
+	{
+		createSockAddrNetMask_ip4 (&m_addr_ip4, bitCount);
+	}
+
+	void
+	createNetMask_ip6 (size_t bitCount)
+	{
+		createSockAddrNetMask_ip6 (&m_addr_ip6, bitCount);
+	}
+
+	bool
+	parse (
+		const char* string,
+		size_t length = -1
+		)
+	{
+		return parseSockAddr (&m_addr, sizeof (SockAddr), string, length);
+	}
+
+	bool
+	parse_ip4 (
+		const char* string,
+		size_t length = -1
+		)
+	{
+		return parseSockAddr_ip4 (&m_addr_ip4, string, length);
+	}
+
+	bool
+	parse_ip6 (
+		const char* string,
+		size_t length = -1
+		)
+	{
+		return parseSockAddr_ip6 (&m_addr_ip6, string, length);
+	}
+
+	size_t
+	getString (rtl::String* string) const
+	{
+		return getSockAddrString (string, &m_addr);
+	}
+
+	inline
+	rtl::String
+	getString () const
+	{
+		return getSockAddrString (&m_addr);
+	}
+
+	size_t
+	getString_ip4 (rtl::String* string) const
+	{
+		return getSockAddrString_ip4 (string, &m_addr_ip4);
+	}
+
+	rtl::String
+	getString_ip4 () const
+	{
+		return getSockAddrString_ip4 (&m_addr_ip4);
+	}
+
+	size_t
+	getString_ip6 (rtl::String* string) const
+	{
+		return getSockAddrString_ip6 (string, &m_addr_ip6);
+	}
+
+	rtl::String
+	getString_ip6 (const sockaddr_in6* addr) const
+	{
+		return getSockAddrString_ip6 (&m_addr_ip6);
 	}
 };
 

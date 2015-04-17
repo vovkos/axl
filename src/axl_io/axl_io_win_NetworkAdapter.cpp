@@ -69,7 +69,7 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-NetworkAdapterEnumerator::createAdapter (
+NetworkAdapterEnumerator::setupAdapter (
 	NetworkAdapter* adapter,
 	IP_ADAPTER_ADDRESSES* srcAdapter
 	)
@@ -132,11 +132,15 @@ NetworkAdapterEnumerator::createAdapter (
 	IP_ADAPTER_UNICAST_ADDRESS* srcAddress = srcAdapter->FirstUnicastAddress;
 	for (; srcAddress; srcAddress = srcAddress->Next)
 	{
-		if (!srcAddress->Address.lpSockaddr)
+		if (!srcAddress->Address.lpSockaddr || srcAddress->Address.iSockaddrLength > sizeof (io::SockAddr))
 			continue;
 
-		NetworkAdapterAddress* address = AXL_MEM_NEW_EXTRA (NetworkAdapterAddress, srcAddress->Address.iSockaddrLength);
-		memcpy (address + 1, srcAddress->Address.lpSockaddr, srcAddress->Address.iSockaddrLength);
+		NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);		
+		memcpy (&address->m_address, srcAddress->Address.lpSockaddr, srcAddress->Address.iSockaddrLength);
+
+		if (srcAddress->Length >= sizeof (IP_ADAPTER_UNICAST_ADDRESS)) 
+			address->m_netMaskBitCount = srcAddress->OnLinkPrefixLength;
+
 		adapter->m_addressList.insertTail (address);
 	}
 }

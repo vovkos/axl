@@ -6,6 +6,7 @@
 
 #include "axl_rtl_List.h"
 #include "axl_rtl_String.h"
+#include "axl_io_SockAddr.h"
 
 #define _AXL_IO_NETWORKADAPTER_H
 
@@ -65,11 +66,8 @@ getNetworkAdapterFlagString (uint_t flags);
 
 struct NetworkAdapterAddress: rtl::ListLink
 {
-	const sockaddr* 
-	getSockAddr ()
-	{
-		return (const sockaddr*) (this + 1);
-	}
+	SockAddr m_address;
+	size_t m_netMaskBitCount;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
