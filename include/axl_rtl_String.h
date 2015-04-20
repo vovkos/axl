@@ -857,27 +857,96 @@ public:
 		return count;
 	}
 
-
 	size_t
 	append (const StringBase& src)
 	{
-		return isEmpty () ? copy (src) : append (src, src.getLength ());
+		return insert (-1, src);
 	}
 
 	size_t
 	append (const String2& src)
 	{
-		return append (src, src.getLength ());
+		return insert (-1, src);
 	}
 
 	size_t
 	append (const String3& src)
 	{
-		return append (src, src.getLength ());
+		return insert (-1, src);
 	}
 
 	size_t
 	append (
+		const C* p,
+		size_t length = -1
+		)
+	{
+		return insert (-1, p, length);
+	}
+
+	size_t
+	append (
+		const C2* p,
+		size_t length = -1
+		)
+	{
+		return insert (-1, p, length);
+	}
+
+	size_t
+	append (
+		const C3* p,
+		size_t length = -1
+		)
+	{
+		return insert (-1, p, length);
+	}
+
+	size_t
+	append (
+		utf32_t x,
+		size_t count = 1
+		)
+	{
+		return insert (-1, x, count);
+	}
+
+	size_t
+	appendNewLine ()
+	{
+		return insertNewLine (-1);
+	}
+
+	size_t
+	insert (
+		size_t index,
+		const StringBase& src
+		)
+	{
+		return isEmpty () ? copy (src) : insert (index, src, src.getLength ());
+	}
+
+	size_t
+	insert (
+		size_t index,
+		const String2& src
+		)
+	{
+		return insert (index, src, src.getLength ());
+	}
+
+	size_t
+	insert (
+		size_t index,
+		const String3& src		
+		)
+	{
+		return insert (index, src, src.getLength ());
+	}
+
+	size_t
+	insert (
+		size_t index,
 		const C* p,
 		size_t length = -1
 		)
@@ -893,16 +962,17 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		size_t newLength = oldLength + length;
-		if (!setLength (newLength, true))
+		C* dst = insertSpace (index, length);
+		if (!dst)
 			return -1;
 
-		Details::copy (m_p + oldLength, p, length);
-		return newLength;
+		Details::copy (dst, p, length);
+		return oldLength + length;
 	}
 
 	size_t
-	append (
+	insert (
+		size_t index,
 		const C2* p,
 		size_t length = -1
 		)
@@ -918,20 +988,21 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		size_t appendLength = enc::UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
-		if (appendLength == -1)
+		size_t insertLength = enc::UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
+		if (insertLength == -1)
 			return -1;
 
-		size_t newLength = oldLength + appendLength;
-		if (!setLength (newLength, true))
+		C* dst = insertSpace (index, insertLength);
+		if (!dst)
 			return -1;
 
-		enc::UtfConvert <Encoding, Encoding2>::convert (m_p + oldLength, appendLength, p, length);
-		return newLength;
+		enc::UtfConvert <Encoding, Encoding2>::convert (dst, insertLength, p, length);
+		return oldLength + insertLength;
 	}
 
 	size_t
-	append (
+	insert (
+		size_t index,
 		const C3* p,
 		size_t length = -1
 		)
@@ -947,20 +1018,21 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		size_t appendLength = enc::UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
-		if (appendLength == -1)
+		size_t insertLength = enc::UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
+		if (insertLength == -1)
 			return -1;
 
-		size_t newLength = oldLength + appendLength;
-		if (!setLength (newLength, true))
+		C* dst = insertSpace (index, insertLength);
+		if (!dst)
 			return -1;
 
-		enc::UtfConvert <Encoding, Encoding3>::convert (m_p + oldLength, appendLength, p, length);
-		return newLength;
+		enc::UtfConvert <Encoding, Encoding3>::convert (dst, insertLength, p, length);
+		return oldLength + insertLength;
 	}
 
 	size_t
-	append (
+	insert (
+		size_t index,
 		utf32_t x,
 		size_t count = 1
 		)
@@ -976,23 +1048,25 @@ public:
 
 		ASSERT (codePointLength <= 4);
 
-		size_t newLength = oldLength + count * codePointLength;
-		if (!setLength (newLength, true))
+		size_t insertLength = count * codePointLength;
+
+		C* dst = insertSpace (index, count * codePointLength);
+		if (!dst)
 			return -1;
 
 		C pattern [sizeof (utf32_t) / sizeof (C)];
 		Encoding::encodeCodePoint (pattern, x);
-		fillWithPattern (m_p + oldLength, pattern, codePointLength, count);
-		return newLength;
+		fillWithPattern (dst, pattern, codePointLength, count);
+		return oldLength + insertLength;
 	}
 
 	size_t
-	appendNewLine ()
+	insertNewLine (size_t index)
 	{
 #if (_AXL_ENV == AXL_ENV_WIN)
-		return append (Details::getCrLf (), 2);
+		return insert (index, Details::getCrLf (), 2);
 #else
-		return append ('\n');
+		return insert (index, '\n');
 #endif
 	}
 
@@ -1213,6 +1287,28 @@ protected:
 
 		newHdr.detach ();
 		return true;
+	}
+
+	C*
+	insertSpace (
+		size_t index,
+		size_t length
+		)
+	{
+		size_t oldLength = getLength ();
+		bool result = setLength (oldLength + length, true);
+		if (!result)
+			return NULL;
+
+		if (index > oldLength)
+			index = oldLength;
+
+		C* dst = m_p + index;
+
+		if (length && index < oldLength)
+			Details::copy (dst + length, dst, oldLength - index);
+
+		return dst;
 	}
 
 	static
