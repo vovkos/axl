@@ -207,17 +207,17 @@ testWinNetworkAdapterList2 ()
 void
 testNetworkAdapterList ()
 {
-	rtl::StdList <io::NetworkAdapter> adapterList;
-	io::buildNetworkAdapterList (&adapterList);
+	rtl::StdList <io::NetworkAdapterDesc> adapterList;
+	io::createNetworkAdapterDescList (&adapterList);
 
-	rtl::Iterator <io::NetworkAdapter> adapterIt = adapterList.getHead ();
+	rtl::Iterator <io::NetworkAdapterDesc> adapterIt = adapterList.getHead ();
 	for (; adapterIt; adapterIt++)
 	{
-		io::NetworkAdapter* adapter = *adapterIt;
+		io::NetworkAdapterDesc* adapter = *adapterIt;
 
 		printf ("Name        = %s\n", adapter->getName ().cc ());
 		printf ("Description = %s\n", adapter->getDescription ().cc ());
-		printf ("Kind        = %s\n", io::getNetworkAdapterKindString (adapter->getAdapterKind ()));
+		printf ("Type        = %s\n", io::getNetworkAdapterTypeString (adapter->getType ()));
 		printf ("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).cc ());
 
 		rtl::ConstList <io::NetworkAdapterAddress> addressList = adapter->getAddressList ();
@@ -257,6 +257,17 @@ testParseFormatIp6 ()
 {
 	printf ("main ()\n");
 
+	bool result;
+
+/*
+	io::SockAddr sockAddr;
+	result = sockAddr.parse ("tibbo.com:80");
+	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
+
+	result = sockAddr.parse ("::123e:325f:0%24393");
+	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
+*/
+
 	sockaddr_in6 addr = { 0 };
 	addr.sin6_family = AF_INET6;
 
@@ -293,9 +304,63 @@ testParseFormatIp6 ()
 		ASSERT (addrString.cmp (addrString2) == 0);
 
 		sockaddr_in6 addr2;
-		bool result = io::parseSockAddr ((sockaddr*) &addr2, sizeof (addr2), addrString);
+		result = io::parseSockAddr ((sockaddr*) &addr2, sizeof (addr2), addrString);
 		ASSERT (result && memcmp (&addr, &addr2, sizeof (addr)) == 0);
 	}
+}
+
+//.............................................................................
+
+void
+testSocketIp6 ()
+{
+	bool result;
+
+	io::Socket socket;
+	result = socket.open (AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+	if (!result)
+	{
+		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+	
+	io::SockAddr addr;
+	result = addr.parse ("[::1]:80");
+	if (!result)
+	{
+		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	result = socket.connect (addr);
+	if (!result)
+	{
+		printf ("socket.connect failed (%s)\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+}
+
+//.............................................................................
+
+void
+testAddrInfoIp6 ()
+{
+	const char* name = "tibbo.com";
+
+	rtl::Array <io::SockAddr> addrArray;
+	bool result = io::resolveHostName (&addrArray, name, AF_INET6);
+	if (!result)
+	{
+		printf ("io::resolveHostName failed (%s)\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	printf ("host name %s resolved to:\n", name);
+
+	size_t count = addrArray.getCount ();
+	for (size_t i = 0; i < count; i++)
+		printf ("    %s\n", addrArray [i].getString ().cc ());
 }
 
 //.............................................................................
@@ -402,9 +467,8 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-
-//	testWinNetworkAdapterList2 ();
-	testNetworkAdapterList ();
+	
+	testAddrInfoIp6 ();
 	return 0;
 }
 

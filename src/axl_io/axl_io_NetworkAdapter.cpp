@@ -8,23 +8,23 @@ namespace io {
 //.............................................................................
 
 const char* 
-getNetworkAdapterKindString (NetworkAdapterKind adapterKind)
+getNetworkAdapterTypeString (NetworkAdapterType adapterKind)
 {
-	static const char* stringTable [NetworkAdapterKind__Count] = 
+	static const char* stringTable [NetworkAdapterType__Count] = 
 	{
-		"unknown-adapter-kind", // NetworkAdapterKind_Unknown,
-		"loopback",             // NetworkAdapterKind_Loopback,
-		"ethernet",             // NetworkAdapterKind_Ethernet,
-		"wireless",             // NetworkAdapterKind_Wireless,
-		"PPP",                  // NetworkAdapterKind_Ppp,
-		"token ring",           // NetworkAdapterKind_TokenRing,
-		"slip",                 // NetworkAdapterKind_Slip,
-		"tunnel",               // NetworkAdapterKind_Tunnel,
+		"unknown-adapter-kind", // NetworkAdapterType_Unknown,
+		"loopback",             // NetworkAdapterType_Loopback,
+		"ethernet",             // NetworkAdapterType_Ethernet,
+		"wireless",             // NetworkAdapterType_Wireless,
+		"PPP",                  // NetworkAdapterType_Ppp,
+		"token ring",           // NetworkAdapterType_TokenRing,
+		"slip",                 // NetworkAdapterType_Slip,
+		"tunnel",               // NetworkAdapterType_Tunnel,
 	};
 
 	return (size_t) adapterKind < countof (stringTable) ? 
 		stringTable [adapterKind] : 
-		stringTable [NetworkAdapterKind_Unknown];
+		stringTable [NetworkAdapterType_Unknown];
 }
 
 //.............................................................................
@@ -73,9 +73,9 @@ getNetworkAdapterFlagString (uint_t flags)
 
 //.............................................................................
 
-NetworkAdapter::NetworkAdapter ()
+NetworkAdapterDesc::NetworkAdapterDesc ()
 {
-	m_adapterKind = NetworkAdapterKind_Unknown;
+	m_type = NetworkAdapterType_Unknown;
 	m_flags = 0;
 	memset (m_mac, 0, sizeof (m_mac));
 }

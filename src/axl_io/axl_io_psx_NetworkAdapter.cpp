@@ -15,20 +15,20 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	buildAdapterList (rtl::StdList <NetworkAdapter>* adapterList);
+	buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
 	void
 	setupAdapter (
-		NetworkAdapter* adapter,
+		NetworkAdapterDesc* adapter,
 		ifaddrs* iface
 		);
 
 	static
 	void
 	addAdapterAddress (
-		NetworkAdapter* adapter,
+		NetworkAdapterDesc* adapter,
 		const sockaddr* addr,
 		const sockaddr* netMask
 		);
@@ -37,7 +37,7 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapterList)
+NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	adapterList->clear ();
 
@@ -49,14 +49,14 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 		return -1;
 	}
 
-	rtl::StringHashTableMap <NetworkAdapter*> adapterMap;
+	rtl::StringHashTableMap <NetworkAdapterDesc*> adapterMap;
 
 	for (ifaddrs* iface = ifaceAddressList; iface; iface = iface->ifa_next)
 	{
 		if (!(iface->ifa_flags & IFF_UP))
 			continue;
 
-		rtl::StringHashTableMapIterator <NetworkAdapter*> it = adapterMap.visit (iface->ifa_name);
+		rtl::StringHashTableMapIterator <NetworkAdapterDesc*> it = adapterMap.visit (iface->ifa_name);
 		if (it->m_value)
 		{
 			if (iface->ifa_addr)
@@ -65,7 +65,7 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 			continue;
 		}
 
-		NetworkAdapter* adapter = AXL_MEM_NEW (NetworkAdapter);
+		NetworkAdapterDesc* adapter = AXL_MEM_NEW (NetworkAdapterDesc);
 		setupAdapter (adapter, iface);
 		adapterList->insertTail (adapter);
 
@@ -80,14 +80,14 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 
 void
 NetworkAdapterEnumerator::setupAdapter (
-	NetworkAdapter* adapter,
+	NetworkAdapterDesc* adapter,
 	ifaddrs* iface
 	)
 {
-	adapter->m_adapterKind =
-		(iface->ifa_flags & IFF_LOOPBACK) ? NetworkAdapterKind_Loopback :
-		(iface->ifa_flags & IFF_POINTOPOINT) ? NetworkAdapterKind_Ppp :
-		NetworkAdapterKind_Ethernet;
+	adapter->m_type =
+		(iface->ifa_flags & IFF_LOOPBACK) ? NetworkAdapterType_Loopback :
+		(iface->ifa_flags & IFF_POINTOPOINT) ? NetworkAdapterType_Ppp :
+		NetworkAdapterType_Ethernet;
 
 	adapter->m_flags = 0;
 
@@ -103,7 +103,7 @@ NetworkAdapterEnumerator::setupAdapter (
 
 void
 NetworkAdapterEnumerator::addAdapterAddress (
-	NetworkAdapter* adapter,
+	NetworkAdapterDesc* adapter,
 	const sockaddr* addr,
 	const sockaddr* netMask
 	)
@@ -117,7 +117,7 @@ NetworkAdapterEnumerator::addAdapterAddress (
 //.............................................................................
 
 size_t
-buildNetworkAdapterList (rtl::StdList <NetworkAdapter>* adapterList)
+createNetworkAdapterDescList (rtl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	return NetworkAdapterEnumerator::buildAdapterList (adapterList);
 }

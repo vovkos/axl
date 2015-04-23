@@ -40,23 +40,35 @@ public:
 		);
 
 	bool
+	parse (in_addr* addr);
+
+	bool
+	parse (in6_addr* addr);
+
+	bool
+	parse (sockaddr_in* addr);
+
+	bool
+	parse (sockaddr_in6* addr);
+
+	bool
 	parse (
 		sockaddr* addr,
 		size_t size
 		);
 
-	bool
-	parseIp4 (sockaddr_in* addr);
-
-	bool
-	parseIp6 (sockaddr_in6* addr);
-
 protected:
 	bool
-	tryIp4 ();
+	tryAddr_ip4 ();
 
 	bool
-	tryIp6 ();
+	tryAddr_ip6 ();
+
+	bool
+	trySockAddr_ip4 ();
+
+	bool
+	trySockAddr_ip6 ();
 
 	void
 	skipWhiteSpace ();
@@ -75,6 +87,9 @@ protected:
 
 	bool
 	tryChar (char c);
+
+	void
+	setParseError ();
 };
 
 //.............................................................................

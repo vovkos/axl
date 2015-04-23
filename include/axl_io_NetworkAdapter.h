@@ -17,23 +17,23 @@ class NetworkAdapterEnumerator;
 
 //.............................................................................
 
-enum NetworkAdapterKind
+enum NetworkAdapterType
 {
-	NetworkAdapterKind_Unknown,
-	NetworkAdapterKind_Loopback,
-	NetworkAdapterKind_Ethernet,
-	NetworkAdapterKind_Wireless,
-	NetworkAdapterKind_Ppp,
-	NetworkAdapterKind_TokenRing,
-	NetworkAdapterKind_Slip,
-	NetworkAdapterKind_Tunnel,
-	NetworkAdapterKind__Count,
+	NetworkAdapterType_Unknown,
+	NetworkAdapterType_Loopback,
+	NetworkAdapterType_Ethernet,
+	NetworkAdapterType_Wireless,
+	NetworkAdapterType_Ppp,
+	NetworkAdapterType_TokenRing,
+	NetworkAdapterType_Slip,
+	NetworkAdapterType_Tunnel,
+	NetworkAdapterType__Count,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char* 
-getNetworkAdapterKindString (NetworkAdapterKind adapterKind);
+getNetworkAdapterTypeString (NetworkAdapterType adapterKind);
 
 //.............................................................................
 
@@ -72,12 +72,12 @@ struct NetworkAdapterAddress: rtl::ListLink
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class NetworkAdapter: public rtl::ListLink
+class NetworkAdapterDesc: public rtl::ListLink
 {
 	friend class NetworkAdapterEnumerator;
 
 protected:
-	NetworkAdapterKind m_adapterKind;
+	NetworkAdapterType m_type;
 	uint_t m_flags;
 	rtl::String m_name;
 	rtl::String m_description;
@@ -85,12 +85,12 @@ protected:
 	rtl::StdList <NetworkAdapterAddress> m_addressList;
 
 public:
-	NetworkAdapter ();
+	NetworkAdapterDesc ();
 
-	NetworkAdapterKind 
-	getAdapterKind () const
+	NetworkAdapterType 
+	getType () const
 	{
-		return m_adapterKind;
+		return m_type;
 	}
 	
 	uint_t 
@@ -100,13 +100,13 @@ public:
 	}
 
 	rtl::String 
-	getName ()
+	getName () const
 	{
 		return m_name;
 	}
 
 	rtl::String 
-	getDescription ()
+	getDescription () const
 	{
 		return m_description;
 	}
@@ -118,7 +118,7 @@ public:
 	}
 
 	rtl::ConstList <NetworkAdapterAddress> 
-	getAddressList ()
+	getAddressList () const
 	{
 		return m_addressList;
 	}
@@ -127,7 +127,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-buildNetworkAdapterList (rtl::StdList <NetworkAdapter>* adapterList);
+createNetworkAdapterDescList (rtl::StdList <NetworkAdapterDesc>* adapterList);
 
 //.............................................................................
 

@@ -21,84 +21,11 @@ SockAddrParser::initialize (
 }
 
 bool
-SockAddrParser::parse (
-	sockaddr* addr,
-	size_t size
-	)
-{
-	skipWhiteSpace ();
-
-	SockAddrParser clone = *this;
-
-	if (tryIp4 ())
-	{
-		if (size < sizeof (sockaddr_in))
-		{
-			err::setError (err::SystemErrorCode_BufferTooSmall);
-			return false;
-		}
-
-		*this = clone;
-		return parseIp4 ((sockaddr_in*) addr);
-	}
-
-	*this = clone;
-
-	if (tryIp6 ())
-	{
-		if (size < sizeof (sockaddr_in6))
-		{
-			err::setError (err::SystemErrorCode_BufferTooSmall);
-			return false;
-		}
-
-		*this = clone;
-		return parseIp6 ((sockaddr_in6*) addr);
-	}
-
-	err::setError (err::SystemErrorCode_InvalidAddress);
-	return false;
-}
-
-bool
-SockAddrParser::tryIp4 ()
+SockAddrParser::parse (in_addr* addr)
 {
 	bool result;
 
-	for (size_t i = 0;; i++)
-	{
-		result = tryInt (10);
-		if (!result)
-			return false;
-
-		if (i >= 3)
-			break;
-
-		result = tryChar ('.');
-		if (!result)
-			return false;
-	}
-
-	result = tryChar (':');
-	if (result)
-	{
-		result = tryInt (10);
-		if (!result)
-			return false;
-	}
-
-	return true;
-}
-
-bool
-SockAddrParser::parseIp4 (sockaddr_in* addr)
-{
-	bool result;
-
-	memset (addr, 0, sizeof (sockaddr_in));
-	addr->sin_family = AF_INET;
-
-	uchar_t* ip = (uchar_t*) &addr->sin_addr;
+	uchar_t* ip = (uchar_t*) addr;
 	for (size_t i = 0;; i++)
 	{
 		uint_t octet;
@@ -116,6 +43,21 @@ SockAddrParser::parseIp4 (sockaddr_in* addr)
 			return false;
 	}
 
+	return true;
+}
+
+bool
+SockAddrParser::parse (sockaddr_in* addr)
+{
+	bool result;
+
+	memset (addr, 0, sizeof (sockaddr_in));
+	addr->sin_family = AF_INET;
+
+	result = parse (&addr->sin_addr); 
+	if (!result)
+		return false;
+
 	result = tryChar (':');
 	if (result)
 	{
@@ -131,104 +73,17 @@ SockAddrParser::parseIp4 (sockaddr_in* addr)
 }
 
 bool
-SockAddrParser::tryIp6 ()
-{
-	bool result;
-	bool hasBrackets = tryChar ('[');
-
-	tryChar (':');
-
-	bool isIp4 = false;
-
-	for (size_t i = 0; i < 8; i++)
-	{
-		tryChar (':');
-
-		skipWhiteSpace ();
-		
-		if (m_p >= m_end || !isxdigit (*m_p))
-			break;
-
-		result = tryInt (16);
-		if (!result)
-			return false;
-
-		result = tryChar (':');
-		if (!result)
-		{
-			result = tryChar ('.');
-			if (result)
-			{
-				if (i > 6)
-					return false;
-
-				isIp4 = true;
-				break;
-			}
-		}
-	}
-
-	if (isIp4)
-	{
-		for (size_t j = 1;; j++)
-		{
-			result = tryInt (10);
-			if (!result)
-				return false;
-
-			if (j >= 3)
-				break;
-
-			result = tryChar ('.');
-			if (!result)
-				return false;
-		}
-	}
-
-	result = tryChar ('%');
-	if (result)
-	{
-		result = tryInt (10);
-		if (!result)
-			return false;
-	}
-
-	if (hasBrackets)
-	{
-		result = tryChar (']');
-		if (!result)
-			return false;
-
-		result = tryChar (':');
-		if (result)
-		{
-			result = tryInt (10);
-			if (!result)
-				return false;
-		}
-	}
-
-	return true;
-}
-
-bool
-SockAddrParser::parseIp6 (sockaddr_in6* addr)
+SockAddrParser::parse (in6_addr* addr)
 {
 	bool result;
 
-	memset (addr, 0, sizeof (sockaddr_in6));
-	addr->sin6_family = AF_INET6;
-
-	bool hasBrackets = tryChar ('[');
-
-	uint16_t* ip = (uint16_t*) &addr->sin6_addr;
+	uint16_t* ip = (uint16_t*) addr;
 
 	size_t zeroRunIdx = -1;
-
-	tryChar (':');
-
 	bool isIp4 = false;
 	uchar_t ip4 [4];
+
+	tryChar (':');
 
 	size_t i = 0;
 	while (i < 8)
@@ -313,6 +168,28 @@ SockAddrParser::parseIp6 (sockaddr_in6* addr)
 			memset (&ip [zeroRunIdx], 0, zeroRunLength * sizeof (uint16_t));
 		}
 	}
+	else if (i != 8)
+	{
+		err::setError (err::SystemErrorCode_InvalidAddress);
+		return false;
+	}
+
+	return true;
+}
+
+bool
+SockAddrParser::parse (sockaddr_in6* addr)
+{
+	bool result;
+
+	memset (addr, 0, sizeof (sockaddr_in6));
+	addr->sin6_family = AF_INET6;
+
+	bool hasBrackets = tryChar ('[');
+
+	result = parse (&addr->sin6_addr);
+	if (!result)
+		return false;
 
 	result = tryChar ('%');
 	if (result)
@@ -340,6 +217,193 @@ SockAddrParser::parseIp6 (sockaddr_in6* addr)
 				return false;
 
 			addr->sin6_port = rtl::swapByteOrder16 ((uint16_t) port);
+		}
+	}
+
+	return true;
+}
+
+bool
+SockAddrParser::parse (
+	sockaddr* addr,
+	size_t size
+	)
+{
+	skipWhiteSpace ();
+
+	SockAddrParser clone = *this;
+
+	if (trySockAddr_ip4 ())
+	{
+		if (size < sizeof (sockaddr_in))
+		{
+			err::setError (err::SystemErrorCode_BufferTooSmall);
+			return false;
+		}
+
+		*this = clone;
+		return parse ((sockaddr_in*) addr);
+	}
+
+	*this = clone;
+
+	if (trySockAddr_ip6 ())
+	{
+		if (size < sizeof (sockaddr_in6))
+		{
+			err::setError (err::SystemErrorCode_BufferTooSmall);
+			return false;
+		}
+
+		*this = clone;
+		return parse ((sockaddr_in6*) addr);
+	}
+
+	err::setError (err::SystemErrorCode_InvalidAddress);
+	return false;
+}
+
+bool
+SockAddrParser::tryAddr_ip4 ()
+{
+	bool result;
+
+	for (size_t i = 0;; i++)
+	{
+		result = tryInt (10);
+		if (!result)
+			return false;
+
+		if (i >= 3)
+			break;
+
+		result = tryChar ('.');
+		if (!result)
+			return false;
+	}
+
+	return true;
+}
+
+bool
+SockAddrParser::tryAddr_ip6 ()
+{
+	bool result;
+
+	bool hasZeroRun = false;
+	bool isIp4 = false;
+
+	tryChar (':');
+
+	size_t i = 0;
+	while (i < 8)
+	{
+		result = tryChar (':');
+		if (result)
+			hasZeroRun = true;
+
+		skipWhiteSpace ();
+		
+		if (m_p >= m_end || !isxdigit (*m_p))
+			break;
+
+		result = tryInt (16);
+		if (!result)
+			return false;
+
+		result = tryChar (':');
+		if (!result)
+		{
+			result = tryChar ('.');
+			if (result)
+			{
+				if (i > 6)
+					return false;
+
+				isIp4 = true;
+				break;
+			}
+		}
+
+		i++;
+
+		if (!result)
+			break;
+	}
+
+	if (isIp4)
+	{
+		for (size_t j = 1;; j++)
+		{
+			result = tryInt (10);
+			if (!result)
+				return false;
+
+			if (j >= 3)
+				break;
+
+			result = tryChar ('.');
+			if (!result)
+				return false;
+		}
+
+		i += 2;
+	}
+
+	if (!hasZeroRun && i != 8)
+		return false;
+
+	return true;
+}
+
+bool
+SockAddrParser::trySockAddr_ip4 ()
+{
+	bool result = tryAddr_ip4 ();
+	if (!result)
+		return false;
+
+	result = tryChar (':');
+	if (result)
+	{
+		result = tryInt (10);
+		if (!result)
+			return false;
+	}
+
+	return true;
+}
+
+bool
+SockAddrParser::trySockAddr_ip6 ()
+{
+	bool result;
+	bool hasBrackets = tryChar ('[');
+
+	result = tryAddr_ip6 ();
+	if (!result)
+		return false;
+
+	result = tryChar ('%');
+	if (result)
+	{
+		result = tryInt (10);
+		if (!result)
+			return false;
+	}
+
+	if (hasBrackets)
+	{
+		result = tryChar (']');
+		if (!result)
+			return false;
+
+		result = tryChar (':');
+		if (result)
+		{
+			result = tryInt (10);
+			if (!result)
+				return false;
 		}
 	}
 

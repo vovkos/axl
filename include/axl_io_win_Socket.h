@@ -50,7 +50,7 @@ public:
 	bool
 	bind (const sockaddr* addr)
 	{
-		int result = ::bind (m_h, addr, sizeof (sockaddr));
+		int result = ::bind (m_h, addr, getSockAddrSize (addr));
 		return err::complete (result != SOCKET_ERROR);
 	}
 
@@ -97,7 +97,7 @@ public:
 	bool
 	connect (const sockaddr* addr)
 	{
-		int result = ::connect (m_h, addr, sizeof (sockaddr));
+		int result = ::connect (m_h, addr, getSockAddrSize (addr));
 		return completeAsyncRequest (result, WSAEWOULDBLOCK);
 	}
 
@@ -135,7 +135,7 @@ public:
 		const sockaddr* addr
 		)
 	{
-		int result = ::sendto (m_h, (char*) p, (int) size, 0, addr, sizeof (sockaddr));
+		int result = ::sendto (m_h, (char*) p, (int) size, 0, addr, getSockAddrSize (addr));
 		return err::complete (result, SOCKET_ERROR);
 	}
 
@@ -178,7 +178,7 @@ public:
 	bool
 	wsaConnect (const sockaddr* addr)
 	{
-		int result = ::WSAConnect (m_h, addr, sizeof (sockaddr), NULL, NULL, NULL, NULL);
+		int result = ::WSAConnect (m_h, addr, getSockAddrSize (addr), NULL, NULL, NULL, NULL);
 		return completeAsyncRequest (result, WSAEWOULDBLOCK);
 	}
 

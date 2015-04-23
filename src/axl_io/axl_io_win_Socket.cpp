@@ -133,11 +133,11 @@ Socket::wsaOpen (
 SOCKET
 Socket::wsaAccept (SockAddr* addr)
 {
-	int size = sizeof (SockAddr);
+	int addrSize = sizeof (SockAddr);
 	SOCKET s = ::WSAAccept (
 		m_h, 
 		(sockaddr*) addr, 
-		addr ? &size : NULL, 
+		addr ? &addrSize : NULL, 
 		NULL, 
 		0
 		);
@@ -201,7 +201,18 @@ Socket::wsaSendTo (
 	buf.buf = (char*) p;
 	buf.len = size;
 
-	int result = ::WSASendTo (m_h, &buf, 1, actualSize, 0, addr, sizeof (sockaddr), overlapped, pfOnComplete);
+	int result = ::WSASendTo (
+		m_h, 
+		&buf, 
+		1, 
+		actualSize, 
+		0, 
+		addr, 
+		getSockAddrSize (addr), 
+		overlapped, 
+		pfOnComplete
+		);
+
 	return completeAsyncRequest (result, WSA_IO_PENDING);
 }
 
@@ -222,7 +233,7 @@ Socket::wsaRecvFrom (
 	buf.len = size;
 
 	dword_t flags = 0;
-	int addrSize = sizeof (sockaddr);
+	int addrSize = sizeof (SockAddr);
 
 	int result = ::WSARecvFrom (
 		m_h, 

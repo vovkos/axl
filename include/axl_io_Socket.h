@@ -79,9 +79,15 @@ public:
 	}
 
 	bool
+	bind (const sockaddr* addr)
+	{
+		return m_socket.bind (addr);
+	}
+
+	bool
 	bind (const SockAddr& addr)
 	{
-		return m_socket.bind (&addr.m_addr);
+		return m_socket.bind (addr);
 	}
 
 	bool
@@ -131,6 +137,12 @@ public:
 		);
 
 	bool
+	connect (const sockaddr* addr)
+	{
+		return m_socket.connect (addr);
+	}
+
+	bool
 	connect (const SockAddr& addr)
 	{
 		return m_socket.connect (addr);
@@ -158,6 +170,16 @@ public:
 		)
 	{
 		return m_socket.recv (p, size);
+	}
+
+	size_t
+	sendTo (
+		void* p,
+		size_t size,
+		const sockaddr* addr
+		)
+	{
+		return m_socket.sendTo (p, size, addr);
 	}
 
 	size_t

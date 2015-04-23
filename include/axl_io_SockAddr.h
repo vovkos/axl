@@ -7,6 +7,7 @@
 #define _AXL_IO_SOCKADDR_H
 
 #include "axl_rtl_String.h"
+#include "axl_rtl_Array.h"
 
 namespace axl {
 namespace io {
@@ -57,6 +58,22 @@ createSockAddrNetMask_ip6 (
 //.............................................................................
 
 bool
+parseAddr_ip4 (
+	in_addr* addr,
+	const char* string,
+	size_t length = -1
+	);
+
+bool
+parseAddr_ip6 (
+	in6_addr* addr,
+	const char* string,
+	size_t length = -1
+	);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
 parseSockAddr_ip4 (
 	sockaddr_in* addr,
 	const char* string,
@@ -79,6 +96,38 @@ parseSockAddr (
 	);
 
 //.............................................................................
+
+size_t
+getAddrString_ip4 (
+	rtl::String* string,
+	const in_addr* addr
+	);
+
+inline
+rtl::String
+getAddrString_ip4 (const in_addr* addr)
+{
+	rtl::String string;
+	getAddrString_ip4 (&string, addr);
+	return string;
+}
+
+size_t
+getAddrString_ip6 (
+	rtl::String* string,
+	const in6_addr* addr
+	);
+
+inline
+rtl::String
+getAddrString_ip6 (const in6_addr* addr)
+{
+	rtl::String string;
+	getAddrString_ip6 (&string, addr);
+	return string;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 getSockAddrString_ip4 (
@@ -124,11 +173,6 @@ getSockAddrString (const sockaddr* addr)
 	getSockAddrString (&string, addr);
 	return string;
 }
-
-//.............................................................................
-
-size_t
-getSockAddrSize (const sockaddr* addr);
 
 //.............................................................................
 
@@ -214,8 +258,27 @@ struct SockAddr
 		memset (this, 0, sizeof (SockAddr));	
 	}
 
+	uint_t 
+	getPort ()
+	{
+		return rtl::swapByteOrder16 (m_addr_ip4.sin_port);
+	}
+
+	void
+	setPort (uint_t port)
+	{
+		m_addr_ip4.sin_port = rtl::swapByteOrder16 ((uint16_t) port);
+	}
+
 	void
 	setup (const sockaddr* addr);
+
+	void
+	setup (
+		uint_t family,
+		const void* addr,
+		size_t size
+		);
 
 	void
 	setup_ip4 (
@@ -349,6 +412,27 @@ struct SockAddr
 		return getSockAddrString_ip6 (&m_addr_ip6);
 	}
 };
+
+//.............................................................................
+
+bool
+resolveHostName (
+	rtl::Array <SockAddr>* addrArray,
+	const char* name,
+	uint_t family = AF_UNSPEC
+	);
+
+inline
+rtl::Array <SockAddr>
+resolveHostName (
+	const char* name,
+	uint_t family = AF_UNSPEC
+	)
+{
+	rtl::Array <SockAddr> addrArray;
+	resolveHostName (&addrArray, name, family);
+	return addrArray;
+}
 
 //.............................................................................
 

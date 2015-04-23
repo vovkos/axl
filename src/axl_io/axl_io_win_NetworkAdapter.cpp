@@ -13,13 +13,13 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	buildAdapterList (rtl::StdList <NetworkAdapter>* adapterList);
+	buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
 	void
 	setupAdapter (
-		NetworkAdapter* adapter,
+		NetworkAdapterDesc* adapter,
 		IP_ADAPTER_ADDRESSES* srcAdapter
 		);
 };
@@ -27,7 +27,7 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapterList)
+NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	adapterList->clear ();
 
@@ -58,7 +58,7 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 
 	for (; srcAdapter; srcAdapter = srcAdapter->Next)
 	{
-		NetworkAdapter* adapter = AXL_MEM_NEW (NetworkAdapter);
+		NetworkAdapterDesc* adapter = AXL_MEM_NEW (NetworkAdapterDesc);
 		setupAdapter (adapter, srcAdapter);
 		adapterList->insertTail (adapter);
 	}
@@ -70,42 +70,42 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapter>* adapt
 
 void
 NetworkAdapterEnumerator::setupAdapter (
-	NetworkAdapter* adapter,
+	NetworkAdapterDesc* adapter,
 	IP_ADAPTER_ADDRESSES* srcAdapter
 	)
 {
 	switch (srcAdapter->IfType)
 	{
 	case IF_TYPE_SOFTWARE_LOOPBACK:
-		adapter->m_adapterKind = NetworkAdapterKind_Loopback;
+		adapter->m_type = NetworkAdapterType_Loopback;
 		break;
 
 	case IF_TYPE_ETHERNET_CSMACD:
-		adapter->m_adapterKind = NetworkAdapterKind_Ethernet;
+		adapter->m_type = NetworkAdapterType_Ethernet;
 		break;
 
 	case IF_TYPE_IEEE80211:
-		adapter->m_adapterKind = NetworkAdapterKind_Wireless;
+		adapter->m_type = NetworkAdapterType_Wireless;
 		break;
 
 	case IF_TYPE_PPP:
-		adapter->m_adapterKind = NetworkAdapterKind_Ppp;
+		adapter->m_type = NetworkAdapterType_Ppp;
 		break;
 
 	case IF_TYPE_ISO88025_TOKENRING:
-		adapter->m_adapterKind = NetworkAdapterKind_TokenRing;
+		adapter->m_type = NetworkAdapterType_TokenRing;
 		break;
 
 	case IF_TYPE_SLIP:
-		adapter->m_adapterKind = NetworkAdapterKind_Slip;
+		adapter->m_type = NetworkAdapterType_Slip;
 		break;
 
 	case IF_TYPE_TUNNEL:
-		adapter->m_adapterKind = NetworkAdapterKind_Tunnel;
+		adapter->m_type = NetworkAdapterType_Tunnel;
 		break;
 
 	default:
-		adapter->m_adapterKind = NetworkAdapterKind_Unknown;
+		adapter->m_type = NetworkAdapterType_Unknown;
 	}
 
 	adapter->m_flags = 0;
@@ -148,7 +148,7 @@ NetworkAdapterEnumerator::setupAdapter (
 //.............................................................................
 
 size_t
-buildNetworkAdapterList (rtl::StdList <NetworkAdapter>* adapterList)
+createNetworkAdapterDescList (rtl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	return NetworkAdapterEnumerator::buildAdapterList (adapterList);
 }

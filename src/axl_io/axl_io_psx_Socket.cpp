@@ -72,11 +72,11 @@ Socket::connect (const sockaddr* addr)
 int
 Socket::accept (SockAddr* addr)
 {
-	socklen_t size = sizeof (SockAddr);
+	socklen_t addrSize = sizeof (SockAddr);
 	int socket = ::accept (
 		m_h, 
 		(sockaddr*) addr, 
-		addr ? &size : NULL
+		addr ? &addrSize : NULL
 		);
 
 	return err::complete (socket, -1);

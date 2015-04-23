@@ -5,6 +5,7 @@
 #include "axl_g_Pch.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
+#	include <ws2tcpip.h>
 #	include <iphlpapi.h>
 #	pragma comment (lib, "ws2_32.lib")
 #	pragma comment (lib, "iphlpapi.lib")

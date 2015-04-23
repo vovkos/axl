@@ -140,6 +140,28 @@ createSockAddrNetMask_ip6 (
 //.............................................................................
 
 bool
+parseAddr_ip4 (
+	in_addr* addr,
+	const char* string,
+	size_t length
+	)
+{
+	SockAddrParser parser (string, length);
+	return parser.parse (addr);
+}
+
+bool
+parseAddr_ip6 (
+	in6_addr* addr,
+	const char* string,
+	size_t length
+	)
+{
+	SockAddrParser parser (string, length);
+	return parser.parse (addr);
+}
+
+bool
 parseSockAddr_ip4 (
 	sockaddr_in* addr,
 	const char* string,
@@ -147,7 +169,7 @@ parseSockAddr_ip4 (
 	)
 {
 	SockAddrParser parser (string, length);
-	return parser.parseIp4 (addr);
+	return parser.parse (addr);
 }
 
 bool
@@ -158,7 +180,7 @@ parseSockAddr_ip6 (
 	)
 {
 	SockAddrParser parser (string, length);
-	return parser.parseIp6 (addr);
+	return parser.parse (addr);
 }
 
 bool
@@ -176,32 +198,24 @@ parseSockAddr (
 //.............................................................................
 
 size_t
-getSockAddrString_ip4 (
+getAddrString_ip4 (
 	rtl::String* string,
-	const sockaddr_in* addr
+	const in_addr* addr
 	)
 {
-	const uchar_t* ip = (const uchar_t*) &addr->sin_addr;
-	string->format ("%d.%d.%d.%d", ip [0], ip [1], ip [2], ip [3]);
-
-	if (addr->sin_port)
-		string->appendFormat (":%d", rtl::swapByteOrder16 (addr->sin_port));
-
-	return string->getLength ();
+	const uchar_t* ip = (const uchar_t*) addr;
+	return string->format ("%d.%d.%d.%d", ip [0], ip [1], ip [2], ip [3]);
 }
 
 size_t
-getSockAddrString_ip6 (
+getAddrString_ip6 (
 	rtl::String* string,
-	const sockaddr_in6* addr
+	const in6_addr* addr
 	)
 {
-	if (addr->sin6_port)
-		string->copy ('[');	
-	else
-		string->clear ();
+	string->clear ();
 	
-	const uint16_t* ip = (const uint16_t*) &addr->sin6_addr;
+	const uint16_t* ip = (const uint16_t*) addr;
 	
 	size_t zeroRunIdx = -1;
 	size_t zeroRunLength = 0;
@@ -306,11 +320,41 @@ getSockAddrString_ip6 (
 		}
 	}
 
+	return string->getLength ();
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+size_t
+getSockAddrString_ip4 (
+	rtl::String* string,
+	const sockaddr_in* addr
+	)
+{
+	getAddrString_ip4 (string, &addr->sin_addr);
+
+	if (addr->sin_port)
+		string->appendFormat (":%d", rtl::swapByteOrder16 (addr->sin_port));
+
+	return string->getLength ();
+}
+
+size_t
+getSockAddrString_ip6 (
+	rtl::String* string,
+	const sockaddr_in6* addr
+	)
+{
+	getAddrString_ip6 (string, &addr->sin6_addr);
+
 	if (addr->sin6_scope_id)
 		string->appendFormat ("%%%d", addr->sin6_scope_id);
 
 	if (addr->sin6_port)
+	{
+		string->insert (0, '[');
 		string->appendFormat ("]:%d", rtl::swapByteOrder16 (addr->sin6_port));
+	}
 
 	return string->getLength ();
 }
@@ -352,6 +396,27 @@ SockAddr::setup (const sockaddr* addr)
 
 	default:
 		m_addr = *addr;
+	}
+}
+
+void
+SockAddr::setup (
+	uint_t family,
+	const void* addr,
+	size_t size
+	)
+{
+	switch (family)
+	{
+	case AF_INET:
+		if (size >= sizeof (in_addr))
+			setup_ip4 ((const in_addr*) addr);
+		break;
+	
+	case AF_INET6:
+		if (size >= sizeof (in6_addr))
+			setup_ip6 ((const in6_addr*) addr);
+		break;
 	}
 }
 
@@ -401,6 +466,49 @@ SockAddr::createNetMask (
 		clear ();
 		m_addr.sa_family = family;
 	}
+}
+
+//.............................................................................
+
+bool 
+resolveHostName (
+	rtl::Array <SockAddr>* addrArray,
+	const char* name,
+	uint_t family
+	)
+{
+	addrArray->clear ();
+
+	addrinfo hintAddrInfo = { 0 };
+	hintAddrInfo.ai_family = family;
+
+	addrinfo* addrInfoList;
+	int result = getaddrinfo (name, NULL, &hintAddrInfo, &addrInfoList);
+	if (result)
+	{
+#if (_AXL_ENV == AXL_ENV_WIN)
+		err::setLastSystemError ();
+#else
+		err::setLastError (gai_strerror (result));
+#endif
+		return false;
+	}
+
+	if (!addrInfoList)
+	{
+		err::setError (err::SystemErrorCode_InvalidParameter);
+		return false;
+	}
+
+	addrinfo* addrInfo = addrInfoList;
+	addrArray->reserve (addrInfo->ai_next ? 4 : 1);
+
+	size_t i = 0;
+	for (; addrInfo; addrInfo = addrInfo->ai_next, i++)
+		addrArray->append (addrInfo->ai_addr);
+
+	freeaddrinfo (addrInfoList);
+	return true;
 }
 
 //.............................................................................
