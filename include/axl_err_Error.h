@@ -339,6 +339,14 @@ public:
 		createSystemError (code);
 	}
 
+	Error (
+		const char* string,
+		size_t length = -1
+		)
+	{
+		createStringError (string, length);
+	}
+
 	bool
 	isKind (
 		const rtl::Guid& guid,
