@@ -8,6 +8,7 @@
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include <ifaddrs.h>
 #	include <net/if.h>
+#	include <netdb.h>
 #endif
 
 #ifdef _AXL_IO_PCAP

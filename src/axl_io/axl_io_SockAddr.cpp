@@ -481,6 +481,7 @@ resolveHostName (
 
 	addrinfo hintAddrInfo = { 0 };
 	hintAddrInfo.ai_family = family;
+	hintAddrInfo.ai_socktype = SOCK_DGRAM;
 
 	addrinfo* addrInfoList;
 	int result = getaddrinfo (name, NULL, &hintAddrInfo, &addrInfoList);
@@ -489,7 +490,7 @@ resolveHostName (
 #if (_AXL_ENV == AXL_ENV_WIN)
 		err::setLastSystemError ();
 #else
-		err::setLastError (gai_strerror (result));
+		err::setError (gai_strerror (result));
 #endif
 		return false;
 	}

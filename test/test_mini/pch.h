@@ -9,6 +9,8 @@
 #	include <iphlpapi.h>
 #	pragma comment (lib, "ws2_32.lib")
 #	pragma comment (lib, "iphlpapi.lib")
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include <netdb.h>
 #endif
 
 // axl
