@@ -35,6 +35,11 @@
 #include <QWidget>
 #include <QScrollBar>
 #include <QTextEdit>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QComboBox>
+#include <QLineEdit>
 
 //.............................................................................
 

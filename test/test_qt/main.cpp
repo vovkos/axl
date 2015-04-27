@@ -270,6 +270,8 @@ main (
 {
 	printf ("main ()\n");
 
+#if 0
+
 //	char const* src = "abc";
 //	char const* src = "a*(b|cd?)+";
 	char const* src = "[ABCDefghijkl](b|c)*";
@@ -283,6 +285,7 @@ main (
 	}
 
 	regExp.print ();
+#endif
 
 #if 0
 	WriterThread writerThread;
@@ -294,12 +297,6 @@ main (
 	char s [256];
 	scanf ("%s", s);
 	return -1;
-
-	QApplication app (argc, argv);
-
-	MainWindow mainWindow;
-	mainWindow.show ();
-	return app.exec ();
 #endif
 
 #if 0
@@ -390,10 +387,16 @@ main (
 	printf ("read: %s\n", buffer);
 #endif
 
-//	trySudo ();
-//	trySudo ();
+#if 0
+	trySudo ();
+	trySudo ();
+#endif
 
-	return 0;
+	QApplication app (argc, argv);
+
+	MainWindow mainWindow;
+	mainWindow.show ();
+	return app.exec ();
 }
 
 //.............................................................................

@@ -30,7 +30,7 @@ public:
 
 private:
 	QTextEdit m_editWidget;
-	MyWidget m_myWidget;
+//	MyWidget m_myWidget;
 };
 
 //.............................................................................
