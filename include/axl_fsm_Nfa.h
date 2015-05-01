@@ -16,6 +16,21 @@ namespace fsm {
 
 //.............................................................................
 
+enum PseudoChar
+{
+	PseudoChar_StartOfLine = 256,
+	PseudoChar_EndOfLine,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum 
+{
+	TransitionTableCharCount = 256 + 2
+};
+
+//.............................................................................
+
 enum MatchConditionKind
 {
 	MatchConditionKind_Undefined,
@@ -30,7 +45,7 @@ struct MatchCondition
 {
 	MatchConditionKind m_conditionKind;
 	rtl::BitMap m_charSet;
-	char m_char;
+	uint_t m_char;
 	
 	MatchCondition ();
 	
@@ -38,18 +53,18 @@ struct MatchCondition
 	copy (const MatchCondition& src);	
 
 	void
-	addChar (char c);
+	addChar (uchar_t c);
 };
-	
+
 //.............................................................................
 
 enum NfaStateFlag
 {
-	NfaStateFlag_Match        = 0x01,
-	NfaStateFlag_EpsilonLink  = 0x02,
-	NfaStateFlag_Accept       = 0x04,
-	NfaStateFlag_OpenCapture  = 0x10,
-	NfaStateFlag_CloseCapture = 0x20,
+	NfaStateFlag_Match        = 0x0001,
+	NfaStateFlag_EpsilonLink  = 0x0002,
+	NfaStateFlag_Accept       = 0x0004,
+	NfaStateFlag_OpenCapture  = 0x0010,
+	NfaStateFlag_CloseCapture = 0x0020,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -68,12 +83,21 @@ struct NfaState: rtl::ListLink
 	NfaState ();
 
 	void
+	copy (const NfaState* srcState);
+	
+	void
 	createEpsilonLink (NfaState* outState);
 
 	void
 	createEpsilonLink (
 		NfaState* outState,
 		NfaState* outState2
+		);
+
+	void
+	createCharMatch (
+		uint_t c,
+		NfaState* outState
 		);
 };
 
@@ -126,8 +150,10 @@ class NfaTransitionMgr
 {
 protected:
 	rtl::StdList <NfaTransition> m_transitionList;
-	NfaTransition* m_transitionMap [256]; // for UTF regexps this should be replaced with interval tree
-	
+	NfaTransition* m_transitionMap [TransitionTableCharCount];
+
+	// for UTF regexps m_transitionMap should be replaced with interval tree
+
 public:
 	void 
 	clear ();
@@ -147,7 +173,7 @@ public:
 protected:
 	void	
 	addMatchCharTransition (
-		uchar_t c, 
+		uint_t c, 
 		NfaState* outState
 		);
 	

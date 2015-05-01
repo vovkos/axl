@@ -424,13 +424,18 @@ testLongJmpTry ()
 void
 testRegExp ()
 {
-	char const* src [] = 
+	fsm::StdRegExpNameMgr nameMgr;
+
+	nameMgr.addName ("ws",  "[ \\t\\r\\n]");
+	nameMgr.addName ("dec", "[0-9]");
+
+	fsm::RegExp regExp;	
+	fsm::RegExpCompiler regExpCompiler (&regExp, &nameMgr);
+
+/*	char const* src [] = 
 	{
 		"'\\x02' V '\\r'",
 	};
-
-	fsm::RegExp regExp;	
-	fsm::RegExpCompiler regExpCompiler (&regExp);
 
 	for (size_t i = 0; i < countof (src); i++)
 	{
@@ -443,6 +448,15 @@ testRegExp ()
 	}
 
 	regExpCompiler.finalize ();
+	regExp.print ();
+*/
+
+	bool result = regExpCompiler.compile ("\"abc\" w* dec+");
+	if (!result)
+	{
+		printf ("error: %s\n", err::getLastError ().getDescription ().cc ());
+		return;
+	}
 
 	regExp.print ();
 }
@@ -468,7 +482,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 	
-	testAddrInfoIp6 ();
+	testRegExp ();
 	return 0;
 }
 

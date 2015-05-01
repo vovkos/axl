@@ -2,6 +2,7 @@
 #include "axl_fsm_RegExp.h"
 #include "axl_err_Error.h"
 #include "axl_rtl_String.h"
+#include "axl_mt_CallOnce.h"
 
 namespace axl {
 namespace fsm {
@@ -68,10 +69,20 @@ getMatchConditionString (const MatchCondition* condition)
 	switch (condition->m_conditionKind)
 	{
 	case MatchConditionKind_Char:
-		string.format (
-			isprint (condition->m_char) ? "'%c'" : "'\\x%02x'", 
-			(uchar_t) condition->m_char
-			);
+		switch (condition->m_char)
+		{
+		case PseudoChar_StartOfLine:
+			string = '^';
+			break;
+
+		case PseudoChar_EndOfLine:
+			string = '$';
+			break;
+
+		default:
+			string.format (isprint (condition->m_char) ? "'%c'" : "'\\x%02x'", condition->m_char);
+		}
+
 		break;
 
 	case MatchConditionKind_CharSet:
@@ -81,7 +92,7 @@ getMatchConditionString (const MatchCondition* condition)
 	case MatchConditionKind_Any:
 		string = "any";
 		break;
-		
+
 	default:
 		ASSERT (false);
 	}
@@ -179,9 +190,46 @@ RegExp::print () const
 
 //.............................................................................
 
-RegExpCompiler::RegExpCompiler (RegExp* regExp)
+static
+void
+initValidSingleTable (bool* table)
+{
+	table ['.'] = true;
+	table ['['] = true;
+	table ['('] = true;
+	table ['{'] = true;
+	table ['^'] = true;
+	table ['$'] = true;
+	table ['d'] = true;
+	table ['D'] = true;
+	table ['h'] = true;
+	table ['H'] = true;
+	table ['w'] = true;
+	table ['W'] = true;
+	table ['s'] = true;
+	table ['S'] = true;
+}
+
+bool
+RegExpCompiler::Token::isValidSingle ()
+{
+	if (m_tokenKind != TokenKind_SpecialChar)
+		return true;
+
+	static bool validSingleTable [256] = { 0 };
+	mt::callOnce (initValidSingleTable, validSingleTable);
+	return validSingleTable [(uchar_t) m_char];
+}
+
+//.............................................................................
+
+RegExpCompiler::RegExpCompiler (
+	RegExp* regExp,
+	RegExpNameMgr* nameMgr
+	)
 {
 	m_regExp = regExp;
+	m_nameMgr = nameMgr;
 	m_p = NULL;
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 	m_lastToken.m_char = 0;
@@ -218,32 +266,33 @@ RegExpCompiler::incrementalCompile (
 		*m_regExp->m_nfaStateList.getHead () :
 		NULL;
 
-	NfaState* newStart = expression ();
-	if (!newStart)
-		return false;
-
-	Token token;
-	bool result = getToken (&token);
-	if (!result)
-		return false;
-	
-	if (!token.isSpecialChar (0))
-	{
-		err::setStringError ("invalid regexp syntax");
-		return false;
-	}
-
-	ASSERT (!m_regExp->m_nfaStateList.isEmpty ());
-	NfaState* acceptState = *m_regExp->m_nfaStateList.getTail ();
-	acceptState->m_flags |= NfaStateFlag_Accept;
-	acceptState->m_acceptContext = acceptContext;
+	NfaState* sol = question (ch (PseudoChar_StartOfLine));
+	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
 
 	if (oldStart)
 	{
 		NfaState* split = AXL_MEM_NEW (NfaState);
-		split->createEpsilonLink (oldStart, newStart);
+		split->createEpsilonLink (oldStart, sol);
 		m_regExp->m_nfaStateList.insertHead (split);
 	}
+
+	NfaState* body = expression ();
+	if (!body)
+		return false;
+
+	bool result = expectEof ();
+	if (!result)
+		return false;	
+
+	accept->createEpsilonLink (body);
+	accept = *m_regExp->m_nfaStateList.getTail ();
+
+	NfaState* eol = question (ch (PseudoChar_EndOfLine));
+
+	accept->createEpsilonLink (eol);
+	accept = *m_regExp->m_nfaStateList.getTail ();
+	accept->m_flags |= NfaStateFlag_Accept;
+	accept->m_acceptContext = acceptContext;
 
 	return true;
 }
@@ -464,25 +513,6 @@ RegExpCompiler::readEscapeSequence (char* c)
 }
 
 bool
-RegExpCompiler::readChar (char* c)
-{
-	switch (*m_p)
-	{
-	case 0:
-		err::setStringError ("invalid char class");
-		return false;
-
-	case '\\':
-		return readEscapeSequence (c);
-
-	default:
-		*c = *m_p++;
-	}
-
-	return true;
-}
-
-bool
 RegExpCompiler::readLiteral (rtl::String* literal)
 {
 	bool result;
@@ -524,6 +554,22 @@ RegExpCompiler::readLiteral (rtl::String* literal)
 }
 
 bool
+RegExpCompiler::readIdentifier (rtl::String* name)
+{
+	ASSERT (isalpha ((uchar_t) *m_p) || *m_p == '_');
+
+	name->copy ((uchar_t) *m_p++);
+	
+	while (isalnum ((uchar_t) *m_p) || *m_p == '_')
+	{
+		name->append ((uchar_t) *m_p);
+		m_p++;
+	}
+
+	return true;
+}
+
+bool
 RegExpCompiler::getToken (Token* token)
 {
 	if (m_lastToken.m_tokenKind)
@@ -538,13 +584,31 @@ RegExpCompiler::getToken (Token* token)
 		switch (*m_p)
 		{
 		case '\\':
-			token->m_tokenKind = TokenKind_Char;
-			return readEscapeSequence (&token->m_char);
+			switch (m_p [1])
+			{
+			case 's':
+			case 'S':
+			case 'd':
+			case 'D':
+			case 'h':
+			case 'H':
+			case 'w':
+			case 'W':
+			case 'b':
+				token->m_tokenKind = TokenKind_SpecialChar;
+				token->m_char = m_p [1];
+				m_p += 2;
+				return true;
+
+			default:
+				token->m_tokenKind = TokenKind_Char;
+				return readEscapeSequence (&token->m_char);
+			}
 
 		case '"':
 		case '\'':
 			token->m_tokenKind = TokenKind_Literal;
-			return readLiteral (&token->m_literal);
+			return readLiteral (&token->m_string);
 
 		case 0:
 			token->m_tokenKind = TokenKind_SpecialChar;
@@ -568,11 +632,20 @@ RegExpCompiler::getToken (Token* token)
 		case ')':
 		case '{':
 		case '}':
+		case '|':
+		case '^':
+		case '$':
 			token->m_tokenKind = TokenKind_SpecialChar;
 			token->m_char = *m_p++;
 			return true;
-
+			
 		default:
+			if (isalpha ((uchar_t) *m_p) || *m_p == '_')
+			{
+				token->m_tokenKind = TokenKind_Identifier;
+				return readIdentifier (&token->m_string);
+			}
+
 			token->m_tokenKind = TokenKind_Char;
 			token->m_char = *m_p++;
 			return true;
@@ -588,13 +661,30 @@ RegExpCompiler::expectSpecialChar (char c)
 	if (!result)
 		return false;
 
-	if (token.m_tokenKind != TokenKind_SpecialChar || token.m_char != c)
+	if (!token.isSpecialChar (c))
 	{
 		err::setFormatStringError ("'%c' expected", c);
 		return false;
 	}
 
 	m_p++;
+	return true;
+}
+
+bool
+RegExpCompiler::expectEof ()
+{
+	Token token;
+	bool result = getToken (&token);
+	if (!result)
+		return false;
+
+	if (!token.isSpecialChar (0))
+	{
+		err::setStringError ("invalid regexp syntax");
+		return false;
+	}
+
 	return true;
 }
 
@@ -612,12 +702,7 @@ RegExpCompiler::expression ()
 
 	if (!token.isSpecialChar ('|'))
 	{
-		if (!token.isSpecialChar (0))
-		{
-			err::setFormatStringError ("invalid regexp syntax");
-			return NULL;
-		}
-
+		m_lastToken = token; // unget token
 		return op1;
 	}
 
@@ -660,7 +745,7 @@ RegExpCompiler::concat ()
 		if (!result)
 			return NULL;
 
-		m_lastToken = token; // unget token anyway
+		m_lastToken = token; // unget token
 
 		if (!token.isValidSingle ())
 			break;
@@ -757,7 +842,9 @@ RegExpCompiler::single ()
 	if (!result)
 		return NULL;
 
-	if (token.m_tokenKind == TokenKind_SpecialChar)
+	switch (token.m_tokenKind)
+	{
+	case TokenKind_SpecialChar:
 		switch (token.m_char)
 		{
 		case '(':
@@ -769,51 +856,102 @@ RegExpCompiler::single ()
 		case '[':
 			return charClass ();
 
+		case 'd':
+		case 'D':
+		case 'h':
+		case 'H':
+		case 'w':
+		case 'W':
+		case 's':
+		case 'S':
+			return stdCharClass (token.m_char);
+
 		case '.':
 			return any ();
+
+		case '^':
+			return ch (PseudoChar_StartOfLine);
+
+		case '$':
+			return ch (PseudoChar_EndOfLine);
 
 		default:
 			err::setStringError ("invalid regexp syntax");
 			return NULL;
 		}
 
+	case TokenKind_Char:
+		return ch (token.m_char);
+
+	case TokenKind_Literal:
+		return literal (token.m_string, token.m_string.getLength ());
+
+	case TokenKind_Identifier:
+		return namedRegExp (token.m_string);
+
+	default:
+		err::setStringError ("invalid regexp syntax");
+		return NULL;
+	}	
+}
+
+NfaState*
+RegExpCompiler::literal (
+	const char* p,
+	size_t length
+	)
+{
 	NfaState* start = AXL_MEM_NEW (NfaState);
 	m_regExp->m_nfaStateList.insertTail (start);
 
-	if (token.m_tokenKind == TokenKind_Char)
+	NfaState* mid = start;
+	const char* end = p + length;
+	for (; p < end; p++)
 	{
-		NfaState* accept = AXL_MEM_NEW (NfaState);
-		m_regExp->m_nfaStateList.insertTail (accept);
-
-		start->m_flags |= NfaStateFlag_Match;
-		start->m_matchCondition.m_conditionKind = MatchConditionKind_Char;
-		start->m_matchCondition.m_char = token.m_char;
-		start->m_outState = accept;
+		ch ((uchar_t) *p, mid);
+		mid = *m_regExp->m_nfaStateList.getTail ();
 	}
-	else if (token.m_tokenKind == TokenKind_Literal)
-	{
-		NfaState* mid = start;
 
-		size_t length = token.m_literal.getLength ();
-		for (size_t i = 0; i < length; i++)
-		{
-			NfaState* accept = AXL_MEM_NEW (NfaState);
-			m_regExp->m_nfaStateList.insertTail (accept);
-
-			mid->m_flags |= NfaStateFlag_Match;
-			mid->m_matchCondition.m_conditionKind = MatchConditionKind_Char;
-			mid->m_matchCondition.m_char = token.m_literal [i];
-			mid->m_outState = accept;
-
-			mid = accept;
-		}
-	}
-	else
-	{
-		m_lastToken = token;
-	}
-	
 	return start;
+}
+
+NfaState*
+RegExpCompiler::ch (uint_t c)
+{
+	NfaState* start = AXL_MEM_NEW (NfaState);
+	m_regExp->m_nfaStateList.insertTail (start);
+	ch (c, start);
+	return start;
+}
+
+void
+RegExpCompiler::ch (
+	uint_t c,
+	NfaState* start
+	)
+{
+	NfaState* accept = AXL_MEM_NEW (NfaState);
+	m_regExp->m_nfaStateList.insertTail (accept);
+
+	if (c != '\r' && c != '\n')
+	{
+		start->createCharMatch (c, accept);
+		return;
+	}
+
+	start->createCharMatch (PseudoChar_StartOfLine, accept);
+	start = accept;
+
+	accept = AXL_MEM_NEW (NfaState);
+	m_regExp->m_nfaStateList.insertTail (accept);
+	
+	start->createCharMatch (c, accept);
+	start = accept;
+
+	accept = AXL_MEM_NEW (NfaState);
+	m_regExp->m_nfaStateList.insertTail (accept);
+
+	start->createCharMatch (PseudoChar_EndOfLine, accept);
 }
 
 NfaState*
@@ -880,10 +1018,39 @@ RegExpCompiler::charClassItem (rtl::BitMap* charSet)
 	bool result;
 
 	char c1;
+	char c2;
 
-	result = readChar (&c1);
-	if (!result)
+	switch (*m_p)
+	{
+	case 0:
+		err::setStringError ("invalid char class");
 		return false;
+
+	case '\\':
+		switch (m_p [1])
+		{
+		case 'd':
+		case 'D':
+		case 'h':
+		case 'H':
+		case 'w':
+		case 'W':
+		case 's':
+		case 'S':			
+			stdCharClass (m_p [1], charSet);
+			m_p += 2;
+			return true;
+		}
+
+		result = readEscapeSequence (&c1);
+		if (!result)
+			return false;
+		
+		break;
+
+	default:
+		c1 = *m_p++;
+	}
 
 	if (*m_p != '-')
 	{
@@ -893,10 +1060,22 @@ RegExpCompiler::charClassItem (rtl::BitMap* charSet)
 
 	m_p++;
 
-	char c2;
-	result = readChar (&c2);
-	if (!result)
+	switch (*m_p)
+	{
+	case 0:
+		err::setStringError ("invalid char class");
 		return false;
+
+	case '\\':
+		result = readEscapeSequence (&c2);
+		if (!result)
+			return false;
+
+		break;
+
+	default:
+		c2 = *m_p++;
+	}
 
 	if (c2 < c1)
 	{
@@ -907,6 +1086,82 @@ RegExpCompiler::charClassItem (rtl::BitMap* charSet)
 
 	charSet->setBitRange (c1, c2 + 1);
 	return true;
+}
+
+NfaState*
+RegExpCompiler::stdCharClass (uint_t c)
+{
+	NfaState* start = AXL_MEM_NEW (NfaState);
+	start->m_flags |= NfaStateFlag_Match;
+	start->m_matchCondition.m_conditionKind = MatchConditionKind_CharSet;
+	start->m_matchCondition.m_charSet.setBitCount (256);
+	m_regExp->m_nfaStateList.insertTail (start);
+
+	stdCharClass (c, &start->m_matchCondition.m_charSet);
+
+	NfaState* accept = AXL_MEM_NEW (NfaState);
+	m_regExp->m_nfaStateList.insertTail (accept);
+
+	start->m_outState = accept;
+	return start;
+}
+
+void
+RegExpCompiler::stdCharClass (
+	uint_t c,
+	rtl::BitMap* charSet
+	)
+{
+	bool isInverted = false;
+
+	switch (c)
+	{
+	case 'D':
+		isInverted = true;
+		// and fall through
+
+	case 'd':
+		charSet->setBitRange ('0', '9' + 1);
+		break;
+
+	case 'H':
+		isInverted = true;
+		// and fall through
+
+	case 'h':
+		charSet->setBitRange ('0', '9' + 1);
+		charSet->setBitRange ('a', 'f' + 1);
+		charSet->setBitRange ('A', 'F' + 1);
+		break;
+
+	case 'W':
+		isInverted = true;
+		// and fall through
+
+	case 'w':
+		charSet->setBitRange ('a', 'z' + 1);
+		charSet->setBitRange ('A', 'Z' + 1);
+		charSet->setBitRange ('0', '9' + 1);
+		charSet->setBit ('_');
+		break;
+
+	case 'S':
+		isInverted = true;
+		// and fall through
+
+	case 's':
+		charSet->setBit (' ');
+		charSet->setBit ('\t');
+		charSet->setBit ('\r');
+		charSet->setBit ('\n');
+		break;
+
+	default:
+		ASSERT (false);
+	}
+
+	if (isInverted)
+		charSet->inverse ();
 }
 
 NfaState*
@@ -956,6 +1211,39 @@ RegExpCompiler::capturingGroup ()
 	accept->m_flags |= NfaStateFlag_CloseCapture;
 	accept->m_captureId = captureId;
 
+	return start;
+}
+
+NfaState*
+RegExpCompiler::namedRegExp (const char* name)
+{
+	if (!m_nameMgr)	
+	{
+		err::setFormatStringError ("named regexp '%s' is used but name manager is not set", name);
+		return NULL;
+	}
+
+	const char* source = m_nameMgr->findName (name);
+	if (!source)
+	{
+		err::setFormatStringError ("named regexp '%s' is not defined", name);
+		return NULL;
+	}
+
+	RegExp subRegExp;
+	RegExpCompiler subRegExpCompiler (&subRegExp, m_nameMgr);
+
+	bool result = subRegExpCompiler.compile (source);
+	if (!result)
+		return NULL;
+	
+	NfaState* start = *subRegExp.m_nfaStateList.getHead ();
+	NfaState* accept = *subRegExp.m_nfaStateList.getTail ();
+
+	ASSERT (accept->m_flags & NfaStateFlag_Accept);
+	accept->m_flags &= ~NfaStateFlag_Accept;
+
+	m_regExp->m_nfaStateList.insertListTail (&subRegExp.m_nfaStateList);
 	return start;
 }
 

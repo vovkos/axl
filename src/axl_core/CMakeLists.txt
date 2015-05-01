@@ -398,6 +398,7 @@ set (
 	${AXL_INC_DIR}/axl_fsm_Nfa.h
 	${AXL_INC_DIR}/axl_fsm_Dfa.h
 	${AXL_INC_DIR}/axl_fsm_RegExp.h
+	${AXL_INC_DIR}/axl_fsm_StdRegExpNameMgr.h
 	)
 
 set (
@@ -405,6 +406,7 @@ set (
 	axl_fsm_Nfa.cpp
 	axl_fsm_Dfa.cpp
 	axl_fsm_RegExp.cpp
+	axl_fsm_StdRegExpNameMgr.cpp
 	)
 
 source_group (

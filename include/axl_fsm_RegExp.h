@@ -14,6 +14,16 @@ namespace fsm {
 
 //.............................................................................
 
+class RegExpNameMgr
+{
+public:
+	virtual 
+	const char*
+	findName (const char* name) = 0;
+};
+
+//.............................................................................
+
 class RegExp
 {
 	friend class RegExpCompiler;
@@ -80,13 +90,14 @@ protected:
 		TokenKind_Char,
 		TokenKind_SpecialChar,
 		TokenKind_Literal,
+		TokenKind_Identifier,
 	};
 
 	struct Token
 	{
 		TokenKind m_tokenKind;
 		char m_char;
-		rtl::String m_literal;
+		rtl::String m_string;
 
 		bool 
 		isSpecialChar (char c)
@@ -95,25 +106,22 @@ protected:
 		}
 
 		bool
-		isValidSingle ()
-		{
-			return 
-				m_tokenKind != TokenKind_SpecialChar || 
-				m_char == '.' ||
-				m_char == '[' || 
-				m_char == '(' || 
-				m_char == '{'; 
-		}
+		isValidSingle ();
 	};
 	
 protected:
 	RegExp* m_regExp;
-	char const* m_p;
+	RegExpNameMgr* m_nameMgr;
+
+	const char* m_p;
 	Token m_lastToken;
 	size_t m_captureId;
 
 public:
-	RegExpCompiler (RegExp* regExp);
+	RegExpCompiler (
+		RegExp* regExp,
+		RegExpNameMgr* nameMgr = NULL
+		);
 
 	bool 
 	compile (
@@ -138,16 +146,19 @@ protected:
 	readEscapeSequence (char* c);
 
 	bool
-	readChar (char* c);
+	readLiteral (rtl::String* literal);
 
 	bool
-	readLiteral (rtl::String* literal);
+	readIdentifier (rtl::String* name);
 
 	bool
 	getToken (Token* token);
 
 	bool
 	expectSpecialChar (char c);
+
+	bool
+	expectEof ();
 
 	NfaState*
 	expression ();
@@ -173,11 +184,38 @@ protected:
 	NfaState*
 	charClass ();
 
-	bool
-	charClassItem (rtl::BitMap* charSet);
+	NfaState*
+	stdCharClass (uint_t c);
+
+	NfaState*
+	namedRegExp (const char* name);
+
+	void
+	stdCharClass (
+		uint_t c,
+		rtl::BitMap* charSet
+		);
+
+	NfaState*
+	literal (
+		const char* p,
+		size_t length
+		);
+
+	NfaState*
+	ch (uint_t c);
+
+	void
+	ch (
+		uint_t c,
+		NfaState* start
+		);
 
 	NfaState*
 	any ();
+
+	bool
+	charClassItem (rtl::BitMap* charSet);
 
 	NfaState*
 	group ();

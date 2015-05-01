@@ -18,6 +18,7 @@
 #include "axl_rtl_String.h"
 #include "axl_err_Error.h"
 #include "axl_fsm_RegExp.h"
+#include "axl_fsm_StdRegExpNameMgr.h"
 #include "axl_rtl_AutoPtrArray.h"
 #include "axl_mt_LongJmpTry.h"
 #include "axl_mt_DynamicLibrary.h"

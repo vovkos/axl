@@ -23,26 +23,30 @@ MatchCondition::copy (const MatchCondition& src)
 }
 
 void
-MatchCondition::addChar (char c)
+MatchCondition::addChar (uchar_t c)
 {
 	switch (m_conditionKind)
 	{
 	case MatchConditionKind_Char:
 		if (m_char == c) 
 			break; // no change
-			
+		
+		ASSERT (m_char < 256);
 		m_conditionKind = MatchConditionKind_CharSet;
 		m_charSet.setBitCount (256);
-		m_charSet.setBit ((uchar_t) m_char);
+		m_charSet.setBit (m_char);
 		
 		// and fall through
 
 	case MatchConditionKind_CharSet:
-		m_charSet.setBit ((uchar_t) c);
+		m_charSet.setBit (c);
 		break;
 
 	case MatchConditionKind_Any:
 		break; // no change
+
+	default:
+		ASSERT (false);
 	}	
 }
 
@@ -56,6 +60,11 @@ NfaState::NfaState ()
 	m_captureId = -1;
 	m_outState = NULL;
 	m_outState2 = NULL;
+}
+
+void
+NfaState::copy (const NfaState* srcState)
+{
 }
 
 void
@@ -78,6 +87,18 @@ NfaState::createEpsilonLink (
 	m_flags |= NfaStateFlag_EpsilonLink;
 	m_outState = outState;
 	m_outState2 = outState2;
+}
+
+void
+NfaState::createCharMatch (
+	uint_t c,
+	NfaState* outState
+	)
+{
+	m_flags |= NfaStateFlag_Match;
+	m_matchCondition.m_conditionKind = MatchConditionKind_Char;
+	m_matchCondition.m_char = c;
+	m_outState = outState;
 }
 
 //.............................................................................
@@ -121,14 +142,17 @@ NfaTransitionMgr::addMatchState (NfaState* state)
 		for (size_t i = 0; i < 256; i++)
 		{
 			if (state->m_matchCondition.m_charSet.getBit (i))
-				addMatchCharTransition ((char) i, state->m_outState);
+				addMatchCharTransition (i, state->m_outState);
 		}
 		break;
 
 	case MatchConditionKind_Any:
 		for (size_t i = 0; i < 256; i++)
-			addMatchCharTransition ((char) i, state->m_outState);
+			addMatchCharTransition (i, state->m_outState);
 		break;	
+
+	default:
+		ASSERT (false);
 	}
 }
 
@@ -158,10 +182,12 @@ NfaTransitionMgr::finalize ()
 
 void	
 NfaTransitionMgr::addMatchCharTransition (
-	uchar_t c, 
+	uint_t c, 
 	NfaState* outState
 	)
 {
+	ASSERT (c < countof (m_transitionMap));
+
 	NfaTransition* transition = m_transitionMap [c];
 	if (!transition)
 	{
