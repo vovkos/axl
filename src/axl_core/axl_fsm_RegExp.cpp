@@ -4,6 +4,8 @@
 #include "axl_rtl_String.h"
 #include "axl_mt_CallOnce.h"
 
+// #define _AXL_FSM_NO_ROOT_SOL_EOL
+
 namespace axl {
 namespace fsm {
 	
@@ -266,15 +268,15 @@ RegExpCompiler::incrementalCompile (
 		*m_regExp->m_nfaStateList.getHead () :
 		NULL;
 
-	NfaState* sol = question (ch (PseudoChar_StartOfLine));
-	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* newStart;
+	NfaState* accept;
 
-	if (oldStart)
-	{
-		NfaState* split = AXL_MEM_NEW (NfaState);
-		split->createEpsilonLink (oldStart, sol);
-		m_regExp->m_nfaStateList.insertHead (split);
-	}
+#ifndef _AXL_FSM_NO_ROOT_SOL_EOL
+	NfaState* sol = question (ch (PseudoChar_StartOfLine));
+	newStart = sol;
+
+	accept = *m_regExp->m_nfaStateList.getTail ();
+#endif
 
 	NfaState* body = expression ();
 	if (!body)
@@ -284,15 +286,26 @@ RegExpCompiler::incrementalCompile (
 	if (!result)
 		return false;	
 
+#ifndef _AXL_FSM_NO_ROOT_SOL_EOL
 	accept->createEpsilonLink (body);
 	accept = *m_regExp->m_nfaStateList.getTail ();
 
 	NfaState* eol = question (ch (PseudoChar_EndOfLine));
-
 	accept->createEpsilonLink (eol);
+#else
+	newStart = body;
+#endif
+
 	accept = *m_regExp->m_nfaStateList.getTail ();
 	accept->m_flags |= NfaStateFlag_Accept;
 	accept->m_acceptContext = acceptContext;
+
+	if (oldStart)
+	{
+		NfaState* split = AXL_MEM_NEW (NfaState);
+		split->createEpsilonLink (oldStart, newStart);
+		m_regExp->m_nfaStateList.insertHead (split);
+	}
 
 	return true;
 }
@@ -667,7 +680,6 @@ RegExpCompiler::expectSpecialChar (char c)
 		return false;
 	}
 
-	m_p++;
 	return true;
 }
 
