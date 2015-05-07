@@ -1,5 +1,176 @@
 #include "pch.h"
 
+#if (_AXL_ENV == AXL_ENV_WIN)
+
+#include "axl_err_NtError.h"
+
+//.............................................................................
+
+#define STATUS_NO_MORE_FILES   0x80000006
+#define STATUS_NO_MORE_ENTRIES 0x8000001a
+
+#define DIRECTORY_QUERY               0x0001
+#define DIRECTORY_TRAVERSE            0x0002
+#define DIRECTORY_CREATE_OBJECT       0x0004
+#define DIRECTORY_CREATE_SUBDIRECTORY 0x0008
+
+enum FILE_INFORMATION_CLASS
+{
+	FileDirectoryInformation = 1,
+};
+
+//.............................................................................
+
+struct IO_STATUS_BLOCK
+{
+	LONG Status;
+	ULONG Information;
+};
+
+typedef IO_STATUS_BLOCK* PIO_STATUS_BLOCK;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct UNICODE_STRING 
+{
+	USHORT Length;
+	USHORT MaximumLength;
+	PWSTR  Buffer;
+};
+
+typedef UNICODE_STRING* PUNICODE_STRING;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct OBJECT_ATTRIBUTES 
+{
+	ULONG Length;
+	HANDLE RootDirectory;
+	PUNICODE_STRING ObjectName;
+	ULONG Attributes;
+	PVOID SecurityDescriptor;
+	PVOID SecurityQualityOfService;
+};
+
+typedef OBJECT_ATTRIBUTES* POBJECT_ATTRIBUTES;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct FILE_DIRECTORY_INFORMATION 
+{ 
+	ULONG NextEntryOffset;
+	ULONG FileIndex;
+	LARGE_INTEGER CreationTime;
+	LARGE_INTEGER LastAccessTime;
+	LARGE_INTEGER LastWriteTime;
+	LARGE_INTEGER ChangeTime;
+	LARGE_INTEGER EndOfFile;
+	LARGE_INTEGER AllocationSize;
+	ULONG FileAttributes;
+	ULONG FileNameLength;
+	WCHAR FileName[1]; 
+};
+
+typedef FILE_DIRECTORY_INFORMATION* PFILE_DIRECTORY_INFORMATION;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct OBJECT_DIRECTORY_INFORMATION 
+{
+	UNICODE_STRING Name;
+	UNICODE_STRING TypeName;
+};
+
+typedef OBJECT_DIRECTORY_INFORMATION* POBJECT_DIRECTORY_INFORMATION;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef
+NTSTATUS 
+NTAPI 
+NtQueryDirectoryFile (
+	IN HANDLE FileHandle,
+	IN HANDLE Event,
+	IN PVOID ApcRoutine,
+	IN PVOID ApcContext,
+	OUT PIO_STATUS_BLOCK IoStatusBlock,
+	OUT PVOID FileInformation,
+	IN ULONG Length,
+	IN INT FileInformationClass,
+	IN BOOLEAN ReturnSingleEntry,
+	IN PVOID FileName,
+	IN BOOLEAN RestartScan 
+	);
+
+typedef
+NTSTATUS 
+NTAPI
+NtOpenDirectoryObject (
+	OUT PHANDLE DirectoryHandle,
+	IN ACCESS_MASK DesiredAccess,
+	IN POBJECT_ATTRIBUTES ObjectAttributes
+	);
+
+typedef
+NTSTATUS 
+NTAPI
+NtQueryDirectoryObject(
+	IN HANDLE DirectoryHandle,
+	OUT PVOID Buffer,
+	IN ULONG Length,
+	IN BOOLEAN ReturnSingleEntry,
+	IN BOOLEAN RestartScan,
+	IN PULONG Context,
+	OUT PULONG ReturnLength
+	);
+
+typedef
+NTSTATUS 
+NTAPI 
+NtOpenSymbolicLinkObject (
+	OUT PHANDLE LinkHandle,
+	IN ACCESS_MASK DesiredAccess,
+	IN POBJECT_ATTRIBUTES ObjectAttributes
+	);
+
+typedef
+NTSTATUS 
+NTAPI 
+NtQuerySymbolicLinkObject (
+	IN HANDLE LinkHandle,
+	OUT PUNICODE_STRING LinkTarget,
+	OUT PULONG ReturnedLength
+	);
+
+//.............................................................................
+
+NtQueryDirectoryFile* ntQueryDirectoryFile = NULL;
+NtOpenDirectoryObject* ntOpenDirectoryObject = NULL;
+NtQueryDirectoryObject* ntQueryDirectoryObject = NULL;
+NtOpenSymbolicLinkObject* ntOpenSymbolicLinkObject = NULL;
+NtQuerySymbolicLinkObject* ntQuerySymbolicLinkObject = NULL;
+
+void
+initNtFunctions ()
+{
+	HMODULE ntdll = ::GetModuleHandleW (L"ntdll.dll");
+	ASSERT (ntdll);
+
+	ntQueryDirectoryFile = (NtQueryDirectoryFile*) ::GetProcAddress (ntdll, "NtQueryDirectoryFile");
+	ntOpenDirectoryObject = (NtOpenDirectoryObject*) ::GetProcAddress (ntdll, "NtOpenDirectoryObject");
+	ntQueryDirectoryObject = (NtQueryDirectoryObject*) ::GetProcAddress (ntdll, "NtQueryDirectoryObject");
+	ntOpenSymbolicLinkObject = (NtOpenSymbolicLinkObject*) ::GetProcAddress (ntdll, "NtOpenSymbolicLinkObject");
+	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObject*) ::GetProcAddress (ntdll, "NtQuerySymbolicLinkObject");
+
+	ASSERT (ntQueryDirectoryFile);
+	ASSERT (ntOpenDirectoryObject);
+	ASSERT (ntQueryDirectoryObject);
+	ASSERT (ntOpenSymbolicLinkObject);
+	ASSERT (ntQuerySymbolicLinkObject);
+}
+
+#endif
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -464,6 +635,870 @@ testRegExp ()
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
+
+#if 0
+
+#define UNICODE
+ 
+#include <windows.h>
+#include <commctrl.h>
+#include "resource.h"
+#include "ntdll.h"
+#pragma comment(lib,"comctl32.lib")
+ 
+NTOPENDIRECTORYOBJECT pOpenDir;
+NTQUERYDIRECTORYOBJECT pQueryDir;
+NTOPENSYMBOLICLINKOBJECT pOpenLink;
+NTQUERYSYMBOLICLINKOBJECT pQueryLink;
+ 
+void GetSel(HWND hTree,WORD *dirname)
+{
+ 
+HTREEITEM hItem;
+TVITEM tvi;
+WORD temp[MAX_PATH];
+ 
+dirname[0]=L'\\';
+dirname[1]=0;
+temp[0]=0;
+tvi.mask=TVIF_TEXT;
+tvi.pszText=dirname+1;
+tvi.cchTextMax=MAX_PATH;
+hItem=(HTREEITEM)SendMessage(hTree,TVM_GETNEXTITEM,
+TVGN_CARET,0);
+while(hItem)
+{
+ 
+tvi.hItem=hItem;
+SendMessage(hTree,TVM_GETITEM,0,(LPARAM)&tvi);
+ 
+if(!lstrcmp(dirname+1,L"\\"))
+{
+ 
+lstrcpy(dirname,*temp?temp:L"\\");
+break;
+ 
+}
+lstrcat(dirname,temp);
+lstrcpy(temp,dirname);
+ 
+hItem=(HTREEITEM)SendMessage(hTree,TVM_GETNEXTITEM,
+TVGN_PARENT,(LPARAM)hItem);
+ 
+}
+ 
+}
+ 
+HTREEITEM FindItem(HWND hTreeView,HTREEITEM hParent,PWORD wszDirName)
+{
+ 
+HTREEITEM hItem;
+TVITEM tvi;
+WORD buf[MAX_PATH];
+ 
+tvi.mask=TVIF_TEXT;
+tvi.pszText=buf;
+tvi.cchTextMax=sizeof(buf);
+hItem=(HTREEITEM)SendMessage(hTreeView,TVM_GETNEXTITEM,
+TVGN_CHILD,(LPARAM)hParent);
+while(hItem)
+{
+ 
+tvi.hItem=hItem;
+SendMessage(hTreeView,TVM_GETITEM,0,(LPARAM)&tvi);
+if(!lstrcmp(wszDirName,buf))
+{
+ 
+tvi.mask=TVIF_PARAM;
+tvi.hItem=hItem;
+tvi.lParam=TRUE;
+SendMessage(hTreeView,TVM_SETITEM,0,(LPARAM)&tvi);
+break;
+ 
+}
+hItem=(HTREEITEM)SendMessage(hTreeView,TVM_GETNEXTITEM,
+TVGN_NEXT,(LPARAM)hItem);
+ 
+}
+ 
+return hItem;
+ 
+}
+ 
+void ClearFlag(HWND hTreeView,HTREEITEM hParent)
+{
+ 
+HTREEITEM hItem;
+TVITEM tvi;
+ 
+tvi.mask=TVIF_PARAM;
+hItem=(HTREEITEM)SendMessage(hTreeView,TVM_GETNEXTITEM,
+TVGN_CHILD,(LPARAM)hParent);
+while(hItem)
+{
+ 
+tvi.hItem=hItem;
+SendMessage(hTreeView,TVM_GETITEM,0,(LPARAM)&tvi);
+hItem=(HTREEITEM)SendMessage(hTreeView,TVM_GETNEXTITEM,
+TVGN_NEXT,(LPARAM)hItem);
+if(tvi.lParam)
+{
+ 
+tvi.lParam=FALSE;
+SendMessage(hTreeView,TVM_SETITEM,0,(LPARAM)&tvi);
+ 
+}
+else
+SendMessage(hTreeView,TVM_DELETEITEM,0,
+	(LPARAM)tvi.hItem);
+ 
+}
+ 
+}
+ 
+void FillList(HWND hList,PWORD dirname)
+{
+ 
+int i;
+HANDLE hDir,hLink;
+UNICODE_STRING name,*p;
+OBJECT_ATTRIBUTE oa;
+PBYTE pBuf;
+DWORD len,context;
+LVITEM lvi;
+WORD targetname[MAX_PATH];
+ 
+static PWORD wszTypes[]=
+{
+ 
+//L"Adapter",
+L"Callback",
+//L"Controller",
+L"Desktop",
+L"Device",
+L"Directory",
+L"Driver",
+L"Event",
+//L"EventPair",
+//L"File",
+//L"IoCompletion",
+//L"Job",
+L"Key",
+L"Mutant",
+L"Port",
+//L"Process",
+//L"Profile",
+L"Section",
+L"Semaphore",
+L"SymbolicLink",
+L"Timer",
+//L"Thread",
+//L"Token",
+L"Type",
+//L"WaitablePort",
+L"WindowStation",
+//L"WmiGuid"
+ 
+};
+ 
+name.buf=dirname;
+name.len=lstrlen(dirname)*sizeof(*dirname);
+oa.len=sizeof(oa);
+oa.hRoot=NULL;
+oa.name=&name;
+oa.attr=0;
+oa.p=NULL;
+oa.ps=NULL;
+pOpenDir(&hDir,1,&oa);
+if(!hDir)
+return;
+ 
+len=0x1000;
+pBuf=(PBYTE)VirtualAlloc(NULL,len,MEM_COMMIT,PAGE_READWRITE);
+if(!pBuf)
+{
+ 
+CloseHandle(hDir);
+return;
+ 
+}
+while(0x105==pQueryDir(hDir,pBuf,len,FALSE,TRUE,&context,NULL))
+{
+ 
+VirtualFree(pBuf,len,MEM_DECOMMIT|MEM_RELEASE);
+len<<=1;
+pBuf=(PBYTE)VirtualAlloc(NULL,len,MEM_COMMIT,PAGE_READWRITE);
+if(!pBuf)
+{
+ 
+CloseHandle(hDir);
+return;
+ 
+}
+ 
+}
+ 
+SendMessage(hList,LVM_DELETEALLITEMS,0,0);
+lvi.iItem=0x0fffffff;
+lvi.cchTextMax=MAX_PATH;
+p=(PUNICODE_STRING)pBuf;
+name.buf=targetname;
+name.max=sizeof(targetname);
+while(p->buf)
+{
+ 
+for(i=0;i<15;i++)
+{
+ 
+if(!lstrcmp((PWORD)(p+1)->buf,wszTypes[i]))
+break;
+ 
+}
+ 
+lvi.mask=LVIF_TEXT|LVIF_IMAGE;
+lvi.iSubItem=0;
+lvi.pszText=(PWORD)p->buf;
+lvi.iImage=i+1;
+lvi.iItem=SendMessage(hList,LVM_INSERTITEM,0,(LPARAM)&lvi);
+ 
+lvi.iSubItem=1;
+lvi.pszText=(PWORD)(p+1)->buf;
+SendMessage(hList,LVM_SETITEMTEXT,0,(LPARAM)&lvi);
+ 
+if(!lstrcmp((PWORD)(p+1)->buf,L"SymbolicLink"))
+{
+ 
+oa.len=sizeof(oa);
+oa.hRoot=hDir;
+oa.name=p;
+oa.attr=0x40;
+oa.p=NULL;
+oa.ps=NULL;
+pOpenLink(&hLink,1,&oa);
+ 
+if(hLink)
+{
+ 
+pQueryLink(hLink,&name,NULL);
+lvi.iSubItem=2;
+lvi.pszText=targetname;
+*(PWORD)((PBYTE)targetname+name.len)=0;
+ 
+SendMessage(hList,LVM_SETITEMTEXT,0,(LPARAM)&lvi);
+CloseHandle(hLink);
+ 
+}
+ 
+}
+p++;p++;
+ 
+}
+VirtualFree(pBuf,len,MEM_DECOMMIT|MEM_RELEASE);
+CloseHandle(hDir);
+ 
+}
+ 
+void 
+EnumerateDirectory(
+	HWND hTreeView,
+	HTREEITEM hParent,
+	HANDLE hRoot,
+	PWORD wszDirName
+	)
+{ 
+	HANDLE hDir;
+	UNICODE_STRING name,*p;
+	OBJECT_ATTRIBUTE oa;
+	PBYTE pBuf;
+	DWORD len,context;
+	HTREEITEM hItem;
+	TVINSERTSTRUCTW tvis;
+ 
+	name.buf=wszDirName;
+	name.len=lstrlen(wszDirName)*sizeof(*wszDirName);
+	name.max=name.len+sizeof(*wszDirName);
+	oa.len=sizeof(oa);
+	oa.hRoot=hRoot;
+	oa.name=&name;
+	oa.attr=0;
+	oa.p=NULL;
+	oa.ps=NULL;
+	pOpenDir(&hDir,1,&oa);
+ 
+	len=0x1000;
+	pBuf=(PBYTE)VirtualAlloc(NULL,len,MEM_COMMIT,PAGE_READWRITE);
+	if(!pBuf)
+	{
+ 
+		CloseHandle(hDir);
+		return; 
+	}
+	
+	while(0x105==pQueryDir(hDir,pBuf,len,FALSE,TRUE,&context,NULL))
+	{
+ 
+		VirtualFree(pBuf,len,MEM_DECOMMIT|MEM_RELEASE);
+		len<<=1;
+		pBuf=(PBYTE)VirtualAlloc(NULL,len,MEM_COMMIT,PAGE_READWRITE);
+		if(!pBuf)
+		{
+ 
+			CloseHandle(hDir);
+			return;
+ 
+		}
+ 
+	}
+ 
+	hItem=FindItem(hTreeView,hParent,wszDirName);
+	if(!hItem)
+	{
+ 
+		tvis.hParent=hParent;
+		tvis.hInsertAfter=TVI_LAST;
+		tvis.item.mask=TVIF_TEXT|TVIF_PARAM;
+		tvis.item.pszText=(PWORD)name.buf;
+		tvis.item.cchTextMax=name.max;
+		tvis.item.lParam=TRUE;
+		hItem=(HTREEITEM)SendMessage(hTreeView,
+		TVM_INSERTITEM,0,(LPARAM)&tvis);
+ 
+	}
+ 
+	p=(PUNICODE_STRING)pBuf;
+	while(p->buf)
+	{
+ 
+		if(!lstrcmpW((PWORD)(p+1)->buf,L"Directory"))
+		EnumerateDirectory(hTreeView,hItem,hDir,(PWORD)p->buf);
+		p++;p++;
+ 
+	}
+	ClearFlag(hTreeView,hItem);
+ 
+	VirtualFree(pBuf,len,MEM_DECOMMIT|MEM_RELEASE);
+	CloseHandle(hDir);
+ 
+}
+ 
+LRESULT WINAPI WndProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
+{
+ 
+static int x,preX;
+static BOOL bDrag;
+static int cxClient,cyClient;
+static int cxTreeView=196,cyToolbar=30,cyStatus=20;
+static HWND hTreeView,hListView,hToolbar,hStatusbar;
+static HIMAGELIST hTreeImage,hListImage,hListImageSM;
+static WORD wszCurDir[MAX_PATH];
+ 
+int i;
+HTREEITEM hTreeItem;
+LVCOLUMN lvc;
+PWORD names[]={
+L"Name",L"Type",L"SymbolicLink"
+};
+ 
+switch(message)
+{
+ 
+case WM_CREATE:
+InitCommonControls();
+hToolbar=CreateWindowEx(0,
+L"ToolbarWindow32",NULL,
+WS_CHILD|WS_VISIBLE,
+0,0,0,0,hwnd,(HMENU)IDC_TOOLBAR,
+((LPCREATESTRUCT)lParam)->hInstance,NULL);
+hTreeView=CreateWindowEx(WS_EX_CLIENTEDGE,
+L"SysTreeView32",NULL,
+WS_CHILD|WS_VISIBLE|TVS_HASBUTTONS|TVS_HASLINES\
+|TVS_LINESATROOT|TVS_DISABLEDRAGDROP|TVS_SHOWSELALWAYS,
+0,0,0,0,hwnd,(HMENU)IDC_TREEVIEW,
+((LPCREATESTRUCT)lParam)->hInstance,NULL);
+hListView=CreateWindowEx(WS_EX_CLIENTEDGE,
+L"SysListView32",NULL,
+WS_CHILD|WS_VISIBLE\
+|LVS_REPORT,
+0,0,0,0,hwnd,(HMENU)IDC_LISTVIEW,
+((LPCREATESTRUCT)lParam)->hInstance,NULL);
+hStatusbar=CreateWindow(L"msctls_statusbar32",NULL,
+WS_CHILD|WS_VISIBLE,
+0,0,0,0,hwnd,(HMENU)IDC_STATUSBAR,
+((LPCREATESTRUCT)lParam)->hInstance,NULL);
+ 
+hTreeImage=ImageList_Create(
+GetSystemMetrics(SM_CXSMICON),
+GetSystemMetrics(SM_CYSMICON),
+ILC_MASK|ILC_COLOR32,1,1);
+ImageList_AddIcon(hTreeImage,LoadIcon(((LPCREATESTRUCT)
+lParam)->hInstance,L"directory"));
+SendMessage(hTreeView,TVM_SETIMAGELIST,TVSIL_NORMAL,(LPARAM)hTreeImage);
+ 
+hListImage=ImageList_Create(
+GetSystemMetrics(SM_CXICON),
+GetSystemMetrics(SM_CYICON),
+ILC_MASK|ILC_COLOR16,15,15);
+hListImageSM=ImageList_Create(
+GetSystemMetrics(SM_CXSMICON),
+GetSystemMetrics(SM_CYSMICON),
+ILC_MASK|ILC_COLOR16,15,15);
+for(i=1;i<16;i++)
+{
+ 
+ImageList_AddIcon(hListImage,LoadIcon(((LPCREATESTRUCT)
+lParam)->hInstance,(PWORD)i));
+ImageList_AddIcon(hListImageSM,LoadIcon(((LPCREATESTRUCT)
+lParam)->hInstance,(PWORD)i));
+ 
+}
+SendMessage(hListView,TVM_SETIMAGELIST,LVSIL_SMALL,(LPARAM)hListImageSM);
+SendMessage(hListView,TVM_SETIMAGELIST,LVSIL_NORMAL,(LPARAM)hListImage);
+ 
+lvc.mask=LVCF_TEXT|LVCF_SUBITEM;
+for(i=0;i<3;i++)
+{
+ 
+lvc.pszText=names[i];
+lvc.cchTextMax=sizeof(names[i]);
+lvc.iSubItem=i;
+SendMessage(hListView,LVM_INSERTCOLUMN,i,(LPARAM)&lvc);
+ 
+}
+ 
+EnumerateDirectory(hTreeView,TVI_ROOT,NULL,L"\\");
+hTreeItem=(HTREEITEM)SendMessage(hTreeView,TVM_GETNEXTITEM,
+TVGN_CHILD,(LPARAM)TVI_ROOT);
+SendMessage(hTreeView,TVM_EXPAND,TVE_EXPAND,(LPARAM)hTreeItem);
+SendMessage(hTreeView,TVM_SELECTITEM,TVGN_CARET,(LPARAM)hTreeItem);
+ 
+return 0;
+case WM_SIZE:
+cxClient=(WORD)lParam;
+cyClient=(WORD)(lParam>>16);
+ 
+MoveWindow(hToolbar,0,0,cxClient,cyToolbar,TRUE);
+MoveWindow(hTreeView,0,cyToolbar,
+cxTreeView,cyClient-cyToolbar-cyStatus,TRUE);
+MoveWindow(hListView,cxTreeView+4,cyToolbar,
+cxClient-cxTreeView-4,cyClient-cyToolbar-cyStatus,TRUE);
+MoveWindow(hStatusbar,0,cyClient-cyStatus,cxClient,cyStatus,TRUE);
+ 
+i=cxClient-cxTreeView-4;
+SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,i/3);
+SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,i/6);
+SendMessage(hListView,LVM_SETCOLUMNWIDTH,2,i/2);
+ 
+return 0;
+case WM_MOUSEMOVE:
+x=(short)lParam;
+if(bDrag)
+{
+ 
+cxTreeView+=x-preX;
+cxTreeView=max(0,min(cxTreeView,cxClient));
+preX=max(0,min(x,cxClient));
+MoveWindow(hTreeView,0,cyToolbar,
+cxTreeView,cyClient-cyToolbar-cyStatus,TRUE);
+MoveWindow(hListView,cxTreeView+4,cyToolbar,
+cxClient-cxTreeView-4,cyClient-cyToolbar-cyStatus,TRUE);
+ 
+}
+SetCursor(LoadCursor(NULL,
+x>=cxTreeView&&x<=cxTreeView+4?
+IDC_SIZEWE:IDC_ARROW));
+return 0;
+case WM_LBUTTONDOWN:
+x=(short)lParam;
+if(x<cxTreeView||x>cxTreeView+4)
+return 0;
+SetCursor(LoadCursor(NULL,IDC_SIZEWE));
+bDrag=TRUE;
+preX=x;
+SetCapture(hwnd);
+return 0;
+case WM_LBUTTONUP:
+if(bDrag)
+{
+ 
+SetCapture(NULL);
+bDrag=FALSE;
+SetCursor(LoadCursor(NULL,IDC_ARROW));
+ 
+}
+return 0;
+case WM_NOTIFY:
+switch(((NMHDR*)lParam)->idFrom)
+{
+ 
+case IDC_TREEVIEW:
+if(((NMHDR*)lParam)->code==TVN_SELCHANGED)
+{
+ 
+GetSel(hTreeView,wszCurDir);
+SendMessage(hStatusbar,SB_SETTEXT,0,(LPARAM)wszCurDir);
+FillList(hListView,wszCurDir);
+return 0;
+ 
+}
+break;
+ 
+}
+break;
+case WM_COMMAND:
+switch((WORD)wParam)
+{
+ 
+case IDM_REFRESH:
+EnumerateDirectory(hTreeView,TVI_ROOT,NULL,L"\\");
+FillList(hListView,wszCurDir);
+return 0;
+ 
+}
+break;
+ 
+case WM_DESTROY:
+ImageList_Destroy(hListImageSM);
+ImageList_Destroy(hListImage);
+ImageList_Destroy(hTreeImage);
+PostQuitMessage(0);
+return 0;
+ 
+}
+return DefWindowProc(hwnd,message,wParam,lParam);
+ 
+}
+ 
+#ifdef _DEBUG
+int WINAPI WinMain(HINSTANCE hInstance,
+   HINSTANCE hPrevInstance,
+   LPSTR lpszCmdLine,
+   int nCmdShow)
+{
+ 
+#else
+#pragma comment(linker,"/entry:MyWinMain")
+int WINAPI MyWinMain()
+{
+ 
+HMODULE hInstance=GetModuleHandle(NULL);
+int nCmdShow=SW_SHOWNORMAL;
+#endif
+ 
+HMODULE hMod;
+HWND hwnd;
+MSG msg;
+WNDCLASS wndclass;
+WORD szAppName[]=L"WinObj";
+ 
+if(GetVersion()&0x80000000)
+{
+ 
+MessageBoxA(0,"WinObj sopports NT only!","Sorry",MB_OK);
+return 0;
+ 
+}
+ 
+hMod=GetModuleHandle(L"ntdll");
+pOpenDir=(NTOPENDIRECTORYOBJECT)GetProcAddress
+(hMod,"NtOpenDirectoryObject");
+pQueryDir=(NTQUERYDIRECTORYOBJECT)GetProcAddress
+(hMod,"NtQueryDirectoryObject");
+pOpenLink=(NTOPENSYMBOLICLINKOBJECT)GetProcAddress
+(hMod,"NtOpenSymbolicLinkObject");
+pQueryLink=(NTQUERYSYMBOLICLINKOBJECT)GetProcAddress
+(hMod,"NtQuerySymbolicLinkObject");
+ 
+wndclass.style=0;
+wndclass.lpfnWndProc=WndProc;
+wndclass.cbClsExtra=0;
+wndclass.cbWndExtra=0;
+wndclass.hInstance=hInstance;
+wndclass.hIcon=LoadIcon(hInstance,L"mainsm");
+wndclass.hCursor=LoadCursor(NULL,IDC_ARROW);
+wndclass.hbrBackground=(HBRUSH)(COLOR_BTNFACE+1);
+wndclass.lpszMenuName=szAppName;
+wndclass.lpszClassName=szAppName;
+ 
+RegisterClass(&wndclass);
+hwnd=CreateWindowEx(WS_EX_WINDOWEDGE,
+szAppName,szAppName,
+WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,
+CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
+NULL,NULL,hInstance,NULL);
+ShowWindow(hwnd,nCmdShow);
+UpdateWindow(hwnd);
+ 
+while(GetMessage(&msg,NULL,0,0))
+{
+ 
+TranslateMessage(&msg);
+DispatchMessage(&msg);
+ 
+}
+return msg.wParam;
+ 
+}
+
+#endif
+
+//.............................................................................
+
+enum
+{
+	BufferSize = 4 * 1024,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+testNamedPipes ()
+{
+	NTSTATUS status;
+
+	HMODULE ntdll = ::GetModuleHandleW (L"ntdll.dll");
+	ASSERT (ntdll);
+
+	NtQueryDirectoryFile* ntQueryDirectoryFile = (NtQueryDirectoryFile*) ::GetProcAddress (ntdll, "NtQueryDirectoryFile");
+	if (!ntQueryDirectoryFile)
+	{
+		err::setLastSystemError ();
+		printf ("cannot find NtQueryDirectoryFile: %s\n", err::getLastErrorDescription ().cc ());
+		return; 
+	}
+
+	io::win::File pipeDir;
+	bool result = pipeDir.create (
+		L"\\\\.\\pipe\\",
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL,
+		OPEN_EXISTING,
+		0
+		);
+
+	if (!result) 
+	{
+		err::setLastSystemError ();
+		printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().cc ());
+		return; 
+	}
+ 
+	rtl::Array <char> dirBuffer;
+	dirBuffer.setCount (BufferSize);
+
+	rtl::String_utf16 fileName;
+
+	BOOLEAN isFirstQuery = TRUE;
+
+	for (;;)
+	{ 
+		IO_STATUS_BLOCK ioStatus;
+
+		status = ntQueryDirectoryFile (
+			pipeDir, 
+			NULL, 
+			NULL, 
+			0, 
+			&ioStatus,
+			dirBuffer, 
+			dirBuffer.getCount (),
+			FileDirectoryInformation,
+			FALSE, 
+			NULL, 
+			isFirstQuery
+			);
+
+		if (status < 0)
+		{
+			if (status == STATUS_NO_MORE_FILES)
+				break;
+
+			err::setError (err::NtError (status));
+			printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().cc ());
+			return; 
+		}
+
+		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*) dirBuffer.a ();
+		for (;;) 
+		{
+			fileName.copy (dirInfo->FileName, dirInfo->FileNameLength / 2);
+
+			printf (
+				dirInfo->AllocationSize.LowPart == -1 ? "%S (%d)\n" : "%S (%d of %d)\n", 
+				fileName.cc (), 
+				dirInfo->EndOfFile.LowPart,
+				dirInfo->AllocationSize.LowPart
+				);
+ 
+			if (!dirInfo->NextEntryOffset) 
+				break;
+ 
+			dirInfo = (FILE_DIRECTORY_INFORMATION*) ((char*) dirInfo + dirInfo->NextEntryOffset); 
+		}
+
+		isFirstQuery = FALSE; 
+	}
+}
+
+//.............................................................................
+
+bool
+querySymbolicLink (
+	rtl::String_utf16* string,
+	HANDLE dir,
+	UNICODE_STRING* uniName
+	)
+{
+	NTSTATUS status;
+
+	string->clear ();
+
+	OBJECT_ATTRIBUTES oa = { 0 };
+	oa.Length = sizeof (oa);
+	oa.RootDirectory = dir;
+	oa.ObjectName = uniName;
+
+	io::win::File link;
+	status = ntOpenSymbolicLinkObject (
+		link.getHandlePtr (), 
+		GENERIC_READ,
+		&oa
+		);
+
+	if (status < 0)
+	{
+		err::setError (err::NtError (status));
+		printf ("cannot open symbolic link: %s\n", err::getLastErrorDescription ().cc ());
+		return false;
+	}
+
+	wchar_t* p = string->getBuffer (BufferSize);
+	size_t length = string->getLength ();
+
+	UNICODE_STRING uniTarget;
+	uniTarget.Buffer = p;
+	uniTarget.Length = 0;
+	uniTarget.MaximumLength = length + sizeof (wchar_t);
+
+	status = ntQuerySymbolicLinkObject (link, &uniTarget, NULL);
+	if (status < 0)
+	{
+		err::setError (err::NtError (status));
+		printf ("cannot query symbolic link: %s\n", err::getLastErrorDescription ().cc ());
+		return false;
+	}
+
+	string->setReducedLength (uniTarget.Length / sizeof (wchar_t));
+	return true;
+}
+
+void 
+enumerateDirectory (
+	HANDLE baseDir,
+	const wchar_t* name,
+	size_t level
+	)
+{ 
+	NTSTATUS status;
+
+	UNICODE_STRING uniName;
+	uniName.Buffer = (wchar_t*) name;
+	uniName.Length = wcslen (name) * sizeof (wchar_t);
+	uniName.MaximumLength = uniName.Length + sizeof (wchar_t);
+	
+	OBJECT_ATTRIBUTES oa = { 0 };
+	oa.Length = sizeof (oa);
+	oa.RootDirectory = baseDir;
+	oa.ObjectName = &uniName;
+		
+	io::win::File dir;
+	status = ntOpenDirectoryObject (
+		dir.getHandlePtr (), 
+		DIRECTORY_QUERY | DIRECTORY_TRAVERSE,
+		&oa
+		);
+
+	if (status < 0)
+	{
+		err::setError (err::NtError (status));
+		printf ("cannot open directory: %s\n", err::getLastErrorDescription ().cc ());
+		return; 
+	}
+
+	rtl::Array <char> buffer;
+	buffer.setCount (BufferSize);
+
+	ULONG queryContext = 0;
+	BOOLEAN isFirstQuery = TRUE;
+
+	rtl::String_utf16 dirName;
+	rtl::String_utf16 dirTypeName;
+	rtl::String_utf16 symLinkTargetName;
+
+	level++;
+	rtl::String indent ((utf32_t) ' ', level * 2);
+
+	for (;;)
+	{
+		ULONG actualSize;
+
+		status = ntQueryDirectoryObject (
+			dir, 
+			buffer, 
+			buffer.getCount (), 
+			FALSE,
+			isFirstQuery,
+			&queryContext,
+			&actualSize
+			);
+
+		if (status < 0)
+		{
+			if (status == STATUS_NO_MORE_ENTRIES)
+				break;
+
+			err::setError (err::NtError (status));
+			printf ("cannot query directory: %s\n", err::getLastErrorDescription ().cc ());
+			return; 
+		}
+
+		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*) buffer.a ();
+		for (; dirInfo->Name.Buffer; dirInfo++)
+		{
+			dirName.copy (dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof (wchar_t));
+			dirTypeName.copy (dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof (wchar_t));
+
+			printf ("%s%S (%S)\n", indent.cc (), dirName.cc (), dirTypeName.cc ());
+
+			if (dirTypeName.cmp (L"Directory") == 0)
+			{
+				enumerateDirectory (dir, dirName, level);
+			}
+			else if (dirTypeName.cmp (L"SymbolicLink") == 0)
+			{
+				bool result = querySymbolicLink (&symLinkTargetName, dir, &dirInfo->Name);
+				if (result)
+					printf ("%s  --> %S\n", indent.cc (), symLinkTargetName.cc ());
+			}
+
+		}
+
+		isFirstQuery = FALSE;
+	}
+}
+
+void
+testDirectoryObjects ()
+{
+	printf ("\\\n");
+	enumerateDirectory (NULL, L"\\", 0);
+}
+
+#endif
+
+//.............................................................................
+
+#if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
 	int argc,
@@ -480,9 +1515,11 @@ main (
 #if (_AXL_ENV == AXL_ENV_WIN)
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
+
+	initNtFunctions ();
 #endif
 	
-	testRegExp ();
+	testDirectoryObjects ();
 	return 0;
 }
 

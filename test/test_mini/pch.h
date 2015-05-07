@@ -23,6 +23,7 @@
 #include "axl_mt_LongJmpTry.h"
 #include "axl_mt_DynamicLibrary.h"
 #include "axl_io_Socket.h"
+#include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"
 
 using namespace axl;
