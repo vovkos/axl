@@ -1158,6 +1158,14 @@ public:
 		return length;
 	}
 
+	void
+	setReducedLength (size_t length)
+	{
+		size_t oldLength = getLength ();
+		if (length < oldLength)
+			setLength (length, true);
+	}
+
 	C*
 	getBuffer ()
 	{
