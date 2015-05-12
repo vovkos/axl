@@ -464,7 +464,7 @@ TextPainter::buildBinTextBuffer (
 			break;
 		}
 
-		m_binTextBuffer [i] = enc::utfIsPrintable (codePoint) ? codePoint : m_unprintableChar;
+		m_binTextBuffer [i] = enc::utfIsPrintableNonMark (codePoint) ? codePoint : m_unprintableChar;
 
 		size_t end = i + takenSize;
 		for (i++; i < end; i++)

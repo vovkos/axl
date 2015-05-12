@@ -85,6 +85,11 @@ enum UtfCategoryMask
 		(1 << UtfCategory_Separator_Line) |
 		(1 << UtfCategory_Separator_Paragraph),
 
+	UtfCategoryMask_Mark = 
+		(1 << UtfCategory_Mark_NonSpacing) |
+		(1 << UtfCategory_Mark_SpacingCombining) |
+		(1 << UtfCategory_Mark_Enclosing),
+
 	UtfCategoryMask_Number = 
 		(1 << UtfCategory_Number_DecimalDigit) |
 		(1 << UtfCategory_Number_Letter) |
@@ -169,6 +174,14 @@ utfIsPrintable (utf32_t c)
 {
 	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
 	return ((1 << attr->m_category) & UtfCategoryMask_NonPrintable) == 0;
+}
+
+inline
+bool
+utfIsPrintableNonMark (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return ((1 << attr->m_category) & (UtfCategoryMask_NonPrintable | UtfCategoryMask_Mark)) == 0;
 }
 
 inline
