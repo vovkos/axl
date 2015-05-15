@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "axl_g_WarningSuppression.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 

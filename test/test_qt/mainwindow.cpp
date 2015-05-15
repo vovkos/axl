@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "moc_mainwindow.cpp"
 
+#include "axl_g_WarningSuppression.h"
 #include "axl_gui_TextPainter.h"
 #include "axl_gui_HyperText.h"
 
