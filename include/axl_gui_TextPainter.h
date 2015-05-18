@@ -680,7 +680,8 @@ public:
 		uint_t fontFlags,
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		);
 
 	int
@@ -688,7 +689,8 @@ public:
 		const TextAttr& attr,
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		)
 	{
 		return drawBinText (
@@ -697,7 +699,8 @@ public:
 			attr.m_fontFlags,
 			codec,
 			p, 
-			size
+			dataSize,
+			bufferSize
 			);
 	}
 
@@ -705,7 +708,8 @@ public:
 	drawBinText (
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		)
 	{
 		drawBinText (
@@ -714,7 +718,8 @@ public:
 			-1, 
 			codec,
 			p, 
-			size
+			dataSize,
+			bufferSize
 			);
 	}
 
@@ -726,7 +731,8 @@ public:
 		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		);
 
 	int
@@ -735,7 +741,8 @@ public:
 		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		)
 	{
 		return drawHyperBinText (
@@ -745,7 +752,8 @@ public:
 			attrArray,
 			codec,
 			p, 
-			size
+			dataSize,
+			bufferSize
 			);
 	}
 
@@ -754,7 +762,8 @@ public:
 		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		)
 	{
 		return drawHyperBinText (
@@ -764,7 +773,8 @@ public:
 			attrArray,
 			codec,
 			p, 
-			size
+			dataSize,
+			bufferSize
 			);
 	}
 
@@ -779,7 +789,8 @@ public:
 		size_t selEnd, 
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		);
 
 	int
@@ -791,7 +802,8 @@ public:
 		size_t selEnd, 
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		)
 	{
 		return drawSelHyperBinText (
@@ -804,7 +816,8 @@ public:
 			selEnd, 
 			codec,
 			p, 
-			size
+			dataSize,
+			bufferSize
 			);
 	}
 
@@ -816,7 +829,8 @@ public:
 		size_t selEnd, 
 		enc::CharCodec* codec,
 		const void* p, 
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		)
 	{
 		return drawSelHyperBinText (
@@ -829,7 +843,8 @@ public:
 			selEnd, 
 			codec,
 			p, 
-			size
+			dataSize,
+			bufferSize
 			);
 	}
 
@@ -837,11 +852,12 @@ protected:
 	void
 	init (Canvas* canvas = NULL);
 
-	void
+	size_t
 	buildBinTextBuffer (
 		enc::CharCodec* codec,
 		const void* p,
-		size_t size
+		size_t dataSize,
+		size_t bufferSize
 		);
 };
 

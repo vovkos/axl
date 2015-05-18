@@ -415,22 +415,23 @@ TextPainter::drawSelHyperBinHex (
 
 // bin text
 
-void
+size_t
 TextPainter::buildBinTextBuffer (
 	enc::CharCodec* codec,
 	const void* p0,
-	size_t size
+	size_t dataSize,
+	size_t bufferSize
 	)
 {
-	m_binTextBuffer.setCount (size);
+	m_binTextBuffer.setCount (dataSize);
 
 	size_t unitSize = codec->getUnitSize ();
 	size_t i = 0;
 
 	const char* p = (const char*) p0;
-	const char* end = p + size;
+	const char* end = p + bufferSize;
 
-	while (p < end)
+	while (i < dataSize && p < end)
 	{
 		utf32_t codePoint;
 		size_t takenBufferLength = 0;
@@ -445,19 +446,10 @@ TextPainter::buildBinTextBuffer (
 
 		if (!takenSize)
 		{
-			leftover = end - p;
-			if (expectedSize <= leftover)
-			{
-				codec->decodeToUtf32 (&codePoint, 1, p, leftover, &takenBufferLength);
-				
-				if (takenBufferLength == 1) // might still be not enough (e.g. UTF-16)
-				{
-					m_binTextBuffer [i] = enc::utfIsPrintable (codePoint) ? codePoint : m_unprintableChar;
-					i++;
-				}
-			}
-
 			size_t end = i + leftover;
+			if (end > dataSize)
+				end = dataSize;
+
 			for (; i < end; i++)
 				m_binTextBuffer [i] = m_unprintableChar;
 
@@ -467,11 +459,16 @@ TextPainter::buildBinTextBuffer (
 		m_binTextBuffer [i] = enc::utfIsPrintableNonMark (codePoint) ? codePoint : m_unprintableChar;
 
 		size_t end = i + takenSize;
+		if (end > dataSize)
+			end = dataSize;
+
 		for (i++; i < end; i++)
 			m_binTextBuffer [i] = m_unprintableChar;
 
 		p += takenSize;
 	}
+
+	return i;
 }
 
 int
@@ -481,14 +478,15 @@ TextPainter::drawBinText (
 	uint_t fontFlags0,
 	enc::CharCodec* codec,
 	const void* p,
-	size_t size
+	size_t dataSize,
+	size_t bufferSize
 	)
 {
-	if (!size)
+	if (!dataSize)
 		return m_point.m_x;
 
-	buildBinTextBuffer (codec, p, size);
-	return drawText_utf32 (m_binTextBuffer, size);
+	size_t length = buildBinTextBuffer (codec, p, dataSize, bufferSize);
+	return drawText_utf32 (m_binTextBuffer, length);
 }
 
 int
@@ -499,20 +497,21 @@ TextPainter::drawHyperBinText (
 	const TextAttrAnchorArray* attrArray,
 	enc::CharCodec* codec,
 	const void* p,
-	size_t size
+	size_t dataSize,
+	size_t bufferSize
 	)
 {
-	if (!size)
+	if (!dataSize)
 		return m_point.m_x;
 
-	buildBinTextBuffer (codec, p, size);
+	size_t length = buildBinTextBuffer (codec, p, dataSize, bufferSize);
 	return drawHyperText_utf32 (
 		textColor0,
 		backColor0,
 		fontFlags0,
 		attrArray,
 		m_binTextBuffer, 
-		size
+		length
 		);
 }
 
@@ -527,13 +526,14 @@ TextPainter::drawSelHyperBinText (
 	size_t selEnd,
 	enc::CharCodec* codec,
 	const void* p,
-	size_t size
+	size_t dataSize,
+	size_t bufferSize
 	)
 {
-	if (!size)
+	if (!dataSize)
 		return m_point.m_x;
 
-	buildBinTextBuffer (codec, p, size);
+	size_t length = buildBinTextBuffer (codec, p, dataSize, bufferSize);
 	return drawSelHyperText_utf32 (
 		textColor0,
 		backColor0,
@@ -543,7 +543,7 @@ TextPainter::drawSelHyperBinText (
 		selStart,
 		selEnd,
 		m_binTextBuffer, 
-		size
+		length
 		);
 }
 
