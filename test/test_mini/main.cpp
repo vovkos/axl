@@ -917,7 +917,7 @@ testTcp ()
 
 	int error = 0;
 	socklen_t len = sizeof (error);
-	result = getsockopt (s, SOL_SOCKET, SO_ERROR, &error, &len);
+	result = getsockopt (s, SOL_SOCKET, SO_ERROR, (char*) &error, &len);
 
 	printf ("receiving...\n");
 	result = recv (s, buf, sizeof (buf), 0);
@@ -929,7 +929,11 @@ testTcp ()
 
 
 	printf ("closing...\n");
+#if (_AXL_ENV == AXL_ENV_WIN)
+	closesocket (s);
+#elif (_AXL_ENV == AXL_ENV_POSIX)
 	close (s);
+#endif
 
 	printf ("done.\n");
 }
