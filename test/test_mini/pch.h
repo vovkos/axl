@@ -25,6 +25,7 @@
 #include "axl_io_Socket.h"
 #include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"
+#include "axl_g_Time.h"
 
 using namespace axl;
 

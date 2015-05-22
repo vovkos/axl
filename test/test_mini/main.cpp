@@ -892,6 +892,48 @@ testDirectoryObjects ()
 
 #endif
 
+void
+testTcp ()
+{
+	int s = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	ASSERT (s != -1);
+
+	linger l;
+	l.l_onoff = 1;
+	l.l_linger = 0;
+	setsockopt (s, SOL_SOCKET, SO_LINGER, (const char*) &l, sizeof (l));
+
+	sockaddr_in a = { 0 };
+	a.sin_family = AF_INET;
+	a.sin_addr.s_addr = inet_addr ("127.0.0.1");
+	a.sin_port = htons (10001);
+
+	printf ("connecting...\n");
+	int result = connect (s, (const sockaddr*) &a, sizeof (a));	
+	printf ("result = %d\n", result);
+
+	char buf [512];
+	scanf ("%d", buf);
+
+	int error = 0;
+	socklen_t len = sizeof (error);
+	result = getsockopt (s, SOL_SOCKET, SO_ERROR, &error, &len);
+
+	printf ("receiving...\n");
+	result = recv (s, buf, sizeof (buf), 0);
+	printf ("result = %d\n", result);
+
+	printf ("receiving...\n");
+	result = recv (s, buf, 0, 0);
+	printf ("result = %d\n", result);
+
+
+	printf ("closing...\n");
+	close (s);
+
+	printf ("done.\n");
+}
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -915,7 +957,7 @@ main (
 	initNtFunctions ();
 #endif
 	
-	testLongJmpTry ();
+	testTcp ();
 	return 0;
 }
 
