@@ -243,6 +243,7 @@ set (
 	MT_WIN_H_LIST
 	${AXL_INC_DIR}/axl_mt_win_CriticalSection.h
 	${AXL_INC_DIR}/axl_mt_win_Event.h
+	${AXL_INC_DIR}/axl_mt_win_JobObject.h
 	${AXL_INC_DIR}/axl_mt_win_Library.h
 	${AXL_INC_DIR}/axl_mt_win_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_win_Thread.h
