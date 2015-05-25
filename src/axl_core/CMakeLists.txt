@@ -252,6 +252,7 @@ set (
 
 set (
 	MT_WIN_CPP_LIST
+	axl_mt_win_JobObject.cpp
 	axl_mt_win_Thread.cpp
 	axl_mt_win_WaitableHandle.cpp
 	)

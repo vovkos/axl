@@ -48,6 +48,24 @@ public:
 		bool_t result = ::AssignProcessToJobObject (m_h, process);
 		return err::complete (result);
 	}
+
+	bool
+	setInformation (
+		JOBOBJECTINFOCLASS infoClass,
+		const void* p,
+		size_t size
+		)
+	{
+		bool_t result = ::SetInformationJobObject (m_h, infoClass, (void*) p,  (dword_t) size);
+		return err::complete (result);
+	}
+
+	size_t 
+	queryInformation (
+		JOBOBJECTINFOCLASS infoClass,
+		void* p,
+		size_t size
+		);
 };
 
 //.............................................................................
