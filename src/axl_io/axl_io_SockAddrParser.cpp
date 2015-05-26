@@ -54,9 +54,28 @@ SockAddrParser::parse (sockaddr_in* addr)
 	memset (addr, 0, sizeof (sockaddr_in));
 	addr->sin_family = AF_INET;
 
+	const char* p0 = m_p;
 	result = parse (&addr->sin_addr); 
-	if (!result)
-		return false;
+	if (!result) // rollback and try single port
+	{
+		m_p = p0; 
+
+		uint_t port;
+		result = parseInt (&port, 10);
+		if (!result)
+			return false;
+
+		skipWhiteSpace ();
+		if (m_p != m_end)
+		{
+			err::setError (err::SystemErrorCode_InvalidAddress);
+			return false;
+		}
+
+		*(uint32_t*) &addr->sin_addr = 0;
+		addr->sin_port = rtl::swapByteOrder16 ((uint16_t) port);
+		return true;
+	}
 
 	result = tryChar (':');
 	if (result)
@@ -359,9 +378,19 @@ SockAddrParser::tryAddr_ip6 ()
 bool
 SockAddrParser::trySockAddr_ip4 ()
 {
+	const char* p0 = m_p;
+
 	bool result = tryAddr_ip4 ();
-	if (!result)
-		return false;
+	if (!result) // rollback and try single port
+	{
+		m_p = p0;
+		result = tryInt (10);
+		if (!result)
+			return false;
+
+		skipWhiteSpace ();
+		return m_p == m_end;
+	}
 
 	result = tryChar (':');
 	if (result)

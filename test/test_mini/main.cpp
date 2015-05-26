@@ -433,6 +433,9 @@ testParseFormatIp6 ()
 
 	io::SockAddr sockAddr;
 
+	result = sockAddr.parse ("6");
+	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
+
 	result = sockAddr.parse ("[1::2:3:4:5]:6");
 	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
 

@@ -220,16 +220,19 @@ isSockAddrMatch (
 	const sockaddr* filterAddr
 	)
 {
-	if (addr->sa_family != filterAddr->sa_family)
-		return false;
-
-	switch (addr->sa_family)
+	switch (filterAddr->sa_family)
 	{
 	case AF_INET:
-		return isSockAddrMatch_ip4 ((const sockaddr_in*) addr, (const sockaddr_in*) filterAddr);
+		return 
+			*(const uint32_t*) &((const sockaddr_in*) filterAddr)->sin_addr == 0 &&
+			((const sockaddr_in*) addr)->sin_port == ((const sockaddr_in*) filterAddr)->sin_port ||
+			addr->sa_family == AF_INET && 
+			isSockAddrMatch_ip4 ((const sockaddr_in*) addr, (const sockaddr_in*) filterAddr);
 
 	case AF_INET6:
-		return isSockAddrMatch_ip6 ((const sockaddr_in6*) addr, (const sockaddr_in6*) filterAddr);
+		return 
+			addr->sa_family == AF_INET6 && 
+			isSockAddrMatch_ip6 ((const sockaddr_in6*) addr, (const sockaddr_in6*) filterAddr);
 
 	default:
 		return false;
