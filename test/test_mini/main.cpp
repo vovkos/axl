@@ -431,14 +431,10 @@ testParseFormatIp6 ()
 
 	bool result;
 
-/*
 	io::SockAddr sockAddr;
-	result = sockAddr.parse ("tibbo.com:80");
-	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
 
-	result = sockAddr.parse ("::123e:325f:0%24393");
+	result = sockAddr.parse ("[fe80::c990:d16e:a986:d56b%11]:10001");
 	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
-*/
 
 	sockaddr_in6 addr = { 0 };
 	addr.sin6_family = AF_INET6;
@@ -961,7 +957,7 @@ main (
 	initNtFunctions ();
 #endif
 	
-	testTcp ();
+	testParseFormatIp6 ();
 	return 0;
 }
 

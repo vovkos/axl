@@ -140,6 +140,105 @@ createSockAddrNetMask_ip6 (
 //.............................................................................
 
 bool
+isSockAddrEqual_ip4 (
+	const sockaddr_in* addr1,
+	const sockaddr_in* addr2
+	)
+{
+	return 
+		addr1->sin_port == addr2->sin_port && 
+		*(const uint32_t*) &addr1->sin_addr == *(const uint32_t*) &addr2->sin_addr;
+}
+
+bool
+isSockAddrEqual_ip6 (
+	const sockaddr_in6* addr1,
+	const sockaddr_in6* addr2
+	)
+{
+	return 
+		addr1->sin6_port == addr2->sin6_port && 
+		addr1->sin6_scope_id == addr2->sin6_scope_id &&
+		memcmp (&addr1->sin6_addr, &addr2->sin6_addr, sizeof (addr1->sin6_addr)) == 0;
+}
+
+bool
+isSockAddrEqual (
+	const sockaddr* addr1,
+	const sockaddr* addr2
+	)
+{
+	if (addr1->sa_family != addr2->sa_family)
+		return false;
+
+	switch (addr1->sa_family)
+	{
+	case AF_INET:
+		return isSockAddrEqual_ip4 ((const sockaddr_in*) addr1, (const sockaddr_in*) addr2);
+
+	case AF_INET6:
+		return isSockAddrEqual_ip6 ((const sockaddr_in6*) addr1, (const sockaddr_in6*) addr2);
+
+	default:
+		return false;
+	}
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
+isSockAddrMatch_ip4 (
+	const sockaddr_in* addr,
+	const sockaddr_in* filterAddr
+	)
+{
+	uint32_t ip = *(const uint32_t*) &addr->sin_addr;
+	uint32_t filterIp = *(const uint32_t*) &filterAddr->sin_addr;
+
+	return 
+		(!filterAddr->sin_port || addr->sin_port == filterAddr->sin_port) && 
+		(!filterIp || ip == filterIp);
+}
+
+bool
+isSockAddrMatch_ip6 (
+	const sockaddr_in6* addr,
+	const sockaddr_in6* filterAddr
+	)
+{
+	in6_addr addrAny = { 0 };
+
+	return 
+		(!filterAddr->sin6_port || addr->sin6_port == filterAddr->sin6_port) && 
+		(memcmp (&filterAddr->sin6_addr, &addrAny, sizeof (addrAny)) == 0 ||
+		memcmp (&addr->sin6_addr, &filterAddr->sin6_addr, sizeof (addr->sin6_addr)) == 0);
+}
+
+bool
+isSockAddrMatch (
+	const sockaddr* addr,
+	const sockaddr* filterAddr
+	)
+{
+	if (addr->sa_family != filterAddr->sa_family)
+		return false;
+
+	switch (addr->sa_family)
+	{
+	case AF_INET:
+		return isSockAddrMatch_ip4 ((const sockaddr_in*) addr, (const sockaddr_in*) filterAddr);
+
+	case AF_INET6:
+		return isSockAddrMatch_ip6 ((const sockaddr_in6*) addr, (const sockaddr_in6*) filterAddr);
+
+	default:
+		return false;
+	}
+}
+
+//.............................................................................
+
+bool
 parseAddr_ip4 (
 	in_addr* addr,
 	const char* string,

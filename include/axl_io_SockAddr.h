@@ -58,6 +58,46 @@ createSockAddrNetMask_ip6 (
 //.............................................................................
 
 bool
+isSockAddrEqual_ip4 (
+	const sockaddr_in* addr1,
+	const sockaddr_in* addr2
+	);
+
+bool
+isSockAddrEqual_ip6 (
+	const sockaddr_in6* addr1,
+	const sockaddr_in6* addr2
+	);
+
+bool
+isSockAddrEqual (
+	const sockaddr* addr1,
+	const sockaddr* addr2
+	);
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
+isSockAddrMatch_ip4 (
+	const sockaddr_in* addr,
+	const sockaddr_in* filterAddr
+	);
+
+bool
+isSockAddrMatch_ip6 (
+	const sockaddr_in6* addr,
+	const sockaddr_in6* filterAddr
+	);
+
+bool
+isSockAddrMatch (
+	const sockaddr* addr,
+	const sockaddr* filterAddr
+	);
+
+//.............................................................................
+
+bool
 parseAddr_ip4 (
 	in_addr* addr,
 	const char* string,
@@ -256,6 +296,30 @@ struct SockAddr
 	clear ()
 	{
 		memset (this, 0, sizeof (SockAddr));	
+	}
+
+	bool
+	isEqual (const sockaddr* addr) const
+	{
+		return isSockAddrEqual (&m_addr, addr);
+	}
+
+	bool
+	isEqual (const SockAddr* addr) const
+	{
+		return isSockAddrEqual (&m_addr, &addr->m_addr);
+	}
+
+	bool
+	isMatch (const sockaddr* addr) const
+	{
+		return isSockAddrMatch (&m_addr, addr);
+	}
+
+	bool
+	isMatch (const SockAddr* addr) const
+	{
+		return isSockAddrMatch (&m_addr, &addr->m_addr);
 	}
 
 	uint_t 
