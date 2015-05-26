@@ -88,6 +88,17 @@ public:
 		memcpy (dst, src, count);
 	}
 
+	static
+	void
+	move (
+		C* dst,
+		const C* src,
+		size_t count
+		)
+	{
+		memmove (dst, src, count);
+	}
+
 #if (_AXL_CPP == AXL_CPP_MSC)
 	static
 	size_t
@@ -210,6 +221,17 @@ public:
 		)
 	{
 		memcpy (dst, src, count * sizeof (T));
+	}
+
+	static
+	void
+	move (
+		T* dst,
+		const T* src,
+		size_t count
+		)
+	{
+		memmove (dst, src, count * sizeof (T));
 	}
 };
 
@@ -1314,7 +1336,7 @@ protected:
 		C* dst = m_p + index;
 
 		if (length && index < oldLength)
-			Details::copy (dst + length, dst, oldLength - index);
+			Details::move (dst + length, dst, oldLength - index);
 
 		return dst;
 	}
