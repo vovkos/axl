@@ -40,7 +40,7 @@ source_group (
 
 #..............................................................................
 #
-# ecc-key elliptic curve product key tool
+# test_mini app
 #
 
 include_directories (

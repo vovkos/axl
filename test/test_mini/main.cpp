@@ -929,7 +929,6 @@ testTcp ()
 	result = recv (s, buf, 0, 0);
 	printf ("result = %d\n", result);
 
-
 	printf ("closing...\n");
 #if (_AXL_ENV == AXL_ENV_WIN)
 	closesocket (s);
