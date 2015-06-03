@@ -18,7 +18,7 @@ WinErrorProvider::getErrorDescription (dword_t code)
 		FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
 		NULL,
 		code,
-		MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+		MAKELANGID (LANG_ENGLISH, SUBLANG_DEFAULT),
 		(LPWSTR) &message, 
 		0, 
 		NULL

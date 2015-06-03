@@ -942,6 +942,60 @@ testTcp ()
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
+
+void
+printWinErrorDescription (
+	dword_t code,
+	uint_t langId,
+	uint_t subLangId
+	)
+{
+	wchar_t* message = NULL;
+	
+	::FormatMessageW ( 
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+		FORMAT_MESSAGE_FROM_SYSTEM | 
+		FORMAT_MESSAGE_IGNORE_INSERTS |
+		FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
+		NULL,
+		code,
+		MAKELANGID (langId, subLangId),
+		(LPWSTR) &message, 
+		0, 
+		NULL
+		);
+
+	rtl::String description = message;
+	::LocalFree (message);
+
+	printf ("%d/%d: %s\n", langId, subLangId, description.cc ());
+}
+
+void 
+testWinError ()
+{
+	dword_t error = ERROR_ACCESS_DENIED;
+	
+	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_NEUTRAL);
+	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_DEFAULT);
+	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_SYS_DEFAULT);
+
+	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_NEUTRAL);
+	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_DEFAULT);
+	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT);
+	
+	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_NEUTRAL);
+	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_DEFAULT);
+	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_SYS_DEFAULT);
+	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_ENGLISH_US);
+	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_ENGLISH_UK);
+}
+
+#endif
+
+//.............................................................................
+
+#if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
 	int argc,
@@ -958,11 +1012,8 @@ main (
 #if (_AXL_ENV == AXL_ENV_WIN)
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
-
-	initNtFunctions ();
 #endif
 	
-	testParseFormatIp6 ();
 	return 0;
 }
 
