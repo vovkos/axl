@@ -433,10 +433,19 @@ getSockAddrString_ip4 (
 	const sockaddr_in* addr
 	)
 {
-	getAddrString_ip4 (string, &addr->sin_addr);
-
-	if (addr->sin_port)
+	if (!addr->sin_port)
+	{
+		getAddrString_ip4 (string, &addr->sin_addr);
+	}
+	else if (*(const uint32_t*) &addr->sin_addr)
+	{
+		getAddrString_ip4 (string, &addr->sin_addr);
 		string->appendFormat (":%d", rtl::swapByteOrder16 (addr->sin_port));
+	}
+	else
+	{
+		string->format ("%d", rtl::swapByteOrder16 (addr->sin_port));
+	}
 
 	return string->getLength ();
 }
