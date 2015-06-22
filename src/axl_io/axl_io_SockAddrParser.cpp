@@ -249,6 +249,12 @@ SockAddrParser::parse (
 	)
 {
 	skipWhiteSpace ();
+	if (m_p == m_end)
+	{
+		memset (addr, 0, sizeof (sockaddr_in));
+		((sockaddr_in*) addr)->sin_family = AF_INET;
+		return true;
+	}
 
 	SockAddrParser clone = *this;
 
