@@ -29,12 +29,15 @@ class PCap: public rtl::Handle <pcap_t*, ClosePCap>
 {
 public:
 	bool
-	open (
+	openDevice (
 		const char* device,
 		size_t snapshotSize,
 		bool isPromiscious,
 		uint_t readTimeout
 		);
+
+	bool
+	openFile (const char* fileName);
 
 	bool
 	setFilter (const char* filter);

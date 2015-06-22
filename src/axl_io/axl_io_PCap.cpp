@@ -8,7 +8,7 @@ namespace io {
 //.............................................................................
 
 bool
-PCap::open (
+PCap::openDevice (
 	const char* device,
 	size_t snapshotSize,
 	bool isPromiscious,
@@ -26,6 +26,22 @@ PCap::open (
 		errorBuffer
 		);
 
+	if (!m_h)
+	{
+		err::setStringError (errorBuffer);
+		return false;
+	}
+
+	return true;
+}
+
+bool
+PCap::openFile (const char* fileName)
+{
+	close ();
+
+	char errorBuffer [PCAP_ERRBUF_SIZE];
+	m_h = pcap_open_offline (fileName, errorBuffer);
 	if (!m_h)
 	{
 		err::setStringError (errorBuffer);
