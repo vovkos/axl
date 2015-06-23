@@ -897,7 +897,11 @@ testDirectoryObjects ()
 void
 testTcp ()
 {
+#if (_AXL_ENV == AXL_ENV_WIN)
+	SOCKET s = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+#else
 	int s = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+#endif
 	ASSERT (s != -1);
 
 	linger l;
