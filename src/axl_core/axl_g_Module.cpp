@@ -5,6 +5,9 @@
 namespace axl {
 namespace g {
 
+void
+initQpc ();
+
 //.............................................................................
 
 Module::Module ()
@@ -25,6 +28,8 @@ Module::Module ()
 	m_systemInfo.m_processorCount     = systemInfo.dwNumberOfProcessors;
 	m_systemInfo.m_pageSize           = systemInfo.dwPageSize;
 	m_systemInfo.m_mappingAlignFactor = systemInfo.dwAllocationGranularity;
+
+	initQpc ();
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 

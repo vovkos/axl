@@ -90,7 +90,7 @@ UsbDevice::open (
 	uint_t productId
 	)
 {
-	setDevice (NULL);
+	close ();
 
 	m_openHandle = libusb_open_device_with_vid_pid (NULL, (uint16_t) vendorId, (uint16_t) productId);
 	return m_openHandle ? true : err::fail (err::Error (err::SystemErrorCode_ObjectNameNotFound));
@@ -111,37 +111,37 @@ UsbDevice::setConfiguration (int configuration)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_get_configuration (m_openHandle, &configuration);
+	int result = libusb_set_configuration (m_openHandle, configuration);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-UsbDevice::claimInterface (int interface)
+UsbDevice::claimInterface (int iface)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_claim_interface (m_openHandle, interface);
+	int result = libusb_claim_interface (m_openHandle, iface);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-UsbDevice::releaseInterface (int interface)
+UsbDevice::releaseInterface (int iface)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_release_interface (m_openHandle, interface);
+	int result = libusb_release_interface (m_openHandle, iface);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
 UsbDevice::setInterfaceAltSetting (
-	int interface,
+	int iface,
 	int altSetting
 	)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_set_interface_alt_setting (m_openHandle, interface, altSetting);
+	int result = libusb_set_interface_alt_setting (m_openHandle, iface, altSetting);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
@@ -164,29 +164,29 @@ UsbDevice::resetDevice ()
 }
 
 bool
-UsbDevice::isKernelDriverActive (int interface)
+UsbDevice::isKernelDriverActive (int iface)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_kernel_driver_active (m_openHandle, interface);
+	int result = libusb_kernel_driver_active (m_openHandle, iface);
 	return result == 1;
 }
 
 bool
-UsbDevice::attachKernelDriver (int interface)
+UsbDevice::attachKernelDriver (int iface)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_attach_kernel_driver (m_openHandle, interface);
+	int result = libusb_attach_kernel_driver (m_openHandle, iface);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-UsbDevice::detachKernelDriver (int interface)
+UsbDevice::detachKernelDriver (int iface)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_detach_kernel_driver (m_openHandle, interface);
+	int result = libusb_detach_kernel_driver (m_openHandle, iface);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 

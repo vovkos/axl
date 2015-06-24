@@ -14,7 +14,7 @@ namespace io {
 
 //.............................................................................
 
-class FreeUsbransfer
+class FreeUsbTransfer
 {
 public:
 	void
@@ -26,7 +26,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Usbransfer: public rtl::Handle <libusb_transfer*, FreeUsbransfer>
+class UsbTransfer: public rtl::Handle <libusb_transfer*, FreeUsbTransfer>
 {
 };
 

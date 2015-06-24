@@ -997,6 +997,16 @@ testWinError ()
 
 #endif
 
+void
+testTimestamp ()
+{
+	for (int i = 0; i < 20; i++)
+	{
+		uint64_t t1 = g::getTimestamp ();
+		printf ("%s: %llu\n", g::Time (t1).format ("%h:%m:%s.%l.%c").cc (), t1);
+	}
+}
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -1017,7 +1027,9 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-	
+
+	testTimestamp ();
+
 	return 0;
 }
 
