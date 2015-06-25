@@ -35,7 +35,7 @@ enum BufKind
 
 template <
 	typename T,
-	typename GetSize = rtl::GetSize <T>
+	typename SizeOf = rtl::SizeOf <T>
 	>
 class Buf
 {
@@ -71,7 +71,7 @@ public:
 		copy (src);
 	}
 
-	Buf (const T& src)
+	Buf (const T* src)
 	{
 		m_p = NULL;
 		copy (src);
@@ -124,7 +124,7 @@ public:
 	}
 
 	Buf& 
-	operator = (const T& src)
+	operator = (const T* src)
 	{
 		copy (src);
 		return *this;
@@ -156,7 +156,7 @@ public:
 		if (src.m_p)
 		{
 			if (src.getHdr ()->getFree () == (mem::FFree*) -1)
-				return copy (*src);
+				return copy (src.m_p);
 
 			src.getHdr ()->addRef ();
 		}
@@ -169,15 +169,15 @@ public:
 	}
 
 	bool
-	copy (const T& src)
+	copy (const T* src)
 	{
-		return m_p == &src ? true : allocateBuffer (GetSize () (src), &src) != NULL;
+		return m_p == src ? true : allocateBuffer (SizeOf () (src), src) != NULL;
 	}
 
 	T* 
 	getBuffer ()
 	{
-		return allocateBuffer (m_p ? GetSize () (*m_p) : sizeof (T), m_p);
+		return allocateBuffer (m_p ? SizeOf () (m_p) : sizeof (T), m_p);
 	}
 
 	T* 
@@ -285,7 +285,10 @@ protected:
 		const T* src
 		)
 	{
-		size_t size = GetSize () (*src);
+		if (!src)
+			return;
+
+		size_t size = SizeOf () (src);
 		if (size > sizeof (T))
 			memcpy (dst + 1, src + 1, size - sizeof (T));
 	}

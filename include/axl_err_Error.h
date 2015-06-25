@@ -249,17 +249,6 @@ getLastSystemErrorCode ()
 
 struct ErrorData
 {
-	class GetSize
-	{
-	public:
-		size_t
-		operator () (const ErrorData& x)
-		{
-			ASSERT (x.m_size >= sizeof (ErrorData));
-			return AXL_MAX (x.m_size, sizeof (ErrorData));
-		}
-	};
-
 	uint32_t m_size;
 	rtl::Guid m_guid;
 	uint32_t m_code;
@@ -278,6 +267,18 @@ struct ErrorData
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+class SizeOfErrorData
+{
+public:
+	size_t
+	operator () (const ErrorData* x)
+	{
+		return AXL_MAX (x->m_size, sizeof (ErrorData));
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 extern
 AXL_SELECT_ANY
 const ErrorData g_noError =
@@ -291,7 +292,7 @@ const ErrorData g_noError =
 
 // ref-counted error buffer
 
-class Error: public ref::Buf <ErrorData, ErrorData::GetSize>
+class Error: public ref::Buf <ErrorData, SizeOfErrorData>
 {
 public:
 	Error ()

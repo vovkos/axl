@@ -37,8 +37,6 @@ public:
 
 //.............................................................................
 
-
-
 template <typename T>
 class PackIntTrunc
 {
@@ -188,13 +186,13 @@ public:
 
 //.............................................................................
 
-// variable sized object pointer
+// pointer to a self-sized object 
 
 template <
 	typename T,
-	typename GetSize = rtl::GetSize <T>
+	typename SizeOf = rtl::SizeOf <T>
 	>
-class PackVsoPtr
+class PackSelfSizedPtr
 {
 public:
 	axl_va_list
@@ -206,7 +204,7 @@ public:
 	{
 		T* obj = AXL_VA_ARG (va, T*);
 
-		size_t objSize = obj ? GetSize () (*obj) : sizeof (T);
+		size_t objSize = obj ? SizeOf () (obj) : sizeof (T);
 
 		*size = objSize;
 
@@ -252,17 +250,17 @@ public:
 // specialization for errors
 
 template <>
-class Pack <err::ErrorData*>: public PackVsoPtr <
+class Pack <err::ErrorData*>: public PackSelfSizedPtr <
 	err::ErrorData, 
-	err::ErrorData::GetSize
+	err::SizeOfErrorData
 	>
 {
 };
 
 template <>
-class Pack <const err::ErrorData*>: public PackVsoPtr <
+class Pack <const err::ErrorData*>: public PackSelfSizedPtr <
 	err::ErrorData, 
-	err::ErrorData::GetSize
+	err::SizeOfErrorData
 	>
 {
 };

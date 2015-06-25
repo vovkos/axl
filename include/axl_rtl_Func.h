@@ -898,12 +898,18 @@ public:
 
 //.............................................................................
 
-// size functors
+// sizeof functor
 
 template <typename T>
-class GetSize
+class SizeOf
 {
 public:
+	size_t
+	operator () (const T* x) const
+	{
+		return sizeof (T);
+	}
+
 	size_t
 	operator () (const T& x) const
 	{

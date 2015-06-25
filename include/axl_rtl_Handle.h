@@ -62,6 +62,11 @@ public:
 		return m_h;
 	}
 
+	T operator -> () const
+	{
+		return m_h;
+	}
+
 	const Handle&
 	operator = (T h)
 	{
