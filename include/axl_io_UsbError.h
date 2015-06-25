@@ -8,6 +8,7 @@
 
 #include "axl_io_UsbError.h"
 #include "axl_err_Error.h"
+#include "axl_err_ErrorMgr.h"
 #include "axl_rtl_String.h"
 
 namespace axl {
@@ -40,6 +41,18 @@ public:
 		return getErrorDescription (error->m_code);
 	}
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline 
+void 
+registerUsbErrorProvider ()
+{
+	err::getErrorMgr ()->registerProvider (
+		GUID_UsbError, 
+		rtl::getSimpleSingleton <UsbErrorProvider> ()
+		);
+}
 
 //.............................................................................
 

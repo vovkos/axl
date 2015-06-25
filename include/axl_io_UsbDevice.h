@@ -15,6 +15,17 @@ namespace io {
 
 //.............................................................................
 
+const char*
+getUsbSpeedString (libusb_speed speed);
+
+const char*
+getUsbClassCodeString (libusb_class_code classCode);
+
+const char*
+getUsbTransferTypeString (libusb_transfer_type transferType);
+
+//.............................................................................
+
 class CloseUsbContext
 {
 public:
@@ -74,9 +85,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbConfigDescriptor: public rtl::Handle <libusb_config_descriptor*, FreeUsbConfigDescriptor>
-{
-};
+typedef rtl::Handle <libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfigDescriptor;
 
 //.............................................................................
 
@@ -122,6 +131,13 @@ public:
 		return m_openHandle != NULL;
 	}
 
+	uint8_t
+	getDeviceAddress ()
+	{
+		ASSERT (m_device);
+		return libusb_get_device_address (m_device);
+	}
+
 	uint8_t 
 	getBusNumber ()
 	{
@@ -130,11 +146,17 @@ public:
 	}
 
 	uint8_t
-	getDeviceAddress ()
+	getPortNumber ()
 	{
 		ASSERT (m_device);
-		return libusb_get_device_address (m_device);
+		return libusb_get_port_number (m_device);
 	}
+
+	size_t
+	getPortPath (
+		uint8_t* path,
+		size_t maxLength
+		);
 
 	libusb_speed 
 	getDeviceSpeed ()
@@ -144,10 +166,10 @@ public:
 	}
 
 	size_t
-	getMaxPacketSize (uint_t endpoint);
+	getMaxPacketSize (size_t endpoint);
 
 	size_t
-	getMaxIsoPacketSize (uint_t endpoint);
+	getMaxIsoPacketSize (size_t endpoint);
 	
 	// open-close
 
@@ -191,50 +213,50 @@ public:
 	getConfiguration ();
 
 	bool
-	setConfiguration (int configuration);
+	setConfiguration (size_t configuration);
 
 	bool
-	claimInterface (int interface);
+	claimInterface (size_t iface);
 
 	bool
-	releaseInterface (int interface);
+	releaseInterface (size_t iface);
 
 	bool
 	setInterfaceAltSetting (
-		int interface,
-		int altSetting
+		size_t iface,
+		size_t altSetting
 		);
 
 	bool
-	clearHalt (uint_t endpoint);
+	clearHalt (size_t endpoint);
 
 	bool
 	resetDevice ();
 
 	bool
-	isKernelDriverActive (int interface);
+	isKernelDriverActive (size_t iface);
 
 	bool
-	attachKernelDriver (int interface);
+	attachKernelDriver (size_t iface);
 
 	bool
-	detachKernelDriver (int interface);
+	detachKernelDriver (size_t iface);
 
 	// descriptors
 
 	rtl::Array <char>
-	getDesrciptor (
+	getDescriptor (
 		libusb_descriptor_type type, 
 		size_t index
 		)
 	{
 		rtl::Array <char> descriptor;
-		getDesrciptor (type, index, &descriptor);
+		getDescriptor (type, index, &descriptor);
 		return descriptor;
 	}
 	
 	bool
-	getDesrciptor (
+	getDescriptor (
 		libusb_descriptor_type type, 
 		size_t index,
 		rtl::Array <char>* descriptor
@@ -245,12 +267,12 @@ public:
 
 	bool
 	getConfigDescriptor (
-		int configuration,
-		libusb_config_descriptor** descriptor
+		size_t configuration,
+		UsbConfigDescriptor* desc
 		);
 
 	bool
-	getActiveConfigDescriptor (libusb_config_descriptor** descriptor);
+	getActiveConfigDescriptor (UsbConfigDescriptor* desc);
 
 	rtl::String 
 	getStringDesrciptor (

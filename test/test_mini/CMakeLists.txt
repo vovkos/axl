@@ -37,19 +37,20 @@ source_group (
 	${PCH_H}
 	${PCH_CPP}
 	)
-
+	
 #..............................................................................
 #
 # test_mini app
 #
 
-include_directories (
-	${AXL_INC_DIR}
-	)
+include_directories (${AXL_INC_DIR})
+link_directories (${AXL_LIB_DIR})
 
-link_directories (
-	${AXL_LIB_DIR}
-	)
+if (BUILD_AXL_IO_USB)	
+	include_directories (${LIBUSB_INC_DIR})
+	link_directories (${LIBUSB_LIB_DIR})
+	add_definitions (-D_AXL_IO_USB)
+endif ()
 
 add_executable (
 	test_mini
@@ -77,6 +78,15 @@ if (UNIX)
 		pthread
 		dl
 		)
+endif ()
+
+if (BUILD_AXL_IO_USB)
+	if (WIN32)
+		target_link_libraries (
+			test_mini
+			libusb-1.0
+			)
+	endif ()
 endif ()
 
 set_pch (

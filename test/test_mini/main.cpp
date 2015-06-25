@@ -1009,6 +1009,162 @@ testTimestamp ()
 
 //.............................................................................
 
+rtl::String 
+getUsbStringDescriptorText (
+	io::UsbDevice* device,
+	size_t index
+	)
+{
+	rtl::String text;
+
+	if (!device->isOpen ())
+	{
+		text = "NOT OPENED";
+	}
+	else
+	{	
+		bool result = device->getStringDesrciptor (index, &text);
+		if (!result)
+			text.format ("ERROR (%s)", err::getLastErrorDescription ().cc ());
+	}
+
+	return text;
+}
+
+void
+printUsbIfaceDesc (const libusb_interface_descriptor* ifaceDesc)
+{
+	printf ("    Interface:   %d\n", ifaceDesc->bInterfaceNumber);
+	printf ("    Alt setting: %d\n", ifaceDesc->bAlternateSetting);
+	printf ("    Class:       %s\n", io::getUsbClassCodeString ((libusb_class_code) ifaceDesc->bInterfaceClass));
+	printf ("    Subclass:    %d\n", ifaceDesc->bInterfaceSubClass);
+	printf ("    Protocol:    %d\n", ifaceDesc->bInterfaceProtocol);
+	printf ("    Endpoints:   %d\n", ifaceDesc->bNumEndpoints);
+
+	for (size_t i = 0; i < ifaceDesc->bNumEndpoints; i++)
+	{
+		const libusb_endpoint_descriptor* endpointDesc = &ifaceDesc->endpoint [i];
+
+		printf ("\n");
+
+		printf ("      Endpoint:        0x%02x\n", endpointDesc->bEndpointAddress);
+		printf ("      Direction:       %s\n", (endpointDesc->bEndpointAddress & LIBUSB_ENDPOINT_IN) ? "In" : "Out");
+		printf ("      Type:            %s\n", io::getUsbTransferTypeString ((libusb_transfer_type) (endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK)));
+		printf ("      Max packet size: %d\n", endpointDesc->wMaxPacketSize);
+	}
+}
+
+void
+printUsbConfigDesc (const libusb_config_descriptor* configDesc)
+{
+	printf ("  Configuration: %d\n", configDesc->bConfigurationValue);
+	printf ("  Max power:     %d mA\n", configDesc->MaxPower * 2);
+	printf ("  Interfaces:    %d\n", configDesc->bNumInterfaces);
+
+	for (size_t i = 0; i < configDesc->bNumInterfaces; i++)
+	{
+		const libusb_interface* iface = &configDesc->interface [i];
+
+		if (!iface->num_altsetting)
+		{
+			printf ("\n    Interface #%d is not configured\n", i);
+		}
+		else for (size_t j = 0; j < (size_t) iface->num_altsetting; j++)
+		{
+			printf ("\n");
+			printUsbIfaceDesc (&iface->altsetting [j]);
+		}
+	}
+}
+
+void
+printUsbDevice (io::UsbDevice* device)
+{
+	bool result;
+
+	libusb_device_descriptor deviceDesc;
+	result = device->getDeviceDescriptor (&deviceDesc);
+	if (!result)
+	{
+		printf ("Cannot get device descriptor (%s)\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	printf ("HWID:           VID_%04x&PID_%04x\n", deviceDesc.idVendor, deviceDesc.idProduct);
+	printf ("Class:          %s\n", io::getUsbClassCodeString ((libusb_class_code) deviceDesc.bDeviceClass));
+	printf ("Manufacturer:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iManufacturer).cc ());
+	printf ("Product name:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iProduct).cc ());
+	printf ("Serial number:  %s\n", getUsbStringDescriptorText (device, deviceDesc.iSerialNumber).cc ());
+
+	printf ("Address:        %d\n", device->getDeviceAddress ());
+	printf ("Bus:            %d\n", device->getBusNumber ());
+	printf ("Port:           %d\n", device->getPortNumber ());
+	printf ("Speed:          %s\n", io::getUsbSpeedString (device->getDeviceSpeed ()));
+	printf ("Port path:      ");
+
+	uint8_t path [8];
+	size_t pathLength = device->getPortPath (path, countof (path));
+	if (pathLength == -1)
+	{
+		printf ("ERROR (%s)\n", err::getLastErrorDescription ().cc ());
+	}
+	else if (pathLength != -1)
+	{
+		for (size_t i = 0; i < pathLength; i++)
+			printf ("-> %d", path [i]);
+
+		printf ("\n");
+	}
+
+	printf ("Configurations: %d\n", deviceDesc.bNumConfigurations);
+
+	for (size_t i = 0; i < deviceDesc.bNumConfigurations; i++)
+	{
+		printf ("\n");
+
+		io::UsbConfigDescriptor configDesc;
+		bool result = device->getConfigDescriptor (i, &configDesc);
+		if (!result)
+			printf ("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription ().cc ());
+		else
+			printUsbConfigDesc (configDesc);
+	}
+}
+
+void 
+testUsb ()
+{
+	bool result;
+
+	io::registerUsbErrorProvider ();
+	io::UsbContext context;
+
+	io::UsbDeviceList deviceList;
+	size_t count = deviceList.enumerateDevices (context);
+	if (count == -1)
+	{
+		printf ("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	libusb_device** pp = deviceList;
+	for (size_t i = 0; *pp; pp++, i++)
+	{
+		printf ("----------------------\nDevice #%d\n", i);
+
+		io::UsbDevice device;
+		device.setDevice (*pp);		
+
+		result = device.open ();
+		if (!result)
+			printf ("Cannot open device (%s)\n", err::getLastErrorDescription ().cc ());		
+
+		printUsbDevice (&device); // even if not opened
+	}
+}
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1027,9 +1183,8 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-
-	testTimestamp ();
-
+	
+	testUsb ();
 	return 0;
 }
 

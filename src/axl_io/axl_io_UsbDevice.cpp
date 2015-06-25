@@ -6,6 +6,87 @@ namespace io {
 
 //.............................................................................
 
+const char*
+getUsbSpeedString (libusb_speed speed)
+{
+	static const char* stringTable [] = 
+	{ 
+		"Unknown",                  // LIBUSB_SPEED_UNKNOWN = 0,
+		"LowSpeed (1.5 Mbit/s)",    // LIBUSB_SPEED_LOW = 1,
+		"FullSpeed (12 Mbit/s)",    // LIBUSB_SPEED_FULL = 2,
+		"HighSpeed (480 Mbit/s)",   // LIBUSB_SPEED_HIGH = 3,
+		"SuperSpeed (5000 Mbit/s)", // LIBUSB_SPEED_SUPER = 4,
+	};
+
+	return (size_t) speed < countof (stringTable) ? 
+		stringTable [speed] : 
+		stringTable [LIBUSB_SPEED_UNKNOWN];
+}
+
+const char*
+getUsbClassCodeString (libusb_class_code classCode)
+{
+	static const char* stringTable [] = 
+	{ 
+		"Multi-function",      // LIBUSB_CLASS_PER_INTERFACE = 0,
+		"Audio",               // LIBUSB_CLASS_AUDIO = 1,
+		"Communication",       // LIBUSB_CLASS_COMM = 2,
+		"HID",                 // LIBUSB_CLASS_HID = 3,
+		"Unknown",             // 4
+		"Physical",            // LIBUSB_CLASS_PHYSICAL = 5,
+		"Image",               // LIBUSB_CLASS_IMAGE = 6,
+		"Printer",             // LIBUSB_CLASS_PRINTER = 7,
+		"Mass Storage",        // LIBUSB_CLASS_MASS_STORAGE = 8,
+		"USB HUB",             // LIBUSB_CLASS_HUB = 9,
+		"Data",                // LIBUSB_CLASS_DATA = 10,
+		"Smart Card",          // LIBUSB_CLASS_SMART_CARD = 0x0b,
+		"Unknown",             // 0x0c,
+		"Content Security",    // LIBUSB_CLASS_CONTENT_SECURITY = 0x0d,
+		"Video",               // LIBUSB_CLASS_VIDEO = 0x0e,
+		"Personal Healthcare", // LIBUSB_CLASS_PERSONAL_HEALTHCARE = 0x0f,
+	};
+
+	if ((size_t) classCode < countof (stringTable))
+		return stringTable [classCode];
+
+	switch (classCode)
+	{
+	case LIBUSB_CLASS_DIAGNOSTIC_DEVICE:
+		return "Diagnostic";
+
+	case LIBUSB_CLASS_WIRELESS:
+		return "Wireless";
+
+	case LIBUSB_CLASS_APPLICATION:
+		return "Application";
+
+	case LIBUSB_CLASS_VENDOR_SPEC:
+		return "Vendor-specific";
+
+	default:
+		return "Unknown";
+	}
+};
+
+const char*
+getUsbTransferTypeString (libusb_transfer_type transferType)
+{
+	static const char* stringTable [] = 
+	{ 
+		"Control",     // LIBUSB_SPEED_LOW = 1,
+		"Isochronous", // LIBUSB_SPEED_FULL = 2,
+		"Bulk",        // LIBUSB_SPEED_HIGH = 3,
+		"Interrupt",   // LIBUSB_SPEED_SUPER = 4,
+		"Bulk stream", // LIBUSB_TRANSFER_TYPE_BULK_STREAM = 4,
+	};
+
+	return (size_t) transferType < countof (stringTable) ? 
+		stringTable [transferType] : 
+		"Unknown";
+}
+
+//.............................................................................
+
 bool 
 UsbContext::open ()
 {
@@ -34,6 +115,18 @@ UsbDevice::getMaxPacketSize (uint_t endpoint)
 	ASSERT (m_device);
 	
 	int result = libusb_get_max_packet_size (m_device, (uchar_t) endpoint);
+	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
+}
+
+size_t
+UsbDevice::getPortPath (
+	uint8_t* path,
+	size_t maxLength
+	)
+{
+	ASSERT (m_device);
+
+	int result = libusb_get_port_numbers (m_device, path, maxLength);
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
@@ -107,7 +200,7 @@ UsbDevice::getConfiguration ()
 }
 
 bool
-UsbDevice::setConfiguration (int configuration)
+UsbDevice::setConfiguration (size_t configuration)
 {
 	ASSERT (m_openHandle);
 
@@ -116,7 +209,7 @@ UsbDevice::setConfiguration (int configuration)
 }
 
 bool
-UsbDevice::claimInterface (int iface)
+UsbDevice::claimInterface (size_t iface)
 {
 	ASSERT (m_openHandle);
 
@@ -125,7 +218,7 @@ UsbDevice::claimInterface (int iface)
 }
 
 bool
-UsbDevice::releaseInterface (int iface)
+UsbDevice::releaseInterface (size_t iface)
 {
 	ASSERT (m_openHandle);
 
@@ -135,8 +228,8 @@ UsbDevice::releaseInterface (int iface)
 
 bool
 UsbDevice::setInterfaceAltSetting (
-	int iface,
-	int altSetting
+	size_t iface,
+	size_t altSetting
 	)
 {
 	ASSERT (m_openHandle);
@@ -164,7 +257,7 @@ UsbDevice::resetDevice ()
 }
 
 bool
-UsbDevice::isKernelDriverActive (int iface)
+UsbDevice::isKernelDriverActive (size_t iface)
 {
 	ASSERT (m_openHandle);
 
@@ -173,7 +266,7 @@ UsbDevice::isKernelDriverActive (int iface)
 }
 
 bool
-UsbDevice::attachKernelDriver (int iface)
+UsbDevice::attachKernelDriver (size_t iface)
 {
 	ASSERT (m_openHandle);
 
@@ -182,7 +275,7 @@ UsbDevice::attachKernelDriver (int iface)
 }
 
 bool
-UsbDevice::detachKernelDriver (int iface)
+UsbDevice::detachKernelDriver (size_t iface)
 {
 	ASSERT (m_openHandle);
 
@@ -191,7 +284,7 @@ UsbDevice::detachKernelDriver (int iface)
 }
 
 bool
-UsbDevice::getDesrciptor (
+UsbDevice::getDescriptor (
 	libusb_descriptor_type type, 
 	size_t index,
 	rtl::Array <char>* descriptor
@@ -242,23 +335,33 @@ UsbDevice::getDeviceDescriptor (libusb_device_descriptor* descriptor)
 
 bool
 UsbDevice::getConfigDescriptor (
-	int configuration,
-	libusb_config_descriptor** descriptor
+	size_t configuration,
+	UsbConfigDescriptor* desc
 	)
 {
 	ASSERT (m_device);
 
-	int result = libusb_get_config_descriptor (m_device, configuration, descriptor);
-	return result == 0 ? true : err::fail (UsbError (result));
+	libusb_config_descriptor* buffer;
+	int result = libusb_get_config_descriptor (m_device, configuration, &buffer);
+	if (result != 0)
+		return err::fail (UsbError (result));
+
+	desc->attach (buffer);
+	return true;
 }
 
 bool
-UsbDevice::getActiveConfigDescriptor (libusb_config_descriptor** descriptor)
+UsbDevice::getActiveConfigDescriptor (UsbConfigDescriptor* desc)
 {
 	ASSERT (m_device);
 
-	int result = libusb_get_active_config_descriptor (m_device, descriptor);
-	return result == 0 ? true : err::fail (UsbError (result));
+	libusb_config_descriptor* buffer;
+	int result = libusb_get_active_config_descriptor (m_device, &buffer);
+	if (result != 0)
+		return err::fail (UsbError (result));
+
+	desc->attach (buffer);
+	return true;
 }
 
 bool

@@ -13,6 +13,16 @@
 #	include <netdb.h>
 #endif
 
+#ifdef _AXL_IO_USB
+#	if (_AXL_ENV == AXL_ENV_WIN)
+#		define _WINSOCKAPI_ // prevent winsock inclusion
+#		pragma warning (disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
+#	endif
+extern "C" {
+#	include <libusb.h>
+} // extern "C" {
+#endif
+
 // axl
 
 #include "axl_rtl_String.h"
@@ -25,6 +35,7 @@
 #include "axl_io_Socket.h"
 #include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"
+#include "axl_io_UsbDevice.h"
 #include "axl_g_Time.h"
 
 using namespace axl;

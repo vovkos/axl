@@ -16,6 +16,11 @@
 #endif
 
 #ifdef _AXL_IO_USB
-#	pragma warning (disable: 4200)
+#	if (_AXL_ENV == AXL_ENV_WIN)
+#		define _WINSOCKAPI_ // prevent winsock inclusion
+#		pragma warning (disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
+#	endif
+extern "C" {
 #	include <libusb.h>
+} // extern "C" {
 #endif
