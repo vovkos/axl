@@ -145,6 +145,7 @@ HexEncoding::decode (
 		length = rtl::StringDetails::calcLength (p);
 
 	buffer->reserve (length / 2);
+	buffer->clear ();
 
 	char hexCodeString [4] = { 0 };
 	char* hexCodeEnd;
@@ -163,8 +164,8 @@ HexEncoding::decode (
 			if (isSpace)
 				break;
 
-			hexCodeLen = 0;
-			hexCodeString [hexCodeLen++] = *p;
+			hexCodeString [0] = *p;
+			hexCodeLen = 1;
 			state = State_Hex;
 			break;
 
