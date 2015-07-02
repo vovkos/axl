@@ -227,9 +227,9 @@ enum SystemErrorCode
 	SystemErrorCode_InvalidDeviceRequest     = ENOSYS,
 //	SystemErrorCode_RequestAborted           = ERROR_REQUEST_ABORTED,
 	SystemErrorCode_BufferTooSmall           = ENOBUFS,
-/*	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
-	SystemErrorCode_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
-	SystemErrorCode_AccessDenied             = ERROR_ACCESS_DENIED,
+//	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
+	SystemErrorCode_ObjectNameNotFound       = ENOENT,
+/*	SystemErrorCode_AccessDenied             = ERROR_ACCESS_DENIED,
 	SystemErrorCode_SharingViolation         = ERROR_SHARING_VIOLATION,
 	SystemErrorCode_NoMoreEntries            = ERROR_NO_MORE_ITEMS, */
 };

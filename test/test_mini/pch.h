@@ -11,6 +11,8 @@
 #	pragma comment (lib, "iphlpapi.lib")
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include <netdb.h>
+#	include <signal.h>
+#	include <ucontext.h>
 #endif
 
 #ifdef _AXL_IO_USB
@@ -35,8 +37,11 @@ extern "C" {
 #include "axl_io_Socket.h"
 #include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"
-#include "axl_io_UsbDevice.h"
 #include "axl_g_Time.h"
+
+#ifdef _AXL_IO_USB
+#	include "axl_io_UsbDevice.h"
+#endif
 
 using namespace axl;
 

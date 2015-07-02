@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_g_WarningSuppression.h"
+#include "axl_mt_Thread.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
@@ -1009,6 +1010,8 @@ testTimestamp ()
 
 //.............................................................................
 
+#ifdef _AXL_IO_USB
+
 rtl::String 
 getUsbStringDescriptorText (
 	io::UsbDevice* device,
@@ -1163,6 +1166,175 @@ testUsb ()
 	}
 }
 
+#endif
+
+//.............................................................................
+
+#if (_AXL_ENV == AXL_ENV_POSIX)
+
+#include "gcconfig.h"
+
+
+class MyThread: public mt::ThreadImpl <MyThread>
+{
+public:
+	volatile bool m_terminateFlag;
+
+	MyThread ()
+	{
+		m_terminateFlag = false;
+	}
+
+	void threadProc ()
+	{
+		uint64_t tid = getThreadId ();
+
+		for (;;)
+		{
+			g::sleep (1000);
+			printf ("MyThread -- TID: %lld\n", tid);
+
+			if (m_terminateFlag)
+				break;
+		}
+
+		printf ("MyThread -- TID: %lld -- TERMINATE\n", tid);
+	}
+};
+
+#if 0
+static void signal_segv(int signum, siginfo_t* info, void*ptr) {
+    static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
+
+    int i, f = 0;
+    ucontext_t *ucontext = (ucontext_t*)ptr;
+    Dl_info dlinfo;
+    void **bp = 0;
+    void *ip = 0;
+
+    sigsegv_outp("Segmentation Fault!");
+    sigsegv_outp("info.si_signo = %d", signum);
+    sigsegv_outp("info.si_errno = %d", info->si_errno);
+    sigsegv_outp("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
+    sigsegv_outp("info.si_addr  = %p", info->si_addr);
+    for(i = 0; i < NGREG; i++)
+        sigsegv_outp("reg[%02d]       = 0x" REGFORMAT, i, ucontext->uc_mcontext.gregs[i]);
+
+#ifndef SIGSEGV_NOSTACK
+#if defined(SIGSEGV_STACK_IA64) || defined(SIGSEGV_STACK_X86)
+#if defined(SIGSEGV_STACK_IA64)
+    ip = (void*)ucontext->uc_mcontext.gregs[REG_RIP];
+    bp = (void**)ucontext->uc_mcontext.gregs[REG_RBP];
+#elif defined(SIGSEGV_STACK_X86)
+    ip = (void*)ucontext->uc_mcontext.gregs[REG_EIP];
+    bp = (void**)ucontext->uc_mcontext.gregs[REG_EBP];
+#endif
+
+    sigsegv_outp("Stack trace:");
+    while(bp && ip) {
+        if(!dladdr(ip, &dlinfo))
+            break;
+
+        const char *symname = dlinfo.dli_sname;
+
+#ifndef NO_CPP_DEMANGLE
+        int status;
+        char * tmp = __cxa_demangle(symname, NULL, 0, &status);
+
+        if (status == 0 && tmp)
+            symname = tmp;
+#endif
+
+        sigsegv_outp("% 2d: %p <%s+%lu> (%s)",
+                 ++f,
+                 ip,
+                 symname,
+                 (unsigned long)ip - (unsigned long)dlinfo.dli_saddr,
+                 dlinfo.dli_fname);
+
+#ifndef NO_CPP_DEMANGLE
+        if (tmp)
+            free(tmp);
+#endif
+
+        if(dlinfo.dli_sname && !strcmp(dlinfo.dli_sname, "main"))
+            break;
+
+        ip = bp[1];
+        bp = (void**)bp[0];
+    }
+#else
+    sigsegv_outp("Stack trace (non-dedicated):");
+    sz = backtrace(bt, 20);
+    strings = backtrace_symbols(bt, sz);
+    for(i = 0; i < sz; ++i)
+        sigsegv_outp("%s", strings[i]);
+#endif
+    sigsegv_outp("End of stack trace.");
+#else
+    sigsegv_outp("Not printing stack strace.");
+#endif
+    _exit (-1);
+}
+
+#endif
+
+void* suspendThread (pthread_t thread)
+{
+	return NULL;
+}
+
+bool resumeThread (pthread_t thread)
+{
+}
+
+void testSuspendThread ()
+{
+	MyThread thread1;
+	MyThread thread2;
+
+	thread1.start ();
+	g::sleep (500);
+	thread2.start ();
+
+	g::sleep (3000);
+
+	printf ("SIG_SUSPEND = %d\n", SIG_SUSPEND);
+
+	suspendThread (thread2.m_thread);
+	printf ("thread2 is suspended...\n");
+
+	g::sleep (3000);
+
+	printf ("thread2 is resumed...\n");
+	resumeThread (thread2.m_thread);
+
+	g::sleep (3000);
+
+	printf ("terminating threads...\n");
+
+	thread1.m_terminateFlag = true;
+	thread2.m_terminateFlag = true;
+
+	thread1.waitAndClose ();
+	thread2.waitAndClose ();
+
+/*
+    sigaction action = { 0 };
+    action.sa_sigaction = signal_segv;
+    action.sa_flags = SA_SIGINFO;
+
+    sigaction(SIGSEGV, &action, NULL);
+        perror("sigaction");
+
+
+	threadArray [i].suspend ();
+*/
+
+}
+
+#endif
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -1184,7 +1356,8 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 	
-	testUsb ();
+//	testUsb ();
+	testSuspendThread ();
 	return 0;
 }
 
