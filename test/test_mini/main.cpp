@@ -1183,7 +1183,9 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-	
+
+	InterlockedCompare64Exchange128;
+
 	testUsb ();
 	return 0;
 }
