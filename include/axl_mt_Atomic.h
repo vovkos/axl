@@ -89,6 +89,13 @@ atomicDec (volatile int64_t* p)
 
 inline
 int32_t
+atomicLoad (volatile int32_t* p)
+{
+	return *p;
+}
+
+inline
+int32_t
 atomicXchg (
 	volatile int32_t* p,
 	int32_t value
@@ -156,6 +163,68 @@ atomicDec (volatile int64_t* p)
 {
 	return __sync_sub_and_fetch (p, 1);
 }
+
+#if (_AXL_PTR_BITNESS == 64)
+
+inline
+int64_t
+atomicLoad (volatile int64_t* p)
+{
+	return *p;
+}
+
+inline
+int128_t
+atomicLoad (volatile int128_t* p)
+{
+	return __sync_val_compare_and_swap (p, 0, 0); // any value will do
+}
+
+inline
+int128_t
+atomicXchg (
+	volatile int128_t* p,
+	int128_t value
+	)
+{
+	return __sync_lock_test_and_set (p, value);
+}
+
+inline
+int128_t
+atomicCmpXchg (
+	volatile int128_t* p,
+	int128_t cmpValue,
+	int128_t newValue
+	)
+{
+	return __sync_val_compare_and_swap (p, cmpValue, newValue);
+}
+
+inline
+int128_t
+atomicInc (volatile int128_t* p)
+{
+	return __sync_add_and_fetch (p, 1);
+}
+
+inline
+int128_t
+atomicDec (volatile int128_t* p)
+{
+	return __sync_sub_and_fetch (p, 1);
+}
+
+#else // 32
+
+inline
+int64_t
+atomicLoad (volatile int64_t* p)
+{
+	return __sync_val_compare_and_swap (p, 0, 0); // any value will do
+}
+
+#endif
 
 #endif
 

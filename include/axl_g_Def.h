@@ -164,34 +164,44 @@
 // intptr_t
 // uintptr_t
 
-typedef int              bool_t;
-typedef unsigned int     uint_t;
-typedef unsigned char    uchar_t;
-typedef unsigned short   ushort_t;
-typedef unsigned long    ulong_t;
+typedef int               bool_t;
+typedef unsigned int      uint_t;
+typedef unsigned char     uchar_t;
+typedef unsigned short    ushort_t;
+typedef unsigned long     ulong_t;
 
-typedef uint8_t          byte_t;
-typedef uint16_t         word_t;
-typedef uint64_t         qword_t;
+typedef uint8_t           byte_t;
+typedef uint16_t          word_t;
+typedef uint64_t          qword_t;
 
 #if (_AXL_CPP == AXL_CPP_MSC)
-typedef ulong_t          dword_t;
+typedef ulong_t           dword_t;
 #else
-typedef uint32_t         dword_t;
+typedef uint32_t          dword_t;
 #endif
 
-typedef void*            handle_t;
+#if (_AXL_PTR_BITNESS == 64)
+typedef __int128          int128_t;
+typedef unsigned __int128 uint128_t;
+typedef int128_t          intdptr_t;
+typedef uint128_t         uintdptr_t;
+#else
+typedef intdptr_t         int64_t;
+typedef uintdptr_t        uint64_t;
+#endif
+
+typedef void*             handle_t;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef char             utf8_t;
+typedef char              utf8_t;
 
 #if (WCHAR_MAX <= 0xffff)
-typedef wchar_t          utf16_t;
-typedef int32_t          utf32_t;
+typedef wchar_t           utf16_t;
+typedef int32_t           utf32_t;
 #else
-typedef int16_t          utf16_t;
-typedef wchar_t          utf32_t;
+typedef int16_t           utf16_t;
+typedef wchar_t           utf32_t;
 #endif
 
 //.............................................................................

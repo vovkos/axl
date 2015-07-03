@@ -1407,9 +1407,9 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-
+	
 //	testUsb ();
-	testGcSafePoints ();
+//	testGcSafePoints ();
 	return 0;
 }
 
