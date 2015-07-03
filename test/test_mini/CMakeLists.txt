@@ -76,6 +76,7 @@ if (UNIX)
 	target_link_libraries (
 		test_mini
 		pthread
+		rt
 		dl
 		)
 endif ()
@@ -85,6 +86,11 @@ if (BUILD_AXL_IO_USB)
 		target_link_libraries (
 			test_mini
 			libusb-1.0
+			)
+	else ()
+		target_link_libraries (
+			test_mini
+			usb-1.0
 			)
 	endif ()
 endif ()

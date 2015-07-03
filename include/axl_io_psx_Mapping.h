@@ -38,6 +38,18 @@ public:
 		return m_p;
 	}
 
+	void* 
+	p () const
+	{
+		return m_p;
+	}
+	
+	size_t 
+	getSize ()
+	{
+		return m_size;
+	}
+
 	bool
 	isOpen () const
 	{
@@ -59,6 +71,13 @@ public:
 		int fd,
 		size_t offset = 0
 		);
+
+	bool
+	protect (int protection)
+	{
+		int result = ::mprotect (m_p, m_size, protection);
+		return err::complete (result != -1);
+	}
 
 	void
 	unmap (size_t size = -1);

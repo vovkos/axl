@@ -78,7 +78,7 @@ public:
 	class New
 	{
 	public:
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 		Ptr <void> 
 		operator () (
 			obj::IType* type,
@@ -138,7 +138,7 @@ public:
 
 public:
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	static
 	Ptr <void> 
 	operatorNew (
@@ -167,7 +167,7 @@ typedef RtFactory <mem::StdAlloc> RtFactory;
 
 //.............................................................................
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 #define AXL_REF_RT_NEW(Type) \
 	ref::RtFactory::operatorNew (Type, __FILE__, __LINE__)

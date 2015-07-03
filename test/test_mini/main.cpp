@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_g_WarningSuppression.h"
+#include "axl_mt_Thread.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
@@ -1165,6 +1166,229 @@ testUsb ()
 
 //.............................................................................
 
+class Gc;
+
+Gc* g_gc = NULL;
+
+class Gc
+{
+protected:
+	enum HandshakeKind
+	{
+		HandshakeKind_None,
+		HandshakeKind_StopTheWorld,
+		HandshakeKind_ResumeTheWorld,
+	};
+
+protected:
+	io::psx::Mapping m_guardPageMapping;
+	void* m_guardPage;	
+
+	rtl::Array <uint64_t> m_threadArray;
+	rtl::HashTableMap <uint64_t, bool, rtl::HashId <uint64_t> > m_threadMap;
+
+	volatile HandshakeKind m_handshakeKind;
+	volatile int32_t m_handshakeCounter;
+	mt::psx::Sem m_handshakeSem;
+
+	sigset_t m_signalWaitMask;
+
+public:
+	Gc ()
+	{
+		m_guardPage = m_guardPageMapping.map (
+			NULL,
+			4 * 1024, // typical page size -- OS will not give us less than that, anyway
+			PROT_READ | PROT_WRITE,
+			MAP_PRIVATE | MAP_ANONYMOUS,
+			-1,
+			0
+			);
+
+		m_handshakeKind = HandshakeKind_None;
+		installSignalHandlers ();
+	}
+
+	void
+	gcSafePoint ()
+	{
+		*(volatile int*) m_guardPage = 0;
+	}
+
+	void
+	stopTheWorld ()
+	{
+		m_handshakeKind = HandshakeKind_StopTheWorld;
+		m_handshakeCounter = m_threadMap.getCount ();
+		m_guardPageMapping.protect (PROT_NONE);
+		m_handshakeSem.wait ();
+		m_handshakeKind = HandshakeKind_None;
+	}
+
+	void
+	resumeTheWorld ()
+	{
+		m_guardPageMapping.protect (PROT_READ | PROT_WRITE);
+
+		m_handshakeKind = HandshakeKind_ResumeTheWorld;
+		m_handshakeCounter = m_threadArray.getCount ();
+		for (size_t i = 0; i < m_handshakeCounter; i++)
+			pthread_kill (m_threadArray [i], SIGUSR1); // resume
+
+		m_handshakeSem.wait ();
+		m_handshakeKind = HandshakeKind_None;
+	}
+
+	bool
+	registerThread (uint64_t threadId)
+	{
+		rtl::HashTableMapIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
+		if (it->m_value)
+			return false;
+
+		m_threadArray.append (threadId);
+		it->m_value = true;
+	}
+
+protected:
+	bool
+	installSignalHandlers ()
+	{
+		sigemptyset (&m_signalWaitMask); // don't block any signals when servicing SIGSEGV
+
+		struct sigaction sigAction = { 0 };
+		sigAction.sa_flags = SA_SIGINFO;
+		sigAction.sa_sigaction = sigsegvHandler;
+		sigAction.sa_mask = m_signalWaitMask;
+
+		struct sigaction prevSigAction;
+		int result = sigaction (SIGSEGV, &sigAction, &prevSigAction);
+		ASSERT (result == 0);
+
+		sigAction.sa_flags = 0;
+		sigAction.sa_handler = sigusr1Handler;
+		result = sigaction (SIGUSR1, &sigAction, &prevSigAction);
+		ASSERT (result == 0);
+
+		return true;
+	}
+
+	static
+	void
+	sigsegvHandler (
+		int signal,
+		siginfo_t* signalInfo,
+		void* context
+		)
+	{
+		if (signal != SIGSEGV || 
+			signalInfo->si_addr != g_gc->m_guardPage ||
+			g_gc->m_handshakeKind != HandshakeKind_StopTheWorld)
+			return; // ignore
+
+		int32_t count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		if (!count)
+			g_gc->m_handshakeSem.post ();
+
+		do
+		{
+			sigsuspend (&g_gc->m_signalWaitMask);
+		} while (g_gc->m_handshakeKind != HandshakeKind_ResumeTheWorld);
+
+		count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		if (!count)
+			g_gc->m_handshakeSem.post ();
+	}
+
+	static
+	void
+	sigusr1Handler (int signal)
+	{
+		// do nothing -- we handshake manually
+	}
+};
+
+class MutatorThread: public mt::ThreadImpl <MutatorThread>
+{
+protected:
+	volatile bool m_terminateFlag;
+
+public:
+	MutatorThread ()
+	{
+		m_terminateFlag = false;
+	}
+
+	void
+	stop ()
+	{
+		m_terminateFlag = true;
+		waitAndClose ();
+		m_terminateFlag = false;
+	}
+
+	void
+	threadProc ()
+	{
+		uint64_t threadId = mt::getCurrentThreadId ();
+
+		for (;;)
+		{
+			if (m_terminateFlag)
+				break;
+
+			printf ("  mutator thread TID:%lld is working...\n", threadId);
+			g::sleep (200);
+			g_gc->gcSafePoint ();
+		}
+		
+		printf ("  mutator thread TID:%lld is finished.\n", threadId);
+	}
+};
+
+void
+testGcSafePoints ()
+{
+	Gc gc;
+
+	g_gc = &gc;
+
+	printf ("starting mutator threads...\n");
+
+	MutatorThread thread1;
+	MutatorThread thread2;
+
+	thread1.start ();
+	thread2.start ();
+
+	gc.registerThread (thread1.getThreadId ());
+	gc.registerThread (thread2.getThreadId ());
+
+	g::sleep (1000);
+
+	printf ("stopping the world...\n");
+	gc.stopTheWorld ();
+	printf ("the world is stopped.\n");
+
+	g::sleep (1000);
+
+	printf ("resuming the world...\n");
+	gc.resumeTheWorld ();
+
+	g::sleep (1000);
+
+	printf ("stopping mutator threads...\n");
+
+	thread1.stop ();
+	thread2.stop ();
+
+	printf ("done.\n");
+
+	g_gc = NULL;
+}
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1184,9 +1408,8 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	InterlockedCompare64Exchange128;
-
-	testUsb ();
+//	testUsb ();
+	testGcSafePoints ();
 	return 0;
 }
 

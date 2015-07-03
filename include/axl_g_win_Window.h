@@ -184,9 +184,7 @@ public:
 // so it's possible to register a class and then use it with ::CreateWindow or as a superclass for ATL::CWindowImpl
 // note that unlike deriving from existing classes subclassing of existing windows IS supported.
 
-extern
-AXL_SELECT_ANY
-const uint_t g_createWindowTls = ::TlsAlloc ();
+AXL_SELECT_ANY const uint_t g_createWindowTls = ::TlsAlloc ();
 
 template <
 	class T, 

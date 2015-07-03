@@ -46,7 +46,7 @@ protected:
 	};
 
 protected:
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	const char* m_tag;
 #endif
 
@@ -94,8 +94,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SELECT_ANY 
-Module g_module;
+AXL_SELECT_ANY Module g_module;
 
 inline
 Module*

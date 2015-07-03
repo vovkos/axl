@@ -12,7 +12,7 @@ initQpc ();
 
 Module::Module ()
 {	
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 #	ifdef _AXL_MODULE_TAG
 	m_tag = _AXL_MODULE_TAG;
 #	else

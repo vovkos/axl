@@ -110,7 +110,7 @@ UsbDeviceList::enumerateDevices (libusb_context* context)
 //.............................................................................
 
 size_t
-UsbDevice::getMaxPacketSize (uint_t endpoint)
+UsbDevice::getMaxPacketSize (size_t endpoint)
 {
 	ASSERT (m_device);
 	
@@ -131,7 +131,7 @@ UsbDevice::getPortPath (
 }
 
 size_t
-UsbDevice::getMaxIsoPacketSize (uint_t endpoint)
+UsbDevice::getMaxIsoPacketSize (size_t endpoint)
 {
 	ASSERT (m_device);
 	
@@ -239,7 +239,7 @@ UsbDevice::setInterfaceAltSetting (
 }
 
 bool
-UsbDevice::clearHalt (uint_t endpoint)
+UsbDevice::clearHalt (size_t endpoint)
 {
 	ASSERT (m_openHandle);
 

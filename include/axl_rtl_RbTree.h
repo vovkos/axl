@@ -54,7 +54,7 @@ public:
 		return node ? node->m_color : RbColor_Black; 
 	}
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	static 
 	size_t 
 	assertValid (T* node)
@@ -122,7 +122,7 @@ class RbTree: public BinTreeBase <
 	>
 {
 public:
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	void 
 	assertValid ()
 	{ 

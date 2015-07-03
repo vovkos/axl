@@ -117,16 +117,30 @@
 #	define AXL_STDCALL    __stdcall
 #	define AXL_SELECT_ANY __declspec (selectany)
 #	define AXL_NO_VTABLE  __declspec (novtable)
+
+#	ifdef _DEBUG
+#		define _AXL_DEBUG 1
+#	else
+#		undef _AXL_DEBUG
+#	endif
 #elif (_AXL_CPP == AXL_CPP_GCC)
 #	if (_AXL_CPU == AXL_CPU_X86)
-#		define AXL_CDECL      __attribute__ ((cdecl))
-#		define AXL_STDCALL    __attribute__ ((stdcall))
+#		define AXL_CDECL   __attribute__ ((cdecl))
+#		define AXL_STDCALL __attribute__ ((stdcall))
 #	else
 #		define AXL_CDECL
 #		define AXL_STDCALL
 #	endif
 #	define AXL_SELECT_ANY __attribute__ ((weak))
 #	define AXL_NO_VTABLE
+#
+#	ifdef NDEBUG
+#		undef _DEBUG
+#		undef _AXL_DEBUG
+#	else
+#		define _DEBUG
+#		define _AXL_DEBUG 1
+#	endif
 #endif
 
 //.............................................................................
@@ -230,7 +244,7 @@ template <typename T>
 void*
 pvoid_cast (T x)
 {
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	switch (sizeof (x))
 	{
 	case sizeof (void*):

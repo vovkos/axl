@@ -24,7 +24,7 @@ enum TraceLevel
 
 //.............................................................................
 
-#ifndef _DEBUG
+#ifndef _AXL_DEBUG
 
 inline
 void
@@ -70,11 +70,9 @@ trace (
 {
 }
 
-
 #else
 
-AXL_SELECT_ANY
-volatile uint_t g_traceFilter = -1;
+AXL_SELECT_ANY volatile uint_t g_traceFilter = -1;
 
 inline
 uint_t
@@ -136,7 +134,7 @@ trace (
 //.............................................................................
 
 #ifndef TRACE
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 #define TRACE \
 	dbg::trace

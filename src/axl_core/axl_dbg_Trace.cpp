@@ -7,7 +7,7 @@ namespace dbg {
 
 //.............................................................................
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 void
 traceEx_va (

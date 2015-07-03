@@ -19,7 +19,7 @@ FFree (void* p);
 
 //.............................................................................
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 class StdAlloc
 {
@@ -72,7 +72,7 @@ typedef Malloc StdAlloc;
 
 //.............................................................................
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 #define AXL_MEM_ALLOC(size) \
 	axl::mem::StdAlloc::alloc (size, "<buffer>", __FILE__, __LINE__)

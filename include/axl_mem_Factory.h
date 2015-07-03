@@ -25,7 +25,7 @@ public:
 	class New
 	{
 	public:
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 		T*
 		operator () (
 			const char* filePath,
@@ -72,7 +72,7 @@ public:
 	};
 
 public:
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	static
 	T*
 	operatorNew (
@@ -164,7 +164,7 @@ cppOperatorDelete (T* p)
 
 //.............................................................................
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 #define AXL_MEM_NEW(Class) \
 	axl::mem::StdFactory <Class>::operatorNew (__FILE__, __LINE__)

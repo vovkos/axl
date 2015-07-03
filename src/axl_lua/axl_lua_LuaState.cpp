@@ -51,7 +51,7 @@ LuaState::load (
 	return complete (result);
 }
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 void
 LuaState::trace ()
 {

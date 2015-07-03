@@ -51,7 +51,7 @@ public:
 		size_t length = -1
 		);
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	void
 	trace ();
 #endif

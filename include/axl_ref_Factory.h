@@ -27,7 +27,7 @@ public:
 	class New
 	{
 	public:
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 		Ptr <T>
 		operator () (
 			const char* filePath,
@@ -52,7 +52,7 @@ public:
 
 public:
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 	static
 	Ptr <T>
 	operatorNew (
@@ -108,7 +108,7 @@ public:
 
 //.............................................................................
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 #define AXL_REF_NEW(Class) \
 	axl::ref::Factory <Class>::operatorNew (__FILE__, __LINE__)

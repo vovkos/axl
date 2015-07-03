@@ -8,7 +8,7 @@ namespace gui {
 //.............................................................................
 
 
-#ifdef _DEBUG
+#ifdef _AXL_DEBUG
 
 void
 TextAttrAnchorArray::trace ()
