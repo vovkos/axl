@@ -1258,7 +1258,7 @@ protected:
 
 		struct sigaction sigAction = { 0 };
 		sigAction.sa_flags = SA_SIGINFO;
-		sigAction.sa_sigaction = sigsegvHandler;
+		sigAction.sa_sigaction = signalHandler_SIGSEGV;
 		sigAction.sa_mask = m_signalWaitMask;
 
 		struct sigaction prevSigAction;
@@ -1266,7 +1266,7 @@ protected:
 		ASSERT (result == 0);
 
 		sigAction.sa_flags = 0;
-		sigAction.sa_handler = sigusr1Handler;
+		sigAction.sa_handler = signalHandler_SIGUSR1;
 		result = sigaction (SIGUSR1, &sigAction, &prevSigAction);
 		ASSERT (result == 0);
 
@@ -1275,7 +1275,7 @@ protected:
 
 	static
 	void
-	sigsegvHandler (
+	signalHandler_SIGSEGV (
 		int signal,
 		siginfo_t* signalInfo,
 		void* context
@@ -1302,9 +1302,9 @@ protected:
 
 	static
 	void
-	sigusr1Handler (int signal)
+	signalHandler_SIGUSR1 (int signal)
 	{
-		// do nothing -- we handshake manually
+		// do nothing (we handshake manually). but we still need a handler
 	}
 };
 
@@ -1370,7 +1370,7 @@ testGcSafePoints ()
 	gc.stopTheWorld ();
 	printf ("the world is stopped.\n");
 
-	g::sleep (1000);
+	g::sleep (2000);
 
 	printf ("resuming the world...\n");
 	gc.resumeTheWorld ();
@@ -1409,7 +1409,7 @@ main (
 #endif
 	
 //	testUsb ();
-//	testGcSafePoints ();
+	testGcSafePoints ();
 	return 0;
 }
 

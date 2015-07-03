@@ -186,8 +186,8 @@ typedef unsigned __int128 uint128_t;
 typedef int128_t          intdptr_t;
 typedef uint128_t         uintdptr_t;
 #else
-typedef intdptr_t         int64_t;
-typedef uintdptr_t        uint64_t;
+typedef int64_t           intdptr_t;
+typedef uint64_t          uintdptr_t;
 #endif
 
 typedef void*             handle_t;
