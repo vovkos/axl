@@ -38,11 +38,13 @@ extern "C" {
 #include "axl_io_NetworkAdapter.h"
 #include "axl_io_UsbDevice.h"
 #include "axl_g_Time.h"
+#include "axl_mt_Event.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
+#	include "axl_mem_win_VirtualMemory.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include <axl_io_psx_Mapping.h>
-#	include <axl_mt_psx_Sem.h>
+#	include "axl_io_psx_Mapping.h"
+#	include "axl_mt_psx_Sem.h"
 #endif
 
 using namespace axl;

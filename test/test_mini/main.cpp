@@ -1170,6 +1170,7 @@ class Gc;
 
 Gc* g_gc = NULL;
 
+#if (_AXL_ENV == AXL_ENV_POSIX)
 class Gc
 {
 protected:
@@ -1181,8 +1182,7 @@ protected:
 	};
 
 protected:
-	io::psx::Mapping m_guardPageMapping;
-	void* m_guardPage;	
+	io::psx::Mapping m_guardPage;
 
 	rtl::Array <uint64_t> m_threadArray;
 	rtl::HashTableMap <uint64_t, bool, rtl::HashId <uint64_t> > m_threadMap;
@@ -1196,7 +1196,7 @@ protected:
 public:
 	Gc ()
 	{
-		m_guardPage = m_guardPageMapping.map (
+		m_guardPage = m_guardPage.map (
 			NULL,
 			4 * 1024, // typical page size -- OS will not give us less than that, anyway
 			PROT_READ | PROT_WRITE,
@@ -1212,7 +1212,7 @@ public:
 	void
 	gcSafePoint ()
 	{
-		*(volatile int*) m_guardPage = 0;
+		*(volatile int*) m_guardPage.p () = 0;
 	}
 
 	void
@@ -1220,7 +1220,7 @@ public:
 	{
 		m_handshakeKind = HandshakeKind_StopTheWorld;
 		m_handshakeCounter = m_threadMap.getCount ();
-		m_guardPageMapping.protect (PROT_NONE);
+		m_guardPage.protect (PROT_NONE);
 		m_handshakeSem.wait ();
 		m_handshakeKind = HandshakeKind_None;
 	}
@@ -1228,7 +1228,7 @@ public:
 	void
 	resumeTheWorld ()
 	{
-		m_guardPageMapping.protect (PROT_READ | PROT_WRITE);
+		m_guardPage.protect (PROT_READ | PROT_WRITE);
 
 		m_handshakeKind = HandshakeKind_ResumeTheWorld;
 		m_handshakeCounter = m_threadArray.getCount ();
@@ -1248,6 +1248,7 @@ public:
 
 		m_threadArray.append (threadId);
 		it->m_value = true;
+		return true;
 	}
 
 protected:
@@ -1308,6 +1309,117 @@ protected:
 	}
 };
 
+#define GC_BEGIN()
+#define GC_END()
+
+#elif (_AXL_ENV == AXL_ENV_WIN)
+
+class Gc
+{
+protected:
+	enum HandshakeKind
+	{
+		HandshakeKind_None,
+		HandshakeKind_StopTheWorld,
+		HandshakeKind_ResumeTheWorld,
+	};
+
+protected:
+	mem::win::VirtualMemory m_guardPage;
+
+	rtl::HashTableMap <uint64_t, bool, rtl::HashId <uint64_t> > m_threadMap;
+
+	volatile HandshakeKind m_handshakeKind;
+	volatile int32_t m_handshakeCounter;
+	mt::Event m_handshakeEvent;
+	mt::NotificationEvent m_resumeEvent;
+
+public:
+	Gc ()
+	{
+		m_guardPage.alloc (4 * 1024);
+		m_handshakeKind = HandshakeKind_None;
+	}
+
+	~Gc ()
+	{
+
+	}
+
+	void
+	gcSafePoint ()
+	{
+		*(volatile int*) m_guardPage.p () = 0;
+	}
+
+	void
+	stopTheWorld ()
+	{
+		m_handshakeKind = HandshakeKind_StopTheWorld;
+		m_handshakeCounter = m_threadMap.getCount ();
+		m_resumeEvent.reset ();
+		m_guardPage.protect (PAGE_NOACCESS);
+		m_handshakeEvent.wait ();
+		m_handshakeKind = HandshakeKind_None;
+	}
+
+	void
+	resumeTheWorld ()
+	{
+		m_guardPage.protect (PAGE_READWRITE);
+
+		m_handshakeKind = HandshakeKind_ResumeTheWorld;
+		m_handshakeCounter = m_threadMap.getCount ();
+		m_resumeEvent.signal ();
+		m_handshakeEvent.wait ();
+		m_handshakeKind = HandshakeKind_None;
+		m_resumeEvent.reset ();
+	}
+
+	bool
+	registerThread (uint64_t threadId)
+	{
+		rtl::HashTableMapIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
+		if (it->m_value)
+			return false;
+
+		it->m_value = true;
+		return true;
+	}
+
+	int 
+	handleException (
+		uint_t code, 
+		EXCEPTION_POINTERS* exceptionPointers
+		) 
+	{
+		if (code != EXCEPTION_ACCESS_VIOLATION || 
+		   exceptionPointers->ExceptionRecord->ExceptionInformation [1] != (uintptr_t) m_guardPage.p () ||
+		   m_handshakeKind != HandshakeKind_StopTheWorld) 
+		  return EXCEPTION_CONTINUE_SEARCH;
+
+		int32_t count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		if (!count)
+			g_gc->m_handshakeEvent.signal ();
+
+		do
+		{
+			g_gc->m_resumeEvent.wait ();
+		} while (m_handshakeKind != HandshakeKind_ResumeTheWorld);
+
+		count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		if (!count)
+			g_gc->m_handshakeEvent.signal ();
+
+		return EXCEPTION_CONTINUE_EXECUTION;
+	}
+};
+
+#define GC_BEGIN() __try {
+#define GC_END() } __except (g_gc->handleException (GetExceptionCode (), GetExceptionInformation ())) { }
+
+#endif
+
 class MutatorThread: public mt::ThreadImpl <MutatorThread>
 {
 protected:
@@ -1332,6 +1444,8 @@ public:
 	{
 		uint64_t threadId = mt::getCurrentThreadId ();
 
+		GC_BEGIN ()
+
 		for (;;)
 		{
 			if (m_terminateFlag)
@@ -1343,6 +1457,8 @@ public:
 		}
 		
 		printf ("  mutator thread TID:%lld is finished.\n", threadId);
+		
+		GC_END ()
 	}
 };
 

@@ -1,0 +1,170 @@
+// This file is part of AXL (R) Library
+// Tibbo Technology Inc (C) 2004-2014. All rights reserved
+// Author: Vladimir Gladkov
+
+#pragma once
+
+#define _AXL_MEM_WIN_VIRTUAL_MEMORY_H
+
+#include "axl_err_Error.h"
+
+namespace axl {
+namespace mem {
+namespace win {
+
+//.............................................................................
+
+class VirtualMemory
+{
+protected:
+	void* m_p;
+	size_t m_size;
+
+public:
+	VirtualMemory ()
+	{
+		m_p = NULL;
+		m_size = 0;
+	}
+
+	~VirtualMemory ()
+	{
+		release ();
+	}
+
+	operator void* () const
+	{
+		return m_p;
+	}
+
+	void* p () const
+	{
+		return m_p;
+	}
+
+	size_t 
+	getSize () const
+	{
+		return m_size;
+	}
+
+	void* 
+	alloc (
+		void* p,
+		size_t size,
+		uint_t allocationFlags = MEM_RESERVE | MEM_COMMIT,
+		uint_t protection = PAGE_READWRITE
+		);
+
+	void* 
+	alloc (
+		size_t size,
+		uint_t allocationFlags = MEM_RESERVE | MEM_COMMIT,
+		uint_t protectionFlags = PAGE_READWRITE
+		)
+	{
+		return alloc (NULL, size, allocationFlags, protectionFlags);
+	}
+
+	static
+	bool
+	commit (
+		void* p,
+		size_t size,
+		uint_t protectionFlags = PAGE_READWRITE
+		)
+	{
+		void* result = ::VirtualAlloc (p, size, MEM_COMMIT, protectionFlags);
+		return err::complete (result != NULL);
+	}
+
+	bool 
+	commit (uint_t protectionFlags = PAGE_READWRITE)
+	{
+		return commit (m_p, m_size, protectionFlags);
+	}
+
+	static
+	bool
+	decommit (
+		void* p,
+		size_t size
+		)
+	{
+		bool_t result = ::VirtualFree (p, size, MEM_DECOMMIT);
+		return err::complete (result);
+	}
+
+	bool
+	decommit ()
+	{
+		return decommit (m_p, m_size);
+	}
+
+	void 
+	release ();
+
+	bool
+	protect (
+		uint_t protectionFlags,
+		uint_t* prevProtectionFlags = NULL
+		);
+
+	static
+	bool
+	lock (
+		void* p,
+		size_t size
+		)
+	{
+		bool_t result = ::VirtualLock (p, size);
+		return err::complete (result);
+	}
+
+	bool
+	lock ()
+	{
+		return lock (m_p, m_size);
+	}
+
+	static
+	bool
+	unlock (
+		void* p,
+		size_t size
+		)
+	{
+		bool_t result = ::VirtualUnlock (p, size);
+		return err::complete (result);
+	}
+
+	bool
+	unlock ()
+	{
+		return unlock (m_p, m_size);
+	}
+
+	static
+	bool
+	query (
+		MEMORY_BASIC_INFORMATION* information,
+		void* p,
+		size_t size
+		)
+	{
+		bool_t result = ::VirtualQuery (p, information, size);
+		return err::complete (result);
+	}
+
+	bool
+	query (MEMORY_BASIC_INFORMATION* information)
+	{
+		return query (information, m_p, m_size);
+	}
+};
+
+//.............................................................................
+
+} // namespace win
+} // namespace mem
+} // namespace axl

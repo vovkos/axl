@@ -169,6 +169,32 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# mem_win folder
+#
+
+set (
+	MEM_WIN_H_LIST
+	${AXL_INC_DIR}/axl_mem_win_VirtualMemory.h
+	)
+
+set (
+	MEM_WIN_CPP_LIST
+	axl_mem_win_VirtualMemory.cpp
+	)
+
+source_group (
+	mem_win
+	FILES
+	${MEM_WIN_H_LIST}
+	${MEM_WIN_CPP_LIST}
+	)
+
+if (NOT WIN32)
+	exclude_from_build (${MEM_WIN_CPP_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # mt folder
 #
 
@@ -456,6 +482,8 @@ add_library (
 	${LEX_CPP_LIST}
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
+	${MEM_WIN_H_LIST}
+	${MEM_WIN_CPP_LIST}
 	${MT_H_LIST}
 	${MT_CPP_LIST}
 	${MT_PSX_H_LIST}
