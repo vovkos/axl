@@ -155,7 +155,7 @@ public:
 
 		if (src.m_p)
 		{
-			if (src.getHdr ()->getFree () == (mem::FFree*) -1)
+			if (src.getHdr ()->getFree () == (FreeFunc*) -1)
 				return copy (src.m_p);
 
 			src.getHdr ()->addRef ();
@@ -200,8 +200,8 @@ public:
 
 		Hdr* oldHdr = getHdr ();
 
-		mem::FFree* pfFree = kind == ref::BufKind_Static ? NULL : (mem::FFree*) -1;
-		Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, pfFree);
+		FreeFunc* freeFunc = kind == ref::BufKind_Static ? NULL : (FreeFunc*) -1;
+		Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, freeFunc);
 		newHdr->m_bufferSize = size - sizeof (Hdr);
 
 		m_p = (T*) (newHdr + 1);
@@ -212,7 +212,7 @@ public:
 		if (oldHdr)
 			oldHdr->release ();
 	}
-
+		
 	bool 
 	ensureExclusive ()
 	{ 

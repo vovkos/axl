@@ -14,38 +14,38 @@ AnsiAttrParser::parse (
 	size_t length
 	)
 {
-	static SetAttrProc setAttrProcTable [108] = { 0 };
+	static SetAttrFuncPtr setAttrFuncTable [108] = { 0 };
 	static bool once = false;
 
 	if (!once) // no need to use mt::callOnce here
 	{
-		setAttrProcTable [0] = &AnsiAttrParser::clear;
-		setAttrProcTable [1] = &AnsiAttrParser::setBoldOn;
-		setAttrProcTable [3] = &AnsiAttrParser::setItalicOn;
-		setAttrProcTable [4] = &AnsiAttrParser::setUnderlineOn;
+		setAttrFuncTable [0] = &AnsiAttrParser::clear;
+		setAttrFuncTable [1] = &AnsiAttrParser::setBoldOn;
+		setAttrFuncTable [3] = &AnsiAttrParser::setItalicOn;
+		setAttrFuncTable [4] = &AnsiAttrParser::setUnderlineOn;
 
 		for (size_t i = 10; i < 20; i++)
-			setAttrProcTable [i] = &AnsiAttrParser::setFont;
+			setAttrFuncTable [i] = &AnsiAttrParser::setFont;
 
-		setAttrProcTable [22] = &AnsiAttrParser::setBoldOff;
-		setAttrProcTable [23] = &AnsiAttrParser::setItalicOff;
-		setAttrProcTable [24] = &AnsiAttrParser::setUnderlineOff;
+		setAttrFuncTable [22] = &AnsiAttrParser::setBoldOff;
+		setAttrFuncTable [23] = &AnsiAttrParser::setItalicOff;
+		setAttrFuncTable [24] = &AnsiAttrParser::setUnderlineOff;
 
 		for (size_t i = 30; i < 38; i++)
-			setAttrProcTable [i] = &AnsiAttrParser::setTextColor;
+			setAttrFuncTable [i] = &AnsiAttrParser::setTextColor;
 
-		setAttrProcTable [39] = &AnsiAttrParser::setBaseTextColor;
+		setAttrFuncTable [39] = &AnsiAttrParser::setBaseTextColor;
 
 		for (size_t i = 40; i < 48; i++)
-			setAttrProcTable [i] = &AnsiAttrParser::setBackColor;
+			setAttrFuncTable [i] = &AnsiAttrParser::setBackColor;
 
-		setAttrProcTable [49] = &AnsiAttrParser::setBaseBackColor;
+		setAttrFuncTable [49] = &AnsiAttrParser::setBaseBackColor;
 
 		for (size_t i = 90; i < 98; i++)
-			setAttrProcTable [i] = &AnsiAttrParser::setBrightTextColor;
+			setAttrFuncTable [i] = &AnsiAttrParser::setBrightTextColor;
 
 		for (size_t i = 100; i < 108; i++)
-			setAttrProcTable [i] = &AnsiAttrParser::setBrightBackColor;
+			setAttrFuncTable [i] = &AnsiAttrParser::setBrightBackColor;
 
 		once = true;
 	}
@@ -69,11 +69,11 @@ AnsiAttrParser::parse (
 
 		attrCount++;
 
-		if (attr < countof (setAttrProcTable))
+		if (attr < countof (setAttrFuncTable))
 		{
-			SetAttrProc setAttrProc = setAttrProcTable [attr];
-			if (setAttrProc)
-				(this->*setAttrProc) (attr);
+			SetAttrFuncPtr setAttrFunc = setAttrFuncTable [attr];
+			if (setAttrFunc)
+				(this->*setAttrFunc) (attr);
 		}
 
 		p = attrEnd;

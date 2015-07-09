@@ -73,10 +73,10 @@ public:
 		void* p, 
 		dword_t size, 
 		OVERLAPPED* overlapped,
-		LPOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
 		) const
 	{
-		bool_t result = ::ReadFileEx (m_h, p, size, overlapped, pfOnComplete);
+		bool_t result = ::ReadFileEx (m_h, p, size, overlapped, completionFunc);
 		return completeAsyncRequest (result, overlapped);
 	}
 
@@ -85,10 +85,10 @@ public:
 		const void* p, 
 		dword_t size,
 		OVERLAPPED* overlapped,
-		LPOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
 		)
 	{
-		bool_t result = ::WriteFileEx (m_h, p, size, overlapped, pfOnComplete);
+		bool_t result = ::WriteFileEx (m_h, p, size, overlapped, completionFunc);
 		return completeAsyncRequest (result, overlapped);
 	}
 };

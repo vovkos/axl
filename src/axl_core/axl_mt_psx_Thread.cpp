@@ -13,13 +13,13 @@ namespace psx {
 bool
 Thread::create (
 	const pthread_attr_t* attr,
-	FThreadProc pfThreadProc,
+	ThreadFunc* threadFunc,
 	void* context
 	)
 {
 	detach ();
 
-	int result = ::pthread_create (&m_threadId, attr, pfThreadProc, context);
+	int result = ::pthread_create (&m_threadId, attr, threadFunc, context);
 	if (result != 0)
 		return err::fail (result);
 

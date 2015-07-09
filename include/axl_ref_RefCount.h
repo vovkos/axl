@@ -14,6 +14,12 @@ namespace ref {
 
 //.............................................................................
 
+typedef 
+void 
+FreeFunc (void* p);
+
+//.............................................................................
+
 // CRefCount decouples destruction and freeing but not in a traditional vtable way
 // this is done to allow overriding allocation at run-time.
 
@@ -23,7 +29,7 @@ namespace ref {
 // -creating ref-counted objects on member fields buffers (be sure to make container non-copiable)
 // -creating ref-counted objects on static/stack buffers
 
-// pfFree could be set to values -10..-1, NULL 
+// freeFunc could be set to values -10..-1, NULL 
 // these constants result in no built-in deallocation in CRefCount::WeakRelease ()
 // could be used as marker for special kinds of deallocation or reference counting
 
@@ -38,8 +44,8 @@ protected:
 	volatile int32_t m_weakRefCount;
 
 	void* m_object;
-	mem::FFree* m_pfDestruct;
-	mem::FFree* m_pfFree;
+	FreeFunc* m_destructFunc;
+	FreeFunc* m_freeFunc;
 
 public:
 	RefCount ();
@@ -52,8 +58,8 @@ public:
 	void
 	setTarget (
 		void* object,
-		mem::FFree* pfDestruct,
-		mem::FFree* pfFree
+		FreeFunc* destructFunc,
+		FreeFunc* freeFunc
 		);
 
 	size_t
@@ -74,16 +80,16 @@ public:
 		return m_object;
 	}
 
-	mem::FFree*
+	FreeFunc*
 	getDestruct ()
 	{
-		return m_pfDestruct;
+		return m_destructFunc;
 	}
 
-	mem::FFree*
+	FreeFunc*
 	getFree ()
 	{
-		return m_pfFree;
+		return m_freeFunc;
 	}
 
 	size_t

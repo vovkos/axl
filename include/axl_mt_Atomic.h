@@ -17,6 +17,13 @@ namespace mt {
 
 inline
 int32_t
+atomicLoad (volatile int32_t* p)
+{
+	return *p;
+}
+
+inline
+int32_t
 atomicXchg (
 	volatile int32_t* p,
 	int32_t value
@@ -84,6 +91,110 @@ atomicDec (volatile int64_t* p)
 {
 	return ::InterlockedDecrement64 (p);
 }
+
+#if (_AXL_PTR_BITNESS == 64)
+
+inline
+int64_t
+atomicLoad (volatile int64_t* p)
+{
+	return *p;
+}
+
+inline
+size_t
+atomicLoad (volatile size_t* p)
+{
+	return *p;
+}
+
+inline
+size_t
+atomicXchg (
+	volatile size_t* p,
+	size_t value
+	)	
+{
+	return ::InterlockedExchange64 ((int64_t*) p, value);
+}
+
+inline
+size_t
+atomicCmpXchg (
+	volatile size_t* p,
+	size_t cmpValue,
+	size_t newValue
+	)	
+{
+	return ::InterlockedCompareExchange64 ((int64_t*) p, newValue, cmpValue); // inverse order!
+}
+
+inline
+size_t
+atomicInc (volatile size_t* p)	
+{
+	return ::InterlockedIncrement64 ((int64_t*) p);
+}
+
+inline
+size_t
+atomicDec (volatile size_t* p)	
+{
+	return ::InterlockedDecrement64 ((int64_t*) p);
+}
+
+#else
+
+inline
+int64_t
+atomicLoad (volatile int64_t* p)
+{
+	return ::InterlockedCompareExchange64 (p, 0, 0); // any value will do
+}
+
+inline
+size_t
+atomicLoad (volatile size_t* p)
+{
+	return *p;
+}
+
+inline
+size_t
+atomicXchg (
+	volatile size_t* p,
+	size_t value
+	)	
+{
+	return ::InterlockedExchange ((long*) p, value);
+}
+
+inline
+size_t
+atomicCmpXchg (
+	volatile size_t* p,
+	size_t cmpValue,
+	size_t newValue
+	)	
+{
+	return ::InterlockedCompareExchange ((long*) p, newValue, cmpValue); // inverse order!
+}
+
+inline
+size_t
+atomicInc (volatile size_t* p)	
+{
+	return ::InterlockedIncrement ((long*) p);
+}
+
+inline
+size_t
+atomicDec (volatile size_t* p)	
+{
+	return ::InterlockedDecrement ((long*) p);
+}
+
+#endif
 
 #elif (_AXL_CPP == AXL_CPP_GCC)
 

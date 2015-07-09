@@ -18,13 +18,13 @@ struct LongJmpTry
 	jmp_buf m_jmpBuf;
 };
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_MT_BEGIN_LONG_JMP_TRY() \
 { \
-	axl::mt::LongJmpTry longJmpTry; \
-	axl::mt::LongJmpTry* prevLongJmpTry = axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (&longJmpTry); \
-	int branch = setjmp (longJmpTry.m_jmpBuf); \
+	axl::mt::LongJmpTry __axlLongJmpTry; \
+	axl::mt::LongJmpTry* __axlPrevLongJmpTry = axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (&__axlLongJmpTry); \
+	int branch = setjmp (__axlLongJmpTry.m_jmpBuf); \
 	if (!branch) \
 	{
 
@@ -32,14 +32,17 @@ struct LongJmpTry
 	} \
 	else \
 	{ \
-		axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (prevLongJmpTry);
+		{ \
+			axl::mt::LongJmpTry* prev = axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (__axlPrevLongJmpTry); \
+			ASSERT (prev == &__axlLongJmpTry); \
+		}
 
 #define AXL_MT_END_LONG_JMP_TRY() \
 	} \
-	axl::mt::LongJmpTry* currentLongJmpTry = axl::mt::getTlsSlotValue <axl::mt::LongJmpTry> (); \
-	ASSERT (currentLongJmpTry == &longJmpTry || currentLongJmpTry == prevLongJmpTry); \
-	if (currentLongJmpTry == &longJmpTry) \
-		axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (prevLongJmpTry); \
+	{ \
+		axl::mt::LongJmpTry* prev = axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (__axlPrevLongJmpTry); \
+		ASSERT (prev == &__axlLongJmpTry || prev == __axlPrevLongJmpTry); \
+	} \
 }
 
 #define AXL_MT_LONG_JMP_THROW() \

@@ -85,11 +85,11 @@ public:
 		Ptr <T>
 		operator () (
 			void* p,
-			mem::FFree* pfFree
+			FreeFunc* freeFunc
 			)
 		{
 			new (p) T;
-			((T*) p)->setTarget (p, &rtl::Type <T>::destruct, pfFree);
+			((T*) p)->setTarget (p, &rtl::Type <T>::destruct, freeFunc);
 			return (T*) p;
 		}
 	};
@@ -99,10 +99,10 @@ public:
 	Ptr <T>
 	operatorNew (
 		void* p,
-		mem::FFree* pfFree
+		FreeFunc* freeFunc
 		)
 	{
-		return New () (p, pfFree);
+		return New () (p, freeFunc);
 	}
 };
 
@@ -126,8 +126,8 @@ public:
 
 #endif
 
-#define AXL_REF_NEW_INPLACE(Class, p, pfFree) \
-	axl::ref::InPlaceFactory <Class>::operatorNew (p, pfFree)
+#define AXL_REF_NEW_INPLACE(Class, p, freeFunc) \
+	axl::ref::InPlaceFactory <Class>::operatorNew (p, freeFunc)
 
 //.............................................................................
 

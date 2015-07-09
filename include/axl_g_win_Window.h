@@ -213,14 +213,14 @@ protected:
 			wndClass.hCursor = ::LoadCursor (NULL, MAKEINTRESOURCE (T::classCursor));
 			wndClass.hbrBackground = (HBRUSH) (T::classBackground + 1);
 			wndClass.hInstance = g::getModule ()->getModuleHandle ();
-			wndClass.lpfnWndProc = &_WindowProc;
+			wndClass.lpfnWndProc = &osWindowProc;
 			wndClass.cbWndExtra = sizeof (T*);				
 			wndClass.lpszClassName = T::getClassName ();
 
 			if (!wndClass.lpszClassName)
 			{
 				static wchar_t className [64] = { 0 };
-				_snwprintf (className, countof (className) - 1, L"axl:%x", &_WindowProc);
+				_snwprintf (className, countof (className) - 1, L"axl:%x", &osWindowProc);
 				wndClass.lpszClassName = className;
 			}; 
 
@@ -241,14 +241,14 @@ protected:
 	// subclass
 
 	exe::Thunk* m_subclassWindowThunk;
-	WNDPROC m_pfOriginalWindowProc;
+	WNDPROC m_prevWindowProc;
 
 public:
 	WindowImpl ()
 	{		
 		m_windowState = WindowState_Idle;
 		m_subclassWindowThunk = NULL;
-		m_pfOriginalWindowProc = NULL;
+		m_prevWindowProc = NULL;
 	}
 
 	~WindowImpl ()
@@ -339,13 +339,13 @@ public:
 	{
 		detach ();
 
-		m_subclassWindowThunk = exe::createThunk (_SubclassWindowProc, static_cast <T*> (this));
+		m_subclassWindowThunk = exe::createThunk (osSubclassWindowProc, static_cast <T*> (this));
 		if (!m_subclassWindowThunk)
 			return false;
 
 		m_h = hWnd;
 		m_windowState = WindowState_Subclassed;
-		m_pfOriginalWindowProc = (WNDPROC) ::SetWindowLongPtr (hWnd, GWLP_WNDPROC, (LONG_PTR) m_subclassWindowThunk);	
+		m_prevWindowProc = (WNDPROC) ::SetWindowLongPtr (hWnd, GWLP_WNDPROC, (LONG_PTR) m_subclassWindowThunk);	
 		return true;
 	}
 	
@@ -364,7 +364,7 @@ public:
 		)
 	{
 		return m_windowState == WindowState_Subclassed ? 
-			::CallWindowProc (m_pfOriginalWindowProc, m_h, msg, wParam, lParam) :
+			::CallWindowProc (m_prevWindowProc, m_h, msg, wParam, lParam) :
 			::DefWindowProc (m_h, msg, wParam, lParam);
 	}
 
@@ -374,7 +374,7 @@ protected:
 	{
 		HWND hWnd = m_h;
 
-		WNDPROC pfPrev;
+		WNDPROC prevWindowProc;
 
 		switch (m_windowState)
 		{
@@ -385,14 +385,14 @@ protected:
 			break;
 
 		case WindowState_Internal:
-			ASSERT (doDrop); // should only be called from _WindowProc::WM_NCDESTROY
+			ASSERT (doDrop); // should only be called from osWindowProc::WM_NCDESTROY
 			break;
 
 		case WindowState_Normal:
 			if (!doDrop)
 			{
-				pfPrev = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) ::defWindowProc);
-				ASSERT (pfPrev == (WNDPROC) &_WindowProc); // check if anybody has subclassed us
+				prevWindowProc = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) ::defWindowProc);
+				ASSERT (prevWindowProc == (WNDPROC) osWindowProc); // check if anybody has subclassed us
 				setWindowLongPtr (0, NULL);
 			}
 
@@ -403,13 +403,13 @@ protected:
 
 			if (!doDrop)
 			{
-				pfPrev = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) m_pfOriginalWindowProc);
-				ASSERT (pfPrev == (WNDPROC) m_subclassWindowThunk); // check if anybody has over-subclassed us
+				prevWindowProc = (WNDPROC) setWindowLongPtr (GWLP_WNDPROC, (LONG_PTR) m_prevWindowProc);
+				ASSERT (prevWindowProc == (WNDPROC) m_subclassWindowThunk); // check if anybody has over-subclassed us
 			}
 
 			AXL_MEM_FREE (m_subclassWindowThunk);
 			m_subclassWindowThunk = NULL;
-			m_pfOriginalWindowProc = NULL;
+			m_prevWindowProc = NULL;
 			break;
 		}
 
@@ -439,7 +439,7 @@ protected:
 	static 
 	LRESULT 
 	WINAPI
-	_WindowProc (
+	osWindowProc (
 		HWND hWnd,
 		UINT msg, 
 		WPARAM wParam, 
@@ -489,7 +489,7 @@ protected:
 	static 
 	LRESULT 
 	WINAPI
-	_SubclassWindowProc (
+	osSubclassWindowProc (
 		T* self, // HWND gonna be replaced with T* by thunk proc
 		UINT msg, 
 		WPARAM wParam, 

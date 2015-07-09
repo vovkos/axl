@@ -66,4 +66,3 @@ getSingleton (volatile int32_t* flag = NULL)
 
 } // namespace rtl
 } // namespace axl
-

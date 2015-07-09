@@ -1343,13 +1343,12 @@ public:
 
 	~Gc ()
 	{
-
 	}
 
 	void
 	gcSafePoint ()
 	{
-		*(volatile int*) m_guardPage.p () = 0;
+		mt::atomicXchg ((volatile int*) m_guardPage.p (), 0);
 	}
 
 	void
@@ -1440,7 +1439,7 @@ public:
 	}
 
 	void
-	threadProc ()
+	threadFunc ()
 	{
 		uint64_t threadId = mt::getCurrentThreadId ();
 

@@ -151,7 +151,7 @@ Socket::wsaSend (
 	dword_t size,
 	dword_t* actualSize,
 	WSAOVERLAPPED* overlapped,
-	LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
 {
 	ASSERT (isOpen ());
@@ -160,7 +160,7 @@ Socket::wsaSend (
 	buf.buf = (char*) p;
 	buf.len = size;
 
-	int result = ::WSASend (m_h, &buf, 1, actualSize, 0, overlapped, pfOnComplete);
+	int result = ::WSASend (m_h, &buf, 1, actualSize, 0, overlapped, completionFunc);
 	return completeAsyncRequest (result, WSA_IO_PENDING);
 }
 
@@ -170,7 +170,7 @@ Socket::wsaRecv (
 	dword_t size,
 	dword_t* actualSize,
 	WSAOVERLAPPED* overlapped,
-	LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
 {
 	ASSERT (isOpen ());
@@ -181,7 +181,7 @@ Socket::wsaRecv (
 
 	dword_t flags = 0;
 
-	int result = ::WSARecv (m_h, &buf, 1, actualSize, &flags, overlapped, pfOnComplete);
+	int result = ::WSARecv (m_h, &buf, 1, actualSize, &flags, overlapped, completionFunc);
 	return completeAsyncRequest (result, WSA_IO_PENDING);
 }
 
@@ -192,7 +192,7 @@ Socket::wsaSendTo (
 	dword_t* actualSize,
 	const sockaddr* addr,
 	WSAOVERLAPPED* overlapped,
-	LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
 {
 	ASSERT (isOpen ());
@@ -210,7 +210,7 @@ Socket::wsaSendTo (
 		addr, 
 		getSockAddrSize (addr), 
 		overlapped, 
-		pfOnComplete
+		completionFunc
 		);
 
 	return completeAsyncRequest (result, WSA_IO_PENDING);
@@ -223,7 +223,7 @@ Socket::wsaRecvFrom (
 	dword_t* actualSize,
 	SockAddr* addr,
 	WSAOVERLAPPED* overlapped,
-	LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
 {
 	ASSERT (isOpen ());
@@ -244,7 +244,7 @@ Socket::wsaRecvFrom (
 		(sockaddr*) addr, 
 		addr ? &addrSize : NULL, 
 		overlapped, 
-		pfOnComplete
+		completionFunc
 		);
 
 	return completeAsyncRequest (result, WSA_IO_PENDING);
@@ -259,7 +259,7 @@ Socket::wsaIoctl (
 	dword_t outBufferSize,
 	dword_t* actualSize,
 	WSAOVERLAPPED* overlapped,
-	LPWSAOVERLAPPED_COMPLETION_ROUTINE pfOnComplete
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
 {
 	ASSERT (isOpen ());
@@ -273,7 +273,7 @@ Socket::wsaIoctl (
 		outBufferSize,
 		actualSize,
 		overlapped, 
-		pfOnComplete
+		completionFunc
 		);
 
 	return completeAsyncRequest (result, WSA_IO_PENDING);

@@ -147,19 +147,18 @@ public:
 	static
 	bool
 	query (
-		MEMORY_BASIC_INFORMATION* information,
 		void* p,
-		size_t size
+		MEMORY_BASIC_INFORMATION* information
 		)
 	{
-		bool_t result = ::VirtualQuery (p, information, size);
-		return err::complete (result);
+		size_t result = ::VirtualQuery (p, information, sizeof (MEMORY_BASIC_INFORMATION));
+		return err::complete (result != 0);
 	}
 
 	bool
 	query (MEMORY_BASIC_INFORMATION* information)
 	{
-		return query (information, m_p, m_size);
+		return query (m_p, information);
 	}
 };
 

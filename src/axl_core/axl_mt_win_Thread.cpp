@@ -11,7 +11,7 @@ bool
 Thread::create (
 	SECURITY_ATTRIBUTES* secAttr,
 	size_t stackSize,
-	PTHREAD_START_ROUTINE pfThreadProc,
+	PTHREAD_START_ROUTINE threadFunc,
 	void* context,
 	uint_t flags
 	)
@@ -19,7 +19,7 @@ Thread::create (
 	close ();
 
 	dword_t threadId;
-	m_h = ::CreateThread (secAttr, stackSize, pfThreadProc, context, flags, &threadId);
+	m_h = ::CreateThread (secAttr, stackSize, threadFunc, context, flags, &threadId);
 	return err::complete (m_h != NULL);
 }
 

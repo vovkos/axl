@@ -14,20 +14,20 @@ RefCount::RefCount ()
 	m_refCount = 0;
 	m_weakRefCount = 1;
 	m_object = NULL;
-	m_pfDestruct = NULL;
-	m_pfFree = NULL;
+	m_destructFunc = NULL;
+	m_freeFunc = NULL;
 }
 
 void
 RefCount::setTarget (
 	void* object,
-	mem::FFree* pfDestruct,
-	mem::FFree* pfFree
+	FreeFunc* destructFunc,
+	FreeFunc* freeFunc
 	)
 {
 	m_object = object;
-	m_pfDestruct = pfDestruct;
-	m_pfFree = pfFree;
+	m_destructFunc = destructFunc;
+	m_freeFunc = freeFunc;
 }
 
 size_t
@@ -37,8 +37,8 @@ RefCount::release ()
 	 
 	if (!refCount)
 	{
-		if (m_pfDestruct)
-			m_pfDestruct (m_object);
+		if (m_destructFunc)
+			m_destructFunc (m_object);
 
 		weakRelease (); 
 
@@ -54,8 +54,8 @@ RefCount::weakRelease ()
 {
 	int32_t refCount = mt::atomicDec (&m_weakRefCount);
 
-	if (!refCount && m_pfFree != NULL && (size_t) m_pfFree < -10)
-		m_pfFree (m_object);
+	if (!refCount && m_freeFunc != NULL && (size_t) m_freeFunc < -10)
+		m_freeFunc (m_object);
 
 	return (uint32_t) refCount;
 }

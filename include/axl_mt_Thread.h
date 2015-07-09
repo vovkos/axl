@@ -46,7 +46,7 @@ public:
 	bool
 	start ()
 	{
-		return m_thread.create (NULL, 0, threadProc, (T*) this, 0);
+		return m_thread.create (NULL, 0, threadFunc, (T*) this, 0);
 	}
 
 	void
@@ -70,9 +70,9 @@ protected:
 	static
 	dword_t
 	WINAPI
-	threadProc (void* context)
+	threadFunc (void* context)
 	{
-		((T*) context)->threadProc ();
+		((T*) context)->threadFunc ();
 		return 0;
 	}
 };
@@ -117,7 +117,7 @@ public:
 	bool
 	start ()
 	{
-		return m_thread.create (threadProc, (T*) this);
+		return m_thread.create (threadFunc, (T*) this);
 	}
 
 	void
@@ -134,9 +134,9 @@ public:
 protected:
 	static
 	void*
-	threadProc (void* context)
+	threadFunc (void* context)
 	{
-		((T*) context)->threadProc ();
+		((T*) context)->threadFunc ();
 		return NULL;
 	}
 };

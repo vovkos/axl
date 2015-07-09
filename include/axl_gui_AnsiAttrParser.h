@@ -15,12 +15,12 @@ namespace gui {
 
 class AnsiAttrParser
 {
-	friend class InitSetAttrProcTable;
+	friend class InitSetAttrFuncTable;
 
 protected:
 	typedef 
 	void
-	(AnsiAttrParser::*SetAttrProc) (uint_t);
+	(AnsiAttrParser::*SetAttrFuncPtr) (uint_t);
 
 protected:
 	TextAttr* m_targetAttr;

@@ -21,7 +21,7 @@ public:
 	create (
 		SECURITY_ATTRIBUTES* secAttr,
 		size_t stackSize,
-		PTHREAD_START_ROUTINE pfThreadProc,
+		PTHREAD_START_ROUTINE threadFunc,
 		void* context,
 		uint_t flags
 		);

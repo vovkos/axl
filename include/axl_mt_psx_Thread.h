@@ -73,7 +73,9 @@ public:
 
 //.............................................................................
 
-typedef void* (FThreadProc) (void* context);
+typedef 
+void* 
+ThreadFunc (void* context);
 
 //.............................................................................
 
@@ -108,17 +110,17 @@ public:
 	bool
 	create (
 		const pthread_attr_t* attr,
-		FThreadProc pfThreadProc,
+		ThreadFunc* threadFunc,
 		void* context = NULL
 		);
 
 	bool
 	create (
-		FThreadProc pfThreadProc,
+		ThreadFunc* threadFunc,
 		void* context = NULL
 		)
 	{
-		return create (NULL, pfThreadProc, context);
+		return create (NULL, threadFunc, context);
 	}
 
 	bool

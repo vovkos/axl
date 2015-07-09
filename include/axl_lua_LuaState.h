@@ -144,29 +144,29 @@ public:
 
 	void
 	pushClosure (
-		lua_CFunction pf,
+		lua_CFunction func,
 		size_t contextArgumentCount
 		)
 	{
 		ASSERT (isOpen ());
-		lua_pushcclosure (m_h, pf, contextArgumentCount);
+		lua_pushcclosure (m_h, func, contextArgumentCount);
 	}	
 
 	void
-	pushFunction (lua_CFunction pf)
+	pushFunction (lua_CFunction func)
 	{
 		ASSERT (isOpen ());
-		lua_pushcfunction (m_h, pf);
+		lua_pushcfunction (m_h, func);
 	}	
 
 	void
 	pushFunction (
-		lua_CFunction pf,
+		lua_CFunction func,
 		intptr_t context
 		)
 	{
 		pushInteger (context);
-		pushClosure (pf, 1);
+		pushClosure (func, 1);
 	}
 
 	void
@@ -410,21 +410,21 @@ public:
 	void
 	registerFunction (
 		const char* name,
-		lua_CFunction pf
+		lua_CFunction func
 		)
 	{
-		pushFunction (pf);
+		pushFunction (func);
 		setGlobal (name);
 	}
 
 	void
 	registerFunction (
 		const char* name,
-		lua_CFunction pf,
+		lua_CFunction func,
 		intptr_t context
 		)
 	{
-		pushFunction (pf, context);
+		pushFunction (func, context);
 		setGlobal (name);
 	}
 

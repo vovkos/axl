@@ -7,23 +7,27 @@ namespace err {
 
 //.............................................................................
 
+typedef 
+dword_t 
+WINAPI
+RtlNtStatusToDosErrorFunc (NTSTATUS);
+
 rtl::String 
 NtErrorProvider::getErrorDescription (NTSTATUS status)
 {
-	typedef dword_t (WINAPI* FRtlNtStatusToDosError) (NTSTATUS);
-	static FRtlNtStatusToDosError _pfRtlNtStatusToDosError = NULL;
+	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = NULL;
 
-	if (!_pfRtlNtStatusToDosError) // no need in interlockedcmpxcg -- the worst thing is pf gets overwritten
+	if (!rtlNtStatusToDosErrorFunc) // no need in interlockedcmpxcg -- the worst thing might happen is ptr gets overwritten
 	{
-		HMODULE hNtDll = ::GetModuleHandleW (L"ntdll.dll");
-		if (hNtDll)
-			_pfRtlNtStatusToDosError = (FRtlNtStatusToDosError) ::GetProcAddress (hNtDll, "RtlNtStatusToDosError");
+		HMODULE ntDll = ::GetModuleHandleW (L"ntdll.dll");
+		if (ntDll)
+			rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress (ntDll, "RtlNtStatusToDosError");
 		
-		if (!_pfRtlNtStatusToDosError)
+		if (!rtlNtStatusToDosErrorFunc)
 			return rtl::String::format_s ("ntstatus #%x", status);
 	}
 
-	dword_t winError = _pfRtlNtStatusToDosError (status);
+	dword_t winError = rtlNtStatusToDosErrorFunc (status);
 	if (winError == ERROR_MR_MID_NOT_FOUND)
 		return rtl::String::format_s ("ntstatus #%x", status);
 
