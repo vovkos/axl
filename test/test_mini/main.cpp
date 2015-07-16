@@ -1357,7 +1357,7 @@ main (
 #endif
 	
 //	testUsb ();
-	testSuspendThread ();
+//	testSuspendThread ();
 	return 0;
 }
 
