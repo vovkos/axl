@@ -12,6 +12,7 @@
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include <netdb.h>
 #	include <signal.h>
+#	include <ucontext.h>
 #endif
 
 #ifdef _AXL_IO_USB

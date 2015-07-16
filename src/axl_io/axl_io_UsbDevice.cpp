@@ -110,11 +110,11 @@ UsbDeviceList::enumerateDevices (libusb_context* context)
 //.............................................................................
 
 size_t
-UsbDevice::getMaxPacketSize (size_t endpoint)
+UsbDevice::getMaxPacketSize (uint_t endpointId)
 {
 	ASSERT (m_device);
 	
-	int result = libusb_get_max_packet_size (m_device, (uchar_t) endpoint);
+	int result = libusb_get_max_packet_size (m_device, (uchar_t) endpointId);
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
@@ -131,11 +131,11 @@ UsbDevice::getPortPath (
 }
 
 size_t
-UsbDevice::getMaxIsoPacketSize (size_t endpoint)
+UsbDevice::getMaxIsoPacketSize (uint_t endpointId)
 {
 	ASSERT (m_device);
 	
-	int result = libusb_get_max_iso_packet_size (m_device, (uchar_t) endpoint);
+	int result = libusb_get_max_iso_packet_size (m_device, (uchar_t) endpointId);
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
@@ -189,52 +189,52 @@ UsbDevice::open (
 	return m_openHandle ? true : err::fail (err::Error (err::SystemErrorCode_ObjectNameNotFound));
 }
 
-int
+uint_t
 UsbDevice::getConfiguration ()
 {
 	ASSERT (m_openHandle);
 
-	int configuration;
-	int result = libusb_get_configuration (m_openHandle, &configuration);
-	return result == 0 ? configuration : err::fail <int> (-1, UsbError (result));
+	int configurationId;
+	int result = libusb_get_configuration (m_openHandle, &configurationId);
+	return result == 0 ? configurationId : err::fail <uint_t> (-1, UsbError (result));
 }
 
 bool
-UsbDevice::setConfiguration (size_t configuration)
+UsbDevice::setConfiguration (uint_t configurationId)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_set_configuration (m_openHandle, configuration);
+	int result = libusb_set_configuration (m_openHandle, configurationId);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-UsbDevice::claimInterface (size_t iface)
+UsbDevice::claimInterface (uint_t ifaceId)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_claim_interface (m_openHandle, iface);
+	int result = libusb_claim_interface (m_openHandle, ifaceId);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-UsbDevice::releaseInterface (size_t iface)
+UsbDevice::releaseInterface (uint_t ifaceId)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_release_interface (m_openHandle, iface);
+	int result = libusb_release_interface (m_openHandle, ifaceId);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
 UsbDevice::setInterfaceAltSetting (
-	size_t iface,
-	size_t altSetting
+	uint_t ifaceId,
+	uint_t altSettingId
 	)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_set_interface_alt_setting (m_openHandle, iface, altSetting);
+	int result = libusb_set_interface_alt_setting (m_openHandle, ifaceId, altSettingId);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
@@ -257,36 +257,36 @@ UsbDevice::resetDevice ()
 }
 
 bool
-UsbDevice::isKernelDriverActive (size_t iface)
+UsbDevice::isKernelDriverActive (uint_t ifaceId)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_kernel_driver_active (m_openHandle, iface);
+	int result = libusb_kernel_driver_active (m_openHandle, ifaceId);
 	return result == 1;
 }
 
 bool
-UsbDevice::attachKernelDriver (size_t iface)
+UsbDevice::attachKernelDriver (uint_t ifaceId)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_attach_kernel_driver (m_openHandle, iface);
+	int result = libusb_attach_kernel_driver (m_openHandle, ifaceId);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
-UsbDevice::detachKernelDriver (size_t iface)
+UsbDevice::detachKernelDriver (uint_t ifaceId)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_detach_kernel_driver (m_openHandle, iface);
+	int result = libusb_detach_kernel_driver (m_openHandle, ifaceId);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
 bool
 UsbDevice::getDescriptor (
-	libusb_descriptor_type type, 
-	size_t index,
+	libusb_descriptor_type descriptorType, 
+	uint_t descriptorId,
 	rtl::Array <char>* descriptor
 	)
 {
@@ -301,8 +301,8 @@ UsbDevice::getDescriptor (
 	{
 		int result = libusb_get_descriptor (
 			m_openHandle, 
-			(uint8_t) type, 
-			(uint8_t) index, 
+			(uint8_t) descriptorType, 
+			(uint8_t) descriptorId, 
 			(uchar_t*) descriptor->a (), 
 			size
 			);
@@ -335,14 +335,14 @@ UsbDevice::getDeviceDescriptor (libusb_device_descriptor* descriptor)
 
 bool
 UsbDevice::getConfigDescriptor (
-	size_t configuration,
+	uint_t configurationId,
 	UsbConfigDescriptor* desc
 	)
 {
 	ASSERT (m_device);
 
 	libusb_config_descriptor* buffer;
-	int result = libusb_get_config_descriptor (m_device, configuration, &buffer);
+	int result = libusb_get_config_descriptor (m_device, configurationId, &buffer);
 	if (result != 0)
 		return err::fail (UsbError (result));
 
@@ -366,7 +366,7 @@ UsbDevice::getActiveConfigDescriptor (UsbConfigDescriptor* desc)
 
 bool
 UsbDevice::getStringDesrciptor (
-	size_t index,
+	uint_t stringId,
 	uint_t langId,
 	rtl::String* string
 	)
@@ -386,7 +386,7 @@ UsbDevice::getStringDesrciptor (
 	{
 		int result = libusb_get_string_descriptor (
 			m_openHandle, 
-			(uint8_t) index, 
+			(uint8_t) stringId, 
 			(uint16_t) langId, 
 			(uchar_t*) p, 
 			length
@@ -411,7 +411,7 @@ UsbDevice::getStringDesrciptor (
 
 bool
 UsbDevice::getStringDesrciptor (
-	size_t index,
+	uint_t stringId,
 	rtl::String* string
 	)
 {
@@ -430,7 +430,7 @@ UsbDevice::getStringDesrciptor (
 	{
 		int result = libusb_get_string_descriptor_ascii (
 			m_openHandle, 
-			(uint8_t) index, 
+			(uint8_t) stringId, 
 			(uchar_t*) p, 
 			length
 			);
@@ -457,7 +457,7 @@ UsbDevice::controlTransfer (
 	uint_t requestType,
 	uint_t request,
 	uint_t value,
-	size_t index,
+	uint_t index,
 	void* p,
 	size_t size,
 	uint_t timeout

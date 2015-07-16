@@ -166,10 +166,10 @@ public:
 	}
 
 	size_t
-	getMaxPacketSize (size_t endpoint);
+	getMaxPacketSize (uint_t endpointId);
 
 	size_t
-	getMaxIsoPacketSize (size_t endpoint);
+	getMaxIsoPacketSize (uint_t endpointId);
 	
 	// open-close
 
@@ -209,56 +209,56 @@ public:
 		uint_t productId
 		);
 
-	int
+	uint_t
 	getConfiguration ();
 
 	bool
-	setConfiguration (size_t configuration);
+	setConfiguration (uint_t configurationId);
 
 	bool
-	claimInterface (size_t iface);
+	claimInterface (uint_t ifaceId);
 
 	bool
-	releaseInterface (size_t iface);
+	releaseInterface (uint_t ifaceId);
 
 	bool
 	setInterfaceAltSetting (
-		size_t iface,
-		size_t altSetting
+		uint_t ifaceId,
+		uint_t altSettingId
 		);
 
 	bool
-	clearHalt (size_t endpoint);
+	clearHalt (uint_t endpointId);
 
 	bool
 	resetDevice ();
 
 	bool
-	isKernelDriverActive (size_t iface);
+	isKernelDriverActive (uint_t ifaceId);
 
 	bool
-	attachKernelDriver (size_t iface);
+	attachKernelDriver (uint_t ifaceId);
 
 	bool
-	detachKernelDriver (size_t iface);
+	detachKernelDriver (uint_t ifaceId);
 
 	// descriptors
 
 	rtl::Array <char>
 	getDescriptor (
-		libusb_descriptor_type type, 
-		size_t index
+		libusb_descriptor_type descriptorType, 
+		uint_t descriptorId
 		)
 	{
 		rtl::Array <char> descriptor;
-		getDescriptor (type, index, &descriptor);
+		getDescriptor (descriptorType, descriptorId, &descriptor);
 		return descriptor;
 	}
 	
 	bool
 	getDescriptor (
-		libusb_descriptor_type type, 
-		size_t index,
+		libusb_descriptor_type descriptorType, 
+		uint_t descriptorId,
 		rtl::Array <char>* descriptor
 		);
 
@@ -267,7 +267,7 @@ public:
 
 	bool
 	getConfigDescriptor (
-		size_t configuration,
+		uint_t configurationId,
 		UsbConfigDescriptor* desc
 		);
 
@@ -276,33 +276,33 @@ public:
 
 	rtl::String 
 	getStringDesrciptor (
-		size_t index,
+		uint_t stringId,
 		uint_t langId
 		)
 	{
 		rtl::String string;
-		getStringDesrciptor (index, langId, &string);
+		getStringDesrciptor (stringId, langId, &string);
 		return string;
 	}
 
 	bool
 	getStringDesrciptor (
-		size_t index,
+		uint_t stringId,
 		uint_t langId,
 		rtl::String* string
 		);
 
 	rtl::String 
-	getStringDesrciptor (size_t index)
+	getStringDesrciptor (uint_t stringId)
 	{
 		rtl::String string;
-		getStringDesrciptor (index, &string);
+		getStringDesrciptor (stringId, &string);
 		return string;
 	}
 
 	bool
 	getStringDesrciptor (
-		size_t index,
+		uint_t stringId,
 		rtl::String* string
 		);
 
@@ -311,9 +311,9 @@ public:
 	size_t 
 	controlTransfer (
 		uint_t requestType,
-		uint_t request,
+		uint_t requestId,
 		uint_t value,
-		size_t index,
+		uint_t index,
 		void* p,
 		size_t size,
 		uint_t timeout = -1
@@ -321,7 +321,7 @@ public:
 
 	size_t 
 	bulkTransfer (
-		uint_t endpoint,
+		uint_t endpointId,
 		void* p,
 		size_t size,
 		uint_t timeout = -1
@@ -329,7 +329,7 @@ public:
 
 	size_t 
 	interruptTransfer (
-		uint_t endpoint,
+		uint_t endpointId,
 		void* p,
 		size_t size,
 		uint_t timeout = -1
