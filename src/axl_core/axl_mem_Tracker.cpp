@@ -57,22 +57,15 @@ Tracker::trace ()
 	m_lock.lock ();
 
 	dbg::trace (
-		"Allocated size:\n"
-		"    Current.............................%d B\n"
-		"    Peak................................%d B\n"
-		"    Total...............................%d B\n",
+		"Allocated memory:\n"
+		"    Current.......%d bytes (%d blocks)\n"
+		"    Peak..........%d bytes (%d blocks)\n"
+		"    Total.........%d bytes (%d blocks)\n",
 		m_size,
-		m_peakSize,
-		m_totalSize
-		);
-
-	dbg::trace (
-		"Allocated blocks:\n"
-		"    Current.............................%d\n"
-		"    Peak................................%d\n"
-		"    Total...............................%d\n",
 		m_blockList.getCount (),
+		m_peakSize,
 		m_peakBlockCount,
+		m_totalSize,
 		m_totalBlockCount
 		);
 
