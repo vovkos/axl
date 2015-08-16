@@ -239,11 +239,11 @@ UsbDevice::setInterfaceAltSetting (
 }
 
 bool
-UsbDevice::clearHalt (size_t endpoint)
+UsbDevice::clearHalt (uint_t endpointId)
 {
 	ASSERT (m_openHandle);
 
-	int result = libusb_clear_halt (m_openHandle, (uchar_t) endpoint);
+	int result = libusb_clear_halt (m_openHandle, (uchar_t) endpointId);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 
@@ -481,7 +481,7 @@ UsbDevice::controlTransfer (
 
 size_t 
 UsbDevice::bulkTransfer (
-	uint_t endpoint,
+	uint_t endpointId,
 	void* p,
 	size_t size,
 	uint_t timeout
@@ -492,7 +492,7 @@ UsbDevice::bulkTransfer (
 	int actualSize;
 	int result = libusb_bulk_transfer (
 		m_openHandle,
-		(uchar_t) endpoint, 
+		(uchar_t) endpointId, 
 		(uchar_t*) p, 
 		(int) size, 
 		&actualSize,
@@ -504,7 +504,7 @@ UsbDevice::bulkTransfer (
 
 size_t 
 UsbDevice::interruptTransfer (
-	uint_t endpoint,
+	uint_t endpointId,
 	void* p,
 	size_t size,
 	uint_t timeout
@@ -515,7 +515,7 @@ UsbDevice::interruptTransfer (
 	int actualSize;
 	int result = libusb_interrupt_transfer (
 		m_openHandle,
-		(uchar_t) endpoint, 
+		(uchar_t) endpointId, 
 		(uchar_t*) p, 
 		(int) size, 
 		&actualSize,
