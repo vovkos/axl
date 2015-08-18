@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_MT_TLSSLOT_H
+#define _AXL_MT_LONGJMPTRY_H
 
 #include "axl_mt_TlsSlot.h"
 
@@ -37,12 +37,20 @@ struct LongJmpTry
 			ASSERT (prev == &__axlLongJmpTry); \
 		}
 
-#define AXL_MT_END_LONG_JMP_TRY() \
+#define AXL_MT_END_LONG_JMP_TRY_IMPL() \
 	} \
 	{ \
 		axl::mt::LongJmpTry* prev = axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (__axlPrevLongJmpTry); \
 		ASSERT (prev == &__axlLongJmpTry || prev == __axlPrevLongJmpTry); \
 	} \
+
+#define AXL_MT_END_LONG_JMP_TRY() \
+	AXL_MT_END_LONG_JMP_TRY_IMPL() \
+}
+
+#define AXL_MT_END_LONG_JMP_TRY_EX(result) \
+	AXL_MT_END_LONG_JMP_TRY_IMPL() \
+	*(result) = branch == 0; \
 }
 
 #define AXL_MT_LONG_JMP_THROW() \
