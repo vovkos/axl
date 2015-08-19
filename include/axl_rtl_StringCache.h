@@ -16,11 +16,11 @@ namespace rtl {
 //.............................................................................
 
 template <typename C>
-class StringCache
+class StringCacheBase
 {
 protected:
 	rtl::BoxList <rtl::StringBase <C> > m_symbolList;
-	rtl::StringHashTable <C> m_symbolMap;
+	rtl::StringHashTableBase <C> m_symbolMap;
 	
 public:
 	const C*
@@ -38,8 +38,11 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef StringCache <char>    StringCache;
-typedef StringCache <wchar_t> StringCache_w;
+typedef StringCacheBase <char>    StringCache;
+typedef StringCacheBase <wchar_t> StringCache_w;
+typedef StringCacheBase <utf8_t>  StringCache_utf8;
+typedef StringCacheBase <utf16_t> StringCache_utf16;
+typedef StringCacheBase <utf32_t> StringCache_utf32;
 
 //.............................................................................
 
