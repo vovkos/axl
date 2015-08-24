@@ -226,6 +226,16 @@ atomicXchg (
 }
 
 inline
+size_t
+atomicXchg (
+	volatile size_t* p,
+	size_t value
+	)
+{
+	return __sync_lock_test_and_set (p, value);
+}
+
+inline
 int32_t
 atomicCmpXchg (
 	volatile int32_t* p,
@@ -248,6 +258,17 @@ atomicCmpXchg (
 }
 
 inline
+size_t
+atomicCmpXchg (
+	volatile size_t* p,
+	size_t cmpValue,
+	size_t newValue
+	)
+{
+	return __sync_val_compare_and_swap (p, cmpValue, newValue);
+}
+
+inline
 int32_t
 atomicInc (volatile int32_t* p)	
 {
@@ -262,6 +283,13 @@ atomicInc (volatile int64_t* p)
 }
 
 inline
+size_t
+atomicInc (volatile size_t* p)
+{
+	return __sync_add_and_fetch (p, 1);
+}
+
+inline
 int32_t
 atomicDec (volatile int32_t* p)	
 {
@@ -271,6 +299,13 @@ atomicDec (volatile int32_t* p)
 inline
 int64_t
 atomicDec (volatile int64_t* p)	
+{
+	return __sync_sub_and_fetch (p, 1);
+}
+
+inline
+size_t
+atomicDec (volatile size_t* p)
 {
 	return __sync_sub_and_fetch (p, 1);
 }

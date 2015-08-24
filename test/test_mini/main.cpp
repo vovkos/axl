@@ -1172,9 +1172,6 @@ testUsb ()
 
 #if (_AXL_ENV == AXL_ENV_POSIX)
 
-#include "gcconfig.h"
-
-
 class MyThread: public mt::ThreadImpl <MyThread>
 {
 public:
@@ -1185,7 +1182,8 @@ public:
 		m_terminateFlag = false;
 	}
 
-	void threadProc ()
+	void 
+	threadFunc ()
 	{
 		uint64_t tid = getThreadId ();
 
@@ -1299,8 +1297,6 @@ void testSuspendThread ()
 
 	g::sleep (3000);
 
-	printf ("SIG_SUSPEND = %d\n", SIG_SUSPEND);
-
 	suspendThread (thread2.m_thread);
 	printf ("thread2 is suspended...\n");
 
@@ -1367,7 +1363,7 @@ protected:
 public:
 	Gc ()
 	{
-		m_guardPage = m_guardPage.map (
+		m_guardPage.map (
 			NULL,
 			4 * 1024, // typical page size -- OS will not give us less than that, anyway
 			PROT_READ | PROT_WRITE,
