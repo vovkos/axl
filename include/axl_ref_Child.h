@@ -7,7 +7,7 @@
 #define _AXL_REF_CHILD_H
 
 #include "axl_ref_RefCount.h"
-#include "axl_rtl_Type.h"
+#include "axl_rtl_Func.h"
 
 namespace axl {
 namespace ref {
@@ -25,53 +25,40 @@ class Child
 	AXL_DISABLE_COPY (Child)
 
 protected:
-	struct Hdr
-	{
-		RefCount* m_parent;
-	};
-	
-	class Object: 
-		public Hdr,
-		public T
-	{
-	};
-
-protected:
-	char m_buffer [sizeof (Object) + extra];
+	char m_buffer [sizeof (T) + extra];
 
 public:
 	Child (RefCount* parent)
 	{ 
 		memset (m_buffer, 0, sizeof (m_buffer));
-		Object* object = (Object*) m_buffer;
-		object->setTarget (object, &rtl::Type <Object>::destruct, &free);
-		object->addRef ();
-		parent->addWeakRef ();
+		T* p = AXL_REF_INPLACE_NEW (m_buffer, 0);
+		p->addRef ();
+		p->addWeakRef ();
 	}
 
 	~Child ()
 	{ 
-		getObject ()->release (); 
+		p ()->release (); 
 	}
 	
 	operator T* ()
 	{ 
-		return getObject (); 
+		return p (); 
 	}
 
 	T*
 	operator & ()
 	{ 
-		return getObject (); 
+		return p (); 
 	}
 
 	T*
 	operator -> ()
 	{ 
-		return getObject (); 
+		return p (); 
 	}
 
-	T* getObject ()
+	T* p ()
 	{
 		return (Object*) m_buffer; 
 	}

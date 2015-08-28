@@ -6,7 +6,7 @@
 
 #define _AXL_REF_BUF_H
 
-#include "axl_ref_Factory.h"
+#include "axl_ref_New.h"
 #include "axl_rtl_Func.h"
 #include "axl_rtl_BitIdx.h"
 
@@ -29,6 +29,13 @@ enum BufKind
 	BufKind_Static = BufKind_Shared, 
 	BufKind_Stack  = BufKind_Exclusive,
 	BufKind_Field  = BufKind_Exclusive,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum BufHdrFlag
+{
+	BufHdrFlag_Exclusive = 0x04
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -155,7 +162,7 @@ public:
 
 		if (src.m_p)
 		{
-			if (src.getHdr ()->getFree () == (FreeFunc*) -1)
+			if (src.getHdr ()->getFlags () & BufHdrFlag_Exclusive)
 				return copy (src.m_p);
 
 			src.getHdr ()->addRef ();
@@ -200,8 +207,8 @@ public:
 
 		Hdr* oldHdr = getHdr ();
 
-		FreeFunc* freeFunc = kind == ref::BufKind_Static ? NULL : (FreeFunc*) -1;
-		Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, freeFunc);
+		uint_t flags = kind != BufKind_Static ? BufHdrFlag_Exclusive : 0;
+		Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
 		newHdr->m_bufferSize = size - sizeof (Hdr);
 
 		m_p = (T*) (newHdr + 1);

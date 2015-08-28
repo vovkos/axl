@@ -492,7 +492,7 @@ public:
 			return true;
 		}
 
-		if (src.getHdr ()->getFree () == (ref::FreeFunc*) -1)
+		if (src.getHdr ()->getFlags () & ref::BufHdrFlag_Exclusive)
 			return copy (src, src.getCount ());
 
 		if (src.m_p)
@@ -792,7 +792,7 @@ public:
 			return false;
 		}
 
-		T* temp = (T*) AXL_MEM_ALLOC (count * sizeof (T));
+		T* temp = (T*) AXL_MEM_ALLOCATE (count * sizeof (T));
 		if (!temp)
 			return false;
 
@@ -1002,7 +1002,7 @@ public:
 
 	void
 	setBuffer (
-		ref::BufKind bufKind,
+		ref::BufKind kind,
 		void* p,
 		size_t size
 		)
@@ -1011,8 +1011,8 @@ public:
 
 		Hdr* oldHdr = getHdr ();
 
-		ref::FreeFunc* freeFunc = bufKind == ref::BufKind_Static ? NULL : (ref::FreeFunc*) -1;
-		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, freeFunc);
+		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
+		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
 		newHdr->m_count = 0;
 		newHdr->m_maxCount = (size - sizeof (Hdr)) / sizeof (T);
 

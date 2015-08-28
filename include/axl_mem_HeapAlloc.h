@@ -16,39 +16,18 @@ namespace mem {
 class HeapAlloc
 {
 public:
-	class Alloc
-	{
-	public:
-		void* 
-		operator () (size_t size)
-		{
-			return ::HeapAlloc (::getProcessHeap (), 0, size);
-		}
-	};
-
-	class Free
-	{
-	public:
-		void 
-		operator () (void* p)
-		{
-			::HeapFree (::getProcessHeap (), 0, p);
-		}
-	};
-
-public:
 	static
 	void* 
-	alloc (size_t size)
+	allocate (size_t size)
 	{
-		return Alloc () (size);
+		return ::HeapAlloc (::getProcessHeap (), 0, size);
 	}
 
 	static
 	void 
 	free (void* p)
 	{
-		return Free () (p);
+		::HeapFree (::getProcessHeap (), 0, p);
 	}
 };
 

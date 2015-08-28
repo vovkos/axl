@@ -13,7 +13,7 @@ namespace rtl {
 
 //.............................................................................
 
-class InitCharLiteralable
+class InitCharLiteralTable
 {
 public:
 	void
@@ -31,13 +31,13 @@ const char*
 getCharLiteral (uchar_t c)
 {
 	static char literalTable [256] [4];
-	mt::callOnce (InitCharLiteralable (), literalTable);
+	mt::callOnce (InitCharLiteralTable (), literalTable);
 	return literalTable [c];
 }
 
 //.............................................................................
 
-class InitCharCodeable
+class InitCharCodeTable
 {
 public:
 	void
@@ -55,7 +55,7 @@ const char*
 getCharCodeLiteral (uchar_t c)
 {
 	static char literalTable [256] [4];
-	mt::callOnce (InitCharCodeable (), literalTable);
+	mt::callOnce (InitCharCodeTable (), literalTable);
 	return literalTable [c];
 }
 

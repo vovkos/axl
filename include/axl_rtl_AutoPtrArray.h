@@ -8,7 +8,7 @@
 
 #include "axl_rtl_Array.h"
 #include "axl_rtl_Func.h"
-#include "axl_mem_Factory.h"
+#include "axl_mem_New.h"
 
 namespace axl {
 namespace rtl {
@@ -17,7 +17,7 @@ namespace rtl {
 
 template <
 	typename T,
-	typename Delete_0 = typename mem::StdFactory <T>::Delete
+	typename Delete_0 = typename mem::StdDelete <T>
 	>
 class AutoPtrArray: public Array <T*>
 {

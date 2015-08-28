@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "axl_ref_RefCount.h"
-#include "axl_ref_Ptr.h"
-#include "axl_ref_WeakPtr.h"
-#include "axl_rtl_Array.h"
+#include "axl_ref_New.h"
 
 namespace axl {
 namespace ref {
@@ -13,51 +11,55 @@ RefCount::RefCount ()
 {
 	m_refCount = 0;
 	m_weakRefCount = 1;
-	m_object = NULL;
-	m_destructFunc = NULL;
-	m_freeFunc = NULL;
+	m_parentOffset = 0;
+	m_flags = 0;
 }
 
 void
-RefCount::setTarget (
-	void* object,
-	FreeFunc* destructFunc,
-	FreeFunc* freeFunc
+RefCount::prime (
+	RefCount* parent,
+	uint_t flags
 	)
 {
-	m_object = object;
-	m_destructFunc = destructFunc;
-	m_freeFunc = freeFunc;
+	ASSERT (!parent || parent < this);
+	ASSERT (m_refCount == 0); // should only be called once in the very beginning
+
+	m_parentOffset = parent ? (char*) this - (char*) parent : 0;
+	m_flags = flags;
 }
 
 size_t
 RefCount::release ()
 {
-	int32_t refCount = mt::atomicDec (&m_refCount);
+	intptr_t refCount = mt::atomicDec (&m_refCount);
 	 
 	if (!refCount)
 	{
-		if (m_destructFunc)
-			m_destructFunc (m_object);
-
-		weakRelease (); 
-
-		// WeakRelease () should be here and not in ~CRefCount ()
-		// otherwise it's possible to free memory prematurely
+		this->~RefCount ();
+		weakRelease (); // weakRelease () should be here, not in ~RefCount ()
 	}
 
-	return (uint32_t) refCount;
+	return refCount;
 }
 
 size_t
 RefCount::weakRelease ()
 {
-	int32_t refCount = mt::atomicDec (&m_weakRefCount);
+	intptr_t refCount = mt::atomicDec (&m_weakRefCount);
 
-	if (!refCount && m_freeFunc != NULL && (size_t) m_freeFunc < -10)
-		m_freeFunc (m_object);
+	if (!refCount)
+		if (m_flags & RefCountFlag_Allocated)
+		{
+			RefCountAllocHdr* hdr = (RefCountAllocHdr*) this - 1;
+			hdr->m_freeFunc (hdr);
+		}
+		else if (m_parentOffset)
+		{
+			RefCount* parent = (RefCount*) ((char*) this - m_parentOffset);
+			parent->weakRelease ();
+		}
 
-	return (uint32_t) refCount;
+	return refCount;
 }
 
 size_t
@@ -65,12 +67,12 @@ RefCount::addRefByWeakPtr ()
 { 
 	for (;;)
 	{
-		int32_t old = m_refCount; 
+		intptr_t old = m_refCount; 
 		if (old == 0)
 			return 0;
 
 		if (mt::atomicCmpXchg (&m_refCount, old, old + 1) == old)
-			return (uint32_t) (old + 1);
+			return old + 1;
 	}
 }
 

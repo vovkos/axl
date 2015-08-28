@@ -7,14 +7,14 @@
 #define _AXL_REF_RTFACTORY_H
 
 #include "axl_ref_Ptr.h"
-#include "axl_mem_Factory.h"
+#include "axl_mem_New.h"
 
 namespace axl {
 namespace ref {
 
 //.............................................................................
 	
-template <typename Alloc = mem::StdAlloc>
+template <typename Alloc = mem::StdAllocator>
 class RtFactory
 {
 protected:
@@ -163,7 +163,7 @@ public:
 #endif
 };
 
-typedef RtFactory <mem::StdAlloc> RtFactory;
+typedef RtFactory <mem::StdAllocator> RtFactory;
 
 //.............................................................................
 

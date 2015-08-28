@@ -146,9 +146,9 @@ source_group (
 
 set (
 	MEM_H_LIST
-	${AXL_INC_DIR}/axl_mem_Alloc.h
+	${AXL_INC_DIR}/axl_mem_StdAllocator.h
 	${AXL_INC_DIR}/axl_mem_Block.h
-	${AXL_INC_DIR}/axl_mem_Factory.h
+	${AXL_INC_DIR}/axl_mem_New.h
 	${AXL_INC_DIR}/axl_mem_HeapAlloc.h
 	${AXL_INC_DIR}/axl_mem_Malloc.h
 	${AXL_INC_DIR}/axl_mem_Tracker.h
@@ -156,7 +156,6 @@ set (
 
 set (
 	MEM_CPP_LIST
-	axl_mem_Alloc.cpp
 	axl_mem_Tracker.cpp
 	)
 
@@ -303,7 +302,7 @@ set (
 	REF_H_LIST
 	${AXL_INC_DIR}/axl_ref_Buf.h
 	${AXL_INC_DIR}/axl_ref_Child.h
-	${AXL_INC_DIR}/axl_ref_Factory.h
+	${AXL_INC_DIR}/axl_ref_New.h
 	${AXL_INC_DIR}/axl_ref_Ptr.h
 	${AXL_INC_DIR}/axl_ref_RefCount.h
 	${AXL_INC_DIR}/axl_ref_RtFactory.h
@@ -349,6 +348,7 @@ set (
 	${AXL_INC_DIR}/axl_rtl_HandleTable.h
 	${AXL_INC_DIR}/axl_rtl_HashTable.h
 	${AXL_INC_DIR}/axl_rtl_List.h
+	${AXL_INC_DIR}/axl_rtl_ListBase.h
 	${AXL_INC_DIR}/axl_rtl_Pack.h
 	${AXL_INC_DIR}/axl_rtl_Packer.h
 	${AXL_INC_DIR}/axl_rtl_Packetizer.h

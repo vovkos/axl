@@ -6,11 +6,19 @@
 
 #define _AXL_REF_REFCOUNT_H
 
-#include "axl_mem_Alloc.h"
+#include "axl_mem_StdAllocator.h"
 #include "axl_mt_Atomic.h"
 
 namespace axl {
 namespace ref {
+
+// RefCount decouples destruction and freeing -- this is done to allow overriding allocation at run-time.
+
+// RefCount features:
+// -weak references and strong references
+// -using different allocators for creating ref-counted object
+// -creating ref-counted objects on member fields buffers (be sure to make container non-copiable)
+// -creating ref-counted objects on static/stack buffers
 
 //.............................................................................
 
@@ -18,20 +26,25 @@ typedef
 void 
 FreeFunc (void* p);
 
-//.............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// CRefCount decouples destruction and freeing but not in a traditional vtable way
-// this is done to allow overriding allocation at run-time.
+struct RefCountAllocHdr
+{
+	union
+	{
+		FreeFunc* m_freeFunc;
+		uint64_t m_padding; // ensure 8-byte alignment
+	};
+};
 
-// CRefCount features:
-// -weak references and strong references
-// -using different allocators for creating ref-counted object
-// -creating ref-counted objects on member fields buffers (be sure to make container non-copiable)
-// -creating ref-counted objects on static/stack buffers
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// freeFunc could be set to values -10..-1, NULL 
-// these constants result in no built-in deallocation in CRefCount::WeakRelease ()
-// could be used as marker for special kinds of deallocation or reference counting
+enum RefCountFlag
+{
+	RefCountFlag_Allocated = 0x01, // must be freed, free func is in hdr
+
+	// ok to define and use your own flags 0x04..0x80
+};
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -40,26 +53,30 @@ class RefCount
 	AXL_DISABLE_COPY (RefCount)
 	
 protected:
-	volatile int32_t m_refCount;
-	volatile int32_t m_weakRefCount;
+	volatile intptr_t m_refCount;
+	volatile intptr_t m_weakRefCount;
 
-	void* m_object;
-	FreeFunc* m_destructFunc;
-	FreeFunc* m_freeFunc;
+	uintptr_t m_flags        : 8;
+
+#if (_AXL_PTR_BITNESS == 64)
+	uintptr_t m_parentOffset : 56;
+#else
+	uintptr_t m_parentOffset : 24; // more than enough
+#endif
 
 public:
 	RefCount ();
 
+	virtual 
 	~RefCount ()
 	{ 
 		ASSERT (m_refCount == 0 && m_weakRefCount > 0);
 	}
 
 	void
-	setTarget (
-		void* object,
-		FreeFunc* destructFunc,
-		FreeFunc* freeFunc
+	prime (
+		RefCount* parent,
+		uint_t flags = 0
 		);
 
 	size_t
@@ -74,22 +91,10 @@ public:
 		return m_weakRefCount; 
 	}
 
-	void*
-	getObject ()
+	uint_t
+	getFlags ()
 	{
-		return m_object;
-	}
-
-	FreeFunc*
-	getDestruct ()
-	{
-		return m_destructFunc;
-	}
-
-	FreeFunc*
-	getFree ()
-	{
-		return m_freeFunc;
+		return m_flags;
 	}
 
 	size_t
@@ -121,6 +126,41 @@ class Box:
 	public RefCount,
 	public T
 {
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class AllocBox: 
+	public RefCountAllocHdr,
+	public T
+{
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class Release
+{
+public:
+	void 
+	operator () (T* p) const
+	{ 
+		p->release (); 
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class WeakRelease
+{
+public:
+	void 
+	operator () (T* p) const
+	{ 
+		p->weakRelease (); 
+	}
 };
 
 //.............................................................................

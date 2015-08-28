@@ -6,7 +6,7 @@
 
 #define _AXL_RTL_FUNC_H
 
-#include "axl_mem_Factory.h"
+#include "axl_g_Def.h"
 
 namespace axl {
 namespace rtl {
@@ -149,8 +149,90 @@ public:
 
 //.............................................................................
 
-// construct / destruct
- 
+// construct/destruct functions (up to 4 ctor arguments)
+
+template <typename T>
+void 
+construct (T* p)
+{
+	new (p) T;
+}
+
+template <
+	typename T,
+	typename Arg
+	>
+void 
+construct (
+	T* p,
+	Arg arg
+	)
+{
+	new (p) T (arg);
+}
+
+template <
+	typename T,
+	typename Arg1,
+	typename Arg2
+	>
+void 
+construct (
+	T* p,
+	Arg1 arg1,
+	Arg2 arg2
+	)
+{
+	new (p) T (arg1, arg2);
+}
+
+template <
+	typename T,
+	typename Arg1,
+	typename Arg2,
+	typename Arg3
+	>
+void 
+construct (
+	T* p,
+	Arg1 arg1,
+	Arg2 arg2,
+	Arg3 arg3
+	)
+{
+	new (p) T (arg1, arg2, arg3);
+}
+
+template <
+	typename T,
+	typename Arg1,
+	typename Arg2,
+	typename Arg3,
+	typename Arg4
+	>
+void 
+construct (
+	T* p,
+	Arg1 arg1,
+	Arg2 arg2,
+	Arg3 arg3,
+	Arg4 arg4
+	)
+{
+	new (p) T (arg1, arg2, arg3, arg4);
+}
+
+template <typename T>
+void 
+destruct (T* p)
+{
+	p->~T ();
+}
+
+//.............................................................................
+
+// construct/destruct functors
+
 template <typename T>
 class Construct
 {
@@ -161,8 +243,6 @@ public:
 		new (p) T; 
 	}
 };
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class Destruct
@@ -177,75 +257,7 @@ public:
 
 //.............................................................................
 
-// new / delete
-
-template <typename T>
-class New
-{
-public:
-	void 
-	operator () () const
-	{ 
-		return AXL_MEM_NEW (T); 
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class Delete
-{
-public:
-	void 
-	operator () (T* p) const
-	{ 
-		AXL_MEM_DELETE (p); 
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CppNew
-{
-public:
-	void 
-	operator () () const
-	{ 
-		return new T; 
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CppDelete
-{
-public:
-	void 
-	operator () (T* p) const
-	{ 
-		delete p; 
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class Release
-{
-public:
-	void 
-	operator () (T* p) const
-	{ 
-		p->release (); 
-	}
-};
-
-
-//.............................................................................
-
-// arithmetic functors (sometimes it's necessary to redefine TArg to "const T&")
+// arithmetic functors (sometimes it's necessary to redefine Arg to "const T&")
 
 template <
 	typename T,
@@ -1048,6 +1060,10 @@ public:
 		swap (a, b);
 	}
 };
+
+//.............................................................................
+
+// construct/destruct
 
 //.............................................................................
 

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_gui_GdiEngine.h"
-#include "axl_ref_Factory.h"
+#include "axl_ref_New.h"
 #include "axl_err_Error.h"
 #include "axl_gui_Widget.h"
 

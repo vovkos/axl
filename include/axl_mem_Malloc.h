@@ -16,39 +16,18 @@ namespace mem {
 class Malloc
 {
 public:
-	class Alloc
-	{
-	public:
-		void* 
-		operator () (size_t size)
-		{
-			return ::malloc (size);
-		}
-	};
-
-	class Free
-	{
-	public:
-		void 
-		operator () (void* p)
-		{
-			return ::free (p);
-		}
-	};
-
-public:
 	static
 	void* 
-	alloc (size_t size)
+	allocate (size_t size)
 	{
-		return Alloc () (size);
+		return ::malloc (size);
 	}
 
 	static
 	void 
 	free (void* p)
 	{
-		return Free () (p);
+		return ::free (p);
 	}
 };
 

@@ -7,7 +7,7 @@
 #define _AXL_RTL_SINGLETON_H
 
 #include "axl_rtl_SimpleSingleton.h"
-#include "axl_ref_Factory.h"
+#include "axl_ref_New.h"
 #include "axl_g_Module.h"
 
 namespace axl {
@@ -17,8 +17,8 @@ namespace rtl {
 
 template <class T>
 class DestructSingleton: 
-	public g::Finalizer,
-	public ref::RefCount
+	public ref::RefCount,
+	public g::Finalizer
 {
 public:
 	T* m_p;

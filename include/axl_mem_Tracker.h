@@ -7,7 +7,7 @@
 #define _AXL_MEM_TRACKER_H
 
 #include "axl_mt_Lock.h"
-#include "axl_rtl_List.h"
+#include "axl_rtl_ListBase.h"
 
 namespace axl {
 namespace mem {
@@ -48,6 +48,11 @@ public:
 	void 
 	trace ();
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+Tracker*
+getTracker ();
 
 //.............................................................................
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_mem_Tracker.h"
+#include "axl_g_Module.h"
 #include "axl_dbg_Trace.h"
 
 namespace axl {
@@ -82,7 +83,7 @@ Tracker::trace ()
 			BlockHdr* blockHdr = *it;
 
 			dbg::trace (
-				"    %s(%d): %s seq: #%d size: %d B\n",
+				"    %s(%d): %s; seq = #%d; size = %d;\n",
 				blockHdr->m_filePath,
 				blockHdr->m_line,
 				blockHdr->m_tag,
@@ -93,6 +94,14 @@ Tracker::trace ()
 	}
 
 	m_lock.unlock ();
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+Tracker*
+getTracker ()
+{
+	return g::getModule ()->getMemTracker ();
 }
 
 //.............................................................................

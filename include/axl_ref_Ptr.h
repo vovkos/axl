@@ -115,6 +115,14 @@ public:
 		return *this;
 	}
 
+	Ptr&
+	operator = (PtrKind ptrKind)
+	{ 
+		ASSERT (ptrKind == PtrKind_Null);
+		clear ();
+		return *this;
+	}
+
 	T* 
 	p () const
 	{

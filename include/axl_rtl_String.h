@@ -748,7 +748,7 @@ public:
 
 		if (src.m_p)
 		{
-			if (src.getHdr ()->getFree () == (ref::FreeFunc*) -1)
+			if (src.getHdr ()->getFlags () & ref::BufHdrFlag_Exclusive)
 				return copy (src, src.getLength ());
 
 			src.getHdr ()->addRef ();
@@ -1246,8 +1246,8 @@ public:
 
 		Hdr* oldHdr = getHdr ();
 
-		ref::FreeFunc* freeFunc = kind == ref::BufKind_Static ? NULL : (ref::FreeFunc*) -1;
-		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, freeFunc);
+		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
+		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
 		newHdr->m_length = 0;
 		newHdr->m_maxLength = (size - sizeof (Hdr)) / sizeof (C) - 1;
 

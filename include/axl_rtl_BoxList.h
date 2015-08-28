@@ -84,14 +84,14 @@ template <
 class BoxList: public ListBase <
 	BoxListEntry <T>,
 	BoxIterator <T>,
-	typename mem::StdFactory <BoxListEntry <T> >::Delete
+	typename mem::StdDelete <BoxListEntry <T> >
 	>
 {
 public:
 	typedef ListBase <
 		BoxListEntry <T>,
 		BoxIterator <T>,
-		typename mem::StdFactory <BoxListEntry <T> >::Delete
+		typename mem::StdDelete <BoxListEntry <T> >
 		> BaseType;
 
 	typedef typename BaseType::Entry Entry;
