@@ -7,6 +7,7 @@
 #define _AXL_MT_PSX_COND_H
 
 #include "axl_mt_psx_Mutex.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace mt {

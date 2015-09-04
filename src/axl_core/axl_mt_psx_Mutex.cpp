@@ -1,10 +1,28 @@
 #include "pch.h"
 #include "axl_mt_psx_Mutex.h"
+#include "axl_err_Error.h"
 #include "axl_g_Time.h"
 
 namespace axl {
 namespace mt {
 namespace psx {
+
+//.............................................................................
+
+int
+MutexAttr::getType () const
+{
+	int type = PTHREAD_MUTEX_NORMAL;
+	::pthread_mutexattr_gettype (&m_attr, &type);
+	return type;
+}
+
+bool
+MutexAttr::setType (int type)
+{
+	int result = ::pthread_mutexattr_settype (&m_attr, type);
+	return result == 0 ? true : err::fail (result);
+}
 
 //.............................................................................
 

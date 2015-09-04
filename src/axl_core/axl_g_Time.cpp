@@ -32,7 +32,7 @@ getTimestamp ()
 	::GetSystemTimeAsFileTime ((FILETIME*) &timestamp);
 #else
 	timespec time;
-	clock_gettime (CLOCK_REALTIME, &time); // CLOCK_REALTIME_COARSE maybe?
+	clock_gettime (CLOCK_REALTIME_COARSE, &time);
 	timestamp = (uint64_t) time.tv_sec * 10000000 + time.tv_nsec / 100;
 #endif
 
@@ -49,7 +49,7 @@ getPreciseTimestamp ()
 #else
 	timespec time;
 	clock_gettime (CLOCK_REALTIME, &time);
-	timestamp = (uint64_t) time.tv_sec * 10000000 + time.tv_nsec / 100;
+	return (uint64_t) time.tv_sec * 10000000 + time.tv_nsec / 100;
 #endif
 }
 

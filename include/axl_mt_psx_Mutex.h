@@ -6,7 +6,7 @@
 
 #define _AXL_MT_PSX_MUTEX_H
 
-#include "axl_err_Error.h"
+#include "axl_g_Def.h"
 
 namespace axl {
 namespace mt {
@@ -41,19 +41,10 @@ public:
 	}
 
 	int
-	getType () const
-	{
-		int type = PTHREAD_MUTEX_NORMAL;
-		::pthread_mutexattr_gettype (&m_attr, &type);
-		return type;
-	}
+	getType () const;
 
 	bool
-	setType (int type)
-	{
-		int result = ::pthread_mutexattr_settype (&m_attr, type);
-		return result == 0 ? true : err::fail (result);
-	}
+	setType (int type);
 
 #if (0)
 	int

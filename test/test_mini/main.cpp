@@ -1720,6 +1720,12 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
+	uint64_t ts1 = g::getTimestamp ();
+	uint64_t ts2 = g::getPreciseTimestamp ();
+
+	printf ("time0.1 = %s\n", g::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.2 = %s\n", g::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
+
 	uint64_t t0 = g::getPreciseTimestamp ();
 
 	for (size_t i = 0; i < 1000000; i++)
@@ -1742,6 +1748,12 @@ main (
 	t2 = g::getPreciseTimestamp ();
 	uint64_t d2 = t2 - t0;
 	printf ("time2 = %s\n", g::Time (d2, 0).format ("%h:%m:%s.%l.%c").cc ());
+
+	ts1 = g::getTimestamp ();
+	ts2 = g::getPreciseTimestamp ();
+
+	printf ("time0.1 = %s\n", g::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.2 = %s\n", g::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
 
 	testInheritance ();
 	return 0;
