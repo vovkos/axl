@@ -1729,7 +1729,7 @@ main (
 
 	uint64_t t2 = g::getPreciseTimestamp ();
 	uint64_t d1 = t2 - t0;
-	printf ("time = %s\n", g::Time (d1, 0).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time1 = %s\n", g::Time (d1, 0).format ("%h:%m:%s.%l.%c").cc ());
 
 
 	t0 = g::getPreciseTimestamp ();
@@ -1741,7 +1741,7 @@ main (
 
 	t2 = g::getPreciseTimestamp ();
 	uint64_t d2 = t2 - t0;
-	printf ("time = %s\n", g::Time (d2, 0).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time2 = %s\n", g::Time (d2, 0).format ("%h:%m:%s.%l.%c").cc ());
 
 	testInheritance ();
 	return 0;
