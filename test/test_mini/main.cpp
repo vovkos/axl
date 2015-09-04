@@ -1719,7 +1719,30 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-	
+
+	uint64_t t0 = g::getPreciseTimestamp ();
+
+	for (size_t i = 0; i < 1000000; i++)
+	{
+		g::getTimestamp ();
+	}
+
+	uint64_t t2 = g::getPreciseTimestamp ();
+	uint64_t d1 = t2 - t0;
+	printf ("time = %s\n", g::Time (d1, 0).format ("%h:%m:%s.%l.%c").cc ());
+
+
+	t0 = g::getPreciseTimestamp ();
+
+	for (size_t i = 0; i < 1000000; i++)
+	{
+		g::getPreciseTimestamp ();
+	}
+
+	t2 = g::getPreciseTimestamp ();
+	uint64_t d2 = t2 - t0;
+	printf ("time = %s\n", g::Time (d2, 0).format ("%h:%m:%s.%l.%c").cc ());
+
 	testInheritance ();
 	return 0;
 }

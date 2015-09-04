@@ -19,6 +19,9 @@ namespace g {
 uint64_t
 getTimestamp ();
 
+uint64_t
+getPreciseTimestamp ();
+
 void
 sleep (uint32_t msCount);
 
