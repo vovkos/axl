@@ -7,32 +7,13 @@ namespace g {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
-
-static uint64_t g_qpcBaseTimestamp;
-static uint64_t g_qpcBaseCounter;
-static uint64_t g_qpcFrequency;
-
-void
-initQpc ()
-{
-	::GetSystemTimeAsFileTime ((FILETIME*) &g_qpcBaseTimestamp);
-	::QueryPerformanceCounter ((LARGE_INTEGER*) &g_qpcBaseCounter);
-	::QueryPerformanceFrequency ((LARGE_INTEGER*) &g_qpcFrequency);
-	g_qpcFrequency /= 100000; // adjust frequency (# of QPC ticks in 100-nanoseconds)
-}
-
-#endif
-
 uint64_t
 getTimestamp ()
 {
 	uint64_t timestamp;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	uint64_t counter;
-	::QueryPerformanceCounter ((LARGE_INTEGER*) &counter);
-	timestamp = g_qpcBaseTimestamp + (counter - g_qpcBaseCounter) / g_qpcFrequency;
+	::GetSystemTimeAsFileTime ((FILETIME*) &timestamp);
 #else
 	timespec time;
 	clock_gettime (CLOCK_REALTIME, &time);
