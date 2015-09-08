@@ -24,8 +24,8 @@ struct LongJmpTry
 { \
 	axl::mt::LongJmpTry __axlLongJmpTry; \
 	axl::mt::LongJmpTry* __axlPrevLongJmpTry = axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (&__axlLongJmpTry); \
-	int branch = setjmp (__axlLongJmpTry.m_jmpBuf); \
-	if (!branch) \
+	int __axlLongJmpBranch = setjmp (__axlLongJmpTry.m_jmpBuf); \
+	if (!__axlLongJmpBranch) \
 	{
 
 #define AXL_MT_LONG_JMP_CATCH() \
@@ -36,6 +36,10 @@ struct LongJmpTry
 			axl::mt::LongJmpTry* prev = axl::mt::setTlsSlotValue <axl::mt::LongJmpTry> (__axlPrevLongJmpTry); \
 			ASSERT (prev == &__axlLongJmpTry); \
 		}
+
+#define AXL_MT_LONG_JMP_FINALLY() \
+	} \
+	{
 
 #define AXL_MT_END_LONG_JMP_TRY_IMPL() \
 	} \
@@ -50,7 +54,7 @@ struct LongJmpTry
 
 #define AXL_MT_END_LONG_JMP_TRY_EX(result) \
 	AXL_MT_END_LONG_JMP_TRY_IMPL() \
-	*(result) = branch == 0; \
+	*(result) = __axlLongJmpBranch == 0; \
 }
 
 #define AXL_MT_LONG_JMP_THROW() \

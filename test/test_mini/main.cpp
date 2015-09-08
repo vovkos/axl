@@ -583,6 +583,30 @@ testLongJmpTry ()
 	{
 		printf ("exception caught\n");
 	}
+	AXL_MT_LONG_JMP_FINALLY ()
+	{
+		printf ("finally\n");
+	}
+	AXL_MT_END_LONG_JMP_TRY ()
+
+	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	{
+		bar ();
+	}
+	AXL_MT_LONG_JMP_CATCH ()
+	{
+		printf ("exception caught\n");
+	}
+	AXL_MT_END_LONG_JMP_TRY ()
+
+	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	{
+		bar ();
+	}
+	AXL_MT_LONG_JMP_FINALLY ()
+	{
+		printf ("finally\n");
+	}
 	AXL_MT_END_LONG_JMP_TRY ()
 
 	AXL_MT_BEGIN_LONG_JMP_TRY ()
@@ -1701,25 +1725,9 @@ testInheritance ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
-int
-wmain (
-	int argc,
-	wchar_t* argv []
-	)
-#else
-int
-main (
-	int argc,
-	char* argv []
-	)
-#endif
+void
+testTimestamps ()
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
-	WSADATA wsaData;
-	WSAStartup (0x0202, &wsaData);	
-#endif
-
 	uint64_t ts1 = g::getTimestamp ();
 	uint64_t ts2 = g::getPreciseTimestamp ();
 
@@ -1754,8 +1762,31 @@ main (
 
 	printf ("time0.1 = %s\n", g::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
 	printf ("time0.2 = %s\n", g::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
+}
 
-	testInheritance ();
+//.............................................................................
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+int
+wmain (
+	int argc,
+	wchar_t* argv []
+	)
+#else
+int
+main (
+	int argc,
+	char* argv []
+	)
+#endif
+{
+#if (_AXL_ENV == AXL_ENV_WIN)
+	WSADATA wsaData;
+	WSAStartup (0x0202, &wsaData);	
+#endif
+
+	testLongJmpTry ();
+
 	return 0;
 }
 
