@@ -179,7 +179,7 @@ public:
 
 		if (!result)
 		{
-			printf ("cannot open reader (%s)\n", err::getLastError ()->getDescription ().cc ());
+			printf ("cannot open reader (%s)\n", err::getLastErrorDescription ().cc ());
 			return;
 		}
 
@@ -192,7 +192,7 @@ public:
 			size_t size = m_reader.read (&buffer);
 			if (size == -1)
 			{
-				printf ("cannot read (%s)\n", err::getLastError ()->getDescription ().cc ());
+				printf ("cannot read (%s)\n", err::getLastErrorDescription ().cc ());
 				return;
 			}
 
@@ -229,7 +229,7 @@ public:
 
 		if (!result)
 		{
-			printf ("cannot open writer (%s)\n", err::getLastError ()->getDescription ().cc ());
+			printf ("cannot open writer (%s)\n", err::getLastErrorDescription ().cc ());
 			return;
 		}
 
@@ -253,7 +253,7 @@ public:
 			size_t result = m_writer.write (p, size);
 			if (result == -1)
 			{
-				printf ("cannot write (%s)\n", err::getLastError ()->getDescription ().cc ());
+				printf ("cannot write (%s)\n", err::getLastErrorDescription ().cc ());
 				return;
 			}
 		}
@@ -280,7 +280,7 @@ main (
 	bool result = regExp.compile (src);
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastError ().getDescription ().cc ());
+		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
 		return -1;
 	}
 

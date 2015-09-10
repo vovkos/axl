@@ -185,17 +185,17 @@ getLastError ()
 	return getErrorMgr ()->getLastError ();
 }
 
-rtl::String
-getLastErrorDescription ()
-{
-	return getLastError ()->getDescription ();
-}
-
 Error
 setError (const Error& error)
 {
 	getErrorMgr ()->setError (error);
 	return error;
+}
+
+rtl::String
+getLastErrorDescription ()
+{
+	return getErrorMgr ()->getLastError ()->getDescription ();
 }
 
 //.............................................................................

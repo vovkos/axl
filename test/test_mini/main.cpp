@@ -548,7 +548,7 @@ testDynamicLibrary ()
 	bool result = dl.load ("libc.so.6");
 	if (!result)
 	{
-		printf ("dl.load failed: %s\n", err::getLastError ().getDescription ().cc ());
+		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().cc ());
 		return;
 	}
 
@@ -556,7 +556,7 @@ testDynamicLibrary ()
 	Printf* prn = (Printf*) dl.getFunction ("printf");
 	if (!prn)
 	{
-		printf ("dl.load failed: %s\n", err::getLastError ().getDescription ().cc ());
+		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().cc ());
 		return;
 	}
 
@@ -641,7 +641,7 @@ testRegExp ()
 		bool result = regExpCompiler.incrementalCompile (src [i]);
 		if (!result)
 		{
-			printf ("error: %s\n", err::getLastError ().getDescription ().cc ());
+			printf ("error: %s\n", err::getLastErrorDescription ().cc ());
 			return;
 		}
 	}
@@ -653,7 +653,7 @@ testRegExp ()
 	bool result = regExpCompiler.compile ("\"abc\" w* dec+");
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastError ().getDescription ().cc ());
+		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
 		return;
 	}
 

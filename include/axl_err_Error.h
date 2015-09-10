@@ -579,9 +579,6 @@ public:
 Error
 getLastError ();
 
-rtl::String
-getLastErrorDescription ();
-
 Error
 setError (const Error& error);
 
@@ -593,6 +590,9 @@ pushError (const Error& error)
 	stack.push (*error);
 	return setError (stack);
 }
+
+rtl::String
+getLastErrorDescription ();
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
