@@ -613,10 +613,23 @@ RegExpCompiler::getToken (Token* token)
 				m_p += 2;
 				return true;
 
+			case '\n':				
+				m_p += 2; // ignore line continuation (LF)
+				break;
+
+			case '\r':
+				if (m_p [2] == '\n')
+				{					
+					m_p += 3; // line continuation (CR-LF)
+					break;
+				}
+
 			default:
 				token->m_tokenKind = TokenKind_Char;
 				return readEscapeSequence (&token->m_char);
 			}
+
+			break;
 
 		case '"':
 		case '\'':
@@ -632,8 +645,8 @@ RegExpCompiler::getToken (Token* token)
 		case '\t':
 		case '\r':
 		case '\n':
-			m_p++;
-			break; // ignore whitespace
+			m_p++; // ignore whitespace
+			break;
 
 		case '.':
 		case '?':
