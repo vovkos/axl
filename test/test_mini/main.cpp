@@ -650,7 +650,8 @@ testRegExp ()
 	regExp.print ();
 */
 
-	bool result = regExpCompiler.compile ("\"abc\" w* dec+");
+//	bool result = regExpCompiler.compile ("\"abc\" ws* dec+");
+	bool result = regExpCompiler.compile ("'abc' \\n");
 	if (!result)
 	{
 		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
@@ -1785,7 +1786,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testLongJmpTry ();
+	testRegExp ();
 
 	return 0;
 }

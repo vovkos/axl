@@ -16,21 +16,6 @@ namespace fsm {
 
 //.............................................................................
 
-enum PseudoChar
-{
-	PseudoChar_StartOfLine = 256,
-	PseudoChar_EndOfLine,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum 
-{
-	TransitionTableCharCount = 256 + 2
-};
-
-//.............................................................................
-
 enum MatchConditionKind
 {
 	MatchConditionKind_Undefined,
@@ -150,7 +135,7 @@ class NfaTransitionMgr
 {
 protected:
 	rtl::StdList <NfaTransition> m_transitionList;
-	NfaTransition* m_transitionMap [TransitionTableCharCount];
+	NfaTransition* m_transitionMap [256];
 
 	// for UTF regexps m_transitionMap should be replaced with interval tree
 

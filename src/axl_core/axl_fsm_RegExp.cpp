@@ -4,8 +4,6 @@
 #include "axl_rtl_String.h"
 #include "axl_mt_CallOnce.h"
 
-// #define _AXL_FSM_NO_ROOT_SOL_EOL
-
 namespace axl {
 namespace fsm {
 	
@@ -71,20 +69,7 @@ getMatchConditionString (const MatchCondition* condition)
 	switch (condition->m_conditionKind)
 	{
 	case MatchConditionKind_Char:
-		switch (condition->m_char)
-		{
-		case PseudoChar_StartOfLine:
-			string = '^';
-			break;
-
-		case PseudoChar_EndOfLine:
-			string = '$';
-			break;
-
-		default:
-			string.format (isprint (condition->m_char) ? "'%c'" : "'\\x%02x'", condition->m_char);
-		}
-
+		string.format (isprint (condition->m_char) ? "'%c'" : "'\\x%02x'", condition->m_char);
 		break;
 
 	case MatchConditionKind_CharSet:
@@ -268,16 +253,6 @@ RegExpCompiler::incrementalCompile (
 		*m_regExp->m_nfaStateList.getHead () :
 		NULL;
 
-	NfaState* newStart;
-	NfaState* accept;
-
-#ifndef _AXL_FSM_NO_ROOT_SOL_EOL
-	NfaState* sol = question (ch (PseudoChar_StartOfLine));
-	newStart = sol;
-
-	accept = *m_regExp->m_nfaStateList.getTail ();
-#endif
-
 	NfaState* body = expression ();
 	if (!body)
 		return false;
@@ -286,24 +261,14 @@ RegExpCompiler::incrementalCompile (
 	if (!result)
 		return false;	
 
-#ifndef _AXL_FSM_NO_ROOT_SOL_EOL
-	accept->createEpsilonLink (body);
-	accept = *m_regExp->m_nfaStateList.getTail ();
-
-	NfaState* eol = question (ch (PseudoChar_EndOfLine));
-	accept->createEpsilonLink (eol);
-#else
-	newStart = body;
-#endif
-
-	accept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
 	accept->m_flags |= NfaStateFlag_Accept;
 	accept->m_acceptContext = acceptContext;
 
 	if (oldStart)
 	{
 		NfaState* split = AXL_MEM_NEW (NfaState);
-		split->createEpsilonLink (oldStart, newStart);
+		split->createEpsilonLink (oldStart, body);
 		m_regExp->m_nfaStateList.insertHead (split);
 	}
 
@@ -607,7 +572,6 @@ RegExpCompiler::getToken (Token* token)
 			case 'H':
 			case 'w':
 			case 'W':
-			case 'b':
 				token->m_tokenKind = TokenKind_SpecialChar;
 				token->m_char = m_p [1];
 				m_p += 2;
@@ -894,12 +858,6 @@ RegExpCompiler::single ()
 		case '.':
 			return any ();
 
-		case '^':
-			return ch (PseudoChar_StartOfLine);
-
-		case '$':
-			return ch (PseudoChar_EndOfLine);
-
 		default:
 			err::setStringError ("invalid regexp syntax");
 			return NULL;
@@ -957,26 +915,7 @@ RegExpCompiler::ch (
 {
 	NfaState* accept = AXL_MEM_NEW (NfaState);
 	m_regExp->m_nfaStateList.insertTail (accept);
-
-	if (c != '\r' && c != '\n')
-	{
-		start->createCharMatch (c, accept);
-		return;
-	}
-
-	start->createCharMatch (PseudoChar_StartOfLine, accept);
-	start = accept;
-
-	accept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (accept);
-	
 	start->createCharMatch (c, accept);
-	start = accept;
-
-	accept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (accept);
-
-	start->createCharMatch (PseudoChar_EndOfLine, accept);
 }
 
 NfaState*
@@ -1048,7 +987,7 @@ RegExpCompiler::charClassItem (rtl::BitMap* charSet)
 	switch (*m_p)
 	{
 	case 0:
-		err::setStringError ("invalid char class");
+		err::setStringError ("invalid character class");
 		return false;
 
 	case '\\':
