@@ -6,7 +6,6 @@
 
 #define _AXL_IO_SHAREDMEMORYTRANSPORT_H
 
-#include "axl_io_MappedFile.h"
 #include "axl_io_Mapping.h"
 #include "axl_mt_Event.h"
 #include "axl_mt_Lock.h"
@@ -53,7 +52,7 @@ struct SharedMemoryTransportHdr
 	uint32_t m_padding;
 };
 
-struct SharedMemoryransportMessageHdr
+struct SharedMemoryTransportMessageHdr
 {
 	uint32_t m_signature;
 	uint32_t m_size;
@@ -65,10 +64,13 @@ class SharedMemoryTransportBase
 {
 protected:
 	uint_t m_flags;
-	MappedFile m_file;
+	
+	File m_file;
+	Mapping m_mapping;
+	size_t m_mappingSize;
+
 	SharedMemoryTransportHdr* m_hdr;
 	char* m_data;
-	size_t m_mappingSize;
 	int32_t m_pendingReqCount;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -99,7 +101,7 @@ public:
 	File::Handle
 	getFileHandle () const
 	{
-		return m_file.getFileHandle ();
+		return m_file.getHandle ();
 	}
 
 	bool

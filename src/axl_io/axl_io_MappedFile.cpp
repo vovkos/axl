@@ -152,7 +152,7 @@ MappedFile::MappedFile ()
 	m_permanentViewMgr.m_mappedFile = this;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	m_mappedSize = 0;
+	m_mappingSize = 0;
 #endif
 }
 
@@ -294,8 +294,9 @@ MappedFile::viewImpl (
 
 	// align view region size on system page size
 
+	size_t remSize = viewEnd % systemInfo->m_pageSize;
 	if (viewEnd % systemInfo->m_pageSize)
-		viewEnd = viewEnd - viewEnd % systemInfo->m_pageSize + systemInfo->m_pageSize;
+		viewEnd = viewEnd - remSize + systemInfo->m_pageSize;
 
 	// make sure we don't overextend beyond the end of read-only file
 
@@ -314,7 +315,7 @@ MappedFile::viewImpl (
 	// ensure mapping covers the view
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	if (!m_mapping.isOpen () || viewEnd > m_mappedSize)
+	if (!m_mapping.isOpen () || viewEnd > m_mappingSize)
 	{
 		uint_t protection = (m_fileFlags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 
@@ -322,7 +323,7 @@ MappedFile::viewImpl (
 		if (!result)
 			return NULL;
 
-		m_mappedSize = viewEnd;
+		m_mappingSize = viewEnd;
 	}
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	if (viewEnd > m_file.getSize ())
@@ -361,7 +362,7 @@ MappedFile::unmapAllViews ()
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	m_mapping.close ();
-	m_mappedSize = 0;
+	m_mappingSize = 0;
 #endif
 }
 

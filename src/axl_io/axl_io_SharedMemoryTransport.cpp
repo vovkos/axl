@@ -2,6 +2,7 @@
 #include "axl_io_SharedMemoryTransport.h"
 #include "axl_rtl_String.h"
 #include "axl_err_Error.h"
+#include "axl_g_Module.h"
 
 namespace axl {
 namespace io {
@@ -11,9 +12,9 @@ namespace io {
 SharedMemoryTransportBase::SharedMemoryTransportBase ()
 {
 	m_flags = 0;
+	m_mappingSize = 0;
 	m_hdr = NULL;
 	m_data = NULL;
-	m_mappingSize = 0;
 	m_pendingReqCount = 0;
 }
 
@@ -54,7 +55,7 @@ SharedMemoryTransportBase::attach (
 
 	close ();
 
-	m_file.attach (fileHandle);
+	m_file.m_file.attach (fileHandle);
 
 	result = ensureMappingSize (SharedMemoryTransportConst_DefMappingSize);
 	if (!result)
@@ -185,13 +186,18 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 	if (size <= m_mappingSize)
 		return true;
 
-	void* p = m_file.view (0, size);
+	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	size_t remSize = size % systemInfo->m_pageSize;
+	if (remSize)
+		size = size - remSize + systemInfo->m_pageSize;
+
+	void* p = m_mapping.open (&m_file, 0, size);
 	if (!p)
 		return false;
 
+	m_mappingSize = size;
 	m_hdr = (SharedMemoryTransportHdr*) p;
 	m_data = (char*) (m_hdr + 1);
-	m_mappingSize = size;
 	return true;
 }
 
@@ -243,9 +249,9 @@ SharedMemoryReader::read (rtl::Array <char>* buffer)
 
 	if (m_flags & SharedMemoryTransportFlag_Message)
 	{
-		SharedMemoryransportMessageHdr* msgHdr = (SharedMemoryransportMessageHdr*) (m_data + readOffset);
+		SharedMemoryTransportMessageHdr* msgHdr = (SharedMemoryTransportMessageHdr*) (m_data + readOffset);
 		readSize = msgHdr->m_size;
-		size_t readEndOffset = readOffset + sizeof (SharedMemoryransportMessageHdr) + msgHdr->m_size;
+		size_t readEndOffset = readOffset + sizeof (SharedMemoryTransportMessageHdr) + msgHdr->m_size;
 
 		if (msgHdr->m_signature != SharedMemoryTransportConst_MessageSignature || readEndOffset > endOffset)
 		{
@@ -356,7 +362,7 @@ SharedMemoryWriter::write (
 	size_t writeSize = chainSize;
 
 	if (m_flags & SharedMemoryTransportFlag_Message)
-		writeSize += sizeof (SharedMemoryransportMessageHdr);
+		writeSize += sizeof (SharedMemoryTransportMessageHdr);
 
 	mt::ScopeLock scopeLock (&m_writeLock); // ensure atomic write
 
@@ -396,7 +402,7 @@ SharedMemoryWriter::write (
 
 	if (m_flags & SharedMemoryTransportFlag_Message)
 	{
-		SharedMemoryransportMessageHdr* msgHdr = (SharedMemoryransportMessageHdr*) (m_data + writeOffset);
+		SharedMemoryTransportMessageHdr* msgHdr = (SharedMemoryTransportMessageHdr*) (m_data + writeOffset);
 		msgHdr->m_signature = SharedMemoryTransportConst_MessageSignature;
 		msgHdr->m_size = chainSize;
 		copyWriteChain (msgHdr + 1, blockArray, sizeArray, count);

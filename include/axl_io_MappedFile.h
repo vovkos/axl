@@ -97,7 +97,7 @@ protected:
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	win::Mapping m_mapping;
-	uint64_t m_mappedSize;
+	uint64_t m_mappingSize;
 #endif
 	
 	MappedViewMgr m_dynamicViewMgr;
