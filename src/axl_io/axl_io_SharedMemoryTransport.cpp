@@ -191,6 +191,15 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 	if (remSize)
 		size = size - remSize + systemInfo->m_pageSize;
 
+#if (_AXL_ENV == AXL_ENV_POSIX)
+	if (size >= m_file.getSize ())
+	{
+		bool result = m_file.setSize (size);
+		if (!result)
+			return false;
+	}		
+#endif
+
 	void* p = m_mapping.open (&m_file, 0, size);
 	if (!p)
 		return false;
