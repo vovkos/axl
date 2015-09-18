@@ -71,6 +71,9 @@ trace (
 }
 
 #else
+#	if (_AXL_ENV == AXL_ENV_POSIX)
+AXL_SELECT_ANY FILE* g_traceFile = stdout;
+#	endif
 
 AXL_SELECT_ANY volatile uint_t g_traceFilter = -1;
 
@@ -134,16 +137,12 @@ trace (
 //.............................................................................
 
 #ifndef TRACE
-#ifdef _AXL_DEBUG
-
-#define TRACE \
-	dbg::trace
-
-#else
-
-#define TRACE \
-	(void)
-
+#	ifdef _AXL_DEBUG
+#		define TRACE \
+			dbg::trace
+#	else
+#		define TRACE \
+			(void)
 #endif
 #endif
 

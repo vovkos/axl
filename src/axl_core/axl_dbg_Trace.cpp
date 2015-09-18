@@ -26,7 +26,8 @@ traceEx_va (
 	string.format_va (formatString, va.m_va);
 	::OutputDebugStringA (string);
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	vprintf (formatString, va.m_va);
+	vfprintf (g_traceFile, formatString, va.m_va);
+	fflush (g_traceFile);
 #endif
 }
 
