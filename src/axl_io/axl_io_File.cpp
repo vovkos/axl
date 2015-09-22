@@ -52,27 +52,19 @@ File::open (
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-uint_t
-getPosixOpenFlags (uint_t fileFlags)
-{
-	uint_t posixFlags = (fileFlags & FileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
-
-	if (!(fileFlags & (FileFlag_ReadOnly | FileFlag_OpenExisting)))
-		posixFlags |= O_CREAT;
-
-	if (fileFlags & FileFlag_Asynchronous)
-		posixFlags |= O_NONBLOCK;
-
-	return posixFlags;
-}
-
 bool
 File::open (
 	const char* fileName,
 	uint_t flags
 	)
 {
-	uint_t posixFlags = getPosixOpenFlags (flags);
+	uint_t posixFlags = (flags & FileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
+
+	if (!(flags & (FileFlag_ReadOnly | FileFlag_OpenExisting)))
+		posixFlags |= O_CREAT;
+
+	if (flags & FileFlag_Asynchronous)
+		posixFlags |= O_NONBLOCK;
 
 	// TODO: handle exclusive and share write flags with fcntl locks
 
@@ -100,6 +92,39 @@ File::writeFormat_va (
 
 	return write (string, string.getLength ());
 }
+
+//.............................................................................
+
+#if (_AXL_ENV == AXL_ENV_POSIX)
+
+void 
+TemporaryFile::close ()
+{
+	if (!isOpen ())
+		return;
+
+	File::close ();
+	deleteFile (m_fileName);
+	m_fileName.clear ();
+}
+
+bool
+TemporaryFile::open (
+	const char* fileName,
+	uint_t flags = 0
+	)
+{
+	close ();
+
+	bool result = io::File::open (fileName, flags & ~FileFlag_DeleteOnClose);
+	if (!result)
+		return false;
+
+	m_fileName = fileName;
+	return true;
+}
+
+#endif
 
 //.............................................................................
 

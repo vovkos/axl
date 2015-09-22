@@ -10,6 +10,7 @@
 #	include "axl_io_win_File.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_io_psx_File.h"
+#	include "axl_rtl_String.h"
 #endif
 
 namespace axl {
@@ -160,12 +161,55 @@ public:
 
 //.............................................................................
 
+class TemporaryFile: public File
+{
 #if (_AXL_ENV == AXL_ENV_POSIX)
+protected:
+	rtl::String m_fileName;
 
-uint_t
-getPosixOpenFlags (uint_t fileFlags);
-
+public:
+	~TemporaryFile ()
+	{
+		close ();
+	}
 #endif
+
+public:
+#if (_AXL_ENV == AXL_ENV_POSIX)
+	void 
+	close ();
+
+	bool
+	open (
+		const char* fileName,
+		uint_t flags = 0
+		);
+#else
+	bool
+	open (
+		const char* fileName,
+		uint_t flags = 0
+		)
+	{
+		return io::File::open (fileName, flags | FileFlag_DeleteOnClose);
+	}
+#endif
+};
+
+//.............................................................................
+
+inline
+bool
+deleteFile (const char* fileName)
+{
+#if (_AXL_ENV == AXL_ENV_WIN)
+	bool_t result = ::DeleteFileA (fileName);
+	return err::complete (result);
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	int result = unlink (fileName);
+	return err::complete (result == 0);
+#endif
+}
 
 //.............................................................................
 
