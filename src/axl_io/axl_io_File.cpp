@@ -111,7 +111,7 @@ TemporaryFile::close ()
 bool
 TemporaryFile::open (
 	const char* fileName,
-	uint_t flags = 0
+	uint_t flags
 	)
 {
 	close ();
