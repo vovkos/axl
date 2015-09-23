@@ -182,20 +182,7 @@ public:
 
 //.............................................................................
 
-inline
-bool
-deleteFile (const char* fileName)
-{
 #if (_AXL_ENV == AXL_ENV_WIN)
-	bool_t result = ::DeleteFileA (fileName);
-	return err::complete (result);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-	int result = unlink (fileName);
-	return err::complete (result == 0);
-#endif
-}
-
-//.............................................................................
 
 inline
 bool
@@ -204,14 +191,40 @@ renameFile (
 	const char* dstFileName
 	)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
 	bool_t result = ::MoveFileA (srcFileName, dstFileName);
 	return err::complete (result);
+}
+
+inline
+bool
+deleteFile (const char* fileName)
+{
+	bool_t result = ::DeleteFileA (fileName);
+	return err::complete (result);
+}
+
 #elif (_AXL_ENV == AXL_ENV_POSIX)
+
+inline
+bool
+renameFile (
+	const char* srcFileName,
+	const char* dstFileName
+	)
+{
 	int result = rename (srcFileName, dstFileName);
 	return err::complete (result == 0);
-#endif
 }
+
+inline
+bool
+deleteFile (const char* fileName)
+{
+	int result = unlink (fileName);
+	return err::complete (result == 0);
+}
+
+#endif
 
 //.............................................................................
 
