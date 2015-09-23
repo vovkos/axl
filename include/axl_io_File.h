@@ -197,5 +197,23 @@ deleteFile (const char* fileName)
 
 //.............................................................................
 
+inline
+bool
+renameFile (
+	const char* srcFileName,
+	const char* dstFileName
+	)
+{
+#if (_AXL_ENV == AXL_ENV_WIN)
+	bool_t result = ::MoveFileA (srcFileName, dstFileName);
+	return err::complete (result);
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	int result = rename (srcFileName, dstFileName);
+	return err::complete (result == 0);
+#endif
+}
+
+//.............................................................................
+
 } // namespace io
 } // namespace axl
