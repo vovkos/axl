@@ -136,22 +136,6 @@ public:
 		return setPosition (offset) ? write (p, size) : -1;
 	}
 
-	size_t
-	writeFormat_va (
-		const char* formatString,
-		axl_va_list va
-		);
-
-	size_t
-	writeFormat (
-		const char* formatString,
-		...
-		)
-	{
-		AXL_VA_DECL (va, formatString);
-		return writeFormat_va (formatString, va);
-	}
-
 	bool
 	flush ()
 	{

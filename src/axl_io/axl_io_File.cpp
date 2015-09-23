@@ -80,19 +80,6 @@ File::open (
 
 #endif
 
-size_t
-File::writeFormat_va (
-	const char* formatString,
-	axl_va_list va
-	)
-{
-	char buffer [256];
-	rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.format_va (formatString, va);
-
-	return write (string, string.getLength ());
-}
-
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_POSIX)

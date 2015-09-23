@@ -182,7 +182,17 @@ public:
 		size_t size = 0, 
 		bool isPermanent = false
 		);
-	
+
+	size_t
+	write (
+		uint64_t offset,
+		const void* p,
+		size_t size
+		)
+	{
+		return m_file.writeAt (offset, p, size);
+	}
+
 	void 
 	unmapAllViews ();
 	
