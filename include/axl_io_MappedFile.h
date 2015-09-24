@@ -188,10 +188,7 @@ public:
 		uint64_t offset,
 		const void* p,
 		size_t size
-		)
-	{
-		return m_file.writeAt (offset, p, size);
-	}
+		);
 
 	void 
 	unmapAllViews ();

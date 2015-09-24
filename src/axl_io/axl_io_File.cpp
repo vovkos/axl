@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_io_File.h"
+#include "axl_io_Mapping.h"
 #include "axl_rtl_String.h"
 
 namespace axl {
@@ -103,7 +104,7 @@ TemporaryFile::open (
 {
 	close ();
 
-	bool result = io::File::open (fileName, flags & ~FileFlag_DeleteOnClose);
+	bool result = File::open (fileName, flags & ~FileFlag_DeleteOnClose);
 	if (!result)
 		return false;
 
@@ -112,6 +113,92 @@ TemporaryFile::open (
 }
 
 #endif
+
+//.............................................................................
+
+uint64_t
+copyFile (
+	const char* srcFileName,
+	const char* dstFileName,
+	uint64_t size
+	)
+{
+	File srcFile;
+	File dstFile;
+
+	bool result = 
+		srcFile.open (srcFileName, FileFlag_ReadOnly) &&
+		dstFile.open (dstFileName);
+
+	if (!result)
+		return false;
+
+	enum 
+	{
+		BlockSize = 32 * 1024, // 32 K
+	};
+
+	if (size == -1)
+		size = srcFile.getSize ();
+
+	uint64_t offset = 0;
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+	win::Mapping srcMapping;
+	win::Mapping dstMapping;
+	win::MappedView srcView;
+	win::MappedView dstView;
+
+	result = 
+		srcMapping.create (srcFile.m_file, NULL, PAGE_READONLY, size) &&
+		dstMapping.create (dstFile.m_file, NULL, PAGE_READWRITE, size);
+
+	while (size)
+	{
+		size_t blockSize = (size_t) AXL_MIN (BlockSize, size);
+
+		const void* src = srcView.view (srcMapping, FILE_MAP_READ, offset, blockSize);
+		void* dst = dstView.view (dstMapping, FILE_MAP_READ | FILE_MAP_WRITE, offset, blockSize);
+
+		if (!src || !dst)
+			return false;
+
+		memcpy (dst, src, blockSize);
+
+		offset += blockSize;
+		size -= blockSize;
+	}
+
+	srcMapping.close ();
+	dstMapping.close ();
+	srcView.close ();
+	dstView.close ();
+#else 
+	psx::Mapping srcMapping;
+	psx::Mapping dstMapping;
+
+	while (size)
+	{
+		size_t blockSize = AXL_MIN (BlockSize, size);
+
+		const void* src = srcView.view (NULL, blockSize, PROT_READ, MAP_SHARED, srcFile->m_file, offset);
+		void* dst = dstView.view (NULL, blockSize, PROT_READ | PROT_WRITE, MAP_SHARED, dstFile->m_file, offset);
+
+		if (!src || !dst)
+			return false;
+
+		memcpy (dst, src, blockSize);
+
+		offset += blockSize;
+		size -= blockSize;
+	}
+
+	srcMapping.close ();
+	dstMapping.close ();
+#endif
+
+	return offset;
+}
 
 //.............................................................................
 

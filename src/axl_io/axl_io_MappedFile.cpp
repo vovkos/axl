@@ -258,6 +258,24 @@ MappedFile::view (
 	return viewImpl (offset, end, isPermanent);
 }
 
+size_t
+MappedFile::write (
+	uint64_t offset,
+	const void* p,
+	size_t size
+	)
+{
+	size_t result = m_file.writeAt (offset, p, size);
+	if (result == -1)
+		return -1;
+
+	uint64_t end = offset + result; 
+	if (end > m_fileSize)
+		m_fileSize = end;
+
+	return result;
+}
+
 void*
 MappedFile::viewImpl (
 	uint64_t offset,

@@ -226,6 +226,13 @@ deleteFile (const char* fileName)
 
 #endif
 
+uint64_t
+copyFile (
+	const char* srcFileName,
+	const char* dstFileName,
+	uint64_t size = -1
+	);
+
 //.............................................................................
 
 } // namespace io
