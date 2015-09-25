@@ -177,6 +177,10 @@ copyFile (
 	psx::Mapping srcMapping;
 	psx::Mapping dstMapping;
 
+	result = dstFile.setSize (size);
+	if (!result)
+		return -1;
+
 	while (size)
 	{
 		size_t blockSize = AXL_MIN (BlockSize, size);
