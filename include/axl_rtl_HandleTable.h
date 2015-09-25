@@ -96,7 +96,7 @@ public:
 			return false;
 
 		*value = it->m_value->m_value;
-		return true;			
+		return true;
 	}
 
 	handle_t
@@ -134,7 +134,7 @@ public:
 			return false;
 
 		remove (it);
-		return true;			
+		return true;
 	}
 };
 
