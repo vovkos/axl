@@ -131,7 +131,7 @@ copyFile (
 		dstFile.open (dstFileName);
 
 	if (!result)
-		return false;
+		return -1;
 
 	enum 
 	{
@@ -161,7 +161,7 @@ copyFile (
 		void* dst = dstView.view (dstMapping, FILE_MAP_READ | FILE_MAP_WRITE, offset, blockSize);
 
 		if (!src || !dst)
-			return false;
+			return -1;
 
 		memcpy (dst, src, blockSize);
 
@@ -181,11 +181,11 @@ copyFile (
 	{
 		size_t blockSize = AXL_MIN (BlockSize, size);
 
-		const void* src = srcView.view (NULL, blockSize, PROT_READ, MAP_SHARED, srcFile->m_file, offset);
-		void* dst = dstView.view (NULL, blockSize, PROT_READ | PROT_WRITE, MAP_SHARED, dstFile->m_file, offset);
+		const void* src = srcMapping.map (NULL, blockSize, PROT_READ, MAP_SHARED, srcFile.m_file, offset);
+		void* dst = dstMapping.map (NULL, blockSize, PROT_READ | PROT_WRITE, MAP_SHARED, dstFile.m_file, offset);
 
 		if (!src || !dst)
-			return false;
+			return -1;
 
 		memcpy (dst, src, blockSize);
 
