@@ -98,6 +98,17 @@ public:
 	typedef typename BaseType::Iterator Iterator;
 
 public:
+	template <typename L>
+	void
+	copy (const L& list)
+	{
+		clear ();
+
+		typename L::Iterator it = list.getHead ();
+		for (; it; it++)
+			insertTail (*it);
+	}
+
 	T
 	remove (Iterator it)
 	{
