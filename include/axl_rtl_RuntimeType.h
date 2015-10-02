@@ -324,7 +324,7 @@ public:
 	AXL_OBJ_BEGIN_INTERFACE_MAP (class)
 
 #define AXL_OBJ_BEGIN_CLASS_0(class) \
-	AXL_OBJ_GUID_TAG_E (axl::rtl::GUID_Null) \
+	AXL_OBJ_GUID_TAG_E (axl::rtl::g_nullGuid) \
 	AXL_OBJ_IMPLEMENT_GET_OBJECT (class) \
 	AXL_OBJ_REF_COUNT_MISCREATION_GUARD (class) \
 	AXL_OBJ_BEGIN_INTERFACE_MAP (class)

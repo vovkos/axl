@@ -17,12 +17,12 @@ ErrorMgr::ErrorMgr ()
 {
 	m_tlsSlot = mt::getTlsMgr ()->createSlot ();
 
-	registerProvider (GUID_StdError, rtl::getSimpleSingleton <StdErrorProvider> ());
-	registerProvider (GUID_Errno, rtl::getSimpleSingleton <ErrnoProvider> ());
+	registerProvider (g_stdErrorGuid, rtl::getSimpleSingleton <StdErrorProvider> ());
+	registerProvider (g_ErrnoGuid, rtl::getSimpleSingleton <ErrnoProvider> ());
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	registerProvider (GUID_WinError, rtl::getSimpleSingleton <WinErrorProvider> ());
-	registerProvider (GUID_NtError, rtl::getSimpleSingleton <NtErrorProvider> ());
+	registerProvider (g_winErrorGuid, rtl::getSimpleSingleton <WinErrorProvider> ());
+	registerProvider (g_ntErrorGuid, rtl::getSimpleSingleton <NtErrorProvider> ());
 #endif
 }
 

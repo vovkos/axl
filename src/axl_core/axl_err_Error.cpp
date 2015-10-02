@@ -16,7 +16,7 @@ ErrorData::isKind (
 {
 	const ErrorData* error = this;
 
-	if (m_guid == rtl::GUID_Null && m_code == StdErrorCode_Stack)
+	if (m_guid == rtl::g_nullGuid && m_code == StdErrorCode_Stack)
 		error++;
 
 	return error->m_guid == guid && error->m_code == code;
@@ -62,7 +62,7 @@ Error::push (const ErrorData& error)
 	size_t base = 0;
 	size_t baseSize = m_p->m_size;
 
-	if (m_p->isKind (GUID_StdError, StdErrorCode_Stack))
+	if (m_p->isKind (g_stdErrorGuid, StdErrorCode_Stack))
 	{
 		base += sizeof (ErrorData);
 		baseSize -= sizeof (ErrorData);
@@ -81,7 +81,7 @@ Error::push (const ErrorData& error)
 		);
 
 	m_p->m_size = (uint32_t) size;
-	m_p->m_guid = GUID_StdError;
+	m_p->m_guid = g_stdErrorGuid;
 	m_p->m_code = StdErrorCode_Stack;
 
 	memcpy (m_p + 1, &error, error.m_size);
@@ -148,7 +148,7 @@ Error::createStringError (
 		return NULL;
 
 	error->m_size = (uint32_t) size;
-	error->m_guid = GUID_StdError;
+	error->m_guid = g_stdErrorGuid;
 	error->m_code = StdErrorCode_String;
 
 	char* dst = (char*) (error + 1);

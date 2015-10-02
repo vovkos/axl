@@ -14,7 +14,7 @@ UsbError::create (int code)
 		return NULL;
 
 	error->m_size = sizeof (err::ErrorData);
-	error->m_guid = GUID_UsbError;
+	error->m_guid = g_usbErrorGuid;
 	error->m_code = code;
 	return error;
 }

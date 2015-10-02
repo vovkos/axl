@@ -22,7 +22,7 @@ typedef long NTSTATUS;
 	
 // {81443347-3BC9-4d5e-8B23-32D780EDB52B}
 AXL_RTL_DEFINE_GUID (
-	GUID_NtError,
+	g_ntErrorGuid,
 	0x81443347, 0x3bc9, 0x4d5e, 0x8b, 0x23, 0x32, 0xd7, 0x80, 0xed, 0xb5, 0x2b
 	);
 

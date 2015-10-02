@@ -329,6 +329,7 @@ source_group (
 set (
 	RTL_H_LIST
 	${AXL_INC_DIR}/axl_rtl_Array.h
+	${AXL_INC_DIR}/axl_rtl_ArraySlice.h
 	${AXL_INC_DIR}/axl_rtl_ArrayList.h
 	${AXL_INC_DIR}/axl_rtl_AutoPtrArray.h
 	${AXL_INC_DIR}/axl_rtl_BinTree.h
@@ -358,6 +359,7 @@ set (
 	${AXL_INC_DIR}/axl_rtl_SimpleSingleton.h
 	${AXL_INC_DIR}/axl_rtl_Singleton.h
 	${AXL_INC_DIR}/axl_rtl_String.h
+	${AXL_INC_DIR}/axl_rtl_StringSlice.h
 	${AXL_INC_DIR}/axl_rtl_StringCache.h
 	${AXL_INC_DIR}/axl_rtl_StringHashTable.h
 	${AXL_INC_DIR}/axl_rtl_Type.h

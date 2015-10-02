@@ -43,7 +43,7 @@ WinError::create (dword_t code)
 		return NULL;
 
 	error->m_size = sizeof (ErrorData);
-	error->m_guid = GUID_WinError;
+	error->m_guid = g_winErrorGuid;
 	error->m_code = code;
 	return error;
 }

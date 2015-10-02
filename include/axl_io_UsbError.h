@@ -18,7 +18,7 @@ namespace io {
 
 // {87EA0738-52E9-4769-B727-7A17377B921E}
 AXL_RTL_DEFINE_GUID (
-	GUID_UsbError,
+	g_usbErrorGuid,
 	0x87ea0738, 0x52e9, 0x4769, 0xb7, 0x27, 0x7a, 0x17, 0x37, 0x7b, 0x92, 0x1e
 	);
 
@@ -49,7 +49,7 @@ void
 registerUsbErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
-		GUID_UsbError, 
+		g_usbErrorGuid, 
 		rtl::getSimpleSingleton <UsbErrorProvider> ()
 		);
 }

@@ -126,10 +126,10 @@ public:
 
 //.............................................................................
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING(class, Value) \
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T (class, Value, char)
+#define AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP(class, Value) \
+	AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP_T (class, Value, char)
 
-#define AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING_T(class, Value, C) \
+#define AXL_RTL_BEGIN_STRING_HASH_TABLE_MAP_T(class, Value, C) \
 	AXL_RTL_BEGIN_HASH_TABLE_MAP ( \
 		class, \
 		const C*, \

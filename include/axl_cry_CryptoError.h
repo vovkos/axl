@@ -13,7 +13,7 @@ namespace cry {
 
 // {0216B513-A6BF-4D0E-9185-DD1260C75356}
 AXL_RTL_DEFINE_GUID (
-	GUID_CryptoError, 
+	g_cryptoErrorGuid, 
 	0x0216b513, 0xa6bf, 0x4d0e, 0x91, 0x85, 0xdd, 0x12, 0x60, 0xc7, 0x53, 0x56
 	);
 
@@ -34,7 +34,7 @@ void
 registerCryptoErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
-		GUID_CryptoError, 
+		g_cryptoErrorGuid, 
 		rtl::getSimpleSingleton <CryptoErrorProvider> ()
 		);
 }
@@ -56,7 +56,7 @@ public:
 	err::ErrorData*
 	create (int code)
 	{
-		return createSimpleError (GUID_CryptoError, code);
+		return createSimpleError (g_cryptoErrorGuid, code);
 	}
 };
 

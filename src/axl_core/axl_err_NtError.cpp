@@ -44,7 +44,7 @@ NtError::create (NTSTATUS status)
 		return NULL;
 
 	error->m_size = sizeof (ErrorData);
-	error->m_guid = GUID_NtError;
+	error->m_guid = g_ntErrorGuid;
 	error->m_code = status;
 	return error;
 }

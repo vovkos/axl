@@ -65,7 +65,7 @@ public:
 
 // axl std errors
 
-extern AXL_SELECT_ANY const rtl::Guid GUID_StdError = rtl::GUID_Null;
+extern AXL_SELECT_ANY const rtl::Guid g_stdErrorGuid = rtl::g_nullGuid;
 
 enum StdErrorCode
 {
@@ -80,9 +80,9 @@ enum StdErrorCode
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-extern const rtl::Guid GUID_WinError;
+extern const rtl::Guid g_winErrorGuid;
 
-#define GUID_SystemError GUID_WinError
+#define g_systemErrorGuid g_winErrorGuid
 
 enum SystemErrorCode
 {
@@ -137,9 +137,9 @@ getLastSystemErrorCode ()
 
 #elif (_AXL_ENV == AXL_ENV_NT)
 
-extern const rtl::Guid GUID_NtError;
+extern const rtl::Guid g_ntErrorGuid;
 
-#define GUID_SystemError GUID_NtError
+#define g_systemErrorGuid g_ntErrorGuid
 
 enum SystemErrorCode
 {
@@ -187,9 +187,9 @@ enum SystemErrorCode
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-extern const rtl::Guid GUID_Errno;
+extern const rtl::Guid g_ErrnoGuid;
 
-#define GUID_SystemError GUID_Errno
+#define g_systemErrorGuid g_ErrnoGuid
 
 enum SystemErrorCode
 {
@@ -280,7 +280,7 @@ public:
 extern AXL_SELECT_ANY const ErrorData g_noError =
 {
 	sizeof (ErrorData),
-	GUID_StdError,
+	g_stdErrorGuid,
 	SystemErrorCode_Success,
 };
 
@@ -505,7 +505,7 @@ public:
 	ErrorData*
 	createSystemError (uint_t code)
 	{
-		return createSimpleError (GUID_SystemError, code);
+		return createSimpleError (g_systemErrorGuid, code);
 	}
 
 	// string error
