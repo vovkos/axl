@@ -18,21 +18,46 @@ namespace rtl {
 template <typename C>
 class StringCacheBase
 {
+public:
+	typedef StringBase <C> String;
+	typedef StringHashTableMapBase <const String*, C> StringMap;
+	typedef StringHashTableMapIterator <const String*, C> StringMapIterator;
+
 protected:
-	rtl::BoxList <rtl::StringBase <C> > m_symbolList;
-	rtl::StringHashTableBase <C> m_symbolMap;
+	BoxList <String> m_stringList;
+	StringHashTableMapBase <const String*, C> m_stringMap;
 	
 public:
-	const C*
-	getString (const C* p)
+	void
+	clear ()
 	{
-		rtl::HashTableIterator <const C*> it = m_symbolMap.find (p);
-		if (it)
-			return it->m_key;
+		m_stringList.clear ();
+		m_stringMap.clear ();
+	}
 
-		rtl::StringBase <C>& string = *m_symbolList.insertTail (p);
-		m_symbolMap.visit (string);
-		return string;
+	String
+	getString (const C* srcString)
+	{
+		StringMapIterator it = m_stringMap.find (srcString);
+		if (it)
+			return *it->m_value;
+
+		String* dstString = m_stringList.insertTail (srcString).p ();
+		it = m_stringMap.visit (*dstString);
+		it->m_value = dstString;
+		return *dstString;
+	}
+
+	String
+	getString (const String& srcString)
+	{
+		StringMapIterator it = m_stringMap.visit (srcString);
+		if (it->m_value)
+			return *it->m_value;
+
+		String* dstString = m_stringList.insertTail (srcString).p ();
+		it->m_value = dstString;
+		return *dstString;
 	}
 };
 
