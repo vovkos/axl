@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_io_Mapping.h"
 #include "axl_g_Module.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -70,7 +70,7 @@ Mapping::open (
 	uint_t protection = (flags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 	uint_t access = (flags & FileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
-	rtl::String_w name_w = name;
+	sl::String_w name_w = name;
 
 	bool result = (flags & FileFlag_OpenExisting) ?
 		m_mapping.open (access, false, name_w):
@@ -142,5 +142,5 @@ Mapping::close ()
 
 //.............................................................................
 
-} // namespace axl {
-} // namespace io {
+} // namespace io
+} // namespace axl

@@ -6,7 +6,7 @@
 
 #define _AXL_G_MODULE_H
 
-#include "axl_rtl_List.h"
+#include "axl_sl_List.h"
 #include "axl_mt_Lock.h"
 #include "axl_mt_CallOnce.h"
 #include "axl_mem_Tracker.h"
@@ -39,7 +39,7 @@ public:
 class Module
 {
 protected:
-	class FinalizerEntry: public rtl::ListLink
+	class FinalizerEntry: public sl::ListLink
 	{
 	public:
 		ref::Ptr <Finalizer> m_finalizer;
@@ -61,7 +61,7 @@ protected:
 	// finalizers
 	
 	mt::Lock m_finalizerListLock;
-	rtl::StdList <FinalizerEntry> m_finalizerList;
+	sl::StdList <FinalizerEntry> m_finalizerList;
 
 public:
 	Module ();

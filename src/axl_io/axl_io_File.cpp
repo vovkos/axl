@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_io_File.h"
 #include "axl_io_Mapping.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -38,7 +38,7 @@ File::open (
 		flagsAttributes |= FILE_FLAG_OVERLAPPED;
 
 	char buffer [256];
-	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
 	return m_file.create (

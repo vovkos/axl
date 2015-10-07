@@ -6,7 +6,7 @@
 
 #define _AXL_IO_SOCKADDRPARSER_H
 
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -94,5 +94,5 @@ protected:
 
 //.............................................................................
 
-} // namespace io {
-} // namespace axl {
+} // namespace io
+} // namespace axl

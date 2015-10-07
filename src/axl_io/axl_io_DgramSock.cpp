@@ -105,7 +105,7 @@ DgramSock::recvFrom (
 void
 onSyncSendRecvComplete (
 	mt::Event* event,
-	err::ErrorData* error,
+	err::ErrorHdr* error,
 	SockAddrU* addrFromBuf,
 	size_t* actualSize,
 

@@ -104,7 +104,7 @@ ConnectionSock::disconnect (
 void
 onSyncConnectDisconnectComplete (
 	mt::Event* event,
-	err::ErrorData* error,
+	err::ErrorHdr* error,
 	const err::Error& error
 	)
 {

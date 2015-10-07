@@ -15,7 +15,7 @@ struct DfaState;
 
 //.............................................................................
 
-struct DfaTransition: rtl::ListLink
+struct DfaTransition: sl::ListLink
 {
 	MatchCondition m_matchCondition;
 	DfaState* m_outState;
@@ -23,16 +23,16 @@ struct DfaTransition: rtl::ListLink
 
 //.............................................................................
 
-struct DfaState: rtl::ListLink
+struct DfaState: sl::ListLink
 {
 	bool m_isAccept;
 	uint_t m_id;
 	uint_t m_acceptNfaStateId;
 	void* m_acceptContext;
-	rtl::Array <size_t> m_openCaptureIdArray;
-	rtl::Array <size_t> m_closeCaptureIdArray;
+	sl::Array <size_t> m_openCaptureIdArray;
+	sl::Array <size_t> m_closeCaptureIdArray;
 
-	rtl::StdList <DfaTransition> m_transitionList;
+	sl::StdList <DfaTransition> m_transitionList;
 
 	NfaStateSet m_nfaStateSet;
 

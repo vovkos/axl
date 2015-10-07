@@ -6,7 +6,7 @@
 
 #define _AXL_EXE_INVOKELIST_H
 
-#include "axl_rtl_List.h"
+#include "axl_sl_List.h"
 #include "axl_exe_Arg.h"
 #include "axl_ref_Ptr.h"
 
@@ -22,7 +22,7 @@ struct IFunction;
 class InvokeList
 {
 protected:
-	class Entry: public rtl::ListLink
+	class Entry: public sl::ListLink
 	{
 	public:
 		ref::Ptr <ArgBlock> m_stack;
@@ -30,7 +30,7 @@ protected:
 	};
 
 protected:
-	rtl::StdList <Entry> m_list;
+	sl::StdList <Entry> m_list;
 
 public:
 	bool 

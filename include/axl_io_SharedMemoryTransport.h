@@ -9,7 +9,7 @@
 #include "axl_io_Mapping.h"
 #include "axl_mt_Event.h"
 #include "axl_mt_Lock.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace io {
@@ -79,8 +79,8 @@ protected:
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	mt::psx::Sem m_readEvent;
 	mt::psx::Sem m_writeEvent;
-	rtl::String m_readEventName;
-	rtl::String m_writeEventName;
+	sl::String m_readEventName;
+	sl::String m_writeEventName;
 #endif
 
 protected:
@@ -149,9 +149,9 @@ class SharedMemoryReader: public SharedMemoryTransportBase
 {
 public:
 	size_t
-	read (rtl::Array <char>* buffer);
+	read (sl::Array <char>* buffer);
 
-	rtl::Array <char>
+	sl::Array <char>
 	read ();
 };
 

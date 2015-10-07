@@ -7,8 +7,8 @@
 #define _AXL_IO_USBDEVICE_H
 
 #include "axl_io_UsbError.h"
-#include "axl_rtl_Handle.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Handle.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace io {
@@ -38,7 +38,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbContext: public rtl::Handle <libusb_context*, CloseUsbContext>
+class UsbContext: public sl::Handle <libusb_context*, CloseUsbContext>
 {
 public:
 	UsbContext ()
@@ -64,7 +64,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbDeviceList: public rtl::Handle <libusb_device**, FreeUsbDeviceList>
+class UsbDeviceList: public sl::Handle <libusb_device**, FreeUsbDeviceList>
 {
 public:
 	size_t
@@ -85,7 +85,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef rtl::Handle <libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfigDescriptor;
+typedef sl::Handle <libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfigDescriptor;
 
 //.............................................................................
 
@@ -244,13 +244,13 @@ public:
 
 	// descriptors
 
-	rtl::Array <char>
+	sl::Array <char>
 	getDescriptor (
 		libusb_descriptor_type descriptorType, 
 		uint_t descriptorId
 		)
 	{
-		rtl::Array <char> descriptor;
+		sl::Array <char> descriptor;
 		getDescriptor (descriptorType, descriptorId, &descriptor);
 		return descriptor;
 	}
@@ -259,7 +259,7 @@ public:
 	getDescriptor (
 		libusb_descriptor_type descriptorType, 
 		uint_t descriptorId,
-		rtl::Array <char>* descriptor
+		sl::Array <char>* descriptor
 		);
 
 	bool
@@ -274,13 +274,13 @@ public:
 	bool
 	getActiveConfigDescriptor (UsbConfigDescriptor* desc);
 
-	rtl::String 
+	sl::String 
 	getStringDesrciptor (
 		uint_t stringId,
 		uint_t langId
 		)
 	{
-		rtl::String string;
+		sl::String string;
 		getStringDesrciptor (stringId, langId, &string);
 		return string;
 	}
@@ -289,13 +289,13 @@ public:
 	getStringDesrciptor (
 		uint_t stringId,
 		uint_t langId,
-		rtl::String* string
+		sl::String* string
 		);
 
-	rtl::String 
+	sl::String 
 	getStringDesrciptor (uint_t stringId)
 	{
-		rtl::String string;
+		sl::String string;
 		getStringDesrciptor (stringId, &string);
 		return string;
 	}
@@ -303,7 +303,7 @@ public:
 	bool
 	getStringDesrciptor (
 		uint_t stringId,
-		rtl::String* string
+		sl::String* string
 		);
 
 	// synchronous transfers
@@ -338,5 +338,5 @@ public:
 
 //.............................................................................
 
-} // namespace io {
-} // namespace axl {
+} // namespace io
+} // namespace axl

@@ -21,7 +21,7 @@ getFontFlagString (FontFlag flag)
 		"clear-strikeout", // EFontFlag_Strikeout = 0x08,
 	};
 
-	size_t i = rtl::getLoBitIdx32 (flag >> 8);
+	size_t i = sl::getLoBitIdx32 (flag >> 8);
 
 	return i < countof (stringTable) ? 
 		stringTable [i] : 

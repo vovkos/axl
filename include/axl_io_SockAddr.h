@@ -6,8 +6,8 @@
 
 #define _AXL_IO_SOCKADDR_H
 
-#include "axl_rtl_String.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_String.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace io {
@@ -139,30 +139,30 @@ parseSockAddr (
 
 size_t
 getAddrString_ip4 (
-	rtl::String* string,
+	sl::String* string,
 	const in_addr* addr
 	);
 
 inline
-rtl::String
+sl::String
 getAddrString_ip4 (const in_addr* addr)
 {
-	rtl::String string;
+	sl::String string;
 	getAddrString_ip4 (&string, addr);
 	return string;
 }
 
 size_t
 getAddrString_ip6 (
-	rtl::String* string,
+	sl::String* string,
 	const in6_addr* addr
 	);
 
 inline
-rtl::String
+sl::String
 getAddrString_ip6 (const in6_addr* addr)
 {
-	rtl::String string;
+	sl::String string;
 	getAddrString_ip6 (&string, addr);
 	return string;
 }
@@ -171,45 +171,45 @@ getAddrString_ip6 (const in6_addr* addr)
 
 size_t
 getSockAddrString_ip4 (
-	rtl::String* string,
+	sl::String* string,
 	const sockaddr_in* addr
 	);
 
 inline
-rtl::String
+sl::String
 getSockAddrString_ip4 (const sockaddr_in* addr)
 {
-	rtl::String string;
+	sl::String string;
 	getSockAddrString_ip4 (&string, addr);
 	return string;
 }
 
 size_t
 getSockAddrString_ip6 (
-	rtl::String* string,
+	sl::String* string,
 	const sockaddr_in6* addr
 	);
 
 inline
-rtl::String
+sl::String
 getSockAddrString_ip6 (const sockaddr_in6* addr)
 {
-	rtl::String string;
+	sl::String string;
 	getSockAddrString_ip6 (&string, addr);
 	return string;
 }
 
 size_t
 getSockAddrString (
-	rtl::String* string,
+	sl::String* string,
 	const sockaddr* addr
 	);
 
 inline
-rtl::String
+sl::String
 getSockAddrString (const sockaddr* addr)
 {
-	rtl::String string;
+	sl::String string;
 	getSockAddrString (&string, addr);
 	return string;
 }
@@ -325,13 +325,13 @@ struct SockAddr
 	uint_t 
 	getPort ()
 	{
-		return rtl::swapByteOrder16 (m_addr_ip4.sin_port);
+		return sl::swapByteOrder16 (m_addr_ip4.sin_port);
 	}
 
 	void
 	setPort (uint_t port)
 	{
-		m_addr_ip4.sin_port = rtl::swapByteOrder16 ((uint16_t) port);
+		m_addr_ip4.sin_port = sl::swapByteOrder16 ((uint16_t) port);
 	}
 
 	void
@@ -440,37 +440,37 @@ struct SockAddr
 	}
 
 	size_t
-	getString (rtl::String* string) const
+	getString (sl::String* string) const
 	{
 		return getSockAddrString (string, &m_addr);
 	}
 
 	inline
-	rtl::String
+	sl::String
 	getString () const
 	{
 		return getSockAddrString (&m_addr);
 	}
 
 	size_t
-	getString_ip4 (rtl::String* string) const
+	getString_ip4 (sl::String* string) const
 	{
 		return getSockAddrString_ip4 (string, &m_addr_ip4);
 	}
 
-	rtl::String
+	sl::String
 	getString_ip4 () const
 	{
 		return getSockAddrString_ip4 (&m_addr_ip4);
 	}
 
 	size_t
-	getString_ip6 (rtl::String* string) const
+	getString_ip6 (sl::String* string) const
 	{
 		return getSockAddrString_ip6 (string, &m_addr_ip6);
 	}
 
-	rtl::String
+	sl::String
 	getString_ip6 (const sockaddr_in6* addr) const
 	{
 		return getSockAddrString_ip6 (&m_addr_ip6);
@@ -481,19 +481,19 @@ struct SockAddr
 
 bool
 resolveHostName (
-	rtl::Array <SockAddr>* addrArray,
+	sl::Array <SockAddr>* addrArray,
 	const char* name,
 	uint_t family = AF_UNSPEC
 	);
 
 inline
-rtl::Array <SockAddr>
+sl::Array <SockAddr>
 resolveHostName (
 	const char* name,
 	uint_t family = AF_UNSPEC
 	)
 {
-	rtl::Array <SockAddr> addrArray;
+	sl::Array <SockAddr> addrArray;
 	resolveHostName (&addrArray, name, family);
 	return addrArray;
 }

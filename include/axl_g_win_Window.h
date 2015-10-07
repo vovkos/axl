@@ -9,7 +9,7 @@
 #include "axl_exe_Thunk.h"
 #include "axl_g_Module.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace g {
@@ -17,7 +17,7 @@ namespace win {
 
 //.............................................................................
 
-class Window: public rtl::Handle <HWND>
+class Window: public sl::Handle <HWND>
 {
 public:
 	// CWindowImplT <> overridables

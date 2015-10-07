@@ -8,7 +8,7 @@ namespace enc {
 
 size_t
 HexEncoding::encode (
-	rtl::String* string,
+	sl::String* string,
 	const void* p,
 	size_t size,
 	uint_t flags
@@ -128,7 +128,7 @@ HexEncoding::encode_nsu (
 
 size_t
 HexEncoding::decode (
-	rtl::Array <char>* buffer,
+	sl::Array <char>* buffer,
 	const char* p,
 	size_t length
 	)
@@ -142,7 +142,7 @@ HexEncoding::decode (
 	State state = State_Normal;
 
 	if (length == -1)
-		length = rtl::StringDetails::calcLength (p);
+		length = sl::StringDetails::calcLength (p);
 
 	buffer->reserve (length / 2);
 	buffer->clear ();

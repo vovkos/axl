@@ -60,7 +60,7 @@ protected:
 
 		virtual
 		size_t
-		getInterfaceOffset (const rtl::Guid& guid)
+		getInterfaceOffset (const sl::Guid& guid)
 		{
 			ASSERT (m_type);
 

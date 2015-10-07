@@ -8,5 +8,5 @@ namespace io {
 
 //.............................................................................
 
-} // namespace io {
-} // namespace axl {
+} // namespace io
+} // namespace axl

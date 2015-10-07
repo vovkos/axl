@@ -17,18 +17,18 @@ ErrorMgr::ErrorMgr ()
 {
 	m_tlsSlot = mt::getTlsMgr ()->createSlot ();
 
-	registerProvider (g_stdErrorGuid, rtl::getSimpleSingleton <StdErrorProvider> ());
-	registerProvider (g_ErrnoGuid, rtl::getSimpleSingleton <ErrnoProvider> ());
+	registerProvider (g_stdErrorGuid, mt::getSimpleSingleton <StdErrorProvider> ());
+	registerProvider (g_ErrnoGuid, mt::getSimpleSingleton <ErrnoProvider> ());
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	registerProvider (g_winErrorGuid, rtl::getSimpleSingleton <WinErrorProvider> ());
-	registerProvider (g_ntErrorGuid, rtl::getSimpleSingleton <NtErrorProvider> ());
+	registerProvider (g_winErrorGuid, mt::getSimpleSingleton <WinErrorProvider> ());
+	registerProvider (g_ntErrorGuid, mt::getSimpleSingleton <NtErrorProvider> ());
 #endif
 }
 
 void
 ErrorMgr::registerProvider (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	ErrorProvider* provider
 	)
 {
@@ -37,10 +37,10 @@ ErrorMgr::registerProvider (
 }
 
 ErrorProvider* 
-ErrorMgr::findProvider (const rtl::Guid& guid)
+ErrorMgr::findProvider (const sl::Guid& guid)
 {
 	mt::ScopeLock scopeLock (&m_lock);
-	rtl::HashTableMapIterator <rtl::Guid, ErrorProvider*> it = m_providerMap.find (guid);
+	sl::HashTableMapIterator <sl::Guid, ErrorProvider*> it = m_providerMap.find (guid);
 	return it ? it->m_value : NULL;
 }
 

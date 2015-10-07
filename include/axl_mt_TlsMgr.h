@@ -6,10 +6,10 @@
 
 #define _AXL_MT_TLSMGR_H
 
-#include "axl_rtl_Singleton.h"
-#include "axl_rtl_BoxList.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_BoxList.h"
+#include "axl_sl_Array.h"
 #include "axl_ref_Ptr.h"
+#include "axl_mt_Singleton.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	define AXL_MT_TLS_CALLBACK_SECTION ".CRT$XLD"
@@ -27,8 +27,8 @@ class TlsMgr
 protected:
 	struct Page
 	{
-		rtl::Array <rtl::BoxListEntry <TlsValue>*> m_array;
-		rtl::BoxList <TlsValue> m_valueList;
+		sl::Array <sl::BoxListEntry <TlsValue>*> m_array;
+		sl::BoxList <TlsValue> m_valueList;
 	};
 
 protected:
@@ -117,7 +117,7 @@ inline
 TlsMgr*
 getTlsMgr ()
 {
-	return rtl::getSingleton <TlsMgr> ();
+	return mt::getSingleton <TlsMgr> ();
 }
 
 //.............................................................................

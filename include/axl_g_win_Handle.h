@@ -6,7 +6,7 @@
 
 #define _AXL_G_WIN_HANDLE_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -27,11 +27,11 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef rtl::Handle <HANDLE, CloseHandle> Handle;
+typedef sl::Handle <HANDLE, CloseHandle> Handle;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class FileHandle: public rtl::Handle <HANDLE, CloseHandle, rtl::MinusOne <HANDLE> >
+class FileHandle: public sl::Handle <HANDLE, CloseHandle, sl::MinusOne <HANDLE> >
 {
 public:
 	static
@@ -59,7 +59,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef rtl::Handle <HKEY, CloseRegKey, rtl::MinusOne <HKEY> > RegKeyHandle;
+typedef sl::Handle <HKEY, CloseRegKey, sl::MinusOne <HKEY> > RegKeyHandle;
 
 //.............................................................................
 

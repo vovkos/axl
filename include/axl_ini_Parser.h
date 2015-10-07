@@ -19,7 +19,7 @@ class Parser: protected Lexer
 {
 public:
 	bool
-	parseFile (const rtl::String& filePath)
+	parseFile (const sl::String& filePath)
 	{
 		io::SimpleMappedFile file;
 		return 
@@ -38,7 +38,7 @@ public:
 
 	bool
 	parse (
-		const rtl::String& filePath,
+		const sl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)

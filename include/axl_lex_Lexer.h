@@ -7,7 +7,7 @@
 #define _AXL_LEX_LEXER_H
 
 #include "axl_lex_Token.h"
-#include "axl_rtl_BoxList.h"
+#include "axl_sl_BoxList.h"
 #include "axl_err_ParseError.h"
 
 namespace axl {
@@ -27,8 +27,8 @@ public:
 	typedef typename Token::Pos Pos;
 
 protected:
-	typedef rtl::BoxList <Token, const Token&> TokenList;
-	typedef rtl::BoxListEntry <Token> TokenEntry;
+	typedef sl::BoxList <Token, const Token&> TokenList;
+	typedef sl::BoxListEntry <Token> TokenEntry;
 
 protected:
 	TokenList m_tokenList;
@@ -69,7 +69,7 @@ public:
 		channelMask |= 1; // ensure channel 0 is ALWAYS in the mask
 
 		size_t i = 0;
-		rtl::BoxIterator <Token> it = m_tokenList.getHead ();
+		sl::BoxIterator <Token> it = m_tokenList.getHead ();
 
 		for (;;)
 		{
@@ -95,7 +95,7 @@ public:
 
 			// ...nope, need to fetch more tokens
 
-			rtl::BoxIterator <Token> tail = m_tokenList.getTail ();
+			sl::BoxIterator <Token> tail = m_tokenList.getTail ();
 
 			size_t oldCount = m_tokenList.getCount ();
 			do
@@ -119,7 +119,7 @@ public:
 		{
 			while (!m_tokenList.isEmpty ())
 			{
-				rtl::BoxIterator <Token> it = m_tokenList.getHead ();
+				sl::BoxIterator <Token> it = m_tokenList.getHead ();
 
 				if (it->m_token <= 0) // done! but don't remove it!
 					return;

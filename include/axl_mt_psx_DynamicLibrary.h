@@ -6,7 +6,7 @@
 
 #define _AXL_MT_PSX_DYNAMICLIBRARY_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace mt {
@@ -26,7 +26,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class DynamicLibrary: public rtl::Handle <void*, CloseDynamicLibrary>
+class DynamicLibrary: public sl::Handle <void*, CloseDynamicLibrary>
 {
 public:
 	bool

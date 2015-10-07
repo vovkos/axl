@@ -7,7 +7,7 @@
 #define _AXL_FSM_STDREGEXPNAMEMGR_H
 
 #include "axl_fsm_RegExp.h"
-#include "axl_rtl_StringHashTable.h"
+#include "axl_sl_StringHashTable.h"
 
 namespace axl {
 namespace fsm {
@@ -17,15 +17,15 @@ namespace fsm {
 class StdRegExpNameMgr: public RegExpNameMgr
 {
 protected:
-	struct Name: public rtl::ListLink
+	struct Name: public sl::ListLink
 	{
-		rtl::String m_name;
-		rtl::String m_source;
+		sl::String m_name;
+		sl::String m_source;
 	};
 
 protected:
-	rtl::StdList <Name> m_nameList;
-	rtl::StringHashTableMap <Name*> m_nameMap;
+	sl::StdList <Name> m_nameList;
+	sl::StringHashTableMap <Name*> m_nameMap;
 
 public:
 	void
@@ -39,14 +39,14 @@ public:
 	const char*
 	findName (const char* name)
 	{
-		rtl::StringHashTableMapIterator <Name*> it = m_nameMap.find (name);
+		sl::StringHashTableMapIterator <Name*> it = m_nameMap.find (name);
 		return it ? it->m_value->m_source.cc () : NULL;
 	}
 
 	void
 	addName (
-		const rtl::String& name,
-		const rtl::String& source
+		const sl::String& name,
+		const sl::String& source
 		);
 
 	void

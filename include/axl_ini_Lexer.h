@@ -27,15 +27,15 @@ public:
 	};
 
 protected:
-	rtl::String m_filePath;
+	sl::String m_filePath;
 
 	char* m_begin;
 	int m_line;
 	size_t m_lineOffset;
 
-	rtl::String m_sectionName;
-	rtl::String m_keyName;
-	rtl::String m_value;
+	sl::String m_sectionName;
+	sl::String m_keyName;
+	sl::String m_value;
 
 	// ragel interface variables
 
@@ -55,8 +55,8 @@ protected: // should only be used as part of ini::CParser
 
 	bool
 	create (
-		const rtl::String& filePath,
-		const rtl::String& source
+		const sl::String& filePath,
+		const sl::String& source
 		)
 	{
 		return create (filePath, source, source.getLength ());
@@ -64,7 +64,7 @@ protected: // should only be used as part of ini::CParser
 
 	bool
 	create (
-		const rtl::String& filePath,
+		const sl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_err_Error.h"
 #include "axl_err_ErrorMgr.h"
-#include "axl_rtl_Packer.h"
+#include "axl_sl_Packer.h"
 
 namespace axl {
 namespace err {
@@ -9,32 +9,32 @@ namespace err {
 //.............................................................................
 
 bool
-ErrorData::isKind (
-	const rtl::Guid& guid,
+ErrorHdr::isKind (
+	const sl::Guid& guid,
 	uint_t code
 	) const
 {
-	const ErrorData* error = this;
+	const ErrorHdr* error = this;
 
-	if (m_guid == rtl::g_nullGuid && m_code == StdErrorCode_Stack)
+	if (m_guid == sl::g_nullGuid && m_code == StdErrorCode_Stack)
 		error++;
 
 	return error->m_guid == guid && error->m_code == code;
 }
 
-rtl::String
-ErrorData::getDescription () const
+sl::String
+ErrorHdr::getDescription () const
 {
 	ErrorProvider* provider = getErrorMgr ()->findProvider (m_guid);
 
 	return provider ?
 		provider->getErrorDescription (this) :
-		rtl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code);
+		sl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code);
 }
 
 //.............................................................................
 
-rtl::String
+sl::String
 Error::getDescription () const
 {
 	return m_p ?
@@ -42,10 +42,10 @@ Error::getDescription () const
 		g_noError.getDescription ();
 }
 
-ErrorData*
-Error::copy (const ErrorData& src)
+ErrorHdr*
+Error::copy (const ErrorHdr& src)
 {
-	ErrorData* error = getBuffer (src.m_size);
+	ErrorHdr* error = getBuffer (src.m_size);
 	if (!error)
 		return NULL;
 
@@ -53,8 +53,8 @@ Error::copy (const ErrorData& src)
 	return error;
 }
 
-ErrorData*
-Error::push (const ErrorData& error)
+ErrorHdr*
+Error::push (const ErrorHdr& error)
 {
 	if (!m_p)
 		return copy (error);
@@ -64,18 +64,18 @@ Error::push (const ErrorData& error)
 
 	if (m_p->isKind (g_stdErrorGuid, StdErrorCode_Stack))
 	{
-		base += sizeof (ErrorData);
-		baseSize -= sizeof (ErrorData);
+		base += sizeof (ErrorHdr);
+		baseSize -= sizeof (ErrorHdr);
 	}
 
-	size_t size = sizeof (ErrorData) + error.m_size + baseSize;
+	size_t size = sizeof (ErrorHdr) + error.m_size + baseSize;
 
 	getBuffer (size, true);
 	if (!m_p)
 		return NULL;
 
 	memmove (
-		(uchar_t*) m_p + sizeof (ErrorData) + error.m_size,
+		(uchar_t*) m_p + sizeof (ErrorHdr) + error.m_size,
 		(uchar_t*) m_p + base,
 		baseSize
 		);
@@ -88,37 +88,37 @@ Error::push (const ErrorData& error)
 	return m_p;
 }
 
-ErrorData*
+ErrorHdr*
 Error::createSimpleError (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code
 	)
 {
-	getBuffer (sizeof (ErrorData));
+	getBuffer (sizeof (ErrorHdr));
 	if (!m_p)
 		return NULL;
 
-	m_p->m_size = sizeof (ErrorData);
+	m_p->m_size = sizeof (ErrorHdr);
 	m_p->m_guid = guid;
 	m_p->m_code = code;
 	return m_p;
 }
 
-ErrorData*
+ErrorHdr*
 Error::format_va (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	rtl::PackerSeq packer;
+	sl::PackerSeq packer;
 	packer.format (formatString);
 
 	size_t packSize;
 	packer.pack_va (NULL, &packSize, va);
 
-	size_t size = sizeof (ErrorData) + packSize;
+	size_t size = sizeof (ErrorHdr) + packSize;
 
 	getBuffer (size);
 	if (!m_p)
@@ -132,7 +132,7 @@ Error::format_va (
 	return m_p;
 }
 
-ErrorData*
+ErrorHdr*
 Error::createStringError (
 	const char* p,
 	size_t length
@@ -141,9 +141,9 @@ Error::createStringError (
 	if (length == -1)
 		length = strlen (p);
 
-	size_t size = sizeof (ErrorData) + length + 1;
+	size_t size = sizeof (ErrorHdr) + length + 1;
 
-	ErrorData* error = getBuffer (size);
+	ErrorHdr* error = getBuffer (size);
 	if (!error)
 		return NULL;
 
@@ -159,14 +159,14 @@ Error::createStringError (
 	return error;
 }
 
-ErrorData*
+ErrorHdr*
 Error::formatStringError_va (
 	const char* formatString,
 	axl_va_list va
 	)
 {
 	char buffer [256];
-	rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.format_va (formatString, va);
 	return createStringError (string, string.getLength ());
 }
@@ -192,7 +192,7 @@ setError (const Error& error)
 	return error;
 }
 
-rtl::String
+sl::String
 getLastErrorDescription ()
 {
 	return getErrorMgr ()->getLastError ()->getDescription ();
@@ -200,11 +200,11 @@ getLastErrorDescription ()
 
 //.............................................................................
 
-rtl::String
-StdErrorProvider::getErrorDescription (const ErrorData* error)
+sl::String
+StdErrorProvider::getErrorDescription (const ErrorHdr* error)
 {
-	if (error->m_size < sizeof (ErrorData))
-		return rtl::String ();
+	if (error->m_size < sizeof (ErrorHdr))
+		return sl::String ();
 
 	size_t length;
 
@@ -214,34 +214,34 @@ StdErrorProvider::getErrorDescription (const ErrorData* error)
 		return "no error";
 
 	case StdErrorCode_String:
-		length = (error->m_size - sizeof (ErrorData)) / sizeof (char);
-		return rtl::String ((char*) (error + 1), length);
+		length = (error->m_size - sizeof (ErrorHdr)) / sizeof (char);
+		return sl::String ((char*) (error + 1), length);
 
 	case StdErrorCode_Stack:
 		return getStackErrorDescription (error);
 
 	default:
-		return rtl::String::format_s ("error #%d");
+		return sl::String::format_s ("error #%d");
 	}
 }
 
-rtl::String
-StdErrorProvider::getStackErrorDescription (const ErrorData* error)
+sl::String
+StdErrorProvider::getStackErrorDescription (const ErrorHdr* error)
 {
-	rtl::String string;
+	sl::String string;
 
 	void* end = (uchar_t*) error + (error->m_size);
-	const ErrorData* p = error + 1;
+	const ErrorHdr* p = error + 1;
 
 	while (p < end)
 	{
-		ASSERT (p->m_size >= sizeof (ErrorData));
+		ASSERT (p->m_size >= sizeof (ErrorHdr));
 
 		if (!string.isEmpty ())
 			string += ": ";
 
 		string += p->getDescription ();
-		p = (ErrorData*) ((uchar_t*) p + p->m_size);
+		p = (ErrorHdr*) ((uchar_t*) p + p->m_size);
 	}
 
 	return string;

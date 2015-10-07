@@ -44,7 +44,7 @@ template <typename T>
 T*
 getTlsSlotValue ()
 {
-	return rtl::getSimpleSingleton <TlsSlot <T> > ()->getValue ();
+	return mt::getSimpleSingleton <TlsSlot <T> > ()->getValue ();
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,7 +53,7 @@ template <typename T>
 T*
 setTlsSlotValue (T* p)
 {
-	return rtl::getSimpleSingleton <TlsSlot <T> > ()->setValue (p);
+	return mt::getSimpleSingleton <TlsSlot <T> > ()->setValue (p);
 }
 
 //.............................................................................

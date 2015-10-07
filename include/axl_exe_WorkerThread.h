@@ -8,7 +8,7 @@
 
 #include "axl_exe_Scheduler.h"
 #include "axl_exe_InvokeList.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 #include "axl_mt_Lock.h"
 #include "axl_mt_Event.h"
 #include "axl_mt_Thread.h"
@@ -26,7 +26,7 @@ public:
 	AXL_OBJ_CLASS_0 (Workerhread, exe::IScheduler)
 
 protected:
-	struct UserEvent: rtl::ListLink
+	struct UserEvent: sl::ListLink
 	{
 		mt::Event* m_event;
 		ref::Ptr <exe::IFunction> m_onEvent;
@@ -40,9 +40,9 @@ protected:
 
 	// these are touched only within the worker thread
 
-	rtl::StdList <UserEvent> m_userEventList;
-	rtl::Array <mt::Event*> m_waitArray;
-	rtl::Array <exe::IFunction*> m_functionArray;
+	sl::StdList <UserEvent> m_userEventList;
+	sl::Array <mt::Event*> m_waitArray;
+	sl::Array <exe::IFunction*> m_functionArray;
 
 public:
 	Workerhread ();

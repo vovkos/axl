@@ -121,13 +121,13 @@ EcKey::signHash (
 bool
 generateEcProductKey (
 	EC_KEY* ecKey0,
-	rtl::String* productKey,
+	sl::String* productKey,
 	const char* userName,
 	size_t hyphenDistance
 	)
 {
 	char buffer [256];
-	rtl::Array <char> signature (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::Array <char> signature (ref::BufKind_Stack, buffer, sizeof (buffer));
 	
 	EcKey ecKey (ecKey0);
 
@@ -147,7 +147,7 @@ verifyEcProductKey (
 	)
 {
 	char buffer [256];
-	rtl::Array <char> signature (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::Array <char> signature (ref::BufKind_Stack, buffer, sizeof (buffer));
 
 	EcKey ecKey (ecKey0);
 

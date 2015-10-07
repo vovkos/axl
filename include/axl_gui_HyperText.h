@@ -25,20 +25,20 @@ protected:
 	};
 
 protected:
-	rtl::String m_source;
-	rtl::String m_text;
+	sl::String m_source;
+	sl::String m_text;
 	TextAttrAnchorArray m_attrArray;
 	HyperlinkAnchorArray m_hyperlinkArray;
-	rtl::Array <HyperlinkXMapEntry> m_hyperlinkXMap;
+	sl::Array <HyperlinkXMapEntry> m_hyperlinkXMap;
 
 public:
-	rtl::String
+	sl::String
 	getSource () const 
 	{
 		return m_source;
 	}
 
-	rtl::String
+	sl::String
 	getText () const 
 	{
 		return m_text;

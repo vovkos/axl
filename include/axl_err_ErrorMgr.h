@@ -7,10 +7,10 @@
 #define _AXL_ERR_ERRORMGR_H
 
 #include "axl_err_Error.h"
-#include "axl_rtl_HashTable.h"
-#include "axl_rtl_Singleton.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_HashTable.h"
+#include "axl_sl_String.h"
 #include "axl_mt_TlsMgr.h"
+#include "axl_mt_Singleton.h"
 
 namespace axl {
 namespace err {
@@ -31,11 +31,11 @@ protected:
 
 	size_t m_tlsSlot;
 
-	rtl::HashTableMap <
-		rtl::Guid, 
+	sl::HashTableMap <
+		sl::Guid, 
 		ErrorProvider*, 
-		rtl::HashDjb2 <rtl::Guid>,
-		rtl::CmpBin <rtl::Guid>
+		sl::HashDjb2 <sl::Guid>,
+		sl::CmpBin <sl::Guid>
 		> m_providerMap;
 
 public:
@@ -43,12 +43,12 @@ public:
 
 	void
 	registerProvider (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		ErrorProvider* provider
 		);
 
 	ErrorProvider* 
-	findProvider (const rtl::Guid& guid);
+	findProvider (const sl::Guid& guid);
 
 	ErrorMode
 	getErrorMode ()
@@ -83,7 +83,7 @@ inline
 ErrorMgr* 
 getErrorMgr ()
 {
-	return rtl::getSingleton <ErrorMgr> ();
+	return mt::getSingleton <ErrorMgr> ();
 }
 
 //.............................................................................

@@ -201,6 +201,8 @@ set (
 	MT_H_LIST
 	${AXL_INC_DIR}/axl_mt_Atomic.h
 	${AXL_INC_DIR}/axl_mt_CallOnce.h
+	${AXL_INC_DIR}/axl_mt_SimpleSingleton.h
+	${AXL_INC_DIR}/axl_mt_Singleton.h
 	${AXL_INC_DIR}/axl_mt_DynamicLibrary.h
 	${AXL_INC_DIR}/axl_mt_Event.h
 	${AXL_INC_DIR}/axl_mt_InvSemaphore.h
@@ -208,6 +210,7 @@ set (
 	${AXL_INC_DIR}/axl_mt_LongJmpTry.h
 	${AXL_INC_DIR}/axl_mt_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_Thread.h
+	${AXL_INC_DIR}/axl_mt_Process.h
 	${AXL_INC_DIR}/axl_mt_TlsMgr.h
 	${AXL_INC_DIR}/axl_mt_TlsSlot.h
 	)
@@ -215,7 +218,7 @@ set (
 set (
 	MT_CPP_LIST
 	axl_mt_TlsMgr.cpp
-	)
+		)
 
 source_group (
 	mt
@@ -323,69 +326,67 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# rtl folder
+# stx folder
 #
 
 set (
-	RTL_H_LIST
-	${AXL_INC_DIR}/axl_rtl_Array.h
-	${AXL_INC_DIR}/axl_rtl_ArraySlice.h
-	${AXL_INC_DIR}/axl_rtl_ArrayList.h
-	${AXL_INC_DIR}/axl_rtl_AutoPtrArray.h
-	${AXL_INC_DIR}/axl_rtl_BinTree.h
-	${AXL_INC_DIR}/axl_rtl_BitIdx.h
-	${AXL_INC_DIR}/axl_rtl_BitMap.h
-	${AXL_INC_DIR}/axl_rtl_BmhFind.h
-	${AXL_INC_DIR}/axl_rtl_BoyerMooreFind.h
-	${AXL_INC_DIR}/axl_rtl_BoxList.h
-	${AXL_INC_DIR}/axl_rtl_BuddyAllocMap.h
-	${AXL_INC_DIR}/axl_rtl_ByteOrder.h
-	${AXL_INC_DIR}/axl_rtl_CharLiteral.h
-	${AXL_INC_DIR}/axl_rtl_CmdLineParser.h
-	${AXL_INC_DIR}/axl_rtl_ForEach.h
-	${AXL_INC_DIR}/axl_rtl_Func.h
-	${AXL_INC_DIR}/axl_rtl_Guid.h
-	${AXL_INC_DIR}/axl_rtl_Handle.h
-	${AXL_INC_DIR}/axl_rtl_HandleTable.h
-	${AXL_INC_DIR}/axl_rtl_HashTable.h
-	${AXL_INC_DIR}/axl_rtl_List.h
-	${AXL_INC_DIR}/axl_rtl_ListBase.h
-	${AXL_INC_DIR}/axl_rtl_Pack.h
-	${AXL_INC_DIR}/axl_rtl_Packer.h
-	${AXL_INC_DIR}/axl_rtl_Packetizer.h
-	${AXL_INC_DIR}/axl_rtl_Protocol.h
-	${AXL_INC_DIR}/axl_rtl_RbTree.h
-	${AXL_INC_DIR}/axl_rtl_RuntimeType.h
-	${AXL_INC_DIR}/axl_rtl_SimpleSingleton.h
-	${AXL_INC_DIR}/axl_rtl_Singleton.h
-	${AXL_INC_DIR}/axl_rtl_String.h
-	${AXL_INC_DIR}/axl_rtl_StringSlice.h
-	${AXL_INC_DIR}/axl_rtl_StringCache.h
-	${AXL_INC_DIR}/axl_rtl_StringHashTable.h
-	${AXL_INC_DIR}/axl_rtl_Type.h
-	${AXL_INC_DIR}/axl_rtl_Unpacker.h
+	SL_H_LIST
+	${AXL_INC_DIR}/axl_sl_Array.h
+	${AXL_INC_DIR}/axl_sl_ArraySlice.h
+	${AXL_INC_DIR}/axl_sl_ArrayList.h
+	${AXL_INC_DIR}/axl_sl_AutoPtrArray.h
+	${AXL_INC_DIR}/axl_sl_BinTree.h
+	${AXL_INC_DIR}/axl_sl_BitIdx.h
+	${AXL_INC_DIR}/axl_sl_BitMap.h
+	${AXL_INC_DIR}/axl_sl_BmhFind.h
+	${AXL_INC_DIR}/axl_sl_BoyerMooreFind.h
+	${AXL_INC_DIR}/axl_sl_BoxList.h
+	${AXL_INC_DIR}/axl_sl_BuddyAllocMap.h
+	${AXL_INC_DIR}/axl_sl_ByteOrder.h
+	${AXL_INC_DIR}/axl_sl_CharLiteral.h
+	${AXL_INC_DIR}/axl_sl_CmdLineParser.h
+	${AXL_INC_DIR}/axl_sl_ForEach.h
+	${AXL_INC_DIR}/axl_sl_Func.h
+	${AXL_INC_DIR}/axl_sl_Guid.h
+	${AXL_INC_DIR}/axl_sl_Handle.h
+	${AXL_INC_DIR}/axl_sl_HandleTable.h
+	${AXL_INC_DIR}/axl_sl_HashTable.h
+	${AXL_INC_DIR}/axl_sl_List.h
+	${AXL_INC_DIR}/axl_sl_ListBase.h
+	${AXL_INC_DIR}/axl_sl_Pack.h
+	${AXL_INC_DIR}/axl_sl_Packer.h
+	${AXL_INC_DIR}/axl_sl_Packetizer.h
+	${AXL_INC_DIR}/axl_sl_Protocol.h
+	${AXL_INC_DIR}/axl_sl_RbTree.h
+	${AXL_INC_DIR}/axl_sl_RuntimeType.h
+	${AXL_INC_DIR}/axl_sl_String.h
+	${AXL_INC_DIR}/axl_sl_StringSlice.h
+	${AXL_INC_DIR}/axl_sl_StringCache.h
+	${AXL_INC_DIR}/axl_sl_StringHashTable.h
+	${AXL_INC_DIR}/axl_sl_Type.h
+	${AXL_INC_DIR}/axl_sl_Unpacker.h
 	)
 
 set (
-	RTL_CPP_LIST
-	axl_rtl_BitMap.cpp	
-	axl_rtl_BoyerMooreAccessor.h
-	axl_rtl_BoyerMooreFind.cpp
-	axl_rtl_BmhFind.cpp
-	axl_rtl_BuddyAllocMap.cpp
-	axl_rtl_CmdLineParser.cpp
-	axl_rtl_Func.cpp
-	axl_rtl_Guid.cpp
-	axl_rtl_Packer.cpp
-	axl_rtl_Packetizer.cpp
-	axl_rtl_Unpacker.cpp
+	SL_CPP_LIST
+	axl_sl_BitMap.cpp	
+	axl_sl_BoyerMooreAccessor.h
+	axl_sl_BoyerMooreFind.cpp
+	axl_sl_BmhFind.cpp
+	axl_sl_BuddyAllocMap.cpp
+	axl_sl_CmdLineParser.cpp
+	axl_sl_Func.cpp
+	axl_sl_Guid.cpp
+	axl_sl_Packer.cpp
+	axl_sl_Packetizer.cpp
+	axl_sl_Unpacker.cpp
 	)
 
 source_group (
-	rtl
+	sl
 	FILES
-	${RTL_H_LIST}
-	${RTL_CPP_LIST}
+	${SL_H_LIST}
+	${SL_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -496,8 +497,8 @@ add_library (
 	${OBJ_CPP_LIST}
 	${REF_H_LIST}
 	${REF_CPP_LIST}
-	${RTL_H_LIST}
-	${RTL_CPP_LIST}
+	${SL_H_LIST}
+	${SL_CPP_LIST}
 	${ENC_H_LIST}
 	${ENC_CPP_LIST}
 	${FSM_H_LIST}

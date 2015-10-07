@@ -16,8 +16,8 @@ StringTemplate::reset ()
 
 bool
 StringTemplate::process (
-	rtl::String* output,
-	const rtl::String& filePath,
+	sl::String* output,
+	const sl::String& filePath,
 	const char* source,
 	size_t length
 	)
@@ -26,7 +26,7 @@ StringTemplate::process (
 
 	output->clear ();
 
-	rtl::String luaSource;
+	sl::String luaSource;
 	result = extractLuaSource (&luaSource, filePath, source, length);
 	if (!result)
 		return false;
@@ -134,8 +134,8 @@ extractUserCode (
 
 bool
 StringTemplate::extractLuaSource (
-	rtl::String* luaSource,
-	const rtl::String& filePath,
+	sl::String* luaSource,
+	const sl::String& filePath,
 	const char* source,
 	size_t length
 	)

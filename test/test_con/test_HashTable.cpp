@@ -6,8 +6,8 @@ namespace test_HashTable {
 
 void run ()
 {
-	rtl::HashTableMap <int, int, rtl::HashId <int> > map;
-	rtl::Iterator <rtl::HashTableMapEntry <int, int> > it;
+	sl::HashTableMap <int, int, sl::HashId <int> > map;
+	sl::Iterator <sl::HashTableMapEntry <int, int> > it;
 
 	srand (::GetTickCount ());
 

@@ -57,7 +57,7 @@ namespace test_List {
 void
 run_BoxList ()
 {
-	rtl::BoxList <int> list;
+	sl::BoxList <int> list;
 	list.insertTail (10);
 	list.insertHead (-10);
 	list.insertTail (20);
@@ -65,7 +65,7 @@ run_BoxList ()
 
 	list.removeHead ();
 
-	rtl::BoxIterator <int> it = list.getHead ();
+	sl::BoxIterator <int> it = list.getHead ();
 	for (; it; it++)
 	{
 		printf ("%d\n", *it);

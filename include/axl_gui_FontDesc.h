@@ -28,7 +28,7 @@ inline
 FontFlag
 getFirstFontFlag (uint_t flags)
 {
-	return (FontFlag) (1 << rtl::getLoBitIdx (flags));
+	return (FontFlag) (1 << sl::getLoBitIdx (flags));
 }
 
 const char* 

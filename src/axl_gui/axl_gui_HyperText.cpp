@@ -215,7 +215,7 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 	m_hyperlinkXMap.setCount (hyperlinkCount);
 	hyperlinkXMapEntry = m_hyperlinkXMap;
 
-	rtl::Iterator <HyperlinkAnchor> it = m_hyperlinkArray.getHead ();
+	sl::Iterator <HyperlinkAnchor> it = m_hyperlinkArray.getHead ();
 	for (; it; it++)
 	{
 		HyperlinkAnchor* hyperlinkAnchor = *it;

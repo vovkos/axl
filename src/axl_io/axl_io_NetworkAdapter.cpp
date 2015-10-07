@@ -42,20 +42,20 @@ getNetworkAdapterFlagString (NetworkAdapterFlag flag)
 		"IPv6",      // NetworkAdapterFlag_Ip6       = 0x20,
 	};
 
-	size_t i = rtl::getLoBitIdx32 (flag);
+	size_t i = sl::getLoBitIdx32 (flag);
 	return i < countof (stringTable) ?
 		stringTable [i] :
 		"undefined-adapter-flag";
 }
 
-rtl::String
+sl::String
 getNetworkAdapterFlagString (uint_t flags)
 {
 	if (!flags)
-		return rtl::String ();
+		return sl::String ();
 
 	NetworkAdapterFlag flag = getFirstNetworkAdapterFlag (flags);
-	rtl::String string = getNetworkAdapterFlagString (flag);
+	sl::String string = getNetworkAdapterFlagString (flag);
 	flags &= ~flag;
 
 	while (flags)
@@ -82,5 +82,5 @@ NetworkAdapterDesc::NetworkAdapterDesc ()
 
 //.............................................................................
 
-} // namespace axl {
-} // namespace io {
+} // namespace io
+} // namespace axl

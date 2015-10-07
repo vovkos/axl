@@ -2,7 +2,7 @@
 #include "axl_gui_GdiFont.h"
 #include "axl_gui_GdiEngine.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace gui {
@@ -114,7 +114,7 @@ GdiFont::calcTextSize_utf8 (
 	)
 {
 	char buffer [256];
-	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_utf16 (string, string.getLength ());
@@ -146,7 +146,7 @@ GdiFont::calcTextSize_utf32 (
 	)
 {
 	char buffer [256];
-	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_utf16 (string, string.getLength ());

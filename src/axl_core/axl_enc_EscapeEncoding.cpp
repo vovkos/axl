@@ -77,14 +77,14 @@ EscapeEncoding::findEscapeReplaceChar (char x)
 
 size_t
 EscapeEncoding::encode (
-	rtl::String* string,
+	sl::String* string,
 	const char* p, 
 	size_t length
 	)
 {
 
 	if (length == -1)
-		length = rtl::StringDetails::calcLength (p);
+		length = sl::StringDetails::calcLength (p);
 
 	const char* base = p;
 	const char* end = p + length;
@@ -132,7 +132,7 @@ isHexChar (char c)
 
 size_t
 EscapeEncoding::decode (
-	rtl::String* string,
+	sl::String* string,
 	const char* p, 
 	size_t length
 	)
@@ -147,7 +147,7 @@ EscapeEncoding::decode (
 	State state = State_Normal;	
 
 	if (length == -1)
-		length = rtl::StringDetails::calcLength (p);
+		length = sl::StringDetails::calcLength (p);
 
 	char hexCodeString [16];
 	size_t hexCodeLen;

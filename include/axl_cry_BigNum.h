@@ -6,8 +6,8 @@
 
 #define _AXL_CRY_BIGNUM_H
 
-#include "axl_rtl_Handle.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Handle.h"
+#include "axl_sl_Array.h"
 #include "axl_cry_CryptoError.h"
 
 namespace axl {
@@ -27,7 +27,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class BnCtx: public rtl::Handle <BN_CTX*, FreeBnCtx>
+class BnCtx: public sl::Handle <BN_CTX*, FreeBnCtx>
 {
 public:
 	BnCtx ()
@@ -35,7 +35,7 @@ public:
 	}
 
 	BnCtx (BN_CTX* h):
-		rtl::Handle <BN_CTX*, FreeBnCtx> (h)
+		sl::Handle <BN_CTX*, FreeBnCtx> (h)
 	{
 	}
 
@@ -69,7 +69,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class BigNum: public rtl::Handle <BIGNUM*, FreeBigNum>
+class BigNum: public sl::Handle <BIGNUM*, FreeBigNum>
 {
 public:
 	BigNum ()
@@ -79,7 +79,7 @@ public:
 	}
 
 	BigNum (BIGNUM* h):
-		rtl::Handle <BIGNUM*, FreeBigNum> (h)
+		sl::Handle <BIGNUM*, FreeBigNum> (h)
 	{
 	}
 
@@ -115,16 +115,16 @@ public:
 		);
 
 	bool
-	getData (rtl::Array <char>* data)
+	getData (sl::Array <char>* data)
 	{
 		size_t size = getSize ();
 		return data->setCount (size) && getData (*data, size);
 	}
 
-	rtl::Array <char>
+	sl::Array <char>
 	getData ()
 	{
-		rtl::Array <char> data;
+		sl::Array <char> data;
 		getData (&data);
 		return data;
 	}
@@ -140,12 +140,12 @@ public:
 	}
 
 	bool
-	getDecString (rtl::String* string);
+	getDecString (sl::String* string);
 
-	rtl::String
+	sl::String
 	getDecString ()
 	{
-		rtl::String string;
+		sl::String string;
 		getDecString (&string);
 		return string;
 	}
@@ -158,12 +158,12 @@ public:
 	}
 
 	bool
-	getHexString (rtl::String* string);
+	getHexString (sl::String* string);
 
-	rtl::String
+	sl::String
 	getHexString ()
 	{
-		rtl::String string;
+		sl::String string;
 		getHexString (&string);
 		return string;
 	}

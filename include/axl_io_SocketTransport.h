@@ -7,7 +7,7 @@
 #define _AXL_IO_SOCKETTRANSPORT_H
 
 #include "axl_io_Transport.h"
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -17,7 +17,7 @@ namespace io {
 
 class Socketransport: 
 	public Transport,
-	public rtl::Handle <SOCKET>
+	public sl::Handle <SOCKET>
 {
 public:
 	virtual

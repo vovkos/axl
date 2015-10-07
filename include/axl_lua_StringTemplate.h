@@ -20,7 +20,7 @@ protected:
 	struct EmitContext
 	{
 		StringTemplate* m_self;
-		rtl::String* m_output;
+		sl::String* m_output;
 		const char* m_source;
 	};
 
@@ -36,8 +36,8 @@ public:
 
 	bool
 	process (
-		rtl::String* output,
-		const rtl::String& filePath,
+		sl::String* output,
+		const sl::String& filePath,
 		const char* source,
 		size_t length = -1
 		);
@@ -45,8 +45,8 @@ public:
 protected:
 	bool
 	extractLuaSource (
-		rtl::String* luaSource,
-		const rtl::String& filePath,
+		sl::String* luaSource,
+		const sl::String& filePath,
 		const char* source,
 		size_t length = -1
 		);

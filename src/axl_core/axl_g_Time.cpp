@@ -194,7 +194,7 @@ Time::setTimestampImpl (
 
 size_t
 Time::format (
-	rtl::String* string,
+	sl::String* string,
 	const char* formatString
 	) const
 {

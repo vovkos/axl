@@ -26,7 +26,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class EcPoint: public rtl::Handle <EC_POINT*, FreeEcPoint>
+class EcPoint: public sl::Handle <EC_POINT*, FreeEcPoint>
 {
 public:
 	EcPoint (EC_GROUP* group)
@@ -35,7 +35,7 @@ public:
 	}
 
 	EcPoint (EC_POINT* h):
-		rtl::Handle <EC_POINT*, FreeEcPoint> (h)
+		sl::Handle <EC_POINT*, FreeEcPoint> (h)
 	{
 	}
 
@@ -57,20 +57,20 @@ public:
 
 	bool
 	getData (
-		rtl::Array <char>* data,
+		sl::Array <char>* data,
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
 		);
 
-	rtl::Array <char>
+	sl::Array <char>
 	getData (
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
 		)
 	{
-		rtl::Array <char> data;
+		sl::Array <char> data;
 		getData (&data, group, form, ctx);
 		return data;
 	}
@@ -112,7 +112,7 @@ public:
 
 	bool
 	getDecString (
-		rtl::String* string,
+		sl::String* string,
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
@@ -122,14 +122,14 @@ public:
 		return getBigNum (group, bigNum, form, ctx) && bigNum.getDecString (string);
 	}
 
-	rtl::String
+	sl::String
 	getDecString (
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
 		)
 	{
-		rtl::String string;
+		sl::String string;
 		getDecString (&string, group, form, ctx);
 		return string;
 	}
@@ -147,20 +147,20 @@ public:
 
 	bool
 	getHexString (
-		rtl::String* string,
+		sl::String* string,
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
 		);
 
-	rtl::String
+	sl::String
 	getHexString (
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
 		)
 	{
-		rtl::String string;
+		sl::String string;
 		getHexString (&string, group, form, ctx);
 		return string;
 	}

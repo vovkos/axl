@@ -10,8 +10,8 @@
 #include "axl_gui_Font.h"
 #include "axl_gui_Image.h"
 #include "axl_gui_QtCaret.h"
-#include "axl_rtl_Singleton.h"
-#include "axl_rtl_StringHashTable.h"
+#include "axl_sl_StringHashTable.h"
+#include "axl_mt_Singleton.h"
 
 namespace axl {
 namespace gui {
@@ -110,8 +110,8 @@ protected:
 	QtCursor* m_stdCursorArray [StdCursorKind__Count];
 	QtCaret m_qtCaret;
 
-	rtl::StringHashTableMap <uintptr_t> m_clipboardFormatNameMap;
-	rtl::Array <rtl::String> m_clipboardFormatNameTable;
+	sl::StringHashTableMap <uintptr_t> m_clipboardFormatNameMap;
+	sl::Array <sl::String> m_clipboardFormatNameTable;
 	QMimeData* m_qtClipboardMimeData;
 
 public:
@@ -349,17 +349,17 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const rtl::String& formatName);
+	registerClipboardFormat (const sl::String& formatName);
 
 	virtual
 	bool
-	readClipboard (rtl::String* string);
+	readClipboard (sl::String* string);
 
 	virtual
 	bool
 	readClipboard (
 		uintptr_t format,
-		rtl::Array <char>* data
+		sl::Array <char>* data
 		);
 
 	virtual
@@ -489,7 +489,7 @@ inline
 Engine* 
 getQtEngine ()
 {
-	return rtl::getSingleton <QtEngine> ();
+	return mt::getSingleton <QtEngine> ();
 }
 
 //.............................................................................

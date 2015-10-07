@@ -6,21 +6,21 @@
 
 #define _AXL_IO_FILEPATHUTILS_H
 
-#include "axl_rtl_BoxList.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_BoxList.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
 
 //.............................................................................
 
-rtl::String
+sl::String
 getCurrentDir ();
 
-rtl::String
+sl::String
 getExeFilePath ();
 
-rtl::String
+sl::String
 getExeDir ();
 
 bool
@@ -29,40 +29,40 @@ doesFileExist (const char* fileName);
 bool
 ensureDirExists (const char* fileName);
 
-rtl::String
+sl::String
 getFullFilePath (const char* fileName);
 
-rtl::String
+sl::String
 getDir (const char* filePath);
 
-rtl::String
+sl::String
 getFileName (const char* filePath);
 
-rtl::String
+sl::String
 getExtension (const char* filePath);
 
-rtl::String
+sl::String
 concatFilePath (
-	rtl::String* filePath,
+	sl::String* filePath,
 	const char* fileName
 	);
 
 inline
-rtl::String
+sl::String
 concatFilePath (
 	const char* dir,
 	const char* fileName
 	)
 {
-	rtl::String filePath = dir;
+	sl::String filePath = dir;
 	return concatFilePath (&filePath, fileName);
 }
 
-rtl::String
+sl::String
 findFilePath (
 	const char* fileName,
 	const char* firstDir,
-	const rtl::BoxList <rtl::String>* dirList,
+	const sl::BoxList <sl::String>* dirList,
 	bool doFindInCurrentDir = true
 	);
 

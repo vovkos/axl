@@ -17,7 +17,7 @@ namespace exe {
 class WorkerhreadPool
 {
 protected:
-	struct ThreadEntry: rtl::ListLink
+	struct ThreadEntry: sl::ListLink
 	{
 		Workerhread m_thread;
 		size_t m_reserveEventCount;
@@ -41,7 +41,7 @@ protected:
 	friend class ThreadPin;
 
 	mt::Lock m_lock;
-	rtl::StdList <ThreadEntry> m_threadList;
+	sl::StdList <ThreadEntry> m_threadList;
 
 public:
 	~WorkerhreadPool ()

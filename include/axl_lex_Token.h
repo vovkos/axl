@@ -7,8 +7,8 @@
 #define _AXL_LEX_TOKEN_H
 
 #include "axl_err_Error.h"
-#include "axl_rtl_String.h"
-#include "axl_rtl_CharLiteral.h"
+#include "axl_sl_String.h"
+#include "axl_sl_CharLiteral.h"
 
 namespace axl {
 namespace lex {
@@ -50,7 +50,7 @@ public:
 class SrcPos: public LineCol
 {
 public:
-	rtl::String m_filePath;
+	sl::String m_filePath;
 
 public:
 	SrcPos ()
@@ -58,7 +58,7 @@ public:
 	}
 
 	SrcPos (
-		const rtl::String& filePath,
+		const sl::String& filePath,
 		const LineCol& lineCol
 		):
 		LineCol (lineCol)
@@ -67,7 +67,7 @@ public:
 	}
 
 	SrcPos (
-		const rtl::String& filePath,
+		const sl::String& filePath,
 		int line,
 		int col
 		):
@@ -103,7 +103,7 @@ public:
 		double m_double;
 	};
 
-	rtl::String m_string;
+	sl::String m_string;
 
 public:
 	StdTokenData ()
@@ -182,7 +182,7 @@ public: \
 
 #define AXL_LEX_END_TOKEN_NAME_MAP_EX(unknownName) \
 		default: \
-			return isprint ((uchar_t) tokenKind) ? axl::rtl::getCharLiteral ((uchar_t) tokenKind) : unknownName; \
+			return isprint ((uchar_t) tokenKind) ? axl::sl::getCharLiteral ((uchar_t) tokenKind) : unknownName; \
 		} \
 	} \
 };

@@ -14,16 +14,16 @@ enum SwitchKind
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_RTL_BEGIN_CMD_LINE_SWITCH_TABLE (Switchable, SwitchKind)
-	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_Help, "h", "help", NULL, "Display help")
-	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
-	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_SessionFile, "f", "session-file", "<file>", "Specify session file")
-	AXL_RTL_CMD_LINE_SWITCH_2 (SwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
-AXL_RTL_END_CMD_LINE_SWITCH_TABLE ()
+AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (Switchable, SwitchKind)
+	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_Help, "h", "help", NULL, "Display help")
+	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
+	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_SessionFile, "f", "session-file", "<file>", "Specify session file")
+	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
+AXL_SL_END_CMD_LINE_SWITCH_TABLE ()
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyParser: public rtl::CmdLineParser <MyParser, Switchable>
+class MyParser: public sl::CmdLineParser <MyParser, Switchable>
 {
 public:
 	bool

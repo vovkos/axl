@@ -4,7 +4,7 @@ namespace test_RbTree {
 
 //.............................................................................
 
-struct Base: rtl::ListLink
+struct Base: sl::ListLink
 {
 	int a, b;
 };
@@ -17,13 +17,13 @@ struct Derived: Base
 void 
 run ()
 {
-	rtl::Iterator <Derived> itDerived;
-	rtl::Iterator <Base> itBase;
+	sl::Iterator <Derived> itDerived;
+	sl::Iterator <Base> itBase;
 
 	itBase = itDerived;
 
-	rtl::RbTreeMap <int, int> tree;
-	rtl::RbTreeMap <int, int>::Iterator it;
+	sl::RbTreeMap <int, int> tree;
+	sl::RbTreeMap <int, int>::Iterator it;
 
 	for (size_t i = 0; i < 50; i++)
 		tree.visit (rand () % 50);

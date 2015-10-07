@@ -27,19 +27,19 @@ run ()
 		char,
 		char,
 		const char*
-		> > (foo, 100, 101, rtl::String ("hui"));
+		> > (foo, 100, 101, sl::String ("hui"));
 
 	workerThread->schedule <exe::ArgSeq_3 < 
 		short,
 		short,
 		const char*
-		> > (foo, 200, 201, rtl::String ("govno"));
+		> > (foo, 200, 201, sl::String ("govno"));
 
 	workerThread->schedule <exe::ArgSeq_3 < 
 		int,
 		int,
 		const char*
-		> > (foo, 300, 301, rtl::String ("muravei"));
+		> > (foo, 300, 301, sl::String ("muravei"));
 
 	mt::Event event1;
 

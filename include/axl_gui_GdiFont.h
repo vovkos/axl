@@ -9,7 +9,7 @@
 #include "axl_gui_Font.h"
 #include "axl_gui_GdiObjectHandle.h"
 #include "axl_ref_RefCount.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace gui {
@@ -33,7 +33,7 @@ getLogFontFromFontDesc (
 {
 	return buildLogFont (
 		logFont,
-		rtl::String_w (fontDesc.m_family), 
+		sl::String_w (fontDesc.m_family), 
 		fontDesc.m_pointSize, 
 		fontDesc.m_flags
 		);

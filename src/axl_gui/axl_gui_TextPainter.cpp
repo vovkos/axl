@@ -97,7 +97,7 @@ TextPainter::drawText_utf32 (
 	)
 {
 	if (length == -1)
-		length = rtl::StringDetails_utf32::calcLength (text);
+		length = sl::StringDetails_utf32::calcLength (text);
 	
 	if (!length)
 		return m_point.m_x;
@@ -198,7 +198,7 @@ TextPainter::drawHyperText_utf32 (
 		return drawText_utf32 (textColor0, backColor0, fontFlags0, text, length);
 
 	if (length == -1)
-		length = rtl::StringDetails_utf32::calcLength (text);
+		length = sl::StringDetails_utf32::calcLength (text);
 	
 	if (!length)
 		return m_point.m_x;

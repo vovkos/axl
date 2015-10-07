@@ -7,7 +7,7 @@
 #define _AXL_GUI_GDICURSOR_H
 
 #include "axl_gui_Cursor.h"
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace gui {
@@ -16,7 +16,7 @@ namespace gui {
 
 class GdiCursor: 
 	public Cursor,
-	public rtl::Handle <HCURSOR>
+	public sl::Handle <HCURSOR>
 {
 	friend class GdiEngine;
 

@@ -48,7 +48,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MappedView: public rtl::Handle <void*, UnmapViewOfFile>
+class MappedView: public sl::Handle <void*, UnmapViewOfFile>
 {
 public:
 	void* 

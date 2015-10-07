@@ -27,7 +27,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class EcKey: public rtl::Handle <EC_KEY*, FreeEcKey> 
+class EcKey: public sl::Handle <EC_KEY*, FreeEcKey> 
 {
 public:
 	EcKey ()
@@ -41,7 +41,7 @@ public:
 	}
 
 	EcKey (EC_KEY* h):
-		rtl::Handle <EC_KEY*, FreeEcKey> (h)
+		sl::Handle <EC_KEY*, FreeEcKey> (h)
 	{
 	}
 
@@ -199,7 +199,7 @@ public:
 
 	bool
 	signHash (
-		rtl::Array <char>* signature,
+		sl::Array <char>* signature,
 		const void* hash,
 		size_t hashSize
 		)
@@ -210,7 +210,7 @@ public:
 
 	bool
 	sign (
-		rtl::Array <char>* signature,
+		sl::Array <char>* signature,
 		const void* p,
 		size_t size
 		)
@@ -220,24 +220,24 @@ public:
 		return signHash (signature, hash, sizeof (hash));
 	}
 
-	rtl::Array <char>
+	sl::Array <char>
 	signHash (
 		const void* hash,
 		size_t hashSize
 		)
 	{
-		rtl::Array <char> signature;
+		sl::Array <char> signature;
 		signHash (&signature, hash, hashSize);
 		return signature;
 	}
 
-	rtl::Array <char>
+	sl::Array <char>
 	sign (
 		const void* p,
 		size_t size
 		)
 	{
-		rtl::Array <char> signature;
+		sl::Array <char> signature;
 		sign (&signature, p, size);
 		return signature;
 	}
@@ -279,20 +279,20 @@ public:
 bool
 generateEcProductKey (
 	EC_KEY* ecKey,
-	rtl::String* productKey,
+	sl::String* productKey,
 	const char* userName,
 	size_t hyphenDistance = 6
 	);
 
 inline
-rtl::String 
+sl::String 
 generateEcProductKey (
 	EC_KEY* ecKey,
 	const char* userName,
 	size_t hyphenDistance = 6
 	)
 {
-	rtl::String productKey;
+	sl::String productKey;
 	generateEcProductKey (ecKey, &productKey, userName, hyphenDistance);
 	return productKey;
 }

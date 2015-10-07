@@ -18,7 +18,7 @@ void run ()
 
 	const char* userName = "Vovkos";
 
-	rtl::String productKey = generateEcProductKey (key, userName);
+	sl::String productKey = generateEcProductKey (key, userName);
 	printf ("user:    %s\n", userName);
 	printf ("license: %s\n", productKey.cc ());
 

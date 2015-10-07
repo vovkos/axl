@@ -6,7 +6,7 @@
 
 #define _AXL_EXE_ARG_H
 
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 #include "axl_mem_Block.h"
 #include "axl_err_Error.h"
 
@@ -113,7 +113,7 @@ public:
 	class Shadow
 	{
 	public:
-		rtl::String <T> m_string;
+		sl::String <T> m_string;
 	};
 
 public:
@@ -223,7 +223,7 @@ public:
 
 template <
 	typename T,
-	typename GetSize = rtl::GetSize <T>
+	typename GetSize = sl::GetSize <T>
 	>
 class ArgVsoPtr: public ArgRoot <T*>
 {

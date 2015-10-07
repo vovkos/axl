@@ -30,7 +30,7 @@ LuaState::complete (int result)
 	if (result == LUA_OK)
 		return true;
 
-	rtl::String message = popString ();
+	sl::String message = popString ();
 	err::setStringError (message, message.getLength ());
 	return false;
 }

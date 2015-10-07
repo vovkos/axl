@@ -10,9 +10,9 @@ namespace test_Scheduler {
 class Test
 {
 public:
-	rtl::String m_s;
-	rtl::String m_s2;
-	rtl::String m_s3;
+	sl::String m_s;
+	sl::String m_s2;
+	sl::String m_s3;
 
 	Test ()
 	{
@@ -93,13 +93,13 @@ run ()
 {
 	Test* p;
 	
-	p = rtl::getSingleton <Test> ();
-	p = rtl::getSingleton <Test> ();
+	p = sl::getSingleton <Test> ();
+	p = sl::getSingleton <Test> ();
 	
 	Test2* p2;
 	
-	p2 = rtl::getSingleton <Test2> ();
-	p2 = rtl::getSingleton <Test2> ();
+	p2 = sl::getSingleton <Test2> ();
+	p2 = sl::getSingleton <Test2> ();
 
 	ref::Ptr<Test> x = AXL_REF_NEW (ref::Box <Test>);
 	ref::WeakPtr<Test> y = x;

@@ -6,8 +6,8 @@
 
 #define _AXL_IO_MAPPEDFILE_H
 
-#include "axl_rtl_List.h"
-#include "axl_rtl_RbTree.h"
+#include "axl_sl_List.h"
+#include "axl_sl_RbTree.h"
 #include "axl_io_File.h"
 #include "axl_io_Mapping.h"
 
@@ -28,9 +28,9 @@ protected:
 
 	struct ViewEntry;
 
-	typedef rtl::RbTreeMap <uint64_t, ViewEntry*> ViewMap;
+	typedef sl::RbTreeMap <uint64_t, ViewEntry*> ViewMap;
 
-	struct ViewEntry: rtl::ListLink 
+	struct ViewEntry: sl::ListLink 
 	{
 #if (_AXL_ENV == AXL_ENV_WIN)
 		win::MappedView m_view;
@@ -44,7 +44,7 @@ protected:
 
 protected:	
 	MappedFile* m_mappedFile;
-	rtl::StdList <ViewEntry> m_viewList;
+	sl::StdList <ViewEntry> m_viewList;
 	ViewMap m_viewMap; 
 
 protected:

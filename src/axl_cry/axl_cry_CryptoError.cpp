@@ -18,8 +18,8 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-rtl::String 
-CryptoErrorProvider::getErrorDescription (const err::ErrorData* error)
+sl::String 
+CryptoErrorProvider::getErrorDescription (const err::ErrorHdr* error)
 {
 	mt::callOnce (LoadCryptoStrings (), 0);
 	return ERR_reason_error_string (error->m_code);

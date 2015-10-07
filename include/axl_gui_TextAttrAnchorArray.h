@@ -6,7 +6,7 @@
 
 #define _AXL_GUI_TEXTATTRANCHORARRAY_H
 
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 #include "axl_gui_TextAttr.h"
 
 namespace axl {
@@ -39,7 +39,7 @@ struct TextAttrAnchor
 class TextAttrAnchorArray
 {
 protected:
-	rtl::Array <TextAttrAnchor> m_array;
+	sl::Array <TextAttrAnchor> m_array;
 
 public:
 	operator const TextAttrAnchor* () const

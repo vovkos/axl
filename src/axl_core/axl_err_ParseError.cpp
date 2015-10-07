@@ -1,18 +1,18 @@
 #include "pch.h"
 #include "axl_err_ParseError.h"
-#include "axl_rtl_Unpacker.h"
+#include "axl_sl_Unpacker.h"
 
 namespace axl {
 namespace err {
 
 //.............................................................................
 
-rtl::String 
-ParseErrorProvider::getErrorDescription (const ErrorData* error)
+sl::String 
+ParseErrorProvider::getErrorDescription (const ErrorHdr* error)
 {
-	rtl::Unpacker unpacker (error + 1, error->m_size - sizeof (ErrorData));
+	sl::Unpacker unpacker (error + 1, error->m_size - sizeof (ErrorHdr));
 
-	rtl::String string;
+	sl::String string;
 
 	switch (error->m_code)
 	{

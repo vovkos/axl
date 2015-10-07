@@ -7,29 +7,29 @@
 #define _AXL_INI_GENERICPARSER_H
 
 #include "axl_ini_Parser.h"
-#include "axl_rtl_StringHashTable.h"
+#include "axl_sl_StringHashTable.h"
 
 namespace axl {
 namespace ini {
 
 //.............................................................................
 
-class NamedValue: public rtl::ListLink
+class NamedValue: public sl::ListLink
 {
 	friend class GenericParser;
 
 protected:
-	rtl::String m_name;
-	rtl::String m_value;
+	sl::String m_name;
+	sl::String m_value;
 
 public:
-	rtl::String 
+	sl::String 
 	getName () const
 	{
 		return m_name;
 	}
 
-	rtl::String 
+	sl::String 
 	getValue () const
 	{
 		return m_value;
@@ -38,18 +38,18 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Section: public rtl::ListLink
+class Section: public sl::ListLink
 {
 	friend class GenericParser;
 
 protected:
-	rtl::String m_name;
-	rtl::StringHashTableMap <NamedValue*> m_namedValueMap;
-	rtl::StdList <NamedValue> m_namedValueList;
-	rtl::BoxList <rtl::String> m_unnamedValueList;
+	sl::String m_name;
+	sl::StringHashTableMap <NamedValue*> m_namedValueMap;
+	sl::StdList <NamedValue> m_namedValueList;
+	sl::BoxList <sl::String> m_unnamedValueList;
 
 public:
-	rtl::String 
+	sl::String 
 	getName ()
 	{
 		return m_name;
@@ -58,11 +58,11 @@ public:
 	NamedValue*
 	getNamedValue (const char* name) const
 	{
-		rtl::StringHashTableMapIterator <NamedValue*> it = m_namedValueMap.find (name);
+		sl::StringHashTableMapIterator <NamedValue*> it = m_namedValueMap.find (name);
 		return it ? it->m_value : NULL;
 	}
 
-	rtl::ConstBoxList <rtl::String>
+	sl::ConstBoxList <sl::String>
 	getUnnamedValueList () const
 	{
 		return m_unnamedValueList;
@@ -76,15 +76,15 @@ class GenericIni
 	friend class GenericParser;
 
 protected:
-	rtl::StringHashTableMap <Section*> m_namedSectionMap;
-	rtl::StdList <Section> m_namedSectionList;
+	sl::StringHashTableMap <Section*> m_namedSectionMap;
+	sl::StdList <Section> m_namedSectionList;
 	Section m_unnamedSection;
 
 public:
 	Section* 
 	getSection (const char* name) const
 	{
-		rtl::StringHashTableMapIterator <Section*> it = m_namedSectionMap.find (name);
+		sl::StringHashTableMapIterator <Section*> it = m_namedSectionMap.find (name);
 		return it ? it->m_value : NULL;
 	}
 

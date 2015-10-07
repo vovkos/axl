@@ -6,19 +6,19 @@
 
 #define _AXL_GUI_HYPERLINKANCHORARRAY_H
 
-#include "axl_rtl_String.h"
-#include "axl_rtl_Array.h"
-#include "axl_rtl_List.h"
+#include "axl_sl_String.h"
+#include "axl_sl_Array.h"
+#include "axl_sl_List.h"
 
 namespace axl {
 namespace gui {
 	
 //.............................................................................
 
-struct HyperlinkAnchor: rtl::ListLink
+struct HyperlinkAnchor: sl::ListLink
 {
 	size_t m_offset;
-	rtl::String m_hyperlink;
+	sl::String m_hyperlink;
 
 	HyperlinkAnchor ()
 	{
@@ -31,8 +31,8 @@ struct HyperlinkAnchor: rtl::ListLink
 class HyperlinkAnchorArray
 {
 protected:
-	rtl::StdList <HyperlinkAnchor> m_list;
-	rtl::Array <HyperlinkAnchor*> m_array;
+	sl::StdList <HyperlinkAnchor> m_list;
+	sl::Array <HyperlinkAnchor*> m_array;
 
 public:
 	bool
@@ -53,13 +53,13 @@ public:
 		return m_list.getCount ();
 	}
 
-	rtl::Iterator <HyperlinkAnchor> 
+	sl::Iterator <HyperlinkAnchor> 
 	getHead () const
 	{
 		return m_list.getHead ();
 	}
 
-	rtl::Iterator <HyperlinkAnchor> 
+	sl::Iterator <HyperlinkAnchor> 
 	getTail () const
 	{
 		return m_list.getHead ();

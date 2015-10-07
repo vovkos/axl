@@ -10,8 +10,8 @@
 #include "axl_gui_ImageDesc.h"
 #include "axl_gui_FontDesc.h"
 #include "axl_ref_Ptr.h"
-#include "axl_rtl_String.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_String.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace gui {
@@ -328,31 +328,31 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const rtl::String& formatName) = 0;
+	registerClipboardFormat (const sl::String& formatName) = 0;
 
 	virtual
 	bool
-	readClipboard (rtl::String* string) = 0;
+	readClipboard (sl::String* string) = 0;
 
 	virtual
 	bool
 	readClipboard (
 		uintptr_t format,
-		rtl::Array <char>* data
+		sl::Array <char>* data
 		) = 0;
 
-	rtl::String
+	sl::String
 	readClipboard ()
 	{
-		rtl::String string;
+		sl::String string;
 		readClipboard (&string);
 		return string;
 	}
 
-	rtl::Array <char>
+	sl::Array <char>
 	readClipboard (uintptr_t format)
 	{
-		rtl::Array <char> data;
+		sl::Array <char> data;
 		readClipboard (format, &data);
 		return data;
 	}
@@ -373,7 +373,7 @@ public:
 		) = 0;
 
 	bool
-	writeClipboard (const rtl::String& string)
+	writeClipboard (const sl::String& string)
 	{
 		return writeClipboard (string, string.getLength ());
 	}
@@ -381,7 +381,7 @@ public:
 	bool
 	writeClipboard (
 		uintptr_t format,
-		const rtl::Array <char>& data
+		const sl::Array <char>& data
 		)
 	{
 		return writeClipboard (format, data, data.getCount ());

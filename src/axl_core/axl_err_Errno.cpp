@@ -6,7 +6,7 @@ namespace err {
 
 //.............................................................................
 
-rtl::String
+sl::String
 ErrnoProvider::getErrorDescription (int code)
 {
 	char buffer [512] = { 0 };

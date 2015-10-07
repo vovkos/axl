@@ -6,7 +6,7 @@
 
 #define _AXL_GUI_DEF_H
 
-#include "axl_rtl_BitIdx.h"
+#include "axl_sl_BitIdx.h"
 
 namespace axl {
 namespace gui {
@@ -29,7 +29,7 @@ inline
 MouseButton
 getFirstMouseButton (uint_t buttons)
 {
-	return (MouseButton) rtl::getLoBitIdx32 (buttons);
+	return (MouseButton) sl::getLoBitIdx32 (buttons);
 }
 
 //.............................................................................
@@ -48,7 +48,7 @@ inline
 ModifierKey
 getFirstModifierKey (uint_t modifierKeys)
 {
-	return (ModifierKey) rtl::getLoBitIdx32 (modifierKeys);
+	return (ModifierKey) sl::getLoBitIdx32 (modifierKeys);
 }
 
 //.............................................................................

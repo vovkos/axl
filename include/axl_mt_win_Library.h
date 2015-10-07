@@ -6,7 +6,7 @@
 
 #define _AXL_MT_WIN_MODULE_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -27,7 +27,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Library: public rtl::Handle <HMODULE, FreeLibrary>
+class Library: public sl::Handle <HMODULE, FreeLibrary>
 {
 public:
 	bool 

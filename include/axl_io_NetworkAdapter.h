@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "axl_rtl_List.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_List.h"
+#include "axl_sl_String.h"
 #include "axl_io_SockAddr.h"
 
 #define _AXL_IO_NETWORKADAPTER_H
@@ -53,18 +53,18 @@ inline
 NetworkAdapterFlag
 getFirstNetworkAdapterFlag (uint_t flags)
 {
-	return (NetworkAdapterFlag) (1 << rtl::getLoBitIdx (flags));
+	return (NetworkAdapterFlag) (1 << sl::getLoBitIdx (flags));
 }
 
 const char* 
 getNetworkAdapterFlagString (NetworkAdapterFlag flag);
 
-rtl::String
+sl::String
 getNetworkAdapterFlagString (uint_t flags);
 
 //.............................................................................
 
-struct NetworkAdapterAddress: rtl::ListLink
+struct NetworkAdapterAddress: sl::ListLink
 {
 	SockAddr m_address;
 	size_t m_netMaskBitCount;
@@ -72,17 +72,17 @@ struct NetworkAdapterAddress: rtl::ListLink
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class NetworkAdapterDesc: public rtl::ListLink
+class NetworkAdapterDesc: public sl::ListLink
 {
 	friend class NetworkAdapterEnumerator;
 
 protected:
 	NetworkAdapterType m_type;
 	uint_t m_flags;
-	rtl::String m_name;
-	rtl::String m_description;
+	sl::String m_name;
+	sl::String m_description;
 	uchar_t m_mac [6];
-	rtl::StdList <NetworkAdapterAddress> m_addressList;
+	sl::StdList <NetworkAdapterAddress> m_addressList;
 
 public:
 	NetworkAdapterDesc ();
@@ -99,13 +99,13 @@ public:
 		return m_flags;
 	}
 
-	rtl::String 
+	sl::String 
 	getName () const
 	{
 		return m_name;
 	}
 
-	rtl::String 
+	sl::String 
 	getDescription () const
 	{
 		return m_description;
@@ -117,7 +117,7 @@ public:
 		return m_mac;
 	}
 
-	rtl::ConstList <NetworkAdapterAddress> 
+	sl::ConstList <NetworkAdapterAddress> 
 	getAddressList () const
 	{
 		return m_addressList;
@@ -127,7 +127,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-createNetworkAdapterDescList (rtl::StdList <NetworkAdapterDesc>* adapterList);
+createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList);
 
 //.............................................................................
 

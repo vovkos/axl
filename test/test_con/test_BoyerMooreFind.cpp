@@ -6,21 +6,21 @@ namespace test_BoyerMooreFind {
 
 void run ()
 {
-	rtl::TextBoyerMooreFind find;
+	sl::TextBoyerMooreFind find;
 
 	char haystack [] = "hui govno i muravei";
 	char needle [] = "muravei";
 
 	uint_t flags = 
-//		rtl::TextBoyerMooreFind::Flag_Reverse | 
-//		rtl::TextBoyerMooreFind::Flag_CaseInsensitive |
-		rtl::TextBoyerMooreFind::Flag_WholeWord |
+//		sl::TextBoyerMooreFind::Flag_Reverse | 
+//		sl::TextBoyerMooreFind::Flag_CaseInsensitive |
+		sl::TextBoyerMooreFind::Flag_WholeWord |
 		0;
 
 	find.setPattern (needle, lengthof (needle), flags);
 	
 	size_t result = -1;
-	rtl::TextBoyerMooreFind::IncrementalContext incrementalContext;
+	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
 
 #if 1
 	for (size_t i = 0; i < lengthof (haystack); i++)
@@ -30,7 +30,7 @@ void run ()
 			break;
 	}
 
-	if (result == -1 && (flags & rtl::TextBoyerMooreFind::Flag_WholeWord) != 0)
+	if (result == -1 && (flags & sl::TextBoyerMooreFind::Flag_WholeWord) != 0)
 		result = find.find (&incrementalContext, lengthof (haystack), " ", 1);
 
 #elif 0
@@ -41,7 +41,7 @@ void run ()
 			break;
 	}
 
-	if (result == -1 && (flags & rtl::TextBoyerMooreFind::Flag_WholeWord) != 0)
+	if (result == -1 && (flags & sl::TextBoyerMooreFind::Flag_WholeWord) != 0)
 		result = find.find (&incrementalContext, -1, " ", 1);
 #else
 	result = find.find (haystack, lengthof (haystack));

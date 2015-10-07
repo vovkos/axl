@@ -7,15 +7,15 @@
 #define _AXL_ERR_ERROR_H
 
 #include "axl_ref_Buf.h"
-#include "axl_rtl_Guid.h"
+#include "axl_sl_Guid.h"
 
 namespace axl {
-namespace rtl {
+namespace sl {
 
 template <typename T> class StringBase;
 typedef StringBase <char> String;
 
-} // namespace rtl
+} // namespace sl
 } // namespace axl
 
 namespace axl {
@@ -65,7 +65,7 @@ public:
 
 // axl std errors
 
-extern AXL_SELECT_ANY const rtl::Guid g_stdErrorGuid = rtl::g_nullGuid;
+extern AXL_SELECT_ANY const sl::Guid g_stdErrorGuid = sl::g_nullGuid;
 
 enum StdErrorCode
 {
@@ -80,7 +80,7 @@ enum StdErrorCode
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-extern const rtl::Guid g_winErrorGuid;
+extern const sl::Guid g_winErrorGuid;
 
 #define g_systemErrorGuid g_winErrorGuid
 
@@ -137,7 +137,7 @@ getLastSystemErrorCode ()
 
 #elif (_AXL_ENV == AXL_ENV_NT)
 
-extern const rtl::Guid g_ntErrorGuid;
+extern const sl::Guid g_ntErrorGuid;
 
 #define g_systemErrorGuid g_ntErrorGuid
 
@@ -187,7 +187,7 @@ enum SystemErrorCode
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-extern const rtl::Guid g_ErrnoGuid;
+extern const sl::Guid g_ErrnoGuid;
 
 #define g_systemErrorGuid g_ErrnoGuid
 
@@ -245,41 +245,41 @@ getLastSystemErrorCode ()
 
 // POD structure
 
-struct ErrorData
+struct ErrorHdr
 {
 	uint32_t m_size;
-	rtl::Guid m_guid;
+	sl::Guid m_guid;
 	uint32_t m_code;
 
 	// possibly followed by error data
 
-	rtl::String
+	sl::String
 	getDescription () const;
 
 	bool
 	isKind (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code
 		) const;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class SizeOfErrorData
+class SizeOfError
 {
 public:
 	size_t
-	operator () (const ErrorData* x)
+	operator () (const ErrorHdr* x)
 	{
-		return AXL_MAX (x->m_size, sizeof (ErrorData));
+		return AXL_MAX (x->m_size, sizeof (ErrorHdr));
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-extern AXL_SELECT_ANY const ErrorData g_noError =
+extern AXL_SELECT_ANY const ErrorHdr g_noError =
 {
-	sizeof (ErrorData),
+	sizeof (ErrorHdr),
 	g_stdErrorGuid,
 	SystemErrorCode_Success,
 };
@@ -288,14 +288,14 @@ extern AXL_SELECT_ANY const ErrorData g_noError =
 
 // ref-counted error buffer
 
-class Error: public ref::Buf <ErrorData, SizeOfErrorData>
+class Error: public ref::Buf <ErrorHdr, SizeOfError>
 {
 public:
 	Error ()
 	{
 	}
 
-	Error (const ErrorData& src)
+	Error (const ErrorHdr& src)
 	{
 		copy (src);
 	}
@@ -310,10 +310,10 @@ public:
 	}
 
 	Error (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		ref::BufKind kind = ref::BufKind_Stack,
-		ErrorData* p = (ErrorData*) _alloca (MinBufSize),
+		ErrorHdr* p = (ErrorHdr*) _alloca (MinBufSize),
 		size_t size = MinBufSize
 		)
 	{
@@ -326,7 +326,7 @@ public:
 	Error (
 		uint_t code,
 		ref::BufKind kind = ref::BufKind_Stack,
-		ErrorData* p = (ErrorData*) _alloca (MinBufSize),
+		ErrorHdr* p = (ErrorHdr*) _alloca (MinBufSize),
 		size_t size = MinBufSize
 		)
 	{
@@ -346,28 +346,28 @@ public:
 
 	bool
 	isKind (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code
 		) const
 	{
 		return m_p && m_p->isKind (guid, code);
 	}
 
-	rtl::String
+	sl::String
 	getDescription () const;
 
-	ErrorData*
-	copy (const ErrorData& src);
+	ErrorHdr*
+	copy (const ErrorHdr& src);
 
-	ErrorData*
-	push (const ErrorData& error);
+	ErrorHdr*
+	push (const ErrorHdr& error);
 
 	// pack
 
 	template <typename Pack>
-	ErrorData*
+	ErrorHdr*
 	pack_va (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		axl_va_list va
 		)
@@ -375,7 +375,7 @@ public:
 		size_t packSize;
 		Pack () (NULL, &packSize, va);
 
-		size_t size = sizeof (ErrorData) + packSize;
+		size_t size = sizeof (ErrorHdr) + packSize;
 		getBuffer (size);
 		if (!m_p)
 			return NULL;
@@ -389,9 +389,9 @@ public:
 	}
 
 	template <typename Pack>
-	ErrorData*
+	ErrorHdr*
 	pack (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		...
 		)
@@ -401,9 +401,9 @@ public:
 	}
 
 	template <typename Pack>
-	ErrorData*
+	ErrorHdr*
 	pushPack_va (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		axl_va_list va
 		)
@@ -417,9 +417,9 @@ public:
 	}
 
 	template <typename Pack>
-	ErrorData*
+	ErrorHdr*
 	pushPack (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		...
 		)
@@ -430,17 +430,17 @@ public:
 
 	// format
 
-	ErrorData*
+	ErrorHdr*
 	format_va (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		axl_va_list va
 		);
 
-	ErrorData*
+	ErrorHdr*
 	format (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		...
@@ -450,9 +450,9 @@ public:
 		return format_va (guid, code, formatString, va);
 	}
 
-	ErrorData*
+	ErrorHdr*
 	pushFormat_va (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		axl_va_list va
@@ -466,9 +466,9 @@ public:
 		return push (*error);
 	}
 
-	ErrorData*
+	ErrorHdr*
 	pushFormat (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code,
 		const char* formatString,
 		...
@@ -480,15 +480,15 @@ public:
 
 	// simple error
 
-	ErrorData*
+	ErrorHdr*
 	createSimpleError (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code
 		);
 
-	ErrorData*
+	ErrorHdr*
 	pushSimpleError (
-		const rtl::Guid& guid,
+		const sl::Guid& guid,
 		uint_t code
 		)
 	{
@@ -502,7 +502,7 @@ public:
 
 	// system error (push is irrelevant for system errors)
 
-	ErrorData*
+	ErrorHdr*
 	createSystemError (uint_t code)
 	{
 		return createSimpleError (g_systemErrorGuid, code);
@@ -510,13 +510,13 @@ public:
 
 	// string error
 
-	ErrorData*
+	ErrorHdr*
 	createStringError (
 		const char* p,
 		size_t length = -1
 		);
 
-	ErrorData*
+	ErrorHdr*
 	pushStringError (
 		const char* p,
 		size_t length = -1
@@ -530,13 +530,13 @@ public:
 		return push (*error);
 	}
 
-	ErrorData*
+	ErrorHdr*
 	formatStringError_va (
 		const char* formatString,
 		axl_va_list va
 		);
 
-	ErrorData*
+	ErrorHdr*
 	formatStringError (
 		const char* formatString,
 		...
@@ -546,7 +546,7 @@ public:
 		return formatStringError_va (formatString, va);
 	}
 
-	ErrorData*
+	ErrorHdr*
 	pushFormatStringError_va (
 		const char* formatString,
 		axl_va_list va
@@ -561,7 +561,7 @@ public:
 	}
 
 
-	ErrorData*
+	ErrorHdr*
 	pushFormatStringError (
 		const char* formatString,
 		...
@@ -591,7 +591,7 @@ pushError (const Error& error)
 	return setError (stack);
 }
 
-rtl::String
+sl::String
 getLastErrorDescription ();
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -601,7 +601,7 @@ getLastErrorDescription ();
 template <typename Pack>
 Error
 setPackError_va (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	axl_va_list va
 	)
@@ -614,7 +614,7 @@ setPackError_va (
 template <typename Pack>
 Error
 setPackError (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	...
 	)
@@ -626,7 +626,7 @@ setPackError (
 template <typename Pack>
 Error
 pushPackError_va (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	axl_va_list va
 	)
@@ -639,7 +639,7 @@ pushPackError_va (
 template <typename Pack>
 Error
 pushPackError (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	...
 	)
@@ -655,7 +655,7 @@ pushPackError (
 inline
 Error
 setFormatError_va (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
@@ -669,7 +669,7 @@ setFormatError_va (
 inline
 Error
 setFormatError (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	...
@@ -682,7 +682,7 @@ setFormatError (
 inline
 Error
 pushFormatError_va (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
@@ -696,7 +696,7 @@ pushFormatError_va (
 inline
 Error
 pushFormatError (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	...
@@ -714,7 +714,7 @@ pushFormatError (
 inline
 Error
 setError (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code
 	)
 {
@@ -724,7 +724,7 @@ setError (
 inline
 Error
 pushError (
-	const rtl::Guid& guid,
+	const sl::Guid& guid,
 	uint_t code
 	)
 {
@@ -921,8 +921,8 @@ class ErrorProvider
 {
 public:
 	virtual
-	rtl::String
-	getErrorDescription (const ErrorData* error) = 0;
+	sl::String
+	getErrorDescription (const ErrorHdr* error) = 0;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -931,12 +931,12 @@ class StdErrorProvider: public ErrorProvider
 {
 public:
 	virtual
-	rtl::String
-	getErrorDescription (const ErrorData* error);
+	sl::String
+	getErrorDescription (const ErrorHdr* error);
 
 protected:
-	rtl::String
-	getStackErrorDescription (const ErrorData* error);
+	sl::String
+	getStackErrorDescription (const ErrorHdr* error);
 };
 
 //.............................................................................

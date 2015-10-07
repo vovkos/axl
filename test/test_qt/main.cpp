@@ -185,7 +185,7 @@ public:
 
 		size_t offset = 0;
 
-		rtl::Array <char> buffer;
+		sl::Array <char> buffer;
 
 		for (;;)
 		{

@@ -11,7 +11,7 @@ GenericParser::onSection (const char* sectionName)
 {
 	ASSERT (m_ini);
 
-	rtl::StringHashTableMapIterator <Section*> it = m_ini->m_namedSectionMap.find (sectionName);
+	sl::StringHashTableMapIterator <Section*> it = m_ini->m_namedSectionMap.find (sectionName);
 	if (it)
 	{
 		m_currentSection = it->m_value;
@@ -39,7 +39,7 @@ GenericParser::onKeyValue (
 		return true;
 	}
 
-	rtl::StringHashTableMapIterator <NamedValue*> it = m_currentSection->m_namedValueMap.find (keyName);
+	sl::StringHashTableMapIterator <NamedValue*> it = m_currentSection->m_namedValueMap.find (keyName);
 	if (it)
 	{
 		it->m_value->m_value = value;

@@ -55,5 +55,5 @@ Lexer::exec ()
 
 //.............................................................................
 
-} // namespace ini {
-} // namespace axl {
+} // namespace ini
+} // namespace axl

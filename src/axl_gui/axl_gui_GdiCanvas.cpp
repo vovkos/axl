@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_gui_GdiCanvas.h"
 #include "axl_gui_GdiEngine.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace gui {
@@ -109,7 +109,7 @@ GdiCanvas::drawText_utf8 (
 	)
 {
 	char buffer [256];
-	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_utf16 (
@@ -200,7 +200,7 @@ GdiCanvas::drawText_utf32 (
 	)
 {
 	char buffer [256];
-	rtl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_utf16 (

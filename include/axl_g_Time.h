@@ -6,7 +6,7 @@
 
 #define _AXL_G_TIME_H
 
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace g {
@@ -101,14 +101,14 @@ public:
 
 	size_t
 	format (
-		rtl::String* string,
+		sl::String* string,
 		const char* formatString = "%W %D %N %Y %h:%m:%s"
 		) const;
 
-	rtl::String
+	sl::String
 	format (const char* formatString = "%W %D %N %Y %h:%m:%s") const
 	{
-		rtl::String string;
+		sl::String string;
 		format (&string, formatString);
 		return string;
 	}

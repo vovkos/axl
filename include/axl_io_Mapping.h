@@ -12,7 +12,7 @@
 #	include "axl_io_win_Mapping.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_io_psx_Mapping.h"
-#	include "axl_rtl_String.h"
+#	include "axl_sl_String.h"
 #endif
 
 namespace axl {
@@ -32,7 +32,7 @@ protected:
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	psx::Mapping m_mapping;
 	psx::SharedMemory m_sharedMemory;
-	rtl::String m_sharedMemoryName;
+	sl::String m_sharedMemoryName;
 #endif
 
 public:

@@ -27,19 +27,19 @@ public:
 	static
 	size_t
 	encode (
-		rtl::String* string,
+		sl::String* string,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	rtl::String
+	sl::String
 	encode (
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		rtl::String string;
+		sl::String string;
 		encode (&string, p, length);
 		return string;
 	}
@@ -47,19 +47,19 @@ public:
 	static
 	size_t
 	decode (
-		rtl::String* string,
+		sl::String* string,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	rtl::String
+	sl::String
 	decode (		
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		rtl::String string;
+		sl::String string;
 		decode (&string, p, length);
 		return string;
 	}

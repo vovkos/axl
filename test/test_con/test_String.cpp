@@ -51,7 +51,7 @@ run ()
 	printf ("point2: %d, %d\n", point2->x, point2->y);
 
 	char buf [80];
-	rtl::String string (ref::BufKind_Stack, buf, sizeof (buf));
+	sl::String string (ref::BufKind_Stack, buf, sizeof (buf));
 
 	string.format ("hui %d %d %d", 1, 2, 3);
 	string.append ("govno");

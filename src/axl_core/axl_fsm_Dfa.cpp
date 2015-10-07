@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_fsm_Dfa.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace fsm {
@@ -52,7 +52,7 @@ DfaState::addNfaState (NfaState* nfaState)
 void
 DfaState::makeEpsilonClosure ()
 {
-	rtl::Array <NfaState*> workingSet = m_nfaStateSet.m_stateArray;
+	sl::Array <NfaState*> workingSet = m_nfaStateSet.m_stateArray;
 	while (!workingSet.isEmpty ())
 	{
 		NfaState* nfaState = workingSet.getBackAndPop ();

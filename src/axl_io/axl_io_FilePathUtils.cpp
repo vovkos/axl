@@ -8,7 +8,7 @@ namespace io {
 
 //.............................................................................
 
-rtl::String
+sl::String
 getCurrentDir ()
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -17,13 +17,13 @@ getCurrentDir ()
 	return dir;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 	char* p = get_current_dir_name ();
-	rtl::String dir = p;
+	sl::String dir = p;
 	free (p);
 	return dir;
 #endif
 }
 
-rtl::String
+sl::String
 getExeFilePath ()
 {
 	char buffer [1024];
@@ -38,7 +38,7 @@ getExeFilePath ()
 	return buffer;
 }
 
-rtl::String
+sl::String
 getExeDir ()
 {
 	return io::getDir (io::getExeFilePath ());
@@ -49,7 +49,7 @@ doesFileExist (const char* fileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 	dword_t attributes = ::GetFileAttributesW (fileName_w);
 	return attributes != INVALID_FILE_ATTRIBUTES;
@@ -71,7 +71,7 @@ bool
 ensureDirExists (const char* fileName)
 {
 	char buffer [256] = { 0 };
-	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
 	if (fileName_w.isEmpty () || isDir (fileName_w))
@@ -160,19 +160,19 @@ ensureDirExists (const char* fileName)
 
 #endif
 
-rtl::String
+sl::String
 getFullFilePath (const char* fileName)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
 	size_t length = ::GetFullPathNameW (fileName_w, 0, NULL, NULL);
 	if (!length)
 		return err::failWithLastSystemError (NULL);
 
-	rtl::String_w filePath;
+	sl::String_w filePath;
 	wchar_t* p = filePath.getBuffer (length);
 	::GetFullPathNameW (fileName_w, length, p, NULL);
 	return filePath;
@@ -183,12 +183,12 @@ getFullFilePath (const char* fileName)
 #endif
 }
 
-rtl::String
+sl::String
 getDir (const char* filePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	filePath_w = filePath;
 
 	wchar_t drive [4] = { 0 };
@@ -202,24 +202,24 @@ getDir (const char* filePath)
 		NULL, 0
 		);
 
-	rtl::String string = drive;
+	sl::String string = drive;
 	string.append (dir);
 	return string;
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	rtl::String string = filePath;
+	sl::String string = filePath;
 	dirname (string.getBuffer ());
 	string.updateLength ();
 	return string;
 #endif
 }
 
-rtl::String
+sl::String
 getFileName (const char* filePath)
 {
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [256];
-	rtl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	filePath_w = filePath;
 
 	wchar_t fileName [1024] = { 0 };
@@ -233,7 +233,7 @@ getFileName (const char* filePath)
 		extension, countof (extension) - 1
 		);
 
-	rtl::String string = fileName;
+	sl::String string = fileName;
 	string.append (extension);
 	return string;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
@@ -242,16 +242,16 @@ getFileName (const char* filePath)
 #endif
 }
 
-rtl::String
+sl::String
 getExtension (const char* filePath)
 {
 	const char *p = strchr (filePath, '.');
 	return p ? p + 1 : NULL;
 }
 
-rtl::String
+sl::String
 concatFilePath (
-	rtl::String* filePath,
+	sl::String* filePath,
 	const char* fileName
 	)
 {
@@ -275,15 +275,15 @@ concatFilePath (
 	return *filePath;
 }
 
-rtl::String
+sl::String
 findFilePath (
 	const char* fileName,
 	const char* firstDir,
-	const rtl::BoxList <rtl::String>* dirList,
+	const sl::BoxList <sl::String>* dirList,
 	bool doFindInCurrentDir
 	)
 {
-	rtl::String filePath;
+	sl::String filePath;
 
 	if (firstDir)
 	{
@@ -298,7 +298,7 @@ findFilePath (
 
 	if (dirList)
 	{
-		rtl::BoxIterator <rtl::String> dir = dirList->getHead ();
+		sl::BoxIterator <sl::String> dir = dirList->getHead ();
 		for (; dir; dir++)
 		{
 			filePath.forceCopy (*dir);
@@ -308,7 +308,7 @@ findFilePath (
 		}
 	}
 
-	return rtl::String ();
+	return sl::String ();
 }
 
 //.............................................................................

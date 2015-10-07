@@ -2,7 +2,7 @@
 #include "axl_gui_GdiImage.h"
 #include "axl_gui_GdiEngine.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace gui {
@@ -45,7 +45,7 @@ GdiImage::getData (
 	}
 	
 	char buffer [1024];
-	rtl::Array <uint_t> colorBuffer (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::Array <uint_t> colorBuffer (ref::BufKind_Stack, buffer, sizeof (buffer));
 	colorBuffer.setCount (m_size.m_width * height);
 
 	result = ::GetDIBits (screenDc, m_h, top, height, colorBuffer, &bitmapInfo, DIB_RGB_COLORS);

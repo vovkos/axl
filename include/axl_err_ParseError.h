@@ -6,7 +6,7 @@
 
 #include "axl_err_ErrorMgr.h"
 #include "axl_lex_Token.h"
-#include "axl_rtl_Pack.h"
+#include "axl_sl_Pack.h"
 
 namespace axl {
 namespace err {
@@ -14,7 +14,7 @@ namespace err {
 //.............................................................................
 
 // {56FC601E-5D2C-4bbe-B455-3D8B81AAD8FF}
-AXL_RTL_DEFINE_GUID (g_parseErrorGuid, 0x56fc601e, 0x5d2c, 0x4bbe, 0xb4, 0x55, 0x3d, 0x8b, 0x81, 0xaa, 0xd8, 0xff);
+AXL_SL_DEFINE_GUID (g_parseErrorGuid, 0x56fc601e, 0x5d2c, 0x4bbe, 0xb4, 0x55, 0x3d, 0x8b, 0x81, 0xaa, 0xd8, 0xff);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -34,8 +34,8 @@ class ParseErrorProvider: public ErrorProvider
 {
 public:
 	virtual 
-	rtl::String 
-	getErrorDescription (const ErrorData* error);
+	sl::String 
+	getErrorDescription (const ErrorHdr* error);
 };
 
 //.............................................................................
@@ -48,7 +48,7 @@ registerParseErrorProvider ()
 {
 	getErrorMgr ()->registerProvider (
 		g_parseErrorGuid, 
-		rtl::getSimpleSingleton <ParseErrorProvider> ()
+		mt::getSimpleSingleton <ParseErrorProvider> ()
 		);
 }
 
@@ -60,7 +60,7 @@ pushSrcPosError (
 	int col = 0
 	)
 {
-	return pushPackError <rtl::PackSeq_3 <const char*, int, int> > (
+	return pushPackError <sl::PackSeq_3 <const char*, int, int> > (
 		g_parseErrorGuid,
 		ParseErrorCode_SrcPos, 
 		filePath, 
@@ -126,7 +126,7 @@ inline
 Error
 setSyntaxError (const char* location)
 {
-	return setPackError <rtl::Pack <const char*> > (
+	return setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_InvalidSyntaxIn, 
 		location
@@ -140,7 +140,7 @@ setExpectedTokenError (
 	const char* actualToken
 	)
 {
-	return setPackError <rtl::PackSeq_2 <const char*, const char*> > (
+	return setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_ExpectedToken, 
 		expectedToken,
@@ -152,7 +152,7 @@ inline
 Error
 setUnexpectedTokenError (const char* token)
 {
-	return setPackError <rtl::Pack <const char*> > (
+	return setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedToken, 
 		token
@@ -166,7 +166,7 @@ setUnexpectedTokenError (
 	const char* location
 	)
 {
-	return setPackError <rtl::PackSeq_2 <const char*, const char*> > (
+	return setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedTokenIn, 
 		token,

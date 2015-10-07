@@ -7,7 +7,7 @@
 #define _AXL_MEM_TRACKER_H
 
 #include "axl_mt_Lock.h"
-#include "axl_rtl_ListBase.h"
+#include "axl_sl_ListBase.h"
 
 namespace axl {
 namespace mem {
@@ -17,7 +17,7 @@ namespace mem {
 class Tracker
 {
 public:
-	struct BlockHdr: rtl::ListLink
+	struct BlockHdr: sl::ListLink
 	{
 		size_t m_size;
 		size_t m_seqNum;
@@ -28,7 +28,7 @@ public:
 
 protected:
 	mt::Lock m_lock;
-	rtl::AuxList <BlockHdr> m_blockList;
+	sl::AuxList <BlockHdr> m_blockList;
 
 	size_t m_peakBlockCount;
 	size_t m_totalBlockCount;

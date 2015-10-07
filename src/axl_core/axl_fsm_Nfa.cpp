@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_fsm_Nfa.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace fsm {
@@ -161,7 +161,7 @@ NfaTransitionMgr::finalize ()
 {
 	NfaStateSetMap <NfaTransition*> transitionMap;
 	
-	rtl::Iterator <NfaTransition> transitionIt = m_transitionList.getHead ();
+	sl::Iterator <NfaTransition> transitionIt = m_transitionList.getHead ();
 	while (transitionIt)
 	{
 		NfaTransition* transition = *transitionIt++;

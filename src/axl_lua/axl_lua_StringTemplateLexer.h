@@ -78,5 +78,5 @@ protected:
 
 //.............................................................................
 
-} // namespace lua {
-} // namespace axl {
+} // namespace lua
+} // namespace axl

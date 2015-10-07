@@ -7,8 +7,8 @@
 #define _AXL_REF_BUF_H
 
 #include "axl_ref_New.h"
-#include "axl_rtl_Func.h"
-#include "axl_rtl_BitIdx.h"
+#include "axl_sl_Func.h"
+#include "axl_sl_BitIdx.h"
 
 namespace axl {
 namespace ref {
@@ -42,7 +42,7 @@ enum BufHdrFlag
 
 template <
 	typename T,
-	typename SizeOf = rtl::SizeOf <T>
+	typename SizeOf = sl::SizeOf <T>
 	>
 class Buf
 {
@@ -259,7 +259,7 @@ protected:
 			return m_p;
 		}
 
-		size_t bufferSize = rtl::getMinPower2Ge (size);
+		size_t bufferSize = sl::getMinPower2Ge (size);
 
 		Ptr <Hdr> newHdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
 		if (!newHdr)

@@ -46,7 +46,7 @@ class ConnectionPipe;
 class ListenerPipe: public Pipe
 {
 protected:
-	rtl::Array <ConnectionPipe*> m_backLog;
+	sl::Array <ConnectionPipe*> m_backLog;
 	exe::Function m_onAccept;
 	ref::Ptr <exe::Workerhread> m_workerThread;
 

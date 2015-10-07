@@ -10,7 +10,7 @@
 #	include "axl_io_win_File.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_io_psx_File.h"
-#	include "axl_rtl_String.h"
+#	include "axl_sl_String.h"
 #endif
 
 namespace axl {
@@ -149,7 +149,7 @@ class TemporaryFile: public File
 {
 #if (_AXL_ENV == AXL_ENV_POSIX)
 protected:
-	rtl::String m_fileName;
+	sl::String m_fileName;
 
 public:
 	~TemporaryFile ()

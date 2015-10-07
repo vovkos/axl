@@ -6,14 +6,14 @@ namespace io {
 
 //.............................................................................
 
-err::ErrorData*
+err::ErrorHdr*
 UsbError::create (int code)
 {
-	err::ErrorData* error = getBuffer (sizeof (err::ErrorData));
+	err::ErrorHdr* error = getBuffer (sizeof (err::ErrorHdr));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (err::ErrorData);
+	error->m_size = sizeof (err::ErrorHdr);
 	error->m_guid = g_usbErrorGuid;
 	error->m_code = code;
 	return error;

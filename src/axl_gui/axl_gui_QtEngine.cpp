@@ -165,7 +165,7 @@ QtEngine::drawText_utf8 (
 	)
 {
 	char buffer [256];
-	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_qt (
@@ -200,7 +200,7 @@ QtEngine::drawText_utf16 (
 	)
 {
 	if (length == -1)
-		length = rtl::StringDetails_utf16::calcLength (text);
+		length = sl::StringDetails_utf16::calcLength (text);
 
 	return drawText_qt (
 		canvas,
@@ -234,7 +234,7 @@ QtEngine::drawText_utf32 (
 	)
 {
 	char buffer [256];
-	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_qt (
@@ -506,7 +506,7 @@ QtEngine::calcTextSize_utf8 (
 	)
 {
 	char buffer [256];
-	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_qt (font, QString ((const QChar*) string.cc (), string.getLength ()));
@@ -520,7 +520,7 @@ QtEngine::calcTextSize_utf16 (
 	)
 {
 	if (length == -1)
-		length = rtl::StringDetails_utf16::calcLength (text);
+		length = sl::StringDetails_utf16::calcLength (text);
 
 	return calcTextSize_qt (font, QString ((const QChar*) text, length));
 }
@@ -533,7 +533,7 @@ QtEngine::calcTextSize_utf32 (
 	)
 {
 	char buffer [256];
-	rtl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return calcTextSize_qt (font, QString ((const QChar*) string.cc (), string.getLength ()));
@@ -605,9 +605,9 @@ QtEngine::getStdCursor (StdCursorKind cursorKind)
 // clipboard
 
 uintptr_t 
-QtEngine::registerClipboardFormat (const rtl::String& formatName)
+QtEngine::registerClipboardFormat (const sl::String& formatName)
 {
-	rtl::StringHashTableMapIterator <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
+	sl::StringHashTableMapIterator <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
 	if (it)
 		return it->m_value;
 
@@ -618,7 +618,7 @@ QtEngine::registerClipboardFormat (const rtl::String& formatName)
 }
 
 bool
-QtEngine::readClipboard (rtl::String* string)
+QtEngine::readClipboard (sl::String* string)
 {
 	QClipboard* qtClipboard = QApplication::clipboard ();
 	QString qtString = qtClipboard->text ();
@@ -630,7 +630,7 @@ QtEngine::readClipboard (rtl::String* string)
 bool
 QtEngine::readClipboard (
 	uintptr_t format,
-	rtl::Array <char>* data
+	sl::Array <char>* data
 	)
 {
 	size_t count = m_clipboardFormatNameTable.getCount ();

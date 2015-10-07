@@ -84,7 +84,7 @@ TlsMgr::getSlotValue (size_t slot)
 	if (slot >= count)
 		return ref::PtrKind_Null;
 
-	rtl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
+	sl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
 	if (!entry)
 		return ref::PtrKind_Null;
 
@@ -108,7 +108,7 @@ TlsMgr::setSlotValue (
 		page->m_array.setCount (slot + 1);
 	}
 
-	rtl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
+	sl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
 
 	TlsValue oldValue;
 

@@ -9,7 +9,7 @@ run ()
 {
 	io::File f;
 	f.open ("d:\\hui", io::FileFlag_ReadOnly);
-	rtl::String text = err::getError ()->getDescription ();
+	sl::String text = err::getError ()->getDescription ();
 	printf ("error: %s\n", text);
 }
 

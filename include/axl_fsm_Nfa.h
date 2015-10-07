@@ -6,10 +6,10 @@
 
 #define _AXL_FSM_NFA_H
 
-#include "axl_rtl_List.h"
-#include "axl_rtl_Array.h"
-#include "axl_rtl_BitMap.h"
-#include "axl_rtl_HashTable.h"
+#include "axl_sl_List.h"
+#include "axl_sl_Array.h"
+#include "axl_sl_BitMap.h"
+#include "axl_sl_HashTable.h"
 
 namespace axl {
 namespace fsm {
@@ -29,7 +29,7 @@ enum MatchConditionKind
 struct MatchCondition
 {
 	MatchConditionKind m_conditionKind;
-	rtl::BitMap m_charSet;
+	sl::BitMap m_charSet;
 	uint_t m_char;
 	
 	MatchCondition ();
@@ -54,7 +54,7 @@ enum NfaStateFlag
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct NfaState: rtl::ListLink
+struct NfaState: sl::ListLink
 {
 	uint_t m_id;
 	uint_t m_flags;
@@ -90,8 +90,8 @@ struct NfaState: rtl::ListLink
 
 struct NfaStateSet
 {
-	rtl::Array <NfaState*> m_stateArray;
-	rtl::BitMap m_stateSet;
+	sl::Array <NfaState*> m_stateArray;
+	sl::BitMap m_stateSet;
 
 	bool
 	addState (NfaState* state);	
@@ -112,18 +112,18 @@ struct NfaStateSet
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class NfaStateSetMap: public rtl::HashTableMap <
+class NfaStateSetMap: public sl::HashTableMap <
 	NfaStateSet*, 
 	T, 
-	rtl::HashDuckType <NfaStateSet>, 
-	rtl::CmpDuckType <NfaStateSet> 
+	sl::HashDuckType <NfaStateSet>, 
+	sl::CmpDuckType <NfaStateSet> 
 	>
 {
 };
 
 //.............................................................................
 
-struct NfaTransition: rtl::ListLink 
+struct NfaTransition: sl::ListLink 
 {
 	MatchCondition m_matchCondition;
 	NfaStateSet m_outStateSet;
@@ -134,7 +134,7 @@ struct NfaTransition: rtl::ListLink
 class NfaTransitionMgr
 {
 protected:
-	rtl::StdList <NfaTransition> m_transitionList;
+	sl::StdList <NfaTransition> m_transitionList;
 	NfaTransition* m_transitionMap [256];
 
 	// for UTF regexps m_transitionMap should be replaced with interval tree
@@ -143,7 +143,7 @@ public:
 	void 
 	clear ();
 	
-	rtl::ConstList <NfaTransition> 
+	sl::ConstList <NfaTransition> 
 	getTransitionList ()
 	{
 		return m_transitionList;
@@ -164,7 +164,7 @@ protected:
 	
 	void
 	addMatchCharSetTransition (
-		const rtl::BitMap* charSet, 
+		const sl::BitMap* charSet, 
 		NfaState* outState
 		);
 	

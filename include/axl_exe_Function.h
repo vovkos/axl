@@ -8,7 +8,7 @@
 
 #include "axl_exe_ArgPacker.h"
 #include "axl_exe_InvokeDirect.h"
-#include "axl_rtl_Singleton.h"
+#include "axl_sl_Singleton.h"
 
 namespace axl {
 namespace exe {

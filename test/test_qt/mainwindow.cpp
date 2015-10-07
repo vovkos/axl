@@ -22,7 +22,7 @@ MyWidget::paintEvent (QPaintEvent* e)
 	hyperText.setHyperText ("abc \x1b^pizda\x1b[4mdef\x1b[m suka");
 	
 	const gui::TextAttrAnchorArray* attrArray = hyperText.getAttrArray ();
-	rtl::String text = hyperText.getText ();
+	sl::String text = hyperText.getText ();
 
 	const gui::HyperlinkAnchor* anchor = hyperText.findHyperlinkByOffset (1);
 

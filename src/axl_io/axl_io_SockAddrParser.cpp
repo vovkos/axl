@@ -73,7 +73,7 @@ SockAddrParser::parse (sockaddr_in* addr)
 		}
 
 		*(uint32_t*) &addr->sin_addr = 0;
-		addr->sin_port = rtl::swapByteOrder16 ((uint16_t) port);
+		addr->sin_port = sl::swapByteOrder16 ((uint16_t) port);
 		return true;
 	}
 
@@ -85,7 +85,7 @@ SockAddrParser::parse (sockaddr_in* addr)
 		if (!result)
 			return false;
 
-		addr->sin_port = rtl::swapByteOrder16 ((uint16_t) port);
+		addr->sin_port = sl::swapByteOrder16 ((uint16_t) port);
 	}
 
 	return true;
@@ -143,7 +143,7 @@ SockAddrParser::parse (in6_addr* addr)
 			}
 		}
 
-		ip [i] = rtl::swapByteOrder16 ((uint16_t) word);
+		ip [i] = sl::swapByteOrder16 ((uint16_t) word);
 		i++;
 
 		if (!result)
@@ -235,7 +235,7 @@ SockAddrParser::parse (sockaddr_in6* addr)
 			if (!result)
 				return false;
 
-			addr->sin6_port = rtl::swapByteOrder16 ((uint16_t) port);
+			addr->sin6_port = sl::swapByteOrder16 ((uint16_t) port);
 		}
 	}
 

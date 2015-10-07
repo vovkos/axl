@@ -19,7 +19,7 @@ run ()
 		return;
 	}
 
-	rtl::String bufferString;
+	sl::String bufferString;
 	bufferString.getBuffer (4096);
 
 	libusb_device** pp = deviceList;

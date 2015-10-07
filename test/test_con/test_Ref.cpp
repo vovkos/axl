@@ -58,16 +58,16 @@ public:
 void 
 run_Buf ()
 {
-	rtl::String s;
+	sl::String s;
 	s = "sdkjhasdljadljasdklj";
 	char x = s [10];
 
 	s.clear ();
 
-	rtl::Array <uchar_t> arr;
+	sl::Array <uchar_t> arr;
 	arr.setCount (10);
 
-	rtl::Array <uchar_t> arr2 = arr;
+	sl::Array <uchar_t> arr2 = arr;
 	arr2 [0] = 10;
 
 	ref::Buf <DCB, DcbGetSize> dcb;

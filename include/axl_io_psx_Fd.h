@@ -6,7 +6,7 @@
 
 #define _AXL_IO_PSX_FD_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace io {
@@ -26,7 +26,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Fd: public rtl::Handle <int, CloseFd, rtl::MinusOne <int> >
+class Fd: public sl::Handle <int, CloseFd, sl::MinusOne <int> >
 {
 public:
 	Fd ()
@@ -34,7 +34,7 @@ public:
 	}
 
 	Fd (int h):
-		rtl::Handle <int, CloseFd, rtl::MinusOne <int> > (h)
+		sl::Handle <int, CloseFd, sl::MinusOne <int> > (h)
 	{
 	}
 

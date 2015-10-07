@@ -636,11 +636,11 @@ public:
 
 		width = width < entry->m_size.m_width_u ? 
 			entry->m_size.m_width_u :
-			rtl::getMinPower2Ge (width);
+			sl::getMinPower2Ge (width);
 
 		height = entry->m_size.m_height_u < height ?
 			entry->m_size.m_height_u :
-			rtl::getMinPower2Ge (height);
+			sl::getMinPower2Ge (height);
 
 		bool result = m_engine->createOffscreenCanvas (&entry->m_canvas, width, height);
 		if (!result)

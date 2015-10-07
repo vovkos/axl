@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_fsm_RegExp.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 #include "axl_mt_CallOnce.h"
 
 namespace axl {
@@ -10,10 +10,10 @@ namespace fsm {
 //.............................................................................
 
 static
-rtl::String 
-getCharSetString (const rtl::BitMap* charSet)
+sl::String 
+getCharSetString (const sl::BitMap* charSet)
 {
-	rtl::String string;
+	sl::String string;
 
 	uint_t c1 = -1;
 
@@ -61,10 +61,10 @@ getCharSetString (const rtl::BitMap* charSet)
 }
 
 static
-rtl::String 
+sl::String 
 getMatchConditionString (const MatchCondition* condition)
 {
-	rtl::String string;
+	sl::String string;
 	
 	switch (condition->m_conditionKind)
 	{
@@ -117,7 +117,7 @@ RegExp::print () const
 	printf ("NFA\n");
 	printf ("==================\n");
 
-	rtl::Iterator <NfaState> nfaIt = m_nfaStateList.getHead ();
+	sl::Iterator <NfaState> nfaIt = m_nfaStateList.getHead ();
 	for (; nfaIt; nfaIt++)
 	{
 		NfaState* nfaState = *nfaIt;
@@ -147,7 +147,7 @@ RegExp::print () const
 	printf ("\nDFA\n");
 	printf ("==================\n");
 
-	rtl::Iterator <DfaState> dfaIt = m_dfaStateList.getHead ();
+	sl::Iterator <DfaState> dfaIt = m_dfaStateList.getHead ();
 	for (; dfaIt; dfaIt++)
 	{
 		DfaState* dfaState = *dfaIt;
@@ -166,7 +166,7 @@ RegExp::print () const
 
 		printf ("}\n");
 
-		rtl::Iterator <DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead ();
+		sl::Iterator <DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead ();
 		for (; dfaTransitionIt; dfaTransitionIt++)
 		{
 			DfaTransition* transition = *dfaTransitionIt;
@@ -290,7 +290,7 @@ RegExpCompiler::assignNfaIds ()
 	size_t nfaStateCount = m_regExp->m_nfaStateList.getCount ();
 	m_regExp->m_nfaStateArray.setCount (nfaStateCount);
 
-	rtl::Iterator <NfaState> nfaIt = m_regExp->m_nfaStateList.getHead ();
+	sl::Iterator <NfaState> nfaIt = m_regExp->m_nfaStateList.getHead ();
 	for (uint_t i = 0; nfaIt; i++, nfaIt++)
 	{
 		NfaState* nfaState = *nfaIt;
@@ -305,7 +305,7 @@ RegExpCompiler::assignDfaIds ()
 	size_t dfaStateCount = m_regExp->m_dfaStateList.getCount ();
 	m_regExp->m_dfaStateArray.setCount (dfaStateCount);
 
-	rtl::Iterator <DfaState> dfaIt = m_regExp->m_dfaStateList.getHead ();
+	sl::Iterator <DfaState> dfaIt = m_regExp->m_dfaStateList.getHead ();
 	for (uint_t i = 0; dfaIt; i++, dfaIt++)
 	{
 		DfaState* state = *dfaIt;
@@ -317,7 +317,7 @@ RegExpCompiler::assignDfaIds ()
 void 
 RegExpCompiler::makeDfa ()
 {
-	rtl::Array <DfaState*> workingSet;
+	sl::Array <DfaState*> workingSet;
 	NfaStateSetMap <DfaState*> dfaStateMap;
 
 	DfaState* dfaState = AXL_MEM_NEW (DfaState);
@@ -346,8 +346,8 @@ RegExpCompiler::makeDfa ()
 		
 		nfaTransitionMgr.finalize ();
 
-		rtl::ConstList <NfaTransition> nfaTransitionList = nfaTransitionMgr.getTransitionList ();		
-		rtl::Iterator <NfaTransition> nfaTransitionIt = nfaTransitionList.getHead ();
+		sl::ConstList <NfaTransition> nfaTransitionList = nfaTransitionMgr.getTransitionList ();		
+		sl::Iterator <NfaTransition> nfaTransitionIt = nfaTransitionList.getHead ();
 		for (; nfaTransitionIt; nfaTransitionIt++)
 		{
 			NfaTransition* nfaTransition = *nfaTransitionIt;
@@ -491,7 +491,7 @@ RegExpCompiler::readEscapeSequence (char* c)
 }
 
 bool
-RegExpCompiler::readLiteral (rtl::String* literal)
+RegExpCompiler::readLiteral (sl::String* literal)
 {
 	bool result;
 
@@ -532,7 +532,7 @@ RegExpCompiler::readLiteral (rtl::String* literal)
 }
 
 bool
-RegExpCompiler::readIdentifier (rtl::String* name)
+RegExpCompiler::readIdentifier (sl::String* name)
 {
 	ASSERT (isalpha ((uchar_t) *m_p) || *m_p == '_');
 
@@ -977,7 +977,7 @@ RegExpCompiler::charClass ()
 }
 
 bool
-RegExpCompiler::charClassItem (rtl::BitMap* charSet)
+RegExpCompiler::charClassItem (sl::BitMap* charSet)
 {
 	bool result;
 
@@ -1073,7 +1073,7 @@ RegExpCompiler::stdCharClass (uint_t c)
 void
 RegExpCompiler::stdCharClass (
 	uint_t c,
-	rtl::BitMap* charSet
+	sl::BitMap* charSet
 	)
 {
 	bool isInverted = false;

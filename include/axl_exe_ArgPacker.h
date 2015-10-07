@@ -7,7 +7,7 @@
 #define _AXL_EXE_ARGPACKER_H
 
 #include "axl_exe_Arg.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace exe {
@@ -121,7 +121,7 @@ public:
 	IArgPackerImplT*
 	getSingleton ()
 	{
-		return rtl::getSimpleSingleton <IArgPackerImplT> ();
+		return sl::getSimpleSingleton <IArgPackerImplT> ();
 	}
 };
 
@@ -140,7 +140,7 @@ protected:
 		public obj::IType
 	{
 	public:
-		rtl::Array <ref::Ptr <obj::IType> > m_sequence;
+		sl::Array <ref::Ptr <obj::IType> > m_sequence;
 
 	public:
 		virtual
@@ -160,14 +160,14 @@ protected:
 
 		virtual
 		size_t
-		getInterfaceOffset (const rtl::Guid& guid)
+		getInterfaceOffset (const sl::Guid& guid)
 		{
 			return -1; // not used in packing
 		}
 	};
 
 protected:
-	rtl::Array <IArgPacker*> m_sequence;
+	sl::Array <IArgPacker*> m_sequence;
 
 public:
 	virtual

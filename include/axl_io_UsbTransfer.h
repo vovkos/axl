@@ -7,7 +7,7 @@
 #define _AXL_IO_USBTRANSFER_H
 
 #include "axl_io_UsbError.h"
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace io {
@@ -26,11 +26,11 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbTransfer: public rtl::Handle <libusb_transfer*, FreeUsbTransfer>
+class UsbTransfer: public sl::Handle <libusb_transfer*, FreeUsbTransfer>
 {
 };
 
 //.............................................................................
 
-} // namespace io {
-} // namespace axl {
+} // namespace io
+} // namespace axl

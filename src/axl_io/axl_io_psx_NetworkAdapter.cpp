@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "axl_io_NetworkAdapter.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_StringHashTable.h"
-#include "axl_rtl_BitMap.h"
+#include "axl_sl_StringHashTable.h"
+#include "axl_sl_BitMap.h"
 #include "axl_io_Socket.h"
 
 namespace axl {
@@ -15,7 +15,7 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList);
+	buildAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
@@ -37,7 +37,7 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList)
+NetworkAdapterEnumerator::buildAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	adapterList->clear ();
 
@@ -49,14 +49,14 @@ NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapterDesc>* a
 		return -1;
 	}
 
-	rtl::StringHashTableMap <NetworkAdapterDesc*> adapterMap;
+	sl::StringHashTableMap <NetworkAdapterDesc*> adapterMap;
 
 	for (ifaddrs* iface = ifaceAddressList; iface; iface = iface->ifa_next)
 	{
 		if (!(iface->ifa_flags & IFF_UP))
 			continue;
 
-		rtl::StringHashTableMapIterator <NetworkAdapterDesc*> it = adapterMap.visit (iface->ifa_name);
+		sl::StringHashTableMapIterator <NetworkAdapterDesc*> it = adapterMap.visit (iface->ifa_name);
 		if (it->m_value)
 		{
 			if (iface->ifa_addr)
@@ -117,12 +117,12 @@ NetworkAdapterEnumerator::addAdapterAddress (
 //.............................................................................
 
 size_t
-createNetworkAdapterDescList (rtl::StdList <NetworkAdapterDesc>* adapterList)
+createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	return NetworkAdapterEnumerator::buildAdapterList (adapterList);
 }
 
 //.............................................................................
 
-} // namespace axl {
-} // namespace io {
+} // namespace io
+} // namespace axl

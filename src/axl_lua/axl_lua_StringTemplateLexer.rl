@@ -101,5 +101,5 @@ Lexer::getMachineState (LexerMachineKind machine)
 
 //.............................................................................
 
-} // namespace lua { 
-} // namespace axl { 
+} // namespace lua
+} // namespace axl

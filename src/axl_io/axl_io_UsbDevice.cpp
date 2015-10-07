@@ -287,13 +287,13 @@ bool
 UsbDevice::getDescriptor (
 	libusb_descriptor_type descriptorType, 
 	uint_t descriptorId,
-	rtl::Array <char>* descriptor
+	sl::Array <char>* descriptor
 	)
 {
 	ASSERT (m_openHandle);
 
 	size_t size = descriptor->getCount ();
-	size = size < Def_BufferSize ? Def_BufferSize : rtl::getMinPower2Ge (size);
+	size = size < Def_BufferSize ? Def_BufferSize : sl::getMinPower2Ge (size);
 
 	descriptor->setCount (size);
 
@@ -368,7 +368,7 @@ bool
 UsbDevice::getStringDesrciptor (
 	uint_t stringId,
 	uint_t langId,
-	rtl::String* string
+	sl::String* string
 	)
 {
 	ASSERT (m_openHandle);
@@ -412,7 +412,7 @@ UsbDevice::getStringDesrciptor (
 bool
 UsbDevice::getStringDesrciptor (
 	uint_t stringId,
-	rtl::String* string
+	sl::String* string
 	)
 {
 	ASSERT (m_openHandle);
@@ -528,5 +528,5 @@ UsbDevice::interruptTransfer (
 
 //.............................................................................
 
-} // namespace io {
-} // namespace axl {
+} // namespace io
+} // namespace axl

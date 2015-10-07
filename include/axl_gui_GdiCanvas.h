@@ -7,7 +7,7 @@
 #define _AXL_GUI_GDICANVAS_H
 
 #include "axl_gui_Canvas.h"
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace gui {
@@ -40,7 +40,7 @@ public:
 
 class GdiCanvas:
 	public Canvas,
-	public rtl::Handle <HDC>
+	public sl::Handle <HDC>
 {
 	friend class GdiEngine;
 	friend class GdiWidgetImpl;

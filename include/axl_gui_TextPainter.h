@@ -8,7 +8,7 @@
 
 #include "axl_gui_Canvas.h"
 #include "axl_gui_TextAttrAnchorArray.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 #include "axl_enc_CharCodec.h"
 
 namespace axl {
@@ -20,8 +20,8 @@ class TextPainter
 {
 protected:
 	TextAttrAnchorArray m_selOverlayBuffer;
-	rtl::String m_stringBuffer; 
-	rtl::Array <utf32_t> m_binTextBuffer; 
+	sl::String m_stringBuffer; 
+	sl::Array <utf32_t> m_binTextBuffer; 
 
 public:
 	Canvas* m_canvas;
@@ -195,7 +195,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
-		const rtl::String& text
+		const sl::String& text
 		)
 	{
 		return drawHyperText_utf8 (

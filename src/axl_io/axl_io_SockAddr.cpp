@@ -2,7 +2,7 @@
 #include "axl_io_SockAddr.h"
 #include "axl_io_SockAddrParser.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_BitMap.h"
+#include "axl_sl_BitMap.h"
 
 namespace axl {
 namespace io {
@@ -65,14 +65,14 @@ getSockProtoString (uint_t proto)
 size_t
 getSockAddrNetMaskBitCount_ip4 (const sockaddr_in* addr)
 {
-	size_t bitIdx = rtl::findBit ((size_t*) &addr->sin_addr, 1, 0, false);
+	size_t bitIdx = sl::findBit ((size_t*) &addr->sin_addr, 1, 0, false);
 	return AXL_MIN (bitIdx, 32);
 }
 
 size_t
 getSockAddrNetMaskBitCount_ip6 (const sockaddr_in6* addr)
 {
-	size_t bitIdx = rtl::findBit (
+	size_t bitIdx = sl::findBit (
 		(size_t*) &addr->sin6_addr,
 		sizeof (addr->sin6_addr) / sizeof (size_t),
 		0, 
@@ -113,7 +113,7 @@ createSockAddrNetMask_ip4 (
 	if (bitCount > maxBitCount)
 		bitCount = maxBitCount;
 
-	rtl::setBitRange ((size_t*) &addr->sin_addr, 1, 0, bitCount);
+	sl::setBitRange ((size_t*) &addr->sin_addr, 1, 0, bitCount);
 }
 
 void
@@ -129,7 +129,7 @@ createSockAddrNetMask_ip6 (
 	if (bitCount > maxBitCount)
 		bitCount = maxBitCount;
 
-	rtl::setBitRange (
+	sl::setBitRange (
 		(size_t*) &addr->sin6_addr, 
 		sizeof (addr->sin6_addr) / sizeof (size_t), 
 		0,
@@ -301,7 +301,7 @@ parseSockAddr (
 
 size_t
 getAddrString_ip4 (
-	rtl::String* string,
+	sl::String* string,
 	const in_addr* addr
 	)
 {
@@ -311,7 +311,7 @@ getAddrString_ip4 (
 
 size_t
 getAddrString_ip6 (
-	rtl::String* string,
+	sl::String* string,
 	const in6_addr* addr
 	)
 {
@@ -361,10 +361,10 @@ getAddrString_ip6 (
 
 	if (maxZeroRunIdx == -1)
 	{
-		string->appendFormat ("%x", rtl::swapByteOrder16 (ip [0]));
+		string->appendFormat ("%x", sl::swapByteOrder16 (ip [0]));
 
 		for (size_t i = 1; i < 8; i++)
-			string->appendFormat (":%x", rtl::swapByteOrder16 (ip [i]));
+			string->appendFormat (":%x", sl::swapByteOrder16 (ip [i]));
 	}
 	else
 	{
@@ -394,7 +394,7 @@ getAddrString_ip6 (
 		else
 		{
 			for (size_t i = 0; i < maxZeroRunIdx; i++)
-				string->appendFormat ("%x:", rtl::swapByteOrder16 (ip [i]));
+				string->appendFormat ("%x:", sl::swapByteOrder16 (ip [i]));
 		}
 
 		if (isIp4)
@@ -417,7 +417,7 @@ getAddrString_ip6 (
 			else
 			{
 				for (size_t i = maxZeroRunEndIdx; i < 8; i++)
-					string->appendFormat (":%x", rtl::swapByteOrder16 (ip [i]));
+					string->appendFormat (":%x", sl::swapByteOrder16 (ip [i]));
 			}
 		}
 	}
@@ -429,7 +429,7 @@ getAddrString_ip6 (
 
 size_t
 getSockAddrString_ip4 (
-	rtl::String* string,
+	sl::String* string,
 	const sockaddr_in* addr
 	)
 {
@@ -440,11 +440,11 @@ getSockAddrString_ip4 (
 	else if (*(const uint32_t*) &addr->sin_addr)
 	{
 		getAddrString_ip4 (string, &addr->sin_addr);
-		string->appendFormat (":%d", rtl::swapByteOrder16 (addr->sin_port));
+		string->appendFormat (":%d", sl::swapByteOrder16 (addr->sin_port));
 	}
 	else
 	{
-		string->format ("%d", rtl::swapByteOrder16 (addr->sin_port));
+		string->format ("%d", sl::swapByteOrder16 (addr->sin_port));
 	}
 
 	return string->getLength ();
@@ -452,7 +452,7 @@ getSockAddrString_ip4 (
 
 size_t
 getSockAddrString_ip6 (
-	rtl::String* string,
+	sl::String* string,
 	const sockaddr_in6* addr
 	)
 {
@@ -464,7 +464,7 @@ getSockAddrString_ip6 (
 	if (addr->sin6_port)
 	{
 		string->insert (0, '[');
-		string->appendFormat ("]:%d", rtl::swapByteOrder16 (addr->sin6_port));
+		string->appendFormat ("]:%d", sl::swapByteOrder16 (addr->sin6_port));
 	}
 
 	return string->getLength ();
@@ -472,7 +472,7 @@ getSockAddrString_ip6 (
 
 size_t
 getSockAddrString (
-	rtl::String* string,
+	sl::String* string,
 	const sockaddr* addr
 	)
 {
@@ -539,7 +539,7 @@ SockAddr::setup_ip4 (
 {
 	m_addr_ip4.sin_family = AF_INET;
 	m_addr_ip4.sin_addr = *addr;
-	m_addr_ip4.sin_port = rtl::swapByteOrder16 (port);
+	m_addr_ip4.sin_port = sl::swapByteOrder16 (port);
 	memset (m_addr_ip4.sin_zero, 0, sizeof (m_addr_ip4.sin_zero));
 }
 
@@ -552,7 +552,7 @@ SockAddr::setup_ip6 (
 {
 	m_addr_ip6.sin6_family = AF_INET6;
 	m_addr_ip6.sin6_addr = *addr;
-	m_addr_ip6.sin6_port = rtl::swapByteOrder16 (port);
+	m_addr_ip6.sin6_port = sl::swapByteOrder16 (port);
 	m_addr_ip6.sin6_flowinfo = 0;
 	m_addr_ip6.sin6_scope_id = scope;
 }
@@ -583,7 +583,7 @@ SockAddr::createNetMask (
 
 bool 
 resolveHostName (
-	rtl::Array <SockAddr>* addrArray,
+	sl::Array <SockAddr>* addrArray,
 	const char* name,
 	uint_t family
 	)

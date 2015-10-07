@@ -14,7 +14,7 @@ namespace win {
 
 //.............................................................................
 
-class JobObject: public rtl::Handle <HANDLE, g::win::CloseHandle, rtl::Zero <HANDLE> >
+class JobObject: public sl::Handle <HANDLE, g::win::CloseHandle, sl::Zero <HANDLE> >
 {
 public:
 	bool 

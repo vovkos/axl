@@ -6,7 +6,7 @@
 
 #define _AXL_GUI_GDIOBJECTHANDLE_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace gui {
@@ -26,7 +26,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class GdiObjectHandle: public rtl::Handle <T, DeleteGdiObject>
+class GdiObjectHandle: public sl::Handle <T, DeleteGdiObject>
 {
 public:
 	GdiObjectHandle ()
@@ -34,7 +34,7 @@ public:
 	}
 
 	GdiObjectHandle (T h):
-		rtl::Handle <T, DeleteGdiObject> (h)
+		sl::Handle <T, DeleteGdiObject> (h)
 	{
 	}
 };

@@ -6,8 +6,8 @@
 
 #define _AXL_ENC_BASE32ENCODING_H
 
-#include "axl_rtl_String.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_String.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace enc {
@@ -20,21 +20,21 @@ public:
 	static
 	size_t
 	encode (
-		rtl::String* string,
+		sl::String* string,
 		const void* p, 
 		size_t size,
 		size_t hyphenDistance = 5
 		);
 
 	static
-	rtl::String
+	sl::String
 	encode (
 		const void* p, 
 		size_t size,
 		size_t hyphenDistance = 5
 		)
 	{
-		rtl::String string;
+		sl::String string;
 		encode (&string, p, size, hyphenDistance);
 		return string;
 	}
@@ -42,19 +42,19 @@ public:
 	static
 	size_t
 	decode (
-		rtl::Array <char>* buffer,
+		sl::Array <char>* buffer,
 		const char* p, 
 		size_t length = -1
 		);
 
 	static
-	rtl::Array <char>
+	sl::Array <char>
 	decode (
 		const char* p, 
 		size_t length = -1
 		)
 	{
-		rtl::Array <char> buffer;
+		sl::Array <char> buffer;
 		decode (&buffer, p, length);
 		return buffer;
 	}

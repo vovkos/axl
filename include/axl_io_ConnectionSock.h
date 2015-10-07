@@ -24,7 +24,7 @@ public:
 	typedef exe::ArgObjPtr <err::Error> OnDisconnectCompleteArg;
 
 protected:
-	struct SendRecv: rtl::ListLink
+	struct SendRecv: sl::ListLink
 	{
 		ConnectionSock* m_sock;
 		OVERLAPPED m_overlapped;
@@ -40,7 +40,7 @@ protected:
 	handle_t m_hWorkerThreadEvent;
 	exe::Function m_onConnectComplete;
 	exe::Function m_onDisconnectComplete;	
-	rtl::StdList <SendRecv> m_sendRecvList;
+	sl::StdList <SendRecv> m_sendRecvList;
 
 public:
 	ConnectionSock ()

@@ -25,19 +25,19 @@ protected:
 		KeyKind_SessionClass,
 	};
 
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (SectionNameMap, SectionKind)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session", SectionKind_Session)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("scripts", SectionKind_Scripts)
-	AXL_RTL_END_HASH_TABLE_MAP ()
+	AXL_SL_BEGIN_HASH_TABLE_MAP_STRING (SectionNameMap, SectionKind)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("session", SectionKind_Session)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("scripts", SectionKind_Scripts)
+	AXL_SL_END_HASH_TABLE_MAP ()
 
-	AXL_RTL_BEGIN_HASH_TABLE_MAP_STRING (KeyNameMap, KeyKind)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("name", KeyKind_Name)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("description", KeyKind_Description)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("guid", KeyKind_Guid)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("icon", KeyKind_Icon)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("session-class", KeyKind_SessionClass)
-		AXL_RTL_HASH_TABLE_MAP_ENTRY ("log-representer-class", KeyKind_LogRepresenterClass)
-	AXL_RTL_END_HASH_TABLE_MAP ()
+	AXL_SL_BEGIN_HASH_TABLE_MAP_STRING (KeyNameMap, KeyKind)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("name", KeyKind_Name)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("description", KeyKind_Description)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("guid", KeyKind_Guid)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("icon", KeyKind_Icon)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("session-class", KeyKind_SessionClass)
+		AXL_SL_HASH_TABLE_MAP_ENTRY ("log-representer-class", KeyKind_LogRepresenterClass)
+	AXL_SL_END_HASH_TABLE_MAP ()
 
 public:
 	bool 

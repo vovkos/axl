@@ -7,7 +7,7 @@
 #define _AXL_FSM_REGEXP_H
 
 #include "axl_fsm_Dfa.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace fsm {
@@ -29,11 +29,11 @@ class RegExp
 	friend class RegExpCompiler;
 
 protected:
-	rtl::StdList <NfaState> m_nfaStateList;
-	rtl::Array <NfaState*> m_nfaStateArray;
+	sl::StdList <NfaState> m_nfaStateList;
+	sl::Array <NfaState*> m_nfaStateArray;
 
-	rtl::StdList <DfaState> m_dfaStateList;
-	rtl::Array <DfaState*> m_dfaStateArray;
+	sl::StdList <DfaState> m_dfaStateList;
+	sl::Array <DfaState*> m_dfaStateArray;
 
 public:
 	bool
@@ -42,25 +42,25 @@ public:
 		return m_nfaStateList.isEmpty ();
 	}
 
-	rtl::ConstList <NfaState> 
+	sl::ConstList <NfaState> 
 	getNfaStateList () const
 	{
 		return m_nfaStateList;
 	}
 
-	rtl::Array <NfaState*> 
+	sl::Array <NfaState*> 
 	getNfaStateArray () const
 	{
 		return m_nfaStateArray;
 	}
 
-	rtl::ConstList <DfaState> 
+	sl::ConstList <DfaState> 
 	getDfaStateList () const
 	{		
 		return m_dfaStateList;
 	}
 
-	rtl::Array <DfaState*> 
+	sl::Array <DfaState*> 
 	getDfaStateArray () const
 	{
 		return m_dfaStateArray;
@@ -97,7 +97,7 @@ protected:
 	{
 		TokenKind m_tokenKind;
 		char m_char;
-		rtl::String m_string;
+		sl::String m_string;
 
 		bool 
 		isSpecialChar (char c)
@@ -146,10 +146,10 @@ protected:
 	readEscapeSequence (char* c);
 
 	bool
-	readLiteral (rtl::String* literal);
+	readLiteral (sl::String* literal);
 
 	bool
-	readIdentifier (rtl::String* name);
+	readIdentifier (sl::String* name);
 
 	bool
 	getToken (Token* token);
@@ -193,7 +193,7 @@ protected:
 	void
 	stdCharClass (
 		uint_t c,
-		rtl::BitMap* charSet
+		sl::BitMap* charSet
 		);
 
 	NfaState*
@@ -215,7 +215,7 @@ protected:
 	any ();
 
 	bool
-	charClassItem (rtl::BitMap* charSet);
+	charClassItem (sl::BitMap* charSet);
 
 	NfaState*
 	group ();

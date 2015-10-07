@@ -258,7 +258,7 @@ testWinNetworkAdapterList ()
 	}
 
 	char buffer [256];
-	rtl::Array <char> bufferArray (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::Array <char> bufferArray (ref::BufKind_Stack, buffer, sizeof (buffer));
 	bufferArray.setCount (size);
 
 	IP_ADAPTER_INFO* ipAdapter = (IP_ADAPTER_INFO*) bufferArray.a ();
@@ -303,7 +303,7 @@ testWinNetworkAdapterList2 ()
 	}
 
 	size_t size = 16 * sizeof (INTERFACE_INFO);
-	rtl::Array <char> buffer;
+	sl::Array <char> buffer;
 	buffer.setCount (size);
 
 	dword_t actualSize;
@@ -380,10 +380,10 @@ testWinNetworkAdapterList2 ()
 void
 testNetworkAdapterList ()
 {
-	rtl::StdList <io::NetworkAdapterDesc> adapterList;
+	sl::StdList <io::NetworkAdapterDesc> adapterList;
 	io::createNetworkAdapterDescList (&adapterList);
 
-	rtl::Iterator <io::NetworkAdapterDesc> adapterIt = adapterList.getHead ();
+	sl::Iterator <io::NetworkAdapterDesc> adapterIt = adapterList.getHead ();
 	for (; adapterIt; adapterIt++)
 	{
 		io::NetworkAdapterDesc* adapter = *adapterIt;
@@ -393,8 +393,8 @@ testNetworkAdapterList ()
 		printf ("Type        = %s\n", io::getNetworkAdapterTypeString (adapter->getType ()));
 		printf ("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).cc ());
 
-		rtl::ConstList <io::NetworkAdapterAddress> addressList = adapter->getAddressList ();
-		rtl::Iterator <io::NetworkAdapterAddress> addressIt = addressList.getHead ();
+		sl::ConstList <io::NetworkAdapterAddress> addressList = adapter->getAddressList ();
+		sl::Iterator <io::NetworkAdapterAddress> addressIt = addressList.getHead ();
 		for (size_t i = 1; addressIt; addressIt++, i++)
 		{
 			io::NetworkAdapterAddress* address = *addressIt;
@@ -463,7 +463,7 @@ testParseFormatIp6 ()
 		addr.sin6_scope_id = rand () % 2 ? rand () : 0;
 #endif
 
-		rtl::String addrString = io::getSockAddrString ((const sockaddr*) &addr).cc ();
+		sl::String addrString = io::getSockAddrString ((const sockaddr*) &addr).cc ();
 		printf ("addr1 = %s\n", addrString.cc ());
 
 		char addrString2 [1024] = { 0 };
@@ -523,7 +523,7 @@ testAddrInfoIp6 ()
 {
 	const char* name = "tibbo.com";
 
-	rtl::Array <io::SockAddr> addrArray;
+	sl::Array <io::SockAddr> addrArray;
 	bool result = io::resolveHostName (&addrArray, name, AF_INET6);
 	if (!result)
 	{
@@ -707,10 +707,10 @@ testNamedPipes ()
 		return; 
 	}
  
-	rtl::Array <char> dirBuffer;
+	sl::Array <char> dirBuffer;
 	dirBuffer.setCount (BufferSize);
 
-	rtl::String_utf16 fileName;
+	sl::String_utf16 fileName;
 
 	BOOLEAN isFirstQuery = TRUE;
 
@@ -768,7 +768,7 @@ testNamedPipes ()
 
 bool
 querySymbolicLink (
-	rtl::String_utf16* string,
+	sl::String_utf16* string,
 	HANDLE dir,
 	UNICODE_STRING* uniName
 	)
@@ -849,18 +849,18 @@ enumerateDirectory (
 		return; 
 	}
 
-	rtl::Array <char> buffer;
+	sl::Array <char> buffer;
 	buffer.setCount (BufferSize);
 
 	ULONG queryContext = 0;
 	BOOLEAN isFirstQuery = TRUE;
 
-	rtl::String_utf16 dirName;
-	rtl::String_utf16 dirTypeName;
-	rtl::String_utf16 symLinkTargetName;
+	sl::String_utf16 dirName;
+	sl::String_utf16 dirTypeName;
+	sl::String_utf16 symLinkTargetName;
 
 	level++;
-	rtl::String indent ((utf32_t) ' ', level * 2);
+	sl::String indent ((utf32_t) ' ', level * 2);
 
 	for (;;)
 	{
@@ -995,7 +995,7 @@ printWinErrorDescription (
 		NULL
 		);
 
-	rtl::String description = message;
+	sl::String description = message;
 	::LocalFree (message);
 
 	printf ("%d/%d: %s\n", langId, subLangId, description.cc ());
@@ -1037,13 +1037,13 @@ testTimestamp ()
 
 #ifdef _AXL_IO_USB
 
-rtl::String 
+sl::String 
 getUsbStringDescriptorText (
 	io::UsbDevice* device,
 	size_t index
 	)
 {
-	rtl::String text;
+	sl::String text;
 
 	if (!device->isOpen ())
 	{
@@ -1376,8 +1376,8 @@ protected:
 protected:
 	io::psx::Mapping m_guardPage;
 
-	rtl::Array <uint64_t> m_threadArray;
-	rtl::HashTableMap <uint64_t, bool, rtl::HashId <uint64_t> > m_threadMap;
+	sl::Array <uint64_t> m_threadArray;
+	sl::HashTableMap <uint64_t, bool, sl::HashId <uint64_t> > m_threadMap;
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
@@ -1434,7 +1434,7 @@ public:
 	bool
 	registerThread (uint64_t threadId)
 	{
-		rtl::HashTableMapIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
+		sl::HashTableMapIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
 		if (it->m_value)
 			return false;
 
@@ -1519,7 +1519,7 @@ protected:
 protected:
 	mem::win::VirtualMemory m_guardPage;
 
-	rtl::HashTableMap <uint64_t, bool, rtl::HashId <uint64_t> > m_threadMap;
+	sl::HashTableMap <uint64_t, bool, sl::HashId <uint64_t> > m_threadMap;
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
@@ -1570,7 +1570,7 @@ public:
 	bool
 	registerThread (uint64_t threadId)
 	{
-		rtl::HashTableMapIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
+		sl::HashTableMapIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
 		if (it->m_value)
 			return false;
 

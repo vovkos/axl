@@ -9,7 +9,7 @@
 #include "axl_io_UsbError.h"
 #include "axl_err_Error.h"
 #include "axl_err_ErrorMgr.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -17,7 +17,7 @@ namespace io {
 //.............................................................................
 
 // {87EA0738-52E9-4769-B727-7A17377B921E}
-AXL_RTL_DEFINE_GUID (
+AXL_SL_DEFINE_GUID (
 	g_usbErrorGuid,
 	0x87ea0738, 0x52e9, 0x4769, 0xb7, 0x27, 0x7a, 0x17, 0x37, 0x7b, 0x92, 0x1e
 	);
@@ -28,15 +28,15 @@ class UsbErrorProvider: public err::ErrorProvider
 {
 public:
 	static
-	rtl::String 
+	sl::String 
 	getErrorDescription (int code)
 	{
 		return libusb_error_name (code);
 	}
 
 	virtual 
-	rtl::String 
-	getErrorDescription (const err::ErrorData* error)
+	sl::String 
+	getErrorDescription (const err::ErrorHdr* error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -50,7 +50,7 @@ registerUsbErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
 		g_usbErrorGuid, 
-		rtl::getSimpleSingleton <UsbErrorProvider> ()
+		mt::getSimpleSingleton <UsbErrorProvider> ()
 		);
 }
 
@@ -68,7 +68,7 @@ public:
 		create (code);
 	}
 
-	err::ErrorData* 
+	err::ErrorHdr* 
 	create (int code);
 };
 
@@ -83,5 +83,5 @@ setUsbError (int code)
 
 //.............................................................................
 
-} // namespace io {
-} // namespace axl {
+} // namespace io
+} // namespace axl

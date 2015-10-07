@@ -180,7 +180,7 @@ Workerhread::removeEvent_wt (UserEvent* userEvent)
 	m_waitArray.setCount (count + 1);
 	m_functionArray.setCount (count);
 
-	rtl::Iterator <UserEvent> it = m_userEventList.getHead ();
+	sl::Iterator <UserEvent> it = m_userEventList.getHead ();
 	mt::Event** event = m_waitArray.getBuffer () + 1;
 	exe::IFunction** onEvent = m_functionArray.getBuffer ();
 
@@ -210,7 +210,7 @@ Workerhread::process_wt ()
 ref::Ptr <Workerhread>
 getWorkerThread (size_t reserveEventCount)
 {
-	exe::WorkerhreadPool* pool = rtl::getSingleton <exe::WorkerhreadPool> ();
+	exe::WorkerhreadPool* pool = sl::getSingleton <exe::WorkerhreadPool> ();
 	return pool->getThread (reserveEventCount);
 }
 
@@ -221,7 +221,7 @@ getWorkerThread (
 	handle_t* phEvent
 	)
 {
-	exe::WorkerhreadPool* pool = rtl::getSingleton <exe::WorkerhreadPool> ();
+	exe::WorkerhreadPool* pool = sl::getSingleton <exe::WorkerhreadPool> ();
 	ref::Ptr <Workerhread> thread = pool->getThread (1);
 	if (!thread)
 		return ref::PtrKind_Null;

@@ -29,7 +29,7 @@ EcPoint::createCopy (
 
 bool
 EcPoint::getData (
-	rtl::Array <char>* data,
+	sl::Array <char>* data,
 	EC_GROUP* group,
 	point_conversion_form_t form,
 	BN_CTX* ctx
@@ -57,7 +57,7 @@ EcPoint::getData (
 
 bool
 EcPoint::getHexString (
-	rtl::String* string,
+	sl::String* string,
 	EC_GROUP* group,
 	point_conversion_form_t form,
 	BN_CTX* ctx

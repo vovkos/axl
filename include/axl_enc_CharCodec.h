@@ -7,7 +7,7 @@
 #define _AXL_ENC_CHARCODEC_H
 
 #include "axl_enc_Utf.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace enc {
@@ -70,38 +70,38 @@ public:
 
 	size_t
 	encodeFromUtf8 (
-		rtl::Array <char>* buffer,
+		sl::Array <char>* buffer,
 		const utf8_t* p,
 		size_t length
 		);
 
 	size_t
 	encodeFromUtf16 (
-		rtl::Array <char>* buffer,
+		sl::Array <char>* buffer,
 		const utf16_t* p,
 		size_t length
 		);
 
 	size_t
 	encodeFromUtf32 (
-		rtl::Array <char>* buffer,
+		sl::Array <char>* buffer,
 		const utf32_t* p,
 		size_t length
 		);
 
-	rtl::Array <char>
+	sl::Array <char>
 	encodeFromUtf8 (
 		const utf8_t* p,
 		size_t length
 		);
 
-	rtl::Array <char>
+	sl::Array <char>
 	encodeFromUtf16 (
 		const utf16_t* p,
 		size_t length
 		);
 
-	rtl::Array <char>
+	sl::Array <char>
 	encodeFromUtf32 (
 		const utf32_t* p,
 		size_t length
@@ -163,38 +163,38 @@ public:
 
 	size_t
 	decodeToUtf8 (
-		rtl::Array <utf8_t>* buffer,
+		sl::Array <utf8_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
 	size_t
 	decodeToUtf16 (
-		rtl::Array <utf16_t>* buffer,
+		sl::Array <utf16_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
 	size_t
 	decodeToUtf32 (
-		rtl::Array <utf32_t>* buffer,
+		sl::Array <utf32_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
-	rtl::Array <utf8_t>
+	sl::Array <utf8_t>
 	decodeToUtf8 (
 		const void* p,
 		size_t size
 		);
 
-	rtl::Array <utf16_t>
+	sl::Array <utf16_t>
 	decodeToUtf16 (
 		const void* p,
 		size_t size
 		);
 
-	rtl::Array <utf32_t>
+	sl::Array <utf32_t>
 	decodeToUtf32 (
 		const void* p,
 		size_t size

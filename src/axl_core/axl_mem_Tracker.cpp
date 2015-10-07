@@ -77,7 +77,7 @@ Tracker::trace ()
 			m_blockList.getCount ()
 			);
 
-		rtl::Iterator <BlockHdr> it = m_blockList.getHead ();
+		sl::Iterator <BlockHdr> it = m_blockList.getHead ();
 		for (; it; it++)
 		{
 			BlockHdr* blockHdr = *it;

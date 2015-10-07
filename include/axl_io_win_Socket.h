@@ -6,7 +6,7 @@
 
 #define _AXL_WIN_SOCKET_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 #include "axl_err_Error.h"
 #include "axl_io_SockAddr.h"
 
@@ -28,7 +28,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Socket: public rtl::Handle <SOCKET, CloseSocket, rtl::MinusOne <SOCKET> >
+class Socket: public sl::Handle <SOCKET, CloseSocket, sl::MinusOne <SOCKET> >
 {
 public:
 	bool

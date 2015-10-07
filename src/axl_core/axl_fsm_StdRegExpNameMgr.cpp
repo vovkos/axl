@@ -8,11 +8,11 @@ namespace fsm {
 
 void
 StdRegExpNameMgr::addName (
-	const rtl::String& name,
-	const rtl::String& source
+	const sl::String& name,
+	const sl::String& source
 	)
 {
-	rtl::StringHashTableMapIterator <Name*> it = m_nameMap.visit (name);
+	sl::StringHashTableMapIterator <Name*> it = m_nameMap.visit (name);
 	if (it->m_value)
 	{
 		it->m_value->m_source = source;
@@ -30,7 +30,7 @@ StdRegExpNameMgr::addName (
 void
 StdRegExpNameMgr::removeName (const char* name)
 {
-	rtl::StringHashTableMapIterator <Name*> it = m_nameMap.find (name);
+	sl::StringHashTableMapIterator <Name*> it = m_nameMap.find (name);
 	if (!it->m_value)
 		return;
 	

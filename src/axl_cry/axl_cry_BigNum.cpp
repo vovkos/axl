@@ -58,7 +58,7 @@ BigNum::getData (
 }
 
 bool
-BigNum::getDecString (rtl::String* string)
+BigNum::getDecString (sl::String* string)
 {		
 	char* p = BN_bn2dec (m_h);
 	if (!p)
@@ -73,7 +73,7 @@ BigNum::getDecString (rtl::String* string)
 }
 
 bool
-BigNum::getHexString (rtl::String* string)
+BigNum::getHexString (sl::String* string)
 {
 	char* p = BN_bn2hex (m_h);
 	if (!p)

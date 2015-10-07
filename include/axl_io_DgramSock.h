@@ -27,7 +27,7 @@ public:
 		> OnSendRecvCompleteArg;
 
 protected:
-	struct SendRecv: rtl::ListLink
+	struct SendRecv: sl::ListLink
 	{
 		DgramSock* m_sock;
 		SOCKADDR m_address;
@@ -41,7 +41,7 @@ public:
 
 protected:
 	ref::Ptr <exe::Workerhread> m_workerThread;
-	rtl::StdList <SendRecv> m_sendRecvList;
+	sl::StdList <SendRecv> m_sendRecvList;
 
 public:
 	~DgramSock ()

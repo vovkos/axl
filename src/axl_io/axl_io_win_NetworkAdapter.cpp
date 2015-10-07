@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_io_NetworkAdapter.h"
 #include "axl_err_Error.h"
-#include "axl_rtl_Array.h"
+#include "axl_sl_Array.h"
 
 namespace axl {
 namespace io {
@@ -13,7 +13,7 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList);
+	buildAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
@@ -27,13 +27,13 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::buildAdapterList (rtl::StdList <NetworkAdapterDesc>* adapterList)
+NetworkAdapterEnumerator::buildAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	adapterList->clear ();
 
 	ulong_t size = 15 * 1024; // Microsoft recommends starting with 15K
 
-	rtl::Array <char> buffer;
+	sl::Array <char> buffer;
 	buffer.setCount (size); 
 
 	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*) buffer.a ();
@@ -148,12 +148,12 @@ NetworkAdapterEnumerator::setupAdapter (
 //.............................................................................
 
 size_t
-createNetworkAdapterDescList (rtl::StdList <NetworkAdapterDesc>* adapterList)
+createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	return NetworkAdapterEnumerator::buildAdapterList (adapterList);
 }
 
 //.............................................................................
 
-} // namespace axl {
-} // namespace io {
+} // namespace io
+} // namespace axl

@@ -4,7 +4,7 @@ namespace test_Packetizer {
 
 //.............................................................................
 
-class MyPacketizer: public rtl::Packetizer <MyPacketizer>
+class MyPacketizer: public sl::Packetizer <MyPacketizer>
 {
 public:
 	void
@@ -48,7 +48,7 @@ run ()
 		printf ("complete (%d, %d chunks).\n", i, j);
 	}
 	
-	rtl::String s = "dsjsdljsdkl";
+	sl::String s = "dsjsdljsdkl";
 	s.clear ();
 
 	printf ("done.\n");

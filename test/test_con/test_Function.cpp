@@ -23,17 +23,17 @@ namespace test_Function {
 //	CFunctionT <
 //		MyFunction, 
 //		exe::ECallingConvention_Cdecl,
-//		rtl::IPackImplT_3 (
-//			CArgT <rtl::CString>,
+//		sl::IPackImplT_3 (
+//			CArgT <sl::CString>,
 //			CArgString,
 //			CArgString
 //			> > Function;
 //
 //	CPtrT <mem::TBlock> Stack = Function.GetArgPacker ()->BuildFromArgs (
 //		0, 
-//		rtl::CString ("hui"), 
-//		rtl::CString ("govno"), 
-//		rtl::CString ("muravei")
+//		sl::CString ("hui"), 
+//		sl::CString ("govno"), 
+//		sl::CString ("muravei")
 //		);
 //
 //	Function.Invoke (Stack->m_p, Stack->m_Size);
@@ -41,7 +41,7 @@ namespace test_Function {
 //	CFunctionT <
 //		MyFunction2, 
 //		exe::ECallingConvention_Stdcall,
-//		rtl::IPackImplT_3 (
+//		sl::IPackImplT_3 (
 //			CArgT <int>,
 //			CArgT <int>,
 //			CArgT <int>
@@ -75,7 +75,7 @@ namespace test_Function {
 //};
 //
 //template <typename A1>
-//class CStackFramePackT_1: public rtl::IPack
+//class CStackFramePackT_1: public sl::IPack
 //{
 //public:
 //	CStackFramePackT_1 ()
@@ -83,7 +83,7 @@ namespace test_Function {
 //};
 //
 //template <typename A1, typename A2>
-//class CStackFramePackT_2: public rtl::IPack
+//class CStackFramePackT_2: public sl::IPack
 //{
 //public:
 //};

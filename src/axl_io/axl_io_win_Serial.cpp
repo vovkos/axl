@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_io_win_Serial.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -20,7 +20,7 @@ Serial::open (
 		name += 4;
 	
 	char buffer [256];
-	rtl::String_w deviceName (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w deviceName (ref::BufKind_Stack, buffer, sizeof (buffer));
 	deviceName.format (L"\\\\.\\%S", name);
 
 	m_h = ::CreateFileW (

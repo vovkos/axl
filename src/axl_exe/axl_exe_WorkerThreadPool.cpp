@@ -44,7 +44,7 @@ WorkerhreadPool::grow (size_t threadCount)
 	if (threadCount == 0)
 		threadCount = g::getModule ()->getSystemInfo ()->m_processorCount;
 
-	rtl::StdList <ThreadEntry> threadList;
+	sl::StdList <ThreadEntry> threadList;
 
 	for (size_t i = 0; i < threadCount; i++)
 	{
@@ -69,10 +69,10 @@ WorkerhreadPool::stop (ulong_t timeout)
 {
 	m_lock.lock ();
 
-	rtl::StdList <ThreadEntry> threadList;
+	sl::StdList <ThreadEntry> threadList;
 	threadList.takeOver (&m_threadList);
 
-	rtl::Iterator <ThreadEntry> it = threadList.getHead ();
+	sl::Iterator <ThreadEntry> it = threadList.getHead ();
 	for (; it; it++)
 	{
 		it->m_pinCount--;
@@ -97,7 +97,7 @@ WorkerhreadPool::getThread (size_t reserveEventCount)
 {
 	ASSERT (reserveEventCount <= MAXIMUM_WAIT_OBJECTS);
 
-	rtl::Iterator <ThreadEntry> it;
+	sl::Iterator <ThreadEntry> it;
 
 	m_lock.lock ();
 

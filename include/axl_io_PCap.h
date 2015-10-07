@@ -6,7 +6,7 @@
 
 #define _AXL_IO_PCAP_H
 
-#include "axl_rtl_Handle.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace io {
@@ -25,7 +25,7 @@ public:
 
 //.............................................................................
 
-class PCap: public rtl::Handle <pcap_t*, ClosePCap>
+class PCap: public sl::Handle <pcap_t*, ClosePCap>
 {
 public:
 	bool
@@ -60,5 +60,5 @@ public:
 
 //.............................................................................
 
-} // namespace io {
-} // namespace axl {
+} // namespace io
+} // namespace axl

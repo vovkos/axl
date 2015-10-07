@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_dbg_Trace.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace dbg {
@@ -22,7 +22,7 @@ traceEx_va (
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	char buffer [512] = { 0 };
-	rtl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.format_va (formatString, va.m_va);
 	::OutputDebugStringA (string);
 #elif (_AXL_ENV == AXL_ENV_POSIX)

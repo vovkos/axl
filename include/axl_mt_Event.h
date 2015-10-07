@@ -6,7 +6,7 @@
 
 #define _AXL_MT_EVENT_H
 
-#include "axl_rtl_Func.h"
+#include "axl_sl_Func.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include "axl_mt_win_Event.h"

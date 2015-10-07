@@ -12,7 +12,7 @@
 #include "axl_gui_GdiFont.h"
 #include "axl_gui_GdiImage.h"
 #include "axl_gui_GdiWidget.h"
-#include "axl_rtl_Singleton.h"
+#include "axl_sl_Singleton.h"
 
 namespace axl {
 namespace gui {
@@ -32,7 +32,7 @@ public:
 	GdiEngine*
 	getSingleton ()
 	{
-		return rtl::getSingleton <GdiEngine> ();
+		return mt::getSingleton <GdiEngine> ();
 	}
 
 	// fonts
@@ -90,17 +90,17 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const rtl::String& formatName);
+	registerClipboardFormat (const sl::String& formatName);
 
 	virtual
 	bool
-	readClipboard (rtl::String* string);
+	readClipboard (sl::String* string);
 
 	virtual
 	bool
 	readClipboard (
 		uintptr_t format,
-		rtl::Array <char>* data
+		sl::Array <char>* data
 		);
 
 	virtual

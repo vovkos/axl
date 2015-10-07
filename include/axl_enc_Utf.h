@@ -6,7 +6,7 @@
 
 #define _AXL_ENC_UTF_H
 
-#include "axl_rtl_ByteOrder.h"
+#include "axl_sl_ByteOrder.h"
 
 namespace axl {
 namespace enc {
@@ -658,7 +658,7 @@ public:
 	utf32_t
 	decodeCodePoint (const utf32_t* p)
 	{
-		return rtl::swapByteOrder32 (*p);
+		return sl::swapByteOrder32 (*p);
 	}
 
 	static
@@ -668,7 +668,7 @@ public:
 		utf32_t x
 		)
 	{
-		*p = rtl::swapByteOrder32 (x);
+		*p = sl::swapByteOrder32 (x);
 	}
 };
 

@@ -12,7 +12,7 @@ dword_t
 WINAPI
 RtlNtStatusToDosErrorFunc (NTSTATUS);
 
-rtl::String 
+sl::String 
 NtErrorProvider::getErrorDescription (NTSTATUS status)
 {
 	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = NULL;
@@ -24,26 +24,26 @@ NtErrorProvider::getErrorDescription (NTSTATUS status)
 			rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress (ntDll, "RtlNtStatusToDosError");
 		
 		if (!rtlNtStatusToDosErrorFunc)
-			return rtl::String::format_s ("ntstatus #%x", status);
+			return sl::String::format_s ("ntstatus #%x", status);
 	}
 
 	dword_t winError = rtlNtStatusToDosErrorFunc (status);
 	if (winError == ERROR_MR_MID_NOT_FOUND)
-		return rtl::String::format_s ("ntstatus #%x", status);
+		return sl::String::format_s ("ntstatus #%x", status);
 
 	return WinErrorProvider::getErrorDescription (winError);
 }
 
 //.............................................................................
 
-ErrorData*
+ErrorHdr*
 NtError::create (NTSTATUS status)
 {
-	ErrorData* error = getBuffer (sizeof (ErrorData));
+	ErrorHdr* error = getBuffer (sizeof (ErrorHdr));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (ErrorData);
+	error->m_size = sizeof (ErrorHdr);
 	error->m_guid = g_ntErrorGuid;
 	error->m_code = status;
 	return error;

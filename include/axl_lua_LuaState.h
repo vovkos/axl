@@ -6,8 +6,8 @@
 
 #define _AXL_LUA_LUASTATE_H
 
-#include "axl_rtl_Handle.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_Handle.h"
+#include "axl_sl_String.h"
 #include "axl_err_Error.h"
 #include "axl_dbg_Trace.h"
 
@@ -28,7 +28,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class LuaState: public rtl::Handle <lua_State*, LuaClose>
+class LuaState: public sl::Handle <lua_State*, LuaClose>
 {
 public:
 	LuaState ()
@@ -331,10 +331,10 @@ public:
 		return value;
 	}
 
-	rtl::String
+	sl::String
 	popString ()
 	{
-		rtl::String string = getString (-1);
+		sl::String string = getString (-1);
 		pop ();
 		return string;
 	}
@@ -469,5 +469,5 @@ protected:
 
 //.............................................................................
 
-} // namespace lua {
-} // namespace axl {
+} // namespace lua
+} // namespace axl

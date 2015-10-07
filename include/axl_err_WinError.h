@@ -7,7 +7,7 @@
 #define _AXL_ERR_WINERROR_H
 
 #include "axl_err_Error.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace err {
@@ -15,7 +15,7 @@ namespace err {
 //.............................................................................
 
 // {54E100E8-2137-40b8-BCD8-00AC1D0BAA16}
-AXL_RTL_DEFINE_GUID (
+AXL_SL_DEFINE_GUID (
 	g_winErrorGuid,
 	0x54e100e8, 0x2137, 0x40b8, 0xbc, 0xd8, 0x0, 0xac, 0x1d, 0xb, 0xaa, 0x16
 	);
@@ -26,12 +26,12 @@ class WinErrorProvider: public ErrorProvider
 {
 public:
 	static
-	rtl::String 
+	sl::String 
 	getErrorDescription (dword_t code);
 
 	virtual 
-	rtl::String 
-	getErrorDescription (const ErrorData* error)
+	sl::String 
+	getErrorDescription (const ErrorHdr* error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -51,7 +51,7 @@ public:
 		create (code);
 	}
 
-	ErrorData* 
+	ErrorHdr* 
 	create (dword_t code);
 };
 

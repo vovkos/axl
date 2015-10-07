@@ -40,21 +40,21 @@ template <
 class RagelToken: public Token <Enum, GetName, Data, RagelTokenPos>
 {
 public:
-	rtl::String
+	sl::String
 	getText () const
 	{
-		return rtl::String (this->m_pos.m_p, this->m_pos.m_length);
+		return sl::String (this->m_pos.m_p, this->m_pos.m_length);
 	}
 
 	static
-	rtl::String 
-	getTokenListString (const rtl::ConstBoxList <RagelToken>& list)
+	sl::String 
+	getTokenListString (const sl::ConstBoxList <RagelToken>& list)
 	{
 		if (list.isEmpty ())
-			return rtl::String ();
+			return sl::String ();
 
-		rtl::BoxIterator <RagelToken> token = list.getHead ();
-		rtl::String string (token->m_pos.m_p, token->m_pos.m_length);
+		sl::BoxIterator <RagelToken> token = list.getHead ();
+		sl::String string (token->m_pos.m_p, token->m_pos.m_length);
 		for (token++; token; token++)
 		{
 			string.append (' ');
@@ -83,13 +83,13 @@ protected:
 	size_t m_tokenizeLimit;
 	size_t m_tokenizeCount;
 
-	rtl::String m_filePath;
+	sl::String m_filePath;
 
 	char* m_begin;
 	int m_line;
 	size_t m_lineOffset;
 
-	rtl::Array <int> m_stack; // stack of states
+	sl::Array <int> m_stack; // stack of states
 
 	// ragel interface variables
 
@@ -125,8 +125,8 @@ public:
 	bool
 	create (
 		int state,
-		const rtl::String& filePath,
-		const rtl::String& source
+		const sl::String& filePath,
+		const sl::String& source
 		)
 	{
 		return create (state, filePath, source, source.getLength ());
@@ -134,8 +134,8 @@ public:
 
 	bool
 	create (
-		const rtl::String& filePath,
-		const rtl::String& source
+		const sl::String& filePath,
+		const sl::String& source
 		)
 	{
 		return create (filePath, source, source.getLength ());
@@ -144,7 +144,7 @@ public:
 	bool
 	create (
 		int state,
-		const rtl::String& filePath,
+		const sl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)
@@ -156,7 +156,7 @@ public:
 
 	bool
 	create (
-		const rtl::String& filePath,
+		const sl::String& filePath,
 		const char* source,
 		size_t length = -1
 		)

@@ -33,7 +33,7 @@ getCharCodec (CharCodecKind codecKind)
 
 size_t
 CharCodec::encodeFromUtf8 (
-	rtl::Array <char>* buffer,
+	sl::Array <char>* buffer,
 	const utf8_t* p,
 	size_t length
 	)
@@ -67,7 +67,7 @@ CharCodec::encodeFromUtf8 (
 
 size_t
 CharCodec::encodeFromUtf16 (
-	rtl::Array <char>* buffer,
+	sl::Array <char>* buffer,
 	const utf16_t* p,
 	size_t length
 	)
@@ -101,7 +101,7 @@ CharCodec::encodeFromUtf16 (
 
 size_t
 CharCodec::encodeFromUtf32 (
-	rtl::Array <char>* buffer,
+	sl::Array <char>* buffer,
 	const utf32_t* p,
 	size_t length
 	)
@@ -135,35 +135,35 @@ CharCodec::encodeFromUtf32 (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-rtl::Array <char>
+sl::Array <char>
 CharCodec::encodeFromUtf8 (
 	const utf8_t* p,
 	size_t length
 	)
 {
-	rtl::Array <char> buffer;
+	sl::Array <char> buffer;
 	encodeFromUtf8 (&buffer, p, length);
 	return buffer;
 }
 
-rtl::Array <char>
+sl::Array <char>
 CharCodec::encodeFromUtf16 (
 	const utf16_t* p,
 	size_t length
 	)
 {
-	rtl::Array <char> buffer;
+	sl::Array <char> buffer;
 	encodeFromUtf16 (&buffer, p, length);
 	return buffer;
 }
 
-rtl::Array <char>
+sl::Array <char>
 CharCodec::encodeFromUtf32 (
 	const utf32_t* p,
 	size_t length
 	)
 {
-	rtl::Array <char> buffer;
+	sl::Array <char> buffer;
 	encodeFromUtf32 (&buffer, p, length);
 	return buffer;
 }
@@ -172,7 +172,7 @@ CharCodec::encodeFromUtf32 (
 
 size_t
 CharCodec::decodeToUtf8 (
-	rtl::Array <utf8_t>* buffer,
+	sl::Array <utf8_t>* buffer,
 	const void* _p,
 	size_t size
 	)
@@ -210,7 +210,7 @@ CharCodec::decodeToUtf8 (
 
 size_t
 CharCodec::decodeToUtf16 (
-	rtl::Array <utf16_t>* buffer,
+	sl::Array <utf16_t>* buffer,
 	const void* _p,
 	size_t size
 	)
@@ -248,7 +248,7 @@ CharCodec::decodeToUtf16 (
 
 size_t
 CharCodec::decodeToUtf32 (
-	rtl::Array <utf32_t>* buffer,
+	sl::Array <utf32_t>* buffer,
 	const void* _p,
 	size_t size
 	)
@@ -284,35 +284,35 @@ CharCodec::decodeToUtf32 (
 	return buffer->getCount ();
 }
 
-rtl::Array <utf8_t>
+sl::Array <utf8_t>
 CharCodec::decodeToUtf8 (
 	const void* p,
 	size_t size
 	)
 {
-	rtl::Array <utf8_t> buffer;
+	sl::Array <utf8_t> buffer;
 	decodeToUtf8 (&buffer, p, size);
 	return buffer;
 }
 
-rtl::Array <utf16_t>
+sl::Array <utf16_t>
 CharCodec::decodeToUtf16 (
 	const void* p,
 	size_t size
 	)
 {
-	rtl::Array <utf16_t> buffer;
+	sl::Array <utf16_t> buffer;
 	decodeToUtf16 (&buffer, p, size);
 	return buffer;
 }
 
-rtl::Array <utf32_t>
+sl::Array <utf32_t>
 CharCodec::decodeToUtf32 (
 	const void* p,
 	size_t size
 	)
 {
-	rtl::Array <utf32_t> buffer;
+	sl::Array <utf32_t> buffer;
 	decodeToUtf32 (&buffer, p, size);
 	return buffer;
 }

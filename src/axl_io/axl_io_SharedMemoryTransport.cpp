@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_io_SharedMemoryTransport.h"
-#include "axl_rtl_String.h"
+#include "axl_sl_String.h"
 #include "axl_err_Error.h"
 #include "axl_g_Module.h"
 
@@ -76,8 +76,8 @@ SharedMemoryTransportBase::attach (
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 		result =
-			m_readEvent.create (NULL, false, false, rtl::String_utf16 (readEventName)) &&
-			m_writeEvent.create (NULL, false, false, rtl::String_utf16 (writeEventName));
+			m_readEvent.create (NULL, false, false, sl::String_utf16 (readEventName)) &&
+			m_writeEvent.create (NULL, false, false, sl::String_utf16 (writeEventName));
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 		result = m_readEvent.open (readEventName, O_CREAT);
 		if (result)
@@ -113,8 +113,8 @@ SharedMemoryTransportBase::attach (
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 		result =
-			m_readEvent.open (EVENT_ALL_ACCESS, false, rtl::String_utf16 (readEventName)) &&
-			m_writeEvent.open (EVENT_ALL_ACCESS, false, rtl::String_utf16 (writeEventName));
+			m_readEvent.open (EVENT_ALL_ACCESS, false, sl::String_utf16 (readEventName)) &&
+			m_writeEvent.open (EVENT_ALL_ACCESS, false, sl::String_utf16 (writeEventName));
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 		result =
 			m_readEvent.open (readEventName, 0) &&
@@ -212,16 +212,16 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 
 //.............................................................................
 
-rtl::Array <char>
+sl::Array <char>
 SharedMemoryReader::read ()
 {
-	rtl::Array <char> buffer;
+	sl::Array <char> buffer;
 	read (&buffer);
 	return buffer;
 }
 
 size_t
-SharedMemoryReader::read (rtl::Array <char>* buffer)
+SharedMemoryReader::read (sl::Array <char>* buffer)
 {
 	ASSERT (isOpen ());
 
@@ -467,5 +467,5 @@ SharedMemoryWriter::copyWriteChain (
 
 //.............................................................................
 
-} // namespace axl {
-} // namespace io {
+} // namespace io
+} // namespace axl

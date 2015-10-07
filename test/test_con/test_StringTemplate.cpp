@@ -22,7 +22,7 @@ run (const char* fileName)
 	
 	lua::StringTemplate st;
 
-	rtl::String resultString;
+	sl::String resultString;
 	result = st.process (&resultString, fileName, p, size);
 	if (!result)
 	{

@@ -71,7 +71,7 @@ Base32Writer::addPadding ()
 
 size_t
 Base32Encoding::encode (
-	rtl::String* string,
+	sl::String* string,
 	const void* p,
 	size_t size,
 	size_t hyphenDistance
@@ -162,7 +162,7 @@ Base32Encoding::encode (
 
 size_t
 Base32Encoding::decode (
-	rtl::Array <char>* buffer,
+	sl::Array <char>* buffer,
 	const char* p,
 	size_t length
 	)
