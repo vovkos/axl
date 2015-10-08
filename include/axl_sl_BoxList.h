@@ -102,7 +102,7 @@ public:
 	void
 	copy (const L& list)
 	{
-		clear ();
+		this->clear ();
 
 		typename L::Iterator it = list.getHead ();
 		for (; it; it++)

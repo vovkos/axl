@@ -65,7 +65,7 @@ public:
 	bool
 	operator == (const StringSliceBase& slice) const
 	{
-		return cmp (string) == 0;
+		return cmp (slice) == 0;
 	}
 
 	bool
@@ -83,7 +83,7 @@ public:
 	bool
 	operator != (const StringSliceBase& slice) const
 	{
-		return cmp (string) != 0;
+		return cmp (slice) != 0;
 	}
 
 	StringSliceBase&
