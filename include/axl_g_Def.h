@@ -117,7 +117,7 @@
 #	define AXL_STDCALL    __stdcall
 #	define AXL_SELECT_ANY __declspec (selectany)
 #	define AXL_NO_VTABLE  __declspec (novtable)
-#	define AXL_EXPORT     extern "C" __declspec (dllexport)
+#	define AXL_EXPORT     __declspec (dllexport)
 #
 #	ifdef _DEBUG
 #		define _AXL_DEBUG 1
@@ -132,7 +132,7 @@
 #		define AXL_CDECL
 #		define AXL_STDCALL
 #	endif
-#	define AXL_SELECT_ANY __attribute__ ((weak))
+#	define AXL_SELECT_ANY  __attribute__ ((weak))
 #	define AXL_NO_VTABLE
 #	define AXL_EXPORT
 #
