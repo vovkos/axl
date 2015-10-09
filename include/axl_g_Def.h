@@ -259,22 +259,17 @@ template <typename T>
 void*
 pvoid_cast (T x)
 {
-#ifdef _AXL_DEBUG
-	switch (sizeof (x))
-	{
-	case sizeof (void*):
-		break;
-
-	case sizeof (void*) * 2:
-		// ASSERT (((void**) &x) [1] == NULL); // <-- fails under MSVC x64
-		break;
-
-	default:
-		ASSERT (false);
-	}
-#endif
-
+	ASSERT (sizeof (x) == sizeof (void*) || sizeof (x) == sizeof (void*) * 2);
 	return *(void**) &x;
+}
+
+// this overload is to make it ok to pvoid_cast (NULL) on 64-bit systems
+
+inline
+void*
+pvoid_cast (int x)
+{
+	return (void*) (intptr_t) x;
 }
 
 //.............................................................................
