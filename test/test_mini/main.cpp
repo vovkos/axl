@@ -545,7 +545,7 @@ testDynamicLibrary ()
 {
 	mt::DynamicLibrary dl;
 	
-	bool result = dl.load ("libc.so.6");
+	bool result = dl.open ("libc.so.6");
 	if (!result)
 	{
 		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().cc ());

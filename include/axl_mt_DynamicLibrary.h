@@ -27,7 +27,7 @@ public:
 
 public:
 	bool
-	load (const char* fileName)
+	open (const char* fileName)
 	{
 		char buffer [256];
 		sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
@@ -37,7 +37,7 @@ public:
 	}
 
 	void
-	release ()
+	close ()
 	{
 		m_library.close ();
 	}
@@ -60,13 +60,13 @@ protected:
 
 public:
 	bool
-	load (const char* fileName)
+	open (const char* fileName)
 	{
 		return m_dynamicLibrary.open (fileName);
 	}
 
 	void
-	release ()
+	close ()
 	{
 		m_dynamicLibrary.close ();
 	}

@@ -351,10 +351,10 @@ public:
 		m_p = NULL;
 	}
 
-	Array (T e)
+	explicit Array (size_t count)
 	{
 		m_p = NULL;
-		copy (&e, 1);
+		setCount (count);
 	}
 
 	Array (const Array& src)
