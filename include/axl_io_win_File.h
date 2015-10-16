@@ -6,7 +6,7 @@
 
 #define _AXL_WIN_FILE_H
 
-#include "axl_g_win_Handle.h"
+#include "axl_io_win_FileHandle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class File: public g::win::FileHandle
+class File: public FileHandle
 {
 public:
 	bool
@@ -80,6 +80,21 @@ public:
 		)
 	{
 		bool_t result = ::WriteFile (m_h, p, size, actualSize, overlapped);
+		return completeAsyncRequest (result, overlapped);
+	}
+
+	bool
+	ioctl (
+		dword_t code,
+		const void* inData,
+		dword_t inDataSize,
+		void* outData,
+		dword_t outDataSize,
+		dword_t* actualSize,
+		OVERLAPPED* overlapped = NULL
+		)
+	{
+		bool_t result = ::DeviceIoControl (m_h, code, (void*) inData, inDataSize, outData, outDataSize, actualSize, overlapped);
 		return completeAsyncRequest (result, overlapped);
 	}
 

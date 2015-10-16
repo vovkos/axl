@@ -4,13 +4,13 @@
 
 #pragma once
 
-#define _AXL_G_WIN_HANDLE_H
+#define _AXL_SYS_WIN_HANDLE_H
 
 #include "axl_sl_Handle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
-namespace g {
+namespace sys {
 namespace win {
 
 //.............................................................................
@@ -28,22 +28,6 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef sl::Handle <HANDLE, CloseHandle> Handle;
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class FileHandle: public sl::Handle <HANDLE, CloseHandle, sl::MinusOne <HANDLE> >
-{
-public:
-	static
-	bool
-	completeAsyncRequest (
-		bool_t result,
-		OVERLAPPED* overlapped
-		);
-
-	size_t
-	getOverlappedResult (OVERLAPPED* overlapped);
-};
 
 //.............................................................................
 
@@ -63,6 +47,22 @@ typedef sl::Handle <HKEY, CloseRegKey, sl::MinusOne <HKEY> > RegKeyHandle;
 
 //.............................................................................
 
+class CloseServiceHandle
+{
+public:
+	void
+	operator () (SC_HANDLE h)
+	{
+		::CloseServiceHandle (h);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef sl::Handle <SC_HANDLE, CloseServiceHandle> ServiceHandle;
+
+//.............................................................................
+
 } // namespace win
-} // namespace g
+} // namespace sys
 } // namespace axl

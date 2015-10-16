@@ -33,7 +33,7 @@ extern "C" {
 #include "axl_fsm_StdRegExpNameMgr.h"
 #include "axl_sl_AutoPtrArray.h"
 #include "axl_mt_LongJmpTry.h"
-#include "axl_mt_DynamicLibrary.h"
+#include "axl_sys_DynamicLibrary.h"
 #include "axl_io_Socket.h"
 #include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"

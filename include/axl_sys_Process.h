@@ -4,12 +4,12 @@
 
 #pragma once
 
-#define _AXL_MT_PROCESS_H
+#define _AXL_SYS_PROCESS_H
 
 #include "axl_err_Error.h"
 
 namespace axl {
-namespace mt {
+namespace sys {
 
 //.............................................................................
 
@@ -28,6 +28,6 @@ createProcess (const char* commandLine)
 
 //.............................................................................
 
-} // namespace mt
+} // namespace sys
 } // namespace axl
 

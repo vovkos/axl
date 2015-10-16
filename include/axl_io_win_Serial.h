@@ -6,7 +6,7 @@
 
 #define _AXL_WIN_SERIAL_H
 
-#include "axl_g_win_Handle.h"
+#include "axl_io_win_FileHandle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -15,7 +15,7 @@ namespace win {
 
 //.............................................................................
 
-class Serial: public g::win::FileHandle
+class Serial: public FileHandle
 {
 public:
 	bool

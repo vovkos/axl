@@ -4,12 +4,12 @@
 
 #pragma once
 
-#define _AXL_MT_PSX_DYNAMICLIBRARY_H
+#define _AXL_SYS_PSX_DYNAMICLIBRARY_H
 
 #include "axl_sl_Handle.h"
 
 namespace axl {
-namespace mt {
+namespace sys {
 namespace psx {
 
 //.............................................................................
@@ -42,5 +42,5 @@ public:
 //.............................................................................
 
 } // namespace psx
-} // namespace mt
+} // namespace sys
 } // namespace axl

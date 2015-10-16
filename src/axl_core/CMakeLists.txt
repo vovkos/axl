@@ -36,7 +36,7 @@ set (
 	${AXL_INC_DIR}/axl_err_ErrorMgr.h
 	${AXL_INC_DIR}/axl_err_NtError.h
 	${AXL_INC_DIR}/axl_err_ParseError.h
-	${AXL_INC_DIR}/axl_err_WinError.h
+	${AXL_INC_DIR}/axl_err_WinError.h		
 	)
 
 set (
@@ -89,34 +89,6 @@ source_group (
 	${G_H_LIST}
 	${G_CPP_LIST}
 	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# axl_g_win folder
-#
-
-set (
-	G_WIN_H_LIST
-	${AXL_INC_DIR}/axl_g_win_Handle.h
-	${AXL_INC_DIR}/axl_g_win_PerfCounter.h
-	${AXL_INC_DIR}/axl_g_win_Window.h
-	)
-
-set (
-	G_WIN_CPP_LIST
-	axl_g_win_Handle.cpp
-	)
-
-source_group (
-	g_win
-	FILES
-	${G_WIN_H_LIST}
-	${G_WIN_CPP_LIST}
-	)
-
-if (NOT WIN32)
-	exclude_from_build (${G_WIN_CPP_LIST})
-endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -203,14 +175,12 @@ set (
 	${AXL_INC_DIR}/axl_mt_CallOnce.h
 	${AXL_INC_DIR}/axl_mt_SimpleSingleton.h
 	${AXL_INC_DIR}/axl_mt_Singleton.h
-	${AXL_INC_DIR}/axl_mt_DynamicLibrary.h
 	${AXL_INC_DIR}/axl_mt_Event.h
 	${AXL_INC_DIR}/axl_mt_InvSemaphore.h
 	${AXL_INC_DIR}/axl_mt_Lock.h
 	${AXL_INC_DIR}/axl_mt_LongJmpTry.h
 	${AXL_INC_DIR}/axl_mt_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_Thread.h
-	${AXL_INC_DIR}/axl_mt_Process.h
 	${AXL_INC_DIR}/axl_mt_TlsMgr.h
 	${AXL_INC_DIR}/axl_mt_TlsSlot.h
 	)
@@ -218,7 +188,7 @@ set (
 set (
 	MT_CPP_LIST
 	axl_mt_TlsMgr.cpp
-		)
+	)
 
 source_group (
 	mt
@@ -235,7 +205,6 @@ source_group (
 set (
 	MT_PSX_H_LIST
 	${AXL_INC_DIR}/axl_mt_psx_Cond.h
-	${AXL_INC_DIR}/axl_mt_psx_DynamicLibrary.h
 	${AXL_INC_DIR}/axl_mt_psx_Mutex.h
 	${AXL_INC_DIR}/axl_mt_psx_Sem.h
 	${AXL_INC_DIR}/axl_mt_psx_Thread.h
@@ -244,7 +213,6 @@ set (
 set (
 	MT_PSX_CPP_LIST
 	axl_mt_psx_Cond.cpp
-	axl_mt_psx_DynamicLibrary.cpp
 	axl_mt_psx_Event.cpp
 	axl_mt_psx_Mutex.cpp
 	axl_mt_psx_Sem.cpp
@@ -271,8 +239,6 @@ set (
 	MT_WIN_H_LIST
 	${AXL_INC_DIR}/axl_mt_win_CriticalSection.h
 	${AXL_INC_DIR}/axl_mt_win_Event.h
-	${AXL_INC_DIR}/axl_mt_win_JobObject.h
-	${AXL_INC_DIR}/axl_mt_win_Library.h
 	${AXL_INC_DIR}/axl_mt_win_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_win_Thread.h
 	${AXL_INC_DIR}/axl_mt_win_WaitableHandle.h
@@ -280,7 +246,6 @@ set (
 
 set (
 	MT_WIN_CPP_LIST
-	axl_mt_win_JobObject.cpp
 	axl_mt_win_Thread.cpp
 	axl_mt_win_WaitableHandle.cpp
 	)
@@ -294,6 +259,89 @@ source_group (
 
 if (NOT WIN32)
 	exclude_from_build (${MT_WIN_CPP_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# sys folder
+#
+
+set (
+	SYS_H_LIST
+	${AXL_INC_DIR}/axl_sys_DynamicLibrary.h
+	${AXL_INC_DIR}/axl_sys_Process.h
+	)
+
+set (
+	SYS_CPP_LIST
+	)
+
+source_group (
+	sys
+	FILES
+	${SYS_H_LIST}
+	${SYS_CPP_LIST}
+	)
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# sys_psx folder
+#
+
+set (
+	SYS_PSX_H_LIST
+	${AXL_INC_DIR}/axl_sys_psx_DynamicLibrary.h
+	)
+
+set (
+	SYS_PSX_CPP_LIST
+	axl_sys_psx_DynamicLibrary.cpp
+	)
+
+source_group (
+	sys_psx
+	FILES
+	${SYS_PSX_H_LIST}
+	${SYS_PSX_CPP_LIST}
+	)
+
+if (NOT UNIX)
+	exclude_from_build (${SYS_PSX_CPP_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# sys_win folder
+#
+
+set (
+	SYS_WIN_H_LIST
+	${AXL_INC_DIR}/axl_sys_win_Handle.h
+	${AXL_INC_DIR}/axl_sys_win_PerfCounter.h
+	${AXL_INC_DIR}/axl_sys_win_JobObject.h
+	${AXL_INC_DIR}/axl_sys_win_Library.h
+	${AXL_INC_DIR}/axl_sys_win_Service.h
+	${AXL_INC_DIR}/axl_sys_win_ServiceMgr.h
+	${AXL_INC_DIR}/axl_sys_win_Window.h
+	)
+
+set (
+	SYS_WIN_CPP_LIST
+	axl_sys_win_JobObject.cpp
+	axl_sys_win_Library.cpp
+	axl_sys_win_Service.cpp
+	axl_sys_win_ServiceMgr.cpp
+	)
+
+source_group (
+	sys_win
+	FILES
+	${SYS_WIN_H_LIST}
+	${SYS_WIN_CPP_LIST}
+	)
+
+if (NOT WIN32)
+	exclude_from_build (${SYS_WIN_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -326,7 +374,7 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# stx folder
+# sl folder
 #
 
 set (
@@ -479,8 +527,6 @@ add_library (
 	${ERR_CPP_LIST}
 	${G_H_LIST}
 	${G_CPP_LIST}
-	${G_WIN_H_LIST}
-	${G_WIN_CPP_LIST}
 	${LEX_H_LIST}
 	${LEX_CPP_LIST}
 	${MEM_H_LIST}
@@ -493,6 +539,12 @@ add_library (
 	${MT_PSX_CPP_LIST}
 	${MT_WIN_H_LIST}
 	${MT_WIN_CPP_LIST}
+	${SYS_H_LIST}
+	${SYS_CPP_LIST}
+	${SYS_PSX_H_LIST}
+	${SYS_PSX_CPP_LIST}
+	${SYS_WIN_H_LIST}
+	${SYS_WIN_CPP_LIST}
 	${OBJ_H_LIST}
 	${OBJ_CPP_LIST}
 	${REF_H_LIST}

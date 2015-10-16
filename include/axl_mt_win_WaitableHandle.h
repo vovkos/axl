@@ -6,7 +6,7 @@
 
 #define _AXL_MT_WIN_WAITABLEHANDLE_H
 
-#include "axl_g_win_Handle.h"
+#include "axl_sys_win_Handle.h"
 
 namespace axl {
 namespace mt {
@@ -24,7 +24,7 @@ enum WaitResult
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class WaitableHandle: public g::win::Handle
+class WaitableHandle: public sys::win::Handle
 {
 public:
 	WaitResult

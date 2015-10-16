@@ -4,17 +4,17 @@
 
 #pragma once
 
-#define _AXL_MT_WIN_JOBOBJECT_H
+#define _AXL_SYS_WIN_JOBOBJECT_H
 
-#include "axl_g_win_Handle.h"
+#include "axl_sys_win_Handle.h"
 
 namespace axl {
-namespace mt {
+namespace sys {
 namespace win {
 
 //.............................................................................
 
-class JobObject: public sl::Handle <HANDLE, g::win::CloseHandle, sl::Zero <HANDLE> >
+class JobObject: public sl::Handle <HANDLE, CloseHandle, sl::Zero <HANDLE> >
 {
 public:
 	bool 
@@ -71,5 +71,5 @@ public:
 //.............................................................................
 
 } // namespace win
-} // namespace mt 
+} // namespace sys
 } // namespace axl

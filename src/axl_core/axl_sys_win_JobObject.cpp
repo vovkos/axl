@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "axl_mt_win_JobObject.h"
+#include "axl_sys_win_JobObject.h"
 
 namespace axl {
-namespace mt {
+namespace sys {
 namespace win {
 
 //.............................................................................
@@ -28,5 +28,5 @@ JobObject::queryInformation (
 //.............................................................................
 
 } // namespace win
-} // namespace mt
+} // namespace sys
 } // namespace axl

@@ -93,6 +93,13 @@ add_executable (
 	${GEN_MOC_CPP_LIST}
 	)
 
+set_pch (
+	test_qt
+	${PCH_H}
+	${PCH_CPP}
+	${Qt5Core_EXECUTABLE_COMPILE_FLAGS}
+	)
+
 target_link_libraries (
 	test_qt
 	axl_gui
@@ -115,13 +122,6 @@ if (WIN32)
 elseif (UNIX)
 	add_qt_rpath_link ()
 endif ()
-
-set_pch (
-	test_qt
-	${PCH_H}
-	${PCH_CPP}
-	${Qt5Core_EXECUTABLE_COMPILE_FLAGS}
-	)
 
 set_target_properties (
 	test_qt

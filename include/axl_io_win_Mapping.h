@@ -6,7 +6,7 @@
 
 #define _AXL_WIN_MAPPING_H
 
-#include "axl_g_win_Handle.h"
+#include "axl_sys_win_Handle.h"
 
 namespace axl {
 namespace io {
@@ -14,7 +14,7 @@ namespace win {
 
 //.............................................................................
 
-class Mapping: public g::win::Handle
+class Mapping: public sys::win::Handle
 {
 public:
 	bool

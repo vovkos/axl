@@ -6,7 +6,7 @@
 
 #define _AXL_IO_PIPE_H
 
-#include "axl_g_win_Handle.h"
+#include "axl_io_win_FileHandle.h"
 #include "axl_io_Transport.h"
 #include "axl_exe_WorkerThread.h"
 
@@ -27,7 +27,7 @@ namespace io {
 class Pipe
 {
 protected:
-	g::win::FileHandle m_socket;
+	FileHandle m_socket;
 
 protected:
 	bool open (

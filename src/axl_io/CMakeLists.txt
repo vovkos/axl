@@ -156,6 +156,7 @@ endif ()
 
 set (
 	IO_WIN_H_LIST
+	${AXL_INC_DIR}/axl_io_win_FileHandle.h
 	${AXL_INC_DIR}/axl_io_win_File.h
 	${AXL_INC_DIR}/axl_io_win_Iocp.h
 	${AXL_INC_DIR}/axl_io_win_Mapping.h
@@ -166,6 +167,7 @@ set (
 
 set (
 	IO_WIN_CPP_LIST
+	axl_io_win_FileHandle.cpp
 	axl_io_win_File.cpp
 	axl_io_win_Iocp.cpp
 	axl_io_win_Mapping.cpp

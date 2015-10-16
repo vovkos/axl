@@ -4,10 +4,10 @@
 
 #pragma once
 
-#define _AXL_G_WIN_PERFCOUNTER_H
+#define _AXL_SYS_WIN_PERFCOUNTER_H
 
 namespace axl {
-namespace g {
+namespace sys {
 namespace win {
 
 //.............................................................................
@@ -46,5 +46,5 @@ public:
 //.............................................................................
 
 } // namespace win
-} // namespace g
+} // namespace sys
 } // namespace axl

@@ -543,7 +543,7 @@ testAddrInfoIp6 ()
 void
 testDynamicLibrary ()
 {
-	mt::DynamicLibrary dl;
+	sys::DynamicLibrary dl;
 	
 	bool result = dl.open ("libc.so.6");
 	if (!result)

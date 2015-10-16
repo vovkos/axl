@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "axl_mt_psx_DynamicLibrary.h"
+#include "axl_sys_psx_DynamicLibrary.h"
 #include "axl_err_Error.h"
 
 namespace axl {
-namespace mt {
+namespace sys {
 namespace psx {
 
 //.............................................................................
@@ -42,5 +42,5 @@ DynamicLibrary::getSymbol (const char* name)
 //.............................................................................
 
 } // namespace psx
-} // namespace mt
+} // namespace sys
 } // namespace axl

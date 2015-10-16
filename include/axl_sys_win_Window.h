@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_G_WIN_WINDOW_H
+#define _AXL_SYS_WIN_WINDOW_H
 
 #include "axl_exe_Thunk.h"
 #include "axl_g_Module.h"
@@ -12,7 +12,7 @@
 #include "axl_sl_Handle.h"
 
 namespace axl {
-namespace g {
+namespace sys {
 namespace win {
 
 //.............................................................................
@@ -511,7 +511,7 @@ protected:
 
 // convenient macros
 
-#define AXL_G_WINDOW_CLASS(name) \
+#define AXL_SYS_WINDOW_CLASS(name) \
 static \
 const wchar_t* \
 getClassName () \
@@ -521,7 +521,7 @@ getClassName () \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_G_WINDOW_MSG_MAP_BEGIN() \
+#define AXL_SYS_WINDOW_MSG_MAP_BEGIN() \
 LRESULT \
 windowProc ( \
 	UINT msg, \
@@ -536,14 +536,14 @@ windowProc ( \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_G_WINDOW_MSG_HANDLER(msgCode, handler) \
+#define AXL_SYS_WINDOW_MSG_HANDLER(msgCode, handler) \
 	case msgCode: \
 		result = handler (msg, wParam, lParam, isHandled_o); \
 		break; \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_G_WINDOW_MSG_MAP_END() \
+#define AXL_SYS_WINDOW_MSG_MAP_END() \
 	default: \
 		*isHandled_o = false; \
 	} \
@@ -553,6 +553,6 @@ windowProc ( \
 //.............................................................................
 
 } // namespace win
-} // namespace g
+} // namespace sys
 } // namespace axl
 

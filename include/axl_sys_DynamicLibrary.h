@@ -4,17 +4,17 @@
 
 #pragma once
 
-#define _AXL_MT_DYNAMICLIBRARY_H
+#define _AXL_SYS_DYNAMICLIBRARY_H
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-#	include "axl_mt_win_Library.h"
+#	include "axl_sys_win_Library.h"
 #	include "axl_sl_String.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include "axl_mt_psx_DynamicLibrary.h"
+#	include "axl_sys_psx_DynamicLibrary.h"
 #endif
 
 namespace axl {
-namespace mt {
+namespace sys {
 
 //.............................................................................
 
@@ -82,5 +82,5 @@ public:
 
 //.............................................................................
 
-} // namespace mt
+} // namespace sys
 } // namespace axl

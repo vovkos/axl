@@ -4,13 +4,13 @@
 
 #pragma once
 
-#define _AXL_MT_WIN_MODULE_H
+#define _AXL_SYS_WIN_SERVICE_H
 
 #include "axl_sl_Handle.h"
 #include "axl_err_Error.h"
 
 namespace axl {
-namespace mt {
+namespace sys {
 namespace win {
 
 //.............................................................................
@@ -31,13 +31,7 @@ class Library: public sl::Handle <HMODULE, FreeLibrary>
 {
 public:
 	bool 
-	loadLibrary (const wchar_t* fileName)
-	{
-		close ();
-
-		m_h = ::LoadLibraryW (fileName);
-		return err::complete (m_h != NULL);
-	}
+	loadLibrary (const wchar_t* fileName);
 
 	void*
 	getProcAddress (const char* name)
@@ -50,5 +44,5 @@ public:
 //.............................................................................
 
 } // namespace win
-} // namespace mt 
+} // namespace sys 
 } // namespace axl
