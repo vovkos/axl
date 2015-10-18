@@ -7,6 +7,7 @@
 #define _AXL_IO_WIN_HANDLE_H
 
 #include "axl_sys_win_Handle.h"
+#include "axl_mt_Event.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -27,6 +28,21 @@ public:
 
 	size_t
 	getOverlappedResult (OVERLAPPED* overlapped);
+};
+
+//.............................................................................
+
+class StdOverlapped: public OVERLAPPED
+{
+public:
+	mt::NotificationEvent m_completionEvent;
+
+public:
+	StdOverlapped ()
+	{		
+		memset (this, 0, sizeof (OVERLAPPED));
+		hEvent = m_completionEvent.m_event;
+	}
 };
 
 //.............................................................................

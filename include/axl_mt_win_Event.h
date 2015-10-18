@@ -20,10 +20,10 @@ class Event: public WaitableHandle
 public:
 	bool 
 	create (
-		SECURITY_ATTRIBUTES* secAttr,
-		bool isManualReset,
-		bool isSignalled,
-		const wchar_t* name
+		SECURITY_ATTRIBUTES* secAttr = NULL,
+		bool isManualReset = false,
+		bool isSignalled = false,
+		const wchar_t* name = NULL
 		)
 	{
 		close ();
@@ -34,9 +34,9 @@ public:
 
 	bool 
 	open (
-		uint_t access,
-		bool doInheritHandle,
-		const wchar_t* name
+		uint_t access = EVENT_ALL_ACCESS,
+		bool doInheritHandle = false,
+		const wchar_t* name = NULL
 		)
 	{
 		close ();

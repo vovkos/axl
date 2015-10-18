@@ -242,6 +242,7 @@ set (
 	${AXL_INC_DIR}/axl_mt_win_Semaphore.h
 	${AXL_INC_DIR}/axl_mt_win_Thread.h
 	${AXL_INC_DIR}/axl_mt_win_WaitableHandle.h
+	${AXL_INC_DIR}/axl_mt_win_WaitableTimer.h
 	)
 
 set (
