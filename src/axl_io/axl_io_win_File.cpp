@@ -105,6 +105,45 @@ File::write (
 	return result ? (size_t) actualSize : -1;
 }
 
+bool
+File::overlappedRead (
+	void* p,
+	dword_t size,
+	dword_t* actualSize
+	) const
+{
+	StdOverlapped overlapped;
+	bool result = read (p, size, actualSize, &overlapped);
+	return result ? getOverlappedResult (&overlapped, actualSize) : false;
+}
+
+bool
+File::overlappedWrite (
+	const void* p,
+	dword_t size,
+	dword_t* actualSize
+	)
+{
+	StdOverlapped overlapped;
+	bool result = write (p, size, actualSize, &overlapped);
+	return result ? getOverlappedResult (&overlapped, actualSize) : false;
+}
+
+bool
+File::overlappedIoctl (
+	dword_t code,
+	const void* inData,
+	dword_t inDataSize,
+	void* outData,
+	dword_t outDataSize,
+	dword_t* actualSize
+	)
+{
+	StdOverlapped overlapped;
+	bool result = ioctl (code, inData, inDataSize, outData, outDataSize, actualSize, &overlapped);
+	return result ? getOverlappedResult (&overlapped, actualSize) : false;
+}
+
 //.............................................................................
 
 } // namespace win

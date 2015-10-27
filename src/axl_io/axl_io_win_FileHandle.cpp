@@ -26,8 +26,8 @@ FileHandle::completeAsyncRequest (
 	return true;
 }
 
-size_t
-FileHandle::getOverlappedResult (OVERLAPPED* overlapped)
+dword_t
+FileHandle::getOverlappedResult (OVERLAPPED* overlapped) const
 {
 	dword_t actualSize;
 	bool_t result = ::GetOverlappedResult (m_h, overlapped, &actualSize, true);
@@ -42,6 +42,20 @@ FileHandle::getOverlappedResult (OVERLAPPED* overlapped)
 	}
 
 	return actualSize;
+}
+
+bool
+FileHandle::getOverlappedResult (
+	OVERLAPPED* overlapped,
+	dword_t* resultActualSize
+	) const
+{
+	dword_t actualSize = getOverlappedResult (overlapped);
+	
+	if (resultActualSize)
+		*resultActualSize = actualSize;
+
+	return actualSize != -1;
 }
 
 //.............................................................................

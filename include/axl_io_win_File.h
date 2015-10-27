@@ -99,6 +99,30 @@ public:
 	}
 
 	bool
+	overlappedRead (
+		void* p,
+		dword_t size,
+		dword_t* actualSize
+		) const;
+
+	bool
+	overlappedWrite (
+		const void* p,
+		dword_t size,
+		dword_t* actualSize
+		);
+
+	bool
+	overlappedIoctl (
+		dword_t code,
+		const void* inData,
+		dword_t inDataSize,
+		void* outData,
+		dword_t outDataSize,
+		dword_t* actualSize
+		);
+
+	bool
 	readEx (
 		void* p,
 		dword_t size,

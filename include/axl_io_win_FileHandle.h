@@ -26,8 +26,14 @@ public:
 		OVERLAPPED* overlapped
 		);
 
-	size_t
-	getOverlappedResult (OVERLAPPED* overlapped);
+	bool
+	getOverlappedResult (
+		OVERLAPPED* overlapped,
+		dword_t* actualSize
+		) const;
+
+	dword_t
+	getOverlappedResult (OVERLAPPED* overlapped) const;
 };
 
 //.............................................................................
