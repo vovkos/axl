@@ -323,6 +323,7 @@ set (
 	${AXL_INC_DIR}/axl_sys_win_Library.h
 	${AXL_INC_DIR}/axl_sys_win_Service.h
 	${AXL_INC_DIR}/axl_sys_win_ServiceMgr.h
+	${AXL_INC_DIR}/axl_sys_win_DeviceInfo.h
 	${AXL_INC_DIR}/axl_sys_win_Window.h
 	)
 
@@ -332,6 +333,7 @@ set (
 	axl_sys_win_Library.cpp
 	axl_sys_win_Service.cpp
 	axl_sys_win_ServiceMgr.cpp
+	axl_sys_win_DeviceInfo.cpp
 	)
 
 source_group (

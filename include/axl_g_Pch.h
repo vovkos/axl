@@ -54,6 +54,7 @@
 #	include <ws2ipdef.h>
 #	include <commctrl.h>
 #	include <shellapi.h>
+#	include <setupapi.h>
 #endif
 
 //.............................................................................
