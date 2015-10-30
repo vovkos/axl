@@ -104,14 +104,35 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 //.............................................................................
 
 bool
-DeviceInfoSet::createClassDeviceInfoSet (
+DeviceInfoSet::create (uint_t flags)
+{
+	close ();
+
+	m_h = ::SetupDiGetClassDevsW (NULL, NULL, NULL, flags | DIGCF_ALLCLASSES);
+	return err::complete (m_h != INVALID_HANDLE_VALUE);
+}
+
+bool
+DeviceInfoSet::create (
 	const GUID& classGuid,
 	uint_t flags
 	)
 {
 	close ();
 
-	m_h = ::SetupDiGetClassDevs (&classGuid, NULL, NULL, flags);
+	m_h = ::SetupDiGetClassDevsW (&classGuid, NULL, NULL, flags);
+	return err::complete (m_h != INVALID_HANDLE_VALUE);
+}
+
+bool
+DeviceInfoSet::create (
+	const wchar_t* enumerator,
+	uint_t flags
+	)
+{
+	close ();
+
+	m_h = ::SetupDiGetClassDevsW (NULL, enumerator, NULL, flags);
 	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 

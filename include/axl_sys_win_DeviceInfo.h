@@ -175,8 +175,17 @@ class DeviceInfoSet: public sl::Handle <HDEVINFO, DestroyDeviceInfoSet, sl::Minu
 {
 public:
 	bool
-	createClassDeviceInfoSet (
+	create (uint_t flags = DIGCF_PRESENT);
+
+	bool
+	create (
 		const GUID& classGuid,
+		uint_t flags = DIGCF_PRESENT
+		);
+
+	bool
+	create (
+		const wchar_t* enumerator,
 		uint_t flags = DIGCF_PRESENT
 		);
 
