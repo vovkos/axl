@@ -784,7 +784,7 @@ querySymbolicLink (
 
 	io::win::File link;
 	status = ntOpenSymbolicLinkObject (
-		link.getHandlePtr (), 
+		link.p (), 
 		GENERIC_READ,
 		&oa
 		);
@@ -837,7 +837,7 @@ enumerateDirectory (
 		
 	io::win::File dir;
 	status = ntOpenDirectoryObject (
-		dir.getHandlePtr (), 
+		dir.p (), 
 		DIRECTORY_QUERY | DIRECTORY_TRAVERSE,
 		&oa
 		);
@@ -1746,7 +1746,6 @@ testTimestamps ()
 	uint64_t d1 = t2 - t0;
 	printf ("time1 = %s\n", g::Time (d1, 0).format ("%h:%m:%s.%l.%c").cc ());
 
-
 	t0 = g::getPreciseTimestamp ();
 
 	for (size_t i = 0; i < 1000000; i++)
@@ -1763,6 +1762,27 @@ testTimestamps ()
 
 	printf ("time0.1 = %s\n", g::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
 	printf ("time0.2 = %s\n", g::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
+}
+
+//.............................................................................
+
+void
+testProcess ()
+{
+	sl::Array <char> output;
+	dword_t exitCode;
+
+	const wchar_t* cmdLine = L"C:\\Projects\\ioninja\\devmon\\build\\msvc10\\bin\\Debug\\tdevmon.exe --start-core-service";
+
+	bool result = sys::win::syncExec (cmdLine, &output, &exitCode);
+	if (!result)
+	{
+		printf ("sys::win::syncExec failed: %s\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	output.append (0);
+	printf ("process returned %d:\n%s\n", exitCode, output.ca ());
 }
 
 //.............................................................................
@@ -1786,7 +1806,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testRegExp ();
+	testProcess ();
 
 	return 0;
 }

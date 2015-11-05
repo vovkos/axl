@@ -1,5 +1,5 @@
 // This file is part of Ninja Scroll (R) Library
-// Tibbo Technology Inc (C) 2004-2014. All rights reserved
+// Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
 #pragma once

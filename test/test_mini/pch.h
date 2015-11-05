@@ -43,6 +43,7 @@ extern "C" {
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include "axl_mem_win_VirtualMemory.h"
+#	include "axl_sys_win_Process.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_mt_psx_Sem.h"

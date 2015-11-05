@@ -1,5 +1,5 @@
 # This file is part of AXL (R) Library
-# Tibbo Technology Inc (C) 2004-2014. All rights reserved
+# Tibbo Technology Inc (C) 2004-2015. All rights reserved
 # Author: Vladimir Gladkov
 
 #..............................................................................
@@ -325,6 +325,7 @@ set (
 	${AXL_INC_DIR}/axl_sys_win_ServiceMgr.h
 	${AXL_INC_DIR}/axl_sys_win_DeviceInfo.h
 	${AXL_INC_DIR}/axl_sys_win_Window.h
+	${AXL_INC_DIR}/axl_sys_win_Process.h
 	)
 
 set (
@@ -334,6 +335,7 @@ set (
 	axl_sys_win_Service.cpp
 	axl_sys_win_ServiceMgr.cpp
 	axl_sys_win_DeviceInfo.cpp
+	axl_sys_win_Process.cpp
 	)
 
 source_group (

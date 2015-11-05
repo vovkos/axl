@@ -1,5 +1,5 @@
 // This file is part of AXL (R) Library
-// Tibbo Technology Inc (C) 2004-2014. All rights reserved
+// Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
 #pragma once
@@ -106,7 +106,7 @@ public:
 	}
 
 	T*
-	getHandlePtr ()
+	p ()
 	{
 		return &m_h;
 	}
