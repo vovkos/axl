@@ -295,7 +295,7 @@ public:
 	{
 	}
 
-	Error (const ErrorHdr& src)
+	Error (const ErrorHdr* src)
 	{
 		copy (src);
 	}
@@ -357,10 +357,10 @@ public:
 	getDescription () const;
 
 	ErrorHdr*
-	copy (const ErrorHdr& src);
+	copy (const ErrorHdr* src);
 
 	ErrorHdr*
-	push (const ErrorHdr& error);
+	push (const ErrorHdr* error);
 
 	// pack
 
@@ -413,7 +413,7 @@ public:
 
 		Error error;
 		error.pack_va <Pack> (guid, code, va);
-		return push (*error);
+		return push (error);
 	}
 
 	template <typename Pack>
@@ -463,7 +463,7 @@ public:
 
 		Error error;
 		error.format_va (guid, code, formatString, va);
-		return push (*error);
+		return push (error);
 	}
 
 	ErrorHdr*
@@ -497,7 +497,7 @@ public:
 
 		Error error;
 		error.createSimpleError (guid, code);
-		return push (*error);
+		return push (error);
 	}
 
 	// system error (push is irrelevant for system errors)
@@ -527,7 +527,7 @@ public:
 
 		Error error;
 		error.createStringError (p, length);
-		return push (*error);
+		return push (error);
 	}
 
 	ErrorHdr*
@@ -557,7 +557,7 @@ public:
 
 		Error error;
 		error.formatStringError_va (formatString, va);
-		return push (*error);
+		return push (error);
 	}
 
 
@@ -587,7 +587,7 @@ Error
 pushError (const Error& error)
 {
 	Error stack = getLastError ();
-	stack.push (*error);
+	stack.push (error);
 	return setError (stack);
 }
 

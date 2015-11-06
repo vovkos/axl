@@ -43,18 +43,18 @@ Error::getDescription () const
 }
 
 ErrorHdr*
-Error::copy (const ErrorHdr& src)
+Error::copy (const ErrorHdr* src)
 {
-	ErrorHdr* error = getBuffer (src.m_size);
+	ErrorHdr* error = getBuffer (src->m_size);
 	if (!error)
 		return NULL;
 
-	memcpy (error, &src, src.m_size);
+	memcpy (error, &src, src->m_size);
 	return error;
 }
 
 ErrorHdr*
-Error::push (const ErrorHdr& error)
+Error::push (const ErrorHdr* error)
 {
 	if (!m_p)
 		return copy (error);
@@ -68,14 +68,14 @@ Error::push (const ErrorHdr& error)
 		baseSize -= sizeof (ErrorHdr);
 	}
 
-	size_t size = sizeof (ErrorHdr) + error.m_size + baseSize;
+	size_t size = sizeof (ErrorHdr) + error->m_size + baseSize;
 
 	getBuffer (size, true);
 	if (!m_p)
 		return NULL;
 
 	memmove (
-		(uchar_t*) m_p + sizeof (ErrorHdr) + error.m_size,
+		(uchar_t*) m_p + sizeof (ErrorHdr) + error->m_size,
 		(uchar_t*) m_p + base,
 		baseSize
 		);
@@ -84,7 +84,7 @@ Error::push (const ErrorHdr& error)
 	m_p->m_guid = g_stdErrorGuid;
 	m_p->m_code = StdErrorCode_Stack;
 
-	memcpy (m_p + 1, &error, error.m_size);
+	memcpy (m_p + 1, &error, error->m_size);
 	return m_p;
 }
 

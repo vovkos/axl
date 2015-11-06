@@ -60,7 +60,7 @@ ErrorMgr::getLastError ()
 	if (entry && entry->m_error)
 		return entry->m_error;
 
-	return g_noError;
+	return &g_noError;
 }
 
 void
@@ -68,7 +68,6 @@ ErrorMgr::setError (const Error& error)
 {	
 	ThreadEntry* entry = getThreadEntry ();
 	entry->m_error = error;
-	ThreadEntry* entry2 = findThreadEntry ();
 	
 	switch (entry->m_mode)
 	{
