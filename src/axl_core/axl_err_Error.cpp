@@ -49,7 +49,7 @@ Error::copy (const ErrorHdr* src)
 	if (!error)
 		return NULL;
 
-	memcpy (error, &src, src->m_size);
+	memcpy (error, src, src->m_size);
 	return error;
 }
 
@@ -84,7 +84,7 @@ Error::push (const ErrorHdr* error)
 	m_p->m_guid = g_stdErrorGuid;
 	m_p->m_code = StdErrorCode_Stack;
 
-	memcpy (m_p + 1, &error, error->m_size);
+	memcpy (m_p + 1, error, error->m_size);
 	return m_p;
 }
 
