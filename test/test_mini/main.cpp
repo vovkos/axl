@@ -1766,6 +1766,7 @@ testTimestamps ()
 
 //.............................................................................
 
+#if (_AXL_ENV == AXL_ENV_WIN)
 void
 testProcess ()
 {
@@ -1784,6 +1785,7 @@ testProcess ()
 	output.append (0);
 	printf ("process returned %d:\n%s\n", exitCode, output.ca ());
 }
+#endif
 
 //.............................................................................
 
@@ -1806,7 +1808,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testProcess ();
+	testTimestamps ();
 
 	return 0;
 }

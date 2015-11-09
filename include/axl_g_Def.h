@@ -194,7 +194,6 @@ typedef int64_t           intdptr_t;
 typedef uint64_t          uintdptr_t;
 #endif
 
-
 typedef void*             handle_t;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -263,7 +262,10 @@ pvoid_cast (T x)
 	return *(void**) &x;
 }
 
-// this overload is to make it ok to pvoid_cast (NULL) on 64-bit systems
+#if (_AXL_CPP != AXL_CPP_GCC)
+
+// this overload is to make it's ok to pvoid_cast (NULL) on 64-bit systems
+// gcc takes care of it automatically (it will not attempt to use 'int' for NULL)
 
 inline
 void*
@@ -271,6 +273,8 @@ pvoid_cast (int x)
 {
 	return (void*) (intptr_t) x;
 }
+
+#endif
 
 //.............................................................................
 
