@@ -227,7 +227,7 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 
 	mt::atomicLock (&m_hdr->m_lock);
 
-	// if buffer is empty, then wait until we have any data
+	// wait until we have any data or remote disconnects
 
 	while (
 		!m_hdr->m_dataSize &&
@@ -238,12 +238,16 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 		mt::atomicLock (&m_hdr->m_lock);
 	}
 
-	if (m_hdr->m_state == SharedMemoryTransportState_Disconnected)
+	if (!m_hdr->m_dataSize)
 	{
+		ASSERT (m_hdr->m_state == SharedMemoryTransportState_Disconnected);
+
 		mt::atomicUnlock (&m_hdr->m_lock);
 		err::setError (err::SystemErrorCode_InvalidDeviceState);
 		return -1;
 	}
+
+	// if there is data, read it even if remote has disconnected
 
 	size_t readOffset = m_hdr->m_readOffset;
 	size_t writeOffset = m_hdr->m_writeOffset;

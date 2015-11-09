@@ -38,6 +38,7 @@ extern "C" {
 #include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"
 #include "axl_io_UsbDevice.h"
+#include "axl_io_SharedMemoryTransport.h"
 #include "axl_g_Time.h"
 #include "axl_mt_Event.h"
 

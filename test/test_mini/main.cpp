@@ -1789,6 +1789,50 @@ testProcess ()
 
 //.............................................................................
 
+void
+testSharedMemoryTransport ()
+{
+	bool result;
+
+	io::SharedMemoryReader reader;
+	result = reader.open (
+		"c:/9141b219-d4af-4f40-96b9-92da376bf3c9.shm", 
+		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e", 
+		"00c34a43-45a4-4137-965e-3b172d3a54ed", 
+		io::SharedMemoryTransportFlag_Create | io::SharedMemoryTransportFlag_Message | io::SharedMemoryTransportFlag_DeleteOnClose
+		);
+
+	if (!result)
+	{
+		printf ("can't open shared memory reader: %s\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	io::SharedMemoryWriter writer;
+	result = writer.open (
+		"c:/9141b219-d4af-4f40-96b9-92da376bf3c9.shm", 
+		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e", 
+		"00c34a43-45a4-4137-965e-3b172d3a54ed", 
+		io::SharedMemoryTransportFlag_Message
+		);
+
+	if (!result)
+	{
+		printf ("can't open shared memory writer: %s\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	char data [] = "hui, govno i muravei";
+
+	writer.write (data, sizeof (data));
+	writer.close ();
+
+	sl::Array <char> a = reader.read ();
+	printf ("reader.read () returned: %s\n", a);
+}
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1808,7 +1852,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testTimestamps ();
+	testSharedMemoryTransport ();
 
 	return 0;
 }
