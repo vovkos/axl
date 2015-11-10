@@ -1828,7 +1828,7 @@ testSharedMemoryTransport ()
 	writer.close ();
 
 	sl::Array <char> a = reader.read ();
-	printf ("reader.read () returned: %s\n", a);
+	printf ("reader.read () returned: %s\n", a.ca ());
 }
 
 //.............................................................................
