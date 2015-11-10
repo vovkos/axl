@@ -568,6 +568,14 @@ set_pch (
 	${PCH_CPP}
 	)
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+	add_target_string_property (
+		axl_core
+		COMPILE_FLAGS
+		"-fPIC"
+		)
+endif ()
+
 if (WIN32)
 	add_target_string_property (
 		axl_core

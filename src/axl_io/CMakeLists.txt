@@ -254,4 +254,12 @@ if (WIN32)
 		)
 endif ()
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+	add_target_string_property (
+		axl_io
+		COMPILE_FLAGS
+		"-fPIC"
+		)
+endif ()
+
 #..............................................................................
