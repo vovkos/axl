@@ -310,6 +310,45 @@ atomicDec (volatile size_t* p)
 	return __sync_sub_and_fetch (p, 1);
 }
 
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+
+inline
+intptr_t
+atomicXchg (
+	volatile intptr_t* p,
+	intptr_t value
+	)
+{
+	return __sync_lock_test_and_set (p, value);
+}
+
+inline
+intptr_t
+atomicCmpXchg (
+	volatile intptr_t* p,
+	intptr_t cmpValue,
+	intptr_t newValue
+	)
+{
+	return __sync_val_compare_and_swap (p, cmpValue, newValue);
+}
+
+inline
+intptr_t
+atomicInc (volatile intptr_t* p)
+{
+	return __sync_add_and_fetch (p, 1);
+}
+
+inline
+intptr_t
+atomicDec (volatile intptr_t* p)
+{
+	return __sync_sub_and_fetch (p, 1);
+}
+
+#endif
+
 #if (_AXL_PTR_BITNESS == 64)
 
 inline

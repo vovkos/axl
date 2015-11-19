@@ -4,34 +4,38 @@
 
 #pragma once 
 
-#define _AXL_ERR_WINERROR_H
+#define _AXL_SYS_DRW_MachError_H
 
 #include "axl_err_Error.h"
 #include "axl_sl_String.h"
 
 namespace axl {
-namespace err {
+namespace sys {
+namespace drw {
 
 //.............................................................................
 
-// {54E100E8-2137-40b8-BCD8-00AC1D0BAA16}
+// {E8840A46-6DE7-4427-B356-24B2ED4B08D1}
 AXL_SL_DEFINE_GUID (
-	g_winErrorGuid,
-	0x54e100e8, 0x2137, 0x40b8, 0xbc, 0xd8, 0x0, 0xac, 0x1d, 0xb, 0xaa, 0x16
+	g_MachErrorGuid,
+	0xe8840a46, 0x6de7, 0x4427, 0xb3, 0x56, 0x24, 0xb2, 0xed, 0x4b, 0x8, 0xd1
 	);
 
 //.............................................................................
 
-class WinErrorProvider: public ErrorProvider
+class MachErrorProvider: public err::ErrorProvider
 {
 public:
 	static
 	sl::String 
-	getErrorDescription (dword_t code);
+	getErrorDescription (mach_error_t code)
+	{
+		return ::mach_error_string (code);
+	}
 
 	virtual 
 	sl::String 
-	getErrorDescription (const ErrorHdr* error)
+	getErrorDescription (const err::ErrorHdr* error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -39,33 +43,34 @@ public:
 
 //.............................................................................
 
-class WinError: public Error
+class MachError: public err::Error
 {
 public:
-	WinError ()
+	MachError ()
 	{
 	}
 
-	WinError (dword_t code)
+	MachError (mach_error_t code)
 	{
 		create (code);
 	}
 
-	ErrorHdr* 
-	create (dword_t code);
+	err::ErrorHdr*
+	create (mach_error_t code);
 };
 
 //.............................................................................
 
 inline
-Error
-setWinError (dword_t code)
+err::Error
+setMachError (mach_error_t code)
 {
-	return setError (WinError (code));
+	return err::setError (MachError (code));
 }
 
 //.............................................................................
 
-} // namespace err
+} // namespace drw
+} // namespace sys
 } // namespace axl
 

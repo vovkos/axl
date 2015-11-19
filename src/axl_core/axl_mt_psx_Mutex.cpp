@@ -27,6 +27,14 @@ MutexAttr::setType (int type)
 //.............................................................................
 
 bool
+Mutex::tryLock ()
+{
+	int result = ::pthread_mutex_trylock (&m_mutex);
+	return result == 0 ? true : err::fail (result);
+}
+
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+bool
 Mutex::lock (uint_t timeout)
 {
 	int result;
@@ -49,6 +57,7 @@ Mutex::lock (uint_t timeout)
 
 	return result == 0 ? true : err::fail (result);
 }
+#endif
 
 //.............................................................................
 

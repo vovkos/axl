@@ -360,7 +360,7 @@ QtEngine::getStdFontTuple (StdFontKind fontKind)
 		break;
 
 	case StdFontKind_Monospace:
-		font->m_qtFont = QFont ("Monospace", 10);
+		font->m_qtFont = QFont ("Monospace", 11);
 		font->m_qtFont.setFixedPitch (true);
 		font->m_qtFont.setKerning (false);
 		font->m_qtFont.setStyleHint (
@@ -816,7 +816,7 @@ QtEngine::updateWidgetScrollBar (
 	ASSERT (widgetDriver->getEngine () == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
 
-	ASSERT (orientation < 2);
+	ASSERT ((size_t) orientation < 2);
 	const WidgetScrollBar* scrollBar = &widgetDriver->m_scrollBarArray [orientation];
 
 	QScrollBar* qtScrollBar = orientation == Orientation_Horizontal ?

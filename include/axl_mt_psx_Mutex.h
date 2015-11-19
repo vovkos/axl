@@ -87,14 +87,20 @@ public:
 		return &m_mutex;
 	}
 
+	bool
+	tryLock ();
+
 	void
 	lock ()
 	{
-		::pthread_mutex_lock (&m_mutex);
+		int result = ::pthread_mutex_lock (&m_mutex);
+		ASSERT (result == 0);
 	}
 
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
 	bool
 	lock (uint_t timeout);
+#endif
 
 	void
 	unlock ()

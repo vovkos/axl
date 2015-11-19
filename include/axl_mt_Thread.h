@@ -10,6 +10,7 @@
 #	include "axl_mt_win_Thread.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_mt_psx_Thread.h"
+#include "axl_mt_Event.h"
 #endif
 
 namespace axl {
@@ -90,18 +91,12 @@ getCurrentThreadId ()
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-template <typename T>
-class ThreadImpl
+class ThreadImplRoot
 {
 public:
 	psx::Thread m_thread;
 
 public:
-	~ThreadImpl ()
-	{
-		waitAndClose ();
-	}
-
 	bool
 	isOpen ()
 	{
@@ -111,12 +106,84 @@ public:
 	uint64_t
 	getThreadId ()
 	{
-		return m_thread;
+		return (uint64_t) (pthread_t) m_thread;
+	}
+};
+
+//.............................................................................
+
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+
+template <typename T>
+class ThreadImpl: public ThreadImplRoot
+{
+public:
+	NotificationEvent m_threadCompletedEvent;
+
+public:
+	~ThreadImpl ()
+	{
+		waitAndClose ();
 	}
 
 	bool
 	start ()
+	{	
+		ASSERT (!m_thread.isOpen ());
+
+		m_threadCompletedEvent.reset ();
+		return m_thread.create (threadFunc, (T*) this);
+	}
+	
+	void
+	waitAndClose (uint_t timeout = -1)
 	{
+		if (!m_thread.isOpen ())
+			return;
+
+		bool result = m_threadCompletedEvent.wait (timeout);
+		if (result)
+		{
+			m_thread.join ();
+		}
+		else
+		{
+			ASSERT (false); // cancelling thread		
+			m_thread.cancel ();
+		}
+		
+		m_thread.detach ();
+	}
+
+protected:
+	static
+	void*
+	threadFunc (void* context)
+	{
+		T* self = (T*) context;
+		self->threadFunc ();
+		self->m_threadCompletedEvent.signal ();
+		return NULL;
+	}
+};
+
+#else
+
+//.............................................................................
+
+template <typename T>
+class ThreadImpl: public ThreadImplRoot
+{
+public:
+	~ThreadImpl ()
+	{
+		waitAndClose ();
+	}
+
+	bool
+	start ()
+	{	
+		ASSERT (!m_thread.isOpen ());
 		return m_thread.create (threadFunc, (T*) this);
 	}
 
@@ -126,10 +193,15 @@ public:
 		if (!m_thread.isOpen ())
 			return;
 
-		if (!m_thread.join (timeout))
-			m_thread.detach ();
+		bool result = m_thread.join (timeout);
+		if (!result)
+		{
+			ASSERT (false);
+			m_thread.cancel ();
+		}
+		
+		m_thread.detach ();
 	}
-
 
 protected:
 	static
@@ -141,11 +213,15 @@ protected:
 	}
 };
 
+//.............................................................................
+
+#endif
+
 inline
 uint64_t
 getCurrentThreadId ()
 {
-	return ::pthread_self ();
+	return (uint64_t) ::pthread_self ();
 }
 
 #endif

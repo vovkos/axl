@@ -254,8 +254,6 @@ protected:
 				copyExtra (m_p, src);
 			}
 
-			Hdr* srcHdr = (Hdr*) src - 1;
-
 			return m_p;
 		}
 

@@ -8,6 +8,29 @@ namespace io {
 
 //.............................................................................
 
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+char*
+get_current_dir_name ()
+{
+	size_t size = 128;
+
+	for (;;)
+	{
+		char* buffer = (char*) malloc (size);
+		char* result = getcwd (buffer, size);
+		if (result == buffer)
+			return buffer;
+
+		free (buffer);
+
+		if (errno != ERANGE)
+			return NULL;
+
+		size *= 2;
+	}
+}
+#endif
+
 sl::String
 getCurrentDir ()
 {
@@ -26,13 +49,19 @@ getCurrentDir ()
 sl::String
 getExeFilePath ()
 {
-	char buffer [1024];
-	buffer [countof (buffer) - 1] = 0;
+	char buffer [1024] = { 0 };
 	
 #if (_AXL_ENV == AXL_ENV_WIN)
 	::GetModuleFileNameA (::GetModuleHandle (NULL), buffer, countof (buffer) - 1);
 #elif (_AXL_ENV == AXL_ENV_POSIX)
+#	if (_AXL_POSIX == AXL_POSIX_LINUX)
 	readlink ("/proc/self/exe", buffer, countof (buffer) - 1);
+#	elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+	uint32_t size = sizeof (buffer);
+	_NSGetExecutablePath (buffer, &size);
+#	else
+#		error unsupported POSIX flavor
+#	endif
 #endif
 
 	return buffer;
@@ -207,10 +236,8 @@ getDir (const char* filePath)
 	return string;
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	sl::String string = filePath;
-	dirname (string.getBuffer ());
-	string.updateLength ();
-	return string;
+	const char* p = strrchr (filePath, '/');
+	return sl::String (filePath, p ? p - filePath : -1);
 #endif
 }
 
@@ -237,7 +264,7 @@ getFileName (const char* filePath)
 	string.append (extension);
 	return string;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	const char *p = strrchr (filePath, '/');
+	const char* p = strrchr (filePath, '/');
 	return p ? p + 1 : filePath;
 #endif
 }
@@ -245,7 +272,7 @@ getFileName (const char* filePath)
 sl::String
 getExtension (const char* filePath)
 {
-	const char *p = strchr (filePath, '.');
+	const char* p = strchr (filePath, '.');
 	return p ? p + 1 : NULL;
 }
 

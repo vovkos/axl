@@ -6,73 +6,67 @@ namespace mt {
 
 //.............................................................................
 
-bool
-Event::signal ()
+void
+EventRoot::reset ()
 {
-	m_mutex.lock ();
-
-	int value = 0;
-	bool result = m_sem.getValue (&value);
-	if (result && value <= 0)
-		result = m_sem.post ();
-
-	m_mutex.unlock ();
-
-	return result;
-}
-
-bool
-Event::reset ()
-{
-	m_mutex.lock ();
-
-	int value = 0;
-	bool result = m_sem.getValue (&value);
-	if (result && value > 0)
-		result = m_sem.wait ();
-
-	m_mutex.unlock ();
-
-	return result;
-}
-
-//.............................................................................
-
-bool
-NotificationEvent::signal ()
-{
-	m_mutex.lock ();
-
-	bool result = m_cond.broadcast ();			
-	if (result)
-		m_state = true;
-
-	m_mutex.unlock ();
-	return result;
-}
-
-bool
-NotificationEvent::reset ()
-{
-	m_mutex.lock ();
+    m_condMutexPair.lock ();
 	m_state = false;
-	m_mutex.unlock ();
-	return true;		
+	m_condMutexPair.unlock ();
 }
 
 bool
-NotificationEvent::wait (uint_t timeout)
+EventRoot::wait (uint_t timeout)
 {
-	m_mutex.lock ();
+	m_condMutexPair.lock ();
+	
 	if (m_state)
 	{
-		m_mutex.unlock ();
+		if (!m_isNotificationEvent)
+			m_state = false;
+		
+		m_condMutexPair.unlock ();
 		return true;
 	}
 
-	bool result = m_cond.wait (m_mutex, timeout);
-	m_mutex.unlock ();
-	return result;		
+    bool result = m_condMutexPair.wait (timeout);
+    if (!result)
+    {
+        m_condMutexPair.unlock ();
+        return false;
+    }
+
+	if (!m_isNotificationEvent)
+		m_state = false;
+
+	m_condMutexPair.unlock ();
+	
+    return true;
+}
+
+bool
+EventRoot::signal ()
+{
+	m_condMutexPair.lock ();
+	if (m_state)
+	{
+		m_condMutexPair.unlock ();
+		return true;
+	}
+
+	bool result = m_isNotificationEvent ?
+		m_condMutexPair.broadcast () :
+		m_condMutexPair.signal ();
+
+	if (!result)
+	{
+		m_condMutexPair.unlock ();
+		return false;
+	}
+
+	m_state = true;
+	m_condMutexPair.unlock ();
+    
+	return true;
 }
 
 //.............................................................................

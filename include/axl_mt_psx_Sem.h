@@ -14,11 +14,12 @@ namespace psx {
 
 //.............................................................................
 
+#if (_AXL_POSIX != AXL_POSIX_DARWIN) // no unnamed semaphores on darwin
+
 class Sem
 {
 protected:
-	sem_t* m_sem;
-	sem_t m_unnamedSem;
+	sem_t m_sem;
 
 public:
 	Sem (
@@ -26,11 +27,75 @@ public:
 		uint_t value = 0
 		)
 	{
-		m_sem = NULL;
-		init (isShared, value);
+		int result = sem_init (&m_sem, isShared, value);
+		ASSERT (result == 0);
 	}
 
 	~Sem ()
+	{
+		int result = ::sem_destroy (&m_sem);
+		ASSERT (result == 0);
+	}
+
+	operator sem_t* ()
+	{
+		return &m_sem;
+	}
+
+	bool
+	post ()
+	{
+		int result = ::sem_post (&m_sem);
+		return err::complete (result == 0);
+	}
+
+	bool
+	signal ()
+	{
+		return post ();
+	}
+
+	bool
+	tryWait ()
+	{
+		int result = ::sem_trywait (&m_sem);
+		return err::complete (result == 0);
+	}
+
+	bool
+	wait ()
+	{
+		int result = ::sem_wait (&m_sem);
+		return err::complete (result == 0);
+	}
+
+	bool
+	wait (uint_t timeout);
+
+	bool
+	getValue (int* value)
+	{
+		int result = ::sem_getvalue (&m_sem, value);
+		return err::complete (result == 0);
+	}
+};
+
+#endif
+
+//.............................................................................
+
+class NamedSem
+{
+protected:
+	sem_t* m_sem;
+
+public:
+	NamedSem ()
+	{
+		m_sem = NULL;
+	}
+
+	~NamedSem ()
 	{
 		close ();
 	}
@@ -39,12 +104,6 @@ public:
 	{
 		return m_sem;
 	}
-
-	bool
-	init (
-		bool isShared = false,
-		uint_t value = 0
-		);
 
 	bool
 	open (
@@ -73,11 +132,28 @@ public:
 	}
 
 	bool
+	signal ()
+	{
+		return post ();
+	}
+
+	bool
+	tryWait ()
+	{
+		int result = ::sem_trywait (m_sem);
+		return err::complete (result == 0);
+	}
+
+	bool
 	wait ()
 	{
 		int result = ::sem_wait (m_sem);
 		return err::complete (result == 0);
 	}
+
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+	bool
+	wait (uint_t timeout);
 
 	bool
 	getValue (int* value)
@@ -85,9 +161,7 @@ public:
 		int result = ::sem_getvalue (m_sem, value);
 		return err::complete (result == 0);
 	}
-
-	bool
-	wait (uint_t timeout);
+#endif
 };
 
 //.............................................................................

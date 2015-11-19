@@ -712,7 +712,7 @@ public:
 		size_t bufferSize
 		)
 	{
-		drawBinText (
+		return drawBinText (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 

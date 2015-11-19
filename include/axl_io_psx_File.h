@@ -24,7 +24,11 @@ public:
 	bool
 	setSize (uint64_t size)
 	{
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+		int result = ::ftruncate (m_h, size);
+#else
 		int result = ::ftruncate64 (m_h, size);
+#endif
 		return err::complete (result != -1);
 	}
 
@@ -32,16 +36,20 @@ public:
 	getPosition () const;
 
 	bool
-	setPosition (off64_t offset) const
+	setPosition (uint64_t offset) const
 	{
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+		uint64_t actualOffset = ::lseek (m_h, offset, SEEK_SET);
+#else
 		uint64_t actualOffset = ::lseek64 (m_h, offset, SEEK_SET);
+#endif
 		return err::complete (actualOffset != -1);
 	}
 
 	bool
 	flush ()
 	{
-		int result = ::fdatasync (m_h);
+		int result = ::fsync (m_h);
 		return err::complete (result != -1);
 	}
 };

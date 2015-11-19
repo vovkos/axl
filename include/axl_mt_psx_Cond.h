@@ -73,6 +73,12 @@ protected:
 	Mutex m_mutex;
 
 public:
+	bool
+	tryLock ()
+	{
+		return m_mutex.tryLock ();
+	}
+
 	void
 	lock ()
 	{
@@ -100,14 +106,12 @@ public:
 	bool
 	wait ()
 	{
-		lock ();
 		return m_cond.wait (m_mutex);
 	}
 
 	bool
 	wait (uint_t timeout)
 	{
-		lock ();
 		return m_cond.wait (m_mutex, timeout);
 	}
 };

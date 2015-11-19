@@ -10,8 +10,14 @@ namespace psx {
 uint64_t
 File::getSize () const
 {
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+	struct stat stat;
+	int result = ::fstat (m_h, &stat);
+#else
 	struct stat64 stat;
 	int result = ::fstat64 (m_h, &stat);
+#endif
+
 	if (result == -1)
 	{
 		err::setLastSystemError ();
@@ -24,7 +30,12 @@ File::getSize () const
 uint64_t
 File::getPosition () const
 {
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+	uint64_t offset = ::lseek (m_h, 0, SEEK_CUR);
+#else
 	uint64_t offset = ::lseek64 (m_h, 0, SEEK_CUR);
+#endif
+
 	if (offset == -1)
 		err::setLastSystemError ();
 

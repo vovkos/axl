@@ -15,7 +15,7 @@ getPixelFormatString (PixelFormat pixelFormat)
 		"RGB",  // PixelFormat_Rgb,
 	};
 
-	return pixelFormat < countof (stringTable) ? 
+	return (size_t) pixelFormat < countof (stringTable) ?
 		stringTable [pixelFormat] : 
 		"undefined-pixel-format";
 }

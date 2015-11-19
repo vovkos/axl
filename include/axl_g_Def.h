@@ -69,8 +69,6 @@
 #	endif
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 #if (_AXL_CPU == AXL_CPU_X86)
 #	define _AXL_CPU_STRING "x86"
 #elif (_AXL_CPU == AXL_CPU_AMD64)
@@ -78,9 +76,6 @@
 #else
 #	error _AXL_CPU is set to unknown CPU arch id
 #endif
-
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (_AXL_CPU == AXL_CPU_AMD64)
 #	define _AXL_PTR_BITNESS 64
@@ -96,7 +91,7 @@
 
 #define AXL_ENV_WIN   1  // win32 / win64 user mode module
 #define AXL_ENV_NT    2  // NT native / kernel mode module
-#define AXL_ENV_POSIX 3  // Unix / Linux
+#define AXL_ENV_POSIX 3  // Unix / Linux / MacOSX
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -106,8 +101,34 @@
 #	elif (_AXL_CPP == AXL_CPP_GCC)
 #		define _AXL_ENV AXL_ENV_POSIX
 #	endif
-#elif (_AXL_ENV != AXL_ENV_WIN && _AXL_ENV != AXL_ENV_NT && _AXL_ENV != AXL_ENV_POSIX)
+#endif
+
+#if (_AXL_ENV < AXL_ENV_WIN || _AXL_ENV > AXL_ENV_POSIX)
 #	error _AXL_ENV is set to unknown runtime environment id
+#endif
+
+//.............................................................................
+
+// POSIX flavors
+
+#define AXL_POSIX_LINUX   1
+#define AXL_POSIX FREEBSD 2
+#define AXL_POSIX_DARWIN  3
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#if (_AXL_ENV == AXL_ENV_POSIX && !defined _AXL_POSIX)
+#	ifdef __linux__
+#		define _AXL_POSIX AXL_POSIX_LINUX
+#	elif (defined __FreeBSD__)
+#		define _AXL_POSIX AXL_POSIX_FREEBSD
+#	elif (defined __APPLE__ && defined __MACH__)
+#		define _AXL_POSIX AXL_POSIX_DARWIN
+#	endif
+#endif
+
+#if (_AXL_POSIX < AXL_POSIX_LINUX || _AXL_POSIX > AXL_POSIX_DARWIN)
+#	error _AXL_POSIX is set to unknown POSIX id
 #endif
 
 //.............................................................................
@@ -134,7 +155,7 @@
 #	endif
 #	define AXL_SELECT_ANY  __attribute__ ((weak))
 #	define AXL_NO_VTABLE
-#	define AXL_EXPORT
+#	define AXL_EXPORT __attribute__ ((visibility ("default")))
 #
 #	ifdef NDEBUG
 #		undef _DEBUG

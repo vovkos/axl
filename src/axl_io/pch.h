@@ -9,6 +9,10 @@
 #	include <ifaddrs.h>
 #	include <net/if.h>
 #	include <netdb.h>
+#	include <libproc.h>
+#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#		include <mach-o/dyld.h>
+#	endif
 #endif
 
 #ifdef _AXL_IO_PCAP

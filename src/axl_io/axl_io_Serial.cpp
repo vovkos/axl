@@ -277,6 +277,7 @@ Serial::setSettings (
 			attr.c_cflag |= PARENB;
 			break;
 
+#ifdef CMSPAR
 		case SerialParity_Mark:
 			attr.c_cflag |= PARENB | CMSPAR | PARODD;
 			break;
@@ -285,6 +286,7 @@ Serial::setSettings (
 			attr.c_cflag &= ~PARODD;
 			attr.c_cflag |= PARENB | CMSPAR;
 			break;
+#endif
 
 		default:
 			attr.c_cflag |= PARENB;
@@ -408,12 +410,19 @@ Serial::getSettings (SerialSettings* settings)
 		SerialStopBits_2 :
 		SerialStopBits_1;
 
+#ifdef CMSPAR
 	settings->m_parity =
 		(attr.c_cflag & PARENB) ?
 			(attr.c_cflag & CMSPAR)  ?
-				(attr.c_cflag & PARODD) ? SerialParity_Odd : SerialParity_Even :
 				(attr.c_cflag & PARODD) ? SerialParity_Mark : SerialParity_Space :
+				(attr.c_cflag & PARODD) ? SerialParity_Odd : SerialParity_Even :
 		SerialParity_None;
+#else
+	settings->m_parity = (attr.c_cflag & PARENB) ? (attr.c_cflag & PARODD) ?
+		SerialParity_Odd :
+		SerialParity_Even :
+		SerialParity_None;
+#endif
 
 	settings->m_flowControl =
 		(attr.c_cflag & CRTSCTS) ? SerialFlowControl_RtsCts :

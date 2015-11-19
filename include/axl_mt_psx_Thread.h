@@ -40,6 +40,7 @@ public:
 		return &m_attr;
 	}
 
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
 	cpu_set_t
 	getAffinity () const
 	{
@@ -54,7 +55,8 @@ public:
 		int result = ::pthread_attr_setaffinity_np (&m_attr, sizeof (cpu_set_t), &cpuSet);
 		return result == 0 ? true : err::fail (result);
 	}
-
+#endif
+	
 	size_t
 	getStackSize () const
 	{
@@ -124,16 +126,25 @@ public:
 	}
 
 	bool
+	cancel ()
+	{
+		int result = pthread_cancel (m_threadId);
+		return result != 0 ? true : err::fail (result);
+	}
+
+	bool
+	join (void** retVal = NULL);
+
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+	bool
+	tryJoin (void** retVal = NULL);
+
+	bool
 	join (
 		uint_t timeout,
 		void** retVal = NULL
 		);
-
-	bool
-	join (void** retVal = NULL)
-	{
-		return join (-1, retVal);
-	}
+#endif
 
 	bool
 	detach ();

@@ -264,6 +264,32 @@ endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# mt_drw folder
+#
+
+set (
+	MT_DRW_H_LIST
+	${AXL_INC_DIR}/axl_mt_drw_Semaphore.h
+	)
+
+set (
+	MT_DRW_CPP_LIST
+	axl_mt_drw_Semaphore.cpp
+	)
+
+source_group (
+	mt_drw
+	FILES
+	${MT_DRW_H_LIST}
+	${MT_DRW_CPP_LIST}
+	)
+
+if (NOT WIN32)
+	exclude_from_build (${MT_WIN_DRW_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # sys folder
 #
 
@@ -347,6 +373,32 @@ source_group (
 
 if (NOT WIN32)
 	exclude_from_build (${SYS_WIN_CPP_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# sys_drw folder
+#
+
+set (
+	SYS_DRW_H_LIST
+	${AXL_INC_DIR}/axl_sys_drw_MachError.h
+	)
+
+set (
+	SYS_DRW_CPP_LIST
+	axl_sys_drw_MachError.cpp
+	)
+
+source_group (
+	sys_drw
+	FILES
+	${SYS_DRW_H_LIST}
+	${SYS_DRW_CPP_LIST}
+	)
+
+if (NOT APPLE)
+	exclude_from_build (${SYS_DRW_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -544,12 +596,16 @@ add_library (
 	${MT_PSX_CPP_LIST}
 	${MT_WIN_H_LIST}
 	${MT_WIN_CPP_LIST}
+	${MT_DRW_H_LIST}
+	${MT_DRW_CPP_LIST}
 	${SYS_H_LIST}
 	${SYS_CPP_LIST}
 	${SYS_PSX_H_LIST}
 	${SYS_PSX_CPP_LIST}
 	${SYS_WIN_H_LIST}
 	${SYS_WIN_CPP_LIST}
+	${SYS_DRW_H_LIST}
+	${SYS_DRW_CPP_LIST}
 	${OBJ_H_LIST}
 	${OBJ_CPP_LIST}
 	${REF_H_LIST}
@@ -568,11 +624,11 @@ set_pch (
 	${PCH_CPP}
 	)
 
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_target_string_property (
 		axl_core
 		COMPILE_FLAGS
-		"-fPIC"
+		"-fPIC -fvisibility=hidden"
 		)
 endif ()
 

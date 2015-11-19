@@ -8,49 +8,7 @@ namespace psx {
 
 //.............................................................................
 
-bool
-Sem::init (
-	bool isShared,
-	uint_t value
-	)
-{
-	close ();
-
-	int result = sem_init (&m_unnamedSem, isShared, value);
-	if (result != 0)
-		return err::failWithLastSystemError ();
-
-	m_sem = &m_unnamedSem;
-	return true;
-}
-
-bool
-Sem::open (
-	const char* name,
-	int flags,
-	mode_t mode,
-	uint_t value
-	)
-{
-	close ();
-
-	m_sem = sem_open (name, flags, mode, value);
-	return err::complete (m_sem != SEM_FAILED);
-}
-
-void
-Sem::close ()
-{
-	if (!m_sem)
-		return;
-
-	if (m_sem == &m_unnamedSem)
-		sem_destroy (&m_unnamedSem);
-	else
-		sem_close (m_sem);
-
-	m_sem = NULL;
-}
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
 
 bool
 Sem::wait (uint_t timeout)
@@ -75,6 +33,60 @@ Sem::wait (uint_t timeout)
 
 	return err::complete (result == 0);
 }
+
+#endif
+
+//.............................................................................
+
+bool
+NamedSem::open (
+	const char* name,
+	int flags,
+	mode_t mode,
+	uint_t value
+	)
+{
+	close ();
+
+	m_sem = sem_open (name, flags, mode, value);
+	return err::complete (m_sem != SEM_FAILED);
+}
+
+void
+NamedSem::close ()
+{
+	if (!m_sem)
+		return;
+
+	sem_close (m_sem);
+	m_sem = NULL;
+}
+
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+bool
+NamedSem::wait (uint_t timeout)
+{
+	int result;
+
+	switch (timeout)
+	{
+	case 0:
+		result = sem_trywait (m_sem);
+		break;
+
+	case -1:
+		result = sem_wait (m_sem);
+		break;
+
+	default:
+		timespec timespec = { 0 };
+		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		result = sem_timedwait (m_sem, &timespec);
+	}
+
+	return err::complete (result == 0);
+}
+#endif
 
 //.............................................................................
 

@@ -30,10 +30,17 @@ getTimestamp ()
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	::GetSystemTimeAsFileTime ((FILETIME*) &timestamp);
-#else
-	timespec time;
-	clock_gettime (CLOCK_REALTIME_COARSE, &time);
-	timestamp = (uint64_t) time.tv_sec * 10000000 + time.tv_nsec / 100;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	timespec tspec;
+#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+	timeval tval;
+	gettimeofday (&tval, NULL);
+	tspec.tv_sec = tval.tv_sec;
+	tspec.tv_nsec = tval.tv_usec * 1000;
+#	else
+	clock_gettime (CLOCK_REALTIME_COARSE, &tspec);
+#	endif
+	timestamp = (uint64_t) tspec.tv_sec * 10000000 + tspec.tv_nsec / 100;
 #endif
 
 	return timestamp;
@@ -46,10 +53,17 @@ getPreciseTimestamp ()
 	uint64_t counter;
 	::QueryPerformanceCounter ((LARGE_INTEGER*) &counter);
 	return g_qpcBaseTimestamp + (uint64_t) ((double) (counter - g_qpcBaseCounter) * 10000000 / g_qpcFrequency);
-#else
-	timespec time;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	timespec tspec;
+#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+	timeval tval;
+	gettimeofday (&tval, NULL);
+	tspec.tv_sec = tval.tv_sec;
+	tspec.tv_nsec = tval.tv_usec * 1000;
+#	else
 	clock_gettime (CLOCK_REALTIME, &time);
-	return (uint64_t) time.tv_sec * 10000000 + time.tv_nsec / 100;
+#	endif
+	return (uint64_t) tspec.tv_sec * 10000000 + tspec.tv_nsec / 100;
 #endif
 }
 
@@ -62,7 +76,7 @@ sleep (uint32_t msCount)
 	::Sleep (msCount);
 #else
 	timespec timespec;
-	g::getTimespecFromTimeout (msCount, &timespec);
+	getTimespecFromTimeout (msCount, &timespec);
 	nanosleep (&timespec, NULL);
 #endif
 }

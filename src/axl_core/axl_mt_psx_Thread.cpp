@@ -28,6 +28,35 @@ Thread::create (
 }
 
 bool
+Thread::join (void** retVal)
+{
+	if (!m_isOpen)
+		return true;
+
+	int result = ::pthread_join (m_threadId, retVal);
+	if (result != 0)
+		return err::fail (result);
+
+	m_isOpen = false;
+	return true;
+}
+
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+bool
+Thread::tryJoin (void** retVal)
+{
+	if (!m_isOpen)
+		return true;
+
+	int result = ::pthread_tryjoin_np (m_threadId, retVal);
+	if (result != 0)
+		return err::fail (result);
+
+	m_isOpen = false;
+	return true;
+}
+
+bool
 Thread::join (
 	uint_t timeout,
 	void** retVal
@@ -60,6 +89,7 @@ Thread::join (
 	m_isOpen = false;
 	return true;
 }
+#endif
 
 bool
 Thread::detach ()

@@ -11,10 +11,7 @@
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include "axl_mt_win_Event.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include "axl_mt_psx_Mutex.h"
-#	include "axl_mt_psx_Sem.h"
 #	include "axl_mt_psx_Cond.h"
-#	include "axl_io_psx_Mapping.h"
 #endif
 
 namespace axl {
@@ -80,47 +77,50 @@ public:
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-class Event
+class EventRoot
 {
 protected:
-	psx::Mutex m_mutex;
-	psx::Sem m_sem;
+	psx::CondMutexPair m_condMutexPair;
+	bool m_isNotificationEvent;
+	volatile bool m_state;
 
 public:
-	bool
-	signal ();
-
-	bool
-	reset ();
-
-	bool
-	wait (uint_t timeout = -1)
+	EventRoot (bool isNotificationEvent)
 	{
-		return m_sem.wait (timeout);
-	}
-};
-
-class NotificationEvent
-{
-protected:
-	psx::Mutex m_mutex;
-	psx::Cond m_cond;
-	bool m_state;
-
-public:
-	NotificationEvent ()
-	{
+		m_isNotificationEvent = isNotificationEvent;
 		m_state = false;
 	}
 
+	void
+	reset ();
+
 	bool
 	signal ();
 
 	bool
-	reset ();
-
-	bool
 	wait (uint_t timeout = -1);
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class Event: public EventRoot
+{
+public:
+	Event ():
+		EventRoot (false)
+	{
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class NotificationEvent: public EventRoot
+{
+public:
+	NotificationEvent ():
+		EventRoot (true)
+	{
+	}
 };
 
 #endif

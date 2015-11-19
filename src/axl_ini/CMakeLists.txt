@@ -104,7 +104,7 @@ set_pch (
 	${PCH_CPP}
 	)
 
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_target_string_property (
 		axl_ini
 		COMPILE_FLAGS

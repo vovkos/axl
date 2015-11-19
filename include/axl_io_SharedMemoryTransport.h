@@ -7,9 +7,14 @@
 #define _AXL_IO_SHAREDMEMORYTRANSPORT_H
 
 #include "axl_io_Mapping.h"
-#include "axl_mt_Event.h"
 #include "axl_mt_Lock.h"
 #include "axl_sl_Array.h"
+
+#if (_AXL_ENV == AXL_ENV_WIN)
+#	include "axl_mt_win_Event.h"
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	include "axl_mt_psx_Sem.h"
+#endif
 
 namespace axl {
 namespace io {
@@ -77,8 +82,8 @@ protected:
 	mt::win::Event m_readEvent;
 	mt::win::Event m_writeEvent;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	mt::psx::Sem m_readEvent;
-	mt::psx::Sem m_writeEvent;
+	mt::psx::NamedSem m_readEvent;
+	mt::psx::NamedSem m_writeEvent;
 	sl::String m_readEventName;
 	sl::String m_writeEventName;
 #endif
@@ -133,6 +138,9 @@ public:
 	disconnect ();
 
 protected:
+	void
+	closeImpl ();
+
 	bool
 	ensureMappingSize (size_t size);
 

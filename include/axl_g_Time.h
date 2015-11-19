@@ -173,8 +173,15 @@ getAbsTimespecFromTimeout (
 	timespec* tspec
 	)
 {
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+	timeval tval;
+	gettimeofday (&tval, NULL);
+	tspec->tv_sec = tval.tv_sec;
+	tspec->tv_nsec = tval.tv_usec * 1000;
+#else
 	int result = clock_gettime (CLOCK_REALTIME, tspec);
 	ASSERT (result == 0);
+#endif
 
 	tspec->tv_sec += timeout / 1000;
 	tspec->tv_nsec += (timeout % 1000) * 1000000;

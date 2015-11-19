@@ -13,8 +13,13 @@ ErrnoProvider::getErrorDescription (int code)
 #if (_AXL_ENV == AXL_ENV_WIN)
 	strerror_s (buffer, countof (buffer) - 1, code);
 	return buffer;
-#else
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+#	if (_AXL_POSIX == AXL_POSIX_LINUX)
 	return strerror_r (code, buffer, countof (buffer) - 1);
+#	else
+	strerror_r (code, buffer, countof (buffer) - 1);
+	return buffer;
+#	endif
 #endif
 }
 

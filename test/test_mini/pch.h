@@ -12,7 +12,7 @@
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include <netdb.h>
 #	include <signal.h>
-#	include <ucontext.h>
+#	include <sys/ucontext.h>
 #endif
 
 #ifdef _AXL_IO_USB
@@ -37,10 +37,14 @@ extern "C" {
 #include "axl_io_Socket.h"
 #include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"
-#include "axl_io_UsbDevice.h"
 #include "axl_io_SharedMemoryTransport.h"
 #include "axl_g_Time.h"
 #include "axl_mt_Event.h"
+#include "axl_io_FilePathUtils.h"
+
+#ifdef _AXL_IO_USB
+#	include "axl_io_UsbDevice.h"
+#endif
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include "axl_mem_win_VirtualMemory.h"
@@ -48,6 +52,9 @@ extern "C" {
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_mt_psx_Sem.h"
+#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#		include "axl_mt_drw_Semaphore.h"
+#	endif
 #endif
 
 using namespace axl;

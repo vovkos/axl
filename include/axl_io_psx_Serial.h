@@ -73,12 +73,14 @@ public:
 	bool
 	setRts (bool isSet);
 
+#if (_AXL_POSIX != AXL_POSIX_DARWIN)
 	bool
 	wait (uint_t mask)
 	{
 		int result = ::ioctl (m_h, TIOCMIWAIT, mask);
 		return err::complete (result != -1);
 	}
+#endif
 };
 
 //.............................................................................

@@ -132,9 +132,7 @@ protected:
 		if (!patternSize)
 			return true;
 
-		intptr_t last = patternSize - 1;
-		intptr_t lastPrefixPos = patternSize - 1;
- 
+        intptr_t lastPrefixPos = patternSize - 1; 
 		for (intptr_t i = patternSize - 1; i >= 0; i--) 
 		{
 			if (isPrefix (i + 1)) 

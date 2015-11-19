@@ -32,7 +32,7 @@ public:
 	bool
 	open (
 		const char* name,
-		int flags = RTLD_LAZY
+		int flags = RTLD_LAZY | RTLD_LOCAL
 		);
 
 	void*

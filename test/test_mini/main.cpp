@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_g_WarningSuppression.h"
 #include "axl_mt_Thread.h"
+#include "axl_err_Errno.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
@@ -1309,6 +1310,7 @@ void* suspendThread (pthread_t thread)
 
 bool resumeThread (pthread_t thread)
 {
+	return false;
 }
 
 void testSuspendThread ()
@@ -1381,7 +1383,12 @@ protected:
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
+
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+	mt::drw::Semaphore m_handshakeSem;
+#else
 	mt::psx::Sem m_handshakeSem;
+#endif
 
 	sigset_t m_signalWaitMask;
 
@@ -1425,7 +1432,7 @@ public:
 		m_handshakeKind = HandshakeKind_ResumeTheWorld;
 		m_handshakeCounter = m_threadArray.getCount ();
 		for (size_t i = 0; i < m_handshakeCounter; i++)
-			pthread_kill (m_threadArray [i], SIGUSR1); // resume
+			pthread_kill ((pthread_t) m_threadArray [i], SIGUSR1); // resume
 
 		m_handshakeSem.wait ();
 		m_handshakeKind = HandshakeKind_None;
@@ -1481,7 +1488,7 @@ protected:
 
 		int32_t count = mt::atomicDec (&g_gc->m_handshakeCounter);
 		if (!count)
-			g_gc->m_handshakeSem.post ();
+			g_gc->m_handshakeSem.signal ();
 
 		do
 		{
@@ -1490,7 +1497,7 @@ protected:
 
 		count = mt::atomicDec (&g_gc->m_handshakeCounter);
 		if (!count)
-			g_gc->m_handshakeSem.post ();
+			g_gc->m_handshakeSem.signal ();
 	}
 
 	static
@@ -1833,6 +1840,58 @@ testSharedMemoryTransport ()
 
 //.............................................................................
 
+uint64_t g_guardPage;
+
+void
+signalHandler_SIGBUS (
+	int signal,
+	siginfo_t* signalInfo,
+	void* context
+	)
+{
+	printf ("signalHandler_SIGBUS (%p/%p)\n", signalInfo->si_addr, g_guardPage);
+
+}
+
+void
+testSafePoint ()
+{
+	printf ("test safe point...\n");
+
+	sigset_t signalWaitMask;
+	sigemptyset (&signalWaitMask); // don't block any signals when servicing SIGSEGV
+	
+	struct sigaction sigAction = { 0 };
+	sigAction.sa_flags = SA_SIGINFO;
+	sigAction.sa_sigaction = signalHandler_SIGBUS;
+	sigAction.sa_mask = signalWaitMask;
+	
+	struct sigaction prevSigAction;
+	int result = sigaction (SIGBUS, &sigAction, &prevSigAction);
+	ASSERT (result == 0);
+	
+	io::psx::Mapping guardPage;
+	
+	guardPage.map (
+		 NULL,
+		 4 * 1024,
+		 PROT_READ | PROT_WRITE,
+		 MAP_PRIVATE | MAP_ANONYMOUS,
+		 -1,
+		 0
+		 );
+
+	int* p = (int*) guardPage.p ();
+	g_guardPage = (intptr_t) p;
+	
+	*p = 0;
+	
+	guardPage.protect (PROT_READ);
+	
+	printf ("before writing...\n");
+	*p = 0;
+}
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1852,8 +1911,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testSharedMemoryTransport ();
-
+	testSafePoint ();
 	return 0;
 }
 

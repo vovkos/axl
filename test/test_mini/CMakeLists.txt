@@ -76,9 +76,15 @@ if (UNIX)
 	target_link_libraries (
 		test_mini
 		pthread
-		rt
 		dl
 		)
+
+	if (NOT APPLE)
+		target_link_libraries (
+			test_mini
+			rt
+			)
+	endif ()
 endif ()
 
 if (BUILD_AXL_IO_USB)

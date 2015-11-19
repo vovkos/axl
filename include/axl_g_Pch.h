@@ -69,7 +69,6 @@
 #	include <fcntl.h>
 #	include <dlfcn.h>
 #	include <limits.h>
-#	include <byteswap.h>
 #	include <sys/stat.h>
 #	include <sys/mman.h>
 #	include <sys/socket.h>
@@ -79,6 +78,18 @@
 #	include <arpa/inet.h>
 #	include <termios.h>
 #	include <libgen.h>
+#
+#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#		include <machine/endian.h>
+#		include <mach/mach_error.h>
+#		include <mach/mach_init.h>
+#		include <mach/task.h>
+#		include <mach/semaphore.h>
+#		include <sys/time.h>
+#	else
+#		include "byteswap.h"
+#	endif
+#
 #	undef basename
 #
 #	define _stricmp    strcasecmp

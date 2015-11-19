@@ -1,5 +1,3 @@
-#include <asm-generic/errno.h>
-
 #include "pch.h"
 #include "axl_io_psx_Socket.h"
 
@@ -34,7 +32,7 @@ Socket::setBlockingMode (bool isBlocking)
 {
 	int value = !isBlocking;
 	int result = ::ioctl (m_h, FIONBIO, &value);
-	return err::complete (m_h != -1);
+	return err::complete (result != -1);
 }
 
 bool

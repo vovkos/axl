@@ -124,7 +124,7 @@ SharedMemoryTransportBase::attach (
 
 	if (!result)
 	{
-		close ();
+		closeImpl ();
 		return false;
 	}
 
@@ -139,7 +139,12 @@ SharedMemoryTransportBase::close ()
 		return;
 
 	disconnect ();
+	closeImpl ();
+}
 
+void
+SharedMemoryTransportBase::closeImpl ()
+{
 	m_file.close ();
 	m_readEvent.close ();
 	m_writeEvent.close ();
@@ -151,13 +156,13 @@ SharedMemoryTransportBase::close ()
 #if (_AXL_ENV == AXL_ENV_POSIX)
 	if (!m_readEventName.isEmpty ())
 	{
-		mt::psx::Sem::unlink (m_readEventName);
+		mt::psx::NamedSem::unlink (m_readEventName);
 		m_readEventName.clear ();
 	}
 
 	if (!m_writeEventName.isEmpty ())
 	{
-		mt::psx::Sem::unlink (m_writeEventName);
+		mt::psx::NamedSem::unlink (m_writeEventName);
 		m_writeEventName.clear ();
 	}
 #endif
@@ -401,9 +406,7 @@ SharedMemoryWriter::write (
 		return -1;
 	}
 
-	size_t readOffset = m_hdr->m_readOffset;
 	size_t writeOffset = m_hdr->m_writeOffset;
-	size_t dataSize = m_hdr->m_dataSize;
 
 	mt::atomicUnlock (&m_hdr->m_lock);
 

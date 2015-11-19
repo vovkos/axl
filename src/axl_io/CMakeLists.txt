@@ -254,7 +254,7 @@ if (WIN32)
 		)
 endif ()
 
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_target_string_property (
 		axl_io
 		COMPILE_FLAGS
