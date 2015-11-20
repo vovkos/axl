@@ -363,7 +363,7 @@ QtEngine::getStdFontTuple (StdFontKind fontKind)
 #if (_AXL_POSIX == AXL_POSIX_DARWIN)
 		font->m_qtFont = QFont ("Menlo", 11);
 #else
-		font->m_qtFont = QFont ("Monospace", 10);
+		font->m_qtFont = QFont ("Monospace", 9);
 #endif
 		font->m_qtFont.setFixedPitch (true);
 		font->m_qtFont.setKerning (false);
