@@ -1840,58 +1840,6 @@ testSharedMemoryTransport ()
 
 //.............................................................................
 
-uint64_t g_guardPage;
-
-void
-signalHandler_SIGBUS (
-	int signal,
-	siginfo_t* signalInfo,
-	void* context
-	)
-{
-	printf ("signalHandler_SIGBUS (%p/%p)\n", signalInfo->si_addr, g_guardPage);
-
-}
-
-void
-testSafePoint ()
-{
-	printf ("test safe point...\n");
-
-	sigset_t signalWaitMask;
-	sigemptyset (&signalWaitMask); // don't block any signals when servicing SIGSEGV
-	
-	struct sigaction sigAction = { 0 };
-	sigAction.sa_flags = SA_SIGINFO;
-	sigAction.sa_sigaction = signalHandler_SIGBUS;
-	sigAction.sa_mask = signalWaitMask;
-	
-	struct sigaction prevSigAction;
-	int result = sigaction (SIGBUS, &sigAction, &prevSigAction);
-	ASSERT (result == 0);
-	
-	io::psx::Mapping guardPage;
-	
-	guardPage.map (
-		 NULL,
-		 4 * 1024,
-		 PROT_READ | PROT_WRITE,
-		 MAP_PRIVATE | MAP_ANONYMOUS,
-		 -1,
-		 0
-		 );
-
-	int* p = (int*) guardPage.p ();
-	g_guardPage = (intptr_t) p;
-	
-	*p = 0;
-	
-	guardPage.protect (PROT_READ);
-	
-	printf ("before writing...\n");
-	*p = 0;
-}
-
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1911,7 +1859,6 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testSafePoint ();
 	return 0;
 }
 

@@ -4,7 +4,7 @@
 
 #pragma once 
 
-#define _AXL_SYS_DRW_MachError_H
+#define _AXL_SYS_DRW_MACHERROR_H
 
 #include "axl_err_Error.h"
 #include "axl_sl_String.h"

@@ -284,8 +284,8 @@ source_group (
 	${MT_DRW_CPP_LIST}
 	)
 
-if (NOT WIN32)
-	exclude_from_build (${MT_WIN_DRW_LIST})
+if (NOT APPLE)
+	exclude_from_build (${MT_DRW_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -115,20 +115,22 @@
 #define AXL_POSIX FREEBSD 2
 #define AXL_POSIX_DARWIN  3
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#if (_AXL_ENV == AXL_ENV_POSIX && !defined _AXL_POSIX)
-#	ifdef __linux__
-#		define _AXL_POSIX AXL_POSIX_LINUX
-#	elif (defined __FreeBSD__)
-#		define _AXL_POSIX AXL_POSIX_FREEBSD
-#	elif (defined __APPLE__ && defined __MACH__)
-#		define _AXL_POSIX AXL_POSIX_DARWIN
+#if (_AXL_ENV != AXL_ENV_POSIX)
+#	undef _AXL_POSIX
+#else
+#	if (!defined _AXL_POSIX)
+#		ifdef __linux__
+#			define _AXL_POSIX AXL_POSIX_LINUX
+#		elif (defined __FreeBSD__)
+#			define _AXL_POSIX AXL_POSIX_FREEBSD
+#		elif (defined __APPLE__ && defined __MACH__)
+#			define _AXL_POSIX AXL_POSIX_DARWIN
+#		endif
 #	endif
-#endif
-
-#if (_AXL_POSIX < AXL_POSIX_LINUX || _AXL_POSIX > AXL_POSIX_DARWIN)
-#	error _AXL_POSIX is set to unknown POSIX id
+#
+#	if (_AXL_POSIX < AXL_POSIX_LINUX || _AXL_POSIX > AXL_POSIX_DARWIN)
+#		error _AXL_POSIX is set to unknown POSIX id
+#	endif
 #endif
 
 //.............................................................................
