@@ -9,8 +9,8 @@
 #	include <ifaddrs.h>
 #	include <net/if.h>
 #	include <netdb.h>
-#	include <libproc.h>
 #	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#		include <libproc.h>
 #		include <mach-o/dyld.h>
 #	endif
 #endif

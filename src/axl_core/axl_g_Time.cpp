@@ -61,7 +61,7 @@ getPreciseTimestamp ()
 	tspec.tv_sec = tval.tv_sec;
 	tspec.tv_nsec = tval.tv_usec * 1000;
 #	else
-	clock_gettime (CLOCK_REALTIME, &time);
+	clock_gettime (CLOCK_REALTIME, &tspec);
 #	endif
 	return (uint64_t) tspec.tv_sec * 10000000 + tspec.tv_nsec / 100;
 #endif

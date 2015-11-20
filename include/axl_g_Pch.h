@@ -79,7 +79,7 @@
 #	include <termios.h>
 #	include <libgen.h>
 #
-#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#	if (defined __APPLE__ && defined __MACH__)
 #		include <machine/endian.h>
 #		include <mach/mach_error.h>
 #		include <mach/mach_init.h>

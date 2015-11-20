@@ -18,17 +18,17 @@ Sem::wait (uint_t timeout)
 	switch (timeout)
 	{
 	case 0:
-		result = sem_trywait (m_sem);
+		result = sem_trywait (&m_sem);
 		break;
 
 	case -1:
-		result = sem_wait (m_sem);
+		result = sem_wait (&m_sem);
 		break;
 
 	default:
 		timespec timespec = { 0 };
 		g::getAbsTimespecFromTimeout (timeout, &timespec);
-		result = sem_timedwait (m_sem, &timespec);
+		result = sem_timedwait (&m_sem, &timespec);
 	}
 
 	return err::complete (result == 0);
