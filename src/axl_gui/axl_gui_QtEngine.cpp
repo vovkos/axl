@@ -360,7 +360,11 @@ QtEngine::getStdFontTuple (StdFontKind fontKind)
 		break;
 
 	case StdFontKind_Monospace:
-		font->m_qtFont = QFont ("Monospace", 11);
+#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+		font->m_qtFont = QFont ("Menlo", 11);
+#else
+		font->m_qtFont = QFont ("Monospace", 10);
+#endif
 		font->m_qtFont.setFixedPitch (true);
 		font->m_qtFont.setKerning (false);
 		font->m_qtFont.setStyleHint (

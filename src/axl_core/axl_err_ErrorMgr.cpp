@@ -6,6 +6,8 @@
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include "axl_err_WinError.h"
 #	include "axl_err_NtError.h"
+#elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+#	include "axl_sys_drw_MachError.h"
 #endif
 
 namespace axl {
@@ -23,6 +25,8 @@ ErrorMgr::ErrorMgr ()
 #if (_AXL_ENV == AXL_ENV_WIN)
 	registerProvider (g_winErrorGuid, mt::getSimpleSingleton <WinErrorProvider> ());
 	registerProvider (g_ntErrorGuid, mt::getSimpleSingleton <NtErrorProvider> ());
+#elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+	registerProvider (sys::drw::g_MachErrorGuid, mt::getSimpleSingleton <sys::drw::MachErrorProvider> ());
 #endif
 }
 
