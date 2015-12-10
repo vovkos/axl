@@ -34,6 +34,22 @@ protected:
 
 public:
 	Font* 
+	createFont (
+		const char* family,
+		size_t pointSize,
+		uint_t flags = 0
+		)
+	{
+		return m_engine->createFont (this, family, pointSize, flags);
+	}
+
+	Font* 
+	createFont (const FontDesc& fontDesc)
+	{
+		return m_engine->createFont (this, fontDesc);
+	}
+
+	Font* 
 	getFont (uint_t flags = 0)
 	{
 		flags = (flags & FontFlag_Undefined) ? 0 : (flags & 0x0f);

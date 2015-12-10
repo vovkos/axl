@@ -8,6 +8,20 @@ namespace gui {
 
 //.............................................................................
 
+QtFont* QtFontTuple::attachFont (QFont qtFont)
+{
+	clear ();
+
+	QtFont* font = AXL_MEM_NEW (QtFont);
+	font->m_tuple = this;
+	font->m_qtFont = qtFont;
+	m_fontModArray [0] = font;
+
+	return font;
+}
+
+//.............................................................................
+
 QtEngine::QtEngine ():
 	m_sharedOffscreenCanvasCache (this)
 {

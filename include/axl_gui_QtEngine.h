@@ -17,6 +17,7 @@ namespace axl {
 namespace gui {
 
 class QtEngine;
+class QtFont;
 
 inline 
 Engine* 
@@ -50,6 +51,8 @@ public:
 		FontTuple (getQtEngine ()) 
 	{
 	}
+
+	QtFont* attachFont (QFont qtFont);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -57,11 +60,12 @@ public:
 class QtFont: public Font
 {
 	friend class QtEngine;
+	friend class QtFontTuple;
 
 public:
 	QFont m_qtFont;
 
-public:
+protected:
 	QtFont ():
 		Font (getQtEngine ()) 
 	{
