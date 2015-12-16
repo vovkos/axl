@@ -352,6 +352,8 @@ set (
 	${AXL_INC_DIR}/axl_sys_win_DeviceInfo.h
 	${AXL_INC_DIR}/axl_sys_win_Window.h
 	${AXL_INC_DIR}/axl_sys_win_Process.h
+	${AXL_INC_DIR}/axl_sys_win_AccessToken.h
+	${AXL_INC_DIR}/axl_sys_win_Sid.h
 	)
 
 set (
@@ -362,6 +364,8 @@ set (
 	axl_sys_win_ServiceMgr.cpp
 	axl_sys_win_DeviceInfo.cpp
 	axl_sys_win_Process.cpp
+	axl_sys_win_AccessToken.cpp
+	axl_sys_win_Sid.cpp
 	)
 
 source_group (
