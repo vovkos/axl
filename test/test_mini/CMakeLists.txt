@@ -70,6 +70,7 @@ target_link_libraries (
 	test_mini
 	axl_io
 	axl_core
+	axl_zip
 	)
 
 if (UNIX)

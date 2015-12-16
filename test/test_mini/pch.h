@@ -41,6 +41,7 @@ extern "C" {
 #include "axl_g_Time.h"
 #include "axl_mt_Event.h"
 #include "axl_io_FilePathUtils.h"
+#include "axl_zip_ZipReader.h"
 
 #ifdef _AXL_IO_USB
 #	include "axl_io_UsbDevice.h"

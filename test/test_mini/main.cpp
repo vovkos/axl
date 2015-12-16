@@ -1840,6 +1840,58 @@ testSharedMemoryTransport ()
 
 //.............................................................................
 
+void
+testZip ()
+{
+	bool result;
+
+	zip::ZipReader reader;
+
+	result = reader.openFile ("c:/projects/projects.zip");
+	if (!result)
+	{
+		printf ("can't open file: %s\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	sl::Array <char> buffer;
+
+	size_t count = reader.getFileCount ();
+	for (size_t i = 0; i < count; i++)
+	{
+		sl::String fileName = reader.getFileName (i);
+
+		zip::ZipFileInfo fileInfo;
+		reader.getFileInfo (i, &fileInfo);
+
+		bool isDir = reader.isDirectoryFile (i);
+
+		printf (
+			"%-10s         %s\n"
+			"compressed size:   %d\n"
+			"uncompressed size: %d\n"
+			"timestamp:         %s\n"
+			"method:            %d\n",
+			isDir ? "directory:" : "file:",
+			fileName.cc (),
+			(size_t) fileInfo.m_compressedSize,
+			(size_t) fileInfo.m_uncompressedSize,
+			g::Time (fileInfo.m_timestamp).format ().cc (),
+			fileInfo.m_method
+			);
+
+		if (!isDir)
+		{
+			reader.extractFileToMem (i, &buffer);
+			printf ("<<<\n%s\n>>>\n", buffer);
+		}
+
+		printf ("\n");
+	}
+}
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1858,6 +1910,8 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
+
+	testZip ();
 
 	return 0;
 }

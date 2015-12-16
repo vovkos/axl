@@ -114,6 +114,18 @@ endif ()
 
 #..............................................................................
 
+option (
+	BUILD_AXL_ZIP
+	"Build axl_zip library (miniz wrapper)"
+	ON
+	)
+
+if (BUILD_AXL_ZIP)
+	add_subdirectory (axl_zip)
+endif ()
+
+#..............................................................................
+
 if (${OPENSSL_FOUND})
 	option (
 		BUILD_AXL_CRY
