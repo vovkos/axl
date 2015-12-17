@@ -44,7 +44,7 @@ AccessToken::getTokenInformation (
 
 	return
 		buffer->setCount (size) &&
-		getTokenInformation (infoClass, buffer, size, &size);
+		getTokenInformation (infoClass, buffer->a (), size, &size);
 }
 
 bool
