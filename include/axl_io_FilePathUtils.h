@@ -14,6 +14,9 @@ namespace io {
 
 //.............................................................................
 
+sl::String 
+getTempDir ();
+
 sl::String
 getCurrentDir ();
 

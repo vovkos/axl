@@ -22,7 +22,7 @@ namespace sys {
 
 class DynamicLibrary
 {
-public:
+protected:
 	win::Library m_library;
 
 public:

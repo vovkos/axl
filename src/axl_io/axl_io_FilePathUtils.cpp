@@ -31,6 +31,18 @@ get_current_dir_name ()
 }
 #endif
 
+sl::String 
+getTempDir ()
+{
+#if (_AXL_ENV == AXL_ENV_WIN)
+	wchar_t dir [1024] = { 0 };
+	::GetTempPathW (countof (dir) - 1, dir);
+	return dir;
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+	return "/tmp";
+#endif
+}
+
 sl::String
 getCurrentDir ()
 {
