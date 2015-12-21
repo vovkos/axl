@@ -1883,7 +1883,7 @@ testZip ()
 		if (!isDir)
 		{
 			reader.extractFileToMem (i, &buffer);
-			printf ("<<<\n%s\n>>>\n", buffer);
+			printf ("<<<\n%s\n>>>\n", buffer.ca ());
 		}
 
 		printf ("\n");
