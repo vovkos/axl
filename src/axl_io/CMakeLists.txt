@@ -134,7 +134,6 @@ set (
 	axl_io_psx_Mapping.cpp
 	axl_io_psx_Pipe.cpp
 	axl_io_psx_Serial.cpp
-	axl_io_psx_SerialPortEnumerator.cpp
 	axl_io_psx_Socket.cpp
 	axl_io_psx_NetworkAdapterEnumerator.cpp
 	)
@@ -188,6 +187,31 @@ source_group (
 
 if (NOT WIN32)
 	exclude_from_build (${IO_WIN_CPP_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# io_lnx folder
+#
+
+set (
+	IO_LNX_H_LIST
+	)
+
+set (
+	IO_LNX_CPP_LIST
+	axl_io_lnx_SerialPortEnumerator.cpp
+	)
+
+source_group (
+	io_lnx
+	FILES
+	${IO_LNX_H_LIST}
+	${IO_LNX_CPP_LIST}
+	)
+
+if (NOT LINUX)
+	exclude_from_build (${IO_LNX_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -265,6 +289,8 @@ add_library (
 	${IO_WIN_CPP_LIST}
 	${IO_PSX_H_LIST}
 	${IO_PSX_CPP_LIST}
+	${IO_LNX_H_LIST}
+	${IO_LNX_CPP_LIST}
 	${IO_DRW_H_LIST}
 	${IO_DRW_CPP_LIST}
 	)

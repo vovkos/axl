@@ -11,7 +11,10 @@
 #	include <ifaddrs.h>
 #	include <net/if.h>
 #	include <netdb.h>
-#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#	if (_AXL_POSIX == AXL_POSIX_LINUX)
+#		include <libudev.h>
+#		include <linux/serial.h>
+#	elif (_AXL_POSIX == AXL_POSIX_DARWIN)
 #		include <libproc.h>
 #		include <mach-o/dyld.h>
 #	endif

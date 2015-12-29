@@ -1029,8 +1029,8 @@ testTimestamp ()
 {
 	for (int i = 0; i < 20; i++)
 	{
-		uint64_t t1 = g::getTimestamp ();
-		printf ("%s: %llu\n", g::Time (t1).format ("%h:%m:%s.%l.%c").cc (), t1);
+		uint64_t t1 = sys::getTimestamp ();
+		printf ("%s: %llu\n", sys::Time (t1).format ("%h:%m:%s.%l.%c").cc (), t1);
 	}
 }
 
@@ -1215,7 +1215,7 @@ public:
 
 		for (;;)
 		{
-			g::sleep (1000);
+			sys::sleep (1000);
 			printf ("MyThread -- TID: %lld\n", tid);
 
 			if (m_terminateFlag)
@@ -1319,20 +1319,20 @@ void testSuspendThread ()
 	MyThread thread2;
 
 	thread1.start ();
-	g::sleep (500);
+	sys::sleep (500);
 	thread2.start ();
 
-	g::sleep (3000);
+	sys::sleep (3000);
 
 	suspendThread (thread2.m_thread);
 	printf ("thread2 is suspended...\n");
 
-	g::sleep (3000);
+	sys::sleep (3000);
 
 	printf ("thread2 is resumed...\n");
 	resumeThread (thread2.m_thread);
 
-	g::sleep (3000);
+	sys::sleep (3000);
 
 	printf ("terminating threads...\n");
 
@@ -1650,7 +1650,7 @@ public:
 				break;
 
 			printf ("  mutator thread TID:%lld is working...\n", threadId);
-			g::sleep (200);
+			sys::sleep (200);
 			g_gc->gcSafePoint ();
 		}
 		
@@ -1678,18 +1678,18 @@ testGcSafePoints ()
 	gc.registerThread (thread1.getThreadId ());
 	gc.registerThread (thread2.getThreadId ());
 
-	g::sleep (1000);
+	sys::sleep (1000);
 
 	printf ("stopping the world...\n");
 	gc.stopTheWorld ();
 	printf ("the world is stopped.\n");
 
-	g::sleep (2000);
+	sys::sleep (2000);
 
 	printf ("resuming the world...\n");
 	gc.resumeTheWorld ();
 
-	g::sleep (1000);
+	sys::sleep (1000);
 
 	printf ("stopping mutator threads...\n");
 
@@ -1736,39 +1736,39 @@ testInheritance ()
 void
 testTimestamps ()
 {
-	uint64_t ts1 = g::getTimestamp ();
-	uint64_t ts2 = g::getPreciseTimestamp ();
+	uint64_t ts1 = sys::getTimestamp ();
+	uint64_t ts2 = sys::getPreciseTimestamp ();
 
-	printf ("time0.1 = %s\n", g::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
-	printf ("time0.2 = %s\n", g::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
 
-	uint64_t t0 = g::getPreciseTimestamp ();
+	uint64_t t0 = sys::getPreciseTimestamp ();
 
 	for (size_t i = 0; i < 1000000; i++)
 	{
-		g::getTimestamp ();
+		sys::getTimestamp ();
 	}
 
-	uint64_t t2 = g::getPreciseTimestamp ();
+	uint64_t t2 = sys::getPreciseTimestamp ();
 	uint64_t d1 = t2 - t0;
-	printf ("time1 = %s\n", g::Time (d1, 0).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time1 = %s\n", sys::Time (d1, 0).format ("%h:%m:%s.%l.%c").cc ());
 
-	t0 = g::getPreciseTimestamp ();
+	t0 = sys::getPreciseTimestamp ();
 
 	for (size_t i = 0; i < 1000000; i++)
 	{
-		g::getPreciseTimestamp ();
+		sys::getPreciseTimestamp ();
 	}
 
-	t2 = g::getPreciseTimestamp ();
+	t2 = sys::getPreciseTimestamp ();
 	uint64_t d2 = t2 - t0;
-	printf ("time2 = %s\n", g::Time (d2, 0).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time2 = %s\n", sys::Time (d2, 0).format ("%h:%m:%s.%l.%c").cc ());
 
-	ts1 = g::getTimestamp ();
-	ts2 = g::getPreciseTimestamp ();
+	ts1 = sys::getTimestamp ();
+	ts2 = sys::getPreciseTimestamp ();
 
-	printf ("time0.1 = %s\n", g::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
-	printf ("time0.2 = %s\n", g::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
 }
 
 //.............................................................................
@@ -1876,7 +1876,7 @@ testZip ()
 			fileName.cc (),
 			(size_t) fileInfo.m_compressedSize,
 			(size_t) fileInfo.m_uncompressedSize,
-			g::Time (fileInfo.m_timestamp).format ().cc (),
+			sys::Time (fileInfo.m_timestamp).format ().cc (),
 			fileInfo.m_method
 			);
 
@@ -1900,7 +1900,7 @@ testEnumSerial ()
 
 	sl::Iterator <io::SerialPortDesc> it = portList.getHead ();
 	for (; it; it++)
-		printf ("decice name: %s\ndescription: %s\n\n", it->getDeviceName ().cc (), it->getDescription ().cc ());
+		printf ("device name: %s\ndescription: %s\n\n", it->getDeviceName ().cc (), it->getDescription ().cc ());
 
 	printf ("%d ports total\n", portList.getCount ());
 }

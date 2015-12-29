@@ -21,7 +21,7 @@ main (
 	WORD versionRequested = MAKEWORD (2, 2);
 
 	WSAStartup (versionRequested, &wsaData);
-	srand ((uint_t) g::getTimestamp ());
+	srand ((uint_t) sys::getTimestamp ());
 
 	err::registerParseErrorProvider ();
 		

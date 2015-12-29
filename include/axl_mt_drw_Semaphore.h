@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define _AXL_MT_PSX_SEMAPHORE_H
+#define _AXL_MT_DRW_SEMAPHORE_H
 
 #include "axl_sys_drw_MachError.h"
 

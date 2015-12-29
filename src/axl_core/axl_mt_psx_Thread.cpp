@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_mt_psx_Thread.h"
-#include "axl_g_Time.h"
+#include "axl_sys_Time.h"
 
 #include "axl_mt_Thread.h"
 
@@ -79,7 +79,7 @@ Thread::join (
 
 	default:
 		timespec timespec = { 0 };
-		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		sys::getAbsTimespecFromTimeout (timeout, &timespec);
 		result = ::pthread_timedjoin_np (m_threadId, retVal, &timespec);
 	}
 

@@ -7,6 +7,7 @@
 #define _AXL_IO_PSX_FD_H
 
 #include "axl_sl_Handle.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace io {
@@ -44,6 +45,48 @@ public:
 		uint_t openFlags = O_RDWR | O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
+
+	int
+	ioctl (int code)
+	{
+		int result = ::ioctl (m_h, code);
+		return err::complete (result, -1);
+	}
+
+	template <typename T>
+	int
+	ioctl (
+		int code,
+		T param
+		)
+	{
+		int result = ::ioctl (m_h, code, param);
+		if (result == -1)
+			err::setLastSystemError ();
+
+		return result;
+	}
+
+	int
+	fcntl (int code)
+	{
+		int result = ::fcntl (m_h, code);
+		return err::complete (result, -1);
+	}
+	
+	template <typename T>
+	int
+	fcntl (
+		int code,
+		T param
+		)
+	{
+		int result = ::fcntl (m_h, code, param);
+		if (result == -1)
+			err::setLastSystemError ();
+
+		return result;
+	}
 
 	bool
 	setBlockingMode (bool isBlocking);

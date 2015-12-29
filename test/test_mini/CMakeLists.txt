@@ -87,6 +87,13 @@ if (UNIX)
 		dl
 		)
 
+	if (LINUX)
+		target_link_libraries (
+			test_mini
+			udev
+			)
+	endif ()
+
 	if (NOT APPLE)
 		target_link_libraries (
 			test_mini

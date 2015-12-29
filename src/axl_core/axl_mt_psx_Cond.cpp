@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_mt_psx_Cond.h"
-#include "axl_g_Time.h"
+#include "axl_sys_Time.h"
 
 #include "axl_mt_Event.h"
 
@@ -26,7 +26,7 @@ Cond::wait (
 
 	default:
 		timespec timespec = { 0 };
-		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		sys::getAbsTimespecFromTimeout (timeout, &timespec);
 		result = ::pthread_cond_timedwait (&m_cond, mutex, &timespec);
 	}
 

@@ -100,7 +100,7 @@ extern "C" {
 #include <axl_gui_GdiEngine.h>
 #include <axl_ini_Parser.h>
 #include <axl_enc_Base32Encoding.h>
-#include <axl_g_Time.h>
+#include <axl_sys_Time.h>
 #include <axl_cry_EcKey.h>
 #include <axl_cry_EcPoint.h>
 

@@ -73,14 +73,12 @@ set (
 	${AXL_INC_DIR}/axl_g_Def.h
 	${AXL_INC_DIR}/axl_g_Module.h
 	${AXL_INC_DIR}/axl_g_Pch.h
-	${AXL_INC_DIR}/axl_g_Time.h
 	${AXL_INC_DIR}/axl_g_WarningSuppression.h
 	)
 
 set (
 	G_CPP_LIST
 	axl_g_Module.cpp
-	axl_g_Time.cpp
 	)
 
 source_group (
@@ -297,10 +295,12 @@ set (
 	SYS_H_LIST
 	${AXL_INC_DIR}/axl_sys_DynamicLibrary.h
 	${AXL_INC_DIR}/axl_sys_Process.h
+	${AXL_INC_DIR}/axl_sys_Time.h
 	)
 
 set (
 	SYS_CPP_LIST
+	axl_sys_Time.cpp
 	)
 
 source_group (
@@ -381,17 +381,45 @@ endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# sys_lnx folder
+#
+
+set (
+	SYS_LNX_H_LIST
+	${AXL_INC_DIR}/axl_sys_lnx_Udev.h
+	)
+
+set (
+	SYS_LNX_CPP_LIST
+	axl_sys_lnx_Udev.cpp
+	)
+
+source_group (
+	sys_lnx
+	FILES
+	${SYS_LNX_H_LIST}
+	${SYS_LNX_CPP_LIST}
+	)
+
+if (NOT LINUX)
+	exclude_from_build (${SYS_LNX_CPP_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # sys_drw folder
 #
 
 set (
 	SYS_DRW_H_LIST
 	${AXL_INC_DIR}/axl_sys_drw_MachError.h
+	${AXL_INC_DIR}/axl_sys_drw_IoKit.h
 	)
 
 set (
 	SYS_DRW_CPP_LIST
 	axl_sys_drw_MachError.cpp
+	axl_sys_drw_IoKit.cpp
 	)
 
 source_group (
@@ -608,6 +636,8 @@ add_library (
 	${SYS_PSX_CPP_LIST}
 	${SYS_WIN_H_LIST}
 	${SYS_WIN_CPP_LIST}
+	${SYS_LNX_H_LIST}
+	${SYS_LNX_CPP_LIST}
 	${SYS_DRW_H_LIST}
 	${SYS_DRW_CPP_LIST}
 	${OBJ_H_LIST}

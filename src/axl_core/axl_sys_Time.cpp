@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "axl_g_Time.h"
+#include "axl_sys_Time.h"
 #include "axl_mt_CallOnce.h"
 
 namespace axl {
-namespace g {	
+namespace sys {
 
 //.............................................................................
 
@@ -372,5 +372,5 @@ Time::format (
 
 //.............................................................................
 
-} // namespace g
+} // namespace sys
 } // namespace axl

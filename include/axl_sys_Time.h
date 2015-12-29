@@ -4,12 +4,12 @@
 
 #pragma once
 
-#define _AXL_G_TIME_H
+#define _AXL_SYS_TIME_H
 
 #include "axl_sl_String.h"
 
 namespace axl {
-namespace g {
+namespace sys {
 
 //.............................................................................
 
@@ -191,5 +191,5 @@ getAbsTimespecFromTimeout (
 
 //.............................................................................
 
-} // namespace g
+} // namespace sys
 } // namespace axl

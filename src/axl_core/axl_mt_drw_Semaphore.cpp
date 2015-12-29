@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_mt_drw_Semaphore.h"
-#include "axl_g_Time.h"
 
 namespace axl {
 namespace mt {

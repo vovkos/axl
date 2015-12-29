@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_mt_psx_Sem.h"
-#include "axl_g_Time.h"
+#include "axl_sys_Time.h"
 
 namespace axl {
 namespace mt {
@@ -27,7 +27,7 @@ Sem::wait (uint_t timeout)
 
 	default:
 		timespec timespec = { 0 };
-		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		sys::getAbsTimespecFromTimeout (timeout, &timespec);
 		result = sem_timedwait (&m_sem, &timespec);
 	}
 
@@ -80,7 +80,7 @@ NamedSem::wait (uint_t timeout)
 
 	default:
 		timespec timespec = { 0 };
-		g::getAbsTimespecFromTimeout (timeout, &timespec);
+		sys::getAbsTimespecFromTimeout (timeout, &timespec);
 		result = sem_timedwait (m_sem, &timespec);
 	}
 

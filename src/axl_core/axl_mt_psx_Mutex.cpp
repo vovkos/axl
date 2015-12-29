@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "axl_mt_psx_Mutex.h"
 #include "axl_err_Error.h"
-#include "axl_g_Time.h"
+#include "axl_sys_Time.h"
 
 namespace axl {
 namespace mt {
@@ -51,7 +51,7 @@ Mutex::lock (uint_t timeout)
 
 	default:
 		timespec ts = { 0 };
-		g::getAbsTimespecFromTimeout (timeout, &ts);
+		sys::getAbsTimespecFromTimeout (timeout, &ts);
 		result = ::pthread_mutex_timedlock (&m_mutex, &ts);
 	}
 
