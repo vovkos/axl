@@ -12,6 +12,9 @@
 #	include "axl_io_psx_Serial.h"
 #endif
 
+#include "axl_sl_BoxList.h"
+#include "axl_sl_String.h"
+
 namespace axl {
 namespace io {
 
@@ -210,6 +213,34 @@ public:
 
 //.............................................................................
 
+class SerialPortDesc: public sl::ListLink
+{
+	friend class SerialPortEnumerator;
+
+protected:
+	sl::String m_deviceName;
+	sl::String m_description;
+
+public:
+	sl::String 
+	getDeviceName ()
+	{
+		return m_deviceName;
+	}
+		
+	sl::String
+	getDescription ()
+	{
+		return m_description;
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+size_t
+createSerialPortDescList (sl::StdList <SerialPortDesc>* portList);
+
+//.............................................................................
+
 } // namespace io
 } // namespace axl
-

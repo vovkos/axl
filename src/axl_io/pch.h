@@ -5,6 +5,8 @@
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include <ws2tcpip.h>
 #	include <iphlpapi.h>
+#	include <winioctl.h>
+#	include <devguid.h>
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include <ifaddrs.h>
 #	include <net/if.h>

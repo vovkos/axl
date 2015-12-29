@@ -73,6 +73,13 @@ target_link_libraries (
 	axl_zip
 	)
 
+if (WIN32)
+	target_link_libraries (
+		test_mini
+		setupapi
+		)
+endif ()
+
 if (UNIX)
 	target_link_libraries (
 		test_mini

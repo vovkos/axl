@@ -102,11 +102,7 @@ public:
 	}
 
 	HKEY
-	openDeviceRegistryKey (REGSAM keyAccess) // KEY_ALL_ACCESS, KEY_QUERY_VALUE, KEY_SET_VALUE etc
-	{
-		HKEY key = ::SetupDiOpenDevRegKey (m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
-		return err::complete (key, (HKEY) INVALID_HANDLE_VALUE);
-	}
+	openDeviceRegistryKey (REGSAM keyAccess); // KEY_ALL_ACCESS, KEY_QUERY_VALUE, KEY_SET_VALUE etc
 
 	bool
 	getDeviceInstallParams (SP_DEVINSTALL_PARAMS_W* params)

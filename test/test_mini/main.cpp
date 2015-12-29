@@ -1892,6 +1892,21 @@ testZip ()
 
 //.............................................................................
 
+void
+testEnumSerial ()
+{
+	sl::StdList <io::SerialPortDesc> portList;
+	io::createSerialPortDescList (&portList);
+
+	sl::Iterator <io::SerialPortDesc> it = portList.getHead ();
+	for (; it; it++)
+		printf ("decice name: %s\ndescription: %s\n\n", it->getDeviceName ().cc (), it->getDescription ().cc ());
+
+	printf ("%d ports total\n", portList.getCount ());
+}
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1911,7 +1926,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testZip ();
+	testEnumSerial ();
 
 	return 0;
 }

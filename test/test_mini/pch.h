@@ -35,6 +35,7 @@ extern "C" {
 #include "axl_mt_LongJmpTry.h"
 #include "axl_sys_DynamicLibrary.h"
 #include "axl_io_Socket.h"
+#include "axl_io_Serial.h"
 #include "axl_io_File.h"
 #include "axl_io_NetworkAdapter.h"
 #include "axl_io_SharedMemoryTransport.h"

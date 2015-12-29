@@ -134,8 +134,9 @@ set (
 	axl_io_psx_Mapping.cpp
 	axl_io_psx_Pipe.cpp
 	axl_io_psx_Serial.cpp
+	axl_io_psx_SerialPortEnumerator.cpp
 	axl_io_psx_Socket.cpp
-	axl_io_psx_NetworkAdapter.cpp
+	axl_io_psx_NetworkAdapterEnumerator.cpp
 	)
 
 source_group (
@@ -173,8 +174,9 @@ set (
 	axl_io_win_Mapping.cpp
 	axl_io_win_NamedPipe.cpp
 	axl_io_win_Serial.cpp
+	axl_io_win_SerialPortEnumerator.cpp
 	axl_io_win_Socket.cpp
-	axl_io_win_NetworkAdapter.cpp
+	axl_io_win_NetworkAdapterEnumerator.cpp
 	)
 
 source_group (
@@ -186,6 +188,31 @@ source_group (
 
 if (NOT WIN32)
 	exclude_from_build (${IO_WIN_CPP_LIST})
+endif ()
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# io_drw folder
+#
+
+set (
+	IO_DRW_H_LIST
+	)
+
+set (
+	IO_DRW_CPP_LIST
+	axl_io_drw_SerialPortEnumerator.cpp
+	)
+
+source_group (
+	io_drw
+	FILES
+	${IO_DRW_H_LIST}
+	${IO_DRW_CPP_LIST}
+	)
+
+if (NOT APPLE)
+	exclude_from_build (${IO_DRW_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -234,10 +261,12 @@ add_library (
 	${IO_PCAP_CPP_LIST}
 	${IO_USB_H_LIST}
 	${IO_USB_CPP_LIST}
-	${IO_PSX_H_LIST}
-	${IO_PSX_CPP_LIST}
 	${IO_WIN_H_LIST}
 	${IO_WIN_CPP_LIST}
+	${IO_PSX_H_LIST}
+	${IO_PSX_CPP_LIST}
+	${IO_DRW_H_LIST}
+	${IO_DRW_CPP_LIST}
 	)
 
 set_pch (

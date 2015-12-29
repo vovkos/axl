@@ -50,6 +50,16 @@ DeviceInfo::getDeviceRegistryProperty (
 	return true;
 }
 
+HKEY
+DeviceInfo::openDeviceRegistryKey (REGSAM keyAccess)
+{
+	HKEY key = ::SetupDiOpenDevRegKey (m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
+	if (key == INVALID_HANDLE_VALUE)
+		err::setLastSystemError ();
+			
+	return key;
+}
+
 bool
 DeviceInfo::getClassInstallParams (sl::Array <char>* buffer)
 {

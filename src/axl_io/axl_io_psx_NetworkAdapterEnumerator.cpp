@@ -15,7 +15,7 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	buildAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList);
+	createAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
@@ -37,7 +37,7 @@ protected:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::buildAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList)
+NetworkAdapterEnumerator::createAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList)
 {
 	adapterList->clear ();
 
@@ -75,8 +75,6 @@ NetworkAdapterEnumerator::buildAdapterList (sl::StdList <NetworkAdapterDesc>* ad
 	freeifaddrs (ifaceAddressList);
 	return adapterList->getCount ();
 }
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 NetworkAdapterEnumerator::setupAdapter (
@@ -119,7 +117,7 @@ NetworkAdapterEnumerator::addAdapterAddress (
 size_t
 createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
 {
-	return NetworkAdapterEnumerator::buildAdapterList (adapterList);
+	return NetworkAdapterEnumerator::createAdapterList (adapterList);
 }
 
 //.............................................................................
