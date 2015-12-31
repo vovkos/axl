@@ -189,8 +189,10 @@ public:
 	sl::String
 	getDescription () const
 	{
-		CFStringRef desc = ::CFCopyDescription (m_p);
-		return getStringFromCfString (desc);
+		CFStringRef cfString = ::CFCopyDescription (m_p);
+		sl::String string = getStringFromCfString (cfString);
+		::CFRelease (cfString);
+		return string;
 	}
 
 	sl::String
