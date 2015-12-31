@@ -3,10 +3,14 @@
 #include "axl_sl_String.h"
 
 namespace axl {
-namespace g {
+namespace sys {
 
 void
 initQpc ();
+
+} // namespace sys
+
+namespace g {
 
 //.............................................................................
 
@@ -29,7 +33,7 @@ Module::Module ()
 	m_systemInfo.m_pageSize           = systemInfo.dwPageSize;
 	m_systemInfo.m_mappingAlignFactor = systemInfo.dwAllocationGranularity;
 
-	initQpc ();
+	sys::initQpc ();
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
