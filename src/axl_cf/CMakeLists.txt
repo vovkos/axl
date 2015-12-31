@@ -4,32 +4,30 @@
 
 #..............................................................................
 #
-# zip folder
+# lib folder
 #
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_zip_ZipReader.h
+	${AXL_INC_DIR}/axl_cf_Type.h
+	${AXL_INC_DIR}/axl_cf_Number.h
+	${AXL_INC_DIR}/axl_cf_String.h
+	${AXL_INC_DIR}/axl_cf_Dictionary.h
 	)
 
 set (
 	LIB_CPP_LIST
-	axl_zip_ZipReader.cpp
+	axl_cf_Type.cpp
+	axl_cf_Number.cpp
+	axl_cf_String.cpp
+	axl_cf_Dictionary.cpp
 	)
-
-set (
-	LIB_C_LIST
-	miniz.c
-	)
-
-exclude_from_build (miniz.c)
 
 source_group (
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	${LIB_C_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -40,44 +38,46 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
+set (
+	PCH_H_LIST
+	${PCH_H}
+	${AXL_INC_DIR}/axl_cf_Pch.h
+	)
+
 source_group (
 	pch
 	FILES
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	)
 
 #..............................................................................
 #
-# axl_zip library
+# axl_cf library
 #
 
-include_directories (
-	${AXL_INC_DIR}
-	)
+include_directories (${AXL_INC_DIR})
 
 add_library (
-	axl_zip
-	${PCH_H}
+	axl_cf
+	${PCH_H_LIST}
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	${LIB_C_LIST}
 	)
 
 set_pch (
-	axl_zip
+	axl_cf
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_target_string_property (
-		axl_zip
+		axl_cf
 		COMPILE_FLAGS
 		"-fPIC"
 		)
 endif ()
 
 #..............................................................................
-

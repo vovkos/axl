@@ -413,13 +413,11 @@ endif ()
 set (
 	SYS_DRW_H_LIST
 	${AXL_INC_DIR}/axl_sys_drw_MachError.h
-	${AXL_INC_DIR}/axl_sys_drw_IoKit.h
 	)
 
 set (
 	SYS_DRW_CPP_LIST
 	axl_sys_drw_MachError.cpp
-	axl_sys_drw_IoKit.cpp
 	)
 
 source_group (
@@ -558,34 +556,6 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# fsm folder
-#
-
-set (
-	FSM_H_LIST
-	${AXL_INC_DIR}/axl_fsm_Nfa.h
-	${AXL_INC_DIR}/axl_fsm_Dfa.h
-	${AXL_INC_DIR}/axl_fsm_RegExp.h
-	${AXL_INC_DIR}/axl_fsm_StdRegExpNameMgr.h
-	)
-
-set (
-	FSM_CPP_LIST
-	axl_fsm_Nfa.cpp
-	axl_fsm_Dfa.cpp
-	axl_fsm_RegExp.cpp
-	axl_fsm_StdRegExpNameMgr.cpp
-	)
-
-source_group (
-	fsm
-	FILES
-	${FSM_H_LIST}
-	${FSM_CPP_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # pch folder
 #
 
@@ -648,8 +618,6 @@ add_library (
 	${SL_CPP_LIST}
 	${ENC_H_LIST}
 	${ENC_CPP_LIST}
-	${FSM_H_LIST}
-	${FSM_CPP_LIST}
 	)
 
 set_pch (

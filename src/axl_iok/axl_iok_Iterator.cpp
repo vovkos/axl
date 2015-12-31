@@ -1,15 +1,22 @@
 #include "pch.h"
-#include "axl_sys_drw_IoKit.h"
-#include "axl_err_Error.h"
+#include "axl_iok_Iterator.h"
 
 namespace axl {
-namespace sys {
-namespace drw {
+namespace iok {
 
 //.............................................................................
 
+Object
+Iterator::next ()
+{
+	io_object_t p = ::IOIteratorNext (m_p);
+
+	Object object;
+	object.attach (p);
+	return object;
+}
+
 //.............................................................................
 
-} // namespace drw
-} // namespace sys
+} // namespace iok
 } // namespace axl

@@ -69,8 +69,9 @@ set_target_properties (
 target_link_libraries (
 	test_mini
 	axl_io
-	axl_core
+	axl_fsm
 	axl_zip
+	axl_core
 	)
 
 if (WIN32)
@@ -94,7 +95,18 @@ if (UNIX)
 			)
 	endif ()
 
-	if (NOT APPLE)
+	if (APPLE)
+		find_library (CORE_FOUNDATION_FRAMEWORK CoreFoundation)
+		find_library (IOKIT_FRAMEWORK IOKit)
+
+		target_link_libraries (
+			test_mini
+			axl_cf
+			axl_iok
+			${CORE_FOUNDATION_FRAMEWORK}
+			${IOKIT_FRAMEWORK}
+			)
+	else ()
 		target_link_libraries (
 			test_mini
 			rt

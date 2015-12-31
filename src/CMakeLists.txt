@@ -67,6 +67,18 @@ endif ()
 #..............................................................................
 
 option (
+	BUILD_AXL_FSM
+	"Build axl_fsm library (finite state machines)"
+	ON
+	)
+
+if (BUILD_AXL_FSM)
+	add_subdirectory (axl_fsm)
+endif ()
+
+#..............................................................................
+
+option (
 	BUILD_AXL_IO
 	"Build axl_io library"
 	ON
@@ -138,6 +150,30 @@ endif ()
 
 if (BUILD_AXL_CRY)
 	add_subdirectory (axl_cry)
+endif ()
+
+#..............................................................................
+
+if (APPLE)
+	option (
+		BUILD_AXL_CF
+		"Build axl_cf library (Core Foundation Framework wrappers)"
+		ON
+		)
+
+	option (
+		BUILD_AXL_IOK
+		"Build axl_iok library (IOKit Framework wrappers)"
+		ON
+		)
+endif ()
+
+if (BUILD_AXL_CF)
+	add_subdirectory (axl_cf)
+endif ()
+
+if (BUILD_AXL_IOK)
+	add_subdirectory (axl_iok)
 endif ()
 
 #..............................................................................

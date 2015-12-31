@@ -8,30 +8,30 @@
 #
 
 set (
-	LUA_H_LIST
+	LIB_H_LIST
 	${AXL_INC_DIR}/axl_lua_LuaState.h
 	${AXL_INC_DIR}/axl_lua_StringTemplate.h
 	axl_lua_StringTemplateLexer.h
 	)
 
 set (
-	LUA_CPP_LIST
+	LIB_CPP_LIST
 	axl_lua_LuaState.cpp
 	axl_lua_StringTemplate.cpp
 	axl_lua_StringTemplateLexer.cpp
 	)
 
 set (
-	LUA_RL_LIST
+	LIB_RL_LIST
 	axl_lua_StringTemplateLexer.rl
 	)
 
 source_group (
-	lua
+	lib
 	FILES
-	${LUA_H_LIST}
-	${LUA_CPP_LIST}
-	${LUA_RL_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
+	${LIB_RL_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -72,10 +72,17 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
+
+set (
+	PCH_H_LIST
+	${PCH_H}
+	${AXL_INC_DIR}/axl_lua_Pch.h
+	)
+
 source_group (
 	pch
 	FILES
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	)
 
@@ -92,11 +99,11 @@ include_directories (
 
 add_library (
 	axl_lua
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
-	${LUA_H_LIST}
-	${LUA_CPP_LIST}
-	${LUA_RL_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
+	${LIB_RL_LIST}
 	${GEN_RL_CPP_LIST}
 	)
 

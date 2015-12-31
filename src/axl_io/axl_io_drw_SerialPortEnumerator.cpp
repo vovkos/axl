@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_io_Serial.h"
+#include "axl_iok_RegistryEntry.h"
 
 namespace axl {
 namespace io {
@@ -12,14 +13,49 @@ public:
 	static
 	size_t
 	createPortList (sl::StdList <SerialPortDesc>* portList);
-
-protected:
-	static
-	SerialPortDesc* 
-	createPortDesc (sys::win::DeviceInfo* deviceInfo);
 };
 
 //.............................................................................
+
+#ifdef _AXL_DEBUG
+size_t
+printDeviceProperties (const iok::RegistryEntry& device)
+{
+	size_t indent = 0;
+
+	iok::RegistryEntry parent = device.getParentEntry ();
+	if (parent)
+		indent = printDeviceProperties (parent);
+
+	cf::MutableDictionaryRef propDict = device.getAllProperties ();
+
+	sl::Array <const void*> keyArray;
+	sl::Array <const void*> valueArray;
+
+	size_t count = propDict.getCount ();
+	propDict.getKeysAndValues (&keyArray, &valueArray);
+
+	for (size_t i = 0; i < indent; i++)
+		printf ("\t");
+
+	printf ("deviceName = %s\n", device.getName ().cc ());
+	for (size_t i = 0; i < count; i++)
+	{
+		for (size_t i = 0; i < indent; i++)
+			printf ("\t");
+
+		printf (
+			"%s = %s\n",
+			cf::TypeRef (keyArray [i]).toString ().cc (),
+			cf::TypeRef (valueArray [i]).toString ().cc ()
+			); 
+	}
+
+	printf ("\n");
+
+	return indent + 1;
+}
+#endif
 
 size_t
 SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
@@ -28,62 +64,40 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 
 	portList->clear ();
 
-	sys::win::DeviceInfoSet deviceInfoSet;
-	result = deviceInfoSet.create (GUID_CLASS_COMPORT);
-	if (!result)
-		return 0;
+	cf::MutableDictionaryRef dict = iok::createServiceMatchingDictionary (kIOSerialBSDServiceValue);
+	dict.setValue (CFSTR (kIOSerialBSDTypeKey), CFSTR (kIOSerialBSDAllTypes));
 
-	for (size_t i = 0;; i++)
+	iok::Iterator it = iok::findMatchingServices (dict);
+	iok::RegistryEntry port = it.next ().p ();
+	for (; port; port = it.next ().p ())
 	{
-		sys::win::DeviceInfo deviceInfo;
-		result = deviceInfoSet.getDeviceInfo (i, &deviceInfo);
-		if (!result)
-			continue;
+#ifdef _AXL_DEBUG
+		printDeviceProperties (port);
+#endif
 
-		SerialPortDesc* portDesc = createPortDesc (&deviceInfo);
-		if (portDesc)
-			portList->insertTail (portDesc);
+		sl::String name;
+		sl::String description;
+
+		cf::TypeRef prop = port.getProperty (kIOCalloutDeviceKey).p ();
+		if (!prop)
+		{
+			prop = port.getProperty (kIODialinDeviceKey).p ();
+			if (!prop)
+				continue;
+		}
+
+		name = prop.toString ();
+
+		prop = port.getProperty (kIOTTYDeviceKey);
+		description = prop ? prop.toString () : port.getName ();
+
+		SerialPortDesc* portDesc = AXL_MEM_NEW (SerialPortDesc);
+		portDesc->m_deviceName = name;
+		portDesc->m_description = description;
+		portList->insertTail (portDesc);
 	}
 
 	return portList->getCount ();
-}
-
-SerialPortDesc* 
-SerialPortEnumerator::createPortDesc (sys::win::DeviceInfo* deviceInfo)
-{
-	int result;
-
-	sys::win::RegKeyHandle devRegKey = deviceInfo->openDeviceRegistryKey (KEY_QUERY_VALUE);
-	if (devRegKey == INVALID_HANDLE_VALUE)
-		return NULL;
-
-	dword_t type = 0;
-	dword_t size = 0;
-
-	result = ::RegQueryValueExA (devRegKey, "PortName", NULL, &type, NULL, &size);
-	if (result != ERROR_SUCCESS)
-		return NULL;
-
-	char buffer [256];
-	sl::Array <char> bufferString (ref::BufKind_Stack, buffer, sizeof (buffer));
-	bufferString.setCount (size);
-
-	result = ::RegQueryValueExA (
-		devRegKey,
-		"PortName",
-		NULL,
-		&type,
-		(byte_t*) bufferString.a (),
-		&size
-		);
-
-	if (result != ERROR_SUCCESS)
-		return NULL;
-
-	SerialPortDesc* portDesc = AXL_MEM_NEW (SerialPortDesc);
-	portDesc->m_portName = buffer;
-	deviceInfo->getDeviceRegistryProperty (SPDRP_DEVICEDESC, &portDesc->m_description);
-	return portDesc;
 }
 
 //.............................................................................

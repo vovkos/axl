@@ -37,7 +37,7 @@ completeUdevErrno (int result)
 	if (result != 0)
 	{
 		err::setError (-result);
-		false;
+		return false;
 	}
 
 	return true;

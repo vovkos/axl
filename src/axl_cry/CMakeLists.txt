@@ -24,7 +24,7 @@ set (
 	)
 
 source_group (
-	cry
+	lib
 	FILES
 	${CRY_H_LIST}
 	${CRY_CPP_LIST}
@@ -38,10 +38,16 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
+set (
+	PCH_H_LIST
+	${PCH_H}
+	${AXL_INC_DIR}/axl_cry_Pch.h
+	)
+
 source_group (
 	pch
 	FILES
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	)
 
@@ -57,7 +63,7 @@ include_directories (
 
 add_library (
 	axl_cry
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	${CRY_H_LIST}
 	${CRY_CPP_LIST}

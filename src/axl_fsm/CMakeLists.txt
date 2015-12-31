@@ -4,33 +4,32 @@
 
 #..............................................................................
 #
-# zip folder
+# lib folder
 #
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_zip_ZipReader.h
+	${AXL_INC_DIR}/axl_fsm_Nfa.h
+	${AXL_INC_DIR}/axl_fsm_Dfa.h
+	${AXL_INC_DIR}/axl_fsm_RegExp.h
+	${AXL_INC_DIR}/axl_fsm_StdRegExpNameMgr.h
 	)
 
 set (
 	LIB_CPP_LIST
-	axl_zip_ZipReader.cpp
+	axl_fsm_Nfa.cpp
+	axl_fsm_Dfa.cpp
+	axl_fsm_RegExp.cpp
+	axl_fsm_StdRegExpNameMgr.cpp
 	)
-
-set (
-	LIB_C_LIST
-	miniz.c
-	)
-
-exclude_from_build (miniz.c)
 
 source_group (
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	${LIB_C_LIST}
 	)
+
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -49,35 +48,31 @@ source_group (
 
 #..............................................................................
 #
-# axl_zip library
+# axl_fsm library (finite state machines)
 #
 
-include_directories (
-	${AXL_INC_DIR}
-	)
+include_directories (${AXL_INC_DIR})
 
 add_library (
-	axl_zip
+	axl_fsm
 	${PCH_H}
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	${LIB_C_LIST}
 	)
 
 set_pch (
-	axl_zip
+	axl_fsm
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_target_string_property (
-		axl_zip
+		axl_fsm
 		COMPILE_FLAGS
 		"-fPIC"
 		)
 endif ()
 
 #..............................................................................
-

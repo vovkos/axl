@@ -26,7 +26,7 @@ set (
 	)
 
 source_group (
-	ini
+	lib
 	FILES
 	${INI_H_LIST}
 	${INI_CPP_LIST}
