@@ -88,7 +88,7 @@ if (UNIX)
 		dl
 		)
 
-	if (LINUX)
+	if (LINUX AND LIBUDEV_FOUND)
 		target_link_libraries (
 			test_mini
 			udev
