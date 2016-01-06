@@ -41,13 +41,6 @@ public:
 //.............................................................................
 
 template <typename T>
-const char*
-getTypeName ()
-{
-	return typeid (T).name ();
-}
-
-template <typename T>
 void
 stdDelete (T* p)
 {
@@ -60,16 +53,16 @@ stdDelete (T* p)
 #ifdef _AXL_DEBUG
 
 #define AXL_MEM_NEW(T) \
-	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T), axl::mem::getTypeName <T> ())) T)
+	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T), #T)) T)
 
 #define AXL_MEM_NEW_EXTRA(T, extra) \
-	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T) + extra, axl::mem::getTypeName <T> ())) T)
+	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T) + extra, #T)) T)
 
 #define AXL_MEM_NEW_ARGS(T, args) \
-	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T), axl::mem::getTypeName <T> ())) T args)
+	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T), #T)) T args)
 
 #define AXL_MEM_NEW_ARGS_EXTRA(T, args, extra) \
-	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T) + extra, axl::mem::getTypeName <T> ())) T args)
+	(new (AXL_MEM_ZERO_ALLOCATE_EX (sizeof (T) + extra, #T)) T args)
 
 #else
 

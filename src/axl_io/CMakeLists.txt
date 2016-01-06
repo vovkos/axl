@@ -275,6 +275,10 @@ else ()
 	exclude_from_build (${IO_USB_CPP_LIST})
 endif ()
 
+if (BUILD_AXL_SYS_LNX_LIBUDEV)
+	add_definitions (-D_AXL_SYS_LNX_LIBUDEV)
+endif ()
+
 add_library (
 	axl_io
 	${PCH_H}

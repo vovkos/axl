@@ -60,10 +60,10 @@ primeInPlaceRefCount (
 #ifdef _AXL_DEBUG
 
 #define AXL_REF_ALLOCATE(T) \
-	axl::ref::postAllocateRefCount (AXL_MEM_ZERO_ALLOCATE_EX (AXL_REF_ALLOC_SIZEOF(T), axl::mem::getTypeName <T> ()))
+	axl::ref::postAllocateRefCount (AXL_MEM_ZERO_ALLOCATE_EX (AXL_REF_ALLOC_SIZEOF(T), #T))
 
 #define AXL_REF_ALLOCATE_EXTRA(T, extra) \
-	axl::ref::postAllocateRefCount (AXL_MEM_ZERO_ALLOCATE_EX (AXL_REF_ALLOC_SIZEOF(T) + extra, axl::mem::getTypeName <T> ()))
+	axl::ref::postAllocateRefCount (AXL_MEM_ZERO_ALLOCATE_EX (AXL_REF_ALLOC_SIZEOF(T) + extra, #T))
 
 #else
 

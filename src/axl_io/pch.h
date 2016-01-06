@@ -15,7 +15,7 @@
 #	include <ifaddrs.h>
 #	include <net/if.h>
 #	include <netdb.h>
-#	if (_AXL_POSIX == AXL_POSIX_LINUX)
+#	if (_AXL_POSIX == AXL_POSIX_LINUX && _AXL_SYS_LNX_LIBUDEV)
 #		include <libudev.h>
 #		include <linux/serial.h>
 #	elif (_AXL_POSIX == AXL_POSIX_DARWIN)

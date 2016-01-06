@@ -27,13 +27,6 @@ public:
 	}
 
 	static
-	const char*
-	getName ()
-	{ 
-		return typeid (T).name ();
-	}
-
-	static
 	void
 	construct (void* p)
 	{
@@ -61,13 +54,6 @@ public:
 	getSize ()
 	{ 
 		return 0;
-	}
-
-	static
-	const char*
-	getName ()
-	{ 
-		return typeid (void).name ();
 	}
 
 	static

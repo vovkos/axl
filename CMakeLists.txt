@@ -23,6 +23,7 @@ check_and_print_libs (
 		RAGEL
 		LUA
 		PCAP
+		LIBUDEV
 		LIBUSB
 		OPENSSL
 		QT

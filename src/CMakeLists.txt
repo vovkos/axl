@@ -4,6 +4,18 @@
 
 #..............................................................................
 
+if (LINUX)
+	if (${LIBUDEV_FOUND})
+		option (
+			BUILD_AXL_SYS_LNX_LIBUDEV
+			"Build LibUdev wrappers for axl_core library"
+			ON
+			)
+	else ()
+		unset (BUILD_AXL_SYS_LNX_LIBUDEV CACHE)
+	endif ()
+endif ()
+
 add_subdirectory (axl_core)
 
 #..............................................................................

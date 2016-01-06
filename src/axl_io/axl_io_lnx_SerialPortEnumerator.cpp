@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "axl_io_Serial.h"
 #include "axl_io_psx_Fd.h"
-#include "axl_sys_lnx_Udev.h"
+
+#ifdef _AXL_SYS_LNX_LIBUDEV
+#	include "axl_sys_lnx_Udev.h"
+#endif
 
 namespace axl {
 namespace io {
@@ -23,6 +26,7 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 {
 	portList->clear ();
 
+#ifdef _AXL_SYS_LNX_LIBUDEV
 	sys::lnx::UdevContext udev;
 	sys::lnx::UdevEnumerator enumerator = udev.createEnumerator ();
 
@@ -77,7 +81,24 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 		portDesc->m_description = description;
 		portList->insertTail (portDesc);
 	}
-
+#else
+	static const char* deviceNameTable [] [2] = 
+	{
+		{ "/dev/ttyS0",   "Serial device /dev/ttyS0" },
+		{ "/dev/ttyS1",   "Serial device /dev/ttyS1" },
+		{ "/dev/ttyUSB0", "USB Serial device /dev/ttyUSB0" },
+		{ "/dev/ttyUSB1", "USB Serial device /dev/ttyUSB1" },
+	};
+	
+	for (size_t i = 0; i < countof (deviceNameTable); i++)
+	{
+		SerialPortDesc* portDesc = AXL_MEM_NEW (SerialPortDesc);
+		portDesc->m_deviceName = deviceNameTable [i] [0];
+		portDesc->m_description = deviceNameTable [i] [1];
+		portList->insertTail (portDesc);		
+	}	
+#endif
+	
 	return portList->getCount ();
 }
 

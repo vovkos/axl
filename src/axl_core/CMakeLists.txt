@@ -390,8 +390,13 @@ set (
 	)
 
 set (
-	SYS_LNX_CPP_LIST
+	SYS_LNX_LIBUDEV_CPP_LIST
 	axl_sys_lnx_Udev.cpp
+	)
+
+set (
+	SYS_LNX_CPP_LIST
+	${SYS_LNX_LIBUDEV_CPP_LIST}
 	)
 
 source_group (
@@ -575,6 +580,12 @@ source_group (
 #
 
 include_directories (${AXL_INC_DIR})
+
+if (BUILD_AXL_SYS_LNX_LIBUDEV)
+	add_definitions (-D_AXL_SYS_LNX_LIBUDEV)
+else ()
+	exclude_from_build (${SYS_LNX_LIBUDEV_CPP_LIST})
+endif ()
 
 add_library (
 	axl_core
