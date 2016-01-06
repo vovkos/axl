@@ -37,8 +37,10 @@ getTimestamp ()
 	gettimeofday (&tval, NULL);
 	tspec.tv_sec = tval.tv_sec;
 	tspec.tv_nsec = tval.tv_usec * 1000;
-#	else
+#	elif (defined CLOCK_REALTIME_COARSE)
 	clock_gettime (CLOCK_REALTIME_COARSE, &tspec);
+#	else
+	clock_gettime (CLOCK_REALTIME, &tspec);
 #	endif
 	timestamp = (uint64_t) tspec.tv_sec * 10000000 + tspec.tv_nsec / 100;
 #endif
