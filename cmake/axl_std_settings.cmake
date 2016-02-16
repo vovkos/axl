@@ -156,11 +156,15 @@ endmacro ()
 macro (
 axl_create_gcc_settings)
 
-	option (
-		GCC_USE_PCH
-		"Use precompiled headers in GNU C/C++"
-		ON
-		)		
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		unset (GCC_USE_PCH CACHE) # axl pch does not work on clang yet
+	else ()
+		option (
+			GCC_USE_PCH
+			"Use precompiled headers in GNU C/C++"
+			ON
+			)		
+	endif ()
 
 	axl_create_c_cxx_flag_setting (
 		GCC_FLAG_SHOW_INCLUDES
