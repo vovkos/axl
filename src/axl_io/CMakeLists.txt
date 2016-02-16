@@ -49,7 +49,7 @@ set (
 
 # temporarily exclude until i port axl_exe
 
-exclude_from_build (
+axl_exclude_from_build (
 	axl_io_ConnectionSock.cpp
 	axl_io_DgramSock.cpp
 	axl_io_ListenerSock.cpp
@@ -146,7 +146,7 @@ source_group (
 	)
 
 if (NOT UNIX)
-	exclude_from_build (${IO_PSX_CPP_LIST})
+	axl_exclude_from_build (${IO_PSX_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -186,7 +186,7 @@ source_group (
 	)
 
 if (NOT WIN32)
-	exclude_from_build (${IO_WIN_CPP_LIST})
+	axl_exclude_from_build (${IO_WIN_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -211,7 +211,7 @@ source_group (
 	)
 
 if (NOT LINUX)
-	exclude_from_build (${IO_LNX_CPP_LIST})
+	axl_exclude_from_build (${IO_LNX_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -236,7 +236,7 @@ source_group (
 	)
 
 if (NOT APPLE)
-	exclude_from_build (${IO_DRW_CPP_LIST})
+	axl_exclude_from_build (${IO_DRW_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -265,14 +265,14 @@ if (BUILD_AXL_IO_PCAP)
 	include_directories (${PCAP_INC_DIR})
 	add_definitions (-D_AXL_IO_PCAP)
 else ()
-	exclude_from_build (${IO_PCAP_CPP_LIST})
+	axl_exclude_from_build (${IO_PCAP_CPP_LIST})
 endif ()
 
 if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
 	add_definitions (-D_AXL_IO_USB)
 else ()
-	exclude_from_build (${IO_USB_CPP_LIST})
+	axl_exclude_from_build (${IO_USB_CPP_LIST})
 endif ()
 
 if (BUILD_AXL_SYS_LNX_LIBUDEV)
@@ -299,14 +299,14 @@ add_library (
 	${IO_DRW_CPP_LIST}
 	)
 
-set_pch (
+axl_set_pch (
 	axl_io
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (WIN32)
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_io
 		STATIC_LIBRARY_FLAGS 
 		"/IGNORE:4221"
@@ -314,7 +314,7 @@ if (WIN32)
 endif ()
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_io
 		COMPILE_FLAGS
 		"-fPIC"

@@ -69,14 +69,14 @@ add_library (
 	${CRY_CPP_LIST}
 	)
 
-set_pch (
+axl_set_pch (
 	axl_cry
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_cry
 		COMPILE_FLAGS
 		"-fPIC"

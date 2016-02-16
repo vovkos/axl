@@ -51,7 +51,7 @@ source_group (
 	${SRC_CPP_LIST}
 	)
 
-exclude_from_build (
+axl_exclude_from_build (
 	test_Log.cpp
 	test_Packer.cpp
 	)
@@ -116,7 +116,7 @@ if (WIN32)
 		)
 endif ()
 
-set_pch (
+axl_set_pch (
 	test_con
 	${PCH_H}
 	${PCH_CPP}

@@ -41,21 +41,21 @@ source_group (
 set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
 file (MAKE_DIRECTORY ${GEN_DIR})
 
-push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
+axl_push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
 
 add_ragel_step (
 	axl_ini_Lexer.rl.cpp
 	axl_ini_Lexer.rl
 	)
 
-pop (CMAKE_CURRENT_BINARY_DIR)
+axl_pop (CMAKE_CURRENT_BINARY_DIR)
 
 set (
 	GEN_RL_CPP_LIST
 	${GEN_DIR}/axl_ini_Lexer.rl.cpp
 	)
 
-exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
+axl_exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
 
 source_group (
 	gen
@@ -98,14 +98,14 @@ add_library (
 	${GEN_RL_CPP_LIST}
 	)
 
-set_pch (
+axl_set_pch (
 	axl_ini
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_ini
 		COMPILE_FLAGS
 		"-fPIC"

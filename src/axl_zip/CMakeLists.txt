@@ -22,7 +22,7 @@ set (
 	miniz.c
 	)
 
-exclude_from_build (miniz.c)
+axl_exclude_from_build (miniz.c)
 
 source_group (
 	lib
@@ -65,14 +65,14 @@ add_library (
 	${LIB_C_LIST}
 	)
 
-set_pch (
+axl_set_pch (
 	axl_zip
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_zip
 		COMPILE_FLAGS
 		"-fPIC"

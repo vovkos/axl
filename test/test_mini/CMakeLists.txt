@@ -133,7 +133,7 @@ if (BUILD_AXL_IO_USB)
 	endif ()
 endif ()
 
-set_pch (
+axl_set_pch (
 	test_mini
 	${PCH_H}
 	${PCH_CPP}

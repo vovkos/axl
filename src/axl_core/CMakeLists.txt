@@ -57,7 +57,7 @@ source_group (
 	)
 
 if (NOT WIN32)
-	exclude_from_build (
+	axl_exclude_from_build (
 		axl_err_NtError.cpp
 		axl_err_WinError.cpp
 		)
@@ -159,7 +159,7 @@ source_group (
 	)
 
 if (NOT WIN32)
-	exclude_from_build (${MEM_WIN_CPP_LIST})
+	axl_exclude_from_build (${MEM_WIN_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -225,7 +225,7 @@ source_group (
 	)
 
 if (NOT UNIX)
-	exclude_from_build (${MT_PSX_CPP_LIST})
+	axl_exclude_from_build (${MT_PSX_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -257,7 +257,7 @@ source_group (
 	)
 
 if (NOT WIN32)
-	exclude_from_build (${MT_WIN_CPP_LIST})
+	axl_exclude_from_build (${MT_WIN_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -283,7 +283,7 @@ source_group (
 	)
 
 if (NOT APPLE)
-	exclude_from_build (${MT_DRW_CPP_LIST})
+	axl_exclude_from_build (${MT_DRW_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -333,7 +333,7 @@ source_group (
 	)
 
 if (NOT UNIX)
-	exclude_from_build (${SYS_PSX_CPP_LIST})
+	axl_exclude_from_build (${SYS_PSX_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -376,7 +376,7 @@ source_group (
 	)
 
 if (NOT WIN32)
-	exclude_from_build (${SYS_WIN_CPP_LIST})
+	axl_exclude_from_build (${SYS_WIN_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -407,7 +407,7 @@ source_group (
 	)
 
 if (NOT LINUX)
-	exclude_from_build (${SYS_LNX_CPP_LIST})
+	axl_exclude_from_build (${SYS_LNX_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -433,7 +433,7 @@ source_group (
 	)
 
 if (NOT APPLE)
-	exclude_from_build (${SYS_DRW_CPP_LIST})
+	axl_exclude_from_build (${SYS_DRW_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -584,7 +584,7 @@ include_directories (${AXL_INC_DIR})
 if (BUILD_AXL_SYS_LNX_LIBUDEV)
 	add_definitions (-D_AXL_SYS_LNX_LIBUDEV)
 else ()
-	exclude_from_build (${SYS_LNX_LIBUDEV_CPP_LIST})
+	axl_exclude_from_build (${SYS_LNX_LIBUDEV_CPP_LIST})
 endif ()
 
 add_library (
@@ -631,14 +631,14 @@ add_library (
 	${ENC_CPP_LIST}
 	)
 
-set_pch (
+axl_set_pch (
 	axl_core
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_core
 		COMPILE_FLAGS
 		"-fPIC -fvisibility=hidden"
@@ -646,7 +646,7 @@ if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif ()
 
 if (WIN32)
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_core
 		STATIC_LIBRARY_FLAGS 
 		"/IGNORE:4221"

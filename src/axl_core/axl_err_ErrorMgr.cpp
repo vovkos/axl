@@ -63,7 +63,7 @@ ErrorMgr::getLastError ()
 	ThreadEntry* entry = findThreadEntry ();
 	if (entry && entry->m_error)
 		return entry->m_error;  
-    
+	
 	return &g_noError;
 }
 

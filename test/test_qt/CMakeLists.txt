@@ -34,7 +34,7 @@ source_group (
 set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
 file (MAKE_DIRECTORY ${GEN_DIR})
 
-push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
+axl_push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
 
 set (
 	MOC_H_LIST
@@ -47,9 +47,9 @@ qt5_wrap_cpp_alt (
 	${MOC_H_LIST}
 	)
 
-pop (CMAKE_CURRENT_BINARY_DIR)
+axl_pop (CMAKE_CURRENT_BINARY_DIR)
 
-exclude_from_build (${GEN_MOC_CPP_LIST}) # include "moc_*.cpp" manually
+axl_exclude_from_build (${GEN_MOC_CPP_LIST}) # include "moc_*.cpp" manually
 
 source_group (
 	gen
@@ -93,7 +93,7 @@ add_executable (
 	${GEN_MOC_CPP_LIST}
 	)
 
-set_pch (
+axl_set_pch (
 	test_qt
 	${PCH_H}
 	${PCH_CPP}

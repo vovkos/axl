@@ -83,7 +83,7 @@ source_group (
 	)
 
 if (NOT BUILD_AXL_GUI_GDI)
-	exclude_from_build (${GUI_GDI_CPP_LIST})
+	axl_exclude_from_build (${GUI_GDI_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -113,7 +113,7 @@ source_group (
 	)
 
 if (NOT BUILD_AXL_GUI_QT)
-	exclude_from_build (${GUI_QT_CPP_LIST})
+	axl_exclude_from_build (${GUI_QT_CPP_LIST})
 endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -159,14 +159,14 @@ if (BUILD_AXL_GUI_QT)
 	qt5_use_modules (axl_gui Widgets)
 endif ()
 
-set_pch (
+axl_set_pch (
 	axl_gui
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_target_string_property (
+	axl_add_target_string_property (
 		axl_gui
 		COMPILE_FLAGS
 		"-fPIC"

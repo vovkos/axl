@@ -1,16 +1,20 @@
-set (VERSION_MAJOR     5)
-set (VERSION_MINOR     5)
-set (VERSION_REVISION  3)
-set (VERSION_TAG)
+#..............................................................................
 
-set (VERSION_FILE_SUFFIX "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
+set (AXL_VERSION_MAJOR     5)
+set (AXL_VERSION_MINOR     5)
+set (AXL_VERSION_REVISION  3)
+set (AXL_VERSION_TAG)
 
-if (NOT "${VERSION_TAG}" STREQUAL "")
-	set (VERSION_TAG_SUFFIX " ${VERSION_TAG}")
-	set (VERSION_FILE_SUFFIX "${VERSION_FILE_SUFFIX}-${VERSION_TAG}")
+set (AXL_VERSION_FILE_SUFFIX "${AXL_VERSION_MAJOR}.${AXL_VERSION_MINOR}.${AXL_VERSION_REVISION}")
+
+if (NOT "${AXL_VERSION_TAG}" STREQUAL "")
+	set (AXL_VERSION_TAG_SUFFIX " ${AXL_VERSION_TAG}")
+	set (AXL_VERSION_FILE_SUFFIX "${AXL_VERSION_FILE_SUFFIX}-${AXL_VERSION_TAG}")
 else ()
-	set (VERSION_TAG_SUFFIX)
+	set (AXL_VERSION_TAG_SUFFIX)
 endif ()
 
-set (VERSION_COMPANY   "Tibbo Technology Inc")
-set (VERSION_YEARS     "2007-2015")
+set (AXL_VERSION_COMPANY   "Tibbo Technology Inc")
+set (AXL_VERSION_YEARS     "2007-2016")
+
+#..............................................................................
