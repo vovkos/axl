@@ -7,7 +7,7 @@
 #define _AXL_INI_LEXER_H
 
 #include "axl_lex_Token.h"
-#include "axl_err_ParseError.h"
+#include "axl_lex_ParseError.h"
 #include "axl_enc_EscapeEncoding.h"
 
 namespace axl {
@@ -165,7 +165,7 @@ protected: // should only be used as part of ini::CParser
 		if (!result)
 		{
 			err::setStringError ("invalid syntax");
-			err::pushSrcPosError (m_filePath, m_line, p - m_begin - m_lineOffset);
+			lex::pushSrcPosError (m_filePath, m_line, p - m_begin - m_lineOffset);
 			return ScanResultKind_Error;
 		}
 		

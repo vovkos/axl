@@ -9,7 +9,7 @@
 #include "axl_sl_Pack.h"
 
 namespace axl {
-namespace err {
+namespace lex {
 
 //.............................................................................
 
@@ -30,12 +30,12 @@ enum ParseErrorCode
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ParseErrorProvider: public ErrorProvider
+class ParseErrorProvider: public err::ErrorProvider
 {
 public:
 	virtual 
 	sl::String 
-	getErrorDescription (const ErrorHdr* error);
+	getErrorDescription (const err::ErrorHdr* error);
 };
 
 //.............................................................................
@@ -46,21 +46,21 @@ inline
 void 
 registerParseErrorProvider ()
 {
-	getErrorMgr ()->registerProvider (
+	err::getErrorMgr ()->registerProvider (
 		g_parseErrorGuid, 
 		mt::getSimpleSingleton <ParseErrorProvider> ()
 		);
 }
 
 inline
-Error
+err::Error
 pushSrcPosError (
 	const char* filePath,
 	int line,
 	int col = 0
 	)
 {
-	return pushPackError <sl::PackSeq_3 <const char*, int, int> > (
+	return err::pushPackError <sl::PackSeq_3 <const char*, int, int> > (
 		g_parseErrorGuid,
 		ParseErrorCode_SrcPos, 
 		filePath, 
@@ -70,63 +70,63 @@ pushSrcPosError (
 }
 
 inline
-Error
+err::Error
 pushSrcPosError (
 	const char* filePath,
-	const lex::LineCol& lineCol
+	const LineCol& lineCol
 	)
 {
 	return pushSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
 }
 
 inline
-Error
-pushSrcPosError (const lex::SrcPos& srcPos)
+err::Error
+pushSrcPosError (const SrcPos& srcPos)
 {
 	return pushSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
 inline
-Error
+err::Error
 ensureSrcPosError (
 	const char* filePath,
 	int line,
 	int col = 0
 	)
 {
-	Error error = getLastError ();
+	err::Error error = err::getLastError ();
 	return error->isKind (g_parseErrorGuid, ParseErrorCode_SrcPos) ? error : pushSrcPosError (filePath, line, col);
 }
 
 inline
-Error
+err::Error
 ensureSrcPosError (
 	const char* filePath,
-	const lex::LineCol& lineCol
+	const LineCol& lineCol
 	)
 {
 	return ensureSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
 }
 
 inline
-Error
-ensureSrcPosError (const lex::SrcPos& srcPos)
+err::Error
+ensureSrcPosError (const SrcPos& srcPos)
 {
 	return ensureSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
 inline
-Error
+err::Error
 setSyntaxError ()
 {
-	return setError (g_parseErrorGuid, ParseErrorCode_InvalidSyntax);
+	return err::setError (g_parseErrorGuid, ParseErrorCode_InvalidSyntax);
 }
 
 inline
-Error
+err::Error
 setSyntaxError (const char* location)
 {
-	return setPackError <sl::Pack <const char*> > (
+	return err::setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_InvalidSyntaxIn, 
 		location
@@ -134,13 +134,13 @@ setSyntaxError (const char* location)
 }
 
 inline
-Error
+err::Error
 setExpectedTokenError (
 	const char* expectedToken,
 	const char* actualToken
 	)
 {
-	return setPackError <sl::PackSeq_2 <const char*, const char*> > (
+	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_ExpectedToken, 
 		expectedToken,
@@ -149,10 +149,10 @@ setExpectedTokenError (
 }
 
 inline
-Error
+err::Error
 setUnexpectedTokenError (const char* token)
 {
-	return setPackError <sl::Pack <const char*> > (
+	return err::setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedToken, 
 		token
@@ -160,13 +160,13 @@ setUnexpectedTokenError (const char* token)
 }
 
 inline
-Error
+err::Error
 setUnexpectedTokenError (
 	const char* token,
 	const char* location
 	)
 {
-	return setPackError <sl::PackSeq_2 <const char*, const char*> > (
+	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedTokenIn, 
 		token,
@@ -176,6 +176,6 @@ setUnexpectedTokenError (
 
 //.............................................................................
 
-} // namespace err
+} // namespace lex
 } // namespace axl
 

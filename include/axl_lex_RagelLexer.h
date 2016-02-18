@@ -181,7 +181,7 @@ public:
 		if (token->m_token == tokenKind)
 			return token;
 
-		err::setExpectedTokenError (Token::getName (tokenKind), token->getName ());
+		lex::setExpectedTokenError (Token::getName (tokenKind), token->getName ());
 		return NULL;
 	}
 
@@ -189,8 +189,8 @@ public:
 	ensureSrcPosError ()
 	{
 		err::Error error = err::getLastError ();
-		if (!error->isKind (err::g_parseErrorGuid, err::ParseErrorCode_SrcPos))
-			err::pushSrcPosError (
+		if (!error->isKind (lex::g_parseErrorGuid, lex::ParseErrorCode_SrcPos))
+			lex::pushSrcPosError (
 				m_filePath, 
 				this->m_lastTokenPos.m_line, 
 				this->m_lastTokenPos.m_col 
@@ -378,16 +378,15 @@ protected:
 		}
 	}
 
-
 	// to be implemented in lexer instance:
 
 	// void
-	// Init ()
+	// init ()
 	// {
 	// }
 
 	// void
-	// Exec ()
+	// exec ()
 	// {
 	// }
 };

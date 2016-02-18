@@ -104,7 +104,7 @@ extractUserCode (
 		}
 		else if (token->m_token == TokenKind_Eof)
 		{
-			err::setUnexpectedTokenError ("eof", "user-code");
+			lex::setUnexpectedTokenError ("eof", "user-code");
 			return false;
 		}
 		else if (token->m_token == openBracket)

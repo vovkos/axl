@@ -1,16 +1,16 @@
 #include "pch.h"
-#include "axl_err_ParseError.h"
+#include "axl_lex_ParseError.h"
 #include "axl_sl_Unpacker.h"
 
 namespace axl {
-namespace err {
+namespace lex {
 
 //.............................................................................
 
 sl::String 
-ParseErrorProvider::getErrorDescription (const ErrorHdr* error)
+ParseErrorProvider::getErrorDescription (const err::ErrorHdr* error)
 {
-	sl::Unpacker unpacker (error + 1, error->m_size - sizeof (ErrorHdr));
+	sl::Unpacker unpacker (error + 1, error->m_size - sizeof (err::ErrorHdr));
 
 	sl::String string;
 
@@ -83,6 +83,6 @@ ParseErrorProvider::getErrorDescription (const ErrorHdr* error)
 
 //.............................................................................
 
-} // namespace err
+} // namespace lex
 } // namespace axl
 

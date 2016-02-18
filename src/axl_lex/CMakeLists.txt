@@ -8,28 +8,24 @@
 #
 
 set (
-	LIB_H_LIST
-	${AXL_INC_DIR}/axl_fsm_Nfa.h
-	${AXL_INC_DIR}/axl_fsm_Dfa.h
-	${AXL_INC_DIR}/axl_fsm_RegExp.h
-	${AXL_INC_DIR}/axl_fsm_StdRegExpNameMgr.h
+	LEX_H_LIST
+	${AXL_INC_DIR}/axl_lex_Lexer.h
+	${AXL_INC_DIR}/axl_lex_RagelLexer.h
+	${AXL_INC_DIR}/axl_lex_Token.h
+	${AXL_INC_DIR}/axl_lex_ParseError.h
 	)
 
 set (
-	LIB_CPP_LIST
-	axl_fsm_Nfa.cpp
-	axl_fsm_Dfa.cpp
-	axl_fsm_RegExp.cpp
-	axl_fsm_StdRegExpNameMgr.cpp
+	LEX_CPP_LIST
+	axl_lex_ParseError.cpp
 	)
 
 source_group (
-	lib
+	lex
 	FILES
-	${LIB_H_LIST}
-	${LIB_CPP_LIST}
+	${LEX_H_LIST}
+	${LEX_CPP_LIST}
 	)
-
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -48,30 +44,30 @@ source_group (
 
 #..............................................................................
 #
-# axl_fsm library (finite state machines)
+# axl_lex library
 #
 
 include_directories (${AXL_INC_DIR})
 
 add_library (
-	axl_fsm
+	axl_lex
 	${PCH_H}
 	${PCH_CPP}
-	${LIB_H_LIST}
-	${LIB_CPP_LIST}
+	${LEX_H_LIST}
+	${LEX_CPP_LIST}
 	)
 
 axl_set_pch (
-	axl_fsm
+	axl_lex
 	${PCH_H}
 	${PCH_CPP}
 	)
 
 if (GCC)
 	axl_add_target_string_property (
-		axl_fsm
+		axl_core
 		COMPILE_FLAGS
-		"-fPIC"
+		"-fPIC -fvisibility=hidden"
 		)
 endif ()
 

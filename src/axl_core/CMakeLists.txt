@@ -35,7 +35,6 @@ set (
 	${AXL_INC_DIR}/axl_err_Error.h
 	${AXL_INC_DIR}/axl_err_ErrorMgr.h
 	${AXL_INC_DIR}/axl_err_NtError.h
-	${AXL_INC_DIR}/axl_err_ParseError.h
 	${AXL_INC_DIR}/axl_err_WinError.h		
 	)
 
@@ -45,7 +44,6 @@ set (
 	axl_err_Error.cpp
 	axl_err_ErrorMgr.cpp
 	axl_err_NtError.cpp
-	axl_err_ParseError.cpp
 	axl_err_WinError.cpp
 	)
 
@@ -86,27 +84,6 @@ source_group (
 	FILES
 	${G_H_LIST}
 	${G_CPP_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# lex folder
-#
-
-set (
-	LEX_H_LIST
-	${AXL_INC_DIR}/axl_lex_Lexer.h
-	${AXL_INC_DIR}/axl_lex_RagelLexer.h
-	${AXL_INC_DIR}/axl_lex_Token.h
-	)
-
-set (LEX_CPP_LIST)
-
-source_group (
-	lex
-	FILES
-	${LEX_H_LIST}
-	${LEX_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -597,8 +574,6 @@ add_library (
 	${ERR_CPP_LIST}
 	${G_H_LIST}
 	${G_CPP_LIST}
-	${LEX_H_LIST}
-	${LEX_CPP_LIST}
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
 	${MEM_WIN_H_LIST}
@@ -637,7 +612,7 @@ axl_set_pch (
 	${PCH_CPP}
 	)
 
-if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if (GCC)
 	axl_add_target_string_property (
 		axl_core
 		COMPILE_FLAGS

@@ -122,6 +122,18 @@ endif ()
 
 #..............................................................................
 
+option (
+	BUILD_AXL_LEX
+	"Build axl_lex library"
+	ON
+	)
+
+if (BUILD_AXL_LEX)
+	add_subdirectory (axl_lex)
+endif ()
+
+#..............................................................................
+
 if (${RAGEL_FOUND} AND ${LUA_FOUND})
 	option (
 		BUILD_AXL_LUA

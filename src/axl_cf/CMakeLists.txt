@@ -72,7 +72,7 @@ axl_set_pch (
 	${PCH_CPP}
 	)
 
-if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if (GCC)
 	axl_add_target_string_property (
 		axl_cf
 		COMPILE_FLAGS
