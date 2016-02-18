@@ -280,7 +280,7 @@ public:
 	getWndClass ()
 	{
 		static WNDCLASS* wndClass = NULL;
-		mt::callOnce (RegisterWndClass (), &wndClass);
+		sl::callOnce (RegisterWndClass (), &wndClass);
 		return wndClass;
 	}
 

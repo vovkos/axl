@@ -11,7 +11,7 @@
 #include "axl_gui_Image.h"
 #include "axl_gui_QtCaret.h"
 #include "axl_sl_StringHashTable.h"
-#include "axl_mt_Singleton.h"
+#include "axl_sl_Singleton.h"
 
 namespace axl {
 namespace gui {
@@ -493,7 +493,7 @@ inline
 Engine* 
 getQtEngine ()
 {
-	return mt::getSingleton <QtEngine> ();
+	return sl::getSingleton <QtEngine> ();
 }
 
 //.............................................................................

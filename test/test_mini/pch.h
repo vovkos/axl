@@ -32,7 +32,7 @@ extern "C" {
 #include "axl_fsm_RegExp.h"
 #include "axl_fsm_StdRegExpNameMgr.h"
 #include "axl_sl_AutoPtrArray.h"
-#include "axl_mt_LongJmpTry.h"
+#include "axl_sys_LongJmpTry.h"
 #include "axl_sys_DynamicLibrary.h"
 #include "axl_io_Socket.h"
 #include "axl_io_Serial.h"
@@ -40,7 +40,7 @@ extern "C" {
 #include "axl_io_NetworkAdapter.h"
 #include "axl_io_SharedMemoryTransport.h"
 #include "axl_sys_Time.h"
-#include "axl_mt_Event.h"
+#include "axl_sys_Event.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_zip_ZipReader.h"
 
@@ -49,13 +49,13 @@ extern "C" {
 #endif
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-#	include "axl_mem_win_VirtualMemory.h"
+#	include "axl_sys_win_VirtualMemory.h"
 #	include "axl_sys_win_Process.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 #	include "axl_io_psx_Mapping.h"
-#	include "axl_mt_psx_Sem.h"
+#	include "axl_sys_psx_Sem.h"
 #	if (_AXL_POSIX == AXL_POSIX_DARWIN)
-#		include "axl_mt_drw_Semaphore.h"
+#		include "axl_sys_drw_Semaphore.h"
 #	endif
 #endif
 

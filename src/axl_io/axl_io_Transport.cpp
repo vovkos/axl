@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_io_Transport.h"
-#include "axl_mt_Event.h"
+#include "axl_sys_Event.h"
 
 namespace axl {
 namespace io {
@@ -9,7 +9,7 @@ namespace io {
 
 void
 onSyncSendRecvComplete (
-	mt::Event* event,
+	sys::Event* event,
 	err::Error* error_o,
 	size_t* actualSize,
 
@@ -32,12 +32,12 @@ Asyncransport::syncSend (
 	size_t size
 	)
 {
-	mt::Event event;
+	sys::Event event;
 	err::Error error;
 	size_t actualSize;
 
 	exe::Function <
-		exe::ArgSeq_3 <mt::Event*, err::Error*, size_t*>,
+		exe::ArgSeq_3 <sys::Event*, err::Error*, size_t*>,
 		OnRecvCompleteArg
 		> onComplete (onSyncSendRecvComplete, &event, &error, &actualSize);
 
@@ -59,12 +59,12 @@ Asyncransport::syncRecv (
 	size_t size
 	)
 {
-	mt::Event event;
+	sys::Event event;
 	err::Error error;
 	size_t actualSize;
 
 	exe::Function <
-		exe::ArgSeq_3 <mt::Event*, err::Error*, size_t*>,
+		exe::ArgSeq_3 <sys::Event*, err::Error*, size_t*>,
 		OnRecvCompleteArg
 		> onComplete (onSyncSendRecvComplete, &event, &error, &actualSize);
 

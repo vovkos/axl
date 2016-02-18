@@ -103,7 +103,7 @@ ConnectionSock::disconnect (
 
 void
 onSyncConnectDisconnectComplete (
-	mt::Event* event,
+	sys::Event* event,
 	err::ErrorHdr* error,
 	const err::Error& error
 	)
@@ -120,11 +120,11 @@ ConnectionSock::syncConnect (
 	uint_t timeout
 	)
 {
-	mt::Event event;
+	sys::Event event;
 	err::Error error;
 
 	exe::Function <
-		exe::ArgSeq_2 <mt::Event*, err::Error*>,
+		exe::ArgSeq_2 <sys::Event*, err::Error*>,
 		OnConnectCompleteArg
 		> onComplete (onSyncConnectDisconnectComplete, &event, &error);
 
@@ -143,11 +143,11 @@ ConnectionSock::syncConnect (
 bool
 ConnectionSock::syncDisconnect (uint_t timeout)
 {
-	mt::Event event;
+	sys::Event event;
 	err::Error error;
 
 	exe::Function <
-		exe::ArgSeq_2 <mt::Event*, err::Error*>,
+		exe::ArgSeq_2 <sys::Event*, err::Error*>,
 		OnDisconnectCompleteArg
 		> onComplete (onSyncConnectDisconnectComplete, &event, &error);
 

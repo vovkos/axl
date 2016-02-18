@@ -7,7 +7,7 @@
 #define _AXL_REF_REFCOUNT_H
 
 #include "axl_mem_StdAllocator.h"
-#include "axl_mt_Atomic.h"
+#include "axl_sys_Atomic.h"
 
 namespace axl {
 namespace ref {
@@ -100,7 +100,7 @@ public:
 	size_t
 	addRef ()
 	{ 
-		return mt::atomicInc (&m_refCount); 
+		return sys::atomicInc (&m_refCount); 
 	}
 
 	size_t
@@ -109,7 +109,7 @@ public:
 	size_t
 	addWeakRef ()
 	{ 
-		return mt::atomicInc (&m_weakRefCount); 
+		return sys::atomicInc (&m_weakRefCount); 
 	}
 
 	size_t

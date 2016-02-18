@@ -7,7 +7,7 @@
 #define _AXL_IO_WIN_HANDLE_H
 
 #include "axl_sys_win_Handle.h"
-#include "axl_mt_Event.h"
+#include "axl_sys_Event.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -41,7 +41,7 @@ public:
 class StdOverlapped: public OVERLAPPED
 {
 public:
-	mt::NotificationEvent m_completionEvent;
+	sys::NotificationEvent m_completionEvent;
 
 public:
 	StdOverlapped ()

@@ -7,7 +7,7 @@
 #define _AXL_DBG_TRACE_H
 
 #include "axl_g_Def.h"
-#include "axl_mt_Atomic.h"
+#include "axl_sys_Atomic.h"
 
 namespace axl {
 namespace dbg {
@@ -89,7 +89,7 @@ inline
 void
 setTraceFilter (uint_t level)
 {
-	mt::atomicXchg ((volatile int32_t*) &g_traceFilter, makeTraceFilter (level));
+	sys::atomicXchg ((volatile int32_t*) &g_traceFilter, makeTraceFilter (level));
 }
 
 void

@@ -7,13 +7,13 @@
 #define _AXL_IO_SHAREDMEMORYTRANSPORT_H
 
 #include "axl_io_Mapping.h"
-#include "axl_mt_Lock.h"
+#include "axl_sys_Lock.h"
 #include "axl_sl_Array.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-#	include "axl_mt_win_Event.h"
+#	include "axl_sys_win_Event.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include "axl_mt_psx_Sem.h"
+#	include "axl_sys_psx_Sem.h"
 #endif
 
 namespace axl {
@@ -79,11 +79,11 @@ protected:
 	int32_t m_pendingReqCount;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	mt::win::Event m_readEvent;
-	mt::win::Event m_writeEvent;
+	sys::win::Event m_readEvent;
+	sys::win::Event m_writeEvent;
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-	mt::psx::NamedSem m_readEvent;
-	mt::psx::NamedSem m_writeEvent;
+	sys::psx::NamedSem m_readEvent;
+	sys::psx::NamedSem m_writeEvent;
 	sl::String m_readEventName;
 	sl::String m_writeEventName;
 #endif
@@ -169,7 +169,7 @@ class SharedMemoryWriter: public SharedMemoryTransportBase
 {
 protected:
 	size_t m_sizeLimitHint;
-	mt::Lock m_writeLock; // make write operations atomic
+	sys::Lock m_writeLock; // make write operations atomic
 
 public:
 	SharedMemoryWriter ()

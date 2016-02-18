@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_g_WarningSuppression.h"
-#include "axl_mt_Thread.h"
+#include "axl_sys_Thread.h"
 #include "axl_err_Errno.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -1198,7 +1198,7 @@ testUsb ()
 
 #if (_AXL_ENV == AXL_ENV_POSIX)
 
-class MyThread: public mt::ThreadImpl <MyThread>
+class MyThread: public sys::ThreadImpl <MyThread>
 {
 public:
 	volatile bool m_terminateFlag;
@@ -1385,9 +1385,9 @@ protected:
 	volatile int32_t m_handshakeCounter;
 
 #if (_AXL_POSIX == AXL_POSIX_DARWIN)
-	mt::drw::Semaphore m_handshakeSem;
+	sys::drw::Semaphore m_handshakeSem;
 #else
-	mt::psx::Sem m_handshakeSem;
+	sys::psx::Sem m_handshakeSem;
 #endif
 
 	sigset_t m_signalWaitMask;
@@ -1486,7 +1486,7 @@ protected:
 			g_gc->m_handshakeKind != HandshakeKind_StopTheWorld)
 			return; // ignore
 
-		int32_t count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		int32_t count = sys::atomicDec (&g_gc->m_handshakeCounter);
 		if (!count)
 			g_gc->m_handshakeSem.signal ();
 
@@ -1495,7 +1495,7 @@ protected:
 			sigsuspend (&g_gc->m_signalWaitMask);
 		} while (g_gc->m_handshakeKind != HandshakeKind_ResumeTheWorld);
 
-		count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		count = sys::atomicDec (&g_gc->m_handshakeCounter);
 		if (!count)
 			g_gc->m_handshakeSem.signal ();
 	}
@@ -1524,14 +1524,14 @@ protected:
 	};
 
 protected:
-	mem::win::VirtualMemory m_guardPage;
+	sys::win::VirtualMemory m_guardPage;
 
 	sl::HashTableMap <uint64_t, bool, sl::HashId <uint64_t> > m_threadMap;
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
-	mt::Event m_handshakeEvent;
-	mt::NotificationEvent m_resumeEvent;
+	sys::Event m_handshakeEvent;
+	sys::NotificationEvent m_resumeEvent;
 
 public:
 	Gc ()
@@ -1547,7 +1547,7 @@ public:
 	void
 	gcSafePoint ()
 	{
-		mt::atomicXchg ((volatile int*) m_guardPage.p (), 0);
+		sys::atomicXchg ((volatile int*) m_guardPage.p (), 0);
 	}
 
 	void
@@ -1596,7 +1596,7 @@ public:
 		   m_handshakeKind != HandshakeKind_StopTheWorld) 
 		  return EXCEPTION_CONTINUE_SEARCH;
 
-		int32_t count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		int32_t count = sys::atomicDec (&g_gc->m_handshakeCounter);
 		if (!count)
 			g_gc->m_handshakeEvent.signal ();
 
@@ -1605,7 +1605,7 @@ public:
 			g_gc->m_resumeEvent.wait ();
 		} while (m_handshakeKind != HandshakeKind_ResumeTheWorld);
 
-		count = mt::atomicDec (&g_gc->m_handshakeCounter);
+		count = sys::atomicDec (&g_gc->m_handshakeCounter);
 		if (!count)
 			g_gc->m_handshakeEvent.signal ();
 
@@ -1618,7 +1618,7 @@ public:
 
 #endif
 
-class MutatorThread: public mt::ThreadImpl <MutatorThread>
+class MutatorThread: public sys::ThreadImpl <MutatorThread>
 {
 protected:
 	volatile bool m_terminateFlag;
@@ -1640,7 +1640,7 @@ public:
 	void
 	threadFunc ()
 	{
-		uint64_t threadId = mt::getCurrentThreadId ();
+		uint64_t threadId = sys::getCurrentThreadId ();
 
 		GC_BEGIN ()
 

@@ -2,7 +2,7 @@
 #include "axl_fsm_RegExp.h"
 #include "axl_err_Error.h"
 #include "axl_sl_String.h"
-#include "axl_mt_CallOnce.h"
+#include "axl_sl_CallOnce.h"
 
 namespace axl {
 namespace fsm {
@@ -204,7 +204,7 @@ RegExpCompiler::Token::isValidSingle ()
 		return true;
 
 	static bool validSingleTable [256] = { 0 };
-	mt::callOnce (initValidSingleTable, validSingleTable);
+	sl::callOnce (initValidSingleTable, validSingleTable);
 	return validSingleTable [(uchar_t) m_char];
 }
 

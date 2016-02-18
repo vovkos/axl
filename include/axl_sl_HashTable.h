@@ -350,7 +350,7 @@ public: \
 	Iterator \
 	find (Key key) \
 	{ \
-		return axl::mt::getSingleton <Map> ()->find (key); \
+		return axl::sl::getSingleton <Map> ()->find (key); \
 	} \
 	Iterator \
 	operator () (Key key) \

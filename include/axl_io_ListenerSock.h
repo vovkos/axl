@@ -23,7 +23,7 @@ public:
 
 protected:
 	ref::Ptr <exe::Workerhread> m_workerThread;
-	mt::Event m_event;
+	sys::Event m_event;
 	handle_t m_hWorkerThreadEvent;
 	exe::Function m_onAccept;
 

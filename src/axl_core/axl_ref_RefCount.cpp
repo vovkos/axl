@@ -31,7 +31,7 @@ RefCount::prime (
 size_t
 RefCount::release ()
 {
-	intptr_t refCount = mt::atomicDec (&m_refCount);
+	intptr_t refCount = sys::atomicDec (&m_refCount);
 	 
 	if (!refCount)
 	{
@@ -45,7 +45,7 @@ RefCount::release ()
 size_t
 RefCount::weakRelease ()
 {
-	intptr_t refCount = mt::atomicDec (&m_weakRefCount);
+	intptr_t refCount = sys::atomicDec (&m_weakRefCount);
 
 	if (!refCount)
 		if (m_flags & RefCountFlag_Allocated)
@@ -71,7 +71,7 @@ RefCount::addRefByWeakPtr ()
 		if (old == 0)
 			return 0;
 
-		if (mt::atomicCmpXchg (&m_refCount, old, old + 1) == old)
+		if (sys::atomicCmpXchg (&m_refCount, old, old + 1) == old)
 			return old + 1;
 	}
 }

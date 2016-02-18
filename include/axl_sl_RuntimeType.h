@@ -183,7 +183,7 @@ public:
 	ITypeSimpleImplT*
 	getSingleton ()
 	{
-		return mt::getSimpleSingleton <ITypeSimpleImplT> ();
+		return sl::getSimpleSingleton <ITypeSimpleImplT> ();
 	}
 };
 
@@ -209,7 +209,7 @@ public:
 	ITypeClassImplT*
 	getSingleton ()
 	{
-		return mt::getSimpleSingleton <ITypeClassImplT> ();
+		return sl::getSimpleSingleton <ITypeClassImplT> ();
 	}
 };
 

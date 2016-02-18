@@ -98,7 +98,7 @@ SharedMemoryTransportBase::attach (
 			return false;
 		}
 
-		mt::atomicLock (&m_hdr->m_lock);
+		sys::atomicLock (&m_hdr->m_lock);
 
 		if (m_hdr->m_state != SharedMemoryTransportState_MasterConnected ||
 			m_hdr->m_readOffset != 0)
@@ -109,7 +109,7 @@ SharedMemoryTransportBase::attach (
 
 		m_hdr->m_state = SharedMemoryTransportState_SlaveConnected;
 
-		mt::atomicUnlock (&m_hdr->m_lock);
+		sys::atomicUnlock (&m_hdr->m_lock);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 		result =
@@ -156,13 +156,13 @@ SharedMemoryTransportBase::closeImpl ()
 #if (_AXL_ENV == AXL_ENV_POSIX)
 	if (!m_readEventName.isEmpty ())
 	{
-		mt::psx::NamedSem::unlink (m_readEventName);
+		sys::psx::NamedSem::unlink (m_readEventName);
 		m_readEventName.clear ();
 	}
 
 	if (!m_writeEventName.isEmpty ())
 	{
-		mt::psx::NamedSem::unlink (m_writeEventName);
+		sys::psx::NamedSem::unlink (m_writeEventName);
 		m_writeEventName.clear ();
 	}
 #endif
@@ -171,7 +171,7 @@ SharedMemoryTransportBase::closeImpl ()
 void
 SharedMemoryTransportBase::disconnect ()
 {
-	mt::atomicLock (&m_hdr->m_lock);
+	sys::atomicLock (&m_hdr->m_lock);
 	m_hdr->m_state = SharedMemoryTransportState_Disconnected;
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -182,7 +182,7 @@ SharedMemoryTransportBase::disconnect ()
 	m_writeEvent.post ();
 #endif
 
-	mt::atomicUnlock (&m_hdr->m_lock);
+	sys::atomicUnlock (&m_hdr->m_lock);
 }
 
 bool
@@ -230,7 +230,7 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 {
 	ASSERT (isOpen ());
 
-	mt::atomicLock (&m_hdr->m_lock);
+	sys::atomicLock (&m_hdr->m_lock);
 
 	// wait until we have any data or remote disconnects
 
@@ -238,16 +238,16 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 		!m_hdr->m_dataSize &&
 		m_hdr->m_state != SharedMemoryTransportState_Disconnected)
 	{
-		mt::atomicUnlock (&m_hdr->m_lock);
+		sys::atomicUnlock (&m_hdr->m_lock);
 		m_writeEvent.wait ();
-		mt::atomicLock (&m_hdr->m_lock);
+		sys::atomicLock (&m_hdr->m_lock);
 	}
 
 	if (!m_hdr->m_dataSize)
 	{
 		ASSERT (m_hdr->m_state == SharedMemoryTransportState_Disconnected);
 
-		mt::atomicUnlock (&m_hdr->m_lock);
+		sys::atomicUnlock (&m_hdr->m_lock);
 		err::setError (err::SystemErrorCode_InvalidDeviceState);
 		return -1;
 	}
@@ -257,7 +257,7 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 	size_t readOffset = m_hdr->m_readOffset;
 	size_t writeOffset = m_hdr->m_writeOffset;
 	size_t endOffset = m_hdr->m_endOffset;
-	mt::atomicUnlock (&m_hdr->m_lock);
+	sys::atomicUnlock (&m_hdr->m_lock);
 
 	bool result = ensureOffsetMapped (endOffset);
 	if (!result)
@@ -279,7 +279,7 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 
 		buffer->copy ((const char*) (msgHdr + 1), readSize);
 
-		mt::atomicLock (&m_hdr->m_lock);
+		sys::atomicLock (&m_hdr->m_lock);
 		ASSERT (readEndOffset <= m_hdr->m_endOffset);
 
 		m_hdr->m_readOffset = m_hdr->m_endOffset != m_hdr->m_writeOffset && readEndOffset >= m_hdr->m_endOffset ?
@@ -307,12 +307,12 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 				memcpy (*buffer + size1, m_data + 1, size2);
 		}
 
-		mt::atomicLock (&m_hdr->m_lock);
+		sys::atomicLock (&m_hdr->m_lock);
 		m_hdr->m_readOffset = writeOffset;
 	}
 
 	m_hdr->m_dataSize -= readSize;
-	mt::atomicUnlock (&m_hdr->m_lock);
+	sys::atomicUnlock (&m_hdr->m_lock);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	m_readEvent.signal ();
@@ -382,9 +382,9 @@ SharedMemoryWriter::write (
 	if (m_flags & SharedMemoryTransportFlag_Message)
 		writeSize += sizeof (SharedMemoryTransportMessageHdr);
 
-	mt::ScopeLock scopeLock (&m_writeLock); // ensure atomic write
+	sys::ScopeLock scopeLock (&m_writeLock); // ensure atomic write
 
-	mt::atomicLock (&m_hdr->m_lock);
+	sys::atomicLock (&m_hdr->m_lock);
 
 	// if buffer is wrapped, then wait until we have enough space
 
@@ -394,21 +394,21 @@ SharedMemoryWriter::write (
 		m_hdr->m_state != SharedMemoryTransportState_Disconnected
 		)
 	{
-		mt::atomicUnlock (&m_hdr->m_lock);
+		sys::atomicUnlock (&m_hdr->m_lock);
 		m_readEvent.wait ();
-		mt::atomicLock (&m_hdr->m_lock);
+		sys::atomicLock (&m_hdr->m_lock);
 	}
 
 	if (m_hdr->m_state == SharedMemoryTransportState_Disconnected)
 	{
-		mt::atomicUnlock (&m_hdr->m_lock);
+		sys::atomicUnlock (&m_hdr->m_lock);
 		err::setError (err::SystemErrorCode_InvalidDeviceState);
 		return -1;
 	}
 
 	size_t writeOffset = m_hdr->m_writeOffset;
 
-	mt::atomicUnlock (&m_hdr->m_lock);
+	sys::atomicUnlock (&m_hdr->m_lock);
 
 	size_t writeEndOffset = writeOffset + writeSize;
 
@@ -428,7 +428,7 @@ SharedMemoryWriter::write (
 		copyWriteChain (m_data + writeOffset, blockArray, sizeArray, count);
 	}
 
-	mt::atomicLock (&m_hdr->m_lock);
+	sys::atomicLock (&m_hdr->m_lock);
 
 	if (m_hdr->m_writeOffset <= m_hdr->m_readOffset && m_hdr->m_dataSize) // wrapped
 	{
@@ -441,7 +441,7 @@ SharedMemoryWriter::write (
 	}
 
 	m_hdr->m_dataSize += chainSize;
-	mt::atomicUnlock (&m_hdr->m_lock);
+	sys::atomicUnlock (&m_hdr->m_lock);
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 	m_writeEvent.signal ();

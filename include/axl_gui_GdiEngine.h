@@ -32,7 +32,7 @@ public:
 	GdiEngine*
 	getSingleton ()
 	{
-		return mt::getSingleton <GdiEngine> ();
+		return sl::getSingleton <GdiEngine> ();
 	}
 
 	// fonts

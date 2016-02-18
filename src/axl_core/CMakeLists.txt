@@ -63,7 +63,7 @@ endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# axl_g folder
+# g folder
 #
 
 set (
@@ -96,7 +96,6 @@ set (
 	${AXL_INC_DIR}/axl_mem_StdAllocator.h
 	${AXL_INC_DIR}/axl_mem_Block.h
 	${AXL_INC_DIR}/axl_mem_New.h
-	${AXL_INC_DIR}/axl_mem_HeapAlloc.h
 	${AXL_INC_DIR}/axl_mem_Malloc.h
 	${AXL_INC_DIR}/axl_mem_Tracker.h
 	)
@@ -115,161 +114,20 @@ source_group (
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# mem_win folder
-#
-
-set (
-	MEM_WIN_H_LIST
-	${AXL_INC_DIR}/axl_mem_win_VirtualMemory.h
-	)
-
-set (
-	MEM_WIN_CPP_LIST
-	axl_mem_win_VirtualMemory.cpp
-	)
-
-source_group (
-	mem_win
-	FILES
-	${MEM_WIN_H_LIST}
-	${MEM_WIN_CPP_LIST}
-	)
-
-if (NOT WIN32)
-	axl_exclude_from_build (${MEM_WIN_CPP_LIST})
-endif ()
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# mt folder
-#
-
-set (
-	MT_H_LIST
-	${AXL_INC_DIR}/axl_mt_Atomic.h
-	${AXL_INC_DIR}/axl_mt_CallOnce.h
-	${AXL_INC_DIR}/axl_mt_SimpleSingleton.h
-	${AXL_INC_DIR}/axl_mt_Singleton.h
-	${AXL_INC_DIR}/axl_mt_Event.h
-	${AXL_INC_DIR}/axl_mt_InvSemaphore.h
-	${AXL_INC_DIR}/axl_mt_Lock.h
-	${AXL_INC_DIR}/axl_mt_LongJmpTry.h
-	${AXL_INC_DIR}/axl_mt_Semaphore.h
-	${AXL_INC_DIR}/axl_mt_Thread.h
-	${AXL_INC_DIR}/axl_mt_TlsMgr.h
-	${AXL_INC_DIR}/axl_mt_TlsSlot.h
-	)
-
-set (
-	MT_CPP_LIST
-	axl_mt_TlsMgr.cpp
-	)
-
-source_group (
-	mt
-	FILES
-	${MT_H_LIST}
-	${MT_CPP_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# mt_psx folder
-#
-
-set (
-	MT_PSX_H_LIST
-	${AXL_INC_DIR}/axl_mt_psx_Cond.h
-	${AXL_INC_DIR}/axl_mt_psx_Mutex.h
-	${AXL_INC_DIR}/axl_mt_psx_Sem.h
-	${AXL_INC_DIR}/axl_mt_psx_Thread.h
-	)
-
-set (
-	MT_PSX_CPP_LIST
-	axl_mt_psx_Cond.cpp
-	axl_mt_psx_Event.cpp
-	axl_mt_psx_Mutex.cpp
-	axl_mt_psx_Sem.cpp
-	axl_mt_psx_Thread.cpp
-	)
-
-source_group (
-	mt_psx
-	FILES
-	${MT_PSX_H_LIST}
-	${MT_PSX_CPP_LIST}
-	)
-
-if (NOT UNIX)
-	axl_exclude_from_build (${MT_PSX_CPP_LIST})
-endif ()
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# mt_win folder
-#
-
-set (
-	MT_WIN_H_LIST
-	${AXL_INC_DIR}/axl_mt_win_CriticalSection.h
-	${AXL_INC_DIR}/axl_mt_win_Event.h
-	${AXL_INC_DIR}/axl_mt_win_Semaphore.h
-	${AXL_INC_DIR}/axl_mt_win_Thread.h
-	${AXL_INC_DIR}/axl_mt_win_WaitableHandle.h
-	${AXL_INC_DIR}/axl_mt_win_WaitableTimer.h
-	)
-
-set (
-	MT_WIN_CPP_LIST
-	axl_mt_win_Thread.cpp
-	axl_mt_win_WaitableHandle.cpp
-	)
-
-source_group (
-	mt_win
-	FILES
-	${MT_WIN_H_LIST}
-	${MT_WIN_CPP_LIST}
-	)
-
-if (NOT WIN32)
-	axl_exclude_from_build (${MT_WIN_CPP_LIST})
-endif ()
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# mt_drw folder
-#
-
-set (
-	MT_DRW_H_LIST
-	${AXL_INC_DIR}/axl_mt_drw_Semaphore.h
-	)
-
-set (
-	MT_DRW_CPP_LIST
-	axl_mt_drw_Semaphore.cpp
-	)
-
-source_group (
-	mt_drw
-	FILES
-	${MT_DRW_H_LIST}
-	${MT_DRW_CPP_LIST}
-	)
-
-if (NOT APPLE)
-	axl_exclude_from_build (${MT_DRW_CPP_LIST})
-endif ()
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # sys folder
 #
 
 set (
 	SYS_H_LIST
+	${AXL_INC_DIR}/axl_sys_Atomic.h
+	${AXL_INC_DIR}/axl_sys_Event.h
+	${AXL_INC_DIR}/axl_sys_Lock.h
+	${AXL_INC_DIR}/axl_sys_LongJmpTry.h
+	${AXL_INC_DIR}/axl_sys_Semaphore.h
+	${AXL_INC_DIR}/axl_sys_InvSemaphore.h
+	${AXL_INC_DIR}/axl_sys_Thread.h
+	${AXL_INC_DIR}/axl_sys_TlsMgr.h
+	${AXL_INC_DIR}/axl_sys_TlsSlot.h
 	${AXL_INC_DIR}/axl_sys_DynamicLibrary.h
 	${AXL_INC_DIR}/axl_sys_Process.h
 	${AXL_INC_DIR}/axl_sys_Time.h
@@ -277,6 +135,7 @@ set (
 
 set (
 	SYS_CPP_LIST
+	axl_sys_TlsMgr.cpp
 	axl_sys_Time.cpp
 	)
 
@@ -294,11 +153,20 @@ source_group (
 
 set (
 	SYS_PSX_H_LIST
+	${AXL_INC_DIR}/axl_sys_psx_Cond.h
+	${AXL_INC_DIR}/axl_sys_psx_Mutex.h
+	${AXL_INC_DIR}/axl_sys_psx_Sem.h
+	${AXL_INC_DIR}/axl_sys_psx_Thread.h
 	${AXL_INC_DIR}/axl_sys_psx_DynamicLibrary.h
 	)
 
 set (
 	SYS_PSX_CPP_LIST
+	axl_sys_psx_Cond.cpp
+	axl_sys_psx_Event.cpp
+	axl_sys_psx_Mutex.cpp
+	axl_sys_psx_Sem.cpp
+	axl_sys_psx_Thread.cpp
 	axl_sys_psx_DynamicLibrary.cpp
 	)
 
@@ -320,6 +188,12 @@ endif ()
 
 set (
 	SYS_WIN_H_LIST
+	${AXL_INC_DIR}/axl_sys_win_CriticalSection.h
+	${AXL_INC_DIR}/axl_sys_win_Event.h
+	${AXL_INC_DIR}/axl_sys_win_Semaphore.h
+	${AXL_INC_DIR}/axl_sys_win_Thread.h
+	${AXL_INC_DIR}/axl_sys_win_WaitableHandle.h
+	${AXL_INC_DIR}/axl_sys_win_WaitableTimer.h
 	${AXL_INC_DIR}/axl_sys_win_Handle.h
 	${AXL_INC_DIR}/axl_sys_win_PerfCounter.h
 	${AXL_INC_DIR}/axl_sys_win_JobObject.h
@@ -331,10 +205,14 @@ set (
 	${AXL_INC_DIR}/axl_sys_win_Process.h
 	${AXL_INC_DIR}/axl_sys_win_AccessToken.h
 	${AXL_INC_DIR}/axl_sys_win_Sid.h
+	${AXL_INC_DIR}/axl_sys_win_HeapAlloc.h
+	${AXL_INC_DIR}/axl_sys_win_VirtualMemory.h
 	)
 
 set (
 	SYS_WIN_CPP_LIST
+	axl_sys_win_Thread.cpp
+	axl_sys_win_WaitableHandle.cpp
 	axl_sys_win_JobObject.cpp
 	axl_sys_win_Library.cpp
 	axl_sys_win_Service.cpp
@@ -343,6 +221,7 @@ set (
 	axl_sys_win_Process.cpp
 	axl_sys_win_AccessToken.cpp
 	axl_sys_win_Sid.cpp
+	axl_sys_win_VirtualMemory.cpp
 	)
 
 source_group (
@@ -395,11 +274,13 @@ endif ()
 set (
 	SYS_DRW_H_LIST
 	${AXL_INC_DIR}/axl_sys_drw_MachError.h
+	${AXL_INC_DIR}/axl_sys_drw_Semaphore.h
 	)
 
 set (
 	SYS_DRW_CPP_LIST
 	axl_sys_drw_MachError.cpp
+	axl_sys_drw_Semaphore.cpp
 	)
 
 source_group (
@@ -448,6 +329,9 @@ source_group (
 
 set (
 	SL_H_LIST
+	${AXL_INC_DIR}/axl_sl_CallOnce.h
+	${AXL_INC_DIR}/axl_sl_Singleton.h
+	${AXL_INC_DIR}/axl_sl_SimpleSingleton.h
 	${AXL_INC_DIR}/axl_sl_Array.h
 	${AXL_INC_DIR}/axl_sl_ArraySlice.h
 	${AXL_INC_DIR}/axl_sl_ArrayList.h
@@ -576,16 +460,6 @@ add_library (
 	${G_CPP_LIST}
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
-	${MEM_WIN_H_LIST}
-	${MEM_WIN_CPP_LIST}
-	${MT_H_LIST}
-	${MT_CPP_LIST}
-	${MT_PSX_H_LIST}
-	${MT_PSX_CPP_LIST}
-	${MT_WIN_H_LIST}
-	${MT_WIN_CPP_LIST}
-	${MT_DRW_H_LIST}
-	${MT_DRW_CPP_LIST}
 	${SYS_H_LIST}
 	${SYS_CPP_LIST}
 	${SYS_PSX_H_LIST}

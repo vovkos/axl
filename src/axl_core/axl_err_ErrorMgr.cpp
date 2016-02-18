@@ -17,16 +17,16 @@ namespace err {
 
 ErrorMgr::ErrorMgr ()
 {
-	m_tlsSlot = mt::getTlsMgr ()->createSlot ();
+	m_tlsSlot = sys::getTlsMgr ()->createSlot ();
 
-	registerProvider (g_stdErrorGuid, mt::getSimpleSingleton <StdErrorProvider> ());
-	registerProvider (g_ErrnoGuid, mt::getSimpleSingleton <ErrnoProvider> ());
+	registerProvider (g_stdErrorGuid, sl::getSimpleSingleton <StdErrorProvider> ());
+	registerProvider (g_ErrnoGuid, sl::getSimpleSingleton <ErrnoProvider> ());
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-	registerProvider (g_winErrorGuid, mt::getSimpleSingleton <WinErrorProvider> ());
-	registerProvider (g_ntErrorGuid, mt::getSimpleSingleton <NtErrorProvider> ());
+	registerProvider (g_winErrorGuid, sl::getSimpleSingleton <WinErrorProvider> ());
+	registerProvider (g_ntErrorGuid, sl::getSimpleSingleton <NtErrorProvider> ());
 #elif (_AXL_POSIX == AXL_POSIX_DARWIN)
-	registerProvider (sys::drw::g_MachErrorGuid, mt::getSimpleSingleton <sys::drw::MachErrorProvider> ());
+	registerProvider (sys::drw::g_MachErrorGuid, sl::getSimpleSingleton <sys::drw::MachErrorProvider> ());
 #endif
 }
 
@@ -36,14 +36,14 @@ ErrorMgr::registerProvider (
 	ErrorProvider* provider
 	)
 {
-	mt::ScopeLock scopeLock (&m_lock);
+	sys::ScopeLock scopeLock (&m_lock);
 	m_providerMap.visit (guid)->m_value = provider;
 }
 
 ErrorProvider* 
 ErrorMgr::findProvider (const sl::Guid& guid)
 {
-	mt::ScopeLock scopeLock (&m_lock);
+	sys::ScopeLock scopeLock (&m_lock);
 	sl::HashTableMapIterator <sl::Guid, ErrorProvider*> it = m_providerMap.find (guid);
 	return it ? it->m_value : NULL;
 }
@@ -98,7 +98,7 @@ ErrorMgr::getThreadEntry ()
 		return entry;
 
 	ref::Ptr <ThreadEntry> newEntry = AXL_REF_NEW (ref::Box <ThreadEntry>);
-	mt::getTlsMgr ()->setSlotValue (m_tlsSlot, newEntry);
+	sys::getTlsMgr ()->setSlotValue (m_tlsSlot, newEntry);
 	return newEntry;
 }
 

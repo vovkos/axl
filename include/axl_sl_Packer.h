@@ -8,7 +8,7 @@
 
 #include "axl_sl_Pack.h"
 #include "axl_sl_Array.h"
-#include "axl_mt_SimpleSingleton.h"
+#include "axl_sl_SimpleSingleton.h"
 
 namespace axl {
 namespace sl {
@@ -105,7 +105,7 @@ public:
 	PackerImpl*
 	getSingleton ()
 	{
-		return mt::getSimpleSingleton <PackerImpl> ();
+		return sl::getSimpleSingleton <PackerImpl> ();
 	}
 };
 

@@ -6,7 +6,7 @@
 
 #define _AXL_SL_CHARLITERAL_H
 
-#include "axl_mt_CallOnce.h"
+#include "axl_sl_CallOnce.h"
 
 namespace axl {
 namespace sl {
@@ -31,7 +31,7 @@ const char*
 getCharLiteral (uchar_t c)
 {
 	static char literalTable [256] [4];
-	mt::callOnce (InitCharLiteralTable (), literalTable);
+	sl::callOnce (InitCharLiteralTable (), literalTable);
 	return literalTable [c];
 }
 
@@ -55,7 +55,7 @@ const char*
 getCharCodeLiteral (uchar_t c)
 {
 	static char literalTable [256] [4];
-	mt::callOnce (InitCharCodeTable (), literalTable);
+	sl::callOnce (InitCharCodeTable (), literalTable);
 	return literalTable [c];
 }
 

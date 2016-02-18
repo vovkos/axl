@@ -17,7 +17,7 @@ AnsiAttrParser::parse (
 	static SetAttrFuncPtr setAttrFuncTable [108] = { 0 };
 	static bool once = false;
 
-	if (!once) // no need to use mt::callOnce here
+	if (!once) // no need to use sl::callOnce here
 	{
 		setAttrFuncTable [0] = &AnsiAttrParser::clear;
 		setAttrFuncTable [1] = &AnsiAttrParser::setBoldOn;

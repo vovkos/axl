@@ -48,7 +48,7 @@ registerParseErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
 		g_parseErrorGuid, 
-		mt::getSimpleSingleton <ParseErrorProvider> ()
+		sl::getSimpleSingleton <ParseErrorProvider> ()
 		);
 }
 

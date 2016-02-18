@@ -7,8 +7,8 @@
 #define _AXL_G_MODULE_H
 
 #include "axl_sl_List.h"
-#include "axl_mt_Lock.h"
-#include "axl_mt_CallOnce.h"
+#include "axl_sys_Lock.h"
+#include "axl_sl_CallOnce.h"
 #include "axl_mem_Tracker.h"
 #include "axl_ref_Ptr.h"
 
@@ -60,7 +60,7 @@ protected:
 
 	// finalizers
 	
-	mt::Lock m_finalizerListLock;
+	sys::Lock m_finalizerListLock;
 	sl::StdList <FinalizerEntry> m_finalizerList;
 
 public:

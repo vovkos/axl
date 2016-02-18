@@ -104,7 +104,7 @@ DgramSock::recvFrom (
 
 void
 onSyncSendRecvComplete (
-	mt::Event* event,
+	sys::Event* event,
 	err::ErrorHdr* error,
 	SockAddrU* addrFromBuf,
 	size_t* actualSize,
@@ -131,12 +131,12 @@ DgramSock::syncSendTo (
 	const SockAddr* addr
 	)
 {
-	mt::Event event;
+	sys::Event event;
 	err::Error error;
 	size_t actualSize;
 
 	exe::Function <
-		exe::ArgSeq_4 <mt::Event*, err::Error*, SockAddrU*, size_t*>,
+		exe::ArgSeq_4 <sys::Event*, err::Error*, SockAddrU*, size_t*>,
 		OnSendRecvCompleteArg
 		> onComplete (onSyncSendRecvComplete, &event, &error, NULL, &actualSize);
 
@@ -159,12 +159,12 @@ DgramSock::syncRecvFrom (
 	SockAddrU* from
 	)
 {
-	mt::Event event;
+	sys::Event event;
 	err::Error error;
 	size_t actualSize;
 
 	exe::Function <
-		exe::ArgSeq_4 <mt::Event*, err::Error*, SockAddrU*, size_t*>,
+		exe::ArgSeq_4 <sys::Event*, err::Error*, SockAddrU*, size_t*>,
 		OnSendRecvCompleteArg
 		> onComplete (onSyncSendRecvComplete, &event, &error, from, &actualSize);
 

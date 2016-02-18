@@ -35,7 +35,7 @@ registerCryptoErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
 		g_cryptoErrorGuid, 
-		mt::getSimpleSingleton <CryptoErrorProvider> ()
+		sl::getSimpleSingleton <CryptoErrorProvider> ()
 		);
 }
 

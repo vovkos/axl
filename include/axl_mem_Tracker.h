@@ -6,7 +6,7 @@
 
 #define _AXL_MEM_TRACKER_H
 
-#include "axl_mt_Lock.h"
+#include "axl_sys_Lock.h"
 #include "axl_sl_ListBase.h"
 
 namespace axl {
@@ -27,7 +27,7 @@ public:
 	};
 
 protected:
-	mt::Lock m_lock;
+	sys::Lock m_lock;
 	sl::AuxList <BlockHdr> m_blockList;
 
 	size_t m_peakBlockCount;

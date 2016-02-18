@@ -9,8 +9,8 @@
 #include "axl_err_Error.h"
 #include "axl_sl_HashTable.h"
 #include "axl_sl_String.h"
-#include "axl_mt_TlsMgr.h"
-#include "axl_mt_Singleton.h"
+#include "axl_sys_TlsMgr.h"
+#include "axl_sl_Singleton.h"
 
 namespace axl {
 namespace err {
@@ -27,7 +27,7 @@ protected:
 	};
 
 protected:
-	mt::Lock m_lock;
+	sys::Lock m_lock;
 
 	size_t m_tlsSlot;
 
@@ -70,7 +70,7 @@ protected:
 	ThreadEntry*
 	findThreadEntry ()
 	{
-		return (ThreadEntry*) (void*) mt::getTlsMgr ()->getSlotValue (m_tlsSlot);
+		return (ThreadEntry*) (void*) sys::getTlsMgr ()->getSlotValue (m_tlsSlot);
 	}
 
 	ThreadEntry*
@@ -83,7 +83,7 @@ inline
 ErrorMgr* 
 getErrorMgr ()
 {
-	return mt::getSingleton <ErrorMgr> ();
+	return sl::getSingleton <ErrorMgr> ();
 }
 
 //.............................................................................

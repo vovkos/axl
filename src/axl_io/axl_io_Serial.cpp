@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "axl_io_Serial.h"
-#include "axl_mt_Event.h"
+#include "axl_sys_Event.h"
 
 namespace axl {
 namespace io {
@@ -106,7 +106,7 @@ Serial::read (
 	size_t size
 	)
 {
-	mt::Event completionEvent;
+	sys::Event completionEvent;
 
 	OVERLAPPED overlapped = { 0 };
 	overlapped.hEvent = completionEvent.m_event;
@@ -132,7 +132,7 @@ Serial::write (
 	size_t size
 	)
 {
-	mt::Event completionEvent;
+	sys::Event completionEvent;
 
 	OVERLAPPED overlapped = { 0 };
 	overlapped.hEvent = completionEvent.m_event;
