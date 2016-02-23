@@ -1907,6 +1907,16 @@ testEnumSerial ()
 
 //.............................................................................
 
+// AXL_NO_ASAN
+void
+testAddressSanitizer ()
+{
+	char c = 10;
+	char* p = &c;
+	p++;
+	*p = 0;
+}
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1926,7 +1936,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testEnumSerial ();
+	testAddressSanitizer ();
 
 	return 0;
 }

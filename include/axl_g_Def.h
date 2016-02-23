@@ -170,6 +170,14 @@
 
 //.............................................................................
 
+#if (_AXL_CPP == AXL_CPP_GCC)
+#	define AXL_NO_ASAN __attribute__((no_sanitize_address))
+#else
+#	define AXL_NO_ASAN
+#endif
+
+//.............................................................................
+
 // common type aliases
 
 #ifndef INTPTR_MIN
