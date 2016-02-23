@@ -249,6 +249,19 @@ axl_create_gcc_settings)
 		"-Wno-missing-braces"
 		"-Wmissing-braces" "-Wno-missing-braces"
 		)
+
+	axl_create_setting (
+		GCC_SANITIZER
+		"-fsanitize=address"
+		STRING
+		"Sanitizer to use in Debug build"
+		" " "-fsanitize=address" "-fsanitize=memory" "-fsanitize=thread"
+		)
+
+	if (NOT "${GCC_SANITIZER}" STREQUAL " ")
+		set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${GCC_SANITIZER}")
+		set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_SANITIZER}")
+	endif ()
 endmacro ()
 
 #..............................................................................
