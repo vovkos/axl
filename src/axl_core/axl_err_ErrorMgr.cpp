@@ -2,6 +2,7 @@
 #include "axl_err_ErrorMgr.h"
 #include "axl_err_Errno.h"
 #include "axl_dbg_Trace.h"
+#include "axl_sys_SjljTry.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include "axl_err_WinError.h"
@@ -80,10 +81,11 @@ ErrorMgr::setError (const Error& error)
 
 	case ErrorMode_CppException:
 		throw error;
+		ASSERT (false);
 
-	case ErrorMode_SehException:
 	case ErrorMode_SetJmpLongJmp:
-		TRACE ("*** unsupported error mode\n");
+		AXL_SYS_SJLJ_THROW ();
+		ASSERT (false);
 
 	default:
 		ASSERT (false);

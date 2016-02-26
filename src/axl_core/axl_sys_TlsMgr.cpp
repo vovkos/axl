@@ -156,10 +156,10 @@ TlsMgr::getCurrentThreadPage ()
 
 #if (_AXL_ENV == AXL_ENV_WIN)
 
-#pragma section (AXL_MT_TLS_CALLBACK_SECTION, long, read)
+#pragma section (AXL_SYS_TLS_CALLBACK_SECTION, long, read)
 
 extern "C"
-__declspec(allocate (AXL_MT_TLS_CALLBACK_SECTION))
+__declspec(allocate (AXL_SYS_TLS_CALLBACK_SECTION))
 PIMAGE_TLS_CALLBACK g_axl_sys_pfTlsCallback = axl::sys::TlsMgr::tlsCallback;
 
 #ifdef _WIN64

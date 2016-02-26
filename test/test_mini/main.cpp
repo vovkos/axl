@@ -570,51 +570,51 @@ void
 bar ()
 {
 	printf ("bar -- throwing...\n");
-	AXL_MT_LONG_JMP_THROW ();	
+	AXL_SYS_SJLJ_THROW ();	
 }
 
 void 
 testLongJmpTry ()
 {
-	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY ()
 	{
 		bar ();
 	}
-	AXL_MT_LONG_JMP_CATCH ()
+	AXL_SYS_SJLJ_CATCH ()
 	{
 		printf ("exception caught\n");
 	}
-	AXL_MT_LONG_JMP_FINALLY ()
+	AXL_SYS_SJLJ_FINALLY ()
 	{
 		printf ("finally\n");
 	}
-	AXL_MT_END_LONG_JMP_TRY ()
+	AXL_SYS_END_SJLJ_TRY ()
 
-	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY ()
 	{
 		bar ();
 	}
-	AXL_MT_LONG_JMP_CATCH ()
+	AXL_SYS_SJLJ_CATCH ()
 	{
 		printf ("exception caught\n");
 	}
-	AXL_MT_END_LONG_JMP_TRY ()
+	AXL_SYS_END_SJLJ_TRY ()
 
-	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY ()
 	{
 		bar ();
 	}
-	AXL_MT_LONG_JMP_FINALLY ()
+	AXL_SYS_SJLJ_FINALLY ()
 	{
 		printf ("finally\n");
 	}
-	AXL_MT_END_LONG_JMP_TRY ()
+	AXL_SYS_END_SJLJ_TRY ()
 
-	AXL_MT_BEGIN_LONG_JMP_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY ()
 	{
 		bar ();
 	}
-	AXL_MT_END_LONG_JMP_TRY ()
+	AXL_SYS_END_SJLJ_TRY ()
 
 	printf ("done\n");
 }

@@ -26,12 +26,8 @@ namespace err {
 enum ErrorMode
 {
 	ErrorMode_NoThrow       = 0,
-	ErrorMode_CppException  = 1,
-
-	// these 2 are almost useless unless in C-style code without classes
-
-	ErrorMode_SehException  = 2,
-	ErrorMode_SetJmpLongJmp = 4,
+	ErrorMode_CppException,
+	ErrorMode_SetJmpLongJmp,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

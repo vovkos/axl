@@ -12,7 +12,7 @@
 #include "axl_sl_Singleton.h"
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-#	define AXL_MT_TLS_CALLBACK_SECTION ".CRT$XLD"
+#	define AXL_SYS_TLS_CALLBACK_SECTION ".CRT$XLD"
 #endif
 
 namespace axl {
