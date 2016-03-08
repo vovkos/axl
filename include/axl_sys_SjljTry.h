@@ -13,19 +13,29 @@ namespace sys {
 
 //.............................................................................
 
-struct SjljTry
+struct SjljFrame
 {
-	SjljTry* m_prev;
 	jmp_buf m_jmpBuf;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+inline 
+void
+sjljThrow ()
+{
+	SjljFrame* sjljFrame = getTlsSlotValue <SjljFrame> ();
+	ASSERT (sjljFrame);
+	longjmp (sjljFrame->m_jmpBuf, -1);
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 #define AXL_SYS_BEGIN_SJLJ_TRY() \
 { \
-	axl::sys::SjljTry __axlSjljTry; \
-	__axlSjljTry.m_prev = axl::sys::setTlsSlotValue <axl::sys::SjljTry> (&__axlSjljTry); \
-	int __axlSjljBranch = setjmp (__axlSjljTry.m_jmpBuf); \
+	axl::sys::SjljFrame __axlSjljFrame; \
+	axl::sys::SjljFrame* __axlSjljPrevFrame = axl::sys::setTlsSlotValue <axl::sys::SjljFrame> (&__axlSjljFrame); \
+	int __axlSjljBranch = setjmp (__axlSjljFrame.m_jmpBuf); \
 	if (!__axlSjljBranch) \
 	{
 
@@ -34,19 +44,23 @@ struct SjljTry
 	else \
 	{ \
 		{ \
-			axl::sys::SjljTry* prev = axl::sys::setTlsSlotValue <axl::sys::SjljTry> (__axlSjljTry.m_prev); \
-			ASSERT (prev == &__axlSjljTry); \
+			axl::sys::SjljFrame* prev = axl::sys::setTlsSlotValue <axl::sys::SjljFrame> (__axlSjljPrevFrame); \
+			ASSERT (prev == &__axlSjljFrame); \
 		}
 
 #define AXL_SYS_SJLJ_FINALLY() \
 	} \
-	{
+	{ \
+		{ \
+			axl::sys::SjljFrame* prev = axl::sys::setTlsSlotValue <axl::sys::SjljFrame> (__axlSjljPrevFrame); \
+			ASSERT (prev == &__axlSjljFrame || prev == __axlSjljPrevFrame); \
+		}
 
 #define AXL_SYS_END_SJLJ_TRY_IMPL() \
 	} \
 	{ \
-		axl::sys::SjljTry* prev = axl::sys::setTlsSlotValue <axl::sys::SjljTry> (__axlSjljTry.m_prev); \
-		ASSERT (prev == &__axlSjljTry || prev == __axlSjljTry.m_prev); \
+		axl::sys::SjljFrame* prev = axl::sys::setTlsSlotValue <axl::sys::SjljFrame> (__axlSjljPrevFrame); \
+		ASSERT (prev == &__axlSjljFrame || prev == __axlSjljPrevFrame); \
 	} \
 
 #define AXL_SYS_END_SJLJ_TRY() \
@@ -59,12 +73,7 @@ struct SjljTry
 }
 
 #define AXL_SYS_SJLJ_THROW() \
-do \
-{ \
-	axl::sys::SjljTry* sjljTry = axl::sys::getTlsSlotValue <axl::sys::SjljTry> (); \
-	ASSERT (sjljTry); \
-	longjmp (sjljTry->m_jmpBuf, -1); \
-} while (0)
+	axl::sys::sjljThrow ()
 
 //.............................................................................
 

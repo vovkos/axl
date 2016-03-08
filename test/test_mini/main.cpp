@@ -1917,6 +1917,11 @@ testAddressSanitizer ()
 	*p = 0;
 }
 
+int foo (jmp_buf buf)
+{
+	return 0;
+}
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1935,6 +1940,18 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
+
+	jmp_buf buf;
+
+	int result;
+
+	typedef int SetJmp (jmp_buf);
+	
+	SetJmp* bar = setjmp;
+
+	result = foo (buf);
+	result = bar (buf);
+	result = setjmp (buf);
 
 	testAddressSanitizer ();
 
