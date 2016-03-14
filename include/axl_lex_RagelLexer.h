@@ -161,6 +161,9 @@ public:
 		size_t length = -1
 		)
 	{
+		if (length == -1)
+			length = strlen (source);
+
 		this->reset (); 
 		
 		static_cast <T*> (this)->init ();
