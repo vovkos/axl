@@ -324,7 +324,7 @@ findFilePath (
 {
 	sl::String filePath;
 
-	if (firstDir)
+	if (firstDir && *firstDir)
 	{
 		filePath = concatFilePath (firstDir, fileName);
 		if (doesFileExist (filePath))
