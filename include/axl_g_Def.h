@@ -172,7 +172,17 @@
 
 #if (_AXL_CPP == AXL_CPP_GCC)
 #	define AXL_NO_ASAN __attribute__((no_sanitize_address))
+#	if (defined (__has_feature))
+#		if (__has_feature (address_sanitizer))
+#	 		define _AXL_ASAN 1
+#		endif
+#	elif (defined (__SANITIZE_ADDRESS__))
+# 		define _AXL_ASAN 1
+#	else
+#		undef _AXL_ASAN
+#	endif
 #else
+#	undef _AXL_ASAN
 #	define AXL_NO_ASAN
 #endif
 
