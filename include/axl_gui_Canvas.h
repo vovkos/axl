@@ -98,6 +98,66 @@ public:
 			);
 	}
 
+	// alpha rect drawing
+
+	bool
+	drawAlphaRect (
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color,
+		uint_t alpha
+		)
+	{
+		return m_engine->drawAlphaRect (this, left, top, right, bottom, color, alpha);
+	}
+
+	bool
+	drawAlphaRect (
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t alpha
+		)
+	{
+		return drawAlphaRect (left, top, right, bottom, m_colorAttr.m_backColor, alpha);
+	}
+
+	bool
+	drawAlphaRect (
+		const Rect& rect,
+		uint_t color,
+		uint_t alpha
+		)
+	{
+		return drawAlphaRect (
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			color, 
+			alpha
+			);
+	}
+
+	bool
+	drawAlphaRect (
+		const Rect& rect,
+		uint_t alpha
+		)
+	{
+		return drawAlphaRect (
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			m_colorAttr.m_backColor,
+			alpha
+			);
+	}
+
 	// default to utf8 
 
 	bool

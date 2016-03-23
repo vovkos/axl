@@ -111,6 +111,28 @@ QtEngine::drawRect (
 }
 
 bool
+QtEngine::drawAlphaRect (
+	Canvas* canvas,
+	int left,
+	int top,
+	int right,
+	int bottom,
+	uint_t color,
+	uint_t alpha
+	)
+{
+	ASSERT (canvas->getEngine () == this);
+	QtCanvas* qtCanvas = (QtCanvas*) canvas;
+
+	ASSERT (!(color & ColorFlag_Undefined));
+	QColor qtColor = qtCanvas->m_palette.getColorRgb (color);
+	qtColor.setAlpha (alpha);
+
+	qtCanvas->m_qtPainter.fillRect (left, top, right - left, bottom - top, qtColor);
+	return true;
+}
+
+bool
 QtEngine::drawText_qt (
 	Canvas* canvas,
 	int x,
@@ -874,6 +896,23 @@ QtEngine::postWidgetThreadMsg (
 	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
 	qtWidget->postThreadMsg (code, params);
 	return true;
+}
+
+bool
+QtEngine::startWidgetAnimation (WidgetDriver* widgetDriver)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+	qtWidget->m_animationTimer.start (10, qtWidget);
+	return true;
+}
+
+void
+QtEngine::stopWidgetAnimation (WidgetDriver* widgetDriver)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+	qtWidget->m_animationTimer.stop ();
 }
 
 //.............................................................................

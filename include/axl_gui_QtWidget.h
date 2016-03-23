@@ -18,8 +18,11 @@ class QtWidgetBase: public QAbstractScrollArea
 {
 	Q_OBJECT
 
+	friend class QtEngine;
+
 protected:
 	WidgetDriver* m_widgetDriver;
+	QBasicTimer m_animationTimer;
 
 public:
 	QtWidgetBase (
@@ -136,6 +139,14 @@ protected:
 	closeEvent (QCloseEvent* e)
 	{
 		genericEventImpl (e, WidgetMsgCode_Close);
+	}
+
+	virtual
+	void
+	timerEvent (QTimerEvent* e)
+	{
+		if (e->timerId () == m_animationTimer.timerId ())
+			genericEventImpl (e, WidgetMsgCode_Animate);
 	}
 
 	virtual

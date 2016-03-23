@@ -131,6 +131,21 @@ public:
 
 	virtual
 	bool
+	drawAlphaRect (
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color,
+		uint_t alpha
+		)
+	{
+		return drawRect (canvas, left, top, right, bottom, color); // draw opaque rect by default
+	}
+
+	virtual
+	bool
 	drawText_utf8 (
 		Canvas* canvas,
 		int x,
@@ -468,6 +483,14 @@ public:
 		uint_t code,
 		const ref::Ptr <void>& params
 		) = 0;
+
+	virtual
+	bool
+	startWidgetAnimation (WidgetDriver* widgetDriver) = 0;
+
+	virtual
+	void
+	stopWidgetAnimation (WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool

@@ -42,6 +42,7 @@ enum WidgetMsgCode
 	WidgetMsgCode_KeyUp,                   // WidgetKeyMsg
 
 	WidgetMsgCode_ThreadMsg,               // WidgetThreadMsg
+	WidgetMsgCode_Animate,                 // WidgetMsg
 
 	WidgetMsgCode_Gdi,                     // WidgetGdiMsg
 	WidgetMsgCode_Qt,                      // WidgetQtMsg
@@ -590,6 +591,18 @@ public:
 		)
 	{
 		return m_engine->postWidgetThreadMsg (this, code, params);
+	}
+
+	bool
+	startAnimation ()
+	{
+		return m_engine->startWidgetAnimation (this);
+	}
+
+	void
+	stopAnimation ()
+	{
+		m_engine->stopWidgetAnimation (this);
 	}
 
 	bool

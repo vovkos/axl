@@ -168,6 +168,18 @@ public:
 		uint_t color
 		);
 
+	virtual
+	bool
+	drawAlphaRect (
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		uint_t color,
+		uint_t alpha
+		);
+
 	bool
 	drawText_qt (
 		Canvas* canvas,
@@ -462,6 +474,14 @@ public:
 		uint_t code,
 		const ref::Ptr <void>& params
 		);
+
+	virtual
+	bool
+	startWidgetAnimation (WidgetDriver* widgetDriver);
+
+	virtual
+	void
+	stopWidgetAnimation (WidgetDriver* widgetDriver);
 
 	virtual
 	bool
