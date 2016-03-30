@@ -32,7 +32,7 @@ public:
 		dword_t* actualSize
 		) const;
 
-	dword_t
+	size_t
 	getOverlappedResult (OVERLAPPED* overlapped) const;
 };
 
