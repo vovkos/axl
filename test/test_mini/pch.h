@@ -43,6 +43,7 @@ extern "C" {
 #include "axl_sys_Event.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_zip_ZipReader.h"
+#include "axl_enc_EscapeEncoding.h"
 
 #ifdef _AXL_IO_USB
 #	include "axl_io_UsbDevice.h"

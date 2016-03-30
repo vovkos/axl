@@ -86,32 +86,44 @@ EscapeEncoding::encode (
 	if (length == -1)
 		length = sl::StringDetails::calcLength (p);
 
+	char escapeSequence [4] = { '\\' };
+
 	const char* base = p;
 	const char* end = p + length;
 	for (; p < end; p++)
 	{
-		if (isprint (*p))
-			continue;
-
-		char escapeSequence [4] = { '\\' };
-
-		string->append (base, p - base);
-
-		char escape = findEscapeChar (*p);		
-		if (escape != *p)
+		if (*p == '\\')
 		{
-			escapeSequence [1] = escape;
+			string->append (base, p - base);
+
+			escapeSequence [1] = '\\';
 			string->append (escapeSequence, 2);
+
+			base = p + 1;
 		}
 		else
 		{
-			escapeSequence [1] = 'x';
-			escapeSequence [2] = HexEncoding::getHexChar_l (*p >> 4);
-			escapeSequence [3] = HexEncoding::getHexChar_l (*p);
-			string->append (escapeSequence, 4);
-		}
+			if (isprint (*p))
+				continue;
 
-		base = p + 1;
+			string->append (base, p - base);
+
+			char escape = findEscapeChar (*p);		
+			if (escape != *p)
+			{
+				escapeSequence [1] = escape;
+				string->append (escapeSequence, 2);
+			}
+			else
+			{
+				escapeSequence [1] = 'x';
+				escapeSequence [2] = HexEncoding::getHexChar_l (*p >> 4);
+				escapeSequence [3] = HexEncoding::getHexChar_l (*p);
+				string->append (escapeSequence, 4);
+			}
+
+			base = p + 1;
+		}
 	}
 
 	string->append (base, p - base);

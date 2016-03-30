@@ -1907,6 +1907,16 @@ testEnumSerial ()
 
 //.............................................................................
 
+void
+testEncoding ()
+{
+	sl::String s;
+	enc::EscapeEncoding::encode (&s, "\\\\.\\pipe\\mypipe");
+	printf ("%s\n", s.cc ());
+}
+
+//.............................................................................
+
 // AXL_NO_ASAN
 void
 testAddressSanitizer ()
@@ -1941,19 +1951,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	jmp_buf buf;
-
-	int result;
-
-	typedef int SetJmp (jmp_buf);
-	
-	SetJmp* bar = setjmp;
-
-	result = foo (buf);
-	result = bar (buf);
-	result = setjmp (buf);
-
-	testAddressSanitizer ();
+	testEncoding ();
 
 	return 0;
 }
