@@ -49,7 +49,7 @@ File::setSize (uint64_t size)
 {
 	uint64_t position = getPosition ();
 
-	bool result = setPosition (size);
+	bool_t result = setPosition (size);
 	if (!result)
 		return false;
 
