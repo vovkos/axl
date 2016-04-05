@@ -250,6 +250,13 @@ axl_create_gcc_settings)
 		"-Wmissing-braces" "-Wno-missing-braces"
 		)
 
+	axl_create_c_cxx_flag_setting (
+		GCC_FLAG_INCOMPATIBLE_MS_STRUCT
+		"GNU C++ shows warnings on potentially MSVC-incompatible structs"
+		"-Wno-incompatible-ms-struct"
+		"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
+		)
+
 	axl_create_setting (
 		GCC_SANITIZER
 		"-fsanitize=address"
