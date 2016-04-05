@@ -1932,6 +1932,67 @@ int foo (jmp_buf buf)
 	return 0;
 }
 
+//.............................................................................
+
+#pragma pack ()
+
+struct F0
+{
+	uint8_t m_int8_1;
+	uint64_t m_int64;
+	uint8_t m_int8_2;
+} AXL_GCC_MSC_STRUCT;
+
+#pragma pack (1)
+
+struct F1
+{
+	uint8_t m_int8_1;
+	uint64_t m_int64;
+	uint8_t m_int8_2;
+} AXL_GCC_MSC_STRUCT;
+
+#pragma pack (2)
+
+struct F2
+{
+	uint8_t m_int8_1;
+	uint64_t m_int64;
+	uint8_t m_int8_2;
+} AXL_GCC_MSC_STRUCT;
+
+#pragma pack (4)
+
+struct F4
+{
+	uint8_t m_int8_1;
+	uint64_t m_int64;
+	uint8_t m_int8_2;
+} AXL_GCC_MSC_STRUCT;
+
+#pragma pack (8)
+
+struct F8  
+{
+	uint8_t m_int8_1;
+	uint64_t m_int64;
+	uint8_t m_int8_2;
+} AXL_GCC_MSC_STRUCT;
+
+void
+testPacking ()
+{
+	size_t s0 = sizeof (F0);
+	size_t s1 = sizeof (F1);
+	size_t s2 = sizeof (F2);
+	size_t s4 = sizeof (F4);
+	size_t s8 = sizeof (F8);
+
+	printf ("s0 = %d; s1 = %d; s2 = %d; s4 = %d; s8 = %d\n", s0, s1, s2, s4, s8);
+}
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -1950,8 +2011,8 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-
-	testEncoding ();
+	
+	testPacking ();
 
 	return 0;
 }

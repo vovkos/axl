@@ -171,6 +171,8 @@
 //.............................................................................
 
 #if (_AXL_CPP == AXL_CPP_GCC)
+#	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
+#	define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
 #	define AXL_NO_ASAN __attribute__((no_sanitize_address))
 #	if (defined (__has_feature))
 #		if (__has_feature (address_sanitizer))
@@ -182,6 +184,8 @@
 #		undef _AXL_ASAN
 #	endif
 #else
+#	define AXL_GCC_ALIGN(n)
+#	define AXL_GCC_MSC_STRUCT
 #	undef _AXL_ASAN
 #	define AXL_NO_ASAN
 #endif
