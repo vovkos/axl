@@ -36,7 +36,10 @@ Serial::setSettings (
 		dcb.StopBits = settings->m_stopBits;
 
 	if (mask & SerialSettingId_Parity)
-		dcb.fParity = settings->m_parity;
+	{
+		dcb.fParity = settings->m_parity != SerialParity_None;
+		dcb.Parity = settings->m_parity;
+	}
 
 	if (mask & SerialSettingId_FlowControl)
 		switch (settings->m_flowControl)
