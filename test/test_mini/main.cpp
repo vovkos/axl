@@ -2119,6 +2119,27 @@ testModBus ()
 		crc16_ccit (packet, sizeof (packet), 0),
 		crc16_ccit (packet, sizeof (packet), 0xffff)
 		);
+
+	uint_t baud = 19200;
+
+	uint64_t timeout_1_5;
+	uint64_t timeout_3_5;
+	
+	if (baud > 19200)
+	{
+		timeout_1_5 = 7500; 
+		timeout_3_5 = 17500; 
+	}
+	else 
+	{
+		timeout_1_5 = 150000000 / baud; 
+		timeout_3_5 = 350000000 / baud; 
+	}
+
+	sl::String s_1_5 = sys::Time (timeout_1_5, false).format ("%s.%l.%c");
+	sl::String s_3_5 = sys::Time (timeout_3_5, false).format ("%s.%l.%c");
+
+	printf ("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.cc (), s_3_5.cc ());
 }
 
 //.............................................................................
