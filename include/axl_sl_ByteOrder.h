@@ -9,7 +9,7 @@
 #include "axl_g_Def.h"
 
 namespace axl {
- namespace sl {
+namespace sl {
 
 //.............................................................................
 

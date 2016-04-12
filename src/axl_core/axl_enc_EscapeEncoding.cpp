@@ -82,9 +82,11 @@ EscapeEncoding::encode (
 	size_t length
 	)
 {
-
 	if (length == -1)
 		length = sl::StringDetails::calcLength (p);
+
+	string->clear ();
+	string->reserve (length);
 
 	char escapeSequence [4] = { '\\' };
 
@@ -160,6 +162,9 @@ EscapeEncoding::decode (
 
 	if (length == -1)
 		length = sl::StringDetails::calcLength (p);
+
+	string->clear ();
+	string->reserve (length / 2);
 
 	char hexCodeString [16];
 	size_t hexCodeLen;

@@ -144,8 +144,8 @@ HexEncoding::decode (
 	if (length == -1)
 		length = sl::StringDetails::calcLength (p);
 
-	buffer->reserve (length / 2);
 	buffer->clear ();
+	buffer->reserve (length / 2);
 
 	char hexCodeString [4] = { 0 };
 	char* hexCodeEnd;

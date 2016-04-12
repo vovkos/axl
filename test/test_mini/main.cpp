@@ -2144,6 +2144,107 @@ testModBus ()
 
 //.............................................................................
 
+uint_t calcChecksum16 (
+	const uint8_t* p0, 
+	size_t size
+	) 
+{
+	uint16_t const* p = (uint16_t const*) p0;
+	void const* end = p0 + (size & ~1);
+
+	uint_t checksum = 0;
+	
+	for (; p < end; p++)
+		checksum += htons (*p);
+  
+	if (size & 1) 
+		checksum += *(uint8_t const*) p << 8;
+
+	return checksum;
+}
+
+uint16_t adjustIpCheckSum (uint_t checksum) 
+{
+	checksum = (checksum >> 16) + (checksum & 0xffff);
+	checksum += checksum >> 16;
+	return ~checksum;
+}
+
+uint16_t calcIpHdrChecksum (const uint8_t* ipHdr, size_t size)
+{
+	uint_t checksum = calcChecksum16 (ipHdr, size);
+	return adjustIpCheckSum (checksum);
+}
+
+void
+testIpChecksum ()
+{
+	uint8_t data1_0 [] = 
+	{
+		0x45, 0x00, 0x00, 0x1e, 0x7e, 0x8b, 0x00, 0x00, 0x80, 0x11, 0x37, 0x7d, 0xc0, 0xa8, 0x01, 0x77,
+		0xc0, 0xa8, 0x01, 0xff
+	};
+
+	uint8_t data1 [] = 
+	{
+		0x45, 0x00, 0x00, 0x1e, 0x7e, 0x8b, 0x00, 0x00, 0x80, 0x11, 0x00, 0x00, 0xc0, 0xa8, 0x01, 0x77,
+		0xc0, 0xa8, 0x01, 0xff
+	};
+
+	uint8_t data2_0 [] = 
+	{
+		0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00, 0x40, 0x11, 0xb8, 0x61, 0xc0, 0xa8, 0x00, 0x01,
+		0xc0, 0xa8, 0x00, 0xc7
+	};
+
+	uint8_t data2 [] = 
+	{
+		0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00, 0x40, 0x11, 0x00, 0x00, 0xc0, 0xa8, 0x00, 0x01,
+		0xc0, 0xa8, 0x00, 0xc7
+	};
+
+	uint16_t x = calcIpHdrChecksum (data2, sizeof (data2));
+	printf ("%x\n", x);
+}
+
+void
+encodeNetBiosName (
+	char* buffer,
+	const char* name
+	)
+{
+	size_t i = 0;
+	size_t j = 0;
+
+	for (; i < 16; i++)
+	{
+		uchar_t c = name [i];
+		if (!c)
+			break;
+		
+		buffer [j++] = 'A' + (c >> 4);
+		buffer [j++] = 'A' + (c & 0x0f);
+	}
+
+	while (j < 32)
+	{
+		buffer [j++] = 'A' + (' ' >> 4);
+		buffer [j++] = 'A' + (' ' & 0x0f);
+	}	
+}	
+
+void
+testNetBios ()
+{
+	const char* name = "FRED";
+
+	char buffer [1024] = { 0 };
+	encodeNetBiosName (buffer, name);
+	printf ("%s\n", buffer);
+}
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -2163,7 +2264,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 	
-	testModBus ();
+	testNetBios ();
 
 	return 0;
 }
