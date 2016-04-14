@@ -19,7 +19,7 @@ buildLogFont (
 {
 	memset (logFont, 0, sizeof (LOGFONT));
 
-	size_t length = wcslen (family);
+	size_t length = axl_wcslen (family);
 
 	memcpy (
 		logFont->lfFaceName, 
@@ -127,7 +127,7 @@ GdiFont::calcTextSize_utf16 (
 	)
 {
 	if (length == -1)
-		length = wcslen (text);
+		length = axl_wcslen (text);
 
 	ScreenDc screenDc;
 	HFONT hOldFont = (HFONT) ::SelectObject (screenDc, m_h);

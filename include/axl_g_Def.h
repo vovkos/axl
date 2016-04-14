@@ -323,6 +323,24 @@ pvoid_cast (int x)
 
 //.............................................................................
 
+// NULL-checked strlen/wcslen
+
+inline
+size_t 
+axl_strlen (const char* p)
+{
+	return p ? strlen (p) : 0;
+}
+
+inline
+size_t 
+axl_wcslen (const wchar_t* p)
+{
+	return p ? wcslen (p) : 0;
+}
+
+//.............................................................................
+
 // non-conflicting portable macro utilities
 
 #ifndef countof

@@ -14,7 +14,7 @@ SockAddrParser::initialize (
 	)
 {
 	if (length == -1)
-		length = p ? strlen (p) : 0;
+		length = axl_strlen (p);
 
 	m_p = p;
 	m_end = p + length;

@@ -828,7 +828,7 @@ enumerateDirectory (
 
 	UNICODE_STRING uniName;
 	uniName.Buffer = (wchar_t*) name;
-	uniName.Length = wcslen (name) * sizeof (wchar_t);
+	uniName.Length = axl_wcslen (name) * sizeof (wchar_t);
 	uniName.MaximumLength = uniName.Length + sizeof (wchar_t);
 	
 	OBJECT_ATTRIBUTES oa = { 0 };

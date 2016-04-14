@@ -158,7 +158,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 			if (switchInfo->m_nameTable [i] [1])
 			{
 				switchLength += 2; // "--"
-				switchLength += strlen (switchInfo->m_nameTable [i]);
+				switchLength += axl_strlen (switchInfo->m_nameTable [i]);
 			}
 			else
 			{
@@ -174,7 +174,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 		if (hasValue)
 		{
 			switchLength++; // '='
-			switchLength += strlen (switchInfo->m_value);
+			switchLength += axl_strlen (switchInfo->m_value);
 		}
 
 		if (switchLength < switchLengthLimit && maxSwitchLength < switchLength)

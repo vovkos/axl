@@ -132,7 +132,7 @@ generateEcProductKey (
 	EcKey ecKey (ecKey0);
 
 	bool result = 
-		ecKey.sign (&signature, userName, strlen (userName)) &&
+		ecKey.sign (&signature, userName, axl_strlen (userName)) &&
 		enc::Base32Encoding::encode (productKey, signature, signature.getCount (), hyphenDistance) != -1;
 
 	ecKey.detach ();
@@ -153,7 +153,7 @@ verifyEcProductKey (
 
 	bool result = 
 		enc::Base32Encoding::decode (&signature, productKey) != -1 &&
-		ecKey.verify (userName, strlen (userName), signature, signature.getCount ());
+		ecKey.verify (userName, axl_strlen (userName), signature, signature.getCount ());
 
 	ecKey.detach ();
 	return result;

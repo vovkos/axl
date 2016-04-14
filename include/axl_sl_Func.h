@@ -864,7 +864,7 @@ public:
 	size_t 
 	operator () (const char* p) const
 	{ 
-		return p ? djb2 (p, strlen (p)) : 0;
+		return djb2 (p, axl_strlen (p));
 	}
 };
 
@@ -877,7 +877,7 @@ public:
 	size_t 
 	operator () (const wchar_t* p) const
 	{ 
-		return p ? djb2 (p, wcslen (p) * sizeof (wchar_t)) : 0;
+		return djb2 (p, axl_wcslen (p) * sizeof (wchar_t));
 	}
 };
 

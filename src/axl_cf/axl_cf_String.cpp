@@ -25,7 +25,7 @@ StringRef::create (
 	)
 {
 	if (length == -1)
-		length = p ? strlen (p) : 0;
+		length = axl_strlen (p);
 
 	CFStringRef newString = ::CFStringCreateWithBytes (
 		kCFAllocatorDefault,

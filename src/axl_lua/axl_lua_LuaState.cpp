@@ -45,7 +45,7 @@ LuaState::load (
 	ASSERT (isOpen ());
 
 	if (length == -1)
-		length = strlen (source);
+		length = axl_strlen (source);
 
 	int result = luaL_loadbuffer (m_h, source, length, name);
 	return complete (result);

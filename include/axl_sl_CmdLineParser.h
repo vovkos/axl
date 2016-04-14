@@ -80,7 +80,7 @@ public:
 		bool result;
 
 		if (length == -1)
-			length = strlen (cmdLine);
+			length = axl_strlen (cmdLine);
 
 		const char* p = cmdLine;
 		const char* end = p + length;

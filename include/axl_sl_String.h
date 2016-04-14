@@ -52,7 +52,7 @@ public:
 	size_t
 	calcLength (const C* p)
 	{
-		return strlen (p);
+		return strlen (p); // no NULL-check
 	}
 
 	static

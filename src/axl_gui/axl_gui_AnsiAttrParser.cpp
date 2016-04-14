@@ -54,7 +54,7 @@ AnsiAttrParser::parse (
 	m_baseAttr = baseAttr;
 
 	if (length == -1)
-		length = strlen (p);
+		length = axl_strlen (p);
 
 	size_t attrCount = 0;
 

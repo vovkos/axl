@@ -60,7 +60,7 @@ TextPainter::drawText_utf8 (
 	)
 {
 	if (length == -1)
-		length = strlen (text);
+		length = axl_strlen (text);
 	
 	if (!length)
 		return m_point.m_x;
@@ -140,7 +140,7 @@ TextPainter::drawHyperText_utf8 (
 		return drawText_utf8 (textColor0, backColor0, fontFlags0, text, length);
 
 	if (length == -1)
-		length = strlen (text);
+		length = axl_strlen (text);
 	
 	if (!length)
 		return m_point.m_x;

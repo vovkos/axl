@@ -167,7 +167,7 @@ public:
 		)
 	{
 		m_p = p;
-		m_length = p ? length != -1 ? length : strlen (p) : 0;
+		m_length = length != -1 ? length : axl_strlen (p);
 	}
 };
 

@@ -215,11 +215,8 @@ StringTemplate::countLineCol (
 	size_t length
 	)
 {
-	if (!p)
-		return;
-
 	if (length == -1)
-		length = strlen (p);
+		length = axl_strlen (p);
 
 	const char* end = p + length;
 	const char* line = p;

@@ -162,7 +162,7 @@ public:
 		)
 	{
 		if (length == -1)
-			length = strlen (source);
+			length = axl_strlen (source);
 
 		this->reset (); 
 		

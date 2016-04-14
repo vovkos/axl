@@ -132,7 +132,7 @@ protected:
 		if (!patternSize)
 			return true;
 
-        intptr_t lastPrefixPos = patternSize - 1; 
+		intptr_t lastPrefixPos = patternSize - 1; 
 		for (intptr_t i = patternSize - 1; i >= 0; i--) 
 		{
 			if (isPrefix (i + 1)) 
@@ -277,7 +277,7 @@ public:
 			Def_BadSkipTableSize, 
 			enc::CharCodecKind_Utf8, 
 			p, 
-			length != -1 ? length : strlen (p),
+			length != -1 ? length : axl_strlen (p),
 			flags
 			);
 	}
@@ -305,7 +305,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return find (enc::CharCodecKind_Utf8, p, length != -1 ? length : strlen (p));
+		return find (enc::CharCodecKind_Utf8, p, length != -1 ? length : axl_strlen (p));
 	}
 
 	size_t 
@@ -337,7 +337,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return find (incrementalContext, enc::CharCodecKind_Utf8, offset, p, length != -1 ? length : strlen (p));
+		return find (incrementalContext, enc::CharCodecKind_Utf8, offset, p, length != -1 ? length : axl_strlen (p));
 	}
 
 protected:
