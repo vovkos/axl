@@ -2207,7 +2207,7 @@ testIpChecksum ()
 	printf ("%x\n", x);
 }
 
-void
+size_t
 encodeNetBiosName (
 	char* buffer,
 	const char* name
@@ -2222,6 +2222,8 @@ encodeNetBiosName (
 		if (!c)
 			break;
 		
+		c = toupper (c);
+
 		buffer [j++] = 'A' + (c >> 4);
 		buffer [j++] = 'A' + (c & 0x0f);
 	}
@@ -2230,8 +2232,33 @@ encodeNetBiosName (
 	{
 		buffer [j++] = 'A' + (' ' >> 4);
 		buffer [j++] = 'A' + (' ' & 0x0f);
-	}	
+	}
+
+	return j;
 }	
+
+size_t
+decodeNetBiosName (
+	char* buffer,
+	const char* name,
+	size_t length
+	)
+{
+	ASSERT (!(length & 1)); // must be even
+
+	size_t i = 0;
+	size_t j = 0;
+
+	while (i < length)
+	{
+		uchar_t hi = name [i++] - 'A';
+		uchar_t lo = name [i++] - 'A';
+		
+		buffer [j++] = lo + (hi << 4);
+	}
+
+	return j;
+}
 
 void
 testNetBios ()
@@ -2239,8 +2266,12 @@ testNetBios ()
 	const char* name = "FRED";
 
 	char buffer [1024] = { 0 };
-	encodeNetBiosName (buffer, name);
+	size_t length = encodeNetBiosName (buffer, name);
 	printf ("%s\n", buffer);
+
+	char buffer2 [1024] = { 0 };
+	decodeNetBiosName (buffer2, buffer, length);
+	printf ("%s\n", buffer2);
 }
 
 //.............................................................................
