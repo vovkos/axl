@@ -144,8 +144,12 @@
 #
 #	ifdef _DEBUG
 #		define _AXL_DEBUG 1
+#		define _AXL_DEBUG_STRING "Debug"
+#		define _AXL_DEBUG_SUFFIX " Debug"
 #	else
 #		undef _AXL_DEBUG
+#		define _AXL_DEBUG_STRING ""
+#		define _AXL_DEBUG_SUFFIX ""
 #	endif
 #elif (_AXL_CPP == AXL_CPP_GCC)
 #	if (_AXL_CPU == AXL_CPU_X86)
@@ -162,9 +166,13 @@
 #	ifdef NDEBUG
 #		undef _DEBUG
 #		undef _AXL_DEBUG
+#		define _AXL_DEBUG_STRING ""
+#		define _AXL_DEBUG_SUFFIX ""
 #	else
 #		define _DEBUG
 #		define _AXL_DEBUG 1
+#		define _AXL_DEBUG_STRING "Debug"
+#		define _AXL_DEBUG_SUFFIX " Debug"
 #	endif
 #endif
 
