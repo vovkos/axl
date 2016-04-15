@@ -83,7 +83,7 @@ EscapeEncoding::encode (
 	)
 {
 	if (length == -1)
-		length = sl::StringDetails::calcLength (p);
+		length = axl_strlen (p);
 
 	string->clear ();
 	string->reserve (length);
@@ -161,7 +161,7 @@ EscapeEncoding::decode (
 	State state = State_Normal;	
 
 	if (length == -1)
-		length = sl::StringDetails::calcLength (p);
+		length = axl_strlen (p);
 
 	string->clear ();
 	string->reserve (length / 2);

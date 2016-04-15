@@ -132,9 +132,6 @@ public:
 	{
 		size_t thisLength = getLength ();
 
-		if (!p)
-			return thisLength ? 1 : 0;
-
 		if (length == -1)
 			length = Details::calcLength (p);
 

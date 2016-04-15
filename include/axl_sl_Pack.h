@@ -106,7 +106,7 @@ public:
 	{
 		T* string = AXL_VA_ARG (va, T*);
 
-		size_t length = string ? StringDetailsBase <T>::calcLength (string) : 0;			
+		size_t length = StringDetailsBase <T>::calcLength (string);
 		size_t stringSize = (length + 1) * sizeof (T);
 
 		*size = stringSize;

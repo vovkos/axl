@@ -52,7 +52,7 @@ public:
 	size_t
 	calcLength (const C* p)
 	{
-		return strlen (p); // no NULL-check
+		return p ? strlen (p) : 0;
 	}
 
 	static
@@ -174,6 +174,9 @@ public:
 	size_t
 	calcLength (const T* p)
 	{
+		if (!p)
+			return 0;
+
 		const T* p0 = p;
 		while (*p)
 			p++;
@@ -718,9 +721,6 @@ public:
 	{
 		size_t thisLength = getLength ();
 
-		if (!p)
-			return thisLength ? 1 : 0;
-
 		if (length == -1)
 			length = Details::calcLength (p);
 
@@ -782,14 +782,14 @@ public:
 		if (p == m_p && length == -1)
 			return getLength ();
 
-		if (!p)
+		if (length == -1)
+			length = Details::calcLength (p);
+
+		if (!length)
 		{
 			clear ();
 			return 0;
 		}
-
-		if (length == -1)
-			length = Details::calcLength (p);
 
 		if (!setLength (length, false))
 			return -1;
@@ -806,14 +806,14 @@ public:
 		size_t length = -1
 		)
 	{
-		if (!p)
+		if (length == -1)
+			length = Details2::calcLength (p);
+
+		if (!length)
 		{
 			clear ();
 			return 0;
 		}
-
-		if (length == -1)
-			length = Details2::calcLength (p);
 
 		size_t newLength = enc::UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
 		if (newLength == -1)
@@ -832,14 +832,14 @@ public:
 		size_t length = -1
 		)
 	{
-		if (!p)
+		if (length == -1)
+			length = Details3::calcLength (p);
+
+		if (!length)
 		{
 			clear ();
 			return 0;
 		}
-
-		if (length == -1)
-			length = Details3::calcLength (p);
 
 		size_t newLength = enc::UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
 		if (newLength == -1)
@@ -975,9 +975,6 @@ public:
 	{
 		size_t oldLength = getLength ();
 
-		if (!p)
-			return oldLength;
-
 		if (length == -1)
 			length = Details::calcLength (p);
 
@@ -1000,9 +997,6 @@ public:
 		)
 	{
 		size_t oldLength = getLength ();
-
-		if (!p)
-			return oldLength;
 
 		if (length == -1)
 			length = Details2::calcLength (p);
@@ -1030,9 +1024,6 @@ public:
 		)
 	{
 		size_t oldLength = getLength ();
-
-		if (!p)
-			return oldLength;
 
 		if (length == -1)
 			length = Details3::calcLength (p);
