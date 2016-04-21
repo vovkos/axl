@@ -2210,7 +2210,8 @@ testIpChecksum ()
 size_t
 encodeNetBiosName (
 	char* buffer,
-	const char* name
+	const char* name,
+	char paddingChar
 	)
 {
 	size_t i = 0;
@@ -2228,10 +2229,13 @@ encodeNetBiosName (
 		buffer [j++] = 'A' + (c & 0x0f);
 	}
 
+	char paddingByteHi = 'A' + (paddingChar >> 4);
+	char paddingByteLo = 'A' + (paddingChar & 0x0f);
+
 	while (j < 32)
 	{
-		buffer [j++] = 'A' + (' ' >> 4);
-		buffer [j++] = 'A' + (' ' & 0x0f);
+		buffer [j++] = paddingByteHi;
+		buffer [j++] = paddingByteLo;
 	}
 
 	return j;
@@ -2263,15 +2267,119 @@ decodeNetBiosName (
 void
 testNetBios ()
 {
-	const char* name = "FRED";
+	const char* name = "*";
 
-	char buffer [1024] = { 0 };
-	size_t length = encodeNetBiosName (buffer, name);
+	char buffer [1024] = "CKAAAAAAA" "AAAAAAAAAAAAAAAA" "AAAAAAA"; //{ 0 };
+	size_t length = 32; //encodeNetBiosName (buffer, name);
 	printf ("%s\n", buffer);
 
-	char buffer2 [1024] = { 0 };
+	char buffer2 [1024] = { 0 };	
 	decodeNetBiosName (buffer2, buffer, length);
 	printf ("%s\n", buffer2);
+}
+
+//.............................................................................
+
+BOOL WriteSlot(HANDLE hSlot, const char* lpszMessage)
+{
+   BOOL fResult; 
+   DWORD cbWritten; 
+ 
+   fResult = WriteFile(hSlot, 
+	 lpszMessage, 
+	 strlen (lpszMessage),
+	 &cbWritten, 
+	 (LPOVERLAPPED) NULL); 
+ 
+   if (!fResult) 
+   { 
+	  printf("WriteFile failed with %d.\n", GetLastError()); 
+	  return FALSE; 
+   } 
+ 
+   printf("Slot written to successfully.\n"); 
+
+   return TRUE;
+}
+
+BOOL ReadSlot(HANDLE hSlot)
+{
+   BOOL fResult; 
+   DWORD cbRead; 
+ 
+   char buffer [256];
+
+   fResult = ReadFile (hSlot, buffer, sizeof (buffer) - 1, &cbRead, NULL);
+   if (!fResult) 
+   { 
+	  printf("ReadFile failed with %d.\n", GetLastError()); 
+	  return FALSE;
+   } 
+ 
+   buffer [cbRead] = 0;
+   printf("Read from slot: %s\n", buffer); 
+
+   return TRUE;
+}
+
+void
+testMailSlot ()
+{ 
+	printf ("1 for server, 2 for client:\n");
+	char buffer [256];
+	gets (buffer);
+	
+	if (buffer [0] == '1')
+	{
+	char slotName [256];
+	printf ("slot name (e.g. \\\\.\\mailslot\\foo):\n");
+	gets (slotName);
+
+		HANDLE hFile = CreateMailslotA (slotName, 0, -1, NULL);
+	   if (hFile == INVALID_HANDLE_VALUE) 
+	   { 
+		  printf("CreateMailslot failed with %d.\n", GetLastError()); 
+		  return; 
+	   } 
+
+	  printf("Server is running...\n"); 
+
+		for (;;)
+		{
+		   ReadSlot(hFile);
+		}
+	}
+	else for (;;)
+	{	
+
+	char slotName [256];
+	printf ("slot name (e.g. \\\\*\\mailslot\\foo):\n");
+	gets (slotName);
+
+		HANDLE hFile; 
+
+	   hFile = CreateFileA (
+		   slotName, 
+		 GENERIC_READ | GENERIC_WRITE, 
+		 FILE_SHARE_READ | FILE_SHARE_WRITE,
+		 (LPSECURITY_ATTRIBUTES) NULL, 
+		 OPEN_EXISTING, 
+		 FILE_ATTRIBUTE_NORMAL, 
+		 (HANDLE) NULL); 
+ 
+	   if (hFile == INVALID_HANDLE_VALUE) 
+	   { 
+		  printf("CreateFile failed with %d.\n", GetLastError()); 
+		  return; 
+	   } 
+
+	   ReadSlot(hFile);
+
+	   WriteSlot(hFile, "Message one for mailslot.");
+	   WriteSlot(hFile, "Message two for mailslot.");
+ 
+	   CloseHandle(hFile); 
+	} 
 }
 
 //.............................................................................
@@ -2295,7 +2403,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 	
-	testNetBios ();
+	testMailSlot ();
 
 	return 0;
 }
