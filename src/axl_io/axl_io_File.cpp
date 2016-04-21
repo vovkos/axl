@@ -16,13 +16,13 @@ File::open (
 	uint_t flags
 	)
 {
-	uint_t accessMode = (flags & FileFlag_ReadOnly) ?
-		GENERIC_READ :
-		GENERIC_READ | GENERIC_WRITE;
+	uint_t accessMode = 
+		(flags & FileFlag_ReadOnly) ? GENERIC_READ :
+		(flags & FileFlag_WriteOnly) ? GENERIC_WRITE : GENERIC_READ | GENERIC_WRITE;
 
-	uint_t shareMode = (flags & FileFlag_Exclusive) ?
-		0 :
-		(flags & FileFlag_ReadOnly) || (flags & FileFlag_ShareWrite) ?
+	uint_t shareMode = 
+		(flags & FileFlag_Exclusive) ? 0 :
+		(flags & (FileFlag_ReadOnly | FileFlag_ShareWrite)) ?
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE :
 			FILE_SHARE_READ;
 
@@ -59,7 +59,9 @@ File::open (
 	uint_t flags
 	)
 {
-	uint_t posixFlags = (flags & FileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
+	uint_t posixFlags = 
+		(flags & FileFlag_ReadOnly) ? O_RDONLY : 
+		(flags & FileFlag_WriteOnly) ? O_WRONLY : O_RDWR;
 
 	if (!(flags & (FileFlag_ReadOnly | FileFlag_OpenExisting)))
 		posixFlags |= O_CREAT;

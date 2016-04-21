@@ -21,11 +21,12 @@ namespace io {
 enum FileFlag
 {
 	FileFlag_ReadOnly      = 0x01,
-	FileFlag_OpenExisting  = 0x02,
-	FileFlag_Exclusive     = 0x04,
-	FileFlag_ShareWrite    = 0x08,
-	FileFlag_DeleteOnClose = 0x10,
-	FileFlag_Asynchronous  = 0x20,
+	FileFlag_WriteOnly     = 0x02,
+	FileFlag_OpenExisting  = 0x04,
+	FileFlag_Exclusive     = 0x08,
+	FileFlag_ShareWrite    = 0x10,
+	FileFlag_DeleteOnClose = 0x20,
+	FileFlag_Asynchronous  = 0x40,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
