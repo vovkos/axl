@@ -467,9 +467,15 @@ public:
 		copy (p, length);
 	}
 
+	StringBase (utf32_t x)
+	{
+		m_p = NULL;
+		copy (x);
+	}
+
 	StringBase (
 		utf32_t x,
-		size_t count = 1
+		size_t count
 		)
 	{
 		m_p = NULL;
@@ -573,7 +579,7 @@ public:
 	StringBase&
 	operator = (utf32_t x)
 	{
-		copy (x, 1);
+		copy (x);
 		return *this;
 	}
 
@@ -601,7 +607,7 @@ public:
 	StringBase&
 	operator += (utf32_t x)
 	{
-		append (x, 1);
+		append (x);
 		return *this;
 	}
 
@@ -853,9 +859,21 @@ public:
 	}
 
 	size_t
+	copy (utf32_t x)
+	{
+		if (!x)
+		{
+			clear ();
+			return 0;
+		}
+
+		return copy (x, 1);		
+	}
+
+	size_t
 	copy (
 		utf32_t x,
-		size_t count = 1
+		size_t count
 		)
 	{
 		if (!count)
@@ -925,9 +943,15 @@ public:
 	}
 
 	size_t
+	append (utf32_t x)
+	{
+		return x ? append (x, 1) : getLength ();
+	}
+
+	size_t
 	append (
 		utf32_t x,
-		size_t count = 1
+		size_t count
 		)
 	{
 		return insert (-1, x, count);
@@ -1046,8 +1070,17 @@ public:
 	size_t
 	insert (
 		size_t index,
+		utf32_t x
+		)
+	{
+		return x ? insert (index, x, 1) : getLength ();
+	}
+
+	size_t
+	insert (
+		size_t index,
 		utf32_t x,
-		size_t count = 1
+		size_t count
 		)
 	{
 		size_t oldLength = getLength ();
