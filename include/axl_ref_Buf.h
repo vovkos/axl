@@ -136,6 +136,12 @@ public:
 		copy (src);
 		return *this;
 	}
+	
+	size_t
+	getSize () const
+	{
+		return m_p ? SizeOf () (m_p) : 0;
+	}
 
 	void 
 	release ()
