@@ -189,6 +189,13 @@ getAbsTimespecFromTimeout (
 
 #endif
 
+inline 
+uint64_t
+getTimestampFromTimeval (const timeval* tval) 
+{
+	return ((uint64_t) tval->tv_sec + 11644473600) * 10000000 + (uint64_t) tval->tv_usec * 10;
+}
+
 //.............................................................................
 
 } // namespace sys
