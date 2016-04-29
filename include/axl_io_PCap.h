@@ -48,8 +48,18 @@ public:
 	size_t
 	read (
 		void* p,
-		size_t size
+		size_t size,
+		uint64_t* timestamp
 		);
+
+	size_t
+	read (
+		void* p,
+		size_t size
+		)
+	{
+		return read (p, size, NULL);
+	}
 
 	size_t
 	write (

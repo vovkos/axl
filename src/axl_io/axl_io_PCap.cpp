@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "axl_io_PCap.h"
 #include "axl_err_Error.h"
+#include "axl_sys_Time.h"
 
 namespace axl {
 namespace io {
@@ -85,7 +86,8 @@ PCap::setBlockingMode (bool isBlocking)
 size_t
 PCap::read (
 	void* p,
-	size_t size
+	size_t size,
+	uint64_t* timestamp
 	)
 {
 	pcap_pkthdr* hdr;
@@ -99,10 +101,14 @@ PCap::read (
 	}
 
 	if (result != 1) // special values
-		return result;
+		return result != -2 ? result : 0; // -2 means EOF
 
 	size_t copySize = AXL_MIN (hdr->caplen, size);
 	memcpy (p, data, copySize);
+
+	if (timestamp)
+		*timestamp = sys::getTimestampFromTimeval (&hdr->ts);
+
 	return copySize;
 }
 
