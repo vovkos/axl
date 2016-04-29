@@ -2280,6 +2280,8 @@ testNetBios ()
 
 //.............................................................................
 
+#if (_AXL_ENV == AXL_ENV_WIN)
+
 BOOL WriteSlot(HANDLE hSlot, const char* lpszMessage)
 {
    BOOL fResult; 
@@ -2382,6 +2384,8 @@ testMailSlot ()
 	} 
 }
 
+#endif
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -2403,7 +2407,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 	
-	testMailSlot ();
+	testNetBios ();
 
 	return 0;
 }
