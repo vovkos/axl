@@ -50,14 +50,17 @@ public:
 		return m_thread.create (NULL, 0, threadFunc, (T*) this, 0);
 	}
 
+	bool
+	wait (uint_t timeout = -1)
+	{
+		return !m_thread.isOpen () || m_thread.wait (timeout) == win::WaitResult_Object0;
+	}
+
 	void
 	waitAndClose (uint_t timeout = -1)
 	{
-		if (!m_thread.isOpen ())
-			return;
-
-		win::WaitResult result = m_thread.wait (timeout);
-		if (result != win::WaitResult_Object0)
+		bool result = wait (timeout);
+		if (!result)
 		{
 			ASSERT (false); // terminating thread
 			m_thread.terminate (err::SystemErrorCode_IoTimeout);
@@ -66,6 +69,11 @@ public:
 		m_thread.close ();
 	}
 
+	bool
+	terminate ()
+	{
+		return m_thread.terminate (err::SystemErrorCode_IoTimeout);
+	}
 
 protected:
 	static
@@ -108,6 +116,12 @@ public:
 	{
 		return (uint64_t) (pthread_t) m_thread;
 	}
+
+	bool
+	terminate ()
+	{
+		return m_thread.cancel ();
+	}
 };
 
 //.............................................................................
@@ -134,7 +148,13 @@ public:
 		m_threadCompletedEvent.reset ();
 		return m_thread.create (threadFunc, (T*) this);
 	}
-	
+
+	bool
+	wait (uint_t timeout = -1)
+	{
+		return !m_thread.isOpen () || m_threadCompletedEvent.wait (timeout);
+	}
+
 	void
 	waitAndClose (uint_t timeout = -1)
 	{
@@ -187,13 +207,16 @@ public:
 		return m_thread.create (threadFunc, (T*) this);
 	}
 
+	bool
+	wait (uint_t timeout = -1)
+	{
+		return !m_thread.isOpen () || m_thread.join (timeout);
+	}
+
 	void
 	waitAndClose (uint_t timeout = -1)
 	{
-		if (!m_thread.isOpen ())
-			return;
-
-		bool result = m_thread.join (timeout);
+		bool result = wait (timeout);
 		if (!result)
 		{
 			ASSERT (false);

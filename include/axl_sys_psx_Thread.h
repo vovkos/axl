@@ -128,7 +128,7 @@ public:
 	bool
 	cancel ()
 	{
-		int result = pthread_cancel (m_threadId);
+		int result = ::pthread_cancel (m_threadId);
 		return result != 0 ? true : err::fail (result);
 	}
 
