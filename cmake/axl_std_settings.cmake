@@ -266,6 +266,11 @@ axl_create_gcc_settings)
 		)
 
 	if (NOT "${GCC_SANITIZER}" STREQUAL " ")
+		if (CMAKE_GENERATOR MATCHES "Xcode")
+			# Xcode fires unresolved externals otherwise
+			set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${GCC_SANITIZER}")
+		endif ()
+	
 		set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${GCC_SANITIZER}")
 		set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_SANITIZER}")
 	endif ()
