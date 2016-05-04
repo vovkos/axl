@@ -60,8 +60,7 @@ public:
 		m_p = NULL;
 	}
 
-	template <typename T2>
-	TypeRefBase (const TypeRefBase <T2>& src)
+	TypeRefBase (const TypeRefBase& src)
 	{
 		if (src.m_p)
 			::CFRetain (src.m_p);
@@ -90,9 +89,8 @@ public:
 		return m_p;
 	}
 
-	template <typename T2>
 	TypeRefBase&
-	operator = (const TypeRefBase <T2>& src)
+	operator = (const TypeRefBase& src)
 	{
 		copy (src.m_p);
 		return *this;

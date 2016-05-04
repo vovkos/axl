@@ -78,10 +78,10 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 		sl::String name;
 		sl::String description;
 
-		cf::TypeRef prop = port.getProperty (kIOCalloutDeviceKey).p ();
+		cf::TypeRef prop = port.getProperty (kIOCalloutDeviceKey);
 		if (!prop)
 		{
-			prop = port.getProperty (kIODialinDeviceKey).p ();
+			prop = port.getProperty (kIODialinDeviceKey);
 			if (!prop)
 				continue;
 		}

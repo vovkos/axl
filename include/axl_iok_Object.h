@@ -25,8 +25,7 @@ public:
 		m_p = MACH_PORT_NULL;
 	}
 
-	template <typename T2>
-	ObjectBase (const ObjectBase <T2>& src)
+	ObjectBase (const ObjectBase& src)
 	{
 		if (src.m_p)
 			::IOObjectRetain (src.m_p);
@@ -50,9 +49,8 @@ public:
 		return m_p;
 	}
 
-	template <typename T2>
 	ObjectBase&
-	operator = (const ObjectBase <T2>& src)
+	operator = (const ObjectBase& src)
 	{
 		copy (src.m_p);
 		return *this;
