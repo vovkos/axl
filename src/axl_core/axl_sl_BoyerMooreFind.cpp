@@ -465,5 +465,22 @@ TextBoyerMooreFind::findImpl (
 
 //.............................................................................
 
+const void*
+memMem (
+	const void* p1,
+	size_t size1,
+	const void* p2,
+	size_t size2
+	)
+{
+	// building good-skip table is not worth it -- it's a single search
+
+	BinaryBoyerMooreFind find (p2, size2, BinaryBoyerMooreFind::Flag_Horspool);
+	size_t offset = find.find (p1, size1);
+	return offset != -1 ? (char*) p1 + offset : NULL;
+}
+
+//.............................................................................
+
 } // namespace sl
 } // namespace axl

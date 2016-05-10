@@ -355,5 +355,27 @@ protected:
 
 //.............................................................................
 
+const void*
+memMem (
+	const void* p1,
+	size_t size1,
+	const void* p2,
+	size_t size2
+	);
+
+inline
+void*
+memMem (
+	void* p1,
+	size_t size1,
+	const void* p2,
+	size_t size2
+	)
+{
+	return (void*) memMem ((const void*) p1, size1, p2, size2);
+}
+
+//.............................................................................
+
 } // namespace sl
 } // namespace axl
