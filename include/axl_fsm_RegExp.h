@@ -96,7 +96,7 @@ protected:
 	struct Token
 	{
 		TokenKind m_tokenKind;
-		char m_char;
+		uchar_t m_char;
 		sl::String m_string;
 
 		bool 
@@ -140,13 +140,16 @@ public:
 
 protected:
 	bool
-	readHexEscapeSequence (char* c);
+	readHexEscapeSequence (uchar_t* c);
 
 	bool
-	readEscapeSequence (char* c);
+	readEscapeSequence (uchar_t* c);
 
 	bool
-	readLiteral (sl::String* literal);
+	readLiteral (sl::String* string);
+
+	bool
+	readHexLiteral (sl::String* string);
 
 	bool
 	readIdentifier (sl::String* name);

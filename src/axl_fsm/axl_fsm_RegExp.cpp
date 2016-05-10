@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "axl_fsm_RegExp.h"
-#include "axl_err_Error.h"
-#include "axl_sl_String.h"
-#include "axl_sl_CallOnce.h"
 
 namespace axl {
 namespace fsm {
@@ -398,9 +395,9 @@ getHexValue (
 	if (c >= '0' && c <= '9')
 		*value = c - '0';
 	else if (c >= 'a' && c <= 'f')
-		*value = c - 'a';
+		*value = 10 + c - 'a';
 	else if (c >= 'A' && c <= 'F')
-		*value = c - 'A';
+		*value = 10 + c - 'A';
 	else
 		return false;
 
@@ -408,7 +405,7 @@ getHexValue (
 }
 
 bool
-RegExpCompiler::readHexEscapeSequence (char* c)
+RegExpCompiler::readHexEscapeSequence (uchar_t* c)
 {
 	ASSERT (*m_p == 'x');
 	m_p++;
@@ -432,7 +429,7 @@ RegExpCompiler::readHexEscapeSequence (char* c)
 }
 
 bool
-RegExpCompiler::readEscapeSequence (char* c)
+RegExpCompiler::readEscapeSequence (uchar_t* c)
 {
 	ASSERT (*m_p == '\\');
 	m_p++;
@@ -491,42 +488,74 @@ RegExpCompiler::readEscapeSequence (char* c)
 }
 
 bool
-RegExpCompiler::readLiteral (sl::String* literal)
+RegExpCompiler::readLiteral (sl::String* string)
 {
-	bool result;
-
 	char delimiter = *m_p++;
 	ASSERT (delimiter == '"' || delimiter == '\'');
 
-	for (;;)
+	for (const char* p = m_p;; p++)
 	{
-		char c;
-
-		switch (*m_p)
+		switch (*p)
 		{
 		case 0:
 			err::setStringError ("unclosed literal");
 			return false;
 
 		case '\\':
-			result = readEscapeSequence (&c);
-			if (!result)
+			if (!p [1])
+			{
+				err::setStringError ("invalid escape sequence");
 				return false;
+			}
 
-			literal->append (c);
+			p += 2;
 			break;
 
 		case '"':
 		case '\'':			
-			if (*m_p == delimiter)
+			if (*p == delimiter)
 			{
-				m_p++;
+				size_t size = enc::EscapeEncoding::decode (string, m_p, p - m_p);
+				if (size == -1)
+					return false;
+
+				m_p = p + 1;
 				return true;
 			}
+		}
+	}
+}
 
-		default:
-			c = *m_p++;
-			literal->append (c);
+bool
+RegExpCompiler::readHexLiteral (sl::String* string)
+{
+	ASSERT (m_p [0] == '0' && m_p [1] == 'x');
+	m_p += 2;
+
+	char delimiter = *m_p++;
+	ASSERT (delimiter == '"' || delimiter == '\'');
+
+	for (const char* p = m_p;; p++)
+	{
+		switch (*p)
+		{
+		case 0:
+			err::setStringError ("unclosed literal");
+			return false;
+
+		case '"':
+		case '\'':			
+			if (*p == delimiter)
+			{
+				sl::Array <char> buffer;
+				size_t size = enc::HexEncoding::decode (&buffer, m_p, p - m_p);
+				if (size == -1)
+					return false;
+
+				string->copy (buffer, size);
+				m_p = p + 1;
+				return true;
+			}
 		}
 	}
 }
@@ -628,7 +657,14 @@ RegExpCompiler::getToken (Token* token)
 			token->m_tokenKind = TokenKind_SpecialChar;
 			token->m_char = *m_p++;
 			return true;
-			
+
+		case '0':
+			if (m_p [1] == 'x' && (m_p [2] == '"' || m_p [2] == '\''))
+			{
+				token->m_tokenKind = TokenKind_Literal;
+				return readHexLiteral (&token->m_string);
+			}
+
 		default:
 			if (isalpha ((uchar_t) *m_p) || *m_p == '_')
 			{
@@ -981,8 +1017,8 @@ RegExpCompiler::charClassItem (sl::BitMap* charSet)
 {
 	bool result;
 
-	char c1;
-	char c2;
+	uchar_t c1;
+	uchar_t c2;
 
 	switch (*m_p)
 	{

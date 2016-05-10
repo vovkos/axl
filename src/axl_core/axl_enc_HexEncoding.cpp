@@ -156,7 +156,7 @@ HexEncoding::decode (
 	const char* end = p + length;
 	for (; p < end; p++)
 	{
-		bool_t isSpace = isspace(*p);
+		bool_t isSpace = isspace (*p);
 
 		switch (state)
 		{
