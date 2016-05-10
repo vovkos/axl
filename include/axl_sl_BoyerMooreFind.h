@@ -154,7 +154,7 @@ protected:
 
 //.............................................................................
 
-class BinaryBoyerMooreFind: public BoyerMooreFindBase <char>
+class BinaryBoyerMooreFind: public BoyerMooreFindBase <uchar_t>
 {
 public:
 	BinaryBoyerMooreFind ()

@@ -246,10 +246,10 @@ public:
 
 //.............................................................................
 
-typedef BoyerMooreAccessor <char> BinaryBoyerMooreAccessor;
-typedef BoyerMooreReverseAccessor <char> BinaryBoyerMooreReverseAccessor;
-typedef BoyerMooreIncrementalAccessor <char> BinaryBoyerMooreIncrementalAccessor;
-typedef BoyerMooreIncrementalReverseAccessor <char> BinaryBoyerMooreIncrementalReverseAccessor;
+typedef BoyerMooreAccessor <uchar_t> BinaryBoyerMooreAccessor;
+typedef BoyerMooreReverseAccessor <uchar_t> BinaryBoyerMooreReverseAccessor;
+typedef BoyerMooreIncrementalAccessor <uchar_t> BinaryBoyerMooreIncrementalAccessor;
+typedef BoyerMooreIncrementalReverseAccessor <uchar_t> BinaryBoyerMooreIncrementalReverseAccessor;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

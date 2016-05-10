@@ -21,8 +21,8 @@ BinaryBoyerMooreFind::setPattern (
 	}
 
 	bool result = (flags & Flag_Reverse) ?
-		m_pattern.copyReverse ((const char*) p, size) :
-		m_pattern.copy ((const char*) p, size);
+		m_pattern.copyReverse ((const uchar_t*) p, size) :
+		m_pattern.copy ((const uchar_t*) p, size);
 
 	if (!result)
 		return false;
@@ -63,8 +63,8 @@ BinaryBoyerMooreFind::find (
 		return -1;
 
 	size_t result = (m_flags & Flag_Reverse) ? 
-		findImpl (BinaryBoyerMooreReverseAccessor ((const char*) p + size - 1), size) : 
-		findImpl (BinaryBoyerMooreAccessor ((const char*) p), size);
+		findImpl (BinaryBoyerMooreReverseAccessor ((const uchar_t*) p + size - 1), size) : 
+		findImpl (BinaryBoyerMooreAccessor ((const uchar_t*) p), size);
 
 	if (result == -1)
 		return -1;
@@ -93,16 +93,16 @@ BinaryBoyerMooreFind::find (
 	if (fullSize < patternSize)
 	{
 		if (m_flags & Flag_Reverse)
-			incrementalContext->m_tail.appendReverse ((const char*) p, size);
+			incrementalContext->m_tail.appendReverse ((const uchar_t*) p, size);
 		else
-			incrementalContext->m_tail.append ((const char*) p, size);
+			incrementalContext->m_tail.append ((const uchar_t*) p, size);
 
 		return -1;
 	}
 
 	size_t result = (m_flags & Flag_Reverse) ? 
-		findImpl (BinaryBoyerMooreIncrementalReverseAccessor ((const char*) p + size - 1, incrementalContext), fullSize) : 
-		findImpl (BinaryBoyerMooreIncrementalAccessor ((const char*) p, incrementalContext), fullSize);
+		findImpl (BinaryBoyerMooreIncrementalReverseAccessor ((const uchar_t*) p + size - 1, incrementalContext), fullSize) : 
+		findImpl (BinaryBoyerMooreIncrementalAccessor ((const uchar_t*) p, incrementalContext), fullSize);
 
 	if (result == -1)
 		return -1;
