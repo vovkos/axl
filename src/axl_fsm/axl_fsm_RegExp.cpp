@@ -508,7 +508,7 @@ RegExpCompiler::readLiteral (sl::String* string)
 				return false;
 			}
 
-			p += 2;
+			p++;
 			break;
 
 		case '"':
