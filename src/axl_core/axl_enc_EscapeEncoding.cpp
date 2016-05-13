@@ -213,7 +213,7 @@ EscapeEncoding::decode (
 				replace = findEscapeReplaceChar (*p);
 				if (replace != *p)
 				{
-					string->append (replace);
+					string->append (replace, 1);
 					base = p + 1;
 				}
 				else
