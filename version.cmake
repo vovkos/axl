@@ -14,7 +14,11 @@ else ()
 	set (AXL_VERSION_TAG_SUFFIX)
 endif ()
 
+string (TIMESTAMP AXL_VERSION_YEAR  "%Y")
+string (TIMESTAMP AXL_VERSION_MONTH "%m")
+string (TIMESTAMP AXL_VERSION_DAY   "%d")
+
 set (AXL_VERSION_COMPANY   "Tibbo Technology Inc")
-set (AXL_VERSION_YEARS     "2007-2016")
+set (AXL_VERSION_YEARS     "2007-${AXL_VERSION_YEAR}")
 
 #..............................................................................
