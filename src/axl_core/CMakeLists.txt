@@ -487,7 +487,7 @@ axl_set_pch (
 	)
 
 if (GCC)
-	axl_add_target_string_property (
+	axl_append_target_string_property (
 		axl_core
 		COMPILE_FLAGS
 		"-fPIC -fvisibility=hidden"
@@ -495,7 +495,7 @@ if (GCC)
 endif ()
 
 if (WIN32)
-	axl_add_target_string_property (
+	axl_append_target_string_property (
 		axl_core
 		STATIC_LIBRARY_FLAGS 
 		"/IGNORE:4221"

@@ -306,7 +306,7 @@ axl_set_pch (
 	)
 
 if (WIN32)
-	axl_add_target_string_property (
+	axl_append_target_string_property (
 		axl_io
 		STATIC_LIBRARY_FLAGS 
 		"/IGNORE:4221"
@@ -314,7 +314,7 @@ if (WIN32)
 endif ()
 
 if (GCC)
-	axl_add_target_string_property (
+	axl_append_target_string_property (
 		axl_io
 		COMPILE_FLAGS
 		"-fPIC"

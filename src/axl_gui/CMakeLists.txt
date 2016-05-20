@@ -166,7 +166,7 @@ axl_set_pch (
 	)
 
 if (GCC)
-	axl_add_target_string_property (
+	axl_append_target_string_property (
 		axl_gui
 		COMPILE_FLAGS
 		"-fPIC"

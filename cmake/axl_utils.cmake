@@ -271,16 +271,21 @@ axl_set_pch_msvc
 	get_filename_component (_PCH_NAME ${_PCH_H} NAME_WE)
 	set (_PCH_BIN "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET}.dir/$(Configuration)/${_PCH_NAME}.pch")
 
-	set_target_properties (
+	axl_append_target_string_property (
 		${_TARGET}
-		PROPERTIES
-		COMPILE_FLAGS "/Yu\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
+		COMPILE_FLAGS 
+		"/Yu\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
+		)
+
+	axl_append_source_file_string_property (
+		${_PCH_CPP}
+		COMPILE_FLAGS 
+		"/Yc\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
 		)
 
 	set_source_files_properties (
 		${_PCH_CPP}
 		PROPERTIES
-		COMPILE_FLAGS "/Yc\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
 		OBJECT_OUTPUTS "${_PCH_BIN}"
 		)
 endmacro ()
@@ -404,9 +409,9 @@ axl_set_pch_gcc
 
 	include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
-	set_target_properties (
+	axl_append_target_string_property (
 		${_TARGET}
-		PROPERTIES COMPILE_FLAGS
+		COMPILE_FLAGS
 		"-include \"${_PCH_GCC}\""
 		)
 endmacro ()
@@ -535,10 +540,10 @@ endmacro ()
 
 #..............................................................................
 
-# target property helpers
+# target & source file property helpers
 
 macro (
-axl_add_target_string_property 
+axl_append_target_string_property 
 	_TARGET
 	_PROPERTY
 	_VALUE
@@ -549,20 +554,48 @@ axl_add_target_string_property
 		${_TARGET}
 		${_PROPERTY}
 		)
-		
-	if (${_OLD_VALUE})
-		set (_VALUE, "${_OLD_VALUE} ${_VALUE}")
+
+	if (NOT _OLD_VALUE)
+		set (_NEW_VALUE ${_VALUE})
+	else ()
+		set (_NEW_VALUE "${_OLD_VALUE} ${_VALUE}")
 	endif ()
 
 	set_target_properties (
 		${_TARGET}
 		PROPERTIES
-		${_PROPERTY} ${_VALUE}
+		${_PROPERTY} ${_NEW_VALUE}
 		)	
 endmacro ()
 
 macro (
-axl_add_target_list_property 
+axl_append_source_file_string_property 
+	_FILE
+	_PROPERTY
+	_VALUE
+	)
+
+	get_source_file_property (
+		_OLD_VALUE
+		${_FILE}
+		${_PROPERTY}
+		)
+
+	if (NOT _OLD_VALUE)
+		set (_NEW_VALUE ${_VALUE})
+	else ()
+		set (_NEW_VALUE "${_OLD_VALUE} ${_VALUE}")
+	endif ()
+
+	set_source_files_properties (
+		${_FILE}
+		PROPERTIES
+		${_PROPERTY} ${_NEW_VALUE}
+		)	
+endmacro ()
+
+macro (
+axl_append_target_list_property 
 	_TARGET
 	_PROPERTY
 	#...
@@ -575,21 +608,49 @@ axl_add_target_list_property
 		${_TARGET}
 		${_PROPERTY}
 		)
-	
-	if (${_OLD_VALUE_LIST})
-		set (_NEW_VALUE_LIST ${_OLD_VALUE_LIST})
-	else ()
+
+	if (NOT _OLD_VALUE_LIST)
 		set (_NEW_VALUE_LIST)
+	else ()
+		set (_NEW_VALUE_LIST ${_OLD_VALUE_LIST})
 	endif ()
 
-	foreach (_VALUE ${_VALUE_LIST})
-		list (APPEND ${_NEW_VALUE_LIST} ${_VALUE})
-	endforeach ()
+	list (APPEND _NEW_VALUE_LIST ${_VALUE_LIST})
 
 	set_target_properties (
 		${_TARGET}
 		PROPERTIES
-		${_PROPERTY} ${_VALUE_LIST}
+		${_PROPERTY} "${_NEW_VALUE_LIST}"
+		)	
+endmacro ()
+
+macro (
+axl_append_source_file_list_property 
+	_FILE
+	_PROPERTY
+	#...
+	)
+
+	set (_VALUE_LIST ${ARGN})
+	
+	get_source_file_property (
+		_OLD_VALUE_LIST
+		${_FILE}
+		${_PROPERTY}
+		)
+
+	if (NOT _OLD_VALUE_LIST)
+		set (_NEW_VALUE_LIST)
+	else ()
+		set (_NEW_VALUE_LIST ${_OLD_VALUE_LIST})
+	endif ()
+
+	list (APPEND _NEW_VALUE_LIST ${_VALUE_LIST})
+
+	set_source_files_properties (
+		${_FILE}
+		PROPERTIES
+		${_PROPERTY} "${_NEW_VALUE_LIST}"
 		)	
 endmacro ()
 

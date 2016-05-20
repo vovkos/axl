@@ -72,7 +72,7 @@ axl_set_pch (
 	)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	axl_add_target_string_property (
+	axl_append_target_string_property (
 		axl_zip
 		COMPILE_FLAGS
 		"-fPIC"
