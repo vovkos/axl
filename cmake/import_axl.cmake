@@ -1,15 +1,24 @@
 #..............................................................................
 
-if ("${AXL_CMAKE_DIR_2}" STREQUAL "")
-	set (AXL_FOUND FALSE)
-	message (STATUS "AXL:                        <not-found>")
-else ()
-	include (${AXL_CMAKE_DIR_2}/axl_config.cmake)	
+axl_find_file (
+	_CONFIG_CMAKE
+	axl_config.cmake
+	${AXL_CMAKE_DIR}
+	)
 
-	set (AXL_FOUND TRUE)
-	message (STATUS "Path to AXL cmake files:    ${AXL_CMAKE_DIR}")
-	message (STATUS "Path to AXL includes:       ${AXL_INC_DIR}")
-	message (STATUS "Path to AXL libraries:      ${AXL_LIB_DIR}")
+if (_CONFIG_CMAKE)
+	include (${_CONFIG_CMAKE})
+
+	message (STATUS "Path defintions for AXL")
+	message (STATUS "    AXL cmake files: ${AXL_CMAKE_DIR}")
+	message (STATUS "    AXL includes:    ${AXL_INC_DIR}")
+	message (STATUS "    AXL libraries:   ${AXL_LIB_DIR}")
+
+	set (AXL_FOUND TRUE)	
+else ()
+	message (STATUS "AXL not found")
+
+	set (AXL_FOUND FALSE)
 endif ()
 
 #..............................................................................

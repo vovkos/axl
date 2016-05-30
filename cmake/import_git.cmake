@@ -1,11 +1,9 @@
 #..............................................................................
 
-if ("${GIT_EXE}" STREQUAL "")
-	set (GIT_FOUND FALSE)
-	message (STATUS "Git:                        <not-found>")
-else ()
+if (EXISTS ${GIT_EXE})
 	set (GIT_FOUND TRUE)
-	message (STATUS "Path to Git executable:     ${GIT_EXE}")
+else ()
+	set (GIT_FOUND FALSE)
 endif ()
 
 #..............................................................................

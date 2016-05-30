@@ -1,12 +1,9 @@
 #..............................................................................
 
-if ("${LUA_INC_DIR}" STREQUAL "")
-	set (LUA_FOUND FALSE)
-	message (STATUS "Lua:                        <not-found>")
-else ()
+if (EXISTS ${LUA_INC_DIR}/lua.h)
 	set (LUA_FOUND TRUE)
-	message (STATUS "Path to Lua includes:       ${LUA_INC_DIR}")
-	message (STATUS "Path to Lua libraries:      ${LUA_LIB_DIR}")
+else ()
+	set (LUA_FOUND FALSE)
 endif ()
 
 #..............................................................................

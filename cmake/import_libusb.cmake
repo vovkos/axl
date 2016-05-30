@@ -1,12 +1,9 @@
 #..............................................................................
 
-if ("${LIBUSB_INC_DIR}" STREQUAL "")
-	set (LIBUSB_FOUND FALSE)
-	message (STATUS "LibUSB:                     <not-found>")
-else ()
+if (EXISTS ${LIBUSB_INC_DIR}/libusb.h)
 	set (LIBUSB_FOUND TRUE)
-	message (STATUS "Path to LibUSB includes:    ${LIBUSB_INC_DIR}")
-	message (STATUS "Path to LibUSB libraries:   ${LIBUSB_LIB_DIR}")
+else ()
+	set (LIBUSB_FOUND FALSE)
 endif ()
 
 #..............................................................................

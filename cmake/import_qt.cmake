@@ -1,11 +1,9 @@
 #..............................................................................
 
-if ("${QT_CMAKE_DIR}" STREQUAL "")
-	set (QT_FOUND FALSE)
-	message (STATUS "QT:                         <not-found>")
-else ()
+if (EXISTS ${QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake)
 	set (QT_FOUND TRUE)
-	message (STATUS "Path to QT cmake files:     ${QT_CMAKE_DIR}")
+else ()
+	set (QT_FOUND FALSE)
 endif ()
 
 unset (Qt5Core_DIR    CACHE)
@@ -58,6 +56,10 @@ copy_qt_dll_files
 	# ...
 	)
 
+	if (NOT QT_FOUND)
+		message (FATAL_ERROR "QT is required for copy_qt_dll_files () macro")
+	endif ()
+	
 	if (NOT WIN32)
 		message (FATAL_ERROR "copy_qt_dll_files should only be used on Windows")
 	endif ()
@@ -66,18 +68,19 @@ copy_qt_dll_files
 
 	if (CMAKE_GENERATOR MATCHES "Visual Studio")
 		foreach (_QT_MODULE ${_QT_MODULE_LIST})
+			set (_QT_FILE_NAME_DEBUG Qt5${_QT_MODULE}d.dll)
+			set (_QT_FILE_NAME_RELEASE Qt5${_QT_MODULE}.dll)
+
 			axl_copy_file_if_different (
 				${_TARGET}
-				${QT_DLL_DIR}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
-				Qt5${_QT_MODULE}d.dll
+				${QT_DLL_DIR}/${_QT_FILE_NAME_DEBUG}
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/${_QT_FILE_NAME_DEBUG}
 				)
 
 			axl_copy_file_if_different (
 				${_TARGET}
-				${QT_DLL_DIR}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
-				Qt5${_QT_MODULE}.dll
+				${QT_DLL_DIR}/${_QT_FILE_NAME_RELEASE}
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/${_QT_FILE_NAME_RELEASE}
 				)
 		endforeach ()
 	else ()
@@ -88,11 +91,12 @@ copy_qt_dll_files
 		endif ()
 
 		foreach (_QT_MODULE ${_QT_MODULE_LIST})
+			set (_QT_FILE_NAME Qt5${_QT_MODULE}${_QT_DLL_SUFFIX})
+
 			axl_copy_file_if_different (
 				${_TARGET}
-				${QT_DLL_DIR}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-				Qt5${_QT_MODULE}${_QT_DLL_SUFFIX}
+				${QT_DLL_DIR}/${_QT_FILE_NAME}
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_QT_FILE_NAME}				
 				)
 		endforeach ()
 	endif ()
@@ -102,6 +106,10 @@ endmacro ()
 
 macro (
 add_qt_rpath_link)
+	if (NOT QT_FOUND)
+		message (FATAL_ERROR "QT is required for add_qt_rpath_link () macro")
+	endif ()
+
 	if (NOT UNIX OR APPLE)
 		message (FATAL_ERROR "add_qt_rpath_link should only be used on Unix")
 	endif ()

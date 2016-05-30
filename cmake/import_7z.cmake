@@ -1,11 +1,9 @@
 #..............................................................................
 
-if ("${7Z_EXE}" STREQUAL "")
-	set (7Z_FOUND FALSE)
-	message (STATUS "7Zip:                       <not-found>")
-else ()
+if (EXISTS ${7Z_EXE})
 	set (7Z_FOUND TRUE)
-	message (STATUS "Path to 7Zip executable:    ${7Z_EXE}")
+else ()
+	set (7Z_FOUND FALSE)
 endif ()
 
 #..............................................................................

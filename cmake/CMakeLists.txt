@@ -10,12 +10,4 @@ configure_file (
 	@ONLY
 	)
 
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/paths.cmake)
-	configure_file (
-		paths.cmake.template
-		${CMAKE_SOURCE_DIR}/paths.cmake
-		COPYONLY
-		)
-endif ()
-
 #..............................................................................

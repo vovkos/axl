@@ -303,22 +303,22 @@ endmacro ()
 macro (
 axl_print_std_settings)
 
-	message (STATUS "Target CPU:                 ${AXL_CPU}")
+	message (STATUS "Target CPU:          ${AXL_CPU}")
 
 	if (HAS_BUILD_TYPE_SETTING)
-		message (STATUS "Build type:                 ${CMAKE_BUILD_TYPE}")
+		message (STATUS "Build type:          ${CMAKE_BUILD_TYPE}")
 	endif ()
 
 	string (STRIP "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}"   _CXX_FLAGS_DEBUG)
 	string (STRIP "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}" _CXX_FLAGS_RELEASE)
 
-	message (STATUS "C++ flags (Debug):          ${_CXX_FLAGS_DEBUG}")
-	message (STATUS "C++ flags (Release):        ${_CXX_FLAGS_RELEASE}")
+	message (STATUS "C++ flags (Debug):   ${_CXX_FLAGS_DEBUG}")
+	message (STATUS "C++ flags (Release): ${_CXX_FLAGS_RELEASE}")
 
 	get_directory_property (_CXX_DEFINITIONS COMPILE_DEFINITIONS)
 
 	if (_CXX_DEFINITIONS)
-		message (STATUS "C++ definitions:            ${_CXX_DEFINITIONS}")
+		message (STATUS "C++ definitions:     ${_CXX_DEFINITIONS}")
 	endif ()
 endmacro ()
 

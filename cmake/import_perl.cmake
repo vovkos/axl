@@ -1,11 +1,9 @@
 #..............................................................................
 
-if ("${PERL_EXE}" STREQUAL "")
-	set (PERL_FOUND FALSE)
-	message (STATUS "Perl:                       <not-found>")
-else ()
+if (EXISTS ${PERL_EXE})
 	set (PERL_FOUND TRUE)
-	message (STATUS "Path to Perl executable:    ${PERL_EXE}")
+else ()
+	set (PERL_FOUND FALSE)
 endif ()
 
 #..............................................................................
@@ -17,6 +15,10 @@ add_perl_step
 	_SCRIPT_FILE
 	# ... 
 	)
+	
+	if (NOT PERL_FOUND)
+		message (FATAL_ERROR "Perl is required for add_perl_step () macro")
+	endif ()
 
 	set (_SWITCH_LIST ${ARGN})
 	

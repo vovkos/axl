@@ -1,12 +1,9 @@
 #..............................................................................
 
-if ("${OPENSSL_INC_DIR}" STREQUAL "")
-	set (OPENSSL_FOUND FALSE)
-	message (STATUS "OpenSSL:                    <not-found>")
-else ()
+if (EXISTS ${OPENSSL_INC_DIR}/openssl/obj_mac.h)
 	set (OPENSSL_FOUND TRUE)
-	message (STATUS "Path to OpenSSL includes:   ${OPENSSL_INC_DIR}")
-	message (STATUS "Path to OpenSSL libraries:  ${OPENSSL_LIB_DIR}")
+else ()
+	set (OPENSSL_FOUND FALSE)
 endif ()
 
 #..............................................................................

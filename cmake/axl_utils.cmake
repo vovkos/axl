@@ -1,13 +1,111 @@
 #..............................................................................
 
-# print all variables (for debugging)
+# aligned variable list printing helpers
 
 macro (
-axl_print_all_vars)
+axl_calc_max_string_length 
+	_RESULT
+	# ...
+	)
 
-	get_cmake_property (_VARIABLE_LIST VARIABLES)
+	set (_STRING_LIST ${ARGN})
+
+	set (_MAX_LENGTH 0)
+	foreach (_STRING ${_STRING_LIST})
+		string (LENGTH ${_STRING} _LENGTH)
+		if (${_LENGTH} GREATER ${_MAX_LENGTH})
+			set (_MAX_LENGTH ${_LENGTH})
+		endif ()
+	endforeach ()
+	
+	set (${_RESULT} ${_MAX_LENGTH})	
+endmacro ()
+
+macro (
+axl_create_space_padding
+	_RESULT
+	_STRING
+	_MAX_LENGTH
+	)
+
+	string (LENGTH ${_STRING} _LENGTH)
+	math (EXPR _PADDING_LENGTH "${_MAX_LENGTH} - ${_LENGTH} + 1")
+	string (RANDOM LENGTH ${_PADDING_LENGTH} ALPHABET " " ${_RESULT})
+endmacro ()
+
+macro (
+axl_print_variable_list
+	_INDENT
+	# ...
+	)
+
+	set (_VARIABLE_LIST ${ARGN})
+
+	axl_calc_max_string_length (_MAX_LENGTH ${_VARIABLE_LIST})
+
 	foreach (_VARIABLE ${_VARIABLE_LIST})
-		message(STATUS "${_VARIABLE} = ${${_VARIABLE}}")
+		axl_create_space_padding (_PADDING ${_VARIABLE} ${_MAX_LENGTH})
+		message(STATUS "${_INDENT}${_VARIABLE}:${_PADDING}${${_VARIABLE}}")
+	endforeach ()
+endmacro ()
+
+macro (
+axl_filter_list
+	_RESULT
+	_FILTER
+	# ...
+	)
+
+	set (_LIST ${ARGN})
+	unset (_FILTERED_LIST)
+
+	foreach (_ITEM ${_LIST})
+		string (REGEX MATCH "${_FILTER}$" _MATCH "${_ITEM}")
+		if (_MATCH)
+			list (APPEND _FILTERED_LIST ${_ITEM})
+		endif ()
+	endforeach ()	
+
+	set (${_RESULT} ${_FILTERED_LIST})	
+endmacro ()
+
+#..............................................................................
+
+# create a template file in form 
+# 
+# set (SETTING1 SETTING1-NOTFOUND)
+# set (SETTING2 SETTING2-NOTFOUND)
+# ...
+# 
+
+macro (
+	axl_create_empty_setting_file
+	_FILE_PATH
+	_COMMENT
+	# ...
+	)
+
+	set (_SETTING_LIST ${ARGN})
+
+	axl_calc_max_string_length (_MAX_LENGTH ${_SETTING_LIST})
+
+	if (WIN32)
+		set (_NL "\r\n")
+	else ()
+		set (_NL "\n")
+	endif ()
+
+	set (_CONTENTS "# ${_NL}")
+	set (_CONTENTS "${_CONTENTS}# This is an auto-generated setting file${_NL}")
+	set (_CONTENTS "${_CONTENTS}# Fill it by hand with proper settings${_NL}")
+	set (_CONTENTS "${_CONTENTS}# ${_NL}${_NL}")
+
+	foreach (_SETTING ${_SETTING_LIST})
+		axl_create_space_padding (_PADDING ${_SETTING} ${_MAX_LENGTH})
+		set (_CONTENTS "${_CONTENTS}set (${_SETTING}${_PADDING}${_SETTING}-NOTFOUND)${_NL}")
+	endforeach ()
+
+	file (WRITE ${_FILE_PATH} ${_CONTENTS})
 endmacro ()
 
 #..............................................................................
@@ -291,6 +389,22 @@ axl_set_pch_msvc
 endmacro ()
 
 macro (
+axl_disable_pch_msvc
+	# ...
+	)
+
+	set (_FILE_LIST ${ARGN})
+
+	foreach (_FILE ${_FILE_LIST})
+		axl_append_source_file_string_property (
+			${_FILE}
+			COMPILE_FLAGS 
+			"/Y-"
+			)
+	endforeach ()
+endmacro ()
+
+macro (
 axl_set_pch_gcc
 	_TARGET
 	_PCH_H
@@ -473,6 +587,55 @@ endmacro ()
 # file helpers
 
 macro (
+axl_find_file
+	_RESULT
+	_FILE_NAME
+	# ...
+	)
+	
+	set (_DIR_LIST ${ARGN})
+
+	set (_FILE_PATH ${_FILE_NAME}-NOTFOUND)
+
+	foreach (_DIR ${_DIR_LIST})
+		if (EXISTS ${_DIR}/${_FILE_NAME})
+			set (_FILE_PATH ${_DIR}/${_FILE_NAME})
+			break ()
+		endif ()	
+	endforeach ()
+
+	set (${_RESULT} ${_FILE_PATH})
+endmacro ()
+
+macro (
+axl_find_file_recurse_parent_dirs
+	_RESULT
+	_FILE_NAME
+	_START_DIR
+	)
+
+	set (_DIR ${_START_DIR})
+
+	while (TRUE)
+		if (EXISTS ${_DIR}/${_FILE_NAME})
+			set (_FILE_PATH ${_DIR}/${_FILE_NAME})
+			break ()
+		endif ()
+	
+		get_filename_component (_PARENT_DIR "${_DIR}/.." ABSOLUTE)
+
+		if (${_DIR} STREQUAL ${_PARENT_DIR})
+			set (_FILE_PATH ${_FILE_NAME}-NOTFOUND)
+			break ()
+		endif ()	
+	
+		set (_DIR ${_PARENT_DIR})
+	endwhile ()
+
+	set (${_RESULT} ${_FILE_PATH})
+endmacro ()
+
+macro (
 axl_make_path
 	_FILE_PATH
 	_FILE_NAME
@@ -503,18 +666,36 @@ endmacro ()
 macro (
 axl_copy_file_if_different
 	_TARGET
-	_SRC_DIR
-	_DST_DIR
-	_FILE_NAME
+	_SRC_FILE_NAME
+	_DST_FILE_NAME
 	)
 	
 	add_custom_command (
 		TARGET ${_TARGET} 
 		POST_BUILD        
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"${_SRC_DIR}/${_FILE_NAME}"
-			"${_DST_DIR}/${_FILE_NAME}"
+			"${_SRC_FILE_NAME}"
+			"${_DST_FILE_NAME}"
 		)
+endmacro ()
+
+macro (
+axl_copy_file_list_if_different
+	_TARGET
+	_SRC_DIR
+	_DST_DIR
+	# ...
+	)
+	
+	set (_FILE_NAME_LIST ${ARGN})
+
+	foreach (_FILE_NAME ${_FILE_NAME_LIST})
+		axl_copy_file_if_different (
+			${_TARGET}
+			${_SRC_DIR}/${_FILE_NAME}
+			${_DST_DIR}/${_FILE_NAME}
+			)
+	endforeach ()
 endmacro ()
 
 macro (
@@ -658,6 +839,8 @@ endmacro ()
 
 # imports -- CMake' find_package replacement with support for manual override 
 
+set (AXL_STD_IMPORT_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 macro (
 axl_include_import_file
 	_IMPORT
@@ -666,19 +849,28 @@ axl_include_import_file
 
 	set (${_IMPORT}_FOUND FALSE)
 
+	# use AXL_IMPORT_DIR_LIST first (to allow overriding)
+	
 	foreach (_IMPORT_DIR ${AXL_IMPORT_DIR_LIST})
 		unset (_IMPORT_FILE_PATH)
 
-		include (
-			${_IMPORT_DIR}/import_${_IMPORT}.cmake 
-			OPTIONAL 
-			RESULT_VARIABLE _IMPORT_FILE_PATH
-			)
-			
-		if (_IMPORT_FILE_PATH)
+		if (EXISTS ${_IMPORT_DIR}/import_${_IMPORT}.cmake)
+			set (_IMPORT_FILE_PATH ${_IMPORT_DIR}/import_${_IMPORT}.cmake)
 			break ()
 		endif ()
 	endforeach ()
+	
+	# fallback to standard import_*.cmake
+	
+	if (NOT _IMPORT_FILE_PATH)
+		if (EXISTS ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
+			set (_IMPORT_FILE_PATH ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
+		else ()
+			message (FATAL_ERROR "import_${_IMPORT}.cmake not found (use AXL_IMPORT_DIR_LIST in dependencies.cmake)")
+		endif ()
+	endif ()
+	
+	include (${_IMPORT_FILE_PATH})
 	
 	string (TOUPPER ${_IMPORT} _IMPORT_UC)
 	if (NOT ${_IMPORT_UC}_FOUND AND NOT _IS_OPTIONAL)
@@ -707,5 +899,5 @@ axl_import
 		endif ()
 	endforeach ()
 endmacro ()
-
+	
 #..............................................................................

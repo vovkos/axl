@@ -1,11 +1,9 @@
 #..............................................................................
 
-if ("${RAGEL_EXE}" STREQUAL "")
-	set (RAGEL_FOUND FALSE)
-	message (STATUS "Ragel:                      <not-found>")
-else ()
+if (EXISTS ${RAGEL_EXE})
 	set (RAGEL_FOUND TRUE)
-	message (STATUS "Path to Ragel executable:   ${RAGEL_EXE}")
+else ()
+	set (RAGEL_FOUND FALSE)
 endif ()
 
 #..............................................................................
@@ -15,6 +13,10 @@ add_ragel_step
 	_OUTPUT_FILE
 	_INPUT_FILE
 	)
+	
+	if (NOT RAGEL_FOUND)
+		message (FATAL_ERROR "Ragel is required for add_ragel_step () macro")
+	endif ()
 
 	axl_make_path (_OUTPUT_PATH ${_OUTPUT_FILE} ${CMAKE_CURRENT_BINARY_DIR})
 	axl_make_path (_INPUT_PATH ${_INPUT_FILE} ${CMAKE_CURRENT_SOURCE_DIR})
