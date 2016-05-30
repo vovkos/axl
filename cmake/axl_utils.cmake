@@ -80,8 +80,7 @@ endmacro ()
 
 macro (
 	axl_create_empty_setting_file
-	_FILE_PATH
-	_COMMENT
+	_FILE_NAME
 	# ...
 	)
 
@@ -89,23 +88,17 @@ macro (
 
 	axl_calc_max_string_length (_MAX_LENGTH ${_SETTING_LIST})
 
-	if (WIN32)
-		set (_NL "\r\n")
-	else ()
-		set (_NL "\n")
-	endif ()
-
-	set (_CONTENTS "# ${_NL}")
-	set (_CONTENTS "${_CONTENTS}# This is an auto-generated setting file${_NL}")
-	set (_CONTENTS "${_CONTENTS}# Fill it by hand with proper settings${_NL}")
-	set (_CONTENTS "${_CONTENTS}# ${_NL}${_NL}")
+	set (_CONTENTS "#\n")
+	set (_CONTENTS "${_CONTENTS}# This is an auto-generated setting file\n")
+	set (_CONTENTS "${_CONTENTS}# Fill it by hand with proper settings\n")
+	set (_CONTENTS "${_CONTENTS}#\n\n")
 
 	foreach (_SETTING ${_SETTING_LIST})
 		axl_create_space_padding (_PADDING ${_SETTING} ${_MAX_LENGTH})
-		set (_CONTENTS "${_CONTENTS}set (${_SETTING}${_PADDING}${_SETTING}-NOTFOUND)${_NL}")
+		set (_CONTENTS "${_CONTENTS}set (${_SETTING}${_PADDING}${_SETTING}-NOTFOUND)\n")
 	endforeach ()
 
-	file (WRITE ${_FILE_PATH} ${_CONTENTS})
+	file (WRITE ${_FILE_NAME} ${_CONTENTS})
 endmacro ()
 
 #..............................................................................
