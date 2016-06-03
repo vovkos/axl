@@ -712,6 +712,25 @@ axl_configure_file_w_permissions
 	file (REMOVE ${_TMP_FILE})
 endmacro ()
 
+macro (
+axl_enum_directories
+	_RESULT
+	_DIR
+	)
+	
+	file (GLOB _FILE_LIST RELATIVE ${_DIR} ${_DIR}/*)
+	set (_DIR_LIST)
+	
+	foreach (_FILE ${_FILE_LIST})
+		if (IS_DIRECTORY ${_DIR}/${_FILE})
+			LIST (APPEND _DIR_LIST ${_FILE})
+		endif ()
+	endforeach ()
+
+	set (${_RESULT} ${_DIR_LIST})
+endmacro ()
+
+
 #..............................................................................
 
 # target & source file property helpers
