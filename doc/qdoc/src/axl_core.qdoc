@@ -1,0 +1,71 @@
+/*!
+	\group modules
+	\title All Modules
+
+	\table 80%
+		\header
+		\li Module
+		\li Description
+	
+		\row
+		\li \l{AXL Core}
+		\li AXL Core Description
+	
+		\row
+		\li \l{AXL IO}
+		\li AXL IO Description
+	\endtable
+*/
+
+// ............................
+
+/*!
+    \module axl_core
+    \ingroup modules
+	\title AXL Core Module
+    \target AXL Core
+    \brief axl_core brief
+    
+    axl_core details
+*/
+
+/*!
+    \module axl_io
+    \ingroup modules
+	\title AXL IO Module
+    \target AXL IO
+    \brief axl_io brief
+    
+    axl_io details
+*/
+
+// ............................
+
+/*!
+    \namespace axl
+    \inmodule axl_core  
+    \target axl Namespace
+    \brief axl namespace brief
+    
+	axl namespace details
+*/
+
+/*!
+    \namespace axl::sl
+    \inmodule axl_core  
+    \target axl::sl Namespace
+    \brief axl::io brief
+    
+	axl::io details
+*/
+
+/*!
+    \namespace axl::io
+    \inmodule axl_io    
+    \target axl::io Namespace
+    \brief axl::io brief
+    
+	axl::io details
+*/
+
+// ............................

@@ -13,6 +13,7 @@ cmake_minimum_required (VERSION 2.8)
 set (AXL_ROOT_DIR     ${CMAKE_CURRENT_LIST_DIR})
 set (AXL_BIN_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set (AXL_LIB_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set (AXL_DOC_DIR      ${CMAKE_CURRENT_BINARY_DIR}/doc)
 set (AXL_PACKAGE_DIR  ${CMAKE_CURRENT_BINARY_DIR}/package)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,6 +54,7 @@ axl_import (${AXL_IMPORT_LIST})
 #..............................................................................
 
 add_subdirectory (src)
+add_subdirectory (doc)
 
 if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt")
 	add_subdirectory (test)

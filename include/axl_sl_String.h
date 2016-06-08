@@ -7,7 +7,6 @@
 #define _AXL_SL_STRING_H
 
 #include "axl_ref_Buf.h"
-#include "axl_sl_BitIdx.h"
 #include "axl_enc_Utf.h"
 
 namespace axl {

@@ -1,0 +1,2 @@
+${ECHO_OFF}
+${QDOC_EXE} ${CMAKE_CURRENT_BINARY_DIR}/axl.qdocconf

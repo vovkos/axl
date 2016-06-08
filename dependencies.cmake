@@ -21,6 +21,8 @@ set (
 	QT_DLL_DIR
 	RAGEL_EXE
 	7Z_EXE
+	DOXYGEN_EXE
+	QDOC_EXE
 	)
 
 set (

@@ -1,0 +1,23 @@
+project       = AXL
+description   = AXL Library Reference Documentation
+version       = ${AXL_VERSION_MAJOR}.${AXL_VERSION_MINOR}.${AXL_VERSION_REVISION}
+outputdir     = ${CMAKE_CURRENT_BINARY_DIR}/html
+outputformats = HTML
+
+headerdirs  = ${AXL_INC_DIR}
+sourcedirs  = ${CMAKE_CURRENT_LIST_DIR}/src
+
+headers.fileextensions = *.h
+sources.fileextensions = *.qdoc
+
+HTML.stylesheets  = style/offline.css
+HTML.headerstyles = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style/offline.css\"/>\n"
+HTML.extraimages  = \
+	images/ico_out.png \
+	images/ico_note.png \
+	images/ico_note_attention.png \
+	images/btn_prev.png \
+	images/btn_next.png \
+	images/bullet_dn.png \
+	images/bullet_sq.png \
+	images/bgrContent.png
