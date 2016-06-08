@@ -3,7 +3,7 @@
 # aligned variable list printing helpers
 
 macro (
-axl_calc_max_string_length 
+axl_calc_max_string_length
 	_RESULT
 	# ...
 	)
@@ -17,8 +17,8 @@ axl_calc_max_string_length
 			set (_MAX_LENGTH ${_LENGTH})
 		endif ()
 	endforeach ()
-	
-	set (${_RESULT} ${_MAX_LENGTH})	
+
+	set (${_RESULT} ${_MAX_LENGTH})
 endmacro ()
 
 macro (
@@ -64,19 +64,19 @@ axl_filter_list
 		if (_MATCH)
 			list (APPEND _FILTERED_LIST ${_ITEM})
 		endif ()
-	endforeach ()	
+	endforeach ()
 
-	set (${_RESULT} ${_FILTERED_LIST})	
+	set (${_RESULT} ${_FILTERED_LIST})
 endmacro ()
 
 #..............................................................................
 
-# create a template file in form 
-# 
+# create a template file in form
+#
 # set (SETTING1 SETTING1-NOTFOUND)
 # set (SETTING2 SETTING2-NOTFOUND)
 # ...
-# 
+#
 
 macro (
 	axl_create_empty_setting_file
@@ -364,13 +364,13 @@ axl_set_pch_msvc
 
 	axl_append_target_string_property (
 		${_TARGET}
-		COMPILE_FLAGS 
+		COMPILE_FLAGS
 		"/Yu\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
 		)
 
 	axl_append_source_file_string_property (
 		${_PCH_CPP}
-		COMPILE_FLAGS 
+		COMPILE_FLAGS
 		"/Yc\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
 		)
 
@@ -391,7 +391,7 @@ axl_disable_pch_msvc
 	foreach (_FILE ${_FILE_LIST})
 		axl_append_source_file_string_property (
 			${_FILE}
-			COMPILE_FLAGS 
+			COMPILE_FLAGS
 			"/Y-"
 			)
 	endforeach ()
@@ -409,7 +409,7 @@ axl_set_pch_gcc
 	set (_PCH_BIN "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_H}.gcc.gch")
 
 	# get directory flags, defines, includes
-	
+
 	get_property (
 		_DIR_CXX_FLAGS
 		DIRECTORY
@@ -429,7 +429,7 @@ axl_set_pch_gcc
 		)
 
 	# get target flags, defines, includes
-		
+
 	get_target_property (
 		_TARGET_CXX_DEFINES
 		${_TARGET}
@@ -458,7 +458,7 @@ axl_set_pch_gcc
 	endif ()
 
 	# append directory flags, defines, includes
-	
+
 	if (_DIR_CXX_FLAGS)
 		string (REPLACE " " ";" _DIR_CXX_FLAGS ${_DIR_CXX_FLAGS})
 		list (APPEND _CXX_FLAGS ${_DIR_CXX_FLAGS})
@@ -496,7 +496,7 @@ axl_set_pch_gcc
 	endif ()
 
 	# append extra flags passed in vararg
-	
+
 	if (_EXTRA_FLAG_LIST)
 		list (APPEND _CXX_FLAGS "${_EXTRA_FLAG_LIST}")
 	endif ()
@@ -585,7 +585,7 @@ axl_find_file
 	_FILE_NAME
 	# ...
 	)
-	
+
 	set (_DIR_LIST ${ARGN})
 
 	set (_FILE_PATH ${_FILE_NAME}-NOTFOUND)
@@ -594,7 +594,7 @@ axl_find_file
 		if (EXISTS ${_DIR}/${_FILE_NAME})
 			set (_FILE_PATH ${_DIR}/${_FILE_NAME})
 			break ()
-		endif ()	
+		endif ()
 	endforeach ()
 
 	set (${_RESULT} ${_FILE_PATH})
@@ -614,14 +614,14 @@ axl_find_file_recurse_parent_dirs
 			set (_FILE_PATH ${_DIR}/${_FILE_NAME})
 			break ()
 		endif ()
-	
+
 		get_filename_component (_PARENT_DIR "${_DIR}/.." ABSOLUTE)
 
 		if (${_DIR} STREQUAL ${_PARENT_DIR})
 			set (_FILE_PATH ${_FILE_NAME}-NOTFOUND)
 			break ()
-		endif ()	
-	
+		endif ()
+
 		set (_DIR ${_PARENT_DIR})
 	endwhile ()
 
@@ -662,10 +662,10 @@ axl_copy_file_if_different
 	_SRC_FILE_NAME
 	_DST_FILE_NAME
 	)
-	
+
 	add_custom_command (
-		TARGET ${_TARGET} 
-		POST_BUILD        
+		TARGET ${_TARGET}
+		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			"${_SRC_FILE_NAME}"
 			"${_DST_FILE_NAME}"
@@ -679,7 +679,7 @@ axl_copy_file_list_if_different
 	_DST_DIR
 	# ...
 	)
-	
+
 	set (_FILE_NAME_LIST ${ARGN})
 
 	foreach (_FILE_NAME ${_FILE_NAME_LIST})
@@ -697,7 +697,7 @@ axl_configure_file_w_permissions
 	_DST_FILE
 	# ...
 	)
-	
+
 	set (_PERMISSION_LIST ${ARGN})
 	set (_TMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/tmp/${_DST_FILE})
 
@@ -717,10 +717,10 @@ axl_enum_directories
 	_RESULT
 	_DIR
 	)
-	
+
 	file (GLOB _FILE_LIST RELATIVE ${_DIR} ${_DIR}/*)
 	set (_DIR_LIST)
-	
+
 	foreach (_FILE ${_FILE_LIST})
 		if (IS_DIRECTORY ${_DIR}/${_FILE})
 			LIST (APPEND _DIR_LIST ${_FILE})
@@ -736,7 +736,7 @@ endmacro ()
 # target & source file property helpers
 
 macro (
-axl_append_target_string_property 
+axl_append_target_string_property
 	_TARGET
 	_PROPERTY
 	_VALUE
@@ -758,11 +758,11 @@ axl_append_target_string_property
 		${_TARGET}
 		PROPERTIES
 		${_PROPERTY} ${_NEW_VALUE}
-		)	
+		)
 endmacro ()
 
 macro (
-axl_append_source_file_string_property 
+axl_append_source_file_string_property
 	_FILE
 	_PROPERTY
 	_VALUE
@@ -784,18 +784,18 @@ axl_append_source_file_string_property
 		${_FILE}
 		PROPERTIES
 		${_PROPERTY} ${_NEW_VALUE}
-		)	
+		)
 endmacro ()
 
 macro (
-axl_append_target_list_property 
+axl_append_target_list_property
 	_TARGET
 	_PROPERTY
 	#...
 	)
 
 	set (_VALUE_LIST ${ARGN})
-	
+
 	get_target_property (
 		_OLD_VALUE_LIST
 		${_TARGET}
@@ -814,18 +814,18 @@ axl_append_target_list_property
 		${_TARGET}
 		PROPERTIES
 		${_PROPERTY} "${_NEW_VALUE_LIST}"
-		)	
+		)
 endmacro ()
 
 macro (
-axl_append_source_file_list_property 
+axl_append_source_file_list_property
 	_FILE
 	_PROPERTY
 	#...
 	)
 
 	set (_VALUE_LIST ${ARGN})
-	
+
 	get_source_file_property (
 		_OLD_VALUE_LIST
 		${_FILE}
@@ -844,12 +844,12 @@ axl_append_source_file_list_property
 		${_FILE}
 		PROPERTIES
 		${_PROPERTY} "${_NEW_VALUE_LIST}"
-		)	
+		)
 endmacro ()
 
 #..............................................................................
 
-# imports -- CMake' find_package replacement with support for manual override 
+# imports -- CMake' find_package replacement with support for manual override
 
 set (AXL_STD_IMPORT_DIR ${CMAKE_CURRENT_LIST_DIR})
 
@@ -862,7 +862,7 @@ axl_include_import_file
 	set (${_IMPORT}_FOUND FALSE)
 
 	# use AXL_IMPORT_DIR_LIST first (to allow overriding)
-	
+
 	foreach (_IMPORT_DIR ${AXL_IMPORT_DIR_LIST})
 		unset (_IMPORT_FILE_PATH)
 
@@ -871,22 +871,22 @@ axl_include_import_file
 			break ()
 		endif ()
 	endforeach ()
-	
+
 	# fallback to standard import_*.cmake
-	
-	if (NOT _IMPORT_FILE_PATH)
-		if (EXISTS ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
-			set (_IMPORT_FILE_PATH ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
-		else ()
-			message (FATAL_ERROR "import_${_IMPORT}.cmake not found (use AXL_IMPORT_DIR_LIST in dependencies.cmake)")
-		endif ()
+
+	if (NOT _IMPORT_FILE_PATH AND EXISTS ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
+		set (_IMPORT_FILE_PATH ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
 	endif ()
-	
-	include (${_IMPORT_FILE_PATH})
-	
-	string (TOUPPER ${_IMPORT} _IMPORT_UC)
-	if (NOT ${_IMPORT_UC}_FOUND AND NOT _IS_OPTIONAL)
-		message (FATAL_ERROR "${_IMPORT} is required but not found, check paths.cmake")
+
+	if (_IMPORT_FILE_PATH)
+		include (${_IMPORT_FILE_PATH})
+
+		string (TOUPPER ${_IMPORT} _IMPORT_UC)
+		if (NOT ${_IMPORT_UC}_FOUND AND NOT _IS_OPTIONAL)
+			message (FATAL_ERROR "${_IMPORT} is required but not found, check paths.cmake")
+		endif ()
+	elseif (NOT _IS_OPTIONAL)
+		message (FATAL_ERROR "import_${_IMPORT}.cmake not found (use AXL_IMPORT_DIR_LIST in dependencies.cmake)")
 	endif ()
 endmacro ()
 
@@ -897,7 +897,7 @@ axl_import
 
 	set (_IMPORT_LIST ${ARGN})
 	set (_IS_OPTIONAL FALSE)
-	
+
 	foreach (_IMPORT ${_IMPORT_LIST})
 		if ("${_IMPORT}" STREQUAL "REQUIRED")
 			set (_IS_OPTIONAL FALSE)
@@ -907,9 +907,9 @@ axl_import
 			axl_include_import_file (
 				${_IMPORT}
 				_IS_OPTIONAL
-				)	
+				)
 		endif ()
 	endforeach ()
 endmacro ()
-	
+
 #..............................................................................
