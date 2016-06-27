@@ -43,6 +43,22 @@ public:
 		m_line = 0;
 		m_col = 0;
 	}
+
+	void
+	count (
+		const char* p,
+		size_t length = -1
+		)
+	{
+		clear ();
+		incrementalCount (p, length);
+	}
+
+	void
+	incrementalCount (
+		const char* p,
+		size_t length = -1
+		);
 };
 
 //.............................................................................
@@ -79,8 +95,7 @@ public:
 	SrcPos&
 	operator = (const LineCol& lineCol)
 	{
-		m_line = lineCol.m_line;
-		m_col = lineCol.m_col;
+		*(LineCol*) this = lineCol;
 		return *this;
 	}
 };

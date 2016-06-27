@@ -20,18 +20,6 @@ add_subdirectory (axl_core)
 
 #..............................................................................
 
-option (
-	BUILD_AXL_EXE
-	"Build axl_exe library"
-	OFF
-	)
-
-if (BUILD_AXL_EXE)
-	add_subdirectory (axl_exe)
-endif ()
-
-#..............................................................................
-
 if (WIN32)
 	option (
 		BUILD_AXL_GUI_GDI
@@ -74,6 +62,22 @@ endif ()
 
 if (BUILD_AXL_INI)
 	add_subdirectory (axl_ini)
+endif ()
+
+#..............................................................................
+
+if (${EXPAT_FOUND})
+	option (
+		BUILD_AXL_XML
+		"Build axl_xml library (Expat XML Parser wrappers)"
+		ON
+		)
+else ()
+	unset (BUILD_AXL_XML CACHE)
+endif ()
+
+if (BUILD_AXL_XML)
+	add_subdirectory (axl_xml)
 endif ()
 
 #..............................................................................
@@ -134,7 +138,7 @@ endif ()
 
 #..............................................................................
 
-if (${RAGEL_FOUND} AND ${LUA_FOUND})
+if (${LUA_FOUND})
 	option (
 		BUILD_AXL_LUA
 		"Build axl_lua library"
@@ -146,6 +150,22 @@ endif ()
 
 if (BUILD_AXL_LUA)
 	add_subdirectory (axl_lua)
+endif ()
+
+#..............................................................................
+
+if (${RAGEL_FOUND} AND ${LUA_FOUND})
+	option (
+		BUILD_AXL_ST
+		"Build axl_st library (string templates)"
+		ON
+		)
+else ()
+	unset (BUILD_AXL_ST CACHE)
+endif ()
+
+if (BUILD_AXL_ST)
+	add_subdirectory (axl_st)
 endif ()
 
 #..............................................................................

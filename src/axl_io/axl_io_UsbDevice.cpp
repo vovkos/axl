@@ -373,13 +373,13 @@ UsbDevice::getStringDesrciptor (
 {
 	ASSERT (m_openHandle);
 
-	char* p = string->getBuffer ();
-	size_t length = string->getBufferLength ();
+	size_t length;
+	char* p = string->getBuffer (&length);
 
 	if (length < Def_BufferSize)
 	{
 		length = Def_BufferSize;
-		p = string->getBuffer (length - 1, false);
+		p = string->createBuffer (length - 1);
 	}
 
 	for (;;)
@@ -402,7 +402,7 @@ UsbDevice::getStringDesrciptor (
 			return err::fail (UsbError (result));
 		
 		length *= 2;
-		p = string->getBuffer (length - 1, false);
+		p = string->createBuffer (length - 1);
 	}
 
 	string->reduceLength (length);
@@ -417,13 +417,13 @@ UsbDevice::getStringDesrciptor (
 {
 	ASSERT (m_openHandle);
 
-	char* p = string->getBuffer ();
-	size_t length = string->getBufferLength ();
+	size_t length;
+	char* p = string->getBuffer (&length);
 
 	if (length < Def_BufferSize)
 	{
 		length = Def_BufferSize;
-		p = string->getBuffer (length - 1, false);
+		p = string->createBuffer (length - 1);
 	}
 
 	for (;;)
@@ -445,7 +445,7 @@ UsbDevice::getStringDesrciptor (
 			return err::fail (UsbError (result));
 		
 		length *= 2;
-		p = string->getBuffer (length - 1, false);
+		p = string->createBuffer (length - 1);
 	}
 
 	string->reduceLength (length);

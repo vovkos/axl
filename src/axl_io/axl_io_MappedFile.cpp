@@ -394,11 +394,16 @@ SimpleMappedFile::open (
 	uint_t flags
 	)
 {
+	bool result;
+
 	close ();
 
-	return 
-		m_file.open (fileName, flags) &&
-		m_mapping.open (&m_file, offset, size, flags);
+	result = m_file.open (fileName, flags);
+	if (!result)
+		return false;
+
+	m_openFlags = flags;
+	return !size || m_mapping.open (&m_file, offset, size, flags);
 }
 
 //.............................................................................

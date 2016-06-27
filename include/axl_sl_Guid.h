@@ -11,7 +11,10 @@
 namespace axl {
 namespace sl {
 
+template <typename T> class StringRefBase;
 template <typename T> class StringBase;
+
+typedef StringRefBase <char> StringRef;
 typedef StringBase <char> String;
 
 //.............................................................................

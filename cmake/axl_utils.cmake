@@ -635,9 +635,7 @@ axl_make_path
 	_BASE_DIR
 	)
 
-	string (REGEX MATCH "/" _SLASH ${_FILE_NAME})
-
-	if (_SLASH)
+	if (IS_ABSOLUTE ${_FILE_NAME})
 		set (${_FILE_PATH} ${_FILE_NAME})
 	else ()
 		set (${_FILE_PATH} "${_BASE_DIR}/${_FILE_NAME}")

@@ -40,7 +40,7 @@ public:
 	typedef psx::File FileImpl;
 #endif
 	
-	typedef FileImpl::T Handle;
+	typedef FileImpl::H Handle;
 	FileImpl m_file;
 
 public:

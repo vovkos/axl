@@ -98,7 +98,7 @@ Base32Encoding::encode (
 		length += hyphenCount;
 	}
 
-	char* dst = string->getBuffer (length);
+	char* dst = string->createBuffer (length);
 	if (!dst)
 		return -1;
 

@@ -7,7 +7,7 @@
 #define _AXL_REF_BUF_H
 
 #include "axl_ref_New.h"
-#include "axl_sl_Func.h"
+#include "axl_sl_Operator.h"
 #include "axl_sl_BitIdx.h"
 
 namespace axl {
@@ -40,6 +40,13 @@ enum BufHdrFlag
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+struct BufHdr: public RefCount
+{
+	size_t m_bufferSize;
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <
 	typename T,
 	typename SizeOf = sl::SizeOf <T>
@@ -47,11 +54,9 @@ template <
 class Buf
 {
 public:
-	class Hdr: public RefCount
+	class Hdr: public BufHdr
 	{
 	public:
-		size_t m_bufferSize;
-
 		~Hdr ()
 		{
 			((T*) (this + 1))->~T ();

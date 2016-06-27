@@ -17,6 +17,8 @@ set (
 	LIBUSB_LIB_DIR
 	OPENSSL_INC_DIR
 	OPENSSL_LIB_DIR
+	EXPAT_INC_DIR
+	EXPAT_LIB_DIR
 	QT_CMAKE_DIR
 	QT_DLL_DIR
 	RAGEL_EXE
@@ -34,6 +36,7 @@ set (
 		pcap
 		libusb
 		openssl
+		expat
 		qt
 		7z
 	)

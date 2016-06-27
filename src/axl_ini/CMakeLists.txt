@@ -8,29 +8,29 @@
 #
 
 set (
-	INI_H_LIST
+	LIB_H_LIST
 	${AXL_INC_DIR}/axl_ini_Lexer.h
 	${AXL_INC_DIR}/axl_ini_Parser.h
 	${AXL_INC_DIR}/axl_ini_GenericParser.h
 	)
 
 set (
-	INI_CPP_LIST
+	LIB_CPP_LIST
 	axl_ini_Lexer.cpp
 	axl_ini_GenericParser.cpp
 	)
 
 set (
-	INI_RL_LIST
+	LIB_RL_LIST
 	axl_ini_Lexer.rl
 	)
 
 source_group (
 	lib
 	FILES
-	${INI_H_LIST}
-	${INI_CPP_LIST}
-	${INI_RL_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
+	${LIB_RL_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -92,9 +92,9 @@ add_library (
 	axl_ini
 	${PCH_H}
 	${PCH_CPP}
-	${INI_H_LIST}
-	${INI_CPP_LIST}
-	${INI_RL_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
+	${LIB_RL_LIST}
 	${GEN_RL_CPP_LIST}
 	)
 

@@ -43,7 +43,7 @@ enum RefCountFlag
 {
 	RefCountFlag_Allocated = 0x01, // must be freed, free func is in hdr
 
-	// ok to define and use your own flags 0x04..0x80
+	// ok to define and use your own flags 0x08..0x80
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

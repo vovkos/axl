@@ -9,8 +9,8 @@
 #include "axl_err_Error.h"
 #include "axl_sl_HashTable.h"
 #include "axl_sl_String.h"
-#include "axl_sys_TlsMgr.h"
 #include "axl_sl_Singleton.h"
+#include "axl_sys_TlsMgr.h"
 
 namespace axl {
 namespace err {

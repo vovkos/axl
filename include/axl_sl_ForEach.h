@@ -6,8 +6,7 @@
 
 #define _AXL_SL_FOREACH_H
 
-#include "axl_sl_Func.h"
-#include "axl_sl_List.h"
+#include "axl_g_Def.h"
 
 namespace axl {
 namespace sl {

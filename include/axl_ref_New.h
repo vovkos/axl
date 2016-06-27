@@ -8,7 +8,6 @@
 
 #include "axl_ref_Ptr.h"
 #include "axl_mem_New.h"
-#include "axl_sl_Func.h"
 
 namespace axl {
 namespace ref {

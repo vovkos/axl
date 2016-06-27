@@ -52,6 +52,12 @@ if (BUILD_AXL_IO_USB)
 	add_definitions (-D_AXL_IO_USB)
 endif ()
 
+if (BUILD_AXL_XML)	
+	include_directories (${EXPAT_INC_DIR})
+	link_directories (${EXPAT_LIB_DIR})
+	add_definitions (-D_AXL_XML)
+endif ()
+
 add_executable (
 	test_mini
 	${PCH_H}
@@ -131,6 +137,14 @@ if (BUILD_AXL_IO_USB)
 			usb-1.0
 			)
 	endif ()
+endif ()
+
+if (BUILD_AXL_XML)
+	target_link_libraries (
+		test_mini
+		axl_xml
+		expat
+		)
 endif ()
 
 axl_set_pch (

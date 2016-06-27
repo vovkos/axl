@@ -25,6 +25,10 @@ extern "C" {
 } // extern "C" {
 #endif
 
+#ifdef _AXL_XML
+#	include "axl_xml_Pch.h"
+#endif
+
 // axl
 
 #include "axl_sl_String.h"
@@ -44,6 +48,10 @@ extern "C" {
 #include "axl_io_FilePathUtils.h"
 #include "axl_zip_ZipReader.h"
 #include "axl_enc_EscapeEncoding.h"
+
+#ifdef _AXL_XML
+#	include "axl_xml_ExpatParser.h"
+#endif
 
 #ifdef _AXL_IO_USB
 #	include "axl_io_UsbDevice.h"

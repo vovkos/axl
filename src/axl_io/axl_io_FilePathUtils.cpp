@@ -214,7 +214,7 @@ getFullFilePath (const char* fileName)
 		return err::failWithLastSystemError (NULL);
 
 	sl::String_w filePath;
-	wchar_t* p = filePath.getBuffer (length);
+	wchar_t* p = filePath.createBuffer (length);
 	::GetFullPathNameW (fileName_w, length, p, NULL);
 	return filePath;
 #elif (_AXL_ENV == AXL_ENV_POSIX)

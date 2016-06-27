@@ -20,11 +20,11 @@ BinaryBoyerMooreFind::setPattern (
 		return true;
 	}
 
-	bool result = (flags & Flag_Reverse) ?
+	size_t result = (flags & Flag_Reverse) ?
 		m_pattern.copyReverse ((const uchar_t*) p, size) :
 		m_pattern.copy ((const uchar_t*) p, size);
 
-	if (!result)
+	if (result == -1)
 		return false;
 
 	m_flags = flags;

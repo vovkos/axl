@@ -84,6 +84,51 @@ LuaState::trace ()
 	}
 }
 #endif
+
+void
+LuaState::setStringError (
+	const char* string,
+	size_t length
+	)
+{
+	where ();
+	pushString (string, length);
+	concatenate ();
+
+	sl::String s = getString ();
+	setError ();
+}
+
+void
+LuaState::setFormatStringError_va (
+	const char* format,
+	axl_va_list va
+	)
+{
+	where ();
+	pushFormatString_va (format, va);
+	concatenate ();
+	setError ();
+}
+
+void
+LuaState::pushString (
+	const char* string,
+	size_t length
+	)
+{
+	ASSERT (isOpen ());
+
+	if (!string)
+		string = "";
+
+	if (length != -1)
+		lua_pushlstring (m_h, string, length);
+	else
+		lua_pushstring (m_h, string);
+}
+
+
 //.............................................................................
 
 } // namespace lua

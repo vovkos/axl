@@ -6,391 +6,23 @@
 
 #define _AXL_SL_STRING_H
 
+#include "axl_sl_StringDetails.h"
+#include "axl_sl_Cmp.h"
 #include "axl_ref_Buf.h"
-#include "axl_enc_Utf.h"
 
 namespace axl {
 namespace sl {
 
-//.............................................................................
-
-template <typename T>
-class StringDetailsBase
-{
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <>
-class StringDetailsBase <utf8_t>
-{
-public:
-	typedef utf8_t  C;
-	typedef utf16_t C2;
-	typedef utf32_t C3;
-
-	typedef enc::Utf8 Encoding;
-	typedef StringDetailsBase <C2> Details2;
-	typedef StringDetailsBase <C3> Details3;
-
-	static
-	const C*
-	getEmptyString ()
-	{
-		return "";
-	}
-
-	static
-	const C*
-	getCrLf ()
-	{
-		return "\r\n";
-	}
-
-	static
-	size_t
-	calcLength (const C* p)
-	{
-		return p ? strlen (p) : 0;
-	}
-
-	static
-	int
-	cmp (
-		const C* p1,
-		const C* p2,
-		size_t length
-		)
-	{
-		return memcmp (p1, p2, length);
-	}
-
-	static
-	void
-	fill (
-		C* p,
-		C c,
-		size_t count
-		)
-	{
-		memset (p, c, count);
-	}
-
-	static
-	void
-	copy (
-		C* dst,
-		const C* src,
-		size_t count
-		)
-	{
-		memcpy (dst, src, count);
-	}
-
-	static
-	void
-	move (
-		C* dst,
-		const C* src,
-		size_t count
-		)
-	{
-		memmove (dst, src, count);
-	}
-
-#if (_AXL_CPP == AXL_CPP_MSC)
-	static
-	size_t
-	calcFormatLength_va (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		return _vscprintf (formatString, va.m_va);
-	}
-
-	static
-	void
-	format_va (
-		C* buffer,
-		size_t bufferLength,
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		_vsnprintf (buffer, bufferLength, formatString, va.m_va);
-		if (bufferLength)
-			buffer [bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
-	}
-#else
-	static
-	size_t
-	calcFormatLength_va (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		return vsnprintf (NULL, 0, formatString, va.m_va);
-	}
-
-	static
-	size_t
-	format_va (
-		C* buffer,
-		size_t bufferLength,
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		return vsnprintf (buffer, bufferLength, formatString, va.m_va);
-	}
-#endif
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class StringDetailsImpl
-{
-public:
-	static
-	const T*
-	getEmptyString ()
-	{
-		static T emptyString [1] = { 0 };
-		return emptyString;
-	}
-
-	static
-	const T*
-	getCrLf ()
-	{
-		static T crLf [2] = { '\r', '\n' };
-		return crLf;
-	}
-
-	static
-	size_t
-	calcLength (const T* p)
-	{
-		if (!p)
-			return 0;
-
-		const T* p0 = p;
-		while (*p)
-			p++;
-
-		return p - p0;
-	}
-
-	static
-	int
-	cmp (
-		const T* p1,
-		const T* p2,
-		size_t length
-		)
-	{
-		const T* end = p1 + length;
-		for (; p1 < end; p1++, p2++)
-			if (*p1 < *p2)
-				return -1;
-			else if (*p1 > *p2)
-				return 1;
-
-		return 0;
-	}
-
-	static
-	void
-	fill (
-		T* p,
-		T c,
-		size_t count
-		)
-	{
-		const T* end = p + count;
-		for (; p < end; p++)
-			*p = c;
-	}
-
-	static
-	void
-	copy (
-		T* dst,
-		const T* src,
-		size_t count
-		)
-	{
-		memcpy (dst, src, count * sizeof (T));
-	}
-
-	static
-	void
-	move (
-		T* dst,
-		const T* src,
-		size_t count
-		)
-	{
-		memmove (dst, src, count * sizeof (T));
-	}
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <>
-class StringDetailsBase <utf16_t>: public StringDetailsImpl <utf16_t>
-{
-public:
-	typedef utf16_t C;
-	typedef utf8_t  C2;
-	typedef utf32_t C3;
-
-	typedef enc::Utf16 Encoding;
-	typedef StringDetailsBase <C2> Details2;
-	typedef StringDetailsBase <C3> Details3;
-
-#if (_AXL_CPP == AXL_CPP_MSC)
-	static
-	size_t
-	calcFormatLength_va (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		return _vscwprintf (formatString, va.m_va);
-	}
-
-	static
-	void
-	format_va (
-		C* buffer,
-		size_t bufferLength,
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		_vsnwprintf (buffer, bufferLength, formatString, va.m_va);
-		if (bufferLength)
-			buffer [bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
-	}
-#else
-	static
-	size_t
-	calcFormatLength_va (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		ASSERT (false);
-		return 0;
-	}
-
-	static
-	void
-	format_va (
-		C* buffer,
-		size_t bufferLength,
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		ASSERT (false);
-	}
-#endif
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <>
-class StringDetailsBase <utf32_t>: public StringDetailsImpl <utf32_t>
-{
-public:
-	typedef utf32_t C;
-	typedef utf8_t  C2;
-	typedef utf16_t C3;
-
-	typedef enc::Utf32 Encoding;
-	typedef StringDetailsBase <C2> Details2;
-	typedef StringDetailsBase <C3> Details3;
-
-#if (_AXL_CPP == AXL_CPP_MSC)
-	static
-	size_t
-	calcFormatLength_va (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		ASSERT (false);
-		return 0;
-	}
-
-	static
-	void
-	format_va (
-		C* buffer,
-		size_t bufferLength,
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		ASSERT (false);
-	}
-#else
-	static
-	size_t
-	calcFormatLength_va (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		return vswprintf (NULL, 0, formatString, va.m_va);
-	}
-
-	static
-	void
-	format_va (
-		C* buffer,
-		size_t bufferLength,
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		vswprintf (buffer, bufferLength, formatString, va.m_va);
-	}
-#endif
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef StringDetailsBase <char>    StringDetails;
-typedef StringDetailsBase <wchar_t> StringDetails_w;
-typedef StringDetailsBase <utf8_t>  StringDetails_utf8;
-typedef StringDetailsBase <utf16_t> StringDetails_utf16;
-typedef StringDetailsBase <utf32_t> StringDetails_utf32;
+template <typename T> class StringBase;
 
 //.............................................................................
 
-enum StringKind
-{
-	StringKind_Empty = 0
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 template <typename T>
-class StringBase
+class StringRefBase
 {
-public:
-	class Hdr: public ref::RefCount
-	{
-	public:
-		size_t m_maxLength;
-		size_t m_length;
-	};
+	friend class StringBase <T>;
 
+public:
 	typedef StringDetailsBase <T> Details;
 	typedef typename Details::Details2 Details2;
 	typedef typename Details::Details3 Details3;
@@ -403,95 +35,93 @@ public:
 	typedef typename Details2::Encoding Encoding2;
 	typedef typename Details3::Encoding Encoding3;
 
+	typedef StringRefBase <C> StringRef;
+	typedef StringRefBase <C2> StringRef2;
+	typedef StringRefBase <C3> StringRef3;
+
+	typedef StringBase <C> String;
 	typedef StringBase <C2> String2;
 	typedef StringBase <C3> String3;
 
 protected:
-	C* m_p;
+	mutable C* m_p;
+	mutable ref::BufHdr* m_hdr;
+
+#if (_AXL_PTR_BITNESS == 64)
+	size_t m_length : 63;
+#else
+	size_t m_length : 31; // more than enough
+#endif
+
+	mutable size_t m_isNullTerminated : 1;
 
 public:
-	StringBase ()
+	StringRefBase ()
 	{
-		m_p = NULL;
+		initialize ();
 	}
 
-	StringBase (StringKind stringKind)
+	StringRefBase (const StringRef& src)
 	{
-		ASSERT (stringKind == StringKind_Empty);
-		m_p = NULL;
+		initialize ();
+		attach (src);
 	}
 
-	StringBase (const StringBase& src)
+	StringRefBase (const StringRef2& src)
 	{
-		m_p = NULL;
-		copy (src);
+		initialize ();
+		attach (String (src));
 	}
 
-	StringBase (const String2& src)
+	StringRefBase (const StringRef3& src)
 	{
-		m_p = NULL;
-		copy (src);
+		initialize ();
+		attach (String (src));
 	}
 
-	StringBase (const String3& src)
-	{
-		m_p = NULL;
-		copy (src);
-	}
-
-	StringBase (
+	StringRefBase (
 		const C* p,
 		size_t length = -1
 		)
 	{
-		m_p = NULL;
-		copy (p, length);
+		initialize ();
+		attach (p, NULL, length);
 	}
 
-	StringBase (
+	StringRefBase (
 		const C2* p,
 		size_t length = -1
 		)
 	{
-		m_p = NULL;
-		copy (p, length);
+		initialize ();
+		attach (String (p, length));
 	}
 
-	StringBase (
+	StringRefBase (
 		const C3* p,
 		size_t length = -1
 		)
 	{
-		m_p = NULL;
-		copy (p, length);
+		initialize ();
+		attach (String (p, length));
 	}
 
-	StringBase (utf32_t x)
+	StringRefBase (utf32_t x)
 	{
-		m_p = NULL;
-		copy (x);
+		initialize ();
+		attach (String (x));
 	}
 
-	StringBase (
+	StringRefBase (
 		utf32_t x,
 		size_t count
 		)
 	{
-		m_p = NULL;
-		copy (x, count);
+		initialize ();
+		attach (String (x, count));
 	}
 
-	StringBase (
-		ref::BufKind kind,
-		void* p,
-		size_t size
-		)
-	{
-		m_p = NULL;
-		setBuffer (kind, p, size);
-	}
-
-	~StringBase ()
+	~StringRefBase ()
 	{
 		release ();
 	}
@@ -502,7 +132,7 @@ public:
 	}
 
 	bool
-	operator == (const StringBase& string) const
+	operator == (const StringRef& string) const
 	{
 		return cmp (string) == 0;
 	}
@@ -514,7 +144,7 @@ public:
 	}
 
 	bool
-	operator != (const StringBase& string) const
+	operator != (const StringRef& string) const
 	{
 		return cmp (string) != 0;
 	}
@@ -525,12 +155,288 @@ public:
 		return cmp (p) != 0;
 	}
 
-	StringBase&
-	operator = (StringKind stringKind)
+	StringRefBase
+	operator + (const StringRef& string) const
 	{
-		ASSERT (stringKind == StringKind_Empty);
-		clear ();
-		return *this;
+		String result = *this;
+		result.append (string);
+		return result;
+	}
+
+	StringRefBase
+	operator + (const StringRef2& string) const
+	{
+		String result = *this;
+		result.append (string);
+		return result;
+	}
+
+	StringRefBase
+	operator + (const StringRef3& string) const
+	{
+		String result = *this;
+		result.append (string);
+		return result;
+	}
+
+	StringRefBase
+	operator + (const C* p) const
+	{
+		String result = *this;
+		result.append (p);
+		return result;
+	}
+
+	StringRefBase
+	operator + (const C2* p) const
+	{
+		String result = *this;
+		result.append (p);
+		return result;
+	}
+
+	StringRefBase
+	operator + (const C3* p) const
+	{
+		String result = *this;
+		result.append (p);
+		return result;
+	}
+
+	StringRefBase
+	operator + (utf32_t x) const
+	{
+		String result = *this;
+		result.append (x);
+		return result;
+	}
+
+	const C*
+	cc () const
+	{
+		if (m_isNullTerminated)
+			return m_p;
+
+		if (!m_length)
+			return Details::getEmptyString ();
+
+		String string (m_p, m_length);
+		ASSERT (string.m_length == m_length && string.m_isNullTerminated);
+
+		if (m_hdr)
+			m_hdr->release ();
+
+		m_p = string.m_p;
+		m_hdr = string.m_hdr;
+		m_isNullTerminated = true;
+
+		string.m_hdr = NULL;
+
+		return m_p;
+	}
+
+	StringRef2
+	s2 () const
+	{
+		return String2 (m_p, m_length);
+	}
+
+	StringRef3
+	s3 () const
+	{
+		return String3 (m_p, m_length);
+	}
+
+	size_t
+	getLength () const
+	{
+		return m_length;
+	}
+
+	bool
+	isEmpty () const
+	{
+		return m_length == 0;
+	}
+
+	bool
+	isNullTerminated () const
+	{
+		return m_isNullTerminated;
+	}
+
+	int
+	cmp (
+		const C* p,
+		size_t length = -1
+		) const
+	{
+		if (length == -1)
+			length = Details::calcLength (p);
+
+		int result = Details::cmp (m_p, p, AXL_MIN (length, m_length));
+		return result ? result : sl::Cmp <size_t> () (m_length, length);
+	}
+
+	int
+	cmp (const StringRef& string) const
+	{
+		return cmp (string, string.m_length);
+	}		
+
+	void
+	release ()
+	{
+		if (m_hdr)
+			m_hdr->release ();
+
+		initialize ();
+	}
+
+protected:
+	void
+	initialize ()
+	{
+		m_p = NULL;
+		m_hdr = NULL;
+		m_length = 0;
+		m_isNullTerminated = false;
+	}
+
+	void
+	attachBufHdr (ref::BufHdr* hdr) const
+	{
+		if (hdr == m_hdr)
+			return; // try to avoid unnecessary interlocked ops
+
+		if (hdr)
+			hdr->addRef ();
+
+		if (m_hdr)
+			m_hdr->release ();
+		
+		m_hdr = hdr;
+	}
+
+	void
+	attach (const StringRef& src)
+	{
+		if (&src == this)
+			return;
+
+		attachBufHdr (src.m_hdr);
+
+		m_p = src.m_p;
+		m_length = src.m_length;
+		m_isNullTerminated = src.m_isNullTerminated;
+	}
+
+	void
+	attach (
+		const C* p,
+		ref::BufHdr* hdr,
+		size_t length
+		)
+	{
+		attachBufHdr (hdr);
+
+		m_p = const_cast <C*> (p);
+
+		if (length == -1)
+		{
+			m_length = Details::calcLength (p);
+			m_isNullTerminated = true;
+		}
+		else
+		{
+			m_length = length;
+			m_isNullTerminated = false;
+		}
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef StringRefBase <char>    StringRef;
+typedef StringRefBase <wchar_t> StringRef_w;
+typedef StringRefBase <utf8_t>  StringRef_utf8;
+typedef StringRefBase <utf16_t> StringRef_utf16;
+typedef StringRefBase <utf32_t> StringRef_utf32;
+
+//.............................................................................
+
+template <typename T>
+class StringBase: public StringRefBase <T>
+{
+public:
+	StringBase ()
+	{
+	}
+
+	StringBase (const StringBase& src)
+	{
+		copy (src);
+	}
+
+	StringBase (const StringRef& src)
+	{
+		copy (src);
+	}
+
+	StringBase (const StringRef2& src)
+	{
+		copy (src);
+	}
+
+	StringBase (const StringRef3& src)
+	{
+		copy (src);
+	}
+
+	StringBase (
+		const C* p,
+		size_t length = -1
+		)
+	{
+		copy (p, length);
+	}
+
+	StringBase (
+		const C2* p,
+		size_t length = -1
+		)
+	{
+		copy (p, length);
+	}
+
+	StringBase (
+		const C3* p,
+		size_t length = -1
+		)
+	{
+		copy (p, length);
+	}
+
+	StringBase (utf32_t x)
+	{
+		copy (x);
+	}
+
+	StringBase (
+		utf32_t x,
+		size_t count
+		)
+	{
+		copy (x, count);
+	}
+
+	StringBase (
+		ref::BufKind kind,
+		void* p,
+		size_t size
+		)
+	{
+		setBuffer (kind, p, size);
 	}
 
 	StringBase&
@@ -541,14 +447,21 @@ public:
 	}
 
 	StringBase&
-	operator = (const String2& src)
+	operator = (const StringRef& src)
 	{
 		copy (src);
 		return *this;
 	}
 
 	StringBase&
-	operator = (const String3& src)
+	operator = (const StringRef2& src)
+	{
+		copy (src);
+		return *this;
+	}
+
+	StringBase&
+	operator = (const StringRef3& src)
 	{
 		copy (src);
 		return *this;
@@ -583,6 +496,27 @@ public:
 	}
 
 	StringBase&
+	operator += (const StringRef& string)
+	{
+		append (string);
+		return *this;
+	}
+
+	StringBase&
+	operator += (const StringRef2& string)
+	{
+		append (string);
+		return *this;
+	}
+
+	StringBase&
+	operator += (const StringRef3& string)
+	{
+		append (string);
+		return *this;
+	}
+
+	StringBase&
 	operator += (const C* p)
 	{
 		append (p, -1);
@@ -610,170 +544,54 @@ public:
 		return *this;
 	}
 
-	StringBase
-	operator + (const StringBase& string) const
-	{
-		StringBase result = *this;
-		result.append (string);
-		return result;
-	}
-
-	StringBase
-	operator + (const C* p) const
-	{
-		StringBase result = *this;
-		result.append (p);
-		return result;
-	}
-
-	StringBase
-	operator + (const C2* p) const
-	{
-		StringBase result = *this;
-		result.append (p);
-		return result;
-	}
-
-	StringBase
-	operator + (const C3* p) const
-	{
-		StringBase result = *this;
-		result.append (p);
-		return result;
-	}
-
-	StringBase
-	operator + (utf32_t x) const
-	{
-		StringBase result = *this;
-		result.append (x);
-		return result;
-	}
-
-	StringBase
-	operator + (const String2& string) const
-	{
-		StringBase result = *this;
-		result.append (string);
-		return result;
-	}
-
-	StringBase
-	operator + (const String3& string) const
-	{
-		StringBase result = *this;
-		result.append (string);
-		return result;
-	}
-
-	const C*
-	cc () const
-	{
-		return m_p ? m_p : Details::getEmptyString ();
-	}
-
-	String2
-	s2 () const
-	{
-		return String2 (m_p, getLength ());
-	}
-
-	String3
-	s3 () const
-	{
-		return String3 (m_p, getLength ());
-	}
-
-	size_t
-	getLength () const
-	{
-		return m_p ? getHdr ()->m_length : 0;
-	}
-
-	size_t
-	getBufferLength () const
-	{
-		return m_p ? getHdr ()->m_maxLength : 0;
-	}
-
-	bool
-	isEmpty () const
-	{
-		return getLength () == 0;
-	}
-
-	void
-	release ()
-	{
-		if (!m_p)
-			return;
-
-		getHdr ()->release ();
-		m_p = NULL;
-	}
-
 	void
 	clear ()
 	{
-		setLength (0, false);
-	}
-
-	int
-	cmp (
-		const C* p,
-		size_t length = -1
-		) const
-	{
-		size_t thisLength = getLength ();
-
-		if (length == -1)
-			length = Details::calcLength (p);
-
-		int result = Details::cmp (m_p, p, AXL_MIN (length, thisLength));
-		return result ? result : sl::Cmp <size_t> () (thisLength, length);
-	}
-
-	int
-	cmp (const StringBase& string) const
-	{
-		return cmp (string, string.getLength ());
-	}
-
-	size_t
-	forceCopy (const StringBase& src)
-	{
-		return copy (src, src.getLength ());
-	}
-
-	size_t
-	copy (const StringBase& src)
-	{
-		if (m_p == src.m_p)
-			return getLength ();
-
-		if (src.m_p)
+		if (!m_hdr)
 		{
-			if (src.getHdr ()->getFlags () & ref::BufHdrFlag_Exclusive)
-				return copy (src, src.getLength ());
-
-			src.getHdr ()->addRef ();
+			ASSERT (!m_length);
+			return;
 		}
 
-		if (m_p)
-			getHdr ()->release ();
+		if (m_hdr->getRefCount () != 1)
+		{
+			release ();
+			return;
+		}
 
-		m_p = src.m_p;
-		return getLength ();
+		m_p = (C*) (m_hdr + 1);
+		m_p [0] = 0;
+		m_length = 0;
+		m_isNullTerminated = true;
 	}
 
 	size_t
-	copy (const String2& src)
+	forceCopy (const StringRef& src)
+	{
+		return copy (src, src.m_length);
+	}
+
+	size_t
+	copy (const StringRef& src)
+	{
+		if (&src == this)
+			return m_length;
+
+		if (!src.m_hdr || src.m_hdr->getFlags () & ref::BufHdrFlag_Exclusive)
+			return copy (src, src.m_length);
+
+		attach (src);
+		return m_length;
+	}
+
+	size_t
+	copy (const StringRef2& src)
 	{
 		return copy (src, src.getLength ());
 	}
 
 	size_t
-	copy (const String3& src)
+	copy (const StringRef3& src)
 	{
 		return copy (src, src.getLength ());
 	}
@@ -785,7 +603,7 @@ public:
 		)
 	{
 		if (p == m_p && length == -1)
-			return getLength ();
+			return m_length;
 
 		if (length == -1)
 			length = Details::calcLength (p);
@@ -796,12 +614,10 @@ public:
 			return 0;
 		}
 
-		if (!setLength (length, false))
+		if (!createBuffer (length, false))
 			return -1;
 
-		if (p != m_p)
-			Details::copy (m_p, p, length);
-
+		Details::copy (m_p, p, length);
 		return length;
 	}
 
@@ -824,11 +640,11 @@ public:
 		if (newLength == -1)
 			return -1;
 
-		if (!setLength (newLength, false))
+		if (!createBuffer (newLength, false))
 			return -1;
 
 		enc::UtfConvert <Encoding, Encoding2>::convert (m_p, newLength, p, length);
-		return length;
+		return newLength;
 	}
 
 	size_t
@@ -850,11 +666,11 @@ public:
 		if (newLength == -1)
 			return -1;
 
-		if (!setLength (newLength, false))
+		if (!createBuffer (newLength, false))
 			return -1;
 
 		enc::UtfConvert <Encoding, Encoding3>::convert (m_p, newLength, p, length);
-		return length;
+		return newLength;
 	}
 
 	size_t
@@ -886,30 +702,31 @@ public:
 			return -1;
 
 		ASSERT (codePointLength <= 4);
-
-		if (!setLength (count * codePointLength, false))
+		
+		size_t newLength = count * codePointLength;
+		if (!createBuffer (newLength, false))
 			return -1;
 
 		C pattern [sizeof (utf32_t) / sizeof (C)];
 		Encoding::encodeCodePoint (pattern, x);
 		fillWithPattern (m_p, pattern, codePointLength, count);
-		return count;
+		return newLength;
 	}
 
 	size_t
-	append (const StringBase& src)
+	append (const StringRef& src)
 	{
 		return insert (-1, src);
 	}
 
 	size_t
-	append (const String2& src)
+	append (const StringRef2& src)
 	{
 		return insert (-1, src);
 	}
 
 	size_t
-	append (const String3& src)
+	append (const StringRef3& src)
 	{
 		return insert (-1, src);
 	}
@@ -944,7 +761,7 @@ public:
 	size_t
 	append (utf32_t x)
 	{
-		return x ? append (x, 1) : getLength ();
+		return x ? append (x, 1) : m_length;
 	}
 
 	size_t
@@ -965,16 +782,16 @@ public:
 	size_t
 	insert (
 		size_t index,
-		const StringBase& src
+		const StringRef& src
 		)
 	{
-		return isEmpty () ? copy (src) : insert (index, src, src.getLength ());
+		return isEmpty () ? copy (src) : insert (index, src, src.m_length);
 	}
 
 	size_t
 	insert (
 		size_t index,
-		const String2& src
+		const StringRef2& src
 		)
 	{
 		return insert (index, src, src.getLength ());
@@ -983,7 +800,7 @@ public:
 	size_t
 	insert (
 		size_t index,
-		const String3& src		
+		const StringRef3& src		
 		)
 	{
 		return insert (index, src, src.getLength ());
@@ -996,7 +813,7 @@ public:
 		size_t length = -1
 		)
 	{
-		size_t oldLength = getLength ();
+		size_t oldLength = m_length;
 
 		if (length == -1)
 			length = Details::calcLength (p);
@@ -1019,7 +836,7 @@ public:
 		size_t length = -1
 		)
 	{
-		size_t oldLength = getLength ();
+		size_t oldLength = m_length;
 
 		if (length == -1)
 			length = Details2::calcLength (p);
@@ -1046,7 +863,7 @@ public:
 		size_t length = -1
 		)
 	{
-		size_t oldLength = getLength ();
+		size_t oldLength = m_length;
 
 		if (length == -1)
 			length = Details3::calcLength (p);
@@ -1072,7 +889,7 @@ public:
 		utf32_t x
 		)
 	{
-		return x ? insert (index, x, 1) : getLength ();
+		return x ? insert (index, x, 1) : m_length;
 	}
 
 	size_t
@@ -1082,7 +899,7 @@ public:
 		size_t count
 		)
 	{
-		size_t oldLength = getLength ();
+		size_t oldLength = m_length;
 
 		if (count == 0)
 			return oldLength;
@@ -1122,7 +939,7 @@ public:
 		)
 	{
 		size_t length = Details::calcFormatLength_va (formatString, va);
-		if (!setLength (length, false))
+		if (!createBuffer (length, false))
 			return -1;
 
 		Details::format_va (m_p, length + 1, formatString, va);
@@ -1146,9 +963,9 @@ public:
 		)
 	{
 		size_t appendLength = Details::calcFormatLength_va (formatString, va);
-		size_t oldLength = getLength ();
+		size_t oldLength = m_length;
 		size_t newLength = oldLength + appendLength;
-		if (!setLength (newLength, true))
+		if (!createBuffer (newLength, true))
 			return -1;
 
 		Details::format_va (m_p + oldLength, appendLength + 1, formatString, va);
@@ -1191,39 +1008,141 @@ public:
 	size_t
 	reduceLength (size_t delta)
 	{
-		size_t length = getLength ();
-		if (length <= delta)
-		{
+		if (m_length <= delta)
 			clear ();
-			return 0;
-		}
+		else
+			setReducedLength (m_length - delta);
 
-		length -= delta;
-		setLength (length, true);
-		return length;
+		return m_length;
 	}
 
 	void
 	setReducedLength (size_t length)
 	{
-		size_t oldLength = getLength ();
-		if (length < oldLength)
-			setLength (length, true);
+		if (length >= m_length)
+		{
+			ASSERT (false); // misuse
+			return; 
+		}
+
+		if (!length)
+		{
+			clear ();
+			return;
+		}
+
+		ASSERT (m_p && m_hdr);
+		
+		if (!m_p [length])
+		{
+			m_isNullTerminated = true;
+		}
+		else if (m_hdr->getRefCount () == 1)
+		{
+			m_p [length] = 0;
+			m_isNullTerminated = true;
+		}
+		else
+		{
+			m_isNullTerminated = false;
+		}
+
+		m_length = length;
 	}
 
-	C*
-	getBuffer ()
+	bool
+	ensureExclusive ()
 	{
-		return ensureExclusive () ? m_p : NULL;
+		return m_length ? createBuffer (m_length, true) : true;
 	}
 
 	C*
-	getBuffer (
+	getBuffer (size_t* length = NULL)
+	{
+		C* p = createBuffer (m_length);
+		if (!p)
+			return NULL;
+
+		if (length)
+		{
+			C* end = (C*) ((char*) (m_hdr + 1) + m_hdr->m_bufferSize);		
+			ASSERT (m_p >= (C*) (m_hdr + 1) && m_p < end);
+
+			*length = end - m_p;
+		}
+
+		return p;
+	}
+
+	C*
+	createBuffer (
 		size_t length,
 		bool saveContents = false
 		)
+	{			
+		size_t size = (length + 1) * sizeof (C);
+
+		if (m_hdr &&
+			m_hdr->m_bufferSize >= size &&
+			m_hdr->getRefCount () == 1)
+		{
+			m_length = length;
+			m_p [length] = 0;
+			m_isNullTerminated = true;
+			return m_p;
+		}
+
+		size_t bufferSize = sl::getMinPower2Ge (size);
+
+		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_EXTRA (ref::BufHdr, bufferSize);
+		if (!hdr)
+			return false;
+
+		hdr->m_bufferSize = bufferSize;
+
+		C* p = (C*) (hdr + 1);
+
+		if (saveContents && m_p)
+		{
+			size_t copyLength = AXL_MIN (length, m_length);
+			Details::copy (p, m_p, copyLength);
+		}
+
+		if (m_hdr)
+			m_hdr->release ();
+
+		m_p = p;
+		m_hdr = hdr.detach ();
+		m_length = length;
+		m_isNullTerminated = true; // AXL_REF_NEW zeroes memory
+		return p;
+	}
+
+	size_t
+	setBuffer (
+		ref::BufKind kind,
+		void* p,
+		size_t size
+		)
 	{
-		return setLength (length, saveContents) ? m_p : NULL;
+		ASSERT (size >= sizeof (ref::BufHdr) + sizeof (C));
+
+		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
+		size_t bufferSize = size - sizeof (ref::BufHdr);
+		
+		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_INPLACE (ref::BufHdr, p, flags);
+		hdr->m_bufferSize = bufferSize;
+
+		if (m_hdr)
+			m_hdr->release ();
+
+		m_p = (C*) (hdr + 1);
+		m_p [0] = 0;
+		m_hdr = hdr.detach ();
+		m_length = 0;
+		m_isNullTerminated = true;
+
+		return bufferSize / sizeof (C) - 1;
 	}
 
 	C*
@@ -1232,125 +1151,45 @@ public:
 		bool saveContents = false
 		)
 	{
-		size_t oldLength = getLength ();
+		if (saveContents && length < m_length)
+			length = m_length;
 
-		if (!setLength (length, saveContents))
+		size_t oldLength = m_length;
+
+		if (!createBuffer (length, saveContents))
 			return NULL;
 
-		setLength (oldLength, saveContents);
+		m_p [oldLength] = 0;
+		m_length = oldLength;
+		m_isNullTerminated = true;
 		return m_p;
 	}
 
 	size_t
 	updateLength ()
 	{
-		if (!m_p)
+		if (!m_hdr)
 			return 0;
 
-		Hdr* hdr = getHdr ();
-		hdr->m_length = Details::calcLength (m_p);
-		return hdr->m_length;
-	}
+		C* end = (C*) ((char*) (m_hdr + 1) + m_hdr->m_bufferSize);		
+		ASSERT (m_p >= (C*) (m_hdr + 1) && m_p < end);
 
-	bool
-	ensureExclusive ()
-	{
-		return m_p ? setLength (getLength (), true) : true;
-	}
-
-	void
-	setBuffer (
-		ref::BufKind kind,
-		void* p,
-		size_t size
-		)
-	{
-		ASSERT (size >= sizeof (Hdr) + sizeof (C));
-
-		Hdr* oldHdr = getHdr ();
-
-		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
-		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
-		newHdr->m_length = 0;
-		newHdr->m_maxLength = (size - sizeof (Hdr)) / sizeof (C) - 1;
-
-		if (oldHdr)
-			oldHdr->release ();
-
-		m_p = (T*) (newHdr + 1);
-		m_p [0] = 0;
-
-		newHdr.detach ();
+		size_t maxLength = end - m_p;
+		m_length = Details::calcLength (m_p, maxLength);
+		m_isNullTerminated = m_length < maxLength;
+		return m_length;
 	}
 
 protected:
-	Hdr*
-	getHdr () const
-	{
-		return m_p ? (Hdr*) m_p - 1 : NULL;
-	}
-
-	bool
-	setLength (
-		size_t length,
-		bool saveContents
-		)
-	{
-		Hdr* oldHdr = getHdr ();
-
-		if (oldHdr &&
-			oldHdr->m_maxLength >= length &&
-			oldHdr->getRefCount () == 1)
-		{
-			oldHdr->m_length = length;
-			m_p [length] = 0;
-			return true;
-		}
-
-		if (length == 0)
-		{
-			release ();
-			return true;
-		}
-
-		size_t maxLength = sl::getMinPower2Gt (length) - 1;
-		ASSERT (maxLength >= length);
-
-		size_t size = (maxLength + 1) * sizeof (C);
-		ref::Ptr <Hdr> newHdr = AXL_REF_NEW_EXTRA (Hdr, size);
-		if (!newHdr)
-			return false;
-
-		newHdr->m_length = length;
-		newHdr->m_maxLength = maxLength;
-
-		C* p = (C*) (newHdr + 1);
-		p [0] = p [length] = 0;
-
-		if (saveContents && m_p)
-		{
-			size_t copyLength = AXL_MIN (length, oldHdr->m_length);
-			Details::copy (p, m_p, copyLength + 1);
-		}
-
-		if (oldHdr)
-			oldHdr->release ();
-
-		m_p = p;
-
-		newHdr.detach ();
-		return true;
-	}
-
 	C*
 	insertSpace (
 		size_t index,
 		size_t length
 		)
 	{
-		size_t oldLength = getLength ();
-		bool result = setLength (oldLength + length, true);
-		if (!result)
+		size_t oldLength = m_length;
+
+		if (!createBuffer (oldLength + length, true))
 			return NULL;
 
 		if (index > oldLength)
@@ -1421,4 +1260,3 @@ formatString (
 
 } // namespace sl
 } // namespace axl
-

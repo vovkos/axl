@@ -10,20 +10,11 @@
 set (
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_lua_LuaState.h
-	${AXL_INC_DIR}/axl_lua_StringTemplate.h
-	axl_lua_StringTemplateLexer.h
 	)
 
 set (
 	LIB_CPP_LIST
 	axl_lua_LuaState.cpp
-	axl_lua_StringTemplate.cpp
-	axl_lua_StringTemplateLexer.cpp
-	)
-
-set (
-	LIB_RL_LIST
-	axl_lua_StringTemplateLexer.rl
 	)
 
 source_group (
@@ -31,37 +22,6 @@ source_group (
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	${LIB_RL_LIST}
-	)
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# gen folder
-#
-
-set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
-file (MAKE_DIRECTORY ${GEN_DIR})
-
-axl_push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
-
-add_ragel_step (
-	axl_lua_StringTemplateLexer.rl.cpp
-	axl_lua_StringTemplateLexer.rl
-	)
-
-axl_pop (CMAKE_CURRENT_BINARY_DIR)
-
-set (
-	GEN_RL_CPP_LIST
-	${GEN_DIR}/axl_lua_StringTemplateLexer.rl.cpp
-	)
-
-axl_exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
-
-source_group (
-	gen
-	FILES
-	${GEN_RL_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -94,7 +54,6 @@ source_group (
 include_directories (
 	${LUA_INC_DIR}
 	${AXL_INC_DIR}
-	${GEN_DIR}
 	)
 
 add_library (
@@ -104,7 +63,6 @@ add_library (
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_RL_LIST}
-	${GEN_RL_CPP_LIST}
 	)
 
 axl_set_pch (

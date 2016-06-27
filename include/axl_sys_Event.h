@@ -6,8 +6,6 @@
 
 #define _AXL_SYS_EVENT_H
 
-#include "axl_sl_Func.h"
-
 #if (_AXL_ENV == AXL_ENV_WIN)
 #	include "axl_sys_win_Event.h"
 #elif (_AXL_ENV == AXL_ENV_POSIX)

@@ -7,7 +7,6 @@
 #define _AXL_REF_CHILD_H
 
 #include "axl_ref_RefCount.h"
-#include "axl_sl_Func.h"
 
 namespace axl {
 namespace ref {

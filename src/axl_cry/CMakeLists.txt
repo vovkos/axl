@@ -8,7 +8,7 @@
 #
 
 set (
-	CRY_H_LIST
+	LIB_H_LIST
 	${AXL_INC_DIR}/axl_cry_CryptoError.h
 	${AXL_INC_DIR}/axl_cry_BigNum.h
 	${AXL_INC_DIR}/axl_cry_EcKey.h
@@ -16,7 +16,7 @@ set (
 	)
 
 set (
-	CRY_CPP_LIST
+	LIB_CPP_LIST
 	axl_cry_CryptoError.cpp
 	axl_cry_BigNum.cpp
 	axl_cry_EcKey.cpp
@@ -26,8 +26,8 @@ set (
 source_group (
 	lib
 	FILES
-	${CRY_H_LIST}
-	${CRY_CPP_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -65,8 +65,8 @@ add_library (
 	axl_cry
 	${PCH_H_LIST}
 	${PCH_CPP}
-	${CRY_H_LIST}
-	${CRY_CPP_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
 	)
 
 axl_set_pch (

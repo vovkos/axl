@@ -8,7 +8,7 @@
 #
 
 set (
-	LEX_H_LIST
+	LIB_H_LIST
 	${AXL_INC_DIR}/axl_lex_Lexer.h
 	${AXL_INC_DIR}/axl_lex_RagelLexer.h
 	${AXL_INC_DIR}/axl_lex_Token.h
@@ -16,15 +16,16 @@ set (
 	)
 
 set (
-	LEX_CPP_LIST
+	LIB_CPP_LIST
 	axl_lex_ParseError.cpp
+	axl_lex_Token.cpp
 	)
 
 source_group (
 	lex
 	FILES
-	${LEX_H_LIST}
-	${LEX_CPP_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
 	)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,8 +54,8 @@ add_library (
 	axl_lex
 	${PCH_H}
 	${PCH_CPP}
-	${LEX_H_LIST}
-	${LEX_CPP_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
 	)
 
 axl_set_pch (

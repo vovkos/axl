@@ -8,7 +8,8 @@
 
 #include "axl_sl_Array.h"
 #include "axl_sl_List.h"
-#include "axl_sl_Func.h"
+#include "axl_sl_Cmp.h"
+#include "axl_sl_Hash.h"
 
 namespace axl {
 namespace sl {
@@ -16,22 +17,22 @@ namespace sl {
 //.............................................................................
 
 template <typename T>
-class HashTableEntryBase: public sl::ListLink
+class HashTableEntryBase: public ListLink
 {
 public:
 	class BucketLink
 	{
 	public:
-		sl::ListLink*
+		ListLink*
 		operator () (T* entry)
 		{
 			return &entry->m_bucketLink;
 		}
 	};
 
-	typedef sl::AuxList <T, BucketLink> Bucket;
+	typedef AuxList <T, BucketLink> Bucket;
 
-	sl::ListLink m_bucketLink;
+	ListLink m_bucketLink;
 	Bucket* m_bucket;
 };
 
@@ -142,11 +143,11 @@ public:
 	typedef Entry_0 Entry;
 	typedef typename Entry::Bucket Bucket;
 
-	typedef sl::Iterator <Entry> Iterator;
+	typedef Iterator <Entry> Iterator;
 
 protected:
-	sl::StdList <Entry> m_list;
-	sl::Array <Bucket> m_table;
+	StdList <Entry> m_list;
+	Array <Bucket> m_table;
 	size_t m_resizeThreshold;
 
 public:
@@ -195,7 +196,7 @@ public:
 	bool
 	setBucketCount (size_t bucketCount)
 	{
-		sl::Array <Bucket> newTable;
+		Array <Bucket> newTable;
 		bool result = newTable.setCount (bucketCount);
 		if (!result)
 			return false;
@@ -351,6 +352,16 @@ public: \
 	find (Key key) \
 	{ \
 		return axl::sl::getSingleton <Map> ()->find (key); \
+	} \
+	static \
+	Value \
+	find ( \
+		Key key, \
+		Value undefined \
+		) \
+	{ \
+		Iterator it = axl::sl::getSingleton <Map> ()->find (key); \
+		return it ? it->m_value : undefined; \
 	} \
 	Iterator \
 	operator () (Key key) \

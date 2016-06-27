@@ -209,8 +209,14 @@ class SimpleMappedFile
 protected:
 	File m_file;
 	Mapping m_mapping;
+	uint_t m_openFlags;
 
 public:
+	SimpleMappedFile ()
+	{
+		m_openFlags = 0;
+	}
+
 	bool
 	isOpen ()
 	{
@@ -228,8 +234,14 @@ public:
 		return m_mapping;
 	}
 
+	uint64_t 
+	getFileSize ()
+	{
+		return m_file.getSize ();
+	}
+
 	size_t 
-	getSize ()
+	getMappingSize ()
 	{
 		return m_mapping.getSize ();
 	}
@@ -251,11 +263,21 @@ public:
 		return open (fileName, 0, -1, flags);
 	}
 
+	void*
+	view (
+		uint64_t offset,
+		size_t size
+		)
+	{
+		return m_mapping.open (&m_file, offset, size, m_openFlags);
+	}
+
 	void 
 	close ()
 	{
 		m_file.close ();
 		m_mapping.close ();
+		m_openFlags = 0;
 	}
 };
 

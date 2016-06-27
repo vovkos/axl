@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_sl_Packetizer.h"
+#include "axl_sl_Hash.h"
 
 namespace axl {
 namespace sl {

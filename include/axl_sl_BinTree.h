@@ -7,6 +7,7 @@
 #define _AXL_SL_BINTREE_H
 
 #include "axl_sl_List.h"
+#include "axl_sl_Cmp.h"
 
 namespace axl {
 namespace sl {

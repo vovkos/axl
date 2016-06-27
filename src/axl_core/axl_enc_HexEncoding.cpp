@@ -27,7 +27,7 @@ HexEncoding::encode (
 	if ((flags & Flag_NoSpace))
 	{
 		length = size * 2;
-		char* dst = string->getBuffer (length, false);
+		char* dst = string->createBuffer (length);
 		if (!dst)
 			return -1;
 
@@ -39,7 +39,7 @@ HexEncoding::encode (
 	else
 	{
 		length = size * 3 - 1;
-		char* dst = string->getBuffer (length, false);
+		char* dst = string->createBuffer (length);
 		if (!dst)
 			return -1;
 

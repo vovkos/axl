@@ -201,7 +201,6 @@ set (
 	${AXL_INC_DIR}/axl_sys_win_Service.h
 	${AXL_INC_DIR}/axl_sys_win_ServiceMgr.h
 	${AXL_INC_DIR}/axl_sys_win_DeviceInfo.h
-	${AXL_INC_DIR}/axl_sys_win_Window.h
 	${AXL_INC_DIR}/axl_sys_win_Process.h
 	${AXL_INC_DIR}/axl_sys_win_AccessToken.h
 	${AXL_INC_DIR}/axl_sys_win_Sid.h
@@ -329,11 +328,18 @@ source_group (
 
 set (
 	SL_H_LIST
+	${AXL_INC_DIR}/axl_sl_Operator.h
+	${AXL_INC_DIR}/axl_sl_Construct.h
+	${AXL_INC_DIR}/axl_sl_Cmp.h
+	${AXL_INC_DIR}/axl_sl_Hash.h
+	${AXL_INC_DIR}/axl_sl_Swap.h
+	${AXL_INC_DIR}/axl_sl_Closure.h
+	${AXL_INC_DIR}/axl_sl_ForEach.h
 	${AXL_INC_DIR}/axl_sl_CallOnce.h
 	${AXL_INC_DIR}/axl_sl_Singleton.h
 	${AXL_INC_DIR}/axl_sl_SimpleSingleton.h
 	${AXL_INC_DIR}/axl_sl_Array.h
-	${AXL_INC_DIR}/axl_sl_ArraySlice.h
+	${AXL_INC_DIR}/axl_sl_ArrayDetails.h
 	${AXL_INC_DIR}/axl_sl_ArrayList.h
 	${AXL_INC_DIR}/axl_sl_AutoPtrArray.h
 	${AXL_INC_DIR}/axl_sl_BinTree.h
@@ -346,8 +352,6 @@ set (
 	${AXL_INC_DIR}/axl_sl_ByteOrder.h
 	${AXL_INC_DIR}/axl_sl_CharLiteral.h
 	${AXL_INC_DIR}/axl_sl_CmdLineParser.h
-	${AXL_INC_DIR}/axl_sl_ForEach.h
-	${AXL_INC_DIR}/axl_sl_Func.h
 	${AXL_INC_DIR}/axl_sl_Guid.h
 	${AXL_INC_DIR}/axl_sl_Handle.h
 	${AXL_INC_DIR}/axl_sl_HandleTable.h
@@ -359,12 +363,10 @@ set (
 	${AXL_INC_DIR}/axl_sl_Packetizer.h
 	${AXL_INC_DIR}/axl_sl_Protocol.h
 	${AXL_INC_DIR}/axl_sl_RbTree.h
-	${AXL_INC_DIR}/axl_sl_RuntimeType.h
 	${AXL_INC_DIR}/axl_sl_String.h
-	${AXL_INC_DIR}/axl_sl_StringSlice.h
+	${AXL_INC_DIR}/axl_sl_StringDetails.h
 	${AXL_INC_DIR}/axl_sl_StringCache.h
 	${AXL_INC_DIR}/axl_sl_StringHashTable.h
-	${AXL_INC_DIR}/axl_sl_Type.h
 	${AXL_INC_DIR}/axl_sl_Unpacker.h
 	)
 
@@ -376,8 +378,8 @@ set (
 	axl_sl_BmhFind.cpp
 	axl_sl_BuddyAllocMap.cpp
 	axl_sl_CmdLineParser.cpp
-	axl_sl_Func.cpp
 	axl_sl_Guid.cpp
+	axl_sl_Hash.cpp
 	axl_sl_Packer.cpp
 	axl_sl_Packetizer.cpp
 	axl_sl_Unpacker.cpp

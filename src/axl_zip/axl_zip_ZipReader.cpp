@@ -57,7 +57,7 @@ ZipReader::getFileName (size_t index)
 	size_t size = mz_zip_reader_get_filename (m_zip, index, NULL, 0);
 	
 	sl::String fileName;
-	char* p = fileName.getBuffer (size);
+	char* p = fileName.createBuffer (size);
 	mz_zip_reader_get_filename (m_zip, index, p, size);
 	fileName.reduceLength (1);
 	return fileName;

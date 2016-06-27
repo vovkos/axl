@@ -797,7 +797,7 @@ querySymbolicLink (
 		return false;
 	}
 
-	wchar_t* p = string->getBuffer (BufferSize);
+	wchar_t* p = string->createBuffer (BufferSize);
 	size_t length = string->getLength ();
 
 	UNICODE_STRING uniTarget;
@@ -2388,6 +2388,95 @@ testMailSlot ()
 
 //.............................................................................
 
+#ifdef _AXL_XML
+
+class MyXmlParser: public xml::ExpatParser <MyXmlParser>
+{
+protected:
+	size_t m_indent;
+
+public:
+	MyXmlParser ()
+	{
+		m_indent = 0;
+	}
+
+	void 
+	onStartElement (
+		const char* name,
+		const char** attributes
+		)
+	{
+		printIndent ();
+		printf ("<%s", name);
+
+		if (*attributes)
+		{
+			printf ("\n");
+			m_indent++;
+			
+			while (*attributes)
+			{
+				printIndent ();
+				printf ("%s = %s\n", attributes [0], attributes [1]);
+				attributes += 2;
+			}
+
+			m_indent--;
+			printIndent ();
+		}
+
+		printf (">\n");
+		m_indent++;
+	}
+
+	void 
+	onEndElement (const char* name)
+	{
+		m_indent--;
+		printIndent ();
+		printf ("</%s>\n", name);
+	}
+
+	void 
+	onCharacterData (
+		const char* string,
+		size_t length
+		)
+	{		
+		printIndent ();
+		printf ("%s\n", sl::String (string, length).cc ());
+	}
+
+protected:
+	void 
+	printIndent ()
+	{
+		for (size_t i = 0; i < m_indent; i++)
+			printf ("  ");
+	}
+};
+
+void
+testXml ()
+{
+	bool result;
+
+	MyXmlParser parser;
+	result = parser.parseFile ("c:/projects/playground/doxygen/xml/index.xml", 100);
+	if (!result)
+	{
+		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	printf ("success\n");
+}
+
+#endif
+
+//.............................................................................
+
 #if (_AXL_ENV == AXL_ENV_WIN)
 int
 wmain (
@@ -2407,7 +2496,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 	
-	testNetBios ();
+	testXml ();
 
 	return 0;
 }

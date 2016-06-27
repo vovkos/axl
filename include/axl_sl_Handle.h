@@ -6,7 +6,7 @@
 
 #define _AXL_SL_HANDLE_H
 
-#include "axl_sl_Func.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace sl {
@@ -14,14 +14,14 @@ namespace sl {
 //.............................................................................
 
 template <
-	typename T_0,
-	typename Close	= Void <T_0>,
-	typename GetInvalidHandle = Zero <T_0>
+	typename T,
+	typename Close	= Void <T>,
+	typename GetInvalidHandle = Zero <T>
 	>
 class Handle
 {
 public:
-	typedef T_0 T;
+	typedef T H;
 
 protected:
 	T m_h;

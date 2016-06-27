@@ -33,7 +33,6 @@ class LuaState: public sl::Handle <lua_State*, LuaClose>
 public:
 	LuaState ()
 	{
-		create ();
 	}
 
 	LuaState (lua_State* h)
@@ -56,6 +55,41 @@ public:
 	trace ();
 #endif
 
+	void
+	openLibs ()
+	{
+		luaL_openlibs (m_h);
+	}
+
+	void
+	where (int level = 1)
+	{
+		ASSERT (isOpen ());
+		luaL_where (m_h, level);
+	}
+
+	void
+	setStringError (
+		const char* string,
+		size_t length = -1
+		);
+
+	void
+	setFormatStringError_va (
+		const char* format,
+		axl_va_list va
+		);
+
+	void
+	setFormatStringError (
+		const char* format,
+		...
+		)
+	{
+		AXL_VA_DECL (va, format);
+		setFormatStringError_va (format, va);
+	}
+
 	void 
 	clearStack ()
 	{
@@ -68,6 +102,13 @@ public:
 	{
 		ASSERT (isOpen ());
 		return lua_gettop (m_h);
+	}
+
+	void
+	setTop (int index)
+	{
+		ASSERT (isOpen ());
+		lua_settop (m_h, index);
 	}
 
 	int 
@@ -105,6 +146,13 @@ public:
 	}
 
 	void
+	concatenate (int count = 2)
+	{
+		ASSERT (isOpen ());
+		lua_concat (m_h, count);
+	}
+
+	void
 	pushNil ()
 	{
 		ASSERT (isOpen ());
@@ -129,17 +177,26 @@ public:
 	pushString (
 		const char* string,
 		size_t length = -1
+		);
+
+	void
+	pushFormatString_va (
+		const char* format,
+		axl_va_list va
 		)
 	{
 		ASSERT (isOpen ());
+		lua_pushvfstring (m_h, format, va.m_va);
+	}
 
-		if (!string)
-			string = "";
-
-		if (length != -1)
-			lua_pushlstring (m_h, string, length);
-		else
-			lua_pushstring (m_h, string);
+	void
+	pushFormatString (
+		const char* format,
+		...
+		)
+	{
+		AXL_VA_DECL (va, format);
+		pushFormatString_va (format, va);
 	}
 
 	void
@@ -465,6 +522,30 @@ public:
 protected:
 	bool
 	complete (int result);
+
+private:
+	void
+	setError ()
+	{
+		ASSERT (isOpen ());
+		lua_error (m_h);
+	}
+};
+
+//.............................................................................
+
+class LuaNonOwnerState: public LuaState
+{
+public:
+	LuaNonOwnerState (lua_State* h)
+	{
+		attach (h);
+	}
+
+	~LuaNonOwnerState ()
+	{
+		detach ();
+	}
 };
 
 //.............................................................................

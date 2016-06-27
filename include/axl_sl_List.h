@@ -7,7 +7,6 @@
 #define _AXL_SL_LIST_H
 
 #include "axl_sl_ListBase.h"
-#include "axl_sl_Func.h"
 #include "axl_mem_New.h"
 
 namespace axl {

@@ -7,6 +7,7 @@
 #define _AXL_SL_BITMAP_H
 
 #include "axl_sl_Array.h"
+#include "axl_sl_Hash.h"
 
 namespace axl {
 namespace sl {

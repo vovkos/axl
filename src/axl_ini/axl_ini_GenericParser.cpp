@@ -56,6 +56,6 @@ GenericParser::onKeyValue (
 
 //.............................................................................
 
-} // namespace lua
+} // namespace ini
 } // namespace axl
 

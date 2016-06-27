@@ -168,20 +168,17 @@ public:
 		m_refCount = refCount;
 	}
 
-	void 
-	detach (
-		T** pp_o = NULL, 
-		RefCount** refCount_o = NULL
-		)
+	T* 
+	detach (RefCount** refCount = NULL)
 	{ 
-		if (pp_o)
-			*pp_o = m_p;
-		
-		if (refCount_o)
-			*refCount_o = m_refCount;
+		T* p = m_p;
+
+		if (refCount)
+			*refCount = m_refCount;
 
 		m_p = NULL;
-		m_refCount = NULL; 
+		m_refCount = NULL;
+		return p;
 	}
 
 	void 
