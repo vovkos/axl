@@ -369,6 +369,24 @@ template <typename T>
 class StringBase: public StringRefBase <T>
 {
 public:
+	typedef StringRefBase <T> StringRef;
+
+	typedef typename StringRef::Details Details;
+	typedef typename StringRef::Details2 Details2;
+	typedef typename StringRef::Details3 Details3;
+
+	typedef typename StringRef::C C;
+	typedef typename StringRef::C2 C2;
+	typedef typename StringRef::C3 C3;
+
+	typedef typename StringRef::Encoding Encoding;
+	typedef typename StringRef::Encoding2 Encoding2;
+	typedef typename StringRef::Encoding3 Encoding3;
+
+	typedef typename StringRef::StringRef2 StringRef2;
+	typedef typename StringRef::StringRef3 StringRef3;
+	
+public:
 	StringBase ()
 	{
 	}
@@ -547,22 +565,22 @@ public:
 	void
 	clear ()
 	{
-		if (!m_hdr)
+		if (!this->m_hdr)
 		{
-			ASSERT (!m_length);
+			ASSERT (!this->m_length);
 			return;
 		}
 
-		if (m_hdr->getRefCount () != 1)
+		if (this->m_hdr->getRefCount () != 1)
 		{
-			release ();
+			this->release ();
 			return;
 		}
 
-		m_p = (C*) (m_hdr + 1);
-		m_p [0] = 0;
-		m_length = 0;
-		m_isNullTerminated = true;
+		this->m_p = (C*) (this->m_hdr + 1);
+		this->m_p [0] = 0;
+		this->m_length = 0;
+		this->m_isNullTerminated = true;
 	}
 
 	size_t
@@ -575,13 +593,13 @@ public:
 	copy (const StringRef& src)
 	{
 		if (&src == this)
-			return m_length;
+			return this->m_length;
 
 		if (!src.m_hdr || src.m_hdr->getFlags () & ref::BufHdrFlag_Exclusive)
 			return copy (src, src.m_length);
 
-		attach (src);
-		return m_length;
+		this->attach (src);
+		return this->m_length;
 	}
 
 	size_t
@@ -602,8 +620,8 @@ public:
 		size_t length = -1
 		)
 	{
-		if (p == m_p && length == -1)
-			return m_length;
+		if (p == this->m_p && length == -1)
+			return this->m_length;
 
 		if (length == -1)
 			length = Details::calcLength (p);
@@ -617,7 +635,7 @@ public:
 		if (!createBuffer (length, false))
 			return -1;
 
-		Details::copy (m_p, p, length);
+		Details::copy (this->m_p, p, length);
 		return length;
 	}
 
@@ -643,7 +661,7 @@ public:
 		if (!createBuffer (newLength, false))
 			return -1;
 
-		enc::UtfConvert <Encoding, Encoding2>::convert (m_p, newLength, p, length);
+		enc::UtfConvert <Encoding, Encoding2>::convert (this->m_p, newLength, p, length);
 		return newLength;
 	}
 
@@ -669,7 +687,7 @@ public:
 		if (!createBuffer (newLength, false))
 			return -1;
 
-		enc::UtfConvert <Encoding, Encoding3>::convert (m_p, newLength, p, length);
+		enc::UtfConvert <Encoding, Encoding3>::convert (this->m_p, newLength, p, length);
 		return newLength;
 	}
 
@@ -709,7 +727,7 @@ public:
 
 		C pattern [sizeof (utf32_t) / sizeof (C)];
 		Encoding::encodeCodePoint (pattern, x);
-		fillWithPattern (m_p, pattern, codePointLength, count);
+		fillWithPattern (this->m_p, pattern, codePointLength, count);
 		return newLength;
 	}
 
@@ -761,7 +779,7 @@ public:
 	size_t
 	append (utf32_t x)
 	{
-		return x ? append (x, 1) : m_length;
+		return x ? append (x, 1) : this->m_length;
 	}
 
 	size_t
@@ -785,7 +803,7 @@ public:
 		const StringRef& src
 		)
 	{
-		return isEmpty () ? copy (src) : insert (index, src, src.m_length);
+		return !this->m_length ? copy (src) : insert (index, src, src.m_length);
 	}
 
 	size_t
@@ -813,7 +831,7 @@ public:
 		size_t length = -1
 		)
 	{
-		size_t oldLength = m_length;
+		size_t oldLength = this->m_length;
 
 		if (length == -1)
 			length = Details::calcLength (p);
@@ -836,7 +854,7 @@ public:
 		size_t length = -1
 		)
 	{
-		size_t oldLength = m_length;
+		size_t oldLength = this->m_length;
 
 		if (length == -1)
 			length = Details2::calcLength (p);
@@ -863,7 +881,7 @@ public:
 		size_t length = -1
 		)
 	{
-		size_t oldLength = m_length;
+		size_t oldLength = this->m_length;
 
 		if (length == -1)
 			length = Details3::calcLength (p);
@@ -889,7 +907,7 @@ public:
 		utf32_t x
 		)
 	{
-		return x ? insert (index, x, 1) : m_length;
+		return x ? insert (index, x, 1) : this->m_length;
 	}
 
 	size_t
@@ -899,7 +917,7 @@ public:
 		size_t count
 		)
 	{
-		size_t oldLength = m_length;
+		size_t oldLength = this->m_length;
 
 		if (count == 0)
 			return oldLength;
@@ -942,7 +960,7 @@ public:
 		if (!createBuffer (length, false))
 			return -1;
 
-		Details::format_va (m_p, length + 1, formatString, va);
+		Details::format_va (this->m_p, length + 1, formatString, va);
 		return length;
 	}
 
@@ -963,12 +981,12 @@ public:
 		)
 	{
 		size_t appendLength = Details::calcFormatLength_va (formatString, va);
-		size_t oldLength = m_length;
+		size_t oldLength = this->m_length;
 		size_t newLength = oldLength + appendLength;
 		if (!createBuffer (newLength, true))
 			return -1;
 
-		Details::format_va (m_p + oldLength, appendLength + 1, formatString, va);
+		Details::format_va (this->m_p + oldLength, appendLength + 1, formatString, va);
 		return newLength;
 	}
 
@@ -1008,18 +1026,18 @@ public:
 	size_t
 	reduceLength (size_t delta)
 	{
-		if (m_length <= delta)
+		if (this->m_length <= delta)
 			clear ();
 		else
-			setReducedLength (m_length - delta);
+			setReducedLength (this->m_length - delta);
 
-		return m_length;
+		return this->m_length;
 	}
 
 	void
 	setReducedLength (size_t length)
 	{
-		if (length >= m_length)
+		if (length >= this->m_length)
 		{
 			ASSERT (false); // misuse
 			return; 
@@ -1031,44 +1049,44 @@ public:
 			return;
 		}
 
-		ASSERT (m_p && m_hdr);
+		ASSERT (this->m_p && this->m_hdr);
 		
-		if (!m_p [length])
+		if (!this->m_p [length])
 		{
-			m_isNullTerminated = true;
+			this->m_isNullTerminated = true;
 		}
-		else if (m_hdr->getRefCount () == 1)
+		else if (this->m_hdr->getRefCount () == 1)
 		{
-			m_p [length] = 0;
-			m_isNullTerminated = true;
+			this->m_p [length] = 0;
+			this->m_isNullTerminated = true;
 		}
 		else
 		{
-			m_isNullTerminated = false;
+			this->m_isNullTerminated = false;
 		}
 
-		m_length = length;
+		this->m_length = length;
 	}
 
 	bool
 	ensureExclusive ()
 	{
-		return m_length ? createBuffer (m_length, true) : true;
+		return this->m_length ? createBuffer (this->m_length, true) : true;
 	}
 
 	C*
 	getBuffer (size_t* length = NULL)
 	{
-		C* p = createBuffer (m_length);
+		C* p = createBuffer (this->m_length);
 		if (!p)
 			return NULL;
 
 		if (length)
 		{
-			C* end = (C*) ((char*) (m_hdr + 1) + m_hdr->m_bufferSize);		
-			ASSERT (m_p >= (C*) (m_hdr + 1) && m_p < end);
+			C* end = (C*) ((char*) (this->m_hdr + 1) + this->m_hdr->m_bufferSize);		
+			ASSERT (this->m_p >= (C*) (this->m_hdr + 1) && this->m_p < end);
 
-			*length = end - m_p;
+			*length = end - this->m_p;
 		}
 
 		return p;
@@ -1082,39 +1100,39 @@ public:
 	{			
 		size_t size = (length + 1) * sizeof (C);
 
-		if (m_hdr &&
-			m_hdr->m_bufferSize >= size &&
-			m_hdr->getRefCount () == 1)
+		if (this->m_hdr &&
+			this->m_hdr->m_bufferSize >= size &&
+			this->m_hdr->getRefCount () == 1)
 		{
-			m_length = length;
-			m_p [length] = 0;
-			m_isNullTerminated = true;
-			return m_p;
+			this->m_length = length;
+			this->m_p [length] = 0;
+			this->m_isNullTerminated = true;
+			return this->m_p;
 		}
 
 		size_t bufferSize = sl::getMinPower2Ge (size);
 
 		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_EXTRA (ref::BufHdr, bufferSize);
 		if (!hdr)
-			return false;
+			return NULL;
 
 		hdr->m_bufferSize = bufferSize;
 
 		C* p = (C*) (hdr + 1);
 
-		if (saveContents && m_p)
+		if (saveContents && this->m_p)
 		{
-			size_t copyLength = AXL_MIN (length, m_length);
-			Details::copy (p, m_p, copyLength);
+			size_t copyLength = AXL_MIN (length, this->m_length);
+			Details::copy (p, this->m_p, copyLength);
 		}
 
-		if (m_hdr)
-			m_hdr->release ();
+		if (this->m_hdr)
+			this->m_hdr->release ();
 
-		m_p = p;
-		m_hdr = hdr.detach ();
-		m_length = length;
-		m_isNullTerminated = true; // AXL_REF_NEW zeroes memory
+		this->m_p = p;
+		this->m_hdr = hdr.detach ();
+		this->m_length = length;
+		this->m_isNullTerminated = true; // AXL_REF_NEW zeroes memory
 		return p;
 	}
 
@@ -1133,14 +1151,14 @@ public:
 		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_INPLACE (ref::BufHdr, p, flags);
 		hdr->m_bufferSize = bufferSize;
 
-		if (m_hdr)
-			m_hdr->release ();
+		if (this->m_hdr)
+			this->m_hdr->release ();
 
-		m_p = (C*) (hdr + 1);
-		m_p [0] = 0;
-		m_hdr = hdr.detach ();
-		m_length = 0;
-		m_isNullTerminated = true;
+		this->m_p = (C*) (hdr + 1);
+		this->m_p [0] = 0;
+		this->m_hdr = hdr.detach ();
+		this->m_length = 0;
+		this->m_isNullTerminated = true;
 
 		return bufferSize / sizeof (C) - 1;
 	}
@@ -1151,33 +1169,33 @@ public:
 		bool saveContents = false
 		)
 	{
-		if (saveContents && length < m_length)
-			length = m_length;
+		if (saveContents && length < this->m_length)
+			length = this->m_length;
 
-		size_t oldLength = m_length;
+		size_t oldLength = this->m_length;
 
 		if (!createBuffer (length, saveContents))
 			return NULL;
 
-		m_p [oldLength] = 0;
-		m_length = oldLength;
-		m_isNullTerminated = true;
-		return m_p;
+		this->m_p [oldLength] = 0;
+		this->m_length = oldLength;
+		this->m_isNullTerminated = true;
+		return this->m_p;
 	}
 
 	size_t
 	updateLength ()
 	{
-		if (!m_hdr)
+		if (!this->m_hdr)
 			return 0;
 
-		C* end = (C*) ((char*) (m_hdr + 1) + m_hdr->m_bufferSize);		
-		ASSERT (m_p >= (C*) (m_hdr + 1) && m_p < end);
+		C* end = (C*) ((char*) (this->m_hdr + 1) + this->m_hdr->m_bufferSize);
+		ASSERT (this->m_p >= (C*) (this->m_hdr + 1) && this->m_p < end);
 
-		size_t maxLength = end - m_p;
-		m_length = Details::calcLength (m_p, maxLength);
-		m_isNullTerminated = m_length < maxLength;
-		return m_length;
+		size_t maxLength = end - this->m_p;
+		this->m_length = Details::calcLength (this->m_p, maxLength);
+		this->m_isNullTerminated = this->m_length < maxLength;
+		return this->m_length;
 	}
 
 protected:
@@ -1187,7 +1205,7 @@ protected:
 		size_t length
 		)
 	{
-		size_t oldLength = m_length;
+		size_t oldLength = this->m_length;
 
 		if (!createBuffer (oldLength + length, true))
 			return NULL;
@@ -1195,7 +1213,7 @@ protected:
 		if (index > oldLength)
 			index = oldLength;
 
-		C* dst = m_p + index;
+		C* dst = this->m_p + index;
 
 		if (length && index < oldLength)
 			Details::move (dst + length, dst, oldLength - index);

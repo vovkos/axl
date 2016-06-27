@@ -2496,7 +2496,9 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 	
+#ifdef _AXL_XML
 	testXml ();
+#endif
 
 	return 0;
 }

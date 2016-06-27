@@ -143,7 +143,7 @@ public:
 	typedef Entry_0 Entry;
 	typedef typename Entry::Bucket Bucket;
 
-	typedef Iterator <Entry> Iterator;
+	typedef sl::Iterator <Entry> Iterator;
 
 protected:
 	StdList <Entry> m_list;

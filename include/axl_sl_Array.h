@@ -7,6 +7,7 @@
 #define _AXL_SL_ARRAY_H
 
 #include "axl_sl_ArrayDetails.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace sl {
@@ -22,8 +23,6 @@ class ArrayRef
 
 public:
 	typedef ArrayDetails <T> Details;
-	typedef Array <T> Array;
-
 	typedef typename Details::Hdr Hdr;
 
 protected:
@@ -182,6 +181,12 @@ template <typename T>
 class Array: public ArrayRef <T>
 {
 public:
+	typedef sl::ArrayRef <T> ArrayRef;
+
+	typedef typename ArrayRef::Details Details;
+	typedef typename ArrayRef::Hdr Hdr;
+	
+public:
 	Array ()
 	{
 	}
@@ -220,7 +225,7 @@ public:
 
 	operator const T* () const
 	{
-		return ca ();
+		return this->ca ();
 	}
 
 	operator T* ()
@@ -245,7 +250,7 @@ public:
 	T*
 	a ()
 	{
-		return ensureExclusive () ? m_p : NULL;
+		return ensureExclusive () ? this->m_p : NULL;
 	}
 
 	void
@@ -258,13 +263,13 @@ public:
 	copy (const ArrayRef& src)
 	{
 		if (&src == this)
-			return m_count;
+			return this->m_count;
 
 		if (!src.m_hdr || src.m_hdr->getFlags () & ref::BufHdrFlag_Exclusive)
 			return copy (src, src.m_count);
 
-		attach (src);
-		return m_count;
+		this->attach (src);
+		return this->m_count;
 	}
 
 	size_t
@@ -289,7 +294,7 @@ public:
 		if (!result)
 			return -1;
 
-		Details::copy (m_p, p, count);
+		Details::copy (this->m_p, p, count);
 		return true;
 	}
 
@@ -309,7 +314,7 @@ public:
 		if (!result)
 			return -1;
 
-		Details::copyReverse (m_p, p, count);
+		Details::copyReverse (this->m_p, p, count);
 		return true;
 	}
 
@@ -370,15 +375,15 @@ public:
 		size_t count
 		)
 	{
-		size_t oldCount = m_count;
-		bool result = setCount (m_count + count);
+		size_t oldCount = this->m_count;
+		bool result = setCount (this->m_count + count);
 		if (!result)
 			return NULL;
 
 		if (index > oldCount)
 			index = oldCount;
 
-		T* dst = m_p + index;
+		T* dst = this->m_p + index;
 
 		if (count && index < oldCount)
 			Details::copy (dst + count, dst, oldCount - index);
@@ -498,7 +503,7 @@ public:
 		if (count == 0)
 			return true;
 
-		size_t oldCount = m_count;
+		size_t oldCount = this->m_count;
 		if (index >= oldCount)
 			return true;
 
@@ -511,7 +516,7 @@ public:
 
 		size_t newCount = oldCount - count;
 
-		T* dst = m_p + index;
+		T* dst = this->m_p + index;
 		Details::copy (dst, dst + count, newCount - index);
 
 		return setCount (newCount);
@@ -520,17 +525,17 @@ public:
 	size_t
 	pop (size_t count = 1)
 	{
-		if (count >= m_count)
-			count = m_count;
+		if (count >= this->m_count)
+			count = this->m_count;
 
-		setCount (m_count - count);
+		setCount (this->m_count - count);
 		return count;
 	}
 
 	T
 	getBackAndPop ()
 	{
-		T e = getBack ();
+		T e = this->getBack ();
 		pop ();
 		return e;
 	}
@@ -545,7 +550,7 @@ public:
 		if (count == 0 || indexDst == indexSrc)
 			return true;
 
-		size_t oldCount = m_count;
+		size_t oldCount = this->m_count;
 
 		if (indexDst + count > oldCount || indexSrc + count > oldCount)
 		{
@@ -557,8 +562,8 @@ public:
 		if (!temp)
 			return false;
 
-		T* dst = m_p + indexDst;
-		T* src = m_p + indexSrc;
+		T* dst = this->m_p + indexDst;
+		T* src = this->m_p + indexSrc;
 
 		Details::constructCopy (temp, src, count);
 
@@ -581,7 +586,7 @@ public:
 		size_t count
 		)
 	{
-		size_t thisCount = m_count;
+		size_t thisCount = this->m_count;
 
 		if (index >= thisCount)
 			return;
@@ -589,7 +594,7 @@ public:
 		if (index + count > thisCount)
 			count = thisCount - index;
 
-		Details::reverse (m_p + index, count);
+		Details::reverse (this->m_p + index, count);
 	}
 
 	void
@@ -613,7 +618,7 @@ public:
 	bool
 	ensureExclusive ()
 	{
-		return m_count ? setCount (m_count) : true;
+		return this->m_count ? setCount (this->m_count) : true;
 	}
 
 	bool
@@ -621,27 +626,27 @@ public:
 	{
 		size_t size = count * sizeof (T);
 
-		if (m_hdr && 
-			m_hdr->getRefCount () == 1 &&
-			m_hdr->m_bufferSize >= size)
+		if (this->m_hdr && 
+			this->m_hdr->getRefCount () == 1 &&
+			this->m_hdr->m_bufferSize >= size)
 			return true;
 
 		size_t bufferSize = sl::getMinPower2Ge (size);
 
 		ref::Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
 		hdr->m_bufferSize = bufferSize;
-		Details::setHdrCount (hdr, m_count);
+		Details::setHdrCount (hdr, this->m_count);
 
 		T* p = (T*) (hdr + 1);
 
-		if (m_count)
-			Details::constructCopy (p, m_p, m_count);
+		if (this->m_count)
+			Details::constructCopy (p, this->m_p, this->m_count);
 
-		if (m_hdr)
-			m_hdr->release ();
+		if (this->m_hdr)
+			this->m_hdr->release ();
 
-		m_p = p;
-		m_hdr = hdr.detach ();
+		this->m_p = p;
+		this->m_hdr = hdr.detach ();
 		return true;
 	}
 
@@ -650,44 +655,44 @@ public:
 	{
 		size_t size = count * sizeof (T);
 
-		if (m_hdr && 
-			m_hdr->getRefCount () == 1)
+		if (this->m_hdr && 
+			this->m_hdr->getRefCount () == 1)
 		{
-			if (m_count == count)
+			if (this->m_count == count)
 				return true;
 
-			if (m_hdr->m_bufferSize >= size)
+			if (this->m_hdr->m_bufferSize >= size)
 			{
-				if (count > m_count)
-					Details::construct (m_p + m_count, count - m_count);
+				if (count > this->m_count)
+					Details::construct (this->m_p + this->m_count, count - this->m_count);
 				else
-					Details::destruct (m_p + count, m_count - count);
+					Details::destruct (this->m_p + count, this->m_count - count);
 
-				Details::setHdrCount (m_hdr, count);
-				m_count = count;
+				Details::setHdrCount (this->m_hdr, count);
+				this->m_count = count;
 				return true;
 			}
 		}
 
 		if (count == 0)
 		{
-			release ();
+			this->release ();
 			return true;
 		}
 
-		if (!m_count)
+		if (!this->m_count)
 		{
 			bool result = reserve (count);
 			if (!result)
 				return false;
 
-			Details::construct (m_p, count);
-			Details::setHdrCount (m_hdr, count);
-			m_count = count;
+			Details::construct (this->m_p, count);
+			Details::setHdrCount (this->m_hdr, count);
+			this->m_count = count;
 			return true;
 		}
 
-		ASSERT (m_hdr);
+		ASSERT (this->m_hdr);
 
 		size_t bufferSize = sl::getMinPower2Ge (size);
 
@@ -700,31 +705,31 @@ public:
 
 		T* p = (T*) (hdr + 1);
 
-		if (count <= m_count)
+		if (count <= this->m_count)
 		{
-			Details::constructCopy (p, m_p, count);
+			Details::constructCopy (p, this->m_p, count);
 		}
 		else
 		{
-			Details::constructCopy (p, m_p, m_count);
-			Details::construct (p + m_count, count - m_count);
+			Details::constructCopy (p, this->m_p, this->m_count);
+			Details::construct (p + this->m_count, count - this->m_count);
 		}
 
-		m_hdr->release ();
+		this->m_hdr->release ();
 
-		m_p = p;
-		m_hdr = hdr.detach ();
-		m_count = count;
+		this->m_p = p;
+		this->m_hdr = hdr.detach ();
+		this->m_count = count;
 		return true;
 	}
 	
 	size_t
 	ensureCount (size_t count)
 	{
-		if (m_count < count)
+		if (this->m_count < count)
 			setCount (count);
 
-		return m_count;
+		return this->m_count;
 	}
 
 	size_t
@@ -743,12 +748,12 @@ public:
 		hdr->m_bufferSize = bufferSize;
 		Details::setHdrCount (hdr, 0);
 
-		if (m_hdr)
-			m_hdr->release ();
+		if (this->m_hdr)
+			this->m_hdr->release ();
 
-		m_p = (T*) (hdr + 1);
-		m_hdr = hdr.detach ();
-		m_count = 0;
+		this->m_p = (T*) (hdr + 1);
+		this->m_hdr = hdr.detach ();
+		this->m_count = 0;
 
 		return bufferSize / sizeof (T);
 	}
