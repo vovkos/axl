@@ -72,6 +72,14 @@ set_target_properties (
 	FOLDER test
 	)
 	
+if (BUILD_AXL_XML)
+	target_link_libraries (
+		test_mini
+		axl_xml
+		expat
+		)
+endif ()
+	
 target_link_libraries (
 	test_mini
 	axl_io
@@ -137,14 +145,6 @@ if (BUILD_AXL_IO_USB)
 			usb-1.0
 			)
 	endif ()
-endif ()
-
-if (BUILD_AXL_XML)
-	target_link_libraries (
-		test_mini
-		axl_xml
-		expat
-		)
 endif ()
 
 axl_set_pch (

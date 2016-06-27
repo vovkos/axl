@@ -58,7 +58,7 @@ public:
 	getLastError () const
 	{
 		XML_Error errorCode = getLastErrorCode ();
-		return errorCode ? (err::Error) ExpatError (errorCode) : &err::g_noError;
+		return errorCode ? (err::Error) ExpatError (errorCode) : (err::Error) &err::g_noError;
 	}
 
 	int
