@@ -8,6 +8,14 @@ namespace st {
 
 //.............................................................................
 
+void
+LuaStringTemplate::close ()
+{
+	m_luaState.close ();
+	StringTemplate <LuaStringTemplate>::clear ();
+	m_argCount = 0;
+}
+
 bool
 LuaStringTemplate::create ()
 {
@@ -27,19 +35,43 @@ LuaStringTemplate::create ()
 	return true;
 }
 
+bool
+LuaStringTemplate::setArgCount (size_t count)
+{
+	int top = m_luaState.getTop ();
+	if (count > (size_t) top)
+	{
+		err::setError (err::SystemErrorCode_InvalidParameter);
+		return false;
+	}
+
+	m_argCount = count;
+	return true;
+}
+
 bool 
 LuaStringTemplate::runScript (
 	const sl::StringRef& fileName,
 	const sl::StringRef& source
 	)
 {
+	int top = m_luaState.getTop ();
+
 	bool result = m_luaState.load (fileName, source, source.getLength ());
 	if (!result)
 		return false;
 
-	int top = m_luaState.getTop ();
-	
-	result = m_luaState.PCall (0, 0);
+	if (m_argCount)
+	{
+		ASSERT (m_argCount <= (size_t) top);
+
+		for (int i = top - m_argCount + 1; i <= top; i++)
+			m_luaState.pushValue (i);
+	}
+
+	result = m_luaState.PCall (m_argCount, 0);
+
+	m_argCount = 0;
 
 	// clean up even on failure
 

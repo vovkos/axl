@@ -160,6 +160,13 @@ public:
 	}
 
 	void
+	pushValue (int index = -1)
+	{
+		ASSERT (isOpen ());
+		lua_pushvalue (m_h, index);
+	}
+
+	void
 	pushInteger (lua_Integer value)
 	{
 		ASSERT (isOpen ());

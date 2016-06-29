@@ -17,19 +17,32 @@ class LuaStringTemplate: public StringTemplate <LuaStringTemplate>
 {
 	friend class StringTemplate <LuaStringTemplate>;
 
+protected:
+	size_t m_argCount;
+
 public:
 	lua::LuaState m_luaState;
 	
 public:
-	void
-	close ()
+	LuaStringTemplate ()
 	{
-		m_luaState.close ();
-		StringTemplate <LuaStringTemplate>::clear ();
+		m_argCount = 0;
 	}
+
+	void
+	close ();
 
 	bool
 	create ();
+
+	size_t 
+	getArgCount ()
+	{
+		return m_argCount;
+	}
+
+	bool
+	setArgCount (size_t count);
 
 protected:
 	bool 
