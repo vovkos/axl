@@ -37,16 +37,18 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum BoyerMooreFlag
+{
+	BoyerMooreFlag_Reverse  = 0x01,
+	BoyerMooreFlag_Horspool = 0x02, // don't use good-skip table
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <typename T>
 class BoyerMooreFindBase
 {
 public:
-	enum Flag
-	{
-		Flag_Reverse  = 0x01,
-		Flag_Horspool = 0x02, // don't use good-skip table
-	};
-
 	typedef BoyerMooreIncrementalContext <T> IncrementalContext;
 
 protected:
@@ -205,15 +207,17 @@ protected:
 
 //.............................................................................
 
+enum TextBoyerMooreFlag
+{
+	TextBoyerMooreFlag_CaseInsensitive = 0x10,
+	TextBoyerMooreFlag_WholeWord       = 0x20,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class TextBoyerMooreFind: public BoyerMooreFindBase <utf32_t>
 {
 public:
-	enum Flag
-	{
-		Flag_CaseInsensitive = 0x10,
-		Flag_WholeWord       = 0x20,
-	};
-
 	enum Def
 	{
 		Def_BadSkipTableSize = 256, // any number will do, actually (code points are hashed)
@@ -373,6 +377,26 @@ memMem (
 	)
 {
 	return (void*) memMem ((const void*) p1, size1, p2, size2);
+}
+
+const void*
+reverseMemMem (
+	const void* p1,
+	size_t size1,
+	const void* p2,
+	size_t size2
+	);
+
+inline
+void*
+reverseMemMem (
+	void* p1,
+	size_t size1,
+	const void* p2,
+	size_t size2
+	)
+{
+	return (void*) reverseMemMem ((const void*) p1, size1, p2, size2);
 }
 
 //.............................................................................

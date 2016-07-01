@@ -20,7 +20,7 @@ BinaryBoyerMooreFind::setPattern (
 		return true;
 	}
 
-	size_t result = (flags & Flag_Reverse) ?
+	size_t result = (flags & BoyerMooreFlag_Reverse) ?
 		m_pattern.copyReverse ((const uchar_t*) p, size) :
 		m_pattern.copy ((const uchar_t*) p, size);
 
@@ -31,7 +31,7 @@ BinaryBoyerMooreFind::setPattern (
 
 	buildBadSkipTable ();
 
-	return !(flags & Flag_Horspool) ? buildGoodSkipTable () : true;
+	return !(flags & BoyerMooreFlag_Horspool) ? buildGoodSkipTable () : true;
 }
 
 void
@@ -62,14 +62,14 @@ BinaryBoyerMooreFind::find (
 	if (size < patternSize)
 		return -1;
 
-	size_t result = (m_flags & Flag_Reverse) ? 
+	size_t result = (m_flags & BoyerMooreFlag_Reverse) ? 
 		findImpl (BinaryBoyerMooreReverseAccessor ((const uchar_t*) p + size - 1), size) : 
 		findImpl (BinaryBoyerMooreAccessor ((const uchar_t*) p), size);
 
 	if (result == -1)
 		return -1;
 
-	if (m_flags & Flag_Reverse)
+	if (m_flags & BoyerMooreFlag_Reverse)
 		result = size - result - patternSize;
 
 	return result;
@@ -92,7 +92,7 @@ BinaryBoyerMooreFind::find (
 
 	if (fullSize < patternSize)
 	{
-		if (m_flags & Flag_Reverse)
+		if (m_flags & BoyerMooreFlag_Reverse)
 			incrementalContext->m_tail.appendReverse ((const uchar_t*) p, size);
 		else
 			incrementalContext->m_tail.append ((const uchar_t*) p, size);
@@ -100,7 +100,7 @@ BinaryBoyerMooreFind::find (
 		return -1;
 	}
 
-	size_t result = (m_flags & Flag_Reverse) ? 
+	size_t result = (m_flags & BoyerMooreFlag_Reverse) ? 
 		findImpl (BinaryBoyerMooreIncrementalReverseAccessor ((const uchar_t*) p + size - 1, incrementalContext), fullSize) : 
 		findImpl (BinaryBoyerMooreIncrementalAccessor ((const uchar_t*) p, incrementalContext), fullSize);
 
@@ -111,7 +111,7 @@ BinaryBoyerMooreFind::find (
 
 	result -= tailSize;
 
-	if (m_flags & Flag_Reverse)
+	if (m_flags & BoyerMooreFlag_Reverse)
 		result = size - result - patternSize;
 
 	return offset + result;
@@ -131,7 +131,7 @@ BinaryBoyerMooreFind::findImpl (
 
 	size_t i = last;
 
-	if (m_flags & Flag_Horspool)
+	if (m_flags & BoyerMooreFlag_Horspool)
 		while (i < size)
 		{
 			intptr_t j = last;
@@ -207,11 +207,11 @@ TextBoyerMooreFind::setPattern (
 		return true;
 	}
 
-	if (flags & Flag_CaseInsensitive)
+	if (flags & TextBoyerMooreFlag_CaseInsensitive)
 		for (size_t i = 0; i < length; i++)
 			m_pattern [i] = enc::utfToCaseFold (m_pattern [i]);
 
-	if (flags & Flag_Reverse)
+	if (flags & BoyerMooreFlag_Reverse)
 		m_pattern.reverse ();
 	
 	m_flags = flags;
@@ -220,7 +220,7 @@ TextBoyerMooreFind::setPattern (
 	if (!result)
 		return false;
 
-	return !(flags & Flag_Horspool) ? buildGoodSkipTable () : true;
+	return !(flags & BoyerMooreFlag_Horspool) ? buildGoodSkipTable () : true;
 }
 
 bool
@@ -237,7 +237,7 @@ TextBoyerMooreFind::buildBadSkipTable (size_t tableSize)
 
 	size_t last = patternSize - 1;
 	
-	if (m_flags & Flag_CaseInsensitive)
+	if (m_flags & TextBoyerMooreFlag_CaseInsensitive)
 		for (size_t i = 0, j = last; i < last; i++, j--)
 		{
 			uint32_t c = enc::utfToCaseFold (m_pattern [i]);
@@ -271,21 +271,21 @@ TextBoyerMooreFind::find (
 	if (length < patternLength)
 		return -1;
 
-	if (m_flags & Flag_WholeWord)
+	if (m_flags & TextBoyerMooreFlag_WholeWord)
 		m_buffer.append (' ');
 
-	size_t result = (m_flags & Flag_CaseInsensitive) ? 
-		(m_flags & Flag_Reverse) ? 
+	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ? 
+		(m_flags & BoyerMooreFlag_Reverse) ? 
 			findImpl (TextBoyerMooreCaseFoldReverseAccessor (m_buffer + length - 1), length, length) : 
 			findImpl (TextBoyerMooreCaseFoldAccessor (m_buffer), length, length) :
-		(m_flags & Flag_Reverse) ? 
+		(m_flags & BoyerMooreFlag_Reverse) ? 
 			findImpl (TextBoyerMooreReverseAccessor (m_buffer + length - 1), length, length) : 
 			findImpl (TextBoyerMooreAccessor (m_buffer), length, length);
 
 	if (result == -1)
 		return -1;
 	
-	if (m_flags & Flag_Reverse)
+	if (m_flags & BoyerMooreFlag_Reverse)
 		result = size - result - patternLength;
 
 	ASSERT (result <= length);
@@ -313,12 +313,12 @@ TextBoyerMooreFind::find (
 	size_t fullLength = chunkLength + tailLength;
 	size_t end = fullLength;
 
-	if (m_flags & Flag_WholeWord)
+	if (m_flags & TextBoyerMooreFlag_WholeWord)
 		end--;
 
 	if (end < patternLength)
 	{
-		if (m_flags & Flag_Reverse)
+		if (m_flags & BoyerMooreFlag_Reverse)
 			incrementalContext->m_tail.appendReverse (m_buffer, chunkLength);
 		else
 			incrementalContext->m_tail.append (m_buffer, chunkLength);
@@ -326,8 +326,8 @@ TextBoyerMooreFind::find (
 		return -1;
 	}
 
-	size_t result = (m_flags & Flag_CaseInsensitive) ? 
-		(m_flags & Flag_Reverse) ? 
+	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ? 
+		(m_flags & BoyerMooreFlag_Reverse) ? 
 			findImpl (
 				TextBoyerMooreCaseFoldIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
 				end,
@@ -338,7 +338,7 @@ TextBoyerMooreFind::find (
 				end,
 				fullLength
 				) :
-		(m_flags & Flag_Reverse) ? 
+		(m_flags & BoyerMooreFlag_Reverse) ? 
 			findImpl (
 				TextBoyerMooreIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
 				end,
@@ -355,7 +355,7 @@ TextBoyerMooreFind::find (
 
 	result -= tailLength;
 
-	if (m_flags & Flag_Reverse)
+	if (m_flags & BoyerMooreFlag_Reverse)
 		result = size - result - patternLength;
 
 	if ((intptr_t) result < 0)
@@ -389,7 +389,7 @@ TextBoyerMooreFind::findImpl (
 
 	size_t i = last;
 
-	if (m_flags & Flag_Horspool)
+	if (m_flags & BoyerMooreFlag_Horspool)
 		while (i < end)
 		{
 			intptr_t j = last;
@@ -405,7 +405,7 @@ TextBoyerMooreFind::findImpl (
 
 				if (j == 0)
 				{
-					if ((m_flags & Flag_WholeWord) && 
+					if ((m_flags & TextBoyerMooreFlag_WholeWord) && 
 						(!accessor.isDelimChar (i - 1) || !accessor.isDelimChar (i + patternSize)))
 					{
 						break;
@@ -436,7 +436,7 @@ TextBoyerMooreFind::findImpl (
 
 				if (j == 0)
 				{
-					if ((m_flags & Flag_WholeWord) && 
+					if ((m_flags & TextBoyerMooreFlag_WholeWord) && 
 						(!accessor.isDelimChar (i - 1) || !accessor.isDelimChar (i + patternSize)))
 					{
 						break;
@@ -465,6 +465,8 @@ TextBoyerMooreFind::findImpl (
 
 //.............................................................................
 
+// building good-skip table is not worth it -- it's a single search
+
 const void*
 memMem (
 	const void* p1,
@@ -473,9 +475,20 @@ memMem (
 	size_t size2
 	)
 {
-	// building good-skip table is not worth it -- it's a single search
+	BinaryBoyerMooreFind find (p2, size2, BoyerMooreFlag_Horspool);
+	size_t offset = find.find (p1, size1);
+	return offset != -1 ? (char*) p1 + offset : NULL;
+}
 
-	BinaryBoyerMooreFind find (p2, size2, BinaryBoyerMooreFind::Flag_Horspool);
+const void*
+reverseMemMem (
+	const void* p1,
+	size_t size1,
+	const void* p2,
+	size_t size2
+	)
+{
+	BinaryBoyerMooreFind find (p2, size2, BoyerMooreFlag_Horspool | BoyerMooreFlag_Reverse);
 	size_t offset = find.find (p1, size1);
 	return offset != -1 ? (char*) p1 + offset : NULL;
 }
