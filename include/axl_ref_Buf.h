@@ -43,6 +43,24 @@ enum BufHdrFlag
 struct BufHdr: public RefCount
 {
 	size_t m_bufferSize;
+
+	void*
+	getBufferEnd ()
+	{
+		return (char*) (this + 1) + m_bufferSize;
+	}
+
+	const void*
+	getBufferEnd () const
+	{
+		return (const char*) (this + 1) + m_bufferSize;
+	}
+
+	bool
+	isInsideBuffer (const void* p) const
+	{
+		return p >= this + 1 && p < getBufferEnd ();
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
