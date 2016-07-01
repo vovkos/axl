@@ -15,14 +15,14 @@ namespace io {
 
 //.............................................................................
 
-class Fileransport: public Transport
+class FileTransport: public Transport
 {
 protected:
 	File* m_transmitFile;
 	File* m_receiveFile;
 
 public:
-	Fileransport ()
+	FileTransport ()
 	{
 		m_transmitFile = NULL;
 		m_receiveFile = NULL;

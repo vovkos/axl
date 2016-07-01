@@ -67,13 +67,13 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef RagelToken <int, StdTokenData> StdRageloken;
+typedef RagelToken <int, StdTokenData> StdRagelToken;
 
 //.............................................................................
 
 template <
 	typename T,
-	typename Token = StdRageloken
+	typename Token = StdRagelToken
 	>
 class RagelLexer: public Lexer <T, Token>
 {
