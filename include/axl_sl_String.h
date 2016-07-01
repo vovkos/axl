@@ -203,14 +203,6 @@ public:
 		return result;
 	}
 
-	StringRefBase
-	operator + (utf32_t x) const
-	{
-		String result = *this;
-		result.append (x);
-		return result;
-	}
-
 	const C*
 	cc () const
 	{
@@ -265,6 +257,15 @@ public:
 		return m_isNullTerminated;
 	}
 
+	void
+	release ()
+	{
+		if (m_hdr)
+			m_hdr->release ();
+
+		initialize ();
+	}
+
 	int
 	cmp (
 		const C* p,
@@ -282,15 +283,54 @@ public:
 	cmp (const StringRef& string) const
 	{
 		return cmp (string, string.m_length);
-	}		
+	}
 
-	void
-	release ()
+	size_t 
+	find (C c) const
 	{
-		if (m_hdr)
-			m_hdr->release ();
+		return Details::find (m_p, m_length, c);
+	}
 
-		initialize ();
+	size_t 
+	find (const StringRef& subString) const
+	{
+		return Details::find (m_p, m_length, subString.m_p, subString.m_length);
+	}
+
+	size_t 
+	findOneOf (const StringRef& charSet) const
+	{
+		return Details::findOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
+	}
+
+	size_t 
+	findNotOneOf (const StringRef& charSet) const
+	{
+		return Details::findNotOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
+	}
+
+	size_t 
+	reverseFind (C c) const
+	{
+		return Details::reverseFind (m_p, m_length, c);
+	}
+
+	size_t 
+	reverseFind (const StringRef& subString) const
+	{
+		return Details::reverseFind (m_p, m_length, subString.m_p, subString.m_length);
+	}
+
+	size_t 
+	reverseFindOneOf (const StringRef& charSet) const
+	{
+		return Details::reverseFindOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
+	}
+
+	size_t 
+	reverseFindNotOneOf (const StringRef& charSet) const
+	{
+		return Details::reverseFindNotOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
 	}
 
 protected:
@@ -632,6 +672,17 @@ public:
 			return 0;
 		}
 
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+		{
+			C* end = (C*) this->m_hdr->getBufferEnd ();
+			ASSERT (p + length <= end);
+
+			this->m_p = (C*) p;
+			this->m_length = length;
+			this->m_isNullTerminated = p + length < end && !p [length];
+			return length;
+		}
+
 		if (!createBuffer (length, false))
 			return -1;
 
@@ -950,6 +1001,35 @@ public:
 #endif
 	}
 
+	size_t trimWhitespaceLeft ()
+	{
+		static StringRef whitespace (Details::getWhitespace (), 4);
+		size_t i = findNotOneOf (whitespace);
+		if (i != -1)
+		{
+			m_p += i;
+			m_length -= i;
+		}
+
+		return m_length;
+	}
+
+	size_t trimWhitespaceRight ()
+	{
+		static StringRef whitespace (Details::getWhitespace (), 4);
+		size_t i = reverseFindNotOneOf (whitespace);
+		if (i != -1)
+			setReducedLength (i + 1);
+
+		return m_length;
+	}
+
+	size_t trimWhitespace ()
+	{
+		trimWhitespaceLeft ();
+		return trimWhitespaceRight ();
+	}
+
 	size_t
 	format_va (
 		const C* formatString,
@@ -1039,7 +1119,7 @@ public:
 	{
 		if (length >= this->m_length)
 		{
-			ASSERT (false); // misuse
+			ASSERT (length == this->m_length); // misuse otherwise
 			return; 
 		}
 
@@ -1189,10 +1269,9 @@ public:
 		if (!this->m_hdr)
 			return 0;
 
-		C* end = (C*) ((char*) (this->m_hdr + 1) + this->m_hdr->m_bufferSize);
-		ASSERT (this->m_p >= (C*) (this->m_hdr + 1) && this->m_p < end);
+		ASSERT (this->m_hdr->isInsideBuffer (this->m_p));
 
-		size_t maxLength = end - this->m_p;
+		size_t maxLength = (C*) this->m_hdr->getBufferEnd () - this->m_p;
 		this->m_length = Details::calcLength (this->m_p, maxLength);
 		this->m_isNullTerminated = this->m_length < maxLength;
 		return this->m_length;

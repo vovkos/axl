@@ -6,6 +6,7 @@
 
 #define _AXL_SL_STRING_H
 
+#include "axl_sl_BoyerMooreFind.h"
 #include "axl_enc_Utf.h"
 
 namespace axl {
@@ -20,8 +21,279 @@ class StringDetailsBase
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+template <typename T>
+class StringDetailsImpl
+{
+public:
+	static
+	const T*
+	getEmptyString ()
+	{
+		static T emptyString [] = { 0 };
+		return emptyString;
+	}
+
+	static
+	const T*
+	getCrLf ()
+	{
+		static T crLf [] = { '\r', '\n', 0 };
+		return crLf;
+	}
+
+	static
+	const T*
+	getWhitespace ()
+	{
+		static T whitespace [] = { ' ', '\t', '\r', '\n', 0 };
+		return whitespace;
+	}
+
+	static
+	size_t
+	calcLength (const T* p)
+	{
+		if (!p)
+			return 0;
+
+		const T* p0 = p;
+		while (*p)
+			p++;
+
+		return p - p0;
+	}
+
+	static
+	size_t
+	calcLength (
+		const T* p,
+		size_t maxLength
+		)
+	{
+		if (!p)
+			return 0;
+
+		const T* p0 = p;
+		const T* end = p + maxLength;
+		while (p < end && *p)
+			p++;
+
+		return p - p0;
+	}
+
+	static
+	int
+	cmp (
+		const T* p1,
+		const T* p2,
+		size_t length
+		)
+	{
+		const T* end = p1 + length;
+		for (; p1 < end; p1++, p2++)
+			if (*p1 < *p2)
+				return -1;
+			else if (*p1 > *p2)
+				return 1;
+
+		return 0;
+	}
+
+	static
+	size_t 
+	find (
+		const T* p,
+		size_t length,
+		T c
+		)
+	{
+		const T* p0 = p;
+		const T* end = p + length;
+		for (; p < end; p++)
+			if (*p == c)
+				return p - p0;
+
+		return -1;
+	}
+
+	static
+	size_t 
+	find (
+		const T* p,
+		size_t length,
+		const T* subString,
+		size_t subStringLength
+		)
+	{
+		const T* f = memMem (p, length * sizeof (T), subString, subStringLength * sizeof (T));
+		return f ? f - p : -1;
+	}
+
+	static
+	size_t 
+	findOneOf (
+		const T* p,
+		size_t length,
+		const T* charSet,
+		size_t charCount
+		)
+	{
+		if (!charCount)
+			return -1;
+
+		const T* p0 = p;
+		const T* end = p + length;
+		for (; p < end; p++)
+		{
+			size_t f = find (charSet, charCount, *p);
+			if (f != -1)
+				return p - p0;
+		}
+
+		return -1;
+	}
+
+	static
+	size_t 
+	findNotOneOf (
+		const T* p,
+		size_t length,
+		const T* charSet,
+		size_t charCount
+		)
+	{
+		if (!charCount)
+			return -1;
+
+		const T* p0 = p;
+		const T* end = p + length;
+		for (; p < end; p++)
+		{
+			size_t f = find (charSet, charCount, *p);
+			if (f == -1)
+				return p - p0;
+		}
+
+		return -1;
+	}
+
+	static
+	size_t 
+	reverseFind (
+		const T* p,
+		size_t length,
+		T c
+		)
+	{
+		if (!length)
+			return -1;
+
+		const T* p0 = p;
+		for (p += length - 1; p >= p0; p--)
+			if (*p == c)
+				return p - p0;
+
+		return -1;
+	}
+
+	static
+	size_t 
+	reverseFind (
+		const T* p,
+		size_t length,
+		const T* subString,
+		size_t subStringLength
+		)
+	{
+		const T* f = reverseMemMem (p, length * sizeof (T), subString, subStringLength * sizeof (T));
+		return f ? f - p : -1;
+	}
+
+	static
+	size_t 
+	reverseFindOneOf (
+		const T* p,
+		size_t length,
+		const T* charSet,
+		size_t charCount
+		)
+	{
+		if (!length || !charCount)
+			return -1;
+
+		const T* p0 = p;
+		for (p += length - 1; p >= p0; p--)
+		{
+			size_t f = find (charSet, charCount, *p);
+			if (f != -1)
+				return p - p0;
+		}
+
+		return -1;
+	}
+
+	static
+	size_t 
+	reverseFindNotOneOf (
+		const T* p,
+		size_t length,
+		const T* charSet,
+		size_t charCount
+		)
+	{
+		if (!length || !charCount)
+			return -1;
+
+		const T* p0 = p;
+		for (p += length - 1; p >= p0; p--)
+		{
+			size_t f = find (charSet, charCount, *p);
+			if (f == -1)
+				return p - p0;
+		}
+
+		return -1;
+	}
+	static
+	void
+	fill (
+		T* p,
+		T c,
+		size_t count
+		)
+	{
+		const T* end = p + count;
+		for (; p < end; p++)
+			*p = c;
+	}
+
+	static
+	void
+	copy (
+		T* dst,
+		const T* src,
+		size_t length
+		)
+	{
+		memcpy (dst, src, length * sizeof (T));
+	}
+
+	static
+	void
+	move (
+		T* dst,
+		const T* src,
+		size_t length
+		)
+	{
+		memmove (dst, src, length * sizeof (T));
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <>
-class StringDetailsBase <utf8_t>
+class StringDetailsBase <utf8_t>: public StringDetailsImpl <utf8_t>
 {
 public:
 	typedef utf8_t  C;
@@ -31,20 +303,6 @@ public:
 	typedef enc::Utf8 Encoding;
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
-
-	static
-	const C*
-	getEmptyString ()
-	{
-		return "";
-	}
-
-	static
-	const C*
-	getCrLf ()
-	{
-		return "\r\n";
-	}
 
 	static
 	size_t
@@ -75,6 +333,18 @@ public:
 	}
 
 	static
+	size_t 
+	find (
+		const C* p,
+		size_t length,
+		C c
+		)
+	{
+		const C* f = (const C*) memchr (p, c, length);
+		return f ? f - p : -1;
+	}
+
+	static
 	void
 	fill (
 		C* p,
@@ -83,28 +353,6 @@ public:
 		)
 	{
 		memset (p, c, count);
-	}
-
-	static
-	void
-	copy (
-		C* dst,
-		const C* src,
-		size_t count
-		)
-	{
-		memcpy (dst, src, count);
-	}
-
-	static
-	void
-	move (
-		C* dst,
-		const C* src,
-		size_t count
-		)
-	{
-		memmove (dst, src, count);
 	}
 
 #if (_AXL_CPP == AXL_CPP_MSC)
@@ -154,115 +402,6 @@ public:
 		return vsnprintf (buffer, bufferLength, formatString, va.m_va);
 	}
 #endif
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class StringDetailsImpl
-{
-public:
-	static
-	const T*
-	getEmptyString ()
-	{
-		static T emptyString [1] = { 0 };
-		return emptyString;
-	}
-
-	static
-	const T*
-	getCrLf ()
-	{
-		static T crLf [2] = { '\r', '\n' };
-		return crLf;
-	}
-
-	static
-	size_t
-	calcLength (const T* p)
-	{
-		if (!p)
-			return 0;
-
-		const T* p0 = p;
-		while (*p)
-			p++;
-
-		return p - p0;
-	}
-
-	static
-	size_t
-	calcLength (
-		const T* p,
-		size_t maxLength
-		)
-	{
-		if (!p)
-			return 0;
-
-		const T* p0 = p;
-		const T* end = p + maxLength;
-
-		while (p < end && *p)
-			p++;
-
-		return p - p0;
-	}
-
-	static
-	int
-	cmp (
-		const T* p1,
-		const T* p2,
-		size_t length
-		)
-	{
-		const T* end = p1 + length;
-		for (; p1 < end; p1++, p2++)
-			if (*p1 < *p2)
-				return -1;
-			else if (*p1 > *p2)
-				return 1;
-
-		return 0;
-	}
-
-	static
-	void
-	fill (
-		T* p,
-		T c,
-		size_t count
-		)
-	{
-		const T* end = p + count;
-		for (; p < end; p++)
-			*p = c;
-	}
-
-	static
-	void
-	copy (
-		T* dst,
-		const T* src,
-		size_t count
-		)
-	{
-		memcpy (dst, src, count * sizeof (T));
-	}
-
-	static
-	void
-	move (
-		T* dst,
-		const T* src,
-		size_t count
-		)
-	{
-		memmove (dst, src, count * sizeof (T));
-	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
