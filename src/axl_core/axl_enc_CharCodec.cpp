@@ -194,7 +194,7 @@ CharCodec::decodeToUtf8 (
 		size_t takenBufferSize;
 		size_t takenLength;
 
-		decodeToUtf8 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		decodeToUtf8 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -232,7 +232,7 @@ CharCodec::decodeToUtf16 (
 		size_t takenBufferSize;
 		size_t takenLength;
 
-		decodeToUtf16 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		decodeToUtf16 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -270,7 +270,7 @@ CharCodec::decodeToUtf32 (
 		size_t takenBufferSize;
 		size_t takenLength;
 
-		decodeToUtf32 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		decodeToUtf32 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
 		if (!takenLength)
 			break;
 
