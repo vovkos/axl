@@ -135,6 +135,12 @@
 
 //.............................................................................
 
+#ifdef __cplusplus
+#	define AXL_EXTERN_C extern "C"
+#else
+#	define AXL_EXTERN_C
+#endif
+
 #if (_AXL_CPP == AXL_CPP_MSC)
 #	define AXL_CDECL      __cdecl
 #	define AXL_STDCALL    __stdcall
