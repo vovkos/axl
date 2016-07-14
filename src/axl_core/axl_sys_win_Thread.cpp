@@ -20,7 +20,14 @@ Thread::create (
 
 	dword_t threadId;
 	m_h = ::CreateThread (secAttr, stackSize, threadFunc, context, flags, &threadId);
-	return err::complete (m_h != NULL);
+	if (!m_h)
+	{
+		err::setLastSystemError ();
+		return false;
+	}
+
+	m_threadId = threadId;
+	return true;
 }
 
 //.............................................................................
