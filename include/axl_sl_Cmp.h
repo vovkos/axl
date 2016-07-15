@@ -48,6 +48,25 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+template <
+	typename T,
+	typename C
+	>
+class CmpPtr
+{
+public:
+	int 
+	operator () (
+		const T* a, 
+		const T* b
+		) const
+	{ 
+		return C () (*a, *b);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <typename T>
 class CmpStringBase
 {

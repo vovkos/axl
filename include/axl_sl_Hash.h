@@ -66,6 +66,25 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+template <
+	typename T,
+	typename H
+	>
+class HashPtr
+{
+public:
+	int 
+	operator () (
+		const T* a, 
+		const T* b
+		) const
+	{ 
+		return H () (*a, *b);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <typename T>
 class HashStringBase 
 {
