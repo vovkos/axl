@@ -131,6 +131,13 @@ public:
 		return cc ();
 	}
 
+	StringRefBase&
+	operator = (const StringRef& src)
+	{
+		attach (src);
+		return *this;
+	}
+
 	bool
 	operator == (const StringRef& string) const
 	{

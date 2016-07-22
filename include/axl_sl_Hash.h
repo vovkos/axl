@@ -73,7 +73,7 @@ template <
 class HashPtr
 {
 public:
-	int 
+	size_t 
 	operator () (
 		const T* a, 
 		const T* b
@@ -130,13 +130,13 @@ template <typename T>
 class HashDuckType
 {
 public:
-	intptr_t
+	size_t 
 	operator () (const T* a)
 	{
 		return a->getHash ();
 	}
 
-	intptr_t
+	size_t 
 	operator () (const T& a)
 	{
 		return a.getHash ();
