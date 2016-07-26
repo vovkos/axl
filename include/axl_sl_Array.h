@@ -60,6 +60,13 @@ public:
 	{
 		return m_p;
 	}
+	
+	ArrayRef& 
+	operator = (const ArrayRef& src)
+	{
+		attach (src);
+		return *this;
+	}	
 
 	const T*
 	ca () const
