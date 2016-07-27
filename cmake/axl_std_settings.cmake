@@ -169,7 +169,7 @@ axl_create_gcc_settings)
 	axl_create_c_cxx_flag_setting (
 		GCC_FLAG_SHOW_INCLUDES
 		"GNU C++ shows include stack during compilation"
-		""
+		" "
 		"-H"
 		)
 
@@ -251,29 +251,43 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_c_cxx_flag_setting (
+		GCC_FLAG_WARNING_NARROWING
+		"GNU C++ produces warnings/errors on narrowing conversions"
+		" "
+		"-Wnarrowing" "-Wno-narrowing"
+		)
+
+	axl_create_c_cxx_flag_setting (
 		GCC_FLAG_INCOMPATIBLE_MS_STRUCT
 		"GNU C++ shows warnings on potentially MSVC-incompatible structs"
 		"-Wno-incompatible-ms-struct"
 		"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
 		)
 
+	axl_create_c_cxx_flag_setting (
+		GCC_FLAG_CPP_STANDARD
+		"Specify the C++ standard to use"
+		"-std=gnu++98"
+		"-std=c++98" "-std=gnu++98" "-std=c++0x" "-std=gnu++0x" 
+		)
+
 	axl_create_setting (
-		GCC_SANITIZER
-		"-fsanitize=address"
+		GCC_FLAG_SANITIZER
+		" "
 		STRING
 		"Sanitizer to use in Debug build"
 		" " "-fsanitize=address" "-fsanitize=memory" "-fsanitize=thread"
 		)
 
-	if (NOT "${GCC_SANITIZER}" STREQUAL " ")
+	if (NOT "${GCC_FLAG_SANITIZER}" STREQUAL " ")
 		if (CMAKE_GENERATOR MATCHES "Xcode")
 			# Xcode fires unresolved externals otherwise
-			set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${GCC_SANITIZER}")
-			set (CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${GCC_SANITIZER}")
+			set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
+			set (CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
 		endif ()
 	
-		set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${GCC_SANITIZER}")
-		set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_SANITIZER}")
+		set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
+		set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
 	endif ()
 endmacro ()
 

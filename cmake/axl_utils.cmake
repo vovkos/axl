@@ -197,6 +197,8 @@ axl_create_flag_list_regex
 	set (${_REGEX} "")
 
 	foreach (_FLAG ${_FLAG_LIST})
+		string (REPLACE "+" "%+" _FLAG ${_FLAG}) # e.g. -std=c++0x
+
 		set (_FLAG_REGEX "(^| +)${_FLAG}($| +)")
 
 		if (${_REGEX} STREQUAL "")
