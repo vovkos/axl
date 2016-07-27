@@ -1,5 +1,13 @@
 #..............................................................................
 
+if (NOT RAGEL_EXE)
+	axl_find_executable (RAGEL_EXE ragel)
+
+	if (RAGEL_EXE)
+		message (STATUS "Ragel found at: ${RAGEL_EXE}")
+	endif ()	
+endif ()
+
 if (EXISTS ${RAGEL_EXE})
 	set (RAGEL_FOUND TRUE)
 else ()

@@ -582,6 +582,74 @@ endmacro ()
 # file helpers
 
 macro (
+axl_find_executable
+	_RESULT
+	_FILE_NAME
+	)
+
+	if (WIN32)
+		set (_WHICH where)
+	else ()
+		set (_WHICH which)
+	endif ()
+
+	execute_process (
+		COMMAND ${_WHICH} ${_FILE_NAME}
+		OUTPUT_VARIABLE _OUTPUT
+		)
+
+	string (STRIP "${_OUTPUT}" _OUTPUT)
+
+	if (NOT "${_OUTPUT}" STREQUAL "")
+		set (${_RESULT} ${_OUTPUT})
+	else ()
+		set (${_RESULT} ${_RESULT}-NOTFOUND)
+	endif ()
+endmacro ()
+
+macro (
+axl_find_inc_dir
+	_RESULT
+	_FILE_NAME
+	)
+
+	unset (_DIR)
+	find_path (_DIR ${_FILE_NAME})
+
+	if (_DIR)
+		set (${_RESULT} ${_DIR})
+	else ()
+		set (${_RESULT} ${_RESULT}-NOTFOUND)
+	endif ()
+
+	unset (_DIR CACHE)
+endmacro ()
+
+macro (
+axl_find_lib_dir
+	_RESULT
+	_LIB_NAME
+	)
+
+	unset (_PATH)
+	find_library (_PATH ${_LIB_NAME})
+
+	if (_PATH)
+		get_filename_component (
+			_DIR
+			${_PATH}
+			DIRECTORY
+			)
+
+		set (${_RESULT} ${_DIR})
+	else ()
+		set (${_RESULT} ${_RESULT}-NOTFOUND)
+	endif ()
+
+	unset (_PATH CACHE)
+endmacro ()
+
+macro (
 axl_find_file
 	_RESULT
 	_FILE_NAME
