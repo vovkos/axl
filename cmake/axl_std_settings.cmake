@@ -60,7 +60,7 @@ axl_create_build_type_setting)
 
 		set (CONFIGURATION_SUFFIX   "${CMAKE_BUILD_TYPE}")
 		set (CONFIGURATION_SUFFIX_0 "${CMAKE_BUILD_TYPE}")
-	
+
 		if (UNIX)
 			if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 				set (CMAKE_SKIP_RPATH TRUE)
@@ -86,12 +86,12 @@ axl_create_msvc_settings)
 		"Use solution folders in Microsoft Visual Studio"
 		ON
 		)
-		
+
 	option (
 		MSVC_USE_PCH
 		"Use precompiled headers in Microsoft Visual C/C++"
 		ON
-		)		
+		)
 
 	set_property (
 		GLOBAL PROPERTY
@@ -108,7 +108,7 @@ axl_create_msvc_settings)
 	axl_create_c_cxx_flag_setting (
 		MSVC_FLAG_RTTI
 		"Microsoft Visual C++ RTTI (run-time type information) support"
-		"/GR-" 
+		"/GR-"
 		"/GR" "/GR-"
 		)
 
@@ -139,7 +139,7 @@ axl_create_msvc_settings)
 		"/Zi"
 		"/Z7" "/Zi" "/ZI"
 		)
-		
+
 	option (
 		MSVC_FLAG_UNICODE
 		"Compile for UNICODE rather than multibyte"
@@ -156,6 +156,28 @@ endmacro ()
 macro (
 axl_create_gcc_settings)
 
+	option (
+		GCC_SUPPRESS_RDYNAMIC
+		"Remove -rdynamic flag from default linker options"
+		ON
+		)
+
+	if (GCC_SUPPRESS_RDYNAMIC)
+		string (
+			REPLACE
+			"-rdynamic" ""
+			CMAKE_SHARED_LIBRARY_LINK_C_FLAGS
+			"${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS}"
+			)
+
+		string (
+			REPLACE
+			"-rdynamic" ""
+			CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS
+			"${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS}"
+			)
+	endif ()
+
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		unset (GCC_USE_PCH CACHE) # axl pch does not work on clang yet
 	else ()
@@ -163,7 +185,7 @@ axl_create_gcc_settings)
 			GCC_USE_PCH
 			"Use precompiled headers in GNU C/C++"
 			ON
-			)		
+			)
 	endif ()
 
 	axl_create_c_cxx_flag_setting (
@@ -268,7 +290,7 @@ axl_create_gcc_settings)
 		GCC_FLAG_CPP_STANDARD
 		"Specify the C++ standard to use"
 		"-std=gnu++98"
-		"-std=c++98" "-std=gnu++98" "-std=c++0x" "-std=gnu++0x" 
+		"-std=c++98" "-std=gnu++98" "-std=c++0x" "-std=gnu++0x"
 		)
 
 	axl_create_setting (
@@ -285,7 +307,7 @@ axl_create_gcc_settings)
 			set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
 			set (CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
 		endif ()
-	
+
 		set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
 		set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER}")
 	endif ()
