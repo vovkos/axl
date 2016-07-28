@@ -1,9 +1,10 @@
 #..............................................................................
 
+unset (_DIR)
+
 find_path (
 	_DIR
 	NAMES libudev.h
-	HINTS /usr/include
 	)
 
 if (_DIR)

@@ -16,7 +16,28 @@ namespace win {
 
 class Thread: public WaitableHandle
 {
+protected:
+	uint_t m_threadId;
+
 public:
+	Thread ()
+	{
+		m_threadId = -1;
+	}
+
+	uint_t
+	getThreadId ()
+	{
+		return m_threadId;
+	}
+
+	void
+	close ()
+	{
+		WaitableHandle::close ();
+		m_threadId = -1;
+	}
+
 	bool 
 	create (
 		SECURITY_ATTRIBUTES* secAttr,
@@ -25,13 +46,6 @@ public:
 		void* context,
 		uint_t flags
 		);
-
-	uint_t
-	getThreadId ()
-	{
-		uint_t id = ::GetThreadId (m_h);
-		return err::complete (id, (uint_t) -1);
-	}
 
 	bool 
 	setPriority (int priority)

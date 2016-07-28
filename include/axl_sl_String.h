@@ -1011,24 +1011,24 @@ public:
 	size_t trimWhitespaceLeft ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
-		size_t i = findNotOneOf (whitespace);
+		size_t i = this->findNotOneOf (whitespace);
 		if (i != -1)
 		{
-			m_p += i;
-			m_length -= i;
+			this->m_p += i;
+			this->m_length -= i;
 		}
 
-		return m_length;
+		return this->m_length;
 	}
 
 	size_t trimWhitespaceRight ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
-		size_t i = reverseFindNotOneOf (whitespace);
+		size_t i = this->reverseFindNotOneOf (whitespace);
 		if (i != -1)
 			setReducedLength (i + 1);
 
-		return m_length;
+		return this->m_length;
 	}
 
 	size_t trimWhitespace ()
