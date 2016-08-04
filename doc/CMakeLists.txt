@@ -4,8 +4,12 @@
 
 #..............................................................................
 
-add_subdirectory (qdoc)
-add_subdirectory (doxygen)
-add_subdirectory (manual)
+if (DOXYGEN_FOUND)
+	add_subdirectory (doxygen)
+endif ()
+
+if (SPHINX_FOUND)
+	add_subdirectory (manual)
+endif ()
 
 #..............................................................................
