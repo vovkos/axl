@@ -27,6 +27,7 @@ enum FileFlag
 	FileFlag_ShareWrite    = 0x10,
 	FileFlag_DeleteOnClose = 0x20,
 	FileFlag_Asynchronous  = 0x40,
+	FileFlag_Clear         = 0x80,
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

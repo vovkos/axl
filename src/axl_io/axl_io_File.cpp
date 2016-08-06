@@ -41,7 +41,7 @@ File::open (
 	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
-	return m_file.create (
+	bool result = m_file.create (
 		fileName_w,
 		accessMode,
 		shareMode,
@@ -49,6 +49,14 @@ File::open (
 		creationDisposition,
 		flagsAttributes
 		);
+
+	if (!result)
+		return false;
+
+	if (flags & FileFlag_Clear)
+		m_file.setSize (0);
+
+	return true;
 }
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
@@ -77,6 +85,9 @@ File::open (
 
 	if (flags & FileFlag_DeleteOnClose)
 		unlink (fileName);
+
+	if (flags & FileFlag_Clear)
+		m_file.setSize (0);
 
 	return true;
 }
