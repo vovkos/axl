@@ -1008,7 +1008,8 @@ public:
 #endif
 	}
 
-	size_t trimWhitespaceLeft ()
+	size_t 
+	trimWhitespaceLeft ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
 		size_t i = this->findNotOneOf (whitespace);
@@ -1021,7 +1022,8 @@ public:
 		return this->m_length;
 	}
 
-	size_t trimWhitespaceRight ()
+	size_t 
+	trimWhitespaceRight ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
 		size_t i = this->reverseFindNotOneOf (whitespace);
@@ -1031,10 +1033,32 @@ public:
 		return this->m_length;
 	}
 
-	size_t trimWhitespace ()
+	size_t 
+	trimWhitespace ()
 	{
 		trimWhitespaceLeft ();
 		return trimWhitespaceRight ();
+	}
+
+	size_t 
+	replace (
+		C from,
+		C to
+		)
+	{
+		bool result = ensureExclusive ();
+		if (result)
+			return -1;
+
+		size_t count = 0;
+		C* p = this->m_p;
+		C* end = p + this->m_length;
+
+		for (; p < end; p++)
+			if (*p == from)
+				*p = to;
+
+		return count;
 	}
 
 	size_t
@@ -1158,7 +1182,7 @@ public:
 	bool
 	ensureExclusive ()
 	{
-		return this->m_length ? createBuffer (this->m_length, true) : true;
+		return this->m_length ? createBuffer (this->m_length, true) != NULL : true;
 	}
 
 	C*
