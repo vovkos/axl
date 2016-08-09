@@ -58,8 +58,20 @@ public:
 		if (length == -1)
 			length = axl_strlen (frame);
 
-		output->clear ();
-		output->reserve (length);
+		if (output)
+		{
+			output->clear ();
+			output->reserve (length);
+		}
+		else if (!m_emitContextStack.isEmpty ())
+		{
+			output = m_emitContextStack.getTail ()->m_output; // append to the last output buffer
+		}
+		else
+		{
+			err::setError (err::SystemErrorCode_InvalidParameter);
+			return false;
+		}
 
 		sl::String scriptSource;
 		result = createScript (&scriptSource, fileName, frame, length);
