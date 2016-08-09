@@ -32,6 +32,9 @@ doesFileExist (const char* fileName);
 bool
 ensureDirExists (const char* fileName);
 
+bool
+isDir (const char* fileName);
+
 sl::String
 getFullFilePath (const char* fileName);
 

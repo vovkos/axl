@@ -100,12 +100,19 @@ doesFileExist (const char* fileName)
 }
 
 #if (_AXL_ENV == AXL_ENV_WIN)
-inline
 bool
 isDir (const wchar_t* fileName)
 {
 	dword_t attributes = ::GetFileAttributesW (fileName);
 	return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+}
+
+bool
+isDir (const char* fileName)
+{
+	char buffer [256];
+	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	return isDir (fileName_w);
 }
 
 bool
@@ -153,7 +160,6 @@ ensureDirExists (const char* fileName)
 
 #elif (_AXL_ENV == AXL_ENV_POSIX)
 
-inline
 bool
 isDir (const char* fileName)
 {

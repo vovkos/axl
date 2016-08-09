@@ -11,6 +11,7 @@ set (
 	IO_H_LIST
 	${AXL_INC_DIR}/axl_io_File.h
 	${AXL_INC_DIR}/axl_io_FilePathUtils.h
+	${AXL_INC_DIR}/axl_io_FileEnumerator.h
 	${AXL_INC_DIR}/axl_io_FileTransport.h
 	${AXL_INC_DIR}/axl_io_Mapping.h
 	${AXL_INC_DIR}/axl_io_MappedFile.h
@@ -28,6 +29,7 @@ set (
 	IO_CPP_LIST
 	axl_io_File.cpp
 	axl_io_FilePathUtils.cpp
+	axl_io_FileEnumerator.cpp
 	axl_io_Mapping.cpp
 	axl_io_MappedFile.cpp
 	axl_io_Serial.cpp

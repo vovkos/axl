@@ -2475,6 +2475,24 @@ testXml ()
 
 #endif
 
+void
+testFileEnum ()
+{
+	io::FileEnumerator fileEnum;
+	bool result = fileEnum.openDir (".");
+	if (!result)
+	{
+		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
+		return;
+	}
+
+	while (fileEnum.hasNextFile ())
+	{
+		sl::String fileName = fileEnum.getNextFileName ();
+		printf ("%s\n", fileName.cc ());
+	}
+}
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -2495,10 +2513,8 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-	
-#ifdef _AXL_XML
-	testXml ();
-#endif
+
+	testFileEnum ();
 
 	return 0;
 }

@@ -68,6 +68,8 @@ extern "C" {
 #	endif
 #endif
 
+#include "axl_io_FileEnumerator.h"
+
 using namespace axl;
 
 //.............................................................................
