@@ -129,6 +129,13 @@ public:
 
 //.............................................................................
 
+enum TokenChannelMask
+{
+	TokenChannelMask_Main = 1,
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <
 	typename TokenKind_0,
 	typename Name_0,
@@ -152,7 +159,8 @@ public:
 		wchar_t m_WCharToken;
 	};
 
-	size_t m_channel;
+	uint_t m_channelMask;
+
 	Data m_data;
 	Pos m_pos;
 
@@ -162,7 +170,7 @@ public:
 	Token ()
 	{
 		m_token = 0;
-		m_channel = 0;
+		m_channelMask = TokenChannelMask_Main;
 	}
 
 	static

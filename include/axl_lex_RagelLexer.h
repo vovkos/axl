@@ -296,7 +296,7 @@ protected:
 	Token*
 	preCreateToken (
 		int tokenKind,
-		size_t channel = 0
+		uint_t channelMask = TokenChannelMask_Main
 		)
 	{
 		size_t offset = ts - m_begin;
@@ -304,7 +304,7 @@ protected:
 
 		Token* token = this->allocateToken (); 
 		token->m_token = tokenKind;
-		token->m_channel = channel;
+		token->m_channelMask = channelMask;
 		token->m_pos.m_offset = offset;
 		token->m_pos.m_line = m_line;
 		token->m_pos.m_col = offset - m_lineOffset;
@@ -324,10 +324,10 @@ protected:
 	Token*
 	createToken (
 		int tokenKind,
-		size_t channel = 0
+		uint_t channelMask = TokenChannelMask_Main
 		)
 	{
-		Token* token = preCreateToken (tokenKind, channel);
+		Token* token = preCreateToken (tokenKind, channelMask);
 		postCreateToken ();
 		return token;
 	}

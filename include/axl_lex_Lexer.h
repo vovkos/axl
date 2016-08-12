@@ -33,40 +33,34 @@ protected:
 protected:
 	TokenList m_tokenList;
 	TokenList m_freeTokenList;
-	size_t m_channelMask;
 
 	Pos m_lastTokenPos;
 
 public:
+	uint_t m_channelMask;
+
+public:
+	Lexer ()
+	{
+		m_channelMask = TokenChannelMask_Main;
+	}
+
 	void
 	reset ()
 	{
 		m_freeTokenList.insertListTail (&m_tokenList);
-		m_channelMask = 1;
 		m_lastTokenPos.clear ();
 
 		static_cast <T*> (this)->onReset ();
 	}
 
-	size_t
-	getChannelMask ()
-	{
-		return m_channelMask;
-	}
-
-	void
-	setChannelMask (size_t mask)
-	{
-		m_channelMask = mask;
-	}
-
 	const Token*
 	getChannelToken (
-		size_t channelMask,
+		uint_t channelMask,
 		size_t index = 0
 		)
 	{
-		channelMask |= 1; // ensure channel 0 is ALWAYS in the mask
+		channelMask |= TokenChannelMask_Main; // make sure main channel is ALWAYS in the mask
 
 		size_t i = 0;
 		sl::BoxIterator <Token> it = m_tokenList.getHead ();
@@ -80,7 +74,7 @@ public:
 				if (it->m_token <= 0)
 					return &*it;
 
-				bool isMatch = (channelMask & ((size_t) 1 << it->m_channel)) != 0;
+				bool isMatch = (channelMask & it->m_channelMask) != 0;
 				if (isMatch)
 				{
 					if (i >= index)
@@ -109,11 +103,11 @@ public:
 
 	void
 	nextChannelToken (
-		size_t channelMask,
+		uint_t channelMask,
 		size_t count = 1
 		)
 	{
-		channelMask |= 1; // ensure channel 0 is ALWAYS in the mask
+		channelMask |= TokenChannelMask_Main; // make sure main channel is ALWAYS in the mask
 
 		for (size_t i = 0; i < count; i++)
 		{
@@ -124,7 +118,7 @@ public:
 				if (it->m_token <= 0) // done! but don't remove it!
 					return;
 
-				bool isMatch = (channelMask & ((size_t) 1 << it->m_channel)) != 0;
+				bool isMatch = (channelMask & it->m_channelMask) != 0;
 
 				TokenEntry* entry = it.getEntry ();
 
