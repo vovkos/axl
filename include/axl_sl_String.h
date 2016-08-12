@@ -340,6 +340,30 @@ public:
 		return Details::reverseFindNotOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
 	}
 
+	StringRef
+	getLeftTrimmedString () const
+	{
+		String string = *this;
+		string.trimLeft ();
+		return string;
+	}
+
+	StringRef
+	getRightTimmedString () const
+	{
+		String string = *this;
+		string.trimRight ();
+		return string;
+	}
+
+	StringRef
+	getTrimmedString () const
+	{
+		String string = *this;
+		string.trim ();
+		return string;
+	}
+
 protected:
 	void
 	initialize ()
@@ -1009,7 +1033,7 @@ public:
 	}
 
 	size_t 
-	trimWhitespaceLeft ()
+	trimLeft ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
 		size_t i = this->findNotOneOf (whitespace);
@@ -1023,7 +1047,7 @@ public:
 	}
 
 	size_t 
-	trimWhitespaceRight ()
+	trimRight ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
 		size_t i = this->reverseFindNotOneOf (whitespace);
@@ -1034,10 +1058,10 @@ public:
 	}
 
 	size_t 
-	trimWhitespace ()
+	trim ()
 	{
-		trimWhitespaceLeft ();
-		return trimWhitespaceRight ();
+		trimLeft ();
+		return trimRight ();
 	}
 
 	size_t 
