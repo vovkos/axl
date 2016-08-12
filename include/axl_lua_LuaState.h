@@ -439,6 +439,12 @@ public:
 		remove (-2);
 	}
 
+	lua_Integer
+	getGlobalInteger (const char* name)
+	{
+		getGlobal (name);
+		return popInteger ();
+	}
 
 	void
 	setGlobalInteger (
@@ -450,6 +456,13 @@ public:
 		setGlobal (name);
 	}
 
+	bool
+	getGlobalBoolean (const char* name)
+	{
+		getGlobal (name);
+		return popBoolean ();
+	}
+
 	void
 	setGlobalBoolean (
 		const char* name,
@@ -458,6 +471,13 @@ public:
 	{
 		pushBoolean (value);
 		setGlobal (name);
+	}
+
+	sl::String
+	getGlobalString (const char* name)
+	{
+		getGlobal (name);
+		return popString ();
 	}
 
 	void
