@@ -66,7 +66,7 @@ public:
 class SrcPos: public LineCol
 {
 public:
-	sl::String m_filePath;
+	sl::StringRef m_filePath;
 
 public:
 	SrcPos ()
@@ -74,7 +74,7 @@ public:
 	}
 
 	SrcPos (
-		const sl::String& filePath,
+		const sl::StringRef& filePath,
 		const LineCol& lineCol
 		):
 		LineCol (lineCol)
@@ -83,7 +83,7 @@ public:
 	}
 
 	SrcPos (
-		const sl::String& filePath,
+		const sl::StringRef& filePath,
 		int line,
 		int col
 		):

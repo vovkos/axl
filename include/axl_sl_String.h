@@ -265,6 +265,12 @@ public:
 	}
 
 	void
+	clear ()
+	{
+		release ();
+	}
+
+	void
 	release ()
 	{
 		if (m_hdr)

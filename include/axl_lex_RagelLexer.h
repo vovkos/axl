@@ -40,10 +40,10 @@ template <
 class RagelToken: public Token <Enum, GetName, Data, RagelTokenPos>
 {
 public:
-	sl::String
+	sl::StringRef
 	getText () const
 	{
-		return sl::String (this->m_pos.m_p, this->m_pos.m_length);
+		return sl::StringRef (this->m_pos.m_p, this->m_pos.m_length);
 	}
 
 	static
@@ -83,7 +83,7 @@ protected:
 	size_t m_tokenizeLimit;
 	size_t m_tokenizeCount;
 
-	sl::String m_filePath;
+	sl::StringRef m_filePath;
 
 	char* m_begin;
 	int m_line;
@@ -125,8 +125,8 @@ public:
 	bool
 	create (
 		int state,
-		const sl::String& filePath,
-		const sl::String& source
+		const sl::StringRef& filePath,
+		const sl::StringRef& source
 		)
 	{
 		return create (state, filePath, source, source.getLength ());
@@ -134,8 +134,8 @@ public:
 
 	bool
 	create (
-		const sl::String& filePath,
-		const sl::String& source
+		const sl::StringRef& filePath,
+		const sl::StringRef& source
 		)
 	{
 		return create (filePath, source, source.getLength ());
@@ -144,7 +144,7 @@ public:
 	bool
 	create (
 		int state,
-		const sl::String& filePath,
+		const sl::StringRef& filePath,
 		const char* source,
 		size_t length = -1
 		)
@@ -156,7 +156,7 @@ public:
 
 	bool
 	create (
-		const sl::String& filePath,
+		const sl::StringRef& filePath,
 		const char* source,
 		size_t length = -1
 		)
