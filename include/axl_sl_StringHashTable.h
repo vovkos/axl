@@ -137,6 +137,9 @@ public:
 		sl::CmpStringBase <C> \
 		)
 
+#define AXL_SL_END_STRING_HASH_TABLE_MAP() \
+	AXL_SL_END_HASH_TABLE_MAP ()
+
 //.............................................................................
 
 } // namespace sl
