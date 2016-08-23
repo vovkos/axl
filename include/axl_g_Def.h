@@ -18,12 +18,6 @@
 
 //.............................................................................
 
-// AXL library version
-
-#define _AXL_VER 0x0300
-
-//.............................................................................
-
 // C++ compiler ids
 
 #define AXL_CPP_MSC  1  // Microsoft Visual C++ compiler (cl.exe)
@@ -311,7 +305,7 @@ struct axl_va_list
 
 //.............................................................................
 
-// pvoid_cast is mostly used for casting member function pointers to void*
+// pvoid_cast is used for casting member function pointers to void*
 
 template <typename T>
 void*
@@ -323,7 +317,7 @@ pvoid_cast (T x)
 
 #if (_AXL_CPP != AXL_CPP_GCC)
 
-// this overload is to make it's ok to pvoid_cast (NULL) on 64-bit systems
+// this overload is to make sure it's ok to pvoid_cast (NULL) on 64-bit systems
 // gcc takes care of it automatically (it will not attempt to use 'int' for NULL)
 
 inline
