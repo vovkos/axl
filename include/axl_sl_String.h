@@ -1077,7 +1077,7 @@ public:
 		)
 	{
 		bool result = ensureExclusive ();
-		if (result)
+		if (!result)
 			return -1;
 
 		size_t count = 0;
