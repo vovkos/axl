@@ -209,7 +209,7 @@ TextBoyerMooreFind::setPattern (
 
 	if (flags & TextBoyerMooreFlag_CaseInsensitive)
 		for (size_t i = 0; i < length; i++)
-			m_pattern [i] = enc::utfToCaseFold (m_pattern [i]);
+			m_pattern [i] = enc::utfToCaseFolded (m_pattern [i]);
 
 	if (flags & BoyerMooreFlag_Reverse)
 		m_pattern.reverse ();
@@ -240,7 +240,7 @@ TextBoyerMooreFind::buildBadSkipTable (size_t tableSize)
 	if (m_flags & TextBoyerMooreFlag_CaseInsensitive)
 		for (size_t i = 0, j = last; i < last; i++, j--)
 		{
-			uint32_t c = enc::utfToCaseFold (m_pattern [i]);
+			uint32_t c = enc::utfToCaseFolded (m_pattern [i]);
 			m_badSkipTable [c % tableSize] = j;
 		}
 	else
@@ -276,8 +276,8 @@ TextBoyerMooreFind::find (
 
 	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ? 
 		(m_flags & BoyerMooreFlag_Reverse) ? 
-			findImpl (TextBoyerMooreCaseFoldReverseAccessor (m_buffer + length - 1), length, length) : 
-			findImpl (TextBoyerMooreCaseFoldAccessor (m_buffer), length, length) :
+			findImpl (TextBoyerMooreCaseFoldedReverseAccessor (m_buffer + length - 1), length, length) : 
+			findImpl (TextBoyerMooreCaseFoldedAccessor (m_buffer), length, length) :
 		(m_flags & BoyerMooreFlag_Reverse) ? 
 			findImpl (TextBoyerMooreReverseAccessor (m_buffer + length - 1), length, length) : 
 			findImpl (TextBoyerMooreAccessor (m_buffer), length, length);
@@ -329,12 +329,12 @@ TextBoyerMooreFind::find (
 	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ? 
 		(m_flags & BoyerMooreFlag_Reverse) ? 
 			findImpl (
-				TextBoyerMooreCaseFoldIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
+				TextBoyerMooreCaseFoldedIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
 				end,
 				fullLength
 				) : 
 			findImpl (
-				TextBoyerMooreCaseFoldIncrementalAccessor (m_buffer, incrementalContext), 
+				TextBoyerMooreCaseFoldedIncrementalAccessor (m_buffer, incrementalContext), 
 				end,
 				fullLength
 				) :

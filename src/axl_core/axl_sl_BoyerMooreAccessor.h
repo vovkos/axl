@@ -209,10 +209,10 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
-class TextBoyerMooreCaseFoldAccessorImpl: public TextBoyerMooreAccessorImpl <Base>
+class TextBoyerMooreCaseFoldedAccessorImpl: public TextBoyerMooreAccessorImpl <Base>
 {
 public:
-	TextBoyerMooreCaseFoldAccessorImpl (const utf32_t* p):
+	TextBoyerMooreCaseFoldedAccessorImpl (const utf32_t* p):
 		TextBoyerMooreAccessorImpl <Base> (p)			
 	{
 	}
@@ -220,17 +220,17 @@ public:
 	utf32_t
 	getChar (size_t i) const
 	{
-		return enc::utfToCaseFold (Base::getChar (i));
+		return enc::utfToCaseFolded (Base::getChar (i));
 	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
-class TextBoyerMooreCaseFoldIncrementalAccessorImpl: public TextBoyerMooreIncrementalAccessorImpl <Base>
+class TextBoyerMooreCaseFoldedIncrementalAccessorImpl: public TextBoyerMooreIncrementalAccessorImpl <Base>
 {
 public:
-	TextBoyerMooreCaseFoldIncrementalAccessorImpl (
+	TextBoyerMooreCaseFoldedIncrementalAccessorImpl (
 		const utf32_t* p,
 		BoyerMooreIncrementalContext <utf32_t>* incrementalContext
 		): TextBoyerMooreIncrementalAccessorImpl <Base> (p, incrementalContext)
@@ -240,7 +240,7 @@ public:
 	utf32_t
 	getChar (size_t i) const
 	{
-		return enc::utfToCaseFold (Base::getChar (i));
+		return enc::utfToCaseFolded (Base::getChar (i));
 	}
 };
 
@@ -270,20 +270,20 @@ TextBoyerMooreIncrementalAccessorImpl <BoyerMooreIncrementalReverseAccessor <utf
 TextBoyerMooreIncrementalReverseAccessor;
 
 typedef 
-TextBoyerMooreCaseFoldAccessorImpl <BoyerMooreAccessor <utf32_t> >
-TextBoyerMooreCaseFoldAccessor;
+TextBoyerMooreCaseFoldedAccessorImpl <BoyerMooreAccessor <utf32_t> >
+TextBoyerMooreCaseFoldedAccessor;
 
 typedef 
-TextBoyerMooreCaseFoldAccessorImpl <BoyerMooreReverseAccessor <utf32_t> >
-TextBoyerMooreCaseFoldReverseAccessor;
+TextBoyerMooreCaseFoldedAccessorImpl <BoyerMooreReverseAccessor <utf32_t> >
+TextBoyerMooreCaseFoldedReverseAccessor;
 
 typedef 
-TextBoyerMooreCaseFoldIncrementalAccessorImpl <BoyerMooreIncrementalAccessor <utf32_t> >
-TextBoyerMooreCaseFoldIncrementalAccessor;
+TextBoyerMooreCaseFoldedIncrementalAccessorImpl <BoyerMooreIncrementalAccessor <utf32_t> >
+TextBoyerMooreCaseFoldedIncrementalAccessor;
 
 typedef 
-TextBoyerMooreCaseFoldIncrementalAccessorImpl <BoyerMooreIncrementalReverseAccessor <utf32_t> >
-TextBoyerMooreCaseFoldIncrementalReverseAccessor;
+TextBoyerMooreCaseFoldedIncrementalAccessorImpl <BoyerMooreIncrementalReverseAccessor <utf32_t> >
+TextBoyerMooreCaseFoldedIncrementalReverseAccessor;
 
 //.............................................................................
 

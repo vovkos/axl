@@ -154,6 +154,21 @@ public:
 
 //.............................................................................
 
+// no-op (identity)
+
+template <typename T>
+class NoOp
+{
+public:
+	T
+	operator () (T a) const
+	{ 
+		return a; 
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 // arithmetic operators (sometimes it's necessary to redefine Arg to "const T&")
 
 template <

@@ -370,6 +370,30 @@ public:
 		return string;
 	}
 
+	StringRef
+	getLowerCaseString ()
+	{
+		String string = *this;
+		string.makeLowerCase ();
+		return string;
+	}
+
+	StringRef
+	getUpperCaseString ()
+	{
+		String string = *this;
+		string.makeUpperCase ();
+		return string;
+	}
+
+	StringRef
+	getCaseFoldedString ()
+	{
+		String string = *this;
+		string.makeCaseFolded ();
+		return string;
+	}
+
 protected:
 	void
 	initialize ()
@@ -743,9 +767,6 @@ public:
 		}
 
 		size_t newLength = enc::UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
-		if (newLength == -1)
-			return -1;
-
 		if (!createBuffer (newLength, false))
 			return -1;
 
@@ -769,9 +790,6 @@ public:
 		}
 
 		size_t newLength = enc::UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
-		if (newLength == -1)
-			return -1;
-
 		if (!createBuffer (newLength, false))
 			return -1;
 
@@ -951,9 +969,6 @@ public:
 			return oldLength;
 
 		size_t insertLength = enc::UtfConvert <Encoding, Encoding2>::calcRequiredLength (p, length);
-		if (insertLength == -1)
-			return -1;
-
 		C* dst = insertSpace (index, insertLength);
 		if (!dst)
 			return -1;
@@ -978,9 +993,6 @@ public:
 			return oldLength;
 
 		size_t insertLength = enc::UtfConvert <Encoding, Encoding3>::calcRequiredLength (p, length);
-		if (insertLength == -1)
-			return -1;
-
 		C* dst = insertSpace (index, insertLength);
 		if (!dst)
 			return -1;
@@ -1089,6 +1101,39 @@ public:
 				*p = to;
 
 		return count;
+	}
+
+	template <typename CaseOp>
+	size_t
+	convertCase ()
+	{
+		sl::StringRef src = *this; // save old contents -- can't convert in-place because length can increase
+
+		size_t length = enc::UtfConvert <Encoding, Encoding, CaseOp>::calcRequiredLength (m_p, m_length);
+		C* p = createBuffer (length);
+		if (!p)
+			return -1;
+
+		enc::UtfConvert <Encoding, Encoding, CaseOp>::convert (p, length, src, src.getLength ());
+		return length;
+	}
+
+	size_t 
+	makeLowerCase ()
+	{
+		return convertCase <enc::UtfToLowerCase> ();
+	}
+
+	size_t 
+	makeUpperCase ()
+	{
+		return convertCase <enc::UtfToUpperCase> ();
+	}
+
+	size_t 
+	makeCaseFolded ()
+	{
+		return convertCase <enc::UtfToCaseFolded> ();
 	}
 
 	size_t

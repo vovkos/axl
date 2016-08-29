@@ -144,29 +144,7 @@ struct UtfCodePointAttr
 const UtfCodePointAttr*
 getUtfCodePointAttr (utf32_t c);
 
-inline
-utf32_t
-utfToLower (utf32_t c)
-{
-	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
-	return attr->m_lowerCaseDiff && !attr->m_lowerCaseSpecial ? c + attr->m_lowerCaseDiff : c;
-}
-
-inline
-utf32_t
-utfToUpper (utf32_t c)
-{
-	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
-	return attr->m_upperCaseDiff && !attr->m_upperCaseSpecial ? c + attr->m_upperCaseDiff : c;
-}
-
-inline
-utf32_t
-utfToCaseFold (utf32_t c)
-{
-	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
-	return attr->m_caseFoldDiff && !attr->m_caseFoldSpecial ? c + attr->m_caseFoldDiff : c;
-}
+//.............................................................................
 
 inline
 bool
@@ -223,6 +201,66 @@ utfIsLetterOrNumber (utf32_t c)
 	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
 	return ((1 << attr->m_category) & (UtfCategoryMask_Letter | UtfCategoryMask_Number)) != 0;
 }
+
+//.............................................................................
+
+// case ops
+
+inline
+utf32_t
+utfToLowerCase (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return attr->m_lowerCaseDiff && !attr->m_lowerCaseSpecial ? c + attr->m_lowerCaseDiff : c;
+}
+
+inline
+utf32_t
+utfToUpperCase (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return attr->m_upperCaseDiff && !attr->m_upperCaseSpecial ? c + attr->m_upperCaseDiff : c;
+}
+
+inline
+utf32_t
+utfToCaseFolded (utf32_t c)
+{
+	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
+	return attr->m_caseFoldDiff && !attr->m_caseFoldSpecial ? c + attr->m_caseFoldDiff : c;
+}
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class UtfToLowerCase
+{
+public:
+	utf32_t
+	operator () (utf32_t x) const
+	{
+		return utfToLowerCase (x);
+	}
+};
+
+class UtfToUpperCase
+{
+public:
+	utf32_t
+	operator () (utf32_t x) const
+	{
+		return utfToUpperCase (x);
+	}
+};
+
+class UtfToCaseFolded
+{
+public:
+	utf32_t
+	operator () (utf32_t x) const
+	{
+		return utfToCaseFolded (x);
+	}
+};
 
 //.............................................................................
 
@@ -676,7 +714,8 @@ public:
 
 template <
 	typename DstEncoding_0,
-	typename SrcEncoding_0
+	typename SrcEncoding_0,
+	typename CaseOp = sl::NoOp <utf32_t>
 	>
 class UtfConvert
 {
@@ -703,7 +742,7 @@ public:
 			if (p + srcCodePointLength > end)
 				break;
 
-			utf32_t x = SrcEncoding::decodeCodePoint (p);
+			utf32_t x = CaseOp () (SrcEncoding::decodeCodePoint (p));
 			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 
 			resultLength += dstCodePointLength;
@@ -741,7 +780,7 @@ public:
 				break;
 			}
 
-			utf32_t x = SrcEncoding::decodeCodePoint (src);
+			utf32_t x = CaseOp () (SrcEncoding::decodeCodePoint (src));
 			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 			if (dst + dstCodePointLength > dstEnd)
 				break;
@@ -765,7 +804,10 @@ public:
 
 //.............................................................................
 
-template <typename SrcEncoding_0>
+template <
+	typename SrcEncoding_0,
+	typename CaseOp = sl::NoOp <utf32_t>
+	>
 class UtfToAsciiConvert
 {
 public:
@@ -824,7 +866,7 @@ public:
 				break;
 			}
 
-			utf32_t x = SrcEncoding::decodeCodePoint (src);
+			utf32_t x = CaseOp () (SrcEncoding::decodeCodePoint (src));
 			*dst = (char) x;
 
 			dst++;
@@ -845,7 +887,10 @@ public:
 
 //.............................................................................
 
-template <typename DstEncoding_0>
+template <
+	typename DstEncoding_0,
+	typename CaseOp = sl::NoOp <utf32_t>
+	>
 class AsciiToUtfConvert
 {
 public:
@@ -865,7 +910,7 @@ public:
 		size_t resultLength = 0;
 		while (p < end)
 		{
-			utf32_t x = (uchar_t) *p; // don't propagate sign bit
+			utf32_t x = CaseOp () ((uchar_t) *p); // don't propagate sign bit
 
 			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 
@@ -895,7 +940,7 @@ public:
 
 		while (src < srcEnd)
 		{
-			utf32_t x = (uchar_t) *src; // don't propagate sign bit
+			utf32_t x = CaseOp () ((uchar_t) *src); // don't propagate sign bit
 
 			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
 			if (dst + dstCodePointLength > dstEnd)

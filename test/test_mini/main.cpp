@@ -2493,6 +2493,17 @@ testFileEnum ()
 	}
 }
 
+void
+testStringCase ()
+{
+	sl::String s = "Hui Govno i Muravei";
+	s.makeLowerCase ();
+	printf ("s = %s\n", s.cc ());
+
+	s.makeUpperCase ();
+	printf ("s = %s\n", s.cc ());
+}
+
 //.............................................................................
 
 #if (_AXL_ENV == AXL_ENV_WIN)
@@ -2514,7 +2525,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testFileEnum ();
+	testStringCase ();
 
 	return 0;
 }
