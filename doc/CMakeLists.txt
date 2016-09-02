@@ -4,11 +4,7 @@
 
 #..............................................................................
 
-if (DOXYGEN_FOUND)
-	add_subdirectory (doxygen)
-endif ()
-
-if (SPHINX_FOUND)
+if (DOXYGEN_FOUND AND DOXYREST_FOUND AND SPHINX_FOUND)
 	add_subdirectory (manual)
 endif ()
 
