@@ -22,11 +22,11 @@ add_subdirectory (cmake)
 
 include (${CMAKE_CURRENT_BINARY_DIR}/cmake/axl_config.cmake)
 include (cmake/axl_init.cmake NO_POLICY_SCOPE)
-include (dependencies.cmake)
 
 axl_find_file_recurse_parent_dirs (_PATHS_CMAKE paths.cmake ${CMAKE_CURRENT_LIST_DIR})
 
 if (NOT _PATHS_CMAKE)
+	include (dependencies.cmake)
 	axl_create_empty_setting_file (
 		${CMAKE_SOURCE_DIR}/paths.cmake
 		${AXL_PATH_LIST}
@@ -35,7 +35,8 @@ if (NOT _PATHS_CMAKE)
 	message (FATAL_ERROR "please fill the newly generated ${CMAKE_SOURCE_DIR}/paths.cmake")
 endif ()
 
-include (${_DIR}/paths.cmake)
+include (${_PATHS_CMAKE})
+include (dependencies.cmake)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

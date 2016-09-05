@@ -928,6 +928,7 @@ axl_include_import_file
 	)
 
 	set (${_IMPORT}_FOUND FALSE)
+	unset (_IMPORT_FILE_PATH)
 
 	# use AXL_IMPORT_DIR_LIST first (to allow overriding)
 

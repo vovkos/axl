@@ -24,8 +24,9 @@ set (
 	RAGEL_EXE
 	7Z_EXE
 	DOXYGEN_EXE
+	DOXYREST_CMAKE_DIR
 	SPHINX_BUILD_EXE
-	QDOC_EXE
+	PDFLATEX_EXE
 	)
 
 set (
@@ -41,6 +42,7 @@ set (
 		doxygen
 		doxyrest
 		sphinx
+		latex
 		qt
 		7z
 	)
@@ -49,15 +51,10 @@ if (UNIX AND NOT APPLE)
 	set (AXL_IMPORT_LIST ${AXL_IMPORT_LIST} OPTIONAL libudev)
 endif ()
 
-if (DOXYREST_CMAKE_DIR)
-	set (_DOXYREST_CMAKE_DIR ${DOXYREST_CMAKE_DIR})
-else ()
-	set (_DOXYREST_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR}/../doxyrest/cmake)
-endif ()
-
 set (
 	AXL_IMPORT_DIR_LIST
-	${_DOXYREST_CMAKE_DIR}
+
+	${DOXYREST_CMAKE_DIR}
 	)
 	
 #..............................................................................
