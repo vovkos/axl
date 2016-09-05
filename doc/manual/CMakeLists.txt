@@ -52,7 +52,7 @@ set (
 	-quiet
 	-output-directory=${PDF_DIR}
 	-aux-directory=${TMP_DIR}
-	jancy_stdlib.tex
+	axl.tex
 	)
 
 string (
