@@ -1109,7 +1109,7 @@ public:
 	{
 		sl::StringRef src = *this; // save old contents -- can't convert in-place because length can increase
 
-		size_t length = enc::UtfConvert <Encoding, Encoding, CaseOp>::calcRequiredLength (m_p, m_length);
+		size_t length = enc::UtfConvert <Encoding, Encoding, CaseOp>::calcRequiredLength (this->m_p, this->m_length);
 		C* p = createBuffer (length);
 		if (!p)
 			return -1;

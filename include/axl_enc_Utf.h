@@ -7,6 +7,7 @@
 #define _AXL_ENC_UTF_H
 
 #include "axl_sl_ByteOrder.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace enc {
