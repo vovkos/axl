@@ -44,6 +44,51 @@ FileEnumerator::getNextFileName ()
 	return fileName;
 }
 
+#elif (_AXL_ENV == AXL_ENV_POSIX)
+
+bool
+FileEnumerator::openDir (const char* dir)
+{
+	close ();
+	m_nextFileName.clear ();
+
+	m_h = ::opendir (dir);
+	if (!m_h)
+		return err::failWithLastSystemError ();
+
+	dirent dirEntry;
+	dirent* dirEntryPtr;
+	int result = readdir_r (m_h, &dirEntry, &dirEntryPtr);
+	
+	if (result != 0)
+		return err::failWithLastSystemError ();
+
+	if (dirEntryPtr)
+		m_nextFileName = dirEntryPtr->d_name;
+	
+	return true;
+}
+
+sl::String
+FileEnumerator::getNextFileName ()
+{
+	if (!isOpen ())
+		return sl::String ();
+
+	sl::String fileName = m_nextFileName;
+
+	dirent dirEntry;
+	dirent* dirEntryPtr;
+	int result = readdir_r (m_h, &dirEntry, &dirEntryPtr);
+	
+	if (result == 0 && dirEntryPtr)
+		m_nextFileName = dirEntryPtr->d_name;
+	else
+		m_nextFileName.clear ();
+	
+	return fileName;
+}
+
 #endif
 
 //.............................................................................
