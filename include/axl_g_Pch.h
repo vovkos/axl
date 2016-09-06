@@ -69,6 +69,7 @@
 #	include <fcntl.h>
 #	include <dlfcn.h>
 #	include <limits.h>
+#	include <sys/types.h>
 #	include <sys/stat.h>
 #	include <sys/mman.h>
 #	include <sys/socket.h>
@@ -78,6 +79,7 @@
 #	include <arpa/inet.h>
 #	include <termios.h>
 #	include <libgen.h>
+#	include <dirent.h>
 #
 #	if (defined __APPLE__ && defined __MACH__)
 #		include <machine/endian.h>

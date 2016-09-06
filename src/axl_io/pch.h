@@ -12,8 +12,6 @@
 #	include <winioctl.h>
 #	include <devguid.h>
 #elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include <sys/types.h>
-#	include <dirent.h>
 #	include <ifaddrs.h>
 #	include <net/if.h>
 #	include <netdb.h>
