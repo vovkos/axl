@@ -103,7 +103,7 @@ option (
 if (${PCAP_FOUND})
 	option (
 		BUILD_AXL_IO_PCAP
-		"Build PCap wrappers for axl_io library"
+		"Build Pcap wrappers for axl_io library"
 		ON
 		)
 else ()

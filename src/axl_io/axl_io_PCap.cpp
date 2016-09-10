@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "axl_io_PCap.h"
+#include "axl_io_Pcap.h"
 #include "axl_err_Error.h"
 #include "axl_sys_Time.h"
 
@@ -9,7 +9,7 @@ namespace io {
 //.............................................................................
 
 bool
-PCap::openDevice (
+Pcap::openDevice (
 	const char* device,
 	size_t snapshotSize,
 	bool isPromiscious,
@@ -37,7 +37,7 @@ PCap::openDevice (
 }
 
 bool
-PCap::openFile (const char* fileName)
+Pcap::openFile (const char* fileName)
 {
 	close ();
 
@@ -53,7 +53,7 @@ PCap::openFile (const char* fileName)
 }
 
 bool
-PCap::setFilter (const char* filter)
+Pcap::setFilter (const char* filter)
 {
 	bpf_program program;
 
@@ -70,7 +70,7 @@ PCap::setFilter (const char* filter)
 }
 
 bool
-PCap::setBlockingMode (bool isBlocking)
+Pcap::setBlockingMode (bool isBlocking)
 {
 	char errorBuffer [PCAP_ERRBUF_SIZE];
 	int result = pcap_setnonblock (m_h, !isBlocking, errorBuffer);
@@ -84,7 +84,7 @@ PCap::setBlockingMode (bool isBlocking)
 }
 
 size_t
-PCap::read (
+Pcap::read (
 	void* p,
 	size_t size,
 	uint64_t* timestamp
@@ -113,7 +113,7 @@ PCap::read (
 }
 
 size_t
-PCap::write (
+Pcap::write (
 	const void* p,
 	size_t size
 	)

@@ -64,12 +64,12 @@ source_group (
 
 set (
 	IO_PCAP_H_LIST
-	${AXL_INC_DIR}/axl_io_PCap.h
+	${AXL_INC_DIR}/axl_io_Pcap.h
 	)
 
 set (
 	IO_PCAP_CPP_LIST
-	axl_io_PCap.cpp
+	axl_io_Pcap.cpp
 	)
 
 source_group (

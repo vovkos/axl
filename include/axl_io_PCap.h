@@ -13,7 +13,7 @@ namespace io {
 
 //.............................................................................
 
-class ClosePCap
+class ClosePcap
 {
 public:
 	void
@@ -25,7 +25,7 @@ public:
 
 //.............................................................................
 
-class PCap: public sl::Handle <pcap_t*, ClosePCap>
+class Pcap: public sl::Handle <pcap_t*, ClosePcap>
 {
 public:
 	bool
