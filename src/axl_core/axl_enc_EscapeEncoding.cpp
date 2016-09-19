@@ -30,6 +30,9 @@ EscapeEncoding::findEscapeChar (char x)
 	case '\f':
 		return 'f';
 
+	case '\v':
+		return 'v';
+
 	case '\r':
 		return 'r';
 
@@ -63,6 +66,9 @@ EscapeEncoding::findEscapeReplaceChar (char x)
 
 	case 'f':
 		return '\f';
+
+	case 'v':
+		return '\v';
 
 	case 'r':
 		return '\r';
