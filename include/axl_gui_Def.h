@@ -106,12 +106,14 @@ struct Point
 	{
 		struct
 		{
+			//! \unnamed{union/struct:2}
 			int m_x;
 			int m_y;
 		};
 
 		struct
 		{
+			//! \unnamed{struct:2}
 			uint_t m_x_u;
 			uint_t m_y_u;
 		};
@@ -173,12 +175,14 @@ struct Size
 	{
 		struct 
 		{
+			//! \unnamed{union/struct:2}
 			int m_width;
 			int m_height;
 		};
 
 		struct 
 		{
+			//! \unnamed{struct:2}
 			uint_t m_width_u;
 			uint_t m_height_u;
 		};
@@ -240,6 +244,7 @@ struct Rect
 	{
 		struct 
 		{
+			//! \unnamed{union/struct:4}
 			int m_left;
 			int m_top;
 			int m_right;
@@ -248,6 +253,7 @@ struct Rect
 
 		struct 
 		{
+			//! \unnamed{struct:4}
 			uint_t m_left_u;
 			uint_t m_top_u;
 			uint_t m_right_u;
@@ -380,12 +386,14 @@ struct CaretPos
 	{
 		struct
 		{
+			//! \unnamed{union/struct:2}
 			int m_line;
 			int m_col;
 		};
 
 		struct
 		{
+			//! \unnamed{struct:2}
 			uint_t m_line_u;
 			uint_t m_col_u;
 		};

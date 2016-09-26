@@ -220,6 +220,7 @@ struct SockAddr
 {
 	union
 	{
+		//! \unnamed{union}
 		sockaddr m_addr;
 		sockaddr_in m_addr_ip4;
 		sockaddr_in6 m_addr_ip6;

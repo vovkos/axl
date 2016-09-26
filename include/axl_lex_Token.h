@@ -109,6 +109,7 @@ class StdTokenData
 public:
 	union
 	{
+		//! \unnamed{union}
 		int m_integer;
 		int32_t m_int32;
 		uint32_t m_int32_u;
@@ -153,6 +154,7 @@ public:
 public:
 	union // it's nice to see it in debugger
 	{
+		//! \unnamed{union:4}
 		int m_token;
 		TokenKind m_enumToken;
 		char m_charToken;

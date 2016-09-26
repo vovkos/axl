@@ -31,7 +31,8 @@ FreeFunc (void* p);
 struct RefCountAllocHdr
 {
 	union
-	{
+	{	
+		//! \unnamed{union}
 		FreeFunc* m_freeFunc;
 		uint64_t m_padding; // ensure 8-byte alignment
 	};

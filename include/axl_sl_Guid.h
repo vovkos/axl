@@ -33,6 +33,7 @@ struct Guid
 	{
 		struct
 		{
+			//! \unnamed{union/struct:4}
 			uint32_t m_data1;
 			uint16_t m_data2;
 			uint16_t m_data3;
@@ -41,6 +42,7 @@ struct Guid
 
 		struct
 		{
+			//! \unnamed{struct:4}
 			uint32_t m_long1;
 			uint32_t m_long2;
 			uint32_t m_long3;
