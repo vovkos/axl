@@ -6,9 +6,11 @@
 
 #define _AXL_SYS_THREAD_H
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#include "axl_g_Pch.h"
+
+#if (_AXL_OS_WIN)
 #	include "axl_sys_win_Thread.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_sys_psx_Thread.h"
 #include "axl_sys_Event.h"
 #endif
@@ -18,7 +20,7 @@ namespace sys {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 template <typename T>
 class ThreadImpl
@@ -97,7 +99,7 @@ getCurrentThreadId ()
 
 //.............................................................................
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 class ThreadImplRoot
 {
@@ -126,7 +128,7 @@ public:
 
 //.............................................................................
 
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 
 template <typename T>
 class ThreadImpl: public ThreadImplRoot

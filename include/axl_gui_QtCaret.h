@@ -6,6 +6,7 @@
 
 #define _AXL_GUI_QTCANVAS_H
 
+#include "axl_gui_QtPch.h"
 #include "axl_gui_Def.h"
 
 namespace axl {

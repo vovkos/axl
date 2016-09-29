@@ -72,10 +72,10 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
-
 set (
 	PCH_H_LIST
 	${PCH_H}
+	${AXL_INC_DIR}/axl_st_Pch.h
 	)
 
 source_group (

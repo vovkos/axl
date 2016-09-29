@@ -6,7 +6,7 @@ namespace sys {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 bool TlsMgr::m_isDead = false;
 
@@ -51,7 +51,7 @@ TlsMgr::tlsCallback (
 	::TlsSetValue (self->m_tlsIdx, NULL);
 }
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 TlsMgr::TlsMgr ()
 {
@@ -154,7 +154,7 @@ TlsMgr::getCurrentThreadPage ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 #pragma section (AXL_SYS_TLS_CALLBACK_SECTION, long, read)
 

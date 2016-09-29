@@ -12,7 +12,7 @@ Socket::accept (
 	SockAddr* addr
 	)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	SOCKET h = m_socket.accept (addr);
 #else 
 	int h = m_socket.accept (addr);

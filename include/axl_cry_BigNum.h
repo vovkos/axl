@@ -6,8 +6,6 @@
 
 #define _AXL_CRY_BIGNUM_H
 
-#include "axl_sl_Handle.h"
-#include "axl_sl_Array.h"
 #include "axl_cry_CryptoError.h"
 
 namespace axl {

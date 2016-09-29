@@ -6,9 +6,7 @@
 
 #define _AXL_ST_STRINGTEMPLATE_H
 
-#include "axl_lua_LuaState.h"
 #include "axl_st_StringTemplateLexer.h"
-#include "axl_io_MappedFile.h"
 
 namespace axl {
 namespace st {
@@ -56,7 +54,7 @@ public:
 		bool result;
 
 		if (length == -1)
-			length = axl_strlen (frame);
+			length = strlen_s (frame);
 
 		if (output)
 		{

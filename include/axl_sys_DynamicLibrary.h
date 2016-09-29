@@ -6,10 +6,12 @@
 
 #define _AXL_SYS_DYNAMICLIBRARY_H
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#include "axl_g_Pch.h"
+
+#if (_AXL_OS_WIN)
 #	include "axl_sys_win_Library.h"
 #	include "axl_sl_String.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_sys_psx_DynamicLibrary.h"
 #endif
 
@@ -18,7 +20,7 @@ namespace sys {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 class DynamicLibrary
 {
@@ -51,7 +53,7 @@ public:
 
 //.............................................................................
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 class DynamicLibrary
 {

@@ -42,7 +42,7 @@ HyperText::appendPlainText (
 	)
 {
 	if (length == -1)
-		length = axl_strlen (text);
+		length = strlen_s (text);
 
 	m_source.append (text, length);
 	return m_text.append (text, length);
@@ -80,7 +80,7 @@ HyperText::appendHyperText (
 	size_t lastLength = m_text.getLength ();
 	
 	if (length == -1)
-		length = axl_strlen (text);
+		length = strlen_s (text);
 
 	const char* p = text;
 	const char* end = p + length;

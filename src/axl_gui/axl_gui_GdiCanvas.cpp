@@ -177,7 +177,7 @@ GdiCanvas::drawText_utf16 (
 	}
 
 	if (length == -1)
-		length = axl_wcslen (text);
+		length = wcslen_s (text);
 
 	RECT gdiRect = { left, top, right, bottom };
 	::ExtTextOutW (m_h, x, y, ETO_OPAQUE, &gdiRect, text, length, NULL);

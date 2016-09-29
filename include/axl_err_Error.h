@@ -77,7 +77,7 @@ enum StdErrorCode
 
 // system errors
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 extern const sl::Guid g_winErrorGuid;
 
@@ -134,57 +134,7 @@ getLastSystemErrorCode ()
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#elif (_AXL_ENV == AXL_ENV_NT)
-
-extern const sl::Guid g_ntErrorGuid;
-
-#define g_systemErrorGuid g_ntErrorGuid
-
-enum SystemErrorCode
-{
-	SystemErrorCode_Success                  = STATUS_SUCCESS,
-	SystemErrorCode_Pending                  = STATUS_PENDING,
-	SystemErrorCode_Cancelled                = STATUS_CANCELLED,
-	SystemErrorCode_Unsuccessful             = STATUS_UNSUCCESSFUL,
-	SystemErrorCode_InsufficientResources    = STATUS_INSUFFICIENT_RESOURCES,
-	SystemErrorCode_NotImplemented           = STATUS_NOT_IMPLEMENTED,
-	SystemErrorCode_InvalidHandle            = STATUS_INVALID_HANDLE,
-	SystemErrorCode_AddressAlreadyExists     = STATUS_ADDRESS_ALREADY_EXISTS,
-	SystemErrorCode_InvalidAddressComponent  = STATUS_INVALID_ADDRESS_COMPONENT,
-	SystemErrorCode_TooManyAddresses         = STATUS_TOO_MANY_ADDRESSES,
-	SystemErrorCode_InvalidAddress           = STATUS_INVALID_ADDRESS,
-	SystemErrorCode_AddressClosed            = STATUS_ADDRESS_CLOSED,
-	SystemErrorCode_BufferOverflow           = STATUS_BUFFER_OVERFLOW,
-	SystemErrorCode_InvalidParameter         = STATUS_INVALID_PARAMETER,
-	SystemErrorCode_ConnectionRefused        = STATUS_CONNECTION_REFUSED,
-	SystemErrorCode_ConnectionInvalid        = STATUS_CONNECTION_INVALID,
-	SystemErrorCode_AddressAlreadyAssociated = STATUS_ADDRESS_ALREADY_ASSOCIATED,
-	SystemErrorCode_AddressNotAssociated     = STATUS_ADDRESS_NOT_ASSOCIATED,
-	SystemErrorCode_ConnectionActive         = STATUS_CONNECTION_ACTIVE,
-	SystemErrorCode_ConnectionAborted        = STATUS_CONNECTION_ABORTED,
-	SystemErrorCode_ConnectionReset          = STATUS_CONNECTION_RESET,
-	SystemErrorCode_IoTimeout                = STATUS_IO_TIMEOUT,
-	SystemErrorCode_GracefulDisconnect       = STATUS_GRACEFUL_DISCONNECT,
-	SystemErrorCode_DataNotAccepted          = STATUS_DATA_NOT_ACCEPTED,
-	SystemErrorCode_MoreProcessingRequired   = STATUS_MORE_PROCESSING_REQUIRED,
-	SystemErrorCode_InvalidDeviceState       = STATUS_INVALID_DEVICE_STATE,
-	SystemErrorCode_NetworkUnreachable       = STATUS_NETWORK_UNREACHABLE,
-	SystemErrorCode_HostUnreachable          = STATUS_HOST_UNREACHABLE,
-	SystemErrorCode_ProtocolUnreachable      = STATUS_PROTOCOL_UNREACHABLE,
-	SystemErrorCode_PortUnreachable          = STATUS_PORT_UNREACHABLE,
-	SystemErrorCode_InvalidDeviceRequest     = STATUS_INVALID_DEVICE_REQUEST,
-	SystemErrorCode_RequestAborted           = STATUS_REQUEST_ABORTED,
-	SystemErrorCode_BufferTooSmall           = STATUS_BUFFER_TOO_SMALL,
-	SystemErrorCode_InvalidBufferSize        = STATUS_INVALID_BUFFER_SIZE,
-	SystemErrorCode_ObjectNameNotFound       = STATUS_OBJECT_NAME_NOT_FOUND,
-	SystemErrorCode_AccessDenied             = STATUS_ACCESS_DENIED,
-	SystemErrorCode_SharingViolation         = STATUS_SHARING_VIOLATION,
-	SystemErrorCode_NoMoreEntries            = STATUS_NO_MORE_ENTRIES,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 extern const sl::Guid g_ErrnoGuid;
 

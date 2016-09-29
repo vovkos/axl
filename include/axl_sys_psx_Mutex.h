@@ -6,7 +6,7 @@
 
 #define _AXL_SYS_PSX_MUTEX_H
 
-#include "axl_g_Def.h"
+#include "axl_g_Pch.h"
 
 namespace axl {
 namespace sys {
@@ -97,7 +97,7 @@ public:
 		ASSERT (result == 0);
 	}
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 	bool
 	lock (uint_t timeout);
 #endif

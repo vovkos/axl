@@ -9,9 +9,6 @@
 #include "axl_gui_Color.h"
 #include "axl_gui_ImageDesc.h"
 #include "axl_gui_FontDesc.h"
-#include "axl_ref_Ptr.h"
-#include "axl_sl_String.h"
-#include "axl_sl_Array.h"
 
 namespace axl {
 namespace gui {

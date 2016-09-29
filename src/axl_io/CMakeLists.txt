@@ -240,10 +240,20 @@ endif ()
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
+set (
+	PCH_H_LIST
+	${PCH_H}
+	${AXL_INC_DIR}/axl_io_Pch.h
+	${AXL_INC_DIR}/axl_io_UsbPch.h
+	${AXL_INC_DIR}/axl_io_PcapPch.h
+	${AXL_INC_DIR}/axl_io_psx_Pch.h
+	${AXL_INC_DIR}/axl_io_win_Pch.h
+	)
+
 source_group (
 	pch
 	FILES
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	)
 
@@ -274,7 +284,7 @@ endif ()
 
 add_library (
 	axl_io
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	${IO_H_LIST}
 	${IO_CPP_LIST}

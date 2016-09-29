@@ -6,8 +6,8 @@
 
 #define _AXL_GUI_GDIIMAGE_H
 
-#include "axl_gui_Image.h"
 #include "axl_gui_GdiObjectHandle.h"
+#include "axl_gui_Image.h"
 
 namespace axl {
 namespace gui {

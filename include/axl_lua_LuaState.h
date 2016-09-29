@@ -6,10 +6,7 @@
 
 #define _AXL_LUA_LUASTATE_H
 
-#include "axl_sl_Handle.h"
-#include "axl_sl_String.h"
-#include "axl_err_Error.h"
-#include "axl_dbg_Trace.h"
+#include "axl_lua_Pch.h"
 
 namespace axl {
 namespace lua {
@@ -193,7 +190,7 @@ public:
 		)
 	{
 		ASSERT (isOpen ());
-		lua_pushvfstring (m_h, format, va.m_va);
+		lua_pushvfstring (m_h, format, va);
 	}
 
 	void

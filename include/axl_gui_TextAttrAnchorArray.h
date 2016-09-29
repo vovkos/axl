@@ -6,7 +6,6 @@
 
 #define _AXL_GUI_TEXTATTRANCHORARRAY_H
 
-#include "axl_sl_Array.h"
 #include "axl_gui_TextAttr.h"
 
 namespace axl {

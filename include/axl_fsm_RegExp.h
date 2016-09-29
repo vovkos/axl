@@ -7,7 +7,6 @@
 #define _AXL_FSM_REGEXP_H
 
 #include "axl_fsm_Dfa.h"
-#include "axl_sl_String.h"
 
 namespace axl {
 namespace fsm {

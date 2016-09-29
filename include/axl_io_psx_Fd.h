@@ -6,8 +6,7 @@
 
 #define _AXL_IO_PSX_FD_H
 
-#include "axl_sl_Handle.h"
-#include "axl_err_Error.h"
+#include "axl_io_psx_Pch.h"
 
 namespace axl {
 namespace io {

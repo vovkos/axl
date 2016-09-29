@@ -4,14 +4,142 @@
 
 #pragma once
 
-//.............................................................................
+#define _AXL_G_PCH_H
 
-// C standard headers
+#ifndef __cplusplus
+#	error AXL library requires a C++ compiler
+#endif
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 1) detect build/target environment section
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// detect C++ compiler
+
+#ifdef _MSC_VER
+#	define _AXL_CPP_MSC 1
+#	define _AXL_CPP_MSC_VERSION_MAJOR (_MSC_VER / 100)
+#	define _AXL_CPP_MSC_VERSION_MINOR (_MSC_VER % 100)
+#	define _AXL_CPP_MSC_VERSION (((_MSC_VER / 100) << 8) | (_MSC_VER % 100))
+#	define AXL_CPP_STRING "Microsoft Visual C++"
+#elif (defined __GNUC__)
+#	define _AXL_CPP_GCC 1
+#	define _AXL_CPP_GCC_VERSION_MAJOR __GNUC__
+#	define _AXL_CPP_GCC_VERSION_MINOR __GNUC_MINOR__
+#	define _AXL_CPP_GCC_VERSION ((__GNUC__ << 8) | __GNUC_MINOR__)
+#	ifdef __clang__
+#		define _AXL_CPP_CLANG 1
+#		define _AXL_CPP_CLANG_VERSION_MAJOR __clang_major__
+#		define _AXL_CPP_CLANG_VERSION_MINOR __clang_minor__
+#		define _AXL_CPP_CLANG_VERSION ((__clang_major__ << 8) | __clang_minor__)
+#		define AXL_CPP_STRING "Clang/LLVM"
+#	elif (defined __ICC)
+#		define _AXL_CPP_ICC 1
+#		define _AXL_CPP_ICC_VERSION_MAJOR (__ICC / 100)
+#		define _AXL_CPP_ICC_VERSION_MINOR (__ICC % 100)
+#		define _AXL_CPP_ICC_VERSION (((__ICC / 100) << 8) | (__ICC % 100))
+#		define AXL_CPP_STRING "Intel C++"
+#	else
+#		define AXL_CPP_STRING "GNU C++"
+#	endif
+#else
+#	error unsupported C++ compiler
+#endif
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// detect CPU architecture
+
+#if (_AXL_CPP_MSC)
+#	if (defined _M_IX86)
+#		define _AXL_CPU_X86 1
+#	elif (defined _M_AMD64)
+#		define _AXL_CPU_AMD64 1
+#	endif
+#elif (_AXL_CPP_GCC)
+#	if defined __i386__
+#		define _AXL_CPU_X86 1
+#	elif (defined __amd64__)
+#		define _AXL_CPU_AMD64 1
+#	endif
+#endif
+
+#if (_AXL_CPU_X86)
+#	define AXL_CPU_STRING  "x86"
+#	define AXL_PTR_SIZE    4
+#elif (_AXL_CPU_AMD64)
+#	define AXL_CPU_STRING  "amd64"
+#	define AXL_PTR_SIZE    8
+#else
+#	error unsupported CPU architecture
+#endif
+
+#define AXL_PTR_BITS (AXL_PTR_SIZE * 8) // often times it's more natural to use bit size
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// detect OS 
+
+#ifdef _WIN32
+#	define _AXL_OS_WIN 1
+#	define AXL_OS_STRING "Microsoft Windows"
+#elif (defined __unix__)
+#	define _AXL_OS_POSIX 1
+#	ifdef __linux__
+#		define _AXL_OS_LINUX 1
+#		define AXL_OS_STRING "Linux"
+#	elif (defined __sun__)
+#		define _AXL_OS_SOLARIS 1
+#		define AXL_OS_STRING "Linux"
+#	elif (defined __FreeBSD__ || defined __OpenBSD__ || defined __NetBSD__)
+#		define _AXL_OS_BSD 1
+#		define AXL_OS_STRING "BSD"
+#	endif
+#elif (defined __APPLE__ && defined __MACH__)
+#	define _AXL_OS_POSIX  1
+#	define _AXL_OS_BSD    1
+#	define _AXL_OS_DARWIN 1
+#	define AXL_OS_STRING "Apple Darwin"
+#else
+#	error unsupported OS
+#endif
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// detect Debug build
+
+#if (_AXL_CPP_MSC)
+#	ifdef _DEBUG
+#		define _AXL_DEBUG 1
+#	endif
+#else 
+#	ifndef NDEBUG
+#		define _AXL_DEBUG 1
+#	endif
+#endif
+
+#if (_AXL_DEBUG)
+#	define AXL_DEBUG_STRING "Debug"
+#	define AXL_DEBUG_SUFFIX " " AXL_DEBUG_STRING
+#else
+#	define AXL_DEBUG_STRING ""
+#	define AXL_DEBUG_SUFFIX ""
+#endif
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 2) standard includes
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// C/C++ headers
 
 #define __STDC_LIMIT_MACROS
 #define __STDC_CONSTANT_MACROS
 
-#if (_WIN32)
+#if (_AXL_OS_WIN)
 #	define _CRT_SECURE_NO_WARNINGS  // useless warnings about "unsafe" string functions
 #	define _SCL_SECURE_NO_WARNINGS  // useless warnings about "unsafe" iterator operations
 #endif
@@ -28,42 +156,27 @@
 #include <wctype.h>
 #include <errno.h>
 
+#include <new>
+
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// C++ standard headers
+// OS-specific headers
 
-#include <new>
-#include <typeinfo>
-
-//.............................................................................
-
-#if (_WIN32)
-#	include <crtdbg.h>
-#	define ASSERT _ASSERTE
-#
-#	ifndef _WIN32_WINNT             // Specifies that the minimum required platform is Windows Vista.
-#		define _WIN32_WINNT 0x0600  // Change this to the appropriate value to target other versions of Windows.
+#if (_AXL_OS_WIN)
+#	ifndef _WIN32_WINNT
+#		define _WIN32_WINNT 0x0600 // Windows Vista
 #	endif
 #
-#	define WIN32_LEAN_AND_MEAN      // Exclude rarely-used stuff from Windows headers
+#	define WIN32_LEAN_AND_MEAN // prevent winsock.h vs winsock2.h conflict
 #
-#	include <tchar.h>
-#	include <guiddef.h>
-#	include <cguid.h>
+#	include <windows.h>
 #	include <winsock2.h>
-#	include <ws2ipdef.h>
-#	include <commctrl.h>
 #	include <shellapi.h>
 #	include <setupapi.h>
-#endif
-
-//.............................................................................
-
-#if (__GNUC__)
-#	include <assert.h>
-#	define ASSERT assert
-#
+#	include <crtdbg.h>
+#elif (_AXL_OS_POSIX)
 #	include <unistd.h>
+#	include <assert.h>
 #	include <pthread.h>
 #	include <semaphore.h>
 #	include <fcntl.h>
@@ -81,7 +194,7 @@
 #	include <libgen.h>
 #	include <dirent.h>
 #
-#	if (defined __APPLE__ && defined __MACH__)
+#	if (_AXL_OS_DARWIN)
 #		include <machine/endian.h>
 #		include <mach/mach_error.h>
 #		include <mach/mach_init.h>
@@ -91,9 +204,77 @@
 #	else
 #		include "byteswap.h"
 #	endif
-#
+#endif
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 3) possibly conflicting complementary definitions
+
+// items here sort of complement standard C types/operators/functions
+// so prefixing them with 'axl_' would look non-consistent
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// common type aliases 
+
+// stdint.h already defines:
+//     int8_t
+//     uint8_t
+//     int16_t
+//     uint16_t
+//     int32_t
+//     uint32_t
+//     int64_t
+//     uint64_t
+//     intptr_t
+//     uintptr_t
+
+typedef int               bool_t;
+typedef unsigned int      uint_t;
+typedef unsigned char     uchar_t;
+typedef unsigned short    ushort_t;
+typedef unsigned long     ulong_t;
+
+typedef uint8_t           byte_t;
+typedef uint16_t          word_t;
+typedef uint64_t          qword_t;
+
+#if (_AXL_CPP_MSC)
+typedef ulong_t           dword_t;
+#else
+typedef uint32_t          dword_t;
+#endif
+
+#if (AXL_PTR_BITS == 64)
+#	if (_AXL_CPP_GCC)
+typedef __int128          int128_t;
+typedef unsigned __int128 uint128_t;
+typedef int128_t          intdptr_t;
+typedef uint128_t         uintdptr_t;
+#	endif
+#else
+typedef int64_t           intdptr_t;
+typedef uint64_t          uintdptr_t;
+#endif
+
+typedef void*             handle_t;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef char              utf8_t;
+
+#if (WCHAR_MAX <= 0xffff)
+typedef wchar_t           utf16_t;
+typedef int32_t           utf32_t;
+#else
+typedef int16_t           utf16_t;
+typedef wchar_t           utf32_t;
+#endif
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#if (_AXL_OS_POSIX)
 #	undef basename
-#
 #	define _stricmp    strcasecmp
 #	define _wcsicmp    wcscasecmp
 #	define _snprintf   snprintf
@@ -108,136 +289,247 @@
 #	define HIWORD(l)      ((word_t)(((l) >> 16) & 0xffff))
 #	define LOBYTE(w)      ((byte_t)((w) & 0xff))
 #	define HIBYTE(w)      ((byte_t)(((w) >> 8) & 0xff))
-#	define RGB(r,g,b)     ((dword_t)(((byte_t)(r)|((word_t)((byte_t)(g))<<8))|(((dword_t)(byte_t)(b))<<16)))
+#	define RGB(r, g, b)   ((dword_t)(((byte_t)(r)|((word_t)((byte_t)(g)) << 8))|(((dword_t)(byte_t)(b)) << 16)))
 #endif
-
-//.............................................................................
-
-// strnchr / wcsnchr
-
-inline
-const char*
-strchr_e (
-	const char* p,
-	const char* end,
-	char c
-	)
-{
-	while (p < end)
-	{
-		if (*p == c)
-			return p;
-
-		p++;
-	}
-
-	return NULL;
-}
-
-inline
-char*
-strchr_e (
-	char* p,
-	char* end,
-	char c
-	)
-{
-	while (p < end)
-	{
-		if (*p == c)
-			return p;
-
-		p++;
-	}
-
-	return NULL;
-}
-
-inline
-const wchar_t*
-wcschr_e (
-	const wchar_t* p,
-	const wchar_t* end,
-	wchar_t c
-	)
-{
-	while (p < end)
-	{
-		if (*p == c)
-			return p;
-
-		p++;
-	}
-
-	return NULL;
-}
-
-inline
-wchar_t*
-wcschr_e (
-	wchar_t* p,
-	wchar_t* end,
-	wchar_t c
-	)
-{
-	while (p < end)
-	{
-		if (*p == c)
-			return p;
-
-		p++;
-	}
-
-	return NULL;
-}
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// sizeof/countof/lengthof/offsetof/containerof
+
+#ifndef countof
+#	define countof(a) (sizeof (a) / sizeof ((a) [0]))
+#endif
+
+#ifndef lengthof
+#	define lengthof(s) (countof (s) - 1)
+#endif
+
+#ifndef containerof
+#	define containerof(p, T, f) \
+		((T*) ((char*) (p) - offsetof (T, f)))
+#endif
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// NULL-checked strlen/wcslen 
+
 inline
-const char*
-strnchr (
-	const char* p,
-	size_t length,
-	char c
-	)
+size_t 
+strlen_s (const char* p)
 {
-	return strchr_e (p, p + length, c);
+	return p ? strlen (p) : 0;
 }
 
 inline
-char*
-strnchr (
-	char* p,
-	size_t length,
-	char c
-	)
+size_t 
+wcslen_s (const wchar_t* p)
 {
-	return strchr_e (p, p + length, c);
+	return p ? wcslen (p) : 0;
 }
 
-inline
-const wchar_t*
-wcsnchr (
-	const wchar_t* p,
-	size_t length,
-	wchar_t c
-	)
-{
-	return wcschr_e (p, p + length, c);
-}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-inline
-wchar_t*
-wcsnchr (
-	wchar_t* p,
-	size_t length,
-	wchar_t c
-	)
+// 4) non-confliciting macro definitions
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// declaration options/attributes
+
+#if (_AXL_CPP_MSC)
+#	define AXL_CDECL       __cdecl
+#	define AXL_STDCALL     __stdcall
+#	define AXL_SELECT_ANY  __declspec (selectany)
+#	define AXL_NO_VTABLE   __declspec (novtable)
+#	define AXL_EXPORT      __declspec (dllexport)
+#
+#	define AXL_GCC_ALIGN(n)
+#	define AXL_GCC_MSC_STRUCT
+#	define AXL_GCC_NO_ASAN
+#elif (_AXL_CPP_GCC)
+#	if (_AXL_CPU_X86)
+#		define AXL_CDECL   __attribute__ ((cdecl))
+#		define AXL_STDCALL __attribute__ ((stdcall))
+#	else
+#		define AXL_CDECL
+#		define AXL_STDCALL
+#	endif
+#	define AXL_SELECT_ANY  __attribute__ ((weak))
+#	define AXL_NO_VTABLE
+#	define AXL_EXPORT      __attribute__ ((visibility ("default")))
+#
+#	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
+#	define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
+#
+#	ifdef __has_feature
+#		if (__has_feature (address_sanitizer))
+#	 		define _AXL_GCC_ASAN 1
+#		endif
+#	elif (defined (__SANITIZE_ADDRESS__))
+# 		define _AXL_GCC_ASAN 1
+#	endif
+#
+#	define AXL_GCC_NO_ASAN __attribute__((no_sanitize_address))
+#endif
+
+#define AXL_EXTERN_C extern "C"
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// min/max are WAY too conflict-prone, so we use non-conflicting versions 
+// with 'AXL_' prefix
+
+#define AXL_MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define AXL_MAX(a, b) (((a) > (b)) ? (a) : (b))
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// ensure class is never accidentally copied
+
+#define AXL_DISABLE_COPY(Class) \
+private: \
+	Class (const Class&);  \
+	void \
+	operator = (const Class&); \
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// ASSERT macro
+
+#if (_AXL_OS_WIN)
+#	define AXL_ASSERT _ASSERTE // from crtdbg.h
+#else
+#	define AXL_ASSERT assert   // from assert.h
+#endif
+
+#ifndef ASSERT
+#	define ASSERT AXL_ASSERT
+#endif
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// source-position for TODO reminders
+
+// usage: 
+//   #pragma message (AXL_SRC_POS "TODO: implement new feature")
+//   #pragma message (AXL_SRC_POS "FIXME: temp workaround")
+
+#define AXL_LTOA2(l) #l
+#define AXL_LTOA(l)  AXL_LTOA2 (l)
+#define AXL_SRC_POS  __FILE__ "(" AXL_LTOA (__LINE__) "): "
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 5) convenient vararg facilities
+
+// this wrapper struct serves the following purposes:
+//   * makes sure va_list isn't get modified if passed as an argument;
+//   * makes it possible to simply assign one to another.
+//   * ensures va_end is called at the end
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct axl_va_list
 {
-	return wcschr_e (p, p + length, c);
-}
+	va_list m_va;
+	bool m_isInitialized;
+
+	axl_va_list ()
+	{
+		m_isInitialized = false;
+	}
+
+	axl_va_list (const axl_va_list& src)
+	{
+		m_isInitialized = false;
+		copy (src);
+	}
+
+	axl_va_list (va_list va)
+	{
+		m_isInitialized = false;
+		copy (va);
+	}
+
+	~axl_va_list ()
+	{
+		end ();
+	}
+
+	axl_va_list&
+	operator = (const axl_va_list& src)
+	{
+		copy (src);
+		return *this;
+	}
+
+	axl_va_list&
+	operator = (va_list va)
+	{
+		copy (va);
+		return *this;
+	}
+
+	operator va_list ()
+	{
+		ASSERT (m_isInitialized);
+		return m_va;
+	}
+
+	void
+	end ()
+	{
+		if (m_isInitialized)
+		{
+			va_end (m_va);
+			m_isInitialized = false;
+		}
+	}
+
+	void
+	copy (const axl_va_list& src)
+	{
+		copy (src.m_va);
+	}
+
+	void
+	copy (va_list va)
+	{
+		end ();
+
+#ifdef va_copy
+		va_copy (m_va, va);
+#else
+		m_va = va;
+#endif
+		m_isInitialized = true;
+	}
+
+	template <typename T>
+	T
+	arg ()
+	{
+		ASSERT (m_isInitialized);
+		return va_arg (m_va, T);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// use axl_va_start/axl_va_arg just like you would use va_start/va_arg...
+
+#define axl_va_start(va, a) \
+	va_start ((va).m_va, a); \
+	(va).m_isInitialized = true;
+
+#define axl_va_arg(va, T) \
+	va_arg ((va).m_va, T)
+
+// ...or use this single-line macro and then iterate via va.arg <T> ()
+
+#define AXL_VA_DECL(va, a) \
+	axl_va_list va; \
+	axl_va_start (va, a);
 
 //.............................................................................
 
-#include "axl_g_Def.h"
 #include "axl_g_WarningSuppression.h"

@@ -7,7 +7,6 @@
 #define _AXL_INI_PARSER_H
 
 #include "axl_ini_Lexer.h"
-#include "axl_io_MappedFile.h"
 
 namespace axl {
 namespace ini {

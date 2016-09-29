@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "axl_gui_QtEngine.h"
 #include "axl_gui_QtWidget.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace gui {
@@ -396,7 +395,7 @@ QtEngine::getStdFontTuple (StdFontKind fontKind)
 		break;
 
 	case StdFontKind_Monospace:
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 		font->m_qtFont = QFont ("Menlo", 11);
 #else
 		font->m_qtFont = QFont ("Monospace", 9);

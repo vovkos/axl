@@ -153,7 +153,7 @@ protected:
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 
 inline
 void
@@ -173,7 +173,7 @@ getAbsTimespecFromTimeout (
 	timespec* tspec
 	)
 {
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 	timeval tval;
 	gettimeofday (&tval, NULL);
 	tspec->tv_sec = tval.tv_sec;

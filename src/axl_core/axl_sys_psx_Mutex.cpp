@@ -33,7 +33,7 @@ Mutex::tryLock ()
 	return result == 0 ? true : err::fail (result);
 }
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 bool
 Mutex::lock (uint_t timeout)
 {

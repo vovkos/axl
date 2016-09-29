@@ -6,14 +6,14 @@
 
 #define _AXL_SYS_ATOMIC_H
 
-#include "axl_g_Def.h"
+#include "axl_g_Pch.h"
 
 namespace axl {
 namespace sys {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN || _AXL_ENV == AXL_ENV_NT)
+#if (_AXL_OS_WIN)
 
 inline
 int32_t
@@ -92,7 +92,7 @@ atomicDec (volatile int64_t* p)
 	return ::InterlockedDecrement64 (p);
 }
 
-#if (_AXL_PTR_BITNESS == 64)
+#if (AXL_PTR_BITS == 64)
 
 inline
 int64_t
@@ -196,7 +196,7 @@ atomicDec (volatile size_t* p)
 
 #endif
 
-#elif (_AXL_CPP == AXL_CPP_GCC)
+#elif (_AXL_CPP_GCC)
 
 inline
 int32_t
@@ -310,7 +310,7 @@ atomicDec (volatile size_t* p)
 	return __sync_sub_and_fetch (p, 1);
 }
 
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 
 inline
 intptr_t
@@ -349,7 +349,7 @@ atomicDec (volatile intptr_t* p)
 
 #endif
 
-#if (_AXL_PTR_BITNESS == 64)
+#if (AXL_PTR_BITS == 64)
 
 inline
 int64_t
@@ -438,9 +438,9 @@ inline
 void
 yieldProcessor ()
 {
-#if (_AXL_ENV == AXL_ENV_WIN || _AXL_ENV == AXL_ENV_NT)
+#if (_AXL_OS_WIN)
 	::YieldProcessor ();
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	sched_yield ();
 #endif
 }

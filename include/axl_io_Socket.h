@@ -6,9 +6,11 @@
 
 #define _AXL_IO_SOCKET_H
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#include "axl_g_Pch.h"
+
+#if (_AXL_OS_WIN)
 #	include "axl_io_win_Socket.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Socket.h"
 #endif
 
@@ -31,9 +33,9 @@ enum SocketShutdownKind
 class Socket
 {
 public:
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	win::Socket m_socket;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	psx::Socket m_socket;
 #endif
 

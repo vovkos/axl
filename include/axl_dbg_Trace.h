@@ -6,7 +6,6 @@
 
 #define _AXL_DBG_TRACE_H
 
-#include "axl_g_Def.h"
 #include "axl_sys_Atomic.h"
 
 namespace axl {
@@ -71,7 +70,7 @@ trace (
 }
 
 #else
-#	if (_AXL_ENV == AXL_ENV_POSIX)
+#	if (_AXL_OS_POSIX)
 AXL_SELECT_ANY FILE* g_traceFile = stdout;
 #	endif
 

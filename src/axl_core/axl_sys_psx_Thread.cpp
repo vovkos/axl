@@ -41,7 +41,7 @@ Thread::join (void** retVal)
 	return true;
 }
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 bool
 Thread::tryJoin (void** retVal)
 {

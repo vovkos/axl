@@ -165,7 +165,7 @@ struct WidgetThreadMsg: WidgetMsg
 
 // engine-specific messages 
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 struct WidgetGdiMsg: WidgetMsg
 {

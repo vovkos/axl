@@ -37,7 +37,7 @@ FontDesc::setup (
 	uint_t flags
 	)
 {
-	size_t length = axl_strlen (family);
+	size_t length = strlen_s (family);
 
 	if (length >= countof (m_family))
 		length = countof (m_family) - 1;

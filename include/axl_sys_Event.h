@@ -6,9 +6,11 @@
 
 #define _AXL_SYS_EVENT_H
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#include "axl_g_Pch.h"
+
+#if (_AXL_OS_WIN)
 #	include "axl_sys_win_Event.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_sys_psx_Cond.h"
 #endif
 
@@ -17,7 +19,7 @@ namespace sys {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 class EventRoot
 {
@@ -73,7 +75,7 @@ public:
 
 //.............................................................................
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 class EventRoot
 {

@@ -14,7 +14,7 @@ namespace psx {
 
 //.............................................................................
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN) // no unnamed semaphores on darwin
+#if (!_AXL_OS_DARWIN) // no unnamed semaphores on darwin
 
 class Sem
 {
@@ -151,7 +151,7 @@ public:
 		return err::complete (result == 0);
 	}
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 	bool
 	wait (uint_t timeout);
 

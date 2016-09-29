@@ -6,7 +6,7 @@
 
 #define _AXL_SL_HASH_H
 
-#include "axl_g_Def.h"
+#include "axl_g_Pch.h"
 
 namespace axl {
 namespace sl {
@@ -99,7 +99,7 @@ public:
 	size_t 
 	operator () (const char* p) const
 	{ 
-		return djb2 (p, axl_strlen (p));
+		return djb2 (p, strlen_s (p));
 	}
 };
 
@@ -112,7 +112,7 @@ public:
 	size_t 
 	operator () (const wchar_t* p) const
 	{ 
-		return djb2 (p, axl_wcslen (p) * sizeof (wchar_t));
+		return djb2 (p, wcslen_s (p) * sizeof (wchar_t));
 	}
 };
 

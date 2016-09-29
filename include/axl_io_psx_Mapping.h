@@ -7,7 +7,6 @@
 #define _AXL_IO_PSX_MAPPING_H
 
 #include "axl_io_psx_Fd.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace io {

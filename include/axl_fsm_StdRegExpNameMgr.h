@@ -7,7 +7,6 @@
 #define _AXL_FSM_STDREGEXPNAMEMGR_H
 
 #include "axl_fsm_RegExp.h"
-#include "axl_sl_StringHashTable.h"
 
 namespace axl {
 namespace fsm {

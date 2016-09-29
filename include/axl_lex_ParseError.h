@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "axl_err_ErrorMgr.h"
+#define _AXL_LEX_PARSEERROR_H
+
 #include "axl_lex_Token.h"
-#include "axl_sl_Pack.h"
 
 namespace axl {
 namespace lex {

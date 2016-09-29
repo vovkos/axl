@@ -7,7 +7,6 @@
 #define _AXL_INI_GENERICPARSER_H
 
 #include "axl_ini_Parser.h"
-#include "axl_sl_StringHashTable.h"
 
 namespace axl {
 namespace ini {

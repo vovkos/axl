@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "axl_sl_List.h"
-#include "axl_sl_String.h"
 #include "axl_io_SockAddr.h"
 
 #define _AXL_IO_NETWORKADAPTER_H

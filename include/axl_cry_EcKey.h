@@ -8,7 +8,6 @@
 
 #include "axl_cry_BigNum.h"
 #include "axl_cry_EcPoint.h"
-#include "axl_cry_CryptoError.h"
 
 namespace axl {
 namespace cry {

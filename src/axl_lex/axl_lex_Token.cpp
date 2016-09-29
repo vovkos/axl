@@ -14,7 +14,7 @@ LineCol::incrementalCount (
 	)
 {
 	if (length == -1)
-		length = axl_strlen (p);
+		length = strlen_s (p);
 
 	const char* end = p + length;
 	const char* line = p;

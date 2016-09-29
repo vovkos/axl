@@ -6,7 +6,7 @@
 
 #define _AXL_SL_BYTEORDER_H
 
-#include "axl_g_Def.h"
+#include "axl_g_Pch.h"
 
 namespace axl {
 namespace sl {
@@ -17,9 +17,9 @@ inline
 uint16_t
 swapByteOrder16 (uint16_t value)
 {
-#if (_AXL_CPP == AXL_CPP_MSC)
+#if (_AXL_CPP_MSC)
 	return _byteswap_ushort (value);
-#elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+#elif (_AXL_OS_DARWIN)
 	return __DARWIN_OSSwapInt16 (value);
 #else
 	return bswap_16 (value);
@@ -30,9 +30,9 @@ inline
 uint32_t
 swapByteOrder32 (uint32_t value)
 {
-#if (_AXL_CPP == AXL_CPP_MSC)
+#if (_AXL_CPP_MSC)
 	return _byteswap_ulong (value);
-#elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+#elif (_AXL_OS_DARWIN)
 	return __DARWIN_OSSwapInt32 (value);
 #else
 	return bswap_32 (value);
@@ -43,9 +43,9 @@ inline
 uint64_t
 swapByteOrder64 (uint64_t value)
 {
-#if (_AXL_CPP == AXL_CPP_MSC)
+#if (_AXL_CPP_MSC)
 	return _byteswap_uint64 (value);
-#elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+#elif (_AXL_OS_DARWIN)
 	return __DARWIN_OSSwapInt64 (value);
 #else
 	return bswap_64 (value);

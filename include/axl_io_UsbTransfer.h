@@ -7,7 +7,6 @@
 #define _AXL_IO_USBTRANSFER_H
 
 #include "axl_io_UsbError.h"
-#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace io {

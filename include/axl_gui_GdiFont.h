@@ -6,10 +6,8 @@
 
 #define _AXL_GUI_GDIFONT_H
 
-#include "axl_gui_Font.h"
 #include "axl_gui_GdiObjectHandle.h"
-#include "axl_ref_RefCount.h"
-#include "axl_sl_String.h"
+#include "axl_gui_Font.h"
 
 namespace axl {
 namespace gui {

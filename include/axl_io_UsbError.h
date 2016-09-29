@@ -6,10 +6,7 @@
 
 #define _AXL_IO_USBERROR_H
 
-#include "axl_io_UsbError.h"
-#include "axl_err_Error.h"
-#include "axl_err_ErrorMgr.h"
-#include "axl_sl_String.h"
+#include "axl_io_UsbPch.h"
 
 namespace axl {
 namespace io {

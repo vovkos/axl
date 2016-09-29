@@ -355,7 +355,7 @@ public:
 		memset (p, c, count);
 	}
 
-#if (_AXL_CPP == AXL_CPP_MSC)
+#if (_AXL_CPP_MSC)
 	static
 	size_t
 	calcFormatLength_va (
@@ -363,7 +363,7 @@ public:
 		axl_va_list va
 		)
 	{
-		return _vscprintf (formatString, va.m_va);
+		return _vscprintf (formatString, va);
 	}
 
 	static
@@ -375,7 +375,7 @@ public:
 		axl_va_list va
 		)
 	{
-		_vsnprintf (buffer, bufferLength, formatString, va.m_va);
+		_vsnprintf (buffer, bufferLength, formatString, va);
 		if (bufferLength)
 			buffer [bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
 	}
@@ -387,7 +387,7 @@ public:
 		axl_va_list va
 		)
 	{
-		return vsnprintf (NULL, 0, formatString, va.m_va);
+		return vsnprintf (NULL, 0, formatString, va);
 	}
 
 	static
@@ -399,7 +399,7 @@ public:
 		axl_va_list va
 		)
 	{
-		return vsnprintf (buffer, bufferLength, formatString, va.m_va);
+		return vsnprintf (buffer, bufferLength, formatString, va);
 	}
 #endif
 };
@@ -418,7 +418,7 @@ public:
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
 
-#if (_AXL_CPP == AXL_CPP_MSC)
+#if (_AXL_CPP_MSC)
 	static
 	size_t
 	calcFormatLength_va (
@@ -426,7 +426,7 @@ public:
 		axl_va_list va
 		)
 	{
-		return _vscwprintf (formatString, va.m_va);
+		return _vscwprintf (formatString, va);
 	}
 
 	static
@@ -438,7 +438,7 @@ public:
 		axl_va_list va
 		)
 	{
-		_vsnwprintf (buffer, bufferLength, formatString, va.m_va);
+		_vsnwprintf (buffer, bufferLength, formatString, va);
 		if (bufferLength)
 			buffer [bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
 	}
@@ -482,7 +482,7 @@ public:
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
 
-#if (_AXL_CPP == AXL_CPP_MSC)
+#if (_AXL_CPP_MSC)
 	static
 	size_t
 	calcFormatLength_va (
@@ -513,7 +513,7 @@ public:
 		axl_va_list va
 		)
 	{
-		return vswprintf (NULL, 0, formatString, va.m_va);
+		return vswprintf (NULL, 0, formatString, va);
 	}
 
 	static
@@ -525,7 +525,7 @@ public:
 		axl_va_list va
 		)
 	{
-		vswprintf (buffer, bufferLength, formatString, va.m_va);
+		vswprintf (buffer, bufferLength, formatString, va);
 	}
 #endif
 };

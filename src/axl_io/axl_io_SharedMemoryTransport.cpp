@@ -74,11 +74,11 @@ SharedMemoryTransportBase::attach (
 		m_hdr->m_endOffset = 0;
 		m_hdr->m_dataSize = 0;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		result =
 			m_readEvent.create (NULL, false, false, sl::String_utf16 (readEventName)) &&
 			m_writeEvent.create (NULL, false, false, sl::String_utf16 (writeEventName));
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 		result = m_readEvent.open (readEventName, O_CREAT);
 		if (result)
 		{
@@ -111,11 +111,11 @@ SharedMemoryTransportBase::attach (
 
 		sys::atomicUnlock (&m_hdr->m_lock);
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		result =
 			m_readEvent.open (EVENT_ALL_ACCESS, false, sl::String_utf16 (readEventName)) &&
 			m_writeEvent.open (EVENT_ALL_ACCESS, false, sl::String_utf16 (writeEventName));
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 		result =
 			m_readEvent.open (readEventName, 0) &&
 			m_writeEvent.open (writeEventName, 0);
@@ -153,7 +153,7 @@ SharedMemoryTransportBase::closeImpl ()
 	m_mappingSize = 0;
 	m_pendingReqCount = 0;
 
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 	if (!m_readEventName.isEmpty ())
 	{
 		sys::psx::NamedSem::unlink (m_readEventName);
@@ -174,10 +174,10 @@ SharedMemoryTransportBase::disconnect ()
 	sys::atomicLock (&m_hdr->m_lock);
 	m_hdr->m_state = SharedMemoryTransportState_Disconnected;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	m_readEvent.signal ();
 	m_writeEvent.signal ();
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	m_readEvent.post ();
 	m_writeEvent.post ();
 #endif
@@ -196,7 +196,7 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 	if (remSize)
 		size = size - remSize + systemInfo->m_pageSize;
 
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 	if (size >= m_file.getSize ())
 	{
 		bool result = m_file.setSize (size);
@@ -314,9 +314,9 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 	m_hdr->m_dataSize -= readSize;
 	sys::atomicUnlock (&m_hdr->m_lock);
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	m_readEvent.signal ();
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	m_readEvent.post ();
 #endif
 
@@ -443,9 +443,9 @@ SharedMemoryWriter::write (
 	m_hdr->m_dataSize += chainSize;
 	sys::atomicUnlock (&m_hdr->m_lock);
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	m_writeEvent.signal ();
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	m_writeEvent.post ();
 #endif
 

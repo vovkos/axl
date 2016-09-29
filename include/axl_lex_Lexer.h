@@ -6,7 +6,6 @@
 
 #define _AXL_LEX_LEXER_H
 
-#include "axl_sl_BoxList.h"
 #include "axl_lex_Token.h"
 #include "axl_lex_ParseError.h"
 

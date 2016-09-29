@@ -82,7 +82,7 @@ class BitMapN
 public:
 	enum
 	{
-		pageCount = bitCount / _AXL_PTR_BITNESS
+		pageCount = bitCount / AXL_PTR_BITS
 	};
 
 protected:
@@ -225,7 +225,7 @@ public:
 	size_t 
 	getBitCount () const
 	{
-		return getPageCount () * _AXL_PTR_BITNESS;
+		return getPageCount () * AXL_PTR_BITS;
 	}
 
 	void 

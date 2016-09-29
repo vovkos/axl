@@ -7,7 +7,7 @@ namespace io {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 bool
 Serial::setSettings (
@@ -155,7 +155,7 @@ Serial::write (
 	return actualSize;
 }
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 bool
 Serial::setSettings (

@@ -7,7 +7,7 @@ namespace sys {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 static uint64_t g_qpcBaseTimestamp;
 static uint64_t g_qpcBaseCounter;
@@ -28,11 +28,11 @@ getTimestamp ()
 {
 	uint64_t timestamp;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	::GetSystemTimeAsFileTime ((FILETIME*) &timestamp);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	timespec tspec;
-#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#	if (_AXL_OS_DARWIN)
 	timeval tval;
 	gettimeofday (&tval, NULL);
 	tspec.tv_sec = tval.tv_sec;
@@ -51,13 +51,13 @@ getTimestamp ()
 uint64_t
 getPreciseTimestamp ()
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	uint64_t counter;
 	::QueryPerformanceCounter ((LARGE_INTEGER*) &counter);
 	return g_qpcBaseTimestamp + (uint64_t) ((double) (counter - g_qpcBaseCounter) * 10000000 / g_qpcFrequency);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	timespec tspec;
-#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#	if (_AXL_OS_DARWIN)
 	timeval tval;
 	gettimeofday (&tval, NULL);
 	tspec.tv_sec = tval.tv_sec;
@@ -74,7 +74,7 @@ getPreciseTimestamp ()
 void
 sleep (uint32_t msCount)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	::Sleep (msCount);
 #else
 	timespec timespec;
@@ -93,7 +93,7 @@ Time::getTimestampImpl (
 {
 	uint64_t timestamp = 0;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	SYSTEMTIME sysTime = { 0 };
 	sysTime.wYear   = m_year;
 	sysTime.wMonth  = m_month + 1;
@@ -139,7 +139,7 @@ Time::setTimestampImpl (
 	int timeZone
 	)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	SYSTEMTIME sysTime = { 0 };
 
 	if (isLocal)

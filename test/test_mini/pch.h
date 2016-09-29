@@ -2,33 +2,6 @@
 
 //.............................................................................
 
-#include "axl_g_Pch.h"
-
-#if (_AXL_ENV == AXL_ENV_WIN)
-#	include <ws2tcpip.h>
-#	include <iphlpapi.h>
-#	pragma comment (lib, "ws2_32.lib")
-#	pragma comment (lib, "iphlpapi.lib")
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include <netdb.h>
-#	include <signal.h>
-#	include <sys/ucontext.h>
-#endif
-
-#ifdef _AXL_IO_USB
-#	if (_AXL_ENV == AXL_ENV_WIN)
-#		define _WINSOCKAPI_ // prevent winsock inclusion
-#		pragma warning (disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
-#	endif
-extern "C" {
-#	include <libusb.h>
-} // extern "C" {
-#endif
-
-#ifdef _AXL_XML
-#	include "axl_xml_Pch.h"
-#endif
-
 // axl
 
 #include "axl_sl_String.h"
@@ -57,13 +30,13 @@ extern "C" {
 #	include "axl_io_UsbDevice.h"
 #endif
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 #	include "axl_sys_win_VirtualMemory.h"
 #	include "axl_sys_win_Process.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_sys_psx_Sem.h"
-#	if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#	if (_AXL_OS_DARWIN)
 #		include "axl_sys_drw_Semaphore.h"
 #	endif
 #endif
@@ -71,5 +44,32 @@ extern "C" {
 #include "axl_io_FileEnumerator.h"
 
 using namespace axl;
+
+//.............................................................................
+
+#if (_AXL_OS_WIN)
+#	include <ws2tcpip.h>
+#	include <iphlpapi.h>
+#	pragma comment (lib, "ws2_32.lib")
+#	pragma comment (lib, "iphlpapi.lib")
+#elif (_AXL_OS_POSIX)
+#	include <netdb.h>
+#	include <signal.h>
+#	include <sys/ucontext.h>
+#endif
+
+#ifdef _AXL_IO_USB
+#	if (_AXL_OS_WIN)
+#		define _WINSOCKAPI_ // prevent winsock inclusion
+#		pragma warning (disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
+#	endif
+extern "C" {
+#	include <libusb.h>
+} // extern "C" {
+#endif
+
+#ifdef _AXL_XML
+#	include "axl_xml_Pch.h"
+#endif
 
 //.............................................................................

@@ -13,11 +13,11 @@ getBit (
 	size_t pageCount,
 	size_t bit)
 {
-	size_t page = bit / _AXL_PTR_BITNESS;
+	size_t page = bit / AXL_PTR_BITS;
 	if (page >= pageCount)
 		return false;
 
-	size_t mask = (size_t) 1 << (bit & (_AXL_PTR_BITNESS - 1));
+	size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
 	
 	return (map [page] & mask) != 0;
 }
@@ -30,12 +30,12 @@ setBit (
 	bool value
 	)
 {
-	size_t page = bit / _AXL_PTR_BITNESS;
+	size_t page = bit / AXL_PTR_BITS;
 	if (page >= pageCount)
 		return false;
 
 	size_t* p = map + page;
-	size_t mask = (size_t) 1 << (bit & (_AXL_PTR_BITNESS - 1));
+	size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
 	size_t old = *p;
 
 	if (value)
@@ -57,7 +57,7 @@ setBitRange (
 {
 	bool hasChanged = false;
 
-	size_t bitCount = pageCount * _AXL_PTR_BITNESS;
+	size_t bitCount = pageCount * AXL_PTR_BITS;
 
 	if (from >= bitCount)
 		return false;
@@ -65,11 +65,11 @@ setBitRange (
 	if (to > bitCount)
 		to = bitCount;
 
-	size_t pageIndex = from / _AXL_PTR_BITNESS;
+	size_t pageIndex = from / AXL_PTR_BITS;
 	size_t* p = map + pageIndex;
 
-	from -= pageIndex * _AXL_PTR_BITNESS;
-	to -= pageIndex * _AXL_PTR_BITNESS;
+	from -= pageIndex * AXL_PTR_BITS;
+	to -= pageIndex * AXL_PTR_BITS;
 
 	size_t mask;
 	size_t old;
@@ -78,7 +78,7 @@ setBitRange (
 	{
 		old = *p;
 
-		if (to < _AXL_PTR_BITNESS)
+		if (to < AXL_PTR_BITS)
 		{
 			mask = getBitmask (from, to);
 			*p |= mask;
@@ -91,16 +91,16 @@ setBitRange (
 		if (*p != old)
 			hasChanged = true;
 
-		to -= _AXL_PTR_BITNESS;
+		to -= AXL_PTR_BITS;
 		p++;
 	
-		while (to >= _AXL_PTR_BITNESS)
+		while (to >= AXL_PTR_BITS)
 		{
 			if (*p != -1)
 				hasChanged = true;
 
 			*p = -1;
-			to -= _AXL_PTR_BITNESS;
+			to -= AXL_PTR_BITS;
 			p++;
 		}
 
@@ -118,7 +118,7 @@ setBitRange (
 	{
 		old = *p;
 
-		if (to < _AXL_PTR_BITNESS)
+		if (to < AXL_PTR_BITS)
 		{
 			mask = getBitmask (from, to);
 			*p &= ~mask;
@@ -131,16 +131,16 @@ setBitRange (
 		if (*p != old)
 			hasChanged = true;
 
-		to -= _AXL_PTR_BITNESS;
+		to -= AXL_PTR_BITS;
 		p++;
 	
-		while (to >= _AXL_PTR_BITNESS)
+		while (to >= AXL_PTR_BITS)
 		{
 			if (*p != 0)
 				hasChanged = true;
 
 			*p = 0;
-			to -= _AXL_PTR_BITNESS;
+			to -= AXL_PTR_BITS;
 			p++;
 		}
 
@@ -222,25 +222,25 @@ findBit (
 	bool value
 	)
 {
-	size_t i = from / _AXL_PTR_BITNESS;
+	size_t i = from / AXL_PTR_BITS;
 	if (i >= pageCount)
 		return -1;
 
 	const size_t* p = map + i;
 
-	from -= i * _AXL_PTR_BITNESS;
+	from -= i * AXL_PTR_BITS;
 
 	if (value)
 	{
 		size_t x = *p & getHiBitmask (from);
 
 		if (x)
-			return i * _AXL_PTR_BITNESS + getLoBitIdx (x);
+			return i * AXL_PTR_BITS + getLoBitIdx (x);
 
 		for (i++, p++; i < pageCount; i++, p++)
 		{
 			if (*p != 0)
-				return i * _AXL_PTR_BITNESS + getLoBitIdx (*p);
+				return i * AXL_PTR_BITS + getLoBitIdx (*p);
 		}
 	}
 	else
@@ -248,12 +248,12 @@ findBit (
 		size_t x = ~*p & getHiBitmask (from);
 
 		if (x)
-			return i * _AXL_PTR_BITNESS + getLoBitIdx (x);
+			return i * AXL_PTR_BITS + getLoBitIdx (x);
 
 		for (i++, p++; i < pageCount; i++, p++)
 		{
 			if (*p != -1)
-				return i * _AXL_PTR_BITNESS + getLoBitIdx (~*p);
+				return i * AXL_PTR_BITS + getLoBitIdx (~*p);
 		}
 	}
 
@@ -276,8 +276,8 @@ BitMap::create (size_t bitCount)
 bool 
 BitMap::setBitCount (size_t bitCount)
 {
-	size_t pageCount = bitCount / _AXL_PTR_BITNESS;
-	if (bitCount & (_AXL_PTR_BITNESS - 1))
+	size_t pageCount = bitCount / AXL_PTR_BITS;
+	if (bitCount & (AXL_PTR_BITS - 1))
 		pageCount++;
 
 	return m_map.setCount (pageCount);

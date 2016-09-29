@@ -68,10 +68,8 @@ endif ()
 
 set (
 	G_H_LIST
-	${AXL_INC_DIR}/axl_g_Def.h
-	${AXL_INC_DIR}/axl_g_Module.h
-	${AXL_INC_DIR}/axl_g_Pch.h
 	${AXL_INC_DIR}/axl_g_WarningSuppression.h
+	${AXL_INC_DIR}/axl_g_Module.h
 	)
 
 set (
@@ -430,10 +428,16 @@ source_group (
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
+set (
+	PCH_H_LIST
+	${PCH_H}
+	${AXL_INC_DIR}/axl_g_Pch.h
+	)
+
 source_group (
 	pch
 	FILES
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	)
 
@@ -452,7 +456,7 @@ endif ()
 
 add_library (
 	axl_core
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	${DBG_H_LIST}
 	${DBG_CPP_LIST}

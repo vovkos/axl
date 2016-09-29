@@ -6,7 +6,7 @@
 
 #define _AXL_GUI_COLOR_H
 
-#include "axl_g_Def.h"
+#include "axl_gui_Def.h"
 
 namespace axl {
 namespace gui {

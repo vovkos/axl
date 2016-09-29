@@ -59,7 +59,7 @@ protected:
 
 	uintptr_t m_flags        : 8;
 
-#if (_AXL_PTR_BITNESS == 64)
+#if (AXL_PTR_BITS == 64)
 	uintptr_t m_parentOffset : 56;
 #else
 	uintptr_t m_parentOffset : 24; // more than enough

@@ -6,8 +6,7 @@
 
 #define _AXL_ZIP_ZIP_H
 
-#include "axl_sl_String.h"
-#include "axl_sl_Array.h"
+#include "axl_zip_Pch.h"
 
 struct mz_zip_archive_tag;
 

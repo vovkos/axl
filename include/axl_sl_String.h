@@ -47,7 +47,7 @@ protected:
 	mutable C* m_p;
 	mutable ref::BufHdr* m_hdr;
 
-#if (_AXL_PTR_BITNESS == 64)
+#if (AXL_PTR_BITS == 64)
 	size_t m_length : 63;
 #else
 	size_t m_length : 31; // more than enough
@@ -1043,7 +1043,7 @@ public:
 	size_t
 	insertNewLine (size_t index)
 	{
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		return insert (index, Details::getCrLf (), 2);
 #else
 		return insert (index, '\n');

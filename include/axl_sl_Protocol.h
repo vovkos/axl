@@ -139,7 +139,7 @@ struct ProtoMsg_4: ProtoMsg
 	void \
 	sender (const char* strArg) \
 	{ \
-		size_t length = axl_strlen (strArg); \
+		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg (&msg, sizeof (msg), strArg, length); \
@@ -185,7 +185,7 @@ struct ProtoMsg_4: ProtoMsg
 		const char* strArg \
 		) \
 	{ \
-		size_t length = axl_strlen (strArg); \
+		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_1 <T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -243,7 +243,7 @@ struct ProtoMsg_4: ProtoMsg
 		const char* strArg \
 		) \
 	{ \
-		size_t length = axl_strlen (strArg); \
+		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_2 <T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -309,7 +309,7 @@ struct ProtoMsg_4: ProtoMsg
 		const char* strArg \
 		) \
 	{ \
-		size_t length = axl_strlen (strArg); \
+		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_3 <T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -383,7 +383,7 @@ struct ProtoMsg_4: ProtoMsg
 		const char* strArg \
 		) \
 	{ \
-		size_t length = axl_strlen (strArg); \
+		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_4 <T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \

@@ -40,7 +40,7 @@ public:
 		return &m_attr;
 	}
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 	cpu_set_t
 	getAffinity () const
 	{
@@ -135,7 +135,7 @@ public:
 	bool
 	join (void** retVal = NULL);
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 	bool
 	tryJoin (void** retVal = NULL);
 

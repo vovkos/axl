@@ -37,7 +37,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_lua_Pch.h
+	${AXL_INC_DIR}/axl_xml_Pch.h
 	)
 
 source_group (

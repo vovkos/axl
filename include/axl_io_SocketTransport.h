@@ -7,8 +7,6 @@
 #define _AXL_IO_SOCKETTRANSPORT_H
 
 #include "axl_io_Transport.h"
-#include "axl_sl_Handle.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace io {

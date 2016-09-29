@@ -7,7 +7,6 @@
 #define _AXL_PSX_SERIAL_H
 
 #include "axl_io_psx_Fd.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace io {
@@ -73,7 +72,7 @@ public:
 	bool
 	setRts (bool isSet);
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 	bool
 	wait (uint_t mask)
 	{

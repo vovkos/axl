@@ -4,10 +4,10 @@
 #include "axl_dbg_Trace.h"
 #include "axl_sys_SjljTry.h"
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 #	include "axl_err_WinError.h"
 #	include "axl_err_NtError.h"
-#elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+#elif (_AXL_OS_DARWIN)
 #	include "axl_sys_drw_MachError.h"
 #endif
 
@@ -23,10 +23,10 @@ ErrorMgr::ErrorMgr ()
 	registerProvider (g_stdErrorGuid, sl::getSimpleSingleton <StdErrorProvider> ());
 	registerProvider (g_ErrnoGuid, sl::getSimpleSingleton <ErrnoProvider> ());
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	registerProvider (g_winErrorGuid, sl::getSimpleSingleton <WinErrorProvider> ());
 	registerProvider (g_ntErrorGuid, sl::getSimpleSingleton <NtErrorProvider> ());
-#elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+#elif (_AXL_OS_DARWIN)
 	registerProvider (sys::drw::g_MachErrorGuid, sl::getSimpleSingleton <sys::drw::MachErrorProvider> ());
 #endif
 }

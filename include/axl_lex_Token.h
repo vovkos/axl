@@ -6,9 +6,7 @@
 
 #define _AXL_LEX_TOKEN_H
 
-#include "axl_err_Error.h"
-#include "axl_sl_String.h"
-#include "axl_sl_CharLiteral.h"
+#include "axl_lex_Pch.h"
 
 namespace axl {
 namespace lex {

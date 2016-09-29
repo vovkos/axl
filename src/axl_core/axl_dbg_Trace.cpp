@@ -20,13 +20,13 @@ traceEx_va (
 	if (!(g_traceFilter & mask))
 		return;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	char buffer [512] = { 0 };
 	sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.format_va (formatString, va.m_va);
+	string.format_va (formatString, va);
 	::OutputDebugStringA (string);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-	vfprintf (g_traceFile, formatString, va.m_va);
+#elif (_AXL_OS_POSIX)
+	vfprintf (g_traceFile, formatString, va);
 	fflush (g_traceFile);
 #endif
 }

@@ -6,8 +6,6 @@
 
 #define _AXL_WIN_SOCKET_H
 
-#include "axl_sl_Handle.h"
-#include "axl_err_Error.h"
 #include "axl_io_SockAddr.h"
 
 namespace axl {

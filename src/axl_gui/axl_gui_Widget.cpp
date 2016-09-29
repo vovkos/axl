@@ -96,7 +96,7 @@ WidgetDriver::processMsg (
 {
 	ASSERT (msg->m_msgCode < WidgetMsgCode__Count);
 
-	Widget* widget = AXL_CONTAINING_RECORD (this, Widget, m_widgetDriver);
+	Widget* widget = containerof (this, Widget, m_widgetDriver);
 	if (!m_msgMap)
 		m_msgMap = widget->getWidgetMsgMap ();
 

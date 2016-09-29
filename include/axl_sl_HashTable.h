@@ -283,7 +283,7 @@ public:
 		m_list.insertTail (entry);
 		bucket->insertTail (entry);
 
-	#if (_AXL_PTR_BITNESS == 64)
+	#if (AXL_PTR_BITS == 64)
 		size_t loadFactor = getCount () * 100 / bucketCount;
 	#else
 		size_t loadFactor = (size_t) ((uint64_t) getCount () * 100 / bucketCount);

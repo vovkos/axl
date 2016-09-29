@@ -6,8 +6,8 @@
 
 #define _AXL_GUI_QTWIDGET_H
 
-#include "axl_gui_Widget.h"
 #include "axl_gui_QtEngine.h"
+#include "axl_gui_Widget.h"
 
 namespace axl {
 namespace gui {

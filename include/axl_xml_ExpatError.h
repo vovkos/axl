@@ -6,9 +6,7 @@
 
 #define _AXL_XML_ERROR_H
 
-#include "axl_err_Error.h"
-#include "axl_err_ErrorMgr.h"
-#include "axl_sl_String.h"
+#include "axl_xml_Pch.h"
 
 namespace axl {
 namespace xml {

@@ -7,7 +7,6 @@
 #define _AXL_PSX_SOCKET_H
 
 #include "axl_io_psx_Fd.h"
-#include "axl_err_Error.h"
 #include "axl_io_SockAddr.h"
 
 namespace axl {

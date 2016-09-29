@@ -26,7 +26,7 @@ Mapping::open (
 
 	void* p;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	uint_t protection = (flags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 	uint_t access = (flags & FileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
@@ -40,7 +40,7 @@ Mapping::open (
 		m_mapping.close ();
 		return NULL;
 	}
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	int protection = (flags & FileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
 	p = m_mapping.map (NULL, size, protection, MAP_SHARED, file->m_file, offset);
@@ -66,7 +66,7 @@ Mapping::open (
 
 	void* p;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	uint_t protection = (flags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 	uint_t access = (flags & FileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
@@ -85,7 +85,7 @@ Mapping::open (
 		m_mapping.close ();
 		return NULL;
 	}
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	int shmFlags = (flags & FileFlag_ReadOnly) ? O_RDONLY : O_RDWR;
 	int protection = (flags & FileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
@@ -122,10 +122,10 @@ Mapping::close ()
 	if (!isOpen ())
 		return;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	m_mapping.close ();
 	m_view.close ();
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	m_sharedMemory.close ();
 	m_mapping.close ();
 

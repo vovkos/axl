@@ -118,7 +118,7 @@ Pcap::write (
 	size_t size
 	)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	int result = pcap_sendpacket (m_h, (const u_char*) p, (int) size);
 #else
 	int result = pcap_inject (m_h, p, (int) size);

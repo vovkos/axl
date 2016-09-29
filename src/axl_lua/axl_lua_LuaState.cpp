@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_lua_LuaState.h"
-#include "axl_dbg_Trace.h"
 
 namespace axl {
 namespace lua {
@@ -45,7 +44,7 @@ LuaState::load (
 	ASSERT (isOpen ());
 
 	if (length == -1)
-		length = axl_strlen (source);
+		length = strlen_s (source);
 
 	int result = luaL_loadbuffer (m_h, source, length, name);
 	return complete (result);

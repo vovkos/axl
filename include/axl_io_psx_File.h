@@ -7,7 +7,6 @@
 #define _AXL_IO_PSX_FILE_H
 
 #include "axl_io_psx_Fd.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace io {
@@ -24,7 +23,7 @@ public:
 	bool
 	setSize (uint64_t size)
 	{
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 		int result = ::ftruncate (m_h, size);
 #else
 		int result = ::ftruncate64 (m_h, size);
@@ -38,7 +37,7 @@ public:
 	bool
 	setPosition (uint64_t offset) const
 	{
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 		uint64_t actualOffset = ::lseek (m_h, offset, SEEK_SET);
 #else
 		uint64_t actualOffset = ::lseek64 (m_h, offset, SEEK_SET);

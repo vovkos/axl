@@ -11,7 +11,7 @@
 #include "axl_ref_Ptr.h"
 #include "axl_sl_Singleton.h"
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 #	define AXL_SYS_TLS_CALLBACK_SECTION ".CRT$XLD"
 #endif
 
@@ -32,10 +32,10 @@ protected:
 	};
 
 protected:
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	uint_t m_tlsIdx;
 	static bool m_isDead;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	pthread_key_t m_tlsKey;
 #endif
 
@@ -61,7 +61,7 @@ public:
 		const TlsValue& value
 		);
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	static
 	void
 	NTAPI
@@ -76,7 +76,7 @@ protected:
 	Page*
 	getCurrentThreadPage ();
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	Page*
 	findCurrentThreadPage ()
 	{
@@ -88,7 +88,7 @@ protected:
 	{
 		::TlsSetValue (m_tlsIdx, page);
 	}
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	Page*
 	findCurrentThreadPage ()
 	{

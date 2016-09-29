@@ -6,7 +6,7 @@
 
 #define _AXL_SL_GUID_H
 
-#include "axl_g_Def.h"
+#include "axl_g_Pch.h"
 
 namespace axl {
 namespace sl {
@@ -49,7 +49,7 @@ struct Guid
 			uint32_t m_long4;
 		};
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		GUID m_guid;
 #endif
 	};

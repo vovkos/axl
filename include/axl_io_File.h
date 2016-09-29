@@ -6,11 +6,12 @@
 
 #define _AXL_IO_FILE_H
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#include "axl_g_Pch.h"
+
+#if (_AXL_OS_WIN)
 #	include "axl_io_win_File.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_File.h"
-#	include "axl_sl_String.h"
 #endif
 
 namespace axl {
@@ -35,9 +36,9 @@ enum FileFlag
 class File
 {
 public:
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	typedef win::File FileImpl;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	typedef psx::File FileImpl;
 #endif
 	
@@ -149,7 +150,7 @@ public:
 
 class TemporaryFile: public File
 {
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 protected:
 	sl::String m_fileName;
 
@@ -161,7 +162,7 @@ public:
 #endif
 
 public:
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 	void 
 	close ();
 
@@ -184,7 +185,7 @@ public:
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 inline
 bool
@@ -205,7 +206,7 @@ deleteFile (const char* fileName)
 	return err::complete (result);
 }
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 inline
 bool

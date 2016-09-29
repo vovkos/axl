@@ -6,13 +6,12 @@
 
 #define _AXL_GUI_GDIENGINE_H
 
-#include "axl_gui_Engine.h"
 #include "axl_gui_GdiCanvas.h"
 #include "axl_gui_GdiCursor.h"
 #include "axl_gui_GdiFont.h"
 #include "axl_gui_GdiImage.h"
 #include "axl_gui_GdiWidget.h"
-#include "axl_sl_Singleton.h"
+#include "axl_gui_Engine.h"
 
 namespace axl {
 namespace gui {

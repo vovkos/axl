@@ -15,7 +15,42 @@
 #define _CRT_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" string functions
 #define _SCL_SECURE_NO_WARNINGS // disable useless warnings about "unsafe" iterators
 
-#include "axl_g_Pch.h"
+//.............................................................................
+
+// axl
+
+#include "axl_sl_Array.h"
+#include "axl_sl_HashTable.h"
+#include "axl_sl_BoxList.h"
+#include "axl_sl_Packer.h"
+#include "axl_sl_Unpacker.h"
+#include "axl_sl_HandleTable.h"
+#include "axl_sl_Packetizer.h"
+#include "axl_sl_StringHashTable.h"
+#include "axl_sl_ForEach.h"
+#include "axl_sl_CmdLineParser.h"
+#include "axl_sl_BoyerMooreFind.h"
+#include "axl_ref_WeakPtr.h"
+#include "axl_ref_Child.h"
+#include "axl_io_File.h"
+#include "axl_io_MappedFile.h"
+#include "axl_io_UsbDevice.h"
+#include "axl_lex_RagelLexer.h"
+#include "axl_lua_StringTemplate.h"
+#include "axl_gui_GdiEngine.h"
+#include "axl_ini_Parser.h"
+#include "axl_enc_Base32Encoding.h"
+#include "axl_sys_Time.h"
+#include "axl_cry_EcKey.h"
+#include "axl_cry_EcPoint.h"
+
+#if (_AXL_OS_WIN)
+#	include "axl_sys_win_Window.h"
+#endif
+
+using namespace axl;
+
+//.............................................................................
 
 #include <new>
 #include <typeinfo>
@@ -25,7 +60,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 #	include <tchar.h>
 #	include <winsock2.h>
 #	include <ws2ipdef.h>
@@ -39,75 +74,9 @@
 
 // atl
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 #	include <atlbase.h>
 #	include <atlwin.h>
 #endif
-
-//.............................................................................
-
-// LUA
-
-extern "C" {
-
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-
-} // extern "C" {
-
-//.............................................................................
-
-// libusb
-
-#pragma warning (disable: 4200)
-#include <libusb.h>
-
-//.............................................................................
-
-// openssl 
-
-#include <openssl/ec.h>
-#include <openssl/obj_mac.h>
-#include <openssl/err.h>
-#include <openssl/md5.h>
-#include <openssl/ecdsa.h>
-
-//.............................................................................
-
-// axl
-
-#define _AXL_DISABLE_PREMATURE_WINDOW_DESTRUCTION_CHECK
-
-#include <axl_sl_Array.h>
-#include <axl_sl_HashTable.h>
-#include <axl_sl_BoxList.h>
-#include <axl_sl_Packer.h>
-#include <axl_sl_Unpacker.h>
-#include <axl_sl_HandleTable.h>
-#include <axl_sl_Packetizer.h>
-#include <axl_sl_StringHashTable.h>
-#include <axl_sl_ForEach.h>
-#include <axl_sl_CmdLineParser.h>
-#include <axl_sl_BoyerMooreFind.h>
-#include <axl_ref_WeakPtr.h>
-#include <axl_ref_Child.h>
-#include <axl_io_File.h>
-#include <axl_io_MappedFile.h>
-#include <axl_io_UsbDevice.h>
-#include <axl_lex_RagelLexer.h>
-#include <axl_lua_StringTemplate.h>
-#include <axl_gui_GdiEngine.h>
-#include <axl_ini_Parser.h>
-#include <axl_enc_Base32Encoding.h>
-#include <axl_sys_Time.h>
-#include <axl_cry_EcKey.h>
-#include <axl_cry_EcPoint.h>
-
-#if (_AXL_ENV == AXL_ENV_WIN)
-#	include <axl_g_win_Window.h>
-#endif
-
-using namespace axl;
 
 //.............................................................................

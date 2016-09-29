@@ -8,7 +8,7 @@ namespace io {
 
 //.............................................................................
 
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 char*
 get_current_dir_name ()
 {
@@ -34,11 +34,11 @@ get_current_dir_name ()
 sl::String 
 getTempDir ()
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	wchar_t dir [1024] = { 0 };
 	::GetTempPathW (countof (dir) - 1, dir);
 	return dir;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	return "/tmp";
 #endif
 }
@@ -46,11 +46,11 @@ getTempDir ()
 sl::String
 getCurrentDir ()
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	wchar_t dir [1024] = { 0 };
 	::GetCurrentDirectoryW (countof (dir) - 1, dir);
 	return dir;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	char* p = get_current_dir_name ();
 	sl::String dir = p;
 	free (p);
@@ -63,12 +63,12 @@ getExeFilePath ()
 {
 	char buffer [1024] = { 0 };
 	
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	::GetModuleFileNameA (::GetModuleHandle (NULL), buffer, countof (buffer) - 1);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-#	if (_AXL_POSIX == AXL_POSIX_LINUX)
+#elif (_AXL_OS_POSIX)
+#	if (_AXL_OS_LINUX)
 	readlink ("/proc/self/exe", buffer, countof (buffer) - 1);
-#	elif (_AXL_POSIX == AXL_POSIX_DARWIN)
+#	elif (_AXL_OS_DARWIN)
 	uint32_t size = sizeof (buffer);
 	_NSGetExecutablePath (buffer, &size);
 #	else
@@ -88,18 +88,18 @@ getExeDir ()
 bool
 doesFileExist (const char* fileName)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	char buffer [256];
 	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 	dword_t attributes = ::GetFileAttributesW (fileName_w);
 	return attributes != INVALID_FILE_ATTRIBUTES;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	return access (fileName, F_OK) != -1;
 #endif
 }
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 bool
 isDir (const wchar_t* fileName)
 {
@@ -158,7 +158,7 @@ ensureDirExists (const char* fileName)
 	return true;
 }
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 bool
 isDir (const char* fileName)
@@ -210,7 +210,7 @@ ensureDirExists (const char* fileName)
 sl::String
 getFullFilePath (const char* fileName)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	char buffer [256];
 	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
@@ -223,7 +223,7 @@ getFullFilePath (const char* fileName)
 	wchar_t* p = filePath.createBuffer (length);
 	::GetFullPathNameW (fileName_w, length, p, NULL);
 	return filePath;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	char fullPath [PATH_MAX] = { 0 };
 	realpath (fileName, fullPath);
 	return fullPath;
@@ -233,7 +233,7 @@ getFullFilePath (const char* fileName)
 sl::String
 getDir (const char* filePath)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	char buffer [256];
 	sl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	filePath_w = filePath;
@@ -253,7 +253,7 @@ getDir (const char* filePath)
 	string.append (dir);
 	return string;
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	const char* p = strrchr (filePath, '/');
 	return sl::String (filePath, p ? p - filePath : -1);
 #endif
@@ -262,7 +262,7 @@ getDir (const char* filePath)
 sl::String
 getFileName (const char* filePath)
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	char buffer [256];
 	sl::String_w filePath_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	filePath_w = filePath;
@@ -281,7 +281,7 @@ getFileName (const char* filePath)
 	sl::String string = fileName;
 	string.append (extension);
 	return string;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	const char* p = strrchr (filePath, '/');
 	return p ? p + 1 : filePath;
 #endif
@@ -308,10 +308,10 @@ concatFilePath (
 
 	char last = (*filePath) [filePath->getLength () - 1];
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	if (last != '\\' && last != '/')
 		filePath->append ('\\');
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	if (last != '/')
 		filePath->append ('/');
 #endif

@@ -281,7 +281,7 @@ public:
 			Def_BadSkipTableSize, 
 			enc::CharCodecKind_Utf8, 
 			p, 
-			length != -1 ? length : axl_strlen (p),
+			length != -1 ? length : strlen_s (p),
 			flags
 			);
 	}
@@ -309,7 +309,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return find (enc::CharCodecKind_Utf8, p, length != -1 ? length : axl_strlen (p));
+		return find (enc::CharCodecKind_Utf8, p, length != -1 ? length : strlen_s (p));
 	}
 
 	size_t 
@@ -341,7 +341,7 @@ public:
 		size_t length = -1
 		)
 	{
-		return find (incrementalContext, enc::CharCodecKind_Utf8, offset, p, length != -1 ? length : axl_strlen (p));
+		return find (incrementalContext, enc::CharCodecKind_Utf8, offset, p, length != -1 ? length : strlen_s (p));
 	}
 
 protected:

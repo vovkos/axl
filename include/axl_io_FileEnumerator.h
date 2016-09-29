@@ -6,15 +6,14 @@
 
 #define _AXL_IO_FILEENUMERATOR_H
 
-#include "axl_sl_Handle.h"
-#include "axl_sl_String.h"
+#include "axl_io_Pch.h"
 
 namespace axl {
 namespace io {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 class CloseFileEnumeratorHandle
 {
@@ -28,7 +27,7 @@ public:
 
 typedef sl::Handle <HANDLE, CloseFileEnumeratorHandle, sl::MinusOne <HANDLE> > FileEnumeratorHandle;
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 class CloseFileEnumeratorHandle
 {

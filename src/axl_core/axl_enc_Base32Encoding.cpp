@@ -168,7 +168,7 @@ Base32Encoding::decode (
 	)
 {
 	if (length == -1)
-		length = axl_strlen (p);
+		length = strlen_s (p);
 
 	size_t sizeGuess = (length * 5) / 8;
 	buffer->reserve (sizeGuess);

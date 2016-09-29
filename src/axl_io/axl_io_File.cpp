@@ -8,7 +8,7 @@ namespace io {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 bool
 File::open (
@@ -59,7 +59,7 @@ File::open (
 	return true;
 }
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 bool
 File::open (
@@ -96,7 +96,7 @@ File::open (
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 
 void 
 TemporaryFile::close ()
@@ -156,7 +156,7 @@ copyFile (
 
 	uint64_t offset = 0;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	win::Mapping srcMapping;
 	win::Mapping dstMapping;
 	win::MappedView srcView;

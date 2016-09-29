@@ -3,7 +3,7 @@
 #include "axl_sys_Thread.h"
 #include "axl_err_Errno.h"
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 #include "axl_err_NtError.h"
 
@@ -176,7 +176,7 @@ initNtFunctions ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 void
 printAdapterAddress (const IP_ADDR_STRING* ipAddrString)
@@ -459,7 +459,7 @@ testParseFormatIp6 ()
 		ip [5] = rand () % 2 ? rand () : rand () % 2 ? 0xffff : 0;
 		ip [6] = rand () % 2 ? rand () : 0;
 		ip [7] = rand () % 2 ? rand () : 0;
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		addr.sin6_port = rand () % 2 ? rand () : 0;
 		addr.sin6_scope_id = rand () % 2 ? rand () : 0;
 #endif
@@ -470,9 +470,9 @@ testParseFormatIp6 ()
 		char addrString2 [1024] = { 0 };
 		dword_t size = sizeof (addrString2);
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		WSAAddressToStringA ((sockaddr*) &addr, sizeof (addr), NULL, addrString2, &size);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 		inet_ntop (AF_INET6, &addr.sin6_addr, addrString2, size);
 #endif
 
@@ -664,7 +664,7 @@ testRegExp ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 //.............................................................................
 
@@ -828,7 +828,7 @@ enumerateDirectory (
 
 	UNICODE_STRING uniName;
 	uniName.Buffer = (wchar_t*) name;
-	uniName.Length = axl_wcslen (name) * sizeof (wchar_t);
+	uniName.Length = wcslen_s (name) * sizeof (wchar_t);
 	uniName.MaximumLength = uniName.Length + sizeof (wchar_t);
 	
 	OBJECT_ATTRIBUTES oa = { 0 };
@@ -924,7 +924,7 @@ testDirectoryObjects ()
 void
 testTcp ()
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	SOCKET s = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
 #else
 	int s = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -961,9 +961,9 @@ testTcp ()
 	printf ("result = %d\n", result);
 
 	printf ("closing...\n");
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	closesocket (s);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	close (s);
 #endif
 
@@ -972,7 +972,7 @@ testTcp ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 void
 printWinErrorDescription (
@@ -1196,7 +1196,7 @@ testUsb ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 
 class MyThread: public sys::ThreadImpl <MyThread>
 {
@@ -1364,7 +1364,7 @@ class Gc;
 
 Gc* g_gc = NULL;
 
-#if (_AXL_ENV == AXL_ENV_POSIX)
+#if (_AXL_OS_POSIX)
 class Gc
 {
 protected:
@@ -1384,7 +1384,7 @@ protected:
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
 
-#if (_AXL_POSIX == AXL_POSIX_DARWIN)
+#if (_AXL_OS_DARWIN)
 	sys::drw::Semaphore m_handshakeSem;
 #else
 	sys::psx::Sem m_handshakeSem;
@@ -1511,7 +1511,7 @@ protected:
 #define GC_BEGIN()
 #define GC_END()
 
-#elif (_AXL_ENV == AXL_ENV_WIN)
+#elif (_AXL_OS_WIN)
 
 class Gc
 {
@@ -1773,7 +1773,7 @@ testTimestamps ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 void
 testProcess ()
 {
@@ -2280,7 +2280,7 @@ testNetBios ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 BOOL WriteSlot(HANDLE hSlot, const char* lpszMessage)
 {
@@ -2506,7 +2506,23 @@ testStringCase ()
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+void foo_va (char const* format, va_list va)
+{
+	vprintf (format, va);
+}
+
+void foo (char const* format, ...)
+{
+	AXL_VA_DECL (va, format);
+	foo_va (format, va);
+}
+
+void testVarArg ()
+{
+	foo ("hui %d govno %d i muravei %d\n", 10, 20, 30);
+};
+
+#if (_AXL_OS_WIN)
 int
 wmain (
 	int argc,
@@ -2520,12 +2536,12 @@ main (
 	)
 #endif
 {
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testStringCase ();
+	testVarArg ();
 
 	return 0;
 }

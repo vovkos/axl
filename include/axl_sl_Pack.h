@@ -29,7 +29,7 @@ public:
 		*size = sizeof (T);
 
 		if (p)
-			*(T*) p = AXL_VA_ARG (va, T);
+			*(T*) p = va.arg <T> ();
 
 		return va;
 	}
@@ -51,7 +51,7 @@ public:
 		*size = sizeof (T);
 
 		if (p)
-			*(T*) p = (T) AXL_VA_ARG (va, int);
+			*(T*) p = (T) va.arg <int> ();
 
 		return va;
 	}
@@ -104,7 +104,7 @@ public:
 		axl_va_list va
 		)
 	{
-		T* string = AXL_VA_ARG (va, T*);
+		T* string = va.arg <T*> ();
 
 		size_t length = StringDetailsBase <T>::calcLength (string);
 		size_t stringSize = (length + 1) * sizeof (T);
@@ -168,7 +168,7 @@ public:
 		axl_va_list va
 		)
 	{
-		T* obj = AXL_VA_ARG (va, T*);
+		T* obj = va.arg <T*> ();
 
 		*size = sizeof (T);
 
@@ -202,7 +202,7 @@ public:
 		axl_va_list va
 		)
 	{
-		T* obj = AXL_VA_ARG (va, T*);
+		T* obj = va.arg <T*> ();
 
 		size_t objSize = obj ? SizeOf () (obj) : sizeof (T);
 
@@ -267,7 +267,7 @@ class Pack <const err::ErrorHdr*>: public PackSelfSizedPtr <
 
 //.............................................................................
 
-// pack object referenced by (void* p, size_t Size) pair
+// pack object referenced by (void* p, size_t size) pair
 
 class PackPtrSize
 {
@@ -279,8 +279,8 @@ public:
 		axl_va_list va
 		)
 	{
-		void* obj = AXL_VA_ARG (va, void*);
-		size_t objSize = AXL_VA_ARG (va, size_t);
+		void* obj = va.arg <void*> ();
+		size_t objSize = va.arg <size_t> ();
 	
 		*size = objSize;
 

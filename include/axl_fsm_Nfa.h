@@ -6,10 +6,7 @@
 
 #define _AXL_FSM_NFA_H
 
-#include "axl_sl_List.h"
-#include "axl_sl_Array.h"
-#include "axl_sl_BitMap.h"
-#include "axl_sl_HashTable.h"
+#include "axl_fsm_Pch.h"
 
 namespace axl {
 namespace fsm {

@@ -6,8 +6,8 @@
 
 #define _AXL_GUI_GDIWIDGET_H
 
+#include "axl_gui_GdiPch.h"
 #include "axl_gui_Widget.h"
-#include "axl_g_win_Window.h"
 
 namespace axl {
 namespace gui {

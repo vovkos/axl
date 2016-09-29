@@ -124,10 +124,18 @@ endif ()
 set (PCH_H   pch.h)
 set (PCH_CPP pch.cpp)
 
+set (
+	PCH_H_LIST
+	${PCH_H}
+	${AXL_INC_DIR}/axl_gui_Pch.h
+	${AXL_INC_DIR}/axl_gui_GdiPch.h
+	${AXL_INC_DIR}/axl_gui_QtPch.h
+	)
+
 source_group (
 	pch
 	FILES
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	)
 
@@ -145,7 +153,7 @@ endif ()
 
 add_library (
 	axl_gui
-	${PCH_H}
+	${PCH_H_LIST}
 	${PCH_CPP}
 	${GUI_H_LIST}
 	${GUI_CPP_LIST}

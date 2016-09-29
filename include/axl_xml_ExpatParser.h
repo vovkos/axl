@@ -6,7 +6,6 @@
 
 #define _AXL_XML_EXPAT_PARSER_H
 
-#include "axl_sl_Handle.h"
 #include "axl_xml_ExpatError.h"
 
 namespace axl {

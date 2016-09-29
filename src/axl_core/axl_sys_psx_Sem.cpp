@@ -8,7 +8,7 @@ namespace psx {
 
 //.............................................................................
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 
 bool
 Sem::wait (uint_t timeout)
@@ -62,7 +62,7 @@ NamedSem::close ()
 	m_sem = NULL;
 }
 
-#if (_AXL_POSIX != AXL_POSIX_DARWIN)
+#if (!_AXL_OS_DARWIN)
 bool
 NamedSem::wait (uint_t timeout)
 {

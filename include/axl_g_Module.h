@@ -50,7 +50,7 @@ protected:
 	const char* m_tag;
 #endif
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	HMODULE m_hModule;
 #endif
 	
@@ -68,7 +68,7 @@ public:
 
 	~Module ();
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	HMODULE 
 	getModuleHandle ()
 	{

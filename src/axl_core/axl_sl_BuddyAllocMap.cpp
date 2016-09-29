@@ -50,8 +50,8 @@ BuddyAllocMap::Level::setBit (
 {
 	size_t mask;
 
-	page += bit / _AXL_PTR_BITNESS;
-	bit &= _AXL_PTR_BITNESS - 1;
+	page += bit / AXL_PTR_BITS;
+	bit &= AXL_PTR_BITS - 1;
 	mask = (size_t) 1 << bit;
 
 	if (value)
@@ -74,16 +74,16 @@ BuddyAllocMap::Level::setBitRange (
 	bool value
 	)
 {
-	size_t pageIdx = from / _AXL_PTR_BITNESS;
+	size_t pageIdx = from / AXL_PTR_BITS;
 	size_t mask;
 
 	page += pageIdx;
-	from -= pageIdx * _AXL_PTR_BITNESS;
-	to -= pageIdx * _AXL_PTR_BITNESS;
+	from -= pageIdx * AXL_PTR_BITS;
+	to -= pageIdx * AXL_PTR_BITS;
 
 	if (value)
 	{
-		if (to < _AXL_PTR_BITNESS)
+		if (to < AXL_PTR_BITS)
 		{
 			mask = getBitmask (from, to);
 			// ASSERT ((pPage->m_Map & Mask) == 0);
@@ -95,14 +95,14 @@ BuddyAllocMap::Level::setBitRange (
 		// ASSERT ((pPage->m_Map & Mask) == 0);
 		setPageMap (page, page->m_map | mask);
 
-		to -= _AXL_PTR_BITNESS;
+		to -= AXL_PTR_BITS;
 		page++;
 
-		while (to >= _AXL_PTR_BITNESS)
+		while (to >= AXL_PTR_BITS)
 		{
 			// ASSERT (pPage->m_Map == 0);
 			page->m_map = -1;
-			to -= _AXL_PTR_BITNESS;
+			to -= AXL_PTR_BITS;
 			page++;
 		}
 
@@ -115,7 +115,7 @@ BuddyAllocMap::Level::setBitRange (
 	}
 	else
 	{
-		if (to < _AXL_PTR_BITNESS)
+		if (to < AXL_PTR_BITS)
 		{
 			mask = getBitmask(from, to);
 			// ASSERT ((pPage->m_Map & Mask) == Mask);
@@ -127,14 +127,14 @@ BuddyAllocMap::Level::setBitRange (
 		// ASSERT ((pPage->m_Map & Mask) == Mask);
 		setPageMap (page, page->m_map & ~mask);
 
-		to -= _AXL_PTR_BITNESS;
+		to -= AXL_PTR_BITS;
 		page++;
 
-		while (to >= _AXL_PTR_BITNESS)
+		while (to >= AXL_PTR_BITS)
 		{
 			// ASSERT (pPage->m_Map == -1);
 			page->m_map = 0;
-			to -= _AXL_PTR_BITNESS;
+			to -= AXL_PTR_BITS;
 			page++;
 		}
 
@@ -200,7 +200,7 @@ BuddyAllocMap::create(
 
 	m_width = width;
 	m_height = height;
-	m_totalSize = pageCount * _AXL_PTR_BITNESS;
+	m_totalSize = pageCount * AXL_PTR_BITS;
 	m_freeSizeTop = m_totalSize;
 	m_freeSizeBottom = m_totalSize;
 	m_maxAllocSize = (size_t) 1 << (height - 1);
@@ -292,7 +292,7 @@ BuddyAllocMap::allocate (size_t size)
 
 	size_t pageIdx = page - level->getFirstPage ();
 
-	address = (pageIdx * _AXL_PTR_BITNESS + bitIdx) * bitSize;
+	address = (pageIdx * AXL_PTR_BITS + bitIdx) * bitSize;
 	addressEnd = address + size;
 
 	m_freeSizeBottom -= size;

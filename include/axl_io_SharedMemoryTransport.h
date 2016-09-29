@@ -7,14 +7,6 @@
 #define _AXL_IO_SHAREDMEMORYTRANSPORT_H
 
 #include "axl_io_Mapping.h"
-#include "axl_sys_Lock.h"
-#include "axl_sl_Array.h"
-
-#if (_AXL_ENV == AXL_ENV_WIN)
-#	include "axl_sys_win_Event.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
-#	include "axl_sys_psx_Sem.h"
-#endif
 
 namespace axl {
 namespace io {
@@ -78,10 +70,10 @@ protected:
 	char* m_data;
 	int32_t m_pendingReqCount;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	sys::win::Event m_readEvent;
 	sys::win::Event m_writeEvent;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	sys::psx::NamedSem m_readEvent;
 	sys::psx::NamedSem m_writeEvent;
 	sl::String m_readEventName;

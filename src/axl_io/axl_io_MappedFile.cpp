@@ -53,13 +53,13 @@ MappedViewMgr::view (
 	void* p;
 	size_t size = (size_t) (end - begin);
 	
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	uint_t access = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ? 
 		FILE_MAP_READ : 
 		FILE_MAP_READ | FILE_MAP_WRITE;	
 
 	p = viewEntry->m_view.view (m_mappedFile->m_mapping, access, begin, size);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	int protection = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ? 
 		PROT_READ : 
 		PROT_READ | PROT_WRITE;	
@@ -151,7 +151,7 @@ MappedFile::MappedFile ()
 	m_dynamicViewMgr.m_mappedFile = this;
 	m_permanentViewMgr.m_mappedFile = this;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	m_mappingSize = 0;
 #endif
 }
@@ -332,7 +332,7 @@ MappedFile::viewImpl (
 
 	// ensure mapping covers the view
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	if (!m_mapping.isOpen () || viewEnd > m_mappingSize)
 	{
 		uint_t protection = (m_fileFlags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
@@ -343,7 +343,7 @@ MappedFile::viewImpl (
 
 		m_mappingSize = viewEnd;
 	}
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	if (viewEnd > m_file.getSize ())
 	{
 		result = m_file.setSize (viewEnd);
@@ -378,7 +378,7 @@ MappedFile::unmapAllViews ()
 	m_permanentViewMgr.clear ();
 	m_dynamicViewMgr.clear ();
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	m_mapping.close ();
 	m_mappingSize = 0;
 #endif

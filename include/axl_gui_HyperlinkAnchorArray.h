@@ -6,9 +6,7 @@
 
 #define _AXL_GUI_HYPERLINKANCHORARRAY_H
 
-#include "axl_sl_String.h"
-#include "axl_sl_Array.h"
-#include "axl_sl_List.h"
+#include "axl_gui_Def.h"
 
 namespace axl {
 namespace gui {

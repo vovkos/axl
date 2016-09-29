@@ -150,8 +150,8 @@ protected:
 		size_t bit
 		)
 	{
-		size_t pageIdx = bit / _AXL_PTR_BITNESS;
-		size_t mask = (size_t) 1 << (bit & (_AXL_PTR_BITNESS - 1));
+		size_t pageIdx = bit / AXL_PTR_BITS;
+		size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
 		return (page [pageIdx].m_map & mask) != 0;
 	}
 };

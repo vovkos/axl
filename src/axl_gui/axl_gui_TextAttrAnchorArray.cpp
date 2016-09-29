@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_gui_TextAttrAnchorArray.h"
-#include "axl_dbg_Trace.h"
 
 namespace axl {
 namespace gui {

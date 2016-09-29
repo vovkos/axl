@@ -8,8 +8,6 @@
 
 #include "axl_gui_Canvas.h"
 #include "axl_gui_TextAttrAnchorArray.h"
-#include "axl_sl_String.h"
-#include "axl_enc_CharCodec.h"
 
 namespace axl {
 namespace gui {

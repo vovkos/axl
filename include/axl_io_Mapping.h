@@ -8,11 +8,10 @@
 
 #include "axl_io_File.h"
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 #	include "axl_io_win_Mapping.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
-#	include "axl_sl_String.h"
 #endif
 
 namespace axl {
@@ -26,10 +25,10 @@ protected:
 	void* m_p;
 	size_t m_size;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	win::Mapping m_mapping;
 	win::MappedView m_view;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	psx::Mapping m_mapping;
 	psx::SharedMemory m_sharedMemory;
 	sl::String m_sharedMemoryName;

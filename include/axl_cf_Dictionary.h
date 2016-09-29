@@ -7,8 +7,6 @@
 #define _AXL_CF_DICTIONARY_H
 
 #include "axl_cf_Type.h"
-#include "axl_err_Error.h"
-#include "axl_sl_Array.h"
 
 namespace axl {
 namespace cf {

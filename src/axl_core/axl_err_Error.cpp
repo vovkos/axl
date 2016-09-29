@@ -139,7 +139,7 @@ Error::createStringError (
 	)
 {
 	if (length == -1)
-		length = axl_strlen (p);
+		length = strlen_s (p);
 
 	size_t size = sizeof (ErrorHdr) + length + 1;
 

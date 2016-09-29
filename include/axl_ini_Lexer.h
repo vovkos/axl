@@ -6,9 +6,7 @@
 
 #define _AXL_INI_LEXER_H
 
-#include "axl_lex_Token.h"
-#include "axl_lex_ParseError.h"
-#include "axl_enc_EscapeEncoding.h"
+#include "axl_ini_Pch.h"
 
 namespace axl {
 namespace ini {

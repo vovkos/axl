@@ -24,7 +24,7 @@ Module::Module ()
 #	endif
 #endif
 
-#if (_AXL_ENV == AXL_ENV_WIN)	
+#if (_AXL_OS_WIN)	
 	m_hModule = ::GetModuleHandle (NULL);
 
 	SYSTEM_INFO systemInfo;
@@ -35,7 +35,7 @@ Module::Module ()
 
 	sys::initQpc ();
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 	m_systemInfo.m_processorCount     = sysconf (_SC_NPROCESSORS_ONLN);
 	m_systemInfo.m_pageSize           = sysconf (_SC_PAGE_SIZE);

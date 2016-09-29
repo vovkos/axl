@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "axl_st_LuaStringTemplate.h"
 #include "axl_st_StringTemplateLexer.h"
-#include "axl_io_MappedFile.h"
 
 namespace axl {
 namespace st {

@@ -6,8 +6,6 @@
 
 #define _AXL_IO_MAPPEDFILE_H
 
-#include "axl_sl_List.h"
-#include "axl_sl_RbTree.h"
 #include "axl_io_File.h"
 #include "axl_io_Mapping.h"
 
@@ -32,9 +30,9 @@ protected:
 
 	struct ViewEntry: sl::ListLink 
 	{
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		win::MappedView m_view;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 		psx::Mapping m_view;
 #endif
 		uint64_t m_begin;
@@ -95,7 +93,7 @@ public:
 protected:
 	File m_file;
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	win::Mapping m_mapping;
 	uint64_t m_mappingSize;
 #endif

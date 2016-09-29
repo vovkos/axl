@@ -28,7 +28,7 @@ Sid::create_va (
 	dword_t* subAuthorityTable = ::GetSidSubAuthority (sid, 0);
 
 	for (size_t i = 0; i < subAuthorityCount; i++)
-		subAuthorityTable [i] = AXL_VA_ARG (va, dword_t);
+		subAuthorityTable [i] = va.arg <dword_t> ();
 
 	return true;
 }

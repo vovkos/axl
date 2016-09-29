@@ -142,7 +142,7 @@ HexEncoding::decode (
 	State state = State_Normal;
 
 	if (length == -1)
-		length = axl_strlen (p);
+		length = strlen_s (p);
 
 	buffer->clear ();
 	buffer->reserve (length / 2);

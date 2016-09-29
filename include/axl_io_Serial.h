@@ -6,14 +6,13 @@
 
 #define _AXL_IO_SERIAL_H
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#include "axl_g_Pch.h"
+
+#if (_AXL_OS_WIN)
 #	include "axl_io_win_Serial.h"
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Serial.h"
 #endif
-
-#include "axl_sl_BoxList.h"
-#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -124,9 +123,9 @@ struct SerialSettings
 class Serial
 {
 public:
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	win::Serial m_serial;
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	psx::Serial m_serial;
 #endif
 
@@ -140,7 +139,7 @@ public:
 	bool
 	open (const char* name)
 	{
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 		return m_serial.open (name, FILE_FLAG_OVERLAPPED);
 #else
 		return m_serial.open (name);
@@ -177,7 +176,7 @@ public:
 	uint_t
 	getStatusLines ();
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 	size_t
 	read (
 		void* p,
@@ -189,7 +188,7 @@ public:
 		const void* p,
 		size_t size
 		);
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 	size_t
 	read (
 		void* p,

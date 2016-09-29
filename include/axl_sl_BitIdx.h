@@ -6,7 +6,7 @@
 
 #define _AXL_SL_BITIDX_H
 
-#include "axl_g_Def.h"
+#include "axl_g_Pch.h"
 
 namespace axl {
 namespace sl {
@@ -101,7 +101,7 @@ getHiBitIdx64 (uint64_t x)
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#if (_AXL_PTR_BITNESS == 64)
+#if (AXL_PTR_BITS == 64)
 
 #define getLoBitIdx  getLoBitIdx64
 #define getHiBitIdx  getHiBitIdx64
@@ -221,7 +221,7 @@ getBitmask64 (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#if (_AXL_PTR_BITNESS == 64)
+#if (AXL_PTR_BITS == 64)
 
 #define getBitmask   getBitmask64
 #define getLoBitmask getLoBitmask64

@@ -1,20 +1,14 @@
 #pragma once
 
-#include "axl_g_Pch.h"
-#include "axl_dbg_Trace.h"
+#include "axl_gui_Pch.h"
+
+#ifdef _AXL_GUI_GDI
+#	include "axl_gui_GdiPch.h"
+#endif
 
 #ifdef _AXL_GUI_QT
-#	include <QAbstractScrollArea>
-#	include <QApplication>
-#	include <QClipboard>
-#	include <QFont>
-#	include <QIcon>
-#	include <QImage>
-#	include <QMouseEvent>
-#	include <QMimeData>
-#	include <QPainter>
-#	include <QPixmap>
-#	include <QScrollBar>
-#	include <QWidget>
-#	include <QTimer>
+#	include "axl_gui_QtPch.h"
 #endif
+
+#include "axl_dbg_Trace.h"
+

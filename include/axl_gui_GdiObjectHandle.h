@@ -6,7 +6,7 @@
 
 #define _AXL_GUI_GDIOBJECTHANDLE_H
 
-#include "axl_sl_Handle.h"
+#include "axl_gui_GdiPch.h"
 
 namespace axl {
 namespace gui {

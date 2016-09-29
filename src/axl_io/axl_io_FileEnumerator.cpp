@@ -6,7 +6,7 @@ namespace io {
 
 //.............................................................................
 
-#if (_AXL_ENV == AXL_ENV_WIN)
+#if (_AXL_OS_WIN)
 
 bool
 FileEnumerator::openDir (const char* dir)
@@ -44,7 +44,7 @@ FileEnumerator::getNextFileName ()
 	return fileName;
 }
 
-#elif (_AXL_ENV == AXL_ENV_POSIX)
+#elif (_AXL_OS_POSIX)
 
 bool
 FileEnumerator::openDir (const char* dir)

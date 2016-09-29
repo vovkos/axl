@@ -6,8 +6,8 @@
 
 #define _AXL_GUI_GDICANVAS_H
 
+#include "axl_gui_GdiPch.h"
 #include "axl_gui_Canvas.h"
-#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace gui {
