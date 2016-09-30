@@ -80,7 +80,7 @@
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// detect OS 
+// detect OS
 
 #ifdef _WIN32
 #	define _AXL_OS_WIN 1
@@ -114,7 +114,7 @@
 #	ifdef _DEBUG
 #		define _AXL_DEBUG 1
 #	endif
-#else 
+#else
 #	ifndef NDEBUG
 #		define _AXL_DEBUG 1
 #	endif
@@ -215,7 +215,7 @@
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// common type aliases 
+// common type aliases
 
 // stdint.h already defines:
 //   int8_t
@@ -311,17 +311,17 @@ typedef wchar_t           utf32_t;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// NULL-checked strlen/wcslen 
+// NULL-checked strlen/wcslen
 
 inline
-size_t 
+size_t
 strlen_s (const char* p)
 {
 	return p ? strlen (p) : 0;
 }
 
 inline
-size_t 
+size_t
 wcslen_s (const wchar_t* p)
 {
 	return p ? wcslen (p) : 0;
@@ -375,7 +375,7 @@ wcslen_s (const wchar_t* p)
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// min/max are WAY too conflict-prone, so we use non-conflicting versions 
+// min/max are WAY too conflict-prone, so we use non-conflicting versions
 // with 'AXL_' prefix
 
 #define AXL_MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -409,7 +409,7 @@ private: \
 
 // TODO reminders
 
-// usage: 
+// usage:
 //   AXL_TODO ("implement new feature")
 
 #define AXL_ITOA_IMPL(n) #n
@@ -491,7 +491,7 @@ public:
 		m_isInitialized = true;
 		return &m_va;
 	}
-	
+
 	void
 	end ()
 	{
@@ -532,7 +532,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// use axl_va_start/axl_va_arg and (optionally)axl_va_end just like you would 
+// use axl_va_start/axl_va_arg and (optionally) axl_va_end just like you would
 // use va_start/va_arg/va_end...
 
 #define axl_va_start(va, a) \

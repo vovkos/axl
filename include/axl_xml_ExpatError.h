@@ -76,7 +76,7 @@ inline
 err::Error
 setExpatError (XML_Error code)
 {
-	setError (ExpatError (code));
+	return setError (ExpatError (code));
 }
 
 //.............................................................................

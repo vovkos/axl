@@ -31,7 +31,7 @@ getStringFromCfString (CFStringRef cfString)
 		return sl::String ();
 
 	sl::String string;
-	char* p = string.getBuffer (bufferLength);
+	char* p = string.createBuffer (bufferLength);
 	if (p)
 		::CFStringGetBytes (
 			cfString,
