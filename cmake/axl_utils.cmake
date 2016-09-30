@@ -236,6 +236,22 @@ axl_create_c_cxx_flag_setting
 		endif ()
 	endforeach ()
 
+	# check if this is C-only or C++ only setting
+
+	string (REGEX MATCH "_C_" _MATCH "${_SETTING}")
+	if (NOT ${_MATCH} STREQUAL "")
+		set (_IS_C_ONLY TRUE)
+	else ()
+		set (_IS_C_ONLY FALSE)
+	endif ()
+
+	string (REGEX MATCH "_CPP_|_CXX_" _MATCH "${_SETTING}")
+	if (NOT ${_MATCH} STREQUAL "")
+		set (_IS_CPP_ONLY TRUE)
+	else ()
+		set (_IS_CPP_ONLY FALSE)
+	endif ()
+
 	# get current value of the setting in C/C++ flags
 
 	string (
@@ -272,14 +288,19 @@ axl_create_c_cxx_flag_setting
 		set (_FORCE)
 	endif ()
 
-	if ("${_DEFAULT_VALUE}" STREQUAL "")
+	if (NOT "${_DEFAULT_VALUE}" STREQUAL "")
 		set (
-			${_SETTING} ${_CURRENT_VALUE_CXX}
+			${_SETTING} ${_DEFAULT_VALUE}
+			CACHE STRING ${_DESCRIPTION} ${_FORCE}
+			)
+	elseif (_IS_C_ONLY)
+		set (
+			${_SETTING} ${_CURRENT_VALUE_C}
 			CACHE STRING ${_DESCRIPTION} ${_FORCE}
 			)
 	else ()
 		set (
-			${_SETTING} ${_DEFAULT_VALUE}
+			${_SETTING} ${_CURRENT_VALUE_CXX}
 			CACHE STRING ${_DESCRIPTION} ${_FORCE}
 			)
 	endif ()
@@ -313,41 +334,45 @@ axl_create_c_cxx_flag_setting
 
 	# apply setting to C/C++ flags
 
-	if ("${_CURRENT_VALUE_C}" STREQUAL "")
-		set (CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX} "${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}} ${${_SETTING}}")
-	else  ()
+	if (NOT _IS_CPP_ONLY)
+		if ("${_CURRENT_VALUE_C}" STREQUAL "")
+			set (CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX} "${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}} ${${_SETTING}}")
+		else  ()
+			string (
+				REGEX REPLACE
+				"${_REGEX}"
+				" ${${_SETTING}} "
+				CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
+				"${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}}"
+				)
+		endif ()
+
 		string (
-			REGEX REPLACE
-			"${_REGEX}"
-			" ${${_SETTING}} "
-			CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
+			STRIP
 			"${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}}"
+			CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
 			)
 	endif ()
 
-	if ("${_CURRENT_VALUE_CXX}" STREQUAL "")
-		set (CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX} "${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}} ${${_SETTING}}")
-	else  ()
+	if (NOT _IS_C_ONLY)
+		if ("${_CURRENT_VALUE_CXX}" STREQUAL "")
+			set (CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX} "${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}} ${${_SETTING}}")
+		else  ()
+			string (
+				REGEX REPLACE
+				"${_REGEX}"
+				" ${${_SETTING}} "
+				CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
+				"${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}}"
+				)
+		endif ()
+
 		string (
-			REGEX REPLACE
-			"${_REGEX}"
-			" ${${_SETTING}} "
-			CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
+			STRIP
 			"${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}}"
+			CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
 			)
 	endif ()
-
-	string (
-		STRIP
-		"${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}}"
-		CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
-		)
-
-	string (
-		STRIP
-		"${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}}"
-		CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
-		)
 endmacro ()
 
 #..............................................................................
