@@ -218,16 +218,16 @@
 // common type aliases 
 
 // stdint.h already defines:
-//     int8_t
-//     uint8_t
-//     int16_t
-//     uint16_t
-//     int32_t
-//     uint32_t
-//     int64_t
-//     uint64_t
-//     intptr_t
-//     uintptr_t
+//   int8_t
+//   uint8_t
+//   int16_t
+//   uint16_t
+//   int32_t
+//   uint32_t
+//   int64_t
+//   uint64_t
+//   intptr_t
+//   uintptr_t
 
 typedef int               bool_t;
 typedef unsigned int      uint_t;
@@ -407,32 +407,42 @@ private: \
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// source-position for TODO reminders
+// TODO reminders
 
 // usage: 
-//   #pragma message (AXL_SRC_POS "TODO: implement new feature")
-//   #pragma message (AXL_SRC_POS "FIXME: temp workaround")
+//   AXL_TODO ("implement new feature")
 
-#define AXL_LTOA2(l) #l
-#define AXL_LTOA(l)  AXL_LTOA2 (l)
-#define AXL_SRC_POS  __FILE__ "(" AXL_LTOA (__LINE__) "): "
+#define AXL_ITOA_IMPL(n) #n
+#define AXL_ITOA(n)  AXL_ITOA_IMPL (n)
+
+#if (_AXL_CPP_MSC)
+#	define AXL_SRC_POS  __FILE__ "(" AXL_ITOA (__LINE__) ")"
+#	define AXL_PRAGMA_IMPL(p) __pragma (#p)
+#	define AXL_TODO(s) AXL_PRAGMA_IMPL (message AXL_SRC_POS ": TODO: " s)
+#elif (_AXL_CPP_GCC)
+#	define AXL_SRC_POS  __FILE__ ":" AXL_ITOA (__LINE__)
+#	define AXL_PRAGMA_IMPL(p) _Pragma (#p)
+#	define AXL_TODO(s) AXL_PRAGMA_IMPL (message "TODO: " s)
+#endif
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // 5) convenient vararg facilities
 
-// this wrapper struct serves the following purposes:
+// this wrapper class serves the following purposes:
 //   * makes sure va_list isn't get modified if passed as an argument;
 //   * makes it possible to simply assign one to another.
 //   * ensures va_end is called at the end
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct axl_va_list
+class axl_va_list
 {
+protected:
 	va_list m_va;
 	bool m_isInitialized;
 
+public:
 	axl_va_list ()
 	{
 		m_isInitialized = false;
@@ -469,12 +479,19 @@ struct axl_va_list
 		return *this;
 	}
 
-	operator va_list ()
+	operator va_list& ()
 	{
 		ASSERT (m_isInitialized);
 		return m_va;
 	}
 
+	va_list*
+	initialize ()
+	{
+		m_isInitialized = true;
+		return &m_va;
+	}
+	
 	void
 	end ()
 	{
@@ -488,7 +505,7 @@ struct axl_va_list
 	void
 	copy (const axl_va_list& src)
 	{
-		copy (src.m_va);
+		copy ((va_list&) src.m_va);
 	}
 
 	void
@@ -515,14 +532,17 @@ struct axl_va_list
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// use axl_va_start/axl_va_arg just like you would use va_start/va_arg...
+// use axl_va_start/axl_va_arg and (optionally)axl_va_end just like you would 
+// use va_start/va_arg/va_end...
 
 #define axl_va_start(va, a) \
-	va_start ((va).m_va, a); \
-	(va).m_isInitialized = true;
+	va_start (*(va).initialize (), a)
 
 #define axl_va_arg(va, T) \
-	va_arg ((va).m_va, T)
+	((va).arg <T> ())
+
+#define axl_va_end(va) \
+	((va).end ())
 
 // ...or use this single-line macro and then iterate via va.arg <T> ()
 
