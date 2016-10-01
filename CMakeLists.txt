@@ -61,10 +61,6 @@ if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt")
 	add_subdirectory (test)
 endif ()
 
-if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/tools/CMakeLists.txt")
-	add_subdirectory (tools)
-endif ()
-
 if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/samples/CMakeLists.txt")
 	add_subdirectory (samples)
 endif ()
