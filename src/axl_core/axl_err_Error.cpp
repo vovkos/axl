@@ -45,7 +45,7 @@ Error::getDescription () const
 ErrorHdr*
 Error::copy (const ErrorHdr* src)
 {
-	ErrorHdr* error = getBuffer (src->m_size);
+	ErrorHdr* error = createBuffer (src->m_size);
 	if (!error)
 		return NULL;
 
@@ -70,7 +70,7 @@ Error::push (const ErrorHdr* error)
 
 	size_t size = sizeof (ErrorHdr) + error->m_size + baseSize;
 
-	getBuffer (size, true);
+	createBuffer (size, true);
 	if (!m_p)
 		return NULL;
 
@@ -94,7 +94,7 @@ Error::createSimpleError (
 	uint_t code
 	)
 {
-	getBuffer (sizeof (ErrorHdr));
+	createBuffer (sizeof (ErrorHdr));
 	if (!m_p)
 		return NULL;
 
@@ -120,7 +120,7 @@ Error::format_va (
 
 	size_t size = sizeof (ErrorHdr) + packSize;
 
-	getBuffer (size);
+	createBuffer (size);
 	if (!m_p)
 		return NULL;
 
@@ -143,7 +143,7 @@ Error::createStringError (
 
 	size_t size = sizeof (ErrorHdr) + length + 1;
 
-	ErrorHdr* error = getBuffer (size);
+	ErrorHdr* error = createBuffer (size);
 	if (!error)
 		return NULL;
 

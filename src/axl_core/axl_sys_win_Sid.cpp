@@ -17,7 +17,7 @@ Sid::create_va (
 	)
 {
 	size_t size = ::GetSidLengthRequired ((uchar_t) subAuthorityCount);
-	SID* sid = getBuffer (size, false);
+	SID* sid = createBuffer (size, false);
 	if (!sid)
 		return false;
 

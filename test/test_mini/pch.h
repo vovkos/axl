@@ -9,6 +9,7 @@
 #include "axl_fsm_RegExp.h"
 #include "axl_fsm_StdRegExpNameMgr.h"
 #include "axl_sl_AutoPtrArray.h"
+#include "axl_sl_CmdLineParser.h"
 #include "axl_sys_SjljTry.h"
 #include "axl_sys_DynamicLibrary.h"
 #include "axl_io_Socket.h"

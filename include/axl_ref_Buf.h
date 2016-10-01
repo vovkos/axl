@@ -160,6 +160,12 @@ public:
 		return *this;
 	}
 	
+	bool
+	isNull () const
+	{
+		return !m_p;
+	}
+
 	size_t
 	getSize () const
 	{
@@ -174,13 +180,6 @@ public:
 
 		getHdr ()->release ();
 		m_p = NULL;
-	}
-
-	T* 
-	create (size_t size = sizeof (T))
-	{
-		release ();
-		return allocateBuffer (size, NULL);
 	}
 
 	bool
@@ -207,22 +206,29 @@ public:
 	bool
 	copy (const T* src)
 	{
-		return m_p == src ? true : allocateBuffer (SizeOf () (src), src) != NULL;
+		return m_p == src ? true : prepareBuffer (SizeOf () (src), src) != NULL;
 	}
 
 	T* 
-	getBuffer ()
+	getBuffer (size_t* size = NULL)
 	{
-		return allocateBuffer (m_p ? SizeOf () (m_p) : sizeof (T), m_p);
+		T* p = prepareBuffer (m_p ? SizeOf () (m_p) : sizeof (T), m_p);
+		if (!p)
+			return NULL;
+
+		if (size)
+			*size = getHdr ()->m_bufferSize;
+
+		return p;
 	}
 
 	T* 
-	getBuffer (
+	createBuffer (
 		size_t size, 
 		bool saveContents = false
 		)
 	{
-		return allocateBuffer (size, saveContents ? m_p : NULL);
+		return prepareBuffer (size, saveContents ? m_p : NULL);
 	}
 
 	void
@@ -232,7 +238,7 @@ public:
 		size_t size
 		)
 	{
-		ASSERT (size >= sizeof (Hdr) + sizeof (T));
+		ASSERT (size >= MinBufSize);
 
 		Hdr* oldHdr = getHdr ();
 
@@ -263,7 +269,7 @@ protected:
 	}
 
 	T* 
-	allocateBuffer (
+	prepareBuffer (
 		size_t size,
 		const T* src
 		)

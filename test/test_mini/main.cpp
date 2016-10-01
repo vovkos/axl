@@ -2506,21 +2506,114 @@ testStringCase ()
 
 //.............................................................................
 
-void foo_va (char const* format, va_list va)
+enum CmdLineSwitchKind
 {
-	vprintf (format, va);
-}
+	CmdLineSwitchKind_Undefined = 0,
+	CmdLineSwitchKind_Help,
+	CmdLineSwitchKind_Version,
+	CmdLineSwitchKind_Verbose,
 
-void foo (char const* format, ...)
-{
-	AXL_VA_DECL (va, format);
-	foo_va (format, va);
-}
-
-void testVarArg ()
-{
-	foo ("hui %d govno %d i muravei %d\n", 10, 20, 30);
+	CmdLineSwitchKind_Add = sl::CmdLineSwitchFlag_HasValue,
+	CmdLineSwitchKind_Remove,
 };
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (CmdLineSwitchTable, CmdLineSwitchKind)
+	AXL_SL_CMD_LINE_SWITCH_2 (
+		CmdLineSwitchKind_Help,
+		"h", "help", NULL,
+		"Display this help"
+		)
+	AXL_SL_CMD_LINE_SWITCH_2 (
+		CmdLineSwitchKind_Version,
+		"v", "version", NULL,
+		"Display version"
+		)
+	AXL_SL_CMD_LINE_SWITCH_2 (
+		CmdLineSwitchKind_Verbose,
+		"z", "verbose", NULL,
+		"Verbose mode"
+		)
+	AXL_SL_CMD_LINE_SWITCH_2 (
+		CmdLineSwitchKind_Add,
+		"a", "add", "<item>",
+		"Add item <item>"
+		)
+	AXL_SL_CMD_LINE_SWITCH_2 (
+		CmdLineSwitchKind_Remove,
+		"r", "remove", "<item>",
+		"Remove item <item>"
+		)
+AXL_SL_END_CMD_LINE_SWITCH_TABLE ()
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CmdLineParser: public sl::CmdLineParser <CmdLineParser, CmdLineSwitchTable>
+{
+	friend class sl::CmdLineParser <CmdLineParser, CmdLineSwitchTable>;
+
+protected:
+	bool
+	onValue (const char* value)
+	{
+		printf ("onValue (%s)\n", value);
+		return true;
+	}
+
+	bool
+	onSwitch (
+		SwitchKind switchKind,
+		const char* value
+		)
+	{
+		switch (switchKind)
+		{
+		case CmdLineSwitchKind_Help:
+			printf ("CmdLineSwitchKind_Help\n");
+			break;
+
+		case CmdLineSwitchKind_Version:
+			printf ("CmdLineSwitchKind_Version\n");
+			break;
+
+		case CmdLineSwitchKind_Verbose:
+			printf ("CmdLineSwitchKind_Verbose\n");
+			break;
+
+		case CmdLineSwitchKind_Add:
+			printf ("CmdLineSwitchKind_Add (%s)\n", value);
+			break;
+
+		case CmdLineSwitchKind_Remove:
+			printf ("CmdLineSwitchKind_Remove (%s)\n", value);
+			break;
+
+		};
+
+		return true;
+	}
+};
+
+#if (_AXL_OS_WIN)
+void
+testCmdLine (
+	int argc,
+	wchar_t* argv []
+	)
+#else
+void
+testCmdLine (
+	int argc,
+	char* argv []
+	)
+#endif
+{
+	CmdLineParser parser;
+	parser.parse (argc, argv);
+}
+
+//.............................................................................
 
 #if (_AXL_OS_WIN)
 int
@@ -2541,7 +2634,7 @@ main (
 	WSAStartup (0x0202, &wsaData);	
 #endif
 
-	testVarArg ();
+	testCmdLine (argc, argv);
 
 	return 0;
 }

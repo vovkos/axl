@@ -325,7 +325,7 @@ public:
 		Pack () (NULL, &packSize, va);
 
 		size_t size = sizeof (ErrorHdr) + packSize;
-		getBuffer (size);
+		createBuffer (size);
 		if (!m_p)
 			return NULL;
 

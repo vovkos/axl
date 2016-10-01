@@ -39,7 +39,7 @@ NtErrorProvider::getErrorDescription (NTSTATUS status)
 ErrorHdr*
 NtError::create (NTSTATUS status)
 {
-	ErrorHdr* error = getBuffer (sizeof (ErrorHdr));
+	ErrorHdr* error = createBuffer (sizeof (ErrorHdr));
 	if (!error)
 		return NULL;
 

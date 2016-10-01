@@ -317,8 +317,9 @@ TextPainter::drawBinHex (
 
 		ASSERT (j < m_stringBuffer.getLength ());
 
-		m_stringBuffer.getBuffer () [i] = m_stringBuffer [j];
-		m_stringBuffer.getBuffer () [j] = ' ';
+		char* buffer = m_stringBuffer.getBuffer ();
+		buffer [i] = buffer [j];
+		buffer [j] = ' ';
 	}
 	
 	return drawText_utf8 (

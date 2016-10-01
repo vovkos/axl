@@ -38,7 +38,7 @@ WinErrorProvider::getErrorDescription (dword_t code)
 ErrorHdr*
 WinError::create (dword_t code)
 {
-	ErrorHdr* error = getBuffer (sizeof (ErrorHdr));
+	ErrorHdr* error = createBuffer (sizeof (ErrorHdr));
 	if (!error)
 		return NULL;
 
