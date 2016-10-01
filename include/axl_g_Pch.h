@@ -417,8 +417,7 @@ private: \
 
 #if (_AXL_CPP_MSC)
 #	define AXL_SRC_POS  __FILE__ "(" AXL_ITOA (__LINE__) ")"
-#	define AXL_PRAGMA_IMPL(p) __pragma (#p)
-#	define AXL_TODO(s) AXL_PRAGMA_IMPL (message AXL_SRC_POS ": TODO: " s)
+#	define AXL_TODO(s) __pragma (message (AXL_SRC_POS ": TODO: " s))
 #elif (_AXL_CPP_GCC)
 #	define AXL_SRC_POS  __FILE__ ":" AXL_ITOA (__LINE__)
 #	define AXL_PRAGMA_IMPL(p) _Pragma (#p)
