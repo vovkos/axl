@@ -19,7 +19,7 @@ DynamicLibrary::open (
 	m_h = ::dlopen (name, flags);
 	if (!m_h)
 	{
-		err::setStringError (dlerror ());
+		err::setError (dlerror ());
 		return false;
 	}
 
@@ -32,7 +32,7 @@ DynamicLibrary::getSymbol (const char* name)
 	void* p = ::dlsym (m_h, name);
 	if (!p)
 	{
-		err::setStringError (dlerror ());
+		err::setError (dlerror ());
 		return NULL;
 	}
 

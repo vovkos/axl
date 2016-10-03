@@ -437,7 +437,7 @@ RegExpCompiler::readEscapeSequence (uchar_t* c)
 	switch (*m_p)
 	{
 	case 0:
-		err::setStringError ("invalid escape sequence");
+		err::setError ("invalid escape sequence");
 		return false;
 
 	case '0': 
@@ -498,13 +498,13 @@ RegExpCompiler::readLiteral (sl::String* string)
 		switch (*p)
 		{
 		case 0:
-			err::setStringError ("unclosed literal");
+			err::setError ("unclosed literal");
 			return false;
 
 		case '\\':
 			if (!p [1])
 			{
-				err::setStringError ("invalid escape sequence");
+				err::setError ("invalid escape sequence");
 				return false;
 			}
 
@@ -540,7 +540,7 @@ RegExpCompiler::readHexLiteral (sl::String* string)
 		switch (*p)
 		{
 		case 0:
-			err::setStringError ("unclosed literal");
+			err::setError ("unclosed literal");
 			return false;
 
 		case '"':
@@ -706,7 +706,7 @@ RegExpCompiler::expectEof ()
 
 	if (!token.isSpecialChar (0))
 	{
-		err::setStringError ("invalid regexp syntax");
+		err::setError ("invalid regexp syntax");
 		return false;
 	}
 
@@ -895,7 +895,7 @@ RegExpCompiler::single ()
 			return any ();
 
 		default:
-			err::setStringError ("invalid regexp syntax");
+			err::setError ("invalid regexp syntax");
 			return NULL;
 		}
 
@@ -909,7 +909,7 @@ RegExpCompiler::single ()
 		return namedRegExp (token.m_string);
 
 	default:
-		err::setStringError ("invalid regexp syntax");
+		err::setError ("invalid regexp syntax");
 		return NULL;
 	}	
 }
@@ -979,7 +979,7 @@ RegExpCompiler::charClass ()
 	{
 		if (!*m_p)
 		{
-			err::setStringError ("invalid character class");
+			err::setError ("invalid character class");
 			return NULL;
 		}	
 		
@@ -998,7 +998,7 @@ RegExpCompiler::charClass ()
 
 	if (!count)
 	{
-		err::setStringError ("empty character class");
+		err::setError ("empty character class");
 		return NULL;
 	}	
 
@@ -1023,7 +1023,7 @@ RegExpCompiler::charClassItem (sl::BitMap* charSet)
 	switch (*m_p)
 	{
 	case 0:
-		err::setStringError ("invalid character class");
+		err::setError ("invalid character class");
 		return false;
 
 	case '\\':
@@ -1063,7 +1063,7 @@ RegExpCompiler::charClassItem (sl::BitMap* charSet)
 	switch (*m_p)
 	{
 	case 0:
-		err::setStringError ("invalid char class");
+		err::setError ("invalid char class");
 		return false;
 
 	case '\\':

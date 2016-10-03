@@ -33,7 +33,7 @@ public:
 
 	virtual 
 	sl::String 
-	getErrorDescription (const err::ErrorHdr* error)
+	getErrorDescription (const err::ErrorRef& error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -72,10 +72,10 @@ public:
 //.............................................................................
 
 inline
-err::Error
+size_t
 setUsbError (int code)
 {
-	setError (UsbError (code));
+	return setError (UsbError (code));
 }
 
 //.............................................................................

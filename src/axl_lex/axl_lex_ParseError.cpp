@@ -8,7 +8,7 @@ namespace lex {
 //.............................................................................
 
 sl::String 
-ParseErrorProvider::getErrorDescription (const err::ErrorHdr* error)
+ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 {
 	sl::Unpacker unpacker (error + 1, error->m_size - sizeof (err::ErrorHdr));
 

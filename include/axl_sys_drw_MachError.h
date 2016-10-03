@@ -35,7 +35,7 @@ public:
 
 	virtual 
 	sl::String 
-	getErrorDescription (const err::ErrorHdr* error)
+	getErrorDescription (const err::ErrorRef& error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -62,7 +62,7 @@ public:
 //.............................................................................
 
 inline
-err::Error
+size_t
 setMachError (mach_error_t code)
 {
 	return err::setError (MachError (code));

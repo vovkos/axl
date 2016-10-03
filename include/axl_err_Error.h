@@ -163,6 +163,29 @@ struct ErrorHdr
 	uint32_t m_size;
 	sl::Guid m_guid;
 	uint32_t m_code;
+
+	bool
+	isKindOf (
+		const sl::Guid& guid,
+		uint_t code
+		) const
+	{
+		return m_guid == guid && m_code == code;
+	}
+
+	bool
+	isStackTopKindOf (
+		const sl::Guid& guid,
+		uint_t code
+		) const
+	{
+		return 
+			isKindOf (g_stdErrorGuid, StdErrorCode_Stack) &&
+			(this + 1)->isKindOf (guid, code);
+	}
+
+	sl::String
+	getDescription () const;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -171,9 +194,9 @@ class SizeOfError
 {
 public:
 	size_t
-	operator () (const ErrorHdr* x)
+	operator () (const ErrorHdr* error)
 	{
-		return AXL_MAX (x->m_size, sizeof (ErrorHdr));
+		return AXL_MAX (error->m_size, sizeof (ErrorHdr));
 	}
 };
 
@@ -208,6 +231,18 @@ public:
 	{
 	}
 
+	ErrorRef (uint_t code);
+
+	ErrorRef (
+		const sl::Guid& guid,
+		uint_t code
+		);
+
+	ErrorRef (
+		const char* string,
+		size_t length = -1
+		);
+
 	ErrorRef&
 	operator = (const ErrorRef& src)
 	{
@@ -221,7 +256,7 @@ public:
 		uint_t code
 		) const
 	{
-		return !isEmpty () && cp ()->m_guid == guid && cp ()->m_code == code;
+		return !isEmpty () && m_p->isKindOf (guid, code);
 	}
 
 	sl::String
@@ -252,13 +287,9 @@ public:
 		copy (src);
 	}
 
-	Error (
-		ref::BufKind kind,
-		void* p,
-		size_t size
-		)
+	Error (uint_t code)
 	{
-		setBuffer (kind, p, size);
+		createSystemError (code);
 	}
 
 	Error (
@@ -269,11 +300,6 @@ public:
 		createSimpleError (guid, code);
 	}
 
-	Error (uint_t code)
-	{
-		createSystemError (code);
-	}
-
 	Error (
 		const char* string,
 		size_t length = -1
@@ -282,8 +308,17 @@ public:
 		createStringError (string, length);
 	}
 
+	Error (
+		ref::BufKind kind,
+		void* p,
+		size_t size
+		)
+	{
+		setBuffer (kind, p, size);
+	}
+
 	size_t
-	push (const ErrorHdr* error);
+	push (const ErrorRef& error);
 
 	// pack
 
@@ -401,6 +436,14 @@ public:
 		return pushFormat_va (guid, code, formatString, va);
 	}
 
+	// system error (push is irrelevant for system errors)
+
+	size_t
+	createSystemError (uint_t code)
+	{
+		return createSimpleError (g_systemErrorGuid, code);
+	}
+
 	// simple error
 
 	size_t
@@ -421,14 +464,6 @@ public:
 		Error error;
 		error.createSimpleError (guid, code);
 		return push (error);
-	}
-
-	// system error (push is irrelevant for system errors)
-
-	size_t
-	createSystemError (uint_t code)
-	{
-		return createSimpleError (g_systemErrorGuid, code);
 	}
 
 	// string error
@@ -496,22 +531,42 @@ public:
 
 //.............................................................................
 
-// utility functions
-
-Error
-getLastError ();
-
-Error
-setError (const Error& error);
+inline
+ErrorRef::ErrorRef (uint_t code):
+	BaseType (Error (code))
+{
+}
 
 inline
-Error
-pushError (const Error& error)
+ErrorRef::ErrorRef (
+	const sl::Guid& guid,
+	uint_t code
+	):
+	BaseType (Error (guid, code))
 {
-	Error stack = getLastError ();
-	stack.push (error);
-	return setError (stack);
 }
+
+inline
+ErrorRef::ErrorRef (
+	const char* string,
+	size_t length
+	):
+	BaseType (Error (string, length))
+{
+}
+
+//.............................................................................
+
+// utility functions
+
+ErrorRef
+getLastError ();
+
+size_t
+setError (const ErrorRef& error);
+
+size_t
+pushError (const ErrorRef& error);
 
 sl::String
 getLastErrorDescription ();
@@ -521,7 +576,7 @@ getLastErrorDescription ();
 // pack
 
 template <typename Pack>
-Error
+size_t
 setPackError_va (
 	const sl::Guid& guid,
 	uint_t code,
@@ -529,12 +584,12 @@ setPackError_va (
 	)
 {
 	Error error;
-	error.pack_va <Pack> (guid, code, va);
-	return setError (error);
+	size_t result = error.pack_va <Pack> (guid, code, va);
+	return result != -1 ? setError (error) : -1;
 }
 
 template <typename Pack>
-Error
+size_t
 setPackError (
 	const sl::Guid& guid,
 	uint_t code,
@@ -546,7 +601,7 @@ setPackError (
 }
 
 template <typename Pack>
-Error
+size_t
 pushPackError_va (
 	const sl::Guid& guid,
 	uint_t code,
@@ -554,12 +609,12 @@ pushPackError_va (
 	)
 {
 	Error error;
-	error.pack_va <Pack> (guid, code, va);
-	return pushError (error);
+	size_t result = error.pack_va <Pack> (guid, code, va);
+	return result != -1 ? pushError (error) : -1;
 }
 
 template <typename Pack>
-Error
+size_t
 pushPackError (
 	const sl::Guid& guid,
 	uint_t code,
@@ -574,22 +629,16 @@ pushPackError (
 
 // format
 
-inline
-Error
+size_t
 setFormatError_va (
 	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
-	)
-{
-	Error error;
-	error.format_va (guid, code, formatString, va);
-	return setError (error);
-}
+	);
 
 inline
-Error
+size_t
 setFormatError (
 	const sl::Guid& guid,
 	uint_t code,
@@ -601,22 +650,16 @@ setFormatError (
 	return setFormatError_va (guid, code, formatString, va);
 }
 
-inline
-Error
+size_t
 pushFormatError_va (
 	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
-	)
-{
-	Error error;
-	error.format_va (guid, code, formatString, va);
-	return pushError (error);
-}
+	);
 
 inline
-Error
+size_t
 pushFormatError (
 	const sl::Guid& guid,
 	uint_t code,
@@ -630,11 +673,10 @@ pushFormatError (
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-
 // simple error
 
 inline
-Error
+size_t
 setError (
 	const sl::Guid& guid,
 	uint_t code
@@ -644,7 +686,7 @@ setError (
 }
 
 inline
-Error
+size_t
 pushError (
 	const sl::Guid& guid,
 	uint_t code
@@ -657,75 +699,26 @@ pushError (
 
 // string error
 
-inline
-Error
-createStringError (
+size_t
+setError (
 	const char* p,
 	size_t length = -1
-	)
-{
-	Error error;
-	error.createStringError (p, length);
-	return error;
-}
+	);
 
-inline
-Error
-setStringError (
+size_t
+pushError (
 	const char* p,
 	size_t length = -1
-	)
-{
-	return setError (createStringError (p, length));
-}
+	);
 
-inline
-Error
-pushStringError (
-	const char* p,
-	size_t length = -1
-	)
-{
-	Error error;
-	error.createStringError (p, -1);
-	return setError (error);
-}
-
-inline
-Error
-formatStringError_va (
-	const char* formatString,
-	axl_va_list va
-	)
-{
-	Error error;
-	error.formatStringError_va (formatString, va);
-	return error;
-}
-
-inline
-Error
-formatStringError (
-	const char* formatString,
-	...
-	)
-{
-	AXL_VA_DECL (va, formatString);
-	return formatStringError_va (formatString, va);
-}
-
-inline
-Error
+size_t
 setFormatStringError_va (
 	const char* formatString,
 	axl_va_list va
-	)
-{
-	return setError (formatStringError_va (formatString, va));
-}
+	);
 
 inline
-Error
+size_t
 setFormatStringError (
 	const char* formatString,
 	...
@@ -735,20 +728,14 @@ setFormatStringError (
 	return setFormatStringError_va (formatString, va);
 }
 
-inline
-Error
+size_t
 pushFormatStringError_va (
 	const char* formatString,
 	axl_va_list va
-	)
-{
-	Error error;
-	error.formatStringError_va (formatString, va);
-	return pushError (error);
-}
+	);
 
 inline
-Error
+size_t
 pushFormatStringError (
 	const char* formatString,
 	...
@@ -766,7 +753,7 @@ template <typename T>
 T
 fail (
 	T failResult,
-	Error error
+	const ErrorRef& error
 	)
 {
 	setError (error);
@@ -775,13 +762,13 @@ fail (
 
 inline
 bool
-fail (Error error)
+fail (const ErrorRef& error)
 {
 	return fail <bool> (false, error);
 }
 
 inline
-Error
+size_t 
 setLastSystemError ()
 {
 	return setError (getLastSystemErrorCode ());
@@ -791,7 +778,8 @@ template <typename T>
 T
 failWithLastSystemError (T failResult)
 {
-	return fail (failResult, getLastSystemErrorCode ());
+	setLastSystemError ();
+	return failResult;
 }
 
 inline
@@ -844,7 +832,7 @@ class ErrorProvider
 public:
 	virtual
 	sl::String
-	getErrorDescription (const ErrorHdr* error) = 0;
+	getErrorDescription (const ErrorRef& error) = 0;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -854,11 +842,11 @@ class StdErrorProvider: public ErrorProvider
 public:
 	virtual
 	sl::String
-	getErrorDescription (const ErrorHdr* error);
+	getErrorDescription (const ErrorRef& error);
 
 protected:
 	sl::String
-	getStackErrorDescription (const ErrorHdr* error);
+	getStackErrorDescription (const ErrorRef& error);
 };
 
 //.............................................................................

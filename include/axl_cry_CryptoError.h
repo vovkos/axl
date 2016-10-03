@@ -24,7 +24,7 @@ class CryptoErrorProvider: public err::ErrorProvider
 public:
 	virtual 
 	sl::String 
-	getErrorDescription (const err::ErrorHdr* error);
+	getErrorDescription (const err::ErrorRef& error);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -63,19 +63,19 @@ public:
 //.............................................................................
 
 inline
-err::Error
+size_t
 setCryptoError (int code)
 {
 	return setError (CryptoError (code));
 }
 
 inline
-err::Error
+size_t
 setLastCryptoError ()
 {
-	err::Error error = setError (CryptoError (ERR_peek_last_error ()));
+	size_t result = setError (CryptoError (ERR_peek_last_error ()));
 	ERR_clear_error ();
-	return error;
+	return result;
 }
 
 inline

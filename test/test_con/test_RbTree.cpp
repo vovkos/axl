@@ -35,7 +35,7 @@ run ()
 	printf (".........\n");
 
 	for (size_t i = 0; i < 50; i++)
-		tree.eraseByKey (rand () % 50);
+		tree.eraseKey (rand () % 50);
 
 	it = tree.getHead ();
 	for (; it; it++)

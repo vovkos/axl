@@ -76,12 +76,41 @@ public:
 	}
 
 	StringRefBase (
+		ref::BufHdr* hdr,
 		const C* p,
 		size_t length = -1
 		)
 	{
 		initialize ();
-		attach (p, NULL, length);
+		attach (hdr, p, length);
+	}
+
+	StringRefBase (
+		ref::BufHdr* hdr,
+		const C* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (hdr, p, (C*) end - p);
+	}
+
+	StringRefBase (
+		const C* p,
+		size_t length = -1
+		)
+	{
+		initialize ();
+		attach (NULL, p, length);
+	}
+
+	StringRefBase (
+		const C* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (NULL, p, (C*) end - p);
 	}
 
 	StringRefBase (
@@ -94,12 +123,30 @@ public:
 	}
 
 	StringRefBase (
+		const C2* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (String (p, end));
+	}
+
+	StringRefBase (
 		const C3* p,
 		size_t length = -1
 		)
 	{
 		initialize ();
 		attach (String (p, length));
+	}
+
+	StringRefBase (
+		const C3* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (String (p, end));
 	}
 
 	StringRefBase (utf32_t x)
@@ -254,6 +301,12 @@ public:
 		return m_hdr;
 	}
 
+	const C* 
+	getEnd () const
+	{
+		return m_p + m_length;
+	}
+	
 	bool
 	isEmpty () const
 	{
@@ -279,6 +332,17 @@ public:
 			m_hdr->release ();
 
 		initialize ();
+	}
+
+	size_t
+	offset (size_t length)
+	{
+		if (length > m_length)
+			length = m_length;
+
+		m_p += length;
+		m_length -= length;
+		return m_length;
 	}
 
 	int
@@ -346,6 +410,40 @@ public:
 	reverseFindNotOneOf (const StringRef& charSet) const
 	{
 		return Details::reverseFindNotOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
+	}
+
+	StringRef
+	getSubString (
+		size_t first,
+		size_t length = -1
+		) const
+	{
+		if (first > m_length)
+			return StringRef ();
+
+		size_t end = length == -1 ? m_length : first + length;
+		if (end > m_length)
+			end = m_length;
+	
+		return StringRef (m_hdr, m_p + first, end - first);
+	}
+
+	StringRef
+	getLeftSubString (size_t length) const
+	{
+		if (length > m_length)
+			return length;
+
+		return StringRef (m_hdr, m_p, length);
+	}
+
+	StringRef
+	getRightSubString (size_t length) const
+	{
+		if (length > m_length)
+			return length;
+
+		return StringRef (m_hdr, m_p + m_length - length, length);
 	}
 
 	StringRef
@@ -436,8 +534,8 @@ protected:
 
 	void
 	attach (
-		const C* p,
 		ref::BufHdr* hdr,
+		const C* p,
 		size_t length
 		)
 	{
@@ -523,6 +621,14 @@ public:
 	}
 
 	StringBase (
+		const C* p,
+		const void* end
+		)
+	{
+		copy (p, (C*) end - p);
+	}
+
+	StringBase (
 		const C2* p,
 		size_t length = -1
 		)
@@ -531,11 +637,27 @@ public:
 	}
 
 	StringBase (
+		const C2* p,
+		const void* end
+		)
+	{
+		copy (p, (C2*) end - p);
+	}
+
+	StringBase (
 		const C3* p,
 		size_t length = -1
 		)
 	{
 		copy (p, length);
+	}
+
+	StringBase (
+		const C3* p,
+		const void* end
+		)
+	{
+		copy (p, (C3*) end - p);
 	}
 
 	StringBase (utf32_t x)
@@ -699,7 +821,7 @@ public:
 			return this->m_length;
 
 		ref::BufHdr* hdr = src.getHdr ();
-		if (!hdr || hdr->getFlags () & ref::BufHdrFlag_Exclusive)
+		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive))
 			return copy (src, src.getLength ());
 
 		this->attach (src);

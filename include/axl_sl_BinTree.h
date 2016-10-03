@@ -257,7 +257,7 @@ public:
 	}
 
 	bool
-	eraseByKey (const Key& key)
+	eraseKey (const Key& key)
 	{
 		Iterator it = find (key);
 		if (!it)

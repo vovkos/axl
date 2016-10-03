@@ -39,12 +39,41 @@ public:
 	}
 
 	ArrayRef (
+		Hdr* hdr,
 		const T* p,
 		size_t count
 		)
 	{
 		initialize ();
-		attach (p, NULL, count);
+		attach (hdr, p, count);
+	}
+
+	ArrayRef (
+		Hdr* hdr,
+		const T* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (hdr, p, (T*) end - p);
+	}
+
+	ArrayRef (
+		const T* p,
+		size_t count
+		)
+	{
+		initialize ();
+		attach (NULL, p, count);
+	}
+
+	ArrayRef (
+		const T* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (NULL, p, (T*) end - p);
 	}
 
 	~ArrayRef ()
@@ -158,13 +187,13 @@ protected:
 	attach (const ArrayRef& src)
 	{
 		if (&src != this)
-			attach (src.m_p, src.m_hdr, src.m_count);
+			attach (src.m_hdr, src.m_p, src.m_count);
 	}
 
 	void
 	attach (
-		T* p,
 		Hdr* hdr,
+		T* p,
 		size_t count
 		)
 	{
@@ -224,6 +253,14 @@ public:
 	}
 
 	Array (
+		const T* p,
+		const void* end
+		)
+	{
+		copy (p, (T*) end - p);
+	}
+
+	Array (
 		ref::BufKind bufKind,
 		void* p,
 		size_t size
@@ -275,7 +312,7 @@ public:
 			return this->m_count;
 		
 		Hdr* hdr = src.getHdr ();
-		if (!hdr || hdr->getFlags () & ref::BufHdrFlag_Exclusive)
+		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive))
 			return copy (src, src.getCount ());
 
 		this->attach (src);
@@ -370,13 +407,13 @@ public:
 	T*
 	append (const ArrayRef& src)
 	{
-		return insert (-1, src, src.m_count);
+		return insert (-1, src, src.getCount ());
 	}
 
 	T*
 	appendReverse (const ArrayRef& src)
 	{
-		return insertReverse (-1, src, src.m_count);
+		return insertReverse (-1, src, src.getCount ());
 	}
 
 	T*
@@ -492,7 +529,7 @@ public:
 		const ArrayRef& src
 		)
 	{
-		return insert (index, src, src.m_count);
+		return insert (index, src, src.getCount ());
 	}
 
 	T*
@@ -501,7 +538,7 @@ public:
 		const ArrayRef& src
 		)
 	{
-		return insertReverse (index, src, src.m_count);
+		return insertReverse (index, src, src.getCount ());
 	}
 
 	bool

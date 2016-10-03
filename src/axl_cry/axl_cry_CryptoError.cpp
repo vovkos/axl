@@ -19,7 +19,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::String 
-CryptoErrorProvider::getErrorDescription (const err::ErrorHdr* error)
+CryptoErrorProvider::getErrorDescription (const err::ErrorRef& error)
 {
 	sl::callOnce (LoadCryptoStrings (), 0);
 	return ERR_reason_error_string (error->m_code);

@@ -35,7 +35,7 @@ class ParseErrorProvider: public err::ErrorProvider
 public:
 	virtual 
 	sl::String 
-	getErrorDescription (const err::ErrorHdr* error);
+	getErrorDescription (const err::ErrorRef& error);
 };
 
 //.............................................................................
@@ -53,7 +53,7 @@ registerParseErrorProvider ()
 }
 
 inline
-err::Error
+size_t
 pushSrcPosError (
 	const char* filePath,
 	int line,
@@ -70,7 +70,7 @@ pushSrcPosError (
 }
 
 inline
-err::Error
+size_t
 pushSrcPosError (
 	const char* filePath,
 	const LineCol& lineCol
@@ -80,19 +80,17 @@ pushSrcPosError (
 }
 
 inline
-err::Error
+size_t
 pushSrcPosError (const SrcPos& srcPos)
 {
 	return pushSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
+inline
 bool
 isLastSrcPosError ()
 {
-	err::Error error = err::getLastError ();
-	return 
-		error.isKindOf (sl::g_nullGuid, err::StdErrorCode_Stack) &&
-		err::ErrorRef (error + 1).isKindOf (g_parseErrorGuid, ParseErrorCode_SrcPos);
+	return err::getLastError ()->isStackTopKindOf (g_parseErrorGuid, ParseErrorCode_SrcPos);
 }
 
 inline
@@ -125,14 +123,14 @@ ensureSrcPosError (const SrcPos& srcPos)
 }
 
 inline
-err::Error
+size_t
 setSyntaxError ()
 {
 	return err::setError (g_parseErrorGuid, ParseErrorCode_InvalidSyntax);
 }
 
 inline
-err::Error
+size_t
 setSyntaxError (const char* location)
 {
 	return err::setPackError <sl::Pack <const char*> > (
@@ -143,7 +141,7 @@ setSyntaxError (const char* location)
 }
 
 inline
-err::Error
+size_t
 setExpectedTokenError (
 	const char* expectedToken,
 	const char* actualToken
@@ -158,7 +156,7 @@ setExpectedTokenError (
 }
 
 inline
-err::Error
+size_t
 setUnexpectedTokenError (const char* token)
 {
 	return err::setPackError <sl::Pack <const char*> > (
@@ -169,7 +167,7 @@ setUnexpectedTokenError (const char* token)
 }
 
 inline
-err::Error
+size_t
 setUnexpectedTokenError (
 	const char* token,
 	const char* location

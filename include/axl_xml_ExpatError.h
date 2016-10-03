@@ -34,7 +34,7 @@ public:
 
 	virtual 
 	sl::String 
-	getErrorDescription (const err::ErrorHdr* error)
+	getErrorDescription (const err::ErrorRef& error)
 	{
 		return getErrorDescription ((XML_Error) error->m_code);
 	}
@@ -73,7 +73,7 @@ public:
 //.............................................................................
 
 inline
-err::Error
+size_t
 setExpatError (XML_Error code)
 {
 	return setError (ExpatError (code));

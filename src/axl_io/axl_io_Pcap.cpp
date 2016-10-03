@@ -29,7 +29,7 @@ Pcap::openDevice (
 
 	if (!m_h)
 	{
-		err::setStringError (errorBuffer);
+		err::setError (errorBuffer);
 		return false;
 	}
 
@@ -45,7 +45,7 @@ Pcap::openFile (const char* fileName)
 	m_h = pcap_open_offline (fileName, errorBuffer);
 	if (!m_h)
 	{
-		err::setStringError (errorBuffer);
+		err::setError (errorBuffer);
 		return false;
 	}
 
@@ -60,7 +60,7 @@ Pcap::setFilter (const char* filter)
 	int result = pcap_compile (m_h, &program, (char*) filter, true, 0);
 	if (result == -1)
 	{
-		err::setStringError (pcap_geterr (m_h));
+		err::setError (pcap_geterr (m_h));
 		return false;
 	}
 
@@ -76,7 +76,7 @@ Pcap::setBlockingMode (bool isBlocking)
 	int result = pcap_setnonblock (m_h, !isBlocking, errorBuffer);
 	if (result == -1)
 	{
-		err::setStringError (errorBuffer);
+		err::setError (errorBuffer);
 		return false;
 	}
 
@@ -96,7 +96,7 @@ Pcap::read (
 	int result = pcap_next_ex (m_h, &hdr, &data);
 	if (result == -1)
 	{
-		err::setStringError (pcap_geterr (m_h));
+		err::setError (pcap_geterr (m_h));
 		return -1;
 	}
 
@@ -125,7 +125,7 @@ Pcap::write (
 #endif
 	if (result == -1)
 	{
-		err::setStringError (pcap_geterr (m_h));
+		err::setError (pcap_geterr (m_h));
 		return -1;
 	}
 

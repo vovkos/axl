@@ -9,12 +9,12 @@ namespace sl {
 
 size_t
 CmdLineParserRoot::extractArg (
-	const char* p,
-	const char* end,
+	const sl::StringRef& cmdLine,
 	sl::String* arg
 	)
 {
-	const char* p0 = p;
+	const char* p = cmdLine;
+	const char* end = cmdLine.getEnd ();
 
 	while (p < end && isspace (*p))
 		p++;
@@ -22,7 +22,7 @@ CmdLineParserRoot::extractArg (
 	if (p >= end)
 	{
 		arg->clear ();
-		return p - p0;
+		return p - cmdLine;
 	}
 
 	const char* p1 = p;
@@ -48,61 +48,41 @@ CmdLineParserRoot::extractArg (
 
 		if (p > end)
 		{
-			err::setStringError ("unterminated escape sequence");
+			err::setError ("unterminated escape sequence");
 			return -1;
 		}
 	}
 
 	arg->copy (p1, p - p1);
-	return p - p0;
+	return p - cmdLine;
 }
 
 bool
-CmdLineParserRoot::parseArg (
-	const char* p,
+CmdLineParserRoot::parseSwitch (
+	ArgKind argKind,
+	const sl::StringRef& arg,
 	sl::String* switchName,
 	sl::String* value
 	)
 {
-	if (*p != '-')
+	const char* p = arg;
+	const char* end = arg.getEnd ();
+
+	if (argKind == ArgKind_CharSwitch)
 	{
-		switchName->clear ();
-		value->copy (p);
-		return true;
-	}
-
-	p++;
-
-	if (*p != '-')
-	{
-		if (!isalpha (*p))
-		{
-			err::setStringError ("invalid command line switch syntax");
-			return false;
-		}
-
 		switchName->copy (*p);
 		p++;
 	}
 	else
 	{
-		p++;
-
-		if (!isalpha (*p))
-		{
-			err::setStringError ("invalid command line switch syntax");
-			return false;
-		}
-
-		const char* p1 = p;
-
-		while (*p && *p != '=' && !isspace (*p))
+		const char* p0 = p;
+		while (p < end && *p != '=' && !isspace (*p))
 			p++;
 
-		switchName->copy (p1, p - p1);
+		switchName->copy (p0, p - p0);
 	}
 
-	if (*p && !isspace (*p)) // have value
+	if (*p && !isspace (*p)) // has value
 	{
 		if (*p == '=')
 			p++;
@@ -116,7 +96,7 @@ CmdLineParserRoot::parseArg (
 	}
 	else
 	{
-		value->clear ();
+		value->clear (); 
 	}
 
 	return true;
@@ -147,8 +127,6 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 
 		size_t switchLength = 0;
 
-		bool hasValue = (switchInfo->m_switchKind & CmdLineSwitchFlag_HasValue) != 0;
-
 		size_t i = 0;
 		for (; i < countof (switchInfo->m_nameTable); i++)
 		{
@@ -171,7 +149,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 			switchLength += (i - 1) * 2; // ", "
 		}
 
-		if (hasValue)
+		if (switchInfo->m_value)
 		{
 			switchLength++; // '='
 			switchLength += strlen_s (switchInfo->m_value);
@@ -202,8 +180,6 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 		else
 		{
 			lineString.copy (' ', indentSize);
-
-			bool hasValue = (switchInfo->m_switchKind & CmdLineSwitchFlag_HasValue) != 0;
 
 			ASSERT (switchInfo->m_nameTable [0]);
 			if (switchInfo->m_nameTable [0] [1])
@@ -236,7 +212,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 				}
 			}
 
-			if (hasValue)
+			if (switchInfo->m_value)
 			{
 				lineString += '=';
 				lineString += switchInfo->m_value;

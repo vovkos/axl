@@ -31,7 +31,7 @@ public:
 
 	virtual 
 	sl::String 
-	getErrorDescription (const ErrorHdr* error)
+	getErrorDescription (const ErrorRef& error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -58,7 +58,7 @@ public:
 //.............................................................................
 
 inline
-Error
+size_t
 setWinError (dword_t code)
 {
 	return setError (WinError (code));

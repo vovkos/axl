@@ -49,11 +49,11 @@ public:
 	ErrorProvider* 
 	findProvider (const sl::Guid& guid);
 
-	Error
+	ErrorRef
 	getLastError ();
 
 	void
-	setError (const Error& error);
+	setError (const ErrorRef& error);
 
 protected:
 	ThreadEntry*

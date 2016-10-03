@@ -64,13 +64,13 @@ public:
 // another solution would be:
 //
 //	template <
-//		typename TKey,
-//		typename TValue
+//		typename Key,
+//		typename Value
 //		>
-//	class CHashTableMapIteratorT
+//	class HashTableMapIteratorT
 //	{
 //	public:
-//		typedef CIteratorT <CHashTableMapEntryT <TKey, TValue> > T;
+//		typedef Iterator <HashTableMapEntry <Key, Value> > T;
 //	};
 //
 // but then it's too easy to forget to write ::T type suffix
@@ -305,7 +305,7 @@ public:
 	}
 
 	bool
-	eraseByKey (const Key& key)
+	eraseKey (const Key& key)
 	{
 		Iterator it = find (key);
 		if (!it)

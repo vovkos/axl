@@ -49,18 +49,18 @@ ErrorMgr::findProvider (const sl::Guid& guid)
 	return it ? it->m_value : NULL;
 }
 
-Error
+ErrorRef
 ErrorMgr::getLastError ()
 {
 	ThreadEntry* entry = findThreadEntry ();
 	if (entry && !entry->m_error.isEmpty ())
-		return entry->m_error;  
+		return entry->m_error;
 	
 	return &g_noError;
 }
 
 void
-ErrorMgr::setError (const Error& error)
+ErrorMgr::setError (const ErrorRef& error)
 {	
 	ThreadEntry* entry = getThreadEntry ();
 	entry->m_error = error;

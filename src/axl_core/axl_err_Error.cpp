@@ -9,34 +9,6 @@ namespace err {
 //.............................................................................
 
 sl::String
-ErrorRef::getDescription () const
-{
-	const ErrorHdr* p = isEmpty () ? cp () : &g_noError;
-
-	ErrorProvider* provider = getErrorMgr ()->findProvider (p->m_guid);
-	return provider ?
-		provider->getErrorDescription (p) :
-		sl::String::format_s ("%s::%d", p->m_guid.getGuidString ().cc (), p->m_code);
-}
-
-//.............................................................................
-
-/*
-bool
-ErrorHdr::isKind (
-	const sl::Guid& guid,
-	uint_t code
-	) const
-{
-	const ErrorHdr* error = this;
-
-	if (m_guid == sl::g_nullGuid && m_code == StdErrorCode_Stack)
-		error++;
-
-	return error->m_guid == guid && error->m_code == code;
-}
-
-sl::String
 ErrorHdr::getDescription () const
 {
 	ErrorProvider* provider = getErrorMgr ()->findProvider (m_guid);
@@ -46,12 +18,18 @@ ErrorHdr::getDescription () const
 		sl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code);
 }
 
-*/
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+sl::String
+ErrorRef::getDescription () const
+{
+	return !isEmpty () ? m_p->getDescription () : g_noError.getDescription ();
+}
 
 //.............................................................................
 
 size_t
-Error::push (const ErrorHdr* error)
+Error::push (const ErrorRef& error)
 {
 	if (!m_p)
 		return copy (error);
@@ -170,17 +148,26 @@ Error::formatStringError_va (
 
 //.............................................................................
 
-Error
+ErrorRef
 getLastError ()
 {
 	return getErrorMgr ()->getLastError ();
 }
 
-Error
-setError (const Error& error)
+size_t
+setError (const ErrorRef& error)
 {
 	getErrorMgr ()->setError (error);
-	return error;
+	return error.getSize ();
+}
+
+size_t
+pushError (const ErrorRef& error)
+{
+	Error stack = getLastError ();
+	ASSERT (!stack.isKindOf (g_stdErrorGuid, StdErrorCode_NoError));
+	size_t result = stack.push (error);
+	return result != -1 ? setError (stack) : -1;
 }
 
 sl::String
@@ -191,8 +178,80 @@ getLastErrorDescription ()
 
 //.............................................................................
 
+size_t
+setFormatError_va (
+	const sl::Guid& guid,
+	uint_t code,
+	const char* formatString,
+	axl_va_list va
+	)
+{
+	Error error;
+	size_t result = error.format_va (guid, code, formatString, va);
+	return result != -1 ? setError (error) : -1;
+}
+
+size_t
+pushFormatError_va (
+	const sl::Guid& guid,
+	uint_t code,
+	const char* formatString,
+	axl_va_list va
+	)
+{
+	Error error;
+	size_t result = error.format_va (guid, code, formatString, va);
+	return result != -1 ? pushError (error) : -1;
+}
+
+size_t
+setError (
+	const char* p,
+	size_t length
+	)
+{
+	Error error;
+	size_t result = error.createStringError (p, length);
+	return result != -1 ? setError (error) : -1;
+}
+
+size_t
+pushError (
+	const char* p,
+	size_t length
+	)
+{
+	Error error;
+	size_t result = error.createStringError (p, length);
+	return result != -1 ? pushError (error) : -1;
+}
+
+size_t
+setFormatStringError_va (
+	const char* formatString,
+	axl_va_list va
+	)
+{
+	Error error;
+	size_t result = error.formatStringError_va (formatString, va);
+	return result != -1 ? setError (error) : -1;
+}
+
+size_t
+pushFormatStringError_va (
+	const char* formatString,
+	axl_va_list va
+	)
+{
+	Error error;
+	size_t result = error.formatStringError_va (formatString, va);
+	return result != -1 ? pushError (error) : -1;
+}
+
+//.............................................................................
+
 sl::String
-StdErrorProvider::getErrorDescription (const ErrorHdr* error)
+StdErrorProvider::getErrorDescription (const ErrorRef& error)
 {
 	if (error->m_size < sizeof (ErrorHdr))
 		return sl::String ();
@@ -217,12 +276,12 @@ StdErrorProvider::getErrorDescription (const ErrorHdr* error)
 }
 
 sl::String
-StdErrorProvider::getStackErrorDescription (const ErrorHdr* error)
+StdErrorProvider::getStackErrorDescription (const ErrorRef& error)
 {
 	sl::String string;
 
-	void* end = (uchar_t*) error + (error->m_size);
 	const ErrorHdr* p = error + 1;
+	const void* end = error.getEnd ();
 
 	while (p < end)
 	{

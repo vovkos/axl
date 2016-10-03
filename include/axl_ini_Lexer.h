@@ -162,7 +162,7 @@ protected: // should only be used as part of ini::CParser
 		bool result = exec ();
 		if (!result)
 		{
-			err::setStringError ("invalid syntax");
+			err::setError ("invalid syntax");
 			lex::pushSrcPosError (m_filePath, m_line, p - m_begin - m_lineOffset);
 			return ScanResultKind_Error;
 		}

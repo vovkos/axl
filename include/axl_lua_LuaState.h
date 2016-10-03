@@ -66,25 +66,32 @@ public:
 	}
 
 	void
-	setStringError (
+	error ()
+	{
+		ASSERT (isOpen ());
+		lua_error (m_h);
+	}
+
+	void
+	error (
 		const char* string,
 		size_t length = -1
 		);
 
 	void
-	setFormatStringError_va (
+	formatError_va (
 		const char* format,
 		axl_va_list va
 		);
 
 	void
-	setFormatStringError (
+	formatError (
 		const char* format,
 		...
 		)
 	{
 		AXL_VA_DECL (va, format);
-		setFormatStringError_va (format, va);
+		formatError_va (format, va);
 	}
 
 	void 
@@ -546,14 +553,6 @@ public:
 protected:
 	bool
 	complete (int result);
-
-private:
-	void
-	setError ()
-	{
-		ASSERT (isOpen ());
-		lua_error (m_h);
-	}
 };
 
 //.............................................................................

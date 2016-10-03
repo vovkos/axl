@@ -30,7 +30,7 @@ LuaState::complete (int result)
 		return true;
 
 	sl::String message = popString ();
-	err::setStringError (message, message.getLength ());
+	err::setError (message, message.getLength ());
 	return false;
 }
 
@@ -85,7 +85,7 @@ LuaState::trace ()
 #endif
 
 void
-LuaState::setStringError (
+LuaState::error (
 	const char* string,
 	size_t length
 	)
@@ -93,13 +93,11 @@ LuaState::setStringError (
 	where ();
 	pushString (string, length);
 	concatenate ();
-
-	sl::String s = getString ();
-	setError ();
+	error ();
 }
 
 void
-LuaState::setFormatStringError_va (
+LuaState::formatError_va (
 	const char* format,
 	axl_va_list va
 	)
@@ -107,7 +105,7 @@ LuaState::setFormatStringError_va (
 	where ();
 	pushFormatString_va (format, va);
 	concatenate ();
-	setError ();
+	error ();
 }
 
 void

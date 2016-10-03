@@ -2512,8 +2512,7 @@ enum CmdLineSwitchKind
 	CmdLineSwitchKind_Help,
 	CmdLineSwitchKind_Version,
 	CmdLineSwitchKind_Verbose,
-
-	CmdLineSwitchKind_Add = sl::CmdLineSwitchFlag_HasValue,
+	CmdLineSwitchKind_Add,
 	CmdLineSwitchKind_Remove,
 };
 
@@ -2610,7 +2609,9 @@ testCmdLine (
 #endif
 {
 	CmdLineParser parser;
-	parser.parse (argc, argv);
+	bool result = parser.parse (argc, argv);
+	if (!result)
+		printf ("Error parsing command line: %s\n", err::getLastErrorDescription ().cc ());
 }
 
 //.............................................................................

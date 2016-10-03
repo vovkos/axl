@@ -96,12 +96,41 @@ public:
 	}
 
 	BufRef (
+		BufHdr* hdr,
 		const T* p,
 		size_t size = -1
 		)
 	{
 		initialize ();
-		attach (p, NULL, size);
+		attach (hdr, p, size);
+	}
+
+	BufRef (
+		BufHdr* hdr,
+		const T* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (hdr, p, (char*) end - (char*) p);
+	}
+
+	BufRef (
+		const T* p,
+		size_t size = -1
+		)
+	{
+		initialize ();
+		attach (NULL, p, size);
+	}
+
+	BufRef (
+		const T* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (NULL, p, (char*) end - (char*) p);
 	}
 
 	~BufRef ()
@@ -144,6 +173,12 @@ public:
 	getHdr () const
 	{
 		return m_hdr;
+	}
+
+	const T* 
+	getEnd () const
+	{
+		return (T*) ((char*) m_p + m_size);
 	}
 
 	bool
@@ -199,8 +234,8 @@ protected:
 
 	void
 	attach (
-		const T* p,
 		BufHdr* hdr,
+		const T* p,
 		size_t size
 		)
 	{
@@ -340,7 +375,7 @@ public:
 			return this->m_size;
 
 		BufHdr* hdr = src.getHdr ();
-		if (!hdr || hdr->getFlags () & BufHdrFlag_Exclusive)
+		if (!hdr || (hdr->getFlags () & BufHdrFlag_Exclusive))
 			return copy (src, src.getSize ());
 
 		this->attach (src);
@@ -405,7 +440,7 @@ public:
 
 	T* 
 	createBuffer (
-		size_t size, 
+		size_t size = sizeof (T), 
 		bool saveContents = false
 		)
 	{	
