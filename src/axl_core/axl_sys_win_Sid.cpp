@@ -108,7 +108,7 @@ Sid::lookupAccountName (
 	if (!result)	
 		return err::failWithLastSystemError ();
 
-	return copy ((SID*) sidBuffer);
+	return copy ((SID*) sidBuffer) != -1;
 }
 
 bool 
@@ -137,7 +137,7 @@ Sid::lookupAccountName (
 	if (!result)	
 		return err::failWithLastSystemError ();
 
-	return copy ((SID*) sidBuffer);
+	return copy ((SID*) sidBuffer) != -1;
 }
 
 bool 

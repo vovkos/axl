@@ -12,15 +12,11 @@
 namespace axl {
 namespace sl {
 
-template <typename T> class Array;
-
 //.............................................................................
 
 template <typename T>
 class ArrayRef
 {
-	friend class Array <T>;
-
 public:
 	typedef ArrayDetails <T> Details;
 	typedef typename Details::Hdr Hdr;
@@ -78,6 +74,12 @@ public:
 	getCount () const
 	{
 		return m_count;
+	}
+
+	Hdr*
+	getHdr () const
+	{
+		return m_hdr;
 	}
 
 	bool
@@ -271,9 +273,10 @@ public:
 	{
 		if (&src == this)
 			return this->m_count;
-
-		if (!src.m_hdr || src.m_hdr->getFlags () & ref::BufHdrFlag_Exclusive)
-			return copy (src, src.m_count);
+		
+		Hdr* hdr = src.getHdr ();
+		if (!hdr || hdr->getFlags () & ref::BufHdrFlag_Exclusive)
+			return copy (src, src.getCount ());
 
 		this->attach (src);
 		return this->m_count;

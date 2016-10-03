@@ -13,15 +13,11 @@
 namespace axl {
 namespace sl {
 
-template <typename T> class StringBase;
-
 //.............................................................................
 
 template <typename T>
 class StringRefBase
 {
-	friend class StringBase <T>;
-
 public:
 	typedef StringDetailsBase <T> Details;
 	typedef typename Details::Details2 Details2;
@@ -250,6 +246,12 @@ public:
 	getLength () const
 	{
 		return m_length;
+	}
+
+	ref::BufHdr* 
+	getHdr () const
+	{
+		return m_hdr;
 	}
 
 	bool
@@ -687,7 +689,7 @@ public:
 	size_t
 	forceCopy (const StringRef& src)
 	{
-		return copy (src, src.m_length);
+		return copy (src, src.getLength ());
 	}
 
 	size_t
@@ -696,8 +698,9 @@ public:
 		if (&src == this)
 			return this->m_length;
 
-		if (!src.m_hdr || src.m_hdr->getFlags () & ref::BufHdrFlag_Exclusive)
-			return copy (src, src.m_length);
+		ref::BufHdr* hdr = src.getHdr ();
+		if (!hdr || hdr->getFlags () & ref::BufHdrFlag_Exclusive)
+			return copy (src, src.getLength ());
 
 		this->attach (src);
 		return this->m_length;
@@ -721,7 +724,7 @@ public:
 		size_t length = -1
 		)
 	{
-		if (p == this->m_p && length == -1)
+		if (p == this->m_p && (length == -1 || length == this->m_length))
 			return this->m_length;
 
 		if (length == -1)
@@ -909,7 +912,7 @@ public:
 		const StringRef& src
 		)
 	{
-		return !this->m_length ? copy (src) : insert (index, src, src.m_length);
+		return !this->m_length ? copy (src) : insert (index, src, src.getLength ());
 	}
 
 	size_t
@@ -1263,16 +1266,22 @@ public:
 	C*
 	getBuffer (size_t* length = NULL)
 	{
-		C* p = createBuffer (this->m_length);
+		C* p = createBuffer (this->m_length, true);
 		if (!p)
 			return NULL;
 
 		if (length)
 		{
-			C* end = (C*) ((char*) (this->m_hdr + 1) + this->m_hdr->m_bufferSize);		
-			ASSERT (this->m_p >= (C*) (this->m_hdr + 1) && this->m_p < end);
-
-			*length = end - this->m_p;
+			size_t fullLength = this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C);
+			if (!m_isNullTerminated)
+			{
+				*length = fullLength;
+			}
+			else
+			{
+				ASSERT (fullLength);
+				*length = fullLength - 1;
+			}
 		}
 
 		return p;
@@ -1290,10 +1299,16 @@ public:
 			this->m_hdr->m_bufferSize >= size &&
 			this->m_hdr->getRefCount () == 1)
 		{
-			this->m_length = length;
-			this->m_p [length] = 0;
-			this->m_isNullTerminated = true;
-			return this->m_p;
+			if (!this->m_length || !saveContents)
+				this->m_p = (C*) (this->m_hdr + 1);
+
+			if (this->m_hdr->getLeftoverBufferSize (this->m_p) >= size)
+			{
+				this->m_length = length;
+				this->m_p [length] = 0;
+				this->m_isNullTerminated = true;
+				return this->m_p;
+			}
 		}
 
 		size_t bufferSize = sl::getMinPower2Ge (size);

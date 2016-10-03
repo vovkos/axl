@@ -22,7 +22,6 @@ class ErrorMgr
 protected:
 	struct ThreadEntry
 	{
-		ErrorMode m_mode;
 		Error m_error;
 	};
 
@@ -49,16 +48,6 @@ public:
 
 	ErrorProvider* 
 	findProvider (const sl::Guid& guid);
-
-	ErrorMode
-	getErrorMode ()
-	{
-		ThreadEntry* entry = findThreadEntry ();
-		return entry ? entry->m_mode : ErrorMode_NoThrow;
-	}
-
-	ErrorMode
-	setErrorMode (ErrorMode mode);
 
 	Error
 	getLastError ();

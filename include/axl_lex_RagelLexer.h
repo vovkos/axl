@@ -191,13 +191,8 @@ public:
 	void
 	ensureSrcPosError ()
 	{
-		err::Error error = err::getLastError ();
-		if (!error->isKind (lex::g_parseErrorGuid, lex::ParseErrorCode_SrcPos))
-			lex::pushSrcPosError (
-				m_filePath, 
-				this->m_lastTokenPos.m_line, 
-				this->m_lastTokenPos.m_col 
-				);
+		if (!lex::isLastSrcPosError ())
+			lex::pushSrcPosError (m_filePath, this->m_lastTokenPos);
 	}
 
 	enum GotoStateKind

@@ -61,6 +61,13 @@ struct BufHdr: public RefCount
 	{
 		return p >= this + 1 && p < getBufferEnd ();
 	}
+
+	size_t
+	getLeftoverBufferSize (const void* p) const
+	{
+		ASSERT (isInsideBuffer (p));
+		return (char*) getBufferEnd () - (char*) p;
+	}
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -69,9 +76,151 @@ template <
 	typename T,
 	typename SizeOf = sl::SizeOf <T>
 	>
-class Buf
+class BufRef
 {
+protected:
+	mutable T* m_p;
+	mutable BufHdr* m_hdr;
+	size_t m_size;
+
 public:
+	BufRef ()
+	{
+		initialize ();
+	}
+
+	BufRef (const BufRef& src)
+	{
+		initialize ();
+		attach (src);
+	}
+
+	BufRef (
+		const T* p,
+		size_t size = -1
+		)
+	{
+		initialize ();
+		attach (p, NULL, size);
+	}
+
+	~BufRef ()
+	{
+		release ();
+	}
+
+	operator const T* () const
+	{
+		return m_p;
+	}
+
+	const T* 
+	operator -> () const
+	{ 
+		ASSERT (m_p);
+		return m_p; 
+	}
+
+	BufRef&
+	operator = (const BufRef& src)
+	{
+		attach (src);
+		return *this;
+	}
+
+	const T* 
+	cp () const
+	{
+		return m_p;
+	}
+
+	size_t
+	getSize () const
+	{
+		return m_size;
+	}
+
+	BufHdr* 
+	getHdr () const
+	{
+		return m_hdr;
+	}
+
+	bool
+	isEmpty () const
+	{
+		return m_size == 0;
+	}
+
+	void
+	release ()
+	{
+		if (m_hdr)
+			m_hdr->release ();
+
+		initialize ();
+	}
+
+protected:
+	void
+	initialize ()
+	{
+		m_p = NULL;
+		m_hdr = NULL;
+		m_size = 0;
+	}
+
+	void
+	attachBufHdr (BufHdr* hdr) const
+	{
+		if (hdr == m_hdr)
+			return; // try to avoid unnecessary interlocked ops
+
+		if (hdr)
+			hdr->addRef ();
+
+		if (m_hdr)
+			m_hdr->release ();
+		
+		m_hdr = hdr;
+	}
+
+	void
+	attach (const BufRef& src)
+	{
+		if (&src == this)
+			return;
+
+		attachBufHdr (src.m_hdr);
+
+		m_p = src.m_p;
+		m_size = src.m_size;
+	}
+
+	void
+	attach (
+		const T* p,
+		BufHdr* hdr,
+		size_t size
+		)
+	{
+		attachBufHdr (hdr);
+
+		m_p = const_cast <T*> (p);
+		m_size = size != -1 ? size : SizeOf () (p);
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename SizeOf = sl::SizeOf <T>,
+	typename Ref = BufRef <T, SizeOf>
+	>
+class Buf: public Ref
+{
+protected:
 	class Hdr: public BufHdr
 	{
 	public:
@@ -86,25 +235,27 @@ public:
 		MinBufSize = sizeof (Hdr) + sizeof (T)
 	};
 
-protected:
-	T* m_p;
-
 public:
 	Buf ()
 	{
-		m_p = NULL;
 	}
 
 	Buf (const Buf& src)
 	{
-		m_p = NULL;
 		copy (src);
 	}
 
-	Buf (const T* src)
+	Buf (const Ref& src)
 	{
-		m_p = NULL;
 		copy (src);
+	}
+
+	Buf (
+		const T* src,
+		size_t size = -1
+		)
+	{
+		copy (src, size);
 	}
 	
 	Buf (
@@ -113,13 +264,7 @@ public:
 		size_t size
 		)
 	{
-		m_p = NULL;
 		setBuffer (kind, p, size);
-	}
-
-	~Buf ()
-	{
-		release ();
 	}
 
 	operator const T* () const
@@ -127,23 +272,16 @@ public:
 		return m_p; 
 	}
 
-	const T* 
-	operator -> () const
-	{ 
-		ASSERT (m_p);
-		return m_p; 
-	}
-
 	operator T* ()
 	{ 
-		return m_p; 
+		return p (); 
 	}
 
 	T* 
 	operator -> ()
 	{ 
-		ASSERT (m_p);
-		return m_p; 
+		ASSERT (m_size);
+		return p (); 
 	}
 
 	Buf& 
@@ -154,70 +292,113 @@ public:
 	}
 
 	Buf& 
-	operator = (const T* src)
-	{
+	operator = (const Ref& src)
+	{ 
 		copy (src);
 		return *this;
 	}
-	
-	bool
-	isNull () const
+
+	Buf& 
+	operator = (const T* p)
 	{
-		return !m_p;
+		copy (p, -1);
+		return *this;
+	}
+	
+	T*
+	p ()
+	{
+		return getBuffer ();
+	}
+
+	void
+	clear ()
+	{
+		if (!this->m_hdr)
+		{
+			ASSERT (!this->m_length);
+			return;
+		}
+
+		if (this->m_hdr->getRefCount () != 1)
+		{
+			this->release ();
+			return;
+		}
+
+		if (m_size)
+			this->m_p->~T ();
+
+		this->m_p = (T*) (this->m_hdr + 1);
+		this->m_size = 0;
 	}
 
 	size_t
-	getSize () const
+	copy (const Ref& src)
 	{
-		return m_p ? SizeOf () (m_p) : 0;
+		if (&src == this)
+			return this->m_size;
+
+		BufHdr* hdr = src.getHdr ();
+		if (!hdr || hdr->getFlags () & BufHdrFlag_Exclusive)
+			return copy (src, src.getSize ());
+
+		this->attach (src);
+		return this->m_size;
 	}
 
-	void 
-	release ()
+	size_t
+	copy (
+		const T* p,
+		size_t size = -1
+		)
 	{
-		if (!m_p)
-			return;
+		if (p == this->m_p && (size == -1 || size == this->m_size))
+			return this->m_size;
 
-		getHdr ()->release ();
-		m_p = NULL;
-	}
+		if (size == -1)
+			size = SizeOf () (p);
 
-	bool
-	copy (const Buf& src)
-	{
-		if (m_p == src.m_p)
-			return true;
+		if (size < sizeof (T))
+			size = sizeof (T);
 
-		if (src.m_p)
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
 		{
-			if (src.getHdr ()->getFlags () & BufHdrFlag_Exclusive)
-				return copy (src.m_p);
+			// in-buffer shifts only applicable to non-destructible-types
 
-			src.getHdr ()->addRef ();
+			T* end = (T*) this->m_hdr->getBufferEnd ();
+			ASSERT (p + size <= end);
+
+			this->m_p = (T*) p;
+			this->m_size = size;
+			return size;
 		}
 
-		if (m_p)
-			getHdr ()->release ();
+		if (!createBuffer (size, false))
+			return -1;
 
-		m_p = src.m_p;
-		return true;
+		*m_p = *p;
+		if (size > sizeof (T))
+			memcpy (this->m_p + 1, p + 1, size - sizeof (T));
+
+		return size;
 	}
 
-	bool
-	copy (const T* src)
-	{
-		return m_p == src ? true : prepareBuffer (SizeOf () (src), src) != NULL;
+	bool 
+	ensureExclusive ()
+	{ 
+		return m_size ? getBuffer () != NULL : true; 
 	}
 
 	T* 
 	getBuffer (size_t* size = NULL)
 	{
-		T* p = prepareBuffer (m_p ? SizeOf () (m_p) : sizeof (T), m_p);
+		T* p = createBuffer (m_size, true);
 		if (!p)
 			return NULL;
 
 		if (size)
-			*size = getHdr ()->m_bufferSize;
+			*size = this->m_hdr->getLeftoverBufferSize (this->m_p);
 
 		return p;
 	}
@@ -227,110 +408,86 @@ public:
 		size_t size, 
 		bool saveContents = false
 		)
-	{
-		return prepareBuffer (size, saveContents ? m_p : NULL);
+	{	
+		if (size < sizeof (T))
+			size = sizeof (T);
+
+		if (this->m_hdr &&
+			this->m_hdr->m_bufferSize >= size &&
+			this->m_hdr->getRefCount () == 1)
+		{
+			if (!this->m_size)
+			{
+				ASSERT (this->m_p == (T*) (this->m_hdr + 1));
+				new (this->m_p) T;
+			}
+			else if (!saveContents)
+			{
+				// no need to call destructor on old m_p -- in-buffer shifts are only applicable to non-destructible types
+				this->m_p = (T*) (this->m_hdr + 1);
+			}
+
+			if (this->m_hdr->getLeftoverBufferSize (this->m_p) >= size)
+			{
+				this->m_size = size;
+				return this->m_p;
+			}
+		}
+
+		size_t bufferSize = sl::getMinPower2Ge (size);
+
+		Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
+		if (!hdr)
+			return NULL;
+
+		hdr->m_bufferSize = bufferSize;
+
+		T* p = (T*) (hdr + 1);
+
+		if (saveContents && this->m_p)
+		{
+			new (p) T (*m_p);
+			size_t copySize = AXL_MIN (size, this->m_size);
+			if (copySize > sizeof (T))
+				memcpy (p + 1, m_p + 1, copySize - sizeof (T));
+		}
+		else
+		{
+			new (p) T;
+		}
+
+		if (this->m_hdr)
+			this->m_hdr->release ();
+
+		this->m_p = p;
+		this->m_hdr = hdr.detach ();
+		this->m_size = size;
+		return p;
 	}
 
-	void
+	size_t
 	setBuffer (
-		BufKind kind,
+		ref::BufKind kind,
 		void* p,
 		size_t size
 		)
 	{
 		ASSERT (size >= MinBufSize);
 
-		Hdr* oldHdr = getHdr ();
-
-		uint_t flags = kind != BufKind_Static ? BufHdrFlag_Exclusive : 0;
-		Ptr <Hdr> newHdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
-		newHdr->m_bufferSize = size - sizeof (Hdr);
-
-		m_p = (T*) (newHdr + 1);
-		newHdr.detach ();
-
-		new (m_p) T;
-
-		if (oldHdr)
-			oldHdr->release ();
-	}
+		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
+		size_t bufferSize = size - sizeof (ref::BufHdr);
 		
-	bool 
-	ensureExclusive ()
-	{ 
-		return m_p ? getBuffer () != NULL : true; 
-	}
+		Ptr <Hdr> hdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
+		hdr->m_bufferSize = bufferSize;
 
-protected:
-	Hdr*
-	getHdr () const
-	{
-		return m_p ? (Hdr*) m_p - 1 : NULL;
-	}
+		if (this->m_hdr)
+			this->m_hdr->release ();
 
-	T* 
-	prepareBuffer (
-		size_t size,
-		const T* src
-		)
-	{
-		ASSERT (size >= sizeof (T));
+		this->m_p = (T*) (hdr + 1);
+		this->m_hdr = hdr.detach ();
+		this->m_size = 0;
 
-		Hdr* oldHdr = getHdr ();
-		
-		if (oldHdr && 
-			oldHdr->m_bufferSize >= size &&
-			oldHdr->getRefCount () == 1
-			)
-		{
-			if (src)
-			{
-				*m_p = *src;
-				copyExtra (m_p, src);
-			}
-
-			return m_p;
-		}
-
-		size_t bufferSize = sl::getMinPower2Ge (size);
-
-		Ptr <Hdr> newHdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
-		if (!newHdr)
-			return NULL;
-
-		newHdr->m_bufferSize = bufferSize;
-		m_p = (T*) (newHdr + 1);
-		newHdr.detach ();
-
-		if (src)
-		{
-			new (m_p) T (*src);
-			copyExtra (m_p, src);
-		}
-		else
-		{
-			new (m_p) T;
-		}
-
-		if (oldHdr)
-			oldHdr->release ();
-
-		return m_p;
-	}
-
-	static
-	void 
-	copyExtra (
-		T* dst,
-		const T* src
-		)
-	{
-		if (!src)
-			return;
-
-		size_t size = SizeOf () (src);
-		if (size > sizeof (T))
-			memcpy (dst + 1, src + 1, size - sizeof (T));
+		return bufferSize;
 	}
 };
 

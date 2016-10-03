@@ -49,20 +49,11 @@ ErrorMgr::findProvider (const sl::Guid& guid)
 	return it ? it->m_value : NULL;
 }
 
-ErrorMode
-ErrorMgr::setErrorMode (ErrorMode mode)
-{
-	ThreadEntry* entry = getThreadEntry ();
-	ErrorMode oldMode = entry->m_mode;
-	entry->m_mode = mode;
-	return oldMode;
-}
-
 Error
 ErrorMgr::getLastError ()
 {
 	ThreadEntry* entry = findThreadEntry ();
-	if (entry && entry->m_error)
+	if (entry && !entry->m_error.isEmpty ())
 		return entry->m_error;  
 	
 	return &g_noError;
@@ -73,23 +64,6 @@ ErrorMgr::setError (const Error& error)
 {	
 	ThreadEntry* entry = getThreadEntry ();
 	entry->m_error = error;
-	
-	switch (entry->m_mode)
-	{
-	case ErrorMode_NoThrow:
-		break;
-
-	case ErrorMode_CppException:
-		throw error;
-		ASSERT (false);
-
-	case ErrorMode_SetJmpLongJmp:
-		AXL_SYS_SJLJ_THROW ();
-		ASSERT (false);
-
-	default:
-		ASSERT (false);
-	}
 }
 
 ErrorMgr::ThreadEntry*

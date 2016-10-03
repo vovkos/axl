@@ -8,6 +8,20 @@ namespace err {
 
 //.............................................................................
 
+sl::String
+ErrorRef::getDescription () const
+{
+	const ErrorHdr* p = isEmpty () ? cp () : &g_noError;
+
+	ErrorProvider* provider = getErrorMgr ()->findProvider (p->m_guid);
+	return provider ?
+		provider->getErrorDescription (p) :
+		sl::String::format_s ("%s::%d", p->m_guid.getGuidString ().cc (), p->m_code);
+}
+
+//.............................................................................
+
+/*
 bool
 ErrorHdr::isKind (
 	const sl::Guid& guid,
@@ -32,28 +46,11 @@ ErrorHdr::getDescription () const
 		sl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code);
 }
 
+*/
+
 //.............................................................................
 
-sl::String
-Error::getDescription () const
-{
-	return m_p ?
-		m_p->getDescription () :
-		g_noError.getDescription ();
-}
-
-ErrorHdr*
-Error::copy (const ErrorHdr* src)
-{
-	ErrorHdr* error = createBuffer (src->m_size);
-	if (!error)
-		return NULL;
-
-	memcpy (error, src, src->m_size);
-	return error;
-}
-
-ErrorHdr*
+size_t
 Error::push (const ErrorHdr* error)
 {
 	if (!m_p)
@@ -62,7 +59,7 @@ Error::push (const ErrorHdr* error)
 	size_t base = 0;
 	size_t baseSize = m_p->m_size;
 
-	if (m_p->isKind (g_stdErrorGuid, StdErrorCode_Stack))
+	if (isKindOf (g_stdErrorGuid, StdErrorCode_Stack))
 	{
 		base += sizeof (ErrorHdr);
 		baseSize -= sizeof (ErrorHdr);
@@ -85,10 +82,10 @@ Error::push (const ErrorHdr* error)
 	m_p->m_code = StdErrorCode_Stack;
 
 	memcpy (m_p + 1, error, error->m_size);
-	return m_p;
+	return size;
 }
 
-ErrorHdr*
+size_t
 Error::createSimpleError (
 	const sl::Guid& guid,
 	uint_t code
@@ -101,10 +98,10 @@ Error::createSimpleError (
 	m_p->m_size = sizeof (ErrorHdr);
 	m_p->m_guid = guid;
 	m_p->m_code = code;
-	return m_p;
+	return sizeof (ErrorHdr);
 }
 
-ErrorHdr*
+size_t
 Error::format_va (
 	const sl::Guid& guid,
 	uint_t code,
@@ -129,10 +126,10 @@ Error::format_va (
 	m_p->m_code = code;
 
 	packer.pack_va (m_p + 1, &packSize, va);
-	return m_p;
+	return size;
 }
 
-ErrorHdr*
+size_t
 Error::createStringError (
 	const char* p,
 	size_t length
@@ -156,10 +153,10 @@ Error::createStringError (
 	memcpy (dst, p, length);
 	dst [length] = 0;
 
-	return error;
+	return size;
 }
 
-ErrorHdr*
+size_t
 Error::formatStringError_va (
 	const char* formatString,
 	axl_va_list va
@@ -172,12 +169,6 @@ Error::formatStringError_va (
 }
 
 //.............................................................................
-
-ErrorMode
-setErrorMode (ErrorMode mode)
-{
-	return getErrorMgr ()->setErrorMode (mode);
-}
 
 Error
 getLastError ()
@@ -195,7 +186,7 @@ setError (const Error& error)
 sl::String
 getLastErrorDescription ()
 {
-	return getErrorMgr ()->getLastError ()->getDescription ();
+	return getErrorMgr ()->getLastError ().getDescription ();
 }
 
 //.............................................................................
@@ -240,7 +231,7 @@ StdErrorProvider::getStackErrorDescription (const ErrorHdr* error)
 		if (!string.isEmpty ())
 			string += ": ";
 
-		string += p->getDescription ();
+		string += ErrorRef (p).getDescription ();
 		p = (ErrorHdr*) ((uchar_t*) p + p->m_size);
 	}
 

@@ -51,7 +51,7 @@ public:
 		create (code);
 	}
 
-	ErrorHdr*
+	size_t
 	create (int code)
 	{
 		return createSimpleError (g_ErrnoGuid, code);

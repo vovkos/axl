@@ -53,7 +53,7 @@ public:
 		create (code);
 	}
 
-	err::ErrorHdr*
+	size_t
 	create (int code)
 	{
 		return createSimpleError (g_cryptoErrorGuid, code);

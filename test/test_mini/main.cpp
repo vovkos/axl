@@ -329,7 +329,7 @@ testWinNetworkAdapterList2 ()
 		dword_t error = ::WSAGetLastError ();
 		if (error != WSAENOBUFS)
 		{
-			printf ("WSAIoctl failed (%s)\n", err::Error (error)->getDescription ().cc ());
+			printf ("WSAIoctl failed (%s)\n", err::Error (error).getDescription ().cc ());
 			return;
 		}
 

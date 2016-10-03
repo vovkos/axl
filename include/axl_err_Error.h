@@ -26,42 +26,6 @@ namespace err {
 
 //.............................................................................
 
-enum ErrorMode
-{
-	ErrorMode_NoThrow       = 0,
-	ErrorMode_CppException,
-	ErrorMode_SetJmpLongJmp,
-};
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-ErrorMode
-getErrorMode ();
-
-ErrorMode // returns previous one
-setErrorMode (ErrorMode mode);
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class ScopeErrorMode
-{
-protected:
-	ErrorMode m_oldMode;
-
-public:
-	ScopeErrorMode (ErrorMode mode)
-	{
-		m_oldMode = setErrorMode (mode);
-	}
-
-	~ScopeErrorMode ()
-	{
-		setErrorMode (m_oldMode);
-	}
-};
-
-//.............................................................................
-
 // axl std errors
 
 extern AXL_SELECT_ANY const sl::Guid g_stdErrorGuid = sl::g_nullGuid;
@@ -199,17 +163,6 @@ struct ErrorHdr
 	uint32_t m_size;
 	sl::Guid m_guid;
 	uint32_t m_code;
-
-	// possibly followed by error data
-
-	sl::String
-	getDescription () const;
-
-	bool
-	isKind (
-		const sl::Guid& guid,
-		uint_t code
-		) const;
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -235,13 +188,63 @@ extern AXL_SELECT_ANY const ErrorHdr g_noError =
 
 //.............................................................................
 
-// ref-counted error buffer
+class ErrorRef: public ref::BufRef <ErrorHdr, SizeOfError>
+{
+public:
+	typedef ref::BufRef <ErrorHdr, SizeOfError> BaseType;
 
-class Error: public ref::Buf <ErrorHdr, SizeOfError>
+public:
+	ErrorRef ()
+	{
+	}
+
+	ErrorRef (const ErrorRef& src):
+		BaseType (src)
+	{
+	}
+
+	ErrorRef (const ErrorHdr* src):
+		BaseType (src)
+	{
+	}
+
+	ErrorRef&
+	operator = (const ErrorRef& src)
+	{
+		attach (src);
+		return *this;
+	}
+
+	bool
+	isKindOf (
+		const sl::Guid& guid,
+		uint_t code
+		) const
+	{
+		return !isEmpty () && cp ()->m_guid == guid && cp ()->m_code == code;
+	}
+
+	sl::String
+	getDescription () const;
+};
+
+//.............................................................................
+
+class Error: public ref::Buf <ErrorHdr, SizeOfError, ErrorRef>
 {
 public:
 	Error ()
 	{
+	}
+
+	Error (const Error& src)
+	{
+		copy (src);
+	}
+
+	Error (const ErrorRef& src)
+	{
+		copy (src);
 	}
 
 	Error (const ErrorHdr* src)
@@ -260,28 +263,14 @@ public:
 
 	Error (
 		const sl::Guid& guid,
-		uint_t code,
-		ref::BufKind kind = ref::BufKind_Stack,
-		ErrorHdr* p = (ErrorHdr*) _alloca (MinBufSize),
-		size_t size = MinBufSize
+		uint_t code
 		)
 	{
-		if (p)
-			setBuffer (kind, p, size);
-
 		createSimpleError (guid, code);
 	}
 
-	Error (
-		uint_t code,
-		ref::BufKind kind = ref::BufKind_Stack,
-		ErrorHdr* p = (ErrorHdr*) _alloca (MinBufSize),
-		size_t size = MinBufSize
-		)
+	Error (uint_t code)
 	{
-		if (p)
-			setBuffer (kind, p, size);
-
 		createSystemError (code);
 	}
 
@@ -293,28 +282,13 @@ public:
 		createStringError (string, length);
 	}
 
-	bool
-	isKind (
-		const sl::Guid& guid,
-		uint_t code
-		) const
-	{
-		return m_p && m_p->isKind (guid, code);
-	}
-
-	sl::String
-	getDescription () const;
-
-	ErrorHdr*
-	copy (const ErrorHdr* src);
-
-	ErrorHdr*
+	size_t
 	push (const ErrorHdr* error);
 
 	// pack
 
 	template <typename Pack>
-	ErrorHdr*
+	size_t
 	pack_va (
 		const sl::Guid& guid,
 		uint_t code,
@@ -334,11 +308,11 @@ public:
 		m_p->m_code = code;
 
 		Pack () (m_p + 1, &packSize, va);
-		return m_p;
+		return size;
 	}
 
 	template <typename Pack>
-	ErrorHdr*
+	size_t
 	pack (
 		const sl::Guid& guid,
 		uint_t code,
@@ -350,7 +324,7 @@ public:
 	}
 
 	template <typename Pack>
-	ErrorHdr*
+	size_t
 	pushPack_va (
 		const sl::Guid& guid,
 		uint_t code,
@@ -366,7 +340,7 @@ public:
 	}
 
 	template <typename Pack>
-	ErrorHdr*
+	size_t
 	pushPack (
 		const sl::Guid& guid,
 		uint_t code,
@@ -379,7 +353,7 @@ public:
 
 	// format
 
-	ErrorHdr*
+	size_t
 	format_va (
 		const sl::Guid& guid,
 		uint_t code,
@@ -387,7 +361,7 @@ public:
 		axl_va_list va
 		);
 
-	ErrorHdr*
+	size_t
 	format (
 		const sl::Guid& guid,
 		uint_t code,
@@ -399,7 +373,7 @@ public:
 		return format_va (guid, code, formatString, va);
 	}
 
-	ErrorHdr*
+	size_t
 	pushFormat_va (
 		const sl::Guid& guid,
 		uint_t code,
@@ -415,7 +389,7 @@ public:
 		return push (error);
 	}
 
-	ErrorHdr*
+	size_t
 	pushFormat (
 		const sl::Guid& guid,
 		uint_t code,
@@ -429,13 +403,13 @@ public:
 
 	// simple error
 
-	ErrorHdr*
+	size_t
 	createSimpleError (
 		const sl::Guid& guid,
 		uint_t code
 		);
 
-	ErrorHdr*
+	size_t
 	pushSimpleError (
 		const sl::Guid& guid,
 		uint_t code
@@ -451,7 +425,7 @@ public:
 
 	// system error (push is irrelevant for system errors)
 
-	ErrorHdr*
+	size_t
 	createSystemError (uint_t code)
 	{
 		return createSimpleError (g_systemErrorGuid, code);
@@ -459,13 +433,13 @@ public:
 
 	// string error
 
-	ErrorHdr*
+	size_t
 	createStringError (
 		const char* p,
 		size_t length = -1
 		);
 
-	ErrorHdr*
+	size_t
 	pushStringError (
 		const char* p,
 		size_t length = -1
@@ -479,13 +453,13 @@ public:
 		return push (error);
 	}
 
-	ErrorHdr*
+	size_t
 	formatStringError_va (
 		const char* formatString,
 		axl_va_list va
 		);
 
-	ErrorHdr*
+	size_t
 	formatStringError (
 		const char* formatString,
 		...
@@ -495,7 +469,7 @@ public:
 		return formatStringError_va (formatString, va);
 	}
 
-	ErrorHdr*
+	size_t
 	pushFormatStringError_va (
 		const char* formatString,
 		axl_va_list va
@@ -509,8 +483,7 @@ public:
 		return push (error);
 	}
 
-
-	ErrorHdr*
+	size_t
 	pushFormatStringError (
 		const char* formatString,
 		...

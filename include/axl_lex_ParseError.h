@@ -86,33 +86,42 @@ pushSrcPosError (const SrcPos& srcPos)
 	return pushSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
+bool
+isLastSrcPosError ()
+{
+	err::Error error = err::getLastError ();
+	return 
+		error.isKindOf (sl::g_nullGuid, err::StdErrorCode_Stack) &&
+		err::ErrorRef (error + 1).isKindOf (g_parseErrorGuid, ParseErrorCode_SrcPos);
+}
+
 inline
-err::Error
+void
 ensureSrcPosError (
 	const char* filePath,
 	int line,
 	int col = 0
 	)
 {
-	err::Error error = err::getLastError ();
-	return error->isKind (g_parseErrorGuid, ParseErrorCode_SrcPos) ? error : pushSrcPosError (filePath, line, col);
+	if (!isLastSrcPosError ())
+		pushSrcPosError (filePath, line, col);
 }
 
 inline
-err::Error
+void
 ensureSrcPosError (
 	const char* filePath,
 	const LineCol& lineCol
 	)
 {
-	return ensureSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
+	ensureSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
 }
 
 inline
-err::Error
+void
 ensureSrcPosError (const SrcPos& srcPos)
 {
-	return ensureSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
+	ensureSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
 inline
