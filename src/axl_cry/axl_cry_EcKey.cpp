@@ -60,7 +60,7 @@ EcKey::setPublicKeyData (
 
 bool
 EcKey::setPublicKeyDecString (
-	const char* string,
+	const sl::StringRef& string,
 	BN_CTX* ctx
 	)
 {
@@ -74,7 +74,7 @@ EcKey::setPublicKeyDecString (
 
 bool
 EcKey::setPublicKeyHexString (
-	const char* string,
+	const sl::StringRef& string,
 	BN_CTX* ctx
 	)
 {
@@ -122,7 +122,7 @@ bool
 generateEcProductKey (
 	EC_KEY* ecKey0,
 	sl::String* productKey,
-	const char* userName,
+	const sl::StringRef& userName,
 	size_t hyphenDistance
 	)
 {
@@ -132,7 +132,7 @@ generateEcProductKey (
 	EcKey ecKey (ecKey0);
 
 	bool result = 
-		ecKey.sign (&signature, userName, strlen_s (userName)) &&
+		ecKey.sign (&signature, userName.cp (), userName.getLength ()) &&
 		enc::Base32Encoding::encode (productKey, signature, signature.getCount (), hyphenDistance) != -1;
 
 	ecKey.detach ();
@@ -142,8 +142,8 @@ generateEcProductKey (
 bool
 verifyEcProductKey (
 	EC_KEY* ecKey0,
-	const char* userName,
-	const char* productKey
+	const sl::StringRef& userName,
+	const sl::StringRef& productKey
 	)
 {
 	char buffer [256];
@@ -153,7 +153,7 @@ verifyEcProductKey (
 
 	bool result = 
 		enc::Base32Encoding::decode (&signature, productKey) != -1 &&
-		ecKey.verify (userName, strlen_s (userName), signature, signature.getCount ());
+		ecKey.verify (userName.cp (), userName.getLength (), signature, signature.getCount ());
 
 	ecKey.detach ();
 	return result;

@@ -76,8 +76,7 @@ public:
 	HyperlinkAnchor* 
 	openHyperlink (
 		size_t offset, 
-		const char* hyperlink, 
-		size_t length = -1
+		const sl::StringRef& hyperlink
 		);
 
 	HyperlinkAnchor* 

@@ -9,7 +9,7 @@ namespace io {
 #if (_AXL_OS_WIN)
 
 bool
-FileEnumerator::openDir (const char* dir)
+FileEnumerator::openDir (const sl::StringRef& dir)
 {
 	close ();
 	m_nextFileName.clear ();
@@ -47,7 +47,7 @@ FileEnumerator::getNextFileName ()
 #elif (_AXL_OS_POSIX)
 
 bool
-FileEnumerator::openDir (const char* dir)
+FileEnumerator::openDir (const sl::StringRef& dir)
 {
 	close ();
 	m_nextFileName.clear ();

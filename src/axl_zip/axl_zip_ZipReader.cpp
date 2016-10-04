@@ -21,12 +21,12 @@ ZipReader::close ()
 }
 
 bool
-ZipReader::openFile (const char* fileName)
+ZipReader::openFile (const sl::StringRef& fileName)
 {
 	close ();
 
 	m_zip = AXL_MEM_NEW (mz_zip_archive);
-	mz_bool result = mz_zip_reader_init_file (m_zip, fileName, MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
+	mz_bool result = mz_zip_reader_init_file (m_zip, fileName.sz (), MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
 	return result ? true : err::fail (err::SystemErrorCode_Unsuccessful);
 }
 
@@ -149,16 +149,16 @@ ZipReader::extractFileToMem (
 	if (!result)
 		return false;
 
-	buffer->a () [(size_t) stat.m_uncomp_size] = 0; // ensure zero termination
+	buffer->p () [(size_t) stat.m_uncomp_size] = 0; // ensure zero termination
 	buffer->setCount ((size_t) stat.m_uncomp_size);
 	
-	return extractFileToMem (index, buffer->a (), (size_t) stat.m_uncomp_size);
+	return extractFileToMem (index, buffer->p (), (size_t) stat.m_uncomp_size);
 }
 
 bool
 ZipReader::extractFileToFile (
 	size_t index,
-	const char* fileName
+	const sl::StringRef& fileName
 	)
 {
 	ASSERT (isOpen ());
@@ -166,7 +166,7 @@ ZipReader::extractFileToFile (
 	mz_bool result = mz_zip_reader_extract_to_file (
 		m_zip,
 		index,
-		fileName,
+		fileName.sz (),
 		0
 		);
 

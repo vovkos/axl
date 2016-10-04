@@ -55,7 +55,7 @@ Mapping::open (
 
 void*
 Mapping::open (
-	const char* name,
+	const sl::StringRef& name,
 	size_t size,
 	uint_t flags
 	)

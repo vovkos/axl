@@ -14,7 +14,7 @@ Mapping::create (
 	SECURITY_ATTRIBUTES* secAttr,
 	uint_t pageProtection,
 	uint64_t _MaxSize,
-	const wchar_t* name
+	const sl::StringRef_w& name
 	)
 {
 	close ();
@@ -28,7 +28,7 @@ Mapping::create (
 		pageProtection, 
 		maxSize.HighPart, 
 		maxSize.LowPart,
-		name
+		name.sz ()
 		);
 
 	return err::complete (m_h != NULL);
@@ -38,12 +38,12 @@ bool
 Mapping::open (
 	uint_t access,
 	bool doInheritHandle,
-	const wchar_t* name
+	const sl::StringRef_w& name
 	)
 {
 	close ();
 
-	m_h = ::OpenFileMappingW (access, doInheritHandle, name);
+	m_h = ::OpenFileMappingW (access, doInheritHandle, name.sz ());
 	return err::complete (m_h != NULL);
 }
 

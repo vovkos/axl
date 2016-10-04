@@ -36,8 +36,7 @@ public:
 	parse (
 		TextAttr* targetAttr,
 		const TextAttr& baseAttr,
-		const char* p,
-		size_t length = -1
+		const sl::StringRef& string
 		);
 
 protected:

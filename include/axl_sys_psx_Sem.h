@@ -107,7 +107,7 @@ public:
 
 	bool
 	open (
-		const char* name,
+		const sl::StringRef& name,
 		int flags = O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH,
 		uint_t value = 0
@@ -118,7 +118,7 @@ public:
 
 	static
 	bool
-	unlink (const char* name)
+	unlink (const sl::StringRef& name)
 	{
 		int result = ::sem_unlink (name);
 		return err::complete (result == 0);

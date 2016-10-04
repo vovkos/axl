@@ -9,7 +9,7 @@ namespace io {
 
 //.............................................................................
 
-const char* 
+sl::StringRef
 getSockAddrFamilyString (uint_t family)
 {
 	switch (family)
@@ -41,7 +41,7 @@ getSockAddrFamilySize (uint_t family)
 	}
 }
 
-const char* 
+sl::StringRef
 getSockProtoString (uint_t proto)
 {
 	switch (proto)
@@ -244,44 +244,40 @@ isSockAddrMatch (
 bool
 parseAddr_ip4 (
 	in_addr* addr,
-	const char* string,
-	size_t length
+	const sl::StringRef& string
 	)
 {
-	SockAddrParser parser (string, length);
-	return parser.parse (addr);
+	;
+	return SockAddrParser (string).parse (addr);
 }
 
 bool
 parseAddr_ip6 (
 	in6_addr* addr,
-	const char* string,
-	size_t length
+	const sl::StringRef& string
 	)
 {
-	SockAddrParser parser (string, length);
+	SockAddrParser parser (string);
 	return parser.parse (addr);
 }
 
 bool
 parseSockAddr_ip4 (
 	sockaddr_in* addr,
-	const char* string,
-	size_t length
+	const sl::StringRef& string
 	)
 {
-	SockAddrParser parser (string, length);
+	SockAddrParser parser (string);
 	return parser.parse (addr);
 }
 
 bool
 parseSockAddr_ip6 (
 	sockaddr_in6* addr,
-	const char* string,
-	size_t length
+	const sl::StringRef& string
 	)
 {
-	SockAddrParser parser (string, length);
+	SockAddrParser parser (string);
 	return parser.parse (addr);
 }
 
@@ -289,11 +285,10 @@ bool
 parseSockAddr (
 	sockaddr* addr,
 	size_t size,
-	const char* string,
-	size_t length
+	const sl::StringRef& string
 	)
 {
-	SockAddrParser parser (string, length);
+	SockAddrParser parser (string);
 	return parser.parse (addr, size);
 }
 
@@ -584,7 +579,7 @@ SockAddr::createNetMask (
 bool 
 resolveHostName (
 	sl::Array <SockAddr>* addrArray,
-	const char* name,
+	const sl::StringRef& name,
 	uint_t family
 	)
 {
@@ -595,7 +590,7 @@ resolveHostName (
 	hintAddrInfo.ai_socktype = SOCK_DGRAM;
 
 	addrinfo* addrInfoList;
-	int result = getaddrinfo (name, NULL, &hintAddrInfo, &addrInfoList);
+	int result = getaddrinfo (name.sz (), NULL, &hintAddrInfo, &addrInfoList);
 	if (result)
 	{
 #if (_AXL_OS_WIN)

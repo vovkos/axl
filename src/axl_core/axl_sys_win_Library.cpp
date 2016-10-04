@@ -8,11 +8,11 @@ namespace win {
 //.............................................................................
 
 bool
-Library::loadLibrary (const wchar_t* fileName)
+Library::loadLibrary (const sl::StringRef_w& fileName)
 {
 	close ();
 
-	m_h = ::LoadLibraryW (fileName);
+	m_h = ::LoadLibraryW (fileName.sz ());
 	return err::complete (m_h != NULL);
 }
 

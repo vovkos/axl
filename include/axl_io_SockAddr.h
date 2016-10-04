@@ -13,7 +13,7 @@ namespace io {
 
 //.............................................................................
 
-const char*
+sl::StringRef
 getSockAddrFamilyString (uint_t family);
 
 size_t
@@ -26,7 +26,7 @@ getSockAddrSize (const sockaddr* addr)
 	return getSockAddrFamilySize (addr->sa_family);
 }
 
-const char*
+sl::StringRef
 getSockProtoString (uint_t proto);
 
 //.............................................................................
@@ -99,15 +99,13 @@ isSockAddrMatch (
 bool
 parseAddr_ip4 (
 	in_addr* addr,
-	const char* string,
-	size_t length = -1
+	const sl::StringRef& string
 	);
 
 bool
 parseAddr_ip6 (
 	in6_addr* addr,
-	const char* string,
-	size_t length = -1
+	const sl::StringRef& string
 	);
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -115,23 +113,20 @@ parseAddr_ip6 (
 bool
 parseSockAddr_ip4 (
 	sockaddr_in* addr,
-	const char* string,
-	size_t length = -1
+	const sl::StringRef& string
 	);
 
 bool
 parseSockAddr_ip6 (
 	sockaddr_in6* addr,
-	const char* string,
-	size_t length = -1
+	const sl::StringRef& string
 	);
 
 bool
 parseSockAddr (
 	sockaddr* addr,
 	size_t size,
-	const char* string,
-	size_t length = -1
+	const sl::StringRef& string
 	);
 
 //.............................................................................
@@ -269,12 +264,9 @@ struct SockAddr
 		setup_ip6 (ip, port, scope);
 	}
 
-	SockAddr (
-		const char* string,
-		size_t length = -1
-		)
+	SockAddr (const sl::StringRef& string)
 	{
-		parse (string, length);
+		parse (string);
 	}
 
 	operator const sockaddr* () const
@@ -413,30 +405,21 @@ struct SockAddr
 	}
 
 	bool
-	parse (
-		const char* string,
-		size_t length = -1
-		)
+	parse (const sl::StringRef& string)
 	{
-		return parseSockAddr (&m_addr, sizeof (SockAddr), string, length);
+		return parseSockAddr (&m_addr, sizeof (SockAddr), string);
 	}
 
 	bool
-	parse_ip4 (
-		const char* string,
-		size_t length = -1
-		)
+	parse_ip4 (const sl::StringRef& string)
 	{
-		return parseSockAddr_ip4 (&m_addr_ip4, string, length);
+		return parseSockAddr_ip4 (&m_addr_ip4, string);
 	}
 
 	bool
-	parse_ip6 (
-		const char* string,
-		size_t length = -1
-		)
+	parse_ip6 (const sl::StringRef& string)
 	{
-		return parseSockAddr_ip6 (&m_addr_ip6, string, length);
+		return parseSockAddr_ip6 (&m_addr_ip6, string);
 	}
 
 	size_t
@@ -482,14 +465,14 @@ struct SockAddr
 bool
 resolveHostName (
 	sl::Array <SockAddr>* addrArray,
-	const char* name,
+	const sl::StringRef& name,
 	uint_t family = AF_UNSPEC
 	);
 
 inline
 sl::Array <SockAddr>
 resolveHostName (
-	const char* name,
+	const sl::StringRef& name,
 	uint_t family = AF_UNSPEC
 	)
 {

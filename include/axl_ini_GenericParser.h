@@ -22,7 +22,7 @@ protected:
 	sl::String m_value;
 
 public:
-	sl::String 
+	sl::String
 	getName () const
 	{
 		return m_name;
@@ -55,7 +55,7 @@ public:
 	}
 
 	NamedValue*
-	getNamedValue (const char* name) const
+	getNamedValue (const sl::StringRef& name) const
 	{
 		sl::StringHashTableMapIterator <NamedValue*> it = m_namedValueMap.find (name);
 		return it ? it->m_value : NULL;
@@ -81,7 +81,7 @@ protected:
 
 public:
 	Section* 
-	getSection (const char* name) const
+	getSection (const sl::StringRef& name) const
 	{
 		sl::StringHashTableMapIterator <Section*> it = m_namedSectionMap.find (name);
 		return it ? it->m_value : NULL;
@@ -123,12 +123,12 @@ public:
 
 public:
 	bool
-	onSection (const char* sectionName);
+	onSection (const sl::StringRef& sectionName);
 
 	bool
 	onKeyValue (
-		const char* keyName, 
-		const char* value
+		const sl::StringRef& keyName, 
+		const sl::StringRef& value
 		);
 };
 

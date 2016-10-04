@@ -7,6 +7,7 @@
 #define _AXL_SL_ARRAYDETAILS_H
 
 #include "axl_ref_Buf.h"
+#include "axl_sl_ArgType.h"
 
 namespace axl {
 namespace sl {
@@ -16,6 +17,9 @@ namespace sl {
 template <typename T>
 class ReverseArray
 {
+public:
+	typedef typename ArgType <T>::Type ValueArg;
+
 public:
 	static
 	void
@@ -282,7 +286,7 @@ public:
 
 //.............................................................................
 
-// specialization for simple types
+// specialization for primitive types
 
 template <>
 class ArrayDetails <char>: public SimpleArrayDetails <char>

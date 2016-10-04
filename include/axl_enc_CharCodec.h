@@ -114,8 +114,8 @@ public:
 		size_t bufferSize,
 		const utf8_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		) = 0;
 
 	virtual
@@ -125,8 +125,8 @@ public:
 		size_t bufferSize,
 		const utf16_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		) = 0;
 
 	virtual
@@ -136,8 +136,8 @@ public:
 		size_t bufferSize,
 		const utf32_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		) = 0;
 
 	virtual
@@ -207,9 +207,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		) = 0;
 
 	virtual
@@ -219,9 +219,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		) = 0;
 
 	virtual
@@ -231,9 +231,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		) = 0;
 };
 
@@ -289,8 +289,8 @@ public:
 		size_t bufferSize,
 		const utf8_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		)
 	{
 		UtfToAsciiConvert <Utf8>::convert (
@@ -298,8 +298,8 @@ public:
 			bufferSize,
 			p,
 			length,
-			takenBufferSize_o,
-			takenLength_o
+			takenBufferSize,
+			takenLength
 			);
 	}
 
@@ -310,8 +310,8 @@ public:
 		size_t bufferSize,
 		const utf16_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		)
 	{
 		UtfToAsciiConvert <Utf16>::convert (
@@ -319,8 +319,8 @@ public:
 			bufferSize,
 			p,
 			length,
-			takenBufferSize_o,
-			takenLength_o
+			takenBufferSize,
+			takenLength
 			);
 	}
 
@@ -331,8 +331,8 @@ public:
 		size_t bufferSize,
 		const utf32_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		)
 	{
 		UtfToAsciiConvert <Utf32>::convert (
@@ -340,8 +340,8 @@ public:
 			bufferSize,
 			p,
 			length,
-			takenBufferSize_o,
-			takenLength_o
+			takenBufferSize,
+			takenLength
 			);
 	}
 
@@ -382,9 +382,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o,
-		size_t* takenSize_o,
-		size_t* expectedSize_o
+		size_t* takenBufferLength,
+		size_t* takenSize,
+		size_t* expectedSize
 		)
 	{
 		AsciiToUtfConvert <Utf8>::convert (
@@ -392,9 +392,9 @@ public:
 			bufferLength,
 			(const char*) p,
 			size,
-			takenBufferLength_o,
-			takenSize_o,
-			expectedSize_o
+			takenBufferLength,
+			takenSize,
+			expectedSize
 			);
 	}
 
@@ -405,9 +405,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		)
 	{
 		AsciiToUtfConvert <Utf16>::convert (
@@ -415,9 +415,9 @@ public:
 			bufferLength,
 			(const char*) p,
 			size,
-			takenBufferLength_o,
-			takenSize_o,
-			expectedSize_o
+			takenBufferLength,
+			takenSize,
+			expectedSize
 			);
 	}
 
@@ -428,9 +428,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		)
 	{
 		AsciiToUtfConvert <Utf32>::convert (
@@ -438,9 +438,9 @@ public:
 			bufferLength,
 			(const char*) p,
 			size,
-			takenBufferLength_o,
-			takenSize_o,
-			expectedSize_o
+			takenBufferLength,
+			takenSize,
+			expectedSize
 			);
 	}
 };
@@ -496,8 +496,8 @@ public:
 		size_t bufferSize,
 		const utf8_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		)
 	{
 		size_t bufferLength = bufferSize / sizeof (C);
@@ -509,11 +509,11 @@ public:
 			p,
 			length,
 			&takenDstLength,
-			takenLength_o
+			takenLength
 			);
 
-		if (takenBufferSize_o)
-			*takenBufferSize_o = takenDstLength * sizeof (C);
+		if (takenBufferSize)
+			*takenBufferSize = takenDstLength * sizeof (C);
 	}
 
 	virtual
@@ -523,8 +523,8 @@ public:
 		size_t bufferSize,
 		const utf16_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		)
 	{
 		size_t bufferLength = bufferSize / sizeof (C);
@@ -536,11 +536,11 @@ public:
 			p,
 			length,
 			&takenDstLength,
-			takenLength_o
+			takenLength
 			);
 
-		if (takenBufferSize_o)
-			*takenBufferSize_o = takenDstLength * sizeof (C);
+		if (takenBufferSize)
+			*takenBufferSize = takenDstLength * sizeof (C);
 	}
 
 	virtual
@@ -550,8 +550,8 @@ public:
 		size_t bufferSize,
 		const utf32_t* p,
 		size_t length,
-		size_t* takenBufferSize_o = NULL,
-		size_t* takenLength_o = NULL
+		size_t* takenBufferSize = NULL,
+		size_t* takenLength = NULL
 		)
 	{
 		size_t bufferLength = bufferSize / sizeof (C);
@@ -563,11 +563,11 @@ public:
 			p,
 			length,
 			&takenDstLength,
-			takenLength_o
+			takenLength
 			);
 
-		if (takenBufferSize_o)
-			*takenBufferSize_o = takenDstLength * sizeof (C);
+		if (takenBufferSize)
+			*takenBufferSize = takenDstLength * sizeof (C);
 	}
 
 	virtual
@@ -610,9 +610,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		)
 	{
 		size_t length = size / sizeof (C);
@@ -626,16 +626,16 @@ public:
 			bufferLength,
 			(const C*) p,
 			length,
-			takenBufferLength_o,
+			takenBufferLength,
 			&takenLength,
 			&expectedLength
 			);
 
-		if (takenSize_o)
-			*takenSize_o = takenLength * sizeof (C);
+		if (takenSize)
+			*takenSize = takenLength * sizeof (C);
 
-		if (expectedSize_o)
-			*expectedSize_o = expectedLength * sizeof (C);
+		if (expectedSize)
+			*expectedSize = expectedLength * sizeof (C);
 	}
 
 	virtual
@@ -645,9 +645,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		)
 	{
 		size_t length = size / sizeof (C);
@@ -661,16 +661,16 @@ public:
 			bufferLength,
 			(const C*) p,
 			length,
-			takenBufferLength_o,
+			takenBufferLength,
 			&takenLength,
 			&expectedLength
 			);
 
-		if (takenSize_o)
-			*takenSize_o = takenLength * sizeof (C);
+		if (takenSize)
+			*takenSize = takenLength * sizeof (C);
 
-		if (expectedSize_o)
-			*expectedSize_o = expectedLength * sizeof (C);
+		if (expectedSize)
+			*expectedSize = expectedLength * sizeof (C);
 	}
 
 	virtual
@@ -680,9 +680,9 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenBufferLength_o = NULL,
-		size_t* takenSize_o = NULL,
-		size_t* expectedSize_o = NULL
+		size_t* takenBufferLength = NULL,
+		size_t* takenSize = NULL,
+		size_t* expectedSize = NULL
 		)
 	{
 		size_t length = size / sizeof (C);
@@ -696,16 +696,16 @@ public:
 			bufferLength,
 			(const C*) p,
 			length,
-			takenBufferLength_o,
+			takenBufferLength,
 			&takenLength,
 			&expectedLength
 			);
 
-		if (takenSize_o)
-			*takenSize_o = takenLength * sizeof (C);
+		if (takenSize)
+			*takenSize = takenLength * sizeof (C);
 
-		if (expectedSize_o)
-			*expectedSize_o = expectedLength * sizeof (C);
+		if (expectedSize)
+			*expectedSize = expectedLength * sizeof (C);
 	}
 };
 

@@ -23,12 +23,12 @@ public:
 		SECURITY_ATTRIBUTES* secAttr = NULL,
 		bool isManualReset = false,
 		bool isSignalled = false,
-		const wchar_t* name = NULL
+		const sl::StringRef_w& name = NULL
 		)
 	{
 		close ();
 
-		m_h = ::CreateEventW (secAttr, isManualReset, isSignalled, name);
+		m_h = ::CreateEventW (secAttr, isManualReset, isSignalled, name.szn ());
 		return err::complete (m_h != NULL);
 	}
 
@@ -36,12 +36,12 @@ public:
 	open (
 		uint_t access = EVENT_ALL_ACCESS,
 		bool doInheritHandle = false,
-		const wchar_t* name = NULL
+		const sl::StringRef_w& name = NULL
 		)
 	{
 		close ();
 
-		m_h = ::OpenEventW (access, doInheritHandle, name);
+		m_h = ::OpenEventW (access, doInheritHandle, name.szn ());
 		return err::complete (m_h != NULL);
 	}
 

@@ -79,30 +79,25 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const char* text, 
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (textColor, backColor, fontFlags, text, length);
+		return drawText_utf8 (textColor, backColor, fontFlags, text);
 	}
 
 	int
 	drawText (
 		const TextAttr& attr,
-		const char* text, 
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (attr, text, length);
+		return drawText_utf8 (attr, text);
 	}
 
 	int
-	drawText (
-		const char* text, 
-		size_t length = -1
-		)
+	drawText (const sl::StringRef& text)
 	{
-		return drawText_utf8 (text, length);
+		return drawText_utf8 (text);
 	}
 
 	int
@@ -110,38 +105,31 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf8_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		);
 
 	int
 	drawText_utf8 (
 		const TextAttr& attr,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawText_utf8 (
 			attr.m_foreColor, 
 			attr.m_backColor, 
 			attr.m_fontFlags, 
-			text, 
-			length
+			text
 			);
 	}
 
 	int
-	drawText_utf8 (
-		const utf8_t* text,
-		size_t length = -1
-		)
+	drawText_utf8 (const sl::StringRef_utf8& text)
 	{
 		return drawText_utf8 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -150,38 +138,31 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		);
 
 	int
 	drawText_utf32 (
 		const TextAttr& attr,
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawText_utf32 (
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags, 
-			text, 
-			length
+			text
 			);
 	}
 
 	int
-	drawText_utf32 (
-		const utf32_t* text, 
-		size_t length = -1
-		)
+	drawText_utf32 (const sl::StringRef_utf32& text)
 	{
 		return drawText_utf32 (
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -193,7 +174,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
-		const sl::String& text
+		const sl::StringRef& text
 		)
 	{
 		return drawHyperText_utf8 (
@@ -201,8 +182,7 @@ public:
 			backColor,
 			fontFlags,
 			attrArray, 
-			text, 
-			text.getLength ()
+			text
 			);
 	}
 
@@ -210,21 +190,19 @@ public:
 	drawHyperText (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
-		const char* text, 
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
-		return drawHyperText_utf8 (attr, attrArray, text, length);
+		return drawHyperText_utf8 (attr, attrArray, text);
 	}
 
 	int
 	drawHyperText (
 		const TextAttrAnchorArray* attrArray,
-		const char* text, 
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
-		return drawHyperText_utf8 (attrArray, text, length);
+		return drawHyperText_utf8 (attrArray, text);
 	}
 
 	int
@@ -233,16 +211,14 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
-		const utf8_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		);
 
 	int
 	drawHyperText_utf8 (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
-		const utf8_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawHyperText_utf8 (
@@ -250,16 +226,14 @@ public:
 			attr.m_backColor,
 			attr.m_fontFlags,
 			attrArray,
-			text, 
-			length
+			text
 			);
 	}
 
 	int
 	drawHyperText_utf8 (
 		const TextAttrAnchorArray* attrArray,
-		const utf8_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawHyperText_utf8 (
@@ -267,8 +241,7 @@ public:
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
 			attrArray,
-			text, 
-			length
+			text
 			);
 	}
 
@@ -278,16 +251,14 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		);
 
 	int
 	drawHyperText_utf32 (
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawHyperText_utf32 (
@@ -295,16 +266,14 @@ public:
 			attr.m_backColor,
 			attr.m_fontFlags,
 			attrArray,
-			text, 
-			length
+			text
 			);
 	}
 
 	int
 	drawHyperText_utf32 (
 		const TextAttrAnchorArray* attrArray,
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawHyperText_utf32 (
@@ -312,8 +281,7 @@ public:
 			m_canvas->m_colorAttr.m_backColor,
 			-1, 
 			attrArray,
-			text, 
-			length
+			text
 			);
 	}
 
@@ -328,8 +296,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const char* text,
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
 		return drawSelHyperText_utf8 (
@@ -340,8 +307,7 @@ public:
 			selAttr,
 			selStart, 
 			selEnd, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -352,8 +318,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const char* text,
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
 		return drawSelHyperText_utf8 (
@@ -362,8 +327,7 @@ public:
 			selAttr,
 			selStart, 
 			selEnd, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -373,8 +337,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const char* text,
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
 		return drawSelHyperText_utf8 (
@@ -382,8 +345,7 @@ public:
 			selAttr,
 			selStart, 
 			selEnd, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -396,8 +358,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const utf8_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		);
 
 	int
@@ -407,8 +368,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const utf8_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawSelHyperText_utf8 (
@@ -419,8 +379,7 @@ public:
 			selAttr,
 			selStart, 
 			selEnd, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -430,8 +389,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const utf8_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawSelHyperText_utf8 (
@@ -442,8 +400,7 @@ public:
 			selAttr,
 			selStart, 
 			selEnd, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -456,8 +413,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		);
 
 	int
@@ -467,8 +423,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawSelHyperText_utf32 (
@@ -479,8 +434,7 @@ public:
 			selAttr,
 			selStart, 
 			selEnd, 
-			text, 
-			length
+			text
 			);
 	}
 
@@ -490,8 +444,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart, 
 		size_t selEnd, 
-		const utf32_t* text, 
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawSelHyperText_utf32 (
@@ -502,8 +455,7 @@ public:
 			selAttr,
 			selStart, 
 			selEnd, 
-			text, 
-			length
+			text
 			);
 	}
 

@@ -29,7 +29,7 @@ protected:
 	{
 		StringTemplate* m_self;
 		sl::String* m_output;
-		const char* m_frame;
+		sl::StringRef m_frame;
 		lex::LineCol m_lineCol;
 	};
 
@@ -47,19 +47,15 @@ public:
 	process (
 		sl::String* output,
 		const sl::StringRef& fileName,
-		const char* frame,
-		size_t length = -1
+		const sl::StringRef& frame
 		)
 	{
 		bool result;
 
-		if (length == -1)
-			length = strlen_s (frame);
-
 		if (output)
 		{
 			output->clear ();
-			output->reserve (length);
+			output->reserve (frame.getLength ());
 		}
 		else if (!m_emitContextStack.isEmpty ())
 		{
@@ -72,13 +68,13 @@ public:
 		}
 
 		sl::String scriptSource;
-		result = createScript (&scriptSource, fileName, frame, length);
+		result = createScript (&scriptSource, fileName, frame);
 		if (!result)
 			return false;
 
 		if (scriptSource.isEmpty ())
 		{
-			output->copy (frame, length);
+			output->copy (frame);
 			return true;
 		}
 			
@@ -106,7 +102,11 @@ public:
 	
 		return
 			file.open (fileName, io::FileFlag_ReadOnly) &&
-			process (output, fileName, (const char*) file.p (), file.getMappingSize ());
+			process (
+				output, 
+				fileName, 
+				sl::StringRef ((const char*) file.p (), file.getMappingSize ())
+				);
 	}
 
 	bool
@@ -142,14 +142,13 @@ protected:
 	createScript (
 		sl::String* scriptSource,
 		const sl::StringRef& fileName,
-		const char* frame,
-		size_t length = -1
+		const sl::StringRef& frame
 		)
 	{
 		bool result;
 
 		Lexer lexer;
-		lexer.create (fileName, frame, length);
+		lexer.create (fileName, frame);
 
 		scriptSource->clear ();
 	
@@ -196,7 +195,7 @@ protected:
 				if (!result)
 					return false;
 
-				scriptSource->append (frame + offset, pos.m_offset - offset);
+				scriptSource->append (frame.getSubString (offset, pos.m_offset - offset));
 				scriptSource->append (";");
 
 				if (*(pos.m_p + pos.m_length - 1) == '\n')
@@ -210,7 +209,7 @@ protected:
 
 				static_cast <T*> (this)->createEmitCall (
 					scriptSource, 
-					sl::StringRef (frame + offset, pos.m_offset - offset)
+					frame.getSubString (offset, pos.m_offset - offset)
 					);
 				break;
 

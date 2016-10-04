@@ -154,8 +154,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		) = 0;
 
 	virtual
@@ -171,8 +170,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf16_t* text,
-		size_t length = -1
+		const sl::StringRef_utf16& text
 		) = 0;
 
 	virtual
@@ -188,8 +186,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf32_t* text,
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		) = 0;
 
 	virtual
@@ -239,7 +236,7 @@ public:
 	Font*
 	createFont (
 		FontTuple* fontTuple,
-		const char* family,
+		const sl::StringRef& family,
 		size_t pointSize,
 		uint_t flags = 0
 		) = 0;
@@ -280,24 +277,21 @@ public:
 	Size
 	calcTextSize_utf8 (
 		Font* font,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		) = 0;
 
 	virtual
 	Size
 	calcTextSize_utf16 (
 		Font* font,
-		const utf16_t* text,
-		size_t length = -1
+		const sl::StringRef_utf16& text
 		) = 0;
 
 	virtual
 	Size
 	calcTextSize_utf32 (
 		Font* font,
-		const utf32_t* text,
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		) = 0;
 
 	// images
@@ -340,7 +334,7 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const sl::String& formatName) = 0;
+	registerClipboardFormat (const sl::StringRef& formatName) = 0;
 
 	virtual
 	bool
@@ -371,10 +365,7 @@ public:
 
 	virtual
 	bool
-	writeClipboard (
-		const char* string,
-		size_t length = -1
-		) = 0;
+	writeClipboard (const sl::StringRef& string) = 0;
 
 	virtual
 	bool
@@ -383,12 +374,6 @@ public:
 		const void* data,
 		size_t size
 		) = 0;
-
-	bool
-	writeClipboard (const sl::String& string)
-	{
-		return writeClipboard (string, string.getLength ());
-	}
 
 	bool
 	writeClipboard (

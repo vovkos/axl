@@ -6,8 +6,8 @@
 
 #define _AXL_SL_STRING_H
 
-#include "axl_sl_BoyerMooreFind.h"
 #include "axl_enc_Utf.h"
+#include "axl_sl_MemMem.h"
 
 namespace axl {
 namespace sl {

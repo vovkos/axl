@@ -17,8 +17,8 @@ class RegExpNameMgr
 {
 public:
 	virtual 
-	const char*
-	findName (const char* name) = 0;
+	sl::StringRef
+	findName (const sl::StringRef& name) = 0;
 };
 
 //.............................................................................
@@ -69,10 +69,10 @@ public:
 	clear ();
 
 	bool 
-	compile (char const* regexp);
+	compile (const sl::StringRef& regexp);
 
 	bool 
-	match (char const* string);
+	match (const sl::StringRef& string);
 
 	void
 	print () const;
@@ -124,13 +124,13 @@ public:
 
 	bool 
 	compile (
-		char const* source,
+		const sl::StringRef& source,
 		void* acceptContext = NULL
 		);
 
 	bool 
 	incrementalCompile (
-		char const* source,
+		const sl::StringRef& source,
 		void* acceptContext = NULL
 		);
 
@@ -190,7 +190,7 @@ protected:
 	stdCharClass (uint_t c);
 
 	NfaState*
-	namedRegExp (const char* name);
+	namedRegExp (const sl::StringRef& name);
 
 	void
 	stdCharClass (
@@ -199,10 +199,7 @@ protected:
 		);
 
 	NfaState*
-	literal (
-		const char* p,
-		size_t length
-		);
+	literal (const sl::StringRef& string);
 
 	NfaState*
 	ch (uint_t c);

@@ -29,24 +29,19 @@ LuaState::complete (int result)
 	if (result == LUA_OK)
 		return true;
 
-	sl::String message = popString ();
-	err::setError (message, message.getLength ());
+	err::setError (popString ());
 	return false;
 }
 
 bool
 LuaState::load (
-	const char* name,
-	const char* source,
-	size_t length
+	const sl::StringRef& name,
+	const sl::StringRef& source
 	)
 {
 	ASSERT (isOpen ());
 
-	if (length == -1)
-		length = strlen_s (source);
-
-	int result = luaL_loadbuffer (m_h, source, length, name);
+	int result = luaL_loadbuffer (m_h, source.cp (), source.getLength (), name.sz ());
 	return complete (result);
 }
 
@@ -85,13 +80,10 @@ LuaState::trace ()
 #endif
 
 void
-LuaState::error (
-	const char* string,
-	size_t length
-	)
+LuaState::error (const sl::StringRef& string)
 {
 	where ();
-	pushString (string, length);
+	pushString (string);
 	concatenate ();
 	error ();
 }
@@ -109,22 +101,11 @@ LuaState::formatError_va (
 }
 
 void
-LuaState::pushString (
-	const char* string,
-	size_t length
-	)
+LuaState::pushString (const sl::StringRef& string)
 {
 	ASSERT (isOpen ());
-
-	if (!string)
-		string = "";
-
-	if (length != -1)
-		lua_pushlstring (m_h, string, length);
-	else
-		lua_pushstring (m_h, string);
+	lua_pushlstring (m_h, string.cp (), string.getLength ());
 }
-
 
 //.............................................................................
 

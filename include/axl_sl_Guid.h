@@ -6,16 +6,11 @@
 
 #define _AXL_SL_GUID_H
 
-#include "axl_g_Pch.h"
+#include "axl_sl_Hash.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace sl {
-
-template <typename T> class StringRefBase;
-template <typename T> class StringBase;
-
-typedef StringRefBase <char> StringRef;
-typedef StringBase <char> String;
 
 //.............................................................................
 
@@ -72,6 +67,12 @@ struct Guid
 		return memcmp (this, &guid, sizeof (Guid));
 	}
 
+	size_t
+	hash () const
+	{
+		return djb2 (this, sizeof (Guid));
+	}
+
 	bool
 	isEqual (const Guid& guid) const
 	{
@@ -114,7 +115,7 @@ struct Guid
 	}
 
 	bool
-	parse (const char* string);
+	parse (const sl::StringRef& string);
 
 	bool
 	generate ();
@@ -145,7 +146,7 @@ buildGuid (
 
 inline
 Guid
-parseGuid (const char* string)
+parseGuid (const sl::StringRef& string)
 {
 	Guid guid;
 	guid.parse (string);

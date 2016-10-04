@@ -36,7 +36,7 @@ NetworkAdapterEnumerator::createAdapterList (sl::StdList <NetworkAdapterDesc>* a
 	sl::Array <char> buffer;
 	buffer.setCount (size); 
 
-	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*) buffer.a ();
+	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*) buffer.p ();
 
 	ulong_t flags = 
 		GAA_FLAG_SKIP_ANYCAST |

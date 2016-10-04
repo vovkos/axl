@@ -19,7 +19,7 @@ class NamedPipe: public FileHandle
 public:
 	bool 
 	create (
-		const wchar_t* name,
+		const sl::StringRef_w& name,
 		uint_t openMode,
 		uint_t pipeMode,
 		dword_t maxInstanceCount,
@@ -31,7 +31,7 @@ public:
 
 	bool 
 	open (
-		const wchar_t* name,
+		const sl::StringRef_w& name,
 		uint_t access = GENERIC_READ | GENERIC_WRITE,
 		uint_t flags = FILE_FLAG_OVERLAPPED
 		);

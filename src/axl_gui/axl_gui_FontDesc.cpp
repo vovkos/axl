@@ -6,7 +6,7 @@ namespace gui {
 
 //.............................................................................
 	
-const char* 
+const char*
 getFontFlagString (FontFlag flag)
 {
 	static const char* stringTable [] = 
@@ -32,17 +32,17 @@ getFontFlagString (FontFlag flag)
 
 void
 FontDesc::setup (
-	const char* family, 
+	const sl::StringRef& family, 
 	size_t pointSize,
 	uint_t flags
 	)
 {
-	size_t length = strlen_s (family);
+	size_t length = family.getLength ();
 
 	if (length >= countof (m_family))
 		length = countof (m_family) - 1;
 	
-	memcpy (m_family, family, length * sizeof (char));
+	memcpy (m_family, family.cp (), length);
 	m_family [length] = 0;
 	m_pointSize = pointSize;
 	m_flags = flags;

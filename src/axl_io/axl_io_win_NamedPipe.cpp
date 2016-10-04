@@ -9,7 +9,7 @@ namespace win {
 
 bool 
 NamedPipe::create (
-	const wchar_t* name,
+	const sl::StringRef_w& name,
 	uint_t openMode,
 	uint_t pipeMode,
 	dword_t maxInstanceCount,
@@ -22,7 +22,7 @@ NamedPipe::create (
 	close ();
 
 	m_h = ::CreateNamedPipeW (
-		name, 
+		name.sz (), 
 		openMode, 
 		pipeMode, 
 		maxInstanceCount, 
@@ -37,14 +37,14 @@ NamedPipe::create (
 
 bool 
 NamedPipe::open (
-	const wchar_t* name,
+	const sl::StringRef_w& name,
 	uint_t access,
 	uint_t flags
 	)
 {
 	close ();
 
-	m_h = ::CreateFileW (name, access, 0, NULL, OPEN_EXISTING, flags, NULL);
+	m_h = ::CreateFileW (name.sz (), access, 0, NULL, OPEN_EXISTING, flags, NULL);
 	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 

@@ -7,6 +7,7 @@
 #define _AXL_SL_BOYERMOOREFIND_H
 
 #include "axl_sl_Array.h"
+#include "axl_sl_String.h"
 #include "axl_enc_CharCodec.h"
 
 namespace axl {
@@ -53,8 +54,8 @@ public:
 
 protected:
 	Array <T> m_pattern;
-	Array <size_t> m_badSkipTable;
-	Array <size_t> m_goodSkipTable;
+	Array <size_t, ArrayDetails <size_t> > m_badSkipTable;
+	Array <size_t, ArrayDetails <size_t> > m_goodSkipTable;
 	uint_t m_flags;
 
 public:
@@ -272,16 +273,15 @@ public:
 
 	bool
 	setPattern (
-		const char* p, 
-		size_t length = -1,
+		const sl::StringRef& pattern,
 		uint_t flags = 0
 		)
 	{
 		return setPattern (
 			Def_BadSkipTableSize, 
 			enc::CharCodecKind_Utf8, 
-			p, 
-			length != -1 ? length : strlen_s (p),
+			pattern.cp (),
+			pattern.getLength (),
 			flags
 			);
 	}
@@ -304,12 +304,9 @@ public:
 	}
 
 	size_t 
-	find (
-		const char* p, 
-		size_t length = -1
-		)
+	find (const sl::StringRef& string)
 	{
-		return find (enc::CharCodecKind_Utf8, p, length != -1 ? length : strlen_s (p));
+		return find (enc::CharCodecKind_Utf8, string.cp (), string.getLength ());
 	}
 
 	size_t 
@@ -337,11 +334,10 @@ public:
 	find (
 		IncrementalContext* incrementalContext,
 		size_t offset,
-		const char* p, 
-		size_t length = -1
+		const sl::StringRef& string
 		)
 	{
-		return find (incrementalContext, enc::CharCodecKind_Utf8, offset, p, length != -1 ? length : strlen_s (p));
+		return find (incrementalContext, enc::CharCodecKind_Utf8, offset, string.cp (), string.getLength ());
 	}
 
 protected:
@@ -356,48 +352,6 @@ protected:
 		size_t size
 		);
 };
-
-//.............................................................................
-
-const void*
-memMem (
-	const void* p1,
-	size_t size1,
-	const void* p2,
-	size_t size2
-	);
-
-inline
-void*
-memMem (
-	void* p1,
-	size_t size1,
-	const void* p2,
-	size_t size2
-	)
-{
-	return (void*) memMem ((const void*) p1, size1, p2, size2);
-}
-
-const void*
-reverseMemMem (
-	const void* p1,
-	size_t size1,
-	const void* p2,
-	size_t size2
-	);
-
-inline
-void*
-reverseMemMem (
-	void* p1,
-	size_t size1,
-	const void* p2,
-	size_t size2
-	)
-{
-	return (void*) reverseMemMem ((const void*) p1, size1, p2, size2);
-}
 
 //.............................................................................
 

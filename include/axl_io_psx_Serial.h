@@ -18,7 +18,7 @@ class Serial: public Fd
 {
 public:
 	bool
-	open (const char* name)
+	open (const sl::StringRef& name)
 	{
 		return
 			Fd::open (name, O_RDWR | O_NONBLOCK | O_NOCTTY, 0) &&

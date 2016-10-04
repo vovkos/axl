@@ -15,7 +15,7 @@ namespace sys {
 
 inline
 bool
-createProcess (const char* commandLine)
+createProcess (const sl::StringRef& commandLine)
 {	
 #if (_AXL_OS_WIN)
 	HINSTANCE hProcess = ::ShellExecuteW (0, L"open", sl::String_w (commandLine), 0, 0, SW_SHOWNORMAL);

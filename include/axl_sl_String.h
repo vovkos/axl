@@ -7,19 +7,23 @@
 #define _AXL_SL_STRING_H
 
 #include "axl_sl_StringDetails.h"
-#include "axl_sl_Cmp.h"
 #include "axl_ref_Buf.h"
 
 namespace axl {
 namespace sl {
 
+template <typename T, typename Details> class StringBase;
+
 //.............................................................................
 
-template <typename T>
+template <
+	typename T,
+	typename Details0 = StringDetailsBase <T>
+	>
 class StringRefBase
 {
 public:
-	typedef StringDetailsBase <T> Details;
+	typedef Details0 Details;
 	typedef typename Details::Details2 Details2;
 	typedef typename Details::Details3 Details3;
 
@@ -31,13 +35,13 @@ public:
 	typedef typename Details2::Encoding Encoding2;
 	typedef typename Details3::Encoding Encoding3;
 
-	typedef StringRefBase <C> StringRef;
-	typedef StringRefBase <C2> StringRef2;
-	typedef StringRefBase <C3> StringRef3;
+	typedef StringRefBase <C, Details> StringRef;
+	typedef StringRefBase <C2, Details2> StringRef2;
+	typedef StringRefBase <C3, Details3> StringRef3;
 
-	typedef StringBase <C> String;
-	typedef StringBase <C2> String2;
-	typedef StringBase <C3> String3;
+	typedef StringBase <C, Details> String;
+	typedef StringBase <C2, Details2> String2;
+	typedef StringBase <C3, Details3> String3;
 
 protected:
 	mutable C* m_p;
@@ -63,26 +67,47 @@ public:
 		attach (src);
 	}
 
-	StringRefBase (const StringRef2& src)
+	StringRefBase (const C* p)
 	{
 		initialize ();
-		attach (String (src));
+		attach (NULL, p, Details::calcLength (p), true);
 	}
 
-	StringRefBase (const StringRef3& src)
+	StringRefBase (
+		const C* p,
+		size_t length
+		)
 	{
 		initialize ();
-		attach (String (src));
+		attach (NULL, p, length, false);
+	}
+
+	StringRefBase (
+		const C* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (NULL, p, (C*) end - p, false);
+	}
+
+	StringRefBase (
+		ref::BufHdr* hdr,
+		const C* p
+		)
+	{
+		initialize ();
+		attach (hdr, p, Details::calcLength (p), true);
 	}
 
 	StringRefBase (
 		ref::BufHdr* hdr,
 		const C* p,
-		size_t length = -1
+		size_t length
 		)
 	{
 		initialize ();
-		attach (hdr, p, length);
+		attach (hdr, p, length, false);
 	}
 
 	StringRefBase (
@@ -92,86 +117,12 @@ public:
 		)
 	{
 		initialize ();
-		attach (hdr, p, (C*) end - p);
-	}
-
-	StringRefBase (
-		const C* p,
-		size_t length = -1
-		)
-	{
-		initialize ();
-		attach (NULL, p, length);
-	}
-
-	StringRefBase (
-		const C* p,
-		const void* end
-		)
-	{
-		initialize ();
-		attach (NULL, p, (C*) end - p);
-	}
-
-	StringRefBase (
-		const C2* p,
-		size_t length = -1
-		)
-	{
-		initialize ();
-		attach (String (p, length));
-	}
-
-	StringRefBase (
-		const C2* p,
-		const void* end
-		)
-	{
-		initialize ();
-		attach (String (p, end));
-	}
-
-	StringRefBase (
-		const C3* p,
-		size_t length = -1
-		)
-	{
-		initialize ();
-		attach (String (p, length));
-	}
-
-	StringRefBase (
-		const C3* p,
-		const void* end
-		)
-	{
-		initialize ();
-		attach (String (p, end));
-	}
-
-	StringRefBase (utf32_t x)
-	{
-		initialize ();
-		attach (String (x));
-	}
-
-	StringRefBase (
-		utf32_t x,
-		size_t count
-		)
-	{
-		initialize ();
-		attach (String (x, count));
+		attach (hdr, p, (C*) end - p, false);
 	}
 
 	~StringRefBase ()
 	{
 		release ();
-	}
-
-	operator const C* () const
-	{
-		return cc ();
 	}
 
 	StringRefBase&
@@ -188,21 +139,69 @@ public:
 	}
 
 	bool
-	operator == (const C* p) const
-	{
-		return cmp (p) == 0;
-	}
-
-	bool
 	operator != (const StringRef& string) const
 	{
 		return cmp (string) != 0;
 	}
 
 	bool
+	operator < (const StringRef& string) const
+	{
+		return cmp (string) < 0;
+	}
+
+	bool
+	operator <= (const StringRef& string) const
+	{
+		return cmp (string) <= 0;
+	}
+
+	bool
+	operator > (const StringRef& string) const
+	{
+		return cmp (string) > 0;
+	}
+
+	bool
+	operator >= (const StringRef& string) const
+	{
+		return cmp (string) >= 0;
+	}
+
+	bool
+	operator == (const C* p) const
+	{
+		return cmp (p) == 0;
+	}
+
+	bool
 	operator != (const C* p) const
 	{
 		return cmp (p) != 0;
+	}
+
+	bool
+	operator < (const C* p) const
+	{
+		return cmp (p) < 0;
+	}
+
+	bool
+	operator <= (const C* p) const
+	{
+		return cmp (p) <= 0;
+	}
+
+	bool
+	operator > (const C* p) const
+	{
+		return cmp (p) > 0;
+	}
+
+	bool
+	operator >= (const C* p) const
+	{
+		return cmp (p) >= 0;
 	}
 
 	StringRefBase
@@ -253,28 +252,29 @@ public:
 		return result;
 	}
 
-	const C*
-	cc () const
+	const C&
+	operator [] (intptr_t i) const
 	{
-		if (m_isNullTerminated)
-			return m_p;
+		ASSERT ((size_t) i < m_length);
+		return m_p [(size_t) i];
+	}
 
-		if (!m_length)
-			return Details::getEmptyString ();
-
-		String string (m_p, m_length);
-		ASSERT (string.m_length == m_length && string.m_isNullTerminated);
-
-		if (m_hdr)
-			m_hdr->release ();
-
-		m_p = string.m_p;
-		m_hdr = string.m_hdr;
-		m_isNullTerminated = true;
-
-		string.m_hdr = NULL;
-
+	const C*
+	cp () const
+	{
 		return m_p;
+	}
+
+	const C*
+	sz () const
+	{
+		return m_length ? ensureNullTerminated () : Details::getEmptyString ();
+	}
+
+	const C*
+	szn () const
+	{
+		return m_length ? ensureNullTerminated () : NULL;
 	}
 
 	StringRef2
@@ -306,7 +306,8 @@ public:
 	{
 		return m_p + m_length;
 	}
-	
+
+
 	bool
 	isEmpty () const
 	{
@@ -346,22 +347,43 @@ public:
 	}
 
 	int
-	cmp (
-		const C* p,
-		size_t length = -1
-		) const
-	{
-		if (length == -1)
-			length = Details::calcLength (p);
-
-		int result = Details::cmp (m_p, p, AXL_MIN (length, m_length));
-		return result ? result : sl::Cmp <size_t> () (m_length, length);
-	}
-
-	int
 	cmp (const StringRef& string) const
 	{
-		return cmp (string, string.m_length);
+		int result = Details::cmp (m_p, string.m_p, AXL_MIN (m_length, string.m_length));
+		return 
+			result ? result : 
+			m_length < string.m_length ? -1 : 
+			m_length > string.m_length ? 1 : 0;
+	}
+
+	size_t
+	hash () const
+	{
+		return djb2 (m_p, m_length * sizeof (C));
+	}
+
+	bool
+	isEqual (const StringRef& string) const
+	{
+		return 
+			m_length == string.m_length &&
+			Details::cmp (m_p, string.m_p, m_length) == 0;
+	}
+
+	bool
+	isPrefix (const StringRef& string) const
+	{
+		return 
+			m_length >= string.m_length && 
+			Details::cmp (m_p, string.m_p, string.m_length) == 0;
+	}
+
+	bool
+	isSuffix (const StringRef& string) const
+	{
+		return 
+			m_length >= string.m_length && 
+			Details::cmp (m_p + m_length - string.m_length, string.m_p, string.m_length) == 0;
 	}
 
 	size_t 
@@ -495,6 +517,25 @@ public:
 	}
 
 protected:
+	const C*
+	ensureNullTerminated () const
+	{
+		if (m_isNullTerminated)
+			return m_p;
+
+		if (m_hdr && m_hdr->isInsideBuffer (m_p + m_length) && !m_p [m_length])
+		{
+			m_isNullTerminated = true;
+			return m_p;
+		}
+
+		String string (*this);
+		attachBufHdr (string.getHdr ());
+		m_p = (C*) string.sz ();
+		m_isNullTerminated = true;
+		return m_p;
+	}
+
 	void
 	initialize ()
 	{
@@ -522,55 +563,36 @@ protected:
 	void
 	attach (const StringRef& src)
 	{
-		if (&src == this)
-			return;
-
-		attachBufHdr (src.m_hdr);
-
-		m_p = src.m_p;
-		m_length = src.m_length;
-		m_isNullTerminated = src.m_isNullTerminated;
+		if (&src != this)
+			attach (src.m_hdr, src.m_p, src.m_length, src.m_isNullTerminated);
 	}
 
 	void
 	attach (
 		ref::BufHdr* hdr,
 		const C* p,
-		size_t length
+		size_t length,
+		bool isNullTerminated
 		)
 	{
 		attachBufHdr (hdr);
 
-		m_p = const_cast <C*> (p);
-
-		if (length == -1)
-		{
-			m_length = Details::calcLength (p);
-			m_isNullTerminated = true;
-		}
-		else
-		{
-			m_length = length;
-			m_isNullTerminated = false;
-		}
+		m_p = (C*) p;
+		m_length = length;
+		m_isNullTerminated = isNullTerminated;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef StringRefBase <char>    StringRef;
-typedef StringRefBase <wchar_t> StringRef_w;
-typedef StringRefBase <utf8_t>  StringRef_utf8;
-typedef StringRefBase <utf16_t> StringRef_utf16;
-typedef StringRefBase <utf32_t> StringRef_utf32;
-
 //.............................................................................
 
-template <typename T>
-class StringBase: public StringRefBase <T>
+template <
+	typename T,
+	typename Details0 = StringDetailsBase <T>
+	>
+class StringBase: public StringRefBase <T, Details0>
 {
 public:
-	typedef StringRefBase <T> StringRef;
+	typedef StringRefBase <T, Details0> StringRef;
 
 	typedef typename StringRef::Details Details;
 	typedef typename StringRef::Details2 Details2;
@@ -682,6 +704,11 @@ public:
 		setBuffer (kind, p, size);
 	}
 
+	operator const C* () const
+	{
+		return sz ();
+	}
+
 	StringBase&
 	operator = (const StringBase& src)
 	{
@@ -787,6 +814,40 @@ public:
 		return *this;
 	}
 
+	const C&
+	operator [] (intptr_t i) const
+	{
+		ASSERT ((size_t) i < m_length);
+		return m_p [(size_t) i];
+	}
+
+	C&
+	operator [] (intptr_t i)
+	{
+		ASSERT ((size_t) i < m_length);
+		return m_p [(size_t) i];
+	}
+
+	C*
+	p ()
+	{
+		return m_p;
+	}
+
+	const C*
+	sz () const
+	{
+		ASSERT (!this->m_length || this->m_isNullTerminated);
+		return this->m_length ? this->m_p : Details::getEmptyString ();
+	}
+
+	const C*
+	szn () const
+	{
+		ASSERT (!this->m_length || this->m_isNullTerminated);
+		return this->m_length ? this->m_p : NULL;
+	}
+
 	void
 	clear ()
 	{
@@ -805,13 +866,12 @@ public:
 		this->m_p = (C*) (this->m_hdr + 1);
 		this->m_p [0] = 0;
 		this->m_length = 0;
-		this->m_isNullTerminated = true;
 	}
 
 	size_t
 	forceCopy (const StringRef& src)
 	{
-		return copy (src, src.getLength ());
+		return copy (src.cp (), src.getLength ());
 	}
 
 	size_t
@@ -820,9 +880,15 @@ public:
 		if (&src == this)
 			return this->m_length;
 
+		if (src.isEmpty ())
+		{
+			clear ();
+			return 0;
+		}
+
 		ref::BufHdr* hdr = src.getHdr ();
-		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive))
-			return copy (src, src.getLength ());
+		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated ())
+			return copy (src.cp (), src.getLength ());
 
 		this->attach (src);
 		return this->m_length;
@@ -831,13 +897,13 @@ public:
 	size_t
 	copy (const StringRef2& src)
 	{
-		return copy (src, src.getLength ());
+		return copy (src.cp (), src.getLength ());
 	}
 
 	size_t
 	copy (const StringRef3& src)
 	{
-		return copy (src, src.getLength ());
+		return copy (src.cp (), src.getLength ());
 	}
 
 	size_t
@@ -856,17 +922,6 @@ public:
 		{
 			clear ();
 			return 0;
-		}
-
-		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
-		{
-			C* end = (C*) this->m_hdr->getBufferEnd ();
-			ASSERT (p + length <= end);
-
-			this->m_p = (C*) p;
-			this->m_length = length;
-			this->m_isNullTerminated = p + length < end && !p [length];
-			return length;
 		}
 
 		if (!createBuffer (length, false))
@@ -1034,7 +1089,7 @@ public:
 		const StringRef& src
 		)
 	{
-		return !this->m_length ? copy (src) : insert (index, src, src.getLength ());
+		return !this->m_length ? copy (src) : insert (index, src.cp (), src.getLength ());
 	}
 
 	size_t
@@ -1043,7 +1098,7 @@ public:
 		const StringRef2& src
 		)
 	{
-		return insert (index, src, src.getLength ());
+		return insert (index, src.cp (), src.getLength ());
 	}
 
 	size_t
@@ -1052,7 +1107,7 @@ public:
 		const StringRef3& src		
 		)
 	{
-		return insert (index, src, src.getLength ());
+		return insert (index, src.cp (), src.getLength ());
 	}
 
 	size_t
@@ -1232,14 +1287,14 @@ public:
 	size_t
 	convertCase ()
 	{
-		sl::StringRef src = *this; // save old contents -- can't convert in-place because length can increase
+		StringRef src = *this; // save old contents -- can't convert in-place because length can increase
 
 		size_t length = enc::UtfConvert <Encoding, Encoding, CaseOp>::calcRequiredLength (this->m_p, this->m_length);
 		C* p = createBuffer (length);
 		if (!p)
 			return -1;
 
-		enc::UtfConvert <Encoding, Encoding, CaseOp>::convert (p, length, src, src.getLength ());
+		enc::UtfConvert <Encoding, Encoding, CaseOp>::convert (p, length, src.cp (), src.getLength ());
 		return length;
 	}
 
@@ -1345,38 +1400,38 @@ public:
 		return this->m_length;
 	}
 
-	void
+	bool
 	setReducedLength (size_t length)
 	{
 		if (length >= this->m_length)
 		{
 			ASSERT (length == this->m_length); // misuse otherwise
-			return; 
+			return true;
 		}
 
 		if (!length)
 		{
 			clear ();
-			return;
+			return true;
 		}
 
 		ASSERT (this->m_p && this->m_hdr);
 		
-		if (!this->m_p [length])
-		{
-			this->m_isNullTerminated = true;
-		}
-		else if (this->m_hdr->getRefCount () == 1)
+		bool isNullTerminated = !this->m_p [length];
+		if (!isNullTerminated && this->m_hdr->getRefCount () == 1)
 		{
 			this->m_p [length] = 0;
-			this->m_isNullTerminated = true;
-		}
-		else
-		{
-			this->m_isNullTerminated = false;
+			isNullTerminated = true;
 		}
 
 		this->m_length = length;
+		return isNullTerminated || createBuffer (length, true) != NULL;
+	}
+
+	bool
+	isExclusive ()
+	{
+		return !this->m_length || this->m_hdr && this->m_hdr->getRefCount () == 1;
 	}
 
 	bool
@@ -1395,15 +1450,9 @@ public:
 		if (length)
 		{
 			size_t fullLength = this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C);
-			if (!m_isNullTerminated)
-			{
-				*length = fullLength;
-			}
-			else
-			{
-				ASSERT (fullLength);
-				*length = fullLength - 1;
-			}
+			ASSERT (fullLength);
+
+			*length = fullLength - 1;
 		}
 
 		return p;
@@ -1433,7 +1482,7 @@ public:
 			}
 		}
 
-		size_t bufferSize = sl::getMinPower2Ge (size);
+		size_t bufferSize = getMinPower2Ge (size);
 
 		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_EXTRA (ref::BufHdr, bufferSize);
 		if (!hdr)
@@ -1482,7 +1531,6 @@ public:
 		this->m_hdr = hdr.detach ();
 		this->m_length = 0;
 		this->m_isNullTerminated = true;
-
 		return bufferSize / sizeof (C) - 1;
 	}
 
@@ -1512,11 +1560,10 @@ public:
 		if (!this->m_hdr)
 			return 0;
 
-		ASSERT (this->m_hdr->isInsideBuffer (this->m_p));
-
-		size_t maxLength = (C*) this->m_hdr->getBufferEnd () - this->m_p;
-		this->m_length = Details::calcLength (this->m_p, maxLength);
-		this->m_isNullTerminated = this->m_length < maxLength;
+		size_t fullLength = this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C);
+		ASSERT (fullLength);
+		
+		this->m_length = Details::calcLength (this->m_p, fullLength - 1);
 		return this->m_length;
 	}
 
@@ -1565,13 +1612,45 @@ protected:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//.............................................................................
+
+typedef StringRefBase <char>    StringRef;
+typedef StringRefBase <wchar_t> StringRef_w;
+typedef StringRefBase <utf8_t>  StringRef_utf8;
+typedef StringRefBase <utf16_t> StringRef_utf16;
+typedef StringRefBase <utf32_t> StringRef_utf32;
 
 typedef StringBase <char>    String;
 typedef StringBase <wchar_t> String_w;
 typedef StringBase <utf8_t>  String_utf8;
 typedef StringBase <utf16_t> String_utf16;
 typedef StringBase <utf32_t> String_utf32;
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// specializations for ArgType
+
+template <>
+class ArgType <String_utf8>
+{
+public:
+	typedef const StringRef_utf8& Type;
+};
+
+template <>
+class ArgType <String_utf16>
+{
+public:
+	typedef const StringRef_utf16& Type;
+};
+
+template <>
+class ArgType <String_utf32>
+{
+public:
+	typedef const StringRef_utf32& Type;
+};
+
 
 //.............................................................................
 

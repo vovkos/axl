@@ -34,12 +34,12 @@ Sid::create_va (
 }
 
 bool 
-Sid::parse (const char* string)
+Sid::parse (const sl::StringRef& string)
 {
 	bool_t result;
 	SID* sid;
 
-	result = ::ConvertStringSidToSidA (string, (PSID*) &sid);
+	result = ::ConvertStringSidToSidA (string.sz (), (PSID*) &sid);
 	if (!result)
 		return err::failWithLastSystemError ();
 
@@ -49,12 +49,12 @@ Sid::parse (const char* string)
 }
 
 bool 
-Sid::parse (const wchar_t* string)
+Sid::parse (const sl::StringRef_w& string)
 {
 	bool_t result;
 	SID* sid;
 
-	result = ::ConvertStringSidToSidW (string, (PSID*) &sid);
+	result = ::ConvertStringSidToSidW (string.sz (), (PSID*) &sid);
 	if (!result)
 		return err::failWithLastSystemError ();
 
@@ -84,8 +84,8 @@ Sid::getString (sl::String* string) const
 
 bool 
 Sid::lookupAccountName (
-	const char* systemName,
-	const char* accountName,
+	const sl::StringRef& systemName,
+	const sl::StringRef& accountName,
 	SID_NAME_USE* sidType
 	)
 {
@@ -96,8 +96,8 @@ Sid::lookupAccountName (
 	SID_NAME_USE dummySidType;
 
 	bool_t result = ::LookupAccountNameA (
-		systemName, 
-		accountName, 
+		systemName.szn (), 
+		accountName.szn (), 
 		(SID*) sidBuffer, 
 		&sidSize, 
 		domainNameBuffer, 
@@ -113,8 +113,8 @@ Sid::lookupAccountName (
 
 bool 
 Sid::lookupAccountName (
-	const wchar_t* systemName,
-	const wchar_t* accountName,
+	const sl::StringRef_w& systemName,
+	const sl::StringRef_w& accountName,
 	SID_NAME_USE* sidType
 	)
 {
@@ -125,8 +125,8 @@ Sid::lookupAccountName (
 	SID_NAME_USE dummySidType;
 
 	bool_t result = ::LookupAccountNameW (
-		systemName, 
-		accountName, 
+		systemName.szn (), 
+		accountName.szn (), 
 		(SID*) sidBuffer, 
 		&sidSize, 
 		domainNameBuffer, 
@@ -142,7 +142,7 @@ Sid::lookupAccountName (
 
 bool 
 Sid::lookupAccountSid (
-	const char* systemName,
+	const sl::StringRef& systemName,
 	const SID* sid,
 	sl::String* accountName,
 	SID_NAME_USE* sidType
@@ -158,7 +158,7 @@ Sid::lookupAccountSid (
 		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	bool_t result = ::LookupAccountSidA (
-		systemName, 
+		systemName.szn (), 
 		(SID*) sid, 
 		accountNameBuffer, 
 		&accountNameLength, 

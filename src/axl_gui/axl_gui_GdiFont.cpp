@@ -12,14 +12,14 @@ namespace gui {
 bool
 buildLogFont (
 	LOGFONTW* logFont,
-	const wchar_t* family,
+	const sl::StringRef_w& family,
 	size_t pointSize,
 	uint_t flags
 	)
 {
 	memset (logFont, 0, sizeof (LOGFONT));
 
-	size_t length = wcslen_s (family);
+	size_t length = family.getLength ();
 
 	memcpy (
 		logFont->lfFaceName, 
@@ -108,10 +108,7 @@ GdiFont::isMonospace ()
 }
 
 Size
-GdiFont::calcTextSize_utf8 (
-	const utf8_t* text,
-	size_t length
-	)
+GdiFont::calcTextSize_utf8 (const sl::StringRef_utf8& text)
 {
 	char buffer [256];
 	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
@@ -121,10 +118,7 @@ GdiFont::calcTextSize_utf8 (
 }
 
 Size
-GdiFont::calcTextSize_utf16 (
-	const utf16_t* text,
-	size_t length
-	)
+GdiFont::calcTextSize_utf16 (const sl::StringRef_utf16& text)
 {
 	if (length == -1)
 		length = wcslen_s (text);
@@ -140,10 +134,7 @@ GdiFont::calcTextSize_utf16 (
 }
 
 Size
-GdiFont::calcTextSize_utf32 (
-	const utf32_t* text,
-	size_t length
-	)
+GdiFont::calcTextSize_utf32 (const sl::StringRef_utf32& text)
 {
 	char buffer [256];
 	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));

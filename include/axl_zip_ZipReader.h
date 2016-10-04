@@ -59,7 +59,7 @@ public:
 	close ();
 
 	bool
-	openFile (const char* fileName);
+	openFile (const sl::StringRef& fileName);
 
 	bool
 	openMem (
@@ -110,7 +110,7 @@ public:
 	bool
 	extractFileToFile (
 		size_t index,
-		const char* fileName
+		const sl::StringRef& fileName
 		);
 };
 

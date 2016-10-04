@@ -23,14 +23,14 @@ public:
 		SECURITY_ATTRIBUTES* secAttr,
 		uint_t pageProtection,
 		uint64_t maxSize,
-		const wchar_t* name = NULL
+		const sl::StringRef_w& name = NULL
 		);
 
 	bool 
 	open (
 		uint_t access,
 		bool doInheritHandle,
-		const wchar_t* name
+		const sl::StringRef_w& name
 		);
 };
 

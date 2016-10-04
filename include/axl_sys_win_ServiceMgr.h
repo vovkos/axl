@@ -19,32 +19,32 @@ class ServiceMgr: public ServiceHandle
 public:
 	bool 
 	open (
-		const wchar_t* machineName,
-		const wchar_t* databaseName,
+		const sl::StringRef_w& machineName,
+		const sl::StringRef_w& databaseName,
 		dword_t access
 		);
 
 	bool
 	createService (
 		Service* service,
-		const wchar_t* name,
-		const wchar_t* displayName,
+		const sl::StringRef_w& name,
+		const sl::StringRef_w& displayName,
 		dword_t access,
 		dword_t serviceType,
 		dword_t startType,
 		dword_t errorControl,
-		const wchar_t* binaryFilePath,
-		const wchar_t* loadOrderGroup = NULL,
+		const sl::StringRef_w& binaryFilePath,
+		const sl::StringRef_w& loadOrderGroup = NULL,
 		dword_t* tagId = NULL,
-		const wchar_t* dependencies = NULL,
-		const wchar_t* startName = NULL,
-		const wchar_t* password = NULL
+		const sl::StringRef_w& dependencies = NULL,
+		const sl::StringRef_w& startName = NULL,
+		const sl::StringRef_w& password = NULL
 		);
 
 	bool
 	openService (
 		Service* service,
-		const wchar_t* name,
+		const sl::StringRef_w& name,
 		dword_t access = SERVICE_ALL_ACCESS
 		);
 };

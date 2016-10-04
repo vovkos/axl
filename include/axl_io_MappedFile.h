@@ -132,7 +132,7 @@ public:
 
 	bool 
 	open (
-		const char* fileName, 
+		const sl::StringRef& fileName, 
 		uint_t flags = 0 // FileFlag
 		);
 
@@ -246,7 +246,7 @@ public:
 
 	bool
 	open (
-		const char* fileName, 
+		const sl::StringRef& fileName, 
 		uint64_t offset,
 		size_t size,
 		uint_t flags = 0 // EFileFlag 
@@ -254,7 +254,7 @@ public:
 
 	bool
 	open (
-		const char* fileName, 
+		const sl::StringRef& fileName, 
 		uint_t flags = 0 // EFileFlag 
 		)
 	{

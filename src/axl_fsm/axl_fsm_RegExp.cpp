@@ -70,7 +70,7 @@ getMatchConditionString (const MatchCondition* condition)
 		break;
 
 	case MatchConditionKind_CharSet:
-		string.format ("[%s]", getCharSetString (&condition->m_charSet).cc ());
+		string.format ("[%s]", getCharSetString (&condition->m_charSet).sz ());
 		break;
 
 	case MatchConditionKind_Any:
@@ -96,13 +96,13 @@ RegExp::clear ()
 }
 
 bool 
-RegExp::match (char const* string)
+RegExp::match (const sl::StringRef& string)
 {
 	return false;
 }
 
 bool 
-RegExp::compile (char const* source)
+RegExp::compile (const sl::StringRef& source)
 {
 	RegExpCompiler compiler (this);
 	return compiler.compile (source);
@@ -127,7 +127,7 @@ RegExp::print () const
 		if (nfaState->m_flags & NfaStateFlag_Match)
 		{
 			ASSERT (nfaState->m_outState && !nfaState->m_outState2);
-			printf ("%s -> %02d", getMatchConditionString (&nfaState->m_matchCondition).cc (), nfaState->m_outState->m_id);
+			printf ("%s -> %02d", getMatchConditionString (&nfaState->m_matchCondition).sz (), nfaState->m_outState->m_id);
 		}
 		else if (nfaState->m_flags & NfaStateFlag_EpsilonLink)
 		{
@@ -167,7 +167,7 @@ RegExp::print () const
 		for (; dfaTransitionIt; dfaTransitionIt++)
 		{
 			DfaTransition* transition = *dfaTransitionIt;
-			printf ("    %s -> %02d\n", getMatchConditionString (&transition->m_matchCondition).cc (), transition->m_outState->m_id);
+			printf ("    %s -> %02d\n", getMatchConditionString (&transition->m_matchCondition).sz (), transition->m_outState->m_id);
 		}
 	}
 }
@@ -222,7 +222,7 @@ RegExpCompiler::RegExpCompiler (
 
 bool 
 RegExpCompiler::compile (
-	char const* source,
+	const sl::StringRef& source,
 	void* acceptContext
 	)
 {
@@ -239,11 +239,11 @@ RegExpCompiler::compile (
 
 bool 
 RegExpCompiler::incrementalCompile (
-	char const* source,
+	const sl::StringRef& source,
 	void* acceptContext
 	)
 {
-	m_p = source;
+	m_p = source.sz ();
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 
 	NfaState* oldStart = !m_regExp->m_nfaStateList.isEmpty () ? 
@@ -515,7 +515,7 @@ RegExpCompiler::readLiteral (sl::String* string)
 		case '\'':			
 			if (*p == delimiter)
 			{
-				size_t size = enc::EscapeEncoding::decode (string, m_p, p - m_p);
+				size_t size = enc::EscapeEncoding::decode (string, sl::StringRef (m_p, p - m_p));
 				if (size == -1)
 					return false;
 
@@ -548,7 +548,7 @@ RegExpCompiler::readHexLiteral (sl::String* string)
 			if (*p == delimiter)
 			{
 				sl::Array <char> buffer;
-				size_t size = enc::HexEncoding::decode (&buffer, m_p, p - m_p);
+				size_t size = enc::HexEncoding::decode (&buffer, sl::StringRef (m_p, p - m_p));
 				if (size == -1)
 					return false;
 
@@ -903,7 +903,7 @@ RegExpCompiler::single ()
 		return ch (token.m_char);
 
 	case TokenKind_Literal:
-		return literal (token.m_string, token.m_string.getLength ());
+		return literal (token.m_string);
 
 	case TokenKind_Identifier:
 		return namedRegExp (token.m_string);
@@ -915,16 +915,14 @@ RegExpCompiler::single ()
 }
 
 NfaState*
-RegExpCompiler::literal (
-	const char* p,
-	size_t length
-	)
+RegExpCompiler::literal (const sl::StringRef& string)
 {
 	NfaState* start = AXL_MEM_NEW (NfaState);
 	m_regExp->m_nfaStateList.insertTail (start);
 
 	NfaState* mid = start;
-	const char* end = p + length;
+	const char* p = string.cp ();
+	const char* end = string.getEnd ();
 	for (; p < end; p++)
 	{
 		ch ((uchar_t) *p, mid);
@@ -1215,7 +1213,7 @@ RegExpCompiler::capturingGroup ()
 }
 
 NfaState*
-RegExpCompiler::namedRegExp (const char* name)
+RegExpCompiler::namedRegExp (const sl::StringRef& name)
 {
 	if (!m_nameMgr)	
 	{
@@ -1223,8 +1221,8 @@ RegExpCompiler::namedRegExp (const char* name)
 		return NULL;
 	}
 
-	const char* source = m_nameMgr->findName (name);
-	if (!source)
+	sl::StringRef source = m_nameMgr->findName (name);
+	if (source.isEmpty ())
 	{
 		err::setFormatStringError ("named regexp '%s' is not defined", name);
 		return NULL;

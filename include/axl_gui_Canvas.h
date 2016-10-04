@@ -171,8 +171,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const char* text,
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
 		return drawText_utf8 (
@@ -185,8 +184,7 @@ public:
 			textColor,
 			backColor,
 			fontFlags,
-			text,
-			length
+			text
 			);
 	}
 
@@ -198,11 +196,10 @@ public:
 		int top,
 		int right,
 		int bottom,
-		const char* text,
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (x, y, left, top, right, bottom, text, length);
+		return drawText_utf8 (x, y, left, top, right, bottom, text);
 	}
 
 	bool
@@ -210,22 +207,20 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
-		const char* text,
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (point, rect, textAttr, text, length);
+		return drawText_utf8 (point, rect, textAttr, text);
 	}
 
 	bool
 	drawText (
 		const Point& point,
 		const Rect& rect,
-		const char* text,
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (point, rect, text, length);
+		return drawText_utf8 (point, rect, text);
 	}
 
 	// utf8 text drawing
@@ -241,8 +236,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return m_engine->drawText_utf8 (
@@ -256,8 +250,7 @@ public:
 			textColor,
 			backColor,
 			fontFlags,
-			text,
-			length
+			text
 			);
 	}
 
@@ -269,8 +262,7 @@ public:
 		int top,
 		int right,
 		int bottom,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawText_utf8 (
@@ -283,8 +275,7 @@ public:
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
 			-1,
-			text,
-			length
+			text
 			);
 	}
 
@@ -293,8 +284,7 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawText_utf8 (
@@ -307,8 +297,7 @@ public:
 			textAttr.m_foreColor,
 			textAttr.m_backColor,
 			textAttr.m_fontFlags,
-			text,
-			length
+			text
 			);
 	}
 
@@ -316,8 +305,7 @@ public:
 	drawText_utf8 (
 		const Point& point,
 		const Rect& rect,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		)
 	{
 		return drawText_utf8 (
@@ -330,8 +318,7 @@ public:
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
 			0,
-			text,
-			length
+			text
 			);
 	}
 
@@ -348,8 +335,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf16_t* text,
-		size_t length = -1
+		const sl::StringRef_utf16& text
 		)
 	{
 		return m_engine->drawText_utf16 (
@@ -363,8 +349,7 @@ public:
 			textColor,
 			backColor,
 			fontFlags,
-			text,
-			length
+			text
 			);
 	}
 
@@ -376,8 +361,7 @@ public:
 		int top,
 		int right,
 		int bottom,
-		const utf16_t* text,
-		size_t length = -1
+		const sl::StringRef_utf16& text
 		)
 	{
 		return drawText_utf16 (
@@ -390,8 +374,7 @@ public:
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
 			-1,
-			text,
-			length
+			text
 			);
 	}
 
@@ -400,8 +383,7 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
-		const utf16_t* text,
-		size_t length = -1
+		const sl::StringRef_utf16& text
 		)
 	{
 		return drawText_utf16 (
@@ -414,8 +396,7 @@ public:
 			textAttr.m_foreColor,
 			textAttr.m_backColor,
 			textAttr.m_fontFlags,
-			text,
-			length
+			text
 			);
 	}
 
@@ -423,8 +404,7 @@ public:
 	drawText_utf16 (
 		const Point& point,
 		const Rect& rect,
-		const utf16_t* text,
-		size_t length = -1
+		const sl::StringRef_utf16& text
 		)
 	{
 		return drawText_utf16 (
@@ -437,8 +417,7 @@ public:
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
 			-1,
-			text,
-			length
+			text
 			);
 	}
 
@@ -455,8 +434,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf32_t* text,
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return m_engine->drawText_utf32 (
@@ -470,8 +448,7 @@ public:
 			textColor,
 			backColor,
 			fontFlags,
-			text,
-			length
+			text
 			);
 	}
 
@@ -483,8 +460,7 @@ public:
 		int top,
 		int right,
 		int bottom,
-		const utf32_t* text,
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawText_utf32 (
@@ -497,8 +473,7 @@ public:
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
 			-1,
-			text,
-			length
+			text
 			);
 	}
 
@@ -507,8 +482,7 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
-		const utf32_t* text,
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawText_utf32 (
@@ -521,8 +495,7 @@ public:
 			textAttr.m_foreColor,
 			textAttr.m_backColor,
 			textAttr.m_fontFlags,
-			text,
-			length
+			text
 			);
 	}
 
@@ -530,8 +503,7 @@ public:
 	drawText_utf32 (
 		const Point& point,
 		const Rect& rect,
-		const utf32_t* text,
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		)
 	{
 		return drawText_utf32 (
@@ -544,8 +516,7 @@ public:
 			m_colorAttr.m_foreColor,
 			m_colorAttr.m_backColor,
 			0,
-			text,
-			length
+			text
 			);
 	}
 

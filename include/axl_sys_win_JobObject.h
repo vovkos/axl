@@ -7,6 +7,7 @@
 #define _AXL_SYS_WIN_JOBOBJECT_H
 
 #include "axl_sys_win_Handle.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace sys {
@@ -20,12 +21,12 @@ public:
 	bool 
 	create (
 		SECURITY_ATTRIBUTES* secAttr,
-		const wchar_t* name
+		const sl::StringRef_w& name
 		)
 	{
 		close ();
 
-		m_h = ::CreateJobObjectW (secAttr, name);
+		m_h = ::CreateJobObjectW (secAttr, name.szn ());
 		return err::complete (m_h != NULL);
 	}
 
@@ -33,12 +34,12 @@ public:
 	open (
 		uint_t access,
 		bool doInheritHandle,
-		const wchar_t* name
+		const sl::StringRef_w& name
 		)
 	{
 		close ();
 
-		m_h = ::OpenJobObjectW (access, doInheritHandle, name);
+		m_h = ::OpenJobObjectW (access, doInheritHandle, name.szn ());
 		return err::complete (m_h != NULL);
 	}
 

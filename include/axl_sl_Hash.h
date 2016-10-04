@@ -32,9 +32,15 @@ class HashDjb2
 {
 public:
 	size_t 
+	operator () (const T* key) const
+	{ 
+		return djb2 (key, sizeof (T)); 
+	}
+
+	size_t 
 	operator () (const T& key) const
 	{ 
-		return djb2 (&key, sizeof (key)); 
+		return djb2 (&key, sizeof (T)); 
 	}
 };
 
@@ -45,9 +51,15 @@ class HashChecksum16
 {
 public:
 	size_t 
+	operator () (const T* key) const
+	{ 
+		return checksum16 (key, sizeof (T)); 
+	}
+
+	size_t 
 	operator () (const T& key) const
 	{ 
-		return checksum16 (&key, sizeof (key)); 
+		return checksum16 (&key, sizeof (T)); 
 	}
 };
 
@@ -86,14 +98,14 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class HashStringBase 
+class HashSzBase 
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class HashStringBase <char>
+class HashSzBase <char>
 {
 public:
 	size_t 
@@ -106,7 +118,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class HashStringBase <wchar_t>
+class HashSzBase <wchar_t>
 {
 public:
 	size_t 
@@ -118,28 +130,31 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef HashStringBase <char>    HashString;
-typedef HashStringBase <wchar_t> HashString_w;
-typedef HashStringBase <utf8_t>  HashString_utf8;
-typedef HashStringBase <utf16_t> HashString_utf16;
-typedef HashStringBase <utf32_t> HashString_utf32;
+typedef HashSzBase <char>    HashSz;
+typedef HashSzBase <wchar_t> HashSz_w;
+typedef HashSzBase <utf8_t>  HashSz_utf8;
+typedef HashSzBase <utf16_t> HashSz_utf16;
+typedef HashSzBase <utf32_t> HashSz_utf32;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
+template <
+	typename T,
+	typename Arg = typename ArgType <T>::Type
+	>
 class HashDuckType
 {
 public:
 	size_t 
-	operator () (const T* a)
+	operator () (Arg a)
 	{
-		return a->getHash ();
+		return a.hash ();
 	}
 
 	size_t 
-	operator () (const T& a)
+	operator () (const T* a)
 	{
-		return a.getHash ();
+		return a->hash ();
 	}
 };
 

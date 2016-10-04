@@ -44,7 +44,7 @@ TextPainter::drawSpace (
 	uint_t color
 	)
 {
-	Size size = m_canvas->m_font->calcTextSize (" ", 1);
+	Size size = m_canvas->m_font->calcTextSize (sl::StringRef (" ", 1));
 	return drawSpace_p (length * size.m_width, color);
 }
 
@@ -55,18 +55,14 @@ TextPainter::drawText_utf8 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf8_t* text,
-	size_t length
+	const sl::StringRef_utf8& text
 	)
 {
-	if (length == -1)
-		length = strlen_s (text);
-	
-	if (!length)
+	if (text.isEmpty ())
 		return m_point.m_x;
 
 	Font* font = m_canvas->m_font->getFontMod (fontFlags);
-	Size size = font->calcTextSize_utf8 (text, length);
+	Size size = font->calcTextSize_utf8 (text);
 	int right = m_point.m_x + size.m_width;
 	
 	m_canvas->drawText_utf8 (
@@ -79,8 +75,7 @@ TextPainter::drawText_utf8 (
 		textColor, 
 		backColor, 
 		fontFlags, 
-		text, 
-		length
+		text
 		);
 	
 	m_point.m_x = right;
@@ -92,18 +87,14 @@ TextPainter::drawText_utf32 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf32_t* text,
-	size_t length
+	const sl::StringRef_utf32& text
 	)
 {
-	if (length == -1)
-		length = sl::StringDetails_utf32::calcLength (text);
-	
-	if (!length)
+	if (text.isEmpty ())
 		return m_point.m_x;
 
 	Font* font = m_canvas->m_font->getFontMod (fontFlags);
-	Size size = font->calcTextSize_utf32 (text, length);
+	Size size = font->calcTextSize_utf32 (text);
 	int right = m_point.m_x + size.m_width;
 	
 	m_canvas->drawText_utf32 (
@@ -116,8 +107,7 @@ TextPainter::drawText_utf32 (
 		textColor, 
 		backColor, 
 		fontFlags, 
-		text, 
-		length
+		text
 		);
 	
 	m_point.m_x = right;
@@ -132,23 +122,19 @@ TextPainter::drawHyperText_utf8 (
 	uint_t backColor0,
 	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
-	const utf8_t* text,
-	size_t length
+	const sl::StringRef_utf8& text
 	)
 {
 	if (!attrArray || attrArray->isEmpty ())
-		return drawText_utf8 (textColor0, backColor0, fontFlags0, text, length);
+		return drawText_utf8 (textColor0, backColor0, fontFlags0, text);
 
-	if (length == -1)
-		length = strlen_s (text);
-	
-	if (!length)
+	if (text.isEmpty ())
 		return m_point.m_x;
 	
 	TextAttr attr0 (textColor0, backColor0, fontFlags0);
 	TextAttr attr = attr0;
 
-	const TextAttrAnchor* nextAttr = attrArray->ca ();
+	const TextAttrAnchor* nextAttr = attrArray->cp ();
 	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount ();
 
 	if (!nextAttr->m_offset)
@@ -157,17 +143,18 @@ TextPainter::drawHyperText_utf8 (
 		nextAttr++;
 	}
 
+	const utf8_t* p = text.cp ();
+	size_t length = text.getLength ();
 	size_t offset = 0;
-	const utf8_t* p = text;
 
 	while (offset < length && nextAttr < attrEnd)
 	{	
 		size_t leftover = length - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
-			return drawText_utf8 (attr, p, leftover);
+			return drawText_utf8 (attr, sl::StringRef_utf8 (p, leftover));
 
-		drawText_utf8 (attr, p, chunk);
+		drawText_utf8 (attr, sl::StringRef_utf8 (p, chunk));
 
 		attr.overlay (attr0, nextAttr->m_attr);
 		nextAttr++;
@@ -178,7 +165,7 @@ TextPainter::drawHyperText_utf8 (
 	if (offset < length)
 	{
 		size_t leftover = length - offset;
-		drawText_utf8 (attr, p, leftover);
+		drawText_utf8 (attr, sl::StringRef_utf8 (p, leftover));
 	}
 
 	return m_point.m_x;
@@ -190,23 +177,19 @@ TextPainter::drawHyperText_utf32 (
 	uint_t backColor0,
 	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
-	const utf32_t* text,
-	size_t length
+	const sl::StringRef_utf32& text
 	)
 {
 	if (!attrArray || attrArray->isEmpty ())
-		return drawText_utf32 (textColor0, backColor0, fontFlags0, text, length);
+		return drawText_utf32 (textColor0, backColor0, fontFlags0, text);
 
-	if (length == -1)
-		length = sl::StringDetails_utf32::calcLength (text);
-	
-	if (!length)
+	if (text.isEmpty ())
 		return m_point.m_x;
 	
 	TextAttr attr0 (textColor0, backColor0, fontFlags0);
 	TextAttr attr = attr0;
 
-	const TextAttrAnchor* nextAttr = attrArray->ca ();
+	const TextAttrAnchor* nextAttr = attrArray->cp ();
 	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount ();
 
 	if (!nextAttr->m_offset)
@@ -215,17 +198,18 @@ TextPainter::drawHyperText_utf32 (
 		nextAttr++;
 	}
 
+	const utf32_t* p = text.cp ();
+	size_t length = text.getLength ();
 	size_t offset = 0;
-	const utf32_t* p = text;
 
 	while (offset < length && nextAttr < attrEnd)
 	{	
 		size_t leftover = length - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
-			return drawText_utf32 (attr, p, leftover);
+			return drawText_utf32 (attr, sl::StringRef_utf32 (p, leftover));
 
-		drawText_utf32 (attr, p, chunk);
+		drawText_utf32 (attr, sl::StringRef_utf32 (p, chunk));
 
 		attr.overlay (attr0, nextAttr->m_attr);
 		nextAttr++;
@@ -236,7 +220,7 @@ TextPainter::drawHyperText_utf32 (
 	if (offset < length)
 	{
 		size_t leftover = length - offset;
-		drawText_utf32 (attr, p, leftover);
+		drawText_utf32 (attr, sl::StringRef_utf32 (p, leftover));
 	}
 
 	return m_point.m_x;
@@ -251,20 +235,19 @@ TextPainter::drawSelHyperText_utf8 (
 	const TextAttr& selAttr,
 	size_t selStart,
 	size_t selEnd,
-	const utf8_t* text,
-	size_t length
+	const sl::StringRef_utf8& text
 	)
 {
 	if (selStart >= selEnd) 
-		return drawHyperText_utf8 (textColor, backColor, fontFlags, attrArray, text, length);
+		return drawHyperText_utf8 (textColor, backColor, fontFlags, attrArray, text);
 
 	if (attrArray)
-		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
+		m_selOverlayBuffer.copy (attrArray->cp (), attrArray->getCount ());
 	else
 		m_selOverlayBuffer.clear ();
 
 	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
-	return drawHyperText_utf8 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
+	return drawHyperText_utf8 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text);
 }
 
 int
@@ -276,20 +259,19 @@ TextPainter::drawSelHyperText_utf32 (
 	const TextAttr& selAttr,
 	size_t selStart,
 	size_t selEnd,
-	const utf32_t* text,
-	size_t length
+	const sl::StringRef_utf32& text
 	)
 {
 	if (selStart >= selEnd) 
-		return drawHyperText_utf32 (textColor, backColor, fontFlags, attrArray, text, length);
+		return drawHyperText_utf32 (textColor, backColor, fontFlags, attrArray, text);
 
 	if (attrArray)
-		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
+		m_selOverlayBuffer.copy (attrArray->cp (), attrArray->getCount ());
 	else
 		m_selOverlayBuffer.clear ();
 
 	m_selOverlayBuffer.setAttr (selStart, selEnd, selAttr);
-	return drawHyperText_utf32 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text, length);
+	return drawHyperText_utf32 (textColor, backColor, fontFlags, &m_selOverlayBuffer, text);
 }
 
 // bin hex
@@ -326,8 +308,7 @@ TextPainter::drawBinHex (
 		textColor,
 		backColor,
 		fontFlags,
-		m_stringBuffer, 
-		m_stringBuffer.getLength ()
+		m_stringBuffer
 		);
 }
 
@@ -351,7 +332,7 @@ TextPainter::drawHyperBinHex (
 	TextAttr attr0 (textColor0, backColor0, fontFlags0);
 	TextAttr attr = attr0;
 
-	const TextAttrAnchor* nextAttr = attrArray->ca ();
+	const TextAttrAnchor* nextAttr = attrArray->cp ();
 	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount ();
 
 	if (!nextAttr->m_offset)
@@ -406,7 +387,7 @@ TextPainter::drawSelHyperBinHex (
 		return drawHyperBinHex (textColor0, backColor0, fontFlags0, attrArray, halfBitOffset, p, size);
 
 	if (attrArray)
-		m_selOverlayBuffer.copy (attrArray->ca (), attrArray->getCount ());
+		m_selOverlayBuffer.copy (attrArray->cp (), attrArray->getCount ());
 	else
 		m_selOverlayBuffer.clear ();
 
@@ -487,7 +468,7 @@ TextPainter::drawBinText (
 		return m_point.m_x;
 
 	size_t length = buildBinTextBuffer (codec, p, dataSize, bufferSize);
-	return drawText_utf32 (m_binTextBuffer, length);
+	return drawText_utf32 (sl::StringRef_utf32 (m_binTextBuffer, length));
 }
 
 int
@@ -511,8 +492,7 @@ TextPainter::drawHyperBinText (
 		backColor0,
 		fontFlags0,
 		attrArray,
-		m_binTextBuffer, 
-		length
+		sl::StringRef_utf32 (m_binTextBuffer, length)
 		);
 }
 
@@ -543,8 +523,7 @@ TextPainter::drawSelHyperBinText (
 		selAttr,
 		selStart,
 		selEnd,
-		m_binTextBuffer, 
-		length
+		sl::StringRef_utf32 (m_binTextBuffer, length)
 		);
 }
 

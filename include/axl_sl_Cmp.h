@@ -68,19 +68,19 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CmpStringBase
+class CmpSzBase
 {
 };
 
 template <typename T>
-class CmpStringBase_i
+class CmpSzBase_i
 {
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpStringBase <char>
+class CmpSzBase <char>
 {
 public:
 	int
@@ -96,7 +96,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpStringBase_i <char>
+class CmpSzBase_i <char>
 {
 public:
 	int
@@ -112,7 +112,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpStringBase <wchar_t>
+class CmpSzBase <wchar_t>
 {
 public:
 	int
@@ -128,7 +128,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpStringBase_i <wchar_t>
+class CmpSzBase_i <wchar_t>
 {
 public:
 	int
@@ -143,17 +143,29 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CmpStringBase <char>      CmpString;
-typedef CmpStringBase <wchar_t>   CmpString_w;
-typedef CmpStringBase_i <char>    CmpString_i;
-typedef CmpStringBase_i <wchar_t> CmpString_wi;
+typedef CmpSzBase <char>      CmpSz;
+typedef CmpSzBase <wchar_t>   CmpSz_w;
+typedef CmpSzBase_i <char>    CmpSz_i;
+typedef CmpSzBase_i <wchar_t> CmpSz_wi;
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
+template <
+	typename T,
+	typename Arg = typename ArgType <T>::Type
+	>
 class CmpDuckType
 {
 public:
+	int 
+	operator () (
+		Arg a,
+		Arg b
+		)
+	{
+		return a.cmp (b);
+	}
+
 	int 
 	operator () (
 		const T* a,
@@ -162,14 +174,28 @@ public:
 	{
 		return a->cmp (*b);
 	}
+};
 
+template <typename T>
+class CmpDuckTypePtr
+{
+public:
 	int 
 	operator () (
 		const T& a,
 		const T& b
 		)
 	{
-		return a.cmp (b);
+		return a.cmp (&b);
+	}
+
+	int 
+	operator () (
+		const T* a,
+		const T* b
+		)
+	{
+		return a->cmp (b);
 	}
 };
 

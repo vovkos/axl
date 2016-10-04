@@ -326,6 +326,7 @@ source_group (
 
 set (
 	SL_H_LIST
+	${AXL_INC_DIR}/axl_sl_ArgType.h
 	${AXL_INC_DIR}/axl_sl_Operator.h
 	${AXL_INC_DIR}/axl_sl_Construct.h
 	${AXL_INC_DIR}/axl_sl_Cmp.h
@@ -345,6 +346,7 @@ set (
 	${AXL_INC_DIR}/axl_sl_BitMap.h
 	${AXL_INC_DIR}/axl_sl_BmhFind.h
 	${AXL_INC_DIR}/axl_sl_BoyerMooreFind.h
+	${AXL_INC_DIR}/axl_sl_MemMem.h
 	${AXL_INC_DIR}/axl_sl_BoxList.h
 	${AXL_INC_DIR}/axl_sl_BuddyAllocMap.h
 	${AXL_INC_DIR}/axl_sl_ByteOrder.h
@@ -361,9 +363,9 @@ set (
 	${AXL_INC_DIR}/axl_sl_Packetizer.h
 	${AXL_INC_DIR}/axl_sl_Protocol.h
 	${AXL_INC_DIR}/axl_sl_RbTree.h
+	${AXL_INC_DIR}/axl_sl_StringForward.h
 	${AXL_INC_DIR}/axl_sl_String.h
 	${AXL_INC_DIR}/axl_sl_StringDetails.h
-	${AXL_INC_DIR}/axl_sl_StringCache.h
 	${AXL_INC_DIR}/axl_sl_StringHashTable.h
 	${AXL_INC_DIR}/axl_sl_Unpacker.h
 	)
@@ -371,9 +373,10 @@ set (
 set (
 	SL_CPP_LIST
 	axl_sl_BitMap.cpp	
+	axl_sl_BmhFind.cpp
 	axl_sl_BoyerMooreAccessor.h
 	axl_sl_BoyerMooreFind.cpp
-	axl_sl_BmhFind.cpp
+	axl_sl_MemMem.cpp
 	axl_sl_BuddyAllocMap.cpp
 	axl_sl_CmdLineParser.cpp
 	axl_sl_Guid.cpp

@@ -50,7 +50,7 @@ protected:
 
 public:
 	bool
-	openDir (const char* dir);
+	openDir (const sl::StringRef& dir);
 
 	bool 
 	hasNextFile ()

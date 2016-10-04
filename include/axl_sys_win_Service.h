@@ -7,7 +7,7 @@
 #define _AXL_SYS_WIN_SERVICE_H
 
 #include "axl_sys_win_Handle.h"
-#include "axl_err_Error.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace sys {
@@ -77,11 +77,7 @@ public:
 	}
 
 	bool
-	setDescription (const wchar_t* description)
-	{
-		SERVICE_DESCRIPTIONW info = { (WCHAR*) description };
-		return changeServiceConfig2 (SERVICE_CONFIG_DESCRIPTION, &info);
-	}
+	setDescription (const sl::StringRef_w& description);
 
 	bool 
 	queryServiceStatus (SERVICE_STATUS* serviceStatus)
@@ -95,13 +91,13 @@ public:
 		dword_t serviceType,
 		dword_t startType,
 		dword_t errorControl,
-		const wchar_t* binaryFilePath = NULL,
-		const wchar_t* loadOrderGroup = NULL,
+		const sl::StringRef_w& binaryFilePath = NULL,
+		const sl::StringRef_w& loadOrderGroup = NULL,
 		dword_t* tagId = NULL,
-		const wchar_t* dependencies = NULL,
-		const wchar_t* serviceStartName = NULL,
-		const wchar_t* password = NULL,
-		const wchar_t* displayName = NULL
+		const sl::StringRef_w& dependencies = NULL,
+		const sl::StringRef_w& serviceStartName = NULL,
+		const sl::StringRef_w& password = NULL,
+		const sl::StringRef_w& displayName = NULL
 		)
 	{
 		bool_t result = ::ChangeServiceConfigW (
@@ -109,13 +105,13 @@ public:
 			serviceType,
 			startType,
 			errorControl,
-			binaryFilePath,
-			loadOrderGroup,
+			binaryFilePath.szn (),
+			loadOrderGroup.szn (),
 			tagId,
-			dependencies,
-			serviceStartName,
-			password,
-			displayName
+			dependencies.szn (),
+			serviceStartName.szn (),
+			password.szn (),
+			displayName.szn ()
 			);
 
 		return err::complete (result);

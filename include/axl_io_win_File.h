@@ -19,7 +19,7 @@ class File: public FileHandle
 public:
 	bool
 	create (
-		const wchar_t* fileName,
+		const sl::StringRef_w& fileName,
 		uint_t accessMode,
 		uint_t shareMode,
 		SECURITY_ATTRIBUTES* secAttr,

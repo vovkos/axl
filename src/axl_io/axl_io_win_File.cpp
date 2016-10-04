@@ -9,7 +9,7 @@ namespace win {
 
 bool
 File::create (
-	const wchar_t* fileName,
+	const sl::StringRef_w& fileName,
 	uint_t accessMode,
 	uint_t shareMode,
 	SECURITY_ATTRIBUTES* secAttr,
@@ -20,7 +20,7 @@ File::create (
 	close ();
 
 	m_h = ::CreateFileW (
-		fileName,
+		fileName.sz (),
 		accessMode,
 		shareMode,
 		secAttr,

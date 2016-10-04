@@ -98,11 +98,17 @@ struct NfaStateSet
 	{
 		return m_stateSet.cmp (set.m_stateSet);
 	}
-	
-	intptr_t
-	getHash () const
+
+	bool
+	isEqual (const NfaStateSet& set) const
 	{
-		return m_stateSet.getHash ();
+		return m_stateSet.isEqual (set.m_stateSet);
+	}
+	
+	size_t
+	hash () const
+	{
+		return m_stateSet.hash ();
 	}
 };
 
@@ -111,9 +117,9 @@ struct NfaStateSet
 template <typename T>
 class NfaStateSetMap: public sl::HashTableMap <
 	NfaStateSet*, 
-	T, 
-	sl::HashDuckType <NfaStateSet>, 
-	sl::CmpDuckType <NfaStateSet> 
+	T,
+	sl::HashDuckType <NfaStateSet>,
+	sl::EqDuckType <NfaStateSet>
 	>
 {
 };

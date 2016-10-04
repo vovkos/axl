@@ -137,12 +137,11 @@ struct ProtoMsg_4: ProtoMsg
 
 #define AXL_SL_PROTO_SEND_FUNCTION_0_STR(code, sender, strArg) \
 	void \
-	sender (const char* strArg) \
+	sender (const axl::sl::StringRef& strArg) \
 	{ \
-		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg msg; \
 		msg.m_code = code; \
-		sendMsg (&msg, sizeof (msg), strArg, length); \
+		sendMsg (&msg, sizeof (msg), strArg.cp (), strArg.getLength ()); \
 	}
 
 #define AXL_SL_PROTO_SEND_FUNCTION_0_PTR(code, sender, ptrArg, sizeArg) \
@@ -182,14 +181,13 @@ struct ProtoMsg_4: ProtoMsg
 	void \
 	sender ( \
 		T1 arg1, \
-		const char* strArg \
+		const sl::StringRef& strArg \
 		) \
 	{ \
-		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_1 <T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
-		sendMsg (&msg, sizeof (msg), strArg, length); \
+		sendMsg (&msg, sizeof (msg), strArg.cp (), strArg.getLength ()); \
 	}
 
 #define AXL_SL_PROTO_SEND_FUNCTION_1_PTR(code, sender, T1, arg1, ptrArg, sizeArg) \
@@ -240,15 +238,14 @@ struct ProtoMsg_4: ProtoMsg
 	sender ( \
 		T1 arg1, \
 		T2 arg2, \
-		const char* strArg \
+		const sl::StringRef& strArg \
 		) \
 	{ \
-		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_2 <T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
-		sendMsg (&msg, sizeof (msg), strArg, length); \
+		sendMsg (&msg, sizeof (msg), strArg.cp (), strArg.getLength ()); \
 	}
 
 #define AXL_SL_PROTO_SEND_FUNCTION_2_PTR(code, sender, T1, arg1, T2, arg2, ptrArg, sizeArg) \
@@ -306,16 +303,15 @@ struct ProtoMsg_4: ProtoMsg
 		T1 arg1, \
 		T2 arg2, \
 		T3 arg3, \
-		const char* strArg \
+		const sl::StringRef& strArg \
 		) \
 	{ \
-		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_3 <T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
 		msg.m_arg3 = arg3; \
-		sendMsg (&msg, sizeof (msg), strArg, length); \
+		sendMsg (&msg, sizeof (msg), strArg.cp (), strArg.getLength ()); \
 	}
 
 #define AXL_SL_PROTO_SEND_FUNCTION_3_PTR(code, sender, T1, arg1, T2, arg2, T3, arg3, ptrArg, sizeArg) \
@@ -380,17 +376,16 @@ struct ProtoMsg_4: ProtoMsg
 		T2 arg2, \
 		T3 arg3, \
 		T4 arg4, \
-		const char* strArg \
+		const sl::StringRef& strArg \
 		) \
 	{ \
-		size_t length = strlen_s (strArg); \
 		axl::sl::ProtoMsg_4 <T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
 		msg.m_arg2 = arg2; \
 		msg.m_arg3 = arg3; \
 		msg.m_arg4 = arg4; \
-		sendMsg (&msg, sizeof (msg), strArg, length); \
+		sendMsg (&msg, sizeof (msg), strArg.cp (), strArg.getLength ()); \
 	}
 
 #define AXL_SL_PROTO_SEND_FUNCTION_4_PTR(code, sender, T1, arg1, T2, arg2, T3, arg3, T4, arg4, ptrArg, sizeArg) \
@@ -467,9 +462,7 @@ struct ProtoMsg_4: ProtoMsg
 		if (size < sizeof (Msg)) \
 			break; \
 		size_t length = size - sizeof (Msg); \
-		char buffer [256]; \
-		axl::sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
-		string.copy ((char*) (msg + 1), length); \
+		axl::sl::StringRef string ((char*) (msg + 1), length); \
 		handler (string); \
 		break; \
 		}
@@ -518,9 +511,7 @@ struct ProtoMsg_4: ProtoMsg
 		if (size < sizeof (Msg)) \
 			break; \
 		size_t length = size - sizeof (Msg); \
-		char buffer [256]; \
-		axl::sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
-		string.copy ((char*) (msg + 1), length); \
+		axl::sl::StringRef string ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, string); \
 		break; \
 		}
@@ -569,9 +560,7 @@ struct ProtoMsg_4: ProtoMsg
 		if (size < sizeof (Msg)) \
 			break; \
 		size_t length = size - sizeof (Msg); \
-		char buffer [256]; \
-		axl::sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
-		string.copy ((char*) (msg + 1), length); \
+		axl::sl::StringRef string ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, msg->m_arg2, string); \
 		break; \
 		}
@@ -620,9 +609,7 @@ struct ProtoMsg_4: ProtoMsg
 		if (size < sizeof (Msg)) \
 			break; \
 		size_t length = size - sizeof (Msg); \
-		char buffer [256]; \
-		axl::sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
-		string.copy ((char*) (msg + 1), length); \
+		axl::sl::StringRef string ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, string); \
 		break; \
 		}
@@ -672,9 +659,7 @@ struct ProtoMsg_4: ProtoMsg
 		if (size < sizeof (Msg)) \
 			break; \
 		size_t length = size - sizeof (Msg); \
-		char buffer [256]; \
-		axl::sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer)); \
-		string.copy ((char*) (msg + 1), length); \
+		axl::sl::StringRef string ((char*) (msg + 1), length); \
 		handler (msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4, string); \
 		break; \
 		}

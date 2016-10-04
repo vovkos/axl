@@ -7,7 +7,7 @@ namespace ini {
 //.............................................................................
 
 bool
-GenericParser::onSection (const char* sectionName)
+GenericParser::onSection (const sl::StringRef& sectionName)
 {
 	ASSERT (m_ini);
 
@@ -27,13 +27,13 @@ GenericParser::onSection (const char* sectionName)
 
 bool
 GenericParser::onKeyValue (
-	const char* keyName, 
-	const char* value
+	const sl::StringRef& keyName, 
+	const sl::StringRef& value
 	)
 {
 	ASSERT (m_currentSection);
 
-	if (!value || !*value)
+	if (value.isEmpty ())
 	{
 		m_currentSection->m_unnamedValueList.insertTail (keyName);
 		return true;

@@ -39,8 +39,7 @@ HyperlinkAnchorArray::find (size_t offset) const
 HyperlinkAnchor* 
 HyperlinkAnchorArray::openHyperlink (
 	size_t offset,
-	const char* hyperlink,
-	size_t length
+	const sl::StringRef& hyperlink
 	)
 {
 	HyperlinkAnchor* anchor;
@@ -50,7 +49,7 @@ HyperlinkAnchorArray::openHyperlink (
 	{
 		anchor = m_array [count - 1];
 		
-		if (anchor->m_hyperlink.cmp (hyperlink, length) == 0)
+		if (anchor->m_hyperlink == hyperlink)
 			return anchor; // same attr
 		
 		if (anchor->m_offset == offset)
@@ -58,7 +57,7 @@ HyperlinkAnchorArray::openHyperlink (
 			if (count >= 2)
 			{
 				HyperlinkAnchor* prevAnchor = m_array [count - 2];
-				if (prevAnchor->m_hyperlink.cmp (hyperlink, length) == 0)
+				if (prevAnchor->m_hyperlink == hyperlink)
 				{
 					// remove last anchor to normalize array
 
@@ -73,7 +72,7 @@ HyperlinkAnchorArray::openHyperlink (
 
 			// modify last anchor
 
-			anchor->m_hyperlink.copy (hyperlink, length);
+			anchor->m_hyperlink = hyperlink;
 			return anchor;
 		}
 	}
@@ -82,7 +81,7 @@ HyperlinkAnchorArray::openHyperlink (
 
 	anchor = AXL_MEM_NEW (HyperlinkAnchor);
 	anchor->m_offset = offset;
-	anchor->m_hyperlink.copy (hyperlink, length);
+	anchor->m_hyperlink = hyperlink;
 	m_list.insertTail (anchor);
 	m_array.append (anchor);
 
@@ -101,7 +100,7 @@ HyperlinkAnchorArray::closeHyperlink (
 	if (!closeEmpty && m_list.getTail ()->m_offset == offset)
 		return NULL;
 
-	return openHyperlink (offset, NULL, 0);
+	return openHyperlink (offset, NULL);
 }
 
 

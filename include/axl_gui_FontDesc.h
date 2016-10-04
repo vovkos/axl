@@ -31,11 +31,11 @@ getFirstFontFlag (uint_t flags)
 	return (FontFlag) (1 << sl::getLoBitIdx (flags));
 }
 
-const char* 
+const char*
 getFontFlagString (FontFlag flag);
 
 inline
-const char* 
+const char*
 getFontFlagString (uint_t flags)
 {
 	return getFontFlagString (getFirstFontFlag (flags));
@@ -65,7 +65,7 @@ struct FontDesc
 	}
 
 	FontDesc (
-		const char* family, 
+		const sl::StringRef& family, 
 		size_t pointSize = 0,
 		uint_t flags = 0
 		)
@@ -75,7 +75,7 @@ struct FontDesc
 
 	void
 	setup (
-		const char* family, 
+		const sl::StringRef& family, 
 		size_t pointSize = 0,
 		uint_t flags = 0
 		);

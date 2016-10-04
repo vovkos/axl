@@ -6,7 +6,7 @@
 
 #define _AXL_SL_OPERATOR_H
 
-#include "axl_g_Pch.h"
+#include "axl_sl_ArgType.h"
 
 namespace axl {
 namespace sl {
@@ -173,7 +173,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Minus
 {
@@ -187,7 +187,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Not
 {
@@ -201,7 +201,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Add
 {
@@ -218,7 +218,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Sub
 {
@@ -235,7 +235,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Mul
 {
@@ -252,7 +252,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Div
 {
@@ -269,7 +269,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Mod
 {
@@ -286,7 +286,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Shl
 {
@@ -303,7 +303,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Shr
 {
@@ -320,7 +320,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class And
 {
@@ -337,7 +337,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Xor
 {
@@ -354,7 +354,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Or
 {
@@ -371,7 +371,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Min
 {
@@ -388,7 +388,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Max
 {
@@ -409,7 +409,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Eq
 {
@@ -428,7 +428,58 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
+	>
+class EqDuckType
+{
+public:
+	bool 
+	operator () (
+		Arg a, 
+		Arg b
+		) const
+	{ 
+		return a.isEqual (b); 
+	}
+
+	bool 
+	operator () (
+		const T* a, 
+		const T* b
+		) const
+	{ 
+		return a->isEqual (*b); 
+	}
+};
+
+template <typename T>
+class EqDuckTypePtr
+{
+public:
+	bool 
+	operator () (
+		const T& a, 
+		const T& b
+		) const
+	{ 
+		return a.isEqual (b); 
+	}
+
+	bool 
+	operator () (
+		const T* a, 
+		const T* b
+		) const
+	{ 
+		return a->isEqual (b); 
+	}
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = typename ArgType <T>::Type
 	>
 class Ne
 {
@@ -447,7 +498,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Lt
 {
@@ -466,7 +517,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Gt
 {
@@ -485,7 +536,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Le
 {
@@ -504,7 +555,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Ge
 {
@@ -525,7 +576,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Assign
 {
@@ -545,7 +596,7 @@ public:
 template <
 	typename Func,
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class OpAssign
 {

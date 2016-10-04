@@ -21,7 +21,7 @@ enum PixelFormat
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const char* 
+const char*
 getPixelFormatString (PixelFormat pixelFormat);
 
 //.............................................................................

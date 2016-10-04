@@ -163,21 +163,19 @@ Base32Encoding::encode (
 size_t
 Base32Encoding::decode (
 	sl::Array <char>* buffer,
-	const char* p,
-	size_t length
+	const sl::StringRef& string
 	)
 {
-	if (length == -1)
-		length = strlen_s (p);
 
-	size_t sizeGuess = (length * 5) / 8;
+	size_t sizeGuess = (string.getLength () * 5) / 8;
 	buffer->reserve (sizeGuess);
 	buffer->clear ();
 	
 	uchar_t x = 0;
 	size_t i = 0;
 
-	const char* end = p + length;
+	const char* p = string.cp ();
+	const char* end = string.getEnd ();
 	for (; p < end; p++)
 	{
 		char c = *p;

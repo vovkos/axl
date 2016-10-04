@@ -46,7 +46,7 @@ public:
 	virtual
 	ref::Ptr <Font>
 	createFont (
-		const char* family,
+		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		);
@@ -89,7 +89,7 @@ public:
 
 	virtual
 	uintptr_t 
-	registerClipboardFormat (const sl::String& formatName);
+	registerClipboardFormat (const sl::StringRef& formatName);
 
 	virtual
 	bool
@@ -104,10 +104,7 @@ public:
 
 	virtual
 	bool
-	writeClipboard (
-		const char* string,
-		size_t length = -1
-		);
+	writeClipboard (const sl::StringRef& string);
 
 	virtual
 	bool

@@ -44,7 +44,7 @@ AccessToken::getTokenInformation (
 
 	return
 		buffer->setCount (size) &&
-		getTokenInformation (infoClass, buffer->a (), size, &size);
+		getTokenInformation (infoClass, buffer->p (), size, &size);
 }
 
 bool
@@ -57,7 +57,7 @@ AccessToken::isMemberOf (PSID group)
 
 	ASSERT (buffer.getCount () >= sizeof (TOKEN_GROUPS));
 
-	const TOKEN_GROUPS* groups = (const TOKEN_GROUPS*) buffer.ca ();
+	const TOKEN_GROUPS* groups = (const TOKEN_GROUPS*) buffer.cp ();
 	for (size_t i = 0; i < groups->GroupCount; i++)
 		if (::EqualSid (groups->Groups [i].Sid, group))
 			return true;

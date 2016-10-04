@@ -7,6 +7,7 @@
 #define _AXL_SL_BOXLIST_H
 
 #include "axl_sl_List.h"
+#include "axl_sl_ArgType.h"
 
 namespace axl {
 namespace sl {
@@ -79,7 +80,7 @@ public:
 
 template <
 	typename T,
-	typename InsertArg = T
+	typename ValueArg = typename ArgType <T>::Type
 	>
 class BoxList: public ListBase <
 	BoxListEntry <T>,
@@ -132,7 +133,7 @@ public:
 	}
 
 	Iterator
-	insertHead (InsertArg value)
+	insertHead (ValueArg value)
 	{
 		Entry* entry = AXL_MEM_NEW (Entry);
 		entry->m_value = value;
@@ -140,7 +141,7 @@ public:
 	}
 
 	Iterator
-	insertTail (InsertArg value)
+	insertTail (ValueArg value)
 	{
 		Entry* entry = AXL_MEM_NEW (Entry);
 		entry->m_value = value;
@@ -149,7 +150,7 @@ public:
 
 	Iterator
 	insertBefore (
-		InsertArg value,
+		ValueArg value,
 		Iterator before
 		)
 	{
@@ -160,7 +161,7 @@ public:
 
 	Iterator
 	insertAfter (
-		InsertArg value,
+		ValueArg value,
 		Iterator after
 		)
 	{
@@ -260,8 +261,8 @@ public:
 	{
 	}
 
-	template <typename InsertArg>
-	ConstBoxList (const BoxList <T, InsertArg>& list)
+	template <typename ValueArg>
+	ConstBoxList (const BoxList <T, ValueArg>& list)
 	{
 		this->m_listData = list.getListData ();
 	}

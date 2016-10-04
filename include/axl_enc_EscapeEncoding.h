@@ -28,19 +28,15 @@ public:
 	size_t
 	encode (
 		sl::String* string,
-		const char* p, 
-		size_t length = -1
+		const sl::StringRef& source
 		);
 
 	static
 	sl::String
-	encode (
-		const char* p, 
-		size_t length = -1
-		)
+	encode (const sl::StringRef& source)
 	{
 		sl::String string;
-		encode (&string, p, length);
+		encode (&string, source);
 		return string;
 	}
 
@@ -48,19 +44,15 @@ public:
 	size_t
 	decode (
 		sl::String* string,
-		const char* p, 
-		size_t length = -1
+		const sl::StringRef& source
 		);
 
 	static
 	sl::String
-	decode (		
-		const char* p, 
-		size_t length = -1
-		)
+	decode (const sl::StringRef& source)
 	{
 		sl::String string;
-		decode (&string, p, length);
+		decode (&string, source);
 		return string;
 	}
 };

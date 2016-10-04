@@ -31,11 +31,11 @@ public:
 	// creation methods
 
 	bool
-	create (const char* encoding = NULL);
+	create (const sl::StringRef& encoding = NULL);
 
 	bool
 	createNs (
-		const char* encoding,
+		const sl::StringRef& encoding,
 		char separator
 		);
 
@@ -249,7 +249,7 @@ public:
 
 	bool
 	parseFile (
-		const char* fileName,
+		const sl::StringRef& fileName,
 		size_t blockSize = -1
 		);
 
@@ -287,14 +287,14 @@ public:
 	}
 
 	bool
-	create (const char* encoding = NULL)
+	create (const sl::StringRef& encoding = NULL)
 	{
 		return ExpatParserRoot::create (encoding) && setHandlers ();
 	}
 
 	bool
 	createNs (
-		const char* encoding,
+		const sl::StringRef& encoding,
 		char separator
 		)
 	{
@@ -387,24 +387,24 @@ protected:
 
 	void 
 	onNotationDecl (
-		const XML_Char* notationName,
-		const XML_Char* base,
-		const XML_Char* systemId,
-		const XML_Char* publicId
+		const char* notationName,
+		const char* base,
+		const char* systemId,
+		const char* publicId
 		)
 	{
 	}
 
 	void 
 	onStartNamespaceDecl (
-		const XML_Char* prefix,
-		const XML_Char* uri
+		const char* prefix,
+		const char* uri
 		)
 	{
 	}
 
 	void 
-	onEndNamespaceDecl (const XML_Char* prefix)
+	onEndNamespaceDecl (const char* prefix)
 	{
 	}
 

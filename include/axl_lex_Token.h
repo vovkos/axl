@@ -13,13 +13,11 @@ namespace lex {
 
 //.............................................................................
 
-class LineCol
+struct LineCol
 {
-public:
 	int m_line;
 	int m_col;
 
-public:
 	LineCol ()
 	{
 		m_line = 0;
@@ -43,30 +41,22 @@ public:
 	}
 
 	void
-	count (
-		const char* p,
-		size_t length = -1
-		)
+	count (const sl::StringRef& string)
 	{
 		clear ();
-		incrementalCount (p, length);
+		incrementalCount (string);
 	}
 
 	void
-	incrementalCount (
-		const char* p,
-		size_t length = -1
-		);
+	incrementalCount (const sl::StringRef& string);
 };
 
 //.............................................................................
 
-class SrcPos: public LineCol
+struct SrcPos: LineCol
 {
-public:
 	sl::StringRef m_filePath;
 
-public:
 	SrcPos ()
 	{
 	}
@@ -102,9 +92,8 @@ public:
 
 // std token should be enough for most implementations
 
-class StdTokenData
+struct StdTokenData
 {
-public:
 	union
 	{
 		//! \unnamed{union}
@@ -117,9 +106,8 @@ public:
 		double m_double;
 	};
 
-	sl::String m_string;
+	sl::StringRef m_string;
 
-public:
 	StdTokenData ()
 	{
 		m_int64 = 0;
@@ -136,25 +124,23 @@ enum TokenChannelMask
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename TokenKind_0,
-	typename Name_0,
-	typename Data_0 = StdTokenData,
-	typename Pos_0 = LineCol
+	typename TokenKind0,
+	typename Name0,
+	typename Data0 = StdTokenData,
+	typename Pos0 = LineCol
 	>
-class Token
+struct Token
 {
-public:
-	typedef TokenKind_0 TokenKind;
-	typedef Name_0 Name;
-	typedef Data_0 Data;
-	typedef Pos_0 Pos;
+	typedef TokenKind0 TokenKind;
+	typedef Name0 Name;
+	typedef Data0 Data;
+	typedef Pos0 Pos;
 
-public:
 	union // it's nice to see it in debugger
 	{
 		//! \unnamed{union:4}
 		int m_token;
-		TokenKind m_enumToken;
+		TokenKind m_tokenKind;
 		char m_charToken;
 		wchar_t m_WCharToken;
 	};
@@ -166,7 +152,6 @@ public:
 
 	// define token value in derived class
 
-public:
 	Token ()
 	{
 		m_token = 0;
@@ -174,13 +159,13 @@ public:
 	}
 
 	static
-	const char*
+	sl::StringRef
 	getName (int token)
 	{
 		return Name () (token);
 	}
 
-	const char*
+	sl::StringRef
 	getName () const
 	{
 		return getName (m_token);
@@ -193,7 +178,7 @@ public:
 class Class \
 { \
 public: \
-	const char* \
+	sl::StringRef \
 	operator () (int tokenKind) \
 	{ \
 		switch (tokenKind) \

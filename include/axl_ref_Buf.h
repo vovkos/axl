@@ -44,29 +44,29 @@ struct BufHdr: public RefCount
 {
 	size_t m_bufferSize;
 
-	void*
-	getBufferEnd ()
+	const void*
+	cp () const
 	{
-		return (char*) (this + 1) + m_bufferSize;
+		return this + 1;
 	}
 
 	const void*
-	getBufferEnd () const
+	getEnd () const
 	{
-		return (const char*) (this + 1) + m_bufferSize;
+		return (char*) (this + 1) + m_bufferSize;
 	}
 
 	bool
 	isInsideBuffer (const void* p) const
 	{
-		return p >= this + 1 && p < getBufferEnd ();
+		return p >= cp () && p < getEnd ();
 	}
 
 	size_t
 	getLeftoverBufferSize (const void* p) const
 	{
 		ASSERT (isInsideBuffer (p));
-		return (char*) getBufferEnd () - (char*) p;
+		return (char*) getEnd () - (char*) p;
 	}
 };
 
@@ -79,8 +79,8 @@ template <
 class BufRef
 {
 protected:
-	mutable T* m_p;
-	mutable BufHdr* m_hdr;
+	T* m_p;
+	BufHdr* m_hdr;
 	size_t m_size;
 
 public:
@@ -95,10 +95,43 @@ public:
 		attach (src);
 	}
 
+	BufRef (const T* p)
+	{
+		initialize ();
+		attach (NULL, p, SizeOf () (p));
+	}
+
+	BufRef (
+		const T* p,
+		size_t size
+		)
+	{
+		initialize ();
+		attach (NULL, p, size);
+	}
+
+	BufRef (
+		const T* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (NULL, p, (char*) end - (char*) p);
+	}
+
+	BufRef (
+		BufHdr* hdr,
+		const T* p
+		)
+	{
+		initialize ();
+		attach (hdr, p, SizeOf () (p));
+	}
+
 	BufRef (
 		BufHdr* hdr,
 		const T* p,
-		size_t size = -1
+		size_t size
 		)
 	{
 		initialize ();
@@ -113,24 +146,6 @@ public:
 	{
 		initialize ();
 		attach (hdr, p, (char*) end - (char*) p);
-	}
-
-	BufRef (
-		const T* p,
-		size_t size = -1
-		)
-	{
-		initialize ();
-		attach (NULL, p, size);
-	}
-
-	BufRef (
-		const T* p,
-		const void* end
-		)
-	{
-		initialize ();
-		attach (NULL, p, (char*) end - (char*) p);
 	}
 
 	~BufRef ()
@@ -206,7 +221,7 @@ protected:
 	}
 
 	void
-	attachBufHdr (BufHdr* hdr) const
+	attachBufHdr (BufHdr* hdr)
 	{
 		if (hdr == m_hdr)
 			return; // try to avoid unnecessary interlocked ops
@@ -223,13 +238,8 @@ protected:
 	void
 	attach (const BufRef& src)
 	{
-		if (&src == this)
-			return;
-
-		attachBufHdr (src.m_hdr);
-
-		m_p = src.m_p;
-		m_size = src.m_size;
+		if (&src != this)
+			attach (src.m_hdr, src.m_p, src.m_size);
 	}
 
 	void
@@ -241,8 +251,8 @@ protected:
 	{
 		attachBufHdr (hdr);
 
-		m_p = const_cast <T*> (p);
-		m_size = size != -1 ? size : SizeOf () (p);
+		m_p = (T*) p;
+		m_size = size;
 	}
 };
 
@@ -309,14 +319,21 @@ public:
 
 	operator T* ()
 	{ 
-		return p (); 
+		return m_p; 
+	}
+
+	const T* 
+	operator -> () const
+	{ 
+		ASSERT (m_p);
+		return m_p; 
 	}
 
 	T* 
 	operator -> ()
 	{ 
-		ASSERT (m_size);
-		return p (); 
+		ASSERT (m_p);
+		return m_p; 
 	}
 
 	Buf& 
@@ -343,7 +360,7 @@ public:
 	T*
 	p ()
 	{
-		return getBuffer ();
+		return ensureExclusive () ? m_p : NULL;
 	}
 
 	void
@@ -397,18 +414,6 @@ public:
 		if (size < sizeof (T))
 			size = sizeof (T);
 
-		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
-		{
-			// in-buffer shifts only applicable to non-destructible-types
-
-			T* end = (T*) this->m_hdr->getBufferEnd ();
-			ASSERT (p + size <= end);
-
-			this->m_p = (T*) p;
-			this->m_size = size;
-			return size;
-		}
-
 		if (!createBuffer (size, false))
 			return -1;
 
@@ -419,10 +424,16 @@ public:
 		return size;
 	}
 
+	bool
+	isExclusive ()
+	{
+		return !this->m_size || this->m_hdr && this->m_hdr->getRefCount () == 1;
+	}
+
 	bool 
 	ensureExclusive ()
 	{ 
-		return m_size ? getBuffer () != NULL : true; 
+		return m_size ? createBuffer (m_size, true) != NULL : true; 
 	}
 
 	T* 

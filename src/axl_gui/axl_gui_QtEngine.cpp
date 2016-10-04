@@ -195,14 +195,9 @@ QtEngine::drawText_utf8 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf8_t* text,
-	size_t length
+	const sl::StringRef_utf8& text
 	)
 {
-	char buffer [256];
-	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
-
 	return drawText_qt (
 		canvas,
 		x,
@@ -214,7 +209,7 @@ QtEngine::drawText_utf8 (
 		textColor,
 		backColor,
 		fontFlags,
-		QString ((const QChar*) string.cc (), string.getLength ())
+		QString::fromUtf8 (text.cp (), text.getLength ())
 		);
 }
 
@@ -230,13 +225,9 @@ QtEngine::drawText_utf16 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf16_t* text,
-	size_t length
+	const sl::StringRef_utf16& text
 	)
 {
-	if (length == -1)
-		length = sl::StringDetails_utf16::calcLength (text);
-
 	return drawText_qt (
 		canvas,
 		x,
@@ -248,7 +239,7 @@ QtEngine::drawText_utf16 (
 		textColor,
 		backColor,
 		fontFlags,
-		QString ((const QChar*) text, length)
+		QString ((const QChar*) text.cp (), text.getLength ())
 		);
 }
 
@@ -264,14 +255,9 @@ QtEngine::drawText_utf32 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf32_t* text,
-	size_t length
+	const sl::StringRef_utf32& text
 	)
 {
-	char buffer [256];
-	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
-
 	return drawText_qt (
 		canvas,
 		x,
@@ -283,7 +269,7 @@ QtEngine::drawText_utf32 (
 		textColor,
 		backColor,
 		fontFlags,
-		QString ((const QChar*) string.cc (), string.getLength ())
+		QString::fromUcs4 ((const uint*) text.cp (), text.getLength ())
 		);
 }
 
@@ -416,7 +402,7 @@ QtEngine::getStdFontTuple (StdFontKind fontKind)
 Font*
 QtEngine::createFont (
 	FontTuple* fontTuple,
-	const char* family,
+	const sl::StringRef& family,
 	size_t pointSize,
 	uint_t flags
 	)
@@ -430,7 +416,7 @@ QtEngine::createFont (
 
 	QtFont* qtBaseFont = AXL_MEM_NEW (QtFont);
 	qtBaseFont->m_tuple = fontTuple;
-	qtBaseFont->m_qtFont = QFont (family, pointSize, QFont::Normal);
+	qtBaseFont->m_qtFont = QFont (QString::fromUtf8 (family.cp (), family.getLength ()), pointSize, QFont::Normal);
 	qtFontTuple->m_fontModArray [0] = qtBaseFont;
 
 	if (!flags)
@@ -540,42 +526,28 @@ QtEngine::calcTextSize_qt (
 Size
 QtEngine::calcTextSize_utf8 (
 	Font* font,
-	const utf8_t* text,
-	size_t length
+	const sl::StringRef_utf8& text
 	)
 {
-	char buffer [256];
-	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
-
-	return calcTextSize_qt (font, QString ((const QChar*) string.cc (), string.getLength ()));
+	return calcTextSize_qt (font, QString::fromUtf8 (text.cp (), text.getLength ()));
 }
 
 Size
 QtEngine::calcTextSize_utf16 (
 	Font* font,
-	const utf16_t* text,
-	size_t length
+	const sl::StringRef_utf16& text
 	)
 {
-	if (length == -1)
-		length = sl::StringDetails_utf16::calcLength (text);
-
-	return calcTextSize_qt (font, QString ((const QChar*) text, length));
+	return calcTextSize_qt (font, QString ((const QChar*) text.cp (), text.getLength ()));
 }
 
 Size
 QtEngine::calcTextSize_utf32 (
 	Font* font,
-	const utf32_t* text,
-	size_t length
+	const sl::StringRef_utf32& text
 	)
 {
-	char buffer [256];
-	sl::String_utf16 string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
-
-	return calcTextSize_qt (font, QString ((const QChar*) string.cc (), string.getLength ()));
+	return calcTextSize_qt (font, QString::fromUcs4 ((const uint*) text.cp (), text.getLength ()));
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -644,7 +616,7 @@ QtEngine::getStdCursor (StdCursorKind cursorKind)
 // clipboard
 
 uintptr_t 
-QtEngine::registerClipboardFormat (const sl::String& formatName)
+QtEngine::registerClipboardFormat (const sl::StringRef& formatName)
 {
 	sl::StringHashTableMapIterator <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
 	if (it)
@@ -690,16 +662,12 @@ QtEngine::readClipboard (
 }
 
 bool
-QtEngine::writeClipboard (
-	const char* string,
-	size_t length
-	)
+QtEngine::writeClipboard (const sl::StringRef& string)
 {
 	if (!m_qtClipboardMimeData)
 		m_qtClipboardMimeData = new QMimeData;
 
-	QString qtString = QString::fromUtf8 (string, length);
-	m_qtClipboardMimeData->setText (qtString);
+	m_qtClipboardMimeData->setText (QString::fromUtf8 (string.cp (), string.getLength ()));
 	return true;
 }
 

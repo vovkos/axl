@@ -8,15 +8,10 @@ namespace lex {
 //.............................................................................
 
 void
-LineCol::incrementalCount (
-	const char* p,
-	size_t length
-	)
+LineCol::incrementalCount (const sl::StringRef& string)
 {
-	if (length == -1)
-		length = strlen_s (p);
-
-	const char* end = p + length;
+	const char* p = string.cp ();
+	const char* end = string.getEnd ();
 	const char* line = p;
 
 	for (; p < end; p++)

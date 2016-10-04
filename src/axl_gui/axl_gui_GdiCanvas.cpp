@@ -104,13 +104,12 @@ GdiCanvas::drawText_utf8 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf8_t* text,
-	size_t length
+	const sl::StringRef_utf8& text
 	)
 {
 	char buffer [256];
-	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
+	sl::String_w text_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+	text_w.copy (text);
 
 	return drawText_utf16 (
 		x,
@@ -122,9 +121,8 @@ GdiCanvas::drawText_utf8 (
 		textColor,
 		backColor,
 		fontFlags,
-		string,
-		string.getLength ()
-	);
+		text_w
+		);
 }
 
 bool
@@ -138,8 +136,7 @@ GdiCanvas::drawText_utf16 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf16_t* text,
-	size_t length
+	const sl::StringRef_utf16& text
 	)
 {
 	textColor = overlayColor (m_baseTextAttr.m_foreColor, textColor);
@@ -195,12 +192,11 @@ GdiCanvas::drawText_utf32 (
 	uint_t textColor,
 	uint_t backColor,
 	uint_t fontFlags,
-	const utf32_t* text,
-	size_t length
+	const sl::StringRef_utf32& text
 	)
 {
 	char buffer [256];
-	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	sl::String_w text_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.copy (text, length);
 
 	return drawText_utf16 (
@@ -213,9 +209,8 @@ GdiCanvas::drawText_utf32 (
 		textColor,
 		backColor,
 		fontFlags,
-		string,
-		string.getLength ()
-	);
+		text_w
+		);
 }
 
 bool

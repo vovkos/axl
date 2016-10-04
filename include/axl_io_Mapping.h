@@ -83,7 +83,7 @@ public:
 
 	void*
 	open (
-		const char* name,
+		const sl::StringRef& name,
 		size_t size,
 		uint_t flags = 0 // EFileFlag
 		);

@@ -112,17 +112,17 @@ public:
 
 	bool
 	open (
-		const char* fileName,
-		const char* readEventName,
-		const char* writeEventName,
+		const sl::StringRef& fileName,
+		const sl::StringRef& readEventName,
+		const sl::StringRef& writeEventName,
 		uint_t flags
 		);
 
 	bool
 	attach (
 		File::Handle fileHandle,
-		const char* readEventName,
-		const char* writeEventName,
+		const sl::StringRef& readEventName,
+		const sl::StringRef& writeEventName,
 		uint_t flags
 		);
 
@@ -171,9 +171,9 @@ public:
 
 	bool
 	open (
-		const char* fileName,
-		const char* readEventName,
-		const char* writeEventName,
+		const sl::StringRef& fileName,
+		const sl::StringRef& readEventName,
+		const sl::StringRef& writeEventName,
 		uint_t flags,
 		size_t sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint
 		);
@@ -181,8 +181,8 @@ public:
 	bool
 	attach (
 		File::Handle fileHandle,
-		const char* readEventName,
-		const char* writeEventName,
+		const sl::StringRef& readEventName,
+		const sl::StringRef& writeEventName,
 		uint_t flags,
 		size_t sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint
 		);

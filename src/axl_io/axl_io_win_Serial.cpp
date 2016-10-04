@@ -10,18 +10,20 @@ namespace win {
 
 bool 
 Serial::open (
-	const char* name,
+	const sl::StringRef& name,
 	uint_t flags
 	)
 {
 	close ();
 
-	if (strncmp (name, "\\\\.\\", 4) == 0)
-		name += 4;
-	
 	char buffer [256];
 	sl::String_w deviceName (ref::BufKind_Stack, buffer, sizeof (buffer));
-	deviceName.format (L"\\\\.\\%S", name);
+	deviceName = L"\\\\.\\";
+
+	if (name.isPrefix ("\\\\.\\"))
+		deviceName += name.getSubString (4);
+	else
+		deviceName += name;
 
 	m_h = ::CreateFileW (
 		deviceName, 

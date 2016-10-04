@@ -97,10 +97,10 @@ public:
 		);
 
 	bool
-	parse (const char* string);
+	parse (const sl::StringRef& string);
 
 	bool
-	parse (const wchar_t* string);
+	parse (const sl::StringRef_w& string);
 
 	bool 
 	getString (sl::String* string) const;
@@ -115,21 +115,21 @@ public:
 
 	bool 
 	lookupAccountName (
-		const char* systemName,
-		const char* accountName,
+		const sl::StringRef& systemName,
+		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
 		);
 
 	bool 
 	lookupAccountName (
-		const wchar_t* systemName,
-		const wchar_t* accountName,
+		const sl::StringRef_w& systemName,
+		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
 		);
 
 	bool 
 	lookupAccountName (
-		const char* accountName,
+		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
@@ -138,7 +138,7 @@ public:
 
 	bool 
 	lookupAccountName (
-		const wchar_t* accountName,
+		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
@@ -147,7 +147,7 @@ public:
 
 	bool 
 	lookupAccountSid (
-		const char* systemName,
+		const sl::StringRef& systemName,
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
 		)
@@ -166,7 +166,7 @@ public:
 
 	sl::String
 	lookupAccountSid (
-		const char* systemName,
+		const sl::StringRef& systemName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
@@ -184,7 +184,7 @@ public:
 	static
 	bool 
 	lookupAccountSid (
-		const char* systemName,
+		const sl::StringRef& systemName,
 		const SID* sid,
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
@@ -204,7 +204,7 @@ public:
 	static
 	sl::String
 	lookupAccountSid (
-		const char* systemName,
+		const sl::StringRef& systemName,
 		const SID* sid,
 		SID_NAME_USE* sidType = NULL
 		)

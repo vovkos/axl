@@ -55,7 +55,7 @@ registerParseErrorProvider ()
 inline
 size_t
 pushSrcPosError (
-	const char* filePath,
+	const sl::StringRef& filePath,
 	int line,
 	int col = 0
 	)
@@ -63,7 +63,7 @@ pushSrcPosError (
 	return err::pushPackError <sl::PackSeq_3 <const char*, int, int> > (
 		g_parseErrorGuid,
 		ParseErrorCode_SrcPos, 
-		filePath, 
+		filePath.sz (), 
 		line, 
 		col
 		);
@@ -72,7 +72,7 @@ pushSrcPosError (
 inline
 size_t
 pushSrcPosError (
-	const char* filePath,
+	const sl::StringRef& filePath,
 	const LineCol& lineCol
 	)
 {
@@ -96,7 +96,7 @@ isLastSrcPosError ()
 inline
 void
 ensureSrcPosError (
-	const char* filePath,
+	const sl::StringRef& filePath,
 	int line,
 	int col = 0
 	)
@@ -108,7 +108,7 @@ ensureSrcPosError (
 inline
 void
 ensureSrcPosError (
-	const char* filePath,
+	const sl::StringRef& filePath,
 	const LineCol& lineCol
 	)
 {
@@ -131,53 +131,53 @@ setSyntaxError ()
 
 inline
 size_t
-setSyntaxError (const char* location)
+setSyntaxError (const sl::StringRef& location)
 {
 	return err::setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_InvalidSyntaxIn, 
-		location
+		location.sz ()
 		);
 }
 
 inline
 size_t
 setExpectedTokenError (
-	const char* expectedToken,
-	const char* actualToken
+	const sl::StringRef& expectedToken,
+	const sl::StringRef& actualToken
 	)
 {
 	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_ExpectedToken, 
-		expectedToken,
-		actualToken
+		expectedToken.sz (),
+		actualToken.sz ()
 		);
 }
 
 inline
 size_t
-setUnexpectedTokenError (const char* token)
+setUnexpectedTokenError (const sl::StringRef& token)
 {
 	return err::setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedToken, 
-		token
+		token.sz ()
 		);
 }
 
 inline
 size_t
 setUnexpectedTokenError (
-	const char* token,
-	const char* location
+	const sl::StringRef& token,
+	const sl::StringRef& location
 	)
 {
 	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedTokenIn, 
-		token,
-		location
+		token.sz (),
+		location.sz ()
 		);
 }
 

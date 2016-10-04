@@ -102,11 +102,11 @@ public:
 	size_t
 	format (
 		sl::String* string,
-		const char* formatString = "%W %D %N %Y %h:%m:%s"
+		const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s"
 		) const;
 
 	sl::String
-	format (const char* formatString = "%W %D %N %Y %h:%m:%s") const
+	format (const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s") const
 	{
 		sl::String string;
 		format (&string, formatString);

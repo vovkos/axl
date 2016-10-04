@@ -16,12 +16,12 @@ namespace lex {
 
 template <
 	typename T,
-	typename Token_0
+	typename Token0
 	>
 class Lexer
 {
 public:
-	typedef Token_0 Token;
+	typedef Token0 Token;
 	typedef typename Token::TokenKind TokenKind;
 	typedef typename Token::Pos Pos;
 

@@ -46,7 +46,7 @@ Mapping::unmap (size_t size)
 
 bool
 SharedMemory::open (
-	const char* name,
+	const sl::StringRef& name,
 	uint_t flags,
 	mode_t mode
 	)

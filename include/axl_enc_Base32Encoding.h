@@ -43,19 +43,15 @@ public:
 	size_t
 	decode (
 		sl::Array <char>* buffer,
-		const char* p, 
-		size_t length = -1
+		const sl::StringRef& string
 		);
 
 	static
 	sl::Array <char>
-	decode (
-		const char* p, 
-		size_t length = -1
-		)
+	decode (const sl::StringRef& string)
 	{
 		sl::Array <char> buffer;
-		decode (&buffer, p, length);
+		decode (&buffer, string);
 		return buffer;
 	}
 };

@@ -10,7 +10,7 @@ namespace psx {
 
 bool
 DynamicLibrary::open (
-	const char* name,
+	const sl::StringRef& name,
 	int flags
 	)
 {
@@ -27,7 +27,7 @@ DynamicLibrary::open (
 }
 
 void*
-DynamicLibrary::getSymbol (const char* name)
+DynamicLibrary::getSymbol (const sl::StringRef& name)
 {
 	void* p = ::dlsym (m_h, name);
 	if (!p)

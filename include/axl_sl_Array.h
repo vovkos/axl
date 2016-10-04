@@ -14,12 +14,16 @@ namespace sl {
 
 //.............................................................................
 
-template <typename T>
+template <
+	typename T,
+	typename Details0 = ArrayDetails <T>
+	>
 class ArrayRef
 {
 public:
-	typedef ArrayDetails <T> Details;
+	typedef Details0 Details;
 	typedef typename Details::Hdr Hdr;
+	typedef typename Details::ValueArg ValueArg;
 
 protected:
 	T* m_p;
@@ -36,6 +40,24 @@ public:
 	{
 		initialize ();
 		attach (src);
+	}
+
+	ArrayRef (
+		const T* p,
+		size_t count
+		)
+	{
+		initialize ();
+		attach (NULL, p, count);
+	}
+
+	ArrayRef (
+		const T* p,
+		const void* end
+		)
+	{
+		initialize ();
+		attach (NULL, p, (T*) end - p);
 	}
 
 	ArrayRef (
@@ -58,23 +80,6 @@ public:
 		attach (hdr, p, (T*) end - p);
 	}
 
-	ArrayRef (
-		const T* p,
-		size_t count
-		)
-	{
-		initialize ();
-		attach (NULL, p, count);
-	}
-
-	ArrayRef (
-		const T* p,
-		const void* end
-		)
-	{
-		initialize ();
-		attach (NULL, p, (T*) end - p);
-	}
 
 	~ArrayRef ()
 	{
@@ -91,10 +96,17 @@ public:
 	{
 		attach (src);
 		return *this;
-	}	
+	}
+
+	const T&
+	operator [] (intptr_t i) const
+	{
+		ASSERT ((size_t) i < m_count);
+		return m_p [i];
+	}
 
 	const T*
-	ca () const
+	cp () const
 	{
 		return m_p;
 	}
@@ -146,7 +158,7 @@ public:
 	}
 
 	size_t
-	find (T e)
+	find (ValueArg e)
 	{
 		for (size_t i = 0; i < m_count; i++)
 			if (m_p [i] == e)
@@ -156,7 +168,7 @@ public:
 	}
 
 	size_t
-	findReverse (T e)
+	findReverse (ValueArg e)
 	{
 		for (intptr_t i = m_count - 1; i >= 0; i--)
 			if (m_p [i] == e)
@@ -215,14 +227,18 @@ protected:
 
 //.............................................................................
 
-template <typename T>
-class Array: public ArrayRef <T>
+template <
+	typename T,
+	typename Details0 = ArrayDetails <T>
+	>
+class Array: public ArrayRef <T, Details0>
 {
 public:
-	typedef sl::ArrayRef <T> ArrayRef;
+	typedef sl::ArrayRef <T, Details0> ArrayRef;
 
 	typedef typename ArrayRef::Details Details;
 	typedef typename ArrayRef::Hdr Hdr;
+	typedef typename ArrayRef::ValueArg ValueArg;
 	
 public:
 	Array ()
@@ -271,12 +287,12 @@ public:
 
 	operator const T* () const
 	{
-		return this->ca ();
+		return this->m_p;
 	}
 
 	operator T* ()
 	{
-		return a ();
+		return this->m_p;
 	}
 
 	Array&
@@ -293,8 +309,22 @@ public:
 		return *this;
 	}
 
+	const T&
+	operator [] (intptr_t i) const
+	{
+		ASSERT ((size_t) i < m_count);
+		return m_p [i];
+	}
+
+	T&
+	operator [] (intptr_t i)
+	{
+		ASSERT ((size_t) i < m_count);
+		return m_p [i];
+	}
+
 	T*
-	a ()
+	p ()
 	{
 		return ensureExclusive () ? this->m_p : NULL;
 	}
@@ -366,7 +396,7 @@ public:
 	}
 
 	size_t
-	copy (T e)
+	copy (ValueArg e)
 	{
 		return copy (&e, 1);
 	}
@@ -390,14 +420,14 @@ public:
 	}
 
 	T*
-	append (T e)
+	append (ValueArg e)
 	{
 		return insert (-1, e);
 	}
 
 	T*
 	appendMultiply (
-		T e,
+		ValueArg e,
 		size_t count
 		)
 	{
@@ -493,7 +523,7 @@ public:
 	T*
 	insert (
 		size_t index,
-		T e
+		ValueArg e
 		)
 	{
 		T* dst = insertSpace (index, 1);
@@ -507,7 +537,7 @@ public:
 	T*
 	insertMultiply (
 		size_t index,
-		T e,
+		ValueArg e,
 		size_t count
 		)
 	{
@@ -660,6 +690,12 @@ public:
 	reverseUntil (size_t index)
 	{
 		reverse (0, index);
+	}
+
+	bool
+	isExclusive ()
+	{
+		return !this->m_count || this->m_hdr && this->m_hdr->getRefCount () == 1;
 	}
 
 	bool

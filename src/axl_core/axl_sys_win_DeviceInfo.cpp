@@ -17,7 +17,7 @@ DeviceInfo::getDeviceRegistryProperty (
 	getDeviceRegistryProperty (propId, NULL, 0, &requiredSize);
 
 	buffer->setCount (requiredSize);
-	return getDeviceRegistryProperty (propId, buffer->a (), requiredSize, NULL);
+	return getDeviceRegistryProperty (propId, buffer->p (), requiredSize, NULL);
 }
 
 bool
@@ -31,7 +31,7 @@ DeviceInfo::getDeviceRegistryProperty (
 	if (!result)
 		return false;
 
-	string->copy ((const utf16_t*) buffer.ca (), buffer.getCount () / sizeof (utf16_t));
+	string->copy ((const utf16_t*) buffer.cp (), buffer.getCount () / sizeof (utf16_t));
 	return true;
 }
 
@@ -46,7 +46,7 @@ DeviceInfo::getDeviceRegistryProperty (
 	if (!result)
 		return false;
 
-	string->copy ((const utf16_t*) buffer.ca (), buffer.getCount () / sizeof (utf16_t));
+	string->copy ((const utf16_t*) buffer.cp (), buffer.getCount () / sizeof (utf16_t));
 	return true;
 }
 
@@ -67,7 +67,7 @@ DeviceInfo::getClassInstallParams (sl::Array <char>* buffer)
 	getClassInstallParams (NULL, 0, &requiredSize);
 
 	buffer->setCount (requiredSize);
-	return getClassInstallParams (buffer->a (), requiredSize, NULL);
+	return getClassInstallParams (buffer->p (), requiredSize, NULL);
 }
 
 bool
@@ -136,13 +136,13 @@ DeviceInfoSet::create (
 
 bool
 DeviceInfoSet::create (
-	const wchar_t* enumerator,
+	const sl::StringRef_w& enumerator,
 	uint_t flags
 	)
 {
 	close ();
 
-	m_h = ::SetupDiGetClassDevsW (NULL, enumerator, NULL, flags);
+	m_h = ::SetupDiGetClassDevsW (NULL, enumerator.szn (), NULL, flags);
 	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 
@@ -162,7 +162,7 @@ DeviceInfoSet::getDeviceInfo (
 
 bool 
 DeviceInfoSet::getDeviceClassGuids (
-	const wchar_t* name,
+	const sl::StringRef_w& name,
 	sl::Array <GUID>* buffer
 	)
 {
@@ -170,7 +170,7 @@ DeviceInfoSet::getDeviceClassGuids (
 	getDeviceClassGuids (name, NULL, 0, &requiredCount);
 
 	buffer->setCount (requiredCount);
-	return getDeviceClassGuids (name, buffer->a (), requiredCount, &requiredCount);
+	return getDeviceClassGuids (name, buffer->p (), requiredCount, &requiredCount);
 }
 
 //.............................................................................

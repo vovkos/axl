@@ -303,7 +303,7 @@ UsbDevice::getDescriptor (
 			m_openHandle, 
 			(uint8_t) descriptorType, 
 			(uint8_t) descriptorId, 
-			(uchar_t*) descriptor->a (), 
+			(uchar_t*) descriptor->p (), 
 			size
 			);
 

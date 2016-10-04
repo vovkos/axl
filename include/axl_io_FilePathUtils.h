@@ -26,37 +26,37 @@ sl::String
 getExeDir ();
 
 bool
-doesFileExist (const char* fileName);
+doesFileExist (const sl::StringRef& fileName);
 
 bool
-ensureDirExists (const char* fileName);
+ensureDirExists (const sl::StringRef& fileName);
 
 bool
-isDir (const char* fileName);
+isDir (const sl::StringRef& fileName);
 
 sl::String
-getFullFilePath (const char* fileName);
+getFullFilePath (const sl::StringRef& fileName);
 
 sl::String
-getDir (const char* filePath);
+getDir (const sl::StringRef& filePath);
 
 sl::String
-getFileName (const char* filePath);
+getFileName (const sl::StringRef& filePath);
 
 sl::String
-getExtension (const char* filePath);
+getExtension (const sl::StringRef& filePath);
 
 sl::String
 concatFilePath (
 	sl::String* filePath,
-	const char* fileName
+	const sl::StringRef& fileName
 	);
 
 inline
 sl::String
 concatFilePath (
-	const char* dir,
-	const char* fileName
+	const sl::StringRef& dir,
+	const sl::StringRef& fileName
 	)
 {
 	sl::String filePath = dir;
@@ -65,8 +65,8 @@ concatFilePath (
 
 sl::String
 findFilePath (
-	const char* fileName,
-	const char* firstDir,
+	const sl::StringRef& fileName,
+	const sl::StringRef& firstDir,
 	const sl::BoxList <sl::String>* dirList,
 	bool doFindInCurrentDir = true
 	);

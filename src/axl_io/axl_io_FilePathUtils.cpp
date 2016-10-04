@@ -86,7 +86,7 @@ getExeDir ()
 }
 
 bool
-doesFileExist (const char* fileName)
+doesFileExist (const sl::StringRef& fileName)
 {
 #if (_AXL_OS_WIN)
 	char buffer [256];
@@ -101,14 +101,14 @@ doesFileExist (const char* fileName)
 
 #if (_AXL_OS_WIN)
 bool
-isDir (const wchar_t* fileName)
+isDir (const sl::StringRef_w& fileName)
 {
-	dword_t attributes = ::GetFileAttributesW (fileName);
+	dword_t attributes = ::GetFileAttributesW (fileName.sz ());
 	return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 bool
-isDir (const char* fileName)
+isDir (const sl::StringRef& fileName)
 {
 	char buffer [256];
 	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
@@ -116,7 +116,7 @@ isDir (const char* fileName)
 }
 
 bool
-ensureDirExists (const char* fileName)
+ensureDirExists (const sl::StringRef& fileName)
 {
 	char buffer [256] = { 0 };
 	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
@@ -161,7 +161,7 @@ ensureDirExists (const char* fileName)
 #elif (_AXL_OS_POSIX)
 
 bool
-isDir (const char* fileName)
+isDir (const sl::StringRef& fileName)
 {
 	struct stat st;
 
@@ -170,7 +170,7 @@ isDir (const char* fileName)
 }
 
 bool
-ensureDirExists (const char* fileName)
+ensureDirExists (const sl::StringRef& fileName)
 {
 	if (isDir (fileName))
 		return true;
@@ -208,7 +208,7 @@ ensureDirExists (const char* fileName)
 #endif
 
 sl::String
-getFullFilePath (const char* fileName)
+getFullFilePath (const sl::StringRef& fileName)
 {
 #if (_AXL_OS_WIN)
 	char buffer [256];
@@ -231,7 +231,7 @@ getFullFilePath (const char* fileName)
 }
 
 sl::String
-getDir (const char* filePath)
+getDir (const sl::StringRef& filePath)
 {
 #if (_AXL_OS_WIN)
 	char buffer [256];
@@ -260,7 +260,7 @@ getDir (const char* filePath)
 }
 
 sl::String
-getFileName (const char* filePath)
+getFileName (const sl::StringRef& filePath)
 {
 #if (_AXL_OS_WIN)
 	char buffer [256];
@@ -288,16 +288,16 @@ getFileName (const char* filePath)
 }
 
 sl::String
-getExtension (const char* filePath)
+getExtension (const sl::StringRef& filePath)
 {
-	const char* p = strchr (filePath, '.');
-	return p ? p + 1 : NULL;
+	size_t i = filePath.find ('.');
+	return i != -1 ? filePath.getSubString (i) : NULL;
 }
 
 sl::String
 concatFilePath (
 	sl::String* filePath,
-	const char* fileName
+	const sl::StringRef& fileName
 	)
 {
 	if (filePath->isEmpty ())
@@ -322,15 +322,15 @@ concatFilePath (
 
 sl::String
 findFilePath (
-	const char* fileName,
-	const char* firstDir,
+	const sl::StringRef& fileName,
+	const sl::StringRef& firstDir,
 	const sl::BoxList <sl::String>* dirList,
 	bool doFindInCurrentDir
 	)
 {
 	sl::String filePath;
 
-	if (firstDir && *firstDir)
+	if (!firstDir.isEmpty ())
 	{
 		filePath = concatFilePath (firstDir, fileName);
 		if (doesFileExist (filePath))

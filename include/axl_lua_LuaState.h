@@ -42,9 +42,8 @@ public:
 
 	bool
 	load (
-		const char* name,
-		const char* source,
-		size_t length = -1
+		const sl::StringRef& name,
+		const sl::StringRef& source
 		);
 
 #ifdef _AXL_DEBUG
@@ -73,10 +72,7 @@ public:
 	}
 
 	void
-	error (
-		const char* string,
-		size_t length = -1
-		);
+	error (const sl::StringRef& string);
 
 	void
 	formatError_va (
@@ -122,7 +118,7 @@ public:
 		return lua_type (m_h, index);
 	}
 
-	const char*
+	sl::StringRef
 	getTypeName (int type)
 	{
 		ASSERT (isOpen ());
@@ -185,10 +181,7 @@ public:
 	}
 
 	void
-	pushString (
-		const char* string,
-		size_t length = -1
-		);
+	pushString (const sl::StringRef& string);
 
 	void
 	pushFormatString_va (
@@ -262,14 +255,14 @@ public:
 	}
 
 	void
-	getMember (const char* name)
+	getMember (const sl::StringRef& name)
 	{
 		pushString (name);
 		getTable ();
 	}
 
 	void
-	setMember (const char* name)
+	setMember (const sl::StringRef& name)
 	{
 		pushString (name);
 		swap ();
@@ -293,7 +286,7 @@ public:
 
 	void
 	setMemberInteger (
-		const char* name,
+		const sl::StringRef& name,
 		lua_Integer value
 		)
 	{
@@ -304,7 +297,7 @@ public:
 
 	void
 	setMemberBoolean (
-		const char* name,
+		const sl::StringRef& name,
 		bool value
 		)
 	{
@@ -315,13 +308,12 @@ public:
 
 	void
 	setMemberString (
-		const char* name,
-		const char* string,
-		size_t length = -1
+		const sl::StringRef& name,
+		const sl::StringRef& string
 		)
 	{
 		pushString (name);
-		pushString (string, length);
+		pushString (string);
 		setTable ();
 	}
 
@@ -339,12 +331,11 @@ public:
 	void
 	setArrayElementString (
 		int index,
-		const char* string,
-		size_t length = -1
+		const sl::StringRef& string
 		)
 	{
 		pushInteger (index);
-		pushString (string, length);
+		pushString (string);
 		setTable ();
 	}
 
@@ -376,7 +367,7 @@ public:
 		return lua_toboolean (m_h, index) != 0;
 	}
 
-	const char*
+	sl::StringRef
 	getString (int index = -1)
 	{
 		ASSERT (isOpen ());
@@ -408,22 +399,22 @@ public:
 	}
 
 	void
-	getGlobal (const char* name)
+	getGlobal (const sl::StringRef& name)
 	{
 		ASSERT (isOpen ());
-		lua_getglobal (m_h, name);
+		lua_getglobal (m_h, name.sz ());
 	}
 
 	void
-	setGlobal (const char* name)
+	setGlobal (const sl::StringRef& name)
 	{
 		ASSERT (isOpen ());
-		lua_setglobal (m_h, name);
+		lua_setglobal (m_h, name.sz ());
 	}
 
 	void
 	getGlobalArrayElement (
-		const char* name,
+		const sl::StringRef& name,
 		int index
 		)
 	{
@@ -434,8 +425,8 @@ public:
 
 	void
 	getGlobalMember (
-		const char* name,
-		const char* member
+		const sl::StringRef& name,
+		const sl::StringRef& member
 		)
 	{
 		getGlobal (name);
@@ -444,7 +435,7 @@ public:
 	}
 
 	lua_Integer
-	getGlobalInteger (const char* name)
+	getGlobalInteger (const sl::StringRef& name)
 	{
 		getGlobal (name);
 		return popInteger ();
@@ -452,7 +443,7 @@ public:
 
 	void
 	setGlobalInteger (
-		const char* name,
+		const sl::StringRef& name,
 		lua_Integer value
 		)
 	{
@@ -461,7 +452,7 @@ public:
 	}
 
 	bool
-	getGlobalBoolean (const char* name)
+	getGlobalBoolean (const sl::StringRef& name)
 	{
 		getGlobal (name);
 		return popBoolean ();
@@ -469,7 +460,7 @@ public:
 
 	void
 	setGlobalBoolean (
-		const char* name,
+		const sl::StringRef& name,
 		bool value
 		)
 	{
@@ -478,7 +469,7 @@ public:
 	}
 
 	sl::String
-	getGlobalString (const char* name)
+	getGlobalString (const sl::StringRef& name)
 	{
 		getGlobal (name);
 		return popString ();
@@ -486,18 +477,17 @@ public:
 
 	void
 	setGlobalString (
-		const char* name,
-		const char* string,
-		size_t length = -1
+		const sl::StringRef& name,
+		const sl::StringRef& string
 		)
 	{
-		pushString (string, length);
+		pushString (string);
 		setGlobal (name);
 	}
 
 	void
 	registerFunction (
-		const char* name,
+		const sl::StringRef& name,
 		lua_CFunction func
 		)
 	{
@@ -507,7 +497,7 @@ public:
 
 	void
 	registerFunction (
-		const char* name,
+		const sl::StringRef& name,
 		lua_CFunction func,
 		intptr_t context
 		)

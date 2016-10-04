@@ -7,7 +7,7 @@ namespace io {
 
 //.............................................................................
 
-const char* 
+const char*
 getNetworkAdapterTypeString (NetworkAdapterType adapterKind)
 {
 	static const char* stringTable [NetworkAdapterType__Count] = 
@@ -29,7 +29,7 @@ getNetworkAdapterTypeString (NetworkAdapterType adapterKind)
 
 //.............................................................................
 
-const char* 
+const char*
 getNetworkAdapterFlagString (NetworkAdapterFlag flag)
 {
 	static const char* stringTable [] =

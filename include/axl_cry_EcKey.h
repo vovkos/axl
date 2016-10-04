@@ -130,14 +130,14 @@ public:
 	}
 
 	bool
-	setPrivateKeyDecString (const char* string)
+	setPrivateKeyDecString (const sl::StringRef& string)
 	{
 		BigNum key;
 		return key.setDecString (string) && setPrivateKey (key);
 	}
 
 	bool
-	setPrivateKeyHexString (const char* string)
+	setPrivateKeyHexString (const sl::StringRef& string)
 	{
 		BigNum key;
 		return key.setHexString (string) && setPrivateKey (key);
@@ -165,13 +165,13 @@ public:
 
 	bool
 	setPublicKeyDecString (
-		const char* string,
+		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
 		);
 
 	bool
 	setPublicKeyHexString (
-		const char* string,
+		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
 		);
 
@@ -279,7 +279,7 @@ bool
 generateEcProductKey (
 	EC_KEY* ecKey,
 	sl::String* productKey,
-	const char* userName,
+	const sl::StringRef& userName,
 	size_t hyphenDistance = 6
 	);
 
@@ -287,7 +287,7 @@ inline
 sl::String 
 generateEcProductKey (
 	EC_KEY* ecKey,
-	const char* userName,
+	const sl::StringRef& userName,
 	size_t hyphenDistance = 6
 	)
 {
@@ -299,8 +299,8 @@ generateEcProductKey (
 bool
 verifyEcProductKey (
 	EC_KEY* ecKey,
-	const char* userName,
-	const char* productKey
+	const sl::StringRef& userName,
+	const sl::StringRef& productKey
 	);
 
 //.............................................................................

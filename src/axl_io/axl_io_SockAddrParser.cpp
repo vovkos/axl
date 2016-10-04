@@ -7,19 +7,6 @@ namespace io {
 
 //.............................................................................
 
-void
-SockAddrParser::initialize (
-	const char* p,
-	size_t length
-	)
-{
-	if (length == -1)
-		length = strlen_s (p);
-
-	m_p = p;
-	m_end = p + length;
-}
-
 bool
 SockAddrParser::parse (in_addr* addr)
 {

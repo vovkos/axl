@@ -18,6 +18,9 @@ namespace sl {
 struct SwitchInfo: sl::ListLink
 {
 	int m_switchKind;
+
+	// all strings below are static literals
+
 	const char* m_nameTable [4]; // up to 4 alternative names
 	const char* m_value;
 	const char* m_description;
@@ -160,7 +163,7 @@ public:
 
 		for (int i = 0; i < argc; i++)
 		{
-			result = processArg (i, argv [i]);
+			result = processArg (i, sl::String (argv [i]));
 			if (!result)
 				return false;
 		}
@@ -206,7 +209,7 @@ protected:
 		if (!m_valueSwitchKind)
 			return true;
 
-		err::setFormatStringError ("missing value for switch '%s'", m_valueSwitchName.cc ());
+		err::setFormatStringError ("missing value for switch '%s'", m_valueSwitchName.sz ());
 		return false;
 	}
 
@@ -240,7 +243,7 @@ protected:
 			const SwitchInfo* switchInfo = SwitchTable::findSwitch (switchName);
 			if (!switchInfo)
 			{
-				err::setFormatStringError ("unknown switch --%s", switchName.cc ());
+				err::setFormatStringError ("unknown switch --%s", switchName.sz ());
 				return false;
 			}
 
@@ -353,7 +356,7 @@ public: \
 	} \
 	static \
 	const SwitchInfo* \
-	findSwitch (const char* name) \
+	findSwitch (const sl::StringRef& name) \
 	{ \
 		StringMap::Iterator it = getSingleton ()->m_nameMap.find (name); \
 		return it ? it->m_value : NULL; \

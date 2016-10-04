@@ -10,7 +10,7 @@ namespace io {
 
 bool
 Pcap::openDevice (
-	const char* device,
+	const sl::StringRef& device,
 	size_t snapshotSize,
 	bool isPromiscious,
 	uint_t readTimeout
@@ -20,7 +20,7 @@ Pcap::openDevice (
 
 	char errorBuffer [PCAP_ERRBUF_SIZE];
 	m_h = pcap_open_live (
-		device,
+		device.sz (),
 		snapshotSize,
 		isPromiscious,
 		readTimeout,
@@ -37,12 +37,12 @@ Pcap::openDevice (
 }
 
 bool
-Pcap::openFile (const char* fileName)
+Pcap::openFile (const sl::StringRef& fileName)
 {
 	close ();
 
 	char errorBuffer [PCAP_ERRBUF_SIZE];
-	m_h = pcap_open_offline (fileName, errorBuffer);
+	m_h = pcap_open_offline (fileName.sz (), errorBuffer);
 	if (!m_h)
 	{
 		err::setError (errorBuffer);
@@ -53,11 +53,11 @@ Pcap::openFile (const char* fileName)
 }
 
 bool
-Pcap::setFilter (const char* filter)
+Pcap::setFilter (const sl::StringRef& filter)
 {
 	bpf_program program;
 
-	int result = pcap_compile (m_h, &program, (char*) filter, true, 0);
+	int result = pcap_compile (m_h, &program, (char*) (const char*) filter.sz (), true, 0);
 	if (result == -1)
 	{
 		err::setError (pcap_geterr (m_h));

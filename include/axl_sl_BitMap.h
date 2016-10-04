@@ -111,8 +111,8 @@ public:
 		memcpy (m_map, src.m_map, sizeof (m_map));
 	}
 
-	intptr_t
-	getHash () const
+	size_t
+	hash () const
 	{
 		return djb2 (m_map, sizeof (m_map));
 	}
@@ -204,6 +204,18 @@ public:
 		create (bitCount);
 	}
 
+	bool 
+	operator == (const BitMap& src) const
+	{
+		return isEqual (src);
+	}
+
+	bool 
+	operator != (const BitMap& src) const
+	{
+		return !isEqual (src);
+	}
+
 	const size_t* 
 	getMap () const
 	{
@@ -237,14 +249,20 @@ public:
 	void 
 	copy (const BitMap& src);
 
-	intptr_t
-	getHash () const
+	size_t
+	hash () const
 	{
 		return djb2 (m_map, m_map.getCount () * sizeof (size_t));
 	}
 
 	int
 	cmp (const BitMap& src) const;
+
+	bool
+	isEqual (const BitMap& src) const
+	{
+		return cmp (src) == 0;
+	}
 
 	bool 
 	create (size_t bitCount);

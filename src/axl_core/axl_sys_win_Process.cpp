@@ -12,14 +12,14 @@ namespace win {
 
 bool 
 Process::createProcess (
-	const wchar_t* appName,
-	const wchar_t* cmdLine,
+	const sl::StringRef_w& appName,
+	const sl::StringRef_w& cmdLine,
 	const SECURITY_ATTRIBUTES* processAttr,
 	const SECURITY_ATTRIBUTES* threadAttr,
 	bool inheritHandles,
 	dword_t flags,
 	const void* environment,
-	const wchar_t* currentDir,
+	const sl::StringRef_w& currentDir,
 	const STARTUPINFO* startupInfo,
 	handle_t* threadHandle
 	)
@@ -32,14 +32,14 @@ Process::createProcess (
 	PROCESS_INFORMATION processInfo;
 
 	result = ::CreateProcessW (
-		appName,
+		appName.szn (),
 		mutableCmdLine.getBuffer (),
 		(SECURITY_ATTRIBUTES*) processAttr,
 		(SECURITY_ATTRIBUTES*) threadAttr,
 		inheritHandles,
 		flags,
 		(void*) environment,
-		currentDir,
+		currentDir.szn (),
 		(STARTUPINFO*) startupInfo,
 		&processInfo
 		);
@@ -60,7 +60,7 @@ Process::createProcess (
 
 bool
 syncExec (
-	const wchar_t* cmdLine,
+	const sl::StringRef_w& cmdLine,
 	sl::Array <char>* output,
 	dword_t* exitCode
 	)

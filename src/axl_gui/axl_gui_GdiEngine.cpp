@@ -63,13 +63,13 @@ GdiEngine::createStdFont (StdFontKind fontKind)
 
 ref::Ptr <Font>
 GdiEngine::createFont (
-	const char* family,
+	const sl::StringRef& family,
 	size_t pointSize,
 	uint_t flags
 	)
 {
 	LOGFONTW logFont;
-	buildLogFont (&logFont, sl::String_w (family), pointSize, flags);
+	buildLogFont (&logFont, family, pointSize, flags);
 
 	HFONT hFont = ::CreateFontIndirect (&logFont);
 	if (!hFont)
@@ -283,7 +283,7 @@ GdiEngine::createOffscreenCanvas (
 }
 
 uintptr_t 
-GdiEngine::registerClipboardFormat (const sl::String& formatName)
+GdiEngine::registerClipboardFormat (const sl::StringRef& formatName)
 {
 	err::setError (err::SystemErrorCode_NotImplemented);
 	return -1;
@@ -336,10 +336,7 @@ GdiEngine::readClipboard (
 }
 
 bool
-GdiEngine::writeClipboard (
-	const char* string,
-	size_t length
-	)
+GdiEngine::writeClipboard (const sl::StringRef& string)
 {
 	bool result = openClipboard ();
 	if (!result)

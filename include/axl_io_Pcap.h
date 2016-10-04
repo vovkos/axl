@@ -30,17 +30,17 @@ class Pcap: public sl::Handle <pcap_t*, ClosePcap>
 public:
 	bool
 	openDevice (
-		const char* device,
+		const sl::StringRef& device,
 		size_t snapshotSize,
 		bool isPromiscious,
 		uint_t readTimeout
 		);
 
 	bool
-	openFile (const char* fileName);
+	openFile (const sl::StringRef& fileName);
 
 	bool
-	setFilter (const char* filter);
+	setFilter (const sl::StringRef& filter);
 
 	bool
 	setBlockingMode (bool isBlocking);

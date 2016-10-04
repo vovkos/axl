@@ -81,7 +81,7 @@ SerialPortEnumerator::createPortDesc (sys::win::DeviceInfo* deviceInfo)
 		"PortName",
 		NULL,
 		&type,
-		(byte_t*) bufferString.a (),
+		(byte_t*) bufferString.p (),
 		&size
 		);
 

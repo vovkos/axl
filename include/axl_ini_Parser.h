@@ -18,33 +18,29 @@ class Parser: protected Lexer
 {
 public:
 	bool
-	parseFile (const sl::String& filePath)
+	parseFile (const sl::StringRef& filePath)
 	{
 		io::SimpleMappedFile file;
 		return 
 			file.open (filePath, io::FileFlag_ReadOnly) &&
-			parse (filePath, (const char*) file.p (), file.getMappingSize ());
+			parse (filePath, sl::StringRef ((const char*) file.p (), file.getMappingSize ()));
 	}
 
 	bool
-	parse (
-		const char* source,
-		size_t length = -1
-		)
+	parse (const sl::StringRef& source)
 	{
-		return parse ("INI", source, length);
+		return parse ("INI", source);
 	}
 
 	bool
 	parse (
-		const sl::String& filePath,
-		const char* source,
-		size_t length = -1
+		const sl::StringRef& filePath,
+		const sl::StringRef& source
 		)
 	{
 		bool result;
 
-		Lexer::create (filePath, source, length);
+		Lexer::create (filePath, source);
 
 		for (;;)
 		{
@@ -78,7 +74,7 @@ public:
 	}
 
 	bool 
-	onSection (const char* sectionName) // overridable
+	onSection (const sl::StringRef& sectionName) // overridable
 	{
 		return true;
 	}
@@ -91,9 +87,9 @@ public:
 
 	static 
 	bool
-	parseBoolValue (const char* value)
+	parseBoolValue (const sl::StringRef& value)
 	{
-		return _stricmp (value, "true") == 0 || atoi (value) != 0;
+		return _stricmp (value.sz (), "true") == 0 || atoi (value.sz ()) != 0;
 	}
 };
 

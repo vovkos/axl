@@ -56,31 +56,24 @@ public:
 	size_t 
 	setHyperText (
 		const TextAttr& baseAttr,
-		const char* text, 
-		size_t length = -1
+		const sl::StringRef& text
 		)
 	{
 		clear ();
-		return appendHyperText (baseAttr, text, length);
+		return appendHyperText (baseAttr, text);
 	}
 
 	size_t 
-	setHyperText (
-		const char* text, 
-		size_t length = -1
-		)
+	setHyperText (const sl::StringRef& text)
 	{
-		return setHyperText (TextAttr (), text, length);
+		return setHyperText (TextAttr (), text);
 	}
 
 	size_t 
-	setPlainText (
-		const char* text, 
-		size_t length = -1
-		)
+	setPlainText (const sl::StringRef& text)
 	{
 		clear ();
-		return appendPlainText (text, length);
+		return appendPlainText (text);
 	}
 
 	size_t 
@@ -96,24 +89,17 @@ public:
 	size_t 
 	appendHyperText (
 		const TextAttr& baseAttr,
-		const char* text, 
-		size_t length = -1
+		const sl::StringRef& text
 		);
 
 	size_t 
-	appendHyperText (
-		const char* text, 
-		size_t length = -1
-		)
+	appendHyperText (const sl::StringRef& text)
 	{
-		return appendHyperText (TextAttr (), text, length);
+		return appendHyperText (TextAttr (), text);
 	}
 
 	size_t 
-	appendPlainText (
-		const char* text, 
-		size_t length = -1
-		);
+	appendPlainText (const sl::StringRef& text);
 
 	size_t 
 	appendPlainText (

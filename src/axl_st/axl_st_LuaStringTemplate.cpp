@@ -56,7 +56,7 @@ LuaStringTemplate::runScript (
 {
 	int top = m_luaState.getTop ();
 
-	bool result = m_luaState.load (fileName, source, source.getLength ());
+	bool result = m_luaState.load (fileName, source);
 	if (!result)
 		return false;
 
@@ -131,7 +131,7 @@ LuaStringTemplate::emit_lua (lua_State* h)
 	size_t count = luaState.getTop ();
 	for (size_t i = 1; i <= count; i++)
 	{
-		const char* p = luaState.getString (i);
+		sl::StringRef& p = luaState.getString (i);
 		context->m_output->append (p);
 		context->m_lineCol.incrementalCount (p);
 	}
@@ -151,10 +151,10 @@ LuaStringTemplate::passthrough_lua (lua_State* h)
 	size_t offset = luaState.getInteger (1);
 	size_t length = luaState.getInteger (2);
 
-	const char* p = context->m_frame + offset;
+	sl::StringRef string = context->m_frame.getSubString (offset, length);
 
-	context->m_output->append (p, length);
-	context->m_lineCol.incrementalCount (p, length);
+	context->m_output->append (string);
+	context->m_lineCol.incrementalCount (string);
 
 	return 0;
 }

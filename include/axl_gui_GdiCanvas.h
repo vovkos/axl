@@ -99,8 +99,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf8_t* text,
-		size_t length = -1
+		const sl::StringRef_utf8& text
 		);
 
 	virtual
@@ -115,8 +114,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf16_t* text,
-		size_t length = -1
+		const sl::StringRef_utf16& text
 		);
 
 	virtual
@@ -131,8 +129,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		const utf32_t* text,
-		size_t length = -1
+		const sl::StringRef_utf32& text
 		);
 
 	virtual

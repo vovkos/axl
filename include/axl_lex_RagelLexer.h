@@ -129,7 +129,9 @@ public:
 		const sl::StringRef& source
 		)
 	{
-		return create (state, filePath, source, source.getLength ());
+		create (filePath, source);
+		cs = state;
+		return true;
 	}
 
 	bool
@@ -138,38 +140,12 @@ public:
 		const sl::StringRef& source
 		)
 	{
-		return create (filePath, source, source.getLength ());
-	}
-
-	bool
-	create (
-		int state,
-		const sl::StringRef& filePath,
-		const char* source,
-		size_t length = -1
-		)
-	{
-		create (filePath, source, length);
-		cs = state;
-		return true;
-	}
-
-	bool
-	create (
-		const sl::StringRef& filePath,
-		const char* source,
-		size_t length = -1
-		)
-	{
-		if (length == -1)
-			length = strlen_s (source);
-
 		this->reset (); 
 		
 		static_cast <T*> (this)->init ();
 
-		p   = (char*) source;
-		eof = (char*) source + length;
+		p   = (char*) source.cp ();
+		eof = (char*) source.getEnd ();
 
 		m_filePath = filePath;
 		m_begin = p;

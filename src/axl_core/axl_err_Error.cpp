@@ -15,7 +15,7 @@ ErrorHdr::getDescription () const
 
 	return provider ?
 		provider->getErrorDescription (this) :
-		sl::String::format_s ("%s::%d", m_guid.getGuidString ().cc (), m_code);
+		sl::String::format_s ("%s::%d", m_guid.getGuidString ().sz (), m_code);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -108,14 +108,9 @@ Error::format_va (
 }
 
 size_t
-Error::createStringError (
-	const char* p,
-	size_t length
-	)
+Error::createStringError (const sl::StringRef& string)
 {
-	if (length == -1)
-		length = strlen_s (p);
-
+	size_t length = string.getLength ();
 	size_t size = sizeof (ErrorHdr) + length + 1;
 
 	ErrorHdr* error = createBuffer (size);
@@ -128,7 +123,7 @@ Error::createStringError (
 
 	char* dst = (char*) (error + 1);
 
-	memcpy (dst, p, length);
+	memcpy (dst, string.cp (), length);
 	dst [length] = 0;
 
 	return size;
@@ -143,7 +138,7 @@ Error::formatStringError_va (
 	char buffer [256];
 	sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.format_va (formatString, va);
-	return createStringError (string, string.getLength ());
+	return createStringError (string);
 }
 
 //.............................................................................
@@ -205,24 +200,18 @@ pushFormatError_va (
 }
 
 size_t
-setError (
-	const char* p,
-	size_t length
-	)
+setError (const sl::StringRef& string)
 {
 	Error error;
-	size_t result = error.createStringError (p, length);
+	size_t result = error.createStringError (string);
 	return result != -1 ? setError (error) : -1;
 }
 
 size_t
-pushError (
-	const char* p,
-	size_t length
-	)
+pushError (const sl::StringRef& string)
 {
 	Error error;
-	size_t result = error.createStringError (p, length);
+	size_t result = error.createStringError (string);
 	return result != -1 ? pushError (error) : -1;
 }
 

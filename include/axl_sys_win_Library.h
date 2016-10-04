@@ -31,12 +31,12 @@ class Library: public sl::Handle <HMODULE, FreeLibrary>
 {
 public:
 	bool 
-	loadLibrary (const wchar_t* fileName);
+	loadLibrary (const sl::StringRef_w& fileName);
 
 	void*
-	getProcAddress (const char* name)
+	getProcAddress (const sl::StringRef& name)
 	{ 
-		void* p = ::GetProcAddress (m_h, name);
+		void* p = ::GetProcAddress (m_h, name.sz ());
 		return err::complete <void*> (p, NULL);
 	}
 };

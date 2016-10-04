@@ -29,7 +29,7 @@ protected:
 
 public:
 	bool
-	open (const char* fileName)
+	open (const sl::StringRef& fileName)
 	{
 		char buffer [256];
 		sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
@@ -45,7 +45,7 @@ public:
 	}
 
 	void*
-	getFunction (const char* name)
+	getFunction (const sl::StringRef& name)
 	{
 		return m_library.getProcAddress (name);
 	}
@@ -62,7 +62,7 @@ protected:
 
 public:
 	bool
-	open (const char* fileName)
+	open (const sl::StringRef& fileName)
 	{
 		return m_dynamicLibrary.open (fileName);
 	}
@@ -74,7 +74,7 @@ public:
 	}
 
 	void*
-	getFunction (const char* name)
+	getFunction (const sl::StringRef& name)
 	{
 		return m_dynamicLibrary.getSymbol (name);
 	}

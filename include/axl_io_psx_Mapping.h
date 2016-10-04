@@ -89,14 +89,14 @@ class SharedMemory: public Fd
 public:
 	bool
 	open (
-		const char* name,
+		const sl::StringRef& name,
 		uint_t flags = O_RDWR,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
 
 	static
 	bool
-	unlink (const char* name)
+	unlink (const sl::StringRef& name)
 	{
 		int result = ::shm_unlink (name);
 		return err::complete (result != -1);

@@ -84,20 +84,18 @@ EscapeEncoding::findEscapeReplaceChar (char x)
 size_t
 EscapeEncoding::encode (
 	sl::String* string,
-	const char* p, 
-	size_t length
+	const sl::StringRef& source
 	)
 {
-	if (length == -1)
-		length = strlen_s (p);
-
 	string->clear ();
-	string->reserve (length);
+	string->reserve (source.getLength ());
 
 	char escapeSequence [4] = { '\\' };
 
+	const char* p = source.cp ();
+	const char* end = source.getEnd ();
 	const char* base = p;
-	const char* end = p + length;
+
 	for (; p < end; p++)
 	{
 		if (*p == '\\')
@@ -153,8 +151,7 @@ isHexChar (char c)
 size_t
 EscapeEncoding::decode (
 	sl::String* string,
-	const char* p, 
-	size_t length
+	const sl::StringRef& source
 	)
 {
 	enum State
@@ -166,11 +163,8 @@ EscapeEncoding::decode (
 
 	State state = State_Normal;	
 
-	if (length == -1)
-		length = strlen_s (p);
-
 	string->clear ();
-	string->reserve (length / 2);
+	string->reserve (source.getLength () / 2);
 
 	char hexCodeString [16];
 	size_t hexCodeLen;
@@ -179,8 +173,10 @@ EscapeEncoding::decode (
 
 	char replace;
 
-	const char* end = p + length;
+	const char* p = source.cp ();
+	const char* end = source.getEnd ();
 	const char* base = p;
+
 	for (; p < end; p++)
 	{
 		switch (state)

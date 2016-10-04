@@ -129,8 +129,7 @@ HexEncoding::encode_nsu (
 size_t
 HexEncoding::decode (
 	sl::Array <char>* buffer,
-	const char* p,
-	size_t length
+	const sl::StringRef& source
 	)
 {
 	enum State
@@ -141,11 +140,8 @@ HexEncoding::decode (
 
 	State state = State_Normal;
 
-	if (length == -1)
-		length = strlen_s (p);
-
 	buffer->clear ();
-	buffer->reserve (length / 2);
+	buffer->reserve (source.getLength () / 2);
 
 	char hexCodeString [4] = { 0 };
 	char* hexCodeEnd;
@@ -153,7 +149,9 @@ HexEncoding::decode (
 
 	uchar_t x;
 
-	const char* end = p + length;
+	const char* p = source.cp ();
+	const char* end = source.getEnd ();
+
 	for (; p < end; p++)
 	{
 		bool_t isSpace = isspace (*p);

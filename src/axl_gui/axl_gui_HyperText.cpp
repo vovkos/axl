@@ -36,16 +36,10 @@ HyperText::backspace (size_t backLength)
 }
 
 size_t 
-HyperText::appendPlainText (
-	const char* text, 
-	size_t length
-	)
+HyperText::appendPlainText (const sl::StringRef& text)
 {
-	if (length == -1)
-		length = strlen_s (text);
-
-	m_source.append (text, length);
-	return m_text.append (text, length);
+	m_source.append (text);
+	return m_text.append (text);
 }
 
 size_t 
@@ -58,20 +52,10 @@ HyperText::appendPlainText (
 	return m_text.append (c, count);
 }
 
-void
-parseAnsiAttr (
-	TextAttr* attr,
-	const char* p, 
-	size_t length
-	)
-{
-}
-
 size_t
 HyperText::appendHyperText (
 	const TextAttr& baseAttr,
-	const char* text,
-	size_t length
+	const sl::StringRef& text
 	)
 {
 	TextAttr attr = baseAttr;
@@ -79,13 +63,10 @@ HyperText::appendHyperText (
 
 	size_t lastLength = m_text.getLength ();
 	
-	if (length == -1)
-		length = strlen_s (text);
+	const char* p = text.cp ();
+	const char* end = text.getEnd ();
 
-	const char* p = text;
-	const char* end = p + length;
-
-	m_source.append (p, length);
+	m_source.append (text);
 
 	for (;;)
 	{
@@ -115,7 +96,7 @@ HyperText::appendHyperText (
 			if (p [1] == '\\') // ST: string terminator
 				p += 2;
 
-			m_hyperlinkArray.openHyperlink (textLength, arg, argEnd - arg);
+			m_hyperlinkArray.openHyperlink (textLength, sl::StringRef (arg, argEnd - arg));
 		}
 		else if (*p == '[') // CSI
 		{
@@ -138,8 +119,7 @@ HyperText::appendHyperText (
 				attrParser.parse (
 					&attr,
 					baseAttr, 
-					arg, 
-					argEnd - arg
+					sl::StringRef (arg, argEnd - arg)
 					);
 				break;
 
@@ -158,7 +138,7 @@ HyperText::appendHyperText (
 	}
 
 	m_attrArray.setAttr (lastLength, m_text.getLength (), attr);
-	return length;
+	return m_text.getLength ();
 }
 
 HyperlinkAnchor*
@@ -224,7 +204,7 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 			if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 				continue;
 
-			size = font->calcTextSize (m_text.cc () + offset, attrAnchor->m_offset - offset);			
+			size = font->calcTextSize (m_text.getSubString (offset, attrAnchor->m_offset - offset));
 			
 			x += size.m_width;
 			offset = attrAnchor->m_offset;
@@ -233,7 +213,7 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 			font = baseFont->getFontMod (fontFlags);
 		}
 
-		size = font->calcTextSize (m_text.cc () + offset, hyperlinkAnchor->m_offset - offset);
+		size = font->calcTextSize (m_text.getSubString (offset, hyperlinkAnchor->m_offset - offset));
 		
 		x += size.m_width;
 		offset = hyperlinkAnchor->m_offset;
@@ -266,7 +246,7 @@ HyperText::calcTextSize (Font* baseFont) const
 		if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 			continue;
 
-		size = font->calcTextSize (m_text.cc () + offset, attrAnchor->m_offset - offset);
+		size = font->calcTextSize (m_text.getSubString (offset, attrAnchor->m_offset - offset));
 		
 		x += size.m_width;
 		offset = attrAnchor->m_offset;
@@ -275,7 +255,7 @@ HyperText::calcTextSize (Font* baseFont) const
 		font = baseFont->getFontMod (fontFlags);
 	}
 
-	size = font->calcTextSize (m_text.cc () + offset, length - offset);
+	size = font->calcTextSize (m_text.getSubString (offset, length - offset));
 	size.m_width += x;
 
 	return size;

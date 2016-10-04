@@ -7,7 +7,7 @@
 #define _AXL_SYS_WIN_PROCESS_H
 
 #include "axl_sys_win_Handle.h"
-#include "axl_err_Error.h"
+#include "axl_sl_String.h"
 #include "axl_sl_Array.h"
 
 namespace axl {
@@ -21,21 +21,21 @@ class Process: public Handle
 public:
 	bool 
 	createProcess (
-		const wchar_t* appName,
-		const wchar_t* cmdLine,
+		const sl::StringRef_w& appName,
+		const sl::StringRef_w& cmdLine,
 		const SECURITY_ATTRIBUTES* processAttr,
 		const SECURITY_ATTRIBUTES* threadAttr,
 		bool inheritHandles,
 		dword_t flags,
 		const void* environment,
-		const wchar_t* currentDir,
+		const sl::StringRef_w& currentDir,
 		const STARTUPINFO* startupInfo,
 		handle_t* threadHandle
 		);
 
 	bool 
 	createProcess (
-		const wchar_t* cmdLine,
+		const sl::StringRef_w& cmdLine,
 		bool inheritHandles,
 		dword_t flags,
 		const STARTUPINFO* startupInfo		
@@ -74,7 +74,7 @@ public:
 
 bool
 syncExec (
-	const wchar_t* cmdLine,
+	const sl::StringRef_w& cmdLine,
 	sl::Array <char>* output,
 	dword_t* exitCode = NULL
 	);

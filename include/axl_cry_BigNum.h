@@ -149,9 +149,9 @@ public:
 	}
 
 	bool
-	setDecString (const char* string)
+	setDecString (const sl::StringRef& string)
 	{
-		int result = BN_dec2bn (&m_h, string);
+		int result = BN_dec2bn (&m_h, string.sz ());
 		return completeWithLastCryptoError (result);
 	}
 
@@ -167,9 +167,9 @@ public:
 	}
 
 	bool
-	setHexString (const char* string)
+	setHexString (const sl::StringRef& string)
 	{
-		int result = BN_hex2bn (&m_h, string);
+		int result = BN_hex2bn (&m_h, string.sz ());
 		return completeWithLastCryptoError (result);
 	}
 

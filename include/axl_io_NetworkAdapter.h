@@ -30,7 +30,7 @@ enum NetworkAdapterType
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const char* 
+const char*
 getNetworkAdapterTypeString (NetworkAdapterType adapterKind);
 
 //.............................................................................
@@ -54,7 +54,7 @@ getFirstNetworkAdapterFlag (uint_t flags)
 	return (NetworkAdapterFlag) (1 << sl::getLoBitIdx (flags));
 }
 
-const char* 
+const char*
 getNetworkAdapterFlagString (NetworkAdapterFlag flag);
 
 sl::String

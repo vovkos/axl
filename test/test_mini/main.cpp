@@ -262,7 +262,7 @@ testWinNetworkAdapterList ()
 	sl::Array <char> bufferArray (ref::BufKind_Stack, buffer, sizeof (buffer));
 	bufferArray.setCount (size);
 
-	IP_ADAPTER_INFO* ipAdapter = (IP_ADAPTER_INFO*) bufferArray.a ();
+	IP_ADAPTER_INFO* ipAdapter = (IP_ADAPTER_INFO*) bufferArray.p ();
 	error = ::GetAdaptersInfo (ipAdapter, &size);
 	if (error != ERROR_SUCCESS)
 	{
@@ -299,7 +299,7 @@ testWinNetworkAdapterList2 ()
 	bool result = socket.wsaOpen (AF_INET, SOCK_DGRAM, 0);
 	if (!result)
 	{
-		printf ("socket.wsaOpen failed (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("socket.wsaOpen failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -316,7 +316,7 @@ testWinNetworkAdapterList2 ()
 			SIO_GET_INTERFACE_LIST,
 			NULL, 
 			0,
-			buffer.a (),
+			buffer.p (),
 			size,
 			&actualSize,
 			NULL, 
@@ -329,7 +329,7 @@ testWinNetworkAdapterList2 ()
 		dword_t error = ::WSAGetLastError ();
 		if (error != WSAENOBUFS)
 		{
-			printf ("WSAIoctl failed (%s)\n", err::Error (error).getDescription ().cc ());
+			printf ("WSAIoctl failed (%s)\n", err::Error (error).getDescription ().sz ());
 			return;
 		}
 
@@ -337,15 +337,15 @@ testWinNetworkAdapterList2 ()
 		buffer.setCount (size);
 	}
 
-	const INTERFACE_INFO* iface = (const INTERFACE_INFO*) buffer.ca ();
+	const INTERFACE_INFO* iface = (const INTERFACE_INFO*) buffer.cp ();
 	size_t ifaceCount = actualSize / sizeof (INTERFACE_INFO);
 	
 	for (size_t i = 0; i < ifaceCount; iface++, i++) 
 	{
 		printf ("Interface #%d\n", i);
-		printf ("  Address   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiAddress).cc ());
-		printf ("  Broadcast = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiBroadcastAddress).cc ());
-		printf ("  Netmask   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiNetmask).cc ());
+		printf ("  Address   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiAddress).sz ());
+		printf ("  Broadcast = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiBroadcastAddress).sz ());
+		printf ("  Netmask   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiNetmask).sz ());
 
 /*		cout << endl;
 
@@ -389,10 +389,10 @@ testNetworkAdapterList ()
 	{
 		io::NetworkAdapterDesc* adapter = *adapterIt;
 
-		printf ("Name        = %s\n", adapter->getName ().cc ());
-		printf ("Description = %s\n", adapter->getDescription ().cc ());
+		printf ("Name        = %s\n", adapter->getName ().sz ());
+		printf ("Description = %s\n", adapter->getDescription ().sz ());
 		printf ("Type        = %s\n", io::getNetworkAdapterTypeString (adapter->getType ()));
-		printf ("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).cc ());
+		printf ("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).sz ());
 
 		sl::ConstList <io::NetworkAdapterAddress> addressList = adapter->getAddressList ();
 		sl::Iterator <io::NetworkAdapterAddress> addressIt = addressList.getHead ();
@@ -403,14 +403,14 @@ testNetworkAdapterList ()
 			uint_t family = address->m_address.m_addr.sa_family;
 			printf ("%-11s = %s", 
 				io::getSockAddrFamilyString (family),
-				address->m_address.getString ().cc ()
+				address->m_address.getString ().sz ()
 				);
 
 			if (family == AF_INET)
 			{
 				io::SockAddr netMask;
 				netMask.createNetMask_ip4 (address->m_netMaskBitCount);
-				printf (" (mask %s)\n", netMask.getString ().cc ());
+				printf (" (mask %s)\n", netMask.getString ().sz ());
 			}
 			else
 			{
@@ -436,13 +436,13 @@ testParseFormatIp6 ()
 	io::SockAddr sockAddr;
 
 	result = sockAddr.parse ("6");
-	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
+	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
 
 	result = sockAddr.parse ("[1::2:3:4:5]:6");
-	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
+	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
 
 	result = sockAddr.parse ("[fe80::c990:d16e:a986:d56b%11]:10001");
-	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().cc ());
+	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
 
 	sockaddr_in6 addr = { 0 };
 	addr.sin6_family = AF_INET6;
@@ -464,8 +464,8 @@ testParseFormatIp6 ()
 		addr.sin6_scope_id = rand () % 2 ? rand () : 0;
 #endif
 
-		sl::String addrString = io::getSockAddrString ((const sockaddr*) &addr).cc ();
-		printf ("addr1 = %s\n", addrString.cc ());
+		sl::String addrString = io::getSockAddrString ((const sockaddr*) &addr).sz ();
+		printf ("addr1 = %s\n", addrString.sz ());
 
 		char addrString2 [1024] = { 0 };
 		dword_t size = sizeof (addrString2);
@@ -496,7 +496,7 @@ testSocketIp6 ()
 	result = socket.open (AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 	if (!result)
 	{
-		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 	
@@ -504,14 +504,14 @@ testSocketIp6 ()
 	result = addr.parse ("[::1]:80");
 	if (!result)
 	{
-		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
 	result = socket.connect (addr);
 	if (!result)
 	{
-		printf ("socket.connect failed (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("socket.connect failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -528,7 +528,7 @@ testAddrInfoIp6 ()
 	bool result = io::resolveHostName (&addrArray, name, AF_INET6);
 	if (!result)
 	{
-		printf ("io::resolveHostName failed (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("io::resolveHostName failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -536,7 +536,7 @@ testAddrInfoIp6 ()
 
 	size_t count = addrArray.getCount ();
 	for (size_t i = 0; i < count; i++)
-		printf ("    %s\n", addrArray [i].getString ().cc ());
+		printf ("    %s\n", addrArray [i].getString ().sz ());
 }
 
 //.............................................................................
@@ -549,7 +549,7 @@ testDynamicLibrary ()
 	bool result = dl.open ("libc.so.6");
 	if (!result)
 	{
-		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -557,7 +557,7 @@ testDynamicLibrary ()
 	Printf* prn = (Printf*) dl.getFunction ("printf");
 	if (!prn)
 	{
-		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -642,7 +642,7 @@ testRegExp ()
 		bool result = regExpCompiler.incrementalCompile (src [i]);
 		if (!result)
 		{
-			printf ("error: %s\n", err::getLastErrorDescription ().cc ());
+			printf ("error: %s\n", err::getLastErrorDescription ().sz ());
 			return;
 		}
 	}
@@ -655,7 +655,7 @@ testRegExp ()
 	bool result = regExpCompiler.compile ("'abc' \\n");
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -687,7 +687,7 @@ testNamedPipes ()
 	if (!ntQueryDirectoryFile)
 	{
 		err::setLastSystemError ();
-		printf ("cannot find NtQueryDirectoryFile: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("cannot find NtQueryDirectoryFile: %s\n", err::getLastErrorDescription ().sz ());
 		return; 
 	}
 
@@ -704,7 +704,7 @@ testNamedPipes ()
 	if (!result) 
 	{
 		err::setLastSystemError ();
-		printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
 		return; 
 	}
  
@@ -739,18 +739,18 @@ testNamedPipes ()
 				break;
 
 			err::setError (err::NtError (status));
-			printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().cc ());
+			printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
 			return; 
 		}
 
-		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*) dirBuffer.a ();
+		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*) dirBuffer.p ();
 		for (;;) 
 		{
 			fileName.copy (dirInfo->FileName, dirInfo->FileNameLength / 2);
 
 			printf (
 				dirInfo->AllocationSize.LowPart == -1 ? "%S (%d)\n" : "%S (%d of %d)\n", 
-				fileName.cc (), 
+				fileName.sz (), 
 				dirInfo->EndOfFile.LowPart,
 				dirInfo->AllocationSize.LowPart
 				);
@@ -793,7 +793,7 @@ querySymbolicLink (
 	if (status < 0)
 	{
 		err::setError (err::NtError (status));
-		printf ("cannot open symbolic link: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("cannot open symbolic link: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
@@ -809,7 +809,7 @@ querySymbolicLink (
 	if (status < 0)
 	{
 		err::setError (err::NtError (status));
-		printf ("cannot query symbolic link: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("cannot query symbolic link: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
@@ -846,7 +846,7 @@ enumerateDirectory (
 	if (status < 0)
 	{
 		err::setError (err::NtError (status));
-		printf ("cannot open directory: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("cannot open directory: %s\n", err::getLastErrorDescription ().sz ());
 		return; 
 	}
 
@@ -883,17 +883,17 @@ enumerateDirectory (
 				break;
 
 			err::setError (err::NtError (status));
-			printf ("cannot query directory: %s\n", err::getLastErrorDescription ().cc ());
+			printf ("cannot query directory: %s\n", err::getLastErrorDescription ().sz ());
 			return; 
 		}
 
-		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*) buffer.a ();
+		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*) buffer.p ();
 		for (; dirInfo->Name.Buffer; dirInfo++)
 		{
 			dirName.copy (dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof (wchar_t));
 			dirTypeName.copy (dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof (wchar_t));
 
-			printf ("%s%S (%S)\n", indent.cc (), dirName.cc (), dirTypeName.cc ());
+			printf ("%s%S (%S)\n", indent.sz (), dirName.sz (), dirTypeName.sz ());
 
 			if (dirTypeName.cmp (L"Directory") == 0)
 			{
@@ -903,7 +903,7 @@ enumerateDirectory (
 			{
 				bool result = querySymbolicLink (&symLinkTargetName, dir, &dirInfo->Name);
 				if (result)
-					printf ("%s  --> %S\n", indent.cc (), symLinkTargetName.cc ());
+					printf ("%s  --> %S\n", indent.sz (), symLinkTargetName.sz ());
 			}
 
 		}
@@ -999,7 +999,7 @@ printWinErrorDescription (
 	sl::String description = message;
 	::LocalFree (message);
 
-	printf ("%d/%d: %s\n", langId, subLangId, description.cc ());
+	printf ("%d/%d: %s\n", langId, subLangId, description.sz ());
 }
 
 void 
@@ -1030,7 +1030,7 @@ testTimestamp ()
 	for (int i = 0; i < 20; i++)
 	{
 		uint64_t t1 = sys::getTimestamp ();
-		printf ("%s: %llu\n", sys::Time (t1).format ("%h:%m:%s.%l.%c").cc (), t1);
+		printf ("%s: %llu\n", sys::Time (t1).format ("%h:%m:%s.%l.%c").sz (), t1);
 	}
 }
 
@@ -1054,7 +1054,7 @@ getUsbStringDescriptorText (
 	{	
 		bool result = device->getStringDesrciptor (index, &text);
 		if (!result)
-			text.format ("ERROR (%s)", err::getLastErrorDescription ().cc ());
+			text.format ("ERROR (%s)", err::getLastErrorDescription ().sz ());
 	}
 
 	return text;
@@ -1115,15 +1115,15 @@ printUsbDevice (io::UsbDevice* device)
 	result = device->getDeviceDescriptor (&deviceDesc);
 	if (!result)
 	{
-		printf ("Cannot get device descriptor (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("Cannot get device descriptor (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
 	printf ("HWID:           VID_%04x&PID_%04x\n", deviceDesc.idVendor, deviceDesc.idProduct);
 	printf ("Class:          %s\n", io::getUsbClassCodeString ((libusb_class_code) deviceDesc.bDeviceClass));
-	printf ("Manufacturer:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iManufacturer).cc ());
-	printf ("Product name:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iProduct).cc ());
-	printf ("Serial number:  %s\n", getUsbStringDescriptorText (device, deviceDesc.iSerialNumber).cc ());
+	printf ("Manufacturer:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iManufacturer).sz ());
+	printf ("Product name:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iProduct).sz ());
+	printf ("Serial number:  %s\n", getUsbStringDescriptorText (device, deviceDesc.iSerialNumber).sz ());
 
 	printf ("Address:        %d\n", device->getDeviceAddress ());
 	printf ("Bus:            %d\n", device->getBusNumber ());
@@ -1135,7 +1135,7 @@ printUsbDevice (io::UsbDevice* device)
 	size_t pathLength = device->getPortPath (path, countof (path));
 	if (pathLength == -1)
 	{
-		printf ("ERROR (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("ERROR (%s)\n", err::getLastErrorDescription ().sz ());
 	}
 	else if (pathLength != -1)
 	{
@@ -1154,7 +1154,7 @@ printUsbDevice (io::UsbDevice* device)
 		io::UsbConfigDescriptor configDesc;
 		bool result = device->getConfigDescriptor (i, &configDesc);
 		if (!result)
-			printf ("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription ().cc ());
+			printf ("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription ().sz ());
 		else
 			printUsbConfigDesc (configDesc);
 	}
@@ -1172,7 +1172,7 @@ testUsb ()
 	size_t count = deviceList.enumerateDevices (context);
 	if (count == -1)
 	{
-		printf ("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().cc ());
+		printf ("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -1186,7 +1186,7 @@ testUsb ()
 
 		result = device.open ();
 		if (!result)
-			printf ("Cannot open device (%s)\n", err::getLastErrorDescription ().cc ());		
+			printf ("Cannot open device (%s)\n", err::getLastErrorDescription ().sz ());		
 
 		printUsbDevice (&device); // even if not opened
 	}
@@ -1739,8 +1739,8 @@ testTimestamps ()
 	uint64_t ts1 = sys::getTimestamp ();
 	uint64_t ts2 = sys::getPreciseTimestamp ();
 
-	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
-	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
+	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
 
 	uint64_t t0 = sys::getPreciseTimestamp ();
 
@@ -1751,7 +1751,7 @@ testTimestamps ()
 
 	uint64_t t2 = sys::getPreciseTimestamp ();
 	uint64_t d1 = t2 - t0;
-	printf ("time1 = %s\n", sys::Time (d1, 0).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time1 = %s\n", sys::Time (d1, 0).format ("%h:%m:%s.%l.%c").sz ());
 
 	t0 = sys::getPreciseTimestamp ();
 
@@ -1762,13 +1762,13 @@ testTimestamps ()
 
 	t2 = sys::getPreciseTimestamp ();
 	uint64_t d2 = t2 - t0;
-	printf ("time2 = %s\n", sys::Time (d2, 0).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time2 = %s\n", sys::Time (d2, 0).format ("%h:%m:%s.%l.%c").sz ());
 
 	ts1 = sys::getTimestamp ();
 	ts2 = sys::getPreciseTimestamp ();
 
-	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").cc ());
-	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").cc ());
+	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
+	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
 }
 
 //.............................................................................
@@ -1785,12 +1785,12 @@ testProcess ()
 	bool result = sys::win::syncExec (cmdLine, &output, &exitCode);
 	if (!result)
 	{
-		printf ("sys::win::syncExec failed: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("sys::win::syncExec failed: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
 	output.append (0);
-	printf ("process returned %d:\n%s\n", exitCode, output.ca ());
+	printf ("process returned %d:\n%s\n", exitCode, output.cp ());
 }
 #endif
 
@@ -1811,7 +1811,7 @@ testSharedMemoryTransport ()
 
 	if (!result)
 	{
-		printf ("can't open shared memory reader: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("can't open shared memory reader: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -1825,7 +1825,7 @@ testSharedMemoryTransport ()
 
 	if (!result)
 	{
-		printf ("can't open shared memory writer: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("can't open shared memory writer: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -1835,7 +1835,7 @@ testSharedMemoryTransport ()
 	writer.close ();
 
 	sl::Array <char> a = reader.read ();
-	printf ("reader.read () returned: %s\n", a.ca ());
+	printf ("reader.read () returned: %s\n", a.cp ());
 }
 
 //.............................................................................
@@ -1850,7 +1850,7 @@ testZip ()
 	result = reader.openFile ("c:/projects/projects.zip");
 	if (!result)
 	{
-		printf ("can't open file: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("can't open file: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -1873,17 +1873,17 @@ testZip ()
 			"timestamp:         %s\n"
 			"method:            %d\n",
 			isDir ? "directory:" : "file:",
-			fileName.cc (),
+			fileName.sz (),
 			(size_t) fileInfo.m_compressedSize,
 			(size_t) fileInfo.m_uncompressedSize,
-			sys::Time (fileInfo.m_timestamp).format ().cc (),
+			sys::Time (fileInfo.m_timestamp).format ().sz (),
 			fileInfo.m_method
 			);
 
 		if (!isDir)
 		{
 			reader.extractFileToMem (i, &buffer);
-			printf ("<<<\n%s\n>>>\n", buffer.ca ());
+			printf ("<<<\n%s\n>>>\n", buffer.cp ());
 		}
 
 		printf ("\n");
@@ -1900,7 +1900,7 @@ testEnumSerial ()
 
 	sl::Iterator <io::SerialPortDesc> it = portList.getHead ();
 	for (; it; it++)
-		printf ("device name: %s\ndescription: %s\n\n", it->getDeviceName ().cc (), it->getDescription ().cc ());
+		printf ("device name: %s\ndescription: %s\n\n", it->getDeviceName ().sz (), it->getDescription ().sz ());
 
 	printf ("%d ports total\n", portList.getCount ());
 }
@@ -1912,7 +1912,7 @@ testEncoding ()
 {
 	sl::String s;
 	enc::EscapeEncoding::encode (&s, "\\\\.\\pipe\\mypipe");
-	printf ("%s\n", s.cc ());
+	printf ("%s\n", s.sz ());
 }
 
 //.............................................................................
@@ -2139,7 +2139,7 @@ testModBus ()
 	sl::String s_1_5 = sys::Time (timeout_1_5, false).format ("%s.%l.%c");
 	sl::String s_3_5 = sys::Time (timeout_3_5, false).format ("%s.%l.%c");
 
-	printf ("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.cc (), s_3_5.cc ());
+	printf ("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.sz (), s_3_5.sz ());
 }
 
 //.............................................................................
@@ -2445,7 +2445,7 @@ public:
 		)
 	{		
 		printIndent ();
-		printf ("%s\n", sl::String (string, length).cc ());
+		printf ("%s\n", sl::String (string, length).sz ());
 	}
 
 protected:
@@ -2466,7 +2466,7 @@ testXml ()
 	result = parser.parseFile ("c:/projects/playground/doxygen/xml/index.xml", 100);
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -2482,14 +2482,14 @@ testFileEnum ()
 	bool result = fileEnum.openDir (".");
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
 	while (fileEnum.hasNextFile ())
 	{
 		sl::String fileName = fileEnum.getNextFileName ();
-		printf ("%s\n", fileName.cc ());
+		printf ("%s\n", fileName.sz ());
 	}
 }
 
@@ -2498,10 +2498,10 @@ testStringCase ()
 {
 	sl::String s = "Hui Govno i Muravei";
 	s.makeLowerCase ();
-	printf ("s = %s\n", s.cc ());
+	printf ("s = %s\n", s.sz ());
 
 	s.makeUpperCase ();
-	printf ("s = %s\n", s.cc ());
+	printf ("s = %s\n", s.sz ());
 }
 
 //.............................................................................
@@ -2554,16 +2554,16 @@ class CmdLineParser: public sl::CmdLineParser <CmdLineParser, CmdLineSwitchTable
 
 protected:
 	bool
-	onValue (const char* value)
+	onValue (const sl::StringRef& value)
 	{
-		printf ("onValue (%s)\n", value);
+		printf ("onValue (%s)\n", value.sz ());
 		return true;
 	}
 
 	bool
 	onSwitch (
 		SwitchKind switchKind,
-		const char* value
+		const sl::StringRef& value
 		)
 	{
 		switch (switchKind)
@@ -2581,11 +2581,11 @@ protected:
 			break;
 
 		case CmdLineSwitchKind_Add:
-			printf ("CmdLineSwitchKind_Add (%s)\n", value);
+			printf ("CmdLineSwitchKind_Add (%s)\n", value.sz ());
 			break;
 
 		case CmdLineSwitchKind_Remove:
-			printf ("CmdLineSwitchKind_Remove (%s)\n", value);
+			printf ("CmdLineSwitchKind_Remove (%s)\n", value.sz ());
 			break;
 
 		};
@@ -2611,10 +2611,51 @@ testCmdLine (
 	CmdLineParser parser;
 	bool result = parser.parse (argc, argv);
 	if (!result)
-		printf ("Error parsing command line: %s\n", err::getLastErrorDescription ().cc ());
+		printf ("Error parsing command line: %s\n", err::getLastErrorDescription ().sz ());
 }
 
 //.............................................................................
+
+class A
+{
+	char* m_p;
+	
+public:
+	A ()
+	{
+		m_p = "zhopa!";
+	}
+
+	operator char* ()
+	{
+		printf ("operator char* ()\n");
+		return m_p;
+	}
+
+	operator const char* () const
+	{
+		printf ("operator const char* () const\n");
+		return m_p;
+	}
+
+	const char& operator [] (intptr_t i) const
+	{
+		printf ("const char& operator [] (intptr_t i) const\n");
+		return m_p [i];
+	}
+
+	char& operator [] (intptr_t i)
+	{
+		printf ("char& operator [] (intptr_t i)\n");
+		return m_p [i];
+	}
+};
+
+#include <vector>
+
+void foo (const char* c)
+{
+}
 
 #if (_AXL_OS_WIN)
 int
@@ -2634,6 +2675,9 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
+
+	A a;
+	foo ((const char*) a);
 
 	testCmdLine (argc, argv);
 

@@ -10,18 +10,6 @@
 #include "axl_sl_Guid.h"
 
 namespace axl {
-namespace sl {
-
-template <typename T> class StringRefBase;
-template <typename T> class StringBase;
-
-typedef StringRefBase <char> StringRef;
-typedef StringBase <char> String;
-
-} // namespace sl
-} // namespace axl
-
-namespace axl {
 namespace err {
 
 //.............................................................................
@@ -238,11 +226,6 @@ public:
 		uint_t code
 		);
 
-	ErrorRef (
-		const char* string,
-		size_t length = -1
-		);
-
 	ErrorRef&
 	operator = (const ErrorRef& src)
 	{
@@ -300,12 +283,9 @@ public:
 		createSimpleError (guid, code);
 	}
 
-	Error (
-		const char* string,
-		size_t length = -1
-		)
+	Error (const sl::StringRef& string)
 	{
-		createStringError (string, length);
+		createStringError (string);
 	}
 
 	Error (
@@ -469,22 +449,16 @@ public:
 	// string error
 
 	size_t
-	createStringError (
-		const char* p,
-		size_t length = -1
-		);
+	createStringError (const sl::StringRef& string);
 
 	size_t
-	pushStringError (
-		const char* p,
-		size_t length = -1
-		)
+	pushStringError (const sl::StringRef& string)
 	{
 		if (!m_p)
-			return createStringError (p, length);
+			return createStringError (string);
 
 		Error error;
-		error.createStringError (p, length);
+		error.createStringError (string);
 		return push (error);
 	}
 
@@ -543,15 +517,6 @@ ErrorRef::ErrorRef (
 	uint_t code
 	):
 	BaseType (Error (guid, code))
-{
-}
-
-inline
-ErrorRef::ErrorRef (
-	const char* string,
-	size_t length
-	):
-	BaseType (Error (string, length))
 {
 }
 
@@ -700,16 +665,10 @@ pushError (
 // string error
 
 size_t
-setError (
-	const char* p,
-	size_t length = -1
-	);
+setError (const sl::StringRef& string);
 
 size_t
-pushError (
-	const char* p,
-	size_t length = -1
-	);
+pushError (const sl::StringRef& string);
 
 size_t
 setFormatStringError_va (

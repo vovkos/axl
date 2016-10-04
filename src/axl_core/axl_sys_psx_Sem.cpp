@@ -40,7 +40,7 @@ Sem::wait (uint_t timeout)
 
 bool
 NamedSem::open (
-	const char* name,
+	const sl::StringRef& name,
 	int flags,
 	mode_t mode,
 	uint_t value

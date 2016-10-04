@@ -13,7 +13,7 @@ CmdLineParserRoot::extractArg (
 	sl::String* arg
 	)
 {
-	const char* p = cmdLine;
+	const char* p = cmdLine.cp ();
 	const char* end = cmdLine.getEnd ();
 
 	while (p < end && isspace (*p))
@@ -22,7 +22,7 @@ CmdLineParserRoot::extractArg (
 	if (p >= end)
 	{
 		arg->clear ();
-		return p - cmdLine;
+		return p - cmdLine.cp ();
 	}
 
 	const char* p1 = p;
@@ -54,7 +54,7 @@ CmdLineParserRoot::extractArg (
 	}
 
 	arg->copy (p1, p - p1);
-	return p - cmdLine;
+	return p - cmdLine.cp ();
 }
 
 bool
@@ -65,7 +65,7 @@ CmdLineParserRoot::parseSwitch (
 	sl::String* value
 	)
 {
-	const char* p = arg;
+	const char* p = arg.cp ();
 	const char* end = arg.getEnd ();
 
 	if (argKind == ArgKind_CharSwitch)

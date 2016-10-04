@@ -8,29 +8,29 @@ namespace xml {
 //.............................................................................
 
 bool
-ExpatParserRoot::create (const char* encoding)
+ExpatParserRoot::create (const sl::StringRef& encoding)
 {
 	close ();
 
-	m_h = XML_ParserCreate (encoding);
+	m_h = XML_ParserCreate (encoding.szn ());
 	return err::completeWithSystemError (m_h != NULL, false, err::SystemErrorCode_InsufficientResources);
 }
 
 bool
 ExpatParserRoot::createNs (
-	const char* encoding,
+	const sl::StringRef& encoding,
 	char separator
 	)
 {
 	close ();
 
-	m_h = XML_ParserCreateNS (encoding, separator);
+	m_h = XML_ParserCreateNS (encoding.szn (), separator);
 	return err::completeWithSystemError (m_h != NULL, false, err::SystemErrorCode_InsufficientResources);
 }
 
 bool
 ExpatParserRoot::parseFile (
-	const char* fileName,
+	const sl::StringRef& fileName,
 	size_t blockSize
 	)
 {

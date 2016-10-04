@@ -10,7 +10,7 @@ namespace psx {
 
 bool
 Fd::open (
-	const char* fileName,
+	const sl::StringRef& fileName,
 	uint_t openFlags,
 	mode_t mode
 	)

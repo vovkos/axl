@@ -73,7 +73,7 @@ public:
 
 	bool
 	open (
-		const char* fileName,
+		const sl::StringRef& fileName,
 		uint_t flags = 0
 		);
 
@@ -168,13 +168,13 @@ public:
 
 	bool
 	open (
-		const char* fileName,
+		const sl::StringRef& fileName,
 		uint_t flags = 0
 		);
 #else
 	bool
 	open (
-		const char* fileName,
+		const sl::StringRef& fileName,
 		uint_t flags = 0
 		)
 	{
@@ -190,19 +190,19 @@ public:
 inline
 bool
 renameFile (
-	const char* srcFileName,
-	const char* dstFileName
+	const sl::StringRef& srcFileName,
+	const sl::StringRef& dstFileName
 	)
 {
-	bool_t result = ::MoveFileA (srcFileName, dstFileName);
+	bool_t result = ::MoveFileA (srcFileName.sz (), dstFileName.sz ());
 	return err::complete (result);
 }
 
 inline
 bool
-deleteFile (const char* fileName)
+deleteFile (const sl::StringRef& fileName)
 {
-	bool_t result = ::DeleteFileA (fileName);
+	bool_t result = ::DeleteFileA (fileName.sz ());
 	return err::complete (result);
 }
 
@@ -211,8 +211,8 @@ deleteFile (const char* fileName)
 inline
 bool
 renameFile (
-	const char* srcFileName,
-	const char* dstFileName
+	const sl::StringRef& srcFileName,
+	const sl::StringRef& dstFileName
 	)
 {
 	int result = rename (srcFileName, dstFileName);
@@ -221,7 +221,7 @@ renameFile (
 
 inline
 bool
-deleteFile (const char* fileName)
+deleteFile (const sl::StringRef& fileName)
 {
 	int result = unlink (fileName);
 	return err::complete (result == 0);
@@ -231,8 +231,8 @@ deleteFile (const char* fileName)
 
 uint64_t
 copyFile (
-	const char* srcFileName,
-	const char* dstFileName,
+	const sl::StringRef& srcFileName,
+	const sl::StringRef& dstFileName,
 	uint64_t size = -1
 	);
 

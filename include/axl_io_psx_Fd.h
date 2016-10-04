@@ -40,7 +40,7 @@ public:
 
 	bool
 	open (
-		const char* fileName,
+		const sl::StringRef& fileName,
 		uint_t openFlags = O_RDWR | O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);

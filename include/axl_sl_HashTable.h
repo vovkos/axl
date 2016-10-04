@@ -8,8 +8,8 @@
 
 #include "axl_sl_Array.h"
 #include "axl_sl_List.h"
-#include "axl_sl_Cmp.h"
 #include "axl_sl_Hash.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace sl {
@@ -123,10 +123,11 @@ public:
 //.............................................................................
 
 template <
-	typename Key_0,
-	typename Hash_0,
-	typename Cmp_0 = Cmp <Key_0>,
-	typename Entry_0 = HashTableEntry <Key_0>
+	typename Key,
+	typename Hash,
+	typename Eq = Eq <Key>,
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename Entry = HashTableEntry <Key>
 	>
 class HashTable
 {
@@ -137,12 +138,7 @@ public:
 		Def_ResizeThreshold    = 75,
 	};
 
-	typedef Key_0 Key;
-	typedef Hash_0 Hash;
-	typedef Cmp_0 Cmp;
-	typedef Entry_0 Entry;
 	typedef typename Entry::Bucket Bucket;
-
 	typedef sl::Iterator <Entry> Iterator;
 
 protected:
@@ -233,7 +229,7 @@ public:
 	}
 
 	Iterator
-	find (const Key& key) const
+	find (KeyArg key) const
 	{
 		size_t bucketCount = m_table.getCount ();
 		if (!bucketCount)
@@ -245,8 +241,8 @@ public:
 		typename Bucket::Iterator it = bucket->getHead ();
 		for (; it; it++)
 		{
-			int cmp = Cmp () (key, it->m_key);
-			if (cmp == 0)
+			bool isEqual = Eq () (key, it->m_key);
+			if (isEqual)
 				return it;
 		}
 
@@ -254,7 +250,7 @@ public:
 	}
 
 	Iterator
-	visit (const Key& key)
+	visit (KeyArg key)
 	{
 		size_t bucketCount = m_table.getCount ();
 		if (!bucketCount)
@@ -272,8 +268,8 @@ public:
 		typename Bucket::Iterator it = bucket->getHead ();
 		for (; it; it++)
 		{
-			int cmp = Cmp () (key, it->m_key);
-			if (cmp == 0)
+			bool isEqual = Eq () (key, it->m_key);
+			if (isEqual)
 				return it;
 		}
 
@@ -305,7 +301,7 @@ public:
 	}
 
 	bool
-	eraseKey (const Key& key)
+	eraseKey (KeyArg key)
 	{
 		Iterator it = find (key);
 		if (!it)
@@ -322,51 +318,167 @@ template <
 	typename Key,
 	typename Value,
 	typename Hash,
-	typename Cmp = Cmp <Key>
+	typename Eq = Eq <Key>,
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename ValueArg = typename ArgType <Value>::Type
 	>
 class HashTableMap: public HashTable <
 	Key,
 	Hash,
-	Cmp,
+	Eq,
+	KeyArg,
 	HashTableMapEntry <Key, Value>
 	>
 {
 public:
 	Value&
-	operator [] (const Key& key)
+	operator [] (KeyArg key)
 	{
 		return this->visit (key)->m_value;
+	}
+
+	Value
+	findValue (
+		KeyArg key,
+		ValueArg undefinedValue
+		) const
+	{
+		Iterator it = find (key);
+		return it ? it->m_value : undefinedValue;
+	}
+
+	Iterator
+	add (
+		KeyArg key,
+		ValueArg value
+		)
+	{
+		Iterator it = visit (key);
+		it->m_value = value;
+		return it;
 	}
 };
 
 //.............................................................................
 
-#define AXL_SL_BEGIN_HASH_TABLE_MAP(Class, Key, Value, Hash, Cmp) \
+// hash table for simple types (char, int, void* etc)
+
+template <
+	typename Key,
+	typename KeyArg = typename ArgType <Key>::Type
+	>
+class SimpleHashTable: public HashTable <
+	Key,
+	sl::HashId <Key>, 
+	sl::Eq <Key>,
+	KeyArg
+	>
+{
+};
+
+template <
+	typename Key,
+	typename Value,
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename ValueArg = typename ArgType <Value>::Type
+	>
+class SimpleHashTableMap: public HashTableMap <
+	Key,
+	Value,
+	sl::HashId <Key>, 
+	sl::Eq <Key>,
+	KeyArg,
+	ValueArg
+	>
+{
+};
+
+//.............................................................................
+
+// hash table for ducktyped keys -- uses methods .hash ()
+
+template <
+	typename Key,
+	typename KeyArg = typename ArgType <Key>::Type
+	>
+class DuckTypeHashTable: public HashTable <
+	Key,
+	sl::HashDuckType <Key>, 
+	sl::EqDuckType <Key>,
+	KeyArg
+	>
+{
+};
+
+template <
+	typename Key,
+	typename Value,
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename ValueArg = typename ArgType <Value>::Type
+	>
+class DuckTypeHashTableMap: public HashTableMap <
+	Key,
+	Value,
+	sl::HashDuckType <Key>, 
+	sl::EqDuckType <Key>,
+	KeyArg,
+	ValueArg
+	>
+{
+};
+
+//.............................................................................
+
+// variant of hash table for ducktyped keys (key is a pointer to duck type)
+
+template <typename Key>
+class DuckTypePtrHashTable: public HashTable <
+	Key*,
+	sl::HashDuckType <Key>, 
+	sl::EqDuckType <Key>,
+	Key*
+	>
+{
+};
+
+template <
+	typename Key,
+	typename Value,
+	typename ValueArg = typename ArgType <Value>::Type
+	>
+class DuckTypePtrHashTableMap: public HashTableMap <
+	Key*,
+	Value,
+	sl::HashDuckType <Key>, 
+	sl::EqDuckType <Key>,
+	Key*,
+	ValueArg
+	>
+{
+};
+
+//.............................................................................
+
+#define AXL_SL_BEGIN_HASH_TABLE_MAP_EX(Class, Key, Value, Hash, Eq, KeyArg, ValueArg) \
 class Class \
 { \
 public: \
-	typedef axl::sl::HashTableMap <Key, Value, Hash, Cmp> MapBase; \
+	typedef axl::sl::HashTableMap <Key, Value, Hash, Eq, KeyArg, ValueArg> MapBase; \
 	typedef MapBase::Iterator Iterator; \
 	static \
 	Iterator \
-	find (Key key) \
+	find (KeyArg key) \
 	{ \
 		return axl::sl::getSingleton <Map> ()->find (key); \
 	} \
 	static \
 	Value \
-	find ( \
-		Key key, \
-		Value undefined \
+	findValue ( \
+		KeyArg key, \
+		ValueArg undefinedValue \
 		) \
 	{ \
-		Iterator it = axl::sl::getSingleton <Map> ()->find (key); \
-		return it ? it->m_value : undefined; \
-	} \
-	Iterator \
-	operator () (Key key) \
-	{ \
-		return find (key); \
+		return axl::sl::getSingleton <Map> ()->findValue (key, undefinedValue); \
 	} \
 protected: \
 	class Map: public MapBase \
@@ -383,22 +495,45 @@ protected: \
 	}; \
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#define AXL_SL_BEGIN_HASH_TABLE_MAP_INT(Class, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_MAP_INT_T(Class, int, Value)
-
-#define AXL_SL_BEGIN_HASH_TABLE_MAP_CHAR(Class, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_MAP_INT_T(Class, char, Value)
-
-#define AXL_SL_BEGIN_HASH_TABLE_MAP_INT_T(Class, Key, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_MAP ( \
-		class, \
+#define AXL_SL_BEGIN_HASH_TABLE_MAP(Class, Key, Value, Hash) \
+	AXL_SL_BEGIN_HASH_TABLE_MAP_EX ( \
+		Class, \
 		Key, \
 		Value, \
-		axl::sl::HashId <Key>, \
-		axl::sl::Cmp <Key> \
+		Hash, \
+		axl::sl::Eq <Key>, \
+		axl::sl::ArgType <Key>::Type, \
+		axl::sl::ArgType <Value>::Type \
 		)
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#define AXL_SL_BEGIN_SIMPLE_HASH_TABLE_MAP(Class, Key, Value) \
+	AXL_SL_BEGIN_HASH_TABLE_MAP ( \
+		Class, \
+		Key, \
+		Value, \
+		axl::sl::HashId <Key> \
+		)
+
+#define AXL_SL_END_SIMPLE_HASH_TABLE_MAP() \
+	AXL_SL_END_HASH_TABLE_MAP ()
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE_MAP(Class, Key, Value) \
+	AXL_SL_BEGIN_HASH_TABLE_MAP_EX ( \
+		Class, \
+		Key, \
+		Value, \
+		axl::sl::HashDuckType <Key>, \
+		axl::sl::Eq <Key>, \
+		axl::sl::ArgType <Key>::Type, \
+		axl::sl::ArgType <Value>::Type \
+		)
+
+#define AXL_SL_END_DUCK_TYPE_HASH_TABLE_MAP() \
+	AXL_SL_END_HASH_TABLE_MAP ()
 
 //.............................................................................
 

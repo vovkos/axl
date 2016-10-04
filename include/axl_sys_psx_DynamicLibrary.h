@@ -31,12 +31,12 @@ class DynamicLibrary: public sl::Handle <void*, CloseDynamicLibrary>
 public:
 	bool
 	open (
-		const char* name,
+		const sl::StringRef& name,
 		int flags = RTLD_LAZY | RTLD_LOCAL
 		);
 
 	void*
-	getSymbol (const char* name);
+	getSymbol (const sl::StringRef& name);
 };
 
 //.............................................................................

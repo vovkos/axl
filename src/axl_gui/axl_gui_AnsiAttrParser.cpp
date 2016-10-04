@@ -10,8 +10,7 @@ size_t
 AnsiAttrParser::parse (
 	TextAttr* targetAttr,
 	const TextAttr& baseAttr,
-	const char* p,
-	size_t length
+	const sl::StringRef& string
 	)
 {
 	static SetAttrFuncPtr setAttrFuncTable [108] = { 0 };
@@ -53,12 +52,10 @@ AnsiAttrParser::parse (
 	m_targetAttr = targetAttr;
 	m_baseAttr = baseAttr;
 
-	if (length == -1)
-		length = strlen_s (p);
-
 	size_t attrCount = 0;
 
-	const char* end = p + length;
+	const char* p = string.cp ();
+	const char* end = string.getEnd ();
 
 	while (p < end)
 	{

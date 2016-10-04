@@ -20,9 +20,9 @@ SharedMemoryTransportBase::SharedMemoryTransportBase ()
 
 bool
 SharedMemoryTransportBase::open (
-	const char* fileName,
-	const char* readEventName,
-	const char* writeEventName,
+	const sl::StringRef& fileName,
+	const sl::StringRef& readEventName,
+	const sl::StringRef& writeEventName,
 	uint_t flags
 	)
 {
@@ -46,8 +46,8 @@ SharedMemoryTransportBase::open (
 bool
 SharedMemoryTransportBase::attach (
 	File::Handle fileHandle,
-	const char* readEventName,
-	const char* writeEventName,
+	const sl::StringRef& readEventName,
+	const sl::StringRef& writeEventName,
 	uint_t flags
 	)
 {
@@ -327,9 +327,9 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 
 bool
 SharedMemoryWriter::open (
-	const char* fileName,
-	const char* readEventName,
-	const char* writeEventName,
+	const sl::StringRef& fileName,
+	const sl::StringRef& readEventName,
+	const sl::StringRef& writeEventName,
 	uint_t flags,
 	size_t sizeLimitHint
 	)
@@ -345,8 +345,8 @@ SharedMemoryWriter::open (
 bool
 SharedMemoryWriter::attach (
 	File::Handle fileHandle,
-	const char* readEventName,
-	const char* writeEventName,
+	const sl::StringRef& readEventName,
+	const sl::StringRef& writeEventName,
 	uint_t flags,
 	size_t sizeLimitHint
 	)

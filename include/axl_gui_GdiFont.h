@@ -17,7 +17,7 @@ namespace gui {
 bool
 buildLogFont (
 	LOGFONTW* logFont,
-	const wchar_t* family,
+	const sl::StringRef_w& family,
 	size_t pointSize,
 	uint_t flags = 0
 	);
@@ -69,24 +69,15 @@ public:
 
 	virtual
 	Size
-	calcTextSize_utf8 (
-		const utf8_t* text,
-		size_t length = -1
-		);
+	calcTextSize_utf8 (const sl::StringRef_utf8& text);
 
 	virtual
 	Size
-	calcTextSize_utf16 (
-		const utf16_t* text,
-		size_t length = -1
-		);
+	calcTextSize_utf16 (const sl::StringRef_utf16& text);
 
 	virtual
 	Size
-	calcTextSize_utf32 (
-		const utf32_t* text,
-		size_t length = -1
-		);
+	calcTextSize_utf32 (const sl::StringRef_utf32& text);
 };
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

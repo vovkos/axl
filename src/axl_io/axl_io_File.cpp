@@ -12,7 +12,7 @@ namespace io {
 
 bool
 File::open (
-	const char* fileName,
+	const sl::StringRef& fileName,
 	uint_t flags
 	)
 {
@@ -63,7 +63,7 @@ File::open (
 
 bool
 File::open (
-	const char* fileName,
+	const sl::StringRef& fileName,
 	uint_t flags
 	)
 {
@@ -111,7 +111,7 @@ TemporaryFile::close ()
 
 bool
 TemporaryFile::open (
-	const char* fileName,
+	const sl::StringRef& fileName,
 	uint_t flags
 	)
 {
@@ -131,8 +131,8 @@ TemporaryFile::open (
 
 uint64_t
 copyFile (
-	const char* srcFileName,
-	const char* dstFileName,
+	const sl::StringRef& srcFileName,
+	const sl::StringRef& dstFileName,
 	uint64_t size
 	)
 {

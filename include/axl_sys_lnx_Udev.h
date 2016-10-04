@@ -21,11 +21,11 @@ template <typename T>
 T
 completeUdev (
 	T result,
-	const char* functionName
+	const sl::StringRef& functionName
 	)
 {
 	if (!result)
-		err::setFormatStringError ("'%s' failed", functionName);
+		err::setFormatStringError ("'%s' failed", functionName.sz ());
 
 	return result;
 }
@@ -112,7 +112,7 @@ public:
 	}
 
 	udev_device*
-	getDeviceFromSysPath (const char* sysPath)
+	getDeviceFromSysPath (const sl::StringRef& sysPath)
 	{
 		udev_device* device = ::udev_device_new_from_syspath (m_h, sysPath);
 		return completeUdev (device, "udev_device_new_from_syspath");
@@ -130,8 +130,8 @@ public:
 
 	udev_device*
 	getDeviceFromSubsytemSysName (
-		const char* subsystem,
-		const char* sysName
+		const sl::StringRef& subsystem,
+		const sl::StringRef& sysName
 		)
 	{
 		udev_device* device = ::udev_device_new_from_subsystem_sysname (m_h, subsystem, sysName);
@@ -139,7 +139,7 @@ public:
 	}
 
 	udev_device*
-	getDeviceFromDeviceId (const char* deviceId)
+	getDeviceFromDeviceId (const sl::StringRef& deviceId)
 	{
 		udev_device* device = ::udev_device_new_from_device_id (m_h, (char*) deviceId);
 		return completeUdev (device, "udev_device_new_from_device_id");
@@ -160,7 +160,7 @@ public:
 	}
 
 	udev_monitor*
-	createMonitor (const char* name)
+	createMonitor (const sl::StringRef& name)
 	{
 		udev_monitor* monitor = ::udev_monitor_new_from_netlink (m_h, name);
 		return completeUdev (monitor, "udev_monitor_new_from_netlink");
@@ -193,31 +193,31 @@ public:
 		return ::udev_device_get_udev (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getSysPath ()
 	{
 		return ::udev_device_get_syspath (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getSysName ()
 	{
 		return ::udev_device_get_sysname(m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getSysNum ()
 	{
 		return ::udev_device_get_sysnum (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getDevPath ()
 	{
 		return ::udev_device_get_devpath (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getDevNode ()
 	{
 		return ::udev_device_get_devnode (m_h);
@@ -229,19 +229,19 @@ public:
 		return ::udev_device_get_devnum (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getDevType ()
 	{
 		return ::udev_device_get_devtype (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getSubsystem ()
 	{
 		return ::udev_device_get_subsystem (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getDriver ()
 	{
 		return ::udev_device_get_driver (m_h);
@@ -255,8 +255,8 @@ public:
 
 	udev_device*
 	getParentWithSubsystemDevType (
-		const char* subSystem,
-		const char* devType
+		const sl::StringRef& subSystem,
+		const sl::StringRef& devType
 		)
 	{
 		return ::udev_device_get_parent_with_subsystem_devtype (m_h, subSystem, devType);
@@ -268,7 +268,7 @@ public:
 		return ::udev_device_get_is_initialized (m_h) != 0;
 	}
 
-	const char*
+	sl::StringRef
 	getAction ()
 	{
 		return ::udev_device_get_action (m_h);
@@ -299,28 +299,28 @@ public:
 		return ::udev_device_get_sysattr_list_entry (m_h);
 	}
 
-	const char*
-	getPropertyValue (const char* key)
+	sl::StringRef
+	getPropertyValue (const sl::StringRef& key)
 	{
 		return ::udev_device_get_property_value (m_h, key);
 	}
 
 	bool
-	hasTag (const char* tag)
+	hasTag (const sl::StringRef& tag)
 	{
 		return ::udev_device_has_tag (m_h, tag);
 	}
 
-	const char*
-	getSysAttrValue (const char* sysAttr)
+	sl::StringRef
+	getSysAttrValue (const sl::StringRef& sysAttr)
 	{
 		return ::udev_device_get_sysattr_value (m_h, sysAttr);
 	}
 
 	int
 	setSysAttrValue (
-		const char* sysAttr,
-		const char* value
+		const sl::StringRef& sysAttr,
+		const sl::StringRef& value
 		)
 	{
 		return ::udev_device_set_sysattr_value (m_h, sysAttr, (char*) value);
@@ -354,14 +354,14 @@ public:
 	}
 
 	bool
-	addMatchSubsystem (const char* subsystem)
+	addMatchSubsystem (const sl::StringRef& subsystem)
 	{
 		int result = ::udev_enumerate_add_match_subsystem (m_h, subsystem);
 		return completeUdevErrno (result);
 	}
 
 	bool
-	addNoMatchSubsystem (const char* subsystem)
+	addNoMatchSubsystem (const sl::StringRef& subsystem)
 	{
 		int result = ::udev_enumerate_add_nomatch_subsystem (m_h, subsystem);
 		return completeUdevErrno (result);
@@ -369,8 +369,8 @@ public:
 
 	bool
 	addMatchSysAttr (
-		const char* sysAttr,
-		const char* value
+		const sl::StringRef& sysAttr,
+		const sl::StringRef& value
 		)
 	{
 		int result = ::udev_enumerate_add_match_sysattr (m_h, sysAttr, value);
@@ -379,8 +379,8 @@ public:
 
 	bool
 	addNoMatchSysAttr (
-		const char* sysAttr,
-		const char* value
+		const sl::StringRef& sysAttr,
+		const sl::StringRef& value
 		)
 	{
 		int result = ::udev_enumerate_add_match_sysattr (m_h, sysAttr, value);
@@ -389,8 +389,8 @@ public:
 
 	bool
 	addMatchProperty (
-		const char* prop,
-		const char* value
+		const sl::StringRef& prop,
+		const sl::StringRef& value
 		)
 	{
 		int result = ::udev_enumerate_add_match_property (m_h, prop, value);
@@ -398,14 +398,14 @@ public:
 	}
 
 	bool
-	addMatchSysName (const char* sysName)
+	addMatchSysName (const sl::StringRef& sysName)
 	{
 		int result = ::udev_enumerate_add_match_sysname (m_h, sysName);
 		return completeUdevErrno (result);
 	}
 
 	bool
-	addMatchTag (const char* tag)
+	addMatchTag (const sl::StringRef& tag)
 	{
 		int result = ::udev_enumerate_add_match_tag (m_h,	tag);
 		return completeUdevErrno (result);
@@ -440,7 +440,7 @@ public:
 	}
 
 	bool
-	addSysPath (const char* sysPath)
+	addSysPath (const sl::StringRef& sysPath)
 	{
 		int result = ::udev_enumerate_add_syspath (m_h, sysPath);
 		return completeUdevErrno (result);
@@ -501,8 +501,8 @@ public:
 
 	bool
 	addMatchSubsystemDevTypeFilter (
-		const char* subsystem,
-		const char* devType
+		const sl::StringRef& subsystem,
+		const sl::StringRef& devType
 		)
 	{
 		int result = ::udev_monitor_filter_add_match_subsystem_devtype (m_h, subsystem, devType);
@@ -586,13 +586,13 @@ public:
 		return ::udev_list_entry_get_by_name (m_h, name);
 	}
 
-	const char*
+	sl::StringRef&
 	getName ()
 	{
 		return ::udev_list_entry_get_name (m_h);
 	}
 
-	const char*
+	sl::StringRef
 	getValue ()
 	{
 		return ::udev_list_entry_get_value (m_h);

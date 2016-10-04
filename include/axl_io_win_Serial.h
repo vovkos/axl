@@ -19,7 +19,7 @@ class Serial: public FileHandle
 public:
 	bool
 	open (
-		const char* name,
+		const sl::StringRef& name,
 		uint_t flags = 0
 		);
 

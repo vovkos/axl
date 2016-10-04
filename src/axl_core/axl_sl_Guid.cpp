@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_sl_Guid.h"
-#include "axl_sl_String.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -17,9 +16,9 @@ Guid::generate ()
 }
 
 bool
-Guid::parse (const char* string)
+Guid::parse (const sl::StringRef& string)
 {
-	const char* p = string;
+	const char* p = string.sz ();
 	char* end;
 
 	char terminatorChar = 0;

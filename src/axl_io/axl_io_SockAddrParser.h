@@ -22,22 +22,21 @@ protected:
 public:
 	SockAddrParser ()
 	{
-		initialize (NULL, 0);
+		m_p = NULL;
+		m_end = NULL;
 	}
 
-	SockAddrParser (
-		const char* p,
-		size_t length = -1
-		)
+	SockAddrParser (const sl::StringRef& source)
 	{
-		initialize (p, length);
+		create (source);
 	}
 
 	void
-	initialize (
-		const char* p,
-		size_t length = -1
-		);
+	create (const sl::StringRef& source)
+	{
+		m_p = source.cp ();
+		m_end = source.getEnd ();
+	}
 
 	bool
 	parse (in_addr* addr);

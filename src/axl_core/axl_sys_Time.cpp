@@ -211,7 +211,7 @@ Time::setTimestampImpl (
 size_t
 Time::format (
 	sl::String* string,
-	const char* formatString
+	const sl::StringRef& formatString
 	) const
 {
 	static const char* weekDayShortNameTable [7] =
@@ -270,10 +270,11 @@ Time::format (
 
 	string->clear ();
 
-	const char* p = formatString;
+	const char* p = formatString.cp ();
+	const char* end = formatString.getEnd ();
 	const char* p0 = p;
 
-	for (; *p; p++)
+	for (; p < end; p++)
 	{
 		if (*p != '%')
 			continue;
@@ -281,7 +282,7 @@ Time::format (
 		string->append (p0, p - p0);
 
 		p++;
-		if (!*p)
+		if (p >= end)
 			return string->getLength ();
 
 		int h12;

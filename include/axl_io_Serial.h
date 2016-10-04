@@ -137,7 +137,7 @@ public:
 	}
 
 	bool
-	open (const char* name)
+	open (const sl::StringRef& name)
 	{
 #if (_AXL_OS_WIN)
 		return m_serial.open (name, FILE_FLAG_OVERLAPPED);

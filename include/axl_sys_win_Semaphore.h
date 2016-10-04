@@ -22,7 +22,7 @@ public:
 		SECURITY_ATTRIBUTES* secAttr,
 		uint_t initialCount,
 		uint_t maxCount,
-		const char* name
+		const sl::StringRef& name = NULL
 		)
 	{
 		close ();
@@ -35,7 +35,7 @@ public:
 	open (
 		uint_t access,
 		bool doInheritHandle,
-		const char* name
+		const sl::StringRef& name
 		)
 	{
 		close ();

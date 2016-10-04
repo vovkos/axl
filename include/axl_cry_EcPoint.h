@@ -136,7 +136,7 @@ public:
 	bool
 	setDecString (
 		EC_GROUP* group,
-		const char* string,
+		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -167,11 +167,11 @@ public:
 	bool
 	setHexString (
 		EC_GROUP* group,
-		const char* string,
+		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
 		)
 	{
-		EC_POINT* result = EC_POINT_hex2point (group, string, m_h, ctx);
+		EC_POINT* result = EC_POINT_hex2point (group, string.sz (), m_h, ctx);
 		return completeWithLastCryptoError (result != NULL);
 	}
 

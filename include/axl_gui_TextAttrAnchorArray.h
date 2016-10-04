@@ -59,9 +59,9 @@ public:
 	}
 
 	const TextAttrAnchor*
-	ca () const
+	cp () const
 	{
-		return m_array.ca ();
+		return m_array.cp ();
 	}
 
 	void 

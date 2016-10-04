@@ -181,7 +181,7 @@ public:
 
 	bool
 	create (
-		const wchar_t* enumerator,
+		const sl::StringRef_w& enumerator,
 		uint_t flags = DIGCF_PRESENT
 		);
 
@@ -194,20 +194,20 @@ public:
 	static
 	bool 
 	getDeviceClassGuids (
-		const wchar_t* name,
+		const sl::StringRef_w& name,
 		GUID* buffer,
 		size_t count,
 		dword_t* requiredCount
 		)
 	{
-		bool_t result = ::SetupDiClassGuidsFromNameW (name, buffer, (dword_t) count, requiredCount);
+		bool_t result = ::SetupDiClassGuidsFromNameW (name.sz (), buffer, (dword_t) count, requiredCount);
 		return err::complete (result != 0);
 	}
 
 	static
 	bool 
 	getDeviceClassGuids (
-		const wchar_t* name,
+		const sl::StringRef_w& name,
 		sl::Array <GUID>* buffer
 		);
 };

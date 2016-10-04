@@ -16,40 +16,36 @@ namespace fsm {
 class StdRegExpNameMgr: public RegExpNameMgr
 {
 protected:
-	struct Name: public sl::ListLink
-	{
-		sl::String m_name;
-		sl::String m_source;
-	};
-
-protected:
-	sl::StdList <Name> m_nameList;
-	sl::StringHashTableMap <Name*> m_nameMap;
+	sl::StringHashTableMap <sl::String> m_nameMap;
 
 public:
 	void
 	clear ()
 	{
-		m_nameList.clear ();
 		m_nameMap.clear ();
 	}
 
 	virtual 
-	const char*
-	findName (const char* name)
+	sl::StringRef
+	findName (const sl::StringRef& name)
 	{
-		sl::StringHashTableMapIterator <Name*> it = m_nameMap.find (name);
-		return it ? it->m_value->m_source.cc () : NULL;
+		return m_nameMap.findValue (name, NULL);
 	}
 
 	void
 	addName (
-		const sl::String& name,
-		const sl::String& source
-		);
+		const sl::StringRef& name,
+		const sl::StringRef& source
+		)
+	{
+		m_nameMap [name] = source;
+	}
 
-	void
-	removeName (const char* name);
+	bool
+	removeName (const sl::StringRef& name)
+	{
+		return m_nameMap.eraseKey (name);
+	}
 };
 
 //.............................................................................

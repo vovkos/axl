@@ -45,7 +45,7 @@ EcPoint::getData (
 	size_t size = result;
 	data->setCount (result);
 
-	result = EC_POINT_point2oct (group, m_h, form, (uchar_t*) data->a (), size, ctx);
+	result = EC_POINT_point2oct (group, m_h, form, (uchar_t*) data->p (), size, ctx);
 	if (result <= 0)
 	{
 		setLastCryptoError ();

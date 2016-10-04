@@ -21,7 +21,7 @@ public:
 	create (
 		SECURITY_ATTRIBUTES* secAttr = NULL,
 		bool isManualReset = false,
-		const wchar_t* name = NULL
+		const sl::StringRef_w& name = NULL
 		)
 	{
 		close ();
@@ -34,7 +34,7 @@ public:
 	open (
 		uint_t access = EVENT_ALL_ACCESS,
 		bool doInheritHandle = false,
-		const wchar_t* name = NULL
+		const sl::StringRef_w& name = NULL
 		)
 	{
 		close ();
