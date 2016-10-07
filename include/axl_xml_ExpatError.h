@@ -25,15 +25,15 @@ class ExpatErrorProvider: public err::ErrorProvider
 {
 public:
 	static
-	sl::String 
+	sl::StringRef
 	getErrorDescription (XML_Error code)
 	{
 		const XML_LChar* string = XML_ErrorString (code);
-		return string ? sl::String (string) : "undefined XML error";
+		return string ? string : "undefined XML error";
 	}
 
 	virtual 
-	sl::String 
+	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error)
 	{
 		return getErrorDescription ((XML_Error) error->m_code);

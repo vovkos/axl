@@ -18,7 +18,7 @@ public:
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sl::String 
+sl::StringRef
 CryptoErrorProvider::getErrorDescription (const err::ErrorRef& error)
 {
 	sl::callOnce (LoadCryptoStrings (), 0);

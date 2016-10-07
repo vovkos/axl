@@ -24,12 +24,12 @@ NtErrorProvider::getErrorDescription (NTSTATUS status)
 			rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress (ntDll, "RtlNtStatusToDosError");
 		
 		if (!rtlNtStatusToDosErrorFunc)
-			return sl::String::format_s ("ntstatus #%x", status);
+			return sl::formatString ("ntstatus #%x", status);
 	}
 
 	dword_t winError = rtlNtStatusToDosErrorFunc (status);
 	if (winError == ERROR_MR_MID_NOT_FOUND)
-		return sl::String::format_s ("ntstatus #%x", status);
+		return sl::formatString ("ntstatus #%x", status);
 
 	return WinErrorProvider::getErrorDescription (winError);
 }

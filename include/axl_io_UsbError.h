@@ -25,14 +25,14 @@ class UsbErrorProvider: public err::ErrorProvider
 {
 public:
 	static
-	sl::String 
+	sl::StringRef
 	getErrorDescription (int code)
 	{
 		return libusb_error_name (code);
 	}
 
 	virtual 
-	sl::String 
+	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error)
 	{
 		return getErrorDescription (error->m_code);

@@ -25,7 +25,7 @@ WinErrorProvider::getErrorDescription (dword_t code)
 		);
 
 	if (!message)
-		return sl::String::format_s ("winerror #%d", code);
+		return sl::formatString ("winerror #%d", code);
 
 	sl::String description = message;
 	::LocalFree (message);

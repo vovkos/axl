@@ -27,14 +27,14 @@ class MachErrorProvider: public err::ErrorProvider
 {
 public:
 	static
-	sl::String 
+	sl::StringRef
 	getErrorDescription (mach_error_t code)
 	{
 		return ::mach_error_string (code);
 	}
 
 	virtual 
-	sl::String 
+	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error)
 	{
 		return getErrorDescription (error->m_code);

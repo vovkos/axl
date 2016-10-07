@@ -172,7 +172,7 @@ struct ErrorHdr
 			(this + 1)->isKindOf (guid, code);
 	}
 
-	sl::String
+	sl::StringRef
 	getDescription () const;
 };
 
@@ -790,7 +790,7 @@ class ErrorProvider
 {
 public:
 	virtual
-	sl::String
+	sl::StringRef
 	getErrorDescription (const ErrorRef& error) = 0;
 };
 
@@ -800,7 +800,7 @@ class StdErrorProvider: public ErrorProvider
 {
 public:
 	virtual
-	sl::String
+	sl::StringRef
 	getErrorDescription (const ErrorRef& error);
 
 protected:

@@ -8,14 +8,14 @@ namespace err {
 
 //.............................................................................
 
-sl::String
+sl::StringRef
 ErrorHdr::getDescription () const
 {
 	ErrorProvider* provider = getErrorMgr ()->findProvider (m_guid);
 
 	return provider ?
 		provider->getErrorDescription (this) :
-		sl::String::format_s ("%s::%d", m_guid.getGuidString ().sz (), m_code);
+		sl::formatString ("%s::%d", m_guid.getGuidString ().sz (), m_code);
 }
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -239,12 +239,13 @@ pushFormatStringError_va (
 
 //.............................................................................
 
-sl::String
+sl::StringRef
 StdErrorProvider::getErrorDescription (const ErrorRef& error)
 {
 	if (error->m_size < sizeof (ErrorHdr))
 		return sl::String ();
 
+	const char* p;
 	size_t length;
 
 	switch (error->m_code)
@@ -253,14 +254,19 @@ StdErrorProvider::getErrorDescription (const ErrorRef& error)
 		return "no error";
 
 	case StdErrorCode_String:
-		length = (error->m_size - sizeof (ErrorHdr)) / sizeof (char);
-		return sl::String ((char*) (error + 1), length);
+		p = (const char*) (error + 1);
+		length = error->m_size - sizeof (ErrorHdr);
+
+		if (length && !p [length]) // string buffer should contain a trailing null
+			length--;
+
+		return sl::StringRef (error.getHdr (), p, length);
 
 	case StdErrorCode_Stack:
 		return getStackErrorDescription (error);
 
 	default:
-		return sl::String::format_s ("error #%d");
+		return sl::formatString ("error #%d");
 	}
 }
 

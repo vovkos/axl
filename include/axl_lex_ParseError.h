@@ -34,7 +34,7 @@ class ParseErrorProvider: public err::ErrorProvider
 {
 public:
 	virtual 
-	sl::String 
+	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error);
 };
 

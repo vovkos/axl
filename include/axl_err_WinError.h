@@ -30,7 +30,7 @@ public:
 	getErrorDescription (dword_t code);
 
 	virtual 
-	sl::String 
+	sl::StringRef
 	getErrorDescription (const ErrorRef& error)
 	{
 		return getErrorDescription (error->m_code);
