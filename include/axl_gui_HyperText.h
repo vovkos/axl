@@ -32,13 +32,13 @@ protected:
 	sl::Array <HyperlinkXMapEntry> m_hyperlinkXMap;
 
 public:
-	sl::String
+	const sl::String&
 	getSource () const 
 	{
 		return m_source;
 	}
 
-	sl::String
+	const sl::String&
 	getText () const 
 	{
 		return m_text;

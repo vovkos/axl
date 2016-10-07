@@ -221,13 +221,13 @@ protected:
 	sl::String m_description;
 
 public:
-	sl::String 
+	const sl::String&
 	getDeviceName ()
 	{
 		return m_deviceName;
 	}
 		
-	sl::String
+	const sl::String&
 	getDescription ()
 	{
 		return m_description;

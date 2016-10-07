@@ -97,13 +97,13 @@ public:
 		return m_flags;
 	}
 
-	sl::String 
+	const sl::String&
 	getName () const
 	{
 		return m_name;
 	}
 
-	sl::String 
+	const sl::String&
 	getDescription () const
 	{
 		return m_description;

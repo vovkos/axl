@@ -90,7 +90,7 @@ Guid::getGuidString (uint_t flags) const
 	size_t i1 = (flags & GuidStringFlag_CurlyBraces) ? 1 : 0;
 	size_t i2 = (flags & GuidStringFlag_UpperCase) ? 1 : 0;
 
-	return sl::String::format_s (
+	return sl::formatString (
 		formatTable [i1] [i2],
 		m_data1,
 		m_data2,

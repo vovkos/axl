@@ -1366,29 +1366,6 @@ public:
 		return appendFormat_va (formatString, va);
 	}
 
-	static
-	StringBase
-	format_sva (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		StringBase result;
-		result.format_va (formatString, va);
-		return result;
-	}
-
-	static
-	StringBase
-	format_s (
-		const C* formatString,
-		...
-		)
-	{
-		AXL_VA_DECL (va, formatString);
-		return format_sva (formatString, va);
-	}
-
 	size_t
 	reduceLength (size_t delta)
 	{
@@ -1661,7 +1638,9 @@ formatString_va (
 	axl_va_list va
 	)
 {
-	return String::format_sva (formatString, va);
+	String string;
+	string.format_va (formatString, va);
+	return string;
 }
 
 inline
@@ -1672,7 +1651,7 @@ formatString (
 	)
 {
 	AXL_VA_DECL (va, formatString);
-	return String::format_sva (formatString, va);
+	return formatString_va (formatString, va);
 }
 
 //.............................................................................

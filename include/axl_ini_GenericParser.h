@@ -22,13 +22,13 @@ protected:
 	sl::String m_value;
 
 public:
-	sl::String
+	const sl::String&
 	getName () const
 	{
 		return m_name;
 	}
 
-	sl::String 
+	const sl::String&
 	getValue () const
 	{
 		return m_value;
@@ -48,7 +48,7 @@ protected:
 	sl::BoxList <sl::String> m_unnamedValueList;
 
 public:
-	sl::String 
+	const sl::String&
 	getName ()
 	{
 		return m_name;
