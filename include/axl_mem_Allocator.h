@@ -4,37 +4,74 @@
 
 #pragma once
 
-#define _AXL_MEM_STDALLOCATOR_H
+#define _AXL_MEM_ALLOCATOR_H
 
-#include "axl_mem_Malloc.h"
 #include "axl_mem_Tracker.h"
+
+#if (defined _AXL_MEM_ALLOCATE_IMPL && defined _AXL_MEM_FREE_IMPL)
+
+extern "C"
+void*
+_AXL_MEM_ALLOCATE_IMPL (size_t size);
+
+extern "C"
+void
+_AXL_MEM_FREE_IMPL (void* size);
+
+#endif
 
 namespace axl {
 namespace mem {
 
 //.............................................................................
 
-template <typename BaseAllocator>
-class ZeroAllocator
+class DirectAllocator
 {
 public:
+#if (defined _AXL_MEM_ALLOCATE_IMPL && defined _AXL_MEM_FREE_IMPL)
 	static
 	void* 
 	allocate (size_t size)
 	{
-		void* p = BaseAllocator::allocate (size);
-		if (!p)
-			return NULL;
-
-		memset (p, 0, size);
-		return p;
+		return ::_AXL_MEM_ALLOCATE_IMPL (size);
 	}
 
 	static
 	void 
 	free (void* p)
 	{
-		BaseAllocator::free (p);
+		::_AXL_MEM_FREE_IMPL (p);
+	}
+#else
+	static
+	void* 
+	allocate (size_t size)
+	{
+		return ::malloc (size);
+	}
+
+	static
+	void 
+	free (void* p)
+	{
+		::free (p);
+	}
+#endif
+};
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class ZeroAllocator: public DirectAllocator
+{
+public:
+	static
+	void* 
+	allocate (size_t size)
+	{
+		void* p = DirectAllocator::allocate (size);
+		if (p)
+			memset (p, 0, size);
+		return p;
 	}
 };
 
@@ -138,23 +175,21 @@ public:
 
 //.............................................................................
 
-typedef Malloc StdBaseAllocator;
-
 #ifdef _AXL_DEBUG
 
-typedef TrackingAllocator <StdBaseAllocator>                  StdAllocator;
-typedef TrackingAllocator <ZeroAllocator <StdBaseAllocator> > StdZeroAllocator;
-typedef TrackingAllocate <StdBaseAllocator>                   StdAllocate;
-typedef TrackingAllocate <ZeroAllocator <StdBaseAllocator> >  StdZeroAllocate;
-typedef TrackingFree <StdBaseAllocator>                       StdFree;
+typedef TrackingAllocator <DirectAllocator> StdAllocator;
+typedef TrackingAllocator <ZeroAllocator>   StdZeroAllocator;
+typedef TrackingAllocate <DirectAllocator>  StdAllocate;
+typedef TrackingAllocate <ZeroAllocator>    StdZeroAllocate;
+typedef TrackingFree <DirectAllocator>      StdFree;
 
 #else
 
-typedef StdBaseAllocator                             StdAllocator;
-typedef ZeroAllocator <StdBaseAllocator>             StdZeroAllocator;
-typedef Allocate <StdBaseAllocator>                  StdAllocate;
-typedef Allocate <ZeroAllocator <StdBaseAllocator> > StdZeroAllocate;
-typedef Free <StdBaseAllocator>                      StdFree;
+typedef DirectAllocator            StdAllocator;
+typedef ZeroAllocator              StdZeroAllocator;
+typedef Allocate <DirectAllocator> StdAllocate;
+typedef Allocate <ZeroAllocator>   StdZeroAllocate;
+typedef Free <DirectAllocator>     StdFree;
 
 #endif
 

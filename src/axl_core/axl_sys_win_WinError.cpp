@@ -1,9 +1,10 @@
 #include "pch.h"
-#include "axl_err_WinError.h"
+#include "axl_sys_win_WinError.h"
 
 namespace axl {
-namespace err {
-
+namespace sys {
+namespace win {
+	
 //.............................................................................
 
 sl::String 
@@ -35,20 +36,21 @@ WinErrorProvider::getErrorDescription (dword_t code)
 
 //.............................................................................
 
-ErrorHdr*
+size_t
 WinError::create (dword_t code)
 {
-	ErrorHdr* error = createBuffer (sizeof (ErrorHdr));
+	err::ErrorHdr* error = createBuffer (sizeof (err::ErrorHdr));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (ErrorHdr);
+	error->m_size = sizeof (err::ErrorHdr);
 	error->m_guid = g_winErrorGuid;
 	error->m_code = code;
-	return error;
+	return sizeof (err::ErrorHdr);
 }
 
 //.............................................................................
 
+} // namespace win
 } // namespace err
 } // namespace axl

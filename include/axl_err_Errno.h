@@ -16,7 +16,7 @@ namespace err {
 
 // {25A6A7B5-F662-48ae-BCB6-9A5CB5CE5BB9}
 AXL_SL_DEFINE_GUID (
-	g_ErrnoGuid,
+	g_errnoGuid,
 	0x25a6a7b5, 0xf662, 0x48ae, 0xbc, 0xb6, 0x9a, 0x5c, 0xb5, 0xce, 0x5b, 0xb9
 	);
 
@@ -54,7 +54,7 @@ public:
 	size_t
 	create (int code)
 	{
-		return createSimpleError (g_ErrnoGuid, code);
+		return createSimpleError (g_errnoGuid, code);
 	}
 };
 

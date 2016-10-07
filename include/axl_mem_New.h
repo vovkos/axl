@@ -6,7 +6,7 @@
 
 #define _AXL_MEM_NEW_H
 
-#include "axl_mem_StdAllocator.h"
+#include "axl_mem_Allocator.h"
 
 namespace axl {
 namespace mem {

@@ -1,19 +1,20 @@
 #include "pch.h"
-#include "axl_err_NtError.h"
-#include "axl_err_WinError.h"
+#include "axl_sys_win_NtStatus.h"
+#include "axl_sys_win_WinError.h"
 
 namespace axl {
-namespace err {
+namespace sys {
+namespace win {
 
 //.............................................................................
 
 typedef 
 dword_t 
 WINAPI
-RtlNtStatusToDosErrorFunc (NTSTATUS);
+RtlNtStatusToDosErrorFunc (long);
 
 sl::String 
-NtErrorProvider::getErrorDescription (NTSTATUS status)
+NtStatusProvider::getErrorDescription (long status)
 {
 	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = NULL;
 
@@ -36,20 +37,21 @@ NtErrorProvider::getErrorDescription (NTSTATUS status)
 
 //.............................................................................
 
-ErrorHdr*
-NtError::create (NTSTATUS status)
+size_t
+NtStatus::create (long status)
 {
-	ErrorHdr* error = createBuffer (sizeof (ErrorHdr));
+	err::ErrorHdr* error = createBuffer (sizeof (err::ErrorHdr));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (ErrorHdr);
-	error->m_guid = g_ntErrorGuid;
+	error->m_size = sizeof (err::ErrorHdr);
+	error->m_guid = g_ntStatusGuid;
 	error->m_code = status;
-	return error;
+	return sizeof (err::ErrorHdr);
 }
 
 //.............................................................................
 
+} // namespace win
 } // namespace err
 } // namespace axl

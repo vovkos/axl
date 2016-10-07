@@ -5,7 +5,7 @@
 
 #if (_AXL_OS_WIN)
 
-#include "axl_err_NtError.h"
+#include "axl_sys_win_NtStatus.h"
 
 //.............................................................................
 
@@ -738,7 +738,7 @@ testNamedPipes ()
 			if (status == STATUS_NO_MORE_FILES)
 				break;
 
-			err::setError (err::NtError (status));
+			err::setError (sys::win::NtStatus (status));
 			printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
 			return; 
 		}
@@ -792,7 +792,7 @@ querySymbolicLink (
 
 	if (status < 0)
 	{
-		err::setError (err::NtError (status));
+		err::setError (sys::win::NtStatus (status));
 		printf ("cannot open symbolic link: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
@@ -808,7 +808,7 @@ querySymbolicLink (
 	status = ntQuerySymbolicLinkObject (link, &uniTarget, NULL);
 	if (status < 0)
 	{
-		err::setError (err::NtError (status));
+		err::setError (sys::win::NtStatus (status));
 		printf ("cannot query symbolic link: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
@@ -845,7 +845,7 @@ enumerateDirectory (
 
 	if (status < 0)
 	{
-		err::setError (err::NtError (status));
+		err::setError (sys::win::NtStatus (status));
 		printf ("cannot open directory: %s\n", err::getLastErrorDescription ().sz ());
 		return; 
 	}
@@ -882,7 +882,7 @@ enumerateDirectory (
 			if (status == STATUS_NO_MORE_ENTRIES)
 				break;
 
-			err::setError (err::NtError (status));
+			err::setError (sys::win::NtStatus (status));
 			printf ("cannot query directory: %s\n", err::getLastErrorDescription ().sz ());
 			return; 
 		}

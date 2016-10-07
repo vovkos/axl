@@ -5,8 +5,8 @@
 #include "axl_sys_SjljTry.h"
 
 #if (_AXL_OS_WIN)
-#	include "axl_err_WinError.h"
-#	include "axl_err_NtError.h"
+#	include "axl_sys_win_WinError.h"
+#	include "axl_sys_win_NtStatus.h"
 #elif (_AXL_OS_DARWIN)
 #	include "axl_sys_drw_MachError.h"
 #endif
@@ -21,11 +21,11 @@ ErrorMgr::ErrorMgr ()
 	m_tlsSlot = sys::getTlsMgr ()->createSlot ();
 
 	registerProvider (g_stdErrorGuid, sl::getSimpleSingleton <StdErrorProvider> ());
-	registerProvider (g_ErrnoGuid, sl::getSimpleSingleton <ErrnoProvider> ());
+	registerProvider (g_errnoGuid, sl::getSimpleSingleton <ErrnoProvider> ());
 
 #if (_AXL_OS_WIN)
-	registerProvider (g_winErrorGuid, sl::getSimpleSingleton <WinErrorProvider> ());
-	registerProvider (g_ntErrorGuid, sl::getSimpleSingleton <NtErrorProvider> ());
+	registerProvider (sys::win::g_winErrorGuid, sl::getSimpleSingleton <sys::win::WinErrorProvider> ());
+	registerProvider (sys::win::g_ntStatusGuid, sl::getSimpleSingleton <sys::win::NtStatusProvider> ());
 #elif (_AXL_OS_DARWIN)
 	registerProvider (sys::drw::g_MachErrorGuid, sl::getSimpleSingleton <sys::drw::MachErrorProvider> ());
 #endif

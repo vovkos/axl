@@ -6,7 +6,6 @@
 
 #define _AXL_REF_REFCOUNT_H
 
-#include "axl_mem_StdAllocator.h"
 #include "axl_sys_Atomic.h"
 
 namespace axl {

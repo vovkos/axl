@@ -4,36 +4,34 @@
 
 #pragma once 
 
-#define _AXL_ERR_NTERROR_H
+#define _AXL_ERR_WINERROR_H
 
 #include "axl_err_Error.h"
-#include "axl_sl_String.h"
 
 namespace axl {
-namespace err {
+namespace sys {
+namespace win {
 
 //.............................................................................
 
-typedef long NTSTATUS;
-
-// {81443347-3BC9-4d5e-8B23-32D780EDB52B}
+// {54E100E8-2137-40b8-BCD8-00AC1D0BAA16}
 AXL_SL_DEFINE_GUID (
-	g_ntErrorGuid,
-	0x81443347, 0x3bc9, 0x4d5e, 0x8b, 0x23, 0x32, 0xd7, 0x80, 0xed, 0xb5, 0x2b
+	g_winErrorGuid,
+	0x54e100e8, 0x2137, 0x40b8, 0xbc, 0xd8, 0x0, 0xac, 0x1d, 0xb, 0xaa, 0x16
 	);
 
 //.............................................................................
-	
-class NtErrorProvider: public ErrorProvider
+
+class WinErrorProvider: public err::ErrorProvider
 {
 public:
 	static
 	sl::String 
-	getErrorDescription (NTSTATUS status);
+	getErrorDescription (dword_t code);
 
 	virtual 
 	sl::StringRef
-	getErrorDescription (const ErrorRef& error)
+	getErrorDescription (const err::ErrorRef& error)
 	{
 		return getErrorDescription (error->m_code);
 	}
@@ -41,34 +39,34 @@ public:
 
 //.............................................................................
 
-class NtError: public Error
+class WinError: public err::Error
 {
 public:
-	NtError ()
+	WinError ()
 	{
 	}
 
-	NtError (NTSTATUS status)
+	WinError (dword_t code)
 	{
-		create (status);
+		create (code);
 	}
 
-	ErrorHdr* 
-	create (NTSTATUS status);
+	size_t
+	create (dword_t code);
 };
 
 //.............................................................................
 
 inline
 size_t
-setNtError (NTSTATUS status)
+setWinError (dword_t code)
 {
-	return setError (NtError (status));
+	return err::setError (WinError (code));
 }
 
 //.............................................................................
 
-
-} // namespace err
+} // namespace win
+} // namespace sys
 } // namespace axl
 

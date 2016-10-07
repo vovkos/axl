@@ -31,11 +31,10 @@ source_group (
 
 set (
 	ERR_H_LIST
-	${AXL_INC_DIR}/axl_err_Errno.h
 	${AXL_INC_DIR}/axl_err_Error.h
 	${AXL_INC_DIR}/axl_err_ErrorMgr.h
-	${AXL_INC_DIR}/axl_err_NtError.h
-	${AXL_INC_DIR}/axl_err_WinError.h		
+	${AXL_INC_DIR}/axl_err_SystemError.h
+	${AXL_INC_DIR}/axl_err_Errno.h
 	)
 
 set (
@@ -43,8 +42,6 @@ set (
 	axl_err_Errno.cpp
 	axl_err_Error.cpp
 	axl_err_ErrorMgr.cpp
-	axl_err_NtError.cpp
-	axl_err_WinError.cpp
 	)
 
 source_group (
@@ -53,13 +50,6 @@ source_group (
 	${ERR_H_LIST}
 	${ERR_CPP_LIST}
 	)
-
-if (NOT WIN32)
-	axl_exclude_from_build (
-		axl_err_NtError.cpp
-		axl_err_WinError.cpp
-		)
-endif ()
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -91,10 +81,9 @@ source_group (
 
 set (
 	MEM_H_LIST
-	${AXL_INC_DIR}/axl_mem_StdAllocator.h
+	${AXL_INC_DIR}/axl_mem_Allocator.h
 	${AXL_INC_DIR}/axl_mem_Block.h
 	${AXL_INC_DIR}/axl_mem_New.h
-	${AXL_INC_DIR}/axl_mem_Malloc.h
 	${AXL_INC_DIR}/axl_mem_Tracker.h
 	)
 
@@ -186,6 +175,8 @@ endif ()
 
 set (
 	SYS_WIN_H_LIST
+	${AXL_INC_DIR}/axl_sys_win_WinError.h		
+	${AXL_INC_DIR}/axl_sys_win_NtStatus.h
 	${AXL_INC_DIR}/axl_sys_win_CriticalSection.h
 	${AXL_INC_DIR}/axl_sys_win_Event.h
 	${AXL_INC_DIR}/axl_sys_win_Semaphore.h
@@ -202,12 +193,13 @@ set (
 	${AXL_INC_DIR}/axl_sys_win_Process.h
 	${AXL_INC_DIR}/axl_sys_win_AccessToken.h
 	${AXL_INC_DIR}/axl_sys_win_Sid.h
-	${AXL_INC_DIR}/axl_sys_win_HeapAlloc.h
 	${AXL_INC_DIR}/axl_sys_win_VirtualMemory.h
 	)
 
 set (
 	SYS_WIN_CPP_LIST
+	axl_sys_win_WinError.cpp
+	axl_sys_win_NtStatus.cpp
 	axl_sys_win_Thread.cpp
 	axl_sys_win_WaitableHandle.cpp
 	axl_sys_win_JobObject.cpp
@@ -363,7 +355,6 @@ set (
 	${AXL_INC_DIR}/axl_sl_Packetizer.h
 	${AXL_INC_DIR}/axl_sl_Protocol.h
 	${AXL_INC_DIR}/axl_sl_RbTree.h
-	${AXL_INC_DIR}/axl_sl_StringForward.h
 	${AXL_INC_DIR}/axl_sl_String.h
 	${AXL_INC_DIR}/axl_sl_StringDetails.h
 	${AXL_INC_DIR}/axl_sl_StringHashTable.h

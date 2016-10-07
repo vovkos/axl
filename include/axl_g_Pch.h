@@ -371,8 +371,6 @@ wcslen_s (const wchar_t* p)
 #	define AXL_GCC_NO_ASAN __attribute__((no_sanitize_address))
 #endif
 
-#define AXL_EXTERN_C extern "C"
-
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // min/max are WAY too conflict-prone, so we use non-conflicting versions

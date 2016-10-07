@@ -7,7 +7,7 @@
 #define _AXL_ERR_ERROR_H
 
 #include "axl_ref_Buf.h"
-#include "axl_sl_Guid.h"
+#include "axl_err_SystemError.h"
 
 namespace axl {
 namespace err {
@@ -24,123 +24,6 @@ enum StdErrorCode
 	StdErrorCode_String,
 	StdErrorCode_Stack,
 };
-
-//.............................................................................
-
-// system errors
-
-#if (_AXL_OS_WIN)
-
-extern const sl::Guid g_winErrorGuid;
-
-#define g_systemErrorGuid g_winErrorGuid
-
-enum SystemErrorCode
-{
-	SystemErrorCode_Success                  = ERROR_SUCCESS,
-	SystemErrorCode_Pending                  = ERROR_IO_PENDING,
-	SystemErrorCode_Cancelled                = ERROR_OPERATION_ABORTED,
-	SystemErrorCode_Unsuccessful             = ERROR_GEN_FAILURE,
-	SystemErrorCode_InsufficientResources    = ERROR_NO_SYSTEM_RESOURCES,
-	SystemErrorCode_NotImplemented           = ERROR_INVALID_FUNCTION,
-	SystemErrorCode_InvalidHandle            = ERROR_INVALID_HANDLE,
-	SystemErrorCode_AddressAlreadyExists     = ERROR_DUP_NAME,
-	SystemErrorCode_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
-	SystemErrorCode_TooManyAddresses         = ERROR_TOO_MANY_NAMES,
-	SystemErrorCode_InvalidAddress           = ERROR_UNEXP_NET_ERR,
-	SystemErrorCode_AddressClosed            = ERROR_NETNAME_DELETED,
-	SystemErrorCode_BufferOverflow           = ERROR_MORE_DATA,
-	SystemErrorCode_InvalidParameter         = ERROR_INVALID_PARAMETER,
-	SystemErrorCode_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
-	SystemErrorCode_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
-	SystemErrorCode_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
-	SystemErrorCode_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
-	SystemErrorCode_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
-	SystemErrorCode_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
-	SystemErrorCode_ConnectionReset          = ERROR_NETNAME_DELETED,
-	SystemErrorCode_IoTimeout                = ERROR_SEM_TIMEOUT,
-	SystemErrorCode_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
-	SystemErrorCode_DataNotAccepted          = ERROR_INVALID_DATA,
-	SystemErrorCode_MoreProcessingRequired   = ERROR_MORE_DATA,
-	SystemErrorCode_InvalidDeviceState       = ERROR_BAD_COMMAND,
-	SystemErrorCode_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
-	SystemErrorCode_HostUnreachable          = ERROR_HOST_UNREACHABLE,
-	SystemErrorCode_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
-	SystemErrorCode_PortUnreachable          = ERROR_PORT_UNREACHABLE,
-	SystemErrorCode_InvalidDeviceRequest     = ERROR_INVALID_FUNCTION,
-	SystemErrorCode_RequestAborted           = ERROR_REQUEST_ABORTED,
-	SystemErrorCode_BufferTooSmall           = ERROR_INSUFFICIENT_BUFFER,
-	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
-	SystemErrorCode_ObjectNameNotFound       = ERROR_FILE_NOT_FOUND,
-	SystemErrorCode_AccessDenied             = ERROR_ACCESS_DENIED,
-	SystemErrorCode_SharingViolation         = ERROR_SHARING_VIOLATION,
-	SystemErrorCode_NoMoreEntries            = ERROR_NO_MORE_ITEMS,
-};
-
-inline
-uint_t
-getLastSystemErrorCode ()
-{
-	return ::GetLastError ();
-}
-
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#elif (_AXL_OS_POSIX)
-
-extern const sl::Guid g_ErrnoGuid;
-
-#define g_systemErrorGuid g_ErrnoGuid
-
-enum SystemErrorCode
-{
-	SystemErrorCode_Success                  = 0,
-	SystemErrorCode_Cancelled                = EINTR,
-	SystemErrorCode_Unsuccessful             = EIO,
-	SystemErrorCode_InsufficientResources    = ENOMEM,
-	SystemErrorCode_NotImplemented           = ENOSYS,
-	SystemErrorCode_InvalidHandle            = EBADF,
-	SystemErrorCode_AddressAlreadyExists     = EEXIST,
-/*	SystemErrorCode_InvalidAddressComponent  = ERROR_INVALID_NETNAME,
-	SystemErrorCode_TooManyAddresses         = ERROR_TOO_MANY_NAMES, */
-	SystemErrorCode_InvalidAddress           = EINVAL,
-/*	SystemErrorCode_AddressClosed            = ERROR_NETNAME_DELETED,
-	SystemErrorCode_BufferOverflow           = ERROR_MORE_DATA,*/
-	SystemErrorCode_InvalidParameter         = EINVAL,
-/*	SystemErrorCode_ConnectionRefused        = ERROR_CONNECTION_REFUSED,
-	SystemErrorCode_ConnectionInvalid        = ERROR_CONNECTION_INVALID,
-	SystemErrorCode_AddressAlreadyAssociated = ERROR_ADDRESS_ALREADY_ASSOCIATED,
-	SystemErrorCode_AddressNotAssociated     = ERROR_ADDRESS_NOT_ASSOCIATED,
-	SystemErrorCode_ConnectionActive         = ERROR_CONNECTION_ACTIVE,
-	SystemErrorCode_ConnectionAborted        = ERROR_CONNECTION_ABORTED,
-	SystemErrorCode_ConnectionReset          = ERROR_NETNAME_DELETED,
-	SystemErrorCode_IoTimeout                = ERROR_SEM_TIMEOUT,
-	SystemErrorCode_GracefulDisconnect       = ERROR_GRACEFUL_DISCONNECT,
-	SystemErrorCode_DataNotAccepted          = ERROR_INVALID_DATA,
-	SystemErrorCode_MoreProcessingRequired   = ERROR_MORE_DATA, */
-	SystemErrorCode_InvalidDeviceState       = EBUSY,
-/*	SystemErrorCode_NetworkUnreachable       = ERROR_NETWORK_UNREACHABLE,
-	SystemErrorCode_HostUnreachable          = ERROR_HOST_UNREACHABLE,
-	SystemErrorCode_ProtocolUnreachable      = ERROR_PROTOCOL_UNREACHABLE,
-	SystemErrorCode_PortUnreachable          = ERROR_PORT_UNREACHABLE,*/
-	SystemErrorCode_InvalidDeviceRequest     = ENOSYS,
-//	SystemErrorCode_RequestAborted           = ERROR_REQUEST_ABORTED,
-	SystemErrorCode_BufferTooSmall           = ENOBUFS,
-//	SystemErrorCode_InvalidBufferSize        = ERROR_INVALID_USER_BUFFER,
-	SystemErrorCode_ObjectNameNotFound       = ENOENT,
-/*	SystemErrorCode_AccessDenied             = ERROR_ACCESS_DENIED,
-	SystemErrorCode_SharingViolation         = ERROR_SHARING_VIOLATION,
-	SystemErrorCode_NoMoreEntries            = ERROR_NO_MORE_ITEMS, */
-};
-
-inline
-uint_t
-getLastSystemErrorCode ()
-{
-	return errno;
-}
-
-#endif
 
 //.............................................................................
 
@@ -194,7 +77,7 @@ extern AXL_SELECT_ANY const ErrorHdr g_noError =
 {
 	sizeof (ErrorHdr),
 	g_stdErrorGuid,
-	SystemErrorCode_Success,
+	StdErrorCode_NoError,
 };
 
 //.............................................................................
