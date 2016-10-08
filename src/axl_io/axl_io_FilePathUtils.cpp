@@ -3,9 +3,6 @@
 #include "axl_err_Error.h"
 #include "axl_enc_Utf.h"
 
-namespace axl {
-namespace io {
-
 //.............................................................................
 
 #if (_AXL_OS_DARWIN)
@@ -30,6 +27,11 @@ get_current_dir_name ()
 	}
 }
 #endif
+
+namespace axl {
+namespace io {
+
+//.............................................................................
 
 sl::String 
 getTempDir ()

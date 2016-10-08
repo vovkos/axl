@@ -104,7 +104,7 @@ public:
 	{
 		bool result;
 
-		sl::StringRef cmdLine (cmdLine0, cmdLine0.getLength ());
+		sl::StringRef cmdLine (cmdLine0.cp (), cmdLine0.getLength ());
 
 		sl::String arg;
 		sl::String switchName;

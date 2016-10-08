@@ -82,13 +82,13 @@ cfTypeToString (
 		{
 			double x = 0;
 			::CFNumberGetValue (cfNumber, kCFNumberDoubleType, &x);
-			return sl::String::format_s ("%f", x);
+			return sl::formatString ("%f", x);
 		}
 		else
 		{
 			long long x = 0;
 			::CFNumberGetValue (cfNumber, kCFNumberLongLongType, &x);
-			return sl::String::format_s ("%lld", x);
+			return sl::formatString ("%lld", x);
 		}
 
 	}
