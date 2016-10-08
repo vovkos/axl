@@ -196,7 +196,7 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_c_cxx_flag_setting (
-		GCC_FLAG_RTTI
+		GCC_FLAG_CPP_RTTI
 		"GNU C++ emits RTTI info"
 		"-fno-rtti"
 		"-frtti" "-fno-rtti"
@@ -238,7 +238,7 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_c_cxx_flag_setting (
-		GCC_FLAG_WARNING_INVALID_OFFSET
+		GCC_FLAG_CPP_WARNING_INVALID_OFFSET
 		"GNU C++ shows warnings on invalid-offset declarations"
 		"-Wno-invalid-offsetof"
 		"-Winvalid-offsetof" "-Wno-invalid-offsetof"

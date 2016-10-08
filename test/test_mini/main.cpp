@@ -2287,7 +2287,7 @@ BOOL WriteSlot(HANDLE hSlot, const char* lpszMessage)
    BOOL fResult; 
    DWORD cbWritten; 
  
-   fResult = WriteFile(hSlot, 
+   fResult = ::WriteFile(hSlot, 
 	 lpszMessage, 
 	 strlen (lpszMessage),
 	 &cbWritten, 
@@ -2616,47 +2616,6 @@ testCmdLine (
 
 //.............................................................................
 
-class A
-{
-	char* m_p;
-	
-public:
-	A ()
-	{
-		m_p = "zhopa!";
-	}
-
-	operator char* ()
-	{
-		printf ("operator char* ()\n");
-		return m_p;
-	}
-
-	operator const char* () const
-	{
-		printf ("operator const char* () const\n");
-		return m_p;
-	}
-
-	const char& operator [] (intptr_t i) const
-	{
-		printf ("const char& operator [] (intptr_t i) const\n");
-		return m_p [i];
-	}
-
-	char& operator [] (intptr_t i)
-	{
-		printf ("char& operator [] (intptr_t i)\n");
-		return m_p [i];
-	}
-};
-
-#include <vector>
-
-void foo (const char* c)
-{
-}
-
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2675,9 +2634,6 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);	
 #endif
-
-	A a;
-	foo ((const char*) a);
 
 	testCmdLine (argc, argv);
 

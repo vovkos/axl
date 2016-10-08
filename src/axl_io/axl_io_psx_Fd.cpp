@@ -17,7 +17,7 @@ Fd::open (
 {
 	close ();
 
-	m_h = ::open (fileName, openFlags, mode);
+	m_h = ::open (fileName.sz (), openFlags, mode);
 	return err::complete (m_h != -1);
 }
 

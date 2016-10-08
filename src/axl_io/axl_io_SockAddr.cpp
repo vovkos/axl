@@ -9,7 +9,7 @@ namespace io {
 
 //.............................................................................
 
-sl::StringRef
+const char*
 getSockAddrFamilyString (uint_t family)
 {
 	switch (family)
@@ -41,7 +41,7 @@ getSockAddrFamilySize (uint_t family)
 	}
 }
 
-sl::StringRef
+const char*
 getSockProtoString (uint_t proto)
 {
 	switch (proto)

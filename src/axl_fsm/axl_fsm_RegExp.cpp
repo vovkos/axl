@@ -1217,14 +1217,14 @@ RegExpCompiler::namedRegExp (const sl::StringRef& name)
 {
 	if (!m_nameMgr)	
 	{
-		err::setFormatStringError ("named regexp '%s' is used but name manager is not set", name);
+		err::setFormatStringError ("named regexp '%s' is used but name manager is not set", name.sz ());
 		return NULL;
 	}
 
 	sl::StringRef source = m_nameMgr->findName (name);
 	if (source.isEmpty ())
 	{
-		err::setFormatStringError ("named regexp '%s' is not defined", name);
+		err::setFormatStringError ("named regexp '%s' is not defined", name.sz ());
 		return NULL;
 	}
 

@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "axl_io_File.h"
 #include "axl_io_Mapping.h"
-#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -79,12 +78,12 @@ File::open (
 
 	// TODO: handle exclusive and share write flags with fcntl locks
 
-	bool result = m_file.open (fileName, posixFlags);
+	bool result = m_file.open (fileName.sz (), posixFlags);
 	if (!result)
 		return false;
 
 	if (flags & FileFlag_DeleteOnClose)
-		unlink (fileName);
+		::unlink (fileName.sz ());
 
 	if (flags & FileFlag_Clear)
 		m_file.setSize (0);

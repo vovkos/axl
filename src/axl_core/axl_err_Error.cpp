@@ -47,7 +47,7 @@ Error::push (const ErrorRef& error)
 
 	createBuffer (size, true);
 	if (!m_p)
-		return NULL;
+		return -1;
 
 	memmove (
 		(uchar_t*) m_p + sizeof (ErrorHdr) + error->m_size,
@@ -71,7 +71,7 @@ Error::createSimpleError (
 {
 	createBuffer (sizeof (ErrorHdr));
 	if (!m_p)
-		return NULL;
+		return -1;
 
 	m_p->m_size = sizeof (ErrorHdr);
 	m_p->m_guid = guid;
@@ -97,7 +97,7 @@ Error::format_va (
 
 	createBuffer (size);
 	if (!m_p)
-		return NULL;
+		return -1;
 
 	m_p->m_size = (uint32_t) size;
 	m_p->m_guid = guid;
@@ -115,7 +115,7 @@ Error::createStringError (const sl::StringRef& string)
 
 	ErrorHdr* error = createBuffer (size);
 	if (!error)
-		return NULL;
+		return -1;
 
 	error->m_size = (uint32_t) size;
 	error->m_guid = g_stdErrorGuid;

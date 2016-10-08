@@ -53,7 +53,7 @@ SharedMemory::open (
 {
 	close ();
 
-	m_h = ::shm_open (name, flags, mode);
+	m_h = ::shm_open (name.sz (), flags, mode);
 	return err::complete (m_h != -1);
 }
 

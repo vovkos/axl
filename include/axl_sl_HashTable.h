@@ -331,6 +331,17 @@ class HashTableMap: public HashTable <
 	>
 {
 public:
+	typedef HashTable <
+		Key,
+		Hash,
+		Eq,
+		KeyArg,
+		HashTableMapEntry <Key, Value>
+		> BaseType;
+	
+	typedef typename BaseType::Iterator Iterator;
+	
+public:
 	Value&
 	operator [] (KeyArg key)
 	{
@@ -343,7 +354,7 @@ public:
 		ValueArg undefinedValue
 		) const
 	{
-		Iterator it = find (key);
+		Iterator it = this->find (key);
 		return it ? it->m_value : undefinedValue;
 	}
 
@@ -353,7 +364,7 @@ public:
 		ValueArg value
 		)
 	{
-		Iterator it = visit (key);
+		Iterator it = this->visit (key);
 		it->m_value = value;
 		return it;
 	}

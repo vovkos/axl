@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "axl_xml_ExpatParser.h"
-#include "axl_io_MappedFile.h"
 
 namespace axl {
 namespace xml {

@@ -48,7 +48,7 @@ NamedSem::open (
 {
 	close ();
 
-	m_sem = sem_open (name, flags, mode, value);
+	m_sem = sem_open (name.sz (), flags, mode, value);
 	return err::complete (m_sem != SEM_FAILED);
 }
 

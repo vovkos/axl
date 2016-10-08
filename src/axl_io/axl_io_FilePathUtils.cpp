@@ -16,12 +16,12 @@ get_current_dir_name ()
 
 	for (;;)
 	{
-		char* buffer = (char*) malloc (size);
-		char* result = getcwd (buffer, size);
+		char* buffer = (char*) ::malloc (size);
+		char* result = ::getcwd (buffer, size);
 		if (result == buffer)
 			return buffer;
 
-		free (buffer);
+		::free (buffer);
 
 		if (errno != ERANGE)
 			return NULL;
@@ -51,9 +51,9 @@ getCurrentDir ()
 	::GetCurrentDirectoryW (countof (dir) - 1, dir);
 	return dir;
 #elif (_AXL_OS_POSIX)
-	char* p = get_current_dir_name ();
+	char* p = ::get_current_dir_name ();
 	sl::String dir = p;
-	free (p);
+	::free (p);
 	return dir;
 #endif
 }
@@ -67,7 +67,7 @@ getExeFilePath ()
 	::GetModuleFileNameA (::GetModuleHandle (NULL), buffer, countof (buffer) - 1);
 #elif (_AXL_OS_POSIX)
 #	if (_AXL_OS_LINUX)
-	readlink ("/proc/self/exe", buffer, countof (buffer) - 1);
+	::readlink ("/proc/self/exe", buffer, countof (buffer) - 1);
 #	elif (_AXL_OS_DARWIN)
 	uint32_t size = sizeof (buffer);
 	_NSGetExecutablePath (buffer, &size);
@@ -95,7 +95,7 @@ doesFileExist (const sl::StringRef& fileName)
 	dword_t attributes = ::GetFileAttributesW (fileName_w);
 	return attributes != INVALID_FILE_ATTRIBUTES;
 #elif (_AXL_OS_POSIX)
-	return access (fileName, F_OK) != -1;
+	return ::access (fileName.sz (), F_OK) != -1;
 #endif
 }
 
@@ -165,17 +165,19 @@ isDir (const sl::StringRef& fileName)
 {
 	struct stat st;
 
-	int result = stat (fileName, &st);
+	int result = ::stat (fileName.sz (), &st);
 	return result == 0 && S_ISDIR (st.st_mode);
 }
 
 bool
-ensureDirExists (const sl::StringRef& fileName)
+ensureDirExists (const sl::StringRef& fileName0)
 {
+	sl::String fileName = fileName0;
+	
 	if (isDir (fileName))
 		return true;
 
-	const char* p = fileName;
+	const char* p = fileName.p (); // ensure exclusive buffer (we're going to modify it)
 	while (*p == '/') // skip root
 		p++;
 
@@ -190,7 +192,7 @@ ensureDirExists (const sl::StringRef& fileName)
 
 		if (!isDir (fileName))
 		{
-			int result = mkdir (fileName, S_IRWXU);
+			int result = ::mkdir (fileName, S_IRWXU);
 			if (result != 0)
 				return err::failWithLastSystemError ();
 		}
@@ -225,7 +227,7 @@ getFullFilePath (const sl::StringRef& fileName)
 	return filePath;
 #elif (_AXL_OS_POSIX)
 	char fullPath [PATH_MAX] = { 0 };
-	realpath (fileName, fullPath);
+	::realpath (fileName.sz (), fullPath);
 	return fullPath;
 #endif
 }
@@ -254,8 +256,9 @@ getDir (const sl::StringRef& filePath)
 	return string;
 
 #elif (_AXL_OS_POSIX)
-	const char* p = strrchr (filePath, '/');
-	return sl::String (filePath, p ? p - filePath : -1);
+	const char* p0 = filePath.sz ();
+	const char* p = strrchr (p0, '/');
+	return p ? sl::String (p0, p - p0) : filePath;
 #endif
 }
 
@@ -282,8 +285,8 @@ getFileName (const sl::StringRef& filePath)
 	string.append (extension);
 	return string;
 #elif (_AXL_OS_POSIX)
-	const char* p = strrchr (filePath, '/');
-	return p ? p + 1 : filePath;
+	const char* p = strrchr (filePath.sz (), '/');
+	return p ? sl::String (p + 1) : filePath;
 #endif
 }
 

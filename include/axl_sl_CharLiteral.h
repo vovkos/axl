@@ -27,7 +27,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-sl::StringRef
+const char*
 getCharLiteral (uchar_t c)
 {
 	static char literalTable [256] [4];
@@ -51,7 +51,7 @@ public:
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-sl::StringRef
+const char*
 getCharCodeLiteral (uchar_t c)
 {
 	static char literalTable [256] [4];

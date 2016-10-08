@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "axl_sl_String.h"
 #include "axl_sl_Handle.h"
 #include "axl_err_ErrorMgr.h"
 

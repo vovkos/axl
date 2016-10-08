@@ -98,7 +98,7 @@ public:
 	bool
 	unlink (const sl::StringRef& name)
 	{
-		int result = ::shm_unlink (name);
+		int result = ::shm_unlink (name.sz ());
 		return err::complete (result != -1);
 	}
 };

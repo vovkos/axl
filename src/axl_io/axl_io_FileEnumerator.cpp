@@ -52,7 +52,7 @@ FileEnumerator::openDir (const sl::StringRef& dir)
 	close ();
 	m_nextFileName.clear ();
 
-	m_h = ::opendir (dir);
+	m_h = ::opendir (dir.sz ());
 	if (!m_h)
 		return err::failWithLastSystemError ();
 

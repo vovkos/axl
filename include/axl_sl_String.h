@@ -7,6 +7,7 @@
 #define _AXL_SL_STRING_H
 
 #include "axl_sl_StringDetails.h"
+#include "axl_sl_Hash.h"
 #include "axl_ref_Buf.h"
 
 namespace axl {
@@ -817,21 +818,21 @@ public:
 	const C&
 	operator [] (intptr_t i) const
 	{
-		ASSERT ((size_t) i < m_length);
-		return m_p [(size_t) i];
+		ASSERT ((size_t) i < this->m_length);
+		return this->m_p [(size_t) i];
 	}
 
 	C&
 	operator [] (intptr_t i)
 	{
-		ASSERT ((size_t) i < m_length);
-		return m_p [(size_t) i];
+		ASSERT ((size_t) i < this->m_length);
+		return this->m_p [(size_t) i];
 	}
 
 	C*
 	p ()
 	{
-		return m_p;
+		return this->m_p;
 	}
 
 	const C*

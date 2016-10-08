@@ -10,6 +10,8 @@
 #	include "axl_io_UsbPch.h"
 #endif
 
+#include "axl_g_Module.h"
+
 #if (_AXL_OS_WIN)
 #	include <iphlpapi.h>
 #	include <winioctl.h>

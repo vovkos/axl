@@ -215,7 +215,7 @@ renameFile (
 	const sl::StringRef& dstFileName
 	)
 {
-	int result = rename (srcFileName, dstFileName);
+	int result = ::rename (srcFileName.sz (), dstFileName.sz ());
 	return err::complete (result == 0);
 }
 
@@ -223,7 +223,7 @@ inline
 bool
 deleteFile (const sl::StringRef& fileName)
 {
-	int result = unlink (fileName);
+	int result = ::unlink (fileName.sz ());
 	return err::complete (result == 0);
 }
 

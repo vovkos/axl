@@ -131,9 +131,9 @@ LuaStringTemplate::emit_lua (lua_State* h)
 	size_t count = luaState.getTop ();
 	for (size_t i = 1; i <= count; i++)
 	{
-		sl::StringRef& p = luaState.getString (i);
-		context->m_output->append (p);
-		context->m_lineCol.incrementalCount (p);
+		sl::StringRef string = luaState.getString (i);
+		context->m_output->append (string);
+		context->m_lineCol.incrementalCount (string);
 	}
 
 	return 0;
@@ -152,7 +152,6 @@ LuaStringTemplate::passthrough_lua (lua_State* h)
 	size_t length = luaState.getInteger (2);
 
 	sl::StringRef string = context->m_frame.getSubString (offset, length);
-
 	context->m_output->append (string);
 	context->m_lineCol.incrementalCount (string);
 

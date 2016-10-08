@@ -13,7 +13,7 @@ namespace io {
 
 //.............................................................................
 
-sl::StringRef
+const char*
 getSockAddrFamilyString (uint_t family);
 
 size_t
@@ -26,7 +26,7 @@ getSockAddrSize (const sockaddr* addr)
 	return getSockAddrFamilySize (addr->sa_family);
 }
 
-sl::StringRef
+const char*
 getSockProtoString (uint_t proto);
 
 //.............................................................................

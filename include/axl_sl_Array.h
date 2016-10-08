@@ -312,15 +312,15 @@ public:
 	const T&
 	operator [] (intptr_t i) const
 	{
-		ASSERT ((size_t) i < m_count);
-		return m_p [i];
+		ASSERT ((size_t) i < this->m_count);
+		return this->m_p [i];
 	}
 
 	T&
 	operator [] (intptr_t i)
 	{
-		ASSERT ((size_t) i < m_count);
-		return m_p [i];
+		ASSERT ((size_t) i < this->m_count);
+		return this->m_p [i];
 	}
 
 	T*

@@ -16,10 +16,10 @@ DynamicLibrary::open (
 {
 	close ();
 
-	m_h = ::dlopen (name, flags);
+	m_h = ::dlopen (name.sz (), flags);
 	if (!m_h)
 	{
-		err::setError (dlerror ());
+		err::setError (::dlerror ());
 		return false;
 	}
 
@@ -29,10 +29,10 @@ DynamicLibrary::open (
 void*
 DynamicLibrary::getSymbol (const sl::StringRef& name)
 {
-	void* p = ::dlsym (m_h, name);
+	void* p = ::dlsym (m_h, name.sz ());
 	if (!p)
 	{
-		err::setError (dlerror ());
+		err::setError (::dlerror ());
 		return NULL;
 	}
 

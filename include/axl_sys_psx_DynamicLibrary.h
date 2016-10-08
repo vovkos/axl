@@ -7,6 +7,7 @@
 #define _AXL_SYS_PSX_DYNAMICLIBRARY_H
 
 #include "axl_sl_Handle.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace sys {

@@ -199,7 +199,7 @@ public:
 		size_t size = sizeof (ErrorHdr) + packSize;
 		createBuffer (size);
 		if (!m_p)
-			return NULL;
+			return -1;
 
 		m_p->m_size = size;
 		m_p->m_guid = guid;

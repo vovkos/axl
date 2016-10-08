@@ -40,7 +40,7 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 	sys::lnx::UdevListEntry it = enumerator.getListEntry ();
 	for (; it; it++)
 	{
-		const char* path = it.getName ();
+		sl::StringRef path = it.getName ();
 		sys::lnx::UdevDevice device = udev.getDeviceFromSysPath (path);
 		if (!device)
 			continue;
@@ -51,9 +51,9 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 
 		parentDevice.addRef (); // getParent does not add ref
 
-		const char* name = device.getDevNode ();
-		const char* driver = parentDevice.getDriver ();
-		if (driver && strcmp (driver, "serial8250") == 0)
+		sl::StringRef name = device.getDevNode ();
+		sl::StringRef driver = parentDevice.getDriver ();
+		if (driver == "serial8250")
 		{
 			// serial8250 driver has a hardcoded number of ports
 			// the only way to tell which actually exist on a given system
@@ -69,11 +69,11 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 				continue;
 		}
 
-		const char* description = device.getPropertyValue ("ID_MODEL_FROM_DATABASE");
-		if (!description)
+		sl::StringRef description = device.getPropertyValue ("ID_MODEL_FROM_DATABASE");
+		if (description.isEmpty ())
 			description = device.getPropertyValue ("ID_MODEL");
 
-		if (!description)
+		if (description.isEmpty ())
 			description = driver;
 
 		SerialPortDesc* portDesc = AXL_MEM_NEW (SerialPortDesc);

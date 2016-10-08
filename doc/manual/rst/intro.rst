@@ -38,17 +38,20 @@ Why Use AXL?
 
 * TLS-based error handling model
 
-* Built-in wrappers for many popular C libraries
+* Built-in wrappers for many popular libraries/services
 
 	- OpenSSL
 	- LibSSH2
-	- Lua
-	- PCap
+	- LibLua
+	- LinPCap
 	- LibUSB
-	- Expat
+	- LibExpat
 	- Ragel
 	- CoreFoundation
 	- IOKit
+	- LibUDev
+	- Windows Service Control Manager
+	- Windows Setup API
 
 * Built-in special features
 	- Lua string templates	-

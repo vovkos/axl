@@ -159,13 +159,13 @@ struct Token
 	}
 
 	static
-	sl::StringRef
+	const char*
 	getName (int token)
 	{
 		return Name () (token);
 	}
 
-	sl::StringRef
+	const char*
 	getName () const
 	{
 		return getName (m_token);
@@ -178,7 +178,7 @@ struct Token
 class Class \
 { \
 public: \
-	sl::StringRef \
+	const char* \
 	operator () (int tokenKind) \
 	{ \
 		switch (tokenKind) \

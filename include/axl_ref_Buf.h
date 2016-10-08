@@ -314,26 +314,26 @@ public:
 
 	operator const T* () const
 	{ 
-		return m_p; 
+		return this->m_p; 
 	}
 
 	operator T* ()
 	{ 
-		return m_p; 
+		return this->m_p; 
 	}
 
 	const T* 
 	operator -> () const
 	{ 
-		ASSERT (m_p);
-		return m_p; 
+		ASSERT (this->m_p);
+		return this->m_p; 
 	}
 
 	T* 
 	operator -> ()
 	{ 
-		ASSERT (m_p);
-		return m_p; 
+		ASSERT (this->m_p);
+		return this->m_p; 
 	}
 
 	Buf& 
@@ -360,7 +360,7 @@ public:
 	T*
 	p ()
 	{
-		return ensureExclusive () ? m_p : NULL;
+		return ensureExclusive () ? this->m_p : NULL;
 	}
 
 	void
@@ -378,7 +378,7 @@ public:
 			return;
 		}
 
-		if (m_size)
+		if (this->m_size)
 			this->m_p->~T ();
 
 		this->m_p = (T*) (this->m_hdr + 1);
@@ -417,7 +417,7 @@ public:
 		if (!createBuffer (size, false))
 			return -1;
 
-		*m_p = *p;
+		*this->m_p = *p;
 		if (size > sizeof (T))
 			memcpy (this->m_p + 1, p + 1, size - sizeof (T));
 
@@ -433,13 +433,13 @@ public:
 	bool 
 	ensureExclusive ()
 	{ 
-		return m_size ? createBuffer (m_size, true) != NULL : true; 
+		return this->m_size ? createBuffer (this->m_size, true) != NULL : true; 
 	}
 
 	T* 
 	getBuffer (size_t* size = NULL)
 	{
-		T* p = createBuffer (m_size, true);
+		T* p = createBuffer (this->m_size, true);
 		if (!p)
 			return NULL;
 
@@ -492,10 +492,10 @@ public:
 
 		if (saveContents && this->m_p)
 		{
-			new (p) T (*m_p);
+			new (p) T (*this->m_p);
 			size_t copySize = AXL_MIN (size, this->m_size);
 			if (copySize > sizeof (T))
-				memcpy (p + 1, m_p + 1, copySize - sizeof (T));
+				memcpy (p + 1, this->m_p + 1, copySize - sizeof (T));
 		}
 		else
 		{

@@ -120,7 +120,7 @@ public:
 	bool
 	unlink (const sl::StringRef& name)
 	{
-		int result = ::sem_unlink (name);
+		int result = ::sem_unlink (name.sz ());
 		return err::complete (result == 0);
 	}
 

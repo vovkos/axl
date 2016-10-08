@@ -59,7 +59,7 @@ LuaState::trace ()
 		switch (type) 
 		{    
 		case LUA_TSTRING:
-			TRACE ("%08x %s\n", p, getString(i));
+			TRACE ("%08x %s\n", p, getString (i).sz ());
 			break;
 	
 		case LUA_TBOOLEAN:
@@ -71,7 +71,7 @@ LuaState::trace ()
 			break;
 
 		default:
-			TRACE ("%08x %s\n", p, getTypeName (type));
+			TRACE ("%08x %s\n", p, getTypeName (type).sz ());
 			break;
 	
 		}
