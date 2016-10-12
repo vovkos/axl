@@ -43,8 +43,11 @@ include (dependencies.cmake)
 axl_print_std_settings ()
 
 get_cmake_property (_VARIABLE_LIST VARIABLES)
-string (REPLACE ";" "|" _FILTER "${AXL_PATH_LIST}")
-string (REGEX MATCHALL ${_FILTER} _FILTERED_VARIABLE_LIST ${_VARIABLE_LIST})
+string (REPLACE ";" ":" _FILTER "${AXL_PATH_LIST}")
+string (REPLACE ":" "\;|\;" _FILTER "${_FILTER}")
+set (_FILTER "\;${_FILTER}\;")
+
+string (REGEX MATCHALL ";${_FILTER};" _FILTERED_VARIABLE_LIST ";${_VARIABLE_LIST};")
 
 message(STATUS "Path defintions in ${_PATHS_CMAKE}:")
 

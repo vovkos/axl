@@ -154,6 +154,14 @@ include (${_AXL_INIT_CMAKE} NO_POLICY_SCOPE)
 include (${_PATHS_CMAKE})
 include (${CMAKE_SOURCE_DIR}/dependencies.cmake)
 
+# find and include settings.cmake
+
+axl_find_file_recurse_parent_dirs (_SETTINGS_CMAKE settings.cmake ${CMAKE_CURRENT_LIST_DIR})
+
+if (_SETTINGS_CMAKE)
+	include (${_SETTINGS_CMAKE})
+endif ()
+
 # diagnostic printing
 
 axl_print_std_settings ()

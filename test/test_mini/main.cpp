@@ -2616,6 +2616,10 @@ testCmdLine (
 
 //.............................................................................
 
+#include <string>
+
+std::string testStlString (const std::string& s);
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2636,6 +2640,9 @@ main (
 #endif
 
 	testCmdLine (argc, argv);
+
+	printf ("__cplusplus = %d / 0x%x\n", __cplusplus, __cplusplus);
+//	testStlString ("hui!");
 
 	return 0;
 }

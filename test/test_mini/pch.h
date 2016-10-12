@@ -65,7 +65,7 @@ using namespace axl;
 #		pragma warning (disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
 #	endif
 extern "C" {
-#	include <libusb.h>
+#	include <libusb-1.0/libusb.h>
 } // extern "C" {
 #endif
 

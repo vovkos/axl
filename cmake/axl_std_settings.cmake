@@ -19,11 +19,23 @@ axl_create_cpu_setting)
 			)
 	endif ()
 
-	if (GCC)
-		if ("${AXL_CPU}" STREQUAL "amd64")
+	if ("${AXL_CPU}" STREQUAL "amd64")
+		set (CMAKE_SIZEOF_VOID_P 8)
+		
+		set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
+		set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS FALSE)
+
+		if (GCC)
 			set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -mcx16")
 			set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -m64 -mcx16")
-		elseif ("${AXL_CPU}" STREQUAL "x86")
+		endif ()
+	elseif ("${AXL_CPU}" STREQUAL "x86")
+		set (CMAKE_SIZEOF_VOID_P 4)
+
+		set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS FALSE)
+		set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS TRUE)
+
+		if (GCC)
 			set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 			set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -m32")
 		endif ()

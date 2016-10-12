@@ -33,12 +33,13 @@ set (
 	AXL_IMPORT_LIST
 	
 	OPTIONAL
-		ragel 
 		lua
 		pcap
 		libusb
 		openssl
 		expat
+
+		ragel 
 		doxygen
 		doxyrest
 		sphinx

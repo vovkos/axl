@@ -210,19 +210,20 @@ axl_create_flag_list_regex
 endmacro ()
 
 macro (
-axl_create_c_cxx_flag_setting
+axl_create_or_set_compiler_flag_setting
 	_SETTING
 	_DESCRIPTION
-	_DEFAULT_VALUE
+	_FORCE
+	_VALUE
 	# ...
 	)
 
 	set (_FLAG_LIST ${ARGN})
 	axl_create_flag_list_regex (_REGEX ${_FLAG_LIST})
 
-	set (_CONFIGURATION_SUFFIX)
-
 	# check if this is per-configuration setting
+
+	set (_CONFIGURATION_SUFFIX)
 
 	string (TOUPPER "${_SETTING}" _SETTING_UC)
 
@@ -334,46 +335,28 @@ axl_create_c_cxx_flag_setting
 
 	# apply setting to C/C++ flags
 
-	if (NOT _IS_CPP_ONLY)
-		if ("${_CURRENT_VALUE_C}" STREQUAL "")
-			set (CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX} "${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}} ${${_SETTING}}")
-		else  ()
-			string (
-				REGEX REPLACE
-				"${_REGEX}"
-				" ${${_SETTING}} "
-				CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
-				"${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}}"
-				)
-		endif ()
+	axl_set_c_cxx_flag_setting (${_SETTING} ${${_SETTING}})
 
-		string (
-			STRIP
-			"${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}}"
-			CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
-			)
-	endif ()
-
-	if (NOT _IS_C_ONLY)
-		if ("${_CURRENT_VALUE_CXX}" STREQUAL "")
-			set (CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX} "${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}} ${${_SETTING}}")
-		else  ()
-			string (
-				REGEX REPLACE
-				"${_REGEX}"
-				" ${${_SETTING}} "
-				CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
-				"${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}}"
-				)
-		endif ()
-
-		string (
-			STRIP
-			"${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}}"
-			CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
-			)
-	endif ()
 endmacro ()
+
+macro (
+axl_create_c_cxx_flag_setting
+	_SETTING
+	_DESCRIPTION
+	_DEFAULT_VALUE
+	# ...
+	)
+
+	get_property (
+		CACHE
+		${_SETTING}
+		PROPERTY STRINGS
+		" " ${_FLAG_LIST}
+		)
+
+
+
+endif ()
 
 #..............................................................................
 
@@ -613,15 +596,17 @@ axl_find_executable
 	)
 
 	if (WIN32)
-		set (_WHICH where)
+		execute_process (
+			COMMAND where ${_FILE_NAME}
+			OUTPUT_VARIABLE _OUTPUT
+			)
 	else ()
-		set (_WHICH which)
+		execute_process (
+			COMMAND which ${_FILE_NAME} 
+			ERROR_FILE /dev/null
+			OUTPUT_VARIABLE _OUTPUT
+			)
 	endif ()
-
-	execute_process (
-		COMMAND ${_WHICH} ${_FILE_NAME}
-		OUTPUT_VARIABLE _OUTPUT
-		)
 
 	string (STRIP "${_OUTPUT}" _OUTPUT)
 
