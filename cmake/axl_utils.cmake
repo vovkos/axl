@@ -103,7 +103,7 @@ endmacro ()
 
 #..............................................................................
 
-# detect host CPU (currently we only care about x86 vs amd64)
+# detect host CPU (currently we only care support x86 and amd64)
 
 macro (
 axl_detect_cpu
@@ -157,13 +157,37 @@ endmacro ()
 macro (
 axl_create_setting
 	_SETTING
-	_DEFAULT_VALUE
-	_TYPE
-	_DESCRIPTION
 	# ...
 	)
 
-	if (NOT ${_SETTING})
+	set (_ARG_LIST ${ARGN})
+
+	set (_DESCRIPTION "${_SETTING}")
+	set (_DEFAULT_VALUE)
+	set (_TYPE STRING)
+	set (_OPTION_LIST)
+	set (_STATE "OPTIONS")
+
+	foreach (_ARG ${_ARG_LIST})
+		string (REGEX MATCH "TYPE|DESCRIPTION|DEFAULT|OPTIONS" _MATCH ${_ARG})
+
+		if (NOT ${_MATCH} STREQUAL "")
+			set (_STATE ${_MATCH})
+		elseif (${_STATE} STREQUAL "TYPE")
+			set (_TYPE ${_ARG})
+			set (_STATE "OPTIONS")
+		elseif (${_STATE} STREQUAL "DESCRIPTION")
+			set (_DESCRIPTION ${_ARG})
+			set (_STATE "OPTIONS")
+		elseif (${_STATE} STREQUAL "DEFAULT")
+			set (_DEFAULT_VALUE ${_ARG})
+			set (_STATE "OPTIONS")
+		else ()
+			set (_OPTION_LIST ${_OPTION_LIST} ${_ARG})
+		endif ()
+	endforeach ()
+
+	if ("${${_SETTING}}" STREQUAL "")
 		set (_FORCE FORCE)
 	else ()
 		set (_FORCE)
@@ -174,12 +198,9 @@ axl_create_setting
 		CACHE ${_TYPE} ${_DESCRIPTION} ${_FORCE}
 		)
 
-	if (${ARGC} GREATER 4)
-		set (_OPTION_LIST ${ARGN})
-
-		set_property	(
-			CACHE
-			${_SETTING}
+	if (_OPTION_LIST)
+		set_property (
+			CACHE ${_SETTING}
 			PROPERTY STRINGS
 			${_OPTION_LIST}
 			)
@@ -187,41 +208,180 @@ axl_create_setting
 endmacro ()
 
 macro (
-axl_create_flag_list_regex
+axl_override_setting
+	_SETTING
+	# ...
+	)
+
+	set (_ARG_LIST ${ARGN})
+	if (_ARG_LIST)
+		list (GET _ARG_LIST 0 _VALUE)
+	else ()
+		set (_VALUE)
+	endif ()
+
+	get_property (
+		_TYPE
+		CACHE ${_SETTING}
+		PROPERTY TYPE
+		)
+
+	get_property (
+		_DESCRIPTION
+		CACHE ${_SETTING}
+		PROPERTY HELPSTRING
+		)
+
+	if ("${_TYPE}" STREQUAL "" OR "${_DESCRIPTION}" STREQUAL "")
+		message (FATAL_ERROR "${_SETTING} is not a cached setting")
+	endif ()
+
+	set (
+		${_SETTING} ${_VALUE}
+		CACHE ${_TYPE} ${_DESCRIPTION} FORCE
+		)
+endmacro ()
+
+macro (
+axl_override_setting_once
+	_SETTING
+	# ...
+	)
+
+	if ("${${_SETTING}_OVERRIDEN}" STREQUAL "")
+		axl_override_setting (${_SETTING} ${ARGN})
+
+		set (
+			${_SETTING}_OVERRIDEN TRUE
+			CACHE INTERNAL "${_SETTING} is overriden"
+			)
+	endif ()
+endmacro ()
+
+#..............................................................................
+
+# compiler flag settings (mutually exclusive options in CMAKE_C/CXX_FLAGS)
+
+macro (
+axl_create_compiler_flag_regex
 	_REGEX
 	# ...
 	)
 
-	set (_FLAG_LIST ${ARGN})
+	set (_OPTION_LIST ${ARGN})
 
 	set (${_REGEX} "")
 
-	foreach (_FLAG ${_FLAG_LIST})
-		string (REPLACE "+" "%+" _FLAG ${_FLAG}) # e.g. -std=c++0x
+	foreach (_OPTION ${_OPTION_LIST})
+		string (REPLACE "+" "%+" _OPTION ${_OPTION}) # e.g. -std=c++0x
 
-		set (_FLAG_REGEX "(^| +)${_FLAG}($| +)")
+		set (_OPTION_REGEX "(^| +)${_OPTION}($| +)")
 
 		if (${_REGEX} STREQUAL "")
-			set (${_REGEX} ${_FLAG_REGEX})
+			set (${_REGEX} ${_OPTION_REGEX})
 		else ()
-			set (${_REGEX} "${${_REGEX}}|${_FLAG_REGEX}")
+			set (${_REGEX} "${${_REGEX}}|${_OPTION_REGEX}")
 		endif ()
 	endforeach ()
 endmacro ()
 
 macro (
-axl_create_or_set_compiler_flag_setting
+axl_create_compiler_flag_setting
 	_SETTING
-	_DESCRIPTION
-	_FORCE
-	_VALUE
 	# ...
 	)
 
-	set (_FLAG_LIST ${ARGN})
-	axl_create_flag_list_regex (_REGEX ${_FLAG_LIST})
+	set (_ARG_LIST ${ARGN})
 
-	# check if this is per-configuration setting
+	set (_DESCRIPTION "${_SETTING}")
+	set (_DEFAULT_VALUE)
+	set (_OPTION_LIST)
+	set (_STATE "OPTIONS")
+
+	foreach (_ARG ${_ARG_LIST})
+		string (REGEX MATCH "DESCRIPTION|DEFAULT|OPTIONS" _MATCH ${_ARG})
+
+		if (NOT ${_MATCH} STREQUAL "")
+			set (_STATE ${_MATCH})
+		elseif (${_STATE} STREQUAL "DESCRIPTION")
+			set (_DESCRIPTION ${_ARG})
+			set (_STATE "OPTIONS")
+		elseif (${_STATE} STREQUAL "DEFAULT")
+			set (_DEFAULT_VALUE ${_ARG})
+			set (_STATE "OPTIONS")
+		else ()
+			set (_OPTION_LIST ${_OPTION_LIST} ${_ARG})
+		endif ()
+	endforeach ()
+
+	if (NOT "${${_SETTING}}" STREQUAL "") # setting is already defined (probably, via settings.cmake)
+		set (_VALUE ${${_SETTING}})
+	elseif (NOT "${_DEFAULT_VALUE}" STREQUAL "")
+		set (_VALUE ${_DEFAULT_VALUE})
+	else ()
+		set (_VALUE " ")
+	endif ()
+
+	set (
+		${_SETTING} ${_VALUE}
+		CACHE STRING ${_DESCRIPTION}
+		)
+
+	set_property (
+		CACHE ${_SETTING}
+		PROPERTY STRINGS
+		" " ${_OPTION_LIST}
+		)
+
+	axl_create_compiler_flag_regex (_REGEX ${_OPTION_LIST})
+	axl_set_compiler_flag_setting_impl (${_SETTING} ${_REGEX} ${${_SETTING}})
+endmacro ()
+
+macro (
+axl_override_compiler_flag_setting
+	_SETTING
+	# ... _VALUE
+	)
+
+	get_property (
+		_OPTION_LIST
+		CACHE ${_SETTING}
+		PROPERTY STRINGS
+		)
+
+	if (NOT _OPTION_LIST)
+		message (FATAL_ERROR "${_SETTING} does not have an associated option list")
+	endif ()
+
+	axl_override_setting (${_SETTING} ${ARGN})
+	axl_create_compiler_flag_regex (_REGEX ${_OPTION_LIST})
+	axl_set_compiler_flag_setting_impl (${_SETTING} ${_REGEX} ${ARGN})
+endmacro ()
+
+macro (
+axl_override_compiler_flag_setting_once
+    _SETTING
+	# ... _VALUE
+	)
+
+    if ("${${_SETTING}_OVERRIDEN}" STREQUAL "")
+		axl_override_compiler_flag_setting (${_SETTING} ${ARGN})
+
+		set (
+			${_SETTING}_OVERRIDEN TRUE
+			CACHE INTERNAL "${_SETTING} is overriden"
+			)
+	endif ()
+endmacro ()
+
+macro (
+axl_set_compiler_flag_setting_impl
+	_SETTING
+	_REGEX
+	# ... _VALUE
+	)
+
+	# check whether this setting is per-configuration
 
 	set (_CONFIGURATION_SUFFIX)
 
@@ -229,7 +389,7 @@ axl_create_or_set_compiler_flag_setting
 
 	foreach (_CONFIGURATION ${CMAKE_CONFIGURATION_TYPES})
 		string (TOUPPER "${_CONFIGURATION}" _CONFIGURATION_UC)
-		string (REGEX MATCH "${_CONFIGURATION_UC}$" _MATCH "${_SETTING}")
+		string (REGEX MATCH "_${_CONFIGURATION_UC}$" _MATCH "${_SETTING}")
 
 		if (NOT ${_MATCH} STREQUAL "")
 			set (_CONFIGURATION_SUFFIX "_${_CONFIGURATION_UC}")
@@ -237,126 +397,91 @@ axl_create_or_set_compiler_flag_setting
 		endif ()
 	endforeach ()
 
-	# check if this is C-only or C++ only setting
+	# check whether this setting is C-only
 
 	string (REGEX MATCH "_C_" _MATCH "${_SETTING}")
-	if (NOT ${_MATCH} STREQUAL "")
+	if (NOT "${_MATCH}" STREQUAL "")
 		set (_IS_C_ONLY TRUE)
 	else ()
 		set (_IS_C_ONLY FALSE)
 	endif ()
 
+	# check whether this setting is C++-only
+
 	string (REGEX MATCH "_CPP_|_CXX_" _MATCH "${_SETTING}")
-	if (NOT ${_MATCH} STREQUAL "")
+	if (NOT "${_MATCH}" STREQUAL "")
 		set (_IS_CPP_ONLY TRUE)
 	else ()
 		set (_IS_CPP_ONLY FALSE)
 	endif ()
 
-	# get current value of the setting in C/C++ flags
+	# apply to C/C++ flags
 
-	string (
-		REGEX MATCH
-		"${_REGEX}"
-		_CURRENT_VALUE_C
-		"${CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}}"
-		)
+	if (NOT _IS_CPP_ONLY)
+		if (NOT "${_CONFIGURATION_SUFFIX}" STREQUAL "")
+			axl_apply_compiler_flag (
+				CMAKE_C_FLAGS
+				${_REGEX}
+				)
+		endif ()
 
-	string (
-		REGEX MATCH
-		"${_REGEX}"
-		_CURRENT_VALUE_CXX
-		"${CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}}"
-		)
-
-	string (
-		STRIP
-		"${_CURRENT_VALUE_C}"
-		_CURRENT_VALUE_C
-		)
-
-	string (
-		STRIP
-		"${_CURRENT_VALUE_CXX}"
-		_CURRENT_VALUE_CXX
-		)
-
-	# create cached setting
-
-	if (NOT ${_SETTING})
-		set (_FORCE FORCE)
-	else ()
-		set (_FORCE)
-	endif ()
-
-	if (NOT "${_DEFAULT_VALUE}" STREQUAL "")
-		set (
-			${_SETTING} ${_DEFAULT_VALUE}
-			CACHE STRING ${_DESCRIPTION} ${_FORCE}
-			)
-	elseif (_IS_C_ONLY)
-		set (
-			${_SETTING} ${_CURRENT_VALUE_C}
-			CACHE STRING ${_DESCRIPTION} ${_FORCE}
-			)
-	else ()
-		set (
-			${_SETTING} ${_CURRENT_VALUE_CXX}
-			CACHE STRING ${_DESCRIPTION} ${_FORCE}
+		axl_apply_compiler_flag (
+			CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
+			${_REGEX}
+			${ARGN}
 			)
 	endif ()
 
-	set_property (
-		CACHE
-		${_SETTING}
-		PROPERTY STRINGS
-		" " ${_FLAG_LIST}
-		)
+	if (NOT _IS_C_ONLY)
+		if (NOT "${_CONFIGURATION_SUFFIX}" STREQUAL "")
+			axl_apply_compiler_flag (
+				CMAKE_CXX_FLAGS
+				${_REGEX}
+				)
+		endif ()
 
-	# if this setting is per-configuration then clear configuration-common flags
-
-	if (_CMAKE_CONFIGURATION_SUFFIX)
-		string (
-			REGEX REPLACE
-			"${_REGEX}"
-			" "
-			CMAKE_C_FLAGS
-			"${CMAKE_C_FLAGS}"
-			)
-
-		string (
-			REGEX REPLACE
-			"${_REGEX}"
-			" "
-			CMAKE_CXX_FLAGS
-			"${CMAKE_CXX_FLAGS}"
+		axl_apply_compiler_flag (
+			CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
+			${_REGEX}
+			${ARGN}
 			)
 	endif ()
-
-	# apply setting to C/C++ flags
-
-	axl_set_c_cxx_flag_setting (${_SETTING} ${${_SETTING}})
-
 endmacro ()
 
 macro (
-axl_create_c_cxx_flag_setting
-	_SETTING
-	_DESCRIPTION
-	_DEFAULT_VALUE
-	# ...
+axl_apply_compiler_flag
+	_FLAGS
+	_REGEX
+	# ... _VALUE
 	)
 
-	get_property (
-		CACHE
-		${_SETTING}
-		PROPERTY STRINGS
-		" " ${_FLAG_LIST}
+	set (_ARG_LIST ${ARGN})
+	if (_ARG_LIST)
+		list (GET _ARG_LIST 0 _VALUE)
+	else ()
+		set (_VALUE)
+	endif ()
+
+	# first, remove
+
+	string (
+		REGEX REPLACE
+		"${_REGEX}"
+		" "
+		${_FLAGS}
+		"${${_FLAGS}}"
 		)
 
+	string (STRIP "${${_FLAGS}}" ${_FLAGS})
 
+	# now, if value is not empty, add it
 
-endif ()
+	string (STRIP "${_VALUE}" _VALUE)
+
+	if (NOT "${_VALUE}" STREQUAL "")
+		set (${_FLAGS} "${${_FLAGS}} ${_VALUE}")
+	endif ()
+endmacro ()
 
 #..............................................................................
 
@@ -408,129 +533,163 @@ axl_disable_pch_msvc
 endmacro ()
 
 macro (
+axl_append_compile_flag_list
+    _FLAGS
+	_PREFIX
+	# ...
+	)
+
+    set (_ARG_LIST ${ARGN})
+	string (STRIP ${_PREFIX} _PREFIX)
+
+	foreach (_ARG ${_ARG_LIST})
+		if (_ARG)
+			list (APPEND ${_FLAGS} "${_PREFIX}${_ARG}")
+		endif ()
+	endforeach ()
+endmacro ()
+
+macro (
 axl_set_pch_gcc
 	_TARGET
-	_PCH_H
+	_PCH_CPP
+	# ...
 	)
 
 	set (_EXTRA_FLAG_LIST ${ARGN})
 
-	set (_PCH_GCC "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_H}.gcc")
-	set (_PCH_BIN "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_H}.gcc.gch")
+	# select file paths: we need to generate a force-included header
+	# in binary directory and precompiled header binary *NEXT* to it
 
-	# get directory flags, defines, includes
+	set (_PCH_H "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_CPP}.h")
+	set (_PCH_BIN "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_CPP}.h.gch")
 
-	get_property (
-		_DIR_CXX_FLAGS
-		DIRECTORY
-		PROPERTY COMPILE_FLAGS
+	# choose compiler and language by extension
+
+	get_filename_component (_EXT ${_PCH_CPP} EXT)
+
+	if (${_EXT} STREQUAL ".c")
+		set (_COMPILER ${CMAKE_C_COMPILER})
+		set (_PCH_FLAGS "-x" "c-header")
+		set (_LANGUAGE "C")
+	else ()
+		set (_COMPILER ${CMAKE_CXX_COMPILER})
+		set (_PCH_FLAGS "-x" "c++-header")
+		set (_LANGUAGE "CXX")
+	endif ()
+
+	# start with compile flags global variables
+
+	string (TOUPPER "${CMAKE_BUILD_TYPE}" _BUILD_TYPE_UC)
+
+	set (_COMPILE_FLAGS "${CMAKE_${_LANGUAGE}_FLAGS}")
+
+	if (NOT "${_BUILD_TYPE_UC}" STREQUAL "")
+		set (_COMPILE_FLAGS "${_COMPILE_FLAGS} ${CMAKE_${_LANGUAGE}_FLAGS_${_BUILD_TYPE_UC}}")
+	endif ()
+
+	# get and append COMPILE_FLAGS property
+
+	get_directory_property (_DIR_FLAGS COMPILE_FLAGS)
+	get_target_property (_TARGET_FLAGS ${_TARGET} COMPILE_FLAGS)
+
+	if (_DIR_FLAGS)
+		set (_COMPILE_FLAGS "${_COMPILE_FLAGS} ${_DIR_FLAGS}")
+	endif ()
+
+	if (_TARGET_FLAGS)
+		set (_COMPILE_FLAGS "${_COMPILE_FLAGS} ${_TARGET_FLAGS}")
+	endif ()
+
+	# turn it into a list
+
+	string (STRIP "${_COMPILE_FLAGS}" _COMPILE_FLAGS)
+	string (REGEX REPLACE " +" ";" _COMPILE_FLAGS "${_COMPILE_FLAGS}")
+
+	# get and append COMPILE_DEFINITIONS property
+
+	get_directory_property (_DIR_FLAGS COMPILE_DEFINITIONS)
+	get_target_property (_TARGET_FLAGS ${_TARGET} COMPILE_DEFINITIONS)
+
+	axl_append_compile_flag_list (
+		_COMPILE_FLAGS
+		"-D"
+		${_DIR_FLAGS}
+		${_TARGET_FLAGS}
 		)
 
-	get_property (
-		_DIR_CXX_DEFINES
-		DIRECTORY
-		PROPERTY COMPILE_DEFINITIONS
+	if (NOT "${_BUILD_TYPE_UC}" STREQUAL "")
+		get_directory_property (_DIR_FLAGS COMPILE_DEFINITIONS_${_BUILD_TYPE_UC})
+		get_target_property (_TARGET_FLAGS ${_TARGET} COMPILE_DEFINITIONS_${_BUILD_TYPE_UC})
+
+		axl_append_compile_flag_list (
+			_COMPILE_FLAGS
+			"-D"
+			${_DIR_FLAGS}
+			${_TARGET_FLAGS}
+			)
+	endif ()
+
+	# get and append INCLUDE_DIRECTORIES property
+
+	get_directory_property (_DIR_FLAGS INCLUDE_DIRECTORIES)
+	get_target_property (_TARGET_FLAGS ${_TARGET} INCLUDE_DIRECTORIES)
+
+	axl_append_compile_flag_list (
+		_COMPILE_FLAGS
+		"-I"
+		${_DIR_FLAGS}
+		${_TARGET_FLAGS}
 		)
 
-	get_property (
-		_DIR_CXX_INCLUDES
-		DIRECTORY
-		PROPERTY INCLUDE_DIRECTORIES
-		)
-
-	# get target flags, defines, includes
-
-	get_target_property (
-		_TARGET_CXX_DEFINES
-		${_TARGET}
-		COMPILE_DEFINITIONS
-		)
-
-	get_target_property (
-		_TARGET_CXX_FLAGS
-		${_TARGET}
-		COMPILE_FLAGS
-		)
-
-	get_target_property (
-		_TARGET_CXX_INCLUDES
-		${_TARGET}
-		INCLUDE_DIRECTORIES
-		)
-
-	# get global flags for current build type
-
-	string (TOUPPER "CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}" _CXX_FLAGS)
-	set (_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${${_CXX_FLAGS}}")
-
-	if (_CXX_FLAGS)
-		string (REPLACE " " ";" _CXX_FLAGS ${_CXX_FLAGS})
-	endif ()
-
-	# append directory flags, defines, includes
-
-	if (_DIR_CXX_FLAGS)
-		string (REPLACE " " ";" _DIR_CXX_FLAGS ${_DIR_CXX_FLAGS})
-		list (APPEND _CXX_FLAGS ${_DIR_CXX_FLAGS})
-	endif ()
-
-	if (_DIR_CXX_DEFINES)
-		foreach (_DEF ${_DIR_CXX_DEFINES})
-			list (APPEND _CXX_FLAGS "-D${_DEF}")
-		endforeach ()
-	endif ()
-
-	if (_DIR_CXX_INCLUDES)
-		foreach (_DIR ${_DIR_CXX_INCLUDES})
-			list (APPEND _CXX_FLAGS "-I${_DIR}")
-		endforeach ()
-	endif ()
-
-	# append target flags, defines, includes
-
-	if (_TARGET_CXX_FLAGS)
-		string (REPLACE " " ";" _TARGET_CXX_FLAGS ${_TARGET_CXX_FLAGS})
-		list (APPEND _CXX_FLAGS ${_TARGET_CXX_FLAGS})
-	endif ()
-
-	if (_TARGET_CXX_DEFINES)
-		foreach (_DEF ${_TARGET_CXX_DEFINES})
-			list (APPEND _CXX_FLAGS "-D${_DEF}")
-		endforeach ()
-	endif ()
-
-	if (_TARGET_CXX_INCLUDES)
-		foreach (_DIR ${_TARGET_CXX_INCLUDES})
-			list (APPEND _CXX_FLAGS "-I${_DIR}")
-		endforeach ()
-	endif ()
-
-	# append extra flags passed in vararg
+	# append extra flags passed in vararg and finalize list
 
 	if (_EXTRA_FLAG_LIST)
-		list (APPEND _CXX_FLAGS "${_EXTRA_FLAG_LIST}")
+		list (APPEND _COMPILE_FLAGS "${_EXTRA_FLAG_LIST}")
 	endif ()
 
-	# create pch command
+	list (REMOVE_DUPLICATES _COMPILE_FLAGS)
+
+	# create pch source file and custom command to build pch binary
 
 	file (
-		WRITE ${_PCH_GCC}
-		"\#include \"${CMAKE_CURRENT_SOURCE_DIR}/${_PCH_H}\"\n"
+		WRITE ${_PCH_H}
+		"\#include \"${CMAKE_CURRENT_SOURCE_DIR}/${_PCH_CPP}\"\n"
 		)
 
 	add_custom_command (
 		OUTPUT ${_PCH_BIN}
-		MAIN_DEPENDENCY ${_PCH_H}
-		COMMAND ${CMAKE_CXX_COMPILER} ${_CXX_FLAGS} -x c++-header -o${_PCH_BIN} ${_PCH_GCC}
+		MAIN_DEPENDENCY ${_PCH_CPP}
+		COMMAND
+		    ${_COMPILER}
+			${_COMPILE_FLAGS}
+			${_PCH_FLAGS}
+			"-o" ${_PCH_BIN}
+			${_PCH_H}
 		)
 
-	include_directories (${CMAKE_CURRENT_BINARY_DIR})
+	# modify target
 
-	axl_append_target_string_property (
+	target_include_directories (
+		${_TARGET}
+		PUBLIC
+		${CMAKE_CURRENT_BINARY_DIR}
+		)
+
+	axl_append_target_list_property (
 		${_TARGET}
 		COMPILE_FLAGS
-		"-include \"${_PCH_GCC}\""
+		"-include \"${_PCH_H}\""
 		)
+
+	# add dependencies between target and pch binary
+
+	add_custom_target (
+		${_TARGET}_pch
+		DEPENDS ${_PCH_BIN}
+		)
+
+	add_dependencies (${_TARGET} ${_TARGET}_pch)
 endmacro ()
 
 macro (
@@ -542,7 +701,7 @@ axl_set_pch
 	if (MSVC AND MSVC_USE_PCH)
 		axl_set_pch_msvc (${_TARGET} ${_PCH_H} ${_PCH_CPP} ${ARGN})
 	elseif (GCC AND GCC_USE_PCH)
-		axl_set_pch_gcc (${_TARGET} ${_PCH_H} ${ARGN})
+		axl_set_pch_gcc (${_TARGET} ${_PCH_CPP} ${ARGN})
 	endif ()
 endmacro ()
 
@@ -602,7 +761,7 @@ axl_find_executable
 			)
 	else ()
 		execute_process (
-			COMMAND which ${_FILE_NAME} 
+			COMMAND which ${_FILE_NAME}
 			ERROR_FILE /dev/null
 			OUTPUT_VARIABLE _OUTPUT
 			)
@@ -706,6 +865,20 @@ axl_find_file_recurse_parent_dirs
 	endwhile ()
 
 	set (${_RESULT} ${_FILE_PATH})
+endmacro ()
+
+macro (
+axl_chain_include
+    _FILE_NAME
+	)
+
+    message ("axl_chain_include CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
+
+	axl_find_file_recurse_parent_dirs (_FILE_PATH ${_FILE_NAME} ${CMAKE_CURRENT_LIST_DIR}/..)
+
+	if (_FILE_PATH)
+		include (${_FILE_PATH})
+	endif ()
 endmacro ()
 
 macro (

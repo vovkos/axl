@@ -453,7 +453,7 @@ public:
 	sendWidgetNotification (
 		WidgetDriver* widgetDriver,
 		uint_t code,
-		void* param = NULL
+		const void* param = NULL
 		);
 
 	virtual

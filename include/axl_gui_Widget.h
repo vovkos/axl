@@ -578,7 +578,7 @@ public:
 	void
 	notify (
 		uint_t code,
-		void* params = NULL
+		const void* params = NULL
 		)
 	{
 		m_engine->sendWidgetNotification (this, code, params);

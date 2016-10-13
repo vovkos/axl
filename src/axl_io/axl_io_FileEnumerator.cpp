@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_io_FileEnumerator.h"
+#include "axl_g_WarningSuppression.h"
 
 namespace axl {
 namespace io {

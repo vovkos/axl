@@ -38,6 +38,12 @@ endif ()
 include (${_PATHS_CMAKE})
 include (dependencies.cmake)
 
+axl_find_file_recurse_parent_dirs (_SETTINGS_CMAKE settings.cmake ${CMAKE_CURRENT_LIST_DIR})
+
+if (_SETTINGS_CMAKE)
+	include (${_SETTINGS_CMAKE})
+endif ()
+
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 axl_print_std_settings ()

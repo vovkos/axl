@@ -45,7 +45,7 @@ public:
 	void
 	emitNotificationSignal (
 		uint_t code,
-		const void* params
+		const void* param
 		)
 	{
 	}

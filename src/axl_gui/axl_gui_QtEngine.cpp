@@ -844,7 +844,7 @@ void
 QtEngine::sendWidgetNotification (
 	WidgetDriver* widgetDriver,
 	uint_t code,
-	void* params
+	const void* params
 	)
 {
 	ASSERT (widgetDriver->getEngine () == this);
