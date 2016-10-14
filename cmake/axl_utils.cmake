@@ -332,7 +332,7 @@ axl_create_compiler_flag_setting
 	elseif (NOT "${_DEFAULT_VALUE}" STREQUAL "")
 		set (_VALUE ${_DEFAULT_VALUE})
 	else ()
-		set (_VALUE " ")
+		axl_get_compiler_flag_setting_current_value (_VALUE ${_SETTING} ${_OPTION_LIST})
 	endif ()
 
 	set (
@@ -358,23 +358,46 @@ axl_delete_compiler_flag_setting
 endmacro ()
 
 macro (
-axl_apply_compiler_flag_setting
+axl_get_compiler_flag_setting_current_value
+	_RESULT
 	_SETTING
+	# ...
 	)
 
-	# create regex from option list and
+	axl_create_compiler_flag_regex (_REGEX ${ARGN})
 
-	get_property (
-		_OPTION_LIST
-		CACHE ${_SETTING}
-		PROPERTY STRINGS
+	axl_get_compiler_flag_setting_traits (
+		${_SETTING}
+		_CONFIGURATION_SUFFIX
+		_IS_C_ONLY
+		_IS_CPP_ONLY
 		)
 
-	if (NOT _OPTION_LIST)
-		message (FATAL_ERROR "${_SETTING} does not have an associated option list")
+	if (_IS_C_ONLY)
+		if ("${_CONFIGURATION_SUFFIX}" STREQUAL "")
+			set (_FLAGS CMAKE_C_FLAGS)
+		else ()
+			set (_FLAGS CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX})
+		endif ()
+	else ()
+		if ("${_CONFIGURATION_SUFFIX}" STREQUAL "")
+			set (_FLAGS CMAKE_CXX_FLAGS)
+		else ()
+			set (_FLAGS CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX})
+		endif ()
 	endif ()
 
-	axl_create_compiler_flag_regex (_REGEX ${_OPTION_LIST})
+	string (REGEX MATCH ${_REGEX} _MATCH " ${${_FLAGS}} ")
+	string (STRIP "${_MATCH}" ${_RESULT})
+endmacro ()
+
+macro (
+axl_get_compiler_flag_setting_traits
+	_SETTING
+	_CONFIGURATION_SUFFIX_RESULT
+	_IS_C_ONLY_RESULT
+	_IS_CPP_ONLY_RESULT
+	)
 
 	# check whether this setting is per-configuration
 
@@ -409,6 +432,37 @@ axl_apply_compiler_flag_setting
 	else ()
 		set (_IS_CPP_ONLY FALSE)
 	endif ()
+
+	set (${_CONFIGURATION_SUFFIX_RESULT} ${_CONFIGURATION_SUFFIX})
+	set (${_IS_C_ONLY_RESULT} ${_IS_C_ONLY})
+	set (${_IS_CPP_ONLY_RESULT} ${_IS_CPP_ONLY})
+endmacro ()
+
+macro (
+axl_apply_compiler_flag_setting
+	_SETTING
+	)
+
+	# create regex from option list and
+
+	get_property (
+		_OPTION_LIST
+		CACHE ${_SETTING}
+		PROPERTY STRINGS
+		)
+
+	if (NOT _OPTION_LIST)
+		message (FATAL_ERROR "${_SETTING} does not have an associated option list")
+	endif ()
+
+	axl_create_compiler_flag_regex (_REGEX ${_OPTION_LIST})
+
+	axl_get_compiler_flag_setting_traits (
+		${_SETTING}
+		_CONFIGURATION_SUFFIX
+		_IS_C_ONLY
+		_IS_CPP_ONLY
+		)
 
 	# apply current setting value to C/C++ flags
 
@@ -537,7 +591,14 @@ axl_set_pch_msvc
 		TARGET ${_TARGET}
 		APPEND_STRING
 		PROPERTY COMPILE_FLAGS
-		"/Yu\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
+		" /Yu\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
+		)
+
+	set_property (
+		SOURCE ${_PCH_CPP}
+		APPEND_STRING
+		PROPERTY COMPILE_FLAGS
+		" /Yc\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
 		)
 
 	set_source_files_properties (
@@ -698,7 +759,7 @@ axl_set_pch_gcc
 		TARGET ${_TARGET}
 		APPEND_STRING
 		PROPERTY COMPILE_FLAGS
-		"-include \"${_PCH_H}\""
+		" -include \"${_PCH_H}\""
 		)
 
 	# add dependencies between target and pch binary

@@ -232,7 +232,7 @@ axl_apply_msvc_settings)
 		USE_FOLDERS ${MSVC_USE_FOLDERS}
 		)
 
-	if (${MSVC_FLAG_UNICODE})
+	if (${MSVC_USE_UNICODE})
 		add_definitions (-DUNICODE -D_UNICODE)
 	endif ()
 endmacro ()
@@ -399,7 +399,7 @@ axl_print_std_settings)
 
 	if (_CXX_DEFINITIONS)
 		list (REMOVE_DUPLICATES _CXX_DEFINITIONS)
-		axl_message ("C/C++ definitions:" "${_CXX_DEFINITIONS}")
+		axl_message ("    C/C++ definitions:" "${_CXX_DEFINITIONS}")
 	endif ()
 endmacro ()
 
