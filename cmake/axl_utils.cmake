@@ -540,11 +540,15 @@ axl_append_compile_flag_list
 	)
 
     set (_ARG_LIST ${ARGN})
-	string (STRIP ${_PREFIX} _PREFIX)
 
 	foreach (_ARG ${_ARG_LIST})
 		if (_ARG)
-			list (APPEND ${_FLAGS} "${_PREFIX}${_ARG}")
+			if (${_PREFIX} STREQUAL "-I" AND ${_ARG} MATCHES "\\.framework/?$")
+            	string(REGEX REPLACE "/[^/]+\\.framework" "" _FRAMEWORK "${_ARG}")
+				list (APPEND ${_FLAGS} "-F${_FRAMEWORK}")
+  			else ()
+				list (APPEND ${_FLAGS} "${_PREFIX}${_ARG}")
+			endif ()
 		endif ()
 	endforeach ()
 endmacro ()
@@ -627,6 +631,17 @@ axl_set_pch_gcc
 			"-D"
 			${_DIR_FLAGS}
 			${_TARGET_FLAGS}
+			)
+	endif ()
+
+	# add -isysroot on MacOS
+
+	if (APPLE AND NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
+		list (
+			APPEND
+			_COMPILE_FLAGS
+			"-isysroot"
+			"${CMAKE_OSX_SYSROOT}"
 			)
 	endif ()
 
@@ -871,8 +886,6 @@ macro (
 axl_chain_include
     _FILE_NAME
 	)
-
-    message ("axl_chain_include CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
 
 	axl_find_file_recurse_parent_dirs (_FILE_PATH ${_FILE_NAME} ${CMAKE_CURRENT_LIST_DIR}/..)
 
