@@ -70,12 +70,4 @@ axl_set_pch (
 	${PCH_CPP}
 	)
 
-if (GCC)
-	axl_append_target_string_property (
-		axl_core
-		COMPILE_FLAGS
-		"-fPIC -fvisibility=hidden"
-		)
-endif ()
-
 #..............................................................................

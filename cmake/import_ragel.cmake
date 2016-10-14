@@ -4,8 +4,8 @@ if (NOT RAGEL_EXE)
 	axl_find_executable (RAGEL_EXE ragel)
 
 	if (RAGEL_EXE)
-		message (STATUS "Ragel found at: ${RAGEL_EXE}")
-	endif ()	
+		axl_message ("Ragel found at:" "${RAGEL_EXE}")
+	endif ()
 endif ()
 
 if (EXISTS ${RAGEL_EXE})
@@ -21,7 +21,7 @@ add_ragel_step
 	_OUTPUT_FILE
 	_INPUT_FILE
 	)
-	
+
 	if (NOT RAGEL_FOUND)
 		message (FATAL_ERROR "Ragel is required for add_ragel_step () macro")
 	endif ()

@@ -4,8 +4,8 @@ if (NOT GIT_EXE)
 	axl_find_executable (GIT_EXE git)
 
 	if (GIT_EXE)
-		message (STATUS "Git found at: ${GIT_EXE}")
-	endif ()	
+		axl_message ("Git found at:" "${GIT_EXE}")
+	endif ()
 endif ()
 
 if (EXISTS ${GIT_EXE})

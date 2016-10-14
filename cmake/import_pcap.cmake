@@ -10,8 +10,8 @@ endif ()
 
 if (EXISTS ${PCAP_INC_DIR}/pcap/pcap.h)
 	message (STATUS "Pcap paths:")
-	message (STATUS "    Pcap includes:  ${PCAP_INC_DIR}")
-	message (STATUS "    Pcap libraries: ${PCAP_LIB_DIR}")
+	axl_message ("    Includes:"  "${PCAP_INC_DIR}")
+	axl_message ("    Libraries:" "${PCAP_LIB_DIR}")
 
 	set (PCAP_FOUND TRUE)
 else ()

@@ -12,9 +12,9 @@ if (EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 	endif ()
 
 	message (STATUS "LLVM paths:")
-	message (STATUS "    LLVM cmake files: ${LLVM_CMAKE_DIR}")
-	message (STATUS "    LLVM includes:    ${LLVM_INC_DIR}")
-	message (STATUS "    LLVM libraries:   ${LLVM_LIB_DIR}")
+	axl_message ("    CMake files:" "${LLVM_CMAKE_DIR}")
+	axl_message ("    Includes:"    "${LLVM_INC_DIR}")
+	axl_message ("    Libraries:"   "${LLVM_LIB_DIR}")
 
 	set (LLVM_FOUND TRUE)
 else ()

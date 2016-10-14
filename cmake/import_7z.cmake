@@ -2,9 +2,9 @@
 
 if (NOT 7Z_EXE)
 	axl_find_executable (7Z_EXE 7z)
-	
+
 	if (7Z_EXE)
-		message (STATUS "7-Zip found at: ${7Z_EXE}")
+		axl_message ("7-Zip found at:" "${7Z_EXE}")
 	endif ()
 endif ()
 

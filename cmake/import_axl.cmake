@@ -10,9 +10,9 @@ if (_CONFIG_CMAKE)
 	include (${_CONFIG_CMAKE})
 
 	message (STATUS "AXL paths:")
-	message (STATUS "    AXL cmake files: ${AXL_CMAKE_DIR}")
-	message (STATUS "    AXL includes:    ${AXL_INC_DIR}")
-	message (STATUS "    AXL libraries:   ${AXL_LIB_DIR}")
+	axl_message ("    CMake files:" "${AXL_CMAKE_DIR}")
+	axl_message ("    Includes:"    "${AXL_INC_DIR}")
+	axl_message ("    Libraries:"   "${AXL_LIB_DIR}")
 
 	set (AXL_FOUND TRUE)
 else ()

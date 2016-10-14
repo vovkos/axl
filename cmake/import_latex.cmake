@@ -4,7 +4,7 @@ if (NOT PDFLATEX_EXE)
 	axl_find_executable (PDFLATEX_EXE pdflatex)
 
 	if (PDFLATEX_EXE)
-		message (STATUS "Pdflatex found at: ${PDFLATEX_EXE}")
+		axl_message ("Pdflatex found at:" "${PDFLATEX_EXE}")
 	endif ()
 endif ()
 

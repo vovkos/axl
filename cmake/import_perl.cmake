@@ -4,7 +4,7 @@ if (NOT PERL_EXE)
 	axl_find_executable (PERL_EXE perl)
 
 	if (PERL_EXE)
-		message (STATUS "Perl found at: ${PERL_EXE}")
+		axl_message ("Perl found at:" "${PERL_EXE}")
 	endif ()
 endif ()
 

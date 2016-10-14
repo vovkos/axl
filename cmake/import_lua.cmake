@@ -10,8 +10,8 @@ endif ()
 
 if (EXISTS ${LUA_INC_DIR}/lua.h)
 	message (STATUS "Lua paths:")
-	message (STATUS "    Lua includes:  ${LUA_INC_DIR}")
-	message (STATUS "    Lua libraries: ${LUA_LIB_DIR}")
+	axl_message ("    Includes:"  "${LUA_INC_DIR}")
+	axl_message ("    Libraries:" "${LUA_LIB_DIR}")
 
 	set (LUA_FOUND TRUE)
 else ()

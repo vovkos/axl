@@ -9,7 +9,7 @@ namespace sys {
 void
 EventRoot::reset ()
 {
-    m_condMutexPair.lock ();
+	m_condMutexPair.lock ();
 	m_state = false;
 	m_condMutexPair.unlock ();
 }
@@ -18,29 +18,29 @@ bool
 EventRoot::wait (uint_t timeout)
 {
 	m_condMutexPair.lock ();
-	
+
 	if (m_state)
 	{
 		if (!m_isNotificationEvent)
 			m_state = false;
-		
+
 		m_condMutexPair.unlock ();
 		return true;
 	}
 
-    bool result = m_condMutexPair.wait (timeout);
-    if (!result)
-    {
-        m_condMutexPair.unlock ();
-        return false;
-    }
+	bool result = m_condMutexPair.wait (timeout);
+	if (!result)
+	{
+		m_condMutexPair.unlock ();
+		return false;
+	}
 
 	if (!m_isNotificationEvent)
 		m_state = false;
 
 	m_condMutexPair.unlock ();
-	
-    return true;
+
+	return true;
 }
 
 bool
@@ -65,7 +65,7 @@ EventRoot::signal ()
 
 	m_state = true;
 	m_condMutexPair.unlock ();
-    
+
 	return true;
 }
 
