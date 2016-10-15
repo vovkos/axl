@@ -839,6 +839,8 @@ axl_find_executable
 			COMMAND where ${_FILE_NAME}
 			OUTPUT_VARIABLE _OUTPUT
 			)
+
+		string (REPLACE "\\" "/" _OUTPUT "${_OUTPUT}")
 	else ()
 		execute_process (
 			COMMAND which ${_FILE_NAME}
@@ -849,10 +851,10 @@ axl_find_executable
 
 	string (STRIP "${_OUTPUT}" _OUTPUT)
 
-	if (NOT "${_OUTPUT}" STREQUAL "")
-		set (${_RESULT} ${_OUTPUT})
-	else ()
+	if ("${_OUTPUT}" STREQUAL "")
 		set (${_RESULT} ${_RESULT}-NOTFOUND)
+	else ()
+		set (${_RESULT} ${_OUTPUT})
 	endif ()
 endmacro ()
 
@@ -865,10 +867,12 @@ axl_find_inc_dir
 	unset (_DIR)
 	find_path (_DIR ${_FILE_NAME})
 
-	if (_DIR)
-		set (${_RESULT} ${_DIR})
-	else ()
+	if (NOT _DIR)
 		set (${_RESULT} ${_RESULT}-NOTFOUND)
+	elseif (WIN32)
+		string (REPLACE "\\" "/" ${_RESULT} "${_DIR}")
+	else ()
+		set (${_RESULT} ${_DIR})
 	endif ()
 
 	unset (_DIR CACHE)
@@ -883,7 +887,13 @@ axl_find_lib_dir
 	unset (_PATH)
 	find_library (_PATH ${_LIB_NAME})
 
-	if (_PATH)
+	if (NOT _PATH)
+		set (${_RESULT} ${_RESULT}-NOTFOUND)
+	else ()
+		if (WIN32)
+			string (REPLACE "\\" "/" _PATH "${_PATH}")
+		endif ()
+
 		get_filename_component (
 			_DIR
 			${_PATH}
@@ -891,8 +901,6 @@ axl_find_lib_dir
 			)
 
 		set (${_RESULT} ${_DIR})
-	else ()
-		set (${_RESULT} ${_RESULT}-NOTFOUND)
 	endif ()
 
 	unset (_PATH CACHE)
