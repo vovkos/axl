@@ -1,6 +1,14 @@
 #include "pch.h"
 #include "axl_enc_Utf.h"
 
+#include "icu_def.h"
+
+#define INCLUDED_FROM_UCHAR_C
+#include "icu_uchar_props_data.h"
+
+#define INCLUDED_FROM_UCASE_CPP
+#include "icu_ucase_props_data.h"
+
 namespace axl {
 namespace enc {
 
@@ -9,7 +17,7 @@ namespace enc {
 const char*
 getUtfKindString (UtfKind utfKind)
 {
-	static const char* stringTable [] = 
+	static const char* stringTable [] =
 	{
 		"UTF-8",                // EUtf_Utf8 = 0,
 		"UTF-16",               // EUtf_Utf16,
@@ -18,14 +26,16 @@ getUtfKindString (UtfKind utfKind)
 		"UTF-32 (big-endian)",  // EUtf_Utf32_be,
 	};
 
-	return (size_t) utfKind < countof (stringTable) ? 
-		stringTable [utfKind] : 
+	return (size_t) utfKind < countof (stringTable) ?
+		stringTable [utfKind] :
 		"undefined-utf-kind";
 }
 
 //.............................................................................
 
-static const uint16_t g_utfCodePointAttrTrie [] = 
+#if 0
+
+static const uint16_t g_utfCodePointAttrTrie [] =
 {
 	6256, 6288, 6320, 6352, 6384, 6416, 6448, 6480,
 	6512, 6544, 6576, 6608, 6640, 6672, 6704, 6736,
@@ -4745,7 +4755,7 @@ static const uint16_t g_utfCodePointAttrTrie [] =
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-static const UtfCodePointAttr g_utfCodePointAttrTable [] = 
+static const UtfCodePointAttr g_utfCodePointAttrTable [] =
 {
 	{ 9, 18, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 21, 0 },
 	{ 9, 8, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 5, 17, 0 },
@@ -6308,12 +6318,248 @@ getUtfCodePointAttr (utf32_t c)
 {
 	uint32_t uc = (uint32_t) c;
 
-	size_t index = 
-		uc < 0x11000 ? g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [uc >> 5] + (uc & 0x1f)] : 
-		uc < 0x10ffff ? g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [((uc - 0x11000) >> 8) + 0x880] + (uc & 0xff)] : 
+	size_t index =
+		uc < 0x11000 ? g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [uc >> 5] + (uc & 0x1f)] :
+		uc < 0x10ffff ? g_utfCodePointAttrTrie [g_utfCodePointAttrTrie [((uc - 0x11000) >> 8) + 0x880] + (uc & 0xff)] :
 		countof (g_utfCodePointAttrTable) - 1;
 
 	return g_utfCodePointAttrTable + index;
+}
+
+#endif
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+// from uchar.c & ucase.cpp
+//
+
+/* getting a uint32_t properties word from the data */
+#define GET_PROPS(c, result) ((result)=UTRIE2_GET16(&propsTrie, c));
+
+#define GET_CASE_PROPS() &ucase_props_singleton
+
+#define GET_EXCEPTIONS(csp, props) ((csp)->exceptions+((props)>>UCASE_EXC_SHIFT))
+
+#define PROPS_HAS_EXCEPTION(props) ((props)&UCASE_EXCEPTION)
+
+/* number of bits in an 8-bit integer value */
+static const uint8_t flagsOffset[256]={
+	0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+	1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+	4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+};
+
+#define HAS_SLOT(flags, idx) ((flags)&(1<<(idx)))
+#define SLOT_OFFSET(flags, idx) flagsOffset[(flags)&((1<<(idx))-1)]
+
+/*
+ * Get the value of an optional-value slot where HAS_SLOT(excWord, idx).
+ *
+ * @param excWord (in) initial exceptions word
+ * @param idx (in) desired slot index
+ * @param pExc16 (in/out) const uint16_t * after excWord=*pExc16++;
+ *               moved to the last uint16_t of the value, use +1 for beginning of next slot
+ * @param value (out) int32_t or uint32_t output if hasSlot, otherwise not modified
+ */
+#define GET_SLOT_VALUE(excWord, idx, pExc16, value) \
+	if(((excWord)&UCASE_EXC_DOUBLE_SLOTS)==0) { \
+		(pExc16)+=SLOT_OFFSET(excWord, idx); \
+		(value)=*pExc16; \
+	} else { \
+		(pExc16)+=2*SLOT_OFFSET(excWord, idx); \
+		(value)=*pExc16++; \
+		(value)=((value)<<16)|*pExc16; \
+	}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+bool
+utfIsPrintable (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&U_GC_C_MASK)==0);
+}
+
+bool
+utfIsPrintableNonMark (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	/* comparing ==0 returns FALSE for the categories mentioned */
+	return (UBool)((CAT_MASK(props)&(U_GC_C_MASK|U_GC_M_MASK))==0);
+}
+
+bool
+utfIsSpace (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&U_GC_Z_MASK)!=0 || IS_THAT_CONTROL_SPACE(c));
+}
+
+bool
+utfIsPunctuation (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&U_GC_P_MASK)!=0);
+}
+
+bool
+utfIsLetter (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&U_GC_L_MASK)!=0);
+}
+
+bool
+utfIsDigit (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)(GET_CATEGORY(props)==U_DECIMAL_DIGIT_NUMBER);
+}
+
+bool
+utfIsNumber (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&U_GC_N_MASK)!=0);
+}
+
+bool
+utfIsLetterOrDigit (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&(U_GC_L_MASK|U_GC_ND_MASK))!=0);
+}
+
+bool
+utfIsLetterOrNumber (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&(U_GC_L_MASK|U_GC_N_MASK))!=0);
+}
+
+bool
+utfIsLowerCase (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)(GET_CATEGORY(props)==U_LOWERCASE_LETTER);
+}
+
+bool
+utfIsUpperCase (utf32_t c)
+{
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)(GET_CATEGORY(props)==U_UPPERCASE_LETTER);
+}
+
+utf32_t
+utfToLowerCase (utf32_t c)
+{
+	const UCaseProps *csp = GET_CASE_PROPS();
+	uint16_t props=UTRIE2_GET16(&csp->trie, c);
+	if(!PROPS_HAS_EXCEPTION(props)) {
+		if(UCASE_GET_TYPE(props)>=UCASE_UPPER) {
+			c+=UCASE_GET_DELTA(props);
+		}
+	} else {
+		const uint16_t *pe=GET_EXCEPTIONS(csp, props);
+		uint16_t excWord=*pe++;
+		if(HAS_SLOT(excWord, UCASE_EXC_LOWER)) {
+			GET_SLOT_VALUE(excWord, UCASE_EXC_LOWER, pe, c);
+		}
+	}
+	return c;
+}
+
+utf32_t
+utfToUpperCase (utf32_t c)
+{
+	const UCaseProps *csp = GET_CASE_PROPS();
+	uint16_t props=UTRIE2_GET16(&csp->trie, c);
+	if(!PROPS_HAS_EXCEPTION(props)) {
+		if(UCASE_GET_TYPE(props)==UCASE_LOWER) {
+			c+=UCASE_GET_DELTA(props);
+		}
+	} else {
+		const uint16_t *pe=GET_EXCEPTIONS(csp, props);
+		uint16_t excWord=*pe++;
+		if(HAS_SLOT(excWord, UCASE_EXC_UPPER)) {
+			GET_SLOT_VALUE(excWord, UCASE_EXC_UPPER, pe, c);
+		}
+	}
+	return c;
+}
+
+utf32_t
+utfToCaseFolded (utf32_t c)
+{
+	uint32_t options = U_FOLD_CASE_DEFAULT;
+
+	const UCaseProps *csp = GET_CASE_PROPS();
+	uint16_t props=UTRIE2_GET16(&csp->trie, c);
+	if(!PROPS_HAS_EXCEPTION(props)) {
+		if(UCASE_GET_TYPE(props)>=UCASE_UPPER) {
+			c+=UCASE_GET_DELTA(props);
+		}
+	} else {
+		const uint16_t *pe=GET_EXCEPTIONS(csp, props);
+		uint16_t excWord=*pe++;
+		int32_t idx;
+		if(excWord&UCASE_EXC_CONDITIONAL_FOLD) {
+			/* special case folding mappings, hardcoded */
+			if((options&_FOLD_CASE_OPTIONS_MASK)==U_FOLD_CASE_DEFAULT) {
+				/* default mappings */
+				if(c==0x49) {
+					/* 0049; C; 0069; # LATIN CAPITAL LETTER I */
+					return 0x69;
+				} else if(c==0x130) {
+					/* no simple case folding for U+0130 */
+					return c;
+				}
+			} else {
+				/* Turkic mappings */
+				if(c==0x49) {
+					/* 0049; T; 0131; # LATIN CAPITAL LETTER I */
+					return 0x131;
+				} else if(c==0x130) {
+					/* 0130; T; 0069; # LATIN CAPITAL LETTER I WITH DOT ABOVE */
+					return 0x69;
+				}
+			}
+		}
+		if(HAS_SLOT(excWord, UCASE_EXC_FOLD)) {
+			idx=UCASE_EXC_FOLD;
+		} else if(HAS_SLOT(excWord, UCASE_EXC_LOWER)) {
+			idx=UCASE_EXC_LOWER;
+		} else {
+			return c;
+		}
+		GET_SLOT_VALUE(excWord, idx, pe, c);
+	}
+	return c;
 }
 
 //.............................................................................

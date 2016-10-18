@@ -30,6 +30,8 @@ getUtfKindString (UtfKind utfKind);
 
 //.............................................................................
 
+#if 0
+
 enum UtfCategory
 {
 	UtfCategory_Mark_NonSpacing,          // Mn
@@ -230,6 +232,56 @@ utfToCaseFolded (utf32_t c)
 	const UtfCodePointAttr* attr = getUtfCodePointAttr (c);
 	return attr->m_caseFoldDiff && !attr->m_caseFoldSpecial ? c + attr->m_caseFoldDiff : c;
 }
+
+#else
+
+bool
+utfIsPrintable (utf32_t c);
+
+bool
+utfIsPrintableNonMark (utf32_t c);
+
+bool
+utfIsSpace (utf32_t c);
+
+bool
+utfIsPunctuation (utf32_t c);
+
+bool
+utfIsLetter (utf32_t c);
+
+bool
+utfIsDigit (utf32_t c);
+
+bool
+utfIsNumber (utf32_t c);
+
+bool
+utfIsLetterOrDigit (utf32_t c);
+
+bool
+utfIsLetterOrNumber (utf32_t c);
+
+bool
+utfIsLowerCase (utf32_t c);
+
+bool
+utfIsUpperCase (utf32_t c);
+
+//.............................................................................
+
+// case ops
+
+utf32_t
+utfToLowerCase (utf32_t c);
+
+utf32_t
+utfToUpperCase (utf32_t c);
+
+utf32_t
+utfToCaseFolded (utf32_t c);
+
+#endif
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

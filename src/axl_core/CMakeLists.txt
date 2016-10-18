@@ -396,6 +396,9 @@ set (
 	${AXL_INC_DIR}/axl_enc_EscapeEncoding.h
 	${AXL_INC_DIR}/axl_enc_HexEncoding.h
 	${AXL_INC_DIR}/axl_enc_Utf.h
+	icu_def.h
+	icu_uchar_props_data.h
+	icu_ucase_props_data.h
 	)
 
 set (
