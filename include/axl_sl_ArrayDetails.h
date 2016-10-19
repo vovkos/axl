@@ -109,6 +109,11 @@ public:
 		}
 	};
 
+	enum
+	{
+		IsSimple = false,
+	};
+
 public:
 	static
 	void
@@ -221,6 +226,11 @@ class SimpleArrayDetails: public ReverseArray <T>
 {
 public:
 	typedef ref::BufHdr Hdr;
+
+	enum
+	{
+		IsSimple = true,
+	};
 
 public:
 	static

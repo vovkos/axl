@@ -364,15 +364,33 @@ public:
 		if (count == 0)
 		{
 			clear ();
-			return true;
+			return 0;
 		}
+
+		ref::Ptr <void> shadow;
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+			if (Details::IsSimple)
+			{
+				// for simple non-ctor-dtor types we can apply in-buffer shift
+
+				T* end = (T*) this->m_hdr->getEnd ();
+				ASSERT (p + count <= end);
+
+				this->m_p = (T*) p;
+				this->m_count = count;
+				return count;
+			}
+			else
+			{
+				shadow = this->m_hdr; // ensure we keep p intact
+			}
 
 		bool result = setCount (count);
 		if (!result)
 			return -1;
 
 		Details::copy (this->m_p, p, count);
-		return true;
+		return count;
 	}
 
 	size_t
@@ -384,15 +402,19 @@ public:
 		if (count == 0)
 		{
 			clear ();
-			return true;
+			return 0;
 		}
+
+		ref::Ptr <void> shadow;
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+			shadow = this->m_hdr; // ensure we keep p intact
 
 		bool result = setCount (count);
 		if (!result)
 			return -1;
 
 		Details::copyReverse (this->m_p, p, count);
-		return true;
+		return count;
 	}
 
 	size_t
@@ -401,7 +423,7 @@ public:
 		return copy (&e, 1);
 	}
 
-	T*
+	size_t
 	append (
 		const T* p,
 		size_t count
@@ -410,7 +432,7 @@ public:
 		return insert (-1, p, count);
 	}
 
-	T*
+	size_t
 	appendReverse (
 		const T* p,
 		size_t count
@@ -419,13 +441,13 @@ public:
 		return insertReverse (-1, p, count);
 	}
 
-	T*
+	size_t
 	append (ValueArg e)
 	{
 		return insert (-1, e);
 	}
 
-	T*
+	size_t
 	appendMultiply (
 		ValueArg e,
 		size_t count
@@ -434,41 +456,19 @@ public:
 		return insertMultiply (-1, e, count);
 	}
 
-	T*
+	size_t
 	append (const ArrayRef& src)
 	{
 		return insert (-1, src, src.getCount ());
 	}
 
-	T*
+	size_t
 	appendReverse (const ArrayRef& src)
 	{
 		return insertReverse (-1, src, src.getCount ());
 	}
 
-	T*
-	insertSpace (
-		size_t index,
-		size_t count
-		)
-	{
-		size_t oldCount = this->m_count;
-		bool result = setCount (this->m_count + count);
-		if (!result)
-			return NULL;
-
-		if (index > oldCount)
-			index = oldCount;
-
-		T* dst = this->m_p + index;
-
-		if (count && index < oldCount)
-			Details::copy (dst + count, dst, oldCount - index);
-
-		return dst;
-	}
-
-	T*
+	size_t
 	insertEmptySpace (
 		size_t index,
 		size_t count
@@ -476,51 +476,59 @@ public:
 	{
 		T* dst = insertSpace (index, count);
 		if (!dst)
-			return NULL;
+			return -1;
 
 		Details::clear (dst, count);
-		return dst;
+		return this->m_count;
 	}
 
-	T*
+	size_t
 	insert (
 		size_t index,
 		const T* p,
 		size_t count
 		)
 	{
+		ref::Ptr <void> shadow;
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+			shadow = this->m_hdr; // ensure we keep p intact
+
 		T* dst = insertSpace (index, count);
 		if (!dst)
-			return NULL;
+			return -1;
 
 		if (p)
 			Details::copy (dst, p, count);
 		else
 			Details::clear (dst, count);
 
-		return dst;
+		return this->m_count;
 	}
 
-	T*
+	size_t
 	insertReverse (
 		size_t index,
 		const T* p,
 		size_t count
 		)
 	{
+		ref::Ptr <void> shadow;
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+			shadow = this->m_hdr; // ensure we keep p intact
+
 		T* dst = insertSpace (index, count);
 		if (!dst)
-			return NULL;
+			return -1;
 
 		if (p)
 			Details::copyReverse (dst, p, count);
 		else
 			Details::clear (dst, count);
 
-		return dst;
+		return this->m_count;
 	}
 
-	T*
+	size_t
 	insert (
 		size_t index,
 		ValueArg e
@@ -528,13 +536,13 @@ public:
 	{
 		T* dst = insertSpace (index, 1);
 		if (!dst)
-			return NULL;
+			return -1;
 
 		*dst = e;
-		return dst;
+		return this->m_count;
 	}
 
-	T*
+	size_t
 	insertMultiply (
 		size_t index,
 		ValueArg e,
@@ -543,17 +551,17 @@ public:
 	{
 		T* dst = insertSpace (index, count);
 		if (!dst)
-			return NULL;
+			return -1;
 
 		T* end = dst + count;
 
 		for (; dst < end; dst++)
 			*dst = e;
 
-		return dst;
+		return this->m_count;
 	}
 
-	T*
+	size_t
 	insert (
 		size_t index,
 		const ArrayRef& src
@@ -562,7 +570,7 @@ public:
 		return insert (index, src, src.getCount ());
 	}
 
-	T*
+	size_t
 	insertReverse (
 		size_t index,
 		const ArrayRef& src
@@ -571,32 +579,33 @@ public:
 		return insertReverse (index, src, src.getCount ());
 	}
 
-	bool
+	size_t
 	remove (
 		size_t index,
 		size_t count = 1
 		)
 	{
 		if (count == 0)
-			return true;
+			return this->m_count;
 
 		size_t oldCount = this->m_count;
 		if (index >= oldCount)
-			return true;
+			return this->m_count;
 
 		if (index + count >= oldCount)
 			return setCount (index);
 
 		bool result = ensureExclusive ();
 		if (!result)
-			return false;
+			return -1;
 
 		size_t newCount = oldCount - count;
 
 		T* dst = this->m_p + index;
 		Details::copy (dst, dst + count, newCount - index);
 
-		return setCount (newCount);
+		result = setCount (newCount);
+		return result ? newCount : -1;
 	}
 
 	size_t
@@ -605,8 +614,9 @@ public:
 		if (count >= this->m_count)
 			count = this->m_count;
 
-		setCount (this->m_count - count);
-		return count;
+		size_t newCount = this->m_count - count;
+		bool result = setCount (newCount);
+		return result ? newCount : -1;
 	}
 
 	T
@@ -839,6 +849,29 @@ public:
 		this->m_count = 0;
 
 		return bufferSize / sizeof (T);
+	}
+
+protected:
+	T*
+	insertSpace (
+		size_t index,
+		size_t count
+		)
+	{
+		size_t oldCount = this->m_count;
+		bool result = setCount (this->m_count + count);
+		if (!result)
+			return NULL;
+
+		if (index > oldCount)
+			index = oldCount;
+
+		T* dst = this->m_p + index;
+
+		if (count && index < oldCount)
+			Details::copy (dst + count, dst, oldCount - index);
+
+		return dst;
 	}
 };
 

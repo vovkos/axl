@@ -55,8 +55,8 @@ CharCodec::encodeFromUtf8 (
 		if (!takenLength)
 			break;
 
-		char* p2 = buffer->append (tmpBuffer, takenBufferSize);
-		if (!p2)
+		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		if (!result)
 			return -1;
 
 		p += takenLength;
@@ -89,8 +89,8 @@ CharCodec::encodeFromUtf16 (
 		if (!takenLength)
 			break;
 
-		char* p2 = buffer->append (tmpBuffer, takenBufferSize);
-		if (!p2)
+		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		if (!result)
 			return -1;
 
 		p += takenLength;
@@ -123,8 +123,8 @@ CharCodec::encodeFromUtf32 (
 		if (!takenLength)
 			break;
 
-		char* p2 = buffer->append (tmpBuffer, takenBufferSize);
-		if (!p2)
+		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		if (!result)
 			return -1;
 
 		p += takenLength;
@@ -198,8 +198,8 @@ CharCodec::decodeToUtf8 (
 		if (!takenLength)
 			break;
 
-		utf8_t* p2 = buffer->append (tmpBuffer, takenBufferSize);
-		if (!p2)
+		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		if (!result)
 			return -1;
 
 		p += takenLength;
@@ -236,8 +236,8 @@ CharCodec::decodeToUtf16 (
 		if (!takenLength)
 			break;
 
-		utf16_t* p2 = buffer->append (tmpBuffer, takenBufferSize);
-		if (!p2)
+		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		if (!result)
 			return -1;
 
 		p += takenLength;
@@ -274,8 +274,8 @@ CharCodec::decodeToUtf32 (
 		if (!takenLength)
 			break;
 
-		utf32_t* p2 = buffer->append (tmpBuffer, takenBufferSize);
-		if (!p2)
+		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		if (!result)
 			return -1;
 
 		p += takenLength;
