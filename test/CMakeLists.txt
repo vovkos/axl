@@ -20,13 +20,15 @@ if (${QT_FOUND})
 	option (
 		BUILD_TEST_QT
 		"Build test_qt"
-		OFF
+		ON
 		)
 
 	if (BUILD_TEST_QT)
 		add_subdirectory (test_qt)
 	endif ()
 endif ()
+
+#..............................................................................
 
 add_subdirectory (test_mini)
 

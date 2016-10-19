@@ -93,6 +93,8 @@ add_executable (
 	${GEN_MOC_CPP_LIST}
 	)
 
+qt5_use_modules (test_qt Widgets)
+
 axl_set_pch (
 	test_qt
 	${PCH_H}
@@ -114,8 +116,6 @@ if (UNIX)
 		pthread
 		)
 endif ()
-
-qt5_use_modules (test_qt Widgets)
 
 if (WIN32)
 	copy_qt_dll_files (test_qt Core Gui Widgets)

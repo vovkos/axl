@@ -2613,11 +2613,7 @@ testCmdLine (
 		printf ("Error parsing command line: %s\n", err::getLastErrorDescription ().sz ());
 }
 
-//.............................................................................
-
-#include <string>
-
-std::string testStlString (const std::string& s);
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 int

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "mainwindow.h"
 #include "moc_axl_gui_QtWidget.cpp"
-#include "axl_mt_Thread.h"
+#include "axl_sys_Thread.h"
 #include "axl_fsm_RegExp.h"
 
 //.............................................................................
@@ -262,6 +262,61 @@ public:
 
 #endif
 
+void
+testUtf ()
+{
+	setbuf(stdout, NULL);
+
+	printf ("Testing UTF...\n");
+
+	for (uint_t c = 0; c < 0x10ffff; c++)
+	{
+		if (axl::enc::utfIsDigit (c) != QChar::isDigit (c))
+			printf ("%x\taxl::enc::utfIsDigit -> %d\tQChar::isDigit -> %d\n", c, axl::enc::utfIsDigit (c), QChar::isDigit (c));
+
+		if (axl::enc::utfIsLetter (c) != QChar::isLetter (c))
+			printf ("%x\taxl::enc::utfIsLetter -> %d\tQChar::isLetter -> %d\n", c, axl::enc::utfIsLetter (c), QChar::isLetter (c));
+
+		if (axl::enc::utfIsNumber (c) != QChar::isNumber (c))
+			printf ("%x\taxl::enc::utfIsNumber -> %d\tQChar::isNumber -> %d\n", c, axl::enc::utfIsNumber (c), QChar::isNumber (c));
+
+		if (axl::enc::utfIsLetterOrDigit (c) != (QChar::isLetter (c) || QChar::isDigit (c)))
+			printf ("%x\taxl::enc::utfIsLetterOrDigit -> %d\tQChar::isLetter -> %d\tQChar::isDigit -> %d\n", c, axl::enc::utfIsLetterOrDigit (c), QChar::isLetter (c), QChar::isDigit (c));
+
+		if (axl::enc::utfIsLetterOrNumber (c) != QChar::isLetterOrNumber (c))
+			printf ("%x\taxl::enc::utfIsLetterOrNumber -> %d\tQChar::isLetterOrNumber  -> %d\n", c, axl::enc::utfIsLetterOrNumber (c), QChar::isLetterOrNumber  (c));
+
+		if (axl::enc::utfIsPunctuation (c) != QChar::isPunct (c))
+			printf ("%x\taxl::enc::utfIsPunctuation -> %d\tQChar::isPunct -> %d\n", c, axl::enc::utfIsPunctuation (c), QChar::isPunct (c));
+
+		if (axl::enc::utfIsSpace (c) != QChar::isSpace (c))
+			printf ("%x\taxl::enc::utfIsSpace -> %d\tQChar::isDigit -> %d\n", c, axl::enc::utfIsSpace (c), QChar::isSpace (c));
+
+		if (axl::enc::utfIsPrintable (c) != QChar::isPrint (c))
+			printf ("%x\taxl::enc::utfIsPrintable -> %d\tQChar::isPrint -> %d\n", c, axl::enc::utfIsPrintable (c), QChar::isPrint (c));
+
+		if (axl::enc::utfIsPrintableNonMark (c) != (QChar::isPrint (c) && !QChar::isMark (c)))
+			printf ("%x\taxl::enc::utfIsPrintableNonMark -> %d\tQChar::isPrint -> %d\tQChar::isMark -> %d\n", c, axl::enc::utfIsPrintableNonMark (c), QChar::isPrint (c), QChar::isMark (c));
+
+		if (axl::enc::utfIsLowerCase (c) != QChar::isLower (c))
+			printf ("%x\taxl::enc::utfIsLowerCase -> %d\tQChar::isLower -> %d\n", c, axl::enc::utfIsLowerCase (c), QChar::isLower (c));
+
+		if (axl::enc::utfIsUpperCase (c) != QChar::isUpper (c))
+			printf ("%x\taxl::enc::utfIsUpperCase -> %d\tQChar::isUpper -> %d\n", c, axl::enc::utfIsUpperCase (c), QChar::isUpper (c));
+
+		if (axl::enc::utfToLowerCase (c) != QChar::toLower (c))
+			printf ("%x\taxl::enc::utfToLowerCase -> %x\tQChar::toLower -> %x\n", c, axl::enc::utfToLowerCase (c), QChar::toLower (c));
+
+		if (axl::enc::utfToUpperCase (c) != QChar::toUpper (c))
+			printf ("%x\taxl::enc::utfToUpperCase -> %x\tQChar::toUpper -> %x\n", c, axl::enc::utfToUpperCase (c), QChar::toUpper (c));
+
+		if (axl::enc::utfToCaseFolded (c) != QChar::toCaseFolded (c))
+			printf ("%x\taxl::enc::utfToCaseFolded -> %x\tQChar::toCaseFolded -> %x\n", c, axl::enc::utfToCaseFolded (c), QChar::toCaseFolded (c));
+	}
+
+	printf ("Done\n");
+}
+
 int
 main (
 	int argc,
@@ -269,6 +324,9 @@ main (
 	)
 {
 	printf ("main ()\n");
+
+	testUtf ();
+	return 0;
 
 #if 0
 
