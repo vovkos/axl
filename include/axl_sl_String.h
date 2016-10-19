@@ -925,6 +925,17 @@ public:
 			return 0;
 		}
 
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+		{
+			C* end = (C*) this->m_hdr->getEnd ();
+			ASSERT (p + length <= end);
+
+			this->m_p = (C*) p;
+			this->m_length = length;
+			this->m_isNullTerminated = p + length < end && !p [length];
+			return length;
+		}
+
 		if (!createBuffer (length, false))
 			return -1;
 
@@ -1125,6 +1136,10 @@ public:
 
 		if (length == 0)
 			return oldLength;
+
+		ref::Ptr <void> shadow;
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+			shadow = this->m_hdr; // ensure we keep p intact
 
 		C* dst = insertSpace (index, length);
 		if (!dst)

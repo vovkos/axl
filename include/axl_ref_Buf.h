@@ -414,6 +414,18 @@ public:
 		if (size < sizeof (T))
 			size = sizeof (T);
 
+		if (this->m_hdr && this->m_hdr->isInsideBuffer (p))
+		{
+			// in-buffer shifts are only applicable to non-ctor-dtor types
+
+			T* end = (T*) this->m_hdr->getEnd ();
+			ASSERT (p + size <= end);
+
+			this->m_p = (T*) p;
+			this->m_size = size;
+			return size;
+		}
+
 		if (!createBuffer (size, false))
 			return -1;
 
@@ -469,7 +481,7 @@ public:
 			}
 			else if (!saveContents)
 			{
-				// no need to call destructor on old m_p -- in-buffer shifts are only applicable to non-destructible types
+				// no need to call destructor on old m_p -- in-buffer shifts are only applicable to non-ctor-dtor types
 				this->m_p = (T*) (this->m_hdr + 1);
 			}
 
