@@ -6,7 +6,7 @@
 namespace axl {
 namespace err {
 
-//.............................................................................
+//..............................................................................
 
 sl::StringRef
 ErrorHdr::getDescription () const
@@ -18,7 +18,7 @@ ErrorHdr::getDescription () const
 		sl::formatString ("%s::%d", m_guid.getGuidString ().sz (), m_code);
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::String
 ErrorRef::getDescription () const
@@ -26,7 +26,7 @@ ErrorRef::getDescription () const
 	return !isEmpty () ? m_p->getDescription () : g_noError.getDescription ();
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 Error::push (const ErrorRef& error)
@@ -141,7 +141,7 @@ Error::formatStringError_va (
 	return createStringError (string);
 }
 
-//.............................................................................
+//..............................................................................
 
 ErrorRef
 getLastError ()
@@ -171,7 +171,7 @@ getLastErrorDescription ()
 	return getErrorMgr ()->getLastError ().getDescription ();
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 setFormatError_va (
@@ -237,7 +237,7 @@ pushFormatStringError_va (
 	return result != -1 ? pushError (error) : -1;
 }
 
-//.............................................................................
+//..............................................................................
 
 sl::StringRef
 StdErrorProvider::getErrorDescription (const ErrorRef& error)
@@ -292,7 +292,7 @@ StdErrorProvider::getStackErrorDescription (const ErrorRef& error)
 	return string;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace err
 } // namespace axl

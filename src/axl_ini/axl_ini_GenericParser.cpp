@@ -4,7 +4,7 @@
 namespace axl {
 namespace ini {
 
-//.............................................................................
+//..............................................................................
 
 bool
 GenericParser::onSection (const sl::StringRef& sectionName)
@@ -27,7 +27,7 @@ GenericParser::onSection (const sl::StringRef& sectionName)
 
 bool
 GenericParser::onKeyValue (
-	const sl::StringRef& keyName, 
+	const sl::StringRef& keyName,
 	const sl::StringRef& value
 	)
 {
@@ -54,7 +54,7 @@ GenericParser::onKeyValue (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ini
 } // namespace axl

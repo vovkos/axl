@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_ERR_WINERROR_H
 
@@ -12,7 +12,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 // {54E100E8-2137-40b8-BCD8-00AC1D0BAA16}
 AXL_SL_DEFINE_GUID (
@@ -20,16 +20,16 @@ AXL_SL_DEFINE_GUID (
 	0x54e100e8, 0x2137, 0x40b8, 0xbc, 0xd8, 0x0, 0xac, 0x1d, 0xb, 0xaa, 0x16
 	);
 
-//.............................................................................
+//..............................................................................
 
 class WinErrorProvider: public err::ErrorProvider
 {
 public:
 	static
-	sl::String 
+	sl::String
 	getErrorDescription (dword_t code);
 
-	virtual 
+	virtual
 	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error)
 	{
@@ -37,7 +37,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class WinError: public err::Error
 {
@@ -55,7 +55,7 @@ public:
 	create (dword_t code);
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 size_t
@@ -64,7 +64,7 @@ setWinError (dword_t code)
 	return err::setError (WinError (code));
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

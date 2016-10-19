@@ -5,7 +5,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 bool
 Library::loadLibrary (const sl::StringRef_w& fileName)
@@ -16,7 +16,7 @@ Library::loadLibrary (const sl::StringRef_w& fileName)
 	return err::complete (m_h != NULL);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

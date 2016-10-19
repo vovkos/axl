@@ -7,7 +7,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 GdiEngine::GdiEngine ()
 {
@@ -53,7 +53,7 @@ GdiEngine::createStdFont (StdFontKind fontKind)
 
 		hFont = ::CreateFontIndirectW (&logFont);
 		ASSERT (hFont);
-		
+
 		return createFont (hFont);
 
 	default:
@@ -282,7 +282,7 @@ GdiEngine::createOffscreenCanvas (
 	return dc;
 }
 
-uintptr_t 
+uintptr_t
 GdiEngine::registerClipboardFormat (const sl::StringRef& formatName)
 {
 	err::setError (err::SystemErrorCode_NotImplemented);
@@ -408,7 +408,7 @@ GdiEngine::hideCaret ()
 {
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

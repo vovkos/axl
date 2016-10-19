@@ -11,15 +11,15 @@
 namespace axl {
 namespace st {
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 gotoEndOfScriptSnippet (
 	Lexer* lexer,
 	lex::RagelTokenPos* endPos
 	);
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class StringTemplate
@@ -77,7 +77,7 @@ public:
 			output->copy (frame);
 			return true;
 		}
-			
+
 		EmitContext emitContext;
 		emitContext.m_self = this;
 		emitContext.m_output = output;
@@ -99,12 +99,12 @@ public:
 		)
 	{
 		io::SimpleMappedFile file;
-	
+
 		return
 			file.open (fileName, io::FileFlag_ReadOnly) &&
 			process (
-				output, 
-				fileName, 
+				output,
+				fileName,
 				sl::StringRef ((const char*) file.p (), file.getMappingSize ())
 				);
 	}
@@ -151,7 +151,7 @@ protected:
 		lexer.create (fileName, frame);
 
 		scriptSource->clear ();
-	
+
 		size_t offset = 0;
 		Token::Pos pos;
 
@@ -160,7 +160,7 @@ protected:
 		for (;;)
 		{
 			const Token* token = lexer.getToken ();
-		
+
 			if (token->m_token == TokenKind_Error)
 			{
 				err::setFormatStringError ("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
@@ -169,8 +169,8 @@ protected:
 
 			if (token->m_pos.m_offset > offset)
 				static_cast <T*> (this)->createPassthroughCall (
-					scriptSource, 
-					offset, 
+					scriptSource,
+					offset,
 					token->m_pos.m_offset - offset
 					);
 
@@ -208,7 +208,7 @@ protected:
 					return false;
 
 				static_cast <T*> (this)->createEmitCall (
-					scriptSource, 
+					scriptSource,
 					frame.getSubString (offset, pos.m_offset - offset)
 					);
 				break;
@@ -223,7 +223,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace st
 } // namespace axl

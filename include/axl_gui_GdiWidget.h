@@ -12,7 +12,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 enum WmKind
 {
@@ -25,10 +25,10 @@ struct Notify: NMHDR
 	void* param;
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
-int 
+int
 getScrollBarFromOrientation (Orientation orientation)
 {
 	return orientation == Orientation_Horizontal ? SB_HORZ : SB_VERT;
@@ -45,27 +45,27 @@ buildScrollInfo (
 inline
 void
 getScrollInfoFromScrollBar (
-	const WidgetScrollBar& scrollBar,	
+	const WidgetScrollBar& scrollBar,
 	SCROLLINFO* scrollInfo
 	)
 {
 	buildScrollInfo (scrollInfo, scrollBar.m_end - 1, scrollBar.m_page, scrollBar.m_pos);
 }
 
-//.............................................................................
+//..............................................................................
 
 class GdiWidgetImpl: public Widget
 {
 public:
-	// this class is needed to get access to protected members in CWidget 
+	// this class is needed to get access to protected members in CWidget
 	// also to put part of implementation into .cpp instead of having one huge CGdiWidgetT <>
 
-	LRESULT 
+	LRESULT
 	windowProc (
 		HWND hWnd,
-		UINT wmMsg, 
-		WPARAM wParam, 
-		LPARAM lParam, 
+		UINT wmMsg,
+		WPARAM wParam,
+		LPARAM lParam,
 		bool* isHandled_o
 		);
 
@@ -124,10 +124,10 @@ protected:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
-class GdiWidget: 
+class GdiWidget:
 	public T,
 	public g::win::WindowImpl <GdiWidget <T> >
 {
@@ -151,15 +151,15 @@ public:
 
 	virtual
 	bool
-	redraw (	
-		int left, 
-		int top, 
-		int right, 
-		int bottom		
+	redraw (
+		int left,
+		int top,
+		int right,
+		int bottom
 		)
 	{
 		if (left == right || top == bottom)
-		{	
+		{
 			::InvalidateRect (m_h, NULL, false);
 		}
 		else
@@ -183,7 +183,7 @@ public:
 	setFocus ()
 	{
 		::SetFocus (m_h);
-		return true;		
+		return true;
 	}
 
 	virtual
@@ -193,7 +193,7 @@ public:
 		ASSERT (cursor->getEngine ()->getEngineKind () == EngineKind_Gdi);
 		::SetCursor (*(Cursor*) cursor);
 		m_cursor = cursor;
-		return true;		
+		return true;
 	}
 
 	virtual
@@ -222,7 +222,7 @@ public:
 	virtual
 	bool
 	setCaretPos (
-		int x, 
+		int x,
 		int y
 		)
 	{
@@ -232,7 +232,7 @@ public:
 	virtual
 	bool
 	setCaretSize (
-		uint_t width, 
+		uint_t width,
 		uint_t height
 		)
 	{
@@ -249,7 +249,7 @@ public:
 
 		SCROLLINFO scrollInfo;
 		getScrollInfoFromScrollBar (m_scrollBarArray [orientation], &scrollInfo);
-		bool_t result = ::SetScrollInfo (m_h, bar, &scrollInfo, TRUE); 
+		bool_t result = ::SetScrollInfo (m_h, bar, &scrollInfo, TRUE);
 		return err::complete (result);
 	}
 
@@ -287,19 +287,19 @@ public:
 		if (!result)
 			AXL_MEM_DELETE (msg);
 	}
-	
+
 protected:
 	GdiWidgetImpl*
 	getGdiWidget ()
 	{
 		return (GdiWidgetImpl*) (Widget*) this;
 	}
-	
-	LRESULT 
+
+	LRESULT
 	windowProc (
-		UINT wmMsg, 
-		WPARAM wParam, 
-		LPARAM lParam, 
+		UINT wmMsg,
+		WPARAM wParam,
+		LPARAM lParam,
 		bool* isHandled_o
 		)
 	{
@@ -307,7 +307,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

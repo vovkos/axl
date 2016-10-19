@@ -11,7 +11,7 @@
 namespace axl {
 namespace ini {
 
-//.............................................................................
+//..............................................................................
 
 class Lexer
 {
@@ -88,13 +88,13 @@ protected: // should only be used as part of ini::CParser
 		setLineCol (lineCol.m_line, lineCol.m_col);
 	}
 
-	void 
+	void
 	reset ();
 
 protected:
 	// these are to be called from withing ragel scanner (*.rl)
-	
-	void 
+
+	void
 	newLine (char* line);
 
 	void
@@ -112,7 +112,7 @@ protected:
 	exec ();
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ini
 } // namespace axl

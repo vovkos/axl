@@ -8,9 +8,9 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 Process::createProcess (
 	const sl::StringRef_w& appName,
 	const sl::StringRef_w& cmdLine,
@@ -56,7 +56,7 @@ Process::createProcess (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 syncExec (
@@ -72,11 +72,11 @@ syncExec (
 	secAttr.bInheritHandle = true;
 
 	io::win::File childStdOut;
-	io::win::File childStdIn; 
+	io::win::File childStdIn;
 	io::win::File parentStdOut;
 	io::win::File parentStdIn;
-		
-	result = 
+
+	result =
 		::CreatePipe (parentStdOut.p (), childStdOut.p (), &secAttr, 0) &&
 		::CreatePipe (childStdIn.p (), parentStdIn.p (), &secAttr, 0);
 
@@ -126,7 +126,7 @@ syncExec (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

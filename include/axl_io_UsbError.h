@@ -11,7 +11,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 // {87EA0738-52E9-4769-B727-7A17377B921E}
 AXL_SL_DEFINE_GUID (
@@ -19,7 +19,7 @@ AXL_SL_DEFINE_GUID (
 	0x87ea0738, 0x52e9, 0x4769, 0xb7, 0x27, 0x7a, 0x17, 0x37, 0x7b, 0x92, 0x1e
 	);
 
-//.............................................................................
+//..............................................................................
 
 class UsbErrorProvider: public err::ErrorProvider
 {
@@ -31,7 +31,7 @@ public:
 		return libusb_error_name (code);
 	}
 
-	virtual 
+	virtual
 	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error)
 	{
@@ -39,19 +39,19 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-inline 
-void 
+inline
+void
 registerUsbErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
-		g_usbErrorGuid, 
+		g_usbErrorGuid,
 		sl::getSimpleSingleton <UsbErrorProvider> ()
 		);
 }
 
-//.............................................................................
+//..............................................................................
 
 class UsbError: public err::Error
 {
@@ -65,11 +65,11 @@ public:
 		create (code);
 	}
 
-	err::ErrorHdr* 
+	err::ErrorHdr*
 	create (int code);
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 size_t
@@ -78,7 +78,7 @@ setUsbError (int code)
 	return setError (UsbError (code));
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

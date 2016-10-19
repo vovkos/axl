@@ -14,7 +14,7 @@ namespace io {
 
 class MappedFile;
 
-//.............................................................................
+//..............................................................................
 
 class MappedViewMgr
 {
@@ -28,7 +28,7 @@ protected:
 
 	typedef sl::RbTreeMap <uint64_t, ViewEntry*> ViewMap;
 
-	struct ViewEntry: sl::ListLink 
+	struct ViewEntry: sl::ListLink
 	{
 #if (_AXL_OS_WIN)
 		win::MappedView m_view;
@@ -40,17 +40,17 @@ protected:
 		ViewMap::Iterator m_mapIt; // to optimize deletion
 	};
 
-protected:	
+protected:
 	MappedFile* m_mappedFile;
 	sl::StdList <ViewEntry> m_viewList;
-	ViewMap m_viewMap; 
+	ViewMap m_viewMap;
 
 protected:
 	MappedViewMgr () // protected construction only
-	{		
+	{
 		m_mappedFile = NULL;
 	}
-	
+
 public:
 	void*
 	find (
@@ -64,7 +64,7 @@ public:
 		uint64_t end,
 		uint64_t origBegin,
 		uint64_t origEnd
-		);	
+		);
 
 	void
 	clear ()
@@ -77,12 +77,12 @@ public:
 	limitViewCount (size_t maxViewCount);
 };
 
-//.............................................................................
+//..............................................................................
 
 class MappedFile
 {
 	friend class MappedViewMgr;
-	
+
 public:
 	enum DefaultsKind
 	{
@@ -97,10 +97,10 @@ protected:
 	win::Mapping m_mapping;
 	uint64_t m_mappingSize;
 #endif
-	
+
 	MappedViewMgr m_dynamicViewMgr;
 	MappedViewMgr m_permanentViewMgr;
-	
+
 	size_t m_readAheadSize;
 	size_t m_maxDynamicViewCount;
 
@@ -130,9 +130,9 @@ public:
 	void
 	close ();
 
-	bool 
+	bool
 	open (
-		const sl::StringRef& fileName, 
+		const sl::StringRef& fileName,
 		uint_t flags = 0 // FileFlag
 		);
 
@@ -154,16 +154,16 @@ public:
 		return m_fileSize;
 	}
 
-	bool 
+	bool
 	setSize (
-		uint64_t size, 
+		uint64_t size,
 		bool unmapAndApplyNow = false
 		);
 
-	const void* 
+	const void*
 	view (
-		uint64_t offset = 0, 
-		size_t size = 0, 
+		uint64_t offset = 0,
+		size_t size = 0,
 		bool isPermanent = false
 		) const
 	{
@@ -173,11 +173,11 @@ public:
 			isPermanent
 			);
 	}
-	
-	void* 
+
+	void*
 	view (
-		uint64_t offset = 0, 
-		size_t size = 0, 
+		uint64_t offset = 0,
+		size_t size = 0,
 		bool isPermanent = false
 		);
 
@@ -188,9 +188,9 @@ public:
 		size_t size
 		);
 
-	void 
+	void
 	unmapAllViews ();
-	
+
 protected:
 	void*
 	viewImpl (
@@ -200,7 +200,7 @@ protected:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 class SimpleMappedFile
 {
@@ -232,13 +232,13 @@ public:
 		return m_mapping;
 	}
 
-	uint64_t 
+	uint64_t
 	getFileSize ()
 	{
 		return m_file.getSize ();
 	}
 
-	size_t 
+	size_t
 	getMappingSize ()
 	{
 		return m_mapping.getSize ();
@@ -246,16 +246,16 @@ public:
 
 	bool
 	open (
-		const sl::StringRef& fileName, 
+		const sl::StringRef& fileName,
 		uint64_t offset,
 		size_t size,
-		uint_t flags = 0 // EFileFlag 
+		uint_t flags = 0 // EFileFlag
 		);
 
 	bool
 	open (
-		const sl::StringRef& fileName, 
-		uint_t flags = 0 // EFileFlag 
+		const sl::StringRef& fileName,
+		uint_t flags = 0 // EFileFlag
 		)
 	{
 		return open (fileName, 0, -1, flags);
@@ -270,7 +270,7 @@ public:
 		return m_mapping.open (&m_file, offset, size, m_openFlags);
 	}
 
-	void 
+	void
 	close ()
 	{
 		m_file.close ();
@@ -279,7 +279,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

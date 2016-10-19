@@ -18,11 +18,11 @@ namespace win {
 
 class DeviceInfoSet;
 
-//.............................................................................
+//..............................................................................
 
 AXL_SELECT_ANY SP_DEVINFO_DATA g_nullDevInfoData = { sizeof (SP_DEVINFO_DATA) };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class DeviceInfo
 {
@@ -48,7 +48,7 @@ public:
 		m_devInfoData = *devInfoData;
 	}
 
-	HDEVINFO 
+	HDEVINFO
 	getDevInfoSet ()
 	{
 		return m_devInfoSet;
@@ -141,7 +141,7 @@ public:
 		bool_t result = ::SetupDiSetClassInstallParamsW (m_devInfoSet, &m_devInfoData, (SP_CLASSINSTALL_HEADER*) params, size);
 		return err::complete (result != 0);
 	}
-	
+
 	bool
 	callClassInstaller (DI_FUNCTION function)
 	{
@@ -153,7 +153,7 @@ public:
 	restartDevice (bool* isRebootRequired);
 };
 
-//.............................................................................
+//..............................................................................
 
 class DestroyDeviceInfoSet
 {
@@ -165,7 +165,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class DeviceInfoSet: public sl::Handle <HDEVINFO, DestroyDeviceInfoSet, sl::MinusOne <HDEVINFO> >
 {
@@ -192,7 +192,7 @@ public:
 		);
 
 	static
-	bool 
+	bool
 	getDeviceClassGuids (
 		const sl::StringRef_w& name,
 		GUID* buffer,
@@ -205,15 +205,15 @@ public:
 	}
 
 	static
-	bool 
+	bool
 	getDeviceClassGuids (
 		const sl::StringRef_w& name,
 		sl::Array <GUID>* buffer
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace sys 
+} // namespace sys
 } // namespace axl

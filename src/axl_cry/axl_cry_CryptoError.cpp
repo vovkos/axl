@@ -4,7 +4,7 @@
 namespace axl {
 namespace cry {
 
-//.............................................................................
+//..............................................................................
 
 class LoadCryptoStrings
 {
@@ -16,7 +16,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::StringRef
 CryptoErrorProvider::getErrorDescription (const err::ErrorRef& error)
@@ -25,7 +25,7 @@ CryptoErrorProvider::getErrorDescription (const err::ErrorRef& error)
 	return ERR_reason_error_string (error->m_code);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cry
 } // namespace axl

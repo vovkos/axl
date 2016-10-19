@@ -12,7 +12,7 @@
 namespace axl {
 namespace enc {
 
-//.............................................................................
+//..............................................................................
 
 const char*
 getUtfKindString (UtfKind utfKind)
@@ -31,7 +31,7 @@ getUtfKindString (UtfKind utfKind)
 		"undefined-utf-kind";
 }
 
-//.............................................................................
+//..............................................................................
 
 #if 0
 
@@ -4753,7 +4753,7 @@ static const uint16_t g_utfCodePointAttrTrie [] =
 	1549, 1549, 1549, 1549, 1549, 1549, 1546, 1546,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 static const UtfCodePointAttr g_utfCodePointAttrTable [] =
 {
@@ -6311,7 +6311,7 @@ static const UtfCodePointAttr g_utfCodePointAttrTable [] =
 	{ UtfCategory_Other_NotAssigned },
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const UtfCodePointAttr*
 getUtfCodePointAttr (utf32_t c)
@@ -6562,7 +6562,7 @@ utfToCaseFolded (utf32_t c)
 	return c;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace enc
 } // namespace axl

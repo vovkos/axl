@@ -11,7 +11,7 @@
 namespace axl {
 namespace ini {
 
-//.............................................................................
+//..............................................................................
 
 class NamedValue: public sl::ListLink
 {
@@ -35,7 +35,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Section: public sl::ListLink
 {
@@ -68,7 +68,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class GenericIni
 {
@@ -80,21 +80,21 @@ protected:
 	Section m_unnamedSection;
 
 public:
-	Section* 
+	Section*
 	getSection (const sl::StringRef& name) const
 	{
 		sl::StringHashTableMapIterator <Section*> it = m_namedSectionMap.find (name);
 		return it ? it->m_value : NULL;
 	}
 
-	const Section* 
+	const Section*
 	getUnnamedSection () const
 	{
 		return &m_unnamedSection;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class GenericParser: public Parser <GenericParser>
 {
@@ -127,12 +127,12 @@ public:
 
 	bool
 	onKeyValue (
-		const sl::StringRef& keyName, 
+		const sl::StringRef& keyName,
 		const sl::StringRef& value
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ini
 } // namespace axl

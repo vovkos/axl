@@ -12,12 +12,12 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class ServiceMgr: public ServiceHandle
 {
 public:
-	bool 
+	bool
 	open (
 		const sl::StringRef_w& machineName,
 		const sl::StringRef_w& databaseName,
@@ -49,8 +49,8 @@ public:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace sys 
+} // namespace sys
 } // namespace axl

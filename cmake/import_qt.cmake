@@ -1,4 +1,4 @@
-#..............................................................................
+#...............................................................................
 
 if (EXISTS ${QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake)
 	set (QT_FOUND TRUE)
@@ -18,7 +18,7 @@ if (QT_FOUND)
 	include ("${QT_CMAKE_DIR}/Qt5Network/Qt5NetworkConfig.cmake")
 endif ()
 
-#..............................................................................
+#...............................................................................
 
 # this macro is similar to qt5_wrap_cpp but does not generate those ridiculous output paths
 
@@ -48,7 +48,7 @@ qt5_wrap_cpp_alt
 	endforeach ()
 endmacro ()
 
-#..............................................................................
+#...............................................................................
 
 macro (
 copy_qt_dll_files
@@ -59,7 +59,7 @@ copy_qt_dll_files
 	if (NOT QT_FOUND)
 		message (FATAL_ERROR "QT is required for copy_qt_dll_files () macro")
 	endif ()
-	
+
 	if (NOT WIN32)
 		message (FATAL_ERROR "copy_qt_dll_files should only be used on Windows")
 	endif ()
@@ -96,13 +96,13 @@ copy_qt_dll_files
 			axl_copy_file_if_different (
 				${_TARGET}
 				${QT_DLL_DIR}/${_QT_FILE_NAME}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_QT_FILE_NAME}				
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_QT_FILE_NAME}
 				)
 		endforeach ()
 	endif ()
 endmacro ()
 
-#..............................................................................
+#...............................................................................
 
 macro (
 add_qt_rpath_link)
@@ -113,13 +113,13 @@ add_qt_rpath_link)
 	if (NOT UNIX OR APPLE)
 		message (FATAL_ERROR "add_qt_rpath_link should only be used on Unix")
 	endif ()
-	
+
 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 		set (
 			CMAKE_EXE_LINKER_FLAGS
 			"${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,'${QT_CMAKE_DIR}/..'"
-			)	
+			)
 	endif ()
 endmacro ()
 
-#..............................................................................
+#...............................................................................

@@ -12,15 +12,15 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
-	
+//..............................................................................
+
 class Iocp: public sys::win::Handle
 {
 public:
-	bool 
+	bool
 	create (dword_t threadCount);
 
-	bool 
+	bool
 	associate (
 		HANDLE hIo,
 		void* context
@@ -30,7 +30,7 @@ public:
 		return err::complete (h != NULL);
 	}
 
-	bool 
+	bool
 	postCompletionStatus (
 		dword_t actualSize,
 		void* context,
@@ -41,7 +41,7 @@ public:
 		return err::complete (result);
 	}
 
-	bool 
+	bool
 	getCompletionStatus (
 		dword_t* actualSize,
 		void** context,
@@ -54,7 +54,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace io

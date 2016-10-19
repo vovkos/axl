@@ -8,7 +8,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 class NetworkAdapterEnumerator
 {
@@ -34,7 +34,7 @@ protected:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 NetworkAdapterEnumerator::createAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList)
@@ -109,10 +109,10 @@ NetworkAdapterEnumerator::addAdapterAddress (
 	NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);
 	address->m_address.setup (addr);
 	address->m_netMaskBitCount = netMask ? getSockAddrNetMaskBitCount (netMask) : 0;
-	adapter->m_addressList.insertTail (address);	
+	adapter->m_addressList.insertTail (address);
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
@@ -120,7 +120,7 @@ createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
 	return NetworkAdapterEnumerator::createAdapterList (adapterList);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

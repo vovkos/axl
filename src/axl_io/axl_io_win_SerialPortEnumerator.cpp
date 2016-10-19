@@ -2,12 +2,12 @@
 #include "axl_io_Serial.h"
 #include "axl_sys_win_DeviceInfo.h"
 
-// #define _AXL_ENUMERATE_DEVICE_CLASS 
+// #define _AXL_ENUMERATE_DEVICE_CLASS
 
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 class SerialPortEnumerator
 {
@@ -18,11 +18,11 @@ public:
 
 protected:
 	static
-	SerialPortDesc* 
+	SerialPortDesc*
 	createPortDesc (sys::win::DeviceInfo* deviceInfo);
 };
 
-//.............................................................................
+//..............................................................................
 
 size_t
 SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
@@ -56,7 +56,7 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 	return portList->getCount ();
 }
 
-SerialPortDesc* 
+SerialPortDesc*
 SerialPortEnumerator::createPortDesc (sys::win::DeviceInfo* deviceInfo)
 {
 	int result;
@@ -94,7 +94,7 @@ SerialPortEnumerator::createPortDesc (sys::win::DeviceInfo* deviceInfo)
 	return portDesc;
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
@@ -102,7 +102,7 @@ createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
 	return SerialPortEnumerator::createPortList (portList);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

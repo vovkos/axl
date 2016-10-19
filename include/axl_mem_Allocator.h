@@ -23,35 +23,35 @@ _AXL_MEM_FREE_IMPL (void* size);
 namespace axl {
 namespace mem {
 
-//.............................................................................
+//..............................................................................
 
 class DirectAllocator
 {
 public:
 #if (defined _AXL_MEM_ALLOCATE_IMPL && defined _AXL_MEM_FREE_IMPL)
 	static
-	void* 
+	void*
 	allocate (size_t size)
 	{
 		return ::_AXL_MEM_ALLOCATE_IMPL (size);
 	}
 
 	static
-	void 
+	void
 	free (void* p)
 	{
 		::_AXL_MEM_FREE_IMPL (p);
 	}
 #else
 	static
-	void* 
+	void*
 	allocate (size_t size)
 	{
 		return ::malloc (size);
 	}
 
 	static
-	void 
+	void
 	free (void* p)
 	{
 		::free (p);
@@ -59,13 +59,13 @@ public:
 #endif
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class ZeroAllocator: public DirectAllocator
 {
 public:
 	static
-	void* 
+	void*
 	allocate (size_t size)
 	{
 		void* p = DirectAllocator::allocate (size);
@@ -75,14 +75,14 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename BaseAllocator>
 class TrackingAllocator
 {
 public:
 	static
-	void* 
+	void*
 	allocate (
 		size_t size,
 		const char* tag,
@@ -107,48 +107,48 @@ public:
 	}
 
 	static
-	void 
+	void
 	free (void* p)
 	{
-		Tracker::BlockHdr* hdr = (Tracker::BlockHdr*) p - 1;	
+		Tracker::BlockHdr* hdr = (Tracker::BlockHdr*) p - 1;
 		getTracker ()->remove (hdr);
 		BaseAllocator::free (hdr);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename BaseAllocator>
 class Allocate
 {
 public:
-	void* 
+	void*
 	operator () (size_t size)
 	{
 		return BaseAllocator::allocate (size);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename BaseAllocator>
 class Free
 {
 public:
-	void 
+	void
 	operator () (void* p)
 	{
 		BaseAllocator::free (p);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename BaseAllocator>
 class TrackingAllocate
 {
 public:
-	void* 
+	void*
 	operator () (
 		size_t size,
 		const char* tag,
@@ -160,20 +160,20 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename BaseAllocator>
 class TrackingFree
 {
 public:
-	void 
+	void
 	operator () (void* p)
 	{
 		TrackingAllocator <BaseAllocator>::free (p);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 #ifdef _AXL_DEBUG
 
@@ -193,7 +193,7 @@ typedef Free <DirectAllocator>     StdFree;
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 #ifdef _AXL_DEBUG
 
@@ -222,7 +222,7 @@ typedef Free <DirectAllocator>     StdFree;
 #define AXL_MEM_FREE(p) \
 	(axl::mem::StdAllocator::free (p))
 
-//.............................................................................
+//..............................................................................
 
 } // namespace mem
 } // namespace axl

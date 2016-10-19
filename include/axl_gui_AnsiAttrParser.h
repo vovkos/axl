@@ -11,14 +11,14 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 class AnsiAttrParser
 {
 	friend class InitSetAttrFuncTable;
 
 protected:
-	typedef 
+	typedef
 	void
 	(AnsiAttrParser::*SetAttrFuncPtr) (uint_t);
 
@@ -31,7 +31,7 @@ public:
 	{
 		m_targetAttr = NULL;
 	}
-	
+
 	size_t // returns attr count
 	parse (
 		TextAttr* targetAttr,
@@ -136,7 +136,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

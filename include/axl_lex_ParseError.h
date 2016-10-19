@@ -11,12 +11,12 @@
 namespace axl {
 namespace lex {
 
-//.............................................................................
+//..............................................................................
 
 // {56FC601E-5D2C-4bbe-B455-3D8B81AAD8FF}
 AXL_SL_DEFINE_GUID (g_parseErrorGuid, 0x56fc601e, 0x5d2c, 0x4bbe, 0xb4, 0x55, 0x3d, 0x8b, 0x81, 0xaa, 0xd8, 0xff);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ParseErrorCode
 {
@@ -28,26 +28,26 @@ enum ParseErrorCode
 	ParseErrorCode_UnexpectedTokenIn,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class ParseErrorProvider: public err::ErrorProvider
 {
 public:
-	virtual 
+	virtual
 	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error);
 };
 
-//.............................................................................
+//..............................................................................
 
 // utility
 
-inline 
-void 
+inline
+void
 registerParseErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
-		g_parseErrorGuid, 
+		g_parseErrorGuid,
 		sl::getSimpleSingleton <ParseErrorProvider> ()
 		);
 }
@@ -62,9 +62,9 @@ pushSrcPosError (
 {
 	return err::pushPackError <sl::PackSeq_3 <const char*, int, int> > (
 		g_parseErrorGuid,
-		ParseErrorCode_SrcPos, 
-		filePath.sz (), 
-		line, 
+		ParseErrorCode_SrcPos,
+		filePath.sz (),
+		line,
 		col
 		);
 }
@@ -135,7 +135,7 @@ setSyntaxError (const sl::StringRef& location)
 {
 	return err::setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
-		ParseErrorCode_InvalidSyntaxIn, 
+		ParseErrorCode_InvalidSyntaxIn,
 		location.sz ()
 		);
 }
@@ -149,7 +149,7 @@ setExpectedTokenError (
 {
 	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
-		ParseErrorCode_ExpectedToken, 
+		ParseErrorCode_ExpectedToken,
 		expectedToken.sz (),
 		actualToken.sz ()
 		);
@@ -161,7 +161,7 @@ setUnexpectedTokenError (const sl::StringRef& token)
 {
 	return err::setPackError <sl::Pack <const char*> > (
 		g_parseErrorGuid,
-		ParseErrorCode_UnexpectedToken, 
+		ParseErrorCode_UnexpectedToken,
 		token.sz ()
 		);
 }
@@ -175,13 +175,13 @@ setUnexpectedTokenError (
 {
 	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
 		g_parseErrorGuid,
-		ParseErrorCode_UnexpectedTokenIn, 
+		ParseErrorCode_UnexpectedTokenIn,
 		token.sz (),
 		location.sz ()
 		);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace lex
 } // namespace axl

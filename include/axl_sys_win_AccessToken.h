@@ -14,31 +14,31 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class AccessToken: public Handle
 {
 public:
-	bool 
+	bool
 	openProcessToken (
 		handle_t process,
 		dword_t access = TOKEN_ALL_ACCESS
 		);
 
-	bool 
+	bool
 	openProcessToken (dword_t access = TOKEN_ALL_ACCESS)
 	{
 		return openProcessToken (::GetCurrentProcess (), access);
 	}
 
-	bool 
+	bool
 	openThreadToken (
 		handle_t thread,
 		dword_t access = TOKEN_ALL_ACCESS,
 		bool openAsSelf = false
 		);
 
-	bool 
+	bool
 	openThreadToken (
 		dword_t access = TOKEN_ALL_ACCESS,
 		bool openAsSelf = false
@@ -88,8 +88,8 @@ public:
 	isMemberOf (PSID group);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace sys 
+} // namespace sys
 } // namespace axl

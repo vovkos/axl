@@ -11,7 +11,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 enum FontFlag
 {
@@ -22,7 +22,7 @@ enum FontFlag
 	FontFlag_Strikeout = 0x08,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 FontFlag
@@ -47,11 +47,11 @@ overlayFontFlags (
 	uint_t baseFontFlags,
 	uint_t overlayFontFlags
 	)
-{	
+{
 	return (overlayFontFlags & FontFlag_Undefined) ? baseFontFlags : overlayFontFlags;
 }
 
-//.............................................................................
+//..............................................................................
 
 struct FontDesc
 {
@@ -65,7 +65,7 @@ struct FontDesc
 	}
 
 	FontDesc (
-		const sl::StringRef& family, 
+		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		)
@@ -75,13 +75,13 @@ struct FontDesc
 
 	void
 	setup (
-		const sl::StringRef& family, 
+		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

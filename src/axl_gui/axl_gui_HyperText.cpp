@@ -5,7 +5,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 void
 HyperText::clear ()
@@ -35,16 +35,16 @@ HyperText::backspace (size_t backLength)
 	return length - backLength;
 }
 
-size_t 
+size_t
 HyperText::appendPlainText (const sl::StringRef& text)
 {
 	m_source.append (text);
 	return m_text.append (text);
 }
 
-size_t 
+size_t
 HyperText::appendPlainText (
-	char c, 
+	char c,
 	size_t count
 	)
 {
@@ -62,7 +62,7 @@ HyperText::appendHyperText (
 	AnsiAttrParser attrParser;
 
 	size_t lastLength = m_text.getLength ();
-	
+
 	const char* p = text.cp ();
 	const char* end = text.getEnd ();
 
@@ -71,7 +71,7 @@ HyperText::appendHyperText (
 	for (;;)
 	{
 		const char* token = p;
-		while (token < end && *token != 0x1b)	
+		while (token < end && *token != 0x1b)
 			token++;
 
 		size_t textLength = m_text.append (p, token - p);
@@ -118,12 +118,12 @@ HyperText::appendHyperText (
 				lastLength = textLength;
 				attrParser.parse (
 					&attr,
-					baseAttr, 
+					baseAttr,
 					sl::StringRef (arg, argEnd - arg)
 					);
 				break;
 
-			case 'D':				
+			case 'D':
 				backspace (argEnd == arg ? 1 : atoi (arg));
 				break;
 
@@ -186,7 +186,7 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 	const TextAttrAnchor* attrAnchor = m_attrArray;
 	const TextAttrAnchor* attrEnd = attrAnchor + attrCount;
 	HyperlinkXMapEntry* hyperlinkXMapEntry;
-	
+
 	uint_t fontFlags = 0;
 	Font* font = baseFont->getFontMod (fontFlags);
 
@@ -205,7 +205,7 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 				continue;
 
 			size = font->calcTextSize (m_text.getSubString (offset, attrAnchor->m_offset - offset));
-			
+
 			x += size.m_width;
 			offset = attrAnchor->m_offset;
 
@@ -214,14 +214,14 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 		}
 
 		size = font->calcTextSize (m_text.getSubString (offset, hyperlinkAnchor->m_offset - offset));
-		
+
 		x += size.m_width;
 		offset = hyperlinkAnchor->m_offset;
 
 		hyperlinkXMapEntry->m_x = x;
 		hyperlinkXMapEntry->m_anchor = hyperlinkAnchor;
 
-		hyperlinkAnchor++; 
+		hyperlinkAnchor++;
 		hyperlinkXMapEntry++;
 	}
 }
@@ -247,7 +247,7 @@ HyperText::calcTextSize (Font* baseFont) const
 			continue;
 
 		size = font->calcTextSize (m_text.getSubString (offset, attrAnchor->m_offset - offset));
-		
+
 		x += size.m_width;
 		offset = attrAnchor->m_offset;
 
@@ -261,7 +261,7 @@ HyperText::calcTextSize (Font* baseFont) const
 	return size;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

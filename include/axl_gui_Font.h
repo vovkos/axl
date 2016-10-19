@@ -13,7 +13,7 @@ namespace gui {
 
 class Font;
 
-//.............................................................................
+//..............................................................................
 
 class FontTuple: public GuiItem
 {
@@ -33,7 +33,7 @@ protected:
 	}
 
 public:
-	Font* 
+	Font*
 	createFont (
 		const sl::StringRef& family,
 		size_t pointSize,
@@ -43,13 +43,13 @@ public:
 		return m_engine->createFont (this, family, pointSize, flags);
 	}
 
-	Font* 
+	Font*
 	createFont (const FontDesc& fontDesc)
 	{
 		return m_engine->createFont (this, fontDesc);
 	}
 
-	Font* 
+	Font*
 	getFont (uint_t flags = 0)
 	{
 		flags = (flags & FontFlag_Undefined) ? 0 : (flags & 0x0f);
@@ -63,7 +63,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class Font: public GuiItem
 {
@@ -78,7 +78,7 @@ protected:
 	}
 
 public:
-	Font* 
+	Font*
 	getFontMod (uint_t flags)
 	{
 		return (flags & FontFlag_Undefined) ? this : m_tuple->getFont (flags);
@@ -127,7 +127,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 Font*
@@ -139,7 +139,7 @@ Engine::getStdFont (
 	return getStdFontTuple (fontKind)->getFont (flags);
 }
 
-//.............................................................................
+//..............................................................................
 
 
 } // namespace gui

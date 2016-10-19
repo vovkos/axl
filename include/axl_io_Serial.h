@@ -17,7 +17,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 enum SerialFlowControl
 {
@@ -26,7 +26,7 @@ enum SerialFlowControl
 	SerialFlowControl_XonXoff,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum SerialStopBits
 {
@@ -36,7 +36,7 @@ enum SerialStopBits
 };
 
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum SerialParity
 {
@@ -47,7 +47,7 @@ enum SerialParity
 	SerialParity_Space = 4,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum SerialStatusLine
 {
@@ -57,7 +57,7 @@ enum SerialStatusLine
 	SerialStatusLine_Dcd  = 0x08,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum SerialSettingId
 {
@@ -69,7 +69,7 @@ enum SerialSettingId
 	SerialSettingId_ReadInterval = 0x20,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct SerialSettings
 {
@@ -99,7 +99,7 @@ struct SerialSettings
 		setup (baudRate, flowControl, dataBits, stopBits, parity, readInterval);
 	}
 
-	void 
+	void
 	setup (
 		uint_t baudRate,
 		SerialFlowControl flowControl = SerialFlowControl_None,
@@ -118,7 +118,7 @@ struct SerialSettings
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Serial
 {
@@ -210,7 +210,7 @@ public:
 
 };
 
-//.............................................................................
+//..............................................................................
 
 class SerialPortDesc: public sl::ListLink
 {
@@ -226,7 +226,7 @@ public:
 	{
 		return m_deviceName;
 	}
-		
+
 	const sl::String&
 	getDescription ()
 	{
@@ -234,12 +234,12 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 createSerialPortDescList (sl::StdList <SerialPortDesc>* portList);
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

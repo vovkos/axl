@@ -1,6 +1,6 @@
 #pragma once
 
-//.............................................................................
+//..............................................................................
 
 namespace test_BoyerMooreFind {
 
@@ -25,93 +25,93 @@ run ();
 
 namespace test_Error {
 
-void 
+void
 run ();
 
 }
 
 namespace test_File {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Finalizer {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Function {
 
-void 
+void
 run ();
 
 }
 
 namespace test_HandleTable {
 
-void 
+void
 run ();
 
 }
 
 namespace test_HashTable {
 
-void 
+void
 run ();
 
 }
 
 namespace test_List {
 
-void 
+void
 run_List ();
 
-void 
+void
 run_BoxList ();
 
 }
 
 namespace test_Log {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Packer {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Parse {
 
-void 
+void
 run (const char* fileName);
 
 }
 
 namespace test_RbTree {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Ref {
 
-void 
+void
 run_Buf ();
 
-void 
+void
 run_Clone ();
 
-void 
+void
 run_WeakRef ();
 
 void
@@ -121,86 +121,86 @@ run_Container ();
 
 namespace test_Scheduler {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Sock {
 
-void 
+void
 run_Listen ();
 
-void 
+void
 run_Connect ();
 
-void 
+void
 run_Dgram ();
 
 }
 
 namespace test_String {
 
-void 
+void
 run ();
 
 }
 
 namespace test_StringTemplate {
 
-void 
+void
 run (const char* fileName);
 
 }
 
 namespace test_Timer {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Vso {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Window {
 
-void 
+void
 run ();
 
 }
 
 namespace test_WorkerThread {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Packetizer {
 
-void 
+void
 run ();
 
 }
 
 namespace test_IniParser {
 
-void 
+void
 run ();
 
 }
 
 namespace test_Usb {
 
-void 
+void
 run ();
 
 }
 
-//.............................................................................
+//..............................................................................
 

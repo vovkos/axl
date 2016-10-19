@@ -5,9 +5,9 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 ServiceMgr::open (
 	const sl::StringRef_w& machineName,
 	const sl::StringRef_w& databaseName,
@@ -38,11 +38,11 @@ ServiceMgr::createService (
 	)
 {
 	SC_HANDLE h = ::CreateServiceW (
-		m_h, 
-		name.szn (), 
+		m_h,
+		name.szn (),
 		displayName.szn (),
-		access, 
-		serviceType, 
+		access,
+		serviceType,
 		startType,
 		errorControl,
 		binaryFilePath.szn (),
@@ -81,7 +81,7 @@ ServiceMgr::openService (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

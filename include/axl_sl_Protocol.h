@@ -11,7 +11,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class ProtoPeer
@@ -51,7 +51,7 @@ public:
 
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class AbstractProtoPeer: public ProtoPeer <AbstractProtoPeer>
 {
@@ -65,14 +65,14 @@ public:
 		) = 0;
 };
 
-//.............................................................................
+//..............................................................................
 
 struct ProtoMsg
 {
 	uint32_t m_code;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 struct ProtoMsg_1: ProtoMsg
@@ -80,7 +80,7 @@ struct ProtoMsg_1: ProtoMsg
 	T m_arg1;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T1,
@@ -92,7 +92,7 @@ struct ProtoMsg_2: ProtoMsg
 	T2 m_arg2;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T1,
@@ -106,7 +106,7 @@ struct ProtoMsg_3: ProtoMsg
 	T3 m_arg3;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T1,
@@ -122,7 +122,7 @@ struct ProtoMsg_4: ProtoMsg
 	T4 m_arg4;
 };
 
-//.............................................................................
+//..............................................................................
 
 // convenient macros for sending messages (up to 4 args)
 
@@ -165,7 +165,7 @@ struct ProtoMsg_4: ProtoMsg
 		sendMsg (&msg, sizeof (msg), errArg, errArg->m_size); \
 	}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_SEND_FUNCTION_1(code, sender, T1, arg1) \
 	void \
@@ -217,7 +217,7 @@ struct ProtoMsg_4: ProtoMsg
 		sendMsg (&msg, sizeof (msg), errArg, errArg->m_size); \
 	}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_SEND_FUNCTION_2(code, sender, T1, arg1, T2, arg2) \
 	void \
@@ -279,7 +279,7 @@ struct ProtoMsg_4: ProtoMsg
 		sendMsg (&msg, sizeof (msg), errArg, errArg->m_size); \
 	}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_SEND_FUNCTION_3(code, sender, T1, arg1, T2, arg2, T3, arg3) \
 	void \
@@ -349,7 +349,7 @@ struct ProtoMsg_4: ProtoMsg
 		sendMsg (&msg, sizeof (msg), errArg, errArg->m_size); \
 	}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_SEND_FUNCTION_4(code, sender, T1, arg1, T2, arg2, T3, arg3, T4, arg4) \
 	void \
@@ -427,7 +427,7 @@ struct ProtoMsg_4: ProtoMsg
 		sendMsg (&msg, sizeof (msg), errArg, errArg->m_size); \
 	}
 
-//.............................................................................
+//..............................................................................
 
 // convenient macros for receiving & processing messages (up to 4 args)
 
@@ -447,7 +447,7 @@ struct ProtoMsg_4: ProtoMsg
 		} \
 	}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_0(code, handler) \
 	case code: \
@@ -490,7 +490,7 @@ struct ProtoMsg_4: ProtoMsg
 		break; \
 		}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_1(code, handler, T1) \
 	case code: \
@@ -539,7 +539,7 @@ struct ProtoMsg_4: ProtoMsg
 		break; \
 		}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_2(code, handler, T1, T2) \
 	case code: \
@@ -588,7 +588,7 @@ struct ProtoMsg_4: ProtoMsg
 		break; \
 		}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_3(code, handler, T1, T2, T3) \
 	case code: \
@@ -638,7 +638,7 @@ struct ProtoMsg_4: ProtoMsg
 		break; \
 		}
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_4(code, handler, T1, T2, T3, T4) \
 	case code: \
@@ -687,7 +687,7 @@ struct ProtoMsg_4: ProtoMsg
 		break; \
 		}
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

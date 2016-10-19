@@ -12,7 +12,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 bool
 buildLogFont (
@@ -31,8 +31,8 @@ getLogFontFromFontDesc (
 {
 	return buildLogFont (
 		logFont,
-		sl::String_w (fontDesc.m_family), 
-		fontDesc.m_pointSize, 
+		sl::String_w (fontDesc.m_family),
+		fontDesc.m_pointSize,
 		fontDesc.m_flags
 		);
 }
@@ -49,9 +49,9 @@ getFontDescFromLogFont (
 	FontDesc* fontDesc
 	);
 
-//.............................................................................
+//..............................................................................
 
-class GdiFont: 
+class GdiFont:
 	public Font,
 	public GdiObjectHandle <HFONT>
 {
@@ -80,11 +80,11 @@ public:
 	calcTextSize_utf32 (const sl::StringRef_utf32& text);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef FontTuple <GdiFont> GdiFontuple;
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

@@ -4,11 +4,11 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 Engine::Engine ()
 {
-	static uint_t colorInitTable [StdPalColor__Count] = 
+	static uint_t colorInitTable [StdPalColor__Count] =
 	{
 		StdColor_AnsiBlack,         // StdColor_AnsiBlack,
 		StdColor_AnsiRed,           // StdPalColor_AnsiRed,
@@ -53,7 +53,7 @@ Engine::Engine ()
 		StdColor_LightBlue,         // StdPalColor_LightBlue,
 		StdColor_LightPurple,       // StdPalColor_LightPurple,
 		StdColor_LightCyan,         // StdPalColor_LightCyan,
-	
+
 		StdColor_PastelGray,        // StdPalColor_PastelGray,
 		StdColor_PastelRed,         // StdPalColor_PastelRed,
 		StdColor_PastelOrange,      // StdPalColor_PastelOrange,
@@ -63,12 +63,12 @@ Engine::Engine ()
 		StdColor_PastelBlue,        // StdPalColor_PastelBlue,
 		StdColor_PastelPurple,      // StdPalColor_PastelPurple,
 	};
-	
+
 	ASSERT (sizeof (colorInitTable) == sizeof (m_stdPalColorTable));
 	memcpy (m_stdPalColorTable, colorInitTable, sizeof (m_stdPalColorTable));
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

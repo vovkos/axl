@@ -12,14 +12,14 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class StringDetailsBase
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class StringDetailsImpl
@@ -100,7 +100,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	find (
 		const T* p,
 		size_t length,
@@ -117,7 +117,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	find (
 		const T* p,
 		size_t length,
@@ -130,7 +130,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	findOneOf (
 		const T* p,
 		size_t length,
@@ -154,7 +154,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	findNotOneOf (
 		const T* p,
 		size_t length,
@@ -178,7 +178,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	reverseFind (
 		const T* p,
 		size_t length,
@@ -197,7 +197,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	reverseFind (
 		const T* p,
 		size_t length,
@@ -210,7 +210,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	reverseFindOneOf (
 		const T* p,
 		size_t length,
@@ -233,7 +233,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	reverseFindNotOneOf (
 		const T* p,
 		size_t length,
@@ -290,7 +290,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class StringDetailsBase <utf8_t>: public StringDetailsImpl <utf8_t>
@@ -333,7 +333,7 @@ public:
 	}
 
 	static
-	size_t 
+	size_t
 	find (
 		const C* p,
 		size_t length,
@@ -404,7 +404,7 @@ public:
 #endif
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class StringDetailsBase <utf16_t>: public StringDetailsImpl <utf16_t>
@@ -468,7 +468,7 @@ public:
 #endif
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class StringDetailsBase <utf32_t>: public StringDetailsImpl <utf32_t>
@@ -530,7 +530,7 @@ public:
 #endif
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef StringDetailsBase <char>    StringDetails;
 typedef StringDetailsBase <wchar_t> StringDetails_w;
@@ -538,7 +538,7 @@ typedef StringDetailsBase <utf8_t>  StringDetails_utf8;
 typedef StringDetailsBase <utf16_t> StringDetails_utf16;
 typedef StringDetailsBase <utf32_t> StringDetails_utf32;
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

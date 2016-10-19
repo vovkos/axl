@@ -11,7 +11,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 const char*
 getSockAddrFamilyString (uint_t family);
@@ -20,7 +20,7 @@ size_t
 getSockAddrFamilySize (uint_t family);
 
 inline
-size_t 
+size_t
 getSockAddrSize (const sockaddr* addr)
 {
 	return getSockAddrFamilySize (addr->sa_family);
@@ -29,7 +29,7 @@ getSockAddrSize (const sockaddr* addr)
 const char*
 getSockProtoString (uint_t proto);
 
-//.............................................................................
+//..............................................................................
 
 size_t
 getSockAddrNetMaskBitCount_ip4 (const sockaddr_in* addr);
@@ -40,7 +40,7 @@ getSockAddrNetMaskBitCount_ip6 (const sockaddr_in6* addr);
 size_t
 getSockAddrNetMaskBitCount (const sockaddr* addr);
 
-//.............................................................................
+//..............................................................................
 
 void
 createSockAddrNetMask_ip4 (
@@ -54,7 +54,7 @@ createSockAddrNetMask_ip6 (
 	size_t bitCount
 	);
 
-//.............................................................................
+//..............................................................................
 
 bool
 isSockAddrEqual_ip4 (
@@ -74,7 +74,7 @@ isSockAddrEqual (
 	const sockaddr* addr2
 	);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
 isSockAddrMatch_ip4 (
@@ -94,7 +94,7 @@ isSockAddrMatch (
 	const sockaddr* filterAddr
 	);
 
-//.............................................................................
+//..............................................................................
 
 bool
 parseAddr_ip4 (
@@ -108,7 +108,7 @@ parseAddr_ip6 (
 	const sl::StringRef& string
 	);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
 parseSockAddr_ip4 (
@@ -129,7 +129,7 @@ parseSockAddr (
 	const sl::StringRef& string
 	);
 
-//.............................................................................
+//..............................................................................
 
 size_t
 getAddrString_ip4 (
@@ -161,7 +161,7 @@ getAddrString_ip6 (const in6_addr* addr)
 	return string;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 getSockAddrString_ip4 (
@@ -208,7 +208,7 @@ getSockAddrString (const sockaddr* addr)
 	return string;
 }
 
-//.............................................................................
+//..............................................................................
 
 struct SockAddr
 {
@@ -287,7 +287,7 @@ struct SockAddr
 	void
 	clear ()
 	{
-		memset (this, 0, sizeof (SockAddr));	
+		memset (this, 0, sizeof (SockAddr));
 	}
 
 	bool
@@ -314,7 +314,7 @@ struct SockAddr
 		return isSockAddrMatch (&m_addr, &addr->m_addr);
 	}
 
-	uint_t 
+	uint_t
 	getPort ()
 	{
 		return sl::swapByteOrder16 (m_addr_ip4.sin_port);
@@ -460,7 +460,7 @@ struct SockAddr
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 bool
 resolveHostName (
@@ -481,7 +481,7 @@ resolveHostName (
 	return addrArray;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

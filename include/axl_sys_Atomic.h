@@ -11,7 +11,7 @@
 namespace axl {
 namespace sys {
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
@@ -27,7 +27,7 @@ int32_t
 atomicXchg (
 	volatile int32_t* p,
 	int32_t value
-	)	
+	)
 {
 	return ::InterlockedExchange ((long*) p, value);
 }
@@ -37,7 +37,7 @@ int64_t
 atomicXchg (
 	volatile int64_t* p,
 	int64_t value
-	)	
+	)
 {
 	return ::InterlockedExchange64 (p, value);
 }
@@ -48,7 +48,7 @@ atomicCmpXchg (
 	volatile int32_t* p,
 	int32_t cmpValue,
 	int32_t newValue
-	)	
+	)
 {
 	return ::InterlockedCompareExchange ((long*) p, newValue, cmpValue); // inverse order!
 }
@@ -59,35 +59,35 @@ atomicCmpXchg (
 	volatile int64_t* p,
 	int64_t cmpValue,
 	int64_t newValue
-	)	
+	)
 {
 	return ::InterlockedCompareExchange64 (p, newValue, cmpValue); // inverse order!
 }
 
 inline
 int32_t
-atomicInc (volatile int32_t* p)	
+atomicInc (volatile int32_t* p)
 {
 	return ::InterlockedIncrement ((long*) p);
 }
 
 inline
 int64_t
-atomicInc (volatile int64_t* p)	
+atomicInc (volatile int64_t* p)
 {
 	return ::InterlockedIncrement64 (p);
 }
 
 inline
 int32_t
-atomicDec (volatile int32_t* p)	
+atomicDec (volatile int32_t* p)
 {
 	return ::InterlockedDecrement ((long*) p);
 }
 
 inline
 int64_t
-atomicDec (volatile int64_t* p)	
+atomicDec (volatile int64_t* p)
 {
 	return ::InterlockedDecrement64 (p);
 }
@@ -113,7 +113,7 @@ size_t
 atomicXchg (
 	volatile size_t* p,
 	size_t value
-	)	
+	)
 {
 	return ::InterlockedExchange64 ((int64_t*) p, value);
 }
@@ -124,21 +124,21 @@ atomicCmpXchg (
 	volatile size_t* p,
 	size_t cmpValue,
 	size_t newValue
-	)	
+	)
 {
 	return ::InterlockedCompareExchange64 ((int64_t*) p, newValue, cmpValue); // inverse order!
 }
 
 inline
 size_t
-atomicInc (volatile size_t* p)	
+atomicInc (volatile size_t* p)
 {
 	return ::InterlockedIncrement64 ((int64_t*) p);
 }
 
 inline
 size_t
-atomicDec (volatile size_t* p)	
+atomicDec (volatile size_t* p)
 {
 	return ::InterlockedDecrement64 ((int64_t*) p);
 }
@@ -164,7 +164,7 @@ size_t
 atomicXchg (
 	volatile size_t* p,
 	size_t value
-	)	
+	)
 {
 	return ::InterlockedExchange ((long*) p, value);
 }
@@ -175,21 +175,21 @@ atomicCmpXchg (
 	volatile size_t* p,
 	size_t cmpValue,
 	size_t newValue
-	)	
+	)
 {
 	return ::InterlockedCompareExchange ((long*) p, newValue, cmpValue); // inverse order!
 }
 
 inline
 size_t
-atomicInc (volatile size_t* p)	
+atomicInc (volatile size_t* p)
 {
 	return ::InterlockedIncrement ((long*) p);
 }
 
 inline
 size_t
-atomicDec (volatile size_t* p)	
+atomicDec (volatile size_t* p)
 {
 	return ::InterlockedDecrement ((long*) p);
 }
@@ -210,7 +210,7 @@ int32_t
 atomicXchg (
 	volatile int32_t* p,
 	int32_t value
-	)	
+	)
 {
 	return __sync_lock_test_and_set (p, value);
 }
@@ -220,7 +220,7 @@ int64_t
 atomicXchg (
 	volatile int64_t* p,
 	int64_t value
-	)	
+	)
 {
 	return __sync_lock_test_and_set (p, value);
 }
@@ -241,7 +241,7 @@ atomicCmpXchg (
 	volatile int32_t* p,
 	int32_t cmpValue,
 	int32_t newValue
-	)	
+	)
 {
 	return __sync_val_compare_and_swap (p, cmpValue, newValue);
 }
@@ -252,7 +252,7 @@ atomicCmpXchg (
 	volatile int64_t* p,
 	int64_t cmpValue,
 	int64_t newValue
-	)	
+	)
 {
 	return __sync_val_compare_and_swap (p, cmpValue, newValue);
 }
@@ -270,14 +270,14 @@ atomicCmpXchg (
 
 inline
 int32_t
-atomicInc (volatile int32_t* p)	
+atomicInc (volatile int32_t* p)
 {
 	return __sync_add_and_fetch (p, 1);
 }
 
 inline
 int64_t
-atomicInc (volatile int64_t* p)	
+atomicInc (volatile int64_t* p)
 {
 	return __sync_add_and_fetch (p, 1);
 }
@@ -291,14 +291,14 @@ atomicInc (volatile size_t* p)
 
 inline
 int32_t
-atomicDec (volatile int32_t* p)	
+atomicDec (volatile int32_t* p)
 {
 	return __sync_sub_and_fetch (p, 1);
 }
 
 inline
 int64_t
-atomicDec (volatile int64_t* p)	
+atomicDec (volatile int64_t* p)
 {
 	return __sync_sub_and_fetch (p, 1);
 }
@@ -413,7 +413,7 @@ atomicLoad (volatile int64_t* p)
 
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 void
@@ -425,7 +425,7 @@ atomicUpdatePeak (
 	for (;;)
 	{
 		int32_t old = *peak;
-		
+
 		if (current <= old)
 			break;
 
@@ -445,10 +445,10 @@ yieldProcessor ()
 #endif
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-void 
+void
 atomicLock (volatile int32_t* lock)
 {
 	for (;;)
@@ -462,14 +462,14 @@ atomicLock (volatile int32_t* lock)
 }
 
 inline
-void 
+void
 atomicUnlock (volatile int32_t* lock)
 {
 	uint32_t result = sys::atomicCmpXchg (lock, 1, 0);
 	ASSERT (result == 1);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sys
 } // namespace axl

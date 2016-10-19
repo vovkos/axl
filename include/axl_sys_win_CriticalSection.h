@@ -12,7 +12,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class CriticalSection: public CRITICAL_SECTION
 {
@@ -27,20 +27,20 @@ public:
 		::DeleteCriticalSection (this);
 	}
 
-	void 
+	void
 	enter ()
 	{
 		::EnterCriticalSection (this);
 	}
 
-	void 
+	void
 	leave ()
 	{
 		::LeaveCriticalSection (this);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

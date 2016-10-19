@@ -11,7 +11,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 const char*
 getUsbSpeedString (libusb_speed speed);
@@ -22,7 +22,7 @@ getUsbClassCodeString (libusb_class_code classCode);
 const char*
 getUsbTransferTypeString (libusb_transfer_type transferType);
 
-//.............................................................................
+//..............................................................................
 
 class CloseUsbContext
 {
@@ -34,7 +34,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class UsbContext: public sl::Handle <libusb_context*, CloseUsbContext>
 {
@@ -44,11 +44,11 @@ public:
 		open ();
 	}
 
-	bool 
+	bool
 	open ();
 };
 
-//.............................................................................
+//..............................................................................
 
 class FreeUsbDeviceList
 {
@@ -60,7 +60,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class UsbDeviceList: public sl::Handle <libusb_device**, FreeUsbDeviceList>
 {
@@ -69,7 +69,7 @@ public:
 	enumerateDevices (libusb_context* context);
 };
 
-//.............................................................................
+//..............................................................................
 
 class FreeUsbConfigDescriptor
 {
@@ -81,11 +81,11 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef sl::Handle <libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfigDescriptor;
 
-//.............................................................................
+//..............................................................................
 
 class UsbDevice
 {
@@ -111,18 +111,18 @@ public:
 		setDevice (NULL);
 	}
 
-	libusb_device* 
+	libusb_device*
 	getDevice ()
 	{
 		return m_device;
 	}
 
-	libusb_device_handle* 
+	libusb_device_handle*
 	getOpenHandle ()
 	{
 		return m_openHandle;
 	}
-	
+
 	bool
 	isOpen ()
 	{
@@ -136,7 +136,7 @@ public:
 		return libusb_get_device_address (m_device);
 	}
 
-	uint8_t 
+	uint8_t
 	getBusNumber ()
 	{
 		ASSERT (m_device);
@@ -156,7 +156,7 @@ public:
 		size_t maxLength
 		);
 
-	libusb_speed 
+	libusb_speed
 	getDeviceSpeed ()
 	{
 		ASSERT (m_device);
@@ -168,7 +168,7 @@ public:
 
 	size_t
 	getMaxIsoPacketSize (uint_t endpointId);
-	
+
 	// open-close
 
 	void
@@ -244,7 +244,7 @@ public:
 
 	sl::Array <char>
 	getDescriptor (
-		libusb_descriptor_type descriptorType, 
+		libusb_descriptor_type descriptorType,
 		uint_t descriptorId
 		)
 	{
@@ -252,10 +252,10 @@ public:
 		getDescriptor (descriptorType, descriptorId, &descriptor);
 		return descriptor;
 	}
-	
+
 	bool
 	getDescriptor (
-		libusb_descriptor_type descriptorType, 
+		libusb_descriptor_type descriptorType,
 		uint_t descriptorId,
 		sl::Array <char>* descriptor
 		);
@@ -272,7 +272,7 @@ public:
 	bool
 	getActiveConfigDescriptor (UsbConfigDescriptor* desc);
 
-	sl::String 
+	sl::String
 	getStringDesrciptor (
 		uint_t stringId,
 		uint_t langId
@@ -290,7 +290,7 @@ public:
 		sl::String* string
 		);
 
-	sl::String 
+	sl::String
 	getStringDesrciptor (uint_t stringId)
 	{
 		sl::String string;
@@ -306,7 +306,7 @@ public:
 
 	// synchronous transfers
 
-	size_t 
+	size_t
 	controlTransfer (
 		uint_t requestType,
 		uint_t requestId,
@@ -317,7 +317,7 @@ public:
 		uint_t timeout = -1
 		);
 
-	size_t 
+	size_t
 	bulkTransfer (
 		uint_t endpointId,
 		void* p,
@@ -325,7 +325,7 @@ public:
 		uint_t timeout = -1
 		);
 
-	size_t 
+	size_t
 	interruptTransfer (
 		uint_t endpointId,
 		void* p,
@@ -334,7 +334,7 @@ public:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

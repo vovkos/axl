@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_AUTOPTRARRAY_H
 
@@ -12,7 +12,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -90,7 +90,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

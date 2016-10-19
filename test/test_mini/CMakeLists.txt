@@ -2,7 +2,7 @@
 # Tibbo Technology Inc (C) 2004-2015. All rights reserved
 # Author: Vladimir Gladkov
 
-#..............................................................................
+#...............................................................................
 #
 # app folder
 #
@@ -23,7 +23,7 @@ source_group (
 	${APP_CPP_LIST}
 	)
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # pch folder
 #
@@ -37,8 +37,8 @@ source_group (
 	${PCH_H}
 	${PCH_CPP}
 	)
-	
-#..............................................................................
+
+#...............................................................................
 #
 # test_mini app
 #
@@ -46,13 +46,13 @@ source_group (
 include_directories (${AXL_INC_DIR})
 link_directories (${AXL_LIB_DIR})
 
-if (BUILD_AXL_IO_USB)	
+if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
 	link_directories (${LIBUSB_LIB_DIR})
 	add_definitions (-D_AXL_IO_USB)
 endif ()
 
-if (BUILD_AXL_XML)	
+if (BUILD_AXL_XML)
 	include_directories (${EXPAT_INC_DIR})
 	link_directories (${EXPAT_LIB_DIR})
 	add_definitions (-D_AXL_XML)
@@ -71,7 +71,7 @@ set_target_properties (
 	PROPERTIES
 	FOLDER test
 	)
-	
+
 if (BUILD_AXL_XML)
 	target_link_libraries (
 		test_mini
@@ -79,7 +79,7 @@ if (BUILD_AXL_XML)
 		expat
 		)
 endif ()
-	
+
 target_link_libraries (
 	test_mini
 	axl_io
@@ -153,4 +153,4 @@ axl_set_pch (
 	${PCH_CPP}
 	)
 
-#..............................................................................
+#...............................................................................

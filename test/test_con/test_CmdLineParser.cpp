@@ -2,7 +2,7 @@
 
 namespace test_CmdLineParser {
 
-//.............................................................................
+//..............................................................................
 
 enum SwitchKind
 {
@@ -12,7 +12,7 @@ enum SwitchKind
 	SwitchKind_LogFile,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (Switchable, SwitchKind)
 	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_Help, "h", "help", NULL, "Display help")
@@ -21,7 +21,7 @@ AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (Switchable, SwitchKind)
 	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
 AXL_SL_END_CMD_LINE_SWITCH_TABLE ()
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class MyParser: public sl::CmdLineParser <MyParser, Switchable>
 {
@@ -33,7 +33,7 @@ public:
 		return true;
 	}
 
-	bool 
+	bool
 	onSwitch (
 		SwitchKind switchKind,
 		const char* value
@@ -47,7 +47,7 @@ public:
 void
 run ()
 {
-	const char* cmdLine [] = 
+	const char* cmdLine [] =
 	{
 		"--help",
 		"--session-provider=serial",
@@ -62,6 +62,6 @@ run ()
 
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_CmdLineParser

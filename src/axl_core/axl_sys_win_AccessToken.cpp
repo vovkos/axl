@@ -5,7 +5,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 bool AccessToken::openProcessToken (
 	handle_t process,
@@ -18,7 +18,7 @@ bool AccessToken::openProcessToken (
 	return err::complete (result);
 }
 
-bool 
+bool
 AccessToken::openThreadToken (
 	handle_t thread,
 	dword_t access,
@@ -65,7 +65,7 @@ AccessToken::isMemberOf (PSID group)
 	return false;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

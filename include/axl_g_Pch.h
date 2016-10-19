@@ -10,11 +10,11 @@
 #	error AXL library requires a C++ compiler
 #endif
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // 1) detect build/target environment section
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // detect C++ compiler
 
@@ -48,7 +48,7 @@
 #	error unsupported C++ compiler
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // detect CPU architecture
 
@@ -78,7 +78,7 @@
 
 #define AXL_PTR_BITS (AXL_PTR_SIZE * 8) // often times it's more natural to use bit size
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // detect OS
 
@@ -106,7 +106,7 @@
 #	error unsupported OS
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // detect Debug build
 
@@ -128,11 +128,11 @@
 #	define AXL_DEBUG_SUFFIX ""
 #endif
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // 2) standard includes
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // C/C++ headers
 
@@ -158,7 +158,7 @@
 
 #include <new>
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // OS-specific headers
 
@@ -206,14 +206,14 @@
 #	endif
 #endif
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // 3) possibly conflicting complementary definitions
 
 // items here sort of complement standard C types/operators/functions
 // so prefixing them with 'axl_' would look non-consistent
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // common type aliases
 
@@ -259,7 +259,7 @@ typedef uint64_t          uintdptr_t;
 
 typedef void*             handle_t;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef char              utf8_t;
 
@@ -271,7 +271,7 @@ typedef int16_t           utf16_t;
 typedef wchar_t           utf32_t;
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (_AXL_OS_POSIX)
 #	undef basename
@@ -292,7 +292,7 @@ typedef wchar_t           utf32_t;
 #	define RGB(r, g, b)   ((dword_t)(((byte_t)(r)|((word_t)((byte_t)(g)) << 8))|(((dword_t)(byte_t)(b)) << 16)))
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // sizeof/countof/lengthof/offsetof/containerof
 
@@ -309,7 +309,7 @@ typedef wchar_t           utf32_t;
 		((T*) ((char*) (p) - offsetof (T, f)))
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // NULL-checked strlen/wcslen
 
@@ -327,11 +327,11 @@ wcslen_s (const wchar_t* p)
 	return p ? wcslen (p) : 0;
 }
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // 4) non-confliciting macro definitions
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // declaration options/attributes
 
@@ -371,7 +371,7 @@ wcslen_s (const wchar_t* p)
 #	define AXL_GCC_NO_ASAN __attribute__((no_sanitize_address))
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // min/max are WAY too conflict-prone, so we use non-conflicting versions
 // with 'AXL_' prefix
@@ -389,7 +389,7 @@ private: \
 	void \
 	operator = (const Class&); \
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // ASSERT macro
 
@@ -403,7 +403,7 @@ private: \
 #	define ASSERT AXL_ASSERT
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // TODO reminders
 
@@ -422,7 +422,7 @@ private: \
 #	define AXL_TODO(s) AXL_PRAGMA_IMPL (message "TODO: " s)
 #endif
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // 5) convenient vararg facilities
 
@@ -431,7 +431,7 @@ private: \
 //   * makes it possible to simply assign one to another.
 //   * ensures va_end is called at the end
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class axl_va_list
 {
@@ -527,7 +527,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // use axl_va_start/axl_va_arg and (optionally) axl_va_end just like you would
 // use va_start/va_arg/va_end...
@@ -547,6 +547,6 @@ public:
 	axl_va_list va; \
 	axl_va_start (va, a);
 
-//.............................................................................
+//..............................................................................
 
 #include "axl_g_WarningSuppression.h"

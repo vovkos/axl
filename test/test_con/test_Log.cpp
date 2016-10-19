@@ -1,8 +1,8 @@
 #include "pch.h"
 
-namespace test_Log { 
+namespace test_Log {
 
-//.............................................................................
+//..............................................................................
 
 enum MsgKind
 {
@@ -10,7 +10,7 @@ enum MsgKind
 	MsgKind_DeviceClosed     = 2 | log::PacketCodeFlag_Foldable,
 	MsgKind_Connect          = 3,
 	MsgKind_ConnectComplete  = 4,
-	MsgKind_ConnectError     = 5,	
+	MsgKind_ConnectError     = 5,
 	MsgKind_Bin              = 6 | log::PacketCodeFlag_Mergeable,
 };
 
@@ -78,17 +78,17 @@ protected:
 class Representor: public log::IRepresentor
 {
 public:
-	virtual 
-	bool 
+	virtual
+	bool
 	represent (
-		log::IRepresentorTarget* target, 
-		uint_t packetCode, 
-		const void* p, 
-		size_t size, 
+		log::IRepresentorTarget* target,
+		uint_t packetCode,
+		const void* p,
+		size_t size,
 		uint_t volatileFlags
 		)
 	{
-		char data [] = 
+		char data [] =
 			"sdfjshdjfjhsdjkhfkjsdfsdfsdfsdhkfhkjsdhfkjhsdkjf hsdjkfh skdjhf kjshd kj "
 			"sdfjshdjfjhsdjkhfkjsdfsdfsdfsdhkfhkjsdhfkjhsdkjf hsdjkfh skdjhf kjshd kj "
 			"sdfjshdjfjhsdjkhfkjsdfsdfsdfsdhkfhkjsdhfkjhsdkjf hsdjkfh skdjhf kjshd kj "
@@ -201,7 +201,7 @@ run ()
 
 	log::PacketFile packetFile;
 	packetFile.open ("test_log.nlog");
-	
+
 	Representor representor;
 
 	gui::gdi::Widget <LogWidget> widget;
@@ -216,6 +216,6 @@ run ()
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Log

@@ -11,7 +11,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 // singleton that doesnt require destructor
 
@@ -26,18 +26,18 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 T*
 getSimpleSingleton (volatile int32_t* flag = NULL)
 {
-	static uchar_t buffer [sizeof (T)] = { 0 };	
+	static uchar_t buffer [sizeof (T)] = { 0 };
 	callOnce (ConstructSimpleSingleton <T> (), buffer, flag);
 	return (T*) buffer;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

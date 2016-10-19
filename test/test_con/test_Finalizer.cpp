@@ -1,10 +1,10 @@
 #include "pch.h"
 
-namespace test_Finalize { 
+namespace test_Finalize {
 
-//.............................................................................
+//..............................................................................
 
-class MyFinalizer: 
+class MyFinalizer:
 	public ref::RefCount,
 	public g::Finalizer
 {
@@ -20,14 +20,14 @@ public:
 	}
 
 	virtual
-	void 
+	void
 	finalize ()
 	{
 		printf ("CMyFinalizer::Finalize (this = %x)\n", this);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 run ()
@@ -36,6 +36,6 @@ run ()
 	g::getModule ()->addFinalizer (fin);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Finalize

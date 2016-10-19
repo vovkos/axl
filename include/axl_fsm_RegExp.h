@@ -11,17 +11,17 @@
 namespace axl {
 namespace fsm {
 
-//.............................................................................
+//..............................................................................
 
 class RegExpNameMgr
 {
 public:
-	virtual 
+	virtual
 	sl::StringRef
 	findName (const sl::StringRef& name) = 0;
 };
 
-//.............................................................................
+//..............................................................................
 
 class RegExp
 {
@@ -41,25 +41,25 @@ public:
 		return m_nfaStateList.isEmpty ();
 	}
 
-	sl::ConstList <NfaState> 
+	sl::ConstList <NfaState>
 	getNfaStateList () const
 	{
 		return m_nfaStateList;
 	}
 
-	sl::Array <NfaState*> 
+	sl::Array <NfaState*>
 	getNfaStateArray () const
 	{
 		return m_nfaStateArray;
 	}
 
-	sl::ConstList <DfaState> 
+	sl::ConstList <DfaState>
 	getDfaStateList () const
-	{		
+	{
 		return m_dfaStateList;
 	}
 
-	sl::Array <DfaState*> 
+	sl::Array <DfaState*>
 	getDfaStateArray () const
 	{
 		return m_dfaStateArray;
@@ -68,17 +68,17 @@ public:
 	void
 	clear ();
 
-	bool 
+	bool
 	compile (const sl::StringRef& regexp);
 
-	bool 
+	bool
 	match (const sl::StringRef& string);
 
 	void
 	print () const;
 };
 
-//.............................................................................
+//..............................................................................
 
 class RegExpCompiler
 {
@@ -98,7 +98,7 @@ protected:
 		uchar_t m_char;
 		sl::String m_string;
 
-		bool 
+		bool
 		isSpecialChar (char c)
 		{
 			return m_tokenKind == TokenKind_SpecialChar && m_char == c;
@@ -107,7 +107,7 @@ protected:
 		bool
 		isValidSingle ();
 	};
-	
+
 protected:
 	RegExp* m_regExp;
 	RegExpNameMgr* m_nameMgr;
@@ -122,19 +122,19 @@ public:
 		RegExpNameMgr* nameMgr = NULL
 		);
 
-	bool 
+	bool
 	compile (
 		const sl::StringRef& source,
 		void* acceptContext = NULL
 		);
 
-	bool 
+	bool
 	incrementalCompile (
 		const sl::StringRef& source,
 		void* acceptContext = NULL
 		);
 
-	void 
+	void
 	finalize ();
 
 protected:
@@ -222,10 +222,10 @@ protected:
 	NfaState*
 	capturingGroup ();
 
-	void 
+	void
 	assignNfaIds ();
 
-	void 
+	void
 	assignDfaIds ();
 
 	void
@@ -235,7 +235,7 @@ protected:
 	minimizeDfa ();
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace fsm
 } // namespace axl

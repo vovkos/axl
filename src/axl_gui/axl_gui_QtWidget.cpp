@@ -5,7 +5,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 inline
 MouseButton
@@ -35,7 +35,7 @@ getKeyFromQtKey (int qtKey)
 
 	size_t index = qtKey & ~0x01000000;
 
-	static uint_t keyTable [] = 
+	static uint_t keyTable [] =
 	{
 		Key_Esc,         // 0x00
 		Key_Tab,         // 0x01
@@ -101,7 +101,7 @@ getKeyFromQtKey (int qtKey)
 	return index < countof (keyTable) ? keyTable [index] : 0;
 }
 
-//.............................................................................
+//..............................................................................
 
 QtWidgetBase::QtWidgetBase (
 	WidgetDriver* widgetDriver,
@@ -133,7 +133,7 @@ QtWidgetBase::postThreadMsg (
 	emit threadMsgSignal (msg);
 }
 
-void 
+void
 QtWidgetBase::threadMsgSlot (WidgetThreadMsg* msg)
 {
 	bool isHandled = true;
@@ -146,7 +146,7 @@ QtWidgetBase::wheelEvent (QWheelEvent* e)
 {
 	if (!m_widgetDriver->checkMsgMap (WidgetMsgCode_MouseWheel))
 	{
-		e->ignore ();	
+		e->ignore ();
 		return;
 	}
 
@@ -157,7 +157,7 @@ QtWidgetBase::wheelEvent (QWheelEvent* e)
 	msg.m_wheelDelta = e->delta ();
 
 	bool isHandled = true;
-	m_widgetDriver->processMsg (&msg, &isHandled);			
+	m_widgetDriver->processMsg (&msg, &isHandled);
 
 	if (!isHandled)
 		e->ignore ();
@@ -183,7 +183,7 @@ QtWidgetBase::paintEvent (QPaintEvent* e)
 
 	WidgetPaintMsg msg (&canvas);
 	msg.m_rect.m_left   = rect.x ();
-	msg.m_rect.m_top    = rect.y (); 
+	msg.m_rect.m_top    = rect.y ();
 	msg.m_rect.m_right  = rect.x () + rect.width ();
 	msg.m_rect.m_bottom = rect.y () + rect.height ();
 
@@ -202,18 +202,18 @@ QtWidgetBase::paintEvent (QPaintEvent* e)
 		Rect* dst = msg.m_region;
 		const QRect* src = rectVector.constBegin ();
 		for (size_t i = 0; i < rectCount; i++, dst++, src++)
-		{			
+		{
 			dst->m_left   = src->x ();
-			dst->m_top    = src->y (); 
+			dst->m_top    = src->y ();
 			dst->m_right  = src->x () + src->width ();
 			dst->m_bottom = src->y () + src->height ();
 		}
 	}
 
 	bool isHandled = true;
-	m_widgetDriver->processMsg (&msg, &isHandled);	
+	m_widgetDriver->processMsg (&msg, &isHandled);
 
-	if (m_widgetDriver->isCaretVisible () && 
+	if (m_widgetDriver->isCaretVisible () &&
 		((QtEngine*) m_widgetDriver->getEngine ())->isCaretVisible ())
 	{
 		Point caretPos = m_widgetDriver->getCaretPos ();
@@ -221,9 +221,9 @@ QtWidgetBase::paintEvent (QPaintEvent* e)
 
 		canvas.m_qtPainter.setCompositionMode (QPainter::RasterOp_SourceXorDestination);
 		canvas.m_qtPainter.fillRect (
-			caretPos.m_x, 
-			caretPos.m_y, 
-			caretSize.m_width, 
+			caretPos.m_x,
+			caretPos.m_y,
+			caretSize.m_width,
 			caretSize.m_height,
 			Qt::white
 			);
@@ -254,13 +254,13 @@ QtWidgetBase::resizeEvent (QResizeEvent* e)
 	m_widgetDriver->m_size = size;
 
 	WidgetMsgParam <uint_t> msg (WidgetMsgCode_Size, mask);
-	
+
 	bool isHandled = true;
 	m_widgetDriver->processMsg (&msg, &isHandled);
 
 	if (!isHandled)
-		e->ignore ();			
-}	
+		e->ignore ();
+}
 
 void
 QtWidgetBase::scrollContentsBy (
@@ -269,7 +269,7 @@ QtWidgetBase::scrollContentsBy (
 	)
 {
 	uint_t mask = 0;
-	
+
 	if (dy)
 	{
 		m_widgetDriver->m_scrollBarArray [Orientation_Vertical].m_pos = verticalScrollBar ()->value ();
@@ -286,12 +286,12 @@ QtWidgetBase::scrollContentsBy (
 		return;
 
 	WidgetMsgParam <uint_t> msg (WidgetMsgCode_Scroll, mask);
-	
+
 	bool isHandled = true;
-	m_widgetDriver->processMsg (&msg, &isHandled);	
+	m_widgetDriver->processMsg (&msg, &isHandled);
 }
 
-void 
+void
 QtWidgetBase::genericEventImpl (
 	QEvent* e,
 	WidgetMsgCode msgCode
@@ -299,28 +299,28 @@ QtWidgetBase::genericEventImpl (
 {
 	if (!m_widgetDriver->checkMsgMap (msgCode))
 	{
-		e->ignore ();	
+		e->ignore ();
 		return;
 	}
 
 	WidgetMsg msg (msgCode);
 
 	bool isHandled = true;
-	m_widgetDriver->processMsg (&msg, &isHandled);			
+	m_widgetDriver->processMsg (&msg, &isHandled);
 
 	if (!isHandled)
-		e->ignore ();	
+		e->ignore ();
 }
 
-void 
+void
 QtWidgetBase::mouseEventImpl (
 	QMouseEvent* e,
 	WidgetMsgCode msgCode
 	)
-{	
+{
 	if (!m_widgetDriver->checkMsgMap (msgCode))
 	{
-		e->ignore ();	
+		e->ignore ();
 		return;
 	}
 
@@ -332,21 +332,21 @@ QtWidgetBase::mouseEventImpl (
 	msg.m_button = getMouseButtonFromQtButton (e->button ());
 
 	bool isHandled = true;
-	m_widgetDriver->processMsg (&msg, &isHandled);			
+	m_widgetDriver->processMsg (&msg, &isHandled);
 
 	if (!isHandled)
 		e->ignore ();
 }
 
-void 
+void
 QtWidgetBase::keyEventImpl (
 	QKeyEvent* e,
 	WidgetMsgCode msgCode
 	)
-{	
+{
 	if (!m_widgetDriver->checkMsgMap (msgCode))
 	{
-		e->ignore ();	
+		e->ignore ();
 		return;
 	}
 
@@ -360,22 +360,22 @@ QtWidgetBase::keyEventImpl (
 		if (qtKey <= Qt::Key_Enter)
 			msg.m_char = msg.m_key;
 	}
-	else 
+	else
 	{
 		msg.m_key = qtKey;
 		msg.m_char = e->text ().at (0).unicode ();
 	}
 
 	msg.m_modifierKeys = getModifierKeysFromQtModifiers (e->modifiers ());
-	
+
 	bool isHandled = true;
-	m_widgetDriver->processMsg (&msg, &isHandled);			
+	m_widgetDriver->processMsg (&msg, &isHandled);
 
 	if (!isHandled)
 		e->ignore ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

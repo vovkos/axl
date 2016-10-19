@@ -12,7 +12,7 @@
 namespace axl {
 namespace err {
 
-//.............................................................................
+//..............................................................................
 
 // axl std errors
 
@@ -25,7 +25,7 @@ enum StdErrorCode
 	StdErrorCode_Stack,
 };
 
-//.............................................................................
+//..............................................................................
 
 // POD structure
 
@@ -50,7 +50,7 @@ struct ErrorHdr
 		uint_t code
 		) const
 	{
-		return 
+		return
 			isKindOf (g_stdErrorGuid, StdErrorCode_Stack) &&
 			(this + 1)->isKindOf (guid, code);
 	}
@@ -59,7 +59,7 @@ struct ErrorHdr
 	getDescription () const;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class SizeOfError
 {
@@ -71,7 +71,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 extern AXL_SELECT_ANY const ErrorHdr g_noError =
 {
@@ -80,7 +80,7 @@ extern AXL_SELECT_ANY const ErrorHdr g_noError =
 	StdErrorCode_NoError,
 };
 
-//.............................................................................
+//..............................................................................
 
 class ErrorRef: public ref::BufRef <ErrorHdr, SizeOfError>
 {
@@ -129,7 +129,7 @@ public:
 	getDescription () const;
 };
 
-//.............................................................................
+//..............................................................................
 
 class Error: public ref::Buf <ErrorHdr, SizeOfError, ErrorRef>
 {
@@ -386,7 +386,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 ErrorRef::ErrorRef (uint_t code):
@@ -403,7 +403,7 @@ ErrorRef::ErrorRef (
 {
 }
 
-//.............................................................................
+//..............................................................................
 
 // utility functions
 
@@ -419,7 +419,7 @@ pushError (const ErrorRef& error);
 sl::String
 getLastErrorDescription ();
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // pack
 
@@ -473,7 +473,7 @@ pushPackError (
 	return pushPackError_va <Pack> (guid, code, va);
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // format
 
@@ -519,7 +519,7 @@ pushFormatError (
 	return pushFormatError_va (guid, code, formatString, va);
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // simple error
 
@@ -543,7 +543,7 @@ pushError (
 	return pushError (Error (guid, code));
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // string error
 
@@ -587,7 +587,7 @@ pushFormatStringError (
 	return pushFormatStringError_va (formatString, va);
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // convenient helpers
 
@@ -610,7 +610,7 @@ fail (const ErrorRef& error)
 }
 
 inline
-size_t 
+size_t
 setLastSystemError ()
 {
 	return setError (getLastSystemErrorCode ());
@@ -665,7 +665,7 @@ complete (int result)
 	return complete <bool> (result != 0, false);
 }
 
-//.............................................................................
+//..............................................................................
 
 // providers
 
@@ -677,7 +677,7 @@ public:
 	getErrorDescription (const ErrorRef& error) = 0;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class StdErrorProvider: public ErrorProvider
 {
@@ -691,7 +691,7 @@ protected:
 	getStackErrorDescription (const ErrorRef& error);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace err
 } // namespace axl

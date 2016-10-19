@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_UNPACKER_H
 
@@ -11,7 +11,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class UnpackStringBase
@@ -45,7 +45,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class UnpackPtr
@@ -67,7 +67,7 @@ public:
 };
 
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef UnpackStringBase <char>    UnpackString;
 typedef UnpackStringBase <wchar_t> UnpackString_w;
@@ -75,7 +75,7 @@ typedef UnpackStringBase <utf8_t>  UnpackString_utf8;
 typedef UnpackStringBase <utf16_t> UnpackString_utf16;
 typedef UnpackStringBase <utf32_t> UnpackString_utf32;
 
-//.............................................................................
+//..............................................................................
 
 // most common case
 
@@ -98,7 +98,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // specialization for strings
 
@@ -122,7 +122,7 @@ class Unpack <const wchar_t*>: public UnpackStringBase <wchar_t>
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // specialization for pointers
 
@@ -131,7 +131,7 @@ class Unpack <T*>: public UnpackPtr <T>
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 class Unpacker
 {
@@ -154,7 +154,7 @@ public:
 		setup (p, size);
 	}
 
-	void 
+	void
 	setup (
 		const void* p,
 		size_t size
@@ -165,13 +165,13 @@ public:
 		m_size = size;
 	}
 
-	void 
+	void
 	clear ()
 	{
 		setup (NULL, 0);
 	}
 
-	void 
+	void
 	rewind ()
 	{
 		m_current = m_begin;
@@ -229,7 +229,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

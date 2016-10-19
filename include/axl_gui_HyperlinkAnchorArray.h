@@ -10,8 +10,8 @@
 
 namespace axl {
 namespace gui {
-	
-//.............................................................................
+
+//..............................................................................
 
 struct HyperlinkAnchor: sl::ListLink
 {
@@ -24,7 +24,7 @@ struct HyperlinkAnchor: sl::ListLink
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class HyperlinkAnchorArray
 {
@@ -45,48 +45,48 @@ public:
 		return !m_list.isEmpty () && !m_list.getTail ()->m_hyperlink.isEmpty ();
 	}
 
-	size_t 
+	size_t
 	getCount () const
 	{
 		return m_list.getCount ();
 	}
 
-	sl::Iterator <HyperlinkAnchor> 
+	sl::Iterator <HyperlinkAnchor>
 	getHead () const
 	{
 		return m_list.getHead ();
 	}
 
-	sl::Iterator <HyperlinkAnchor> 
+	sl::Iterator <HyperlinkAnchor>
 	getTail () const
 	{
 		return m_list.getHead ();
 	}
 
-	void 
+	void
 	clear ()
-	{ 
+	{
 		m_list.clear ();
-		m_array.clear ();	
+		m_array.clear ();
 	}
 
-	HyperlinkAnchor* 
+	HyperlinkAnchor*
 	find (size_t offset) const;
 
-	HyperlinkAnchor* 
+	HyperlinkAnchor*
 	openHyperlink (
-		size_t offset, 
+		size_t offset,
 		const sl::StringRef& hyperlink
 		);
 
-	HyperlinkAnchor* 
+	HyperlinkAnchor*
 	closeHyperlink (
 		size_t offset,
 		bool closeEmpty = false
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

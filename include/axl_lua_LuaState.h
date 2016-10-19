@@ -11,19 +11,19 @@
 namespace axl {
 namespace lua {
 
-//.............................................................................
+//..............................................................................
 
 class LuaClose
 {
 public:
-	void 
+	void
 	operator () (lua_State* lua)
 	{
 		lua_close (lua);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class LuaState: public sl::Handle <lua_State*, LuaClose>
 {
@@ -90,14 +90,14 @@ public:
 		formatError_va (format, va);
 	}
 
-	void 
+	void
 	clearStack ()
 	{
 		ASSERT (isOpen ());
 		lua_settop (m_h, 0);
 	}
 
-	int 
+	int
 	getTop ()
 	{
 		ASSERT (isOpen ());
@@ -111,7 +111,7 @@ public:
 		lua_settop (m_h, index);
 	}
 
-	int 
+	int
 	getType (int index)
 	{
 		ASSERT (isOpen ());
@@ -125,21 +125,21 @@ public:
 		return lua_typename (m_h, type);
 	}
 
-	void 
+	void
 	insert (int index)
 	{
 		ASSERT (isOpen ());
 		lua_insert (m_h, index);
 	}
 
-	void 
+	void
 	remove (int index)
 	{
 		ASSERT (isOpen ());
 		lua_remove (m_h, index);
 	}
 
-	void 
+	void
 	swap ()
 	{
 		insert (-2);
@@ -211,14 +211,14 @@ public:
 	{
 		ASSERT (isOpen ());
 		lua_pushcclosure (m_h, func, contextArgumentCount);
-	}	
+	}
 
 	void
 	pushFunction (lua_CFunction func)
 	{
 		ASSERT (isOpen ());
 		lua_pushcfunction (m_h, func);
-	}	
+	}
 
 	void
 	pushFunction (
@@ -545,7 +545,7 @@ protected:
 	complete (int result);
 };
 
-//.............................................................................
+//..............................................................................
 
 class LuaNonOwnerState: public LuaState
 {
@@ -561,7 +561,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace lua
 } // namespace axl

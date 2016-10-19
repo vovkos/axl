@@ -4,7 +4,7 @@
 namespace axl {
 namespace xml {
 
-//.............................................................................
+//..............................................................................
 
 bool
 ExpatParserRoot::create (const sl::StringRef& encoding)
@@ -39,7 +39,7 @@ ExpatParserRoot::parseFile (
 
 	if (!blockSize || blockSize == -1)
 	{
-		return 
+		return
 			mappedFile.open (fileName, io::FileFlag_ReadOnly) &&
 			parse (mappedFile.p (), (size_t) mappedFile.getFileSize (), true);
 	}
@@ -47,7 +47,7 @@ ExpatParserRoot::parseFile (
 	// round-up block size
 
 	size_t alignFactor = g::g_module.getSystemInfo ()->m_mappingAlignFactor;
-	blockSize = (blockSize + alignFactor - 1) & ~(alignFactor - 1); 
+	blockSize = (blockSize + alignFactor - 1) & ~(alignFactor - 1);
 
 	result = mappedFile.open (fileName, 0, 0, io::FileFlag_ReadOnly);
 	if (!result)
@@ -59,7 +59,7 @@ ExpatParserRoot::parseFile (
 
 	while (offset + blockSize < size)
 	{
-		result = 
+		result =
 			(p = mappedFile.view (offset, blockSize)) &&
 			parse (p, blockSize, false);
 
@@ -78,7 +78,7 @@ ExpatParserRoot::parseFile (
 		parse (p, blockSize, true);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace xml
 } // namespace axl

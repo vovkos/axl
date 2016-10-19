@@ -16,7 +16,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 class GdiEngine: public Engine
 {
@@ -88,7 +88,7 @@ public:
 	// clipboard
 
 	virtual
-	uintptr_t 
+	uintptr_t
 	registerClipboardFormat (const sl::StringRef& formatName);
 
 	virtual
@@ -154,7 +154,7 @@ protected:
 	createStdCursor (StdCursorKind cursorKind);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

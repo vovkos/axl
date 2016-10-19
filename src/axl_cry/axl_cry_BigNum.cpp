@@ -4,7 +4,7 @@
 namespace axl {
 namespace cry {
 
-//.............................................................................
+//..............................................................................
 
 BIGNUM*
 BnCtx::getBigNum ()
@@ -19,13 +19,13 @@ BnCtx::getBigNum ()
 	return result;
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 BigNum::create ()
 {
 	close ();
-	
+
 	m_h = BN_new ();
 	return completeWithLastCryptoError (m_h != NULL);
 }
@@ -59,7 +59,7 @@ BigNum::getData (
 
 bool
 BigNum::getDecString (sl::String* string)
-{		
+{
 	char* p = BN_bn2dec (m_h);
 	if (!p)
 	{
@@ -87,7 +87,7 @@ BigNum::getHexString (sl::String* string)
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cry
 } // namespace axl

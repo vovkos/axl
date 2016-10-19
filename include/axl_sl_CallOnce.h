@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_CALLONCE_H
 
@@ -11,13 +11,13 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename Functor,
 	typename Argument
 	>
-void 
+void
 callOnce (
 	Functor functor,
 	Argument argument,
@@ -51,7 +51,7 @@ callOnce (
 	} while (*flag != OnceFlag_Initialized);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

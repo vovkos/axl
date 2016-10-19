@@ -4,7 +4,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 
 #ifdef _AXL_DEBUG
@@ -38,7 +38,7 @@ TextAttrAnchorArray::findAnchor (size_t offset) const
 		const TextAttrAnchor* anchor = &m_array [mid];
 
 		ASSERT (mid < count);
-			
+
 		if (anchor->m_offset == offset)
 			return mid;
 
@@ -106,7 +106,7 @@ TextAttrAnchorArray::normalize (
 {
 	size_t removeIndex = -1;
 	size_t removeCount = 0;
-		
+
 	TextAttrAnchor lastAnchor;
 
 	if (start)
@@ -115,7 +115,7 @@ TextAttrAnchorArray::normalize (
 	for (size_t i = start; i <= end; i++)
 	{
 		TextAttrAnchor* anchor = &m_array [i];
-		
+
 		if (anchor->m_attr.cmp (lastAnchor.m_attr) == 0)
 		{
 			if (!removeCount)
@@ -123,7 +123,7 @@ TextAttrAnchorArray::normalize (
 
 			removeCount++;
 		}
-		else 
+		else
 		{
 			lastAnchor = *anchor;
 
@@ -141,7 +141,7 @@ TextAttrAnchorArray::normalize (
 		m_array.remove (removeIndex, removeCount);
 }
 
-void 
+void
 TextAttrAnchorArray::clearBefore (size_t offset)
 {
 	size_t anchor = findAnchor (offset);
@@ -151,8 +151,8 @@ TextAttrAnchorArray::clearBefore (size_t offset)
 
 void
 TextAttrAnchorArray::setAttr (
-	size_t beginOffset, 
-	size_t endOffset, 
+	size_t beginOffset,
+	size_t endOffset,
 	const TextAttr& attr
 	)
 {
@@ -179,7 +179,7 @@ TextAttrAnchorArray::setAttr (
 	normalize (startIdx, endIdx);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

@@ -13,32 +13,32 @@
 namespace axl {
 namespace ref {
 
-//.............................................................................
+//..............................................................................
 
-// ref-counted buffer for variable-sized objects 
+// ref-counted buffer for variable-sized objects
 // could be also used for fixed-sized object as single-writer multiple reader accessor
 // can use external buffer (e.g. static or allocated on stack)
 
 enum BufKind
 {
-	BufKind_Exclusive, // buffer cannot be shared (stack-allocated or object-field) 
+	BufKind_Exclusive, // buffer cannot be shared (stack-allocated or object-field)
 	BufKind_Shared,    // buffer can be shared (static or global)
 
 	// aliases
 
-	BufKind_Static = BufKind_Shared, 
+	BufKind_Static = BufKind_Shared,
 	BufKind_Stack  = BufKind_Exclusive,
 	BufKind_Field  = BufKind_Exclusive,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum BufHdrFlag
 {
 	BufHdrFlag_Exclusive = 0x04
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct BufHdr: public RefCount
 {
@@ -70,7 +70,7 @@ struct BufHdr: public RefCount
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -158,11 +158,11 @@ public:
 		return m_p;
 	}
 
-	const T* 
+	const T*
 	operator -> () const
-	{ 
+	{
 		ASSERT (m_p);
-		return m_p; 
+		return m_p;
 	}
 
 	BufRef&
@@ -172,7 +172,7 @@ public:
 		return *this;
 	}
 
-	const T* 
+	const T*
 	cp () const
 	{
 		return m_p;
@@ -184,13 +184,13 @@ public:
 		return m_size;
 	}
 
-	BufHdr* 
+	BufHdr*
 	getHdr () const
 	{
 		return m_hdr;
 	}
 
-	const T* 
+	const T*
 	getEnd () const
 	{
 		return (T*) ((char*) m_p + m_size);
@@ -231,7 +231,7 @@ protected:
 
 		if (m_hdr)
 			m_hdr->release ();
-		
+
 		m_hdr = hdr;
 	}
 
@@ -256,7 +256,7 @@ protected:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -302,10 +302,10 @@ public:
 	{
 		copy (src, size);
 	}
-	
+
 	Buf (
 		BufKind kind,
-		void* p, 
+		void* p,
 		size_t size
 		)
 	{
@@ -313,50 +313,50 @@ public:
 	}
 
 	operator const T* () const
-	{ 
-		return this->m_p; 
+	{
+		return this->m_p;
 	}
 
 	operator T* ()
-	{ 
-		return this->m_p; 
+	{
+		return this->m_p;
 	}
 
-	const T* 
+	const T*
 	operator -> () const
-	{ 
+	{
 		ASSERT (this->m_p);
-		return this->m_p; 
+		return this->m_p;
 	}
 
-	T* 
+	T*
 	operator -> ()
-	{ 
+	{
 		ASSERT (this->m_p);
-		return this->m_p; 
+		return this->m_p;
 	}
 
-	Buf& 
+	Buf&
 	operator = (const Buf& src)
-	{ 
+	{
 		copy (src);
 		return *this;
 	}
 
-	Buf& 
+	Buf&
 	operator = (const Ref& src)
-	{ 
+	{
 		copy (src);
 		return *this;
 	}
 
-	Buf& 
+	Buf&
 	operator = (const T* p)
 	{
 		copy (p, -1);
 		return *this;
 	}
-	
+
 	T*
 	p ()
 	{
@@ -442,13 +442,13 @@ public:
 		return !this->m_size || this->m_hdr && this->m_hdr->getRefCount () == 1;
 	}
 
-	bool 
+	bool
 	ensureExclusive ()
-	{ 
-		return this->m_size ? createBuffer (this->m_size, true) != NULL : true; 
+	{
+		return this->m_size ? createBuffer (this->m_size, true) != NULL : true;
 	}
 
-	T* 
+	T*
 	getBuffer (size_t* size = NULL)
 	{
 		T* p = createBuffer (this->m_size, true);
@@ -461,12 +461,12 @@ public:
 		return p;
 	}
 
-	T* 
+	T*
 	createBuffer (
-		size_t size = sizeof (T), 
+		size_t size = sizeof (T),
 		bool saveContents = false
 		)
-	{	
+	{
 		if (size < sizeof (T))
 			size = sizeof (T);
 
@@ -534,7 +534,7 @@ public:
 
 		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof (ref::BufHdr);
-		
+
 		Ptr <Hdr> hdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
 		hdr->m_bufferSize = bufferSize;
 
@@ -549,7 +549,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ref
 } // namespace axl

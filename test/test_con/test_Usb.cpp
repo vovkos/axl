@@ -1,10 +1,10 @@
 #include "pch.h"
 
-namespace test_Usb { 
+namespace test_Usb {
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 run ()
 {
 	bool result;
@@ -32,10 +32,10 @@ run ()
 		device.getDeviceDescriptor (&descriptor);
 
 		printf (
-			"VID_%04x&PID_%04x (Bus: %d Address: %d)\n", 
+			"VID_%04x&PID_%04x (Bus: %d Address: %d)\n",
 			descriptor.idVendor,
 			descriptor.idProduct,
-			device.getBusNumber (), 
+			device.getBusNumber (),
 			device.getDeviceAddress ()
 			);
 
@@ -57,6 +57,6 @@ run ()
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Vso

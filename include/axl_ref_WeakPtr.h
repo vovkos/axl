@@ -11,14 +11,14 @@
 namespace axl {
 namespace ref {
 
-//.............................................................................
+//..............................................................................
 
 // forward
 
 template <typename T>
 class Ptr;
 
-//.............................................................................
+//..............................................................................
 
 // weak ptr
 
@@ -37,13 +37,13 @@ protected:
 
 public:
 	WeakPtr (int i = 0)
-	{ 
+	{
 		m_p = NULL;
-		m_refCount = NULL; 
+		m_refCount = NULL;
 	}
 
 	WeakPtr (const WeakPtr& src)
-	{ 
+	{
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
@@ -57,7 +57,7 @@ public:
 
 	template <typename T2>
 	WeakPtr (const Ptr <T2>& src)
-	{ 
+	{
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
@@ -70,29 +70,29 @@ public:
 	}
 
 	WeakPtr (
-		T* p, 
+		T* p,
 		RefCount* refCount
 		)
-	{ 
+	{
 		m_p = NULL, m_refCount = NULL;
 		copy (p, refCount);
 	}
 
 	~WeakPtr ()
-	{ 
-		clear (); 
+	{
+		clear ();
 	}
 
-	WeakPtr& 
+	WeakPtr&
 	operator = (const WeakPtr& src)
-	{ 
+	{
 		copy (src.m_p, src.m_refCount);
 		return *this;
 	}
 
-	void 
+	void
 	copy (
-		T* p, 
+		T* p,
 		RefCount* refCount
 		)
 	{
@@ -102,7 +102,7 @@ public:
 			return;
 
 		if (refCount)
-			refCount->addWeakRef (); 
+			refCount->addWeakRef ();
 
 		if (m_refCount)
 			m_refCount->weakRelease ();
@@ -110,9 +110,9 @@ public:
 		m_refCount = refCount;
 	}
 
-	void 
+	void
 	attach (
-		T* p, 
+		T* p,
 		RefCount* refCount
 		)
 	{
@@ -123,25 +123,25 @@ public:
 		m_refCount = refCount;
 	}
 
-	void 
+	void
 	detach (
-		T** pp_o = NULL, 
+		T** pp_o = NULL,
 		RefCount** refCount_o = NULL
 		)
-	{ 
+	{
 		if (pp_o)
 			*pp_o = m_p;
-		
+
 		if (refCount_o)
 			*refCount_o = m_refCount;
 
 		m_p = NULL;
-		m_refCount = NULL; 
+		m_refCount = NULL;
 	}
 
-	void 
+	void
 	clear ()
-	{ 
+	{
 		if (m_refCount)
 			m_refCount->weakRelease ();
 
@@ -149,14 +149,14 @@ public:
 		m_refCount = NULL;
 	}
 
-	RefCount* 
+	RefCount*
 	getRefCount () const
 	{
 		return m_refCount;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ref
 } // namespace axl

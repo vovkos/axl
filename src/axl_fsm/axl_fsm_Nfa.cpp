@@ -3,8 +3,8 @@
 
 namespace axl {
 namespace fsm {
-	
-//.............................................................................
+
+//..............................................................................
 
 MatchCondition::MatchCondition ()
 {
@@ -17,7 +17,7 @@ MatchCondition::copy (const MatchCondition& src)
 {
 	m_conditionKind = src.m_conditionKind;
 	m_char = src.m_char;
-	m_charSet.copy (src.m_charSet);	
+	m_charSet.copy (src.m_charSet);
 }
 
 void
@@ -26,14 +26,14 @@ MatchCondition::addChar (uchar_t c)
 	switch (m_conditionKind)
 	{
 	case MatchConditionKind_Char:
-		if (m_char == c) 
+		if (m_char == c)
 			break; // no change
-		
+
 		ASSERT (m_char < 256);
 		m_conditionKind = MatchConditionKind_CharSet;
 		m_charSet.setBitCount (256);
 		m_charSet.setBit (m_char);
-		
+
 		// and fall through
 
 	case MatchConditionKind_CharSet:
@@ -45,10 +45,10 @@ MatchCondition::addChar (uchar_t c)
 
 	default:
 		ASSERT (false);
-	}	
+	}
 }
 
-//.............................................................................
+//..............................................................................
 
 NfaState::NfaState ()
 {
@@ -81,7 +81,7 @@ NfaState::createEpsilonLink (
 	)
 {
 	ASSERT (!m_flags && !m_outState && !m_outState2);
-	
+
 	m_flags |= NfaStateFlag_EpsilonLink;
 	m_outState = outState;
 	m_outState2 = outState2;
@@ -99,7 +99,7 @@ NfaState::createCharMatch (
 	m_outState = outState;
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 NfaStateSet::addState (NfaState* state)
@@ -108,28 +108,28 @@ NfaStateSet::addState (NfaState* state)
 		return false;
 
 	m_stateArray.append (state);
-	
+
 	if (state->m_id >= m_stateSet.getBitCount ())
 		m_stateSet.setBitCount (state->m_id + 1);
 
 	m_stateSet.setBit (state->m_id);
-	return true;	
+	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 NfaTransitionMgr::clear ()
 {
 	m_transitionList.clear ();
 	memset (m_transitionMap, 0, sizeof (m_transitionMap));
 }
-	
+
 void
 NfaTransitionMgr::addMatchState (NfaState* state)
 {
 	ASSERT (state->m_flags & NfaStateFlag_Match);
-	
+
 	switch (state->m_matchCondition.m_conditionKind)
 	{
 	case MatchConditionKind_Char:
@@ -147,7 +147,7 @@ NfaTransitionMgr::addMatchState (NfaState* state)
 	case MatchConditionKind_Any:
 		for (size_t i = 0; i < 256; i++)
 			addMatchCharTransition (i, state->m_outState);
-		break;	
+		break;
 
 	default:
 		ASSERT (false);
@@ -158,13 +158,13 @@ void
 NfaTransitionMgr::finalize ()
 {
 	NfaStateSetMap <NfaTransition*> transitionMap;
-	
+
 	sl::Iterator <NfaTransition> transitionIt = m_transitionList.getHead ();
 	while (transitionIt)
 	{
 		NfaTransition* transition = *transitionIt++;
 		ASSERT (transition->m_matchCondition.m_conditionKind == MatchConditionKind_Char);
-		
+
 		NfaStateSetMap <NfaTransition*>::Iterator mapIt = transitionMap.visit (&transition->m_outStateSet);
 		if (!mapIt->m_value)
 		{
@@ -178,9 +178,9 @@ NfaTransitionMgr::finalize ()
 	}
 }
 
-void	
+void
 NfaTransitionMgr::addMatchCharTransition (
-	uint_t c, 
+	uint_t c,
 	NfaState* outState
 	)
 {
@@ -190,7 +190,7 @@ NfaTransitionMgr::addMatchCharTransition (
 	if (!transition)
 	{
 		transition = AXL_MEM_NEW (NfaTransition);
-		transition->m_matchCondition.m_conditionKind = MatchConditionKind_Char;	
+		transition->m_matchCondition.m_conditionKind = MatchConditionKind_Char;
 		transition->m_matchCondition.m_char = c;
 		m_transitionList.insertTail (transition);
 		m_transitionMap [c] = transition;
@@ -199,7 +199,7 @@ NfaTransitionMgr::addMatchCharTransition (
 	transition->m_outStateSet.addState (outState);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace fsm
 } // namespace axl

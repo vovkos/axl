@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_PACK_H
 
@@ -13,7 +13,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class Pack
@@ -35,7 +35,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class PackIntTrunc
@@ -57,7 +57,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class Pack <char>: public PackIntTrunc <char>
@@ -89,7 +89,7 @@ class Pack <uint16_t>: public PackIntTrunc <uint16_t>
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 // pack string directly into buffer
 
@@ -123,7 +123,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef PackStringBase <char>    PackString;
 typedef PackStringBase <wchar_t> PackString_w;
@@ -131,7 +131,7 @@ typedef PackStringBase <utf8_t>  PackString_utf8;
 typedef PackStringBase <utf16_t> PackString_utf16;
 typedef PackStringBase <utf32_t> PackString_utf32;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class Pack <const char*>: public PackStringBase <char>
@@ -153,7 +153,7 @@ class Pack <wchar_t*>: public PackStringBase <wchar_t>
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 // general pointer
 
@@ -184,9 +184,9 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
-// pointer to a self-sized object 
+// pointer to a self-sized object
 
 template <
 	typename T,
@@ -220,7 +220,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // pack error last
 
@@ -245,13 +245,13 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // specialization for errors
 
 template <>
 class Pack <err::ErrorHdr*>: public PackSelfSizedPtr <
-	err::ErrorHdr, 
+	err::ErrorHdr,
 	err::SizeOfError
 	>
 {
@@ -259,13 +259,13 @@ class Pack <err::ErrorHdr*>: public PackSelfSizedPtr <
 
 template <>
 class Pack <const err::ErrorHdr*>: public PackSelfSizedPtr <
-	err::ErrorHdr, 
+	err::ErrorHdr,
 	err::SizeOfError
 	>
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 // pack object referenced by (void* p, size_t size) pair
 
@@ -281,7 +281,7 @@ public:
 	{
 		void* obj = va.arg <void*> ();
 		size_t objSize = va.arg <size_t> ();
-	
+
 		*size = objSize;
 
 		if (p)
@@ -296,12 +296,12 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // compile-time sequencing
 
 template <
-	typename Pack1, 
+	typename Pack1,
 	typename Pack2
 	>
 class PackSeqEx
@@ -333,108 +333,108 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 //  helper typedefs for packing up to 6 elements
 
 template <
-	typename Pack1, 
+	typename Pack1,
 	typename Pack2
 	>
 class PackSeqEx_2: public PackSeqEx <Pack1, Pack2>
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Pack1, 
-	typename Pack2, 
+	typename Pack1,
+	typename Pack2,
 	typename Pack3
 	>
 class PackSeqEx_3: public PackSeqEx <PackSeqEx <Pack1, Pack2>, Pack3>
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Pack1, 
-	typename Pack2, 
-	typename Pack3, 
+	typename Pack1,
+	typename Pack2,
+	typename Pack3,
 	typename Pack4
 	>
 class PackSeqEx_4: public PackSeqEx <PackSeqEx_3 <Pack1, Pack2, Pack3>, Pack4>
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Pack1, 
-	typename Pack2, 
-	typename Pack3, 
-	typename Pack4, 
+	typename Pack1,
+	typename Pack2,
+	typename Pack3,
+	typename Pack4,
 	typename Pack5
 	>
 class PackSeqEx_5: public PackSeqEx <PackSeqEx_4 <Pack1, Pack2, Pack3, Pack4>, Pack5>
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Pack1, 
-	typename Pack2, 
-	typename Pack3, 
-	typename Pack4, 
-	typename Pack5, 
+	typename Pack1,
+	typename Pack2,
+	typename Pack3,
+	typename Pack4,
+	typename Pack5,
 	typename Pack6
 	>
 class PackSeqEx_6: public PackSeqEx <PackSeqEx_5 <Pack1, Pack2, Pack3, Pack4, Pack5>, Pack6>
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 //  helper typedefs for packing up to 6 simple elements
 
 template <
-	typename T1, 
+	typename T1,
 	typename T2
 	>
 class PackSeq_2: public PackSeqEx <
-	Pack <T1>, 
+	Pack <T1>,
 	Pack <T2>
 	>
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
+	typename T1,
+	typename T2,
 	typename T3
 	>
 class PackSeq_3: public PackSeqEx_3 <
-	Pack <T1>, 
+	Pack <T1>,
 	Pack <T2>,
 	Pack <T3>
 	>
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
-	typename T3, 
+	typename T1,
+	typename T2,
+	typename T3,
 	typename T4
 	>
 class PackSeq_4: public PackSeqEx_4 <
-	Pack <T1>, 
+	Pack <T1>,
 	Pack <T2>,
 	Pack <T3>,
 	Pack <T4>
@@ -442,17 +442,17 @@ class PackSeq_4: public PackSeqEx_4 <
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
-	typename T3, 
-	typename T4, 
+	typename T1,
+	typename T2,
+	typename T3,
+	typename T4,
 	typename T5
 	>
 class PackSeq_5: public PackSeqEx_5 <
-	Pack <T1>, 
+	Pack <T1>,
 	Pack <T2>,
 	Pack <T3>,
 	Pack <T4>,
@@ -461,18 +461,18 @@ class PackSeq_5: public PackSeqEx_5 <
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T1, 
-	typename T2, 
-	typename T3, 
-	typename T4, 
-	typename T5, 
+	typename T1,
+	typename T2,
+	typename T3,
+	typename T4,
+	typename T5,
 	typename T6
 	>
 class PackSeq_6: public PackSeqEx_6 <
-	Pack <T1>, 
+	Pack <T1>,
 	Pack <T2>,
 	Pack <T3>,
 	Pack <T4>,
@@ -482,10 +482,10 @@ class PackSeq_6: public PackSeqEx_6 <
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
-ref::Ptr <mem::Block> 
+ref::Ptr <mem::Block>
 createPackage_va (axl_va_list va)
 {
 	size_t size = 0;
@@ -496,16 +496,16 @@ createPackage_va (axl_va_list va)
 	ref::Ptr <Package> package = AXL_REF_NEW_EXTRA (Package, size);
 	package->m_p = package + 1;
 	package->m_size = size;
-	
+
 	T () (package + 1, &size, va);
-	
-	return package;			
+
+	return package;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-ref::Ptr <mem::Block> 
+ref::Ptr <mem::Block>
 createPackage (
 	int unused,
 	...
@@ -515,7 +515,7 @@ createPackage (
 	return createPackage_va <T> (va);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

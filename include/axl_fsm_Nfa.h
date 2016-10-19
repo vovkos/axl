@@ -11,7 +11,7 @@
 namespace axl {
 namespace fsm {
 
-//.............................................................................
+//..............................................................................
 
 enum MatchConditionKind
 {
@@ -20,25 +20,25 @@ enum MatchConditionKind
 	MatchConditionKind_CharSet,
 	MatchConditionKind_Any,
 };
-	
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct MatchCondition
 {
 	MatchConditionKind m_conditionKind;
 	sl::BitMap m_charSet;
 	uint_t m_char;
-	
+
 	MatchCondition ();
-	
+
 	void
-	copy (const MatchCondition& src);	
+	copy (const MatchCondition& src);
 
 	void
 	addChar (uchar_t c);
 };
 
-//.............................................................................
+//..............................................................................
 
 enum NfaStateFlag
 {
@@ -49,7 +49,7 @@ enum NfaStateFlag
 	NfaStateFlag_CloseCapture = 0x0020,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct NfaState: sl::ListLink
 {
@@ -66,7 +66,7 @@ struct NfaState: sl::ListLink
 
 	void
 	copy (const NfaState* srcState);
-	
+
 	void
 	createEpsilonLink (NfaState* outState);
 
@@ -83,7 +83,7 @@ struct NfaState: sl::ListLink
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 struct NfaStateSet
 {
@@ -91,9 +91,9 @@ struct NfaStateSet
 	sl::BitMap m_stateSet;
 
 	bool
-	addState (NfaState* state);	
+	addState (NfaState* state);
 
-	int 
+	int
 	cmp (const NfaStateSet& set) const
 	{
 		return m_stateSet.cmp (set.m_stateSet);
@@ -104,7 +104,7 @@ struct NfaStateSet
 	{
 		return m_stateSet.isEqual (set.m_stateSet);
 	}
-	
+
 	size_t
 	hash () const
 	{
@@ -112,11 +112,11 @@ struct NfaStateSet
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class NfaStateSetMap: public sl::HashTableMap <
-	NfaStateSet*, 
+	NfaStateSet*,
 	T,
 	sl::HashDuckType <NfaStateSet>,
 	sl::EqDuckType <NfaStateSet>
@@ -124,15 +124,15 @@ class NfaStateSetMap: public sl::HashTableMap <
 {
 };
 
-//.............................................................................
+//..............................................................................
 
-struct NfaTransition: sl::ListLink 
+struct NfaTransition: sl::ListLink
 {
 	MatchCondition m_matchCondition;
 	NfaStateSet m_outStateSet;
 };
 
-//.............................................................................
+//..............................................................................
 
 class NfaTransitionMgr
 {
@@ -143,10 +143,10 @@ protected:
 	// for UTF regexps m_transitionMap should be replaced with interval tree
 
 public:
-	void 
+	void
 	clear ();
-	
-	sl::ConstList <NfaTransition> 
+
+	sl::ConstList <NfaTransition>
 	getTransitionList ()
 	{
 		return m_transitionList;
@@ -154,28 +154,28 @@ public:
 
 	void
 	addMatchState (NfaState* state);
-	
+
 	void
 	finalize ();
-	
+
 protected:
-	void	
+	void
 	addMatchCharTransition (
-		uint_t c, 
+		uint_t c,
 		NfaState* outState
 		);
-	
+
 	void
 	addMatchCharSetTransition (
-		const sl::BitMap* charSet, 
+		const sl::BitMap* charSet,
 		NfaState* outState
 		);
-	
+
 	void
 	addMatchAnyTransition (NfaState* outState);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace fsm
 } // namespace axl

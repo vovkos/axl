@@ -7,7 +7,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 const char*
 getSockAddrFamilyString (uint_t family)
@@ -60,7 +60,7 @@ getSockProtoString (uint_t proto)
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 getSockAddrNetMaskBitCount_ip4 (const sockaddr_in* addr)
@@ -75,7 +75,7 @@ getSockAddrNetMaskBitCount_ip6 (const sockaddr_in6* addr)
 	size_t bitIdx = sl::findBit (
 		(size_t*) &addr->sin6_addr,
 		sizeof (addr->sin6_addr) / sizeof (size_t),
-		0, 
+		0,
 		false
 		);
 
@@ -98,7 +98,7 @@ getSockAddrNetMaskBitCount (const sockaddr* addr)
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 createSockAddrNetMask_ip4 (
@@ -108,7 +108,7 @@ createSockAddrNetMask_ip4 (
 {
 	memset (addr, 0, sizeof (sockaddr_in));
 	addr->sin_family = AF_INET;
-	
+
 	size_t maxBitCount = sizeof (addr->sin_addr) * 8;
 	if (bitCount > maxBitCount)
 		bitCount = maxBitCount;
@@ -124,20 +124,20 @@ createSockAddrNetMask_ip6 (
 {
 	memset (addr, 0, sizeof (sockaddr_in6));
 	addr->sin6_family = AF_INET6;
-	
+
 	size_t maxBitCount = sizeof (addr->sin6_addr) * 8;
 	if (bitCount > maxBitCount)
 		bitCount = maxBitCount;
 
 	sl::setBitRange (
-		(size_t*) &addr->sin6_addr, 
-		sizeof (addr->sin6_addr) / sizeof (size_t), 
+		(size_t*) &addr->sin6_addr,
+		sizeof (addr->sin6_addr) / sizeof (size_t),
 		0,
 		bitCount
 		);
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 isSockAddrEqual_ip4 (
@@ -145,8 +145,8 @@ isSockAddrEqual_ip4 (
 	const sockaddr_in* addr2
 	)
 {
-	return 
-		addr1->sin_port == addr2->sin_port && 
+	return
+		addr1->sin_port == addr2->sin_port &&
 		*(const uint32_t*) &addr1->sin_addr == *(const uint32_t*) &addr2->sin_addr;
 }
 
@@ -156,8 +156,8 @@ isSockAddrEqual_ip6 (
 	const sockaddr_in6* addr2
 	)
 {
-	return 
-		addr1->sin6_port == addr2->sin6_port && 
+	return
+		addr1->sin6_port == addr2->sin6_port &&
 		addr1->sin6_scope_id == addr2->sin6_scope_id &&
 		memcmp (&addr1->sin6_addr, &addr2->sin6_addr, sizeof (addr1->sin6_addr)) == 0;
 }
@@ -184,7 +184,7 @@ isSockAddrEqual (
 	}
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
 isSockAddrMatch_ip4 (
@@ -195,8 +195,8 @@ isSockAddrMatch_ip4 (
 	uint32_t ip = *(const uint32_t*) &addr->sin_addr;
 	uint32_t filterIp = *(const uint32_t*) &filterAddr->sin_addr;
 
-	return 
-		(!filterAddr->sin_port || addr->sin_port == filterAddr->sin_port) && 
+	return
+		(!filterAddr->sin_port || addr->sin_port == filterAddr->sin_port) &&
 		(!filterIp || ip == filterIp);
 }
 
@@ -208,8 +208,8 @@ isSockAddrMatch_ip6 (
 {
 	in6_addr addrAny = { 0 };
 
-	return 
-		(!filterAddr->sin6_port || addr->sin6_port == filterAddr->sin6_port) && 
+	return
+		(!filterAddr->sin6_port || addr->sin6_port == filterAddr->sin6_port) &&
 		(memcmp (&filterAddr->sin6_addr, &addrAny, sizeof (addrAny)) == 0 ||
 		memcmp (&addr->sin6_addr, &filterAddr->sin6_addr, sizeof (addr->sin6_addr)) == 0);
 }
@@ -223,15 +223,15 @@ isSockAddrMatch (
 	switch (filterAddr->sa_family)
 	{
 	case AF_INET:
-		return 
+		return
 			*(const uint32_t*) &((const sockaddr_in*) filterAddr)->sin_addr == 0 &&
 			((const sockaddr_in*) addr)->sin_port == ((const sockaddr_in*) filterAddr)->sin_port ||
-			addr->sa_family == AF_INET && 
+			addr->sa_family == AF_INET &&
 			isSockAddrMatch_ip4 ((const sockaddr_in*) addr, (const sockaddr_in*) filterAddr);
 
 	case AF_INET6:
-		return 
-			addr->sa_family == AF_INET6 && 
+		return
+			addr->sa_family == AF_INET6 &&
 			isSockAddrMatch_ip6 ((const sockaddr_in6*) addr, (const sockaddr_in6*) filterAddr);
 
 	default:
@@ -239,7 +239,7 @@ isSockAddrMatch (
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 parseAddr_ip4 (
@@ -292,7 +292,7 @@ parseSockAddr (
 	return parser.parse (addr, size);
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 getAddrString_ip4 (
@@ -311,9 +311,9 @@ getAddrString_ip6 (
 	)
 {
 	string->clear ();
-	
+
 	const uint16_t* ip = (const uint16_t*) addr;
-	
+
 	size_t zeroRunIdx = -1;
 	size_t zeroRunLength = 0;
 	size_t maxZeroRunIdx = -1;
@@ -335,7 +335,7 @@ getAddrString_ip6 (
 			{
 				zeroRunLength++;
 			}
-			else 
+			else
 			{
 				if (zeroRunLength > maxZeroRunLength)
 				{
@@ -395,9 +395,9 @@ getAddrString_ip6 (
 		if (isIp4)
 		{
 			string->appendFormat (
-				"%d.%d.%d.%d", 
-				ip [6] & 0xff, 
-				(ip [6] >> 8) & 0xff, 
+				"%d.%d.%d.%d",
+				ip [6] & 0xff,
+				(ip [6] >> 8) & 0xff,
 				ip [7] & 0xff,
 				(ip [7] >> 8) & 0xff
 				);
@@ -420,7 +420,7 @@ getAddrString_ip6 (
 	return string->getLength ();
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 getSockAddrString_ip4 (
@@ -485,7 +485,7 @@ getSockAddrString (
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 SockAddr::setup (const sockaddr* addr)
@@ -495,7 +495,7 @@ SockAddr::setup (const sockaddr* addr)
 	case AF_INET:
 		m_addr_ip4 = *(sockaddr_in*) addr;
 		break;
-	
+
 	case AF_INET6:
 		m_addr_ip6 = *(sockaddr_in6*) addr;
 		break;
@@ -518,7 +518,7 @@ SockAddr::setup (
 		if (size >= sizeof (in_addr))
 			setup_ip4 ((const in_addr*) addr);
 		break;
-	
+
 	case AF_INET6:
 		if (size >= sizeof (in6_addr))
 			setup_ip6 ((const in6_addr*) addr);
@@ -574,9 +574,9 @@ SockAddr::createNetMask (
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 resolveHostName (
 	sl::Array <SockAddr>* addrArray,
 	const sl::StringRef& name,
@@ -618,7 +618,7 @@ resolveHostName (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

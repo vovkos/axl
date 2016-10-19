@@ -5,7 +5,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
@@ -15,11 +15,11 @@ File::open (
 	uint_t flags
 	)
 {
-	uint_t accessMode = 
+	uint_t accessMode =
 		(flags & FileFlag_ReadOnly) ? GENERIC_READ :
 		(flags & FileFlag_WriteOnly) ? GENERIC_WRITE : GENERIC_READ | GENERIC_WRITE;
 
-	uint_t shareMode = 
+	uint_t shareMode =
 		(flags & FileFlag_Exclusive) ? 0 :
 		(flags & (FileFlag_ReadOnly | FileFlag_ShareWrite)) ?
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE :
@@ -66,8 +66,8 @@ File::open (
 	uint_t flags
 	)
 {
-	uint_t posixFlags = 
-		(flags & FileFlag_ReadOnly) ? O_RDONLY : 
+	uint_t posixFlags =
+		(flags & FileFlag_ReadOnly) ? O_RDONLY :
 		(flags & FileFlag_WriteOnly) ? O_WRONLY : O_RDWR;
 
 	if (!(flags & (FileFlag_ReadOnly | FileFlag_OpenExisting)))
@@ -93,11 +93,11 @@ File::open (
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_POSIX)
 
-void 
+void
 TemporaryFile::close ()
 {
 	if (!isOpen ())
@@ -126,7 +126,7 @@ TemporaryFile::open (
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 uint64_t
 copyFile (
@@ -138,14 +138,14 @@ copyFile (
 	File srcFile;
 	File dstFile;
 
-	bool result = 
+	bool result =
 		srcFile.open (srcFileName, FileFlag_ReadOnly) &&
 		dstFile.open (dstFileName);
 
 	if (!result)
 		return -1;
 
-	enum 
+	enum
 	{
 		BlockSize = 32 * 1024, // 32 K
 	};
@@ -161,7 +161,7 @@ copyFile (
 	win::MappedView srcView;
 	win::MappedView dstView;
 
-	result = 
+	result =
 		srcMapping.create (srcFile.m_file, NULL, PAGE_READONLY, size) &&
 		dstMapping.create (dstFile.m_file, NULL, PAGE_READWRITE, size);
 
@@ -185,7 +185,7 @@ copyFile (
 	dstMapping.close ();
 	srcView.close ();
 	dstView.close ();
-#else 
+#else
 	psx::Mapping srcMapping;
 	psx::Mapping dstMapping;
 
@@ -216,7 +216,7 @@ copyFile (
 	return offset;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

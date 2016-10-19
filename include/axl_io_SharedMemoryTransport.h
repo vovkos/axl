@@ -11,7 +11,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 enum SharedMemoryTransportConst
 {
@@ -35,7 +35,7 @@ enum SharedMemoryTransportFlag
 	SharedMemoryTransportFlag_DeleteOnClose = 0x04,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct SharedMemoryTransportHdr
 {
@@ -55,13 +55,13 @@ struct SharedMemoryTransportMessageHdr
 	uint32_t m_size;
 };
 
-//.............................................................................
+//..............................................................................
 
 class SharedMemoryTransportBase
 {
 protected:
 	uint_t m_flags;
-	
+
 	File m_file;
 	Mapping m_mapping;
 	size_t m_mappingSize;
@@ -143,7 +143,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class SharedMemoryReader: public SharedMemoryTransportBase
 {
@@ -155,7 +155,7 @@ public:
 	read ();
 };
 
-//.............................................................................
+//..............................................................................
 
 class SharedMemoryWriter: public SharedMemoryTransportBase
 {
@@ -213,7 +213,7 @@ protected:
 		size_t count
 		);
 };
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

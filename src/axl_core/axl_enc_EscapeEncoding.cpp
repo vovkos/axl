@@ -5,7 +5,7 @@
 namespace axl {
 namespace enc {
 
-//.............................................................................
+//..............................................................................
 
 char
 EscapeEncoding::findEscapeChar (char x)
@@ -114,7 +114,7 @@ EscapeEncoding::encode (
 
 			string->append (base, p - base);
 
-			char escape = findEscapeChar (*p);		
+			char escape = findEscapeChar (*p);
 			if (escape != *p)
 			{
 				escapeSequence [1] = escape;
@@ -137,12 +137,12 @@ EscapeEncoding::encode (
 	return string->getLength ();
 }
 
-static 
+static
 inline
-bool 
+bool
 isHexChar (char c)
 {
-	return 
+	return
 		c >= '0' && c <= '9' ||
 		c >= 'a' && c <= 'f' ||
 		c >= 'A' && c <= 'F';
@@ -161,7 +161,7 @@ EscapeEncoding::decode (
 		State_Hex,
 	};
 
-	State state = State_Normal;	
+	State state = State_Normal;
 
 	string->clear ();
 	string->reserve (source.getLength () / 2);
@@ -227,7 +227,7 @@ EscapeEncoding::decode (
 			}
 
 			break;
-		
+
 		case State_Hex:
 			if (isHexChar (*p))
 			{
@@ -247,10 +247,10 @@ EscapeEncoding::decode (
 				hexCode = '?';
 				string->append ((char const*) &hexCode, 1);
 			}
-			else 
+			else
 			{
 				hexCodeString [hexCodeLen] = 0;
-				hexCode = strtoul (hexCodeString, NULL, 16);				
+				hexCode = strtoul (hexCodeString, NULL, 16);
 
 				if (hexCodeMaxLen == 2) // \x
 				{
@@ -274,7 +274,7 @@ EscapeEncoding::decode (
 	return string->getLength ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace enc
 } // namespace axl

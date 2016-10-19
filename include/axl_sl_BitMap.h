@@ -12,7 +12,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 enum BitOpKind
 {
@@ -21,7 +21,7 @@ enum BitOpKind
 	BitOpKind_Xor,
 };
 
-//.............................................................................
+//..............................................................................
 
 bool
 getBit (
@@ -39,7 +39,7 @@ setBit (
 	);
 
 bool
-setBitRange ( 
+setBitRange (
 	size_t* map,
 	size_t pageCount,
 	size_t from,
@@ -48,7 +48,7 @@ setBitRange (
 	);
 
 bool
-mergeBitMaps ( 
+mergeBitMaps (
 	size_t* map,
 	const size_t* map2,
 	size_t pageCount,
@@ -66,7 +66,7 @@ inverseBitMap (
 		map [i] = ~map [i];
 }
 
-size_t 
+size_t
 findBit (
 	const size_t* map,
 	size_t pageCount,
@@ -74,9 +74,9 @@ findBit (
 	bool value = true
 	);
 
-//.............................................................................
+//..............................................................................
 
-template <size_t bitCount> 
+template <size_t bitCount>
 class BitMapN
 {
 public:
@@ -99,9 +99,9 @@ public:
 		copy (src);
 	}
 
-	void 
+	void
 	clear()
-	{ 
+	{
 		memset (m_map, 0, sizeof (m_map));
 	}
 
@@ -117,31 +117,31 @@ public:
 		return djb2 (m_map, sizeof (m_map));
 	}
 
-	int 
+	int
 	cmp (const BitMapN& src) const
 	{
 		return memcmp (m_map, src.m_map, sizeof (m_map));
 	}
 
-	const size_t* 
+	const size_t*
 	getMap () const
 	{
 		return m_map;
 	}
 
-	size_t* 
+	size_t*
 	getMap ()
 	{
 		return m_map;
 	}
-	
-	size_t 
+
+	size_t
 	getPageCount () const
 	{
 		return pageCount;
 	}
 
-	bool 
+	bool
 	getBit (size_t bit) const
 	{
 		return sl::getBit (m_map, pageCount, bit);
@@ -149,7 +149,7 @@ public:
 
 	bool
 	setBit (
-		size_t bit, 
+		size_t bit,
 		bool value = true
 		)
 	{
@@ -157,7 +157,7 @@ public:
 	}
 
 	bool
-	setBitRange ( 
+	setBitRange (
 		size_t from,
 		size_t to,
 		bool value = true
@@ -167,7 +167,7 @@ public:
 	}
 
 	bool
-	merge ( 
+	merge (
 		const BitMapN& bitMap2,
 		BitOpKind op
 		)
@@ -175,13 +175,13 @@ public:
 		return sl::mergeBitMaps (m_map, bitMap2.m_map, pageCount, op);
 	}
 
-	void 
+	void
 	inverse ()
-	{ 
+	{
 		sl::inverseBitMap (m_map, pageCount);
 	}
 
-	size_t 
+	size_t
 	findBit (
 		size_t start,
 		bool value = true
@@ -191,7 +191,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class BitMap
 {
@@ -204,49 +204,49 @@ public:
 		create (bitCount);
 	}
 
-	bool 
+	bool
 	operator == (const BitMap& src) const
 	{
 		return isEqual (src);
 	}
 
-	bool 
+	bool
 	operator != (const BitMap& src) const
 	{
 		return !isEqual (src);
 	}
 
-	const size_t* 
+	const size_t*
 	getMap () const
 	{
 		return m_map;
 	}
 
-	size_t* 
+	size_t*
 	getMap ()
 	{
 		return m_map;
 	}
 
-	size_t 
+	size_t
 	getPageCount () const
 	{
 		return m_map.getCount ();
 	}
 
-	size_t 
+	size_t
 	getBitCount () const
 	{
 		return getPageCount () * AXL_PTR_BITS;
 	}
 
-	void 
+	void
 	clear()
 	{
 		memset (m_map, 0, m_map.getCount () * sizeof (size_t));
 	}
 
-	void 
+	void
 	copy (const BitMap& src);
 
 	size_t
@@ -264,19 +264,19 @@ public:
 		return cmp (src) == 0;
 	}
 
-	bool 
+	bool
 	create (size_t bitCount);
 
-	bool 
+	bool
 	setBitCount (size_t bitCount);
 
-	bool 
+	bool
 	ensureBitCount (size_t bitCount)
 	{
 		return bitCount > getBitCount () ? setBitCount (bitCount) : true;
 	}
 
-	bool 
+	bool
 	getBit (size_t bit) const
 	{
 		return sl::getBit (m_map, m_map.getCount (), bit);
@@ -303,7 +303,7 @@ public:
 
 	bool
 	setBitRange (
-		size_t from, 
+		size_t from,
 		size_t to,
 		bool value = true
 		)
@@ -313,7 +313,7 @@ public:
 
 	bool
 	setBitRangeResize (
-		size_t from, 
+		size_t from,
 		size_t to,
 		bool value = true
 		)
@@ -322,35 +322,35 @@ public:
 		return sl::setBitRange (m_map, m_map.getCount (), from, to, value);
 	}
 
-	bool 
+	bool
 	merge (
-		const BitMap& bitMap2, 
+		const BitMap& bitMap2,
 		BitOpKind op
 		);
 
-	bool 
+	bool
 	mergeResize (
-		const BitMap& bitMap2, 
+		const BitMap& bitMap2,
 		BitOpKind op
 		);
 
-	void 
+	void
 	inverse ()
 	{
 		sl::inverseBitMap (m_map, m_map.getCount ());
 	}
 
-	size_t 
+	size_t
 	findBit (
 		size_t start,
 		bool value = true
-		) const 
+		) const
 	{
 		return sl::findBit (m_map, m_map.getCount (), start, value);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gc
 } // namespace axl

@@ -5,7 +5,7 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 bool
 FileHandle::completeAsyncRequest (
@@ -56,7 +56,7 @@ FileHandle::getOverlappedResult (OVERLAPPED* overlapped) const
 	return result ? (size_t) actualSize : -1;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win {
 } // namespace io

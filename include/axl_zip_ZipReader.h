@@ -13,7 +13,7 @@ struct mz_zip_archive_tag;
 namespace axl {
 namespace zip {
 
-//.............................................................................
+//..............................................................................
 
 struct ZipFileInfo
 {
@@ -31,19 +31,19 @@ struct ZipFileInfo
 	uint64_t m_localHeaderOffset;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class ZipReader
 {
 protected:
 	mz_zip_archive_tag* m_zip;
-	
+
 public:
 	ZipReader ()
 	{
 		m_zip = NULL;
 	}
-	
+
 	~ZipReader ()
 	{
 		close ();
@@ -80,10 +80,10 @@ public:
 		sl::String* comment = NULL
 		);
 
-	bool 
+	bool
 	isDirectoryFile (size_t index);
 
-	bool 
+	bool
 	isFileEncrypted (size_t index);
 
 	bool
@@ -114,7 +114,7 @@ public:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace zip
 } // namespace axl

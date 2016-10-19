@@ -13,7 +13,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class FreeLibrary
 {
@@ -25,24 +25,24 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Library: public sl::Handle <HMODULE, FreeLibrary>
 {
 public:
-	bool 
+	bool
 	loadLibrary (const sl::StringRef_w& fileName);
 
 	void*
 	getProcAddress (const sl::StringRef& name)
-	{ 
+	{
 		void* p = ::GetProcAddress (m_h, name.sz ());
 		return err::complete <void*> (p, NULL);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace sys 
+} // namespace sys
 } // namespace axl

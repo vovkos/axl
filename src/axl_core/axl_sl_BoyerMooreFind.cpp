@@ -5,12 +5,12 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 bool
 BinaryBoyerMooreFind::setPattern (
 	const void* p,
-	size_t size, 
+	size_t size,
 	uint_t flags
 	)
 {
@@ -49,21 +49,21 @@ BinaryBoyerMooreFind::buildBadSkipTable ()
 		m_badSkipTable [(uchar_t) m_pattern [i]] = j;
 }
 
-size_t 
+size_t
 BinaryBoyerMooreFind::find (
-	const void* p, 
+	const void* p,
 	size_t size
 	)
 {
 	size_t patternSize = m_pattern.getCount ();
 	if (!patternSize)
 		return 0;
-		
+
 	if (size < patternSize)
 		return -1;
 
-	size_t result = (m_flags & BoyerMooreFlag_Reverse) ? 
-		findImpl (BinaryBoyerMooreReverseAccessor ((const uchar_t*) p + size - 1), size) : 
+	size_t result = (m_flags & BoyerMooreFlag_Reverse) ?
+		findImpl (BinaryBoyerMooreReverseAccessor ((const uchar_t*) p + size - 1), size) :
 		findImpl (BinaryBoyerMooreAccessor ((const uchar_t*) p), size);
 
 	if (result == -1)
@@ -75,11 +75,11 @@ BinaryBoyerMooreFind::find (
 	return result;
 }
 
-size_t 
+size_t
 BinaryBoyerMooreFind::find (
 	IncrementalContext* incrementalContext,
 	size_t offset,
-	const void* p, 
+	const void* p,
 	size_t size
 	)
 {
@@ -100,13 +100,13 @@ BinaryBoyerMooreFind::find (
 		return -1;
 	}
 
-	size_t result = (m_flags & BoyerMooreFlag_Reverse) ? 
-		findImpl (BinaryBoyerMooreIncrementalReverseAccessor ((const uchar_t*) p + size - 1, incrementalContext), fullSize) : 
+	size_t result = (m_flags & BoyerMooreFlag_Reverse) ?
+		findImpl (BinaryBoyerMooreIncrementalReverseAccessor ((const uchar_t*) p + size - 1, incrementalContext), fullSize) :
 		findImpl (BinaryBoyerMooreIncrementalAccessor ((const uchar_t*) p, incrementalContext), fullSize);
 
 	if (result == -1)
 		return -1;
-	
+
 	incrementalContext->reset ();
 
 	result -= tailSize;
@@ -118,9 +118,9 @@ BinaryBoyerMooreFind::find (
 }
 
 template <typename Accessor>
-size_t 
+size_t
 BinaryBoyerMooreFind::findImpl (
-	const Accessor& accessor, 
+	const Accessor& accessor,
 	size_t size
 	)
 {
@@ -135,7 +135,7 @@ BinaryBoyerMooreFind::findImpl (
 		while (i < size)
 		{
 			intptr_t j = last;
-		
+
 			uchar_t c;
 
 			for (;;)
@@ -158,7 +158,7 @@ BinaryBoyerMooreFind::findImpl (
 		while (i < size)
 		{
 			intptr_t j = last;
-		
+
 			uchar_t c;
 
 			for (;;)
@@ -177,7 +177,7 @@ BinaryBoyerMooreFind::findImpl (
 
 			size_t badSkip = m_badSkipTable [c];
 			size_t goodSkip = m_goodSkipTable [j];
-		
+
 			i += AXL_MAX (badSkip, goodSkip);
 		}
 
@@ -189,13 +189,13 @@ BinaryBoyerMooreFind::findImpl (
 	return -1;
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 TextBoyerMooreFind::setPattern (
 	size_t badSkipTableSize,
 	enc::CharCodec* codec,
-	const void* p, 
+	const void* p,
 	size_t size,
 	uint_t flags
 	)
@@ -213,7 +213,7 @@ TextBoyerMooreFind::setPattern (
 
 	if (flags & BoyerMooreFlag_Reverse)
 		m_pattern.reverse ();
-	
+
 	m_flags = flags;
 
 	bool result = buildBadSkipTable (badSkipTableSize);
@@ -236,7 +236,7 @@ TextBoyerMooreFind::buildBadSkipTable (size_t tableSize)
 		m_badSkipTable [i] = patternSize;
 
 	size_t last = patternSize - 1;
-	
+
 	if (m_flags & TextBoyerMooreFlag_CaseInsensitive)
 		for (size_t i = 0, j = last; i < last; i++, j--)
 		{
@@ -249,14 +249,14 @@ TextBoyerMooreFind::buildBadSkipTable (size_t tableSize)
 			uint32_t c = m_pattern [i];
 			m_badSkipTable [c % tableSize] = j;
 		}
-	
+
 	return true;
 }
 
-size_t 
+size_t
 TextBoyerMooreFind::find (
 	enc::CharCodec* codec,
-	const void* p, 
+	const void* p,
 	size_t size
 	)
 {
@@ -274,17 +274,17 @@ TextBoyerMooreFind::find (
 	if (m_flags & TextBoyerMooreFlag_WholeWord)
 		m_buffer.append (' ');
 
-	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ? 
-		(m_flags & BoyerMooreFlag_Reverse) ? 
-			findImpl (TextBoyerMooreCaseFoldedReverseAccessor (m_buffer + length - 1), length, length) : 
+	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ?
+		(m_flags & BoyerMooreFlag_Reverse) ?
+			findImpl (TextBoyerMooreCaseFoldedReverseAccessor (m_buffer + length - 1), length, length) :
 			findImpl (TextBoyerMooreCaseFoldedAccessor (m_buffer), length, length) :
-		(m_flags & BoyerMooreFlag_Reverse) ? 
-			findImpl (TextBoyerMooreReverseAccessor (m_buffer + length - 1), length, length) : 
+		(m_flags & BoyerMooreFlag_Reverse) ?
+			findImpl (TextBoyerMooreReverseAccessor (m_buffer + length - 1), length, length) :
 			findImpl (TextBoyerMooreAccessor (m_buffer), length, length);
 
 	if (result == -1)
 		return -1;
-	
+
 	if (m_flags & BoyerMooreFlag_Reverse)
 		result = size - result - patternLength;
 
@@ -292,12 +292,12 @@ TextBoyerMooreFind::find (
 	return codec->calcRequiredBufferSizeToEncodeFromUtf32 (m_buffer, result);
 }
 
-size_t 
+size_t
 TextBoyerMooreFind::find (
 	IncrementalContext* incrementalContext,
 	enc::CharCodec* codec,
 	size_t offset,
-	const void* p, 
+	const void* p,
 	size_t size
 	)
 {
@@ -326,26 +326,26 @@ TextBoyerMooreFind::find (
 		return -1;
 	}
 
-	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ? 
-		(m_flags & BoyerMooreFlag_Reverse) ? 
+	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ?
+		(m_flags & BoyerMooreFlag_Reverse) ?
 			findImpl (
-				TextBoyerMooreCaseFoldedIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
-				end,
-				fullLength
-				) : 
-			findImpl (
-				TextBoyerMooreCaseFoldedIncrementalAccessor (m_buffer, incrementalContext), 
+				TextBoyerMooreCaseFoldedIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext),
 				end,
 				fullLength
 				) :
-		(m_flags & BoyerMooreFlag_Reverse) ? 
 			findImpl (
-				TextBoyerMooreIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext), 
+				TextBoyerMooreCaseFoldedIncrementalAccessor (m_buffer, incrementalContext),
 				end,
 				fullLength
-				) : 
+				) :
+		(m_flags & BoyerMooreFlag_Reverse) ?
 			findImpl (
-				TextBoyerMooreIncrementalAccessor (m_buffer, incrementalContext), 
+				TextBoyerMooreIncrementalReverseAccessor (m_buffer + chunkLength - 1, incrementalContext),
+				end,
+				fullLength
+				) :
+			findImpl (
+				TextBoyerMooreIncrementalAccessor (m_buffer, incrementalContext),
 				end,
 				fullLength
 				);
@@ -364,7 +364,7 @@ TextBoyerMooreFind::find (
 		result = -codec->calcRequiredBufferSizeToEncodeFromUtf32 (incrementalContext->m_tail, -result);
 	}
 	else if (result)
-	{	
+	{
 		ASSERT (result <= chunkLength);
 		result = codec->calcRequiredBufferSizeToEncodeFromUtf32 (m_buffer, result);
 	}
@@ -374,9 +374,9 @@ TextBoyerMooreFind::find (
 }
 
 template <typename Accessor>
-size_t 
+size_t
 TextBoyerMooreFind::findImpl (
-	const Accessor& accessor, 
+	const Accessor& accessor,
 	size_t end,
 	size_t size
 	)
@@ -393,7 +393,7 @@ TextBoyerMooreFind::findImpl (
 		while (i < end)
 		{
 			intptr_t j = last;
-		
+
 			uint32_t c;
 
 			for (;;)
@@ -405,7 +405,7 @@ TextBoyerMooreFind::findImpl (
 
 				if (j == 0)
 				{
-					if ((m_flags & TextBoyerMooreFlag_WholeWord) && 
+					if ((m_flags & TextBoyerMooreFlag_WholeWord) &&
 						(!accessor.isDelimChar (i - 1) || !accessor.isDelimChar (i + patternSize)))
 					{
 						break;
@@ -424,7 +424,7 @@ TextBoyerMooreFind::findImpl (
 		while (i < end)
 		{
 			intptr_t j = last;
-		
+
 			uint32_t c;
 
 			for (;;)
@@ -436,7 +436,7 @@ TextBoyerMooreFind::findImpl (
 
 				if (j == 0)
 				{
-					if ((m_flags & TextBoyerMooreFlag_WholeWord) && 
+					if ((m_flags & TextBoyerMooreFlag_WholeWord) &&
 						(!accessor.isDelimChar (i - 1) || !accessor.isDelimChar (i + patternSize)))
 					{
 						break;
@@ -451,7 +451,7 @@ TextBoyerMooreFind::findImpl (
 
 			size_t badSkip = m_badSkipTable [c % badSkipTableSize];
 			size_t goodSkip = m_goodSkipTable [j];
-		
+
 			i += AXL_MAX (badSkip, goodSkip);
 		}
 
@@ -463,7 +463,7 @@ TextBoyerMooreFind::findImpl (
 	return -1;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

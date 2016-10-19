@@ -12,13 +12,13 @@
 namespace axl {
 namespace ref {
 
-//.............................................................................
-	
+//..............................................................................
+
 template <typename Alloc = mem::StdAllocator>
 class RtFactory
 {
 protected:
-	class Box: 
+	class Box:
 		public RefCount,
 		public obj::ITypeSimpleImplT <Box>
 	{
@@ -43,7 +43,7 @@ protected:
 			m_type = type;
 			m_guid = type->getGuid ();
 		}
-			
+
 		// IRoot
 
 		virtual
@@ -79,7 +79,7 @@ public:
 	{
 	public:
 #ifdef _AXL_DEBUG
-		Ptr <void> 
+		Ptr <void>
 		operator () (
 			obj::IType* type,
 			const char* filePath,
@@ -87,7 +87,7 @@ public:
 			size_t extra = 0
 			)
 		{
-			size_t size = type->getSize () + extra;			
+			size_t size = type->getSize () + extra;
 			size_t refCountOffset = type->getInterfaceOffset (AXL_OBJ_GUIDOF (RefCount));
 
 			if (refCountOffset != -1)
@@ -108,13 +108,13 @@ public:
 			}
 		}
 #else
-		Ptr <void> 
+		Ptr <void>
 		operator () (
 			obj::IType* type,
 			size_t extra = 0
 			)
 		{
-			size_t size = type->getSize () + extra;			
+			size_t size = type->getSize () + extra;
 			size_t refCountOffset = type->getInterfaceOffset (AXL_OBJ_GUIDOF (RefCount));
 
 			if (refCountOffset != -1)
@@ -140,7 +140,7 @@ public:
 
 #ifdef _AXL_DEBUG
 	static
-	Ptr <void> 
+	Ptr <void>
 	operatorNew (
 		obj::IType* type,
 		const char* filePath,
@@ -152,7 +152,7 @@ public:
 	}
 #else
 	static
-	Ptr <void> 
+	Ptr <void>
 	operatorNew (
 		obj::IType* type,
 		size_t extra = 0
@@ -165,7 +165,7 @@ public:
 
 typedef RtFactory <mem::StdAllocator> RtFactory;
 
-//.............................................................................
+//..............................................................................
 
 #ifdef _AXL_DEBUG
 
@@ -185,7 +185,7 @@ typedef RtFactory <mem::StdAllocator> RtFactory;
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ref
 } // namespace axl

@@ -13,7 +13,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class Service: public ServiceHandle
 {
@@ -41,7 +41,7 @@ public:
 		return control (SERVICE_CONTROL_STOP, &serviceStatus);
 	}
 
-	bool 
+	bool
 	control (
 		dword_t code,
 		SERVICE_STATUS* serviceStatus
@@ -51,7 +51,7 @@ public:
 		return err::complete (result);
 	}
 
-	bool 
+	bool
 	remove ()
 	{
 		bool_t result = ::DeleteService (m_h);
@@ -79,14 +79,14 @@ public:
 	bool
 	setDescription (const sl::StringRef_w& description);
 
-	bool 
+	bool
 	queryServiceStatus (SERVICE_STATUS* serviceStatus)
 	{
 		bool_t result = ::QueryServiceStatus (m_h, serviceStatus);
 		return err::complete (result);
 	}
 
-	bool 
+	bool
 	changeServiceConfig (
 		dword_t serviceType,
 		dword_t startType,
@@ -117,7 +117,7 @@ public:
 		return err::complete (result);
 	}
 
-	bool 
+	bool
 	changeServiceConfig2 (
 		dword_t infoLevel,
 		const void* info
@@ -128,8 +128,8 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace sys 
+} // namespace sys
 } // namespace axl

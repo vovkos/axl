@@ -14,12 +14,12 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class Process: public Handle
 {
 public:
-	bool 
+	bool
 	createProcess (
 		const sl::StringRef_w& appName,
 		const sl::StringRef_w& cmdLine,
@@ -33,24 +33,24 @@ public:
 		handle_t* threadHandle
 		);
 
-	bool 
+	bool
 	createProcess (
 		const sl::StringRef_w& cmdLine,
 		bool inheritHandles,
 		dword_t flags,
-		const STARTUPINFO* startupInfo		
+		const STARTUPINFO* startupInfo
 		)
 	{
 		return createProcess (
-			NULL, 
-			cmdLine, 
-			NULL, 
-			NULL, 
-			inheritHandles, 
-			flags, 
-			NULL, 
-			NULL, 
-			startupInfo, 
+			NULL,
+			cmdLine,
+			NULL,
+			NULL,
+			inheritHandles,
+			flags,
+			NULL,
+			NULL,
+			startupInfo,
 			NULL
 			);
 	}
@@ -70,7 +70,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 bool
 syncExec (
@@ -79,8 +79,8 @@ syncExec (
 	dword_t* exitCode = NULL
 	);
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace sys 
+} // namespace sys
 } // namespace axl

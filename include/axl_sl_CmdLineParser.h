@@ -13,7 +13,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 struct SwitchInfo: sl::ListLink
 {
@@ -26,12 +26,12 @@ struct SwitchInfo: sl::ListLink
 	const char* m_description;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 String
 getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList);
 
-//.............................................................................
+//..............................................................................
 
 class CmdLineParserRoot
 {
@@ -64,9 +64,9 @@ protected:
 	ArgKind
 	getArgKind (const sl::StringRef& arg)
 	{
-		return 
-			arg.getLength () < 2 || arg [0] != '-' ? ArgKind_Value : 
-			arg [1] != '-' ? ArgKind_CharSwitch : 
+		return
+			arg.getLength () < 2 || arg [0] != '-' ? ArgKind_Value :
+			arg [1] != '-' ? ArgKind_CharSwitch :
 			ArgKind_StringSwitch;
 	}
 
@@ -87,7 +87,7 @@ protected:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -148,7 +148,7 @@ public:
 				return false;
 		}
 
-		return 
+		return
 			checkMissingValue () &&
 			static_cast <T*> (this)->finalize ();
 	}
@@ -168,7 +168,7 @@ public:
 				return false;
 		}
 
-		return 
+		return
 			checkMissingValue () &&
 			static_cast <T*> (this)->finalize ();
 	}
@@ -234,7 +234,7 @@ protected:
 		{
 		case ArgKind_Value:
 			return processValue (i, arg);
-		
+
 		case ArgKind_StringSwitch:
 			result = parseSwitch (argKind, arg.getSubString (2), &switchName, &value);
 			if (!result)
@@ -247,7 +247,7 @@ protected:
 				return false;
 			}
 
-			return processSwitch (switchInfo, switchName, value);	
+			return processSwitch (switchInfo, switchName, value);
 		}
 
 		ASSERT (argKind == ArgKind_CharSwitch);
@@ -264,9 +264,9 @@ protected:
 
 			if (switchInfo->m_value)
 			{
-				return 
+				return
 					parseSwitch (argKind, arg.getSubString (i), &switchName, &value) &&
-					processSwitch (switchInfo, switchName, value);	
+					processSwitch (switchInfo, switchName, value);
 			}
 
 			result = self->onSwitch ((SwitchKind) switchInfo->m_switchKind, NULL);
@@ -320,7 +320,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 #define AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE(Class, SwitchKind_0) \
 class Class \
@@ -423,7 +423,7 @@ public: \
 	} \
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

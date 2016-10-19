@@ -6,21 +6,21 @@
 #include "axl_gui_TextPainter.h"
 #include "axl_gui_HyperText.h"
 
-//.............................................................................
+//..............................................................................
 
 MyWidget::MyWidget (QWidget* parent):
 	QWidget (parent)
-{	
+{
 }
 
 void
 MyWidget::paintEvent (QPaintEvent* e)
 {
 	char str [] = "abcdefghijklmnopqrstuvwxyz";
-	
+
 	gui::HyperText hyperText;
 	hyperText.setHyperText ("abc \x1b^pizda\x1b[4mdef\x1b[m suka");
-	
+
 	const gui::TextAttrAnchorArray* attrArray = hyperText.getAttrArray ();
 	sl::String text = hyperText.getText ();
 
@@ -40,7 +40,7 @@ MyWidget::paintEvent (QPaintEvent* e)
 
 	gui::TextPainter painter (&canvas);
 
-	QSize s = size ();	
+	QSize s = size ();
 	painter.m_bottom = s.height ();
 
 	painter.drawHyperText (attrArray, text);
@@ -48,7 +48,7 @@ MyWidget::paintEvent (QPaintEvent* e)
 	canvas.m_qtPainter.end ();
 }
 
-//.............................................................................
+//..............................................................................
 
 class SizeHintCombo: public QComboBox
 {
@@ -87,7 +87,7 @@ public:
 	{
 		return m_minimumSizeHint.isValid () ? m_minimumSizeHint : QComboBox::minimumSizeHint ();
 	}
-	
+
 private:
 	QSize m_sizeHint;
 	QSize m_minimumSizeHint;
@@ -157,4 +157,4 @@ MainWindow::MainWindow (QWidget* parent) :
 	hlayout->addWidget (combo2);
 }
 
-//.............................................................................
+//..............................................................................

@@ -4,13 +4,13 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 const char*
 getUsbSpeedString (libusb_speed speed)
 {
-	static const char* stringTable [] = 
-	{ 
+	static const char* stringTable [] =
+	{
 		"Unknown",                  // LIBUSB_SPEED_UNKNOWN = 0,
 		"LowSpeed (1.5 Mbit/s)",    // LIBUSB_SPEED_LOW = 1,
 		"FullSpeed (12 Mbit/s)",    // LIBUSB_SPEED_FULL = 2,
@@ -18,16 +18,16 @@ getUsbSpeedString (libusb_speed speed)
 		"SuperSpeed (5000 Mbit/s)", // LIBUSB_SPEED_SUPER = 4,
 	};
 
-	return (size_t) speed < countof (stringTable) ? 
-		stringTable [speed] : 
+	return (size_t) speed < countof (stringTable) ?
+		stringTable [speed] :
 		stringTable [LIBUSB_SPEED_UNKNOWN];
 }
 
 const char*
 getUsbClassCodeString (libusb_class_code classCode)
 {
-	static const char* stringTable [] = 
-	{ 
+	static const char* stringTable [] =
+	{
 		"Multi-function",      // LIBUSB_CLASS_PER_INTERFACE = 0,
 		"Audio",               // LIBUSB_CLASS_AUDIO = 1,
 		"Communication",       // LIBUSB_CLASS_COMM = 2,
@@ -71,8 +71,8 @@ getUsbClassCodeString (libusb_class_code classCode)
 const char*
 getUsbTransferTypeString (libusb_transfer_type transferType)
 {
-	static const char* stringTable [] = 
-	{ 
+	static const char* stringTable [] =
+	{
 		"Control",     // LIBUSB_SPEED_LOW = 1,
 		"Isochronous", // LIBUSB_SPEED_FULL = 2,
 		"Bulk",        // LIBUSB_SPEED_HIGH = 3,
@@ -80,14 +80,14 @@ getUsbTransferTypeString (libusb_transfer_type transferType)
 		"Bulk stream", // LIBUSB_TRANSFER_TYPE_BULK_STREAM = 4,
 	};
 
-	return (size_t) transferType < countof (stringTable) ? 
-		stringTable [transferType] : 
+	return (size_t) transferType < countof (stringTable) ?
+		stringTable [transferType] :
 		"Unknown";
 }
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 UsbContext::open ()
 {
 	close ();
@@ -96,7 +96,7 @@ UsbContext::open ()
 	return result == 0 ? true : err::fail (UsbError ((int) result));
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 UsbDeviceList::enumerateDevices (libusb_context* context)
@@ -107,13 +107,13 @@ UsbDeviceList::enumerateDevices (libusb_context* context)
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError ((int) result));
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 UsbDevice::getMaxPacketSize (uint_t endpointId)
 {
 	ASSERT (m_device);
-	
+
 	int result = libusb_get_max_packet_size (m_device, (uchar_t) endpointId);
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
@@ -134,7 +134,7 @@ size_t
 UsbDevice::getMaxIsoPacketSize (uint_t endpointId)
 {
 	ASSERT (m_device);
-	
+
 	int result = libusb_get_max_iso_packet_size (m_device, (uchar_t) endpointId);
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
@@ -285,7 +285,7 @@ UsbDevice::detachKernelDriver (uint_t ifaceId)
 
 bool
 UsbDevice::getDescriptor (
-	libusb_descriptor_type descriptorType, 
+	libusb_descriptor_type descriptorType,
 	uint_t descriptorId,
 	sl::Array <char>* descriptor
 	)
@@ -300,10 +300,10 @@ UsbDevice::getDescriptor (
 	for (;;)
 	{
 		int result = libusb_get_descriptor (
-			m_openHandle, 
-			(uint8_t) descriptorType, 
-			(uint8_t) descriptorId, 
-			(uchar_t*) descriptor->p (), 
+			m_openHandle,
+			(uint8_t) descriptorType,
+			(uint8_t) descriptorId,
+			(uchar_t*) descriptor->p (),
 			size
 			);
 
@@ -315,7 +315,7 @@ UsbDevice::getDescriptor (
 
 		if (result != LIBUSB_ERROR_OVERFLOW)
 			return err::fail (UsbError (result));
-		
+
 		size *= 2;
 		descriptor->setCount (size);
 	}
@@ -385,10 +385,10 @@ UsbDevice::getStringDesrciptor (
 	for (;;)
 	{
 		int result = libusb_get_string_descriptor (
-			m_openHandle, 
-			(uint8_t) stringId, 
-			(uint16_t) langId, 
-			(uchar_t*) p, 
+			m_openHandle,
+			(uint8_t) stringId,
+			(uint16_t) langId,
+			(uchar_t*) p,
 			length
 			);
 
@@ -400,7 +400,7 @@ UsbDevice::getStringDesrciptor (
 
 		if (result != LIBUSB_ERROR_OVERFLOW)
 			return err::fail (UsbError (result));
-		
+
 		length *= 2;
 		p = string->createBuffer (length - 1);
 	}
@@ -429,9 +429,9 @@ UsbDevice::getStringDesrciptor (
 	for (;;)
 	{
 		int result = libusb_get_string_descriptor_ascii (
-			m_openHandle, 
-			(uint8_t) stringId, 
-			(uchar_t*) p, 
+			m_openHandle,
+			(uint8_t) stringId,
+			(uchar_t*) p,
 			length
 			);
 
@@ -443,7 +443,7 @@ UsbDevice::getStringDesrciptor (
 
 		if (result != LIBUSB_ERROR_OVERFLOW)
 			return err::fail (UsbError (result));
-		
+
 		length *= 2;
 		p = string->createBuffer (length - 1);
 	}
@@ -452,7 +452,7 @@ UsbDevice::getStringDesrciptor (
 	return true;
 }
 
-size_t 
+size_t
 UsbDevice::controlTransfer (
 	uint_t requestType,
 	uint_t request,
@@ -466,20 +466,20 @@ UsbDevice::controlTransfer (
 	ASSERT (m_openHandle);
 
 	int result = libusb_control_transfer (
-		m_openHandle, 
-		(uint8_t) requestType, 
-		(uint8_t) request, 
-		(uint16_t) value, 
-		(uint16_t) index, 
+		m_openHandle,
+		(uint8_t) requestType,
+		(uint8_t) request,
+		(uint16_t) value,
+		(uint16_t) index,
 		(uchar_t*) p,
-		(uint16_t) size, 
+		(uint16_t) size,
 		timeout != -1 ? timeout : 0
 		);
 
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
-size_t 
+size_t
 UsbDevice::bulkTransfer (
 	uint_t endpointId,
 	void* p,
@@ -492,9 +492,9 @@ UsbDevice::bulkTransfer (
 	int actualSize;
 	int result = libusb_bulk_transfer (
 		m_openHandle,
-		(uchar_t) endpointId, 
-		(uchar_t*) p, 
-		(int) size, 
+		(uchar_t) endpointId,
+		(uchar_t*) p,
+		(int) size,
 		&actualSize,
 		timeout != -1 ? timeout : 0
 		);
@@ -502,7 +502,7 @@ UsbDevice::bulkTransfer (
 	return result == 0 ? actualSize : err::fail <size_t> (-1, UsbError (result));
 }
 
-size_t 
+size_t
 UsbDevice::interruptTransfer (
 	uint_t endpointId,
 	void* p,
@@ -515,9 +515,9 @@ UsbDevice::interruptTransfer (
 	int actualSize;
 	int result = libusb_interrupt_transfer (
 		m_openHandle,
-		(uchar_t) endpointId, 
-		(uchar_t*) p, 
-		(int) size, 
+		(uchar_t) endpointId,
+		(uchar_t*) p,
+		(int) size,
 		&actualSize,
 		timeout != -1 ? timeout : 0
 		);
@@ -526,7 +526,7 @@ UsbDevice::interruptTransfer (
 
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

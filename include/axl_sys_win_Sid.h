@@ -12,7 +12,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 AXL_SELECT_ANY SID_IDENTIFIER_AUTHORITY g_nullSidAuthority      = SECURITY_NULL_SID_AUTHORITY;
 AXL_SELECT_ANY SID_IDENTIFIER_AUTHORITY g_worldSidAuthority     = SECURITY_WORLD_SID_AUTHORITY;
@@ -42,7 +42,7 @@ AXL_SELECT_ANY SID g_systemSid         = { SID_REVISION, 1, SECURITY_NT_AUTHORIT
 AXL_SELECT_ANY SID g_localServiceSid   = { SID_REVISION, 1, SECURITY_NT_AUTHORITY, SECURITY_LOCAL_SERVICE_RID };
 AXL_SELECT_ANY SID g_networkServiceSid = { SID_REVISION, 1, SECURITY_NT_AUTHORITY, SECURITY_NETWORK_SERVICE_RID };
 
-//.............................................................................
+//..............................................................................
 
 class SizeOfSid
 {
@@ -54,7 +54,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Sid: public ref::Buf <SID, SizeOfSid>
 {
@@ -78,18 +78,18 @@ public:
 		create_va (identifierAuthority, subAuthorityCount, va);
 	}
 
-	bool 
+	bool
 	create (
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
-		...	
+		...
 		)
 	{
 		AXL_VA_DECL (va, subAuthorityCount);
 		return create_va (identifierAuthority, subAuthorityCount, va);
 	}
 
-	bool 
+	bool
 	create_va (
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
@@ -102,10 +102,10 @@ public:
 	bool
 	parse (const sl::StringRef_w& string);
 
-	bool 
+	bool
 	getString (sl::String* string) const;
 
-	sl::String 
+	sl::String
 	getString () const
 	{
 		sl::String string;
@@ -113,21 +113,21 @@ public:
 		return string;
 	}
 
-	bool 
+	bool
 	lookupAccountName (
 		const sl::StringRef& systemName,
 		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
 		);
 
-	bool 
+	bool
 	lookupAccountName (
 		const sl::StringRef_w& systemName,
 		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
 		);
 
-	bool 
+	bool
 	lookupAccountName (
 		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
@@ -136,7 +136,7 @@ public:
 		return lookupAccountName (NULL, accountName, sidType);
 	}
 
-	bool 
+	bool
 	lookupAccountName (
 		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
@@ -145,7 +145,7 @@ public:
 		return lookupAccountName (NULL, accountName, sidType);
 	}
 
-	bool 
+	bool
 	lookupAccountSid (
 		const sl::StringRef& systemName,
 		sl::String* accountName,
@@ -155,7 +155,7 @@ public:
 		return lookupAccountSid (systemName, m_p, accountName, sidType);
 	}
 
-	bool 
+	bool
 	lookupAccountSid (
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
@@ -182,7 +182,7 @@ public:
 	}
 
 	static
-	bool 
+	bool
 	lookupAccountSid (
 		const sl::StringRef& systemName,
 		const SID* sid,
@@ -191,7 +191,7 @@ public:
 		);
 
 	static
-	bool 
+	bool
 	lookupAccountSid (
 		const SID* sid,
 		sl::String* accountName,
@@ -225,8 +225,8 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace sys 
+} // namespace sys
 } // namespace axl

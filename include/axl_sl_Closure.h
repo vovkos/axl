@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_CLOSURE_H
 
@@ -11,7 +11,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename Func,
@@ -19,11 +19,11 @@ template <
 	typename Arg,
 	typename ArgSave = Arg
 	>
-class BinClosure_1 
+class BinClosure_1
 {
 protected:
 	ArgSave m_a;
-	
+
 public:
 	BinClosure_1 (Arg a)
 	{
@@ -32,12 +32,12 @@ public:
 
 	Result
 	operator () (Arg b) const
-	{ 
-		return Func () (m_a, b); 
+	{
+		return Func () (m_a, b);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Func,
@@ -49,7 +49,7 @@ class BinClosure_2
 {
 protected:
 	ArgSave m_b;
-	
+
 public:
 	BinClosure_2 (Arg b)
 	{
@@ -58,12 +58,12 @@ public:
 
 	Result
 	operator () (Arg a) const
-	{ 
-		return Func () (a, m_b); 
+	{
+		return Func () (a, m_b);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -73,7 +73,7 @@ class AssignClosure_L
 {
 protected:
 	T* m_p;
-	
+
 public:
 	AssignClosure_L (T& a)
 	{
@@ -82,12 +82,12 @@ public:
 
 	void
 	operator () (T& b) const
-	{ 
-		*m_p = b; 
+	{
+		*m_p = b;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -97,7 +97,7 @@ class AssignClosure_R
 {
 protected:
 	T m_b;
-	
+
 public:
 	AssignClosure_R (Arg b)
 	{
@@ -106,12 +106,12 @@ public:
 
 	void
 	operator () (T& a) const
-	{ 
-		a = m_b; 
+	{
+		a = m_b;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

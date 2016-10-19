@@ -11,21 +11,21 @@
 namespace axl {
 namespace ref {
 
-//.............................................................................
+//..............................................................................
 
 // forward
 
 template <typename T>
 class WeakPtr;
 
-//.............................................................................
+//..............................................................................
 
 enum PtrKind
 {
 	PtrKind_Null = 0
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class Ptr
@@ -42,34 +42,34 @@ protected:
 
 public:
 	Ptr ()
-	{ 
+	{
 		m_p = NULL;
-		m_refCount = NULL; 
+		m_refCount = NULL;
 	}
 
 	Ptr (PtrKind ptrKind)
-	{ 
+	{
 		ASSERT (ptrKind == PtrKind_Null);
 		m_p = NULL;
-		m_refCount = NULL; 
+		m_refCount = NULL;
 	}
 
 	Ptr (const Ptr& src)
-	{ 
+	{
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
 	Ptr (const Ptr <A>& src)
-	{ 
+	{
 		m_p = NULL, m_refCount = NULL;
 		copy (src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
 	Ptr (const WeakPtr <A>& src)
-	{ 
+	{
 		m_p = NULL, m_refCount = NULL;
 		if (src.m_refCount && src.m_refCount->addRefByWeakPtr ())
 			attach (src.m_p, src.m_refCount);
@@ -83,61 +83,61 @@ public:
 	}
 
 	Ptr (
-		T* p, 
+		T* p,
 		RefCount* refCount
 		)
-	{ 
+	{
 		m_p = NULL, m_refCount = NULL;
 		copy (p, refCount);
 	}
 
 	~Ptr ()
-	{ 
-		clear (); 
+	{
+		clear ();
 	}
-	
+
 	operator T* () const
-	{ 
-		return m_p; 
+	{
+		return m_p;
 	}
 
-	T* 
+	T*
 	operator -> () const
-	{ 
-		ASSERT (m_p); 
-		return m_p; 
+	{
+		ASSERT (m_p);
+		return m_p;
 	}
 
-	Ptr& 
+	Ptr&
 	operator = (const Ptr& src)
-	{ 
+	{
 		copy (src.m_p, src.m_refCount);
 		return *this;
 	}
 
 	Ptr&
 	operator = (PtrKind ptrKind)
-	{ 
+	{
 		ASSERT (ptrKind == PtrKind_Null);
 		clear ();
 		return *this;
 	}
 
-	T* 
+	T*
 	p () const
 	{
 		return m_p;
 	}
-	
-	RefCount* 
+
+	RefCount*
 	getRefCount () const
 	{
 		return m_refCount;
 	}
-	
-	void 
+
+	void
 	copy (
-		T* p, 
+		T* p,
 		RefCount* refCount
 		)
 	{
@@ -147,7 +147,7 @@ public:
 			return;
 
 		if (refCount)
-			refCount->addRef (); 
+			refCount->addRef ();
 
 		if (m_refCount)
 			m_refCount->release ();
@@ -155,9 +155,9 @@ public:
 		m_refCount = refCount;
 	}
 
-	void 
+	void
 	attach (
-		T* p, 
+		T* p,
 		RefCount* refCount
 		)
 	{
@@ -168,9 +168,9 @@ public:
 		m_refCount = refCount;
 	}
 
-	T* 
+	T*
 	detach (RefCount** refCount = NULL)
-	{ 
+	{
 		T* p = m_p;
 
 		if (refCount)
@@ -181,9 +181,9 @@ public:
 		return p;
 	}
 
-	void 
+	void
 	clear ()
-	{ 
+	{
 		if (m_refCount)
 			m_refCount->release ();
 
@@ -192,7 +192,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ref
 } // namespace axl

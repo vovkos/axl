@@ -12,10 +12,10 @@ initQpc ();
 
 namespace g {
 
-//.............................................................................
+//..............................................................................
 
 Module::Module ()
-{	
+{
 #ifdef _AXL_DEBUG
 #	ifdef _AXL_MODULE_TAG
 	m_tag = _AXL_MODULE_TAG;
@@ -24,7 +24,7 @@ Module::Module ()
 #	endif
 #endif
 
-#if (_AXL_OS_WIN)	
+#if (_AXL_OS_WIN)
 	m_hModule = ::GetModuleHandle (NULL);
 
 	SYSTEM_INFO systemInfo;
@@ -40,8 +40,8 @@ Module::Module ()
 	m_systemInfo.m_processorCount     = sysconf (_SC_NPROCESSORS_ONLN);
 	m_systemInfo.m_pageSize           = sysconf (_SC_PAGE_SIZE);
 	m_systemInfo.m_mappingAlignFactor = sysconf (_SC_PAGE_SIZE);
-		
-#endif	
+
+#endif
 }
 
 Module::~Module ()
@@ -56,7 +56,7 @@ Module::~Module ()
 	m_memTracker.trace ();
 }
 
-bool 
+bool
 Module::addFinalizer (const ref::Ptr <Finalizer>& finalizer)
 {
 	FinalizerEntry* finalizerEntry = AXL_MEM_NEW (FinalizerEntry);
@@ -68,7 +68,7 @@ Module::addFinalizer (const ref::Ptr <Finalizer>& finalizer)
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace g
 } // namespace axl

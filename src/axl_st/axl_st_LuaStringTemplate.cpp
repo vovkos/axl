@@ -5,7 +5,7 @@
 namespace axl {
 namespace st {
 
-//.............................................................................
+//..............................................................................
 
 void
 LuaStringTemplate::close ()
@@ -48,7 +48,7 @@ LuaStringTemplate::setArgCount (size_t count)
 	return true;
 }
 
-bool 
+bool
 LuaStringTemplate::runScript (
 	const sl::StringRef& fileName,
 	const sl::StringRef& source
@@ -90,7 +90,7 @@ LuaStringTemplate::createEmitCall (
 	script->append (");");
 }
 
-int 
+int
 LuaStringTemplate::getLine_lua (lua_State* h)
 {
 	lua::LuaNonOwnerState luaState (h);
@@ -98,14 +98,14 @@ LuaStringTemplate::getLine_lua (lua_State* h)
 	ASSERT (self->m_luaState == h && !self->m_emitContextStack.isEmpty ());
 
 	EmitContext* context = *self->m_emitContextStack.getTail ();
-	
+
 	luaState.pushInteger (context->m_lineCol.m_line);
 
 	luaState.detach ();
 	return 1;
 }
 
-int 
+int
 LuaStringTemplate::getCol_lua (lua_State* h)
 {
 	lua::LuaNonOwnerState luaState (h);
@@ -119,7 +119,7 @@ LuaStringTemplate::getCol_lua (lua_State* h)
 	return 1;
 }
 
-int 
+int
 LuaStringTemplate::emit_lua (lua_State* h)
 {
 	lua::LuaNonOwnerState luaState (h);
@@ -139,7 +139,7 @@ LuaStringTemplate::emit_lua (lua_State* h)
 	return 0;
 }
 
-int 
+int
 LuaStringTemplate::passthrough_lua (lua_State* h)
 {
 	lua::LuaNonOwnerState luaState (h);
@@ -158,7 +158,7 @@ LuaStringTemplate::passthrough_lua (lua_State* h)
 	return 0;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace st
 } // namespace axl

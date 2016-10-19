@@ -7,7 +7,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 GdiImage::GdiImage ()
 {
@@ -43,7 +43,7 @@ GdiImage::getData (
 		result = ::GetDIBits (screenDc, m_h, top, height, data, &bitmapInfo, DIB_RGB_COLORS);
 		return err::complete (result);
 	}
-	
+
 	char buffer [1024];
 	sl::Array <uint_t> colorBuffer (ref::BufKind_Stack, buffer, sizeof (buffer));
 	colorBuffer.setCount (m_size.m_width * height);
@@ -61,7 +61,7 @@ GdiImage::getData (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

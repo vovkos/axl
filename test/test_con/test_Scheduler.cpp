@@ -1,10 +1,10 @@
 #include "pch.h"
 
-namespace test_Scheduler { 
+namespace test_Scheduler {
 
 /*
 
-//.............................................................................
+//..............................................................................
 
 
 class Test
@@ -28,7 +28,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class Test2
 {
@@ -44,9 +44,9 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 test (
 	int x,
 	int y,
@@ -62,7 +62,7 @@ public:
 	virtual
 	ScheduleResultKind
 	schedule_va (
-		const exe::Function& function, 
+		const exe::Function& function,
 		axl_va_list va
 		)
 	{
@@ -88,16 +88,16 @@ struct IInterfaceC: IInterfaceA
 	int m_z;
 };
 
-void 
+void
 run ()
 {
 	Test* p;
-	
+
 	p = sl::getSingleton <Test> ();
 	p = sl::getSingleton <Test> ();
-	
+
 	Test2* p2;
-	
+
 	p2 = sl::getSingleton <Test2> ();
 	p2 = sl::getSingleton <Test2> ();
 
@@ -110,7 +110,7 @@ run ()
 	exe::Function <
 		exe::ArgSeq_2 <
 			int,
-			int 
+			int
 			>,
 		exe::ArgSeq_3 <
 			int,
@@ -124,6 +124,6 @@ run ()
 
 */
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Scheduler

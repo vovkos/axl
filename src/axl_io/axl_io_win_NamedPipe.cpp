@@ -5,9 +5,9 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 NamedPipe::create (
 	const sl::StringRef_w& name,
 	uint_t openMode,
@@ -22,20 +22,20 @@ NamedPipe::create (
 	close ();
 
 	m_h = ::CreateNamedPipeW (
-		name.sz (), 
-		openMode, 
-		pipeMode, 
-		maxInstanceCount, 
-		txBufferSize, 
-		rxBufferSize, 
-		timeout, 
+		name.sz (),
+		openMode,
+		pipeMode,
+		maxInstanceCount,
+		txBufferSize,
+		rxBufferSize,
+		timeout,
 		secAttr
 		);
 
 	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 
-bool 
+bool
 NamedPipe::open (
 	const sl::StringRef_w& name,
 	uint_t access,
@@ -48,7 +48,7 @@ NamedPipe::open (
 	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace io

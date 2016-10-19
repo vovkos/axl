@@ -5,7 +5,7 @@ namespace axl {
 namespace io {
 namespace psx {
 
-//.............................................................................
+//..............................................................................
 
 bool
 Socket::open (
@@ -72,8 +72,8 @@ Socket::accept (SockAddr* addr)
 {
 	socklen_t addrSize = sizeof (SockAddr);
 	int socket = ::accept (
-		m_h, 
-		(sockaddr*) addr, 
+		m_h,
+		(sockaddr*) addr,
 		addr ? &addrSize : NULL
 		);
 
@@ -89,18 +89,18 @@ Socket::recvFrom (
 {
 	socklen_t addrSize = sizeof (SockAddr);
 	int result = ::recvfrom (
-		m_h, 
-		p, 
-		size, 
-		0, 
-		(sockaddr*) addr, 
+		m_h,
+		p,
+		size,
+		0,
+		(sockaddr*) addr,
 		addr ? &addrSize : NULL
 		);
 
 	return err::complete (result, -1);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace psx
 } // namespace io

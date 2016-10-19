@@ -3,10 +3,10 @@
 
 namespace axl {
 namespace gui {
-	
-//.............................................................................
 
-HyperlinkAnchor* 
+//..............................................................................
+
+HyperlinkAnchor*
 HyperlinkAnchorArray::find (size_t offset) const
 {
 	HyperlinkAnchor* result = NULL;
@@ -36,7 +36,7 @@ HyperlinkAnchorArray::find (size_t offset) const
 	return result;
 }
 
-HyperlinkAnchor* 
+HyperlinkAnchor*
 HyperlinkAnchorArray::openHyperlink (
 	size_t offset,
 	const sl::StringRef& hyperlink
@@ -48,10 +48,10 @@ HyperlinkAnchorArray::openHyperlink (
 	if (count)
 	{
 		anchor = m_array [count - 1];
-		
+
 		if (anchor->m_hyperlink == hyperlink)
 			return anchor; // same attr
-		
+
 		if (anchor->m_offset == offset)
 		{
 			if (count >= 2)
@@ -66,7 +66,7 @@ HyperlinkAnchorArray::openHyperlink (
 
 					AXL_MEM_DELETE (anchor);
 
-					return prevAnchor; 
+					return prevAnchor;
 				}
 			}
 
@@ -88,7 +88,7 @@ HyperlinkAnchorArray::openHyperlink (
 	return anchor;
 }
 
-HyperlinkAnchor* 
+HyperlinkAnchor*
 HyperlinkAnchorArray::closeHyperlink (
 	size_t offset,
 	bool closeEmpty
@@ -104,7 +104,7 @@ HyperlinkAnchorArray::closeHyperlink (
 }
 
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

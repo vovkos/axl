@@ -2,9 +2,9 @@
 
 namespace test_Function {
 
-//.............................................................................
+//..............................................................................
 
-////.............................................................................
+////..............................................................................
 //
 //int MyFunction (const char* p1, const char* p2, const char* p3)
 //{
@@ -16,12 +16,12 @@ namespace test_Function {
 //	return printf ("%d %d %d\n", x1, x2, x3);
 //}
 //
-////.............................................................................
+////..............................................................................
 //
 //void FunctionTest ()
 //{
 //	CFunctionT <
-//		MyFunction, 
+//		MyFunction,
 //		exe::ECallingConvention_Cdecl,
 //		sl::IPackImplT_3 (
 //			CArgT <sl::CString>,
@@ -30,16 +30,16 @@ namespace test_Function {
 //			> > Function;
 //
 //	CPtrT <mem::TBlock> Stack = Function.GetArgPacker ()->BuildFromArgs (
-//		0, 
-//		sl::CString ("hui"), 
-//		sl::CString ("govno"), 
+//		0,
+//		sl::CString ("hui"),
+//		sl::CString ("govno"),
 //		sl::CString ("muravei")
 //		);
 //
 //	Function.Invoke (Stack->m_p, Stack->m_Size);
 //
 //	CFunctionT <
-//		MyFunction2, 
+//		MyFunction2,
 //		exe::ECallingConvention_Stdcall,
 //		sl::IPackImplT_3 (
 //			CArgT <int>,
@@ -48,16 +48,16 @@ namespace test_Function {
 //			> > Function2;
 //
 //	Stack = Function2.GetArgPacker ()->BuildFromArgs (
-//		0, 
-//		10, 
-//		20, 
+//		0,
+//		10,
+//		20,
 //		30
 //		);
 //
 //	Function2.Invoke (Stack->m_p, Stack->m_Size);
 //}
 //
-////.............................................................................
+////..............................................................................
 //
 
 
@@ -89,6 +89,6 @@ namespace test_Function {
 //};
 //
 
-//.............................................................................
+//..............................................................................
 
-} // namespace test_Function 
+} // namespace test_Function

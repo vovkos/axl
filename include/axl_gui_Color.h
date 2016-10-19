@@ -10,8 +10,8 @@
 
 namespace axl {
 namespace gui {
-	
-//.............................................................................
+
+//..............................................................................
 
 enum
 {
@@ -21,7 +21,7 @@ enum
 	ColorFlag_RgbMask     = 0x00ffffff,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum StdColor
 {
@@ -68,7 +68,7 @@ enum StdColor
 	StdColor_PastelPurple      = 0xe2dafd,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum StdPalColor
 {
@@ -121,7 +121,7 @@ enum StdPalColor
 	StdPalColor_LightBlue,         // 36
 	StdPalColor_LightPurple,       // 37
 	StdPalColor_LightCyan,         // 38
-	
+
 	StdPalColor_PastelGray,        // 39
 	StdPalColor_PastelRed,         // 40
 	StdPalColor_PastelOrange,      // 41
@@ -131,16 +131,16 @@ enum StdPalColor
 	StdPalColor_PastelBlue,        // 45
 	StdPalColor_PastelPurple,      // 46
 
-	StdPalColor__End, 
+	StdPalColor__End,
 	StdPalColor__Count             = ~ColorFlag_Index & StdPalColor__End
 };
 
-//.............................................................................
+//..............................................................................
 
-inline 
-uint_t 
+inline
+uint_t
 getColorIndex (uint_t color)
-{ 
+{
 	return (color & ColorFlag_Index) ? color & ColorFlag_IndexMask : -1;
 }
 
@@ -155,13 +155,13 @@ overlayColor (
 }
 
 inline
-uint_t 
+uint_t
 inverseRgb (uint_t rgb)
 {
 	return ((rgb & 0x0000ff) << 16) | ((rgb & 0xff0000) >> 16) | (rgb & 0x00ff00);
 }
 
-//.............................................................................
+//..............................................................................
 
 struct Palette
 {
@@ -196,7 +196,7 @@ struct Palette
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

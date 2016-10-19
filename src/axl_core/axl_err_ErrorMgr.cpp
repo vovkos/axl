@@ -14,7 +14,7 @@
 namespace axl {
 namespace err {
 
-//.............................................................................
+//..............................................................................
 
 ErrorMgr::ErrorMgr ()
 {
@@ -41,7 +41,7 @@ ErrorMgr::registerProvider (
 	m_providerMap.visit (guid)->m_value = provider;
 }
 
-ErrorProvider* 
+ErrorProvider*
 ErrorMgr::findProvider (const sl::Guid& guid)
 {
 	sys::ScopeLock scopeLock (&m_lock);
@@ -55,13 +55,13 @@ ErrorMgr::getLastError ()
 	ThreadEntry* entry = findThreadEntry ();
 	if (entry && !entry->m_error.isEmpty ())
 		return entry->m_error;
-	
+
 	return &g_noError;
 }
 
 void
 ErrorMgr::setError (const ErrorRef& error)
-{	
+{
 	ThreadEntry* entry = getThreadEntry ();
 	entry->m_error = error;
 }
@@ -78,7 +78,7 @@ ErrorMgr::getThreadEntry ()
 	return newEntry;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace err
 } // namespace axl

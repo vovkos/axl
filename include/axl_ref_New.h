@@ -12,7 +12,7 @@
 namespace axl {
 namespace ref {
 
-//.............................................................................
+//..............................................................................
 
 inline
 void*
@@ -51,7 +51,7 @@ primeInPlaceRefCount (
 	return p;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_REF_ALLOC_SIZEOF(T) \
 	(sizeof (axl::ref::RefCountAllocHdr) + sizeof (T))
@@ -92,7 +92,7 @@ primeInPlaceRefCount (
 #define AXL_REF_NEW_ARGS_INPLACE(T, args, p, flags) \
 	(axl::ref::primeInPlaceRefCount (new (p) T args,  flags))
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ref
 } // namespace axl

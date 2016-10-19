@@ -4,7 +4,7 @@
 namespace axl {
 namespace enc {
 
-//.............................................................................
+//..............................................................................
 
 class Base32Writer
 {
@@ -28,7 +28,7 @@ public:
 	addPadding ();
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 Base32Writer::Base32Writer (
 	char* p,
@@ -67,7 +67,7 @@ Base32Writer::addPadding ()
 		*m_p++ = paddingTable [rand () % lengthof (paddingTable)];
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 Base32Encoding::encode (
@@ -170,7 +170,7 @@ Base32Encoding::decode (
 	size_t sizeGuess = (string.getLength () * 5) / 8;
 	buffer->reserve (sizeGuess);
 	buffer->clear ();
-	
+
 	uchar_t x = 0;
 	size_t i = 0;
 
@@ -190,7 +190,7 @@ Base32Encoding::decode (
 			y = c - 'A';
 		else
 			continue; // ignore padding, hyphens and other chars
-		
+
 		x |= y << i;
 
 		if (i < 3)
@@ -217,7 +217,7 @@ Base32Encoding::decode (
 	return buffer->getCount ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace enc
 } // namespace axl

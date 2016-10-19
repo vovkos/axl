@@ -16,7 +16,7 @@ namespace gui {
 
 class Image;
 
-//.............................................................................
+//..............................................................................
 
 class Canvas: public GuiItem
 {
@@ -137,7 +137,7 @@ public:
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom,
-			color, 
+			color,
 			alpha
 			);
 	}
@@ -158,7 +158,7 @@ public:
 			);
 	}
 
-	// default to utf8 
+	// default to utf8
 
 	bool
 	drawText (
@@ -339,7 +339,7 @@ public:
 		)
 	{
 		return m_engine->drawText_utf16 (
-			this, 
+			this,
 			x,
 			y,
 			left,
@@ -607,7 +607,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class OffscreenCanvasCache
@@ -635,7 +635,7 @@ public:
 		clear ();
 	}
 
-	void 
+	void
 	clear ()
 	{
 		for (size_t i = 0; i < countof (m_canvasTable); i++)
@@ -653,7 +653,7 @@ public:
 	{
 		FormFactor formFactor = getFormFactor (width, height);
 		ASSERT (formFactor < countof (m_canvasTable));
-	
+
 		Entry* entry = m_canvasTable [formFactor];
 		if (!entry)
 		{
@@ -661,11 +661,11 @@ public:
 			m_canvasTable [formFactor] = entry;
 		}
 
-		if (entry->m_size.m_width_u >= width && 
+		if (entry->m_size.m_width_u >= width &&
 			entry->m_size.m_height_u >= height)
 			return &entry->m_canvas;
 
-		width = width < entry->m_size.m_width_u ? 
+		width = width < entry->m_size.m_width_u ?
 			entry->m_size.m_width_u :
 			sl::getMinPower2Ge (width);
 
@@ -689,7 +689,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

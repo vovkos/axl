@@ -13,7 +13,7 @@ namespace fsm {
 
 struct DfaState;
 
-//.............................................................................
+//..............................................................................
 
 struct DfaTransition: sl::ListLink
 {
@@ -21,7 +21,7 @@ struct DfaTransition: sl::ListLink
 	DfaState* m_outState;
 };
 
-//.............................................................................
+//..............................................................................
 
 struct DfaState: sl::ListLink
 {
@@ -39,13 +39,13 @@ struct DfaState: sl::ListLink
 	DfaState ();
 
 	bool
-	addNfaState (NfaState* state);	
+	addNfaState (NfaState* state);
 
 	void
 	makeEpsilonClosure ();
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace fsm
 } // namespace axl

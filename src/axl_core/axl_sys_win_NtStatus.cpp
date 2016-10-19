@@ -6,14 +6,14 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-typedef 
-dword_t 
+typedef
+dword_t
 WINAPI
 RtlNtStatusToDosErrorFunc (long);
 
-sl::String 
+sl::String
 NtStatusProvider::getErrorDescription (long status)
 {
 	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = NULL;
@@ -23,7 +23,7 @@ NtStatusProvider::getErrorDescription (long status)
 		HMODULE ntDll = ::GetModuleHandleW (L"ntdll.dll");
 		if (ntDll)
 			rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress (ntDll, "RtlNtStatusToDosError");
-		
+
 		if (!rtlNtStatusToDosErrorFunc)
 			return sl::formatString ("ntstatus #%x", status);
 	}
@@ -35,7 +35,7 @@ NtStatusProvider::getErrorDescription (long status)
 	return WinErrorProvider::getErrorDescription (winError);
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 NtStatus::create (long status)
@@ -50,7 +50,7 @@ NtStatus::create (long status)
 	return sizeof (err::ErrorHdr);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace err

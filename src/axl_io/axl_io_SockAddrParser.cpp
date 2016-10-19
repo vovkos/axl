@@ -5,7 +5,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 bool
 SockAddrParser::parse (in_addr* addr)
@@ -42,10 +42,10 @@ SockAddrParser::parse (sockaddr_in* addr)
 	addr->sin_family = AF_INET;
 
 	const char* p0 = m_p;
-	result = parse (&addr->sin_addr); 
+	result = parse (&addr->sin_addr);
 	if (!result) // rollback and try single port
 	{
-		m_p = p0; 
+		m_p = p0;
 
 		uint_t port;
 		result = parseInt (&port, 10);
@@ -99,11 +99,11 @@ SockAddrParser::parse (in6_addr* addr)
 			zeroRunIdx = i;
 
 		skipWhiteSpace ();
-		
+
 		if (m_p >= m_end || !isxdigit (*m_p))
 			break;
 
-		uint_t word;		
+		uint_t word;
 		result = parseInt (&word, 16);
 		if (!result)
 			return false;
@@ -120,9 +120,9 @@ SockAddrParser::parse (in6_addr* addr)
 					return false;
 				}
 
-				ip4 [0] = (uchar_t) 
-					((word & 0x0f) + 
-					((word & 0xf0) >> 4) * 10 + 
+				ip4 [0] = (uchar_t)
+					((word & 0x0f) +
+					((word & 0xf0) >> 4) * 10 +
 					((word & 0xf00) >> 8) * 100);
 
 				isIp4 = true;
@@ -315,7 +315,7 @@ SockAddrParser::tryAddr_ip6 ()
 			hasZeroRun = true;
 
 		skipWhiteSpace ();
-		
+
 		if (m_p >= m_end || !isxdigit (*m_p))
 			break;
 
@@ -435,7 +435,7 @@ SockAddrParser::trySockAddr_ip6 ()
 void
 SockAddrParser::skipWhiteSpace ()
 {
-	while (m_p < m_end && isspace (*m_p)) 
+	while (m_p < m_end && isspace (*m_p))
 		m_p++;
 }
 
@@ -511,7 +511,7 @@ SockAddrParser::tryChar (char c)
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

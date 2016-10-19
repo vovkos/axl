@@ -9,7 +9,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 class SerialPortEnumerator
 {
@@ -19,7 +19,7 @@ public:
 	createPortList (sl::StdList <SerialPortDesc>* portList);
 };
 
-//.............................................................................
+//..............................................................................
 
 size_t
 SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
@@ -30,7 +30,7 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 	sys::lnx::UdevContext udev;
 	sys::lnx::UdevEnumerator enumerator = udev.createEnumerator ();
 
-	bool result = 
+	bool result =
 		enumerator.addMatchSubsystem ("tty") &&
 		enumerator.scanDevices ();
 
@@ -82,27 +82,27 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 		portList->insertTail (portDesc);
 	}
 #else
-	static const char* deviceNameTable [] [2] = 
+	static const char* deviceNameTable [] [2] =
 	{
 		{ "/dev/ttyS0",   "Serial device /dev/ttyS0" },
 		{ "/dev/ttyS1",   "Serial device /dev/ttyS1" },
 		{ "/dev/ttyUSB0", "USB Serial device /dev/ttyUSB0" },
 		{ "/dev/ttyUSB1", "USB Serial device /dev/ttyUSB1" },
 	};
-	
+
 	for (size_t i = 0; i < countof (deviceNameTable); i++)
 	{
 		SerialPortDesc* portDesc = AXL_MEM_NEW (SerialPortDesc);
 		portDesc->m_deviceName = deviceNameTable [i] [0];
 		portDesc->m_description = deviceNameTable [i] [1];
-		portList->insertTail (portDesc);		
-	}	
+		portList->insertTail (portDesc);
+	}
 #endif
-	
+
 	return portList->getCount ();
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
@@ -110,7 +110,7 @@ createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
 	return SerialPortEnumerator::createPortList (portList);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

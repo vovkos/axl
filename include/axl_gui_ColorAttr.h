@@ -11,7 +11,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 struct ColorAttr
 {
@@ -31,7 +31,7 @@ struct ColorAttr
 		setup (foreColor, backColor);
 	}
 
-	int 
+	int
 	cmp (const ColorAttr& attr)
 	{
 		return memcmp (this, &attr, sizeof (ColorAttr));
@@ -70,7 +70,7 @@ struct ColorAttr
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

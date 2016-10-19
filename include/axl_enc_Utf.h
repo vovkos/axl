@@ -12,7 +12,7 @@
 namespace axl {
 namespace enc {
 
-//.............................................................................
+//..............................................................................
 
 enum UtfKind
 {
@@ -23,12 +23,12 @@ enum UtfKind
 	UtfKind_Utf32_be,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char*
 getUtfKindString (UtfKind utfKind);
 
-//.............................................................................
+//..............................................................................
 
 #if 0
 
@@ -72,33 +72,33 @@ enum UtfCategory
 	UtfCategory_Symbol_Other              // So
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum UtfCategoryMask
 {
-	UtfCategoryMask_NonPrintable = 
+	UtfCategoryMask_NonPrintable =
 		(1 << UtfCategory_Other_Control) |
 		(1 << UtfCategory_Other_Format) |
 		(1 << UtfCategory_Other_Surrogate) |
 		(1 << UtfCategory_Other_PrivateUse) |
 		(1 << UtfCategory_Other_NotAssigned),
 
-	UtfCategoryMask_Space = 
+	UtfCategoryMask_Space =
 		(1 << UtfCategory_Separator_Space) |
 		(1 << UtfCategory_Separator_Line) |
 		(1 << UtfCategory_Separator_Paragraph),
 
-	UtfCategoryMask_Mark = 
+	UtfCategoryMask_Mark =
 		(1 << UtfCategory_Mark_NonSpacing) |
 		(1 << UtfCategory_Mark_SpacingCombining) |
 		(1 << UtfCategory_Mark_Enclosing),
 
-	UtfCategoryMask_Number = 
+	UtfCategoryMask_Number =
 		(1 << UtfCategory_Number_DecimalDigit) |
 		(1 << UtfCategory_Number_Letter) |
 		(1 << UtfCategory_Number_Other),
 
-	UtfCategoryMask_Letter = 
+	UtfCategoryMask_Letter =
 		(1 << UtfCategory_Letter_Uppercase) |
 		(1 << UtfCategory_Letter_Uppercase) |
 		(1 << UtfCategory_Letter_Lowercase) |
@@ -106,7 +106,7 @@ enum UtfCategoryMask
 		(1 << UtfCategory_Letter_Modifier) |
 		(1 << UtfCategory_Letter_Other),
 
-	UtfCategoryMask_Punctuation = 
+	UtfCategoryMask_Punctuation =
 		(1 << UtfCategory_Punctuation_Connector) |
 		(1 << UtfCategory_Punctuation_Dash) |
 		(1 << UtfCategory_Punctuation_Open) |
@@ -116,7 +116,7 @@ enum UtfCategoryMask
 		(1 << UtfCategory_Punctuation_Other),
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct UtfCodePointAttr
 {
@@ -142,12 +142,12 @@ struct UtfCodePointAttr
 	uint16_t m_script             : 8; /* 5 used */
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const UtfCodePointAttr*
 getUtfCodePointAttr (utf32_t c);
 
-//.............................................................................
+//..............................................................................
 
 inline
 bool
@@ -205,7 +205,7 @@ utfIsLetterOrNumber (utf32_t c)
 	return ((1 << attr->m_category) & (UtfCategoryMask_Letter | UtfCategoryMask_Number)) != 0;
 }
 
-//.............................................................................
+//..............................................................................
 
 // case ops
 
@@ -268,7 +268,7 @@ utfIsLowerCase (utf32_t c);
 bool
 utfIsUpperCase (utf32_t c);
 
-//.............................................................................
+//..............................................................................
 
 // case ops
 
@@ -283,7 +283,7 @@ utfToCaseFolded (utf32_t c);
 
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class UtfToLowerCase
 {
@@ -315,7 +315,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 size_t
@@ -340,7 +340,7 @@ calcUtfCodePointCount (
 	return count;
 }
 
-//.............................................................................
+//..............................................................................
 
 class Utf8
 {
@@ -458,7 +458,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class Utf16
 {
@@ -591,7 +591,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Utf16_be: public Utf16
 {
@@ -654,7 +654,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class Utf32
 {
@@ -725,7 +725,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Utf32_be: public Utf32
 {
@@ -763,7 +763,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename DstEncoding_0,
@@ -855,7 +855,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename SrcEncoding_0,
@@ -938,7 +938,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename DstEncoding_0,
@@ -1016,7 +1016,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace enc
 } // namespace axl

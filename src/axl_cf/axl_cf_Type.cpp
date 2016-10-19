@@ -5,7 +5,7 @@
 namespace axl {
 namespace cf {
 
-//.............................................................................
+//..............................................................................
 
 sl::String
 getStringFromCfString (CFStringRef cfString)
@@ -97,7 +97,7 @@ cfTypeToString (
 		CFStringRef cfString = ::CFCopyDescription (cfType);
 		sl::String string = getStringFromCfString (cfString);
 		::CFRelease (cfString);
-		
+
 		return string;
 	}
 	else
@@ -106,7 +106,7 @@ cfTypeToString (
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cf
 } // namespace axl

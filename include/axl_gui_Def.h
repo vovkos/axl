@@ -13,7 +13,7 @@ namespace gui {
 
 class Engine;
 
-//.............................................................................
+//..............................................................................
 
 enum MouseButton
 {
@@ -23,7 +23,7 @@ enum MouseButton
 	MouseButton_Medium = 0x04,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 MouseButton
@@ -32,7 +32,7 @@ getFirstMouseButton (uint_t buttons)
 	return (MouseButton) sl::getLoBitIdx32 (buttons);
 }
 
-//.............................................................................
+//..............................................................................
 
 enum ModifierKey
 {
@@ -42,7 +42,7 @@ enum ModifierKey
 	ModifierKey_Alt    = 0x04,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 ModifierKey
@@ -51,17 +51,17 @@ getFirstModifierKey (uint_t modifierKeys)
 	return (ModifierKey) sl::getLoBitIdx32 (modifierKeys);
 }
 
-//.............................................................................
+//..............................................................................
 
 enum Key
 {
 	Key_Backspace   = 0x08,
 	Key_Tab         = 0x09,
-	Key_Enter       = 0x0d,	
+	Key_Enter       = 0x0d,
 	Key_Esc         = 0x1b,
 
-	Key_Pause       = 0x10000013,	
-	Key_Print       = 0x1000002a,	
+	Key_Pause       = 0x10000013,
+	Key_Print       = 0x1000002a,
 
 	Key_CapsLock    = 0x10000014,
 	Key_NumLock     = 0x10000090,
@@ -98,7 +98,7 @@ enum Key
 	Key_F12         = 0x1000007b,
 };
 
-//.............................................................................
+//..............................................................................
 
 struct Point
 {
@@ -134,13 +134,13 @@ struct Point
 		m_y = y;
 	}
 
-	Point 
+	Point
 	operator + (const Point& point2)
 	{
 		return Point (m_x + point2.m_x, m_y + point2.m_y);
 	}
 
-	Point 
+	Point
 	operator - (const Point& point2)
 	{
 		return Point (m_x - point2.m_x, m_y - point2.m_y);
@@ -167,20 +167,20 @@ struct Point
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 struct Size
 {
 	union
 	{
-		struct 
+		struct
 		{
 			//! \unnamed{union/struct:2}
 			int m_width;
 			int m_height;
 		};
 
-		struct 
+		struct
 		{
 			//! \unnamed{struct:2}
 			uint_t m_width_u;
@@ -203,13 +203,13 @@ struct Size
 		m_height = height;
 	}
 
-	Size 
+	Size
 	operator + (const Size& size2)
 	{
 		return Size (m_width + size2.m_width, m_height + size2.m_height);
 	}
 
-	Size 
+	Size
 	operator - (const Size& size2)
 	{
 		return Size (m_width - size2.m_width, m_height - size2.m_height);
@@ -236,13 +236,13 @@ struct Size
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 struct Rect
 {
-	union 
+	union
 	{
-		struct 
+		struct
 		{
 			//! \unnamed{union/struct:4}
 			int m_left;
@@ -251,7 +251,7 @@ struct Rect
 			int m_bottom;
 		};
 
-		struct 
+		struct
 		{
 			//! \unnamed{struct:4}
 			uint_t m_left_u;
@@ -378,7 +378,7 @@ struct Rect
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 struct CaretPos
 {
@@ -452,20 +452,20 @@ struct CaretPos
 	int
 	cmp (const CaretPos& pos2) const
 	{
-		return 
-			m_line < pos2.m_line ? -1 : 
-			m_line > pos2.m_line ?  1 : 
-			m_col < pos2.m_col ? -1 : 
+		return
+			m_line < pos2.m_line ? -1 :
+			m_line > pos2.m_line ?  1 :
+			m_col < pos2.m_col ? -1 :
 			m_col > pos2.m_col ?  1 : 0;
 	}
 
 	int
 	cmp_u (const CaretPos& pos2) const
 	{
-		return 
-			m_line_u < pos2.m_line_u ? -1 : 
-			m_line_u > pos2.m_line_u ?  1 : 
-			m_col_u < pos2.m_col_u ? -1 : 
+		return
+			m_line_u < pos2.m_line_u ? -1 :
+			m_line_u > pos2.m_line_u ?  1 :
+			m_col_u < pos2.m_col_u ? -1 :
 			m_col_u > pos2.m_col_u ?  1 : 0;
 	}
 
@@ -490,7 +490,7 @@ struct CaretPos
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 enum Orientation
 {
@@ -498,7 +498,7 @@ enum Orientation
 	Orientation_Horizontal,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum FormFactor
 {
@@ -509,17 +509,17 @@ enum FormFactor
 	FormFactor__Count,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 FormFactor
 getFormFactor (
 	int width,
-	int height, 
+	int height,
 	int stripThreshold = 8
 	)
 {
-	return 
+	return
 		height > width * stripThreshold ? FormFactor_LineStrip :
 		width > height * stripThreshold ? FormFactor_ColumnStrip :
 		height > width ? FormFactor_Portrait : FormFactor_Landscape;
@@ -528,14 +528,14 @@ getFormFactor (
 inline
 FormFactor
 getFormFactor (
-	const Size& size, 
+	const Size& size,
 	int stripThreshold = 8
 	)
 {
 	return getFormFactor (size.m_width, size.m_height, stripThreshold);
 }
 
-//.............................................................................
+//..............................................................................
 
 class GuiItem
 {
@@ -548,14 +548,14 @@ public:
 		m_engine = engine;
 	}
 
-	Engine* 
+	Engine*
 	getEngine ()
 	{
 		return m_engine;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

@@ -11,7 +11,7 @@
 namespace axl {
 namespace ref {
 
-//.............................................................................
+//..............................................................................
 
 // creatable child ref-counted object
 
@@ -28,7 +28,7 @@ protected:
 
 public:
 	Child (RefCount* parent)
-	{ 
+	{
 		memset (m_buffer, 0, sizeof (m_buffer));
 		T* p = AXL_REF_INPLACE_NEW (m_buffer, 0);
 		p->addRef ();
@@ -36,42 +36,42 @@ public:
 	}
 
 	~Child ()
-	{ 
-		p ()->release (); 
+	{
+		p ()->release ();
 	}
-	
+
 	operator T* ()
-	{ 
-		return p (); 
+	{
+		return p ();
 	}
 
 	T*
 	operator & ()
-	{ 
-		return p (); 
+	{
+		return p ();
 	}
 
 	T*
 	operator -> ()
-	{ 
-		return p (); 
+	{
+		return p ();
 	}
 
 	T* p ()
 	{
-		return (Object*) m_buffer; 
+		return (Object*) m_buffer;
 	}
 
 protected:
-	static 
-	void 
+	static
+	void
 	free (void* p)
-	{ 			
-		((Object*) p)->m_parent->weakRelease (); 
+	{
+		((Object*) p)->m_parent->weakRelease ();
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ref
 } // namespace axl

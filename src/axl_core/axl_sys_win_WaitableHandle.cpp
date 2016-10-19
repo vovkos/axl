@@ -6,9 +6,9 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-WaitResult 
+WaitResult
 WaitableHandle::completeWait (dword_t result)
 {
 	switch (result)
@@ -35,7 +35,7 @@ WaitableHandle::completeWait (dword_t result)
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

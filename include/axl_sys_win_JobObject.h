@@ -13,12 +13,12 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class JobObject: public sl::Handle <HANDLE, CloseHandle, sl::Zero <HANDLE> >
 {
 public:
-	bool 
+	bool
 	create (
 		SECURITY_ATTRIBUTES* secAttr,
 		const sl::StringRef_w& name
@@ -30,7 +30,7 @@ public:
 		return err::complete (m_h != NULL);
 	}
 
-	bool 
+	bool
 	open (
 		uint_t access,
 		bool doInheritHandle,
@@ -45,7 +45,7 @@ public:
 
 	bool
 	assignProcess (HANDLE process)
-	{ 
+	{
 		bool_t result = ::AssignProcessToJobObject (m_h, process);
 		return err::complete (result);
 	}
@@ -61,7 +61,7 @@ public:
 		return err::complete (result);
 	}
 
-	size_t 
+	size_t
 	queryInformation (
 		JOBOBJECTINFOCLASS infoClass,
 		void* p,
@@ -69,7 +69,7 @@ public:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

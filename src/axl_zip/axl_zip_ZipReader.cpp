@@ -7,7 +7,7 @@
 namespace axl {
 namespace zip {
 
-//.............................................................................
+//..............................................................................
 
 void
 ZipReader::close ()
@@ -55,7 +55,7 @@ ZipReader::getFileName (size_t index)
 {
 	ASSERT (isOpen ());
 	size_t size = mz_zip_reader_get_filename (m_zip, index, NULL, 0);
-	
+
 	sl::String fileName;
 	char* p = fileName.createBuffer (size);
 	mz_zip_reader_get_filename (m_zip, index, p, size);
@@ -89,21 +89,21 @@ ZipReader::getFileInfo (
 	fileInfo->m_internalAttr = stat.m_internal_attr;
 	fileInfo->m_externalAttr = stat.m_external_attr;
 	fileInfo->m_localHeaderOffset = stat.m_local_header_ofs;
-	
+
 	if (comment)
 		*comment = stat.m_comment;
 
 	return true;
 }
 
-bool 
+bool
 ZipReader::isDirectoryFile (size_t index)
 {
 	ASSERT (isOpen ());
 	return mz_zip_reader_is_file_a_directory (m_zip, index) != 0;
 }
 
-bool 
+bool
 ZipReader::isFileEncrypted (size_t index)
 {
 	ASSERT (isOpen ());
@@ -123,8 +123,8 @@ ZipReader::extractFileToMem (
 	mz_bool result = mz_zip_reader_extract_to_mem_no_alloc (
 		m_zip,
 		index,
-		p, 
-		size, 
+		p,
+		size,
 		0,
 		readBuffer,
 		sizeof (readBuffer)
@@ -151,7 +151,7 @@ ZipReader::extractFileToMem (
 
 	buffer->p () [(size_t) stat.m_uncomp_size] = 0; // ensure zero termination
 	buffer->setCount ((size_t) stat.m_uncomp_size);
-	
+
 	return extractFileToMem (index, buffer->p (), (size_t) stat.m_uncomp_size);
 }
 
@@ -173,7 +173,7 @@ ZipReader::extractFileToFile (
 	return result ? true : err::fail (err::SystemErrorCode_Unsuccessful);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace zip
 } // namespace axl

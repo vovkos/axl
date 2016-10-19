@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_ERR_ERRORMGR_H
 
@@ -15,7 +15,7 @@
 namespace axl {
 namespace err {
 
-//.............................................................................
+//..............................................................................
 
 class ErrorMgr
 {
@@ -39,7 +39,7 @@ public:
 		ErrorProvider* provider
 		);
 
-	ErrorProvider* 
+	ErrorProvider*
 	findProvider (const sl::Guid& guid);
 
 	ErrorRef
@@ -59,16 +59,16 @@ protected:
 	getThreadEntry ();
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-ErrorMgr* 
+ErrorMgr*
 getErrorMgr ()
 {
 	return sl::getSingleton <ErrorMgr> ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace err
 } // namespace axl

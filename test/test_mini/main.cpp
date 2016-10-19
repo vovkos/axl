@@ -6,7 +6,7 @@
 
 #include "axl_sys_win_NtStatus.h"
 
-//.............................................................................
+//..............................................................................
 
 #define STATUS_NO_MORE_FILES   0x80000006
 #define STATUS_NO_MORE_ENTRIES 0x8000001a
@@ -21,7 +21,7 @@ enum FILE_INFORMATION_CLASS
 	FileDirectoryInformation = 1,
 };
 
-//.............................................................................
+//..............................................................................
 
 struct IO_STATUS_BLOCK
 {
@@ -31,9 +31,9 @@ struct IO_STATUS_BLOCK
 
 typedef IO_STATUS_BLOCK* PIO_STATUS_BLOCK;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct UNICODE_STRING 
+struct UNICODE_STRING
 {
 	USHORT Length;
 	USHORT MaximumLength;
@@ -42,9 +42,9 @@ struct UNICODE_STRING
 
 typedef UNICODE_STRING* PUNICODE_STRING;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct OBJECT_ATTRIBUTES 
+struct OBJECT_ATTRIBUTES
 {
 	ULONG Length;
 	HANDLE RootDirectory;
@@ -56,10 +56,10 @@ struct OBJECT_ATTRIBUTES
 
 typedef OBJECT_ATTRIBUTES* POBJECT_ATTRIBUTES;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct FILE_DIRECTORY_INFORMATION 
-{ 
+struct FILE_DIRECTORY_INFORMATION
+{
 	ULONG NextEntryOffset;
 	ULONG FileIndex;
 	LARGE_INTEGER CreationTime;
@@ -70,14 +70,14 @@ struct FILE_DIRECTORY_INFORMATION
 	LARGE_INTEGER AllocationSize;
 	ULONG FileAttributes;
 	ULONG FileNameLength;
-	WCHAR FileName[1]; 
+	WCHAR FileName[1];
 };
 
 typedef FILE_DIRECTORY_INFORMATION* PFILE_DIRECTORY_INFORMATION;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct OBJECT_DIRECTORY_INFORMATION 
+struct OBJECT_DIRECTORY_INFORMATION
 {
 	UNICODE_STRING Name;
 	UNICODE_STRING TypeName;
@@ -85,11 +85,11 @@ struct OBJECT_DIRECTORY_INFORMATION
 
 typedef OBJECT_DIRECTORY_INFORMATION* POBJECT_DIRECTORY_INFORMATION;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef
-NTSTATUS 
-NTAPI 
+NTSTATUS
+NTAPI
 NtQueryDirectoryFile (
 	IN HANDLE FileHandle,
 	IN HANDLE Event,
@@ -101,11 +101,11 @@ NtQueryDirectoryFile (
 	IN INT FileInformationClass,
 	IN BOOLEAN ReturnSingleEntry,
 	IN PVOID FileName,
-	IN BOOLEAN RestartScan 
+	IN BOOLEAN RestartScan
 	);
 
 typedef
-NTSTATUS 
+NTSTATUS
 NTAPI
 NtOpenDirectoryObject (
 	OUT PHANDLE DirectoryHandle,
@@ -114,7 +114,7 @@ NtOpenDirectoryObject (
 	);
 
 typedef
-NTSTATUS 
+NTSTATUS
 NTAPI
 NtQueryDirectoryObject(
 	IN HANDLE DirectoryHandle,
@@ -127,8 +127,8 @@ NtQueryDirectoryObject(
 	);
 
 typedef
-NTSTATUS 
-NTAPI 
+NTSTATUS
+NTAPI
 NtOpenSymbolicLinkObject (
 	OUT PHANDLE LinkHandle,
 	IN ACCESS_MASK DesiredAccess,
@@ -136,15 +136,15 @@ NtOpenSymbolicLinkObject (
 	);
 
 typedef
-NTSTATUS 
-NTAPI 
+NTSTATUS
+NTAPI
 NtQuerySymbolicLinkObject (
 	IN HANDLE LinkHandle,
 	OUT PUNICODE_STRING LinkTarget,
 	OUT PULONG ReturnedLength
 	);
 
-//.............................................................................
+//..............................................................................
 
 NtQueryDirectoryFile* ntQueryDirectoryFile = NULL;
 NtOpenDirectoryObject* ntOpenDirectoryObject = NULL;
@@ -173,7 +173,7 @@ initNtFunctions ()
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
@@ -222,7 +222,7 @@ printAdapterInfo (IP_ADAPTER_INFO* ipAdapter)
 
 	printf ("AdapterName = %s\n", ipAdapter->AdapterName);
 	printf ("Description = %s\n", ipAdapter->Description);
-	printf ("MAC         = %02x:%02x:%02x:%02x:%02x:%02x\n", 
+	printf ("MAC         = %02x:%02x:%02x:%02x:%02x:%02x\n",
 		ipAdapter->Address [0],
 		ipAdapter->Address [1],
 		ipAdapter->Address [2],
@@ -309,16 +309,16 @@ testWinNetworkAdapterList2 ()
 	dword_t actualSize;
 
 	for (;;)
-	{	
+	{
 		int result = ::WSAIoctl (
 			socket,
 			SIO_GET_INTERFACE_LIST,
-			NULL, 
+			NULL,
 			0,
 			buffer.p (),
 			size,
 			&actualSize,
-			NULL, 
+			NULL,
 			NULL
 			);
 
@@ -338,8 +338,8 @@ testWinNetworkAdapterList2 ()
 
 	const INTERFACE_INFO* iface = (const INTERFACE_INFO*) buffer.cp ();
 	size_t ifaceCount = actualSize / sizeof (INTERFACE_INFO);
-	
-	for (size_t i = 0; i < ifaceCount; iface++, i++) 
+
+	for (size_t i = 0; i < ifaceCount; iface++, i++)
 	{
 		printf ("Interface #%d\n", i);
 		printf ("  Address   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiAddress).sz ());
@@ -375,7 +375,7 @@ testWinNetworkAdapterList2 ()
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 void
 testNetworkAdapterList ()
@@ -398,9 +398,9 @@ testNetworkAdapterList ()
 		for (size_t i = 1; addressIt; addressIt++, i++)
 		{
 			io::NetworkAdapterAddress* address = *addressIt;
-			
+
 			uint_t family = address->m_address.m_addr.sa_family;
-			printf ("%-11s = %s", 
+			printf ("%-11s = %s",
 				io::getSockAddrFamilyString (family),
 				address->m_address.getString ().sz ()
 				);
@@ -423,7 +423,7 @@ testNetworkAdapterList ()
 	printf ("%d adapters found\n", adapterList.getCount ());
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testParseFormatIp6 ()
@@ -484,7 +484,7 @@ testParseFormatIp6 ()
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testSocketIp6 ()
@@ -498,7 +498,7 @@ testSocketIp6 ()
 		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
-	
+
 	io::SockAddr addr;
 	result = addr.parse ("[::1]:80");
 	if (!result)
@@ -516,7 +516,7 @@ testSocketIp6 ()
 
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testAddrInfoIp6 ()
@@ -538,13 +538,13 @@ testAddrInfoIp6 ()
 		printf ("    %s\n", addrArray [i].getString ().sz ());
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testDynamicLibrary ()
 {
 	sys::DynamicLibrary dl;
-	
+
 	bool result = dl.open ("libc.so.6");
 	if (!result)
 	{
@@ -563,16 +563,16 @@ testDynamicLibrary ()
 	prn ("hui govno i muravei %d\n", 123);
 }
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 bar ()
 {
 	printf ("bar -- throwing...\n");
-	AXL_SYS_SJLJ_THROW ();	
+	AXL_SYS_SJLJ_THROW ();
 }
 
-void 
+void
 testLongJmpTry ()
 {
 	AXL_SYS_BEGIN_SJLJ_TRY ()
@@ -618,7 +618,7 @@ testLongJmpTry ()
 	printf ("done\n");
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testRegExp ()
@@ -628,10 +628,10 @@ testRegExp ()
 	nameMgr.addName ("ws",  "[ \\t\\r\\n]");
 	nameMgr.addName ("dec", "[0-9]");
 
-	fsm::RegExp regExp;	
+	fsm::RegExp regExp;
 	fsm::RegExpCompiler regExpCompiler (&regExp, &nameMgr);
 
-/*	char const* src [] = 
+/*	char const* src [] =
 	{
 		"'\\x02' V '\\r'",
 	};
@@ -661,18 +661,18 @@ testRegExp ()
 	regExp.print ();
 }
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
-//.............................................................................
+//..............................................................................
 
 enum
 {
 	BufferSize = 4 * 1024,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 testNamedPipes ()
@@ -687,7 +687,7 @@ testNamedPipes ()
 	{
 		err::setLastSystemError ();
 		printf ("cannot find NtQueryDirectoryFile: %s\n", err::getLastErrorDescription ().sz ());
-		return; 
+		return;
 	}
 
 	io::win::File pipeDir;
@@ -700,13 +700,13 @@ testNamedPipes ()
 		0
 		);
 
-	if (!result) 
+	if (!result)
 	{
 		err::setLastSystemError ();
 		printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
-		return; 
+		return;
 	}
- 
+
 	sl::Array <char> dirBuffer;
 	dirBuffer.setCount (BufferSize);
 
@@ -715,20 +715,20 @@ testNamedPipes ()
 	BOOLEAN isFirstQuery = TRUE;
 
 	for (;;)
-	{ 
+	{
 		IO_STATUS_BLOCK ioStatus;
 
 		status = ntQueryDirectoryFile (
-			pipeDir, 
-			NULL, 
-			NULL, 
-			0, 
+			pipeDir,
+			NULL,
+			NULL,
+			0,
 			&ioStatus,
-			dirBuffer, 
+			dirBuffer,
 			dirBuffer.getCount (),
 			FileDirectoryInformation,
-			FALSE, 
-			NULL, 
+			FALSE,
+			NULL,
 			isFirstQuery
 			);
 
@@ -739,32 +739,32 @@ testNamedPipes ()
 
 			err::setError (sys::win::NtStatus (status));
 			printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
-			return; 
+			return;
 		}
 
 		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*) dirBuffer.p ();
-		for (;;) 
+		for (;;)
 		{
 			fileName.copy (dirInfo->FileName, dirInfo->FileNameLength / 2);
 
 			printf (
-				dirInfo->AllocationSize.LowPart == -1 ? "%S (%d)\n" : "%S (%d of %d)\n", 
-				fileName.sz (), 
+				dirInfo->AllocationSize.LowPart == -1 ? "%S (%d)\n" : "%S (%d of %d)\n",
+				fileName.sz (),
 				dirInfo->EndOfFile.LowPart,
 				dirInfo->AllocationSize.LowPart
 				);
- 
-			if (!dirInfo->NextEntryOffset) 
+
+			if (!dirInfo->NextEntryOffset)
 				break;
- 
-			dirInfo = (FILE_DIRECTORY_INFORMATION*) ((char*) dirInfo + dirInfo->NextEntryOffset); 
+
+			dirInfo = (FILE_DIRECTORY_INFORMATION*) ((char*) dirInfo + dirInfo->NextEntryOffset);
 		}
 
-		isFirstQuery = FALSE; 
+		isFirstQuery = FALSE;
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 querySymbolicLink (
@@ -784,7 +784,7 @@ querySymbolicLink (
 
 	io::win::File link;
 	status = ntOpenSymbolicLinkObject (
-		link.p (), 
+		link.p (),
 		GENERIC_READ,
 		&oa
 		);
@@ -816,28 +816,28 @@ querySymbolicLink (
 	return true;
 }
 
-void 
+void
 enumerateDirectory (
 	HANDLE baseDir,
 	const wchar_t* name,
 	size_t level
 	)
-{ 
+{
 	NTSTATUS status;
 
 	UNICODE_STRING uniName;
 	uniName.Buffer = (wchar_t*) name;
 	uniName.Length = wcslen_s (name) * sizeof (wchar_t);
 	uniName.MaximumLength = uniName.Length + sizeof (wchar_t);
-	
+
 	OBJECT_ATTRIBUTES oa = { 0 };
 	oa.Length = sizeof (oa);
 	oa.RootDirectory = baseDir;
 	oa.ObjectName = &uniName;
-		
+
 	io::win::File dir;
 	status = ntOpenDirectoryObject (
-		dir.p (), 
+		dir.p (),
 		DIRECTORY_QUERY | DIRECTORY_TRAVERSE,
 		&oa
 		);
@@ -846,7 +846,7 @@ enumerateDirectory (
 	{
 		err::setError (sys::win::NtStatus (status));
 		printf ("cannot open directory: %s\n", err::getLastErrorDescription ().sz ());
-		return; 
+		return;
 	}
 
 	sl::Array <char> buffer;
@@ -867,9 +867,9 @@ enumerateDirectory (
 		ULONG actualSize;
 
 		status = ntQueryDirectoryObject (
-			dir, 
-			buffer, 
-			buffer.getCount (), 
+			dir,
+			buffer,
+			buffer.getCount (),
 			FALSE,
 			isFirstQuery,
 			&queryContext,
@@ -883,7 +883,7 @@ enumerateDirectory (
 
 			err::setError (sys::win::NtStatus (status));
 			printf ("cannot query directory: %s\n", err::getLastErrorDescription ().sz ());
-			return; 
+			return;
 		}
 
 		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*) buffer.p ();
@@ -941,7 +941,7 @@ testTcp ()
 	a.sin_port = htons (10001);
 
 	printf ("connecting...\n");
-	int result = connect (s, (const sockaddr*) &a, sizeof (a));	
+	int result = connect (s, (const sockaddr*) &a, sizeof (a));
 	printf ("result = %d\n", result);
 
 	char buf [512];
@@ -969,7 +969,7 @@ testTcp ()
 	printf ("done.\n");
 }
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
@@ -981,17 +981,17 @@ printWinErrorDescription (
 	)
 {
 	wchar_t* message = NULL;
-	
-	::FormatMessageW ( 
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-		FORMAT_MESSAGE_FROM_SYSTEM | 
+
+	::FormatMessageW (
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS |
 		FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
 		NULL,
 		code,
 		MAKELANGID (langId, subLangId),
-		(LPWSTR) &message, 
-		0, 
+		(LPWSTR) &message,
+		0,
 		NULL
 		);
 
@@ -1001,11 +1001,11 @@ printWinErrorDescription (
 	printf ("%d/%d: %s\n", langId, subLangId, description.sz ());
 }
 
-void 
+void
 testWinError ()
 {
 	dword_t error = ERROR_ACCESS_DENIED;
-	
+
 	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_NEUTRAL);
 	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_DEFAULT);
 	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_SYS_DEFAULT);
@@ -1013,7 +1013,7 @@ testWinError ()
 	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_NEUTRAL);
 	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_DEFAULT);
 	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT);
-	
+
 	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_NEUTRAL);
 	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_DEFAULT);
 	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_SYS_DEFAULT);
@@ -1033,11 +1033,11 @@ testTimestamp ()
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 #ifdef _AXL_IO_USB
 
-sl::String 
+sl::String
 getUsbStringDescriptorText (
 	io::UsbDevice* device,
 	size_t index
@@ -1050,7 +1050,7 @@ getUsbStringDescriptorText (
 		text = "NOT OPENED";
 	}
 	else
-	{	
+	{
 		bool result = device->getStringDesrciptor (index, &text);
 		if (!result)
 			text.format ("ERROR (%s)", err::getLastErrorDescription ().sz ());
@@ -1159,7 +1159,7 @@ printUsbDevice (io::UsbDevice* device)
 	}
 }
 
-void 
+void
 testUsb ()
 {
 	bool result;
@@ -1181,11 +1181,11 @@ testUsb ()
 		printf ("----------------------\nDevice #%d\n", i);
 
 		io::UsbDevice device;
-		device.setDevice (*pp);		
+		device.setDevice (*pp);
 
 		result = device.open ();
 		if (!result)
-			printf ("Cannot open device (%s)\n", err::getLastErrorDescription ().sz ());		
+			printf ("Cannot open device (%s)\n", err::getLastErrorDescription ().sz ());
 
 		printUsbDevice (&device); // even if not opened
 	}
@@ -1193,7 +1193,7 @@ testUsb ()
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_POSIX)
 
@@ -1207,7 +1207,7 @@ public:
 		m_terminateFlag = false;
 	}
 
-	void 
+	void
 	threadFunc ()
 	{
 		uint64_t tid = getThreadId ();
@@ -1357,7 +1357,7 @@ void testSuspendThread ()
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 class Gc;
 
@@ -1480,7 +1480,7 @@ protected:
 		void* context
 		)
 	{
-		if (signal != SIGSEGV || 
+		if (signal != SIGSEGV ||
 			signalInfo->si_addr != g_gc->m_guardPage ||
 			g_gc->m_handshakeKind != HandshakeKind_StopTheWorld)
 			return; // ignore
@@ -1584,15 +1584,15 @@ public:
 		return true;
 	}
 
-	int 
+	int
 	handleException (
-		uint_t code, 
+		uint_t code,
 		EXCEPTION_POINTERS* exceptionPointers
-		) 
+		)
 	{
-		if (code != EXCEPTION_ACCESS_VIOLATION || 
+		if (code != EXCEPTION_ACCESS_VIOLATION ||
 		   exceptionPointers->ExceptionRecord->ExceptionInformation [1] != (uintptr_t) m_guardPage.p () ||
-		   m_handshakeKind != HandshakeKind_StopTheWorld) 
+		   m_handshakeKind != HandshakeKind_StopTheWorld)
 		  return EXCEPTION_CONTINUE_SEARCH;
 
 		int32_t count = sys::atomicDec (&g_gc->m_handshakeCounter);
@@ -1652,9 +1652,9 @@ public:
 			sys::sleep (200);
 			g_gc->gcSafePoint ();
 		}
-		
+
 		printf ("  mutator thread TID:%lld is finished.\n", threadId);
-		
+
 		GC_END ()
 	}
 };
@@ -1700,7 +1700,7 @@ testGcSafePoints ()
 	g_gc = NULL;
 }
 
-//.............................................................................
+//..............................................................................
 
 struct IfaceHdr
 {
@@ -1730,7 +1730,7 @@ testInheritance ()
 	new (buffer) Foo ();
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testTimestamps ()
@@ -1770,7 +1770,7 @@ testTimestamps ()
 	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
 }
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 void
@@ -1793,7 +1793,7 @@ testProcess ()
 }
 #endif
 
-//.............................................................................
+//..............................................................................
 
 void
 testSharedMemoryTransport ()
@@ -1802,9 +1802,9 @@ testSharedMemoryTransport ()
 
 	io::SharedMemoryReader reader;
 	result = reader.open (
-		"c:/9141b219-d4af-4f40-96b9-92da376bf3c9.shm", 
-		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e", 
-		"00c34a43-45a4-4137-965e-3b172d3a54ed", 
+		"c:/9141b219-d4af-4f40-96b9-92da376bf3c9.shm",
+		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e",
+		"00c34a43-45a4-4137-965e-3b172d3a54ed",
 		io::SharedMemoryTransportFlag_Create | io::SharedMemoryTransportFlag_Message | io::SharedMemoryTransportFlag_DeleteOnClose
 		);
 
@@ -1816,9 +1816,9 @@ testSharedMemoryTransport ()
 
 	io::SharedMemoryWriter writer;
 	result = writer.open (
-		"c:/9141b219-d4af-4f40-96b9-92da376bf3c9.shm", 
-		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e", 
-		"00c34a43-45a4-4137-965e-3b172d3a54ed", 
+		"c:/9141b219-d4af-4f40-96b9-92da376bf3c9.shm",
+		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e",
+		"00c34a43-45a4-4137-965e-3b172d3a54ed",
 		io::SharedMemoryTransportFlag_Message
 		);
 
@@ -1837,7 +1837,7 @@ testSharedMemoryTransport ()
 	printf ("reader.read () returned: %s\n", a.cp ());
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testZip ()
@@ -1889,7 +1889,7 @@ testZip ()
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testEnumSerial ()
@@ -1904,7 +1904,7 @@ testEnumSerial ()
 	printf ("%d ports total\n", portList.getCount ());
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 testEncoding ()
@@ -1914,7 +1914,7 @@ testEncoding ()
 	printf ("%s\n", s.sz ());
 }
 
-//.............................................................................
+//..............................................................................
 
 // AXL_NO_ASAN
 void
@@ -1931,7 +1931,7 @@ int foo (jmp_buf buf)
 	return 0;
 }
 
-//.............................................................................
+//..............................................................................
 
 #pragma pack ()
 
@@ -1971,7 +1971,7 @@ struct F4
 
 #pragma pack (8)
 
-struct F8  
+struct F8
 {
 	uint8_t m_int8_1;
 	uint64_t m_int64;
@@ -1990,15 +1990,15 @@ testPacking ()
 	printf ("s0 = %d; s1 = %d; s2 = %d; s4 = %d; s8 = %d\n", s0, s1, s2, s4, s8);
 }
 
-//.............................................................................
+//..............................................................................
 
 uint16_t crc16_ansi (
-	void const* p, 
+	void const* p,
 	size_t size,
 	uint16_t seed = 0
 	)
 {
-	static uint16_t const crcTable [256] = 
+	static uint16_t const crcTable [256] =
 	{
 		0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241,
 		0xc601, 0x06c0, 0x0780, 0xc741, 0x0500, 0xc5c1, 0xc481, 0x0440,
@@ -2103,7 +2103,7 @@ uint16_t crc16_ccit (
 void
 testModBus ()
 {
-	uint8_t packet [] = 
+	uint8_t packet [] =
 	{
 		0x01, 0x03, 0x00, 0x30, 0x00, 0x01, // 0x00, 0x00,
 	};
@@ -2112,7 +2112,7 @@ testModBus ()
 		"crc16        = %04x\n"
 		"crc16 modbus = %04x\n"
 		"crc16 xmodem = %04x\n"
-		"crc16 ffff   = %04x\n", 
+		"crc16 ffff   = %04x\n",
 		crc16_ansi (packet, sizeof (packet), 0),
 		crc16_ansi (packet, sizeof (packet), 0xffff),
 		crc16_ccit (packet, sizeof (packet), 0),
@@ -2123,16 +2123,16 @@ testModBus ()
 
 	uint64_t timeout_1_5;
 	uint64_t timeout_3_5;
-	
+
 	if (baud > 19200)
 	{
-		timeout_1_5 = 7500; 
-		timeout_3_5 = 17500; 
+		timeout_1_5 = 7500;
+		timeout_3_5 = 17500;
 	}
-	else 
+	else
 	{
-		timeout_1_5 = 150000000 / baud; 
-		timeout_3_5 = 350000000 / baud; 
+		timeout_1_5 = 150000000 / baud;
+		timeout_3_5 = 350000000 / baud;
 	}
 
 	sl::String s_1_5 = sys::Time (timeout_1_5, false).format ("%s.%l.%c");
@@ -2141,28 +2141,28 @@ testModBus ()
 	printf ("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.sz (), s_3_5.sz ());
 }
 
-//.............................................................................
+//..............................................................................
 
 uint_t calcChecksum16 (
-	const uint8_t* p0, 
+	const uint8_t* p0,
 	size_t size
-	) 
+	)
 {
 	uint16_t const* p = (uint16_t const*) p0;
 	void const* end = p0 + (size & ~1);
 
 	uint_t checksum = 0;
-	
+
 	for (; p < end; p++)
 		checksum += htons (*p);
-  
-	if (size & 1) 
+
+	if (size & 1)
 		checksum += *(uint8_t const*) p << 8;
 
 	return checksum;
 }
 
-uint16_t adjustIpCheckSum (uint_t checksum) 
+uint16_t adjustIpCheckSum (uint_t checksum)
 {
 	checksum = (checksum >> 16) + (checksum & 0xffff);
 	checksum += checksum >> 16;
@@ -2178,25 +2178,25 @@ uint16_t calcIpHdrChecksum (const uint8_t* ipHdr, size_t size)
 void
 testIpChecksum ()
 {
-	uint8_t data1_0 [] = 
+	uint8_t data1_0 [] =
 	{
 		0x45, 0x00, 0x00, 0x1e, 0x7e, 0x8b, 0x00, 0x00, 0x80, 0x11, 0x37, 0x7d, 0xc0, 0xa8, 0x01, 0x77,
 		0xc0, 0xa8, 0x01, 0xff
 	};
 
-	uint8_t data1 [] = 
+	uint8_t data1 [] =
 	{
 		0x45, 0x00, 0x00, 0x1e, 0x7e, 0x8b, 0x00, 0x00, 0x80, 0x11, 0x00, 0x00, 0xc0, 0xa8, 0x01, 0x77,
 		0xc0, 0xa8, 0x01, 0xff
 	};
 
-	uint8_t data2_0 [] = 
+	uint8_t data2_0 [] =
 	{
 		0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00, 0x40, 0x11, 0xb8, 0x61, 0xc0, 0xa8, 0x00, 0x01,
 		0xc0, 0xa8, 0x00, 0xc7
 	};
 
-	uint8_t data2 [] = 
+	uint8_t data2 [] =
 	{
 		0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00, 0x40, 0x11, 0x00, 0x00, 0xc0, 0xa8, 0x00, 0x01,
 		0xc0, 0xa8, 0x00, 0xc7
@@ -2221,7 +2221,7 @@ encodeNetBiosName (
 		uchar_t c = name [i];
 		if (!c)
 			break;
-		
+
 		c = toupper (c);
 
 		buffer [j++] = 'A' + (c >> 4);
@@ -2238,7 +2238,7 @@ encodeNetBiosName (
 	}
 
 	return j;
-}	
+}
 
 size_t
 decodeNetBiosName (
@@ -2256,7 +2256,7 @@ decodeNetBiosName (
 	{
 		uchar_t hi = name [i++] - 'A';
 		uchar_t lo = name [i++] - 'A';
-		
+
 		buffer [j++] = lo + (hi << 4);
 	}
 
@@ -2272,64 +2272,64 @@ testNetBios ()
 	size_t length = 32; //encodeNetBiosName (buffer, name);
 	printf ("%s\n", buffer);
 
-	char buffer2 [1024] = { 0 };	
+	char buffer2 [1024] = { 0 };
 	decodeNetBiosName (buffer2, buffer, length);
 	printf ("%s\n", buffer2);
 }
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
 BOOL WriteSlot(HANDLE hSlot, const char* lpszMessage)
 {
-   BOOL fResult; 
-   DWORD cbWritten; 
- 
-   fResult = ::WriteFile(hSlot, 
-	 lpszMessage, 
+   BOOL fResult;
+   DWORD cbWritten;
+
+   fResult = ::WriteFile(hSlot,
+	 lpszMessage,
 	 strlen (lpszMessage),
-	 &cbWritten, 
-	 (LPOVERLAPPED) NULL); 
- 
-   if (!fResult) 
-   { 
-	  printf("WriteFile failed with %d.\n", GetLastError()); 
-	  return FALSE; 
-   } 
- 
-   printf("Slot written to successfully.\n"); 
+	 &cbWritten,
+	 (LPOVERLAPPED) NULL);
+
+   if (!fResult)
+   {
+	  printf("WriteFile failed with %d.\n", GetLastError());
+	  return FALSE;
+   }
+
+   printf("Slot written to successfully.\n");
 
    return TRUE;
 }
 
 BOOL ReadSlot(HANDLE hSlot)
 {
-   BOOL fResult; 
-   DWORD cbRead; 
- 
+   BOOL fResult;
+   DWORD cbRead;
+
    char buffer [256];
 
    fResult = ReadFile (hSlot, buffer, sizeof (buffer) - 1, &cbRead, NULL);
-   if (!fResult) 
-   { 
-	  printf("ReadFile failed with %d.\n", GetLastError()); 
+   if (!fResult)
+   {
+	  printf("ReadFile failed with %d.\n", GetLastError());
 	  return FALSE;
-   } 
- 
+   }
+
    buffer [cbRead] = 0;
-   printf("Read from slot: %s\n", buffer); 
+   printf("Read from slot: %s\n", buffer);
 
    return TRUE;
 }
 
 void
 testMailSlot ()
-{ 
+{
 	printf ("1 for server, 2 for client:\n");
 	char buffer [256];
 	gets (buffer);
-	
+
 	if (buffer [0] == '1')
 	{
 	char slotName [256];
@@ -2337,13 +2337,13 @@ testMailSlot ()
 	gets (slotName);
 
 		HANDLE hFile = CreateMailslotA (slotName, 0, -1, NULL);
-	   if (hFile == INVALID_HANDLE_VALUE) 
-	   { 
-		  printf("CreateMailslot failed with %d.\n", GetLastError()); 
-		  return; 
-	   } 
+	   if (hFile == INVALID_HANDLE_VALUE)
+	   {
+		  printf("CreateMailslot failed with %d.\n", GetLastError());
+		  return;
+	   }
 
-	  printf("Server is running...\n"); 
+	  printf("Server is running...\n");
 
 		for (;;)
 		{
@@ -2351,41 +2351,41 @@ testMailSlot ()
 		}
 	}
 	else for (;;)
-	{	
+	{
 
 	char slotName [256];
 	printf ("slot name (e.g. \\\\*\\mailslot\\foo):\n");
 	gets (slotName);
 
-		HANDLE hFile; 
+		HANDLE hFile;
 
 	   hFile = CreateFileA (
-		   slotName, 
-		 GENERIC_READ | GENERIC_WRITE, 
+		   slotName,
+		 GENERIC_READ | GENERIC_WRITE,
 		 FILE_SHARE_READ | FILE_SHARE_WRITE,
-		 (LPSECURITY_ATTRIBUTES) NULL, 
-		 OPEN_EXISTING, 
-		 FILE_ATTRIBUTE_NORMAL, 
-		 (HANDLE) NULL); 
- 
-	   if (hFile == INVALID_HANDLE_VALUE) 
-	   { 
-		  printf("CreateFile failed with %d.\n", GetLastError()); 
-		  return; 
-	   } 
+		 (LPSECURITY_ATTRIBUTES) NULL,
+		 OPEN_EXISTING,
+		 FILE_ATTRIBUTE_NORMAL,
+		 (HANDLE) NULL);
+
+	   if (hFile == INVALID_HANDLE_VALUE)
+	   {
+		  printf("CreateFile failed with %d.\n", GetLastError());
+		  return;
+	   }
 
 	   ReadSlot(hFile);
 
 	   WriteSlot(hFile, "Message one for mailslot.");
 	   WriteSlot(hFile, "Message two for mailslot.");
- 
-	   CloseHandle(hFile); 
-	} 
+
+	   CloseHandle(hFile);
+	}
 }
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 #ifdef _AXL_XML
 
@@ -2400,7 +2400,7 @@ public:
 		m_indent = 0;
 	}
 
-	void 
+	void
 	onStartElement (
 		const char* name,
 		const char** attributes
@@ -2413,7 +2413,7 @@ public:
 		{
 			printf ("\n");
 			m_indent++;
-			
+
 			while (*attributes)
 			{
 				printIndent ();
@@ -2429,7 +2429,7 @@ public:
 		m_indent++;
 	}
 
-	void 
+	void
 	onEndElement (const char* name)
 	{
 		m_indent--;
@@ -2437,18 +2437,18 @@ public:
 		printf ("</%s>\n", name);
 	}
 
-	void 
+	void
 	onCharacterData (
 		const char* string,
 		size_t length
 		)
-	{		
+	{
 		printIndent ();
 		printf ("%s\n", sl::String (string, length).sz ());
 	}
 
 protected:
-	void 
+	void
 	printIndent ()
 	{
 		for (size_t i = 0; i < m_indent; i++)
@@ -2503,7 +2503,7 @@ testStringCase ()
 	printf ("s = %s\n", s.sz ());
 }
 
-//.............................................................................
+//..............................................................................
 
 enum CmdLineSwitchKind
 {
@@ -2515,7 +2515,7 @@ enum CmdLineSwitchKind
 	CmdLineSwitchKind_Remove,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (CmdLineSwitchTable, CmdLineSwitchKind)
 	AXL_SL_CMD_LINE_SWITCH_2 (
@@ -2545,7 +2545,7 @@ AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (CmdLineSwitchTable, CmdLineSwitchKind)
 		)
 AXL_SL_END_CMD_LINE_SWITCH_TABLE ()
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CmdLineParser: public sl::CmdLineParser <CmdLineParser, CmdLineSwitchTable>
 {
@@ -2631,7 +2631,7 @@ main (
 {
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
-	WSAStartup (0x0202, &wsaData);	
+	WSAStartup (0x0202, &wsaData);
 #endif
 
 	testCmdLine (argc, argv);
@@ -2642,4 +2642,4 @@ main (
 	return 0;
 }
 
-//.............................................................................
+//..............................................................................

@@ -9,7 +9,7 @@
 namespace axl {
 namespace st {
 
-//.............................................................................
+//..............................................................................
 
 enum TokenKind
 {
@@ -20,7 +20,7 @@ enum TokenKind
 	TokenKind_Data,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_LEX_BEGIN_TOKEN_NAME_MAP (TokenName)
 	AXL_LEX_TOKEN_NAME (TokenKind_Eof,       "eof")
@@ -30,11 +30,11 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP (TokenName)
 	AXL_LEX_TOKEN_NAME (TokenKind_Data,      "user-data")
 AXL_LEX_END_TOKEN_NAME_MAP ();
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef lex::RagelToken <TokenKind, TokenName> Token;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum LexerMachineKind
 {
@@ -43,7 +43,7 @@ enum LexerMachineKind
 	LexerMachineKind_UserCode,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Lexer: public lex::RagelLexer <Lexer, Token>
 {
@@ -69,14 +69,14 @@ protected:
 
 	// implemented in *.rl
 
-	void 
+	void
 	init ();
 
 	void
 	exec ();
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace st
 } // namespace axl

@@ -4,19 +4,19 @@
 namespace axl {
 namespace enc {
 
-//.............................................................................
+//..............................................................................
 
-CharCodec* 
+CharCodec*
 getCharCodec (CharCodecKind codecKind)
 {
-	static AsciiCodec          asciiCodec; 
-	static UtfCodec <Utf8>     utf8Codec; 
-	static UtfCodec <Utf16>    utf16Codec; 
-	static UtfCodec <Utf16_be> utf16Codec_be; 
-	static UtfCodec <Utf32>    utf32Codec; 
-	static UtfCodec <Utf32_be> utf32Codec_be; 
-	
-	static CharCodec* codecTable [] = 
+	static AsciiCodec          asciiCodec;
+	static UtfCodec <Utf8>     utf8Codec;
+	static UtfCodec <Utf16>    utf16Codec;
+	static UtfCodec <Utf16_be> utf16Codec_be;
+	static UtfCodec <Utf32>    utf32Codec;
+	static UtfCodec <Utf32_be> utf32Codec_be;
+
+	static CharCodec* codecTable [] =
 	{
 		&asciiCodec,
 		&utf8Codec,
@@ -29,7 +29,7 @@ getCharCodec (CharCodecKind codecKind)
 	return (size_t) codecKind < countof (codecTable) ? codecTable [codecKind] : NULL;
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 CharCodec::encodeFromUtf8 (
@@ -47,7 +47,7 @@ CharCodec::encodeFromUtf8 (
 	while (p < end)
 	{
 		char tmpBuffer [256];
-		
+
 		size_t takenBufferSize;
 		size_t takenLength;
 
@@ -81,7 +81,7 @@ CharCodec::encodeFromUtf16 (
 	while (p < end)
 	{
 		char tmpBuffer [256];
-		
+
 		size_t takenBufferSize;
 		size_t takenLength;
 
@@ -115,7 +115,7 @@ CharCodec::encodeFromUtf32 (
 	while (p < end)
 	{
 		char tmpBuffer [256];
-		
+
 		size_t takenBufferSize;
 		size_t takenLength;
 
@@ -133,7 +133,7 @@ CharCodec::encodeFromUtf32 (
 	return buffer->getCount ();
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::Array <char>
 CharCodec::encodeFromUtf8 (
@@ -168,7 +168,7 @@ CharCodec::encodeFromUtf32 (
 	return buffer;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 CharCodec::decodeToUtf8 (
@@ -190,7 +190,7 @@ CharCodec::decodeToUtf8 (
 	while (p < end)
 	{
 		utf8_t tmpBuffer [256];
-		
+
 		size_t takenBufferSize;
 		size_t takenLength;
 
@@ -228,7 +228,7 @@ CharCodec::decodeToUtf16 (
 	while (p < end)
 	{
 		utf16_t tmpBuffer [256];
-		
+
 		size_t takenBufferSize;
 		size_t takenLength;
 
@@ -266,7 +266,7 @@ CharCodec::decodeToUtf32 (
 	while (p < end)
 	{
 		utf32_t tmpBuffer [256];
-		
+
 		size_t takenBufferSize;
 		size_t takenLength;
 
@@ -317,7 +317,7 @@ CharCodec::decodeToUtf32 (
 	return buffer;
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 CodePointDecoder::loadState (uint32_t state)
@@ -355,7 +355,7 @@ CodePointDecoder::decode (
 
 	if (m_accumulatorExpectedSize)
 	{
-		size_t accumulatorMissingSize = m_accumulatorExpectedSize - m_accumulatorCurrentSize;		
+		size_t accumulatorMissingSize = m_accumulatorExpectedSize - m_accumulatorCurrentSize;
 
 		if (size < accumulatorMissingSize) // not yet
 		{
@@ -367,10 +367,10 @@ CodePointDecoder::decode (
 		memcpy (m_accumulator + m_accumulatorCurrentSize, p, accumulatorMissingSize);
 
 		m_charCodec->decodeToUtf32 (
-			codePoint, 
-			1, 
-			m_accumulator, 
-			m_accumulatorExpectedSize, 
+			codePoint,
+			1,
+			m_accumulator,
+			m_accumulatorExpectedSize,
 			&takenBufferLength,
 			&takenSize,
 			&expectedSize
@@ -379,8 +379,8 @@ CodePointDecoder::decode (
 		if (!takenBufferLength) // still not yet (rare, but might actually happen with UTF-16)
 		{
 			ASSERT (
-				m_accumulatorCurrentSize == 1 && 
-				m_accumulatorExpectedSize == 2 && 
+				m_accumulatorCurrentSize == 1 &&
+				m_accumulatorExpectedSize == 2 &&
 				expectedSize == 4
 				);
 
@@ -403,9 +403,9 @@ CodePointDecoder::decode (
 	}
 
 	m_charCodec->decodeToUtf32 (
-		codePoint, 
-		1, 
-		p, 
+		codePoint,
+		1,
+		p,
 		size,
 		&takenBufferLength,
 		&takenSize,
@@ -425,7 +425,7 @@ CodePointDecoder::decode (
 	return takenSize;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace enc
 } // namespace axl

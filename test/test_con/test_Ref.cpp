@@ -1,8 +1,8 @@
 #include "pch.h"
 
-namespace test_Ref { 
+namespace test_Ref {
 
-//.............................................................................
+//..............................................................................
 
 class MyClass
 {
@@ -41,21 +41,21 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class DcbGetSize
 {
 public:
-	size_t 
+	size_t
 	operator () (const DCB& dcb)
 	{
 		return dcb.DCBlength;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-void 
+void
 run_Buf ()
 {
 	sl::String s;
@@ -83,7 +83,7 @@ run_Buf ()
 	a.m_y = 2;
 
 	ref::Buf <MyClass> b1;
-	
+
 	b1 = a;
 	b1->m_x = 10;
 	b1->m_y = 20;
@@ -98,7 +98,7 @@ run_Buf ()
 	//b2 = b1;
 }
 
-//.............................................................................
+//..............................................................................
 
 class MyClass2: public ref::RefCount
 {
@@ -114,7 +114,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 run_WeakRef ()
@@ -127,7 +127,7 @@ run_WeakRef ()
 	p = w;
 }
 
-//.............................................................................
+//..............................................................................
 
 class C1
 {
@@ -148,7 +148,7 @@ public:
 	int m_x;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 run_Clone ()
@@ -164,7 +164,7 @@ run_Clone ()
 //	b = ref::Clone (a);
 }
 
-//.............................................................................
+//..............................................................................
 
 struct IMyInterface
 {
@@ -173,7 +173,7 @@ struct IMyInterface
 	virtual void doSomethingElse () = 0;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class MyClass4: public IMyInterface
 {
@@ -194,9 +194,9 @@ public:
 		{ printf ("CMyClass4::DoSomethingElse ()\n"); }
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyContainer: 
+class MyContainer:
 	public ref::RefCount,
 	public IMyInterface
 {
@@ -216,7 +216,7 @@ public:
 		{ printf ("CMyContainer::~CMyContainer ()\n"); }
 
 	ref::Ptr <IMyInterface> getChild (int i)
-	{ 
+	{
 		switch (i)
 		{
 		case 0:
@@ -240,9 +240,9 @@ public:
 		{ printf ("CMyContainer::DoSomethingElse ()\n"); }
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MySuperContainer: 
+class MySuperContainer:
 	public ref::RefCount,
 	public IMyInterface
 {
@@ -262,7 +262,7 @@ public:
 		{ printf ("CMySuperContainer::~CMySuperContainer ()\n"); }
 
 	ref::Ptr <IMyInterface> getChild (int i)
-	{ 
+	{
 		switch (i)
 		{
 		case 0:
@@ -286,10 +286,10 @@ public:
 		{ printf ("CMySuperContainer::DoSomethingElse ()\n"); }
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-void 
-run_Container () 
+void
+run_Container ()
 {
 	ref::Ptr <IMyInterface> p;
 	ref::Ptr <IMyInterface> p2;
@@ -305,7 +305,7 @@ run_Container ()
 	p2 = p->getChild (2);
 
 	p->getChild (2)->doSomething ();
-	p->getChild (2)->doSomethingElse (); 
+	p->getChild (2)->doSomethingElse ();
 
 	p = ref::PtrKind_Null;
 
@@ -315,7 +315,7 @@ run_Container ()
 	p3 = AXL_REF_NEW (ref::Box <MyClass4>);
 
 	ref::WeakPtr <IMyInterface> w = p3;
-	p3->doSomethingElse ();	
+	p3->doSomethingElse ();
 
 	p3 = ref::PtrKind_Null;
 
@@ -324,6 +324,6 @@ run_Container ()
 //	w.Detach ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Ref

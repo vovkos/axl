@@ -3,7 +3,7 @@
 #include "axl_err_Error.h"
 #include "axl_enc_Utf.h"
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_DARWIN)
 char*
@@ -31,9 +31,9 @@ get_current_dir_name ()
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
-sl::String 
+sl::String
 getTempDir ()
 {
 #if (_AXL_OS_WIN)
@@ -64,7 +64,7 @@ sl::String
 getExeFilePath ()
 {
 	char buffer [1024] = { 0 };
-	
+
 #if (_AXL_OS_WIN)
 	::GetModuleFileNameA (::GetModuleHandle (NULL), buffer, countof (buffer) - 1);
 #elif (_AXL_OS_POSIX)
@@ -175,7 +175,7 @@ bool
 ensureDirExists (const sl::StringRef& fileName0)
 {
 	sl::String fileName = fileName0;
-	
+
 	if (isDir (fileName))
 		return true;
 
@@ -361,7 +361,7 @@ findFilePath (
 	return sl::String ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

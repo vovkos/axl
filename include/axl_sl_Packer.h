@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_PACKER_H
 
@@ -12,8 +12,8 @@
 
 namespace axl {
 namespace sl {
-	
-//.............................................................................
+
+//..............................................................................
 
 class Packer
 {
@@ -25,7 +25,7 @@ public:
 		size_t* size,
 		axl_va_list va
 		) = 0;
-	
+
 	void
 	pack (
 		void* p,
@@ -55,7 +55,7 @@ public:
 		return count_va (va);
 	}
 
-	ref::Ptr <mem::Block> 
+	ref::Ptr <mem::Block>
 	createPackage_va (axl_va_list va)
 	{
 		size_t size = 0;
@@ -70,10 +70,10 @@ public:
 		package->m_p = package + 1;
 		package->m_size = size;
 
-		return package;			
+		return package;
 	}
 
-	ref::Ptr <mem::Block> 
+	ref::Ptr <mem::Block>
 	createPackage (
 		int unused,
 		...
@@ -84,7 +84,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename Pack>
 class PackerImpl: public Packer
@@ -109,7 +109,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // run-time sequencing
 
@@ -160,12 +160,12 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
-ref::Ptr <mem::Block> 
+ref::Ptr <mem::Block>
 formatPackage_va (
-	const char* formatString, 
+	const char* formatString,
 	axl_va_list va
 	)
 {
@@ -174,12 +174,12 @@ formatPackage_va (
 	return packer.createPackage_va (va);
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-ref::Ptr <mem::Block> 
+ref::Ptr <mem::Block>
 formatPackage (
-	const char* formatString, 
+	const char* formatString,
 	...
 	)
 {
@@ -187,9 +187,9 @@ formatPackage (
 	return formatPackage_va (formatString, va);
 }
 
-//.............................................................................
+//..............................................................................
 
-// package: 
+// package:
 
 class Package
 {
@@ -197,7 +197,7 @@ protected:
 	axl::sl::Array <uchar_t> m_buffer;
 
 public:
-	void 
+	void
 	clear ()
 	{
 		m_buffer.clear ();
@@ -236,7 +236,7 @@ public:
 		);
 /*
 	template <typename T>
-	size_t 
+	size_t
 	append (const T& data)
 	{
 		Packer* pack = PackerImpl <Pack <T> >::getSingleton ();
@@ -285,7 +285,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

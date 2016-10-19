@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-//.............................................................................
+//..............................................................................
 
 // no pragma once -- this is to allow multiple inclusions of this file for re-enabling
 // warning suppression (GCC loses warning suppression set up from precompiled headers)
@@ -41,7 +41,7 @@
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 
 /*

@@ -12,7 +12,7 @@
 namespace axl {
 namespace enc {
 
-//.............................................................................
+//..............................................................................
 
 class HexEncoding
 {
@@ -24,7 +24,7 @@ public:
 	};
 
 public:
-	static 
+	static
 	char
 	getHexChar_l (uchar_t x)
 	{
@@ -32,19 +32,19 @@ public:
 		return charTable [x & 0xf];
 	}
 
-	static 
+	static
 	char
 	getHexChar_u (uchar_t x)
 	{
-		static char charTable [] = "0123456789ABCDEF";	
+		static char charTable [] = "0123456789ABCDEF";
 		return charTable [x & 0xf];
 	}
 
-	static 
+	static
 	uchar_t
 	getHexCharValue (char x)
 	{
-		return 
+		return
 			x >= '0' && x <= '9' ? x - '0' :
 			x >= 'a' && x <= 'f' ? 10 + x - 'a' :
 			x >= 'A' && x <= 'F' ? 10 + x - 'A' : 0;
@@ -54,7 +54,7 @@ public:
 	size_t
 	encode (
 		sl::String* string,
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		);
@@ -62,7 +62,7 @@ public:
 	static
 	sl::String
 	encode (
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		)
@@ -93,7 +93,7 @@ protected:
 	void
 	encode_l (
 		char* dst,
-		const uchar_t* src, 
+		const uchar_t* src,
 		const uchar_t* srcEnd
 		);
 
@@ -101,7 +101,7 @@ protected:
 	void
 	encode_u (
 		char* dst,
-		const uchar_t* src, 
+		const uchar_t* src,
 		const uchar_t* srcEnd
 		);
 
@@ -109,7 +109,7 @@ protected:
 	void
 	encode_nsl (
 		char* dst,
-		const uchar_t* src, 
+		const uchar_t* src,
 		const uchar_t* srcEnd
 		);
 
@@ -117,12 +117,12 @@ protected:
 	void
 	encode_nsu (
 		char* dst,
-		const uchar_t* src, 
+		const uchar_t* src,
 		const uchar_t* srcEnd
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace enc
 } // namespace axl

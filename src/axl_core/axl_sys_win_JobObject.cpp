@@ -5,9 +5,9 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-size_t 
+size_t
 JobObject::queryInformation (
 	JOBOBJECTINFOCLASS infoClass,
 	void* p,
@@ -25,7 +25,7 @@ JobObject::queryInformation (
 	return resultSize;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

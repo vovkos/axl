@@ -2,7 +2,7 @@
 # Tibbo Technology Inc (C) 2004-2013. All rights reserved
 # Author: Vladimir Gladkov
 
-#..............................................................................
+#...............................................................................
 
 set (DOC_NAME      "AXL Reference")
 set (TEX_FILE_NAME axl.tex)
@@ -15,7 +15,7 @@ set (TEX_DIR  ${CMAKE_CURRENT_BINARY_DIR}/tex)
 set (PDF_DIR  ${CMAKE_CURRENT_BINARY_DIR}/pdf)
 set (TMP_DIR  ${CMAKE_CURRENT_BINARY_DIR}/tmp)
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 set (
 	DOXYGEN_CMD_LINE
@@ -64,7 +64,7 @@ set (
 	${TEX_FILE_NAME}
 	)
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 set (
 	CMD_LINE_VAR_LIST
@@ -79,14 +79,14 @@ set (
 
 foreach (_VAR ${CMD_LINE_VAR_LIST})
 	string (
-		REPLACE  
+		REPLACE
 		";" " "
 		${_VAR}
 		"${${_VAR}}"
 		)
 endforeach ()
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 configure_file (
 	Doxyfile.in
@@ -98,9 +98,9 @@ configure_file (
 	conf.py
 	)
 
-if (WIN32)	
+if (WIN32)
 	string (REPLACE "$(Configuration)" "%1" DOXYREST_EXE ${DOXYREST_EXE})
-	
+
 	configure_file (
 		build-rst.bat.in
 		build-rst.bat
@@ -114,7 +114,7 @@ if (WIN32)
 	configure_file (
 		build-pdf.bat.in
 		build-pdf.bat
-		)		
+		)
 else ()
 	axl_configure_file_w_permissions (
 		build-rst.sh.in
@@ -140,5 +140,5 @@ else ()
 		WORLD_READ WORLD_WRITE WORLD_EXECUTE
 		)
 endif ()
-	
-#..............................................................................
+
+#...............................................................................

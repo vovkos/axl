@@ -1,14 +1,14 @@
 #include "pch.h"
 
-namespace test_String { 
+namespace test_String {
 
-//.............................................................................
+//..............................................................................
 
 
 //void StringTest ()
 //{
 //	CString s ("hui", 2);
-//	
+//
 //	s += "grr";
 //
 //	CString s2 = s;
@@ -34,7 +34,7 @@ public:
 
 typedef ref::Buf <Point> PointBuf;
 
-void 
+void
 run ()
 {
 	size_t bufSize = sizeof (Point) + sizeof (PointBuf::Hdr);
@@ -58,6 +58,6 @@ run ()
 	string.append ("muravei");
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_String

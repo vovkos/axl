@@ -20,17 +20,17 @@ class Cursor;
 class Canvas;
 class WidgetDriver;
 
-//.............................................................................
+//..............................................................................
 
 enum StdFontKind
 {
 	StdFontKind_Gui = 0,
 	StdFontKind_Monospace,
-	
+
 	StdFontKind__Count
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum StdCursorKind
 {
@@ -43,11 +43,11 @@ enum StdCursorKind
 	StdCursorKind_SizeNWSE,
 	StdCursorKind_SizeNESW,
 	StdCursorKind_SizeAll,
-	
+
 	StdCursorKind__Count
 };
 
-//.............................................................................
+//..............................................................................
 
 class Engine
 {
@@ -333,7 +333,7 @@ public:
 	// clipboard
 
 	virtual
-	uintptr_t 
+	uintptr_t
 	registerClipboardFormat (const sl::StringRef& formatName) = 0;
 
 	virtual
@@ -402,9 +402,9 @@ public:
 	bool
 	redrawWidget (
 		WidgetDriver* widgetDriver,
-		int left, 
-		int top, 
-		int right, 
+		int left,
+		int top,
+		int right,
 		int bottom
 		) = 0;
 
@@ -412,7 +412,7 @@ public:
 	bool
 	scrollWidget (
 		WidgetDriver* widgetDriver,
-		int dx, 
+		int dx,
 		int dy
 		) = 0;
 
@@ -420,11 +420,11 @@ public:
 	bool
 	scrollWidgetRect (
 		WidgetDriver* widgetDriver,
-		int left, 
+		int left,
 		int top,
 		int right,
 		int bottom,
-		int dx, 
+		int dx,
 		int dy
 		) = 0;
 
@@ -486,7 +486,7 @@ public:
 	hideCaret (WidgetDriver* widgetDriver) = 0;
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

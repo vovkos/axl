@@ -5,7 +5,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 class SerialPortEnumerator
 {
@@ -15,7 +15,7 @@ public:
 	createPortList (sl::StdList <SerialPortDesc>* portList);
 };
 
-//.............................................................................
+//..............................................................................
 
 #ifdef _AXL_DEBUG
 size_t
@@ -48,7 +48,7 @@ printDeviceProperties (const iok::RegistryEntry& device)
 			"%s = %s\n",
 			cf::TypeRef (keyArray [i]).toString ().sz (),
 			cf::TypeRef (valueArray [i]).toString ().sz ()
-			); 
+			);
 	}
 
 	printf ("\n");
@@ -100,7 +100,7 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 	return portList->getCount ();
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
@@ -108,7 +108,7 @@ createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
 	return SerialPortEnumerator::createPortList (portList);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

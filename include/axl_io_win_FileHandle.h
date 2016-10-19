@@ -12,7 +12,7 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class FileHandle: public sl::Handle <HANDLE, sys::win::CloseHandle, sl::MinusOne <HANDLE> >
 {
@@ -34,7 +34,7 @@ public:
 	getOverlappedResult (OVERLAPPED* overlapped) const;
 };
 
-//.............................................................................
+//..............................................................................
 
 class StdOverlapped: public OVERLAPPED
 {
@@ -43,13 +43,13 @@ public:
 
 public:
 	StdOverlapped ()
-	{		
+	{
 		memset (this, 0, sizeof (OVERLAPPED));
 		hEvent = m_completionEvent.m_event;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace io

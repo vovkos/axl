@@ -6,7 +6,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 void*
 MappedViewMgr::find (
@@ -19,7 +19,7 @@ MappedViewMgr::find (
 	ViewEntry* viewEntry = *m_viewList.getHead ();
 	if (!viewEntry)
 		return NULL;
-		
+
 	if (viewEntry->m_begin <= begin && viewEntry->m_end >= end)
 		return (uchar_t*) (void*) viewEntry->m_view + begin - viewEntry->m_begin;
 
@@ -52,28 +52,28 @@ MappedViewMgr::view (
 
 	void* p;
 	size_t size = (size_t) (end - begin);
-	
+
 #if (_AXL_OS_WIN)
-	uint_t access = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ? 
-		FILE_MAP_READ : 
-		FILE_MAP_READ | FILE_MAP_WRITE;	
+	uint_t access = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ?
+		FILE_MAP_READ :
+		FILE_MAP_READ | FILE_MAP_WRITE;
 
 	p = viewEntry->m_view.view (m_mappedFile->m_mapping, access, begin, size);
 #elif (_AXL_OS_POSIX)
-	int protection = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ? 
-		PROT_READ : 
-		PROT_READ | PROT_WRITE;	
-	
+	int protection = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ?
+		PROT_READ :
+		PROT_READ | PROT_WRITE;
+
 	p = viewEntry->m_view.map (
-			NULL, 
-			size, 
-			protection, 
-			MAP_SHARED, 
-			m_mappedFile->m_file.m_file, 
+			NULL,
+			size,
+			protection,
+			MAP_SHARED,
+			m_mappedFile->m_file.m_file,
 			begin
 			);
 #endif
-	
+
 	if (!p)
 	{
 		AXL_MEM_DELETE (viewEntry);
@@ -88,10 +88,10 @@ MappedViewMgr::view (
 	// update viewmap
 
 	ViewMap::Iterator it = m_viewMap.visit (begin);
-	if (it->m_value) 
+	if (it->m_value)
 	{
 		ViewEntry* oldViewEntry = it->m_value;
-		
+
 		ASSERT (oldViewEntry->m_mapIt == it);
 		ASSERT (oldViewEntry->m_end < end); // otherwise, we should have just used this view!
 
@@ -132,7 +132,7 @@ MappedViewMgr::limitViewCount (size_t maxViewCount)
 	while (m_viewList.getCount () > maxViewCount)
 	{
 		ViewEntry* view = m_viewList.removeTail ();
-	
+
 		if (view->m_mapIt)
 			m_viewMap.erase (view->m_mapIt);
 
@@ -140,7 +140,7 @@ MappedViewMgr::limitViewCount (size_t maxViewCount)
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 MappedFile::MappedFile ()
 {
@@ -245,16 +245,16 @@ MappedFile::view (
 	bool isPermanent
 	)
 {
-	uint64_t end = size ? offset + size : m_fileSize; 
+	uint64_t end = size ? offset + size : m_fileSize;
 
 	if (end > m_fileSize)
-	{	
+	{
 		if (m_fileFlags & FileFlag_ReadOnly)
 			return err::fail ((void*) NULL, err::SystemErrorCode_InvalidDeviceRequest);
-		
+
 		m_fileSize = end;
 	}
-	
+
 	return viewImpl (offset, end, isPermanent);
 }
 
@@ -269,7 +269,7 @@ MappedFile::write (
 	if (result == -1)
 		return -1;
 
-	uint64_t end = offset + result; 
+	uint64_t end = offset + result;
 	if (end > m_fileSize)
 		m_fileSize = end;
 
@@ -287,7 +287,7 @@ MappedFile::viewImpl (
 
 	if (!isOpen ())
 		return NULL;
-	
+
 	// first, try to find existing view...
 
 	void* p = m_permanentViewMgr.find (offset, end);
@@ -384,11 +384,11 @@ MappedFile::unmapAllViews ()
 #endif
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 SimpleMappedFile::open (
-	const sl::StringRef& fileName, 
+	const sl::StringRef& fileName,
 	uint64_t offset,
 	size_t size,
 	uint_t flags
@@ -406,7 +406,7 @@ SimpleMappedFile::open (
 	return !size || m_mapping.open (&m_file, offset, size, flags);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

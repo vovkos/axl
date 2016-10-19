@@ -11,7 +11,7 @@
 namespace axl {
 namespace ini {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class Parser: protected Lexer
@@ -21,7 +21,7 @@ public:
 	parseFile (const sl::StringRef& filePath)
 	{
 		io::SimpleMappedFile file;
-		return 
+		return
 			file.open (filePath, io::FileFlag_ReadOnly) &&
 			parse (filePath, sl::StringRef ((const char*) file.p (), file.getMappingSize ()));
 	}
@@ -49,7 +49,7 @@ public:
 			{
 			case ScanResultKind_Error:
 				return false;
-			
+
 			case ScanResultKind_Eof:
 				return static_cast <T*> (this)->finalize ();
 
@@ -73,7 +73,7 @@ public:
 		}
 	}
 
-	bool 
+	bool
 	onSection (const sl::StringRef& sectionName) // overridable
 	{
 		return true;
@@ -85,7 +85,7 @@ public:
 		return true;
 	}
 
-	static 
+	static
 	bool
 	parseBoolValue (const sl::StringRef& value)
 	{
@@ -93,7 +93,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ini
 } // namespace axl

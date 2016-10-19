@@ -12,7 +12,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 struct TextAttr: public ColorAttr
 {
@@ -40,7 +40,7 @@ struct TextAttr: public ColorAttr
 		setup (colorAttr, fontFlags);
 	}
 
-	int 
+	int
 	cmp (const TextAttr& attr)
 	{
 		return memcmp (this, &attr, sizeof (TextAttr));
@@ -82,7 +82,7 @@ struct TextAttr: public ColorAttr
 		const TextAttr& overlayAttr
 		)
 	{
-		ColorAttr::overlay (baseAttr, overlayAttr);	
+		ColorAttr::overlay (baseAttr, overlayAttr);
 		m_fontFlags = overlayFontFlags (baseAttr.m_fontFlags, overlayAttr.m_fontFlags);
 	}
 
@@ -93,7 +93,7 @@ struct TextAttr: public ColorAttr
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

@@ -5,7 +5,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 size_t
 PacketizerRoot::writeImpl (
@@ -85,7 +85,7 @@ PacketizerRoot::writeImpl (
 	return size0 - size;
 }
 
-//.............................................................................
+//..............................................................................
 
 uint64_t
 LegacyPacketizerRoot::createHdr (size_t size)
@@ -93,9 +93,9 @@ LegacyPacketizerRoot::createHdr (size_t size)
 	PacketHdr hdr;
 	hdr.m_signature = PacketHdrSignature;
 	hdr.m_dataSize = (uint16_t) size;
-	hdr.m_checksum = 0;	
+	hdr.m_checksum = 0;
 	hdr.m_checksum = checksum16 (&hdr, sizeof (hdr));
-	
+
 	return *(uint64_t*) &hdr;
 }
 
@@ -181,7 +181,7 @@ LegacyPacketizerRoot::writeImpl (
 	return size0 - size;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

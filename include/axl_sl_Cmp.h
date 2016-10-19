@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_CMP_H
 
@@ -11,7 +11,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -20,33 +20,33 @@ template <
 class Cmp
 {
 public:
-	int 
+	int
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a < b ? -1 : a > b ? 1 : 0; 
+	{
+		return a < b ? -1 : a > b ? 1 : 0;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class CmpBin
 {
 public:
-	int 
+	int
 	operator () (
-		const T& a, 
+		const T& a,
 		const T& b
 		) const
-	{ 
+	{
 		return memcmp (&a, &b, sizeof (T));
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -55,17 +55,17 @@ template <
 class CmpPtr
 {
 public:
-	int 
+	int
 	operator () (
-		const T* a, 
+		const T* a,
 		const T* b
 		) const
-	{ 
+	{
 		return C () (*a, *b);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class CmpSzBase
@@ -77,7 +77,7 @@ class CmpSzBase_i
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class CmpSzBase <char>
@@ -88,12 +88,12 @@ public:
 		const char* p1,
 		const char* p2
 		) const
-	{ 
+	{
 		return p1 ? p2 ? strcmp (p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class CmpSzBase_i <char>
@@ -104,12 +104,12 @@ public:
 		const char* p1,
 		const char* p2
 		) const
-	{ 
+	{
 		return p1 ? p2 ? _stricmp (p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class CmpSzBase <wchar_t>
@@ -120,12 +120,12 @@ public:
 		const wchar_t* p1,
 		const wchar_t* p2
 		) const
-	{ 
+	{
 		return p1 ? p2 ? wcscmp (p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
 class CmpSzBase_i <wchar_t>
@@ -136,19 +136,19 @@ public:
 		const wchar_t* p1,
 		const wchar_t* p2
 		) const
-	{ 
+	{
 		return p1 ? p2 ? _wcsicmp (p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef CmpSzBase <char>      CmpSz;
 typedef CmpSzBase <wchar_t>   CmpSz_w;
 typedef CmpSzBase_i <char>    CmpSz_i;
 typedef CmpSzBase_i <wchar_t> CmpSz_wi;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -157,7 +157,7 @@ template <
 class CmpDuckType
 {
 public:
-	int 
+	int
 	operator () (
 		Arg a,
 		Arg b
@@ -166,7 +166,7 @@ public:
 		return a.cmp (b);
 	}
 
-	int 
+	int
 	operator () (
 		const T* a,
 		const T* b
@@ -180,7 +180,7 @@ template <typename T>
 class CmpDuckTypePtr
 {
 public:
-	int 
+	int
 	operator () (
 		const T& a,
 		const T& b
@@ -189,7 +189,7 @@ public:
 		return a.cmp (&b);
 	}
 
-	int 
+	int
 	operator () (
 		const T* a,
 		const T* b
@@ -199,7 +199,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

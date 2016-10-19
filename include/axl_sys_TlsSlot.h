@@ -11,14 +11,14 @@
 namespace axl {
 namespace sys {
 
-//.............................................................................
+//..............................................................................
 
 class TlsSlot
 {
 protected:
 	size_t m_slot;
-	
-public:	
+
+public:
 	TlsSlot ()
 	{
 		m_slot = getTlsMgr ()->createSlot ();
@@ -36,26 +36,26 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class TlsPtrSlot: public TlsSlot
 {
-public:	
+public:
 	T*
 	getValue ()
 	{
 		return (T*) getTlsMgr ()->getSlotValue (m_slot).p ();
 	}
 
-	T* 
+	T*
 	setValue (T* p)
 	{
 		return (T*) getTlsMgr ()->setSlotValue (m_slot, sys::TlsValue (p, NULL)).p ();
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 T*
@@ -64,7 +64,7 @@ getTlsPtrSlotValue ()
 	return sl::getSimpleSingleton <TlsPtrSlot <T> > ()->getValue ();
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 T*
@@ -73,7 +73,7 @@ setTlsPtrSlotValue (T* p)
 	return sl::getSimpleSingleton <TlsPtrSlot <T> > ()->setValue (p);
 }
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class ScopedTlsPtrSlot
@@ -93,7 +93,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sys
 } // namespace axl

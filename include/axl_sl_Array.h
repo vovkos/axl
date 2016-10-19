@@ -12,7 +12,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -90,8 +90,8 @@ public:
 	{
 		return m_p;
 	}
-	
-	ArrayRef& 
+
+	ArrayRef&
 	operator = (const ArrayRef& src)
 	{
 		attach (src);
@@ -216,7 +216,7 @@ protected:
 
 			if (m_hdr)
 				m_hdr->release ();
-		
+
 			m_hdr = hdr;
 		}
 
@@ -225,7 +225,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -239,7 +239,7 @@ public:
 	typedef typename ArrayRef::Details Details;
 	typedef typename ArrayRef::Hdr Hdr;
 	typedef typename ArrayRef::ValueArg ValueArg;
-	
+
 public:
 	Array ()
 	{
@@ -340,7 +340,7 @@ public:
 	{
 		if (&src == this)
 			return this->m_count;
-		
+
 		Hdr* hdr = src.getHdr ();
 		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive))
 			return copy (src, src.getCount ());
@@ -719,7 +719,7 @@ public:
 	{
 		size_t size = count * sizeof (T);
 
-		if (this->m_hdr && 
+		if (this->m_hdr &&
 			this->m_hdr->getRefCount () == 1 &&
 			this->m_hdr->m_bufferSize >= size)
 			return true;
@@ -748,7 +748,7 @@ public:
 	{
 		size_t size = count * sizeof (T);
 
-		if (this->m_hdr && 
+		if (this->m_hdr &&
 			this->m_hdr->getRefCount () == 1)
 		{
 			if (this->m_count == count)
@@ -815,7 +815,7 @@ public:
 		this->m_count = count;
 		return true;
 	}
-	
+
 	size_t
 	ensureCount (size_t count)
 	{
@@ -833,7 +833,7 @@ public:
 		)
 	{
 		ASSERT (size >= sizeof (Hdr) + sizeof (T));
-		
+
 		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof (Hdr);
 
@@ -875,7 +875,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

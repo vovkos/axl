@@ -1,4 +1,4 @@
-#..............................................................................
+#...............................................................................
 
 # sanity checks
 
@@ -9,7 +9,7 @@ if (NOT EXISTS "${AXL_DROPPER_DIR}/axl_cmake.cmake" OR
 	message (FATAL_ERROR "Incorrect usage of axl_init.cmake!")
 endif ()
 
-#..............................................................................
+#...............................................................................
 
 # CMake policies
 
@@ -28,7 +28,7 @@ if (POLICY CMP0054)
 	cmake_policy (SET CMP0054 NEW)
 endif ()
 
-#..............................................................................
+#...............................................................................
 
 include (${CMAKE_CURRENT_LIST_DIR}/axl_utils.cmake)
 include (${CMAKE_CURRENT_LIST_DIR}/axl_std_settings.cmake)
@@ -81,7 +81,7 @@ if (AXL_IMPORT_LIST)
 	axl_import (${AXL_IMPORT_LIST})
 endif ()
 
-#..............................................................................
+#...............................................................................
 
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib/${CONFIGURATION_SUFFIX_0})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/${CONFIGURATION_SUFFIX_0})

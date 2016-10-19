@@ -5,9 +5,9 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-void* 
+void*
 VirtualMemory::alloc (
 	void* p0,
 	size_t size,
@@ -29,7 +29,7 @@ VirtualMemory::alloc (
 	return p;
 }
 
-void 
+void
 VirtualMemory::release ()
 {
 	if (!m_p)
@@ -60,7 +60,7 @@ VirtualMemory::protect (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

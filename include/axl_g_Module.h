@@ -15,8 +15,8 @@
 namespace axl {
 namespace g {
 
-//.............................................................................
-	
+//..............................................................................
+
 struct SystemInfo
 {
 	size_t m_processorCount;
@@ -24,17 +24,17 @@ struct SystemInfo
 	size_t m_mappingAlignFactor;
 };
 
-//.............................................................................
+//..............................................................................
 
 class Finalizer
 {
 public:
-	virtual 
-	void 
+	virtual
+	void
 	finalize () = 0;
 };
 
-//.............................................................................
+//..............................................................................
 
 class Module
 {
@@ -53,13 +53,13 @@ protected:
 #if (_AXL_OS_WIN)
 	HMODULE m_hModule;
 #endif
-	
+
 	SystemInfo m_systemInfo;
 
 	mem::Tracker m_memTracker;
 
 	// finalizers
-	
+
 	sys::Lock m_finalizerListLock;
 	sl::StdList <FinalizerEntry> m_finalizerList;
 
@@ -69,14 +69,14 @@ public:
 	~Module ();
 
 #if (_AXL_OS_WIN)
-	HMODULE 
+	HMODULE
 	getModuleHandle ()
 	{
 		return m_hModule;
 	}
 #endif
 
-	SystemInfo* 
+	SystemInfo*
 	getSystemInfo ()
 	{
 		return &m_systemInfo;
@@ -88,11 +88,11 @@ public:
 		return &m_memTracker;
 	}
 
-	bool 
+	bool
 	addFinalizer (const ref::Ptr <Finalizer>& finalizer);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_SELECT_ANY Module g_module;
 
@@ -103,7 +103,7 @@ getModule ()
 	return &g_module;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace g
 } // namespace axl

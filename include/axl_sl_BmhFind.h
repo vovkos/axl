@@ -17,11 +17,11 @@ namespace sl {
 // the problem with upgrade is the need to carefully port non-trivial building of second table
 // for ReverseFind and IncrementalFind... which i dont have neither time nor mood for
 
-//.............................................................................
+//..............................................................................
 
 class BmhFind
 {
-protected:	
+protected:
 	Array <uchar_t> m_buffer; // work size of buffer is 2 * m_PatternSize
 	size_t m_patternSize;
 	size_t m_incFindOffset;
@@ -29,26 +29,26 @@ protected:
 	size_t m_nextBadCharTable [256];
 	size_t m_prevBadCharTable [256];
 	bool m_doMatchCase;
-	
+
 public:
 	BmhFind ();
 
 	void
 	clear ();
 
-	bool 
+	bool
 	isEmpty ()
 	{
 		return m_patternSize == 0;
 	}
 
-	size_t 
+	size_t
 	getPatternSize ()
 	{
 		return m_patternSize;
 	}
 
-	const void* 
+	const void*
 	getPattern ()
 	{
 		return m_buffer;
@@ -56,36 +56,36 @@ public:
 
 	bool
 	setPattern (
-		const void* p, 
-		size_t size, 
+		const void* p,
+		size_t size,
 		bool doMatchCase = true
 		);
 
-	size_t 
+	size_t
 	find (
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 
-	size_t 
+	size_t
 	reverseFind (
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 
-	size_t 
+	size_t
 	incrementalFind (
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 
-	size_t 
+	size_t
 	reverseIncrementalFind (
 		const void* p,
 		size_t size
 		);
 
-	void 
+	void
 	resetIncrementalFind (size_t incFindOffset = 0)
 	{
 		m_incFindOffset = incFindOffset;
@@ -105,7 +105,7 @@ public:
 	}
 
 protected:
-	void 
+	void
 	rebuildTables ();
 
 	size_t
@@ -115,34 +115,34 @@ protected:
 	reverseCmpPattern (uchar_t* _p);
 
 	size_t
-	incrementalCmpPattern (	
+	incrementalCmpPattern (
 		uchar_t* _p,
 		size_t i
 		);
 
 	size_t
-	reverseIncrementalCmpPattern (	
+	reverseIncrementalCmpPattern (
 		uchar_t* _p,
 		size_t size,
 		size_t i
 		);
 
 	void
-	updateIncrementalTail (	
+	updateIncrementalTail (
 		uchar_t* p,
 		size_t size,
 		size_t tailSize
 		);
 
 	void
-	updateReverseIncrementalTail (	
+	updateReverseIncrementalTail (
 		uchar_t* p,
 		size_t size,
 		size_t tailSize
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

@@ -4,7 +4,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 axl_va_list
 PackerSeq::pack_va (
@@ -48,7 +48,7 @@ size_t
 PackerSeq::appendFormat (const char* formatString)
 {
 	const char* pF = formatString;
-	
+
 	for (; *pF; pF++)
 	{
 		if (*pF != '%')
@@ -58,8 +58,8 @@ PackerSeq::appendFormat (const char* formatString)
 
 		switch (*pF)
 		{
-		case 'd': 
-		case 'i': 
+		case 'd':
+		case 'i':
 		case 'o':
 		case 'u':
 		case 'x':
@@ -67,8 +67,8 @@ PackerSeq::appendFormat (const char* formatString)
 			append <Pack <int> > ();
 			break;
 
-		case 'e': 
-		case 'E': 
+		case 'e':
+		case 'E':
 		case 'f':
 		case 'g':
 		case 'G':
@@ -78,20 +78,20 @@ PackerSeq::appendFormat (const char* formatString)
 		case 'p':
 			append <Pack <size_t> > ();
 			break;
-			
-		case 's': 
+
+		case 's':
 			append <PackString> ();
 			break;
 
-		case 'c': 
+		case 'c':
 			append <Pack <char> > ();
 			break;
 
-		case 'S': 
+		case 'S':
 			append <PackString_w> ();
 			break;
 
-		case 'C': 
+		case 'C':
 			append <Pack <wchar_t> > ();
 			break;
 
@@ -124,8 +124,8 @@ PackerSeq::appendFormat (const char* formatString)
 	return m_sequence.getCount ();
 }
 
-//.............................................................................
-	
+//..............................................................................
+
 size_t
 Package::append_va (
 	Packer* packer,
@@ -143,7 +143,7 @@ Package::append_va (
 	result = m_buffer.setCount (newSize);
 	if (!result)
 		return oldSize;
-	
+
 	packer->pack_va (m_buffer + oldSize, &size, va);
 	return newSize;
 }
@@ -167,7 +167,7 @@ Package::append (
 	return newSize;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace err
 } // namespace axl

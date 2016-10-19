@@ -5,7 +5,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 size_t
 CmdLineParserRoot::extractArg (
@@ -96,13 +96,13 @@ CmdLineParserRoot::parseSwitch (
 	}
 	else
 	{
-		value->clear (); 
+		value->clear ();
 	}
 
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 String
 getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
@@ -239,7 +239,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 	return string;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

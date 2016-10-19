@@ -12,12 +12,12 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class WaitableTimer: public WaitableHandle
 {
 public:
-	bool 
+	bool
 	create (
 		SECURITY_ATTRIBUTES* secAttr = NULL,
 		bool isManualReset = false,
@@ -30,7 +30,7 @@ public:
 		return err::complete (m_h != NULL);
 	}
 
-	bool 
+	bool
 	open (
 		uint_t access = EVENT_ALL_ACCESS,
 		bool doInheritHandle = false,
@@ -51,7 +51,7 @@ public:
 		void* completionContext = NULL,
 		bool resume = false
 		)
-	{ 
+	{
 		bool_t result = ::SetWaitableTimer (m_h, (LARGE_INTEGER*) &dueTime, period, completionRoutine, completionContext, resume);
 		return err::complete (result);
 	}
@@ -64,20 +64,20 @@ public:
 		void* completionContext = NULL,
 		bool resume = false
 		)
-	{ 
+	{
 		uint64_t dueTime = (int64_t) -10000 * timeout;
 		return setTimer (dueTime, period, completionRoutine, completionContext, resume);
 	}
 
 	bool
 	cancel ()
-	{ 
-		bool_t result = ::CancelWaitableTimer (m_h); 
+	{
+		bool_t result = ::CancelWaitableTimer (m_h);
 		return err::complete (result);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

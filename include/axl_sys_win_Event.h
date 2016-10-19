@@ -13,12 +13,12 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class Event: public WaitableHandle
 {
 public:
-	bool 
+	bool
 	create (
 		SECURITY_ATTRIBUTES* secAttr = NULL,
 		bool isManualReset = false,
@@ -32,7 +32,7 @@ public:
 		return err::complete (m_h != NULL);
 	}
 
-	bool 
+	bool
 	open (
 		uint_t access = EVENT_ALL_ACCESS,
 		bool doInheritHandle = false,
@@ -47,27 +47,27 @@ public:
 
 	bool
 	signal ()
-	{ 
+	{
 		bool_t result = ::SetEvent (m_h);
 		return err::complete (result);
 	}
 
 	bool
 	reset ()
-	{ 
-		bool_t result = ::ResetEvent (m_h); 
+	{
+		bool_t result = ::ResetEvent (m_h);
 		return err::complete (result);
 	}
 
 	bool
 	pulse ()
-	{ 
-		bool_t result = ::PulseEvent (m_h); 
+	{
+		bool_t result = ::PulseEvent (m_h);
 		return err::complete (result);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

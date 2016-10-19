@@ -7,9 +7,9 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 Sid::create_va (
 	SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 	size_t subAuthorityCount,
@@ -33,7 +33,7 @@ Sid::create_va (
 	return true;
 }
 
-bool 
+bool
 Sid::parse (const sl::StringRef& string)
 {
 	bool_t result;
@@ -44,11 +44,11 @@ Sid::parse (const sl::StringRef& string)
 		return err::failWithLastSystemError ();
 
 	result = copy (sid);
-	::LocalFree (sid);	
+	::LocalFree (sid);
 	return result != 0;
 }
 
-bool 
+bool
 Sid::parse (const sl::StringRef_w& string)
 {
 	bool_t result;
@@ -59,7 +59,7 @@ Sid::parse (const sl::StringRef_w& string)
 		return err::failWithLastSystemError ();
 
 	result = copy (sid);
-	::LocalFree (sid);	
+	::LocalFree (sid);
 	return result != 0;
 }
 
@@ -82,7 +82,7 @@ Sid::getString (sl::String* string) const
 	return result != 0;
 }
 
-bool 
+bool
 Sid::lookupAccountName (
 	const sl::StringRef& systemName,
 	const sl::StringRef& accountName,
@@ -96,22 +96,22 @@ Sid::lookupAccountName (
 	SID_NAME_USE dummySidType;
 
 	bool_t result = ::LookupAccountNameA (
-		systemName.szn (), 
-		accountName.szn (), 
-		(SID*) sidBuffer, 
-		&sidSize, 
-		domainNameBuffer, 
-		&domainNameLength, 
+		systemName.szn (),
+		accountName.szn (),
+		(SID*) sidBuffer,
+		&sidSize,
+		domainNameBuffer,
+		&domainNameLength,
 		sidType ? sidType : &dummySidType
 		);
 
-	if (!result)	
+	if (!result)
 		return err::failWithLastSystemError ();
 
 	return copy ((SID*) sidBuffer) != -1;
 }
 
-bool 
+bool
 Sid::lookupAccountName (
 	const sl::StringRef_w& systemName,
 	const sl::StringRef_w& accountName,
@@ -125,22 +125,22 @@ Sid::lookupAccountName (
 	SID_NAME_USE dummySidType;
 
 	bool_t result = ::LookupAccountNameW (
-		systemName.szn (), 
-		accountName.szn (), 
-		(SID*) sidBuffer, 
-		&sidSize, 
-		domainNameBuffer, 
-		&domainNameLength, 
+		systemName.szn (),
+		accountName.szn (),
+		(SID*) sidBuffer,
+		&sidSize,
+		domainNameBuffer,
+		&domainNameLength,
 		sidType ? sidType : &dummySidType
 		);
 
-	if (!result)	
+	if (!result)
 		return err::failWithLastSystemError ();
 
 	return copy ((SID*) sidBuffer) != -1;
 }
 
-bool 
+bool
 Sid::lookupAccountSid (
 	const sl::StringRef& systemName,
 	const SID* sid,
@@ -158,22 +158,22 @@ Sid::lookupAccountSid (
 		return err::fail (err::SystemErrorCode_InvalidParameter);
 
 	bool_t result = ::LookupAccountSidA (
-		systemName.szn (), 
-		(SID*) sid, 
-		accountNameBuffer, 
-		&accountNameLength, 
-		domainNameBuffer, 
-		&domainNameLength, 
+		systemName.szn (),
+		(SID*) sid,
+		accountNameBuffer,
+		&accountNameLength,
+		domainNameBuffer,
+		&domainNameLength,
 		sidType ? sidType : &dummySidType
 		);
 
-	if (!result)	
+	if (!result)
 		return err::failWithLastSystemError ();
 
 	accountName->copy (accountNameBuffer, accountNameLength);
 	return true;
 }
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

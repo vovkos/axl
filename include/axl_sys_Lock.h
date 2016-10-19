@@ -17,7 +17,7 @@
 namespace axl {
 namespace sys {
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
@@ -27,13 +27,13 @@ public:
 	win::CriticalSection m_criticalSection;
 
 public:
-	void 
+	void
 	lock ()
 	{
 		m_criticalSection.enter ();
 	}
 
-	void 
+	void
 	unlock ()
 	{
 		m_criticalSection.leave ();
@@ -48,13 +48,13 @@ public:
 	psx::Mutex m_mutex;
 
 public:
-	void 
+	void
 	lock ()
 	{
 		m_mutex.lock ();
 	}
 
-	void 
+	void
 	unlock ()
 	{
 		m_mutex.unlock ();
@@ -63,9 +63,9 @@ public:
 
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ScopeLock 
+class ScopeLock
 {
 protected:
 	Lock* m_lock;
@@ -73,7 +73,7 @@ protected:
 public:
 	ScopeLock (Lock* lock)
 	{
-		m_lock = lock;		
+		m_lock = lock;
 		lock->lock ();
 	}
 
@@ -83,7 +83,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sys
 } // namespace axl

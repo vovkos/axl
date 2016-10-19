@@ -12,7 +12,7 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class Mapping: public sys::win::Handle
 {
@@ -26,7 +26,7 @@ public:
 		const sl::StringRef_w& name = NULL
 		);
 
-	bool 
+	bool
 	open (
 		uint_t access,
 		bool doInheritHandle,
@@ -34,9 +34,9 @@ public:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
-class UnmapViewOfFile 
+class UnmapViewOfFile
 {
 public:
 	void
@@ -46,12 +46,12 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class MappedView: public sl::Handle <void*, UnmapViewOfFile>
 {
 public:
-	void* 
+	void*
 	view (
 		HANDLE hMapping,
 		uint_t access,
@@ -60,8 +60,8 @@ public:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
-} // namespace io 
+} // namespace io
 } // namespace axl

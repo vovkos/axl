@@ -1,12 +1,12 @@
 #include "pch.h"
 
-namespace test_Sock { 
+namespace test_Sock {
 
-//.............................................................................
+//..............................................................................
 
 /*
 
-void 
+void
 onAccept (ref::Ptr <io::ConnectionSock> connectionSock)
 {
 	io::SockAddrU localAddr;
@@ -14,22 +14,22 @@ onAccept (ref::Ptr <io::ConnectionSock> connectionSock)
 
 	connectionSock->getLocalAddress (&localAddr);
 	connectionSock->getPeerAddress (&peerAddr);
-	
+
 	printf ("accepted connection from %s\n", peerAddr.toString ());
 }
 
 void run_Listen ()
 {
-	io::ListenerSock sock;	
+	io::ListenerSock sock;
 
 	io::SockAddrIp addr (1001);
 
-	bool result = 
+	bool result =
 		sock.open (io::SockProtoKind_Tcp, addr) &&
 		sock.listen (32, &exe::Function <
-			exe::Arg <void>, 
+			exe::Arg <void>,
 			exe::Arg <ref::Ptr <io::ConnectionSock> > > (onAccept));;
-	
+
 	if (!result)
 	{
 		printf ("cannot listen on %s: %s\n", addr.toString (), err::getError ()->getDescription ());
@@ -37,14 +37,14 @@ void run_Listen ()
 	}
 
 	printf ("listening on %s\n", addr.toString ());
-	
+
 	char s [32];
 	gets (s);
 }
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 onConnect (
 	io::ConnectionSock* sock,
 	const err::Error& error
@@ -62,25 +62,25 @@ onConnect (
 		printf ("cannot establish connection: %s\n", error->getDescription ());
 }
 
-void 
+void
 run_Connect ()
 {
 	exe::Workerhread workerThread;
 	workerThread.start ();
 
-	io::ConnectionSock sock;	
+	io::ConnectionSock sock;
 
 	io::SockAddrIp addr (0x7f000001, 1001);
 
 	exe::ScheduledFunction <
-		exe::Arg <io::ConnectionSock*>, 
-		io::ConnectionSock::OnConnectCompleteArg> 
+		exe::Arg <io::ConnectionSock*>,
+		io::ConnectionSock::OnConnectCompleteArg>
 		onComplete (&workerThread, onConnect, &sock);
 
-	bool result = 
+	bool result =
 		sock.open (io::SockProtoKind_Tcp, io::SockAddrKind_Ip) &&
 		sock.syncConnect (&addr, 1000);
-	
+
 	if (!result)
 	{
 		printf ("cannot connect to %s: %s\n", addr.toString (), err::getError ()->getDescription ());
@@ -91,11 +91,11 @@ run_Connect ()
 	gets (s);
 }
 
-//.............................................................................
+//..............................................................................
 
 char buffer [1024] = { 0 };
 
-void 
+void
 onRecvFrom (
 	io::DgramSock* sock,
 	const err::Error& error,
@@ -112,17 +112,17 @@ onRecvFrom (
 	printf ("received %d bytes from %s: %s\n", actualSize, addr->toString (), buffer);
 
 	exe::Function <
-		exe::Arg <io::DgramSock*>, 
-		io::DgramSock::OnSendRecvCompleteArg> 
+		exe::Arg <io::DgramSock*>,
+		io::DgramSock::OnSendRecvCompleteArg>
 		onComplete (onRecvFrom, sock);
 
 	sock->recvFrom (buffer, 1023, &onComplete);
 }
 
-void 
+void
 run_Dgram ()
 {
-	io::DgramSock sock;	
+	io::DgramSock sock;
 
 	io::SockAddrIp addr (0, 1001);
 
@@ -139,8 +139,8 @@ run_Dgram ()
 //	size_t x = Sock.SyncSendTo ("hui!", 4, &AddrTo);
 
 	exe::Function <
-		exe::Arg <io::DgramSock*>, 
-		io::DgramSock::OnSendRecvCompleteArg> 
+		exe::Arg <io::DgramSock*>,
+		io::DgramSock::OnSendRecvCompleteArg>
 		onComplete (onRecvFrom, &sock);
 
 	sock.recvFrom (buffer, 1023, &onComplete);
@@ -151,6 +151,6 @@ run_Dgram ()
 
 */
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Sock

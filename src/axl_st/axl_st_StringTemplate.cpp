@@ -4,9 +4,9 @@
 namespace axl {
 namespace st {
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 gotoEndOfScriptSnippet (
 	Lexer* lexer,
 	lex::RagelTokenPos* endPos
@@ -33,8 +33,8 @@ gotoEndOfScriptSnippet (
 	}
 
 	lexer->gotoState (
-		Lexer::getMachineState (machine), 
-		token, 
+		Lexer::getMachineState (machine),
+		token,
 		Lexer::GotoStateKind_EatToken
 		);
 
@@ -69,15 +69,15 @@ gotoEndOfScriptSnippet (
 	*endPos = token->m_pos;
 
 	lexer->gotoState (
-		Lexer::getMachineState (LexerMachineKind_Main), 
-		token, 
+		Lexer::getMachineState (LexerMachineKind_Main),
+		token,
 		Lexer::GotoStateKind_EatToken
 		);
 
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace st
 } // namespace axl

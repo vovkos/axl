@@ -12,21 +12,21 @@
 namespace axl {
 namespace cry {
 
-//.............................................................................
+//..............................................................................
 
 class FreeEcKey
 {
 public:
-	void 
+	void
 	operator () (EC_KEY* h)
 	{
 		EC_KEY_free (h);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class EcKey: public sl::Handle <EC_KEY*, FreeEcKey> 
+class EcKey: public sl::Handle <EC_KEY*, FreeEcKey>
 {
 public:
 	EcKey ()
@@ -49,7 +49,7 @@ public:
 
 	bool
 	create (uint_t curveId);
-	
+
 	bool
 	createCopy (EC_KEY* src);
 
@@ -60,7 +60,7 @@ public:
 		return completeWithLastCryptoError (result != NULL);
 	}
 
-	uint_t 
+	uint_t
 	getFlags ()
 	{
 		return EC_KEY_get_flags (m_h);
@@ -81,7 +81,7 @@ public:
 	void
 	setFlags (uint_t flags);
 
-	uint_t 
+	uint_t
 	getEncFlags ()
 	{
 		return EC_KEY_get_enc_flags (m_h);
@@ -250,11 +250,11 @@ public:
 		)
 	{
 		return ECDSA_verify (
-			0, 
-			(const uchar_t*) hash, 
-			(int) hashSize, 
+			0,
+			(const uchar_t*) hash,
+			(int) hashSize,
 			(const uchar_t*) signature,
-			(int) signatureSize, 
+			(int) signatureSize,
 			m_h
 			) == 1;
 	}
@@ -273,7 +273,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 bool
 generateEcProductKey (
@@ -284,7 +284,7 @@ generateEcProductKey (
 	);
 
 inline
-sl::String 
+sl::String
 generateEcProductKey (
 	EC_KEY* ecKey,
 	const sl::StringRef& userName,
@@ -303,7 +303,7 @@ verifyEcProductKey (
 	const sl::StringRef& productKey
 	);
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cry
 } // namespace axl

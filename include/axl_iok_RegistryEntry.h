@@ -13,7 +13,7 @@
 namespace axl {
 namespace iok {
 
-//.............................................................................
+//..............................................................................
 
 class RegistryEntry: public ObjectBase <io_registry_entry_t>
 {
@@ -67,7 +67,7 @@ public:
 	getChildEntry (const char* plane = kIOServicePlane) const;
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 cf::MutableDictionaryRef
@@ -80,7 +80,7 @@ createServiceMatchingDictionary (const char* service)
 Iterator
 findMatchingServices (CFMutableDictionaryRef dict);
 
-//.............................................................................
+//..............................................................................
 
 } // namespace iok
 } // namespace axl

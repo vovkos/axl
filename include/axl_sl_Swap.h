@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_SWAP_H
 
@@ -11,17 +11,17 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 void
 swap (
-	T& a, 
+	T& a,
 	T& b
 	)
-{ 
+{
 	T t = a;
-	a = b; 
+	a = b;
 	b = t;
 }
 
@@ -31,15 +31,15 @@ class Swap
 public:
 	void
 	operator () (
-		T& a, 
+		T& a,
 		T& b
 		) const
-	{ 
+	{
 		swap (a, b);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

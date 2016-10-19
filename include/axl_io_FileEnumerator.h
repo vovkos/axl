@@ -11,14 +11,14 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
 class CloseFileEnumeratorHandle
 {
 public:
-	void 
+	void
 	operator () (HANDLE h)
 	{
 		::FindClose (h);
@@ -32,7 +32,7 @@ typedef sl::Handle <HANDLE, CloseFileEnumeratorHandle, sl::MinusOne <HANDLE> > F
 class CloseFileEnumeratorHandle
 {
 public:
-	void 
+	void
 	operator () (DIR* h)
 	{
 		::closedir (h);
@@ -52,7 +52,7 @@ public:
 	bool
 	openDir (const sl::StringRef& dir);
 
-	bool 
+	bool
 	hasNextFile ()
 	{
 		return !m_nextFileName.isEmpty ();
@@ -62,7 +62,7 @@ public:
 	getNextFileName ();
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

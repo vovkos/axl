@@ -7,7 +7,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 SharedMemoryTransportBase::SharedMemoryTransportBase ()
 {
@@ -202,7 +202,7 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 		bool result = m_file.setSize (size);
 		if (!result)
 			return false;
-	}		
+	}
 #endif
 
 	void* p = m_mapping.open (&m_file, 0, size);
@@ -215,7 +215,7 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 sl::Array <char>
 SharedMemoryReader::read ()
@@ -323,7 +323,7 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 	return readSize;
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 SharedMemoryWriter::open (
@@ -472,7 +472,7 @@ SharedMemoryWriter::copyWriteChain (
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

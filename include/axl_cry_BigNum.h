@@ -11,19 +11,19 @@
 namespace axl {
 namespace cry {
 
-//.............................................................................
+//..............................................................................
 
 class FreeBnCtx
 {
 public:
-	void 
+	void
 	operator () (BN_CTX* h)
 	{
 		BN_CTX_free (h);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class BnCtx: public sl::Handle <BN_CTX*, FreeBnCtx>
 {
@@ -53,25 +53,25 @@ public:
 	getBigNum ();
 };
 
-//.............................................................................
+//..............................................................................
 
 class FreeBigNum
 {
 public:
-	void 
+	void
 	operator () (BIGNUM* h)
 	{
 		BN_free (h);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class BigNum: public sl::Handle <BIGNUM*, FreeBigNum>
 {
 public:
 	BigNum ()
-	{		
+	{
 		m_h = NULL;
 		create ();
 	}
@@ -94,18 +94,18 @@ public:
 		return completeWithLastCryptoError (result != NULL);
 	}
 
-	size_t 
+	size_t
 	getBitCount ()
 	{
 		return BN_num_bits (m_h);
 	}
 
-	size_t 
+	size_t
 	getSize ()
 	{
 		return BN_num_bytes (m_h);
 	}
-	
+
 	size_t
 	getData (
 		void* p,
@@ -188,7 +188,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cry
 } // namespace axl

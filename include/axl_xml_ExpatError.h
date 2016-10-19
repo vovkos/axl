@@ -11,7 +11,7 @@
 namespace axl {
 namespace xml {
 
-//.............................................................................
+//..............................................................................
 
 // {034B6D20-64F7-4EC1-8C5F-B23F146C8765}
 AXL_SL_DEFINE_GUID (
@@ -19,7 +19,7 @@ AXL_SL_DEFINE_GUID (
 	0x34b6d20, 0x64f7, 0x4ec1, 0x8c, 0x5f, 0xb2, 0x3f, 0x14, 0x6c, 0x87, 0x65
 	);
 
-//.............................................................................
+//..............................................................................
 
 class ExpatErrorProvider: public err::ErrorProvider
 {
@@ -32,7 +32,7 @@ public:
 		return string ? string : "undefined XML error";
 	}
 
-	virtual 
+	virtual
 	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error)
 	{
@@ -40,19 +40,19 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-inline 
-void 
+inline
+void
 registerExpatErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
-		g_expatErrorGuid, 
+		g_expatErrorGuid,
 		sl::getSimpleSingleton <ExpatErrorProvider> ()
 		);
 }
 
-//.............................................................................
+//..............................................................................
 
 class ExpatError: public err::Error
 {
@@ -66,11 +66,11 @@ public:
 		create (code);
 	}
 
-	err::ErrorHdr* 
+	err::ErrorHdr*
 	create (XML_Error code);
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 size_t
@@ -79,7 +79,7 @@ setExpatError (XML_Error code)
 	return setError (ExpatError (code));
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace xml
 } // namespace axl

@@ -12,7 +12,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 class QtWidgetBase: public QAbstractScrollArea
 {
@@ -51,13 +51,13 @@ public:
 	}
 
 private slots:
-	void 
+	void
 	threadMsgSlot (WidgetThreadMsg* msg);
 
 signals:
-	void 
+	void
 	threadMsgSignal (WidgetThreadMsg* msg);
-	
+
 protected:
 	virtual
 	void
@@ -157,29 +157,29 @@ protected:
 		);
 
 protected:
-	void 
+	void
 	genericEventImpl (
 		QEvent* e,
 		WidgetMsgCode msgCode
 		);
 
-	void 
+	void
 	mouseEventImpl (
 		QMouseEvent* e,
 		WidgetMsgCode msgCode
 		);
 
-	void 
+	void
 	keyEventImpl (
 		QKeyEvent* e,
 		WidgetMsgCode msgCode
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
-class QtWidget: 
+class QtWidget:
 	public QtWidgetBase,
 	public T
 {
@@ -191,7 +191,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

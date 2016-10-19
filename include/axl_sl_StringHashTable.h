@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_STRINGHASHTABLE_H
 
@@ -12,7 +12,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 typedef DuckTypeHashTable <String>       StringHashTable;
 typedef DuckTypeHashTable <String_w>     StringHashTable_w;
@@ -26,7 +26,7 @@ typedef StringHashTable_utf8::Iterator   StringHashTableIterator_utf8;
 typedef StringHashTable_utf16::Iterator  StringHashTableIterator_utf16;
 typedef StringHashTable_utf32::Iterator  StringHashTableIterator_utf32;
 
-//.............................................................................
+//..............................................................................
 
 template <typename Value>
 class StringHashTableMap: public DuckTypeHashTableMap <String, Value>
@@ -53,112 +53,112 @@ class StringHashTableMap_utf32: public DuckTypeHashTableMap <String_utf32, Value
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename Value>
 class StringHashTableMapIterator: public HashTableMapIterator <String, Value>
 {
 public:
 	StringHashTableMapIterator ()
-	{ 
+	{
 	}
 
 	StringHashTableMapIterator (const Iterator <typename StringHashTableMapIterator::Entry>& src)
-	{ 
+	{
 		this->m_p = src.getEntry ();
 	}
 
 	StringHashTableMapIterator (typename StringHashTableMapIterator::Entry* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Value>
 class StringHashTableMapIterator_w: public HashTableMapIterator <String_w, Value>
 {
 public:
 	StringHashTableMapIterator_w ()
-	{ 
+	{
 	}
 
 	StringHashTableMapIterator_w (const Iterator <typename StringHashTableMapIterator_w::Entry>& src)
-	{ 
-		this->m_p = src.getLink (); 
+	{
+		this->m_p = src.getLink ();
 	}
 
 	StringHashTableMapIterator_w (typename StringHashTableMapIterator_w::Entry* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Value>
 class StringHashTableMapIterator_utf8: public HashTableMapIterator <String_utf8, Value>
 {
 public:
 	StringHashTableMapIterator_utf8 ()
-	{ 
+	{
 	}
 
 	StringHashTableMapIterator_utf8 (const Iterator <typename StringHashTableMapIterator_utf8::Entry>& src)
-	{ 
-		this->m_p = src.getLink (); 
+	{
+		this->m_p = src.getLink ();
 	}
 
 	StringHashTableMapIterator_utf8 (typename StringHashTableMapIterator_utf8::Entry* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Value>
 class StringHashTableMapIterator_utf16: public HashTableMapIterator <String_utf16, Value>
 {
 public:
 	StringHashTableMapIterator_utf16 ()
-	{ 
+	{
 	}
 
 	StringHashTableMapIterator_utf16 (const Iterator <typename StringHashTableMapIterator_utf16::Entry>& src)
-	{ 
-		this->m_p = src.getLink (); 
+	{
+		this->m_p = src.getLink ();
 	}
 
 	StringHashTableMapIterator_utf16 (typename StringHashTableMapIterator_utf16::Entry* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Value>
 class StringHashTableMapIterator_utf32: public HashTableMapIterator <String_utf32, Value>
 {
 public:
 	StringHashTableMapIterator_utf32 ()
-	{ 
+	{
 	}
 
 	StringHashTableMapIterator_utf32 (const Iterator <typename StringHashTableMapIterator_utf32::Entry>& src)
-	{ 
-		this->m_p = src.getLink (); 
+	{
+		this->m_p = src.getLink ();
 	}
 
 	StringHashTableMapIterator_utf32 (typename StringHashTableMapIterator_utf32::Entry* p)
-	{ 
-		operator = (p); 
+	{
+		operator = (p);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 #define AXL_SL_BEGIN_STRING_HASH_TABLE_MAP(Class, Value) \
 	AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE_MAP (Class, axl::sl::String, Value)
@@ -166,7 +166,7 @@ public:
 #define AXL_SL_END_STRING_HASH_TABLE_MAP() \
 	AXL_SL_END_DUCK_TYPE_HASH_TABLE_MAP ()
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

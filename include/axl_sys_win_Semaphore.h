@@ -12,12 +12,12 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class Semaphore: public WaitableHandle
 {
 public:
-	bool 
+	bool
 	create (
 		SECURITY_ATTRIBUTES* secAttr,
 		uint_t initialCount,
@@ -31,7 +31,7 @@ public:
 		return err::complete (m_h != NULL);
 	}
 
-	bool 
+	bool
 	open (
 		uint_t access,
 		bool doInheritHandle,
@@ -52,7 +52,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace axl
 } // namespace sys

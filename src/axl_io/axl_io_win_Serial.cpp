@@ -6,9 +6,9 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
-bool 
+bool
 Serial::open (
 	const sl::StringRef& name,
 	uint_t flags
@@ -26,11 +26,11 @@ Serial::open (
 		deviceName += name;
 
 	m_h = ::CreateFileW (
-		deviceName, 
-		GENERIC_READ | GENERIC_WRITE, 
-		0, NULL, 
-		OPEN_EXISTING, 
-		flags, 
+		deviceName,
+		GENERIC_READ | GENERIC_WRITE,
+		0, NULL,
+		OPEN_EXISTING,
+		flags,
 		NULL
 		);
 
@@ -43,7 +43,7 @@ Serial::getStatusLines ()
 	ASSERT (isOpen ());
 
 	dword_t lines;
-		
+
 	bool_t result = ::GetCommModemStatus (m_h, &lines);
 	if (!result)
 		return err::failWithLastSystemError (-1);
@@ -65,8 +65,8 @@ Serial::getWaitMask ()
 
 size_t
 Serial::read (
-	void* p, 
-	size_t size 
+	void* p,
+	size_t size
 	)
 {
 	dword_t actualSize;
@@ -76,7 +76,7 @@ Serial::read (
 
 size_t
 Serial::write (
-	const void* p, 
+	const void* p,
 	size_t size
 	)
 {
@@ -85,7 +85,7 @@ Serial::write (
 	return result ? (size_t) actualSize : -1;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace io

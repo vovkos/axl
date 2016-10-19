@@ -1,8 +1,8 @@
 #include "pch.h"
 
-namespace test_Vso { 
+namespace test_Vso {
 
-//.............................................................................
+//..............................................................................
 
 //class CAddress
 //{
@@ -24,9 +24,9 @@ namespace test_Vso {
 //		{ m_Size = Size; }
 //
 //	bool vso_Copy (const CAddress& Src)
-//	{ 
+//	{
 //		ASSERT (m_Size >= Src.m_Size);
-//		memcpy (this, &Src, Src.m_Size); 
+//		memcpy (this, &Src, Src.m_Size);
 //		return true;
 //	}
 //};
@@ -49,13 +49,13 @@ namespace test_Vso {
 //{
 //	CAddressIp4 Ip4_1 (17, 0x7f000001, 1001);
 //	CAddressIp4 Ip4_2 (17, 0xffffffff, 1002);
-//	
+//
 //	CVsoT <CAddress> Address;
 //	Address = Ip4_1;
 //	Address = Ip4_2;
 //}
 
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Vso

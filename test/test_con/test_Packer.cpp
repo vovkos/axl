@@ -1,10 +1,10 @@
 #include "pch.h"
 
-namespace test_Packer { 
+namespace test_Packer {
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 run ()
 {
 	ref::Ptr <exe::ArgBlock> argBlock = exe::createArgBlock <exe::Arg <const char*> > (0, "hui govno i muravei");
@@ -15,12 +15,12 @@ run ()
 		);
 
 	sl::Unpacker unpacker (package->m_p, package->m_size);
-	
-	const char* s1;	
-	long l1;	
-	char* s2;	
-	long l2;	
-	
+
+	const char* s1;
+	long l1;
+	char* s2;
+	long l2;
+
 	unpacker.unpack (&s1);
 	unpacker.unpack (&l1);
 	unpacker.unpack (&s2);
@@ -29,6 +29,6 @@ run ()
 	printf ("%s %d %s %d\n", s1, l1, s2, l2);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Packer

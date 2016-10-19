@@ -5,7 +5,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 bool
 DeviceInfo::getDeviceRegistryProperty (
@@ -56,7 +56,7 @@ DeviceInfo::openDeviceRegistryKey (REGSAM keyAccess)
 	HKEY key = ::SetupDiOpenDevRegKey (m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
 	if (key == INVALID_HANDLE_VALUE)
 		err::setLastSystemError ();
-			
+
 	return key;
 }
 
@@ -83,8 +83,8 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 	propChangeParams.Scope = DICS_FLAG_CONFIGSPECIFIC;
 	propChangeParams.HwProfile = 0; // current profile
 
-	result = 
-		setClassInstallParams (&propChangeParams, sizeof (propChangeParams)) && 
+	result =
+		setClassInstallParams (&propChangeParams, sizeof (propChangeParams)) &&
 		callClassInstaller (DIF_PROPERTYCHANGE);
 
 	if (!result)
@@ -92,8 +92,8 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 
 	propChangeParams.StateChange = DICS_START;
 
-	result = 
-		setClassInstallParams (&propChangeParams, sizeof (propChangeParams)) && 
+	result =
+		setClassInstallParams (&propChangeParams, sizeof (propChangeParams)) &&
 		callClassInstaller (DIF_PROPERTYCHANGE);
 
 	if (!result)
@@ -111,7 +111,7 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 DeviceInfoSet::create (uint_t flags)
@@ -160,7 +160,7 @@ DeviceInfoSet::getDeviceInfo (
 	return true;
 }
 
-bool 
+bool
 DeviceInfoSet::getDeviceClassGuids (
 	const sl::StringRef_w& name,
 	sl::Array <GUID>* buffer
@@ -173,7 +173,7 @@ DeviceInfoSet::getDeviceClassGuids (
 	return getDeviceClassGuids (name, buffer->p (), requiredCount, &requiredCount);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

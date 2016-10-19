@@ -6,7 +6,7 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 bool
 Mapping::create (
@@ -23,10 +23,10 @@ Mapping::create (
 	maxSize.QuadPart = _MaxSize;
 
 	m_h = ::CreateFileMappingW (
-		hFile, 
-		secAttr, 
-		pageProtection, 
-		maxSize.HighPart, 
+		hFile,
+		secAttr,
+		pageProtection,
+		maxSize.HighPart,
 		maxSize.LowPart,
 		name.sz ()
 		);
@@ -47,7 +47,7 @@ Mapping::open (
 	return err::complete (m_h != NULL);
 }
 
-//.............................................................................
+//..............................................................................
 
 void*
 MappedView::view (
@@ -72,7 +72,7 @@ MappedView::view (
 	return m_h;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace io

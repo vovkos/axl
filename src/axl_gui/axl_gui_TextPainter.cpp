@@ -6,7 +6,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 void
 TextPainter::init (Canvas* canvas)
@@ -14,13 +14,13 @@ TextPainter::init (Canvas* canvas)
 	m_canvas = canvas;
 	m_top = 0;
 	m_bottom = 0;
-	m_hexEncodingFlags = 0; 
+	m_hexEncodingFlags = 0;
 	m_unprintableChar = '.';
 }
 
 // space
 
-int 
+int
 TextPainter::drawSpace_p (
 	int width,
 	uint_t color
@@ -38,7 +38,7 @@ TextPainter::drawSpace_p (
 	return m_point.m_x;
 }
 
-int 
+int
 TextPainter::drawSpace (
 	size_t length,
 	uint_t color
@@ -64,20 +64,20 @@ TextPainter::drawText_utf8 (
 	Font* font = m_canvas->m_font->getFontMod (fontFlags);
 	Size size = font->calcTextSize_utf8 (text);
 	int right = m_point.m_x + size.m_width;
-	
+
 	m_canvas->drawText_utf8 (
-		m_point.m_x, 
-		m_point.m_y, 
-		m_point.m_x, 
+		m_point.m_x,
+		m_point.m_y,
+		m_point.m_x,
 		m_point.m_y,
 		right,
 		m_bottom,
-		textColor, 
-		backColor, 
-		fontFlags, 
+		textColor,
+		backColor,
+		fontFlags,
 		text
 		);
-	
+
 	m_point.m_x = right;
 	return right;
 }
@@ -96,20 +96,20 @@ TextPainter::drawText_utf32 (
 	Font* font = m_canvas->m_font->getFontMod (fontFlags);
 	Size size = font->calcTextSize_utf32 (text);
 	int right = m_point.m_x + size.m_width;
-	
+
 	m_canvas->drawText_utf32 (
-		m_point.m_x, 
-		m_point.m_y, 
-		m_point.m_x, 
-		m_point.m_y, 
+		m_point.m_x,
+		m_point.m_y,
+		m_point.m_x,
+		m_point.m_y,
 		right,
 		m_bottom,
-		textColor, 
-		backColor, 
-		fontFlags, 
+		textColor,
+		backColor,
+		fontFlags,
 		text
 		);
-	
+
 	m_point.m_x = right;
 	return right;
 }
@@ -130,7 +130,7 @@ TextPainter::drawHyperText_utf8 (
 
 	if (text.isEmpty ())
 		return m_point.m_x;
-	
+
 	TextAttr attr0 (textColor0, backColor0, fontFlags0);
 	TextAttr attr = attr0;
 
@@ -148,7 +148,7 @@ TextPainter::drawHyperText_utf8 (
 	size_t offset = 0;
 
 	while (offset < length && nextAttr < attrEnd)
-	{	
+	{
 		size_t leftover = length - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
@@ -185,7 +185,7 @@ TextPainter::drawHyperText_utf32 (
 
 	if (text.isEmpty ())
 		return m_point.m_x;
-	
+
 	TextAttr attr0 (textColor0, backColor0, fontFlags0);
 	TextAttr attr = attr0;
 
@@ -203,7 +203,7 @@ TextPainter::drawHyperText_utf32 (
 	size_t offset = 0;
 
 	while (offset < length && nextAttr < attrEnd)
-	{	
+	{
 		size_t leftover = length - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
@@ -238,7 +238,7 @@ TextPainter::drawSelHyperText_utf8 (
 	const sl::StringRef_utf8& text
 	)
 {
-	if (selStart >= selEnd) 
+	if (selStart >= selEnd)
 		return drawHyperText_utf8 (textColor, backColor, fontFlags, attrArray, text);
 
 	if (attrArray)
@@ -262,7 +262,7 @@ TextPainter::drawSelHyperText_utf32 (
 	const sl::StringRef_utf32& text
 	)
 {
-	if (selStart >= selEnd) 
+	if (selStart >= selEnd)
 		return drawHyperText_utf32 (textColor, backColor, fontFlags, attrArray, text);
 
 	if (attrArray)
@@ -303,7 +303,7 @@ TextPainter::drawBinHex (
 		buffer [i] = buffer [j];
 		buffer [j] = ' ';
 	}
-	
+
 	return drawText_utf8 (
 		textColor,
 		backColor,
@@ -328,7 +328,7 @@ TextPainter::drawHyperBinHex (
 
 	if (!size)
 		return m_point.m_x;
-	
+
 	TextAttr attr0 (textColor0, backColor0, fontFlags0);
 	TextAttr attr = attr0;
 
@@ -345,7 +345,7 @@ TextPainter::drawHyperBinHex (
 	const char* p = (const char*) p0;
 
 	while (offset < size && nextAttr < attrEnd)
-	{	
+	{
 		size_t leftover = size - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
@@ -383,7 +383,7 @@ TextPainter::drawSelHyperBinHex (
 	size_t size
 	)
 {
-	if (selStart >= selEnd) 
+	if (selStart >= selEnd)
 		return drawHyperBinHex (textColor0, backColor0, fontFlags0, attrArray, halfBitOffset, p, size);
 
 	if (attrArray)
@@ -527,7 +527,7 @@ TextPainter::drawSelHyperBinText (
 		);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

@@ -14,7 +14,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class HashTableEntryBase: public ListLink
@@ -36,7 +36,7 @@ public:
 	Bucket* m_bucket;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Key>
 class HashTableEntry: public HashTableEntryBase <HashTableEntry <Key> >
@@ -45,7 +45,7 @@ public:
 	Key m_key;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Key,
@@ -58,7 +58,7 @@ public:
 	Value m_value;
 };
 
-//.............................................................................
+//..............................................................................
 
 // too bad there are no templated typedefs in C++
 // another solution would be:
@@ -75,7 +75,7 @@ public:
 //
 // but then it's too easy to forget to write ::T type suffix
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Key>
 class HashTableIterator: public Iterator <HashTableEntry <Key> >
@@ -96,7 +96,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Key,
@@ -120,7 +120,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename Key,
@@ -312,7 +312,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Key,
@@ -338,9 +338,9 @@ public:
 		KeyArg,
 		HashTableMapEntry <Key, Value>
 		> BaseType;
-	
+
 	typedef typename BaseType::Iterator Iterator;
-	
+
 public:
 	Value&
 	operator [] (KeyArg key)
@@ -370,7 +370,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // hash table for simple types (char, int, void* etc)
 
@@ -380,7 +380,7 @@ template <
 	>
 class SimpleHashTable: public HashTable <
 	Key,
-	sl::HashId <Key>, 
+	sl::HashId <Key>,
 	sl::Eq <Key>,
 	KeyArg
 	>
@@ -396,7 +396,7 @@ template <
 class SimpleHashTableMap: public HashTableMap <
 	Key,
 	Value,
-	sl::HashId <Key>, 
+	sl::HashId <Key>,
 	sl::Eq <Key>,
 	KeyArg,
 	ValueArg
@@ -404,7 +404,7 @@ class SimpleHashTableMap: public HashTableMap <
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 // hash table for ducktyped keys -- uses methods .hash ()
 
@@ -414,7 +414,7 @@ template <
 	>
 class DuckTypeHashTable: public HashTable <
 	Key,
-	sl::HashDuckType <Key>, 
+	sl::HashDuckType <Key>,
 	sl::EqDuckType <Key>,
 	KeyArg
 	>
@@ -430,7 +430,7 @@ template <
 class DuckTypeHashTableMap: public HashTableMap <
 	Key,
 	Value,
-	sl::HashDuckType <Key>, 
+	sl::HashDuckType <Key>,
 	sl::EqDuckType <Key>,
 	KeyArg,
 	ValueArg
@@ -438,14 +438,14 @@ class DuckTypeHashTableMap: public HashTableMap <
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 // variant of hash table for ducktyped keys (key is a pointer to duck type)
 
 template <typename Key>
 class DuckTypePtrHashTable: public HashTable <
 	Key*,
-	sl::HashDuckType <Key>, 
+	sl::HashDuckType <Key>,
 	sl::EqDuckType <Key>,
 	Key*
 	>
@@ -460,7 +460,7 @@ template <
 class DuckTypePtrHashTableMap: public HashTableMap <
 	Key*,
 	Value,
-	sl::HashDuckType <Key>, 
+	sl::HashDuckType <Key>,
 	sl::EqDuckType <Key>,
 	Key*,
 	ValueArg
@@ -468,7 +468,7 @@ class DuckTypePtrHashTableMap: public HashTableMap <
 {
 };
 
-//.............................................................................
+//..............................................................................
 
 #define AXL_SL_BEGIN_HASH_TABLE_MAP_EX(Class, Key, Value, Hash, Eq, KeyArg, ValueArg) \
 class Class \
@@ -517,7 +517,7 @@ protected: \
 		axl::sl::ArgType <Value>::Type \
 		)
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_SIMPLE_HASH_TABLE_MAP(Class, Key, Value) \
 	AXL_SL_BEGIN_HASH_TABLE_MAP ( \
@@ -530,7 +530,7 @@ protected: \
 #define AXL_SL_END_SIMPLE_HASH_TABLE_MAP() \
 	AXL_SL_END_HASH_TABLE_MAP ()
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE_MAP(Class, Key, Value) \
 	AXL_SL_BEGIN_HASH_TABLE_MAP_EX ( \
@@ -546,7 +546,7 @@ protected: \
 #define AXL_SL_END_DUCK_TYPE_HASH_TABLE_MAP() \
 	AXL_SL_END_HASH_TABLE_MAP ()
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

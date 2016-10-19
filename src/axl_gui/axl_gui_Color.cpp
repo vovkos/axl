@@ -5,7 +5,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 uint_t
 Palette::getColorRgb (uint_t color)
@@ -15,7 +15,7 @@ Palette::getColorRgb (uint_t color)
 
 	size_t i = color & ColorFlag_IndexMask;
 	color = i < m_count ? m_colorArray [i] : -1;
-			
+
 	if (color & ColorFlag_Index) // allow two-staged index lookups
 	{
 		i = color & ColorFlag_IndexMask;
@@ -25,7 +25,7 @@ Palette::getColorRgb (uint_t color)
 	return color;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

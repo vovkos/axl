@@ -5,7 +5,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 
@@ -60,13 +60,13 @@ FileEnumerator::openDir (const sl::StringRef& dir)
 	dirent dirEntry;
 	dirent* dirEntryPtr;
 	int result = readdir_r (m_h, &dirEntry, &dirEntryPtr);
-	
+
 	if (result != 0)
 		return err::failWithLastSystemError ();
 
 	if (dirEntryPtr)
 		m_nextFileName = dirEntryPtr->d_name;
-	
+
 	return true;
 }
 
@@ -81,18 +81,18 @@ FileEnumerator::getNextFileName ()
 	dirent dirEntry;
 	dirent* dirEntryPtr;
 	int result = readdir_r (m_h, &dirEntry, &dirEntryPtr);
-	
+
 	if (result == 0 && dirEntryPtr)
 		m_nextFileName = dirEntryPtr->d_name;
 	else
 		m_nextFileName.clear ();
-	
+
 	return fileName;
 }
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

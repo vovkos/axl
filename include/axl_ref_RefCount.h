@@ -19,25 +19,25 @@ namespace ref {
 // -creating ref-counted objects on member fields buffers (be sure to make container non-copiable)
 // -creating ref-counted objects on static/stack buffers
 
-//.............................................................................
+//..............................................................................
 
-typedef 
-void 
+typedef
+void
 FreeFunc (void* p);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct RefCountAllocHdr
 {
 	union
-	{	
+	{
 		//! \unnamed{union}
 		FreeFunc* m_freeFunc;
 		uint64_t m_padding; // ensure 8-byte alignment
 	};
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum RefCountFlag
 {
@@ -46,12 +46,12 @@ enum RefCountFlag
 	// ok to define and use your own flags 0x08..0x80
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class RefCount
 {
 	AXL_DISABLE_COPY (RefCount)
-	
+
 protected:
 	volatile intptr_t m_refCount;
 	volatile intptr_t m_weakRefCount;
@@ -67,9 +67,9 @@ protected:
 public:
 	RefCount ();
 
-	virtual 
+	virtual
 	~RefCount ()
-	{ 
+	{
 		ASSERT (m_refCount == 0 && m_weakRefCount > 0);
 	}
 
@@ -81,14 +81,14 @@ public:
 
 	size_t
 	getRefCount ()
-	{ 
-		return m_refCount; 
+	{
+		return m_refCount;
 	}
 
 	size_t
-	getWeakRefCount () 
-	{ 
-		return m_weakRefCount; 
+	getWeakRefCount ()
+	{
+		return m_weakRefCount;
 	}
 
 	uint_t
@@ -99,8 +99,8 @@ public:
 
 	size_t
 	addRef ()
-	{ 
-		return sys::atomicInc (&m_refCount); 
+	{
+		return sys::atomicInc (&m_refCount);
 	}
 
 	size_t
@@ -108,8 +108,8 @@ public:
 
 	size_t
 	addWeakRef ()
-	{ 
-		return sys::atomicInc (&m_weakRefCount); 
+	{
+		return sys::atomicInc (&m_weakRefCount);
 	}
 
 	size_t
@@ -119,51 +119,51 @@ public:
 	addRefByWeakPtr ();
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
-class Box: 
+class Box:
 	public RefCount,
 	public T
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class AllocBox: 
+class AllocBox:
 	public RefCountAllocHdr,
 	public T
 {
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class Release
 {
 public:
-	void 
+	void
 	operator () (T* p) const
-	{ 
-		p->release (); 
+	{
+		p->release ();
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class WeakRelease
 {
 public:
-	void 
+	void
 	operator () (T* p) const
-	{ 
-		p->weakRelease (); 
+	{
+		p->weakRelease ();
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ref
 } // namespace axl

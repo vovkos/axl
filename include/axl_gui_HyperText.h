@@ -13,7 +13,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 class HyperText
 {
@@ -33,27 +33,27 @@ protected:
 
 public:
 	const sl::String&
-	getSource () const 
+	getSource () const
 	{
 		return m_source;
 	}
 
 	const sl::String&
-	getText () const 
+	getText () const
 	{
 		return m_text;
 	}
 
 	const TextAttrAnchorArray*
-	getAttrArray () const 
+	getAttrArray () const
 	{
 		return &m_attrArray;
 	}
 
-	void 
+	void
 	clear ();
 
-	size_t 
+	size_t
 	setHyperText (
 		const TextAttr& baseAttr,
 		const sl::StringRef& text
@@ -63,22 +63,22 @@ public:
 		return appendHyperText (baseAttr, text);
 	}
 
-	size_t 
+	size_t
 	setHyperText (const sl::StringRef& text)
 	{
 		return setHyperText (TextAttr (), text);
 	}
 
-	size_t 
+	size_t
 	setPlainText (const sl::StringRef& text)
 	{
 		clear ();
 		return appendPlainText (text);
 	}
 
-	size_t 
+	size_t
 	setPlainText (
-		char c, 
+		char c,
 		size_t count = 1
 		)
 	{
@@ -86,24 +86,24 @@ public:
 		return appendPlainText (c, count);
 	}
 
-	size_t 
+	size_t
 	appendHyperText (
 		const TextAttr& baseAttr,
 		const sl::StringRef& text
 		);
 
-	size_t 
+	size_t
 	appendHyperText (const sl::StringRef& text)
 	{
 		return appendHyperText (TextAttr (), text);
 	}
 
-	size_t 
+	size_t
 	appendPlainText (const sl::StringRef& text);
 
-	size_t 
+	size_t
 	appendPlainText (
-		char c, 
+		char c,
 		size_t count = 1
 		);
 
@@ -113,21 +113,21 @@ public:
 	Size
 	calcTextSize (Font* font) const;
 
-	void 
+	void
 	calcHyperlinkXMap (Font* font);
 
-	HyperlinkAnchor* 
+	HyperlinkAnchor*
 	findHyperlinkByX (int x) const;
 
 	HyperlinkAnchor*
-	findHyperlinkByOffset (size_t offset) const 
+	findHyperlinkByOffset (size_t offset) const
 	{
 		HyperlinkAnchor* anchor = m_hyperlinkArray.find (offset);
 		return anchor && !anchor->m_hyperlink.isEmpty () ? anchor : NULL;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

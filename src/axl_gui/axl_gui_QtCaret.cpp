@@ -5,7 +5,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 bool
 QtCaret::show (
@@ -22,9 +22,9 @@ QtCaret::show (
 	m_widgetDriver = widgetDriver;
 	m_rect = rect;
 	m_isVisible = true;
-	
+
 	widgetDriver->redraw (rect);
-	
+
 	setSingleShot (false);
 	start (interval);
 	return true;
@@ -54,7 +54,7 @@ QtCaret::timerEvent  (QTimerEvent* e)
 	m_widgetDriver->redraw (m_rect);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

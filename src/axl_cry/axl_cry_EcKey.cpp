@@ -5,7 +5,7 @@
 namespace axl {
 namespace cry {
 
-//.............................................................................
+//..............................................................................
 
 void
 EcKey::setFlags (uint_t flags)
@@ -52,9 +52,9 @@ EcKey::setPublicKeyData (
 {
 	EC_GROUP* group = getGroup ();
 	EcPoint key (group);
-		
-	return 
-		key.setData (group, p, size, ctx) && 
+
+	return
+		key.setData (group, p, size, ctx) &&
 		setPublicKey (key);
 }
 
@@ -66,9 +66,9 @@ EcKey::setPublicKeyDecString (
 {
 	EC_GROUP* group = getGroup ();
 	EcPoint key (group);
-		
-	return 
-		key.setDecString (getGroup (), string, ctx) && 
+
+	return
+		key.setDecString (getGroup (), string, ctx) &&
 		setPublicKey (key);
 }
 
@@ -81,8 +81,8 @@ EcKey::setPublicKeyHexString (
 	EC_GROUP* group = getGroup ();
 	EcPoint key (group);
 
-	return 
-		key.setHexString (group, string, ctx) && 
+	return
+		key.setHexString (group, string, ctx) &&
 		setPublicKey (key);
 }
 
@@ -95,13 +95,13 @@ EcKey::signHash (
 	)
 {
 	ASSERT (signatureSize >= getSignatureSize ());
-	
+
 	uint_t resultSize = (uint_t) signatureSize;
 	int result = ECDSA_sign (
-		0, 
-		(const uchar_t*) hash, 
-		(int) hashSize, 
-		(uchar_t*) signature, 
+		0,
+		(const uchar_t*) hash,
+		(int) hashSize,
+		(uchar_t*) signature,
 		&resultSize,
 		m_h
 		);
@@ -116,7 +116,7 @@ EcKey::signHash (
 	return resultSize;
 }
 
-//.............................................................................
+//..............................................................................
 
 bool
 generateEcProductKey (
@@ -128,10 +128,10 @@ generateEcProductKey (
 {
 	char buffer [256];
 	sl::Array <char> signature (ref::BufKind_Stack, buffer, sizeof (buffer));
-	
+
 	EcKey ecKey (ecKey0);
 
-	bool result = 
+	bool result =
 		ecKey.sign (&signature, userName.cp (), userName.getLength ()) &&
 		enc::Base32Encoding::encode (productKey, signature, signature.getCount (), hyphenDistance) != -1;
 
@@ -151,7 +151,7 @@ verifyEcProductKey (
 
 	EcKey ecKey (ecKey0);
 
-	bool result = 
+	bool result =
 		enc::Base32Encoding::decode (&signature, productKey) != -1 &&
 		ecKey.verify (userName.cp (), userName.getLength (), signature, signature.getCount ());
 
@@ -159,7 +159,7 @@ verifyEcProductKey (
 	return result;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cry
 } // namespace axl

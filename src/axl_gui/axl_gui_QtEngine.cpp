@@ -5,7 +5,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 QtFont* QtFontTuple::attachFont (QFont qtFont)
 {
@@ -19,7 +19,7 @@ QtFont* QtFontTuple::attachFont (QFont qtFont)
 	return font;
 }
 
-//.............................................................................
+//..............................................................................
 
 QtEngine::QtEngine ():
 	m_sharedOffscreenCanvasCache (this)
@@ -35,7 +35,7 @@ QtEngine::~QtEngine ()
 {
 	if (m_qtClipboardMimeData)
 		delete m_qtClipboardMimeData;
-	
+
 	for (size_t i = 0; i < countof (m_stdFontTupleArray); i++)
 		if (m_stdFontTupleArray [i])
 			AXL_MEM_DELETE (m_stdFontTupleArray [i]);
@@ -62,7 +62,7 @@ QtEngine::updateStdPalette ()
 	m_stdPalColorTable [~ColorFlag_Index & StdPalColor_3DHiLight]     = palette.color (QPalette::Light).rgb() & ColorFlag_RgbMask;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // canvas
 
@@ -292,12 +292,12 @@ QtEngine::drawImage (
 	QtImage* qtImage = (QtImage*) image;
 
 	qtCanvas->m_qtPainter.drawImage (
-		x, 
-		y, 
-		qtImage->m_qtImage, 
-		left, 
-		top, 
-		right - left, 
+		x,
+		y,
+		qtImage->m_qtImage,
+		left,
+		top,
+		right - left,
 		bottom - top
 		);
 
@@ -326,19 +326,19 @@ QtEngine::copyRect (
 		return true;
 
 	qtCanvas->m_qtPainter.drawPixmap (
-		x, 
-		y, 
-		qtSrcCanvas->m_qtPixmap, 
-		left, 
-		top, 
-		right - left, 
+		x,
+		y,
+		qtSrcCanvas->m_qtPixmap,
+		left,
+		top,
+		right - left,
 		bottom - top
 		);
 
 	return true;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // font
 
@@ -392,7 +392,7 @@ QtEngine::getStdFontTuple (StdFontKind fontKind)
 			QFont::Monospace,
 			(QFont::StyleStrategy) (QFont::NoFontMerging | QFont::ForceIntegerMetrics)
 			);
-		
+
 		break;
 	}
 
@@ -468,26 +468,26 @@ QtEngine::getFontDesc (
 	)
 {
 	ASSERT (font->getEngine () == this);
-	QtFont* qtFont = (QtFont*) font;	
+	QtFont* qtFont = (QtFont*) font;
 	QFontInfo qtFontInfo (qtFont->m_qtFont);
 
 	QString family = qtFontInfo.family ();
-	QByteArray familyUtf = family.toUtf8 ();	
+	QByteArray familyUtf = family.toUtf8 ();
 	size_t length = familyUtf.size ();
-	
+
 	if (length >= countof (fontDesc->m_family))
 		length = countof (fontDesc->m_family) - 1;
-	
+
 	memcpy (fontDesc->m_family, familyUtf, length);
-	fontDesc->m_family [length] = 0;	
+	fontDesc->m_family [length] = 0;
 	fontDesc->m_pointSize = qtFontInfo.pointSize ();
-	
+
 	if (qtFontInfo.weight () >= QFont::Bold)
 		fontDesc->m_flags |= FontFlag_Bold;
-	
+
 	if (qtFontInfo.italic ())
 		fontDesc->m_flags |= FontFlag_Italic;
-	
+
 	if (qtFontInfo.underline ())
 		fontDesc->m_flags |= FontFlag_Underline;
 
@@ -516,7 +516,7 @@ QtEngine::calcTextSize_qt (
 	ASSERT (font->getEngine () == this);
 	QtFont* qtFont = (QtFont*) font;
 	QFontMetrics qtFontMetrics (qtFont->m_qtFont);
-		
+
 	Size size;
 	size.m_width = qtFontMetrics.width (string);
 	size.m_height = qtFontMetrics.height ();
@@ -550,7 +550,7 @@ QtEngine::calcTextSize_utf32 (
 	return calcTextSize_qt (font, QString::fromUcs4 ((const uint*) text.cp (), text.getLength ()));
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // image
 
@@ -611,11 +611,11 @@ QtEngine::getStdCursor (StdCursorKind cursorKind)
 	return cursor;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // clipboard
 
-uintptr_t 
+uintptr_t
 QtEngine::registerClipboardFormat (const sl::StringRef& formatName)
 {
 	sl::StringHashTableMapIterator <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
@@ -707,7 +707,7 @@ QtEngine::commitClipboard ()
 	return true;
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // widget
 
@@ -731,9 +731,9 @@ QtEngine::setWidgetFocus (WidgetDriver* widgetDriver)
 bool
 QtEngine::redrawWidget (
 	WidgetDriver* widgetDriver,
-	int left, 
-	int top, 
-	int right, 
+	int left,
+	int top,
+	int right,
 	int bottom
 	)
 {
@@ -751,7 +751,7 @@ QtEngine::redrawWidget (
 bool
 QtEngine::scrollWidget (
 	WidgetDriver* widgetDriver,
-	int dx, 
+	int dx,
 	int dy
 	)
 {
@@ -765,11 +765,11 @@ QtEngine::scrollWidget (
 bool
 QtEngine::scrollWidgetRect (
 	WidgetDriver* widgetDriver,
-	int left, 
+	int left,
 	int top,
 	int right,
 	int bottom,
-	int dx, 
+	int dx,
 	int dy
 	)
 {
@@ -882,7 +882,7 @@ QtEngine::stopWidgetAnimation (WidgetDriver* widgetDriver)
 	qtWidget->m_animationTimer.stop ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

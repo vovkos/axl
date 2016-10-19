@@ -5,12 +5,12 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 const char*
 getNetworkAdapterTypeString (NetworkAdapterType adapterKind)
 {
-	static const char* stringTable [NetworkAdapterType__Count] = 
+	static const char* stringTable [NetworkAdapterType__Count] =
 	{
 		"unknown-adapter-kind", // NetworkAdapterType_Unknown,
 		"loopback",             // NetworkAdapterType_Loopback,
@@ -22,12 +22,12 @@ getNetworkAdapterTypeString (NetworkAdapterType adapterKind)
 		"tunnel",               // NetworkAdapterType_Tunnel,
 	};
 
-	return (size_t) adapterKind < countof (stringTable) ? 
-		stringTable [adapterKind] : 
+	return (size_t) adapterKind < countof (stringTable) ?
+		stringTable [adapterKind] :
 		stringTable [NetworkAdapterType_Unknown];
 }
 
-//.............................................................................
+//..............................................................................
 
 const char*
 getNetworkAdapterFlagString (NetworkAdapterFlag flag)
@@ -71,7 +71,7 @@ getNetworkAdapterFlagString (uint_t flags)
 	return string;
 }
 
-//.............................................................................
+//..............................................................................
 
 NetworkAdapterDesc::NetworkAdapterDesc ()
 {
@@ -80,7 +80,7 @@ NetworkAdapterDesc::NetworkAdapterDesc ()
 	memset (m_mac, 0, sizeof (m_mac));
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

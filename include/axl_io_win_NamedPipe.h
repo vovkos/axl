@@ -12,12 +12,12 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
-	
+//..............................................................................
+
 class NamedPipe: public FileHandle
 {
 public:
-	bool 
+	bool
 	create (
 		const sl::StringRef_w& name,
 		uint_t openMode,
@@ -29,24 +29,24 @@ public:
 		SECURITY_ATTRIBUTES* secAttr
 		);
 
-	bool 
+	bool
 	open (
 		const sl::StringRef_w& name,
 		uint_t access = GENERIC_READ | GENERIC_WRITE,
 		uint_t flags = FILE_FLAG_OVERLAPPED
 		);
 
-	bool 
+	bool
 	connect (OVERLAPPED* overlapped = NULL)
 	{
 		bool_t result = ::ConnectNamedPipe (m_h, overlapped);
 		return completeAsyncRequest (result, overlapped);
 	}
 
-	bool 
+	bool
 	read (
-		void* p, 
-		dword_t size, 
+		void* p,
+		dword_t size,
 		dword_t* actualSize,
 		OVERLAPPED* overlapped = NULL
 		) const
@@ -55,9 +55,9 @@ public:
 		return completeAsyncRequest (result, overlapped);
 	}
 
-	bool 
+	bool
 	write (
-		const void* p, 
+		const void* p,
 		dword_t size,
 		dword_t* actualSize,
 		OVERLAPPED* overlapped = NULL
@@ -67,10 +67,10 @@ public:
 		return completeAsyncRequest (result, overlapped);
 	}
 
-	bool 
+	bool
 	readEx (
-		void* p, 
-		dword_t size, 
+		void* p,
+		dword_t size,
 		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
 		) const
@@ -79,9 +79,9 @@ public:
 		return completeAsyncRequest (result, overlapped);
 	}
 
-	bool 
+	bool
 	writeEx (
-		const void* p, 
+		const void* p,
 		dword_t size,
 		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
@@ -92,7 +92,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace io

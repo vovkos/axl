@@ -12,10 +12,10 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
-class HandleTable 
+class HandleTable
 {
 public:
 	class Entry: public sl::ListLink
@@ -36,7 +36,7 @@ public:
 
 	typedef Iterator <Entry> ListIterator;
 	typedef HashTableMapIterator <handle_t, ListIterator> MapIterator;
-	
+
 protected:
 	StdList <Entry> m_list;
 	HashTableMap <handle_t, ListIterator, HashId <handle_t> > m_hashTable;
@@ -59,7 +59,7 @@ public:
 		return m_list.isEmpty ();
 	}
 
-	ConstList <Entry> 
+	ConstList <Entry>
 	getList () const
 	{
 		return m_list;
@@ -84,7 +84,7 @@ public:
 	{
 		return m_hashTable.find (handle);
 	}
-	
+
 	bool
 	find (
 		handle_t handle,
@@ -108,7 +108,7 @@ public:
 		Entry* entry = AXL_MEM_NEW (Entry);
 		entry->m_handle = handle;
 		entry->m_value = value;
-		
+
 		ListIterator it = m_list.insertTail (entry);
 		m_hashTable [handle] = it;
 
@@ -138,7 +138,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

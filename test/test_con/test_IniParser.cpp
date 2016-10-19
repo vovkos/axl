@@ -1,8 +1,8 @@
 #include "pch.h"
 
-namespace test_IniParser { 
+namespace test_IniParser {
 
-//.............................................................................
+//..............................................................................
 
 class MyParser: public ini::Parser <MyParser>
 {
@@ -40,7 +40,7 @@ protected:
 	AXL_SL_END_HASH_TABLE_MAP ()
 
 public:
-	bool 
+	bool
 	onSection (const char* name)
 	{
 		SectionNameMap::Iterator it = SectionNameMap::find (name);
@@ -86,9 +86,9 @@ run ()
 	{
 		printf ("error parsing file: %s\n", err::getError ()->getDescription ().cc ());
 		return;
-	}	
+	}
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_IniParser

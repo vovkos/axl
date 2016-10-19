@@ -11,7 +11,7 @@
 namespace axl {
 namespace xml {
 
-//.............................................................................
+//..............................................................................
 
 class FreeExpatParser
 {
@@ -23,7 +23,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class ExpatParserRoot: public sl::Handle <XML_Parser, FreeExpatParser>
 {
@@ -91,7 +91,7 @@ public:
 	{
 		::XML_SetUserData (m_h, userData);
 	}
-	
+
 	void
 	setElementHandler (
 		XML_StartElementHandler startHandler,
@@ -275,7 +275,7 @@ protected:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class ExpatParser: public ExpatParserRoot
@@ -310,7 +310,7 @@ public:
 protected:
 	// overridables
 
-	void 
+	void
 	onStartElement (
 		const char* name,
 		const char** attributes
@@ -318,12 +318,12 @@ protected:
 	{
 	}
 
-	void 
+	void
 	onEndElement (const char* name)
 	{
 	}
 
-	void 
+	void
 	onCharacterData (
 		const char* string,
 		size_t length
@@ -331,7 +331,7 @@ protected:
 	{
 	}
 
-	void 
+	void
 	onProcessingInstruction (
 		const char* target,
 		const char* data
@@ -339,22 +339,22 @@ protected:
 	{
 	}
 
-	void 
+	void
 	onComment (const char* data)
 	{
 	}
 
-	void 
+	void
 	onStartCdataSection ()
 	{
 	}
 
-	void 
+	void
 	onEndCdataSection ()
 	{
 	}
 
-	void 
+	void
 	onDefault (
 		const char* string,
 		size_t length
@@ -362,7 +362,7 @@ protected:
 	{
 	}
 
-	void 
+	void
 	onDefaultExpand (
 		const char* string,
 		size_t length
@@ -380,12 +380,12 @@ protected:
 	{
 	}
 
-	void 
+	void
 	onEndDoctypeDecl ()
 	{
 	}
 
-	void 
+	void
 	onNotationDecl (
 		const char* notationName,
 		const char* base,
@@ -395,7 +395,7 @@ protected:
 	{
 	}
 
-	void 
+	void
 	onStartNamespaceDecl (
 		const char* prefix,
 		const char* uri
@@ -403,7 +403,7 @@ protected:
 	{
 	}
 
-	void 
+	void
 	onEndNamespaceDecl (const char* prefix)
 	{
 	}
@@ -480,8 +480,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	startElementHandler (
 		void* userData,
 		const XML_Char* name,
@@ -492,8 +492,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	endElementHandler (
 		void* userData,
 		const XML_Char* name
@@ -503,8 +503,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	characterDataHandler (
 		void* userData,
 		const XML_Char* string,
@@ -515,9 +515,9 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
-	processingInstructionHandler (	
+	void
+	XMLCALL
+	processingInstructionHandler (
 		void* userData,
 		const XML_Char* target,
 		const XML_Char* data
@@ -527,8 +527,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	commentHandler (
 		void* userData,
 		const XML_Char* data
@@ -538,24 +538,24 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	startCdataSectionHandler (void* userData)
 	{
 		((T*) userData)->onStartCdataSection ();
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	endCdataSectionHandler (void* userData)
 	{
 		((T*) userData)->onEndCdataSection ();
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	defaultHandler (
 		void* userData,
 		const XML_Char* string,
@@ -566,8 +566,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	defaultHandlerExpand (
 		void* userData,
 		const XML_Char* string,
@@ -578,8 +578,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	startDoctypeDeclHandler (
 		void* userData,
 		const XML_Char* doctypeName,
@@ -592,16 +592,16 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	endDoctypeDeclHandler (void* userData)
 	{
 		((T*) userData)->onEndDoctypeDecl ();
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	notationDeclHandler (
 		void* userData,
 		const XML_Char* notationName,
@@ -614,8 +614,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	startNamespaceDeclHandler (
 		void* userData,
 		const XML_Char* prefix,
@@ -626,8 +626,8 @@ protected:
 	}
 
 	static
-	void 
-	XMLCALL 
+	void
+	XMLCALL
 	endNamespaceDeclHandler (
 		void* userData,
 		const XML_Char* prefix
@@ -637,8 +637,8 @@ protected:
 	}
 
 	static
-	int 
-	XMLCALL 
+	int
+	XMLCALL
 	notStandaloneHandler (void* userData)
 	{
 		return ((T*) userData)->onNotStandalone ();
@@ -646,7 +646,7 @@ protected:
 
 	static
 	int
-	XMLCALL 
+	XMLCALL
 	unknownEncodingHandler (
 		void* userData,
 		const XML_Char* name,
@@ -657,7 +657,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace xml
 } // namespace axl

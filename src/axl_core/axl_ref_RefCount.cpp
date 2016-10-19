@@ -5,9 +5,9 @@
 namespace axl {
 namespace ref {
 
-//.............................................................................
+//..............................................................................
 
-RefCount::RefCount () 
+RefCount::RefCount ()
 {
 	m_refCount = 0;
 	m_weakRefCount = 1;
@@ -32,7 +32,7 @@ size_t
 RefCount::release ()
 {
 	intptr_t refCount = sys::atomicDec (&m_refCount);
-	 
+
 	if (!refCount)
 	{
 		this->~RefCount ();
@@ -64,10 +64,10 @@ RefCount::weakRelease ()
 
 size_t
 RefCount::addRefByWeakPtr ()
-{ 
+{
 	for (;;)
 	{
-		intptr_t old = m_refCount; 
+		intptr_t old = m_refCount;
 		if (old == 0)
 			return 0;
 
@@ -76,7 +76,7 @@ RefCount::addRefByWeakPtr ()
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
-} // namespace axl 
-} // namespace ref 
+} // namespace axl
+} // namespace ref

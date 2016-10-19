@@ -2,14 +2,14 @@
 // #include "TestLexer.h"
 // #include "TestParser.h"
 
-//.............................................................................
+//..............................................................................
 
 namespace test_Parse
 {
 
 /*
 
-void 
+void
 run (const char* fileName)
 {
 	bool result;
@@ -33,7 +33,7 @@ run (const char* fileName)
 
 	for (;;)
 	{
-		const Token* token = lexer.getToken (); 
+		const Token* token = lexer.getToken ();
 
 		result = parser.parseToken (token);
 		if (!result)
@@ -53,4 +53,4 @@ run (const char* fileName)
 
 } // test_Parse
 
-//.............................................................................
+//..............................................................................

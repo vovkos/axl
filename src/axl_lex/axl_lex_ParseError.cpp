@@ -5,7 +5,7 @@
 namespace axl {
 namespace lex {
 
-//.............................................................................
+//..............................................................................
 
 sl::StringRef
 ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
@@ -33,7 +33,7 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 	case ParseErrorCode_InvalidSyntaxIn:
 		{
 		const char* location;
-		
+
 		unpacker.unpack (&location);
 		return sl::formatString ("invalid syntax in '%s'", location);
 		}
@@ -42,7 +42,7 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 		{
 		const char* expectedToken;
 		const char* actualToken;
-		
+
 		unpacker.unpack (&expectedToken);
 		unpacker.unpack (&actualToken);
 		return sl::formatString ("expected '%s' before '%s'", expectedToken, actualToken);
@@ -51,7 +51,7 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 	case ParseErrorCode_UnexpectedToken:
 		{
 		const char* token;
-		
+
 		unpacker.unpack (&token);
 		return sl::formatString ("unexpected '%s'", token);
 		}
@@ -60,7 +60,7 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 		{
 		const char* token;
 		const char* location;
-		
+
 		unpacker.unpack (&token);
 		unpacker.unpack (&location);
 		return sl::formatString ("unexpected '%s' in '%s'", token, location);
@@ -71,7 +71,7 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace lex
 } // namespace axl

@@ -5,7 +5,7 @@
 namespace axl {
 namespace ini {
 
-//.............................................................................
+//..............................................................................
 
 bool
 Lexer::create (
@@ -13,8 +13,8 @@ Lexer::create (
 	const sl::StringRef& source
 	)
 {
-	this->reset (); 
-		
+	this->reset ();
+
 	init ();
 
 	p   = (char*) source.cp ();
@@ -33,7 +33,7 @@ Lexer::parseSection (
 	)
 {
 	ASSERT (*p == '[');
-		
+
 	if (end [-1] != ']')
 		return;
 
@@ -84,11 +84,11 @@ Lexer::parseKeyValue (
 		if (p < end)
 		{
 			size_t length = end - p;
-			m_value.copy (p, length);					
+			m_value.copy (p, length);
 
 			if (m_value [0] == '"' && m_value [length - 1] == '"')
 				m_value = enc::EscapeEncoding::decode (m_value.getSubString (1, length - 2));
-		}	
+		}
 	}
 
 	stop ();
@@ -97,7 +97,7 @@ Lexer::parseKeyValue (
 Lexer::ScanResultKind
 Lexer::scanLine ()
 {
-	if (p == eof) 
+	if (p == eof)
 		return ScanResultKind_Eof;
 
 	pe = eof;
@@ -112,13 +112,13 @@ Lexer::scanLine ()
 		lex::pushSrcPosError (m_filePath, m_line, p - m_begin - m_lineOffset);
 		return ScanResultKind_Error;
 	}
-		
-	return 
-		!m_sectionName.isEmpty () ? ScanResultKind_Section : 
+
+	return
+		!m_sectionName.isEmpty () ? ScanResultKind_Section :
 		!m_keyName.isEmpty () ? ScanResultKind_KeyValue : ScanResultKind_Eof;
 }
 
-void 
+void
 Lexer::reset ()
 {
 	p = NULL;
@@ -139,16 +139,16 @@ Lexer::reset ()
 	m_value.clear ();
 }
 
-void 
+void
 Lexer::newLine (char* line)
-{ 
+{
 	ASSERT (line [-1] == '\n');
 
 	m_lineOffset = line - m_begin;
 	m_line++;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace ini
 } // namespace axl

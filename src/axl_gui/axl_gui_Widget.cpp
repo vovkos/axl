@@ -7,7 +7,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 WidgetDriver::WidgetDriver (const WidgetConstructParam& param):
 	GuiItem (param.m_engine)
@@ -15,7 +15,7 @@ WidgetDriver::WidgetDriver (const WidgetConstructParam& param):
 	m_engineWidget = param.m_engineWidget;
 	m_cursor = m_engine->getStdCursor (StdCursorKind_Arrow);
 	m_font = m_engine->getStdFont (StdFontKind_Monospace);
-	m_msgMap = NULL;	
+	m_msgMap = NULL;
 	m_colorAttr.m_foreColor = StdPalColor_WidgetText;
 	m_colorAttr.m_backColor = StdPalColor_WidgetBack;
 	m_caretSize.m_width = 2;
@@ -64,7 +64,7 @@ WidgetDriver::setCaretSize (
 
 bool
 WidgetDriver::setCaretPos (
-	int x, 
+	int x,
 	int y
 	)
 {
@@ -119,7 +119,7 @@ WidgetDriver::processMsg (
 	*isHandled = result;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

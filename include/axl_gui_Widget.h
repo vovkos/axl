@@ -15,7 +15,7 @@ namespace gui {
 class Canvas;
 class Widget;
 
-//.............................................................................
+//..............................................................................
 
 // master message structure
 
@@ -26,7 +26,7 @@ enum WidgetMsgCode
 	WidgetMsgCode_Close,                   // WidgetMsg
 	WidgetMsgCode_SetFocus,                // WidgetMsg
 	WidgetMsgCode_KillFocus,               // WidgetMsg
-	WidgetMsgCode_Size,                    // WidgetMsgParam <uint_t OrientationMask> 
+	WidgetMsgCode_Size,                    // WidgetMsgParam <uint_t OrientationMask>
 	WidgetMsgCode_Scroll,                  // WidgetMsgParam <uint_t OrientationMask>
 	WidgetMsgCode_Paint,                   // WidgetPaintMsg
 
@@ -52,7 +52,7 @@ enum WidgetMsgCode
 	WidgetMsgCode__Count,
 };
 
-//.............................................................................
+//..............................................................................
 
 struct WidgetMsg
 {
@@ -62,14 +62,14 @@ struct WidgetMsg
 	{
 		m_msgCode = WidgetMsgCode_Undefined;
 	}
-	
+
 	WidgetMsg (WidgetMsgCode msgCode)
 	{
 		m_msgCode = msgCode;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 struct WidgetMsgParam: WidgetMsg
@@ -79,10 +79,10 @@ struct WidgetMsgParam: WidgetMsg
 	WidgetMsgParam ()
 	{
 	}
-	
+
 	WidgetMsgParam (
 		WidgetMsgCode msgCode,
-		const T& param	
+		const T& param
 		)
 	{
 		m_msgCode = msgCode;
@@ -90,7 +90,7 @@ struct WidgetMsgParam: WidgetMsg
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct WidgetPaintMsg: WidgetMsg
 {
@@ -100,14 +100,14 @@ struct WidgetPaintMsg: WidgetMsg
 	size_t m_regionRectCount;
 
 	WidgetPaintMsg (Canvas* canvas)
-	{		
+	{
 		m_msgCode = WidgetMsgCode_Paint;
 		m_canvas = canvas;
 		m_regionRectCount = 0;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct WidgetMouseMsg: WidgetMsg
 {
@@ -119,16 +119,16 @@ struct WidgetMouseMsg: WidgetMsg
 	WidgetMouseMsg ()
 	{
 		m_buttons = 0;
-		m_modifierKeys = 0;		
+		m_modifierKeys = 0;
 		m_button = MouseButton_None;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct WidgetMouseWheelMsg: WidgetMouseMsg
 {
-	int m_wheelDelta;	
+	int m_wheelDelta;
 
 	WidgetMouseWheelMsg ()
 	{
@@ -137,7 +137,7 @@ struct WidgetMouseWheelMsg: WidgetMouseMsg
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct WidgetKeyMsg: WidgetMsg
 {
@@ -153,7 +153,7 @@ struct WidgetKeyMsg: WidgetMsg
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct WidgetThreadMsg: WidgetMsg
 {
@@ -161,9 +161,9 @@ struct WidgetThreadMsg: WidgetMsg
 	ref::Ptr <void> m_params;
 };
 
-//.............................................................................
+//..............................................................................
 
-// engine-specific messages 
+// engine-specific messages
 
 #if (_AXL_OS_WIN)
 
@@ -190,7 +190,7 @@ struct WidgetGdiMsg: WidgetMsg
 
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (_AXL_GUI_QT)
 
@@ -206,7 +206,7 @@ struct WidgetQtMsg: WidgetMsg
 
 #endif
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (_AXL_GTK)
 
@@ -222,7 +222,7 @@ struct WidgetGtkMsg: WidgetMsg
 
 #endif
 
-//.............................................................................
+//..............................................................................
 
 // scroll bars
 
@@ -262,17 +262,17 @@ struct WidgetScrollBar
 		return m_pos + m_page + 1 >= m_end;
 	}
 
-	size_t 
+	size_t
 	getMaxPos ()
 	{
 		return m_end > m_page ? m_end - m_page : 0;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
-typedef 
-void 
+typedef
+void
 (Widget::*WidgetMsgProc) (
 	const WidgetMsg* msg,
 	bool* isHandled
@@ -284,7 +284,7 @@ struct WidgetMsgMap
 	WidgetMsgMap* m_baseMap;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct WidgetConstructParam
 {
@@ -301,7 +301,7 @@ struct WidgetConstructParam
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class WidgetDriver: public GuiItem
 {
@@ -327,13 +327,13 @@ protected:
 	WidgetDriver (const WidgetConstructParam& param);
 
 public:
-	void* 
+	void*
 	getEngineWidget ()
 	{
 		return m_engineWidget;
 	}
 
-	Font* 
+	Font*
 	getFont ()
 	{
 		return m_font;
@@ -341,14 +341,14 @@ public:
 
 	bool
 	setFont (Font* font);
-	
-	ColorAttr 
+
+	ColorAttr
 	getColorAttr ()
 	{
 		return m_colorAttr;
 	}
 
-	bool 
+	bool
 	setColorAttr (
 		uint_t foreColor,
 		uint_t backColor
@@ -358,14 +358,14 @@ public:
 		return redraw ();
 	}
 
-	bool 
+	bool
 	setColorAttr (const ColorAttr& attr)
 	{
 		m_colorAttr = attr;
 		return redraw ();
 	}
 
-	Palette 
+	Palette
 	getPalette ()
 	{
 		return m_palette;
@@ -392,10 +392,10 @@ public:
 
 	bool
 	redraw (
-		int left, 
-		int top, 
-		int right, 
-		int bottom		
+		int left,
+		int top,
+		int right,
+		int bottom
 		)
 	{
 		return m_engine->redrawWidget (this, left, top, right, bottom);
@@ -415,7 +415,7 @@ public:
 
 	bool
 	scroll (
-		int dx, 
+		int dx,
 		int dy
 		)
 	{
@@ -424,11 +424,11 @@ public:
 
 	bool
 	scrollRect (
-		int left, 
-		int top, 
-		int right, 
+		int left,
+		int top,
+		int right,
 		int bottom,
-		int dx, 
+		int dx,
 		int dy
 		)
 	{
@@ -437,8 +437,8 @@ public:
 
 	bool
 	scrollRect (
-		const Rect& rect, 
-		int dx, 
+		const Rect& rect,
+		int dx,
 		int dy
 		)
 	{
@@ -447,7 +447,7 @@ public:
 
 	bool
 	scrollRect (
-		int dx, 
+		int dx,
 		int dy
 		)
 	{
@@ -470,7 +470,7 @@ public:
 
 	// mouse
 
-	Cursor* 
+	Cursor*
 	getCursor ()
 	{
 		return m_cursor;
@@ -506,7 +506,7 @@ public:
 	bool
 	setCaretVisible (bool isVisible);
 
-	Size 
+	Size
 	getCaretSize ()
 	{
 		return m_caretSize;
@@ -544,7 +544,7 @@ public:
 
 	bool
 	setCaretPos (
-		int x, 
+		int x,
 		int y
 		);
 
@@ -565,7 +565,7 @@ public:
 	bool
 	updateScrollBars ()
 	{
-		return 
+		return
 			updateScrollBar (Orientation_Vertical) &&
 			updateScrollBar (Orientation_Horizontal);
 	}
@@ -619,7 +619,7 @@ public:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 class Widget
 {
@@ -642,7 +642,7 @@ public:
 	}
 
 protected:
-	virtual 
+	virtual
 	WidgetMsgMap*
 	getWidgetMsgMap ()
 	{
@@ -650,7 +650,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 #define AXL_GUI_WIDGET_BEGIN_MSG_MAP(BaseClass) \
 virtual \
@@ -673,7 +673,7 @@ getWidgetMsgMap () \
 	return &map; \
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

@@ -13,7 +13,7 @@ namespace io {
 
 class NetworkAdapterEnumerator;
 
-//.............................................................................
+//..............................................................................
 
 enum NetworkAdapterType
 {
@@ -28,12 +28,12 @@ enum NetworkAdapterType
 	NetworkAdapterType__Count,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char*
 getNetworkAdapterTypeString (NetworkAdapterType adapterKind);
 
-//.............................................................................
+//..............................................................................
 
 enum NetworkAdapterFlag
 {
@@ -45,7 +45,7 @@ enum NetworkAdapterFlag
 	NetworkAdapterFlag_Ip6       = 0x20,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 NetworkAdapterFlag
@@ -60,7 +60,7 @@ getNetworkAdapterFlagString (NetworkAdapterFlag flag);
 sl::String
 getNetworkAdapterFlagString (uint_t flags);
 
-//.............................................................................
+//..............................................................................
 
 struct NetworkAdapterAddress: sl::ListLink
 {
@@ -68,7 +68,7 @@ struct NetworkAdapterAddress: sl::ListLink
 	size_t m_netMaskBitCount;
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class NetworkAdapterDesc: public sl::ListLink
 {
@@ -85,13 +85,13 @@ protected:
 public:
 	NetworkAdapterDesc ();
 
-	NetworkAdapterType 
+	NetworkAdapterType
 	getType () const
 	{
 		return m_type;
 	}
-	
-	uint_t 
+
+	uint_t
 	getFlags () const
 	{
 		return m_flags;
@@ -109,25 +109,25 @@ public:
 		return m_description;
 	}
 
-	const uchar_t* 
+	const uchar_t*
 	getMac () const
 	{
 		return m_mac;
 	}
 
-	sl::ConstList <NetworkAdapterAddress> 
+	sl::ConstList <NetworkAdapterAddress>
 	getAddressList () const
 	{
 		return m_addressList;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList);
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

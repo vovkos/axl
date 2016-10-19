@@ -11,19 +11,19 @@
 namespace axl {
 namespace cry {
 
-//.............................................................................
+//..............................................................................
 
 class FreeEcPoint
 {
 public:
-	void 
+	void
 	operator () (EC_POINT* h)
 	{
 		EC_POINT_free (h);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class EcPoint: public sl::Handle <EC_POINT*, FreeEcPoint>
 {
@@ -193,7 +193,7 @@ public:
 	bool
 	isEqual (
 		EC_GROUP* group,
-		EC_POINT* op, 
+		EC_POINT* op,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -203,8 +203,8 @@ public:
 	bool
 	add (
 		EC_GROUP* group,
-		EC_POINT* op1, 
-		EC_POINT* op2, 
+		EC_POINT* op1,
+		EC_POINT* op2,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -215,9 +215,9 @@ public:
 	bool
 	mul (
 		EC_GROUP* group,
-		BIGNUM* op1, 
-		EC_POINT* op2, 
-		BIGNUM* op3, 
+		BIGNUM* op1,
+		EC_POINT* op2,
+		BIGNUM* op3,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -228,7 +228,7 @@ public:
 	bool
 	mul (
 		EC_GROUP* group,
-		BIGNUM* op, 
+		BIGNUM* op,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -239,7 +239,7 @@ public:
 	bool
 	dbl (
 		EC_GROUP* group,
-		EC_POINT* op, 
+		EC_POINT* op,
 		BN_CTX* ctx = NULL
 		)
 	{
@@ -268,7 +268,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cry
 } // namespace axl

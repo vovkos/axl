@@ -1,8 +1,8 @@
 #include "pch.h"
 
-namespace test_BoyerMooreFind { 
+namespace test_BoyerMooreFind {
 
-//.............................................................................
+//..............................................................................
 
 void run ()
 {
@@ -11,14 +11,14 @@ void run ()
 	char haystack [] = "hui govno i muravei";
 	char needle [] = "muravei";
 
-	uint_t flags = 
-//		sl::TextBoyerMooreFind::Flag_Reverse | 
+	uint_t flags =
+//		sl::TextBoyerMooreFind::Flag_Reverse |
 //		sl::TextBoyerMooreFind::Flag_CaseInsensitive |
 		sl::TextBoyerMooreFind::Flag_WholeWord |
 		0;
 
 	find.setPattern (needle, lengthof (needle), flags);
-	
+
 	size_t result = -1;
 	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
 
@@ -48,11 +48,11 @@ void run ()
 #endif
 
 	printf ("result = %d\n", result);
-	
+
 	result = find.find (haystack, lengthof (haystack));
 	printf ("result = %d\n", result);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace test_Vso

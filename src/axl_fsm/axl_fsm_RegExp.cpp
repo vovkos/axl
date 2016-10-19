@@ -3,11 +3,11 @@
 
 namespace axl {
 namespace fsm {
-	
-//.............................................................................
+
+//..............................................................................
 
 static
-sl::String 
+sl::String
 getCharSetString (const sl::BitMap* charSet)
 {
 	sl::String string;
@@ -36,7 +36,7 @@ getCharSetString (const sl::BitMap* charSet)
 
 				string.appendFormat (isprint (c2) ? "%c" : "\\x%02x", c2);
 			}
-			
+
 			c1 = -1;
 		}
 	}
@@ -58,11 +58,11 @@ getCharSetString (const sl::BitMap* charSet)
 }
 
 static
-sl::String 
+sl::String
 getMatchConditionString (const MatchCondition* condition)
 {
 	sl::String string;
-	
+
 	switch (condition->m_conditionKind)
 	{
 	case MatchConditionKind_Char:
@@ -84,7 +84,7 @@ getMatchConditionString (const MatchCondition* condition)
 	return string;
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 RegExp::clear ()
@@ -95,13 +95,13 @@ RegExp::clear ()
 	m_dfaStateArray.clear ();
 }
 
-bool 
+bool
 RegExp::match (const sl::StringRef& string)
 {
 	return false;
 }
 
-bool 
+bool
 RegExp::compile (const sl::StringRef& source)
 {
 	RegExpCompiler compiler (this);
@@ -119,7 +119,7 @@ RegExp::print () const
 	{
 		NfaState* nfaState = *nfaIt;
 		printf (
-			"%c %02d ", 
+			"%c %02d ",
 			(nfaState->m_flags & NfaStateFlag_Accept) ? '*' : ' ',
 			nfaState->m_id
 			);
@@ -149,7 +149,7 @@ RegExp::print () const
 	{
 		DfaState* dfaState = *dfaIt;
 		printf (
-			"%c %02d = { ", 
+			"%c %02d = { ",
 			(dfaState->m_isAccept) ? '*' : ' ',
 			dfaState->m_id
 			);
@@ -172,7 +172,7 @@ RegExp::print () const
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 static
 void
@@ -205,7 +205,7 @@ RegExpCompiler::Token::isValidSingle ()
 	return validSingleTable [(uchar_t) m_char];
 }
 
-//.............................................................................
+//..............................................................................
 
 RegExpCompiler::RegExpCompiler (
 	RegExp* regExp,
@@ -220,7 +220,7 @@ RegExpCompiler::RegExpCompiler (
 	m_captureId = 0;
 }
 
-bool 
+bool
 RegExpCompiler::compile (
 	const sl::StringRef& source,
 	void* acceptContext
@@ -228,16 +228,16 @@ RegExpCompiler::compile (
 {
 	m_regExp->clear ();
 	m_captureId = 0;
-	
+
 	bool result = incrementalCompile (source, acceptContext);
 	if (!result)
 		return false;
-	
+
 	finalize ();
 	return true;
 }
 
-bool 
+bool
 RegExpCompiler::incrementalCompile (
 	const sl::StringRef& source,
 	void* acceptContext
@@ -246,7 +246,7 @@ RegExpCompiler::incrementalCompile (
 	m_p = source.sz ();
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 
-	NfaState* oldStart = !m_regExp->m_nfaStateList.isEmpty () ? 
+	NfaState* oldStart = !m_regExp->m_nfaStateList.isEmpty () ?
 		*m_regExp->m_nfaStateList.getHead () :
 		NULL;
 
@@ -256,7 +256,7 @@ RegExpCompiler::incrementalCompile (
 
 	bool result = expectEof ();
 	if (!result)
-		return false;	
+		return false;
 
 	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
 	accept->m_flags |= NfaStateFlag_Accept;
@@ -281,7 +281,7 @@ RegExpCompiler::finalize ()
 	assignDfaIds ();
 }
 
-void 
+void
 RegExpCompiler::assignNfaIds ()
 {
 	size_t nfaStateCount = m_regExp->m_nfaStateList.getCount ();
@@ -296,7 +296,7 @@ RegExpCompiler::assignNfaIds ()
 	}
 }
 
-void 
+void
 RegExpCompiler::assignDfaIds ()
 {
 	size_t dfaStateCount = m_regExp->m_dfaStateList.getCount ();
@@ -311,22 +311,22 @@ RegExpCompiler::assignDfaIds ()
 	}
 }
 
-void 
+void
 RegExpCompiler::makeDfa ()
 {
 	sl::Array <DfaState*> workingSet;
 	NfaStateSetMap <DfaState*> dfaStateMap;
 
 	DfaState* dfaState = AXL_MEM_NEW (DfaState);
-	dfaState->addNfaState (*m_regExp->m_nfaStateList.getHead ()); 
+	dfaState->addNfaState (*m_regExp->m_nfaStateList.getHead ());
 	dfaState->makeEpsilonClosure ();
 
 	m_regExp->m_dfaStateList.insertTail (dfaState);
 	workingSet.append (dfaState);
 	dfaStateMap [&dfaState->m_nfaStateSet] = dfaState;
-	
+
 	NfaTransitionMgr nfaTransitionMgr;
-	
+
 	while (!workingSet.isEmpty ())
 	{
 		DfaState* dfaState = workingSet.getBackAndPop ();
@@ -336,14 +336,14 @@ RegExpCompiler::makeDfa ()
 		size_t nfaStateCount = dfaState->m_nfaStateSet.m_stateArray.getCount ();
 		for (size_t i = 0; i < nfaStateCount; i++)
 		{
-			NfaState* nfaState = dfaState->m_nfaStateSet.m_stateArray [i];			
+			NfaState* nfaState = dfaState->m_nfaStateSet.m_stateArray [i];
 			if (nfaState->m_flags & NfaStateFlag_Match)
-				nfaTransitionMgr.addMatchState (nfaState);			
+				nfaTransitionMgr.addMatchState (nfaState);
 		}
-		
+
 		nfaTransitionMgr.finalize ();
 
-		sl::ConstList <NfaTransition> nfaTransitionList = nfaTransitionMgr.getTransitionList ();		
+		sl::ConstList <NfaTransition> nfaTransitionList = nfaTransitionMgr.getTransitionList ();
 		sl::Iterator <NfaTransition> nfaTransitionIt = nfaTransitionList.getHead ();
 		for (; nfaTransitionIt; nfaTransitionIt++)
 		{
@@ -353,7 +353,7 @@ RegExpCompiler::makeDfa ()
 
 			size_t outCount = nfaTransition->m_outStateSet.m_stateArray.getCount ();
 			for (size_t i = 0; i < outCount; i++)
-			{				
+			{
 				NfaState* nfaState = nfaTransition->m_outStateSet.m_stateArray [i];
 				dfaState2->addNfaState (nfaState);
 			}
@@ -381,7 +381,7 @@ RegExpCompiler::makeDfa ()
 	}
 }
 
-void 
+void
 RegExpCompiler::minimizeDfa ()
 {
 }
@@ -413,7 +413,7 @@ RegExpCompiler::readHexEscapeSequence (uchar_t* c)
 	uint_t x1;
 	uint_t x2;
 
-	bool result = 
+	bool result =
 		getHexValue (m_p [0], &x1) &&
 		getHexValue (m_p [1], &x2);
 
@@ -440,43 +440,43 @@ RegExpCompiler::readEscapeSequence (uchar_t* c)
 		err::setError ("invalid escape sequence");
 		return false;
 
-	case '0': 
-		*c = '\0'; 
+	case '0':
+		*c = '\0';
 		break;
 
-	case 'a': 
-		*c = '\a'; 
+	case 'a':
+		*c = '\a';
 		break; // 07
 
-	case 'b': 
-		*c = '\b'; 
+	case 'b':
+		*c = '\b';
 		break; // 08
 
-	case 't': 
-		*c = '\t'; 
+	case 't':
+		*c = '\t';
 		break; // 09
 
-	case 'n': 
-		*c = '\n'; 
+	case 'n':
+		*c = '\n';
 		break; // 0A
 
-	case 'v': 
-		*c = '\v'; 
+	case 'v':
+		*c = '\v';
 		break; // 0B
 
-	case 'f': 
-		*c = '\f'; 
+	case 'f':
+		*c = '\f';
 		break; // 0C
 
-	case 'r': 
-		*c = '\r'; 
+	case 'r':
+		*c = '\r';
 		break; // 0D
 
-	case 'e': 
-		*c = 0x1b; 
+	case 'e':
+		*c = 0x1b;
 		break;
 
-	case 'x':		
+	case 'x':
 		return readHexEscapeSequence (c);
 
 	default:
@@ -512,7 +512,7 @@ RegExpCompiler::readLiteral (sl::String* string)
 			break;
 
 		case '"':
-		case '\'':			
+		case '\'':
 			if (*p == delimiter)
 			{
 				size_t size = enc::EscapeEncoding::decode (string, sl::StringRef (m_p, p - m_p));
@@ -544,7 +544,7 @@ RegExpCompiler::readHexLiteral (sl::String* string)
 			return false;
 
 		case '"':
-		case '\'':			
+		case '\'':
 			if (*p == delimiter)
 			{
 				sl::Array <char> buffer;
@@ -566,7 +566,7 @@ RegExpCompiler::readIdentifier (sl::String* name)
 	ASSERT (isalpha ((uchar_t) *m_p) || *m_p == '_');
 
 	name->copy ((uchar_t) *m_p++);
-	
+
 	while (isalnum ((uchar_t) *m_p) || *m_p == '_')
 	{
 		name->append ((uchar_t) *m_p);
@@ -606,13 +606,13 @@ RegExpCompiler::getToken (Token* token)
 				m_p += 2;
 				return true;
 
-			case '\n':				
+			case '\n':
 				m_p += 2; // ignore line continuation (LF)
 				break;
 
 			case '\r':
 				if (m_p [2] == '\n')
-				{					
+				{
 					m_p += 3; // line continuation (CR-LF)
 					break;
 				}
@@ -738,7 +738,7 @@ RegExpCompiler::expression ()
 	NfaState* op2 = expression ();
 	if (!op2)
 		return NULL;
-		
+
 	NfaState* accept2 = *m_regExp->m_nfaStateList.getTail ();
 
 	NfaState* start = AXL_MEM_NEW (NfaState);
@@ -811,7 +811,7 @@ RegExpCompiler::repeat ()
 		case '+':
 			return plus (start);
 		}
-	
+
 	m_lastToken = token; // unget token
 	return start;
 }
@@ -875,7 +875,7 @@ RegExpCompiler::single ()
 		case '(':
 			return group ();
 
-		case '{': 
+		case '{':
 			return capturingGroup ();
 
 		case '[':
@@ -911,7 +911,7 @@ RegExpCompiler::single ()
 	default:
 		err::setError ("invalid regexp syntax");
 		return NULL;
-	}	
+	}
 }
 
 NfaState*
@@ -958,7 +958,7 @@ RegExpCompiler::charClass ()
 	bool result;
 
 	bool isInversed = false;
-	
+
 	if (*m_p == '^')
 	{
 		isInversed = true;
@@ -979,8 +979,8 @@ RegExpCompiler::charClass ()
 		{
 			err::setError ("invalid character class");
 			return NULL;
-		}	
-		
+		}
+
 		if (*m_p == ']')
 		{
 			m_p++;
@@ -998,7 +998,7 @@ RegExpCompiler::charClass ()
 	{
 		err::setError ("empty character class");
 		return NULL;
-	}	
+	}
 
 	if (isInversed) // invert range
 		start->m_matchCondition.m_charSet.inverse ();
@@ -1034,7 +1034,7 @@ RegExpCompiler::charClassItem (sl::BitMap* charSet)
 		case 'w':
 		case 'W':
 		case 's':
-		case 'S':			
+		case 'S':
 			stdCharClass (m_p [1], charSet);
 			m_p += 2;
 			return true;
@@ -1043,7 +1043,7 @@ RegExpCompiler::charClassItem (sl::BitMap* charSet)
 		result = readEscapeSequence (&c1);
 		if (!result)
 			return false;
-		
+
 		break;
 
 	default:
@@ -1172,7 +1172,7 @@ RegExpCompiler::any ()
 
 	NfaState* accept = AXL_MEM_NEW (NfaState);
 	m_regExp->m_nfaStateList.insertTail (accept);
-	
+
 	start->m_outState = accept;
 	return start;
 }
@@ -1215,7 +1215,7 @@ RegExpCompiler::capturingGroup ()
 NfaState*
 RegExpCompiler::namedRegExp (const sl::StringRef& name)
 {
-	if (!m_nameMgr)	
+	if (!m_nameMgr)
 	{
 		err::setFormatStringError ("named regexp '%s' is used but name manager is not set", name.sz ());
 		return NULL;
@@ -1234,7 +1234,7 @@ RegExpCompiler::namedRegExp (const sl::StringRef& name)
 	bool result = subRegExpCompiler.compile (source);
 	if (!result)
 		return NULL;
-	
+
 	NfaState* start = *subRegExp.m_nfaStateList.getHead ();
 	NfaState* accept = *subRegExp.m_nfaStateList.getTail ();
 
@@ -1245,7 +1245,7 @@ RegExpCompiler::namedRegExp (const sl::StringRef& name)
 	return start;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace fsm
 } // namespace axl

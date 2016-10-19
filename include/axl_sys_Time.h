@@ -11,7 +11,7 @@
 namespace axl {
 namespace sys {
 
-//.............................................................................
+//..............................................................................
 
 // timestamp is Windows FILETIME: number of 100-nanosecond intervals since January 1, 1601 (UTC)
 // note that Windows FILETIME epoch is different from POSIX time epoch which is January 1, 1970
@@ -25,7 +25,7 @@ getPreciseTimestamp ();
 void
 sleep (uint32_t msCount);
 
-//.............................................................................
+//..............................................................................
 
 // time zone is given in ISO 8601 format e.g.: -930, +4, +800, +845
 
@@ -38,7 +38,7 @@ getTimeZoneOffsetInMinutes (int timeZone)
 		timeZone * 60;
 }
 
-//.............................................................................
+//..............................................................................
 
 struct Time
 {
@@ -128,7 +128,7 @@ protected:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // format specifiers differ slightly from strftime ()
 //
@@ -151,7 +151,7 @@ protected:
 //   %w -- week day short name (Sun..Sat)
 //   %W -- week day full name (Sunday..Saturday)
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_POSIX)
 
@@ -189,14 +189,14 @@ getAbsTimespecFromTimeout (
 
 #endif
 
-inline 
+inline
 uint64_t
-getTimestampFromTimeval (const timeval* tval) 
+getTimestampFromTimeval (const timeval* tval)
 {
 	return ((uint64_t) tval->tv_sec + 11644473600) * 10000000 + (uint64_t) tval->tv_usec * 10;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sys
 } // namespace axl

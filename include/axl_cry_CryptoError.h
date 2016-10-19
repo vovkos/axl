@@ -9,37 +9,37 @@
 namespace axl {
 namespace cry {
 
-//.............................................................................
+//..............................................................................
 
 // {0216B513-A6BF-4D0E-9185-DD1260C75356}
 AXL_SL_DEFINE_GUID (
-	g_cryptoErrorGuid, 
+	g_cryptoErrorGuid,
 	0x0216b513, 0xa6bf, 0x4d0e, 0x91, 0x85, 0xdd, 0x12, 0x60, 0xc7, 0x53, 0x56
 	);
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class CryptoErrorProvider: public err::ErrorProvider
 {
 public:
-	virtual 
+	virtual
 	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-inline 
-void 
+inline
+void
 registerCryptoErrorProvider ()
 {
 	err::getErrorMgr ()->registerProvider (
-		g_cryptoErrorGuid, 
+		g_cryptoErrorGuid,
 		sl::getSimpleSingleton <CryptoErrorProvider> ()
 		);
 }
 
-//.............................................................................
+//..............................................................................
 
 class CryptoError: public err::Error
 {
@@ -60,7 +60,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 size_t
@@ -81,7 +81,7 @@ setLastCryptoError ()
 inline
 bool
 completeWithCryptoError (
-	int result, 
+	int result,
 	int errorCode
 	)
 {
@@ -101,7 +101,7 @@ completeWithLastCryptoError (int result)
 	return result != 0;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace cry
 } // namespace axl

@@ -12,38 +12,38 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 enum WaitResult
 {
 	WaitResult_Fail         = -1,
-	WaitResult_Timeout      = -2,		
+	WaitResult_Timeout      = -2,
 	WaitResult_Object0      = 0,
 	WaitResult_IoCompletion = 0x100,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class WaitableHandle: public sys::win::Handle
 {
 public:
 	WaitResult
 	wait (
-		uint_t timeout = -1, 
+		uint_t timeout = -1,
 		bool isAlertable = false
 		)
 	{
 		dword_t result = ::WaitForSingleObjectEx (m_h, timeout, isAlertable);
 		return completeWait (result);
 	}
-	
-	static 
+
+	static
 	WaitResult
 	multiWait (
-		HANDLE* waitArray, 
-		dword_t count, 
+		HANDLE* waitArray,
+		dword_t count,
 		bool doWaitAll = false,
-		uint_t timeout = -1, 
+		uint_t timeout = -1,
 		bool isAlertable = false
 		)
 	{
@@ -53,11 +53,11 @@ public:
 
 protected:
 	static
-	WaitResult 
+	WaitResult
 	completeWait (dword_t result);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

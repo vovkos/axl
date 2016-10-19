@@ -1,8 +1,8 @@
 #include "pch.h"
 
-namespace test_Window { 
+namespace test_Window {
 
-//.............................................................................
+//..............................................................................
 
 /*
 
@@ -79,7 +79,7 @@ test4_wt (exe::IScheduler* mtScheduler, int a)
 	mtScheduler->schedule <exe::Arg <int> > (test4_mt, 600);
 }
 
-//.............................................................................
+//..............................................................................
 
 class MyAtlWindow: public WindowImpl <MyAtlWindow>
 {
@@ -115,12 +115,12 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 run ()
 {
-	printf ("Test4: TID: %x\n", getCurrentThreadId ()); 
+	printf ("Test4: TID: %x\n", getCurrentThreadId ());
 
 	MyWindow::register ();
 
@@ -136,7 +136,7 @@ run ()
 	exe::Workerhread workerThread;
 	workerThread.start ();
 
-	workerThread.schedule <exe::ArgSeq_2 < 
+	workerThread.schedule <exe::ArgSeq_2 <
 		exe::IScheduler*,
 		int
 		> > (test4_wt, (exe::IScheduler*) &workerWindow, 300);
@@ -151,6 +151,6 @@ run ()
 
 */
 
-//.............................................................................
+//..............................................................................
 
-} // namespace test_Window 
+} // namespace test_Window

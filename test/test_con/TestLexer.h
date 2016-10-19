@@ -1,6 +1,6 @@
 #pragma once
 
-//.............................................................................
+//..............................................................................
 
 enum TokenKind
 {
@@ -76,11 +76,11 @@ enum TokenKind
 	TokenKind_PUBLIC,
 	TokenKind_STATIC,
 	TokenKind_LIBRARY,
-	
+
 	TokenKind_PPLINE,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_PRS_BEGIN_TOKEN_NAME_MAP (TokenName)
 	AXL_PRS_TOKEN_NAME (TokenKind_Eof,        "eof")
@@ -88,7 +88,7 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (TokenName)
 	AXL_PRS_TOKEN_NAME (TokenKind_Identifier, "identifier")
 	AXL_PRS_TOKEN_NAME (TokenKind_Integer,    "integer-constant")
 	AXL_PRS_TOKEN_NAME (TokenKind_Double,     "double-constant")
-	AXL_PRS_TOKEN_NAME (TokenKind_Literal,    "string-literal")	
+	AXL_PRS_TOKEN_NAME (TokenKind_Literal,    "string-literal")
 	AXL_PRS_TOKEN_NAME (TokenKind_Comment,    "comment")
 	AXL_PRS_TOKEN_NAME (TokenKind_Ne,         "<>")
 	AXL_PRS_TOKEN_NAME (TokenKind_Le,         "<=")
@@ -151,12 +151,12 @@ AXL_PRS_BEGIN_TOKEN_NAME_MAP (TokenName)
 	AXL_PRS_TOKEN_NAME (TokenKind_INCLUDE,    "incldue")
 	AXL_PRS_TOKEN_NAME (TokenKind_PUBLIC,     "public")
 	AXL_PRS_TOKEN_NAME (TokenKind_STATIC,     "static")
-	AXL_PRS_TOKEN_NAME (TokenKind_LIBRARY,    "library")	
+	AXL_PRS_TOKEN_NAME (TokenKind_LIBRARY,    "library")
 	AXL_PRS_TOKEN_NAME (TokenKind_PPLINE,     "line")
 
 AXL_PRS_END_TOKEN_NAME_MAP ()
 
-//.............................................................................
+//..............................................................................
 
 typedef axl::lex::RagelToken <TokenKind, TokenName> Token;
 
@@ -167,7 +167,7 @@ class Lexer: public axl::lex::RagelLexer <Lexer, Token>
 protected:
 	Token*
 	createIntegerToken (
-		int begin, 
+		int begin,
 		int base
 		)
 	{
@@ -200,7 +200,7 @@ protected:
 	uchar_t
 	getHexValue (char c)
 	{
-		return 
+		return
 			c >= '0' && c <= '9' ? c - '0' :
 			c >= 'a' && c <= 'f' ? 10 + c - 'a' :
 			c >= 'A' && c <= 'F' ? 10 + c - 'A' : 0;
@@ -209,7 +209,7 @@ protected:
 	Token*
 	createCharConstToken(
 		int begin,
-		int end	
+		int end
 		)
 	{
 		Token* token = createToken (TokenKind_Integer);
@@ -221,7 +221,7 @@ protected:
 		size_t length = token->m_pos.m_length - begin - end;
 		if (length > 16) // int64
 			length = 16;
-		
+
 		char* p = ts + begin;
 		int base = 1 << (length - 1) * 4;
 
@@ -241,11 +241,11 @@ protected:
 
 	// implemented in TestLexer.rl
 
-	void 
+	void
 	init ();
 
 	bool
 	exec ();
 };
 
-//.............................................................................
+//..............................................................................

@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_ERR_NTSTATUS_H
 
@@ -12,7 +12,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 // {81443347-3BC9-4d5e-8B23-32D780EDB52B}
 AXL_SL_DEFINE_GUID (
@@ -20,16 +20,16 @@ AXL_SL_DEFINE_GUID (
 	0x81443347, 0x3bc9, 0x4d5e, 0x8b, 0x23, 0x32, 0xd7, 0x80, 0xed, 0xb5, 0x2b
 	);
 
-//.............................................................................
-	
+//..............................................................................
+
 class NtStatusProvider: public err::ErrorProvider
 {
 public:
 	static
-	sl::String 
+	sl::String
 	getErrorDescription (long status);
 
-	virtual 
+	virtual
 	sl::StringRef
 	getErrorDescription (const err::ErrorRef& error)
 	{
@@ -37,7 +37,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class NtStatus: public err::Error
 {
@@ -55,7 +55,7 @@ public:
 	create (long status);
 };
 
-//.............................................................................
+//..............................................................................
 
 inline
 size_t
@@ -64,7 +64,7 @@ setNtStatus (long status)
 	return setError (NtStatus (status));
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace err

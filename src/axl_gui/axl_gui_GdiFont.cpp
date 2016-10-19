@@ -7,7 +7,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 bool
 buildLogFont (
@@ -22,17 +22,17 @@ buildLogFont (
 	size_t length = family.getLength ();
 
 	memcpy (
-		logFont->lfFaceName, 
-		family, 
+		logFont->lfFaceName,
+		family,
 		AXL_MIN (countof (logFont->lfFaceName), length) * sizeof (wchar_t)
 		);
 
 	logFont->lfCharSet = DEFAULT_CHARSET;
-	
+
 	ScreenDc screenDc;
 	::SetMapMode (screenDc, MM_TEXT);
 	logFont->lfHeight = -::MulDiv (pointSize, ::GetDeviceCaps (screenDc, LOGPIXELSY), 72);
-		
+
 	modifyLogFont (logFont, flags);
 	return true;
 }
@@ -58,15 +58,15 @@ getFontDescFromLogFont (
 	memset (fontDesc, 0, sizeof (FontDesc));
 
 	memcpy (
-		fontDesc->m_family, 
-		logFont->lfFaceName, 
+		fontDesc->m_family,
+		logFont->lfFaceName,
 		(AXL_MIN (countof (logFont->lfFaceName), countof (fontDesc->m_family)) - 1) * sizeof (char)
 		);
 
 	ScreenDc screenDc;
 	::SetMapMode (screenDc, MM_TEXT);
-	
-	fontDesc->m_pointSize = 
+
+	fontDesc->m_pointSize =
 		logFont->lfHeight > 0 ? logFont->lfHeight :
 		::MulDiv (-logFont->lfHeight, 72, ::GetDeviceCaps (screenDc, LOGPIXELSY));
 
@@ -85,7 +85,7 @@ getFontDescFromLogFont (
 	return true;
 }
 
-//.............................................................................
+//..............................................................................
 
 GdiFont::GdiFont ()
 {
@@ -143,7 +143,7 @@ GdiFont::calcTextSize_utf32 (const sl::StringRef_utf32& text)
 	return calcTextSize_utf16 (string, string.getLength ());
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

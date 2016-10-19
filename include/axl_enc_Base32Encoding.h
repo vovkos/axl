@@ -12,7 +12,7 @@
 namespace axl {
 namespace enc {
 
-//.............................................................................
+//..............................................................................
 
 class Base32Encoding
 {
@@ -21,7 +21,7 @@ public:
 	size_t
 	encode (
 		sl::String* string,
-		const void* p, 
+		const void* p,
 		size_t size,
 		size_t hyphenDistance = 5
 		);
@@ -29,7 +29,7 @@ public:
 	static
 	sl::String
 	encode (
-		const void* p, 
+		const void* p,
 		size_t size,
 		size_t hyphenDistance = 5
 		)
@@ -56,7 +56,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace enc
 } // namespace axl

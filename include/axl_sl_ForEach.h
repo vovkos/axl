@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_FOREACH_H
 
@@ -11,7 +11,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -44,7 +44,7 @@ loopIterator (
 		action (*it);
 }
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -97,7 +97,7 @@ filteredLoopIterator (
 	return filterPassCount;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

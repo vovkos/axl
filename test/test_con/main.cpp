@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "test.h"
 
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 int
@@ -24,7 +24,7 @@ main (
 	srand ((uint_t) sys::getTimestamp ());
 
 	err::registerParseErrorProvider ();
-		
+
 	//test_Error::Run ();
 	//test_File::Run ();
 	//test_Finalizer::Run ();
@@ -32,7 +32,7 @@ main (
 	//test_HandleTable::Run ();
 	//test_HashTable::Run ();
 	//test_List::Run ();
-	//test_Log::Run ();	
+	//test_Log::Run ();
 	//test_Packer::Run ();
 	//test_Parse::Run ();
 	//test_RbTree::Run ();
@@ -52,7 +52,7 @@ main (
 	//test_WorkerThread::Run ();
 	//test_Packetizer::Run ();
 	//test_CmdLineParser::Run ();
-	//test_Usb::run ();		
+	//test_Usb::run ();
 	//test_BoyerMooreFind::run ();
 
 	test_Crypto::run ();
@@ -60,4 +60,4 @@ main (
 	return 0;
 }
 
-//.............................................................................
+//..............................................................................

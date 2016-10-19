@@ -4,12 +4,12 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
-	
+//..............................................................................
+
 const char*
 getFontFlagString (FontFlag flag)
 {
-	static const char* stringTable [] = 
+	static const char* stringTable [] =
 	{
 		"bold",            // EFontFlag_Bold      = 0x01,
 		"italic",          // EFontFlag_Italic    = 0x02,
@@ -23,16 +23,16 @@ getFontFlagString (FontFlag flag)
 
 	size_t i = sl::getLoBitIdx32 (flag >> 8);
 
-	return i < countof (stringTable) ? 
-		stringTable [i] : 
+	return i < countof (stringTable) ?
+		stringTable [i] :
 		"undefined-font-flag";
 }
 
-//.............................................................................
+//..............................................................................
 
 void
 FontDesc::setup (
-	const sl::StringRef& family, 
+	const sl::StringRef& family,
 	size_t pointSize,
 	uint_t flags
 	)
@@ -41,14 +41,14 @@ FontDesc::setup (
 
 	if (length >= countof (m_family))
 		length = countof (m_family) - 1;
-	
+
 	memcpy (m_family, family.cp (), length);
 	m_family [length] = 0;
 	m_pointSize = pointSize;
 	m_flags = flags;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

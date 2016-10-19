@@ -13,10 +13,10 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <class T>
-class DestructSingleton: 
+class DestructSingleton:
 	public ref::RefCount,
 	public g::Finalizer
 {
@@ -24,34 +24,34 @@ public:
 	T* m_p;
 
 public:
-	virtual 
-	void 
+	virtual
+	void
 	finalize ()
 	{
 		m_p->~T ();
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <class T>
 class ConstructSingleton
 {
-public: 
+public:
 	typedef DestructSingleton <T> Destruct;
 
 public:
 	void
 	operator () (void* p)
 	{
-		new (p) T;			
+		new (p) T;
 		ref::Ptr <Destruct> destruct = AXL_REF_NEW (Destruct);
 		destruct->m_p = (T*) p;
 		g::getModule ()->addFinalizer (destruct);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 T*
@@ -62,7 +62,7 @@ getSingleton (volatile int32_t* flag = NULL)
 	return (T*) buffer;
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

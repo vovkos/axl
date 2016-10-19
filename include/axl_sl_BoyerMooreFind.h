@@ -13,7 +13,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class BoyerMooreIncrementalContext
@@ -28,7 +28,7 @@ public:
 		m_prefix = ' ';
 	}
 
-	void 
+	void
 	reset ()
 	{
 		m_tail.clear ();
@@ -36,7 +36,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum BoyerMooreFlag
 {
@@ -44,7 +44,7 @@ enum BoyerMooreFlag
 	BoyerMooreFlag_Horspool = 0x02, // don't use good-skip table
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class BoyerMooreFindBase
@@ -64,7 +64,7 @@ public:
 		m_flags = 0;
 	}
 
-	bool 
+	bool
 	isEmpty ()
 	{
 		return m_pattern.isEmpty ();
@@ -76,7 +76,7 @@ public:
 		return m_pattern;
 	}
 
-	uint_t 
+	uint_t
 	getFlags ()
 	{
 		return m_flags;
@@ -88,26 +88,26 @@ public:
 		m_pattern.clear ();
 		m_badSkipTable.clear ();
 		m_goodSkipTable.clear ();
-		m_flags = 0;	
+		m_flags = 0;
 	}
 
 protected:
 	// wikipedia implementation adaptation
 
-	bool 
+	bool
 	isPrefix (intptr_t pos)
 	{
 		intptr_t suffixSize = m_pattern.getCount () - pos;
 
-		for (intptr_t i = 0, j = pos; i < suffixSize; i++, j++) 
-			if (m_pattern [i] != m_pattern [j]) 
+		for (intptr_t i = 0, j = pos; i < suffixSize; i++, j++)
+			if (m_pattern [i] != m_pattern [j])
 				return false;
 
 		return true;
 	}
- 
+
 	size_t
-	calcSuffixSize (intptr_t pos) 
+	calcSuffixSize (intptr_t pos)
 	{
 		intptr_t i = 0;
 		intptr_t j = pos;
@@ -122,8 +122,8 @@ protected:
 
 		return i;
 	}
-	
-	bool 
+
+	bool
 	buildGoodSkipTable ()
 	{
 		intptr_t patternSize = m_pattern.getCount ();
@@ -135,19 +135,19 @@ protected:
 		if (!patternSize)
 			return true;
 
-		intptr_t lastPrefixPos = patternSize - 1; 
-		for (intptr_t i = patternSize - 1; i >= 0; i--) 
+		intptr_t lastPrefixPos = patternSize - 1;
+		for (intptr_t i = patternSize - 1; i >= 0; i--)
 		{
-			if (isPrefix (i + 1)) 
+			if (isPrefix (i + 1))
 				lastPrefixPos = i + 1;
 
 			m_goodSkipTable [i] = lastPrefixPos + patternSize - 1 - i;
 		}
- 
-		for (intptr_t i = 0; i < patternSize - 1; i++) 
+
+		for (intptr_t i = 0; i < patternSize - 1; i++)
 		{
 			intptr_t suffixSize = calcSuffixSize (i);
-			if (m_pattern [i - suffixSize] != m_pattern [patternSize - 1 - suffixSize]) 
+			if (m_pattern [i - suffixSize] != m_pattern [patternSize - 1 - suffixSize])
 				m_goodSkipTable [patternSize - 1 - suffixSize] = patternSize - 1 - i + suffixSize;
 		}
 
@@ -155,7 +155,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class BinaryBoyerMooreFind: public BoyerMooreFindBase <uchar_t>
 {
@@ -165,7 +165,7 @@ public:
 	}
 
 	BinaryBoyerMooreFind (
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		)
@@ -175,22 +175,22 @@ public:
 
 	bool
 	setPattern (
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		);
 
-	size_t 
+	size_t
 	find (
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 
-	size_t 
+	size_t
 	find (
 		IncrementalContext* incrementalContext,
 		size_t offset,
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 
@@ -199,14 +199,14 @@ protected:
 	buildBadSkipTable ();
 
 	template <typename Accessor>
-	size_t 
+	size_t
 	findImpl (
 		const Accessor& accessor,
 		size_t size
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 enum TextBoyerMooreFlag
 {
@@ -214,7 +214,7 @@ enum TextBoyerMooreFlag
 	TextBoyerMooreFlag_WholeWord       = 0x20,
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class TextBoyerMooreFind: public BoyerMooreFindBase <utf32_t>
 {
@@ -232,7 +232,7 @@ public:
 	setPattern (
 		size_t badSkipTableSize,
 		enc::CharCodec* codec,
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		);
@@ -241,7 +241,7 @@ public:
 	setPattern (
 		size_t badSkipTableSize,
 		enc::CharCodecKind codecKind,
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		)
@@ -252,7 +252,7 @@ public:
 	bool
 	setPattern (
 		enc::CharCodec* codec,
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		)
@@ -263,7 +263,7 @@ public:
 	bool
 	setPattern (
 		enc::CharCodecKind codecKind,
-		const void* p, 
+		const void* p,
 		size_t size,
 		uint_t flags = 0
 		)
@@ -278,59 +278,59 @@ public:
 		)
 	{
 		return setPattern (
-			Def_BadSkipTableSize, 
-			enc::CharCodecKind_Utf8, 
+			Def_BadSkipTableSize,
+			enc::CharCodecKind_Utf8,
 			pattern.cp (),
 			pattern.getLength (),
 			flags
 			);
 	}
 
-	size_t 
+	size_t
 	find (
 		enc::CharCodec* codec,
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 
-	size_t 
+	size_t
 	find (
 		enc::CharCodecKind codecKind,
-		const void* p, 
+		const void* p,
 		size_t size
 		)
 	{
 		return find (enc::getCharCodec (codecKind), p, size);
 	}
 
-	size_t 
+	size_t
 	find (const sl::StringRef& string)
 	{
 		return find (enc::CharCodecKind_Utf8, string.cp (), string.getLength ());
 	}
 
-	size_t 
+	size_t
 	find (
 		IncrementalContext* incrementalContext,
 		enc::CharCodec* codec,
 		size_t offset,
-		const void* p, 
+		const void* p,
 		size_t size
 		);
 
-	size_t 
+	size_t
 	find (
 		IncrementalContext* incrementalContext,
 		enc::CharCodecKind codecKind,
 		size_t offset,
-		const void* p, 
+		const void* p,
 		size_t size
 		)
 	{
 		return find (incrementalContext, enc::getCharCodec (codecKind), offset, p, size);
 	}
 
-	size_t 
+	size_t
 	find (
 		IncrementalContext* incrementalContext,
 		size_t offset,
@@ -345,7 +345,7 @@ protected:
 	buildBadSkipTable (size_t tableSize);
 
 	template <typename Accessor>
-	size_t 
+	size_t
 	findImpl (
 		const Accessor& accessor,
 		size_t end,
@@ -353,7 +353,7 @@ protected:
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

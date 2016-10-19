@@ -5,7 +5,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 template <typename T>
 class BoyerMooreAccessor
@@ -34,7 +34,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class BoyerMooreReverseAccessor: public BoyerMooreAccessor <T>
@@ -52,7 +52,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class BoyerMooreIncrementalAccessor: public BoyerMooreAccessor <T>
@@ -73,7 +73,7 @@ public:
 	getChar (size_t i) const
 	{
 		size_t tailLength = m_incrementalContext->m_tail.getCount ();
-		return i < tailLength ? 
+		return i < tailLength ?
 			this->m_incrementalContext->m_tail [i] :
 			this->m_p [i - tailLength];
 	}
@@ -106,7 +106,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class BoyerMooreIncrementalReverseAccessor: public BoyerMooreIncrementalAccessor <T>
@@ -144,7 +144,7 @@ public:
 		if (i < tailLength)
 		{
 			ASSERT (size > tailLength - i);
-		
+
 			size_t copySize = size - (tailLength - i);
 			this->m_incrementalContext->m_tail.remove (0, i);
 			this->m_incrementalContext->m_tail.appendReverse (this->m_p - copySize + 1, copySize);
@@ -156,14 +156,14 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <typename Base>
 class TextBoyerMooreAccessorImpl: public Base
 {
 public:
 	TextBoyerMooreAccessorImpl (const utf32_t* p):
-		Base (p)			
+		Base (p)
 	{
 	}
 
@@ -174,7 +174,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
 class TextBoyerMooreIncrementalAccessorImpl: public Base
@@ -206,14 +206,14 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
 class TextBoyerMooreCaseFoldedAccessorImpl: public TextBoyerMooreAccessorImpl <Base>
 {
 public:
 	TextBoyerMooreCaseFoldedAccessorImpl (const utf32_t* p):
-		TextBoyerMooreAccessorImpl <Base> (p)			
+		TextBoyerMooreAccessorImpl <Base> (p)
 	{
 	}
 
@@ -224,7 +224,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
 class TextBoyerMooreCaseFoldedIncrementalAccessorImpl: public TextBoyerMooreIncrementalAccessorImpl <Base>
@@ -244,48 +244,48 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 typedef BoyerMooreAccessor <uchar_t> BinaryBoyerMooreAccessor;
 typedef BoyerMooreReverseAccessor <uchar_t> BinaryBoyerMooreReverseAccessor;
 typedef BoyerMooreIncrementalAccessor <uchar_t> BinaryBoyerMooreIncrementalAccessor;
 typedef BoyerMooreIncrementalReverseAccessor <uchar_t> BinaryBoyerMooreIncrementalReverseAccessor;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef 
+typedef
 TextBoyerMooreAccessorImpl <BoyerMooreAccessor <utf32_t> >
 TextBoyerMooreAccessor;
 
-typedef 
+typedef
 TextBoyerMooreAccessorImpl <BoyerMooreReverseAccessor <utf32_t> >
 TextBoyerMooreReverseAccessor;
 
-typedef 
+typedef
 TextBoyerMooreIncrementalAccessorImpl <BoyerMooreIncrementalAccessor <utf32_t> >
 TextBoyerMooreIncrementalAccessor;
 
-typedef 
+typedef
 TextBoyerMooreIncrementalAccessorImpl <BoyerMooreIncrementalReverseAccessor <utf32_t> >
 TextBoyerMooreIncrementalReverseAccessor;
 
-typedef 
+typedef
 TextBoyerMooreCaseFoldedAccessorImpl <BoyerMooreAccessor <utf32_t> >
 TextBoyerMooreCaseFoldedAccessor;
 
-typedef 
+typedef
 TextBoyerMooreCaseFoldedAccessorImpl <BoyerMooreReverseAccessor <utf32_t> >
 TextBoyerMooreCaseFoldedReverseAccessor;
 
-typedef 
+typedef
 TextBoyerMooreCaseFoldedIncrementalAccessorImpl <BoyerMooreIncrementalAccessor <utf32_t> >
 TextBoyerMooreCaseFoldedIncrementalAccessor;
 
-typedef 
+typedef
 TextBoyerMooreCaseFoldedIncrementalAccessorImpl <BoyerMooreIncrementalReverseAccessor <utf32_t> >
 TextBoyerMooreCaseFoldedIncrementalReverseAccessor;
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gc
 } // namespace axl

@@ -15,7 +15,7 @@ namespace sl {
 
 template <typename T, typename Details> class StringBase;
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -296,13 +296,13 @@ public:
 		return m_length;
 	}
 
-	ref::BufHdr* 
+	ref::BufHdr*
 	getHdr () const
 	{
 		return m_hdr;
 	}
 
-	const C* 
+	const C*
 	getEnd () const
 	{
 		return m_p + m_length;
@@ -351,9 +351,9 @@ public:
 	cmp (const StringRef& string) const
 	{
 		int result = Details::cmp (m_p, string.m_p, AXL_MIN (m_length, string.m_length));
-		return 
-			result ? result : 
-			m_length < string.m_length ? -1 : 
+		return
+			result ? result :
+			m_length < string.m_length ? -1 :
 			m_length > string.m_length ? 1 : 0;
 	}
 
@@ -366,7 +366,7 @@ public:
 	bool
 	isEqual (const StringRef& string) const
 	{
-		return 
+		return
 			m_length == string.m_length &&
 			Details::cmp (m_p, string.m_p, m_length) == 0;
 	}
@@ -374,62 +374,62 @@ public:
 	bool
 	isPrefix (const StringRef& string) const
 	{
-		return 
-			m_length >= string.m_length && 
+		return
+			m_length >= string.m_length &&
 			Details::cmp (m_p, string.m_p, string.m_length) == 0;
 	}
 
 	bool
 	isSuffix (const StringRef& string) const
 	{
-		return 
-			m_length >= string.m_length && 
+		return
+			m_length >= string.m_length &&
 			Details::cmp (m_p + m_length - string.m_length, string.m_p, string.m_length) == 0;
 	}
 
-	size_t 
+	size_t
 	find (C c) const
 	{
 		return Details::find (m_p, m_length, c);
 	}
 
-	size_t 
+	size_t
 	find (const StringRef& subString) const
 	{
 		return Details::find (m_p, m_length, subString.m_p, subString.m_length);
 	}
 
-	size_t 
+	size_t
 	findOneOf (const StringRef& charSet) const
 	{
 		return Details::findOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
 	}
 
-	size_t 
+	size_t
 	findNotOneOf (const StringRef& charSet) const
 	{
 		return Details::findNotOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
 	}
 
-	size_t 
+	size_t
 	reverseFind (C c) const
 	{
 		return Details::reverseFind (m_p, m_length, c);
 	}
 
-	size_t 
+	size_t
 	reverseFind (const StringRef& subString) const
 	{
 		return Details::reverseFind (m_p, m_length, subString.m_p, subString.m_length);
 	}
 
-	size_t 
+	size_t
 	reverseFindOneOf (const StringRef& charSet) const
 	{
 		return Details::reverseFindOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
 	}
 
-	size_t 
+	size_t
 	reverseFindNotOneOf (const StringRef& charSet) const
 	{
 		return Details::reverseFindNotOneOf (m_p, m_length, charSet.m_p, charSet.m_length);
@@ -447,7 +447,7 @@ public:
 		size_t end = length == -1 ? m_length : first + length;
 		if (end > m_length)
 			end = m_length;
-	
+
 		return StringRef (m_hdr, m_p + first, end - first);
 	}
 
@@ -557,7 +557,7 @@ protected:
 
 		if (m_hdr)
 			m_hdr->release ();
-		
+
 		m_hdr = hdr;
 	}
 
@@ -584,7 +584,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -609,7 +609,7 @@ public:
 
 	typedef typename StringRef::StringRef2 StringRef2;
 	typedef typename StringRef::StringRef3 StringRef3;
-	
+
 public:
 	StringBase ()
 	{
@@ -998,7 +998,7 @@ public:
 			return 0;
 		}
 
-		return copy (x, 1);		
+		return copy (x, 1);
 	}
 
 	size_t
@@ -1018,7 +1018,7 @@ public:
 			return -1;
 
 		ASSERT (codePointLength <= 4);
-		
+
 		size_t newLength = count * codePointLength;
 		if (!createBuffer (newLength, false))
 			return -1;
@@ -1116,7 +1116,7 @@ public:
 	size_t
 	insert (
 		size_t index,
-		const StringRef3& src		
+		const StringRef3& src
 		)
 	{
 		return insert (index, src.cp (), src.getLength ());
@@ -1246,7 +1246,7 @@ public:
 #endif
 	}
 
-	size_t 
+	size_t
 	trimLeft ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
@@ -1260,7 +1260,7 @@ public:
 		return this->m_length;
 	}
 
-	size_t 
+	size_t
 	trimRight ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
@@ -1271,14 +1271,14 @@ public:
 		return this->m_length;
 	}
 
-	size_t 
+	size_t
 	trim ()
 	{
 		trimLeft ();
 		return trimRight ();
 	}
 
-	size_t 
+	size_t
 	replace (
 		C from,
 		C to
@@ -1314,19 +1314,19 @@ public:
 		return length;
 	}
 
-	size_t 
+	size_t
 	makeLowerCase ()
 	{
 		return convertCase <enc::UtfToLowerCase> ();
 	}
 
-	size_t 
+	size_t
 	makeUpperCase ()
 	{
 		return convertCase <enc::UtfToUpperCase> ();
 	}
 
-	size_t 
+	size_t
 	makeCaseFolded ()
 	{
 		return convertCase <enc::UtfToCaseFolded> ();
@@ -1409,7 +1409,7 @@ public:
 		}
 
 		ASSERT (this->m_p && this->m_hdr);
-		
+
 		bool isNullTerminated = !this->m_p [length];
 		if (!isNullTerminated && this->m_hdr->getRefCount () == 1)
 		{
@@ -1456,7 +1456,7 @@ public:
 		size_t length,
 		bool saveContents = false
 		)
-	{			
+	{
 		size_t size = (length + 1) * sizeof (C);
 
 		if (this->m_hdr &&
@@ -1512,7 +1512,7 @@ public:
 
 		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof (ref::BufHdr);
-		
+
 		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_INPLACE (ref::BufHdr, p, flags);
 		hdr->m_bufferSize = bufferSize;
 
@@ -1555,7 +1555,7 @@ public:
 
 		size_t fullLength = this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C);
 		ASSERT (fullLength);
-		
+
 		this->m_length = Details::calcLength (this->m_p, fullLength - 1);
 		return this->m_length;
 	}
@@ -1605,7 +1605,7 @@ protected:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 typedef StringRefBase <char>    StringRef;
 typedef StringRefBase <wchar_t> StringRef_w;
@@ -1619,7 +1619,7 @@ typedef StringBase <utf8_t>  String_utf8;
 typedef StringBase <utf16_t> String_utf16;
 typedef StringBase <utf32_t> String_utf32;
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // specializations for ArgType
 
@@ -1645,7 +1645,7 @@ public:
 };
 
 
-//.............................................................................
+//..............................................................................
 
 inline
 String
@@ -1670,7 +1670,7 @@ formatString (
 	return formatString_va (formatString, va);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

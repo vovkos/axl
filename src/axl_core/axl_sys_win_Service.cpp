@@ -5,7 +5,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 bool
 Service::setDescription (const sl::StringRef_w& description)
@@ -14,7 +14,7 @@ Service::setDescription (const sl::StringRef_w& description)
 	return changeServiceConfig2 (SERVICE_CONFIG_DESCRIPTION, &info);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

@@ -11,7 +11,7 @@
 namespace axl {
 namespace st {
 
-//.............................................................................
+//..............................................................................
 
 class LuaStringTemplate: public StringTemplate <LuaStringTemplate>
 {
@@ -22,7 +22,7 @@ protected:
 
 public:
 	lua::LuaState m_luaState;
-	
+
 public:
 	LuaStringTemplate ()
 	{
@@ -35,7 +35,7 @@ public:
 	bool
 	create ();
 
-	size_t 
+	size_t
 	getArgCount ()
 	{
 		return m_argCount;
@@ -45,7 +45,7 @@ public:
 	setArgCount (size_t count);
 
 protected:
-	bool 
+	bool
 	runScript (
 		const sl::StringRef& fileName,
 		const sl::StringRef& source
@@ -55,7 +55,7 @@ protected:
 	createPassthroughCall (
 		sl::String* script,
 		size_t offset,
-		size_t length	
+		size_t length
 		)
 	{
 		script->appendFormat ("passthrough (%d, %d);", offset, length);
@@ -68,23 +68,23 @@ protected:
 		);
 
 	static
-	int 
+	int
 	getLine_lua (lua_State* h);
 
 	static
-	int 
+	int
 	getCol_lua (lua_State* h);
 
 	static
-	int 
+	int
 	emit_lua (lua_State* h);
 
 	static
-	int 
+	int
 	passthrough_lua (lua_State* h);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace st
 } // namespace axl

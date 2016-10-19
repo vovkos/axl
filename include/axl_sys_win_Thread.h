@@ -12,7 +12,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class Thread: public WaitableHandle
 {
@@ -38,7 +38,7 @@ public:
 		m_threadId = -1;
 	}
 
-	bool 
+	bool
 	create (
 		SECURITY_ATTRIBUTES* secAttr,
 		size_t stackSize,
@@ -47,14 +47,14 @@ public:
 		uint_t flags
 		);
 
-	bool 
+	bool
 	setPriority (int priority)
 	{
 		bool_t result = ::SetThreadPriority (m_h, priority);
 		return err::complete (result);
 	}
 
-	bool 
+	bool
 	terminate (dword_t exitCode)
 	{
 		bool_t result = ::TerminateThread (m_h, exitCode);
@@ -69,7 +69,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

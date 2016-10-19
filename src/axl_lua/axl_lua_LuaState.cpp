@@ -4,7 +4,7 @@
 namespace axl {
 namespace lua {
 
-//.............................................................................
+//..............................................................................
 
 bool
 LuaState::create ()
@@ -51,21 +51,21 @@ LuaState::trace ()
 {
 	int top = getTop ();
 
-	for (int i = 1; i <= top; i++) 
+	for (int i = 1; i <= top; i++)
 	{
 		int type = getType (i);
 		const void* p = lua_topointer (m_h, i);
-		
-		switch (type) 
-		{    
+
+		switch (type)
+		{
 		case LUA_TSTRING:
 			TRACE ("%08x %s\n", p, getString (i).sz ());
 			break;
-	
+
 		case LUA_TBOOLEAN:
 			TRACE ("%08x %s\n", p, getBoolean (i) ? "true" : "false");
 			break;
-	
+
 		case LUA_TNUMBER:
 			TRACE ("%08x %g\n", p, getNumber (i));
 			break;
@@ -73,7 +73,7 @@ LuaState::trace ()
 		default:
 			TRACE ("%08x %s\n", p, getTypeName (type).sz ());
 			break;
-	
+
 		}
 	}
 }
@@ -107,7 +107,7 @@ LuaState::pushString (const sl::StringRef& string)
 	lua_pushlstring (m_h, string.cp (), string.getLength ());
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace lua
 } // namespace axl

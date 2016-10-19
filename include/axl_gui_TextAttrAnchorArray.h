@@ -11,7 +11,7 @@
 namespace axl {
 namespace gui {
 
-//.............................................................................
+//..............................................................................
 
 struct TextAttrAnchor
 {
@@ -33,7 +33,7 @@ struct TextAttrAnchor
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class TextAttrAnchorArray
 {
@@ -52,7 +52,7 @@ public:
 		return m_array.isEmpty ();
 	}
 
-	size_t 
+	size_t
 	getCount () const
 	{
 		return m_array.getCount ();
@@ -64,13 +64,13 @@ public:
 		return m_array.cp ();
 	}
 
-	void 
+	void
 	clear ()
 	{
 		m_array.clear ();
 	}
 
-	void 
+	void
 	clearBefore (size_t offset);
 
 	void
@@ -89,10 +89,10 @@ public:
 		return anchor == -1 ? m_array [anchor].m_attr : TextAttr ();
 	}
 
-	void 
+	void
 	setAttr (
-		size_t beginOffset, 
-		size_t endOffset, 
+		size_t beginOffset,
+		size_t endOffset,
 		const TextAttr& attr
 		);
 
@@ -114,11 +114,11 @@ protected:
 	void
 	normalize (
 		size_t start,
-		size_t end		
+		size_t end
 		);
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl

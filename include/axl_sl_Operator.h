@@ -2,7 +2,7 @@
 // Tibbo Technology Inc (C) 2004-2015. All rights reserved
 // Author: Vladimir Gladkov
 
-#pragma once 
+#pragma once
 
 #define _AXL_SL_OPERATOR_H
 
@@ -11,7 +11,7 @@
 namespace axl {
 namespace sl {
 
-//.............................................................................
+//..............................................................................
 
 // cast operators
 
@@ -63,41 +63,41 @@ template <typename T>
 class Void
 {
 public:
-	void 
+	void
 	operator () (T x) const
 	{
 	}
 };
 
 template <
-	typename A, 
+	typename A,
 	typename B
 	>
 class ImplicitCast
 {
 public:
-	B 
+	B
 	operator () (A x) const
-	{ 
-		return x; 
+	{
+		return x;
 	}
 };
 
 template <
-	typename A, 
+	typename A,
 	typename B
 	>
 class ExplicitCast
 {
 public:
-	B 
+	B
 	operator () (A x) const
-	{ 
-		return (B) x; 
+	{
+		return (B) x;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // sizeof & offsetof operators
 
@@ -119,13 +119,13 @@ public:
 };
 
 template <
-	typename C, 
+	typename C,
 	typename B
 	>
 class OffsetOf
 {
 public:
-	size_t 
+	size_t
 	operator () () const
 	{
 		B* p = (C*) 1;
@@ -133,26 +133,26 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // offset (pointer increment) operator
 
 template <
-	typename A, 
-	typename B, 
+	typename A,
+	typename B,
 	size_t offset
 	>
 class Offset
 {
 public:
-	B* 
+	B*
 	operator () (A* p) const
-	{ 
-		return (B*) ((uchar_t*) p + offset); 
+	{
+		return (B*) ((uchar_t*) p + offset);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // no-op (identity)
 
@@ -162,12 +162,12 @@ class NoOp
 public:
 	T
 	operator () (T a) const
-	{ 
-		return a; 
+	{
+		return a;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // arithmetic operators (sometimes it's necessary to redefine Arg to "const T&")
 
@@ -180,8 +180,8 @@ class Minus
 public:
 	T
 	operator () (Arg a) const
-	{ 
-		return -a; 
+	{
+		return -a;
 	}
 };
 
@@ -194,8 +194,8 @@ class Not
 public:
 	T
 	operator () (Arg a) const
-	{ 
-		return ~a; 
+	{
+		return ~a;
 	}
 };
 
@@ -211,8 +211,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a + b; 
+	{
+		return a + b;
 	}
 };
 
@@ -228,8 +228,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a - b; 
+	{
+		return a - b;
 	}
 };
 
@@ -245,8 +245,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a * b; 
+	{
+		return a * b;
 	}
 };
 
@@ -262,8 +262,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a / b; 
+	{
+		return a / b;
 	}
 };
 
@@ -279,8 +279,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a % b; 
+	{
+		return a % b;
 	}
 };
 
@@ -296,8 +296,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a << b; 
+	{
+		return a << b;
 	}
 };
 
@@ -313,8 +313,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a >> b; 
+	{
+		return a >> b;
 	}
 };
 
@@ -330,8 +330,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a & b; 
+	{
+		return a & b;
 	}
 };
 
@@ -347,8 +347,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a ^ b; 
+	{
+		return a ^ b;
 	}
 };
 
@@ -364,8 +364,8 @@ public:
 		Arg a,
 		Arg b
 		) const
-	{ 
-		return a | b; 
+	{
+		return a | b;
 	}
 };
 
@@ -378,7 +378,7 @@ class Min
 public:
 	T
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
 	{
@@ -395,7 +395,7 @@ class Max
 public:
 	T
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
 	{
@@ -403,7 +403,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // relational operators
 
@@ -414,17 +414,17 @@ template <
 class Eq
 {
 public:
-	bool 
+	bool
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a == b; 
+	{
+		return a == b;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -433,22 +433,22 @@ template <
 class EqDuckType
 {
 public:
-	bool 
+	bool
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a.isEqual (b); 
+	{
+		return a.isEqual (b);
 	}
 
-	bool 
+	bool
 	operator () (
-		const T* a, 
+		const T* a,
 		const T* b
 		) const
-	{ 
-		return a->isEqual (*b); 
+	{
+		return a->isEqual (*b);
 	}
 };
 
@@ -456,26 +456,26 @@ template <typename T>
 class EqDuckTypePtr
 {
 public:
-	bool 
+	bool
 	operator () (
-		const T& a, 
+		const T& a,
 		const T& b
 		) const
-	{ 
-		return a.isEqual (b); 
+	{
+		return a.isEqual (b);
 	}
 
-	bool 
+	bool
 	operator () (
-		const T* a, 
+		const T* a,
 		const T* b
 		) const
-	{ 
-		return a->isEqual (b); 
+	{
+		return a->isEqual (b);
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -484,17 +484,17 @@ template <
 class Ne
 {
 public:
-	bool 
+	bool
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a != b; 
+	{
+		return a != b;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -503,17 +503,17 @@ template <
 class Lt
 {
 public:
-	bool 
+	bool
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a < b; 
+	{
+		return a < b;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -522,17 +522,17 @@ template <
 class Gt
 {
 public:
-	bool 
+	bool
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a > b; 
+	{
+		return a > b;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -541,17 +541,17 @@ template <
 class Le
 {
 public:
-	bool 
+	bool
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a <= b; 
+	{
+		return a <= b;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,
@@ -560,17 +560,17 @@ template <
 class Ge
 {
 public:
-	bool 
+	bool
 	operator () (
-		Arg a, 
+		Arg a,
 		Arg b
 		) const
-	{ 
-		return a >= b; 
+	{
+		return a >= b;
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 // assign functors
 
@@ -583,15 +583,15 @@ class Assign
 public:
 	void
 	operator () (
-		T& a, 
+		T& a,
 		Arg b
 		) const
-	{ 
+	{
 		a = b;
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Func,
@@ -603,15 +603,15 @@ class OpAssign
 public:
 	void
 	operator () (
-		T& a, 
+		T& a,
 		Arg b
 		) const
-	{ 
+	{
 		a = Func () (a, b);
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sl
 } // namespace axl

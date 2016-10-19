@@ -12,7 +12,7 @@ namespace axl {
 namespace sys {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 class VirtualMemory
 {
@@ -42,13 +42,13 @@ public:
 		return m_p;
 	}
 
-	size_t 
+	size_t
 	getSize () const
 	{
 		return m_size;
 	}
 
-	void* 
+	void*
 	alloc (
 		void* p,
 		size_t size,
@@ -56,7 +56,7 @@ public:
 		uint_t protection = PAGE_READWRITE
 		);
 
-	void* 
+	void*
 	alloc (
 		size_t size,
 		uint_t allocationFlags = MEM_RESERVE | MEM_COMMIT,
@@ -78,7 +78,7 @@ public:
 		return err::complete (result != NULL);
 	}
 
-	bool 
+	bool
 	commit (uint_t protectionFlags = PAGE_READWRITE)
 	{
 		return commit (m_p, m_size, protectionFlags);
@@ -101,7 +101,7 @@ public:
 		return decommit (m_p, m_size);
 	}
 
-	void 
+	void
 	release ();
 
 	bool
@@ -162,7 +162,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace sys

@@ -11,8 +11,8 @@
 namespace axl {
 namespace lex {
 
-//.............................................................................
-	
+//..............................................................................
+
 class RagelTokenPos: public LineCol
 {
 public:
@@ -30,7 +30,7 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Enum,
@@ -47,7 +47,7 @@ public:
 	}
 
 	static
-	sl::String 
+	sl::String
 	getTokenListString (const sl::ConstBoxList <RagelToken>& list)
 	{
 		if (list.isEmpty ())
@@ -65,11 +65,11 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef RagelToken <int, StdTokenData> StdRagelToken;
 
-//.............................................................................
+//..............................................................................
 
 template <
 	typename T,
@@ -109,7 +109,7 @@ public:
 		onReset ();
 	}
 
-	size_t 
+	size_t
 	getTokenizeLimit ()
 	{
 		return m_tokenizeLimit;
@@ -140,8 +140,8 @@ public:
 		const sl::StringRef& source
 		)
 	{
-		this->reset (); 
-		
+		this->reset ();
+
 		static_cast <T*> (this)->init ();
 
 		p   = (char*) source.cp ();
@@ -156,7 +156,7 @@ public:
 	const Token*
 	expectToken (int tokenKind)
 	{
-		const Token* token = this->getToken (); 
+		const Token* token = this->getToken ();
 		if (token->m_token == tokenKind)
 			return token;
 
@@ -177,7 +177,7 @@ public:
 		GotoStateKind_EatToken,
 	};
 
-	void 
+	void
 	gotoState (
 		int state,
 		const Token* token,
@@ -192,7 +192,7 @@ public:
 		m_lineOffset = token->m_pos.m_offset - token->m_pos.m_col;
 		m_line = token->m_pos.m_line;
 		cs = state;
-		this->m_tokenList.clear(); 
+		this->m_tokenList.clear();
 	}
 
 	void
@@ -203,7 +203,7 @@ public:
 		gotoState (state);
 
 		stack = prePush ();
-		stack [top++] = oldState; 
+		stack [top++] = oldState;
 	}
 
 	void
@@ -224,28 +224,28 @@ public:
 
 protected:
 	// these are to be called from withing ragel scanner (*.rl)
-	
-	void 
+
+	void
 	newLine (char* line)
-	{ 
+	{
 		ASSERT (line [-1] == '\n');
 
 		m_lineOffset = line - m_begin;
 		m_line++;
 	}
 
-	int* 
+	int*
 	prePush ()
-	{ 
+	{
 		size_t count = m_stack.getCount ();
 		m_stack.setCount (count + 1);
 		stack = m_stack;
 		return stack;
 	}
 
-	void 
+	void
 	postPop ()
-	{ 
+	{
 		size_t count = m_stack.getCount ();
 		if (!count)
 			return;
@@ -259,11 +259,11 @@ protected:
 		pe = p + 1;
 	}
 
-	void 
+	void
 	onLexerError ()
-	{	
+	{
 	}
-	
+
 	Token*
 	preCreateToken (
 		int tokenKind,
@@ -273,7 +273,7 @@ protected:
 		size_t offset = ts - m_begin;
 		size_t length = te - ts;
 
-		Token* token = this->allocateToken (); 
+		Token* token = this->allocateToken ();
 		token->m_token = tokenKind;
 		token->m_channelMask = channelMask;
 		token->m_pos.m_offset = offset;
@@ -311,8 +311,8 @@ protected:
 		postCreateToken ();
 		return token;
 	}
-	
-	void 
+
+	void
 	onReset ()
 	{
 		p = NULL;
@@ -338,7 +338,7 @@ protected:
 	void
 	tokenize ()
 	{
-		if (p != eof) 
+		if (p != eof)
 		{
 			pe = eof;
 			m_tokenizeCount = 0;
@@ -365,7 +365,7 @@ protected:
 	// }
 };
 
-//.............................................................................
+//..............................................................................
 
-} // namespace lex 
+} // namespace lex
 } // namespace axl

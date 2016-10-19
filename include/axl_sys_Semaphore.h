@@ -11,7 +11,7 @@
 namespace axl {
 namespace sys {
 
-//.............................................................................
+//..............................................................................
 
 class Semaphore
 {
@@ -24,19 +24,19 @@ public:
 		create (initialCount);
 	}
 
-	bool 
+	bool
 	isOpen ()
 	{
 		return m_semaphore.isOpen ();
 	}
 
-	void 
+	void
 	close ()
 	{
 		m_semaphore.close ();
 	}
 
-	bool 
+	bool
 	create (size_t initialCount = 0)
 	{
 		return m_semaphore.create (NULL, (uint_t) initialCount, MAXLONG, NULL);
@@ -55,7 +55,7 @@ public:
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 } // namespace sys
 } // namespace axl

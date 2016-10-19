@@ -5,7 +5,7 @@ namespace axl {
 namespace io {
 namespace win {
 
-//.............................................................................
+//..............................................................................
 
 bool
 Socket::open (
@@ -70,8 +70,8 @@ Socket::accept (SockAddr* addr)
 {
 	int size = sizeof (SockAddr);
 	SOCKET socket = ::accept (
-		m_h, 
-		(sockaddr*) addr, 
+		m_h,
+		(sockaddr*) addr,
 		addr ? &size : NULL
 		);
 
@@ -87,11 +87,11 @@ Socket::recvFrom (
 {
 	int addrSize = sizeof (SockAddr);
 	int result = ::recvfrom (
-		m_h, 
-		(char*) p, 
-		(int) size, 
-		0, 
-		(sockaddr*) addr, 
+		m_h,
+		(char*) p,
+		(int) size,
+		0,
+		(sockaddr*) addr,
 		addr ? &addrSize : NULL
 		);
 
@@ -135,10 +135,10 @@ Socket::wsaAccept (SockAddr* addr)
 {
 	int addrSize = sizeof (SockAddr);
 	SOCKET s = ::WSAAccept (
-		m_h, 
-		(sockaddr*) addr, 
-		addr ? &addrSize : NULL, 
-		NULL, 
+		m_h,
+		(sockaddr*) addr,
+		addr ? &addrSize : NULL,
+		NULL,
 		0
 		);
 
@@ -202,14 +202,14 @@ Socket::wsaSendTo (
 	buf.len = size;
 
 	int result = ::WSASendTo (
-		m_h, 
-		&buf, 
-		1, 
-		actualSize, 
-		0, 
-		addr, 
-		getSockAddrSize (addr), 
-		overlapped, 
+		m_h,
+		&buf,
+		1,
+		actualSize,
+		0,
+		addr,
+		getSockAddrSize (addr),
+		overlapped,
 		completionFunc
 		);
 
@@ -236,14 +236,14 @@ Socket::wsaRecvFrom (
 	int addrSize = sizeof (SockAddr);
 
 	int result = ::WSARecvFrom (
-		m_h, 
-		&buf, 
-		1, 
-		actualSize, 
-		&flags, 
-		(sockaddr*) addr, 
-		addr ? &addrSize : NULL, 
-		overlapped, 
+		m_h,
+		&buf,
+		1,
+		actualSize,
+		&flags,
+		(sockaddr*) addr,
+		addr ? &addrSize : NULL,
+		overlapped,
 		completionFunc
 		);
 
@@ -265,21 +265,21 @@ Socket::wsaIoctl (
 	ASSERT (isOpen ());
 
 	int result = ::WSAIoctl (
-		m_h, 
-		ioctlCode, 
-		(void*) inBuffer, 
-		inBufferSize, 
+		m_h,
+		ioctlCode,
+		(void*) inBuffer,
+		inBufferSize,
 		outBuffer,
 		outBufferSize,
 		actualSize,
-		overlapped, 
+		overlapped,
 		completionFunc
 		);
 
 	return completeAsyncRequest (result, WSA_IO_PENDING);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace win
 } // namespace io

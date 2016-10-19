@@ -5,7 +5,7 @@
 namespace axl {
 namespace iok {
 
-//.............................................................................
+//..............................................................................
 
 sl::String
 RegistryEntry::getName () const
@@ -55,7 +55,7 @@ RegistryEntry::getChildEntry (const char* plane) const
 	return RegistryEntry (p, true);
 }
 
-//.............................................................................
+//..............................................................................
 
 Iterator
 findMatchingServices (CFMutableDictionaryRef dict)
@@ -73,7 +73,7 @@ findMatchingServices (CFMutableDictionaryRef dict)
 	return Iterator (p, true);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace iok
 } // namespace axl

@@ -1,16 +1,16 @@
-//.............................................................................
+//..............................................................................
 
 %%{
 
-machine parse_test; 
+machine parse_test;
 write data nofinal;
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # prepush / postpop (for fcall/fret)
 #
 
-prepush 
+prepush
 {
 	stack = prePush ();
 }
@@ -20,7 +20,7 @@ postpop
 	postPop ();
 }
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # standard definitions
 #
@@ -36,14 +36,14 @@ esc    = '\\' [^\n];
 lit_dq = '"' ([^"\n\\] | esc)* (["\\] | nl);
 lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # main machine of BASIC lexer
 #
 
 main := |*
-	
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # keywords
 #
@@ -111,19 +111,19 @@ main := |*
 'message'i       { createToken (TokenKind_Message); };
 
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # operators
 #
 
 '<>'   { createToken (TokenKind_Ne); };
 '<='   { createToken (TokenKind_Le); };
-'>='   { createToken (TokenKind_Ge); };	
+'>='   { createToken (TokenKind_Ge); };
 'or'i  { createToken (TokenKind_Or); };
-'and'i { createToken (TokenKind_And); };	
-'xor'i { createToken (TokenKind_Xor); };	
+'and'i { createToken (TokenKind_And); };
+'xor'i { createToken (TokenKind_Xor); };
 
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # other tokens
 #
@@ -144,14 +144,14 @@ id             { createStringToken (0, 0, TokenKind_Identifier); };
 ws             ;
 nl             ;
 any            { createToken ((TokenKind) ts [0]); };
-	
+
 *|;
 
 }%%
 
-//.............................................................................
+//..............................................................................
 
-void 
+void
 Lexer::init ()
 {
 	%% write init;
@@ -172,4 +172,4 @@ Lexer::exec ()
 	return result;
 }
 
-//.............................................................................
+//..............................................................................

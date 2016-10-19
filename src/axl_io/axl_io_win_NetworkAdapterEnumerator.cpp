@@ -6,7 +6,7 @@
 namespace axl {
 namespace io {
 
-//.............................................................................
+//..............................................................................
 
 class NetworkAdapterEnumerator
 {
@@ -24,7 +24,7 @@ protected:
 		);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
 NetworkAdapterEnumerator::createAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList)
@@ -34,11 +34,11 @@ NetworkAdapterEnumerator::createAdapterList (sl::StdList <NetworkAdapterDesc>* a
 	ulong_t size = 15 * 1024; // Microsoft recommends starting with 15K
 
 	sl::Array <char> buffer;
-	buffer.setCount (size); 
+	buffer.setCount (size);
 
 	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*) buffer.p ();
 
-	ulong_t flags = 
+	ulong_t flags =
 		GAA_FLAG_SKIP_ANYCAST |
 		GAA_FLAG_SKIP_MULTICAST |
 		GAA_FLAG_SKIP_DNS_SERVER;
@@ -126,24 +126,24 @@ NetworkAdapterEnumerator::setupAdapter (
 	adapter->m_name = srcAdapter->AdapterName;
 	adapter->m_description = srcAdapter->Description;
 	memcpy (adapter->m_mac, srcAdapter->PhysicalAddress, 6);
-	
+
 	IP_ADAPTER_UNICAST_ADDRESS* srcAddress = srcAdapter->FirstUnicastAddress;
 	for (; srcAddress; srcAddress = srcAddress->Next)
 	{
 		if (!srcAddress->Address.lpSockaddr || srcAddress->Address.iSockaddrLength > sizeof (io::SockAddr))
 			continue;
 
-		NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);		
+		NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);
 		memcpy (&address->m_address, srcAddress->Address.lpSockaddr, srcAddress->Address.iSockaddrLength);
 
-		if (srcAddress->Length >= sizeof (IP_ADAPTER_UNICAST_ADDRESS)) 
+		if (srcAddress->Length >= sizeof (IP_ADAPTER_UNICAST_ADDRESS))
 			address->m_netMaskBitCount = srcAddress->OnLinkPrefixLength;
 
 		adapter->m_addressList.insertTail (address);
 	}
 }
 
-//.............................................................................
+//..............................................................................
 
 size_t
 createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
@@ -151,7 +151,7 @@ createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
 	return NetworkAdapterEnumerator::createAdapterList (adapterList);
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace io
 } // namespace axl

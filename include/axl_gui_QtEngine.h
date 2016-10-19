@@ -17,11 +17,11 @@ namespace gui {
 class QtEngine;
 class QtFont;
 
-inline 
-Engine* 
+inline
+Engine*
 getQtEngine ();
 
-//.............................................................................
+//..............................................................................
 
 class QtCanvas: public Canvas
 {
@@ -33,12 +33,12 @@ public:
 
 public:
 	QtCanvas ():
-		Canvas (getQtEngine ()) 
+		Canvas (getQtEngine ())
 	{
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class QtFontTuple: public FontTuple
 {
@@ -46,14 +46,14 @@ class QtFontTuple: public FontTuple
 
 public:
 	QtFontTuple ():
-		FontTuple (getQtEngine ()) 
+		FontTuple (getQtEngine ())
 	{
 	}
 
 	QtFont* attachFont (QFont qtFont);
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class QtFont: public Font
 {
@@ -65,12 +65,12 @@ public:
 
 protected:
 	QtFont ():
-		Font (getQtEngine ()) 
+		Font (getQtEngine ())
 	{
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class QtImage: public Image
 {
@@ -81,12 +81,12 @@ public:
 
 public:
 	QtImage ():
-		Image (getQtEngine ()) 
+		Image (getQtEngine ())
 	{
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class QtCursor: public Cursor
 {
@@ -97,12 +97,12 @@ public:
 
 public:
 	QtCursor ():
-		Cursor (getQtEngine ()) 
+		Cursor (getQtEngine ())
 	{
 	}
 };
 
-//.............................................................................
+//..............................................................................
 
 class QtEngine: public Engine
 {
@@ -352,11 +352,11 @@ public:
 	virtual
 	Cursor*
 	getStdCursor (StdCursorKind cursorKind);
-	
+
 	// clipboard
 
 	virtual
-	uintptr_t 
+	uintptr_t
 	registerClipboardFormat (const sl::StringRef& formatName);
 
 	virtual
@@ -400,9 +400,9 @@ public:
 	bool
 	redrawWidget (
 		WidgetDriver* widgetDriver,
-		int left, 
-		int top, 
-		int right, 
+		int left,
+		int top,
+		int right,
 		int bottom
 		);
 
@@ -410,7 +410,7 @@ public:
 	bool
 	scrollWidget (
 		WidgetDriver* widgetDriver,
-		int dx, 
+		int dx,
 		int dy
 		);
 
@@ -418,11 +418,11 @@ public:
 	bool
 	scrollWidgetRect (
 		WidgetDriver* widgetDriver,
-		int left, 
+		int left,
 		int top,
 		int right,
 		int bottom,
-		int dx, 
+		int dx,
 		int dy
 		);
 
@@ -496,16 +496,16 @@ public:
 	}
 };
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-inline 
-Engine* 
+inline
+Engine*
 getQtEngine ()
 {
 	return sl::getSingleton <QtEngine> ();
 }
 
-//.............................................................................
+//..............................................................................
 
 } // namespace gui
 } // namespace axl
