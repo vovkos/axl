@@ -1,6 +1,13 @@
-// This file is part of AXL (R) Library
-// Tibbo Technology Inc (C) 2004-2015. All rights reserved
-// Author: Vladimir Gladkov
+//..............................................................................
+//
+//  This file is part of the AXL library.
+//
+//  AXL is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/axl/license.txt
+//
+//..............................................................................
 
 #pragma once
 
@@ -60,4 +67,3 @@ struct ImageDesc
 
 } // namespace gui
 } // namespace axl
-
