@@ -99,7 +99,7 @@
 #		define AXL_OS_STRING "Linux"
 #	elif (defined __sun__)
 #		define _AXL_OS_SOLARIS 1
-#		define AXL_OS_STRING "Linux"
+#		define AXL_OS_STRING "Solaris"
 #	elif (defined __FreeBSD__ || defined __OpenBSD__ || defined __NetBSD__)
 #		define _AXL_OS_BSD 1
 #		define AXL_OS_STRING "BSD"
