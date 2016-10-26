@@ -10,7 +10,7 @@
 #...............................................................................
 
 if (EXISTS ${WDK_DDK_INC_DIR}/ntddk.h)
-	message (STATUS "WDK paths:")
+	axl_message ("WDK paths:")
 	axl_message ("    WDK root:"      "${WDK_ROOT_DIR}")
 	axl_message ("    WDK binaries:"  "${WDK_BIN_DIR}")
 	axl_message ("    CRT includes:"  "${WDK_CRT_INC_DIR}")

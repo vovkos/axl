@@ -11,9 +11,10 @@
 
 # sanity checks
 
-if (NOT EXISTS "${AXL_DROPPER_DIR}/axl_cmake.cmake" OR
-	NOT EXISTS "${AXL_PATHS_CMAKE}" OR
-	NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies.cmake")
+get_filename_component (_FILE_NAME ${CMAKE_PARENT_LIST_FILE} NAME)
+
+if (NOT "${_FILE_NAME}" STREQUAL "axl_cmake.cmake" OR
+	NOT EXISTS "${AXL_CMAKE_ORIGIN_DIR}/dependencies.cmake")
 
 	message (FATAL_ERROR "Incorrect usage of axl_init.cmake!")
 endif ()
@@ -44,39 +45,53 @@ include (${CMAKE_CURRENT_LIST_DIR}/axl_std_settings.cmake)
 
 axl_create_std_settings ()
 
-# find and include settings.cmake to give a chance for overriding std settings
+# find paths.cmake
 
-axl_find_file_recurse_parent_dirs (_SETTINGS_CMAKE settings.cmake ${AXL_DROPPER_DIR})
+axl_find_file_recurse_parent_dirs (
+	AXL_PATHS_CMAKE
+	paths.cmake
+	${AXL_CMAKE_ORIGIN_DIR}
+	)
 
-if (_SETTINGS_CMAKE)
-	include (${_SETTINGS_CMAKE})
+# find and include settings.cmake to give a chance for overriding std settings...
+
+axl_find_file_recurse_parent_dirs (
+	AXL_SETTINGS_CMAKE
+	settings.cmake
+	${AXL_CMAKE_ORIGIN_DIR}
+	)
+
+if (AXL_SETTINGS_CMAKE)
+	include (${AXL_SETTINGS_CMAKE})
 endif ()
 
-# apply std settings
+# ...then apply and do diagnostic print
 
 axl_apply_std_settings ()
-
-# re-include paths.cmake and dependencies.cmake
-# this time ${CONFIGURATION_SUFFIX} and all the other settings are defined
-
-include (${AXL_PATHS_CMAKE})
-include (${CMAKE_SOURCE_DIR}/dependencies.cmake)
-
-# do diagnostic printing
-
 axl_print_std_settings ()
+
+# re-include dependencies.cmake and paths.cmake -- this time ${CONFIGURATION_SUFFIX}
+# and all the other settings are defined
+
+include (${AXL_CMAKE_ORIGIN_DIR}/dependencies.cmake)
+
+if (AXL_PATHS_CMAKE)
+	include (${AXL_PATHS_CMAKE})
+endif ()
 
 get_cmake_property (_VARIABLE_LIST VARIABLES)
 string (REPLACE ";" "\$|^" _FILTER "^${AXL_PATH_LIST}\$")
 axl_filter_list (_FILTERED_VARIABLE_LIST ${_FILTER} ${_VARIABLE_LIST})
 
-message(STATUS "Path defintions in ${AXL_PATHS_CMAKE}:")
+if (_FILTERED_VARIABLE_LIST)
+	message (STATUS "Dependency path definitions:")
 
-axl_print_variable_list (
-	"    "
-	${AXL_G_MESSAGE_ALIGN}
-	${_FILTERED_VARIABLE_LIST}
-	)
+	axl_print_variable_list (
+		"    "
+		${AXL_G_MESSAGE_ALIGN}
+		${_FILTERED_VARIABLE_LIST}
+		)
+endif ()
 
 # import modules (if dependencies.cmake defines any imports)
 
@@ -91,9 +106,5 @@ if (AXL_IMPORT_LIST)
 endif ()
 
 #...............................................................................
-
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib/${CONFIGURATION_SUFFIX_0})
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/${CONFIGURATION_SUFFIX_0})
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/${CONFIGURATION_SUFFIX_0})
 
 enable_testing ()

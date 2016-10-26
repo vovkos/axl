@@ -18,7 +18,7 @@ if (NOT EXPAT_LIB_DIR)
 endif ()
 
 if (EXISTS ${EXPAT_INC_DIR}/expat.h)
-	message (STATUS "Expat paths:")
+	axl_message ("Expat paths:")
 	axl_message ("    Includes:"  "${EXPAT_INC_DIR}")
 	axl_message ("    Libraries:" "${EXPAT_LIB_DIR}")
 

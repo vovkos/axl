@@ -18,7 +18,7 @@ if (NOT OPENSSL_LIB_DIR)
 endif ()
 
 if (EXISTS ${OPENSSL_INC_DIR}/openssl/obj_mac.h)
-	message (STATUS "OpenSSL paths:")
+	axl_message ("OpenSSL paths:")
 	axl_message ("    Includes:"  "${OPENSSL_INC_DIR}")
 	axl_message ("    Libraries:" "${OPENSSL_LIB_DIR}")
 

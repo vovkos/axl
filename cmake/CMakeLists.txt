@@ -15,4 +15,14 @@ configure_file (
 	@ONLY
 	)
 
+# make AXL_CMAKE_DIR available to any project within the same source tree
+
+set (
+	AXL_CMAKE_DIR
+	${CMAKE_CURRENT_LIST_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}
+	CACHE INTERNAL
+	"In-source-tree AXL CMake directories"
+	)
+
 #...............................................................................

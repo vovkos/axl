@@ -101,12 +101,18 @@ set (AXL_G_MESSAGE_ALIGN 16) # adjustable
 
 macro (
 axl_message
-	_PREFIX
-	_SUFFIX
+	_FIRST
+	# ...
 	)
 
-	axl_create_space_padding (_PADDING ${_PREFIX} ${AXL_G_MESSAGE_ALIGN})
-	message (STATUS "${_PREFIX}${_PADDING}${_SUFFIX}")
+	set (_ARG_LIST ${ARGN})
+
+	if (NOT _ARG_LIST)
+		message (STATUS "${_FIRST}")
+	else ()
+		axl_create_space_padding (_PADDING ${_FIRST} ${AXL_G_MESSAGE_ALIGN})
+		message (STATUS "${_FIRST}${_PADDING}${_ARG_LIST}")
+	endif ()
 endmacro ()
 
 #...............................................................................
@@ -143,7 +149,7 @@ endmacro ()
 
 #...............................................................................
 
-# detect host CPU (currently we only care support x86 and amd64)
+# detect host CPU (currently we only support x86 and amd64)
 
 macro (
 axl_detect_cpu
@@ -1080,8 +1086,6 @@ endmacro ()
 
 # imports -- CMake' find_package replacement with support for manual override
 
-set (AXL_STD_IMPORT_DIR ${CMAKE_CURRENT_LIST_DIR})
-
 macro (
 axl_include_import_file
 	_IMPORT
@@ -1091,22 +1095,12 @@ axl_include_import_file
 	set (${_IMPORT}_FOUND FALSE)
 	unset (_IMPORT_FILE_PATH)
 
-	# use AXL_IMPORT_DIR_LIST first (to allow overriding)
-
-	foreach (_IMPORT_DIR ${AXL_IMPORT_DIR_LIST})
-		unset (_IMPORT_FILE_PATH)
-
-		if (EXISTS ${_IMPORT_DIR}/import_${_IMPORT}.cmake)
-			set (_IMPORT_FILE_PATH ${_IMPORT_DIR}/import_${_IMPORT}.cmake)
-			break ()
-		endif ()
-	endforeach ()
-
-	# fallback to standard import_*.cmake
-
-	if (NOT _IMPORT_FILE_PATH AND EXISTS ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
-		set (_IMPORT_FILE_PATH ${AXL_STD_IMPORT_DIR}/import_${_IMPORT}.cmake)
-	endif ()
+	axl_find_file (
+		_IMPORT_FILE_PATH
+		import_${_IMPORT}.cmake
+		${AXL_IMPORT_DIR_LIST} # AXL_IMPORT_DIR_LIST first (to allow overriding)
+		${CMAKE_CURRENT_LIST_DIR}
+		)
 
 	if (_IMPORT_FILE_PATH)
 		include (${_IMPORT_FILE_PATH})

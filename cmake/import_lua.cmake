@@ -18,7 +18,7 @@ if (NOT LUA_LIB_DIR)
 endif ()
 
 if (EXISTS ${LUA_INC_DIR}/lua.h)
-	message (STATUS "Lua paths:")
+	axl_message ("Lua paths:")
 	axl_message ("    Includes:"  "${LUA_INC_DIR}")
 	axl_message ("    Libraries:" "${LUA_LIB_DIR}")
 

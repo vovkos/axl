@@ -18,7 +18,7 @@ if (NOT LIBUSB_LIB_DIR)
 endif ()
 
 if (EXISTS ${LIBUSB_INC_DIR}/libusb-1.0/libusb.h)
-	message (STATUS "LibUSB paths:")
+	axl_message ("LibUSB paths:")
 	axl_message ("    Includes:"  "${LIBUSB_INC_DIR}")
 	axl_message ("    Libraries:" "${LIBUSB_LIB_DIR}")
 

@@ -111,58 +111,6 @@ axl_apply_build_type_setting)
 	endif ()
 endmacro ()
 
-macro (
-axl_create_compiler_setting)
-
-	axl_find_executable	(_CC      cc)
-	axl_find_executable	(_CXX     c++)
-	axl_find_executable	(_GCC     gcc)
-	axl_find_executable	(_GXX     g++)
-	axl_find_executable	(_CLANG   clang)
-	axl_find_executable	(_CLANGXX clang++)
-
-	set (
-		_C_COMPILER_LIST
-		${CMAKE_C_COMPILER}
-		${_CC}
-		${_GCC}
-		${_CLANG}
-		)
-
-	list (REMOVE_DUPLICATES _C_COMPILER_LIST)
-
-	axl_create_setting (
-		AXL_C_COMPILER
-		DESCRIPTION "C compiler"
-		DEFAULT ${CMAKE_C_COMPILER}
-		${_C_COMPILER_LIST}
-		)
-
-	set (
-		_CXX_COMPILER_LIST
-		${CMAKE_CXX_COMPILER}
-		${_CXX}
-		${_GXX}
-		${_CLANGXX}
-		)
-
-	list (REMOVE_DUPLICATES _CXX_COMPILER_LIST)
-
-	axl_create_setting (
-		AXL_CPP_COMPILER
-		DESCRIPTION "C++ compiler"
-		DEFAULT ${CMAKE_CXX_COMPILER}
-		${_CXX_COMPILER_LIST}
-		)
-endmacro ()
-
-macro (
-axl_apply_compiler_setting)
-
-	set (CMAKE_C_COMPILER ${AXL_C_COMPILER})
-	set (CMAKE_CXX_COMPILER ${AXL_CPP_COMPILER})
-endmacro ()
-
 #...............................................................................
 
 macro (
@@ -349,10 +297,6 @@ axl_create_std_settings)
 	axl_create_cpu_setting ()
 	axl_create_build_type_setting ()
 
-	if (UNIX)
-		axl_create_compiler_setting ()
-	endif ()
-
 	if (MSVC)
 		axl_create_msvc_settings ()
 	elseif (GCC)
@@ -365,10 +309,6 @@ axl_apply_std_settings)
 
 	axl_apply_cpu_setting ()
 	axl_apply_build_type_setting ()
-
-	if (UNIX)
-		axl_apply_compiler_setting ()
-	endif ()
 
 	if (MSVC)
 		axl_apply_msvc_settings ()
@@ -384,8 +324,19 @@ axl_print_std_settings)
 
 	string (LENGTH ".......................:" AXL_G_MESSAGE_ALIGN)
 
-	message (STATUS "Target:")
-	axl_message ("    CPU:" ${AXL_CPU})
+	message (STATUS "AXL CMake:")
+	axl_message ("    Invoked from:" ${AXL_CMAKE_ORIGIN_FILE})
+	axl_message ("    dependencies.cmake:" ${AXL_CMAKE_ORIGIN_DIR}/dependencies.cmake)
+
+	if (AXL_SETTINGS_CMAKE)
+		axl_message ("    settings.cmake:" ${AXL_SETTINGS_CMAKE})
+	endif ()
+
+	if (AXL_PATHS_CMAKE)
+		axl_message ("    paths.cmake:" ${AXL_PATHS_CMAKE})
+	endif ()
+
+	axl_message ("    Target CPU:" ${AXL_CPU})
 
 	if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
 		axl_message ("    Build configuration:" ${CMAKE_BUILD_TYPE})

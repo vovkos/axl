@@ -18,7 +18,7 @@ if (NOT LIBSSH2_LIB_DIR)
 endif ()
 
 if (EXISTS ${LIBSSH2_INC_DIR}/libssh2.h)
-	message (STATUS "LibSSH2 paths:")
+	axl_message ("LibSSH2 paths:")
 	axl_message ("    Includes:"  "${LIBSSH2_INC_DIR}")
 	axl_message ("    Libraries:" "${LIBSSH2_LIB_DIR}")
 
