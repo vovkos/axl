@@ -10,31 +10,31 @@
 #...............................................................................
 
 option (
-	BUILD_TEST_CON
-	"Build test_con"
+	BUILD_AXL_TEST_CON
+	"Build axl_test_con"
 	OFF
 	)
 
-if (BUILD_TEST_CON)
-	add_subdirectory (test_con)
+if (BUILD_AXL_TEST_CON)
+	add_subdirectory (axl_test_con)
 endif ()
 
 #...............................................................................
 
 if (${QT_FOUND})
 	option (
-		BUILD_TEST_QT
-		"Build test_qt"
+		BUILD_AXL_TEST_QT
+		"Build axl_test_qt"
 		ON
 		)
 
-	if (BUILD_TEST_QT)
-		add_subdirectory (test_qt)
+	if (BUILD_AXL_TEST_QT)
+		add_subdirectory (axl_test_qt)
 	endif ()
 endif ()
 
 #...............................................................................
 
-add_subdirectory (test_mini)
+add_subdirectory (axl_test_mini)
 
 #...............................................................................

@@ -46,7 +46,7 @@ source_group (
 
 #...............................................................................
 #
-# test_mini app
+# axl_test_mini app
 #
 
 include_directories (${AXL_INC_DIR})
@@ -65,7 +65,7 @@ if (BUILD_AXL_XML)
 endif ()
 
 add_executable (
-	test_mini
+	axl_test_mini
 	${PCH_H}
 	${PCH_CPP}
 	${APP_H_LIST}
@@ -73,21 +73,21 @@ add_executable (
 	)
 
 set_target_properties (
-	test_mini
+	axl_test_mini
 	PROPERTIES
 	FOLDER test
 	)
 
 if (BUILD_AXL_XML)
 	target_link_libraries (
-		test_mini
+		axl_test_mini
 		axl_xml
 		expat
 		)
 endif ()
 
 target_link_libraries (
-	test_mini
+	axl_test_mini
 	axl_io
 	axl_fsm
 	axl_zip
@@ -96,21 +96,21 @@ target_link_libraries (
 
 if (WIN32)
 	target_link_libraries (
-		test_mini
+		axl_test_mini
 		setupapi
 		)
 endif ()
 
 if (UNIX)
 	target_link_libraries (
-		test_mini
+		axl_test_mini
 		pthread
 		dl
 		)
 
 	if (LINUX AND LIBUDEV_FOUND)
 		target_link_libraries (
-			test_mini
+			axl_test_mini
 			udev
 			)
 	endif ()
@@ -120,7 +120,7 @@ if (UNIX)
 		find_library (IOKIT_FRAMEWORK IOKit)
 
 		target_link_libraries (
-			test_mini
+			axl_test_mini
 			axl_cf
 			axl_iok
 			${CORE_FOUNDATION_FRAMEWORK}
@@ -128,7 +128,7 @@ if (UNIX)
 			)
 	else ()
 		target_link_libraries (
-			test_mini
+			axl_test_mini
 			rt
 			)
 	endif ()
@@ -137,24 +137,24 @@ endif ()
 if (BUILD_AXL_IO_USB)
 	if (UNIX)
 		target_link_libraries (
-			test_mini
+			axl_test_mini
 			usb-1.0
 			)
 	elseif (WIN32)
 		target_link_libraries (
-			test_mini
+			axl_test_mini
 			libusb-1.0
 			)
 	else ()
 		target_link_libraries (
-			test_mini
+			axl_test_mini
 			usb-1.0
 			)
 	endif ()
 endif ()
 
 axl_set_pch (
-	test_mini
+	axl_test_mini
 	${PCH_H}
 	${PCH_CPP}
 	)
