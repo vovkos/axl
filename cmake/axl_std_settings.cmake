@@ -246,7 +246,6 @@ axl_create_gcc_settings)
 	axl_create_compiler_flag_setting (
 		GCC_FLAG_SANITIZER_DEBUG
 		DESCRIPTION "Sanitizer to use in Debug build"
-		DEFAULT "-fsanitize=address"
 		"-fsanitize=address" "-fsanitize=memory" "-fsanitize=thread"
 		)
 
