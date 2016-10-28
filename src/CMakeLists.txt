@@ -33,7 +33,7 @@ if (WIN32)
 		)
 endif ()
 
-if (${QT_FOUND})
+if (QT_FOUND)
 	option (
 		BUILD_AXL_GUI_QT
 		"Build QT drivers for axl_gui library"
@@ -55,7 +55,7 @@ endif ()
 
 #...............................................................................
 
-if (${RAGEL_FOUND})
+if (RAGEL_FOUND)
 	option (
 		BUILD_AXL_INI
 		"Build axl_ini library"
@@ -71,7 +71,7 @@ endif ()
 
 #...............................................................................
 
-if (${EXPAT_FOUND})
+if (EXPAT_FOUND)
 	option (
 		BUILD_AXL_XML
 		"Build axl_xml library (Expat XML Parser wrappers)"
@@ -105,7 +105,7 @@ option (
 	ON
 	)
 
-if (${PCAP_FOUND})
+if (PCAP_FOUND)
 	option (
 		BUILD_AXL_IO_PCAP
 		"Build Pcap wrappers for axl_io library"
@@ -115,7 +115,7 @@ else ()
 	unset (BUILD_AXL_IO_PCAP CACHE)
 endif ()
 
-if (${LIBUSB_FOUND})
+if (LIBUSB_FOUND)
 	option (
 		BUILD_AXL_IO_USB
 		"Build LibUSB wrappers for axl_io library"
@@ -143,7 +143,7 @@ endif ()
 
 #...............................................................................
 
-if (${LUA_FOUND})
+if (LUA_FOUND)
 	option (
 		BUILD_AXL_LUA
 		"Build axl_lua library"
@@ -159,7 +159,7 @@ endif ()
 
 #...............................................................................
 
-if (${RAGEL_FOUND} AND ${LUA_FOUND})
+if (RAGEL_FOUND AND LUA_FOUND)
 	option (
 		BUILD_AXL_ST
 		"Build axl_st library (string templates)"
@@ -187,7 +187,7 @@ endif ()
 
 #...............................................................................
 
-if (${OPENSSL_FOUND})
+if (OPENSSL_FOUND)
 	option (
 		BUILD_AXL_CRY
 		"Build axl_cry library"
