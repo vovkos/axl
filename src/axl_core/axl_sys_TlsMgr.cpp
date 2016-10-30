@@ -171,14 +171,14 @@ TlsMgr::getCurrentThreadPage ()
 
 extern "C"
 __declspec(allocate (AXL_SYS_TLS_CALLBACK_SECTION))
-PIMAGE_TLS_CALLBACK g_axl_sys_pfTlsCallback = axl::sys::TlsMgr::tlsCallback;
+PIMAGE_TLS_CALLBACK axl_g_sys_pfTlsCallback = axl::sys::TlsMgr::tlsCallback;
 
 #ifdef _WIN64
 #	pragma comment (linker, "/INCLUDE:_tls_used")
-#	pragma comment (linker, "/INCLUDE:g_axl_sys_pfTlsCallback")
+#	pragma comment (linker, "/INCLUDE:axl_g_sys_pfTlsCallback")
 #else
 #	pragma comment (linker, "/INCLUDE:__tls_used")
-#	pragma comment (linker, "/INCLUDE:_g_axl_sys_pfTlsCallback")
+#	pragma comment (linker, "/INCLUDE:_axl_g_sys_pfTlsCallback")
 #endif
 
 #endif

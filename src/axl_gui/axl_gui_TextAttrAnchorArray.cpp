@@ -17,19 +17,18 @@ namespace gui {
 
 //..............................................................................
 
-
 #ifdef _AXL_DEBUG
 
 void
 TextAttrAnchorArray::trace ()
 {
 	size_t count = getCount ();
-	dbg::trace ("--- CTextAttrAnchorArray {%d}---\n", count);
+	TRACE ("--- CTextAttrAnchorArray {%d}---\n", count);
 
 	for (size_t i = 0; i < count; i++)
 	{
 		const TextAttrAnchor* anchor = &(m_array [i]);
-		dbg::trace ("[%d] ofs:%02x fc:%x\n", i, anchor->m_offset, anchor->m_attr.m_foreColor);
+		TRACE ("[%d] ofs:%02x fc:%x\n", i, anchor->m_offset, anchor->m_attr.m_foreColor);
 	}
 }
 

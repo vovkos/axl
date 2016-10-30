@@ -83,3 +83,19 @@ Module::addFinalizer (const ref::Ptr <Finalizer>& finalizer)
 
 } // namespace g
 } // namespace axl
+
+#if (_AXL_OS_WIN)
+void
+axl_trace_va (
+	const char* formatString,
+	axl_va_list va
+	)
+{
+	char buffer [512] = { 0 };
+	sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	string.format_va (formatString, va);
+	::OutputDebugStringA (string);
+}
+#endif
+
+//..............................................................................

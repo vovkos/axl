@@ -12,7 +12,6 @@
 #include "pch.h"
 #include "axl_mem_Tracker.h"
 #include "axl_g_Module.h"
-#include "axl_dbg_Trace.h"
 
 namespace axl {
 namespace mem {
@@ -68,7 +67,7 @@ Tracker::trace ()
 {
 	m_lock.lock ();
 
-	dbg::trace (
+	TRACE (
 		"Allocated memory:\n"
 		"    Current.......%d bytes (%d blocks)\n"
 		"    Peak..........%d bytes (%d blocks)\n"
@@ -83,7 +82,7 @@ Tracker::trace ()
 
 	if (!m_blockList.isEmpty ())
 	{
-		dbg::trace (
+		TRACE (
 			"*** Found %d unfreed blocks:\n",
 			m_blockList.getCount ()
 			);
@@ -93,7 +92,7 @@ Tracker::trace ()
 		{
 			BlockHdr* blockHdr = *it;
 
-			dbg::trace (
+			TRACE (
 				"    %s(%d): %s; seq = #%d; size = %d;\n",
 				blockHdr->m_filePath,
 				blockHdr->m_line,

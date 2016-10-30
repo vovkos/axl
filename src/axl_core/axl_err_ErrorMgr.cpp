@@ -12,7 +12,6 @@
 #include "pch.h"
 #include "axl_err_ErrorMgr.h"
 #include "axl_err_Errno.h"
-#include "axl_dbg_Trace.h"
 #include "axl_sys_SjljTry.h"
 
 #if (_AXL_OS_WIN)

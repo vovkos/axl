@@ -10,28 +10,6 @@
 #...............................................................................
 
 #
-# dbg folder
-#
-
-set (
-	DBG_H_LIST
-	${AXL_INC_DIR}/axl_dbg_Trace.h
-	)
-
-set (
-	DBG_CPP_LIST
-	axl_dbg_Trace.cpp
-	)
-
-source_group (
-	dbg
-	FILES
-	${DBG_H_LIST}
-	${DBG_CPP_LIST}
-	)
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # err folder
 #
 

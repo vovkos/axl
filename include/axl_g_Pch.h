@@ -556,4 +556,52 @@ public:
 
 //..............................................................................
 
+// TRACE macro
+
+#ifdef _AXL_DEBUG
+#	if (_AXL_OS_WIN)
+void
+axl_trace_va (
+	const char* formatString,
+	axl_va_list va
+	);
+#	else
+AXL_SELECT_ANY FILE* axl_g_traceFile = stdout;
+
+inline
+void
+axl_trace_va (
+	const char* formatString,
+	axl_va_list va
+	)
+{
+	vfprintf (axl_g_traceFile, formatString, va);
+	fflush (axl_g_traceFile);
+}
+#	endif
+
+inline
+void
+axl_trace (
+	const char* formatString,
+	...
+	)
+{
+	AXL_VA_DECL (va, formatString);
+	axl_trace_va (formatString, va);
+}
+
+#	define AXL_TRACE \
+		axl_trace
+#else
+#	define AXL_TRACE \
+		(void)
+#endif
+
+#ifndef TRACE
+#	define TRACE AXL_TRACE
+#endif
+
+//..............................................................................
+
 #include "axl_g_WarningSuppression.h"
