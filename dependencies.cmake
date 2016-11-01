@@ -43,13 +43,12 @@ set (
 		libusb
 		openssl
 		expat
-
+		qt
 		ragel
 		doxygen
 		doxyrest
 		sphinx
 		latex
-		qt
 		7z
 	)
 

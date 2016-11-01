@@ -9,22 +9,84 @@
 #
 #...............................................................................
 
-if (EXISTS ${QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake)
-	set (QT_FOUND TRUE)
-else ()
-	set (QT_FOUND FALSE)
-endif ()
-
 unset (Qt5Core_DIR    CACHE)
 unset (Qt5Gui_DIR     CACHE)
 unset (Qt5Widgets_DIR CACHE)
 unset (Qt5Network_DIR CACHE)
 
+set (QT_FOUND FALSE)
+set (QTCORE_FOUND FALSE)
+set (QTGUI_FOUND FALSE)
+set (QTWIDGETS_FOUND FALSE)
+set (QTNETWORK_FOUND FALSE)
+
+if (NOT QT_CMAKE_DIR)
+	find_package (Qt5Core)
+	if (Qt5Core_FOUND)
+	 	set (QT_FOUND TRUE)
+		set (QTCORE_FOUND TRUE)
+	endif ()
+
+	find_package (Qt5Gui)
+	if (Qt5Gui_FOUND)
+		set (QTGUI_FOUND TRUE)
+	endif ()
+
+	find_package (Qt5Widgets)
+	if (Qt5Widgets_FOUND)
+		set (QTWIDGETS_FOUND TRUE)
+	endif ()
+
+	find_package (Qt5Network)
+	if (Qt5Network_FOUND)
+		set (QTNETWORK_FOUND TRUE)
+	endif ()
+else ()
+	if (EXISTS ${QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake)
+		include ("${QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
+	 	set (QT_FOUND TRUE)
+		set (QTCORE_FOUND TRUE)
+	endif ()
+
+	if (EXISTS ${QT_CMAKE_DIR}/Qt5Core/Qt5GuiConfig.cmake)
+		include ("${QT_CMAKE_DIR}/Qt5Gui/Qt5GuiConfig.cmake")
+		set (QTGUI_FOUND TRUE)
+	endif ()
+
+	if (EXISTS ${QT_CMAKE_DIR}/Qt5Core/Qt5WidgetsConfig.cmake)
+		include ("${QT_CMAKE_DIR}/Qt5Widgets/Qt5WidgetsConfig.cmake")
+		set (QTWIDGETS_FOUND TRUE)
+	endif ()
+
+	if (EXISTS ${QT_CMAKE_DIR}/Qt5Core/Qt5NetworkConfig.cmake)
+		include ("${QT_CMAKE_DIR}/Qt5Network/Qt5NetworkConfig.cmake")
+		set (QTNETWORK_FOUND TRUE)
+	endif ()
+endif ()
+
 if (QT_FOUND)
-	include ("${QT_CMAKE_DIR}/Qt5Core/Qt5CoreConfig.cmake")
-	include ("${QT_CMAKE_DIR}/Qt5Gui/Qt5GuiConfig.cmake")
-	include ("${QT_CMAKE_DIR}/Qt5Widgets/Qt5WidgetsConfig.cmake")
-	include ("${QT_CMAKE_DIR}/Qt5Network/Qt5NetworkConfig.cmake")
+	axl_message ("QT paths:")
+	axl_message ("    Core:")
+	axl_message ("        CMake files:" "${Qt5Core_DIR}")
+	axl_message ("        Includes:"    "${Qt5Core_INCLUDE_DIRS}")
+
+	if (QTGUI_FOUND)
+		axl_message ("    Gui:")
+		axl_message ("        CMake files:" "${Qt5Gui_DIR}")
+		axl_message ("        Includes:"    "${Qt5Gui_INCLUDE_DIRS}")
+	endif ()
+
+	if (QTWIDGETS_FOUND)
+		axl_message ("    Widgets:")
+		axl_message ("        CMake files:" "${Qt5Widgets_DIR}")
+		axl_message ("        Includes:"    "${Qt5Widgets_INCLUDE_DIRS}")
+	endif ()
+
+	if (QTNETWORK_FOUND)
+		axl_message ("    Network:")
+		axl_message ("        CMake files:" "${Qt5Network_DIR}")
+		axl_message ("        Includes:"    "${Qt5Network_INCLUDE_DIRS}")
+	endif ()
 endif ()
 
 #...............................................................................
