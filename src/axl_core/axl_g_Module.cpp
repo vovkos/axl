@@ -92,7 +92,7 @@ axl_trace_va (
 	)
 {
 	char buffer [512] = { 0 };
-	sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
+	axl::sl::String string (axl::ref::BufKind_Stack, buffer, sizeof (buffer));
 	string.format_va (formatString, va);
 	::OutputDebugStringA (string);
 }
