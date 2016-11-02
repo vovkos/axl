@@ -23,20 +23,14 @@ endif ()
 
 # CMake policies
 
-if (POLICY CMP0020)
-	# Automatically link Qt executables to qtmain.lib on Windows (OLD: OFF; NEW: ON)
-	cmake_policy (SET CMP0020 OLD)
-endif ()
+# as of now, we have CMake version requirement of 3.3, and all the default 
+# policy values work well with AXL CMake infrastructure.
 
-if (POLICY CMP0043)
-	# Ignore COMPILE_DEFINITIONS_<Config> properties (OLD: OFF; NEW: ON)
-	cmake_policy (SET CMP0043 NEW)
-endif ()
+# when in need to adjust a policy, use the following template:
 
-if (POLICY CMP0054)
-	# Only interpret if() arguments as variables or keywords when unquoted (OLD: OFF; NEW: ON)
-	cmake_policy (SET CMP0054 NEW)
-endif ()
+# if (POLICY CMPNNNN)
+#	cmake_policy (SET CMPNNNN OLD)
+# endif ()
 
 #...............................................................................
 
