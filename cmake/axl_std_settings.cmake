@@ -179,6 +179,13 @@ axl_create_msvc_settings)
 		DEFAULT "/Zi"
 		"/Z7" "/Zi" "/ZI"
 		)
+
+	axl_create_setting (
+		MSVC_LINK_FLAG_IGNORE4221
+		DESCRIPTION "Ignore linker warning LNK4221 (object file doesn't define new symbols)"
+		DEFAULT "/IGNORE:4221"
+		" " "/IGNORE:4221"
+		)
 endmacro ()
 
 macro (
@@ -192,6 +199,11 @@ axl_apply_msvc_settings)
 	if (${MSVC_USE_UNICODE})
 		add_definitions (-DUNICODE -D_UNICODE)
 	endif ()
+
+	axl_create_compiler_flag_setting_regex (_REGEX MSVC_LINK_FLAG_IGNORE4221)
+	axl_apply_compiler_flag (CMAKE_EXE_LINKER_FLAGS ${_REGEX} ${MSVC_LINK_FLAG_IGNORE4221})
+	axl_apply_compiler_flag (CMAKE_SHARED_LINKER_FLAGS ${_REGEX} ${MSVC_LINK_FLAG_IGNORE4221})
+	axl_apply_compiler_flag (CMAKE_STATIC_LINKER_FLAGS ${_REGEX} ${MSVC_LINK_FLAG_IGNORE4221})
 endmacro ()
 
 #...............................................................................
@@ -275,7 +287,7 @@ axl_apply_gcc_settings)
 		set (CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${GCC_FLAG_SANITIZER_DEBUG}")
 	endif ()
 
-	axl_create_compiler_flag_regex (_REGEX "-rdynamic")
+	axl_create_compiler_flag_setting_regex (_REGEX GCC_LINK_FLAG_RDYNAMIC)
 	axl_apply_compiler_flag (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
 	axl_apply_compiler_flag (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
 endmacro ()

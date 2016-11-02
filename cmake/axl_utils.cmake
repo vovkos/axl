@@ -458,19 +458,7 @@ axl_apply_compiler_flag_setting
 	_SETTING
 	)
 
-	# create regex from option list and
-
-	get_property (
-		_OPTION_LIST
-		CACHE ${_SETTING}
-		PROPERTY STRINGS
-		)
-
-	if (NOT _OPTION_LIST)
-		message (FATAL_ERROR "${_SETTING} does not have an associated option list")
-	endif ()
-
-	axl_create_compiler_flag_regex (_REGEX ${_OPTION_LIST})
+	axl_create_compiler_flag_setting_regex (_REGEX ${_SETTING})
 
 	axl_get_compiler_flag_setting_traits (
 		${_SETTING}
@@ -517,6 +505,27 @@ axl_apply_all_compiler_flag_settings)
 	foreach (_SETTING ${_AXL_G_COMPILER_FLAG_SETTING_LIST})
 		axl_apply_compiler_flag_setting (${_SETTING})
 	endforeach ()
+endmacro ()
+
+macro (
+axl_create_compiler_flag_setting_regex
+	_RESULT
+	_SETTING
+	)
+
+	# create regex from option list and
+
+	get_property (
+		_OPTION_LIST
+		CACHE ${_SETTING}
+		PROPERTY STRINGS
+		)
+
+	if (NOT _OPTION_LIST)
+		message (FATAL_ERROR "${_SETTING} does not have an associated option list")
+	endif ()
+
+	axl_create_compiler_flag_regex (_REGEX ${_OPTION_LIST})
 endmacro ()
 
 # direct management of individual flags
