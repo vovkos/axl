@@ -85,7 +85,7 @@ axl_filter_list
 	unset (_FILTERED_LIST)
 
 	foreach (_ITEM ${_LIST})
-		string (REGEX MATCH "${_FILTER}$" _MATCH "${_ITEM}")
+		string (REGEX MATCH "${_FILTER}" _MATCH "${_ITEM}")
 		if (_MATCH)
 			list (APPEND _FILTERED_LIST ${_ITEM})
 		endif ()
@@ -852,6 +852,7 @@ axl_find_executable
 	if (WIN32)
 		execute_process (
 			COMMAND where ${_FILE_NAME}
+			ERROR_FILE "NUL"
 			OUTPUT_VARIABLE _OUTPUT
 			)
 
@@ -1107,10 +1108,17 @@ axl_include_import_file
 
 		string (TOUPPER ${_IMPORT} _IMPORT_UC)
 		if (NOT ${_IMPORT_UC}_FOUND AND NOT _IS_OPTIONAL)
-			message (FATAL_ERROR "${_IMPORT} is required but not found, check paths.cmake")
+			string (TOUPPER ${_IMPORT} _FILTER)
+			axl_filter_list (_FILTERED_PATH_LIST ${_FILTER} ${AXL_PATH_LIST})
+
+			if (NOT _FILTERED_PATH_LIST)
+				message (FATAL_ERROR "${_IMPORT} is required but not found (use paths.cmake)")
+			else ()
+				message (FATAL_ERROR "${_IMPORT} is required but not found (adjust ${_FILTERED_PATH_LIST} in paths.cmake)")
+			endif ()
 		endif ()
 	elseif (NOT _IS_OPTIONAL)
-		message (FATAL_ERROR "import_${_IMPORT}.cmake not found (use AXL_IMPORT_DIR_LIST in dependencies.cmake)")
+		message (FATAL_ERROR "import_${_IMPORT}.cmake not found (adjust AXL_IMPORT_DIR_LIST in dependencies.cmake)")
 	endif ()
 endmacro ()
 
