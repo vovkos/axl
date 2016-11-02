@@ -111,7 +111,7 @@ target_link_libraries (
 	axl_io
 	axl_lua
 	axl_cry
-	lua
+	${LUA_LIB_NAME}
 	libeay32MTd
 	)
 

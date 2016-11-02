@@ -215,7 +215,7 @@ axl_create_setting
 	set (_STATE "OPTIONS")
 
 	foreach (_ARG ${_ARG_LIST})
-		string (REGEX MATCH "TYPE|DESCRIPTION|DEFAULT|OPTIONS" _MATCH ${_ARG})
+		string (REGEX MATCH "^(TYPE|DESCRIPTION|DEFAULT|OPTIONS)$" _MATCH ${_ARG})
 
 		if (NOT "${_MATCH}" STREQUAL "")
 			set (_STATE ${_MATCH})
@@ -327,7 +327,7 @@ axl_create_compiler_flag_setting
 	set (_STATE "OPTIONS")
 
 	foreach (_ARG ${_ARG_LIST})
-		string (REGEX MATCH "DESCRIPTION|DEFAULT|OPTIONS" _MATCH ${_ARG})
+		string (REGEX MATCH "^(DESCRIPTION|DEFAULT|OPTIONS)$" _MATCH ${_ARG})
 
 		if (NOT "${_MATCH}" STREQUAL "")
 			set (_STATE ${_MATCH})
@@ -904,13 +904,68 @@ axl_find_inc_dir
 endmacro ()
 
 macro (
+axl_find_lib_dir_ex
+	# ...
+	)
+
+	set (_ARG_LIST ${ARGN})
+
+	set (_RESULT_LIB_DIR)
+	set (_RESULT_LIB_NAME)
+	set (_LIB_DIR_LIST)
+	set (_LIB_NAME_LIST)
+	set (_STATE)
+
+	foreach (_ARG ${_ARG_LIST})
+		string (REGEX MATCH "^(RESULT_LIB_DIR|RESULT_LIB_NAME|LIB_DIR|LIB_NAME)$" _MATCH ${_ARG})
+
+		if (NOT "${_MATCH}" STREQUAL "")
+			set (_STATE ${_MATCH})
+		elseif ("${_STATE}" STREQUAL "RESULT_LIB_DIR")
+			set (_RESULT_LIB_DIR ${_ARG})
+			set (_STATE)
+		elseif ("${_STATE}" STREQUAL "RESULT_LIB_NAME")
+			set (_RESULT_LIB_NAME ${_ARG})
+			set (_STATE)
+		elseif ("${_STATE}" STREQUAL "LIB_DIR")
+			list (APPEND _LIB_DIR_LIST ${_ARG})
+		elseif ("${_STATE}" STREQUAL "LIB_NAME")
+			list (APPEND _LIB_NAME_LIST ${_ARG})
+		endif ()
+	endforeach ()
+
+	if (NOT _LIB_DIR_LIST)
+		set (_OPTIONS)
+	else ()
+		set (_OPTIONS PATHS ${_LIB_DIR_LIST} NO_DEFAULT_PATH)
+	endif ()
+
+	foreach (_LIB_NAME ${_LIB_NAME_LIST})
+		axl_find_lib_dir (_LIB_DIR ${_LIB_NAME} ${_OPTIONS})
+
+		if (_LIB_DIR)
+			if (_RESULT_LIB_DIR)
+				set (${_RESULT_LIB_DIR} ${_LIB_DIR})
+			endif ()
+
+			if (_RESULT_LIB_NAME)
+				set (${_RESULT_LIB_NAME} ${_LIB_NAME})
+			endif ()
+
+			break ()
+		endif ()
+	endforeach ()
+endmacro ()
+
+macro (
 axl_find_lib_dir
 	_RESULT
 	_LIB_NAME
+	# ... _OPTIONS
 	)
 
 	unset (_PATH)
-	find_library (_PATH ${_LIB_NAME})
+	find_library (_PATH ${_LIB_NAME} ${ARGN})
 
 	if (NOT _PATH)
 		set (${_RESULT} ${_RESULT}-NOTFOUND)
