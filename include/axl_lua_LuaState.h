@@ -517,7 +517,7 @@ public:
 	getContext ()
 	{
 		int index = getUpValueIndex ();
-		return getInteger (index);
+		return (intptr_t) getInteger (index);
 	}
 
 	int

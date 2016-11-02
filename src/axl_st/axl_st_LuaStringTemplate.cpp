@@ -159,8 +159,8 @@ LuaStringTemplate::passthrough_lua (lua_State* h)
 
 	EmitContext* context = *self->m_emitContextStack.getTail ();
 
-	size_t offset = luaState.getInteger (1);
-	size_t length = luaState.getInteger (2);
+	size_t offset = (size_t) luaState.getInteger (1);
+	size_t length = (size_t) luaState.getInteger (2);
 
 	sl::StringRef string = context->m_frame.getSubString (offset, length);
 	context->m_output->append (string);
