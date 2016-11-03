@@ -23,7 +23,7 @@ endif ()
 
 # CMake policies
 
-# as of now, we have CMake version requirement of 3.3, and all the default 
+# as of now, we have CMake version requirement of 3.3, and all the default
 # policy values work well with AXL CMake infrastructure.
 
 # when in need to adjust a policy, use the following template:
@@ -64,14 +64,14 @@ endif ()
 axl_apply_std_settings ()
 axl_print_std_settings ()
 
-# re-include dependencies.cmake and paths.cmake -- this time ${CONFIGURATION_SUFFIX}
+# re-include paths.cmake and dependencies.cmake -- this time ${CONFIGURATION_SUFFIX}
 # and all the other settings are defined
-
-include (${AXL_CMAKE_ORIGIN_DIR}/dependencies.cmake)
 
 if (AXL_PATHS_CMAKE)
 	include (${AXL_PATHS_CMAKE})
 endif ()
+
+include (${AXL_CMAKE_ORIGIN_DIR}/dependencies.cmake)
 
 get_cmake_property (_VARIABLE_LIST VARIABLES)
 string (REPLACE ";" "\$|^" _FILTER "^${AXL_PATH_LIST}\$")
