@@ -56,7 +56,7 @@ public:
 	bool
 	start ()
 	{
-		return m_thread.create (NULL, 0, threadFunc, (T*) this, 0);
+		return m_thread.create (NULL, 0, threadFuncImpl, (T*) this, 0);
 	}
 
 	bool
@@ -88,7 +88,7 @@ protected:
 	static
 	dword_t
 	WINAPI
-	threadFunc (void* context)
+	threadFuncImpl (void* context)
 	{
 		((T*) context)->threadFunc ();
 		return 0;
@@ -155,7 +155,7 @@ public:
 		ASSERT (!m_thread.isOpen ());
 
 		m_threadCompletedEvent.reset ();
-		return m_thread.create (threadFunc, (T*) this);
+		return m_thread.create (threadFuncImpl, (T*) this);
 	}
 
 	bool
@@ -187,7 +187,7 @@ public:
 protected:
 	static
 	void*
-	threadFunc (void* context)
+	threadFuncImpl (void* context)
 	{
 		T* self = (T*) context;
 		self->threadFunc ();
