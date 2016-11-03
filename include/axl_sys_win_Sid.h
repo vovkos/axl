@@ -85,6 +85,20 @@ public:
 		create_va (identifierAuthority, subAuthorityCount, va);
 	}
 
+	Sid&
+	operator = (const Sid& src)
+	{
+		copy (src);
+		return *this;
+	}
+
+	Sid&
+	operator = (const SID* sid)
+	{
+		copy (sid);
+		return *this;
+	}
+	
 	bool
 	create (
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,

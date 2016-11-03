@@ -105,7 +105,8 @@ public:
 	BufRef (const T* p)
 	{
 		initialize ();
-		attach (NULL, p, SizeOf () (p));
+		if (p)
+			attach (NULL, p, SizeOf () (p));
 	}
 
 	BufRef (
@@ -375,7 +376,7 @@ public:
 	{
 		if (!this->m_hdr)
 		{
-			ASSERT (!this->m_length);
+			ASSERT (!this->m_size);
 			return;
 		}
 
@@ -414,6 +415,12 @@ public:
 	{
 		if (p == this->m_p && (size == -1 || size == this->m_size))
 			return this->m_size;
+
+		if (!p || size == 0)
+		{
+			clear ();
+			return 0;
+		}
 
 		if (size == -1)
 			size = SizeOf () (p);

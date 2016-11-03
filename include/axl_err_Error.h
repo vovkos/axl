@@ -187,6 +187,34 @@ public:
 		setBuffer (kind, p, size);
 	}
 
+	Error&
+	operator = (const Error& src)
+	{
+		copy (src);
+		return *this;
+	}
+
+	Error&
+	operator = (const ErrorRef& src)
+	{
+		copy (src);
+		return *this;
+	}
+
+	Error&
+	operator = (const ErrorHdr* src)
+	{
+		copy (src);
+		return *this;
+	}
+
+	Error&
+	operator = (uint_t code)
+	{
+		createSystemError (code);
+		return *this;
+	}
+
 	size_t
 	push (const ErrorRef& error);
 
