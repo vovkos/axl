@@ -2728,6 +2728,52 @@ testConn ()
 	return true;
 }
 
+bool
+testSerial ()
+{
+	printf ("opening COM4...\n");
+
+	io::SerialSettings settings;
+	settings.m_baudRate = 115200;
+	settings.m_dataBits = 8;
+	settings.m_stopBits = io::SerialStopBits_1;
+	settings.m_flowControl = io::SerialFlowControl_None;
+	settings.m_parity = io::SerialParity_None;
+
+	io::Serial serial;
+	bool result = 
+		serial.open ("COM4") &&
+		serial.setSettings (&settings);
+
+	if (!result)
+	{
+		printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+		return false;
+	}
+
+	size_t totalSize = 0;
+	size_t targetSize = 20 * 1024;
+
+	printf ("\rwriting... %3d%%; bytes: %5d", totalSize * 100 / targetSize, totalSize);
+
+	while (totalSize < targetSize)
+	{
+		static char data [] = "123456789abcdef";
+		size_t size = serial.write (data, sizeof (data));
+		if (size == -1)
+		{
+			printf ("can't write: %s\n", err::getLastErrorDescription ().sz ());
+			return false;
+		}
+
+		totalSize += size;
+		printf ("\rwriting... %3d%%; bytes: %5d", totalSize * 100 / targetSize, totalSize);
+	}
+
+	printf ("\ndone\n");
+	return true;
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2750,8 +2796,7 @@ main (
 	err::Error error = ERROR_ACCESS_DENIED;
 	error = ERROR_ACCESS_DENIED;
 
-
-	testConn ();
+	testSerial ();
 
 	return 0;
 }
