@@ -30,9 +30,15 @@ namespace io {
 
 enum SocketShutdownKind
 {
-	SocketShutdownKind_Recv,
-	SocketShutdownKind_Send,
-	SocketShutdownKind_All,
+#if (_AXL_OS_WIN)
+	SocketShutdownKind_Recv = SD_RECEIVE,
+	SocketShutdownKind_Send = SD_SEND,
+	SocketShutdownKind_All  = SD_BOTH,
+#elif (_AXL_OS_POSIX)
+	SocketShutdownKind_Recv = SHUT_RD,
+	SocketShutdownKind_Send = SHUT_WR,
+	SocketShutdownKind_All  = SHUT_RDWR,
+#endif
 };
 
 //..............................................................................

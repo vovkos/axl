@@ -2626,6 +2626,108 @@ testCmdLine (
 
 //..............................................................................
 
+class ServerThread: public sys::ThreadImpl <ServerThread>
+{
+public:
+	sys::Event m_startEvent;
+
+public:
+	intptr_t threadFunc ()
+	{
+		io::SockAddr addr;
+		addr.parse ("0.0.0.0:1002");
+
+		printf ("listening on TCP %s...\n", addr.getString ().sz ());
+	
+		io::Socket serverSocket;
+		io::Socket clientSocket;
+
+		bool result = 
+			serverSocket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
+			serverSocket.bind (addr) &&
+			serverSocket.listen (8);
+		
+		m_startEvent.signal ();
+	
+		printf ("waiting for clients...\n");
+		result = serverSocket.accept (&clientSocket, &addr);
+		if (!result)
+		{
+			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			return -1;
+		}
+		
+		
+		printf ("client connected from: %s\n", addr.getString ().sz ());
+
+		for (;;)
+		{
+			char buffer [1024];
+			int x = clientSocket.recv (buffer, sizeof (buffer) - 1);
+
+			if (x > 0)
+			{
+				buffer [x] = 0;
+				printf ("client sent %d bytes: %s\n", x, buffer);
+			}
+			else if (x < 0)
+			{
+				printf ("client reset.\n");
+				break;
+			}
+			else
+			{
+				printf ("client disconnected.\n");
+				break;
+			}
+		}
+
+		printf ("server thread done.\n");
+
+		return 0;
+	}
+};
+
+bool
+testConn ()
+{
+/*	printf ("startion server thread...\n");
+
+	ServerThread thread;
+	thread.start ();
+	thread.m_startEvent.wait ();
+*/
+	io::SockAddr addr;
+	addr.parse ("127.0.0.1:1002");
+
+	printf ("connecting to %s...\n", addr.getString ().sz ());
+	
+	io::Socket socket;
+	bool result = 
+		socket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
+		socket.connect (addr);
+
+	if (!result)
+	{
+		printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+		return false;
+	}
+
+	static char data [] = "hui govno i muravei";
+
+	printf ("sending %d bytes...\n", sizeof (data));
+	socket.send (data, sizeof (data));
+	
+	printf ("closing...\n");
+	socket.close ();
+	
+//	printf ("waiting for server thread...\n");
+//	thread.wait ();
+	
+	printf ("done.\n");
+	return true;
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2645,10 +2747,11 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testCmdLine (argc, argv);
+	err::Error error = ERROR_ACCESS_DENIED;
+	error = ERROR_ACCESS_DENIED;
 
-	printf ("__cplusplus = %d / 0x%x\n", __cplusplus, __cplusplus);
-//	testStlString ("hui!");
+
+	testConn ();
 
 	return 0;
 }
