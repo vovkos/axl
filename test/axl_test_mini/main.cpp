@@ -2638,17 +2638,17 @@ public:
 		addr.parse ("0.0.0.0:1002");
 
 		printf ("listening on TCP %s...\n", addr.getString ().sz ());
-	
+
 		io::Socket serverSocket;
 		io::Socket clientSocket;
 
-		bool result = 
+		bool result =
 			serverSocket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
 			serverSocket.bind (addr) &&
 			serverSocket.listen (8);
-		
+
 		m_startEvent.signal ();
-	
+
 		printf ("waiting for clients...\n");
 		result = serverSocket.accept (&clientSocket, &addr);
 		if (!result)
@@ -2656,8 +2656,8 @@ public:
 			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
 			return -1;
 		}
-		
-		
+
+
 		printf ("client connected from: %s\n", addr.getString ().sz ());
 
 		for (;;)
@@ -2701,9 +2701,9 @@ testConn ()
 	addr.parse ("127.0.0.1:1002");
 
 	printf ("connecting to %s...\n", addr.getString ().sz ());
-	
+
 	io::Socket socket;
-	bool result = 
+	bool result =
 		socket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
 		socket.connect (addr);
 
@@ -2717,13 +2717,13 @@ testConn ()
 
 	printf ("sending %d bytes...\n", sizeof (data));
 	socket.send (data, sizeof (data));
-	
+
 	printf ("closing...\n");
 	socket.close ();
-	
+
 //	printf ("waiting for server thread...\n");
 //	thread.wait ();
-	
+
 	printf ("done.\n");
 	return true;
 }
@@ -2741,8 +2741,8 @@ testSerial ()
 	settings.m_parity = io::SerialParity_None;
 
 	io::Serial serial;
-	bool result = 
-		serial.open ("COM4") &&
+	bool result =
+		serial.open ("/dev/ttyUSB0") &&
 		serial.setSettings (&settings);
 
 	if (!result)
@@ -2792,9 +2792,6 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);
 #endif
-
-	err::Error error = ERROR_ACCESS_DENIED;
-	error = ERROR_ACCESS_DENIED;
 
 	testSerial ();
 
