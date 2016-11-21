@@ -132,7 +132,7 @@ public:
 		size_t subStringLength
 		)
 	{
-		const T* f = memMem (p, length * sizeof (T), subString, subStringLength * sizeof (T));
+		const T* f = (const T*) memMem (p, length * sizeof (T), subString, subStringLength * sizeof (T));
 		return f ? f - p : -1;
 	}
 
@@ -349,6 +349,18 @@ public:
 	{
 		const C* f = (const C*) memchr (p, c, length);
 		return f ? f - p : -1;
+	}
+
+	static
+	size_t
+	find (
+		const C* p,
+		size_t length,
+		const C* subString,
+		size_t subStringLength
+		)
+	{
+		return StringDetailsImpl <utf8_t>::find (p, length, subString, subStringLength);
 	}
 
 	static

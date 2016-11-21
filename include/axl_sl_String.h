@@ -1254,6 +1254,40 @@ public:
 	}
 
 	size_t
+	remove (
+		size_t index,
+		size_t count = 1
+		)
+	{
+		bool result;
+
+		if (count == 0)
+			return this->m_length;
+
+		size_t oldLength = this->m_length;
+		if (index >= oldLength)
+			return this->m_length;
+
+		if (index + count >= oldLength)
+		{
+			result = setReducedLength (index);
+			return result ? index : -1;
+		}
+
+		result = ensureExclusive ();
+		if (!result)
+			return -1;
+
+		size_t newLength = oldLength - count;
+
+		T* dst = this->m_p + index;
+		Details::copy (dst, dst + count, newLength - index);
+
+		result = setReducedLength (newLength);
+		return result ? newLength : -1;
+	}
+
+	size_t
 	trimLeft ()
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
@@ -1283,6 +1317,62 @@ public:
 	{
 		trimLeft ();
 		return trimRight ();
+	}
+
+	size_t
+	replace (
+		const StringRef& from,
+		const StringRef& to
+		)
+	{
+		return replace (from, from.getLength (), to, to.getLength ());
+	}
+
+	size_t
+	replace (
+		const C* from,
+		const C* to
+		)
+	{
+		return replace (from, Details::calcLength (from), to, Details::calcLength (to));
+	}
+
+	size_t
+	replace (
+		const C* from,
+		size_t fromLength,
+		const C* to,
+		size_t toLength
+		)
+	{
+		bool result = ensureExclusive ();
+		if (!result)
+			return -1;
+
+		size_t count = 0;
+		size_t offset = 0;
+
+		for (;;)
+		{
+			size_t i = Details::find (this->m_p + offset, this->m_length - offset, from, fromLength);
+			if (i == -1)
+				break;
+
+			i += offset;
+
+			result =
+				fromLength < toLength ?	insertSpace (i, toLength - fromLength) != NULL :
+				fromLength > toLength ?	remove (i, fromLength - toLength) != -1 :
+				true;
+
+			if (!result)
+				return -1;
+
+			Details::copy (this->m_p + i, to, toLength);
+			offset = i + toLength;
+		}
+
+		return count;
 	}
 
 	size_t

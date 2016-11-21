@@ -2774,6 +2774,17 @@ testSerial ()
 	return true;
 }
 
+void
+testStringReplace ()
+{
+	sl::String title = "contains: < (less-than) > (greater-than) & (ampersand)";
+	title.replace ("<", "&lt;");
+	title.replace (">", "&gt;");
+	title.replace ("&", "&amp;");
+
+	printf ("title = %s\n", title.sz ());
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2793,7 +2804,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testSerial ();
+	testStringReplace ();
 
 	return 0;
 }
