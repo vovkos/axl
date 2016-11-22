@@ -2785,6 +2785,8 @@ testStringReplace ()
 	printf ("title = %s\n", title.sz ());
 }
 
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2799,6 +2801,10 @@ main (
 	)
 #endif
 {
+#if _AXL_OS_POSIX
+	setvbuf (stdout, NULL, _IOLBF, 1024);
+#endif
+
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);
