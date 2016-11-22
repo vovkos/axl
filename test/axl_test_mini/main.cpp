@@ -2787,6 +2787,23 @@ testStringReplace ()
 
 //..............................................................................
 
+void
+testEvent ()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		sys::NotificationEvent e;
+
+		bool r = e.wait (500);
+		if (!r)
+			printf ("[%s] ---wait failed: %s\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz (), err::getLastErrorDescription ().sz ());
+		else
+			printf ("[%s] ---wait SUCCEEDED! (WTF?!)\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz ());
+	}
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2810,7 +2827,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testStringReplace ();
+	testEvent ();
 
 	return 0;
 }
