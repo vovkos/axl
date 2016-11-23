@@ -222,9 +222,6 @@ Base32Encoding::decode (
 		}
 	}
 
-	if (i)
-		buffer->append (x);
-
 	return buffer->getCount ();
 }
 

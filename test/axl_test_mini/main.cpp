@@ -2804,6 +2804,27 @@ testEvent ()
 
 //..............................................................................
 
+void
+testBase32 ()
+{
+	sl::Array <char> source;
+
+	for (int i = 0; i < 500; i++)
+	{
+		size_t size = rand () % 64 + 16;
+		source.setCount (size);
+		for (size_t j = 0; j < size; j++)
+			source [j] = rand () % 256;
+
+		sl::String enc = enc::Base32Encoding::encode (source, size);
+		sl::Array <char> dec = enc::Base32Encoding::decode (enc);
+
+		ASSERT (dec.getCount () == size && memcmp (dec, source, size) == 0);
+	}
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2822,14 +2843,17 @@ main (
 	setvbuf (stdout, NULL, _IOLBF, 1024);
 #endif
 
+	srand (sys::getTimestamp ());
+
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testEvent ();
+	testBase32 ();
 
 	return 0;
 }
 
 //..............................................................................
+

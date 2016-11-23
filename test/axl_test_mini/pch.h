@@ -33,6 +33,8 @@
 #include "axl_io_FilePathUtils.h"
 #include "axl_zip_ZipReader.h"
 #include "axl_enc_EscapeEncoding.h"
+#include "axl_enc_Base32Encoding.h"
+#include "axl_enc_HexEncoding.h"
 
 #ifdef _AXL_XML
 #	include "axl_xml_ExpatParser.h"
