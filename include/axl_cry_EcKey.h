@@ -190,7 +190,7 @@ public:
 	}
 
 	size_t
-	getSignatureSize ()
+	getMaxSignatureSize ()
 	{
 		return ECDSA_size (m_h);
 	}
@@ -208,11 +208,7 @@ public:
 		sl::Array <char>* signature,
 		const void* hash,
 		size_t hashSize
-		)
-	{
-		size_t signatureSize = getSignatureSize ();
-		return signature->setCount (signatureSize) && signHash (*signature, signatureSize, hash, hashSize);
-	}
+		);
 
 	bool
 	sign (

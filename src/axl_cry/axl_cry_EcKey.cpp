@@ -99,20 +99,20 @@ EcKey::setPublicKeyHexString (
 
 size_t
 EcKey::signHash (
-	void* signature,
-	size_t signatureSize,
+	void* signatureBuffer,
+	size_t signatureBufferSize,
 	const void* hash,
 	size_t hashSize
 	)
 {
-	ASSERT (signatureSize >= getSignatureSize ());
+	ASSERT (signatureBufferSize >= getMaxSignatureSize ());
 
-	uint_t resultSize = (uint_t) signatureSize;
+	uint_t resultSize = (uint_t) signatureBufferSize;
 	int result = ECDSA_sign (
 		0,
 		(const uchar_t*) hash,
 		(int) hashSize,
-		(uchar_t*) signature,
+		(uchar_t*) signatureBuffer,
 		&resultSize,
 		m_h
 		);
@@ -123,8 +123,29 @@ EcKey::signHash (
 		return -1;
 	}
 
-	ASSERT (resultSize <= signatureSize);
+	ASSERT (resultSize <= signatureBufferSize);
 	return resultSize;
+}
+
+bool
+EcKey::signHash (
+	sl::Array <char>* signature,
+	const void* hash,
+	size_t hashSize
+	)
+{
+	size_t maxSize = getMaxSignatureSize ();
+	bool result = signature->setCount (maxSize);
+	if (!result)
+		return false;
+
+	size_t size = signHash (*signature, maxSize, hash, hashSize);
+	if (size == -1)
+		return false;
+
+	ASSERT (size <= maxSize);
+	signature->setCount (size);
+	return true;
 }
 
 //..............................................................................
