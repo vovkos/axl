@@ -133,7 +133,7 @@ Time::getTimestampImpl (
 		mktime (&tmStruct) :
 		timegm (&tmStruct) + getTimeZoneOffsetInMinutes (timeZone) * 60;
 
-	timestamp = (uint64_t) posixTime * 10000000;
+	timestamp = (uint64_t) (posixTime + AXL_SYS_EPOCH_DIFF) * 10000000;
 #endif
 
 	return
@@ -171,7 +171,7 @@ Time::setTimestampImpl (
 #else
 	tm* tmStruct;
 
-	time_t posixTime = timestamp / 10000000;
+	time_t posixTime = timestamp / 10000000 - AXL_SYS_EPOCH_DIFF;
 
 	if (isLocal)
 	{
@@ -195,7 +195,6 @@ Time::setTimestampImpl (
 	m_milliSecond = (timestamp / 10000) % 1000;
 	m_microSecond = (timestamp / 10) % 1000;
 	m_nanoSecond  = (timestamp % 10) * 100;
-
 }
 
 /*

@@ -2828,15 +2828,15 @@ testBase32 ()
 void
 testTime ()
 {
-	// wrong:
-	// timestamp = 0x34941c889f8a39; time = Thursday 24 November 2016 10:35:06
-	// timestamp = 0x34941cc95d2ff9; time = Thursday 24 November 2016 10:36:54
-	// timestamp = 0x34941cd6a5aa9b; time = Thursday 24 November 2016 10:37:17
-
 	// windows:
 	// timestamp = 0x1d245fe80cc7e08; time = Thursday 24 November 2016 10:57:33
 	// timestamp = 0x1d245fe906433ed; time = Thursday 24 November 2016 10:57:59
 	// timestamp = 0x1d245fe9b7e771d; time = Thursday 24 November 2016 10:58:17
+
+	// linux:
+	// timestamp = 0x1d246026f5fa498; time = Thursday 24 November 2016 11:25:41
+	// timestamp = 0x1d2460277e1f810; time = Thursday 24 November 2016 11:25:56
+	// timestamp = 0x1d2460280f3b836; time = Thursday 24 November 2016 11:26:11
 
 	uint64_t timestamp = sys::getTimestamp ();
 	printf ("timestamp = 0x%llx; time = %s\n", timestamp, sys::Time (timestamp).format ().sz ());
