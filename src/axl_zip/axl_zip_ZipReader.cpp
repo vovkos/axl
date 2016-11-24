@@ -93,7 +93,7 @@ ZipReader::getFileInfo (
 	fileInfo->m_versionNeeded = stat.m_version_needed;
 	fileInfo->m_bitFlags = stat.m_bit_flag;
 	fileInfo->m_method = stat.m_method;
-	fileInfo->m_timestamp = stat.m_time * 10000000 + 116444736000000000;
+	fileInfo->m_timestamp = (stat.m_time + AXL_SYS_EPOCH_DIFF) * 10000000;
 	fileInfo->m_crc32 = stat.m_crc32;
 	fileInfo->m_compressedSize = stat.m_comp_size;
 	fileInfo->m_uncompressedSize = stat.m_uncomp_size;

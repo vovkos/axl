@@ -2825,6 +2825,25 @@ testBase32 ()
 
 //..............................................................................
 
+void
+testTime ()
+{
+	// wrong:
+	// timestamp = 0x34941c889f8a39; time = Thursday 24 November 2016 10:35:06
+	// timestamp = 0x34941cc95d2ff9; time = Thursday 24 November 2016 10:36:54
+	// timestamp = 0x34941cd6a5aa9b; time = Thursday 24 November 2016 10:37:17
+
+	// windows:
+	// timestamp = 0x1d245fe80cc7e08; time = Thursday 24 November 2016 10:57:33
+	// timestamp = 0x1d245fe906433ed; time = Thursday 24 November 2016 10:57:59
+	// timestamp = 0x1d245fe9b7e771d; time = Thursday 24 November 2016 10:58:17
+
+	uint64_t timestamp = sys::getTimestamp ();
+	printf ("timestamp = 0x%llx; time = %s\n", timestamp, sys::Time (timestamp).format ().sz ());
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2843,17 +2862,16 @@ main (
 	setvbuf (stdout, NULL, _IOLBF, 1024);
 #endif
 
-	srand (sys::getTimestamp ());
+	srand ((uint_t) sys::getTimestamp ());
 
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testBase32 ();
+	testTime ();
 
 	return 0;
 }
 
 //..............................................................................
-

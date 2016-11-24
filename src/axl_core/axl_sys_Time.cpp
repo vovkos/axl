@@ -53,7 +53,7 @@ getTimestamp ()
 #	else
 	clock_gettime (CLOCK_REALTIME, &tspec);
 #	endif
-	timestamp = (uint64_t) tspec.tv_sec * 10000000 + tspec.tv_nsec / 100;
+	timestamp = (uint64_t) (tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
 #endif
 
 	return timestamp;
@@ -76,7 +76,7 @@ getPreciseTimestamp ()
 #	else
 	clock_gettime (CLOCK_REALTIME, &tspec);
 #	endif
-	return (uint64_t) tspec.tv_sec * 10000000 + tspec.tv_nsec / 100;
+	return (uint64_t) (tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
 #endif
 }
 

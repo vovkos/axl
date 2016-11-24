@@ -181,11 +181,15 @@ getAbsTimespecFromTimeout (
 
 #endif
 
+// epoch difference between Unix time (1 Jan 1970 00:00) and Windows time (1 Jan. 1601 00:00)
+
+#define AXL_SYS_EPOCH_DIFF 11644473600LL
+
 inline
 uint64_t
 getTimestampFromTimeval (const timeval* tval)
 {
-	return ((uint64_t) tval->tv_sec + 11644473600) * 10000000 + (uint64_t) tval->tv_usec * 10;
+	return ((uint64_t) tval->tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + (uint64_t) tval->tv_usec * 10;
 }
 
 //..............................................................................
