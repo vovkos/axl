@@ -118,9 +118,15 @@ target_link_libraries (
 if (UNIX)
 	target_link_libraries (
 		axl_test_qt
-		rt
 		pthread
 		)
+
+	if (NOT APPLE)
+		target_link_libraries (
+			axl_test_qt
+			rt
+			)
+	endif ()
 endif ()
 
 if (WIN32)
