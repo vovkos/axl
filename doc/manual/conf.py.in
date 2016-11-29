@@ -49,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'AXL Library Reference'
+project = u'${DOC_NAME}'
 copyright = u'${AXL_YEARS}, ${AXL_VERSION_COMPANY}'
 author = u'Vladimir Gladkov'
 

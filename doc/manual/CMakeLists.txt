@@ -11,7 +11,7 @@
 
 set (DOC_NAME      "AXL Reference")
 set (TEX_FILE_NAME axl.tex)
-set (PDF_FILE_NAME axl.pdf)
+set (PDF_FILE_NAME axl-${AXL_VERSION_FILE_SUFFIX}.pdf)
 
 set (XML_DIR  ${CMAKE_CURRENT_BINARY_DIR}/xml)
 set (RST_DIR  ${CMAKE_CURRENT_BINARY_DIR}/rst)
