@@ -1,12 +1,12 @@
 #!/bin/bash
 #...............................................................................
 #
-#  This file is part of the AXL library.
+#  This file is part of the Jancy toolkit.
 #
-#  AXL is distributed under the MIT license.
+#  Jancy is distributed under the MIT license.
 #  For details see accompanying license.txt file,
 #  the public copy of which is also available at:
-#  http://tibbo.com/downloads/archive/axl/license.txt
+#  http://tibbo.com/downloads/archive/jancy/license.txt
 #
 #...............................................................................
 
@@ -28,6 +28,6 @@ cp ${DOXYREST_SPHINX_DIR}/doxyrest.sty .
 "${PDFLATEX_EXE}" ${PDFLATEX_TEXLIVE_CMD_LINE}
 "${PDFLATEX_EXE}" ${PDFLATEX_TEXLIVE_CMD_LINE}
 
-cp ${TMP_DIR}/${PDF_FILE_NAME} ${PDF_DIR}
+cp ${TMP_DIR}/${TEX_BASE_NAME}.pdf ${PDF_DIR}
 
 cd $PREV_DIR
