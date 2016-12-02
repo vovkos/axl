@@ -10,9 +10,10 @@
 #...............................................................................
 
 set (DOC_NAME      "AXL Reference")
-set (TEX_BASE_NAME axl-${JANCY_VERSION_FILE_SUFFIX})
+set (TEX_BASE_NAME axl-${AXL_VERSION_FILE_SUFFIX})
 set (TEX_FILE_NAME ${TEX_BASE_NAME}.tex)
 set (PDF_FILE_NAME ${TEX_BASE_NAME}.pdf)
+set (SPHINX_HTML_THEME "sphinxdoc")
 
 set (SHARED_DIR     ${CMAKE_CURRENT_LIST_DIR}/../shared)
 set (STATIC_RST_DIR ${CMAKE_CURRENT_LIST_DIR}/rst)
