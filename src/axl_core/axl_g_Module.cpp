@@ -28,11 +28,7 @@ namespace g {
 Module::Module ()
 {
 #ifdef _AXL_DEBUG
-#	ifdef _AXL_MODULE_TAG
-	m_tag = _AXL_MODULE_TAG;
-#	else
-	m_tag = "UNK_MOD";
-#	endif
+	m_tag = "<untagged-module>";
 #endif
 
 #if (_AXL_OS_WIN)

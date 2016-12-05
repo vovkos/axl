@@ -53,10 +53,6 @@ protected:
 	};
 
 protected:
-#ifdef _AXL_DEBUG
-	const char* m_tag;
-#endif
-
 #if (_AXL_OS_WIN)
 	HMODULE m_hModule;
 #endif
@@ -70,10 +66,38 @@ protected:
 	sys::Lock m_finalizerListLock;
 	sl::StdList <FinalizerEntry> m_finalizerList;
 
+#ifdef _AXL_DEBUG
+	const char* m_tag;
+#endif
+
 public:
 	Module ();
-
 	~Module ();
+
+#ifdef _AXL_DEBUG
+	const char*
+	getTag ()
+	{
+		return m_tag;
+	}
+
+	void
+	setTag (const char* tag)
+	{
+		m_tag = tag;
+	}
+#else
+	const char*
+	getTag ()
+	{
+		return "<untagged-module>";
+	}
+
+	void
+	setTag (const char* tag)
+	{
+	}
+#endif
 
 #if (_AXL_OS_WIN)
 	HMODULE

@@ -334,7 +334,7 @@ main (
 	char *argv[]
 	)
 {
-	printf ("main ()\n");
+	g::getModule ()->setTag ("axl_test_qt");
 
 	testUtf ();
 	return 0;

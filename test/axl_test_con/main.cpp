@@ -34,6 +34,7 @@ main (
 	WSAStartup (versionRequested, &wsaData);
 	srand ((uint_t) sys::getTimestamp ());
 
+	g::getModule ()->setTag ("axl_test_con");
 	err::registerParseErrorProvider ();
 
 	//test_Error::Run ();

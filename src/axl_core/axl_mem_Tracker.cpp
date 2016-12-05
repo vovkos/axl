@@ -68,10 +68,11 @@ Tracker::trace ()
 	m_lock.lock ();
 
 	TRACE (
-		"Allocated memory:\n"
-		"    Current.......%d bytes (%d blocks)\n"
-		"    Peak..........%d bytes (%d blocks)\n"
-		"    Total.........%d bytes (%d blocks)\n",
+		"%s: AXL memory stats:\n"
+		"    Current...%d bytes (%d blocks)\n"
+		"    Peak......%d bytes (%d blocks)\n"
+		"    Total.....%d bytes (%d blocks)\n",
+		g::getModule ()->getTag (),
 		m_size,
 		m_blockList.getCount (),
 		m_peakSize,
