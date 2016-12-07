@@ -11,6 +11,7 @@
 
 set (AXL_INC_DIR     "@AXL_ROOT_DIR@/include")
 set (AXL_LIB_DIR     "@AXL_LIB_BASE_DIR@/${CONFIGURATION_SUFFIX}")
+set (AXL_DOC_DIR     "@AXL_ROOT_DIR@/doc")
 
 set (
 	AXL_CMAKE_DIR

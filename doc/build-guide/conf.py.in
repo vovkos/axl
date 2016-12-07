@@ -16,8 +16,6 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('${DOXYREST_SPHINX_DIR}'))
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -27,7 +25,7 @@ sys.path.insert(0, os.path.abspath('${DOXYREST_SPHINX_DIR}'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['doxyrest', 'cpplexer']
+extensions = []
 
 # disable permalinks
 html_add_permalinks = ''
@@ -86,7 +84,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
 #
-default_role = 'cref'
+#default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 #
@@ -256,11 +254,7 @@ latex_elements = {
      # 'figure_align': 'htbp',
 
     'classoptions': ',openany,oneside',
-    'babel': '\\usepackage[english]{babel}',
-
-    'preamble': '''
-        \\usepackage{doxyrest}
-    '''
+    'babel': '\\usepackage[english]{babel}'
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -344,4 +338,4 @@ texinfo_documents = [
 #
 # texinfo_no_detailmenu = False
 
-highlight_language = 'cpp'
+highlight_language = 'none'
