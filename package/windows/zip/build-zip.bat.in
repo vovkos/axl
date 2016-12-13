@@ -50,6 +50,7 @@ xcopy /Y /E /Q %ROOT_DIR%\license\*.* %CONTENTS_DIR%\license || exit
 xcopy /Y /E /Q %ROOT_DIR%\package\*.* %CONTENTS_DIR%\package || exit
 copy /Y %ROOT_DIR%\CMakeLists.txt %CONTENTS_DIR% || exit
 copy /Y %ROOT_DIR%\version.cmake %CONTENTS_DIR% || exit
+copy /Y %ROOT_DIR%\dependencies.cmake %CONTENTS_DIR% || exit
 
 set PREV_DIR=%CD%
 cd %ZIP_DIR% || exit
