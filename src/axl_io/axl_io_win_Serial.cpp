@@ -74,26 +74,13 @@ Serial::getWaitMask ()
 	return mask;
 }
 
-size_t
-Serial::read (
-	void* p,
-	size_t size
-	)
+bool
+Serial::overlappedWait (dword_t* event)
 {
-	dword_t actualSize;
-	bool_t result = read (p, (dword_t) size, &actualSize, NULL);
-	return result ? (size_t) actualSize : -1;
-}
-
-size_t
-Serial::write (
-	const void* p,
-	size_t size
-	)
-{
-	dword_t actualSize;
-	bool_t result = write (p, (dword_t) size, &actualSize, NULL);
-	return result ? (size_t) actualSize : -1;
+	dword_t actualSize; // unused
+	StdOverlapped overlapped;
+	bool result = overlappedWait (event, &overlapped);	
+	return result ? getOverlappedResult (&overlapped, &actualSize) : false;
 }
 
 //..............................................................................

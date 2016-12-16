@@ -188,19 +188,25 @@ public:
 	read (
 		void* p,
 		size_t size
-		);
+		) const
+	{
+		return m_serial.overlappedRead (p, size);
+	}
 
 	size_t
 	write (
 		const void* p,
 		size_t size
-		);
+		)
+	{
+		return m_serial.overlappedWrite (p, size);
+	}
 #elif (_AXL_OS_POSIX)
 	size_t
 	read (
 		void* p,
 		size_t size
-		)
+		) const
 	{
 		return m_serial.read (p, size);
 	}

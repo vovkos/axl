@@ -30,6 +30,16 @@ public:
 		uint_t flags = 0
 		);
 
+	bool 
+	clearError (
+		dword_t* errors,
+		COMSTAT* stat
+		)
+	{
+		bool_t result = ::ClearCommError (m_h, errors, stat);
+		return err::complete (result);
+	}
+
 	bool
 	getSettings (DCB* dcb)
 	{
@@ -91,14 +101,24 @@ public:
 	}
 
 	bool
-	wait (
+	wait (dword_t* event)
+	{
+		bool_t result = ::WaitCommEvent (m_h, event, NULL);
+		return err::complete (result);
+	}
+
+	bool
+	overlappedWait (
 		dword_t* event,
 		OVERLAPPED* overlapped
 		)
 	{
 		bool_t result = ::WaitCommEvent (m_h, event, overlapped);
-		return completeAsyncRequest (result, overlapped);
+		return completeOverlappedRequest (result);
 	}
+
+	bool
+	overlappedWait (dword_t* event);
 
 	size_t
 	read (
@@ -111,30 +131,6 @@ public:
 		const void* p,
 		size_t size
 		);
-
-	bool
-	read (
-		void* p,
-		dword_t size,
-		dword_t* actualSize,
-		OVERLAPPED* overlapped
-		)
-	{
-		bool_t result = ::ReadFile (m_h, p, size, actualSize, overlapped);
-		return completeAsyncRequest (result, overlapped);
-	}
-
-	bool
-	write (
-		const void* p,
-		dword_t size,
-		dword_t* actualSize,
-		OVERLAPPED* overlapped
-		)
-	{
-		bool_t result = ::WriteFile (m_h, p, size, actualSize, overlapped);
-		return completeAsyncRequest (result, overlapped);
-	}
 };
 
 //..............................................................................

@@ -44,59 +44,21 @@ public:
 		);
 
 	bool
-	connect (OVERLAPPED* overlapped = NULL)
+	connect ()
+	{
+		bool_t result = ::ConnectNamedPipe (m_h, NULL);
+		return err::complete (result);
+	}
+
+	bool
+	overlappedConnect (OVERLAPPED* overlapped)
 	{
 		bool_t result = ::ConnectNamedPipe (m_h, overlapped);
-		return completeAsyncRequest (result, overlapped);
+		return completeOverlappedRequest (result);
 	}
 
 	bool
-	read (
-		void* p,
-		dword_t size,
-		dword_t* actualSize,
-		OVERLAPPED* overlapped = NULL
-		) const
-	{
-		bool_t result = ::ReadFile (m_h, p, size, actualSize, overlapped);
-		return completeAsyncRequest (result, overlapped);
-	}
-
-	bool
-	write (
-		const void* p,
-		dword_t size,
-		dword_t* actualSize,
-		OVERLAPPED* overlapped = NULL
-		)
-	{
-		bool_t result = ::WriteFile (m_h, p, size, actualSize, overlapped);
-		return completeAsyncRequest (result, overlapped);
-	}
-
-	bool
-	readEx (
-		void* p,
-		dword_t size,
-		OVERLAPPED* overlapped,
-		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
-		) const
-	{
-		bool_t result = ::ReadFileEx (m_h, p, size, overlapped, completionFunc);
-		return completeAsyncRequest (result, overlapped);
-	}
-
-	bool
-	writeEx (
-		const void* p,
-		dword_t size,
-		OVERLAPPED* overlapped,
-		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
-		)
-	{
-		bool_t result = ::WriteFileEx (m_h, p, size, overlapped, completionFunc);
-		return completeAsyncRequest (result, overlapped);
-	}
+	overlappedConnect ();
 };
 
 //..............................................................................

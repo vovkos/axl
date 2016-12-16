@@ -114,58 +114,6 @@ Serial::getStatusLines ()
 	return lines != -1 ? (lines & 0xf0) >> 4 : -1;
 }
 
-size_t
-Serial::read (
-	void* p,
-	size_t size
-	)
-{
-	sys::Event completionEvent;
-
-	OVERLAPPED overlapped = { 0 };
-	overlapped.hEvent = completionEvent.m_event;
-
-	bool_t result = m_serial.read (p, (dword_t) size, NULL, &overlapped);
-	if (!result)
-		return -1;
-
-	dword_t actualSize;
-	result = ::GetOverlappedResult (m_serial, &overlapped, &actualSize, true);
-	if (!result)
-	{
-		err::setLastSystemError ();
-		return -1;
-	}
-
-	return actualSize;
-}
-
-size_t
-Serial::write (
-	const void* p,
-	size_t size
-	)
-{
-	sys::Event completionEvent;
-
-	OVERLAPPED overlapped = { 0 };
-	overlapped.hEvent = completionEvent.m_event;
-
-	bool_t result = m_serial.write (p, (dword_t) size, NULL, &overlapped);
-	if (!result)
-		return -1;
-
-	dword_t actualSize;
-	result = ::GetOverlappedResult (m_serial, &overlapped, &actualSize, true);
-	if (!result)
-	{
-		err::setLastSystemError ();
-		return -1;
-	}
-
-	return actualSize;
-}
-
 #elif (_AXL_OS_POSIX)
 
 bool

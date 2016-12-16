@@ -59,6 +59,15 @@ NamedPipe::open (
 	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 
+bool
+NamedPipe::overlappedConnect ()
+{
+	dword_t actualSize; // unused
+	StdOverlapped overlapped;
+	bool result = overlappedConnect (&overlapped);
+	return result ? getOverlappedResult (&overlapped, &actualSize) : false;
+}
+
 //..............................................................................
 
 } // namespace win
