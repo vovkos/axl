@@ -37,11 +37,6 @@ class RbTreeNodeBase: public BinTreeNodeBase <T, NodeData>
 public:
 	RbColor m_color;
 
-	RbTreeNodeBase ()
-	{
-		m_color = RbColor_Black;
-	}
-
 	static
 	void
 	onXcg (

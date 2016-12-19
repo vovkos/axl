@@ -55,13 +55,6 @@ public:
 	T* m_left;
 	T* m_right;
 
-	BinTreeNodeBase ()
-	{
-		m_parent = NULL;
-		m_left = NULL;
-		m_right = NULL;
-	}
-
 	// overridable
 
 	static
