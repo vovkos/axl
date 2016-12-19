@@ -156,10 +156,12 @@ axl_detect_cpu
 	_CPU
 	)
 
-	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}"  MATCHES "^(amd64|x86_64|x64)$")
 		set (${_CPU} "amd64")
-	else ()
+	elseif ("${CMAKE_HOST_SYSTEM_PROCESSOR}"  MATCHES "^(x86|i386)$")
 		set (${_CPU} "x86")
+	else ()
+		message (FATAL_ERROR "Unsupported CPU: ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 	endif ()
 endmacro ()
 
