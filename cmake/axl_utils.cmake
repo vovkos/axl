@@ -149,20 +149,43 @@ endmacro ()
 
 #...............................................................................
 
-# detect host CPU (currently we only support x86 and amd64)
+# detect host/target CPU (currently we only support x86 and amd64)
 
 macro (
-axl_detect_cpu
+axl_normalize_cpu
+	_RESULT
 	_CPU
 	)
 
-	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}"  MATCHES "^(amd64|x86_64|x64)$")
-		set (${_CPU} "amd64")
-	elseif ("${CMAKE_HOST_SYSTEM_PROCESSOR}"  MATCHES "^(x86|i386)$")
-		set (${_CPU} "x86")
+	string (TOLOWER ${_CPU} _CPU_LC)
+	
+	if ("${_CPU_LC}" MATCHES "^(amd64|x86_64|x64)$")
+		set (${_RESULT} "amd64")
+	elseif ("${_CPU_LC}" MATCHES "^(x86|i386)$")
+		set (${_RESULT} "x86")
 	else ()
-		message (FATAL_ERROR "Unsupported CPU: ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+		set (${_RESULT} "${_CPU}") # can't normalize -- leave as is
 	endif ()
+endmacro ()
+
+macro (
+axl_detect_target_cpu
+	_CPU
+	)
+	
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set (${_CPU} "amd64")
+	else ()
+		set (${_CPU} "x86")
+	endif ()
+endmacro ()
+
+macro (
+axl_detect_host_cpu
+	_CPU
+	)
+	
+	axl_normalize_cpu (${_CPU} "${CMAKE_HOST_SYSTEM_PROCESSOR}")
 endmacro ()
 
 #...............................................................................
