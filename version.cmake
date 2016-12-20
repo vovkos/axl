@@ -9,8 +9,8 @@
 #
 #...............................................................................
 
-set (AXL_VERSION_MAJOR     5)
-set (AXL_VERSION_MINOR     9)
+set (AXL_VERSION_MAJOR     6)
+set (AXL_VERSION_MINOR     0)
 set (AXL_VERSION_REVISION  0)
 set (AXL_VERSION_TAG)
 
