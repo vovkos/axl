@@ -12,15 +12,7 @@
 paths.cmake
 ===========
 
-AXL build system uses ``paths.cmake`` file as the main reference when it needs to find a certain tool or library. When a path is not specified, a fallback attempt to find it using ``find_package`` will be made.
-
-This allows for out-of-the-box *default* build and at the same time provides a *fine-grained* control over locations of dependencies. Here in Tibbo, we have multiple versions of tools and libraries installed on the single build machine and at the same time, we are always in full control over which tool or library is going to be used when building a particular project.
-
-``paths.cmake`` files are **cascading**. It means, you can place one *anywhere* above the current directory and it will be found and used. From there you can chain-include the next ``paths.cmake`` and so on. This way you can specify some default locations for *all* your projects but still be able to override the paths for sub-projects.
-
-Being machine-specific ``paths.cmake`` files are added to ``.gitignore`` and are never tracked in Git. Therefore, you need to write ``paths.cmake`` file as the very first step of the configuration process. So, what should be inside?
-
-To answer this question, you need to check ``dependencies.cmake`` file. Inside this file, a variable called ``AXL_PATH_LIST`` contains all the paths that will be used during the build:
+.. expand-macro:: paths-cmake AXL
 
 .. code-block:: bash
 
@@ -46,13 +38,9 @@ To answer this question, you need to check ``dependencies.cmake`` file. Inside t
 	SPHINX_BUILD_EXE    # (optional) path to Sphinx compiler executable sphinx-build
 	PDFLATEX_EXE        # (optional) path to Latex-to-PDF compiler
 
-Note that dependencies may be auto-detected -- on Unix systems installed libraries and tools will likely be found automatically. On Windows AXL build system will automatically find executables if they are added to ``PATH`` (via ``where`` command).
+.. expand-macro:: dependencies-cmake AXL
 
-On Windows, you will also need to specify paths to the libraries -- they are unlikely to be found automatically.
-
-And of course, you can always use ``paths.cmake`` to *fine-tune* the location of a specific tool/library.
-
-I personally prefer to always specify all the paths explicitly.
+On Windows you will have to specify paths to the *libraries* you need -- they are unlikely to be found automatically.
 
 .. rubric:: Sample paths.cmake on Windows:
 

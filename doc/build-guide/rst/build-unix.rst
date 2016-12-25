@@ -12,14 +12,6 @@
 Building on Unix
 ================
 
-Run in ``./build`` folder::
-
-	make
-
-You might also want to add ``-j <n>`` to make use of multiple CPU cores and speed up build process, like::
-
-	make -j 4
+.. expand-macro:: build-unix AXL
 
 After AXL build is complete you will have AXL static library files in ``./build/lib/${CMAKE_BUILD_TYPE}`` directory.
-
-Note that with ``make``-based build changing configuration from ``Debug`` to ``Release`` should be done at CMake configuration step (Xcode and Visual Studio are multi-configuration build systems).

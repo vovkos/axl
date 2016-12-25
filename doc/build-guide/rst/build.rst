@@ -12,7 +12,7 @@
 Building
 ========
 
-Once CMake configuration step completes, makefiles/project files are generated. You are now ready to build AXL.
+.. expand-macro:: build-intro AXL
 
 .. toctree::
 	:titlesonly:
