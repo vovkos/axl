@@ -11,8 +11,8 @@
 
 set (AXL_INC_DIR "@AXL_ROOT_DIR@/include")
 set (AXL_LIB_DIR "@AXL_LIB_BASE_DIR@/${CONFIGURATION_SUFFIX}")
-set (AXL_DOC_DIR "@AXL_ROOT_DIR@/doc")
 
+set (AXL_DOC_SHARE_DIR     "@AXL_ROOT_DIR@/doc/share")
 set (AXL_SPHINX_HTML_THEME "sphinx_rtd_theme")
 
 set (
