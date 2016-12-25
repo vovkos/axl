@@ -14,9 +14,6 @@
 macro (
 axl_create_cpu_setting)
 
-	axl_detect_host_cpu (_CPU)
-	message ("HOST_CPU = ${_CPU}")
-
 	axl_detect_target_cpu (_CPU)
 
 	# Microsoft Visual C++ is a native-only generator, GCC can cross-compile
