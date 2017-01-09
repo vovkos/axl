@@ -136,15 +136,20 @@ public:
 		return m_count == 0;
 	}
 
-	const T&
-	getFront () const
+	const T*
+	getBegin () const
 	{
-		ASSERT (m_count);
-		return m_p [0];
+		return m_p;
 	}
 
-	T&
-	getFront ()
+	const T*
+	getEnd () const
+	{
+		return m_p + m_count;
+	}
+
+	const T&
+	getFront () const
 	{
 		ASSERT (m_count);
 		return m_p [0];
@@ -157,15 +162,8 @@ public:
 		return m_p [m_count - 1];
 	}
 
-	T&
-	getBack ()
-	{
-		ASSERT (m_count);
-		return m_p [m_count - 1];
-	}
-
 	size_t
-	find (ValueArg e)
+	find (ValueArg e) const
 	{
 		for (size_t i = 0; i < m_count; i++)
 			if (m_p [i] == e)
@@ -175,7 +173,7 @@ public:
 	}
 
 	size_t
-	findReverse (ValueArg e)
+	findReverse (ValueArg e) const
 	{
 		for (intptr_t i = m_count - 1; i >= 0; i--)
 			if (m_p [i] == e)
@@ -319,21 +317,67 @@ public:
 	const T&
 	operator [] (intptr_t i) const
 	{
-		ASSERT ((size_t) i < this->m_count);
-		return this->m_p [i];
+		return ArrayRef::operator [] (i);
 	}
 
 	T&
 	operator [] (intptr_t i)
 	{
-		ASSERT ((size_t) i < this->m_count);
-		return this->m_p [i];
+		return (T&) ArrayRef::operator [] (i);
 	}
 
 	T*
 	p ()
 	{
 		return ensureExclusive () ? this->m_p : NULL;
+	}
+
+	const T*
+	getBegin () const
+	{
+		return this->cp ();
+	}
+
+	T*
+	getBegin ()
+	{
+		return p ();
+	}
+
+	const T*
+	getEnd () const
+	{
+		return ArrayRef::getEnd ();
+	}
+
+	T*
+	getEnd ()
+	{
+		return (T*) ArrayRef::getEnd ();
+	}
+
+	const T&
+	getFront () const
+	{
+		return ArrayRef::getFront ();
+	}
+
+	T&
+	getFront ()
+	{
+		return (T&) ArrayRef::getFront ();
+	}
+
+	const T&
+	getBack () const
+	{
+		return ArrayRef::getBack ();
+	}
+
+	T&
+	getBack ()
+	{
+		return (T&) ArrayRef::getBack ();
 	}
 
 	void
