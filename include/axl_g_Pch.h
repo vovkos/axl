@@ -346,7 +346,6 @@ wcslen_s (const wchar_t* p)
 #	define AXL_CDECL       __cdecl
 #	define AXL_STDCALL     __stdcall
 #	define AXL_SELECT_ANY  __declspec (selectany)
-#	define AXL_NO_VTABLE   __declspec (novtable)
 #	define AXL_EXPORT      __declspec (dllexport)
 #
 #	define AXL_GCC_ALIGN(n)
@@ -361,7 +360,6 @@ wcslen_s (const wchar_t* p)
 #		define AXL_STDCALL
 #	endif
 #	define AXL_SELECT_ANY  __attribute__ ((weak))
-#	define AXL_NO_VTABLE
 #	define AXL_EXPORT      __attribute__ ((visibility ("default")))
 #
 #	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
