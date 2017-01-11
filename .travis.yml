@@ -9,6 +9,9 @@
 #
 #...............................................................................
 
+dist: trusty
+sudo: required
+
 language: cpp
 
 compiler:
@@ -16,6 +19,13 @@ compiler:
     - clang
 
 script:
+    - uname -a
+    - cat /etc/*-release
+
+    - cmake --version
+    - gcc --version
+    - clang --version
+
     - mkdir build
     - cd build
     - cmake ..
