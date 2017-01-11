@@ -12,11 +12,11 @@
 language: cpp
 
 compiler:
-	- gcc
-	- clang
+    - gcc
+    - clang
 
 script:
-	- mkdir build
-	- cd build
-	- cmake ..
-	- make
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
