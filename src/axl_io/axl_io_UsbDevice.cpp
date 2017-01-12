@@ -129,6 +129,8 @@ UsbDevice::getMaxPacketSize (uint_t endpointId)
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
 
+#if (_AXL_IO_USBDEVICE_PORT)
+
 size_t
 UsbDevice::getPortPath (
 	uint8_t* path,
@@ -140,6 +142,8 @@ UsbDevice::getPortPath (
 	int result = libusb_get_port_numbers (m_device, path, maxLength);
 	return result >= 0 ? result : err::fail <size_t> (-1, UsbError (result));
 }
+
+#endif
 
 size_t
 UsbDevice::getMaxIsoPacketSize (uint_t endpointId)

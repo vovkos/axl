@@ -18,6 +18,10 @@
 namespace axl {
 namespace io {
 
+#if (LIBUSB_API_VERSION >= 0x01000105)
+#	define _AXL_IO_USBDEVICE_PORT 1
+#endif
+
 //..............................................................................
 
 const char*
@@ -150,6 +154,7 @@ public:
 		return libusb_get_bus_number (m_device);
 	}
 
+#if (_AXL_IO_USBDEVICE_PORT)
 	uint8_t
 	getPortNumber ()
 	{
@@ -162,6 +167,7 @@ public:
 		uint8_t* path,
 		size_t maxLength
 		);
+#endif
 
 	libusb_speed
 	getDeviceSpeed ()
