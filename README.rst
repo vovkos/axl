@@ -11,6 +11,7 @@
 
 AXL
 ===
+.. image:: https://api.travis-ci.org/vovkos/axl.svg?branch=master
 
 Abstract
 --------
