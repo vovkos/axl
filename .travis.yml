@@ -35,6 +35,7 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y liblua${LUA_VERSION}-dev
     - sudo apt-get install -y libpcap-dev
+    - sudo apt-get install -y libudev-dev
     - sudo apt-get install -y libusb-1.0
 
 script:
