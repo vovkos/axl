@@ -55,13 +55,13 @@ link_directories (${AXL_LIB_DIR})
 if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
 	link_directories (${LIBUSB_LIB_DIR})
-	add_definitions (-D_AXL_IO_USB)
+	add_definitions (-D_AXL_IO_USB=1)
 endif ()
 
 if (BUILD_AXL_XML)
 	include_directories (${EXPAT_INC_DIR})
 	link_directories (${EXPAT_LIB_DIR})
-	add_definitions (-D_AXL_XML)
+	add_definitions (-D_AXL_XML=1)
 endif ()
 
 add_executable (

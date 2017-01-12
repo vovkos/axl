@@ -430,7 +430,7 @@ source_group (
 include_directories (${AXL_INC_DIR})
 
 if (BUILD_AXL_SYS_LNX_LIBUDEV)
-	add_definitions (-D_AXL_SYS_LNX_LIBUDEV)
+	add_definitions (-D_AXL_SYS_LNX_LIBUDEV=1)
 else ()
 	axl_exclude_from_build (${SYS_LNX_LIBUDEV_CPP_LIST})
 endif ()

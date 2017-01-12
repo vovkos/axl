@@ -272,20 +272,24 @@ include_directories (${AXL_INC_DIR})
 
 if (BUILD_AXL_IO_PCAP)
 	include_directories (${PCAP_INC_DIR})
-	add_definitions (-D_AXL_IO_PCAP)
+	add_definitions (-D_AXL_IO_PCAP=1)
 else ()
 	axl_exclude_from_build (${IO_PCAP_CPP_LIST})
 endif ()
 
 if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
-	add_definitions (-D_AXL_IO_USB)
+	add_definitions (-D_AXL_IO_USB=1)
 else ()
 	axl_exclude_from_build (${IO_USB_CPP_LIST})
 endif ()
 
 if (BUILD_AXL_SYS_LNX_LIBUDEV)
-	add_definitions (-D_AXL_SYS_LNX_LIBUDEV)
+	add_definitions (-D_AXL_SYS_LNX_LIBUDEV=1)
+
+	if (BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API)
+		add_definitions (-D_AXL_SYS_LNX_LIBUDEV_NEW_API=1)
+	endif ()
 endif ()
 
 add_library (

@@ -145,12 +145,14 @@ public:
 		return completeUdev (device, "udev_device_new_from_subsystem_sysname");
 	}
 
+#if (_AXL_SYS_LNX_LIBUDEV_NEW_API)
 	udev_device*
 	getDeviceFromDeviceId (const sl::StringRef& deviceId)
 	{
 		udev_device* device = ::udev_device_new_from_device_id (m_h, (char*) deviceId.sz ());
 		return completeUdev (device, "udev_device_new_from_device_id");
 	}
+#endif
 
 	udev_device*
 	getDeviceFromEnvironment ()
@@ -318,6 +320,7 @@ public:
 		return ::udev_device_has_tag (m_h, tag.sz ());
 	}
 
+#if (_AXL_SYS_LNX_LIBUDEV_NEW_API)
 	sl::StringRef
 	getSysAttrValue (const sl::StringRef& sysAttr)
 	{
@@ -332,6 +335,7 @@ public:
 	{
 		return ::udev_device_set_sysattr_value (m_h, sysAttr.sz (), (char*) value.sz ());
 	}
+#endif
 };
 
 //..............................................................................

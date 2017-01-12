@@ -16,6 +16,12 @@ if (LINUX)
 			"Build LibUdev wrappers for axl_core library"
 			ON
 			)
+
+		option (
+			BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API
+			"Build LibUdev wrappers for axl_core library"
+			OFF
+			)
 	else ()
 		unset (BUILD_AXL_SYS_LNX_LIBUDEV CACHE)
 	endif ()
