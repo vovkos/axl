@@ -158,7 +158,7 @@ axl_normalize_cpu
 	)
 
 	string (TOLOWER ${_CPU} _CPU_LC)
-	
+
 	if ("${_CPU_LC}" MATCHES "^(amd64|x86_64|x64)$")
 		set (${_RESULT} "amd64")
 	elseif ("${_CPU_LC}" MATCHES "^(x86|i386)$")
@@ -172,7 +172,7 @@ macro (
 axl_detect_target_cpu
 	_CPU
 	)
-	
+
 	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 		set (${_CPU} "amd64")
 	else ()
@@ -184,7 +184,7 @@ macro (
 axl_detect_host_cpu
 	_CPU
 	)
-	
+
 	axl_normalize_cpu (${_CPU} "${CMAKE_HOST_SYSTEM_PROCESSOR}")
 endmacro ()
 
@@ -911,11 +911,11 @@ endmacro ()
 macro (
 axl_find_inc_dir
 	_RESULT
-	_FILE_NAME
+	# ...
 	)
 
 	unset (_DIR)
-	find_path (_DIR ${_FILE_NAME})
+	find_path (_DIR ${ARGN})
 
 	if (NOT _DIR)
 		set (${_RESULT} ${_RESULT}-NOTFOUND)
@@ -1207,13 +1207,13 @@ axl_include_import_file
 			if (_IS_OPTIONAL)
 				axl_message ("${_IMPORT}:" "NOT FOUND, adjust ${_FILTERED_PATH_LIST}paths.cmake (optional)")
 			else ()
-				message (FATAL_ERROR "${_IMPORT} is required but not found (adjust ${_FILTERED_PATH_LIST}paths.cmake)")
+				message (FATAL_ERROR "${_IMPORT} is REQUIRED but NOT FOUND, adjust ${_FILTERED_PATH_LIST}paths.cmake)")
 			endif ()
 		endif ()
 	elseif (_IS_OPTIONAL)
-		axl_message ("${_IMPORT}:" "NOT FOUND, adjust AXL_IMPORT_DIR_LIST in dependencies.cmake (optional)")
+		axl_message ("${_IMPORT}:" "NOT FOUND, missing import_${_IMPORT}.cmake, adjust AXL_IMPORT_DIR_LIST (optional)")
 	else ()
-		message (FATAL_ERROR "${_IMPORT} is required but import_${_IMPORT}.cmake not found (adjust AXL_IMPORT_DIR_LIST in dependencies.cmake)")
+		message (FATAL_ERROR "${_IMPORT} is REQUIRED but NOT FOUND, missing import_${_IMPORT}.cmake, adjust AXL_IMPORT_DIR_LIST")
 	endif ()
 endmacro ()
 
