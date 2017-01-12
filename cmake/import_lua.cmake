@@ -25,7 +25,7 @@ if (NOT LUA_INC_DIR)
 	axl_find_inc_dir (
 		LUA_INC_DIR
 		lua.h
-		PATH_SUFFIXES ${_LUA_NAME_LIST}
+		PATH_SUFFIXES . ${_LUA_NAME_LIST}
 		)
 endif ()
 
