@@ -27,7 +27,10 @@
 #	endif
 //#	pragma GCC diagnostic ignored "-Wmissing-braces"
 #	pragma GCC diagnostic ignored "-Wmultichar"
-#	pragma GCC diagnostic ignored "-Wnarrowing"
+#	pragma GCC diagnostic ignored "-Wformat"
+#	if (__cplusplus >= 201103L)
+#		pragma GCC diagnostic ignored "-Wnarrowing"
+#	endif
 //#	pragma GCC diagnostic ignored "-Wparentheses"
 //#	pragma GCC diagnostic ignored "-Wsign-compare"
 //#	pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -39,7 +42,6 @@
 #if (_AXL_CPP_CLANG)
 
 #	pragma GCC diagnostic ignored "-Wdangling-else"
-#	pragma GCC diagnostic ignored "-Wformat"
 #	pragma GCC diagnostic ignored "-Wincompatible-ms-struct"
 #	pragma GCC diagnostic ignored "-Wlogical-op-parentheses"
 #	pragma GCC diagnostic ignored "-Wswitch"

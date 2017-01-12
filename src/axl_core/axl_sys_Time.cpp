@@ -385,7 +385,7 @@ Time::format (
 
 //..............................................................................
 
-#if _AXL_OS_POSIX
+#if (_AXL_OS_POSIX)
 
 void
 getAbsTimespecFromTimeout (

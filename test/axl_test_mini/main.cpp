@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_sys_Thread.h"
 #include "axl_err_Errno.h"
+#include "axl_g_WarningSuppression.h"
 
 #if (_AXL_OS_WIN)
 
@@ -1137,10 +1138,13 @@ printUsbDevice (io::UsbDevice* device)
 
 	printf ("Address:        %d\n", device->getDeviceAddress ());
 	printf ("Bus:            %d\n", device->getBusNumber ());
+#if (_AXL_IO_USBDEVICE_PORT)
 	printf ("Port:           %d\n", device->getPortNumber ());
+#endif
 	printf ("Speed:          %s\n", io::getUsbSpeedString (device->getDeviceSpeed ()));
 	printf ("Port path:      ");
 
+#if (_AXL_IO_USBDEVICE_PORT)
 	uint8_t path [8];
 	size_t pathLength = device->getPortPath (path, countof (path));
 	if (pathLength == -1)
@@ -1154,6 +1158,7 @@ printUsbDevice (io::UsbDevice* device)
 
 		printf ("\n");
 	}
+#endif
 
 	printf ("Configurations: %d\n", deviceDesc.bNumConfigurations);
 
@@ -2858,7 +2863,7 @@ main (
 	)
 #endif
 {
-#if _AXL_OS_POSIX
+#if (_AXL_OS_POSIX)
 	setvbuf (stdout, NULL, _IOLBF, 1024);
 #endif
 
