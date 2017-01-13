@@ -37,10 +37,10 @@ LuaStringTemplate::create ()
 
 	m_luaState.openLibs ();
 
-	m_luaState.registerFunction ("getLine", getLine_lua, (intptr_t) this);
-	m_luaState.registerFunction ("getCol", getCol_lua, (intptr_t) this);
-	m_luaState.registerFunction ("emit", emit_lua, (intptr_t) this);
-	m_luaState.registerFunction ("passthrough", passthrough_lua, (intptr_t) this);
+	m_luaState.registerFunction ("getLine", getLine_lua, this);
+	m_luaState.registerFunction ("getCol", getCol_lua, this);
+	m_luaState.registerFunction ("emit", emit_lua, this);
+	m_luaState.registerFunction ("passthrough", passthrough_lua, this);
 
 	return true;
 }

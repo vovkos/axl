@@ -230,10 +230,11 @@ public:
 	void
 	pushFunction (
 		lua_CFunction func,
-		intptr_t context
+		void* context
 		)
 	{
-		pushInteger (context);
+		ASSERT (isOpen ());
+		lua_pushlightuserdata (m_h, context);
 		pushClosure (func, 1);
 	}
 
@@ -506,18 +507,18 @@ public:
 	registerFunction (
 		const sl::StringRef& name,
 		lua_CFunction func,
-		intptr_t context
+		void* context
 		)
 	{
 		pushFunction (func, context);
 		setGlobal (name);
 	}
 
-	intptr_t
+	void*
 	getContext ()
 	{
 		int index = getUpValueIndex ();
-		return (intptr_t) getInteger (index);
+		return lua_touserdata (m_h, index);
 	}
 
 	int
