@@ -12,7 +12,6 @@
 #include "pch.h"
 #include "axl_sys_Thread.h"
 #include "axl_err_Errno.h"
-#include "axl_g_WarningSuppression.h"
 
 #if (_AXL_OS_WIN)
 

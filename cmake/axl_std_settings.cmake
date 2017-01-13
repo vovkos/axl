@@ -270,9 +270,16 @@ axl_create_gcc_settings)
 
 	axl_create_compiler_flag_setting (
 		GCC_FLAG_WARNING_MULTICHAR
-		DESCRIPTION "GNU C++ shows include stack during compilation"
+		DESCRIPTION "GNU C++ shows warnings if multicharacter constants are used, e.g. 'ABCD'"
 		DEFAULT "-Wno-multichar"
 		"-Wmultichar" "-Wno-multichar"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_FORMAT
+		DESCRIPTION "GNU C++ shows warnings if printf format specifiers mismatch arguments"
+		DEFAULT "-Wno-format"
+		"-Wformat" "-Wno-format"
 		)
 endmacro ()
 
