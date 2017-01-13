@@ -11,7 +11,8 @@
 
 AXL
 ===
-.. image:: https://api.travis-ci.org/vovkos/axl.svg?branch=master
+.. image:: https://travis-ci.org/vovkos/axl.svg?branch=master
+	:target: https://travis-ci.org/vovkos/axl
 
 Abstract
 --------
