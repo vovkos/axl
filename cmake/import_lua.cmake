@@ -30,11 +30,18 @@ if (NOT LUA_INC_DIR)
 endif ()
 
 if (NOT LUA_LIB_DIR)
-	axl_find_lib_dir_ex (
-		RESULT_LIB_DIR LUA_LIB_DIR
-		RESULT_LIB_NAME LUA_LIB_NAME
-		LIB_NAME ${_LUA_NAME_LIST}
-		)
+	if (NOT_LUA_LIB_NAME)
+		axl_find_lib_dir_ex (
+			RESULT_LIB_DIR LUA_LIB_DIR
+			RESULT_LIB_NAME LUA_LIB_NAME
+			LIB_NAME ${_LUA_NAME_LIST}
+			)
+	else ()
+		axl_find_lib_dir_ex (
+			RESULT_LIB_DIR LUA_LIB_DIR
+			LIB_NAME ${LUA_LIB_NAME}
+			)
+	endif ()
 elseif (NOT LUA_LIB_NAME)
 	axl_find_lib_dir_ex (
 		RESULT_LIB_NAME LUA_LIB_NAME
@@ -43,7 +50,7 @@ elseif (NOT LUA_LIB_NAME)
 		)
 endif ()
 
-if (EXISTS ${LUA_INC_DIR}/lua.h AND LUA_LIB_NAME)
+if (EXISTS ${LUA_INC_DIR}/lua.h AND LUA_LIB_DIR AND LUA_LIB_NAME)
 	axl_message ("Lua paths:")
 	axl_message ("    Includes:"  "${LUA_INC_DIR}")
 	axl_message ("    Library dir:" "${LUA_LIB_DIR}")
