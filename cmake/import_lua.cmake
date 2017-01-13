@@ -30,7 +30,7 @@ if (NOT LUA_INC_DIR)
 endif ()
 
 if (NOT LUA_LIB_DIR)
-	if (NOT_LUA_LIB_NAME)
+	if (NOT LUA_LIB_NAME)
 		axl_find_lib_dir_ex (
 			RESULT_LIB_DIR LUA_LIB_DIR
 			RESULT_LIB_NAME LUA_LIB_NAME
