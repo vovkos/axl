@@ -13,7 +13,7 @@
 
 #define _AXL_IO_USBDEVICE_H
 
-#include "axl_io_UsbError.h"
+#include "axl_io_UsbPch.h"
 
 namespace axl {
 namespace io {
@@ -33,31 +33,33 @@ getUsbClassCodeString (libusb_class_code classCode);
 const char*
 getUsbTransferTypeString (libusb_transfer_type transferType);
 
-//..............................................................................
-
-class CloseUsbContext
-{
-public:
-	void
-	operator () (libusb_context* h)
-	{
-		libusb_exit (h);
-	}
-};
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbContext: public sl::Handle <libusb_context*, CloseUsbContext>
-{
-public:
-	UsbContext ()
-	{
-		open ();
-	}
+const libusb_interface_descriptor*
+findUsbInterfaceDescriptor (
+	const libusb_config_descriptor* configDesc,
+	uint_t interfaceId,
+	uint_t altSettingId
+	);
 
-	bool
-	open ();
-};
+const libusb_endpoint_descriptor*
+findUsbEndpointDescriptor (
+	const libusb_interface_descriptor* ifaceDesc,
+	uint_t endpointId
+	);
+
+inline
+const libusb_endpoint_descriptor*
+findUsbEndpointDescriptor (
+	const libusb_config_descriptor* configDesc,
+	uint_t endpointId,
+	uint_t interfaceId = 0,
+	uint_t altSettingId = 0
+	)
+{
+	const libusb_interface_descriptor* ifaceDesc = findUsbInterfaceDescriptor (configDesc, interfaceId, altSettingId);
+	return ifaceDesc ? findUsbEndpointDescriptor (ifaceDesc, endpointId) : NULL;
+}
 
 //..............................................................................
 
@@ -77,7 +79,7 @@ class UsbDeviceList: public sl::Handle <libusb_device**, FreeUsbDeviceList>
 {
 public:
 	size_t
-	enumerateDevices (libusb_context* context);
+	enumerateDevices (libusb_context* context = NULL);
 };
 
 //..............................................................................
@@ -202,6 +204,9 @@ public:
 	setDevice (libusb_device* device);
 
 	void
+	takeOver (UsbDevice* srcDevice);
+
+	void
 	close ();
 
 	bool
@@ -216,6 +221,16 @@ public:
 
 	bool
 	open (
+		uint_t vendorId,
+		uint_t productId
+		)
+	{
+		return open (NULL, vendorId, productId);
+	}
+
+	bool
+	open (
+		libusb_context* context,
 		uint_t vendorId,
 		uint_t productId
 		);
@@ -252,6 +267,9 @@ public:
 
 	bool
 	detachKernelDriver (uint_t ifaceId);
+
+	bool
+	setAutoDetachKernelDriver (bool isAutoDetach);
 
 	// descriptors
 

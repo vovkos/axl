@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_UsbDevice.h"
+#include "axl_io_UsbError.h"
 
 namespace axl {
 namespace io {
@@ -96,15 +97,38 @@ getUsbTransferTypeString (libusb_transfer_type transferType)
 		"Unknown";
 }
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-bool
-UsbContext::open ()
+const libusb_interface_descriptor*
+findUsbInterfaceDescriptor (
+	const libusb_config_descriptor* configDesc,
+	uint_t interfaceId,
+	uint_t altSettingId
+	)
 {
-	close ();
+	if (interfaceId >= configDesc->bNumInterfaces)
+		return NULL;
 
-	int result = libusb_init (&m_h);
-	return result == 0 ? true : err::fail (UsbError ((int) result));
+	const libusb_interface* iface = &configDesc->interface [interfaceId];
+	return altSettingId < iface->num_altsetting ?
+		&iface->altsetting [altSettingId] :
+		NULL;
+}
+
+const libusb_endpoint_descriptor*
+findUsbEndpointDescriptor (
+	const libusb_interface_descriptor* ifaceDesc,
+	uint_t endpointId
+	)
+{
+	for (size_t k = 0; k < ifaceDesc->bNumEndpoints; k++)
+	{
+		const libusb_endpoint_descriptor* endpointDesc = &ifaceDesc->endpoint [k];
+		if (endpointDesc->bEndpointAddress == endpointId)
+			return endpointDesc;
+	}
+
+	return NULL;
 }
 
 //..............................................................................
@@ -172,6 +196,22 @@ UsbDevice::setDevice (libusb_device* device)
 }
 
 void
+UsbDevice::takeOver (UsbDevice* srcDevice)
+{
+	if (m_device != srcDevice->m_device)
+	{
+		setDevice (NULL);
+		m_device = srcDevice->m_device;
+	}
+
+	m_openHandle = srcDevice->m_openHandle;
+
+	srcDevice->m_device = NULL;
+	srcDevice->m_openHandle = NULL;
+}
+
+
+void
 UsbDevice::close ()
 {
 	if (!m_openHandle)
@@ -194,14 +234,19 @@ UsbDevice::open ()
 
 bool
 UsbDevice::open (
+	libusb_context* context,
 	uint_t vendorId,
 	uint_t productId
 	)
 {
 	close ();
 
-	m_openHandle = libusb_open_device_with_vid_pid (NULL, (uint16_t) vendorId, (uint16_t) productId);
-	return m_openHandle ? true : err::fail (err::Error (err::SystemErrorCode_ObjectNameNotFound));
+	m_openHandle = libusb_open_device_with_vid_pid (context, (uint16_t) vendorId, (uint16_t) productId);
+	if (!m_openHandle)
+		return err::fail (err::Error (err::SystemErrorCode_ObjectNameNotFound));
+
+	m_device = libusb_get_device (m_openHandle);
+	return true;
 }
 
 uint_t
@@ -295,6 +340,15 @@ UsbDevice::detachKernelDriver (uint_t ifaceId)
 	ASSERT (m_openHandle);
 
 	int result = libusb_detach_kernel_driver (m_openHandle, ifaceId);
+	return result == 0 ? true : err::fail (UsbError (result));
+}
+
+bool
+UsbDevice::setAutoDetachKernelDriver (bool isAutoDetach)
+{
+	ASSERT (m_openHandle);
+
+	int result = libusb_set_auto_detach_kernel_driver (m_openHandle, isAutoDetach);
 	return result == 0 ? true : err::fail (UsbError (result));
 }
 

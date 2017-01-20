@@ -41,7 +41,10 @@
 #endif
 
 #ifdef _AXL_IO_USB
+#	include "axl_io_UsbContext.h"
+#	include "axl_io_UsbEventThread.h"
 #	include "axl_io_UsbDevice.h"
+#	include "axl_io_UsbTransfer.h"
 #endif
 
 #if (_AXL_OS_WIN)

@@ -92,6 +92,8 @@ source_group (
 
 set (
 	IO_USB_H_LIST
+	${AXL_INC_DIR}/axl_io_UsbContext.h
+	${AXL_INC_DIR}/axl_io_UsbEventThread.h
 	${AXL_INC_DIR}/axl_io_UsbDevice.h
 	${AXL_INC_DIR}/axl_io_UsbTransfer.h
 	${AXL_INC_DIR}/axl_io_UsbError.h
@@ -99,6 +101,8 @@ set (
 
 set (
 	IO_USB_CPP_LIST
+	axl_io_UsbContext.cpp
+	axl_io_UsbEventThread.cpp
 	axl_io_UsbDevice.cpp
 	axl_io_UsbTransfer.cpp
 	axl_io_UsbError.cpp

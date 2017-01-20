@@ -135,12 +135,7 @@ if (UNIX)
 endif ()
 
 if (BUILD_AXL_IO_USB)
-	if (UNIX)
-		target_link_libraries (
-			axl_test_mini
-			usb-1.0
-			)
-	elseif (WIN32)
+	if (WIN32)
 		target_link_libraries (
 			axl_test_mini
 			libusb-1.0

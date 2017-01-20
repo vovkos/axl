@@ -1180,15 +1180,17 @@ testUsb ()
 	bool result;
 
 	io::registerUsbErrorProvider ();
-	io::UsbContext context;
+	io::createUsbDefaultContext ();
 
 	io::UsbDeviceList deviceList;
-	size_t count = deviceList.enumerateDevices (context);
+	size_t count = deviceList.enumerateDevices ();
 	if (count == -1)
 	{
 		printf ("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
+
+	io::UsbDeviceList dev;
 
 	libusb_device** pp = deviceList;
 	for (size_t i = 0; *pp; pp++, i++)
@@ -1204,6 +1206,236 @@ testUsb ()
 
 		printUsbDevice (&device); // even if not opened
 	}
+}
+
+class UsbRead
+{
+protected:
+	io::UsbDevice* m_device;
+	uint_t m_endpointId;
+	libusb_transfer_type m_endpointType;
+	size_t m_maxPacketSize;
+	uint_t m_timeout;
+
+public:
+	UsbRead (
+		io::UsbDevice* device,
+		uint_t endpointId,
+		uint_t timeout = 1000
+		)
+	{
+		m_device = device;
+		m_endpointId = endpointId;
+		m_timeout = timeout;
+
+		io::UsbConfigDescriptor configDesc;
+		m_device->getActiveConfigDescriptor (&configDesc);
+		const libusb_endpoint_descriptor* endpointDesc = io::findUsbEndpointDescriptor (configDesc, m_endpointId);
+		ASSERT (endpointDesc);
+
+		m_endpointType = (libusb_transfer_type) (endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK);
+		m_maxPacketSize = endpointDesc->wMaxPacketSize;
+	}
+};
+
+class UsbReadThread:
+	public sys::ThreadImpl <UsbReadThread>,
+	public UsbRead
+{
+public:
+	UsbReadThread (
+		io::UsbDevice* device,
+		uint_t endpointId,
+		uint_t timeout = 1000
+		): UsbRead (device, endpointId, timeout)
+	{
+	}
+
+	void
+	threadFunc ()
+	{
+		sl::Array <char> buffer;
+		buffer.setCount (m_maxPacketSize);
+
+		size_t totalSize = 0;
+		while (totalSize < 1024)
+		{
+			size_t size;
+			switch (m_endpointType)
+			{
+			case LIBUSB_TRANSFER_TYPE_BULK:
+				size = m_device->bulkTransfer (m_endpointId, buffer, m_maxPacketSize, m_timeout);
+				break;
+
+			case LIBUSB_TRANSFER_TYPE_INTERRUPT:
+				size = m_device->interruptTransfer (m_endpointId, buffer, m_maxPacketSize, m_timeout);
+				break;
+
+			default:
+				ASSERT (false);
+			}
+
+			if (size == -1)
+			{
+				printf ("interrupt transfer error: %s\n", err::getLastErrorDescription ().sz ());
+			}
+			else
+			{
+				printf ("received %d bytes\n", size);
+				totalSize += size;
+			}
+		}
+	}
+};
+
+class UsbAsyncTransfer:
+	public sys::ThreadImpl <UsbReadThread>,
+	public UsbRead
+{
+protected:
+	io::UsbTransfer m_transfer;
+	sys::NotificationEvent m_completionEvent;
+	sl::Array <char> m_buffer;
+	size_t m_totalSize;
+
+public:
+	UsbAsyncTransfer (
+		io::UsbDevice* device,
+		uint_t endpointId,
+		uint_t timeout = 1000
+		): UsbRead (device, endpointId, timeout)
+	{
+		m_transfer.create ();
+		m_buffer.setCount (m_maxPacketSize);
+		m_totalSize = 0;
+	}
+
+	bool
+	next ()
+	{
+		switch (m_endpointType)
+		{
+		case LIBUSB_TRANSFER_TYPE_BULK:
+			m_transfer.fillBulkTransfer (
+				m_device->getOpenHandle(),
+				m_endpointId,
+				m_buffer,
+				m_maxPacketSize,
+				onCompleted,
+				this,
+				m_timeout
+				);
+
+			break;
+
+		case LIBUSB_TRANSFER_TYPE_INTERRUPT:
+			m_transfer.fillInterruptTransfer (
+				m_device->getOpenHandle(),
+				m_endpointId,
+				m_buffer,
+				m_maxPacketSize,
+				onCompleted,
+				this,
+				m_timeout
+				);
+			break;
+
+		default:
+			ASSERT (false);
+		}
+
+		return m_transfer.submit ();
+	}
+
+	bool
+	wait (uint_t timeout = -1)
+	{
+		return m_completionEvent.wait (timeout);
+	}
+
+protected:
+	static
+	void
+	onCompleted (libusb_transfer* transfer)
+	{
+		UsbAsyncTransfer* self = (UsbAsyncTransfer*) transfer->user_data;
+
+		printf (
+			"libusb_transfer completed:\n"
+			"    status:        %s (%x)\n"
+			"    actual length: %d\n",
+			io::getUsbTransferStatusString (transfer->status),
+			transfer->status,
+			transfer->actual_length
+			);
+
+		if (transfer->status == LIBUSB_TRANSFER_COMPLETED)
+		{
+			self->m_totalSize += transfer->actual_length;
+			if (self->m_totalSize > 1024)
+			{
+				self->m_completionEvent.signal ();
+				return;
+			}
+		}
+
+		self->next ();
+	}
+};
+
+void
+testUsbMouse ()
+{
+	enum
+	{
+		// Logitech Gaming Mouse
+		VendorId  = 0x046d,
+		ProductId = 0xc246,
+
+		InterfaceId = 0,
+		EndpointId  = 0x81,
+	};
+
+	io::registerUsbErrorProvider ();
+	io::createUsbDefaultContext ();
+	io::startUsbDefaultContextEventThread ();
+
+	printf ("Opening device...\n");
+
+	io::UsbDevice device;
+	bool result = device.open (VendorId, ProductId);
+	if (!result)
+	{
+		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+		return;
+	}
+
+	printf ("Reading device properties...\n");
+	printUsbDevice (&device);
+
+	printf ("Claiming interface #%d...\n", InterfaceId);
+	result =
+		device.setAutoDetachKernelDriver (true) &&
+		device.claimInterface (InterfaceId);
+
+	if (!result)
+	{
+		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+		return;
+	}
+
+/*	UsbReadThread readThread (&device, EndpointId);
+	printf ("Starting read thread...\n");
+	readThread.start ();
+	readThread.waitAndClose ();
+*/
+
+	UsbAsyncTransfer asyncTransfer (&device, EndpointId);
+	printf ("Starting async transfer...\n");
+	asyncTransfer.next ();
+	asyncTransfer.wait ();
+
+	device.releaseInterface (InterfaceId);
 }
 
 #endif
@@ -2848,6 +3080,8 @@ testTime ()
 
 //..............................................................................
 
+#include <vector>
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -2874,7 +3108,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testTime ();
+	testUsb (); //Mouse ();
 
 	return 0;
 }
