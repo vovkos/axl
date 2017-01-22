@@ -3108,7 +3108,9 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testUsb (); //Mouse ();
+#ifdef _AXL_IO_USB
+	testUsbMouse ();
+#endif
 
 	return 0;
 }
