@@ -135,6 +135,12 @@ RegExp::print () const
 			nfaState->m_id
 			);
 
+		if (nfaState->m_flags & NfaStateFlag_OpenCapture)
+			printf ("open (%d) ", nfaState->m_captureId);
+
+		if (nfaState->m_flags & NfaStateFlag_CloseCapture)
+			printf ("close (%d) ", nfaState->m_captureId);
+
 		if (nfaState->m_flags & NfaStateFlag_Match)
 		{
 			ASSERT (nfaState->m_outState && !nfaState->m_outState2);
@@ -172,41 +178,43 @@ RegExp::print () const
 			printf ("%02d ", nfaState->m_id);
 		}
 
-		printf ("}");
-
-		if (!dfaState->m_openCaptureIdArray.isEmpty ())
-		{
-			printf (" open ( ");
-
-			count = dfaState->m_openCaptureIdArray.getCount ();		
-			for (size_t i = 0; i < count; i++)
-			{
-				printf ("%d ", dfaState->m_openCaptureIdArray [i]);
-			}
-
-			printf (")");
-		}
-
-		if (!dfaState->m_closeCaptureIdArray.isEmpty ())
-		{
-			printf (" close ( ");
-
-			count = dfaState->m_closeCaptureIdArray.getCount ();		
-			for (size_t i = 0; i < count; i++)
-			{
-				printf ("%d ", dfaState->m_closeCaptureIdArray [i]);
-			}
-
-			printf (")");
-		}
-
-		printf ("\n");
+		printf ("}\n");
 
 		sl::Iterator <DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead ();
 		for (; dfaTransitionIt; dfaTransitionIt++)
 		{
 			DfaTransition* transition = *dfaTransitionIt;
-			printf ("    %s -> %02d\n", getMatchConditionString (&transition->m_matchCondition).sz (), transition->m_outState->m_id);
+			printf ("    %s -> %02d", getMatchConditionString (&transition->m_matchCondition).sz (), transition->m_outState->m_id);
+
+			size_t i = transition->m_openCaptureIdSet.findBit (0);
+			if (i != -1)
+			{
+				printf (" open ( ");
+
+				do
+				{
+					printf ("%d ", i);
+					i = transition->m_openCaptureIdSet.findBit (i + 1);
+				} while (i != -1);
+
+				printf (")");
+			}
+
+			i = transition->m_closeCaptureIdSet.findBit (0);
+			if (i != -1)
+			{
+				printf (" close ( ");
+
+				do
+				{
+					printf ("%d ", i);
+					i = transition->m_closeCaptureIdSet.findBit (i + 1);
+				} while (i != -1);
+
+				printf (")");
+			}
+
+			printf ("\n");
 		}
 	}
 }
@@ -364,6 +372,7 @@ RegExpCompiler::makeDfa ()
 	dfaStateMap [&dfaState->m_nfaStateSet] = dfaState;
 
 	NfaTransitionMgr nfaTransitionMgr;
+	sl::BitMap tmpSet;
 
 	while (!workingSet.isEmpty ())
 	{
@@ -409,11 +418,17 @@ RegExpCompiler::makeDfa ()
 				m_regExp->m_dfaStateList.insertTail (dfaState2);
 				workingSet.append (dfaState2);
 				mapIt->m_value = dfaState2;
-			}
+			}			
+
 
 			DfaTransition* dfaTransition = AXL_MEM_NEW (DfaTransition);
 			dfaTransition->m_matchCondition.copy (nfaTransition->m_matchCondition);
 			dfaTransition->m_outState = dfaState2;
+			dfaTransition->m_openCaptureIdSet.copy (dfaState->m_openCaptureIdSet);
+			dfaTransition->m_openCaptureIdSet.merge (dfaState2->m_openCaptureIdSet, sl::BitOpKind_AndNot);
+			dfaTransition->m_closeCaptureIdSet.copy (dfaState->m_closeCaptureIdSet);
+			dfaTransition->m_closeCaptureIdSet.merge (dfaState2->m_closeCaptureIdSet, sl::BitOpKind_AndNot);
+
 			dfaState->m_transitionList.insertTail (dfaTransition);
 		}
 	}
@@ -1223,22 +1238,26 @@ RegExpCompiler::capturingGroup ()
 {
 	size_t captureId = m_captureId++;
 
-
+	NfaState* open = AXL_MEM_NEW (NfaState);
+	open->m_flags |= NfaStateFlag_OpenCapture;
+	open->m_captureId = captureId;
+	m_regExp->m_nfaStateList.insertTail (open);
 
 	NfaState* start = nonCapturingGroup ();
 	if (!start)
 		return NULL;
 
 	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
-	ASSERT (accept);
 
-	start->m_flags |= NfaStateFlag_OpenCapture;
-	start->m_captureId = captureId;
+	NfaState* close = AXL_MEM_NEW (NfaState);
+	close->m_flags |= NfaStateFlag_CloseCapture;
+	close->m_captureId = captureId;
+	m_regExp->m_nfaStateList.insertTail (close);
 
-	accept->m_flags |= NfaStateFlag_CloseCapture;
-	accept->m_captureId = captureId;
+	open->createEpsilonLink (start);
+	accept->createEpsilonLink (close);
 
-	return start;
+	return open;
 }
 
 NfaState*

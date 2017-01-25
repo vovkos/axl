@@ -26,6 +26,8 @@ struct DfaTransition: sl::ListLink
 {
 	MatchCondition m_matchCondition;
 	DfaState* m_outState;
+	sl::BitMap m_openCaptureIdSet;
+	sl::BitMap m_closeCaptureIdSet;
 };
 
 //..............................................................................
@@ -36,12 +38,12 @@ struct DfaState: sl::ListLink
 	uint_t m_id;
 	uint_t m_acceptNfaStateId;
 	void* m_acceptContext;
-	sl::Array <size_t> m_openCaptureIdArray;
-	sl::Array <size_t> m_closeCaptureIdArray;
 
 	sl::StdList <DfaTransition> m_transitionList;
 
 	NfaStateSet m_nfaStateSet;
+	sl::BitMap m_openCaptureIdSet;
+	sl::BitMap m_closeCaptureIdSet;
 
 	DfaState ();
 

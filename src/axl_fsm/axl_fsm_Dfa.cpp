@@ -46,13 +46,13 @@ DfaState::addNfaState (NfaState* nfaState)
 	if (nfaState->m_flags & NfaStateFlag_OpenCapture)
 	{
 		ASSERT (nfaState->m_captureId != -1);
-		m_openCaptureIdArray.append (nfaState->m_captureId);
+		m_openCaptureIdSet.setBitResize (nfaState->m_captureId);
 	}
 
 	if (nfaState->m_flags & NfaStateFlag_CloseCapture)
 	{
 		ASSERT (nfaState->m_captureId != -1);
-		m_closeCaptureIdArray.append (nfaState->m_captureId);
+		m_closeCaptureIdSet.setBitResize (nfaState->m_captureId);
 	}
 
 	return true;
@@ -68,7 +68,7 @@ DfaState::makeEpsilonClosure ()
 		if (!(nfaState->m_flags & NfaStateFlag_EpsilonLink))
 			continue;
 
-		bool isAdded =  addNfaState (nfaState->m_outState);
+		bool isAdded = addNfaState (nfaState->m_outState);
 		if (isAdded)
 			workingSet.append (nfaState->m_outState);
 
