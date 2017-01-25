@@ -1157,6 +1157,8 @@ printUsbDevice (io::UsbDevice* device)
 
 		printf ("\n");
 	}
+#else
+	printf ("\n");
 #endif
 
 	printf ("Configurations: %d\n", deviceDesc.bNumConfigurations);
@@ -1175,7 +1177,7 @@ printUsbDevice (io::UsbDevice* device)
 }
 
 void
-testUsb ()
+testUsbEnum ()
 {
 	bool result;
 
@@ -1396,6 +1398,8 @@ testUsbMouse ()
 		EndpointId  = 0x81,
 	};
 
+	bool result;
+
 	io::registerUsbErrorProvider ();
 	io::createUsbDefaultContext ();
 	io::startUsbDefaultContextEventThread ();
@@ -1403,7 +1407,7 @@ testUsbMouse ()
 	printf ("Opening device...\n");
 
 	io::UsbDevice device;
-	bool result = device.open (VendorId, ProductId);
+	result = device.open (VendorId, ProductId);
 	if (!result)
 	{
 		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
@@ -1413,11 +1417,19 @@ testUsbMouse ()
 	printf ("Reading device properties...\n");
 	printUsbDevice (&device);
 
-	printf ("Claiming interface #%d...\n", InterfaceId);
-	result =
-		device.setAutoDetachKernelDriver (true) &&
-		device.claimInterface (InterfaceId);
+	if (io::hasUsbCapability (LIBUSB_CAP_SUPPORTS_DETACH_KERNEL_DRIVER))
+	{
+		printf ("Setting auto-detach for kernel driver...\n");
+		result = device.setAutoDetachKernelDriver (true);
+		if (!result)
+		{
+			printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+			return;
+		}
+	}
 
+	printf ("Claiming interface #%d...\n", InterfaceId);
+	result = device.claimInterface (InterfaceId);
 	if (!result)
 	{
 		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
@@ -1427,8 +1439,7 @@ testUsbMouse ()
 /*	UsbReadThread readThread (&device, EndpointId);
 	printf ("Starting read thread...\n");
 	readThread.start ();
-	readThread.waitAndClose ();
-*/
+	readThread.waitAndClose (); */
 
 	UsbAsyncTransfer asyncTransfer (&device, EndpointId);
 	printf ("Starting async transfer...\n");

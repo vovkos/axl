@@ -110,7 +110,7 @@ findUsbInterfaceDescriptor (
 		return NULL;
 
 	const libusb_interface* iface = &configDesc->interface [interfaceId];
-	return altSettingId < iface->num_altsetting ?
+	return altSettingId < (uint_t) iface->num_altsetting ?
 		&iface->altsetting [altSettingId] :
 		NULL;
 }
@@ -210,7 +210,6 @@ UsbDevice::takeOver (UsbDevice* srcDevice)
 	srcDevice->m_openHandle = NULL;
 }
 
-
 void
 UsbDevice::close ()
 {
@@ -246,6 +245,9 @@ UsbDevice::open (
 		return err::fail (err::Error (err::SystemErrorCode_ObjectNameNotFound));
 
 	m_device = libusb_get_device (m_openHandle);
+	ASSERT (m_device);
+
+	libusb_ref_device (m_device);
 	return true;
 }
 

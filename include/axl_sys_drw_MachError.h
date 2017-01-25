@@ -62,7 +62,7 @@ public:
 		create (code);
 	}
 
-	err::ErrorHdr*
+	size_t
 	create (mach_error_t code);
 };
 

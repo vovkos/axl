@@ -72,18 +72,9 @@ public:
 		create (code);
 	}
 
-	err::ErrorHdr*
+	size_t
 	create (int code);
 };
-
-//..............................................................................
-
-inline
-size_t
-setUsbError (int code)
-{
-	return setError (UsbError (code));
-}
 
 //..............................................................................
 

@@ -53,7 +53,7 @@ NtStatus::create (long status)
 {
 	err::ErrorHdr* error = createBuffer (sizeof (err::ErrorHdr));
 	if (!error)
-		return NULL;
+		return -1;
 
 	error->m_size = sizeof (err::ErrorHdr);
 	error->m_guid = g_ntStatusGuid;

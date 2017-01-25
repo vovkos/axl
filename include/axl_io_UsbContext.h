@@ -73,6 +73,13 @@ createUsbDefaultContext ()
 	return getUsbDefaultContext ()->create ();
 }
 
+inline
+bool
+hasUsbCapability (uint32_t capability)
+{
+	return libusb_has_capability (capability) != 0;
+}
+
 //..............................................................................
 
 } // namespace io
