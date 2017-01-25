@@ -165,14 +165,42 @@ RegExp::print () const
 			dfaState->m_id
 			);
 
-		size_t nfaStateCount = dfaState->m_nfaStateSet.m_stateArray.getCount ();
-		for (size_t i = 0; i < nfaStateCount; i++)
+		size_t count = dfaState->m_nfaStateSet.m_stateArray.getCount ();
+		for (size_t i = 0; i < count; i++)
 		{
 			NfaState* nfaState = dfaState->m_nfaStateSet.m_stateArray [i];
 			printf ("%02d ", nfaState->m_id);
 		}
 
-		printf ("}\n");
+		printf ("}");
+
+		if (!dfaState->m_openCaptureIdArray.isEmpty ())
+		{
+			printf (" open ( ");
+
+			count = dfaState->m_openCaptureIdArray.getCount ();		
+			for (size_t i = 0; i < count; i++)
+			{
+				printf ("%d ", dfaState->m_openCaptureIdArray [i]);
+			}
+
+			printf (")");
+		}
+
+		if (!dfaState->m_closeCaptureIdArray.isEmpty ())
+		{
+			printf (" close ( ");
+
+			count = dfaState->m_closeCaptureIdArray.getCount ();		
+			for (size_t i = 0; i < count; i++)
+			{
+				printf ("%d ", dfaState->m_closeCaptureIdArray [i]);
+			}
+
+			printf (")");
+		}
+
+		printf ("\n");
 
 		sl::Iterator <DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead ();
 		for (; dfaTransitionIt; dfaTransitionIt++)
@@ -192,7 +220,6 @@ initValidSingleTable (bool* table)
 	table ['.'] = true;
 	table ['['] = true;
 	table ['('] = true;
-	table ['{'] = true;
 	table ['^'] = true;
 	table ['$'] = true;
 	table ['d'] = true;
@@ -660,8 +687,6 @@ RegExpCompiler::getToken (Token* token)
 		case ']':
 		case '(':
 		case ')':
-		case '{':
-		case '}':
 		case '|':
 		case '^':
 		case '$':
@@ -884,10 +909,15 @@ RegExpCompiler::single ()
 		switch (token.m_char)
 		{
 		case '(':
-			return group ();
-
-		case '{':
-			return capturingGroup ();
+			if (m_p [0] == '?' && m_p [1] == ':')
+			{
+				m_p += 2;
+				return nonCapturingGroup ();
+			}
+			else
+			{				
+				return capturingGroup ();
+			}
 
 		case '[':
 			return charClass ();
@@ -1189,25 +1219,13 @@ RegExpCompiler::any ()
 }
 
 NfaState*
-RegExpCompiler::group ()
-{
-	NfaState* start = expression ();
-	if (!start)
-		return NULL;
-
-	bool result = expectSpecialChar (')');
-	if (!result)
-		return NULL;
-
-	return start;
-}
-
-NfaState*
 RegExpCompiler::capturingGroup ()
 {
 	size_t captureId = m_captureId++;
 
-	NfaState* start = group ();
+
+
+	NfaState* start = nonCapturingGroup ();
 	if (!start)
 		return NULL;
 
@@ -1219,6 +1237,20 @@ RegExpCompiler::capturingGroup ()
 
 	accept->m_flags |= NfaStateFlag_CloseCapture;
 	accept->m_captureId = captureId;
+
+	return start;
+}
+
+NfaState*
+RegExpCompiler::nonCapturingGroup ()
+{
+	NfaState* start = expression ();
+	if (!start)
+		return NULL;
+
+	bool result = expectSpecialChar (')');
+	if (!result)
+		return NULL;
 
 	return start;
 }

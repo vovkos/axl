@@ -49,11 +49,13 @@ struct MatchCondition
 
 enum NfaStateFlag
 {
-	NfaStateFlag_Match        = 0x0001,
-	NfaStateFlag_EpsilonLink  = 0x0002,
-	NfaStateFlag_Accept       = 0x0004,
-	NfaStateFlag_OpenCapture  = 0x0010,
-	NfaStateFlag_CloseCapture = 0x0020,
+	NfaStateFlag_Match          = 0x0001,
+	NfaStateFlag_EpsilonLink    = 0x0002,
+	NfaStateFlag_Accept         = 0x0004,
+	NfaStateFlag_TransitionMask = 0x0007,
+
+	NfaStateFlag_OpenCapture    = 0x0010,
+	NfaStateFlag_CloseCapture   = 0x0020,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

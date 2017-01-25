@@ -224,10 +224,10 @@ protected:
 	charClassItem (sl::BitMap* charSet);
 
 	NfaState*
-	group ();
+	capturingGroup ();
 
 	NfaState*
-	capturingGroup ();
+	nonCapturingGroup ();
 
 	void
 	assignNfaIds ();

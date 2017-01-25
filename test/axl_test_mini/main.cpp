@@ -662,7 +662,8 @@ testRegExp ()
 */
 
 //	bool result = regExpCompiler.compile ("\"abc\" ws* dec+");
-	bool result = regExpCompiler.compile ("'abc' \\n");
+
+	bool result = regExpCompiler.compile ("\\s*([a-z]+)\\s*");
 	if (!result)
 	{
 		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
@@ -3119,9 +3120,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-#ifdef _AXL_IO_USB
-	testUsbMouse ();
-#endif
+	testRegExp ();
 
 	return 0;
 }

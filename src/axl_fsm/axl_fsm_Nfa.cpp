@@ -79,7 +79,7 @@ NfaState::copy (const NfaState* srcState)
 void
 NfaState::createEpsilonLink (NfaState* outState)
 {
-	ASSERT (!m_flags && !m_outState && !m_outState2);
+	ASSERT (!(m_flags & NfaStateFlag_TransitionMask) && !m_outState && !m_outState2);
 
 	m_flags |= NfaStateFlag_EpsilonLink;
 	m_outState = outState;
@@ -91,7 +91,7 @@ NfaState::createEpsilonLink (
 	NfaState* outState2
 	)
 {
-	ASSERT (!m_flags && !m_outState && !m_outState2);
+	ASSERT (!(m_flags & NfaStateFlag_TransitionMask) && !m_outState && !m_outState2);
 
 	m_flags |= NfaStateFlag_EpsilonLink;
 	m_outState = outState;
