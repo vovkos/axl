@@ -198,7 +198,19 @@ mergeBitMaps (
 
 		break;
 
+	case BitOpKind_Xor:
+		for (; p < end; p++, p2++)
+		{
+			old = *p;
+			*p ^= *p2;
+			if (*p != old)
+				hasChanged = true;
+		}
+
+		break;
+
 	case BitOpKind_And:
+		for (; p < end; p++, p2++)
 		{
 			old = *p;
 			*p &= *p2;
@@ -208,10 +220,11 @@ mergeBitMaps (
 
 		break;
 
-	case BitOpKind_Xor:
+	case BitOpKind_AndNot:
+		for (; p < end; p++, p2++)
 		{
 			old = *p;
-			*p ^= *p2;
+			*p &= ~*p2;
 			if (*p != old)
 				hasChanged = true;
 		}

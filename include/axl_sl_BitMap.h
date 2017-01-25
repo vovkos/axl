@@ -24,8 +24,9 @@ namespace sl {
 enum BitOpKind
 {
 	BitOpKind_Or = 0,
-	BitOpKind_And,
 	BitOpKind_Xor,
+	BitOpKind_And,
+	BitOpKind_AndNot,
 };
 
 //..............................................................................
