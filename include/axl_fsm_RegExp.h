@@ -89,6 +89,12 @@ public:
 
 class RegExpCompiler
 {
+public:
+	enum Flag
+	{
+		Flag_NonCapturingGroups = 0x01,
+	};
+
 protected:
 	enum TokenKind
 	{
@@ -118,6 +124,7 @@ protected:
 protected:
 	RegExp* m_regExp;
 	RegExpNameMgr* m_nameMgr;
+	uint_t m_flags;
 
 	const char* m_p;
 	Token m_lastToken;
@@ -127,7 +134,19 @@ public:
 	RegExpCompiler (
 		RegExp* regExp,
 		RegExpNameMgr* nameMgr = NULL
-		);
+		)
+	{
+		construct (0, regExp, nameMgr);
+	}
+
+	RegExpCompiler (
+		uint_t flags,
+		RegExp* regExp,
+		RegExpNameMgr* nameMgr = NULL
+		)
+	{
+		construct (flags, regExp, nameMgr);
+	}
 
 	bool
 	compile (
@@ -145,6 +164,13 @@ public:
 	finalize ();
 
 protected:
+	void
+	construct (
+		uint_t flags,
+		RegExp* regExp,
+		RegExpNameMgr* nameMgr
+		);
+
 	bool
 	readHexEscapeSequence (uchar_t* c);
 

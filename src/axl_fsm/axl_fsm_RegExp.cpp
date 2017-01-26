@@ -178,43 +178,44 @@ RegExp::print () const
 			printf ("%02d ", nfaState->m_id);
 		}
 
-		printf ("}\n");
+		printf ("}");
+
+		size_t i = dfaState->m_openCaptureIdSet.findBit (0);
+		if (i != -1)
+		{
+			printf (" open ( ");
+
+			do
+			{
+				printf ("%d ", i);
+				i = dfaState->m_openCaptureIdSet.findBit (i + 1);
+			} while (i != -1);
+
+			printf (")");
+		}
+
+		i = dfaState->m_closeCaptureIdSet.findBit (0);
+		if (i != -1)
+		{
+			printf (" close ( ");
+
+			do
+			{
+				printf ("%d ", i);
+				i = dfaState->m_closeCaptureIdSet.findBit (i + 1);
+			} while (i != -1);
+
+			printf (")");
+		}
+
+		printf ("\n");
+
 
 		sl::Iterator <DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead ();
 		for (; dfaTransitionIt; dfaTransitionIt++)
 		{
 			DfaTransition* transition = *dfaTransitionIt;
-			printf ("    %s -> %02d", getMatchConditionString (&transition->m_matchCondition).sz (), transition->m_outState->m_id);
-
-			size_t i = transition->m_openCaptureIdSet.findBit (0);
-			if (i != -1)
-			{
-				printf (" open ( ");
-
-				do
-				{
-					printf ("%d ", i);
-					i = transition->m_openCaptureIdSet.findBit (i + 1);
-				} while (i != -1);
-
-				printf (")");
-			}
-
-			i = transition->m_closeCaptureIdSet.findBit (0);
-			if (i != -1)
-			{
-				printf (" close ( ");
-
-				do
-				{
-					printf ("%d ", i);
-					i = transition->m_closeCaptureIdSet.findBit (i + 1);
-				} while (i != -1);
-
-				printf (")");
-			}
-
-			printf ("\n");
+			printf ("    %s -> %02d\n", getMatchConditionString (&transition->m_matchCondition).sz (), transition->m_outState->m_id);
 		}
 	}
 }
@@ -253,13 +254,16 @@ RegExpCompiler::Token::isValidSingle ()
 
 //..............................................................................
 
-RegExpCompiler::RegExpCompiler (
+void
+RegExpCompiler::construct (
+	uint_t flags,
 	RegExp* regExp,
 	RegExpNameMgr* nameMgr
 	)
 {
 	m_regExp = regExp;
 	m_nameMgr = nameMgr;
+	m_flags = 0;
 	m_p = NULL;
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 	m_lastToken.m_char = 0;
@@ -420,15 +424,9 @@ RegExpCompiler::makeDfa ()
 				mapIt->m_value = dfaState2;
 			}			
 
-
 			DfaTransition* dfaTransition = AXL_MEM_NEW (DfaTransition);
 			dfaTransition->m_matchCondition.copy (nfaTransition->m_matchCondition);
 			dfaTransition->m_outState = dfaState2;
-			dfaTransition->m_openCaptureIdSet.copy (dfaState->m_openCaptureIdSet);
-			dfaTransition->m_openCaptureIdSet.merge (dfaState2->m_openCaptureIdSet, sl::BitOpKind_AndNot);
-			dfaTransition->m_closeCaptureIdSet.copy (dfaState->m_closeCaptureIdSet);
-			dfaTransition->m_closeCaptureIdSet.merge (dfaState2->m_closeCaptureIdSet, sl::BitOpKind_AndNot);
-
 			dfaState->m_transitionList.insertTail (dfaTransition);
 		}
 	}
@@ -929,6 +927,10 @@ RegExpCompiler::single ()
 				m_p += 2;
 				return nonCapturingGroup ();
 			}
+			else if (m_flags & Flag_NonCapturingGroups)
+			{				
+				return nonCapturingGroup ();
+			}
 			else
 			{				
 				return capturingGroup ();
@@ -1291,7 +1293,7 @@ RegExpCompiler::namedRegExp (const sl::StringRef& name)
 	}
 
 	RegExp subRegExp;
-	RegExpCompiler subRegExpCompiler (&subRegExp, m_nameMgr);
+	RegExpCompiler subRegExpCompiler (Flag_NonCapturingGroups, &subRegExp, m_nameMgr);
 
 	bool result = subRegExpCompiler.compile (source);
 	if (!result)
