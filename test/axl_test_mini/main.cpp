@@ -663,13 +663,17 @@ testRegExp ()
 
 //	bool result = regExpCompiler.compile ("\"abc\" ws* dec+");
 
-	bool result = regExpCompiler.compile ("\\s*([a-z]+)\\s*");
+	bool result =
+		regExpCompiler.incrementalCompile ("(\\h{2})   ' '+ (\\d{2})") &&
+		regExpCompiler.incrementalCompile ("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
+
 	if (!result)
 	{
 		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
+	regExpCompiler.finalize ();
 	regExp.print ();
 }
 

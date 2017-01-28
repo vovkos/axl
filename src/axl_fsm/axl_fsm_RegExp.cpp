@@ -100,6 +100,7 @@ getMatchConditionString (const MatchCondition* condition)
 void
 RegExp::clear ()
 {
+	m_groupCount = 0;
 	m_nfaStateList.clear ();
 	m_nfaStateArray.clear ();
 	m_dfaStateList.clear ();
@@ -267,7 +268,6 @@ RegExpCompiler::construct (
 	m_p = NULL;
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 	m_lastToken.m_char = 0;
-	m_captureId = 0;
 }
 
 bool
@@ -277,7 +277,6 @@ RegExpCompiler::compile (
 	)
 {
 	m_regExp->clear ();
-	m_captureId = 0;
 
 	bool result = incrementalCompile (source, acceptContext);
 	if (!result)
@@ -425,7 +424,7 @@ RegExpCompiler::makeDfa ()
 			}			
 
 			DfaTransition* dfaTransition = AXL_MEM_NEW (DfaTransition);
-			dfaTransition->m_matchCondition.copy (nfaTransition->m_matchCondition);
+			dfaTransition->m_matchCondition = nfaTransition->m_matchCondition;
 			dfaTransition->m_outState = dfaState2;
 			dfaState->m_transitionList.insertTail (dfaTransition);
 		}
@@ -628,6 +627,32 @@ RegExpCompiler::readIdentifier (sl::String* name)
 }
 
 bool
+RegExpCompiler::readQuantifier (size_t* count)
+{
+	char* end;
+	long n  = strtoul (m_p, &end, 10);
+	bool result = end != m_p && n >= 1 && n <= Const_MaxQuantifier;
+
+	if (result)
+	{
+		m_p = end;
+		result = expectSpecialChar ('}');
+	}
+
+	if (!result)
+	{
+		err::setFormatStringError (
+			"invalid quantifier; only simple quantifiers are supported: {n}, 1 <= n <= %d",
+			Const_MaxQuantifier
+			);
+		return false;
+	}
+
+	*count = n;
+	return true;
+}
+
+bool
 RegExpCompiler::getToken (Token* token)
 {
 	if (m_lastToken.m_tokenKind)
@@ -703,6 +728,8 @@ RegExpCompiler::getToken (Token* token)
 		case '|':
 		case '^':
 		case '$':
+		case '{':
+		case '}':
 			token->m_tokenKind = TokenKind_SpecialChar;
 			token->m_char = *m_p++;
 			return true;
@@ -859,6 +886,11 @@ RegExpCompiler::repeat ()
 
 		case '+':
 			return plus (start);
+
+		case '{':
+			size_t count;
+			result = readQuantifier (&count);
+			return result ? quantify (start, count) : NULL;
 		}
 
 	m_lastToken = token; // unget token
@@ -904,6 +936,75 @@ RegExpCompiler::plus (NfaState* start)
 	oldAccept->createEpsilonLink (start, newAccept);
 
 	return start;
+}
+
+NfaState*
+RegExpCompiler::quantify (
+	NfaState* start,
+	size_t count
+	)
+{
+	ASSERT (count <= Const_MaxQuantifier);
+
+	NfaState* originalStart = start;
+	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
+	for (size_t i = 1; i < count; i++)
+	{
+		start = clone (start, accept);
+		accept->createEpsilonLink (start);
+		accept = *m_regExp->m_nfaStateList.getTail ();
+	}
+
+	return originalStart;
+}
+
+NfaState*
+RegExpCompiler::clone (
+	NfaState* first,
+	NfaState* last
+	)
+{
+	sl::HashTableMap <NfaState*, NfaState*, sl::HashId <NfaState*> > stateMap;
+
+	sl::Iterator <NfaState> end = m_regExp->m_nfaStateList.getTail ();
+	sl::Iterator <NfaState> it = first;
+	for (;;)
+	{
+		NfaState* oldState = *it;
+		NfaState* newState = AXL_MEM_NEW (NfaState);
+		*newState = *oldState;
+		stateMap [oldState] = newState;
+		m_regExp->m_nfaStateList.insertTail (newState);
+
+		if (it == last)
+			break;
+
+		it++;
+	}
+
+	it = end + 1;
+	NfaState* result = *it;
+	for (; it; it++)
+	{
+		NfaState* state = *it;
+
+		sl::HashTableMapIterator <NfaState*, NfaState*> mapIt;
+		if (state->m_outState)
+		{
+			mapIt = stateMap.find (state->m_outState);
+			if (mapIt)
+				state->m_outState = mapIt->m_value;
+		}
+
+		if (state->m_outState2)
+		{
+			mapIt = stateMap.find (state->m_outState);
+			if (mapIt)
+				state->m_outState2 = mapIt->m_value;
+		}
+	}
+
+	return result;
 }
 
 NfaState*
@@ -1238,7 +1339,7 @@ RegExpCompiler::any ()
 NfaState*
 RegExpCompiler::capturingGroup ()
 {
-	size_t captureId = m_captureId++;
+	size_t captureId = m_regExp->m_groupCount++;
 
 	NfaState* open = AXL_MEM_NEW (NfaState);
 	open->m_flags |= NfaStateFlag_OpenCapture;

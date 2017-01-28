@@ -24,14 +24,6 @@ MatchCondition::MatchCondition ()
 }
 
 void
-MatchCondition::copy (const MatchCondition& src)
-{
-	m_conditionKind = src.m_conditionKind;
-	m_char = src.m_char;
-	m_charSet.copy (src.m_charSet);
-}
-
-void
 MatchCondition::addChar (uchar_t c)
 {
 	switch (m_conditionKind)
@@ -69,11 +61,6 @@ NfaState::NfaState ()
 	m_captureId = -1;
 	m_outState = NULL;
 	m_outState2 = NULL;
-}
-
-void
-NfaState::copy (const NfaState* srcState)
-{
 }
 
 void

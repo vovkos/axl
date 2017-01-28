@@ -41,11 +41,24 @@ protected:
 	sl::StdList <DfaState> m_dfaStateList;
 	sl::Array <DfaState*> m_dfaStateArray;
 
+	size_t m_groupCount;
+
 public:
+	RegExp ()
+	{
+		m_groupCount = 0;
+	}
+
 	bool
 	isEmpty () const
 	{
 		return m_nfaStateList.isEmpty ();
+	}
+
+	size_t
+	getGroupCount () const
+	{
+		return m_groupCount;
 	}
 
 	sl::ConstList <NfaState>
@@ -95,6 +108,11 @@ public:
 		Flag_NonCapturingGroups = 0x01,
 	};
 
+	enum Const
+	{
+		Const_MaxQuantifier = 32,
+	};
+
 protected:
 	enum TokenKind
 	{
@@ -103,6 +121,7 @@ protected:
 		TokenKind_SpecialChar,
 		TokenKind_Literal,
 		TokenKind_Identifier,
+		TokenKind_Quantifier,
 	};
 
 	struct Token
@@ -128,7 +147,6 @@ protected:
 
 	const char* m_p;
 	Token m_lastToken;
-	size_t m_captureId;
 
 public:
 	RegExpCompiler (
@@ -187,6 +205,9 @@ protected:
 	readIdentifier (sl::String* name);
 
 	bool
+	readQuantifier (size_t* count);
+
+	bool
 	getToken (Token* token);
 
 	bool
@@ -212,6 +233,12 @@ protected:
 
 	NfaState*
 	plus (NfaState* start);
+
+	NfaState*
+	quantify (
+		NfaState* start,
+		size_t count
+		);
 
 	NfaState*
 	single ();
@@ -245,6 +272,12 @@ protected:
 
 	NfaState*
 	any ();
+
+	NfaState*
+	clone (
+		NfaState* first,
+		NfaState* last
+		);
 
 	bool
 	charClassItem (sl::BitMap* charSet);

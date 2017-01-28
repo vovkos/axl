@@ -39,9 +39,6 @@ struct MatchCondition
 	MatchCondition ();
 
 	void
-	copy (const MatchCondition& src);
-
-	void
 	addChar (uchar_t c);
 };
 
@@ -72,9 +69,6 @@ struct NfaState: sl::ListLink
 	NfaState* m_outState2;
 
 	NfaState ();
-
-	void
-	copy (const NfaState* srcState);
 
 	void
 	createEpsilonLink (NfaState* outState);
