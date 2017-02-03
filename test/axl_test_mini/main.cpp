@@ -1441,6 +1441,25 @@ testUsbMouse ()
 		return;
 	}
 
+	io::UsbConfigDescriptor configDesc;
+	device.getActiveConfigDescriptor (&configDesc);
+	const libusb_endpoint_descriptor* endpointDesc = io::findUsbEndpointDescriptor (configDesc, EndpointId);
+	ASSERT (endpointDesc);
+
+	printf ("Sync read...\n");
+
+	sl::Array <char> buffer;
+	buffer.setCount (endpointDesc->wMaxPacketSize);
+	size_t size = device.interruptTransfer (EndpointId, buffer, endpointDesc->wMaxPacketSize);
+
+	if (size == -1)
+	{
+		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+		return;
+	}
+
+	printf ("%d bytes read...\n", size);
+
 /*	UsbReadThread readThread (&device, EndpointId);
 	printf ("Starting read thread...\n");
 	readThread.start ();
@@ -3124,8 +3143,13 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testUsbEnum ();
 
+#if (_AXL_IO_USB)
+	testUsbMouse ();
+#else
+	testRegExp ();
+#endif
+	
 	return 0;
 }
 
