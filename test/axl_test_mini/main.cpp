@@ -1407,7 +1407,7 @@ testUsbMouse ()
 
 	io::registerUsbErrorProvider ();
 	io::createUsbDefaultContext ();
-	io::startUsbDefaultContextEventThread ();
+	io::getUsbDefaultContextEventThread ()->start ();
 
 	printf ("Opening device...\n");
 
@@ -3124,7 +3124,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testRegExp ();
+	testUsbEnum ();
 
 	return 0;
 }

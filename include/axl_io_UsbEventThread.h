@@ -60,14 +60,14 @@ public:
 	threadFunc ();
 };
 
-//..............................................................................
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-bool
-startUsbDefaultContextEventThread ()
+UsbEventThread*
+getUsbDefaultContextEventThread ()
 {
 	static int32_t flag = 0;
-	return sl::getSingleton <UsbEventThread> (&flag)->start ();
+	return sl::getSingleton <UsbEventThread> (&flag);
 }
 
 //..............................................................................
