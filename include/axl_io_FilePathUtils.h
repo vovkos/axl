@@ -26,6 +26,9 @@ getTempDir ();
 sl::String
 getCurrentDir ();
 
+bool
+setCurrentDir (const sl::StringRef& dir);
+
 sl::String
 getExeFilePath ();
 

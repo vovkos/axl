@@ -71,6 +71,18 @@ getCurrentDir ()
 #endif
 }
 
+bool
+setCurrentDir (const sl::StringRef& dir)
+{
+#if (_AXL_OS_WIN)
+	bool_t result = ::SetCurrentDirectoryW (dir.sz ());
+	return err::complete (result);
+#elif (_AXL_OS_POSIX)
+	int result = ::chdir (dir.sz ());
+	return err::complete (result == 0);
+#endif
+}
+
 sl::String
 getExeFilePath ()
 {
