@@ -51,6 +51,12 @@ public:
 		m_library.close ();
 	}
 
+	void
+	detach ()
+	{
+		m_library.detach ();
+	}
+
 	void*
 	getFunction (const sl::StringRef& name)
 	{
@@ -65,25 +71,31 @@ public:
 class DynamicLibrary
 {
 protected:
-	psx::DynamicLibrary m_dynamicLibrary;
+	psx::DynamicLibrary m_library;
 
 public:
 	bool
 	open (const sl::StringRef& fileName)
 	{
-		return m_dynamicLibrary.open (fileName);
+		return m_library.open (fileName);
 	}
 
 	void
 	close ()
 	{
-		m_dynamicLibrary.close ();
+		m_library.close ();
+	}
+
+	void
+	detach ()
+	{
+		m_library.detach ();
 	}
 
 	void*
 	getFunction (const sl::StringRef& name)
 	{
-		return m_dynamicLibrary.getSymbol (name);
+		return m_library.getSymbol (name);
 	}
 };
 
