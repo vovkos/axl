@@ -18,8 +18,10 @@ namespace win {
 
 //..............................................................................
 
-sl::String
-WinErrorProvider::getErrorDescription (dword_t code)
+static
+inline
+wchar_t*
+getSystemMessage (dword_t code)
 {
 	wchar_t* message = NULL;
 
@@ -36,8 +38,20 @@ WinErrorProvider::getErrorDescription (dword_t code)
 		NULL
 		);
 
-	if (!message)
-		return sl::formatString ("winerror #%d", code);
+	return message;
+}
+
+sl::String
+WinErrorProvider::getErrorDescription (dword_t code)
+{
+	wchar_t* message = getSystemMessage (code);
+	if (!message) // try again with HRESULT_FROM_SETUPAPI
+	{	
+		HRESULT hresult = HRESULT_FROM_SETUPAPI (code);
+		message = getSystemMessage (hresult);
+		if (!message)
+			return sl::formatString ("winerror (%d 0x%08x)", code, code);
+	}
 
 	sl::String description = message;
 	::LocalFree (message);
