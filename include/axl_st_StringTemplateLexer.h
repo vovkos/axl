@@ -23,18 +23,20 @@ enum TokenKind
 	TokenKind_Eof = 0,
 	TokenKind_Error = -1,
 	TokenKind_OpenCode = 256,
-	TokenKind_OpenData,
+	TokenKind_OpenData_r,
+	TokenKind_OpenData_c,
 	TokenKind_Data,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 AXL_LEX_BEGIN_TOKEN_NAME_MAP (TokenName)
-	AXL_LEX_TOKEN_NAME (TokenKind_Eof,       "eof")
-	AXL_LEX_TOKEN_NAME (TokenKind_Error,     "error")
-	AXL_LEX_TOKEN_NAME (TokenKind_OpenCode,  "%{")
-	AXL_LEX_TOKEN_NAME (TokenKind_OpenData,  "%(")
-	AXL_LEX_TOKEN_NAME (TokenKind_Data,      "user-data")
+	AXL_LEX_TOKEN_NAME (TokenKind_Eof,        "eof")
+	AXL_LEX_TOKEN_NAME (TokenKind_Error,      "error")
+	AXL_LEX_TOKEN_NAME (TokenKind_OpenCode,   "%{")
+	AXL_LEX_TOKEN_NAME (TokenKind_OpenData_r, "%(")
+	AXL_LEX_TOKEN_NAME (TokenKind_OpenData_c, "%{")
+	AXL_LEX_TOKEN_NAME (TokenKind_Data,       "user-data")
 AXL_LEX_END_TOKEN_NAME_MAP ();
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

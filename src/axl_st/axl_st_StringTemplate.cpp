@@ -23,21 +23,28 @@ gotoEndOfScriptSnippet (
 	lex::RagelTokenPos* endPos
 	)
 {
-	const Token* token = lexer->getToken ();
-	ASSERT (token->m_token == TokenKind_OpenCode || token->m_token == TokenKind_OpenData);
-
 	int openBracket;
 	int closeBracket;
 	LexerMachineKind machine;
 
-	if (token->m_token == TokenKind_OpenData)
+	const Token* token = lexer->getToken ();
+	switch (token->m_token)
 	{
+	case TokenKind_OpenData_r:
 		openBracket = '(';
 		closeBracket = ')';
 		machine = LexerMachineKind_UserData;
-	}
-	else
-	{
+		break;
+
+	case TokenKind_OpenData_c:
+		openBracket = '{';
+		closeBracket = '}';
+		machine = LexerMachineKind_UserData;
+		break;
+
+	case TokenKind_OpenCode:
+	default:
+		ASSERT (token->m_token == TokenKind_OpenCode);
 		openBracket = '{';
 		closeBracket = '}';
 		machine = LexerMachineKind_UserCode;

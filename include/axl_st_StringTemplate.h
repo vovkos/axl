@@ -209,7 +209,8 @@ protected:
 					pos.m_line--; // fix line cause we have eaten a line-feed with close bracket
 				break;
 
-			case TokenKind_OpenData:
+			case TokenKind_OpenData_r:
+			case TokenKind_OpenData_c:
 				result = gotoEndOfScriptSnippet (&lexer, &pos);
 				if (!result)
 					return false;
