@@ -33,11 +33,18 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbContext: public sl::Handle <libusb_context*, CloseUsbContext>
+class UsbContext: public sl::Handle <
+	libusb_context*, 
+	CloseUsbContext, 
+	sl::MinusOne <libusb_context*> 
+	>
 {
 public:
 	bool
 	create ();
+
+	bool
+	createDefault ();
 
 	void
 	setDebugLevel (int level)
@@ -63,14 +70,7 @@ UsbContext*
 getUsbDefaultContext ()
 {
 	static int32_t flag = 0;
-	return sl::getSimpleSingleton <UsbContext> (&flag);
-}
-
-inline
-bool
-createUsbDefaultContext ()
-{
-	return getUsbDefaultContext ()->create ();
+	return sl::getSingleton <UsbContext> (&flag);
 }
 
 inline

@@ -27,6 +27,19 @@ UsbContext::create ()
 }
 
 bool
+UsbContext::createDefault ()
+{
+	close ();
+
+	int result = libusb_init (NULL);
+	if (result != 0)
+		return err::fail (UsbError ((int) result));
+
+	m_h = NULL;
+	return true;
+}
+
+bool
 UsbContext::handleEvents (uint_t timeout)
 {
 	if (timeout == -1)
