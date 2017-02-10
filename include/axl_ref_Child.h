@@ -37,9 +37,8 @@ public:
 	Child (RefCount* parent)
 	{
 		memset (m_buffer, 0, sizeof (m_buffer));
-		T* p = AXL_REF_INPLACE_NEW (m_buffer, 0);
+		T* p = AXL_REF_NEW_INPLACE (T, m_buffer, parent, 0);
 		p->addRef ();
-		p->addWeakRef ();
 	}
 
 	~Child ()
@@ -66,15 +65,7 @@ public:
 
 	T* p ()
 	{
-		return (Object*) m_buffer;
-	}
-
-protected:
-	static
-	void
-	free (void* p)
-	{
-		((Object*) p)->m_parent->weakRelease ();
+		return (T*) m_buffer;
 	}
 };
 

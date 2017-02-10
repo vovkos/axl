@@ -51,10 +51,12 @@ template <typename T>
 T*
 primeInPlaceRefCount (
 	T* p,
+	RefCount* parent,
 	uint_t flags
 	)
 {
-	p->prime (NULL, flags);
+	ASSERT (p);
+	p->prime (parent, flags);
 	return p;
 }
 
@@ -87,8 +89,8 @@ primeInPlaceRefCount (
 #define AXL_REF_NEW_EXTRA(T, extra) \
 	(axl::ref::primeAllocatedRefCount (new (AXL_REF_ALLOCATE_EXTRA (T, extra)) T))
 
-#define AXL_REF_NEW_INPLACE(T, p, flags) \
-	(axl::ref::primeInPlaceRefCount (new (p) T, flags))
+#define AXL_REF_NEW_INPLACE(T, p, parent, flags) \
+	(axl::ref::primeInPlaceRefCount (new (p) T, parent, flags))
 
 #define AXL_REF_NEW_ARGS(T, args) \
 	(axl::ref::primeAllocatedRefCount (new (AXL_REF_ALLOCATE (T)) T args))
@@ -96,8 +98,8 @@ primeInPlaceRefCount (
 #define AXL_REF_NEW_ARGS_EXTRA(T, args, extra) \
 	(axl::ref::primeAllocatedRefCount (new (AXL_REF_ALLOCATE_EXTRA (T, extra)) T args))
 
-#define AXL_REF_NEW_ARGS_INPLACE(T, args, p, flags) \
-	(axl::ref::primeInPlaceRefCount (new (p) T args,  flags))
+#define AXL_REF_NEW_ARGS_INPLACE(T, args, p, parent, flags) \
+	(axl::ref::primeInPlaceRefCount (new (p) T args, parent, flags))
 
 //..............................................................................
 

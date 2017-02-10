@@ -32,10 +32,19 @@ RefCount::prime (
 	uint_t flags
 	)
 {
-	ASSERT (!parent || parent < this);
 	ASSERT (m_refCount == 0); // should only be called once in the very beginning
 
-	m_parentOffset = parent ? (char*) this - (char*) parent : 0;
+	if (!parent)
+	{
+		m_parentOffset = 0;
+	}
+	else
+	{
+		ASSERT (parent < this);
+		m_parentOffset = (char*) this - (char*) parent;
+		parent->addWeakRef ();
+	}
+
 	m_flags = flags;
 }
 

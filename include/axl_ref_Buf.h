@@ -549,7 +549,7 @@ public:
 		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof (ref::BufHdr);
 
-		Ptr <Hdr> hdr = AXL_REF_NEW_INPLACE (Hdr, p, flags);
+		Ptr <Hdr> hdr = AXL_REF_NEW_INPLACE (Hdr, p, NULL, flags);
 		hdr->m_bufferSize = bufferSize;
 
 		if (this->m_hdr)
