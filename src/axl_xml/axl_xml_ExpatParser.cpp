@@ -57,7 +57,7 @@ ExpatParserRoot::parseFile (
 
 	// round-up block size
 
-	size_t alignFactor = g::g_module.getSystemInfo ()->m_mappingAlignFactor;
+	size_t alignFactor = g::getModule ()->getSystemInfo ()->m_mappingAlignFactor;
 	blockSize = (blockSize + alignFactor - 1) & ~(alignFactor - 1);
 
 	result = mappedFile.open (fileName, 0, 0, io::FileFlag_ReadOnly);
