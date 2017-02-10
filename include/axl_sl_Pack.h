@@ -33,10 +33,12 @@ public:
 		axl_va_list va
 		)
 	{
+		T a = va.arg <T> ();
+
 		*size = sizeof (T);
 
 		if (p)
-			*(T*) p = va.arg <T> ();
+			*(T*) p = a;
 
 		return va;
 	}
@@ -55,6 +57,8 @@ public:
 		axl_va_list va
 		)
 	{
+		int n = va.arg <int> ();
+
 		*size = sizeof (T);
 
 		if (p)
