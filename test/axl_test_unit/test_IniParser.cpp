@@ -10,8 +10,9 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_IniParser {
+namespace {
 
 //..............................................................................
 
@@ -36,12 +37,12 @@ protected:
 		KeyKind_SessionClass,
 	};
 
-	AXL_SL_BEGIN_HASH_TABLE_MAP_STRING (SectionNameMap, SectionKind)
+	AXL_SL_BEGIN_STRING_HASH_TABLE_MAP (SectionNameMap, SectionKind)
 		AXL_SL_HASH_TABLE_MAP_ENTRY ("session", SectionKind_Session)
 		AXL_SL_HASH_TABLE_MAP_ENTRY ("scripts", SectionKind_Scripts)
 	AXL_SL_END_HASH_TABLE_MAP ()
 
-	AXL_SL_BEGIN_HASH_TABLE_MAP_STRING (KeyNameMap, KeyKind)
+	AXL_SL_BEGIN_STRING_HASH_TABLE_MAP (KeyNameMap, KeyKind)
 		AXL_SL_HASH_TABLE_MAP_ENTRY ("name", KeyKind_Name)
 		AXL_SL_HASH_TABLE_MAP_ENTRY ("description", KeyKind_Description)
 		AXL_SL_HASH_TABLE_MAP_ENTRY ("guid", KeyKind_Guid)
@@ -84,7 +85,7 @@ run ()
 	result = file.open (filePath, io::FileFlag_ReadOnly);
 	if (!result)
 	{
-		printf ("error opening file: %s\n", err::getError ()->getDescription ().cc ());
+		printf ("error opening file: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -92,14 +93,16 @@ run ()
 	uint64_t size = file.getSize ();
 
 	MyParser parser;
-	result = parser.parse (filePath, p, (size_t) size);
+	result = parser.parse (filePath, sl::StringRef (p, (size_t) size));
 	if (!result)
 	{
-		printf ("error parsing file: %s\n", err::getError ()->getDescription ().cc ());
+		printf ("error parsing file: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 }
 
 //..............................................................................
 
-} // namespace test_IniParser
+ADD_TEST_CASE ("test_IniParser", run)
+
+}

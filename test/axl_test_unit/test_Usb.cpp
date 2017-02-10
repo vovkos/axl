@@ -10,8 +10,9 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_Usb {
+namespace {
 
 //..............................................................................
 
@@ -20,18 +21,18 @@ run ()
 {
 	bool result;
 
-	io::UsbContext context;
+	io::getUsbDefaultContext ()->createDefault ();
 
 	io::UsbDeviceList deviceList;
-	size_t count = deviceList.enumerateDevices (context);
+	size_t count = deviceList.enumerateDevices ();
 	if (count == -1)
 	{
-		printf ("Cannot enumerate USB devices (%s)\n", err::getError ()->getDescription ().cc ());
+		printf ("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
 	sl::String bufferString;
-	bufferString.getBuffer (4096);
+	bufferString.createBuffer (4096);
 
 	libusb_device** pp = deviceList;
 	for (; *pp; pp++)
@@ -56,18 +57,20 @@ run ()
 
 		result = device.getStringDesrciptor (descriptor.iManufacturer, &bufferString);
 		if (result)
-			printf ("\tManufacturer:  %s\n", bufferString.cc ());
+			printf ("\tManufacturer:  %s\n", bufferString.sz ());
 
 		result = device.getStringDesrciptor (descriptor.iProduct, &bufferString);
 		if (result)
-			printf ("\tProduct name:  %s\n", bufferString.cc ());
+			printf ("\tProduct name:  %s\n", bufferString.sz ());
 
 		result = device.getStringDesrciptor (descriptor.iSerialNumber, &bufferString);
 		if (result)
-			printf ("\tSerial number: %s\n", bufferString.cc ());
+			printf ("\tSerial number: %s\n", bufferString.sz ());
 	}
 }
 
 //..............................................................................
 
-} // namespace test_Vso
+ADD_TEST_CASE ("test_Usb", run)
+
+}

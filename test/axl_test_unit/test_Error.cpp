@@ -10,52 +10,45 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_RbTree {
+namespace {
 
 //..............................................................................
-
-struct Base: sl::ListLink
-{
-	int a, b;
-};
-
-struct Derived: Base
-{
-	int c, d;
-};
 
 void
 run ()
 {
-	sl::Iterator <Derived> itDerived;
-	sl::Iterator <Base> itBase;
+	err::Error error;
 
-	itBase = itDerived;
+	error.pack <sl::PackSeq_4 <
+		const char*,
+		int,
+		const char*,
+		int
+		> > (
+		sl::g_nullGuid,
+		12345,
+		"hui", 0xdead, "govno", 0xbeaf
+		);
 
-	sl::RbTreeMap <int, int> tree;
-	sl::RbTreeMap <int, int>::Iterator it;
+	sl::String s = enc::HexEncoding::encode (error.cp (), error.getSize ());
+	printf ("error: %s\n", s.sz ());
 
-	for (size_t i = 0; i < 50; i++)
-		tree.visit (rand () % 50);
+	err::Error error2;
+	error2.format (
+		sl::g_nullGuid,
+		12345,
+		"%s %d %s %d",
+		"hui", 0xdead, "govno", 0xbeaf
+		);
 
-	it = tree.getHead ();
-	for (; it; it++)
-		printf ("%d\n", it->m_key);
-
-	printf (".........\n");
-
-	for (size_t i = 0; i < 50; i++)
-		tree.eraseKey (rand () % 50);
-
-	it = tree.getHead ();
-	for (; it; it++)
-		printf ("%d\n", it->m_key);
-
-	printf (".........\n");
+	s = enc::HexEncoding::encode (error.cp (), error.getSize ());
+	printf ("error: %s\n", s.sz ());
 }
-
 
 //..............................................................................
 
-} // namespace test_RbTree
+ADD_TEST_CASE ("test_Error", run)
+
+}

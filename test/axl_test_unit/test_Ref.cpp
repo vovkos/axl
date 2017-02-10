@@ -10,8 +10,9 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_Ref {
+namespace {
 
 //..............................................................................
 
@@ -24,27 +25,27 @@ public:
 public:
 	MyClass ()
 	{
-		printf ("CMyClass::CMyClass ()\n");
+		printf ("MyClass::MyClass ()\n");
 		m_x = 0;
 		m_y = 0;
 	}
 
 	MyClass (const MyClass& src)
 	{
-		printf ("CMyClass::CMyClass (const CMyClass&)\n");
+		printf ("MyClass::MyClass (const MyClass&)\n");
 		m_x = src.m_x;
 		m_y = src.m_y;
 	}
 
 	~MyClass ()
 	{
-		printf ("CMyClass::~CMyClass ()\n");
+		printf ("MyClass::~MyClass ()\n");
 	}
 
 	MyClass&
 	operator = (const MyClass& src)
 	{
-		printf ("CMyClass::operator = (const CMyClass&)\n");
+		printf ("MyClass::operator = (const MyClass&)\n");
 		m_x = src.m_x;
 		m_y = src.m_y;
 
@@ -58,11 +59,31 @@ class DcbGetSize
 {
 public:
 	size_t
-	operator () (const DCB& dcb)
+	operator () (const DCB* dcb)
 	{
-		return dcb.DCBlength;
+		return dcb->DCBlength;
 	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class Point: public POINT
+{
+public:
+	Point ()
+	{
+		printf ("CPoint::CPoint ()\n");
+		x = 10;
+		y = 20;
+	}
+
+	~Point ()
+	{
+		printf ("CPoint::~CPoint ()\n");
+	}
+};
+
+typedef ref::Buf <Point> PointBuf;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -95,7 +116,7 @@ run_Buf ()
 
 	ref::Buf <MyClass> b1;
 
-	b1 = a;
+	b1 = &a;
 	b1->m_x = 10;
 	b1->m_y = 20;
 
@@ -107,6 +128,30 @@ run_Buf ()
 //	b1.GetBuffer ();
 
 	//b2 = b1;
+
+	size_t bufSize = sizeof (Point) + sizeof (ref::BufHdr);
+	PointBuf point (ref::BufKind_Stack, _alloca (bufSize), bufSize);
+	
+	point = &Point ();
+
+	PointBuf point2 = point;
+
+	printf ("point: %p, %d, %d\n", point.cp (), point->x, point->y);
+	printf ("point2: %p, %d, %d\n", point.cp (), point2->x, point2->y);
+
+	point2->x *= 10;
+	point2->y *= 10;
+
+	printf ("point: %d, %d\n", point->x, point->y);
+	printf ("point2: %d, %d\n", point2->x, point2->y);
+
+	char buf [80];
+	sl::String string (ref::BufKind_Stack, buf, sizeof (buf));
+
+	string.format ("hui %d %d %d", 1, 2, 3);
+	string.append ("govno");
+	string.append ("muravei");
+
 }
 
 //..............................................................................
@@ -116,12 +161,12 @@ class MyClass2: public ref::RefCount
 public:
 	MyClass2 ()
 	{
-		printf ("CMyClass2::CMyClass2 ()\n");
+		printf ("MyClass2::MyClass2 ()\n");
 	}
 
 	~MyClass2 ()
 	{
-		printf ("CMyClass2::CMyClass2 ()\n");
+		printf ("MyClass2::MyClass2 ()\n");
 	}
 };
 
@@ -131,48 +176,11 @@ void
 run_WeakRef ()
 {
 	ref::Ptr <MyClass2> p = AXL_REF_NEW (MyClass2);
-//	ref::CPtrT <CMyClass2> p2 = ref::GetPtrOrClone ((CMyClass2*) p);
-//	ref::CPtrT <CMyClass2> p3 = ref::Clone (p);
+//	ref::CPtrT <MyClass2> p2 = ref::GetPtrOrClone ((MyClass2*) p);
+//	ref::CPtrT <MyClass2> p3 = ref::Clone (p);
 	ref::WeakPtr <MyClass2> w = p;
 	p = ref::PtrKind_Null;
 	p = w;
-}
-
-//..............................................................................
-
-class C1
-{
-	operator int* ()
-	{
-		return NULL;
-	}
-};
-
-template <typename T>
-void tempFunc (T* p)
-{
-}
-
-class MyClass3: public ref::RefCount
-{
-public:
-	int m_x;
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-void
-run_Clone ()
-{
-	ref::Ptr <MyClass3> a, b;
-
-	a = AXL_REF_NEW (MyClass3);
-	a->m_x = 10;
-
-	a->addRef ();
-	a->addWeakRef ();
-
-//	b = ref::Clone (a);
 }
 
 //..............................................................................
@@ -190,19 +198,19 @@ class MyClass4: public IMyInterface
 {
 public:
 	MyClass4 ()
-		{ printf ("CMyClass4::CMyClass4 ()\n"); }
+		{ printf ("MyClass4::MyClass4 ()\n"); }
 
 	~MyClass4 ()
-		{ printf ("CMyClass4::~CMyClass4 ()\n"); }
+		{ printf ("MyClass4::~MyClass4 ()\n"); }
 
 	ref::Ptr <IMyInterface> getChild (int i)
 		{ return ref::PtrKind_Null; }
 
 	virtual void doSomething ()
-		{ printf ("CMyClass4::DoSomething ()\n"); }
+		{ printf ("MyClass4::doSomething ()\n"); }
 
 	virtual void doSomethingElse ()
-		{ printf ("CMyClass4::DoSomethingElse ()\n"); }
+		{ printf ("MyClass4::doSomethingElse ()\n"); }
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -221,10 +229,10 @@ public:
 		m_child1 (this),
 		m_child2 (this),
 		m_child3 (this)
-		{ printf ("CMyContainer::CMyContainer ()\n"); }
+		{ printf ("MyContainer::MyContainer ()\n"); }
 
 	~MyContainer ()
-		{ printf ("CMyContainer::~CMyContainer ()\n"); }
+		{ printf ("MyContainer::~MyContainer ()\n"); }
 
 	ref::Ptr <IMyInterface> getChild (int i)
 	{
@@ -245,10 +253,10 @@ public:
 	}
 
 	virtual void doSomething ()
-		{ printf ("CMyContainer::DoSomething ()\n"); }
+		{ printf ("MyContainer::doSomething ()\n"); }
 
 	virtual void doSomethingElse ()
-		{ printf ("CMyContainer::DoSomethingElse ()\n"); }
+		{ printf ("MyContainer::doSomethingElse ()\n"); }
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -267,10 +275,10 @@ public:
 		m_child1 (this),
 		m_child2 (this),
 		m_child3 (this)
-		{ printf ("CMySuperContainer::CMySuperContainer ()\n"); }
+		{ printf ("MySuperContainer::MySuperContainer ()\n"); }
 
 	~MySuperContainer ()
-		{ printf ("CMySuperContainer::~CMySuperContainer ()\n"); }
+		{ printf ("MySuperContainer::~MySuperContainer ()\n"); }
 
 	ref::Ptr <IMyInterface> getChild (int i)
 	{
@@ -291,10 +299,10 @@ public:
 	}
 
 	virtual void doSomething ()
-		{ printf ("CMySuperContainer::DoSomething ()\n"); }
+		{ printf ("MySuperContainer::doSomething ()\n"); }
 
 	virtual void doSomethingElse ()
-		{ printf ("CMySuperContainer::DoSomethingElse ()\n"); }
+		{ printf ("MySuperContainer::doSomethingElse ()\n"); }
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -313,15 +321,15 @@ run_Container ()
 	p->getChild (1)->doSomething ();
 	p->getChild (1)->doSomethingElse ();
 
-	p2 = p->getChild (2);
+//	p2 = p->getChild (2);
 
 	p->getChild (2)->doSomething ();
 	p->getChild (2)->doSomethingElse ();
 
 	p = ref::PtrKind_Null;
 
-	p2->doSomething ();
-	p2 = ref::PtrKind_Null;
+//	p2->doSomething ();
+//	p2 = ref::PtrKind_Null;
 
 	p3 = AXL_REF_NEW (ref::Box <MyClass4>);
 
@@ -331,10 +339,20 @@ run_Container ()
 	p3 = ref::PtrKind_Null;
 
 	p = w;
+}
 
-//	w.Detach ();
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+run ()
+{
+	run_Buf ();
+	run_WeakRef ();
+	run_Container ();
 }
 
 //..............................................................................
+
+ADD_TEST_CASE ("test_Ref", run)
 
 } // namespace test_Ref

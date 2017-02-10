@@ -10,8 +10,9 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_CmdLineParser {
+namespace  {
 
 //..............................................................................
 
@@ -38,19 +39,19 @@ class MyParser: public sl::CmdLineParser <MyParser, Switchable>
 {
 public:
 	bool
-	onValue (const char* value)
+	onValue (const sl::StringRef& value)
 	{
-		printf ("OnValue '%s'\n", value);
+		printf ("OnValue '%s'\n", value.sz ());
 		return true;
 	}
 
 	bool
 	onSwitch (
 		SwitchKind switchKind,
-		const char* value
+		const sl::StringRef& value
 		)
 	{
-		printf ("OnSwitch #%d = '%s'\n", switchKind, value);
+		printf ("OnSwitch #%d = '%s'\n", switchKind, value.sz ());
 		return true;
 	}
 };
@@ -75,4 +76,6 @@ run ()
 
 //..............................................................................
 
-} // namespace test_CmdLineParser
+ADD_TEST_CASE ("test_CmdLineParser", run)
+
+}

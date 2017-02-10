@@ -10,40 +10,33 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_StringTemplate {
+namespace {
 
 //..............................................................................
 
 void
-run (const char* fileName)
+run ()
 {
-	bool result;
+	printf ("hui govno i muravei\n");
 
-	io::MappedFile file;
-	result = file.open (fileName, io::FileFlag_ReadOnly);
-	if (!result)
+	sl::HandleTable <int> handleTable (0xffffffff);
+
+	handle_t h1 = handleTable.add (100);
+	handle_t h2 = handleTable.add (200);
+	handle_t h3 = handleTable.add (300);
+	handle_t h4 = handleTable.add (400);
+
+	sl::Iterator <sl::HandleTable <int>::Entry> it = handleTable.getList ().getHead ();
+	for (; it; it++)
 	{
-		printf ("%s\n", err::getError ()->getDescription ());
-		return;
+		printf ("0x%x = %d\n", it->getHandle (), it->m_value);
 	}
-
-	char* p = (char*) file.view ();
-	size_t size = (size_t) file.getSize ();
-
-	lua::StringTemplate st;
-
-	sl::String resultString;
-	result = st.process (&resultString, fileName, p, size);
-	if (!result)
-	{
-		printf ("error processing string template: %s\n", err::getError ()->getDescription ());
-		return;
-	}
-
-	printf ("result string:\n%s\n", resultString);
 }
 
 //..............................................................................
 
-} // namespace test_StringTemplate
+ADD_TEST_CASE ("test_HandleTable", run)
+
+}

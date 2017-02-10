@@ -10,10 +10,9 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-#include <string>
-
-namespace test_Crypto {
+namespace {
 
 //..............................................................................
 
@@ -24,17 +23,18 @@ void run ()
 
 	cry::BigNum privateKey = key.getPrivateKey ();
 	cry::EcPoint publicKey = key.getPublicKey ();
-	printf ("private: %s\n", privateKey.getHexString ().cc ());
-	printf ("public:  %s\n", publicKey.getHexString (key.getGroup ()).cc ());
+	printf ("private: %s\n", privateKey.getHexString ().sz ());
+	printf ("public:  %s\n", publicKey.getHexString (key.getGroup ()).sz ());
 
 	const char* userName = "Vovkos";
 
 	sl::String productKey = generateEcProductKey (key, userName);
 	printf ("user:    %s\n", userName);
-	printf ("license: %s\n", productKey.cc ());
+	printf ("license: %s\n", productKey.sz ());
 
 	bool result = verifyEcProductKey (key, userName, productKey);
 	printf ("verify:  %d\n", result);
+	ASSERT (result);
 
 	privateKey.detach ();
 	publicKey.detach ();
@@ -43,4 +43,6 @@ void run ()
 
 //..............................................................................
 
-} // namespace test_Vso
+ADD_TEST_CASE ("test_Crypto", run)
+
+}

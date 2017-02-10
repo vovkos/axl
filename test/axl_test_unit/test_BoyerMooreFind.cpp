@@ -10,8 +10,9 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_BoyerMooreFind {
+namespace {
 
 //..............................................................................
 
@@ -23,12 +24,12 @@ void run ()
 	char needle [] = "muravei";
 
 	uint_t flags =
-//		sl::TextBoyerMooreFind::Flag_Reverse |
-//		sl::TextBoyerMooreFind::Flag_CaseInsensitive |
-		sl::TextBoyerMooreFind::Flag_WholeWord |
+//		sl::TextBoyerMooreFlag_Reverse |
+//		sl::TextBoyerMooreFlag_CaseInsensitive |
+		sl::TextBoyerMooreFlag_WholeWord |
 		0;
 
-	find.setPattern (needle, lengthof (needle), flags);
+	find.setPattern (sl::StringRef (needle, lengthof (needle)), flags);
 
 	size_t result = -1;
 	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
@@ -36,13 +37,13 @@ void run ()
 #if 1
 	for (size_t i = 0; i < lengthof (haystack); i++)
 	{
-		result = find.find (&incrementalContext, i, haystack + i, 1);
+		result = find.find (&incrementalContext, i, sl::StringRef (haystack + i, 1));
 		if (result != -1)
 			break;
 	}
 
-	if (result == -1 && (flags & sl::TextBoyerMooreFind::Flag_WholeWord) != 0)
-		result = find.find (&incrementalContext, lengthof (haystack), " ", 1);
+	if (result == -1 && (flags & sl::TextBoyerMooreFlag_WholeWord) != 0)
+		result = find.find (&incrementalContext, lengthof (haystack), sl::StringRef (" ", 1));
 
 #elif 0
 	for (intptr_t i = lengthof (haystack) - 1; i >= 0; i--)
@@ -60,10 +61,12 @@ void run ()
 
 	printf ("result = %d\n", result);
 
-	result = find.find (haystack, lengthof (haystack));
+	result = find.find (sl::StringRef (haystack, lengthof (haystack)));
 	printf ("result = %d\n", result);
 }
 
 //..............................................................................
 
-} // namespace test_Vso
+ADD_TEST_CASE ("test_BoyerMooreFind", run)
+
+}

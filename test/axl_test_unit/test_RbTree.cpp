@@ -10,30 +10,55 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_HandleTable {
+namespace {
 
 //..............................................................................
+
+struct Base: sl::ListLink
+{
+	int a, b;
+};
+
+struct Derived: Base
+{
+	int c, d;
+};
 
 void
 run ()
 {
-	printf ("hui govno i muravei\n");
+	sl::Iterator <Derived> itDerived;
+	sl::Iterator <Base> itBase;
 
-	sl::HandleTable <int> handleTable (0xffffffff);
+	itBase = itDerived;
 
-	handle_t h1 = handleTable.add (100);
-	handle_t h2 = handleTable.add (200);
-	handle_t h3 = handleTable.add (300);
-	handle_t h4 = handleTable.add (400);
+	sl::RbTreeMap <int, int> tree;
+	sl::RbTreeMap <int, int>::Iterator it;
 
-	sl::Iterator <sl::HandleTable <int>::Entry> it = handleTable.getList ().getHead ();
+	for (size_t i = 0; i < 50; i++)
+		tree.visit (rand () % 50);
+
+	it = tree.getHead ();
 	for (; it; it++)
-	{
-		printf ("0x%x = %d\n", it->getHandle (), it->m_value);
-	}
+		printf ("%d\n", it->m_key);
+
+	printf (".........\n");
+
+	for (size_t i = 0; i < 50; i++)
+		tree.eraseKey (rand () % 50);
+
+	it = tree.getHead ();
+	for (; it; it++)
+		printf ("%d\n", it->m_key);
+
+	printf (".........\n");
 }
+
 
 //..............................................................................
 
-} // namespace test_HandleTable
+ADD_TEST_CASE ("test_RbTree", run)
+
+}

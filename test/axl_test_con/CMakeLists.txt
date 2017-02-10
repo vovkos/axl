@@ -10,56 +10,23 @@
 #...............................................................................
 
 #
-# src folder
+# app folder
 #
 
 set (
-	SRC_H_LIST
-	test.h
+	APP_H_LIST
 	)
 
 set (
-	SRC_CPP_LIST
+	APP_CPP_LIST
 	main.cpp
-	test_BoyerMooreFind.cpp
-	test_Crypto.cpp
-	test_CmdLineParser.cpp
-	test_Error.cpp
-	test_File.cpp
-	test_Finalizer.cpp
-	test_ForEach.cpp
-	test_Function.cpp
-	test_HandleTable.cpp
-	test_HashTable.cpp
-	test_IniParser.cpp
-	test_List.cpp
-	test_Log.cpp
-	test_Packer.cpp
-	test_Packetizer.cpp
-	test_Parse.cpp
-	test_RbTree.cpp
-	test_Ref.cpp
-	test_Scheduler.cpp
-	test_Sock.cpp
-	test_String.cpp
-	test_StringTemplate.cpp
-	test_Timer.cpp
-	test_Usb.cpp
-	test_Vso.cpp
-	test_Window.cpp
-	test_WorkerThread.cpp
 	)
 
 source_group (
-	src
+	app
 	FILES
-	${SRC_H_LIST}
-	${SRC_CPP_LIST}
-	)
-
-axl_exclude_from_build (
-	test_Log.cpp
-	test_Packer.cpp
+	${APP_H_LIST}
+	${APP_CPP_LIST}
 	)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -79,47 +46,106 @@ source_group (
 
 #...............................................................................
 #
-# axl_test_con compiler test
+# axl_test_con app
 #
 
-include_directories (
-	${LUA_INC_DIR}
-	${LIBUSB_INC_DIR}
-	${OPENSSL_INC_DIR}
-	${AXL_INC_DIR}
-	)
+include_directories (${AXL_INC_DIR})
+link_directories (${AXL_LIB_DIR})
 
-link_directories (
-	${LUA_LIB_DIR}
-	${LIBUSB_LIB_DIR}
-	${OPENSSL_LIB_DIR}
-	)
+if (BUILD_AXL_IO_USB)
+	include_directories (${LIBUSB_INC_DIR})
+	link_directories (${LIBUSB_LIB_DIR})
+	add_definitions (-D_AXL_IO_USB=1)
+endif ()
+
+if (BUILD_AXL_XML)
+	include_directories (${EXPAT_INC_DIR})
+	link_directories (${EXPAT_LIB_DIR})
+	add_definitions (-D_AXL_XML=1)
+endif ()
 
 add_executable (
 	axl_test_con
 	${PCH_H}
 	${PCH_CPP}
-	${SRC_H_LIST}
-	${SRC_CPP_LIST}
+	${APP_H_LIST}
+	${APP_CPP_LIST}
 	)
+
+set_target_properties (
+	axl_test_con
+	PROPERTIES
+	FOLDER test
+	)
+
+if (BUILD_AXL_XML)
+	target_link_libraries (
+		axl_test_con
+		axl_xml
+		expat
+		)
+endif ()
 
 target_link_libraries (
 	axl_test_con
-	axl_core
-	axl_gui
-	axl_ini
 	axl_io
-	axl_lua
-	axl_cry
-	${LUA_LIB_NAME}
-	libeay32MTd
+	axl_fsm
+	axl_zip
+	axl_core
 	)
 
 if (WIN32)
 	target_link_libraries (
 		axl_test_con
-		libusb-1.0
+		setupapi
 		)
+endif ()
+
+if (UNIX)
+	target_link_libraries (
+		axl_test_con
+		pthread
+		dl
+		)
+
+	if (LINUX AND LIBUDEV_FOUND)
+		target_link_libraries (
+			axl_test_con
+			udev
+			)
+	endif ()
+
+	if (APPLE)
+		find_library (CORE_FOUNDATION_FRAMEWORK CoreFoundation)
+		find_library (IOKIT_FRAMEWORK IOKit)
+
+		target_link_libraries (
+			axl_test_con
+			axl_cf
+			axl_iok
+			${CORE_FOUNDATION_FRAMEWORK}
+			${IOKIT_FRAMEWORK}
+			)
+	else ()
+		target_link_libraries (
+			axl_test_con
+			rt
+			)
+	endif ()
+endif ()
+
+if (BUILD_AXL_IO_USB)
+	if (WIN32)
+		target_link_libraries (
+			axl_test_con
+			libusb-1.0
+			)
+	else ()
+		target_link_libraries (
+			axl_test_con
+			usb-1.0
+			)
+	endif ()
 endif ()
 
 axl_set_pch (

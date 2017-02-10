@@ -10,18 +10,46 @@
 //..............................................................................
 
 #include "pch.h"
+#include "test.h"
 
-namespace test_ForEach {
+namespace {
 
 //..............................................................................
+
+class MyFinalizer:
+	public ref::RefCount,
+	public g::Finalizer
+{
+public:
+	MyFinalizer ()
+	{
+		printf ("MyFinalizer::MyFinalizer (this = %x)\n", this);
+	}
+
+	~MyFinalizer ()
+	{
+		printf ("MyFinalizer::~MyFinalizer (this = %x)\n", this);
+	}
+
+	virtual
+	void
+	finalize ()
+	{
+		printf ("MyFinalizer::finalize (this = %x)\n", this);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 run ()
 {
-	char buffer [] = "hui govno i muravei";
-
+	ref::Ptr <MyFinalizer> fin = AXL_REF_NEW (MyFinalizer);
+	g::getModule ()->addFinalizer (fin);
 }
 
 //..............................................................................
 
-} // namespace test_ForEach
+ADD_TEST_CASE ("test_Finalizer", run)
+
+}
