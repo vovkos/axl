@@ -1483,9 +1483,15 @@ public:
 	reduceLength (size_t delta)
 	{
 		if (this->m_length <= delta)
+		{
 			clear ();
+		}
 		else
-			setReducedLength (this->m_length - delta);
+		{
+			bool result = setReducedLength (this->m_length - delta);
+			if (!result)
+				return -1;
+		}
 
 		return this->m_length;
 	}
@@ -1493,11 +1499,8 @@ public:
 	bool
 	setReducedLength (size_t length)
 	{
-		if (length >= this->m_length)
-		{
-			ASSERT (length == this->m_length); // misuse otherwise
+		if (length == this->m_length)
 			return true;
-		}
 
 		if (!length)
 		{
@@ -1505,7 +1508,8 @@ public:
 			return true;
 		}
 
-		ASSERT (this->m_p && this->m_hdr);
+		ASSERT (this->m_p && this->m_hdr);		
+		ASSERT (length < this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C)); // misuse otherwise
 
 		bool isNullTerminated = !this->m_p [length];
 		if (!isNullTerminated && this->m_hdr->getRefCount () == 1)
@@ -1539,10 +1543,10 @@ public:
 
 		if (length)
 		{
-			size_t fullLength = this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C);
-			ASSERT (fullLength);
+			size_t bufferLength = this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C);
+			ASSERT (bufferLength);
 
-			*length = fullLength - 1;
+			*length = bufferLength - 1;
 		}
 
 		return p;
@@ -1610,7 +1614,7 @@ public:
 		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof (ref::BufHdr);
 
-		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_INPLACE (ref::BufHdr, p, flags);
+		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_INPLACE (ref::BufHdr, p, NULL, flags);
 		hdr->m_bufferSize = bufferSize;
 
 		if (this->m_hdr)
