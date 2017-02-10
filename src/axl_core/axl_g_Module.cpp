@@ -23,6 +23,21 @@ initQpc ();
 
 namespace g {
 
+//.............................................................................
+
+// ensure module creation at startup
+
+class ModuleCreator
+{
+public:
+	ModuleCreator ()
+	{
+		getModule ();
+	}
+};
+
+static ModuleCreator g_moduleCreator;
+
 //..............................................................................
 
 Module::Module ()
@@ -43,11 +58,9 @@ Module::Module ()
 	sys::initQpc ();
 
 #elif (_AXL_OS_POSIX)
-
 	m_systemInfo.m_processorCount     = sysconf (_SC_NPROCESSORS_ONLN);
 	m_systemInfo.m_pageSize           = sysconf (_SC_PAGE_SIZE);
 	m_systemInfo.m_mappingAlignFactor = sysconf (_SC_PAGE_SIZE);
-
 #endif
 }
 

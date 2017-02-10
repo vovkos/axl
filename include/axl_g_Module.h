@@ -125,13 +125,15 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SELECT_ANY Module g_module;
-
 inline
 Module*
 getModule ()
 {
-	return &g_module;
+	// guaranteed to be thread safe since C++11 
+	// otherwise it's still OK -- unless going MT in static constructors
+
+	static Module module; 
+	return &module;
 }
 
 //..............................................................................
