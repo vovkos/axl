@@ -38,8 +38,6 @@ run ()
 
 	char data [] = "papapaapak:\xf\0\0\0pizda ivanovna";
 
-	srand (::GetTickCount ());
-
 	for (size_t i = 0; i < 64; i++)
 	{
 		char* p = data;

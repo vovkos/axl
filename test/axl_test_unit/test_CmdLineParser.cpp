@@ -12,30 +12,30 @@
 #include "pch.h"
 #include "test.h"
 
-namespace  {
+namespace {
 
 //..............................................................................
 
-enum SwitchKind
+enum MySwitchKind
 {
-	SwitchKind_Help,
-	SwitchKind_SessionProvider,
-	SwitchKind_SessionFile,
-	SwitchKind_LogFile,
+	MySwitchKind_Help,
+	MySwitchKind_SessionProvider,
+	MySwitchKind_SessionFile,
+	MySwitchKind_LogFile,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (Switchable, SwitchKind)
-	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_Help, "h", "help", NULL, "Display help")
-	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
-	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_SessionFile, "f", "session-file", "<file>", "Specify session file")
-	AXL_SL_CMD_LINE_SWITCH_2 (SwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
+AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (MySwitchTable, MySwitchKind)
+	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_Help, "h", "help", NULL, "Display help")
+	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
+	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_SessionFile, "f", "session-file", "<file>", "Specify session file")
+	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
 AXL_SL_END_CMD_LINE_SWITCH_TABLE ()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyParser: public sl::CmdLineParser <MyParser, Switchable>
+class MyParser: public sl::CmdLineParser <MyParser, MySwitchTable>
 {
 public:
 	bool

@@ -88,23 +88,92 @@ add_executable (
 
 target_link_libraries (
 	axl_test_unit
-	axl_core
 	axl_gui
 	axl_ini
-	axl_io
-	axl_lua
-	axl_cry
-	axl_lex
 	axl_st
+	axl_lua
+	axl_lex
+	axl_cry
+	axl_io
+	axl_core
 	${LUA_LIB_NAME}
-	libeay32MTd
 	)
 
 if (WIN32)
 	target_link_libraries (
 		axl_test_unit
-		libusb-1.0
+		setupapi
 		)
+endif ()
+
+if (UNIX)
+	target_link_libraries (
+		axl_test_unit
+		pthread
+		dl
+		)
+
+	if (LINUX AND LIBUDEV_FOUND)
+		target_link_libraries (
+			axl_test_unit
+			udev
+			)
+	endif ()
+
+	if (APPLE)
+		find_library (CORE_FOUNDATION_FRAMEWORK CoreFoundation)
+		find_library (IOKIT_FRAMEWORK IOKit)
+
+		target_link_libraries (
+			axl_test_unit
+			axl_cf
+			axl_iok
+			${CORE_FOUNDATION_FRAMEWORK}
+			${IOKIT_FRAMEWORK}
+			)
+	else ()
+		target_link_libraries (
+			axl_test_unit
+			rt
+			)
+	endif ()
+endif ()
+
+if (BUILD_AXL_IO_USB)
+	if (WIN32)
+		target_link_libraries (
+			axl_test_unit
+			libusb-1.0
+			)
+	else ()
+		target_link_libraries (
+			axl_test_unit
+			usb-1.0
+			)
+	endif ()
+endif ()
+
+if (BUILD_AXL_CRY)
+	if (WIN32)
+		target_link_libraries (
+			axl_test_unit
+			libeay32MT
+			)
+	elseif (UNIX)
+		target_link_libraries (
+			axl_test_unit
+			crypto
+			dl
+			pthread
+			)
+
+		if (NOT APPLE)
+			target_link_libraries (
+				axl_test_unit
+				rt
+				)
+		endif ()
+	endif ()
 endif ()
 
 axl_set_pch (

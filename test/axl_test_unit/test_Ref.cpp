@@ -55,6 +55,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+#if (_AXL_OS_WIN)
+
 class DcbGetSize
 {
 public:
@@ -65,21 +67,27 @@ public:
 	}
 };
 
+#endif
+
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Point: public POINT
+class Point
 {
+public:
+	int x;
+	int y;
+
 public:
 	Point ()
 	{
-		printf ("CPoint::CPoint ()\n");
+		printf ("Point::Point ()\n");
 		x = 10;
 		y = 20;
 	}
 
 	~Point ()
 	{
-		printf ("CPoint::~CPoint ()\n");
+		printf ("Point::~Point ()\n");
 	}
 };
 
@@ -102,6 +110,7 @@ run_Buf ()
 	sl::Array <uchar_t> arr2 = arr;
 	arr2 [0] = 10;
 
+#if (_AXL_OS_WIN)
 	ref::Buf <DCB, DcbGetSize> dcb;
 	dcb.getBuffer ();
 	dcb->DCBlength = 240;
@@ -109,7 +118,7 @@ run_Buf ()
 
 	ref::Buf <DCB, DcbGetSize> dcb2 = dcb;
 	dcb2.getBuffer ();
-
+#endif
 	MyClass a;
 	a.m_x = 1;
 	a.m_y = 2;
@@ -131,8 +140,7 @@ run_Buf ()
 
 	size_t bufSize = sizeof (Point) + sizeof (ref::BufHdr);
 	PointBuf point (ref::BufKind_Stack, _alloca (bufSize), bufSize);
-	
-	point = &Point ();
+	point.createBuffer ();
 
 	PointBuf point2 = point;
 

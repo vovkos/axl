@@ -21,8 +21,6 @@ void run ()
 	sl::HashTableMap <int, int, sl::HashId <int> > map;
 	sl::Iterator <sl::HashTableMapEntry <int, int> > it;
 
-	srand (::GetTickCount ());
-
 	for (size_t i = 0; i < 50; i++)
 	{
 		int key = rand () % 50;

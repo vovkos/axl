@@ -25,15 +25,15 @@ runTest (
 	printf (
 		"Test %d/%d: %s\n"
 		"...................................................................\n",
-		index, 
-		total, 
+		index,
+		total,
 		name
 		);
 
 	bool result = true;
 	try
 	{
-		func ();	
+		func ();
 	}
 	catch (const char* message)
 	{
@@ -65,10 +65,12 @@ main (
 	)
 #endif
 {
+#if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WORD versionRequested = MAKEWORD (2, 2);
-
 	WSAStartup (versionRequested, &wsaData);
+#endif
+
 	srand ((uint_t) sys::getTimestamp ());
 
 	g::getModule ()->setTag ("axl_test_unit");
@@ -88,7 +90,7 @@ main (
 	{
 		total = argc - 1;
 		sl::String name;
-		
+
 		for (int i = 1; i < argc; i++)
 		{
 			name = argv [i];
