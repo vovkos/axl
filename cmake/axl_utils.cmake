@@ -852,6 +852,19 @@ axl_set_header_file_only
 endmacro ()
 
 macro (
+axl_is_excluded_from_build
+	_RESULT
+	_FILE_NAME
+	)
+
+	get_source_file_property (
+		${_RESULT}
+		${_FILE_NAME}
+		HEADER_FILE_ONLY
+		)
+endmacro ()
+
+macro (
 axl_exclude_from_build
 	# ...
 	)
