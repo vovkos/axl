@@ -50,11 +50,16 @@
 #include "axl_ini_Parser.h"
 #include "axl_enc_Base32Encoding.h"
 #include "axl_sys_Time.h"
-#include "axl_cry_EcKey.h"
-#include "axl_cry_EcPoint.h"
 
-#include "axl_io_UsbDevice.h"
-#include "axl_io_UsbContext.h"
+#if (_AXL_CRY)
+#	include "axl_cry_EcKey.h"
+#	include "axl_cry_EcPoint.h"
+#endif
+
+#if (_AXL_IO_USB)
+#	include "axl_io_UsbDevice.h"
+#	include "axl_io_UsbContext.h"
+#endif
 
 using namespace axl;
 

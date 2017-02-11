@@ -10,16 +10,16 @@
 #...............................................................................
 
 #
-# src folder
+# app folder
 #
 
 set (
-	SRC_H_LIST
+	APP_H_LIST
 	test.h
 	)
 
 set (
-	SRC_CPP_LIST
+	APP_CPP_LIST
 	main.cpp
 	test_BoyerMooreFind.cpp
 	test_CmdLineParser.cpp
@@ -39,10 +39,10 @@ set (
 	)
 
 source_group (
-	src
+	app
 	FILES
-	${SRC_H_LIST}
-	${SRC_CPP_LIST}
+	${APP_H_LIST}
+	${APP_CPP_LIST}
 	)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -62,60 +62,90 @@ source_group (
 
 #...............................................................................
 #
-# axl_test_unit compiler test
+# axl_test_auto automated testing app
 #
 
-include_directories (
-	${LUA_INC_DIR}
-	${LIBUSB_INC_DIR}
-	${OPENSSL_INC_DIR}
-	${AXL_INC_DIR}
-	)
+include_directories (${AXL_INC_DIR})
+link_directories (${AXL_LIB_DIR})
 
-link_directories (
-	${LUA_LIB_DIR}
-	${LIBUSB_LIB_DIR}
-	${OPENSSL_LIB_DIR}
-	)
+set (OPT_LIB_LIST)
+
+if (BUILD_AXL_CRY)
+	include_directories (${OPENSSL_INC_DIR})
+	link_directories (${OPENSSL_LIB_DIR})
+	add_definitions (-D_AXL_CRY=1)
+
+	if (WIN32)
+		list (APPEND OPT_LIB_LIST axl_cry libeay32MT)
+	elseif (UNIX)
+		list (APPEND OPT_LIB_LIST axl_cry crypto)
+	endif ()
+else ()
+	axl_exclude_from_build (test_Crypto.cpp)
+endif ()
+
+if (BUILD_AXL_IO_USB)
+	include_directories (${LIBUSB_INC_DIR})
+	link_directories (${LIBUSB_LIB_DIR})
+	add_definitions (-D_AXL_IO_USB=1)
+
+	if (WIN32)
+		list (APPEND OPT_LIB_LIST libusb-1.0)
+	else ()
+		list (APPEND OPT_LIB_LIST usb-1.0)
+	endif ()
+else ()
+	axl_exclude_from_build (test_Usb.cpp)
+endif ()
+
+if (BUILD_AXL_LUA)
+	include_directories (${LUA_INC_DIR})
+	link_directories (${LUA_LIB_DIR})
+	add_definitions (-D_AXL_LUA=1)
+	list (APPEND OPT_LIB_LIST axl_st axl_lua ${LUA_LIB_NAME})
+else ()
+	axl_exclude_from_build (test_StringTemplate.cpp)
+endif ()
 
 add_executable (
-	axl_test_unit
+	axl_test_auto
 	${PCH_H}
 	${PCH_CPP}
-	${SRC_H_LIST}
-	${SRC_CPP_LIST}
+	${APP_H_LIST}
+	${APP_CPP_LIST}
+	)
+
+axl_set_pch (
+	axl_test_auto
+	${PCH_H}
+	${PCH_CPP}
+	)
+
+set_target_properties (
+	axl_test_auto
+	PROPERTIES
+	FOLDER test
 	)
 
 target_link_libraries (
-	axl_test_unit
-	axl_gui
+	axl_test_auto
+	${OPT_LIB_LIST}
 	axl_ini
-	axl_st
-	axl_lua
 	axl_lex
-	axl_cry
 	axl_io
 	axl_core
-	${LUA_LIB_NAME}
 	)
-
-if (WIN32)
-	target_link_libraries (
-		axl_test_unit
-		setupapi
-		)
-endif ()
 
 if (UNIX)
 	target_link_libraries (
-		axl_test_unit
+		axl_test_auto
 		pthread
 		dl
 		)
 
 	if (LINUX AND LIBUDEV_FOUND)
 		target_link_libraries (
-			axl_test_unit
+			axl_test_auto
 			udev
 			)
 	endif ()
@@ -125,7 +155,7 @@ if (UNIX)
 		find_library (IOKIT_FRAMEWORK IOKit)
 
 		target_link_libraries (
-			axl_test_unit
+			axl_test_auto
 			axl_cf
 			axl_iok
 			${CORE_FOUNDATION_FRAMEWORK}
@@ -133,60 +163,11 @@ if (UNIX)
 			)
 	else ()
 		target_link_libraries (
-			axl_test_unit
+			axl_test_auto
 			rt
 			)
 	endif ()
 endif ()
-
-if (BUILD_AXL_IO_USB)
-	if (WIN32)
-		target_link_libraries (
-			axl_test_unit
-			libusb-1.0
-			)
-	else ()
-		target_link_libraries (
-			axl_test_unit
-			usb-1.0
-			)
-	endif ()
-endif ()
-
-if (BUILD_AXL_CRY)
-	if (WIN32)
-		target_link_libraries (
-			axl_test_unit
-			libeay32MT
-			)
-	elseif (UNIX)
-		target_link_libraries (
-			axl_test_unit
-			crypto
-			dl
-			pthread
-			)
-
-		if (NOT APPLE)
-			target_link_libraries (
-				axl_test_unit
-				rt
-				)
-		endif ()
-	endif ()
-endif ()
-
-axl_set_pch (
-	axl_test_unit
-	${PCH_H}
-	${PCH_CPP}
-	)
-
-set_target_properties (
-	axl_test_unit
-	PROPERTIES
-	FOLDER test
-	)
 
 #...............................................................................
 
@@ -198,13 +179,17 @@ file (
 	)
 
 foreach (_FILE_NAME ${TEST_CPP_LIST})
-	get_filename_component (_TEST_NAME ${_FILE_NAME} NAME_WE)
+	axl_is_excluded_from_build (_IS_EXCLUDED ${_FILE_NAME})
 
-	add_test (
-		NAME ${_TEST_NAME}
-		WORKING_DIRECTORY ${_DIR}
-		COMMAND $<TARGET_FILE:axl_test_unit> ${_TEST_NAME}
-		)
+	if (NOT _IS_EXCLUDED)
+		get_filename_component (_TEST_NAME ${_FILE_NAME} NAME_WE)
+
+		add_test (
+			NAME ${_TEST_NAME}
+			WORKING_DIRECTORY ${_DIR}
+			COMMAND $<TARGET_FILE:axl_test_auto> ${_TEST_NAME}
+			)
+	endif ()
 endforeach ()
 
 #...............................................................................

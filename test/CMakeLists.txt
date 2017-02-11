@@ -10,13 +10,13 @@
 #...............................................................................
 
 option (
-	BUILD_AXL_TEST_UNIT
-	"Build axl_test_perf (unit tests for AXL subsystems)"
+	BUILD_AXL_TEST_AUTO
+	"Build axl_test_auto (misc automated tests - smoke, unit, integration etc)"
 	ON
 	)
 
-if (BUILD_AXL_TEST_UNIT)
-	add_subdirectory (axl_test_unit)
+if (BUILD_AXL_TEST_AUTO)
+	add_subdirectory (axl_test_auto)
 endif ()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
