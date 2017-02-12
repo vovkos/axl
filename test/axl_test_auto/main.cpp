@@ -65,15 +65,18 @@ main (
 	)
 #endif
 {
+#if (_AXL_OS_POSIX)
+	setvbuf (stdout, NULL, _IOLBF, 1024);
+#endif
+
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WORD versionRequested = MAKEWORD (2, 2);
 	WSAStartup (versionRequested, &wsaData);
 #endif
-
 	srand ((uint_t) sys::getTimestamp ());
 
-	g::getModule ()->setTag ("axl_test_unit");
+	g::getModule ()->setTag ("axl_test_auto");
 	lex::registerParseErrorProvider ();
 
 	size_t total;

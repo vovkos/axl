@@ -19,15 +19,22 @@ namespace {
 void
 run ()
 {
-	bool result;
+	io::registerUsbErrorProvider ();
 
-	io::getUsbDefaultContext ()->createDefault ();
+	bool result = io::getUsbDefaultContext ()->createDefault ();
+	if (!result)
+	{
+		printf ("Cannot initialize libusb: %s\n", err::getLastErrorDescription ().sz ());
+		ASSERT (false);
+		return;
+	}
 
 	io::UsbDeviceList deviceList;
 	size_t count = deviceList.enumerateDevices ();
 	if (count == -1)
 	{
 		printf ("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
+		ASSERT (false);
 		return;
 	}
 
