@@ -24,6 +24,15 @@ template <typename T, typename Details> class StringBase;
 
 //..............................................................................
 
+enum CaseConvertMethod
+{
+	CaseConvertMethod_PerCodePoint = 0, // true UTF conversion (default)
+	CaseConvertMethod_PerCodeUnit,      // per-unit tolower/toupper (less precise, but faster)
+	CaseConvertMethod_Default = CaseConvertMethod_PerCodePoint
+};
+
+//..............................................................................
+
 template <
 	typename T,
 	typename Details0 = StringDetailsBase <T>
@@ -212,7 +221,7 @@ public:
 		return cmp (p) >= 0;
 	}
 
-	StringRefBase
+	String
 	operator + (const StringRef& string) const
 	{
 		String result = *this;
@@ -220,7 +229,7 @@ public:
 		return result;
 	}
 
-	StringRefBase
+	String
 	operator + (const StringRef2& string) const
 	{
 		String result = *this;
@@ -228,7 +237,7 @@ public:
 		return result;
 	}
 
-	StringRefBase
+	String
 	operator + (const StringRef3& string) const
 	{
 		String result = *this;
@@ -236,7 +245,7 @@ public:
 		return result;
 	}
 
-	StringRefBase
+	String
 	operator + (const C* p) const
 	{
 		String result = *this;
@@ -244,7 +253,7 @@ public:
 		return result;
 	}
 
-	StringRefBase
+	String
 	operator + (const C2* p) const
 	{
 		String result = *this;
@@ -252,7 +261,7 @@ public:
 		return result;
 	}
 
-	StringRefBase
+	String
 	operator + (const C3* p) const
 	{
 		String result = *this;
@@ -364,10 +373,25 @@ public:
 			m_length > string.m_length ? 1 : 0;
 	}
 
+	int
+	cmpNoCase (
+		const StringRef& string,
+		CaseConvertMethod method = CaseConvertMethod_Default
+		) const
+	{
+		return cmp (string);
+	}
+
 	size_t
 	hash () const
 	{
 		return djb2 (m_p, m_length * sizeof (C));
+	}
+
+	size_t
+	hashNoCase (CaseConvertMethod method = CaseConvertMethod_Default) const
+	{
+		return hash ();
 	}
 
 	bool
@@ -479,48 +503,83 @@ public:
 	StringRef
 	getLeftTrimmedString () const
 	{
-		String string = *this;
-		string.trimLeft ();
+		static StringRef whitespace (Details::getWhitespace (), 4);
+		size_t i = findNotOneOf (whitespace);
+		if (i == -1)
+			return StringRef ();
+		else if (i == 0)
+			return *this;
+
+		StringRef string;
+		string.attach (m_hdr, m_p + i, m_length - i, m_isNullTerminated);
 		return string;
 	}
 
 	StringRef
 	getRightTimmedString () const
 	{
-		String string = *this;
-		string.trimRight ();
+		static StringRef whitespace (Details::getWhitespace (), 4);
+		size_t i = reverseFindNotOneOf (whitespace);
+		if (i == -1)
+			return StringRef ();
+		else if (i == m_length - 1)
+			return *this;
+
+		StringRef string;
+		string.attach (m_hdr, m_p, i + 1, false);
 		return string;
 	}
 
 	StringRef
 	getTrimmedString () const
 	{
+		static StringRef whitespace (Details::getWhitespace (), 4);
+		size_t i = findNotOneOf (whitespace);
+		if (i == -1)
+			return StringRef ();
+
+		size_t j = reverseFindNotOneOf (whitespace);
+		ASSERT (j != -1);
+
+		if (j != m_length - 1)
+		{
+			StringRef string;
+			string.attach (m_hdr, m_p + i, j + 1 - i);
+			return string;
+		}
+		else if (i != 0)
+		{
+			StringRef string;
+			string.attach (m_hdr, m_p + i, m_length - i, m_isNullTerminated);
+			return string;
+		}
+		else
+		{
+			return *this;
+		}
+	}
+
+	String
+	getLowerCaseString (CaseConvertMethod method = CaseConvertMethod_Default)
+	{
 		String string = *this;
-		string.trim ();
+		string.makeLowerCase (method);
 		return string;
 	}
 
-	StringRef
-	getLowerCaseString ()
+	String
+	getUpperCaseString (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
 		String string = *this;
-		string.makeLowerCase ();
+		string.makeUpperCase (method);
 		return string;
 	}
 
-	StringRef
-	getUpperCaseString ()
+	String
+	getCaseFoldedString (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
 		String string = *this;
-		string.makeUpperCase ();
-		return string;
-	}
-
-	StringRef
-	getCaseFoldedString ()
-	{
-		String string = *this;
-		string.makeCaseFolded ();
+		string.makeCaseFolded (method);
 		return string;
 	}
 
@@ -1292,12 +1351,14 @@ public:
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
 		size_t i = this->findNotOneOf (whitespace);
-		if (i != -1)
+		if (i == -1)
 		{
-			this->m_p += i;
-			this->m_length -= i;
+			clear ();
+			return 0;
 		}
 
+		this->m_p += i;
+		this->m_length -= i;
 		return this->m_length;
 	}
 
@@ -1306,9 +1367,13 @@ public:
 	{
 		static StringRef whitespace (Details::getWhitespace (), 4);
 		size_t i = this->reverseFindNotOneOf (whitespace);
-		if (i != -1)
-			setReducedLength (i + 1);
+		if (i == -1)
+		{
+			clear ();
+			return 0;
+		}
 
+		setReducedLength (i + 1);
 		return this->m_length;
 	}
 
@@ -1396,37 +1461,22 @@ public:
 		return count;
 	}
 
-	template <typename CaseOp>
 	size_t
-	convertCase ()
+	makeLowerCase (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
-		StringRef src = *this; // save old contents -- can't convert in-place because length can increase
-
-		size_t length = enc::UtfConvert <Encoding, Encoding, CaseOp>::calcRequiredLength (this->m_p, this->m_length);
-		C* p = createBuffer (length);
-		if (!p)
-			return -1;
-
-		enc::UtfConvert <Encoding, Encoding, CaseOp>::convert (p, length, src.cp (), src.getLength ());
-		return length;
+		return utfConvertCase <enc::UtfToLowerCase> ();
 	}
 
 	size_t
-	makeLowerCase ()
+	makeUpperCase (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
-		return convertCase <enc::UtfToLowerCase> ();
+		return utfConvertCase <enc::UtfToUpperCase> ();
 	}
 
 	size_t
-	makeUpperCase ()
+	makeCaseFolded (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
-		return convertCase <enc::UtfToUpperCase> ();
-	}
-
-	size_t
-	makeCaseFolded ()
-	{
-		return convertCase <enc::UtfToCaseFolded> ();
+		return utfConvertCase <enc::UtfToCaseFolded> ();
 	}
 
 	size_t
@@ -1508,7 +1558,7 @@ public:
 			return true;
 		}
 
-		ASSERT (this->m_p && this->m_hdr);		
+		ASSERT (this->m_p && this->m_hdr);
 		ASSERT (length < this->m_hdr->getLeftoverBufferSize (this->m_p) / sizeof (C)); // misuse otherwise
 
 		bool isNullTerminated = !this->m_p [length];
@@ -1703,6 +1753,21 @@ protected:
 
 		for (; p < end; p += patternLength)
 			Details::copy (p, pattern, patternLength);
+	}
+
+	template <typename CaseOp>
+	size_t
+	utfConvertCase ()
+	{
+		StringRef src = *this; // save old contents -- can't convert in-place because length can increase
+
+		size_t length = enc::UtfConvert <Encoding, Encoding, CaseOp>::calcRequiredLength (this->m_p, this->m_length);
+		C* p = createBuffer (length);
+		if (!p)
+			return -1;
+
+		enc::UtfConvert <Encoding, Encoding, CaseOp>::convert (p, length, src.cp (), src.getLength ());
+		return length;
 	}
 };
 
