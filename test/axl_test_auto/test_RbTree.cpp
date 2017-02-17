@@ -37,6 +37,10 @@ run ()
 	sl::RbTreeMap <int, int> tree;
 	sl::RbTreeMap <int, int>::Iterator it;
 
+	sl::RbTreeMapIterator <int, int> it2 = tree.find (100);
+
+	it2 = it;
+
 	for (size_t i = 0; i < 50; i++)
 		tree.visit (rand () % 50);
 

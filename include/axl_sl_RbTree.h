@@ -111,6 +111,41 @@ class RbTreeMapNode: public RbTreeNodeBase <
 
 //..............................................................................
 
+template <typename Key>
+class RbTreeIterator: public Iterator <RbTreeNode <Key> >
+{
+public:
+	RbTreeIterator ()
+	{
+	}
+
+	RbTreeIterator (const Iterator <RbTreeNode <Key> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename Key,
+	typename Value
+	>
+class RbTreeMapIterator: public Iterator <RbTreeMapNode <Key, Value> >
+{
+public:
+	RbTreeMapIterator ()
+	{
+	}
+
+	RbTreeMapIterator (const Iterator <RbTreeMapNode <Key, Value> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+//..............................................................................
+
 template <
 	typename Key,
 	typename Cmp,
