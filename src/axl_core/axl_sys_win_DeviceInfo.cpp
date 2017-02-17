@@ -110,7 +110,7 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 	if (!result)
 		return false;
 
-	SP_DEVINSTALL_PARAMS devInstallParams = { 0 };
+	SP_DEVINSTALL_PARAMS_W devInstallParams = { 0 };
 	devInstallParams.cbSize = sizeof (devInstallParams);
 	result = getDeviceInstallParams (&devInstallParams);
 	if (!result)

@@ -31,7 +31,7 @@ Process::createProcess (
 	dword_t flags,
 	const void* environment,
 	const sl::StringRef_w& currentDir,
-	const STARTUPINFO* startupInfo,
+	const STARTUPINFOW* startupInfo,
 	handle_t* threadHandle
 	)
 {
@@ -51,7 +51,7 @@ Process::createProcess (
 		flags,
 		(void*) environment,
 		currentDir.szn (),
-		(STARTUPINFO*) startupInfo,
+		(STARTUPINFOW*) startupInfo,
 		&processInfo
 		);
 
@@ -94,7 +94,7 @@ syncExec (
 	if (!result)
 		return err::failWithLastSystemError ();
 
-	STARTUPINFO startupInfo = { 0 };
+	STARTUPINFOW startupInfo = { 0 };
 	startupInfo.cb = sizeof (STARTUPINFO);
 	startupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 	startupInfo.hStdOutput = childStdOut;

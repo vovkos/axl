@@ -29,7 +29,7 @@ FileEnumerator::openDir (const sl::StringRef& dir)
 	sl::String_w fileName = dir;
 	fileName.append (L"\\*.*");
 
-	WIN32_FIND_DATA findData;
+	WIN32_FIND_DATAW findData;
 	m_h = ::FindFirstFileW (fileName, &findData);
 	if (m_h == INVALID_HANDLE_VALUE)
 		return err::failWithLastSystemError ();
@@ -46,7 +46,7 @@ FileEnumerator::getNextFileName ()
 
 	sl::String fileName = m_nextFileName;
 
-	WIN32_FIND_DATA findData;
+	WIN32_FIND_DATAW findData;
 	bool_t result = ::FindNextFileW (m_h, &findData);
 	if (result)
 		m_nextFileName = findData.cFileName;

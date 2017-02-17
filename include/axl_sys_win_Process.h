@@ -36,7 +36,7 @@ public:
 		dword_t flags,
 		const void* environment,
 		const sl::StringRef_w& currentDir,
-		const STARTUPINFO* startupInfo,
+		const STARTUPINFOW* startupInfo,
 		handle_t* threadHandle
 		);
 
@@ -45,7 +45,7 @@ public:
 		const sl::StringRef_w& cmdLine,
 		bool inheritHandles,
 		dword_t flags,
-		const STARTUPINFO* startupInfo
+		const STARTUPINFOW* startupInfo
 		)
 	{
 		return createProcess (
