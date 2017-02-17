@@ -10,6 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
+#include "axl_st_LuaStringTemplate.h"
 #include "test.h"
 
 namespace {

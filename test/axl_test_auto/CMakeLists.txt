@@ -36,6 +36,7 @@ set (
 	test_Ref.cpp
 	test_StringTemplate.cpp
 	test_Usb.cpp
+	test_Bstr.cpp
 	)
 
 source_group (
@@ -44,6 +45,10 @@ source_group (
 	${APP_H_LIST}
 	${APP_CPP_LIST}
 	)
+
+if (NOT WIN32)
+	axl_exclude_from_build (test_Bstr.cpp)
+endif ()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #

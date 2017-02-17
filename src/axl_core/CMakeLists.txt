@@ -159,6 +159,7 @@ endif ()
 
 set (
 	SYS_WIN_H_LIST
+	${AXL_INC_DIR}/axl_sys_win_Bstr.h
 	${AXL_INC_DIR}/axl_sys_win_WinError.h
 	${AXL_INC_DIR}/axl_sys_win_NtStatus.h
 	${AXL_INC_DIR}/axl_sys_win_CriticalSection.h
@@ -182,6 +183,7 @@ set (
 
 set (
 	SYS_WIN_CPP_LIST
+	axl_sys_win_Bstr.cpp
 	axl_sys_win_WinError.cpp
 	axl_sys_win_NtStatus.cpp
 	axl_sys_win_Thread.cpp

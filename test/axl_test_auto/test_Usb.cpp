@@ -10,7 +10,10 @@
 //..............................................................................
 
 #include "pch.h"
+#include "axl_io_UsbDevice.h"
+#include "axl_io_UsbContext.h"
 #include "test.h"
+
 
 namespace {
 

@@ -10,6 +10,8 @@
 //..............................................................................
 
 #include "pch.h"
+#include "axl_cry_EcKey.h"
+#include "axl_cry_EcPoint.h"
 #include "test.h"
 
 namespace {
