@@ -74,7 +74,7 @@ public:
 //		typename Key,
 //		typename Value
 //		>
-//	class HashTableMapIteratorT
+//	class HashTableMapIterator
 //	{
 //	public:
 //		typedef Iterator <HashTableMapEntry <Key, Value> > T;
@@ -96,11 +96,6 @@ public:
 	{
 		this->m_p = src.getEntry ();
 	}
-
-	HashTableIterator (HashTableEntry <Key>* p)
-	{
-		this->m_p = p;
-	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -119,11 +114,6 @@ public:
 	HashTableMapIterator (const Iterator <HashTableMapEntry <Key, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
-	}
-
-	HashTableMapIterator (HashTableMapEntry <Key, Value>* p)
-	{
-		this->m_p = p;
 	}
 };
 
