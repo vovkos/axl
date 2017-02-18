@@ -544,7 +544,7 @@ public:
 		if (j != m_length - 1)
 		{
 			StringRef string;
-			string.attach (m_hdr, m_p + i, j + 1 - i);
+			string.attach (m_hdr, m_p + i, j + 1 - i, false);
 			return string;
 		}
 		else if (i != 0)
