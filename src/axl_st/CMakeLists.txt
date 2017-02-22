@@ -15,9 +15,9 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_st_StringTemplate.h
-	${AXL_INC_DIR}/axl_st_StringTemplateLexer.h
-	${AXL_INC_DIR}/axl_st_LuaStringTemplate.h
+	${AXL_INC_DIR}/axl_st/axl_st_StringTemplate.h
+	${AXL_INC_DIR}/axl_st/axl_st_StringTemplateLexer.h
+	${AXL_INC_DIR}/axl_st/axl_st_LuaStringTemplate.h
 	)
 
 set (
@@ -81,7 +81,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_st_Pch.h
+	${AXL_INC_DIR}/axl_st/axl_st_Pch.h
 	)
 
 source_group (

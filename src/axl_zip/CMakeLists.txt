@@ -15,7 +15,7 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_zip_ZipReader.h
+	${AXL_INC_DIR}/axl_zip/axl_zip_ZipReader.h
 	)
 
 set (
@@ -49,7 +49,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_zip_Pch.h
+	${AXL_INC_DIR}/axl_zip/axl_zip_Pch.h
 	)
 
 source_group (

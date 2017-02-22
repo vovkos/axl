@@ -15,7 +15,7 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_lua_LuaState.h
+	${AXL_INC_DIR}/axl_lua/axl_lua_LuaState.h
 	)
 
 set (
@@ -42,7 +42,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_lua_Pch.h
+	${AXL_INC_DIR}/axl_lua/axl_lua_Pch.h
 	)
 
 source_group (

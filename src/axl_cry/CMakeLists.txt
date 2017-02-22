@@ -15,10 +15,10 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_cry_CryptoError.h
-	${AXL_INC_DIR}/axl_cry_BigNum.h
-	${AXL_INC_DIR}/axl_cry_EcKey.h
-	${AXL_INC_DIR}/axl_cry_EcPoint.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_CryptoError.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_BigNum.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_EcKey.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_EcPoint.h
 	)
 
 set (
@@ -47,7 +47,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_cry_Pch.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_Pch.h
 	)
 
 source_group (

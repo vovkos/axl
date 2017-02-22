@@ -15,10 +15,10 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_fsm_Nfa.h
-	${AXL_INC_DIR}/axl_fsm_Dfa.h
-	${AXL_INC_DIR}/axl_fsm_RegExp.h
-	${AXL_INC_DIR}/axl_fsm_StdRegExpNameMgr.h
+	${AXL_INC_DIR}/axl_fsm/axl_fsm_Nfa.h
+	${AXL_INC_DIR}/axl_fsm/axl_fsm_Dfa.h
+	${AXL_INC_DIR}/axl_fsm/axl_fsm_RegExp.h
+	${AXL_INC_DIR}/axl_fsm/axl_fsm_StdRegExpNameMgr.h
 	)
 
 set (
@@ -47,7 +47,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_fsm_Pch.h
+	${AXL_INC_DIR}/axl_fsm/axl_fsm_Pch.h
 	)
 
 source_group (

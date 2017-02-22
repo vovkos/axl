@@ -15,10 +15,10 @@
 
 set (
 	ERR_H_LIST
-	${AXL_INC_DIR}/axl_err_Error.h
-	${AXL_INC_DIR}/axl_err_ErrorMgr.h
-	${AXL_INC_DIR}/axl_err_SystemError.h
-	${AXL_INC_DIR}/axl_err_Errno.h
+	${AXL_INC_DIR}/axl_err/axl_err_Error.h
+	${AXL_INC_DIR}/axl_err/axl_err_ErrorMgr.h
+	${AXL_INC_DIR}/axl_err/axl_err_SystemError.h
+	${AXL_INC_DIR}/axl_err/axl_err_Errno.h
 	)
 
 set (
@@ -42,8 +42,8 @@ source_group (
 
 set (
 	G_H_LIST
-	${AXL_INC_DIR}/axl_g_WarningSuppression.h
-	${AXL_INC_DIR}/axl_g_Module.h
+	${AXL_INC_DIR}/axl_g/axl_g_WarningSuppression.h
+	${AXL_INC_DIR}/axl_g/axl_g_Module.h
 	)
 
 set (
@@ -65,10 +65,10 @@ source_group (
 
 set (
 	MEM_H_LIST
-	${AXL_INC_DIR}/axl_mem_Allocator.h
-	${AXL_INC_DIR}/axl_mem_Block.h
-	${AXL_INC_DIR}/axl_mem_New.h
-	${AXL_INC_DIR}/axl_mem_Tracker.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_Allocator.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_Block.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_New.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_Tracker.h
 	)
 
 set (
@@ -90,18 +90,18 @@ source_group (
 
 set (
 	SYS_H_LIST
-	${AXL_INC_DIR}/axl_sys_Atomic.h
-	${AXL_INC_DIR}/axl_sys_Event.h
-	${AXL_INC_DIR}/axl_sys_Lock.h
-	${AXL_INC_DIR}/axl_sys_SjljTry.h
-	${AXL_INC_DIR}/axl_sys_Semaphore.h
-	${AXL_INC_DIR}/axl_sys_InvSemaphore.h
-	${AXL_INC_DIR}/axl_sys_Thread.h
-	${AXL_INC_DIR}/axl_sys_TlsMgr.h
-	${AXL_INC_DIR}/axl_sys_TlsSlot.h
-	${AXL_INC_DIR}/axl_sys_DynamicLibrary.h
-	${AXL_INC_DIR}/axl_sys_Process.h
-	${AXL_INC_DIR}/axl_sys_Time.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_Atomic.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_Event.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_Lock.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_SjljTry.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_Semaphore.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_InvSemaphore.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_Thread.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_TlsMgr.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_TlsSlot.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_DynamicLibrary.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_Process.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_Time.h
 	)
 
 set (
@@ -124,11 +124,11 @@ source_group (
 
 set (
 	SYS_PSX_H_LIST
-	${AXL_INC_DIR}/axl_sys_psx_Cond.h
-	${AXL_INC_DIR}/axl_sys_psx_Mutex.h
-	${AXL_INC_DIR}/axl_sys_psx_Sem.h
-	${AXL_INC_DIR}/axl_sys_psx_Thread.h
-	${AXL_INC_DIR}/axl_sys_psx_DynamicLibrary.h
+	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Cond.h
+	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Mutex.h
+	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Sem.h
+	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Thread.h
+	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_DynamicLibrary.h
 	)
 
 set (
@@ -159,26 +159,26 @@ endif ()
 
 set (
 	SYS_WIN_H_LIST
-	${AXL_INC_DIR}/axl_sys_win_Bstr.h
-	${AXL_INC_DIR}/axl_sys_win_WinError.h
-	${AXL_INC_DIR}/axl_sys_win_NtStatus.h
-	${AXL_INC_DIR}/axl_sys_win_CriticalSection.h
-	${AXL_INC_DIR}/axl_sys_win_Event.h
-	${AXL_INC_DIR}/axl_sys_win_Semaphore.h
-	${AXL_INC_DIR}/axl_sys_win_Thread.h
-	${AXL_INC_DIR}/axl_sys_win_WaitableHandle.h
-	${AXL_INC_DIR}/axl_sys_win_WaitableTimer.h
-	${AXL_INC_DIR}/axl_sys_win_Handle.h
-	${AXL_INC_DIR}/axl_sys_win_PerfCounter.h
-	${AXL_INC_DIR}/axl_sys_win_JobObject.h
-	${AXL_INC_DIR}/axl_sys_win_Library.h
-	${AXL_INC_DIR}/axl_sys_win_Service.h
-	${AXL_INC_DIR}/axl_sys_win_ServiceMgr.h
-	${AXL_INC_DIR}/axl_sys_win_DeviceInfo.h
-	${AXL_INC_DIR}/axl_sys_win_Process.h
-	${AXL_INC_DIR}/axl_sys_win_AccessToken.h
-	${AXL_INC_DIR}/axl_sys_win_Sid.h
-	${AXL_INC_DIR}/axl_sys_win_VirtualMemory.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Bstr.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WinError.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_NtStatus.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_CriticalSection.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Event.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Semaphore.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Thread.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WaitableHandle.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WaitableTimer.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Handle.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_PerfCounter.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_JobObject.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Library.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Service.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_ServiceMgr.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_DeviceInfo.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Process.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_AccessToken.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Sid.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_VirtualMemory.h
 	)
 
 set (
@@ -217,7 +217,7 @@ endif ()
 
 set (
 	SYS_LNX_H_LIST
-	${AXL_INC_DIR}/axl_sys_lnx_Udev.h
+	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_Udev.h
 	)
 
 set (
@@ -248,8 +248,8 @@ endif ()
 
 set (
 	SYS_DRW_H_LIST
-	${AXL_INC_DIR}/axl_sys_drw_MachError.h
-	${AXL_INC_DIR}/axl_sys_drw_Semaphore.h
+	${AXL_INC_DIR}/axl_sys_drw/axl_sys_drw_MachError.h
+	${AXL_INC_DIR}/axl_sys_drw/axl_sys_drw_Semaphore.h
 	)
 
 set (
@@ -276,13 +276,13 @@ endif ()
 
 set (
 	REF_H_LIST
-	${AXL_INC_DIR}/axl_ref_Buf.h
-	${AXL_INC_DIR}/axl_ref_Child.h
-	${AXL_INC_DIR}/axl_ref_New.h
-	${AXL_INC_DIR}/axl_ref_Ptr.h
-	${AXL_INC_DIR}/axl_ref_RefCount.h
-	${AXL_INC_DIR}/axl_ref_RtFactory.h
-	${AXL_INC_DIR}/axl_ref_WeakPtr.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_Buf.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_Child.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_New.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_Ptr.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_RefCount.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_RtFactory.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_WeakPtr.h
 	)
 
 set (
@@ -304,47 +304,47 @@ source_group (
 
 set (
 	SL_H_LIST
-	${AXL_INC_DIR}/axl_sl_ArgType.h
-	${AXL_INC_DIR}/axl_sl_Operator.h
-	${AXL_INC_DIR}/axl_sl_Construct.h
-	${AXL_INC_DIR}/axl_sl_Cmp.h
-	${AXL_INC_DIR}/axl_sl_Hash.h
-	${AXL_INC_DIR}/axl_sl_Swap.h
-	${AXL_INC_DIR}/axl_sl_Closure.h
-	${AXL_INC_DIR}/axl_sl_ForEach.h
-	${AXL_INC_DIR}/axl_sl_CallOnce.h
-	${AXL_INC_DIR}/axl_sl_Singleton.h
-	${AXL_INC_DIR}/axl_sl_SimpleSingleton.h
-	${AXL_INC_DIR}/axl_sl_Array.h
-	${AXL_INC_DIR}/axl_sl_ArrayDetails.h
-	${AXL_INC_DIR}/axl_sl_ArrayList.h
-	${AXL_INC_DIR}/axl_sl_AutoPtrArray.h
-	${AXL_INC_DIR}/axl_sl_BinTree.h
-	${AXL_INC_DIR}/axl_sl_BitIdx.h
-	${AXL_INC_DIR}/axl_sl_BitMap.h
-	${AXL_INC_DIR}/axl_sl_BmhFind.h
-	${AXL_INC_DIR}/axl_sl_BoyerMooreFind.h
-	${AXL_INC_DIR}/axl_sl_MemMem.h
-	${AXL_INC_DIR}/axl_sl_BoxList.h
-	${AXL_INC_DIR}/axl_sl_BuddyAllocMap.h
-	${AXL_INC_DIR}/axl_sl_ByteOrder.h
-	${AXL_INC_DIR}/axl_sl_CharLiteral.h
-	${AXL_INC_DIR}/axl_sl_CmdLineParser.h
-	${AXL_INC_DIR}/axl_sl_Guid.h
-	${AXL_INC_DIR}/axl_sl_Handle.h
-	${AXL_INC_DIR}/axl_sl_HandleTable.h
-	${AXL_INC_DIR}/axl_sl_HashTable.h
-	${AXL_INC_DIR}/axl_sl_List.h
-	${AXL_INC_DIR}/axl_sl_ListBase.h
-	${AXL_INC_DIR}/axl_sl_Pack.h
-	${AXL_INC_DIR}/axl_sl_Packer.h
-	${AXL_INC_DIR}/axl_sl_Packetizer.h
-	${AXL_INC_DIR}/axl_sl_Protocol.h
-	${AXL_INC_DIR}/axl_sl_RbTree.h
-	${AXL_INC_DIR}/axl_sl_String.h
-	${AXL_INC_DIR}/axl_sl_StringDetails.h
-	${AXL_INC_DIR}/axl_sl_StringHashTable.h
-	${AXL_INC_DIR}/axl_sl_Unpacker.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ArgType.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Operator.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Construct.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Cmp.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Hash.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Swap.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Closure.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ForEach.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_CallOnce.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Singleton.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_SimpleSingleton.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Array.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayDetails.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayList.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_AutoPtrArray.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BinTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BitIdx.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BitMap.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BmhFind.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreFind.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_MemMem.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BoxList.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BuddyAllocMap.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ByteOrder.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_CharLiteral.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_CmdLineParser.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Guid.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Handle.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_HandleTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_HashTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_List.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ListBase.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Pack.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Packer.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Packetizer.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Protocol.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_RbTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_String.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_StringDetails.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_StringHashTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Unpacker.h
 	)
 
 set (
@@ -377,11 +377,11 @@ source_group (
 
 set (
 	ENC_H_LIST
-	${AXL_INC_DIR}/axl_enc_Base32Encoding.h
-	${AXL_INC_DIR}/axl_enc_CharCodec.h
-	${AXL_INC_DIR}/axl_enc_EscapeEncoding.h
-	${AXL_INC_DIR}/axl_enc_HexEncoding.h
-	${AXL_INC_DIR}/axl_enc_Utf.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Base32Encoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_CharCodec.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_EscapeEncoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_HexEncoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf.h
 	icu_def.h
 	icu_uchar_props_data.h
 	icu_ucase_props_data.h
@@ -414,7 +414,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_g_Pch.h
+	${AXL_INC_DIR}/axl_g/axl_g_Pch.h
 	)
 
 source_group (

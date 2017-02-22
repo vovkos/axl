@@ -15,22 +15,22 @@
 
 set (
 	GUI_H_LIST
-	${AXL_INC_DIR}/axl_gui_AnsiAttrParser.h
-	${AXL_INC_DIR}/axl_gui_Canvas.h
-	${AXL_INC_DIR}/axl_gui_Color.h
-	${AXL_INC_DIR}/axl_gui_ColorAttr.h
-	${AXL_INC_DIR}/axl_gui_Def.h
-	${AXL_INC_DIR}/axl_gui_Engine.h
-	${AXL_INC_DIR}/axl_gui_Font.h
-	${AXL_INC_DIR}/axl_gui_FontDesc.h
-	${AXL_INC_DIR}/axl_gui_HyperlinkAnchorArray.h
-	${AXL_INC_DIR}/axl_gui_HyperText.h
-	${AXL_INC_DIR}/axl_gui_Image.h
-	${AXL_INC_DIR}/axl_gui_ImageDesc.h
-	${AXL_INC_DIR}/axl_gui_TextAttr.h
-	${AXL_INC_DIR}/axl_gui_TextAttrAnchorArray.h
-	${AXL_INC_DIR}/axl_gui_TextPainter.h
-	${AXL_INC_DIR}/axl_gui_Widget.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_AnsiAttrParser.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Canvas.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Color.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_ColorAttr.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Def.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Engine.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Font.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_FontDesc.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_HyperlinkAnchorArray.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_HyperText.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Image.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_ImageDesc.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_TextAttr.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_TextAttrAnchorArray.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_TextPainter.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Widget.h
 	)
 
 set (
@@ -62,13 +62,13 @@ source_group (
 
 set (
 	GUI_GDI_H_LIST
-	${AXL_INC_DIR}/axl_gui_GdiCanvas.h
-	${AXL_INC_DIR}/axl_gui_GdiCursor.h
-	${AXL_INC_DIR}/axl_gui_GdiEngine.h
-	${AXL_INC_DIR}/axl_gui_GdiFont.h
-	${AXL_INC_DIR}/axl_gui_GdiImage.h
-	${AXL_INC_DIR}/axl_gui_GdiObjectHandle.h
-	${AXL_INC_DIR}/axl_gui_GdiWidget.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiCanvas.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiCursor.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiEngine.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiFont.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiImage.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiObjectHandle.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiWidget.h
 	)
 
 set (
@@ -99,9 +99,9 @@ endif ()
 
 set (
 	GUI_QT_H_LIST
-	${AXL_INC_DIR}/axl_gui_QtCaret.h
-	${AXL_INC_DIR}/axl_gui_QtEngine.h
-	${AXL_INC_DIR}/axl_gui_QtWidget.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_QtCaret.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_QtEngine.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_QtWidget.h
 	)
 
 set (
@@ -133,9 +133,9 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_gui_Pch.h
-	${AXL_INC_DIR}/axl_gui_GdiPch.h
-	${AXL_INC_DIR}/axl_gui_QtPch.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_Pch.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_GdiPch.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_QtPch.h
 	)
 
 source_group (

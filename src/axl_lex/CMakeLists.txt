@@ -15,10 +15,10 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_lex_Lexer.h
-	${AXL_INC_DIR}/axl_lex_RagelLexer.h
-	${AXL_INC_DIR}/axl_lex_Token.h
-	${AXL_INC_DIR}/axl_lex_ParseError.h
+	${AXL_INC_DIR}/axl_lex/axl_lex_Lexer.h
+	${AXL_INC_DIR}/axl_lex/axl_lex_RagelLexer.h
+	${AXL_INC_DIR}/axl_lex/axl_lex_Token.h
+	${AXL_INC_DIR}/axl_lex/axl_lex_ParseError.h
 	)
 
 set (
@@ -45,7 +45,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_lex_Pch.h
+	${AXL_INC_DIR}/axl_lex/axl_lex_Pch.h
 	)
 
 source_group (

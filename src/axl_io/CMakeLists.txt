@@ -15,19 +15,19 @@
 
 set (
 	IO_H_LIST
-	${AXL_INC_DIR}/axl_io_File.h
-	${AXL_INC_DIR}/axl_io_FilePathUtils.h
-	${AXL_INC_DIR}/axl_io_FileEnumerator.h
-	${AXL_INC_DIR}/axl_io_FileTransport.h
-	${AXL_INC_DIR}/axl_io_Mapping.h
-	${AXL_INC_DIR}/axl_io_MappedFile.h
-	${AXL_INC_DIR}/axl_io_SharedMemoryTransport.h
-	${AXL_INC_DIR}/axl_io_Serial.h
-	${AXL_INC_DIR}/axl_io_SockAddr.h
-	${AXL_INC_DIR}/axl_io_Socket.h
-	${AXL_INC_DIR}/axl_io_SocketTransport.h
-	${AXL_INC_DIR}/axl_io_Transport.h
-	${AXL_INC_DIR}/axl_io_NetworkAdapter.h
+	${AXL_INC_DIR}/axl_io/axl_io_File.h
+	${AXL_INC_DIR}/axl_io/axl_io_FilePathUtils.h
+	${AXL_INC_DIR}/axl_io/axl_io_FileEnumerator.h
+	${AXL_INC_DIR}/axl_io/axl_io_FileTransport.h
+	${AXL_INC_DIR}/axl_io/axl_io_Mapping.h
+	${AXL_INC_DIR}/axl_io/axl_io_MappedFile.h
+	${AXL_INC_DIR}/axl_io/axl_io_SharedMemoryTransport.h
+	${AXL_INC_DIR}/axl_io/axl_io_Serial.h
+	${AXL_INC_DIR}/axl_io/axl_io_SockAddr.h
+	${AXL_INC_DIR}/axl_io/axl_io_Socket.h
+	${AXL_INC_DIR}/axl_io/axl_io_SocketTransport.h
+	${AXL_INC_DIR}/axl_io/axl_io_Transport.h
+	${AXL_INC_DIR}/axl_io/axl_io_NetworkAdapter.h
 	axl_io_SockAddrParser.h
 	)
 
@@ -70,7 +70,7 @@ source_group (
 
 set (
 	IO_PCAP_H_LIST
-	${AXL_INC_DIR}/axl_io_Pcap.h
+	${AXL_INC_DIR}/axl_io/axl_io_Pcap.h
 	)
 
 set (
@@ -92,11 +92,11 @@ source_group (
 
 set (
 	IO_USB_H_LIST
-	${AXL_INC_DIR}/axl_io_UsbContext.h
-	${AXL_INC_DIR}/axl_io_UsbEventThread.h
-	${AXL_INC_DIR}/axl_io_UsbDevice.h
-	${AXL_INC_DIR}/axl_io_UsbTransfer.h
-	${AXL_INC_DIR}/axl_io_UsbError.h
+	${AXL_INC_DIR}/axl_io/axl_io_UsbContext.h
+	${AXL_INC_DIR}/axl_io/axl_io_UsbEventThread.h
+	${AXL_INC_DIR}/axl_io/axl_io_UsbDevice.h
+	${AXL_INC_DIR}/axl_io/axl_io_UsbTransfer.h
+	${AXL_INC_DIR}/axl_io/axl_io_UsbError.h
 	)
 
 set (
@@ -122,12 +122,12 @@ source_group (
 
 set (
 	IO_PSX_H_LIST
-	${AXL_INC_DIR}/axl_io_psx_Fd.h
-	${AXL_INC_DIR}/axl_io_psx_File.h
-	${AXL_INC_DIR}/axl_io_psx_Mapping.h
-	${AXL_INC_DIR}/axl_io_psx_Pipe.h
-	${AXL_INC_DIR}/axl_io_psx_Serial.h
-	${AXL_INC_DIR}/axl_io_psx_Socket.h
+	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Fd.h
+	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_File.h
+	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Mapping.h
+	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Pipe.h
+	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Serial.h
+	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Socket.h
 	)
 
 set (
@@ -159,13 +159,13 @@ endif ()
 
 set (
 	IO_WIN_H_LIST
-	${AXL_INC_DIR}/axl_io_win_FileHandle.h
-	${AXL_INC_DIR}/axl_io_win_File.h
-	${AXL_INC_DIR}/axl_io_win_Iocp.h
-	${AXL_INC_DIR}/axl_io_win_Mapping.h
-	${AXL_INC_DIR}/axl_io_win_NamedPipe.h
-	${AXL_INC_DIR}/axl_io_win_Serial.h
-	${AXL_INC_DIR}/axl_io_win_Socket.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_FileHandle.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_File.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_Iocp.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_Mapping.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_NamedPipe.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_Serial.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_Socket.h
 	)
 
 set (
@@ -253,11 +253,11 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_io_Pch.h
-	${AXL_INC_DIR}/axl_io_UsbPch.h
-	${AXL_INC_DIR}/axl_io_PcapPch.h
-	${AXL_INC_DIR}/axl_io_psx_Pch.h
-	${AXL_INC_DIR}/axl_io_win_Pch.h
+	${AXL_INC_DIR}/axl_io/axl_io_Pch.h
+	${AXL_INC_DIR}/axl_io/axl_io_UsbPch.h
+	${AXL_INC_DIR}/axl_io/axl_io_PcapPch.h
+	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Pch.h
+	${AXL_INC_DIR}/axl_io_win/axl_io_win_Pch.h
 	)
 
 source_group (

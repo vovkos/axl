@@ -15,10 +15,10 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_cf_Type.h
-	${AXL_INC_DIR}/axl_cf_Number.h
-	${AXL_INC_DIR}/axl_cf_String.h
-	${AXL_INC_DIR}/axl_cf_Dictionary.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_Type.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_Number.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_String.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_Dictionary.h
 	)
 
 set (
@@ -47,7 +47,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_cf_Pch.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_Pch.h
 	)
 
 source_group (

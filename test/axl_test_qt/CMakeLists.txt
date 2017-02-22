@@ -45,7 +45,7 @@ axl_push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
 set (
 	MOC_H_LIST
 	mainwindow.h
-	${AXL_INC_DIR}/axl_gui_QtWidget.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_QtWidget.h
 	)
 
 qt5_wrap_cpp_alt (

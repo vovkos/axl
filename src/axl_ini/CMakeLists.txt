@@ -15,9 +15,9 @@
 
 set (
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_ini_Lexer.h
-	${AXL_INC_DIR}/axl_ini_Parser.h
-	${AXL_INC_DIR}/axl_ini_GenericParser.h
+	${AXL_INC_DIR}/axl_ini/axl_ini_Lexer.h
+	${AXL_INC_DIR}/axl_ini/axl_ini_Parser.h
+	${AXL_INC_DIR}/axl_ini/axl_ini_GenericParser.h
 	)
 
 set (
@@ -80,7 +80,7 @@ set (PCH_CPP pch.cpp)
 set (
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_ini_Pch.h
+	${AXL_INC_DIR}/axl_ini/axl_ini_Pch.h
 	)
 
 source_group (
