@@ -374,12 +374,14 @@ public:
 	}
 
 	int
-	cmpNoCase (
+	cmpIgnoreCase (
 		const StringRef& string,
 		CaseConvertMethod method = CaseConvertMethod_Default
 		) const
 	{
-		return cmp (string);
+		return method == CaseConvertMethod_PerCodeUnit ? 
+			cmpIgnoreCase_pcu (string) :
+			cmpIgnoreCase_pcp (string);
 	}
 
 	size_t
@@ -389,9 +391,11 @@ public:
 	}
 
 	size_t
-	hashNoCase (CaseConvertMethod method = CaseConvertMethod_Default) const
+	hashIgnoreCase (CaseConvertMethod method = CaseConvertMethod_Default) const
 	{
-		return hash ();
+		return method == CaseConvertMethod_PerCodeUnit ? 
+			hashIgnoreCase_pcu () :
+			hashIgnoreCase_pcp ();
 	}
 
 	bool
@@ -647,6 +651,106 @@ protected:
 		m_p = (C*) p;
 		m_length = length;
 		m_isNullTerminated = isNullTerminated;
+	}
+
+	int
+	cmpIgnoreCase_pcu (const StringRef& string) const
+	{
+		size_t length = AXL_MIN (m_length, string.m_length);
+
+		const C* p1 = m_p;
+		const C* p2 = string.m_p;
+		const C* end = p1 + length;
+		for (; p1 < end; p1++, p2++)
+		{
+			C c1 = Details::toLower (*p1);
+			C c2 = Details::toLower (*p2);
+
+			if (c1 < c2)
+				return -1;
+			else if (c1 > c2)
+				return 1;
+		}
+
+		return
+			m_length < string.m_length ? -1 :
+			m_length > string.m_length ? 1 : 0;
+	}
+
+	int
+	cmpIgnoreCase_pcp (const StringRef& string) const
+	{
+		const C* p1 = m_p;
+		const C* end1 = p1 + m_length;
+		const C* p2 = string.m_p;
+		const C* end2 = p2 + string.m_length;
+
+		while (p1 < end1 && p2 < end2)
+		{
+			size_t codePointLength1 = Encoding::getDecodeCodePointLength (*p1);
+			size_t codePointLength2 = Encoding::getDecodeCodePointLength (*p2);
+			
+			if (p1 + codePointLength1 > end1)
+				return p2 + codePointLength2 > end2 ? 0 : -1; // if both are badly terminated, return 0
+			else if (p2 + codePointLength2 > end2)
+				return 1;
+
+			utf32_t c1 = Encoding::decodeCodePoint (p1);
+			utf32_t c2 = Encoding::decodeCodePoint (p2);
+
+			c1 = enc::UtfToCaseFolded () (c1);
+			c2 = enc::UtfToCaseFolded () (c2);
+
+			if (c1 < c2)
+				return -1;
+			else if (c1 > c2)
+				return 1;
+
+			p1 += codePointLength1;
+			p2 += codePointLength2;
+		}
+
+		return
+			p2 < end2 ? -1 :
+			p1 < end1 ? 1 : 0;
+	}
+
+	size_t
+	hashIgnoreCase_pcu () const
+	{
+		size_t h = djb2 ();
+
+		const C* end = m_p + m_length;
+		for (const C* p = m_p; p < end; p++)
+		{
+			C c = Details::toLower (*p);
+			h = djb2 (h, &c, sizeof (c));
+		}
+
+		return h;
+	}
+
+	size_t
+	hashIgnoreCase_pcp () const
+	{
+		size_t h = djb2 ();
+
+		const C* p = m_p;
+		const C* end = m_p + m_length;
+
+		while (p < end)
+		{
+			size_t codePointLength = Encoding::getDecodeCodePointLength (*p);
+			if (p + codePointLength > end)
+				break;
+
+			utf32_t c = Encoding::decodeCodePoint (p);
+			c = enc::UtfToCaseFolded () (c);
+			h = djb2 (h, &c, sizeof (c));
+			p += codePointLength;
+		}
+
+		return h;
 	}
 };
 
@@ -1464,19 +1568,25 @@ public:
 	size_t
 	makeLowerCase (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
-		return utfConvertCase <enc::UtfToLowerCase> ();
+		return method == CaseConvertMethod_PerCodeUnit ?
+			convertCase_pcu (Details::toLower) :
+			convertCase_pcp <enc::UtfToLowerCase> ();
 	}
 
 	size_t
 	makeUpperCase (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
-		return utfConvertCase <enc::UtfToUpperCase> ();
+		return method == CaseConvertMethod_PerCodeUnit ?
+			convertCase_pcu (Details::toUpper) :
+			convertCase_pcp <enc::UtfToUpperCase> ();
 	}
 
 	size_t
 	makeCaseFolded (CaseConvertMethod method = CaseConvertMethod_Default)
 	{
-		return utfConvertCase <enc::UtfToCaseFolded> ();
+		return method == CaseConvertMethod_PerCodeUnit ?
+			convertCase_pcu (Details::toLower) :
+			convertCase_pcp <enc::UtfToCaseFolded> ();
 	}
 
 	size_t
@@ -1757,7 +1867,22 @@ protected:
 
 	template <typename CaseOp>
 	size_t
-	utfConvertCase ()
+	convertCase_pcu (CaseOp op)
+	{
+		bool result = ensureExclusive ();
+		if (!result)
+			return -1;
+
+		C* end = this->m_p + this->m_length;
+		for (C* p = this->m_p; p < end; p++)
+			*p = op (*p);
+
+		return this->m_length;
+	}
+
+	template <typename CaseOp>
+	size_t
+	convertCase_pcp ()
 	{
 		StringRef src = *this; // save old contents -- can't convert in-place because length can increase
 

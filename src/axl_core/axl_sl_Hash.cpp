@@ -17,23 +17,6 @@ namespace sl {
 
 //..............................................................................
 
-size_t
-djb2 (
-	const void* _p,
-	size_t size
-	)
-{
-	uchar_t* p = (uchar_t*) _p;
-	uchar_t* end = p + size;
-
-	size_t hash = 5381;
-
-	for (; p < end; p++)
-		hash = ((hash << 5) + hash) + *p; /* hash * 33 + c */
-
-	return hash;
-}
-
 uint16_t
 checksum16 (
 	const void* _p,

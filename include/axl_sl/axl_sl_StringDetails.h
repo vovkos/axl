@@ -329,6 +329,20 @@ public:
 	}
 
 	static
+	C
+	toLower (C c)
+	{
+		return (C) tolower ((uint8_t) c);
+	}
+
+	static
+	C
+	toUpper (C c)
+	{
+		return (C) toupper ((uint8_t) c);
+	}
+
+	static
 	int
 	cmp (
 		const C* p1,
@@ -437,6 +451,20 @@ public:
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
 
+	static
+	C
+	toLower (C c)
+	{
+		return (C) towlower ((uint16_t) c);
+	}
+
+	static
+	C
+	toUpper (C c)
+	{
+		return (C) towupper ((uint16_t) c);
+	}
+
 #if (_AXL_CPP_MSC)
 	static
 	size_t
@@ -500,6 +528,20 @@ public:
 	typedef enc::Utf32 Encoding;
 	typedef StringDetailsBase <C2> Details2;
 	typedef StringDetailsBase <C3> Details3;
+
+	static
+	C
+	toLower (C c)
+	{
+		return (C) towlower ((uint32_t) c);
+	}
+
+	static
+	C
+	toUpper (C c)
+	{
+		return (C) towupper ((uint32_t) c);
+	}
 
 #if (_AXL_CPP_MSC)
 	static

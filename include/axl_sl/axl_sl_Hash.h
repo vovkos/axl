@@ -20,11 +20,41 @@ namespace sl {
 
 //..............................................................................
 
+inline
+size_t
+djb2 (
+	size_t hash,
+	const void* p0,
+	size_t size
+	)
+{
+	uchar_t* p = (uchar_t*) p0;
+	uchar_t* end = p + size;
+
+	for (; p < end; p++)
+		hash = ((hash << 5) + hash) + *p; /* hash * 33 + c */
+
+	return hash;
+}
+
+inline
 size_t
 djb2 (
 	const void* p,
 	size_t size
-	);
+	)
+{
+	return djb2 (5381, p, size);
+}
+
+inline
+size_t
+djb2 ()
+{
+	return 5381;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint16_t
 checksum16 (
