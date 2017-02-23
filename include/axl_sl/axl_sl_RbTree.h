@@ -358,6 +358,12 @@ class RbTreeMap: public RbTree <
 	RbTreeMapNode <Key, Value>
 	>
 {
+public:
+	Value&
+	operator [] (KeyArg key)
+	{
+		return this->visit (key)->m_value;
+	}
 };
 
 //..............................................................................
