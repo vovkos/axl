@@ -76,13 +76,13 @@ public:
 		File* file,
 		uint64_t offset,
 		size_t size,
-		uint_t flags = 0 // EFileFlag
+		uint_t flags = 0 // FileFlag
 		);
 
 	void*
 	open (
 		File* file,
-		uint_t flags = 0 // EFileFlag
+		uint_t flags = 0 // FileFlag
 		)
 	{
 		return open (file, 0, -1, flags);
@@ -92,7 +92,7 @@ public:
 	open (
 		const sl::StringRef& name,
 		size_t size,
-		uint_t flags = 0 // EFileFlag
+		uint_t flags = 0 // FileFlag
 		);
 
 	void

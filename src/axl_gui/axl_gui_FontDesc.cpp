@@ -22,14 +22,14 @@ getFontFlagString (FontFlag flag)
 {
 	static const char* stringTable [] =
 	{
-		"bold",            // EFontFlag_Bold      = 0x01,
-		"italic",          // EFontFlag_Italic    = 0x02,
-		"underline",       // EFontFlag_Underline = 0x04,
-		"strikeout",       // EFontFlag_Strikeout = 0x08,
-		"clear-bold",      // EFontFlag_Bold      = 0x01,
-		"clear-italic",    // EFontFlag_Italic    = 0x02,
-		"clear-underline", // EFontFlag_Underline = 0x04,
-		"clear-strikeout", // EFontFlag_Strikeout = 0x08,
+		"bold",            // FontFlag_Bold      = 0x01,
+		"italic",          // FontFlag_Italic    = 0x02,
+		"underline",       // FontFlag_Underline = 0x04,
+		"strikeout",       // FontFlag_Strikeout = 0x08,
+		"clear-bold",      // FontFlag_Bold      = 0x01,
+		"clear-italic",    // FontFlag_Italic    = 0x02,
+		"clear-underline", // FontFlag_Underline = 0x04,
+		"clear-strikeout", // FontFlag_Strikeout = 0x08,
 	};
 
 	size_t i = sl::getLoBitIdx32 (flag >> 8);

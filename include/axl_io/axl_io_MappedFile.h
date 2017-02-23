@@ -256,13 +256,13 @@ public:
 		const sl::StringRef& fileName,
 		uint64_t offset,
 		size_t size,
-		uint_t flags = 0 // EFileFlag
+		uint_t flags = 0 // FileFlag
 		);
 
 	bool
 	open (
 		const sl::StringRef& fileName,
-		uint_t flags = 0 // EFileFlag
+		uint_t flags = 0 // FileFlag
 		)
 	{
 		return open (fileName, 0, -1, flags);

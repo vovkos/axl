@@ -407,6 +407,15 @@ public:
 	}
 
 	bool
+	isEqualIgnoreCase (
+		const StringRef& string,
+		CaseConvertMethod method = CaseConvertMethod_Default
+		) const
+	{
+		return cmpIgnoreCase (string, method) == 0;
+	}
+
+	bool
 	isPrefix (const StringRef& string) const
 	{
 		return
@@ -415,11 +424,33 @@ public:
 	}
 
 	bool
+	isPrefixIgnoreCase (
+		const StringRef& string,
+		CaseConvertMethod method = CaseConvertMethod_Default
+		) const
+	{
+		return
+			m_length >= string.m_length &&
+			getLeftSubString (string.m_length).isEqualIgnoreCase (string, method);
+	}
+
+	bool
 	isSuffix (const StringRef& string) const
 	{
 		return
 			m_length >= string.m_length &&
 			Details::cmp (m_p + m_length - string.m_length, string.m_p, string.m_length) == 0;
+	}
+
+	bool
+	isSuffixIgnoreCase (
+		const StringRef& string,
+		CaseConvertMethod method = CaseConvertMethod_Default
+		) const
+	{
+		return
+			m_length >= string.m_length &&
+			getRightSubString (string.m_length).isEqualIgnoreCase (string, method);
 	}
 
 	size_t

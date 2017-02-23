@@ -535,7 +535,7 @@ protected: \
 		Key, \
 		Value, \
 		axl::sl::HashDuckType <Key>, \
-		axl::sl::Eq <Key>, \
+		axl::sl::EqDuckType <Key>, \
 		axl::sl::ArgType <Key>::Type, \
 		axl::sl::ArgType <Value>::Type \
 		)

@@ -29,11 +29,11 @@ getUtfKindString (UtfKind utfKind)
 {
 	static const char* stringTable [] =
 	{
-		"UTF-8",                // EUtf_Utf8 = 0,
-		"UTF-16",               // EUtf_Utf16,
-		"UTF-16 (big-endian)",  // EUtf_Utf16_be,
-		"UTF-32",               // EUtf_Utf32,
-		"UTF-32 (big-endian)",  // EUtf_Utf32_be,
+		"UTF-8",                // UtfKind_Utf8 = 0,
+		"UTF-16",               // UtfKind_Utf16,
+		"UTF-16 (big-endian)",  // UtfKind_Utf16_be,
+		"UTF-32",               // UtfKind_Utf32,
+		"UTF-32 (big-endian)",  // UtfKind_Utf32_be,
 	};
 
 	return (size_t) utfKind < countof (stringTable) ?

@@ -170,15 +170,15 @@ GdiEngine::createStdCursor (StdCursorKind cursorKind)
 {
 	static LPCTSTR stockCursorResTable [StdCursorKind__Count] =
 	{
-		IDC_ARROW,    // EStdCursor_Arrow = 0,
-		IDC_WAIT,     // EStdCursor_Wait,
-		IDC_IBEAM,    // EStdCursor_IBeam,
-		IDC_HAND,     // EStdCursor_Hyperlink,
-		IDC_SIZENS,   // EStdCursor_SizeNS,
-		IDC_SIZEWE,   // EStdCursor_SizeWE,
-		IDC_SIZENWSE, // EStdCursor_SizeNWSE,
-		IDC_SIZENESW, // EStdCursor_SizeNESW,
-		IDC_SIZEALL,  // EStdCursor_SizeAll,
+		IDC_ARROW,    // StdCursorKind_Arrow = 0,
+		IDC_WAIT,     // StdCursorKind_Wait,
+		IDC_IBEAM,    // StdCursorKind_IBeam,
+		IDC_HAND,     // StdCursorKind_Hyperlink,
+		IDC_SIZENS,   // StdCursorKind_SizeNS,
+		IDC_SIZEWE,   // StdCursorKind_SizeWE,
+		IDC_SIZENWSE, // StdCursorKind_SizeNWSE,
+		IDC_SIZENESW, // StdCursorKind_SizeNESW,
+		IDC_SIZEALL,  // StdCursorKind_SizeAll,
 	};
 
 	ASSERT (cursorKind < StdCursorKind__Count);
