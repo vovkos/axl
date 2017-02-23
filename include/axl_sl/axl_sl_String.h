@@ -1992,6 +1992,29 @@ formatString (
 	return formatString_va (formatString, va);
 }
 
+inline
+String_w
+formatString_w_va (
+	const wchar_t* formatString,
+	axl_va_list va
+	)
+{
+	String_w string;
+	string.format_va (formatString, va);
+	return string;
+}
+
+inline
+String_w
+formatString_w (
+	const wchar_t* formatString,
+	...
+	)
+{
+	AXL_VA_DECL (va, formatString);
+	return formatString_w_va (formatString, va);
+}
+
 //..............................................................................
 
 } // namespace sl
