@@ -112,64 +112,64 @@ typedef DuckTypeHashTable <String_utf32> StringHashTable_utf32;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef HashTable <
-	String, 
-	HashStringIgnoreCase_pcu, 
+	String,
+	HashStringIgnoreCase_pcu,
 	EqStringIgnoreCase_pcu
 	> StringHashTableIgnoreCase_pcu;
 
 typedef HashTable <
-	String_w, 
-	HashStringIgnoreCase_pcu_w, 
+	String_w,
+	HashStringIgnoreCase_pcu_w,
 	EqStringIgnoreCase_pcu_w
 	> StringHashTableIgnoreCase_pcu_w;
 
 typedef HashTable <
-	String_utf8, 
-	HashStringIgnoreCase_pcu_utf8, 
+	String_utf8,
+	HashStringIgnoreCase_pcu_utf8,
 	EqStringIgnoreCase_pcu_utf8
 	> StringHashTableIgnoreCase_pcu_utf8;
 
 typedef HashTable <
-	String_utf16, 
-	HashStringIgnoreCase_pcu_utf16, 
+	String_utf16,
+	HashStringIgnoreCase_pcu_utf16,
 	EqStringIgnoreCase_pcu_utf16
 	> StringHashTableIgnoreCase_pcu_utf16;
 
 typedef HashTable <
-	String_utf32, 
-	HashStringIgnoreCase_pcu_utf32, 
+	String_utf32,
+	HashStringIgnoreCase_pcu_utf32,
 	EqStringIgnoreCase_pcu_utf32
 	> StringHashTableIgnoreCase_pcu_utf32;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef HashTable <
-	String, 
-	HashStringIgnoreCase_pcp, 
+	String,
+	HashStringIgnoreCase_pcp,
 	EqStringIgnoreCase_pcp
 	> StringHashTableIgnoreCase_pcp;
 
 typedef HashTable <
-	String_w, 
-	HashStringIgnoreCase_pcp_w, 
+	String_w,
+	HashStringIgnoreCase_pcp_w,
 	EqStringIgnoreCase_pcp_w
 	> StringHashTableIgnoreCase_pcp_w;
 
 typedef HashTable <
-	String_utf8, 
-	HashStringIgnoreCase_pcp_utf8, 
+	String_utf8,
+	HashStringIgnoreCase_pcp_utf8,
 	EqStringIgnoreCase_pcp_utf8
 	> StringHashTableIgnoreCase_pcp_utf8;
 
 typedef HashTable <
-	String_utf16, 
-	HashStringIgnoreCase_pcp_utf16, 
+	String_utf16,
+	HashStringIgnoreCase_pcp_utf16,
 	EqStringIgnoreCase_pcp_utf16
 	> StringHashTableIgnoreCase_pcp_utf16;
 
 typedef HashTable <
-	String_utf32, 
-	HashStringIgnoreCase_pcp_utf32, 
+	String_utf32,
+	HashStringIgnoreCase_pcp_utf32,
 	EqStringIgnoreCase_pcp_utf32
 	> StringHashTableIgnoreCase_pcp_utf32;
 
@@ -212,9 +212,9 @@ class StringHashTableMap_utf32: public DuckTypeHashTableMap <String_utf32, Value
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcu: public HashTableMap <
-	String, 
+	String,
 	Value,
-	HashStringIgnoreCase_pcu, 
+	HashStringIgnoreCase_pcu,
 	EqStringIgnoreCase_pcu
 	>
 {
@@ -222,40 +222,40 @@ class StringHashTableMapIgnoreCase_pcu: public HashTableMap <
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcu_w: public HashTableMap <
-	String_w, 
+	String_w,
 	Value,
-	HashStringIgnoreCase_pcu, 
-	EqStringIgnoreCase_pcu
+	HashStringIgnoreCase_pcu_w,
+	EqStringIgnoreCase_pcu_w
 	>
 {
 };
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcu_utf8: public HashTableMap <
-	String_utf8, 
+	String_utf8,
 	Value,
-	HashStringIgnoreCase_pcu, 
-	EqStringIgnoreCase_pcu
+	HashStringIgnoreCase_pcu_utf8,
+	EqStringIgnoreCase_pcu_utf8
 	>
 {
 };
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcu_utf16: public HashTableMap <
-	String_utf16, 
+	String_utf16,
 	Value,
-	HashStringIgnoreCase_pcu, 
-	EqStringIgnoreCase_pcu
+	HashStringIgnoreCase_pcu_utf16,
+	EqStringIgnoreCase_pcu_utf16
 	>
 {
 };
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcu_utf32: public HashTableMap <
-	String_utf32, 
+	String_utf32,
 	Value,
-	HashStringIgnoreCase_pcu, 
-	EqStringIgnoreCase_pcu
+	HashStringIgnoreCase_pcu_utf32,
+	EqStringIgnoreCase_pcu_utf32
 	>
 {
 };
@@ -264,9 +264,9 @@ class StringHashTableMapIgnoreCase_pcu_utf32: public HashTableMap <
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcp: public HashTableMap <
-	String, 
+	String,
 	Value,
-	HashStringIgnoreCase_pcp, 
+	HashStringIgnoreCase_pcp,
 	EqStringIgnoreCase_pcp
 	>
 {
@@ -274,40 +274,40 @@ class StringHashTableMapIgnoreCase_pcp: public HashTableMap <
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcp_w: public HashTableMap <
-	String_w, 
+	String_w,
 	Value,
-	HashStringIgnoreCase_pcp, 
-	EqStringIgnoreCase_pcp
+	HashStringIgnoreCase_pcp_w,
+	EqStringIgnoreCase_pcp_w
 	>
 {
 };
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcp_utf8: public HashTableMap <
-	String_utf8, 
+	String_utf8,
 	Value,
-	HashStringIgnoreCase_pcp, 
-	EqStringIgnoreCase_pcp
+	HashStringIgnoreCase_pcp_utf8,
+	EqStringIgnoreCase_pcp_utf8
 	>
 {
 };
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcp_utf16: public HashTableMap <
-	String_utf16, 
+	String_utf16,
 	Value,
-	HashStringIgnoreCase_pcp, 
-	EqStringIgnoreCase_pcp
+	HashStringIgnoreCase_pcp_utf16,
+	EqStringIgnoreCase_pcp_utf16
 	>
 {
 };
 
 template <typename Value>
 class StringHashTableMapIgnoreCase_pcp_utf32: public HashTableMap <
-	String_utf32, 
+	String_utf32,
 	Value,
-	HashStringIgnoreCase_pcp,
-	EqStringIgnoreCase_pcp
+	HashStringIgnoreCase_pcp_utf32,
+	EqStringIgnoreCase_pcp_utf32
 	>
 {
 };
@@ -321,7 +321,7 @@ public:
 	StringHashTableMapIterator ()
 	{
 	}
- 
+
 	StringHashTableMapIterator (const Iterator <HashTableMapEntry <String, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
@@ -335,7 +335,7 @@ public:
 	StringHashTableMapIterator_w ()
 	{
 	}
- 
+
 	StringHashTableMapIterator_w (const Iterator <HashTableMapEntry <String_w, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
@@ -349,7 +349,7 @@ public:
 	StringHashTableMapIterator_utf8 ()
 	{
 	}
- 
+
 	StringHashTableMapIterator_utf8 (const Iterator <HashTableMapEntry <String_utf8, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
@@ -363,7 +363,7 @@ public:
 	StringHashTableMapIterator_utf16 ()
 	{
 	}
- 
+
 	StringHashTableMapIterator_utf16 (const Iterator <HashTableMapEntry <String_utf16, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
@@ -377,7 +377,7 @@ public:
 	StringHashTableMapIterator_utf32 ()
 	{
 	}
- 
+
 	StringHashTableMapIterator_utf32 (const Iterator <HashTableMapEntry <String_utf32, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
