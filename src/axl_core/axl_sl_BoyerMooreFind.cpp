@@ -247,19 +247,11 @@ TextBoyerMooreFind::buildBadSkipTable (size_t tableSize)
 		m_badSkipTable [i] = patternSize;
 
 	size_t last = patternSize - 1;
-
-	if (m_flags & TextBoyerMooreFlag_CaseInsensitive)
-		for (size_t i = 0, j = last; i < last; i++, j--)
-		{
-			uint32_t c = enc::utfToCaseFolded (m_pattern [i]);
-			m_badSkipTable [c % tableSize] = j;
-		}
-	else
-		for (size_t i = 0, j = last; i < last; i++, j--)
-		{
-			uint32_t c = m_pattern [i];
-			m_badSkipTable [c % tableSize] = j;
-		}
+	for (size_t i = 0, j = last; i < last; i++, j--)
+	{
+		uint32_t c = m_pattern [i];
+		m_badSkipTable [c % tableSize] = j;
+	}
 
 	return true;
 }
