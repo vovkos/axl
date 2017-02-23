@@ -82,17 +82,14 @@ enum BinTreeFindRelOp
 
 template <
 	typename T,
-	typename Key_0,
-	typename Cmp_0,
-	typename Node_0
+	typename Key,
+	typename Cmp,
+	typename KeyArg,
+	typename Node
 	>
 class BinTreeBase
 {
 public:
-	typedef Key_0 Key;
-	typedef Cmp_0 Cmp;
-	typedef Node_0 Node;
-
 	typedef sl::Iterator <Node> Iterator;
 
 protected:
@@ -130,7 +127,7 @@ public:
 	}
 
 	Iterator
-	find (const Key& key) const
+	find (KeyArg key) const
 	{
 		Node* node = m_root;
 
@@ -148,7 +145,7 @@ public:
 
 	Iterator
 	find (
-		const Key& key,
+		KeyArg key,
 		BinTreeFindRelOp relOp
 		) const
 	{
@@ -193,7 +190,7 @@ public:
 	}
 
 	Iterator
-	visit (const Key& key)
+	visit (KeyArg key)
 	{
 		Node* parent = NULL;
 		Node* node = m_root;
@@ -257,7 +254,7 @@ public:
 	}
 
 	bool
-	eraseKey (const Key& key)
+	eraseKey (KeyArg key)
 	{
 		Iterator it = find (key);
 		if (!it)

@@ -13,7 +13,7 @@
 
 #define _AXL_SL_CMP_H
 
-#include "axl_g_Pch.h"
+#include "axl_sl_ArgType.h"
 
 namespace axl {
 namespace sl {
@@ -22,7 +22,7 @@ namespace sl {
 
 template <
 	typename T,
-	typename Arg = T
+	typename Arg = typename ArgType <T>::Type
 	>
 class Cmp
 {

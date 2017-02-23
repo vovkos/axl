@@ -149,12 +149,14 @@ public:
 template <
 	typename Key,
 	typename Cmp,
+	typename KeyArg = ArgType <Key>,
 	typename Node = RbTreeNode <Key>
 	>
 class RbTree: public BinTreeBase <
-	RbTree <Key, Cmp, Node>,
+	RbTree <Key, Cmp, KeyArg, Node>,
 	Key,
 	Cmp,
+	KeyArg,
 	Node
 	>
 {
@@ -345,24 +347,51 @@ public:
 
 };
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//..............................................................................
 
 template <
 	typename Key,
 	typename Value,
-	typename Cmp = Cmp <Key>
+	typename Cmp = Cmp <Key>,
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename ValueArg = typename ArgType <Value>::Type
 	>
 class RbTreeMap: public RbTree <
 	Key,
 	Cmp,
+	KeyArg,
 	RbTreeMapNode <Key, Value>
 	>
 {
+public:
+	typedef sl::Iterator <RbTreeMapNode <Key, Value> > Iterator;
+
 public:
 	Value&
 	operator [] (KeyArg key)
 	{
 		return this->visit (key)->m_value;
+	}
+
+	Value
+	findValue (
+		KeyArg key,
+		ValueArg undefinedValue
+		) const
+	{
+		Iterator it = this->find (key);
+		return it ? it->m_value : undefinedValue;
+	}
+
+	Iterator
+	add (
+		KeyArg key,
+		ValueArg value
+		)
+	{
+		Iterator it = this->visit (key);
+		it->m_value = value;
+		return it;
 	}
 };
 

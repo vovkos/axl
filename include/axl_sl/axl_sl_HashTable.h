@@ -328,15 +328,7 @@ class HashTableMap: public HashTable <
 	>
 {
 public:
-	typedef HashTable <
-		Key,
-		Hash,
-		Eq,
-		KeyArg,
-		HashTableMapEntry <Key, Value>
-		> BaseType;
-
-	typedef typename BaseType::Iterator Iterator;
+	typedef sl::Iterator <HashTableMapEntry <Key, Value> > Iterator;
 
 public:
 	Value&
