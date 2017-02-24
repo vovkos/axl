@@ -335,7 +335,7 @@ class Class \
 public: \
 	typedef SwitchKind_0 SwitchKind; \
 	typedef axl::sl::SwitchInfo SwitchInfo; \
-	typedef axl::sl::HashTableMap <char, SwitchInfo*, axl::sl::HashId <char> > CharMap; \
+	typedef axl::sl::SimpleHashTableMap <char, SwitchInfo*> CharMap; \
 	typedef axl::sl::StringHashTableMap <SwitchInfo*> StringMap; \
 protected: \
 	axl::sl::AuxList <axl::sl::SwitchInfo> m_switchInfoList; \

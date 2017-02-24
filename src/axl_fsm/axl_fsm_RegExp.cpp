@@ -964,7 +964,7 @@ RegExpCompiler::clone (
 	NfaState* last
 	)
 {
-	sl::HashTableMap <NfaState*, NfaState*, sl::HashId <NfaState*> > stateMap;
+	sl::SimpleHashTableMap <NfaState*, NfaState*> stateMap;
 
 	sl::Iterator <NfaState> end = m_regExp->m_nfaStateList.getTail ();
 	sl::Iterator <NfaState> it = first;

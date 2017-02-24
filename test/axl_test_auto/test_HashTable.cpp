@@ -18,7 +18,7 @@ namespace {
 
 void test_IntHashTable ()
 {
-	sl::HashTableMap <int, int, sl::HashId <int> > map;
+	sl::SimpleHashTableMap <int, int> map;
 	sl::HashTableMapIterator <int, int> it;
 
 	for (size_t i = 0; i < 50; i++)
