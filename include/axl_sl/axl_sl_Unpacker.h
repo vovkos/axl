@@ -73,6 +73,37 @@ public:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// self-sized object
+
+template <
+	typename T,
+	typename SizeOf = sl::SizeOf <T>
+	>
+class UnpackSelfSizedPtr
+{
+public:
+	size_t
+	operator () (
+		const void* p,
+		size_t size,
+		T** value
+		)
+	{
+		if (size < sizeof (T))
+			return -1;
+
+		size_t objectSize = SizeOf () ((T*) p);
+		ASSERT (objectSize >= sizeof (T)); // otherwise wrong SizeOf impl
+
+		if (size < objectSize)
+			return -1;
+
+		*value = (T*) p;
+		return objectSize;
+	}
+};
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -138,6 +169,25 @@ class Unpack <T*>: public UnpackPtr <T>
 {
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// specialization for errors
+
+template <>
+class Unpack <err::ErrorHdr*>: public UnpackSelfSizedPtr <
+	err::ErrorHdr,
+	err::SizeOfError
+	>
+{
+};
+
+template <>
+class Unpack <const err::ErrorHdr*>: public UnpackSelfSizedPtr <
+	const err::ErrorHdr,
+	err::SizeOfError
+	>
+{
+};
 //..............................................................................
 
 class Unpacker
