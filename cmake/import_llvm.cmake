@@ -9,6 +9,13 @@
 #
 #...............................................................................
 
+unset (LLVM_DIR CACHE)
+set (LLVM_FOUND FALSE)
+
+if (NOT LLVM_CMAKE_DIR)
+	find_package (LLVM QUIET)
+endif ()
+
 if (EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 	include (${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 
@@ -20,14 +27,60 @@ if (EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 		set (LLVM_LIB_DIR ${LLVM_LIBRARY_DIRS})
 	endif ()
 
-	axl_message ("LLVM paths:")
+	set (LLVM_VERSION ${LLVM_PACKAGE_VERSION})
+
+	axl_message ("LLVM ${LLVM_VERSION} paths:")
 	axl_message ("    CMake files:" "${LLVM_CMAKE_DIR}")
 	axl_message ("    Includes:"    "${LLVM_INC_DIR}")
 	axl_message ("    Libraries:"   "${LLVM_LIB_DIR}")
 
 	set (LLVM_FOUND TRUE)
-else ()
-	set (LLVM_FOUND FALSE)
 endif ()
+
+#...............................................................................
+
+macro (
+target_link_llvm_libraries
+	_TARGET
+	# ...
+	)
+
+	set (_COMPONENT_LIST ${ARGN})
+
+	if (${LLVM_VERSION} VERSION_LESS 3.5)
+		llvm_map_components_to_libraries (_LIB_LIST ${_COMPONENT_LIST})
+	else ()
+		llvm_map_components_to_libnames (_LIB_LIST ${_COMPONENT_LIST})
+	endif ()
+
+	target_link_libraries (${_TARGET} ${_LIB_LIST})
+endmacro ()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+macro (
+target_link_llvm_jit_libraries
+	_TARGET
+	# ...
+	)
+
+	set (_EXTRA_COMPONENT_LIST ${ARGN})
+
+	set (
+		_COMPONENT_LIST
+		native
+		MCJIT
+		)
+
+	if (${LLVM_VERSION} VERSION_LESS 3.6)
+		set (_COMPONENT_LIST ${_COMPONENT_LIST} jit)
+	endif ()
+
+	target_link_llvm_libraries (
+		${_TARGET}
+		${_COMPONENT_LIST}
+		${_EXTRA_COMPONENT_LIST}
+		)
+endmacro ()
 
 #...............................................................................
