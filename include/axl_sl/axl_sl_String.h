@@ -379,7 +379,7 @@ public:
 		CaseConvertMethod method = CaseConvertMethod_Default
 		) const
 	{
-		return method == CaseConvertMethod_PerCodeUnit ? 
+		return method == CaseConvertMethod_PerCodeUnit ?
 			cmpIgnoreCase_pcu (string) :
 			cmpIgnoreCase_pcp (string);
 	}
@@ -393,7 +393,7 @@ public:
 	size_t
 	hashIgnoreCase (CaseConvertMethod method = CaseConvertMethod_Default) const
 	{
-		return method == CaseConvertMethod_PerCodeUnit ? 
+		return method == CaseConvertMethod_PerCodeUnit ?
 			hashIgnoreCase_pcu () :
 			hashIgnoreCase_pcp ();
 	}
@@ -720,7 +720,7 @@ protected:
 		{
 			size_t codePointLength1 = Encoding::getDecodeCodePointLength (*p1);
 			size_t codePointLength2 = Encoding::getDecodeCodePointLength (*p2);
-			
+
 			if (p1 + codePointLength1 > end1)
 				return p2 + codePointLength2 > end2 ? 0 : -1; // if both are badly terminated, return 0
 			else if (p2 + codePointLength2 > end2)
@@ -1671,7 +1671,7 @@ public:
 	}
 
 	size_t
-	reduceLength (size_t delta)
+	chop (size_t delta)
 	{
 		if (this->m_length <= delta)
 		{

@@ -42,7 +42,7 @@ HyperText::backspace (size_t backLength)
 		return 0;
 	}
 
-	m_text.reduceLength (backLength);
+	m_text.chop (backLength);
 	return length - backLength;
 }
 
