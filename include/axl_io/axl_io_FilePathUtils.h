@@ -81,6 +81,17 @@ findFilePath (
 	bool doFindInCurrentDir = true
 	);
 
+inline
+sl::String
+findFilePath (
+	const sl::StringRef& fileName,
+	const sl::BoxList <sl::String>* dirList,
+	bool doFindInCurrentDir = true
+	)
+{
+	return findFilePath (fileName, NULL, dirList, doFindInCurrentDir);
+}
+
 //..............................................................................
 
 } // namespace io
