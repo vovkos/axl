@@ -22,6 +22,22 @@ namespace win {
 
 //..............................................................................
 
+class CloseServiceHandle
+{
+public:
+	void
+	operator () (SC_HANDLE h)
+	{
+		::CloseServiceHandle (h);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef sl::Handle <SC_HANDLE, CloseServiceHandle> ServiceHandle;
+
+//..............................................................................
+
 class Service: public ServiceHandle
 {
 public:

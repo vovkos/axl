@@ -54,22 +54,6 @@ typedef sl::Handle <HKEY, CloseRegKey, sl::MinusOne <HKEY> > RegKeyHandle;
 
 //..............................................................................
 
-class CloseServiceHandle
-{
-public:
-	void
-	operator () (SC_HANDLE h)
-	{
-		::CloseServiceHandle (h);
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef sl::Handle <SC_HANDLE, CloseServiceHandle> ServiceHandle;
-
-//..............................................................................
-
 } // namespace win
 } // namespace sys
 } // namespace axl
