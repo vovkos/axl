@@ -148,7 +148,7 @@ public:
 
 template <
 	typename Key,
-	typename Cmp,
+	typename Cmp = Cmp <Key>,
 	typename KeyArg = ArgType <Key>,
 	typename Node = RbTreeNode <Key>
 	>
