@@ -46,6 +46,15 @@ struct RefCountAllocHdr
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+template <typename T>
+class RefCountAllocBuffer:
+	public RefCountAllocHdr,
+	public T
+{
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 enum RefCountFlag
 {
 	RefCountFlag_Allocated = 0x01, // must be freed, free func is in hdr
@@ -138,15 +147,6 @@ class Box:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class AllocBox:
-	public RefCountAllocHdr,
-	public T
-{
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
 class Release
 {
 public:
@@ -169,6 +169,18 @@ public:
 		p->weakRelease ();
 	}
 };
+
+//..............................................................................
+
+// forwards
+
+template <typename T>
+class Ptr;
+
+template <typename T>
+class WeakPtr;
+
+extern struct NullPtr g_nullPtr;
 
 //..............................................................................
 

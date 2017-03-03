@@ -20,20 +20,6 @@ namespace ref {
 
 //..............................................................................
 
-// forward
-
-template <typename T>
-class WeakPtr;
-
-//..............................................................................
-
-enum PtrKind
-{
-	PtrKind_Null = 0
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 template <typename T>
 class Ptr
 {
@@ -54,9 +40,8 @@ public:
 		m_refCount = NULL;
 	}
 
-	Ptr (PtrKind ptrKind)
+	Ptr (const NullPtr&)
 	{
-		ASSERT (ptrKind == PtrKind_Null);
 		m_p = NULL;
 		m_refCount = NULL;
 	}
@@ -116,17 +101,16 @@ public:
 	}
 
 	Ptr&
-	operator = (const Ptr& src)
+	operator = (const NullPtr&)
 	{
-		copy (src.m_p, src.m_refCount);
+		clear ();
 		return *this;
 	}
 
 	Ptr&
-	operator = (PtrKind ptrKind)
+	operator = (const Ptr& src)
 	{
-		ASSERT (ptrKind == PtrKind_Null);
-		clear ();
+		copy (src.m_p, src.m_refCount);
 		return *this;
 	}
 

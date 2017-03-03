@@ -69,7 +69,7 @@ public:
 		pack_va (NULL, &size, va);
 
 		if (size == -1)
-			return ref::PtrKind_Null;
+			return ref::g_nullPtr;
 
 		typedef ref::Box <mem::Block> Package;
 		ref::Ptr <Package> package = AXL_REF_NEW_EXTRA (Package, size);

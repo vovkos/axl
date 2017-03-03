@@ -68,7 +68,7 @@ GdiEngine::createStdFont (StdFontKind fontKind)
 		return createFont (hFont);
 
 	default:
-		return ref::PtrKind_Null;
+		return ref::g_nullPtr;
 	}
 }
 
@@ -84,7 +84,7 @@ GdiEngine::createFont (
 
 	HFONT hFont = ::CreateFontIndirect (&logFont);
 	if (!hFont)
-		return err::failWithLastSystemError (ref::PtrKind_Null);
+		return err::failWithLastSystemError (ref::g_nullPtr);
 
 	return createFont (hFont);
 }
@@ -97,7 +97,7 @@ GdiEngine::createStockFont (int stockFontKind)
 	if (gdiObjectType != OBJ_FONT)
 	{
 		err::setError (err::SystemErrorCode_InvalidHandle);
-		return ref::PtrKind_Null;
+		return ref::g_nullPtr;
 	}
 
 	return createFont ((HFONT) h);
@@ -158,7 +158,7 @@ GdiEngine::createStockCursor (LPCTSTR stockCursorRes)
 {
 	HCURSOR h = ::LoadCursor (NULL, stockCursorRes);
 	if (!h)
-		return err::failWithLastSystemError (ref::PtrKind_Null);
+		return err::failWithLastSystemError (ref::g_nullPtr);
 
 	ref::Ptr <GdiCursor> cursor = AXL_REF_NEW (ref::Box <GdiCursor>);
 	cursor->m_h = h;
@@ -230,7 +230,7 @@ GdiEngine::createImage (
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError (ref::PtrKind_Null);
+			return err::failWithLastSystemError (ref::g_nullPtr);
 	}
 	else
 	{
@@ -251,7 +251,7 @@ GdiEngine::createImage (
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError (ref::PtrKind_Null);
+			return err::failWithLastSystemError (ref::g_nullPtr);
 
 		bool_t result = ::SetDIBits (
 			screenDc,
@@ -264,7 +264,7 @@ GdiEngine::createImage (
 			);
 
 		if (!result)
-			return err::failWithLastSystemError (ref::PtrKind_Null);
+			return err::failWithLastSystemError (ref::g_nullPtr);
 	}
 
 	ref::Ptr <GdiImage> image = AXL_REF_NEW (ref::Box <GdiImage>);
@@ -281,7 +281,7 @@ GdiEngine::createOffscreenCanvas (
 	ScreenDc screenDc;
 	HBITMAP hBitmap = ::CreateCompatibleBitmap (screenDc, width, height);
 	if (!hBitmap)
-		return err::failWithLastSystemError (ref::PtrKind_Null);
+		return err::failWithLastSystemError (ref::g_nullPtr);
 
 	HDC hdc = ::CreateCompatibleDC (screenDc);
 

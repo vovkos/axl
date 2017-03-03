@@ -187,7 +187,7 @@ run_WeakRef ()
 //	ref::CPtrT <MyClass2> p2 = ref::GetPtrOrClone ((MyClass2*) p);
 //	ref::CPtrT <MyClass2> p3 = ref::Clone (p);
 	ref::WeakPtr <MyClass2> w = p;
-	p = ref::PtrKind_Null;
+	p = ref::g_nullPtr;
 	p = w;
 }
 
@@ -212,7 +212,7 @@ public:
 		{ printf ("MyClass4::~MyClass4 ()\n"); }
 
 	ref::Ptr <IMyInterface> getChild (int i)
-		{ return ref::PtrKind_Null; }
+		{ return ref::g_nullPtr; }
 
 	virtual void doSomething ()
 		{ printf ("MyClass4::doSomething ()\n"); }
@@ -256,7 +256,7 @@ public:
 			return &m_child3;
 
 		default:
-			return ref::PtrKind_Null;
+			return ref::g_nullPtr;
 		}
 	}
 
@@ -302,7 +302,7 @@ public:
 			return &m_child3;
 
 		default:
-			return ref::PtrKind_Null;
+			return ref::g_nullPtr;
 		}
 	}
 
@@ -334,17 +334,17 @@ run_Container ()
 	p->getChild (2)->doSomething ();
 	p->getChild (2)->doSomethingElse ();
 
-	p = ref::PtrKind_Null;
+	p = ref::g_nullPtr;
 
 //	p2->doSomething ();
-//	p2 = ref::PtrKind_Null;
+//	p2 = ref::g_nullPtr;
 
 	p3 = AXL_REF_NEW (ref::Box <MyClass4>);
 
 	ref::WeakPtr <IMyInterface> w = p3;
 	p3->doSomethingElse ();
 
-	p3 = ref::PtrKind_Null;
+	p3 = ref::g_nullPtr;
 
 	p = w;
 }

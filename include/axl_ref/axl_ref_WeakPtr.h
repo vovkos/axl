@@ -20,13 +20,6 @@ namespace ref {
 
 //..............................................................................
 
-// forward
-
-template <typename T>
-class Ptr;
-
-//..............................................................................
-
 // weak ptr
 
 template <typename T>
@@ -43,7 +36,13 @@ protected:
 	RefCount* m_refCount;
 
 public:
-	WeakPtr (int i = 0)
+	WeakPtr ()
+	{
+		m_p = NULL;
+		m_refCount = NULL;
+	}
+
+	WeakPtr (const NullPtr&)
 	{
 		m_p = NULL;
 		m_refCount = NULL;
@@ -88,6 +87,13 @@ public:
 	~WeakPtr ()
 	{
 		clear ();
+	}
+
+	WeakPtr&
+	operator = (const NullPtr&)
+	{
+		clear ();
+		return *this;
 	}
 
 	WeakPtr&
