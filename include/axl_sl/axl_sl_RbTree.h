@@ -386,10 +386,34 @@ public:
 	Iterator
 	add (
 		KeyArg key,
+		ValueArg value,
+		bool* isNew = NULL
+		)
+	{
+		size_t prevCount = getCount ();
+
+		Iterator it = this->visit (key);
+		it->m_value = value;
+
+		if (isNew)
+			*isNew = getCount () > prevCount;
+
+		return it;
+	}
+
+	Iterator
+	addIfNotExists (
+		KeyArg key,
 		ValueArg value
 		)
 	{
+		size_t prevCount = getCount ();
+
 		Iterator it = this->visit (key);
+
+		if (getCount () == prevCount)
+			return NULL;
+
 		it->m_value = value;
 		return it;
 	}

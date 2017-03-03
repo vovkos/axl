@@ -237,6 +237,30 @@ public:
 		return node;
 	}
 
+	Iterator
+	add (
+		KeyArg key,
+		bool* isNew = NULL
+		)
+	{
+		size_t prevCount = getCount ();
+
+		Iterator it = this->visit (key);
+
+		if (isNew)
+			*isNew = getCount () > prevCount;
+
+		return it;
+	}
+
+	Iterator
+	addIfNotExists (KeyArg key)
+	{
+		size_t prevCount = getCount ();
+		Iterator it = this->visit (key);
+		return getCount () > prevCount ? it : NULL;
+	}
+
 	void
 	erase (Iterator it)
 	{

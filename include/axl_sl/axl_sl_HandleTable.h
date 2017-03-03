@@ -15,13 +15,17 @@
 
 #include "axl_sl_List.h"
 #include "axl_sl_HashTable.h"
+#include "axl_sl_ArgType.h"
 
 namespace axl {
 namespace sl {
 
 //..............................................................................
 
-template <typename T>
+template <
+	typename T,
+	typename Arg = ArgType <T>::Type
+	>
 class HandleTable
 {
 public:
@@ -92,22 +96,18 @@ public:
 		return m_hashTable.find (handle);
 	}
 
-	bool
-	find (
+	T
+	findValue (
 		handle_t handle,
-		T* value
+		Arg undefinedValue
 		) const
 	{
 		MapIterator it = m_hashTable.find (handle);
-		if (!it)
-			return false;
-
-		*value = it->m_value->m_value;
-		return true;
+		return it ? it->m_value->m_value : undefinedValue;
 	}
 
 	handle_t
-	add (T value)
+	add (Arg value)
 	{
 		ASSERT (m_seed);
 		handle_t handle = (handle_t) m_seed;
@@ -127,20 +127,20 @@ public:
 	}
 
 	void
-	remove (MapIterator it)
+	erase (MapIterator it)
 	{
 		m_list.erase (it->m_value);
 		m_hashTable.erase (it);
 	}
 
 	bool
-	remove (handle_t handle)
+	eraseHandle (handle_t handle)
 	{
 		MapIterator it = m_hashTable.find (handle);
 		if (!it)
 			return false;
 
-		remove (it);
+		erase (it);
 		return true;
 	}
 };
