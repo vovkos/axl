@@ -24,7 +24,7 @@ namespace sl {
 
 template <
 	typename T,
-	typename Arg = ArgType <T>::Type
+	typename Arg = typename ArgType <T>::Type
 	>
 class HandleTable
 {

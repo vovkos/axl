@@ -297,10 +297,10 @@ public:
 		size_t prevCount = getCount ();
 
 		Iterator it = visit (key);
-		
+
 		if (isNew)
 			*isNew = getCount () > prevCount;
-		
+
 		return it;
 	}
 
@@ -378,13 +378,13 @@ public:
 		bool* isNew = NULL
 		)
 	{
-		size_t prevCount = getCount ();
+		size_t prevCount = this->getCount ();
 
 		Iterator it = this->visit (key);
 		it->m_value = value;
 
 		if (isNew)
-			*isNew = getCount () > prevCount;
+			*isNew = this->getCount () > prevCount;
 
 		return it;
 	}
@@ -395,11 +395,11 @@ public:
 		ValueArg value
 		)
 	{
-		size_t prevCount = getCount ();
+		size_t prevCount = this->getCount ();
 
 		Iterator it = this->visit (key);
 
-		if (getCount () == prevCount)
+		if (this->getCount () == this->prevCount)
 			return NULL;
 
 		it->m_value = value;
