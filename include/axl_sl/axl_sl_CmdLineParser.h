@@ -56,6 +56,7 @@ protected:
 	};
 
 protected:
+	int m_argIdx;
 	int m_valueSwitchKind;
 	sl::String m_valueSwitchName;
 	uint_t m_flags;
@@ -63,6 +64,7 @@ protected:
 protected:
 	CmdLineParserRoot ()
 	{
+		m_argIdx = 0;
 		m_valueSwitchKind = 0;
 		m_flags = 0;
 	}
@@ -119,7 +121,7 @@ public:
 
 		m_valueSwitchKind = 0;
 
-		for (int i = 0; !cmdLine.isEmpty (); i++)
+		for (m_argIdx = 0; !cmdLine.isEmpty (); m_argIdx++)
 		{
 			size_t length = extractArg (cmdLine, &arg);
 			if (length == -1)
@@ -128,7 +130,7 @@ public:
 			if (arg.isEmpty ())
 				break;
 
-			result = processArg (i, arg);
+			result = processArg (arg);
 			if (!result)
 				return false;
 
@@ -150,7 +152,8 @@ public:
 
 		for (int i = 0; i < argc; i++)
 		{
-			result = processArg (i, argv [i]);
+			m_argIdx = i;
+			result = processArg (argv [i]);
 			if (!result)
 				return false;
 		}
@@ -170,7 +173,8 @@ public:
 
 		for (int i = 0; i < argc; i++)
 		{
-			result = processArg (i, sl::String (argv [i]));
+			m_argIdx = i;
+			result = processArg (sl::String (argv [i]));
 			if (!result)
 				return false;
 		}
@@ -221,10 +225,7 @@ protected:
 	}
 
 	bool
-	processArg (
-		int i,
-		const sl::StringRef& arg
-		)
+	processArg (const sl::StringRef& arg)
 	{
 		bool result;
 
@@ -240,7 +241,7 @@ protected:
 		switch (argKind)
 		{
 		case ArgKind_Value:
-			return processValue (i, arg);
+			return processValue (arg);
 
 		case ArgKind_StringSwitch:
 			result = parseSwitch (argKind, arg.getSubString (2), &switchName, &value);
@@ -283,15 +284,12 @@ protected:
 	}
 
 	bool
-	processValue (
-		int i,
-		const sl::StringRef& value
-		)
+	processValue (const sl::StringRef& value)
 	{
 		T* self = static_cast <T*> (this);
 
 		if (!m_valueSwitchKind)
-			return i == 0 ? self->onValue0 (value) : self->onValue (value);
+			return m_argIdx == 0 ? self->onValue0 (value) : self->onValue (value);
 
 		bool result = self->onSwitch ((SwitchKind) m_valueSwitchKind, value);
 		if (!result)
