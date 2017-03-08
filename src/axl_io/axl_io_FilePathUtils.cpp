@@ -242,14 +242,29 @@ getFullFilePath (const sl::StringRef& fileName)
 	sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
 	fileName_w = fileName;
 
-	size_t length = ::GetFullPathNameW (fileName_w, 0, NULL, NULL);
-	if (!length)
+	size_t bufferLength = ::GetFullPathNameW (fileName_w, 0, NULL, NULL);
+	if (!bufferLength)
 		return err::failWithLastSystemError (NULL);
 
 	sl::String_w filePath;
-	wchar_t* p = filePath.createBuffer (length);
-	::GetFullPathNameW (fileName_w, length, p, NULL);
-	return filePath;
+
+	for (;;)
+	{
+		wchar_t* p = filePath.createBuffer (bufferLength);
+		if (!p)
+			return NULL;
+
+		size_t actualLength = ::GetFullPathNameW (fileName_w, bufferLength, p, NULL);
+		if (!actualLength)
+			return err::failWithLastSystemError (NULL);
+
+		if (actualLength < bufferLength)
+			return sl::String (filePath, actualLength);
+
+		ASSERT (actualLength > bufferLength);
+		bufferLength = actualLength; // try with a bigger buffer
+	}
+
 #elif (_AXL_OS_POSIX)
 	char fullPath [PATH_MAX] = { 0 };
 	::realpath (fileName.sz (), fullPath);
