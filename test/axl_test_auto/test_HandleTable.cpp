@@ -31,7 +31,7 @@ run ()
 	sl::Iterator <sl::HandleTable <int>::Entry> it = handleTable.getList ().getHead ();
 	for (; it; it++)
 	{
-		printf ("0x%x = %d\n", it->getHandle (), it->m_value);
+		printf ("0x%p -> %d\n", it->getHandle (), it->m_value);
 	}
 }
 

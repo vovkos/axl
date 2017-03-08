@@ -23,19 +23,19 @@ class MyFinalizer:
 public:
 	MyFinalizer ()
 	{
-		printf ("MyFinalizer::MyFinalizer (this = %x)\n", this);
+		printf ("MyFinalizer::MyFinalizer (this = %p)\n", this);
 	}
 
 	~MyFinalizer ()
 	{
-		printf ("MyFinalizer::~MyFinalizer (this = %x)\n", this);
+		printf ("MyFinalizer::~MyFinalizer (this = %p)\n", this);
 	}
 
 	virtual
 	void
 	finalize ()
 	{
-		printf ("MyFinalizer::finalize (this = %x)\n", this);
+		printf ("MyFinalizer::finalize (this = %p)\n", this);
 	}
 };
 
