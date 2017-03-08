@@ -55,6 +55,7 @@ using namespace axl;
 #	include <commctrl.h>
 
 #	pragma comment (lib, "ws2_32.lib")
+#	pragma comment (lib, "crypt32.lib")
 #	pragma comment (lib, "comctl32.lib")
 #endif
 
