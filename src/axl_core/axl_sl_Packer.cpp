@@ -58,6 +58,9 @@ PackerSeq::pack_va (
 size_t
 PackerSeq::appendFormat (const char* formatString)
 {
+	if (!formatString)
+		return m_sequence.getCount ();
+
 	const char* pF = formatString;
 
 	for (; *pF; pF++)
