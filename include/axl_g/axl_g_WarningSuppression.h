@@ -17,6 +17,7 @@
 #	pragma warning (disable: 4267) // warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
 #	pragma warning (disable: 4355) // warning C4355: 'this' : used in base member initializer list
 #	pragma warning (disable: 4477) // warning C4477: 'printf' : format string '...' requires an argument of type '...', but variadic argument ... has type '...'
+#	pragma warning (disable: 4838) // warning C4838: conversion from 'int' to 'std::size_t' requires a narrowing conversion
 
 	// many binary distributions of libs only come with Release build; static versions of those link to LIBCMT 
 	// thus producing the following warning when linked to your executables on Debug builds:
