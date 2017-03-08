@@ -190,9 +190,9 @@ foreach (_FILE_NAME ${TEST_CPP_LIST})
 		get_filename_component (_TEST_NAME ${_FILE_NAME} NAME_WE)
 
 		add_test (
-			NAME ${_TEST_NAME}
+			NAME axl-${_TEST_NAME}
 			WORKING_DIRECTORY ${_DIR}
-			COMMAND $<TARGET_FILE:axl_test_auto> ${_TEST_NAME}
+			COMMAND axl_test_auto ${_TEST_NAME}
 			)
 	endif ()
 endforeach ()
