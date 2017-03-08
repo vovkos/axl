@@ -159,6 +159,10 @@
 #	ifndef _SCL_SECURE_NO_WARNINGS
 #		define _SCL_SECURE_NO_WARNINGS 1 // useless warnings about "unsafe" iterator operations
 #	endif
+#
+#	ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+#		define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+#	endif
 #endif
 
 #include <stddef.h>
