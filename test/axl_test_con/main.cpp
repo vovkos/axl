@@ -15,6 +15,8 @@
 
 #if (_AXL_OS_WIN)
 
+typedef LONG NTSTATUS;
+
 #include "axl_sys_win_NtStatus.h"
 
 //..............................................................................
@@ -2610,13 +2612,13 @@ testMailSlot ()
 {
 	printf ("1 for server, 2 for client:\n");
 	char buffer [256];
-	gets (buffer);
+	fgets (buffer, countof (buffer), stdin);
 
 	if (buffer [0] == '1')
 	{
 	char slotName [256];
 	printf ("slot name (e.g. \\\\.\\mailslot\\foo):\n");
-	gets (slotName);
+	fgets (slotName, countof(slotName), stdin);
 
 		HANDLE hFile = CreateMailslotA (slotName, 0, -1, NULL);
 	   if (hFile == INVALID_HANDLE_VALUE)
@@ -2637,7 +2639,7 @@ testMailSlot ()
 
 	char slotName [256];
 	printf ("slot name (e.g. \\\\*\\mailslot\\foo):\n");
-	gets (slotName);
+	fgets (slotName, countof(slotName), stdin);
 
 		HANDLE hFile;
 
