@@ -255,14 +255,15 @@ getFullFilePath (const sl::StringRef& fileName)
 			return NULL;
 
 		size_t actualLength = ::GetFullPathNameW (fileName_w, bufferLength, p, NULL);
+		ASSERT (actualLength != bufferLength); // on success, it should be bufferLength - 1
+
 		if (!actualLength)
 			return err::failWithLastSystemError (NULL);
 
-		if (actualLength < bufferLength)
+		if (actualLength <= bufferLength)
 			return sl::String (filePath, actualLength);
 
-		ASSERT (actualLength > bufferLength);
-		bufferLength = actualLength; // try with a bigger buffer
+		bufferLength = actualLength; // try again with a bigger buffer
 	}
 
 #elif (_AXL_OS_POSIX)
