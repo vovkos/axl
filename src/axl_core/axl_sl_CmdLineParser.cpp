@@ -93,17 +93,12 @@ CmdLineParserRoot::parseSwitch (
 		switchName->copy (p0, p - p0);
 	}
 
-	if (*p && !isspace (*p)) // has value
+	if (p < end && !isspace (*p)) // has value
 	{
 		if (*p == '=')
 			p++;
 
-		const char* p1 = p;
-
-		while (*p && !isspace (*p))
-			p++;
-
-		value->copy (p1, p - p1);
+		value->copy (p, end - p);
 	}
 	else
 	{
