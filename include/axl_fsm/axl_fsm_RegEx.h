@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_FSM_REGEXP_H
+#define _AXL_FSM_REGEX_H
 
 #include "axl_fsm_Dfa.h"
 
@@ -20,7 +20,7 @@ namespace fsm {
 
 //..............................................................................
 
-class RegExpNameMgr
+class RegExNameMgr
 {
 public:
 	virtual
@@ -30,9 +30,9 @@ public:
 
 //..............................................................................
 
-class RegExp
+class RegEx
 {
-	friend class RegExpCompiler;
+	friend class RegExCompiler;
 
 protected:
 	sl::StdList <NfaState> m_nfaStateList;
@@ -44,7 +44,7 @@ protected:
 	size_t m_groupCount;
 
 public:
-	RegExp ()
+	RegEx ()
 	{
 		m_groupCount = 0;
 	}
@@ -100,12 +100,13 @@ public:
 
 //..............................................................................
 
-class RegExpCompiler
+class RegExCompiler
 {
 public:
 	enum Flag
 	{
 		Flag_NonCapturingGroups = 0x01,
+		Flag_SparseSyntax       = 0x02,
 	};
 
 	enum Const
@@ -141,29 +142,29 @@ protected:
 	};
 
 protected:
-	RegExp* m_regExp;
-	RegExpNameMgr* m_nameMgr;
+	RegEx* m_regEx;
+	RegExNameMgr* m_nameMgr;
 	uint_t m_flags;
 
 	const char* m_p;
 	Token m_lastToken;
 
 public:
-	RegExpCompiler (
-		RegExp* regExp,
-		RegExpNameMgr* nameMgr = NULL
+	RegExCompiler (
+		RegEx* regEx,
+		RegExNameMgr* nameMgr = NULL
 		)
 	{
-		construct (0, regExp, nameMgr);
+		construct (0, regEx, nameMgr);
 	}
 
-	RegExpCompiler (
+	RegExCompiler (
 		uint_t flags,
-		RegExp* regExp,
-		RegExpNameMgr* nameMgr = NULL
+		RegEx* regEx,
+		RegExNameMgr* nameMgr = NULL
 		)
 	{
-		construct (flags, regExp, nameMgr);
+		construct (flags, regEx, nameMgr);
 	}
 
 	bool
@@ -185,8 +186,8 @@ protected:
 	void
 	construct (
 		uint_t flags,
-		RegExp* regExp,
-		RegExpNameMgr* nameMgr
+		RegEx* regEx,
+		RegExNameMgr* nameMgr
 		);
 
 	bool
@@ -250,7 +251,7 @@ protected:
 	stdCharClass (uint_t c);
 
 	NfaState*
-	namedRegExp (const sl::StringRef& name);
+	namedRegEx (const sl::StringRef& name);
 
 	void
 	stdCharClass (

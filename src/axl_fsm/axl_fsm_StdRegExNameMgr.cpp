@@ -9,51 +9,13 @@
 //
 //..............................................................................
 
-#pragma once
-
-#define _AXL_FSM_STDREGEXPNAMEMGR_H
-
-#include "axl_fsm_RegExp.h"
+#include "pch.h"
+#include "axl_fsm_StdRegExNameMgr.h"
 
 namespace axl {
 namespace fsm {
 
 //..............................................................................
-
-class StdRegExpNameMgr: public RegExpNameMgr
-{
-protected:
-	sl::StringHashTableMap <sl::String> m_nameMap;
-
-public:
-	void
-	clear ()
-	{
-		m_nameMap.clear ();
-	}
-
-	virtual
-	sl::StringRef
-	findName (const sl::StringRef& name)
-	{
-		return m_nameMap.findValue (name, NULL);
-	}
-
-	void
-	addName (
-		const sl::StringRef& name,
-		const sl::StringRef& source
-		)
-	{
-		m_nameMap [name] = source;
-	}
-
-	bool
-	removeName (const sl::StringRef& name)
-	{
-		return m_nameMap.eraseKey (name);
-	}
-};
 
 //..............................................................................
 

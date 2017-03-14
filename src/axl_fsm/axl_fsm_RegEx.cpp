@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_fsm_RegExp.h"
+#include "axl_fsm_RegEx.h"
 
 namespace axl {
 namespace fsm {
@@ -98,7 +98,7 @@ getMatchConditionString (const MatchCondition* condition)
 //..............................................................................
 
 void
-RegExp::clear ()
+RegEx::clear ()
 {
 	m_groupCount = 0;
 	m_nfaStateList.clear ();
@@ -108,20 +108,20 @@ RegExp::clear ()
 }
 
 bool
-RegExp::match (const sl::StringRef& string)
+RegEx::match (const sl::StringRef& string)
 {
 	return false;
 }
 
 bool
-RegExp::compile (const sl::StringRef& source)
+RegEx::compile (const sl::StringRef& source)
 {
-	RegExpCompiler compiler (this);
+	RegExCompiler compiler (this);
 	return compiler.compile (source);
 }
 
 void
-RegExp::print () const
+RegEx::print () const
 {
 	printf ("NFA\n");
 	printf ("==================\n");
@@ -243,7 +243,7 @@ initValidSingleTable (bool* table)
 }
 
 bool
-RegExpCompiler::Token::isValidSingle ()
+RegExCompiler::Token::isValidSingle ()
 {
 	if (m_tokenKind != TokenKind_SpecialChar)
 		return true;
@@ -256,13 +256,13 @@ RegExpCompiler::Token::isValidSingle ()
 //..............................................................................
 
 void
-RegExpCompiler::construct (
+RegExCompiler::construct (
 	uint_t flags,
-	RegExp* regExp,
-	RegExpNameMgr* nameMgr
+	RegEx* regEx,
+	RegExNameMgr* nameMgr
 	)
 {
-	m_regExp = regExp;
+	m_regEx = regEx;
 	m_nameMgr = nameMgr;
 	m_flags = 0;
 	m_p = NULL;
@@ -271,12 +271,12 @@ RegExpCompiler::construct (
 }
 
 bool
-RegExpCompiler::compile (
+RegExCompiler::compile (
 	const sl::StringRef& source,
 	void* acceptContext
 	)
 {
-	m_regExp->clear ();
+	m_regEx->clear ();
 
 	bool result = incrementalCompile (source, acceptContext);
 	if (!result)
@@ -287,7 +287,7 @@ RegExpCompiler::compile (
 }
 
 bool
-RegExpCompiler::incrementalCompile (
+RegExCompiler::incrementalCompile (
 	const sl::StringRef& source,
 	void* acceptContext
 	)
@@ -295,8 +295,8 @@ RegExpCompiler::incrementalCompile (
 	m_p = source.sz ();
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 
-	NfaState* oldStart = !m_regExp->m_nfaStateList.isEmpty () ?
-		*m_regExp->m_nfaStateList.getHead () :
+	NfaState* oldStart = !m_regEx->m_nfaStateList.isEmpty () ?
+		*m_regEx->m_nfaStateList.getHead () :
 		NULL;
 
 	NfaState* body = expression ();
@@ -307,7 +307,7 @@ RegExpCompiler::incrementalCompile (
 	if (!result)
 		return false;
 
-	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* accept = *m_regEx->m_nfaStateList.getTail ();
 	accept->m_flags |= NfaStateFlag_Accept;
 	accept->m_acceptContext = acceptContext;
 
@@ -315,14 +315,14 @@ RegExpCompiler::incrementalCompile (
 	{
 		NfaState* split = AXL_MEM_NEW (NfaState);
 		split->createEpsilonLink (oldStart, body);
-		m_regExp->m_nfaStateList.insertHead (split);
+		m_regEx->m_nfaStateList.insertHead (split);
 	}
 
 	return true;
 }
 
 void
-RegExpCompiler::finalize ()
+RegExCompiler::finalize ()
 {
 	assignNfaIds ();
 	makeDfa ();
@@ -331,46 +331,46 @@ RegExpCompiler::finalize ()
 }
 
 void
-RegExpCompiler::assignNfaIds ()
+RegExCompiler::assignNfaIds ()
 {
-	size_t nfaStateCount = m_regExp->m_nfaStateList.getCount ();
-	m_regExp->m_nfaStateArray.setCount (nfaStateCount);
+	size_t nfaStateCount = m_regEx->m_nfaStateList.getCount ();
+	m_regEx->m_nfaStateArray.setCount (nfaStateCount);
 
-	sl::Iterator <NfaState> nfaIt = m_regExp->m_nfaStateList.getHead ();
+	sl::Iterator <NfaState> nfaIt = m_regEx->m_nfaStateList.getHead ();
 	for (uint_t i = 0; nfaIt; i++, nfaIt++)
 	{
 		NfaState* nfaState = *nfaIt;
 		nfaState->m_id = i;
-		m_regExp->m_nfaStateArray [i] = nfaState;
+		m_regEx->m_nfaStateArray [i] = nfaState;
 	}
 }
 
 void
-RegExpCompiler::assignDfaIds ()
+RegExCompiler::assignDfaIds ()
 {
-	size_t dfaStateCount = m_regExp->m_dfaStateList.getCount ();
-	m_regExp->m_dfaStateArray.setCount (dfaStateCount);
+	size_t dfaStateCount = m_regEx->m_dfaStateList.getCount ();
+	m_regEx->m_dfaStateArray.setCount (dfaStateCount);
 
-	sl::Iterator <DfaState> dfaIt = m_regExp->m_dfaStateList.getHead ();
+	sl::Iterator <DfaState> dfaIt = m_regEx->m_dfaStateList.getHead ();
 	for (uint_t i = 0; dfaIt; i++, dfaIt++)
 	{
 		DfaState* state = *dfaIt;
 		state->m_id = i;
-		m_regExp->m_dfaStateArray [i] = state;
+		m_regEx->m_dfaStateArray [i] = state;
 	}
 }
 
 void
-RegExpCompiler::makeDfa ()
+RegExCompiler::makeDfa ()
 {
 	sl::Array <DfaState*> workingSet;
 	NfaStateSetMap <DfaState*> dfaStateMap;
 
 	DfaState* dfaState = AXL_MEM_NEW (DfaState);
-	dfaState->addNfaState (*m_regExp->m_nfaStateList.getHead ());
+	dfaState->addNfaState (*m_regEx->m_nfaStateList.getHead ());
 	dfaState->makeEpsilonClosure ();
 
-	m_regExp->m_dfaStateList.insertTail (dfaState);
+	m_regEx->m_dfaStateList.insertTail (dfaState);
 	workingSet.append (dfaState);
 	dfaStateMap [&dfaState->m_nfaStateSet] = dfaState;
 
@@ -418,7 +418,7 @@ RegExpCompiler::makeDfa ()
 			}
 			else
 			{
-				m_regExp->m_dfaStateList.insertTail (dfaState2);
+				m_regEx->m_dfaStateList.insertTail (dfaState2);
 				workingSet.append (dfaState2);
 				mapIt->m_value = dfaState2;
 			}			
@@ -432,7 +432,7 @@ RegExpCompiler::makeDfa ()
 }
 
 void
-RegExpCompiler::minimizeDfa ()
+RegExCompiler::minimizeDfa ()
 {
 }
 
@@ -455,7 +455,7 @@ getHexValue (
 }
 
 bool
-RegExpCompiler::readHexEscapeSequence (uchar_t* c)
+RegExCompiler::readHexEscapeSequence (uchar_t* c)
 {
 	ASSERT (*m_p == 'x');
 	m_p++;
@@ -479,7 +479,7 @@ RegExpCompiler::readHexEscapeSequence (uchar_t* c)
 }
 
 bool
-RegExpCompiler::readEscapeSequence (uchar_t* c)
+RegExCompiler::readEscapeSequence (uchar_t* c)
 {
 	ASSERT (*m_p == '\\');
 	m_p++;
@@ -538,7 +538,7 @@ RegExpCompiler::readEscapeSequence (uchar_t* c)
 }
 
 bool
-RegExpCompiler::readLiteral (sl::String* string)
+RegExCompiler::readLiteral (sl::String* string)
 {
 	char delimiter = *m_p++;
 	ASSERT (delimiter == '"' || delimiter == '\'');
@@ -577,7 +577,7 @@ RegExpCompiler::readLiteral (sl::String* string)
 }
 
 bool
-RegExpCompiler::readHexLiteral (sl::String* string)
+RegExCompiler::readHexLiteral (sl::String* string)
 {
 	ASSERT (m_p [0] == '0' && m_p [1] == 'x');
 	m_p += 2;
@@ -611,7 +611,7 @@ RegExpCompiler::readHexLiteral (sl::String* string)
 }
 
 bool
-RegExpCompiler::readIdentifier (sl::String* name)
+RegExCompiler::readIdentifier (sl::String* name)
 {
 	ASSERT (isalpha ((uchar_t) *m_p) || *m_p == '_');
 
@@ -627,7 +627,7 @@ RegExpCompiler::readIdentifier (sl::String* name)
 }
 
 bool
-RegExpCompiler::readQuantifier (size_t* count)
+RegExCompiler::readQuantifier (size_t* count)
 {
 	char* end;
 	long n  = strtoul (m_p, &end, 10);
@@ -653,7 +653,7 @@ RegExpCompiler::readQuantifier (size_t* count)
 }
 
 bool
-RegExpCompiler::getToken (Token* token)
+RegExCompiler::getToken (Token* token)
 {
 	if (m_lastToken.m_tokenKind)
 	{
@@ -662,101 +662,171 @@ RegExpCompiler::getToken (Token* token)
 		return true;
 	}
 
-	for (;;)
+	if (!(m_flags & Flag_SparseSyntax))
 	{
-		switch (*m_p)
+		for (;;)
 		{
-		case '\\':
-			switch (m_p [1])
+			switch (*m_p)
 			{
-			case 's':
-			case 'S':
-			case 'd':
-			case 'D':
-			case 'h':
-			case 'H':
-			case 'w':
-			case 'W':
-				token->m_tokenKind = TokenKind_SpecialChar;
-				token->m_char = m_p [1];
-				m_p += 2;
-				return true;
+			case '\\':
+				switch (m_p [1])
+				{
+				case 's':
+				case 'S':
+				case 'd':
+				case 'D':
+				case 'h':
+				case 'H':
+				case 'w':
+				case 'W':
+					token->m_tokenKind = TokenKind_SpecialChar;
+					token->m_char = m_p [1];
+					m_p += 2;
+					return true;
 
-			case '\n':
-				m_p += 2; // ignore line continuation (LF)
+				case '\n':
+					m_p += 2; // ignore line continuation (LF)
+					break;
+
+				case '\r':
+					if (m_p [2] == '\n')
+					{
+						m_p += 3; // line continuation (CR-LF)
+						break;
+					}
+
+				default:
+					token->m_tokenKind = TokenKind_Char;
+					return readEscapeSequence (&token->m_char);
+				}
+
 				break;
 
-			case '\r':
-				if (m_p [2] == '\n')
-				{
-					m_p += 3; // line continuation (CR-LF)
-					break;
-				}
+			case 0:
+				token->m_tokenKind = TokenKind_SpecialChar;
+				token->m_char = 0; // don't advance m_p
+				return true;
+
+			case '.':
+			case '?':
+			case '*':
+			case '+':
+			case '[':
+			case ']':
+			case '(':
+			case ')':
+			case '|':
+			case '^':
+			case '$':
+			case '{':
+			case '}':
+				token->m_tokenKind = TokenKind_SpecialChar;
+				token->m_char = *m_p++;
+				return true;
 
 			default:
 				token->m_tokenKind = TokenKind_Char;
-				return readEscapeSequence (&token->m_char);
+				token->m_char = *m_p++;
+				return true;
 			}
-
-			break;
-
-		case '"':
-		case '\'':
-			token->m_tokenKind = TokenKind_Literal;
-			return readLiteral (&token->m_string);
-
-		case 0:
-			token->m_tokenKind = TokenKind_SpecialChar;
-			token->m_char = 0; // don't advance m_p
-			return true;
-
-		case ' ':
-		case '\t':
-		case '\r':
-		case '\n':
-			m_p++; // ignore whitespace
-			break;
-
-		case '.':
-		case '?':
-		case '*':
-		case '+':
-		case '[':
-		case ']':
-		case '(':
-		case ')':
-		case '|':
-		case '^':
-		case '$':
-		case '{':
-		case '}':
-			token->m_tokenKind = TokenKind_SpecialChar;
-			token->m_char = *m_p++;
-			return true;
-
-		case '0':
-			if (m_p [1] == 'x' && (m_p [2] == '"' || m_p [2] == '\''))
-			{
-				token->m_tokenKind = TokenKind_Literal;
-				return readHexLiteral (&token->m_string);
-			}
-
-		default:
-			if (isalpha ((uchar_t) *m_p) || *m_p == '_')
-			{
-				token->m_tokenKind = TokenKind_Identifier;
-				return readIdentifier (&token->m_string);
-			}
-
-			token->m_tokenKind = TokenKind_Char;
-			token->m_char = *m_p++;
-			return true;
 		}
 	}
+	else 
+		for (;;)
+		{
+			switch (*m_p)
+			{
+			case '\\':
+				switch (m_p [1])
+				{
+				case 's':
+				case 'S':
+				case 'd':
+				case 'D':
+				case 'h':
+				case 'H':
+				case 'w':
+				case 'W':
+					token->m_tokenKind = TokenKind_SpecialChar;
+					token->m_char = m_p [1];
+					m_p += 2;
+					return true;
+
+				case '\n':
+					m_p += 2; // ignore line continuation (LF)
+					break;
+
+				case '\r':
+					if (m_p [2] == '\n')
+					{
+						m_p += 3; // line continuation (CR-LF)
+						break;
+					}
+
+				default:
+					token->m_tokenKind = TokenKind_Char;
+					return readEscapeSequence (&token->m_char);
+				}
+
+				break;
+
+			case '"':
+			case '\'':
+				token->m_tokenKind = TokenKind_Literal;
+				return readLiteral (&token->m_string);
+
+			case 0:
+				token->m_tokenKind = TokenKind_SpecialChar;
+				token->m_char = 0; // don't advance m_p
+				return true;
+
+			case ' ':
+			case '\t':
+			case '\r':
+			case '\n':
+				m_p++; // ignore whitespace
+				break;
+
+			case '.':
+			case '?':
+			case '*':
+			case '+':
+			case '[':
+			case ']':
+			case '(':
+			case ')':
+			case '|':
+			case '^':
+			case '$':
+			case '{':
+			case '}':
+				token->m_tokenKind = TokenKind_SpecialChar;
+				token->m_char = *m_p++;
+				return true;
+
+			case '0':
+				if (m_p [1] == 'x' && (m_p [2] == '"' || m_p [2] == '\''))
+				{
+					token->m_tokenKind = TokenKind_Literal;
+					return readHexLiteral (&token->m_string);
+				}
+
+			default:
+				if (isalpha ((uchar_t) *m_p) || *m_p == '_')
+				{
+					token->m_tokenKind = TokenKind_Identifier;
+					return readIdentifier (&token->m_string);
+				}
+
+				token->m_tokenKind = TokenKind_Char;
+				token->m_char = *m_p++;
+				return true;
+			}
+		}
 }
 
 bool
-RegExpCompiler::expectSpecialChar (char c)
+RegExCompiler::expectSpecialChar (char c)
 {
 	Token token;
 	bool result = getToken (&token);
@@ -773,7 +843,7 @@ RegExpCompiler::expectSpecialChar (char c)
 }
 
 bool
-RegExpCompiler::expectEof ()
+RegExCompiler::expectEof ()
 {
 	Token token;
 	bool result = getToken (&token);
@@ -790,7 +860,7 @@ RegExpCompiler::expectEof ()
 }
 
 NfaState*
-RegExpCompiler::expression ()
+RegExCompiler::expression ()
 {
 	NfaState* op1 = concat ();
 	if (!op1)
@@ -809,21 +879,21 @@ RegExpCompiler::expression ()
 
 	m_p++;
 
-	NfaState* accept1 = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* accept1 = *m_regEx->m_nfaStateList.getTail ();
 
 	NfaState* op2 = expression ();
 	if (!op2)
 		return NULL;
 
-	NfaState* accept2 = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* accept2 = *m_regEx->m_nfaStateList.getTail ();
 
 	NfaState* start = AXL_MEM_NEW (NfaState);
 	NfaState* accept = AXL_MEM_NEW (NfaState);
 
 	// connect
 
-	m_regExp->m_nfaStateList.insertBefore (start, op1);
-	m_regExp->m_nfaStateList.insertTail (accept);
+	m_regEx->m_nfaStateList.insertBefore (start, op1);
+	m_regEx->m_nfaStateList.insertTail (accept);
 
 	start->createEpsilonLink (op1, op2);
 	accept1->createEpsilonLink (accept);
@@ -833,7 +903,7 @@ RegExpCompiler::expression ()
 }
 
 NfaState*
-RegExpCompiler::concat ()
+RegExCompiler::concat ()
 {
 	NfaState* start = repeat ();
 	if (!start)
@@ -851,7 +921,7 @@ RegExpCompiler::concat ()
 		if (!token.isValidSingle ())
 			break;
 
-		NfaState* accept1 = *m_regExp->m_nfaStateList.getTail ();
+		NfaState* accept1 = *m_regEx->m_nfaStateList.getTail ();
 
 		NfaState* op2 = repeat ();
 		if (!op2)
@@ -864,7 +934,7 @@ RegExpCompiler::concat ()
 }
 
 NfaState*
-RegExpCompiler::repeat ()
+RegExCompiler::repeat ()
 {
 	NfaState* start = single ();
 	if (!start)
@@ -898,27 +968,27 @@ RegExpCompiler::repeat ()
 }
 
 NfaState*
-RegExpCompiler::question (NfaState* start)
+RegExCompiler::question (NfaState* start)
 {
-	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* accept = *m_regEx->m_nfaStateList.getTail ();
 
 	NfaState* split = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertBefore (split, start);
+	m_regEx->m_nfaStateList.insertBefore (split, start);
 	split->createEpsilonLink (start, accept);
 
 	return split;
 }
 
 NfaState*
-RegExpCompiler::star (NfaState* start)
+RegExCompiler::star (NfaState* start)
 {
-	NfaState* oldAccept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* oldAccept = *m_regEx->m_nfaStateList.getTail ();
 
 	NfaState* newAccept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (newAccept);
+	m_regEx->m_nfaStateList.insertTail (newAccept);
 
 	NfaState* split = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertBefore (split, start);
+	m_regEx->m_nfaStateList.insertBefore (split, start);
 	split->createEpsilonLink (start, newAccept);
 	oldAccept->createEpsilonLink (start, newAccept);
 
@@ -926,12 +996,12 @@ RegExpCompiler::star (NfaState* start)
 }
 
 NfaState*
-RegExpCompiler::plus (NfaState* start)
+RegExCompiler::plus (NfaState* start)
 {
-	NfaState* oldAccept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* oldAccept = *m_regEx->m_nfaStateList.getTail ();
 
 	NfaState* newAccept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (newAccept);
+	m_regEx->m_nfaStateList.insertTail (newAccept);
 
 	oldAccept->createEpsilonLink (start, newAccept);
 
@@ -939,7 +1009,7 @@ RegExpCompiler::plus (NfaState* start)
 }
 
 NfaState*
-RegExpCompiler::quantify (
+RegExCompiler::quantify (
 	NfaState* start,
 	size_t count
 	)
@@ -947,26 +1017,26 @@ RegExpCompiler::quantify (
 	ASSERT (count <= Const_MaxQuantifier);
 
 	NfaState* originalStart = start;
-	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* accept = *m_regEx->m_nfaStateList.getTail ();
 	for (size_t i = 1; i < count; i++)
 	{
 		start = clone (start, accept);
 		accept->createEpsilonLink (start);
-		accept = *m_regExp->m_nfaStateList.getTail ();
+		accept = *m_regEx->m_nfaStateList.getTail ();
 	}
 
 	return originalStart;
 }
 
 NfaState*
-RegExpCompiler::clone (
+RegExCompiler::clone (
 	NfaState* first,
 	NfaState* last
 	)
 {
 	sl::SimpleHashTableMap <NfaState*, NfaState*> stateMap;
 
-	sl::Iterator <NfaState> end = m_regExp->m_nfaStateList.getTail ();
+	sl::Iterator <NfaState> end = m_regEx->m_nfaStateList.getTail ();
 	sl::Iterator <NfaState> it = first;
 	for (;;)
 	{
@@ -974,7 +1044,7 @@ RegExpCompiler::clone (
 		NfaState* newState = AXL_MEM_NEW (NfaState);
 		*newState = *oldState;
 		stateMap [oldState] = newState;
-		m_regExp->m_nfaStateList.insertTail (newState);
+		m_regEx->m_nfaStateList.insertTail (newState);
 
 		if (it == last)
 			break;
@@ -1008,7 +1078,7 @@ RegExpCompiler::clone (
 }
 
 NfaState*
-RegExpCompiler::single ()
+RegExCompiler::single ()
 {
 	bool result;
 
@@ -1065,7 +1135,7 @@ RegExpCompiler::single ()
 		return literal (token.m_string);
 
 	case TokenKind_Identifier:
-		return namedRegExp (token.m_string);
+		return namedRegEx (token.m_string);
 
 	default:
 		err::setError ("invalid regexp syntax");
@@ -1074,10 +1144,10 @@ RegExpCompiler::single ()
 }
 
 NfaState*
-RegExpCompiler::literal (const sl::StringRef& string)
+RegExCompiler::literal (const sl::StringRef& string)
 {
 	NfaState* start = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (start);
+	m_regEx->m_nfaStateList.insertTail (start);
 
 	NfaState* mid = start;
 	const char* p = string.cp ();
@@ -1085,34 +1155,34 @@ RegExpCompiler::literal (const sl::StringRef& string)
 	for (; p < end; p++)
 	{
 		ch ((uchar_t) *p, mid);
-		mid = *m_regExp->m_nfaStateList.getTail ();
+		mid = *m_regEx->m_nfaStateList.getTail ();
 	}
 
 	return start;
 }
 
 NfaState*
-RegExpCompiler::ch (uint_t c)
+RegExCompiler::ch (uint_t c)
 {
 	NfaState* start = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (start);
+	m_regEx->m_nfaStateList.insertTail (start);
 	ch (c, start);
 	return start;
 }
 
 void
-RegExpCompiler::ch (
+RegExCompiler::ch (
 	uint_t c,
 	NfaState* start
 	)
 {
 	NfaState* accept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (accept);
+	m_regEx->m_nfaStateList.insertTail (accept);
 	start->createCharMatch (c, accept);
 }
 
 NfaState*
-RegExpCompiler::charClass ()
+RegExCompiler::charClass ()
 {
 	bool result;
 
@@ -1128,7 +1198,7 @@ RegExpCompiler::charClass ()
 	start->m_flags |= NfaStateFlag_Match;
 	start->m_matchCondition.m_conditionKind = MatchConditionKind_CharSet;
 	start->m_matchCondition.m_charSet.setBitCount (256);
-	m_regExp->m_nfaStateList.insertTail (start);
+	m_regEx->m_nfaStateList.insertTail (start);
 
 	size_t count = 0;
 
@@ -1163,14 +1233,14 @@ RegExpCompiler::charClass ()
 		start->m_matchCondition.m_charSet.inverse ();
 
 	NfaState* accept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (accept);
+	m_regEx->m_nfaStateList.insertTail (accept);
 
 	start->m_outState = accept;
 	return start;
 }
 
 bool
-RegExpCompiler::charClassItem (sl::BitMap* charSet)
+RegExCompiler::charClassItem (sl::BitMap* charSet)
 {
 	bool result;
 
@@ -1246,25 +1316,25 @@ RegExpCompiler::charClassItem (sl::BitMap* charSet)
 }
 
 NfaState*
-RegExpCompiler::stdCharClass (uint_t c)
+RegExCompiler::stdCharClass (uint_t c)
 {
 	NfaState* start = AXL_MEM_NEW (NfaState);
 	start->m_flags |= NfaStateFlag_Match;
 	start->m_matchCondition.m_conditionKind = MatchConditionKind_CharSet;
 	start->m_matchCondition.m_charSet.setBitCount (256);
-	m_regExp->m_nfaStateList.insertTail (start);
+	m_regEx->m_nfaStateList.insertTail (start);
 
 	stdCharClass (c, &start->m_matchCondition.m_charSet);
 
 	NfaState* accept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (accept);
+	m_regEx->m_nfaStateList.insertTail (accept);
 
 	start->m_outState = accept;
 	return start;
 }
 
 void
-RegExpCompiler::stdCharClass (
+RegExCompiler::stdCharClass (
 	uint_t c,
 	sl::BitMap* charSet
 	)
@@ -1322,40 +1392,40 @@ RegExpCompiler::stdCharClass (
 }
 
 NfaState*
-RegExpCompiler::any ()
+RegExCompiler::any ()
 {
 	NfaState* start = AXL_MEM_NEW (NfaState);
 	start->m_flags |= NfaStateFlag_Match;
 	start->m_matchCondition.m_conditionKind = MatchConditionKind_Any;
-	m_regExp->m_nfaStateList.insertTail (start);
+	m_regEx->m_nfaStateList.insertTail (start);
 
 	NfaState* accept = AXL_MEM_NEW (NfaState);
-	m_regExp->m_nfaStateList.insertTail (accept);
+	m_regEx->m_nfaStateList.insertTail (accept);
 
 	start->m_outState = accept;
 	return start;
 }
 
 NfaState*
-RegExpCompiler::capturingGroup ()
+RegExCompiler::capturingGroup ()
 {
-	size_t captureId = m_regExp->m_groupCount++;
+	size_t captureId = m_regEx->m_groupCount++;
 
 	NfaState* open = AXL_MEM_NEW (NfaState);
 	open->m_flags |= NfaStateFlag_OpenCapture;
 	open->m_captureId = captureId;
-	m_regExp->m_nfaStateList.insertTail (open);
+	m_regEx->m_nfaStateList.insertTail (open);
 
 	NfaState* start = nonCapturingGroup ();
 	if (!start)
 		return NULL;
 
-	NfaState* accept = *m_regExp->m_nfaStateList.getTail ();
+	NfaState* accept = *m_regEx->m_nfaStateList.getTail ();
 
 	NfaState* close = AXL_MEM_NEW (NfaState);
 	close->m_flags |= NfaStateFlag_CloseCapture;
 	close->m_captureId = captureId;
-	m_regExp->m_nfaStateList.insertTail (close);
+	m_regEx->m_nfaStateList.insertTail (close);
 
 	open->createEpsilonLink (start);
 	accept->createEpsilonLink (close);
@@ -1364,7 +1434,7 @@ RegExpCompiler::capturingGroup ()
 }
 
 NfaState*
-RegExpCompiler::nonCapturingGroup ()
+RegExCompiler::nonCapturingGroup ()
 {
 	NfaState* start = expression ();
 	if (!start)
@@ -1378,7 +1448,7 @@ RegExpCompiler::nonCapturingGroup ()
 }
 
 NfaState*
-RegExpCompiler::namedRegExp (const sl::StringRef& name)
+RegExCompiler::namedRegEx (const sl::StringRef& name)
 {
 	if (!m_nameMgr)
 	{
@@ -1393,20 +1463,20 @@ RegExpCompiler::namedRegExp (const sl::StringRef& name)
 		return NULL;
 	}
 
-	RegExp subRegExp;
-	RegExpCompiler subRegExpCompiler (Flag_NonCapturingGroups, &subRegExp, m_nameMgr);
+	RegEx subRegEx;
+	RegExCompiler subRegExCompiler (Flag_NonCapturingGroups, &subRegEx, m_nameMgr);
 
-	bool result = subRegExpCompiler.compile (source);
+	bool result = subRegExCompiler.compile (source);
 	if (!result)
 		return NULL;
 
-	NfaState* start = *subRegExp.m_nfaStateList.getHead ();
-	NfaState* accept = *subRegExp.m_nfaStateList.getTail ();
+	NfaState* start = *subRegEx.m_nfaStateList.getHead ();
+	NfaState* accept = *subRegEx.m_nfaStateList.getTail ();
 
 	ASSERT (accept->m_flags & NfaStateFlag_Accept);
 	accept->m_flags &= ~NfaStateFlag_Accept;
 
-	m_regExp->m_nfaStateList.insertListTail (&subRegExp.m_nfaStateList);
+	m_regEx->m_nfaStateList.insertListTail (&subRegEx.m_nfaStateList);
 	return start;
 }
 

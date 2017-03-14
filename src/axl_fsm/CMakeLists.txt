@@ -17,16 +17,16 @@ set (
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_fsm/axl_fsm_Nfa.h
 	${AXL_INC_DIR}/axl_fsm/axl_fsm_Dfa.h
-	${AXL_INC_DIR}/axl_fsm/axl_fsm_RegExp.h
-	${AXL_INC_DIR}/axl_fsm/axl_fsm_StdRegExpNameMgr.h
+	${AXL_INC_DIR}/axl_fsm/axl_fsm_RegEx.h
+	${AXL_INC_DIR}/axl_fsm/axl_fsm_StdRegExNameMgr.h
 	)
 
 set (
 	LIB_CPP_LIST
 	axl_fsm_Nfa.cpp
 	axl_fsm_Dfa.cpp
-	axl_fsm_RegExp.cpp
-	axl_fsm_StdRegExpNameMgr.cpp
+	axl_fsm_RegEx.cpp
+	axl_fsm_StdRegExNameMgr.cpp
 	)
 
 source_group (

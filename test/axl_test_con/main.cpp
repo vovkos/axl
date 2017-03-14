@@ -634,15 +634,15 @@ testLongJmpTry ()
 //..............................................................................
 
 void
-testRegExp ()
+testRegEx ()
 {
-	fsm::StdRegExpNameMgr nameMgr;
+	fsm::StdRegExNameMgr nameMgr;
 
 	nameMgr.addName ("ws",  "[ \\t\\r\\n]");
 	nameMgr.addName ("dec", "[0-9]");
 
-	fsm::RegExp regExp;
-	fsm::RegExpCompiler regExpCompiler (&regExp, &nameMgr);
+	fsm::RegEx regEx;
+	fsm::RegExCompiler regExCompiler (fsm::RegExCompiler::Flag_SparseSyntax, &regEx, &nameMgr);
 
 /*	char const* src [] =
 	{
@@ -651,7 +651,7 @@ testRegExp ()
 
 	for (size_t i = 0; i < countof (src); i++)
 	{
-		bool result = regExpCompiler.incrementalCompile (src [i]);
+		bool result = regExCompiler.incrementalCompile (src [i]);
 		if (!result)
 		{
 			printf ("error: %s\n", err::getLastErrorDescription ().sz ());
@@ -659,15 +659,15 @@ testRegExp ()
 		}
 	}
 
-	regExpCompiler.finalize ();
-	regExp.print ();
+	regExCompiler.finalize ();
+	regEx.print ();
 */
 
-//	bool result = regExpCompiler.compile ("\"abc\" ws* dec+");
+//	bool result = regExCompiler.compile ("\"abc\" ws* dec+");
 
 	bool result =
-		regExpCompiler.incrementalCompile ("(\\h{2})   ' '+ (\\d{2})") &&
-		regExpCompiler.incrementalCompile ("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
+		regExCompiler.incrementalCompile ("(\\h{2})   ' '+ (\\d{2})") &&
+		regExCompiler.incrementalCompile ("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
 
 	if (!result)
 	{
@@ -675,8 +675,8 @@ testRegExp ()
 		return;
 	}
 
-	regExpCompiler.finalize ();
-	regExp.print ();
+	regExCompiler.finalize ();
+	regEx.print ();
 }
 
 //..............................................................................
@@ -3145,12 +3145,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-
-#if (_AXL_IO_USB)
-	testUsbMouse ();
-#else
-	testRegExp ();
-#endif
+	testRegEx ();
 
 	return 0;
 }
