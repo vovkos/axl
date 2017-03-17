@@ -1220,7 +1220,7 @@ axl_include_import_file
 			if (_IS_OPTIONAL)
 				axl_message ("${_IMPORT}:" "NOT FOUND, adjust ${_FILTERED_PATH_LIST}paths.cmake (optional)")
 			else ()
-				message (FATAL_ERROR "${_IMPORT} is REQUIRED but NOT FOUND, adjust ${_FILTERED_PATH_LIST}paths.cmake)")
+				message (FATAL_ERROR "${_IMPORT} is REQUIRED but NOT FOUND, adjust ${_FILTERED_PATH_LIST}paths.cmake")
 			endif ()
 		endif ()
 	elseif (_IS_OPTIONAL)
