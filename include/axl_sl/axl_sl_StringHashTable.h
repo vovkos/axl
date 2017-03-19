@@ -103,115 +103,35 @@ typedef HashStringIgnoreCaseBase_pcp <utf32_t> HashStringIgnoreCase_pcp_utf32;
 
 //..............................................................................
 
-typedef DuckTypeHashTable <String>       StringHashTable;
-typedef DuckTypeHashTable <String_w>     StringHashTable_w;
-typedef DuckTypeHashTable <String_utf8>  StringHashTable_utf8;
-typedef DuckTypeHashTable <String_utf16> StringHashTable_utf16;
-typedef DuckTypeHashTable <String_utf32> StringHashTable_utf32;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef HashTable <
-	String,
-	HashStringIgnoreCase_pcu,
-	EqStringIgnoreCase_pcu
-	> StringHashTableIgnoreCase_pcu;
-
-typedef HashTable <
-	String_w,
-	HashStringIgnoreCase_pcu_w,
-	EqStringIgnoreCase_pcu_w
-	> StringHashTableIgnoreCase_pcu_w;
-
-typedef HashTable <
-	String_utf8,
-	HashStringIgnoreCase_pcu_utf8,
-	EqStringIgnoreCase_pcu_utf8
-	> StringHashTableIgnoreCase_pcu_utf8;
-
-typedef HashTable <
-	String_utf16,
-	HashStringIgnoreCase_pcu_utf16,
-	EqStringIgnoreCase_pcu_utf16
-	> StringHashTableIgnoreCase_pcu_utf16;
-
-typedef HashTable <
-	String_utf32,
-	HashStringIgnoreCase_pcu_utf32,
-	EqStringIgnoreCase_pcu_utf32
-	> StringHashTableIgnoreCase_pcu_utf32;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef HashTable <
-	String,
-	HashStringIgnoreCase_pcp,
-	EqStringIgnoreCase_pcp
-	> StringHashTableIgnoreCase_pcp;
-
-typedef HashTable <
-	String_w,
-	HashStringIgnoreCase_pcp_w,
-	EqStringIgnoreCase_pcp_w
-	> StringHashTableIgnoreCase_pcp_w;
-
-typedef HashTable <
-	String_utf8,
-	HashStringIgnoreCase_pcp_utf8,
-	EqStringIgnoreCase_pcp_utf8
-	> StringHashTableIgnoreCase_pcp_utf8;
-
-typedef HashTable <
-	String_utf16,
-	HashStringIgnoreCase_pcp_utf16,
-	EqStringIgnoreCase_pcp_utf16
-	> StringHashTableIgnoreCase_pcp_utf16;
-
-typedef HashTable <
-	String_utf32,
-	HashStringIgnoreCase_pcp_utf32,
-	EqStringIgnoreCase_pcp_utf32
-	> StringHashTableIgnoreCase_pcp_utf32;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef HashTableIterator <String>       StringHashTableIterator;
-typedef HashTableIterator <String_w>     StringHashTableIterator_w;
-typedef HashTableIterator <String_utf8>  StringHashTableIterator_utf8;
-typedef HashTableIterator <String_utf16> StringHashTableIterator_utf16;
-typedef HashTableIterator <String_utf32> StringHashTableIterator_utf32;
-
-//..............................................................................
-
 template <typename Value>
-class StringHashTableMap: public DuckTypeHashTableMap <String, Value>
+class StringHashTable: public DuckTypeHashTable <String, Value>
 {
 };
 
 template <typename Value>
-class StringHashTableMap_w: public DuckTypeHashTableMap <String_w, Value>
+class StringHashTable_w: public DuckTypeHashTable <String_w, Value>
 {
 };
 
 template <typename Value>
-class StringHashTableMap_utf8: public DuckTypeHashTableMap <String_utf8, Value>
+class StringHashTable_utf8: public DuckTypeHashTable <String_utf8, Value>
 {
 };
 
 template <typename Value>
-class StringHashTableMap_utf16: public DuckTypeHashTableMap <String_utf16, Value>
+class StringHashTable_utf16: public DuckTypeHashTable <String_utf16, Value>
 {
 };
 
 template <typename Value>
-class StringHashTableMap_utf32: public DuckTypeHashTableMap <String_utf32, Value>
+class StringHashTable_utf32: public DuckTypeHashTable <String_utf32, Value>
 {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcu: public HashTableMap <
+class StringHashTableIgnoreCase_pcu: public HashTable <
 	String,
 	Value,
 	HashStringIgnoreCase_pcu,
@@ -221,7 +141,7 @@ class StringHashTableMapIgnoreCase_pcu: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcu_w: public HashTableMap <
+class StringHashTableIgnoreCase_pcu_w: public HashTable <
 	String_w,
 	Value,
 	HashStringIgnoreCase_pcu_w,
@@ -231,7 +151,7 @@ class StringHashTableMapIgnoreCase_pcu_w: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcu_utf8: public HashTableMap <
+class StringHashTableIgnoreCase_pcu_utf8: public HashTable <
 	String_utf8,
 	Value,
 	HashStringIgnoreCase_pcu_utf8,
@@ -241,7 +161,7 @@ class StringHashTableMapIgnoreCase_pcu_utf8: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcu_utf16: public HashTableMap <
+class StringHashTableIgnoreCase_pcu_utf16: public HashTable <
 	String_utf16,
 	Value,
 	HashStringIgnoreCase_pcu_utf16,
@@ -251,7 +171,7 @@ class StringHashTableMapIgnoreCase_pcu_utf16: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcu_utf32: public HashTableMap <
+class StringHashTableIgnoreCase_pcu_utf32: public HashTable <
 	String_utf32,
 	Value,
 	HashStringIgnoreCase_pcu_utf32,
@@ -263,7 +183,7 @@ class StringHashTableMapIgnoreCase_pcu_utf32: public HashTableMap <
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcp: public HashTableMap <
+class StringHashTableIgnoreCase_pcp: public HashTable <
 	String,
 	Value,
 	HashStringIgnoreCase_pcp,
@@ -273,7 +193,7 @@ class StringHashTableMapIgnoreCase_pcp: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcp_w: public HashTableMap <
+class StringHashTableIgnoreCase_pcp_w: public HashTable <
 	String_w,
 	Value,
 	HashStringIgnoreCase_pcp_w,
@@ -283,7 +203,7 @@ class StringHashTableMapIgnoreCase_pcp_w: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcp_utf8: public HashTableMap <
+class StringHashTableIgnoreCase_pcp_utf8: public HashTable <
 	String_utf8,
 	Value,
 	HashStringIgnoreCase_pcp_utf8,
@@ -293,7 +213,7 @@ class StringHashTableMapIgnoreCase_pcp_utf8: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcp_utf16: public HashTableMap <
+class StringHashTableIgnoreCase_pcp_utf16: public HashTable <
 	String_utf16,
 	Value,
 	HashStringIgnoreCase_pcp_utf16,
@@ -303,7 +223,7 @@ class StringHashTableMapIgnoreCase_pcp_utf16: public HashTableMap <
 };
 
 template <typename Value>
-class StringHashTableMapIgnoreCase_pcp_utf32: public HashTableMap <
+class StringHashTableIgnoreCase_pcp_utf32: public HashTable <
 	String_utf32,
 	Value,
 	HashStringIgnoreCase_pcp_utf32,
@@ -315,70 +235,70 @@ class StringHashTableMapIgnoreCase_pcp_utf32: public HashTableMap <
 //..............................................................................
 
 template <typename Value>
-class StringHashTableMapIterator: public Iterator <HashTableMapEntry <String, Value> >
+class StringHashTableIterator: public Iterator <HashTableEntry <String, Value> >
 {
 public:
-	StringHashTableMapIterator ()
+	StringHashTableIterator ()
 	{
 	}
 
-	StringHashTableMapIterator (const Iterator <HashTableMapEntry <String, Value> >& src)
+	StringHashTableIterator (const Iterator <HashTableEntry <String, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
 };
 
 template <typename Value>
-class StringHashTableMapIterator_w: public Iterator <HashTableMapEntry <String_w, Value> >
+class StringHashTableIterator_w: public Iterator <HashTableEntry <String_w, Value> >
 {
 public:
-	StringHashTableMapIterator_w ()
+	StringHashTableIterator_w ()
 	{
 	}
 
-	StringHashTableMapIterator_w (const Iterator <HashTableMapEntry <String_w, Value> >& src)
+	StringHashTableIterator_w (const Iterator <HashTableEntry <String_w, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
 };
 
 template <typename Value>
-class StringHashTableMapIterator_utf8: public Iterator <HashTableMapEntry <String_utf8, Value> >
+class StringHashTableIterator_utf8: public Iterator <HashTableEntry <String_utf8, Value> >
 {
 public:
-	StringHashTableMapIterator_utf8 ()
+	StringHashTableIterator_utf8 ()
 	{
 	}
 
-	StringHashTableMapIterator_utf8 (const Iterator <HashTableMapEntry <String_utf8, Value> >& src)
+	StringHashTableIterator_utf8 (const Iterator <HashTableEntry <String_utf8, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
 };
 
 template <typename Value>
-class StringHashTableMapIterator_utf16: public Iterator <HashTableMapEntry <String_utf16, Value> >
+class StringHashTableIterator_utf16: public Iterator <HashTableEntry <String_utf16, Value> >
 {
 public:
-	StringHashTableMapIterator_utf16 ()
+	StringHashTableIterator_utf16 ()
 	{
 	}
 
-	StringHashTableMapIterator_utf16 (const Iterator <HashTableMapEntry <String_utf16, Value> >& src)
+	StringHashTableIterator_utf16 (const Iterator <HashTableEntry <String_utf16, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
 };
 
 template <typename Value>
-class StringHashTableMapIterator_utf32: public Iterator <HashTableMapEntry <String_utf32, Value> >
+class StringHashTableIterator_utf32: public Iterator <HashTableEntry <String_utf32, Value> >
 {
 public:
-	StringHashTableMapIterator_utf32 ()
+	StringHashTableIterator_utf32 ()
 	{
 	}
 
-	StringHashTableMapIterator_utf32 (const Iterator <HashTableMapEntry <String_utf32, Value> >& src)
+	StringHashTableIterator_utf32 (const Iterator <HashTableEntry <String_utf32, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
@@ -386,16 +306,16 @@ public:
 
 //..............................................................................
 
-#define AXL_SL_BEGIN_STRING_HASH_TABLE_MAP(Class, Value) \
-	AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE_MAP (Class, axl::sl::String, Value)
+#define AXL_SL_BEGIN_STRING_HASH_TABLE(Class, Value) \
+	AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE (Class, axl::sl::String, Value)
 
-#define AXL_SL_END_STRING_HASH_TABLE_MAP() \
-	AXL_SL_END_DUCK_TYPE_HASH_TABLE_MAP ()
+#define AXL_SL_END_STRING_HASH_TABLE() \
+	AXL_SL_END_DUCK_TYPE_HASH_TABLE ()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_SL_BEGIN_STRING_HASH_TABLE_MAP_IGNORE_CASE_PCU(Class, Value) \
-	AXL_SL_HASH_TABLE_MAP_EX ( \
+#define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCU(Class, Value) \
+	AXL_SL_HASH_TABLE_EX ( \
 		Class, \
 		axl::sl::String, \
 		Value, \
@@ -405,13 +325,13 @@ public:
 		axl::sl::ArgType <Value>::Type \
 		)
 
-#define AXL_SL_END_STRING_HASH_TABLE_MAP_IGNORE_CASE_PCU() \
-	AXL_SL_END_HASH_TABLE_MAP ()
+#define AXL_SL_END_STRING_HASH_TABLE_IGNORE_CASE_PCU() \
+	AXL_SL_END_HASH_TABLE ()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_SL_BEGIN_STRING_HASH_TABLE_MAP_IGNORE_CASE_PCP(Class, Value) \
-	AXL_SL_HASH_TABLE_MAP_EX ( \
+#define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCP(Class, Value) \
+	AXL_SL_HASH_TABLE_EX ( \
 		Class, \
 		axl::sl::String, \
 		Value, \
@@ -421,8 +341,8 @@ public:
 		axl::sl::ArgType <Value>::Type \
 		)
 
-#define AXL_SL_END_STRING_HASH_TABLE_MAP_IGNORE_CASE_PCP() \
-	AXL_SL_END_HASH_TABLE_MAP ()
+#define AXL_SL_END_STRING_HASH_TABLE_IGNORE_CASE_PCP() \
+	AXL_SL_END_HASH_TABLE ()
 
 //..............................................................................
 

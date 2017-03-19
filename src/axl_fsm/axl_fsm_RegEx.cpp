@@ -421,7 +421,7 @@ RegExCompiler::makeDfa ()
 				m_regEx->m_dfaStateList.insertTail (dfaState2);
 				workingSet.append (dfaState2);
 				mapIt->m_value = dfaState2;
-			}			
+			}
 
 			DfaTransition* dfaTransition = AXL_MEM_NEW (DfaTransition);
 			dfaTransition->m_matchCondition = nfaTransition->m_matchCondition;
@@ -731,7 +731,7 @@ RegExCompiler::getToken (Token* token)
 			}
 		}
 	}
-	else 
+	else
 		for (;;)
 		{
 			switch (*m_p)
@@ -1034,7 +1034,7 @@ RegExCompiler::clone (
 	NfaState* last
 	)
 {
-	sl::SimpleHashTableMap <NfaState*, NfaState*> stateMap;
+	sl::SimpleHashTable <NfaState*, NfaState*> stateMap;
 
 	sl::Iterator <NfaState> end = m_regEx->m_nfaStateList.getTail ();
 	sl::Iterator <NfaState> it = first;
@@ -1058,7 +1058,7 @@ RegExCompiler::clone (
 	{
 		NfaState* state = *it;
 
-		sl::HashTableMapIterator <NfaState*, NfaState*> mapIt;
+		sl::HashTableIterator <NfaState*, NfaState*> mapIt;
 		if (state->m_outState)
 		{
 			mapIt = stateMap.find (state->m_outState);
@@ -1099,11 +1099,11 @@ RegExCompiler::single ()
 				return nonCapturingGroup ();
 			}
 			else if (m_flags & Flag_NonCapturingGroups)
-			{				
+			{
 				return nonCapturingGroup ();
 			}
 			else
-			{				
+			{
 				return capturingGroup ();
 			}
 

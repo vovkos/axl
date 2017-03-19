@@ -46,11 +46,11 @@ public:
 	};
 
 	typedef Iterator <Entry> ListIterator;
-	typedef HashTableMapIterator <handle_t, ListIterator> MapIterator;
+	typedef HashTableIterator <handle_t, ListIterator> MapIterator;
 
 protected:
 	StdList <Entry> m_list;
-	HashTableMap <handle_t, ListIterator, HashId <handle_t> > m_hashTable;
+	HashTable <handle_t, ListIterator, HashId <handle_t> > m_hashTable;
 	uintptr_t m_seed;
 
 public:

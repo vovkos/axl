@@ -15,6 +15,7 @@
 
 #include "axl_sl_Array.h"
 #include "axl_sl_List.h"
+#include "axl_sl_MapEntry.h"
 #include "axl_sl_Hash.h"
 #include "axl_sl_Operator.h"
 
@@ -23,21 +24,23 @@ namespace sl {
 
 //..............................................................................
 
-template <typename T>
-class HashTableEntryBase: public ListLink
+template <
+	typename Key,
+	typename Value
+	>
+struct HashTableEntry: public MapEntry <Key, Value>
 {
-public:
 	class BucketLink
 	{
 	public:
 		ListLink*
-		operator () (T* entry)
+		operator () (HashTableEntry* entry)
 		{
 			return &entry->m_bucketLink;
 		}
 	};
 
-	typedef AuxList <T, BucketLink> Bucket;
+	typedef AuxList <HashTableEntry, BucketLink> Bucket;
 
 	ListLink m_bucketLink;
 	Bucket* m_bucket;
@@ -45,73 +48,18 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename Key>
-class HashTableEntry: public HashTableEntryBase <HashTableEntry <Key> >
-{
-public:
-	Key m_key;
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 template <
 	typename Key,
 	typename Value
 	>
-class HashTableMapEntry: public HashTableEntryBase <HashTableMapEntry <Key, Value> >
-{
-public:
-	Key m_key;
-	Value m_value;
-};
-
-//..............................................................................
-
-// too bad there are no templated typedefs in C++
-// another solution would be:
-//
-//	template <
-//		typename Key,
-//		typename Value
-//		>
-//	class HashTableMapIterator
-//	{
-//	public:
-//		typedef Iterator <HashTableMapEntry <Key, Value> > T;
-//	};
-//
-// but then it's too easy to forget to write ::T type suffix
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename Key>
-class HashTableIterator: public Iterator <HashTableEntry <Key> >
+class HashTableIterator: public Iterator <HashTableEntry <Key, Value> >
 {
 public:
 	HashTableIterator ()
 	{
 	}
 
-	HashTableIterator (const Iterator <HashTableEntry <Key> >& src)
-	{
-		this->m_p = src.getEntry ();
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <
-	typename Key,
-	typename Value
-	>
-class HashTableMapIterator: public Iterator <HashTableMapEntry <Key, Value> >
-{
-public:
-	HashTableMapIterator ()
-	{
-	}
-
-	HashTableMapIterator (const Iterator <HashTableMapEntry <Key, Value> >& src)
+	HashTableIterator (const Iterator <HashTableEntry <Key, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
@@ -121,10 +69,11 @@ public:
 
 template <
 	typename Key,
+	typename Value,
 	typename Hash,
 	typename Eq = Eq <Key>,
 	typename KeyArg = typename ArgType <Key>::Type,
-	typename Entry = HashTableEntry <Key>
+	typename ValueArg = typename ArgType <Value>::Type
 	>
 class HashTable
 {
@@ -135,8 +84,9 @@ public:
 		Def_ResizeThreshold    = 75,
 	};
 
-	typedef typename Entry::Bucket Bucket;
+	typedef HashTableEntry <Key, Value> Entry;
 	typedef sl::Iterator <Entry> Iterator;
+	typedef typename Entry::Bucket Bucket;
 
 protected:
 	StdList <Entry> m_list;
@@ -147,6 +97,12 @@ public:
 	HashTable ()
 	{
 		m_resizeThreshold = Def_ResizeThreshold;
+	}
+
+	Value&
+	operator [] (KeyArg key)
+	{
+		return this->visit (key)->m_value;
 	}
 
 	void
@@ -246,6 +202,16 @@ public:
 		return NULL;
 	}
 
+	Value
+	findValue (
+		KeyArg key,
+		ValueArg undefinedValue
+		) const
+	{
+		Iterator it = this->find (key);
+		return it ? it->m_value : undefinedValue;
+	}
+
 	Iterator
 	visit (KeyArg key)
 	{
@@ -291,89 +257,6 @@ public:
 	Iterator
 	add (
 		KeyArg key,
-		bool* isNew = NULL
-		)
-	{
-		size_t prevCount = getCount ();
-
-		Iterator it = visit (key);
-
-		if (isNew)
-			*isNew = getCount () > prevCount;
-
-		return it;
-	}
-
-	Iterator
-	addIfNotExists (KeyArg key)
-	{
-		size_t prevCount = getCount ();
-		Iterator it = this->visit (key);
-		return getCount () > prevCount ? it : NULL;
-	}
-
-	void
-	erase (Iterator it)
-	{
-		Entry* entry = *it;
-		entry->m_bucket->remove (entry);
-		m_list.remove (entry);
-		AXL_MEM_DELETE (entry);
-	}
-
-	bool
-	eraseKey (KeyArg key)
-	{
-		Iterator it = find (key);
-		if (!it)
-			return false;
-
-		erase (it);
-		return true;
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <
-	typename Key,
-	typename Value,
-	typename Hash,
-	typename Eq = Eq <Key>,
-	typename KeyArg = typename ArgType <Key>::Type,
-	typename ValueArg = typename ArgType <Value>::Type
-	>
-class HashTableMap: public HashTable <
-	Key,
-	Hash,
-	Eq,
-	KeyArg,
-	HashTableMapEntry <Key, Value>
-	>
-{
-public:
-	typedef sl::Iterator <HashTableMapEntry <Key, Value> > Iterator;
-
-public:
-	Value&
-	operator [] (KeyArg key)
-	{
-		return this->visit (key)->m_value;
-	}
-
-	Value
-	findValue (
-		KeyArg key,
-		ValueArg undefinedValue
-		) const
-	{
-		Iterator it = this->find (key);
-		return it ? it->m_value : undefinedValue;
-	}
-
-	Iterator
-	add (
-		KeyArg key,
 		ValueArg value,
 		bool* isNew = NULL
 		)
@@ -405,6 +288,26 @@ public:
 		it->m_value = value;
 		return it;
 	}
+
+	void
+	erase (Iterator it)
+	{
+		Entry* entry = *it;
+		entry->m_bucket->remove (entry);
+		m_list.remove (entry);
+		AXL_MEM_DELETE (entry);
+	}
+
+	bool
+	eraseKey (KeyArg key)
+	{
+		Iterator it = find (key);
+		if (!it)
+			return false;
+
+		erase (it);
+		return true;
+	}
 };
 
 //..............................................................................
@@ -413,25 +316,12 @@ public:
 
 template <
 	typename Key,
-	typename KeyArg = typename ArgType <Key>::Type
+	typename Value,
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename ValueArg = typename ArgType <Value>::Type
 	>
 class SimpleHashTable: public HashTable <
 	Key,
-	sl::HashId <Key>,
-	sl::Eq <Key>,
-	KeyArg
-	>
-{
-};
-
-template <
-	typename Key,
-	typename Value,
-	typename KeyArg = typename ArgType <Key>::Type,
-	typename ValueArg = typename ArgType <Value>::Type
-	>
-class SimpleHashTableMap: public HashTableMap <
-	Key,
 	Value,
 	sl::HashId <Key>,
 	sl::Eq <Key>,
@@ -443,29 +333,16 @@ class SimpleHashTableMap: public HashTableMap <
 
 //..............................................................................
 
-// hash table for ducktyped keys -- uses methods .hash ()
+// hash table for ducktyped keys -- uses methods .hash () and .isEqual ()
 
 template <
 	typename Key,
-	typename KeyArg = typename ArgType <Key>::Type
+	typename Value,
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename ValueArg = typename ArgType <Value>::Type
 	>
 class DuckTypeHashTable: public HashTable <
 	Key,
-	sl::HashDuckType <Key>,
-	sl::EqDuckType <Key>,
-	KeyArg
-	>
-{
-};
-
-template <
-	typename Key,
-	typename Value,
-	typename KeyArg = typename ArgType <Key>::Type,
-	typename ValueArg = typename ArgType <Value>::Type
-	>
-class DuckTypeHashTableMap: public HashTableMap <
-	Key,
 	Value,
 	sl::HashDuckType <Key>,
 	sl::EqDuckType <Key>,
@@ -477,24 +354,14 @@ class DuckTypeHashTableMap: public HashTableMap <
 
 //..............................................................................
 
-// variant of hash table for ducktyped keys (key is a pointer to duck type)
-
-template <typename Key>
-class DuckTypePtrHashTable: public HashTable <
-	Key*,
-	sl::HashDuckType <Key>,
-	sl::EqDuckType <Key>,
-	Key*
-	>
-{
-};
+// variation of hash table for ducktyped keys (key is a pointer to duck type)
 
 template <
 	typename Key,
 	typename Value,
 	typename ValueArg = typename ArgType <Value>::Type
 	>
-class DuckTypePtrHashTableMap: public HashTableMap <
+class DuckTypePtrHashTable: public HashTable <
 	Key*,
 	Value,
 	sl::HashDuckType <Key>,
@@ -507,11 +374,11 @@ class DuckTypePtrHashTableMap: public HashTableMap <
 
 //..............................................................................
 
-#define AXL_SL_BEGIN_HASH_TABLE_MAP_EX(Class, Key, Value, Hash, Eq, KeyArg, ValueArg) \
+#define AXL_SL_BEGIN_HASH_TABLE_EX(Class, Key, Value, Hash, Eq, KeyArg, ValueArg) \
 class Class \
 { \
 public: \
-	typedef axl::sl::HashTableMap <Key, Value, Hash, Eq, KeyArg, ValueArg> MapBase; \
+	typedef axl::sl::HashTable <Key, Value, Hash, Eq, KeyArg, ValueArg> MapBase; \
 	typedef MapBase::Iterator Iterator; \
 	static \
 	Iterator \
@@ -535,16 +402,16 @@ protected: \
 		Map () \
 		{
 
-#define AXL_SL_HASH_TABLE_MAP_ENTRY(key, value) \
+#define AXL_SL_HASH_TABLE_ENTRY(key, value) \
 			visit (key)->m_value = value;
 
-#define AXL_SL_END_HASH_TABLE_MAP() \
+#define AXL_SL_END_HASH_TABLE() \
 		} \
 	}; \
 };
 
-#define AXL_SL_BEGIN_HASH_TABLE_MAP(Class, Key, Value, Hash) \
-	AXL_SL_BEGIN_HASH_TABLE_MAP_EX ( \
+#define AXL_SL_BEGIN_HASH_TABLE(Class, Key, Value, Hash) \
+	AXL_SL_BEGIN_HASH_TABLE_EX ( \
 		Class, \
 		Key, \
 		Value, \
@@ -556,21 +423,21 @@ protected: \
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_SL_BEGIN_SIMPLE_HASH_TABLE_MAP(Class, Key, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_MAP ( \
+#define AXL_SL_BEGIN_SIMPLE_HASH_TABLE(Class, Key, Value) \
+	AXL_SL_BEGIN_HASH_TABLE ( \
 		Class, \
 		Key, \
 		Value, \
 		axl::sl::HashId <Key> \
 		)
 
-#define AXL_SL_END_SIMPLE_HASH_TABLE_MAP() \
-	AXL_SL_END_HASH_TABLE_MAP ()
+#define AXL_SL_END_SIMPLE_HASH_TABLE() \
+	AXL_SL_END_HASH_TABLE ()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE_MAP(Class, Key, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_MAP_EX ( \
+#define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE(Class, Key, Value) \
+	AXL_SL_BEGIN_HASH_TABLE_EX ( \
 		Class, \
 		Key, \
 		Value, \
@@ -580,8 +447,8 @@ protected: \
 		axl::sl::ArgType <Value>::Type \
 		)
 
-#define AXL_SL_END_DUCK_TYPE_HASH_TABLE_MAP() \
-	AXL_SL_END_HASH_TABLE_MAP ()
+#define AXL_SL_END_DUCK_TYPE_HASH_TABLE() \
+	AXL_SL_END_HASH_TABLE ()
 
 //..............................................................................
 

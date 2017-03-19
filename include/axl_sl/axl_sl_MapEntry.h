@@ -11,51 +11,46 @@
 
 #pragma once
 
-#define _AXL_FSM_STDREGEXNAMEMGR_H
+#define _AXL_SL_MAPENTRY_H
 
-#include "axl_fsm_RegEx.h"
+#include "axl_sl_ListBase.h"
 
 namespace axl {
-namespace fsm {
+namespace sl {
 
 //..............................................................................
 
-class StdRegExNameMgr: public RegExNameMgr
+template <
+	typename Key,
+	typename Value
+	>
+struct MapEntry: ListLink
 {
-protected:
-	sl::StringHashTable <sl::String> m_nameMap;
+	Key m_key;
+	Value m_value;
+};
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename Key,
+	typename Value
+	>
+class MapIterator: public Iterator <MapEntry <Key, Value> >
+{
 public:
-	void
-	clear ()
+	MapIterator ()
 	{
-		m_nameMap.clear ();
 	}
 
-	virtual
-	sl::StringRef
-	findName (const sl::StringRef& name)
+	template <typename T>
+	MapIterator (const Iterator <T>& src)
 	{
-		return m_nameMap.findValue (name, NULL);
-	}
-
-	void
-	addName (
-		const sl::StringRef& name,
-		const sl::StringRef& source
-		)
-	{
-		m_nameMap [name] = source;
-	}
-
-	bool
-	removeName (const sl::StringRef& name)
-	{
-		return m_nameMap.eraseKey (name);
+		this->m_p = src.getEntry ();
 	}
 };
 
 //..............................................................................
 
-} // namespace fsm
+} // namespace sl
 } // namespace axl

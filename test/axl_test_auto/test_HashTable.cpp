@@ -18,8 +18,8 @@ namespace {
 
 void test_IntHashTable ()
 {
-	sl::SimpleHashTableMap <int, int> map;
-	sl::HashTableMapIterator <int, int> it;
+	sl::SimpleHashTable <int, int> map;
+	sl::HashTableIterator <int, int> it;
 
 	for (size_t i = 0; i < 50; i++)
 	{
@@ -77,10 +77,10 @@ void test_StringHashTableIgnoreCase ()
 		"Personal Healthcare", // LIBUSB_CLASS_PERSONAL_HEALTHCARE = 0x0f,
 	};
 
-	sl::StringHashTableMapIgnoreCase_pcu <int> map_pcu;
-	sl::StringHashTableMapIgnoreCase_pcp <int> map_pcp;
+	sl::StringHashTableIgnoreCase_pcu <int> map_pcu;
+	sl::StringHashTableIgnoreCase_pcp <int> map_pcp;
 	
-	sl::StringHashTableMapIterator <int> it;
+	sl::StringHashTableIterator <int> it;
 	for (size_t i = 0; i < countof (stringTable); i++)
 	{
 		it = map_pcu.visit (stringTable [i]);

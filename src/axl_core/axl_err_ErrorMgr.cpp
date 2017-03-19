@@ -55,7 +55,7 @@ ErrorProvider*
 ErrorMgr::findProvider (const sl::Guid& guid)
 {
 	sys::ScopeLock scopeLock (&m_lock);
-	sl::HashTableMapIterator <sl::Guid, ErrorProvider*> it = m_providerMap.find (guid);
+	sl::HashTableIterator <sl::Guid, ErrorProvider*> it = m_providerMap.find (guid);
 	return it ? it->m_value : NULL;
 }
 

@@ -118,7 +118,7 @@ struct NfaStateSet
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class NfaStateSetMap: public sl::HashTableMap <
+class NfaStateSetMap: public sl::HashTable <
 	NfaStateSet*,
 	T,
 	sl::HashDuckType <NfaStateSet>,

@@ -35,7 +35,7 @@ protected:
 protected:
 	sys::Lock m_lock;
 	size_t m_tlsSlot;
-	sl::DuckTypeHashTableMap <sl::Guid, ErrorProvider*> m_providerMap;
+	sl::DuckTypeHashTable <sl::Guid, ErrorProvider*> m_providerMap;
 
 public:
 	ErrorMgr ();

@@ -119,7 +119,7 @@ protected:
 	QtCursor* m_stdCursorArray [StdCursorKind__Count];
 	QtCaret m_qtCaret;
 
-	sl::StringHashTableMap <uintptr_t> m_clipboardFormatNameMap;
+	sl::StringHashTable <uintptr_t> m_clipboardFormatNameMap;
 	sl::Array <sl::String> m_clipboardFormatNameTable;
 	QMimeData* m_qtClipboardMimeData;
 

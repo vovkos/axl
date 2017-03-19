@@ -85,7 +85,7 @@ main (
 	if (argc < 2) // run all
 	{
 		total = getTestCaseSet ()->getCount ();
-		sl::StringHashTableMapIterator <TestFunc*> it = getTestCaseSet ()->getHead ();
+		sl::StringHashTableIterator <TestFunc*> it = getTestCaseSet ()->getHead ();
 		for (size_t i = 0; it; it++, i++)
 			passed += runTest (i, total, it->m_key, it->m_value);
 	}
@@ -97,7 +97,7 @@ main (
 		for (int i = 1; i < argc; i++)
 		{
 			name = argv [i];
-			sl::StringHashTableMapIterator <TestFunc*> it = getTestCaseSet ()->find (name);
+			sl::StringHashTableIterator <TestFunc*> it = getTestCaseSet ()->find (name);
 			if (it)
 				passed += runTest (i, total, it->m_key, it->m_value);
 			else

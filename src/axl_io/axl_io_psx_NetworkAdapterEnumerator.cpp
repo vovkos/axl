@@ -60,14 +60,14 @@ NetworkAdapterEnumerator::createAdapterList (sl::StdList <NetworkAdapterDesc>* a
 		return -1;
 	}
 
-	sl::StringHashTableMap <NetworkAdapterDesc*> adapterMap;
+	sl::StringHashTable <NetworkAdapterDesc*> adapterMap;
 
 	for (ifaddrs* iface = ifaceAddressList; iface; iface = iface->ifa_next)
 	{
 		if (!(iface->ifa_flags & IFF_UP))
 			continue;
 
-		sl::StringHashTableMapIterator <NetworkAdapterDesc*> it = adapterMap.visit (iface->ifa_name);
+		sl::StringHashTableIterator <NetworkAdapterDesc*> it = adapterMap.visit (iface->ifa_name);
 		if (it->m_value)
 		{
 			if (iface->ifa_addr)

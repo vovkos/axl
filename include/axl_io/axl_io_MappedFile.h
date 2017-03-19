@@ -33,7 +33,7 @@ protected:
 
 	struct ViewEntry;
 
-	typedef sl::RbTreeMap <uint64_t, ViewEntry*> ViewMap;
+	typedef sl::RbTree <uint64_t, ViewEntry*> ViewMap;
 
 	struct ViewEntry: sl::ListLink
 	{

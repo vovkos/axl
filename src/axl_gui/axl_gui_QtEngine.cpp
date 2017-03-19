@@ -629,7 +629,7 @@ QtEngine::getStdCursor (StdCursorKind cursorKind)
 uintptr_t
 QtEngine::registerClipboardFormat (const sl::StringRef& formatName)
 {
-	sl::StringHashTableMapIterator <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
+	sl::StringHashTableIterator <uintptr_t> it = m_clipboardFormatNameMap.find (formatName);
 	if (it)
 		return it->m_value;
 

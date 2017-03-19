@@ -50,7 +50,7 @@ class Section: public sl::ListLink
 
 protected:
 	sl::String m_name;
-	sl::StringHashTableMap <NamedValue*> m_namedValueMap;
+	sl::StringHashTable <NamedValue*> m_namedValueMap;
 	sl::StdList <NamedValue> m_namedValueList;
 	sl::BoxList <sl::String> m_unnamedValueList;
 
@@ -64,7 +64,7 @@ public:
 	NamedValue*
 	getNamedValue (const sl::StringRef& name) const
 	{
-		sl::StringHashTableMapIterator <NamedValue*> it = m_namedValueMap.find (name);
+		sl::StringHashTableIterator <NamedValue*> it = m_namedValueMap.find (name);
 		return it ? it->m_value : NULL;
 	}
 
@@ -82,7 +82,7 @@ class GenericIni
 	friend class GenericParser;
 
 protected:
-	sl::StringHashTableMap <Section*> m_namedSectionMap;
+	sl::StringHashTable <Section*> m_namedSectionMap;
 	sl::StdList <Section> m_namedSectionList;
 	Section m_unnamedSection;
 
@@ -90,7 +90,7 @@ public:
 	Section*
 	getSection (const sl::StringRef& name) const
 	{
-		sl::StringHashTableMapIterator <Section*> it = m_namedSectionMap.find (name);
+		sl::StringHashTableIterator <Section*> it = m_namedSectionMap.find (name);
 		return it ? it->m_value : NULL;
 	}
 

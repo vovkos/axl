@@ -29,10 +29,14 @@ enum RbColor
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T,
-	typename NodeData
+	typename Key,
+	typename Value
 	>
-class RbTreeNodeBase: public BinTreeNodeBase <T, NodeData>
+class RbTreeNode: public BinTreeNodeBase <
+	RbTreeNode <Key, Value>,
+	Key,
+	Value
+	>
 {
 public:
 	RbColor m_color;
@@ -40,8 +44,8 @@ public:
 	static
 	void
 	onXcg (
-		T* node1,
-		T* node2
+		RbTreeNode* node1,
+		RbTreeNode* node2
 		)
 	{
 		RbColor oldColor = node1->m_color;
@@ -51,7 +55,7 @@ public:
 
 	static
 	int
-	getColor (T* node)
+	getColor (RbTreeNode* node)
 	{
 		return node ? node->m_color : RbColor_Black;
 	}
@@ -59,7 +63,7 @@ public:
 #ifdef _AXL_DEBUG
 	static
 	size_t
-	assertValid (T* node)
+	assertValid (RbTreeNode* node)
 	{
 		if (!node)
 			return 1;
@@ -86,59 +90,20 @@ public:
 #endif
 };
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename Key>
-class RbTreeNode: public RbTreeNodeBase <
-	RbTreeNode <Key>,
-	KeyNodeData <Key>
-	>
-{
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//..............................................................................
 
 template <
 	typename Key,
 	typename Value
 	>
-class RbTreeMapNode: public RbTreeNodeBase <
-	RbTreeMapNode <Key, Value>,
-	KeyValueNodeData <Key, Value>
-	>
-{
-};
-
-//..............................................................................
-
-template <typename Key>
-class RbTreeIterator: public Iterator <RbTreeNode <Key> >
+class RbTreeIterator: public Iterator <RbTreeNode <Key, Value> >
 {
 public:
 	RbTreeIterator ()
 	{
 	}
 
-	RbTreeIterator (const Iterator <RbTreeNode <Key> >& src)
-	{
-		this->m_p = src.getEntry ();
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <
-	typename Key,
-	typename Value
-	>
-class RbTreeMapIterator: public Iterator <RbTreeMapNode <Key, Value> >
-{
-public:
-	RbTreeMapIterator ()
-	{
-	}
-
-	RbTreeMapIterator (const Iterator <RbTreeMapNode <Key, Value> >& src)
+	RbTreeIterator (const Iterator <RbTreeNode <Key, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
@@ -148,18 +113,24 @@ public:
 
 template <
 	typename Key,
+	typename Value,
 	typename Cmp = Cmp <Key>,
-	typename KeyArg = ArgType <Key>,
-	typename Node = RbTreeNode <Key>
+	typename KeyArg = typename ArgType <Key>::Type,
+	typename ValueArg = typename ArgType <Value>::Type
 	>
 class RbTree: public BinTreeBase <
-	RbTree <Key, Cmp, KeyArg, Node>,
+	RbTree <Key, Value, Cmp, KeyArg, ValueArg>,
+	RbTreeNode <Key, Value>,
 	Key,
+	Value,
 	Cmp,
 	KeyArg,
-	Node
+	ValueArg
 	>
 {
+public:
+	typedef RbTreeNode <Key, Value> Node;
+
 public:
 #ifdef _AXL_DEBUG
 	void
@@ -345,78 +316,6 @@ public:
 	#endif
 	}
 
-};
-
-//..............................................................................
-
-template <
-	typename Key,
-	typename Value,
-	typename Cmp = Cmp <Key>,
-	typename KeyArg = typename ArgType <Key>::Type,
-	typename ValueArg = typename ArgType <Value>::Type
-	>
-class RbTreeMap: public RbTree <
-	Key,
-	Cmp,
-	KeyArg,
-	RbTreeMapNode <Key, Value>
-	>
-{
-public:
-	typedef sl::Iterator <RbTreeMapNode <Key, Value> > Iterator;
-
-public:
-	Value&
-	operator [] (KeyArg key)
-	{
-		return this->visit (key)->m_value;
-	}
-
-	Value
-	findValue (
-		KeyArg key,
-		ValueArg undefinedValue
-		) const
-	{
-		Iterator it = this->find (key);
-		return it ? it->m_value : undefinedValue;
-	}
-
-	Iterator
-	add (
-		KeyArg key,
-		ValueArg value,
-		bool* isNew = NULL
-		)
-	{
-		size_t prevCount = this->getCount ();
-
-		Iterator it = this->visit (key);
-		it->m_value = value;
-
-		if (isNew)
-			*isNew = this->getCount () > prevCount;
-
-		return it;
-	}
-
-	Iterator
-	addIfNotExists (
-		KeyArg key,
-		ValueArg value
-		)
-	{
-		size_t prevCount = this->getCount ();
-
-		Iterator it = this->visit (key);
-
-		if (this->getCount () == prevCount)
-			return NULL;
-
-		it->m_value = value;
-		return it;
-	}
 };
 
 //..............................................................................

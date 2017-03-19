@@ -14,6 +14,7 @@
 #define _AXL_SL_BINTREE_H
 
 #include "axl_sl_List.h"
+#include "axl_sl_MapEntry.h"
 #include "axl_sl_Cmp.h"
 
 namespace axl {
@@ -21,36 +22,13 @@ namespace sl {
 
 //..............................................................................
 
-template <typename Key>
-class KeyNodeData
-{
-public:
-	Key m_key;
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 template <
+	typename T,
 	typename Key,
 	typename Value
 	>
-class KeyValueNodeData: public KeyNodeData <Key>
+struct BinTreeNodeBase: MapEntry <Key, Value>
 {
-public:
-	Value m_value;
-};
-
-//..............................................................................
-
-template <
-	typename T,
-	typename NodeData
-	>
-class BinTreeNodeBase:
-	public sl::ListLink,
-	public NodeData
-{
-public:
 	T* m_parent;
 	T* m_left;
 	T* m_right;
@@ -82,10 +60,12 @@ enum BinTreeFindRelOp
 
 template <
 	typename T,
+	typename Node,
 	typename Key,
+	typename Value,
 	typename Cmp,
 	typename KeyArg,
-	typename Node
+	typename ValueArg
 	>
 class BinTreeBase
 {
@@ -100,6 +80,12 @@ public:
 	BinTreeBase ()
 	{
 		m_root = NULL;
+	}
+
+	Value&
+	operator [] (KeyArg key)
+	{
+		return visit (key)->m_value;
 	}
 
 	bool
@@ -189,6 +175,27 @@ public:
 		}
 	}
 
+	Value
+	findValue (
+		KeyArg key,
+		ValueArg undefinedValue
+		) const
+	{
+		Iterator it = find (key);
+		return it ? it->m_value : undefinedValue;
+	}
+
+	Value
+	findValue (
+		KeyArg key,
+		BinTreeFindRelOp relOp,
+		ValueArg undefinedValue
+		) const
+	{
+		Iterator it = find (key, relOp);
+		return it ? it->m_value : undefinedValue;
+	}
+
 	Iterator
 	visit (KeyArg key)
 	{
@@ -240,12 +247,14 @@ public:
 	Iterator
 	add (
 		KeyArg key,
+		ValueArg value,
 		bool* isNew = NULL
 		)
 	{
 		size_t prevCount = getCount ();
 
-		Iterator it = this->visit (key);
+		Iterator it = visit (key);
+		it->m_value = value;
 
 		if (isNew)
 			*isNew = getCount () > prevCount;
@@ -254,11 +263,20 @@ public:
 	}
 
 	Iterator
-	addIfNotExists (KeyArg key)
+	addIfNotExists (
+		KeyArg key,
+		ValueArg value
+		)
 	{
 		size_t prevCount = getCount ();
-		Iterator it = this->visit (key);
-		return getCount () > prevCount ? it : NULL;
+
+		Iterator it = visit (key);
+
+		if (getCount () == prevCount)
+			return NULL;
+
+		it->m_value = value;
+		return it;
 	}
 
 	void
