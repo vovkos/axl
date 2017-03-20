@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_fsm_StdRegExNameMgr.h"
+#include "axl_fsm_StdRegexNameMgr.h"
 
 namespace axl {
 namespace fsm {

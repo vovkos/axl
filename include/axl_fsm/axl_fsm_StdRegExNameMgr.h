@@ -13,14 +13,14 @@
 
 #define _AXL_FSM_STDREGEXNAMEMGR_H
 
-#include "axl_fsm_RegEx.h"
+#include "axl_fsm_Regex.h"
 
 namespace axl {
 namespace fsm {
 
 //..............................................................................
 
-class StdRegExNameMgr: public RegExNameMgr
+class StdRegexNameMgr: public RegexNameMgr
 {
 protected:
 	sl::StringHashTable <sl::String> m_nameMap;

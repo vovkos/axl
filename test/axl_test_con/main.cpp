@@ -634,15 +634,15 @@ testLongJmpTry ()
 //..............................................................................
 
 void
-testRegEx ()
+testRegex ()
 {
-	fsm::StdRegExNameMgr nameMgr;
+	fsm::StdRegexNameMgr nameMgr;
 
 	nameMgr.addName ("ws",  "[ \\t\\r\\n]");
 	nameMgr.addName ("dec", "[0-9]");
 
-	fsm::RegEx regEx;
-	fsm::RegExCompiler regExCompiler (fsm::RegExCompiler::Flag_SparseSyntax, &regEx, &nameMgr);
+	fsm::Regex regex;
+	fsm::RegexCompiler regexCompiler (fsm::RegexCompiler::Flag_SparseSyntax, &regex, &nameMgr);
 
 /*	char const* src [] =
 	{
@@ -651,7 +651,7 @@ testRegEx ()
 
 	for (size_t i = 0; i < countof (src); i++)
 	{
-		bool result = regExCompiler.incrementalCompile (src [i]);
+		bool result = regexCompiler.incrementalCompile (src [i]);
 		if (!result)
 		{
 			printf ("error: %s\n", err::getLastErrorDescription ().sz ());
@@ -659,15 +659,15 @@ testRegEx ()
 		}
 	}
 
-	regExCompiler.finalize ();
-	regEx.print ();
+	regexCompiler.finalize ();
+	regex.print ();
 */
 
-//	bool result = regExCompiler.compile ("\"abc\" ws* dec+");
+//	bool result = regexCompiler.compile ("\"abc\" ws* dec+");
 
 	bool result =
-		regExCompiler.incrementalCompile ("(\\h{2})   ' '+ (\\d{2})") &&
-		regExCompiler.incrementalCompile ("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
+		regexCompiler.incrementalCompile ("(\\h{2})   ' '+ (\\d{2})") &&
+		regexCompiler.incrementalCompile ("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
 
 	if (!result)
 	{
@@ -675,8 +675,8 @@ testRegEx ()
 		return;
 	}
 
-	regExCompiler.finalize ();
-	regEx.print ();
+	regexCompiler.finalize ();
+	regex.print ();
 }
 
 //..............................................................................
@@ -3145,7 +3145,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testRegEx ();
+	testRegex ();
 
 	return 0;
 }

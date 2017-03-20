@@ -20,7 +20,7 @@ namespace fsm {
 
 //..............................................................................
 
-class RegExNameMgr
+class RegexNameMgr
 {
 public:
 	virtual
@@ -30,9 +30,9 @@ public:
 
 //..............................................................................
 
-class RegEx
+class Regex
 {
-	friend class RegExCompiler;
+	friend class RegexCompiler;
 
 protected:
 	sl::StdList <NfaState> m_nfaStateList;
@@ -44,7 +44,7 @@ protected:
 	size_t m_groupCount;
 
 public:
-	RegEx ()
+	Regex ()
 	{
 		m_groupCount = 0;
 	}
@@ -100,7 +100,7 @@ public:
 
 //..............................................................................
 
-class RegExCompiler
+class RegexCompiler
 {
 public:
 	enum Flag
@@ -142,29 +142,29 @@ protected:
 	};
 
 protected:
-	RegEx* m_regEx;
-	RegExNameMgr* m_nameMgr;
+	Regex* m_regex;
+	RegexNameMgr* m_nameMgr;
 	uint_t m_flags;
 
 	const char* m_p;
 	Token m_lastToken;
 
 public:
-	RegExCompiler (
-		RegEx* regEx,
-		RegExNameMgr* nameMgr = NULL
+	RegexCompiler (
+		Regex* regex,
+		RegexNameMgr* nameMgr = NULL
 		)
 	{
-		construct (0, regEx, nameMgr);
+		construct (0, regex, nameMgr);
 	}
 
-	RegExCompiler (
+	RegexCompiler (
 		uint_t flags,
-		RegEx* regEx,
-		RegExNameMgr* nameMgr = NULL
+		Regex* regex,
+		RegexNameMgr* nameMgr = NULL
 		)
 	{
-		construct (flags, regEx, nameMgr);
+		construct (flags, regex, nameMgr);
 	}
 
 	bool
@@ -186,8 +186,8 @@ protected:
 	void
 	construct (
 		uint_t flags,
-		RegEx* regEx,
-		RegExNameMgr* nameMgr
+		Regex* regex,
+		RegexNameMgr* nameMgr
 		);
 
 	bool
@@ -251,7 +251,7 @@ protected:
 	stdCharClass (uint_t c);
 
 	NfaState*
-	namedRegEx (const sl::StringRef& name);
+	namedRegex (const sl::StringRef& name);
 
 	void
 	stdCharClass (

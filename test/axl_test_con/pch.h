@@ -17,8 +17,8 @@
 
 #include "axl_sl_String.h"
 #include "axl_err_Error.h"
-#include "axl_fsm_RegEx.h"
-#include "axl_fsm_StdRegExNameMgr.h"
+#include "axl_fsm_Regex.h"
+#include "axl_fsm_StdRegexNameMgr.h"
 #include "axl_sl_AutoPtrArray.h"
 #include "axl_sl_CmdLineParser.h"
 #include "axl_sys_SjljTry.h"

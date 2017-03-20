@@ -13,7 +13,7 @@
 #include "mainwindow.h"
 #include "moc_axl_gui_QtWidget.cpp"
 #include "axl_sys_Thread.h"
-#include "axl_fsm_RegEx.h"
+#include "axl_fsm_Regex.h"
 
 //..............................................................................
 
@@ -345,15 +345,15 @@ main (
 //	char const* src = "a*(b|cd?)+";
 	char const* src = "[ABCDefghijkl](b|c)*";
 
-	fsm::RegEx regEx;
-	bool result = regEx.compile (src);
+	fsm::Regex regex;
+	bool result = regex.compile (src);
 	if (!result)
 	{
 		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
 		return -1;
 	}
 
-	regEx.print ();
+	regex.print ();
 #endif
 
 #if 0
