@@ -25,7 +25,7 @@ class StdDelete
 {
 public:
 	void
-	operator () (T* p)
+	operator () (T* p) const
 	{
 		p->~T ();
 		StdAllocator::free (p);
@@ -39,7 +39,7 @@ class CppDelete
 {
 public:
 	void
-	operator () (T* p)
+	operator () (T* p) const
 	{
 		delete p;
 	}

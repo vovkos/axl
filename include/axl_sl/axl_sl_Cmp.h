@@ -168,7 +168,7 @@ public:
 	operator () (
 		Arg a,
 		Arg b
-		)
+		) const
 	{
 		return a.cmp (b);
 	}
@@ -177,7 +177,7 @@ public:
 	operator () (
 		const T* a,
 		const T* b
-		)
+		) const
 	{
 		return a->cmp (*b);
 	}
@@ -191,7 +191,7 @@ public:
 	operator () (
 		const T& a,
 		const T& b
-		)
+		) const
 	{
 		return a.cmp (&b);
 	}
@@ -200,7 +200,7 @@ public:
 	operator () (
 		const T* a,
 		const T* b
-		)
+		) const
 	{
 		return a->cmp (b);
 	}

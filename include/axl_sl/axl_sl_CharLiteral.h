@@ -24,7 +24,7 @@ class InitCharLiteralTable
 {
 public:
 	void
-	operator () (char literalTable [] [4])
+	operator () (char literalTable [] [4]) const
 	{
 		for (int i = 0; i < 256; i++)
 			_snprintf (literalTable [i], 4, "%c", i);
@@ -48,7 +48,7 @@ class InitCharCodeTable
 {
 public:
 	void
-	operator () (char literalTable [] [4])
+	operator () (char literalTable [] [4]) const
 	{
 		for (int i = 0; i < 256; i++)
 			_snprintf (literalTable [i], 4, "\\%02x", i);

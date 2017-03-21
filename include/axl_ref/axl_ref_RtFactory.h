@@ -92,7 +92,7 @@ public:
 			const char* filePath,
 			int line,
 			size_t extra = 0
-			)
+			) const
 		{
 			size_t size = type->getSize () + extra;
 			size_t refCountOffset = type->getInterfaceOffset (AXL_OBJ_GUIDOF (RefCount));
@@ -119,7 +119,7 @@ public:
 		operator () (
 			obj::IType* type,
 			size_t extra = 0
-			)
+			) const
 		{
 			size_t size = type->getSize () + extra;
 			size_t refCountOffset = type->getInterfaceOffset (AXL_OBJ_GUIDOF (RefCount));

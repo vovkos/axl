@@ -72,7 +72,7 @@ class SizeOfError
 {
 public:
 	size_t
-	operator () (const ErrorHdr* error)
+	operator () (const ErrorHdr* error) const
 	{
 		return AXL_MAX (error->m_size, sizeof (ErrorHdr));
 	}

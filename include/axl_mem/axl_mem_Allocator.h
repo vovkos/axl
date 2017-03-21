@@ -130,7 +130,7 @@ class Allocate
 {
 public:
 	void*
-	operator () (size_t size)
+	operator () (size_t size) const
 	{
 		return BaseAllocator::allocate (size);
 	}
@@ -143,7 +143,7 @@ class Free
 {
 public:
 	void
-	operator () (void* p)
+	operator () (void* p) const
 	{
 		BaseAllocator::free (p);
 	}
@@ -161,7 +161,7 @@ public:
 		const char* tag,
 		const char* filePath,
 		int line
-		)
+		) const
 	{
 		return TrackingAllocator <BaseAllocator>::allocate (size, tag, filePath, line);
 	}
@@ -174,7 +174,7 @@ class TrackingFree
 {
 public:
 	void
-	operator () (void* p)
+	operator () (void* p) const
 	{
 		TrackingAllocator <BaseAllocator>::free (p);
 	}

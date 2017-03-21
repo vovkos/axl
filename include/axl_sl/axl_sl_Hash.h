@@ -325,13 +325,13 @@ class HashDuckType
 {
 public:
 	size_t
-	operator () (Arg a)
+	operator () (Arg a) const
 	{
 		return a.hash ();
 	}
 
 	size_t
-	operator () (const T* a)
+	operator () (const T* a) const
 	{
 		return a->hash ();
 	}
