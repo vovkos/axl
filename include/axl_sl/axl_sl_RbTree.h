@@ -129,6 +129,16 @@ class RbTree: public BinTreeBase <
 	>
 {
 public:
+	friend class BinTreeBase <
+		RbTree <Key, Value, Cmp, KeyArg, ValueArg>,
+		RbTreeNode <Key, Value>,
+		Key,
+		Value,
+		Cmp,
+		KeyArg,
+		ValueArg
+		>;
+
 	typedef BinTreeBase <
 		RbTree <Key, Value, Cmp, KeyArg, ValueArg>,
 		RbTreeNode <Key, Value>,
@@ -140,8 +150,6 @@ public:
 		> BaseType;
 
 	typedef RbTreeNode <Key, Value> Node;
-	
-	friend class BaseType;
 
 public:
 	RbTree (const Cmp& cmp = Cmp ()):
