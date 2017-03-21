@@ -75,11 +75,13 @@ public:
 protected:
 	StdList <Node> m_nodeList;
 	Node* m_root;
+	Cmp m_cmp;
 
 public:
-	BinTreeBase ()
+	explicit BinTreeBase (const Cmp& cmp = Cmp ())
 	{
 		m_root = NULL;
+		m_cmp = cmp;
 	}
 
 	Value&
@@ -119,7 +121,7 @@ public:
 
 		while (node)
 		{
-			int cmp = Cmp () (key, node->m_key);
+			int cmp = m_cmp (key, node->m_key);
 			if (cmp == 0)
 				return node;
 
@@ -144,7 +146,7 @@ public:
 
 		while (node)
 		{
-			int cmp = Cmp () (key, node->m_key);
+			int cmp = m_cmp (key, node->m_key);
 			if (cmp == 0)
 				break; // exact match
 
@@ -208,7 +210,7 @@ public:
 
 		while (node)
 		{
-			cmp = Cmp () (key, node->m_key);
+			cmp = m_cmp (key, node->m_key);
 			if (cmp == 0)
 				return node;
 

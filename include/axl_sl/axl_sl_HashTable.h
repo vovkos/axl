@@ -34,7 +34,7 @@ struct HashTableEntry: public MapEntry <Key, Value>
 	{
 	public:
 		ListLink*
-		operator () (HashTableEntry* entry)
+		operator () (HashTableEntry* entry) const
 		{
 			return &entry->m_bucketLink;
 		}
@@ -92,11 +92,18 @@ protected:
 	StdList <Entry> m_list;
 	Array <Bucket> m_table;
 	size_t m_resizeThreshold;
+	Hash m_hash;
+	Eq m_eq;
 
 public:
-	HashTable ()
+	explicit HashTable (
+		const Hash& hash = Hash (),
+		const Eq& eq = Eq ()
+		)
 	{
 		m_resizeThreshold = Def_ResizeThreshold;
+		m_hash = hash;
+		m_eq = eq;
 	}
 
 	Value&
@@ -157,7 +164,7 @@ public:
 			while (!oldBucket->isEmpty ())
 			{
 				Entry* entry = oldBucket->removeHead ();
-				size_t hash = Hash () (entry->m_key);
+				size_t hash = m_hash (entry->m_key);
 
 				Bucket* newBucket = &newTable [hash % bucketCount];
 				entry->m_bucket = newBucket;
@@ -188,13 +195,13 @@ public:
 		if (!bucketCount)
 			return NULL;
 
-		size_t hash = Hash () (key);
+		size_t hash = m_hash (key);
 		const Bucket* bucket = &m_table [hash % bucketCount];
 
 		typename Bucket::Iterator it = bucket->getHead ();
 		for (; it; it++)
 		{
-			bool isEqual = Eq () (key, it->m_key);
+			bool isEqual = m_eq (key, it->m_key);
 			if (isEqual)
 				return it;
 		}
@@ -225,13 +232,13 @@ public:
 				return NULL;
 		}
 
-		size_t hash = Hash () (key);
+		size_t hash = m_hash (key);
 		Bucket* bucket = &m_table [hash % bucketCount];
 
 		typename Bucket::Iterator it = bucket->getHead ();
 		for (; it; it++)
 		{
-			bool isEqual = Eq () (key, it->m_key);
+			bool isEqual = m_eq (key, it->m_key);
 			if (isEqual)
 				return it;
 		}

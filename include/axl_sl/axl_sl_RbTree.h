@@ -129,17 +129,27 @@ class RbTree: public BinTreeBase <
 	>
 {
 public:
+	typedef BinTreeBase <
+		RbTree <Key, Value, Cmp, KeyArg, ValueArg>,
+		RbTreeNode <Key, Value>,
+		Key,
+		Value,
+		Cmp,
+		KeyArg,
+		ValueArg
+		> BaseType;
+
 	typedef RbTreeNode <Key, Value> Node;
+	
+	friend class BaseType;
 
 public:
-#ifdef _AXL_DEBUG
-	void
-	assertValid ()
+	RbTree (const Cmp& cmp = Cmp ()):
+		BaseType (cmp)
 	{
-		Node::assertValid (this->m_root);
 	}
-#endif
 
+protected:
 	void
 	onInsert (Node* x)
 	{
@@ -316,6 +326,13 @@ public:
 	#endif
 	}
 
+#ifdef _AXL_DEBUG
+	void
+	assertValid ()
+	{
+		Node::assertValid (this->m_root);
+	}
+#endif
 };
 
 //..............................................................................
