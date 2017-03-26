@@ -1253,3 +1253,32 @@ axl_import
 endmacro ()
 
 #...............................................................................
+
+macro (
+axl_install_redirected_includes
+	_TARGET_DIR
+	_SUB_DIR
+	# ...
+	)
+
+	set (_H_LIST ${ARGN})
+
+	install (
+		FILES ${_H_LIST}
+		DESTINATION ${_TARGET_DIR}/${_SUB_DIR}
+		)
+
+	set (_REDIR_H_LIST)
+
+	foreach (_FILE ${LIB_H_LIST})
+		string (REPLACE "/${_SUB_DIR}/" "/" _FILE ${_FILE})
+		list (APPEND _REDIR_H_LIST ${_FILE})
+	endforeach ()
+
+	install (
+		FILES ${_REDIR_H_LIST}
+		DESTINATION ${_TARGET_DIR}
+		)
+endmacro ()
+
+#...............................................................................

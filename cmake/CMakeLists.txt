@@ -25,4 +25,21 @@ set (
 	"In-source-tree AXL CMake directories"
 	)
 
+install (
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/
+	DESTINATION ${INSTALL_CMAKE_DIR}
+	FILES_MATCHING PATTERN *.cmake
+	)
+
+install (
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/axl_config.cmake
+	DESTINATION ${INSTALL_CMAKE_DIR}
+	)
+
+install (
+	FILES ${AXL_ROOT_DIR}/version.cmake
+	RENAME axl_version.cmake
+	DESTINATION ${INSTALL_CMAKE_DIR}
+	)
+
 #...............................................................................

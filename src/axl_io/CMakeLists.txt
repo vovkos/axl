@@ -277,6 +277,12 @@ include_directories (${AXL_INC_DIR})
 if (BUILD_AXL_IO_PCAP)
 	include_directories (${PCAP_INC_DIR})
 	add_definitions (-D_AXL_IO_PCAP=1)
+
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_io
+		${IO_PCAP_H_LIST}
+		)
 else ()
 	axl_exclude_from_build (${IO_PCAP_CPP_LIST})
 endif ()
@@ -284,6 +290,12 @@ endif ()
 if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
 	add_definitions (-D_AXL_IO_USB=1)
+
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_io
+		${IO_USB_H_LIST}
+		)
 else ()
 	axl_exclude_from_build (${IO_USB_CPP_LIST})
 endif ()
@@ -320,6 +332,36 @@ axl_set_pch (
 	axl_io
 	${PCH_H}
 	${PCH_CPP}
+	)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_io
+	${IO_H_LIST}
+	)
+
+if (WIN32)
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_io_win
+		${IO_WIN_H_LIST}
+		)
+endif ()
+
+
+if (UNIX)
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_io_psx
+		${IO_PSX_H_LIST}
+		)
+endif ()
+
+install (
+	TARGETS axl_io
+	DESTINATION ${INSTALL_LIB_DIR}
 	)
 
 #...............................................................................

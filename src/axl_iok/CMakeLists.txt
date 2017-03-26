@@ -75,4 +75,17 @@ axl_set_pch (
 	${PCH_CPP}
 	)
 
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_iok
+	${LIB_H_LIST}
+	)
+
+install (
+	TARGETS axl_iok
+	DESTINATION ${INSTALL_LIB_DIR}
+	)
+
 #...............................................................................

@@ -10,33 +10,6 @@
 #...............................................................................
 
 #
-# err folder
-#
-
-set (
-	ERR_H_LIST
-	${AXL_INC_DIR}/axl_err/axl_err_Error.h
-	${AXL_INC_DIR}/axl_err/axl_err_ErrorMgr.h
-	${AXL_INC_DIR}/axl_err/axl_err_SystemError.h
-	${AXL_INC_DIR}/axl_err/axl_err_Errno.h
-	)
-
-set (
-	ERR_CPP_LIST
-	axl_err_Errno.cpp
-	axl_err_Error.cpp
-	axl_err_ErrorMgr.cpp
-	)
-
-source_group (
-	err
-	FILES
-	${ERR_H_LIST}
-	${ERR_CPP_LIST}
-	)
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # g folder
 #
 
@@ -81,6 +54,168 @@ source_group (
 	FILES
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
+	)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# ref folder
+#
+
+set (
+	REF_H_LIST
+	${AXL_INC_DIR}/axl_ref/axl_ref_Buf.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_Child.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_New.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_Ptr.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_RefCount.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_RtFactory.h
+	${AXL_INC_DIR}/axl_ref/axl_ref_WeakPtr.h
+	)
+
+set (
+	REF_CPP_LIST
+	axl_ref_RefCount.cpp
+	)
+
+source_group (
+	ref
+	FILES
+	${REF_H_LIST}
+	${REF_CPP_LIST}
+	)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# err folder
+#
+
+set (
+	ERR_H_LIST
+	${AXL_INC_DIR}/axl_err/axl_err_Error.h
+	${AXL_INC_DIR}/axl_err/axl_err_ErrorMgr.h
+	${AXL_INC_DIR}/axl_err/axl_err_SystemError.h
+	${AXL_INC_DIR}/axl_err/axl_err_Errno.h
+	)
+
+set (
+	ERR_CPP_LIST
+	axl_err_Errno.cpp
+	axl_err_Error.cpp
+	axl_err_ErrorMgr.cpp
+	)
+
+source_group (
+	err
+	FILES
+	${ERR_H_LIST}
+	${ERR_CPP_LIST}
+	)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# sl folder
+#
+
+set (
+	SL_H_LIST
+	${AXL_INC_DIR}/axl_sl/axl_sl_ArgType.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Operator.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Construct.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Cmp.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Hash.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Swap.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Closure.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ForEach.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_CallOnce.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Singleton.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_SimpleSingleton.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Array.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayDetails.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayList.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_AutoPtrArray.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BinTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BitIdx.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BitMap.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BmhFind.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreFind.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_MemMem.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BoxList.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BuddyAllocMap.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ByteOrder.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_CharLiteral.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_CmdLineParser.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Guid.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Handle.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_HandleTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_HashTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_List.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ListBase.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_MapEntry.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Pack.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Packer.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Packetizer.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Protocol.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_RbTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_String.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_StringDetails.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_StringHashTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Unpacker.h
+	)
+
+set (
+	SL_CPP_LIST
+	axl_sl_BitMap.cpp
+	axl_sl_BmhFind.cpp
+	axl_sl_BoyerMooreAccessor.h
+	axl_sl_BoyerMooreFind.cpp
+	axl_sl_MemMem.cpp
+	axl_sl_BuddyAllocMap.cpp
+	axl_sl_CmdLineParser.cpp
+	axl_sl_Guid.cpp
+	axl_sl_Hash.cpp
+	axl_sl_Packer.cpp
+	axl_sl_Packetizer.cpp
+	axl_sl_Unpacker.cpp
+	)
+
+source_group (
+	sl
+	FILES
+	${SL_H_LIST}
+	${SL_CPP_LIST}
+	)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# enc folder
+#
+
+set (
+	ENC_H_LIST
+	${AXL_INC_DIR}/axl_enc/axl_enc_Base32Encoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_CharCodec.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_EscapeEncoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_HexEncoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf.h
+	icu_def.h
+	icu_uchar_props_data.h
+	icu_ucase_props_data.h
+	)
+
+set (
+	ENC_CPP_LIST
+	axl_enc_Base32Encoding.cpp
+	axl_enc_CharCodec.cpp
+	axl_enc_EscapeEncoding.cpp
+	axl_enc_HexEncoding.cpp
+	axl_enc_Utf.cpp
+	)
+
+source_group (
+	enc
+	FILES
+	${ENC_H_LIST}
+	${ENC_CPP_LIST}
 	)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -271,141 +406,6 @@ endif ()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# ref folder
-#
-
-set (
-	REF_H_LIST
-	${AXL_INC_DIR}/axl_ref/axl_ref_Buf.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_Child.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_New.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_Ptr.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_RefCount.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_RtFactory.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_WeakPtr.h
-	)
-
-set (
-	REF_CPP_LIST
-	axl_ref_RefCount.cpp
-	)
-
-source_group (
-	ref
-	FILES
-	${REF_H_LIST}
-	${REF_CPP_LIST}
-	)
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# sl folder
-#
-
-set (
-	SL_H_LIST
-	${AXL_INC_DIR}/axl_sl/axl_sl_ArgType.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Operator.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Construct.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Cmp.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Hash.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Swap.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Closure.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_ForEach.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_CallOnce.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Singleton.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_SimpleSingleton.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Array.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayDetails.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayList.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_AutoPtrArray.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BinTree.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BitIdx.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BitMap.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BmhFind.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreFind.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_MemMem.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BoxList.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BuddyAllocMap.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_ByteOrder.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_CharLiteral.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_CmdLineParser.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Guid.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Handle.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_HandleTable.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_HashTable.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_List.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_ListBase.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_MapEntry.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Pack.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Packer.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Packetizer.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Protocol.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_RbTree.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_String.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_StringDetails.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_StringHashTable.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Unpacker.h
-	)
-
-set (
-	SL_CPP_LIST
-	axl_sl_BitMap.cpp
-	axl_sl_BmhFind.cpp
-	axl_sl_BoyerMooreAccessor.h
-	axl_sl_BoyerMooreFind.cpp
-	axl_sl_MemMem.cpp
-	axl_sl_BuddyAllocMap.cpp
-	axl_sl_CmdLineParser.cpp
-	axl_sl_Guid.cpp
-	axl_sl_Hash.cpp
-	axl_sl_Packer.cpp
-	axl_sl_Packetizer.cpp
-	axl_sl_Unpacker.cpp
-	)
-
-source_group (
-	sl
-	FILES
-	${SL_H_LIST}
-	${SL_CPP_LIST}
-	)
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# enc folder
-#
-
-set (
-	ENC_H_LIST
-	${AXL_INC_DIR}/axl_enc/axl_enc_Base32Encoding.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_CharCodec.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_EscapeEncoding.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_HexEncoding.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Utf.h
-	icu_def.h
-	icu_uchar_props_data.h
-	icu_ucase_props_data.h
-	)
-
-set (
-	ENC_CPP_LIST
-	axl_enc_Base32Encoding.cpp
-	axl_enc_CharCodec.cpp
-	axl_enc_EscapeEncoding.cpp
-	axl_enc_HexEncoding.cpp
-	axl_enc_Utf.cpp
-	)
-
-source_group (
-	enc
-	FILES
-	${ENC_H_LIST}
-	${ENC_CPP_LIST}
-	)
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # pch folder
 #
 
@@ -442,38 +442,115 @@ add_library (
 	axl_core
 	${PCH_H_LIST}
 	${PCH_CPP}
-	${DBG_H_LIST}
-	${DBG_CPP_LIST}
-	${ERR_H_LIST}
-	${ERR_CPP_LIST}
 	${G_H_LIST}
 	${G_CPP_LIST}
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
-	${SYS_H_LIST}
-	${SYS_CPP_LIST}
-	${SYS_PSX_H_LIST}
-	${SYS_PSX_CPP_LIST}
-	${SYS_WIN_H_LIST}
-	${SYS_WIN_CPP_LIST}
-	${SYS_LNX_H_LIST}
-	${SYS_LNX_CPP_LIST}
-	${SYS_DRW_H_LIST}
-	${SYS_DRW_CPP_LIST}
-	${OBJ_H_LIST}
-	${OBJ_CPP_LIST}
 	${REF_H_LIST}
 	${REF_CPP_LIST}
+	${ERR_H_LIST}
+	${ERR_CPP_LIST}
 	${SL_H_LIST}
 	${SL_CPP_LIST}
 	${ENC_H_LIST}
 	${ENC_CPP_LIST}
+	${SYS_H_LIST}
+	${SYS_CPP_LIST}
+	${SYS_WIN_H_LIST}
+	${SYS_WIN_CPP_LIST}
+	${SYS_PSX_H_LIST}
+	${SYS_PSX_CPP_LIST}
+	${SYS_LNX_H_LIST}
+	${SYS_LNX_CPP_LIST}
+	${SYS_DRW_H_LIST}
+	${SYS_DRW_CPP_LIST}
 	)
 
 axl_set_pch (
 	axl_core
 	${PCH_H}
 	${PCH_CPP}
+	)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_g
+	${G_H_LIST}
+	)
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_err
+	${ERR_H_LIST}
+	)
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_mem
+	${MEM_H_LIST}
+	)
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_ref
+	${REF_H_LIST}
+	)
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_sl
+	${SL_H_LIST}
+	)
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_enc
+	${ENC_H_LIST}
+	)
+
+axl_install_redirected_includes (
+	${INSTALL_INCLUDE_DIR}
+	axl_sys
+	${SYS_H_LIST}
+	)
+
+if (WIN32)
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_sys_win
+		${SYS_WIN_H_LIST}
+		)
+endif ()
+
+if (UNIX)
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_sys_psx
+		${SYS_PSX_H_LIST}
+		)
+endif ()
+
+if (LINUX)
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_sys_lnx
+		${SYS_LNX_H_LIST}
+		)
+endif ()
+
+if (APPLE)
+	axl_install_redirected_includes (
+		${INSTALL_INCLUDE_DIR}
+		axl_sys_drw
+		${SYS_DRW_H_LIST}
+		)
+endif ()
+
+install (
+	TARGETS axl_core
+	DESTINATION ${INSTALL_LIB_DIR}
 	)
 
 #...............................................................................

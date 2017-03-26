@@ -58,6 +58,8 @@ axl_apply_cpu_setting)
 	endif ()
 endmacro ()
 
+#...............................................................................
+
 macro (
 axl_create_build_type_setting)
 
