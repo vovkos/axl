@@ -12,17 +12,17 @@
 # CPU setting
 
 macro (
-axl_create_cpu_setting)
+axl_create_target_cpu_setting)
 
 	axl_detect_target_cpu (_CPU)
 
 	# Microsoft Visual C++ is a native-only generator, GCC can cross-compile
 
 	if (MSVC)
-		set (AXL_CPU ${_CPU})
+		set (TARGET_CPU ${_CPU})
 	else ()
 		axl_create_setting (
-			AXL_CPU
+			TARGET_CPU
 			DESCRIPTION "Target CPU"
 			DEFAULT ${_CPU}
 			"x86" "amd64"
@@ -31,9 +31,9 @@ axl_create_cpu_setting)
 endmacro ()
 
 macro (
-axl_apply_cpu_setting)
+axl_apply_target_cpu_setting)
 
-	if ("${AXL_CPU}" STREQUAL "amd64")
+	if ("${TARGET_CPU}" STREQUAL "amd64")
 		set (CMAKE_SIZEOF_VOID_P 8)
 
 		set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
@@ -43,7 +43,7 @@ axl_apply_cpu_setting)
 			set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -mcx16")
 			set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -m64 -mcx16")
 		endif ()
-	elseif ("${AXL_CPU}" STREQUAL "x86")
+	elseif ("${TARGET_CPU}" STREQUAL "x86")
 		set (CMAKE_SIZEOF_VOID_P 4)
 
 		set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS FALSE)
@@ -54,8 +54,10 @@ axl_apply_cpu_setting)
 			set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -m32")
 		endif ()
 	else ()
-		message (FATAL_ERROR "Unsupported CPU: ${AXL_CPU}")
+		message (FATAL_ERROR "Unsupported CPU: ${TARGET_CPU}")
 	endif ()
+
+	set (TARGET_CPU ${TARGET_CPU}) # for backward compatibility re paths.cmake
 endmacro ()
 
 #...............................................................................
@@ -77,7 +79,7 @@ axl_create_build_type_setting)
 		axl_create_setting (
 			CMAKE_BUILD_TYPE
 			DESCRIPTION "Build configuration"
-			DEFAULT Debug
+			DEFAULT Release
 			${CMAKE_CONFIGURATION_TYPES}
 			)
 	endif ()
@@ -314,7 +316,7 @@ axl_create_std_settings)
 		set (GCC TRUE)
 	endif ()
 
-	axl_create_cpu_setting ()
+	axl_create_target_cpu_setting ()
 	axl_create_build_type_setting ()
 
 	if (MSVC)
@@ -327,7 +329,7 @@ endmacro ()
 macro (
 axl_apply_std_settings)
 
-	axl_apply_cpu_setting ()
+	axl_apply_target_cpu_setting ()
 	axl_apply_build_type_setting ()
 
 	if (MSVC)
@@ -356,7 +358,7 @@ axl_print_std_settings)
 		axl_message ("    paths.cmake:" ${AXL_PATHS_CMAKE})
 	endif ()
 
-	axl_message ("    Target CPU:" ${AXL_CPU})
+	axl_message ("    Target CPU:" ${TARGET_CPU})
 
 	if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
 		axl_message ("    Build configuration:" ${CMAKE_BUILD_TYPE})

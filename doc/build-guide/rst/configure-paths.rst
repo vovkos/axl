@@ -61,7 +61,7 @@ On Windows you will have to specify paths to the *libraries* you need -- they ar
 	set (LIBUSB_INC_DIR      c:/Develop/libusb/libusb-${LIBUSB_VERSION}/libusb)
 	set (EXPAT_INC_DIR       c:/Develop/expat/expat-${EXPAT_VERSION}/lib)
 
-	if ("${AXL_CPU}" STREQUAL "amd64")
+	if ("${TARGET_CPU}" STREQUAL "amd64")
 		set (LUA_LIB_DIR        c:/Develop/lua/lua-${LUA_VERSION}/lib/amd64/${CONFIGURATION_SUFFIX})
 		set (PCAP_LIB_DIR       c:/Develop/winpcap/winpcap-${WINPCAP_VERSION}/lib/x64)
 		set (LIBUSB_LIB_DIR     c:/Develop/libusb/libusb-${LIBUSB_VERSION}/x64/${CONFIGURATION_SUFFIX}/lib)
