@@ -73,7 +73,7 @@ else ()
 endif ()
 
 if (QT_FOUND)
-	axl_message ("QT paths:")
+	axl_message ("QT ${Qt5Core_VERSION_STRING} paths:")
 	axl_message ("    Core CMake files:" "${QTCORE_CMAKE_DIR}")
 
 	if (QTGUI_FOUND)

@@ -18,7 +18,7 @@ axl_find_file (
 if (_CONFIG_CMAKE)
 	include (${_CONFIG_CMAKE})
 
-	axl_message ("AXL paths:")
+	axl_message ("AXL ${AXL_VERSION_FULL} paths:")
 	axl_message ("    CMake files:" "${AXL_CMAKE_DIR}")
 	axl_message ("    Includes:"    "${AXL_INC_DIR}")
 	axl_message ("    Libraries:"   "${AXL_LIB_DIR}")
