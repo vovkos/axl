@@ -85,7 +85,7 @@ axl_install_redirected_includes (
 
 install (
 	TARGETS axl_iok
-	DESTINATION ${INSTALL_LIB_DIR}
+	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)
 
 #...............................................................................
