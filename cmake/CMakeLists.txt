@@ -13,13 +13,13 @@ string (REGEX REPLACE "[a-z]+" ".." AXL_INSTALL_ROOT_SUBDIR ${AXL_INSTALL_CMAKE_
 
 configure_file (
 	axl_config_build.cmake.in
-	${CMAKE_CURRENT_BINARY_DIR}/axl_config.cmake
+	axl_config.cmake
 	@ONLY
 	)
 
 configure_file (
 	axl_config_install.cmake.in
-	${CMAKE_CURRENT_BINARY_DIR}/axl_config_install.cmake
+	axl_config_install.cmake
 	@ONLY
 	)
 
