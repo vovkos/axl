@@ -19,7 +19,7 @@ if (LINUX)
 
 		option (
 			BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API
-			"Build LibUdev wrappers for axl_core library"
+			"Build wrappers for new functions in LibUdev (e.g. udev_device_get_sysattr_value)"
 			OFF
 			)
 	else ()

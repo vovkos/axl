@@ -26,50 +26,19 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${AXL_BIN_BASE_DIR}/${CONFIGURATION_SUFFIX_0
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${AXL_BIN_BASE_DIR}/${CONFIGURATION_SUFFIX_0})
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${AXL_LIB_BASE_DIR}/${CONFIGURATION_SUFFIX_0})
 
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+set (AXL_INSTALL_LIB_SUBDIR lib)
 
-axl_create_setting (
-	INSTALL_INCLUDE_DIR
-	DESCRIPTION "Installation directory for header files"
-	DEFAULT "include/${CMAKE_PROJECT_NAME}"
-	"include"
-	"include/${CMAKE_PROJECT_NAME}"
-	)
-
-axl_create_setting (
-	INSTALL_LIB_DIR
-	DESCRIPTION "Installation directory for library files"
-	DEFAULT "lib"
-	"lib"
-	"lib/${CMAKE_PROJECT_NAME}"
-	)
-
-axl_create_setting (
-	INSTALL_CMAKE_DIR
-	DESCRIPTION "Installation directory for CMake files"
-	DEFAULT lib/cmake/${CMAKE_PROJECT_NAME}
-	"cmake"
-	"share/${CMAKE_PROJECT_NAME}/cmake"
-	"lib/cmake/${CMAKE_PROJECT_NAME}"
-	)
-
-axl_create_setting (
-	INSTALL_DOC_DIR
-	DESCRIPTION "Installation directory for documentation files"
-	DEFAULT "share/${CMAKE_PROJECT_NAME}/doc"
-	"doc"
-	"share/doc/${CMAKE_PROJECT_NAME}"
-	"share/${CMAKE_PROJECT_NAME}/doc"
-	)
-
-axl_create_setting (
-	INSTALL_LICENSE_DIR
-	DESCRIPTION "Installation directory for license files"
-	DEFAULT "share/${CMAKE_PROJECT_NAME}/license"
-	"license"
-	"share/licenses/${CMAKE_PROJECT_NAME}"
-	"share/${CMAKE_PROJECT_NAME}/license"
-	)
+if (WIN32)
+	set (AXL_INSTALL_INC_SUBDIR     include)
+	set (AXL_INSTALL_CMAKE_SUBDIR   cmake)
+	set (AXL_INSTALL_DOC_SUBDIR     doc)
+	set (AXL_INSTALL_LICENSE_SUBDIR license)
+else ()
+	set (AXL_INSTALL_INC_SUBDIR     include/${CMAKE_PROJECT_NAME})
+	set (AXL_INSTALL_CMAKE_SUBDIR   lib/cmake/${CMAKE_PROJECT_NAME})
+	set (AXL_INSTALL_DOC_SUBDIR     share/${CMAKE_PROJECT_NAME}/doc)
+	set (AXL_INSTALL_LICENSE_SUBDIR share/${CMAKE_PROJECT_NAME}/license)
+endif ()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -79,22 +48,13 @@ include (${CMAKE_CURRENT_BINARY_DIR}/cmake/axl_config.cmake)
 
 add_subdirectory (src)
 add_subdirectory (doc)
+add_subdirectory (test)
 
-if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt")
-	add_subdirectory (test)
-endif ()
-
-if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/samples/CMakeLists.txt")
-	add_subdirectory (samples)
-endif ()
-
-if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/package/CMakeLists.txt")
-	add_subdirectory (package)
-endif ()
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 install (
 	DIRECTORY license/
-	DESTINATION ${INSTALL_LICENSE_DIR}
+	DESTINATION ${AXL_INSTALL_LICENSE_SUBDIR}
 	)
 
 #...............................................................................
@@ -108,8 +68,8 @@ set (CPACK_SOURCE_IGNORE_FILES "/\\.;\\.user$;/build/;/travis/;/paths.cmake$")
 
 string (TOLOWER ${CMAKE_SYSTEM_NAME} OS_NAME)
 
-set (CPACK_PACKAGE_FILE_NAME axl-${OS_NAME}-${AXL_VERSION_MAJOR}.${AXL_VERSION_MINOR}.${AXL_VERSION_REVISION}-${AXL_CPU})
-set (CPACK_SOURCE_PACKAGE_FILE_NAME axl-src-${AXL_VERSION_MAJOR}.${AXL_VERSION_MINOR}.${AXL_VERSION_REVISION})
+set (CPACK_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-${OS_NAME}-${AXL_VERSION_FILE_SUFFIX}-${TARGET_CPU})
+set (CPACK_SOURCE_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-src-${AXL_VERSION_FILE_SUFFIX})
 
 include (CPack)
 

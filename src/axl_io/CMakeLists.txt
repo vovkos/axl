@@ -279,7 +279,7 @@ if (BUILD_AXL_IO_PCAP)
 	add_definitions (-D_AXL_IO_PCAP=1)
 
 	axl_install_redirected_includes (
-		${INSTALL_INCLUDE_DIR}
+		${AXL_INSTALL_INC_SUBDIR}
 		axl_io
 		${IO_PCAP_H_LIST}
 		)
@@ -292,7 +292,7 @@ if (BUILD_AXL_IO_USB)
 	add_definitions (-D_AXL_IO_USB=1)
 
 	axl_install_redirected_includes (
-		${INSTALL_INCLUDE_DIR}
+		${AXL_INSTALL_INC_SUBDIR}
 		axl_io
 		${IO_USB_H_LIST}
 		)
@@ -337,14 +337,14 @@ axl_set_pch (
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 axl_install_redirected_includes (
-	${INSTALL_INCLUDE_DIR}
+	${AXL_INSTALL_INC_SUBDIR}
 	axl_io
 	${IO_H_LIST}
 	)
 
 if (WIN32)
 	axl_install_redirected_includes (
-		${INSTALL_INCLUDE_DIR}
+		${AXL_INSTALL_INC_SUBDIR}
 		axl_io_win
 		${IO_WIN_H_LIST}
 		)
@@ -353,7 +353,7 @@ endif ()
 
 if (UNIX)
 	axl_install_redirected_includes (
-		${INSTALL_INCLUDE_DIR}
+		${AXL_INSTALL_INC_SUBDIR}
 		axl_io_psx
 		${IO_PSX_H_LIST}
 		)
@@ -361,7 +361,7 @@ endif ()
 
 install (
 	TARGETS axl_io
-	DESTINATION ${INSTALL_LIB_DIR}
+	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)
 
 #...............................................................................

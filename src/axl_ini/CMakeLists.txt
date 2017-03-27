@@ -119,14 +119,14 @@ axl_set_pch (
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 axl_install_redirected_includes (
-	${INSTALL_INCLUDE_DIR}
+	${AXL_INSTALL_INC_SUBDIR}
 	axl_ini
 	${LIB_H_LIST}
 	)
 
 install (
 	TARGETS axl_ini
-	DESTINATION ${INSTALL_LIB_DIR}
+	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)
 
 #...............................................................................
