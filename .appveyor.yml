@@ -1,0 +1,49 @@
+#...............................................................................
+#
+#  This file is part of the AXL library.
+#
+#  AXL is distributed under the MIT license.
+#  For details see accompanying license.txt file,
+#  the public copy of which is also available at:
+#  http://tibbo.com/downloads/archive/axl/license.txt
+#
+#...............................................................................
+
+branches:
+    only:
+        - master
+
+image: Visual Studio 2015
+
+init:
+    - git config --global core.autocrlf input
+
+clone_folder: c:\projects\axl
+shallow_clone: true
+
+matrix:
+    fast_finish: true
+
+install:
+    - echo Post clone script...
+
+platform:
+    - x64
+    - x86
+
+configuration:
+    - Debug
+    - Release
+
+before_build:
+    - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+    - call ci\appveyor\set-env.bat %PLATFORM%
+
+build_script:
+    - mkdir build
+    - cd build
+    - cmake .. %CMAKE_FLAGS%
+    - cmake --build . -- /nologo /verbosity:minimal /consoleloggerparameters:Summary /maxcpucount /property:configuration=%CONFIGURATION%
+
+after_build:
+    - ctest -C %CONFIGURATION%

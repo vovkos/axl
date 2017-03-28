@@ -64,7 +64,7 @@ set (CPACK_PACKAGE_VERSION_MINOR ${AXL_VERSION_MINOR})
 set (CPACK_PACKAGE_VERSION_PATCH ${AXL_VERSION_REVISION})
 
 set (CPACK_SOURCE_GENERATOR TXZ)
-set (CPACK_SOURCE_IGNORE_FILES "/[.];[.]user$;/build/;/travis/;/paths.cmake$")
+set (CPACK_SOURCE_IGNORE_FILES "/[.];[.]user$;/build/;/ci/;/paths.cmake$")
 
 string (TOLOWER ${CMAKE_SYSTEM_NAME} OS_NAME)
 

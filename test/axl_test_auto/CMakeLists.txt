@@ -107,6 +107,12 @@ else ()
 	axl_exclude_from_build (test_StringTemplate.cpp)
 endif ()
 
+if (BUILD_AXL_INI)
+	list (APPEND OPT_LIB_LIST axl_ini)
+else ()
+	axl_exclude_from_build (test_IniParser.cpp)
+endif ()
+
 add_executable (
 	axl_test_auto
 	${PCH_H}
@@ -130,7 +136,6 @@ set_target_properties (
 target_link_libraries (
 	axl_test_auto
 	${OPT_LIB_LIST}
-	axl_ini
 	axl_lex
 	axl_io
 	axl_core
