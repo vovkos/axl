@@ -59,6 +59,7 @@ goto :loop
 set TARGET_CPU=x86
 set CMAKE_GENERATOR_SUFFIX=
 set LUA_PLATFORM=Win32
+set OPENSSL_DIR=C:\OpenSSL-Win32
 shift
 goto :loop
 
@@ -66,6 +67,7 @@ goto :loop
 set TARGET_CPU=amd64
 set CMAKE_GENERATOR_SUFFIX= Win64
 set LUA_PLATFORM=Win64
+set OPENSSL_DIR=C:\OpenSSL-Win64
 shift
 goto :loop
 
@@ -85,9 +87,13 @@ set RAGEL_DOWNLOAD_URL=http://downloads.yorickpeterse.com/files/ragel-68-visuals
 
 set CMAKE_FLAGS=-G "%CMAKE_GENERATOR%%CMAKE_GENERATOR_SUFFIX%" -DTARGET_CPU=%TARGET_CPU%
 
+set MSBUILD_FLAGS=/nologo /verbosity:minimal /consoleloggerparameters:Summary /maxcpucount /property:configuration=%CONFIGURATION%
+
 echo ---------------------------------------------------------------------------
 echo LUA_LIB_NAME:       %LUA_LIB_NAME%
 echo LUA_DOWNLOAD_URL:   %LUA_DOWNLOAD_URL%
+echo OPENSSL_DIR:        %OPENSSL_DIR%
 echo RAGEL_DOWNLOAD_URL: %RAGEL_DOWNLOAD_URL%
 echo CMAKE_FLAGS:        %CMAKE_FLAGS%
+echo MSBUILD_FLAGS:      %MSBUILD_FLAGS%
 echo ---------------------------------------------------------------------------

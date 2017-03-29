@@ -1,4 +1,4 @@
-:: .............................................................................
+::..............................................................................
 ::
 ::  This file is part of the AXL library.
 ::
@@ -7,11 +7,11 @@
 ::  the public copy of which is also available at:
 ::  http://tibbo.com/downloads/archive/axl/license.txt
 ::
-:: .............................................................................
+::..............................................................................
 
 @echo off
 
-set DOWNLOAD_DIR=c:\Downloads
+set DOWNLOAD_DIR=c:\downloads
 set DOWNLOAD_DIR_CMAKE=%DOWNLOAD_DIR:\=/%
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -35,6 +35,15 @@ appveyor DownloadFile %LUA_DOWNLOAD_URL% -FileName %DOWNLOAD_DIR%\lua\lua.zip
 echo set (LUA_INC_DIR %DOWNLOAD_DIR_CMAKE%/lua/include) >> paths.cmake
 echo set (LUA_LIB_DIR %DOWNLOAD_DIR_CMAKE%/lua) >> paths.cmake
 echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
+
+:: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+:: OpenSSL
+
+set OPENSSL_DIR_CMAKE=%OPENSSL_DIR:\=/%
+
+echo set (OPENSSL_INC_DIR %OPENSSL_DIR_CMAKE%/include) >> paths.cmake
+echo set (OPENSSL_LIB_DIR %OPENSSL_DIR_CMAKE%/lib) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
