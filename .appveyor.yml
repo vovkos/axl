@@ -24,9 +24,6 @@ shallow_clone: true
 matrix:
     fast_finish: false
 
-install:
-    - echo Post clone script...
-
 platform:
     - x64
     - x86
@@ -41,9 +38,9 @@ environment:
         - TOOLCHAIN: msvc12
         - TOOLCHAIN: msvc14
 
-before_build:
-    - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+install:
     - call ci\appveyor\set-env.bat %TOOLCHAIN% %PLATFORM%
+    - call ci\appveyor\install.bat
 
 build_script:
     - mkdir build
@@ -51,5 +48,5 @@ build_script:
     - cmake .. %CMAKE_FLAGS%
     - cmake --build . -- /nologo /verbosity:minimal /consoleloggerparameters:Summary /maxcpucount /property:configuration=%CONFIGURATION%
 
-after_build:
+test_script:
     - ctest -C %CONFIGURATION%
