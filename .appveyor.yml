@@ -22,7 +22,7 @@ clone_folder: c:\projects\axl
 shallow_clone: true
 
 matrix:
-    fast_finish: true
+    fast_finish: false
 
 install:
     - echo Post clone script...
@@ -35,9 +35,15 @@ configuration:
     - Debug
     - Release
 
+environment:
+    matrix:
+        - TOOLCHAIN: msvc10
+        - TOOLCHAIN: msvc12
+        - TOOLCHAIN: msvc14
+
 before_build:
     - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
-    - call ci\appveyor\set-env.bat %PLATFORM%
+    - call ci\appveyor\set-env.bat %TOOLCHAIN% %PLATFORM%
 
 build_script:
     - mkdir build

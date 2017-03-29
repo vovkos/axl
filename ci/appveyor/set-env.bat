@@ -14,6 +14,9 @@
 :loop
 
 if "%1" == "" goto :finalize
+if /i "%1" == "msvc10" goto :msvc10
+if /i "%1" == "msvc12" goto :msvc12
+if /i "%1" == "msvc14" goto :msvc14
 if /i "%1" == "x86" goto :x86
 if /i "%1" == "i386" goto :x86
 if /i "%1" == "amd64" goto :amd64
@@ -22,6 +25,24 @@ if /i "%1" == "x64" goto :amd64
 
 echo Invalid argument: '%1'
 exit -1
+
+:msvc10
+set TOOLCHAIN=msvc10
+set CMAKE_GENERATOR=Visual Studio 10 2010
+shift
+goto :loop
+
+:msvc12
+set TOOLCHAIN=msvc12
+set CMAKE_GENERATOR=Visual Studio 12 2013
+shift
+goto :loop
+
+:msvc14
+set TOOLCHAIN=msvc14
+set CMAKE_GENERATOR=Visual Studio 14 2015
+shift
+goto :loop
 
 :x86
 set TARGET_CPU=x86
@@ -35,21 +56,12 @@ set CMAKE_GENERATOR_SUFFIX= Win64
 shift
 goto :loop
 
-:cpu
-
-if /i "%PROCESSOR_ARCHITECTURE%" == "x86" goto :x86
-if /i "%PROCESSOR_ARCHITECTURE%" == "i386" goto :x86
-if /i "%PROCESSOR_ARCHITECTURE%" == "amd64" goto :amd64
-if /i "%PROCESSOR_ARCHITECTURE%" == "x86_64" goto :amd64
-if /i "%PROCESSOR_ARCHITECTURE%" == "x64" goto :amd64
-
-echo Unsupported native architecture: '%PROCESSOR_ARCHITECTURE%'
-exit -1
-
 :finalize
 
-if "%TARGET_CPU%" == "" goto :cpu
+if "%TOOLCHAIN%" == "" goto :msvc14
+if "%TARGET_CPU%" == "" goto :amd64
+if "%CONFIGURATION%" == "" (set CONFIGURATION=Release)
 
-set CMAKE_FLAGS=-G "Visual Studio 14 2015%CMAKE_GENERATOR_SUFFIX%" -DTARGET_CPU=%TARGET_CPU%
+set CMAKE_FLAGS=-G "%CMAKE_GENERATOR%%CMAKE_GENERATOR_SUFFIX%" -DTARGET_CPU=%TARGET_CPU%
 
 echo CMAKE_FLAGS = %CMAKE_FLAGS%
