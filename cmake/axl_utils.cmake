@@ -903,7 +903,10 @@ axl_find_executable
 			OUTPUT_VARIABLE _OUTPUT
 			)
 
-		string (REPLACE "\\" "/" _OUTPUT "${_OUTPUT}")
+		if (NOT "${_OUTPUT}" STREQUAL "")
+			string (REGEX REPLACE "\n.*" "" _OUTPUT ${_OUTPUT})
+			string (REPLACE "\\" "/" _OUTPUT "${_OUTPUT}")
+		endif ()
 	else ()
 		execute_process (
 			COMMAND which ${_FILE_NAME}
