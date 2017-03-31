@@ -1365,6 +1365,7 @@ public:
 protected:
 	static
 	void
+	LIBUSB_CALL
 	onCompleted (libusb_transfer* transfer)
 	{
 		UsbAsyncTransfer* self = (UsbAsyncTransfer*) transfer->user_data;
