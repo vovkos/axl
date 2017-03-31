@@ -85,15 +85,18 @@ set LUA_DOWNLOAD_URL=https://sourceforge.net/projects/luabinaries/files/%LUA_VER
 
 set RAGEL_DOWNLOAD_URL=http://downloads.yorickpeterse.com/files/ragel-68-visualstudio2012.7z
 
-set CMAKE_FLAGS=-G "%CMAKE_GENERATOR%%CMAKE_GENERATOR_SUFFIX%" -DTARGET_CPU=%TARGET_CPU%
+set CMAKE_CONFIGURE_FLAGS=-G "%CMAKE_GENERATOR%%CMAKE_GENERATOR_SUFFIX%"
 
-set MSBUILD_FLAGS=/nologo /verbosity:minimal /consoleloggerparameters:Summary /maxcpucount /property:configuration=%CONFIGURATION%
+set CMAKE_BUILD_FLAGS= ^
+	--config %CONFIGURATION% ^
+	-- ^
+	/nologo ^
+	/verbosity:minimal ^
+	/consoleloggerparameters:Summary
 
 echo ---------------------------------------------------------------------------
 echo LUA_LIB_NAME:       %LUA_LIB_NAME%
 echo LUA_DOWNLOAD_URL:   %LUA_DOWNLOAD_URL%
 echo OPENSSL_DIR:        %OPENSSL_DIR%
 echo RAGEL_DOWNLOAD_URL: %RAGEL_DOWNLOAD_URL%
-echo CMAKE_FLAGS:        %CMAKE_FLAGS%
-echo MSBUILD_FLAGS:      %MSBUILD_FLAGS%
 echo ---------------------------------------------------------------------------

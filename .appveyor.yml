@@ -45,8 +45,8 @@ install:
 build_script:
     - mkdir build
     - cd build
-    - cmake .. %CMAKE_FLAGS%
-    - cmake --build . -- %MSBUILD_FLAGS%
+    - cmake .. %CMAKE_CONFIGURE_FLAGS%
+    - cmake --build . %CMAKE_BUILD_FLAGS%
 
 test_script:
     - ctest -C %CONFIGURATION%
