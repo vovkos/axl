@@ -257,7 +257,7 @@ StdErrorProvider::getErrorDescription (const ErrorRef& error)
 		return sl::String ();
 
 	const char* p;
-	size_t length;
+	size_t stringSize;
 
 	switch (error->m_code)
 	{
@@ -266,12 +266,11 @@ StdErrorProvider::getErrorDescription (const ErrorRef& error)
 
 	case StdErrorCode_String:
 		p = (const char*) (error + 1);
-		length = error->m_size - sizeof (ErrorHdr);
+		stringSize = error->m_size - sizeof (ErrorHdr);
 
-		if (length && !p [length]) // string buffer should contain a trailing null
-			length--;
-
-		return sl::StringRef (error.getHdr (), p, length);
+		return stringSize && !p [stringSize - 1] ?
+			sl::StringRef (error.getHdr (), p, stringSize - 1, true) :
+			sl::StringRef (error.getHdr (), p, stringSize, false);
 
 	case StdErrorCode_Stack:
 		return getStackErrorDescription (error);
