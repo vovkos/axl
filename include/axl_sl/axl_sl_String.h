@@ -87,25 +87,27 @@ public:
 	StringRefBase (const C* p)
 	{
 		initialize ();
-		attach (NULL, p, Details::calcLength (p), true);
+		attach (NULL, p, Details::calcLength (p), p != NULL);
 	}
 
 	StringRefBase (
 		const C* p,
-		size_t length
+		size_t length,
+		bool isNullTerminated = false
 		)
 	{
 		initialize ();
-		attach (NULL, p, length, false);
+		attach (NULL, p, length, isNullTerminated);
 	}
 
 	StringRefBase (
 		const C* p,
-		const void* end
+		const void* end,
+		bool isNullTerminated = false
 		)
 	{
 		initialize ();
-		attach (NULL, p, (C*) end - p, false);
+		attach (NULL, p, (C*) end - p, isNullTerminated);
 	}
 
 	StringRefBase (
@@ -114,27 +116,29 @@ public:
 		)
 	{
 		initialize ();
-		attach (hdr, p, Details::calcLength (p), true);
+		attach (hdr, p, Details::calcLength (p), p != NULL);
 	}
 
 	StringRefBase (
 		ref::BufHdr* hdr,
 		const C* p,
-		size_t length
+		size_t length,
+		bool isNullTerminated = false
 		)
 	{
 		initialize ();
-		attach (hdr, p, length, false);
+		attach (hdr, p, length, isNullTerminated);
 	}
 
 	StringRefBase (
 		ref::BufHdr* hdr,
 		const C* p,
-		const void* end
+		const void* end,
+		bool isNullTerminated = false
 		)
 	{
 		initialize ();
-		attach (hdr, p, (C*) end - p, false);
+		attach (hdr, p, (C*) end - p, isNullTerminated);
 	}
 
 	~StringRefBase ()
@@ -677,6 +681,7 @@ protected:
 		bool isNullTerminated
 		)
 	{
+		ASSERT (!isNullTerminated || !p [length]);
 		attachBufHdr (hdr);
 
 		m_p = (C*) p;
