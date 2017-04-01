@@ -57,7 +57,7 @@ axl_apply_target_cpu_setting)
 		message (FATAL_ERROR "Unsupported CPU: ${TARGET_CPU}")
 	endif ()
 
-	set (TARGET_CPU ${TARGET_CPU}) # for backward compatibility re paths.cmake
+	set (AXL_CPU ${TARGET_CPU}) # for backward compatibility (in paths.cmake)
 endmacro ()
 
 #...............................................................................
@@ -260,9 +260,15 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_compiler_flag_setting (
-		GCC_FLAG_SANITIZER_DEBUG
-		DESCRIPTION "Sanitizer to use in Debug build"
+		GCC_FLAG_SANITIZE
+		DESCRIPTION "Compile with a specific sanitizer instrumentation"
 		"-fsanitize=address" "-fsanitize=memory" "-fsanitize=thread"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_COVERAGE
+		DESCRIPTION "Compile with code coverage instrumentation"
+		"-coverage"
 		)
 
 	axl_create_setting (
