@@ -21,9 +21,13 @@
 
 		cmake --build .
 
+	By default, ``msbuild.exe`` will build the ``Debug`` configuration of the project. To override that and build for ``Release``, use::
+
+		cmake --build . --config Release
+		
 	You can pass extra command-line arguments to ``msbuild.exe`` using ``--`` switch. For example, if you want to have a multi-core build of ``Release`` configuration, run::
 
-		cmake --build . -- /maxcpucount /property:configuration=Release
+		cmake --build . --config Release -- /maxcpucount
 
 	Please refer to ``msbuild`` documentation for more details on command-line parameters: https://msdn.microsoft.com/en-us/library/ms164311.aspx
 
