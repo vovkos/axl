@@ -59,6 +59,9 @@ else
 	echo "set (LIBUSB_LIB_DIR /usr/lib/i386-linux-gnu)" >> paths.cmake
 fi
 
+sudo apt-get install -y doxygen
+sudo apt-get install -y python-sphinx
+
 # lcov doesn't work with clang on ubuntu out-of-the-box
 # also, coverage should be collected without optimizations
 

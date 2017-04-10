@@ -14,6 +14,9 @@ brew install lua
 brew install libusb
 brew install ragel
 
+brew install doxygen
+brew install sphinx-doc
+
 # coverage should be collected without optimizations
 
 if [ "$BUILD_CONFIGURATION" == "Debug" ]; then
