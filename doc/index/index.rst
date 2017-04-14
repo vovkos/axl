@@ -23,5 +23,5 @@ AXL is a lightweight C++ library featuring:
 
 Follow the links below for additional information.
 
-* `AXL Manual <http://docs.tibbo.com/axl/manual>`_
-* `AXL Build Guide <http://docs.tibbo.com/axl/build-guide>`_
+* `AXL Manual <manual/index.html>`_
+* `AXL Build Guide <build-guide/index.html>`_
