@@ -14,4 +14,4 @@ set -e
 
 echo Building ${DOC_NAME} HTML files at ${HTML_DIR}...
 
-"${SPHINX_BUILD_EXE}" ${SPHINX_HTML_CMD_LINE}
+"${SPHINX_BUILD_EXE}" ${SPHINX_HTML_CMD_LINE} $*
