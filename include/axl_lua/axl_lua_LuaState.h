@@ -72,29 +72,19 @@ public:
 	}
 
 	void
+	prepareErrorString (const sl::StringRef& string);
+
+	void
+	prepareLastErrorString ()
+	{
+		prepareErrorString (err::getLastErrorDescription ());
+	}
+
+	void
 	error ()
 	{
 		ASSERT (isOpen ());
 		lua_error (m_h);
-	}
-
-	void
-	error (const sl::StringRef& string);
-
-	void
-	formatError_va (
-		const char* format,
-		axl_va_list va
-		);
-
-	void
-	formatError (
-		const char* format,
-		...
-		)
-	{
-		AXL_VA_DECL (va, format);
-		formatError_va (format, va);
 	}
 
 	void
@@ -117,6 +107,12 @@ public:
 		ASSERT (isOpen ());
 		lua_settop (m_h, index);
 	}
+
+	bool
+	tryCheckStack (int extraSlotCount);
+
+	void
+	checkStack (int extraSlotCount);
 
 	int
 	getType (int index)
@@ -188,7 +184,11 @@ public:
 	}
 
 	void
-	pushString (const sl::StringRef& string);
+	pushString (const sl::StringRef& string)
+	{
+		ASSERT (isOpen ());
+		lua_pushlstring (m_h, string.cp (), string.getLength ());
+	}
 
 	void
 	pushFormatString_va (
@@ -238,15 +238,19 @@ public:
 		pushClosure (func, 1);
 	}
 
+	bool
+	tryCreateTable (
+		size_t elementCount = 0,
+		size_t memberCount = 0,
+		size_t extraStackSlotCount = LUA_MINSTACK
+		);
+
 	void
 	createTable (
 		size_t elementCount = 0,
-		size_t memberCount = 0
-		)
-	{
-		ASSERT (isOpen ());
-		lua_createtable (m_h, elementCount, memberCount);
-	}
+		size_t memberCount = 0,
+		size_t extraStackSlotCount = LUA_MINSTACK
+		);
 
 	void
 	getTable (int index = -2)

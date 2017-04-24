@@ -91,31 +91,72 @@ LuaState::trace ()
 #endif
 
 void
-LuaState::error (const sl::StringRef& string)
+LuaState::prepareErrorString (const sl::StringRef& string)
 {
+	ASSERT (isOpen ());
+
+	int result = lua_checkstack (m_h, 2);
+	ASSERT (result);
+
 	where ();
 	pushString (string);
 	concatenate ();
-	error ();
 }
 
-void
-LuaState::formatError_va (
-	const char* format,
-	axl_va_list va
-	)
-{
-	where ();
-	pushFormatString_va (format, va);
-	concatenate ();
-	error ();
-}
-
-void
-LuaState::pushString (const sl::StringRef& string)
+bool
+LuaState::tryCheckStack (int extraSlotCount)
 {
 	ASSERT (isOpen ());
-	lua_pushlstring (m_h, string.cp (), string.getLength ());
+
+	int result = lua_checkstack (m_h, extraSlotCount);
+	if (!result)
+	{
+		err::setError (err::SystemErrorCode_InsufficientResources);
+		return false;
+	}
+
+	return true;
+}
+
+void
+LuaState::checkStack (int extraSlotCount)
+{
+	bool result = tryCheckStack (extraSlotCount);
+	if (!result)
+	{
+		prepareLastErrorString ();
+		error ();
+	}
+}
+
+bool
+LuaState::tryCreateTable (
+	size_t elementCount,
+	size_t memberCount,
+	size_t extraStackSlotCount
+	)
+{
+	bool result = tryCheckStack (extraStackSlotCount);
+	if (!result)
+		return false;
+
+	lua_createtable (m_h, elementCount, memberCount);
+	return true;
+}
+
+void
+LuaState::createTable (
+	size_t elementCount,
+	size_t memberCount,
+	size_t extraStackSlotCount
+	)
+{
+	bool result = tryCreateTable (elementCount, memberCount, extraStackSlotCount);
+	if (!result)
+	{
+		prepareLastErrorString ();
+		error ();
+	}
 }
 
 //..............................................................................
