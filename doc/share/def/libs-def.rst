@@ -60,7 +60,7 @@
 	* Wrappers for many popular libraries;
 	* And more...
 
-	Sources of AXL are available at: http://tibbo.com/downloads/archive/axl
+	Sources of AXL are available at: https://github.com/vovkos/axl
 
 .. define-macro:: axl-bundle-info project package package_b
 
