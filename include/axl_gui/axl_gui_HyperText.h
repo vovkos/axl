@@ -33,7 +33,7 @@ protected:
 
 protected:
 	sl::String m_source;
-	sl::String m_text;
+	sl::String_utf32 m_text;
 	TextAttrAnchorArray m_attrArray;
 	HyperlinkAnchorArray m_hyperlinkArray;
 	sl::Array <HyperlinkXMapEntry> m_hyperlinkXMap;
@@ -45,7 +45,7 @@ public:
 		return m_source;
 	}
 
-	const sl::String&
+	const sl::String_utf32&
 	getText () const
 	{
 		return m_text;
@@ -84,13 +84,13 @@ public:
 	}
 
 	size_t
-	setPlainText (
-		char c,
+	setChar (
+		utf32_t c,
 		size_t count = 1
 		)
 	{
 		clear ();
-		return appendPlainText (c, count);
+		return appendChar (c, count);
 	}
 
 	size_t
@@ -109,8 +109,8 @@ public:
 	appendPlainText (const sl::StringRef& text);
 
 	size_t
-	appendPlainText (
-		char c,
+	appendChar (
+		utf32_t c,
 		size_t count = 1
 		);
 

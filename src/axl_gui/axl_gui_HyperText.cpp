@@ -54,8 +54,8 @@ HyperText::appendPlainText (const sl::StringRef& text)
 }
 
 size_t
-HyperText::appendPlainText (
-	char c,
+HyperText::appendChar (
+	utf32_t c,
 	size_t count
 	)
 {
@@ -215,7 +215,7 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 			if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 				continue;
 
-			size = font->calcTextSize (m_text.getSubString (offset, attrAnchor->m_offset - offset));
+			size = font->calcTextSize_utf32 (m_text.getSubString (offset, attrAnchor->m_offset - offset));
 
 			x += size.m_width;
 			offset = attrAnchor->m_offset;
@@ -224,7 +224,7 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 			font = baseFont->getFontMod (fontFlags);
 		}
 
-		size = font->calcTextSize (m_text.getSubString (offset, hyperlinkAnchor->m_offset - offset));
+		size = font->calcTextSize_utf32 (m_text.getSubString (offset, hyperlinkAnchor->m_offset - offset));
 
 		x += size.m_width;
 		offset = hyperlinkAnchor->m_offset;
@@ -257,7 +257,7 @@ HyperText::calcTextSize (Font* baseFont) const
 		if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 			continue;
 
-		size = font->calcTextSize (m_text.getSubString (offset, attrAnchor->m_offset - offset));
+		size = font->calcTextSize_utf32 (m_text.getSubString (offset, attrAnchor->m_offset - offset));
 
 		x += size.m_width;
 		offset = attrAnchor->m_offset;
@@ -266,7 +266,7 @@ HyperText::calcTextSize (Font* baseFont) const
 		font = baseFont->getFontMod (fontFlags);
 	}
 
-	size = font->calcTextSize (m_text.getSubString (offset, length - offset));
+	size = font->calcTextSize_utf32 (m_text.getSubString (offset, length - offset));
 	size.m_width += x;
 
 	return size;

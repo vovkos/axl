@@ -336,8 +336,10 @@ main (
 {
 	g::getModule ()->setTag ("axl_test_qt");
 
+#if 0
 	testUtf ();
 	return 0;
+#endif
 
 #if 0
 

@@ -40,8 +40,11 @@ public:
 	}
 
 private:
+#if (1)
+	MyWidget m_myWidget;
+#else
 	QTextEdit m_editWidget;
-//	MyWidget m_myWidget;
+#endif
 };
 
 //..............................................................................

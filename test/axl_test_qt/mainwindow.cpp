@@ -30,10 +30,10 @@ MyWidget::paintEvent (QPaintEvent* e)
 	char str [] = "abcdefghijklmnopqrstuvwxyz";
 
 	gui::HyperText hyperText;
-	hyperText.setHyperText ("abc \x1b^pizda\x1b[4mdef\x1b[m suka");
+	hyperText.setHyperText ("\xd0\x91\xd0\xbe " "abc \x1b^pizda\x1b[4mdef\x1b[m suka");
 
 	const gui::TextAttrAnchorArray* attrArray = hyperText.getAttrArray ();
-	sl::String text = hyperText.getText ();
+	sl::String_utf32 text = hyperText.getText ();
 
 	const gui::HyperlinkAnchor* anchor = hyperText.findHyperlinkByOffset (1);
 
@@ -54,7 +54,7 @@ MyWidget::paintEvent (QPaintEvent* e)
 	QSize s = size ();
 	painter.m_bottom = s.height ();
 
-	painter.drawHyperText (attrArray, text);
+	painter.drawHyperText_utf32 (attrArray, text);
 
 	canvas.m_qtPainter.end ();
 }
@@ -106,9 +106,11 @@ private:
 
 MainWindow::MainWindow (QWidget* parent) :
 	QMainWindow (parent),
-//	m_myWidget (this),
+#if (1)
+	m_myWidget (this)
+#else
 	m_editWidget (this)
-
+#endif
 {
 	QFont f ("Monospace", 10);
 	f.setFixedPitch (true);
@@ -123,16 +125,18 @@ MainWindow::MainWindow (QWidget* parent) :
 	QVBoxLayout* vlayout = new QVBoxLayout;
 	client->setLayout (vlayout);
 
-//	m_myWidget.setFont (f);
-//	m_myWidget.setGeometry (0, 0, 400, 40);
-
+#if (1)
+	m_myWidget.setFont (f);
+	m_myWidget.setGeometry (0, 0, 400, 40);
+	vlayout->addWidget (&m_myWidget);
+#else
 	m_editWidget.setFont (f);
 	m_editWidget.setFrameStyle (0);
 	m_editWidget.setGeometry (0, 40, 400, 100);
 	m_editWidget.setContentsMargins (0, 0, 0, 0);
 	m_editWidget.setText ("abcdefghijklmnopqrstuvwxyz");
-
 	vlayout->addWidget (&m_editWidget);
+#endif
 
 	QHBoxLayout* hlayout = new QHBoxLayout;
 	vlayout->addLayout (hlayout);
