@@ -50,7 +50,7 @@ getKeyFromQtKey (int qtKey)
 	{
 		Key_Esc,         // 0x00
 		Key_Tab,         // 0x01
-		0,               // 0x02
+		Key_Tab,         // 0x02
 		Key_Backspace,   // 0x03
 		Key_Enter,       // 0x04
 		Key_Enter,       // 0x05
