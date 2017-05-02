@@ -334,7 +334,7 @@ TextPainter::drawHyperBinHex (
 	size_t size
 	)
 {
-	if (!attrArray)
+	if (!attrArray || attrArray->isEmpty ())
 		return drawBinHex (textColor0, backColor0, fontFlags0, halfBitOffset, p0, size);
 
 	if (!size)
