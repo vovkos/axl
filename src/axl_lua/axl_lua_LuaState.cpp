@@ -159,6 +159,39 @@ LuaState::createTable (
 	}
 }
 
+int
+LuaState::getGlobalArrayLen (const sl::StringRef& name)
+{
+	getGlobal (name);
+	size_t len = getRawLen ();
+	pop ();
+	return len;
+}
+
+void
+LuaState::setGlobalArrayElement (
+	const sl::StringRef& name,
+	int index
+	)
+{
+	getGlobal (name);
+	swap ();
+	setArrayElement (index);
+	pop ();
+}
+
+void
+LuaState::setGlobalMember (
+	const sl::StringRef& name,
+	const sl::StringRef& member
+	)
+{
+	getGlobal (name);
+	swap ();
+	setMember (member);
+	pop ();
+}
+
 //..............................................................................
 
 } // namespace lua

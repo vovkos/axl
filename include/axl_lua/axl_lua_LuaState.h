@@ -129,6 +129,20 @@ public:
 	}
 
 	void
+	getLen (int index = -1)
+	{
+		ASSERT (isOpen ());
+		lua_len (m_h, index);
+	}
+
+	size_t
+	getRawLen (int index = -1)
+	{
+		ASSERT (isOpen ());
+		return lua_rawlen (m_h, index);
+	}
+
+	void
 	insert (int index)
 	{
 		ASSERT (isOpen ());
@@ -424,6 +438,9 @@ public:
 		lua_setglobal (m_h, name.sz ());
 	}
 
+	int
+	getGlobalArrayLen (const sl::StringRef& name);
+
 	void
 	getGlobalArrayElement (
 		const sl::StringRef& name,
@@ -436,6 +453,12 @@ public:
 	}
 
 	void
+	setGlobalArrayElement (
+		const sl::StringRef& name,
+		int index
+		);
+
+	void
 	getGlobalMember (
 		const sl::StringRef& name,
 		const sl::StringRef& member
@@ -445,6 +468,12 @@ public:
 		getMember (member);
 		remove (-2);
 	}
+
+	void
+	setGlobalMember (
+		const sl::StringRef& name,
+		const sl::StringRef& member
+		);
 
 	lua_Integer
 	getGlobalInteger (const sl::StringRef& name)
