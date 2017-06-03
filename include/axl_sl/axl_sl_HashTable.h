@@ -289,7 +289,7 @@ public:
 
 		Iterator it = this->visit (key);
 
-		if (this->getCount () == this->prevCount)
+		if (this->getCount () == prevCount)
 			return NULL;
 
 		it->m_value = value;
