@@ -3118,6 +3118,75 @@ testTime ()
 
 //..............................................................................
 
+void
+mergeSort (
+	int* a,
+	int* b,
+	size_t count
+	)
+{
+	if (count < 2)
+	{
+		return;
+	}
+	else if (count == 2)
+	{
+		if (a [0] > a [1])
+		{
+			int t = a [0];
+			a [0] = a [1];
+			a [1] = t;
+		}
+
+		return;
+	}
+
+	size_t left = count / 2;
+	mergeSort (a, b, left);
+	mergeSort (a + left, b + left, count - left);
+
+	size_t i = 0;
+	size_t l = 0; // left index
+	size_t r = left; // right index
+
+	for (; l < left && r < count; i++)
+		b [i] = a [l] < a [r] ?  a [l++] : a [r++];
+
+	if (l < left)
+		for (; l < left; i++, l++)
+			b [i] = a [l];
+	else
+		for (; r < count; i++, r++)
+			b [i] = a [r];
+
+	ASSERT (i == count && l == left && r == count);
+	memcpy (a, b, count * sizeof (int));
+}
+
+void
+testMergeSort ()
+{
+	int a [20]; // = { 3, 2, 1 };
+
+	for (size_t i = 0; i < countof (a); i++)
+	{
+		a [i] = rand () % 100;
+		printf ("a [%d] = %d\n", i, a [i]);
+	}
+
+
+	int buf [countof (a)];
+	mergeSort (a, buf, countof (buf));
+
+	printf ("---------------\n");
+
+	for (size_t i = 0; i < countof (a); i++)
+		printf ("a [%d] = %d\n", i, a [i]);
+
+	for (size_t i = 0; i < countof (a) - 1; i++)
+		ASSERT (a [i] <= a [i + 1]);
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -3144,7 +3213,8 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testRegex ();
+	testMergeSort ();
+//	testRegex ();
 
 	return 0;
 }

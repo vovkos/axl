@@ -15,6 +15,13 @@ pre.overview-code-block {
 	margin-left: 0px;
 }
 
+pre.inherited-code-block {
+	font-size: 70%;
+    border: 1px solid #ccc;
+    background-color: #eee;
+	margin-left: 0px;
+}
+
 pre.title-code-block {
 	font-size: larger;
     border: none;
