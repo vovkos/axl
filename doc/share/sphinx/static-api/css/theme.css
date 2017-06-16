@@ -15,9 +15,22 @@ pre.overview-code-block {
 	margin-left: 0px;
 }
 
-pre.inherited-code-block {
+pre.overview-protected-code-block {
+    border: 1px solid #faa;
+    background-color: #fff;
+	margin-left: 0px;
+}
+
+pre.overview-inherited-code-block {
 	font-size: 70%;
     border: 1px solid #ccc;
+    background-color: #eee;
+	margin-left: 0px;
+}
+
+pre.overview-inherited-protected-code-block {
+	font-size: 70%;
+    border: 1px solid #faa;
     background-color: #eee;
 	margin-left: 0px;
 }

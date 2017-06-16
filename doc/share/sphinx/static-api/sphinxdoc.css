@@ -254,10 +254,23 @@ pre.overview-code-block {
 	margin-left: 0px;
 }
 
-pre.inherited-code-block {
+pre.overview-protected-code-block {
+    border: 1px solid #faa;
+    background-color: #f8f8f8;
+    margin-left: 0px;
+}
+
+pre.overview-inherited-code-block {
     font-size: smaller;
     border: 1px solid #ccc;
-    background-color: #f8f8f8;
+    background-color: #eee;
+    margin-left: 0px;
+}
+
+pre.overview-inherited-protected-code-block {
+    font-size: smaller;
+    border: 1px solid #faa;
+    background-color: #eee;
     margin-left: 0px;
 }
 

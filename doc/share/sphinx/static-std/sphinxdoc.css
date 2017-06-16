@@ -247,33 +247,6 @@ pre {
     background-color: #f8f8f8;
 }
 
-pre.overview-code-block {
-    border: 1px solid #ccc;
-    background-color: #f8f8f8;
-	margin-left: 0px;
-}
-
-pre.inherited-code-block {
-    font-size: smaller;
-    border: 1px solid #ccc;
-    background-color: #f8f8f8;
-    margin-left: 0px;
-}
-
-pre.title-code-block {
-	font-size: larger;
-    border: 1px solid #ccc;
-    background-color: #f8f8f8;
-	margin-left: 0px;
-}
-
-pre.sample-code-block {
-	margin-left: 10%;
-    border: dashed;
-	font-size: smaller;
-    background-color: #f0f0ff;
-}
-
 code.cref a {
     color: #333;
 }
