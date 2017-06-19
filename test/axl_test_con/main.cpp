@@ -29,17 +29,86 @@ typedef LONG NTSTATUS;
 #define DIRECTORY_CREATE_OBJECT       0x0004
 #define DIRECTORY_CREATE_SUBDIRECTORY 0x0008
 
-enum FILE_INFORMATION_CLASS
+typedef enum _FILE_INFORMATION_CLASS 
 {
-	FileDirectoryInformation = 1,
+	FileDirectoryInformation         = 1,
+	FileFullDirectoryInformation,   // 2
+	FileBothDirectoryInformation,   // 3
+	FileBasicInformation,           // 4
+	FileStandardInformation,        // 5
+	FileInternalInformation,        // 6
+	FileEaInformation,              // 7
+	FileAccessInformation,          // 8
+	FileNameInformation,            // 9
+	FileRenameInformation,          // 10
+	FileLinkInformation,            // 11
+	FileNamesInformation,           // 12
+	FileDispositionInformation,     // 13
+	FilePositionInformation,        // 14
+	FileFullEaInformation,          // 15
+	FileModeInformation,            // 16
+	FileAlignmentInformation,       // 17
+	FileAllInformation,             // 18
+	FileAllocationInformation,      // 19
+	FileEndOfFileInformation,       // 20
+	FileAlternateNameInformation,   // 21
+	FileStreamInformation,          // 22
+	FilePipeInformation,            // 23
+	FilePipeLocalInformation,       // 24
+	FilePipeRemoteInformation,      // 25
+	FileMailslotQueryInformation,   // 26
+	FileMailslotSetInformation,     // 27
+	FileCompressionInformation,     // 28
+	FileObjectIdInformation,        // 29
+	FileCompletionInformation,      // 30
+	FileMoveClusterInformation,     // 31
+	FileQuotaInformation,           // 32
+	FileReparsePointInformation,    // 33
+	FileNetworkOpenInformation,     // 34
+	FileAttributeTagInformation,    // 35
+	FileTrackingInformation,        // 36
+	FileIdBothDirectoryInformation, // 37
+	FileIdFullDirectoryInformation, // 38
+	FileValidDataLengthInformation, // 39
+	FileShortNameInformation,       // 40
+	FileIoCompletionNotificationInformation, // 41
+	FileIoStatusBlockRangeInformation,       // 42
+	FileIoPriorityHintInformation,           // 43
+	FileSfioReserveInformation,              // 44
+	FileSfioVolumeInformation,               // 45
+	FileHardLinkInformation,                 // 46
+	FileProcessIdsUsingFileInformation,      // 47
+	FileNormalizedNameInformation,           // 48
+	FileNetworkPhysicalNameInformation,      // 49
+	FileIdGlobalTxDirectoryInformation,      // 50
+	FileIsRemoteDeviceInformation,           // 51
+	FileAttributeCacheInformation,           // 52
+	FileNumaNodeInformation,                 // 53
+	FileStandardLinkInformation,             // 54
+	FileRemoteProtocolInformation,           // 55
+	FileMaximumInformation
+} FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
+
+struct FILE_BASIC_INFORMATION 
+{
+	LARGE_INTEGER CreationTime;
+	LARGE_INTEGER LastAccessTime;
+	LARGE_INTEGER LastWriteTime;
+	LARGE_INTEGER ChangeTime;
+	ULONG FileAttributes;
 };
 
 //..............................................................................
 
 struct IO_STATUS_BLOCK
 {
-	LONG Status;
-	ULONG Information;
+	union
+	{
+		NTSTATUS Status;
+		PVOID _Align; // make sure it's aligned regardless of #pragma pack
+	};
+
+	ULONG_PTR Information;
 };
 
 typedef IO_STATUS_BLOCK* PIO_STATUS_BLOCK;
@@ -157,6 +226,17 @@ NtQuerySymbolicLinkObject (
 	OUT PULONG ReturnedLength
 	);
 
+typedef
+NTSTATUS
+NTAPI
+NtQueryInformationFile (
+	HANDLE FileHandle,
+	PIO_STATUS_BLOCK IoStatusBlock,
+	PVOID FileInformation,
+	ULONG Length,
+	FILE_INFORMATION_CLASS FileInformationClass
+	);
+
 //..............................................................................
 
 NtQueryDirectoryFile* ntQueryDirectoryFile = NULL;
@@ -164,6 +244,7 @@ NtOpenDirectoryObject* ntOpenDirectoryObject = NULL;
 NtQueryDirectoryObject* ntQueryDirectoryObject = NULL;
 NtOpenSymbolicLinkObject* ntOpenSymbolicLinkObject = NULL;
 NtQuerySymbolicLinkObject* ntQuerySymbolicLinkObject = NULL;
+NtQueryInformationFile* ntQueryInformationFile = NULL;
 
 void
 initNtFunctions ()
@@ -176,12 +257,15 @@ initNtFunctions ()
 	ntQueryDirectoryObject = (NtQueryDirectoryObject*) ::GetProcAddress (ntdll, "NtQueryDirectoryObject");
 	ntOpenSymbolicLinkObject = (NtOpenSymbolicLinkObject*) ::GetProcAddress (ntdll, "NtOpenSymbolicLinkObject");
 	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObject*) ::GetProcAddress (ntdll, "NtQuerySymbolicLinkObject");
+	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObject*) ::GetProcAddress (ntdll, "NtQuerySymbolicLinkObject");
+	ntQueryInformationFile = (NtQueryInformationFile*) ::GetProcAddress (ntdll, "NtQueryInformationFile");
 
 	ASSERT (ntQueryDirectoryFile);
 	ASSERT (ntOpenDirectoryObject);
 	ASSERT (ntQueryDirectoryObject);
 	ASSERT (ntOpenSymbolicLinkObject);
 	ASSERT (ntQuerySymbolicLinkObject);
+	ASSERT (ntQueryInformationFile);
 }
 
 #endif
@@ -384,6 +468,83 @@ testWinNetworkAdapterList2 ()
 	}
 
 	printf ("%d adapters found\n---------------------------------\n\n", ifaceCount);
+}
+
+bool
+getFileTimes_nt (const char* fileName)
+{
+	initNtFunctions ();
+
+	io::File file;
+	bool result = file.open (fileName);
+	if (!result)
+	{
+		printf ("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
+		return false;
+	}
+
+	IO_STATUS_BLOCK ioStatus;
+	FILE_BASIC_INFORMATION basicInfo = { 0 };
+	
+	NTSTATUS status = ntQueryInformationFile (
+		(HANDLE) file.m_file, 
+		&ioStatus,
+		&basicInfo, 
+		sizeof (FILE_BASIC_INFORMATION), 
+		FileBasicInformation
+		);
+
+	if (status < 0)
+	{
+		printf ("can't query file information: %s: %s\n", fileName, sys::win::NtStatus (status).getDescription ().sz ());
+		return false;
+	}
+
+	printf ("NT File times for: %s\n", fileName);
+	printf ("  CreationTime:   %s\n", sys::Time (basicInfo.CreationTime.QuadPart).format ().sz ());
+	printf ("  LastWriteTime:  %s\n", sys::Time (basicInfo.LastWriteTime.QuadPart).format ().sz ());
+	printf ("  LastAccessTime: %s\n", sys::Time (basicInfo.LastAccessTime.QuadPart).format ().sz ());
+	printf ("  ChangeTime:     %s\n", sys::Time (basicInfo.ChangeTime.QuadPart).format ().sz ());
+
+	return true;
+}
+
+bool
+getFileTimes_win (const char* fileName)
+{
+	io::File file;
+	bool result = file.open (fileName);
+	if (!result)
+	{
+		printf ("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
+		return false;
+	}
+
+	FILE_BASIC_INFO basicInfo2 = { 0 };
+	result = ::GetFileInformationByHandleEx (file.m_file, FileBasicInfo, &basicInfo2, sizeof (basicInfo2)) != 0;
+	if (!result)
+	{
+		err::setLastSystemError ();
+		printf ("can't query file information: %s, %s\n", fileName, err::getLastErrorDescription ().sz ());
+		return false;
+	}
+
+	printf ("WIN File times for: %s\n", fileName);
+	printf ("  CreationTime:   %s\n", sys::Time (basicInfo2.CreationTime.QuadPart).format ().sz ());
+	printf ("  LastWriteTime:  %s\n", sys::Time (basicInfo2.LastWriteTime.QuadPart).format ().sz ());
+	printf ("  LastAccessTime: %s\n", sys::Time (basicInfo2.LastAccessTime.QuadPart).format ().sz ());
+	printf ("  ChangeTime:     %s\n", sys::Time (basicInfo2.ChangeTime.QuadPart).format ().sz ());
+
+	return true;
+}
+
+void
+testFileTime ()
+{
+	getFileTimes_win ("c:/1/far/ioninja-3.7.4/bin/ioninja.exe");
+	getFileTimes_nt ("c:/1/far/ioninja-3.7.4/bin/ioninja.exe");
+	getFileTimes_win ("c:/1/7z/ioninja-3.7.4/bin/ioninja.exe");
+	getFileTimes_nt ("c:/1/7z/ioninja-3.7.4/bin/ioninja.exe");
 }
 
 #endif
@@ -3118,75 +3279,6 @@ testTime ()
 
 //..............................................................................
 
-void
-mergeSort (
-	int* a,
-	int* b,
-	size_t count
-	)
-{
-	if (count < 2)
-	{
-		return;
-	}
-	else if (count == 2)
-	{
-		if (a [0] > a [1])
-		{
-			int t = a [0];
-			a [0] = a [1];
-			a [1] = t;
-		}
-
-		return;
-	}
-
-	size_t left = count / 2;
-	mergeSort (a, b, left);
-	mergeSort (a + left, b + left, count - left);
-
-	size_t i = 0;
-	size_t l = 0; // left index
-	size_t r = left; // right index
-
-	for (; l < left && r < count; i++)
-		b [i] = a [l] < a [r] ?  a [l++] : a [r++];
-
-	if (l < left)
-		for (; l < left; i++, l++)
-			b [i] = a [l];
-	else
-		for (; r < count; i++, r++)
-			b [i] = a [r];
-
-	ASSERT (i == count && l == left && r == count);
-	memcpy (a, b, count * sizeof (int));
-}
-
-void
-testMergeSort ()
-{
-	int a [20]; // = { 3, 2, 1 };
-
-	for (size_t i = 0; i < countof (a); i++)
-	{
-		a [i] = rand () % 100;
-		printf ("a [%d] = %d\n", i, a [i]);
-	}
-
-
-	int buf [countof (a)];
-	mergeSort (a, buf, countof (buf));
-
-	printf ("---------------\n");
-
-	for (size_t i = 0; i < countof (a); i++)
-		printf ("a [%d] = %d\n", i, a [i]);
-
-	for (size_t i = 0; i < countof (a) - 1; i++)
-		ASSERT (a [i] <= a [i + 1]);
-}
-
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -3213,8 +3305,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testMergeSort ();
-//	testRegex ();
+	testRegex ();
 
 	return 0;
 }
