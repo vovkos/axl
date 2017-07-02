@@ -264,8 +264,9 @@ RegexCompiler::construct (
 {
 	m_regex = regex;
 	m_nameMgr = nameMgr;
-	m_flags = 0;
+	m_flags = flags;
 	m_p = NULL;
+	m_end = NULL;
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 	m_lastToken.m_char = 0;
 }
@@ -292,7 +293,8 @@ RegexCompiler::incrementalCompile (
 	void* acceptContext
 	)
 {
-	m_p = source.sz ();
+	m_p = source.cp ();
+	m_end = source.getEnd ();
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
 
 	NfaState* oldStart = !m_regex->m_nfaStateList.isEmpty () ?
@@ -464,6 +466,7 @@ RegexCompiler::readHexEscapeSequence (uchar_t* c)
 	uint_t x2;
 
 	bool result =
+		m_p + 1 < m_end &&
 		getHexValue (m_p [0], &x1) &&
 		getHexValue (m_p [1], &x2);
 
@@ -484,12 +487,14 @@ RegexCompiler::readEscapeSequence (uchar_t* c)
 	ASSERT (*m_p == '\\');
 	m_p++;
 
-	switch (*m_p)
+	if (m_p >= m_end)
 	{
-	case 0:
 		err::setError ("invalid escape sequence");
 		return false;
+	}
 
+	switch (*m_p)
+	{
 	case '0':
 		*c = '\0';
 		break;
@@ -545,20 +550,21 @@ RegexCompiler::readLiteral (sl::String* string)
 
 	for (const char* p = m_p;; p++)
 	{
-		switch (*p)
+		if (p >= m_end)
 		{
-		case 0:
 			err::setError ("unclosed literal");
 			return false;
+		}
 
+		switch (*p)
+		{
 		case '\\':
-			if (!p [1])
+			if (++p >= m_end)
 			{
 				err::setError ("invalid escape sequence");
 				return false;
 			}
 
-			p++;
 			break;
 
 		case '"':
@@ -587,12 +593,14 @@ RegexCompiler::readHexLiteral (sl::String* string)
 
 	for (const char* p = m_p;; p++)
 	{
-		switch (*p)
+		if (p >= m_end)
 		{
-		case 0:
 			err::setError ("unclosed literal");
 			return false;
+		}
 
+		switch (*p)
+		{
 		case '"':
 		case '\'':
 			if (*p == delimiter)
@@ -617,7 +625,7 @@ RegexCompiler::readIdentifier (sl::String* name)
 
 	name->copy ((uchar_t) *m_p++);
 
-	while (isalnum ((uchar_t) *m_p) || *m_p == '_')
+	while (m_p < m_end && isalnum ((uchar_t) *m_p) || *m_p == '_')
 	{
 		name->append ((uchar_t) *m_p);
 		m_p++;
@@ -629,15 +637,21 @@ RegexCompiler::readIdentifier (sl::String* name)
 bool
 RegexCompiler::readQuantifier (size_t* count)
 {
-	char* end;
-	long n  = strtoul (m_p, &end, 10);
-	bool result = end != m_p && n >= 1 && n <= Const_MaxQuantifier;
-
-	if (result)
+	char buffer [16] = { 0 };
+	for (
+		size_t i = 0;
+		i < countof (buffer) - 1 && m_p < m_end && isdigit ((uchar_t) *m_p);
+		i++, m_p++
+		)
 	{
-		m_p = end;
-		result = expectSpecialChar ('}');
+		buffer [i] = *m_p;
 	}
+
+	char* end;
+	long n  = strtoul (buffer, &end, 10);
+	bool result = n >= 1 && n <= Const_MaxQuantifier;
+	if (result)
+		result = expectSpecialChar ('}');
 
 	if (!result)
 	{
@@ -666,9 +680,22 @@ RegexCompiler::getToken (Token* token)
 	{
 		for (;;)
 		{
+			if (m_p >= m_end)
+			{
+				token->m_tokenKind = TokenKind_SpecialChar;
+				token->m_char = 0; // don't advance m_p
+				return true;
+			}
+
 			switch (*m_p)
 			{
 			case '\\':
+				if (m_p + 1 >= m_end)
+				{
+					err::setError ("invalid escape sequence");
+					return false;
+				}
+
 				switch (m_p [1])
 				{
 				case 's':
@@ -689,7 +716,7 @@ RegexCompiler::getToken (Token* token)
 					break;
 
 				case '\r':
-					if (m_p [2] == '\n')
+					if (m_p + 2 < m_end && m_p [2] == '\n')
 					{
 						m_p += 3; // line continuation (CR-LF)
 						break;
@@ -701,11 +728,6 @@ RegexCompiler::getToken (Token* token)
 				}
 
 				break;
-
-			case 0:
-				token->m_tokenKind = TokenKind_SpecialChar;
-				token->m_char = 0; // don't advance m_p
-				return true;
 
 			case '.':
 			case '?':
@@ -734,9 +756,22 @@ RegexCompiler::getToken (Token* token)
 	else
 		for (;;)
 		{
+			if (m_p >= m_end)
+			{
+				token->m_tokenKind = TokenKind_SpecialChar;
+				token->m_char = 0; // don't advance m_p
+				return true;
+			}
+
 			switch (*m_p)
 			{
 			case '\\':
+				if (m_p + 1 >= m_end)
+				{
+					err::setError ("invalid escape sequence");
+					return false;
+				}
+
 				switch (m_p [1])
 				{
 				case 's':
@@ -757,7 +792,7 @@ RegexCompiler::getToken (Token* token)
 					break;
 
 				case '\r':
-					if (m_p [2] == '\n')
+					if (m_p + 2 < m_end && m_p [2] == '\n')
 					{
 						m_p += 3; // line continuation (CR-LF)
 						break;
@@ -774,11 +809,6 @@ RegexCompiler::getToken (Token* token)
 			case '\'':
 				token->m_tokenKind = TokenKind_Literal;
 				return readLiteral (&token->m_string);
-
-			case 0:
-				token->m_tokenKind = TokenKind_SpecialChar;
-				token->m_char = 0; // don't advance m_p
-				return true;
 
 			case ' ':
 			case '\t':
@@ -805,7 +835,7 @@ RegexCompiler::getToken (Token* token)
 				return true;
 
 			case '0':
-				if (m_p [1] == 'x' && (m_p [2] == '"' || m_p [2] == '\''))
+				if (m_p + 2 < m_end && m_p [1] == 'x' && (m_p [2] == '"' || m_p [2] == '\''))
 				{
 					token->m_tokenKind = TokenKind_Literal;
 					return readHexLiteral (&token->m_string);
@@ -876,8 +906,6 @@ RegexCompiler::expression ()
 		m_lastToken = token; // unget token
 		return op1;
 	}
-
-	m_p++;
 
 	NfaState* accept1 = *m_regex->m_nfaStateList.getTail ();
 
@@ -1093,7 +1121,7 @@ RegexCompiler::single ()
 		switch (token.m_char)
 		{
 		case '(':
-			if (m_p [0] == '?' && m_p [1] == ':')
+			if (m_p + 1 < m_end && m_p [0] == '?' && m_p [1] == ':')
 			{
 				m_p += 2;
 				return nonCapturingGroup ();
@@ -1188,7 +1216,7 @@ RegexCompiler::charClass ()
 
 	bool isInversed = false;
 
-	if (*m_p == '^')
+	if (m_p < m_end && *m_p == '^')
 	{
 		isInversed = true;
 		m_p++;
@@ -1204,7 +1232,7 @@ RegexCompiler::charClass ()
 
 	for (;;)
 	{
-		if (!*m_p)
+		if (m_p >= m_end)
 		{
 			err::setError ("invalid character class");
 			return NULL;
@@ -1242,6 +1270,8 @@ RegexCompiler::charClass ()
 bool
 RegexCompiler::charClassItem (sl::BitMap* charSet)
 {
+	ASSERT (m_p < m_end);
+
 	bool result;
 
 	uchar_t c1;
@@ -1249,11 +1279,13 @@ RegexCompiler::charClassItem (sl::BitMap* charSet)
 
 	switch (*m_p)
 	{
-	case 0:
-		err::setError ("invalid character class");
-		return false;
-
 	case '\\':
+		if (m_p + 1 >= m_end)
+		{
+			err::setError ("invalid escape sequence");
+			return false;
+		}
+
 		switch (m_p [1])
 		{
 		case 'd':
@@ -1279,7 +1311,7 @@ RegexCompiler::charClassItem (sl::BitMap* charSet)
 		c1 = *m_p++;
 	}
 
-	if (*m_p != '-')
+	if (m_p >= m_end || *m_p != '-')
 	{
 		charSet->setBit (c1);
 		return true;
@@ -1287,12 +1319,14 @@ RegexCompiler::charClassItem (sl::BitMap* charSet)
 
 	m_p++;
 
-	switch (*m_p)
+	if (m_p >= m_end)
 	{
-	case 0:
 		err::setError ("invalid char class");
 		return false;
+	}
 
+	switch (*m_p)
+	{
 	case '\\':
 		result = readEscapeSequence (&c2);
 		if (!result)

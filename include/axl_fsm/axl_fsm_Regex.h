@@ -147,6 +147,7 @@ protected:
 	uint_t m_flags;
 
 	const char* m_p;
+	const char* m_end;
 	Token m_lastToken;
 
 public:

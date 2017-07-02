@@ -29,7 +29,7 @@ typedef LONG NTSTATUS;
 #define DIRECTORY_CREATE_OBJECT       0x0004
 #define DIRECTORY_CREATE_SUBDIRECTORY 0x0008
 
-typedef enum _FILE_INFORMATION_CLASS 
+typedef enum _FILE_INFORMATION_CLASS
 {
 	FileDirectoryInformation         = 1,
 	FileFullDirectoryInformation,   // 2
@@ -89,7 +89,7 @@ typedef enum _FILE_INFORMATION_CLASS
 	FileMaximumInformation
 } FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
 
-struct FILE_BASIC_INFORMATION 
+struct FILE_BASIC_INFORMATION
 {
 	LARGE_INTEGER CreationTime;
 	LARGE_INTEGER LastAccessTime;
@@ -485,12 +485,12 @@ getFileTimes_nt (const char* fileName)
 
 	IO_STATUS_BLOCK ioStatus;
 	FILE_BASIC_INFORMATION basicInfo = { 0 };
-	
+
 	NTSTATUS status = ntQueryInformationFile (
-		(HANDLE) file.m_file, 
+		(HANDLE) file.m_file,
 		&ioStatus,
-		&basicInfo, 
-		sizeof (FILE_BASIC_INFORMATION), 
+		&basicInfo,
+		sizeof (FILE_BASIC_INFORMATION),
 		FileBasicInformation
 		);
 
@@ -802,8 +802,10 @@ testRegex ()
 	nameMgr.addName ("ws",  "[ \\t\\r\\n]");
 	nameMgr.addName ("dec", "[0-9]");
 
+	uint_t flags = 0; // fsm::RegexCompiler::Flag_SparseSyntax;
+
 	fsm::Regex regex;
-	fsm::RegexCompiler regexCompiler (fsm::RegexCompiler::Flag_SparseSyntax, &regex, &nameMgr);
+	fsm::RegexCompiler regexCompiler (flags, &regex, &nameMgr);
 
 /*	char const* src [] =
 	{
@@ -824,12 +826,12 @@ testRegex ()
 	regex.print ();
 */
 
-//	bool result = regexCompiler.compile ("\"abc\" ws* dec+");
+	bool result = regexCompiler.compile ("ab|cd");
 
-	bool result =
+/*	bool result =
 		regexCompiler.incrementalCompile ("(\\h{2})   ' '+ (\\d{2})") &&
 		regexCompiler.incrementalCompile ("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
-
+*/
 	if (!result)
 	{
 		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
