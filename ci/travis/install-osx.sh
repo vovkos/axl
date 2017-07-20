@@ -28,6 +28,8 @@ else
 	brew install doxygen
 	pip install sphinx sphinx_rtd_theme
 	rvm get stable
+
+    git clone --depth 1 http://github.com/vovkos/doxyrest
 fi
 
 # openssl is already installed, but not linked
