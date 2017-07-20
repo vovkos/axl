@@ -22,6 +22,12 @@ brew install sphinx-doc
 if [ "$BUILD_CONFIGURATION" == "Debug" ]; then
 	brew install lcov
 	echo "axl_override_setting (GCC_FLAG_COVERAGE -coverage)" >> settings.cmake
+else
+	BUILD_DOC=ON
+
+	brew install doxygen
+	pip install sphinx sphinx_rtd_theme
+	rvm get stable
 fi
 
 # openssl is already installed, but not linked
