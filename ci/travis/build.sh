@@ -18,9 +18,16 @@ make
 ctest --output-on-failure
 popd
 
-source ci/travis/get-coverage.sh
+if [ "$GET_COVERAGE" != "" ]; then
+	lcov --capture --directory . --no-external --output-file coverage.info
+	lcov --list coverage.info
+
+	curl -s https://codecov.io/bash | bash
+fi
 
 if [ "$BUILD_DOC" != "" ]; then
+	echo "set (AXL_CMAKE_DIR $THIS_DIR/cmake $THIS_DIR/build/cmake)" >> paths.cmake
+
 	mkdir doxyrest/build
 	pushd doxyrest/build
 	cmake .. -DTARGET_CPU=$TARGET_CPU -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION

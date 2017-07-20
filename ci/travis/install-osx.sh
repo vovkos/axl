@@ -17,19 +17,12 @@ brew install ragel
 brew install doxygen
 brew install sphinx-doc
 
-# coverage should be collected without optimizations
-
-if [ "$BUILD_CONFIGURATION" == "Debug" ]; then
-	brew install lcov
-	echo "axl_override_setting (GCC_FLAG_COVERAGE -coverage)" >> settings.cmake
-else
-	BUILD_DOC=ON
-
+if [ "$BUILD_DOC" != "" ]; then
 	brew install doxygen
 	pip install sphinx sphinx_rtd_theme
 	rvm get stable
 
-    git clone --depth 1 http://github.com/vovkos/doxyrest
+	git clone --depth 1 http://github.com/vovkos/doxyrest
 fi
 
 # openssl is already installed, but not linked
