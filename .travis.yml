@@ -46,7 +46,7 @@ matrix:
 install:
     - source ci/travis/set-env.sh
     - echo BUILD_DOC=$BUILD_DOC
-    - bash -e ci/travis/install-$TRAVIS_OS_NAME.sh
+    - bash ci/travis/install-$TRAVIS_OS_NAME.sh
 
 script:
     - bash -e ci/travis/build.sh
