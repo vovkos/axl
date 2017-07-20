@@ -9,28 +9,51 @@
 #
 #...............................................................................
 
+set (
+	_OPENSSL_CRYPTO_LIB_NAME_LIST
+	crypto
+	libcrypto
+	libeay32
+	)
+
+set (
+	_OPENSSL_SSL_LIB_NAME_LIST
+	ssl
+	libssl
+	ssleay32
+	)
+
 if (NOT OPENSSL_INC_DIR)
 	axl_find_inc_dir (OPENSSL_INC_DIR openssl/obj_mac.h)
 endif ()
 
 if (NOT OPENSSL_LIB_DIR)
-	axl_find_lib_dir (OPENSSL_LIB_DIR ssl)
-endif ()
-
-if (NOT OPENSSL_CRYPTO_LIB_NAME)
-	if (WIN32)
-		set (OPENSSL_CRYPTO_LIB_NAME libeay32)
+	if (NOT OPENSSL_CRYPTO_LIB_NAME)
+		axl_find_lib_dir_ex (
+			RESULT_LIB_DIR OPENSSL_LIB_DIR
+			RESULT_LIB_NAME OPENSSL_CRYPTO_LIB_NAME
+			LIB_NAME ${_OPENSSL_CRYPTO_LIB_NAME_LIST}
+			)
 	else ()
-		set (OPENSSL_CRYPTO_LIB_NAME crypto)
+		axl_find_lib_dir_ex (
+			RESULT_LIB_DIR OPENSSL_LIB_DIR
+			LIB_NAME ${OPENSSL_CRYPTO_LIB_NAME}
+			)
 	endif ()
+elseif (NOT OPENSSL_CRYPTO_LIB_NAME)
+	axl_find_lib_dir_ex (
+		RESULT_LIB_NAME OPENSSL_CRYPTO_LIB_NAME
+		LIB_DIR ${OPENSSL_LIB_DIR}
+		LIB_NAME ${_OPENSSL_CRYPTO_LIB_NAME_LIST}
+		)
 endif ()
 
 if (NOT OPENSSL_SSL_LIB_NAME)
-	if (WIN32)
-		set (OPENSSL_SSL_LIB_NAME ssleay32)
-	else ()
-		set (OPENSSL_SSL_LIB_NAME ssl)
-	endif ()
+	axl_find_lib_dir_ex (
+		RESULT_LIB_NAME OPENSSL_SSL_LIB_NAME
+		LIB_DIR ${OPENSSL_LIB_DIR}
+		LIB_NAME ${_OPENSSL_SSL_LIB_NAME_LIST}
+		)
 endif ()
 
 if (EXISTS ${OPENSSL_INC_DIR}/openssl/obj_mac.h)
