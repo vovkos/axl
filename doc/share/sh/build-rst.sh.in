@@ -12,7 +12,6 @@
 
 set -e
 
-
 rm -rf ${RST_DIR}
 mkdir -p ${RST_DIR}
 
