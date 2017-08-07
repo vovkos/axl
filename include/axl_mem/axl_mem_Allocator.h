@@ -28,6 +28,15 @@ _AXL_MEM_FREE_IMPL (void* size);
 #endif
 
 namespace axl {
+namespace err {
+
+// we can't use any of our error facilities here, so use a dedicated function
+
+void
+setOutOfMemoryError ();
+
+} // namespace err
+
 namespace mem {
 
 //..............................................................................
@@ -54,7 +63,11 @@ public:
 	void*
 	allocate (size_t size)
 	{
-		return ::malloc (size);
+		void* p = ::malloc (size);
+		if (!p)
+			err::setOutOfMemoryError ();
+
+		return p;
 	}
 
 	static
@@ -64,6 +77,8 @@ public:
 		::free (p);
 	}
 #endif
+
+
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -78,6 +93,7 @@ public:
 		void* p = DirectAllocator::allocate (size);
 		if (p)
 			memset (p, 0, size);
+
 		return p;
 	}
 };
