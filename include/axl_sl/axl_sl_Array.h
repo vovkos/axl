@@ -778,6 +778,9 @@ public:
 		size_t bufferSize = sl::getMinPower2Ge (size);
 
 		ref::Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
+		if (!hdr)
+			return false;
+
 		hdr->m_bufferSize = bufferSize;
 		Details::setHdrCount (hdr, this->m_count);
 
