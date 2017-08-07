@@ -252,8 +252,8 @@ inline
 size_t
 getMinPower2Gt (size_t size)
 {
-	size_t hiBitIdx = getHiBitIdx (size);
-	return 2 << hiBitIdx;
+	ASSERT ((intptr_t) size >= 0); // hi-bit is already set
+	return size ? 2 << getHiBitIdx (size) : 1;
 }
 
 inline
