@@ -524,8 +524,8 @@ public:
 	StringRef
 	getLeftSubString (size_t length) const
 	{
-		if (length > m_length)
-			return length;
+		if (length >= m_length)
+			return *this;
 
 		return StringRef (m_hdr, m_p, length);
 	}
@@ -533,8 +533,8 @@ public:
 	StringRef
 	getRightSubString (size_t length) const
 	{
-		if (length > m_length)
-			return length;
+		if (length >= m_length)
+			return *this;
 
 		return StringRef (m_hdr, m_p + m_length - length, length);
 	}
