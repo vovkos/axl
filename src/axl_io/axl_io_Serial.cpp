@@ -95,15 +95,7 @@ Serial::getSettings (SerialSettings* settings)
 	if (!result)
 		return false;
 
-	settings->m_baudRate = dcb.BaudRate;
-	settings->m_dataBits = dcb.ByteSize;
-	settings->m_stopBits = (SerialStopBits) dcb.StopBits;
-	settings->m_parity   = (SerialParity) dcb.Parity;
-
-	settings->m_flowControl =
-		dcb.fOutxCtsFlow && dcb.fRtsControl == RTS_CONTROL_HANDSHAKE ? SerialFlowControl_RtsCts :
-		dcb.fOutX && dcb.fInX ? SerialFlowControl_XonXoff : SerialFlowControl_None;
-
+	settings->setDcb (&dcb);
 	return true;
 }
 
@@ -295,101 +287,7 @@ Serial::getSettings (SerialSettings* settings)
 	if (!result)
 		return false;
 
-	speed_t speed = cfgetispeed (&attr);
-	switch (speed)
-	{
-	case B110:
-		settings->m_baudRate = 110;
-		break;
-
-	case B300:
-		settings->m_baudRate = 300;
-		break;
-
-	case B600:
-		settings->m_baudRate = 600;
-		break;
-
-	case B1200:
-		settings->m_baudRate = 1200;
-		break;
-
-	case B2400:
-		settings->m_baudRate = 2400;
-		break;
-
-	case B4800:
-		settings->m_baudRate = 4800;
-		break;
-
-	case B9600:
-		settings->m_baudRate = 9600;
-		break;
-
-	case B19200:
-		settings->m_baudRate = 19200;
-		break;
-
-	case B38400:
-		settings->m_baudRate = 38400;
-		break;
-
-	case B57600:
-		settings->m_baudRate = 57600;
-		break;
-
-	case B115200:
-		settings->m_baudRate = 115200;
-		break;
-
-	default:
-		// TODO: custom baud rate (currently fall back to 38400)
-		settings->m_baudRate = 38400;
-	}
-
-	uint_t byteSize = attr.c_cflag & CSIZE;
-	switch (byteSize)
-	{
-	case CS5:
-		settings->m_dataBits = 5;
-		break;
-
-	case CS6:
-		settings->m_dataBits = 6;
-		break;
-
-	case CS7:
-		settings->m_dataBits = 7;
-		break;
-
-	case CS8:
-	default:
-		settings->m_dataBits = 8;
-		break;
-	}
-
-	settings->m_stopBits = (attr.c_cflag & CSTOPB) ?
-		SerialStopBits_2 :
-		SerialStopBits_1;
-
-#ifdef CMSPAR
-	settings->m_parity =
-		(attr.c_cflag & PARENB) ?
-			(attr.c_cflag & CMSPAR)  ?
-				(attr.c_cflag & PARODD) ? SerialParity_Mark : SerialParity_Space :
-				(attr.c_cflag & PARODD) ? SerialParity_Odd : SerialParity_Even :
-		SerialParity_None;
-#else
-	settings->m_parity = (attr.c_cflag & PARENB) ? (attr.c_cflag & PARODD) ?
-		SerialParity_Odd :
-		SerialParity_Even :
-		SerialParity_None;
-#endif
-
-	settings->m_flowControl =
-		(attr.c_cflag & CRTSCTS) ? SerialFlowControl_RtsCts :
-		(attr.c_iflag & (IXON | IXOFF)) ? SerialFlowControl_XonXoff : SerialFlowControl_None;
-
+	settings->setAttr (&attr);
 	return true;
 }
 
