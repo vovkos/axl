@@ -90,6 +90,11 @@ include_directories (
 
 link_directories (${AXL_LIB_DIR})
 
+add_definitions (
+	-DQT_COMPILING_QSTRING_COMPAT_CPP
+	-DQT_COMPILING_QIMAGE_COMPAT_CPP
+	)
+
 add_executable (
 	axl_test_qt
 	${PCH_H}

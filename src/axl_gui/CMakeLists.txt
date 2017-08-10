@@ -153,7 +153,12 @@ source_group (
 include_directories (${AXL_INC_DIR})
 
 if (BUILD_AXL_GUI_QT)
-	add_definitions (-D_AXL_GUI_QT=1)
+	add_definitions (
+		-D_AXL_GUI_QT=1
+		-DQT_COMPILING_QSTRING_COMPAT_CPP
+		-DQT_COMPILING_QIMAGE_COMPAT_CPP
+		)
+
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 endif ()
 
