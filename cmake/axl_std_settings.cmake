@@ -240,6 +240,20 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_compiler_flag_setting (
+		GCC_FLAG_STATIC_LIBGCC
+		DESCRIPTION "Use static linkage to libgcc"
+		DEFAULT "-static-libgcc"
+		"-static-libgcc"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_CPP_STATIC_LIBSTDCPP
+		DESCRIPTION "Use static linkage to libstdc++"
+		DEFAULT "-static-libstdc++"
+		"-static-libstdc++"
+		)
+
+	axl_create_compiler_flag_setting (
 		GCC_FLAG_CPP_RTTI
 		DESCRIPTION "GNU C++ emits RTTI info"
 		"-frtti" "-fno-rtti"
