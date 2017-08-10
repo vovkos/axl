@@ -793,7 +793,7 @@ axl_set_pch_gcc
 			${_COMPILE_FLAGS}
 			${_PCH_FLAGS}
 			"-o" ${_PCH_BIN}
-			${_PCH_H}
+			"-c" ${_PCH_H}
 		)
 
 	# modify target
