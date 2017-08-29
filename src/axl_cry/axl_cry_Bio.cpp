@@ -25,7 +25,7 @@ Bio::create (
 {
 	close ();
 	
-	m_h = BIO_new_mem_buf (p, size);
+	m_h = BIO_new_mem_buf ((void*) p, size);
 	if (!m_h)
 	{
 		// BIO_new_mem_buf doesn't always set crypto error
