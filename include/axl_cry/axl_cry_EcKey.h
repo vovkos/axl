@@ -210,6 +210,17 @@ public:
 		size_t hashSize
 		);
 
+	sl::Array <char>
+	signHash (
+		const void* hash,
+		size_t hashSize
+		)
+	{
+		sl::Array <char> signature;
+		signHash (&signature, hash, hashSize);
+		return signature;
+	}
+
 	bool
 	sign (
 		sl::Array <char>* signature,
@@ -220,17 +231,6 @@ public:
 		char hash [MD5_DIGEST_LENGTH];
 		MD5 ((const uchar_t*) p, size, (uchar_t*) hash);
 		return signHash (signature, hash, sizeof (hash));
-	}
-
-	sl::Array <char>
-	signHash (
-		const void* hash,
-		size_t hashSize
-		)
-	{
-		sl::Array <char> signature;
-		signHash (&signature, hash, hashSize);
-		return signature;
 	}
 
 	sl::Array <char>

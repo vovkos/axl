@@ -21,3 +21,5 @@
 #include <openssl/err.h>
 #include <openssl/md5.h>
 #include <openssl/ecdsa.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
