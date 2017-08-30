@@ -239,19 +239,21 @@ axl_create_gcc_settings)
 		"-std=c++98" "-std=c++11" "-std=c++14" "-std=gnu++98" "-std=gnu++11" "-std=gnu++14"
 		)
 
-	axl_create_compiler_flag_setting (
-		GCC_FLAG_STATIC_LIBGCC
-		DESCRIPTION "Use static linkage to libgcc"
-		DEFAULT "-static-libgcc"
-		"-static-libgcc"
-		)
+	if (NOT APPLE)
+		axl_create_compiler_flag_setting (
+			GCC_FLAG_STATIC_LIBGCC
+			DESCRIPTION "Use static linkage to libgcc"
+			DEFAULT "-static-libgcc"
+			"-static-libgcc"
+			)
 
-	axl_create_compiler_flag_setting (
-		GCC_FLAG_CPP_STATIC_LIBSTDCPP
-		DESCRIPTION "Use static linkage to libstdc++"
-		DEFAULT "-static-libstdc++"
-		"-static-libstdc++"
-		)
+		axl_create_compiler_flag_setting (
+			GCC_FLAG_CPP_STATIC_LIBSTDCPP
+			DESCRIPTION "Use static linkage to libstdc++"
+			DEFAULT "-static-libstdc++"
+			"-static-libstdc++"
+			)
+	endif ()
 
 	axl_create_compiler_flag_setting (
 		GCC_FLAG_CPP_RTTI
