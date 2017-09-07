@@ -349,11 +349,11 @@ Time::format (
 			break;
 
 		case 'M':
-			string->appendFormat ("%02d", m_month);
+			string->appendFormat ("%02d", m_month + 1);
 			break;
 
 		case 'o':
-			string->appendFormat ("%d", m_month);
+			string->appendFormat ("%d", m_month + 1);
 			break;
 
 		case 'n':
