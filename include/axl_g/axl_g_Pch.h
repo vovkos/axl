@@ -64,12 +64,20 @@
 #		define _AXL_CPU_X86 1
 #	elif (defined _M_AMD64)
 #		define _AXL_CPU_AMD64 1
+#	elif (defined _M_ARM)
+#		define _AXL_CPU_ARM32 1
+#	elif (defined _M_ARM64)
+#		define _AXL_CPU_ARM64 1
 #	endif
 #elif (_AXL_CPP_GCC)
 #	if defined __i386__
 #		define _AXL_CPU_X86 1
 #	elif (defined __amd64__)
 #		define _AXL_CPU_AMD64 1
+#	elif (defined __arm__)
+#		define _AXL_CPU_ARM32 1
+#	elif (defined __aarch64__)
+#		define _AXL_CPU_ARM64 1
 #	endif
 #endif
 
@@ -78,6 +86,12 @@
 #	define AXL_PTR_SIZE    4
 #elif (_AXL_CPU_AMD64)
 #	define AXL_CPU_STRING  "amd64"
+#	define AXL_PTR_SIZE    8
+#elif (_AXL_CPU_ARM32)
+#	define AXL_CPU_STRING  "arm32"
+#	define AXL_PTR_SIZE    4
+#elif (_AXL_CPU_ARM64)
+#	define AXL_CPU_STRING  "arm64"
 #	define AXL_PTR_SIZE    8
 #else
 #	error unsupported CPU architecture
