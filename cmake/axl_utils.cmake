@@ -173,10 +173,20 @@ axl_detect_target_cpu
 	_CPU
 	)
 
-	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set (${_CPU} "amd64")
+	get_filename_component (_CXX_FILE_NAME ${CMAKE_CXX_COMPILER} NAME)
+
+	if ("${_CXX_FILE_NAME}" MATCHES "arm")
+		if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set (${_CPU} "arm64")
+		else ()
+			set (${_CPU} "arm32")
+		endif ()
 	else ()
-		set (${_CPU} "x86")
+		if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set (${_CPU} "amd64")
+		else ()
+			set (${_CPU} "x86")
+		endif ()
 	endif ()
 endmacro ()
 
@@ -711,7 +721,7 @@ axl_set_pch_gcc
 
 	string (TOUPPER "${CMAKE_BUILD_TYPE}" _CONFIGURATION)
 
-	set (_COMPILE_FLAGS "${CMAKE_${_LANGUAGE}_FLAGS} ${CMAKE_${_LANGUAGE}_FLAGS_${_CONFIGURATION}}")
+	set (_COMPILE_FLAGS "${CMAKE_${_LANGUAGE}_COMPILER_ARG1} ${CMAKE_${_LANGUAGE}_FLAGS} ${CMAKE_${_LANGUAGE}_FLAGS_${_CONFIGURATION}}")
 
 	# get and append COMPILE_FLAGS property
 

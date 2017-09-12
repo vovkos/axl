@@ -16,16 +16,17 @@ axl_create_target_cpu_setting)
 
 	axl_detect_target_cpu (_CPU)
 
-	# Microsoft Visual C++ is a native-only generator, GCC can cross-compile
+	# Microsoft Visual C++ is a native-only generator, x86/amd64 GCC can cross-compile
 
-	if (MSVC)
+	if (NOT GCC OR NOT ("${_CPU}" STREQUAL "x86" OR "${_CPU}" STREQUAL "amd64"))
 		set (TARGET_CPU ${_CPU})
 	else ()
 		axl_create_setting (
 			TARGET_CPU
 			DESCRIPTION "Target CPU"
 			DEFAULT ${_CPU}
-			"x86" "amd64"
+			"x86"
+			"amd64"
 			)
 	endif ()
 endmacro ()
@@ -53,7 +54,7 @@ axl_apply_target_cpu_setting)
 			set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 			set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -m32")
 		endif ()
-	else ()
+	elseif (NOT "${TARGET_CPU}" MATCHES "arm")
 		message (FATAL_ERROR "Unsupported CPU: ${TARGET_CPU}")
 	endif ()
 
@@ -386,10 +387,10 @@ axl_print_std_settings)
 		axl_message ("    Build configuration:" ${CMAKE_BUILD_TYPE})
 	endif ()
 
-	string (STRIP "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" _C_FLAGS_DEBUG)
-	string (STRIP "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}" _C_FLAGS_RELEASE)
-	string (STRIP "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}" _CXX_FLAGS_DEBUG)
-	string (STRIP "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}" _CXX_FLAGS_RELEASE)
+	string (STRIP "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" _C_FLAGS_DEBUG)
+	string (STRIP "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}" _C_FLAGS_RELEASE)
+	string (STRIP "${CMAKE_CXX_COMPILER_ARG1} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}" _CXX_FLAGS_DEBUG)
+	string (STRIP "${CMAKE_CXX_COMPILER_ARG1} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}" _CXX_FLAGS_RELEASE)
 
 	message (STATUS "C/C++:")
 	axl_message ("    C Compiler:"          ${CMAKE_C_COMPILER})
