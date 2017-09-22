@@ -365,6 +365,11 @@ RegexCompiler::assignDfaIds ()
 void
 RegexCompiler::makeDfa ()
 {
+	m_regex->m_dfaStateList.clear ();
+
+	if (m_regex->m_nfaStateList.isEmpty ())
+		return;
+
 	sl::Array <DfaState*> workingSet;
 	NfaStateSetMap <DfaState*> dfaStateMap;
 
