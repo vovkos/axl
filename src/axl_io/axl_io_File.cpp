@@ -147,12 +147,22 @@ copyFile (
 	)
 {
 	File srcFile;
+	bool result = srcFile.open (srcFileName, FileFlag_ReadOnly);
+	if (!result)
+		return -1;
+
+	return copyFile (&srcFile, dstFileName, size);
+}
+
+uint64_t
+copyFile (
+	const io::File* srcFile,
+	const sl::StringRef& dstFileName,
+	uint64_t size
+	)
+{
 	File dstFile;
-
-	bool result =
-		srcFile.open (srcFileName, FileFlag_ReadOnly) &&
-		dstFile.open (dstFileName);
-
+	bool result = dstFile.open (dstFileName);
 	if (!result)
 		return -1;
 
@@ -162,7 +172,7 @@ copyFile (
 	};
 
 	if (size == -1)
-		size = srcFile.getSize ();
+		size = srcFile->getSize ();
 
 	uint64_t offset = 0;
 
@@ -173,7 +183,7 @@ copyFile (
 	win::MappedView dstView;
 
 	result =
-		srcMapping.create (srcFile.m_file, NULL, PAGE_READONLY, size) &&
+		srcMapping.create (srcFile->m_file, NULL, PAGE_READONLY, size) &&
 		dstMapping.create (dstFile.m_file, NULL, PAGE_READWRITE, size);
 
 	while (size)
