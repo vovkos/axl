@@ -62,7 +62,8 @@ public:
 	void*
 	find (
 		uint64_t begin,
-		uint64_t end
+		uint64_t end,
+		uint64_t* actualEnd
 		);
 
 	void*
@@ -122,10 +123,10 @@ public:
 		close ();
 	}
 
-	File::Handle
-	getFileHandle () const
+	const File*
+	getFile () const
 	{
-		return m_file.getHandle ();
+		return &m_file;
 	}
 
 	bool
@@ -155,6 +156,12 @@ public:
 		size_t readAheadSize
 		);
 
+	uint_t 
+	getFlags () const
+	{
+		return m_fileFlags;
+	}
+
 	uint64_t
 	getSize () const
 	{
@@ -174,17 +181,35 @@ public:
 		bool isPermanent = false
 		) const
 	{
-		return ((MappedFile*) this)->viewImpl (
-			offset,
-			size ? offset + size : m_fileSize,
-			isPermanent
-			);
+		return ((MappedFile*) this)->view (offset, size, isPermanent);
 	}
 
 	void*
 	view (
 		uint64_t offset = 0,
 		size_t size = 0,
+		bool isPermanent = false
+		)
+	{
+		return view (offset, size, NULL, isPermanent);
+	}
+
+	const void*
+	view (
+		uint64_t offset,
+		size_t size,
+		size_t* actualSize,
+		bool isPermanent = false
+		) const
+	{
+		return ((MappedFile*) this)->view (offset, size, actualSize, isPermanent);
+	}
+
+	void*
+	view (
+		uint64_t offset,
+		size_t size,
+		size_t* actualSize,
 		bool isPermanent = false
 		);
 
@@ -203,6 +228,7 @@ protected:
 	viewImpl (
 		uint64_t offset,
 		uint64_t end,
+		uint64_t* actualEnd,
 		bool isPermanent
 		);
 };

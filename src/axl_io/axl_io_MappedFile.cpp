@@ -22,7 +22,8 @@ namespace io {
 void*
 MappedViewMgr::find (
 	uint64_t begin,
-	uint64_t end
+	uint64_t end,
+	uint64_t* actualEnd
 	)
 {
 	// first check the last view
@@ -32,7 +33,10 @@ MappedViewMgr::find (
 		return NULL;
 
 	if (viewEntry->m_begin <= begin && viewEntry->m_end >= end)
-		return (uchar_t*) (void*) viewEntry->m_view + begin - viewEntry->m_begin;
+	{
+		*actualEnd = viewEntry->m_end;
+		return (char*) (void*) viewEntry->m_view + begin - viewEntry->m_begin;
+	}
 
 	// ok, now try to find existing view using the view map...
 
@@ -48,7 +52,8 @@ MappedViewMgr::find (
 	// move it to the head to mark as recently used and return
 
 	m_viewList.moveToHead (viewEntry);
-	return (uchar_t*) (void*) viewEntry->m_view + begin - viewEntry->m_begin;
+	*actualEnd = viewEntry->m_end;
+	return (char*) (void*) viewEntry->m_view + begin - viewEntry->m_begin;
 }
 
 void*
@@ -253,6 +258,7 @@ void*
 MappedFile::view (
 	uint64_t offset,
 	size_t size,
+	size_t* actualSize,
 	bool isPermanent
 	)
 {
@@ -266,7 +272,15 @@ MappedFile::view (
 		m_fileSize = end;
 	}
 
-	return viewImpl (offset, end, isPermanent);
+	uint64_t actualEnd;
+	void* p = viewImpl (offset, end, &actualEnd, isPermanent);
+	if (!p)
+		return NULL;
+
+	if (actualSize)
+		*actualSize = (size_t) (actualEnd - offset);
+
+	return p;
 }
 
 size_t
@@ -291,6 +305,7 @@ void*
 MappedFile::viewImpl (
 	uint64_t offset,
 	uint64_t end,
+	uint64_t* actualEnd,
 	bool isPermanent
 	)
 {
@@ -301,13 +316,13 @@ MappedFile::viewImpl (
 
 	// first, try to find existing view...
 
-	void* p = m_permanentViewMgr.find (offset, end);
+	void* p = m_permanentViewMgr.find (offset, end, actualEnd);
 	if (p)
 		return p;
 
 	if (!isPermanent)
 	{
-		p = m_dynamicViewMgr.find (offset, end);
+		p = m_dynamicViewMgr.find (offset, end, actualEnd);
 		if (p)
 			return p;
 	}
@@ -380,6 +395,7 @@ MappedFile::viewImpl (
 	if (!p)
 		return NULL;
 
+	*actualEnd = viewEnd;
 	return (uchar_t*) p + offset - viewBegin;
 }
 
