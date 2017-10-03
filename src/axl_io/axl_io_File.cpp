@@ -218,7 +218,7 @@ copyFile (
 	{
 		size_t blockSize = AXL_MIN (BlockSize, size);
 
-		const void* src = srcMapping.map (NULL, blockSize, PROT_READ, MAP_SHARED, srcFile.m_file, offset);
+		const void* src = srcMapping.map (NULL, blockSize, PROT_READ, MAP_SHARED, srcFile->m_file, offset);
 		void* dst = dstMapping.map (NULL, blockSize, PROT_READ | PROT_WRITE, MAP_SHARED, dstFile.m_file, offset);
 
 		if (!src || !dst)
