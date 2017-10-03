@@ -668,6 +668,20 @@ public:
 		T* p = this->remove (it);
 		typename List::Delete () (p);
 	}
+
+	void
+	eraseHead ()
+	{
+		T* p = this->removeHead (it);
+		p ? typename List::Delete () (p) : (void) 0;
+	}
+
+	void
+	eraseTail ()
+	{
+		T* p = this->removeTail (it);
+		p ? typename List::Delete () (p) : (void) 0;
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
