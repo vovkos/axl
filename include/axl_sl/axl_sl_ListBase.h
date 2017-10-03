@@ -672,14 +672,14 @@ public:
 	void
 	eraseHead ()
 	{
-		T* p = this->removeHead (it);
+		T* p = this->removeHead ();
 		p ? typename List::Delete () (p) : (void) 0;
 	}
 
 	void
 	eraseTail ()
 	{
-		T* p = this->removeTail (it);
+		T* p = this->removeTail ();
 		p ? typename List::Delete () (p) : (void) 0;
 	}
 };
