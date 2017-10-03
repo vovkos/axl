@@ -102,10 +102,10 @@ public:
 		return m_flags;
 	}
 
-	File::Handle
-	getFileHandle () const
+	const File*
+	getFile () const
 	{
-		return m_file.getHandle ();
+		return &m_file;
 	}
 
 	bool
