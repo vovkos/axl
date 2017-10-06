@@ -299,7 +299,7 @@ getDir (const sl::StringRef& filePath)
 #elif (_AXL_OS_POSIX)
 	const char* p0 = filePath.sz ();
 	const char* p = strrchr (p0, '/');
-	return p ? sl::String (p0, p - p0) : filePath;
+	return p ? sl::String (p0, p - p0) : sl::String ();
 #endif
 }
 
