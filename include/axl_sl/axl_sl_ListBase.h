@@ -550,7 +550,7 @@ public:
 		Iterator before
 		)
 	{
-		T* p = *it;
+		T* p = it.getEntry ();
 		remove (it);
 		insertBefore (p, before);
 	}
@@ -561,7 +561,7 @@ public:
 		Iterator after
 		)
 	{
-		T* p = *it;
+		T* p = it.getEntry ();
 		remove (it);
 		insertAfter (p, after);
 	}
@@ -569,7 +569,7 @@ public:
 	void
 	moveToHead (Iterator it)
 	{
-		T* p = *it;
+		T* p = it.getEntry ();
 		remove (it);
 		insertHead (p);
 	}
@@ -577,7 +577,7 @@ public:
 	void
 	moveToTail (Iterator it)
 	{
-		T* p = *it;
+		T* p = it.getEntry ();
 		remove (it);
 		insertTail (p);
 	}
