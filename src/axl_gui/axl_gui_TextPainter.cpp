@@ -409,14 +409,48 @@ TextPainter::drawSelHyperBinHex (
 // bin text
 
 size_t
+TextPainter::buildBinTextString (
+	sl::Array <utf32_t>* binTextBuffer,
+	sl::String* stringBuffer,
+	enc::CharCodec* codec,
+	const void* p,
+	size_t dataSize,
+	size_t bufferSize,
+	utf32_t unprintableChar
+	)
+{
+	size_t length = buildBinTextBuffer (binTextBuffer, codec, p, dataSize, bufferSize, unprintableChar);
+	stringBuffer->copy (sl::StringRef_utf32 (*binTextBuffer, length));
+	return length;
+}
+
+sl::String
+TextPainter::buildBinTextString (
+	enc::CharCodec* codec,
+	const void* p,
+	size_t dataSize,
+	size_t bufferSize,
+	utf32_t unprintableChar
+	)
+{
+	sl::Array <utf32_t> binTextBuffer;
+	sl::String stringBuffer;
+	buildBinTextString (&binTextBuffer, &stringBuffer, codec, p, dataSize, bufferSize, unprintableChar);
+	return stringBuffer;
+}
+
+size_t
 TextPainter::buildBinTextBuffer (
+	sl::Array <utf32_t>* binTextBuffer,
 	enc::CharCodec* codec,
 	const void* p0,
 	size_t dataSize,
-	size_t bufferSize
+	size_t bufferSize,
+	utf32_t unprintableChar
 	)
 {
-	m_binTextBuffer.setCount (dataSize);
+	binTextBuffer->setCount (dataSize);
+	utf32_t* buffer = binTextBuffer->p ();
 
 	size_t unitSize = codec->getUnitSize ();
 	size_t i = 0;
@@ -444,19 +478,19 @@ TextPainter::buildBinTextBuffer (
 				end = dataSize;
 
 			for (; i < end; i++)
-				m_binTextBuffer [i] = m_unprintableChar;
+				buffer [i] = unprintableChar;
 
 			break;
 		}
 
-		m_binTextBuffer [i] = enc::utfIsPrintableNonMark (codePoint) ? codePoint : m_unprintableChar;
+		buffer [i] = enc::utfIsPrintableNonMark (codePoint) ? codePoint : unprintableChar;
 
 		size_t end = i + takenSize;
 		if (end > dataSize)
 			end = dataSize;
 
 		for (i++; i < end; i++)
-			m_binTextBuffer [i] = m_unprintableChar;
+			buffer [i] = unprintableChar;
 
 		p += takenSize;
 	}

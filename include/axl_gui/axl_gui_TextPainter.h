@@ -34,7 +34,7 @@ public:
 	int m_top;
 	int m_bottom;
 	uint_t m_hexEncodingFlags;
-	char m_unprintableChar;
+	utf32_t m_unprintableChar;
 
 public:
 	TextPainter ()
@@ -805,9 +805,42 @@ public:
 			);
 	}
 
+	static
+	size_t
+	buildBinTextString (
+		sl::Array <utf32_t>* binTextBuffer,
+		sl::String* stringBuffer,
+		enc::CharCodec* codec,
+		const void* p,
+		size_t dataSize,
+		size_t bufferSize,
+		utf32_t unprintableChar = '.'
+		);
+
+	static
+	sl::String
+	buildBinTextString (
+		enc::CharCodec* codec,
+		const void* p,
+		size_t dataSize,
+		size_t bufferSize,
+		utf32_t unprintableChar = '.'
+		);
+
 protected:
 	void
 	init (Canvas* canvas = NULL);
+
+	static
+	size_t
+	buildBinTextBuffer (
+		sl::Array <utf32_t>* binTextBuffer,
+		enc::CharCodec* codec,
+		const void* p,
+		size_t dataSize,
+		size_t bufferSize,
+		utf32_t unprintableChar = '.'
+		);
 
 	size_t
 	buildBinTextBuffer (
@@ -815,7 +848,17 @@ protected:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		);
+		)
+	{
+		return buildBinTextBuffer (
+			&m_binTextBuffer,
+			codec,
+			p,
+			dataSize,
+			bufferSize,
+			m_unprintableChar
+			);
+	}
 };
 
 //..............................................................................
