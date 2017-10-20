@@ -114,6 +114,7 @@ SharedMemoryTransportBase::attach (
 		if (m_hdr->m_state != SharedMemoryTransportState_MasterConnected ||
 			m_hdr->m_readOffset != 0)
 		{
+			sys::atomicUnlock (&m_hdr->m_lock);
 			err::setError (err::SystemErrorCode_InvalidDeviceState);
 			return false;
 		}
