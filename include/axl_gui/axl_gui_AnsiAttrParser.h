@@ -32,12 +32,11 @@ protected:
 protected:
 	TextAttr* m_targetAttr;
 	TextAttr m_baseAttr;
+	uint_t* m_textColor;
+	uint_t* m_backColor;
 
 public:
-	AnsiAttrParser ()
-	{
-		m_targetAttr = NULL;
-	}
+	AnsiAttrParser ();
 
 	size_t // returns attr count
 	parse (
@@ -48,10 +47,7 @@ public:
 
 protected:
 	void
-	clear (uint_t)
-	{
-		*m_targetAttr = m_baseAttr;
-	}
+	clear (uint_t);
 
 	void
 	setFontFlag (uint_t flag);
@@ -103,43 +99,58 @@ protected:
 	}
 
 	void
+	setInverse (bool isInversed);
+
+	void
+	setInverseOn (uint_t)
+	{
+		setInverse (true);
+	}
+
+	void
+	setInverseOff (uint_t)
+	{
+		setInverse (false);
+	}
+
+	void
 	setTextColor (uint_t color)
 	{
 		ASSERT (color >= 30 && color < 38);
-		m_targetAttr->m_foreColor = StdPalColor_AnsiBlack + color - 30;
+		*m_textColor = StdPalColor_AnsiBlack + color - 30;
 	}
 
 	void
 	setBrightTextColor (uint_t color)
 	{
 		ASSERT (color >= 90 && color < 98);
-		m_targetAttr->m_foreColor = StdPalColor_AnsiBrightBlack + color - 90;
+		*m_textColor = StdPalColor_AnsiBrightBlack + color - 90;
 	}
 
 	void
 	setBaseTextColor (uint_t)
 	{
-		m_targetAttr->m_foreColor = m_baseAttr.m_foreColor;
+		*m_textColor = m_baseAttr.m_foreColor;
 	}
 
 	void
 	setBackColor (uint_t color)
 	{
 		ASSERT (color >= 40 && color < 48);
-		m_targetAttr->m_backColor = StdPalColor_AnsiBlack + color - 40;
+		*m_backColor = StdPalColor_AnsiBlack + color - 40;
 	}
 
 	void
 	setBrightBackColor (uint_t color)
 	{
 		ASSERT (color >= 100 && color < 108);
-		m_targetAttr->m_backColor = StdPalColor_AnsiBrightBlack + color - 100;
+		*m_backColor = StdPalColor_AnsiBrightBlack + color - 100;
 	}
 
 	void
 	setBaseBackColor (uint_t)
 	{
-		m_targetAttr->m_backColor = m_baseAttr.m_backColor;
+		*m_backColor = m_baseAttr.m_backColor;
 	}
 };
 

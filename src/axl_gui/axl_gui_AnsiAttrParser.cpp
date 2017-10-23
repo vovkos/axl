@@ -17,6 +17,13 @@ namespace gui {
 
 //..............................................................................
 
+AnsiAttrParser::AnsiAttrParser ()
+{
+	m_targetAttr = NULL;
+	m_textColor = NULL;
+	m_backColor = NULL;
+}
+
 size_t
 AnsiAttrParser::parse (
 	TextAttr* targetAttr,
@@ -33,6 +40,7 @@ AnsiAttrParser::parse (
 		setAttrFuncTable [1] = &AnsiAttrParser::setBoldOn;
 		setAttrFuncTable [3] = &AnsiAttrParser::setItalicOn;
 		setAttrFuncTable [4] = &AnsiAttrParser::setUnderlineOn;
+		setAttrFuncTable [7] = &AnsiAttrParser::setInverseOn;
 
 		for (size_t i = 10; i < 20; i++)
 			setAttrFuncTable [i] = &AnsiAttrParser::setFont;
@@ -40,6 +48,7 @@ AnsiAttrParser::parse (
 		setAttrFuncTable [22] = &AnsiAttrParser::setBoldOff;
 		setAttrFuncTable [23] = &AnsiAttrParser::setItalicOff;
 		setAttrFuncTable [24] = &AnsiAttrParser::setUnderlineOff;
+		setAttrFuncTable [27] = &AnsiAttrParser::setInverseOff;
 
 		for (size_t i = 30; i < 38; i++)
 			setAttrFuncTable [i] = &AnsiAttrParser::setTextColor;
@@ -62,6 +71,8 @@ AnsiAttrParser::parse (
 
 	m_targetAttr = targetAttr;
 	m_baseAttr = baseAttr;
+	m_textColor = &m_targetAttr->m_foreColor;
+	m_backColor = &m_targetAttr->m_backColor;
 
 	size_t attrCount = 0;
 
@@ -101,6 +112,29 @@ AnsiAttrParser::parse (
 		*targetAttr = baseAttr;
 
 	return attrCount;
+}
+
+void
+AnsiAttrParser::clear (uint_t)
+{
+	*m_targetAttr = m_baseAttr;
+	m_textColor = &m_targetAttr->m_foreColor;
+	m_backColor = &m_targetAttr->m_backColor;
+}
+
+void
+AnsiAttrParser::setInverse (bool isInversed)
+{
+	if (isInversed == (m_textColor == &m_targetAttr->m_backColor))
+		return;
+	
+	uint_t c = m_targetAttr->m_foreColor;
+	m_targetAttr->m_foreColor = m_targetAttr->m_backColor;
+	m_targetAttr->m_backColor = c;
+
+	uint_t* p = m_textColor;
+	m_textColor = m_backColor;
+	m_backColor = p;
 }
 
 void
