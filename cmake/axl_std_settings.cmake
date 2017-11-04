@@ -240,7 +240,7 @@ axl_create_gcc_settings)
 		"-std=c++98" "-std=c++11" "-std=c++14" "-std=gnu++98" "-std=gnu++11" "-std=gnu++14"
 		)
 
-	if (NOT APPLE)
+	if (NOT CLANG)
 		axl_create_compiler_flag_setting (
 			GCC_FLAG_STATIC_LIBGCC
 			DESCRIPTION "Use static linkage to libgcc"
@@ -335,7 +335,10 @@ axl_create_std_settings)
 		set (LINUX TRUE)
 	endif ()
 
-	if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set (CLANG TRUE)
+		set (GCC TRUE)
+	elseif (CMAKE_COMPILER_IS_GNUCXX)
 		set (GCC TRUE)
 	endif ()
 
