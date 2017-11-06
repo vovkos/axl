@@ -71,8 +71,6 @@ printDeviceProperties (const iok::RegistryEntry& device)
 size_t
 SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 {
-	bool result;
-
 	portList->clear ();
 
 	cf::MutableDictionaryRef dict = iok::createServiceMatchingDictionary (kIOSerialBSDServiceValue);
