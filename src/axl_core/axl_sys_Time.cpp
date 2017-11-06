@@ -20,19 +20,43 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-static uint64_t g_qpcBaseTimestamp;
-static uint64_t g_qpcBaseCounter;
-static uint64_t g_qpcFrequency;
+typedef 
+void
+WINAPI 
+GetSystemTimePreciseAsFileTimeFunc (FILETIME* time);
+
+GetSystemTimePreciseAsFileTimeFunc* systemTimePreciseAsFileTime = NULL;
 
 void
-initQpc ()
+initPreciseTimestamps ()
 {
-	::GetSystemTimeAsFileTime ((FILETIME*) &g_qpcBaseTimestamp);
-	::QueryPerformanceCounter ((LARGE_INTEGER*) &g_qpcBaseCounter);
-	::QueryPerformanceFrequency ((LARGE_INTEGER*) &g_qpcFrequency);
+	HMODULE kernel32 = ::GetModuleHandleW (L"kernel32.dll");
+	ASSERT (kernel32);
+
+	systemTimePreciseAsFileTime = (GetSystemTimePreciseAsFileTimeFunc*) ::GetProcAddress (kernel32, "GetSystemTimePreciseAsFileTime");
+	if (!systemTimePreciseAsFileTime)
+		systemTimePreciseAsFileTime = ::GetSystemTimeAsFileTime;
+}
+
+#elif (_AXL_OS_DARWIN)
+
+void
+initPreciseTimestamps ()
+{
+	// need to experiment with mach_absolute_time/mach_timebase_info and clock_get_time/host_get_clock_service
+}
+
+#else
+
+void
+initPreciseTimestamps ()
+{
+	// nothing to do here
 }
 
 #endif
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint64_t
 getTimestamp ()
@@ -62,10 +86,10 @@ getTimestamp ()
 uint64_t
 getPreciseTimestamp ()
 {
+	uint64_t timestamp;
+
 #if (_AXL_OS_WIN)
-	uint64_t counter;
-	::QueryPerformanceCounter ((LARGE_INTEGER*) &counter);
-	return g_qpcBaseTimestamp + (uint64_t) ((double) (counter - g_qpcBaseCounter) * 10000000 / g_qpcFrequency);
+	systemTimePreciseAsFileTime ((FILETIME*) &timestamp);
 #elif (_AXL_OS_POSIX)
 	timespec tspec;
 #	if (_AXL_OS_DARWIN)
@@ -76,8 +100,10 @@ getPreciseTimestamp ()
 #	else
 	clock_gettime (CLOCK_REALTIME, &tspec);
 #	endif
-	return (uint64_t) (tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
+	timestamp = (uint64_t) (tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
 #endif
+
+	return timestamp;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

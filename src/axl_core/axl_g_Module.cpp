@@ -17,7 +17,7 @@ namespace axl {
 namespace sys {
 
 void
-initQpc ();
+initPreciseTimestamps ();
 
 } // namespace sys
 
@@ -55,13 +55,13 @@ Module::Module ()
 	m_systemInfo.m_pageSize           = systemInfo.dwPageSize;
 	m_systemInfo.m_mappingAlignFactor = systemInfo.dwAllocationGranularity;
 
-	sys::initQpc ();
-
 #elif (_AXL_OS_POSIX)
 	m_systemInfo.m_processorCount     = sysconf (_SC_NPROCESSORS_ONLN);
 	m_systemInfo.m_pageSize           = sysconf (_SC_PAGE_SIZE);
 	m_systemInfo.m_mappingAlignFactor = sysconf (_SC_PAGE_SIZE);
 #endif
+
+	sys::initPreciseTimestamps ();
 }
 
 Module::~Module ()
