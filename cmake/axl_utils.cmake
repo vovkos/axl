@@ -839,7 +839,10 @@ axl_set_pch
 	)
 	if (MSVC AND MSVC_USE_PCH)
 		axl_set_pch_msvc (${_TARGET} ${_PCH_H} ${_PCH_CPP} ${ARGN})
-	elseif (GCC AND GCC_USE_PCH)
+	elseif (GCC AND GCC_USE_PCH AND NOT CMAKE_GENERATOR MATCHES "Xcode")
+		# Xcode adds a lot of compiler flags on its own, so it's hard to create
+		# a proper command line by hand
+
 		axl_set_pch_gcc (${_TARGET} ${_PCH_CPP} ${ARGN})
 	endif ()
 endmacro ()
