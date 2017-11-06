@@ -2186,36 +2186,39 @@ testTimestamps ()
 	uint64_t ts1 = sys::getTimestamp ();
 	uint64_t ts2 = sys::getPreciseTimestamp ();
 
-	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
-	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
+	printf ("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
+	printf ("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
 
 	uint64_t t0 = sys::getPreciseTimestamp ();
 
-	for (size_t i = 0; i < 1000000; i++)
+	size_t n = 10000000;
+
+	for (size_t i = 0; i < n; i++)
 	{
 		sys::getTimestamp ();
 	}
 
 	uint64_t t2 = sys::getPreciseTimestamp ();
-	uint64_t d1 = t2 - t0;
-	printf ("time1 = %s\n", sys::Time (d1, 0).format ("%h:%m:%s.%l.%c").sz ());
+	uint64_t d = t2 - t0;
+	printf ("time (ts1) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
 
 	t0 = sys::getPreciseTimestamp ();
 
-	for (size_t i = 0; i < 1000000; i++)
+	for (size_t i = 0; i < n; i++)
 	{
 		sys::getPreciseTimestamp ();
 	}
 
 	t2 = sys::getPreciseTimestamp ();
-	uint64_t d2 = t2 - t0;
-	printf ("time2 = %s\n", sys::Time (d2, 0).format ("%h:%m:%s.%l.%c").sz ());
+	d = t2 - t0;
+	printf ("time (ts2) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
 
 	ts1 = sys::getTimestamp ();
 	ts2 = sys::getPreciseTimestamp ();
 
-	printf ("time0.1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
-	printf ("time0.2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
+	printf ("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
+	printf ("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
+
 }
 
 //..............................................................................
@@ -3307,7 +3310,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testRegex ();
+	testTimestamps ();
 
 	return 0;
 }

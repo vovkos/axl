@@ -13,6 +13,8 @@
 #include "axl_sys_Time.h"
 #include "axl_sl_CallOnce.h"
 
+// #define _AXL_SYS_USE_MACH_ABSOULTE_TIME 1
+
 namespace axl {
 namespace sys {
 
@@ -25,7 +27,7 @@ void
 WINAPI 
 GetSystemTimePreciseAsFileTimeFunc (FILETIME* time);
 
-GetSystemTimePreciseAsFileTimeFunc* systemTimePreciseAsFileTime = NULL;
+static GetSystemTimePreciseAsFileTimeFunc* systemTimePreciseAsFileTime = NULL;
 
 void
 initPreciseTimestamps ()
@@ -38,12 +40,18 @@ initPreciseTimestamps ()
 		systemTimePreciseAsFileTime = ::GetSystemTimeAsFileTime;
 }
 
-#elif (_AXL_OS_DARWIN)
+#elif (_AXL_OS_DARWIN && _AXL_SYS_USE_MACH_ABSOULTE_TIME)
+
+static uint64_t g_machBaseTimestamp = 0;
+static uint64_t g_machBaseAbsoluteTime = 0;
+static mach_timebase_info_data_t g_machTimeBaseInfo = { 0 };
 
 void
 initPreciseTimestamps ()
 {
-	// need to experiment with mach_absolute_time/mach_timebase_info and clock_get_time/host_get_clock_service
+	mach_timebase_info (&g_machTimeBaseInfo);
+	g_machBaseTimestamp = sys::getTimestamp ();
+	g_machBaseAbsoluteTime = mach_absolute_time ();
 }
 
 #else
@@ -51,7 +59,6 @@ initPreciseTimestamps ()
 void
 initPreciseTimestamps ()
 {
-	// nothing to do here
 }
 
 #endif
@@ -65,14 +72,13 @@ getTimestamp ()
 
 #if (_AXL_OS_WIN)
 	::GetSystemTimeAsFileTime ((FILETIME*) &timestamp);
-#elif (_AXL_OS_POSIX)
-	timespec tspec;
-#	if (_AXL_OS_DARWIN)
+#elif (_AXL_OS_DARWIN)
 	timeval tval;
 	gettimeofday (&tval, NULL);
-	tspec.tv_sec = tval.tv_sec;
-	tspec.tv_nsec = tval.tv_usec * 1000;
-#	elif (defined CLOCK_REALTIME_COARSE)
+	timestamp = (uint64_t) (tval.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tval.tv_usec * 10;
+#else
+	timespec tspec;
+#	if (defined CLOCK_REALTIME_COARSE)
 	clock_gettime (CLOCK_REALTIME_COARSE, &tspec);
 #	else
 	clock_gettime (CLOCK_REALTIME, &tspec);
@@ -90,16 +96,18 @@ getPreciseTimestamp ()
 
 #if (_AXL_OS_WIN)
 	systemTimePreciseAsFileTime ((FILETIME*) &timestamp);
-#elif (_AXL_OS_POSIX)
-	timespec tspec;
-#	if (_AXL_OS_DARWIN)
+#elif (_AXL_OS_DARWIN)
+#	if (_AXL_SYS_USE_MACH_ABSOULTE_TIME)
+	uint64_t elapsed = mach_absolute_time () - g_machBaseAbsoluteTime;
+	timestamp = g_machBaseTimestamp + elapsed * g_machTimeBaseInfo.numer / g_machTimeBaseInfo.denom / 100;
+#	else
 	timeval tval;
 	gettimeofday (&tval, NULL);
-	tspec.tv_sec = tval.tv_sec;
-	tspec.tv_nsec = tval.tv_usec * 1000;
-#	else
-	clock_gettime (CLOCK_REALTIME, &tspec);
+	timestamp = (uint64_t) (tval.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tval.tv_usec * 10;
 #	endif
+#else
+	timespec tspec;
+	clock_gettime (CLOCK_REALTIME, &tspec);
 	timestamp = (uint64_t) (tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
 #endif
 
