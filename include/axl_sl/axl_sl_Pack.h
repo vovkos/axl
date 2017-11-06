@@ -62,7 +62,7 @@ public:
 		*size = sizeof (T);
 
 		if (p)
-			*(T*) p = (T) va.arg <int> ();
+			*(T*) p = (T) n;
 
 		return va;
 	}
