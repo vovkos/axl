@@ -32,7 +32,7 @@ Rsa::readPrivateKey (BIO* bio)
 {
 	close ();
 
-	bool result = PEM_read_bio_RSA_PUBKEY (bio, &m_h, 0, NULL) != NULL;
+	bool result = PEM_read_bio_RSAPrivateKey (bio, &m_h, 0, NULL) != NULL;
 	return completeWithLastCryptoError (result);
 }
 

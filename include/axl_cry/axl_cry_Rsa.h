@@ -14,6 +14,7 @@
 #define _AXL_CRY_RSA_H
 
 #include "axl_cry_Bio.h"
+#include "axl_cry_CryptoError.h"
 
 namespace axl {
 namespace cry {
@@ -69,6 +70,54 @@ public:
 	{
 		Bio bio;
 		return bio.create (pem, size) && readPrivateKey (bio);
+	}
+
+	size_t
+	publicEncrypt (
+		void* dst,
+		const void* src,
+		size_t size,
+		int padding = RSA_PKCS1_PADDING
+		)
+	{
+		int result = RSA_public_encrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
+		return completeWithLastCryptoError <size_t> (result, -1);
+	}
+
+	size_t
+	privateEncrypt (
+		void* dst,
+		const void* src,
+		size_t size,
+		int padding = RSA_PKCS1_PADDING
+		)
+	{
+		int result = RSA_private_encrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
+		return completeWithLastCryptoError <size_t> (result, -1);
+	}
+
+	size_t
+	publicDecrypt (
+		void* dst,
+		const void* src,
+		size_t size,
+		int padding = RSA_PKCS1_PADDING
+		)
+	{
+		int result = RSA_public_decrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
+		return completeWithLastCryptoError <size_t> (result, -1);
+	}
+
+	size_t
+	privateDecrypt (
+		void* dst,
+		const void* src,
+		size_t size,
+		int padding = RSA_PKCS1_PADDING
+		)
+	{
+		int result = RSA_private_decrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
+		return completeWithLastCryptoError <size_t> (result, -1);
 	}
 
 	size_t

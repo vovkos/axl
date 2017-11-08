@@ -21,6 +21,7 @@ set (
 	${AXL_INC_DIR}/axl_cry/axl_cry_EcKey.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_EcPoint.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Rsa.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_Aes.h
 	)
 
 set (
