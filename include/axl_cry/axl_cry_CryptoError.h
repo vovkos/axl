@@ -85,6 +85,20 @@ setLastCryptoError ()
 	return result;
 }
 
+template <typename T>
+T
+completeWithCryptoError (
+	T result,
+	T failResult,
+	int errorCode
+	)
+{
+	if (result == failResult)
+		setCryptoError (errorCode);
+
+	return result;
+}
+
 inline
 bool
 completeWithCryptoError (
@@ -92,20 +106,28 @@ completeWithCryptoError (
 	int errorCode
 	)
 {
-	if (!result)
-		setCryptoError (errorCode);
-
-	return result != 0;
+	return completeWithCryptoError <bool> (result != 0, false, errorCode);
 }
+
+template <typename T>
+T
+completeWithLastCryptoError (
+	T result,
+	T failResult
+	)
+{
+	if (result == failResult)
+		setLastCryptoError ();
+
+	return result;
+}
+
 
 inline
 bool
 completeWithLastCryptoError (int result)
 {
-	if (!result)
-		setLastCryptoError ();
-
-	return result != 0;
+	return completeWithLastCryptoError <bool> (result != 0, false);
 }
 
 //..............................................................................
