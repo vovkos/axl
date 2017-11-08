@@ -680,6 +680,16 @@ completeWithSystemError (
 	return result;
 }
 
+inline
+bool
+completeWithSystemError (
+	int result,
+	uint_t errorCode
+	)
+{
+	return completeWithSystemError <bool> (result != 0, false, errorCode);
+}
+
 template <typename T>
 T
 complete (
