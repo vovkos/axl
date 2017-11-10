@@ -632,6 +632,21 @@ axl_apply_compiler_flag
 	set (${_RESULT} ${_FLAGS})
 endmacro ()
 
+macro (
+axl_apply_compiler_flag_setting_to_list
+	_SETTING
+	# ... _FLAG_LIST
+	)
+
+	set (_FLAG_LIST ${ARGN})
+
+	axl_create_compiler_flag_setting_regex (_REGEX ${_SETTING})
+
+	foreach (_FLAG ${_FLAG_LIST})
+		axl_apply_compiler_flag (${_FLAG} ${_REGEX} ${${_SETTING}})
+	endforeach ()
+endmacro ()
+
 #...............................................................................
 
 # precompiled headers

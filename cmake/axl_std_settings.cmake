@@ -191,6 +191,12 @@ axl_create_msvc_settings)
 		DEFAULT "/IGNORE:4221"
 		" " "/IGNORE:4221"
 		)
+
+	option (
+		MSVC_LINK_DEBUG_INFO_RELEASE
+		"Generate linker debug information in Release builds"
+		ON
+		)
 endmacro ()
 
 macro (
@@ -201,14 +207,30 @@ axl_apply_msvc_settings)
 		USE_FOLDERS ${MSVC_USE_FOLDERS}
 		)
 
-	if (${MSVC_USE_UNICODE})
+	if (MSVC_USE_UNICODE)
 		add_definitions (-DUNICODE -D_UNICODE)
 	endif ()
 
-	axl_create_compiler_flag_setting_regex (_REGEX MSVC_LINK_FLAG_IGNORE4221)
-	axl_apply_compiler_flag (CMAKE_EXE_LINKER_FLAGS ${_REGEX} ${MSVC_LINK_FLAG_IGNORE4221})
-	axl_apply_compiler_flag (CMAKE_SHARED_LINKER_FLAGS ${_REGEX} ${MSVC_LINK_FLAG_IGNORE4221})
-	axl_apply_compiler_flag (CMAKE_STATIC_LINKER_FLAGS ${_REGEX} ${MSVC_LINK_FLAG_IGNORE4221})
+	if (MSVC_LINK_DEBUG_INFO_RELEASE)
+		# lift the proper link flag set from WDK which keeps a good balance between
+		# having enough debug info and keeping the size of a resulting binary small
+
+		set (
+			_RELEASE_DEBUG_FLAGS
+			"/OPT:REF,ICF /DEBUG /DEBUGTYPE:CV,FIXUP,PDATA"
+			)
+
+		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${_RELEASE_DEBUG_FLAGS}")
+		set (CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${_RELEASE_DEBUG_FLAGS}")
+	endif ()
+
+	axl_apply_compiler_flag_setting_to_list (
+		MSVC_LINK_FLAG_IGNORE4221
+		CMAKE_EXE_LINKER_FLAGS
+		CMAKE_MODULE_LINKER_FLAGS
+		CMAKE_SHARED_LINKER_FLAGS
+		CMAKE_STATIC_LINKER_FLAGS
+		)
 endmacro ()
 
 #...............................................................................
