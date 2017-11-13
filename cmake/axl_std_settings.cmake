@@ -212,12 +212,11 @@ axl_apply_msvc_settings)
 	endif ()
 
 	if (MSVC_LINK_DEBUG_INFO_RELEASE)
-		# lift the proper link flag set from WDK which keeps a good balance between
-		# having enough debug info and keeping the size of a resulting binary small
+		# /DEBUG implies linking unreferenced symbols by default; undo that with /OPT:REF
 
 		set (
 			_RELEASE_DEBUG_FLAGS
-			"/OPT:REF,ICF /DEBUG /DEBUGTYPE:CV,FIXUP,PDATA"
+			"/DEBUG /OPT:REF"
 			)
 
 		set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${_RELEASE_DEBUG_FLAGS}")
