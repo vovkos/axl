@@ -159,7 +159,12 @@ public:
 	read (sl::Array <char>* buffer);
 
 	sl::Array <char>
-	read ();
+	read ()
+	{
+		sl::Array <char> buffer;
+		read (&buffer);
+		return buffer;
+	}
 };
 
 //..............................................................................
