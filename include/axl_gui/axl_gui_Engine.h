@@ -491,6 +491,10 @@ public:
 	virtual
 	void
 	hideCaret (WidgetDriver* widgetDriver) = 0;
+
+	virtual
+	void
+	processUiEvents (uint32_t timeLimit = -1) = 0;
 };
 
 //..............................................................................

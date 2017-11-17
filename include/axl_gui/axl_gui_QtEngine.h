@@ -501,6 +501,10 @@ public:
 	{
 		return m_qtCaret.isVisible ();
 	}
+
+	virtual
+	void
+	processUiEvents (uint32_t timeLimit);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

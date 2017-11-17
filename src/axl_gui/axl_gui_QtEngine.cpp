@@ -893,6 +893,14 @@ QtEngine::stopWidgetAnimation (WidgetDriver* widgetDriver)
 	qtWidget->m_animationTimer.stop ();
 }
 
+void
+QtEngine::processUiEvents (uint32_t timeLimit)
+{
+	timeLimit != -1 ?
+		qApp->processEvents (QEventLoop::AllEvents, timeLimit) :
+		qApp->processEvents (QEventLoop::AllEvents);
+}
+
 //..............................................................................
 
 } // namespace gui
