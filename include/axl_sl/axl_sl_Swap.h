@@ -23,13 +23,13 @@ namespace sl {
 template <typename T>
 void
 swap (
-	T& a,
-	T& b
+	T* a,
+	T* b
 	)
 {
-	T t = a;
-	a = b;
-	b = t;
+	T t = *a;
+	*a = *b;
+	*b = t;
 }
 
 template <typename T>
@@ -38,8 +38,8 @@ class Swap
 public:
 	void
 	operator () (
-		T& a,
-		T& b
+		T* a,
+		T* b
 		) const
 	{
 		swap (a, b);
