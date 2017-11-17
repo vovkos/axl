@@ -601,6 +601,28 @@ public:
 	}
 
 	bool
+	postThreadMsg (
+		uint_t code,
+		const void* params,
+		size_t size
+		);
+
+	bool
+	postThreadMsg (
+		uint_t code,
+		uintptr_t param
+		)
+	{
+		return m_engine->postWidgetThreadMsg (this, code, ref::Ptr <void> ((void*) param, NULL));
+	}
+
+	bool
+	postThreadMsg (uint_t code)
+	{
+		return m_engine->postWidgetThreadMsg (this, code, ref::Ptr <void> (NULL, NULL));
+	}
+
+	bool
 	startAnimation ()
 	{
 		return m_engine->startWidgetAnimation (this);

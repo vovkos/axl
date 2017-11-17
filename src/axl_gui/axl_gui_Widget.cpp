@@ -100,6 +100,25 @@ WidgetDriver::updateScrollBars (uint_t mask)
 	return true;
 }
 
+bool
+WidgetDriver::postThreadMsg (
+	uint_t code,
+	const void* p,
+	size_t size
+	)
+{
+	if (!p || !size)
+		return m_engine->postWidgetThreadMsg (this, code, ref::Ptr <void> ());
+
+	ref::RefCount* refCount = AXL_REF_NEW_EXTRA (ref::RefCount, size);
+	if (!refCount)
+		return false;
+
+	ref::Ptr <void> params (refCount + 1, refCount);
+	memcpy (params, p, size);
+	return m_engine->postWidgetThreadMsg (this, code, params);
+}
+
 void
 WidgetDriver::processMsg (
 	const WidgetMsg* msg,
