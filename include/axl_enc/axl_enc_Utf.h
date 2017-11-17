@@ -606,13 +606,12 @@ public:
 	}
 
 	static
-	void
+	size_t
 	convert (
 		DstUnit* dst,
 		size_t dstLength,
 		const SrcUnit* src,
 		size_t srcLength,
-		size_t* takenDstLength_o = NULL,
 		size_t* takenSrcLength_o = NULL,
 		size_t* expectedSrcLength_o = NULL
 		)
@@ -644,14 +643,62 @@ public:
 			src += srcCodePointLength;
 		}
 
-		if (takenDstLength_o)
-			*takenDstLength_o = dst - dst0;
+		if (takenSrcLength_o)
+			*takenSrcLength_o = src - src0;
+
+		if (expectedSrcLength_o)
+			*expectedSrcLength_o = expectedSrcLength;
+
+		return dst - dst0;
+	}
+
+	static
+	size_t
+	convert (
+		uchar_t* cpl, // src code point length table
+		DstUnit* dst,
+		size_t dstLength,
+		const SrcUnit* src,
+		size_t srcLength,
+		size_t* takenSrcLength_o = NULL,
+		size_t* expectedSrcLength_o = NULL
+		)
+	{
+		DstUnit* dst0 = dst;
+		DstUnit* dstEnd = dst + dstLength;
+		const SrcUnit* src0 = src;
+		const SrcUnit* srcEnd = src + srcLength;
+
+		size_t expectedSrcLength = 0;
+
+		while (src < srcEnd)
+		{
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*src);
+			if (src + srcCodePointLength > srcEnd)
+			{
+				expectedSrcLength = srcCodePointLength;
+				break;
+			}
+
+			utf32_t x = CaseOp () (SrcEncoding::decodeCodePoint (src));
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
+			if (dst + dstCodePointLength > dstEnd)
+				break;
+
+			DstEncoding::encodeCodePoint (dst, x);
+			*cpl++ = (uchar_t) srcCodePointLength;
+
+			dst += dstCodePointLength;
+			src += srcCodePointLength;
+		}
 
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
 
 		if (expectedSrcLength_o)
 			*expectedSrcLength_o = expectedSrcLength;
+
+		return dst - dst0;
 	}
 };
 
@@ -692,13 +739,12 @@ public:
 	}
 
 	static
-	void
+	size_t
 	convert (
 		char* dst,
 		size_t dstLength,
 		const SrcUnit* src,
 		size_t srcLength,
-		size_t* takenDstLength_o = NULL,
 		size_t* takenSrcLength_o = NULL,
 		size_t* expectedSrcLength_o = NULL
 		)
@@ -726,15 +772,13 @@ public:
 			src += srcCodePointLength;
 		}
 
-		if (takenDstLength_o)
-			*takenDstLength_o = dst - dst0;
-
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
 
 		if (expectedSrcLength_o)
 			*expectedSrcLength_o = expectedSrcLength;
 
+		return dst - dst0;
 	}
 };
 
@@ -775,13 +819,12 @@ public:
 	}
 
 	static
-	void
+	size_t
 	convert (
 		DstUnit* dst,
 		size_t dstLength,
 		const char* src,
 		size_t srcLength,
-		size_t* takenDstLength_o = NULL,
 		size_t* takenSrcLength_o = NULL,
 		size_t* expectedSrcLength_o = NULL
 		)
@@ -805,14 +848,54 @@ public:
 			src++;
 		}
 
-		if (takenDstLength_o)
-			*takenDstLength_o = dst - dst0;
+		if (takenSrcLength_o)
+			*takenSrcLength_o = src - src0;
+
+		if (expectedSrcLength_o)
+			*expectedSrcLength_o = 0;
+
+		return dst - dst0;
+	}
+
+	static
+	size_t
+	convert (
+		uchar_t* cpl,
+		DstUnit* dst,
+		size_t dstLength,
+		const char* src,
+		size_t srcLength,
+		size_t* takenSrcLength_o = NULL,
+		size_t* expectedSrcLength_o = NULL
+		)
+	{
+		DstUnit* dst0 = dst;
+		DstUnit* dstEnd = dst + dstLength;
+		const char* src0 = src;
+		const char* srcEnd = src + srcLength;
+
+		while (src < srcEnd)
+		{
+			utf32_t x = CaseOp () ((uchar_t) *src); // don't propagate sign bit
+
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
+			if (dst + dstCodePointLength > dstEnd)
+				break;
+
+			DstEncoding::encodeCodePoint (dst, x);
+			*cpl++ = 1;
+
+			dst += dstCodePointLength;
+			src++;
+		}
 
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
 
 		if (expectedSrcLength_o)
 			*expectedSrcLength_o = 0;
+
+		return dst - dst0;
 	}
 };
 

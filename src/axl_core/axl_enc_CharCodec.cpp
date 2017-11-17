@@ -59,10 +59,9 @@ CharCodec::encodeFromUtf8 (
 	{
 		char tmpBuffer [256];
 
-		size_t takenBufferSize;
 		size_t takenLength;
 
-		encodeFromUtf8 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		size_t takenBufferSize = encodeFromUtf8 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -93,10 +92,9 @@ CharCodec::encodeFromUtf16 (
 	{
 		char tmpBuffer [256];
 
-		size_t takenBufferSize;
 		size_t takenLength;
 
-		encodeFromUtf16 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		size_t takenBufferSize = encodeFromUtf16 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -127,10 +125,9 @@ CharCodec::encodeFromUtf32 (
 	{
 		char tmpBuffer [256];
 
-		size_t takenBufferSize;
 		size_t takenLength;
 
-		encodeFromUtf32 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
+		size_t takenBufferSize = encodeFromUtf32 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -334,106 +331,246 @@ void
 CodePointDecoder::loadState (uint32_t state)
 {
 	*((uint32_t*) m_accumulator) = state;
-	m_accumulatorCurrentSize = (state & 0x0f000000) >> 24;
-	m_accumulatorExpectedSize = (state & 0xf0000000) >> 28;
-
-	ASSERT (m_accumulatorCurrentSize <= 3 && m_accumulatorExpectedSize <= 4);
+	m_accumulatorCount = (state & 0x03000000) >> 24;
 }
 
 uint32_t
 CodePointDecoder::saveState ()
 {
 	uint32_t state = *((const uint32_t*) m_accumulator) & 0x00ffffff;
-	state |= (m_accumulatorCurrentSize & 0x0f) << 24;
-	state |= (m_accumulatorExpectedSize & 0x0f) << 28;
-
+	state |= (m_accumulatorCount & 0x03) << 24;
 	return state;
 }
 
 size_t
 CodePointDecoder::decode (
-	utf32_t* codePoint,
+	utf32_t* buffer,
+	size_t bufferLength,
 	const void* p,
-	size_t size
+	size_t size,
+	size_t* takenSize_o
 	)
 {
-	size_t unitSize = m_charCodec->getUnitSize ();
-	ASSERT (unitSize <= sizeof (m_accumulator));
-
 	size_t takenBufferLength;
 	size_t takenSize;
-	size_t expectedSize;
 
-	if (m_accumulatorExpectedSize)
+	if (!m_accumulatorCount)
 	{
-		size_t accumulatorMissingSize = m_accumulatorExpectedSize - m_accumulatorCurrentSize;
+		takenBufferLength = decodeImpl (buffer, bufferLength, p, size, &takenSize);
 
-		if (size < accumulatorMissingSize) // not yet
-		{
-			memcpy (m_accumulator + m_accumulatorCurrentSize, p, size);
-			m_accumulatorCurrentSize += size;
-			return -1;
-		}
+		if (takenSize_o)
+			*takenSize_o = takenSize;
 
-		memcpy (m_accumulator + m_accumulatorCurrentSize, p, accumulatorMissingSize);
-
-		m_charCodec->decodeToUtf32 (
-			codePoint,
-			1,
-			m_accumulator,
-			m_accumulatorExpectedSize,
-			&takenBufferLength,
-			&takenSize,
-			&expectedSize
-			);
-
-		if (!takenBufferLength) // still not yet (rare, but might actually happen with UTF-16)
-		{
-			ASSERT (
-				m_accumulatorCurrentSize == 1 &&
-				m_accumulatorExpectedSize == 2 &&
-				expectedSize == 4
-				);
-
-			m_accumulatorCurrentSize += accumulatorMissingSize;
-			m_accumulatorExpectedSize = expectedSize;
-			return -1;
-		}
-
-		m_accumulatorExpectedSize = 0;
-		m_accumulatorCurrentSize = 0;
-		return accumulatorMissingSize;
+		return takenBufferLength;
 	}
 
-	if (size < unitSize) // wait for the whole unit
-	{
-		memcpy (m_accumulator, p, size);
-		m_accumulatorCurrentSize = size;
-		m_accumulatorExpectedSize = unitSize;
-		return -1;
-	}
+	ASSERT (m_accumulatorCount < sizeof (m_accumulator));
 
-	m_charCodec->decodeToUtf32 (
-		codePoint,
+	size_t accumulatorLeftoverSize = sizeof (m_accumulator) - m_accumulatorCount;
+	size_t copySize = AXL_MIN (size, accumulatorLeftoverSize);
+
+	memcpy (m_accumulator + m_accumulatorCount, p, copySize);
+
+	takenBufferLength = m_charCodec->decodeToUtf32 (
+		buffer,
 		1,
-		p,
-		size,
-		&takenBufferLength,
-		&takenSize,
-		&expectedSize
+		m_accumulator,
+		m_accumulatorCount + copySize,
+		&takenSize
 		);
 
 	if (!takenBufferLength)
 	{
-		ASSERT (!takenSize && size < expectedSize);
+		ASSERT (takenSize == 0);
+		m_accumulatorCount += copySize;
 
-		memcpy (m_accumulator, p, size);
-		m_accumulatorCurrentSize = size;
-		m_accumulatorExpectedSize = expectedSize;
-		return -1;
+		if (takenSize_o)
+			*takenSize_o = size;
+
+		return 0;
 	}
 
-	return takenSize;
+	ASSERT (takenBufferLength == 1 && takenSize > m_accumulatorCount);
+	
+	takenSize -= m_accumulatorCount;
+	m_accumulatorCount = 0;
+
+	if (takenSize < size)
+	{
+		size_t takenSize2;
+		takenBufferLength += decodeImpl (
+			buffer + 1,
+			bufferLength - 1,
+			(char*) p + takenSize,
+			size - takenSize,
+			&takenSize2
+			);
+
+		takenSize += takenSize2;
+	}
+
+	if (takenSize_o)
+		*takenSize_o = takenSize;
+
+	return takenBufferLength;
+}
+
+size_t
+CodePointDecoder::decode (
+	uchar_t* cplBuffer,
+	utf32_t* textBuffer,
+	size_t bufferLength,
+	const void* p,
+	size_t size,
+	size_t* takenSize_o
+	)
+{
+	size_t takenBufferLength;
+	size_t takenSize;
+
+	if (!m_accumulatorCount)
+	{
+		takenBufferLength = decodeImpl (cplBuffer, textBuffer, bufferLength, p, size, &takenSize);
+
+		if (takenSize_o)
+			*takenSize_o = takenSize;
+
+		return takenBufferLength;
+	}
+
+	ASSERT (m_accumulatorCount < sizeof (m_accumulator));
+
+	size_t accumulatorLeftoverSize = sizeof (m_accumulator) - m_accumulatorCount;
+	size_t copySize = AXL_MIN (size, accumulatorLeftoverSize);
+
+	memcpy (m_accumulator + m_accumulatorCount, p, copySize);
+
+	takenBufferLength = m_charCodec->decodeToUtf32 (
+		cplBuffer,
+		textBuffer,
+		1,
+		m_accumulator,
+		m_accumulatorCount + copySize,
+		&takenSize
+		);
+
+	if (!takenBufferLength)
+	{
+		ASSERT (takenSize == 0);
+		m_accumulatorCount += copySize;
+
+		if (takenSize_o)
+			*takenSize_o = size;
+
+		return 0;
+	}
+
+	ASSERT (takenBufferLength == 1 && takenSize > m_accumulatorCount);
+	
+	takenSize -= m_accumulatorCount;
+	m_accumulatorCount = 0;
+
+	if (takenSize < size)
+	{
+		size_t takenSize2;
+		takenBufferLength += decodeImpl (
+			cplBuffer + 1,
+			textBuffer + 1,
+			bufferLength - 1,
+			(char*) p + takenSize,
+			size - takenSize,
+			&takenSize2
+			);
+
+		takenSize += takenSize2;
+	}
+
+	if (takenSize_o)
+		*takenSize_o = takenSize;
+
+	return takenBufferLength;
+}
+
+size_t
+CodePointDecoder::decodeImpl (
+	utf32_t* buffer,
+	size_t bufferLength,
+	const void* p,
+	size_t size,
+	size_t* takenSize_o
+	)
+{
+	ASSERT (takenSize_o);
+
+	size_t takenSize;
+	size_t expectedSize;
+
+	size_t takenBufferLength = m_charCodec->decodeToUtf32 (
+		buffer,
+		bufferLength,
+		p,
+		size,
+		&takenSize,
+		&expectedSize
+		);
+
+	if (expectedSize)
+	{
+		ASSERT (
+			takenSize < size &&
+			takenSize + expectedSize > size &&
+			size - takenSize < sizeof (m_accumulator)
+			);
+
+		m_accumulatorCount = size - takenSize;
+		memcpy (m_accumulator, (char*) p + takenSize, m_accumulatorCount);
+		takenSize += m_accumulatorCount;
+	}
+
+	*takenSize_o = takenSize;
+	return takenBufferLength;
+}
+
+size_t
+CodePointDecoder::decodeImpl (
+	uchar_t* cplBuffer,
+	utf32_t* textBuffer,
+	size_t bufferLength,
+	const void* p,
+	size_t size,
+	size_t* takenSize_o
+	)
+{
+	ASSERT (takenSize_o);
+
+	size_t takenSize;
+	size_t expectedSize;
+
+	size_t takenBufferLength = m_charCodec->decodeToUtf32 (
+		cplBuffer,
+		textBuffer,
+		bufferLength,
+		p,
+		size,
+		&takenSize,
+		&expectedSize
+		);
+
+	if (expectedSize)
+	{
+		ASSERT (
+			takenSize < size &&
+			takenSize + expectedSize > size &&
+			size - takenSize < sizeof (m_accumulator)
+			);
+
+		m_accumulatorCount = size - takenSize;
+		memcpy (m_accumulator, (char*) p + takenSize, m_accumulatorCount);
+		takenSize += m_accumulatorCount;
+	}
+
+	*takenSize_o = takenSize;
+	return takenBufferLength;
 }
 
 //..............................................................................
