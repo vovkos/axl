@@ -229,14 +229,6 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 
 //..............................................................................
 
-sl::Array <char>
-SharedMemoryReader::read ()
-{
-	sl::Array <char> buffer;
-	read (&buffer);
-	return buffer;
-}
-
 size_t
 SharedMemoryReader::read (sl::Array <char>* buffer)
 {

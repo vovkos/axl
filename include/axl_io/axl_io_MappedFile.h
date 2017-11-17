@@ -95,7 +95,7 @@ public:
 	enum DefaultsKind
 	{
 		DefaultsKind_MaxDynamicViewCount = 32,
-		DefaultsKind_ReadAheadSize       = 16 * 1024,
+		DefaultsKind_ReadAheadSize       = 64 * 1024, // 64K
 	};
 
 protected:
