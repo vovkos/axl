@@ -24,6 +24,12 @@ namespace gui {
 class TextPainter
 {
 protected:
+	enum Def
+	{
+		Def_BinTextDecodeBufferLength = 2 * 1024, // 8K
+	};
+
+protected:
 	TextAttrAnchorArray m_selOverlayBuffer;
 	sl::String m_stringBuffer;
 	sl::Array <utf32_t> m_binTextBuffer;

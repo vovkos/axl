@@ -458,19 +458,15 @@ TextPainter::buildBinTextBuffer (
 	const char* p = (const char*) p0;
 	const char* end = p + bufferSize;
 
+	AXL_TODO ("do a whole buffer decode rather than codepoint-after-codepoint")
+
 	while (i < dataSize && p < end)
 	{
 		utf32_t codePoint;
-		size_t takenBufferLength = 0;
-		size_t takenSize = 0;
-		size_t expectedSize;
-
+		size_t takenSize;
 		size_t leftover = end - p;
-		if (leftover < unitSize)
-			expectedSize = unitSize;
-		else
-			codec->decodeToUtf32 (&codePoint, 1, p, leftover, &takenBufferLength, &takenSize, &expectedSize);
 
+		codec->decodeToUtf32 (&codePoint, 1, p, leftover, &takenSize);
 		if (!takenSize)
 		{
 			size_t end = i + leftover;
