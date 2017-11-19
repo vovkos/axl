@@ -762,7 +762,12 @@ protected:
 	CharCodec* m_charCodec;
 
 	size_t m_accumulatorCount;
-	char m_accumulator [4];
+
+	union
+	{
+		char m_accumulator [4];
+		uint32_t m_accumulator_i32;
+	};
 
 public:
 	CodePointDecoder (
@@ -777,6 +782,24 @@ public:
 	getCharCodec ()
 	{
 		return m_charCodec;
+	}
+
+	size_t
+	getAccumulatorCount ()
+	{
+		return m_accumulatorCount;
+	}
+
+	const char*
+	getAccumulator ()
+	{
+		return m_accumulator;
+	}
+
+	uint32_t
+	getAccumulator_i32 ()
+	{
+		return m_accumulator_i32;
 	}
 
 	void
@@ -799,16 +822,16 @@ public:
 	}
 
 	void
-	resetAccumulator ()
-	{
-		m_accumulatorCount = 0;
-	}
-
-	void
 	clear ()
 	{
 		m_charCodec = NULL;
 		resetAccumulator ();
+	}
+
+	void
+	resetAccumulator ()
+	{
+		m_accumulatorCount = 0;
 	}
 
 	void
