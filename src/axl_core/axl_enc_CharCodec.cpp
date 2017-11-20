@@ -60,7 +60,6 @@ CharCodec::encodeFromUtf8 (
 		char tmpBuffer [256];
 
 		size_t takenLength;
-
 		size_t takenBufferSize = encodeFromUtf8 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
@@ -93,7 +92,6 @@ CharCodec::encodeFromUtf16 (
 		char tmpBuffer [256];
 
 		size_t takenLength;
-
 		size_t takenBufferSize = encodeFromUtf16 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
@@ -126,7 +124,6 @@ CharCodec::encodeFromUtf32 (
 		char tmpBuffer [256];
 
 		size_t takenLength;
-
 		size_t takenBufferSize = encodeFromUtf32 (tmpBuffer, sizeof (tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
@@ -199,18 +196,16 @@ CharCodec::decodeToUtf8 (
 	{
 		utf8_t tmpBuffer [256];
 
-		size_t takenBufferSize;
-		size_t takenLength;
-
-		decodeToUtf8 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
-		if (!takenLength)
+		size_t takenSize;
+		size_t takenBufferLength = decodeToUtf8 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenSize);
+		if (!takenBufferLength)
 			break;
 
-		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		result = buffer->append (tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
-		p += takenLength;
+		p += takenSize;
 	}
 
 	return buffer->getCount ();
@@ -237,18 +232,16 @@ CharCodec::decodeToUtf16 (
 	{
 		utf16_t tmpBuffer [256];
 
-		size_t takenBufferSize;
-		size_t takenLength;
-
-		decodeToUtf16 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
-		if (!takenLength)
+		size_t takenSize;
+		size_t takenBufferLength = decodeToUtf16 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenSize);
+		if (!takenBufferLength)
 			break;
 
-		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		result = buffer->append (tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
-		p += takenLength;
+		p += takenSize;
 	}
 
 	return buffer->getCount ();
@@ -275,18 +268,16 @@ CharCodec::decodeToUtf32 (
 	{
 		utf32_t tmpBuffer [256];
 
-		size_t takenBufferSize;
-		size_t takenLength;
-
-		decodeToUtf32 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenBufferSize, &takenLength);
-		if (!takenLength)
+		size_t takenSize;
+		size_t takenBufferLength = decodeToUtf32 (tmpBuffer, countof (tmpBuffer), p, end - p, &takenSize);
+		if (!takenBufferLength)
 			break;
 
-		result = buffer->append (tmpBuffer, takenBufferSize) != -1;
+		result = buffer->append (tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
-		p += takenLength;
+		p += takenSize;
 	}
 
 	return buffer->getCount ();
