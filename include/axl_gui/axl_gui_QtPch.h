@@ -27,4 +27,5 @@
 #include <QPixmap>
 #include <QScrollBar>
 #include <QWidget>
+#include <QToolTip>
 #include <QTimer>

@@ -61,6 +61,9 @@ private slots:
 	void
 	threadMsgSlot (WidgetThreadMsg* msg);
 
+	void
+	toolTipTimerSlot ();
+
 signals:
 	void
 	threadMsgSignal (WidgetThreadMsg* msg);

@@ -1,4 +1,4 @@
-//..............................................................................
+sho//..............................................................................
 //
 //  This file is part of the AXL library.
 //
@@ -38,6 +38,8 @@ QtEngine::QtEngine ():
 	m_qtClipboardMimeData = NULL;
 	memset (m_stdFontTupleArray, 0, sizeof (m_stdFontTupleArray));
 	memset (m_stdCursorArray, 0, sizeof (m_stdCursorArray));
+
+	m_toolTipTimer.setSingleShot (true);
 
 	updateStdPalette ();
 }
@@ -891,6 +893,53 @@ QtEngine::stopWidgetAnimation (WidgetDriver* widgetDriver)
 	ASSERT (widgetDriver->getEngine () == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
 	qtWidget->m_animationTimer.stop ();
+}
+
+bool
+QtEngine::scheduleToolTipMsg (
+	WidgetDriver* widgetDriver,
+	uint_t timeout
+	)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+
+	m_toolTipTimer.stop ();
+	m_toolTipTimer.disconnect ();
+	
+	QObject::connect (
+		&m_toolTipTimer,
+		SIGNAL (timeout ()),
+		qtWidget,
+		SLOT (toolTipTimerSlot ())
+		);
+
+	m_toolTipTimer.start (timeout ? timeout : Def_ToolTipTimeout);
+	return true;
+}
+
+bool
+QtEngine::showToolTip (
+	WidgetDriver* widgetDriver,
+	int x,
+	int y,
+	const sl::StringRef& toolTip
+	)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+
+	QPoint pos = qtWidget->mapToGlobal (QPoint (x, y));
+	QString qtText = QString::fromUtf8 (toolTip.cp (), toolTip.getLength ());
+	QToolTip::showText (pos, qtText, qtWidget);
+	return true;
+}
+
+bool
+QtEngine::hideToolTip (WidgetDriver* widgetDriver)
+{
+	QToolTip::hideText ();
+	return true;
 }
 
 void

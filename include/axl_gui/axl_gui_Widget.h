@@ -50,6 +50,7 @@ enum WidgetMsgCode
 
 	WidgetMsgCode_ThreadMsg,               // WidgetThreadMsg
 	WidgetMsgCode_Animate,                 // WidgetMsg
+	WidgetMsgCode_ToolTip,                 // WidgetMouseMsg
 
 	WidgetMsgCode_Gdi,                     // WidgetGdiMsg
 	WidgetMsgCode_Qt,                      // WidgetQtMsg
@@ -559,6 +560,39 @@ public:
 	setCaretPos (const Point& point)
 	{
 		return setCaretPos (point.m_x, point.m_y);
+	}
+
+	// tooltips
+
+	bool
+	scheduleToolTipMsg (uint_t timeout = 0) // 0 -- use engine default
+	{
+		return m_engine->scheduleToolTipMsg (this, timeout);
+	}
+
+	bool
+	showToolTip (
+		int x,
+		int y,
+		const sl::StringRef& toolTip
+		)
+	{
+		return m_engine->showToolTip (this, x, y, toolTip);
+	}
+
+	bool
+	showToolTip (
+		const Point& point,
+		const sl::StringRef& toolTip
+		)
+	{
+		return m_engine->showToolTip (this, point.m_x, point.m_y, toolTip);
+	}
+
+	bool
+	hideToolTip ()
+	{
+		return m_engine->hideToolTip (this);
 	}
 
 	// scroll bars

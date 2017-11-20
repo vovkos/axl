@@ -153,6 +153,22 @@ QtWidgetBase::threadMsgSlot (WidgetThreadMsg* msg)
 }
 
 void
+QtWidgetBase::toolTipTimerSlot ()
+{
+	QPoint pos = mapFromGlobal (QCursor::pos ());
+
+	WidgetMouseMsg msg;
+	msg.m_msgCode = WidgetMsgCode_ToolTip;
+	msg.m_point.setup (pos.x (), pos.y ());
+	msg.m_buttons = getMouseButtonsFromQtButtons (QApplication::mouseButtons ());
+	msg.m_modifierKeys = getModifierKeysFromQtModifiers (QApplication::keyboardModifiers ());
+	msg.m_button = MouseButton_None;
+
+	bool isHandled = true;
+	m_widgetDriver->processMsg (&msg, &isHandled);
+}
+
+void
 QtWidgetBase::wheelEvent (QWheelEvent* e)
 {
 	if (!m_widgetDriver->checkMsgMap (WidgetMsgCode_MouseWheel))

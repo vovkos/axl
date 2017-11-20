@@ -114,10 +114,17 @@ public:
 class QtEngine: public Engine
 {
 protected:
+	enum Def
+	{
+		Def_ToolTipTimeout = 1000,
+	};
+
+protected:
 	OffscreenCanvasCache <QtCanvas> m_sharedOffscreenCanvasCache;
 	QtFontTuple* m_stdFontTupleArray [StdFontKind__Count];
 	QtCursor* m_stdCursorArray [StdCursorKind__Count];
 	QtCaret m_qtCaret;
+	QTimer m_toolTipTimer;
 
 	sl::StringHashTable <uintptr_t> m_clipboardFormatNameMap;
 	sl::Array <sl::String> m_clipboardFormatNameTable;
@@ -501,6 +508,26 @@ public:
 	{
 		return m_qtCaret.isVisible ();
 	}
+
+	virtual
+	bool
+	scheduleToolTipMsg (
+		WidgetDriver* widgetDriver,
+		uint_t timeout
+		);
+
+	virtual
+	bool
+	showToolTip (
+		WidgetDriver* widgetDriver,
+		int x,
+		int y,
+		const sl::StringRef& toolTip
+		);
+
+	virtual
+	bool
+	hideToolTip (WidgetDriver* widgetDriver);
 
 	virtual
 	void

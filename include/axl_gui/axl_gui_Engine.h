@@ -76,7 +76,6 @@ public:
 
 	// canvas
 
-
 	virtual
 	bool
 	createOffscreenCanvas (
@@ -491,6 +490,26 @@ public:
 	virtual
 	void
 	hideCaret (WidgetDriver* widgetDriver) = 0;
+
+	virtual
+	bool
+	scheduleToolTipMsg (
+		WidgetDriver* widgetDriver,
+		uint_t timeout
+		) = 0;
+
+	virtual
+	bool
+	showToolTip (
+		WidgetDriver* widgetDriver,
+		int x,
+		int y,
+		const sl::StringRef& toolTip
+		) = 0;
+
+	virtual
+	bool
+	hideToolTip (WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	void
