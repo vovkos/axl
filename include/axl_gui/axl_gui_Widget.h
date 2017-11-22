@@ -571,6 +571,12 @@ public:
 	}
 
 	bool
+	cancelToolTipMsg ()
+	{
+		return m_engine->cancelToolTipMsg (this);
+	}
+
+	bool
 	showToolTip (
 		int x,
 		int y,

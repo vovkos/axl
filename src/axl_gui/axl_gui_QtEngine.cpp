@@ -919,6 +919,23 @@ QtEngine::scheduleToolTipMsg (
 }
 
 bool
+QtEngine::cancelToolTipMsg (WidgetDriver* widgetDriver)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+
+	if (!m_toolTipTimer.isActive ())
+		return false;
+
+	bool result = m_toolTipTimer.disconnect (qtWidget);
+	if (!result)
+		return false;
+
+	m_toolTipTimer.stop ();
+	return true;
+}
+
+bool
 QtEngine::showToolTip (
 	WidgetDriver* widgetDriver,
 	int x,

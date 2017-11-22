@@ -518,6 +518,10 @@ public:
 
 	virtual
 	bool
+	cancelToolTipMsg (WidgetDriver* widgetDriver);
+
+	virtual
+	bool
 	showToolTip (
 		WidgetDriver* widgetDriver,
 		int x,
