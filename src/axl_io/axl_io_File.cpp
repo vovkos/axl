@@ -166,15 +166,18 @@ copyFile (
 	if (!result)
 		return -1;
 
-	enum
+	enum 
 	{
-		BlockSize = 32 * 1024, // 32 K
+		BaseBlockSize = 64 * 1024, // 64K
 	};
+
+	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	size_t blockSize = BaseBlockSize + systemInfo->m_mappingAlignFactor - BaseBlockSize % systemInfo->m_mappingAlignFactor;
+
+	uint64_t offset = 0;
 
 	if (size == -1)
 		size = srcFile->getSize ();
-
-	uint64_t offset = 0;
 
 #if (_AXL_OS_WIN)
 	win::Mapping srcMapping;
@@ -186,9 +189,13 @@ copyFile (
 		srcMapping.create (srcFile->m_file, NULL, PAGE_READONLY, size) &&
 		dstMapping.create (dstFile.m_file, NULL, PAGE_READWRITE, size);
 
+	if (!result)
+		return -1;
+
 	while (size)
 	{
-		size_t blockSize = (size_t) AXL_MIN (BlockSize, size);
+		if (blockSize > size)
+			blockSize = (size_t) size;
 
 		const void* src = srcView.view (srcMapping, FILE_MAP_READ, offset, blockSize);
 		void* dst = dstView.view (dstMapping, FILE_MAP_READ | FILE_MAP_WRITE, offset, blockSize);
@@ -216,7 +223,8 @@ copyFile (
 
 	while (size)
 	{
-		size_t blockSize = AXL_MIN (BlockSize, size);
+		if (blockSize > size)
+			blockSize = (size_t) size;
 
 		const void* src = srcMapping.map (NULL, blockSize, PROT_READ, MAP_SHARED, srcFile->m_file, offset);
 		void* dst = dstMapping.map (NULL, blockSize, PROT_READ | PROT_WRITE, MAP_SHARED, dstFile.m_file, offset);
