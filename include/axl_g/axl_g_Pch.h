@@ -394,12 +394,11 @@ wcslen_s (const wchar_t* p)
 #	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
 #	define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
 #
-#	if (defined (__SANITIZE_ADDRESS__))
-# 		define _AXL_GCC_ASAN 1
-#	elif (defined (__has_feature))
+#	if (defined (__has_feature))
 #		if (__has_feature (address_sanitizer))
 #	 		define _AXL_GCC_ASAN 1
 #		endif
+#	elif (defined (__SANITIZE_ADDRESS__))
 # 		define _AXL_GCC_ASAN 1
 #	endif
 #
