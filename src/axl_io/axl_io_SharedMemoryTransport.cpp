@@ -68,15 +68,15 @@ SharedMemoryTransportBase::attach (
 
 	m_file.m_file.attach (fileHandle);
 
-	result = ensureMappingSize (SharedMemoryTransportConst_DefMappingSize);
-	if (!result)
-	{
-		m_file.close ();
-		return false;
-	}
-
 	if (flags & SharedMemoryTransportFlag_Create)
 	{
+		result = initializeMapping (SharedMemoryTransportConst_DefMappingSize, true);
+		if (!result)
+		{
+			closeImpl ();
+			return false;
+		}
+
 		m_hdr->m_signature = SharedMemoryTransportConst_FileSignature;
 		m_hdr->m_lock = 0;
 		m_hdr->m_state = SharedMemoryTransportState_MasterConnected;
@@ -103,9 +103,17 @@ SharedMemoryTransportBase::attach (
 	}
 	else
 	{
+		result = initializeMapping (sizeof (SharedMemoryTransportHdr), false);
+		if (!result)
+		{
+			closeImpl ();
+			return false;
+		}
+
 		if (m_hdr->m_signature != SharedMemoryTransportConst_FileSignature)
 		{
 			err::setError (err::SystemErrorCode_InvalidParameter);
+			closeImpl ();
 			return false;
 		}
 
@@ -116,6 +124,7 @@ SharedMemoryTransportBase::attach (
 		{
 			sys::atomicUnlock (&m_hdr->m_lock);
 			err::setError (err::SystemErrorCode_InvalidDeviceState);
+			closeImpl ();
 			return false;
 		}
 
@@ -197,6 +206,45 @@ SharedMemoryTransportBase::disconnect ()
 	sys::atomicUnlock (&m_hdr->m_lock);
 }
 
+#if (_AXL_OS_POSIX)
+bool
+SharedMemoryTransportBase::initializeMapping (
+	size_t size,
+	bool isForced
+	)
+{
+	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	size_t remSize = size % systemInfo->m_pageSize;
+	if (remSize)
+		size = size - remSize + systemInfo->m_pageSize;
+
+	if (isForced)
+	{
+		bool result = m_file.setSize (size);
+		if (!result)
+			return false;
+	}
+	else
+	{
+		uint64_t fileSize = m_file.getSize ();
+		if (fileSize < size)
+		{
+			err::setError (err::SystemErrorCode_InvalidParameter);
+			return false;
+		}
+	}
+
+	void* p = m_mapping.open (&m_file, 0, size);
+	if (!p)
+		return false;
+
+	m_mappingSize = size;
+	m_hdr = (SharedMemoryTransportHdr*) p;
+	m_data = (char*) (m_hdr + 1);
+	return true;
+}
+#endif
+
 bool
 SharedMemoryTransportBase::ensureMappingSize (size_t size)
 {
@@ -209,9 +257,15 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 		size = size - remSize + systemInfo->m_pageSize;
 
 #if (_AXL_OS_POSIX)
-	if (size >= m_file.getSize ())
+	sys::atomicLock (&m_hdr->m_lock);
+	if (size <= m_file.getSize ())
+	{
+		sys::atomicUnlock (&m_hdr->m_lock);
+	}
+	else
 	{
 		bool result = m_file.setSize (size);
+		sys::atomicUnlock (&m_hdr->m_lock);
 		if (!result)
 			return false;
 	}

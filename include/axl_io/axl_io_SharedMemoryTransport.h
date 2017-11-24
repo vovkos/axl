@@ -140,6 +140,23 @@ protected:
 	void
 	closeImpl ();
 
+#if (!_AXL_OS_POSIX)
+	bool
+	initializeMapping (
+		size_t size,
+		bool isForced
+		)
+	{
+		return ensureMappingSize (size);
+	}
+#else
+	bool
+	initializeMapping (
+		size_t size,
+		bool isForced
+		);
+#endif
+
 	bool
 	ensureMappingSize (size_t size);
 
