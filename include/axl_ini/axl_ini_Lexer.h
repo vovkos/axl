@@ -42,6 +42,8 @@ protected:
 	sl::String m_keyName;
 	sl::String m_value;
 
+	ScanResultKind m_scanResultKind;
+
 	// ragel interface variables
 
 	char* p;

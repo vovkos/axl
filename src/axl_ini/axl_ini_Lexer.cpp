@@ -43,10 +43,7 @@ Lexer::parseSection (
 	const char* end
 	)
 {
-	ASSERT (*p == '[');
-
-	if (end [-1] != ']')
-		return;
+	ASSERT (*p == '[' && end [-1] == ']');
 
 	p++;
 	end--;
@@ -58,10 +55,11 @@ Lexer::parseSection (
 		end--;
 
 	if (p < end)
-	{
 		m_sectionName.copy (p, end - p);
-		stop ();
-	}
+
+	stop ();
+
+	m_scanResultKind = ScanResultKind_Section;
 }
 
 void
@@ -74,7 +72,7 @@ Lexer::parseKeyValue (
 
 	const char* p0 = p;
 
-	while (p < end && !isspace (*p))
+	while (p < end  && *p != '=' && !isspace (*p))
 		p++;
 
 	m_keyName.copy (p0, p - p0);
@@ -103,6 +101,8 @@ Lexer::parseKeyValue (
 	}
 
 	stop ();
+
+	m_scanResultKind = ScanResultKind_KeyValue;
 }
 
 Lexer::ScanResultKind
@@ -115,6 +115,7 @@ Lexer::scanLine ()
 	m_sectionName.clear ();
 	m_keyName.clear ();
 	m_value.clear ();
+	m_scanResultKind = ScanResultKind_Eof; // assume eof
 
 	bool result = exec ();
 	if (!result)
@@ -124,9 +125,7 @@ Lexer::scanLine ()
 		return ScanResultKind_Error;
 	}
 
-	return
-		!m_sectionName.isEmpty () ? ScanResultKind_Section :
-		!m_keyName.isEmpty () ? ScanResultKind_KeyValue : ScanResultKind_Eof;
+	return m_scanResultKind;
 }
 
 void
@@ -148,6 +147,7 @@ Lexer::reset ()
 	m_sectionName.clear ();
 	m_keyName.clear ();
 	m_value.clear ();
+	m_scanResultKind = ScanResultKind_Eof;
 }
 
 void

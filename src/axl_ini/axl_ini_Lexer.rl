@@ -42,7 +42,7 @@ ws | nl               ;
 [;#] [^\n]*           ;
 '//' [^\n]*           ;
 
-'[' [^\n\]]+ ']'      { parseSection (ts, te); };
+'[' [^\n\]]* ']'      { parseSection (ts, te); };
 [^;# \t\r\n\[] [^\n]* { parseKeyValue (ts, te); };
 
 *|;
