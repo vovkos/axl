@@ -160,6 +160,7 @@ set (
 	${AXL_INC_DIR}/axl_sl/axl_sl_StringDetails.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_StringHashTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Unpacker.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_CircularBuffer.h
 	)
 
 set (
@@ -176,6 +177,7 @@ set (
 	axl_sl_Packer.cpp
 	axl_sl_Packetizer.cpp
 	axl_sl_Unpacker.cpp
+	axl_sl_CircularBuffer.cpp
 	)
 
 source_group (
