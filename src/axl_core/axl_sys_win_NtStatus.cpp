@@ -27,23 +27,39 @@ RtlNtStatusToDosErrorFunc (long);
 sl::String
 NtStatusProvider::getErrorDescription (long status)
 {
-	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = NULL;
+	static HMODULE ntDll = ::GetModuleHandleW (L"ntdll.dll");
+	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress (ntDll, "RtlNtStatusToDosError");
 
-	if (!rtlNtStatusToDosErrorFunc) // no need in interlockedcmpxcg -- the worst thing might happen is ptr gets overwritten
-	{
-		HMODULE ntDll = ::GetModuleHandleW (L"ntdll.dll");
-		if (ntDll)
-			rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress (ntDll, "RtlNtStatusToDosError");
+	dword_t winError = status;
 
-		if (!rtlNtStatusToDosErrorFunc)
-			return sl::formatString ("ntstatus #%x", status);
-	}
+	if (rtlNtStatusToDosErrorFunc)
+		winError = rtlNtStatusToDosErrorFunc (status);
+	
+	if (winError != ERROR_MR_MID_NOT_FOUND && winError != status)
+		return WinErrorProvider::getErrorDescription (winError);
+	
+	wchar_t* message = NULL;
 
-	dword_t winError = rtlNtStatusToDosErrorFunc (status);
-	if (winError == ERROR_MR_MID_NOT_FOUND)
-		return sl::formatString ("ntstatus #%x", status);
+	::FormatMessageW (
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_FROM_HMODULE |
+		FORMAT_MESSAGE_IGNORE_INSERTS |
+		FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
+		ntDll,
+		status,
+		MAKELANGID (LANG_ENGLISH, SUBLANG_DEFAULT),
+		(LPWSTR) &message,
+		0,
+		NULL
+		);
 
-	return WinErrorProvider::getErrorDescription (winError);
+	if (!message)
+		return sl::formatString ("ntstatus 0x%08x", status);
+
+	sl::String description = message;
+	::LocalFree (message);
+	return description;
 }
 
 //..............................................................................

@@ -50,7 +50,7 @@ WinErrorProvider::getErrorDescription (dword_t code)
 		HRESULT hresult = HRESULT_FROM_SETUPAPI (code);
 		message = getSystemMessage (hresult);
 		if (!message)
-			return sl::formatString ("winerror (%d 0x%08x)", code, code);
+			return sl::formatString ("winerror #%d", code);
 	}
 
 	sl::String description = message;
