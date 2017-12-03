@@ -26,16 +26,29 @@ protected:
 	sl::Array <char> m_buffer;
 	char* m_reader;
 	char* m_writer;
+	size_t m_dataSize;
 
 public:
-	CircularBuffer ()
+	CircularBuffer ();
+	
+	bool
+	isValid () const;
+
+	bool
+	isEmpty () const
 	{
-		m_reader = 0;
-		m_writer = 0;
+		return m_dataSize == 0;
+	}
+
+	bool
+	isFull () const
+	{
+		ASSERT (isValid ());
+		return m_dataSize == m_buffer.getCount ();
 	}
 
 	size_t 
-	getBufferSize ()
+	getBufferSize () const
 	{
 		return m_buffer.getCount ();
 	}
@@ -44,12 +57,13 @@ public:
 	setBufferSize (size_t size);
 
 	size_t 
-	getDataSize ()
+	getDataSize () const
 	{
-		return m_reader <= m_writer ? 
-			m_writer - m_reader :
-			m_buffer.getCount () + m_writer - m_reader;
+		return m_dataSize;
 	}
+
+	void
+	clear ();
 
 	size_t
 	readAll (sl::Array <char>* buffer);
@@ -64,7 +78,7 @@ public:
 
 	size_t
 	read (
-		void* p,
+		 void* p,
 		size_t size
 		);
 
