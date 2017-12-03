@@ -101,24 +101,24 @@ public:
 	}
 
 	bool
-	wait (dword_t* event)
+	wait (dword_t* events)
 	{
-		bool_t result = ::WaitCommEvent (m_h, event, NULL);
+		bool_t result = ::WaitCommEvent (m_h, events, NULL);
 		return err::complete (result);
 	}
 
 	bool
 	overlappedWait (
-		dword_t* event,
+		dword_t* events,
 		OVERLAPPED* overlapped
 		)
 	{
-		bool_t result = ::WaitCommEvent (m_h, event, overlapped);
+		bool_t result = ::WaitCommEvent (m_h, events, overlapped);
 		return completeOverlappedRequest (result);
 	}
 
 	bool
-	overlappedWait (dword_t* event);
+	overlappedWait (dword_t* events);
 
 	size_t
 	read (

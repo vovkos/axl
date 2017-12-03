@@ -75,11 +75,11 @@ Serial::getWaitMask ()
 }
 
 bool
-Serial::overlappedWait (dword_t* event)
+Serial::overlappedWait (dword_t* events)
 {
 	dword_t actualSize; // unused
 	StdOverlapped overlapped;
-	bool result = overlappedWait (event, &overlapped);	
+	bool result = overlappedWait (events, &overlapped);	
 	return result ? getOverlappedResult (&overlapped, &actualSize) : false;
 }
 

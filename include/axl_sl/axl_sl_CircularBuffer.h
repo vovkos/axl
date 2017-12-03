@@ -78,7 +78,7 @@ public:
 
 	size_t
 	read (
-		 void* p,
+		void* p,
 		size_t size
 		);
 

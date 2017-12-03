@@ -94,7 +94,7 @@ struct SerialSettings
 		uint_t dataBits = 8,
 		SerialStopBits stopBits = SerialStopBits_1,
 		SerialParity parity = SerialParity_None,
-		uint_t readInterval = 10 // 10ms can be used in general case
+		uint_t readInterval = 10 // 10ms can be used in the most general case
 		)
 	{
 		setup (baudRate, flowControl, dataBits, stopBits, parity, readInterval);
