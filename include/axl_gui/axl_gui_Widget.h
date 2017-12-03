@@ -422,6 +422,29 @@ public:
 	}
 
 	bool
+	redrawImmediate (
+		int left,
+		int top,
+		int right,
+		int bottom
+		)
+	{
+		return m_engine->redrawWidgetImmediate (this, left, top, right, bottom);
+	}
+
+	bool
+	redrawImmediate (const Rect& rect)
+	{
+		return redrawImmediate (rect.m_left, rect.m_top, rect.m_right, rect.m_bottom);
+	}
+
+	bool
+	redrawImmediate ()
+	{
+		return redrawImmediate (0, 0, 0, 0);
+	}
+
+	bool
 	scroll (
 		int dx,
 		int dy

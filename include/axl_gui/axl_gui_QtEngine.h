@@ -422,6 +422,16 @@ public:
 
 	virtual
 	bool
+	redrawWidgetImmediate (
+		WidgetDriver* widgetDriver,
+		int left,
+		int top,
+		int right,
+		int bottom
+		);
+
+	virtual
+	bool
 	scrollWidget (
 		WidgetDriver* widgetDriver,
 		int dx,

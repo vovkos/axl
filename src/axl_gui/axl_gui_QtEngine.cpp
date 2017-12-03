@@ -762,6 +762,26 @@ QtEngine::redrawWidget (
 }
 
 bool
+QtEngine::redrawWidgetImmediate (
+	WidgetDriver* widgetDriver,
+	int left,
+	int top,
+	int right,
+	int bottom
+	)
+{
+	ASSERT (widgetDriver->getEngine () == this);
+	QtWidgetBase* qtWidget = (QtWidgetBase*) widgetDriver->getEngineWidget ();
+
+	if (left == right || top == bottom)
+		qtWidget->viewport ()->repaint ();
+	else
+		qtWidget->viewport ()->repaint (left, top, right - left, bottom - top);
+
+	return true;
+}
+
+bool
 QtEngine::scrollWidget (
 	WidgetDriver* widgetDriver,
 	int dx,
