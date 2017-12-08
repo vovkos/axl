@@ -167,6 +167,33 @@ CircularBuffer::read (
 }
 
 size_t
+CircularBuffer::drop (size_t size)
+{
+	if (size > m_dataSize)
+		size = m_dataSize;
+
+	m_dataSize -= size;
+	if (!m_dataSize) // reset
+	{
+		m_reader = m_buffer;
+		m_writer = m_buffer;
+	}
+	else
+	{
+		m_reader += size;
+		
+		if (m_reader >= m_buffer.getEnd ())
+		{
+			m_reader = m_buffer + (m_reader - m_buffer.getEnd ());
+			ASSERT (m_reader < m_writer);
+		}
+	}
+
+	ASSERT (isValid ());
+	return size;
+}
+
+size_t
 CircularBuffer::write (
 	const void* p,
 	size_t size
