@@ -26,7 +26,6 @@
 #if (_AXL_OS_WIN)
 #	include <iphlpapi.h>
 #	include <winioctl.h>
-#	include <ws2tcpip.h>
 #elif (_AXL_OS_POSIX)
 #	include <ifaddrs.h>
 #	include <net/if.h>

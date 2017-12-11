@@ -27,7 +27,7 @@ Socket::open (
 {
 	close ();
 	m_h = ::socket (addressFamily, sockKind, protocol);
-	return err::complete (m_h != INVALID_SOCKET);
+	return complete (m_h != INVALID_SOCKET);
 }
 
 int
@@ -43,7 +43,7 @@ Socket::setBlockingMode (bool isBlocking)
 {
 	ulong_t value = !isBlocking;
 	int result = ::ioctlsocket (m_h, FIONBIO, &value);
-	return err::complete (m_h != -1);
+	return complete (m_h != -1);
 }
 
 size_t
@@ -65,7 +65,7 @@ Socket::getAddress (SockAddr* addr)
 {
 	int size = sizeof (SockAddr);
 	int result = ::getsockname (m_h, (sockaddr*) addr, &size);
-	return err::complete (result != SOCKET_ERROR);
+	return complete (result != SOCKET_ERROR);
 }
 
 bool
@@ -73,7 +73,7 @@ Socket::getPeerAddress (SockAddr* addr)
 {
 	int size = sizeof (SockAddr);
 	int result = ::getpeername (m_h, (sockaddr*) addr, &size);
-	return err::complete (result != SOCKET_ERROR);
+	return complete (result != SOCKET_ERROR);
 }
 
 SOCKET
@@ -86,7 +86,7 @@ Socket::accept (SockAddr* addr)
 		addr ? &size : NULL
 		);
 
-	return err::complete (socket, INVALID_SOCKET);
+	return complete (socket, INVALID_SOCKET);
 }
 
 size_t
@@ -106,7 +106,7 @@ Socket::recvFrom (
 		addr ? &addrSize : NULL
 		);
 
-	return err::complete (result, SOCKET_ERROR);
+	return complete (result, SOCKET_ERROR);
 }
 
 bool
@@ -138,7 +138,7 @@ Socket::wsaOpen (
 {
 	close ();
 	m_h = ::WSASocket (addressFamily, sockKind, protocol, NULL, 0, flags);
-	return err::complete (m_h != INVALID_SOCKET);
+	return complete (m_h != INVALID_SOCKET);
 }
 
 SOCKET
@@ -153,7 +153,7 @@ Socket::wsaAccept (SockAddr* addr)
 		0
 		);
 
-	return err::complete (s, INVALID_SOCKET);
+	return complete (s, INVALID_SOCKET);
 }
 
 bool
@@ -161,6 +161,7 @@ Socket::wsaSend (
 	const void* p,
 	dword_t size,
 	dword_t* actualSize,
+	dword_t flags,
 	WSAOVERLAPPED* overlapped,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
@@ -180,6 +181,7 @@ Socket::wsaRecv (
 	void* p,
 	dword_t size,
 	dword_t* actualSize,
+	dword_t* flags,
 	WSAOVERLAPPED* overlapped,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
@@ -190,9 +192,7 @@ Socket::wsaRecv (
 	buf.buf = (char*) p;
 	buf.len = size;
 
-	dword_t flags = 0;
-
-	int result = ::WSARecv (m_h, &buf, 1, actualSize, &flags, overlapped, completionFunc);
+	int result = ::WSARecv (m_h, &buf, 1, actualSize, flags, overlapped, completionFunc);
 	return completeAsyncRequest (result, WSA_IO_PENDING);
 }
 
@@ -201,6 +201,7 @@ Socket::wsaSendTo (
 	const void* p,
 	dword_t size,
 	dword_t* actualSize,
+	dword_t flags,
 	const sockaddr* addr,
 	WSAOVERLAPPED* overlapped,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
@@ -217,7 +218,7 @@ Socket::wsaSendTo (
 		&buf,
 		1,
 		actualSize,
-		0,
+		flags,
 		addr,
 		getSockAddrSize (addr),
 		overlapped,
@@ -232,7 +233,9 @@ Socket::wsaRecvFrom (
 	void* p,
 	dword_t size,
 	dword_t* actualSize,
+	dword_t* flags,
 	SockAddr* addr,
+	socklen_t* addrSize,
 	WSAOVERLAPPED* overlapped,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
 	)
@@ -243,17 +246,14 @@ Socket::wsaRecvFrom (
 	buf.buf = (char*) p;
 	buf.len = size;
 
-	dword_t flags = 0;
-	int addrSize = sizeof (SockAddr);
-
 	int result = ::WSARecvFrom (
 		m_h,
 		&buf,
 		1,
 		actualSize,
-		&flags,
+		flags,
 		(sockaddr*) addr,
-		addr ? &addrSize : NULL,
+		addrSize,
 		overlapped,
 		completionFunc
 		);
@@ -288,6 +288,26 @@ Socket::wsaIoctl (
 		);
 
 	return completeAsyncRequest (result, WSA_IO_PENDING);
+}
+
+bool
+Socket::wsaGetOverlappedResult (
+	WSAOVERLAPPED* overlapped,
+	dword_t* actualSize,
+	dword_t* flags
+	) const
+{
+	dword_t unused;
+	bool_t result = ::WSAGetOverlappedResult (m_h, overlapped, actualSize, true, flags ? flags : &unused);
+	return complete (result);
+}
+
+size_t
+Socket::wsaGetOverlappedResult (WSAOVERLAPPED* overlapped) const
+{
+	dword_t actualSize;
+	bool result = wsaGetOverlappedResult (overlapped, &actualSize);
+	return result ? (size_t) actualSize : -1;
 }
 
 //..............................................................................

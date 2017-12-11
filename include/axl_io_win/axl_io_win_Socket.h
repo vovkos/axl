@@ -56,7 +56,7 @@ public:
 	bind (const sockaddr* addr)
 	{
 		int result = ::bind (m_h, addr, getSockAddrSize (addr));
-		return err::complete (result != SOCKET_ERROR);
+		return complete (result != SOCKET_ERROR);
 	}
 
 	bool
@@ -74,7 +74,7 @@ public:
 		)
 	{
 		int result = ::getsockopt (m_h, level, option, (char*) p, (int*) &size);
-		return err::complete (result != SOCKET_ERROR);
+		return complete (result != SOCKET_ERROR);
 	}
 
 	bool
@@ -86,14 +86,14 @@ public:
 		)
 	{
 		int result = ::setsockopt (m_h, level, option, (char*) p, size);
-		return err::complete (result != SOCKET_ERROR);
+		return complete (result != SOCKET_ERROR);
 	}
 
 	bool
 	listen (size_t backLog)
 	{
 		int result = ::listen (m_h, (int) backLog);
-		return err::complete (result != SOCKET_ERROR);
+		return complete (result != SOCKET_ERROR);
 	}
 
 	SOCKET
@@ -110,7 +110,7 @@ public:
 	shutdown (int mode = SD_BOTH)
 	{
 		int result = ::shutdown (m_h, mode);
-		return err::complete (result);
+		return complete (result);
 	}
 
 	size_t
@@ -120,7 +120,7 @@ public:
 		)
 	{
 		int result = ::send (m_h, (const char*) p, (int) size, 0);
-		return err::complete (result, SOCKET_ERROR);
+		return complete (result, SOCKET_ERROR);
 	}
 
 	size_t
@@ -130,7 +130,7 @@ public:
 		)
 	{
 		int result = ::recv (m_h, (char*) p, (int) size, 0);
-		return err::complete (result, SOCKET_ERROR);
+		return complete (result, SOCKET_ERROR);
 	}
 
 	size_t
@@ -141,7 +141,7 @@ public:
 		)
 	{
 		int result = ::sendto (m_h, (char*) p, (int) size, 0, addr, getSockAddrSize (addr));
-		return err::complete (result, SOCKET_ERROR);
+		return complete (result, SOCKET_ERROR);
 	}
 
 	size_t
@@ -167,7 +167,7 @@ public:
 		)
 	{
 		int result = ::WSAEventSelect (m_h, hEvent, mask);
-		return err::complete (result != SOCKET_ERROR);
+		return complete (result != SOCKET_ERROR);
 	}
 
 	bool
@@ -177,7 +177,7 @@ public:
 		)
 	{
 		int result = ::WSAEnumNetworkEvents (m_h, hEvent, events);
-		return err::complete (result != SOCKET_ERROR);
+		return complete (result != SOCKET_ERROR);
 	}
 
 	bool
@@ -195,8 +195,9 @@ public:
 		const void* p,
 		dword_t size,
 		dword_t* actualSize,
+		dword_t flags,
 		WSAOVERLAPPED* overlapped,
-		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
+		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 		);
 
 	bool
@@ -204,8 +205,9 @@ public:
 		void* p,
 		dword_t size,
 		dword_t* actualSize,
+		dword_t* flags,
 		WSAOVERLAPPED* overlapped,
-		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
+		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 		);
 
 	bool
@@ -213,9 +215,10 @@ public:
 		const void* p,
 		dword_t size,
 		dword_t* actualSize,
+		dword_t flags,
 		const sockaddr* addr,
 		WSAOVERLAPPED* overlapped,
-		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
+		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 		);
 
 	bool
@@ -223,9 +226,11 @@ public:
 		void* p,
 		dword_t size,
 		dword_t* actualSize,
+		dword_t* flags,
 		SockAddr* addr,
+		socklen_t* addrSize,
 		WSAOVERLAPPED* overlapped,
-		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
+		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 		);
 
 	bool
@@ -237,10 +242,41 @@ public:
 		dword_t outBufferSize,
 		dword_t* actualSize,
 		WSAOVERLAPPED* overlapped,
-		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc
+		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 		);
 
-protected:
+	bool
+	wsaGetOverlappedResult (
+		WSAOVERLAPPED* overlapped,
+		dword_t* actualSize,
+		dword_t* flags = NULL
+		) const;
+
+	size_t
+	wsaGetOverlappedResult (WSAOVERLAPPED* overlapped) const;
+
+protected:	
+	template <typename T>
+	static
+	T
+	complete (
+		T result,
+		T failResult
+		)
+	{
+		if (result == failResult)
+			err::setError (::WSAGetLastError ());
+
+		return result;
+	}
+
+	static
+	bool
+	complete (int result)
+	{
+		return complete <bool> (result != 0, false);
+	}
+
 	static
 	bool
 	completeAsyncRequest (

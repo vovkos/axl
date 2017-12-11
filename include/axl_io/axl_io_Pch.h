@@ -23,6 +23,7 @@
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_Event.h"
 #	include <ws2ipdef.h>
+#	include <ws2tcpip.h>
 #elif (_AXL_OS_POSIX)
 #	include "axl_sys_psx_Sem.h"
 #endif
