@@ -27,6 +27,13 @@ CircularBuffer::CircularBuffer ()
 bool
 CircularBuffer::isValid () const
 {
+	if (m_buffer.isEmpty ()) // uninitialized
+		return 
+			m_buffer == NULL &&
+			m_reader == NULL && 
+			m_writer == NULL &&
+			m_dataSize == 0;
+
 	return
 		m_dataSize <= m_buffer.getCount () &&
 		m_reader >= m_buffer && m_reader < m_buffer.getEnd () &&
