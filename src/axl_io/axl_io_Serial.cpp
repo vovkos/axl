@@ -301,12 +301,19 @@ Serial::setSettings (
 			attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 		}
 
+
 	// ensure some extra default flags
 
+	attr.c_iflag |= IGNBRK;
+	attr.c_iflag &= ~(BRKINT | IGNCR | INLCR | ICRNL | ISTRIP);
+	attr.c_oflag = 0;
 	attr.c_cflag |= CREAD | CLOCAL;
 	attr.c_lflag = 0;
-	attr.c_oflag = 0;
-	attr.c_cc [VTIME] = 0;
+
+	for (size_t i = 0; i < countof (attr.c_cc); i++)
+		attr.c_cc [i] = _POSIX_VDISABLE;
+
+	attr.c_cc [VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
 	attr.c_cc [VMIN]  = 1;
 
 	return m_serial.setAttr (&attr);
