@@ -61,7 +61,8 @@
 
 #if (_AXL_CPP_MSC)
 #	if (defined _M_IX86)
-#		define _AXL_CPU_X86 1
+#		define _AXL_CPU_IA32  1
+#		define _AXL_CPU_X86   1
 #	elif (defined _M_AMD64)
 #		define _AXL_CPU_AMD64 1
 #	elif (defined _M_ARM)
@@ -71,7 +72,8 @@
 #	endif
 #elif (_AXL_CPP_GCC)
 #	if defined __i386__
-#		define _AXL_CPU_X86 1
+#		define _AXL_CPU_IA32  1
+#		define _AXL_CPU_X86   1
 #	elif (defined __amd64__)
 #		define _AXL_CPU_AMD64 1
 #	elif (defined __arm__)
