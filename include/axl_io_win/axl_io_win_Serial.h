@@ -27,10 +27,11 @@ public:
 	bool
 	open (
 		const sl::StringRef& name,
-		uint_t flags = 0
+		uint_t accessMode = GENERIC_READ | GENERIC_WRITE,
+		uint_t flagsAttributes = 0
 		);
 
-	bool 
+	bool
 	clearError (
 		dword_t* errors,
 		COMSTAT* stat

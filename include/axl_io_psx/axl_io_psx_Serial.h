@@ -25,11 +25,12 @@ class Serial: public Fd
 {
 public:
 	bool
-	open (const sl::StringRef& name)
+	open (
+		const sl::StringRef& name,
+		uint_t openFlags = O_RDWR | O_NOCTTY
+		)
 	{
-		return
-			Fd::open (name, O_RDWR | O_NONBLOCK | O_NOCTTY, 0) &&
-			setBlockingMode (true);
+		return Fd::open (name, openFlags, 0);
 	}
 
 	bool

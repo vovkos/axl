@@ -21,6 +21,21 @@ namespace io {
 #if (_AXL_OS_WIN)
 
 bool
+Serial::open (
+	const sl::StringRef& name,
+	uint_t flags
+	)
+{
+	uint_t accessMode =
+		(flags & FileFlag_ReadOnly) ? GENERIC_READ :
+		(flags & FileFlag_WriteOnly) ? GENERIC_WRITE : GENERIC_READ | GENERIC_WRITE;
+
+	uint_t flagsAttributes = (flags & FileFlag_Asynchronous) ? FILE_FLAG_OVERLAPPED : 0;
+
+	return m_serial.open (name, accessMode, flagsAttributes);
+}
+
+bool
 Serial::setSettings (
 	const SerialSettings* settings,
 	uint_t mask
@@ -107,6 +122,24 @@ Serial::getStatusLines ()
 }
 
 #elif (_AXL_OS_POSIX)
+
+bool
+Serial::open (
+	const sl::StringRef& name,
+	uint_t flags
+	)
+{
+	uint_t posixFlags =
+		(flags & FileFlag_ReadOnly) ? O_RDONLY :
+		(flags & FileFlag_WriteOnly) ? O_WRONLY : O_RDWR;
+
+	if (flags & FileFlag_Asynchronous)
+		posixFlags |= O_NONBLOCK;
+
+	posixFlags |= O_NOCTTY;
+
+	return m_serial.open (name, posixFlags);
+}
 
 bool
 Serial::setSettings (

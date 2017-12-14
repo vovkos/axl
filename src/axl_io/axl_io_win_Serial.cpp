@@ -22,7 +22,8 @@ namespace win {
 bool
 Serial::open (
 	const sl::StringRef& name,
-	uint_t flags
+	uint_t accessMode,
+	uint_t flagsAttributes
 	)
 {
 	close ();
@@ -38,10 +39,11 @@ Serial::open (
 
 	m_h = ::CreateFileW (
 		deviceName,
-		GENERIC_READ | GENERIC_WRITE,
-		0, NULL,
+		accessMode,
+		0,
+		NULL,
 		OPEN_EXISTING,
-		flags,
+		flagsAttributes,
 		NULL
 		);
 
@@ -79,7 +81,7 @@ Serial::overlappedWait (dword_t* events)
 {
 	dword_t actualSize; // unused
 	StdOverlapped overlapped;
-	bool result = overlappedWait (events, &overlapped);	
+	bool result = overlappedWait (events, &overlapped);
 	return result ? getOverlappedResult (&overlapped, &actualSize) : false;
 }
 

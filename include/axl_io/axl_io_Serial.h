@@ -13,6 +13,7 @@
 
 #define _AXL_IO_SERIAL_H
 
+#include "axl_io_File.h"
 #include "axl_io_SerialSettings.h"
 
 #if (_AXL_OS_WIN)
@@ -43,14 +44,10 @@ public:
 	}
 
 	bool
-	open (const sl::StringRef& name)
-	{
-#if (_AXL_OS_WIN)
-		return m_serial.open (name, FILE_FLAG_OVERLAPPED);
-#else
-		return m_serial.open (name);
-#endif
-	}
+	open (
+		const sl::StringRef& name,
+		uint_t flags = 0
+		);
 
 	void
 	close ()
