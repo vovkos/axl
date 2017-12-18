@@ -25,7 +25,6 @@ env:
     global:
         - secure: fs/92i0+/YFzVnSYFmIhgrfRAw0NhbZy3+QS8tYOpC3rBTT5h6dQnlmnTiCPzFIGwBUcWy6v+DTU7ZIqDtncEbQ4tirI12RQWznHyYo3PMG0h9v8dNwF+Yhfv8QmTNA/TxHT9XQmjF9Oh7c9q1BBYMc/pGA0GyrBQXJTbUbORLuEUsMg+k2932njKaCZFhtva3gRoWdg2dHaEefQ9Pe2GJqudnxQHlmg7lMSSvuFpDElJc5UGK6lnOKF8XSVP9d8AnTGnPpRulq0qiWDb3VyeaFUWesJXXia7IR+1ljDWDO6VMh+1Q+FyfeuwkmGq40HLLaM4efE0PKIDd/TjFnbICx27RwM/+9TVjJbuMZq8+zgByvRjqnWcn/vEW7DUQwljweE1nlUvF8QVWnZr5a6vmjkr+oTkBhFy6f2naI4L8xz95I0+t68GFJMbu19LGTP21sJbBdsXpEaeqRDewQX5dLX7ikjnr6Ecdw4rbrQEnMv+9DbIbUcZKE3UMD3nbGjWhlyTnJdOGoJVnozcv/C7lhBhzjnHsKWrwGa3T9v3+POxz8YdnNPwE0c5XaBUWIOY90CoZ0Kv235rroKX1w740Ye9SgWMlakOqb0SPm8Ai1Y4BDLxiCTnEzQgkvTEzmsI2nYZvdcFvH8bEETCpH8wlAnwLPgQiv/RmUKGsjg5fc=
 
-
     matrix:
         - TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
         - TARGET_CPU=x86 BUILD_CONFIGURATION=Release
@@ -45,7 +44,6 @@ matrix:
 
 install:
     - source ci/travis/set-env.sh
-    - echo BUILD_DOC=$BUILD_DOC
     - bash ci/travis/install-$TRAVIS_OS_NAME.sh
 
 script:
