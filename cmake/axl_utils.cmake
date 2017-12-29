@@ -70,7 +70,7 @@ axl_print_variable_list
 	foreach (_VARIABLE ${_VARIABLE_LIST})
 		set (_PREFIX "${_INDENT}${_VARIABLE}:")
 		axl_create_space_padding (_PADDING ${_PREFIX} ${_ALIGN})
-		message(STATUS "${_PREFIX}${_PADDING}${${_VARIABLE}}")
+		message (STATUS "${_PREFIX}${_PADDING}${${_VARIABLE}}")
 	endforeach ()
 endmacro ()
 

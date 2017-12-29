@@ -19,39 +19,32 @@
 #	pragma warning (disable: 4477) // warning C4477: 'printf' : format string '...' requires an argument of type '...', but variadic argument ... has type '...'
 #	pragma warning (disable: 4838) // warning C4838: conversion from 'int' to 'std::size_t' requires a narrowing conversion
 
-	// many binary distributions of libs only come with Release build; static versions of those link to LIBCMT 
+	// many binary distributions of libs only come with Release build; static versions of those link to LIBCMT
 	// thus producing the following warning when linked to your executables on Debug builds:
 
 	// warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
 #	if (_AXL_DEBUG)
-#		pragma comment (linker, "/NODEFAULTLIB:LIBCMT")	
+#		pragma comment (linker, "/NODEFAULTLIB:LIBCMT")
 #	endif
 #endif
 
 #if (_AXL_CPP_GCC)
 #	pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-//#	pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #	ifdef __cplusplus
 #		pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #	endif
-//#	pragma GCC diagnostic ignored "-Wmissing-braces"
 #	pragma GCC diagnostic ignored "-Wmultichar"
 #	pragma GCC diagnostic ignored "-Wformat"
 #	if (__cplusplus >= 201103L)
 #		pragma GCC diagnostic ignored "-Wnarrowing"
 #	endif
-//#	pragma GCC diagnostic ignored "-Wparentheses"
-//#	pragma GCC diagnostic ignored "-Wsign-compare"
-//#	pragma GCC diagnostic ignored "-Wunused-parameter"
-//#	pragma GCC diagnostic ignored "-Wunused-result"
-//#	pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
 
-#	if (_AXL_CPP_CLANG)
-#		pragma GCC diagnostic ignored "-Wdangling-else"
-#		pragma GCC diagnostic ignored "-Wincompatible-ms-struct"
-#		pragma GCC diagnostic ignored "-Wlogical-op-parentheses"
-#		pragma GCC diagnostic ignored "-Wswitch"
-#	endif
+#if (_AXL_CPP_CLANG)
+#	pragma GCC diagnostic ignored "-Wdangling-else"
+#	pragma GCC diagnostic ignored "-Wincompatible-ms-struct"
+#	pragma GCC diagnostic ignored "-Wlogical-op-parentheses"
+#	pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
 //..............................................................................
