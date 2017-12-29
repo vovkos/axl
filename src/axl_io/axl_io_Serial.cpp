@@ -68,13 +68,16 @@ Serial::setSettings (
 	}
 
 	if (mask & SerialSettingId_FlowControl)
+	{
+		dcb.fOutxCtsFlow = FALSE;
+		dcb.fOutX = FALSE;
+		dcb.fInX = FALSE;
+
+		if (dcb.fRtsControl == RTS_CONTROL_HANDSHAKE)
+			dcb.fRtsControl = RTS_CONTROL_DISABLE;
+
 		switch (settings->m_flowControl)
 		{
-		case SerialFlowControl_None:
-			dcb.fOutxCtsFlow = FALSE;
-			dcb.fRtsControl = RTS_CONTROL_DISABLE;
-			break;
-
 		case SerialFlowControl_RtsCts:
 			dcb.fOutxCtsFlow = TRUE;
 			dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
@@ -85,6 +88,7 @@ Serial::setSettings (
 			dcb.fInX = TRUE;
 			break;
 		}
+	}
 
 	if (!(mask & SerialSettingId_ReadInterval))
 		return m_serial.setSettings (&dcb);
