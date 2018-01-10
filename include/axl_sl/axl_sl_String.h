@@ -681,7 +681,8 @@ protected:
 		bool isNullTerminated
 		)
 	{
-		ASSERT (!isNullTerminated || !p [length]);
+		ASSERT (length != -1 && (!isNullTerminated || !p [length]));
+
 		attachBufHdr (hdr);
 
 		m_p = (C*) p;
