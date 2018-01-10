@@ -41,6 +41,7 @@ set (
 	${AXL_INC_DIR}/axl_mem/axl_mem_Allocator.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Block.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_New.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_Pool.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Tracker.h
 	)
 
