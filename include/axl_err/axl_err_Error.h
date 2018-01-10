@@ -178,6 +178,11 @@ public:
 		createStringError (string);
 	}
 
+	Error (const char* string) // may be useful for overload resolving
+	{
+		createStringError (string);
+	}
+
 	Error (
 		ref::BufKind kind,
 		void* p,
