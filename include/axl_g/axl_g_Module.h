@@ -107,7 +107,7 @@ public:
 	}
 #endif
 
-	SystemInfo*
+	const SystemInfo*
 	getSystemInfo ()
 	{
 		return &m_systemInfo;

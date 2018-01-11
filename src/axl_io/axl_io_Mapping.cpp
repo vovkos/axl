@@ -30,7 +30,7 @@ Mapping::open (
 	if (size == -1)
 		size = (size_t) (file->getSize () - offset);
 
-	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
 
 	void* p;

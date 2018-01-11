@@ -171,7 +171,7 @@ copyFile (
 		BaseBlockSize = 64 * 1024, // 64K
 	};
 
-	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 	size_t blockSize = BaseBlockSize + systemInfo->m_mappingAlignFactor - BaseBlockSize % systemInfo->m_mappingAlignFactor;
 
 	uint64_t offset = 0;

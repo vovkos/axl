@@ -331,7 +331,7 @@ MappedFile::viewImpl (
 
 	// align view base on system allocation granularity
 
-	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 
 	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
 	uint64_t viewEnd = end + m_readAheadSize;
