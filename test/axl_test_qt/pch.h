@@ -15,6 +15,8 @@
 #define __STDC_LIMIT_MACROS
 #define __STDC_CONSTANT_MACROS
 
+#include "axl_g_Pch.h"
+
 //..............................................................................
 
 // QT
