@@ -27,26 +27,26 @@
 
 #ifdef _MSC_VER
 #	define _AXL_CPP_MSC 1
-#	define _AXL_CPP_MSC_VERSION_MAJOR (_MSC_VER / 100)
-#	define _AXL_CPP_MSC_VERSION_MINOR (_MSC_VER % 100)
-#	define _AXL_CPP_MSC_VERSION (((_MSC_VER / 100) << 8) | (_MSC_VER % 100))
+#	define AXL_CPP_MSC_VERSION_MAJOR (_MSC_VER / 100)
+#	define AXL_CPP_MSC_VERSION_MINOR (_MSC_VER % 100)
+#	define AXL_CPP_MSC_VERSION (((_MSC_VER / 100) << 8) | (_MSC_VER % 100))
 #	define AXL_CPP_STRING "Microsoft Visual C++"
 #elif (defined __GNUC__)
 #	define _AXL_CPP_GCC 1
-#	define _AXL_CPP_GCC_VERSION_MAJOR __GNUC__
-#	define _AXL_CPP_GCC_VERSION_MINOR __GNUC_MINOR__
-#	define _AXL_CPP_GCC_VERSION ((__GNUC__ << 8) | __GNUC_MINOR__)
+#	define AXL_CPP_GCC_VERSION_MAJOR __GNUC__
+#	define AXL_CPP_GCC_VERSION_MINOR __GNUC_MINOR__
+#	define AXL_CPP_GCC_VERSION ((__GNUC__ << 8) | __GNUC_MINOR__)
 #	ifdef __clang__
 #		define _AXL_CPP_CLANG 1
-#		define _AXL_CPP_CLANG_VERSION_MAJOR __clang_major__
-#		define _AXL_CPP_CLANG_VERSION_MINOR __clang_minor__
-#		define _AXL_CPP_CLANG_VERSION ((__clang_major__ << 8) | __clang_minor__)
+#		define AXL_CPP_CLANG_VERSION_MAJOR __clang_major__
+#		define AXL_CPP_CLANG_VERSION_MINOR __clang_minor__
+#		define AXL_CPP_CLANG_VERSION ((__clang_major__ << 8) | __clang_minor__)
 #		define AXL_CPP_STRING "Clang/LLVM"
 #	elif (defined __ICC)
 #		define _AXL_CPP_ICC 1
-#		define _AXL_CPP_ICC_VERSION_MAJOR (__ICC / 100)
-#		define _AXL_CPP_ICC_VERSION_MINOR (__ICC % 100)
-#		define _AXL_CPP_ICC_VERSION (((__ICC / 100) << 8) | (__ICC % 100))
+#		define AXL_CPP_ICC_VERSION_MAJOR (__ICC / 100)
+#		define AXL_CPP_ICC_VERSION_MINOR (__ICC % 100)
+#		define AXL_CPP_ICC_VERSION (((__ICC / 100) << 8) | (__ICC % 100))
 #		define AXL_CPP_STRING "Intel C++"
 #	else
 #		define AXL_CPP_STRING "GNU C++"
