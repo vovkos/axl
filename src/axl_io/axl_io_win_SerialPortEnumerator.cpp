@@ -13,7 +13,10 @@
 #include "axl_io_Serial.h"
 #include "axl_sys_win_DeviceInfo.h"
 
-// #define _AXL_ENUMERATE_DEVICE_CLASS
+#define _AXL_ENUMERATE_DEVICE_CLASS 1
+
+#include <initguid.h>
+#include <devguid.h>
 
 namespace axl {
 namespace io {
@@ -45,10 +48,11 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 	sys::win::DeviceInfoSet deviceInfoSet;
 
 #ifdef _AXL_ENUMERATE_DEVICE_CLASS
-	result = deviceInfoSet.create (GUID_DEVCLASS_PORTS);
+	result = deviceInfoSet.create (GUID_DEVCLASS_PORTS, DIGCF_PRESENT);
 #else
 	result = deviceInfoSet.create (GUID_DEVINTERFACE_COMPORT, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
 #endif
+
 	if (!result)
 		return 0;
 
