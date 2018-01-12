@@ -49,8 +49,6 @@ Serial::setSettings (
 		return false;
 
 	dcb.fBinary = TRUE;
-	dcb.fDsrSensitivity = FALSE;
-	dcb.fDtrControl = DTR_CONTROL_DISABLE;
 
 	if (mask & SerialSettingId_BaudRate)
 		dcb.BaudRate = settings->m_baudRate;
@@ -69,12 +67,12 @@ Serial::setSettings (
 
 	if (mask & SerialSettingId_FlowControl)
 	{
-		dcb.fOutxCtsFlow = FALSE;
 		dcb.fOutX = FALSE;
 		dcb.fInX = FALSE;
-
-		if (dcb.fRtsControl == RTS_CONTROL_HANDSHAKE)
-			dcb.fRtsControl = RTS_CONTROL_DISABLE;
+		dcb.fDsrSensitivity = FALSE;
+		dcb.fOutxCtsFlow = FALSE;
+		dcb.fDtrControl = settings->m_dtr ? DTR_CONTROL_ENABLE : DTR_CONTROL_DISABLE;
+		dcb.fRtsControl = settings->m_rts ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE;
 
 		switch (settings->m_flowControl)
 		{
@@ -287,24 +285,21 @@ Serial::setSettings (
 	}
 
 	if (mask & SerialSettingId_FlowControl)
+	{
+		attr.c_cflag &= ~CRTSCTS;
+		attr.c_iflag &= ~(IXON | IXOFF | IXANY);
+
 		switch (settings->m_flowControl)
 		{
 		case SerialFlowControl_RtsCts:
 			attr.c_cflag |= CRTSCTS;
-			attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 			break;
 
 		case SerialFlowControl_XonXoff:
-			attr.c_cflag &= ~CRTSCTS;
 			attr.c_iflag |= IXON | IXOFF | IXANY;
 			break;
-
-		case SerialFlowControl_None:
-		default:
-			attr.c_cflag &= ~CRTSCTS;
-			attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 		}
-
+	}
 
 	// ensure some extra default flags
 
@@ -320,7 +315,25 @@ Serial::setSettings (
 	attr.c_cc [VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
 	attr.c_cc [VMIN]  = 1;
 
-	return m_serial.setAttr (&attr);
+	result = m_serial.setAttr (&attr);
+	if (!result)
+		return false;
+
+	if (mask & SerialSettingId_FlowControl) // also, adjust DTR & RTS lines
+	{
+		result = m_serial.setDtr (settings->m_dtr);
+		if (!result)
+			return false;
+
+		if (settings->m_flowControl != SerialFlowControl_RtsCts)
+		{
+			result = m_serial.setRts (settings->m_rts);
+			if (!result)
+				return false;
+		}
+	}
+
+	return true;
 }
 
 bool

@@ -83,6 +83,9 @@ struct SerialSettings
 	                       // 0  -- return immediatly
 	                       // -1 -- wait for the buffer to fill completely
 
+	bool m_dtr; // used when setting SerialSettingId_FlowControl
+	bool m_rts; // used when setting SerialSettingId_FlowControl
+
 	SerialSettings ()
 	{
 		setup (38400);
@@ -94,7 +97,9 @@ struct SerialSettings
 		uint_t dataBits = 8,
 		SerialStopBits stopBits = SerialStopBits_1,
 		SerialParity parity = SerialParity_None,
-		uint_t readInterval = 10 // 10ms can be used in the most general case
+		uint_t readInterval = 10, // 10ms can be used in the most general case
+		bool dtr = true,
+		bool rts = true
 		)
 	{
 		setup (baudRate, flowControl, dataBits, stopBits, parity, readInterval);
@@ -107,16 +112,10 @@ struct SerialSettings
 		uint_t dataBits = 8,
 		SerialStopBits stopBits = SerialStopBits_1,
 		SerialParity parity = SerialParity_None,
-		uint_t readInterval = 10
-		)
-	{
-		m_baudRate = baudRate;
-		m_flowControl = flowControl;
-		m_dataBits = dataBits;
-		m_stopBits = stopBits;
-		m_parity = parity;
-		m_readInterval = readInterval;
-	}
+		uint_t readInterval = 10,
+		bool dtr = true,
+		bool rts = true
+		);
 
 #if (_AXL_OS_WIN)
 	void

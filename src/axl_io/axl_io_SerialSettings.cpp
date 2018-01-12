@@ -17,6 +17,28 @@ namespace io {
 
 //..............................................................................
 
+void
+SerialSettings::setup (
+	uint_t baudRate,
+	SerialFlowControl flowControl,
+	uint_t dataBits,
+	SerialStopBits stopBits,
+	SerialParity parity,
+	uint_t readInterval,
+	bool dtr,
+	bool rts
+	)
+{
+	m_baudRate = baudRate;
+	m_flowControl = flowControl;
+	m_dataBits = dataBits;
+	m_stopBits = stopBits;
+	m_parity = parity;
+	m_readInterval = readInterval;
+	m_dtr = dtr;
+	m_rts = rts;
+}
+
 #if (_AXL_OS_WIN)
 
 void
@@ -30,6 +52,16 @@ SerialSettings::setDcb (const DCB* dcb)
 	m_flowControl =
 		dcb->fOutxCtsFlow && dcb->fRtsControl == RTS_CONTROL_HANDSHAKE ? SerialFlowControl_RtsCts :
 		dcb->fOutX && dcb->fInX ? SerialFlowControl_XonXoff : SerialFlowControl_None;
+
+	if (dcb->fDtrControl == DTR_CONTROL_ENABLE)
+		m_dtr = true;
+	else if (dcb->fDtrControl == DTR_CONTROL_DISABLE)
+		m_dtr = false;
+
+	if (dcb->fRtsControl == RTS_CONTROL_ENABLE)
+		m_rts = true;
+	else if (dcb->fRtsControl == RTS_CONTROL_DISABLE)
+		m_rts = false;
 }
 
 #elif (_AXL_OS_POSIX)
