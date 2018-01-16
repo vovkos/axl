@@ -14,6 +14,12 @@
 #include "axl_err_Error.h"
 #include "axl_enc_Utf.h"
 
+#if (_AXL_OS_WIN)
+#	include "axl_io_File.h"
+#	include "axl_sys_win_NtDll.h"
+#	include "axl_sys_win_NtStatus.h"
+#endif
+
 //..............................................................................
 
 #if (_AXL_OS_DARWIN)
@@ -399,6 +405,135 @@ findFilePath (
 
 	return sl::String ();
 }
+
+#if (_AXL_OS_WIN)
+
+bool
+getSymbolicLinkTarget (
+	sl::String* targetName,
+	const sl::StringRef& linkName
+	)
+{
+	using namespace axl::sys::win;
+
+	NTSTATUS status;
+
+	sl::String_w linkName_w = linkName;
+
+	UNICODE_STRING uniLinkName;
+	uniLinkName.Buffer = linkName_w.p ();
+	uniLinkName.Length = linkName_w.getLength () * sizeof (WCHAR);
+	uniLinkName.MaximumLength = linkName_w.getHdr ()->m_bufferSize;
+
+	OBJECT_ATTRIBUTES oa = { 0 };
+	oa.Length = sizeof (oa);
+	oa.RootDirectory = NULL;
+	oa.ObjectName = &uniLinkName;
+
+	io::win::FileHandle link;
+	status = ntOpenSymbolicLinkObject (
+		link.p (),
+		GENERIC_READ,
+		&oa
+		);
+
+	if (status < 0)
+	{
+		err::setError (sys::win::NtStatus (status));
+		return false;
+	}
+
+	UNICODE_STRING uniTarget = { 0 };
+	ULONG bufferSize = 0;
+
+	status = ntQuerySymbolicLinkObject (link, &uniTarget, &bufferSize);
+	if (status != STATUS_BUFFER_TOO_SMALL)
+	{
+		err::setError (sys::win::NtStatus (status));
+		return false;
+	}
+
+	sl::String_w targetName_w;
+	wchar_t* p = targetName_w.createBuffer (bufferSize / sizeof (WCHAR));
+
+	uniTarget.Buffer = p;
+	uniTarget.Length = 0;
+	uniTarget.MaximumLength = (USHORT) bufferSize;
+
+	status = ntQuerySymbolicLinkObject (link, &uniTarget, &bufferSize);
+	if (status < 0)
+	{
+		err::setError (sys::win::NtStatus (status));
+		return false;
+	}
+
+	ASSERT (uniTarget.Length <= uniTarget.MaximumLength);
+	targetName_w.setReducedLength (uniTarget.Length / sizeof (WCHAR));
+	*targetName = targetName_w;
+	return true;
+}
+
+#elif (_AXL_OS_POSIX)
+
+bool
+getSymbolicLinkTarget (
+	sl::String* targetName,
+	const sl::StringRef& linkName
+	)
+{
+	struct stat sb;
+	char *buf;
+	ssize_t nbytes, bufsiz;
+
+	if (argc != 2) {
+	fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
+	exit(EXIT_FAILURE);
+	}
+
+	if (lstat(argv[1], &sb) == -1) {
+	perror("lstat");
+	exit(EXIT_FAILURE);
+	}
+
+	/* Add one to the link size, so that we can determine whether
+	the buffer returned by readlink() was truncated. */
+
+	bufsiz = sb.st_size + 1;
+
+	/* Some magic symlinks under (for example) /proc and /sys
+	report 'st_size' as zero. In that case, take PATH_MAX as
+	a "good enough" estimate. */
+
+	if (sb.st_size == 0)
+	bufsiz = PATH_MAX;
+
+	buf = malloc(bufsiz);
+	if (buf == NULL) {
+	perror("malloc");
+	exit(EXIT_FAILURE);
+	}
+
+	nbytes = readlink(argv[1], buf, bufsiz);
+	if (nbytes == -1) {
+	perror("readlink");
+	exit(EXIT_FAILURE);
+	}
+
+	printf("'%s' points to '%.*s'\n", argv[1], (int) nbytes, buf);
+
+	/* If the return value was equal to the buffer size, then the
+	the link target was larger than expected (perhaps because the
+	target was changed between the call to lstat() and the call to
+	readlink()). Warn the user that the returned target may have
+	been truncated. */
+
+	if (nbytes == bufsiz)
+	printf("(Returned buffer may have been truncated)\n");
+
+	return linkName; // not yet
+}
+
+#endif
 
 //..............................................................................
 

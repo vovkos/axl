@@ -92,6 +92,12 @@ findFilePath (
 	return findFilePath (fileName, NULL, dirList, doFindInCurrentDir);
 }
 
+bool
+getSymbolicLinkTarget (
+	sl::String* targetName,
+	const sl::StringRef& linkName
+	);
+
 //..............................................................................
 
 } // namespace io
