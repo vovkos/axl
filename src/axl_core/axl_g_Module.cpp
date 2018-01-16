@@ -13,6 +13,10 @@
 #include "axl_g_Module.h"
 #include "axl_sl_String.h"
 
+#if (_AXL_OS_WIN)
+#	include "axl_sys_win_NtDll.h"
+#endif
+
 namespace axl {
 namespace sys {
 
@@ -54,6 +58,8 @@ Module::Module ()
 	m_systemInfo.m_processorCount     = systemInfo.dwNumberOfProcessors;
 	m_systemInfo.m_pageSize           = systemInfo.dwPageSize;
 	m_systemInfo.m_mappingAlignFactor = systemInfo.dwAllocationGranularity;
+
+	sys::win::initNtDllFunctions ();
 
 #elif (_AXL_OS_POSIX)
 	m_systemInfo.m_processorCount     = sysconf (_SC_NPROCESSORS_ONLN);

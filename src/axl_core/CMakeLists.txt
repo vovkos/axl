@@ -300,6 +300,7 @@ set (
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Bstr.h
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WinError.h
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_NtStatus.h
+	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_NtDll.h
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_CriticalSection.h
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Event.h
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Semaphore.h
@@ -324,6 +325,7 @@ set (
 	axl_sys_win_Bstr.cpp
 	axl_sys_win_WinError.cpp
 	axl_sys_win_NtStatus.cpp
+	axl_sys_win_NtDll.cpp
 	axl_sys_win_Thread.cpp
 	axl_sys_win_WaitableHandle.cpp
 	axl_sys_win_JobObject.cpp
