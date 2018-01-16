@@ -13,263 +13,6 @@
 #include "axl_sys_Thread.h"
 #include "axl_err_Errno.h"
 
-#if (_AXL_OS_WIN)
-
-typedef LONG NTSTATUS;
-
-#include "axl_sys_win_NtStatus.h"
-
-//..............................................................................
-
-#define STATUS_NO_MORE_FILES   0x80000006
-#define STATUS_NO_MORE_ENTRIES 0x8000001a
-
-#define DIRECTORY_QUERY               0x0001
-#define DIRECTORY_TRAVERSE            0x0002
-#define DIRECTORY_CREATE_OBJECT       0x0004
-#define DIRECTORY_CREATE_SUBDIRECTORY 0x0008
-
-typedef enum _FILE_INFORMATION_CLASS
-{
-	FileDirectoryInformation         = 1,
-	FileFullDirectoryInformation,   // 2
-	FileBothDirectoryInformation,   // 3
-	FileBasicInformation,           // 4
-	FileStandardInformation,        // 5
-	FileInternalInformation,        // 6
-	FileEaInformation,              // 7
-	FileAccessInformation,          // 8
-	FileNameInformation,            // 9
-	FileRenameInformation,          // 10
-	FileLinkInformation,            // 11
-	FileNamesInformation,           // 12
-	FileDispositionInformation,     // 13
-	FilePositionInformation,        // 14
-	FileFullEaInformation,          // 15
-	FileModeInformation,            // 16
-	FileAlignmentInformation,       // 17
-	FileAllInformation,             // 18
-	FileAllocationInformation,      // 19
-	FileEndOfFileInformation,       // 20
-	FileAlternateNameInformation,   // 21
-	FileStreamInformation,          // 22
-	FilePipeInformation,            // 23
-	FilePipeLocalInformation,       // 24
-	FilePipeRemoteInformation,      // 25
-	FileMailslotQueryInformation,   // 26
-	FileMailslotSetInformation,     // 27
-	FileCompressionInformation,     // 28
-	FileObjectIdInformation,        // 29
-	FileCompletionInformation,      // 30
-	FileMoveClusterInformation,     // 31
-	FileQuotaInformation,           // 32
-	FileReparsePointInformation,    // 33
-	FileNetworkOpenInformation,     // 34
-	FileAttributeTagInformation,    // 35
-	FileTrackingInformation,        // 36
-	FileIdBothDirectoryInformation, // 37
-	FileIdFullDirectoryInformation, // 38
-	FileValidDataLengthInformation, // 39
-	FileShortNameInformation,       // 40
-	FileIoCompletionNotificationInformation, // 41
-	FileIoStatusBlockRangeInformation,       // 42
-	FileIoPriorityHintInformation,           // 43
-	FileSfioReserveInformation,              // 44
-	FileSfioVolumeInformation,               // 45
-	FileHardLinkInformation,                 // 46
-	FileProcessIdsUsingFileInformation,      // 47
-	FileNormalizedNameInformation,           // 48
-	FileNetworkPhysicalNameInformation,      // 49
-	FileIdGlobalTxDirectoryInformation,      // 50
-	FileIsRemoteDeviceInformation,           // 51
-	FileAttributeCacheInformation,           // 52
-	FileNumaNodeInformation,                 // 53
-	FileStandardLinkInformation,             // 54
-	FileRemoteProtocolInformation,           // 55
-	FileMaximumInformation
-} FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
-
-struct FILE_BASIC_INFORMATION
-{
-	LARGE_INTEGER CreationTime;
-	LARGE_INTEGER LastAccessTime;
-	LARGE_INTEGER LastWriteTime;
-	LARGE_INTEGER ChangeTime;
-	ULONG FileAttributes;
-};
-
-//..............................................................................
-
-struct IO_STATUS_BLOCK
-{
-	union
-	{
-		NTSTATUS Status;
-		PVOID _Align; // make sure it's aligned regardless of #pragma pack
-	};
-
-	ULONG_PTR Information;
-};
-
-typedef IO_STATUS_BLOCK* PIO_STATUS_BLOCK;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct UNICODE_STRING
-{
-	USHORT Length;
-	USHORT MaximumLength;
-	PWSTR  Buffer;
-};
-
-typedef UNICODE_STRING* PUNICODE_STRING;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct OBJECT_ATTRIBUTES
-{
-	ULONG Length;
-	HANDLE RootDirectory;
-	PUNICODE_STRING ObjectName;
-	ULONG Attributes;
-	PVOID SecurityDescriptor;
-	PVOID SecurityQualityOfService;
-};
-
-typedef OBJECT_ATTRIBUTES* POBJECT_ATTRIBUTES;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct FILE_DIRECTORY_INFORMATION
-{
-	ULONG NextEntryOffset;
-	ULONG FileIndex;
-	LARGE_INTEGER CreationTime;
-	LARGE_INTEGER LastAccessTime;
-	LARGE_INTEGER LastWriteTime;
-	LARGE_INTEGER ChangeTime;
-	LARGE_INTEGER EndOfFile;
-	LARGE_INTEGER AllocationSize;
-	ULONG FileAttributes;
-	ULONG FileNameLength;
-	WCHAR FileName[1];
-};
-
-typedef FILE_DIRECTORY_INFORMATION* PFILE_DIRECTORY_INFORMATION;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct OBJECT_DIRECTORY_INFORMATION
-{
-	UNICODE_STRING Name;
-	UNICODE_STRING TypeName;
-};
-
-typedef OBJECT_DIRECTORY_INFORMATION* POBJECT_DIRECTORY_INFORMATION;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef
-NTSTATUS
-NTAPI
-NtQueryDirectoryFile (
-	IN HANDLE FileHandle,
-	IN HANDLE Event,
-	IN PVOID ApcRoutine,
-	IN PVOID ApcContext,
-	OUT PIO_STATUS_BLOCK IoStatusBlock,
-	OUT PVOID FileInformation,
-	IN ULONG Length,
-	IN INT FileInformationClass,
-	IN BOOLEAN ReturnSingleEntry,
-	IN PVOID FileName,
-	IN BOOLEAN RestartScan
-	);
-
-typedef
-NTSTATUS
-NTAPI
-NtOpenDirectoryObject (
-	OUT PHANDLE DirectoryHandle,
-	IN ACCESS_MASK DesiredAccess,
-	IN POBJECT_ATTRIBUTES ObjectAttributes
-	);
-
-typedef
-NTSTATUS
-NTAPI
-NtQueryDirectoryObject(
-	IN HANDLE DirectoryHandle,
-	OUT PVOID Buffer,
-	IN ULONG Length,
-	IN BOOLEAN ReturnSingleEntry,
-	IN BOOLEAN RestartScan,
-	IN PULONG Context,
-	OUT PULONG ReturnLength
-	);
-
-typedef
-NTSTATUS
-NTAPI
-NtOpenSymbolicLinkObject (
-	OUT PHANDLE LinkHandle,
-	IN ACCESS_MASK DesiredAccess,
-	IN POBJECT_ATTRIBUTES ObjectAttributes
-	);
-
-typedef
-NTSTATUS
-NTAPI
-NtQuerySymbolicLinkObject (
-	IN HANDLE LinkHandle,
-	OUT PUNICODE_STRING LinkTarget,
-	OUT PULONG ReturnedLength
-	);
-
-typedef
-NTSTATUS
-NTAPI
-NtQueryInformationFile (
-	HANDLE FileHandle,
-	PIO_STATUS_BLOCK IoStatusBlock,
-	PVOID FileInformation,
-	ULONG Length,
-	FILE_INFORMATION_CLASS FileInformationClass
-	);
-
-//..............................................................................
-
-NtQueryDirectoryFile* ntQueryDirectoryFile = NULL;
-NtOpenDirectoryObject* ntOpenDirectoryObject = NULL;
-NtQueryDirectoryObject* ntQueryDirectoryObject = NULL;
-NtOpenSymbolicLinkObject* ntOpenSymbolicLinkObject = NULL;
-NtQuerySymbolicLinkObject* ntQuerySymbolicLinkObject = NULL;
-NtQueryInformationFile* ntQueryInformationFile = NULL;
-
-void
-initNtFunctions ()
-{
-	HMODULE ntdll = ::GetModuleHandleW (L"ntdll.dll");
-	ASSERT (ntdll);
-
-	ntQueryDirectoryFile = (NtQueryDirectoryFile*) ::GetProcAddress (ntdll, "NtQueryDirectoryFile");
-	ntOpenDirectoryObject = (NtOpenDirectoryObject*) ::GetProcAddress (ntdll, "NtOpenDirectoryObject");
-	ntQueryDirectoryObject = (NtQueryDirectoryObject*) ::GetProcAddress (ntdll, "NtQueryDirectoryObject");
-	ntOpenSymbolicLinkObject = (NtOpenSymbolicLinkObject*) ::GetProcAddress (ntdll, "NtOpenSymbolicLinkObject");
-	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObject*) ::GetProcAddress (ntdll, "NtQuerySymbolicLinkObject");
-	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObject*) ::GetProcAddress (ntdll, "NtQuerySymbolicLinkObject");
-	ntQueryInformationFile = (NtQueryInformationFile*) ::GetProcAddress (ntdll, "NtQueryInformationFile");
-
-	ASSERT (ntQueryDirectoryFile);
-	ASSERT (ntOpenDirectoryObject);
-	ASSERT (ntQueryDirectoryObject);
-	ASSERT (ntOpenSymbolicLinkObject);
-	ASSERT (ntQuerySymbolicLinkObject);
-	ASSERT (ntQueryInformationFile);
-}
-
-#endif
-
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -473,7 +216,7 @@ testWinNetworkAdapterList2 ()
 bool
 getFileTimes_nt (const char* fileName)
 {
-	initNtFunctions ();
+	using namespace axl::sys::win;
 
 	io::File file;
 	bool result = file.open (fileName);
@@ -858,18 +601,12 @@ enum
 void
 testNamedPipes ()
 {
+	using namespace axl::sys::win;
+
 	NTSTATUS status;
 
 	HMODULE ntdll = ::GetModuleHandleW (L"ntdll.dll");
 	ASSERT (ntdll);
-
-	NtQueryDirectoryFile* ntQueryDirectoryFile = (NtQueryDirectoryFile*) ::GetProcAddress (ntdll, "NtQueryDirectoryFile");
-	if (!ntQueryDirectoryFile)
-	{
-		err::setLastSystemError ();
-		printf ("cannot find NtQueryDirectoryFile: %s\n", err::getLastErrorDescription ().sz ());
-		return;
-	}
 
 	io::win::File pipeDir;
 	bool result = pipeDir.create (
@@ -907,7 +644,7 @@ testNamedPipes ()
 			&ioStatus,
 			dirBuffer,
 			dirBuffer.getCount (),
-			FileDirectoryInformation,
+			sys::win::FileDirectoryInformation,
 			FALSE,
 			NULL,
 			isFirstQuery
@@ -954,6 +691,8 @@ querySymbolicLink (
 	UNICODE_STRING* uniName
 	)
 {
+	using namespace axl::sys::win;
+
 	NTSTATUS status;
 
 	string->clear ();
@@ -1004,6 +743,8 @@ enumerateDirectory (
 	size_t level
 	)
 {
+	using namespace axl::sys::win;
+
 	NTSTATUS status;
 
 	UNICODE_STRING uniName;
@@ -1095,6 +836,37 @@ enumerateDirectory (
 void
 testDirectoryObjects ()
 {
+	using namespace axl::sys::win;
+
+	sl::String_utf16 s;
+
+	io::win::File f;
+	bool result = f.create (L"COM3", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING);
+
+	struct ObjectInfo: OBJECT_NAME_INFORMATION
+	{
+		char m_buffer [1024];
+	} objectNameInfo;
+
+	ULONG actualSize;
+	NTSTATUS status = ntQueryObject (f, ObjectNameInformation, &objectNameInfo, sizeof (objectNameInfo), &actualSize);
+
+	sl::String ss;
+	result = io::getSymbolicLinkTarget (&ss, "COM3");
+
+	WCHAR* linkName = L"\\\\.\\COM3";
+	size_t length = wcslen (linkName);
+
+	UNICODE_STRING uniLink;
+	uniLink.Buffer = linkName;
+	uniLink.Length = length * sizeof (WCHAR);
+	uniLink.MaximumLength = (length + 1) * sizeof (wchar_t);
+
+	querySymbolicLink (&s, NULL, &uniLink);
+
+	printf ("target: %S\n", s.sz ());
+
+
 	printf ("\\\n");
 	enumerateDirectory (NULL, L"\\", 0);
 }
@@ -3284,6 +3056,92 @@ testTime ()
 
 //..............................................................................
 
+void
+testSerial2 ()
+{
+	bool result;
+
+	io::Serial serial;
+	result = serial.open ("/dev/ttyUSB0");
+
+	io::SerialSettings settings;
+	settings.m_baudRate = 115200;
+	settings.m_dataBits = 8;
+	settings.m_stopBits = io::SerialStopBits_1;
+	settings.m_flowControl = io::SerialFlowControl_None;
+	settings.m_parity = io::SerialParity_None;
+
+	result = serial.setSettings (&settings);
+
+	serial.write ("\r", 1);
+
+	char buffer [1024];
+	size_t size = serial.read (buffer, sizeof (buffer));
+
+	sl::String s0 = "takie dela";
+
+	sl::String s = enc::HexEncoding::encode (buffer, size);
+	printf ("incoming: %s\n", s.sz ());
+}
+
+//..............................................................................
+
+#include <axl_io_MappedFile.h>
+
+enum
+{
+	dm_ConnectionCountLimit      = 16,              // no more than 16 connections to a device
+	dm_DefPendingNotifySizeLimit = 1 * 1024 * 1024, // drop notifications if application is not fast enough to pick'em up
+	dm_NotifyHdrSignature        = 'nomt',
+};
+
+enum dm_NotifyFlag
+{
+	dm_NotifyFlag_InsufficientBuffer = 0x01, // buffer is not big enough, resize and try again
+	dm_NotifyFlag_DataDropped        = 0x02, // one or more notifications after this one were dropped
+	dm_NotifyFlag_Timestamp          = 0x04, // this notification is timestamped
+};
+
+struct dm_NotifyHdr
+{
+	UINT m_signature;
+	USHORT m_code;
+	USHORT m_flags;
+	LONG m_ntStatus;
+	ULONG m_paramSize;
+	ULONG m_processId;
+	ULONG m_threadId;
+	ULONGLONG m_timestamp;
+
+	// followed by params
+};
+
+void
+testDevmon ()
+{
+	io::SimpleMappedFile f;
+	f.open ("c:/xcg/test.bin");
+	
+	char* p = (char*) f.p ();
+	char* end = p + f.getMappingSize ();
+
+	size_t offset = 0;
+	while (p < end)
+	{
+		dm_NotifyHdr* hdr = (dm_NotifyHdr*) p;
+		ASSERT (hdr->m_signature == dm_NotifyHdrSignature);
+		if (hdr->m_flags & (dm_NotifyFlag_DataDropped | dm_NotifyFlag_InsufficientBuffer))
+			printf ("OH-OH: %x\n", hdr->m_flags);
+
+		printf ("offset %p is OK\n", offset);
+
+		size_t notifySize = sizeof (dm_NotifyHdr) + hdr->m_paramSize;
+		offset += notifySize;
+
+		p += notifySize;
+	}
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -3310,7 +3168,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testTimestamps ();
+	testDirectoryObjects ();
 
 	return 0;
 }

@@ -51,6 +51,8 @@
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_VirtualMemory.h"
 #	include "axl_sys_win_Process.h"
+#	include "axl_sys_win_NtDll.h"
+#	include "axl_sys_win_NtStatus.h"
 #elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_sys_psx_Sem.h"
