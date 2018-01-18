@@ -213,7 +213,7 @@ SharedMemoryTransportBase::initializeMapping (
 	bool isForced
 	)
 {
-	g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 	size_t remSize = size % systemInfo->m_pageSize;
 	if (remSize)
 		size = size - remSize + systemInfo->m_pageSize;
