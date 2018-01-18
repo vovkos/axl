@@ -481,56 +481,28 @@ getSymbolicLinkTarget (
 	const sl::StringRef& linkName
 	)
 {
-	struct stat sb;
-	char *buf;
-	ssize_t nbytes, bufsiz;
+	struct stat linkStat = { 0 };
 
-	if (argc != 2) {
-	fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
-	exit(EXIT_FAILURE);
-	}
+	int result = ::lstat (linkName.sz (), &linkStat);
+	if (result == -1)
+		return err::failWithLastSystemError ();
 
-	if (lstat(argv[1], &sb) == -1) {
-	perror("lstat");
-	exit(EXIT_FAILURE);
-	}
+	if (!S_ISLNK (linkStat.st_mode))
+		return err::fail (EINVAL);
 
-	/* Add one to the link size, so that we can determine whether
-	the buffer returned by readlink() was truncated. */
+	size_t bufferLength = linkStat.st_size ? linkStat.st_size : PATH_MAX;
 
-	bufsiz = sb.st_size + 1;
+	char* p = targetName->createBuffer (bufferLength);
+	if (!p)
+		return false;
 
-	/* Some magic symlinks under (for example) /proc and /sys
-	report 'st_size' as zero. In that case, take PATH_MAX as
-	a "good enough" estimate. */
+	result = readlink (linkName.sz (), p, bufferLength);
+	if (result == -1)
+		return err::failWithLastSystemError ();
 
-	if (sb.st_size == 0)
-	bufsiz = PATH_MAX;
-
-	buf = malloc(bufsiz);
-	if (buf == NULL) {
-	perror("malloc");
-	exit(EXIT_FAILURE);
-	}
-
-	nbytes = readlink(argv[1], buf, bufsiz);
-	if (nbytes == -1) {
-	perror("readlink");
-	exit(EXIT_FAILURE);
-	}
-
-	printf("'%s' points to '%.*s'\n", argv[1], (int) nbytes, buf);
-
-	/* If the return value was equal to the buffer size, then the
-	the link target was larger than expected (perhaps because the
-	target was changed between the call to lstat() and the call to
-	readlink()). Warn the user that the returned target may have
-	been truncated. */
-
-	if (nbytes == bufsiz)
-	printf("(Returned buffer may have been truncated)\n");
-
-	return linkName; // not yet
+	ASSERT (result <= bufferLength);
+	targetName->setReducedLength (result);
+	return true;
 }
 
 #endif

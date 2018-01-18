@@ -3086,61 +3086,21 @@ testSerial2 ()
 
 //..............................................................................
 
-#include <axl_io_MappedFile.h>
-
-enum
-{
-	dm_ConnectionCountLimit      = 16,              // no more than 16 connections to a device
-	dm_DefPendingNotifySizeLimit = 1 * 1024 * 1024, // drop notifications if application is not fast enough to pick'em up
-	dm_NotifyHdrSignature        = 'nomt',
-};
-
-enum dm_NotifyFlag
-{
-	dm_NotifyFlag_InsufficientBuffer = 0x01, // buffer is not big enough, resize and try again
-	dm_NotifyFlag_DataDropped        = 0x02, // one or more notifications after this one were dropped
-	dm_NotifyFlag_Timestamp          = 0x04, // this notification is timestamped
-};
-
-struct dm_NotifyHdr
-{
-	UINT m_signature;
-	USHORT m_code;
-	USHORT m_flags;
-	LONG m_ntStatus;
-	ULONG m_paramSize;
-	ULONG m_processId;
-	ULONG m_threadId;
-	ULONGLONG m_timestamp;
-
-	// followed by params
-};
-
 void
-testDevmon ()
+testSymbolicLinks ()
 {
-	io::SimpleMappedFile f;
-	f.open ("c:/xcg/test.bin");
-	
-	char* p = (char*) f.p ();
-	char* end = p + f.getMappingSize ();
-
-	size_t offset = 0;
-	while (p < end)
+	sl::String target;
+	bool result = io::getSymbolicLinkTarget (&target, "/home/vladimir/a");
+	if (!result)
 	{
-		dm_NotifyHdr* hdr = (dm_NotifyHdr*) p;
-		ASSERT (hdr->m_signature == dm_NotifyHdrSignature);
-		if (hdr->m_flags & (dm_NotifyFlag_DataDropped | dm_NotifyFlag_InsufficientBuffer))
-			printf ("OH-OH: %x\n", hdr->m_flags);
-
-		printf ("offset %p is OK\n", offset);
-
-		size_t notifySize = sizeof (dm_NotifyHdr) + hdr->m_paramSize;
-		offset += notifySize;
-
-		p += notifySize;
+		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		return;
 	}
+
+	printf ("target: %s\n", target.sz ());
 }
+
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 int
@@ -3168,7 +3128,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testDirectoryObjects ();
+	testSymbolicLinks ();
 
 	return 0;
 }
