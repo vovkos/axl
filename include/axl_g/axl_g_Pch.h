@@ -315,7 +315,9 @@ typedef wchar_t           utf32_t;
 #if (_AXL_OS_POSIX)
 #	undef basename
 #	define _stricmp    strcasecmp
+#	define _strnicmp   strncasecmp
 #	define _wcsicmp    wcscasecmp
+#	define _wcsnicmp   wcsncasecmp
 #	define _snprintf   snprintf
 #	define _snwprintf  swprintf
 #	define _alloca     alloca
