@@ -102,7 +102,7 @@ struct SerialSettings
 		bool rts = true
 		)
 	{
-		setup (baudRate, flowControl, dataBits, stopBits, parity, readInterval);
+		setup (baudRate, flowControl, dataBits, stopBits, parity, readInterval, dtr, rts);
 	}
 
 	void
