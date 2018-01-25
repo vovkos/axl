@@ -3128,7 +3128,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testSymbolicLinks ();
+	testEnumSerial ();
 
 	return 0;
 }

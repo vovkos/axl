@@ -105,7 +105,11 @@ SerialPortEnumerator::createPortDesc (sys::win::DeviceInfo* deviceInfo)
 
 	SerialPortDesc* portDesc = AXL_MEM_NEW (SerialPortDesc);
 	portDesc->m_deviceName = bufferString;
-	deviceInfo->getDeviceRegistryProperty (SPDRP_DEVICEDESC, &portDesc->m_description);
+	deviceInfo->getDeviceRegistryProperty (SPDRP_FRIENDLYNAME, &portDesc->m_description);
+	
+	if (portDesc->m_description.isEmpty ()) // try another property
+		deviceInfo->getDeviceRegistryProperty (SPDRP_DEVICEDESC, &portDesc->m_description);
+	
 	return portDesc;
 }
 
