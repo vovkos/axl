@@ -83,7 +83,7 @@ set LUA_VERSION=5.3.3
 set LUA_LIB_NAME=lua53
 set LUA_DOWNLOAD_URL=https://sourceforge.net/projects/luabinaries/files/%LUA_VERSION%/Windows%%20Libraries/Static/lua-%LUA_VERSION%_%LUA_PLATFORM%_%LUA_TOOLCHAIN%_lib.zip/download
 
-set RAGEL_DOWNLOAD_URL=http://downloads.yorickpeterse.com/files/ragel-68-visualstudio2012.7z
+set RAGEL_DOWNLOAD_URL=https://github.com/eloraiby/ragel-windows/raw/master/ragel.exe
 
 set CMAKE_CONFIGURE_FLAGS=-G "%CMAKE_GENERATOR%%CMAKE_GENERATOR_SUFFIX%"
 
