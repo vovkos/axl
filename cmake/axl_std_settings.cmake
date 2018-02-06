@@ -316,6 +316,12 @@ axl_create_gcc_settings)
 		" " "-rdynamic"
 		)
 
+	option (
+		GCC_LINK_FLAG_EXPORTLESS_EXE
+		"Don't export ANYTHING from executables"
+		ON
+		)
+
 	axl_create_compiler_flag_setting (
 		GCC_FLAG_WARNING_MULTICHAR
 		DESCRIPTION "GNU C++ shows warnings if multicharacter constants are used, e.g. 'ABCD'"
@@ -345,6 +351,12 @@ axl_apply_gcc_settings)
 	axl_create_compiler_flag_setting_regex (_REGEX GCC_LINK_FLAG_RDYNAMIC)
 	axl_apply_compiler_flag (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
 	axl_apply_compiler_flag (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
+
+	if (GCC_LINK_FLAG_EXPORTLESS_EXE)
+		set (_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
+		file (WRITE ${_VERSION_SCRIPT} "{ local: *; };")
+		set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_VERSION_SCRIPT}'")
+	endif ()
 endmacro ()
 
 #...............................................................................

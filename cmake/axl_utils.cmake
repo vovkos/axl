@@ -647,6 +647,25 @@ axl_apply_compiler_flag_setting_to_list
 	endforeach ()
 endmacro ()
 
+macro (
+axl_set_export_version_script_gcc
+	_TARGET
+	# ... _EXPORT_LIST
+	)
+
+	set (_EXPORT_LIST ${ARGN})
+	set (_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET}-export.version")
+
+	file (WRITE ${_VERSION_SCRIPT} "{ global: ${_EXPORT_LIST}; local: *; };")
+
+	set_property (
+		TARGET ${_TARGET}
+		APPEND_STRING
+		PROPERTY LINK_FLAGS
+		" -Wl,--version-script='${_VERSION_SCRIPT}'"
+		)
+endmacro ()
+
 #...............................................................................
 
 # precompiled headers
