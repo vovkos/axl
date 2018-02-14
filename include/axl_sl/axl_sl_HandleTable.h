@@ -13,9 +13,7 @@
 
 #define _AXL_SL_HANDLETABLE_H
 
-#include "axl_sl_List.h"
 #include "axl_sl_HashTable.h"
-#include "axl_sl_ArgType.h"
 
 namespace axl {
 namespace sl {
@@ -49,7 +47,7 @@ public:
 	{
 	}
 
-	HandleTableIterator (const HandleTableIteratorBase <uintptr_t, T>& src)
+	HandleTableIterator (const Iterator <HashTableEntry <uintptr_t, T> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
@@ -63,12 +61,12 @@ template <
 	typename ValueArg = typename ArgType <Value>::Type
 	>
 class HandleTableBase: public HashTable <
-	Key, 
-	Value, 
+	Key,
+	Value,
 	HashId <Key>,
 	Eq <Key>,
-	Key, 
-	Value
+	Key,
+	ValueArg
 	>
 {
 protected:
@@ -83,7 +81,7 @@ public:
 	void
 	reset (Key seed = 1)
 	{
-		clear ();
+		this->clear ();
 		m_seed = seed;
 	}
 
@@ -104,14 +102,14 @@ public:
 			if (!key)
 				key = 1; // never 0
 
-			if (!find (key))
+			if (!this->find (key))
 				break;
 
 			key++;
 		}
 
 		ASSERT (key);
-		Iterator it = visit (key);
+		typename HandleTableBase::Iterator it = this->visit (key);
 		it->m_value = value;
 		m_seed = key + 1;
 		return key;
@@ -128,7 +126,7 @@ class HandleTable: public HandleTableBase <uintptr_t, T, Arg>
 {
 public:
 	HandleTable (uintptr_t seed = 1):
-		HandleTableBase (seed)
+		HandleTableBase <uintptr_t, T, Arg> (seed)
 	{
 	}
 };
