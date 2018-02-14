@@ -22,7 +22,7 @@ namespace sl {
 
 template <
 	typename T,
-	typename Close	= Void <T>,
+	typename Close = Void <T>,
 	typename GetInvalidHandle = Zero <T>
 	>
 class Handle

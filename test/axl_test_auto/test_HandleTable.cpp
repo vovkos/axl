@@ -23,15 +23,15 @@ run ()
 
 	sl::HandleTable <int> handleTable (0xffffffff);
 
-	handle_t h1 = handleTable.add (100);
-	handle_t h2 = handleTable.add (200);
-	handle_t h3 = handleTable.add (300);
-	handle_t h4 = handleTable.add (400);
+	uintptr_t h1 = handleTable.add (100);
+	uintptr_t h2 = handleTable.add (200);
+	uintptr_t h3 = handleTable.add (300);
+	uintptr_t h4 = handleTable.add (400);
 
-	sl::Iterator <sl::HandleTable <int>::Entry> it = handleTable.getList ().getHead ();
+	sl::HandleTableIterator <int> it = handleTable.getHead ();
 	for (; it; it++)
 	{
-		printf ("0x%p -> %d\n", it->getHandle (), it->m_value);
+		printf ("0x%p -> %d\n", it->m_key, it->m_value);
 	}
 }
 
