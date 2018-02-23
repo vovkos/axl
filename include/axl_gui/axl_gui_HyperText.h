@@ -39,6 +39,23 @@ protected:
 	sl::Array <HyperlinkXMapEntry> m_hyperlinkXMap;
 
 public:
+	HyperText ()
+	{
+	}
+
+	HyperText (const sl::StringRef& source)
+	{
+		setHyperText (source);
+	}
+
+	HyperText (
+		const gui::TextAttr& baseAttr,
+		const sl::StringRef& source
+		)
+	{
+		setHyperText (baseAttr, source);
+	}
+
 	const sl::String&
 	getSource () const
 	{
