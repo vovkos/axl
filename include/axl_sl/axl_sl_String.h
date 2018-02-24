@@ -298,13 +298,13 @@ public:
 		return m_length ? ensureNullTerminated () : NULL;
 	}
 
-	StringRef2
+	String2
 	s2 () const
 	{
 		return String2 (m_p, m_length);
 	}
 
-	StringRef3
+	String3
 	s3 () const
 	{
 		return String3 (m_p, m_length);
