@@ -162,7 +162,7 @@ public:
 		}
 		else
 		{
-			this->m_incrementalContext->m_tail.copyReverse (this->m_p - size + i - tailLength + 1, size);
+			this->m_incrementalContext->m_tail.copyReverse (this->m_p - size - (i - tailLength) + 1, size);
 		}
 	}
 };

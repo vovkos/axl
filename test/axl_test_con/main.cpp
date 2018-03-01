@@ -3102,6 +3102,28 @@ testSymbolicLinks ()
 
 //..............................................................................
 
+void
+testBoyerMoore ()
+{
+	static const char pattern [] = "muravei";
+
+	sl::BinaryBoyerMooreFind find;
+	find.setPattern (pattern, lengthof (pattern), sl::BoyerMooreFlag_Reverse);
+
+	static const char chunk1 [] = "vei! mura";
+	static const char chunk2 [] = "vei, go";
+
+	size_t offset;
+
+	sl::BinaryBoyerMooreFind::IncrementalContext incrementalContext;
+	offset = find.find (&incrementalContext, 0, chunk2, lengthof (chunk2));
+	offset = find.find (&incrementalContext, 0, chunk1, lengthof (chunk1));
+
+	printf ("offset = %d\n", offset);
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -3128,7 +3150,8 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testEnumSerial ();
+	testBoyerMoore ();
+// 	testEnumSerial ();
 
 	return 0;
 }
