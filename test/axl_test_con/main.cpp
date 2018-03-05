@@ -3105,6 +3105,7 @@ testSymbolicLinks ()
 void
 testBoyerMoore ()
 {
+#if (0)
 	static const char pattern [] = "muravei";
 
 	sl::BinaryBoyerMooreFind find;
@@ -3120,6 +3121,25 @@ testBoyerMoore ()
 	offset = find.find (&incrementalContext, 0, chunk1, lengthof (chunk1));
 
 	printf ("offset = %d\n", offset);
+#else
+	static const char pattern [] = "s";
+
+	sl::TextBoyerMooreFind find;
+	find.setPattern (
+		enc::CharCodecKind_Utf8, 
+		pattern, 
+		lengthof (pattern), 
+		sl::BoyerMooreFlag_Reverse | sl::TextBoyerMooreFlag_CaseInsensitive
+		);
+
+	static const utf32_t chunk1 [] = { 'S', 'e' };
+
+	size_t offset;
+
+	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
+	offset = find.find (&incrementalContext, enc::CharCodecKind_Utf32, 0, chunk1, sizeof (chunk1));
+
+#endif
 }
 
 //..............................................................................

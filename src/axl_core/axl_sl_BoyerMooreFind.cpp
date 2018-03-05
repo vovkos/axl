@@ -289,7 +289,7 @@ TextBoyerMooreFind::find (
 		return -1;
 
 	if (m_flags & BoyerMooreFlag_Reverse)
-		result = size - result - patternLength;
+		result = length - result - patternLength;
 
 	ASSERT (result <= length);
 	return codec->calcRequiredBufferSizeToEncodeFromUtf32 (m_buffer, result);
@@ -359,7 +359,7 @@ TextBoyerMooreFind::find (
 	result -= tailLength;
 
 	if (m_flags & BoyerMooreFlag_Reverse)
-		result = size - result - patternLength;
+		result = chunkLength - result - patternLength;
 
 	if ((intptr_t) result < 0)
 	{
