@@ -185,6 +185,7 @@ public:
 	getEncodeCodePointLength (utf32_t x)
 	{
 		return
+			x == 0xffff ? 1 :            // non-character U+FFFF
 			x < 0x80 ? 1 :               // 0xxxxxxx
 			x < 0x800 ? 2 :              // 110xxxxx 10xxxxxx
 			x < 0x10000 ? 3 :            // 1110xxxx 10xxxxxx 10xxxxxx
@@ -219,7 +220,11 @@ public:
 		utf32_t x
 		)
 	{
-		if (x < 0x80)                    // 0xxxxxxx
+		if (x == 0xffff)                 // non-character U+FFFF
+		{
+			p [0] = -1;
+		}
+		else if (x < 0x80)               // 0xxxxxxx
 		{
 			p [0] = (uint8_t) x;
 		}
