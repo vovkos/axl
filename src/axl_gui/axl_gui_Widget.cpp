@@ -48,10 +48,14 @@ WidgetDriver::setFont (Font* font)
 bool
 WidgetDriver::setCaretVisible (bool isVisible)
 {
-	if (m_isCaretVisible == isVisible)
-		return true;
+	// don't check if nothing changed, force caret update --
+	// otherwise, this sequence will work incorrectly:
+	
+	// widgetA.setCaretVisible (true);
+	// widgetB.setCaretVisible (false);
+	// widgetA.setCaretVisible (true);
 
-	m_isCaretVisible = isVisible;
+	m_isCaretVisible = isVisible; 
 
 	if (isVisible)
 		return m_engine->showCaret (this, Rect (m_caretPos, m_caretSize));
