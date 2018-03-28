@@ -653,6 +653,10 @@ axl_set_export_version_script_gcc
 	# ... _EXPORT_LIST
 	)
 
+	if (APPLE)
+		message (FATAL_ERROR "axl_set_export_version_script is not supported")
+	endif ()
+
 	set (_EXPORT_LIST ${ARGN})
 	set (_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET}-export.version")
 
