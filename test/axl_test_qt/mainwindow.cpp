@@ -104,6 +104,56 @@ private:
 	QSize m_minimumSizeHint;
 };
 
+int
+cloneStandardItemModel (
+	QStandardItemModel* dst,
+	const QStandardItemModel* src
+	)
+{
+	dst->clear();
+
+	int count = src->rowCount();
+	for (int i = 0 ; i < count; i++)
+	{
+		QStandardItem* item = src->item (i);
+		dst->appendRow (item->clone ());
+	}
+
+	return count;
+}
+
+class MyItemModel: public QStandardItemModel
+{
+public:
+	MyItemModel (QObject* parent = NULL):
+		QStandardItemModel (parent)
+	{
+	}
+
+	MyItemModel (
+		const QStandardItemModel* model,
+		QObject* parent = NULL
+		):
+		QStandardItemModel (parent)
+	{
+		cloneStandardItemModel (this, model);
+	}
+
+protected:
+	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+	{
+		if (role == Qt::DisplayRole)
+		{
+			QVariant userData = QStandardItemModel::data (index, Qt::UserRole);
+			if (!userData.isNull ())
+				return userData;
+		}
+
+		return QStandardItemModel::data (index, role);
+	}
+
+};
+
 MainWindow::MainWindow (QWidget* parent) :
 	QMainWindow (parent),
 #if (1)
@@ -147,19 +197,23 @@ MainWindow::MainWindow (QWidget* parent) :
 
 	SizeHintCombo* combo1 = new SizeHintCombo (this);
 	combo1->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-	combo1->setEditable (false);
+	combo1->setEditable (true);
 	combo1->setSizeAdjustPolicy (QComboBox::AdjustToContents);
 	combo1->setSizeHint (combo1->sizeHint ());
 	combo1->setMinimumSizeHint (combo1->minimumSizeHint ());
 	combo1->view ()->setTextElideMode (Qt::ElideRight);
 
-	combo1->addItem ("hui");
-	combo1->addItem ("hui govno");
-	combo1->addItem ("hui govno i");
-	combo1->addItem ("hui govno i muravei");
-	combo1->addItem ("hui govno i muravei (c) laertsky");
+	combo1->addItem ("hui", "HUI");
+	combo1->addItem ("hui govno", "HUI GOVNO");
+	combo1->addItem ("hui govno i", "HUI GOVNO I");
+	combo1->addItem ("hui govno i muravei", "HUI GOVNO I MURAVEI");
+	combo1->addItem ("hui govno i muravei (c) laertsky", "LAERTSKY");
+
+	combo1->setModel (new MyItemModel (qobject_cast <QStandardItemModel*> (combo1->model ())));
+
 	combo1->view ()->setMinimumWidth (combo1->QComboBox::sizeHint ().width ());
 	hlayout->addWidget (combo1);
+
 
 	QLabel* label2 = new QLabel (this);
 	label2->setText ("Port:");

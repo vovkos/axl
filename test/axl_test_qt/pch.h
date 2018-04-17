@@ -45,6 +45,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include <QListView>
+#include <QTableView>
+#include <QItemDelegate>
 #include <QLineEdit>
 
 //..............................................................................
