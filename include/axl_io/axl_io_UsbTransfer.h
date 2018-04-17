@@ -49,6 +49,41 @@ public:
 	bool
 	cancel ();
 
+	static
+	void
+	fillControlSetup (
+		libusb_control_setup* setup,
+		uint_t requestType, 
+		uint_t requestId, 
+		uint_t value, 
+		uint_t index,
+		size_t size
+		)
+	{
+		libusb_fill_control_setup ((uchar_t*) setup, requestType, requestId, value, index, size);
+	}
+
+	void
+	fillControlTransfer (
+		libusb_device_handle* deviceOpenHandle,
+		libusb_control_setup* setup,
+		libusb_transfer_cb_fn callback,
+		void* context,
+		uint_t timeout = -1
+		)
+	{
+		ASSERT (m_h);
+
+		libusb_fill_control_transfer (
+			m_h,
+			deviceOpenHandle,
+			(uchar_t*) setup,
+			callback,
+			context,
+			timeout != -1 ? timeout : 0
+			);
+	}
+
 	void
 	fillBulkTransfer (
 		libusb_device_handle* deviceOpenHandle,
