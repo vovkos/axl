@@ -69,16 +69,10 @@ class RefCount
 	AXL_DISABLE_COPY (RefCount)
 
 protected:
-	volatile intptr_t m_refCount;
-	volatile intptr_t m_weakRefCount;
-
-	uintptr_t m_flags        : 8;
-
-#if (AXL_PTR_BITS == 64)
-	uintptr_t m_parentOffset : 56;
-#else
-	uintptr_t m_parentOffset : 24; // more than enough
-#endif
+	volatile int32_t m_refCount;
+	volatile int32_t m_weakRefCount;
+	uint_t m_parentOffset;
+	uint_t m_flags;
 
 public:
 	RefCount ();
@@ -135,6 +129,91 @@ public:
 	addRefByWeakPtr ();
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+RefCount::RefCount ()
+{
+	m_refCount = 0;
+	m_weakRefCount = 1;
+	m_parentOffset = 0;
+	m_flags = 0;
+}
+
+inline
+void
+RefCount::prime (
+	RefCount* parent,
+	uint_t flags
+	)
+{
+	ASSERT (m_refCount == 0); // should only be called once in the very beginning
+
+	if (!parent)
+	{
+		m_parentOffset = 0;
+	}
+	else
+	{
+		ASSERT (parent < this);
+		m_parentOffset = (uint_t) ((char*) this - (char*) parent);
+		parent->addWeakRef ();
+	}
+
+	m_flags = flags;
+}
+
+inline
+size_t
+RefCount::release ()
+{
+	intptr_t refCount = sys::atomicDec (&m_refCount);
+
+	if (!refCount)
+	{
+		this->~RefCount ();
+		weakRelease (); // weakRelease () should be here, not in ~RefCount ()
+	}
+
+	return refCount;
+}
+
+inline
+size_t
+RefCount::weakRelease ()
+{
+	intptr_t refCount = sys::atomicDec (&m_weakRefCount);
+
+	if (!refCount)
+		if (m_flags & RefCountFlag_Allocated)
+		{
+			RefCountAllocHdr* hdr = (RefCountAllocHdr*) this - 1;
+			hdr->m_freeFunc (hdr);
+		}
+		else if (m_parentOffset)
+		{
+			RefCount* parent = (RefCount*) ((char*) this - m_parentOffset);
+			parent->weakRelease ();
+		}
+
+	return refCount;
+}
+
+inline
+size_t
+RefCount::addRefByWeakPtr ()
+{
+	for (;;)
+	{
+		int32_t old = m_refCount;
+		if (old == 0)
+			return 0;
+
+		if (sys::atomicCmpXchg (&m_refCount, old, old + 1) == old)
+			return old + 1;
+	}
+}
+
 //..............................................................................
 
 template <typename T>
@@ -180,7 +259,9 @@ class Ptr;
 template <typename T>
 class WeakPtr;
 
-extern struct NullPtr g_nullPtr;
+AXL_SELECT_ANY struct NullPtr
+{
+} g_nullPtr;
 
 //..............................................................................
 
