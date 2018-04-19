@@ -31,6 +31,9 @@
 #	define AXL_CPP_MSC_VERSION_MINOR (_MSC_VER % 100)
 #	define AXL_CPP_MSC_VERSION (((_MSC_VER / 100) << 8) | (_MSC_VER % 100))
 #	define AXL_CPP_STRING "Microsoft Visual C++"
+#	if (AXL_CPP_MSC_VERSION >= 0x1000)
+#		define _AXL_CPP_HAS_RVALUE_REF 1
+#	endif
 #elif (defined __GNUC__)
 #	define _AXL_CPP_GCC 1
 #	define AXL_CPP_GCC_VERSION_MAJOR __GNUC__
@@ -50,6 +53,9 @@
 #		define AXL_CPP_STRING "Intel C++"
 #	else
 #		define AXL_CPP_STRING "GNU C++"
+#	endif
+#	if (__cplusplus >= 201103L)
+#		define _AXL_CPP_HAS_RVALUE_REF 1
 #	endif
 #else
 #	error unsupported C++ compiler
@@ -194,6 +200,7 @@
 #include <errno.h>
 
 #include <new>
+#include <utility>
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
