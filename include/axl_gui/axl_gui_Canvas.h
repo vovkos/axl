@@ -674,11 +674,11 @@ public:
 
 		width = width < entry->m_size.m_width_u ?
 			entry->m_size.m_width_u :
-			sl::getMinPower2Ge (width);
+			sl::align <16> (width);
 
 		height = entry->m_size.m_height_u < height ?
 			entry->m_size.m_height_u :
-			sl::getMinPower2Ge (height);
+			sl::align <16> (height);
 
 		bool result = m_engine->createOffscreenCanvas (&entry->m_canvas, width, height);
 		if (!result)

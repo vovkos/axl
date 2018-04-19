@@ -364,7 +364,7 @@ UsbDevice::getDescriptor (
 	ASSERT (m_openHandle);
 
 	size_t size = descriptor->getCount ();
-	size = size < Def_BufferSize ? Def_BufferSize : sl::getMinPower2Ge (size);
+	size = size < Def_BufferSize ? Def_BufferSize : sl::getAllocSize (size);
 
 	descriptor->setCount (size);
 
