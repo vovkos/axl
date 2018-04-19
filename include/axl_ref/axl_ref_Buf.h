@@ -96,6 +96,14 @@ public:
 		initialize ();
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	BufRef (BufRef&& src)
+	{
+		initialize ();
+		move (std::move (src));
+	}
+#endif
+
 	BufRef (const BufRef& src)
 	{
 		initialize ();
@@ -173,6 +181,15 @@ public:
 		return m_p;
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	BufRef&
+	operator = (BufRef&& src)
+	{
+		move (std::move (src));
+		return *this;
+	}
+#endif
+
 	BufRef&
 	operator = (const BufRef& src)
 	{
@@ -227,6 +244,20 @@ protected:
 		m_hdr = NULL;
 		m_size = 0;
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move (BufRef&& src)
+	{
+		if (m_hdr)
+			m_hdr->release ();
+
+		m_p = src.m_p;
+		m_hdr = src.m_hdr;
+		m_size = src.m_size;
+		src.initialize ();
+	}
+#endif
 
 	void
 	attachBufHdr (BufHdr* hdr)
@@ -293,6 +324,18 @@ public:
 	{
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Buf (Buf&& src)
+	{
+		copy (std::move (src));
+	}
+
+	Buf (Ref&& src)
+	{
+		copy (std::move (src));
+	}
+#endif
+
 	Buf (const Buf& src)
 	{
 		copy (src);
@@ -344,6 +387,22 @@ public:
 		return this->m_p;
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Buf&
+	operator = (Buf&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+
+	Buf&
+	operator = (Ref&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+#endif
+
 	Buf&
 	operator = (const Buf& src)
 	{
@@ -393,11 +452,41 @@ public:
 		this->m_size = 0;
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	size_t
+	copy (Ref&& src)
+	{
+		if (src.isEmpty ())
+		{
+			clear ();
+			src.release ();
+			return 0;
+		}
+
+		BufHdr* hdr = src.getHdr ();
+		if (!hdr || (hdr->getFlags () & BufHdrFlag_Exclusive))
+		{
+			copy (src, src.getSize ());
+			src.release ();
+			return this->m_size;
+		}
+
+		this->move (std::move (src));
+		return this->m_size;
+	}
+#endif
+
 	size_t
 	copy (const Ref& src)
 	{
 		if (&src == this)
 			return this->m_size;
+
+		if (src.isEmpty ())
+		{
+			clear ();
+			return 0;
+		}
 
 		BufHdr* hdr = src.getHdr ();
 		if (!hdr || (hdr->getFlags () & BufHdrFlag_Exclusive))
@@ -506,7 +595,7 @@ public:
 			}
 		}
 
-		size_t bufferSize = sl::getMinPower2Ge (size);
+		size_t bufferSize = sl::getAllocSize (size);
 
 		Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
 		if (!hdr)

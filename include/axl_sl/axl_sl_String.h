@@ -63,20 +63,22 @@ public:
 protected:
 	mutable C* m_p;
 	mutable ref::BufHdr* m_hdr;
-
-#if (AXL_PTR_BITS == 64)
-	size_t m_length : 63;
-#else
-	size_t m_length : 31; // more than enough
-#endif
-
-	mutable size_t m_isNullTerminated : 1;
+	size_t m_length;
+	mutable bool m_isNullTerminated;
 
 public:
 	StringRefBase ()
 	{
 		initialize ();
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	StringRefBase (StringRef&& src)
+	{
+		initialize ();
+		move (std::move (src));
+	}
+#endif
 
 	StringRefBase (const StringRef& src)
 	{
@@ -145,6 +147,15 @@ public:
 	{
 		release ();
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	StringRefBase&
+	operator = (StringRef&& src)
+	{
+		move (std::move (src));
+		return *this;
+	}
+#endif
 
 	StringRefBase&
 	operator = (const StringRef& src)
@@ -651,6 +662,21 @@ protected:
 		m_isNullTerminated = false;
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move (StringRefBase&& src)
+	{
+		if (m_hdr)
+			m_hdr->release ();
+
+		m_p = src.m_p;
+		m_hdr = src.m_hdr;
+		m_length = src.m_length;
+		m_isNullTerminated = src.m_isNullTerminated;
+		src.initialize ();
+	}
+#endif
+
 	void
 	attachBufHdr (ref::BufHdr* hdr) const
 	{
@@ -822,6 +848,18 @@ public:
 	{
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	StringBase (StringBase&& src)
+	{
+		copy (std::move (src));
+	}
+
+	StringBase (StringRef&& src)
+	{
+		copy (std::move (src));
+	}
+#endif
+
 	StringBase (const StringBase& src)
 	{
 		copy (src);
@@ -916,6 +954,22 @@ public:
 	{
 		return sz ();
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	StringBase&
+	operator = (StringBase&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+
+	StringBase&
+	operator = (StringRef&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+#endif
 
 	StringBase&
 	operator = (const StringBase& src)
@@ -1081,6 +1135,30 @@ public:
 	{
 		return copy (src.cp (), src.getLength ());
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	size_t
+	copy (StringRef&& src)
+	{
+		if (src.isEmpty ())
+		{
+			clear ();
+			src.release ();
+			return 0;
+		}
+
+		ref::BufHdr* hdr = src.getHdr ();
+		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated ())
+		{
+			copy (src.cp (), src.getLength ());
+			src.release ();
+			return this->m_length;
+		}
+
+		this->move (std::move (src));
+		return this->m_length;
+	}
+#endif
 
 	size_t
 	copy (const StringRef& src)
@@ -1773,7 +1851,7 @@ public:
 			}
 		}
 
-		size_t bufferSize = getMinPower2Ge (size);
+		size_t bufferSize = getAllocSize (size);
 
 		ref::Ptr <ref::BufHdr> hdr = AXL_REF_NEW_EXTRA (ref::BufHdr, bufferSize);
 		if (!hdr)

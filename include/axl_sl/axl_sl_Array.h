@@ -43,6 +43,14 @@ public:
 		initialize ();
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	ArrayRef (ArrayRef&& src)
+	{
+		initialize ();
+		move (std::move (src));
+	}
+#endif
+
 	ArrayRef (const ArrayRef& src)
 	{
 		initialize ();
@@ -97,6 +105,15 @@ public:
 	{
 		return m_p;
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	ArrayRef&
+	operator = (ArrayRef&& src)
+	{
+		move (std::move (src));
+		return *this;
+	}
+#endif
 
 	ArrayRef&
 	operator = (const ArrayRef& src)
@@ -200,6 +217,20 @@ protected:
 		m_count = 0;
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move (ArrayRef&& src)
+	{
+		if (m_hdr)
+			m_hdr->release ();
+
+		m_p = src.m_p;
+		m_hdr = src.m_hdr;
+		m_count = src.m_count;
+		src.initialize ();
+	}
+#endif
+
 	void
 	attach (const ArrayRef& src)
 	{
@@ -250,6 +281,18 @@ public:
 	{
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Array (Array&& src)
+	{
+		copy (std::move (src));
+	}
+
+	Array (ArrayRef&& src)
+	{
+		copy (std::move (src));
+	}
+#endif
+
 	Array (const Array& src)
 	{
 		copy (src);
@@ -299,6 +342,22 @@ public:
 	{
 		return this->m_p;
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Array&
+	operator = (Array&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+
+	Array&
+	operator = (ArrayRef&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+#endif
 
 	Array&
 	operator = (const Array& src)
@@ -386,11 +445,41 @@ public:
 		setCount (0);
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	size_t
+	copy (ArrayRef&& src)
+	{
+		if (src.isEmpty ())
+		{
+			clear ();
+			src.release ();
+			return 0;
+		}
+
+		Hdr* hdr = src.getHdr ();
+		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive))
+		{
+			copy (src, src.getCount ());
+			src.release ();
+			return this->m_count;
+		}
+
+		this->move (std::move (src));
+		return this->m_count;
+	}
+#endif
+
 	size_t
 	copy (const ArrayRef& src)
 	{
 		if (&src == this)
 			return this->m_count;
+
+		if (src.isEmpty ())
+		{
+			clear ();
+			return 0;
+		}
 
 		Hdr* hdr = src.getHdr ();
 		if (!hdr || (hdr->getFlags () & ref::BufHdrFlag_Exclusive))
@@ -678,46 +767,6 @@ public:
 		return e;
 	}
 
-	bool
-	move (
-		size_t indexDst,
-		size_t indexSrc,
-		size_t count = 1
-		)
-	{
-		if (count == 0 || indexDst == indexSrc)
-			return true;
-
-		size_t oldCount = this->m_count;
-
-		if (indexDst + count > oldCount || indexSrc + count > oldCount)
-		{
-			err::setError (err::SystemErrorCode_InvalidParameter);
-			return false;
-		}
-
-		T* temp = (T*) AXL_MEM_ALLOCATE (count * sizeof (T));
-		if (!temp)
-			return false;
-
-		T* dst = this->m_p + indexDst;
-		T* src = this->m_p + indexSrc;
-
-		Details::constructCopy (temp, src, count);
-
-		if (indexSrc < indexDst)
-			Details::copy (src, src + count, indexDst - indexSrc);
-		else
-			Details::copy (dst + count, dst, indexSrc - indexDst);
-
-		Details::copy (dst, temp, count);
-
-		Details::destruct (temp, count);
-		AXL_MEM_FREE (temp);
-
-		return true;
-	}
-
 	void
 	reverse (
 		size_t index,
@@ -775,7 +824,7 @@ public:
 			this->m_hdr->m_bufferSize >= size)
 			return true;
 
-		size_t bufferSize = sl::getMinPower2Ge (size);
+		size_t bufferSize = getAllocSize (size);
 
 		ref::Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
 		if (!hdr)
@@ -841,7 +890,7 @@ public:
 
 		ASSERT (this->m_hdr);
 
-		size_t bufferSize = sl::getMinPower2Ge (size);
+		size_t bufferSize = getAllocSize (size);
 
 		ref::Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
 		if (!hdr)

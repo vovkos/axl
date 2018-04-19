@@ -99,6 +99,13 @@ public:
 	{
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	ErrorRef (ErrorRef&& src):
+		BaseType (std::move (src))
+	{
+	}
+#endif
+
 	ErrorRef (const ErrorRef& src):
 		BaseType (src)
 	{
@@ -115,6 +122,15 @@ public:
 		const sl::Guid& guid,
 		uint_t code
 		);
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	ErrorRef&
+	operator = (ErrorRef&& src)
+	{
+		this->move (std::move (src));
+		return *this;
+	}
+#endif
 
 	ErrorRef&
 	operator = (const ErrorRef& src)
@@ -144,6 +160,18 @@ public:
 	Error ()
 	{
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Error (Error&& src)
+	{
+		copy (std::move (src));
+	}
+
+	Error (ErrorRef&& src)
+	{
+		copy (std::move (src));
+	}
+#endif
 
 	Error (const Error& src)
 	{
@@ -191,6 +219,22 @@ public:
 	{
 		setBuffer (kind, p, size);
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Error&
+	operator = (Error&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+
+	Error&
+	operator = (ErrorRef&& src)
+	{
+		copy (std::move (src));
+		return *this;
+	}
+#endif
 
 	Error&
 	operator = (const Error& src)
