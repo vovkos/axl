@@ -15,12 +15,40 @@
 
 #include "axl_g_Pch.h"
 
+#include <intrin.h>
+
 namespace axl {
 namespace sys {
 
 //..............................................................................
 
 #if (_AXL_OS_WIN)
+
+// for the sake of benchmarking intrinsic-vs-api, you can define: 
+
+// #define _AXL_USE_WINAPI_INTERLOCKED 1
+
+// spoiler: no difference on amd64; about 15% speed up on x86
+
+#if (_AXL_USE_WINAPI_INTERLOCKED)
+#	define AXL_INTERLOCKED_FUNC32(name) (::Interlocked ## name)
+#	define AXL_INTERLOCKED_FUNC64(name) (::Interlocked ## name)
+#else // use intrinsics
+#	pragma intrinsic (_InterlockedExchange)
+#	pragma intrinsic (_InterlockedCompareExchange)
+#	pragma intrinsic (_InterlockedIncrement)
+#	pragma intrinsic (_InterlockedDecrement)
+#	define AXL_INTERLOCKED_FUNC32(name) (_Interlocked ## name)
+#	if (_AXL_CPU_AMD64)
+#		pragma intrinsic (_InterlockedExchange64)
+#		pragma intrinsic (_InterlockedCompareExchange64)
+#		pragma intrinsic (_InterlockedIncrement64)
+#		pragma intrinsic (_InterlockedDecrement64)
+#		define AXL_INTERLOCKED_FUNC64(name) (_Interlocked ## name)
+#	else
+#		define AXL_INTERLOCKED_FUNC64(name) (::Interlocked ## name)
+#	endif
+#endif
 
 inline
 int32_t
@@ -36,7 +64,7 @@ atomicXchg (
 	int32_t value
 	)
 {
-	return ::InterlockedExchange ((long*) p, value);
+	return AXL_INTERLOCKED_FUNC32 (Exchange) ((long*) p, value);
 }
 
 inline
@@ -46,7 +74,7 @@ atomicXchg (
 	int64_t value
 	)
 {
-	return ::InterlockedExchange64 (p, value);
+	return AXL_INTERLOCKED_FUNC64 (Exchange64) (p, value);
 }
 
 inline
@@ -57,7 +85,7 @@ atomicCmpXchg (
 	int32_t newValue
 	)
 {
-	return ::InterlockedCompareExchange ((long*) p, newValue, cmpValue); // inverse order!
+	return AXL_INTERLOCKED_FUNC32 (CompareExchange) ((long*) p, newValue, cmpValue); // inverse order!
 }
 
 inline
@@ -68,35 +96,35 @@ atomicCmpXchg (
 	int64_t newValue
 	)
 {
-	return ::InterlockedCompareExchange64 (p, newValue, cmpValue); // inverse order!
+	return AXL_INTERLOCKED_FUNC64 (CompareExchange64) (p, newValue, cmpValue); // inverse order!
 }
 
 inline
 int32_t
 atomicInc (volatile int32_t* p)
 {
-	return ::InterlockedIncrement ((long*) p);
+	return AXL_INTERLOCKED_FUNC32 (Increment) ((long*) p);
 }
 
 inline
 int64_t
 atomicInc (volatile int64_t* p)
 {
-	return ::InterlockedIncrement64 (p);
+	return AXL_INTERLOCKED_FUNC64 (Increment64) (p);
 }
 
 inline
 int32_t
 atomicDec (volatile int32_t* p)
 {
-	return ::InterlockedDecrement ((long*) p);
+	return AXL_INTERLOCKED_FUNC32 (Decrement) ((long*) p);
 }
 
 inline
 int64_t
 atomicDec (volatile int64_t* p)
 {
-	return ::InterlockedDecrement64 (p);
+	return AXL_INTERLOCKED_FUNC64 (Decrement64) (p);
 }
 
 #if (AXL_PTR_BITS == 64)
@@ -122,7 +150,7 @@ atomicXchg (
 	size_t value
 	)
 {
-	return ::InterlockedExchange64 ((int64_t*) p, value);
+	return AXL_INTERLOCKED_FUNC64 (Exchange64) ((int64_t*) p, value);
 }
 
 inline
@@ -133,21 +161,21 @@ atomicCmpXchg (
 	size_t newValue
 	)
 {
-	return ::InterlockedCompareExchange64 ((int64_t*) p, newValue, cmpValue); // inverse order!
+	return AXL_INTERLOCKED_FUNC64 (CompareExchange64) ((int64_t*) p, newValue, cmpValue); // inverse order!
 }
 
 inline
 size_t
 atomicInc (volatile size_t* p)
 {
-	return ::InterlockedIncrement64 ((int64_t*) p);
+	return AXL_INTERLOCKED_FUNC64 (Increment64) ((int64_t*) p);
 }
 
 inline
 size_t
 atomicDec (volatile size_t* p)
 {
-	return ::InterlockedDecrement64 ((int64_t*) p);
+	return AXL_INTERLOCKED_FUNC64 (Decrement64) ((int64_t*) p);
 }
 
 #else
@@ -156,7 +184,7 @@ inline
 int64_t
 atomicLoad (volatile int64_t* p)
 {
-	return ::InterlockedCompareExchange64 (p, 0, 0); // any value will do
+	return AXL_INTERLOCKED_FUNC64 (CompareExchange64) (p, 0, 0); // any value will do
 }
 
 inline
@@ -173,7 +201,7 @@ atomicXchg (
 	size_t value
 	)
 {
-	return ::InterlockedExchange ((long*) p, value);
+	return AXL_INTERLOCKED_FUNC32 (Exchange) ((long*) p, value);
 }
 
 inline
@@ -184,21 +212,21 @@ atomicCmpXchg (
 	size_t newValue
 	)
 {
-	return ::InterlockedCompareExchange ((long*) p, newValue, cmpValue); // inverse order!
+	return AXL_INTERLOCKED_FUNC32 (CompareExchange) ((long*) p, newValue, cmpValue); // inverse order!
 }
 
 inline
 size_t
 atomicInc (volatile size_t* p)
 {
-	return ::InterlockedIncrement ((long*) p);
+	return AXL_INTERLOCKED_FUNC32 (Increment) ((long*) p);
 }
 
 inline
 size_t
 atomicDec (volatile size_t* p)
 {
-	return ::InterlockedDecrement ((long*) p);
+	return AXL_INTERLOCKED_FUNC32 (Decrement) ((long*) p);
 }
 
 #endif
