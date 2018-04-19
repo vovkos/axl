@@ -328,6 +328,317 @@ testUtf ()
 	printf ("Done\n");
 }
 
+void ulltoa (quint64 l, char* buff, size_t size)
+{
+	size_t last = size - 1;
+	memset (buff, 'a', last);
+	buff [last] = 0;
+
+	char *p = buff + last;
+
+	while (l != 0) {
+		int c = l % 10;
+
+		--p;
+
+		if (c < 10)
+			*p = '0' + c;
+		else
+			*p = c - 10 + 'a';
+
+		l /= 10;
+	}
+}
+
+size_t formatIntegerWithThousandSep_stl (std::string* string, quint64 l)
+{
+	char buff [65];
+	ulltoa (l, buff, sizeof (buff));
+
+	*string = buff;
+
+	intptr_t i = string->length () - 3;
+	for (; i > 0; i -= 3)
+		string->insert (i, 1, ',');
+
+	return string->length ();
+}
+
+#define _RETURN_STRING 1
+
+#if (_RETURN_STRING)
+std::string
+#else
+void
+#endif
+formatIntegerWithThousandSep_stl (quint64 value)
+{
+	std::string string;
+	formatIntegerWithThousandSep_stl (&string, value);
+#if (_RETURN_STRING)
+	return string;
+#endif
+}
+
+size_t formatIntegerWithThousandSep_qt (QString* string, quint64 l)
+{
+	char buff [65];
+	ulltoa (l, buff, sizeof (buff));
+
+	*string = QString::fromUtf8 (buff, sizeof (buff) - 1);
+
+	int i = string->length () - 3;
+	for (; i > 0; i -= 3)
+		string->insert (i, ',');
+
+	return string->length ();
+}
+
+#if (_RETURN_STRING)
+QString
+#else
+void
+#endif
+formatIntegerWithThousandSep_qt (quint64 value)
+{
+	QString string;
+	formatIntegerWithThousandSep_qt (&string, value);
+#if (_RETURN_STRING)
+	return string;
+#endif
+}
+
+size_t formatIntegerWithThousandSep_axl (sl::String* string, quint64 l)
+{
+	char buff [65];
+	ulltoa (l, buff, sizeof (buff));
+
+	string->copy (buff, sizeof (buff) - 1);
+
+	intptr_t i = string->getLength () - 3;
+	for (; i > 0; i -= 3)
+		string->insert (i, ',');
+
+	return string->getLength ();
+}
+
+#if (_RETURN_STRING)
+sl::String
+#else
+void 
+#endif
+formatIntegerWithThousandSep_axl (quint64 value)
+{
+	sl::String string;
+	formatIntegerWithThousandSep_axl (&string, value);
+#if (_RETURN_STRING)
+	return string;
+#endif
+}
+
+inline
+size_t
+getMinPower2Gt (size_t size)
+{
+	ASSERT ((intptr_t) size >= 0); // hi-bit is already set
+	return size ? 2 << sl::getHiBitIdx (size) : 1;
+}
+
+inline
+size_t
+getMinPower2Ge (size_t size)
+{
+	return !(size & (size - 1)) ? size : getMinPower2Gt (size);
+}
+
+void benchFormat ()
+{
+	enum 
+	{
+		IterationCount = 8 * 1024 * 1024,
+		InterlockedIterationCount = 32 * 1024,
+		BitIterationCount = 256 * 1024 * 1024,
+	};
+
+	printf ("__cplusplus = %d\n", __cplusplus);
+	printf ("AXL_CPP_MSC_VERSION = %x\n", AXL_CPP_MSC_VERSION);
+	
+	std::string stlString;
+	QString qtString;
+	sl::String axlString;
+
+	printf ("sizeof (std::string) = %d\n", sizeof (std::string));
+	printf ("sizeof (axl::sl::String) = %d\n", sizeof (axl::sl::String));
+
+	uint64_t baseTimestamp;
+	uint64_t time;
+	size_t counter;
+
+	printf ("Testing Hacker's delight...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	counter = 0;
+
+	for (size_t i = 0; i < InterlockedIterationCount; i++)
+	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	{
+		counter += sl::getHiBit (j);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %d %s\n", counter, sys::Time (time, 0).format ("%m:%s.%l").sz ());
+
+	printf ("Testing old index-based search...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	counter = 0;
+
+	for (size_t i = 0; i < InterlockedIterationCount; i++)
+	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	{
+		counter += getMinPower2Ge (j);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %d %s\n", counter, sys::Time (time, 0).format ("%m:%s.%l").sz ());
+
+	printf ("Testing Interlocked (intrinsic, i32)...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	volatile long i32;
+	volatile long long i64;
+
+	for (size_t i = 0; i < InterlockedIterationCount; i++)
+	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	{
+		_InterlockedIncrement (&i32);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+
+	printf ("Testing Interlocked (winapi, i32)...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < InterlockedIterationCount; i++)
+	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	{
+		::InterlockedIncrement (&i32);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+
+#if (_AXL_CPU_AMD64)
+	printf ("Testing Interlocked (intrinsic, i64)...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < InterlockedIterationCount; i++)
+	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	{
+		_InterlockedIncrement64 (&i64);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+#endif
+
+	printf ("Testing Interlocked (winapi, i64)...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < InterlockedIterationCount; i++)
+	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	{
+		::InterlockedIncrement64 (&i64);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+
+	printf ("Testing STL...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < IterationCount; i++)
+	{
+//		std::wstring s (L"abcdefghijklmnopqrstuvwxyz");
+#if (_RETURN_STRING)
+		stlString = formatIntegerWithThousandSep_stl (i);
+#else
+		formatIntegerWithThousandSep_stl (i);
+#endif
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+/*
+	printf ("Testing STL (no alloc)...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < IterationCount; i++)
+	{
+		formatIntegerWithThousandSep_stl (&stlString, i);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+*/
+	printf ("Testing QT...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < IterationCount; i++)
+	{
+//		QString s ((QChar*) L"abcdefghijklmnopqrstuvwxyz");
+#if (_RETURN_STRING)
+		qtString = formatIntegerWithThousandSep_qt (i);
+#else
+		formatIntegerWithThousandSep_qt (i);
+#endif
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+/*
+	printf ("Testing QT (no alloc)...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < IterationCount; i++)
+	{
+		formatIntegerWithThousandSep_qt (&qtString, i);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+*/
+	printf ("Testing AXL...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < IterationCount; i++)
+	{
+//		sl::String_w s (L"abcdefghijklmnopqrstuvwxyz");
+#if (_RETURN_STRING)
+		axlString = formatIntegerWithThousandSep_axl (i);
+#else
+		formatIntegerWithThousandSep_axl (i);
+#endif
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+/*
+	printf ("Testing AXL (no alloc)...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	for (size_t i = 0; i < IterationCount; i++)
+	{
+		formatIntegerWithThousandSep_axl (&axlString, i);
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+*/
+}
+
+
 int
 main (
 	int argc,
@@ -335,6 +646,8 @@ main (
 	)
 {
 	g::getModule ()->setTag ("axl_test_qt");
+	benchFormat ();
+	return 0;
 
 #if 0
 	testUtf ();
