@@ -20,7 +20,119 @@ namespace sl {
 
 //..............................................................................
 
-// finding lowest bit's index with binary search
+// finding lowest/highest bit (branch-free; source: Hacker's Delight)
+
+inline
+uint8_t
+getLoBit8 (uint8_t x)
+{
+   x = x | (x >> 1);
+   x = x | (x >> 2);
+   x = x | (x >> 4);
+   return x - (x >> 1);
+}
+
+inline
+uint16_t
+getLoBit16 (uint16_t x)
+{
+   x = x | (x >> 1);
+   x = x | (x >> 2);
+   x = x | (x >> 4);
+   x = x | (x >> 8);
+   return x - (x >> 1);
+}
+
+inline
+uint32_t
+getLoBit32 (uint32_t x)
+{
+   x = x | (x >> 1);
+   x = x | (x >> 2);
+   x = x | (x >> 4);
+   x = x | (x >> 8);
+   x = x | (x >> 16);
+   return x - (x >> 1);
+}
+
+inline
+uint64_t
+getLoBit64 (uint64_t x)
+{
+   x = x | (x >> 1);
+   x = x | (x >> 2);
+   x = x | (x >> 4);
+   x = x | (x >> 8);
+   x = x | (x >> 16);
+   x = x | (x >> 32);
+   return x - (x >> 1);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+uint8_t
+getHiBit8 (uint8_t x)
+{
+	x = x - 1;
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	return x + 1;
+}
+
+inline
+uint16_t
+getHiBit16 (uint16_t x)
+{
+	x = x - 1;
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	x = x | (x >> 8);
+	return x + 1;
+}
+
+inline
+uint32_t
+getHiBit32 (uint32_t x)
+{
+	x = x - 1;
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	x = x | (x >> 8);
+	x = x | (x >> 16);
+	return x + 1;
+}
+
+inline
+uint64_t
+getHiBit64 (uint64_t x)
+{
+	x = x - 1;
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	x = x | (x >> 8);
+	x = x | (x >> 16);
+	x = x | (x >> 32);
+	return x + 1;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#if (AXL_PTR_BITS == 64)
+#	define getLoBit getLoBit64
+#	define getHiBit getHiBit64
+#else
+#	define getLoBit getLoBit32
+#	define getHiBit getHiBit32
+#endif
+
+//..............................................................................
+
+// finding lowest/highest bit's index with binary search
 
 inline
 uint8_t
@@ -62,9 +174,7 @@ getLoBitIdx64 (uint64_t x)
 		(32 + getLoBitIdx32 ((uint32_t) (x >> 32)));
 }
 
-//..............................................................................
-
-// finding highest bit's index with binary search
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint8_t
@@ -109,15 +219,11 @@ getHiBitIdx64 (uint64_t x)
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (AXL_PTR_BITS == 64)
-
-#define getLoBitIdx  getLoBitIdx64
-#define getHiBitIdx  getHiBitIdx64
-
+#	define getLoBitIdx  getLoBitIdx64
+#	define getHiBitIdx  getHiBitIdx64
 #else
-
-#define getLoBitIdx  getLoBitIdx32
-#define getHiBitIdx  getHiBitIdx32
-
+#	define getLoBitIdx  getLoBitIdx32
+#	define getHiBitIdx  getHiBitIdx32
 #endif
 
 //..............................................................................
@@ -229,38 +335,49 @@ getBitmask64 (
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (AXL_PTR_BITS == 64)
-
-#define getBitmask   getBitmask64
-#define getLoBitmask getLoBitmask64
-#define getHiBitmask getHiBitmask64
-
+#	define getBitmask   getBitmask64
+#	define getLoBitmask getLoBitmask64
+#	define getHiBitmask getHiBitmask64
 #else
-
-#define getBitmask   getBitmask32
-#define getLoBitmask getLoBitmask32
-#define getHiBitmask getHiBitmask32
-
+#	define getBitmask   getBitmask32
+#	define getLoBitmask getLoBitmask32
+#	define getHiBitmask getHiBitmask32
 #endif
 
 //..............................................................................
 
-// finding the closest power of 2 which is
-// (gt) greater than... or
-// (ge) greater or equal
-
-inline
+template <size_t factor>
 size_t
-getMinPower2Gt (size_t size)
+align (size_t x)
 {
-	ASSERT ((intptr_t) size >= 0); // hi-bit is already set
-	return size ? 2 << getHiBitIdx (size) : 1;
+	ASSERT (!(factor & (factor - 1))); // must be a power of 2
+	return ((x - 1) | (factor - 1)) + 1;
 }
 
 inline
 size_t
-getMinPower2Ge (size_t size)
+align (size_t x)
 {
-	return size && !(size & (size - 1)) ? size : getMinPower2Gt (size);
+	return align <AXL_PTR_SIZE> (x);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	size_t alignFactor,
+	size_t growLimit
+	>
+size_t
+getAllocSize (size_t size)
+{
+	return size < growLimit ? getHiBit (size) : align <alignFactor> (size);
+}
+
+inline
+size_t
+getAllocSize (size_t size)
+{
+	return getAllocSize <AXL_PTR_SIZE, AXL_PTR_SIZE * 1024 * 1024> (size);
 }
 
 //..............................................................................
