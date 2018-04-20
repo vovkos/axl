@@ -87,8 +87,8 @@ SharedMemoryTransportBase::attach (
 
 #if (_AXL_OS_WIN)
 		result =
-			m_readEvent.create (NULL, false, false, sl::String_utf16 (readEventName)) &&
-			m_writeEvent.create (NULL, false, false, sl::String_utf16 (writeEventName));
+			m_readEvent.create (NULL, false, false, sl::String_w (readEventName)) &&
+			m_writeEvent.create (NULL, false, false, sl::String_w (writeEventName));
 #elif (_AXL_OS_POSIX)
 		result = m_readEvent.open (readEventName, O_CREAT);
 		if (result)
@@ -134,8 +134,8 @@ SharedMemoryTransportBase::attach (
 
 #if (_AXL_OS_WIN)
 		result =
-			m_readEvent.open (EVENT_ALL_ACCESS, false, sl::String_utf16 (readEventName)) &&
-			m_writeEvent.open (EVENT_ALL_ACCESS, false, sl::String_utf16 (writeEventName));
+			m_readEvent.open (EVENT_ALL_ACCESS, false, sl::String_w (readEventName)) &&
+			m_writeEvent.open (EVENT_ALL_ACCESS, false, sl::String_w (writeEventName));
 #elif (_AXL_OS_POSIX)
 		result =
 			m_readEvent.open (readEventName, 0) &&
