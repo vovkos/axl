@@ -220,6 +220,7 @@
 #	include <shellapi.h>
 #	include <setupapi.h>
 #	include <crtdbg.h>
+#	include <intrin.h>
 #elif (_AXL_OS_POSIX)
 #	include <unistd.h>
 #	include <assert.h>

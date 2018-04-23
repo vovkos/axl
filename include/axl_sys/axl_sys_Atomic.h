@@ -15,8 +15,6 @@
 
 #include "axl_g_Pch.h"
 
-#include <intrin.h>
-
 namespace axl {
 namespace sys {
 
@@ -24,7 +22,7 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-// for the sake of benchmarking intrinsic-vs-api, you can define: 
+// for the sake of benchmarking intrinsic-vs-api, you can define:
 
 // #define _AXL_USE_WINAPI_INTERLOCKED 1
 

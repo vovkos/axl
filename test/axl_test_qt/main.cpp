@@ -425,7 +425,7 @@ size_t formatIntegerWithThousandSep_axl (sl::String* string, quint64 l)
 #if (_RETURN_STRING)
 sl::String
 #else
-void 
+void
 #endif
 formatIntegerWithThousandSep_axl (quint64 value)
 {
@@ -453,16 +453,19 @@ getMinPower2Ge (size_t size)
 
 void benchFormat ()
 {
-	enum 
+	enum
 	{
-		IterationCount = 8 * 1024 * 1024,
+		IterationCount = 32 * 1024 * 1024,
 		InterlockedIterationCount = 32 * 1024,
-		BitIterationCount = 256 * 1024 * 1024,
+		BitIterationCount = 64 * 1024,
 	};
 
 	printf ("__cplusplus = %d\n", __cplusplus);
+
+#ifdef AXL_CPP_MSC_VERSION
 	printf ("AXL_CPP_MSC_VERSION = %x\n", AXL_CPP_MSC_VERSION);
-	
+#endif
+
 	std::string stlString;
 	QString qtString;
 	sl::String axlString;
@@ -479,8 +482,8 @@ void benchFormat ()
 
 	counter = 0;
 
-	for (size_t i = 0; i < InterlockedIterationCount; i++)
-	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	for (size_t i = 0; i < BitIterationCount; i++)
+	for (size_t j = 0; j < BitIterationCount; j++)
 	{
 		counter += sl::getHiBit (j);
 	}
@@ -493,8 +496,8 @@ void benchFormat ()
 
 	counter = 0;
 
-	for (size_t i = 0; i < InterlockedIterationCount; i++)
-	for (size_t j = 0; j < InterlockedIterationCount; j++)
+	for (size_t i = 0; i < BitIterationCount; i++)
+	for (size_t j = 0; j < BitIterationCount; j++)
 	{
 		counter += getMinPower2Ge (j);
 	}
@@ -502,6 +505,7 @@ void benchFormat ()
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %d %s\n", counter, sys::Time (time, 0).format ("%m:%s.%l").sz ());
 
+#if (_AXL_OS_WIN)
 	printf ("Testing Interlocked (intrinsic, i32)...\n");
 	baseTimestamp = sys::getTimestamp ();
 
@@ -554,6 +558,7 @@ void benchFormat ()
 
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+#endif
 
 	printf ("Testing STL...\n");
 	baseTimestamp = sys::getTimestamp ();
@@ -570,7 +575,7 @@ void benchFormat ()
 
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
-/*
+
 	printf ("Testing STL (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp ();
 
@@ -581,7 +586,7 @@ void benchFormat ()
 
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
-*/
+
 	printf ("Testing QT...\n");
 	baseTimestamp = sys::getTimestamp ();
 
@@ -597,7 +602,7 @@ void benchFormat ()
 
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
-/*
+
 	printf ("Testing QT (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp ();
 
@@ -608,7 +613,7 @@ void benchFormat ()
 
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
-*/
+
 	printf ("Testing AXL...\n");
 	baseTimestamp = sys::getTimestamp ();
 
@@ -624,7 +629,7 @@ void benchFormat ()
 
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
-/*
+
 	printf ("Testing AXL (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp ();
 
@@ -635,7 +640,6 @@ void benchFormat ()
 
 	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
-*/
 }
 
 
@@ -645,6 +649,10 @@ main (
 	char *argv[]
 	)
 {
+#if (_AXL_OS_POSIX)
+	setvbuf (stdout, NULL, _IOLBF, 1024);
+#endif
+
 	g::getModule ()->setTag ("axl_test_qt");
 	benchFormat ();
 	return 0;
