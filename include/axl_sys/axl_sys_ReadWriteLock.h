@@ -35,26 +35,102 @@ protected:
 		volatile uint32_t m_writeCount; // one or zero active, the rest is on queue
 	};
 
+#if (_AXL_OS_WIN)
+	class WinEvent: public sys::win::Event
+	{
+	public:
+		sys::win::Event*
+		operator -> ()
+		{
+			return this;
+		}
+
+		bool
+		wait (uint_t timeout)
+		{
+			return sys::win::Event::wait (timeout) == sys::win::WaitResult_Object0;
+		}
+	};
+#elif (_AXL_OS_POSIX)
+	enum SemType
+	{
+		SemType_Unnamed,
+		SemType_Named,
+	};
+
+	class SemEvent
+	{
+	protected:
+		SemType m_semType;
+
+	public:
+		virtual ~SemEvent ()
+		{
+		}
+
+		// hot path functions are non-virtual for better performance
+
+		bool
+		signal ();
+
+		void
+		reset ();
+
+		bool
+		wait (uint_t timeout);
+	};
+
+	class UnnamedSemEvent: public SemEvent
+	{
+		friend class SemEvent;
+
+	protected:
+		sys::psx::Sem m_sem;
+
+	public:
+		UnnamedSemEvent ()
+		{
+			m_semType = SemType_Unnamed;
+		}
+	};
+
+	class NamedSemEvent: public SemEvent
+	{
+		friend class SemEvent;
+
+	protected:
+		sys::psx::NamedSem m_sem;
+		sl::String m_name;
+
+	public:
+		NamedSemEvent ()
+		{
+			m_semType = SemType_Named;
+		}
+
+		bool
+		create (const sl::StringRef& name);
+
+		bool
+		open (const sl::StringRef& name);
+	};
+#endif
+
 protected:
 	Data* m_data;
 	io::File m_file;
 	io::Mapping m_mapping;
 
 #if (_AXL_OS_WIN)
-	sys::win::Event m_readEvent;
-	sys::win::Event m_writeEvent;
+	WinEvent m_readEvent;
+	WinEvent m_writeEvent;
 #elif (_AXL_OS_POSIX)
-	sys::psx::NamedSem m_readEvent;
-	sys::psx::NamedSem m_writeEvent;
-	sl::String m_readEventName;
-	sl::String m_writeEventName;
+	SemEvent* m_readEvent;
+	SemEvent* m_writeEvent;
 #endif
 
 public:
-	ReadWriteLock ()
-	{
-		m_data = NULL;
-	}
+	ReadWriteLock ();
 
 	~ReadWriteLock ()
 	{
