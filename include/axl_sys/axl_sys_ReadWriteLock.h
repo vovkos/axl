@@ -36,19 +36,23 @@ protected:
 	};
 
 #if (_AXL_OS_WIN)
-	class WinEvent: public sys::win::Event
+	class WinEventWaitHelper: public sys::win::Event
 	{
 	public:
-		sys::win::Event*
-		operator -> ()
-		{
-			return this;
-		}
-
 		bool
 		wait (uint_t timeout)
 		{
 			return sys::win::Event::wait (timeout) == sys::win::WaitResult_Object0;
+		}
+	};
+
+	class WinEvent: public WinEventWaitHelper
+	{
+	public:
+		WinEventWaitHelper*
+		operator -> ()
+		{
+			return this;
 		}
 	};
 #elif (_AXL_OS_POSIX)
