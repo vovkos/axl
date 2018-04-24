@@ -56,19 +56,19 @@ protected:
 		}
 	};
 #elif (_AXL_OS_POSIX)
-	enum SemType
+	enum EventKind
 	{
-		SemType_Unnamed,
-		SemType_Named,
+		EventKind_UnnamedEvent,
+		EventKind_NamedSem,
 	};
 
-	class SemEvent
+	class EventBase // pseudo-virtual base
 	{
 	protected:
-		SemType m_semType;
+		EventKind m_eventKind;
 
 	public:
-		virtual ~SemEvent ()
+		virtual ~EventBase ()
 		{
 		}
 
@@ -84,23 +84,24 @@ protected:
 		wait (uint_t timeout);
 	};
 
-	class UnnamedSemEvent: public SemEvent
+	class UnnamedEvent: public EventBase
 	{
-		friend class SemEvent;
+		friend class EventBase;
 
 	protected:
-		sys::psx::Sem m_sem;
+		sys::EventBase m_event;
 
 	public:
-		UnnamedSemEvent ()
+		UnnamedEvent (bool isNotificationEvent):
+			m_event (isNotificationEvent)
 		{
-			m_semType = SemType_Unnamed;
+			m_eventKind = EventKind_UnnamedEvent;
 		}
 	};
 
-	class NamedSemEvent: public SemEvent
+	class NamedSemEvent: public EventBase
 	{
-		friend class SemEvent;
+		friend class EventBase;
 
 	protected:
 		sys::psx::NamedSem m_sem;
@@ -109,7 +110,7 @@ protected:
 	public:
 		NamedSemEvent ()
 		{
-			m_semType = SemType_Named;
+			m_eventKind = EventKind_NamedSem;
 		}
 
 		bool
@@ -129,8 +130,8 @@ protected:
 	WinEvent m_readEvent;
 	WinEvent m_writeEvent;
 #elif (_AXL_OS_POSIX)
-	SemEvent* m_readEvent;
-	SemEvent* m_writeEvent;
+	EventBase* m_readEvent;
+	EventBase* m_writeEvent;
 #endif
 
 public:

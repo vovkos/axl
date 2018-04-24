@@ -20,28 +20,28 @@ namespace sys {
 //..............................................................................
 
 bool
-ReadWriteLock::SemEvent::signal ()
+ReadWriteLock::EventBase::signal ()
 {
-	return m_semType == SemType_Named ?
-		((ReadWriteLock::NamedSemEvent*) this)->m_sem.signal () :
-		((ReadWriteLock::UnnamedSemEvent*) this)->m_sem.signal ();
+	return m_eventKind == EventKind_NamedSem ?
+		((NamedSemEvent*) this)->m_sem.signal () :
+		((UnnamedEvent*) this)->m_event.signal ();
 }
 
 void
-ReadWriteLock::SemEvent::reset ()
+ReadWriteLock::EventBase::reset ()
 {
-	if (m_semType == SemType_Named)
-		while (((ReadWriteLock::NamedSemEvent*) this)->m_sem.tryWait ());
+	if (m_eventKind == EventKind_NamedSem)
+		while (((NamedSemEvent*) this)->m_sem.tryWait ());
 	else
-		while (((ReadWriteLock::UnnamedSemEvent*) this)->m_sem.tryWait ());
+		((UnnamedEvent*) this)->m_event.reset ();
 }
 
 bool
-ReadWriteLock::SemEvent::wait (uint_t timeout)
+ReadWriteLock::EventBase::wait (uint_t timeout)
 {
-	return m_semType == SemType_Named ?
+	return m_eventKind == EventKind_NamedSem ?
 		((ReadWriteLock::NamedSemEvent*) this)->m_sem.wait (timeout) :
-		((ReadWriteLock::UnnamedSemEvent*) this)->m_sem.wait (timeout);
+		((ReadWriteLock::UnnamedEvent*) this)->m_event.wait (timeout);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -112,8 +112,8 @@ ReadWriteLock::create ()
 	m_readEvent.create (NULL, true, false);
 	m_writeEvent.create (NULL, false, false);
 #elif (_AXL_OS_POSIX)
-	m_readEvent = AXL_MEM_NEW (UnnamedSemEvent);
-	m_writeEvent = AXL_MEM_NEW (UnnamedSemEvent);
+	m_readEvent = AXL_MEM_NEW_ARGS (UnnamedEvent, (true));
+	m_writeEvent = AXL_MEM_NEW_ARGS (UnnamedEvent, (false));
 #endif
 
 	return true;
