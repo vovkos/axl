@@ -40,7 +40,13 @@ bool
 ReadWriteLock::EventBase::wait (uint_t timeout)
 {
 	return m_eventKind == EventKind_NamedSem ?
+#if (_AXL_OS_DARWIN) // no sem_timedwait on darwin
+		timeout == 0 ?
+			((ReadWriteLock::NamedSemEvent*) this)->m_sem.tryWait () :
+			((ReadWriteLock::NamedSemEvent*) this)->m_sem.wait () :
+#else
 		((ReadWriteLock::NamedSemEvent*) this)->m_sem.wait (timeout) :
+#endif
 		((ReadWriteLock::UnnamedEvent*) this)->m_event.wait (timeout);
 }
 
