@@ -3144,6 +3144,172 @@ testBoyerMoore ()
 
 //..............................................................................
 
+struct RecordFileHdr
+{
+	uint32_t m_signature; // RecordFileConst_LogFileSignature
+	uint32_t m_version;
+	uint64_t m_recordCount;
+	uint64_t m_totalRecordSize;
+	uint32_t _m_reserved;
+	uint32_t m_recordOffset  : 24;
+	uint32_t m_auxClassCount : 8;
+	sl::Guid m_classGuid;
+
+	// followed by sl::Guid [m_classCount]
+	// followed by aux headers (may be added in further versions)
+	// followed by log records at m_recordOffset
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct Record
+{
+	uint32_t m_signature; // RecordFileConst_RecordSignature
+	uint32_t m_code;
+	uint64_t m_timestamp;
+	uint32_t m_dataSize;
+	uint32_t _m_padding;
+
+	// followed by record data (if any)
+};
+
+void
+testIoPerformance ()
+{
+	#define _READ_ONLY 1
+	#define _DUMMY_WRITE 0
+
+	io::File simpleFileSrc;
+#if (!_READ_ONLY)		
+	io::File simpleFileDst;
+#endif
+
+	static char fileNameSrc [] = "C:/Temp/Test MTK TCP/Test MTK TCP.njlog";
+	static char fileNameDst_s [] = "C:/Temp/Test MTK TCP/Test MTK TCP - 2.njlog";
+	static char fileNameDst_m [] = "C:/Temp/Test MTK TCP/Test MTK TCP - 3.njlog";
+
+	bool result = simpleFileSrc.open (fileNameSrc, io::FileFlag_ReadOnly);
+
+	uint64_t baseTimestamp;
+	uint64_t time;
+	uint64_t offset;
+
+	sl::Array <char> buffer;
+	
+	struct Rec: Record
+	{
+		char m_data [1024];
+	};
+
+	Rec staticRec;
+	memset (&staticRec, 0, sizeof (staticRec));
+	staticRec.m_dataSize = sizeof (staticRec.m_data);
+
+	io::MappedFile mappedFileSrc;
+	io::MappedFile mappedFileDst;
+
+	result = mappedFileSrc.open (fileNameSrc, io::FileFlag_ReadOnly);
+
+#if (!_READ_ONLY)		
+	result =
+		result &&
+		mappedFileDst.open (fileNameDst_m) &&
+		mappedFileDst.setSize (0);
+#endif
+
+	if (!result)
+	{
+		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		return;
+	}
+
+	printf ("testing mapped file...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	RecordFileHdr* hdr2 = (RecordFileHdr*) mappedFileSrc.view (0, sizeof (RecordFileHdr), true);
+
+#if (!_READ_ONLY)		
+	RecordFileHdr* hdr3 = (RecordFileHdr*) mappedFileDst.view (0, sizeof (RecordFileHdr), true);
+	*hdr3 = *hdr2;
+#endif
+
+	offset = sizeof (RecordFileHdr);
+	uint64_t endOffset = offset + hdr2->m_totalRecordSize;
+
+	while (offset < endOffset)
+	{
+#if (_DUMMY_WRITE)
+		Record* rec = &staticRec;
+		size_t recSize = sizeof (rec);
+#else
+		Record* rec = (Record*) mappedFileSrc.view (offset, sizeof (Record));
+		size_t recSize = sizeof (Record) + rec->m_dataSize;
+		if (rec->m_dataSize)
+			rec = (Record*) mappedFileSrc.view (offset, recSize);
+#endif
+
+#if (!_READ_ONLY)		
+		void* p = mappedFileDst.view (offset, recSize);
+		memcpy (p, rec, recSize);
+#endif
+
+		offset += recSize;
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;	
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
+
+#if (!_READ_ONLY)
+	result = 
+		result	&&
+		simpleFileDst.open (fileNameDst_s) &&
+		simpleFileDst.setSize (0);
+#endif
+
+	if (!result)
+	{
+		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		return;
+	}
+
+	printf ("testing simple file...\n");
+	baseTimestamp = sys::getTimestamp ();
+
+	RecordFileHdr hdr;
+	simpleFileSrc.read (&hdr, sizeof (hdr));
+
+#if (!_READ_ONLY)		
+	simpleFileDst.write (&hdr, sizeof (hdr));
+#endif
+
+	offset = 0;
+	while (offset < hdr.m_totalRecordSize)
+	{
+#if (!_DUMMY_WRITE)
+		Record rec;
+		simpleFileSrc.read (&rec, sizeof (rec));
+		if (rec.m_dataSize)
+		{
+			buffer.setCount (rec.m_dataSize);
+			simpleFileSrc.read (buffer, rec.m_dataSize);
+		}
+ 
+#	if (!_READ_ONLY)		
+		simpleFileDst.write (&rec, sizeof (rec));
+		simpleFileDst.write (buffer, rec.m_dataSize);
+#	endif
+
+		offset += sizeof (rec) + rec.m_dataSize;
+#else
+		simpleFileDst.write (&staticRec, sizeof (staticRec));
+		offset += sizeof (staticRec);
+#endif
+	}
+
+	time = sys::getTimestamp () - baseTimestamp;	
+	printf ("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -3170,7 +3336,9 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testBoyerMoore ();
+	testIoPerformance ();
+
+//	testBoyerMoore ();
 // 	testEnumSerial ();
 
 	return 0;
