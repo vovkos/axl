@@ -84,7 +84,7 @@ public:
 
 #elif (_AXL_OS_POSIX)
 
-class EventRoot
+class EventBase
 {
 protected:
 	psx::CondMutexPair m_condMutexPair;
@@ -92,7 +92,7 @@ protected:
 	volatile bool m_state;
 
 public:
-	EventRoot (bool isNotificationEvent)
+	EventBase (bool isNotificationEvent)
 	{
 		m_isNotificationEvent = isNotificationEvent;
 		m_state = false;
@@ -110,22 +110,22 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Event: public EventRoot
+class Event: public EventBase
 {
 public:
 	Event ():
-		EventRoot (false)
+		EventBase (false)
 	{
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class NotificationEvent: public EventRoot
+class NotificationEvent: public EventBase
 {
 public:
 	NotificationEvent ():
-		EventRoot (true)
+		EventBase (true)
 	{
 	}
 };

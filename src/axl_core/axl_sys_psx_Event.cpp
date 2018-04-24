@@ -18,7 +18,7 @@ namespace sys {
 //..............................................................................
 
 void
-EventRoot::reset ()
+EventBase::reset ()
 {
 	m_condMutexPair.lock ();
 	m_state = false;
@@ -26,7 +26,7 @@ EventRoot::reset ()
 }
 
 bool
-EventRoot::wait (uint_t timeout)
+EventBase::wait (uint_t timeout)
 {
 	m_condMutexPair.lock ();
 
@@ -55,7 +55,7 @@ EventRoot::wait (uint_t timeout)
 }
 
 bool
-EventRoot::signal ()
+EventBase::signal ()
 {
 	m_condMutexPair.lock ();
 	if (m_state)
