@@ -73,7 +73,7 @@ public:
 	r () const
 	{
 		ASSERT (this->m_p);
-		return *p ();
+		return this->m_p->m_value;
 	}
 
 	T*
