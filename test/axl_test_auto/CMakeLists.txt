@@ -174,6 +174,35 @@ if (UNIX)
 	endif ()
 endif ()
 
+if (WIN32)
+	set (_DLL_LIST)
+
+	if (BUILD_AXL_CRY AND OPENSSL_DLL_DIR)
+		list (APPEND _DLL_LIST ${OPENSSL_DLL_DIR}/${OPENSSL_CRYPTO_DLL_NAME}.dll)
+	endif ()
+
+	if (BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
+		list (APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
+	endif ()
+
+	if (BUILD_AXL_LUA AND LUA_DLL_DIR)
+		list (APPEND _DLL_LIST ${LUA_DLL_DIR}/${LUA_LIB_NAME}.dll)
+	endif ()
+
+	if (_DLL_LIST)
+		add_custom_command (
+			TARGET axl_test_auto
+			POST_BUILD
+			COMMAND
+				echo "Copying DLL files for axl_test_auto..."
+			COMMAND
+				${CMAKE_COMMAND} -E copy
+				${_DLL_LIST}
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CONFIGURATION_SUFFIX}
+			)
+	endif ()
+endif ()
+
 #...............................................................................
 
 file (

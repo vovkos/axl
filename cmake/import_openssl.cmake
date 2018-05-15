@@ -59,9 +59,23 @@ endif ()
 if (EXISTS ${OPENSSL_INC_DIR}/openssl/obj_mac.h)
 	axl_message ("OpenSSL paths:")
 	axl_message ("    Includes:"       "${OPENSSL_INC_DIR}")
-	axl_message ("    Library dir:"    "${OPENSSL_LIB_DIR}")
+	axl_message ("    Libraries:"      "${OPENSSL_LIB_DIR}")
+
+	if (OPENSSL_DLL_DIR)
+		axl_message ("    DLLs:"       "${OPENSSL_DLL_DIR}")
+	endif ()
+
 	axl_message ("    Crypto library:" "${OPENSSL_CRYPTO_LIB_NAME}")
+
+	if (OPENSSL_CRYPTO_DLL_NAME)
+		axl_message ("    Crypto DLL:" "${OPENSSL_CRYPTO_DLL_NAME}")
+	endif ()
+
 	axl_message ("    SSL library:"    "${OPENSSL_SSL_LIB_NAME}")
+
+	if (OPENSSL_SSL_DLL_NAME)
+		axl_message ("    SSL DLL:"    "${OPENSSL_SSL_DLL_NAME}")
+	endif ()
 
 	set (OPENSSL_FOUND TRUE)
 else ()

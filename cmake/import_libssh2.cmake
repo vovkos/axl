@@ -22,6 +22,10 @@ if (EXISTS ${LIBSSH2_INC_DIR}/libssh2.h)
 	axl_message ("    Includes:"  "${LIBSSH2_INC_DIR}")
 	axl_message ("    Libraries:" "${LIBSSH2_LIB_DIR}")
 
+	if (LIBSSH2_DLL_DIR)
+		axl_message ("    DLLs:"  "${LIBSSH2_DLL_DIR}")
+	endif ()
+
 	set (LIBSSH2_FOUND TRUE)
 else ()
 	set (LIBSSH2_FOUND FALSE)

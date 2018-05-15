@@ -22,6 +22,10 @@ if (EXISTS ${EXPAT_INC_DIR}/expat.h)
 	axl_message ("    Includes:"  "${EXPAT_INC_DIR}")
 	axl_message ("    Libraries:" "${EXPAT_LIB_DIR}")
 
+	if (EXPAT_DLL_DIR)
+		axl_message ("    DLLs:"  "${EXPAT_DLL_DIR}")
+	endif ()
+
 	set (EXPAT_FOUND TRUE)
 else ()
 	set (EXPAT_FOUND FALSE)

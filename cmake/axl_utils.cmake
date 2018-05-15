@@ -1166,41 +1166,6 @@ axl_ensure_file_exists
 endmacro ()
 
 macro (
-axl_copy_file_if_different
-	_TARGET
-	_SRC_FILE_NAME
-	_DST_FILE_NAME
-	)
-
-	add_custom_command (
-		TARGET ${_TARGET}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"${_SRC_FILE_NAME}"
-			"${_DST_FILE_NAME}"
-		)
-endmacro ()
-
-macro (
-axl_copy_file_list_if_different
-	_TARGET
-	_SRC_DIR
-	_DST_DIR
-	# ...
-	)
-
-	set (_FILE_NAME_LIST ${ARGN})
-
-	foreach (_FILE_NAME ${_FILE_NAME_LIST})
-		axl_copy_file_if_different (
-			${_TARGET}
-			${_SRC_DIR}/${_FILE_NAME}
-			${_DST_DIR}/${_FILE_NAME}
-			)
-	endforeach ()
-endmacro ()
-
-macro (
 axl_configure_file_w_permissions
 	_SRC_FILE
 	_DST_FILE

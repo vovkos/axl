@@ -87,6 +87,10 @@ if (QT_FOUND)
 	if (QTNETWORK_FOUND)
 		axl_message ("    Network CMake files:" "${QTNETWORK_CMAKE_DIR}")
 	endif ()
+
+	if (QT_DLL_DIR)
+		axl_message ("    DLLs:" "${QT_DLL_DIR}")
+	endif ()
 endif ()
 
 #...............................................................................
@@ -117,60 +121,6 @@ qt5_wrap_cpp_alt
 		qt5_generate_moc (${_H_PATH} ${_MOC_CPP_PATH})
 		list (APPEND ${_MOC_CPP_LIST} ${_MOC_CPP_PATH})
 	endforeach ()
-endmacro ()
-
-#...............................................................................
-
-macro (
-copy_qt_dll_files
-	_TARGET
-	# ...
-	)
-
-	if (NOT QT_FOUND)
-		message (FATAL_ERROR "QT is required for copy_qt_dll_files () macro")
-	endif ()
-
-	if (NOT WIN32)
-		message (FATAL_ERROR "copy_qt_dll_files should only be used on Windows")
-	endif ()
-
-	set (_QT_MODULE_LIST ${ARGN})
-
-	if (CMAKE_GENERATOR MATCHES "Visual Studio")
-		foreach (_QT_MODULE ${_QT_MODULE_LIST})
-			set (_QT_FILE_NAME_DEBUG Qt5${_QT_MODULE}d.dll)
-			set (_QT_FILE_NAME_RELEASE Qt5${_QT_MODULE}.dll)
-
-			axl_copy_file_if_different (
-				${_TARGET}
-				${QT_DLL_DIR}/${_QT_FILE_NAME_DEBUG}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/${_QT_FILE_NAME_DEBUG}
-				)
-
-			axl_copy_file_if_different (
-				${_TARGET}
-				${QT_DLL_DIR}/${_QT_FILE_NAME_RELEASE}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/${_QT_FILE_NAME_RELEASE}
-				)
-		endforeach ()
-	else ()
-		if ("${_BUILD_TYPE}" STREQUAL "Debug")
-			set (_QT_DLL_SUFFIX "d.dll")
-		else ()
-			set (_QT_DLL_SUFFIX ".dll")
-		endif ()
-
-		foreach (_QT_MODULE ${_QT_MODULE_LIST})
-			set (_QT_FILE_NAME Qt5${_QT_MODULE}${_QT_DLL_SUFFIX})
-
-			axl_copy_file_if_different (
-				${_TARGET}
-				${QT_DLL_DIR}/${_QT_FILE_NAME}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_QT_FILE_NAME}
-				)
-		endforeach ()
-	endif ()
 endmacro ()
 
 #...............................................................................

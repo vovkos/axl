@@ -160,14 +160,14 @@ axl_create_msvc_settings)
 	axl_create_compiler_flag_setting (
 		MSVC_FLAG_CRT_DEBUG
 		DESCRIPTION "Microsoft Visual C++ CRT (Debug)"
-		DEFAULT "/MTd"
+		DEFAULT "/MDd"
 		"/MT" "/MTd" "/MD" "/MDd"
 		)
 
 	axl_create_compiler_flag_setting (
 		MSVC_FLAG_CRT_RELEASE
 		DESCRIPTION "Microsoft Visual C++ CRT (Release)"
-		DEFAULT "/MT"
+		DEFAULT "/MD"
 		"/MT" "/MTd" "/MD" "/MDd"
 		)
 

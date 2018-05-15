@@ -113,6 +113,12 @@ axl_set_pch (
 	${Qt5Core_EXECUTABLE_COMPILE_FLAGS}
 	)
 
+set_target_properties (
+	axl_test_qt
+	PROPERTIES
+	FOLDER test
+	)
+
 target_link_libraries (
 	axl_test_qt
 	axl_gui
@@ -134,16 +140,25 @@ if (UNIX)
 	endif ()
 endif ()
 
-if (WIN32)
-	copy_qt_dll_files (axl_test_qt Core Gui Widgets)
-elseif (UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE)
 	add_qt_rpath_link ()
 endif ()
 
-set_target_properties (
-	axl_test_qt
-	PROPERTIES
-	FOLDER test
-	)
+if (WIN32 AND QT_DLL_DIR)
+	set (_DEBUG_SUFFIX $<$<CONFIG:Debug>:d>)
+
+	add_custom_command (
+		TARGET axl_test_qt
+		POST_BUILD
+		COMMAND
+			echo "Copying DLL files for axl_test_qt..."
+		COMMAND
+			${CMAKE_COMMAND} -E copy
+			${QT_DLL_DIR}/Qt5Core${_DEBUG_SUFFIX}.dll
+			${QT_DLL_DIR}/Qt5Gui${_DEBUG_SUFFIX}.dll
+			${QT_DLL_DIR}/Qt5Widgets${_DEBUG_SUFFIX}.dll
+			${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CONFIGURATION_SUFFIX}
+		)
+endif ()
 
 #...............................................................................

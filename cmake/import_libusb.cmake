@@ -22,6 +22,10 @@ if (EXISTS ${LIBUSB_INC_DIR}/libusb-1.0/libusb.h)
 	axl_message ("    Includes:"  "${LIBUSB_INC_DIR}")
 	axl_message ("    Libraries:" "${LIBUSB_LIB_DIR}")
 
+	if (LIBUSB_DLL_DIR)
+		axl_message ("    DLLs:" "${LIBUSB_DLL_DIR}")
+	endif ()
+
 	set (LIBUSB_FOUND TRUE)
 else ()
 	set (LIBUSB_FOUND FALSE)

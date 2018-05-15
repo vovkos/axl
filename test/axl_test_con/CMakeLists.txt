@@ -52,16 +52,25 @@ source_group (
 include_directories (${AXL_INC_DIR})
 link_directories (${AXL_LIB_DIR})
 
+set (OPT_LIB_LIST)
+
 if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
 	link_directories (${LIBUSB_LIB_DIR})
 	add_definitions (-D_AXL_IO_USB=1)
+
+	if (WIN32)
+		list (APPEND OPT_LIB_LIST libusb-1.0)
+	else ()
+		list (APPEND OPT_LIB_LIST usb-1.0)
+	endif ()
 endif ()
 
 if (BUILD_AXL_XML)
 	include_directories (${EXPAT_INC_DIR})
 	link_directories (${EXPAT_LIB_DIR})
 	add_definitions (-D_AXL_XML=1)
+	list (APPEND OPT_LIB_LIST axl_xml expat)
 endif ()
 
 add_executable (
@@ -72,19 +81,17 @@ add_executable (
 	${APP_CPP_LIST}
 	)
 
+axl_set_pch (
+	axl_test_con
+	${PCH_H}
+	${PCH_CPP}
+	)
+
 set_target_properties (
 	axl_test_con
 	PROPERTIES
 	FOLDER test
 	)
-
-if (BUILD_AXL_XML)
-	target_link_libraries (
-		axl_test_con
-		axl_xml
-		expat
-		)
-endif ()
 
 target_link_libraries (
 	axl_test_con
@@ -92,6 +99,7 @@ target_link_libraries (
 	axl_fsm
 	axl_zip
 	axl_core
+	${OPT_LIB_LIST}
 	)
 
 if (WIN32)
@@ -134,30 +142,27 @@ if (UNIX)
 	endif ()
 endif ()
 
-if (BUILD_AXL_IO_USB)
-	if (WIN32)
-		target_link_libraries (
-			axl_test_con
-			libusb-1.0
-			)
-	else ()
-		target_link_libraries (
-			axl_test_con
-			usb-1.0
+if (WIN32)
+	if (BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
+		list (APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
+	endif ()
+
+	if (BUILD_AXL_XML AND EXPAT_DLL_DIR)
+		list (APPEND _DLL_LIST ${EXPAT_DLL_DIR}/expat.dll)
+	endif ()
+
+	if (_DLL_LIST)
+		add_custom_command (
+			TARGET axl_test_con
+			POST_BUILD
+			COMMAND
+				echo "Copying DLL files for axl_test_con..."
+			COMMAND
+				${CMAKE_COMMAND} -E copy
+				${_DLL_LIST}
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CONFIGURATION_SUFFIX}
 			)
 	endif ()
 endif ()
-
-axl_set_pch (
-	axl_test_con
-	${PCH_H}
-	${PCH_CPP}
-	)
-
-set_target_properties (
-	axl_test_con
-	PROPERTIES
-	FOLDER test
-	)
 
 #...............................................................................

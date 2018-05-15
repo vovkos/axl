@@ -53,7 +53,12 @@ endif ()
 if (EXISTS ${LUA_INC_DIR}/lua.h AND LUA_LIB_DIR AND LUA_LIB_NAME)
 	axl_message ("Lua paths:")
 	axl_message ("    Includes:"  "${LUA_INC_DIR}")
-	axl_message ("    Library dir:" "${LUA_LIB_DIR}")
+	axl_message ("    Libraries:" "${LUA_LIB_DIR}")
+
+	if (LUA_DLL_DIR)
+		axl_message ("    DLLs:" "${LUA_DLL_DIR}")
+	endif ()
+
 	axl_message ("    Library name:" "${LUA_LIB_NAME}")
 
 	set (LUA_FOUND TRUE)
