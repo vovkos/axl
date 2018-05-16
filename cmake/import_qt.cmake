@@ -135,7 +135,7 @@ add_qt_rpath_link)
 		message (FATAL_ERROR "add_qt_rpath_link should only be used on Unix")
 	endif ()
 
-	if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+	if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 		set (
 			CMAKE_EXE_LINKER_FLAGS
 			"${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,'${QT_CMAKE_DIR}/..'"
