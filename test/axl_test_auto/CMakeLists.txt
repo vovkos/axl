@@ -194,7 +194,7 @@ if (WIN32)
 			TARGET axl_test_auto
 			POST_BUILD
 			COMMAND
-				echo "Copying DLL files for axl_test_auto..."
+				echo Copying DLL files for axl_test_auto...
 			COMMAND
 				${CMAKE_COMMAND} -E copy
 				${_DLL_LIST}

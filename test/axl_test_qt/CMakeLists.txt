@@ -151,7 +151,7 @@ if (WIN32 AND QT_DLL_DIR)
 		TARGET axl_test_qt
 		POST_BUILD
 		COMMAND
-			echo "Copying DLL files for axl_test_qt..."
+			echo Copying DLL files for axl_test_qt...
 		COMMAND
 			${CMAKE_COMMAND} -E copy
 			${QT_DLL_DIR}/Qt5Core${_DEBUG_SUFFIX}.dll
