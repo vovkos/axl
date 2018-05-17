@@ -64,7 +64,7 @@ endif ()
 axl_apply_std_settings ()
 axl_print_std_settings ()
 
-# re-include paths.cmake and dependencies.cmake -- this time ${CONFIGURATION_SUFFIX}
+# re-include paths.cmake and dependencies.cmake -- this time ${CONFIGURATION}
 # and all the other settings are defined
 
 if (AXL_PATHS_CMAKE)

@@ -10,7 +10,7 @@
 #...............................................................................
 
 set (AXL_INC_DIR "@AXL_ROOT_DIR@/include")
-set (AXL_LIB_DIR "@AXL_LIB_BASE_DIR@/${CONFIGURATION_SUFFIX}")
+set (AXL_LIB_DIR "@AXL_LIB_BASE_DIR@/${CONFIGURATION}")
 
 set (
 	AXL_CMAKE_DIR

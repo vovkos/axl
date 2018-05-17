@@ -58,7 +58,9 @@ axl_apply_target_cpu_setting)
 		message (FATAL_ERROR "Unsupported CPU: ${TARGET_CPU}")
 	endif ()
 
-	set (AXL_CPU ${TARGET_CPU}) # for backward compatibility (in paths.cmake)
+	# for backward compatibility (in paths.cmake, settings.cmake, etc)
+
+	set (AXL_CPU ${TARGET_CPU})
 endmacro ()
 
 #...............................................................................
@@ -75,8 +77,12 @@ axl_create_build_type_setting)
 
 	# Microsoft Visual C++ and Xcode are multi-configuration generators
 
-	if (NOT CMAKE_GENERATOR MATCHES "Visual Studio" AND
-		NOT CMAKE_GENERATOR MATCHES "Xcode")
+	if (CMAKE_GENERATOR MATCHES "Visual Studio" OR
+		CMAKE_GENERATOR MATCHES "Xcode")
+		set (IS_MULTI_CONFIGURATION TRUE)
+	else ()
+		set (IS_MULTI_CONFIGURATION FALSE)
+
 		axl_create_setting (
 			CMAKE_BUILD_TYPE
 			DESCRIPTION "Build configuration"
@@ -92,14 +98,19 @@ axl_apply_build_type_setting)
 	# Microsoft Visual C++ and Xcode are multi-configuration generators
 
 	if (CMAKE_GENERATOR MATCHES "Visual Studio")
-		set (CONFIGURATION_SUFFIX   "$(Configuration)")
-		set (CONFIGURATION_SUFFIX_0)
+		set (CONFIGURATION     "$(Configuration)")
+		set (CONFIGURATION_MCG "$(Configuration)")
+		set (CONFIGURATION_SCG)
 	elseif (CMAKE_GENERATOR MATCHES "Xcode")
-		set (CONFIGURATION_SUFFIX   "$(CONFIGURATION)")
-		set (CONFIGURATION_SUFFIX_0)
+		set (CONFIGURATION     "$(CONFIGURATION)")
+		set (CONFIGURATION_MCG "$(CONFIGURATION)")
+		set (CONFIGURATION_SCG)
 	else ()
-		set (CONFIGURATION_SUFFIX   "${CMAKE_BUILD_TYPE}")
-		set (CONFIGURATION_SUFFIX_0 "${CMAKE_BUILD_TYPE}")
+		set (CONFIGURATION     "${CMAKE_BUILD_TYPE}")
+		set (CONFIGURATION_MCG)
+		set (CONFIGURATION_SCG "${CMAKE_BUILD_TYPE}")
+
+		# TODO: remove this and apply directly where needed
 
 		if (UNIX)
 			if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
@@ -114,6 +125,11 @@ axl_apply_build_type_setting)
 			endif ()
 		endif ()
 	endif ()
+
+	# for backward compatibility (in paths.cmake, settings.cmake, etc)
+
+	set (CONFIGURATION_SUFFIX   "${CONFIGURATION}")
+	set (CONFIGURATION_SUFFIX_0 "${CONFIGURATION_SCG}")
 endmacro ()
 
 #...............................................................................
