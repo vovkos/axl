@@ -109,21 +109,6 @@ axl_apply_build_type_setting)
 		set (CONFIGURATION     "${CMAKE_BUILD_TYPE}")
 		set (CONFIGURATION_MCG)
 		set (CONFIGURATION_SCG "${CMAKE_BUILD_TYPE}")
-
-		# TODO: remove this and apply directly where needed
-
-		if (UNIX)
-			if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-				set (CMAKE_SKIP_RPATH TRUE)
-
-				if (APPLE)
-					set (
-						CMAKE_EXE_LINKER_FLAGS
-						"${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,'@loader_path/../Frameworks'"
-						)
-				endif ()
-			endif ()
-		endif ()
 	endif ()
 
 	# for backward compatibility (in paths.cmake, settings.cmake, etc)
