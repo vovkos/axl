@@ -24,7 +24,17 @@ namespace err {
 
 //..............................................................................
 
-class ErrorMgr
+class ErrorRouter
+{
+public:
+	virtual
+	void
+	routeError (const ErrorHdr* error) = 0;
+};
+
+//..............................................................................
+
+class ErrorMgr: public ErrorRouter
 {
 protected:
 	struct ThreadEntry
@@ -36,6 +46,7 @@ protected:
 	sys::Lock m_lock;
 	size_t m_tlsSlot;
 	sl::DuckTypeHashTable <sl::Guid, ErrorProvider*> m_providerMap;
+	ErrorRouter* m_forwardRouter;
 
 public:
 	ErrorMgr ();
@@ -54,6 +65,26 @@ public:
 
 	void
 	setError (const ErrorRef& error);
+
+	ErrorRouter*
+	getForwardRouter ()
+	{
+		return m_forwardRouter;
+	}
+
+	void
+	setForwardRouter (ErrorRouter* router)
+	{
+		ASSERT (!m_forwardRouter && router != this);
+		m_forwardRouter = router;
+	}
+
+	virtual
+	void
+	routeError (const ErrorHdr* error)
+	{
+		setError (error);
+	}
 
 protected:
 	ThreadEntry*

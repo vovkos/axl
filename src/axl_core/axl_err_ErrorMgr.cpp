@@ -29,6 +29,7 @@ namespace err {
 ErrorMgr::ErrorMgr ()
 {
 	m_tlsSlot = sys::getTlsMgr ()->createSlot ();
+	m_forwardRouter = NULL;
 
 	registerProvider (g_stdErrorGuid, sl::getSimpleSingleton <StdErrorProvider> ());
 	registerProvider (g_errnoGuid, sl::getSimpleSingleton <ErrnoProvider> ());
@@ -74,6 +75,9 @@ ErrorMgr::setError (const ErrorRef& error)
 {
 	ThreadEntry* entry = getThreadEntry ();
 	entry->m_error = error;
+
+	if (m_forwardRouter)
+		m_forwardRouter->routeError (error);
 }
 
 ErrorMgr::ThreadEntry*
