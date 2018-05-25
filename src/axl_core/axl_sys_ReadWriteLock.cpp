@@ -42,26 +42,40 @@ ReadWriteLock::EventBase::wait (uint_t timeout)
 	return m_eventKind == EventKind_NamedSem ?
 #if (_AXL_OS_DARWIN) // no sem_timedwait on darwin
 		timeout == 0 ?
-			((ReadWriteLock::NamedSemEvent*) this)->m_sem.tryWait () :
-			((ReadWriteLock::NamedSemEvent*) this)->m_sem.wait () :
+			((NamedSemEvent*) this)->m_sem.tryWait () :
+			((NamedSemEvent*) this)->m_sem.wait () :
 #else
-		((ReadWriteLock::NamedSemEvent*) this)->m_sem.wait (timeout) :
+		((NamedSemEvent*) this)->m_sem.wait (timeout) :
 #endif
-		((ReadWriteLock::UnnamedEvent*) this)->m_event.wait (timeout);
+		((UnnamedEvent*) this)->m_event.wait (timeout);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+ReadWriteLock::NamedSemEvent::~NamedSemEvent ()
+{
+	if (!m_name.isEmpty ())
+		sys::psx::NamedSem::unlink (m_name);
+}
+
 bool
 ReadWriteLock::NamedSemEvent::create (const sl::StringRef& name)
 {
+	ASSERT (!m_sem);
+
+	bool result = m_sem.open (name, O_CREAT);
+	if (!result)
+		return false;
+
+	m_name = name;
 	return true;
 }
 
 bool
 ReadWriteLock::NamedSemEvent::open (const sl::StringRef& name)
 {
-	return true;
+	ASSERT (!m_sem);
+	return m_sem.open (name, 0);
 }
 
 //..............................................................................

@@ -113,6 +113,8 @@ protected:
 			m_eventKind = EventKind_NamedSem;
 		}
 
+		~NamedSemEvent ();
+
 		bool
 		create (const sl::StringRef& name);
 
