@@ -3126,9 +3126,9 @@ testBoyerMoore ()
 
 	sl::TextBoyerMooreFind find;
 	find.setPattern (
-		enc::CharCodecKind_Utf8, 
-		pattern, 
-		lengthof (pattern), 
+		enc::CharCodecKind_Utf8,
+		pattern,
+		lengthof (pattern),
 		sl::BoyerMooreFlag_Reverse | sl::TextBoyerMooreFlag_CaseInsensitive
 		);
 
@@ -3176,26 +3176,31 @@ struct Record
 void
 testIoPerformance ()
 {
-	#define _READ_ONLY 1
+	#define _READ_ONLY 0
 	#define _DUMMY_WRITE 0
 
 	io::File simpleFileSrc;
-#if (!_READ_ONLY)		
+#if (!_READ_ONLY)
 	io::File simpleFileDst;
 #endif
 
-	static char fileNameSrc [] = "C:/Temp/Test MTK TCP/Test MTK TCP.njlog";
-	static char fileNameDst_s [] = "C:/Temp/Test MTK TCP/Test MTK TCP - 2.njlog";
-	static char fileNameDst_m [] = "C:/Temp/Test MTK TCP/Test MTK TCP - 3.njlog";
+	static char fileNameSrc [] = "G:/Temp/Test MTK TCP/Test MTK TCP.njlog";
+	static char fileNameDst_s [] = "G:/Temp/Test MTK TCP/Test MTK TCP - 2.njlog";
+	static char fileNameDst_m [] = "G:/Temp/Test MTK TCP/Test MTK TCP - 3.njlog";
 
 	bool result = simpleFileSrc.open (fileNameSrc, io::FileFlag_ReadOnly);
+	if (!result)
+	{
+		printf ("can't open %s: %s\n", fileNameSrc, err::getLastErrorDescription ().sz ());
+		return;
+	}
 
 	uint64_t baseTimestamp;
 	uint64_t time;
 	uint64_t offset;
 
 	sl::Array <char> buffer;
-	
+
 	struct Rec: Record
 	{
 		char m_data [1024];
@@ -3210,11 +3215,11 @@ testIoPerformance ()
 
 	result = mappedFileSrc.open (fileNameSrc, io::FileFlag_ReadOnly);
 
-#if (!_READ_ONLY)		
+#if (!_READ_ONLY)
 	result =
 		result &&
 		mappedFileDst.open (fileNameDst_m) &&
-		mappedFileDst.setSize (0);
+		mappedFileDst.m_file.setSize (0);
 #endif
 
 	if (!result)
@@ -3228,7 +3233,7 @@ testIoPerformance ()
 
 	RecordFileHdr* hdr2 = (RecordFileHdr*) mappedFileSrc.view (0, sizeof (RecordFileHdr), true);
 
-#if (!_READ_ONLY)		
+#if (!_READ_ONLY)
 	RecordFileHdr* hdr3 = (RecordFileHdr*) mappedFileDst.view (0, sizeof (RecordFileHdr), true);
 	*hdr3 = *hdr2;
 #endif
@@ -3248,7 +3253,7 @@ testIoPerformance ()
 			rec = (Record*) mappedFileSrc.view (offset, recSize);
 #endif
 
-#if (!_READ_ONLY)		
+#if (!_READ_ONLY)
 		void* p = mappedFileDst.view (offset, recSize);
 		memcpy (p, rec, recSize);
 #endif
@@ -3256,11 +3261,11 @@ testIoPerformance ()
 		offset += recSize;
 	}
 
-	time = sys::getTimestamp () - baseTimestamp;	
+	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
 
 #if (!_READ_ONLY)
-	result = 
+	result =
 		result	&&
 		simpleFileDst.open (fileNameDst_s) &&
 		simpleFileDst.setSize (0);
@@ -3278,7 +3283,7 @@ testIoPerformance ()
 	RecordFileHdr hdr;
 	simpleFileSrc.read (&hdr, sizeof (hdr));
 
-#if (!_READ_ONLY)		
+#if (!_READ_ONLY)
 	simpleFileDst.write (&hdr, sizeof (hdr));
 #endif
 
@@ -3293,8 +3298,8 @@ testIoPerformance ()
 			buffer.setCount (rec.m_dataSize);
 			simpleFileSrc.read (buffer, rec.m_dataSize);
 		}
- 
-#	if (!_READ_ONLY)		
+
+#	if (!_READ_ONLY)
 		simpleFileDst.write (&rec, sizeof (rec));
 		simpleFileDst.write (buffer, rec.m_dataSize);
 #	endif
@@ -3306,7 +3311,7 @@ testIoPerformance ()
 #endif
 	}
 
-	time = sys::getTimestamp () - baseTimestamp;	
+	time = sys::getTimestamp () - baseTimestamp;
 	printf ("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
 }
 

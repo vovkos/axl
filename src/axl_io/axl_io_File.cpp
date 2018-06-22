@@ -166,7 +166,17 @@ copyFile (
 	if (!result)
 		return -1;
 
-	enum 
+	return copyFile (srcFile, &dstFile, size);
+}
+
+uint64_t
+copyFile (
+	const io::File* srcFile,
+	io::File* dstFile,
+	uint64_t size
+	)
+{
+	enum
 	{
 		BaseBlockSize = 64 * 1024, // 64K
 	};
@@ -185,9 +195,10 @@ copyFile (
 	win::MappedView srcView;
 	win::MappedView dstView;
 
-	result =
+	bool result =
+		dstFile->setSize (size) &&
 		srcMapping.create (srcFile->m_file, NULL, PAGE_READONLY, size) &&
-		dstMapping.create (dstFile.m_file, NULL, PAGE_READWRITE, size);
+		dstMapping.create (dstFile->m_file, NULL, PAGE_READWRITE, size);
 
 	if (!result)
 		return -1;
@@ -216,10 +227,6 @@ copyFile (
 #else
 	psx::Mapping srcMapping;
 	psx::Mapping dstMapping;
-
-	result = dstFile.setSize (size);
-	if (!result)
-		return -1;
 
 	while (size)
 	{

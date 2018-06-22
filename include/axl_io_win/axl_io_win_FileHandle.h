@@ -25,6 +25,16 @@ class FileHandle: public sl::Handle <HANDLE, sys::win::CloseHandle, sl::MinusOne
 {
 public:
 	bool
+	duplicate (
+		HANDLE sourceProcess,
+		HANDLE sourceHandle,
+		HANDLE targetProcess,
+		dword_t access,
+		bool isInheritable,
+		dword_t options
+		);
+
+	bool
 	read (
 		void* p,
 		dword_t size,
@@ -34,7 +44,7 @@ public:
 		bool_t result = ::ReadFile (m_h, p, size, actualSize, NULL);
 		return err::complete (result);
 	}
-	
+
 	bool
 	write (
 		const void* p,

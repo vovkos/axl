@@ -32,6 +32,7 @@ Mapping::open (
 
 	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
+	uint64_t viewEnd = offset + size;
 
 	void* p;
 
@@ -39,11 +40,11 @@ Mapping::open (
 	uint_t protection = (flags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 	uint_t access = (flags & FileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
-	bool result = m_mapping.create (file->m_file, NULL, protection, offset + size);
+	bool result = m_mapping.create (file->m_file, NULL, protection, viewEnd);
 	if (!result)
 		return NULL;
 
-	p = m_view.view (m_mapping, access, offset, size);
+	p = m_view.view (m_mapping, access, viewBegin, viewEnd - viewBegin);
 	if (!p)
 	{
 		m_mapping.close ();
@@ -52,7 +53,7 @@ Mapping::open (
 #elif (_AXL_OS_POSIX)
 	int protection = (flags & FileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
-	p = m_mapping.map (NULL, size, protection, MAP_SHARED, file->m_file, offset);
+	p = m_mapping.map (NULL, viewEnd - viewBegin, protection, MAP_SHARED, file->m_file, viewBegin);
 	if (!p)
 		return NULL;
 #endif

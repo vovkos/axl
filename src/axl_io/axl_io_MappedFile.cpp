@@ -160,12 +160,12 @@ MappedViewMgr::limitViewCount (size_t maxViewCount)
 
 MappedFile::MappedFile ()
 {
-	m_fileFlags = 0;
-	m_fileSize = 0;
-	m_readAheadSize = DefaultsKind_ReadAheadSize;
-	m_maxDynamicViewCount = DefaultsKind_MaxDynamicViewCount;
 	m_dynamicViewMgr.m_mappedFile = this;
 	m_permanentViewMgr.m_mappedFile = this;
+
+	m_readAheadSize = DefaultsKind_ReadAheadSize;
+	m_maxDynamicViewCount = DefaultsKind_MaxDynamicViewCount;
+	m_fileFlags = 0;
 
 #if (_AXL_OS_WIN)
 	m_mappingSize = 0;
@@ -180,15 +180,8 @@ MappedFile::close ()
 
 	unmapAllViews ();
 
-	// now that all the views are unmapped, we can update file size
-
-	if (m_fileSize != m_file.getSize ())
-		m_file.setSize (m_fileSize);
-
 	m_file.close ();
-
 	m_fileFlags = 0;
-	m_fileSize = 0;
 }
 
 bool
@@ -217,25 +210,6 @@ MappedFile::attach (
 
 	m_file.m_file.attach (fileHandle);
 	m_fileFlags = flags;
-	m_fileSize = m_file.getSize ();
-}
-
-bool
-MappedFile::setSize (
-	uint64_t size,
-	bool unmapAndApplyNow
-	)
-{
-	if (m_fileFlags & FileFlag_ReadOnly)
-		return err::fail (err::SystemErrorCode_InvalidDeviceRequest);
-
-	m_fileSize = size;
-
-	if (!unmapAndApplyNow || m_fileSize == m_file.getSize ())
-		return true;
-
-	unmapAllViews ();
-	return m_file.setSize (m_fileSize);
 }
 
 bool
@@ -262,15 +236,7 @@ MappedFile::view (
 	bool isPermanent
 	)
 {
-	uint64_t end = size ? offset + size : m_fileSize;
-
-	if (end > m_fileSize)
-	{
-		if (m_fileFlags & FileFlag_ReadOnly)
-			return err::fail ((void*) NULL, err::SystemErrorCode_InvalidDeviceRequest);
-
-		m_fileSize = end;
-	}
+	uint64_t end = size ? offset + size : m_file.getSize ();
 
 	uint64_t actualEnd;
 	void* p = viewImpl (offset, end, &actualEnd, isPermanent);
@@ -281,24 +247,6 @@ MappedFile::view (
 		*actualSize = (size_t) (actualEnd - offset);
 
 	return p;
-}
-
-size_t
-MappedFile::write (
-	uint64_t offset,
-	const void* p,
-	size_t size
-	)
-{
-	size_t result = m_file.writeAt (offset, p, size);
-	if (result == -1)
-		return -1;
-
-	uint64_t end = offset + result;
-	if (end > m_fileSize)
-		m_fileSize = end;
-
-	return result;
 }
 
 void*
@@ -346,14 +294,15 @@ MappedFile::viewImpl (
 
 	if (m_fileFlags & FileFlag_ReadOnly)
 	{
-		if (end > m_fileSize)
+		uint64_t fileSize = m_file.getSize ();
+		if (end > fileSize)
 		{
 			err::setError (err::SystemErrorCode_InvalidDeviceRequest);
 			return NULL;
 		}
 
-		if (viewEnd > m_fileSize)
-			viewEnd = m_fileSize;
+		if (viewEnd > fileSize)
+			viewEnd = fileSize;
 	}
 
 	// ensure mapping covers the view
@@ -375,8 +324,6 @@ MappedFile::viewImpl (
 		result = m_file.setSize (viewEnd);
 		if (!result)
 			return NULL;
-
-		m_fileSize = viewEnd;
 	}
 #endif
 

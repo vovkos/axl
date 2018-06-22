@@ -64,14 +64,14 @@ void*
 MappedView::view (
 	HANDLE hMapping,
 	uint_t access,
-	uint64_t _Offset,
+	uint64_t _offset,
 	uint32_t size
 	)
 {
 	close ();
 
 	ULARGE_INTEGER offset;
-	offset.QuadPart = _Offset;
+	offset.QuadPart = _offset;
 
 	m_h = ::MapViewOfFile (hMapping, access, offset.HighPart, offset.LowPart, size);
 	if (!m_h)

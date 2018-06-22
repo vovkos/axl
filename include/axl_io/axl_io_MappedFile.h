@@ -99,8 +99,6 @@ public:
 	};
 
 protected:
-	File m_file;
-
 #if (_AXL_OS_WIN)
 	win::Mapping m_mapping;
 	uint64_t m_mappingSize;
@@ -111,9 +109,10 @@ protected:
 
 	size_t m_readAheadSize;
 	size_t m_maxDynamicViewCount;
-
 	uint_t m_fileFlags;
-	uint64_t m_fileSize;
+
+public:
+	File m_file;
 
 public:
 	MappedFile ();
@@ -123,16 +122,22 @@ public:
 		close ();
 	}
 
-	const File*
-	getFile () const
-	{
-		return &m_file;
-	}
-
 	bool
 	isOpen () const
 	{
 		return m_file.isOpen ();
+	}
+
+	uint64_t
+	getSize () const
+	{
+		return m_file.getSize ();
+	}
+
+	uint_t
+	getFlags () const
+	{
+		return m_fileFlags;
 	}
 
 	void
@@ -150,28 +155,16 @@ public:
 		uint_t flags = 0 // FileFlag
 		);
 
+	void
+	duplicate (
+		File::Handle fileHandle,
+		uint_t flags = 0 // FileFlag
+		);
+
 	bool
 	setup (
 		size_t maxDynamicViewCount,
 		size_t readAheadSize
-		);
-
-	uint_t 
-	getFlags () const
-	{
-		return m_fileFlags;
-	}
-
-	uint64_t
-	getSize () const
-	{
-		return m_fileSize;
-	}
-
-	bool
-	setSize (
-		uint64_t size,
-		bool unmapAndApplyNow = false
 		);
 
 	const void*
@@ -211,13 +204,6 @@ public:
 		size_t size,
 		size_t* actualSize,
 		bool isPermanent = false
-		);
-
-	size_t
-	write (
-		uint64_t offset,
-		const void* p,
-		size_t size
 		);
 
 	void

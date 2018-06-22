@@ -250,6 +250,13 @@ copyFile (
 	uint64_t size = -1
 	);
 
+uint64_t
+copyFile (
+	const io::File* srcFile,
+	io::File* dstFile,
+	uint64_t size = -1
+	);
+
 //..............................................................................
 
 } // namespace io
