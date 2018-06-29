@@ -204,9 +204,6 @@ public:
 	setDevice (libusb_device* device);
 
 	void
-	takeOver (UsbDevice* srcDevice);
-
-	void
 	close ();
 
 	bool

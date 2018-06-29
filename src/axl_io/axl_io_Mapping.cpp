@@ -44,7 +44,7 @@ Mapping::open (
 	if (!result)
 		return NULL;
 
-	p = m_view.view (m_mapping, access, viewBegin, viewEnd - viewBegin);
+	p = m_view.view (m_mapping, access, viewBegin, (size_t) (viewEnd - viewBegin));
 	if (!p)
 	{
 		m_mapping.close ();

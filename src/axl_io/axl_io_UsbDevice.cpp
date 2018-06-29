@@ -196,21 +196,6 @@ UsbDevice::setDevice (libusb_device* device)
 }
 
 void
-UsbDevice::takeOver (UsbDevice* srcDevice)
-{
-	if (m_device != srcDevice->m_device)
-	{
-		setDevice (NULL);
-		m_device = srcDevice->m_device;
-	}
-
-	m_openHandle = srcDevice->m_openHandle;
-
-	srcDevice->m_device = NULL;
-	srcDevice->m_openHandle = NULL;
-}
-
-void
 UsbDevice::close ()
 {
 	if (!m_openHandle)

@@ -233,7 +233,7 @@ set (
 	${AXL_INC_DIR}/axl_sys/axl_sys_Lock.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_SjljTry.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_Semaphore.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_InvSemaphore.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_InvertedSemaphore.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_ReadWriteLock.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_Thread.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_TlsMgr.h

@@ -73,15 +73,6 @@ public:
 		BaseType::clear ();
 	}
 
-	void
-	takeOver (AutoPtrArray* src)
-	{
-		deleteElements ();
-		this->release ();
-		this->m_p = src->m_p;
-		src->m_p = NULL;
-	}
-
 protected:
 	void
 	deleteElements ()

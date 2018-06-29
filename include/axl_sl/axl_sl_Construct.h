@@ -98,6 +98,23 @@ destruct (T* p)
 	p->~T ();
 }
 
+// be careful to only use takeOver where its applicable
+
+template <typename T>
+void
+takeOver (
+	T* dst,
+	T* src
+	)
+{
+	if (dst == src)
+		return;
+
+	dst->~T ();
+	memcpy (dst, src, sizeof (T));
+	new (src) T;
+}
+
 //..............................................................................
 
 template <typename T>

@@ -112,12 +112,6 @@ public:
 		return h;
 	}
 
-	void
-	takeOver (Handle* src)
-	{
-		attach (src->detach ());
-	}
-
 	T*
 	p ()
 	{

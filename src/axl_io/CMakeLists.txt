@@ -124,7 +124,6 @@ source_group (
 
 set (
 	IO_PSX_H_LIST
-	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Fd.h
 	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_File.h
 	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Mapping.h
 	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Pipe.h
@@ -134,7 +133,6 @@ set (
 
 set (
 	IO_PSX_CPP_LIST
-	axl_io_psx_Fd.cpp
 	axl_io_psx_File.cpp
 	axl_io_psx_Mapping.cpp
 	axl_io_psx_Pipe.cpp
@@ -161,7 +159,6 @@ endif ()
 
 set (
 	IO_WIN_H_LIST
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_FileHandle.h
 	${AXL_INC_DIR}/axl_io_win/axl_io_win_File.h
 	${AXL_INC_DIR}/axl_io_win/axl_io_win_Iocp.h
 	${AXL_INC_DIR}/axl_io_win/axl_io_win_Mapping.h
@@ -172,7 +169,6 @@ set (
 
 set (
 	IO_WIN_CPP_LIST
-	axl_io_win_FileHandle.cpp
 	axl_io_win_File.cpp
 	axl_io_win_Iocp.cpp
 	axl_io_win_Mapping.cpp

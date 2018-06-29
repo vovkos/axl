@@ -14,6 +14,7 @@
 #define _AXL_SL_LISTBASE_H
 
 #include "axl_sl_Operator.h"
+#include "axl_sl_Construct.h"
 
 namespace axl {
 namespace sl {
@@ -502,7 +503,7 @@ public:
 
 		if (isEmpty ())
 		{
-			takeOver (src);
+			sl::takeOver (this, src);
 			return;
 		}
 
@@ -527,7 +528,7 @@ public:
 
 		if (isEmpty ())
 		{
-			takeOver (src);
+			sl::takeOver (this, src);
 			return;
 		}
 
@@ -580,18 +581,6 @@ public:
 		T* p = it.getEntry ();
 		remove (it);
 		insertTail (p);
-	}
-
-	void
-	takeOver (ListBase* list)
-	{
-		clear ();
-
-		this->m_head = list->m_head;
-		this->m_tail = list->m_tail;
-		this->m_count = list->m_count;
-
-		list->construct ();
 	}
 
 protected:
