@@ -66,17 +66,18 @@ MappedViewMgr::view (
 {
 	ViewEntry* viewEntry = AXL_MEM_NEW (ViewEntry);
 
+	MappedFile* mappedFile = getMappedFile ();
 	void* p;
 	size_t size = (size_t) (end - begin);
 
 #if (_AXL_OS_WIN)
-	uint_t access = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ?
+	uint_t access = (mappedFile->m_fileFlags & FileFlag_ReadOnly) ?
 		FILE_MAP_READ :
 		FILE_MAP_READ | FILE_MAP_WRITE;
 
-	p = viewEntry->m_view.view (m_mappedFile->m_mapping, access, begin, size);
+	p = viewEntry->m_view.view (mappedFile->m_mapping, access, begin, size);
 #elif (_AXL_OS_POSIX)
-	int protection = (m_mappedFile->m_fileFlags & FileFlag_ReadOnly) ?
+	int protection = (mappedFile->m_fileFlags & FileFlag_ReadOnly) ?
 		PROT_READ :
 		PROT_READ | PROT_WRITE;
 
@@ -85,7 +86,7 @@ MappedViewMgr::view (
 			size,
 			protection,
 			MAP_SHARED,
-			m_mappedFile->m_file.m_file,
+			mappedFile->m_file.m_file,
 			begin
 			);
 #endif
@@ -158,11 +159,10 @@ MappedViewMgr::limitViewCount (size_t maxViewCount)
 
 //..............................................................................
 
-MappedFile::MappedFile ()
+MappedFile::MappedFile ():
+	m_dynamicViewMgr (offsetof (MappedFile, m_dynamicViewMgr)),
+	m_permanentViewMgr (offsetof (MappedFile, m_permanentViewMgr))
 {
-	m_dynamicViewMgr.m_mappedFile = this;
-	m_permanentViewMgr.m_mappedFile = this;
-
 	m_readAheadSize = DefaultsKind_ReadAheadSize;
 	m_maxDynamicViewCount = DefaultsKind_MaxDynamicViewCount;
 	m_fileFlags = 0;
@@ -210,6 +210,18 @@ MappedFile::attach (
 
 	m_file.m_file.attach (fileHandle);
 	m_fileFlags = flags;
+}
+
+File::Handle
+MappedFile::detach ()
+{
+	if (!isOpen ())
+		return File::getInvalidHandle ();
+
+	unmapAllViews ();
+	m_fileFlags = 0;
+
+	return m_file.m_file.detach ();
 }
 
 bool

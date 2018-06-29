@@ -48,17 +48,23 @@ protected:
 	};
 
 protected:
-	MappedFile* m_mappedFile;
 	sl::StdList <ViewEntry> m_viewList;
 	ViewMap m_viewMap;
+	size_t m_parentOffset;
 
 protected:
-	MappedViewMgr () // protected construction only
+	MappedViewMgr (size_t offset) // protected construction only
 	{
-		m_mappedFile = NULL;
+		m_parentOffset = offset;
 	}
 
 public:
+	MappedFile*
+	getMappedFile ()
+	{
+		return (MappedFile*) ((char*) this - m_parentOffset);
+	}
+
 	void*
 	find (
 		uint64_t begin,
@@ -155,11 +161,8 @@ public:
 		uint_t flags = 0 // FileFlag
 		);
 
-	void
-	duplicate (
-		File::Handle fileHandle,
-		uint_t flags = 0 // FileFlag
-		);
+	File::Handle
+	detach ();
 
 	bool
 	setup (
