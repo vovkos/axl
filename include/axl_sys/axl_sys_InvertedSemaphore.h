@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_SYS_INVSEMAPHORE_H
+#define _AXL_SYS_INVERTEDSEMAPHORE_H
 
 #include "axl_sys_Lock.h"
 #include "axl_sys_Event.h"
@@ -21,14 +21,14 @@ namespace sys {
 
 //..............................................................................
 
-class InvSemaphore: public NotificationEvent
+class InvertedSemaphore: public NotificationEvent
 {
 protected:
 	Lock m_lock;
 	intptr_t m_count;
 
 public:
-	InvSemaphore (intptr_t count = 0)
+	InvertedSemaphore (intptr_t count = 0)
 	{
 		setImpl (count);
 	}
