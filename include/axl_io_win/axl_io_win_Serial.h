@@ -13,7 +13,7 @@
 
 #define _AXL_WIN_SERIAL_H
 
-#include "axl_io_win_FileHandle.h"
+#include "axl_io_win_File.h"
 
 namespace axl {
 namespace io {
@@ -21,7 +21,7 @@ namespace win {
 
 //..............................................................................
 
-class Serial: public FileHandle
+class Serial: public File
 {
 public:
 	bool

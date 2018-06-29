@@ -50,6 +50,8 @@ public:
 #endif
 
 	typedef FileImpl::H Handle;
+
+public:
 	FileImpl m_file;
 
 public:

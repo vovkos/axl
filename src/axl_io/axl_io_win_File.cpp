@@ -43,6 +43,31 @@ File::create (
 	return err::complete (m_h != INVALID_HANDLE_VALUE);
 }
 
+bool
+File::duplicate (
+	HANDLE sourceProcess,
+	HANDLE sourceHandle,
+	HANDLE targetProcess,
+	dword_t accessMode,
+	bool isInheritable,
+	dword_t options
+	)
+{
+	close ();
+
+	bool_t result = ::DuplicateHandle (
+		sourceProcess,
+		sourceHandle,
+		targetProcess,
+		&m_h,
+		accessMode,
+		isInheritable,
+		options
+		);
+
+	return err::complete (result);
+}
+
 uint64_t
 File::getSize () const
 {
@@ -94,8 +119,137 @@ File::setPosition (uint64_t _Offset) const
 	return err::complete (result != INVALID_SET_FILE_POINTER);
 }
 
+size_t
+File::read (
+	void* p,
+	size_t size
+	) const
+{
+	dword_t actualSize;
+	bool result = read (p, (dword_t) size, &actualSize);
+	return result ? (size_t) actualSize : -1;
+}
+
+size_t
+File::write (
+	const void* p,
+	size_t size
+	)
+{
+	dword_t actualSize;
+	bool result = write (p, (dword_t) size, &actualSize);
+	return result ? (size_t) actualSize : -1;
+}
+
+size_t
+File::overlappedRead (
+	void* p,
+	size_t size
+	) const
+{
+	dword_t actualSize;
+	bool result = overlappedRead (p, (dword_t) size, &actualSize);
+	return result ? (size_t) actualSize : -1;
+}
+
+size_t
+File::overlappedWrite (
+	const void* p,
+	size_t size
+	)
+{
+	dword_t actualSize;
+	bool result = overlappedWrite (p, (dword_t) size, &actualSize);
+	return result ? (size_t) actualSize : -1;
+}
+
+bool
+File::overlappedRead (
+	void* p,
+	dword_t size,
+	dword_t* actualSize
+	) const
+{
+	StdOverlapped overlapped;
+	bool result = overlappedRead (p, size, &overlapped);
+	return result ? getOverlappedResult (&overlapped, actualSize) : false;
+}
+
+bool
+File::overlappedWrite (
+	const void* p,
+	dword_t size,
+	dword_t* actualSize
+	)
+{
+	StdOverlapped overlapped;
+	bool result = overlappedWrite (p, size, &overlapped);
+	return result ? getOverlappedResult (&overlapped, actualSize) : false;
+}
+
+bool
+File::overlappedIoctl (
+	dword_t code,
+	const void* inData,
+	dword_t inDataSize,
+	void* outData,
+	dword_t outDataSize,
+	dword_t* actualSize
+	)
+{
+	StdOverlapped overlapped;
+	bool result = overlappedIoctl (code, inData, inDataSize, outData, outDataSize, &overlapped);
+	return result ? getOverlappedResult (&overlapped, actualSize) : false;
+}
+
+bool
+File::completeOverlappedRequest (bool_t result)
+{
+	if (result)
+		return true;
+
+	dword_t error = ::GetLastError ();
+	if (error != ERROR_IO_PENDING)
+	{
+		err::setError (error);
+		return false;
+	}
+
+	return true;
+}
+
+bool
+File::getOverlappedResult (
+	OVERLAPPED* overlapped,
+	dword_t* actualSize
+	) const
+{
+	bool_t result = ::GetOverlappedResult (m_h, overlapped, actualSize, true);
+	if (!result)
+	{
+		DWORD error = ::GetLastError ();
+		if (error != ERROR_HANDLE_EOF)
+		{
+			err::setError (error);
+			return false;
+		}
+
+		*actualSize = 0; // EOF is not an error
+	}
+
+	return true;
+}
+
+size_t
+File::getOverlappedResult (OVERLAPPED* overlapped) const
+{
+	dword_t actualSize;
+	bool result = getOverlappedResult (overlapped, &actualSize);
+	return result ? (size_t) actualSize : -1;
+}
+
 //..............................................................................
 
-} // namespace win
+} // namespace win {
 } // namespace io
 } // namespace axl

@@ -430,7 +430,7 @@ getSymbolicLinkTarget (
 	oa.RootDirectory = NULL;
 	oa.ObjectName = &uniLinkName;
 
-	io::win::FileHandle link;
+	io::win::File link;
 	status = ntOpenSymbolicLinkObject (
 		link.p (),
 		GENERIC_READ,

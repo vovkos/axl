@@ -13,7 +13,7 @@
 
 #define _AXL_WIN_NAMEDPIPE_H
 
-#include "axl_io_win_FileHandle.h"
+#include "axl_io_win_File.h"
 
 namespace axl {
 namespace io {
@@ -21,7 +21,7 @@ namespace win {
 
 //..............................................................................
 
-class NamedPipe: public FileHandle
+class NamedPipe: public File
 {
 public:
 	bool
