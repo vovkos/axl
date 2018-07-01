@@ -33,6 +33,15 @@ File::open (
 }
 
 bool
+File::duplicate (int fd)
+{
+	close ();
+
+	m_h = ::dup (fd);
+	return err::complete (m_h != -1);
+}
+
+bool
 File::setBlockingMode (bool isBlocking)
 {
 	int result = ::fcntl (m_h, F_GETFL, 0);

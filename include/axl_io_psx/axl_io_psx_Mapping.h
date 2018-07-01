@@ -13,7 +13,7 @@
 
 #define _AXL_IO_PSX_MAPPING_H
 
-#include "axl_io_psx_Fd.h"
+#include "axl_io_psx_File.h"
 
 namespace axl {
 namespace io {
@@ -91,7 +91,7 @@ public:
 
 //..............................................................................
 
-class SharedMemory: public Fd
+class SharedMemory: public File
 {
 public:
 	bool

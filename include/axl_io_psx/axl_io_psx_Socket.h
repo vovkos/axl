@@ -13,7 +13,7 @@
 
 #define _AXL_PSX_SOCKET_H
 
-#include "axl_io_psx_Fd.h"
+#include "axl_io_psx_File.h"
 #include "axl_io_SockAddr.h"
 
 namespace axl {
@@ -22,7 +22,7 @@ namespace psx {
 
 //..............................................................................
 
-class Socket: public Fd
+class Socket: public File
 {
 public:
 	bool

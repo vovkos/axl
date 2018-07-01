@@ -234,7 +234,7 @@ copyFile (
 			blockSize = (size_t) size;
 
 		const void* src = srcMapping.map (NULL, blockSize, PROT_READ, MAP_SHARED, srcFile->m_file, offset);
-		void* dst = dstMapping.map (NULL, blockSize, PROT_READ | PROT_WRITE, MAP_SHARED, dstFile.m_file, offset);
+		void* dst = dstMapping.map (NULL, blockSize, PROT_READ | PROT_WRITE, MAP_SHARED, dstFile->m_file, offset);
 
 		if (!src || !dst)
 			return -1;

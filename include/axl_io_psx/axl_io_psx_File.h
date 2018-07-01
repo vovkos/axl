@@ -21,7 +21,7 @@ namespace psx {
 
 //..............................................................................
 
-class CloseFd
+class CloseFile
 {
 public:
 	void
@@ -33,15 +33,15 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Fd: public sl::Handle <int, CloseFd, sl::MinusOne <int> >
+class File: public sl::Handle <int, CloseFile, sl::MinusOne <int> >
 {
 public:
-	Fd ()
+	File ()
 	{
 	}
 
-	Fd (int h):
-		sl::Handle <int, CloseFd, sl::MinusOne <int> > (h)
+	File (int h):
+		sl::Handle <int, CloseFile, sl::MinusOne <int> > (h)
 	{
 	}
 
@@ -51,6 +51,9 @@ public:
 		uint_t openFlags = O_RDWR | O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
+
+	bool
+	duplicate (int fd);
 
 	bool
 	setBlockingMode (bool isBlocking);

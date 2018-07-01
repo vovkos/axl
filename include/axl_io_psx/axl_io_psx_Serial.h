@@ -13,7 +13,7 @@
 
 #define _AXL_PSX_SERIAL_H
 
-#include "axl_io_psx_Fd.h"
+#include "axl_io_psx_File.h"
 
 namespace axl {
 namespace io {
@@ -21,7 +21,7 @@ namespace psx {
 
 //..............................................................................
 
-class Serial: public Fd
+class Serial: public File
 {
 public:
 	bool
@@ -30,7 +30,7 @@ public:
 		uint_t openFlags = O_RDWR | O_NOCTTY
 		)
 	{
-		return Fd::open (name, openFlags, 0);
+		return File::open (name, openFlags, 0);
 	}
 
 	bool

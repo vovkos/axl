@@ -11,7 +11,6 @@
 
 #include "pch.h"
 #include "axl_io_Serial.h"
-#include "axl_io_psx_Fd.h"
 
 #ifdef _AXL_SYS_LNX_LIBUDEV
 #	include "axl_sys_lnx_Udev.h"
@@ -71,10 +70,10 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 			// is to try to open them and make an ioctl call
 
 			serial_struct serialInfo;
-			io::psx::Fd fd;
+			io::psx::File file;
 			bool result =
-				fd.open (name, O_RDWR | O_NONBLOCK | O_NOCTTY) &&
-				fd.ioctl (TIOCGSERIAL, &serialInfo);
+				file.open (name, O_RDWR | O_NONBLOCK | O_NOCTTY) &&
+				file.ioctl (TIOCGSERIAL, &serialInfo);
 
 			if (!result || serialInfo.type == PORT_UNKNOWN)
 				continue;
