@@ -16,13 +16,10 @@
 // axl
 
 #include "axl_sl_String.h"
-#include "axl_err_Error.h"
-#include "axl_fsm_Regex.h"
-#include "axl_fsm_StdRegexNameMgr.h"
 #include "axl_sl_AutoPtrArray.h"
 #include "axl_sl_CmdLineParser.h"
-#include "axl_sys_SjljTry.h"
-#include "axl_sys_DynamicLibrary.h"
+#include "axl_sl_BoyerMooreFind.h"
+
 #include "axl_io_Socket.h"
 #include "axl_io_Serial.h"
 #include "axl_io_File.h"
@@ -30,14 +27,20 @@
 #include "axl_io_FilePathUtils.h"
 #include "axl_io_NetworkAdapter.h"
 #include "axl_io_SharedMemoryTransport.h"
+
+#include "axl_sys_SjljTry.h"
+#include "axl_sys_DynamicLibrary.h"
 #include "axl_sys_Time.h"
 #include "axl_sys_Event.h"
-#include "axl_io_FilePathUtils.h"
+#include "axl_sys_ReadWriteLock.h"
+
+#include "axl_fsm_Regex.h"
+#include "axl_fsm_StdRegexNameMgr.h"
 #include "axl_zip_ZipReader.h"
+
 #include "axl_enc_EscapeEncoding.h"
 #include "axl_enc_Base32Encoding.h"
 #include "axl_enc_HexEncoding.h"
-#include "axl_sl_BoyerMooreFind.h"
 
 #ifdef _AXL_XML
 #	include "axl_xml_ExpatParser.h"

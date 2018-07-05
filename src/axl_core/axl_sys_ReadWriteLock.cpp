@@ -244,10 +244,10 @@ ReadWriteLock::readLock (uint_t timeout)
 	result = m_readEvent->wait (timeout);
 
 	sys::atomicLock (&m_data->m_lock);
+	m_data->m_queuedReadCount--;
 
-	result ?
-		m_data->m_activeReadCount++ :
-		m_data->m_queuedReadCount--;
+	if (result)
+		m_data->m_activeReadCount++;
 
 	sys::atomicUnlock (&m_data->m_lock);
 	return result;
