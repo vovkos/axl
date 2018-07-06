@@ -85,21 +85,9 @@ SharedMemoryTransportBase::attach (
 		m_hdr->m_endOffset = 0;
 		m_hdr->m_dataSize = 0;
 
-#if (_AXL_OS_WIN)
 		result =
-			m_readEvent.create (NULL, false, false, sl::String_w (readEventName)) &&
-			m_writeEvent.create (NULL, false, false, sl::String_w (writeEventName));
-#elif (_AXL_OS_POSIX)
-		result = m_readEvent.open (readEventName, O_CREAT);
-		if (result)
-		{
-			m_readEventName = readEventName;
-
-			result = m_writeEvent.open (writeEventName, O_CREAT);
-			if (result)
-				m_writeEventName = writeEventName;
-		}
-#endif
+			m_readEvent.create (readEventName) &&
+			m_writeEvent.create (writeEventName);
 	}
 	else
 	{
@@ -132,15 +120,9 @@ SharedMemoryTransportBase::attach (
 
 		sys::atomicUnlock (&m_hdr->m_lock);
 
-#if (_AXL_OS_WIN)
 		result =
-			m_readEvent.open (EVENT_ALL_ACCESS, false, sl::String_w (readEventName)) &&
-			m_writeEvent.open (EVENT_ALL_ACCESS, false, sl::String_w (writeEventName));
-#elif (_AXL_OS_POSIX)
-		result =
-			m_readEvent.open (readEventName, 0) &&
-			m_writeEvent.open (writeEventName, 0);
-#endif
+			m_readEvent.open (readEventName) &&
+			m_writeEvent.open (writeEventName);
 	}
 
 	if (!result)

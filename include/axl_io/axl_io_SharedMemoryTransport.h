@@ -76,16 +76,8 @@ protected:
 	SharedMemoryTransportHdr* m_hdr;
 	char* m_data;
 	int32_t m_pendingReqCount;
-
-#if (_AXL_OS_WIN)
-	sys::win::Event m_readEvent;
-	sys::win::Event m_writeEvent;
-#elif (_AXL_OS_POSIX)
-	sys::psx::NamedSem m_readEvent;
-	sys::psx::NamedSem m_writeEvent;
-	sl::String m_readEventName;
-	sl::String m_writeEventName;
-#endif
+	sys::UniversalEvent m_readEvent;
+	sys::UniversalEvent m_writeEvent;
 
 protected:
 	SharedMemoryTransportBase ();

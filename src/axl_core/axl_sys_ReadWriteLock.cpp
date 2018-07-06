@@ -15,82 +15,7 @@
 namespace axl {
 namespace sys {
 
-#if (_AXL_OS_POSIX)
-
 //..............................................................................
-
-bool
-ReadWriteLock::EventBase::signal ()
-{
-	return m_eventKind == EventKind_NamedSem ?
-		((NamedSemEvent*) this)->m_sem.signal () :
-		((UnnamedEvent*) this)->m_event.signal ();
-}
-
-void
-ReadWriteLock::EventBase::reset ()
-{
-	if (m_eventKind == EventKind_NamedSem)
-		while (((NamedSemEvent*) this)->m_sem.tryWait ());
-	else
-		((UnnamedEvent*) this)->m_event.reset ();
-}
-
-bool
-ReadWriteLock::EventBase::wait (uint_t timeout)
-{
-	return m_eventKind == EventKind_NamedSem ?
-#if (_AXL_OS_DARWIN) // no sem_timedwait on darwin
-		timeout == 0 ?
-			((NamedSemEvent*) this)->m_sem.tryWait () :
-			((NamedSemEvent*) this)->m_sem.wait () :
-#else
-		((NamedSemEvent*) this)->m_sem.wait (timeout) :
-#endif
-		((UnnamedEvent*) this)->m_event.wait (timeout);
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-ReadWriteLock::NamedSemEvent::~NamedSemEvent ()
-{
-	if (!m_name.isEmpty ())
-		sys::psx::NamedSem::unlink (m_name);
-}
-
-bool
-ReadWriteLock::NamedSemEvent::create (const sl::StringRef& name)
-{
-	ASSERT (!m_sem);
-
-	bool result = m_sem.open (name, O_CREAT);
-	if (!result)
-		return false;
-
-	m_name = name;
-	return true;
-}
-
-bool
-ReadWriteLock::NamedSemEvent::open (const sl::StringRef& name)
-{
-	ASSERT (!m_sem);
-	return m_sem.open (name, 0);
-}
-
-//..............................................................................
-
-#endif
-
-ReadWriteLock::ReadWriteLock ()
-{
-	m_data = NULL;
-
-#if (_AXL_OS_POSIX)
-	m_readEvent = NULL;
-	m_writeEvent = NULL;
-#endif
-}
 
 void
 ReadWriteLock::close ()
@@ -102,23 +27,8 @@ ReadWriteLock::close ()
 
 	m_mapping.close ();
 	m_file.close ();
-
-#if (_AXL_OS_WIN)
 	m_readEvent.close ();
 	m_writeEvent.close ();
-#elif (_AXL_OS_POSIX)
-	if (m_readEvent)
-	{
-		AXL_MEM_DELETE (m_readEvent);
-		m_readEvent = NULL;
-	}
-
-	if (m_writeEvent)
-	{
-		AXL_MEM_DELETE (m_writeEvent);
-		m_writeEvent = NULL;
-	}
-#endif
 }
 
 bool
@@ -127,15 +37,8 @@ ReadWriteLock::create ()
 	close ();
 
 	m_data = AXL_MEM_NEW (Data);
-
-#if (_AXL_OS_WIN)
-	m_readEvent.create (NULL, true, false);
-	m_writeEvent.create (NULL, false, false);
-#elif (_AXL_OS_POSIX)
-	m_readEvent = AXL_MEM_NEW_ARGS (UnnamedEvent, (true));
-	m_writeEvent = AXL_MEM_NEW_ARGS (UnnamedEvent, (false));
-#endif
-
+	m_readEvent.create ();
+	m_writeEvent.create ();
 	return true;
 }
 
@@ -150,32 +53,12 @@ ReadWriteLock::create (
 
 	bool result =
 		m_file.open (fileName, io::FileFlag_ShareWrite | io::FileFlag_DeleteOnClose) &&
-		m_mapping.open (&m_file, 0, sizeof (Data));
+		m_mapping.open (&m_file, 0, sizeof (Data)) &&
+		m_readEvent.create (readEventName) &&
+		m_writeEvent.create (writeEventName);
 
 	if (!result)
 		return false;
-
-#if (_AXL_OS_WIN)
-	result =
-		m_readEvent.create (NULL, true, false, sl::String_w (readEventName)) &&
-		m_writeEvent.create (NULL, false, false, sl::String_w (writeEventName));
-
-	if (!result)
-		return false;
-#elif (_AXL_OS_POSIX)
-	NamedSemEvent* readEvent = AXL_MEM_NEW (NamedSemEvent);
-	NamedSemEvent* writeEvent = AXL_MEM_NEW (NamedSemEvent);
-
-	result =
-		readEvent->create (readEventName) &&
-		writeEvent->create (writeEventName);
-
-	if (!result)
-		return false;
-
-	m_readEvent = readEvent;
-	m_writeEvent = writeEvent;
-#endif
 
 	m_data = (Data*) m_mapping.p ();
 	memset (m_data, 0, sizeof (Data));
@@ -193,29 +76,9 @@ ReadWriteLock::open (
 
 	bool result =
 		m_file.open (fileName, io::FileFlag_ShareWrite | io::FileFlag_OpenExisting) &&
-		m_mapping.open (&m_file, 0, sizeof (Data));
-
-	if (!result)
-		return false;
-
-#if (_AXL_OS_WIN)
-	result =
-		m_readEvent.open (EVENT_ALL_ACCESS, false, sl::String_w (readEventName)) &&
-		m_writeEvent.open (EVENT_ALL_ACCESS, false, sl::String_w (writeEventName));
-#elif (_AXL_OS_POSIX)
-	NamedSemEvent* readEvent = AXL_MEM_NEW (NamedSemEvent);
-	NamedSemEvent* writeEvent = AXL_MEM_NEW (NamedSemEvent);
-
-	result =
-		readEvent->open (readEventName) &&
-		writeEvent->open (writeEventName);
-
-	if (!result)
-		return false;
-
-	m_readEvent = readEvent;
-	m_writeEvent = writeEvent;
-#endif
+		m_mapping.open (&m_file, 0, sizeof (Data)) &&
+		m_readEvent.open (readEventName) &&
+		m_writeEvent.open (writeEventName);
 
 	if (!result)
 		return false;
@@ -237,11 +100,11 @@ ReadWriteLock::readLock (uint_t timeout)
 		return true;
 	}
 
-	m_readEvent->reset ();
+	m_readEvent.reset ();
 	m_data->m_queuedReadCount++;
 	sys::atomicUnlock (&m_data->m_lock);
 
-	result = m_readEvent->wait (timeout);
+	result = m_readEvent.wait (timeout);
 
 	sys::atomicLock (&m_data->m_lock);
 	m_data->m_queuedReadCount--;
@@ -263,9 +126,9 @@ ReadWriteLock::readUnlock ()
 	if (!m_data->m_activeReadCount)
 	{
 		if (m_data->m_writeCount) // check writers first, so we alternate
-			m_writeEvent->signal ();
+			m_writeEvent.signal ();
 		else if (m_data->m_queuedReadCount)
-			m_readEvent->signal ();
+			m_readEvent.signal ();
 	}
 
 	sys::atomicUnlock (&m_data->m_lock);
@@ -284,11 +147,11 @@ ReadWriteLock::writeLock (uint_t timeout)
 		return true;
 	}
 
-	m_writeEvent->reset ();
+	m_writeEvent.reset ();
 	m_data->m_writeCount++;
 	sys::atomicUnlock (&m_data->m_lock);
 
-	result = m_writeEvent->wait (timeout);
+	result = m_writeEvent.wait (timeout);
 
 	sys::atomicLock (&m_data->m_lock);
 
@@ -296,7 +159,7 @@ ReadWriteLock::writeLock (uint_t timeout)
 	{
 		m_data->m_writeCount--;
 		if (!m_data->m_writeCount && m_data->m_queuedReadCount)
-			m_readEvent->signal ();
+			m_readEvent.signal ();
 	}
 
 	sys::atomicUnlock (&m_data->m_lock);
@@ -311,9 +174,9 @@ ReadWriteLock::writeUnlock ()
 	m_data->m_writeCount--;
 
 	if (m_data->m_queuedReadCount) // check readers first, so we alternate
-		m_readEvent->signal ();
+		m_readEvent.signal ();
 	else if (m_data->m_writeCount)
-		m_writeEvent->signal ();
+		m_writeEvent.signal ();
 
 	sys::atomicUnlock (&m_data->m_lock);
 }

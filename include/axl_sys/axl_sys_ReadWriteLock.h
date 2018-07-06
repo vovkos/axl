@@ -35,109 +35,18 @@ protected:
 		volatile uint32_t m_writeCount; // one or zero active, the rest is on queue
 	};
 
-#if (_AXL_OS_WIN)
-	class WinEventWaitHelper: public sys::win::Event
-	{
-	public:
-		bool
-		wait (uint_t timeout)
-		{
-			return sys::win::Event::wait (timeout) == sys::win::WaitResult_Object0;
-		}
-	};
-
-	class WinEvent: public WinEventWaitHelper
-	{
-	public:
-		WinEventWaitHelper*
-		operator -> ()
-		{
-			return this;
-		}
-	};
-#elif (_AXL_OS_POSIX)
-	enum EventKind
-	{
-		EventKind_UnnamedEvent,
-		EventKind_NamedSem,
-	};
-
-	class EventBase // pseudo-virtual base
-	{
-	protected:
-		EventKind m_eventKind;
-
-	public:
-		virtual ~EventBase ()
-		{
-		}
-
-		// hot path functions are non-virtual for better performance
-
-		bool
-		signal ();
-
-		void
-		reset ();
-
-		bool
-		wait (uint_t timeout);
-	};
-
-	class UnnamedEvent: public EventBase
-	{
-		friend class EventBase;
-
-	protected:
-		sys::EventBase m_event;
-
-	public:
-		UnnamedEvent (bool isNotificationEvent):
-			m_event (isNotificationEvent)
-		{
-			m_eventKind = EventKind_UnnamedEvent;
-		}
-	};
-
-	class NamedSemEvent: public EventBase
-	{
-		friend class EventBase;
-
-	protected:
-		sys::psx::NamedSem m_sem;
-		sl::String m_name;
-
-	public:
-		NamedSemEvent ()
-		{
-			m_eventKind = EventKind_NamedSem;
-		}
-
-		~NamedSemEvent ();
-
-		bool
-		create (const sl::StringRef& name);
-
-		bool
-		open (const sl::StringRef& name);
-	};
-#endif
-
 protected:
 	Data* m_data;
 	io::File m_file;
 	io::Mapping m_mapping;
-
-#if (_AXL_OS_WIN)
-	WinEvent m_readEvent;
-	WinEvent m_writeEvent;
-#elif (_AXL_OS_POSIX)
-	EventBase* m_readEvent;
-	EventBase* m_writeEvent;
-#endif
+	UniversalNotificationEvent m_readEvent;
+	UniversalEvent m_writeEvent;
 
 public:
-	ReadWriteLock ();
+	ReadWriteLock ()
+	{
+		m_data = NULL;
+	}
 
 	~ReadWriteLock ()
 	{

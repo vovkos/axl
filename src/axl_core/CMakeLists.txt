@@ -245,6 +245,7 @@ set (
 
 set (
 	SYS_CPP_LIST
+	axl_sys_Event.cpp
 	axl_sys_TlsMgr.cpp
 	axl_sys_Time.cpp
 	axl_sys_ReadWriteLock.cpp
@@ -274,7 +275,6 @@ set (
 set (
 	SYS_PSX_CPP_LIST
 	axl_sys_psx_Cond.cpp
-	axl_sys_psx_Event.cpp
 	axl_sys_psx_Mutex.cpp
 	axl_sys_psx_Sem.cpp
 	axl_sys_psx_Thread.cpp
