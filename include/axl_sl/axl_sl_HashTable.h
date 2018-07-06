@@ -18,6 +18,7 @@
 #include "axl_sl_MapEntry.h"
 #include "axl_sl_Hash.h"
 #include "axl_sl_Operator.h"
+#include "axl_sl_Singleton.h"
 
 namespace axl {
 namespace sl {
