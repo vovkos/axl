@@ -32,7 +32,8 @@ protected:
 		volatile int32_t m_lock;
 		volatile uint32_t m_activeReadCount;
 		volatile uint32_t m_queuedReadCount;
-		volatile uint32_t m_writeCount; // one or zero active, the rest is on queue
+		volatile uint32_t m_activeWriteCount; // one or zero
+		volatile uint32_t m_queuedWriteCount;
 	};
 
 protected:

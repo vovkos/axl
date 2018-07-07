@@ -93,26 +93,39 @@ ReadWriteLock::readLock (uint_t timeout)
 	bool result;
 
 	sys::atomicLock (&m_data->m_lock);
-	if (!m_data->m_writeCount)
+	if (!m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
 	{
 		m_data->m_activeReadCount++;
 		sys::atomicUnlock (&m_data->m_lock);
 		return true;
 	}
 
-	m_readEvent.reset ();
 	m_data->m_queuedReadCount++;
-	sys::atomicUnlock (&m_data->m_lock);
 
-	result = m_readEvent.wait (timeout);
+	for (;;) // this loop is REQUIRED!
+	{
+		m_readEvent.reset ();
+		sys::atomicUnlock (&m_data->m_lock);
 
-	sys::atomicLock (&m_data->m_lock);
+		result = m_readEvent.wait (timeout);
+
+		// 1 (or more) readers AND 1 (or more) writers might squeeze in here
+
+		sys::atomicLock (&m_data->m_lock);
+
+		if (!result)
+			break;
+
+		if (!m_data->m_activeWriteCount)
+		{
+			m_data->m_activeReadCount++;
+			break;
+		}
+	}
+
 	m_data->m_queuedReadCount--;
-
-	if (result)
-		m_data->m_activeReadCount++;
-
 	sys::atomicUnlock (&m_data->m_lock);
+
 	return result;
 }
 
@@ -120,14 +133,17 @@ void
 ReadWriteLock::readUnlock ()
 {
 	sys::atomicLock (&m_data->m_lock);
-	ASSERT (m_data->m_activeReadCount);
+	ASSERT (m_data->m_activeReadCount && !m_data->m_activeWriteCount);
 	m_data->m_activeReadCount--;
 
-	if (!m_data->m_activeReadCount)
+	if (m_data->m_queuedWriteCount) // check writers first, so we alternate
 	{
-		if (m_data->m_writeCount) // check writers first, so we alternate
+		if (!m_data->m_activeReadCount)
 			m_writeEvent.signal ();
-		else if (m_data->m_queuedReadCount)
+	}
+	else
+	{
+		if (m_data->m_queuedReadCount)
 			m_readEvent.signal ();
 	}
 
@@ -140,29 +156,44 @@ ReadWriteLock::writeLock (uint_t timeout)
 	bool result;
 
 	sys::atomicLock (&m_data->m_lock);
-	if (!m_data->m_activeReadCount && !m_data->m_writeCount)
+	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
 	{
-		m_data->m_writeCount = 1;
+		m_data->m_activeWriteCount = 1;
 		sys::atomicUnlock (&m_data->m_lock);
 		return true;
 	}
 
-	m_writeEvent.reset ();
-	m_data->m_writeCount++;
-	sys::atomicUnlock (&m_data->m_lock);
+	m_data->m_queuedWriteCount++;
 
-	result = m_writeEvent.wait (timeout);
-
-	sys::atomicLock (&m_data->m_lock);
-
-	if (!result)
+	for (;;) // this loop (probably) isn't required, but it's good for symmetry and peace of mind
 	{
-		m_data->m_writeCount--;
-		if (!m_data->m_writeCount && m_data->m_queuedReadCount)
-			m_readEvent.signal ();
+		m_writeEvent.reset ();
+		sys::atomicUnlock (&m_data->m_lock);
+
+		result = m_writeEvent.wait (timeout);
+
+		sys::atomicLock (&m_data->m_lock);
+
+		if (!result)
+		{
+			if (!m_data->m_activeWriteCount && m_data->m_queuedReadCount)
+				m_readEvent.signal ();
+
+			break;
+		}
+
+		if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount)
+		{
+			m_data->m_activeWriteCount++;
+			break;
+		}
+
+		ASSERT (false); // let's find out whether this loop is really optional
 	}
 
+	m_data->m_queuedWriteCount--;
 	sys::atomicUnlock (&m_data->m_lock);
+
 	return result;
 }
 
@@ -170,12 +201,12 @@ void
 ReadWriteLock::writeUnlock ()
 {
 	sys::atomicLock (&m_data->m_lock);
-	ASSERT (!m_data->m_activeReadCount);
-	m_data->m_writeCount--;
+	ASSERT (!m_data->m_activeReadCount && m_data->m_activeWriteCount == 1);
+	m_data->m_activeWriteCount = 0;
 
 	if (m_data->m_queuedReadCount) // check readers first, so we alternate
 		m_readEvent.signal ();
-	else if (m_data->m_writeCount)
+	else if (m_data->m_queuedWriteCount)
 		m_writeEvent.signal ();
 
 	sys::atomicUnlock (&m_data->m_lock);
