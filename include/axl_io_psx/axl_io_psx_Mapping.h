@@ -97,7 +97,7 @@ public:
 	bool
 	open (
 		const sl::StringRef& name,
-		uint_t flags = O_RDWR,
+		uint_t flags = O_RDWR | O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
 
