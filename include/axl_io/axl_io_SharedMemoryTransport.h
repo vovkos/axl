@@ -14,6 +14,7 @@
 #define _AXL_IO_SHAREDMEMORYTRANSPORT_H
 
 #include "axl_io_Mapping.h"
+#include "axl_sys_Event.h"
 
 namespace axl {
 namespace io {
@@ -76,8 +77,8 @@ protected:
 	SharedMemoryTransportHdr* m_hdr;
 	char* m_data;
 	int32_t m_pendingReqCount;
-	sys::UniversalEvent m_readEvent;
-	sys::UniversalEvent m_writeEvent;
+	sys::NameableEvent m_readEvent;
+	sys::NameableEvent m_writeEvent;
 
 protected:
 	SharedMemoryTransportBase ();

@@ -40,8 +40,8 @@ protected:
 	Data* m_data;
 	io::File m_file;
 	io::Mapping m_mapping;
-	UniversalNotificationEvent m_readEvent;
-	UniversalEvent m_writeEvent;
+	NameableNotificationEvent m_readEvent;
+	NameableEvent m_writeEvent;
 
 public:
 	ReadWriteLock ()

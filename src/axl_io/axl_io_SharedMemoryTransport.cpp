@@ -155,20 +155,6 @@ SharedMemoryTransportBase::closeImpl ()
 	m_data = NULL;
 	m_mappingSize = 0;
 	m_pendingReqCount = 0;
-
-#if (_AXL_OS_POSIX)
-	if (!m_readEventName.isEmpty ())
-	{
-		sys::psx::NamedSem::unlink (m_readEventName);
-		m_readEventName.clear ();
-	}
-
-	if (!m_writeEventName.isEmpty ())
-	{
-		sys::psx::NamedSem::unlink (m_writeEventName);
-		m_writeEventName.clear ();
-	}
-#endif
 }
 
 void
@@ -176,15 +162,8 @@ SharedMemoryTransportBase::disconnect ()
 {
 	sys::atomicLock (&m_hdr->m_lock);
 	m_hdr->m_state = SharedMemoryTransportState_Disconnected;
-
-#if (_AXL_OS_WIN)
 	m_readEvent.signal ();
 	m_writeEvent.signal ();
-#elif (_AXL_OS_POSIX)
-	m_readEvent.post ();
-	m_writeEvent.post ();
-#endif
-
 	sys::atomicUnlock (&m_hdr->m_lock);
 }
 
@@ -352,13 +331,8 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 	}
 
 	m_hdr->m_dataSize -= readSize;
-	sys::atomicUnlock (&m_hdr->m_lock);
-
-#if (_AXL_OS_WIN)
 	m_readEvent.signal ();
-#elif (_AXL_OS_POSIX)
-	m_readEvent.post ();
-#endif
+	sys::atomicUnlock (&m_hdr->m_lock);
 
 	return readSize;
 }
@@ -481,13 +455,8 @@ SharedMemoryWriter::write (
 	}
 
 	m_hdr->m_dataSize += chainSize;
-	sys::atomicUnlock (&m_hdr->m_lock);
-
-#if (_AXL_OS_WIN)
 	m_writeEvent.signal ();
-#elif (_AXL_OS_POSIX)
-	m_writeEvent.post ();
-#endif
+	sys::atomicUnlock (&m_hdr->m_lock);
 
 	return chainSize;
 }
