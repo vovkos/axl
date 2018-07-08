@@ -20,18 +20,31 @@ namespace psx {
 
 //..............................................................................
 
-int
-MutexAttr::getType () const
+bool
+MutexAttr::getProcessShared (int* value) const
 {
-	int type = PTHREAD_MUTEX_NORMAL;
-	::pthread_mutexattr_gettype (&m_attr, &type);
-	return type;
+	int result = ::pthread_mutexattr_getpshared (&m_attr, value);
+	return result == 0 ? true : err::fail (result);
 }
 
 bool
-MutexAttr::setType (int type)
+MutexAttr::setProcessShared (int value)
 {
-	int result = ::pthread_mutexattr_settype (&m_attr, type);
+	int result = ::pthread_mutexattr_setpshared (&m_attr, value);
+	return result == 0 ? true : err::fail (result);
+}
+
+bool
+MutexAttr::getType (int* value) const
+{
+	int result = ::pthread_mutexattr_gettype (&m_attr, value);
+	return result == 0 ? true : err::fail (result);
+}
+
+bool
+MutexAttr::setType (int value)
+{
+	int result = ::pthread_mutexattr_settype (&m_attr, value);
 	return result == 0 ? true : err::fail (result);
 }
 

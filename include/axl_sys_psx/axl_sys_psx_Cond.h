@@ -20,6 +20,50 @@ namespace axl {
 namespace sys {
 namespace psx {
 
+
+//..............................................................................
+
+class CondAttr
+{
+protected:
+	pthread_condattr_t m_attr;
+
+public:
+	CondAttr ()
+	{
+		::pthread_condattr_init (&m_attr);
+	}
+
+	~CondAttr ()
+	{
+		::pthread_condattr_destroy (&m_attr);
+	}
+
+	operator const pthread_condattr_t* () const
+	{
+		return &m_attr;
+	}
+
+	operator pthread_condattr_t* ()
+	{
+		return &m_attr;
+	}
+
+	bool
+	getProcessShared (int* value) const
+	{
+		int result = ::pthread_condattr_getpshared (&m_attr, value);
+		return result == 0 ? true : err::fail (result);
+	}
+
+	bool
+	setProcessShared (int value)
+	{
+		int result = ::pthread_condattr_setpshared (&m_attr, value);
+		return result == 0 ? true : err::fail (result);
+	}
+};
+
 //..............................................................................
 
 class Cond
@@ -28,9 +72,9 @@ protected:
 	pthread_cond_t m_cond;
 
 public:
-	Cond ()
+	Cond (const pthread_condattr_t* attr = NULL)
 	{
-		::pthread_cond_init (&m_cond, NULL);
+		::pthread_cond_init (&m_cond, attr);
 	}
 
 	~Cond ()
@@ -80,6 +124,19 @@ protected:
 	Mutex m_mutex;
 
 public:
+	CondMutexPair ()
+	{
+	}
+
+	CondMutexPair (
+		const pthread_condattr_t* condAttr,
+		const pthread_mutexattr_t* mutexAttr
+		):
+		m_cond (condAttr),
+		m_mutex (mutexAttr)
+	{
+	}
+
 	bool
 	tryLock ()
 	{
