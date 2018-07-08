@@ -245,7 +245,6 @@ set (
 
 set (
 	SYS_CPP_LIST
-	axl_sys_Event.cpp
 	axl_sys_TlsMgr.cpp
 	axl_sys_Time.cpp
 	axl_sys_ReadWriteLock.cpp
