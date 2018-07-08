@@ -47,28 +47,17 @@ public:
 		return &m_attr;
 	}
 
-	int
-	getType () const;
+	bool
+	getProcessShared (int* value) const;
 
 	bool
-	setType (int type);
-
-#if (0)
-	int
-	getRobust () const
-	{
-		int robust = PTHREAD_MUTEX_STALLED;
-		::pthread_mutexattr_getrobust (&m_attr, &robust);
-		return robust;
-	}
+	setProcessShared (int value);
 
 	bool
-	setRobust (int robust)
-	{
-		int result = ::pthread_mutexattr_setrobust (&m_attr, robust);
-		return result == 0 ? true : err::fail (result);
-	}
-#endif
+	getType (int* value) const;
+
+	bool
+	setType (int value);
 };
 
 //..............................................................................
@@ -79,7 +68,7 @@ protected:
 	pthread_mutex_t m_mutex;
 
 public:
-	Mutex (pthread_mutexattr_t* attr = NULL)
+	Mutex (const pthread_mutexattr_t* attr = NULL)
 	{
 		::pthread_mutex_init (&m_mutex, attr);
 	}
