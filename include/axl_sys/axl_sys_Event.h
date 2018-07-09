@@ -111,12 +111,13 @@ public:
 	void
 	close ();
 
-	void
+	bool
 	reset ()
 	{
 		m_condMutexPair.lock ();
 		m_state = false;
 		m_condMutexPair.unlock ();
+		return true;
 	}
 
 	bool
@@ -286,10 +287,15 @@ public:
 		if (!m_event)
 			return;
 
-		m_event->~EventImpl ();
-
-		if (!m_name.isEmpty ())
+		if (m_event == (EventImpl*) m_unnamedEventBuffer)
+		{
+			m_event->~EventImpl ();
+		}
+		else if (!m_name.isEmpty ())
+		{
 			io::psx::SharedMemory::unlink (m_name);
+			m_event->~EventImpl ();
+		}
 
 		m_mapping.close ();
 		m_name.clear ();
