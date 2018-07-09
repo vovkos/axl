@@ -70,7 +70,7 @@ Mapping::open (
 	uint_t flags
 	)
 {
-	ASSERT (size != 0 && size != -1);
+	ASSERT (size != -1);
 
 	close ();
 
@@ -100,25 +100,36 @@ Mapping::open (
 	int protection = (flags & FileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
 	if (!(flags & FileFlag_OpenExisting))
-	{
 		shmFlags |= O_CREAT;
-		m_sharedMemoryName = name;
-	}
 
 	bool result = m_sharedMemory.open (name, shmFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (!result)
 		return NULL;
 
+	if (!(flags & FileFlag_OpenExisting) && m_sharedMemory.getSize () < size)
+	{
+		result = m_sharedMemory.setSize (size);
+		if (!result)
+		{
+			if (!(flags & FileFlag_OpenExisting))
+				psx::SharedMemory::unlink (name);
+
+			return NULL;
+		}
+	}
+
 	p = m_mapping.map (NULL, size, protection, MAP_SHARED, m_sharedMemory, 0);
 	if (!p)
 	{
-		m_sharedMemory.close ();
-		psx::SharedMemory::unlink (name);
+		if (!(flags & FileFlag_OpenExisting))
+			psx::SharedMemory::unlink (name);
+
 		return NULL;
 	}
 
 	if (!(flags & FileFlag_OpenExisting))
 		m_sharedMemoryName = name;
+
 #endif
 
 	m_p = p;
@@ -129,9 +140,6 @@ Mapping::open (
 void
 Mapping::close ()
 {
-	if (!isOpen ())
-		return;
-
 #if (_AXL_OS_WIN)
 	m_mapping.close ();
 	m_view.close ();
