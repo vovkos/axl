@@ -27,8 +27,15 @@ class ReadWriteLock
 protected:
 	// locking data may be shared between processes
 
+	enum
+	{
+		Signature = 'klwr',
+	};
+
 	struct Data
 	{
+		uint32_t m_signature;
+
 		volatile int32_t m_lock;
 		volatile uint32_t m_activeReadCount;
 		volatile uint32_t m_queuedReadCount;
@@ -38,7 +45,6 @@ protected:
 
 protected:
 	Data* m_data;
-	io::File m_file;
 	io::Mapping m_mapping;
 	NameableNotificationEvent m_readEvent;
 	NameableEvent m_writeEvent;
@@ -62,14 +68,14 @@ public:
 
 	bool
 	create (
-		const sl::StringRef& fileName,
+		const sl::StringRef& mappingName,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName
 		);
 
 	bool
 	open (
-		const sl::StringRef& fileName,
+		const sl::StringRef& mappingName,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName
 		);

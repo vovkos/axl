@@ -25,10 +25,9 @@ ReadWriteLock::close ()
 
 	m_data = NULL;
 
-	m_mapping.close ();
-	m_file.close ();
 	m_readEvent.close ();
 	m_writeEvent.close ();
+	m_mapping.close ();
 }
 
 bool
@@ -39,12 +38,15 @@ ReadWriteLock::create ()
 	m_data = AXL_MEM_NEW (Data);
 	m_readEvent.create ();
 	m_writeEvent.create ();
+
+	m_data->m_signature = Signature;
+
 	return true;
 }
 
 bool
 ReadWriteLock::create (
-	const sl::StringRef& fileName,
+	const sl::StringRef& mappingName,
 	const sl::StringRef& readEventName,
 	const sl::StringRef& writeEventName
 	)
@@ -52,8 +54,7 @@ ReadWriteLock::create (
 	close ();
 
 	bool result =
-		m_file.open (fileName, io::FileFlag_ShareWrite | io::FileFlag_DeleteOnClose) &&
-		m_mapping.open (&m_file, 0, sizeof (Data)) &&
+		m_mapping.open (mappingName, sizeof (Data)) &&
 		m_readEvent.create (readEventName) &&
 		m_writeEvent.create (writeEventName);
 
@@ -62,12 +63,13 @@ ReadWriteLock::create (
 
 	m_data = (Data*) m_mapping.p ();
 	memset (m_data, 0, sizeof (Data));
+	m_data->m_signature = Signature;
 	return true;
 }
 
 bool
 ReadWriteLock::open (
-	const sl::StringRef& fileName,
+	const sl::StringRef& mappingName,
 	const sl::StringRef& readEventName,
 	const sl::StringRef& writeEventName
 	)
@@ -75,8 +77,7 @@ ReadWriteLock::open (
 	close ();
 
 	bool result =
-		m_file.open (fileName, io::FileFlag_ShareWrite | io::FileFlag_OpenExisting) &&
-		m_mapping.open (&m_file, 0, sizeof (Data)) &&
+		m_mapping.open (mappingName, sizeof (Data), io::FileFlag_OpenExisting) &&
 		m_readEvent.open (readEventName) &&
 		m_writeEvent.open (writeEventName);
 
@@ -84,6 +85,13 @@ ReadWriteLock::open (
 		return false;
 
 	m_data = (Data*) m_mapping.p ();
+
+	if (m_data->m_signature != Signature)
+	{
+		err::setError (err::SystemErrorCode_InvalidParameter);
+		return false;
+	}
+
 	return true;
 }
 
