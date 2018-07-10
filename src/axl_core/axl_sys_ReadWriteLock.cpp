@@ -21,7 +21,7 @@ void
 ReadWriteLock::close ()
 {
 	if (m_data && m_data != m_mapping.p ())
-		AXL_MEM_FREE (m_data);
+		AXL_MEM_FREE ((void*) m_data);
 
 	m_data = NULL;
 
@@ -62,7 +62,7 @@ ReadWriteLock::create (
 		return false;
 
 	m_data = (Data*) m_mapping.p ();
-	memset (m_data, 0, sizeof (Data));
+	memset ((void*) m_data, 0, sizeof (Data));
 	m_data->m_signature = Signature;
 	return true;
 }

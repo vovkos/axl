@@ -35,16 +35,15 @@ protected:
 	struct Data
 	{
 		uint32_t m_signature;
-
-		volatile int32_t m_lock;
-		volatile uint32_t m_activeReadCount;
-		volatile uint32_t m_queuedReadCount;
-		volatile uint32_t m_activeWriteCount; // one or zero
-		volatile uint32_t m_queuedWriteCount;
+		int32_t m_lock;
+		uint32_t m_activeReadCount;
+		uint32_t m_queuedReadCount;
+		uint32_t m_activeWriteCount; // one or zero
+		uint32_t m_queuedWriteCount;
 	};
 
 protected:
-	Data* m_data;
+	volatile Data* m_data;
 	io::Mapping m_mapping;
 	NameableNotificationEvent m_readEvent;
 	NameableEvent m_writeEvent;
