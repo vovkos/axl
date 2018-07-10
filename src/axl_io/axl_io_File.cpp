@@ -93,45 +93,12 @@ File::open (
 	if (!result)
 		return false;
 
-	if (flags & FileFlag_DeleteOnClose)
+	if (flags & FileFlag_Unlink)
 		::unlink (fileName.sz ());
 
 	if (flags & FileFlag_Clear)
 		m_file.setSize (0);
 
-	return true;
-}
-
-#endif
-
-//..............................................................................
-
-#if (_AXL_OS_POSIX)
-
-void
-TemporaryFile::close ()
-{
-	if (!isOpen ())
-		return;
-
-	File::close ();
-	deleteFile (m_fileName);
-	m_fileName.clear ();
-}
-
-bool
-TemporaryFile::open (
-	const sl::StringRef& fileName,
-	uint_t flags
-	)
-{
-	close ();
-
-	bool result = File::open (fileName, flags & ~FileFlag_DeleteOnClose);
-	if (!result)
-		return false;
-
-	m_fileName = fileName;
 	return true;
 }
 
@@ -189,6 +156,10 @@ copyFile (
 	if (size == -1)
 		size = srcFile->getSize ();
 
+	bool result = dstFile->setSize (size);
+	if (!result)
+		return -1;
+
 #if (_AXL_OS_WIN)
 	win::Mapping srcMapping;
 	win::Mapping dstMapping;
@@ -196,7 +167,6 @@ copyFile (
 	win::MappedView dstView;
 
 	bool result =
-		dstFile->setSize (size) &&
 		srcMapping.create (srcFile->m_file, NULL, PAGE_READONLY, size) &&
 		dstMapping.create (dstFile->m_file, NULL, PAGE_READWRITE, size);
 

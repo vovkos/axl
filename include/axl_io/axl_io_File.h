@@ -28,14 +28,15 @@ namespace io {
 
 enum FileFlag
 {
-	FileFlag_ReadOnly      = 0x01,
-	FileFlag_WriteOnly     = 0x02,
-	FileFlag_OpenExisting  = 0x04,
-	FileFlag_Exclusive     = 0x08,
-	FileFlag_ShareWrite    = 0x10,
-	FileFlag_DeleteOnClose = 0x20,
-	FileFlag_Asynchronous  = 0x40,
-	FileFlag_Clear         = 0x80,
+	FileFlag_ReadOnly      = 0x0001,
+	FileFlag_WriteOnly     = 0x0002,
+	FileFlag_OpenExisting  = 0x0004,
+	FileFlag_Exclusive     = 0x0008,
+	FileFlag_ShareWrite    = 0x0010,
+	FileFlag_DeleteOnClose = 0x0020, // windows only
+	FileFlag_Unlink        = 0x0040, // POSIX only
+	FileFlag_Clear         = 0x0080,
+	FileFlag_Asynchronous  = 0x0100,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -157,43 +158,6 @@ public:
 
 //..............................................................................
 
-class TemporaryFile: public File
-{
-#if (_AXL_OS_POSIX)
-protected:
-	sl::String m_fileName;
-
-public:
-	~TemporaryFile ()
-	{
-		close ();
-	}
-#endif
-
-public:
-#if (_AXL_OS_POSIX)
-	void
-	close ();
-
-	bool
-	open (
-		const sl::StringRef& fileName,
-		uint_t flags = 0
-		);
-#else
-	bool
-	open (
-		const sl::StringRef& fileName,
-		uint_t flags = 0
-		)
-	{
-		return io::File::open (fileName, flags | FileFlag_DeleteOnClose);
-	}
-#endif
-};
-
-//..............................................................................
-
 #if (_AXL_OS_WIN)
 
 inline
@@ -258,6 +222,30 @@ copyFile (
 	io::File* dstFile,
 	uint64_t size = -1
 	);
+
+//..............................................................................
+
+class AutoDeleteFile
+{
+public:
+	sl::String m_fileName;
+
+public:
+	AutoDeleteFile ()
+	{
+	}
+
+	AutoDeleteFile (const sl::StringRef& fileName)
+	{
+		m_fileName = fileName;
+	}
+
+	~AutoDeleteFile ()
+	{
+		if (!m_fileName.isEmpty ())
+			deleteFile (m_fileName);
+	}
+};
 
 //..............................................................................
 
