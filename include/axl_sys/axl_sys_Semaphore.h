@@ -13,24 +13,27 @@
 
 #define _AXL_SYS_SEMAPHORE_H
 
-#include "axl_win_Semaphore.h"
+#if (_AXL_OS_WIN)
+#	include "axl_sys_win_Semaphore.h"
+#elif (_AXL_OS_POSIX)
+
+#endif
+
+#include "axl_sys_psx_Sem.h"
 
 namespace axl {
 namespace sys {
 
 //..............................................................................
 
-class Semaphore
+#if (_AXL_OS_WIN)
+
+class NamedSemaphore
 {
 public:
 	win::Semaphore m_semaphore;
 
 public:
-	Semaphore (size_t initialCount = 0)
-	{
-		create (initialCount);
-	}
-
 	bool
 	isOpen ()
 	{
@@ -44,21 +47,76 @@ public:
 	}
 
 	bool
-	create (size_t initialCount = 0)
+	create ()
 	{
 		return m_semaphore.create (NULL, (uint_t) initialCount, MAXLONG, NULL);
 	}
 
 	bool
-	signal (size_t count = 1)
+	signal ()
 	{
-		return m_semaphore.signal ((uint_t) count);
+		return m_semaphore.signal (1);
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait ()
 	{
-		return m_semaphore.wait (timeout) == win::WaitResult_Object0;
+		return m_semaphore.wait (-1) == win::WaitResult_Object0;
+	}
+};
+
+#elif (_AXL_OS_POSIX)
+
+
+
+#endif
+
+class NamedSemaphore
+{
+public:
+	psx::NamedSem m_sem;
+
+public:
+	bool
+	isOpen ()
+	{
+		return m_sem.isOpen ();
+	}
+
+	void
+	close ()
+	{
+		m_sem.close ();
+	}
+
+	bool
+	create (const sl::StringRef& name)
+	{
+		return m_sem.open (name, O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, 0);
+	}
+
+	bool
+	open (const sl::StringRef& name)
+	{
+		return m_sem.open (name, 0, 0, 0);
+	}
+
+	bool
+	signal ()
+	{
+		return m_sem.post ();
+	}
+
+	bool
+	tryWait ()
+	{
+		return m_sem.tryWait ();
+	}
+
+	bool
+	wait ()
+	{
+		return m_sem.wait ();
 	}
 };
 

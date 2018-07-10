@@ -252,6 +252,8 @@ public:
 
 #elif (_AXL_OS_POSIX)
 
+// cannot be destroyed while someone is waiting on it!
+
 template <typename IsNotificationEvent>
 class NameableEventBase
 {

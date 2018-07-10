@@ -14,10 +14,12 @@
 #define _AXL_SYS_PSX_SEM_H
 
 #include "axl_err_Error.h"
+#include "axl_sl_Handle.h"
 
 namespace axl {
 namespace sys {
 namespace psx {
+
 
 //..............................................................................
 
@@ -91,27 +93,21 @@ public:
 
 //..............................................................................
 
-class NamedSem
+class CloseNamedSem
 {
-protected:
-	sem_t* m_sem;
-
 public:
-	NamedSem ()
+	void
+	operator () (sem_t* h)
 	{
-		m_sem = NULL;
+		::sem_close (h);
 	}
+};
 
-	~NamedSem ()
-	{
-		close ();
-	}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-	operator sem_t* ()
-	{
-		return m_sem;
-	}
-
+class NamedSem: public sl::Handle <sem_t*, CloseNamedSem>
+{
+public:
 	bool
 	open (
 		const sl::StringRef& name,
@@ -119,9 +115,6 @@ public:
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH,
 		uint_t value = 0
 		);
-
-	void
-	close ();
 
 	static
 	bool
@@ -134,7 +127,7 @@ public:
 	bool
 	post ()
 	{
-		int result = ::sem_post (m_sem);
+		int result = ::sem_post (m_h);
 		return err::complete (result == 0);
 	}
 
@@ -147,14 +140,14 @@ public:
 	bool
 	tryWait ()
 	{
-		int result = ::sem_trywait (m_sem);
+		int result = ::sem_trywait (m_h);
 		return err::complete (result == 0);
 	}
 
 	bool
 	wait ()
 	{
-		int result = ::sem_wait (m_sem);
+		int result = ::sem_wait (m_h);
 		return err::complete (result == 0);
 	}
 
@@ -165,7 +158,7 @@ public:
 	bool
 	getValue (int* value)
 	{
-		int result = ::sem_getvalue (m_sem, value);
+		int result = ::sem_getvalue (m_h, value);
 		return err::complete (result == 0);
 	}
 #endif
