@@ -112,6 +112,30 @@ public:
 
 //..............................................................................
 
+class AutoUnlinkSharedMemory
+{
+public:
+	sl::String m_name;
+
+public:
+	AutoUnlinkSharedMemory ()
+	{
+	}
+
+	AutoUnlinkSharedMemory (const sl::StringRef& name)
+	{
+		m_name = name;
+	}
+
+	~AutoUnlinkSharedMemory ()
+	{
+		if (!m_name.isEmpty ())
+			::shm_unlink (m_name.sz ());;
+	}
+};
+
+//..............................................................................
+
 } // namespace psx
 } // namespace io
 } // namespace axl
