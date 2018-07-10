@@ -2028,7 +2028,7 @@ testSharedMemoryTransport ()
 		"/home/vladimir/9141b219-d4af-4f40-96b9-92da376bf3c9.shm",
 		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e",
 		"00c34a43-45a4-4137-965e-3b172d3a54ed",
-		io::SharedMemoryTransportFlag_Create | io::SharedMemoryTransportFlag_Message
+		io::SharedMemoryTransportFlag_Message
 		);
 
 	if (!result)
@@ -2042,7 +2042,7 @@ testSharedMemoryTransport ()
 		"/home/vladimir/9141b219-d4af-4f40-96b9-92da376bf3c9.shm",
 		"a51aa9f2-f6d0-43f0-bce2-099a9f780a2e",
 		"00c34a43-45a4-4137-965e-3b172d3a54ed",
-		io::SharedMemoryTransportFlag_Message
+		io::SharedMemoryTransportFlag_Message | io::FileFlag_OpenExisting
 		);
 
 	if (!result)

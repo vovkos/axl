@@ -15,6 +15,7 @@
 
 #include "axl_io_Mapping.h"
 #include "axl_sys_Event.h"
+#include "axl_sys_Semaphore.h"
 
 namespace axl {
 namespace io {
@@ -31,16 +32,16 @@ enum SharedMemoryTransportConst
 
 enum SharedMemoryTransportState
 {
-	SharedMemoryTransportState_MasterConnected,
-	SharedMemoryTransportState_SlaveConnected,
-	SharedMemoryTransportState_Disconnected,
+	SharedMemoryTransportState_MasterConnected = 0x01,
+	SharedMemoryTransportState_SlaveConnected  = 0x02,
+	SharedMemoryTransportState_Disconnected    = 0x04,
+	SharedMemoryTransportState_WaitingForRead  = 0x10,
+	SharedMemoryTransportState_WaitingForWrite = 0x20,
 };
 
-enum SharedMemoryTransportFlag
+enum SharedMemoryTransportFlag // should be combined with FileFlag
 {
-	SharedMemoryTransportFlag_Create        = 0x01,
-	SharedMemoryTransportFlag_Message       = 0x02,
-	SharedMemoryTransportFlag_DeleteOnClose = 0x04,
+	SharedMemoryTransportFlag_Message = 0x010000,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -74,11 +75,11 @@ protected:
 	Mapping m_mapping;
 	size_t m_mappingSize;
 
-	SharedMemoryTransportHdr* m_hdr;
+	volatile SharedMemoryTransportHdr* m_hdr;
 	char* m_data;
 	int32_t m_pendingReqCount;
-	sys::NameableEvent m_readEvent;
-	sys::NameableEvent m_writeEvent;
+	sys::NamedSemaphore m_readSemaphore;
+	sys::NamedSemaphore m_writeSemaphore;
 
 protected:
 	SharedMemoryTransportBase ();
@@ -113,16 +114,16 @@ public:
 	bool
 	open (
 		const sl::StringRef& fileName,
-		const sl::StringRef& readEventName,
-		const sl::StringRef& writeEventName,
+		const sl::StringRef& readSemaphoreName,
+		const sl::StringRef& writeSemaphoreName,
 		uint_t flags
 		);
 
 	bool
 	attach (
 		File::Handle fileHandle,
-		const sl::StringRef& readEventName,
-		const sl::StringRef& writeEventName,
+		const sl::StringRef& readSemaphoreName,
+		const sl::StringRef& writeSemaphoreName,
 		uint_t flags
 		);
 

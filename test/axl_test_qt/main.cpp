@@ -185,7 +185,7 @@ public:
 			"/home/vladimir/test-transport",
 			"test-transport-read",
 			"test-transport-write",
-			io::SharedMemoryTransportFlag_Message
+			io::SharedMemoryTransportFlag_Message | io::FileFlag_OpenExisting
 			);
 
 		if (!result)
@@ -235,7 +235,7 @@ public:
 			"/home/vladimir/test-transport",
 			"test-transport-read",
 			"test-transport-write",
-			io::SharedMemoryTransportFlag_Create | io::SharedMemoryTransportFlag_Message
+			io::SharedMemoryTransportFlag_Message
 			);
 
 		if (!result)

@@ -32,24 +32,20 @@ SharedMemoryTransportBase::SharedMemoryTransportBase ()
 bool
 SharedMemoryTransportBase::open (
 	const sl::StringRef& fileName,
-	const sl::StringRef& readEventName,
-	const sl::StringRef& writeEventName,
+	const sl::StringRef& readSemaphoreName,
+	const sl::StringRef& writeSemaphoreName,
 	uint_t flags
 	)
 {
-	uint_t fileFlags = io::FileFlag_ShareWrite;
-	if (flags & SharedMemoryTransportFlag_DeleteOnClose)
-		fileFlags |= io::FileFlag_DeleteOnClose;
-
 	io::File file;
-	bool result = file.open (fileName, fileFlags);
+	bool result = file.open (fileName, flags);
 	if (!result)
 		return false;
 
 	return attach (
 		file.m_file.detach (),
-		readEventName,
-		writeEventName,
+		readSemaphoreName,
+		writeSemaphoreName,
 		flags
 		);
 }
@@ -57,8 +53,8 @@ SharedMemoryTransportBase::open (
 bool
 SharedMemoryTransportBase::attach (
 	File::Handle fileHandle,
-	const sl::StringRef& readEventName,
-	const sl::StringRef& writeEventName,
+	const sl::StringRef& readSemaphoreName,
+	const sl::StringRef& writeSemaphoreName,
 	uint_t flags
 	)
 {
@@ -68,7 +64,7 @@ SharedMemoryTransportBase::attach (
 
 	m_file.m_file.attach (fileHandle);
 
-	if (flags & SharedMemoryTransportFlag_Create)
+	if (!(flags & FileFlag_OpenExisting))
 	{
 		result = initializeMapping (SharedMemoryTransportConst_DefMappingSize, true);
 		if (!result)
@@ -86,8 +82,8 @@ SharedMemoryTransportBase::attach (
 		m_hdr->m_dataSize = 0;
 
 		result =
-			m_readEvent.create (readEventName) &&
-			m_writeEvent.create (writeEventName);
+			m_readSemaphore.create (readSemaphoreName) &&
+			m_writeSemaphore.create (writeSemaphoreName);
 	}
 	else
 	{
@@ -107,7 +103,8 @@ SharedMemoryTransportBase::attach (
 
 		sys::atomicLock (&m_hdr->m_lock);
 
-		if (m_hdr->m_state != SharedMemoryTransportState_MasterConnected ||
+		if (!(m_hdr->m_state & SharedMemoryTransportState_MasterConnected) ||
+			(m_hdr->m_state & SharedMemoryTransportState_SlaveConnected) ||
 			m_hdr->m_readOffset != 0)
 		{
 			sys::atomicUnlock (&m_hdr->m_lock);
@@ -116,13 +113,13 @@ SharedMemoryTransportBase::attach (
 			return false;
 		}
 
-		m_hdr->m_state = SharedMemoryTransportState_SlaveConnected;
+		m_hdr->m_state |= SharedMemoryTransportState_SlaveConnected;
 
 		sys::atomicUnlock (&m_hdr->m_lock);
 
 		result =
-			m_readEvent.open (readEventName) &&
-			m_writeEvent.open (writeEventName);
+			m_readSemaphore.open (readSemaphoreName) &&
+			m_writeSemaphore.open (writeSemaphoreName);
 	}
 
 	if (!result)
@@ -149,8 +146,8 @@ void
 SharedMemoryTransportBase::closeImpl ()
 {
 	m_file.close ();
-	m_readEvent.close ();
-	m_writeEvent.close ();
+	m_readSemaphore.close ();
+	m_writeSemaphore.close ();
 	m_hdr = NULL;
 	m_data = NULL;
 	m_mappingSize = 0;
@@ -161,9 +158,9 @@ void
 SharedMemoryTransportBase::disconnect ()
 {
 	sys::atomicLock (&m_hdr->m_lock);
-	m_hdr->m_state = SharedMemoryTransportState_Disconnected;
-	m_readEvent.signal ();
-	m_writeEvent.signal ();
+	m_hdr->m_state |= SharedMemoryTransportState_Disconnected;
+	m_readSemaphore.signal ();
+	m_writeSemaphore.signal ();
 	sys::atomicUnlock (&m_hdr->m_lock);
 }
 
@@ -253,22 +250,29 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 
 	// wait until we have any data or remote disconnects
 
-	while (
-		!m_hdr->m_dataSize &&
-		m_hdr->m_state != SharedMemoryTransportState_Disconnected)
-	{
-		sys::atomicUnlock (&m_hdr->m_lock);
-		m_writeEvent.wait ();
-		sys::atomicLock (&m_hdr->m_lock);
-	}
-
 	if (!m_hdr->m_dataSize)
 	{
-		ASSERT (m_hdr->m_state == SharedMemoryTransportState_Disconnected);
+		m_hdr->m_state |= SharedMemoryTransportState_WaitingForWrite;
 
-		sys::atomicUnlock (&m_hdr->m_lock);
-		err::setError (err::SystemErrorCode_InvalidDeviceState);
-		return -1;
+		while (
+			!m_hdr->m_dataSize &&
+			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected))
+		{
+			sys::atomicUnlock (&m_hdr->m_lock);
+			m_writeSemaphore.wait ();
+			sys::atomicLock (&m_hdr->m_lock);
+		}
+
+		m_hdr->m_state &= ~SharedMemoryTransportState_WaitingForWrite;
+
+		if (!m_hdr->m_dataSize)
+		{
+			ASSERT (m_hdr->m_state & SharedMemoryTransportState_Disconnected);
+
+			sys::atomicUnlock (&m_hdr->m_lock);
+			err::setError (err::SystemErrorCode_InvalidDeviceState);
+			return -1;
+		}
 	}
 
 	// if there is data, read it even if remote has disconnected
@@ -331,7 +335,10 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 	}
 
 	m_hdr->m_dataSize -= readSize;
-	m_readEvent.signal ();
+
+	if (m_hdr->m_state & SharedMemoryTransportState_WaitingForRead)
+		m_readSemaphore.signal ();
+
 	sys::atomicUnlock (&m_hdr->m_lock);
 
 	return readSize;
@@ -402,22 +409,31 @@ SharedMemoryWriter::write (
 
 	// if buffer is wrapped, then wait until we have enough space
 
-	while (
-		m_hdr->m_writeOffset <= m_hdr->m_readOffset && m_hdr->m_dataSize && // wrapped
-		m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset &&
-		m_hdr->m_state != SharedMemoryTransportState_Disconnected
-		)
+	if (m_hdr->m_dataSize &&
+		m_hdr->m_writeOffset <= m_hdr->m_readOffset &&
+		m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset)
 	{
-		sys::atomicUnlock (&m_hdr->m_lock);
-		m_readEvent.wait ();
-		sys::atomicLock (&m_hdr->m_lock);
-	}
+		m_hdr->m_state |= SharedMemoryTransportState_WaitingForRead;
 
-	if (m_hdr->m_state == SharedMemoryTransportState_Disconnected)
-	{
-		sys::atomicUnlock (&m_hdr->m_lock);
-		err::setError (err::SystemErrorCode_InvalidDeviceState);
-		return -1;
+		while (
+			m_hdr->m_dataSize &&
+			m_hdr->m_writeOffset <= m_hdr->m_readOffset &&
+			m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset &&
+			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected))
+		{
+			sys::atomicUnlock (&m_hdr->m_lock);
+			m_readSemaphore.wait ();
+			sys::atomicLock (&m_hdr->m_lock);
+		}
+
+		m_hdr->m_state &= ~SharedMemoryTransportState_WaitingForRead;
+
+		if (m_hdr->m_state & SharedMemoryTransportState_Disconnected)
+		{
+			sys::atomicUnlock (&m_hdr->m_lock);
+			err::setError (err::SystemErrorCode_InvalidDeviceState);
+			return -1;
+		}
 	}
 
 	size_t writeOffset = m_hdr->m_writeOffset;
@@ -455,7 +471,10 @@ SharedMemoryWriter::write (
 	}
 
 	m_hdr->m_dataSize += chainSize;
-	m_writeEvent.signal ();
+
+	if (m_hdr->m_state & SharedMemoryTransportState_WaitingForWrite)
+		m_writeSemaphore.signal ();
+
 	sys::atomicUnlock (&m_hdr->m_lock);
 
 	return chainSize;
