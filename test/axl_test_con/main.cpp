@@ -2020,8 +2020,8 @@ testProcess ()
 
 namespace shm_test {
 
-const size_t TotalSize = 256 * 1024 * 1024; // 256M
-const size_t MaxBlockSize = 64;
+const size_t TotalSize = 16 * 1024 * 1024; // 256M
+const size_t MaxBlockSize = 16;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -2247,20 +2247,21 @@ public:
 
 		while (size < sizeof (ReqHdr))
 		{
-	#if (_AXL_OS_WIN)
+#if (_AXL_OS_WIN)
 			dword_t actualSize;
 			bool result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
-			size += actualSize;
-	#elif (_AXL_OS_POSIX)
-			int result = ::read (m_readPipe, buffer->p () + size, bufferSize - size) != -1;
-			size += result;
-	#endif
+#elif (_AXL_OS_POSIX)
+			int actualSize = ::read (m_readPipe, buffer->p () + size, bufferSize - size);
+			bool result = actualSize != -1;
+#endif
 
 			if (!result)
 			{
 				err::setLastSystemError ();
 				return -1;
 			}
+
+			size += actualSize;
 		}
 
 		ReqHdr* hdr = (ReqHdr*) buffer->p ();
@@ -2277,21 +2278,22 @@ public:
 
 		while (size < messageSize)
 		{
-	#if (_AXL_OS_WIN)
+#if (_AXL_OS_WIN)
 			dword_t actualSize;
 			bool result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
-			size += actualSize;
-	#elif (_AXL_OS_POSIX)
-			int result = ::read (m_readPipe, buffer->p () + size, bufferSize - size) != -1;
-			size += result;
-	#endif
+#elif (_AXL_OS_POSIX)
+			int actualSize = ::read (m_readPipe, buffer->p () + size, bufferSize - size);
+			bool result = actualSize != -1;
+#endif
 
 			if (!result)
 			{
 				err::setLastSystemError ();
 				return -1;
 			}
-	}
+
+			size += actualSize;
+		}
 
 		ASSERT (size == messageSize);
 		return messageSize;
@@ -2341,6 +2343,7 @@ testSharedMemoryTransport ()
 #	define HOME_DIR "C:/Users/Vladimir"
 #elif (_AXL_OS_POSIX)
 #	define HOME_DIR "/home/vladimir"
+	setvbuf (stdout, NULL, _IONBF, 0);
 
 	::sem_unlink ("shmt-test-cli-srv-r");
 	::sem_unlink ("shmt-test-cli-srv-w");
@@ -2427,13 +2430,14 @@ testPipeTransport ()
 		::CreatePipe (&pipeB [0], &pipeB [1], NULL, 0);
 
 #elif (_AXL_OS_POSIX)
+	setvbuf (stdout, NULL, _IONBF, 0);
+
 	int pipeA [2] = { 0 };
 	int pipeB [2] = { 0 };
 
 	result =
 		::pipe (pipeA) == 0 &&
 		::pipe (pipeB) == 0;
-
 #endif
 
 	if (!result)
