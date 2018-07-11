@@ -148,6 +148,8 @@ copyFile (
 		BaseBlockSize = 64 * 1024, // 64K
 	};
 
+	bool result;
+
 	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
 	size_t blockSize = BaseBlockSize + systemInfo->m_mappingAlignFactor - BaseBlockSize % systemInfo->m_mappingAlignFactor;
 
@@ -156,7 +158,7 @@ copyFile (
 	if (size == -1)
 		size = srcFile->getSize ();
 
-	bool result = dstFile->setSize (size);
+	result = dstFile->setSize (size);
 	if (!result)
 		return -1;
 
@@ -166,7 +168,7 @@ copyFile (
 	win::MappedView srcView;
 	win::MappedView dstView;
 
-	bool result =
+	result =
 		srcMapping.create (srcFile->m_file, NULL, PAGE_READONLY, size) &&
 		dstMapping.create (dstFile->m_file, NULL, PAGE_READWRITE, size);
 

@@ -29,12 +29,12 @@ public:
 		SECURITY_ATTRIBUTES* secAttr,
 		uint_t initialCount,
 		uint_t maxCount,
-		const sl::StringRef& name = NULL
+		const sl::StringRef_w& name = NULL
 		)
 	{
 		close ();
 
-		m_h = ::CreateSemaphore (secAttr, initialCount, maxCount, name);
+		m_h = ::CreateSemaphore (secAttr, initialCount, maxCount, name.sz ());
 		return err::complete (m_h != NULL);
 	}
 
@@ -42,12 +42,12 @@ public:
 	open (
 		uint_t access,
 		bool doInheritHandle,
-		const sl::StringRef& name
+		const sl::StringRef_w& name
 		)
 	{
 		close ();
 
-		m_h = ::OpenSemaphore (access, doInheritHandle, name);
+		m_h = ::OpenSemaphore (access, doInheritHandle, name.sz ());
 		return err::complete (m_h != NULL);
 	}
 

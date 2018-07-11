@@ -16,10 +16,8 @@
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_Semaphore.h"
 #elif (_AXL_OS_POSIX)
-
+#	include "axl_sys_psx_Sem.h"
 #endif
-
-#include "axl_sys_psx_Sem.h"
 
 namespace axl {
 namespace sys {
@@ -47,9 +45,15 @@ public:
 	}
 
 	bool
-	create ()
+	create (const sl::StringRef& name)
 	{
-		return m_semaphore.create (NULL, (uint_t) initialCount, MAXLONG, NULL);
+		return m_semaphore.create (NULL, 0, MAXLONG, name.s2 ());
+	}
+
+	bool
+	open (const sl::StringRef& name)
+	{
+		return m_semaphore.open (SEMAPHORE_ALL_ACCESS, false, name.s2 ());
 	}
 
 	bool
@@ -66,10 +70,6 @@ public:
 };
 
 #elif (_AXL_OS_POSIX)
-
-
-
-#endif
 
 class NamedSemaphore
 {
@@ -119,6 +119,8 @@ public:
 		return m_sem.wait ();
 	}
 };
+
+#endif
 
 //..............................................................................
 

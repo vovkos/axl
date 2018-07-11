@@ -30,17 +30,18 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-class EventRoot
+template <typename IsNotificationEvent>
+class EventBase
 {
 public:
 	win::Event m_event;
 
-protected:
-	EventRoot () // protected construction
+public:
+	EventBase ()
 	{
+		m_event.create (NULL, IsNotificationEvent () (), false, NULL);
 	}
 
-public:
 	bool
 	signal ()
 	{
@@ -57,28 +58,6 @@ public:
 	wait (uint_t timeout = -1)
 	{
 		return m_event.wait (timeout) == win::WaitResult_Object0;
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class Event: public EventRoot
-{
-public:
-	Event ()
-	{
-		m_event.create (NULL, false, false, NULL);
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class NotificationEvent: public EventRoot
-{
-public:
-	NotificationEvent ()
-	{
-		m_event.create (NULL, true, false, NULL);
 	}
 };
 
