@@ -290,18 +290,13 @@ MappedFile::viewImpl (
 
 	// ...nope. ok, new view needed.
 
-	// align view base on system allocation granularity
+	// align view base on system allocation granularity and view region size on system page size
 
 	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	ASSERT (sl::isPowerOf2 (systemInfo->m_mappingAlignFactor));
 
-	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
-	uint64_t viewEnd = end + m_readAheadSize;
-
-	// align view region size on system page size
-
-	size_t remSize = viewEnd % systemInfo->m_pageSize;
-	if (viewEnd % systemInfo->m_pageSize)
-		viewEnd = viewEnd - remSize + systemInfo->m_pageSize;
+	uint64_t viewBegin = offset & ~(systemInfo->m_mappingAlignFactor - 1);
+	uint64_t viewEnd = sl::align (end + m_readAheadSize, systemInfo->m_pageSize);
 
 	// make sure we don't overextend beyond the end of read-only file
 
