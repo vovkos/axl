@@ -346,19 +346,49 @@ getBitmask64 (
 
 //..............................................................................
 
+inline
+bool
+isPowerOf2 (size_t x)
+{
+	return !(x & (x - 1));
+}
+
+inline
+bool
+isAligned (
+	size_t x,
+	size_t factor
+	)
+{
+	ASSERT (isPowerOf2 (factor));
+	return !(x & (factor - 1));
+}
+
 template <size_t factor>
 size_t
-align (size_t x)
+isAligned (size_t x)
 {
-	ASSERT (!(factor & (factor - 1))); // must be a power of 2
-	return ((x - 1) | (factor - 1)) + 1;
+	ASSERT (isPowerOf2 (factor));
+	return !(x & (factor - 1));
 }
 
 inline
 size_t
+align (
+	size_t x,
+	size_t factor
+	)
+{
+	ASSERT (isPowerOf2 (factor));
+	return (x + factor - 1) & ~(factor - 1);
+}
+
+template <size_t factor>
+size_t
 align (size_t x)
 {
-	return align <AXL_PTR_SIZE> (x);
+	ASSERT (isPowerOf2 (factor));
+	return (x + factor - 1) & ~(factor - 1);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
