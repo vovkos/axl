@@ -2018,337 +2018,366 @@ testProcess ()
 
 //..............................................................................
 
-enum ShmReqCode
+namespace shm_test {
+
+const size_t TotalSize = 256 * 1024 * 1024; // 256M
+const size_t MaxBlockSize = 64;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum ReqCode
 {
-	ShmReqCode_Command,
-	ShmReqCode_Reply
+	ReqCode_Command,
+	ReqCode_Reply
 };
 
-struct ShmReqHdr
+struct ReqHdr
 {
 	uint32_t m_code;
 	uint32_t m_size;
 };
 
-const size_t TotalSize = 256 * 1024 * 1024;
-const size_t MaxBlockSize = 64;
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ShmServerThread: public sys::ThreadImpl <ShmServerThread>
+class Transport
 {
 public:
-	io::SharedMemoryReader m_reader;
-	io::SharedMemoryWriter m_writer;
+	virtual
+	size_t
+	readMessage (sl::Array <char>* buffer) = 0;
+
+	virtual
+	bool
+	writeMessage (
+		const ReqHdr* hdr,
+		const void* p,
+		size_t size
+		) = 0;
+};
+
+//..............................................................................
+
+class ServerThread: public sys::ThreadImpl <ServerThread>
+{
+public:
+	Transport* m_transport;
 
 public:
+	ServerThread (Transport* transport)
+	{
+		m_transport = transport;
+	}
+
 	uint_t
 	threadFunc ()
 	{
+		ASSERT (m_transport);
+
 		sl::Array <char> buffer;
 
 		static char data [MaxBlockSize] = { 0 };
 
 		for (;;)
 		{
-			size_t size = m_reader.read (&buffer);
+			size_t size = m_transport->readMessage (&buffer);
 			if (size == -1)
 			{
 				printf ("server: read error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
-			if (size < sizeof (ShmReqHdr))
+			if (size < sizeof (ReqHdr))
 			{
 				printf ("server: buffer too small\n");
 				return -1;
 			}
 
-			ShmReqHdr* command = (ShmReqHdr*) buffer.cp ();
-			if (command->m_code != ShmReqCode_Command || command->m_size > sizeof (data))
+			ReqHdr* command = (ReqHdr*) buffer.cp ();
+			if (command->m_code != ReqCode_Command || command->m_size > sizeof (data))
 			{
 				printf ("server: invalid command: %d/%d\n", command->m_code, command->m_size);
 				return -1;
 			}
 
-			ShmReqHdr reply;
-			reply.m_code = ShmReqCode_Reply;
+			ReqHdr reply;
+			reply.m_code = ReqCode_Reply;
 			reply.m_size = command->m_size;
 
-			const void* blockArray [] = { &reply, data };
-			size_t sizeArray [] = { sizeof (reply), reply.m_size };
-
-			m_writer.write (blockArray, sizeArray, 2);
+			m_transport->writeMessage (&reply, data, reply.m_size);
 		}
 
 		return 0;
 	}
 };
 
-class ShmClientThread: public sys::ThreadImpl <ShmClientThread>
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class ClientThread: public sys::ThreadImpl <ClientThread>
 {
-public:
-	io::SharedMemoryReader m_reader;
-	io::SharedMemoryWriter m_writer;
+protected:
+	Transport* m_transport;
 
 public:
+	ClientThread (Transport* transport)
+	{
+		m_transport = transport;
+	}
+
 	uint_t
 	threadFunc ()
 	{
+		ASSERT (m_transport);
+
 		sl::Array <char> buffer;
 
+		int percentage = 0;
 		size_t totalSize = 0;
 
 		while (totalSize < TotalSize)
 		{
 			size_t blockSize = rand () % MaxBlockSize;
 
-			ShmReqHdr command;
-			command.m_code = ShmReqCode_Command;
+			ReqHdr command;
+			command.m_code = ReqCode_Command;
 			command.m_size = blockSize;
 
-			bool result = m_writer.write (&command, sizeof (command)) != -1;
+			bool result = m_transport->writeMessage (&command, NULL, 0);
 			if (!result)
 			{
 				printf ("client: write error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
-			size_t receivedSize = m_reader.read (&buffer);
+			size_t receivedSize = m_transport->readMessage (&buffer);
 			if (receivedSize == -1)
 			{
 				printf ("client: read error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
-			if (receivedSize < sizeof (ShmReqHdr))
+			if (receivedSize < sizeof (ReqHdr))
 			{
 				printf ("client: buffer too small\n");
 				return -1;
 			}
 
-			ShmReqHdr* reply = (ShmReqHdr*) buffer.cp ();
-			if (reply->m_code != ShmReqCode_Reply || reply->m_size != blockSize)
+			ReqHdr* reply = (ReqHdr*) buffer.cp ();
+			if (reply->m_code != ReqCode_Reply || reply->m_size != blockSize)
 			{
 				printf ("client: invalid reply: %d/%d\n", reply->m_code, reply->m_size);
 				return -1;
 			}
 
 			totalSize += blockSize;
+
+			int newPercentage = (uint64_t) totalSize * 100 / TotalSize;
+			if (newPercentage != percentage)
+			{
+				percentage = newPercentage;
+				printf ("\b\b\b\b%d%%", percentage);
+			}
 		}
 
+		printf ("\b\b\b\b100%% (done)\n");
 		return 0;
 	}
 };
 
 //..............................................................................
 
-size_t readPipeMessage (int fd, sl::Array <char>* buffer)
-{
-	size_t bufferSize = buffer->getCount ();
-
-	if (bufferSize < sizeof (ShmReqHdr))
-	{
-		buffer->setCount (sizeof (ShmReqHdr));
-		bufferSize = sizeof (ShmReqHdr);
-	}
-
-	size_t size = 0;
-
-	while (size < sizeof (ShmReqHdr))
-	{
-		int result = ::read (fd, buffer->p () + size, bufferSize - size);
-		if (result == -1)
-		{
-			err::setLastSystemError ();
-			return -1;
-		}
-
-		size += result;
-	}
-
-	ShmReqHdr* hdr = (ShmReqHdr*) buffer->p ();
-	if (hdr->m_code == ShmReqCode_Command)
-	{
-		ASSERT (size == sizeof (ShmReqHdr));
-		buffer->setCount (sizeof (ShmReqHdr));
-		return sizeof (ShmReqHdr);
-	}
-
-	size_t messageSize = sizeof (ShmReqHdr) + hdr->m_size;
-	buffer->setCount (messageSize);
-	bufferSize = messageSize;
-
-	while (size < messageSize)
-	{
-		int result = ::read (fd, buffer->p () + size, bufferSize - size);
-		if (result == -1)
-		{
-			err::setLastSystemError ();
-			return -1;
-		}
-
-		size += result;
-	}
-
-	ASSERT (size == messageSize);
-	return messageSize;
-}
-
-class PipeServerThread: public sys::ThreadImpl <PipeServerThread>
+class ShmTransport: public Transport
 {
 public:
-	int m_readPipe;
-	int m_writePipe;
+	io::SharedMemoryReader m_reader;
+	io::SharedMemoryWriter m_writer;
 
 public:
-	uint_t
-	threadFunc ()
+	virtual
+	size_t
+	readMessage (sl::Array <char>* buffer)
 	{
-		sl::Array <char> buffer;
-
-		static char data [MaxBlockSize] = { 0 };
-
-		for (;;)
-		{
-			size_t size = readPipeMessage (m_readPipe, &buffer);
-			if (size == -1)
-			{
-				printf ("server: read error: %s\n", err::getLastErrorDescription ().sz ());
-				return -1;
-			}
-
-			if (size < sizeof (ShmReqHdr))
-			{
-				printf ("server: buffer too small\n");
-				return -1;
-			}
-
-			ShmReqHdr* command = (ShmReqHdr*) buffer.cp ();
-			if (command->m_code != ShmReqCode_Command || command->m_size > sizeof (data))
-			{
-				printf ("server: invalid command: %d/%d\n", command->m_code, command->m_size);
-				return -1;
-			}
-
-			ShmReqHdr reply;
-			reply.m_code = ShmReqCode_Reply;
-			reply.m_size = command->m_size;
-
-			bool result =
-				write (m_writePipe, &reply, sizeof (reply)) != -1 &&
-				write (m_writePipe, data, reply.m_size) != -1;
-
-			if (!result)
-			{
-				err::setLastSystemError ();
-				printf ("client: write error: %s\n", err::getLastErrorDescription ().sz ());
-				return -1;
-			}
-		}
-
-		return 0;
+		return m_reader.read (buffer);
 	}
-};
 
-class PipeClientThread: public sys::ThreadImpl <PipeClientThread>
-{
-public:
-	int m_readPipe;
-	int m_writePipe;
-
-public:
-	uint_t
-	threadFunc ()
+	virtual
+	bool
+	writeMessage (
+		const ReqHdr* hdr,
+		const void* p,
+		size_t size
+		)
 	{
-		sl::Array <char> buffer;
+		if (!size)
+			return m_writer.write (hdr, sizeof (ReqHdr));
 
-		size_t totalSize = 0;
+		const void* blockArray [] = { hdr, p };
+		size_t sizeArray [] = { sizeof (ReqHdr), size };
 
-		while (totalSize < TotalSize)
-		{
-			size_t blockSize = rand () % MaxBlockSize;
-
-			ShmReqHdr command;
-			command.m_code = ShmReqCode_Command;
-			command.m_size = blockSize;
-
-			bool result = write (m_writePipe, &command, sizeof (command)) != -1;
-			if (!result)
-			{
-				err::setLastSystemError ();
-				printf ("client: write error: %s\n", err::getLastErrorDescription ().sz ());
-				return -1;
-			}
-
-			size_t receivedSize = readPipeMessage (m_readPipe, &buffer);
-			if (receivedSize == -1)
-			{
-				printf ("client: read error: %s\n", err::getLastErrorDescription ().sz ());
-				return -1;
-			}
-
-			if (receivedSize < sizeof (ShmReqHdr))
-			{
-				printf ("client: buffer too small\n");
-				return -1;
-			}
-
-			ShmReqHdr* reply = (ShmReqHdr*) buffer.cp ();
-			if (reply->m_code != ShmReqCode_Reply || reply->m_size != blockSize)
-			{
-				printf ("client: invalid reply: %d/%d\n", reply->m_code, reply->m_size);
-				return -1;
-			}
-
-			totalSize += blockSize;
-		}
-
-		return 0;
+		return m_writer.write (blockArray, sizeArray, 2);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+class PipeTransport: public Transport
+{
+public:
+#if (_AXL_OS_WIN)
+	HANDLE m_readPipe;
+	HANDLE m_writePipe;
+#elif (_AXL_OS_POSIX)
+	int m_readPipe;
+	int m_writePipe;
+#endif
+
+public:
+	virtual
+	size_t
+	readMessage (sl::Array <char>* buffer)
+	{
+		size_t bufferSize = buffer->getCount ();
+
+		if (bufferSize < sizeof (ReqHdr))
+		{
+			buffer->setCount (sizeof (ReqHdr));
+			bufferSize = sizeof (ReqHdr);
+		}
+
+		size_t size = 0;
+
+		while (size < sizeof (ReqHdr))
+		{
+	#if (_AXL_OS_WIN)
+			dword_t actualSize;
+			bool result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
+			size += actualSize;
+	#elif (_AXL_OS_POSIX)
+			int result = ::read (m_readPipe, buffer->p () + size, bufferSize - size) != -1;
+			size += result;
+	#endif
+
+			if (!result)
+			{
+				err::setLastSystemError ();
+				return -1;
+			}
+		}
+
+		ReqHdr* hdr = (ReqHdr*) buffer->p ();
+		if (hdr->m_code == ReqCode_Command)
+		{
+			ASSERT (size == sizeof (ReqHdr));
+			buffer->setCount (sizeof (ReqHdr));
+			return sizeof (ReqHdr);
+		}
+
+		size_t messageSize = sizeof (ReqHdr) + hdr->m_size;
+		buffer->setCount (messageSize);
+		bufferSize = messageSize;
+
+		while (size < messageSize)
+		{
+	#if (_AXL_OS_WIN)
+			dword_t actualSize;
+			bool result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
+			size += actualSize;
+	#elif (_AXL_OS_POSIX)
+			int result = ::read (m_readPipe, buffer->p () + size, bufferSize - size) != -1;
+			size += result;
+	#endif
+
+			if (!result)
+			{
+				err::setLastSystemError ();
+				return -1;
+			}
+	}
+
+		ASSERT (size == messageSize);
+		return messageSize;
+	}
+
+	virtual
+	bool
+	writeMessage (
+		const ReqHdr* hdr,
+		const void* p,
+		size_t size
+		)
+	{
+#if (_AXL_OS_WIN)
+		dword_t actualSize;
+
+		bool result = ::WriteFile (m_writePipe, hdr, sizeof (ReqHdr), &actualSize, NULL) != 0;
+
+		if (result && size)
+			result = ::WriteFile (m_writePipe, p, size, &actualSize, NULL) != 0;
+#elif (_AXL_OS_POSIX)
+		bool result = ::write (m_writePipe, hdr, sizeof (ReqHdr)) != -1;
+
+		if (result && size)
+			result = ::write (m_writePipe, p, size) != -1;
+#endif
+
+		return result;
+	}
+};
+
+} // namespace shm_test
+
+//..............................................................................
+
 void
 testSharedMemoryTransport ()
 {
+	using namespace shm_test;
+
 	bool result;
 
-	ShmServerThread serverThread;
-	ShmClientThread clientThread;
+	ShmTransport serverTransport;
+	ShmTransport clientTransport;
+
+#if (_AXL_OS_WIN)
+#	define HOME_DIR "C:/Users/Vladimir"
+#elif (_AXL_OS_POSIX)
+#	define HOME_DIR "/home/vladimir"
 
 	::sem_unlink ("shmt-test-cli-srv-r");
 	::sem_unlink ("shmt-test-cli-srv-w");
 	::sem_unlink ("shmt-test-srv-cli-r");
 	::sem_unlink ("shmt-test-srv-cli-w");
+#endif
 
 	result =
-		serverThread.m_reader.open (
-			"/home/vladimir/shmt-test-cli-srv",
-			"shmt-test-cli-srv-r",
-			"shmt-test-cli-srv-w",
-			io::SharedMemoryTransportFlag_Message
-			) &&
-		serverThread.m_writer.open (
-			"/home/vladimir/shmt-test-srv-cli",
-			"shmt-test-srv-cli-r",
-			"shmt-test-srv-cli-w",
-			io::SharedMemoryTransportFlag_Message
-			) &&
-		clientThread.m_reader.open (
-			"/home/vladimir/shmt-test-srv-cli",
-			"shmt-test-srv-cli-r",
-			"shmt-test-srv-cli-w",
-			io::SharedMemoryTransportFlag_Message |
-			io::FileFlag_OpenExisting
-			) &&
-		clientThread.m_writer.open (
-			"/home/vladimir/shmt-test-cli-srv",
+		serverTransport.m_reader.open (
+			HOME_DIR "/shmt-test-cli-srv",
 			"shmt-test-cli-srv-r",
 			"shmt-test-cli-srv-w",
 			io::SharedMemoryTransportFlag_Message |
-			io::FileFlag_OpenExisting
+			io::FileFlag_DeleteOnClose
+			) &&
+		serverTransport.m_writer.open (
+			HOME_DIR "/shmt-test-srv-cli",
+			"shmt-test-srv-cli-r",
+			"shmt-test-srv-cli-w",
+			io::SharedMemoryTransportFlag_Message |
+			io::FileFlag_DeleteOnClose
+			) &&
+		clientTransport.m_reader.open (
+			HOME_DIR "/shmt-test-srv-cli",
+			"shmt-test-srv-cli-r",
+			"shmt-test-srv-cli-w",
+			io::SharedMemoryTransportFlag_Message |
+			io::FileFlag_OpenExisting |
+			io::FileFlag_Unlink
+			) &&
+		clientTransport.m_writer.open (
+			HOME_DIR "/shmt-test-cli-srv",
+			"shmt-test-cli-srv-r",
+			"shmt-test-cli-srv-w",
+			io::SharedMemoryTransportFlag_Message |
+			io::FileFlag_OpenExisting |
+			io::FileFlag_Unlink
 			);
 
 	if (!result)
@@ -2357,6 +2386,9 @@ testSharedMemoryTransport ()
 		return;
 	}
 
+	ServerThread serverThread (&serverTransport);
+	ClientThread clientThread (&clientTransport);
+
 	uint64_t time0 = sys::getTimestamp ();
 
 	serverThread.start ();
@@ -2364,8 +2396,8 @@ testSharedMemoryTransport ()
 
 	clientThread.waitAndClose ();
 
-	clientThread.m_reader.disconnect ();
-	clientThread.m_writer.disconnect ();
+	clientTransport.m_reader.disconnect ();
+	clientTransport.m_writer.disconnect ();
 
 	serverThread.waitAndClose ();
 
@@ -2379,31 +2411,45 @@ testSharedMemoryTransport ()
 void
 testPipeTransport ()
 {
+	using namespace shm_test;
+
 	bool result;
 
-	PipeServerThread serverThread;
-	PipeClientThread clientThread;
+	PipeTransport serverTransport;
+	PipeTransport clientTransport;
 
+#if (_AXL_OS_WIN)
+	HANDLE pipeA [2] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
+	HANDLE pipeB [2] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
+
+	result =
+		::CreatePipe (&pipeA [0], &pipeA [1], NULL, 0) &&
+		::CreatePipe (&pipeB [0], &pipeB [1], NULL, 0);
+
+#elif (_AXL_OS_POSIX)
 	int pipeA [2] = { 0 };
 	int pipeB [2] = { 0 };
 
 	result =
-		pipe (pipeA) == 0 &&
-		pipe (pipeB) == 0;
+		::pipe (pipeA) == 0 &&
+		::pipe (pipeB) == 0;
 
-	if (!result)
-		err::setLastSystemError ();
-
-	serverThread.m_readPipe = pipeA [0];
-	serverThread.m_writePipe = pipeB [1];
-	clientThread.m_readPipe = pipeB [0];
-	clientThread.m_writePipe = pipeA [1];
+#endif
 
 	if (!result)
 	{
+		err::setLastSystemError ();
 		printf ("can't initialize: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
+
+	serverTransport.m_readPipe = pipeA [0];
+	serverTransport.m_writePipe = pipeB [1];
+	clientTransport.m_readPipe = pipeB [0];
+	clientTransport.m_writePipe = pipeA [1];
+
+	ServerThread serverThread (&serverTransport);
+	ClientThread clientThread (&clientTransport);
 
 	uint64_t time0 = sys::getTimestamp ();
 
@@ -2412,10 +2458,19 @@ testPipeTransport ()
 
 	clientThread.waitAndClose ();
 
-	close (pipeA [0]);
-	close (pipeA [1]);
-	close (pipeB [0]);
-	close (pipeB [1]);
+	// first close the writer side
+
+#if (_AXL_OS_WIN)
+	::CloseHandle (pipeA [1]);
+	::CloseHandle (pipeB [1]);
+	::CloseHandle (pipeA [0]);
+	::CloseHandle (pipeB [0]);
+#elif (_AXL_OS_POSIX)
+	::close (pipeA [1]);
+	::close (pipeB [1]);
+	::close (pipeA [0]);
+	::close (pipeB [0]);
+#endif
 
 	serverThread.waitAndClose ();
 
