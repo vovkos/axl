@@ -2022,7 +2022,7 @@ namespace shm_test {
 
 #define _SHM_TEST_ONE_WAY 1
 
-const size_t TotalSize = 64 * 1024 * 1024; // 256M
+const size_t TotalSize = 64 * 1024 * 1024;
 const size_t MaxBlockSize = 16;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -2096,7 +2096,7 @@ public:
 			ReqHdr* command = (ReqHdr*) buffer.cp ();
 			if (command->m_code != ReqCode_Command || sizeof (ReqHdr) + command->m_size != size)
 			{
-				printf ("server: invalid command: %d/%d\n", command->m_code, command->m_size);
+				printf ("server: invalid command: %d (%d)\n", command->m_code, command->m_size);
 				return -1;
 			}
 		}
@@ -2119,9 +2119,9 @@ public:
 			}
 
 			ReqHdr* command = (ReqHdr*) buffer.cp ();
-			if (command->m_code != ReqCode_Command)
+			if (command->m_code != ReqCode_Command || sizeof (ReqHdr) + command->m_size != size)
 			{
-				printf ("server: invalid command: %d\n", command->m_code);
+				printf ("server: invalid command: %d (%d)\n", command->m_code, command->m_size);
 				return -1;
 			}
 
@@ -2216,9 +2216,9 @@ public:
 			}
 
 			ReqHdr* reply = (ReqHdr*) buffer.cp ();
-			if (reply->m_code != ReqCode_Reply)
+			if (reply->m_code != ReqCode_Reply || sizeof (ReqHdr) + reply->m_size != receivedSize)
 			{
-				printf ("client: invalid reply: %d\n", reply->m_code);
+				printf ("client: invalid reply: %d (%d)\n", reply->m_code, reply->m_size);
 				return -1;
 			}
 

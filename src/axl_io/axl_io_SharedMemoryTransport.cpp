@@ -15,7 +15,7 @@
 #include "axl_err_Error.h"
 #include "axl_g_Module.h"
 
-#define _ALIGN_MESSAGES 1
+#define _AXL_IO_SHMT_ALIGN_MESSAGES 1
 
 namespace axl {
 namespace io {
@@ -296,7 +296,7 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 		readSize = msgHdr->m_size;
 		size_t readEndOffset = readOffset + sizeof (SharedMemoryTransportMessageHdr) + msgHdr->m_size;
 
-#if (_ALIGN_MESSAGES)
+#if (_AXL_IO_SHMT_ALIGN_MESSAGES)
 		ASSERT (sl::isAligned <AXL_PTR_SIZE> (readOffset));
 		readEndOffset = sl::align <AXL_PTR_SIZE> (readEndOffset);
 #endif
@@ -410,7 +410,7 @@ SharedMemoryWriter::write (
 	if (m_flags & SharedMemoryTransportFlag_Message)
 	{
 		writeSize += sizeof (SharedMemoryTransportMessageHdr);
-#if (_ALIGN_MESSAGES)
+#if (_AXL_IO_SHMT_ALIGN_MESSAGES)
 		writeSize = sl::align <AXL_PTR_SIZE> (writeSize);
 #endif
 	}
@@ -460,7 +460,7 @@ SharedMemoryWriter::write (
 
 	if (m_flags & SharedMemoryTransportFlag_Message)
 	{
-#if (_ALIGN_MESSAGES)
+#if (_AXL_IO_SHMT_ALIGN_MESSAGES)
 		ASSERT (sl::isAligned <AXL_PTR_SIZE> (writeOffset));
 #endif
 
