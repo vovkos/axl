@@ -110,14 +110,14 @@ ReadWriteLock::readLock (uint_t timeout)
 
 	m_data->m_queuedReadCount++;
 
-	for (;;) // this loop is REQUIRED!
+	for (;;) // loop is required (obvious)
 	{
 		m_readEvent.reset ();
 		sys::atomicUnlock (&m_data->m_lock);
 
 		result = m_readEvent.wait (timeout);
 
-		// 1 (or more) readers AND 1 (or more) writers might squeeze in here
+		// another reader might squeeze in here, finish and start a writer
 
 		sys::atomicLock (&m_data->m_lock);
 
@@ -173,12 +173,17 @@ ReadWriteLock::writeLock (uint_t timeout)
 
 	m_data->m_queuedWriteCount++;
 
-	for (;;) // this loop (probably) isn't required, but it's good for symmetry and peace of mind
+	for (;;) // loop is STILL required (non-obvious)
 	{
 		m_writeEvent.reset ();
 		sys::atomicUnlock (&m_data->m_lock);
 
+		// another writer might squeeze in here, finish and wake up readers
+		// one reader might start, finish and wake up this writer
+
 		result = m_writeEvent.wait (timeout);
+
+		// another reader woken up by the first writer might grab the lock
 
 		sys::atomicLock (&m_data->m_lock);
 
@@ -195,8 +200,6 @@ ReadWriteLock::writeLock (uint_t timeout)
 			m_data->m_activeWriteCount++;
 			break;
 		}
-
-		ASSERT (false); // let's find out whether this loop is really optional
 	}
 
 	m_data->m_queuedWriteCount--;
