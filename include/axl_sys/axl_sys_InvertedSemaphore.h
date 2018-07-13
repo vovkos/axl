@@ -53,6 +53,7 @@ protected:
 	void
 	setImpl (intptr_t count) // called under lock
 	{
+		ASSERT (count >= 0);
 		m_count = count;
 
 		if (m_count)
