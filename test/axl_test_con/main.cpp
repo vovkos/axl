@@ -2023,7 +2023,7 @@ namespace shm_test {
 #define _SHM_TEST_ONE_WAY 1
 
 const size_t TotalSize = 64 * 1024 * 1024;
-const size_t MaxBlockSize = 16;
+const size_t MaxBlockSize = 64;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -2263,12 +2263,12 @@ public:
 		)
 	{
 		if (!size)
-			return m_writer.write (hdr, sizeof (ReqHdr));
+			return m_writer.write (hdr, sizeof (ReqHdr)) != -1;
 
 		const void* blockArray [] = { hdr, p };
 		size_t sizeArray [] = { sizeof (ReqHdr), size };
 
-		return m_writer.write (blockArray, sizeArray, 2);
+		return m_writer.write (blockArray, sizeArray, 2) != -1;
 	}
 };
 
@@ -2305,7 +2305,7 @@ public:
 		{
 #if (_AXL_OS_WIN)
 			dword_t actualSize;
-			bool result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
+			bool_t result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
 #elif (_AXL_OS_POSIX)
 			int actualSize = ::read (m_readPipe, buffer->p () + size, bufferSize - size);
 			bool result = actualSize != -1;
@@ -2337,7 +2337,7 @@ public:
 		{
 #if (_AXL_OS_WIN)
 			dword_t actualSize;
-			bool result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
+			bool_t result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
 #elif (_AXL_OS_POSIX)
 			int actualSize = ::read (m_readPipe, buffer->p () + size, bufferSize - size);
 			bool result = actualSize != -1;
