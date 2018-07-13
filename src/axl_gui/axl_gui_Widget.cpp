@@ -50,12 +50,12 @@ WidgetDriver::setCaretVisible (bool isVisible)
 {
 	// don't check if nothing changed, force caret update --
 	// otherwise, this sequence will work incorrectly:
-	
+
 	// widgetA.setCaretVisible (true);
 	// widgetB.setCaretVisible (false);
 	// widgetA.setCaretVisible (true);
 
-	m_isCaretVisible = isVisible; 
+	m_isCaretVisible = isVisible;
 
 	if (isVisible)
 		return m_engine->showCaret (this, Rect (m_caretPos, m_caretSize));

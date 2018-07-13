@@ -510,7 +510,7 @@ public:
 	void
 	hideCaret (WidgetDriver* widgetDriver)
 	{
-		m_qtCaret.hide ();
+		m_qtCaret.hide (widgetDriver);
 	}
 
 	bool

@@ -28,7 +28,10 @@ QtCaret::show (
 	ASSERT (widgetDriver);
 
 	if (m_widgetDriver && m_isVisible)
+	{
+		m_isVisible = false;
 		m_widgetDriver->redraw (m_rect);
+	}
 
 	m_widgetDriver = widgetDriver;
 	m_rect = rect;
@@ -42,9 +45,9 @@ QtCaret::show (
 }
 
 void
-QtCaret::hide ()
+QtCaret::hide (WidgetDriver* widgetDriver)
 {
-	if (!m_widgetDriver)
+	if (widgetDriver != m_widgetDriver)
 		return;
 
 	if (m_isVisible)

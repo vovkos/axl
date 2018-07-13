@@ -51,7 +51,7 @@ public:
 		);
 
 	void
-	hide ();
+	hide (WidgetDriver* widgetDriver);
 
 protected:
 	virtual void timerEvent (QTimerEvent* e);
