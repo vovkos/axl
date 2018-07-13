@@ -80,6 +80,9 @@ SharedMemoryTransportBase::attach (
 		m_hdr->m_writeOffset = 0;
 		m_hdr->m_endOffset = 0;
 		m_hdr->m_dataSize = 0;
+		m_hdr->m_readSemaphoreWaitCount = 0;
+		m_hdr->m_writeSemaphoreWaitCount = 0;
+		m_hdr->m_padding = 0;
 
 		result =
 			m_readSemaphore.create (readSemaphoreName) &&
@@ -156,9 +159,18 @@ void
 SharedMemoryTransportBase::disconnect ()
 {
 	sys::atomicLock (&m_hdr->m_lock);
+
 	m_hdr->m_state |= SharedMemoryTransportState_Disconnected;
-	m_readSemaphore.signal ();
-	m_writeSemaphore.signal ();
+
+	if (m_hdr->m_readSemaphoreWaitCount)
+		m_readSemaphore.signal (m_hdr->m_readSemaphoreWaitCount);
+
+	if (m_hdr->m_writeSemaphoreWaitCount)
+		m_writeSemaphore.signal (m_hdr->m_writeSemaphoreWaitCount);
+
+	m_hdr->m_readSemaphoreWaitCount = 0;
+	m_hdr->m_writeSemaphoreWaitCount = 0;
+
 	sys::atomicUnlock (&m_hdr->m_lock);
 }
 
@@ -247,18 +259,17 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 
 	if (!m_hdr->m_dataSize)
 	{
-		m_hdr->m_state |= SharedMemoryTransportState_WaitingForWrite;
-
 		while (
 			!m_hdr->m_dataSize &&
 			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected))
 		{
+			m_hdr->m_writeSemaphoreWaitCount++;
 			sys::atomicUnlock (&m_hdr->m_lock);
+
 			m_writeSemaphore.wait ();
+
 			sys::atomicLock (&m_hdr->m_lock);
 		}
-
-		m_hdr->m_state &= ~SharedMemoryTransportState_WaitingForWrite;
 
 		if (!m_hdr->m_dataSize)
 		{
@@ -336,9 +347,10 @@ SharedMemoryReader::read (sl::Array <char>* buffer)
 
 	m_hdr->m_dataSize -= readSize;
 
-	if (m_hdr->m_state & SharedMemoryTransportState_WaitingForRead)
-		m_readSemaphore.signal ();
+	if (m_hdr->m_readSemaphoreWaitCount)
+		m_readSemaphore.signal (m_hdr->m_readSemaphoreWaitCount);
 
+	m_hdr->m_readSemaphoreWaitCount = 0;
 	sys::atomicUnlock (&m_hdr->m_lock);
 
 	return readSize;
@@ -418,20 +430,19 @@ SharedMemoryWriter::write (
 		m_hdr->m_writeOffset <= m_hdr->m_readOffset &&
 		m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset)
 	{
-		m_hdr->m_state |= SharedMemoryTransportState_WaitingForRead;
-
 		while (
 			m_hdr->m_dataSize &&
 			m_hdr->m_writeOffset <= m_hdr->m_readOffset &&
 			m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset &&
 			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected))
 		{
+			m_hdr->m_readSemaphoreWaitCount++;
 			sys::atomicUnlock (&m_hdr->m_lock);
+
 			m_readSemaphore.wait ();
+
 			sys::atomicLock (&m_hdr->m_lock);
 		}
-
-		m_hdr->m_state &= ~SharedMemoryTransportState_WaitingForRead;
 
 		if (m_hdr->m_state & SharedMemoryTransportState_Disconnected)
 		{
@@ -481,9 +492,10 @@ SharedMemoryWriter::write (
 
 	m_hdr->m_dataSize += chainSize;
 
-	if (m_hdr->m_state & SharedMemoryTransportState_WaitingForWrite)
-		m_writeSemaphore.signal ();
+	if (m_hdr->m_writeSemaphoreWaitCount)
+		m_writeSemaphore.signal (m_hdr->m_writeSemaphoreWaitCount);
 
+	m_hdr->m_writeSemaphoreWaitCount = 0;
 	sys::atomicUnlock (&m_hdr->m_lock);
 
 	return chainSize;

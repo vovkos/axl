@@ -35,8 +35,6 @@ enum SharedMemoryTransportState
 	SharedMemoryTransportState_MasterConnected = 0x01,
 	SharedMemoryTransportState_SlaveConnected  = 0x02,
 	SharedMemoryTransportState_Disconnected    = 0x04,
-	SharedMemoryTransportState_WaitingForRead  = 0x10,
-	SharedMemoryTransportState_WaitingForWrite = 0x20,
 };
 
 enum SharedMemoryTransportFlag // should be combined with FileFlag
@@ -49,13 +47,15 @@ enum SharedMemoryTransportFlag // should be combined with FileFlag
 struct SharedMemoryTransportHdr
 {
 	uint32_t m_signature;
+	uint32_t m_padding;
 	int32_t m_lock;
 	uint32_t m_state;
+	uint32_t m_readSemaphoreWaitCount;  // to prevent semaphore overflow
+	uint32_t m_writeSemaphoreWaitCount; // to prevent semaphore overflow
 	uint32_t m_readOffset;   // only modified by reader
 	uint32_t m_writeOffset;  // only modified by writer
 	uint32_t m_endOffset;    // only modified by writer
 	uint32_t m_dataSize;     // modified by both reader and writer
-	uint32_t m_padding;
 };
 
 struct SharedMemoryTransportMessageHdr
