@@ -57,9 +57,9 @@ public:
 	}
 
 	bool
-	signal ()
+	signal (size_t count = 1)
 	{
-		return m_semaphore.signal (1);
+		return m_semaphore.signal (count);
 	}
 
 	bool
@@ -105,6 +105,19 @@ public:
 	signal ()
 	{
 		return m_sem.post ();
+	}
+
+	bool
+	signal (size_t count)
+	{
+		for (; count; count--)
+		{
+			bool result = m_sem.post ();
+			if (!result)
+				return false;
+		}
+
+		return true;
 	}
 
 	bool
