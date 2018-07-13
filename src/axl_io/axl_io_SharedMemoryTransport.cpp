@@ -25,10 +25,8 @@ namespace io {
 SharedMemoryTransportBase::SharedMemoryTransportBase ()
 {
 	m_flags = 0;
-	m_mappingSize = 0;
 	m_hdr = NULL;
 	m_data = NULL;
-	m_pendingReqCount = 0;
 }
 
 bool
@@ -152,8 +150,6 @@ SharedMemoryTransportBase::closeImpl ()
 	m_writeSemaphore.close ();
 	m_hdr = NULL;
 	m_data = NULL;
-	m_mappingSize = 0;
-	m_pendingReqCount = 0;
 }
 
 void
@@ -208,13 +204,11 @@ SharedMemoryTransportBase::initializeMapping (
 bool
 SharedMemoryTransportBase::ensureMappingSize (size_t size)
 {
-	if (size <= m_mappingSize)
+	if (size <= m_mapping.getSize ())
 		return true;
 
 	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
-	size_t remSize = size % systemInfo->m_pageSize;
-	if (remSize)
-		size = size - remSize + systemInfo->m_pageSize;
+	size = sl::align (size, systemInfo->m_pageSize);
 
 #if (_AXL_OS_POSIX)
 	sys::atomicLock (&m_hdr->m_lock);
@@ -235,7 +229,6 @@ SharedMemoryTransportBase::ensureMappingSize (size_t size)
 	if (!p)
 		return false;
 
-	m_mappingSize = size;
 	m_hdr = (SharedMemoryTransportHdr*) p;
 	m_data = (char*) (m_hdr + 1);
 	return true;

@@ -73,11 +73,9 @@ protected:
 
 	File m_file;
 	Mapping m_mapping;
-	size_t m_mappingSize;
 
 	volatile SharedMemoryTransportHdr* m_hdr;
 	char* m_data;
-	int32_t m_pendingReqCount;
 	sys::NamedSemaphore m_readSemaphore;
 	sys::NamedSemaphore m_writeSemaphore;
 
