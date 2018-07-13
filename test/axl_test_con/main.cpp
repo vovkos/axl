@@ -2020,7 +2020,9 @@ testProcess ()
 
 namespace shm_test {
 
-const size_t TotalSize = 16 * 1024 * 1024; // 256M
+#define _SHM_TEST_ONE_WAY 1
+
+const size_t TotalSize = 64 * 1024 * 1024; // 256M
 const size_t MaxBlockSize = 16;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -2075,6 +2077,30 @@ public:
 
 		sl::Array <char> buffer;
 
+#if (_SHM_TEST_ONE_WAY)
+		for (;;)
+		{
+			size_t size = m_transport->readMessage (&buffer);
+			if (size == -1)
+			{
+				printf ("server: read error: %s\n", err::getLastErrorDescription ().sz ());
+				return -1;
+			}
+
+			if (size < sizeof (ReqHdr))
+			{
+				printf ("server: buffer too small\n");
+				return -1;
+			}
+
+			ReqHdr* command = (ReqHdr*) buffer.cp ();
+			if (command->m_code != ReqCode_Command || sizeof (ReqHdr) + command->m_size != size)
+			{
+				printf ("server: invalid command: %d/%d\n", command->m_code, command->m_size);
+				return -1;
+			}
+		}
+#else
 		static char data [MaxBlockSize] = { 0 };
 
 		for (;;)
@@ -2093,18 +2119,20 @@ public:
 			}
 
 			ReqHdr* command = (ReqHdr*) buffer.cp ();
-			if (command->m_code != ReqCode_Command || command->m_size > sizeof (data))
+			if (command->m_code != ReqCode_Command)
 			{
-				printf ("server: invalid command: %d/%d\n", command->m_code, command->m_size);
+				printf ("server: invalid command: %d\n", command->m_code);
 				return -1;
 			}
 
 			ReqHdr reply;
 			reply.m_code = ReqCode_Reply;
-			reply.m_size = command->m_size;
+			reply.m_size = ::rand () % MaxBlockSize;
 
 			m_transport->writeMessage (&reply, data, reply.m_size);
 		}
+
+#endif
 
 		return 0;
 	}
@@ -2128,10 +2156,11 @@ public:
 	{
 		ASSERT (m_transport);
 
-		sl::Array <char> buffer;
-
 		int percentage = 0;
 		size_t totalSize = 0;
+
+#if (_SHM_TEST_ONE_WAY)
+		static char data [MaxBlockSize] = { 0 };
 
 		while (totalSize < TotalSize)
 		{
@@ -2140,6 +2169,31 @@ public:
 			ReqHdr command;
 			command.m_code = ReqCode_Command;
 			command.m_size = blockSize;
+
+			bool result = m_transport->writeMessage (&command, data, blockSize);
+			if (!result)
+			{
+				printf ("client: write error: %s\n", err::getLastErrorDescription ().sz ());
+				return -1;
+			}
+
+			totalSize += blockSize;
+
+			int newPercentage = (uint64_t) totalSize * 100 / TotalSize;
+			if (newPercentage != percentage)
+			{
+				percentage = newPercentage;
+				printf ("\b\b\b\b%d%%", percentage);
+			}
+		}
+#else
+		sl::Array <char> buffer;
+
+		while (totalSize < TotalSize)
+		{
+			ReqHdr command;
+			command.m_code = ReqCode_Command;
+			command.m_size = 0;
 
 			bool result = m_transport->writeMessage (&command, NULL, 0);
 			if (!result)
@@ -2162,13 +2216,13 @@ public:
 			}
 
 			ReqHdr* reply = (ReqHdr*) buffer.cp ();
-			if (reply->m_code != ReqCode_Reply || reply->m_size != blockSize)
+			if (reply->m_code != ReqCode_Reply)
 			{
-				printf ("client: invalid reply: %d/%d\n", reply->m_code, reply->m_size);
+				printf ("client: invalid reply: %d\n", reply->m_code);
 				return -1;
 			}
 
-			totalSize += blockSize;
+			totalSize += reply->m_size;
 
 			int newPercentage = (uint64_t) totalSize * 100 / TotalSize;
 			if (newPercentage != percentage)
@@ -2177,6 +2231,7 @@ public:
 				printf ("\b\b\b\b%d%%", percentage);
 			}
 		}
+#endif
 
 		printf ("\b\b\b\b100%% (done)\n");
 		return 0;
@@ -2230,22 +2285,23 @@ public:
 	int m_writePipe;
 #endif
 
+	sl::Array <char> m_leftover;
+
 public:
 	virtual
 	size_t
 	readMessage (sl::Array <char>* buffer)
 	{
+		size_t size = 0;
+
 		size_t bufferSize = buffer->getCount ();
 
 		if (bufferSize < sizeof (ReqHdr))
-		{
 			buffer->setCount (sizeof (ReqHdr));
-			bufferSize = sizeof (ReqHdr);
-		}
 
-		size_t size = 0;
+		bufferSize = sizeof (ReqHdr);
 
-		while (size < sizeof (ReqHdr))
+		while (size < bufferSize)
 		{
 #if (_AXL_OS_WIN)
 			dword_t actualSize;
@@ -2264,19 +2320,20 @@ public:
 			size += actualSize;
 		}
 
+		ASSERT (size == bufferSize);
+
 		ReqHdr* hdr = (ReqHdr*) buffer->p ();
-		if (hdr->m_code == ReqCode_Command)
+		if (!hdr->m_size)
 		{
 			ASSERT (size == sizeof (ReqHdr));
 			buffer->setCount (sizeof (ReqHdr));
 			return sizeof (ReqHdr);
 		}
 
-		size_t messageSize = sizeof (ReqHdr) + hdr->m_size;
-		buffer->setCount (messageSize);
-		bufferSize = messageSize;
+		bufferSize = sizeof (ReqHdr) + hdr->m_size;
+		buffer->setCount (bufferSize);
 
-		while (size < messageSize)
+		while (size < bufferSize)
 		{
 #if (_AXL_OS_WIN)
 			dword_t actualSize;
@@ -2295,8 +2352,8 @@ public:
 			size += actualSize;
 		}
 
-		ASSERT (size == messageSize);
-		return messageSize;
+		ASSERT (size == bufferSize);
+		return size;
 	}
 
 	virtual
