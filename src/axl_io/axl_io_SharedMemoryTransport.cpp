@@ -206,7 +206,6 @@ SharedMemoryTransportBase::initializeMapping (
 	if (!p)
 		return false;
 
-	m_mappingSize = size;
 	m_hdr = (SharedMemoryTransportHdr*) p;
 	m_data = (char*) (m_hdr + 1);
 	return true;
