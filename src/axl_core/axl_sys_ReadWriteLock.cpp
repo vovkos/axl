@@ -122,7 +122,12 @@ ReadWriteLock::readLock (uint_t timeout)
 		sys::atomicLock (&m_data->m_lock);
 
 		if (!result)
+		{
+			if (!m_data->m_activeReadCount && m_data->m_queuedWriteCount)
+				m_writeEvent.signal ();
+
 			break;
+		}
 
 		if (!m_data->m_activeWriteCount)
 		{
@@ -183,7 +188,7 @@ ReadWriteLock::writeLock (uint_t timeout)
 
 		result = m_writeEvent.wait (timeout);
 
-		// another reader woken up by the first writer might grab the lock
+		// another reader woken up by the first writer might have read-locked
 
 		sys::atomicLock (&m_data->m_lock);
 
