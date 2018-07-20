@@ -75,10 +75,10 @@ enum SerialSettingId
 struct SerialSettings
 {
 	uint_t m_baudRate;
-	SerialFlowControl m_flowControl;
 	uint_t m_dataBits;
 	SerialStopBits m_stopBits;
 	SerialParity m_parity;
+	SerialFlowControl m_flowControl;
 	uint_t m_readInterval; // inverse of COMMTIMEOUTS.ReadIntervalTimeout (which always makes me confused):
 	                       // 0  -- return immediatly
 	                       // -1 -- wait for the buffer to fill completely
@@ -93,25 +93,25 @@ struct SerialSettings
 
 	SerialSettings (
 		uint_t baudRate,
-		SerialFlowControl flowControl = SerialFlowControl_None,
 		uint_t dataBits = 8,
 		SerialStopBits stopBits = SerialStopBits_1,
 		SerialParity parity = SerialParity_None,
+		SerialFlowControl flowControl = SerialFlowControl_None,
 		uint_t readInterval = 10, // 10ms can be used in the most general case
 		bool dtr = true,
 		bool rts = true
 		)
 	{
-		setup (baudRate, flowControl, dataBits, stopBits, parity, readInterval, dtr, rts);
+		setup (baudRate, dataBits, stopBits, parity, flowControl, readInterval, dtr, rts);
 	}
 
 	void
 	setup (
 		uint_t baudRate,
-		SerialFlowControl flowControl = SerialFlowControl_None,
 		uint_t dataBits = 8,
 		SerialStopBits stopBits = SerialStopBits_1,
 		SerialParity parity = SerialParity_None,
+		SerialFlowControl flowControl = SerialFlowControl_None,
 		uint_t readInterval = 10,
 		bool dtr = true,
 		bool rts = true

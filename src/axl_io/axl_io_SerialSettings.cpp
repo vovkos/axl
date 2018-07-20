@@ -20,20 +20,20 @@ namespace io {
 void
 SerialSettings::setup (
 	uint_t baudRate,
-	SerialFlowControl flowControl,
 	uint_t dataBits,
 	SerialStopBits stopBits,
 	SerialParity parity,
+	SerialFlowControl flowControl,
 	uint_t readInterval,
 	bool dtr,
 	bool rts
 	)
 {
 	m_baudRate = baudRate;
-	m_flowControl = flowControl;
 	m_dataBits = dataBits;
 	m_stopBits = stopBits;
 	m_parity = parity;
+	m_flowControl = flowControl;
 	m_readInterval = readInterval;
 	m_dtr = dtr;
 	m_rts = rts;
