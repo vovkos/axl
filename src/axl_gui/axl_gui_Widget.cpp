@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_g_WarningSuppression.h"
 #include "axl_gui_Widget.h"
 #include "axl_gui_Engine.h"
 #include "axl_gui_Font.h"

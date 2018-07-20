@@ -15,7 +15,6 @@
 
 set (
 	G_H_LIST
-	${AXL_INC_DIR}/axl_g/axl_g_WarningSuppression.h
 	${AXL_INC_DIR}/axl_g/axl_g_Module.h
 	)
 

@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_g_WarningSuppression.h"
 #include "axl_io_MappedFile.h"
 #include "axl_g_Module.h"
 #include "axl_err_Error.h"
