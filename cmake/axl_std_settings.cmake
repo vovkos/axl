@@ -325,18 +325,70 @@ axl_create_gcc_settings)
 			)
 	endif ()
 
+	# alas, warning suppressions must be passed in command line, not pragma-ed
+	# that is because GCC diagnostic pragmas get lost if defined in precompiled headers
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_DEPRECATED_DECLARATIONS
+		DESCRIPTION "Warn about uses of functions/variables/types marked as deprecated"
+		DEFAULT "-Wno-deprecated-declarations"
+		"-Wdeprecated-declarations" "-Wno-deprecated-declarations"
+		)
+
 	axl_create_compiler_flag_setting (
 		GCC_FLAG_WARNING_MULTICHAR
-		DESCRIPTION "GNU C++ shows warnings if multicharacter constants are used, e.g. 'ABCD'"
+		DESCRIPTION "Warn if a multicharacter constant (‘'FOOF'’) is used"
 		DEFAULT "-Wno-multichar"
 		"-Wmultichar" "-Wno-multichar"
 		)
 
 	axl_create_compiler_flag_setting (
 		GCC_FLAG_WARNING_FORMAT
-		DESCRIPTION "GNU C++ shows warnings if printf format specifiers mismatch arguments"
+		DESCRIPTION "Check calls to printf/scanf/etc to ensure that the arguments are appropriate to the format string"
 		DEFAULT "-Wno-format"
 		"-Wformat" "-Wno-format"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_CPP_WARNING_INVALID_OFFSETOF
+		DESCRIPTION "Warn about applying the offsetof macro to a non-POD type"
+		DEFAULT "-Wno-invalid-offsetof"
+		"-Winvalid-offsetof" "-Wno-invalid-offsetof"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_CPP_WARNING_NARROWING
+		DESCRIPTION "Warn about narrowing conversions"
+		DEFAULT "-Wno-narrowing"
+		"-Wnarrowing" "-Wno-narrowing"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_DANGLING_ELSE
+		DESCRIPTION "Warn about dangling else without explicit braces"
+		DEFAULT "-Wno-dangling-else"
+		"-Wdangling-else" "-Wno-dangling-else"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_CPP_WARNING_LOGICAL_OP_PARENTHESES
+		DESCRIPTION "Warn about '&&' within '||'"
+		DEFAULT "-Wno-logical-op-parentheses"
+		"-Wlogical-op-parentheses" "-Wno-logical-op-parentheses"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_CPP_WARNING_SWITCH
+		DESCRIPTION "Warn about missing case values in a switch statement"
+		DEFAULT "-Wno-switch"
+		"-Wswitch" "-Wno-switch"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
+		DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
+		DEFAULT "-Wno-incompatible-ms-struct"
+		"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
 		)
 endmacro ()
 
@@ -404,6 +456,26 @@ axl_apply_std_settings)
 endmacro ()
 
 macro (
+axl_cleanup_compiler_flags
+	_FLAGS
+	_WARNING_FLAG_LIST
+	)
+
+	string (REPLACE " " ";" _FLAG_LIST "${${_FLAGS}}")
+	list (REMOVE_DUPLICATES _FLAG_LIST)
+
+	foreach (_FLAG ${_FLAG_LIST})
+		if (_FLAG MATCHES "-W[a-z-]+")
+			list (APPEND ${_WARNING_FLAG_LIST} ${_FLAG})
+			list (REMOVE_ITEM _FLAG_LIST ${_FLAG})
+		endif ()
+	endforeach ()
+
+	string (REPLACE ";" " " ${_FLAGS} "${_FLAG_LIST}")
+	string (STRIP "${${_FLAGS}}" ${_FLAGS})
+endmacro ()
+
+macro (
 axl_print_std_settings)
 
 	string (LENGTH ".......................:" AXL_G_MESSAGE_ALIGN)
@@ -426,18 +498,33 @@ axl_print_std_settings)
 		axl_message ("    Build configuration:" ${CMAKE_BUILD_TYPE})
 	endif ()
 
-	string (STRIP "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" _C_FLAGS_DEBUG)
-	string (STRIP "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}" _C_FLAGS_RELEASE)
-	string (STRIP "${CMAKE_CXX_COMPILER_ARG1} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}" _CXX_FLAGS_DEBUG)
-	string (STRIP "${CMAKE_CXX_COMPILER_ARG1} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}" _CXX_FLAGS_RELEASE)
+	set (_C_FLAGS_DEBUG "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}")
+	set (_C_FLAGS_RELEASE "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}")
+	set (_CXX_FLAGS_DEBUG "${CMAKE_CXX_COMPILER_ARG1} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
+	set (_CXX_FLAGS_RELEASE "${CMAKE_CXX_COMPILER_ARG1} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+	set (_WARNING_FLAG_LIST)
+
+	axl_cleanup_compiler_flags (_C_FLAGS_DEBUG _WARNING_FLAG_LIST)
+	axl_cleanup_compiler_flags (_C_FLAGS_RELEASE _WARNING_FLAG_LIST)
+	axl_cleanup_compiler_flags (_CXX_FLAGS_DEBUG _WARNING_FLAG_LIST)
+	axl_cleanup_compiler_flags (_CXX_FLAGS_RELEASE _WARNING_FLAG_LIST)
 
 	message (STATUS "C/C++:")
 	axl_message ("    C Compiler:"          ${CMAKE_C_COMPILER})
-	axl_message ("    C flags (Debug):"     ${_C_FLAGS_DEBUG})
+	axl_message ("    C flags (Debug):"     "'${_C_FLAGS_DEBUG}'")
 	axl_message ("    C flags (Release):"   ${_C_FLAGS_RELEASE})
 	axl_message ("    C++ Compiler:"        ${CMAKE_CXX_COMPILER})
 	axl_message ("    C++ flags (Debug):"   ${_CXX_FLAGS_DEBUG})
 	axl_message ("    C++ flags (Release):" ${_CXX_FLAGS_RELEASE})
+
+	if (_WARNING_FLAG_LIST)
+		message (STATUS "    C/C++ warning flags:")
+
+		list (REMOVE_DUPLICATES _WARNING_FLAG_LIST)
+		foreach (_FLAG ${_WARNING_FLAG_LIST})
+			axl_message ("        ${_FLAG}")
+		endforeach ()
+	endif ()
 
 	get_directory_property (_CXX_DEFINITIONS COMPILE_DEFINITIONS)
 
