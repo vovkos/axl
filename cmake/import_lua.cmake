@@ -10,7 +10,7 @@
 #...............................................................................
 
 set (
-	_LUA_NAME_LIST
+	_LUA_LIB_NAME_LIST
 	lua
 	lua5
 	lua53
@@ -25,7 +25,7 @@ if (NOT LUA_INC_DIR)
 	axl_find_inc_dir (
 		LUA_INC_DIR
 		lua.h
-		PATH_SUFFIXES . ${_LUA_NAME_LIST}
+		PATH_SUFFIXES . ${_LUA_LIB_NAME_LIST}
 		)
 endif ()
 
@@ -34,7 +34,7 @@ if (NOT LUA_LIB_DIR)
 		axl_find_lib_dir_ex (
 			RESULT_LIB_DIR LUA_LIB_DIR
 			RESULT_LIB_NAME LUA_LIB_NAME
-			LIB_NAME ${_LUA_NAME_LIST}
+			LIB_NAME ${_LUA_LIB_NAME_LIST}
 			)
 	else ()
 		axl_find_lib_dir_ex (
@@ -46,7 +46,7 @@ elseif (NOT LUA_LIB_NAME)
 	axl_find_lib_dir_ex (
 		RESULT_LIB_NAME LUA_LIB_NAME
 		LIB_DIR ${LUA_LIB_DIR}
-		LIB_NAME ${_LUA_NAME_LIST}
+		LIB_NAME ${_LUA_LIB_NAME_LIST}
 		)
 endif ()
 

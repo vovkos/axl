@@ -58,12 +58,7 @@ if (BUILD_AXL_IO_USB)
 	include_directories (${LIBUSB_INC_DIR})
 	link_directories (${LIBUSB_LIB_DIR})
 	add_definitions (-D_AXL_IO_USB=1)
-
-	if (WIN32)
-		list (APPEND OPT_LIB_LIST libusb-1.0)
-	else ()
-		list (APPEND OPT_LIB_LIST usb-1.0)
-	endif ()
+	list (APPEND OPT_LIB_LIST ${LIBUSB_LIB_NAME})
 endif ()
 
 if (BUILD_AXL_XML)
