@@ -38,15 +38,13 @@ axl_create_space_padding
 	)
 
 	string (LENGTH ${_STRING} _LENGTH)
-	math (EXPR _PADDING_LENGTH "${_MAX_LENGTH} - ${_LENGTH} + 1")
+	math (EXPR _PADDING_LENGTH "${_MAX_LENGTH} - ${_LENGTH}")
 
 	if (${_PADDING_LENGTH} GREATER "0")
-		string (RANDOM LENGTH ${_PADDING_LENGTH} ALPHABET " " _PADDING)
+		string (RANDOM LENGTH ${_PADDING_LENGTH} ALPHABET " " ${_RESULT})
 	else ()
-		set (_PADDING " ")
+		set (${_RESULT} "")
 	endif ()
-
-	set (${_RESULT} ${_PADDING})
 endmacro ()
 
 macro (
@@ -61,7 +59,7 @@ axl_print_variable_list
 	axl_calc_max_string_length (_ALIGN ${_VARIABLE_LIST})
 
 	string (LENGTH ${_INDENT} _INDENT_LENGTH)
-	math (EXPR _ALIGN "${_ALIGN} + ${_INDENT_LENGTH} + 1")
+	math (EXPR _ALIGN "${_ALIGN} + ${_INDENT_LENGTH} + 2") # colon and space
 
 	if (${_ALIGN} LESS ${_MIN_ALIGN})
 		set (_ALIGN ${_MIN_ALIGN})
@@ -70,7 +68,7 @@ axl_print_variable_list
 	foreach (_VARIABLE ${_VARIABLE_LIST})
 		set (_PREFIX "${_INDENT}${_VARIABLE}:")
 		axl_create_space_padding (_PADDING ${_PREFIX} ${_ALIGN})
-		message (STATUS "${_PREFIX}${_PADDING}${${_VARIABLE}}")
+		axl_message ("${_PREFIX}${_PADDING}" ${${_VARIABLE}})
 	endforeach ()
 endmacro ()
 
@@ -111,7 +109,21 @@ axl_message
 		message (STATUS "${_FIRST}")
 	else ()
 		axl_create_space_padding (_PADDING ${_FIRST} ${AXL_G_MESSAGE_ALIGN})
-		message (STATUS "${_FIRST}${_PADDING}${_ARG_LIST}")
+		list (LENGTH _ARG_LIST _LENGTH)
+		if (_LENGTH LESS 2)
+			message (STATUS "${_FIRST}${_PADDING}${_ARG_LIST}")
+		else ()
+			list (GET _ARG_LIST 0 _ITEM)
+			list (REMOVE_AT _ARG_LIST 0)
+
+			message (STATUS "${_FIRST}${_PADDING}${_ITEM}")
+			string (LENGTH "${_FIRST}${_PADDING}" _LENGTH)
+			axl_create_space_padding (_PADDING " " ${_LENGTH})
+
+			foreach (_ITEM ${_ARG_LIST})
+				message (STATUS "${_PADDING} ${_ITEM}")
+			endforeach ()
+		endif ()
 	endif ()
 endmacro ()
 
@@ -141,7 +153,7 @@ macro (
 
 	foreach (_SETTING ${_SETTING_LIST})
 		axl_create_space_padding (_PADDING ${_SETTING} ${_MAX_LENGTH})
-		set (_CONTENTS "${_CONTENTS}set (${_SETTING}${_PADDING}${_SETTING}-NOTFOUND)\n")
+		set (_CONTENTS "${_CONTENTS}set (${_SETTING}${_PADDING} ${_SETTING}-NOTFOUND)\n")
 	endforeach ()
 
 	file (WRITE ${_FILE_NAME} ${_CONTENTS})

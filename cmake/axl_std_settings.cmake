@@ -478,7 +478,7 @@ endmacro ()
 macro (
 axl_print_std_settings)
 
-	string (LENGTH ".......................:" AXL_G_MESSAGE_ALIGN)
+	string (LENGTH "........................:" AXL_G_MESSAGE_ALIGN)
 
 	message (STATUS "AXL CMake:")
 	axl_message ("    Invoked from:" ${AXL_CMAKE_ORIGIN_FILE})
@@ -511,7 +511,7 @@ axl_print_std_settings)
 
 	message (STATUS "C/C++:")
 	axl_message ("    C Compiler:"          ${CMAKE_C_COMPILER})
-	axl_message ("    C flags (Debug):"     "'${_C_FLAGS_DEBUG}'")
+	axl_message ("    C flags (Debug):"     ${_C_FLAGS_DEBUG})
 	axl_message ("    C flags (Release):"   ${_C_FLAGS_RELEASE})
 	axl_message ("    C++ Compiler:"        ${CMAKE_CXX_COMPILER})
 	axl_message ("    C++ flags (Debug):"   ${_CXX_FLAGS_DEBUG})
