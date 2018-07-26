@@ -350,6 +350,48 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
+		DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
+		DEFAULT "-Wno-incompatible-ms-struct"
+		"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_DANGLING_ELSE
+		DESCRIPTION "Warn about dangling else without explicit braces"
+		DEFAULT "-Wno-dangling-else"
+		"-Wdangling-else" "-Wno-dangling-else"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_LOGICAL_OP_PARENTHESES
+		DESCRIPTION "Warn about '&&' within '||'"
+		DEFAULT "-Wno-logical-op-parentheses"
+		"-Wlogical-op-parentheses" "-Wno-logical-op-parentheses"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_SWITCH
+		DESCRIPTION "Warn about missing case values in a switch statement"
+		DEFAULT "-Wno-switch"
+		"-Wswitch" "-Wno-switch"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_STRINGOP_OVERFLOW
+		DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overflow the buffer"
+		DEFAULT "-Wno-stringop-overflow"
+		"-Wstringop-overflow"
+		"-Wstringop-overflow=1"
+		"-Wstringop-overflow=2"
+		"-Wstringop-overflow=3"
+		"-Wstringop-overflow=4"
+		"-Wno-stringop-overflow"
+		)
+
+	# C++ specific warnings
+
+	axl_create_compiler_flag_setting (
 		GCC_FLAG_CPP_WARNING_INVALID_OFFSETOF
 		DESCRIPTION "Warn about applying the offsetof macro to a non-POD type"
 		DEFAULT "-Wno-invalid-offsetof"
@@ -361,34 +403,6 @@ axl_create_gcc_settings)
 		DESCRIPTION "Warn about narrowing conversions"
 		DEFAULT "-Wno-narrowing"
 		"-Wnarrowing" "-Wno-narrowing"
-		)
-
-	axl_create_compiler_flag_setting (
-		GCC_FLAG_WARNING_DANGLING_ELSE
-		DESCRIPTION "Warn about dangling else without explicit braces"
-		DEFAULT "-Wno-dangling-else"
-		"-Wdangling-else" "-Wno-dangling-else"
-		)
-
-	axl_create_compiler_flag_setting (
-		GCC_FLAG_CPP_WARNING_LOGICAL_OP_PARENTHESES
-		DESCRIPTION "Warn about '&&' within '||'"
-		DEFAULT "-Wno-logical-op-parentheses"
-		"-Wlogical-op-parentheses" "-Wno-logical-op-parentheses"
-		)
-
-	axl_create_compiler_flag_setting (
-		GCC_FLAG_CPP_WARNING_SWITCH
-		DESCRIPTION "Warn about missing case values in a switch statement"
-		DEFAULT "-Wno-switch"
-		"-Wswitch" "-Wno-switch"
-		)
-
-	axl_create_compiler_flag_setting (
-		GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
-		DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
-		DEFAULT "-Wno-incompatible-ms-struct"
-		"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
 		)
 endmacro ()
 
