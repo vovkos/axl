@@ -93,7 +93,7 @@ else ()
 	axl_exclude_from_build (test_Usb.cpp)
 endif ()
 
-if (BUILD_AXL_LUA)
+if (BUILD_AXL_ST)
 	include_directories (${LUA_INC_DIR})
 	link_directories (${LUA_LIB_DIR})
 	add_definitions (-D_AXL_LUA=1)
