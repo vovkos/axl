@@ -337,7 +337,7 @@ public:
 	size_t
 	controlTransfer (
 		uint_t requestType,
-		uint_t requestId,
+		uint_t requestCode,
 		uint_t value,
 		uint_t index,
 		void* p,

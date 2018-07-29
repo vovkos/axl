@@ -511,7 +511,7 @@ UsbDevice::getStringDesrciptor (
 size_t
 UsbDevice::controlTransfer (
 	uint_t requestType,
-	uint_t request,
+	uint_t requestCode,
 	uint_t value,
 	uint_t index,
 	void* p,
@@ -524,7 +524,7 @@ UsbDevice::controlTransfer (
 	int result = libusb_control_transfer (
 		m_openHandle,
 		(uint8_t) requestType,
-		(uint8_t) request,
+		(uint8_t) requestCode,
 		(uint16_t) value,
 		(uint16_t) index,
 		(uchar_t*) p,

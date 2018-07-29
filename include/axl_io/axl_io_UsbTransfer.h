@@ -54,13 +54,13 @@ public:
 	fillControlSetup (
 		libusb_control_setup* setup,
 		uint_t requestType,
-		uint_t requestId,
+		uint_t requestCode,
 		uint_t value,
 		uint_t index,
 		size_t size
 		)
 	{
-		libusb_fill_control_setup ((uchar_t*) setup, requestType, requestId, value, index, size);
+		libusb_fill_control_setup ((uchar_t*) setup, requestType, requestCode, value, index, size);
 	}
 
 	void
