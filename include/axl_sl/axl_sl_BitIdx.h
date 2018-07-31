@@ -346,17 +346,19 @@ getBitmask64 (
 
 //..............................................................................
 
+template <typename T>
 inline
 bool
-isPowerOf2 (size_t x)
+isPowerOf2 (T x)
 {
 	return !(x & (x - 1));
 }
 
+template <typename T>
 inline
 bool
 isAligned (
-	size_t x,
+	T x,
 	size_t factor
 	)
 {
@@ -364,18 +366,22 @@ isAligned (
 	return !(x & (factor - 1));
 }
 
-template <size_t factor>
-size_t
-isAligned (size_t x)
+template <
+	size_t factor,
+	typename T
+	>
+T
+isAligned (T x)
 {
 	ASSERT (isPowerOf2 (factor));
 	return !(x & (factor - 1));
 }
 
+template <typename T>
 inline
-size_t
+T
 align (
-	size_t x,
+	T x,
 	size_t factor
 	)
 {
@@ -383,9 +389,12 @@ align (
 	return (x + factor - 1) & ~(factor - 1);
 }
 
-template <size_t factor>
-size_t
-align (size_t x)
+template <
+	size_t factor,
+	typename T
+	>
+T
+align (T x)
 {
 	ASSERT (isPowerOf2 (factor));
 	return (x + factor - 1) & ~(factor - 1);
