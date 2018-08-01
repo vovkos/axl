@@ -542,6 +542,8 @@ axl_print_std_settings)
 		message (STATUS "    C/C++ warning flags:")
 
 		list (REMOVE_DUPLICATES _WARNING_FLAG_LIST)
+		list (SORT _WARNING_FLAG_LIST)
+
 		foreach (_FLAG ${_WARNING_FLAG_LIST})
 			axl_message ("        ${_FLAG}")
 		endforeach ()
