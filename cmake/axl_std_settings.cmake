@@ -329,6 +329,13 @@ axl_create_gcc_settings)
 	# that is because GCC diagnostic pragmas get lost if defined in precompiled headers
 
 	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_UNKNOWN_WARNING_OPTIONS
+		DESCRIPTION "Warn about unknown warning command-line options"
+		DEFAULT "-Wno-unknown-warning-option"
+		"-Wunknown-warning-option" "-Wno-unknown-warning-option"
+		)
+
+	axl_create_compiler_flag_setting (
 		GCC_FLAG_WARNING_DEPRECATED_DECLARATIONS
 		DESCRIPTION "Warn about uses of functions/variables/types marked as deprecated"
 		DEFAULT "-Wno-deprecated-declarations"
