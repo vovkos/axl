@@ -2549,7 +2549,7 @@ testZip ()
 
 	zip::ZipReader reader;
 
-	result = reader.openFile ("c:/projects/projects.zip");
+	result = reader.openFile ("C:/Program Files/Tibbo/Ninja 3/bin/io_base.jncx");
 	if (!result)
 	{
 		printf ("can't open file: %s\n", err::getLastErrorDescription ().sz ());
@@ -2557,6 +2557,8 @@ testZip ()
 	}
 
 	sl::Array <char> buffer;
+
+	sl::String dir = "C:/\xd0\xa1\xd1\x83\xd0\xba\xd0\xb0/";
 
 	size_t count = reader.getFileCount ();
 	for (size_t i = 0; i < count; i++)
@@ -2586,6 +2588,14 @@ testZip ()
 		{
 			reader.extractFileToMem (i, &buffer);
 			printf ("<<<\n%s\n>>>\n", buffer.cp ());
+
+			sl::String dstFileName = dir + fileName;
+			result = reader.extractFileToFile (i, dstFileName);
+			if (!result)
+			{
+				printf ("can't extract file: %s\n", err::getLastErrorDescription ().sz ());
+				return;
+			}
 		}
 
 		printf ("\n");
@@ -3925,8 +3935,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testSharedMemoryTransport ();
-	testPipeTransport ();
+	testZip ();
 
 	return 0;
 }

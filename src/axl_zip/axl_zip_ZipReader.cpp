@@ -12,8 +12,47 @@
 #include "pch.h"
 #include "axl_zip_ZipReader.h"
 #include "axl_err_Error.h"
-#include "miniz.c"
 #include "axl_sys_Time.h"
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#if (_AXL_OS_WIN)
+
+static
+FILE*
+mz_fopen(
+	const char* fileName,
+	const char* mode
+	)
+{
+	FILE* file = NULL;
+	_wfopen_s(&file, axl::sl::String_w (fileName), axl::sl::String_w (mode));
+	return file;
+}
+
+static
+FILE*
+mz_freopen (
+	const char* path,
+	const char* mode,
+	FILE* stream
+	)
+{
+	FILE* file = NULL;
+	if (_wfreopen_s(&file, axl::sl::String_w (path), axl::sl::String_w (mode), stream))
+		return NULL;
+
+	return file;
+}
+
+#	define MZ_FOPEN mz_fopen
+#	define MZ_FREOPEN mz_freopen
+
+#endif // _AXL_OS_WIN
+
+#include "miniz.c"
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 namespace axl {
 namespace zip {

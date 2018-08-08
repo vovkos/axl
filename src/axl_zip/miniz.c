@@ -821,7 +821,7 @@ size_t tdefl_compress_mem_to_mem(void *pOut_buf, size_t out_buf_len, const void 
 
 // Compresses an image to a compressed PNG file in memory.
 // On entry:
-//  pImage, w, h, and num_chans describe the image to compress. num_chans may be 1, 2, 3, or 4. 
+//  pImage, w, h, and num_chans describe the image to compress. num_chans may be 1, 2, 3, or 4.
 //  The image pitch in bytes per scanline will be w*num_chans. The leftmost pixel on the top scanline is stored first in memory.
 //  level may range from [0,10], use MZ_NO_COMPRESSION, MZ_BEST_SPEED, MZ_BEST_COMPRESSION, etc. or a decent default is MZ_DEFAULT_LEVEL
 //  If flip is true, the image will be flipped on the Y axis (useful for OpenGL apps).
@@ -2849,12 +2849,18 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
   #include <sys/stat.h>
 
   #if defined(_MSC_VER) || defined(__MINGW64__)
+    #ifndef MZ_FOPEN
     static FILE *mz_fopen(const char *pFilename, const char *pMode)
     {
       FILE* pFile = NULL;
       fopen_s(&pFile, pFilename, pMode);
+
       return pFile;
     }
+    #define MZ_FOPEN mz_fopen
+    #endif
+
+    #ifndef MZ_FREOPEN
     static FILE *mz_freopen(const char *pPath, const char *pMode, FILE *pStream)
     {
       FILE* pFile = NULL;
@@ -2862,11 +2868,13 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
         return NULL;
       return pFile;
     }
+    #define MZ_FREOPEN mz_freopen
+    #endif
+
     #ifndef MINIZ_NO_TIME
       #include <sys/utime.h>
     #endif
     #define MZ_FILE FILE
-    #define MZ_FOPEN mz_fopen
     #define MZ_FCLOSE fclose
     #define MZ_FREAD fread
     #define MZ_FWRITE fwrite
@@ -2875,7 +2883,6 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
     #define MZ_FILE_STAT_STRUCT _stat
     #define MZ_FILE_STAT _stat
     #define MZ_FFLUSH fflush
-    #define MZ_FREOPEN mz_freopen
     #define MZ_DELETE_FILE remove
   #elif defined(__MINGW32__)
     #ifndef MINIZ_NO_TIME
@@ -4441,7 +4448,7 @@ mz_bool mz_zip_writer_add_file(mz_zip_archive *pZip, const char *pArchive_name, 
 
   if (!mz_zip_get_file_modified_time(pSrc_filename, &dos_time, &dos_date))
     return MZ_FALSE;
-    
+
   pSrc_file = MZ_FOPEN(pSrc_filename, "rb");
   if (!pSrc_file)
     return MZ_FALSE;
