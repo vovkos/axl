@@ -564,6 +564,12 @@ public:
 	}
 
 	size_t
+	appendEmptySpace (size_t count)
+	{
+		return insertEmptySpace (-1, count);
+	}
+
+	size_t
 	append (
 		const T* p,
 		size_t count
