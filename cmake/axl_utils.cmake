@@ -548,10 +548,20 @@ axl_apply_compiler_flag_setting
 endmacro ()
 
 macro (
-axl_apply_all_compiler_flag_settings)
-	foreach (_SETTING ${_AXL_G_COMPILER_FLAG_SETTING_LIST})
+axl_apply_compiler_flag_setting_list
+	# ...
+	)
+
+	set (_SETTING_LIST ${ARGN})
+
+	foreach (_SETTING ${_SETTING_LIST})
 		axl_apply_compiler_flag_setting (${_SETTING})
 	endforeach ()
+endmacro ()
+
+macro (
+axl_apply_all_compiler_flag_settings)
+	axl_apply_compiler_flag_setting_list (${_AXL_G_COMPILER_FLAG_SETTING_LIST})
 endmacro ()
 
 macro (
@@ -639,7 +649,6 @@ axl_apply_compiler_flag
 	if (NOT "${_VALUE}" STREQUAL "")
 		set (_FLAGS "${_FLAGS} ${_VALUE}")
 	endif ()
-
 
 	set (${_RESULT} ${_FLAGS})
 endmacro ()
