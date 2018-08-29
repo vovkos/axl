@@ -52,14 +52,20 @@ struct ErrorHdr
 	}
 
 	bool
+	isStack () const
+	{
+		return
+			m_size >= sizeof (ErrorHdr) * 2 &&
+			isKindOf (g_stdErrorGuid, StdErrorCode_Stack);
+	}
+
+	bool
 	isStackTopKindOf (
 		const sl::Guid& guid,
 		uint_t code
 		) const
 	{
-		return
-			isKindOf (g_stdErrorGuid, StdErrorCode_Stack) &&
-			(this + 1)->isKindOf (guid, code);
+		return isStack () && (this + 1)->isKindOf (guid, code);
 	}
 
 	sl::StringRef
