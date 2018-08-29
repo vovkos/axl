@@ -18,6 +18,28 @@ namespace lex {
 
 //..............................................................................
 
+void
+decodeSrcPosError (
+	sl::StringRef* filePath_o,
+	LineCol* lineCol,
+	const err::ErrorHdr* error
+	)
+{
+	ASSERT (isSrcPosError (error));
+
+	sl::Unpacker unpacker (error + 2, error [1].m_size - sizeof (err::ErrorHdr));
+
+	const char* filePath;
+	unpacker.unpack (&filePath);
+	unpacker.unpack (&lineCol->m_line);
+	unpacker.unpack (&lineCol->m_col);
+
+	if (filePath_o)
+		*filePath_o = filePath;
+}
+
+//..............................................................................
+
 sl::StringRef
 ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 {

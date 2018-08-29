@@ -95,9 +95,45 @@ pushSrcPosError (const SrcPos& srcPos)
 
 inline
 bool
+isSrcPosError (const err::ErrorHdr* error)
+{
+	return
+		error->m_size >= sizeof (err::ErrorHdr) * 2 + sizeof (char) + sizeof (int) * 2 &&
+		error->isStackTopKindOf (g_parseErrorGuid, ParseErrorCode_SrcPos);
+}
+
+void
+decodeSrcPosError (
+	sl::StringRef* filePath,
+	LineCol* lineCol,
+	const err::ErrorHdr* error
+	);
+
+inline
+void
+decodeSrcPosError (
+	LineCol* lineCol,
+	const err::ErrorHdr* error
+	)
+{
+	decodeSrcPosError (NULL, lineCol, error);
+}
+
+inline
+void
+decodeSrcPosError (
+	SrcPos* srcPos,
+	const err::ErrorHdr* error
+	)
+{
+	decodeSrcPosError (&srcPos->m_filePath, srcPos, error);
+}
+
+inline
+bool
 isLastSrcPosError ()
 {
-	return err::getLastError ()->isStackTopKindOf (g_parseErrorGuid, ParseErrorCode_SrcPos);
+	return isSrcPosError (err::getLastError ());
 }
 
 inline
