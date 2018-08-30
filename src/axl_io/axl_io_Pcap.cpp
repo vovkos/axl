@@ -140,7 +140,11 @@ Pcap::write (
 		return -1;
 	}
 
+#if (_AXL_OS_WIN)
 	return size;
+#else
+	return result;
+#endif
 }
 
 //..............................................................................
