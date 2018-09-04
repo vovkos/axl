@@ -18,25 +18,29 @@ namespace win {
 
 //..............................................................................
 
-static
 inline
 wchar_t*
 getSystemMessage (dword_t code)
 {
-	wchar_t* message = NULL;
+	enum
+	{
+		Flags =
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS |
+			FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
 
-	::FormatMessageW (
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS |
-		FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
-		NULL,
-		code,
-		MAKELANGID (LANG_ENGLISH, SUBLANG_DEFAULT),
-		(LPWSTR) &message,
-		0,
-		NULL
-		);
+		EnglishLangId = MAKELANGID (LANG_ENGLISH, SUBLANG_ENGLISH_US),
+		NeutralLangId = MAKELANGID (LANG_NEUTRAL, SUBLANG_NEUTRAL),
+	};
+
+	// prefer english message, fall back localized defaults if failed
+
+	wchar_t* message = NULL;
+	::FormatMessageW (Flags, NULL, code, EnglishLangId, (LPWSTR) &message, 0, NULL);
+
+	if (!message)
+		::FormatMessageW (Flags, NULL, code, NeutralLangId, (LPWSTR) &message, 0, NULL);
 
 	return message;
 }
@@ -46,7 +50,7 @@ WinErrorProvider::getErrorDescription (dword_t code)
 {
 	wchar_t* message = getSystemMessage (code);
 	if (!message) // try again with HRESULT_FROM_SETUPAPI
-	{	
+	{
 		HRESULT hresult = HRESULT_FROM_SETUPAPI (code);
 		message = getSystemMessage (hresult);
 		if (!message)
