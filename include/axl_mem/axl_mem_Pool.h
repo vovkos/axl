@@ -24,7 +24,7 @@ template <typename T>
 class Pool
 {
 protected:
-	sl::StdList <T> m_freeList;
+	sl::List <T> m_freeList;
 
 public:
 	T*
@@ -52,7 +52,7 @@ public:
 	}
 
 	void
-	put (sl::StdList <T>* list)
+	put (sl::List <T>* list)
 	{
 		m_freeList.insertListTail (list);
 	}

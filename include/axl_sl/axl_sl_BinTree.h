@@ -76,7 +76,7 @@ public:
 	typedef sl::ConstIterator <Node> ConstIterator;
 
 protected:
-	StdList <Node> m_nodeList;
+	List <Node> m_nodeList;
 	Node* m_root;
 	Cmp m_cmp;
 

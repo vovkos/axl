@@ -51,7 +51,7 @@ class Section: public sl::ListLink
 protected:
 	sl::String m_name;
 	sl::StringHashTable <NamedValue*> m_namedValueMap;
-	sl::StdList <NamedValue> m_namedValueList;
+	sl::List <NamedValue> m_namedValueList;
 	sl::BoxList <sl::String> m_unnamedValueList;
 
 public:
@@ -83,7 +83,7 @@ class GenericIni
 
 protected:
 	sl::StringHashTable <Section*> m_namedSectionMap;
-	sl::StdList <Section> m_namedSectionList;
+	sl::List <Section> m_namedSectionList;
 	Section m_unnamedSection;
 
 public:

@@ -36,7 +36,7 @@ struct HyperlinkAnchor: sl::ListLink
 class HyperlinkAnchorArray
 {
 protected:
-	sl::StdList <HyperlinkAnchor> m_list;
+	sl::List <HyperlinkAnchor> m_list;
 	sl::Array <HyperlinkAnchor*> m_array;
 
 public:

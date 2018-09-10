@@ -37,7 +37,7 @@ struct DfaState: sl::ListLink
 	uint_t m_acceptNfaStateId;
 	void* m_acceptContext;
 
-	sl::StdList <DfaTransition> m_transitionList;
+	sl::List <DfaTransition> m_transitionList;
 
 	NfaStateSet m_nfaStateSet;
 	sl::BitMap m_openCaptureIdSet;

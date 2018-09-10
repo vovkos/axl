@@ -462,16 +462,6 @@ template <
 	typename T,
 	typename GetLink = ImplicitPtrCast <T, ListLink>
 	>
-class StdList: public List <T, GetLink, mem::StdDelete <T>>
-{
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <
-	typename T,
-	typename GetLink = ImplicitPtrCast <T, ListLink>
-	>
 class CppList: public List <T, GetLink, mem::CppDelete <T>>
 {
 };

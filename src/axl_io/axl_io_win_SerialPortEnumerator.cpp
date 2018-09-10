@@ -28,7 +28,7 @@ class SerialPortEnumerator
 public:
 	static
 	size_t
-	createPortList (sl::StdList <SerialPortDesc>* portList);
+	createPortList (sl::List <SerialPortDesc>* portList);
 
 protected:
 	static
@@ -39,7 +39,7 @@ protected:
 //..............................................................................
 
 size_t
-SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
+SerialPortEnumerator::createPortList (sl::List <SerialPortDesc>* portList)
 {
 	bool result;
 
@@ -106,17 +106,17 @@ SerialPortEnumerator::createPortDesc (sys::win::DeviceInfo* deviceInfo)
 	SerialPortDesc* portDesc = AXL_MEM_NEW (SerialPortDesc);
 	portDesc->m_deviceName = bufferString;
 	deviceInfo->getDeviceRegistryProperty (SPDRP_FRIENDLYNAME, &portDesc->m_description);
-	
+
 	if (portDesc->m_description.isEmpty ()) // try another property
 		deviceInfo->getDeviceRegistryProperty (SPDRP_DEVICEDESC, &portDesc->m_description);
-	
+
 	return portDesc;
 }
 
 //..............................................................................
 
 size_t
-createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
+createSerialPortDescList (sl::List <SerialPortDesc>* portList)
 {
 	return SerialPortEnumerator::createPortList (portList);
 }

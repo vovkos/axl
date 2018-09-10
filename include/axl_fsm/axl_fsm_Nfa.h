@@ -140,7 +140,7 @@ struct NfaTransition: sl::ListLink
 class NfaTransitionMgr
 {
 protected:
-	sl::StdList <NfaTransition> m_transitionList;
+	sl::List <NfaTransition> m_transitionList;
 	NfaTransition* m_transitionMap [256];
 
 	// for UTF regexps m_transitionMap should be replaced with interval tree

@@ -26,7 +26,7 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	createAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList);
+	createAdapterList (sl::List <NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
@@ -48,7 +48,7 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::createAdapterList (sl::StdList <NetworkAdapterDesc>* adapterList)
+NetworkAdapterEnumerator::createAdapterList (sl::List <NetworkAdapterDesc>* adapterList)
 {
 	adapterList->clear ();
 
@@ -126,7 +126,7 @@ NetworkAdapterEnumerator::addAdapterAddress (
 //..............................................................................
 
 size_t
-createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList)
+createNetworkAdapterDescList (sl::List <NetworkAdapterDesc>* adapterList)
 {
 	return NetworkAdapterEnumerator::createAdapterList (adapterList);
 }

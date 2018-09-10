@@ -23,7 +23,7 @@ class SerialPortEnumerator
 public:
 	static
 	size_t
-	createPortList (sl::StdList <SerialPortDesc>* portList);
+	createPortList (sl::List <SerialPortDesc>* portList);
 };
 
 //..............................................................................
@@ -69,7 +69,7 @@ printDeviceProperties (const iok::RegistryEntry& device)
 #endif
 
 size_t
-SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
+SerialPortEnumerator::createPortList (sl::List <SerialPortDesc>* portList)
 {
 	portList->clear ();
 
@@ -112,7 +112,7 @@ SerialPortEnumerator::createPortList (sl::StdList <SerialPortDesc>* portList)
 //..............................................................................
 
 size_t
-createSerialPortDescList (sl::StdList <SerialPortDesc>* portList)
+createSerialPortDescList (sl::List <SerialPortDesc>* portList)
 {
 	return SerialPortEnumerator::createPortList (portList);
 }

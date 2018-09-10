@@ -48,7 +48,7 @@ protected:
 	};
 
 protected:
-	sl::StdList <ViewEntry> m_viewList;
+	sl::List <ViewEntry> m_viewList;
 	ViewMap m_viewMap;
 	size_t m_parentOffset;
 

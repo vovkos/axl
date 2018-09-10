@@ -87,7 +87,7 @@ protected:
 	sl::String m_name;
 	sl::String m_description;
 	uchar_t m_mac [6];
-	sl::StdList <NetworkAdapterAddress> m_addressList;
+	sl::List <NetworkAdapterAddress> m_addressList;
 
 public:
 	NetworkAdapterDesc ();
@@ -132,7 +132,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-createNetworkAdapterDescList (sl::StdList <NetworkAdapterDesc>* adapterList);
+createNetworkAdapterDescList (sl::List <NetworkAdapterDesc>* adapterList);
 
 //..............................................................................
 

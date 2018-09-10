@@ -35,10 +35,10 @@ class Regex
 	friend class RegexCompiler;
 
 protected:
-	sl::StdList <NfaState> m_nfaStateList;
+	sl::List <NfaState> m_nfaStateList;
 	sl::Array <NfaState*> m_nfaStateArray;
 
-	sl::StdList <DfaState> m_dfaStateList;
+	sl::List <DfaState> m_dfaStateList;
 	sl::Array <DfaState*> m_dfaStateArray;
 
 	size_t m_groupCount;

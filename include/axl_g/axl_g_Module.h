@@ -64,7 +64,7 @@ protected:
 	// finalizers
 
 	sys::Lock m_finalizerListLock;
-	sl::StdList <FinalizerEntry> m_finalizerList;
+	sl::List <FinalizerEntry> m_finalizerList;
 
 #ifdef _AXL_DEBUG
 	const char* m_tag;

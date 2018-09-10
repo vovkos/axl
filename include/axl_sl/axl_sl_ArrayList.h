@@ -28,7 +28,7 @@ public:
 	typedef sl::Iterator <T> Iterator;
 
 protected:
-	sl::StdList <T> m_list;
+	sl::List <T> m_list;
 	sl::Array <T*> m_array;
 
 public:

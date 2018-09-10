@@ -297,7 +297,7 @@ testFileTime ()
 void
 testNetworkAdapterList ()
 {
-	sl::StdList <io::NetworkAdapterDesc> adapterList;
+	sl::List <io::NetworkAdapterDesc> adapterList;
 	io::createNetworkAdapterDescList (&adapterList);
 
 	sl::Iterator <io::NetworkAdapterDesc> adapterIt = adapterList.getHead ();
@@ -2607,7 +2607,7 @@ testZip ()
 void
 testEnumSerial ()
 {
-	sl::StdList <io::SerialPortDesc> portList;
+	sl::List <io::SerialPortDesc> portList;
 	io::createSerialPortDescList (&portList);
 
 	sl::Iterator <io::SerialPortDesc> it = portList.getHead ();
@@ -3886,7 +3886,7 @@ testReadWriteLock ()
 	sys::ReadWriteLock lock;
 	lock.create ();
 
-	sl::StdList <RwLockThread> threadList;
+	sl::List <RwLockThread> threadList;
 
 	for (size_t i = 0; i < ReaderCount; i++)
 	{
@@ -3932,7 +3932,7 @@ testConstList ()
 		int m_y;
 	};
 
-	sl::StdList <Point> list;
+	sl::List <Point> list;
 
 	Point* point = AXL_MEM_NEW (Point);
 	point->m_x = 10;

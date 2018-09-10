@@ -146,7 +146,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-createSerialPortDescList (sl::StdList <SerialPortDesc>* portList);
+createSerialPortDescList (sl::List <SerialPortDesc>* portList);
 
 //..............................................................................
 

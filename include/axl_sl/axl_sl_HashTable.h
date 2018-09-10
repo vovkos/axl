@@ -120,7 +120,7 @@ public:
 	typedef typename Entry::Bucket Bucket;
 
 protected:
-	StdList <Entry> m_list;
+	List <Entry> m_list;
 	Array <Bucket> m_table;
 	size_t m_resizeThreshold;
 	Hash m_hash;
