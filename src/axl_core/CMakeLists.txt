@@ -42,6 +42,7 @@ set (
 	${AXL_INC_DIR}/axl_mem/axl_mem_New.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Pool.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Tracker.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_TrackerBlock.h
 	)
 
 set (
@@ -148,8 +149,8 @@ set (
 	${AXL_INC_DIR}/axl_sl/axl_sl_Handle.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_HandleTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_HashTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_Iterator.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_List.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_ListBase.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_MapEntry.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Pack.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Packer.h

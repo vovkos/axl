@@ -40,11 +40,54 @@ public:
 
 //..............................................................................
 
+template <
+	typename T,
+	typename Value,
+	typename Entry,
+	typename Link
+	>
+class BoxIteratorImpl: public IteratorBase <
+	T,
+	Entry,
+	Link,
+	ImplicitCast <Entry*, Link*>
+	>
+{
+public:
+	Value&
+	operator * () const
+	{
+		return r ();
+	}
+
+	Value*
+	operator -> () const
+	{
+		return p ();
+	}
+
+	Value&
+	r () const
+	{
+		ASSERT (this->m_p);
+		return this->m_p->m_value;
+	}
+
+	Value*
+	p () const
+	{
+		return this->m_p ? &this->m_p->m_value : NULL;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <typename T>
-class BoxIterator: public IteratorBase <
+class BoxIterator: public BoxIteratorImpl <
 	BoxIterator <T>,
+	T,
 	BoxListEntry <T>,
-	ImplicitCast <BoxListEntry <T>*, ListLink*>
+	ListLink
 	>
 {
 public:
@@ -56,30 +99,31 @@ public:
 	{
 		this->m_p = p;
 	}
+};
 
-	T&
-	operator * () const
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class ConstBoxIterator: public BoxIteratorImpl <
+	ConstBoxIterator <T>,
+	const T,
+	const BoxListEntry <T>,
+	const ListLink
+	>
+{
+public:
+	ConstBoxIterator ()
 	{
-		return r ();
 	}
 
-	T*
-	operator -> () const
+	ConstBoxIterator (const BoxListEntry <T>* p)
 	{
-		return p ();
+		this->m_p = p;
 	}
 
-	T&
-	r () const
+	ConstBoxIterator (const BoxIterator <T>& it)
 	{
-		ASSERT (this->m_p);
-		return this->m_p->m_value;
-	}
-
-	T*
-	p () const
-	{
-		return this->m_p ? &this->m_p->m_value : NULL;
+		this->m_p = it.getEntry ();
 	}
 };
 
@@ -91,14 +135,18 @@ template <
 	>
 class BoxList: public ListBase <
 	BoxListEntry <T>,
+	ImplicitPtrCast <BoxListEntry <T>, ListLink>,
 	BoxIterator <T>,
+	ConstBoxIterator <T>,
 	typename mem::StdDelete <BoxListEntry <T> >
 	>
 {
 public:
 	typedef ListBase <
 		BoxListEntry <T>,
+		ImplicitPtrCast <BoxListEntry <T>, ListLink>,
 		BoxIterator <T>,
+		ConstBoxIterator <T>,
 		typename mem::StdDelete <BoxListEntry <T> >
 		> BaseType;
 
@@ -261,7 +309,11 @@ public:
 //..............................................................................
 
 template <typename T>
-class ConstBoxList: public ConstListBase <T, BoxIterator <T> >
+class ConstBoxList: public ConstListBase <
+	BoxListEntry <T>,
+	ImplicitPtrCast <BoxListEntry <T>, ListLink>,
+	ConstBoxIterator <T>
+	>
 {
 public:
 	ConstBoxList ()
@@ -275,7 +327,7 @@ public:
 	}
 
 	template <typename Delete>
-	ConstBoxList (const List <BoxListEntry <T>, Delete>& list)
+	ConstBoxList (const List <BoxListEntry <T>, typename GetLink, Delete>& list)
 	{
 		this->m_listData = list.getListData ();
 	}

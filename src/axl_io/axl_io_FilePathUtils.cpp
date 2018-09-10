@@ -393,7 +393,7 @@ findFilePath (
 
 	if (dirList)
 	{
-		sl::BoxIterator <sl::String> dir = dirList->getHead ();
+		sl::ConstBoxIterator <sl::String> dir = dirList->getHead ();
 		for (; dir; dir++)
 		{
 			filePath.forceCopy (*dir);

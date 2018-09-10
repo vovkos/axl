@@ -64,7 +64,7 @@ public:
 	NamedValue*
 	getNamedValue (const sl::StringRef& name) const
 	{
-		sl::StringHashTableIterator <NamedValue*> it = m_namedValueMap.find (name);
+		sl::ConstStringHashTableIterator <NamedValue*> it = m_namedValueMap.find (name);
 		return it ? it->m_value : NULL;
 	}
 
@@ -90,7 +90,7 @@ public:
 	Section*
 	getSection (const sl::StringRef& name) const
 	{
-		sl::StringHashTableIterator <Section*> it = m_namedSectionMap.find (name);
+		sl::ConstStringHashTableIterator <Section*> it = m_namedSectionMap.find (name);
 		return it ? it->m_value : NULL;
 	}
 

@@ -38,9 +38,30 @@ class RbTreeNode: public BinTreeNodeBase <
 	Value
 	>
 {
-public:
+	template <
+		typename T,
+		typename Node,
+		typename Key,
+		typename Value,
+		typename Cmp,
+		typename KeyArg,
+		typename ValueArg
+		>
+	friend class BinTreeBase;
+
+	template <
+		typename Key,
+		typename Value,
+		typename Cmp,
+		typename KeyArg,
+		typename ValueArg
+		>
+	friend class RbTree;
+
+protected:
 	RbColor m_color;
 
+protected:
 	static
 	void
 	onXcg (

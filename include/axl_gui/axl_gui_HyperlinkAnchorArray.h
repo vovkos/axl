@@ -58,13 +58,13 @@ public:
 		return m_list.getCount ();
 	}
 
-	sl::Iterator <HyperlinkAnchor>
+	sl::ConstIterator <HyperlinkAnchor>
 	getHead () const
 	{
 		return m_list.getHead ();
 	}
 
-	sl::Iterator <HyperlinkAnchor>
+	sl::ConstIterator <HyperlinkAnchor>
 	getTail () const
 	{
 		return m_list.getHead ();
@@ -77,7 +77,7 @@ public:
 		m_array.clear ();
 	}
 
-	HyperlinkAnchor*
+	const HyperlinkAnchor*
 	find (size_t offset) const;
 
 	HyperlinkAnchor*

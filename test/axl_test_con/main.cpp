@@ -311,10 +311,10 @@ testNetworkAdapterList ()
 		printf ("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).sz ());
 
 		sl::ConstList <io::NetworkAdapterAddress> addressList = adapter->getAddressList ();
-		sl::Iterator <io::NetworkAdapterAddress> addressIt = addressList.getHead ();
+		sl::ConstIterator <io::NetworkAdapterAddress> addressIt = addressList.getHead ();
 		for (size_t i = 1; addressIt; addressIt++, i++)
 		{
-			io::NetworkAdapterAddress* address = *addressIt;
+			const io::NetworkAdapterAddress* address = *addressIt;
 
 			uint_t family = address->m_address.m_addr.sa_family;
 			printf ("%-11s = %s",
@@ -3909,6 +3909,54 @@ testReadWriteLock ()
 
 //..............................................................................
 
+template <typename T>
+void
+foo (T* p)
+{
+	printf ("foo - 1\n");
+}
+
+template <typename T>
+void
+foo (const T* p)
+{
+	printf ("foo - 2\n");
+}
+
+void
+testConstList ()
+{
+	struct Point: sl::ListLink
+	{
+		int m_x;
+		int m_y;
+	};
+
+	sl::StdList <Point> list;
+
+	Point* point = AXL_MEM_NEW (Point);
+	point->m_x = 10;
+	point->m_y = 20;
+	list.insertTail (point);
+
+	sl::Iterator <Point> it = list.getHead ();
+	sl::ConstIterator <Point> it2 = it;
+	it2 = it;
+	it2++;
+
+	it2 = it.getInc(1);
+
+	int x = it->m_x;
+	int y = it2->m_y;
+
+	it->m_x = 0;
+
+//	it->m_x = 10;
+//	it->m_y = 20;
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain (
@@ -3935,7 +3983,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testZip ();
+	testConstList ();
 
 	return 0;
 }

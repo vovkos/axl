@@ -31,7 +31,7 @@ run ()
 	sl::HandleTableIterator <int> it = handleTable.getHead ();
 	for (; it; it++)
 	{
-		printf ("0x%p -> %d\n", it->m_key, it->m_value);
+		printf ("0x%p -> %d\n", it->getKey (), it->m_value);
 	}
 }
 

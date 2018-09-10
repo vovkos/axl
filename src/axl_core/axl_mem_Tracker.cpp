@@ -18,6 +18,20 @@ namespace mem {
 
 //..............................................................................
 
+void
+addTrackerBlock (TrackerBlockHdr* hdr)
+{
+	g::getModule ()->getMemTracker ()->add (hdr);
+}
+
+void
+removeTrackerBlock (TrackerBlockHdr* hdr)
+{
+	g::getModule ()->getMemTracker ()->remove (hdr);
+}
+
+//..............................................................................
+
 Tracker::Tracker ()
 {
 	m_peakBlockCount = 0;
@@ -28,7 +42,7 @@ Tracker::Tracker ()
 }
 
 void
-Tracker::add (BlockHdr* hdr)
+Tracker::add (TrackerBlockHdr* hdr)
 {
 	m_lock.lock ();
 
@@ -52,7 +66,7 @@ Tracker::add (BlockHdr* hdr)
 }
 
 void
-Tracker::remove (BlockHdr* hdr)
+Tracker::remove (TrackerBlockHdr* hdr)
 {
 	m_lock.lock ();
 
@@ -88,10 +102,10 @@ Tracker::trace ()
 			m_blockList.getCount ()
 			);
 
-		sl::Iterator <BlockHdr> it = m_blockList.getHead ();
+		sl::Iterator <TrackerBlockHdr> it = m_blockList.getHead ();
 		for (; it; it++)
 		{
-			BlockHdr* blockHdr = *it;
+			TrackerBlockHdr* blockHdr = *it;
 
 			TRACE (
 				"    %s(%d): %s; seq = #%d; size = %d;\n",
@@ -105,14 +119,6 @@ Tracker::trace ()
 	}
 
 	m_lock.unlock ();
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-Tracker*
-getTracker ()
-{
-	return g::getModule ()->getMemTracker ();
 }
 
 //..............................................................................

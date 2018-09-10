@@ -28,7 +28,7 @@ protected:
 	struct HyperlinkXMapEntry
 	{
 		int m_x;
-		HyperlinkAnchor* m_anchor;
+		const HyperlinkAnchor* m_anchor;
 	};
 
 protected:
@@ -140,13 +140,13 @@ public:
 	void
 	calcHyperlinkXMap (Font* font);
 
-	HyperlinkAnchor*
+	const HyperlinkAnchor*
 	findHyperlinkByX (int x) const;
 
-	HyperlinkAnchor*
+	const HyperlinkAnchor*
 	findHyperlinkByOffset (size_t offset) const
 	{
-		HyperlinkAnchor* anchor = m_hyperlinkArray.find (offset);
+		const HyperlinkAnchor* anchor = m_hyperlinkArray.find (offset);
 		return anchor && !anchor->m_hyperlink.isEmpty () ? anchor : NULL;
 	}
 };

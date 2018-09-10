@@ -23,7 +23,7 @@ namespace sl {
 
 template <
 	typename T,
-	typename Delete_0 = typename mem::StdDelete <T>
+	typename Delete0 = typename mem::StdDelete <T>
 	>
 class AutoPtrArray: public Array <T*>
 {
@@ -31,7 +31,7 @@ class AutoPtrArray: public Array <T*>
 
 public:
 	typedef Array <T*> BaseType;
-	typedef Delete_0 Delete;
+	typedef Delete0 Delete;
 
 public:
 	AutoPtrArray ():

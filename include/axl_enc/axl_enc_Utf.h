@@ -571,15 +571,15 @@ public:
 //..............................................................................
 
 template <
-	typename DstEncoding_0,
-	typename SrcEncoding_0,
+	typename DstEncoding0,
+	typename SrcEncoding0,
 	typename CaseOp = sl::NoOp <utf32_t>
 	>
 class UtfConvert
 {
 public:
-	typedef DstEncoding_0 DstEncoding;
-	typedef SrcEncoding_0 SrcEncoding;
+	typedef DstEncoding0 DstEncoding;
+	typedef SrcEncoding0 SrcEncoding;
 	typedef typename DstEncoding::C DstUnit;
 	typedef typename SrcEncoding::C SrcUnit;
 
@@ -710,13 +710,13 @@ public:
 //..............................................................................
 
 template <
-	typename SrcEncoding_0,
+	typename SrcEncoding0,
 	typename CaseOp = sl::NoOp <utf32_t>
 	>
 class UtfToAsciiConvert
 {
 public:
-	typedef SrcEncoding_0 SrcEncoding;
+	typedef SrcEncoding0 SrcEncoding;
 	typedef typename SrcEncoding::C SrcUnit;
 
 public:
@@ -790,13 +790,13 @@ public:
 //..............................................................................
 
 template <
-	typename DstEncoding_0,
+	typename DstEncoding0,
 	typename CaseOp = sl::NoOp <utf32_t>
 	>
 class AsciiToUtfConvert
 {
 public:
-	typedef DstEncoding_0 DstEncoding;
+	typedef DstEncoding0 DstEncoding;
 	typedef typename DstEncoding::C DstUnit;
 
 public:

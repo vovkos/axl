@@ -152,10 +152,10 @@ HyperText::appendHyperText (
 	return m_text.getLength ();
 }
 
-HyperlinkAnchor*
+const HyperlinkAnchor*
 HyperText::findHyperlinkByX (int x) const
 {
-	HyperlinkAnchor* result = NULL;
+	const HyperlinkAnchor* result = NULL;
 
 	size_t begin = 0;
 	size_t end = m_hyperlinkXMap.getCount ();
@@ -204,10 +204,10 @@ HyperText::calcHyperlinkXMap (Font* baseFont)
 	m_hyperlinkXMap.setCount (hyperlinkCount);
 	hyperlinkXMapEntry = m_hyperlinkXMap;
 
-	sl::Iterator <HyperlinkAnchor> it = m_hyperlinkArray.getHead ();
+	sl::ConstIterator <HyperlinkAnchor> it = m_hyperlinkArray.getHead ();
 	for (; it; it++)
 	{
-		HyperlinkAnchor* hyperlinkAnchor = *it;
+		const HyperlinkAnchor* hyperlinkAnchor = *it;
 		Size size;
 
 		for (; attrAnchor < attrEnd && attrAnchor->m_offset < hyperlinkAnchor->m_offset; attrAnchor++)

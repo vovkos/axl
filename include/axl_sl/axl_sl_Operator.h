@@ -104,6 +104,46 @@ public:
 	}
 };
 
+template <
+	typename A,
+	typename B
+	>
+class ImplicitPtrCast
+{
+public:
+	B*
+	operator () (A* x) const
+	{
+		return x;
+	}
+
+	const B*
+	operator () (const A* x) const
+	{
+		return x;
+	}
+};
+
+template <
+	typename A,
+	typename B
+	>
+class ExplicitPtrCast
+{
+public:
+	B*
+	operator () (A* x) const
+	{
+		return (B*) x;
+	}
+
+	const B*
+	operator () (const A* x) const
+	{
+		return (const B*) x;
+	}
+};
+
 //..............................................................................
 
 // sizeof & offsetof operators

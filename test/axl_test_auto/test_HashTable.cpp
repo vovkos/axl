@@ -33,7 +33,7 @@ void test_IntHashTable ()
 
 	it = map.getHead ();
 	for (; it; it++)
-		printf ("%d = %d\n", it->m_key, it->m_value);
+		printf ("%d = %d\n", it->getKey (), it->m_value);
 
 	printf (".........\n");
 
@@ -79,7 +79,7 @@ void test_StringHashTableIgnoreCase ()
 
 	sl::StringHashTableIgnoreCase_pcu <int> map_pcu;
 	sl::StringHashTableIgnoreCase_pcp <int> map_pcp;
-	
+
 	sl::StringHashTableIterator <int> it;
 	for (size_t i = 0; i < countof (stringTable); i++)
 	{

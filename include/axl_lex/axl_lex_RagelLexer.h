@@ -60,7 +60,7 @@ public:
 		if (list.isEmpty ())
 			return sl::String ();
 
-		sl::BoxIterator <RagelToken> token = list.getHead ();
+		sl::ConstBoxIterator <RagelToken> token = list.getHead ();
 		sl::String string (token->m_pos.m_p, token->m_pos.m_length);
 		for (token++; token; token++)
 		{

@@ -124,10 +124,10 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 
 	size_t maxSwitchLength = 0;
 
-	Iterator <SwitchInfo> it = switchInfoList.getHead ();
+	ConstIterator <SwitchInfo> it = switchInfoList.getHead ();
 	for (; it; it++)
 	{
-		SwitchInfo* switchInfo = *it;
+		const SwitchInfo* switchInfo = *it;
 		if (!switchInfo->m_switchKind) // group
 			continue;
 
@@ -175,7 +175,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 	it = switchInfoList.getHead ();
 	for (; it; it++)
 	{
-		SwitchInfo* switchInfo = *it;
+		const SwitchInfo* switchInfo = *it;
 		if (!switchInfo->m_switchKind) // group
 		{
 			if (!string.isEmpty ())

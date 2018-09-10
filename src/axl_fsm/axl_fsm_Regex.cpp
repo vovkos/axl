@@ -126,10 +126,10 @@ Regex::print () const
 	printf ("NFA\n");
 	printf ("==================\n");
 
-	sl::Iterator <NfaState> nfaIt = m_nfaStateList.getHead ();
+	sl::ConstIterator <NfaState> nfaIt = m_nfaStateList.getHead ();
 	for (; nfaIt; nfaIt++)
 	{
-		NfaState* nfaState = *nfaIt;
+		const NfaState* nfaState = *nfaIt;
 		printf (
 			"%c %02d ",
 			(nfaState->m_flags & NfaStateFlag_Accept) ? '*' : ' ',
@@ -162,10 +162,10 @@ Regex::print () const
 	printf ("\nDFA\n");
 	printf ("==================\n");
 
-	sl::Iterator <DfaState> dfaIt = m_dfaStateList.getHead ();
+	sl::ConstIterator <DfaState> dfaIt = m_dfaStateList.getHead ();
 	for (; dfaIt; dfaIt++)
 	{
-		DfaState* dfaState = *dfaIt;
+		const DfaState* dfaState = *dfaIt;
 		printf (
 			"%c %02d = { ",
 			(dfaState->m_isAccept) ? '*' : ' ',
@@ -212,10 +212,10 @@ Regex::print () const
 		printf ("\n");
 
 
-		sl::Iterator <DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead ();
+		sl::ConstIterator <DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead ();
 		for (; dfaTransitionIt; dfaTransitionIt++)
 		{
-			DfaTransition* transition = *dfaTransitionIt;
+			const DfaTransition* transition = *dfaTransitionIt;
 			printf ("    %s -> %02d\n", getMatchConditionString (&transition->m_matchCondition).sz (), transition->m_outState->m_id);
 		}
 	}
@@ -401,10 +401,10 @@ RegexCompiler::makeDfa ()
 		nfaTransitionMgr.finalize ();
 
 		sl::ConstList <NfaTransition> nfaTransitionList = nfaTransitionMgr.getTransitionList ();
-		sl::Iterator <NfaTransition> nfaTransitionIt = nfaTransitionList.getHead ();
+		sl::ConstIterator <NfaTransition> nfaTransitionIt = nfaTransitionList.getHead ();
 		for (; nfaTransitionIt; nfaTransitionIt++)
 		{
-			NfaTransition* nfaTransition = *nfaTransitionIt;
+			const NfaTransition* nfaTransition = *nfaTransitionIt;
 
 			DfaState* dfaState2 = AXL_MEM_NEW (DfaState);
 

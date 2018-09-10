@@ -11,74 +11,33 @@
 
 #pragma once
 
-#define _AXL_SL_MAPENTRY_H
+#define _AXL_MEM_TRACKERBLOCK_H
 
 #include "axl_sl_Iterator.h"
 
 namespace axl {
-namespace sl {
+namespace mem {
 
 //..............................................................................
 
-template <
-	typename Key,
-	typename Value
-	>
-struct MapEntry: ListLink
+struct TrackerBlockHdr: sl::ListLink
 {
-protected:
-	Key m_key;
-
-public:
-	Value m_value;
-
-public:
-	const Key&
-	getKey () const
-	{
-		return m_key;
-	}
+	size_t m_size;
+	size_t m_seqNum;
+	const char* m_tag;
+	const char* m_filePath;
+	size_t m_line;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <
-	typename Key,
-	typename Value
-	>
-class MapIterator: public Iterator <MapEntry <Key, Value> >
-{
-public:
-	MapIterator ()
-	{
-	}
+void
+addTrackerBlock (TrackerBlockHdr* hdr);
 
-	template <typename T>
-	MapIterator (const Iterator <T>& src)
-	{
-		this->m_p = src.getEntry ();
-	}
-};
-
-template <
-	typename Key,
-	typename Value
-	>
-class ConstMapIterator: public ConstIterator <MapEntry <Key, Value> >
-{
-public:
-	ConstMapIterator ()
-	{
-	}
-
-	template <typename T>
-	ConstMapIterator (const ConstIterator <T>& src)
-	{
-		this->m_p = src.getEntry ();
-	}
-};
+void
+removeTrackerBlock (TrackerBlockHdr* hdr);
 
 //..............................................................................
 
-} // namespace sl
+} // namespace mem
 } // namespace axl

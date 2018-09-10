@@ -327,11 +327,11 @@ protected:
 
 //..............................................................................
 
-#define AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE(Class, SwitchKind_0) \
+#define AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE(Class, SwitchKind0) \
 class Class \
 { \
 public: \
-	typedef SwitchKind_0 SwitchKind; \
+	typedef SwitchKind0 SwitchKind; \
 	typedef axl::sl::SwitchInfo SwitchInfo; \
 	typedef axl::sl::SimpleHashTable <char, SwitchInfo*> CharMap; \
 	typedef axl::sl::StringHashTable <SwitchInfo*> StringMap; \

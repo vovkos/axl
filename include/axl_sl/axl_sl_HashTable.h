@@ -29,8 +29,19 @@ template <
 	typename Key,
 	typename Value
 	>
-struct HashTableEntry: public MapEntry <Key, Value>
+struct HashTableEntry: MapEntry <Key, Value>
 {
+	template <
+		typename Key,
+		typename Value,
+		typename Hash,
+		typename Eq,
+		typename KeyArg,
+		typename ValueArg
+		>
+	friend class HashTable;
+
+protected:
 	class BucketLink
 	{
 	public:
@@ -43,6 +54,7 @@ struct HashTableEntry: public MapEntry <Key, Value>
 
 	typedef AuxList <HashTableEntry, BucketLink> Bucket;
 
+protected:
 	ListLink m_bucketLink;
 	Bucket* m_bucket;
 };
@@ -61,6 +73,23 @@ public:
 	}
 
 	HashTableIterator (const Iterator <HashTableEntry <Key, Value> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+template <
+	typename Key,
+	typename Value
+	>
+class ConstHashTableIterator: public ConstIterator <HashTableEntry <Key, Value> >
+{
+public:
+	ConstHashTableIterator ()
+	{
+	}
+
+	ConstHashTableIterator (const ConstIterator <HashTableEntry <Key, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
@@ -87,6 +116,7 @@ public:
 
 	typedef HashTableEntry <Key, Value> Entry;
 	typedef sl::Iterator <Entry> Iterator;
+	typedef sl::ConstIterator <Entry> ConstIterator;
 	typedef typename Entry::Bucket Bucket;
 
 protected:
@@ -127,12 +157,24 @@ public:
 	}
 
 	Iterator
+	getHead ()
+	{
+		return m_list.getHead ();
+	}
+
+	ConstIterator
 	getHead () const
 	{
 		return m_list.getHead ();
 	}
 
 	Iterator
+	getTail ()
+	{
+		return m_list.getHead ();
+	}
+
+	ConstIterator
 	getTail () const
 	{
 		return m_list.getHead ();
@@ -190,14 +232,14 @@ public:
 	}
 
 	Iterator
-	find (KeyArg key) const
+	find (KeyArg key)
 	{
 		size_t bucketCount = m_table.getCount ();
 		if (!bucketCount)
 			return NULL;
 
 		size_t hash = m_hash (key);
-		const Bucket* bucket = &m_table [hash % bucketCount];
+		Bucket* bucket = &m_table [hash % bucketCount];
 
 		typename Bucket::Iterator it = bucket->getHead ();
 		for (; it; it++)
@@ -210,13 +252,19 @@ public:
 		return NULL;
 	}
 
+	ConstIterator
+	find (KeyArg key) const
+	{
+		return ((HashTable*) this)->find (key); // a simple const-cast
+	}
+
 	Value
 	findValue (
 		KeyArg key,
 		ValueArg undefinedValue
 		) const
 	{
-		Iterator it = this->find (key);
+		ConstIterator it = this->find (key);
 		return it ? it->m_value : undefinedValue;
 	}
 

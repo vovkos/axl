@@ -13,7 +13,7 @@
 
 #define _AXL_MEM_ALLOCATOR_H
 
-#include "axl_mem_Tracker.h"
+#include "axl_mem_TrackerBlock.h"
 
 #if (defined _AXL_MEM_ALLOCATE_IMPL && defined _AXL_MEM_FREE_IMPL)
 
@@ -113,9 +113,9 @@ public:
 		int line
 		)
 	{
-		size_t allocSize = size + sizeof (Tracker::BlockHdr);
+		size_t allocSize = size + sizeof (TrackerBlockHdr);
 
-		Tracker::BlockHdr* hdr = (Tracker::BlockHdr*) BaseAllocator::allocate (allocSize);
+		TrackerBlockHdr* hdr = (TrackerBlockHdr*) BaseAllocator::allocate (allocSize);
 		if (!hdr)
 			return NULL;
 
@@ -124,7 +124,7 @@ public:
 		hdr->m_filePath = filePath;
 		hdr->m_line = line;
 
-		getTracker ()->add (hdr);
+		addTrackerBlock (hdr);
 
 		return hdr + 1;
 	}
@@ -133,8 +133,8 @@ public:
 	void
 	free (void* p)
 	{
-		Tracker::BlockHdr* hdr = (Tracker::BlockHdr*) p - 1;
-		getTracker ()->remove (hdr);
+		TrackerBlockHdr* hdr = (TrackerBlockHdr*) p - 1;
+		removeTrackerBlock (hdr);
 		BaseAllocator::free (hdr);
 	}
 };

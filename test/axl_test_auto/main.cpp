@@ -87,7 +87,7 @@ main (
 		total = getTestCaseSet ()->getCount ();
 		sl::StringHashTableIterator <TestFunc*> it = getTestCaseSet ()->getHead ();
 		for (size_t i = 0; it; it++, i++)
-			passed += runTest (i, total, it->m_key, it->m_value);
+			passed += runTest (i, total, it->getKey (), it->m_value);
 	}
 	else
 	{
@@ -99,7 +99,7 @@ main (
 			name = argv [i];
 			sl::StringHashTableIterator <TestFunc*> it = getTestCaseSet ()->find (name);
 			if (it)
-				passed += runTest (i, total, it->m_key, it->m_value);
+				passed += runTest (i, total, it->getKey (), it->m_value);
 			else
 				printf ("TEST NOT FOUND: %s\n", name.sz ());
 		}

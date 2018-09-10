@@ -29,10 +29,12 @@ template <
 	>
 struct BinTreeNodeBase: MapEntry <Key, Value>
 {
+protected:
 	T* m_parent;
 	T* m_left;
 	T* m_right;
 
+protected:
 	// overridable
 
 	static
@@ -71,6 +73,7 @@ class BinTreeBase
 {
 public:
 	typedef sl::Iterator <Node> Iterator;
+	typedef sl::ConstIterator <Node> ConstIterator;
 
 protected:
 	StdList <Node> m_nodeList;
@@ -90,6 +93,12 @@ public:
 		return visit (key)->m_value;
 	}
 
+	const Value&
+	operator [] (KeyArg key) const
+	{
+		return visit (key)->m_value;
+	}
+
 	bool
 	isEmpty () const
 	{
@@ -103,19 +112,31 @@ public:
 	}
 
 	Iterator
+	getHead ()
+	{
+		return m_nodeList.getHead ();
+	}
+
+	ConstIterator
 	getHead () const
 	{
 		return m_nodeList.getHead ();
 	}
 
 	Iterator
+	getTail ()
+	{
+		return m_nodeList.getTail ();
+	}
+
+	ConstIterator
 	getTail () const
 	{
 		return m_nodeList.getTail ();
 	}
 
 	Iterator
-	find (KeyArg key) const
+	find (KeyArg key)
 	{
 		Node* node = m_root;
 
@@ -131,11 +152,17 @@ public:
 		return NULL;
 	}
 
+	ConstIterator
+	find (KeyArg key) const
+	{
+		return ((BinTreeBase*) this)->find (key); // a simple const-cast
+	}
+
 	Iterator
 	find (
 		KeyArg key,
 		BinTreeFindRelOp relOp
-		) const
+		)
 	{
 		Node* node = m_root;
 		Node* prevNode;
@@ -177,13 +204,22 @@ public:
 		}
 	}
 
+	ConstIterator
+	find (
+		KeyArg key,
+		BinTreeFindRelOp relOp
+		) const
+	{
+		return ((BinTreeBase*) this)->find (key, relOp); // a simple const-cast
+	}
+
 	Value
 	findValue (
 		KeyArg key,
 		ValueArg undefinedValue
 		) const
 	{
-		Iterator it = find (key);
+		ConstIterator it = find (key);
 		return it ? it->m_value : undefinedValue;
 	}
 
@@ -194,7 +230,7 @@ public:
 		ValueArg undefinedValue
 		) const
 	{
-		Iterator it = find (key, relOp);
+		ConstIterator it = find (key, relOp);
 		return it ? it->m_value : undefinedValue;
 	}
 

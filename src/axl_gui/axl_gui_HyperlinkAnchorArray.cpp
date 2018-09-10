@@ -17,10 +17,10 @@ namespace gui {
 
 //..............................................................................
 
-HyperlinkAnchor*
+const HyperlinkAnchor*
 HyperlinkAnchorArray::find (size_t offset) const
 {
-	HyperlinkAnchor* result = NULL;
+	const HyperlinkAnchor* result = NULL;
 
 	size_t begin = 0;
 	size_t end = m_array.getCount ();

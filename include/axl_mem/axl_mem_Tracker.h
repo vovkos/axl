@@ -13,8 +13,9 @@
 
 #define _AXL_MEM_TRACKER_H
 
+#include "axl_mem_TrackerBlock.h"
+#include "axl_sl_List.h"
 #include "axl_sys_Lock.h"
-#include "axl_sl_ListBase.h"
 
 namespace axl {
 namespace mem {
@@ -23,19 +24,9 @@ namespace mem {
 
 class Tracker
 {
-public:
-	struct BlockHdr: sl::ListLink
-	{
-		size_t m_size;
-		size_t m_seqNum;
-		const char* m_tag;
-		const char* m_filePath;
-		size_t m_line;
-	};
-
 protected:
 	sys::Lock m_lock;
-	sl::AuxList <BlockHdr> m_blockList;
+	sl::AuxList <TrackerBlockHdr> m_blockList;
 
 	size_t m_peakBlockCount;
 	size_t m_totalBlockCount;
@@ -47,19 +38,14 @@ public:
 	Tracker ();
 
 	void
-	add (BlockHdr* hdr);
+	add (TrackerBlockHdr* hdr);
 
 	void
-	remove (BlockHdr* hdr);
+	remove (TrackerBlockHdr* hdr);
 
 	void
 	trace ();
 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-Tracker*
-getTracker ();
 
 //..............................................................................
 

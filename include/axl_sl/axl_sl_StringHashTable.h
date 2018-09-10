@@ -249,6 +249,20 @@ public:
 };
 
 template <typename Value>
+class ConstStringHashTableIterator: public ConstIterator <HashTableEntry <String, Value> >
+{
+public:
+	ConstStringHashTableIterator ()
+	{
+	}
+
+	ConstStringHashTableIterator (const ConstIterator <HashTableEntry <String, Value> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+template <typename Value>
 class StringHashTableIterator_w: public Iterator <HashTableEntry <String_w, Value> >
 {
 public:
@@ -257,6 +271,20 @@ public:
 	}
 
 	StringHashTableIterator_w (const Iterator <HashTableEntry <String_w, Value> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+template <typename Value>
+class ConstStringHashTableIterator_w: public ConstIterator <HashTableEntry <String_w, Value> >
+{
+public:
+	ConstStringHashTableIterator_w ()
+	{
+	}
+
+	ConstStringHashTableIterator_w (const ConstIterator <HashTableEntry <String_w, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
@@ -277,6 +305,20 @@ public:
 };
 
 template <typename Value>
+class ConstStringHashTableIterator_utf8: public ConstIterator <HashTableEntry <String_utf8, Value> >
+{
+public:
+	ConstStringHashTableIterator_utf8 ()
+	{
+	}
+
+	ConstStringHashTableIterator_utf8 (const ConstIterator <HashTableEntry <String_utf8, Value> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+template <typename Value>
 class StringHashTableIterator_utf16: public Iterator <HashTableEntry <String_utf16, Value> >
 {
 public:
@@ -291,6 +333,20 @@ public:
 };
 
 template <typename Value>
+class ConstStringHashTableIterator_utf16: public ConstIterator <HashTableEntry <String_utf16, Value> >
+{
+public:
+	ConstStringHashTableIterator_utf16 ()
+	{
+	}
+
+	ConstStringHashTableIterator_utf16 (const ConstIterator <HashTableEntry <String_utf16, Value> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+template <typename Value>
 class StringHashTableIterator_utf32: public Iterator <HashTableEntry <String_utf32, Value> >
 {
 public:
@@ -299,6 +355,20 @@ public:
 	}
 
 	StringHashTableIterator_utf32 (const Iterator <HashTableEntry <String_utf32, Value> >& src)
+	{
+		this->m_p = src.getEntry ();
+	}
+};
+
+template <typename Value>
+class ConstStringHashTableIterator_utf32: public ConstIterator <HashTableEntry <String_utf32, Value> >
+{
+public:
+	ConstStringHashTableIterator_utf32 ()
+	{
+	}
+
+	ConstStringHashTableIterator_utf32 (const ConstIterator <HashTableEntry <String_utf32, Value> >& src)
 	{
 		this->m_p = src.getEntry ();
 	}
