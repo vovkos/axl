@@ -41,8 +41,8 @@ class RbTreeNode: public BinTreeNodeBase <
 	template <
 		typename T,
 		typename Node,
-		typename Key,
-		typename Value,
+		typename Key2,
+		typename Value2,
 		typename Cmp,
 		typename KeyArg,
 		typename ValueArg
@@ -50,8 +50,8 @@ class RbTreeNode: public BinTreeNodeBase <
 	friend class BinTreeBase;
 
 	template <
-		typename Key,
-		typename Value,
+		typename Key2,
+		typename Value2,
 		typename Cmp,
 		typename KeyArg,
 		typename ValueArg

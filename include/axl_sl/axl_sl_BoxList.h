@@ -327,7 +327,13 @@ public:
 	}
 
 	template <typename Delete>
-	ConstBoxList (const List <BoxListEntry <T>, typename GetLink, Delete>& list)
+	ConstBoxList (
+		const List <
+			BoxListEntry <T>,
+			typename ConstBoxList::GetLink,
+			Delete
+			>& list
+		)
 	{
 		this->m_listData = list.getListData ();
 	}

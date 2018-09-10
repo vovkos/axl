@@ -32,8 +32,8 @@ template <
 struct HashTableEntry: MapEntry <Key, Value>
 {
 	template <
-		typename Key,
-		typename Value,
+		typename Key2,
+		typename Value2,
 		typename Hash,
 		typename Eq,
 		typename KeyArg,
