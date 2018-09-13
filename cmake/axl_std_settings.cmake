@@ -302,6 +302,7 @@ axl_create_gcc_settings)
 		GCC_FLAG_SANITIZE
 		DESCRIPTION "Compile with a specific sanitizer instrumentation"
 		"-fsanitize=address" "-fsanitize=memory" "-fsanitize=thread"
+		"-fsanitize=fuzzer" "-fsanitize=fuzzer,address" "-fsanitize=fuzzer,memory"
 		)
 
 	axl_create_compiler_flag_setting (
