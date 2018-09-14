@@ -65,6 +65,12 @@ public:
 		return (MappedFile*) ((char*) this - m_parentOffset);
 	}
 
+	bool
+	isEmpty ()
+	{
+		return m_viewList.isEmpty ();
+	}
+
 	void*
 	find (
 		uint64_t begin,
@@ -105,6 +111,8 @@ public:
 	};
 
 protected:
+	File m_file;
+
 #if (_AXL_OS_WIN)
 	win::Mapping m_mapping;
 	uint64_t m_mappingSize;
@@ -116,9 +124,6 @@ protected:
 	size_t m_readAheadSize;
 	size_t m_maxDynamicViewCount;
 	uint_t m_fileFlags;
-
-public:
-	File m_file;
 
 public:
 	MappedFile ();
@@ -134,17 +139,26 @@ public:
 		return m_file.isOpen ();
 	}
 
+	uint_t
+	getFlags () const
+	{
+		return m_fileFlags;
+	}
+
+	const File*
+	getFile () const
+	{
+		return &m_file;
+	}
+
 	uint64_t
 	getSize () const
 	{
 		return m_file.getSize ();
 	}
 
-	uint_t
-	getFlags () const
-	{
-		return m_fileFlags;
-	}
+	bool
+	setSize (uint64_t size); // can only be called when no views are mapped
 
 	void
 	close ();
@@ -154,6 +168,22 @@ public:
 		const sl::StringRef& fileName,
 		uint_t flags = 0 // FileFlag
 		);
+
+	bool
+	duplicate (
+		File::Handle fileHandle,
+		uint_t flags = 0 // FileFlag
+		);
+
+	bool
+	duplicate (
+		const File* file,
+		uint_t flags = 0 // FileFlag
+		)
+	{
+		ASSERT (file->isOpen ());
+		return duplicate (file->getHandle (), flags);
+	}
 
 	void
 	attach (

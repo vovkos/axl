@@ -3709,7 +3709,7 @@ testIoPerformance ()
 	result =
 		result &&
 		mappedFileDst.open (fileNameDst_m) &&
-		mappedFileDst.m_file.setSize (0);
+		mappedFileDst.setSize (0);
 #endif
 
 	if (!result)

@@ -190,13 +190,29 @@ MappedFile::open (
 	uint_t flags
 	)
 {
-	io::File file;
+	close ();
 
-	bool result = file.open (fileName, flags);
+	bool result = m_file.open (fileName, flags);
 	if (!result)
 		return false;
 
-	attach (file.m_file.detach (), flags);
+	m_fileFlags = flags;
+	return true;
+}
+
+bool
+MappedFile::duplicate (
+	File::Handle fileHandle,
+	uint_t flags
+	)
+{
+	close ();
+
+	bool result = m_file.duplicate (fileHandle);
+	if (!result)
+		return false;
+
+	m_fileFlags = flags;
 	return true;
 }
 
@@ -222,6 +238,19 @@ MappedFile::detach ()
 	m_fileFlags = 0;
 
 	return m_file.m_file.detach ();
+}
+
+bool
+MappedFile::setSize (uint64_t size)
+{
+	if (!m_permanentViewMgr.isEmpty () ||
+		!m_dynamicViewMgr.isEmpty ())
+	{
+		err::setError (err::SystemErrorCode_InvalidDeviceState);
+		return false;
+	}
+
+	return m_file.setSize (size);
 }
 
 bool
