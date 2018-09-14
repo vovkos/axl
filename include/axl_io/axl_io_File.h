@@ -87,6 +87,30 @@ public:
 		uint_t flags = 0
 		);
 
+	bool
+	duplicate (Handle h)
+	{
+#if (_AXL_OS_WIN)
+		return m_file.duplicate (
+			::GetCurrentProcess (),
+			h,
+			::GetCurrentProcess (),
+			0,
+			false,
+			DUPLICATE_SAME_ACCESS
+			);
+#else
+		return m_file.duplicate (fileHandle);
+#endif
+	}
+
+	bool
+	duplicate (const File* file)
+	{
+		ASSERT (file->isOpen ());
+		return duplicate (file->m_file);
+	}
+
 	uint64_t
 	getSize () const
 	{
