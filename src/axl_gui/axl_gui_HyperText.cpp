@@ -49,6 +49,13 @@ HyperText::backspace (size_t backLength)
 size_t
 HyperText::appendPlainText (const sl::StringRef& text)
 {
+	size_t i = text.reverseFind ('\x15'); // Ctrl+U -- clear
+	if (i != -1)
+	{
+		clear ();
+		return appendPlainText (text.getSubString (i + 1));
+	}
+
 	m_source.append (text);
 	return m_text.append (text);
 }
@@ -59,6 +66,12 @@ HyperText::appendChar (
 	size_t count
 	)
 {
+	if (c == 0x15) // Ctrl+U -- clear
+	{
+		clear ();
+		return 0;
+	}
+
 	m_source.append (c, count);
 	return m_text.append (c, count);
 }
@@ -69,6 +82,13 @@ HyperText::appendHyperText (
 	const sl::StringRef& text
 	)
 {
+	size_t i = text.reverseFind ('\x15'); // Ctrl+U -- clear
+	if (i != -1)
+	{
+		clear ();
+		return appendHyperText (baseAttr, text.getSubString (i + 1));
+	}
+
 	TextAttr attr = baseAttr;
 	AnsiAttrParser attrParser;
 
