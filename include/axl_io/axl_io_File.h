@@ -100,7 +100,7 @@ public:
 			DUPLICATE_SAME_ACCESS
 			);
 #else
-		return m_file.duplicate (fileHandle);
+		return m_file.duplicate (h);
 #endif
 	}
 
