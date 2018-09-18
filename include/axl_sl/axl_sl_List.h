@@ -462,7 +462,7 @@ template <
 	typename T,
 	typename GetLink = ImplicitPtrCast <T, ListLink>
 	>
-class CppList: public List <T, GetLink, mem::CppDelete <T>>
+class CppList: public List <T, GetLink, mem::CppDelete <T> >
 {
 };
 
@@ -472,7 +472,7 @@ template <
 	typename T,
 	typename GetLink = ImplicitPtrCast <T, ListLink>
 	>
-class AuxList: public List <T, GetLink, sl::Void <T*>>
+class AuxList: public List <T, GetLink, sl::Void <T*> >
 {
 public:
 	void
