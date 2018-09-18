@@ -3923,15 +3923,15 @@ foo (const T* p)
 	printf ("foo - 2\n");
 }
 
+struct Point: sl::ListLink
+{
+	int m_x;
+	int m_y;
+};
+
 void
 testConstList ()
 {
-	struct Point: sl::ListLink
-	{
-		int m_x;
-		int m_y;
-	};
-
 	sl::List <Point> list;
 
 	Point* point = AXL_MEM_NEW (Point);
