@@ -3939,6 +3939,11 @@ testConstList ()
 	point->m_y = 20;
 	list.insertTail (point);
 
+	point = AXL_MEM_NEW (Point);
+	point->m_x = 30;
+	point->m_y = 40;
+	list.insertTail (point);
+
 	sl::Iterator <Point> it = list.getHead ();
 	sl::ConstIterator <Point> it2 = it;
 	it2 = it;
@@ -3982,6 +3987,10 @@ main (
 	WSADATA wsaData;
 	WSAStartup (0x0202, &wsaData);
 #endif
+
+	printf ("current dir: %s\n", io::getCurrentDir ().sz ());
+	sl::String s = io::getDir ("suka/grr.h");
+	io::ensureDirExists (s);
 
 	testConstList ();
 

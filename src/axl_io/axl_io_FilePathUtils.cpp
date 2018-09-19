@@ -156,7 +156,7 @@ ensureDirExists (const sl::StringRef& fileName)
 	if (fileName_w.isEmpty () || isDir (fileName_w))
 		return true;
 
-	const wchar_t* p = fileName_w;
+	wchar_t* p = fileName_w.getBuffer ();
 	if (p [1] == ':')
 		p += 2;
 
@@ -165,7 +165,7 @@ ensureDirExists (const sl::StringRef& fileName)
 
 	while (*p)
 	{
-		const wchar_t* p2 = p + 1;
+		wchar_t* p2 = p + 1;
 		while (*p2 && *p2 != '\\' && *p2 != '/')
 			p2++;
 
@@ -179,7 +179,7 @@ ensureDirExists (const sl::StringRef& fileName)
 				return err::failWithLastSystemError ();
 		}
 
-		*(wchar_t*) p2 = c; // restore
+		*p2 = c; // restore
 
 		p = p2 + 1;
 		while (*p == '\\' || *p == '/') // skip separators
@@ -203,23 +203,22 @@ isDir (const sl::StringRef& fileName)
 bool
 ensureDirExists (const sl::StringRef& fileName0)
 {
-	sl::String fileName = fileName0;
-
-	if (isDir (fileName))
+	if (fileName0.isEmpty() || isDir (fileName0))
 		return true;
 
-	const char* p = fileName.p (); // ensure exclusive buffer (we're going to modify it)
+	sl::String fileName = fileName0;
+
+	char* p = fileName.getBuffer (); // ensure exclusive buffer (we're going to modify it)
 	while (*p == '/') // skip root
 		p++;
 
 	while (*p)
 	{
-		const char* p2 = p + 1;
+		char* p2 = p + 1;
 		while (*p2 && *p2 != '/')
 			p2++;
 
-		char c = *p2; // save
-		*(char*) p2 = 0;
+		*p2 = 0;
 
 		if (!isDir (fileName))
 		{
@@ -228,7 +227,7 @@ ensureDirExists (const sl::StringRef& fileName0)
 				return err::failWithLastSystemError ();
 		}
 
-		*(char*) p2 = c; // restore
+		*p2 = '/'; // restore
 
 		p = p2 + 1;
 		while (*p == '/') // skip separators
@@ -274,8 +273,7 @@ getFullFilePath (const sl::StringRef& fileName)
 
 #elif (_AXL_OS_POSIX)
 	char fullPath [PATH_MAX] = { 0 };
-	::realpath (fileName.sz (), fullPath);
-	return fullPath;
+	return ::realpath (fileName.sz (), fullPath);
 #endif
 }
 
@@ -303,9 +301,8 @@ getDir (const sl::StringRef& filePath)
 	return string;
 
 #elif (_AXL_OS_POSIX)
-	const char* p0 = filePath.sz ();
-	const char* p = strrchr (p0, '/');
-	return p ? sl::String (p0, p - p0) : sl::String ();
+	size_t i = filePath.reverseFind ('/');
+	return i != -1 ? filePath.getLeftSubString (i + 1) : NULL;
 #endif
 }
 
@@ -332,8 +329,8 @@ getFileName (const sl::StringRef& filePath)
 	string.append (extension);
 	return string;
 #elif (_AXL_OS_POSIX)
-	const char* p = strrchr (filePath.sz (), '/');
-	return p ? sl::String (p + 1) : filePath;
+	size_t i = filePath.reverseFind ('/');
+	return i != -1 ? filePath.getSubString (i + 1) : filePath;
 #endif
 }
 
