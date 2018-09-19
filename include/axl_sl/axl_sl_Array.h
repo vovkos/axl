@@ -868,6 +868,15 @@ public:
 	}
 
 	size_t
+	ensureCountZeroConstruct (size_t count)
+	{
+		if (this->m_count < count)
+			setCountZeroConstruct (count);
+
+		return this->m_count;
+	}
+
+	size_t
 	setBuffer (
 		ref::BufKind kind,
 		void* p,

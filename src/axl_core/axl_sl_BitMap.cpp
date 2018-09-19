@@ -346,9 +346,9 @@ BitMap::mergeResize (
 	)
 {
 	size_t pageCount2 = bitMap2.m_map.getCount ();
-	size_t pageCount = m_map.ensureCount (pageCount2);
+	size_t pageCount = m_map.ensureCountZeroConstruct (pageCount2);
 
-	return sl::mergeBitMaps (m_map, bitMap2.m_map, pageCount, op);
+	return sl::mergeBitMaps (m_map, bitMap2.m_map, AXL_MIN (pageCount, pageCount2), op);
 }
 
 //..............................................................................
