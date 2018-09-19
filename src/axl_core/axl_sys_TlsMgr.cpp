@@ -116,7 +116,7 @@ TlsMgr::setSlotValue (
 		if (!value)
 			return TlsValue ();
 
-		page->m_array.setCount (slot + 1);
+		page->m_array.setCountZeroConstruct (slot + 1);
 	}
 
 	sl::BoxListEntry <TlsValue>* entry = page->m_array [slot];

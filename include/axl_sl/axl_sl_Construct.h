@@ -143,5 +143,43 @@ public:
 
 //..............................................................................
 
+template <typename T>
+class InitializedPtr
+{
+protected:
+	T* m_p;
+
+public:
+	InitializedPtr ()
+	{
+		m_p = NULL;
+	}
+
+	InitializedPtr (T* p)
+	{
+		m_p = p;
+	}
+
+	operator T* () const
+	{
+		return m_p;
+	}
+
+	T*
+	operator -> () const
+	{
+		return m_p;
+	}
+
+	InitializedPtr&
+	operator = (T* p)
+	{
+		m_p = p;
+		return *this;
+	}
+};
+
+//..............................................................................
+
 } // namespace sl
 } // namespace axl

@@ -90,7 +90,7 @@ class BitMapN
 public:
 	enum
 	{
-		pageCount = bitCount / AXL_PTR_BITS
+		pageCount = bitCount / AXL_PTR_BITS + bitCount % AXL_PTR_BITS ? 1 : 0
 	};
 
 protected:

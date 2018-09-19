@@ -292,7 +292,7 @@ public:
 				return it;
 		}
 
-		Entry* entry = AXL_MEM_NEW (Entry);
+		Entry* entry = AXL_MEM_ZERO_NEW (Entry);
 		entry->m_key = key;
 		entry->m_bucket = bucket;
 		m_list.insertTail (entry);

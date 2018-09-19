@@ -121,6 +121,35 @@ public:
 		IsSimple = false,
 	};
 
+	class Construct
+	{
+	public:
+		void
+		operator () (
+			T* p,
+			size_t count
+			) const
+		{
+			T* end = p + count;
+			for (; p < end; p++)
+				new (p) T;
+		}
+	};
+
+	class ZeroConstruct
+	{
+	public:
+		void
+		operator () (
+			T* p,
+			size_t count
+			) const
+		{
+			memset (p, 0, count * sizeof (T));
+			construct (p, count);
+		}
+	};
+
 public:
 	static
 	void
@@ -134,28 +163,12 @@ public:
 
 	static
 	void
-	construct (
-		T* p,
-		size_t count
-		)
-	{
-		memset (p, 0, count * sizeof (T)); // zero memory before construction
-
-		T* end = p + count;
-		for (; p < end; p++)
-			new (p) T;
-	}
-
-	static
-	void
 	constructCopy (
 		T* dst,
 		const T* src,
 		size_t count
 		)
 	{
-		memset (dst, 0, count * sizeof (T)); // zero memory before construction
-
 		T* end = dst + count;
 		for (; dst < end; dst++, src++)
 			new (dst) T (*src);
@@ -202,26 +215,6 @@ public:
 			}
 		}
 	}
-
-	static
-	void
-	clear (
-		T* p,
-		size_t count
-		)
-	{
-		T* begin = p;
-		T* end = p + count;
-
-		for (; p < end; p++)
-			p->~T ();
-
-		p = begin;
-		memset (p, 0, count * sizeof (T));
-
-		for (; p < end; p++)
-			new (p) T;
-	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -239,6 +232,31 @@ public:
 		IsSimple = true,
 	};
 
+	class Construct
+	{
+	public:
+		void
+		operator () (
+			T* p,
+			size_t count
+			) const
+		{
+		}
+	};
+
+	class ZeroConstruct
+	{
+	public:
+		void
+		operator () (
+			T* p,
+			size_t count
+			) const
+		{
+			memset (p, 0, count * sizeof (T));
+		}
+	};
+
 public:
 	static
 	void
@@ -247,16 +265,6 @@ public:
 		size_t count
 		)
 	{
-	}
-
-	static
-	void
-	construct (
-		T* p,
-		size_t count
-		)
-	{
-		memset (p, 0, count * sizeof (T));
 	}
 
 	static
@@ -288,16 +296,6 @@ public:
 		)
 	{
 		memmove (dst, src, count * sizeof (T));
-	}
-
-	static
-	void
-	clear (
-		T* p,
-		size_t count
-		)
-	{
-		memset (p, 0, count * sizeof (T));
 	}
 };
 

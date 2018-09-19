@@ -621,11 +621,7 @@ public:
 		)
 	{
 		T* dst = insertSpace (index, count);
-		if (!dst)
-			return -1;
-
-		Details::clear (dst, count);
-		return this->m_count;
+		return dst ? this->m_count : -1;
 	}
 
 	size_t
@@ -645,8 +641,6 @@ public:
 
 		if (p)
 			Details::copy (dst, p, count);
-		else
-			Details::clear (dst, count);
 
 		return this->m_count;
 	}
@@ -668,8 +662,6 @@ public:
 
 		if (p)
 			Details::copyReverse (dst, p, count);
-		else
-			Details::clear (dst, count);
 
 		return this->m_count;
 	}
@@ -738,7 +730,9 @@ public:
 		if (index >= oldCount)
 			return this->m_count;
 
-		if (index + count >= oldCount)
+		if (count == -1)
+			count = oldCount - index;
+		else if (index + count >= oldCount)
 			return setCount (index);
 
 		bool result = ensureExclusive ();
@@ -855,74 +849,13 @@ public:
 	bool
 	setCount (size_t count)
 	{
-		size_t size = count * sizeof (T);
+		return setCountImpl <typename Details::Construct> (count);
+	}
 
-		if (this->m_hdr &&
-			this->m_hdr->getRefCount () == 1)
-		{
-			if (this->m_count == count)
-				return true;
-
-			if (this->m_hdr->m_bufferSize >= size)
-			{
-				if (count > this->m_count)
-					Details::construct (this->m_p + this->m_count, count - this->m_count);
-				else
-					Details::destruct (this->m_p + count, this->m_count - count);
-
-				Details::setHdrCount (this->m_hdr, count);
-				this->m_count = count;
-				return true;
-			}
-		}
-
-		if (count == 0)
-		{
-			this->release ();
-			return true;
-		}
-
-		if (!this->m_count)
-		{
-			bool result = reserve (count);
-			if (!result)
-				return false;
-
-			Details::construct (this->m_p, count);
-			Details::setHdrCount (this->m_hdr, count);
-			this->m_count = count;
-			return true;
-		}
-
-		ASSERT (this->m_hdr);
-
-		size_t bufferSize = getAllocSize (size);
-
-		ref::Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
-		if (!hdr)
-			return false;
-
-		hdr->m_bufferSize = bufferSize;
-		Details::setHdrCount (hdr, count);
-
-		T* p = (T*) (hdr + 1);
-
-		if (count <= this->m_count)
-		{
-			Details::constructCopy (p, this->m_p, count);
-		}
-		else
-		{
-			Details::constructCopy (p, this->m_p, this->m_count);
-			Details::construct (p + this->m_count, count - this->m_count);
-		}
-
-		this->m_hdr->release ();
-
-		this->m_p = p;
-		this->m_hdr = hdr.detach ();
-		this->m_count = count;
-		return true;
+	bool
+	setCountZeroConstruct (size_t count)
+	{
+		return setCountImpl <typename Details::ZeroConstruct> (count);
 	}
 
 	size_t
@@ -981,6 +914,80 @@ protected:
 			Details::copy (dst + count, dst, oldCount - index);
 
 		return dst;
+	}
+
+	template <typename Construct>
+	bool
+	setCountImpl (size_t count)
+	{
+		size_t size = count * sizeof (T);
+
+		if (this->m_hdr &&
+			this->m_hdr->getRefCount () == 1)
+		{
+			if (this->m_count == count)
+				return true;
+
+			if (this->m_hdr->m_bufferSize >= size)
+			{
+				if (count > this->m_count)
+					Construct () (this->m_p + this->m_count, count - this->m_count);
+				else
+					Details::destruct (this->m_p + count, this->m_count - count);
+
+				Details::setHdrCount (this->m_hdr, count);
+				this->m_count = count;
+				return true;
+			}
+		}
+
+		if (count == 0)
+		{
+			this->release ();
+			return true;
+		}
+
+		if (!this->m_count)
+		{
+			bool result = reserve (count);
+			if (!result)
+				return false;
+
+			Construct () (this->m_p, count);
+			Details::setHdrCount (this->m_hdr, count);
+			this->m_count = count;
+			return true;
+		}
+
+		ASSERT (this->m_hdr);
+
+		size_t bufferSize = getAllocSize (size);
+
+		ref::Ptr <Hdr> hdr = AXL_REF_NEW_EXTRA (Hdr, bufferSize);
+		if (!hdr)
+			return false;
+
+		hdr->m_bufferSize = bufferSize;
+		Details::setHdrCount (hdr, count);
+
+		T* p = (T*) (hdr + 1);
+
+		if (count <= this->m_count)
+		{
+			Details::constructCopy (p, this->m_p, count);
+		}
+		else
+		{
+			Details::constructCopy (p, this->m_p, this->m_count);
+			Construct () (p + this->m_count, count - this->m_count);
+		}
+
+		this->m_hdr->release ();
+
+		this->m_p = p;
+		this->m_hdr = hdr.detach ();
+		this->m_count = count;
+		return true;
 	}
 };
 

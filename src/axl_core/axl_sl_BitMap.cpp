@@ -304,7 +304,7 @@ BitMap::setBitCount (size_t bitCount)
 	if (bitCount & (AXL_PTR_BITS - 1))
 		pageCount++;
 
-	return m_map.setCount (pageCount);
+	return m_map.setCountZeroConstruct (pageCount);
 }
 
 void
