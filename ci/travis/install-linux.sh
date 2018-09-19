@@ -53,7 +53,7 @@ fi
 
 if [ "$BUILD_DOC" != "" ]; then
 	sudo apt-get install -y doxygen
-	sudo pip install sphinx sphinx_rtd_theme
+	sudo pip install sphinx==1.7.9 sphinx_rtd_theme
 
 	git clone --depth 1 http://github.com/vovkos/doxyrest
 fi
