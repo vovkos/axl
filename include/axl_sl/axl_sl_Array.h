@@ -445,6 +445,30 @@ public:
 		setCount (0);
 	}
 
+	void
+	zeroConstruct (
+		size_t index,
+		size_t count
+		)
+	{
+		if (index >= this->m_count)
+			return;
+
+		if (count == -1 || index + count > this->m_count)
+			count = this->m_count - index;
+
+		T* p = m_p + index;
+		Details::destruct (dst, count);
+		Details::ZeroConstruct () (dst, count);
+	}
+
+	void
+	zeroConstruct ()
+	{
+		Details::destruct (m_p, this->m_count);
+		Details::ZeroConstruct () (m_p, this->m_count);
+	}
+
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
 	copy (ArrayRef&& src)
@@ -570,6 +594,12 @@ public:
 	}
 
 	size_t
+	appendZeroConstruct (size_t count)
+	{
+		return insertZeroConstruct (-1, count);
+	}
+
+	size_t
 	append (
 		const T* p,
 		size_t count
@@ -622,6 +652,21 @@ public:
 	{
 		T* dst = insertSpace (index, count);
 		return dst ? this->m_count : -1;
+	}
+
+	size_t
+	insertZeroConstruct (
+		size_t index,
+		size_t count
+		)
+	{
+		T* dst = insertSpace (index, count);
+		if (!dst)
+			return -1;
+
+		Details::destruct (dst, count);
+		Details::ZeroConstruct () (dst, count);
+		return this->m_count;
 	}
 
 	size_t
