@@ -146,7 +146,7 @@ public:
 			) const
 		{
 			memset (p, 0, count * sizeof (T));
-			construct (p, count);
+			Construct () (p, count);
 		}
 	};
 
