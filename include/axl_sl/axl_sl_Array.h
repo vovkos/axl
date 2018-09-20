@@ -664,8 +664,10 @@ public:
 		if (!dst)
 			return -1;
 
+		typedef typename Details::ZeroConstruct ZeroConstruct;
+
 		Details::destruct (dst, count);
-		Details::ZeroConstruct () (dst, count);
+		ZeroConstruct () (dst, count);
 		return this->m_count;
 	}
 
