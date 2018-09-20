@@ -457,16 +457,16 @@ public:
 		if (count == -1 || index + count > this->m_count)
 			count = this->m_count - index;
 
-		T* p = m_p + index;
-		Details::destruct (dst, count);
-		Details::ZeroConstruct () (dst, count);
+		T* p = this->m_p + index;
+		Details::destruct (p, count);
+		Details::ZeroConstruct () (p, count);
 	}
 
 	void
 	zeroConstruct ()
 	{
-		Details::destruct (m_p, this->m_count);
-		Details::ZeroConstruct () (m_p, this->m_count);
+		Details::destruct (this->m_p, this->m_count);
+		Details::ZeroConstruct () (this->m_p, this->m_count);
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
