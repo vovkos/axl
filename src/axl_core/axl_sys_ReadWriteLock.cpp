@@ -35,7 +35,7 @@ ReadWriteLock::create ()
 {
 	close ();
 
-	m_data = AXL_MEM_NEW (Data);
+	m_data = AXL_MEM_ZERO_NEW (Data);
 	m_readEvent.create ();
 	m_writeEvent.create ();
 
