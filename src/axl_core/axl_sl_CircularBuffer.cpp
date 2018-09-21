@@ -28,9 +28,9 @@ bool
 CircularBuffer::isValid () const
 {
 	if (m_buffer.isEmpty ()) // uninitialized
-		return 
+		return
 			m_buffer == NULL &&
-			m_reader == NULL && 
+			m_reader == NULL &&
 			m_writer == NULL &&
 			m_dataSize == 0;
 
@@ -67,7 +67,11 @@ CircularBuffer::setBufferSize (size_t size)
 
 	write (data, dataSize);
 
-	ASSERT (isValid () && m_dataSize == dataSize);
+	ASSERT (
+		isValid () &&
+		(size >= dataSize && m_dataSize == dataSize || m_dataSize == size)
+		);
+
 	return true;
 }
 
@@ -188,7 +192,7 @@ CircularBuffer::drop (size_t size)
 	else
 	{
 		m_reader += size;
-		
+
 		if (m_reader >= m_buffer.getEnd ())
 		{
 			m_reader = m_buffer + (m_reader - m_buffer.getEnd ());
