@@ -3960,6 +3960,22 @@ testConstList ()
 //	it->m_y = 20;
 }
 
+void
+testBitIdx ()
+{
+	for (size_t i = 0; i < 1024 * 1024 * 1024; i++)
+	{
+		size_t size = sl::getAllocSize (i);
+		ASSERT (size >= i);
+
+		size_t x = sl::getPowerOf2Ge (i);
+		ASSERT (x >= i);
+
+		size_t y = sl::getPowerOf2Le (i);
+		ASSERT (y <= i);
+	}
+}
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -3988,11 +4004,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	printf ("current dir: %s\n", io::getCurrentDir ().sz ());
-	sl::String s = io::getDir ("suka/grr.h");
-	io::ensureDirExists (s);
-
-	testConstList ();
+//	testBitIdx ();
 
 	return 0;
 }

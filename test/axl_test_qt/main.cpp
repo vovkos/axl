@@ -485,7 +485,7 @@ void benchFormat ()
 	for (size_t i = 0; i < BitIterationCount; i++)
 	for (size_t j = 0; j < BitIterationCount; j++)
 	{
-		counter += sl::getHiBit (j);
+		counter += sl::getPowerOf2Ge (j);
 	}
 
 	time = sys::getTimestamp () - baseTimestamp;

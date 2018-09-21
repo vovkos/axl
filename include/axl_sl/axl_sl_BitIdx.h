@@ -20,11 +20,11 @@ namespace sl {
 
 //..............................................................................
 
-// finding lowest/highest bit (branch-free; source: Hacker's Delight)
+// finding closest power-of-2, branch-free -- from Hacker's Delight
 
 inline
 uint8_t
-getLoBit8 (uint8_t x)
+getPowerOf2Le8 (uint8_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -34,7 +34,7 @@ getLoBit8 (uint8_t x)
 
 inline
 uint16_t
-getLoBit16 (uint16_t x)
+getPowerOf2Le16 (uint16_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -45,7 +45,7 @@ getLoBit16 (uint16_t x)
 
 inline
 uint32_t
-getLoBit32 (uint32_t x)
+getPowerOf2Le32 (uint32_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -57,7 +57,7 @@ getLoBit32 (uint32_t x)
 
 inline
 uint64_t
-getLoBit64 (uint64_t x)
+getPowerOf2Le64 (uint64_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -72,7 +72,7 @@ getLoBit64 (uint64_t x)
 
 inline
 uint8_t
-getHiBit8 (uint8_t x)
+getPowerOf2Ge8 (uint8_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -83,7 +83,7 @@ getHiBit8 (uint8_t x)
 
 inline
 uint16_t
-getHiBit16 (uint16_t x)
+getPowerOf2Ge16 (uint16_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -95,7 +95,7 @@ getHiBit16 (uint16_t x)
 
 inline
 uint32_t
-getHiBit32 (uint32_t x)
+getPowerOf2Ge32 (uint32_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -108,7 +108,7 @@ getHiBit32 (uint32_t x)
 
 inline
 uint64_t
-getHiBit64 (uint64_t x)
+getPowerOf2Ge64 (uint64_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -123,12 +123,15 @@ getHiBit64 (uint64_t x)
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (AXL_PTR_BITS == 64)
-#	define getLoBit getLoBit64
-#	define getHiBit getHiBit64
+#	define getPowerOf2Le getPowerOf2Le64
+#	define getPowerOf2Ge getPowerOf2Ge64
 #else
-#	define getLoBit getLoBit32
-#	define getHiBit getHiBit32
+#	define getPowerOf2Le getPowerOf2Le32
+#	define getPowerOf2Ge getPowerOf2Ge32
 #endif
+
+//..............................................................................
+
 
 //..............................................................................
 
@@ -409,7 +412,7 @@ template <
 size_t
 getAllocSize (size_t size)
 {
-	return size < growLimit ? getHiBit (size) : align <alignFactor> (size);
+	return size < growLimit ? getPowerOf2Ge (size) : align <alignFactor> (size);
 }
 
 inline
