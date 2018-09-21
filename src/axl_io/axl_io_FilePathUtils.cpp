@@ -273,7 +273,8 @@ getFullFilePath (const sl::StringRef& fileName)
 
 #elif (_AXL_OS_POSIX)
 	char fullPath [PATH_MAX] = { 0 };
-	return ::realpath (fileName.sz (), fullPath);
+	::realpath (fileName.sz (), fullPath);
+	return fullPath;
 #endif
 }
 
