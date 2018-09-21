@@ -267,7 +267,7 @@ struct WidgetScrollBar
 	bool
 	isMaxed () const
 	{
-		return m_pos + m_page + 1 >= m_end;
+		return m_pos + m_page >= m_end;
 	}
 
 	size_t
