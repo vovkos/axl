@@ -54,6 +54,9 @@ CircularBuffer::setBufferSize (size_t size)
 {
 	ASSERT (size);
 
+	if (m_buffer.getCount () == size)
+		return true;
+
 	char buffer [256];
 	sl::Array <char> data (ref::BufKind_Stack, buffer, sizeof (buffer));
 	size_t dataSize = readAll (&data);

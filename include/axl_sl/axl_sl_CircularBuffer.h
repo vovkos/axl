@@ -30,7 +30,7 @@ protected:
 
 public:
 	CircularBuffer ();
-	
+
 	bool
 	isValid () const;
 
@@ -47,7 +47,7 @@ public:
 		return m_dataSize == m_buffer.getCount ();
 	}
 
-	size_t 
+	size_t
 	getBufferSize () const
 	{
 		return m_buffer.getCount ();
@@ -56,7 +56,7 @@ public:
 	bool
 	setBufferSize (size_t size);
 
-	size_t 
+	size_t
 	getDataSize () const
 	{
 		return m_dataSize;
