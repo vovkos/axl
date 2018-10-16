@@ -1870,10 +1870,12 @@ public:
 		if (this->m_hdr)
 			this->m_hdr->release ();
 
+		p [length] = 0; // ensure zero termination
+
 		this->m_p = p;
 		this->m_hdr = hdr.detach ();
 		this->m_length = length;
-		this->m_isNullTerminated = true; // AXL_REF_NEW zeroes memory
+		this->m_isNullTerminated = true;
 		return p;
 	}
 

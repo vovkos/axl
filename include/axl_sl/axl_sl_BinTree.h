@@ -256,7 +256,7 @@ public:
 
 		// create and insert new node
 
-		node = AXL_MEM_NEW (Node);
+		node = AXL_MEM_ZERO_NEW (Node);
 		node->m_key = key;
 		node->m_parent = parent;
 		node->m_left = NULL;

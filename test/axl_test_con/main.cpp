@@ -3963,7 +3963,19 @@ testConstList ()
 void
 testBitIdx ()
 {
-	for (size_t i = 0; i < 1024 * 1024 * 1024; i++)
+	size_t size = sl::getAllocSize (0);
+	ASSERT (size == 0);
+
+	size_t x = sl::getPowerOf2Ge (0);
+	ASSERT (x == 0);
+
+	size_t y = sl::getHiBit (0);
+	ASSERT (y == 0);
+
+	size_t z = sl::getLoBit (0);
+	ASSERT (z == 0);
+
+	for (size_t i = 1; i < 128 * 1024 * 1024; i++)
 	{
 		size_t size = sl::getAllocSize (i);
 		ASSERT (size >= i);
@@ -3971,8 +3983,11 @@ testBitIdx ()
 		size_t x = sl::getPowerOf2Ge (i);
 		ASSERT (x >= i);
 
-		size_t y = sl::getPowerOf2Le (i);
-		ASSERT (y <= i);
+		size_t y = sl::getHiBit (i);
+		ASSERT ((i & y) && y <= i);
+
+		size_t z = sl::getLoBit (i);
+		ASSERT ((i & z) && z <= y);
 	}
 }
 
@@ -4004,7 +4019,7 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-//	testBitIdx ();
+	testBitIdx ();
 
 	return 0;
 }

@@ -67,6 +67,9 @@ public:
 		if (!p)
 			err::setOutOfMemoryError ();
 
+#if (_AXL_DEBUG && !_AXL_CPP_MSC) // MSVC debug CRT marks newly allocated blocks
+ 		memset (p, 0xcd, size);
+#endif
 		return p;
 	}
 
