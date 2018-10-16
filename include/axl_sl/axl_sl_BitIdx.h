@@ -20,11 +20,43 @@ namespace sl {
 
 //..............................................................................
 
-// finding closest power-of-2, branch-free -- from Hacker's Delight
+// finding the lowest set bit via two's complement
 
 inline
 uint8_t
-getPowerOf2Le8 (uint8_t x)
+geLoBit8 (uint8_t x)
+{
+   return x & -x;
+}
+
+inline
+uint16_t
+getLoBit16 (uint16_t x)
+{
+   return x & -x;
+}
+
+inline
+uint32_t
+getLoBit32 (uint32_t x)
+{
+   return x & -x;
+}
+
+inline
+uint64_t
+getLoBit64 (uint64_t x)
+{
+   return x & -x;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// finding the highest set bit, branch-free -- from Hacker's Delight
+
+inline
+uint8_t
+getHiBit8 (uint8_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -34,7 +66,7 @@ getPowerOf2Le8 (uint8_t x)
 
 inline
 uint16_t
-getPowerOf2Le16 (uint16_t x)
+getHiBit16 (uint16_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -45,7 +77,7 @@ getPowerOf2Le16 (uint16_t x)
 
 inline
 uint32_t
-getPowerOf2Le32 (uint32_t x)
+getHiBit32 (uint32_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -57,7 +89,7 @@ getPowerOf2Le32 (uint32_t x)
 
 inline
 uint64_t
-getPowerOf2Le64 (uint64_t x)
+getHiBit64 (uint64_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -69,6 +101,8 @@ getPowerOf2Le64 (uint64_t x)
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// finding closest power-of-2, branch-free -- from Hacker's Delight
 
 inline
 uint8_t
@@ -123,19 +157,18 @@ getPowerOf2Ge64 (uint64_t x)
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (AXL_PTR_BITS == 64)
-#	define getPowerOf2Le getPowerOf2Le64
+#	define getLoBit      getLoBit64
+#	define getHiBit      getHiBit64
 #	define getPowerOf2Ge getPowerOf2Ge64
 #else
-#	define getPowerOf2Le getPowerOf2Le32
+#	define getLoBitLe    getLoBit32
+#	define getHiBitLe    getHiBit32
 #	define getPowerOf2Ge getPowerOf2Ge32
 #endif
 
 //..............................................................................
 
-
-//..............................................................................
-
-// finding lowest/highest bit's index with binary search
+// finding lowest/highest bit's index with binary search (re-write with DeBruijn sequennces?)
 
 inline
 uint8_t
@@ -237,14 +270,14 @@ inline
 uint8_t
 getLoBitmask8 (size_t to)
 {
-	return to >= 8 ? (uint8_t) -1 : ((uint8_t) 1 << (uint8_t) to) - 1;
+	return ((uint8_t) 1 << (uint8_t) to) - 1;
 }
 
 inline
 uint8_t
 getHiBitmask8 (size_t from)
 {
-	return from >= 8 ? 0 : ~(((uint8_t) 1 << (uint8_t) from) - 1);
+	return ~(((uint8_t) 1 << (uint8_t) from) - 1);
 }
 
 inline
@@ -263,14 +296,14 @@ inline
 uint16_t
 getLoBitmask16 (size_t to)
 {
-	return to >= 16 ? (uint16_t) -1 : ((uint16_t) 1 << (uint16_t) to) - 1;
+	return ((uint16_t) 1 << (uint16_t) to) - 1;
 }
 
 inline
 uint16_t
 getHiBitmask16 (size_t from)
 {
-	return from >= 16 ? 0 : ~(((uint16_t) 1 << (uint16_t) from) - 1);
+	return ~(((uint16_t) 1 << (uint16_t) from) - 1);
 }
 
 inline
@@ -289,14 +322,14 @@ inline
 uint32_t
 getLoBitmask32 (size_t to)
 {
-	return to >= 32 ? (uint32_t) -1 : ((uint32_t) 1 << (uint32_t) to) - 1;
+	return ((uint32_t) 1 << (uint32_t) to) - 1;
 }
 
 inline
 uint32_t
 getHiBitmask32 (size_t from)
 {
-	return from >= 32 ? 0 : ~(((uint32_t) 1 << (uint32_t) from) - 1);
+	return ~(((uint32_t) 1 << (uint32_t) from) - 1);
 }
 
 inline
@@ -315,14 +348,14 @@ inline
 uint64_t
 getLoBitmask64 (size_t to)
 {
-	return to >= 64 ? (uint64_t) -1 : ((uint64_t) 1 << (uint64_t) to) - 1;
+	return ((uint64_t) 1 << (uint64_t) to) - 1;
 }
 
 inline
 uint64_t
 getHiBitmask64 (size_t from)
 {
-	return from >= 64 ? 0 : ~(((uint64_t) 1 << (uint64_t) from) - 1);
+	return ~(((uint64_t) 1 << (uint64_t) from) - 1);
 }
 
 inline
