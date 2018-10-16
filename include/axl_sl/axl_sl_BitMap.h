@@ -102,11 +102,6 @@ public:
 		clear ();
 	}
 
-	BitMapN (const BitMapN& src)
-	{
-		copy (src);
-	}
-
 	void
 	clear()
 	{
@@ -212,6 +207,18 @@ public:
 		create (bitCount);
 	}
 
+	BitMap (const BitMap& src)
+	{
+		copy (src);
+	}
+
+	BitMap&
+	operator = (const BitMap& src)
+	{
+		copy (src);
+		return *this;
+	}
+
 	bool
 	operator == (const BitMap& src) const
 	{
@@ -255,7 +262,10 @@ public:
 	}
 
 	void
-	copy (const BitMap& src);
+	copy (const BitMap& src)
+	{
+		m_map.copy (src.m_map, src.m_map.getCount ());
+	}
 
 	size_t
 	hash () const

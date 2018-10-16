@@ -98,7 +98,7 @@ public:
 		copy (sid);
 		return *this;
 	}
-	
+
 	bool
 	create (
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
@@ -199,7 +199,9 @@ public:
 	sl::String
 	lookupAccountSid (SID_NAME_USE* sidType = NULL)
 	{
-		return lookupAccountSid (NULL, m_p, sidType);
+		sl::String accountName;
+		lookupAccountSid (NULL, m_p, &accountName, sidType);
+		return accountName;
 	}
 
 	static

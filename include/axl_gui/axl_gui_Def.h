@@ -169,8 +169,8 @@ struct Point
 		if (m_x < 0)
 			m_x = 0;
 
-		if (m_x < 0)
-			m_x = 0;
+		if (m_y < 0)
+			m_y = 0;
 	}
 };
 

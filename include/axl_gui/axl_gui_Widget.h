@@ -209,6 +209,7 @@ struct WidgetQtMsg: WidgetMsg
 	WidgetQtMsg ():
 		WidgetMsg (WidgetMsgCode_Qt)
 	{
+		m_event = NULL;
 	}
 };
 

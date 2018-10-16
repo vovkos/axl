@@ -29,7 +29,6 @@ initNtDllFunctions ()
 	ntQueryDirectoryObject = (NtQueryDirectoryObjectFunc*) ::GetProcAddress (hNtDll, "NtQueryDirectoryObject");
 	ntOpenSymbolicLinkObject = (NtOpenSymbolicLinkObjectFunc*) ::GetProcAddress (hNtDll, "NtOpenSymbolicLinkObject");
 	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObjectFunc*) ::GetProcAddress (hNtDll, "NtQuerySymbolicLinkObject");
-	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObjectFunc*) ::GetProcAddress (hNtDll, "NtQuerySymbolicLinkObject");
 	ntQueryInformationFile = (NtQueryInformationFileFunc*) ::GetProcAddress (hNtDll, "NtQueryInformationFile");
 	ntQueryObject = (NtQueryObjectFunc*) ::GetProcAddress (hNtDll, "NtQueryObject");
 

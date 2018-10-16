@@ -307,14 +307,6 @@ BitMap::setBitCount (size_t bitCount)
 	return m_map.setCountZeroConstruct (pageCount);
 }
 
-void
-BitMap::copy (const BitMap& src)
-{
-	size_t count = src.m_map.getCount ();
-	m_map.setCount (count);
-	memcpy (m_map, src.m_map, count * sizeof (size_t));
-}
-
 int
 BitMap::cmp (const BitMap& src) const
 {

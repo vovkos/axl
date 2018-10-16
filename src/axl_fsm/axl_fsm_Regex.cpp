@@ -1101,7 +1101,7 @@ RegexCompiler::clone (
 
 		if (state->m_outState2)
 		{
-			mapIt = stateMap.find (state->m_outState);
+			mapIt = stateMap.find (state->m_outState2);
 			if (mapIt)
 				state->m_outState2 = mapIt->m_value;
 		}
