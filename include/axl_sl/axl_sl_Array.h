@@ -275,6 +275,8 @@ public:
 	typedef typename ArrayRef::Details Details;
 	typedef typename ArrayRef::Hdr Hdr;
 	typedef typename ArrayRef::ValueArg ValueArg;
+	typedef typename Details::Construct Construct;
+	typedef typename Details::ZeroConstruct ZeroConstruct;
 
 public:
 	Array ()
@@ -457,16 +459,16 @@ public:
 		if (count == -1 || index + count > this->m_count)
 			count = this->m_count - index;
 
-		T* p = m_p + index;
-		Details::destruct (dst, count);
-		Details::ZeroConstruct () (dst, count);
+		T* p = this->m_p + index;
+		Details::destruct (p, count);
+		ZeroConstruct () (p, count);
 	}
 
 	void
 	zeroConstruct ()
 	{
-		Details::destruct (m_p, this->m_count);
-		Details::ZeroConstruct () (m_p, this->m_count);
+		Details::destruct (this->m_p, this->m_count);
+		ZeroConstruct () (this->m_p, this->m_count);
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
@@ -665,7 +667,7 @@ public:
 			return -1;
 
 		Details::destruct (dst, count);
-		Details::ZeroConstruct () (dst, count);
+		ZeroConstruct () (dst, count);
 		return this->m_count;
 	}
 
@@ -894,13 +896,13 @@ public:
 	bool
 	setCount (size_t count)
 	{
-		return setCountImpl <typename Details::Construct> (count);
+		return setCountImpl <Construct> (count);
 	}
 
 	bool
 	setCountZeroConstruct (size_t count)
 	{
-		return setCountImpl <typename Details::ZeroConstruct> (count);
+		return setCountImpl <ZeroConstruct> (count);
 	}
 
 	size_t
