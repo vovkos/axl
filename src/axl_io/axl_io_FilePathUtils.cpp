@@ -179,6 +179,9 @@ ensureDirExists (const sl::StringRef& fileName)
 				return err::failWithLastSystemError ();
 		}
 
+		if (!c)
+			break;
+
 		*p2 = c; // restore
 
 		p = p2 + 1;
@@ -218,6 +221,7 @@ ensureDirExists (const sl::StringRef& fileName0)
 		while (*p2 && *p2 != '/')
 			p2++;
 
+		char c = *p2; // save
 		*p2 = 0;
 
 		if (!isDir (fileName))
@@ -227,7 +231,10 @@ ensureDirExists (const sl::StringRef& fileName0)
 				return err::failWithLastSystemError ();
 		}
 
-		*p2 = '/'; // restore
+		if (!c)
+			break;
+
+		*p2 = c; // restore
 
 		p = p2 + 1;
 		while (*p == '/') // skip separators
