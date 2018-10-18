@@ -177,11 +177,11 @@
 #	ifndef _CRT_SECURE_NO_WARNINGS
 #		define _CRT_SECURE_NO_WARNINGS 1 // useless warnings about "unsafe" string functions
 #	endif
-#
+
 #	ifndef _SCL_SECURE_NO_WARNINGS
 #		define _SCL_SECURE_NO_WARNINGS 1 // useless warnings about "unsafe" iterator operations
 #	endif
-#
+
 #	ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
 #		define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 #	endif
@@ -210,10 +210,10 @@
 #	ifndef _WIN32_WINNT
 #		define _WIN32_WINNT 0x0600 // Windows Vista
 #	endif
-#
+
 #	define WIN32_LEAN_AND_MEAN // prevent winsock.h vs winsock2.h conflict
 #	define NOMINMAX            // prevent min/max macro conflicts
-#
+
 #	include <windows.h>
 #	include <winsock2.h>
 #	include <oleauto.h>
@@ -240,7 +240,7 @@
 #	include <termios.h>
 #	include <libgen.h>
 #	include <dirent.h>
-#
+
 #	if (_AXL_OS_DARWIN)
 #		include <machine/endian.h>
 #		include <mach/mach_error.h>
@@ -331,7 +331,7 @@ typedef wchar_t           utf32_t;
 #	define _alloca     alloca
 #	define _strtoi64   strtoll
 #	define _strtoui64  strtoull
-#
+
 #	define MAKEWORD(a, b) ((word_t)(((byte_t)((a) & 0xff)) | ((word_t)((byte_t)((b) & 0xff))) << 8))
 #	define MAKELONG(a, b) ((int32_t)(((word_t)((a) & 0xffff)) | ((dword_t)((word_t)((b) & 0xffff))) << 16))
 #	define LOWORD(l)      ((word_t)((l) & 0xffff))
@@ -389,7 +389,7 @@ wcslen_s (const wchar_t* p)
 #	define AXL_STDCALL     __stdcall
 #	define AXL_SELECT_ANY  __declspec (selectany)
 #	define AXL_EXPORT      __declspec (dllexport)
-#
+
 #	define AXL_GCC_ALIGN(n)
 #	define AXL_GCC_MSC_STRUCT
 #	define AXL_GCC_NO_ASAN
@@ -403,10 +403,10 @@ wcslen_s (const wchar_t* p)
 #	endif
 #	define AXL_SELECT_ANY  __attribute__ ((weak))
 #	define AXL_EXPORT      __attribute__ ((visibility ("default")))
-#
+
 #	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
 #	define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
-#
+
 #	if (defined (__has_feature))
 #		if (__has_feature (address_sanitizer))
 #	 		define _AXL_GCC_ASAN 1
@@ -414,7 +414,7 @@ wcslen_s (const wchar_t* p)
 #	elif (defined (__SANITIZE_ADDRESS__))
 # 		define _AXL_GCC_ASAN 1
 #	endif
-#
+
 #	define AXL_GCC_NO_ASAN __attribute__((no_sanitize_address))
 #endif
 
