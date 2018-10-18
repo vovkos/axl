@@ -412,6 +412,22 @@ axl_create_gcc_settings)
 		DEFAULT "-Wno-narrowing"
 		"-Wnarrowing" "-Wno-narrowing"
 		)
+
+	# the cppcheck static analyzer (introduced in CMake 3.10)
+
+	if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.10)
+		if (NOT CPPCHECK_EXE)
+			find_program (CPPCHECK_EXE cppcheck)
+		endif ()
+
+		if (CPPCHECK_EXE)
+			option (
+				GCC_USE_CPPCHECK
+				"Use cppcheck for static analysis during build"
+				OFF
+				)
+		endif ()
+	endif ()
 endmacro ()
 
 macro (
@@ -433,6 +449,50 @@ axl_apply_gcc_settings)
 		set (_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
 		file (WRITE ${_VERSION_SCRIPT} "{ local: *; };")
 		set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_VERSION_SCRIPT}'")
+	endif ()
+
+	# cppcheck
+
+	if (NOT GCC_USE_CPPCHECK)
+		unset (CMAKE_C_CPPCHECK)
+		unset (CMAKE_CXX_CPPCHECK)
+	else ()
+		set (_EMPTY_C_FILE ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
+		set (_EMPTY_CPP_FILE ${CMAKE_CURRENT_BINARY_DIR}/empty.cpp)
+		set (_CPPCHECK_C_PREAMBLE_FILE ${CMAKE_CURRENT_BINARY_DIR}/preamble_c.h)
+		set (_CPPCHECK_CPP_PREAMBLE_FILE ${CMAKE_CURRENT_BINARY_DIR}/preamble_cpp.h)
+
+		if (NOT EXISTS ${_CPPCHECK_C_PREAMBLE_FILE})
+			axl_create_predefined_macro_file_gcc (
+				${CMAKE_C_COMPILER}
+				${_EMPTY_C_FILE}
+				${_CPPCHECK_C_PREAMBLE_FILE}
+				)
+		endif ()
+
+		if (NOT EXISTS ${_CPPCHECK_CPP_PREAMBLE_FILE})
+			axl_create_predefined_macro_file_gcc (
+				${CMAKE_CXX_COMPILER}
+				${_EMPTY_CPP_FILE}
+				${_CPPCHECK_CPP_PREAMBLE_FILE}
+				)
+		endif ()
+
+		set (
+			CMAKE_C_CPPCHECK
+			${CPPCHECK_EXE}
+			--quiet
+			--include=${_CPPCHECK_C_PREAMBLE_FILE}
+			-D_AXL_CPPCHECK=1
+			)
+
+		set (
+			CMAKE_CXX_CPPCHECK
+			${CPPCHECK_EXE}
+			--quiet
+			--include=${_CPPCHECK_CPP_PREAMBLE_FILE}
+			-D_AXL_CPPCHECK=1
+			)
 	endif ()
 endmacro ()
 

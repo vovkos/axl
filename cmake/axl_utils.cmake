@@ -691,6 +691,25 @@ axl_set_export_version_script_gcc
 		)
 endmacro ()
 
+macro (
+axl_create_predefined_macro_file_gcc
+	_COMPILER
+	_SOURCE_FILE
+	_OUTPUT_FILE
+	)
+
+	file (WRITE ${_SOURCE_FILE}) # create an empty file
+
+	execute_process (
+		COMMAND
+			${_COMPILER}
+			-E                 # pre-process only
+			-dM                # output as: #define <name>=<value>
+			-o ${_OUTPUT_FILE}
+			${_SOURCE_FILE}
+		)
+endmacro ()
+
 #...............................................................................
 
 # precompiled headers
