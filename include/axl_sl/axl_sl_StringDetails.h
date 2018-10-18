@@ -543,7 +543,8 @@ public:
 		return (C) towupper ((uint32_t) c);
 	}
 
-#if (_AXL_CPP_MSC)
+	// alas, _vscwprintf can't be emulated with vswprintf
+
 	static
 	size_t
 	calcFormatLength_va (
@@ -566,29 +567,6 @@ public:
 	{
 		ASSERT (false);
 	}
-#else
-	static
-	size_t
-	calcFormatLength_va (
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		return vswprintf (NULL, 0, formatString, va);
-	}
-
-	static
-	void
-	format_va (
-		C* buffer,
-		size_t bufferLength,
-		const C* formatString,
-		axl_va_list va
-		)
-	{
-		vswprintf (buffer, bufferLength, formatString, va);
-	}
-#endif
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
