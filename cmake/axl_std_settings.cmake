@@ -415,7 +415,7 @@ axl_create_gcc_settings)
 
 	# the cppcheck static analyzer (introduced in CMake 3.10)
 
-	if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.10)
+	if (NOT ${CMAKE_VERSION} VERSION_LESS 3.10)
 		if (NOT CPPCHECK_EXE)
 			find_program (CPPCHECK_EXE cppcheck)
 		endif ()
