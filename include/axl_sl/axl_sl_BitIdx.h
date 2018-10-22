@@ -161,8 +161,8 @@ getPowerOf2Ge64 (uint64_t x)
 #	define getHiBit      getHiBit64
 #	define getPowerOf2Ge getPowerOf2Ge64
 #else
-#	define getLoBitLe    getLoBit32
-#	define getHiBitLe    getHiBit32
+#	define getLoBit      getLoBit32
+#	define getHiBit      getHiBit32
 #	define getPowerOf2Ge getPowerOf2Ge32
 #endif
 
