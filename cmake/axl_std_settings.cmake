@@ -330,7 +330,7 @@ axl_create_gcc_settings)
 	# that is because GCC diagnostic pragmas get lost if defined in precompiled headers
 
 	axl_create_compiler_flag_setting (
-		GCC_FLAG_WARNING_UNKNOWN_WARNING_OPTIONS
+		GCC_FLAG_WARNING_UNKNOWN_WARNING_OPTION
 		DESCRIPTION "Warn about unknown warning command-line options"
 		DEFAULT "-Wno-unknown-warning-option"
 		"-Wunknown-warning-option" "-Wno-unknown-warning-option"
@@ -397,6 +397,24 @@ axl_create_gcc_settings)
 		"-Wno-stringop-overflow"
 		)
 
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_MISSING_BRACES
+		DESCRIPTION "Warn about missing braces in aggregate initializers"
+		"-Wmissing-braces" "-Wno-missing-braces"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_UNUSED_VARIABLE
+		DESCRIPTION "Warn about unused variables"
+		"-Wunused-variable" "-Wno-unused-variable"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_WARNING_UNUSED_VALUE
+		DESCRIPTION "Warn about unused expressions"
+		"-Wunused-value" "-Wno-unused-value"
+		)
+
 	# C++ specific warnings
 
 	axl_create_compiler_flag_setting (
@@ -411,6 +429,12 @@ axl_create_gcc_settings)
 		DESCRIPTION "Warn about narrowing conversions"
 		DEFAULT "-Wno-narrowing"
 		"-Wnarrowing" "-Wno-narrowing"
+		)
+
+	axl_create_compiler_flag_setting (
+		GCC_FLAG_CPP_DELETE_NON_VIRTUAL_DTOR
+		DESCRIPTION "Warn about calling non-virtual dtor of a class with virtual funtions"
+		"-Wdelete-non-virtual-dtor" "-Wno-delete-non-virtual-dtor"
 		)
 
 	# the cppcheck static analyzer (introduced in CMake 3.10)
