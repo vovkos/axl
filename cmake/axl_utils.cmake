@@ -161,7 +161,7 @@ endmacro ()
 
 #...............................................................................
 
-# detect host/target CPU (currently we only support x86 and amd64)
+# detect host/target CPU (we support x86 and amd64)
 
 macro (
 axl_normalize_cpu
@@ -175,6 +175,10 @@ axl_normalize_cpu
 		set (${_RESULT} "amd64")
 	elseif ("${_CPU_LC}" MATCHES "^(x86|i386)$")
 		set (${_RESULT} "x86")
+	elseif ("${_CPU_LC}" MATCHES "^(aarch64|arm64)$")
+		set (${_RESULT} "arm64")
+	elseif ("${_CPU_LC}" MATCHES "^(arm)$")
+		set (${_RESULT} "arm32")
 	else ()
 		set (${_RESULT} "${_CPU}") # can't normalize -- leave as is
 	endif ()
@@ -185,9 +189,11 @@ axl_detect_target_cpu
 	_CPU
 	)
 
+	# TODO: replace with try_run and CPU detection C pre-processor code
+
 	get_filename_component (_CXX_FILE_NAME ${CMAKE_CXX_COMPILER} NAME)
 
-	if ("${_CXX_FILE_NAME}" MATCHES "arm")
+	if ("${_CXX_FILE_NAME}${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
 		if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 			set (${_CPU} "arm64")
 		else ()
