@@ -45,10 +45,10 @@ struct Guid
 		struct
 		{
 			//! \unnamed{struct:4}
-			uint32_t m_long1;
-			uint32_t m_long2;
-			uint32_t m_long3;
-			uint32_t m_long4;
+			uint32_t m_dword1;
+			uint32_t m_dword2;
+			uint32_t m_dword3;
+			uint32_t m_dword4;
 		};
 
 #if (_AXL_OS_WIN)
@@ -81,13 +81,23 @@ struct Guid
 	}
 
 	bool
+	isNull () const
+	{
+		return
+			!m_dword1 &&
+			!m_dword2 &&
+			!m_dword3 &&
+			!m_dword4;
+	}
+
+	bool
 	isEqual (const Guid& guid) const
 	{
 		return
-			m_long1 == guid.m_long1 &&
-			m_long2 == guid.m_long2 &&
-			m_long3 == guid.m_long3 &&
-			m_long4 == guid.m_long4;
+			m_dword1 == guid.m_dword1 &&
+			m_dword2 == guid.m_dword2 &&
+			m_dword3 == guid.m_dword3 &&
+			m_dword4 == guid.m_dword4;
 	}
 
 	sl::String
