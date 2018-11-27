@@ -30,6 +30,9 @@ bool
 Guid::parse (const sl::StringRef& string)
 {
 	const char* p = string.sz ();
+	while (isspace (*p))
+		p++;
+
 	char* end;
 
 	char terminatorChar = 0;
@@ -37,6 +40,9 @@ Guid::parse (const sl::StringRef& string)
 	if (*p == '{')
 	{
 		p++;
+		while (isspace (*p))
+			p++;
+
 		terminatorChar = '}';
 	}
 
@@ -65,8 +71,18 @@ Guid::parse (const sl::StringRef& string)
 	p = end + 1;
 
 	uint64_t e = _strtoui64 (p, &end, 16);
-	if (end != p + 12 || *end != terminatorChar)
+	if (end != p + 12)
 		return err::fail (err::SystemErrorCode_InvalidParameter);
+
+	if (terminatorChar)
+	{
+		p = end;
+		while (isspace (*p))
+			p++;
+
+		if (*p != terminatorChar)
+			return err::fail (err::SystemErrorCode_InvalidParameter);
+	}
 
 	memset (this, 0, sizeof (Guid));
 	m_data1 = a;
@@ -84,7 +100,7 @@ Guid::parse (const sl::StringRef& string)
 }
 
 sl::String
-Guid::getGuidString (uint_t flags) const
+Guid::getString (uint_t flags) const
 {
 	static const char* formatTable [2] [2] =
 	{

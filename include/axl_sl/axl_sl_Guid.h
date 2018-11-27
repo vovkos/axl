@@ -101,7 +101,7 @@ struct Guid
 	}
 
 	sl::String
-	getGuidString (uint_t flags = 0) const;
+	getString (uint_t flags = 0) const;
 
 	void
 	setup (
