@@ -129,10 +129,10 @@ inline
 Module*
 getModule ()
 {
-	// guaranteed to be thread safe since C++11 
+	// guaranteed to be thread safe since C++11
 	// otherwise it's still OK -- unless going MT in static constructors
 
-	static Module module; 
+	static Module module;
 	return &module;
 }
 

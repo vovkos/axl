@@ -34,10 +34,10 @@ NtStatusProvider::getErrorDescription (long status)
 
 	if (rtlNtStatusToDosErrorFunc)
 		winError = rtlNtStatusToDosErrorFunc (status);
-	
+
 	if (winError != ERROR_MR_MID_NOT_FOUND && winError != status)
 		return WinErrorProvider::getErrorDescription (winError);
-	
+
 	wchar_t* message = NULL;
 
 	::FormatMessageW (

@@ -127,7 +127,7 @@ AnsiAttrParser::setInverse (bool isInversed)
 {
 	if (isInversed == (m_textColor == &m_targetAttr->m_backColor))
 		return;
-	
+
 	uint_t c = m_targetAttr->m_foreColor;
 	m_targetAttr->m_foreColor = m_targetAttr->m_backColor;
 	m_targetAttr->m_backColor = c;

@@ -382,7 +382,7 @@ CodePointDecoder::decode (
 	}
 
 	ASSERT (takenBufferLength == 1 && takenSize > m_accumulatorCount);
-	
+
 	takenSize -= m_accumulatorCount;
 	m_accumulatorCount = 0;
 
@@ -457,7 +457,7 @@ CodePointDecoder::decode (
 	}
 
 	ASSERT (takenBufferLength == 1 && takenSize > m_accumulatorCount);
-	
+
 	takenSize -= m_accumulatorCount;
 	m_accumulatorCount = 0;
 

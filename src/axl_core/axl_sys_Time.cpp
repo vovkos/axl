@@ -22,9 +22,9 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-typedef 
+typedef
 void
-WINAPI 
+WINAPI
 GetSystemTimePreciseAsFileTimeFunc (FILETIME* time);
 
 static GetSystemTimePreciseAsFileTimeFunc* systemTimePreciseAsFileTime = NULL;

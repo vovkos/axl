@@ -57,9 +57,9 @@ struct AesKey: AES_KEY
 	{
 		AES_cbc_encrypt (
 			(const uchar_t*) src,
-			(uchar_t*) dst, 
-			size, 
-			this, 
+			(uchar_t*) dst,
+			size,
+			this,
 			(uchar_t*) iv,
 			AES_ENCRYPT
 			);
@@ -74,9 +74,9 @@ struct AesKey: AES_KEY
 	{
 		AES_cbc_encrypt (
 			(const uchar_t*) src,
-			(uchar_t*) dst, 
-			size, 
-			this, 
+			(uchar_t*) dst,
+			size,
+			this,
 			(uchar_t*) iv,
 			AES_DECRYPT
 			);

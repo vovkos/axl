@@ -255,7 +255,7 @@ public:
 	size_t
 	wsaGetOverlappedResult (WSAOVERLAPPED* overlapped) const;
 
-protected:	
+protected:
 	template <typename T>
 	static
 	T

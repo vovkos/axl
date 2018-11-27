@@ -926,7 +926,7 @@ QtEngine::scheduleToolTipMsg (
 
 	m_toolTipTimer.stop ();
 	m_toolTipTimer.disconnect ();
-	
+
 	QObject::connect (
 		&m_toolTipTimer,
 		SIGNAL (timeout ()),

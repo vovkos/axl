@@ -34,9 +34,9 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class UsbContext: public sl::Handle <
-	libusb_context*, 
-	CloseUsbContext, 
-	sl::MinusOne <libusb_context*> 
+	libusb_context*,
+	CloseUsbContext,
+	sl::MinusOne <libusb_context*>
 	>
 {
 public:
