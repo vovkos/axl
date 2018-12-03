@@ -405,7 +405,12 @@ wcslen_s (const wchar_t* p)
 #	define AXL_EXPORT      __attribute__ ((visibility ("default")))
 
 #	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
-#	define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
+
+#	if (defined (__has_attribute) && __has_attribute (ms_struct))
+#		define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
+#   else
+#		define AXL_GCC_MSC_STRUCT
+#   endif
 
 #	if (defined (__has_feature))
 #		if (__has_feature (address_sanitizer))
