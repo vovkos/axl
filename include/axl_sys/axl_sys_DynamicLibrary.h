@@ -36,6 +36,12 @@ protected:
 
 public:
 	bool
+	isOpen () const
+	{
+		return m_library.isOpen ();
+	}
+
+	bool
 	open (const sl::StringRef& fileName)
 	{
 		char buffer [256];
@@ -74,6 +80,12 @@ protected:
 	psx::DynamicLibrary m_library;
 
 public:
+	bool
+	isOpen () const
+	{
+		return m_library.isOpen ();
+	}
+
 	bool
 	open (const sl::StringRef& fileName)
 	{
