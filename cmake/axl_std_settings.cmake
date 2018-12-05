@@ -432,7 +432,7 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_compiler_flag_setting (
-		GCC_FLAG_CPP_DELETE_NON_VIRTUAL_DTOR
+		GCC_FLAG_CPP_WARNING_DELETE_NON_VIRTUAL_DTOR
 		DESCRIPTION "Warn about calling non-virtual dtor of a class with virtual funtions"
 		"-Wdelete-non-virtual-dtor" "-Wno-delete-non-virtual-dtor"
 		)
