@@ -65,10 +65,13 @@ public:
 	{
 		void* p = ::malloc (size);
 		if (!p)
+		{
 			err::setOutOfMemoryError ();
+			return NULL;
+		}
 
-#if (_AXL_DEBUG && !_AXL_CPP_MSC) // MSVC debug CRT marks newly allocated blocks
- 		memset (p, 0xcd, size);
+#if (_AXL_DEBUG && !_AXL_CPP_MSC) // MSVC CRT debug heap already does this
+		memset (p, 0xcd, size);
 #endif
 		return p;
 	}
