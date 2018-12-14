@@ -406,13 +406,17 @@ wcslen_s (const wchar_t* p)
 
 #	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
 
-#	if (defined (__has_attribute) && __has_attribute (ms_struct))
-#		define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
+#	ifdef __has_attribute
+#		if (__has_attribute (ms_struct))
+#			define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
+#		else
+#			define AXL_GCC_MSC_STRUCT
+#		endif
 #   else
 #		define AXL_GCC_MSC_STRUCT
 #   endif
 
-#	if (defined (__has_feature))
+#	ifdef __has_feature
 #		if (__has_feature (address_sanitizer))
 #	 		define _AXL_GCC_ASAN 1
 #		endif
