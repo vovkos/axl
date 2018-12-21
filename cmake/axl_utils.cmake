@@ -775,6 +775,7 @@ endmacro ()
 macro (
 axl_set_pch_gcc
 	_TARGET
+	_PCH_H
 	_PCH_CPP
 	# ...
 	)
@@ -784,8 +785,8 @@ axl_set_pch_gcc
 	# select file paths: we need to generate a force-included header
 	# in binary directory and precompiled header binary *NEXT* to it
 
-	set (_PCH_H "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_CPP}.h")
-	set (_PCH_BIN "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_CPP}.h.gch")
+	set (_PCH_PROXY_H "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_CPP}.h")
+	set (_PCH_BIN "${_PCH_PROXY_H}.gch")
 
 	# choose compiler and language by extension
 
@@ -872,22 +873,25 @@ axl_set_pch_gcc
 
 	list (REMOVE_DUPLICATES _COMPILE_FLAGS)
 
-	# create pch source file and custom command to build pch binary
+	# create pch proxy header file and custom command to build pch binary
 
-	file (
-		WRITE ${_PCH_H}
-		"\#include \"${CMAKE_CURRENT_SOURCE_DIR}/${_PCH_CPP}\"\n"
-		)
+	if (NOT EXISTS ${_PCH_PROXY_H})
+		file (
+			WRITE ${_PCH_PROXY_H}
+			"\#include \"${CMAKE_CURRENT_SOURCE_DIR}/${_PCH_H}\"\n"
+			)
+	endif ()
 
 	add_custom_command (
 		OUTPUT ${_PCH_BIN}
-		MAIN_DEPENDENCY ${_PCH_CPP}
+		MAIN_DEPENDENCY ${_PCH_H}
+		DEPENDS ${_PCH_PROXY_H}
 		COMMAND
 			${_COMPILER}
 			${_COMPILE_FLAGS}
 			${_PCH_FLAGS}
 			"-o" ${_PCH_BIN}
-			"-c" ${_PCH_H}
+			"-c" ${_PCH_PROXY_H}
 		)
 
 	# modify target
@@ -902,7 +906,7 @@ axl_set_pch_gcc
 		TARGET ${_TARGET}
 		APPEND_STRING
 		PROPERTY COMPILE_FLAGS
-		" -include \"${_PCH_H}\""
+		" -include \"${_PCH_PROXY_H}\""
 		)
 
 	# add dependencies between target and pch binary
@@ -927,7 +931,7 @@ axl_set_pch
 		# Xcode adds a lot of compiler flags on its own, so it's hard to create
 		# a proper command line by hand
 
-		axl_set_pch_gcc (${_TARGET} ${_PCH_CPP} ${ARGN})
+		axl_set_pch_gcc (${_TARGET} ${_PCH_H} ${_PCH_CPP} ${ARGN})
 	endif ()
 endmacro ()
 
