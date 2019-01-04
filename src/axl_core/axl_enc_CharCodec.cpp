@@ -494,25 +494,17 @@ CodePointDecoder::decodeImpl (
 	ASSERT (takenSize_o);
 
 	size_t takenSize;
-	size_t expectedSize;
-
 	size_t takenBufferLength = m_charCodec->decodeToUtf32 (
 		buffer,
 		bufferLength,
 		p,
 		size,
-		&takenSize,
-		&expectedSize
+		&takenSize
 		);
 
-	if (expectedSize)
+	if (takenSize < size)
 	{
-		ASSERT (
-			takenSize < size &&
-			takenSize + expectedSize > size &&
-			size - takenSize < sizeof (m_accumulator)
-			);
-
+		ASSERT (size - takenSize < sizeof (m_accumulator));
 		m_accumulatorCount = size - takenSize;
 		memcpy (m_accumulator, (char*) p + takenSize, m_accumulatorCount);
 		takenSize += m_accumulatorCount;
@@ -535,7 +527,6 @@ CodePointDecoder::decodeImpl (
 	ASSERT (takenSize_o);
 
 	size_t takenSize;
-	size_t expectedSize;
 
 	size_t takenBufferLength = m_charCodec->decodeToUtf32 (
 		cplBuffer,
@@ -543,18 +534,12 @@ CodePointDecoder::decodeImpl (
 		bufferLength,
 		p,
 		size,
-		&takenSize,
-		&expectedSize
+		&takenSize
 		);
 
-	if (expectedSize)
+	if (takenSize < size)
 	{
-		ASSERT (
-			takenSize < size &&
-			takenSize + expectedSize > size &&
-			size - takenSize < sizeof (m_accumulator)
-			);
-
+		ASSERT (size - takenSize < sizeof (m_accumulator));
 		m_accumulatorCount = size - takenSize;
 		memcpy (m_accumulator, (char*) p + takenSize, m_accumulatorCount);
 		takenSize += m_accumulatorCount;

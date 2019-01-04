@@ -617,8 +617,7 @@ public:
 		size_t dstLength,
 		const SrcUnit* src,
 		size_t srcLength,
-		size_t* takenSrcLength_o = NULL,
-		size_t* expectedSrcLength_o = NULL
+		size_t* takenSrcLength_o = NULL
 		)
 	{
 		DstUnit* dst0 = dst;
@@ -626,16 +625,11 @@ public:
 		const SrcUnit* src0 = src;
 		const SrcUnit* srcEnd = src + srcLength;
 
-		size_t expectedSrcLength = 0;
-
 		while (src < srcEnd)
 		{
 			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*src);
 			if (src + srcCodePointLength > srcEnd)
-			{
-				expectedSrcLength = srcCodePointLength;
 				break;
-			}
 
 			utf32_t x = CaseOp () (SrcEncoding::decodeCodePoint (src));
 			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
@@ -651,9 +645,6 @@ public:
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
 
-		if (expectedSrcLength_o)
-			*expectedSrcLength_o = expectedSrcLength;
-
 		return dst - dst0;
 	}
 
@@ -665,8 +656,7 @@ public:
 		size_t dstLength,
 		const SrcUnit* src,
 		size_t srcLength,
-		size_t* takenSrcLength_o = NULL,
-		size_t* expectedSrcLength_o = NULL
+		size_t* takenSrcLength_o = NULL
 		)
 	{
 		DstUnit* dst0 = dst;
@@ -674,16 +664,11 @@ public:
 		const SrcUnit* src0 = src;
 		const SrcUnit* srcEnd = src + srcLength;
 
-		size_t expectedSrcLength = 0;
-
 		while (src < srcEnd)
 		{
 			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*src);
 			if (src + srcCodePointLength > srcEnd)
-			{
-				expectedSrcLength = srcCodePointLength;
 				break;
-			}
 
 			utf32_t x = CaseOp () (SrcEncoding::decodeCodePoint (src));
 			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength (x);
@@ -699,9 +684,6 @@ public:
 
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
-
-		if (expectedSrcLength_o)
-			*expectedSrcLength_o = expectedSrcLength;
 
 		return dst - dst0;
 	}
@@ -750,8 +732,7 @@ public:
 		size_t dstLength,
 		const SrcUnit* src,
 		size_t srcLength,
-		size_t* takenSrcLength_o = NULL,
-		size_t* expectedSrcLength_o = NULL
+		size_t* takenSrcLength_o = NULL
 		)
 	{
 		char* dst0 = dst;
@@ -759,16 +740,11 @@ public:
 		const SrcUnit* src0 = src;
 		const SrcUnit* srcEnd = src + srcLength;
 
-		size_t expectedSrcLength = 0;
-
 		while (src < srcEnd && dst < dstEnd)
 		{
 			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength (*src);
 			if (src + srcCodePointLength > srcEnd)
-			{
-				expectedSrcLength = srcCodePointLength;
 				break;
-			}
 
 			utf32_t x = CaseOp () (SrcEncoding::decodeCodePoint (src));
 			*dst = (char) x;
@@ -779,9 +755,6 @@ public:
 
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
-
-		if (expectedSrcLength_o)
-			*expectedSrcLength_o = expectedSrcLength;
 
 		return dst - dst0;
 	}
@@ -830,8 +803,7 @@ public:
 		size_t dstLength,
 		const char* src,
 		size_t srcLength,
-		size_t* takenSrcLength_o = NULL,
-		size_t* expectedSrcLength_o = NULL
+		size_t* takenSrcLength_o = NULL
 		)
 	{
 		DstUnit* dst0 = dst;
@@ -856,9 +828,6 @@ public:
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
 
-		if (expectedSrcLength_o)
-			*expectedSrcLength_o = 0;
-
 		return dst - dst0;
 	}
 
@@ -870,8 +839,7 @@ public:
 		size_t dstLength,
 		const char* src,
 		size_t srcLength,
-		size_t* takenSrcLength_o = NULL,
-		size_t* expectedSrcLength_o = NULL
+		size_t* takenSrcLength_o = NULL
 		)
 	{
 		DstUnit* dst0 = dst;
@@ -896,9 +864,6 @@ public:
 
 		if (takenSrcLength_o)
 			*takenSrcLength_o = src - src0;
-
-		if (expectedSrcLength_o)
-			*expectedSrcLength_o = 0;
 
 		return dst - dst0;
 	}

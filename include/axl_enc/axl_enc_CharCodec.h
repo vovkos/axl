@@ -211,8 +211,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		) = 0;
 
 	virtual
@@ -222,8 +221,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		) = 0;
 
 	virtual
@@ -233,8 +231,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		) = 0;
 
 	virtual
@@ -245,8 +242,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		) = 0;
 };
 
@@ -389,8 +385,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize,
-		size_t* expectedSize
+		size_t* takenSize
 		)
 	{
 		return AsciiToUtfConvert <Utf8>::convert (
@@ -398,8 +393,7 @@ public:
 			bufferLength,
 			(const char*) p,
 			size,
-			takenSize,
-			expectedSize
+			takenSize
 			);
 	}
 
@@ -410,8 +404,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		)
 	{
 		return AsciiToUtfConvert <Utf16>::convert (
@@ -419,8 +412,7 @@ public:
 			bufferLength,
 			(const char*) p,
 			size,
-			takenSize,
-			expectedSize
+			takenSize
 			);
 	}
 
@@ -431,8 +423,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		)
 	{
 		return AsciiToUtfConvert <Utf32>::convert (
@@ -440,8 +431,7 @@ public:
 			bufferLength,
 			(const char*) p,
 			size,
-			takenSize,
-			expectedSize
+			takenSize
 			);
 	}
 
@@ -453,8 +443,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		)
 	{
 		return AsciiToUtfConvert <Utf32>::convert (
@@ -463,8 +452,7 @@ public:
 			bufferLength,
 			(const char*) p,
 			size,
-			takenSize,
-			expectedSize
+			takenSize
 			);
 	}};
 
@@ -522,16 +510,13 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		size_t bufferLength = bufferSize / sizeof (C);
-		size_t takenDstLength = UtfConvert <T, Utf8>::convert (
+		return UtfConvert <T, Utf8>::convert (
 			(C*) buffer,
-			bufferLength,
+			bufferSize / sizeof (C),
 			p,
 			length,
 			takenLength
-			);
-
-		return takenDstLength * sizeof (C);
+			) * sizeof (C);
 	}
 
 	virtual
@@ -544,16 +529,13 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		size_t bufferLength = bufferSize / sizeof (C);
-		size_t takenDstLength = UtfConvert <T, Utf16>::convert (
+		return UtfConvert <T, Utf16>::convert (
 			(C*) buffer,
-			bufferLength,
+			bufferSize / sizeof (C),
 			p,
 			length,
 			takenLength
-			);
-
-		return takenDstLength * sizeof (C);
+			) * sizeof (C);
 	}
 
 	virtual
@@ -566,16 +548,13 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		size_t bufferLength = bufferSize / sizeof (C);
-		size_t takenDstLength = UtfConvert <T, Utf32>::convert (
+		return UtfConvert <T, Utf32>::convert (
 			(C*) buffer,
-			bufferLength,
+			bufferSize / sizeof (C),
 			p,
 			length,
 			takenLength
-			);
-
-		return takenDstLength * sizeof (C);
+			) * sizeof (C);
 	}
 
 	virtual
@@ -585,8 +564,10 @@ public:
 		size_t size
 		)
 	{
-		size_t length = size / sizeof (C);
-		return UtfConvert <Utf8, T>::calcRequiredLength ((const C*) p, length);
+		return UtfConvert <Utf8, T>::calcRequiredLength (
+			(const C*) p,
+			size / sizeof (C)
+			);
 	}
 
 	virtual
@@ -596,8 +577,10 @@ public:
 		size_t size
 		)
 	{
-		size_t length = size / sizeof (C);
-		return UtfConvert <Utf16, T>::calcRequiredLength ((const C*) p, length);
+		return UtfConvert <Utf16, T>::calcRequiredLength (
+			(const C*) p,
+			size / sizeof (C)
+			);
 	}
 
 	virtual
@@ -607,8 +590,10 @@ public:
 		size_t size
 		)
 	{
-		size_t length = size / sizeof (C);
-		return UtfConvert <Utf32, T>::calcRequiredLength ((const C*) p, length);
+		return UtfConvert <Utf32, T>::calcRequiredLength (
+			(const C*) p,
+			size / sizeof (C)
+			);
 	}
 
 	virtual
@@ -618,30 +603,20 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		)
 	{
-		size_t length = size / sizeof (C);
-		ASSERT (length || !size); // don't pass less than one unit
-
 		size_t takenLength;
-		size_t expectedLength;
-
 		size_t takenBufferLength = UtfConvert <Utf8, T>::convert (
 			buffer,
 			bufferLength,
 			(const C*) p,
-			length,
-			&takenLength,
-			&expectedLength
+			size / sizeof (C),
+			&takenLength
 			);
 
 		if (takenSize)
 			*takenSize = takenLength * sizeof (C);
-
-		if (expectedSize)
-			*expectedSize = expectedLength * sizeof (C);
 
 		return takenBufferLength;
 	}
@@ -653,30 +628,20 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		)
 	{
-		size_t length = size / sizeof (C);
-		ASSERT (length || !size); // don't pass less than one unit
-
 		size_t takenLength;
-		size_t expectedLength;
-
 		size_t takenBufferLength = UtfConvert <Utf16, T>::convert (
 			buffer,
 			bufferLength,
 			(const C*) p,
-			length,
-			&takenLength,
-			&expectedLength
+			size / sizeof (C),
+			&takenLength
 			);
 
 		if (takenSize)
 			*takenSize = takenLength * sizeof (C);
-
-		if (expectedSize)
-			*expectedSize = expectedLength * sizeof (C);
 
 		return takenBufferLength;
 	}
@@ -688,30 +653,20 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		)
 	{
-		size_t length = size / sizeof (C);
-		ASSERT (length || !size); // don't pass less than one unit
-
 		size_t takenLength;
-		size_t expectedLength;
-
 		size_t takenBufferLength = UtfConvert <Utf32, T>::convert (
 			buffer,
 			bufferLength,
 			(const C*) p,
-			length,
-			&takenLength,
-			&expectedLength
+			size / sizeof (C),
+			&takenLength
 			);
 
 		if (takenSize)
 			*takenSize = takenLength * sizeof (C);
-
-		if (expectedSize)
-			*expectedSize = expectedLength * sizeof (C);
 
 		return takenBufferLength;
 	}
@@ -724,31 +679,21 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL,
-		size_t* expectedSize = NULL
+		size_t* takenSize = NULL
 		)
 	{
-		size_t length = size / sizeof (C);
-		ASSERT (length || !size); // don't pass less than one unit
-
 		size_t takenLength;
-		size_t expectedLength;
-
 		size_t takenBufferLength = UtfConvert <Utf32, T>::convert (
 			cplBuffer,
 			textBuffer,
 			bufferLength,
 			(const C*) p,
-			length,
-			&takenLength,
-			&expectedLength
+			size / sizeof (C),
+			&takenLength
 			);
 
 		if (takenSize)
 			*takenSize = takenLength * sizeof (C);
-
-		if (expectedSize)
-			*expectedSize = expectedLength * sizeof (C);
 
 		return takenBufferLength;
 	}
