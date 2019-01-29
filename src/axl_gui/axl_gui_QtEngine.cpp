@@ -394,10 +394,12 @@ QtEngine::getStdFontTuple (StdFontKind fontKind)
 		break;
 
 	case StdFontKind_Monospace:
-#if (_AXL_OS_DARWIN)
-		font->m_qtFont = QFont ("Menlo", 11);
+#if (_AXL_OS_WIN)
+		font->m_qtFont = QFont ("Consolas", 10);
+#elif (_AXL_OS_DARWIN)
+		font->m_qtFont = QFont ("Menlo", 12);
 #else
-		font->m_qtFont = QFont ("Monospace", 9);
+		font->m_qtFont = QFont ("Monospace", 10);
 #endif
 		font->m_qtFont.setFixedPitch (true);
 		font->m_qtFont.setKerning (false);
