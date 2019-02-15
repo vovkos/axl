@@ -403,26 +403,47 @@ testParseFormatIp6 ()
 
 //..............................................................................
 
+#ifndef TCP_KEEPIDLE
+#	define TCP_KEEPIDLE  TCP_KEEPALIVE
+#endif
+
+#ifndef TCP_KEEPINTVL
+#	define TCP_KEEPINTVL 17
+#endif
+
 void
-testSocketIp6 ()
+testKeepAlives (const sl::StringRef& addrString)
 {
-	bool result;
+	dword_t value = 1;
+	dword_t delay = 3;
 
 	io::Socket socket;
-	result = socket.open (AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+
+	printf ("Opening a TCP socket (%d sec keep-alives)...\n", delay);
+
+	bool result =
+		socket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
+		socket.setOption (SOL_SOCKET, SO_KEEPALIVE, &value, sizeof (value)) &&
+		socket.setOption (IPPROTO_TCP, TCP_KEEPIDLE, &delay, sizeof (delay)) &&
+		socket.setOption (IPPROTO_TCP, TCP_KEEPINTVL, &delay, sizeof (delay));
+
 	if (!result)
 	{
 		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
+	printf ("Parsing address '%s'...\n", addrString.sz ());
+
 	io::SockAddr addr;
-	result = addr.parse ("[::1]:80");
+	result = addr.parse (addrString);
 	if (!result)
 	{
-		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf ("addr.parse failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
+
+	printf ("Connecting to %s...\n", addr.getString ().sz ());
 
 	result = socket.connect (addr);
 	if (!result)
@@ -431,6 +452,12 @@ testSocketIp6 ()
 		return;
 	}
 
+	printf ("Press CTRL+C to exit...\n");
+
+	for (;;)
+	{
+		sys::sleep (1000);
+	}
 }
 
 //..............................................................................
@@ -3433,24 +3460,64 @@ testConn ()
 bool
 testSerial ()
 {
-	printf ("opening COM4...\n");
+	char const* port = "COM1";
+
+	printf ("opening %s...\n", port);
 
 	io::SerialSettings settings;
-	settings.m_baudRate = 115200;
+	settings.m_baudRate = 38400;
 	settings.m_dataBits = 8;
 	settings.m_stopBits = io::SerialStopBits_1;
 	settings.m_flowControl = io::SerialFlowControl_None;
-	settings.m_parity = io::SerialParity_None;
+	settings.m_parity = io::SerialParity_Odd;
 
 	io::Serial serial;
 	bool result =
-		serial.open ("/dev/ttyUSB0") &&
+		serial.open (port) &&
 		serial.setSettings (&settings);
 
 	if (!result)
 	{
 		printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
+	}
+
+	serial.m_serial.setWaitMask (EV_ERR);
+
+	for (;;)
+	{
+		char buf [1024] = { 0 };
+
+		size_t result = serial.read (buf, sizeof (buf));
+		if (result == -1)
+		{
+			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			return false;
+		}
+
+		buf [result] = 0;
+		printf ("received: %s\n", buf);
+
+		dword_t events;
+		bool result2 = serial.m_serial.wait (&events);
+		if (!result2)
+		{
+			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			return false;
+		}
+
+		printf ("events: %x\n", events);
+
+		dword_t errors;
+		COMSTAT stat;
+		result2 = serial.m_serial.clearError (&errors, &stat);
+		if (!result2)
+		{
+			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			return false;
+		}
+
+		printf ("errors: %x\n", errors);
 	}
 
 	size_t totalSize = 0;
@@ -4019,7 +4086,8 @@ main (
 	WSAStartup (0x0202, &wsaData);
 #endif
 
-	testBitIdx ();
+	testSerial ();
+	// testKeepAlives (sl::String (argv [1]));
 
 	return 0;
 }
