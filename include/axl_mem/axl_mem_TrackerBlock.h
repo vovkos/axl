@@ -27,6 +27,7 @@ struct TrackerBlockHdr: sl::ListLink
 	const char* m_tag;
 	const char* m_filePath;
 	size_t m_line;
+	size_t padding; // ensure dual-pointer alignment
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
