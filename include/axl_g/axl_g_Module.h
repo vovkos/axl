@@ -46,9 +46,8 @@ public:
 class Module
 {
 protected:
-	class FinalizerEntry: public sl::ListLink
+	struct FinalizerEntry: sl::ListLink
 	{
-	public:
 		ref::Ptr <Finalizer> m_finalizer;
 	};
 
