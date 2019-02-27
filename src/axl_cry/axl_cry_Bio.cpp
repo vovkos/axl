@@ -18,18 +18,18 @@ namespace cry {
 //..............................................................................
 
 bool
-Bio::create (
+Bio::create(
 	const void* p,
 	size_t size
 	)
 {
-	close ();
+	close();
 
-	m_h = BIO_new_mem_buf ((void*) p, size);
+	m_h = BIO_new_mem_buf((void*)p, size);
 	if (!m_h)
 	{
 		// BIO_new_mem_buf doesn't always set crypto error
-		err::setError (err::SystemErrorCode_InsufficientResources);
+		err::setError(err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
 

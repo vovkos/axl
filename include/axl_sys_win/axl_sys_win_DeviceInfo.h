@@ -27,7 +27,7 @@ class DeviceInfoSet;
 
 //..............................................................................
 
-AXL_SELECT_ANY SP_DEVINFO_DATA g_nullDevInfoData = { sizeof (SP_DEVINFO_DATA) };
+AXL_SELECT_ANY SP_DEVINFO_DATA g_nullDevInfoData = { sizeof(SP_DEVINFO_DATA) };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -40,13 +40,13 @@ protected:
 	SP_DEVINFO_DATA m_devInfoData;
 
 public:
-	DeviceInfo ()
+	DeviceInfo()
 	{
 		m_devInfoSet = INVALID_HANDLE_VALUE;
 		m_devInfoData = g_nullDevInfoData;
 	}
 
-	DeviceInfo (
+	DeviceInfo(
 		HDEVINFO devInfoSet,
 		const SP_DEVINFO_DATA* devInfoData
 		)
@@ -56,108 +56,108 @@ public:
 	}
 
 	HDEVINFO
-	getDevInfoSet ()
+	getDevInfoSet()
 	{
 		return m_devInfoSet;
 	}
 
 	SP_DEVINFO_DATA*
-	getDevInfoData ()
+	getDevInfoData()
 	{
 		return &m_devInfoData;
 	}
 
 	bool
-	getDeviceRegistryProperty (
+	getDeviceRegistryProperty(
 		uint_t propId,
 		void* buffer,
 		size_t size,
 		dword_t* requiredSize
 		)
 	{
-		bool_t result = ::SetupDiGetDeviceRegistryPropertyW (m_devInfoSet, &m_devInfoData, propId, NULL, (byte_t*) buffer, (dword_t) size, requiredSize);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiGetDeviceRegistryPropertyW(m_devInfoSet, &m_devInfoData, propId, NULL, (byte_t*)buffer, (dword_t)size, requiredSize);
+		return err::complete(result != 0);
 	}
 
 	bool
-	getDeviceRegistryProperty (
+	getDeviceRegistryProperty(
 		uint_t propId,
-		sl::Array <char>* buffer
+		sl::Array<char>* buffer
 		);
 
 	bool
-	getDeviceRegistryProperty (
+	getDeviceRegistryProperty(
 		uint_t propId,
 		sl::String_w* string
 		);
 
 	bool
-	getDeviceRegistryProperty (
+	getDeviceRegistryProperty(
 		uint_t propId,
 		sl::String* string
 		);
 
 	bool
-	setDeviceRegistryProperty (
+	setDeviceRegistryProperty(
 		uint_t propId,
 		const void* buffer,
 		size_t size
 		)
 	{
-		bool_t result = ::SetupDiSetDeviceRegistryPropertyW (m_devInfoSet, &m_devInfoData, propId, (const byte_t*) buffer, (dword_t) size);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiSetDeviceRegistryPropertyW(m_devInfoSet, &m_devInfoData, propId, (const byte_t*) buffer, (dword_t)size);
+		return err::complete(result != 0);
 	}
 
 	HKEY
-	openDeviceRegistryKey (REGSAM keyAccess); // KEY_ALL_ACCESS, KEY_QUERY_VALUE, KEY_SET_VALUE etc
+	openDeviceRegistryKey(REGSAM keyAccess); // KEY_ALL_ACCESS, KEY_QUERY_VALUE, KEY_SET_VALUE etc
 
 	bool
-	getDeviceInstallParams (SP_DEVINSTALL_PARAMS_W* params)
+	getDeviceInstallParams(SP_DEVINSTALL_PARAMS_W* params)
 	{
-		bool_t result = ::SetupDiGetDeviceInstallParamsW (m_devInfoSet, &m_devInfoData, params);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiGetDeviceInstallParamsW(m_devInfoSet, &m_devInfoData, params);
+		return err::complete(result != 0);
 	}
 
 	bool
-	setDeviceInstallParams (const SP_DEVINSTALL_PARAMS_W* params)
+	setDeviceInstallParams(const SP_DEVINSTALL_PARAMS_W* params)
 	{
-		bool_t result = ::SetupDiSetDeviceInstallParamsW (m_devInfoSet, &m_devInfoData, (SP_DEVINSTALL_PARAMS_W*) params);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiSetDeviceInstallParamsW(m_devInfoSet, &m_devInfoData, (SP_DEVINSTALL_PARAMS_W*)params);
+		return err::complete(result != 0);
 	}
 
 	bool
-	getClassInstallParams (
+	getClassInstallParams(
 		void* buffer,
 		size_t size,
 		dword_t* requiredSize
 		)
 	{
-		bool_t result = ::SetupDiGetClassInstallParamsW (m_devInfoSet, &m_devInfoData, (SP_CLASSINSTALL_HEADER*) buffer, (dword_t) size, requiredSize);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiGetClassInstallParamsW(m_devInfoSet, &m_devInfoData, (SP_CLASSINSTALL_HEADER*)buffer, (dword_t)size, requiredSize);
+		return err::complete(result != 0);
 	}
 
 	bool
-	getClassInstallParams (sl::Array <char>* buffer);
+	getClassInstallParams(sl::Array<char>* buffer);
 
 	bool
-	setClassInstallParams (
+	setClassInstallParams(
 		const void* params,
 		size_t size
 		)
 	{
-		bool_t result = ::SetupDiSetClassInstallParamsW (m_devInfoSet, &m_devInfoData, (SP_CLASSINSTALL_HEADER*) params, size);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiSetClassInstallParamsW(m_devInfoSet, &m_devInfoData, (SP_CLASSINSTALL_HEADER*)params, size);
+		return err::complete(result != 0);
 	}
 
 	bool
-	callClassInstaller (DI_FUNCTION function)
+	callClassInstaller(DI_FUNCTION function)
 	{
-		bool_t result = ::SetupDiCallClassInstaller (function, m_devInfoSet, &m_devInfoData);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiCallClassInstaller(function, m_devInfoSet, &m_devInfoData);
+		return err::complete(result != 0);
 	}
 
 	bool
-	restartDevice (bool* isRebootRequired);
+	restartDevice(bool* isRebootRequired);
 };
 
 //..............................................................................
@@ -168,54 +168,54 @@ public:
 	void
 	operator () (HDEVINFO h)
 	{
-		::SetupDiDestroyDeviceInfoList (h);
+		::SetupDiDestroyDeviceInfoList(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class DeviceInfoSet: public sl::Handle <HDEVINFO, DestroyDeviceInfoSet, sl::MinusOne <HDEVINFO> >
+class DeviceInfoSet: public sl::Handle<HDEVINFO, DestroyDeviceInfoSet, sl::MinusOne<HDEVINFO> >
 {
 public:
 	bool
-	create (uint_t flags = DIGCF_PRESENT);
+	create(uint_t flags = DIGCF_PRESENT);
 
 	bool
-	create (
+	create(
 		const GUID& classGuid,
 		uint_t flags = DIGCF_PRESENT
 		);
 
 	bool
-	create (
+	create(
 		const sl::StringRef_w& enumerator,
 		uint_t flags = DIGCF_PRESENT
 		);
 
 	bool
-	getDeviceInfo (
+	getDeviceInfo(
 		size_t i,
 		DeviceInfo* deviceInfo
 		);
 
 	static
 	bool
-	getDeviceClassGuids (
+	getDeviceClassGuids(
 		const sl::StringRef_w& name,
 		GUID* buffer,
 		size_t count,
 		dword_t* requiredCount
 		)
 	{
-		bool_t result = ::SetupDiClassGuidsFromNameW (name.sz (), buffer, (dword_t) count, requiredCount);
-		return err::complete (result != 0);
+		bool_t result = ::SetupDiClassGuidsFromNameW(name.sz(), buffer, (dword_t)count, requiredCount);
+		return err::complete(result != 0);
 	}
 
 	static
 	bool
-	getDeviceClassGuids (
+	getDeviceClassGuids(
 		const sl::StringRef_w& name,
-		sl::Array <GUID>* buffer
+		sl::Array<GUID>* buffer
 		);
 };
 

@@ -25,41 +25,41 @@ class EscapeEncoding
 public:
 	static
 	char
-	findEscapeChar (char x);
+	findEscapeChar(char x);
 
 	static
 	char
-	findEscapeReplaceChar (char x);
+	findEscapeReplaceChar(char x);
 
 	static
 	size_t
-	encode (
+	encode(
 		sl::String* string,
 		const sl::StringRef& source
 		);
 
 	static
 	sl::String
-	encode (const sl::StringRef& source)
+	encode(const sl::StringRef& source)
 	{
 		sl::String string;
-		encode (&string, source);
+		encode(&string, source);
 		return string;
 	}
 
 	static
 	size_t
-	decode (
+	decode(
 		sl::String* string,
 		const sl::StringRef& source
 		);
 
 	static
 	sl::String
-	decode (const sl::StringRef& source)
+	decode(const sl::StringRef& source)
 	{
 		sl::String string;
-		decode (&string, source);
+		decode(&string, source);
 		return string;
 	}
 };

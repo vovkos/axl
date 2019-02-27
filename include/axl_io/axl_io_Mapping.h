@@ -42,7 +42,7 @@ protected:
 #endif
 
 public:
-	Mapping ()
+	Mapping()
 	{
 		m_p = NULL;
 		m_size = 0;
@@ -54,25 +54,25 @@ public:
 	}
 
 	bool
-	isOpen ()
+	isOpen()
 	{
 		return m_p != NULL;
 	}
 
 	void*
-	p ()
+	p()
 	{
 		return m_p;
 	}
 
 	size_t
-	getSize ()
+	getSize()
 	{
 		return m_size;
 	}
 
 	void*
-	open (
+	open(
 		File* file,
 		uint64_t offset,
 		size_t size,
@@ -80,23 +80,23 @@ public:
 		);
 
 	void*
-	open (
+	open(
 		File* file,
 		uint_t flags = 0 // FileFlag
 		)
 	{
-		return open (file, 0, -1, flags);
+		return open(file, 0, -1, flags);
 	}
 
 	void*
-	open (
+	open(
 		const sl::StringRef& name,
 		size_t size,
 		uint_t flags = 0 // FileFlag
 		);
 
 	void
-	close ();
+	close();
 };
 
 //..............................................................................

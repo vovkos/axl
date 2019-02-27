@@ -22,8 +22,8 @@ namespace sl {
 
 template <
 	typename T,
-	typename Close = Void <T>,
-	typename GetInvalidHandle = Zero <T>
+	typename Close = Void<T>,
+	typename GetInvalidHandle = Zero<T>
 	>
 class Handle
 {
@@ -34,29 +34,29 @@ protected:
 	T m_h;
 
 public:
-	Handle ()
+	Handle()
 	{
-		m_h = GetInvalidHandle () ();
+		m_h = GetInvalidHandle() ();
 	}
 
-	Handle (T h)
+	Handle(T h)
 	{
 		m_h = h;
 	}
 
-	~Handle ()
+	~Handle()
 	{
-		close ();
+		close();
 	}
 
 	static
 	T
-	getInvalidHandle ()
+	getInvalidHandle()
 	{
-		return GetInvalidHandle () ();
+		return GetInvalidHandle() ();
 	}
 
-	operator T () const
+	operator T() const
 	{
 		return m_h;
 	}
@@ -69,43 +69,43 @@ public:
 	const Handle&
 	operator = (T h)
 	{
-		attach (h);
+		attach(h);
 		return *this;
 	}
 
 	bool
-	isOpen () const
+	isOpen() const
 	{
-		return m_h != GetInvalidHandle () ();
+		return m_h != GetInvalidHandle() ();
 	}
 
 	void
-	close ()
+	close()
 	{
-		if (isOpen ())
+		if (isOpen())
 		{
-			Close () (m_h);
-			m_h = GetInvalidHandle () ();
+			Close() (m_h);
+			m_h = GetInvalidHandle() ();
 		}
 	}
 
 	void
-	attach (T h)
+	attach(T h)
 	{
-		close ();
+		close();
 		m_h = h;
 	}
 
 	T
-	detach ()
+	detach()
 	{
 		T h = m_h;
-		m_h = GetInvalidHandle () ();
+		m_h = GetInvalidHandle() ();
 		return h;
 	}
 
 	T*
-	p ()
+	p()
 	{
 		return &m_h;
 	}

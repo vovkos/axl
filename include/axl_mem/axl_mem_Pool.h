@@ -24,54 +24,54 @@ template <typename T>
 class Pool
 {
 protected:
-	sl::List <T> m_freeList;
+	sl::List<T> m_freeList;
 
 public:
 	T*
-	get ()
+	get()
 	{
-		return !m_freeList.isEmpty () ? m_freeList.removeHead () : AXL_MEM_NEW (T);
+		return !m_freeList.isEmpty() ? m_freeList.removeHead() : AXL_MEM_NEW(T);
 	}
 
 	void
-	put (T* p)
+	put(T* p)
 	{
-		putFront (p); // by default, use stack rather than queue semantics
+		putFront(p); // by default, use stack rather than queue semantics
 	}
 
 	void
-	putFront (T* p)
+	putFront(T* p)
 	{
-		m_freeList.insertHead (p);
+		m_freeList.insertHead(p);
 	}
 
 	void
-	putBack (T* p)
+	putBack(T* p)
 	{
-		m_freeList.insertTail (p);
+		m_freeList.insertTail(p);
 	}
 
 	void
-	put (sl::List <T>* list)
+	put(sl::List<T>* list)
 	{
-		m_freeList.insertListTail (list);
+		m_freeList.insertListTail(list);
 	}
 
 	bool
-	reserve (size_t count)
+	reserve(size_t count)
 	{
-		size_t freeCount = m_freeList.getCount ();
+		size_t freeCount = m_freeList.getCount();
 		if (count <= freeCount)
 			return true;
 
 		count -= freeCount;
 		for (size_t i = 0; i < count; i++)
 		{
-			T* p = AXL_MEM_NEW (T);
+			T* p = AXL_MEM_NEW(T);
 			if (!p)
 				return false;
 
-			m_freeList.insertTail (p);
+			m_freeList.insertTail(p);
 		}
 
 		return true;

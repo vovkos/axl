@@ -19,9 +19,9 @@ namespace gui {
 
 //..............................................................................
 
-GdiCanvas::GdiCanvas ()
+GdiCanvas::GdiCanvas()
 {
-	m_engine = GdiEngine::getSingleton ();
+	m_engine = GdiEngine::getSingleton();
 	m_destructKind = DestructKind_None;
 	m_hCompatibleDc = NULL;
 	m_hBitmap = NULL;
@@ -30,13 +30,13 @@ GdiCanvas::GdiCanvas ()
 }
 
 void
-GdiCanvas::attach (
+GdiCanvas::attach(
 	HDC hdc,
 	HWND hWnd,
 	DestructKind destructKind
 	)
 {
-	release ();
+	release();
 
 	m_h = hdc;
 	m_hWnd = hWnd;
@@ -44,31 +44,31 @@ GdiCanvas::attach (
 }
 
 void
-GdiCanvas::release ()
+GdiCanvas::release()
 {
 	if (!m_h)
 		return;
 
 	if (m_hPrevBitmap)
-		::SelectObject (m_h, m_hPrevBitmap);
+		::SelectObject(m_h, m_hPrevBitmap);
 
 	if (m_hPrevFont)
-		::SelectObject (m_h, m_hPrevFont);
+		::SelectObject(m_h, m_hPrevFont);
 
 	if (m_hBitmap)
-		::DeleteObject (m_hBitmap);
+		::DeleteObject(m_hBitmap);
 
 	if (m_hCompatibleDc)
-		::DeleteDC (m_hCompatibleDc);
+		::DeleteDC(m_hCompatibleDc);
 
-	switch (m_destructKind)
+	switch(m_destructKind)
 	{
 	case DestructKind_DeleteDc:
-		::DeleteDC (m_h);
+		::DeleteDC(m_h);
 		break;
 
 	case DestructKind_ReleaseDc:
-		::ReleaseDC (m_hWnd, m_h);
+		::ReleaseDC(m_hWnd, m_h);
 		break;
 	}
 
@@ -81,7 +81,7 @@ GdiCanvas::release ()
 }
 
 bool
-GdiCanvas::drawRect (
+GdiCanvas::drawRect(
 	int left,
 	int top,
 	int right,
@@ -89,23 +89,23 @@ GdiCanvas::drawRect (
 	uint_t color
 	)
 {
-	color = overlayColor (m_baseTextAttr.m_backColor, color);
+	color = overlayColor(m_baseTextAttr.m_backColor, color);
 
 	if (m_colorAttr.m_backColor != color)
 	{
 		m_colorAttr.m_backColor = color;
 
 		if (!(color & ColorFlag_Transparent))
-			::SetBkColor (m_h, m_palette.getColorRgb (color));
+			::SetBkColor(m_h, m_palette.getColorRgb(color));
 	}
 
 	RECT gdiRect = { left, top, right, bottom };
-	::ExtTextOut (m_h, 0, 0, ETO_OPAQUE, &gdiRect, NULL, 0, NULL);
+	::ExtTextOut(m_h, 0, 0, ETO_OPAQUE, &gdiRect, NULL, 0, NULL);
 	return true;
 }
 
 bool
-GdiCanvas::drawText_utf8 (
+GdiCanvas::drawText_utf8(
 	int x,
 	int y,
 	int left,
@@ -118,11 +118,11 @@ GdiCanvas::drawText_utf8 (
 	const sl::StringRef_utf8& text
 	)
 {
-	char buffer [256];
-	sl::String_w text_w (ref::BufKind_Stack, buffer, sizeof (buffer));
-	text_w.copy (text);
+	char buffer[256];
+	sl::String_w text_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	text_w.copy(text);
 
-	return drawText_utf16 (
+	return drawText_utf16(
 		x,
 		y,
 		left,
@@ -137,7 +137,7 @@ GdiCanvas::drawText_utf8 (
 }
 
 bool
-GdiCanvas::drawText_utf16 (
+GdiCanvas::drawText_utf16(
 	int x,
 	int y,
 	int left,
@@ -150,19 +150,19 @@ GdiCanvas::drawText_utf16 (
 	const sl::StringRef_utf16& text
 	)
 {
-	textColor = overlayColor (m_baseTextAttr.m_foreColor, textColor);
-	backColor = overlayColor (m_baseTextAttr.m_backColor, backColor);
-	fontFlags = overlayFontFlags (m_baseTextAttr.m_fontFlags, fontFlags);
+	textColor = overlayColor(m_baseTextAttr.m_foreColor, textColor);
+	backColor = overlayColor(m_baseTextAttr.m_backColor, backColor);
+	fontFlags = overlayFontFlags(m_baseTextAttr.m_fontFlags, fontFlags);
 
-	Font* font = m_baseFont->getFontMod (fontFlags);
+	Font* font = m_baseFont->getFontMod(fontFlags);
 
 	if (m_font != font)
 	{
-		ASSERT (font->getEngine ()->getEngineKind () == EngineKind_Gdi);
-		GdiFont* gdiFont = (GdiFont*) font;
+		ASSERT(font->getEngine()->getEngineKind() == EngineKind_Gdi);
+		GdiFont* gdiFont = (GdiFont*)font;
 
 		m_font = font;
-		HFONT hPrevFont = (HFONT) ::SelectObject (m_h, *gdiFont);
+		HFONT hPrevFont = (HFONT) ::SelectObject(m_h, *gdiFont);
 
 		if (!m_hPrevFont)
 			m_hPrevFont = hPrevFont;
@@ -173,7 +173,7 @@ GdiCanvas::drawText_utf16 (
 		m_colorAttr.m_foreColor = textColor;
 
 		if (!(textColor & ColorFlag_Transparent))
-			::SetTextColor (m_h, m_palette.getColorRgb (textColor));
+			::SetTextColor(m_h, m_palette.getColorRgb(textColor));
 	}
 
 	if (m_colorAttr.m_backColor != backColor)
@@ -181,19 +181,19 @@ GdiCanvas::drawText_utf16 (
 		m_colorAttr.m_backColor = backColor;
 
 		if (!(backColor & ColorFlag_Transparent))
-			::SetBkColor (m_h, m_palette.getColorRgb (backColor));
+			::SetBkColor(m_h, m_palette.getColorRgb(backColor));
 	}
 
 	if (length == -1)
-		length = wcslen_s (text);
+		length = wcslen_s(text);
 
 	RECT gdiRect = { left, top, right, bottom };
-	::ExtTextOutW (m_h, x, y, ETO_OPAQUE, &gdiRect, text, length, NULL);
+	::ExtTextOutW(m_h, x, y, ETO_OPAQUE, &gdiRect, text, length, NULL);
 	return true;
 }
 
 bool
-GdiCanvas::drawText_utf32 (
+GdiCanvas::drawText_utf32(
 	int x,
 	int y,
 	int left,
@@ -206,11 +206,11 @@ GdiCanvas::drawText_utf32 (
 	const sl::StringRef_utf32& text
 	)
 {
-	char buffer [256];
-	sl::String_w text_w (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
+	char buffer[256];
+	sl::String_w text_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	string.copy(text, length);
 
-	return drawText_utf16 (
+	return drawText_utf16(
 		x,
 		y,
 		left,
@@ -225,7 +225,7 @@ GdiCanvas::drawText_utf32 (
 }
 
 bool
-GdiCanvas::drawImage (
+GdiCanvas::drawImage(
 	int x,
 	int y,
 	Image* image,
@@ -235,18 +235,18 @@ GdiCanvas::drawImage (
 	int bottom
 	)
 {
-	ASSERT (image->getEngine ()->getEngineKind () == EngineKind_Gdi);
-	GdiImage* gdiImage = (GdiImage*) image;
+	ASSERT(image->getEngine()->getEngineKind() == EngineKind_Gdi);
+	GdiImage* gdiImage = (GdiImage*)image;
 
 	if (!m_hCompatibleDc)
 	{
 		ScreenDc screenDc;
-		m_hCompatibleDc = ::CreateCompatibleDC (screenDc);
+		m_hCompatibleDc = ::CreateCompatibleDC(screenDc);
 	}
 
-	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject (m_hCompatibleDc, *gdiImage);
+	HBITMAP hPrevBitmap = (HBITMAP) ::SelectObject(m_hCompatibleDc, *gdiImage);
 
-	::BitBlt (
+	::BitBlt(
 		m_h,
 		x,
 		y,
@@ -258,12 +258,12 @@ GdiCanvas::drawImage (
 		SRCCOPY
 		);
 
-	::SelectObject (m_hCompatibleDc, hPrevBitmap);
+	::SelectObject(m_hCompatibleDc, hPrevBitmap);
 	return true;
 }
 
 bool
-GdiCanvas::copyRect (
+GdiCanvas::copyRect(
 	Canvas* srcCanvas,
 	int xDst,
 	int yDst,
@@ -273,10 +273,10 @@ GdiCanvas::copyRect (
 	int height
 	)
 {
-	ASSERT (srcCanvas->getEngine ()->getEngineKind () == EngineKind_Gdi);
-	GdiCanvas* dc = (GdiCanvas*) srcCanvas;
+	ASSERT(srcCanvas->getEngine()->getEngineKind() == EngineKind_Gdi);
+	GdiCanvas* dc = (GdiCanvas*)srcCanvas;
 
-	::BitBlt (
+	::BitBlt(
 		m_h,
 		xDst,
 		yDst,

@@ -17,26 +17,26 @@ namespace {
 //..............................................................................
 
 void
-run ()
+run()
 {
-	printf ("hui govno i muravei\n");
+	printf("hui govno i muravei\n");
 
-	sl::HandleTable <int> handleTable (0xffffffff);
+	sl::HandleTable<int> handleTable(0xffffffff);
 
-	uintptr_t h1 = handleTable.add (100);
-	uintptr_t h2 = handleTable.add (200);
-	uintptr_t h3 = handleTable.add (300);
-	uintptr_t h4 = handleTable.add (400);
+	uintptr_t h1 = handleTable.add(100);
+	uintptr_t h2 = handleTable.add(200);
+	uintptr_t h3 = handleTable.add(300);
+	uintptr_t h4 = handleTable.add(400);
 
-	sl::HandleTableIterator <int> it = handleTable.getHead ();
+	sl::HandleTableIterator<int> it = handleTable.getHead();
 	for (; it; it++)
 	{
-		printf ("0x%p -> %d\n", it->getKey (), it->m_value);
+		printf("0x%p -> %d\n", it->getKey (), it->m_value);
 	}
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_HandleTable", run)
+ADD_TEST_CASE("test_HandleTable", run)
 
 }

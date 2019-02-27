@@ -16,17 +16,17 @@
 
 typedef
 void
-TestFunc ();
+TestFunc();
 
 typedef
-sl::StringHashTable <TestFunc*> TestSet;
+sl::StringHashTable<TestFunc*> TestSet;
 
 inline
 TestSet*
-getTestCaseSet ()
+getTestCaseSet()
 {
 	static int32_t flag = 0;
-	return sl::getSingleton <TestSet> (&flag);
+	return sl::getSingleton<TestSet> (&flag);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -34,17 +34,17 @@ getTestCaseSet ()
 class AddTestCase
 {
 public:
-	AddTestCase (
+	AddTestCase(
 		const char* name,
 		TestFunc* func
 		)
 	{
-		getTestCaseSet ()->add (name, func);
+		getTestCaseSet()->add(name, func);
 	}
 };
 
 #define ADD_TEST_CASE(name, func) \
-	static AddTestCase testCaseAdder_ ## func (name, func);
+	static AddTestCase testCaseAdder_ ## func(name, func);
 
 //..............................................................................
 
@@ -53,6 +53,6 @@ public:
 #undef ASSERT
 #define ASSERT(e) ((bool) (e) ? \
 	(void) 0 : \
-	(void) (throw "Assertion failure at: " __FILE__ "(" AXL_ITOA (__LINE__) "): " #e))
+	(void)(throw "Assertion failure at: " __FILE__ "(" AXL_ITOA (__LINE__) "): " #e))
 
 //..............................................................................

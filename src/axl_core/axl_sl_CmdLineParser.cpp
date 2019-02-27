@@ -19,28 +19,28 @@ namespace sl {
 //..............................................................................
 
 size_t
-CmdLineParserRoot::extractArg (
+CmdLineParserRoot::extractArg(
 	const sl::StringRef& cmdLine,
 	sl::String* arg
 	)
 {
-	const char* p = cmdLine.cp ();
-	const char* end = cmdLine.getEnd ();
+	const char* p = cmdLine.cp();
+	const char* end = cmdLine.getEnd();
 
-	while (p < end && isspace (*p))
+	while (p < end && isspace(*p))
 		p++;
 
 	if (p >= end)
 	{
-		arg->clear ();
-		return p - cmdLine.cp ();
+		arg->clear();
+		return p - cmdLine.cp();
 	}
 
 	const char* p1 = p;
 
 	if (*p != '\"')
 	{
-		while (p < end && !isspace (*p))
+		while (p < end && !isspace(*p))
 			p++;
 	}
 	else
@@ -59,50 +59,50 @@ CmdLineParserRoot::extractArg (
 
 		if (p > end)
 		{
-			err::setError ("unterminated escape sequence");
+			err::setError("unterminated escape sequence");
 			return -1;
 		}
 	}
 
-	arg->copy (p1, p - p1);
-	return p - cmdLine.cp ();
+	arg->copy(p1, p - p1);
+	return p - cmdLine.cp();
 }
 
 bool
-CmdLineParserRoot::parseSwitch (
+CmdLineParserRoot::parseSwitch(
 	ArgKind argKind,
 	const sl::StringRef& arg,
 	sl::String* switchName,
 	sl::String* value
 	)
 {
-	const char* p = arg.cp ();
-	const char* end = arg.getEnd ();
+	const char* p = arg.cp();
+	const char* end = arg.getEnd();
 
 	if (argKind == ArgKind_CharSwitch)
 	{
-		switchName->copy (*p);
+		switchName->copy(*p);
 		p++;
 	}
 	else
 	{
 		const char* p0 = p;
-		while (p < end && *p != '=' && !isspace (*p))
+		while (p < end && *p != '=' && !isspace(*p))
 			p++;
 
-		switchName->copy (p0, p - p0);
+		switchName->copy(p0, p - p0);
 	}
 
-	if (p < end && !isspace (*p)) // has value
+	if (p < end && !isspace(*p)) // has value
 	{
 		if (*p == '=')
 			p++;
 
-		value->copy (p, end - p);
+		value->copy(p, end - p);
 	}
 	else
 	{
-		value->clear ();
+		value->clear();
 	}
 
 	return true;
@@ -111,7 +111,7 @@ CmdLineParserRoot::parseSwitch (
 //..............................................................................
 
 String
-getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
+getCmdLineHelpString(const ConstList<SwitchInfo>& switchInfoList)
 {
 	enum
 	{
@@ -124,7 +124,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 
 	size_t maxSwitchLength = 0;
 
-	ConstIterator <SwitchInfo> it = switchInfoList.getHead ();
+	ConstIterator<SwitchInfo> it = switchInfoList.getHead();
 	for (; it; it++)
 	{
 		const SwitchInfo* switchInfo = *it;
@@ -134,15 +134,15 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 		size_t switchLength = 0;
 
 		size_t i = 0;
-		for (; i < countof (switchInfo->m_nameTable); i++)
+		for (; i < countof(switchInfo->m_nameTable); i++)
 		{
-			if (!switchInfo->m_nameTable [i])
+			if (!switchInfo->m_nameTable[i])
 				break;
 
-			if (switchInfo->m_nameTable [i] [1])
+			if (switchInfo->m_nameTable[i] [1])
 			{
 				switchLength += 2; // "--"
-				switchLength += strlen_s (switchInfo->m_nameTable [i]);
+				switchLength += strlen_s(switchInfo->m_nameTable[i]);
 			}
 			else
 			{
@@ -158,7 +158,7 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 		if (switchInfo->m_value)
 		{
 			switchLength++; // '='
-			switchLength += strlen_s (switchInfo->m_value);
+			switchLength += strlen_s(switchInfo->m_value);
 		}
 
 		if (switchLength < switchLengthLimit && maxSwitchLength < switchLength)
@@ -172,49 +172,49 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 	String string;
 	String lineString;
 
-	it = switchInfoList.getHead ();
+	it = switchInfoList.getHead();
 	for (; it; it++)
 	{
 		const SwitchInfo* switchInfo = *it;
 		if (!switchInfo->m_switchKind) // group
 		{
-			if (!string.isEmpty ())
-				string.appendNewLine ();
+			if (!string.isEmpty())
+				string.appendNewLine();
 
 			lineString = switchInfo->m_description;
 		}
 		else
 		{
-			lineString.copy (' ', indentSize);
+			lineString.copy(' ', indentSize);
 
-			ASSERT (switchInfo->m_nameTable [0]);
-			if (switchInfo->m_nameTable [0] [1])
+			ASSERT(switchInfo->m_nameTable[0]);
+			if (switchInfo->m_nameTable[0] [1])
 			{
 				lineString += "--";
-				lineString += switchInfo->m_nameTable [0];
+				lineString += switchInfo->m_nameTable[0];
 			}
 			else
 			{
 				lineString += '-';
-				lineString += switchInfo->m_nameTable [0] [0];
+				lineString += switchInfo->m_nameTable[0] [0];
 			}
 
-			for (size_t i = 1; i < countof (switchInfo->m_nameTable); i++)
+			for (size_t i = 1; i < countof(switchInfo->m_nameTable); i++)
 			{
-				if (!switchInfo->m_nameTable [i])
+				if (!switchInfo->m_nameTable[i])
 					break;
 
 				lineString += ", ";
 
-				if (switchInfo->m_nameTable [i] [1])
+				if (switchInfo->m_nameTable[i] [1])
 				{
 					lineString += "--";
-					lineString += switchInfo->m_nameTable [i];
+					lineString += switchInfo->m_nameTable[i];
 				}
 				else
 				{
 					lineString += '-';
-					lineString += switchInfo->m_nameTable [i] [0];
+					lineString += switchInfo->m_nameTable[i] [0];
 				}
 			}
 
@@ -224,22 +224,22 @@ getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList)
 				lineString += switchInfo->m_value;
 			}
 
-			size_t length = lineString.getLength ();
+			size_t length = lineString.getLength();
 			if (length < descriptionCol)
 			{
-				lineString.append (' ', descriptionCol - length);
+				lineString.append(' ', descriptionCol - length);
 			}
 			else
 			{
-				lineString.appendNewLine ();
-				lineString.append (' ', descriptionCol);
+				lineString.appendNewLine();
+				lineString.append(' ', descriptionCol);
 			}
 
 			lineString += switchInfo->m_description;
 		}
 
 		string += lineString;
-		string.appendNewLine ();
+		string.appendNewLine();
 	}
 
 	return string;

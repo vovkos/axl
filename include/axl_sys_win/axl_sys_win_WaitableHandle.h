@@ -35,18 +35,18 @@ class WaitableHandle: public sys::win::Handle
 {
 public:
 	WaitResult
-	wait (
+	wait(
 		uint_t timeout = -1,
 		bool isAlertable = false
 		)
 	{
-		dword_t result = ::WaitForSingleObjectEx (m_h, timeout, isAlertable);
-		return completeWait (result);
+		dword_t result = ::WaitForSingleObjectEx(m_h, timeout, isAlertable);
+		return completeWait(result);
 	}
 
 	static
 	WaitResult
-	multiWait (
+	multiWait(
 		HANDLE* waitArray,
 		dword_t count,
 		bool doWaitAll = false,
@@ -54,14 +54,14 @@ public:
 		bool isAlertable = false
 		)
 	{
-		dword_t result = ::WaitForMultipleObjectsEx (count, waitArray, doWaitAll, timeout, isAlertable);
-		return completeWait (result);
+		dword_t result = ::WaitForMultipleObjectsEx(count, waitArray, doWaitAll, timeout, isAlertable);
+		return completeWait(result);
 	}
 
 protected:
 	static
 	WaitResult
-	completeWait (dword_t result);
+	completeWait(dword_t result);
 };
 
 //..............................................................................

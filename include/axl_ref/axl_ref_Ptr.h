@@ -34,58 +34,58 @@ protected:
 	RefCount* m_refCount;
 
 public:
-	Ptr ()
+	Ptr()
 	{
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	Ptr (const NullPtr&)
+	Ptr(const NullPtr&)
 	{
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	Ptr (const Ptr& src)
+	Ptr(const Ptr& src)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (src.m_p, src.m_refCount);
+		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
-	Ptr (const Ptr <A>& src)
+	Ptr(const Ptr<A>& src)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (src.m_p, src.m_refCount);
+		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
-	Ptr (const WeakPtr <A>& src)
+	Ptr(const WeakPtr<A>& src)
 	{
 		m_p = NULL, m_refCount = NULL;
-		if (src.m_refCount && src.m_refCount->addRefByWeakPtr ())
-			attach (src.m_p, src.m_refCount);
+		if (src.m_refCount && src.m_refCount->addRefByWeakPtr())
+			attach(src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
-	Ptr (A* p)
+	Ptr(A* p)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (p, p);
+		copy(p, p);
 	}
 
-	Ptr (
+	Ptr(
 		T* p,
 		RefCount* refCount
 		)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (p, refCount);
+		copy(p, refCount);
 	}
 
-	~Ptr ()
+	~Ptr()
 	{
-		clear ();
+		clear();
 	}
 
 	operator T* () const
@@ -96,38 +96,38 @@ public:
 	T*
 	operator -> () const
 	{
-		ASSERT (m_p);
+		ASSERT(m_p);
 		return m_p;
 	}
 
 	Ptr&
 	operator = (const NullPtr&)
 	{
-		clear ();
+		clear();
 		return *this;
 	}
 
 	Ptr&
 	operator = (const Ptr& src)
 	{
-		copy (src.m_p, src.m_refCount);
+		copy(src.m_p, src.m_refCount);
 		return *this;
 	}
 
 	T*
-	p () const
+	p() const
 	{
 		return m_p;
 	}
 
 	RefCount*
-	getRefCount () const
+	getRefCount() const
 	{
 		return m_refCount;
 	}
 
 	void
-	copy (
+	copy(
 		T* p,
 		RefCount* refCount
 		)
@@ -138,29 +138,29 @@ public:
 			return;
 
 		if (refCount)
-			refCount->addRef ();
+			refCount->addRef();
 
 		if (m_refCount)
-			m_refCount->release ();
+			m_refCount->release();
 
 		m_refCount = refCount;
 	}
 
 	void
-	attach (
+	attach(
 		T* p,
 		RefCount* refCount
 		)
 	{
 		if (m_refCount)
-			m_refCount->release ();
+			m_refCount->release();
 
 		m_p = p;
 		m_refCount = refCount;
 	}
 
 	T*
-	detach (RefCount** refCount = NULL)
+	detach(RefCount** refCount = NULL)
 	{
 		T* p = m_p;
 
@@ -173,10 +173,10 @@ public:
 	}
 
 	void
-	clear ()
+	clear()
 	{
 		if (m_refCount)
-			m_refCount->release ();
+			m_refCount->release();
 
 		m_p = NULL;
 		m_refCount = NULL;

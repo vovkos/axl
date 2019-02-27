@@ -18,21 +18,21 @@ namespace io {
 //..............................................................................
 
 bool
-Socket::accept (
+Socket::accept(
 	Socket* socket,
 	SockAddr* addr
 	)
 {
 #if (_AXL_OS_WIN)
-	SOCKET h = m_socket.accept (addr);
+	SOCKET h = m_socket.accept(addr);
 #else
-	int h = m_socket.accept (addr);
+	int h = m_socket.accept(addr);
 #endif
 
 	if (h == -1)
 		return false;
 
-	socket->m_socket.attach (h);
+	socket->m_socket.attach(h);
 	return true;
 }
 

@@ -28,13 +28,13 @@ public:
 	void
 	operator () (HANDLE h)
 	{
-		::CloseHandle (h);
+		::CloseHandle(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef sl::Handle <HANDLE, CloseHandle> Handle;
+typedef sl::Handle<HANDLE, CloseHandle> Handle;
 
 //..............................................................................
 
@@ -44,13 +44,13 @@ public:
 	void
 	operator () (HKEY h)
 	{
-		::RegCloseKey (h);
+		::RegCloseKey(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef sl::Handle <HKEY, CloseRegKey, sl::MinusOne <HKEY> > RegKeyHandle;
+typedef sl::Handle<HKEY, CloseRegKey, sl::MinusOne<HKEY> > RegKeyHandle;
 
 //..............................................................................
 

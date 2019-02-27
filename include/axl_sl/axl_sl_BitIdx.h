@@ -24,28 +24,28 @@ namespace sl {
 
 inline
 uint8_t
-geLoBit8 (uint8_t x)
+geLoBit8(uint8_t x)
 {
    return x & -x;
 }
 
 inline
 uint16_t
-getLoBit16 (uint16_t x)
+getLoBit16(uint16_t x)
 {
    return x & -x;
 }
 
 inline
 uint32_t
-getLoBit32 (uint32_t x)
+getLoBit32(uint32_t x)
 {
    return x & -x;
 }
 
 inline
 uint64_t
-getLoBit64 (uint64_t x)
+getLoBit64(uint64_t x)
 {
    return x & -x;
 }
@@ -56,7 +56,7 @@ getLoBit64 (uint64_t x)
 
 inline
 uint8_t
-getHiBit8 (uint8_t x)
+getHiBit8(uint8_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -66,7 +66,7 @@ getHiBit8 (uint8_t x)
 
 inline
 uint16_t
-getHiBit16 (uint16_t x)
+getHiBit16(uint16_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -77,7 +77,7 @@ getHiBit16 (uint16_t x)
 
 inline
 uint32_t
-getHiBit32 (uint32_t x)
+getHiBit32(uint32_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -89,7 +89,7 @@ getHiBit32 (uint32_t x)
 
 inline
 uint64_t
-getHiBit64 (uint64_t x)
+getHiBit64(uint64_t x)
 {
    x = x | (x >> 1);
    x = x | (x >> 2);
@@ -106,7 +106,7 @@ getHiBit64 (uint64_t x)
 
 inline
 uint8_t
-getPowerOf2Ge8 (uint8_t x)
+getPowerOf2Ge8(uint8_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -117,7 +117,7 @@ getPowerOf2Ge8 (uint8_t x)
 
 inline
 uint16_t
-getPowerOf2Ge16 (uint16_t x)
+getPowerOf2Ge16(uint16_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -129,7 +129,7 @@ getPowerOf2Ge16 (uint16_t x)
 
 inline
 uint32_t
-getPowerOf2Ge32 (uint32_t x)
+getPowerOf2Ge32(uint32_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -142,7 +142,7 @@ getPowerOf2Ge32 (uint32_t x)
 
 inline
 uint64_t
-getPowerOf2Ge64 (uint64_t x)
+getPowerOf2Ge64(uint64_t x)
 {
 	x = x - 1;
 	x = x | (x >> 1);
@@ -172,7 +172,7 @@ getPowerOf2Ge64 (uint64_t x)
 
 inline
 uint8_t
-getLoBitIdx8 (uint8_t x)
+getLoBitIdx8(uint8_t x)
 {
 	return (x & 0x0f) ?
 		(x & 0x03) ?
@@ -185,36 +185,36 @@ getLoBitIdx8 (uint8_t x)
 
 inline
 uint8_t
-getLoBitIdx16 (uint16_t x)
+getLoBitIdx16(uint16_t x)
 {
 	return (x & 0x00ff) ?
-		getLoBitIdx8 ((uint8_t) x) :
-		(8 + getLoBitIdx8 ((uint8_t) (x >> 8)));
+		getLoBitIdx8((uint8_t)x) :
+		(8 + getLoBitIdx8((uint8_t)(x >> 8)));
 }
 
 inline
 uint8_t
-getLoBitIdx32 (uint32_t x)
+getLoBitIdx32(uint32_t x)
 {
 	return (x & 0x0000ffff) ?
-		getLoBitIdx16 ((uint16_t) x) :
-		(16 + getLoBitIdx16 ((uint16_t) (x >> 16)));
+		getLoBitIdx16((uint16_t)x) :
+		(16 + getLoBitIdx16((uint16_t)(x >> 16)));
 }
 
 inline
 uint8_t
-getLoBitIdx64 (uint64_t x)
+getLoBitIdx64(uint64_t x)
 {
 	return (x & 0x00000000ffffffffLL) ?
-		getLoBitIdx32 ((uint32_t) x) :
-		(32 + getLoBitIdx32 ((uint32_t) (x >> 32)));
+		getLoBitIdx32((uint32_t)x) :
+		(32 + getLoBitIdx32((uint32_t)(x >> 32)));
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint8_t
-getHiBitIdx8 (uint8_t x)
+getHiBitIdx8(uint8_t x)
 {
 	return (x & 0xf0) ?
 		(x & 0xc0) ?
@@ -227,29 +227,29 @@ getHiBitIdx8 (uint8_t x)
 
 inline
 uint8_t
-getHiBitIdx16 (uint16_t x)
+getHiBitIdx16(uint16_t x)
 {
 	return (x & 0xff00) ?
-		(8 + getHiBitIdx8 ((uint8_t) (x >> 8))) :
-		getHiBitIdx8 ((uint8_t) x);
+		(8 + getHiBitIdx8((uint8_t)(x >> 8))) :
+		getHiBitIdx8((uint8_t)x);
 }
 
 inline
 uint8_t
-getHiBitIdx32 (uint32_t x)
+getHiBitIdx32(uint32_t x)
 {
 	return (x & 0xffff0000) ?
-		(16 + getHiBitIdx16 ((uint16_t) (x >> 16))) :
-		getHiBitIdx16 ((uint16_t) x);
+		(16 + getHiBitIdx16((uint16_t)(x >> 16))) :
+		getHiBitIdx16((uint16_t)x);
 }
 
 inline
 uint8_t
-getHiBitIdx64 (uint64_t x)
+getHiBitIdx64(uint64_t x)
 {
 	return (x & 0xffffffff00000000LL) ?
-		(32 + getHiBitIdx32 ((uint32_t) (x >> 32))) :
-		getHiBitIdx32 ((uint32_t) x);
+		(32 + getHiBitIdx32((uint32_t)(x >> 32))) :
+		getHiBitIdx32((uint32_t)x);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -268,104 +268,104 @@ getHiBitIdx64 (uint64_t x)
 
 inline
 uint8_t
-getLoBitmask8 (size_t to)
+getLoBitmask8(size_t to)
 {
-	return ((uint8_t) 1 << (uint8_t) to) - 1;
+	return ((uint8_t) 1 << (uint8_t)to) - 1;
 }
 
 inline
 uint8_t
-getHiBitmask8 (size_t from)
+getHiBitmask8(size_t from)
 {
-	return ~(((uint8_t) 1 << (uint8_t) from) - 1);
+	return ~(((uint8_t) 1 << (uint8_t)from) - 1);
 }
 
 inline
 uint8_t
-getBitmask8 (
+getBitmask8(
 	size_t from,
 	size_t to
 	)
 {
-	return getLoBitmask8 (to) & getHiBitmask8 (from);
+	return getLoBitmask8(to) & getHiBitmask8(from);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint16_t
-getLoBitmask16 (size_t to)
+getLoBitmask16(size_t to)
 {
-	return ((uint16_t) 1 << (uint16_t) to) - 1;
+	return ((uint16_t) 1 << (uint16_t)to) - 1;
 }
 
 inline
 uint16_t
-getHiBitmask16 (size_t from)
+getHiBitmask16(size_t from)
 {
-	return ~(((uint16_t) 1 << (uint16_t) from) - 1);
+	return ~(((uint16_t) 1 << (uint16_t)from) - 1);
 }
 
 inline
 uint16_t
-getBitmask16 (
+getBitmask16(
 	size_t from,
 	size_t to
 	)
 {
-	return getLoBitmask16 (to) & getHiBitmask16 (from);
+	return getLoBitmask16(to) & getHiBitmask16(from);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint32_t
-getLoBitmask32 (size_t to)
+getLoBitmask32(size_t to)
 {
-	return ((uint32_t) 1 << (uint32_t) to) - 1;
+	return ((uint32_t) 1 << (uint32_t)to) - 1;
 }
 
 inline
 uint32_t
-getHiBitmask32 (size_t from)
+getHiBitmask32(size_t from)
 {
-	return ~(((uint32_t) 1 << (uint32_t) from) - 1);
+	return ~(((uint32_t) 1 << (uint32_t)from) - 1);
 }
 
 inline
 uint32_t
-getBitmask32 (
+getBitmask32(
 	size_t from,
 	size_t to
 	)
 {
-	return getLoBitmask32 (to) & getHiBitmask32 (from);
+	return getLoBitmask32(to) & getHiBitmask32(from);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 uint64_t
-getLoBitmask64 (size_t to)
+getLoBitmask64(size_t to)
 {
-	return ((uint64_t) 1 << (uint64_t) to) - 1;
+	return ((uint64_t) 1 << (uint64_t)to) - 1;
 }
 
 inline
 uint64_t
-getHiBitmask64 (size_t from)
+getHiBitmask64(size_t from)
 {
-	return ~(((uint64_t) 1 << (uint64_t) from) - 1);
+	return ~(((uint64_t) 1 << (uint64_t)from) - 1);
 }
 
 inline
 uint64_t
-getBitmask64 (
+getBitmask64(
 	size_t from,
 	size_t to
 	)
 {
-	return getLoBitmask64 (to) & getHiBitmask64 (from);
+	return getLoBitmask64(to) & getHiBitmask64(from);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -385,7 +385,7 @@ getBitmask64 (
 template <typename T>
 inline
 bool
-isPowerOf2 (T x)
+isPowerOf2(T x)
 {
 	return !(x & (x - 1));
 }
@@ -393,12 +393,12 @@ isPowerOf2 (T x)
 template <typename T>
 inline
 bool
-isAligned (
+isAligned(
 	T x,
 	size_t factor
 	)
 {
-	ASSERT (isPowerOf2 (factor));
+	ASSERT(isPowerOf2(factor));
 	return !(x & (factor - 1));
 }
 
@@ -407,21 +407,21 @@ template <
 	typename T
 	>
 T
-isAligned (T x)
+isAligned(T x)
 {
-	ASSERT (isPowerOf2 (factor));
+	ASSERT(isPowerOf2(factor));
 	return !(x & (factor - 1));
 }
 
 template <typename T>
 inline
 T
-align (
+align(
 	T x,
 	size_t factor
 	)
 {
-	ASSERT (isPowerOf2 (factor));
+	ASSERT(isPowerOf2(factor));
 	return (x + factor - 1) & ~(factor - 1);
 }
 
@@ -430,9 +430,9 @@ template <
 	typename T
 	>
 T
-align (T x)
+align(T x)
 {
-	ASSERT (isPowerOf2 (factor));
+	ASSERT(isPowerOf2(factor));
 	return (x + factor - 1) & ~(factor - 1);
 }
 
@@ -443,16 +443,16 @@ template <
 	size_t growLimit
 	>
 size_t
-getAllocSize (size_t size)
+getAllocSize(size_t size)
 {
-	return size < growLimit ? getPowerOf2Ge (size) : align <alignFactor> (size);
+	return size < growLimit ? getPowerOf2Ge(size) : align<alignFactor> (size);
 }
 
 inline
 size_t
-getAllocSize (size_t size)
+getAllocSize(size_t size)
 {
-	return getAllocSize <AXL_PTR_SIZE, AXL_PTR_SIZE * 1024 * 1024> (size);
+	return getAllocSize<AXL_PTR_SIZE, AXL_PTR_SIZE * 1024 * 1024> (size);
 }
 
 //..............................................................................

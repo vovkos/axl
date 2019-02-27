@@ -26,51 +26,51 @@ class Event: public WaitableHandle
 {
 public:
 	bool
-	create (
+	create(
 		SECURITY_ATTRIBUTES* secAttr = NULL,
 		bool isManualReset = false,
 		bool isSignalled = false,
 		const sl::StringRef_w& name = NULL
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::CreateEventW (secAttr, isManualReset, isSignalled, name.szn ());
-		return err::complete (m_h != NULL);
+		m_h = ::CreateEventW(secAttr, isManualReset, isSignalled, name.szn());
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	open (
+	open(
 		uint_t access = EVENT_ALL_ACCESS,
 		bool doInheritHandle = false,
 		const sl::StringRef_w& name = NULL
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::OpenEventW (access, doInheritHandle, name.szn ());
-		return err::complete (m_h != NULL);
+		m_h = ::OpenEventW(access, doInheritHandle, name.szn());
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		bool_t result = ::SetEvent (m_h);
-		return err::complete (result);
+		bool_t result = ::SetEvent(m_h);
+		return err::complete(result);
 	}
 
 	bool
-	reset ()
+	reset()
 	{
-		bool_t result = ::ResetEvent (m_h);
-		return err::complete (result);
+		bool_t result = ::ResetEvent(m_h);
+		return err::complete(result);
 	}
 
 	bool
-	pulse ()
+	pulse()
 	{
-		bool_t result = ::PulseEvent (m_h);
-		return err::complete (result);
+		bool_t result = ::PulseEvent(m_h);
+		return err::complete(result);
 	}
 };
 

@@ -80,37 +80,37 @@ protected:
 	sys::NamedSemaphore m_writeSemaphore;
 
 protected:
-	SharedMemoryTransportBase ();
+	SharedMemoryTransportBase();
 
-	~SharedMemoryTransportBase ()
+	~SharedMemoryTransportBase()
 	{
-		close ();
+		close();
 	}
 
 public:
 	uint_t
-	getFlags ()
+	getFlags()
 	{
 		return m_flags;
 	}
 
 	const File*
-	getFile () const
+	getFile() const
 	{
 		return &m_file;
 	}
 
 	bool
-	isOpen ()
+	isOpen()
 	{
 		return m_hdr != NULL;
 	}
 
 	void
-	close ();
+	close();
 
 	bool
-	open (
+	open(
 		const sl::StringRef& fileName,
 		const sl::StringRef& readSemaphoreName,
 		const sl::StringRef& writeSemaphoreName,
@@ -118,7 +118,7 @@ public:
 		);
 
 	bool
-	attach (
+	attach(
 		File::Handle fileHandle,
 		const sl::StringRef& readSemaphoreName,
 		const sl::StringRef& writeSemaphoreName,
@@ -126,36 +126,36 @@ public:
 		);
 
 	void
-	disconnect ();
+	disconnect();
 
 protected:
 	void
-	closeImpl ();
+	closeImpl();
 
 #if (!_AXL_OS_POSIX)
 	bool
-	initializeMapping (
+	initializeMapping(
 		size_t size,
 		bool isForced
 		)
 	{
-		return ensureMappingSize (size);
+		return ensureMappingSize(size);
 	}
 #else
 	bool
-	initializeMapping (
+	initializeMapping(
 		size_t size,
 		bool isForced
 		);
 #endif
 
 	bool
-	ensureMappingSize (size_t size);
+	ensureMappingSize(size_t size);
 
 	bool
-	ensureOffsetMapped (size_t offset)
+	ensureOffsetMapped(size_t offset)
 	{
-		return ensureMappingSize (offset + sizeof (SharedMemoryTransportHdr));
+		return ensureMappingSize(offset + sizeof(SharedMemoryTransportHdr));
 	}
 };
 
@@ -165,13 +165,13 @@ class SharedMemoryReader: public SharedMemoryTransportBase
 {
 public:
 	size_t
-	read (sl::Array <char>* buffer);
+	read(sl::Array<char>* buffer);
 
-	sl::Array <char>
-	read ()
+	sl::Array<char>
+	read()
 	{
-		sl::Array <char> buffer;
-		read (&buffer);
+		sl::Array<char> buffer;
+		read(&buffer);
 		return buffer;
 	}
 };
@@ -185,13 +185,13 @@ protected:
 	sys::Lock m_writeLock; // make write operations atomic
 
 public:
-	SharedMemoryWriter ()
+	SharedMemoryWriter()
 	{
 		m_sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint;
 	}
 
 	bool
-	open (
+	open(
 		const sl::StringRef& fileName,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName,
@@ -200,7 +200,7 @@ public:
 		);
 
 	bool
-	attach (
+	attach(
 		File::Handle fileHandle,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName,
@@ -209,16 +209,16 @@ public:
 		);
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		)
 	{
-		return write (&p, &size, 1);
+		return write(&p, &size, 1);
 	}
 
 	size_t
-	write (
+	write(
 		const void* const* blockArray,
 		const size_t* sizeArray,
 		size_t count
@@ -227,7 +227,7 @@ public:
 protected:
 	static
 	void
-	copyWriteChain (
+	copyWriteChain(
 		void* dst,
 		const void* const* blockArray,
 		const size_t* sizeArray,

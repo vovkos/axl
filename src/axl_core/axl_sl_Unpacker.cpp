@@ -18,7 +18,7 @@ namespace sl {
 //..............................................................................
 
 size_t
-Unpacker::scan_va (
+Unpacker::scan_va(
 	const char* formatString,
 	axl_va_list va
 	)

@@ -25,7 +25,7 @@ class NamedPipe: public File
 {
 public:
 	bool
-	create (
+	create(
 		const sl::StringRef_w& name,
 		uint_t openMode,
 		uint_t pipeMode,
@@ -37,28 +37,28 @@ public:
 		);
 
 	bool
-	open (
+	open(
 		const sl::StringRef_w& name,
 		uint_t access = GENERIC_READ | GENERIC_WRITE,
 		uint_t flags = FILE_FLAG_OVERLAPPED
 		);
 
 	bool
-	connect ()
+	connect()
 	{
-		bool_t result = ::ConnectNamedPipe (m_h, NULL);
-		return err::complete (result);
+		bool_t result = ::ConnectNamedPipe(m_h, NULL);
+		return err::complete(result);
 	}
 
 	bool
-	overlappedConnect (OVERLAPPED* overlapped)
+	overlappedConnect(OVERLAPPED* overlapped)
 	{
-		bool_t result = ::ConnectNamedPipe (m_h, overlapped);
-		return completeOverlappedRequest (result);
+		bool_t result = ::ConnectNamedPipe(m_h, overlapped);
+		return completeOverlappedRequest(result);
 	}
 
 	bool
-	overlappedConnect ();
+	overlappedConnect();
 };
 
 //..............................................................................

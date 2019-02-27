@@ -36,10 +36,10 @@ struct MatchCondition
 	sl::BitMap m_charSet;
 	uint_t m_char;
 
-	MatchCondition ();
+	MatchCondition();
 
 	void
-	addChar (uchar_t c);
+	addChar(uchar_t c);
 };
 
 //..............................................................................
@@ -68,19 +68,19 @@ struct NfaState: sl::ListLink
 	NfaState* m_outState;
 	NfaState* m_outState2;
 
-	NfaState ();
+	NfaState();
 
 	void
-	createEpsilonLink (NfaState* outState);
+	createEpsilonLink(NfaState* outState);
 
 	void
-	createEpsilonLink (
+	createEpsilonLink(
 		NfaState* outState,
 		NfaState* outState2
 		);
 
 	void
-	createCharMatch (
+	createCharMatch(
 		uint_t c,
 		NfaState* outState
 		);
@@ -90,39 +90,39 @@ struct NfaState: sl::ListLink
 
 struct NfaStateSet
 {
-	sl::Array <NfaState*> m_stateArray;
+	sl::Array<NfaState*> m_stateArray;
 	sl::BitMap m_stateSet;
 
 	bool
-	addState (NfaState* state);
+	addState(NfaState* state);
 
 	int
-	cmp (const NfaStateSet& set) const
+	cmp(const NfaStateSet& set) const
 	{
-		return m_stateSet.cmp (set.m_stateSet);
+		return m_stateSet.cmp(set.m_stateSet);
 	}
 
 	bool
-	isEqual (const NfaStateSet& set) const
+	isEqual(const NfaStateSet& set) const
 	{
-		return m_stateSet.isEqual (set.m_stateSet);
+		return m_stateSet.isEqual(set.m_stateSet);
 	}
 
 	size_t
-	hash () const
+	hash() const
 	{
-		return m_stateSet.hash ();
+		return m_stateSet.hash();
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class NfaStateSetMap: public sl::HashTable <
+class NfaStateSetMap: public sl::HashTable<
 	NfaStateSet*,
 	T,
-	sl::HashDuckType <NfaStateSet>,
-	sl::EqDuckType <NfaStateSet>
+	sl::HashDuckType<NfaStateSet>,
+	sl::EqDuckType<NfaStateSet>
 	>
 {
 };
@@ -140,42 +140,42 @@ struct NfaTransition: sl::ListLink
 class NfaTransitionMgr
 {
 protected:
-	sl::List <NfaTransition> m_transitionList;
-	NfaTransition* m_transitionMap [256];
+	sl::List<NfaTransition> m_transitionList;
+	NfaTransition* m_transitionMap[256];
 
 	// for UTF regexps m_transitionMap should be replaced with interval tree
 
 public:
 	void
-	clear ();
+	clear();
 
-	sl::ConstList <NfaTransition>
-	getTransitionList ()
+	sl::ConstList<NfaTransition>
+	getTransitionList()
 	{
 		return m_transitionList;
 	}
 
 	void
-	addMatchState (NfaState* state);
+	addMatchState(NfaState* state);
 
 	void
-	finalize ();
+	finalize();
 
 protected:
 	void
-	addMatchCharTransition (
+	addMatchCharTransition(
 		uint_t c,
 		NfaState* outState
 		);
 
 	void
-	addMatchCharSetTransition (
+	addMatchCharSetTransition(
 		const sl::BitMap* charSet,
 		NfaState* outState
 		);
 
 	void
-	addMatchAnyTransition (NfaState* outState);
+	addMatchAnyTransition(NfaState* outState);
 };
 
 //..............................................................................

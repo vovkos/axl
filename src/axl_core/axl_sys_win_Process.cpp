@@ -22,7 +22,7 @@ namespace win {
 //..............................................................................
 
 bool
-Process::createProcess (
+Process::createProcess(
 	const sl::StringRef_w& appName,
 	const sl::StringRef_w& cmdLine,
 	const SECURITY_ATTRIBUTES* processAttr,
@@ -37,31 +37,31 @@ Process::createProcess (
 {
 	bool_t result;
 
-	close ();
+	close();
 
 	sl::String_w mutableCmdLine = cmdLine;
 	PROCESS_INFORMATION processInfo;
 
-	result = ::CreateProcessW (
-		appName.szn (),
-		mutableCmdLine.getBuffer (),
-		(SECURITY_ATTRIBUTES*) processAttr,
-		(SECURITY_ATTRIBUTES*) threadAttr,
+	result = ::CreateProcessW(
+		appName.szn(),
+		mutableCmdLine.getBuffer(),
+		(SECURITY_ATTRIBUTES*)processAttr,
+		(SECURITY_ATTRIBUTES*)threadAttr,
 		inheritHandles,
 		flags,
-		(void*) environment,
-		currentDir.szn (),
-		(STARTUPINFOW*) startupInfo,
+		(void*)environment,
+		currentDir.szn(),
+		(STARTUPINFOW*)startupInfo,
 		&processInfo
 		);
 
 	if (!result)
-		return err::failWithLastSystemError ();
+		return err::failWithLastSystemError();
 
 	if (threadHandle)
 		*threadHandle = processInfo.hThread;
 	else
-		::CloseHandle (processInfo.hThread);
+		::CloseHandle(processInfo.hThread);
 
 	m_h = processInfo.hProcess;
 	return true;
@@ -70,16 +70,16 @@ Process::createProcess (
 //..............................................................................
 
 bool
-syncExec (
+syncExec(
 	const sl::StringRef_w& cmdLine,
-	sl::Array <char>* output,
+	sl::Array<char>* output,
 	dword_t* exitCode
 	)
 {
 	bool_t result;
 
 	SECURITY_ATTRIBUTES secAttr = { 0 };
-	secAttr.nLength = sizeof (SECURITY_ATTRIBUTES);
+	secAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 	secAttr.bInheritHandle = true;
 
 	io::win::File childStdOut;
@@ -88,14 +88,14 @@ syncExec (
 	io::win::File parentStdIn;
 
 	result =
-		::CreatePipe (parentStdOut.p (), childStdOut.p (), &secAttr, 0) &&
-		::CreatePipe (childStdIn.p (), parentStdIn.p (), &secAttr, 0);
+		::CreatePipe(parentStdOut.p(), childStdOut.p(), &secAttr, 0) &&
+		::CreatePipe(childStdIn.p(), parentStdIn.p(), &secAttr, 0);
 
 	if (!result)
-		return err::failWithLastSystemError ();
+		return err::failWithLastSystemError();
 
 	STARTUPINFOW startupInfo = { 0 };
-	startupInfo.cb = sizeof (STARTUPINFO);
+	startupInfo.cb = sizeof(STARTUPINFO);
 	startupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 	startupInfo.hStdOutput = childStdOut;
 	startupInfo.hStdInput  = childStdIn;
@@ -103,36 +103,36 @@ syncExec (
 	startupInfo.wShowWindow = SW_HIDE;
 
 	Process process;
-	result = process.createProcess (cmdLine, true, CREATE_NEW_CONSOLE, &startupInfo);
+	result = process.createProcess(cmdLine, true, CREATE_NEW_CONSOLE, &startupInfo);
 	if (!result)
 		return false;
 
-	childStdOut.close ();
-	childStdIn.close ();
+	childStdOut.close();
+	childStdIn.close();
 
-	output->clear ();
+	output->clear();
 
 	for (;;)
 	{
-		char buffer [1024];
+		char buffer[1024];
 
-		size_t size = parentStdOut.read (buffer, countof (buffer));
+		size_t size = parentStdOut.read(buffer, countof(buffer));
 		if (!size)
 			break;
 
 		if (size == -1)
 		{
-			if (err::getLastError ()->m_code == ERROR_BROKEN_PIPE)
+			if (err::getLastError()->m_code == ERROR_BROKEN_PIPE)
 				break; // pipe done - normal exit path
 
 			return false;
 		}
 
-		output->append (buffer, size);
+		output->append(buffer, size);
 	}
 
 	if (exitCode)
-		process.getExitCode (exitCode);
+		process.getExitCode(exitCode);
 
 	return true;
 }

@@ -32,7 +32,7 @@ protected:
 	ArgSave m_a;
 
 public:
-	BinClosure_1 (Arg a)
+	BinClosure_1(Arg a)
 	{
 		m_a = a;
 	}
@@ -40,7 +40,7 @@ public:
 	Result
 	operator () (Arg b) const
 	{
-		return Func () (m_a, b);
+		return Func() (m_a, b);
 	}
 };
 
@@ -58,7 +58,7 @@ protected:
 	ArgSave m_b;
 
 public:
-	BinClosure_2 (Arg b)
+	BinClosure_2(Arg b)
 	{
 		m_b = b;
 	}
@@ -66,7 +66,7 @@ public:
 	Result
 	operator () (Arg a) const
 	{
-		return Func () (a, m_b);
+		return Func() (a, m_b);
 	}
 };
 
@@ -82,7 +82,7 @@ protected:
 	T* m_p;
 
 public:
-	AssignClosure_L (T& a)
+	AssignClosure_L(T& a)
 	{
 		m_p = &a;
 	}
@@ -106,7 +106,7 @@ protected:
 	T m_b;
 
 public:
-	AssignClosure_R (Arg b)
+	AssignClosure_R(Arg b)
 	{
 		m_b = b;
 	}

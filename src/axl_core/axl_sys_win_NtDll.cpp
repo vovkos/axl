@@ -19,26 +19,26 @@ namespace win {
 //..............................................................................
 
 void
-initNtDllFunctions ()
+initNtDllFunctions()
 {
-	HMODULE hNtDll = ::GetModuleHandleW (L"ntdll.dll");
-	ASSERT (hNtDll);
+	HMODULE hNtDll = ::GetModuleHandleW(L"ntdll.dll");
+	ASSERT(hNtDll);
 
-	ntQueryDirectoryFile = (NtQueryDirectoryFileFunc*) ::GetProcAddress (hNtDll, "NtQueryDirectoryFile");
-	ntOpenDirectoryObject = (NtOpenDirectoryObjectFunc*) ::GetProcAddress (hNtDll, "NtOpenDirectoryObject");
-	ntQueryDirectoryObject = (NtQueryDirectoryObjectFunc*) ::GetProcAddress (hNtDll, "NtQueryDirectoryObject");
-	ntOpenSymbolicLinkObject = (NtOpenSymbolicLinkObjectFunc*) ::GetProcAddress (hNtDll, "NtOpenSymbolicLinkObject");
-	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObjectFunc*) ::GetProcAddress (hNtDll, "NtQuerySymbolicLinkObject");
-	ntQueryInformationFile = (NtQueryInformationFileFunc*) ::GetProcAddress (hNtDll, "NtQueryInformationFile");
-	ntQueryObject = (NtQueryObjectFunc*) ::GetProcAddress (hNtDll, "NtQueryObject");
+	ntQueryDirectoryFile = (NtQueryDirectoryFileFunc*) ::GetProcAddress(hNtDll, "NtQueryDirectoryFile");
+	ntOpenDirectoryObject = (NtOpenDirectoryObjectFunc*) ::GetProcAddress(hNtDll, "NtOpenDirectoryObject");
+	ntQueryDirectoryObject = (NtQueryDirectoryObjectFunc*) ::GetProcAddress(hNtDll, "NtQueryDirectoryObject");
+	ntOpenSymbolicLinkObject = (NtOpenSymbolicLinkObjectFunc*) ::GetProcAddress(hNtDll, "NtOpenSymbolicLinkObject");
+	ntQuerySymbolicLinkObject = (NtQuerySymbolicLinkObjectFunc*) ::GetProcAddress(hNtDll, "NtQuerySymbolicLinkObject");
+	ntQueryInformationFile = (NtQueryInformationFileFunc*) ::GetProcAddress(hNtDll, "NtQueryInformationFile");
+	ntQueryObject = (NtQueryObjectFunc*) ::GetProcAddress(hNtDll, "NtQueryObject");
 
-	ASSERT (ntQueryDirectoryFile);
-	ASSERT (ntOpenDirectoryObject);
-	ASSERT (ntQueryDirectoryObject);
-	ASSERT (ntOpenSymbolicLinkObject);
-	ASSERT (ntQuerySymbolicLinkObject);
-	ASSERT (ntQueryInformationFile);
-	ASSERT (ntQueryObject);
+	ASSERT(ntQueryDirectoryFile);
+	ASSERT(ntOpenDirectoryObject);
+	ASSERT(ntQueryDirectoryObject);
+	ASSERT(ntOpenSymbolicLinkObject);
+	ASSERT(ntQuerySymbolicLinkObject);
+	ASSERT(ntQueryInformationFile);
+	ASSERT(ntQueryObject);
 }
 
 //..............................................................................

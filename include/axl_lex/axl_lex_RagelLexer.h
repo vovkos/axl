@@ -29,7 +29,7 @@ public:
 	char* m_p;
 
 public:
-	RagelTokenPos ()
+	RagelTokenPos()
 	{
 		m_offset = 0;
 		m_length = 0;
@@ -44,28 +44,28 @@ template <
 	typename GetName,
 	typename Data = StdTokenData
 	>
-class RagelToken: public Token <Enum, GetName, Data, RagelTokenPos>
+class RagelToken: public Token<Enum, GetName, Data, RagelTokenPos>
 {
 public:
 	sl::StringRef
-	getText () const
+	getText() const
 	{
-		return sl::StringRef (this->m_pos.m_p, this->m_pos.m_length);
+		return sl::StringRef(this->m_pos.m_p, this->m_pos.m_length);
 	}
 
 	static
 	sl::String
-	getTokenListString (const sl::ConstBoxList <RagelToken>& list)
+	getTokenListString(const sl::ConstBoxList<RagelToken>& list)
 	{
-		if (list.isEmpty ())
-			return sl::String ();
+		if (list.isEmpty())
+			return sl::String();
 
-		sl::ConstBoxIterator <RagelToken> token = list.getHead ();
-		sl::String string (token->m_pos.m_p, token->m_pos.m_length);
+		sl::ConstBoxIterator<RagelToken> token = list.getHead();
+		sl::String string(token->m_pos.m_p, token->m_pos.m_length);
 		for (token++; token; token++)
 		{
-			string.append (' ');
-			string.append (token->m_pos.m_p, token->m_pos.m_length);
+			string.append(' ');
+			string.append(token->m_pos.m_p, token->m_pos.m_length);
 		}
 
 		return string;
@@ -74,7 +74,7 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef RagelToken <int, StdTokenData> StdRagelToken;
+typedef RagelToken<int, StdTokenData> StdRagelToken;
 
 //..............................................................................
 
@@ -82,9 +82,9 @@ template <
 	typename T,
 	typename Token = StdRagelToken
 	>
-class RagelLexer: public Lexer <T, Token>
+class RagelLexer: public Lexer<T, Token>
 {
-	friend class Lexer <T, Token>;
+	friend class Lexer<T, Token>;
 
 protected:
 	size_t m_tokenizeLimit;
@@ -96,7 +96,7 @@ protected:
 	int m_line;
 	size_t m_lineOffset;
 
-	sl::Array <int> m_stack; // stack of states
+	sl::Array<int> m_stack; // stack of states
 
 	// ragel interface variables
 
@@ -111,48 +111,48 @@ protected:
 	int* stack;
 
 public:
-	RagelLexer ()
+	RagelLexer()
 	{
-		onReset ();
+		onReset();
 	}
 
 	size_t
-	getTokenizeLimit ()
+	getTokenizeLimit()
 	{
 		return m_tokenizeLimit;
 	}
 
 	void
-	setTokenizeLimit (size_t tokenizeLimit)
+	setTokenizeLimit(size_t tokenizeLimit)
 	{
-		ASSERT (tokenizeLimit);
+		ASSERT(tokenizeLimit);
 		m_tokenizeLimit = tokenizeLimit;
 	}
 
 	bool
-	create (
+	create(
 		int state,
 		const sl::StringRef& filePath,
 		const sl::StringRef& source
 		)
 	{
-		create (filePath, source);
+		create(filePath, source);
 		cs = state;
 		return true;
 	}
 
 	bool
-	create (
+	create(
 		const sl::StringRef& filePath,
 		const sl::StringRef& source
 		)
 	{
-		this->reset ();
+		this->reset();
 
-		static_cast <T*> (this)->init ();
+		static_cast<T*> (this)->init();
 
-		p   = (char*) source.cp ();
-		eof = (char*) source.getEnd ();
+		p   = (char*)source.cp();
+		eof = (char*)source.getEnd();
 
 		m_filePath = filePath;
 		m_begin = p;
@@ -161,21 +161,21 @@ public:
 	}
 
 	const Token*
-	expectToken (int tokenKind)
+	expectToken(int tokenKind)
 	{
-		const Token* token = this->getToken ();
+		const Token* token = this->getToken();
 		if (token->m_token == tokenKind)
 			return token;
 
-		lex::setExpectedTokenError (Token::getName (tokenKind), token->getName ());
+		lex::setExpectedTokenError(Token::getName(tokenKind), token->getName());
 		return NULL;
 	}
 
 	void
-	ensureSrcPosError ()
+	ensureSrcPosError()
 	{
-		if (!lex::isLastSrcPosError ())
-			lex::pushSrcPosError (m_filePath, this->m_lastTokenPos);
+		if (!lex::isLastSrcPosError())
+			lex::pushSrcPosError(m_filePath, this->m_lastTokenPos);
 	}
 
 	enum GotoStateKind
@@ -185,7 +185,7 @@ public:
 	};
 
 	void
-	gotoState (
+	gotoState(
 		int state,
 		const Token* token,
 		GotoStateKind kind
@@ -203,18 +203,18 @@ public:
 	}
 
 	void
-	callState (int state)
+	callState(int state)
 	{
 		int oldState = cs;
 
-		gotoState (state);
+		gotoState(state);
 
-		stack = prePush ();
-		stack [top++] = oldState;
+		stack = prePush();
+		stack[top++] = oldState;
 	}
 
 	void
-	setLineCol (
+	setLineCol(
 		int line,
 		int col
 		)
@@ -224,55 +224,55 @@ public:
 	}
 
 	void
-	setLineCol (const LineCol& lineCol)
+	setLineCol(const LineCol& lineCol)
 	{
-		setLineCol (lineCol.m_line, lineCol.m_col);
+		setLineCol(lineCol.m_line, lineCol.m_col);
 	}
 
 protected:
 	// these are to be called from withing ragel scanner (*.rl)
 
 	void
-	newLine (char* line)
+	newLine(char* line)
 	{
-		ASSERT (line [-1] == '\n');
+		ASSERT(line[-1] == '\n');
 
 		m_lineOffset = line - m_begin;
 		m_line++;
 	}
 
 	int*
-	prePush ()
+	prePush()
 	{
-		size_t count = m_stack.getCount ();
-		m_stack.setCount (count + 1);
+		size_t count = m_stack.getCount();
+		m_stack.setCount(count + 1);
 		stack = m_stack;
 		return stack;
 	}
 
 	void
-	postPop ()
+	postPop()
 	{
-		size_t count = m_stack.getCount ();
+		size_t count = m_stack.getCount();
 		if (!count)
 			return;
 
-		m_stack.setCount (count - 1);
+		m_stack.setCount(count - 1);
 	}
 
 	void
-	stop ()
+	stop()
 	{
 		pe = p + 1;
 	}
 
 	void
-	onLexerError ()
+	onLexerError()
 	{
 	}
 
 	Token*
-	preCreateToken (
+	preCreateToken(
 		int tokenKind,
 		uint_t channelMask = TokenChannelMask_Main
 		)
@@ -280,7 +280,7 @@ protected:
 		size_t offset = ts - m_begin;
 		size_t length = te - ts;
 
-		Token* token = this->allocateToken ();
+		Token* token = this->allocateToken();
 		token->m_token = tokenKind;
 		token->m_channelMask = channelMask;
 		token->m_pos.m_offset = offset;
@@ -292,35 +292,35 @@ protected:
 	}
 
 	void
-	postCreateToken ()
+	postCreateToken()
 	{
 		m_tokenizeCount++;
 		if (m_tokenizeCount >= m_tokenizeLimit)
-			stop ();
+			stop();
 	}
 
 	Token*
-	createToken (
+	createToken(
 		int tokenKind,
 		uint_t channelMask = TokenChannelMask_Main
 		)
 	{
-		Token* token = preCreateToken (tokenKind, channelMask);
-		postCreateToken ();
+		Token* token = preCreateToken(tokenKind, channelMask);
+		postCreateToken();
 		return token;
 	}
 
 	Token*
-	createErrorToken (int c)
+	createErrorToken(int c)
 	{
-		Token* token = createToken (-1);
+		Token* token = createToken(-1);
 		token->m_data.m_integer = c;
-		postCreateToken ();
+		postCreateToken();
 		return token;
 	}
 
 	void
-	onReset ()
+	onReset()
 	{
 		p = NULL;
 		pe = NULL;
@@ -338,24 +338,24 @@ protected:
 		m_tokenizeLimit = 8;
 		m_tokenizeCount = 0;
 
-		m_filePath.clear ();
-		m_stack.clear ();
+		m_filePath.clear();
+		m_stack.clear();
 	}
 
 	void
-	tokenize ()
+	tokenize()
 	{
 		if (p != eof)
 		{
 			pe = eof;
 			m_tokenizeCount = 0;
-			static_cast <T*> (this)->exec ();
+			static_cast<T*> (this)->exec();
 		}
 		else
 		{
 			// add eof token
 			ts = te = p;
-			createToken (0);
+			createToken(0);
 		}
 	}
 

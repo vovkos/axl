@@ -19,24 +19,24 @@ namespace io {
 //..............................................................................
 
 bool
-SockAddrParser::parse (in_addr* addr)
+SockAddrParser::parse(in_addr* addr)
 {
 	bool result;
 
-	uchar_t* ip = (uchar_t*) addr;
+	uchar_t* ip = (uchar_t*)addr;
 	for (size_t i = 0;; i++)
 	{
 		uint_t octet;
-		result = parseInt (&octet, 10);
+		result = parseInt(&octet, 10);
 		if (!result)
 			return false;
 
-		ip [i] = octet;
+		ip[i] = octet;
 
 		if (i >= 3)
 			break;
 
-		result = expectChar ('.');
+		result = expectChar('.');
 		if (!result)
 			return false;
 	}
@@ -45,93 +45,93 @@ SockAddrParser::parse (in_addr* addr)
 }
 
 bool
-SockAddrParser::parse (sockaddr_in* addr)
+SockAddrParser::parse(sockaddr_in* addr)
 {
 	bool result;
 
-	memset (addr, 0, sizeof (sockaddr_in));
+	memset(addr, 0, sizeof(sockaddr_in));
 	addr->sin_family = AF_INET;
 
 	const char* p0 = m_p;
-	result = parse (&addr->sin_addr);
+	result = parse(&addr->sin_addr);
 	if (!result) // rollback and try single port
 	{
 		m_p = p0;
 
 		uint_t port;
-		result = parseInt (&port, 10);
+		result = parseInt(&port, 10);
 		if (!result)
 			return false;
 
-		skipWhiteSpace ();
+		skipWhiteSpace();
 		if (m_p != m_end)
 		{
-			err::setError (err::SystemErrorCode_InvalidAddress);
+			err::setError(err::SystemErrorCode_InvalidAddress);
 			return false;
 		}
 
 		*(uint32_t*) &addr->sin_addr = 0;
-		addr->sin_port = sl::swapByteOrder16 ((uint16_t) port);
+		addr->sin_port = sl::swapByteOrder16((uint16_t)port);
 		return true;
 	}
 
-	result = tryChar (':');
+	result = tryChar(':');
 	if (result)
 	{
 		uint_t port;
-		result = parseInt (&port, 10);
+		result = parseInt(&port, 10);
 		if (!result)
 			return false;
 
-		addr->sin_port = sl::swapByteOrder16 ((uint16_t) port);
+		addr->sin_port = sl::swapByteOrder16((uint16_t)port);
 	}
 
 	return true;
 }
 
 bool
-SockAddrParser::parse (in6_addr* addr)
+SockAddrParser::parse(in6_addr* addr)
 {
 	bool result;
 
-	uint16_t* ip = (uint16_t*) addr;
+	uint16_t* ip = (uint16_t*)addr;
 
 	size_t zeroRunIdx = -1;
 	bool isIp4 = false;
-	uchar_t ip4 [4];
+	uchar_t ip4[4];
 
-	tryChar (':');
+	tryChar(':');
 
 	size_t i = 0;
 	while (i < 8)
 	{
-		result = tryChar (':');
+		result = tryChar(':');
 		if (result)
 			zeroRunIdx = i;
 
-		skipWhiteSpace ();
+		skipWhiteSpace();
 
-		if (m_p >= m_end || !isxdigit (*m_p))
+		if (m_p >= m_end || !isxdigit(*m_p))
 			break;
 
 		uint_t word;
-		result = parseInt (&word, 16);
+		result = parseInt(&word, 16);
 		if (!result)
 			return false;
 
-		result = tryChar (':');
+		result = tryChar(':');
 		if (!result)
 		{
-			result = tryChar ('.');
+			result = tryChar('.');
 			if (result)
 			{
 				if (i > 6)
 				{
-					err::setError (err::SystemErrorCode_InvalidAddress);
+					err::setError(err::SystemErrorCode_InvalidAddress);
 					return false;
 				}
 
-				ip4 [0] = (uchar_t)
+				ip4[0] = (uchar_t)
 					((word & 0x0f) +
 					((word & 0xf0) >> 4) * 10 +
 					((word & 0xf00) >> 8) * 100);
@@ -141,7 +141,7 @@ SockAddrParser::parse (in6_addr* addr)
 			}
 		}
 
-		ip [i] = sl::swapByteOrder16 ((uint16_t) word);
+		ip[i] = sl::swapByteOrder16((uint16_t)word);
 		i++;
 
 		if (!result)
@@ -153,41 +153,41 @@ SockAddrParser::parse (in6_addr* addr)
 		for (size_t j = 1;; j++)
 		{
 			uint_t octet;
-			result = parseInt (&octet, 10);
+			result = parseInt(&octet, 10);
 			if (!result)
 				return false;
 
-			ip4 [j] = (uchar_t) octet;
+			ip4[j] = (uchar_t)octet;
 
 			if (j >= 3)
 				break;
 
-			result = expectChar ('.');
+			result = expectChar('.');
 			if (!result)
 				return false;
 		}
 
-		ASSERT (i <= 6);
-		ip [i] = ip4 [0] + (ip4 [1] << 8);
-		ip [i + 1] = ip4 [2] + (ip4 [3] << 8);
+		ASSERT(i <= 6);
+		ip[i] = ip4[0] + (ip4[1] << 8);
+		ip[i + 1] = ip4[2] + (ip4[3] << 8);
 		i += 2;
 	}
 
 	if (zeroRunIdx != -1)
 	{
-		ASSERT (i <= 8 && zeroRunIdx <= i);
+		ASSERT(i <= 8 && zeroRunIdx <= i);
 
 		size_t zeroRunLength = 8 - i;
 
 		if (zeroRunIdx < i)
 		{
-			memmove (&ip [zeroRunIdx + zeroRunLength], &ip [zeroRunIdx], (i - zeroRunIdx) * sizeof (uint16_t));
-			memset (&ip [zeroRunIdx], 0, zeroRunLength * sizeof (uint16_t));
+			memmove(&ip[zeroRunIdx + zeroRunLength], &ip[zeroRunIdx], (i - zeroRunIdx) * sizeof(uint16_t));
+			memset(&ip[zeroRunIdx], 0, zeroRunLength * sizeof(uint16_t));
 		}
 	}
 	else if (i != 8)
 	{
-		err::setError (err::SystemErrorCode_InvalidAddress);
+		err::setError(err::SystemErrorCode_InvalidAddress);
 		return false;
 	}
 
@@ -195,24 +195,24 @@ SockAddrParser::parse (in6_addr* addr)
 }
 
 bool
-SockAddrParser::parse (sockaddr_in6* addr)
+SockAddrParser::parse(sockaddr_in6* addr)
 {
 	bool result;
 
-	memset (addr, 0, sizeof (sockaddr_in6));
+	memset(addr, 0, sizeof(sockaddr_in6));
 	addr->sin6_family = AF_INET6;
 
-	bool hasBrackets = tryChar ('[');
+	bool hasBrackets = tryChar('[');
 
-	result = parse (&addr->sin6_addr);
+	result = parse(&addr->sin6_addr);
 	if (!result)
 		return false;
 
-	result = tryChar ('%');
+	result = tryChar('%');
 	if (result)
 	{
 		uint_t scope;
-		result = parseInt (&scope, 10);
+		result = parseInt(&scope, 10);
 		if (!result)
 			return false;
 
@@ -221,19 +221,19 @@ SockAddrParser::parse (sockaddr_in6* addr)
 
 	if (hasBrackets)
 	{
-		result = expectChar (']');
+		result = expectChar(']');
 		if (!result)
 			return false;
 
-		result = tryChar (':');
+		result = tryChar(':');
 		if (result)
 		{
 			uint_t port;
-			result = parseInt (&port, 10);
+			result = parseInt(&port, 10);
 			if (!result)
 				return false;
 
-			addr->sin6_port = sl::swapByteOrder16 ((uint16_t) port);
+			addr->sin6_port = sl::swapByteOrder16((uint16_t)port);
 		}
 	}
 
@@ -241,66 +241,66 @@ SockAddrParser::parse (sockaddr_in6* addr)
 }
 
 bool
-SockAddrParser::parse (
+SockAddrParser::parse(
 	sockaddr* addr,
 	size_t size
 	)
 {
-	skipWhiteSpace ();
+	skipWhiteSpace();
 	if (m_p == m_end)
 	{
-		memset (addr, 0, sizeof (sockaddr_in));
-		((sockaddr_in*) addr)->sin_family = AF_INET;
+		memset(addr, 0, sizeof(sockaddr_in));
+		((sockaddr_in*)addr)->sin_family = AF_INET;
 		return true;
 	}
 
 	SockAddrParser clone = *this;
 
-	if (trySockAddr_ip4 ())
+	if (trySockAddr_ip4())
 	{
-		if (size < sizeof (sockaddr_in))
+		if (size < sizeof(sockaddr_in))
 		{
-			err::setError (err::SystemErrorCode_BufferTooSmall);
+			err::setError(err::SystemErrorCode_BufferTooSmall);
 			return false;
 		}
 
 		*this = clone;
-		return parse ((sockaddr_in*) addr);
+		return parse((sockaddr_in*)addr);
 	}
 
 	*this = clone;
 
-	if (trySockAddr_ip6 ())
+	if (trySockAddr_ip6())
 	{
-		if (size < sizeof (sockaddr_in6))
+		if (size < sizeof(sockaddr_in6))
 		{
-			err::setError (err::SystemErrorCode_BufferTooSmall);
+			err::setError(err::SystemErrorCode_BufferTooSmall);
 			return false;
 		}
 
 		*this = clone;
-		return parse ((sockaddr_in6*) addr);
+		return parse((sockaddr_in6*)addr);
 	}
 
-	err::setError (err::SystemErrorCode_InvalidAddress);
+	err::setError(err::SystemErrorCode_InvalidAddress);
 	return false;
 }
 
 bool
-SockAddrParser::tryAddr_ip4 ()
+SockAddrParser::tryAddr_ip4()
 {
 	bool result;
 
 	for (size_t i = 0;; i++)
 	{
-		result = tryInt (10);
+		result = tryInt(10);
 		if (!result)
 			return false;
 
 		if (i >= 3)
 			break;
 
-		result = tryChar ('.');
+		result = tryChar('.');
 		if (!result)
 			return false;
 	}
@@ -309,35 +309,35 @@ SockAddrParser::tryAddr_ip4 ()
 }
 
 bool
-SockAddrParser::tryAddr_ip6 ()
+SockAddrParser::tryAddr_ip6()
 {
 	bool result;
 
 	bool hasZeroRun = false;
 	bool isIp4 = false;
 
-	tryChar (':');
+	tryChar(':');
 
 	size_t i = 0;
 	while (i < 8)
 	{
-		result = tryChar (':');
+		result = tryChar(':');
 		if (result)
 			hasZeroRun = true;
 
-		skipWhiteSpace ();
+		skipWhiteSpace();
 
-		if (m_p >= m_end || !isxdigit (*m_p))
+		if (m_p >= m_end || !isxdigit(*m_p))
 			break;
 
-		result = tryInt (16);
+		result = tryInt(16);
 		if (!result)
 			return false;
 
-		result = tryChar (':');
+		result = tryChar(':');
 		if (!result)
 		{
-			result = tryChar ('.');
+			result = tryChar('.');
 			if (result)
 			{
 				if (i > 6)
@@ -358,14 +358,14 @@ SockAddrParser::tryAddr_ip6 ()
 	{
 		for (size_t j = 1;; j++)
 		{
-			result = tryInt (10);
+			result = tryInt(10);
 			if (!result)
 				return false;
 
 			if (j >= 3)
 				break;
 
-			result = tryChar ('.');
+			result = tryChar('.');
 			if (!result)
 				return false;
 		}
@@ -380,26 +380,26 @@ SockAddrParser::tryAddr_ip6 ()
 }
 
 bool
-SockAddrParser::trySockAddr_ip4 ()
+SockAddrParser::trySockAddr_ip4()
 {
 	const char* p0 = m_p;
 
-	bool result = tryAddr_ip4 ();
+	bool result = tryAddr_ip4();
 	if (!result) // rollback and try single port
 	{
 		m_p = p0;
-		result = tryInt (10);
+		result = tryInt(10);
 		if (!result)
 			return false;
 
-		skipWhiteSpace ();
+		skipWhiteSpace();
 		return m_p == m_end;
 	}
 
-	result = tryChar (':');
+	result = tryChar(':');
 	if (result)
 	{
-		result = tryInt (10);
+		result = tryInt(10);
 		if (!result)
 			return false;
 	}
@@ -408,33 +408,33 @@ SockAddrParser::trySockAddr_ip4 ()
 }
 
 bool
-SockAddrParser::trySockAddr_ip6 ()
+SockAddrParser::trySockAddr_ip6()
 {
 	bool result;
-	bool hasBrackets = tryChar ('[');
+	bool hasBrackets = tryChar('[');
 
-	result = tryAddr_ip6 ();
+	result = tryAddr_ip6();
 	if (!result)
 		return false;
 
-	result = tryChar ('%');
+	result = tryChar('%');
 	if (result)
 	{
-		result = tryInt (10);
+		result = tryInt(10);
 		if (!result)
 			return false;
 	}
 
 	if (hasBrackets)
 	{
-		result = tryChar (']');
+		result = tryChar(']');
 		if (!result)
 			return false;
 
-		result = tryChar (':');
+		result = tryChar(':');
 		if (result)
 		{
-			result = tryInt (10);
+			result = tryInt(10);
 			if (!result)
 				return false;
 		}
@@ -444,26 +444,26 @@ SockAddrParser::trySockAddr_ip6 ()
 }
 
 void
-SockAddrParser::skipWhiteSpace ()
+SockAddrParser::skipWhiteSpace()
 {
-	while (m_p < m_end && isspace (*m_p))
+	while (m_p < m_end && isspace(*m_p))
 		m_p++;
 }
 
 bool
-SockAddrParser::parseInt (
+SockAddrParser::parseInt(
 	uint_t* p,
 	int radix
 	)
 {
-	skipWhiteSpace ();
+	skipWhiteSpace();
 
 	char* end;
-	*p = (uint_t) strtoul (m_p, &end, radix);
+	*p = (uint_t)strtoul(m_p, &end, radix);
 
 	if (end == m_p)
 	{
-		err::setError (err::SystemErrorCode_InvalidAddress);
+		err::setError(err::SystemErrorCode_InvalidAddress);
 		return false;
 	}
 
@@ -472,20 +472,20 @@ SockAddrParser::parseInt (
 }
 
 bool
-SockAddrParser::tryInt (int radix)
+SockAddrParser::tryInt(int radix)
 {
-	skipWhiteSpace ();
+	skipWhiteSpace();
 
 	const char* p = m_p;
 
 	if (radix == 16)
 	{
-		while (p < m_end && isxdigit (*p))
+		while (p < m_end && isxdigit(*p))
 			p++;
 	}
 	else
 	{
-		while (p < m_end && isdigit (*p))
+		while (p < m_end && isdigit(*p))
 			p++;
 	}
 
@@ -497,13 +497,13 @@ SockAddrParser::tryInt (int radix)
 }
 
 bool
-SockAddrParser::expectChar (char c)
+SockAddrParser::expectChar(char c)
 {
-	bool result = tryChar (c);
+	bool result = tryChar(c);
 
 	if (!result)
 	{
-		err::setError (err::SystemErrorCode_InvalidAddress);
+		err::setError(err::SystemErrorCode_InvalidAddress);
 		return false;
 	}
 
@@ -511,9 +511,9 @@ SockAddrParser::expectChar (char c)
 }
 
 bool
-SockAddrParser::tryChar (char c)
+SockAddrParser::tryChar(char c)
 {
-	skipWhiteSpace ();
+	skipWhiteSpace();
 
 	if (m_p >= m_end || *m_p != c)
 		return false;

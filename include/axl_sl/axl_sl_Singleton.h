@@ -33,9 +33,9 @@ public:
 public:
 	virtual
 	void
-	finalize ()
+	finalize()
 	{
-		m_p->~T ();
+		m_p->~T();
 	}
 };
 
@@ -45,16 +45,16 @@ template <class T>
 class ConstructSingleton
 {
 public:
-	typedef DestructSingleton <T> Destruct;
+	typedef DestructSingleton<T> Destruct;
 
 public:
 	void
 	operator () (void* p)
 	{
-		new (p) T;
-		ref::Ptr <Destruct> destruct = AXL_REF_NEW (Destruct);
-		destruct->m_p = (T*) p;
-		g::getModule ()->addFinalizer (destruct);
+		new(p)T;
+		ref::Ptr<Destruct> destruct = AXL_REF_NEW(Destruct);
+		destruct->m_p = (T*)p;
+		g::getModule()->addFinalizer(destruct);
 	}
 };
 
@@ -62,11 +62,11 @@ public:
 
 template <typename T>
 T*
-getSingleton (volatile int32_t* flag = NULL)
+getSingleton(volatile int32_t* flag = NULL)
 {
-	static uchar_t buffer [sizeof (T)] = { 0 };
-	callOnce (ConstructSingleton <T> (), buffer, flag);
-	return (T*) buffer;
+	static uchar_t buffer[sizeof(T)] = { 0 };
+	callOnce(ConstructSingleton<T> (), buffer, flag);
+	return (T*)buffer;
 }
 
 //..............................................................................

@@ -21,35 +21,35 @@ class MyFinalizer:
 	public g::Finalizer
 {
 public:
-	MyFinalizer ()
+	MyFinalizer()
 	{
-		printf ("MyFinalizer::MyFinalizer (this = %p)\n", this);
+		printf("MyFinalizer::MyFinalizer (this = %p)\n", this);
 	}
 
-	~MyFinalizer ()
+	~MyFinalizer()
 	{
-		printf ("MyFinalizer::~MyFinalizer (this = %p)\n", this);
+		printf("MyFinalizer::~MyFinalizer (this = %p)\n", this);
 	}
 
 	virtual
 	void
-	finalize ()
+	finalize()
 	{
-		printf ("MyFinalizer::finalize (this = %p)\n", this);
+		printf("MyFinalizer::finalize (this = %p)\n", this);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-run ()
+run()
 {
-	ref::Ptr <MyFinalizer> fin = AXL_REF_NEW (MyFinalizer);
-	g::getModule ()->addFinalizer (fin);
+	ref::Ptr<MyFinalizer> fin = AXL_REF_NEW(MyFinalizer);
+	g::getModule()->addFinalizer(fin);
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_Finalizer", run)
+ADD_TEST_CASE("test_Finalizer", run)
 
 }

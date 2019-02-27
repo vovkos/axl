@@ -20,18 +20,18 @@ namespace io {
 //..............................................................................
 
 bool
-Pcap::openDevice (
+Pcap::openDevice(
 	const sl::StringRef& device,
 	size_t snapshotSize,
 	bool isPromiscious,
 	uint_t readTimeout
 	)
 {
-	close ();
+	close();
 
-	char errorBuffer [PCAP_ERRBUF_SIZE];
-	m_h = pcap_open_live (
-		device.sz (),
+	char errorBuffer[PCAP_ERRBUF_SIZE];
+	m_h = pcap_open_live(
+		device.sz(),
 		snapshotSize,
 		isPromiscious,
 		readTimeout,
@@ -40,7 +40,7 @@ Pcap::openDevice (
 
 	if (!m_h)
 	{
-		err::setError (errorBuffer);
+		err::setError(errorBuffer);
 		return false;
 	}
 
@@ -48,15 +48,15 @@ Pcap::openDevice (
 }
 
 bool
-Pcap::openFile (const sl::StringRef& fileName)
+Pcap::openFile(const sl::StringRef& fileName)
 {
-	close ();
+	close();
 
-	char errorBuffer [PCAP_ERRBUF_SIZE];
-	m_h = pcap_open_offline (fileName.sz (), errorBuffer);
+	char errorBuffer[PCAP_ERRBUF_SIZE];
+	m_h = pcap_open_offline(fileName.sz(), errorBuffer);
 	if (!m_h)
 	{
-		err::setError (errorBuffer);
+		err::setError(errorBuffer);
 		return false;
 	}
 
@@ -64,30 +64,30 @@ Pcap::openFile (const sl::StringRef& fileName)
 }
 
 bool
-Pcap::setFilter (const sl::StringRef& filter)
+Pcap::setFilter(const sl::StringRef& filter)
 {
 	bpf_program program;
 
-	int result = pcap_compile (m_h, &program, (char*) (const char*) filter.sz (), true, 0);
+	int result = pcap_compile(m_h, &program, (char*)(const char*) filter.sz(), true, 0);
 	if (result == -1)
 	{
-		err::setError (pcap_geterr (m_h));
+		err::setError(pcap_geterr(m_h));
 		return false;
 	}
 
-	result = pcap_setfilter (m_h, &program);
-	pcap_freecode (&program);
+	result = pcap_setfilter(m_h, &program);
+	pcap_freecode(&program);
 	return result == 0;
 }
 
 bool
-Pcap::setBlockingMode (bool isBlocking)
+Pcap::setBlockingMode(bool isBlocking)
 {
-	char errorBuffer [PCAP_ERRBUF_SIZE];
-	int result = pcap_setnonblock (m_h, !isBlocking, errorBuffer);
+	char errorBuffer[PCAP_ERRBUF_SIZE];
+	int result = pcap_setnonblock(m_h, !isBlocking, errorBuffer);
 	if (result == -1)
 	{
-		err::setError (errorBuffer);
+		err::setError(errorBuffer);
 		return false;
 	}
 
@@ -95,7 +95,7 @@ Pcap::setBlockingMode (bool isBlocking)
 }
 
 size_t
-Pcap::read (
+Pcap::read(
 	void* p,
 	size_t size,
 	uint64_t* timestamp
@@ -104,39 +104,39 @@ Pcap::read (
 	pcap_pkthdr* hdr;
 	const uchar_t* data;
 
-	int result = pcap_next_ex (m_h, &hdr, &data);
+	int result = pcap_next_ex(m_h, &hdr, &data);
 	if (result == -1)
 	{
-		err::setError (pcap_geterr (m_h));
+		err::setError(pcap_geterr(m_h));
 		return -1;
 	}
 
 	if (result != 1) // special values
 		return result != -2 ? result : 0; // -2 means EOF
 
-	size_t copySize = AXL_MIN (hdr->caplen, size);
-	memcpy (p, data, copySize);
+	size_t copySize = AXL_MIN(hdr->caplen, size);
+	memcpy(p, data, copySize);
 
 	if (timestamp)
-		*timestamp = sys::getTimestampFromTimeval (&hdr->ts);
+		*timestamp = sys::getTimestampFromTimeval(&hdr->ts);
 
 	return copySize;
 }
 
 size_t
-Pcap::write (
+Pcap::write(
 	const void* p,
 	size_t size
 	)
 {
 #if (_AXL_OS_WIN)
-	int result = pcap_sendpacket (m_h, (const u_char*) p, (int) size);
+	int result = pcap_sendpacket(m_h, (const u_char*) p, (int)size);
 #else
-	int result = pcap_inject (m_h, p, (int) size);
+	int result = pcap_inject(m_h, p, (int)size);
 #endif
 	if (result == -1)
 	{
-		err::setError (pcap_geterr (m_h));
+		err::setError(pcap_geterr(m_h));
 		return -1;
 	}
 

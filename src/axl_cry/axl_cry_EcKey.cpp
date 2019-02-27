@@ -19,175 +19,175 @@ namespace cry {
 //..............................................................................
 
 void
-EcKey::setFlags (uint_t flags)
+EcKey::setFlags(uint_t flags)
 {
-	int prevFlags = getFlags ();
+	int prevFlags = getFlags();
 
-	addFlags (flags & ~prevFlags);
-	removeFlags (prevFlags & ~flags);
+	addFlags(flags & ~prevFlags);
+	removeFlags(prevFlags & ~flags);
 }
 
 bool
-EcKey::create ()
+EcKey::create()
 {
-	close ();
+	close();
 
-	m_h = EC_KEY_new ();
-	return completeWithLastCryptoError (m_h != NULL);
+	m_h = EC_KEY_new();
+	return completeWithLastCryptoError(m_h != NULL);
 }
 
 bool
-EcKey::create (uint_t curveId)
+EcKey::create(uint_t curveId)
 {
-	close ();
+	close();
 
-	m_h = EC_KEY_new_by_curve_name (curveId);
-	return completeWithLastCryptoError (m_h != NULL);
+	m_h = EC_KEY_new_by_curve_name(curveId);
+	return completeWithLastCryptoError(m_h != NULL);
 }
 
 bool
-EcKey::createCopy (EC_KEY* src)
+EcKey::createCopy(EC_KEY* src)
 {
-	close ();
+	close();
 
-	m_h = EC_KEY_dup (src);
-	return completeWithLastCryptoError (m_h != NULL);
+	m_h = EC_KEY_dup(src);
+	return completeWithLastCryptoError(m_h != NULL);
 }
 
 bool
-EcKey::setPublicKeyData (
+EcKey::setPublicKeyData(
 	const void* p,
 	size_t size,
 	BN_CTX* ctx
 	)
 {
-	EC_GROUP* group = getGroup ();
-	EcPoint key (group);
+	EC_GROUP* group = getGroup();
+	EcPoint key(group);
 
 	return
-		key.setData (group, p, size, ctx) &&
-		setPublicKey (key);
+		key.setData(group, p, size, ctx) &&
+		setPublicKey(key);
 }
 
 bool
-EcKey::setPublicKeyDecString (
+EcKey::setPublicKeyDecString(
 	const sl::StringRef& string,
 	BN_CTX* ctx
 	)
 {
-	EC_GROUP* group = getGroup ();
-	EcPoint key (group);
+	EC_GROUP* group = getGroup();
+	EcPoint key(group);
 
 	return
-		key.setDecString (getGroup (), string, ctx) &&
-		setPublicKey (key);
+		key.setDecString(getGroup(), string, ctx) &&
+		setPublicKey(key);
 }
 
 bool
-EcKey::setPublicKeyHexString (
+EcKey::setPublicKeyHexString(
 	const sl::StringRef& string,
 	BN_CTX* ctx
 	)
 {
-	EC_GROUP* group = getGroup ();
-	EcPoint key (group);
+	EC_GROUP* group = getGroup();
+	EcPoint key(group);
 
 	return
-		key.setHexString (group, string, ctx) &&
-		setPublicKey (key);
+		key.setHexString(group, string, ctx) &&
+		setPublicKey(key);
 }
 
 size_t
-EcKey::signHash (
+EcKey::signHash(
 	void* signatureBuffer,
 	size_t signatureBufferSize,
 	const void* hash,
 	size_t hashSize
 	)
 {
-	ASSERT (signatureBufferSize >= getMaxSignatureSize ());
+	ASSERT(signatureBufferSize >= getMaxSignatureSize());
 
-	uint_t resultSize = (uint_t) signatureBufferSize;
-	int result = ECDSA_sign (
+	uint_t resultSize = (uint_t)signatureBufferSize;
+	int result = ECDSA_sign(
 		0,
 		(const uchar_t*) hash,
-		(int) hashSize,
-		(uchar_t*) signatureBuffer,
+		(int)hashSize,
+		(uchar_t*)signatureBuffer,
 		&resultSize,
 		m_h
 		);
 
 	if (!result)
 	{
-		setLastCryptoError ();
+		setLastCryptoError();
 		return -1;
 	}
 
-	ASSERT (resultSize <= signatureBufferSize);
+	ASSERT(resultSize <= signatureBufferSize);
 	return resultSize;
 }
 
 bool
-EcKey::signHash (
-	sl::Array <char>* signature,
+EcKey::signHash(
+	sl::Array<char>* signature,
 	const void* hash,
 	size_t hashSize
 	)
 {
-	size_t maxSize = getMaxSignatureSize ();
-	bool result = signature->setCount (maxSize);
+	size_t maxSize = getMaxSignatureSize();
+	bool result = signature->setCount(maxSize);
 	if (!result)
 		return false;
 
-	size_t size = signHash (*signature, maxSize, hash, hashSize);
+	size_t size = signHash(*signature, maxSize, hash, hashSize);
 	if (size == -1)
 		return false;
 
-	ASSERT (size <= maxSize);
-	signature->setCount (size);
+	ASSERT(size <= maxSize);
+	signature->setCount(size);
 	return true;
 }
 
 //..............................................................................
 
 bool
-generateEcProductKey (
+generateEcProductKey(
 	EC_KEY* ecKey0,
 	sl::String* productKey,
 	const sl::StringRef& userName,
 	size_t hyphenDistance
 	)
 {
-	char buffer [256];
-	sl::Array <char> signature (ref::BufKind_Stack, buffer, sizeof (buffer));
+	char buffer[256];
+	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
 
-	EcKey ecKey (ecKey0);
+	EcKey ecKey(ecKey0);
 
 	bool result =
-		ecKey.sign (&signature, userName.cp (), userName.getLength ()) &&
-		enc::Base32Encoding::encode (productKey, signature, signature.getCount (), hyphenDistance) != -1;
+		ecKey.sign(&signature, userName.cp(), userName.getLength()) &&
+		enc::Base32Encoding::encode(productKey, signature, signature.getCount(), hyphenDistance) != -1;
 
-	ecKey.detach ();
+	ecKey.detach();
 	return result;
 }
 
 bool
-verifyEcProductKey (
+verifyEcProductKey(
 	EC_KEY* ecKey0,
 	const sl::StringRef& userName,
 	const sl::StringRef& productKey
 	)
 {
-	char buffer [256];
-	sl::Array <char> signature (ref::BufKind_Stack, buffer, sizeof (buffer));
+	char buffer[256];
+	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
 
-	EcKey ecKey (ecKey0);
+	EcKey ecKey(ecKey0);
 
 	bool result =
-		enc::Base32Encoding::decode (&signature, productKey) != -1 &&
-		ecKey.verify (userName.cp (), userName.getLength (), signature, signature.getCount ());
+		enc::Base32Encoding::decode(&signature, productKey) != -1 &&
+		ecKey.verify(userName.cp(), userName.getLength(), signature, signature.getCount());
 
-	ecKey.detach ();
+	ecKey.detach();
 	return result;
 }
 

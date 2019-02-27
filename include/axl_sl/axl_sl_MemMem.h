@@ -21,7 +21,7 @@ namespace sl {
 //..............................................................................
 
 const void*
-memMem (
+memMem(
 	const void* p1,
 	size_t size1,
 	const void* p2,
@@ -30,18 +30,18 @@ memMem (
 
 inline
 void*
-memMem (
+memMem(
 	void* p1,
 	size_t size1,
 	const void* p2,
 	size_t size2
 	)
 {
-	return (void*) memMem ((const void*) p1, size1, p2, size2);
+	return (void*)memMem((const void*) p1, size1, p2, size2);
 }
 
 const void*
-reverseMemMem (
+reverseMemMem(
 	const void* p1,
 	size_t size1,
 	const void* p2,
@@ -50,14 +50,14 @@ reverseMemMem (
 
 inline
 void*
-reverseMemMem (
+reverseMemMem(
 	void* p1,
 	size_t size1,
 	const void* p2,
 	size_t size2
 	)
 {
-	return (void*) reverseMemMem ((const void*) p1, size1, p2, size2);
+	return (void*)reverseMemMem((const void*) p1, size1, p2, size2);
 }
 
 //..............................................................................

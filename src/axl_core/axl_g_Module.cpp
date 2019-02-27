@@ -21,7 +21,7 @@ namespace axl {
 namespace sys {
 
 void
-initPreciseTimestamps ();
+initPreciseTimestamps();
 
 } // namespace sys
 
@@ -34,9 +34,9 @@ namespace g {
 class ModuleCreator
 {
 public:
-	ModuleCreator ()
+	ModuleCreator()
 	{
-		getModule ();
+		getModule();
 	}
 };
 
@@ -44,53 +44,53 @@ static ModuleCreator g_moduleCreator;
 
 //..............................................................................
 
-Module::Module ()
+Module::Module()
 {
 #ifdef _AXL_DEBUG
 	m_tag = "<untagged-module>";
 #endif
 
 #if (_AXL_OS_WIN)
-	m_hModule = ::GetModuleHandle (NULL);
+	m_hModule = ::GetModuleHandle(NULL);
 
 	SYSTEM_INFO systemInfo;
-	::GetSystemInfo (&systemInfo);
+	::GetSystemInfo(&systemInfo);
 	m_systemInfo.m_processorCount     = systemInfo.dwNumberOfProcessors;
 	m_systemInfo.m_pageSize           = systemInfo.dwPageSize;
 	m_systemInfo.m_mappingAlignFactor = systemInfo.dwAllocationGranularity;
 
-	sys::win::initNtDllFunctions ();
+	sys::win::initNtDllFunctions();
 
 #elif (_AXL_OS_POSIX)
-	m_systemInfo.m_processorCount     = sysconf (_SC_NPROCESSORS_ONLN);
-	m_systemInfo.m_pageSize           = sysconf (_SC_PAGE_SIZE);
-	m_systemInfo.m_mappingAlignFactor = sysconf (_SC_PAGE_SIZE);
+	m_systemInfo.m_processorCount     = sysconf(_SC_NPROCESSORS_ONLN);
+	m_systemInfo.m_pageSize           = sysconf(_SC_PAGE_SIZE);
+	m_systemInfo.m_mappingAlignFactor = sysconf(_SC_PAGE_SIZE);
 #endif
 
-	sys::initPreciseTimestamps ();
+	sys::initPreciseTimestamps();
 }
 
-Module::~Module ()
+Module::~Module()
 {
-	while (!m_finalizerList.isEmpty ())
+	while (!m_finalizerList.isEmpty())
 	{
-		FinalizerEntry* finalizerEntry = m_finalizerList.removeTail ();
-		finalizerEntry->m_finalizer->finalize ();
-		AXL_MEM_DELETE (finalizerEntry);
+		FinalizerEntry* finalizerEntry = m_finalizerList.removeTail();
+		finalizerEntry->m_finalizer->finalize();
+		AXL_MEM_DELETE(finalizerEntry);
 	}
 
-	m_memTracker.trace ();
+	m_memTracker.trace();
 }
 
 bool
-Module::addFinalizer (const ref::Ptr <Finalizer>& finalizer)
+Module::addFinalizer(const ref::Ptr<Finalizer>& finalizer)
 {
-	FinalizerEntry* finalizerEntry = AXL_MEM_NEW (FinalizerEntry);
+	FinalizerEntry* finalizerEntry = AXL_MEM_NEW(FinalizerEntry);
 	finalizerEntry->m_finalizer = finalizer;
 
-	m_finalizerListLock.lock ();
-	m_finalizerList.insertTail (finalizerEntry);
-	m_finalizerListLock.unlock ();
+	m_finalizerListLock.lock();
+	m_finalizerList.insertTail(finalizerEntry);
+	m_finalizerListLock.unlock();
 	return true;
 }
 
@@ -101,15 +101,15 @@ Module::addFinalizer (const ref::Ptr <Finalizer>& finalizer)
 
 #if (_AXL_OS_WIN)
 void
-axl_trace_va (
+axl_trace_va(
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	char buffer [512] = { 0 };
-	axl::sl::String string (axl::ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.format_va (formatString, va);
-	::OutputDebugStringA (string);
+	char buffer[512] = { 0 };
+	axl::sl::String string(axl::ref::BufKind_Stack, buffer, sizeof(buffer));
+	string.format_va(formatString, va);
+	::OutputDebugStringA(string);
 }
 #endif
 

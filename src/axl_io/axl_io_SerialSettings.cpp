@@ -18,7 +18,7 @@ namespace io {
 //..............................................................................
 
 void
-SerialSettings::setup (
+SerialSettings::setup(
 	uint_t baudRate,
 	uint_t dataBits,
 	SerialStopBits stopBits,
@@ -42,12 +42,12 @@ SerialSettings::setup (
 #if (_AXL_OS_WIN)
 
 void
-SerialSettings::setDcb (const DCB* dcb)
+SerialSettings::setDcb(const DCB* dcb)
 {
 	m_baudRate = dcb->BaudRate;
 	m_dataBits = dcb->ByteSize;
-	m_stopBits = (SerialStopBits) dcb->StopBits;
-	m_parity   = (SerialParity) dcb->Parity;
+	m_stopBits = (SerialStopBits)dcb->StopBits;
+	m_parity   = (SerialParity)dcb->Parity;
 
 	m_flowControl =
 		dcb->fOutxCtsFlow && dcb->fRtsControl == RTS_CONTROL_HANDSHAKE ? SerialFlowControl_RtsCts :
@@ -67,10 +67,10 @@ SerialSettings::setDcb (const DCB* dcb)
 #elif (_AXL_OS_POSIX)
 
 void
-SerialSettings::setAttr (const termios* attr)
+SerialSettings::setAttr(const termios* attr)
 {
-	speed_t speed = cfgetispeed (attr);
-	switch (speed)
+	speed_t speed = cfgetispeed(attr);
+	switch(speed)
 	{
 	case B110:
 		m_baudRate = 110;
@@ -122,7 +122,7 @@ SerialSettings::setAttr (const termios* attr)
 	}
 
 	uint_t byteSize = attr->c_cflag & CSIZE;
-	switch (byteSize)
+	switch(byteSize)
 	{
 	case CS5:
 		m_dataBits = 5;

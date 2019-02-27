@@ -20,13 +20,13 @@ namespace gui {
 
 //..............................................................................
 
-GdiImage::GdiImage ()
+GdiImage::GdiImage()
 {
-	m_engine = GdiEngine::getSingleton ();
+	m_engine = GdiEngine::getSingleton();
 }
 
 bool
-GdiImage::getData (
+GdiImage::getData(
 	void* data,
 	int left,
 	int top,
@@ -40,7 +40,7 @@ GdiImage::getData (
 	int height = bottom - top;
 
 	BITMAPINFO bitmapInfo = { 0 };
-	bitmapInfo.bmiHeader.biSize = sizeof (bitmapInfo.bmiHeader);
+	bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
 	bitmapInfo.bmiHeader.biPlanes = 1;
 	bitmapInfo.bmiHeader.biBitCount = 32;
 	bitmapInfo.bmiHeader.biCompression = BI_RGB;
@@ -51,23 +51,23 @@ GdiImage::getData (
 
 	if (width == m_size.m_width)
 	{
-		result = ::GetDIBits (screenDc, m_h, top, height, data, &bitmapInfo, DIB_RGB_COLORS);
-		return err::complete (result);
+		result = ::GetDIBits(screenDc, m_h, top, height, data, &bitmapInfo, DIB_RGB_COLORS);
+		return err::complete(result);
 	}
 
-	char buffer [1024];
-	sl::Array <uint_t> colorBuffer (ref::BufKind_Stack, buffer, sizeof (buffer));
-	colorBuffer.setCount (m_size.m_width * height);
+	char buffer[1024];
+	sl::Array<uint_t> colorBuffer(ref::BufKind_Stack, buffer, sizeof(buffer));
+	colorBuffer.setCount(m_size.m_width * height);
 
-	result = ::GetDIBits (screenDc, m_h, top, height, colorBuffer, &bitmapInfo, DIB_RGB_COLORS);
+	result = ::GetDIBits(screenDc, m_h, top, height, colorBuffer, &bitmapInfo, DIB_RGB_COLORS);
 	if (!result)
-		return err::failWithLastSystemError ();
+		return err::failWithLastSystemError();
 
-	uint_t* dst = (uint_t*) data;
+	uint_t* dst = (uint_t*)data;
 	const uint_t* src = colorBuffer;
 
 	for (int i = 0; i < height; i++, dst += width, src += m_size.m_width)
-		memcpy (dst, src, width * sizeof (uint_t));
+		memcpy(dst, src, width * sizeof(uint_t));
 
 	return true;
 }

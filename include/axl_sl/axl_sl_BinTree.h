@@ -27,7 +27,7 @@ template <
 	typename Key,
 	typename Value
 	>
-struct BinTreeNodeBase: MapEntry <Key, Value>
+struct BinTreeNodeBase: MapEntry<Key, Value>
 {
 protected:
 	T* m_parent;
@@ -39,7 +39,7 @@ protected:
 
 	static
 	void
-	onXcg (
+	onXcg(
 		T* node1,
 		T* node2
 		)
@@ -72,16 +72,16 @@ template <
 class BinTreeBase
 {
 public:
-	typedef sl::Iterator <Node> Iterator;
-	typedef sl::ConstIterator <Node> ConstIterator;
+	typedef sl::Iterator<Node> Iterator;
+	typedef sl::ConstIterator<Node> ConstIterator;
 
 protected:
-	List <Node> m_nodeList;
+	List<Node> m_nodeList;
 	Node* m_root;
 	Cmp m_cmp;
 
 public:
-	explicit BinTreeBase (const Cmp& cmp = Cmp ())
+	explicit BinTreeBase(const Cmp& cmp = Cmp())
 	{
 		m_root = NULL;
 		m_cmp = cmp;
@@ -90,59 +90,59 @@ public:
 	Value&
 	operator [] (KeyArg key)
 	{
-		return visit (key)->m_value;
+		return visit(key)->m_value;
 	}
 
 	const Value&
 	operator [] (KeyArg key) const
 	{
-		return visit (key)->m_value;
+		return visit(key)->m_value;
 	}
 
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
-		return m_nodeList.isEmpty ();
+		return m_nodeList.isEmpty();
 	}
 
 	size_t
-	getCount () const
+	getCount() const
 	{
-		return m_nodeList.getCount ();
+		return m_nodeList.getCount();
 	}
 
 	Iterator
-	getHead ()
+	getHead()
 	{
-		return m_nodeList.getHead ();
+		return m_nodeList.getHead();
 	}
 
 	ConstIterator
-	getHead () const
+	getHead() const
 	{
-		return m_nodeList.getHead ();
+		return m_nodeList.getHead();
 	}
 
 	Iterator
-	getTail ()
+	getTail()
 	{
-		return m_nodeList.getTail ();
+		return m_nodeList.getTail();
 	}
 
 	ConstIterator
-	getTail () const
+	getTail() const
 	{
-		return m_nodeList.getTail ();
+		return m_nodeList.getTail();
 	}
 
 	Iterator
-	find (KeyArg key)
+	find(KeyArg key)
 	{
 		Node* node = m_root;
 
 		while (node)
 		{
-			int cmp = m_cmp (key, node->m_key);
+			int cmp = m_cmp(key, node->m_key);
 			if (cmp == 0)
 				return node;
 
@@ -153,13 +153,13 @@ public:
 	}
 
 	ConstIterator
-	find (KeyArg key) const
+	find(KeyArg key) const
 	{
-		return ((BinTreeBase*) this)->find (key); // a simple const-cast
+		return ((BinTreeBase*)this)->find(key); // a simple const-cast
 	}
 
 	Iterator
-	find (
+	find(
 		KeyArg key,
 		BinTreeFindRelOp relOp
 		)
@@ -168,12 +168,12 @@ public:
 		Node* prevNode;
 		int prevCmp;
 
-		if (isEmpty ())
+		if (isEmpty())
 			return NULL;
 
 		while (node)
 		{
-			int cmp = m_cmp (key, node->m_key);
+			int cmp = m_cmp(key, node->m_key);
 			if (cmp == 0)
 				break; // exact match
 
@@ -183,20 +183,20 @@ public:
 			node = cmp < 0 ? node->m_left : node->m_right;
 		}
 
-		ASSERT (node || prevNode);
-		switch (relOp)
+		ASSERT(node || prevNode);
+		switch(relOp)
 		{
 		case BinTreeFindRelOp_Lt:
-			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator (prevNode).getPrev ();
+			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();
 
 		case BinTreeFindRelOp_Le:
-			return node ? node : prevCmp > 0 ? prevNode : Iterator (prevNode).getPrev ();
+			return node ? node : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();
 
 		case BinTreeFindRelOp_Gt:
-			return node ? node->m_right : prevCmp < 0 ? prevNode : Iterator (prevNode).getNext ();
+			return node ? node->m_right : prevCmp < 0 ? prevNode : Iterator(prevNode).getNext();
 
 		case BinTreeFindRelOp_Ge:
-			return node ? node : prevCmp < 0 ? prevNode : Iterator (prevNode).getNext ();
+			return node ? node : prevCmp < 0 ? prevNode : Iterator(prevNode).getNext();
 
 		case BinTreeFindRelOp_Eq:
 		default:
@@ -205,37 +205,37 @@ public:
 	}
 
 	ConstIterator
-	find (
+	find(
 		KeyArg key,
 		BinTreeFindRelOp relOp
 		) const
 	{
-		return ((BinTreeBase*) this)->find (key, relOp); // a simple const-cast
+		return ((BinTreeBase*)this)->find(key, relOp); // a simple const-cast
 	}
 
 	Value
-	findValue (
+	findValue(
 		KeyArg key,
 		ValueArg undefinedValue
 		) const
 	{
-		ConstIterator it = find (key);
+		ConstIterator it = find(key);
 		return it ? it->m_value : undefinedValue;
 	}
 
 	Value
-	findValue (
+	findValue(
 		KeyArg key,
 		BinTreeFindRelOp relOp,
 		ValueArg undefinedValue
 		) const
 	{
-		ConstIterator it = find (key, relOp);
+		ConstIterator it = find(key, relOp);
 		return it ? it->m_value : undefinedValue;
 	}
 
 	Iterator
-	visit (KeyArg key)
+	visit(KeyArg key)
 	{
 		Node* parent = NULL;
 		Node* node = m_root;
@@ -246,7 +246,7 @@ public:
 
 		while (node)
 		{
-			cmp = m_cmp (key, node->m_key);
+			cmp = m_cmp(key, node->m_key);
 			if (cmp == 0)
 				return node;
 
@@ -256,7 +256,7 @@ public:
 
 		// create and insert new node
 
-		node = AXL_MEM_ZERO_NEW (Node);
+		node = AXL_MEM_ZERO_NEW(Node);
 		node->m_key = key;
 		node->m_parent = parent;
 		node->m_left = NULL;
@@ -265,52 +265,52 @@ public:
 		if (!parent)
 		{
 			m_root = node;
-			m_nodeList.insertTail (node);
+			m_nodeList.insertTail(node);
 		}
 		else if (cmp < 0)
 		{
 			parent->m_left = node;
-			m_nodeList.insertBefore (node, parent);
+			m_nodeList.insertBefore(node, parent);
 		}
 		else
 		{
 			parent->m_right = node;
-			m_nodeList.insertAfter (node, parent);
+			m_nodeList.insertAfter(node, parent);
 		}
 
-		static_cast <T*> (this)->onInsert (node);
+		static_cast<T*> (this)->onInsert(node);
 		return node;
 	}
 
 	Iterator
-	add (
+	add(
 		KeyArg key,
 		ValueArg value,
 		bool* isNew = NULL
 		)
 	{
-		size_t prevCount = getCount ();
+		size_t prevCount = getCount();
 
-		Iterator it = visit (key);
+		Iterator it = visit(key);
 		it->m_value = value;
 
 		if (isNew)
-			*isNew = getCount () > prevCount;
+			*isNew = getCount() > prevCount;
 
 		return it;
 	}
 
 	Iterator
-	addIfNotExists (
+	addIfNotExists(
 		KeyArg key,
 		ValueArg value
 		)
 	{
-		size_t prevCount = getCount ();
+		size_t prevCount = getCount();
 
-		Iterator it = visit (key);
+		Iterator it = visit(key);
 
-		if (getCount () == prevCount)
+		if (getCount() == prevCount)
 			return NULL;
 
 		it->m_value = value;
@@ -318,42 +318,42 @@ public:
 	}
 
 	void
-	erase (Iterator it)
+	erase(Iterator it)
 	{
 		Node* node = *it;
 
 		if (node->m_left && node->m_right)
 		{
-			Node* next = (Node*) node->m_next;
-			ASSERT (next == getLeftmostChild (node->m_right));
-			xcg (node, next);
+			Node* next = (Node*)node->m_next;
+			ASSERT(next == getLeftmostChild(node->m_right));
+			xcg(node, next);
 		}
 
-		static_cast <T*> (this)->onErase (node);
-		m_nodeList.erase (node);
+		static_cast<T*> (this)->onErase(node);
+		m_nodeList.erase(node);
 	}
 
 	bool
-	eraseKey (KeyArg key)
+	eraseKey(KeyArg key)
 	{
-		Iterator it = find (key);
+		Iterator it = find(key);
 		if (!it)
 			return false;
 
-		erase (it);
+		erase(it);
 		return true;
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		m_nodeList.clear ();
+		m_nodeList.clear();
 		m_root = NULL;
 	}
 
 protected:
 	Node*
-	getLeftmostChild (Node* node)
+	getLeftmostChild(Node* node)
 	{
 		while (node->m_left)
 			node = node->m_left;
@@ -362,7 +362,7 @@ protected:
 	}
 
 	Node*
-	getRightmostChild (Node* node)
+	getRightmostChild(Node* node)
 	{
 		while (node->m_right)
 			node = node->m_right;
@@ -371,7 +371,7 @@ protected:
 	}
 
 	void
-	xcg (
+	xcg(
 		Node* node1,
 		Node* node2
 		)
@@ -463,17 +463,17 @@ protected:
 		if (node2->m_right)
 			node2->m_right->m_parent = node2;
 
-		Node::onXcg (node1, node2);
+		Node::onXcg(node1, node2);
 	}
 
 	Node*
-	replaceWithChild (Node* node)
+	replaceWithChild(Node* node)
 	{
 		Node* child = node->m_right ? node->m_right : node->m_left;
 
 		if (!node->m_parent)
 		{
-			ASSERT (node == m_root);
+			ASSERT(node == m_root);
 			m_root = child;
 		}
 		else if (node == node->m_parent->m_left)
@@ -488,10 +488,10 @@ protected:
 	}
 
 	void
-	rotateLeft (Node* x)
+	rotateLeft(Node* x)
 	{
 		Node* y = x->m_right;
-		ASSERT (y);
+		ASSERT(y);
 
 		x->m_right = y->m_left;
 
@@ -512,10 +512,10 @@ protected:
 	}
 
 	void
-	rotateRight (Node* x)
+	rotateRight(Node* x)
 	{
 		Node* y = x->m_left;
-		ASSERT (y);
+		ASSERT(y);
 
 		x->m_left = y->m_right;
 
@@ -538,14 +538,14 @@ protected:
 	// overridables: tree rebalancing on insert/delete
 
 	void
-	onInsert (Node* node)
+	onInsert(Node* node)
 	{
 	}
 
 	void
-	onErase (Node* node)
+	onErase(Node* node)
 	{
-		replaceWithChild (node);
+		replaceWithChild(node);
 	}
 };
 

@@ -25,13 +25,13 @@ struct LineCol
 	int m_line;
 	int m_col;
 
-	LineCol ()
+	LineCol()
 	{
 		m_line = 0;
 		m_col = 0;
 	}
 
-	LineCol (
+	LineCol(
 		int line,
 		int col
 		)
@@ -41,21 +41,21 @@ struct LineCol
 	}
 
 	void
-	clear ()
+	clear()
 	{
 		m_line = 0;
 		m_col = 0;
 	}
 
 	void
-	count (const sl::StringRef& string)
+	count(const sl::StringRef& string)
 	{
-		clear ();
-		incrementalCount (string);
+		clear();
+		incrementalCount(string);
 	}
 
 	void
-	incrementalCount (const sl::StringRef& string);
+	incrementalCount(const sl::StringRef& string);
 };
 
 //..............................................................................
@@ -64,25 +64,25 @@ struct SrcPos: LineCol
 {
 	sl::StringRef m_filePath;
 
-	SrcPos ()
+	SrcPos()
 	{
 	}
 
-	SrcPos (
+	SrcPos(
 		const sl::StringRef& filePath,
 		const LineCol& lineCol
 		):
-		LineCol (lineCol)
+		LineCol(lineCol)
 	{
 		m_filePath = filePath;
 	}
 
-	SrcPos (
+	SrcPos(
 		const sl::StringRef& filePath,
 		int line,
 		int col
 		):
-		LineCol (line, col)
+		LineCol(line, col)
 	{
 		m_filePath = filePath;
 	}
@@ -90,7 +90,7 @@ struct SrcPos: LineCol
 	SrcPos&
 	operator = (const LineCol& lineCol)
 	{
-		*(LineCol*) this = lineCol;
+		*(LineCol*)this = lineCol;
 		return *this;
 	}
 };
@@ -115,7 +115,7 @@ struct StdTokenData
 
 	sl::StringRef m_string;
 
-	StdTokenData ()
+	StdTokenData()
 	{
 		m_int64 = 0;
 	}
@@ -159,7 +159,7 @@ struct Token
 
 	// define token value in derived class
 
-	Token ()
+	Token()
 	{
 		m_token = 0;
 		m_channelMask = TokenChannelMask_Main;
@@ -167,15 +167,15 @@ struct Token
 
 	static
 	const char*
-	getName (int token)
+	getName(int token)
 	{
-		return Name () (token);
+		return Name() (token);
 	}
 
 	const char*
-	getName () const
+	getName() const
 	{
-		return getName (m_token);
+		return getName(m_token);
 	}
 };
 
@@ -188,7 +188,7 @@ public: \
 	const char* \
 	operator () (int tokenKind) \
 	{ \
-		switch (tokenKind) \
+		switch(tokenKind) \
 		{
 
 #define AXL_LEX_TOKEN_NAME(tokenKind, name) \
@@ -197,7 +197,7 @@ public: \
 
 #define AXL_LEX_END_TOKEN_NAME_MAP_EX(unknownName) \
 		default: \
-			return isprint ((uchar_t) tokenKind) ? axl::sl::getCharLiteral ((uchar_t) tokenKind) : unknownName; \
+			return isprint((uchar_t)tokenKind) ? axl::sl::getCharLiteral((uchar_t)tokenKind) : unknownName; \
 		} \
 	} \
 };

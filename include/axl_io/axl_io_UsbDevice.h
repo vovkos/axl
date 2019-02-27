@@ -25,40 +25,40 @@ namespace io {
 //..............................................................................
 
 const char*
-getUsbSpeedString (libusb_speed speed);
+getUsbSpeedString(libusb_speed speed);
 
 const char*
-getUsbClassCodeString (libusb_class_code classCode);
+getUsbClassCodeString(libusb_class_code classCode);
 
 const char*
-getUsbTransferTypeString (libusb_transfer_type transferType);
+getUsbTransferTypeString(libusb_transfer_type transferType);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const libusb_interface_descriptor*
-findUsbInterfaceDescriptor (
+findUsbInterfaceDescriptor(
 	const libusb_config_descriptor* configDesc,
 	uint_t interfaceId,
 	uint_t altSettingId
 	);
 
 const libusb_endpoint_descriptor*
-findUsbEndpointDescriptor (
+findUsbEndpointDescriptor(
 	const libusb_interface_descriptor* ifaceDesc,
 	uint_t endpointId
 	);
 
 inline
 const libusb_endpoint_descriptor*
-findUsbEndpointDescriptor (
+findUsbEndpointDescriptor(
 	const libusb_config_descriptor* configDesc,
 	uint_t endpointId,
 	uint_t interfaceId = 0,
 	uint_t altSettingId = 0
 	)
 {
-	const libusb_interface_descriptor* ifaceDesc = findUsbInterfaceDescriptor (configDesc, interfaceId, altSettingId);
-	return ifaceDesc ? findUsbEndpointDescriptor (ifaceDesc, endpointId) : NULL;
+	const libusb_interface_descriptor* ifaceDesc = findUsbInterfaceDescriptor(configDesc, interfaceId, altSettingId);
+	return ifaceDesc ? findUsbEndpointDescriptor(ifaceDesc, endpointId) : NULL;
 }
 
 //..............................................................................
@@ -69,17 +69,17 @@ public:
 	void
 	operator () (libusb_device** h)
 	{
-		libusb_free_device_list (h, true);
+		libusb_free_device_list(h, true);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbDeviceList: public sl::Handle <libusb_device**, FreeUsbDeviceList>
+class UsbDeviceList: public sl::Handle<libusb_device**, FreeUsbDeviceList>
 {
 public:
 	size_t
-	enumerateDevices (libusb_context* context = NULL);
+	enumerateDevices(libusb_context* context = NULL);
 };
 
 //..............................................................................
@@ -90,13 +90,13 @@ public:
 	void
 	operator () (libusb_config_descriptor* h)
 	{
-		libusb_free_config_descriptor (h);
+		libusb_free_config_descriptor(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef sl::Handle <libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfigDescriptor;
+typedef sl::Handle<libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfigDescriptor;
 
 //..............................................................................
 
@@ -113,221 +113,221 @@ protected:
 	libusb_device_handle* m_openHandle;
 
 public:
-	UsbDevice ()
+	UsbDevice()
 	{
 		m_device = NULL;
 		m_openHandle = NULL;
 	}
 
-	~UsbDevice ()
+	~UsbDevice()
 	{
-		setDevice (NULL);
+		setDevice(NULL);
 	}
 
 	libusb_device*
-	getDevice ()
+	getDevice()
 	{
 		return m_device;
 	}
 
 	libusb_device_handle*
-	getOpenHandle ()
+	getOpenHandle()
 	{
 		return m_openHandle;
 	}
 
 	bool
-	isOpen ()
+	isOpen()
 	{
 		return m_openHandle != NULL;
 	}
 
 	uint8_t
-	getDeviceAddress ()
+	getDeviceAddress()
 	{
-		ASSERT (m_device);
-		return libusb_get_device_address (m_device);
+		ASSERT(m_device);
+		return libusb_get_device_address(m_device);
 	}
 
 	uint8_t
-	getBusNumber ()
+	getBusNumber()
 	{
-		ASSERT (m_device);
-		return libusb_get_bus_number (m_device);
+		ASSERT(m_device);
+		return libusb_get_bus_number(m_device);
 	}
 
 #if (_AXL_IO_USBDEVICE_PORT)
 	uint8_t
-	getPortNumber ()
+	getPortNumber()
 	{
-		ASSERT (m_device);
-		return libusb_get_port_number (m_device);
+		ASSERT(m_device);
+		return libusb_get_port_number(m_device);
 	}
 
 	size_t
-	getPortPath (
+	getPortPath(
 		uint8_t* path,
 		size_t maxLength
 		);
 #endif
 
 	libusb_speed
-	getDeviceSpeed ()
+	getDeviceSpeed()
 	{
-		ASSERT (m_device);
-		return (libusb_speed) libusb_get_device_speed (m_device);
+		ASSERT(m_device);
+		return (libusb_speed)libusb_get_device_speed(m_device);
 	}
 
 	size_t
-	getMaxPacketSize (uint_t endpointId);
+	getMaxPacketSize(uint_t endpointId);
 
 	size_t
-	getMaxIsoPacketSize (uint_t endpointId);
+	getMaxIsoPacketSize(uint_t endpointId);
 
 	// open-close
 
 	void
-	refDevice ()
+	refDevice()
 	{
-		ASSERT (m_device);
-		libusb_ref_device (m_device);
+		ASSERT(m_device);
+		libusb_ref_device(m_device);
 	}
 
 	void
-	unrefDevice ()
+	unrefDevice()
 	{
-		ASSERT (m_device);
-		libusb_unref_device (m_device);
+		ASSERT(m_device);
+		libusb_unref_device(m_device);
 	}
 
 	void
-	setDevice (libusb_device* device);
+	setDevice(libusb_device* device);
 
 	void
-	close ();
+	close();
 
 	bool
-	open ();
+	open();
 
 	bool
-	open (libusb_device* device)
+	open(libusb_device* device)
 	{
-		setDevice (device);
-		return open ();
+		setDevice(device);
+		return open();
 	}
 
 	bool
-	open (
+	open(
 		uint_t vendorId,
 		uint_t productId
 		)
 	{
-		return open (NULL, vendorId, productId);
+		return open(NULL, vendorId, productId);
 	}
 
 	bool
-	open (
+	open(
 		libusb_context* context,
 		uint_t vendorId,
 		uint_t productId
 		);
 
 	uint_t
-	getConfiguration ();
+	getConfiguration();
 
 	bool
-	setConfiguration (uint_t configurationId);
+	setConfiguration(uint_t configurationId);
 
 	bool
-	claimInterface (uint_t ifaceId);
+	claimInterface(uint_t ifaceId);
 
 	bool
-	releaseInterface (uint_t ifaceId);
+	releaseInterface(uint_t ifaceId);
 
 	bool
-	setInterfaceAltSetting (
+	setInterfaceAltSetting(
 		uint_t ifaceId,
 		uint_t altSettingId
 		);
 
 	bool
-	clearHalt (uint_t endpointId);
+	clearHalt(uint_t endpointId);
 
 	bool
-	resetDevice ();
+	resetDevice();
 
 	bool
-	isKernelDriverActive (uint_t ifaceId);
+	isKernelDriverActive(uint_t ifaceId);
 
 	bool
-	attachKernelDriver (uint_t ifaceId);
+	attachKernelDriver(uint_t ifaceId);
 
 	bool
-	detachKernelDriver (uint_t ifaceId);
+	detachKernelDriver(uint_t ifaceId);
 
 	bool
-	setAutoDetachKernelDriver (bool isAutoDetach);
+	setAutoDetachKernelDriver(bool isAutoDetach);
 
 	// descriptors
 
-	sl::Array <char>
-	getDescriptor (
+	sl::Array<char>
+	getDescriptor(
 		libusb_descriptor_type descriptorType,
 		uint_t descriptorId
 		)
 	{
-		sl::Array <char> descriptor;
-		getDescriptor (descriptorType, descriptorId, &descriptor);
+		sl::Array<char> descriptor;
+		getDescriptor(descriptorType, descriptorId, &descriptor);
 		return descriptor;
 	}
 
 	bool
-	getDescriptor (
+	getDescriptor(
 		libusb_descriptor_type descriptorType,
 		uint_t descriptorId,
-		sl::Array <char>* descriptor
+		sl::Array<char>* descriptor
 		);
 
 	bool
-	getDeviceDescriptor (libusb_device_descriptor* descriptor);
+	getDeviceDescriptor(libusb_device_descriptor* descriptor);
 
 	bool
-	getConfigDescriptor (
+	getConfigDescriptor(
 		uint_t configurationId,
 		UsbConfigDescriptor* desc
 		);
 
 	bool
-	getActiveConfigDescriptor (UsbConfigDescriptor* desc);
+	getActiveConfigDescriptor(UsbConfigDescriptor* desc);
 
 	sl::String
-	getStringDesrciptor (
+	getStringDesrciptor(
 		uint_t stringId,
 		uint_t langId
 		)
 	{
 		sl::String string;
-		getStringDesrciptor (stringId, langId, &string);
+		getStringDesrciptor(stringId, langId, &string);
 		return string;
 	}
 
 	bool
-	getStringDesrciptor (
+	getStringDesrciptor(
 		uint_t stringId,
 		uint_t langId,
 		sl::String* string
 		);
 
 	sl::String
-	getStringDesrciptor (uint_t stringId)
+	getStringDesrciptor(uint_t stringId)
 	{
 		sl::String string;
-		getStringDesrciptor (stringId, &string);
+		getStringDesrciptor(stringId, &string);
 		return string;
 	}
 
 	bool
-	getStringDesrciptor (
+	getStringDesrciptor(
 		uint_t stringId,
 		sl::String* string
 		);
@@ -335,7 +335,7 @@ public:
 	// synchronous transfers
 
 	size_t
-	controlTransfer (
+	controlTransfer(
 		uint_t requestType,
 		uint_t requestCode,
 		uint_t value,
@@ -346,7 +346,7 @@ public:
 		);
 
 	size_t
-	bulkTransfer (
+	bulkTransfer(
 		uint_t endpointId,
 		void* p,
 		size_t size,
@@ -354,7 +354,7 @@ public:
 		);
 
 	size_t
-	interruptTransfer (
+	interruptTransfer(
 		uint_t endpointId,
 		void* p,
 		size_t size,

@@ -23,73 +23,73 @@ namespace sl {
 class CircularBuffer
 {
 protected:
-	sl::Array <char> m_buffer;
+	sl::Array<char> m_buffer;
 	char* m_reader;
 	char* m_writer;
 	size_t m_dataSize;
 
 public:
-	CircularBuffer ();
+	CircularBuffer();
 
 	bool
-	isValid () const;
+	isValid() const;
 
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
 		return m_dataSize == 0;
 	}
 
 	bool
-	isFull () const
+	isFull() const
 	{
-		ASSERT (isValid ());
-		return m_dataSize == m_buffer.getCount ();
+		ASSERT(isValid());
+		return m_dataSize == m_buffer.getCount();
 	}
 
 	size_t
-	getBufferSize () const
+	getBufferSize() const
 	{
-		return m_buffer.getCount ();
+		return m_buffer.getCount();
 	}
 
 	bool
-	setBufferSize (size_t size);
+	setBufferSize(size_t size);
 
 	size_t
-	getDataSize () const
+	getDataSize() const
 	{
 		return m_dataSize;
 	}
 
 	void
-	clear ();
+	clear();
 
 	size_t
-	readAll (sl::Array <char>* buffer);
+	readAll(sl::Array<char>* buffer);
 
-	sl::Array <char>
-	readAll ()
+	sl::Array<char>
+	readAll()
 	{
-		sl::Array <char> buffer;
-		readAll (&buffer);
+		sl::Array<char> buffer;
+		readAll(&buffer);
 		return buffer;
 	}
 
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size
 		);
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	drop (size_t size);
+	drop(size_t size);
 };
 
 //..............................................................................

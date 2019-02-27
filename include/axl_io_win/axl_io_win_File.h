@@ -21,11 +21,11 @@ namespace win {
 
 //.............................................................................
 
-class File: public sl::Handle <HANDLE, sys::win::CloseHandle, sl::MinusOne <HANDLE> >
+class File: public sl::Handle<HANDLE, sys::win::CloseHandle, sl::MinusOne<HANDLE> >
 {
 public:
 	bool
-	create (
+	create(
 		const sl::StringRef_w& fileName,
 		uint_t accessMode,
 		uint_t shareMode,
@@ -35,7 +35,7 @@ public:
 		);
 
 	bool
-	duplicate (
+	duplicate(
 		HANDLE sourceProcess,
 		HANDLE sourceHandle,
 		HANDLE targetProcess,
@@ -45,48 +45,48 @@ public:
 		);
 
 	uint64_t
-	getSize () const;
+	getSize() const;
 
 	bool
-	setSize (uint64_t size);
+	setSize(uint64_t size);
 
 	uint64_t
-	getPosition () const;
+	getPosition() const;
 
 	bool
-	setPosition (uint64_t offset) const;
+	setPosition(uint64_t offset) const;
 
 	bool
-	flush ()
+	flush()
 	{
-		bool_t result = ::FlushFileBuffers (m_h);
-		return err::complete (result);
+		bool_t result = ::FlushFileBuffers(m_h);
+		return err::complete(result);
 	}
 
 	bool
-	read (
+	read(
 		void* p,
 		dword_t size,
 		dword_t* actualSize
 		) const
 	{
-		bool_t result = ::ReadFile (m_h, p, size, actualSize, NULL);
-		return err::complete (result);
+		bool_t result = ::ReadFile(m_h, p, size, actualSize, NULL);
+		return err::complete(result);
 	}
 
 	bool
-	write (
+	write(
 		const void* p,
 		dword_t size,
 		dword_t* actualSize
 		)
 	{
-		bool_t result = ::WriteFile (m_h, p, size, actualSize, NULL);
-		return err::complete (result);
+		bool_t result = ::WriteFile(m_h, p, size, actualSize, NULL);
+		return err::complete(result);
 	}
 
 	bool
-	ioctl (
+	ioctl(
 		dword_t code,
 		const void* inData,
 		dword_t inDataSize,
@@ -95,34 +95,34 @@ public:
 		dword_t* actualSize
 		)
 	{
-		bool_t result = ::DeviceIoControl (m_h, code, (void*) inData, inDataSize, outData, outDataSize, actualSize, NULL);
-		return err::complete (result);
+		bool_t result = ::DeviceIoControl(m_h, code, (void*)inData, inDataSize, outData, outDataSize, actualSize, NULL);
+		return err::complete(result);
 	}
 
 	bool
-	overlappedRead (
+	overlappedRead(
 		void* p,
 		dword_t size,
 		OVERLAPPED* overlapped
 		) const
 	{
-		bool_t result = ::ReadFile (m_h, p, size, NULL, overlapped);
-		return completeOverlappedRequest (result);
+		bool_t result = ::ReadFile(m_h, p, size, NULL, overlapped);
+		return completeOverlappedRequest(result);
 	}
 
 	bool
-	overlappedWrite (
+	overlappedWrite(
 		const void* p,
 		dword_t size,
 		OVERLAPPED* overlapped
 		)
 	{
-		bool_t result = ::WriteFile (m_h, p, size, NULL, overlapped);
-		return completeOverlappedRequest (result);
+		bool_t result = ::WriteFile(m_h, p, size, NULL, overlapped);
+		return completeOverlappedRequest(result);
 	}
 
 	bool
-	overlappedIoctl (
+	overlappedIoctl(
 		dword_t code,
 		const void* inData,
 		dword_t inDataSize,
@@ -131,74 +131,74 @@ public:
 		OVERLAPPED* overlapped
 		)
 	{
-		bool_t result = ::DeviceIoControl (m_h, code, (void*) inData, inDataSize, outData, outDataSize, NULL, overlapped);
-		return completeOverlappedRequest (result);
+		bool_t result = ::DeviceIoControl(m_h, code, (void*)inData, inDataSize, outData, outDataSize, NULL, overlapped);
+		return completeOverlappedRequest(result);
 	}
 
 	bool
-	readEx (
+	readEx(
 		void* p,
 		dword_t size,
 		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
 		) const
 	{
-		bool_t result = ::ReadFileEx (m_h, p, size, overlapped, completionFunc);
-		return err::complete (result);
+		bool_t result = ::ReadFileEx(m_h, p, size, overlapped, completionFunc);
+		return err::complete(result);
 	}
 
 	bool
-	writeEx (
+	writeEx(
 		const void* p,
 		dword_t size,
 		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
 		)
 	{
-		bool_t result = ::WriteFileEx (m_h, p, size, overlapped, completionFunc);
-		return err::complete (result);
+		bool_t result = ::WriteFileEx(m_h, p, size, overlapped, completionFunc);
+		return err::complete(result);
 	}
 
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size
 		) const;
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	overlappedRead (
+	overlappedRead(
 		void* p,
 		size_t size
 		) const;
 
 	size_t
-	overlappedWrite (
+	overlappedWrite(
 		const void* p,
 		size_t size
 		);
 
 	bool
-	overlappedRead (
+	overlappedRead(
 		void* p,
 		dword_t size,
 		dword_t* actualSize
 		) const;
 
 	bool
-	overlappedWrite (
+	overlappedWrite(
 		const void* p,
 		dword_t size,
 		dword_t* actualSize
 		);
 
 	bool
-	overlappedIoctl (
+	overlappedIoctl(
 		dword_t code,
 		const void* inData,
 		dword_t inDataSize,
@@ -209,16 +209,16 @@ public:
 
 	static
 	bool
-	completeOverlappedRequest (bool_t result);
+	completeOverlappedRequest(bool_t result);
 
 	bool
-	getOverlappedResult (
+	getOverlappedResult(
 		OVERLAPPED* overlapped,
 		dword_t* actualSize
 		) const;
 
 	size_t
-	getOverlappedResult (OVERLAPPED* overlapped) const;
+	getOverlappedResult(OVERLAPPED* overlapped) const;
 };
 
 //..............................................................................
@@ -229,9 +229,9 @@ public:
 	sys::NotificationEvent m_completionEvent;
 
 public:
-	StdOverlapped ()
+	StdOverlapped()
 	{
-		memset (this, 0, sizeof (OVERLAPPED));
+		memset(this, 0, sizeof(OVERLAPPED));
 		hEvent = m_completionEvent.m_event;
 	}
 };

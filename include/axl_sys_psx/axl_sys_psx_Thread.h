@@ -27,14 +27,14 @@ protected:
 	pthread_attr_t m_attr;
 
 public:
-	ThreadAttr ()
+	ThreadAttr()
 	{
-		::pthread_attr_init (&m_attr);
+		::pthread_attr_init(&m_attr);
 	}
 
-	~ThreadAttr ()
+	~ThreadAttr()
 	{
-		::pthread_attr_destroy (&m_attr);
+		::pthread_attr_destroy(&m_attr);
 	}
 
 	operator const pthread_attr_t* () const
@@ -49,34 +49,34 @@ public:
 
 #if (!_AXL_OS_DARWIN)
 	cpu_set_t
-	getAffinity () const
+	getAffinity() const
 	{
 		cpu_set_t cpuSet = { 0 };
-		::pthread_attr_getaffinity_np (&m_attr, sizeof (cpu_set_t), &cpuSet);
+		::pthread_attr_getaffinity_np(&m_attr, sizeof(cpu_set_t), &cpuSet);
 		return cpuSet;
 	}
 
 	bool
-	setAffinity (cpu_set_t cpuSet)
+	setAffinity(cpu_set_t cpuSet)
 	{
-		int result = ::pthread_attr_setaffinity_np (&m_attr, sizeof (cpu_set_t), &cpuSet);
-		return result == 0 ? true : err::fail (result);
+		int result = ::pthread_attr_setaffinity_np(&m_attr, sizeof(cpu_set_t), &cpuSet);
+		return result == 0 ? true : err::fail(result);
 	}
 #endif
 
 	size_t
-	getStackSize () const
+	getStackSize() const
 	{
 		size_t size = -1;
-		::pthread_attr_getstacksize (&m_attr, &size);
+		::pthread_attr_getstacksize(&m_attr, &size);
 		return size;
 	}
 
 	bool
-	setStackSize (size_t size)
+	setStackSize(size_t size)
 	{
-		int result = ::pthread_attr_setstacksize (&m_attr, size);
-		return result == 0 ? true : err::fail (result);
+		int result = ::pthread_attr_setstacksize(&m_attr, size);
+		return result == 0 ? true : err::fail(result);
 	}
 };
 
@@ -84,7 +84,7 @@ public:
 
 typedef
 void*
-ThreadFunc (void* context);
+ThreadFunc(void* context);
 
 //..............................................................................
 
@@ -95,66 +95,66 @@ protected:
 	bool m_isOpen;
 
 public:
-	Thread ()
+	Thread()
 	{
 		m_isOpen = false;
 	}
 
-	~Thread ()
+	~Thread()
 	{
-		detach ();
+		detach();
 	}
 
-	operator pthread_t ()
+	operator pthread_t()
 	{
 		return m_threadId;
 	}
 
 	bool
-	isOpen ()
+	isOpen()
 	{
 		return m_isOpen;
 	}
 
 	bool
-	create (
+	create(
 		const pthread_attr_t* attr,
 		ThreadFunc* threadFunc,
 		void* context = NULL
 		);
 
 	bool
-	create (
+	create(
 		ThreadFunc* threadFunc,
 		void* context = NULL
 		)
 	{
-		return create (NULL, threadFunc, context);
+		return create(NULL, threadFunc, context);
 	}
 
 	bool
-	cancel ()
+	cancel()
 	{
-		int result = ::pthread_cancel (m_threadId);
-		return result != 0 ? true : err::fail (result);
+		int result = ::pthread_cancel(m_threadId);
+		return result != 0 ? true : err::fail(result);
 	}
 
 	bool
-	join (void** retVal = NULL);
+	join(void** retVal = NULL);
 
 #if (!_AXL_OS_DARWIN)
 	bool
-	tryJoin (void** retVal = NULL);
+	tryJoin(void** retVal = NULL);
 
 	bool
-	join (
+	join(
 		uint_t timeout,
 		void** retVal = NULL
 		);
 #endif
 
 	bool
-	detach ();
+	detach();
 };
 
 //..............................................................................

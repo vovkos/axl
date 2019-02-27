@@ -27,31 +27,31 @@ protected:
 	T m_p;
 
 public:
-	ObjectBase ()
+	ObjectBase()
 	{
 		m_p = MACH_PORT_NULL;
 	}
 
-	ObjectBase (const ObjectBase& src)
+	ObjectBase(const ObjectBase& src)
 	{
 		if (src.m_p)
-			::IOObjectRetain (src.m_p);
+			::IOObjectRetain(src.m_p);
 
 		m_p = src.m_p;
 	}
 
-	ObjectBase (
+	ObjectBase(
 		T p,
 		bool isAttach = false
 		)
 	{
 		if (p && !isAttach)
-			::IOObjectRetain (p);
+			::IOObjectRetain(p);
 
 		m_p = p;
 	}
 
-	operator T () const
+	operator T() const
 	{
 		return m_p;
 	}
@@ -59,32 +59,32 @@ public:
 	ObjectBase&
 	operator = (const ObjectBase& src)
 	{
-		copy (src.m_p);
+		copy(src.m_p);
 		return *this;
 	}
 
 	ObjectBase&
 	operator = (T p)
 	{
-		copy (p);
+		copy(p);
 		return *this;
 	}
 
 	T
-	p () const
+	p() const
 	{
 		return m_p;
 	}
 
 	void
-	attach (T p)
+	attach(T p)
 	{
-		clear ();
+		clear();
 		m_p = p;
 	}
 
 	T
-	detach ()
+	detach()
 	{
 		T p = m_p;
 		m_p = MACH_PORT_NULL;
@@ -92,45 +92,45 @@ public:
 	}
 
 	void
-	clear ()
+	clear()
 	{
 		if (m_p)
-			::IOObjectRelease (m_p);
+			::IOObjectRelease(m_p);
 
 		m_p = MACH_PORT_NULL;
 	}
 
 	void
-	copy (T p)
+	copy(T p)
 	{
 		if (m_p == p)
 			return;
 
 		if (p)
-			::IOObjectRetain (p);
+			::IOObjectRetain(p);
 
 		if (m_p)
-			::IOObjectRelease (m_p);
+			::IOObjectRelease(m_p);
 
 		m_p = p;
 	}
 
 	void
-	retain ()
+	retain()
 	{
-		::IOObjectRetain (m_p);
+		::IOObjectRetain(m_p);
 	}
 
 	void
-	release ()
+	release()
 	{
-		::IOObjectRelease (m_p);
+		::IOObjectRelease(m_p);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef ObjectBase <io_object_t> Object;
+typedef ObjectBase<io_object_t> Object;
 
 //..............................................................................
 

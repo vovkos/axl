@@ -20,15 +20,15 @@ namespace win {
 //..............................................................................
 
 bool
-Bstr::copy (
+Bstr::copy(
 	BSTR p,
 	size_t length
 	)
 {
-	close ();
+	close();
 
-	m_h = ::SysAllocStringLen (p, length);
-	return m_h ? true : err::fail (err::SystemErrorCode_InsufficientResources);
+	m_h = ::SysAllocStringLen(p, length);
+	return m_h ? true : err::fail(err::SystemErrorCode_InsufficientResources);
 }
 
 //..............................................................................

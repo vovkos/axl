@@ -43,80 +43,80 @@ protected:
 	size_t m_unitSize;
 
 public:
-	CharCodec ()
+	CharCodec()
 	{
 		m_unitSize = 1;
 	}
 
 	size_t
-	getUnitSize ()
+	getUnitSize()
 	{
 		return m_unitSize;
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf8 (
+	calcRequiredBufferSizeToEncodeFromUtf8(
 		const utf8_t* p,
 		size_t length
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf16 (
+	calcRequiredBufferSizeToEncodeFromUtf16(
 		const utf16_t* p,
 		size_t length
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf32 (
+	calcRequiredBufferSizeToEncodeFromUtf32(
 		const utf32_t* p,
 		size_t length
 		) = 0;
 
 	size_t
-	encodeFromUtf8 (
-		sl::Array <char>* buffer,
+	encodeFromUtf8(
+		sl::Array<char>* buffer,
 		const utf8_t* p,
 		size_t length
 		);
 
 	size_t
-	encodeFromUtf16 (
-		sl::Array <char>* buffer,
+	encodeFromUtf16(
+		sl::Array<char>* buffer,
 		const utf16_t* p,
 		size_t length
 		);
 
 	size_t
-	encodeFromUtf32 (
-		sl::Array <char>* buffer,
+	encodeFromUtf32(
+		sl::Array<char>* buffer,
 		const utf32_t* p,
 		size_t length
 		);
 
-	sl::Array <char>
-	encodeFromUtf8 (
+	sl::Array<char>
+	encodeFromUtf8(
 		const utf8_t* p,
 		size_t length
 		);
 
-	sl::Array <char>
-	encodeFromUtf16 (
+	sl::Array<char>
+	encodeFromUtf16(
 		const utf16_t* p,
 		size_t length
 		);
 
-	sl::Array <char>
-	encodeFromUtf32 (
+	sl::Array<char>
+	encodeFromUtf32(
 		const utf32_t* p,
 		size_t length
 		);
 
 	virtual
 	size_t
-	encodeFromUtf8 (
+	encodeFromUtf8(
 		void* buffer,
 		size_t bufferSize,
 		const utf8_t* p,
@@ -126,7 +126,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf16 (
+	encodeFromUtf16(
 		void* buffer,
 		size_t bufferSize,
 		const utf16_t* p,
@@ -136,7 +136,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf32 (
+	encodeFromUtf32(
 		void* buffer,
 		size_t bufferSize,
 		const utf32_t* p,
@@ -146,67 +146,67 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf8 (
+	calcRequiredBufferLengthToDecodeToUtf8(
 		const void* p,
 		size_t size
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf16 (
+	calcRequiredBufferLengthToDecodeToUtf16(
 		const void* p,
 		size_t size
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf32 (
+	calcRequiredBufferLengthToDecodeToUtf32(
 		const void* p,
 		size_t size
 		) = 0;
 
 	size_t
-	decodeToUtf8 (
-		sl::Array <utf8_t>* buffer,
+	decodeToUtf8(
+		sl::Array<utf8_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	decodeToUtf16 (
-		sl::Array <utf16_t>* buffer,
+	decodeToUtf16(
+		sl::Array<utf16_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	decodeToUtf32 (
-		sl::Array <utf32_t>* buffer,
+	decodeToUtf32(
+		sl::Array<utf32_t>* buffer,
 		const void* p,
 		size_t size
 		);
 
-	sl::Array <utf8_t>
-	decodeToUtf8 (
+	sl::Array<utf8_t>
+	decodeToUtf8(
 		const void* p,
 		size_t size
 		);
 
-	sl::Array <utf16_t>
-	decodeToUtf16 (
+	sl::Array<utf16_t>
+	decodeToUtf16(
 		const void* p,
 		size_t size
 		);
 
-	sl::Array <utf32_t>
-	decodeToUtf32 (
+	sl::Array<utf32_t>
+	decodeToUtf32(
 		const void* p,
 		size_t size
 		);
 
 	virtual
 	size_t
-	decodeToUtf8 (
+	decodeToUtf8(
 		utf8_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -216,7 +216,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf16 (
+	decodeToUtf16(
 		utf16_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -226,7 +226,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32 (
+	decodeToUtf32(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -236,7 +236,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32 (
+	decodeToUtf32(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,
@@ -249,51 +249,51 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 CharCodec*
-getCharCodec (CharCodecKind codecKind);
+getCharCodec(CharCodecKind codecKind);
 
 //..............................................................................
 
 class AsciiCodec: public CharCodec
 {
 public:
-	AsciiCodec ()
+	AsciiCodec()
 	{
 		m_unitSize = 1;
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf8 (
+	calcRequiredBufferSizeToEncodeFromUtf8(
 		const utf8_t* p,
 		size_t length
 		)
 	{
-		return UtfToAsciiConvert <Utf8>::calcRequiredLength (p, length);
+		return UtfToAsciiConvert<Utf8>::calcRequiredLength(p, length);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf16 (
+	calcRequiredBufferSizeToEncodeFromUtf16(
 		const utf16_t* p,
 		size_t length
 		)
 	{
-		return UtfToAsciiConvert <Utf16>::calcRequiredLength (p, length);
+		return UtfToAsciiConvert<Utf16>::calcRequiredLength(p, length);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf32 (
+	calcRequiredBufferSizeToEncodeFromUtf32(
 		const utf32_t* p,
 		size_t length
 		)
 	{
-		return UtfToAsciiConvert <Utf32>::calcRequiredLength (p, length);
+		return UtfToAsciiConvert<Utf32>::calcRequiredLength(p, length);
 	}
 
 	virtual
 	size_t
-	encodeFromUtf8 (
+	encodeFromUtf8(
 		void* buffer,
 		size_t bufferSize,
 		const utf8_t* p,
@@ -301,8 +301,8 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		return UtfToAsciiConvert <Utf8>::convert (
-			(char*) buffer,
+		return UtfToAsciiConvert<Utf8>::convert(
+			(char*)buffer,
 			bufferSize,
 			p,
 			length,
@@ -312,7 +312,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf16 (
+	encodeFromUtf16(
 		void* buffer,
 		size_t bufferSize,
 		const utf16_t* p,
@@ -320,8 +320,8 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		return UtfToAsciiConvert <Utf16>::convert (
-			(char*) buffer,
+		return UtfToAsciiConvert<Utf16>::convert(
+			(char*)buffer,
 			bufferSize,
 			p,
 			length,
@@ -331,7 +331,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf32 (
+	encodeFromUtf32(
 		void* buffer,
 		size_t bufferSize,
 		const utf32_t* p,
@@ -339,8 +339,8 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		return UtfToAsciiConvert <Utf32>::convert (
-			(char*) buffer,
+		return UtfToAsciiConvert<Utf32>::convert(
+			(char*)buffer,
 			bufferSize,
 			p,
 			length,
@@ -350,37 +350,37 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf8 (
+	calcRequiredBufferLengthToDecodeToUtf8(
 		const void* p,
 		size_t size
 		)
 	{
-		return AsciiToUtfConvert <Utf8>::calcRequiredLength ((const char*) p, size);
+		return AsciiToUtfConvert<Utf8>::calcRequiredLength((const char*) p, size);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf16 (
+	calcRequiredBufferLengthToDecodeToUtf16(
 		const void* p,
 		size_t size
 		)
 	{
-		return AsciiToUtfConvert <Utf16>::calcRequiredLength ((const char*) p, size);
+		return AsciiToUtfConvert<Utf16>::calcRequiredLength((const char*) p, size);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf32 (
+	calcRequiredBufferLengthToDecodeToUtf32(
 		const void* p,
 		size_t size
 		)
 	{
-		return AsciiToUtfConvert <Utf32>::calcRequiredLength ((const char*) p, size);
+		return AsciiToUtfConvert<Utf32>::calcRequiredLength((const char*) p, size);
 	}
 
 	virtual
 	size_t
-	decodeToUtf8 (
+	decodeToUtf8(
 		utf8_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -388,7 +388,7 @@ public:
 		size_t* takenSize
 		)
 	{
-		return AsciiToUtfConvert <Utf8>::convert (
+		return AsciiToUtfConvert<Utf8>::convert(
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -399,7 +399,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf16 (
+	decodeToUtf16(
 		utf16_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -407,7 +407,7 @@ public:
 		size_t* takenSize = NULL
 		)
 	{
-		return AsciiToUtfConvert <Utf16>::convert (
+		return AsciiToUtfConvert<Utf16>::convert(
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -418,7 +418,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32 (
+	decodeToUtf32(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -426,7 +426,7 @@ public:
 		size_t* takenSize = NULL
 		)
 	{
-		return AsciiToUtfConvert <Utf32>::convert (
+		return AsciiToUtfConvert<Utf32>::convert(
 			buffer,
 			bufferLength,
 			(const char*) p,
@@ -437,7 +437,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32 (
+	decodeToUtf32(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,
@@ -446,7 +446,7 @@ public:
 		size_t* takenSize = NULL
 		)
 	{
-		return AsciiToUtfConvert <Utf32>::convert (
+		return AsciiToUtfConvert<Utf32>::convert(
 			cplBuffer,
 			textBuffer,
 			bufferLength,
@@ -465,44 +465,44 @@ public:
 	typedef typename T::C C;
 
 public:
-	UtfCodec ()
+	UtfCodec()
 	{
-		m_unitSize = sizeof (C);
+		m_unitSize = sizeof(C);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf8 (
+	calcRequiredBufferSizeToEncodeFromUtf8(
 		const utf8_t* p,
 		size_t length
 		)
 	{
-		return UtfConvert <T, Utf8>::calcRequiredLength (p, length) * sizeof (C);
+		return UtfConvert<T, Utf8>::calcRequiredLength(p, length) * sizeof(C);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf16 (
+	calcRequiredBufferSizeToEncodeFromUtf16(
 		const utf16_t* p,
 		size_t length
 		)
 	{
-		return UtfConvert <T, Utf16>::calcRequiredLength (p, length) * sizeof (C);
+		return UtfConvert<T, Utf16>::calcRequiredLength(p, length) * sizeof(C);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf32 (
+	calcRequiredBufferSizeToEncodeFromUtf32(
 		const utf32_t* p,
 		size_t length
 		)
 	{
-		return UtfConvert <T, Utf32>::calcRequiredLength (p, length) * sizeof (C);
+		return UtfConvert<T, Utf32>::calcRequiredLength(p, length) * sizeof(C);
 	}
 
 	virtual
 	size_t
-	encodeFromUtf8 (
+	encodeFromUtf8(
 		void* buffer,
 		size_t bufferSize,
 		const utf8_t* p,
@@ -510,18 +510,18 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		return UtfConvert <T, Utf8>::convert (
-			(C*) buffer,
-			bufferSize / sizeof (C),
+		return UtfConvert<T, Utf8>::convert(
+			(C*)buffer,
+			bufferSize / sizeof(C),
 			p,
 			length,
 			takenLength
-			) * sizeof (C);
+			) * sizeof(C);
 	}
 
 	virtual
 	size_t
-	encodeFromUtf16 (
+	encodeFromUtf16(
 		void* buffer,
 		size_t bufferSize,
 		const utf16_t* p,
@@ -529,18 +529,18 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		return UtfConvert <T, Utf16>::convert (
-			(C*) buffer,
-			bufferSize / sizeof (C),
+		return UtfConvert<T, Utf16>::convert(
+			(C*)buffer,
+			bufferSize / sizeof(C),
 			p,
 			length,
 			takenLength
-			) * sizeof (C);
+			) * sizeof(C);
 	}
 
 	virtual
 	size_t
-	encodeFromUtf32 (
+	encodeFromUtf32(
 		void* buffer,
 		size_t bufferSize,
 		const utf32_t* p,
@@ -548,57 +548,57 @@ public:
 		size_t* takenLength = NULL
 		)
 	{
-		return UtfConvert <T, Utf32>::convert (
-			(C*) buffer,
-			bufferSize / sizeof (C),
+		return UtfConvert<T, Utf32>::convert(
+			(C*)buffer,
+			bufferSize / sizeof(C),
 			p,
 			length,
 			takenLength
-			) * sizeof (C);
+			) * sizeof(C);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf8 (
+	calcRequiredBufferLengthToDecodeToUtf8(
 		const void* p,
 		size_t size
 		)
 	{
-		return UtfConvert <Utf8, T>::calcRequiredLength (
+		return UtfConvert<Utf8, T>::calcRequiredLength(
 			(const C*) p,
-			size / sizeof (C)
+			size / sizeof(C)
 			);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf16 (
+	calcRequiredBufferLengthToDecodeToUtf16(
 		const void* p,
 		size_t size
 		)
 	{
-		return UtfConvert <Utf16, T>::calcRequiredLength (
+		return UtfConvert<Utf16, T>::calcRequiredLength(
 			(const C*) p,
-			size / sizeof (C)
+			size / sizeof(C)
 			);
 	}
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf32 (
+	calcRequiredBufferLengthToDecodeToUtf32(
 		const void* p,
 		size_t size
 		)
 	{
-		return UtfConvert <Utf32, T>::calcRequiredLength (
+		return UtfConvert<Utf32, T>::calcRequiredLength(
 			(const C*) p,
-			size / sizeof (C)
+			size / sizeof(C)
 			);
 	}
 
 	virtual
 	size_t
-	decodeToUtf8 (
+	decodeToUtf8(
 		utf8_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -607,23 +607,23 @@ public:
 		)
 	{
 		size_t takenLength;
-		size_t takenBufferLength = UtfConvert <Utf8, T>::convert (
+		size_t takenBufferLength = UtfConvert<Utf8, T>::convert(
 			buffer,
 			bufferLength,
 			(const C*) p,
-			size / sizeof (C),
+			size / sizeof(C),
 			&takenLength
 			);
 
 		if (takenSize)
-			*takenSize = takenLength * sizeof (C);
+			*takenSize = takenLength * sizeof(C);
 
 		return takenBufferLength;
 	}
 
 	virtual
 	size_t
-	decodeToUtf16 (
+	decodeToUtf16(
 		utf16_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -632,23 +632,23 @@ public:
 		)
 	{
 		size_t takenLength;
-		size_t takenBufferLength = UtfConvert <Utf16, T>::convert (
+		size_t takenBufferLength = UtfConvert<Utf16, T>::convert(
 			buffer,
 			bufferLength,
 			(const C*) p,
-			size / sizeof (C),
+			size / sizeof(C),
 			&takenLength
 			);
 
 		if (takenSize)
-			*takenSize = takenLength * sizeof (C);
+			*takenSize = takenLength * sizeof(C);
 
 		return takenBufferLength;
 	}
 
 	virtual
 	size_t
-	decodeToUtf32 (
+	decodeToUtf32(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -657,23 +657,23 @@ public:
 		)
 	{
 		size_t takenLength;
-		size_t takenBufferLength = UtfConvert <Utf32, T>::convert (
+		size_t takenBufferLength = UtfConvert<Utf32, T>::convert(
 			buffer,
 			bufferLength,
 			(const C*) p,
-			size / sizeof (C),
+			size / sizeof(C),
 			&takenLength
 			);
 
 		if (takenSize)
-			*takenSize = takenLength * sizeof (C);
+			*takenSize = takenLength * sizeof(C);
 
 		return takenBufferLength;
 	}
 
 	virtual
 	size_t
-	decodeToUtf32 (
+	decodeToUtf32(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,
@@ -683,17 +683,17 @@ public:
 		)
 	{
 		size_t takenLength;
-		size_t takenBufferLength = UtfConvert <Utf32, T>::convert (
+		size_t takenBufferLength = UtfConvert<Utf32, T>::convert(
 			cplBuffer,
 			textBuffer,
 			bufferLength,
 			(const C*) p,
-			size / sizeof (C),
+			size / sizeof(C),
 			&takenLength
 			);
 
 		if (takenSize)
-			*takenSize = takenLength * sizeof (C);
+			*takenSize = takenLength * sizeof(C);
 
 		return takenBufferLength;
 	}
@@ -710,83 +710,83 @@ protected:
 
 	union
 	{
-		char m_accumulator [4];
+		char m_accumulator[4];
 		uint32_t m_accumulator_i32;
 	};
 
 public:
-	CodePointDecoder (
+	CodePointDecoder(
 		CharCodecKind codecKind = CharCodecKind_Utf8,
 		uint32_t state = 0
 		)
 	{
-		setup (codecKind, state);
+		setup(codecKind, state);
 	}
 
 	CharCodec*
-	getCharCodec ()
+	getCharCodec()
 	{
 		return m_charCodec;
 	}
 
 	size_t
-	getAccumulatorCount ()
+	getAccumulatorCount()
 	{
 		return m_accumulatorCount;
 	}
 
 	const char*
-	getAccumulator ()
+	getAccumulator()
 	{
 		return m_accumulator;
 	}
 
 	uint32_t
-	getAccumulator_i32 ()
+	getAccumulator_i32()
 	{
 		return m_accumulator_i32;
 	}
 
 	void
-	setup (
+	setup(
 		CharCodecKind codecKind,
 		uint32_t state = 0
 		)
 	{
-		setup (enc::getCharCodec (codecKind), state);
+		setup(enc::getCharCodec(codecKind), state);
 	}
 
 	void
-	setup (
+	setup(
 		CharCodec* codec,
 		uint32_t state = 0
 		)
 	{
 		m_charCodec = codec;
-		loadState (state);
+		loadState(state);
 	}
 
 	void
-	clear ()
+	clear()
 	{
 		m_charCodec = NULL;
-		resetAccumulator ();
+		resetAccumulator();
 	}
 
 	void
-	resetAccumulator ()
+	resetAccumulator()
 	{
 		m_accumulatorCount = 0;
 	}
 
 	void
-	loadState (uint32_t state);
+	loadState(uint32_t state);
 
 	uint32_t
-	saveState ();
+	saveState();
 
 	size_t
-	decode (
+	decode(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -795,7 +795,7 @@ public:
 		);
 
 	size_t
-	decode (
+	decode(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,
@@ -806,7 +806,7 @@ public:
 
 protected:
 	size_t
-	decodeImpl (
+	decodeImpl(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -815,7 +815,7 @@ protected:
 		);
 
 	size_t
-	decodeImpl (
+	decodeImpl(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,

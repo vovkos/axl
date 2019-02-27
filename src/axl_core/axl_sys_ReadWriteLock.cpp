@@ -18,26 +18,26 @@ namespace sys {
 //..............................................................................
 
 void
-ReadWriteLock::close ()
+ReadWriteLock::close()
 {
-	if (m_data && m_data != m_mapping.p ())
-		AXL_MEM_FREE ((void*) m_data);
+	if (m_data && m_data != m_mapping.p())
+		AXL_MEM_FREE((void*)m_data);
 
 	m_data = NULL;
 
-	m_readEvent.close ();
-	m_writeEvent.close ();
-	m_mapping.close ();
+	m_readEvent.close();
+	m_writeEvent.close();
+	m_mapping.close();
 }
 
 bool
-ReadWriteLock::create ()
+ReadWriteLock::create()
 {
-	close ();
+	close();
 
-	m_data = AXL_MEM_ZERO_NEW (Data);
-	m_readEvent.create ();
-	m_writeEvent.create ();
+	m_data = AXL_MEM_ZERO_NEW(Data);
+	m_readEvent.create();
+	m_writeEvent.create();
 
 	m_data->m_signature = Signature;
 
@@ -45,50 +45,50 @@ ReadWriteLock::create ()
 }
 
 bool
-ReadWriteLock::create (
+ReadWriteLock::create(
 	const sl::StringRef& mappingName,
 	const sl::StringRef& readEventName,
 	const sl::StringRef& writeEventName
 	)
 {
-	close ();
+	close();
 
 	bool result =
-		m_mapping.open (mappingName, sizeof (Data)) &&
-		m_readEvent.create (readEventName) &&
-		m_writeEvent.create (writeEventName);
+		m_mapping.open(mappingName, sizeof(Data)) &&
+		m_readEvent.create(readEventName) &&
+		m_writeEvent.create(writeEventName);
 
 	if (!result)
 		return false;
 
-	m_data = (Data*) m_mapping.p ();
-	memset ((void*) m_data, 0, sizeof (Data));
+	m_data = (Data*)m_mapping.p();
+	memset((void*)m_data, 0, sizeof(Data));
 	m_data->m_signature = Signature;
 	return true;
 }
 
 bool
-ReadWriteLock::open (
+ReadWriteLock::open(
 	const sl::StringRef& mappingName,
 	const sl::StringRef& readEventName,
 	const sl::StringRef& writeEventName
 	)
 {
-	close ();
+	close();
 
 	bool result =
-		m_mapping.open (mappingName, sizeof (Data), io::FileFlag_OpenExisting) &&
-		m_readEvent.open (readEventName) &&
-		m_writeEvent.open (writeEventName);
+		m_mapping.open(mappingName, sizeof(Data), io::FileFlag_OpenExisting) &&
+		m_readEvent.open(readEventName) &&
+		m_writeEvent.open(writeEventName);
 
 	if (!result)
 		return false;
 
-	m_data = (Data*) m_mapping.p ();
+	m_data = (Data*)m_mapping.p();
 
 	if (m_data->m_signature != Signature)
 	{
-		err::setError (err::SystemErrorCode_InvalidParameter);
+		err::setError(err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
 
@@ -96,15 +96,15 @@ ReadWriteLock::open (
 }
 
 bool
-ReadWriteLock::readLock (uint_t timeout)
+ReadWriteLock::readLock(uint_t timeout)
 {
 	bool result;
 
-	sys::atomicLock (&m_data->m_lock);
+	sys::atomicLock(&m_data->m_lock);
 	if (!m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
 	{
 		m_data->m_activeReadCount++;
-		sys::atomicUnlock (&m_data->m_lock);
+		sys::atomicUnlock(&m_data->m_lock);
 		return true;
 	}
 
@@ -112,19 +112,19 @@ ReadWriteLock::readLock (uint_t timeout)
 
 	for (;;) // loop is required (obvious)
 	{
-		m_readEvent.reset ();
-		sys::atomicUnlock (&m_data->m_lock);
+		m_readEvent.reset();
+		sys::atomicUnlock(&m_data->m_lock);
 
-		result = m_readEvent.wait (timeout);
+		result = m_readEvent.wait(timeout);
 
 		// another reader might squeeze in here, finish and start a writer
 
-		sys::atomicLock (&m_data->m_lock);
+		sys::atomicLock(&m_data->m_lock);
 
 		if (!result)
 		{
 			if (!m_data->m_activeReadCount && m_data->m_queuedWriteCount)
-				m_writeEvent.signal ();
+				m_writeEvent.signal();
 
 			break;
 		}
@@ -137,42 +137,42 @@ ReadWriteLock::readLock (uint_t timeout)
 	}
 
 	m_data->m_queuedReadCount--;
-	sys::atomicUnlock (&m_data->m_lock);
+	sys::atomicUnlock(&m_data->m_lock);
 
 	return result;
 }
 
 void
-ReadWriteLock::readUnlock ()
+ReadWriteLock::readUnlock()
 {
-	sys::atomicLock (&m_data->m_lock);
-	ASSERT (m_data->m_activeReadCount && !m_data->m_activeWriteCount);
+	sys::atomicLock(&m_data->m_lock);
+	ASSERT(m_data->m_activeReadCount && !m_data->m_activeWriteCount);
 	m_data->m_activeReadCount--;
 
 	if (m_data->m_queuedWriteCount) // check writers first, so we alternate
 	{
 		if (!m_data->m_activeReadCount)
-			m_writeEvent.signal ();
+			m_writeEvent.signal();
 	}
 	else
 	{
 		if (m_data->m_queuedReadCount)
-			m_readEvent.signal ();
+			m_readEvent.signal();
 	}
 
-	sys::atomicUnlock (&m_data->m_lock);
+	sys::atomicUnlock(&m_data->m_lock);
 }
 
 bool
-ReadWriteLock::writeLock (uint_t timeout)
+ReadWriteLock::writeLock(uint_t timeout)
 {
 	bool result;
 
-	sys::atomicLock (&m_data->m_lock);
+	sys::atomicLock(&m_data->m_lock);
 	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
 	{
 		m_data->m_activeWriteCount = 1;
-		sys::atomicUnlock (&m_data->m_lock);
+		sys::atomicUnlock(&m_data->m_lock);
 		return true;
 	}
 
@@ -180,22 +180,22 @@ ReadWriteLock::writeLock (uint_t timeout)
 
 	for (;;) // loop is STILL required (non-obvious)
 	{
-		m_writeEvent.reset ();
-		sys::atomicUnlock (&m_data->m_lock);
+		m_writeEvent.reset();
+		sys::atomicUnlock(&m_data->m_lock);
 
 		// another writer might squeeze in here, finish and wake up readers
 		// one reader might start, finish and wake up this writer
 
-		result = m_writeEvent.wait (timeout);
+		result = m_writeEvent.wait(timeout);
 
 		// another reader woken up by the first writer might have read-locked
 
-		sys::atomicLock (&m_data->m_lock);
+		sys::atomicLock(&m_data->m_lock);
 
 		if (!result)
 		{
 			if (!m_data->m_activeWriteCount && m_data->m_queuedReadCount)
-				m_readEvent.signal ();
+				m_readEvent.signal();
 
 			break;
 		}
@@ -208,24 +208,24 @@ ReadWriteLock::writeLock (uint_t timeout)
 	}
 
 	m_data->m_queuedWriteCount--;
-	sys::atomicUnlock (&m_data->m_lock);
+	sys::atomicUnlock(&m_data->m_lock);
 
 	return result;
 }
 
 void
-ReadWriteLock::writeUnlock ()
+ReadWriteLock::writeUnlock()
 {
-	sys::atomicLock (&m_data->m_lock);
-	ASSERT (!m_data->m_activeReadCount && m_data->m_activeWriteCount == 1);
+	sys::atomicLock(&m_data->m_lock);
+	ASSERT(!m_data->m_activeReadCount && m_data->m_activeWriteCount == 1);
 	m_data->m_activeWriteCount = 0;
 
 	if (m_data->m_queuedReadCount) // check readers first, so we alternate
-		m_readEvent.signal ();
+		m_readEvent.signal();
 	else if (m_data->m_queuedWriteCount)
-		m_writeEvent.signal ();
+		m_writeEvent.signal();
 
-	sys::atomicUnlock (&m_data->m_lock);
+	sys::atomicUnlock(&m_data->m_lock);
 }
 
 //..............................................................................

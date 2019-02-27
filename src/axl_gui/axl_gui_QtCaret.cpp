@@ -19,43 +19,43 @@ namespace gui {
 //..............................................................................
 
 bool
-QtCaret::show (
+QtCaret::show(
 	WidgetDriver* widgetDriver,
 	const Rect& rect,
 	uint_t interval
 	)
 {
-	ASSERT (widgetDriver);
+	ASSERT(widgetDriver);
 
 	if (m_widgetDriver && m_isVisible)
 	{
 		m_isVisible = false;
-		m_widgetDriver->redraw (m_rect);
+		m_widgetDriver->redraw(m_rect);
 	}
 
 	m_widgetDriver = widgetDriver;
 	m_rect = rect;
 	m_isVisible = true;
 
-	widgetDriver->redraw (rect);
+	widgetDriver->redraw(rect);
 
-	setSingleShot (false);
-	start (interval);
+	setSingleShot(false);
+	start(interval);
 	return true;
 }
 
 void
-QtCaret::hide (WidgetDriver* widgetDriver)
+QtCaret::hide(WidgetDriver* widgetDriver)
 {
 	if (widgetDriver != m_widgetDriver)
 		return;
 
 	if (m_isVisible)
-		m_widgetDriver->redraw (m_rect);
+		m_widgetDriver->redraw(m_rect);
 
 	m_widgetDriver = NULL;
 	m_isVisible = false;
-	stop ();
+	stop();
 }
 
 void
@@ -65,7 +65,7 @@ QtCaret::timerEvent  (QTimerEvent* e)
 		return;
 
 	m_isVisible = !m_isVisible;
-	m_widgetDriver->redraw (m_rect);
+	m_widgetDriver->redraw(m_rect);
 }
 
 //..............................................................................

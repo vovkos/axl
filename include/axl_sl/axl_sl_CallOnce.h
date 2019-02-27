@@ -25,7 +25,7 @@ template <
 	typename Argument
 	>
 void
-callOnce (
+callOnce(
 	Functor functor,
 	Argument argument,
 	volatile int32_t* flag = NULL
@@ -47,14 +47,14 @@ callOnce (
 		return;
 
 	if (value == OnceFlag_Uninitialized && // try to save one interlocked cmpxcg
-		sys::atomicCmpXchg (flag, OnceFlag_Uninitialized, OnceFlag_Initializing) == OnceFlag_Uninitialized)
+		sys::atomicCmpXchg(flag, OnceFlag_Uninitialized, OnceFlag_Initializing) == OnceFlag_Uninitialized)
 	{
-		functor (argument);
-		sys::atomicXchg (flag, OnceFlag_Initialized);
+		functor(argument);
+		sys::atomicXchg(flag, OnceFlag_Initialized);
 	}
 	else do
 	{
-		sys::yieldProcessor ();
+		sys::yieldProcessor();
 	} while (*flag != OnceFlag_Initialized);
 }
 

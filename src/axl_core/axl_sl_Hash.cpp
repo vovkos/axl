@@ -18,17 +18,17 @@ namespace sl {
 //..............................................................................
 
 uint16_t
-checksum16 (
+checksum16(
 	const void* _p,
 	size_t size
 	)
 {
-	ushort_t* p = (ushort_t*) _p;
-	uchar_t* last = (uchar_t*) _p + size - 1;
+	ushort_t* p = (ushort_t*)_p;
+	uchar_t* last = (uchar_t*)_p + size - 1;
 
 	uintptr_t sum = 0;
 
-	for (; (uchar_t*) p < last; p++)
+	for (; (uchar_t*)p < last; p++)
 		sum += *p;
 
 	if (size & 1)

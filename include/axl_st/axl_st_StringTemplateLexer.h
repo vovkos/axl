@@ -30,18 +30,18 @@ enum TokenKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_LEX_BEGIN_TOKEN_NAME_MAP (TokenName)
-	AXL_LEX_TOKEN_NAME (TokenKind_Eof,        "eof")
-	AXL_LEX_TOKEN_NAME (TokenKind_Error,      "error")
-	AXL_LEX_TOKEN_NAME (TokenKind_OpenCode,   "%{")
-	AXL_LEX_TOKEN_NAME (TokenKind_OpenData_r, "%(")
-	AXL_LEX_TOKEN_NAME (TokenKind_OpenData_c, "%{")
-	AXL_LEX_TOKEN_NAME (TokenKind_Data,       "user-data")
-AXL_LEX_END_TOKEN_NAME_MAP ();
+AXL_LEX_BEGIN_TOKEN_NAME_MAP(TokenName)
+	AXL_LEX_TOKEN_NAME(TokenKind_Eof,        "eof")
+	AXL_LEX_TOKEN_NAME(TokenKind_Error,      "error")
+	AXL_LEX_TOKEN_NAME(TokenKind_OpenCode,   "%{")
+	AXL_LEX_TOKEN_NAME(TokenKind_OpenData_r, "%(")
+	AXL_LEX_TOKEN_NAME(TokenKind_OpenData_c, "%{")
+	AXL_LEX_TOKEN_NAME(TokenKind_Data,       "user-data")
+AXL_LEX_END_TOKEN_NAME_MAP();
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef lex::RagelToken <TokenKind, TokenName> Token;
+typedef lex::RagelToken<TokenKind, TokenName> Token;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -54,35 +54,35 @@ enum LexerMachineKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Lexer: public lex::RagelLexer <Lexer, Token>
+class Lexer: public lex::RagelLexer<Lexer, Token>
 {
-	friend class lex::RagelLexer <Lexer, Token>;
+	friend class lex::RagelLexer<Lexer, Token>;
 
 public:
 	static
 	int
-	getMachineState (LexerMachineKind machine);
+	getMachineState(LexerMachineKind machine);
 
 protected:
 	Token*
-	createStringToken (
+	createStringToken(
 		int tokenKind,
 		int left = 0,
 		int right = 0
 		)
 	{
-		Token* token = createToken (tokenKind);
-		token->m_data.m_string = sl::StringRef (ts + left, token->m_pos.m_length - (left + right));
+		Token* token = createToken(tokenKind);
+		token->m_data.m_string = sl::StringRef(ts + left, token->m_pos.m_length - (left + right));
 		return token;
 	}
 
 	// implemented in *.rl
 
 	void
-	init ();
+	init();
 
 	void
-	exec ();
+	exec();
 };
 
 //..............................................................................

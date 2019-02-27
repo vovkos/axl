@@ -9,78 +9,78 @@
 #
 #...............................................................................
 
-unset (LLVM_DIR CACHE)
-set (LLVM_FOUND FALSE)
+unset(LLVM_DIR CACHE)
+set(LLVM_FOUND FALSE)
 
-if (NOT LLVM_CMAKE_DIR)
-	find_package (LLVM QUIET)
-endif ()
+if(NOT LLVM_CMAKE_DIR)
+	find_package(LLVM QUIET)
+endif()
 
-if (EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
-	include (${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
+if(EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
+	include(${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 
-	if (NOT LLVM_INC_DIR)
-		set (LLVM_INC_DIR ${LLVM_INCLUDE_DIRS})
-	endif ()
+	if(NOT LLVM_INC_DIR)
+		set(LLVM_INC_DIR ${LLVM_INCLUDE_DIRS})
+	endif()
 
-	if (NOT LLVM_LIB_DIR)
-		set (LLVM_LIB_DIR ${LLVM_LIBRARY_DIRS})
-	endif ()
+	if(NOT LLVM_LIB_DIR)
+		set(LLVM_LIB_DIR ${LLVM_LIBRARY_DIRS})
+	endif()
 
-	set (LLVM_VERSION ${LLVM_PACKAGE_VERSION})
+	set(LLVM_VERSION ${LLVM_PACKAGE_VERSION})
 
-	axl_message ("LLVM ${LLVM_VERSION} paths:")
-	axl_message ("    CMake files:" "${LLVM_CMAKE_DIR}")
-	axl_message ("    Includes:"    "${LLVM_INC_DIR}")
-	axl_message ("    Libraries:"   "${LLVM_LIB_DIR}")
+	axl_message("LLVM ${LLVM_VERSION} paths:")
+	axl_message("    CMake files:" "${LLVM_CMAKE_DIR}")
+	axl_message("    Includes:"    "${LLVM_INC_DIR}")
+	axl_message("    Libraries:"   "${LLVM_LIB_DIR}")
 
-	set (LLVM_FOUND TRUE)
-endif ()
+	set(LLVM_FOUND TRUE)
+endif()
 
 #...............................................................................
 
-macro (
+macro(
 target_link_llvm_libraries
 	_TARGET
 	# ...
 	)
 
-	set (_COMPONENT_LIST ${ARGN})
+	set(_COMPONENT_LIST ${ARGN})
 
-	if (${LLVM_VERSION} VERSION_LESS 3.5)
-		llvm_map_components_to_libraries (_LIB_LIST ${_COMPONENT_LIST})
-	else ()
-		llvm_map_components_to_libnames (_LIB_LIST ${_COMPONENT_LIST})
-	endif ()
+	if(${LLVM_VERSION} VERSION_LESS 3.5)
+		llvm_map_components_to_libraries(_LIB_LIST ${_COMPONENT_LIST})
+	else()
+		llvm_map_components_to_libnames(_LIB_LIST ${_COMPONENT_LIST})
+	endif()
 
-	target_link_libraries (${_TARGET} ${_LIB_LIST})
-endmacro ()
+	target_link_libraries(${_TARGET} ${_LIB_LIST})
+endmacro()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-macro (
+macro(
 target_link_llvm_jit_libraries
 	_TARGET
 	# ...
 	)
 
-	set (_EXTRA_COMPONENT_LIST ${ARGN})
+	set(_EXTRA_COMPONENT_LIST ${ARGN})
 
-	set (
+	set(
 		_COMPONENT_LIST
 		native
 		MCJIT
 		)
 
-	if (${LLVM_VERSION} VERSION_LESS 3.6)
-		set (_COMPONENT_LIST ${_COMPONENT_LIST} jit)
-	endif ()
+	if(${LLVM_VERSION} VERSION_LESS 3.6)
+		set(_COMPONENT_LIST ${_COMPONENT_LIST} jit)
+	endif()
 
-	target_link_llvm_libraries (
+	target_link_llvm_libraries(
 		${_TARGET}
 		${_COMPONENT_LIST}
 		${_EXTRA_COMPONENT_LIST}
 		)
-endmacro ()
+endmacro()
 
 #...............................................................................

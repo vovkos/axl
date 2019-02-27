@@ -26,29 +26,29 @@ public:
 	void
 	operator () (BIO* h)
 	{
-		BIO_free (h);
+		BIO_free(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Bio: public sl::Handle <BIO*, FreeBio>
+class Bio: public sl::Handle<BIO*, FreeBio>
 {
 public:
-	Bio ()
+	Bio()
 	{
 	}
 
-	Bio (
+	Bio(
 		const void* p,
 		size_t size = -1
 		)
 	{
-		create (p, size);
+		create(p, size);
 	}
 
 	bool
-	create (
+	create(
 		const void* p,
 		size_t size = -1
 		);

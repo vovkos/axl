@@ -25,43 +25,43 @@ struct TextAttr: public ColorAttr
 {
 	uint_t m_fontFlags;
 
-	TextAttr ()
+	TextAttr()
 	{
 		m_fontFlags = -1;
 	}
 
-	TextAttr (
+	TextAttr(
 		uint_t foreColor,
 		uint_t backColor = -1,
 		uint_t fontFlags = -1
 		)
 	{
-		setup (foreColor, backColor, fontFlags);
+		setup(foreColor, backColor, fontFlags);
 	}
 
-	TextAttr (
+	TextAttr(
 		const ColorAttr& colorAttr,
 		uint_t fontFlags = -1
 		)
 	{
-		setup (colorAttr, fontFlags);
+		setup(colorAttr, fontFlags);
 	}
 
 	int
-	cmp (const TextAttr& attr)
+	cmp(const TextAttr& attr)
 	{
-		return memcmp (this, &attr, sizeof (TextAttr));
+		return memcmp(this, &attr, sizeof(TextAttr));
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		ColorAttr::clear ();
+		ColorAttr::clear();
 		m_fontFlags = 0;
 	}
 
 	void
-	setup (
+	setup(
 		uint_t foreColor,
 		uint_t backColor,
 		uint_t fontFlags
@@ -73,30 +73,30 @@ struct TextAttr: public ColorAttr
 	}
 
 	void
-	setup (
+	setup(
 		const ColorAttr& colorAttr,
 		uint_t fontFlags
 		)
 	{
 
-		*(ColorAttr*) this = colorAttr;
+		*(ColorAttr*)this = colorAttr;
 		m_fontFlags = fontFlags;
 	}
 
 	void
-	overlay (
+	overlay(
 		const TextAttr& baseAttr,
 		const TextAttr& overlayAttr
 		)
 	{
-		ColorAttr::overlay (baseAttr, overlayAttr);
-		m_fontFlags = overlayFontFlags (baseAttr.m_fontFlags, overlayAttr.m_fontFlags);
+		ColorAttr::overlay(baseAttr, overlayAttr);
+		m_fontFlags = overlayFontFlags(baseAttr.m_fontFlags, overlayAttr.m_fontFlags);
 	}
 
 	void
-	overlay (const TextAttr& overlayAttr)
+	overlay(const TextAttr& overlayAttr)
 	{
-		overlay (*this, overlayAttr);
+		overlay(*this, overlayAttr);
 	}
 };
 

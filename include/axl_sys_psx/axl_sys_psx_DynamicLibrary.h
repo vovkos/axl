@@ -28,23 +28,23 @@ public:
 	void
 	operator () (void* h)
 	{
-		::dlclose (h);
+		::dlclose(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class DynamicLibrary: public sl::Handle <void*, CloseDynamicLibrary>
+class DynamicLibrary: public sl::Handle<void*, CloseDynamicLibrary>
 {
 public:
 	bool
-	open (
+	open(
 		const sl::StringRef& name,
 		int flags = RTLD_LAZY | RTLD_LOCAL
 		);
 
 	void*
-	getSymbol (const sl::StringRef& name);
+	getSymbol(const sl::StringRef& name);
 };
 
 //..............................................................................

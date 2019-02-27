@@ -34,43 +34,43 @@ protected:
 	class Level
 	{
 	protected:
-		AuxList <Page> m_availablePageList;
+		AuxList<Page> m_availablePageList;
 		Page* m_firstPage;
 
 	public:
 		Page*
-		getFirstPage ()
+		getFirstPage()
 		{
 			return m_firstPage;
 		}
 
 		Page*
-		getFirstAvailablePage ()
+		getFirstAvailablePage()
 		{
-			return *m_availablePageList.getHead ();
+			return *m_availablePageList.getHead();
 		}
 
 		void
-		format (
+		format(
 			Page* page,
 			size_t count
 			);
 
 		void
-		setPageMap (
+		setPageMap(
 			Page* page,
 			size_t map
 			);
 
 		void
-		setBit (
+		setBit(
 			Page* page,
 			size_t bit,
 			bool value
 			);
 
 		void
-		setBitRange (
+		setBitRange(
 			Page* page,
 			size_t from,
 			size_t to,
@@ -79,8 +79,8 @@ protected:
 	};
 
 protected:
-	Array <Page> m_pageArray;
-	Array <Level> m_levelArray;
+	Array<Page> m_pageArray;
+	Array<Level> m_levelArray;
 
 	size_t m_width;
 	size_t m_height;
@@ -90,76 +90,76 @@ protected:
 	size_t m_maxAllocSize;
 
 public:
-	BuddyAllocMap ();
+	BuddyAllocMap();
 
 	bool
-	create (
+	create(
 		size_t width,
 		size_t height
 		);
 
 	void
-	close ();
+	close();
 
 	void
-	clear ();
+	clear();
 
 	size_t
-	getFreeSizeTop ()
+	getFreeSizeTop()
 	{
 		return m_freeSizeTop;
 	}
 
 	size_t
-	getFreeSizeBottom ()
+	getFreeSizeBottom()
 	{
 		return m_freeSizeBottom;
 	}
 
 	size_t
-	getTotalSize ()
+	getTotalSize()
 	{
 		return m_totalSize;
 	}
 
 	bool
-	isEmpty ()
+	isEmpty()
 	{
 		return m_freeSizeBottom == m_totalSize; // can compare either (top or bottom)
 	}
 
 	size_t
-	allocate (size_t size);
+	allocate(size_t size);
 
 	void
-	mark (
+	mark(
 		size_t address,
 		size_t size
 		);
 
 	void
-	free (
+	free(
 		size_t address,
 		size_t size
 		);
 
 	bool
-	getBit (size_t address)
+	getBit(size_t address)
 	{
-		return address < m_totalSize ? getBit (m_pageArray, address) : false;
+		return address < m_totalSize ? getBit(m_pageArray, address) : false;
 	}
 
 protected:
 	static
 	bool
-	getBit (
+	getBit(
 		Page* page,
 		size_t bit
 		)
 	{
 		size_t pageIdx = bit / AXL_PTR_BITS;
 		size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
-		return (page [pageIdx].m_map & mask) != 0;
+		return (page[pageIdx].m_map & mask) != 0;
 	}
 };
 

@@ -21,26 +21,26 @@ namespace psx {
 //..............................................................................
 
 bool
-Cond::wait (
+Cond::wait(
 	pthread_mutex_t* mutex,
 	uint_t timeout
 	)
 {
 	int result;
 
-	switch (timeout)
+	switch(timeout)
 	{
 	case -1:
-		result = ::pthread_cond_wait (&m_cond, mutex);
+		result = ::pthread_cond_wait(&m_cond, mutex);
 		break;
 
 	default:
 		timespec timespec = { 0 };
-		sys::getAbsTimespecFromTimeout (timeout, &timespec);
-		result = ::pthread_cond_timedwait (&m_cond, mutex, &timespec);
+		sys::getAbsTimespecFromTimeout(timeout, &timespec);
+		result = ::pthread_cond_timedwait(&m_cond, mutex, &timespec);
 	}
 
-	return result == 0 ? true : err::fail (result);
+	return result == 0 ? true : err::fail(result);
 }
 
 //..............................................................................

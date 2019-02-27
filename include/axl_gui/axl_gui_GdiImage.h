@@ -23,7 +23,7 @@ namespace gui {
 
 class GdiImage:
 	public Image,
-	public GdiObjectHandle <HBITMAP>
+	public GdiObjectHandle<HBITMAP>
 {
 	friend class GdiEngine;
 
@@ -31,11 +31,11 @@ protected:
 	Size m_size;
 
 public:
-	GdiImage ();
+	GdiImage();
 
 	virtual
 	bool
-	getData (
+	getData(
 		void* data,
 		int left,
 		int top,

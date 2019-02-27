@@ -18,14 +18,14 @@ namespace lua {
 //..............................................................................
 
 bool
-LuaState::create ()
+LuaState::create()
 {
-	close ();
+	close();
 
-	m_h = luaL_newstate ();
+	m_h = luaL_newstate();
 	if (!m_h)
 	{
-		err::setError (err::SystemErrorCode_InsufficientResources);
+		err::setError(err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
 
@@ -33,56 +33,56 @@ LuaState::create ()
 }
 
 bool
-LuaState::complete (int result)
+LuaState::complete(int result)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
 	if (result == LUA_OK)
 		return true;
 
-	err::setError (popString ());
+	err::setError(popString());
 	return false;
 }
 
 bool
-LuaState::load (
+LuaState::load(
 	const sl::StringRef& name,
 	const sl::StringRef& source
 	)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
-	int result = luaL_loadbuffer (m_h, source.cp (), source.getLength (), name.sz ());
-	return complete (result);
+	int result = luaL_loadbuffer(m_h, source.cp(), source.getLength(), name.sz());
+	return complete(result);
 }
 
 #ifdef _AXL_DEBUG
 void
-LuaState::trace ()
+LuaState::trace()
 {
-	int top = getTop ();
+	int top = getTop();
 
 	for (int i = 1; i <= top; i++)
 	{
-		int type = getType (i);
-		const void* p = lua_topointer (m_h, i);
+		int type = getType(i);
+		const void* p = lua_topointer(m_h, i);
 
-		switch (type)
+		switch(type)
 		{
 		case LUA_TSTRING:
-			TRACE ("%08x %s\n", p, getString (i).sz ());
+			TRACE("%08x %s\n", p, getString (i).sz ());
 			break;
 
 		case LUA_TBOOLEAN:
-			TRACE ("%08x %s\n", p, getBoolean (i) ? "true" : "false");
+			TRACE("%08x %s\n", p, getBoolean (i) ? "true" : "false");
 			break;
 
 		case LUA_TNUMBER:
-			TRACE ("%08x %g\n", p, getNumber (i));
+			TRACE("%08x %g\n", p, getNumber (i));
 			break;
 
 		default:
-			TRACE ("%08x %s\n", p, getTypeName (type).sz ());
+			TRACE("%08x %s\n", p, getTypeName (type).sz ());
 			break;
 
 		}
@@ -91,27 +91,27 @@ LuaState::trace ()
 #endif
 
 void
-LuaState::prepareErrorString (const sl::StringRef& string)
+LuaState::prepareErrorString(const sl::StringRef& string)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
-	int result = lua_checkstack (m_h, 2);
-	ASSERT (result);
+	int result = lua_checkstack(m_h, 2);
+	ASSERT(result);
 
-	where ();
-	pushString (string);
-	concatenate ();
+	where();
+	pushString(string);
+	concatenate();
 }
 
 bool
-LuaState::tryCheckStack (int extraSlotCount)
+LuaState::tryCheckStack(int extraSlotCount)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
-	int result = lua_checkstack (m_h, extraSlotCount);
+	int result = lua_checkstack(m_h, extraSlotCount);
 	if (!result)
 	{
-		err::setError (err::SystemErrorCode_InsufficientResources);
+		err::setError(err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
 
@@ -119,77 +119,77 @@ LuaState::tryCheckStack (int extraSlotCount)
 }
 
 void
-LuaState::checkStack (int extraSlotCount)
+LuaState::checkStack(int extraSlotCount)
 {
-	bool result = tryCheckStack (extraSlotCount);
+	bool result = tryCheckStack(extraSlotCount);
 	if (!result)
 	{
-		prepareLastErrorString ();
-		error ();
+		prepareLastErrorString();
+		error();
 	}
 }
 
 bool
-LuaState::tryCreateTable (
+LuaState::tryCreateTable(
 	size_t elementCount,
 	size_t memberCount,
 	size_t extraStackSlotCount
 	)
 {
-	bool result = tryCheckStack (extraStackSlotCount);
+	bool result = tryCheckStack(extraStackSlotCount);
 	if (!result)
 		return false;
 
-	lua_createtable (m_h, elementCount, memberCount);
+	lua_createtable(m_h, elementCount, memberCount);
 	return true;
 }
 
 void
-LuaState::createTable (
+LuaState::createTable(
 	size_t elementCount,
 	size_t memberCount,
 	size_t extraStackSlotCount
 	)
 {
-	bool result = tryCreateTable (elementCount, memberCount, extraStackSlotCount);
+	bool result = tryCreateTable(elementCount, memberCount, extraStackSlotCount);
 	if (!result)
 	{
-		prepareLastErrorString ();
-		error ();
+		prepareLastErrorString();
+		error();
 	}
 }
 
 int
-LuaState::getGlobalArrayLen (const sl::StringRef& name)
+LuaState::getGlobalArrayLen(const sl::StringRef& name)
 {
-	getGlobal (name);
-	size_t len = getRawLen ();
-	pop ();
+	getGlobal(name);
+	size_t len = getRawLen();
+	pop();
 	return len;
 }
 
 void
-LuaState::setGlobalArrayElement (
+LuaState::setGlobalArrayElement(
 	const sl::StringRef& name,
 	int index
 	)
 {
-	getGlobal (name);
-	swap ();
-	setArrayElement (index);
-	pop ();
+	getGlobal(name);
+	swap();
+	setArrayElement(index);
+	pop();
 }
 
 void
-LuaState::setGlobalMember (
+LuaState::setGlobalMember(
 	const sl::StringRef& name,
 	const sl::StringRef& member
 	)
 {
-	getGlobal (name);
-	swap ();
-	setMember (member);
-	pop ();
+	getGlobal(name);
+	swap();
+	setMember(member);
+	pop();
 }
 
 //..............................................................................

@@ -28,7 +28,7 @@ struct SwitchInfo: sl::ListLink
 
 	// all strings below are static literals
 
-	const char* m_nameTable [4]; // up to 4 alternative names
+	const char* m_nameTable[4]; // up to 4 alternative names
 	const char* m_value;
 	const char* m_description;
 };
@@ -36,7 +36,7 @@ struct SwitchInfo: sl::ListLink
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 String
-getCmdLineHelpString (const ConstList <SwitchInfo>& switchInfoList);
+getCmdLineHelpString(const ConstList<SwitchInfo>& switchInfoList);
 
 //..............................................................................
 
@@ -62,7 +62,7 @@ protected:
 	uint_t m_flags;
 
 protected:
-	CmdLineParserRoot ()
+	CmdLineParserRoot()
 	{
 		m_argIdx = 0;
 		m_valueSwitchKind = 0;
@@ -71,24 +71,24 @@ protected:
 
 	static
 	ArgKind
-	getArgKind (const sl::StringRef& arg)
+	getArgKind(const sl::StringRef& arg)
 	{
 		return
-			arg.getLength () < 2 || arg [0] != '-' ? ArgKind_Value :
-			arg [1] != '-' ? ArgKind_CharSwitch :
+			arg.getLength() < 2 || arg[0] != '-' ? ArgKind_Value :
+			arg[1] != '-' ? ArgKind_CharSwitch :
 			ArgKind_StringSwitch;
 	}
 
 	static
 	size_t
-	extractArg (
+	extractArg(
 		const sl::StringRef& cmdLine,
 		sl::String* arg
 		);
 
 	static
 	bool
-	parseSwitch (
+	parseSwitch(
 		ArgKind argKind,
 		const sl::StringRef& arg,
 		sl::String* switchName,
@@ -109,11 +109,11 @@ public:
 
 public:
 	bool
-	parse (const sl::StringRef& cmdLine0)
+	parse(const sl::StringRef& cmdLine0)
 	{
 		bool result;
 
-		sl::StringRef cmdLine (cmdLine0.cp (), cmdLine0.getLength ());
+		sl::StringRef cmdLine(cmdLine0.cp(), cmdLine0.getLength());
 
 		sl::String arg;
 		sl::String switchName;
@@ -121,29 +121,29 @@ public:
 
 		m_valueSwitchKind = 0;
 
-		for (m_argIdx = 0; !cmdLine.isEmpty (); m_argIdx++)
+		for (m_argIdx = 0; !cmdLine.isEmpty(); m_argIdx++)
 		{
-			size_t length = extractArg (cmdLine, &arg);
+			size_t length = extractArg(cmdLine, &arg);
 			if (length == -1)
 				return false;
 
-			if (arg.isEmpty ())
+			if (arg.isEmpty())
 				break;
 
-			result = processArg (arg);
+			result = processArg(arg);
 			if (!result)
 				return false;
 
-			cmdLine.offset (length);
+			cmdLine.offset(length);
 		}
 
 		return
-			checkMissingValue () &&
-			static_cast <T*> (this)->finalize ();
+			checkMissingValue() &&
+			static_cast<T*> (this)->finalize();
 	}
 
 	bool
-	parse (
+	parse(
 		int argc,
 		const char* const* argv
 		)
@@ -153,18 +153,18 @@ public:
 		for (int i = 0; i < argc; i++)
 		{
 			m_argIdx = i;
-			result = processArg (argv [i]);
+			result = processArg(argv[i]);
 			if (!result)
 				return false;
 		}
 
 		return
-			checkMissingValue () &&
-			static_cast <T*> (this)->finalize ();
+			checkMissingValue() &&
+			static_cast<T*> (this)->finalize();
 	}
 
 	bool
-	parse (
+	parse(
 		int argc,
 		const wchar_t* const* argv
 		)
@@ -174,32 +174,32 @@ public:
 		for (int i = 0; i < argc; i++)
 		{
 			m_argIdx = i;
-			result = processArg (sl::String (argv [i]));
+			result = processArg(sl::String(argv[i]));
 			if (!result)
 				return false;
 		}
 
 		return
-			checkMissingValue () &&
-			static_cast <T*> (this)->finalize ();
+			checkMissingValue() &&
+			static_cast<T*> (this)->finalize();
 	}
 
 	// overridables
 
 	bool
-	onValue0 (const sl::StringRef& value)
+	onValue0(const sl::StringRef& value)
 	{
 		return true;
 	}
 
 	bool
-	onValue (const sl::StringRef& value)
+	onValue(const sl::StringRef& value)
 	{
 		return true;
 	}
 
 	bool
-	onSwitch (
+	onSwitch(
 		SwitchKind switchKind,
 		const sl::StringRef& value
 		)
@@ -208,90 +208,90 @@ public:
 	}
 
 	bool
-	finalize ()
+	finalize()
 	{
 		return true;
 	}
 
 protected:
 	bool
-	checkMissingValue ()
+	checkMissingValue()
 	{
 		if (!m_valueSwitchKind)
 			return true;
 
-		err::setFormatStringError ("missing value for switch '%s'", m_valueSwitchName.sz ());
+		err::setFormatStringError("missing value for switch '%s'", m_valueSwitchName.sz ());
 		return false;
 	}
 
 	bool
-	processArg (const sl::StringRef& arg)
+	processArg(const sl::StringRef& arg)
 	{
 		bool result;
 
-		T* self = static_cast <T*> (this);
+		T* self = static_cast<T*> (this);
 
 		if (m_flags & Flag_Forward)
-			return self->onValue (arg);
+			return self->onValue(arg);
 
 		sl::String switchName;
 		sl::String value;
 
-		ArgKind argKind = getArgKind (arg);
-		switch (argKind)
+		ArgKind argKind = getArgKind(arg);
+		switch(argKind)
 		{
 		case ArgKind_Value:
-			return processValue (arg);
+			return processValue(arg);
 
 		case ArgKind_StringSwitch:
-			result = parseSwitch (argKind, arg.getSubString (2), &switchName, &value);
+			result = parseSwitch(argKind, arg.getSubString(2), &switchName, &value);
 			if (!result)
 				return false;
 
-			const SwitchInfo* switchInfo = SwitchTable::findSwitch (switchName);
+			const SwitchInfo* switchInfo = SwitchTable::findSwitch(switchName);
 			if (!switchInfo)
 			{
-				err::setFormatStringError ("unknown switch --%s", switchName.sz ());
+				err::setFormatStringError("unknown switch --%s", switchName.sz ());
 				return false;
 			}
 
-			return processSwitch (switchInfo, switchName, value);
+			return processSwitch(switchInfo, switchName, value);
 		}
 
-		ASSERT (argKind == ArgKind_CharSwitch);
+		ASSERT(argKind == ArgKind_CharSwitch);
 
-		size_t length = arg.getLength ();
+		size_t length = arg.getLength();
 		for (size_t i = 1; i < length; i++)
 		{
-			const SwitchInfo* switchInfo = SwitchTable::findSwitch (arg [i]);
+			const SwitchInfo* switchInfo = SwitchTable::findSwitch(arg[i]);
 			if (!switchInfo)
 			{
-				err::setFormatStringError ("unknown switch -%c", (uchar_t) arg [i]);
+				err::setFormatStringError("unknown switch -%c", (uchar_t) arg [i]);
 				return false;
 			}
 
 			if (switchInfo->m_value)
 			{
 				return
-					parseSwitch (argKind, arg.getSubString (i), &switchName, &value) &&
-					processSwitch (switchInfo, switchName, value);
+					parseSwitch(argKind, arg.getSubString(i), &switchName, &value) &&
+					processSwitch(switchInfo, switchName, value);
 			}
 
-			result = self->onSwitch ((SwitchKind) switchInfo->m_switchKind, NULL);
+			result = self->onSwitch((SwitchKind)switchInfo->m_switchKind, NULL);
 		}
 
 		return true;
 	}
 
 	bool
-	processValue (const sl::StringRef& value)
+	processValue(const sl::StringRef& value)
 	{
-		T* self = static_cast <T*> (this);
+		T* self = static_cast<T*> (this);
 
 		if (!m_valueSwitchKind)
-			return m_argIdx == 0 ? self->onValue0 (value) : self->onValue (value);
+			return m_argIdx == 0 ? self->onValue0(value) : self->onValue(value);
 
-		bool result = self->onSwitch ((SwitchKind) m_valueSwitchKind, value);
+		bool result = self->onSwitch((SwitchKind)m_valueSwitchKind, value);
 		if (!result)
 			return false;
 
@@ -300,7 +300,7 @@ protected:
 	}
 
 	bool
-	processSwitch (
+	processSwitch(
 		const SwitchInfo* switchInfo,
 		const sl::StringRef& switchName,
 		const sl::StringRef& value
@@ -308,20 +308,20 @@ protected:
 	{
 		bool result;
 
-		T* self = static_cast <T*> (this);
+		T* self = static_cast<T*> (this);
 
-		result = checkMissingValue ();
+		result = checkMissingValue();
 		if (!result)
 			return false;
 
-		if (switchInfo->m_value && value.isEmpty ())
+		if (switchInfo->m_value && value.isEmpty())
 		{
 			m_valueSwitchKind = switchInfo->m_switchKind;
 			m_valueSwitchName = switchName;
 			return true;
 		}
 
-		return self->onSwitch ((SwitchKind) switchInfo->m_switchKind, value);
+		return self->onSwitch((SwitchKind)switchInfo->m_switchKind, value);
 	}
 };
 
@@ -333,46 +333,46 @@ class Class \
 public: \
 	typedef SwitchKind0 SwitchKind; \
 	typedef axl::sl::SwitchInfo SwitchInfo; \
-	typedef axl::sl::SimpleHashTable <char, SwitchInfo*> CharMap; \
-	typedef axl::sl::StringHashTable <SwitchInfo*> StringMap; \
+	typedef axl::sl::SimpleHashTable<char, SwitchInfo*> CharMap; \
+	typedef axl::sl::StringHashTable<SwitchInfo*> StringMap; \
 protected: \
-	axl::sl::AuxList <axl::sl::SwitchInfo> m_switchInfoList; \
+	axl::sl::AuxList<axl::sl::SwitchInfo> m_switchInfoList; \
 	CharMap m_charMap; \
 	StringMap m_nameMap; \
 public: \
 	static \
 	Class* \
-	getSingleton () \
+	getSingleton() \
 	{ \
-		return axl::sl::getSingleton <Class> (); \
+		return axl::sl::getSingleton<Class> (); \
 	} \
 	static \
-	axl::sl::ConstList <axl::sl::SwitchInfo> \
-	getSwitchInfoList () \
+	axl::sl::ConstList<axl::sl::SwitchInfo> \
+	getSwitchInfoList() \
 	{ \
-		return getSingleton ()->m_switchInfoList; \
+		return getSingleton()->m_switchInfoList; \
 	} \
 	static \
 	const SwitchInfo* \
-	findSwitch (char c) \
+	findSwitch(char c) \
 	{ \
-		CharMap::Iterator it = getSingleton ()->m_charMap.find (c); \
+		CharMap::Iterator it = getSingleton()->m_charMap.find(c); \
 		return it ? it->m_value : NULL; \
 	} \
 	static \
 	const SwitchInfo* \
-	findSwitch (const sl::StringRef& name) \
+	findSwitch(const sl::StringRef& name) \
 	{ \
-		StringMap::Iterator it = getSingleton ()->m_nameMap.find (name); \
+		StringMap::Iterator it = getSingleton()->m_nameMap.find(name); \
 		return it ? it->m_value : NULL; \
 	} \
 	static \
 	axl::sl::String \
-	getHelpString () \
+	getHelpString() \
 	{ \
-		return axl::sl::getCmdLineHelpString (getSingleton ()->m_switchInfoList); \
+		return axl::sl::getCmdLineHelpString(getSingleton()->m_switchInfoList); \
 	} \
-	Class () \
+	Class() \
 	{ \
 		SwitchInfo* lastSwitchInfo = NULL;
 
@@ -380,47 +380,47 @@ public: \
 		{ \
 			static axl::sl::SwitchInfo switchInfo; \
 			switchInfo.m_switchKind = switchKind; \
-			switchInfo.m_nameTable [0] = name0; \
-			switchInfo.m_nameTable [1] = name1; \
-			switchInfo.m_nameTable [2] = name2; \
-			switchInfo.m_nameTable [3] = name3; \
+			switchInfo.m_nameTable[0] = name0; \
+			switchInfo.m_nameTable[1] = name1; \
+			switchInfo.m_nameTable[2] = name2; \
+			switchInfo.m_nameTable[3] = name3; \
 			switchInfo.m_value = value; \
 			switchInfo.m_description = description; \
-			m_switchInfoList.insertTail (&switchInfo); \
+			m_switchInfoList.insertTail(&switchInfo); \
 			lastSwitchInfo = &switchInfo; \
 		}
 
 #define AXL_SL_CMD_LINE_MAP_SWITCH(name) \
-		ASSERT (name); \
-		if (name [1]) \
-			m_nameMap [name] = lastSwitchInfo; \
+		ASSERT(name); \
+		if (name[1]) \
+			m_nameMap[name] = lastSwitchInfo; \
 		else \
-			m_charMap [name [0]] = lastSwitchInfo; \
+			m_charMap[name[0]] = lastSwitchInfo; \
 
 #define AXL_SL_CMD_LINE_SWITCH_GROUP(description) \
-		AXL_SL_CMD_LINE_ADD_SWITCH_INFO (0, NULL, NULL, NULL, NULL, NULL, description)
+		AXL_SL_CMD_LINE_ADD_SWITCH_INFO(0, NULL, NULL, NULL, NULL, NULL, description)
 
 #define AXL_SL_CMD_LINE_SWITCH_1(switchKind, name, value, description) \
-		AXL_SL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name, NULL, NULL, NULL, value, description) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name)
+		AXL_SL_CMD_LINE_ADD_SWITCH_INFO(switchKind, name, NULL, NULL, NULL, value, description) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name)
 
 #define AXL_SL_CMD_LINE_SWITCH_2(switchKind, name0, name1, value, description) \
-		AXL_SL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name0, name1, NULL, NULL, value, description) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name0) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name1) \
+		AXL_SL_CMD_LINE_ADD_SWITCH_INFO(switchKind, name0, name1, NULL, NULL, value, description) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name0) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name1) \
 
 #define AXL_SL_CMD_LINE_SWITCH_3(switchKind, name0, name1, name2, value, description) \
-		AXL_SL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name0, name1, name2, NULL, value, description) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name0) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name1) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name2) \
+		AXL_SL_CMD_LINE_ADD_SWITCH_INFO(switchKind, name0, name1, name2, NULL, value, description) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name0) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name1) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name2) \
 
 #define AXL_SL_CMD_LINE_SWITCH_4(switchKind, name0, name1, name2, name3, value, description) \
-		AXL_SL_CMD_LINE_ADD_SWITCH_INFO (switchKind, name0, name1, name2, name3, value, description) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name0) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name1) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name2) \
-		AXL_SL_CMD_LINE_MAP_SWITCH (name3)
+		AXL_SL_CMD_LINE_ADD_SWITCH_INFO(switchKind, name0, name1, name2, name3, value, description) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name0) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name1) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name2) \
+		AXL_SL_CMD_LINE_MAP_SWITCH(name3)
 
 #define AXL_SL_CMD_LINE_SWITCH AXL_SL_CMD_LINE_SWITCH_1
 

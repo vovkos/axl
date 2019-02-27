@@ -18,28 +18,28 @@ namespace xml {
 //..............................................................................
 
 bool
-ExpatParserRoot::create (const sl::StringRef& encoding)
+ExpatParserRoot::create(const sl::StringRef& encoding)
 {
-	close ();
+	close();
 
-	m_h = XML_ParserCreate (encoding.szn ());
-	return err::completeWithSystemError (m_h != NULL, false, err::SystemErrorCode_InsufficientResources);
+	m_h = XML_ParserCreate(encoding.szn());
+	return err::completeWithSystemError(m_h != NULL, false, err::SystemErrorCode_InsufficientResources);
 }
 
 bool
-ExpatParserRoot::createNs (
+ExpatParserRoot::createNs(
 	const sl::StringRef& encoding,
 	char separator
 	)
 {
-	close ();
+	close();
 
-	m_h = XML_ParserCreateNS (encoding.szn (), separator);
-	return err::completeWithSystemError (m_h != NULL, false, err::SystemErrorCode_InsufficientResources);
+	m_h = XML_ParserCreateNS(encoding.szn(), separator);
+	return err::completeWithSystemError(m_h != NULL, false, err::SystemErrorCode_InsufficientResources);
 }
 
 bool
-ExpatParserRoot::parseFile (
+ExpatParserRoot::parseFile(
 	const sl::StringRef& fileName,
 	size_t blockSize
 	)
@@ -51,28 +51,28 @@ ExpatParserRoot::parseFile (
 	if (!blockSize || blockSize == -1)
 	{
 		return
-			mappedFile.open (fileName, io::FileFlag_ReadOnly) &&
-			parse (mappedFile.p (), (size_t) mappedFile.getFileSize (), true);
+			mappedFile.open(fileName, io::FileFlag_ReadOnly) &&
+			parse(mappedFile.p(), (size_t)mappedFile.getFileSize(), true);
 	}
 
 	// round-up block size
 
-	size_t alignFactor = g::getModule ()->getSystemInfo ()->m_mappingAlignFactor;
+	size_t alignFactor = g::getModule()->getSystemInfo()->m_mappingAlignFactor;
 	blockSize = (blockSize + alignFactor - 1) & ~(alignFactor - 1);
 
-	result = mappedFile.open (fileName, 0, 0, io::FileFlag_ReadOnly);
+	result = mappedFile.open(fileName, 0, 0, io::FileFlag_ReadOnly);
 	if (!result)
 		return false;
 
 	void* p;
 	uint64_t offset = 0;
-	uint64_t size = mappedFile.getFileSize ();
+	uint64_t size = mappedFile.getFileSize();
 
 	while (offset + blockSize < size)
 	{
 		result =
-			(p = mappedFile.view (offset, blockSize)) &&
-			parse (p, blockSize, false);
+			(p = mappedFile.view(offset, blockSize)) &&
+			parse(p, blockSize, false);
 
 		if (!result)
 			return false;
@@ -82,11 +82,11 @@ ExpatParserRoot::parseFile (
 
 	// final block
 
-	blockSize = (size_t) (size - offset);
+	blockSize = (size_t)(size - offset);
 
 	return
-		(p = mappedFile.view (offset, blockSize)) &&
-		parse (p, blockSize, true);
+		(p = mappedFile.view(offset, blockSize)) &&
+		parse(p, blockSize, true);
 }
 
 //..............................................................................

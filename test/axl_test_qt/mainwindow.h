@@ -18,11 +18,11 @@
 class MyWidget: public QWidget
 {
 public:
-	MyWidget (QWidget* parent = NULL);
+	MyWidget(QWidget* parent = NULL);
 
 	virtual
 	void
-	paintEvent (QPaintEvent* e);
+	paintEvent(QPaintEvent* e);
 };
 
 //..............................................................................
@@ -32,11 +32,11 @@ class MainWindow: public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow (QWidget* parent = NULL);
+	MainWindow(QWidget* parent = NULL);
 
-	virtual QSize sizeHint () const
+	virtual QSize sizeHint() const
 	{
-		return QSize (640, 480);
+		return QSize(640, 480);
 	}
 
 private:

@@ -36,61 +36,61 @@ public:
 	win::Thread m_thread;
 
 public:
-	~ThreadImpl ()
+	~ThreadImpl()
 	{
-		waitAndClose ();
+		waitAndClose();
 	}
 
 	bool
-	isOpen ()
+	isOpen()
 	{
-		return m_thread.isOpen ();
+		return m_thread.isOpen();
 	}
 
 	uint64_t
-	getThreadId ()
+	getThreadId()
 	{
-		return m_thread.getThreadId ();
+		return m_thread.getThreadId();
 	}
 
 	bool
-	start ()
+	start()
 	{
-		return m_thread.create (NULL, 0, threadFuncImpl, (T*) this, 0);
+		return m_thread.create(NULL, 0, threadFuncImpl, (T*)this, 0);
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		return !m_thread.isOpen () || m_thread.wait (timeout) == win::WaitResult_Object0;
+		return !m_thread.isOpen() || m_thread.wait(timeout) == win::WaitResult_Object0;
 	}
 
 	void
-	waitAndClose (uint_t timeout = -1)
+	waitAndClose(uint_t timeout = -1)
 	{
-		bool result = wait (timeout);
+		bool result = wait(timeout);
 		if (!result)
 		{
-			ASSERT (false); // terminating thread
-			m_thread.terminate (err::SystemErrorCode_IoTimeout);
+			ASSERT(false); // terminating thread
+			m_thread.terminate(err::SystemErrorCode_IoTimeout);
 		}
 
-		m_thread.close ();
+		m_thread.close();
 	}
 
 	bool
-	terminate ()
+	terminate()
 	{
-		return m_thread.terminate (err::SystemErrorCode_IoTimeout);
+		return m_thread.terminate(err::SystemErrorCode_IoTimeout);
 	}
 
 protected:
 	static
 	dword_t
 	WINAPI
-	threadFuncImpl (void* context)
+	threadFuncImpl(void* context)
 	{
-		((T*) context)->threadFunc ();
+		((T*)context)->threadFunc();
 		return 0;
 	}
 };
@@ -99,9 +99,9 @@ protected:
 
 inline
 uint64_t
-getCurrentThreadId ()
+getCurrentThreadId()
 {
-	return ::GetCurrentThreadId ();
+	return ::GetCurrentThreadId();
 }
 
 //..............................................................................
@@ -115,21 +115,21 @@ public:
 
 public:
 	bool
-	isOpen ()
+	isOpen()
 	{
-		return m_thread.isOpen ();
+		return m_thread.isOpen();
 	}
 
 	uint64_t
-	getThreadId ()
+	getThreadId()
 	{
-		return (uint64_t) (pthread_t) m_thread;
+		return (uint64_t)(pthread_t)m_thread;
 	}
 
 	bool
-	terminate ()
+	terminate()
 	{
-		return m_thread.cancel ();
+		return m_thread.cancel();
 	}
 };
 
@@ -144,54 +144,54 @@ public:
 	NotificationEvent m_threadCompletedEvent;
 
 public:
-	~ThreadImpl ()
+	~ThreadImpl()
 	{
-		waitAndClose ();
+		waitAndClose();
 	}
 
 	bool
-	start ()
+	start()
 	{
-		ASSERT (!m_thread.isOpen ());
+		ASSERT(!m_thread.isOpen());
 
-		m_threadCompletedEvent.reset ();
-		return m_thread.create (threadFuncImpl, (T*) this);
+		m_threadCompletedEvent.reset();
+		return m_thread.create(threadFuncImpl, (T*)this);
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		return !m_thread.isOpen () || m_threadCompletedEvent.wait (timeout);
+		return !m_thread.isOpen() || m_threadCompletedEvent.wait(timeout);
 	}
 
 	void
-	waitAndClose (uint_t timeout = -1)
+	waitAndClose(uint_t timeout = -1)
 	{
-		if (!m_thread.isOpen ())
+		if (!m_thread.isOpen())
 			return;
 
-		bool result = m_threadCompletedEvent.wait (timeout);
+		bool result = m_threadCompletedEvent.wait(timeout);
 		if (result)
 		{
-			m_thread.join ();
+			m_thread.join();
 		}
 		else
 		{
-			ASSERT (false); // cancelling thread
-			m_thread.cancel ();
+			ASSERT(false); // cancelling thread
+			m_thread.cancel();
 		}
 
-		m_thread.detach ();
+		m_thread.detach();
 	}
 
 protected:
 	static
 	void*
-	threadFuncImpl (void* context)
+	threadFuncImpl(void* context)
 	{
-		T* self = (T*) context;
-		self->threadFunc ();
-		self->m_threadCompletedEvent.signal ();
+		T* self = (T*)context;
+		self->threadFunc();
+		self->m_threadCompletedEvent.signal();
 		return NULL;
 	}
 };
@@ -204,43 +204,43 @@ template <typename T>
 class ThreadImpl: public ThreadImplRoot
 {
 public:
-	~ThreadImpl ()
+	~ThreadImpl()
 	{
-		waitAndClose ();
+		waitAndClose();
 	}
 
 	bool
-	start ()
+	start()
 	{
-		ASSERT (!m_thread.isOpen ());
-		return m_thread.create (threadFunc, (T*) this);
+		ASSERT(!m_thread.isOpen());
+		return m_thread.create(threadFunc, (T*)this);
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		return !m_thread.isOpen () || m_thread.join (timeout);
+		return !m_thread.isOpen() || m_thread.join(timeout);
 	}
 
 	void
-	waitAndClose (uint_t timeout = -1)
+	waitAndClose(uint_t timeout = -1)
 	{
-		bool result = wait (timeout);
+		bool result = wait(timeout);
 		if (!result)
 		{
-			ASSERT (false);
-			m_thread.cancel ();
+			ASSERT(false);
+			m_thread.cancel();
 		}
 
-		m_thread.detach ();
+		m_thread.detach();
 	}
 
 protected:
 	static
 	void*
-	threadFunc (void* context)
+	threadFunc(void* context)
 	{
-		((T*) context)->threadFunc ();
+		((T*)context)->threadFunc();
 		return NULL;
 	}
 };
@@ -251,9 +251,9 @@ protected:
 
 inline
 uint64_t
-getCurrentThreadId ()
+getCurrentThreadId()
 {
-	return (uint64_t) ::pthread_self ();
+	return (uint64_t) ::pthread_self();
 }
 
 #endif

@@ -21,79 +21,79 @@ namespace io {
 //..............................................................................
 
 sl::String
-getTempDir ();
+getTempDir();
 
 sl::String
-getCurrentDir ();
+getCurrentDir();
 
 bool
-setCurrentDir (const sl::StringRef& dir);
+setCurrentDir(const sl::StringRef& dir);
 
 sl::String
-getExeFilePath ();
+getExeFilePath();
 
 sl::String
-getExeDir ();
+getExeDir();
 
 bool
-doesFileExist (const sl::StringRef& fileName);
+doesFileExist(const sl::StringRef& fileName);
 
 bool
-ensureDirExists (const sl::StringRef& fileName);
+ensureDirExists(const sl::StringRef& fileName);
 
 bool
-isDir (const sl::StringRef& fileName);
+isDir(const sl::StringRef& fileName);
 
 sl::String
-getFullFilePath (const sl::StringRef& fileName);
+getFullFilePath(const sl::StringRef& fileName);
 
 sl::String
-getDir (const sl::StringRef& filePath);
+getDir(const sl::StringRef& filePath);
 
 sl::String
-getFileName (const sl::StringRef& filePath);
+getFileName(const sl::StringRef& filePath);
 
 sl::String
-getExtension (const sl::StringRef& filePath);
+getExtension(const sl::StringRef& filePath);
 
 sl::String
-concatFilePath (
+concatFilePath(
 	sl::String* filePath,
 	const sl::StringRef& fileName
 	);
 
 inline
 sl::String
-concatFilePath (
+concatFilePath(
 	const sl::StringRef& dir,
 	const sl::StringRef& fileName
 	)
 {
 	sl::String filePath = dir;
-	return concatFilePath (&filePath, fileName);
+	return concatFilePath(&filePath, fileName);
 }
 
 sl::String
-findFilePath (
+findFilePath(
 	const sl::StringRef& fileName,
 	const sl::StringRef& firstDir,
-	const sl::BoxList <sl::String>* dirList,
+	const sl::BoxList<sl::String>* dirList,
 	bool doFindInCurrentDir = true
 	);
 
 inline
 sl::String
-findFilePath (
+findFilePath(
 	const sl::StringRef& fileName,
-	const sl::BoxList <sl::String>* dirList,
+	const sl::BoxList<sl::String>* dirList,
 	bool doFindInCurrentDir = true
 	)
 {
-	return findFilePath (fileName, NULL, dirList, doFindInCurrentDir);
+	return findFilePath(fileName, NULL, dirList, doFindInCurrentDir);
 }
 
 bool
-getSymbolicLinkTarget (
+getSymbolicLinkTarget(
 	sl::String* targetName,
 	const sl::StringRef& linkName
 	);

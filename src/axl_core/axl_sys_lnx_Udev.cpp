@@ -19,12 +19,12 @@ namespace lnx {
 //..............................................................................
 
 bool
-UdevContext::create ()
+UdevContext::create()
 {
-	close ();
+	close();
 
-	m_h = udev_new ();
-	return completeUdev (m_h != NULL, "udev_new");
+	m_h = udev_new();
+	return completeUdev(m_h != NULL, "udev_new");
 }
 
 //..............................................................................

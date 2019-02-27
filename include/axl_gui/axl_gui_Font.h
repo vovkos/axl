@@ -25,48 +25,48 @@ class Font;
 class FontTuple: public GuiItem
 {
 protected:
-	Font* m_fontModArray [0x10];
+	Font* m_fontModArray[0x10];
 
 protected:
-	FontTuple (Engine* engine):
-		GuiItem (engine)
+	FontTuple(Engine* engine):
+		GuiItem(engine)
 	{
-		memset (m_fontModArray, 0, sizeof (m_fontModArray));
+		memset(m_fontModArray, 0, sizeof(m_fontModArray));
 	}
 
-	~FontTuple ()
+	~FontTuple()
 	{
-		clear ();
+		clear();
 	}
 
 public:
 	Font*
-	createFont (
+	createFont(
 		const sl::StringRef& family,
 		size_t pointSize,
 		uint_t flags = 0
 		)
 	{
-		return m_engine->createFont (this, family, pointSize, flags);
+		return m_engine->createFont(this, family, pointSize, flags);
 	}
 
 	Font*
-	createFont (const FontDesc& fontDesc)
+	createFont(const FontDesc& fontDesc)
 	{
-		return m_engine->createFont (this, fontDesc);
+		return m_engine->createFont(this, fontDesc);
 	}
 
 	Font*
-	getFont (uint_t flags = 0)
+	getFont(uint_t flags = 0)
 	{
 		flags = (flags & FontFlag_Undefined) ? 0 : (flags & 0x0f);
-		return m_fontModArray [flags] ? m_fontModArray [flags] : m_engine->getFontMod (this, flags);
+		return m_fontModArray[flags] ? m_fontModArray[flags] : m_engine->getFontMod(this, flags);
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		m_engine->clearFontTuple (this);
+		m_engine->clearFontTuple(this);
 	}
 };
 
@@ -78,59 +78,59 @@ protected:
 	FontTuple* m_tuple;
 
 protected:
-	Font (Engine* engine):
-		GuiItem (engine)
+	Font(Engine* engine):
+		GuiItem(engine)
 	{
 		m_tuple = NULL;
 	}
 
 public:
 	Font*
-	getFontMod (uint_t flags)
+	getFontMod(uint_t flags)
 	{
-		return (flags & FontFlag_Undefined) ? this : m_tuple->getFont (flags);
+		return (flags & FontFlag_Undefined) ? this : m_tuple->getFont(flags);
 	}
 
 	bool
-	getFontDesc (FontDesc* fontDesc)
+	getFontDesc(FontDesc* fontDesc)
 	{
-		return m_engine->getFontDesc (this, fontDesc);
+		return m_engine->getFontDesc(this, fontDesc);
 	}
 
 	bool
-	isMonospace ()
+	isMonospace()
 	{
-		return m_engine->isMonospaceFont (this);
+		return m_engine->isMonospaceFont(this);
 	}
 
 	Size
-	calcTextSize (const sl::StringRef& text)
+	calcTextSize(const sl::StringRef& text)
 	{
-		return calcTextSize_utf8 (text);
+		return calcTextSize_utf8(text);
 	}
 
 	Size
-	calcTextSize_utf8 (const sl::StringRef_utf8& text)
+	calcTextSize_utf8(const sl::StringRef_utf8& text)
 	{
-		return m_engine->calcTextSize_utf8 (this, text);
+		return m_engine->calcTextSize_utf8(this, text);
 	}
 
 	Size
-	calcTextSize_utf16 (const sl::StringRef_utf16& text)
+	calcTextSize_utf16(const sl::StringRef_utf16& text)
 	{
-		return m_engine->calcTextSize_utf16 (this, text);
+		return m_engine->calcTextSize_utf16(this, text);
 	}
 
 	Size
-	calcTextSize_utf32 (const sl::StringRef_utf32& text)
+	calcTextSize_utf32(const sl::StringRef_utf32& text)
 	{
-		return m_engine->calcTextSize_utf32 (this, text);
+		return m_engine->calcTextSize_utf32(this, text);
 	}
 
 	Size
-	calcTextSize (utf32_t c)
+	calcTextSize(utf32_t c)
 	{
-		return calcTextSize_utf32 (sl::StringRef_utf32 (&c, 1));
+		return calcTextSize_utf32(sl::StringRef_utf32(&c, 1));
 	}
 };
 
@@ -138,12 +138,12 @@ public:
 
 inline
 Font*
-Engine::getStdFont (
+Engine::getStdFont(
 	StdFontKind fontKind,
 	uint_t flags
 	)
 {
-	return getStdFontTuple (fontKind)->getFont (flags);
+	return getStdFontTuple(fontKind)->getFont(flags);
 }
 
 //..............................................................................

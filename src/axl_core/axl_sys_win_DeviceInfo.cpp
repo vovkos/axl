@@ -19,70 +19,70 @@ namespace win {
 //..............................................................................
 
 bool
-DeviceInfo::getDeviceRegistryProperty (
+DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
-	sl::Array <char>* buffer
+	sl::Array<char>* buffer
 	)
 {
 	dword_t requiredSize = 0;
-	getDeviceRegistryProperty (propId, NULL, 0, &requiredSize);
+	getDeviceRegistryProperty(propId, NULL, 0, &requiredSize);
 
-	buffer->setCount (requiredSize);
-	return getDeviceRegistryProperty (propId, buffer->p (), requiredSize, NULL);
+	buffer->setCount(requiredSize);
+	return getDeviceRegistryProperty(propId, buffer->p(), requiredSize, NULL);
 }
 
 bool
-DeviceInfo::getDeviceRegistryProperty (
+DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::String* string
 	)
 {
-	sl::Array <char> buffer;
-	bool result = getDeviceRegistryProperty (propId, &buffer);
+	sl::Array<char> buffer;
+	bool result = getDeviceRegistryProperty(propId, &buffer);
 	if (!result)
 		return false;
 
-	string->copy ((const utf16_t*) buffer.cp (), buffer.getCount () / sizeof (utf16_t));
+	string->copy((const utf16_t*) buffer.cp(), buffer.getCount() / sizeof(utf16_t));
 	return true;
 }
 
 bool
-DeviceInfo::getDeviceRegistryProperty (
+DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::String_w* string
 	)
 {
-	sl::Array <char> buffer;
-	bool result = getDeviceRegistryProperty (propId, &buffer);
+	sl::Array<char> buffer;
+	bool result = getDeviceRegistryProperty(propId, &buffer);
 	if (!result)
 		return false;
 
-	string->copy ((const utf16_t*) buffer.cp (), buffer.getCount () / sizeof (utf16_t));
+	string->copy((const utf16_t*) buffer.cp(), buffer.getCount() / sizeof(utf16_t));
 	return true;
 }
 
 HKEY
-DeviceInfo::openDeviceRegistryKey (REGSAM keyAccess)
+DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess)
 {
-	HKEY key = ::SetupDiOpenDevRegKey (m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
+	HKEY key = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
 	if (key == INVALID_HANDLE_VALUE)
-		err::setLastSystemError ();
+		err::setLastSystemError();
 
 	return key;
 }
 
 bool
-DeviceInfo::getClassInstallParams (sl::Array <char>* buffer)
+DeviceInfo::getClassInstallParams(sl::Array<char>* buffer)
 {
 	dword_t requiredSize = 0;
-	getClassInstallParams (NULL, 0, &requiredSize);
+	getClassInstallParams(NULL, 0, &requiredSize);
 
-	buffer->setCount (requiredSize);
-	return getClassInstallParams (buffer->p (), requiredSize, NULL);
+	buffer->setCount(requiredSize);
+	return getClassInstallParams(buffer->p(), requiredSize, NULL);
 }
 
 bool
-DeviceInfo::restartDevice (bool* isRebootRequired)
+DeviceInfo::restartDevice(bool* isRebootRequired)
 {
 	bool result;
 
@@ -95,8 +95,8 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 	propChangeParams.HwProfile = 0; // current profile
 
 	result =
-		setClassInstallParams (&propChangeParams, sizeof (propChangeParams)) &&
-		callClassInstaller (DIF_PROPERTYCHANGE);
+		setClassInstallParams(&propChangeParams, sizeof(propChangeParams)) &&
+		callClassInstaller(DIF_PROPERTYCHANGE);
 
 	if (!result)
 		return false;
@@ -104,15 +104,15 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 	propChangeParams.StateChange = DICS_START;
 
 	result =
-		setClassInstallParams (&propChangeParams, sizeof (propChangeParams)) &&
-		callClassInstaller (DIF_PROPERTYCHANGE);
+		setClassInstallParams(&propChangeParams, sizeof(propChangeParams)) &&
+		callClassInstaller(DIF_PROPERTYCHANGE);
 
 	if (!result)
 		return false;
 
 	SP_DEVINSTALL_PARAMS_W devInstallParams = { 0 };
-	devInstallParams.cbSize = sizeof (devInstallParams);
-	result = getDeviceInstallParams (&devInstallParams);
+	devInstallParams.cbSize = sizeof(devInstallParams);
+	result = getDeviceInstallParams(&devInstallParams);
 	if (!result)
 		return false;
 
@@ -125,63 +125,63 @@ DeviceInfo::restartDevice (bool* isRebootRequired)
 //..............................................................................
 
 bool
-DeviceInfoSet::create (uint_t flags)
+DeviceInfoSet::create(uint_t flags)
 {
-	close ();
+	close();
 
-	m_h = ::SetupDiGetClassDevsW (NULL, NULL, NULL, flags | DIGCF_ALLCLASSES);
-	return err::complete (m_h != INVALID_HANDLE_VALUE);
+	m_h = ::SetupDiGetClassDevsW(NULL, NULL, NULL, flags | DIGCF_ALLCLASSES);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
 
 bool
-DeviceInfoSet::create (
+DeviceInfoSet::create(
 	const GUID& classGuid,
 	uint_t flags
 	)
 {
-	close ();
+	close();
 
-	m_h = ::SetupDiGetClassDevsW (&classGuid, NULL, NULL, flags);
-	return err::complete (m_h != INVALID_HANDLE_VALUE);
+	m_h = ::SetupDiGetClassDevsW(&classGuid, NULL, NULL, flags);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
 
 bool
-DeviceInfoSet::create (
+DeviceInfoSet::create(
 	const sl::StringRef_w& enumerator,
 	uint_t flags
 	)
 {
-	close ();
+	close();
 
-	m_h = ::SetupDiGetClassDevsW (NULL, enumerator.szn (), NULL, flags);
-	return err::complete (m_h != INVALID_HANDLE_VALUE);
+	m_h = ::SetupDiGetClassDevsW(NULL, enumerator.szn(), NULL, flags);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
 
 bool
-DeviceInfoSet::getDeviceInfo (
+DeviceInfoSet::getDeviceInfo(
 	size_t i,
 	DeviceInfo* deviceInfo
 	)
 {
-	bool_t result = ::SetupDiEnumDeviceInfo (m_h, (DWORD) i, &deviceInfo->m_devInfoData);
+	bool_t result = ::SetupDiEnumDeviceInfo(m_h, (DWORD)i, &deviceInfo->m_devInfoData);
 	if (!result)
-		return err::failWithLastSystemError ();
+		return err::failWithLastSystemError();
 
 	deviceInfo->m_devInfoSet = m_h;
 	return true;
 }
 
 bool
-DeviceInfoSet::getDeviceClassGuids (
+DeviceInfoSet::getDeviceClassGuids(
 	const sl::StringRef_w& name,
-	sl::Array <GUID>* buffer
+	sl::Array<GUID>* buffer
 	)
 {
 	dword_t requiredCount = 0;
-	getDeviceClassGuids (name, NULL, 0, &requiredCount);
+	getDeviceClassGuids(name, NULL, 0, &requiredCount);
 
-	buffer->setCount (requiredCount);
-	return getDeviceClassGuids (name, buffer->p (), requiredCount, &requiredCount);
+	buffer->setCount(requiredCount);
+	return getDeviceClassGuids(name, buffer->p(), requiredCount, &requiredCount);
 }
 
 //..............................................................................

@@ -19,16 +19,16 @@ namespace cf {
 //..............................................................................
 
 bool
-NumberRef::create (
+NumberRef::create(
 	CFNumberType type,
 	const void* p
 	)
 {
-	CFNumberRef newNumber = ::CFNumberCreate (kCFAllocatorDefault, type, p);
+	CFNumberRef newNumber = ::CFNumberCreate(kCFAllocatorDefault, type, p);
 	if (!newNumber)
-		return err::fail (err::SystemErrorCode_InsufficientResources);
+		return err::fail(err::SystemErrorCode_InsufficientResources);
 
-	attach (newNumber);
+	attach(newNumber);
 	return true;
 }
 

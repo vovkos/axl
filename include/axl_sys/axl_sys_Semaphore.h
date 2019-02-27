@@ -33,39 +33,39 @@ public:
 
 public:
 	bool
-	isOpen ()
+	isOpen()
 	{
-		return m_semaphore.isOpen ();
+		return m_semaphore.isOpen();
 	}
 
 	void
-	close ()
+	close()
 	{
-		m_semaphore.close ();
+		m_semaphore.close();
 	}
 
 	bool
-	create (const sl::StringRef& name)
+	create(const sl::StringRef& name)
 	{
-		return m_semaphore.create (NULL, 0, MAXLONG, name.s2 ());
+		return m_semaphore.create(NULL, 0, MAXLONG, name.s2());
 	}
 
 	bool
-	open (const sl::StringRef& name)
+	open(const sl::StringRef& name)
 	{
-		return m_semaphore.open (SEMAPHORE_ALL_ACCESS, false, name.s2 ());
+		return m_semaphore.open(SEMAPHORE_ALL_ACCESS, false, name.s2());
 	}
 
 	bool
-	signal (size_t count = 1)
+	signal(size_t count = 1)
 	{
-		return m_semaphore.signal (count);
+		return m_semaphore.signal(count);
 	}
 
 	bool
-	wait ()
+	wait()
 	{
-		return m_semaphore.wait (-1) == win::WaitResult_Object0;
+		return m_semaphore.wait(-1) == win::WaitResult_Object0;
 	}
 };
 
@@ -78,41 +78,41 @@ public:
 
 public:
 	bool
-	isOpen ()
+	isOpen()
 	{
-		return m_sem.isOpen ();
+		return m_sem.isOpen();
 	}
 
 	void
-	close ()
+	close()
 	{
-		m_sem.close ();
+		m_sem.close();
 	}
 
 	bool
-	create (const sl::StringRef& name)
+	create(const sl::StringRef& name)
 	{
-		return m_sem.open (name, O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, 0);
+		return m_sem.open(name, O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, 0);
 	}
 
 	bool
-	open (const sl::StringRef& name)
+	open(const sl::StringRef& name)
 	{
-		return m_sem.open (name, 0, 0, 0);
+		return m_sem.open(name, 0, 0, 0);
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		return m_sem.post ();
+		return m_sem.post();
 	}
 
 	bool
-	signal (size_t count)
+	signal(size_t count)
 	{
 		for (; count; count--)
 		{
-			bool result = m_sem.post ();
+			bool result = m_sem.post();
 			if (!result)
 				return false;
 		}
@@ -121,15 +121,15 @@ public:
 	}
 
 	bool
-	tryWait ()
+	tryWait()
 	{
-		return m_sem.tryWait ();
+		return m_sem.tryWait();
 	}
 
 	bool
-	wait ()
+	wait()
 	{
-		return m_sem.wait ();
+		return m_sem.wait();
 	}
 };
 

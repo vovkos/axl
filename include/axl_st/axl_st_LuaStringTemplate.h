@@ -20,9 +20,9 @@ namespace st {
 
 //..............................................................................
 
-class LuaStringTemplate: public StringTemplate <LuaStringTemplate>
+class LuaStringTemplate: public StringTemplate<LuaStringTemplate>
 {
-	friend class StringTemplate <LuaStringTemplate>;
+	friend class StringTemplate<LuaStringTemplate>;
 
 protected:
 	size_t m_argCount;
@@ -31,64 +31,64 @@ public:
 	lua::LuaState m_luaState;
 
 public:
-	LuaStringTemplate ()
+	LuaStringTemplate()
 	{
 		m_argCount = 0;
 	}
 
 	void
-	close ();
+	close();
 
 	bool
-	create ();
+	create();
 
 	size_t
-	getArgCount ()
+	getArgCount()
 	{
 		return m_argCount;
 	}
 
 	bool
-	setArgCount (size_t count);
+	setArgCount(size_t count);
 
 protected:
 	bool
-	runScript (
+	runScript(
 		const sl::StringRef& fileName,
 		const sl::StringRef& source
 		);
 
 	void
-	createPassthroughCall (
+	createPassthroughCall(
 		sl::String* script,
 		size_t offset,
 		size_t length
 		)
 	{
-		script->appendFormat ("passthrough (%d, %d);", offset, length);
+		script->appendFormat("passthrough (%d, %d);", offset, length);
 	}
 
 	void
-	createEmitCall (
+	createEmitCall(
 		sl::String* script,
 		const sl::StringRef& value
 		);
 
 	static
 	int
-	getLine_lua (lua_State* h);
+	getLine_lua(lua_State* h);
 
 	static
 	int
-	getCol_lua (lua_State* h);
+	getCol_lua(lua_State* h);
 
 	static
 	int
-	emit_lua (lua_State* h);
+	emit_lua(lua_State* h);
 
 	static
 	int
-	passthrough_lua (lua_State* h);
+	passthrough_lua(lua_State* h);
 };
 
 //..............................................................................

@@ -26,17 +26,17 @@ public:
 	void
 	operator () (pcap_t* h)
 	{
-		::pcap_close (h);
+		::pcap_close(h);
 	}
 };
 
 //..............................................................................
 
-class Pcap: public sl::Handle <pcap_t*, ClosePcap>
+class Pcap: public sl::Handle<pcap_t*, ClosePcap>
 {
 public:
 	bool
-	openDevice (
+	openDevice(
 		const sl::StringRef& device,
 		size_t snapshotSize,
 		bool isPromiscious,
@@ -44,32 +44,32 @@ public:
 		);
 
 	bool
-	openFile (const sl::StringRef& fileName);
+	openFile(const sl::StringRef& fileName);
 
 	bool
-	setFilter (const sl::StringRef& filter);
+	setFilter(const sl::StringRef& filter);
 
 	bool
-	setBlockingMode (bool isBlocking);
+	setBlockingMode(bool isBlocking);
 
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size,
 		uint64_t* timestamp
 		);
 
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size
 		)
 	{
-		return read (p, size, NULL);
+		return read(p, size, NULL);
 	}
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		);

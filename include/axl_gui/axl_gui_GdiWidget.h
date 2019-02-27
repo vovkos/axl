@@ -36,13 +36,13 @@ struct Notify: NMHDR
 
 inline
 int
-getScrollBarFromOrientation (Orientation orientation)
+getScrollBarFromOrientation(Orientation orientation)
 {
 	return orientation == Orientation_Horizontal ? SB_HORZ : SB_VERT;
 }
 
 void
-buildScrollInfo (
+buildScrollInfo(
 	SCROLLINFO* scrollInfo,
 	size_t max,
 	size_t page,
@@ -51,12 +51,12 @@ buildScrollInfo (
 
 inline
 void
-getScrollInfoFromScrollBar (
+getScrollInfoFromScrollBar(
 	const WidgetScrollBar& scrollBar,
 	SCROLLINFO* scrollInfo
 	)
 {
-	buildScrollInfo (scrollInfo, scrollBar.m_end - 1, scrollBar.m_page, scrollBar.m_pos);
+	buildScrollInfo(scrollInfo, scrollBar.m_end - 1, scrollBar.m_page, scrollBar.m_pos);
 }
 
 //..............................................................................
@@ -68,7 +68,7 @@ public:
 	// also to put part of implementation into .cpp instead of having one huge CGdiWidgetT <>
 
 	LRESULT
-	windowProc (
+	windowProc(
 		HWND hWnd,
 		UINT wmMsg,
 		WPARAM wParam,
@@ -77,12 +77,12 @@ public:
 		);
 
 	static
-	ref::Ptr <Canvas>
-	getCanvas (HWND hWnd);
+	ref::Ptr<Canvas>
+	getCanvas(HWND hWnd);
 
 protected:
 	void
-	processWmMouse (
+	processWmMouse(
 		WidgetMsgCode msgCode,
 		int x,
 		int y,
@@ -91,27 +91,27 @@ protected:
 		);
 
 	void
-	processWmMouseWheel (
+	processWmMouseWheel(
 		HWND hWnd,
 		int wheelDelta,
 		bool* isHandled_o
 		);
 
 	void
-	processWmKey (
+	processWmKey(
 		WidgetMsgCode msgCode,
 		int key,
 		bool* isHandled_o
 		);
 
 	void
-	processWmSize (
+	processWmSize(
 		HWND hWnd,
 		bool* isHandled_o
 		);
 
 	void
-	processWmScroll (
+	processWmScroll(
 		HWND hWnd,
 		Orientation orientation,
 		int code,
@@ -119,13 +119,13 @@ protected:
 		);
 
 	void
-	processWmPaint (
+	processWmPaint(
 		HWND hWnd,
 		bool* isHandled_o
 		);
 
 	LRESULT
-	processWmSetCursor (
+	processWmSetCursor(
 		HWND hWnd,
 		bool* isHandled_o
 		);
@@ -136,29 +136,29 @@ protected:
 template <typename T>
 class GdiWidget:
 	public T,
-	public g::win::WindowImpl <GdiWidget <T> >
+	public g::win::WindowImpl<GdiWidget<T> >
 {
 	friend class GdiEngine;
-	friend class g::win::WindowImpl <GdiWidget <T> >;
+	friend class g::win::WindowImpl<GdiWidget<T> >;
 
 public:
-	GdiWidget (): T (GdiEngine::getSingleton ())
+	GdiWidget(): T(GdiEngine::getSingleton())
 	{
-		m_baseTextAttr.m_foreColor = ::GetSysColor (COLOR_WINDOWTEXT);
-		m_baseTextAttr.m_backColor = ::GetSysColor (COLOR_WINDOW);
+		m_baseTextAttr.m_foreColor = ::GetSysColor(COLOR_WINDOWTEXT);
+		m_baseTextAttr.m_backColor = ::GetSysColor(COLOR_WINDOW);
 		m_baseTextAttr.m_fontFlags = 0;
 	}
 
 	virtual
-	ref::Ptr <Canvas>
-	getCanvas ()
+	ref::Ptr<Canvas>
+	getCanvas()
 	{
-		return getGdiWidget ()->getCanvas (m_h);
+		return getGdiWidget()->getCanvas(m_h);
 	}
 
 	virtual
 	bool
-	redraw (
+	redraw(
 		int left,
 		int top,
 		int right,
@@ -167,12 +167,12 @@ public:
 	{
 		if (left == right || top == bottom)
 		{
-			::InvalidateRect (m_h, NULL, false);
+			::InvalidateRect(m_h, NULL, false);
 		}
 		else
 		{
 			RECT rect = { left, top, right, bottom };
-			::InvalidateRect (m_h, &rect, false);
+			::InvalidateRect(m_h, &rect, false);
 		}
 
 		return true;
@@ -180,55 +180,55 @@ public:
 
 	virtual
 	bool
-	isFocused ()
+	isFocused()
 	{
-		return ::GetFocus () == m_h;
+		return ::GetFocus() == m_h;
 	}
 
 	virtual
 	bool
-	setFocus ()
+	setFocus()
 	{
-		::SetFocus (m_h);
+		::SetFocus(m_h);
 		return true;
 	}
 
 	virtual
 	bool
-	setCursor (Cursor* cursor)
+	setCursor(Cursor* cursor)
 	{
-		ASSERT (cursor->getEngine ()->getEngineKind () == EngineKind_Gdi);
-		::SetCursor (*(Cursor*) cursor);
+		ASSERT(cursor->getEngine()->getEngineKind() == EngineKind_Gdi);
+		::SetCursor(*(Cursor*)cursor);
 		m_cursor = cursor;
 		return true;
 	}
 
 	virtual
 	bool
-	setMouseCapture ()
+	setMouseCapture()
 	{
-		HWND hPrevWnd = ::SetCapture (m_h);
+		HWND hPrevWnd = ::SetCapture(m_h);
 		return true;
 	}
 
 	virtual
 	bool
-	releaseMouseCapture ()
+	releaseMouseCapture()
 	{
-		bool_t result = ::ReleaseCapture ();
-		return err::complete (result);
+		bool_t result = ::ReleaseCapture();
+		return err::complete(result);
 	}
 
 	virtual
 	bool
-	setCaretVisible (bool isVisible)
+	setCaretVisible(bool isVisible)
 	{
 		return true;
 	}
 
 	virtual
 	bool
-	setCaretPos (
+	setCaretPos(
 		int x,
 		int y
 		)
@@ -238,7 +238,7 @@ public:
 
 	virtual
 	bool
-	setCaretSize (
+	setCaretSize(
 		uint_t width,
 		uint_t height
 		)
@@ -248,69 +248,69 @@ public:
 
 	virtual
 	bool
-	updateScrollBar (Orientation orientation)
+	updateScrollBar(Orientation orientation)
 	{
-		ASSERT (orientation < countof (m_scrollBarArray));
+		ASSERT(orientation < countof(m_scrollBarArray));
 
-		int bar = getScrollBarFromOrientation (orientation);
+		int bar = getScrollBarFromOrientation(orientation);
 
 		SCROLLINFO scrollInfo;
-		getScrollInfoFromScrollBar (m_scrollBarArray [orientation], &scrollInfo);
-		bool_t result = ::SetScrollInfo (m_h, bar, &scrollInfo, TRUE);
-		return err::complete (result);
+		getScrollInfoFromScrollBar(m_scrollBarArray[orientation], &scrollInfo);
+		bool_t result = ::SetScrollInfo(m_h, bar, &scrollInfo, TRUE);
+		return err::complete(result);
 	}
 
 	virtual
 	intptr_t
-	notifyParent (
+	notifyParent(
 		intptr_t notifyCode,
 		void* param = NULL
 		)
 	{
-		HWND hWndParent = ::GetParent (m_h);
+		HWND hWndParent = ::GetParent(m_h);
 
 		Notify notify;
 		notify.code = notifyCode;
 		notify.hwndFrom = m_h;
-		notify.idFrom = ::GetDlgCtrlID (m_h);
+		notify.idFrom = ::GetDlgCtrlID(m_h);
 		notify.param = param;
 
-		return ::SendMessageW (hWndParent, WM_NOTIFY, notify.idFrom, (LPARAM) &notify);
+		return ::SendMessageW(hWndParent, WM_NOTIFY, notify.idFrom, (LPARAM) &notify);
 	}
 
 	virtual
 	void
-	postThreadMsg (
+	postThreadMsg(
 		uint_t code,
-		const ref::Ptr <void>& params
+		const ref::Ptr<void>& params
 		)
 	{
-		WidgetThreadMsg* msg = AXL_MEM_NEW (WidgetThreadMsg);
+		WidgetThreadMsg* msg = AXL_MEM_NEW(WidgetThreadMsg);
 		msg->m_msgCode = WidgetMsgCode_ThreadMsg;
 		msg->m_code = code;
 		msg->m_params = params;
 
-		bool_t result = ::PostMessageW (m_h, WmKind_ThreadMsg, code, (LPARAM) msg);
+		bool_t result = ::PostMessageW(m_h, WmKind_ThreadMsg, code, (LPARAM)msg);
 		if (!result)
-			AXL_MEM_DELETE (msg);
+			AXL_MEM_DELETE(msg);
 	}
 
 protected:
 	GdiWidgetImpl*
-	getGdiWidget ()
+	getGdiWidget()
 	{
-		return (GdiWidgetImpl*) (Widget*) this;
+		return (GdiWidgetImpl*)(Widget*)this;
 	}
 
 	LRESULT
-	windowProc (
+	windowProc(
 		UINT wmMsg,
 		WPARAM wParam,
 		LPARAM lParam,
 		bool* isHandled_o
 		)
 	{
-		return getGdiWidget ()->windowProc (m_h, wmMsg, wParam, lParam, isHandled_o);
+		return getGdiWidget()->windowProc(m_h, wmMsg, wParam, lParam, isHandled_o);
 	}
 };
 

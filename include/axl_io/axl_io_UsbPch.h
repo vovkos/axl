@@ -17,7 +17,7 @@
 
 #if (_WIN32)
 #	define _WINSOCKAPI_ // prevent winsock inclusion
-#	pragma warning (disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
+#	pragma warning(disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
 #endif
 
 extern "C" {

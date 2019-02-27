@@ -30,13 +30,13 @@ protected:
 
 public:
 	const sl::String&
-	getName () const
+	getName() const
 	{
 		return m_name;
 	}
 
 	const sl::String&
-	getValue () const
+	getValue() const
 	{
 		return m_value;
 	}
@@ -50,26 +50,26 @@ class Section: public sl::ListLink
 
 protected:
 	sl::String m_name;
-	sl::StringHashTable <NamedValue*> m_namedValueMap;
-	sl::List <NamedValue> m_namedValueList;
-	sl::BoxList <sl::String> m_unnamedValueList;
+	sl::StringHashTable<NamedValue*> m_namedValueMap;
+	sl::List<NamedValue> m_namedValueList;
+	sl::BoxList<sl::String> m_unnamedValueList;
 
 public:
 	const sl::String&
-	getName ()
+	getName()
 	{
 		return m_name;
 	}
 
 	NamedValue*
-	getNamedValue (const sl::StringRef& name) const
+	getNamedValue(const sl::StringRef& name) const
 	{
-		sl::ConstStringHashTableIterator <NamedValue*> it = m_namedValueMap.find (name);
+		sl::ConstStringHashTableIterator<NamedValue*> it = m_namedValueMap.find(name);
 		return it ? it->m_value : NULL;
 	}
 
-	sl::ConstBoxList <sl::String>
-	getUnnamedValueList () const
+	sl::ConstBoxList<sl::String>
+	getUnnamedValueList() const
 	{
 		return m_unnamedValueList;
 	}
@@ -82,20 +82,20 @@ class GenericIni
 	friend class GenericParser;
 
 protected:
-	sl::StringHashTable <Section*> m_namedSectionMap;
-	sl::List <Section> m_namedSectionList;
+	sl::StringHashTable<Section*> m_namedSectionMap;
+	sl::List<Section> m_namedSectionList;
 	Section m_unnamedSection;
 
 public:
 	Section*
-	getSection (const sl::StringRef& name) const
+	getSection(const sl::StringRef& name) const
 	{
-		sl::ConstStringHashTableIterator <Section*> it = m_namedSectionMap.find (name);
+		sl::ConstStringHashTableIterator<Section*> it = m_namedSectionMap.find(name);
 		return it ? it->m_value : NULL;
 	}
 
 	const Section*
-	getUnnamedSection () const
+	getUnnamedSection() const
 	{
 		return &m_unnamedSection;
 	}
@@ -103,26 +103,26 @@ public:
 
 //..............................................................................
 
-class GenericParser: public Parser <GenericParser>
+class GenericParser: public Parser<GenericParser>
 {
 protected:
 	GenericIni* m_ini;
 	Section* m_currentSection;
 
 public:
-	GenericParser (GenericIni* ini = NULL)
+	GenericParser(GenericIni* ini = NULL)
 	{
-		setIni (ini);
+		setIni(ini);
 	}
 
 	GenericIni*
-	getIni () const
+	getIni() const
 	{
 		return m_ini;
 	}
 
 	void
-	setIni (GenericIni* ini)
+	setIni(GenericIni* ini)
 	{
 		m_ini = ini;
 		m_currentSection = ini ? &ini->m_unnamedSection : NULL;
@@ -130,10 +130,10 @@ public:
 
 public:
 	bool
-	onSection (const sl::StringRef& sectionName);
+	onSection(const sl::StringRef& sectionName);
 
 	bool
-	onKeyValue (
+	onKeyValue(
 		const sl::StringRef& keyName,
 		const sl::StringRef& value
 		);

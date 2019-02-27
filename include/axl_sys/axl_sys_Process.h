@@ -22,11 +22,11 @@ namespace sys {
 
 inline
 bool
-createProcess (const sl::StringRef& commandLine)
+createProcess(const sl::StringRef& commandLine)
 {
 #if (_AXL_OS_WIN)
-	HINSTANCE hProcess = ::ShellExecuteW (0, L"open", sl::String_w (commandLine), 0, 0, SW_SHOWNORMAL);
-	return err::complete (hProcess != NULL);
+	HINSTANCE hProcess = ::ShellExecuteW(0, L"open", sl::String_w (commandLine), 0, 0, SW_SHOWNORMAL);
+	return err::complete(hProcess != NULL);
 #else
 	// TODO
 	return true;

@@ -27,17 +27,17 @@ protected:
 	HDC m_hdc;
 
 public:
-	ScreenDc ()
+	ScreenDc()
 	{
-		m_hdc = ::GetDC (NULL);
+		m_hdc = ::GetDC(NULL);
 	};
 
-	~ScreenDc ()
+	~ScreenDc()
 	{
-		::ReleaseDC (NULL, m_hdc);
+		::ReleaseDC(NULL, m_hdc);
 	};
 
-	operator HDC ()
+	operator HDC()
 	{
 		return m_hdc;
 	}
@@ -47,7 +47,7 @@ public:
 
 class GdiCanvas:
 	public Canvas,
-	public sl::Handle <HDC>
+	public sl::Handle<HDC>
 {
 	friend class GdiEngine;
 	friend class GdiWidgetImpl;
@@ -70,15 +70,15 @@ protected:
 	HFONT m_hPrevFont;
 
 public:
-	GdiCanvas ();
+	GdiCanvas();
 
-	~GdiCanvas ()
+	~GdiCanvas()
 	{
-		release ();
+		release();
 	}
 
 	void
-	attach (
+	attach(
 		HDC hdc,
 		HWND hWnd,
 		DestructKind destructKind
@@ -86,7 +86,7 @@ public:
 
 	virtual
 	bool
-	drawRect (
+	drawRect(
 		int left,
 		int top,
 		int right,
@@ -96,7 +96,7 @@ public:
 
 	virtual
 	bool
-	drawText_utf8 (
+	drawText_utf8(
 		int x,
 		int y,
 		int left,
@@ -111,7 +111,7 @@ public:
 
 	virtual
 	bool
-	drawText_utf16 (
+	drawText_utf16(
 		int x,
 		int y,
 		int left,
@@ -126,7 +126,7 @@ public:
 
 	virtual
 	bool
-	drawText_utf32 (
+	drawText_utf32(
 		int x,
 		int y,
 		int left,
@@ -141,7 +141,7 @@ public:
 
 	virtual
 	bool
-	drawImage (
+	drawImage(
 		int x,
 		int y,
 		Image* image,
@@ -153,7 +153,7 @@ public:
 
 	virtual
 	bool
-	copyRect (
+	copyRect(
 		Canvas* srcCanvas,
 		int xDst,
 		int yDst,
@@ -165,7 +165,7 @@ public:
 
 protected:
 	void
-	release ();
+	release();
 };
 
 //..............................................................................

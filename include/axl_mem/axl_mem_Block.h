@@ -27,21 +27,21 @@ struct Block
 	void* m_p;
 	size_t m_size;
 
-	Block ()
+	Block()
 	{
-		setup (NULL, 0);
+		setup(NULL, 0);
 	}
 
-	Block (
+	Block(
 		void* p,
 		size_t size
 		)
 	{
-		setup (p, size);
+		setup(p, size);
 	}
 
 	void
-	setup (
+	setup(
 		void* p,
 		size_t size
 		)

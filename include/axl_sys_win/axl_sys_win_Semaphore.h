@@ -25,37 +25,37 @@ class Semaphore: public WaitableHandle
 {
 public:
 	bool
-	create (
+	create(
 		SECURITY_ATTRIBUTES* secAttr,
 		uint_t initialCount,
 		uint_t maxCount,
 		const sl::StringRef_w& name = NULL
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::CreateSemaphore (secAttr, initialCount, maxCount, name.sz ());
-		return err::complete (m_h != NULL);
+		m_h = ::CreateSemaphore(secAttr, initialCount, maxCount, name.sz());
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	open (
+	open(
 		uint_t access,
 		bool doInheritHandle,
 		const sl::StringRef_w& name
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::OpenSemaphore (access, doInheritHandle, name.sz ());
-		return err::complete (m_h != NULL);
+		m_h = ::OpenSemaphore(access, doInheritHandle, name.sz());
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	signal (uint_t count = 1)
+	signal(uint_t count = 1)
 	{
-		bool_t result = ::ReleaseSemaphore (m_h, count, NULL);
-		return err::complete (result);
+		bool_t result = ::ReleaseSemaphore(m_h, count, NULL);
+		return err::complete(result);
 	}
 };
 

@@ -19,7 +19,7 @@ namespace win {
 //..............................................................................
 
 bool
-NamedPipe::create (
+NamedPipe::create(
 	const sl::StringRef_w& name,
 	uint_t openMode,
 	uint_t pipeMode,
@@ -30,10 +30,10 @@ NamedPipe::create (
 	SECURITY_ATTRIBUTES* secAttr
 	)
 {
-	close ();
+	close();
 
-	m_h = ::CreateNamedPipeW (
-		name.sz (),
+	m_h = ::CreateNamedPipeW(
+		name.sz(),
 		openMode,
 		pipeMode,
 		maxInstanceCount,
@@ -43,29 +43,29 @@ NamedPipe::create (
 		secAttr
 		);
 
-	return err::complete (m_h != INVALID_HANDLE_VALUE);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
 
 bool
-NamedPipe::open (
+NamedPipe::open(
 	const sl::StringRef_w& name,
 	uint_t access,
 	uint_t flags
 	)
 {
-	close ();
+	close();
 
-	m_h = ::CreateFileW (name.sz (), access, 0, NULL, OPEN_EXISTING, flags, NULL);
-	return err::complete (m_h != INVALID_HANDLE_VALUE);
+	m_h = ::CreateFileW(name.sz(), access, 0, NULL, OPEN_EXISTING, flags, NULL);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
 
 bool
-NamedPipe::overlappedConnect ()
+NamedPipe::overlappedConnect()
 {
 	dword_t actualSize; // unused
 	StdOverlapped overlapped;
-	bool result = overlappedConnect (&overlapped);
-	return result ? getOverlappedResult (&overlapped, &actualSize) : false;
+	bool result = overlappedConnect(&overlapped);
+	return result ? getOverlappedResult(&overlapped, &actualSize) : false;
 }
 
 //..............................................................................

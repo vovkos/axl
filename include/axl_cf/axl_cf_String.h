@@ -20,83 +20,83 @@ namespace cf {
 
 //..............................................................................
 
-class StringRef: public TypeRefBase <CFStringRef>
+class StringRef: public TypeRefBase<CFStringRef>
 {
 public:
-	StringRef ()
+	StringRef()
 	{
 	}
 
-	StringRef (const StringRef& src)
+	StringRef(const StringRef& src)
 	{
-		copy (src);
+		copy(src);
 	}
 
-	StringRef (
+	StringRef(
 		CFStringRef p,
 		bool isAttach = false
 		)
 	{
-		isAttach ? copy (p) : attach (p);
+		isAttach ? copy(p) : attach(p);
 	}
 
-	StringRef (
+	StringRef(
 	   const char* p,
 	   size_t length = -1
 		)
 	{
-		create (p, length);
+		create(p, length);
 	}
 
 	StringRef&
 	operator = (const StringRef& src)
 	{
-		copy (src);
+		copy(src);
 		return *this;
 	}
 
 	StringRef&
 	operator = (CFStringRef p)
 	{
-		copy (p);
+		copy(p);
 		return *this;
 	}
 
 	StringRef&
 	operator = (const char* p)
 	{
-		create (p);
+		create(p);
 		return *this;
 	}
 
 	bool
-	create (CFStringRef src);
+	create(CFStringRef src);
 
 	bool
-	create (
+	create(
 			const char* p,
 			size_t length = -1
 			);
 
 	size_t
-	getLength () const
+	getLength() const
 	{
-		return ::CFStringGetLength (m_p);
+		return ::CFStringGetLength(m_p);
 	}
 
 	CFComparisonResult
-	compare (
+	compare(
 		CFStringRef p2,
 		CFStringCompareFlags flags
 		) const
 	{
-		return ::CFStringCompare (m_p, p2, flags);
+		return ::CFStringCompare(m_p, p2, flags);
 	}
 
 	sl::String
-	getString () const
+	getString() const
 	{
-		return getStringFromCfString (m_p);
+		return getStringFromCfString(m_p);
 	}
 };
 

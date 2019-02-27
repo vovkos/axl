@@ -26,26 +26,26 @@ protected:
 	LARGE_INTEGER m_startTime;
 
 public:
-	PerfCounter ()
+	PerfCounter()
 	{
-		start ();
+		start();
 	}
 
 	bool
-	start ()
+	start()
 	{
 		bool_t result =
-			::QueryPerformanceFrequency (&m_frequency) &&
-			::QueryPerformanceCounter (&m_startTime);
+			::QueryPerformanceFrequency(&m_frequency) &&
+			::QueryPerformanceCounter(&m_startTime);
 
-		return err::complete (result);
+		return err::complete(result);
 	}
 
 	uint64_t
-	getElapsedTime ()
+	getElapsedTime()
 	{
 		LARGE_INTEGER time;
-		::QueryPerformanceCounter (&time);
+		::QueryPerformanceCounter(&time);
 		return ((time.QuadPart - m_startTime.QuadPart) * 1000000 / m_frequency.QuadPart);
 	}
 };

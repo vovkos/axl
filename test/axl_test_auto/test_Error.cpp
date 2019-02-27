@@ -17,11 +17,11 @@ namespace {
 //..............................................................................
 
 void
-run ()
+run()
 {
 	err::Error error;
 
-	error.pack <sl::PackSeq_4 <
+	error.pack<sl::PackSeq_4<
 		const char*,
 		int,
 		const char*,
@@ -32,23 +32,23 @@ run ()
 		"hui", 0xdead, "govno", 0xbeaf
 		);
 
-	sl::String s = enc::HexEncoding::encode (error.cp (), error.getSize ());
-	printf ("error: %s\n", s.sz ());
+	sl::String s = enc::HexEncoding::encode(error.cp(), error.getSize());
+	printf("error: %s\n", s.sz ());
 
 	err::Error error2;
-	error2.format (
+	error2.format(
 		sl::g_nullGuid,
 		12345,
 		"%s %d %s %d",
 		"hui", 0xdead, "govno", 0xbeaf
 		);
 
-	s = enc::HexEncoding::encode (error.cp (), error.getSize ());
-	printf ("error: %s\n", s.sz ());
+	s = enc::HexEncoding::encode(error.cp(), error.getSize());
+	printf("error: %s\n", s.sz ());
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_Error", run)
+ADD_TEST_CASE("test_Error", run)
 
 }

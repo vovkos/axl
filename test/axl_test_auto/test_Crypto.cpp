@@ -18,33 +18,33 @@ namespace {
 
 //..............................................................................
 
-void run ()
+void run()
 {
-	cry::EcKey key (NID_secp112r1);
-	key.generateKey ();
+	cry::EcKey key(NID_secp112r1);
+	key.generateKey();
 
-	cry::BigNum privateKey = key.getPrivateKey ();
-	cry::EcPoint publicKey = key.getPublicKey ();
-	printf ("private: %s\n", privateKey.getHexString ().sz ());
-	printf ("public:  %s\n", publicKey.getHexString (key.getGroup ()).sz ());
+	cry::BigNum privateKey = key.getPrivateKey();
+	cry::EcPoint publicKey = key.getPublicKey();
+	printf("private: %s\n", privateKey.getHexString ().sz ());
+	printf("public:  %s\n", publicKey.getHexString (key.getGroup ()).sz ());
 
 	const char* userName = "Vovkos";
 
-	sl::String productKey = generateEcProductKey (key, userName);
-	printf ("user:    %s\n", userName);
-	printf ("license: %s\n", productKey.sz ());
+	sl::String productKey = generateEcProductKey(key, userName);
+	printf("user:    %s\n", userName);
+	printf("license: %s\n", productKey.sz ());
 
-	bool result = verifyEcProductKey (key, userName, productKey);
-	printf ("verify:  %d\n", result);
-	ASSERT (result);
+	bool result = verifyEcProductKey(key, userName, productKey);
+	printf("verify:  %d\n", result);
+	ASSERT(result);
 
-	privateKey.detach ();
-	publicKey.detach ();
+	privateKey.detach();
+	publicKey.detach();
 
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_Crypto", run)
+ADD_TEST_CASE("test_Crypto", run)
 
 }

@@ -26,108 +26,108 @@ class Socket: public File
 {
 public:
 	bool
-	open (
+	open(
 		int addressFamily,
 		int sockKind,
 		int protocol
 		);
 
 	bool
-	setBlockingMode (bool isBlocking); // blocking mode is set a bit differently
+	setBlockingMode(bool isBlocking); // blocking mode is set a bit differently
 
 	int
-	getError ();
+	getError();
 
 	bool
-	bind (const sockaddr* addr)
+	bind(const sockaddr* addr)
 	{
-		int result = ::bind (m_h, addr, getSockAddrSize (addr));
-		return err::complete (result != -1);
+		int result = ::bind(m_h, addr, getSockAddrSize(addr));
+		return err::complete(result != -1);
 	}
 
 	bool
-	getAddress (SockAddr* addr);
+	getAddress(SockAddr* addr);
 
 	bool
-	getPeerAddress (SockAddr* addr);
+	getPeerAddress(SockAddr* addr);
 
 	bool
-	getOption (
+	getOption(
 		int level,
 		int option,
 		void* p,
 		socklen_t size
 		)
 	{
-		int result = ::getsockopt (m_h, level, option, p, &size);
-		return err::complete (result != -1);
+		int result = ::getsockopt(m_h, level, option, p, &size);
+		return err::complete(result != -1);
 	}
 
 	bool
-	setOption (
+	setOption(
 		int level,
 		int option,
 		const void* p,
 		socklen_t size
 		)
 	{
-		int result = ::setsockopt (m_h, level, option, p, size);
-		return err::complete (result != -1);
+		int result = ::setsockopt(m_h, level, option, p, size);
+		return err::complete(result != -1);
 	}
 
 	bool
-	listen (size_t backLog)
+	listen(size_t backLog)
 	{
-		int result = ::listen (m_h, (int) backLog);
-		return err::complete (result != -1);
+		int result = ::listen(m_h, (int)backLog);
+		return err::complete(result != -1);
 	}
 
 	int
-	accept (SockAddr* addr = NULL);
+	accept(SockAddr* addr = NULL);
 
 	bool
-	connect (const sockaddr* addr);
+	connect(const sockaddr* addr);
 
 	bool
-	shutdown (int mode = SHUT_RDWR)
+	shutdown(int mode = SHUT_RDWR)
 	{
-		int result = ::shutdown (m_h, mode);
-		return err::complete (result);
+		int result = ::shutdown(m_h, mode);
+		return err::complete(result);
 	}
 
 	size_t
-	send (
+	send(
 		const void* p,
 		size_t size
 		)
 	{
-		int result = ::send (m_h, p, size, 0);
-		return err::complete (result, -1);
+		int result = ::send(m_h, p, size, 0);
+		return err::complete(result, -1);
 	}
 
 	size_t
-	recv (
+	recv(
 		void* p,
 		size_t size
 		)
 	{
-		int result = ::recv (m_h, p, size, 0);
-		return err::complete (result, -1);
+		int result = ::recv(m_h, p, size, 0);
+		return err::complete(result, -1);
 	}
 
 	size_t
-	sendTo (
+	sendTo(
 		void* p,
 		size_t size,
 		const sockaddr* addr
 		)
 	{
-		int result = ::sendto (m_h, p, size, 0, addr, getSockAddrSize (addr));
-		return err::complete (result, -1);
+		int result = ::sendto(m_h, p, size, 0, addr, getSockAddrSize(addr));
+		return err::complete(result, -1);
 	}
 
 	size_t
-	recvFrom (
+	recvFrom(
 		void* p,
 		size_t size,
 		SockAddr* addr

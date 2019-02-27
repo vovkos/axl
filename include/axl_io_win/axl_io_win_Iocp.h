@@ -25,39 +25,39 @@ class Iocp: public sys::win::Handle
 {
 public:
 	bool
-	create (dword_t threadCount);
+	create(dword_t threadCount);
 
 	bool
-	associate (
+	associate(
 		HANDLE hIo,
 		void* context
 		)
 	{
-		HANDLE h = ::CreateIoCompletionPort (hIo, m_h, (uintptr_t) context, 0);
-		return err::complete (h != NULL);
+		HANDLE h = ::CreateIoCompletionPort(hIo, m_h, (uintptr_t)context, 0);
+		return err::complete(h != NULL);
 	}
 
 	bool
-	postCompletionStatus (
+	postCompletionStatus(
 		dword_t actualSize,
 		void* context,
 		OVERLAPPED* overlapped
 		)
 	{
-		bool_t result = ::PostQueuedCompletionStatus (m_h, actualSize, (uintptr_t) context, overlapped);
-		return err::complete (result);
+		bool_t result = ::PostQueuedCompletionStatus(m_h, actualSize, (uintptr_t)context, overlapped);
+		return err::complete(result);
 	}
 
 	bool
-	getCompletionStatus (
+	getCompletionStatus(
 		dword_t* actualSize,
 		void** context,
 		OVERLAPPED** overlapped,
 		uint_t timeout
 		)
 	{
-		bool_t result = ::GetQueuedCompletionStatus (m_h, actualSize, (ULONG_PTR*) context, overlapped, timeout);
-		return err::complete (result);
+		bool_t result = ::GetQueuedCompletionStatus(m_h, actualSize, (ULONG_PTR*)context, overlapped, timeout);
+		return err::complete(result);
 	}
 };
 

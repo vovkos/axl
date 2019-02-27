@@ -26,24 +26,24 @@ namespace lnx {
 
 template <typename T>
 T
-completeUdev (
+completeUdev(
 	T result,
 	const char* functionName
 	)
 {
 	if (!result)
-		err::setFormatStringError ("'%s' failed", functionName);
+		err::setFormatStringError("'%s' failed", functionName);
 
 	return result;
 }
 
 inline
 bool
-completeUdevErrno (int result)
+completeUdevErrno(int result)
 {
 	if (result != 0)
 	{
-		err::setError (-result);
+		err::setError(-result);
 		return false;
 	}
 
@@ -60,7 +60,7 @@ public:
 	void
 	operator () (udev* h)
 	{
-		::udev_unref (h);
+		::udev_unref(h);
 	}
 };
 
@@ -70,7 +70,7 @@ public:
 	void
 	operator () (udev_device* h)
 	{
-		::udev_device_unref (h);
+		::udev_device_unref(h);
 	}
 };
 
@@ -80,7 +80,7 @@ public:
 	void
 	operator () (udev_enumerate* h)
 	{
-		::udev_enumerate_unref (h);
+		::udev_enumerate_unref(h);
 	}
 };
 
@@ -90,475 +90,475 @@ public:
 	void
 	operator () (udev_monitor* h)
 	{
-		::udev_monitor_unref (h);
+		::udev_monitor_unref(h);
 	}
 };
 
 //..............................................................................
 
-class UdevContext: public sl::Handle <udev*, UnrefUdevContext>
+class UdevContext: public sl::Handle<udev*, UnrefUdevContext>
 {
 public:
-	UdevContext ()
+	UdevContext()
 	{
-		create ();
+		create();
 	}
 
-	UdevContext (udev* h)
+	UdevContext(udev* h)
 	{
 		m_h = h;
 	}
 
 	bool
-	create ();
+	create();
 
 	void
-	addRef ()
+	addRef()
 	{
-		::udev_ref (m_h);
+		::udev_ref(m_h);
 	}
 
 	udev_device*
-	getDeviceFromSysPath (const sl::StringRef& sysPath)
+	getDeviceFromSysPath(const sl::StringRef& sysPath)
 	{
-		udev_device* device = ::udev_device_new_from_syspath (m_h, sysPath.sz ());
-		return completeUdev (device, "udev_device_new_from_syspath");
+		udev_device* device = ::udev_device_new_from_syspath(m_h, sysPath.sz());
+		return completeUdev(device, "udev_device_new_from_syspath");
 	}
 
 	udev_device*
-	getDeviceFromDevNum (
+	getDeviceFromDevNum(
 		char type,
 		dev_t devNum
 		)
 	{
-		udev_device* device = ::udev_device_new_from_devnum (m_h, type, devNum);
-		return completeUdev (device, "udev_device_new_from_devnum");
+		udev_device* device = ::udev_device_new_from_devnum(m_h, type, devNum);
+		return completeUdev(device, "udev_device_new_from_devnum");
 	}
 
 	udev_device*
-	getDeviceFromSubsytemSysName (
+	getDeviceFromSubsytemSysName(
 		const sl::StringRef& subsystem,
 		const sl::StringRef& sysName
 		)
 	{
-		udev_device* device = ::udev_device_new_from_subsystem_sysname (m_h, subsystem.sz (), sysName.sz ());
-		return completeUdev (device, "udev_device_new_from_subsystem_sysname");
+		udev_device* device = ::udev_device_new_from_subsystem_sysname(m_h, subsystem.sz(), sysName.sz());
+		return completeUdev(device, "udev_device_new_from_subsystem_sysname");
 	}
 
 #if (_AXL_SYS_LNX_LIBUDEV_NEW_API)
 	udev_device*
-	getDeviceFromDeviceId (const sl::StringRef& deviceId)
+	getDeviceFromDeviceId(const sl::StringRef& deviceId)
 	{
-		udev_device* device = ::udev_device_new_from_device_id (m_h, (char*) deviceId.sz ());
-		return completeUdev (device, "udev_device_new_from_device_id");
+		udev_device* device = ::udev_device_new_from_device_id(m_h, (char*)deviceId.sz());
+		return completeUdev(device, "udev_device_new_from_device_id");
 	}
 #endif
 
 	udev_device*
-	getDeviceFromEnvironment ()
+	getDeviceFromEnvironment()
 	{
-		udev_device* device = ::udev_device_new_from_environment (m_h);
-		return completeUdev (device, "udev_device_new_from_environment");
+		udev_device* device = ::udev_device_new_from_environment(m_h);
+		return completeUdev(device, "udev_device_new_from_environment");
 	}
 
 	udev_enumerate*
-	createEnumerator ()
+	createEnumerator()
 	{
-		udev_enumerate* enumerator = ::udev_enumerate_new (m_h);
-		return completeUdev (enumerator, "udev_device_new_from_environment");
+		udev_enumerate* enumerator = ::udev_enumerate_new(m_h);
+		return completeUdev(enumerator, "udev_device_new_from_environment");
 	}
 
 	udev_monitor*
-	createMonitor (const sl::StringRef& name)
+	createMonitor(const sl::StringRef& name)
 	{
-		udev_monitor* monitor = ::udev_monitor_new_from_netlink (m_h, name.sz ());
-		return completeUdev (monitor, "udev_monitor_new_from_netlink");
+		udev_monitor* monitor = ::udev_monitor_new_from_netlink(m_h, name.sz());
+		return completeUdev(monitor, "udev_monitor_new_from_netlink");
 	}
 };
 
 //..............................................................................
 
-class UdevDevice: public sl::Handle <udev_device*, UnrefUdevDevice>
+class UdevDevice: public sl::Handle<udev_device*, UnrefUdevDevice>
 {
 public:
-	UdevDevice ()
+	UdevDevice()
 	{
 	}
 
-	UdevDevice (udev_device* h)
+	UdevDevice(udev_device* h)
 	{
 		m_h = h;
 	}
 
 	void
-	addRef ()
+	addRef()
 	{
-		::udev_device_ref (m_h);
+		::udev_device_ref(m_h);
 	}
 
 	udev*
-	getUdev ()
+	getUdev()
 	{
-		return ::udev_device_get_udev (m_h);
+		return ::udev_device_get_udev(m_h);
 	}
 
 	sl::StringRef
-	getSysPath ()
+	getSysPath()
 	{
-		return ::udev_device_get_syspath (m_h);
+		return ::udev_device_get_syspath(m_h);
 	}
 
 	sl::StringRef
-	getSysName ()
+	getSysName()
 	{
 		return ::udev_device_get_sysname(m_h);
 	}
 
 	sl::StringRef
-	getSysNum ()
+	getSysNum()
 	{
-		return ::udev_device_get_sysnum (m_h);
+		return ::udev_device_get_sysnum(m_h);
 	}
 
 	sl::StringRef
-	getDevPath ()
+	getDevPath()
 	{
-		return ::udev_device_get_devpath (m_h);
+		return ::udev_device_get_devpath(m_h);
 	}
 
 	sl::StringRef
-	getDevNode ()
+	getDevNode()
 	{
-		return ::udev_device_get_devnode (m_h);
+		return ::udev_device_get_devnode(m_h);
 	}
 
 	dev_t
-	getDevNum ()
+	getDevNum()
 	{
-		return ::udev_device_get_devnum (m_h);
+		return ::udev_device_get_devnum(m_h);
 	}
 
 	sl::StringRef
-	getDevType ()
+	getDevType()
 	{
-		return ::udev_device_get_devtype (m_h);
+		return ::udev_device_get_devtype(m_h);
 	}
 
 	sl::StringRef
-	getSubsystem ()
+	getSubsystem()
 	{
-		return ::udev_device_get_subsystem (m_h);
+		return ::udev_device_get_subsystem(m_h);
 	}
 
 	sl::StringRef
-	getDriver ()
+	getDriver()
 	{
-		return ::udev_device_get_driver (m_h);
+		return ::udev_device_get_driver(m_h);
 	}
 
 	udev_device*
-	getParent ()
+	getParent()
 	{
-		return ::udev_device_get_parent (m_h);
+		return ::udev_device_get_parent(m_h);
 	}
 
 	udev_device*
-	getParentWithSubsystemDevType (
+	getParentWithSubsystemDevType(
 		const sl::StringRef& subSystem,
 		const sl::StringRef& devType
 		)
 	{
-		return ::udev_device_get_parent_with_subsystem_devtype (m_h, subSystem.sz (), devType.sz ());
+		return ::udev_device_get_parent_with_subsystem_devtype(m_h, subSystem.sz(), devType.sz());
 	}
 
 	bool
-	isInitialized ()
+	isInitialized()
 	{
-		return ::udev_device_get_is_initialized (m_h) != 0;
+		return ::udev_device_get_is_initialized(m_h) != 0;
 	}
 
 	sl::StringRef
-	getAction ()
+	getAction()
 	{
-		return ::udev_device_get_action (m_h);
+		return ::udev_device_get_action(m_h);
 	}
 
 
 	udev_list_entry*
-	getDevLinkList ()
+	getDevLinkList()
 	{
-		return ::udev_device_get_devlinks_list_entry (m_h);
+		return ::udev_device_get_devlinks_list_entry(m_h);
 	}
 
 	udev_list_entry*
-	getPropertyList ()
+	getPropertyList()
 	{
-		return ::udev_device_get_properties_list_entry (m_h);
+		return ::udev_device_get_properties_list_entry(m_h);
 	}
 
 	udev_list_entry*
-	getTagList ()
+	getTagList()
 	{
-		return ::udev_device_get_tags_list_entry (m_h);
+		return ::udev_device_get_tags_list_entry(m_h);
 	}
 
 	udev_list_entry*
-	getSysAttrList ()
+	getSysAttrList()
 	{
-		return ::udev_device_get_sysattr_list_entry (m_h);
+		return ::udev_device_get_sysattr_list_entry(m_h);
 	}
 
 	sl::StringRef
-	getPropertyValue (const sl::StringRef& key)
+	getPropertyValue(const sl::StringRef& key)
 	{
-		return ::udev_device_get_property_value (m_h, key.sz ());
+		return ::udev_device_get_property_value(m_h, key.sz());
 	}
 
 	bool
-	hasTag (const sl::StringRef& tag)
+	hasTag(const sl::StringRef& tag)
 	{
-		return ::udev_device_has_tag (m_h, tag.sz ());
+		return ::udev_device_has_tag(m_h, tag.sz());
 	}
 
 #if (_AXL_SYS_LNX_LIBUDEV_NEW_API)
 	sl::StringRef
-	getSysAttrValue (const sl::StringRef& sysAttr)
+	getSysAttrValue(const sl::StringRef& sysAttr)
 	{
-		return ::udev_device_get_sysattr_value (m_h, sysAttr.sz ());
+		return ::udev_device_get_sysattr_value(m_h, sysAttr.sz());
 	}
 
 	int
-	setSysAttrValue (
+	setSysAttrValue(
 		const sl::StringRef& sysAttr,
 		const sl::StringRef& value
 		)
 	{
-		return ::udev_device_set_sysattr_value (m_h, sysAttr.sz (), (char*) value.sz ());
+		return ::udev_device_set_sysattr_value(m_h, sysAttr.sz(), (char*)value.sz());
 	}
 #endif
 };
 
 //..............................................................................
 
-class UdevEnumerator: public sl::Handle <udev_enumerate*, UnrefUdevEnumerator>
+class UdevEnumerator: public sl::Handle<udev_enumerate*, UnrefUdevEnumerator>
 {
 public:
-	UdevEnumerator ()
+	UdevEnumerator()
 	{
 	}
 
-	UdevEnumerator (udev_enumerate* h)
+	UdevEnumerator(udev_enumerate* h)
 	{
 		m_h = h;
 	}
 
 	void
-	addRef ()
+	addRef()
 	{
-		::udev_enumerate_ref (m_h);
+		::udev_enumerate_ref(m_h);
 	}
 
 	udev*
-	getUdev ()
+	getUdev()
 	{
-		return ::udev_enumerate_get_udev (m_h);
+		return ::udev_enumerate_get_udev(m_h);
 	}
 
 	bool
-	addMatchSubsystem (const sl::StringRef& subsystem)
+	addMatchSubsystem(const sl::StringRef& subsystem)
 	{
-		int result = ::udev_enumerate_add_match_subsystem (m_h, subsystem.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_subsystem(m_h, subsystem.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addNoMatchSubsystem (const sl::StringRef& subsystem)
+	addNoMatchSubsystem(const sl::StringRef& subsystem)
 	{
-		int result = ::udev_enumerate_add_nomatch_subsystem (m_h, subsystem.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_nomatch_subsystem(m_h, subsystem.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchSysAttr (
+	addMatchSysAttr(
 		const sl::StringRef& sysAttr,
 		const sl::StringRef& value
 		)
 	{
-		int result = ::udev_enumerate_add_match_sysattr (m_h, sysAttr.sz (), value.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_sysattr(m_h, sysAttr.sz(), value.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addNoMatchSysAttr (
+	addNoMatchSysAttr(
 		const sl::StringRef& sysAttr,
 		const sl::StringRef& value
 		)
 	{
-		int result = ::udev_enumerate_add_match_sysattr (m_h, sysAttr.sz (), value.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_sysattr(m_h, sysAttr.sz(), value.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchProperty (
+	addMatchProperty(
 		const sl::StringRef& prop,
 		const sl::StringRef& value
 		)
 	{
-		int result = ::udev_enumerate_add_match_property (m_h, prop.sz (), value.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_property(m_h, prop.sz(), value.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchSysName (const sl::StringRef& sysName)
+	addMatchSysName(const sl::StringRef& sysName)
 	{
-		int result = ::udev_enumerate_add_match_sysname (m_h, sysName.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_sysname(m_h, sysName.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchTag (const sl::StringRef& tag)
+	addMatchTag(const sl::StringRef& tag)
 	{
-		int result = ::udev_enumerate_add_match_tag (m_h, tag.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_tag(m_h, tag.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchParentDevice (udev_device* parentDevice)
+	addMatchParentDevice(udev_device* parentDevice)
 	{
-		int result = ::udev_enumerate_add_match_parent (m_h, parentDevice);
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_parent(m_h, parentDevice);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchIsInitialized ()
+	addMatchIsInitialized()
 	{
-		int result = ::udev_enumerate_add_match_is_initialized (m_h);
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_match_is_initialized(m_h);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	scanDevices ()
+	scanDevices()
 	{
-		int result = ::udev_enumerate_scan_devices (m_h);
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_scan_devices(m_h);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	scanSubsystems ()
+	scanSubsystems()
 	{
-		int result = ::udev_enumerate_scan_subsystems (m_h);
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_scan_subsystems(m_h);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addSysPath (const sl::StringRef& sysPath)
+	addSysPath(const sl::StringRef& sysPath)
 	{
-		int result = ::udev_enumerate_add_syspath (m_h, sysPath.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_enumerate_add_syspath(m_h, sysPath.sz());
+		return completeUdevErrno(result);
 	}
 
 	udev_list_entry*
-	getListEntry ()
+	getListEntry()
 	{
-		return ::udev_enumerate_get_list_entry (m_h);
+		return ::udev_enumerate_get_list_entry(m_h);
 	}
 };
 
 //..............................................................................
 
-class UdevMonitor: public sl::Handle <udev_monitor*, UnrefUdevMonitor>
+class UdevMonitor: public sl::Handle<udev_monitor*, UnrefUdevMonitor>
 {
 public:
-	UdevMonitor ()
+	UdevMonitor()
 	{
 	}
 
-	UdevMonitor (udev_monitor* h)
+	UdevMonitor(udev_monitor* h)
 	{
 		m_h = h;
 	}
 
 	void
-	addRef ()
+	addRef()
 	{
-		::udev_monitor_ref (m_h);
+		::udev_monitor_ref(m_h);
 	}
 
 	udev*
-	getUdev ()
+	getUdev()
 	{
-		return ::udev_monitor_get_udev (m_h);
+		return ::udev_monitor_get_udev(m_h);
 	}
 
 	int
-	getFd ()
+	getFd()
 	{
-		return ::udev_monitor_get_fd (m_h);
+		return ::udev_monitor_get_fd(m_h);
 	}
 
 	bool
-	updateFilter ()
+	updateFilter()
 	{
-		int result = ::udev_monitor_filter_update (m_h);
-		return completeUdevErrno (result);
+		int result = ::udev_monitor_filter_update(m_h);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	removeFilter ()
+	removeFilter()
 	{
-		int result = ::udev_monitor_filter_remove (m_h);
-		return completeUdevErrno (result);
+		int result = ::udev_monitor_filter_remove(m_h);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchSubsystemDevTypeFilter (
+	addMatchSubsystemDevTypeFilter(
 		const sl::StringRef& subsystem,
 		const sl::StringRef& devType
 		)
 	{
-		int result = ::udev_monitor_filter_add_match_subsystem_devtype (m_h, subsystem.sz (), devType.sz ());
-		return completeUdevErrno (result);
+		int result = ::udev_monitor_filter_add_match_subsystem_devtype(m_h, subsystem.sz(), devType.sz());
+		return completeUdevErrno(result);
 	}
 
 	bool
-	addMatchTagFilter (const char *tag)
+	addMatchTagFilter(const char *tag)
 	{
-		int result = ::udev_monitor_filter_add_match_tag (m_h, tag);
-		return completeUdevErrno (result);
+		int result = ::udev_monitor_filter_add_match_tag(m_h, tag);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	setReceiveBufferSize (size_t size)
+	setReceiveBufferSize(size_t size)
 	{
-		int result = ::udev_monitor_set_receive_buffer_size (m_h, size);
-		return completeUdevErrno (result);
+		int result = ::udev_monitor_set_receive_buffer_size(m_h, size);
+		return completeUdevErrno(result);
 	}
 
 	bool
-	enableReceiving ()
+	enableReceiving()
 	{
-		int result = ::udev_monitor_enable_receiving (m_h);
-		return completeUdevErrno (result);
+		int result = ::udev_monitor_enable_receiving(m_h);
+		return completeUdevErrno(result);
 	}
 
 	udev_device*
-	receiveDevice ()
+	receiveDevice()
 	{
-		udev_device* device = ::udev_monitor_receive_device (m_h);
-		return completeUdev (device, "udev_monitor_receive_device ");
+		udev_device* device = ::udev_monitor_receive_device(m_h);
+		return completeUdev(device, "udev_monitor_receive_device ");
 	}
 };
 
 //..............................................................................
 
-class UdevListEntry: public sl::Handle <udev_list_entry*>
+class UdevListEntry: public sl::Handle<udev_list_entry*>
 {
 public:
-	UdevListEntry ()
+	UdevListEntry()
 	{
 	}
 
-	UdevListEntry (udev_list_entry* h)
+	UdevListEntry(udev_list_entry* h)
 	{
 		m_h = h;
 	}
@@ -566,7 +566,7 @@ public:
 	UdevListEntry&
 	operator ++ ()
 	{
-		next ();
+		next();
 		return *this;
 	}
 
@@ -574,39 +574,39 @@ public:
 	operator ++ (int)
 	{
 		UdevListEntry old = *this;
-		next ();
+		next();
 		return old;
 	}
 
 	udev_list_entry*
-	getNext ()
+	getNext()
 	{
-		return ::udev_list_entry_get_next (m_h);
+		return ::udev_list_entry_get_next(m_h);
 	}
 
 	bool
-	next ()
+	next()
 	{
-		m_h = ::udev_list_entry_get_next (m_h);
+		m_h = ::udev_list_entry_get_next(m_h);
 		return m_h != NULL;
 	}
 
 	udev_list_entry*
-	findByName (const char *name)
+	findByName(const char *name)
 	{
-		return ::udev_list_entry_get_by_name (m_h, name);
+		return ::udev_list_entry_get_by_name(m_h, name);
 	}
 
 	sl::StringRef
-	getName ()
+	getName()
 	{
-		return ::udev_list_entry_get_name (m_h);
+		return ::udev_list_entry_get_name(m_h);
 	}
 
 	sl::StringRef
-	getValue ()
+	getValue()
 	{
-		return ::udev_list_entry_get_value (m_h);
+		return ::udev_list_entry_get_value(m_h);
 	}
 };
 

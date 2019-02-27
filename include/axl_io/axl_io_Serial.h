@@ -38,82 +38,82 @@ public:
 
 public:
 	bool
-	isOpen ()
+	isOpen()
 	{
-		return m_serial.isOpen ();
+		return m_serial.isOpen();
 	}
 
 	bool
-	open (
+	open(
 		const sl::StringRef& name,
 		uint_t flags = 0
 		);
 
 	void
-	close ()
+	close()
 	{
-		return m_serial.close ();
+		return m_serial.close();
 	}
 
 	bool
-	setSettings (
+	setSettings(
 		const SerialSettings* settings,
 		uint_t mask = -1
 		);
 
 	bool
-	getSettings (SerialSettings* settings);
+	getSettings(SerialSettings* settings);
 
 	bool
-	setDtr (bool isSet)
+	setDtr(bool isSet)
 	{
-		return m_serial.setDtr (isSet);
+		return m_serial.setDtr(isSet);
 	}
 
 	bool
-	setRts (bool isSet)
+	setRts(bool isSet)
 	{
-		return m_serial.setRts (isSet);
+		return m_serial.setRts(isSet);
 	}
 
 	uint_t
-	getStatusLines ();
+	getStatusLines();
 
 #if (_AXL_OS_WIN)
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size
 		) const
 	{
-		return m_serial.overlappedRead (p, size);
+		return m_serial.overlappedRead(p, size);
 	}
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		)
 	{
-		return m_serial.overlappedWrite (p, size);
+		return m_serial.overlappedWrite(p, size);
 	}
 #elif (_AXL_OS_POSIX)
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size
 		) const
 	{
-		return m_serial.read (p, size);
+		return m_serial.read(p, size);
 	}
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		)
 	{
-		return m_serial.write (p, size);
+		return m_serial.write(p, size);
 	}
 #endif
 
@@ -131,13 +131,13 @@ protected:
 
 public:
 	const sl::String&
-	getDeviceName ()
+	getDeviceName()
 	{
 		return m_deviceName;
 	}
 
 	const sl::String&
-	getDescription ()
+	getDescription()
 	{
 		return m_description;
 	}
@@ -146,7 +146,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-createSerialPortDescList (sl::List <SerialPortDesc>* portList);
+createSerialPortDescList(sl::List<SerialPortDesc>* portList);
 
 //..............................................................................
 

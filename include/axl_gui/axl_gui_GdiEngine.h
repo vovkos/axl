@@ -31,53 +31,53 @@ protected:
 	HWND m_hWndClipboardOwner;
 
 public:
-	GdiEngine ();
-	~GdiEngine ();
+	GdiEngine();
+	~GdiEngine();
 
 	static
 	GdiEngine*
-	getSingleton ()
+	getSingleton()
 	{
-		return sl::getSingleton <GdiEngine> ();
+		return sl::getSingleton<GdiEngine> ();
 	}
 
 	// fonts
 
 	Font*
-	getDefaultGuiFont ();
+	getDefaultGuiFont();
 
 	virtual
 	Font*
-	getDefaultMonospaceFont ();
+	getDefaultMonospaceFont();
 
 	virtual
-	ref::Ptr <Font>
-	createFont (
+	ref::Ptr<Font>
+	createFont(
 		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		);
 
-	ref::Ptr <Font>
-	createStockFont (int stockFontKind);
+	ref::Ptr<Font>
+	createStockFont(int stockFontKind);
 
-	ref::Ptr <Font>
-	createFont (HFONT hFont);
+	ref::Ptr<Font>
+	createFont(HFONT hFont);
 
 	// cursors
 
-	ref::Ptr <Cursor>
-	createStockCursor (LPCTSTR stockCursorRes);
+	ref::Ptr<Cursor>
+	createStockCursor(LPCTSTR stockCursorRes);
 
 	// images
 
 	virtual
-	ref::Ptr <Image>
-	createImage ();
+	ref::Ptr<Image>
+	createImage();
 
 	virtual
-	ref::Ptr <Image>
-	createImage (
+	ref::Ptr<Image>
+	createImage(
 		int width,
 		int height,
 		PixelFormat pixelFormat,
@@ -86,8 +86,8 @@ public:
 		);
 
 	virtual
-	ref::Ptr <Canvas>
-	createOffscreenCanvas (
+	ref::Ptr<Canvas>
+	createOffscreenCanvas(
 		int width,
 		int height
 		);
@@ -96,26 +96,26 @@ public:
 
 	virtual
 	uintptr_t
-	registerClipboardFormat (const sl::StringRef& formatName);
+	registerClipboardFormat(const sl::StringRef& formatName);
 
 	virtual
 	bool
-	readClipboard (sl::String* string);
+	readClipboard(sl::String* string);
 
 	virtual
 	bool
-	readClipboard (
+	readClipboard(
 		uintptr_t format,
-		sl::Array <char>* data
+		sl::Array<char>* data
 		);
 
 	virtual
 	bool
-	writeClipboard (const sl::StringRef& string);
+	writeClipboard(const sl::StringRef& string);
 
 	virtual
 	bool
-	writeClipboard (
+	writeClipboard(
 		uintptr_t format,
 		const void* data,
 		size_t size
@@ -123,7 +123,7 @@ public:
 
 	virtual
 	bool
-	commitClipboard ()
+	commitClipboard()
 	{
 		return true;
 	}
@@ -132,33 +132,33 @@ public:
 
 	virtual
 	bool
-	showCaret (
+	showCaret(
 		Widget* widget,
 		const Rect& rect
 		);
 
 	virtual
 	void
-	hideCaret ();
+	hideCaret();
 
 protected:
 	bool
-	openClipboard ();
+	openClipboard();
 
 	virtual
 	Font*
-	getFontMod (
+	getFontMod(
 		Font* baseFont,
 		uint_t flags
 		);
 
 	virtual
-	ref::Ptr <Font>
-	createStdFont (StdFontKind fontKind);
+	ref::Ptr<Font>
+	createStdFont(StdFontKind fontKind);
 
 	virtual
-	ref::Ptr <Cursor>
-	createStdCursor (StdCursorKind cursorKind);
+	ref::Ptr<Cursor>
+	createStdCursor(StdCursorKind cursorKind);
 };
 
 //..............................................................................

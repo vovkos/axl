@@ -25,14 +25,14 @@ class ServiceMgr: public ServiceHandle
 {
 public:
 	bool
-	open (
+	open(
 		const sl::StringRef_w& machineName,
 		const sl::StringRef_w& databaseName,
 		dword_t access
 		);
 
 	bool
-	createService (
+	createService(
 		Service* service,
 		const sl::StringRef_w& name,
 		const sl::StringRef_w& displayName,
@@ -49,7 +49,7 @@ public:
 		);
 
 	bool
-	openService (
+	openService(
 		Service* service,
 		const sl::StringRef_w& name,
 		dword_t access = SERVICE_ALL_ACCESS

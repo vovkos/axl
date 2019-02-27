@@ -19,17 +19,17 @@ namespace psx {
 //..............................................................................
 
 bool
-Pipe::create ()
+Pipe::create()
 {
-	close ();
+	close();
 
-	int fd [2];
-	int result = ::pipe (fd);
+	int fd[2];
+	int result = ::pipe(fd);
 	if (result == -1)
-		return err::failWithLastSystemError ();
+		return err::failWithLastSystemError();
 
-	m_readFile.attach (fd [0]);
-	m_writeFile.attach (fd [1]);
+	m_readFile.attach(fd[0]);
+	m_writeFile.attach(fd[1]);
 	return true;
 }
 

@@ -29,31 +29,31 @@ public:
 
 public:
 	bool
-	create ();
+	create();
 
 	void
-	close ()
+	close()
 	{
-		m_readFile.close ();
-		m_writeFile.close ();
+		m_readFile.close();
+		m_writeFile.close();
 	}
 
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size
 		) const
 	{
-		return m_readFile.read (p, size);
+		return m_readFile.read(p, size);
 	}
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		)
 	{
-		return m_writeFile.write (p, size);
+		return m_writeFile.write(p, size);
 	}
 };
 

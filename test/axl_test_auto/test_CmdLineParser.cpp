@@ -26,40 +26,40 @@ enum MySwitchKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (MySwitchTable, MySwitchKind)
-	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_Help, "h", "help", NULL, "Display help")
-	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
-	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_SessionFile, "f", "session-file", "<file>", "Specify session file")
-	AXL_SL_CMD_LINE_SWITCH_2 (MySwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
-AXL_SL_END_CMD_LINE_SWITCH_TABLE ()
+AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE(MySwitchTable, MySwitchKind)
+	AXL_SL_CMD_LINE_SWITCH_2(MySwitchKind_Help, "h", "help", NULL, "Display help")
+	AXL_SL_CMD_LINE_SWITCH_2(MySwitchKind_SessionProvider, "s", "session-provider", "<provider>", "Specify provider")
+	AXL_SL_CMD_LINE_SWITCH_2(MySwitchKind_SessionFile, "f", "session-file", "<file>", "Specify session file")
+	AXL_SL_CMD_LINE_SWITCH_2(MySwitchKind_LogFile, "l", "log-file", "<file>", "Specify log file")
+AXL_SL_END_CMD_LINE_SWITCH_TABLE()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyParser: public sl::CmdLineParser <MyParser, MySwitchTable>
+class MyParser: public sl::CmdLineParser<MyParser, MySwitchTable>
 {
 public:
 	bool
-	onValue (const sl::StringRef& value)
+	onValue(const sl::StringRef& value)
 	{
-		printf ("OnValue '%s'\n", value.sz ());
+		printf("OnValue '%s'\n", value.sz ());
 		return true;
 	}
 
 	bool
-	onSwitch (
+	onSwitch(
 		SwitchKind switchKind,
 		const sl::StringRef& value
 		)
 	{
-		printf ("OnSwitch #%d = '%s'\n", switchKind, value.sz ());
+		printf("OnSwitch #%d = '%s'\n", switchKind, value.sz ());
 		return true;
 	}
 };
 
 void
-run ()
+run()
 {
-	const char* cmdLine [] =
+	const char* cmdLine[] =
 	{
 		"--help",
 		"--session-provider=serial",
@@ -70,12 +70,12 @@ run ()
 	};
 
 	MyParser parser;
-	parser.parse ((int) countof (cmdLine), cmdLine);
+	parser.parse((int)countof(cmdLine), cmdLine);
 
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_CmdLineParser", run)
+ADD_TEST_CASE("test_CmdLineParser", run)
 
 }

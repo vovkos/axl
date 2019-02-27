@@ -86,12 +86,12 @@ struct SerialSettings
 	bool m_dtr; // used when setting SerialSettingId_FlowControl
 	bool m_rts; // used when setting SerialSettingId_FlowControl
 
-	SerialSettings ()
+	SerialSettings()
 	{
-		setup (38400);
+		setup(38400);
 	}
 
-	SerialSettings (
+	SerialSettings(
 		uint_t baudRate,
 		uint_t dataBits = 8,
 		SerialStopBits stopBits = SerialStopBits_1,
@@ -102,11 +102,11 @@ struct SerialSettings
 		bool rts = true
 		)
 	{
-		setup (baudRate, dataBits, stopBits, parity, flowControl, readInterval, dtr, rts);
+		setup(baudRate, dataBits, stopBits, parity, flowControl, readInterval, dtr, rts);
 	}
 
 	void
-	setup (
+	setup(
 		uint_t baudRate,
 		uint_t dataBits = 8,
 		SerialStopBits stopBits = SerialStopBits_1,
@@ -119,10 +119,10 @@ struct SerialSettings
 
 #if (_AXL_OS_WIN)
 	void
-	setDcb (const DCB* dcb);
+	setDcb(const DCB* dcb);
 #elif (_AXL_OS_POSIX)
 	void
-	setAttr (const termios* attr);
+	setAttr(const termios* attr);
 #endif
 };
 

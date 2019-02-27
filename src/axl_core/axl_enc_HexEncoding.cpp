@@ -18,7 +18,7 @@ namespace enc {
 //..............................................................................
 
 size_t
-HexEncoding::encode (
+HexEncoding::encode(
 	sl::String* string,
 	const void* p,
 	size_t size,
@@ -27,7 +27,7 @@ HexEncoding::encode (
 {
 	if (!size)
 	{
-		string->clear ();
+		string->clear();
 		return 0;
 	}
 
@@ -38,75 +38,75 @@ HexEncoding::encode (
 	if ((flags & Flag_NoSpace))
 	{
 		length = size * 2;
-		char* dst = string->createBuffer (length);
+		char* dst = string->createBuffer(length);
 		if (!dst)
 			return -1;
 
 		if (flags & Flag_UpperCase)
-			encode_nsu (dst, src, srcEnd);
+			encode_nsu(dst, src, srcEnd);
 		else
-			encode_nsl (dst, src, srcEnd);
+			encode_nsl(dst, src, srcEnd);
 	}
 	else
 	{
 		length = size * 3 - 1;
-		char* dst = string->createBuffer (length);
+		char* dst = string->createBuffer(length);
 		if (!dst)
 			return -1;
 
 		if (flags & Flag_UpperCase)
-			encode_u (dst, src, srcEnd);
+			encode_u(dst, src, srcEnd);
 		else
-			encode_l (dst, src, srcEnd);
+			encode_l(dst, src, srcEnd);
 	}
 
 	return length;
 }
 
 void
-HexEncoding::encode_l (
+HexEncoding::encode_l(
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
 	)
 {
 	uchar_t x = *src;
-	*dst++ = getHexChar_l (x >> 4);
-	*dst++ = getHexChar_l (x);
+	*dst++ = getHexChar_l(x >> 4);
+	*dst++ = getHexChar_l(x);
 
 	for (src++; src < srcEnd; src++)
 	{
 		uchar_t x = *src;
 
 		*dst++ = ' ';
-		*dst++ = getHexChar_l (x >> 4);
-		*dst++ = getHexChar_l (x);
+		*dst++ = getHexChar_l(x >> 4);
+		*dst++ = getHexChar_l(x);
 	}
 }
 
 void
-HexEncoding::encode_u (
+HexEncoding::encode_u(
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
 	)
 {
 	uchar_t x = *src;
-	*dst++ = getHexChar_u (x >> 4);
-	*dst++ = getHexChar_u (x);
+	*dst++ = getHexChar_u(x >> 4);
+	*dst++ = getHexChar_u(x);
 
 	for (src++; src < srcEnd; src++)
 	{
 		uchar_t x = *src;
 
 		*dst++ = ' ';
-		*dst++ = getHexChar_u (x >> 4);
-		*dst++ = getHexChar_u (x);
+		*dst++ = getHexChar_u(x >> 4);
+		*dst++ = getHexChar_u(x);
 	}
 }
 
 void
-HexEncoding::encode_nsl (
+HexEncoding::encode_nsl(
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
@@ -116,13 +116,13 @@ HexEncoding::encode_nsl (
 	{
 		uchar_t x = *src;
 
-		*dst++ = getHexChar_l (x >> 4);
-		*dst++ = getHexChar_l (x);
+		*dst++ = getHexChar_l(x >> 4);
+		*dst++ = getHexChar_l(x);
 	}
 }
 
 void
-HexEncoding::encode_nsu (
+HexEncoding::encode_nsu(
 	char* dst,
 	const uchar_t* src,
 	const uchar_t* srcEnd
@@ -132,14 +132,14 @@ HexEncoding::encode_nsu (
 	{
 		uchar_t x = *src;
 
-		*dst++ = getHexChar_u (x >> 4);
-		*dst++ = getHexChar_u (x);
+		*dst++ = getHexChar_u(x >> 4);
+		*dst++ = getHexChar_u(x);
 	}
 }
 
 size_t
-HexEncoding::decode (
-	sl::Array <char>* buffer,
+HexEncoding::decode(
+	sl::Array<char>* buffer,
 	const sl::StringRef& source
 	)
 {
@@ -151,29 +151,29 @@ HexEncoding::decode (
 
 	State state = State_Normal;
 
-	buffer->clear ();
-	buffer->reserve (source.getLength () / 2);
+	buffer->clear();
+	buffer->reserve(source.getLength() / 2);
 
-	char hexCodeString [4] = { 0 };
+	char hexCodeString[4] = { 0 };
 	char* hexCodeEnd;
 	size_t hexCodeLen;
 
 	uchar_t x;
 
-	const char* p = source.cp ();
-	const char* end = source.getEnd ();
+	const char* p = source.cp();
+	const char* end = source.getEnd();
 
 	for (; p < end; p++)
 	{
-		bool_t isSpace = isspace (*p);
+		bool_t isSpace = isspace(*p);
 
-		switch (state)
+		switch(state)
 		{
 		case State_Normal:
 			if (isSpace)
 				break;
 
-			hexCodeString [0] = *p;
+			hexCodeString[0] = *p;
 			hexCodeLen = 1;
 			state = State_Hex;
 			break;
@@ -181,16 +181,16 @@ HexEncoding::decode (
 		case State_Hex:
 			if (!isSpace)
 			{
-				hexCodeString [hexCodeLen++] = *p;
+				hexCodeString[hexCodeLen++] = *p;
 				if (hexCodeLen < 2)
 					break;
 			}
 
-			hexCodeString [hexCodeLen] = 0;
-			x = (uchar_t) strtoul (hexCodeString, &hexCodeEnd, 16);
+			hexCodeString[hexCodeLen] = 0;
+			x = (uchar_t)strtoul(hexCodeString, &hexCodeEnd, 16);
 
-			if (hexCodeEnd == &hexCodeString [hexCodeLen])
-				buffer->append (x);
+			if (hexCodeEnd == &hexCodeString[hexCodeLen])
+				buffer->append(x);
 			else
 				p = end; // not a hex string anymore, break the loop
 
@@ -201,14 +201,14 @@ HexEncoding::decode (
 
 	if (state == State_Hex)
 	{
-		hexCodeString [hexCodeLen] = 0;
-		x = (uchar_t) strtoul (hexCodeString, &hexCodeEnd, 16);
+		hexCodeString[hexCodeLen] = 0;
+		x = (uchar_t)strtoul(hexCodeString, &hexCodeEnd, 16);
 
-		if (hexCodeEnd == &hexCodeString [hexCodeLen])
-			buffer->append (x);
+		if (hexCodeEnd == &hexCodeString[hexCodeLen])
+			buffer->append(x);
 	}
 
-	return buffer->getCount ();
+	return buffer->getCount();
 }
 
 //..............................................................................

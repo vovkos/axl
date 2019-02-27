@@ -33,24 +33,24 @@ enum FontFlag
 
 inline
 FontFlag
-getFirstFontFlag (uint_t flags)
+getFirstFontFlag(uint_t flags)
 {
-	return (FontFlag) (1 << sl::getLoBitIdx (flags));
+	return (FontFlag)(1 << sl::getLoBitIdx(flags));
 }
 
 const char*
-getFontFlagString (FontFlag flag);
+getFontFlagString(FontFlag flag);
 
 inline
 const char*
-getFontFlagString (uint_t flags)
+getFontFlagString(uint_t flags)
 {
-	return getFontFlagString (getFirstFontFlag (flags));
+	return getFontFlagString(getFirstFontFlag(flags));
 }
 
 inline
 uint_t
-overlayFontFlags (
+overlayFontFlags(
 	uint_t baseFontFlags,
 	uint_t overlayFontFlags
 	)
@@ -62,26 +62,26 @@ overlayFontFlags (
 
 struct FontDesc
 {
-	char m_family [32];
+	char m_family[32];
 	size_t m_pointSize;
 	uint_t m_flags;
 
-	FontDesc ()
+	FontDesc()
 	{
-		memset (this, 0, sizeof (FontDesc));
+		memset(this, 0, sizeof(FontDesc));
 	}
 
-	FontDesc (
+	FontDesc(
 		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		)
 	{
-		setup (family, pointSize, flags);
+		setup(family, pointSize, flags);
 	}
 
 	void
-	setup (
+	setup(
 		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0

@@ -146,14 +146,14 @@ enum StdPalColor
 
 inline
 uint_t
-getColorIndex (uint_t color)
+getColorIndex(uint_t color)
 {
 	return (color & ColorFlag_Index) ? color & ColorFlag_IndexMask : -1;
 }
 
 inline
 uint_t
-overlayColor (
+overlayColor(
 	uint_t baseColor,
 	uint_t overlayColor
 	)
@@ -163,7 +163,7 @@ overlayColor (
 
 inline
 uint_t
-inverseRgb (uint_t rgb)
+inverseRgb(uint_t rgb)
 {
 	return ((rgb & 0x0000ff) << 16) | ((rgb & 0xff0000) >> 16) | (rgb & 0x00ff00);
 }
@@ -175,12 +175,12 @@ struct Palette
 	const uint_t* m_colorArray;
 	size_t m_count;
 
-	Palette ()
+	Palette()
 	{
-		setup (NULL, 0);
+		setup(NULL, 0);
 	}
 
-	Palette (
+	Palette(
 		const uint_t* colorTable,
 		size_t count
 		)
@@ -190,10 +190,10 @@ struct Palette
 	}
 
 	uint_t
-	getColorRgb (uint_t color);
+	getColorRgb(uint_t color);
 
 	void
-	setup (
+	setup(
 		const uint_t* colorTable,
 		size_t count
 		)

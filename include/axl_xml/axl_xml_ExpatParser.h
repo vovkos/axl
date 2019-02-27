@@ -26,257 +26,257 @@ public:
 	void
 	operator () (XML_Parser h)
 	{
-		::XML_ParserFree (h);
+		::XML_ParserFree(h);
 	}
 };
 
 //..............................................................................
 
-class ExpatParserRoot: public sl::Handle <XML_Parser, FreeExpatParser>
+class ExpatParserRoot: public sl::Handle<XML_Parser, FreeExpatParser>
 {
 public:
 	// creation methods
 
 	bool
-	create (const sl::StringRef& encoding = NULL);
+	create(const sl::StringRef& encoding = NULL);
 
 	bool
-	createNs (
+	createNs(
 		const sl::StringRef& encoding,
 		char separator
 		);
 
 	bool
-	createNs (char separator)
+	createNs(char separator)
 	{
-		return createNs (NULL, separator);
+		return createNs(NULL, separator);
 	}
 
 	// informational methods
 
 	XML_Error
-	getLastErrorCode () const
+	getLastErrorCode() const
 	{
-		return ::XML_GetErrorCode (m_h);
+		return ::XML_GetErrorCode(m_h);
 	}
 
 	err::Error
-	getLastError () const
+	getLastError() const
 	{
-		XML_Error errorCode = getLastErrorCode ();
-		return errorCode ? (err::Error) ExpatError (errorCode) : (err::Error) &err::g_noError;
+		XML_Error errorCode = getLastErrorCode();
+		return errorCode ? (err::Error)ExpatError(errorCode) : (err::Error) &err::g_noError;
 	}
 
 	int
-	getLineNumber () const
+	getLineNumber() const
 	{
-		return ::XML_GetCurrentLineNumber (m_h);
+		return ::XML_GetCurrentLineNumber(m_h);
 	}
 
 	int
-	getColumnNumber () const
+	getColumnNumber() const
 	{
-		return ::XML_GetCurrentColumnNumber (m_h);
+		return ::XML_GetCurrentColumnNumber(m_h);
 	}
 
 	size_t
-	getByteOffset () const
+	getByteOffset() const
 	{
-		return ::XML_GetCurrentByteIndex (m_h);
+		return ::XML_GetCurrentByteIndex(m_h);
 	}
 
 	// handlers
 
 	void*
-	getUserData ()
+	getUserData()
 	{
-		return XML_GetUserData (m_h);
+		return XML_GetUserData(m_h);
 	}
 
 	void
-	setUserData (void* userData)
+	setUserData(void* userData)
 	{
-		::XML_SetUserData (m_h, userData);
+		::XML_SetUserData(m_h, userData);
 	}
 
 	void
-	setElementHandler (
+	setElementHandler(
 		XML_StartElementHandler startHandler,
 		XML_EndElementHandler endHandler
 		)
 	{
-		::XML_SetElementHandler (m_h, startHandler, endHandler);
+		::XML_SetElementHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartElementHandler (XML_StartElementHandler handler)
+	setStartElementHandler(XML_StartElementHandler handler)
 	{
-		::XML_SetStartElementHandler (m_h, handler);
+		::XML_SetStartElementHandler(m_h, handler);
 	}
 
 	void
-	setEndElementHandler (XML_EndElementHandler handler)
+	setEndElementHandler(XML_EndElementHandler handler)
 	{
-		::XML_SetEndElementHandler (m_h, handler);
+		::XML_SetEndElementHandler(m_h, handler);
 	}
 
 	void
-	setCharacterDataHandler (XML_CharacterDataHandler handler)
+	setCharacterDataHandler(XML_CharacterDataHandler handler)
 	{
-		::XML_SetCharacterDataHandler (m_h, handler);
+		::XML_SetCharacterDataHandler(m_h, handler);
 	}
 
 	void
-	setProcessingInstructionHandler (XML_ProcessingInstructionHandler handler)
+	setProcessingInstructionHandler(XML_ProcessingInstructionHandler handler)
 	{
-		::XML_SetProcessingInstructionHandler (m_h, handler);
+		::XML_SetProcessingInstructionHandler(m_h, handler);
 	}
 
 	void
-	setCommentHandler (XML_CommentHandler handler)
+	setCommentHandler(XML_CommentHandler handler)
 	{
-		::XML_SetCommentHandler (m_h, handler);
+		::XML_SetCommentHandler(m_h, handler);
 	}
 
 	void
-	setCdataSectionHandler (
+	setCdataSectionHandler(
 		XML_StartCdataSectionHandler startHandler,
 		XML_EndCdataSectionHandler endHandler
 		)
 	{
-		::XML_SetCdataSectionHandler (m_h, startHandler, endHandler);
+		::XML_SetCdataSectionHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartCdataSectionHandler (XML_StartCdataSectionHandler handler)
+	setStartCdataSectionHandler(XML_StartCdataSectionHandler handler)
 	{
-		::XML_SetStartCdataSectionHandler (m_h, handler);
+		::XML_SetStartCdataSectionHandler(m_h, handler);
 	}
 
 	void
-	setEndCdataSectionHandler (XML_EndCdataSectionHandler handler)
+	setEndCdataSectionHandler(XML_EndCdataSectionHandler handler)
 	{
-		::XML_SetEndCdataSectionHandler (m_h, handler);
+		::XML_SetEndCdataSectionHandler(m_h, handler);
 	}
 
 	void
-	setDefaultHandler (XML_DefaultHandler handler)
+	setDefaultHandler(XML_DefaultHandler handler)
 	{
-		::XML_SetDefaultHandler (m_h, handler);
+		::XML_SetDefaultHandler(m_h, handler);
 	}
 
 	void
-	setDefaultHandlerExpand (XML_DefaultHandler handler)
+	setDefaultHandlerExpand(XML_DefaultHandler handler)
 	{
-		::XML_SetDefaultHandlerExpand (m_h, handler);
+		::XML_SetDefaultHandlerExpand(m_h, handler);
 	}
 
 	void
-	setDoctypeDeclHandler (
+	setDoctypeDeclHandler(
 		XML_StartDoctypeDeclHandler startHandler,
 		XML_EndDoctypeDeclHandler endHandler
 		)
 	{
-		::XML_SetDoctypeDeclHandler (m_h, startHandler, endHandler);
+		::XML_SetDoctypeDeclHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartDoctypeDeclHandler (XML_StartDoctypeDeclHandler handler)
+	setStartDoctypeDeclHandler(XML_StartDoctypeDeclHandler handler)
 	{
-		::XML_SetStartDoctypeDeclHandler (m_h, handler);
+		::XML_SetStartDoctypeDeclHandler(m_h, handler);
 	}
 
 	void
-	setEndDoctypeDeclHandler (XML_EndDoctypeDeclHandler handler)
+	setEndDoctypeDeclHandler(XML_EndDoctypeDeclHandler handler)
 	{
-		::XML_SetEndDoctypeDeclHandler (m_h, handler);
+		::XML_SetEndDoctypeDeclHandler(m_h, handler);
 	}
 
 	void
-	setNotationDeclHandler (XML_NotationDeclHandler handler)
+	setNotationDeclHandler(XML_NotationDeclHandler handler)
 	{
-		::XML_SetNotationDeclHandler (m_h, handler);
+		::XML_SetNotationDeclHandler(m_h, handler);
 	}
 
 	void
-	setNamespaceDeclHandler (
+	setNamespaceDeclHandler(
 		XML_StartNamespaceDeclHandler startHandler,
 		XML_EndNamespaceDeclHandler endHandler
 		)
 	{
-		::XML_SetNamespaceDeclHandler (m_h, startHandler, endHandler);
+		::XML_SetNamespaceDeclHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartNamespaceDeclHandler (XML_StartNamespaceDeclHandler handler)
+	setStartNamespaceDeclHandler(XML_StartNamespaceDeclHandler handler)
 	{
-		::XML_SetStartNamespaceDeclHandler (m_h, handler);
+		::XML_SetStartNamespaceDeclHandler(m_h, handler);
 	}
 
 	void
-	setEndNamespaceDeclHandler (XML_EndNamespaceDeclHandler handler)
+	setEndNamespaceDeclHandler(XML_EndNamespaceDeclHandler handler)
 	{
-		::XML_SetEndNamespaceDeclHandler (m_h, handler);
+		::XML_SetEndNamespaceDeclHandler(m_h, handler);
 	}
 
 	void
-	setNotStandaloneHandler (XML_NotStandaloneHandler handler)
+	setNotStandaloneHandler(XML_NotStandaloneHandler handler)
 	{
-		::XML_SetNotStandaloneHandler (m_h, handler);
+		::XML_SetNotStandaloneHandler(m_h, handler);
 	}
 
 	void
-	setUnknownEncodingHandler (XML_UnknownEncodingHandler handler)
+	setUnknownEncodingHandler(XML_UnknownEncodingHandler handler)
 	{
-		::XML_SetUnknownEncodingHandler (m_h, handler, getUserData ());
+		::XML_SetUnknownEncodingHandler(m_h, handler, getUserData());
 	}
 
 	// parsing methods
 
 	bool
-	parse (
+	parse(
 		const void* p,
 		size_t size,
 		bool isFinal
 		)
 	{
-		XML_Status status = ::XML_Parse (m_h, (const char*) p, size, isFinal);
-		return complete (status == XML_STATUS_OK, false);
+		XML_Status status = ::XML_Parse(m_h, (const char*) p, size, isFinal);
+		return complete(status == XML_STATUS_OK, false);
 	}
 
 	bool
-	parseBuffer (
+	parseBuffer(
 		size_t size,
 		bool isFinal
 		)
 	{
-		XML_Status status = ::XML_ParseBuffer (m_h, size, isFinal);
-		return complete (status == XML_STATUS_OK, false);
+		XML_Status status = ::XML_ParseBuffer(m_h, size, isFinal);
+		return complete(status == XML_STATUS_OK, false);
 	}
 
 	bool
-	parseFile (
+	parseFile(
 		const sl::StringRef& fileName,
 		size_t blockSize = -1
 		);
 
 	void*
-	getBuffer (size_t size)
+	getBuffer(size_t size)
 	{
-		void* p = ::XML_GetBuffer (m_h, size);
-		return complete <void*> (p, NULL);
+		void* p = ::XML_GetBuffer(m_h, size);
+		return complete<void*> (p, NULL);
 	}
 
 protected:
 	template <typename T>
 	T
-	complete (
+	complete(
 		T result,
 		T failResult
 		)
 	{
 		if (result == failResult)
-			err::setError (getLastError ());
+			err::setError(getLastError());
 
 		return result;
 	}
@@ -288,37 +288,37 @@ template <typename T>
 class ExpatParser: public ExpatParserRoot
 {
 public:
-	ExpatParser ()
+	ExpatParser()
 	{
-		create ();
+		create();
 	}
 
 	bool
-	create (const sl::StringRef& encoding = NULL)
+	create(const sl::StringRef& encoding = NULL)
 	{
-		return ExpatParserRoot::create (encoding) && setHandlers ();
+		return ExpatParserRoot::create(encoding) && setHandlers();
 	}
 
 	bool
-	createNs (
+	createNs(
 		const sl::StringRef& encoding,
 		char separator
 		)
 	{
-		return ExpatParserRoot::createNs (encoding, separator) && setHandlers ();
+		return ExpatParserRoot::createNs(encoding, separator) && setHandlers();
 	}
 
 	bool
-	createNs (char separator)
+	createNs(char separator)
 	{
-		return ExpatParserRoot::createNs (separator) && setHandlers ();
+		return ExpatParserRoot::createNs(separator) && setHandlers();
 	}
 
 protected:
 	// overridables
 
 	void
-	onStartElement (
+	onStartElement(
 		const char* name,
 		const char** attributes
 		)
@@ -326,12 +326,12 @@ protected:
 	}
 
 	void
-	onEndElement (const char* name)
+	onEndElement(const char* name)
 	{
 	}
 
 	void
-	onCharacterData (
+	onCharacterData(
 		const char* string,
 		size_t length
 		)
@@ -339,7 +339,7 @@ protected:
 	}
 
 	void
-	onProcessingInstruction (
+	onProcessingInstruction(
 		const char* target,
 		const char* data
 		)
@@ -347,22 +347,22 @@ protected:
 	}
 
 	void
-	onComment (const char* data)
+	onComment(const char* data)
 	{
 	}
 
 	void
-	onStartCdataSection ()
+	onStartCdataSection()
 	{
 	}
 
 	void
-	onEndCdataSection ()
+	onEndCdataSection()
 	{
 	}
 
 	void
-	onDefault (
+	onDefault(
 		const char* string,
 		size_t length
 		)
@@ -370,7 +370,7 @@ protected:
 	}
 
 	void
-	onDefaultExpand (
+	onDefaultExpand(
 		const char* string,
 		size_t length
 		)
@@ -378,7 +378,7 @@ protected:
 	}
 
 	void
-	onStartDoctypeDecl (
+	onStartDoctypeDecl(
 		const char* doctypeName,
 		const char* systemId,
 		const char* publicId,
@@ -388,12 +388,12 @@ protected:
 	}
 
 	void
-	onEndDoctypeDecl ()
+	onEndDoctypeDecl()
 	{
 	}
 
 	void
-	onNotationDecl (
+	onNotationDecl(
 		const char* notationName,
 		const char* base,
 		const char* systemId,
@@ -403,7 +403,7 @@ protected:
 	}
 
 	void
-	onStartNamespaceDecl (
+	onStartNamespaceDecl(
 		const char* prefix,
 		const char* uri
 		)
@@ -411,18 +411,18 @@ protected:
 	}
 
 	void
-	onEndNamespaceDecl (const char* prefix)
+	onEndNamespaceDecl(const char* prefix)
 	{
 	}
 
 	bool
-	onNotStandalone ()
+	onNotStandalone()
 	{
 		return false;
 	}
 
 	bool
-	onUnknownEncoding (
+	onUnknownEncoding(
 		const char* name,
 		XML_Encoding* encoding
 		)
@@ -432,56 +432,56 @@ protected:
 
 protected:
 	bool
-	setHandlers ()
+	setHandlers()
 	{
-		setUserData (static_cast <T*> (this));
+		setUserData(static_cast<T*> (this));
 
 		if (&T::onStartElement != &ExpatParser::onStartElement)
-			setStartElementHandler (startElementHandler);
+			setStartElementHandler(startElementHandler);
 
 		if (&T::onEndElement != &ExpatParser::onEndElement)
-			setEndElementHandler (endElementHandler);
+			setEndElementHandler(endElementHandler);
 
 		if (&T::onCharacterData != &ExpatParser::onCharacterData)
-			setCharacterDataHandler (characterDataHandler);
+			setCharacterDataHandler(characterDataHandler);
 
 		if (&T::onProcessingInstruction != &ExpatParser::onProcessingInstruction)
-			setProcessingInstructionHandler (processingInstructionHandler);
+			setProcessingInstructionHandler(processingInstructionHandler);
 
 		if (&T::onComment != &ExpatParser::onComment)
-			setCommentHandler (commentHandler);
+			setCommentHandler(commentHandler);
 
 		if (&T::onStartCdataSection != &ExpatParser::onStartCdataSection)
-			setStartCdataSectionHandler (startCdataSectionHandler);
+			setStartCdataSectionHandler(startCdataSectionHandler);
 
 		if (&T::onEndCdataSection != &ExpatParser::onEndCdataSection)
-			setEndCdataSectionHandler (endCdataSectionHandler);
+			setEndCdataSectionHandler(endCdataSectionHandler);
 
 		if (&T::onDefault != &ExpatParser::onDefault)
-			setDefaultHandler (defaultHandler);
+			setDefaultHandler(defaultHandler);
 		else if (&T::onDefaultExpand != &ExpatParser::onDefaultExpand)
-			setDefaultHandlerExpand (defaultHandlerExpand);
+			setDefaultHandlerExpand(defaultHandlerExpand);
 
 		if (&T::onStartDoctypeDecl != &ExpatParser::onStartDoctypeDecl)
-			setStartDoctypeDeclHandler (startDoctypeDeclHandler);
+			setStartDoctypeDeclHandler(startDoctypeDeclHandler);
 
 		if (&T::onEndDoctypeDecl != &ExpatParser::onEndDoctypeDecl)
-			setEndDoctypeDeclHandler (endDoctypeDeclHandler);
+			setEndDoctypeDeclHandler(endDoctypeDeclHandler);
 
 		if (&T::onNotationDecl != &ExpatParser::onNotationDecl)
-			setNotationDeclHandler (notationDeclHandler);
+			setNotationDeclHandler(notationDeclHandler);
 
 		if (&T::onStartNamespaceDecl != &ExpatParser::onStartNamespaceDecl)
-			setStartNamespaceDeclHandler (startNamespaceDeclHandler);
+			setStartNamespaceDeclHandler(startNamespaceDeclHandler);
 
 		if (&T::onEndNamespaceDecl != &ExpatParser::onEndNamespaceDecl)
-			setEndNamespaceDeclHandler (endNamespaceDeclHandler);
+			setEndNamespaceDeclHandler(endNamespaceDeclHandler);
 
 		if (&T::onNotStandalone != &ExpatParser::onNotStandalone)
-			setNotStandaloneHandler (notStandaloneHandler);
+			setNotStandaloneHandler(notStandaloneHandler);
 
 		if (&T::onUnknownEncoding != &ExpatParser::onUnknownEncoding)
-			setUnknownEncodingHandler (unknownEncodingHandler);
+			setUnknownEncodingHandler(unknownEncodingHandler);
 
 		return true;
 	}
@@ -489,105 +489,105 @@ protected:
 	static
 	void
 	XMLCALL
-	startElementHandler (
+	startElementHandler(
 		void* userData,
 		const XML_Char* name,
 		const XML_Char** attributes
 		)
 	{
-		((T*) userData)->onStartElement (name, attributes);
+		((T*)userData)->onStartElement(name, attributes);
 	}
 
 	static
 	void
 	XMLCALL
-	endElementHandler (
+	endElementHandler(
 		void* userData,
 		const XML_Char* name
 		)
 	{
-		((T*) userData)->onEndElement (name);
+		((T*)userData)->onEndElement(name);
 	}
 
 	static
 	void
 	XMLCALL
-	characterDataHandler (
+	characterDataHandler(
 		void* userData,
 		const XML_Char* string,
 		int length
 		)
 	{
-		((T*) userData)->onCharacterData (string, length);
+		((T*)userData)->onCharacterData(string, length);
 	}
 
 	static
 	void
 	XMLCALL
-	processingInstructionHandler (
+	processingInstructionHandler(
 		void* userData,
 		const XML_Char* target,
 		const XML_Char* data
 		)
 	{
-		((T*) userData)->onProcessingInstruction (target, data);
+		((T*)userData)->onProcessingInstruction(target, data);
 	}
 
 	static
 	void
 	XMLCALL
-	commentHandler (
+	commentHandler(
 		void* userData,
 		const XML_Char* data
 		)
 	{
-		((T*) userData)->onComment (data);
+		((T*)userData)->onComment(data);
 	}
 
 	static
 	void
 	XMLCALL
-	startCdataSectionHandler (void* userData)
+	startCdataSectionHandler(void* userData)
 	{
-		((T*) userData)->onStartCdataSection ();
+		((T*)userData)->onStartCdataSection();
 	}
 
 	static
 	void
 	XMLCALL
-	endCdataSectionHandler (void* userData)
+	endCdataSectionHandler(void* userData)
 	{
-		((T*) userData)->onEndCdataSection ();
+		((T*)userData)->onEndCdataSection();
 	}
 
 	static
 	void
 	XMLCALL
-	defaultHandler (
+	defaultHandler(
 		void* userData,
 		const XML_Char* string,
 		int length
 		)
 	{
-		((T*) userData)->onDefault (string, length);
+		((T*)userData)->onDefault(string, length);
 	}
 
 	static
 	void
 	XMLCALL
-	defaultHandlerExpand (
+	defaultHandlerExpand(
 		void* userData,
 		const XML_Char* string,
 		int length
 		)
 	{
-		((T*) userData)->onDefaultExpand (string, length);
+		((T*)userData)->onDefaultExpand(string, length);
 	}
 
 	static
 	void
 	XMLCALL
-	startDoctypeDeclHandler (
+	startDoctypeDeclHandler(
 		void* userData,
 		const XML_Char* doctypeName,
 		const XML_Char* systemId,
@@ -595,21 +595,21 @@ protected:
 		int hasInternalSubset
 		)
 	{
-		((T*) userData)->onStartDoctypeDecl (doctypeName, systemId, publicId, hasInternalSubset != 0);
+		((T*)userData)->onStartDoctypeDecl(doctypeName, systemId, publicId, hasInternalSubset != 0);
 	}
 
 	static
 	void
 	XMLCALL
-	endDoctypeDeclHandler (void* userData)
+	endDoctypeDeclHandler(void* userData)
 	{
-		((T*) userData)->onEndDoctypeDecl ();
+		((T*)userData)->onEndDoctypeDecl();
 	}
 
 	static
 	void
 	XMLCALL
-	notationDeclHandler (
+	notationDeclHandler(
 		void* userData,
 		const XML_Char* notationName,
 		const XML_Char* base,
@@ -617,50 +617,50 @@ protected:
 		const XML_Char* publicId
 		)
 	{
-		((T*) userData)->onNotationDecl (notationName, base, systemId, publicId);
+		((T*)userData)->onNotationDecl(notationName, base, systemId, publicId);
 	}
 
 	static
 	void
 	XMLCALL
-	startNamespaceDeclHandler (
+	startNamespaceDeclHandler(
 		void* userData,
 		const XML_Char* prefix,
 		const XML_Char* uri
 		)
 	{
-		((T*) userData)->onStartNamespaceDecl (prefix, uri);
+		((T*)userData)->onStartNamespaceDecl(prefix, uri);
 	}
 
 	static
 	void
 	XMLCALL
-	endNamespaceDeclHandler (
+	endNamespaceDeclHandler(
 		void* userData,
 		const XML_Char* prefix
 		)
 	{
-		((T*) userData)->onEndNamespaceDecl (prefix);
+		((T*)userData)->onEndNamespaceDecl(prefix);
 	}
 
 	static
 	int
 	XMLCALL
-	notStandaloneHandler (void* userData)
+	notStandaloneHandler(void* userData)
 	{
-		return ((T*) userData)->onNotStandalone ();
+		return ((T*)userData)->onNotStandalone();
 	}
 
 	static
 	int
 	XMLCALL
-	unknownEncodingHandler (
+	unknownEncodingHandler(
 		void* userData,
 		const XML_Char* name,
 		XML_Encoding* encoding
 		)
 	{
-		return ((T*) userData)->onUnknownEncoding (name, encoding);
+		return ((T*)userData)->onUnknownEncoding(name, encoding);
 	}
 };
 

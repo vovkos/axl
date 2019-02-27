@@ -23,23 +23,23 @@ namespace gui {
 class Image: public GuiItem
 {
 protected:
-	Image (Engine* engine):
-		GuiItem (engine)
+	Image(Engine* engine):
+		GuiItem(engine)
 	{
 	}
 
 public:
 	bool
-	getImageDesc (ImageDesc* imageDesc)
+	getImageDesc(ImageDesc* imageDesc)
 	{
-		return m_engine->getImageDesc (this, imageDesc);
+		return m_engine->getImageDesc(this, imageDesc);
 	}
 
 	Size
-	getSize ()
+	getSize()
 	{
 		ImageDesc imageDesc;
-		getImageDesc (&imageDesc);
+		getImageDesc(&imageDesc);
 		return imageDesc.m_size;
 	}
 };
@@ -49,8 +49,8 @@ public:
 class Cursor: public GuiItem
 {
 protected:
-	Cursor (Engine* engine):
-		GuiItem (engine)
+	Cursor(Engine* engine):
+		GuiItem(engine)
 	{
 	}
 };

@@ -37,26 +37,26 @@ public:
 	Palette m_palette;
 
 protected:
-	Canvas (Engine* engine):
-		GuiItem (engine)
+	Canvas(Engine* engine):
+		GuiItem(engine)
 	{
-		m_font = engine->getStdFont (StdFontKind_Gui);
+		m_font = engine->getStdFont(StdFontKind_Gui);
 		m_driverFont = NULL;
-		m_colorAttr.setup (StdPalColor_WidgetText, StdPalColor_WidgetBack);
+		m_colorAttr.setup(StdPalColor_WidgetText, StdPalColor_WidgetBack);
 	}
 
 public:
 	void
-	setTextAttr (const TextAttr& attr)
+	setTextAttr(const TextAttr& attr)
 	{
 		m_colorAttr = attr;
-		m_font = m_font->getFontMod (attr.m_fontFlags);
+		m_font = m_font->getFontMod(attr.m_fontFlags);
 	}
 
 	// rect drawing
 
 	bool
-	drawRect (
+	drawRect(
 		int left,
 		int top,
 		int right,
@@ -64,27 +64,27 @@ public:
 		uint_t color
 		)
 	{
-		return m_engine->drawRect (this, left, top, right, bottom, color);
+		return m_engine->drawRect(this, left, top, right, bottom, color);
 	}
 
 	bool
-	drawRect (
+	drawRect(
 		int left,
 		int top,
 		int right,
 		int bottom
 		)
 	{
-		return drawRect (left, top, right, bottom, m_colorAttr.m_backColor);
+		return drawRect(left, top, right, bottom, m_colorAttr.m_backColor);
 	}
 
 	bool
-	drawRect (
+	drawRect(
 		const Rect& rect,
 		uint_t color
 		)
 	{
-		return drawRect (
+		return drawRect(
 			rect.m_left,
 			rect.m_top,
 			rect.m_right,
@@ -94,9 +94,9 @@ public:
 	}
 
 	bool
-	drawRect (const Rect& rect)
+	drawRect(const Rect& rect)
 	{
-		return drawRect (
+		return drawRect(
 			rect.m_left,
 			rect.m_top,
 			rect.m_right,
@@ -108,7 +108,7 @@ public:
 	// alpha rect drawing
 
 	bool
-	drawAlphaRect (
+	drawAlphaRect(
 		int left,
 		int top,
 		int right,
@@ -117,11 +117,11 @@ public:
 		uint_t alpha
 		)
 	{
-		return m_engine->drawAlphaRect (this, left, top, right, bottom, color, alpha);
+		return m_engine->drawAlphaRect(this, left, top, right, bottom, color, alpha);
 	}
 
 	bool
-	drawAlphaRect (
+	drawAlphaRect(
 		int left,
 		int top,
 		int right,
@@ -129,17 +129,17 @@ public:
 		uint_t alpha
 		)
 	{
-		return drawAlphaRect (left, top, right, bottom, m_colorAttr.m_backColor, alpha);
+		return drawAlphaRect(left, top, right, bottom, m_colorAttr.m_backColor, alpha);
 	}
 
 	bool
-	drawAlphaRect (
+	drawAlphaRect(
 		const Rect& rect,
 		uint_t color,
 		uint_t alpha
 		)
 	{
-		return drawAlphaRect (
+		return drawAlphaRect(
 			rect.m_left,
 			rect.m_top,
 			rect.m_right,
@@ -150,12 +150,12 @@ public:
 	}
 
 	bool
-	drawAlphaRect (
+	drawAlphaRect(
 		const Rect& rect,
 		uint_t alpha
 		)
 	{
-		return drawAlphaRect (
+		return drawAlphaRect(
 			rect.m_left,
 			rect.m_top,
 			rect.m_right,
@@ -168,7 +168,7 @@ public:
 	// default to utf8
 
 	bool
-	drawText (
+	drawText(
 		int x,
 		int y,
 		int left,
@@ -181,7 +181,7 @@ public:
 		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (
+		return drawText_utf8(
 			x,
 			y,
 			left,
@@ -196,7 +196,7 @@ public:
 	}
 
 	bool
-	drawText (
+	drawText(
 		int x,
 		int y,
 		int left,
@@ -206,34 +206,34 @@ public:
 		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (x, y, left, top, right, bottom, text);
+		return drawText_utf8(x, y, left, top, right, bottom, text);
 	}
 
 	bool
-	drawText (
+	drawText(
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (point, rect, textAttr, text);
+		return drawText_utf8(point, rect, textAttr, text);
 	}
 
 	bool
-	drawText (
+	drawText(
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (point, rect, text);
+		return drawText_utf8(point, rect, text);
 	}
 
 	// utf8 text drawing
 
 	bool
-	drawText_utf8 (
+	drawText_utf8(
 		int x,
 		int y,
 		int left,
@@ -246,7 +246,7 @@ public:
 		const sl::StringRef_utf8& text
 		)
 	{
-		return m_engine->drawText_utf8 (
+		return m_engine->drawText_utf8(
 			this,
 			x,
 			y,
@@ -262,7 +262,7 @@ public:
 	}
 
 	bool
-	drawText_utf8 (
+	drawText_utf8(
 		int x,
 		int y,
 		int left,
@@ -272,7 +272,7 @@ public:
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawText_utf8 (
+		return drawText_utf8(
 			x,
 			y,
 			left,
@@ -287,14 +287,14 @@ public:
 	}
 
 	bool
-	drawText_utf8 (
+	drawText_utf8(
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawText_utf8 (
+		return drawText_utf8(
 			point.m_x,
 			point.m_y,
 			rect.m_left,
@@ -309,13 +309,13 @@ public:
 	}
 
 	bool
-	drawText_utf8 (
+	drawText_utf8(
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawText_utf8 (
+		return drawText_utf8(
 			point.m_x,
 			point.m_y,
 			rect.m_left,
@@ -332,7 +332,7 @@ public:
 	// utf16 text drawing
 
 	bool
-	drawText_utf16 (
+	drawText_utf16(
 		int x,
 		int y,
 		int left,
@@ -345,7 +345,7 @@ public:
 		const sl::StringRef_utf16& text
 		)
 	{
-		return m_engine->drawText_utf16 (
+		return m_engine->drawText_utf16(
 			this,
 			x,
 			y,
@@ -361,7 +361,7 @@ public:
 	}
 
 	bool
-	drawText_utf16 (
+	drawText_utf16(
 		int x,
 		int y,
 		int left,
@@ -371,7 +371,7 @@ public:
 		const sl::StringRef_utf16& text
 		)
 	{
-		return drawText_utf16 (
+		return drawText_utf16(
 			x,
 			y,
 			left,
@@ -386,14 +386,14 @@ public:
 	}
 
 	bool
-	drawText_utf16 (
+	drawText_utf16(
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef_utf16& text
 		)
 	{
-		return drawText_utf16 (
+		return drawText_utf16(
 			point.m_x,
 			point.m_y,
 			rect.m_left,
@@ -408,13 +408,13 @@ public:
 	}
 
 	bool
-	drawText_utf16 (
+	drawText_utf16(
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef_utf16& text
 		)
 	{
-		return drawText_utf16 (
+		return drawText_utf16(
 			point.m_x,
 			point.m_y,
 			rect.m_left,
@@ -431,7 +431,7 @@ public:
 	// utf32 text drawing
 
 	bool
-	drawText_utf32 (
+	drawText_utf32(
 		int x,
 		int y,
 		int left,
@@ -444,7 +444,7 @@ public:
 		const sl::StringRef_utf32& text
 		)
 	{
-		return m_engine->drawText_utf32 (
+		return m_engine->drawText_utf32(
 			this,
 			x,
 			y,
@@ -460,7 +460,7 @@ public:
 	}
 
 	bool
-	drawText_utf32 (
+	drawText_utf32(
 		int x,
 		int y,
 		int left,
@@ -470,7 +470,7 @@ public:
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawText_utf32 (
+		return drawText_utf32(
 			x,
 			y,
 			left,
@@ -485,14 +485,14 @@ public:
 	}
 
 	bool
-	drawText_utf32 (
+	drawText_utf32(
 		const Point& point,
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawText_utf32 (
+		return drawText_utf32(
 			point.m_x,
 			point.m_y,
 			rect.m_left,
@@ -507,13 +507,13 @@ public:
 	}
 
 	bool
-	drawText_utf32 (
+	drawText_utf32(
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawText_utf32 (
+		return drawText_utf32(
 			point.m_x,
 			point.m_y,
 			rect.m_left,
@@ -530,7 +530,7 @@ public:
 	// image drawing
 
 	bool
-	drawImage (
+	drawImage(
 		int x,
 		int y,
 		Image* image,
@@ -540,7 +540,7 @@ public:
 		int bottom
 		)
 	{
-		return m_engine->drawImage (
+		return m_engine->drawImage(
 			this,
 			x,
 			y,
@@ -553,13 +553,13 @@ public:
 	}
 
 	bool
-	drawImage (
+	drawImage(
 		const Point& point,
 		Image* image,
-		const Rect& rect = Rect ()
+		const Rect& rect = Rect()
 		)
 	{
-		return drawImage (
+		return drawImage(
 			point.m_x,
 			point.m_y,
 			image,
@@ -573,7 +573,7 @@ public:
 	// bitblt
 
 	bool
-	copyRect (
+	copyRect(
 		int x,
 		int y,
 		Canvas* srcCanvas,
@@ -583,7 +583,7 @@ public:
 		int bottom
 		)
 	{
-		return m_engine->copyRect (
+		return m_engine->copyRect(
 			this,
 			x,
 			y,
@@ -596,13 +596,13 @@ public:
 	}
 
 	bool
-	copyRect (
+	copyRect(
 		const Point& point,
 		Canvas* srcCanvas,
 		const Rect& srcRect
 		)
 	{
-		return copyRect (
+		return copyRect(
 			point.m_x,
 			point.m_y,
 			srcCanvas,
@@ -628,44 +628,44 @@ protected:
 
 protected:
 	Engine* m_engine;
-	Entry* m_canvasTable [FormFactor__Count];
+	Entry* m_canvasTable[FormFactor__Count];
 
 public:
-	OffscreenCanvasCache (Engine* engine)
+	OffscreenCanvasCache(Engine* engine)
 	{
 		m_engine = engine;
-		memset (m_canvasTable, 0, sizeof (m_canvasTable));
+		memset(m_canvasTable, 0, sizeof(m_canvasTable));
 	}
 
-	~OffscreenCanvasCache ()
+	~OffscreenCanvasCache()
 	{
-		clear ();
+		clear();
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		for (size_t i = 0; i < countof (m_canvasTable); i++)
-			if (m_canvasTable [i])
-				AXL_MEM_DELETE (m_canvasTable [i]);
+		for (size_t i = 0; i < countof(m_canvasTable); i++)
+			if (m_canvasTable[i])
+				AXL_MEM_DELETE(m_canvasTable[i]);
 
-		memset (m_canvasTable, 0, sizeof (m_canvasTable));
+		memset(m_canvasTable, 0, sizeof(m_canvasTable));
 	}
 
 	T*
-	getCanvas (
+	getCanvas(
 		uint_t width,
 		uint_t height
 		)
 	{
-		FormFactor formFactor = getFormFactor (width, height);
-		ASSERT (formFactor < countof (m_canvasTable));
+		FormFactor formFactor = getFormFactor(width, height);
+		ASSERT(formFactor < countof(m_canvasTable));
 
-		Entry* entry = m_canvasTable [formFactor];
+		Entry* entry = m_canvasTable[formFactor];
 		if (!entry)
 		{
-			entry = AXL_MEM_NEW (Entry);
-			m_canvasTable [formFactor] = entry;
+			entry = AXL_MEM_NEW(Entry);
+			m_canvasTable[formFactor] = entry;
 		}
 
 		if (entry->m_size.m_width_u >= width &&
@@ -674,13 +674,13 @@ public:
 
 		width = width < entry->m_size.m_width_u ?
 			entry->m_size.m_width_u :
-			sl::align <16> (width);
+			sl::align<16> (width);
 
 		height = entry->m_size.m_height_u < height ?
 			entry->m_size.m_height_u :
-			sl::align <16> (height);
+			sl::align<16> (height);
 
-		bool result = m_engine->createOffscreenCanvas (&entry->m_canvas, width, height);
+		bool result = m_engine->createOffscreenCanvas(&entry->m_canvas, width, height);
 		if (!result)
 			return NULL;
 
@@ -690,9 +690,9 @@ public:
 	}
 
 	T*
-	getCanvas (const Size& size)
+	getCanvas(const Size& size)
 	{
-		return getCanvas (size.m_width, size.m_height);
+		return getCanvas(size.m_width, size.m_height);
 	}
 };
 

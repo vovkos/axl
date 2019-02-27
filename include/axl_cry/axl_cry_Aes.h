@@ -23,61 +23,61 @@ namespace cry {
 
 struct AesKey: AES_KEY
 {
-	AesKey ()
+	AesKey()
 	{
-		memset (this, 0, sizeof (AesKey));
+		memset(this, 0, sizeof(AesKey));
 	}
 
 	bool
-	setEncryptKey (
+	setEncryptKey(
 		const void* p,
 		size_t bitCount
 		)
 	{
-		int result = AES_set_encrypt_key ((const uchar_t*) p, (int) bitCount, this);
-		return err::completeWithSystemError (result == 0, err::SystemErrorCode_InvalidParameter);
+		int result = AES_set_encrypt_key((const uchar_t*) p, (int)bitCount, this);
+		return err::completeWithSystemError(result == 0, err::SystemErrorCode_InvalidParameter);
 	}
 
 	bool
-	setDecryptKey (
+	setDecryptKey(
 		const void* p,
 		size_t bitCount
 		)
 	{
-		int result = AES_set_decrypt_key ((const uchar_t*) p, (int) bitCount, this);
-		return err::completeWithSystemError (result == 0, err::SystemErrorCode_InvalidParameter);
+		int result = AES_set_decrypt_key((const uchar_t*) p, (int)bitCount, this);
+		return err::completeWithSystemError(result == 0, err::SystemErrorCode_InvalidParameter);
 	}
 
-	void cbcEncrypt (
+	void cbcEncrypt(
 		void* dst,
 		const void* src,
 		size_t size,
 		void* iv
 		)
 	{
-		AES_cbc_encrypt (
+		AES_cbc_encrypt(
 			(const uchar_t*) src,
-			(uchar_t*) dst,
+			(uchar_t*)dst,
 			size,
 			this,
-			(uchar_t*) iv,
+			(uchar_t*)iv,
 			AES_ENCRYPT
 			);
 	}
 
-	void cbcDecrypt (
+	void cbcDecrypt(
 		void* dst,
 		const void* src,
 		size_t size,
 		void* iv
 		)
 	{
-		AES_cbc_encrypt (
+		AES_cbc_encrypt(
 			(const uchar_t*) src,
-			(uchar_t*) dst,
+			(uchar_t*)dst,
 			size,
 			this,
-			(uchar_t*) iv,
+			(uchar_t*)iv,
 			AES_DECRYPT
 			);
 	}

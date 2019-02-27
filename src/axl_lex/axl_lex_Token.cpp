@@ -19,10 +19,10 @@ namespace lex {
 //..............................................................................
 
 void
-LineCol::incrementalCount (const sl::StringRef& string)
+LineCol::incrementalCount(const sl::StringRef& string)
 {
-	const char* p = string.cp ();
-	const char* end = string.getEnd ();
+	const char* p = string.cp();
+	const char* end = string.getEnd();
 	const char* line = p;
 
 	for (; p < end; p++)
@@ -32,7 +32,7 @@ LineCol::incrementalCount (const sl::StringRef& string)
 			line = p + 1;
 		}
 
-	m_col = (int) (p - line);
+	m_col = (int)(p - line);
 }
 
 //..............................................................................

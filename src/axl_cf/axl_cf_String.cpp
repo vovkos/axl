@@ -19,26 +19,26 @@ namespace cf {
 //..............................................................................
 
 bool
-StringRef::create (CFStringRef src)
+StringRef::create(CFStringRef src)
 {
-	CFStringRef newString = ::CFStringCreateCopy (kCFAllocatorDefault, src);
+	CFStringRef newString = ::CFStringCreateCopy(kCFAllocatorDefault, src);
 	if (!newString)
-		return err::fail (err::SystemErrorCode_InsufficientResources);
+		return err::fail(err::SystemErrorCode_InsufficientResources);
 
-	attach (newString);
+	attach(newString);
 	return true;
 }
 
 bool
-StringRef::create (
+StringRef::create(
 	const char* p,
 	size_t length
 	)
 {
 	if (length == -1)
-		length = strlen_s (p);
+		length = strlen_s(p);
 
-	CFStringRef newString = ::CFStringCreateWithBytes (
+	CFStringRef newString = ::CFStringCreateWithBytes(
 		kCFAllocatorDefault,
 	   (const UInt8*) p,
 	   length,
@@ -47,9 +47,9 @@ StringRef::create (
 	   );
 
 	if (!newString)
-		return err::fail (err::SystemErrorCode_InsufficientResources);
+		return err::fail(err::SystemErrorCode_InsufficientResources);
 
-	attach (newString);
+	attach(newString);
 	return true;
 }
 

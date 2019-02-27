@@ -19,19 +19,19 @@ namespace win {
 //..............................................................................
 
 void*
-VirtualMemory::alloc (
+VirtualMemory::alloc(
 	void* p0,
 	size_t size,
 	uint_t allocationFlags,
 	uint_t protectionFlags
 	)
 {
-	release ();
+	release();
 
-	void* p = ::VirtualAlloc (p0, size, allocationFlags, protectionFlags);
+	void* p = ::VirtualAlloc(p0, size, allocationFlags, protectionFlags);
 	if (!p)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return NULL;
 	}
 
@@ -41,27 +41,27 @@ VirtualMemory::alloc (
 }
 
 void
-VirtualMemory::release ()
+VirtualMemory::release()
 {
 	if (!m_p)
 		return;
 
-	::VirtualFree (m_p, m_size, MEM_RELEASE);
+	::VirtualFree(m_p, m_size, MEM_RELEASE);
 	m_p = NULL;
 	m_size = 0;
 }
 
 bool
-VirtualMemory::protect (
+VirtualMemory::protect(
 	uint_t protectionFlags,
 	uint_t* prevProtectionFlags0
 	)
 {
 	dword_t prevProtectionFlags;
-	bool_t result = ::VirtualProtect (m_p, m_size, protectionFlags, &prevProtectionFlags);
+	bool_t result = ::VirtualProtect(m_p, m_size, protectionFlags, &prevProtectionFlags);
 	if (!result)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return false;
 	}
 

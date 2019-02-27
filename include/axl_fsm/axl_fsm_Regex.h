@@ -25,7 +25,7 @@ class RegexNameMgr
 public:
 	virtual
 	sl::StringRef
-	findName (const sl::StringRef& name) = 0;
+	findName(const sl::StringRef& name) = 0;
 };
 
 //..............................................................................
@@ -35,67 +35,67 @@ class Regex
 	friend class RegexCompiler;
 
 protected:
-	sl::List <NfaState> m_nfaStateList;
-	sl::Array <NfaState*> m_nfaStateArray;
+	sl::List<NfaState> m_nfaStateList;
+	sl::Array<NfaState*> m_nfaStateArray;
 
-	sl::List <DfaState> m_dfaStateList;
-	sl::Array <DfaState*> m_dfaStateArray;
+	sl::List<DfaState> m_dfaStateList;
+	sl::Array<DfaState*> m_dfaStateArray;
 
 	size_t m_groupCount;
 
 public:
-	Regex ()
+	Regex()
 	{
 		m_groupCount = 0;
 	}
 
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
-		return m_nfaStateList.isEmpty ();
+		return m_nfaStateList.isEmpty();
 	}
 
 	size_t
-	getGroupCount () const
+	getGroupCount() const
 	{
 		return m_groupCount;
 	}
 
-	sl::ConstList <NfaState>
-	getNfaStateList () const
+	sl::ConstList<NfaState>
+	getNfaStateList() const
 	{
 		return m_nfaStateList;
 	}
 
-	sl::Array <NfaState*>
-	getNfaStateArray () const
+	sl::Array<NfaState*>
+	getNfaStateArray() const
 	{
 		return m_nfaStateArray;
 	}
 
-	sl::ConstList <DfaState>
-	getDfaStateList () const
+	sl::ConstList<DfaState>
+	getDfaStateList() const
 	{
 		return m_dfaStateList;
 	}
 
-	sl::Array <DfaState*>
-	getDfaStateArray () const
+	sl::Array<DfaState*>
+	getDfaStateArray() const
 	{
 		return m_dfaStateArray;
 	}
 
 	void
-	clear ();
+	clear();
 
 	bool
-	compile (const sl::StringRef& regexp);
+	compile(const sl::StringRef& regexp);
 
 	bool
-	match (const sl::StringRef& string);
+	match(const sl::StringRef& string);
 
 	void
-	print () const;
+	print() const;
 };
 
 //..............................................................................
@@ -132,13 +132,13 @@ protected:
 		sl::String m_string;
 
 		bool
-		isSpecialChar (char c)
+		isSpecialChar(char c)
 		{
 			return m_tokenKind == TokenKind_SpecialChar && m_char == c;
 		}
 
 		bool
-		isValidSingle ();
+		isValidSingle();
 	};
 
 protected:
@@ -151,156 +151,156 @@ protected:
 	Token m_lastToken;
 
 public:
-	RegexCompiler (
+	RegexCompiler(
 		Regex* regex,
 		RegexNameMgr* nameMgr = NULL
 		)
 	{
-		construct (0, regex, nameMgr);
+		construct(0, regex, nameMgr);
 	}
 
-	RegexCompiler (
+	RegexCompiler(
 		uint_t flags,
 		Regex* regex,
 		RegexNameMgr* nameMgr = NULL
 		)
 	{
-		construct (flags, regex, nameMgr);
+		construct(flags, regex, nameMgr);
 	}
 
 	bool
-	compile (
+	compile(
 		const sl::StringRef& source,
 		void* acceptContext = NULL
 		);
 
 	bool
-	incrementalCompile (
+	incrementalCompile(
 		const sl::StringRef& source,
 		void* acceptContext = NULL
 		);
 
 	void
-	finalize ();
+	finalize();
 
 protected:
 	void
-	construct (
+	construct(
 		uint_t flags,
 		Regex* regex,
 		RegexNameMgr* nameMgr
 		);
 
 	bool
-	readHexEscapeSequence (uchar_t* c);
+	readHexEscapeSequence(uchar_t* c);
 
 	bool
-	readEscapeSequence (uchar_t* c);
+	readEscapeSequence(uchar_t* c);
 
 	bool
-	readLiteral (sl::String* string);
+	readLiteral(sl::String* string);
 
 	bool
-	readHexLiteral (sl::String* string);
+	readHexLiteral(sl::String* string);
 
 	bool
-	readIdentifier (sl::String* name);
+	readIdentifier(sl::String* name);
 
 	bool
-	readQuantifier (size_t* count);
+	readQuantifier(size_t* count);
 
 	bool
-	getToken (Token* token);
+	getToken(Token* token);
 
 	bool
-	expectSpecialChar (char c);
+	expectSpecialChar(char c);
 
 	bool
-	expectEof ();
+	expectEof();
 
 	NfaState*
-	expression ();
+	expression();
 
 	NfaState*
-	concat ();
+	concat();
 
 	NfaState*
-	repeat ();
+	repeat();
 
 	NfaState*
-	question (NfaState* start);
+	question(NfaState* start);
 
 	NfaState*
-	star (NfaState* start);
+	star(NfaState* start);
 
 	NfaState*
-	plus (NfaState* start);
+	plus(NfaState* start);
 
 	NfaState*
-	quantify (
+	quantify(
 		NfaState* start,
 		size_t count
 		);
 
 	NfaState*
-	single ();
+	single();
 
 	NfaState*
-	charClass ();
+	charClass();
 
 	NfaState*
-	stdCharClass (uint_t c);
+	stdCharClass(uint_t c);
 
 	NfaState*
-	namedRegex (const sl::StringRef& name);
+	namedRegex(const sl::StringRef& name);
 
 	void
-	stdCharClass (
+	stdCharClass(
 		uint_t c,
 		sl::BitMap* charSet
 		);
 
 	NfaState*
-	literal (const sl::StringRef& string);
+	literal(const sl::StringRef& string);
 
 	NfaState*
-	ch (uint_t c);
+	ch(uint_t c);
 
 	void
-	ch (
+	ch(
 		uint_t c,
 		NfaState* start
 		);
 
 	NfaState*
-	any ();
+	any();
 
 	NfaState*
-	clone (
+	clone(
 		NfaState* first,
 		NfaState* last
 		);
 
 	bool
-	charClassItem (sl::BitMap* charSet);
+	charClassItem(sl::BitMap* charSet);
 
 	NfaState*
-	capturingGroup ();
+	capturingGroup();
 
 	NfaState*
-	nonCapturingGroup ();
+	nonCapturingGroup();
 
 	void
-	assignNfaIds ();
+	assignNfaIds();
 
 	void
-	assignDfaIds ();
+	assignDfaIds();
 
 	void
-	makeDfa ();
+	makeDfa();
 
 	void
-	minimizeDfa ();
+	minimizeDfa();
 };
 
 //..............................................................................

@@ -18,16 +18,16 @@ namespace io {
 //..............................................................................
 
 size_t
-UsbError::create (int code)
+UsbError::create(int code)
 {
-	err::ErrorHdr* error = createBuffer (sizeof (err::ErrorHdr));
+	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
 	if (!error)
 		return -1;
 
-	error->m_size = sizeof (err::ErrorHdr);
+	error->m_size = sizeof(err::ErrorHdr);
 	error->m_guid = g_usbErrorGuid;
 	error->m_code = code;
-	return sizeof (err::ErrorHdr);
+	return sizeof(err::ErrorHdr);
 }
 
 //..............................................................................

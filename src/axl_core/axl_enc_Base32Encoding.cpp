@@ -26,22 +26,22 @@ protected:
 	size_t m_hyphenDistance;
 
 public:
-	Base32Writer (
+	Base32Writer(
 		char* p,
 		size_t length,
 		size_t hyphenDistance
 		);
 
 	void
-	write (uchar_t x);
+	write(uchar_t x);
 
 	void
-	addPadding ();
+	addPadding();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-Base32Writer::Base32Writer (
+Base32Writer::Base32Writer(
 	char* p,
 	size_t length,
 	size_t hyphenDistance
@@ -54,34 +54,34 @@ Base32Writer::Base32Writer (
 }
 
 void
-Base32Writer::write (uchar_t x)
+Base32Writer::write(uchar_t x)
 {
-	static const char charTable [] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+	static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 	if (m_index && m_index % m_hyphenDistance == 0)
 	{
-		ASSERT (m_p < m_end);
+		ASSERT(m_p < m_end);
 		*m_p++ = '-';
 	}
 
-	ASSERT (m_p < m_end);
-	*m_p++ = charTable [x & 0x1f];
+	ASSERT(m_p < m_end);
+	*m_p++ = charTable[x & 0x1f];
 	m_index++;
 }
 
 void
-Base32Writer::addPadding ()
+Base32Writer::addPadding()
 {
-	static const char paddingTable [] = "0189";
+	static const char paddingTable[] = "0189";
 
 	while (m_p < m_end)
-		*m_p++ = paddingTable [rand () % lengthof (paddingTable)];
+		*m_p++ = paddingTable[rand() % lengthof(paddingTable)];
 }
 
 //..............................................................................
 
 size_t
-Base32Encoding::encode (
+Base32Encoding::encode(
 	sl::String* string,
 	const void* p,
 	size_t size,
@@ -90,7 +90,7 @@ Base32Encoding::encode (
 {
 	if (!size)
 	{
-		string->clear ();
+		string->clear();
 		return 0;
 	}
 
@@ -109,11 +109,11 @@ Base32Encoding::encode (
 		length += hyphenCount;
 	}
 
-	char* dst = string->createBuffer (length);
+	char* dst = string->createBuffer(length);
 	if (!dst)
 		return -1;
 
-	Base32Writer writer (dst, length, hyphenDistance);
+	Base32Writer writer(dst, length, hyphenDistance);
 
 	uchar_t x = 0;
 	size_t i = 0;
@@ -124,69 +124,69 @@ Base32Encoding::encode (
 	{
 		uchar_t y = *src;
 
-		switch (i)
+		switch(i)
 		{
 		case 0:
-			writer.write (y);
+			writer.write(y);
 			x = y >> 5;
 			i = 2;
 			break;
 
 		case 1:
-			writer.write (x | (y << 4));
-			writer.write (y >> 1);
+			writer.write(x | (y << 4));
+			writer.write(y >> 1);
 			x = y >> 6;
 			i = 3;
 			break;
 
 		case 2:
-			writer.write (x | (y << 3));
-			writer.write (y >> 2);
+			writer.write(x | (y << 3));
+			writer.write(y >> 2);
 			x = y >> 7;
 			i = 4;
 			break;
 
 		case 3:
-			writer.write (x | (y << 2));
-			writer.write (y >> 3);
+			writer.write(x | (y << 2));
+			writer.write(y >> 3);
 			x = 0;
 			i = 0;
 			break;
 
 		case 4:
-			writer.write (x | (y << 1));
+			writer.write(x | (y << 1));
 			x = y >> 4;
 			i = 1;
 			break;
 
 		default:
-			ASSERT (false);
+			ASSERT(false);
 		}
 	}
 
 	if (i)
-		writer.write (x);
+		writer.write(x);
 
-	writer.addPadding ();
+	writer.addPadding();
 	return length;
 }
 
 size_t
-Base32Encoding::decode (
-	sl::Array <char>* buffer,
+Base32Encoding::decode(
+	sl::Array<char>* buffer,
 	const sl::StringRef& string
 	)
 {
 
-	size_t sizeGuess = (string.getLength () * 5) / 8;
-	buffer->reserve (sizeGuess);
-	buffer->clear ();
+	size_t sizeGuess = (string.getLength() * 5) / 8;
+	buffer->reserve(sizeGuess);
+	buffer->clear();
 
 	uchar_t x = 0;
 	size_t i = 0;
 
-	const char* p = string.cp ();
-	const char* end = string.getEnd ();
+	const char* p = string.cp();
+	const char* end = string.getEnd();
 	for (; p < end; p++)
 	{
 		char c = *p;
@@ -210,19 +210,19 @@ Base32Encoding::decode (
 		}
 		else if (i == 3)
 		{
-			buffer->append (x);
+			buffer->append(x);
 			x = 0;
 			i = 0;
 		}
 		else
 		{
-			buffer->append (x);
+			buffer->append(x);
 			x = y >> (8 - i);
 			i -= 3;
 		}
 	}
 
-	return buffer->getCount ();
+	return buffer->getCount();
 }
 
 //..............................................................................

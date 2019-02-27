@@ -39,7 +39,7 @@ template <
 	typename ConstIterator0,
 	typename Delete0
 	>
-class ListBase: protected ListData <T>
+class ListBase: protected ListData<T>
 {
 public:
 	typedef T Entry;
@@ -47,140 +47,140 @@ public:
 	typedef Iterator0 Iterator;
 	typedef ConstIterator0 ConstIterator;
 	typedef Delete0 Delete;
-	typedef sl::ListData <T> ListData;
+	typedef sl::ListData<T> ListData;
 
 public:
-	ListBase ()
+	ListBase()
 	{
-		construct ();
+		construct();
 	}
 
-	~ListBase ()
+	~ListBase()
 	{
-		clear ();
+		clear();
 	}
 
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
 		return this->m_head == NULL;
 	}
 
 	const ListData*
-	getListData () const
+	getListData() const
 	{
 		return this;
 	}
 
 	size_t
-	getCount () const
+	getCount() const
 	{
 		return this->m_count;
 	}
 
 	Iterator
-	getHead ()
+	getHead()
 	{
 		return this->m_head;
 	}
 
 	ConstIterator
-	getHead () const
+	getHead() const
 	{
 		return this->m_head;
 	}
 
 	Iterator
-	getTail ()
+	getTail()
 	{
 		return this->m_tail;
 	}
 
 	ConstIterator
-	getTail () const
+	getTail() const
 	{
 		return this->m_tail;
 	}
 
 	T*
-	remove (Iterator it)
+	remove(Iterator it)
 	{
-		ListLink* link = it.getLink ();
+		ListLink* link = it.getLink();
 		ListLink* next = link->m_next;
 		ListLink* prev = link->m_prev;
 
 		if (prev)
 			prev->m_next = next;
 		else
-			this->m_head = Iterator::getEntryFromLink (next);
+			this->m_head = Iterator::getEntryFromLink(next);
 
 		if (next)
 			next->m_prev = prev;
 		else
-			this->m_tail = Iterator::getEntryFromLink (prev);
+			this->m_tail = Iterator::getEntryFromLink(prev);
 
 		this->m_count--;
-		return it.getEntry ();
+		return it.getEntry();
 	}
 
 	T*
-	removeHead ()
+	removeHead()
 	{
-		return this->m_head ? remove (this->m_head) : NULL;
+		return this->m_head ? remove(this->m_head) : NULL;
 	}
 
 	T*
-	removeTail ()
+	removeTail()
 	{
-		return this->m_tail ? remove (this->m_tail) : NULL;
+		return this->m_tail ? remove(this->m_tail) : NULL;
 	}
 
 	void
-	clear ()
+	clear()
 	{
 		if (!this->m_head)
 			return;
 
-		ListLink* link = GetLink () (this->m_head);
+		ListLink* link = GetLink() (this->m_head);
 		while (link)
 		{
-			T* p = Iterator::getEntryFromLink (link);
+			T* p = Iterator::getEntryFromLink(link);
 			link = link->m_next;
-			Delete () (p);
+			Delete() (p);
 		}
 
-		construct ();
+		construct();
 	}
 
 	bool
-	clearButHead ()
+	clearButHead()
 	{
-		if (isEmpty ())
+		if (isEmpty())
 			return false;
 
-		T* p = removeHead ();
-		clear ();
-		insertHead (p);
+		T* p = removeHead();
+		clear();
+		insertHead(p);
 		return true;
 	}
 
 	bool
-	clearButTail ()
+	clearButTail()
 	{
-		if (isEmpty ())
+		if (isEmpty())
 			return false;
 
-		T* p = removeTail ();
-		clear ();
-		insertTail (p);
+		T* p = removeTail();
+		clear();
+		insertTail(p);
 		return true;
 	}
 
 	Iterator
-	insertHead (T* p)
+	insertHead(T* p)
 	{
-		ListLink* link = GetLink () (p);
-		ListLink* headLink = Iterator::getLinkFromEntry (this->m_head);
+		ListLink* link = GetLink() (p);
+		ListLink* headLink = Iterator::getLinkFromEntry(this->m_head);
 
 		link->m_prev = NULL;
 		link->m_next = headLink;
@@ -197,10 +197,10 @@ public:
 	}
 
 	Iterator
-	insertTail (T* p)
+	insertTail(T* p)
 	{
-		ListLink* link = GetLink () (p);
-		ListLink* tailLink = Iterator::getLinkFromEntry (this->m_tail);
+		ListLink* link = GetLink() (p);
+		ListLink* tailLink = Iterator::getLinkFromEntry(this->m_tail);
 
 		link->m_next = NULL;
 		link->m_prev = tailLink;
@@ -217,16 +217,16 @@ public:
 	}
 
 	Iterator
-	insertBefore (
+	insertBefore(
 		T* p,
 		Iterator before
 		)
 	{
 		if (!before)
-			return insertTail (p);
+			return insertTail(p);
 
-		ListLink* link = GetLink () (p);
-		ListLink* beforeLink = before.getLink ();
+		ListLink* link = GetLink() (p);
+		ListLink* beforeLink = before.getLink();
 		ListLink* prev = beforeLink->m_prev;
 
 		link->m_next = beforeLink;
@@ -240,20 +240,20 @@ public:
 
 		this->m_count++;
 
-		return Iterator::fromLink (link);
+		return Iterator::fromLink(link);
 	}
 
 	Iterator
-	insertAfter (
+	insertAfter(
 		T* p,
 		Iterator after
 		)
 	{
 		if (!after)
-			return insertHead (p);
+			return insertHead(p);
 
-		ListLink* link = GetLink () (p);
-		ListLink* afterLink = after.getLink ();
+		ListLink* link = GetLink() (p);
+		ListLink* afterLink = after.getLink();
 		ListLink* next = afterLink->m_next;
 
 		link->m_prev = afterLink;
@@ -267,23 +267,23 @@ public:
 
 		this->m_count++;
 
-		return Iterator::fromLink (link);
+		return Iterator::fromLink(link);
 	}
 
 	void
-	insertListHead (ListBase* src)
+	insertListHead(ListBase* src)
 	{
-		if (src->isEmpty ())
+		if (src->isEmpty())
 			return;
 
-		if (isEmpty ())
+		if (isEmpty())
 		{
-			sl::takeOver (this, src);
+			sl::takeOver(this, src);
 			return;
 		}
 
-		ListLink* headLink = GetLink () (this->m_head);
-		ListLink* srcTailLink = GetLink () (src->m_tail);
+		ListLink* headLink = GetLink() (this->m_head);
+		ListLink* srcTailLink = GetLink() (src->m_tail);
 
 		headLink->m_prev = srcTailLink;
 		srcTailLink->m_next = headLink;
@@ -296,19 +296,19 @@ public:
 	}
 
 	void
-	insertListTail (ListBase* src)
+	insertListTail(ListBase* src)
 	{
-		if (src->isEmpty ())
+		if (src->isEmpty())
 			return;
 
-		if (isEmpty ())
+		if (isEmpty())
 		{
-			sl::takeOver (this, src);
+			sl::takeOver(this, src);
 			return;
 		}
 
-		ListLink* tailLink = GetLink () (this->m_tail);
-		ListLink* srcHeadLink = GetLink () (src->m_head);
+		ListLink* tailLink = GetLink() (this->m_tail);
+		ListLink* srcHeadLink = GetLink() (src->m_head);
 
 		tailLink->m_next = srcHeadLink;
 		srcHeadLink->m_prev = tailLink;
@@ -321,46 +321,46 @@ public:
 	}
 
 	void
-	moveBefore (
+	moveBefore(
 		Iterator it,
 		Iterator before
 		)
 	{
-		T* p = it.getEntry ();
-		remove (it);
-		insertBefore (p, before);
+		T* p = it.getEntry();
+		remove(it);
+		insertBefore(p, before);
 	}
 
 	void
-	moveAfter (
+	moveAfter(
 		Iterator it,
 		Iterator after
 		)
 	{
-		T* p = it.getEntry ();
-		remove (it);
-		insertAfter (p, after);
+		T* p = it.getEntry();
+		remove(it);
+		insertAfter(p, after);
 	}
 
 	void
-	moveToHead (Iterator it)
+	moveToHead(Iterator it)
 	{
-		T* p = it.getEntry ();
-		remove (it);
-		insertHead (p);
+		T* p = it.getEntry();
+		remove(it);
+		insertHead(p);
 	}
 
 	void
-	moveToTail (Iterator it)
+	moveToTail(Iterator it)
 	{
-		T* p = it.getEntry ();
-		remove (it);
-		insertTail (p);
+		T* p = it.getEntry();
+		remove(it);
+		insertTail(p);
 	}
 
 protected:
 	void
-	construct ()
+	construct()
 	{
 		this->m_head = NULL;
 		this->m_tail = NULL;
@@ -382,37 +382,37 @@ public:
 	typedef GetLink0 GetLink;
 	typedef Iterator0 Iterator;
 	typedef Iterator0 ConstIterator;
-	typedef sl::ListData <T> ListData;
+	typedef sl::ListData<T> ListData;
 
 protected:
 	const ListData* m_listData;
 
 public:
-	ConstListBase ()
+	ConstListBase()
 	{
 		m_listData = NULL;
 	}
 
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
 		return m_listData ? m_listData->m_head == NULL : true;
 	}
 
 	size_t
-	getCount () const
+	getCount() const
 	{
 		return m_listData ? m_listData->m_count : 0;
 	}
 
 	ConstIterator
-	getHead () const
+	getHead() const
 	{
 		return m_listData ? m_listData->m_head : NULL;
 	}
 
 	ConstIterator
-	getTail () const
+	getTail() const
 	{
 		return m_listData ? m_listData->m_tail : NULL;
 	}
@@ -422,37 +422,37 @@ public:
 
 template <
 	typename T,
-	typename GetLink = ImplicitPtrCast <T, ListLink>,
-	typename Delete = mem::StdDelete <T>
+	typename GetLink = ImplicitPtrCast<T, ListLink>,
+	typename Delete = mem::StdDelete<T>
 	>
-class List: public ListBase <
+class List: public ListBase<
 	T,
 	GetLink,
-	Iterator <T, GetLink>,
-	ConstIterator <T, GetLink>,
+	Iterator<T, GetLink>,
+	ConstIterator<T, GetLink>,
 	Delete
 	>
 {
 public:
 	void
-	erase (typename List::Iterator it)
+	erase(typename List::Iterator it)
 	{
-		T* p = this->remove (it);
-		typename List::Delete () (p);
+		T* p = this->remove(it);
+		typename List::Delete() (p);
 	}
 
 	void
-	eraseHead ()
+	eraseHead()
 	{
-		T* p = this->removeHead ();
-		p ? typename List::Delete () (p) : (void) 0;
+		T* p = this->removeHead();
+		p ? typename List::Delete() (p) : (void) 0;
 	}
 
 	void
-	eraseTail ()
+	eraseTail()
 	{
-		T* p = this->removeTail ();
-		p ? typename List::Delete () (p) : (void) 0;
+		T* p = this->removeTail();
+		p ? typename List::Delete() (p) : (void) 0;
 	}
 };
 
@@ -460,9 +460,9 @@ public:
 
 template <
 	typename T,
-	typename GetLink = ImplicitPtrCast <T, ListLink>
+	typename GetLink = ImplicitPtrCast<T, ListLink>
 	>
-class CppList: public List <T, GetLink, mem::CppDelete <T> >
+class CppList: public List<T, GetLink, mem::CppDelete<T> >
 {
 };
 
@@ -470,15 +470,15 @@ class CppList: public List <T, GetLink, mem::CppDelete <T> >
 
 template <
 	typename T,
-	typename GetLink = ImplicitPtrCast <T, ListLink>
+	typename GetLink = ImplicitPtrCast<T, ListLink>
 	>
-class AuxList: public List <T, GetLink, sl::Void <T*> >
+class AuxList: public List<T, GetLink, sl::Void<T*> >
 {
 public:
 	void
-	clear ()
+	clear()
 	{
-		this->construct ();
+		this->construct();
 	}
 };
 
@@ -486,23 +486,23 @@ public:
 
 template <
 	typename T,
-	typename GetLink = ImplicitPtrCast <T, ListLink>
+	typename GetLink = ImplicitPtrCast<T, ListLink>
 	>
-class ConstList: public ConstListBase <
+class ConstList: public ConstListBase<
 	T,
 	GetLink,
-	ConstIterator <T, GetLink>
+	ConstIterator<T, GetLink>
 	>
 {
 public:
-	ConstList ()
+	ConstList()
 	{
 	}
 
 	template <typename Delete>
-	ConstList (const List <T, GetLink, Delete>& list)
+	ConstList(const List<T, GetLink, Delete>& list)
 	{
-		this->m_listData = list.getListData ();
+		this->m_listData = list.getListData();
 	}
 };
 

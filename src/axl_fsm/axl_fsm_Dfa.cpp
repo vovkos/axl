@@ -17,7 +17,7 @@ namespace fsm {
 
 //..............................................................................
 
-DfaState::DfaState ()
+DfaState::DfaState()
 {
 	m_isAccept = false;
 	m_id = -1;
@@ -26,9 +26,9 @@ DfaState::DfaState ()
 }
 
 bool
-DfaState::addNfaState (NfaState* nfaState)
+DfaState::addNfaState(NfaState* nfaState)
 {
-	bool result = m_nfaStateSet.addState (nfaState);
+	bool result = m_nfaStateSet.addState(nfaState);
 	if (!result)
 		return false;
 
@@ -45,38 +45,38 @@ DfaState::addNfaState (NfaState* nfaState)
 
 	if (nfaState->m_flags & NfaStateFlag_OpenCapture)
 	{
-		ASSERT (nfaState->m_captureId != -1);
-		m_openCaptureIdSet.setBitResize (nfaState->m_captureId);
+		ASSERT(nfaState->m_captureId != -1);
+		m_openCaptureIdSet.setBitResize(nfaState->m_captureId);
 	}
 
 	if (nfaState->m_flags & NfaStateFlag_CloseCapture)
 	{
-		ASSERT (nfaState->m_captureId != -1);
-		m_closeCaptureIdSet.setBitResize (nfaState->m_captureId);
+		ASSERT(nfaState->m_captureId != -1);
+		m_closeCaptureIdSet.setBitResize(nfaState->m_captureId);
 	}
 
 	return true;
 }
 
 void
-DfaState::makeEpsilonClosure ()
+DfaState::makeEpsilonClosure()
 {
-	sl::Array <NfaState*> workingSet = m_nfaStateSet.m_stateArray;
-	while (!workingSet.isEmpty ())
+	sl::Array<NfaState*> workingSet = m_nfaStateSet.m_stateArray;
+	while (!workingSet.isEmpty())
 	{
-		NfaState* nfaState = workingSet.getBackAndPop ();
+		NfaState* nfaState = workingSet.getBackAndPop();
 		if (!(nfaState->m_flags & NfaStateFlag_EpsilonLink))
 			continue;
 
-		bool isAdded = addNfaState (nfaState->m_outState);
+		bool isAdded = addNfaState(nfaState->m_outState);
 		if (isAdded)
-			workingSet.append (nfaState->m_outState);
+			workingSet.append(nfaState->m_outState);
 
 		if (nfaState->m_outState2)
 		{
-			isAdded = addNfaState (nfaState->m_outState2);
+			isAdded = addNfaState(nfaState->m_outState2);
 			if (isAdded)
-				workingSet.append (nfaState->m_outState2);
+				workingSet.append(nfaState->m_outState2);
 		}
 	}
 }

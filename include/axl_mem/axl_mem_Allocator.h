@@ -19,11 +19,11 @@
 
 extern "C"
 void*
-_AXL_MEM_ALLOCATE_IMPL (size_t size);
+_AXL_MEM_ALLOCATE_IMPL(size_t size);
 
 extern "C"
 void
-_AXL_MEM_FREE_IMPL (void* size);
+_AXL_MEM_FREE_IMPL(void* size);
 
 #endif
 
@@ -33,7 +33,7 @@ namespace err {
 // we can't use any of our error facilities here, so use a dedicated function
 
 void
-setOutOfMemoryError ();
+setOutOfMemoryError();
 
 } // namespace err
 
@@ -47,40 +47,40 @@ public:
 #if (defined _AXL_MEM_ALLOCATE_IMPL && defined _AXL_MEM_FREE_IMPL)
 	static
 	void*
-	allocate (size_t size)
+	allocate(size_t size)
 	{
-		return ::_AXL_MEM_ALLOCATE_IMPL (size);
+		return ::_AXL_MEM_ALLOCATE_IMPL(size);
 	}
 
 	static
 	void
-	free (void* p)
+	free(void* p)
 	{
-		::_AXL_MEM_FREE_IMPL (p);
+		::_AXL_MEM_FREE_IMPL(p);
 	}
 #else
 	static
 	void*
-	allocate (size_t size)
+	allocate(size_t size)
 	{
-		void* p = ::malloc (size);
+		void* p = ::malloc(size);
 		if (!p)
 		{
-			err::setOutOfMemoryError ();
+			err::setOutOfMemoryError();
 			return NULL;
 		}
 
 #if (_AXL_DEBUG && !_AXL_CPP_MSC) // MSVC CRT debug heap already does this
-		memset (p, 0xcd, size);
+		memset(p, 0xcd, size);
 #endif
 		return p;
 	}
 
 	static
 	void
-	free (void* p)
+	free(void* p)
 	{
-		::free (p);
+		::free(p);
 	}
 #endif
 };
@@ -92,11 +92,11 @@ class ZeroAllocator: public DirectAllocator
 public:
 	static
 	void*
-	allocate (size_t size)
+	allocate(size_t size)
 	{
-		void* p = DirectAllocator::allocate (size);
+		void* p = DirectAllocator::allocate(size);
 		if (p)
-			memset (p, 0, size);
+			memset(p, 0, size);
 
 		return p;
 	}
@@ -110,16 +110,16 @@ class TrackingAllocator
 public:
 	static
 	void*
-	allocate (
+	allocate(
 		size_t size,
 		const char* tag,
 		const char* filePath,
 		int line
 		)
 	{
-		size_t allocSize = size + sizeof (TrackerBlockHdr);
+		size_t allocSize = size + sizeof(TrackerBlockHdr);
 
-		TrackerBlockHdr* hdr = (TrackerBlockHdr*) BaseAllocator::allocate (allocSize);
+		TrackerBlockHdr* hdr = (TrackerBlockHdr*)BaseAllocator::allocate(allocSize);
 		if (!hdr)
 			return NULL;
 
@@ -128,18 +128,18 @@ public:
 		hdr->m_filePath = filePath;
 		hdr->m_line = line;
 
-		addTrackerBlock (hdr);
+		addTrackerBlock(hdr);
 
 		return hdr + 1;
 	}
 
 	static
 	void
-	free (void* p)
+	free(void* p)
 	{
-		TrackerBlockHdr* hdr = (TrackerBlockHdr*) p - 1;
-		removeTrackerBlock (hdr);
-		BaseAllocator::free (hdr);
+		TrackerBlockHdr* hdr = (TrackerBlockHdr*)p - 1;
+		removeTrackerBlock(hdr);
+		BaseAllocator::free(hdr);
 	}
 };
 
@@ -152,7 +152,7 @@ public:
 	void*
 	operator () (size_t size) const
 	{
-		return BaseAllocator::allocate (size);
+		return BaseAllocator::allocate(size);
 	}
 };
 
@@ -165,7 +165,7 @@ public:
 	void
 	operator () (void* p) const
 	{
-		BaseAllocator::free (p);
+		BaseAllocator::free(p);
 	}
 };
 
@@ -183,7 +183,7 @@ public:
 		int line
 		) const
 	{
-		return TrackingAllocator <BaseAllocator>::allocate (size, tag, filePath, line);
+		return TrackingAllocator<BaseAllocator>::allocate(size, tag, filePath, line);
 	}
 };
 
@@ -196,7 +196,7 @@ public:
 	void
 	operator () (void* p) const
 	{
-		TrackingAllocator <BaseAllocator>::free (p);
+		TrackingAllocator<BaseAllocator>::free(p);
 	}
 };
 
@@ -204,19 +204,19 @@ public:
 
 #ifdef _AXL_DEBUG
 
-typedef TrackingAllocator <DirectAllocator> StdAllocator;
-typedef TrackingAllocator <ZeroAllocator>   StdZeroAllocator;
-typedef TrackingAllocate <DirectAllocator>  StdAllocate;
-typedef TrackingAllocate <ZeroAllocator>    StdZeroAllocate;
-typedef TrackingFree <DirectAllocator>      StdFree;
+typedef TrackingAllocator<DirectAllocator> StdAllocator;
+typedef TrackingAllocator<ZeroAllocator>   StdZeroAllocator;
+typedef TrackingAllocate<DirectAllocator>  StdAllocate;
+typedef TrackingAllocate<ZeroAllocator>    StdZeroAllocate;
+typedef TrackingFree<DirectAllocator>      StdFree;
 
 #else
 
 typedef DirectAllocator            StdAllocator;
 typedef ZeroAllocator              StdZeroAllocator;
-typedef Allocate <DirectAllocator> StdAllocate;
-typedef Allocate <ZeroAllocator>   StdZeroAllocate;
-typedef Free <DirectAllocator>     StdFree;
+typedef Allocate<DirectAllocator> StdAllocate;
+typedef Allocate<ZeroAllocator>   StdZeroAllocate;
+typedef Free<DirectAllocator>     StdFree;
 
 #endif
 
@@ -225,29 +225,29 @@ typedef Free <DirectAllocator>     StdFree;
 #ifdef _AXL_DEBUG
 
 #define AXL_MEM_ALLOCATE_EX(size, tag) \
-	(axl::mem::StdAllocator::allocate (size, tag, __FILE__, __LINE__))
+	(axl::mem::StdAllocator::allocate(size, tag, __FILE__, __LINE__))
 
 #define AXL_MEM_ZERO_ALLOCATE_EX(size, tag) \
-	(axl::mem::StdZeroAllocator::allocate (size, tag, __FILE__, __LINE__))
+	(axl::mem::StdZeroAllocator::allocate(size, tag, __FILE__, __LINE__))
 
 #else
 
 #define AXL_MEM_ALLOCATE_EX(size, tag) \
-	(axl::mem::StdAllocator::allocate (size))
+	(axl::mem::StdAllocator::allocate(size))
 
 #define AXL_MEM_ZERO_ALLOCATE_EX(size, tag) \
-	(axl::mem::StdZeroAllocator::allocate (size))
+	(axl::mem::StdZeroAllocator::allocate(size))
 
 #endif
 
 #define AXL_MEM_ALLOCATE(size) \
-	AXL_MEM_ALLOCATE_EX (size, "<buffer>")
+	AXL_MEM_ALLOCATE_EX(size, "<buffer>")
 
 #define AXL_MEM_ZERO_ALLOCATE(size) \
-	AXL_MEM_ZERO_ALLOCATE_EX (size, "<buffer>")
+	AXL_MEM_ZERO_ALLOCATE_EX(size, "<buffer>")
 
 #define AXL_MEM_FREE(p) \
-	(axl::mem::StdAllocator::free (p))
+	(axl::mem::StdAllocator::free(p))
 
 //..............................................................................
 

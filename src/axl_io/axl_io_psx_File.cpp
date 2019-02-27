@@ -20,33 +20,33 @@ namespace psx {
 //..............................................................................
 
 bool
-File::open (
+File::open(
 	const sl::StringRef& fileName,
 	uint_t openFlags,
 	mode_t mode
 	)
 {
-	close ();
+	close();
 
-	m_h = ::open (fileName.sz (), openFlags, mode);
-	return err::complete (m_h != -1);
+	m_h = ::open(fileName.sz(), openFlags, mode);
+	return err::complete(m_h != -1);
 }
 
 bool
-File::duplicate (int fd)
+File::duplicate(int fd)
 {
-	close ();
+	close();
 
-	m_h = ::dup (fd);
-	return err::complete (m_h != -1);
+	m_h = ::dup(fd);
+	return err::complete(m_h != -1);
 }
 
 bool
-File::setBlockingMode (bool isBlocking)
+File::setBlockingMode(bool isBlocking)
 {
-	int result = ::fcntl (m_h, F_GETFL, 0);
+	int result = ::fcntl(m_h, F_GETFL, 0);
 	if (result == -1)
-		return err::failWithLastSystemError ();
+		return err::failWithLastSystemError();
 
 	int flags = result;
 	if (isBlocking)
@@ -54,24 +54,24 @@ File::setBlockingMode (bool isBlocking)
 	else
 		flags |= O_NONBLOCK;
 
-	result = ::fcntl (m_h, F_SETFL, flags);
-	return err::complete (result != -1);
+	result = ::fcntl(m_h, F_SETFL, flags);
+	return err::complete(result != -1);
 }
 
 uint64_t
-File::getSize () const
+File::getSize() const
 {
 #if (_AXL_OS_DARWIN)
 	struct stat stat;
-	int result = ::fstat (m_h, &stat);
+	int result = ::fstat(m_h, &stat);
 #else
 	struct stat64 stat;
-	int result = ::fstat64 (m_h, &stat);
+	int result = ::fstat64(m_h, &stat);
 #endif
 
 	if (result == -1)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return -1;
 	}
 
@@ -79,28 +79,28 @@ File::getSize () const
 }
 
 uint64_t
-File::getPosition () const
+File::getPosition() const
 {
 #if (_AXL_OS_DARWIN)
-	uint64_t offset = ::lseek (m_h, 0, SEEK_CUR);
+	uint64_t offset = ::lseek(m_h, 0, SEEK_CUR);
 #else
-	uint64_t offset = ::lseek64 (m_h, 0, SEEK_CUR);
+	uint64_t offset = ::lseek64(m_h, 0, SEEK_CUR);
 #endif
 
 	if (offset == -1)
-		err::setLastSystemError ();
+		err::setLastSystemError();
 
 	return offset;
 }
 
 size_t
-File::getIncomingDataSize ()
+File::getIncomingDataSize()
 {
 	int value;
-	int result = ::ioctl (m_h, FIONREAD, &value);
+	int result = ::ioctl(m_h, FIONREAD, &value);
 	if (result == -1)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return -1;
 	}
 
@@ -108,27 +108,27 @@ File::getIncomingDataSize ()
 }
 
 size_t
-File::read (
+File::read(
 	void* p,
 	size_t size
 	) const
 {
-	size_t actualSize = ::read (m_h, p, size);
+	size_t actualSize = ::read(m_h, p, size);
 	if (actualSize == -1)
-		err::setLastSystemError ();
+		err::setLastSystemError();
 
 	return actualSize;
 }
 
 size_t
-File::write (
+File::write(
 	const void* p,
 	size_t size
 	)
 {
-	size_t actualSize = ::write (m_h, p, size);
+	size_t actualSize = ::write(m_h, p, size);
 	if (actualSize == -1)
-		err::setLastSystemError ();
+		err::setLastSystemError();
 
 	return actualSize;
 }

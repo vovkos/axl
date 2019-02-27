@@ -29,7 +29,7 @@ template <
 	typename Key,
 	typename Value
 	>
-struct HashTableEntry: MapEntry <Key, Value>
+struct HashTableEntry: MapEntry<Key, Value>
 {
 	template <
 		typename Key2,
@@ -52,7 +52,7 @@ protected:
 		}
 	};
 
-	typedef AuxList <HashTableEntry, BucketLink> Bucket;
+	typedef AuxList<HashTableEntry, BucketLink> Bucket;
 
 protected:
 	ListLink m_bucketLink;
@@ -65,16 +65,16 @@ template <
 	typename Key,
 	typename Value
 	>
-class HashTableIterator: public Iterator <HashTableEntry <Key, Value> >
+class HashTableIterator: public Iterator<HashTableEntry<Key, Value> >
 {
 public:
-	HashTableIterator ()
+	HashTableIterator()
 	{
 	}
 
-	HashTableIterator (const Iterator <HashTableEntry <Key, Value> >& src)
+	HashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src)
 	{
-		this->m_p = src.getEntry ();
+		this->m_p = src.getEntry();
 	}
 };
 
@@ -82,16 +82,16 @@ template <
 	typename Key,
 	typename Value
 	>
-class ConstHashTableIterator: public ConstIterator <HashTableEntry <Key, Value> >
+class ConstHashTableIterator: public ConstIterator<HashTableEntry<Key, Value> >
 {
 public:
-	ConstHashTableIterator ()
+	ConstHashTableIterator()
 	{
 	}
 
-	ConstHashTableIterator (const ConstIterator <HashTableEntry <Key, Value> >& src)
+	ConstHashTableIterator(const ConstIterator<HashTableEntry<Key, Value> >& src)
 	{
-		this->m_p = src.getEntry ();
+		this->m_p = src.getEntry();
 	}
 };
 
@@ -101,9 +101,9 @@ template <
 	typename Key,
 	typename Value,
 	typename Hash,
-	typename Eq = Eq <Key>,
-	typename KeyArg = typename ArgType <Key>::Type,
-	typename ValueArg = typename ArgType <Value>::Type
+	typename Eq = Eq<Key>,
+	typename KeyArg = typename ArgType<Key>::Type,
+	typename ValueArg = typename ArgType<Value>::Type
 	>
 class HashTable
 {
@@ -114,22 +114,22 @@ public:
 		Def_ResizeThreshold    = 75,
 	};
 
-	typedef HashTableEntry <Key, Value> Entry;
-	typedef sl::Iterator <Entry> Iterator;
-	typedef sl::ConstIterator <Entry> ConstIterator;
+	typedef HashTableEntry<Key, Value> Entry;
+	typedef sl::Iterator<Entry> Iterator;
+	typedef sl::ConstIterator<Entry> ConstIterator;
 	typedef typename Entry::Bucket Bucket;
 
 protected:
-	List <Entry> m_list;
-	Array <Bucket> m_table;
+	List<Entry> m_list;
+	Array<Bucket> m_table;
 	size_t m_resizeThreshold;
 	Hash m_hash;
 	Eq m_eq;
 
 public:
-	explicit HashTable (
-		const Hash& hash = Hash (),
-		const Eq& eq = Eq ()
+	explicit HashTable(
+		const Hash& hash = Hash(),
+		const Eq& eq = Eq()
 		)
 	{
 		m_resizeThreshold = Def_ResizeThreshold;
@@ -140,78 +140,78 @@ public:
 	Value&
 	operator [] (KeyArg key)
 	{
-		return this->visit (key)->m_value;
+		return this->visit(key)->m_value;
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		m_table.clear ();
-		m_list.clear ();
+		m_table.clear();
+		m_list.clear();
 	}
 
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
-		return m_list.isEmpty ();
+		return m_list.isEmpty();
 	}
 
 	Iterator
-	getHead ()
+	getHead()
 	{
-		return m_list.getHead ();
+		return m_list.getHead();
 	}
 
 	ConstIterator
-	getHead () const
+	getHead() const
 	{
-		return m_list.getHead ();
+		return m_list.getHead();
 	}
 
 	Iterator
-	getTail ()
+	getTail()
 	{
-		return m_list.getHead ();
+		return m_list.getHead();
 	}
 
 	ConstIterator
-	getTail () const
+	getTail() const
 	{
-		return m_list.getHead ();
+		return m_list.getHead();
 	}
 
 	size_t
-	getCount () const
+	getCount() const
 	{
-		return m_list.getCount ();
+		return m_list.getCount();
 	}
 
 	size_t
-	getBucketCount () const
+	getBucketCount() const
 	{
-		return m_table.getCount ();
+		return m_table.getCount();
 	}
 
 	bool
-	setBucketCount (size_t bucketCount)
+	setBucketCount(size_t bucketCount)
 	{
-		Array <Bucket> newTable;
-		bool result = newTable.setCount (bucketCount);
+		Array<Bucket> newTable;
+		bool result = newTable.setCount(bucketCount);
 		if (!result)
 			return false;
 
-		size_t oldBucketCount = m_table.getCount ();
+		size_t oldBucketCount = m_table.getCount();
 		for (size_t i = 0; i < oldBucketCount; i++)
 		{
-			Bucket* oldBucket = &m_table [i];
-			while (!oldBucket->isEmpty ())
+			Bucket* oldBucket = &m_table[i];
+			while (!oldBucket->isEmpty())
 			{
-				Entry* entry = oldBucket->removeHead ();
-				size_t hash = m_hash (entry->m_key);
+				Entry* entry = oldBucket->removeHead();
+				size_t hash = m_hash(entry->m_key);
 
-				Bucket* newBucket = &newTable [hash % bucketCount];
+				Bucket* newBucket = &newTable[hash % bucketCount];
 				entry->m_bucket = newBucket;
-				newBucket->insertTail (entry);
+				newBucket->insertTail(entry);
 			}
 		}
 
@@ -220,31 +220,31 @@ public:
 	}
 
 	size_t
-	getResizeThreshold () const
+	getResizeThreshold() const
 	{
 		return m_resizeThreshold;
 	}
 
 	void
-	setResizeThreshold (size_t resizeThreshold)
+	setResizeThreshold(size_t resizeThreshold)
 	{
 		m_resizeThreshold = resizeThreshold;
 	}
 
 	Iterator
-	find (KeyArg key)
+	find(KeyArg key)
 	{
-		size_t bucketCount = m_table.getCount ();
+		size_t bucketCount = m_table.getCount();
 		if (!bucketCount)
 			return NULL;
 
-		size_t hash = m_hash (key);
-		Bucket* bucket = &m_table [hash % bucketCount];
+		size_t hash = m_hash(key);
+		Bucket* bucket = &m_table[hash % bucketCount];
 
-		typename Bucket::Iterator it = bucket->getHead ();
+		typename Bucket::Iterator it = bucket->getHead();
 		for (; it; it++)
 		{
-			bool isEqual = m_eq (key, it->m_key);
+			bool isEqual = m_eq(key, it->m_key);
 			if (isEqual)
 				return it;
 		}
@@ -253,92 +253,92 @@ public:
 	}
 
 	ConstIterator
-	find (KeyArg key) const
+	find(KeyArg key) const
 	{
-		return ((HashTable*) this)->find (key); // a simple const-cast
+		return ((HashTable*)this)->find(key); // a simple const-cast
 	}
 
 	Value
-	findValue (
+	findValue(
 		KeyArg key,
 		ValueArg undefinedValue
 		) const
 	{
-		ConstIterator it = this->find (key);
+		ConstIterator it = this->find(key);
 		return it ? it->m_value : undefinedValue;
 	}
 
 	Iterator
-	visit (KeyArg key)
+	visit(KeyArg key)
 	{
-		size_t bucketCount = m_table.getCount ();
+		size_t bucketCount = m_table.getCount();
 		if (!bucketCount)
 		{
 			bucketCount = Def_InitialBucketCount;
 
-			bool result = m_table.setCount (bucketCount);
+			bool result = m_table.setCount(bucketCount);
 			if (!result)
 				return NULL;
 		}
 
-		size_t hash = m_hash (key);
-		Bucket* bucket = &m_table [hash % bucketCount];
+		size_t hash = m_hash(key);
+		Bucket* bucket = &m_table[hash % bucketCount];
 
-		typename Bucket::Iterator it = bucket->getHead ();
+		typename Bucket::Iterator it = bucket->getHead();
 		for (; it; it++)
 		{
-			bool isEqual = m_eq (key, it->m_key);
+			bool isEqual = m_eq(key, it->m_key);
 			if (isEqual)
 				return it;
 		}
 
-		Entry* entry = AXL_MEM_ZERO_NEW (Entry);
+		Entry* entry = AXL_MEM_ZERO_NEW(Entry);
 		entry->m_key = key;
 		entry->m_bucket = bucket;
-		m_list.insertTail (entry);
-		bucket->insertTail (entry);
+		m_list.insertTail(entry);
+		bucket->insertTail(entry);
 
 	#if (AXL_PTR_BITS == 64)
-		size_t loadFactor = getCount () * 100 / bucketCount;
+		size_t loadFactor = getCount() * 100 / bucketCount;
 	#else
-		size_t loadFactor = (size_t) ((uint64_t) getCount () * 100 / bucketCount);
+		size_t loadFactor = (size_t)((uint64_t)getCount() * 100 / bucketCount);
 	#endif
 
 		if (loadFactor > m_resizeThreshold)
-			setBucketCount (bucketCount * 2);
+			setBucketCount(bucketCount * 2);
 
 		return entry;
 	}
 
 	Iterator
-	add (
+	add(
 		KeyArg key,
 		ValueArg value,
 		bool* isNew = NULL
 		)
 	{
-		size_t prevCount = this->getCount ();
+		size_t prevCount = this->getCount();
 
-		Iterator it = this->visit (key);
+		Iterator it = this->visit(key);
 		it->m_value = value;
 
 		if (isNew)
-			*isNew = this->getCount () > prevCount;
+			*isNew = this->getCount() > prevCount;
 
 		return it;
 	}
 
 	Iterator
-	addIfNotExists (
+	addIfNotExists(
 		KeyArg key,
 		ValueArg value
 		)
 	{
-		size_t prevCount = this->getCount ();
+		size_t prevCount = this->getCount();
 
-		Iterator it = this->visit (key);
+		Iterator it = this->visit(key);
 
-		if (this->getCount () == prevCount)
+		if (this->getCount() == prevCount)
 			return NULL;
 
 		it->m_value = value;
@@ -346,22 +346,22 @@ public:
 	}
 
 	void
-	erase (Iterator it)
+	erase(Iterator it)
 	{
 		Entry* entry = *it;
-		entry->m_bucket->remove (entry);
-		m_list.remove (entry);
-		AXL_MEM_DELETE (entry);
+		entry->m_bucket->remove(entry);
+		m_list.remove(entry);
+		AXL_MEM_DELETE(entry);
 	}
 
 	bool
-	eraseKey (KeyArg key)
+	eraseKey(KeyArg key)
 	{
-		Iterator it = find (key);
+		Iterator it = find(key);
 		if (!it)
 			return false;
 
-		erase (it);
+		erase(it);
 		return true;
 	}
 };
@@ -373,14 +373,14 @@ public:
 template <
 	typename Key,
 	typename Value,
-	typename KeyArg = typename ArgType <Key>::Type,
-	typename ValueArg = typename ArgType <Value>::Type
+	typename KeyArg = typename ArgType<Key>::Type,
+	typename ValueArg = typename ArgType<Value>::Type
 	>
-class SimpleHashTable: public HashTable <
+class SimpleHashTable: public HashTable<
 	Key,
 	Value,
-	sl::HashId <Key>,
-	sl::Eq <Key>,
+	sl::HashId<Key>,
+	sl::Eq<Key>,
 	KeyArg,
 	ValueArg
 	>
@@ -394,14 +394,14 @@ class SimpleHashTable: public HashTable <
 template <
 	typename Key,
 	typename Value,
-	typename KeyArg = typename ArgType <Key>::Type,
-	typename ValueArg = typename ArgType <Value>::Type
+	typename KeyArg = typename ArgType<Key>::Type,
+	typename ValueArg = typename ArgType<Value>::Type
 	>
-class DuckTypeHashTable: public HashTable <
+class DuckTypeHashTable: public HashTable<
 	Key,
 	Value,
-	sl::HashDuckType <Key>,
-	sl::EqDuckType <Key>,
+	sl::HashDuckType<Key>,
+	sl::EqDuckType<Key>,
 	KeyArg,
 	ValueArg
 	>
@@ -415,13 +415,13 @@ class DuckTypeHashTable: public HashTable <
 template <
 	typename Key,
 	typename Value,
-	typename ValueArg = typename ArgType <Value>::Type
+	typename ValueArg = typename ArgType<Value>::Type
 	>
-class DuckTypePtrHashTable: public HashTable <
+class DuckTypePtrHashTable: public HashTable<
 	Key*,
 	Value,
-	sl::HashDuckType <Key>,
-	sl::EqDuckType <Key>,
+	sl::HashDuckType<Key>,
+	sl::EqDuckType<Key>,
 	Key*,
 	ValueArg
 	>
@@ -434,13 +434,13 @@ class DuckTypePtrHashTable: public HashTable <
 class Class \
 { \
 public: \
-	typedef axl::sl::HashTable <Key, Value, Hash, Eq, KeyArg, ValueArg> MapBase; \
+	typedef axl::sl::HashTable<Key, Value, Hash, Eq, KeyArg, ValueArg> MapBase; \
 	typedef MapBase::Iterator Iterator; \
 	static \
 	Iterator \
-	find (KeyArg key) \
+	find(KeyArg key) \
 	{ \
-		return axl::sl::getSingleton <Map> ()->find (key); \
+		return axl::sl::getSingleton<Map> ()->find(key); \
 	} \
 	static \
 	Value \
@@ -449,17 +449,17 @@ public: \
 		ValueArg undefinedValue \
 		) \
 	{ \
-		return axl::sl::getSingleton <Map> ()->findValue (key, undefinedValue); \
+		return axl::sl::getSingleton<Map> ()->findValue(key, undefinedValue); \
 	} \
 protected: \
 	class Map: public MapBase \
 	{ \
 	public: \
-		Map () \
+		Map() \
 		{
 
 #define AXL_SL_HASH_TABLE_ENTRY(key, value) \
-			visit (key)->m_value = value;
+			visit(key)->m_value = value;
 
 #define AXL_SL_END_HASH_TABLE() \
 		} \
@@ -472,9 +472,9 @@ protected: \
 		Key, \
 		Value, \
 		Hash, \
-		axl::sl::Eq <Key>, \
-		axl::sl::ArgType <Key>::Type, \
-		axl::sl::ArgType <Value>::Type \
+		axl::sl::Eq<Key>, \
+		axl::sl::ArgType<Key>::Type, \
+		axl::sl::ArgType<Value>::Type \
 		)
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -484,11 +484,11 @@ protected: \
 		Class, \
 		Key, \
 		Value, \
-		axl::sl::HashId <Key> \
+		axl::sl::HashId<Key> \
 		)
 
 #define AXL_SL_END_SIMPLE_HASH_TABLE() \
-	AXL_SL_END_HASH_TABLE ()
+	AXL_SL_END_HASH_TABLE()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -497,14 +497,14 @@ protected: \
 		Class, \
 		Key, \
 		Value, \
-		axl::sl::HashDuckType <Key>, \
-		axl::sl::EqDuckType <Key>, \
-		axl::sl::ArgType <Key>::Type, \
-		axl::sl::ArgType <Value>::Type \
+		axl::sl::HashDuckType<Key>, \
+		axl::sl::EqDuckType<Key>, \
+		axl::sl::ArgType<Key>::Type, \
+		axl::sl::ArgType<Value>::Type \
 		)
 
 #define AXL_SL_END_DUCK_TYPE_HASH_TABLE() \
-	AXL_SL_END_HASH_TABLE ()
+	AXL_SL_END_HASH_TABLE()
 
 //..............................................................................
 

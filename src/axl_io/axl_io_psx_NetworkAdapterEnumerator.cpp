@@ -26,19 +26,19 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	createAdapterList (sl::List <NetworkAdapterDesc>* adapterList);
+	createAdapterList(sl::List<NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
 	void
-	setupAdapter (
+	setupAdapter(
 		NetworkAdapterDesc* adapter,
 		ifaddrs* iface
 		);
 
 	static
 	void
-	addAdapterAddress (
+	addAdapterAddress(
 		NetworkAdapterDesc* adapter,
 		const sockaddr* addr,
 		const sockaddr* netMask
@@ -48,47 +48,47 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::createAdapterList (sl::List <NetworkAdapterDesc>* adapterList)
+NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapterList)
 {
-	adapterList->clear ();
+	adapterList->clear();
 
 	ifaddrs* ifaceAddressList = NULL;
-	int result = getifaddrs (&ifaceAddressList);
+	int result = getifaddrs(&ifaceAddressList);
 	if (result != 0 || !ifaceAddressList)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return -1;
 	}
 
-	sl::StringHashTable <NetworkAdapterDesc*> adapterMap;
+	sl::StringHashTable<NetworkAdapterDesc*> adapterMap;
 
 	for (ifaddrs* iface = ifaceAddressList; iface; iface = iface->ifa_next)
 	{
 		if (!(iface->ifa_flags & IFF_UP))
 			continue;
 
-		sl::StringHashTableIterator <NetworkAdapterDesc*> it = adapterMap.visit (iface->ifa_name);
+		sl::StringHashTableIterator<NetworkAdapterDesc*> it = adapterMap.visit(iface->ifa_name);
 		if (it->m_value)
 		{
 			if (iface->ifa_addr)
-				addAdapterAddress (it->m_value, iface->ifa_addr, iface->ifa_netmask);
+				addAdapterAddress(it->m_value, iface->ifa_addr, iface->ifa_netmask);
 
 			continue;
 		}
 
-		NetworkAdapterDesc* adapter = AXL_MEM_NEW (NetworkAdapterDesc);
-		setupAdapter (adapter, iface);
-		adapterList->insertTail (adapter);
+		NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
+		setupAdapter(adapter, iface);
+		adapterList->insertTail(adapter);
 
 		it->m_value = adapter;
 	}
 
-	freeifaddrs (ifaceAddressList);
-	return adapterList->getCount ();
+	freeifaddrs(ifaceAddressList);
+	return adapterList->getCount();
 }
 
 void
-NetworkAdapterEnumerator::setupAdapter (
+NetworkAdapterEnumerator::setupAdapter(
 	NetworkAdapterDesc* adapter,
 	ifaddrs* iface
 	)
@@ -111,24 +111,24 @@ NetworkAdapterEnumerator::setupAdapter (
 }
 
 void
-NetworkAdapterEnumerator::addAdapterAddress (
+NetworkAdapterEnumerator::addAdapterAddress(
 	NetworkAdapterDesc* adapter,
 	const sockaddr* addr,
 	const sockaddr* netMask
 	)
 {
-	NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);
-	address->m_address.setup (addr);
-	address->m_netMaskBitCount = netMask ? getSockAddrNetMaskBitCount (netMask) : 0;
-	adapter->m_addressList.insertTail (address);
+	NetworkAdapterAddress* address = AXL_MEM_NEW(NetworkAdapterAddress);
+	address->m_address.setup(addr);
+	address->m_netMaskBitCount = netMask ? getSockAddrNetMaskBitCount(netMask) : 0;
+	adapter->m_addressList.insertTail(address);
 }
 
 //..............................................................................
 
 size_t
-createNetworkAdapterDescList (sl::List <NetworkAdapterDesc>* adapterList)
+createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList)
 {
-	return NetworkAdapterEnumerator::createAdapterList (adapterList);
+	return NetworkAdapterEnumerator::createAdapterList(adapterList);
 }
 
 //..............................................................................

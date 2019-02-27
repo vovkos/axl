@@ -18,13 +18,13 @@ namespace sl {
 //..............................................................................
 
 axl_va_list
-PackerSeq::pack_va (
+PackerSeq::pack_va(
 	void* _p,
 	size_t* size,
 	axl_va_list va
 	)
 {
-	size_t count = m_sequence.getCount ();
+	size_t count = m_sequence.getCount();
 	size_t totalSize = 0;
 
 	if (!_p)
@@ -32,19 +32,19 @@ PackerSeq::pack_va (
 		for (size_t i = 0; i < count; i++)
 		{
 			size_t size = 0;
-			va = m_sequence [i]->pack_va (NULL, &size, va);
+			va = m_sequence[i]->pack_va(NULL, &size, va);
 			totalSize += size;
 		}
 	}
 	else
 	{
-		uchar_t* p = (uchar_t*) _p;
+		uchar_t* p = (uchar_t*)_p;
 
 		for (size_t i = 0; i < count; i++)
 		{
 			size_t size = 0;
 
-			va = m_sequence [i]->pack_va (p, &size, va);
+			va = m_sequence[i]->pack_va(p, &size, va);
 
 			p += size;
 			totalSize += size;
@@ -56,10 +56,10 @@ PackerSeq::pack_va (
 }
 
 size_t
-PackerSeq::appendFormat (const char* formatString)
+PackerSeq::appendFormat(const char* formatString)
 {
 	if (!formatString)
-		return m_sequence.getCount ();
+		return m_sequence.getCount();
 
 	const char* pF = formatString;
 
@@ -70,7 +70,7 @@ PackerSeq::appendFormat (const char* formatString)
 
 		pF++;
 
-		switch (*pF)
+		switch(*pF)
 		{
 		case 'd':
 		case 'i':
@@ -78,7 +78,7 @@ PackerSeq::appendFormat (const char* formatString)
 		case 'u':
 		case 'x':
 		case 'X':
-			append <Pack <int> > ();
+			append<Pack<int> > ();
 			break;
 
 		case 'e':
@@ -86,62 +86,62 @@ PackerSeq::appendFormat (const char* formatString)
 		case 'f':
 		case 'g':
 		case 'G':
-			append <Pack <double> > ();
+			append<Pack<double> > ();
 			break;
 
 		case 'p':
-			append <Pack <size_t> > ();
+			append<Pack<size_t> > ();
 			break;
 
 		case 's':
-			append <PackString> ();
+			append<PackString> ();
 			break;
 
 		case 'c':
-			append <Pack <char> > ();
+			append<Pack<char> > ();
 			break;
 
 		case 'S':
-			append <PackString_w> ();
+			append<PackString_w> ();
 			break;
 
 		case 'C':
-			append <Pack <wchar_t> > ();
+			append<Pack<wchar_t> > ();
 			break;
 
 		case 'B':
-			append <Pack <uint8_t> > ();
+			append<Pack<uint8_t> > ();
 			break;
 
 		case 'W':
-			append <Pack <uint16_t> > ();
+			append<Pack<uint16_t> > ();
 			break;
 
 		case 'D':
-			append <Pack <uint32_t> > ();
+			append<Pack<uint32_t> > ();
 			break;
 
 		case 'Z':
-			append <Pack <size_t> > ();
+			append<Pack<size_t> > ();
 			break;
 
 		case 'P':
-			append <PackPtrSize> ();
+			append<PackPtrSize> ();
 			break;
 
 		case 'R':
-			append <PackLastError> ();
+			append<PackLastError> ();
 			break;
 		}
 	}
 
-	return m_sequence.getCount ();
+	return m_sequence.getCount();
 }
 
 //..............................................................................
 
 size_t
-Package::append_va (
+Package::append_va(
 	Packer* packer,
 	axl_va_list va
 	)
@@ -149,35 +149,35 @@ Package::append_va (
 	bool result;
 
 	size_t size;
-	packer->pack_va (NULL, &size, va);
+	packer->pack_va(NULL, &size, va);
 
-	size_t oldSize = m_buffer.getCount ();
+	size_t oldSize = m_buffer.getCount();
 	size_t newSize = oldSize + size;
 
-	result = m_buffer.setCount (newSize);
+	result = m_buffer.setCount(newSize);
 	if (!result)
 		return oldSize;
 
-	packer->pack_va (m_buffer + oldSize, &size, va);
+	packer->pack_va(m_buffer + oldSize, &size, va);
 	return newSize;
 }
 
 size_t
-Package::append (
+Package::append(
 	const void* p,
 	size_t size
 	)
 {
 	bool result;
 
-	size_t oldSize = m_buffer.getCount ();
+	size_t oldSize = m_buffer.getCount();
 	size_t newSize = oldSize + size;
 
-	result = m_buffer.setCount (newSize);
+	result = m_buffer.setCount(newSize);
 	if (!result)
 		return oldSize;
 
-	memcpy (m_buffer + oldSize, p, size);
+	memcpy(m_buffer + oldSize, p, size);
 	return newSize;
 }
 

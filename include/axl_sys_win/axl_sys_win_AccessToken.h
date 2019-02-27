@@ -27,72 +27,72 @@ class AccessToken: public Handle
 {
 public:
 	bool
-	openProcessToken (
+	openProcessToken(
 		handle_t process,
 		dword_t access = TOKEN_ALL_ACCESS
 		);
 
 	bool
-	openProcessToken (dword_t access = TOKEN_ALL_ACCESS)
+	openProcessToken(dword_t access = TOKEN_ALL_ACCESS)
 	{
-		return openProcessToken (::GetCurrentProcess (), access);
+		return openProcessToken(::GetCurrentProcess(), access);
 	}
 
 	bool
-	openThreadToken (
+	openThreadToken(
 		handle_t thread,
 		dword_t access = TOKEN_ALL_ACCESS,
 		bool openAsSelf = false
 		);
 
 	bool
-	openThreadToken (
+	openThreadToken(
 		dword_t access = TOKEN_ALL_ACCESS,
 		bool openAsSelf = false
 		)
 	{
-		return openThreadToken (::GetCurrentThread (), access);
+		return openThreadToken(::GetCurrentThread(), access);
 	}
 
 	bool
-	getTokenInformation (
+	getTokenInformation(
 		TOKEN_INFORMATION_CLASS infoClass,
 		void* p,
 		dword_t size,
 		dword_t* actualSize
 		)
 	{
-		bool_t result = ::GetTokenInformation (m_h, infoClass, p, size, actualSize);
-		return err::complete (result);
+		bool_t result = ::GetTokenInformation(m_h, infoClass, p, size, actualSize);
+		return err::complete(result);
 	}
 
 	bool
-	getTokenInformation (
+	getTokenInformation(
 		TOKEN_INFORMATION_CLASS infoClass,
-		sl::Array <char>* buffer
+		sl::Array<char>* buffer
 		);
 
-	sl::Array <char>
-	getTokenInformation (TOKEN_INFORMATION_CLASS infoClass)
+	sl::Array<char>
+	getTokenInformation(TOKEN_INFORMATION_CLASS infoClass)
 	{
-		sl::Array <char> buffer;
-		getTokenInformation (infoClass, &buffer);
+		sl::Array<char> buffer;
+		getTokenInformation(infoClass, &buffer);
 		return buffer;
 	}
 
 	bool
-	setTokenInformation (
+	setTokenInformation(
 		TOKEN_INFORMATION_CLASS infoClass,
 		void* p,
 		dword_t size
 		)
 	{
-		bool_t result = ::SetTokenInformation (m_h, infoClass, p, size);
-		return err::complete (result);
+		bool_t result = ::SetTokenInformation(m_h, infoClass, p, size);
+		return err::complete(result);
 	}
 
 	bool
-	isMemberOf (PSID group);
+	isMemberOf(PSID group);
 };
 
 //..............................................................................

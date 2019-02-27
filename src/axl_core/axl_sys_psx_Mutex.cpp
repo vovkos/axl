@@ -21,65 +21,65 @@ namespace psx {
 //..............................................................................
 
 bool
-MutexAttr::getProcessShared (int* value) const
+MutexAttr::getProcessShared(int* value) const
 {
-	int result = ::pthread_mutexattr_getpshared (&m_attr, value);
-	return result == 0 ? true : err::fail (result);
+	int result = ::pthread_mutexattr_getpshared(&m_attr, value);
+	return result == 0 ? true : err::fail(result);
 }
 
 bool
-MutexAttr::setProcessShared (int value)
+MutexAttr::setProcessShared(int value)
 {
-	int result = ::pthread_mutexattr_setpshared (&m_attr, value);
-	return result == 0 ? true : err::fail (result);
+	int result = ::pthread_mutexattr_setpshared(&m_attr, value);
+	return result == 0 ? true : err::fail(result);
 }
 
 bool
-MutexAttr::getType (int* value) const
+MutexAttr::getType(int* value) const
 {
-	int result = ::pthread_mutexattr_gettype (&m_attr, value);
-	return result == 0 ? true : err::fail (result);
+	int result = ::pthread_mutexattr_gettype(&m_attr, value);
+	return result == 0 ? true : err::fail(result);
 }
 
 bool
-MutexAttr::setType (int value)
+MutexAttr::setType(int value)
 {
-	int result = ::pthread_mutexattr_settype (&m_attr, value);
-	return result == 0 ? true : err::fail (result);
+	int result = ::pthread_mutexattr_settype(&m_attr, value);
+	return result == 0 ? true : err::fail(result);
 }
 
 //..............................................................................
 
 bool
-Mutex::tryLock ()
+Mutex::tryLock()
 {
-	int result = ::pthread_mutex_trylock (&m_mutex);
-	return result == 0 ? true : err::fail (result);
+	int result = ::pthread_mutex_trylock(&m_mutex);
+	return result == 0 ? true : err::fail(result);
 }
 
 #if (!_AXL_OS_DARWIN)
 bool
-Mutex::lock (uint_t timeout)
+Mutex::lock(uint_t timeout)
 {
 	int result;
 
-	switch (timeout)
+	switch(timeout)
 	{
 	case 0:
-		result = ::pthread_mutex_trylock (&m_mutex);
+		result = ::pthread_mutex_trylock(&m_mutex);
 		break;
 
 	case -1:
-		result = ::pthread_mutex_lock (&m_mutex);
+		result = ::pthread_mutex_lock(&m_mutex);
 		break;
 
 	default:
 		timespec ts = { 0 };
-		sys::getAbsTimespecFromTimeout (timeout, &ts);
-		result = ::pthread_mutex_timedlock (&m_mutex, &ts);
+		sys::getAbsTimespecFromTimeout(timeout, &ts);
+		result = ::pthread_mutex_timedlock(&m_mutex, &ts);
 	}
 
-	return result == 0 ? true : err::fail (result);
+	return result == 0 ? true : err::fail(result);
 }
 #endif
 

@@ -16,48 +16,48 @@ namespace {
 
 //..............................................................................
 
-void test_IntHashTable ()
+void test_IntHashTable()
 {
-	sl::SimpleHashTable <int, int> map;
-	sl::HashTableIterator <int, int> it;
+	sl::SimpleHashTable<int, int> map;
+	sl::HashTableIterator<int, int> it;
 
 	for (size_t i = 0; i < 50; i++)
 	{
-		int key = rand () % 50;
-		it = map.visit (key);
+		int key = rand() % 50;
+		it = map.visit(key);
 		if (it->m_value)
-			ASSERT (it->m_value == key * 10);
+			ASSERT(it->m_value == key * 10);
 
 		it->m_value = key * 10;
 	}
 
-	it = map.getHead ();
+	it = map.getHead();
 	for (; it; it++)
-		printf ("%d = %d\n", it->getKey (), it->m_value);
+		printf("%d = %d\n", it->getKey (), it->m_value);
 
-	printf (".........\n");
+	printf(".........\n");
 
 	for (size_t i = 0; i < 50; i++)
 	{
-		int key = rand () % 50;
-		it = map.find (key);
+		int key = rand() % 50;
+		it = map.find(key);
 		if (!it)
 		{
-			printf ("%d not found\n", key);
+			printf("%d not found\n", key);
 		}
 		else
 		{
-			printf ("%d = %d\n", key, it->m_value);
-			ASSERT (it->m_value == key * 10);
+			printf("%d = %d\n", key, it->m_value);
+			ASSERT(it->m_value == key * 10);
 		}
 	}
 
-	printf (".........\n");
+	printf(".........\n");
 }
 
-void test_StringHashTableIgnoreCase ()
+void test_StringHashTableIgnoreCase()
 {
-	static char stringTable [] [80] =
+	static char stringTable[] [80] =
 	{
 		"Multi-function",      // LIBUSB_CLASS_PER_INTERFACE = 0,
 		"Audio",               // LIBUSB_CLASS_AUDIO = 1,
@@ -77,47 +77,47 @@ void test_StringHashTableIgnoreCase ()
 		"Personal Healthcare", // LIBUSB_CLASS_PERSONAL_HEALTHCARE = 0x0f,
 	};
 
-	sl::StringHashTableIgnoreCase_pcu <int> map_pcu;
-	sl::StringHashTableIgnoreCase_pcp <int> map_pcp;
+	sl::StringHashTableIgnoreCase_pcu<int> map_pcu;
+	sl::StringHashTableIgnoreCase_pcp<int> map_pcp;
 
-	sl::StringHashTableIterator <int> it;
-	for (size_t i = 0; i < countof (stringTable); i++)
+	sl::StringHashTableIterator<int> it;
+	for (size_t i = 0; i < countof(stringTable); i++)
 	{
-		it = map_pcu.visit (stringTable [i]);
-		it->m_value = strlen (stringTable [i]);
+		it = map_pcu.visit(stringTable[i]);
+		it->m_value = strlen(stringTable[i]);
 
-		it = map_pcp.visit (stringTable [i]);
-		it->m_value = strlen (stringTable [i]);
+		it = map_pcp.visit(stringTable[i]);
+		it->m_value = strlen(stringTable[i]);
 	}
 
-	for (size_t i = 0; i < countof (stringTable); i++)
+	for (size_t i = 0; i < countof(stringTable); i++)
 	{
-		size_t length = strlen (stringTable [i]);
+		size_t length = strlen(stringTable[i]);
 		for (size_t j = 0; j < length; j++)
-			stringTable [i] [j] = (rand () & 1) ? tolower (stringTable [i] [j]) : toupper (stringTable [i] [j]);
+			stringTable[i] [j] = (rand() & 1) ? tolower(stringTable[i] [j]) : toupper(stringTable[i] [j]);
 
-		printf ("map_pcu: looking for %s...", stringTable [i]);
-		it = map_pcu.find (stringTable [i]);
-		ASSERT (it && it->m_value == length);
+		printf("map_pcu: looking for %s...", stringTable [i]);
+		it = map_pcu.find(stringTable[i]);
+		ASSERT(it && it->m_value == length);
 
-		printf ("found\n");
+		printf("found\n");
 
-		printf ("map_pcp: looking for %s...", stringTable [i]);
-		it = map_pcp.find (stringTable [i]);
-		ASSERT (it && it->m_value == length);
+		printf("map_pcp: looking for %s...", stringTable [i]);
+		it = map_pcp.find(stringTable[i]);
+		ASSERT(it && it->m_value == length);
 
-		printf ("found\n");
+		printf("found\n");
 	}
 }
 
-void run ()
+void run()
 {
-	test_IntHashTable ();
-	test_StringHashTableIgnoreCase ();
+	test_IntHashTable();
+	test_StringHashTableIgnoreCase();
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_HashTable", run)
+ADD_TEST_CASE("test_HashTable", run)
 
 }

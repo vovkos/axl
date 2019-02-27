@@ -28,44 +28,44 @@ template <
 	>
 class Child
 {
-	AXL_DISABLE_COPY (Child)
+	AXL_DISABLE_COPY(Child)
 
 protected:
-	char m_buffer [sizeof (T) + extra];
+	char m_buffer[sizeof(T) + extra];
 
 public:
-	Child (RefCount* parent)
+	Child(RefCount* parent)
 	{
-		memset (m_buffer, 0, sizeof (m_buffer));
-		T* p = AXL_REF_NEW_INPLACE (T, m_buffer, parent, 0);
-		p->addRef ();
+		memset(m_buffer, 0, sizeof(m_buffer));
+		T* p = AXL_REF_NEW_INPLACE(T, m_buffer, parent, 0);
+		p->addRef();
 	}
 
-	~Child ()
+	~Child()
 	{
-		p ()->release ();
+		p()->release();
 	}
 
 	operator T* ()
 	{
-		return p ();
+		return p();
 	}
 
 	T*
 	operator & ()
 	{
-		return p ();
+		return p();
 	}
 
 	T*
 	operator -> ()
 	{
-		return p ();
+		return p();
 	}
 
-	T* p ()
+	T* p()
 	{
-		return (T*) m_buffer;
+		return (T*)m_buffer;
 	}
 };
 

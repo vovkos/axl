@@ -20,7 +20,7 @@ namespace win {
 //..............................................................................
 
 bool
-Mapping::create (
+Mapping::create(
 	HANDLE hFile,
 	SECURITY_ATTRIBUTES* secAttr,
 	uint_t pageProtection,
@@ -28,55 +28,55 @@ Mapping::create (
 	const sl::StringRef_w& name
 	)
 {
-	close ();
+	close();
 
 	ULARGE_INTEGER maxSize;
 	maxSize.QuadPart = _MaxSize;
 
-	m_h = ::CreateFileMappingW (
+	m_h = ::CreateFileMappingW(
 		hFile,
 		secAttr,
 		pageProtection,
 		maxSize.HighPart,
 		maxSize.LowPart,
-		name.sz ()
+		name.sz()
 		);
 
-	return err::complete (m_h != NULL);
+	return err::complete(m_h != NULL);
 }
 
 bool
-Mapping::open (
+Mapping::open(
 	uint_t access,
 	bool doInheritHandle,
 	const sl::StringRef_w& name
 	)
 {
-	close ();
+	close();
 
-	m_h = ::OpenFileMappingW (access, doInheritHandle, name.sz ());
-	return err::complete (m_h != NULL);
+	m_h = ::OpenFileMappingW(access, doInheritHandle, name.sz());
+	return err::complete(m_h != NULL);
 }
 
 //..............................................................................
 
 void*
-MappedView::view (
+MappedView::view(
 	HANDLE hMapping,
 	uint_t access,
 	uint64_t _offset,
 	uint32_t size
 	)
 {
-	close ();
+	close();
 
 	ULARGE_INTEGER offset;
 	offset.QuadPart = _offset;
 
-	m_h = ::MapViewOfFile (hMapping, access, offset.HighPart, offset.LowPart, size);
+	m_h = ::MapViewOfFile(hMapping, access, offset.HighPart, offset.LowPart, size);
 	if (!m_h)
 	{
-		err::failWithLastSystemError ();
+		err::failWithLastSystemError();
 		return NULL;
 	}
 

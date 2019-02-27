@@ -26,22 +26,22 @@ public:
 	void
 	operator () (HGDIOBJ h)
 	{
-		::DeleteObject (h);
+		::DeleteObject(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class GdiObjectHandle: public sl::Handle <T, DeleteGdiObject>
+class GdiObjectHandle: public sl::Handle<T, DeleteGdiObject>
 {
 public:
-	GdiObjectHandle ()
+	GdiObjectHandle()
 	{
 	}
 
-	GdiObjectHandle (T h):
-		sl::Handle <T, DeleteGdiObject> (h)
+	GdiObjectHandle(T h):
+		sl::Handle<T, DeleteGdiObject> (h)
 	{
 	}
 };

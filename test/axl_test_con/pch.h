@@ -75,8 +75,8 @@ using namespace axl;
 #if (_AXL_OS_WIN)
 #	include <ws2tcpip.h>
 #	include <iphlpapi.h>
-#	pragma comment (lib, "ws2_32.lib")
-#	pragma comment (lib, "iphlpapi.lib")
+#	pragma comment(lib, "ws2_32.lib")
+#	pragma comment(lib, "iphlpapi.lib")
 #elif (_AXL_OS_POSIX)
 #	include <netdb.h>
 #	include <signal.h>
@@ -86,7 +86,7 @@ using namespace axl;
 #ifdef _AXL_IO_USB
 #	if (_AXL_OS_WIN)
 #		define _WINSOCKAPI_ // prevent winsock inclusion
-#		pragma warning (disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
+#		pragma warning(disable: 4200) // warning C4200: nonstandard extension used : zero-sized array in struct/union
 #	endif
 extern "C" {
 #	include <libusb-1.0/libusb.h>

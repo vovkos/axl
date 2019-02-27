@@ -29,7 +29,7 @@ enum PixelFormat
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char*
-getPixelFormatString (PixelFormat pixelFormat);
+getPixelFormatString(PixelFormat pixelFormat);
 
 //..............................................................................
 
@@ -38,22 +38,22 @@ struct ImageDesc
 	Size m_size;
 	PixelFormat m_pixelFormat;
 
-	ImageDesc ()
+	ImageDesc()
 	{
-		memset (this, 0, sizeof (ImageDesc));
+		memset(this, 0, sizeof(ImageDesc));
 	}
 
-	ImageDesc (
+	ImageDesc(
 		uint_t width,
 		uint_t height,
 		PixelFormat pixelFormat = PixelFormat_Rgba
 		)
 	{
-		m_size.setup (width, height);
+		m_size.setup(width, height);
 		m_pixelFormat = pixelFormat;
 	}
 
-	ImageDesc (
+	ImageDesc(
 		const Size& size,
 		PixelFormat pixelFormat = PixelFormat_Rgba
 		)

@@ -38,7 +38,7 @@ class Finalizer
 public:
 	virtual
 	void
-	finalize () = 0;
+	finalize() = 0;
 };
 
 //..............................................................................
@@ -48,7 +48,7 @@ class Module
 protected:
 	struct FinalizerEntry: sl::ListLink
 	{
-		ref::Ptr <Finalizer> m_finalizer;
+		ref::Ptr<Finalizer> m_finalizer;
 	};
 
 protected:
@@ -63,70 +63,70 @@ protected:
 	// finalizers
 
 	sys::Lock m_finalizerListLock;
-	sl::List <FinalizerEntry> m_finalizerList;
+	sl::List<FinalizerEntry> m_finalizerList;
 
 #ifdef _AXL_DEBUG
 	const char* m_tag;
 #endif
 
 public:
-	Module ();
-	~Module ();
+	Module();
+	~Module();
 
 #ifdef _AXL_DEBUG
 	const char*
-	getTag ()
+	getTag()
 	{
 		return m_tag;
 	}
 
 	void
-	setTag (const char* tag)
+	setTag(const char* tag)
 	{
 		m_tag = tag;
 	}
 #else
 	const char*
-	getTag ()
+	getTag()
 	{
 		return "<untagged-module>";
 	}
 
 	void
-	setTag (const char* tag)
+	setTag(const char* tag)
 	{
 	}
 #endif
 
 #if (_AXL_OS_WIN)
 	HMODULE
-	getModuleHandle ()
+	getModuleHandle()
 	{
 		return m_hModule;
 	}
 #endif
 
 	const SystemInfo*
-	getSystemInfo ()
+	getSystemInfo()
 	{
 		return &m_systemInfo;
 	}
 
 	mem::Tracker*
-	getMemTracker ()
+	getMemTracker()
 	{
 		return &m_memTracker;
 	}
 
 	bool
-	addFinalizer (const ref::Ptr <Finalizer>& finalizer);
+	addFinalizer(const ref::Ptr<Finalizer>& finalizer);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 Module*
-getModule ()
+getModule()
 {
 	// guaranteed to be thread safe since C++11
 	// otherwise it's still OK -- unless going MT in static constructors

@@ -20,7 +20,7 @@ namespace psx {
 //..............................................................................
 
 void*
-Mapping::map (
+Mapping::map(
 	void* addrHint,
 	size_t size,
 	int protection,
@@ -29,12 +29,12 @@ Mapping::map (
 	size_t offset
 	)
 {
-	close ();
+	close();
 
-	m_p = ::mmap (addrHint, size, protection, flags, fd, offset);
+	m_p = ::mmap(addrHint, size, protection, flags, fd, offset);
 	if (m_p == (void*) -1)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return NULL;
 	}
 
@@ -43,12 +43,12 @@ Mapping::map (
 }
 
 void
-Mapping::unmap (size_t size)
+Mapping::unmap(size_t size)
 {
-	if (!isOpen ())
+	if (!isOpen())
 		return;
 
-	::munmap (m_p, size);
+	::munmap(m_p, size);
 	m_p = NULL;
 	m_size = 0;
 }
@@ -56,16 +56,16 @@ Mapping::unmap (size_t size)
 //..............................................................................
 
 bool
-SharedMemory::open (
+SharedMemory::open(
 	const sl::StringRef& name,
 	uint_t flags,
 	mode_t mode
 	)
 {
-	close ();
+	close();
 
-	m_h = ::shm_open (name.sz (), flags, mode);
-	return err::complete (m_h != -1);
+	m_h = ::shm_open(name.sz(), flags, mode);
+	return err::complete(m_h != -1);
 }
 
 //..............................................................................

@@ -18,17 +18,17 @@ namespace err {
 //..............................................................................
 
 sl::String
-ErrnoProvider::getErrorDescription (int code)
+ErrnoProvider::getErrorDescription(int code)
 {
-	char buffer [512] = { 0 };
+	char buffer[512] = { 0 };
 #if (_AXL_OS_WIN)
-	strerror_s (buffer, countof (buffer) - 1, code);
+	strerror_s(buffer, countof(buffer) - 1, code);
 	return buffer;
 #elif (_AXL_OS_POSIX)
 #	if (_AXL_OS_LINUX)
-	return strerror_r (code, buffer, countof (buffer) - 1);
+	return strerror_r(code, buffer, countof(buffer) - 1);
 #	else
-	strerror_r (code, buffer, countof (buffer) - 1);
+	strerror_r(code, buffer, countof(buffer) - 1);
 	return buffer;
 #	endif
 #endif

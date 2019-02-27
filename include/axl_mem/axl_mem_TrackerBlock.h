@@ -33,10 +33,10 @@ struct TrackerBlockHdr: sl::ListLink
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-addTrackerBlock (TrackerBlockHdr* hdr);
+addTrackerBlock(TrackerBlockHdr* hdr);
 
 void
-removeTrackerBlock (TrackerBlockHdr* hdr);
+removeTrackerBlock(TrackerBlockHdr* hdr);
 
 //..............................................................................
 

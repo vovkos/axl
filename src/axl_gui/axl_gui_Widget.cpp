@@ -19,33 +19,33 @@ namespace gui {
 
 //..............................................................................
 
-WidgetDriver::WidgetDriver (const WidgetConstructParam& param):
-	GuiItem (param.m_engine)
+WidgetDriver::WidgetDriver(const WidgetConstructParam& param):
+	GuiItem(param.m_engine)
 {
 	m_engineWidget = param.m_engineWidget;
-	m_cursor = m_engine->getStdCursor (StdCursorKind_Arrow);
-	m_font = m_engine->getStdFont (StdFontKind_Monospace);
+	m_cursor = m_engine->getStdCursor(StdCursorKind_Arrow);
+	m_font = m_engine->getStdFont(StdFontKind_Monospace);
 	m_msgMap = NULL;
 	m_colorAttr.m_foreColor = StdPalColor_WidgetText;
 	m_colorAttr.m_backColor = StdPalColor_WidgetBack;
 	m_caretSize.m_width = 2;
-	m_caretSize.m_height = m_font->calcTextSize ('|').m_height;
+	m_caretSize.m_height = m_font->calcTextSize('|').m_height;
 	m_isCaretVisible = false;
 }
 
 bool
-WidgetDriver::setFont (Font* font)
+WidgetDriver::setFont(Font* font)
 {
 	if (m_font == font)
 		return true;
 
 	m_font = font;
-	m_caretSize.m_height = m_font->calcTextSize ('|').m_height;
+	m_caretSize.m_height = m_font->calcTextSize('|').m_height;
 	return true;
 }
 
 bool
-WidgetDriver::setCaretVisible (bool isVisible)
+WidgetDriver::setCaretVisible(bool isVisible)
 {
 	// don't check if nothing changed, force caret update --
 	// otherwise, this sequence will work incorrectly:
@@ -57,14 +57,14 @@ WidgetDriver::setCaretVisible (bool isVisible)
 	m_isCaretVisible = isVisible;
 
 	if (isVisible)
-		return m_engine->showCaret (this, Rect (m_caretPos, m_caretSize));
+		return m_engine->showCaret(this, Rect(m_caretPos, m_caretSize));
 
-	m_engine->hideCaret (this);
+	m_engine->hideCaret(this);
 	return true;
 }
 
 bool
-WidgetDriver::setCaretSize (
+WidgetDriver::setCaretSize(
 	uint_t width,
 	uint_t height
 	)
@@ -72,12 +72,12 @@ WidgetDriver::setCaretSize (
 	if (m_caretSize.m_width == width && m_caretSize.m_height == height)
 		return true; // nothing changed
 
-	m_caretSize.setup (width, height);
-	return m_isCaretVisible ? m_engine->showCaret (this, Rect (m_caretPos, m_caretSize)) : true;
+	m_caretSize.setup(width, height);
+	return m_isCaretVisible ? m_engine->showCaret(this, Rect(m_caretPos, m_caretSize)) : true;
 }
 
 bool
-WidgetDriver::setCaretPos (
+WidgetDriver::setCaretPos(
 	int x,
 	int y
 	)
@@ -85,61 +85,61 @@ WidgetDriver::setCaretPos (
 	if (m_caretPos.m_x == x && m_caretPos.m_y == y)
 		return true; // nothing changed
 
-	m_caretPos.setup (x, y);
-	return m_isCaretVisible ? m_engine->showCaret (this, Rect (m_caretPos, m_caretSize)) : true;
+	m_caretPos.setup(x, y);
+	return m_isCaretVisible ? m_engine->showCaret(this, Rect(m_caretPos, m_caretSize)) : true;
 }
 
 bool
-WidgetDriver::updateScrollBars (uint_t mask)
+WidgetDriver::updateScrollBars(uint_t mask)
 {
 	bool result = true;
 
 	if (mask & Orientation_Vertical)
-		result = updateScrollBar (Orientation_Vertical);
+		result = updateScrollBar(Orientation_Vertical);
 
 	if (mask & Orientation_Horizontal)
-		result = updateScrollBar (Orientation_Horizontal) || result;
+		result = updateScrollBar(Orientation_Horizontal) || result;
 
 	return true;
 }
 
 bool
-WidgetDriver::postThreadMsg (
+WidgetDriver::postThreadMsg(
 	uint_t code,
 	const void* p,
 	size_t size
 	)
 {
 	if (!p || !size)
-		return m_engine->postWidgetThreadMsg (this, code, ref::Ptr <void> ());
+		return m_engine->postWidgetThreadMsg(this, code, ref::Ptr<void> ());
 
-	ref::RefCount* refCount = AXL_REF_NEW_EXTRA (ref::RefCount, size);
+	ref::RefCount* refCount = AXL_REF_NEW_EXTRA(ref::RefCount, size);
 	if (!refCount)
 		return false;
 
-	ref::Ptr <void> params (refCount + 1, refCount);
-	memcpy (params, p, size);
-	return m_engine->postWidgetThreadMsg (this, code, params);
+	ref::Ptr<void> params(refCount + 1, refCount);
+	memcpy(params, p, size);
+	return m_engine->postWidgetThreadMsg(this, code, params);
 }
 
 void
-WidgetDriver::processMsg (
+WidgetDriver::processMsg(
 	const WidgetMsg* msg,
 	bool* isHandled
 	)
 {
-	ASSERT (msg->m_msgCode < WidgetMsgCode__Count);
+	ASSERT(msg->m_msgCode < WidgetMsgCode__Count);
 
-	Widget* widget = containerof (this, Widget, m_widgetDriver);
+	Widget* widget = containerof(this, Widget, m_widgetDriver);
 	if (!m_msgMap)
-		m_msgMap = widget->getWidgetMsgMap ();
+		m_msgMap = widget->getWidgetMsgMap();
 
 	bool result = false;
 
 	WidgetMsgMap* msgMap = m_msgMap;
 	for (; msgMap; msgMap = msgMap->m_baseMap)
 	{
-		WidgetMsgProc proc = msgMap->m_msgProcTable [msg->m_msgCode];
+		WidgetMsgProc proc = msgMap->m_msgProcTable[msg->m_msgCode];
 		if (!proc)
 			break;
 

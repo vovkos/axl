@@ -18,19 +18,19 @@ namespace io {
 //..............................................................................
 
 void*
-Mapping::open (
+Mapping::open(
 	File* file,
 	uint64_t offset,
 	size_t size,
 	uint_t flags
 	)
 {
-	close ();
+	close();
 
 	if (size == -1)
-		size = (size_t) (file->getSize () - offset);
+		size = (size_t)(file->getSize() - offset);
 
-	const g::SystemInfo* systemInfo = g::getModule ()->getSystemInfo ();
+	const g::SystemInfo* systemInfo = g::getModule()->getSystemInfo();
 	uint64_t viewBegin = offset - offset % systemInfo->m_mappingAlignFactor;
 	uint64_t viewEnd = offset + size;
 
@@ -40,39 +40,39 @@ Mapping::open (
 	uint_t protection = (flags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 	uint_t access = (flags & FileFlag_ReadOnly) ? FILE_MAP_READ : FILE_MAP_READ | FILE_MAP_WRITE;
 
-	bool result = m_mapping.create (file->m_file, NULL, protection, viewEnd);
+	bool result = m_mapping.create(file->m_file, NULL, protection, viewEnd);
 	if (!result)
 		return NULL;
 
-	p = m_view.view (m_mapping, access, viewBegin, (size_t) (viewEnd - viewBegin));
+	p = m_view.view(m_mapping, access, viewBegin, (size_t)(viewEnd - viewBegin));
 	if (!p)
 	{
-		m_mapping.close ();
+		m_mapping.close();
 		return NULL;
 	}
 #elif (_AXL_OS_POSIX)
 	int protection = (flags & FileFlag_ReadOnly) ? PROT_READ : PROT_READ | PROT_WRITE;
 
-	p = m_mapping.map (NULL, viewEnd - viewBegin, protection, MAP_SHARED, file->m_file, viewBegin);
+	p = m_mapping.map(NULL, viewEnd - viewBegin, protection, MAP_SHARED, file->m_file, viewBegin);
 	if (!p)
 		return NULL;
 #endif
 
-	m_p = (char*) p + offset - viewBegin;
+	m_p = (char*)p + offset - viewBegin;
 	m_size = size;
 	return m_p;
 }
 
 void*
-Mapping::open (
+Mapping::open(
 	const sl::StringRef& name,
 	size_t size,
 	uint_t flags
 	)
 {
-	ASSERT (size != -1);
+	ASSERT(size != -1);
 
-	close ();
+	close();
 
 	void* p;
 
@@ -83,16 +83,16 @@ Mapping::open (
 	sl::String_w name_w = name;
 
 	bool result = (flags & FileFlag_OpenExisting) ?
-		m_mapping.open (access, false, name_w):
-		m_mapping.create (INVALID_HANDLE_VALUE, NULL, protection, size, name_w);
+		m_mapping.open(access, false, name_w):
+		m_mapping.create(INVALID_HANDLE_VALUE, NULL, protection, size, name_w);
 
 	if (!result)
 		return NULL;
 
-	p = m_view.view (m_mapping, access, 0, size);
+	p = m_view.view(m_mapping, access, 0, size);
 	if (!p)
 	{
-		m_mapping.close ();
+		m_mapping.close();
 		return NULL;
 	}
 #elif (_AXL_OS_POSIX)
@@ -102,27 +102,27 @@ Mapping::open (
 	if (!(flags & FileFlag_OpenExisting))
 		shmFlags |= O_CREAT;
 
-	bool result = m_sharedMemory.open (name, shmFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	bool result = m_sharedMemory.open(name, shmFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (!result)
 		return NULL;
 
-	if (!(flags & FileFlag_OpenExisting) && m_sharedMemory.getSize () < size)
+	if (!(flags & FileFlag_OpenExisting) && m_sharedMemory.getSize() < size)
 	{
-		result = m_sharedMemory.setSize (size);
+		result = m_sharedMemory.setSize(size);
 		if (!result)
 		{
 			if (!(flags & FileFlag_OpenExisting))
-				psx::SharedMemory::unlink (name);
+				psx::SharedMemory::unlink(name);
 
 			return NULL;
 		}
 	}
 
-	p = m_mapping.map (NULL, size, protection, MAP_SHARED, m_sharedMemory, 0);
+	p = m_mapping.map(NULL, size, protection, MAP_SHARED, m_sharedMemory, 0);
 	if (!p)
 	{
 		if (!(flags & FileFlag_OpenExisting))
-			psx::SharedMemory::unlink (name);
+			psx::SharedMemory::unlink(name);
 
 		return NULL;
 	}
@@ -138,19 +138,19 @@ Mapping::open (
 }
 
 void
-Mapping::close ()
+Mapping::close()
 {
 #if (_AXL_OS_WIN)
-	m_mapping.close ();
-	m_view.close ();
+	m_mapping.close();
+	m_view.close();
 #elif (_AXL_OS_POSIX)
-	m_sharedMemory.close ();
-	m_mapping.close ();
+	m_sharedMemory.close();
+	m_mapping.close();
 
 	if (!m_sharedMemoryName.isEmpty())
 	{
-		psx::SharedMemory::unlink (m_sharedMemoryName);
-		m_sharedMemoryName.clear ();
+		psx::SharedMemory::unlink(m_sharedMemoryName);
+		m_sharedMemoryName.clear();
 	}
 #endif
 

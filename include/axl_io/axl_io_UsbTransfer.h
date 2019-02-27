@@ -21,7 +21,7 @@ namespace io {
 //..............................................................................
 
 const char*
-getUsbTransferStatusString (libusb_transfer_status status);
+getUsbTransferStatusString(libusb_transfer_status status);
 
 //..............................................................................
 
@@ -31,27 +31,27 @@ public:
 	void
 	operator () (libusb_transfer* h)
 	{
-		libusb_free_transfer (h);
+		libusb_free_transfer(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbTransfer: public sl::Handle <libusb_transfer*, FreeUsbTransfer>
+class UsbTransfer: public sl::Handle<libusb_transfer*, FreeUsbTransfer>
 {
 public:
 	bool
-	create (size_t isochronousPacketCount = 0);
+	create(size_t isochronousPacketCount = 0);
 
 	bool
-	submit ();
+	submit();
 
 	bool
-	cancel ();
+	cancel();
 
 	static
 	void
-	fillControlSetup (
+	fillControlSetup(
 		libusb_control_setup* setup,
 		uint_t requestType,
 		uint_t requestCode,
@@ -60,11 +60,11 @@ public:
 		size_t size
 		)
 	{
-		libusb_fill_control_setup ((uchar_t*) setup, requestType, requestCode, value, index, size);
+		libusb_fill_control_setup((uchar_t*)setup, requestType, requestCode, value, index, size);
 	}
 
 	void
-	fillControlTransfer (
+	fillControlTransfer(
 		libusb_device_handle* deviceOpenHandle,
 		libusb_control_setup* setup,
 		libusb_transfer_cb_fn callback,
@@ -72,12 +72,12 @@ public:
 		uint_t timeout = -1
 		)
 	{
-		ASSERT (m_h);
+		ASSERT(m_h);
 
-		libusb_fill_control_transfer (
+		libusb_fill_control_transfer(
 			m_h,
 			deviceOpenHandle,
-			(uchar_t*) setup,
+			(uchar_t*)setup,
 			callback,
 			context,
 			timeout != -1 ? timeout : 0
@@ -85,7 +85,7 @@ public:
 	}
 
 	void
-	fillBulkTransfer (
+	fillBulkTransfer(
 		libusb_device_handle* deviceOpenHandle,
 		uint_t endpointId,
 		void* buffer,
@@ -95,13 +95,13 @@ public:
 		uint_t timeout = -1
 		)
 	{
-		ASSERT (m_h);
+		ASSERT(m_h);
 
-		libusb_fill_bulk_transfer (
+		libusb_fill_bulk_transfer(
 			m_h,
 			deviceOpenHandle,
 			endpointId,
-			(uchar_t*) buffer,
+			(uchar_t*)buffer,
 			size,
 			callback,
 			context,
@@ -110,7 +110,7 @@ public:
 	}
 
 	void
-	fillInterruptTransfer (
+	fillInterruptTransfer(
 		libusb_device_handle* deviceOpenHandle,
 		uint_t endpointId,
 		void* buffer,
@@ -120,13 +120,13 @@ public:
 		uint_t timeout = -1
 		)
 	{
-		ASSERT (m_h);
+		ASSERT(m_h);
 
-		libusb_fill_interrupt_transfer (
+		libusb_fill_interrupt_transfer(
 			m_h,
 			deviceOpenHandle,
 			endpointId,
-			(uchar_t*) buffer,
+			(uchar_t*)buffer,
 			size,
 			callback,
 			context,

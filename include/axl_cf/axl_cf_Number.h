@@ -20,189 +20,189 @@ namespace cf {
 
 //..............................................................................
 
-class NumberRef: public TypeRefBase <CFNumberRef>
+class NumberRef: public TypeRefBase<CFNumberRef>
 {
 public:
-	NumberRef ()
+	NumberRef()
 	{
 	}
 
-	NumberRef (const NumberRef& src)
+	NumberRef(const NumberRef& src)
 	{
-		copy (src);
+		copy(src);
 	}
 
-	NumberRef (
+	NumberRef(
 		CFNumberRef p,
 		bool isAttach = false
 		)
 	{
-		isAttach ? copy (p) : attach (p);
+		isAttach ? copy(p) : attach(p);
 	}
 
-	NumberRef (char x)
+	NumberRef(char x)
 	{
 		m_p = NULL;
-		create (kCFNumberCharType, &x);
+		create(kCFNumberCharType, &x);
 	}
 
-	NumberRef (short x)
+	NumberRef(short x)
 	{
 		m_p = NULL;
-		create (kCFNumberShortType, &x);
+		create(kCFNumberShortType, &x);
 	}
 
-	NumberRef (int x)
+	NumberRef(int x)
 	{
 		m_p = NULL;
-		create (kCFNumberIntType, &x);
+		create(kCFNumberIntType, &x);
 	}
 
-	NumberRef (long x)
+	NumberRef(long x)
 	{
 		m_p = NULL;
-		create (kCFNumberLongType, &x);
+		create(kCFNumberLongType, &x);
 	}
 
-	NumberRef (long long x)
+	NumberRef(long long x)
 	{
 		m_p = NULL;
-		create (kCFNumberLongLongType, &x);
+		create(kCFNumberLongLongType, &x);
 	}
 
-	NumberRef (float x)
+	NumberRef(float x)
 	{
 		m_p = NULL;
-		create (kCFNumberFloatType, &x);
+		create(kCFNumberFloatType, &x);
 	}
 
-	NumberRef (double x)
+	NumberRef(double x)
 	{
 		m_p = NULL;
-		create (kCFNumberDoubleType, &x);
+		create(kCFNumberDoubleType, &x);
 	}
 
 	NumberRef&
 	operator = (const NumberRef& src)
 	{
-		copy (src);
+		copy(src);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (CFNumberRef p)
 	{
-		copy (p);
+		copy(p);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (char x)
 	{
-		create (kCFNumberCharType, &x);
+		create(kCFNumberCharType, &x);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (short x)
 	{
-		create (kCFNumberShortType, &x);
+		create(kCFNumberShortType, &x);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (int x)
 	{
-		create (kCFNumberIntType, &x);
+		create(kCFNumberIntType, &x);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (long x)
 	{
-		create (kCFNumberLongType, &x);
+		create(kCFNumberLongType, &x);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (long long x)
 	{
-		create (kCFNumberLongLongType, &x);
+		create(kCFNumberLongLongType, &x);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (float x)
 	{
-		create (kCFNumberFloatType, &x);
+		create(kCFNumberFloatType, &x);
 		return *this;
 	}
 
 	NumberRef&
 	operator = (double x)
 	{
-		create (kCFNumberDoubleType, &x);
+		create(kCFNumberDoubleType, &x);
 		return *this;
 	}
 
 	bool
-	create (
+	create(
 		CFNumberType type,
 		const void* p
 		);
 
 	bool
-	create (char x)
+	create(char x)
 	{
-		return create (kCFNumberCharType, &x);
+		return create(kCFNumberCharType, &x);
 	}
 
 	bool
-	create (short x)
+	create(short x)
 	{
-		return create (kCFNumberShortType, &x);
+		return create(kCFNumberShortType, &x);
 	}
 
 	bool
-	create (int x)
+	create(int x)
 	{
-		return create (kCFNumberIntType, &x);
+		return create(kCFNumberIntType, &x);
 	}
 
 	bool
-	create (long x)
+	create(long x)
 	{
-		return create (kCFNumberLongType, &x);
+		return create(kCFNumberLongType, &x);
 	}
 
 	bool
-	create (long long x)
+	create(long long x)
 	{
-		return create (kCFNumberLongLongType, &x);
+		return create(kCFNumberLongLongType, &x);
 	}
 
 	bool
-	create (float x)
+	create(float x)
 	{
-		return create (kCFNumberFloatType, &x);
+		return create(kCFNumberFloatType, &x);
 	}
 
 	bool
-	create (double x)
+	create(double x)
 	{
-		return create (kCFNumberDoubleType, &x);
+		return create(kCFNumberDoubleType, &x);
 	}
 
 	bool
-	isFloat () const
+	isFloat() const
 	{
-		return ::CFNumberIsFloatType (m_p);
+		return ::CFNumberIsFloatType(m_p);
 	}
 
 	CFComparisonResult
-	compare (CFNumberRef p2) const
+	compare(CFNumberRef p2) const
 	{
-		return ::CFNumberCompare (m_p, p2, NULL);
+		return ::CFNumberCompare(m_p, p2, NULL);
 	}
 };
 

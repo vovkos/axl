@@ -32,25 +32,25 @@ protected:
 	QBasicTimer m_animationTimer;
 
 public:
-	QtWidgetBase (
+	QtWidgetBase(
 		WidgetDriver* widgetDriver,
 		QWidget* parent = NULL
 		);
 
-	~QtWidgetBase ()
+	~QtWidgetBase()
 	{
-		m_widgetDriver->setCaretVisible (false); // important for QT
+		m_widgetDriver->setCaretVisible(false); // important for QT
 	}
 
 	void
-	postThreadMsg (
+	postThreadMsg(
 		uint_t code,
-		const ref::Ptr <void>& params
+		const ref::Ptr<void>& params
 		);
 
 	virtual
 	void
-	emitNotificationSignal (
+	emitNotificationSignal(
 		uint_t code,
 		const void* param
 		)
@@ -59,128 +59,128 @@ public:
 
 private slots:
 	void
-	threadMsgSlot (WidgetThreadMsg* msg);
+	threadMsgSlot(WidgetThreadMsg* msg);
 
 	void
-	toolTipTimerSlot ();
+	toolTipTimerSlot();
 
 signals:
 	void
-	threadMsgSignal (WidgetThreadMsg* msg);
+	threadMsgSignal(WidgetThreadMsg* msg);
 
 protected:
 	virtual
 	void
-	mousePressEvent (QMouseEvent* e)
+	mousePressEvent(QMouseEvent* e)
 	{
-		mouseEventImpl (e, WidgetMsgCode_MouseButtonDown);
+		mouseEventImpl(e, WidgetMsgCode_MouseButtonDown);
 	}
 
 	virtual
 	void
-	mouseReleaseEvent (QMouseEvent* e)
+	mouseReleaseEvent(QMouseEvent* e)
 	{
-		mouseEventImpl (e, WidgetMsgCode_MouseButtonUp);
+		mouseEventImpl(e, WidgetMsgCode_MouseButtonUp);
 	}
 
 	virtual
 	void
-	mouseDoubleClickEvent (QMouseEvent* e)
+	mouseDoubleClickEvent(QMouseEvent* e)
 	{
-		mouseEventImpl (e, WidgetMsgCode_MouseButtonDoubleClick);
+		mouseEventImpl(e, WidgetMsgCode_MouseButtonDoubleClick);
 	}
 
 	virtual
 	void
-	mouseMoveEvent (QMouseEvent* e)
+	mouseMoveEvent(QMouseEvent* e)
 	{
-		mouseEventImpl (e, WidgetMsgCode_MouseMove);
+		mouseEventImpl(e, WidgetMsgCode_MouseMove);
 	}
 
 	virtual
 	void
-	wheelEvent (QWheelEvent* e);
+	wheelEvent(QWheelEvent* e);
 
 	virtual
 	void
-	keyPressEvent (QKeyEvent* e)
+	keyPressEvent(QKeyEvent* e)
 	{
-		keyEventImpl (e, WidgetMsgCode_KeyDown);
+		keyEventImpl(e, WidgetMsgCode_KeyDown);
 	}
 
 	virtual
 	void
-	keyReleaseEvent (QKeyEvent* e)
+	keyReleaseEvent(QKeyEvent* e)
 	{
-		keyEventImpl (e, WidgetMsgCode_KeyUp);
+		keyEventImpl(e, WidgetMsgCode_KeyUp);
 	}
 
 	virtual
 	void
-	focusInEvent (QFocusEvent* e)
+	focusInEvent(QFocusEvent* e)
 	{
-		genericEventImpl (e, WidgetMsgCode_SetFocus);
+		genericEventImpl(e, WidgetMsgCode_SetFocus);
 	}
 
 	virtual
 	void
-	focusOutEvent (QFocusEvent* e)
+	focusOutEvent(QFocusEvent* e)
 	{
-		genericEventImpl (e, WidgetMsgCode_KillFocus);
+		genericEventImpl(e, WidgetMsgCode_KillFocus);
 	}
 
 	virtual
 	void
-	leaveEvent (QEvent* e)
+	leaveEvent(QEvent* e)
 	{
-		genericEventImpl (e, WidgetMsgCode_MouseLeave);
+		genericEventImpl(e, WidgetMsgCode_MouseLeave);
 	}
 
 	virtual
 	void
-	paintEvent (QPaintEvent* e);
+	paintEvent(QPaintEvent* e);
 
 	virtual
 	void
-	resizeEvent (QResizeEvent* e);
+	resizeEvent(QResizeEvent* e);
 
 	virtual
 	void
-	closeEvent (QCloseEvent* e)
+	closeEvent(QCloseEvent* e)
 	{
-		genericEventImpl (e, WidgetMsgCode_Close);
+		genericEventImpl(e, WidgetMsgCode_Close);
 	}
 
 	virtual
 	void
-	timerEvent (QTimerEvent* e)
+	timerEvent(QTimerEvent* e)
 	{
-		if (e->timerId () == m_animationTimer.timerId ())
-			genericEventImpl (e, WidgetMsgCode_Animate);
+		if (e->timerId() == m_animationTimer.timerId())
+			genericEventImpl(e, WidgetMsgCode_Animate);
 	}
 
 	virtual
 	void
-	scrollContentsBy (
+	scrollContentsBy(
 		int dx,
 		int dy
 		);
 
 protected:
 	void
-	genericEventImpl (
+	genericEventImpl(
 		QEvent* e,
 		WidgetMsgCode msgCode
 		);
 
 	void
-	mouseEventImpl (
+	mouseEventImpl(
 		QMouseEvent* e,
 		WidgetMsgCode msgCode
 		);
 
 	void
-	keyEventImpl (
+	keyEventImpl(
 		QKeyEvent* e,
 		WidgetMsgCode msgCode
 		);
@@ -194,9 +194,9 @@ class QtWidget:
 	public T
 {
 public:
-	QtWidget (QWidget* parent = NULL):
-		QtWidgetBase (&(T::m_widgetDriver), parent),
-		T (WidgetConstructParam (getQtEngine (), (QtWidgetBase*) this))
+	QtWidget(QWidget* parent = NULL):
+		QtWidgetBase(&(T::m_widgetDriver), parent),
+		T(WidgetConstructParam(getQtEngine(), (QtWidgetBase*)this))
 	{
 	}
 };

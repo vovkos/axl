@@ -54,9 +54,9 @@ using namespace axl;
 #	include <ws2ipdef.h>
 #	include <commctrl.h>
 
-#	pragma comment (lib, "ws2_32.lib")
-#	pragma comment (lib, "crypt32.lib")
-#	pragma comment (lib, "comctl32.lib")
+#	pragma comment(lib, "ws2_32.lib")
+#	pragma comment(lib, "crypt32.lib")
+#	pragma comment(lib, "comctl32.lib")
 #endif
 
 //..............................................................................

@@ -35,15 +35,15 @@ public:
 
 public:
 	void
-	lock ()
+	lock()
 	{
-		m_criticalSection.enter ();
+		m_criticalSection.enter();
 	}
 
 	void
-	unlock ()
+	unlock()
 	{
-		m_criticalSection.leave ();
+		m_criticalSection.leave();
 	}
 };
 
@@ -56,15 +56,15 @@ public:
 
 public:
 	void
-	lock ()
+	lock()
 	{
-		m_mutex.lock ();
+		m_mutex.lock();
 	}
 
 	void
-	unlock ()
+	unlock()
 	{
-		m_mutex.unlock ();
+		m_mutex.unlock();
 	}
 };
 
@@ -78,15 +78,15 @@ protected:
 	Lock* m_lock;
 
 public:
-	ScopeLock (Lock* lock)
+	ScopeLock(Lock* lock)
 	{
 		m_lock = lock;
-		lock->lock ();
+		lock->lock();
 	}
 
-	~ScopeLock ()
+	~ScopeLock()
 	{
-		m_lock->unlock ();
+		m_lock->unlock();
 	}
 };
 

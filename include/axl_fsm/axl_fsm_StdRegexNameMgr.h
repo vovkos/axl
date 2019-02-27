@@ -23,35 +23,35 @@ namespace fsm {
 class StdRegexNameMgr: public RegexNameMgr
 {
 protected:
-	sl::StringHashTable <sl::String> m_nameMap;
+	sl::StringHashTable<sl::String> m_nameMap;
 
 public:
 	void
-	clear ()
+	clear()
 	{
-		m_nameMap.clear ();
+		m_nameMap.clear();
 	}
 
 	virtual
 	sl::StringRef
-	findName (const sl::StringRef& name)
+	findName(const sl::StringRef& name)
 	{
-		return m_nameMap.findValue (name, NULL);
+		return m_nameMap.findValue(name, NULL);
 	}
 
 	void
-	addName (
+	addName(
 		const sl::StringRef& name,
 		const sl::StringRef& source
 		)
 	{
-		m_nameMap [name] = source;
+		m_nameMap[name] = source;
 	}
 
 	bool
-	removeName (const sl::StringRef& name)
+	removeName(const sl::StringRef& name)
 	{
-		return m_nameMap.eraseKey (name);
+		return m_nameMap.eraseKey(name);
 	}
 };
 

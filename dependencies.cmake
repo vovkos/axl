@@ -9,7 +9,7 @@
 #
 #...............................................................................
 
-set (
+set(
 	AXL_PATH_LIST
 
 	LUA_INC_DIR
@@ -35,7 +35,7 @@ set (
 	PDFLATEX_EXE
 	)
 
-set (
+set(
 	AXL_IMPORT_LIST
 
 	OPTIONAL
@@ -53,11 +53,11 @@ set (
 		7z
 	)
 
-if (UNIX AND NOT APPLE)
-	set (AXL_IMPORT_LIST ${AXL_IMPORT_LIST} OPTIONAL libudev)
-endif ()
+if(UNIX AND NOT APPLE)
+	set(AXL_IMPORT_LIST ${AXL_IMPORT_LIST} OPTIONAL libudev)
+endif()
 
-set (
+set(
 	AXL_IMPORT_DIR_LIST
 
 	${DOXYREST_CMAKE_DIR}

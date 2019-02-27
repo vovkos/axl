@@ -20,24 +20,24 @@ namespace win {
 //..............................................................................
 
 bool
-Serial::open (
+Serial::open(
 	const sl::StringRef& name,
 	uint_t accessMode,
 	uint_t flagsAttributes
 	)
 {
-	close ();
+	close();
 
-	char buffer [256];
-	sl::String_w deviceName (ref::BufKind_Stack, buffer, sizeof (buffer));
+	char buffer[256];
+	sl::String_w deviceName(ref::BufKind_Stack, buffer, sizeof(buffer));
 	deviceName = L"\\\\.\\";
 
-	if (name.isPrefix ("\\\\.\\"))
-		deviceName += name.getSubString (4);
+	if (name.isPrefix("\\\\.\\"))
+		deviceName += name.getSubString(4);
 	else
 		deviceName += name;
 
-	m_h = ::CreateFileW (
+	m_h = ::CreateFileW(
 		deviceName,
 		accessMode,
 		0,
@@ -47,42 +47,42 @@ Serial::open (
 		NULL
 		);
 
-	return err::complete (m_h != INVALID_HANDLE_VALUE);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
 
 dword_t
-Serial::getStatusLines ()
+Serial::getStatusLines()
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
 	dword_t lines;
 
-	bool_t result = ::GetCommModemStatus (m_h, &lines);
+	bool_t result = ::GetCommModemStatus(m_h, &lines);
 	if (!result)
-		return err::failWithLastSystemError (-1);
+		return err::failWithLastSystemError(-1);
 
 	return lines;
 }
 
 dword_t
-Serial::getWaitMask ()
+Serial::getWaitMask()
 {
 	dword_t mask;
 
-	bool_t result = ::GetCommMask (m_h, &mask);
+	bool_t result = ::GetCommMask(m_h, &mask);
 	if (!result)
-		return err::failWithLastSystemError (-1);
+		return err::failWithLastSystemError(-1);
 
 	return mask;
 }
 
 bool
-Serial::overlappedWait (dword_t* events)
+Serial::overlappedWait(dword_t* events)
 {
 	dword_t actualSize; // unused
 	StdOverlapped overlapped;
-	bool result = overlappedWait (events, &overlapped);
-	return result ? getOverlappedResult (&overlapped, &actualSize) : false;
+	bool result = overlappedWait(events, &overlapped);
+	return result ? getOverlappedResult(&overlapped, &actualSize) : false;
 }
 
 //..............................................................................

@@ -100,7 +100,7 @@ public:
 	B
 	operator () (A x) const
 	{
-		return (B) x;
+		return (B)x;
 	}
 };
 
@@ -134,7 +134,7 @@ public:
 	B*
 	operator () (A* x) const
 	{
-		return (B*) x;
+		return (B*)x;
 	}
 
 	const B*
@@ -155,13 +155,13 @@ public:
 	size_t
 	operator () (const T* x) const
 	{
-		return sizeof (T);
+		return sizeof(T);
 	}
 
 	size_t
 	operator () (const T& x) const
 	{
-		return sizeof (T);
+		return sizeof(T);
 	}
 };
 
@@ -176,7 +176,7 @@ public:
 	operator () () const
 	{
 		B* p = (C*) 1;
-		return (size_t) p - 1;
+		return (size_t)p - 1;
 	}
 };
 
@@ -195,7 +195,7 @@ public:
 	B*
 	operator () (A* p) const
 	{
-		return (B*) ((uchar_t*) p + offset);
+		return (B*)((uchar_t*)p + offset);
 	}
 };
 
@@ -220,7 +220,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Minus
 {
@@ -234,7 +234,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Not
 {
@@ -248,7 +248,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Add
 {
@@ -265,7 +265,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Sub
 {
@@ -282,7 +282,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Mul
 {
@@ -299,7 +299,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Div
 {
@@ -316,7 +316,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Mod
 {
@@ -333,7 +333,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Shl
 {
@@ -350,7 +350,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Shr
 {
@@ -367,7 +367,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class And
 {
@@ -384,7 +384,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Xor
 {
@@ -401,7 +401,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Or
 {
@@ -418,7 +418,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Min
 {
@@ -435,7 +435,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Max
 {
@@ -456,7 +456,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Eq
 {
@@ -475,7 +475,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class EqDuckType
 {
@@ -486,7 +486,7 @@ public:
 		Arg b
 		) const
 	{
-		return a.isEqual (b);
+		return a.isEqual(b);
 	}
 
 	bool
@@ -495,7 +495,7 @@ public:
 		const T* b
 		) const
 	{
-		return a->isEqual (*b);
+		return a->isEqual(*b);
 	}
 };
 
@@ -509,7 +509,7 @@ public:
 		const T& b
 		) const
 	{
-		return a.isEqual (b);
+		return a.isEqual(b);
 	}
 
 	bool
@@ -518,7 +518,7 @@ public:
 		const T* b
 		) const
 	{
-		return a->isEqual (b);
+		return a->isEqual(b);
 	}
 };
 
@@ -526,7 +526,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Ne
 {
@@ -545,7 +545,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Lt
 {
@@ -564,7 +564,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Gt
 {
@@ -583,7 +583,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Le
 {
@@ -602,7 +602,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Ge
 {
@@ -623,7 +623,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class Assign
 {
@@ -643,7 +643,7 @@ public:
 template <
 	typename Func,
 	typename T,
-	typename Arg = typename ArgType <T>::Type
+	typename Arg = typename ArgType<T>::Type
 	>
 class OpAssign
 {
@@ -654,7 +654,7 @@ public:
 		Arg b
 		) const
 	{
-		a = Func () (a, b);
+		a = Func() (a, b);
 	}
 };
 

@@ -29,25 +29,25 @@ protected:
 	};
 
 protected:
-	sl::Array <char> m_buffer;
+	sl::Array<char> m_buffer;
 
 public:
 	void
-	reset ()
+	reset()
 	{
-		m_buffer.clear ();
+		m_buffer.clear();
 	}
 
 	static
 	uint64_t
-	createHdr (size_t size)
+	createHdr(size_t size)
 	{
-		return ((uint64_t) size << 32) | PacketHdrSignature;
+		return ((uint64_t)size << 32) | PacketHdrSignature;
 	}
 
 protected:
 	size_t
-	writeImpl (
+	writeImpl(
 		const void* p,
 		size_t size
 		);
@@ -60,25 +60,25 @@ class Packetizer: public PacketizerRoot
 {
 public:
 	void
-	write (
+	write(
 		const void* p,
 		size_t size
 		)
 	{
 		while (size)
 		{
-			size_t taken = writeImpl (p, size);
+			size_t taken = writeImpl(p, size);
 			if (taken == -1)
 				break;
 
-			ASSERT (m_buffer.getCount () >= sizeof (uint64_t));
-			size_t dataSize = m_buffer.getCount () - sizeof (uint64_t);
+			ASSERT(m_buffer.getCount() >= sizeof(uint64_t));
+			size_t dataSize = m_buffer.getCount() - sizeof(uint64_t);
 			if (dataSize)
-				static_cast <T*> (this)->onPacket (m_buffer.p () + sizeof (uint64_t), dataSize);
+				static_cast<T*> (this)->onPacket(m_buffer.p() + sizeof(uint64_t), dataSize);
 
-			reset ();
+			reset();
 
-			p = (char*) p + taken;
+			p = (char*)p + taken;
 			size -= taken;
 		}
 	}
@@ -104,22 +104,22 @@ protected:
 	};
 
 protected:
-	sl::Array <char> m_buffer;
+	sl::Array<char> m_buffer;
 
 public:
 	void
-	reset ()
+	reset()
 	{
-		m_buffer.clear ();
+		m_buffer.clear();
 	}
 
 	static
 	uint64_t
-	createHdr (size_t size);
+	createHdr(size_t size);
 
 protected:
 	size_t
-	writeImpl (
+	writeImpl(
 		const void* p,
 		size_t size
 		);
@@ -132,25 +132,25 @@ class LegacyPacketizer: public LegacyPacketizerRoot
 {
 public:
 	void
-	write (
+	write(
 		const void* p,
 		size_t size
 		)
 	{
 		while (size)
 		{
-			size_t taken = writeImpl (p, size);
+			size_t taken = writeImpl(p, size);
 			if (taken == -1)
 				break;
 
-			ASSERT (m_buffer.getCount () >= sizeof (uint64_t));
-			size_t dataSize = m_buffer.getCount () - sizeof (uint64_t);
+			ASSERT(m_buffer.getCount() >= sizeof(uint64_t));
+			size_t dataSize = m_buffer.getCount() - sizeof(uint64_t);
 			if (dataSize)
-				static_cast <T*> (this)->onPacket (m_buffer.p () + sizeof (uint64_t), dataSize);
+				static_cast<T*> (this)->onPacket(m_buffer.p() + sizeof(uint64_t), dataSize);
 
-			reset ();
+			reset();
 
-			p = (char*) p + taken;
+			p = (char*)p + taken;
 			size -= taken;
 		}
 	}

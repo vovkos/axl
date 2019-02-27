@@ -37,27 +37,27 @@ public:
 	win::Event m_event;
 
 public:
-	EventBase ()
+	EventBase()
 	{
-		m_event.create (NULL, IsNotificationEvent () (), false, NULL);
+		m_event.create(NULL, IsNotificationEvent() (), false, NULL);
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		return m_event.signal ();
+		return m_event.signal();
 	}
 
 	bool
-	reset ()
+	reset()
 	{
-		return m_event.reset ();
+		return m_event.reset();
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		return m_event.wait (timeout) == win::WaitResult_Object0;
+		return m_event.wait(timeout) == win::WaitResult_Object0;
 	}
 };
 
@@ -73,83 +73,83 @@ protected:
 	volatile bool m_state;
 
 public:
-	EventBase ()
+	EventBase()
 	{
 		 m_state = false;
 	}
 
-	EventBase (
+	EventBase(
 		const pthread_condattr_t* condAttr,
 		const pthread_mutexattr_t* mutexAttr
 		):
-		m_condMutexPair (condAttr, mutexAttr)
+		m_condMutexPair(condAttr, mutexAttr)
 	{
 		m_state = false;
 	}
 
 	void
-	close ();
+	close();
 
 	bool
-	reset ()
+	reset()
 	{
-		m_condMutexPair.lock ();
+		m_condMutexPair.lock();
 		m_state = false;
-		m_condMutexPair.unlock ();
+		m_condMutexPair.unlock();
 		return true;
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		m_condMutexPair.lock ();
+		m_condMutexPair.lock();
 
 		if (m_state)
 		{
-			if (!IsNotificationEvent () ())
+			if (!IsNotificationEvent() ())
 				m_state = false;
 
-			m_condMutexPair.unlock ();
+			m_condMutexPair.unlock();
 			return true;
 		}
 
-		bool result = m_condMutexPair.wait (timeout);
+		bool result = m_condMutexPair.wait(timeout);
 		if (!result)
 		{
-			m_condMutexPair.unlock ();
+			m_condMutexPair.unlock();
 			return false;
 		}
 
-		if (!IsNotificationEvent () ())
+		if (!IsNotificationEvent() ())
 			m_state = false;
 
-		m_condMutexPair.unlock ();
+		m_condMutexPair.unlock();
 
 		return true;
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		m_condMutexPair.lock ();
+		m_condMutexPair.lock();
 		if (m_state)
 		{
-			m_condMutexPair.unlock ();
+			m_condMutexPair.unlock();
 			return true;
 		}
 
-		bool result = IsNotificationEvent () () ?
-			m_condMutexPair.broadcast () :
-			m_condMutexPair.signal ();
+		bool result = IsNotificationEvent() () ?
+			m_condMutexPair.broadcast() :
+			m_condMutexPair.signal();
 
 		if (!result)
 		{
-			m_condMutexPair.unlock ();
+			m_condMutexPair.unlock();
 			return false;
 		}
 
 		m_state = true;
-		m_condMutexPair.unlock ();
+		m_condMutexPair.unlock();
 
 		return true;
 	}
@@ -159,8 +159,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef EventBase <sl::False <bool> > Event;
-typedef EventBase <sl::True <bool> > NotificationEvent;
+typedef EventBase<sl::False<bool> > Event;
+typedef EventBase<sl::True<bool> > NotificationEvent;
 
 //..............................................................................
 
@@ -185,45 +185,45 @@ protected:
 
 public:
 	void
-	close ()
+	close()
 	{
-		m_event.close ();
+		m_event.close();
 	}
 
 	bool
-	create ()
+	create()
 	{
-		return m_event.create (NULL, IsNotificationEvent () (), false);
+		return m_event.create(NULL, IsNotificationEvent() (), false);
 	}
 
 	bool
-	create (const sl::StringRef& name)
+	create(const sl::StringRef& name)
 	{
-		return m_event.create (NULL, IsNotificationEvent () (), false, name.s2 ());
+		return m_event.create(NULL, IsNotificationEvent() (), false, name.s2());
 	}
 
 	bool
-	open (const sl::StringRef& name)
+	open(const sl::StringRef& name)
 	{
-		return m_event.open (EVENT_ALL_ACCESS, false, name.s2 ());
+		return m_event.open(EVENT_ALL_ACCESS, false, name.s2());
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		return m_event.wait (timeout) == sys::win::WaitResult_Object0;
+		return m_event.wait(timeout) == sys::win::WaitResult_Object0;
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		return m_event.signal ();
+		return m_event.signal();
 	}
 
 	bool
-	reset ()
+	reset()
 	{
-		return m_event.reset ();
+		return m_event.reset();
 	}
 };
 
@@ -237,7 +237,7 @@ template <typename IsNotificationEvent>
 class NameableEventBase
 {
 public:
-	typedef EventBase <IsNotificationEvent> EventImpl;
+	typedef EventBase<IsNotificationEvent> EventImpl;
 
 protected:
 	EventImpl* m_event;
@@ -246,70 +246,70 @@ protected:
 
 	union
 	{
-		char m_unnamedEventBuffer [sizeof (EventImpl)]; // avoid heap allocations
+		char m_unnamedEventBuffer[sizeof(EventImpl)]; // avoid heap allocations
 		uint64_t _m_align;
 	};
 
 public:
-	NameableEventBase ()
+	NameableEventBase()
 	{
 		m_event = NULL;
-		create ();
+		create();
 	}
 
-	~NameableEventBase ()
+	~NameableEventBase()
 	{
-		close ();
+		close();
 	}
 
 	void
-	close ()
+	close()
 	{
 		if (!m_event)
 			return;
 
-		if (m_event == (EventImpl*) m_unnamedEventBuffer)
+		if (m_event == (EventImpl*)m_unnamedEventBuffer)
 		{
-			m_event->~EventImpl ();
+			m_event->~EventImpl();
 		}
-		else if (!m_name.isEmpty ())
+		else if (!m_name.isEmpty())
 		{
-			io::psx::SharedMemory::unlink (m_name);
-			m_event->~EventImpl ();
+			io::psx::SharedMemory::unlink(m_name);
+			m_event->~EventImpl();
 		}
 
-		m_mapping.close ();
-		m_name.clear ();
+		m_mapping.close();
+		m_name.clear();
 		m_event = NULL;
 	}
 
 	bool
-	create ()
+	create()
 	{
-		close ();
+		close();
 
-		m_event = (EventImpl*) m_unnamedEventBuffer;
-		new (m_event) EventImpl;
+		m_event = (EventImpl*)m_unnamedEventBuffer;
+		new(m_event)EventImpl;
 		return true;
 	}
 
 	bool
-	create (const sl::StringRef& name)
+	create(const sl::StringRef& name)
 	{
-		close ();
+		close();
 
 		io::psx::SharedMemory sharedMemory;
 
 		bool result =
-			sharedMemory.open (name) &&
-			sharedMemory.setSize (sizeof (EventImpl));
+			sharedMemory.open(name) &&
+			sharedMemory.setSize(sizeof(EventImpl));
 
 		if (!result)
 			return false;
 
-		m_event = (EventImpl*) m_mapping.map (
+		m_event = (EventImpl*)m_mapping.map(
 			NULL,
-			sizeof (EventImpl),
+			sizeof(EventImpl),
 			PROT_READ | PROT_WRITE,
 			MAP_SHARED,
 			sharedMemory
@@ -317,35 +317,35 @@ public:
 
 		if (!m_event)
 		{
-			sharedMemory.unlink (name);
+			sharedMemory.unlink(name);
 			return false;
 		}
 
 		psx::CondAttr condAttr;
 		psx::MutexAttr mutexAttr;
 
-		condAttr.setProcessShared (PTHREAD_PROCESS_SHARED);
-		mutexAttr.setProcessShared (PTHREAD_PROCESS_SHARED);
+		condAttr.setProcessShared(PTHREAD_PROCESS_SHARED);
+		mutexAttr.setProcessShared(PTHREAD_PROCESS_SHARED);
 
-		new (m_event) EventImpl (condAttr, mutexAttr);
+		new(m_event)EventImpl(condAttr, mutexAttr);
 		m_name = name;
 		return true;
 	}
 
 	bool
-	open (const sl::StringRef& name)
+	open(const sl::StringRef& name)
 	{
-		close ();
+		close();
 
 		io::psx::SharedMemory sharedMemory;
 
-		bool result = sharedMemory.open (name, O_RDWR); // no O_CREAT
+		bool result = sharedMemory.open(name, O_RDWR); // no O_CREAT
 		if (!result)
 			return false;
 
-		m_event = (EventImpl*) m_mapping.map (
+		m_event = (EventImpl*)m_mapping.map(
 			NULL,
-			sizeof (EventImpl),
+			sizeof(EventImpl),
 			PROT_READ | PROT_WRITE,
 			MAP_SHARED,
 			sharedMemory
@@ -355,24 +355,24 @@ public:
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		ASSERT (m_event);
-		return m_event->wait (timeout);
+		ASSERT(m_event);
+		return m_event->wait(timeout);
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		ASSERT (m_event);
-		return m_event->signal ();
+		ASSERT(m_event);
+		return m_event->signal();
 	}
 
 	bool
-	reset ()
+	reset()
 	{
-		ASSERT (m_event);
-		m_event->reset (); // returns void on POSIX
+		ASSERT(m_event);
+		m_event->reset(); // returns void on POSIX
 		return true;
 	}
 };
@@ -381,8 +381,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef NameableEventBase <sl::False <bool> > NameableEvent;
-typedef NameableEventBase <sl::True <bool> > NameableNotificationEvent;
+typedef NameableEventBase<sl::False<bool> > NameableEvent;
+typedef NameableEventBase<sl::True<bool> > NameableNotificationEvent;
 
 //..............................................................................
 

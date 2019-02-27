@@ -34,7 +34,7 @@ public:
 
 public:
 	const Key&
-	getKey () const
+	getKey() const
 	{
 		return m_key;
 	}
@@ -46,17 +46,17 @@ template <
 	typename Key,
 	typename Value
 	>
-class MapIterator: public Iterator <MapEntry <Key, Value> >
+class MapIterator: public Iterator<MapEntry<Key, Value> >
 {
 public:
-	MapIterator ()
+	MapIterator()
 	{
 	}
 
 	template <typename T>
-	MapIterator (const Iterator <T>& src)
+	MapIterator(const Iterator<T>& src)
 	{
-		this->m_p = src.getEntry ();
+		this->m_p = src.getEntry();
 	}
 };
 
@@ -64,17 +64,17 @@ template <
 	typename Key,
 	typename Value
 	>
-class ConstMapIterator: public ConstIterator <MapEntry <Key, Value> >
+class ConstMapIterator: public ConstIterator<MapEntry<Key, Value> >
 {
 public:
-	ConstMapIterator ()
+	ConstMapIterator()
 	{
 	}
 
 	template <typename T>
-	ConstMapIterator (const ConstIterator <T>& src)
+	ConstMapIterator(const ConstIterator<T>& src)
 	{
-		this->m_p = src.getEntry ();
+		this->m_p = src.getEntry();
 	}
 };
 

@@ -23,17 +23,17 @@ public:
 	void
 	operator () (int)
 	{
-		ERR_load_crypto_strings ();
+		ERR_load_crypto_strings();
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::StringRef
-CryptoErrorProvider::getErrorDescription (const err::ErrorRef& error)
+CryptoErrorProvider::getErrorDescription(const err::ErrorRef& error)
 {
-	sl::callOnce (LoadCryptoStrings (), 0);
-	return ERR_reason_error_string (error->m_code);
+	sl::callOnce(LoadCryptoStrings(), 0);
+	return ERR_reason_error_string(error->m_code);
 }
 
 //..............................................................................

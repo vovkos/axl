@@ -19,59 +19,59 @@ namespace psx {
 //..............................................................................
 
 bool
-Socket::open (
+Socket::open(
 	int addressFamily,
 	int sockKind,
 	int protocol
 	)
 {
-	close ();
-	m_h = ::socket (addressFamily, sockKind, protocol);
-	return err::complete (m_h != -1);
+	close();
+	m_h = ::socket(addressFamily, sockKind, protocol);
+	return err::complete(m_h != -1);
 }
 
 int
-Socket::getError ()
+Socket::getError()
 {
 	int error = 0;
-	getOption (SOL_SOCKET, SO_ERROR, &error, sizeof (int));
+	getOption(SOL_SOCKET, SO_ERROR, &error, sizeof(int));
 	return error;
 }
 
 bool
-Socket::setBlockingMode (bool isBlocking)
+Socket::setBlockingMode(bool isBlocking)
 {
 	int value = !isBlocking;
-	int result = ::ioctl (m_h, FIONBIO, &value);
-	return err::complete (result != -1);
+	int result = ::ioctl(m_h, FIONBIO, &value);
+	return err::complete(result != -1);
 }
 
 bool
-Socket::getAddress (SockAddr* addr)
+Socket::getAddress(SockAddr* addr)
 {
-	socklen_t size = sizeof (SockAddr);
-	int result = ::getsockname (m_h, (sockaddr*) addr, &size);
-	return err::complete (result != -1);
+	socklen_t size = sizeof(SockAddr);
+	int result = ::getsockname(m_h, (sockaddr*)addr, &size);
+	return err::complete(result != -1);
 }
 
 bool
-Socket::getPeerAddress (SockAddr* addr)
+Socket::getPeerAddress(SockAddr* addr)
 {
-	socklen_t size = sizeof (SockAddr);
-	int result = ::getpeername (m_h, (sockaddr*) addr, &size);
-	return err::complete (result != -1);
+	socklen_t size = sizeof(SockAddr);
+	int result = ::getpeername(m_h, (sockaddr*)addr, &size);
+	return err::complete(result != -1);
 }
 
 bool
-Socket::connect (const sockaddr* addr)
+Socket::connect(const sockaddr* addr)
 {
-	int result = ::connect (m_h, addr, getSockAddrSize (addr));
+	int result = ::connect(m_h, addr, getSockAddrSize(addr));
 	if (result != -1)
 		return true;
 
 	if (errno != EINPROGRESS)
 	{
-		err::setError (errno);
+		err::setError(errno);
 		return false;
 	}
 
@@ -79,36 +79,36 @@ Socket::connect (const sockaddr* addr)
 }
 
 int
-Socket::accept (SockAddr* addr)
+Socket::accept(SockAddr* addr)
 {
-	socklen_t addrSize = sizeof (SockAddr);
-	int socket = ::accept (
+	socklen_t addrSize = sizeof(SockAddr);
+	int socket = ::accept(
 		m_h,
-		(sockaddr*) addr,
+		(sockaddr*)addr,
 		addr ? &addrSize : NULL
 		);
 
-	return err::complete (socket, -1);
+	return err::complete(socket, -1);
 }
 
 size_t
-Socket::recvFrom (
+Socket::recvFrom(
 	void* p,
 	size_t size,
 	SockAddr* addr
 	)
 {
-	socklen_t addrSize = sizeof (SockAddr);
-	int result = ::recvfrom (
+	socklen_t addrSize = sizeof(SockAddr);
+	int result = ::recvfrom(
 		m_h,
 		p,
 		size,
 		0,
-		(sockaddr*) addr,
+		(sockaddr*)addr,
 		addr ? &addrSize : NULL
 		);
 
-	return err::complete (result, -1);
+	return err::complete(result, -1);
 }
 
 //..............................................................................

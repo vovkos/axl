@@ -17,22 +17,22 @@ namespace {
 
 //..............................................................................
 
-void run ()
+void run()
 {
 	sys::win::Bstr bstr;
 
 	bstr = "hui";
 	bstr = L"govno";
-	bstr = sl::StringRef ("i");
-	bstr = sl::StringRef_w (L"muravei");
-	bstr = sys::win::Bstr ("muravei");
-	bstr = sys::win::Bstr (L"govno");
-	bstr = sys::win::Bstr (sl::StringRef ("i"));
-	bstr = sys::win::Bstr (sl::StringRef_w (L"hui"));
+	bstr = sl::StringRef("i");
+	bstr = sl::StringRef_w(L"muravei");
+	bstr = sys::win::Bstr("muravei");
+	bstr = sys::win::Bstr(L"govno");
+	bstr = sys::win::Bstr(sl::StringRef("i"));
+	bstr = sys::win::Bstr(sl::StringRef_w(L"hui"));
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_Bstr", run)
+ADD_TEST_CASE("test_Bstr", run)
 
 }

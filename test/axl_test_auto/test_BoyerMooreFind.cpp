@@ -16,12 +16,12 @@ namespace {
 
 //..............................................................................
 
-void run ()
+void run()
 {
 	sl::TextBoyerMooreFind find;
 
-	char haystack [] = "hui govno i muravei";
-	char needle [] = "muravei";
+	char haystack[] = "hui govno i muravei";
+	char needle[] = "muravei";
 
 	uint_t flags =
 //		sl::TextBoyerMooreFlag_Reverse |
@@ -29,44 +29,44 @@ void run ()
 		sl::TextBoyerMooreFlag_WholeWord |
 		0;
 
-	find.setPattern (sl::StringRef (needle, lengthof (needle)), flags);
+	find.setPattern(sl::StringRef(needle, lengthof(needle)), flags);
 
 	size_t result = -1;
 	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
 
 #if 1
-	for (size_t i = 0; i < lengthof (haystack); i++)
+	for (size_t i = 0; i < lengthof(haystack); i++)
 	{
-		result = find.find (&incrementalContext, i, sl::StringRef (haystack + i, 1));
+		result = find.find(&incrementalContext, i, sl::StringRef(haystack + i, 1));
 		if (result != -1)
 			break;
 	}
 
 	if (result == -1 && (flags & sl::TextBoyerMooreFlag_WholeWord) != 0)
-		result = find.find (&incrementalContext, lengthof (haystack), sl::StringRef (" ", 1));
+		result = find.find(&incrementalContext, lengthof(haystack), sl::StringRef(" ", 1));
 
 #elif 0
-	for (intptr_t i = lengthof (haystack) - 1; i >= 0; i--)
+	for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--)
 	{
-		result = find.find (&incrementalContext, i, haystack + i, 1);
+		result = find.find(&incrementalContext, i, haystack + i, 1);
 		if (result != -1)
 			break;
 	}
 
 	if (result == -1 && (flags & sl::TextBoyerMooreFind::Flag_WholeWord) != 0)
-		result = find.find (&incrementalContext, -1, " ", 1);
+		result = find.find(&incrementalContext, -1, " ", 1);
 #else
-	result = find.find (haystack, lengthof (haystack));
+	result = find.find(haystack, lengthof(haystack));
 #endif
 
-	printf ("result = %d\n", result);
+	printf("result = %d\n", result);
 
-	result = find.find (sl::StringRef (haystack, lengthof (haystack)));
-	printf ("result = %d\n", result);
+	result = find.find(sl::StringRef(haystack, lengthof(haystack)));
+	printf("result = %d\n", result);
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_BoyerMooreFind", run)
+ADD_TEST_CASE("test_BoyerMooreFind", run)
 
 }

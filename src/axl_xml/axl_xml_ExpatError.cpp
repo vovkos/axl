@@ -18,13 +18,13 @@ namespace xml {
 //..............................................................................
 
 err::ErrorHdr*
-ExpatError::create (XML_Error code)
+ExpatError::create(XML_Error code)
 {
-	err::ErrorHdr* error = createBuffer (sizeof (err::ErrorHdr));
+	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
 	if (!error)
 		return NULL;
 
-	error->m_size = sizeof (err::ErrorHdr);
+	error->m_size = sizeof(err::ErrorHdr);
 	error->m_guid = g_expatErrorGuid;
 	error->m_code = code;
 	return error;

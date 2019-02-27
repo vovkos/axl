@@ -27,14 +27,14 @@ protected:
 	pthread_mutexattr_t m_attr;
 
 public:
-	MutexAttr ()
+	MutexAttr()
 	{
-		::pthread_mutexattr_init (&m_attr);
+		::pthread_mutexattr_init(&m_attr);
 	}
 
-	~MutexAttr ()
+	~MutexAttr()
 	{
-		::pthread_mutexattr_destroy (&m_attr);
+		::pthread_mutexattr_destroy(&m_attr);
 	}
 
 	operator const pthread_mutexattr_t* () const
@@ -48,16 +48,16 @@ public:
 	}
 
 	bool
-	getProcessShared (int* value) const;
+	getProcessShared(int* value) const;
 
 	bool
-	setProcessShared (int value);
+	setProcessShared(int value);
 
 	bool
-	getType (int* value) const;
+	getType(int* value) const;
 
 	bool
-	setType (int value);
+	setType(int value);
 };
 
 //..............................................................................
@@ -68,14 +68,14 @@ protected:
 	pthread_mutex_t m_mutex;
 
 public:
-	Mutex (const pthread_mutexattr_t* attr = NULL)
+	Mutex(const pthread_mutexattr_t* attr = NULL)
 	{
-		::pthread_mutex_init (&m_mutex, attr);
+		::pthread_mutex_init(&m_mutex, attr);
 	}
 
-	~Mutex ()
+	~Mutex()
 	{
-		::pthread_mutex_destroy (&m_mutex);
+		::pthread_mutex_destroy(&m_mutex);
 	}
 
 	operator pthread_mutex_t* ()
@@ -84,24 +84,24 @@ public:
 	}
 
 	bool
-	tryLock ();
+	tryLock();
 
 	void
-	lock ()
+	lock()
 	{
-		int result = ::pthread_mutex_lock (&m_mutex);
-		ASSERT (result == 0);
+		int result = ::pthread_mutex_lock(&m_mutex);
+		ASSERT(result == 0);
 	}
 
 #if (!_AXL_OS_DARWIN)
 	bool
-	lock (uint_t timeout);
+	lock(uint_t timeout);
 #endif
 
 	void
-	unlock ()
+	unlock()
 	{
-		::pthread_mutex_unlock (&m_mutex);
+		::pthread_mutex_unlock(&m_mutex);
 	}
 };
 

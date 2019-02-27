@@ -27,125 +27,125 @@ public:
 	void
 	operator () (SOCKET socket)
 	{
-		::closesocket (socket);
+		::closesocket(socket);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Socket: public sl::Handle <SOCKET, CloseSocket, sl::MinusOne <SOCKET> >
+class Socket: public sl::Handle<SOCKET, CloseSocket, sl::MinusOne<SOCKET> >
 {
 public:
 	bool
-	open (
+	open(
 		int addressFamily,
 		int sockKind,
 		int protocol
 		);
 
 	int
-	getError ();
+	getError();
 
 	bool
-	setBlockingMode (bool isBlocking);
+	setBlockingMode(bool isBlocking);
 
 	size_t
-	getIncomingDataSize ();
+	getIncomingDataSize();
 
 	bool
-	bind (const sockaddr* addr)
+	bind(const sockaddr* addr)
 	{
-		int result = ::bind (m_h, addr, getSockAddrSize (addr));
-		return complete (result != SOCKET_ERROR);
+		int result = ::bind(m_h, addr, getSockAddrSize(addr));
+		return complete(result != SOCKET_ERROR);
 	}
 
 	bool
-	getAddress (SockAddr* addr);
+	getAddress(SockAddr* addr);
 
 	bool
-	getPeerAddress (SockAddr* addr);
+	getPeerAddress(SockAddr* addr);
 
 	bool
-	getOption (
+	getOption(
 		int level,
 		int option,
 		void* p,
 		size_t size
 		)
 	{
-		int result = ::getsockopt (m_h, level, option, (char*) p, (int*) &size);
-		return complete (result != SOCKET_ERROR);
+		int result = ::getsockopt(m_h, level, option, (char*)p, (int*) &size);
+		return complete(result != SOCKET_ERROR);
 	}
 
 	bool
-	setOption (
+	setOption(
 		int level,
 		int option,
 		const void* p,
 		size_t size
 		)
 	{
-		int result = ::setsockopt (m_h, level, option, (char*) p, size);
-		return complete (result != SOCKET_ERROR);
+		int result = ::setsockopt(m_h, level, option, (char*)p, size);
+		return complete(result != SOCKET_ERROR);
 	}
 
 	bool
-	listen (size_t backLog)
+	listen(size_t backLog)
 	{
-		int result = ::listen (m_h, (int) backLog);
-		return complete (result != SOCKET_ERROR);
+		int result = ::listen(m_h, (int)backLog);
+		return complete(result != SOCKET_ERROR);
 	}
 
 	SOCKET
-	accept (SockAddr* addr = NULL);
+	accept(SockAddr* addr = NULL);
 
 	bool
-	connect (const sockaddr* addr)
+	connect(const sockaddr* addr)
 	{
-		int result = ::connect (m_h, addr, getSockAddrSize (addr));
-		return completeAsyncRequest (result, WSAEWOULDBLOCK);
+		int result = ::connect(m_h, addr, getSockAddrSize(addr));
+		return completeAsyncRequest(result, WSAEWOULDBLOCK);
 	}
 
 	bool
-	shutdown (int mode = SD_BOTH)
+	shutdown(int mode = SD_BOTH)
 	{
-		int result = ::shutdown (m_h, mode);
-		return complete (result);
+		int result = ::shutdown(m_h, mode);
+		return complete(result);
 	}
 
 	size_t
-	send (
+	send(
 		const void* p,
 		size_t size
 		)
 	{
-		int result = ::send (m_h, (const char*) p, (int) size, 0);
-		return complete (result, SOCKET_ERROR);
+		int result = ::send(m_h, (const char*) p, (int)size, 0);
+		return complete(result, SOCKET_ERROR);
 	}
 
 	size_t
-	recv (
+	recv(
 		void* p,
 		size_t size
 		)
 	{
-		int result = ::recv (m_h, (char*) p, (int) size, 0);
-		return complete (result, SOCKET_ERROR);
+		int result = ::recv(m_h, (char*)p, (int)size, 0);
+		return complete(result, SOCKET_ERROR);
 	}
 
 	size_t
-	sendTo (
+	sendTo(
 		void* p,
 		size_t size,
 		const sockaddr* addr
 		)
 	{
-		int result = ::sendto (m_h, (char*) p, (int) size, 0, addr, getSockAddrSize (addr));
-		return complete (result, SOCKET_ERROR);
+		int result = ::sendto(m_h, (char*)p, (int)size, 0, addr, getSockAddrSize(addr));
+		return complete(result, SOCKET_ERROR);
 	}
 
 	size_t
-	recvFrom (
+	recvFrom(
 		void* p,
 		size_t size,
 		SockAddr* addr
@@ -153,7 +153,7 @@ public:
 
 public:
 	bool
-	wsaOpen (
+	wsaOpen(
 		int addressFamily,
 		int sockKind,
 		int protocol,
@@ -161,37 +161,37 @@ public:
 		);
 
 	bool
-	wsaEventSelect (
+	wsaEventSelect(
 		HANDLE hEvent,
 		int mask
 		)
 	{
-		int result = ::WSAEventSelect (m_h, hEvent, mask);
-		return complete (result != SOCKET_ERROR);
+		int result = ::WSAEventSelect(m_h, hEvent, mask);
+		return complete(result != SOCKET_ERROR);
 	}
 
 	bool
-	wsaEnumEvents (
+	wsaEnumEvents(
 		WSANETWORKEVENTS* events,
 		HANDLE hEvent = NULL
 		)
 	{
-		int result = ::WSAEnumNetworkEvents (m_h, hEvent, events);
-		return complete (result != SOCKET_ERROR);
+		int result = ::WSAEnumNetworkEvents(m_h, hEvent, events);
+		return complete(result != SOCKET_ERROR);
 	}
 
 	bool
-	wsaConnect (const sockaddr* addr)
+	wsaConnect(const sockaddr* addr)
 	{
-		int result = ::WSAConnect (m_h, addr, getSockAddrSize (addr), NULL, NULL, NULL, NULL);
-		return completeAsyncRequest (result, WSAEWOULDBLOCK);
+		int result = ::WSAConnect(m_h, addr, getSockAddrSize(addr), NULL, NULL, NULL, NULL);
+		return completeAsyncRequest(result, WSAEWOULDBLOCK);
 	}
 
 	SOCKET
-	wsaAccept (SockAddr* addr);
+	wsaAccept(SockAddr* addr);
 
 	bool
-	wsaSend (
+	wsaSend(
 		const void* p,
 		dword_t size,
 		dword_t* actualSize,
@@ -201,7 +201,7 @@ public:
 		);
 
 	bool
-	wsaRecv (
+	wsaRecv(
 		void* p,
 		dword_t size,
 		dword_t* actualSize,
@@ -211,7 +211,7 @@ public:
 		);
 
 	bool
-	wsaSendTo (
+	wsaSendTo(
 		const void* p,
 		dword_t size,
 		dword_t* actualSize,
@@ -222,7 +222,7 @@ public:
 		);
 
 	bool
-	wsaRecvFrom (
+	wsaRecvFrom(
 		void* p,
 		dword_t size,
 		dword_t* actualSize,
@@ -234,7 +234,7 @@ public:
 		);
 
 	bool
-	wsaIoctl (
+	wsaIoctl(
 		dword_t ioctlCode,
 		const void* inBuffer,
 		dword_t inBufferSize,
@@ -246,40 +246,40 @@ public:
 		);
 
 	bool
-	wsaGetOverlappedResult (
+	wsaGetOverlappedResult(
 		WSAOVERLAPPED* overlapped,
 		dword_t* actualSize,
 		dword_t* flags = NULL
 		) const;
 
 	size_t
-	wsaGetOverlappedResult (WSAOVERLAPPED* overlapped) const;
+	wsaGetOverlappedResult(WSAOVERLAPPED* overlapped) const;
 
 protected:
 	template <typename T>
 	static
 	T
-	complete (
+	complete(
 		T result,
 		T failResult
 		)
 	{
 		if (result == failResult)
-			err::setError (::WSAGetLastError ());
+			err::setError(::WSAGetLastError());
 
 		return result;
 	}
 
 	static
 	bool
-	complete (int result)
+	complete(int result)
 	{
-		return complete <bool> (result != 0, false);
+		return complete<bool> (result != 0, false);
 	}
 
 	static
 	bool
-	completeAsyncRequest (
+	completeAsyncRequest(
 		int result,
 		int pendingResult
 		);

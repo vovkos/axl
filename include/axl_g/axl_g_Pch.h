@@ -346,16 +346,16 @@ typedef wchar_t           utf32_t;
 // sizeof/countof/lengthof/offsetof/containerof
 
 #ifndef countof
-#	define countof(a) (sizeof (a) / sizeof ((a) [0]))
+#	define countof(a) (sizeof(a) / sizeof((a) [0]))
 #endif
 
 #ifndef lengthof
-#	define lengthof(s) (countof (s) - 1)
+#	define lengthof(s) (countof(s) - 1)
 #endif
 
 #ifndef containerof
 #	define containerof(p, T, f) \
-		((T*) ((char*) (p) - offsetof (T, f)))
+		((T*)((char*)(p) - offsetof(T, f)))
 #endif
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -364,16 +364,16 @@ typedef wchar_t           utf32_t;
 
 inline
 size_t
-strlen_s (const char* p)
+strlen_s(const char* p)
 {
-	return p ? strlen (p) : 0;
+	return p ? strlen(p) : 0;
 }
 
 inline
 size_t
-wcslen_s (const wchar_t* p)
+wcslen_s(const wchar_t* p)
 {
-	return p ? wcslen (p) : 0;
+	return p ? wcslen(p) : 0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -387,27 +387,27 @@ wcslen_s (const wchar_t* p)
 #if (_AXL_CPP_MSC)
 #	define AXL_CDECL       __cdecl
 #	define AXL_STDCALL     __stdcall
-#	define AXL_SELECT_ANY  __declspec (selectany)
-#	define AXL_EXPORT      __declspec (dllexport)
+#	define AXL_SELECT_ANY  __declspec(selectany)
+#	define AXL_EXPORT      __declspec(dllexport)
 
 #	define AXL_GCC_ALIGN(n)
 #	define AXL_GCC_MSC_STRUCT
 #	define AXL_GCC_NO_ASAN
 #elif (_AXL_CPP_GCC)
 #	if (_AXL_CPU_X86)
-#		define AXL_CDECL   __attribute__ ((cdecl))
-#		define AXL_STDCALL __attribute__ ((stdcall))
+#		define AXL_CDECL   __attribute__((cdecl))
+#		define AXL_STDCALL __attribute__((stdcall))
 #	else
 #		define AXL_CDECL
 #		define AXL_STDCALL
 #	endif
-#	define AXL_SELECT_ANY  __attribute__ ((weak))
-#	define AXL_EXPORT      __attribute__ ((visibility ("default")))
+#	define AXL_SELECT_ANY  __attribute__((weak))
+#	define AXL_EXPORT      __attribute__((visibility("default")))
 
-#	define AXL_GCC_ALIGN(n) __attribute__((aligned (n)))
+#	define AXL_GCC_ALIGN(n) __attribute__((aligned(n)))
 
 #	ifdef __has_attribute
-#		if (__has_attribute (ms_struct))
+#		if (__has_attribute(ms_struct))
 #			define AXL_GCC_MSC_STRUCT __attribute__((ms_struct))
 #		else
 #			define AXL_GCC_MSC_STRUCT
@@ -417,10 +417,10 @@ wcslen_s (const wchar_t* p)
 #   endif
 
 #	ifdef __has_feature
-#		if (__has_feature (address_sanitizer))
+#		if (__has_feature(address_sanitizer))
 #	 		define _AXL_GCC_ASAN 1
 #		endif
-#	elif (defined (__SANITIZE_ADDRESS__))
+#	elif (defined(__SANITIZE_ADDRESS__))
 # 		define _AXL_GCC_ASAN 1
 #	endif
 
@@ -441,7 +441,7 @@ wcslen_s (const wchar_t* p)
 
 #define AXL_DISABLE_COPY(Class) \
 private: \
-	Class (const Class&);  \
+	Class(const Class&);  \
 	void \
 	operator = (const Class&); \
 
@@ -467,15 +467,15 @@ private: \
 //   AXL_TODO ("implement new feature")
 
 #define AXL_ITOA_IMPL(n) #n
-#define AXL_ITOA(n)  AXL_ITOA_IMPL (n)
+#define AXL_ITOA(n)  AXL_ITOA_IMPL(n)
 
 #if (_AXL_CPP_MSC)
 #	define AXL_SRC_POS  __FILE__ "(" AXL_ITOA (__LINE__) ")"
-#	define AXL_TODO(s) __pragma (message (AXL_SRC_POS ": TODO: " s))
+#	define AXL_TODO(s) __pragma(message(AXL_SRC_POS ": TODO: " s))
 #elif (_AXL_CPP_GCC)
 #	define AXL_SRC_POS  __FILE__ ":" AXL_ITOA (__LINE__)
-#	define AXL_PRAGMA_IMPL(p) _Pragma (#p)
-#	define AXL_TODO(s) AXL_PRAGMA_IMPL (message "TODO: " s)
+#	define AXL_PRAGMA_IMPL(p) _Pragma(#p)
+#	define AXL_TODO(s) AXL_PRAGMA_IMPL(message "TODO: " s)
 #endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -496,78 +496,78 @@ protected:
 	bool m_isInitialized;
 
 public:
-	axl_va_list ()
+	axl_va_list()
 	{
 		m_isInitialized = false;
 	}
 
-	axl_va_list (const axl_va_list& src)
+	axl_va_list(const axl_va_list& src)
 	{
 		m_isInitialized = false;
-		copy (src);
+		copy(src);
 	}
 
-	axl_va_list (va_list va)
+	axl_va_list(va_list va)
 	{
 		m_isInitialized = false;
-		copy (va);
+		copy(va);
 	}
 
-	~axl_va_list ()
+	~axl_va_list()
 	{
-		end ();
+		end();
 	}
 
 	axl_va_list&
 	operator = (const axl_va_list& src)
 	{
-		copy (src);
+		copy(src);
 		return *this;
 	}
 
 	axl_va_list&
 	operator = (va_list va)
 	{
-		copy (va);
+		copy(va);
 		return *this;
 	}
 
 	operator va_list& ()
 	{
-		ASSERT (m_isInitialized);
+		ASSERT(m_isInitialized);
 		return m_va;
 	}
 
 	va_list*
-	initialize ()
+	initialize()
 	{
 		m_isInitialized = true;
 		return &m_va;
 	}
 
 	void
-	end ()
+	end()
 	{
 		if (m_isInitialized)
 		{
-			va_end (m_va);
+			va_end(m_va);
 			m_isInitialized = false;
 		}
 	}
 
 	void
-	copy (const axl_va_list& src)
+	copy(const axl_va_list& src)
 	{
-		copy ((va_list&) src.m_va);
+		copy((va_list&) src.m_va);
 	}
 
 	void
-	copy (va_list va)
+	copy(va_list va)
 	{
-		end ();
+		end();
 
 #ifdef va_copy
-		va_copy (m_va, va);
+		va_copy(m_va, va);
 #else
 		m_va = va;
 #endif
@@ -576,10 +576,10 @@ public:
 
 	template <typename T>
 	T
-	arg ()
+	arg()
 	{
-		ASSERT (m_isInitialized);
-		return va_arg (m_va, T);
+		ASSERT(m_isInitialized);
+		return va_arg(m_va, T);
 	}
 };
 
@@ -589,19 +589,19 @@ public:
 // use va_start/va_arg/va_end...
 
 #define axl_va_start(va, a) \
-	va_start (*(va).initialize (), a)
+	va_start(*(va).initialize(), a)
 
 #define axl_va_arg(va, T) \
-	((va).arg <T> ())
+	((va).arg<T> ())
 
 #define axl_va_end(va) \
-	((va).end ())
+	((va).end())
 
 // ...or use this single-line macro and then iterate via va.arg <T> ()
 
 #define AXL_VA_DECL(va, a) \
 	axl_va_list va; \
-	axl_va_start (va, a);
+	axl_va_start(va, a);
 
 //..............................................................................
 
@@ -610,7 +610,7 @@ public:
 #ifdef _AXL_DEBUG
 #	if (_AXL_OS_WIN)
 void
-axl_trace_va (
+axl_trace_va(
 	const char* formatString,
 	axl_va_list va
 	);
@@ -619,25 +619,25 @@ AXL_SELECT_ANY FILE* axl_g_traceFile = stdout;
 
 inline
 void
-axl_trace_va (
+axl_trace_va(
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	vfprintf (axl_g_traceFile, formatString, va);
-	fflush (axl_g_traceFile);
+	vfprintf(axl_g_traceFile, formatString, va);
+	fflush(axl_g_traceFile);
 }
 #	endif
 
 inline
 void
-axl_trace (
+axl_trace(
 	const char* formatString,
 	...
 	)
 {
-	AXL_VA_DECL (va, formatString);
-	axl_trace_va (formatString, va);
+	AXL_VA_DECL(va, formatString);
+	axl_trace_va(formatString, va);
 }
 
 #	define AXL_TRACE \
@@ -654,18 +654,18 @@ axl_trace (
 //..............................................................................
 
 #if (_AXL_CPP_MSC)
-#	pragma warning (disable: 4146) // warning C4146: unary minus operator applied to unsigned type, result still unsigned
-#	pragma warning (disable: 4267) // warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
-#	pragma warning (disable: 4355) // warning C4355: 'this' : used in base member initializer list
-#	pragma warning (disable: 4477) // warning C4477: 'printf' : format string '...' requires an argument of type '...', but variadic argument ... has type '...'
-#	pragma warning (disable: 4838) // warning C4838: conversion from 'int' to 'std::size_t' requires a narrowing conversion
+#	pragma warning(disable: 4146) // warning C4146: unary minus operator applied to unsigned type, result still unsigned
+#	pragma warning(disable: 4267) // warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+#	pragma warning(disable: 4355) // warning C4355: 'this' : used in base member initializer list
+#	pragma warning(disable: 4477) // warning C4477: 'printf' : format string '...' requires an argument of type '...', but variadic argument ... has type '...'
+#	pragma warning(disable: 4838) // warning C4838: conversion from 'int' to 'std::size_t' requires a narrowing conversion
 
 #	if (_AXL_DEBUG)
 		// many binary distributions of libs only come with Release build; static versions of those link to LIBCMT
 		// thus producing the following warning when linked to your executables on Debug builds:
 
 		// warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-#		pragma comment (linker, "/NODEFAULTLIB:LIBCMT")
+#		pragma comment(linker, "/NODEFAULTLIB:LIBCMT")
 #	endif
 #endif
 

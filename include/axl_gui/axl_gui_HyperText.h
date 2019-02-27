@@ -36,118 +36,118 @@ protected:
 	sl::String_utf32 m_text;
 	TextAttrAnchorArray m_attrArray;
 	HyperlinkAnchorArray m_hyperlinkArray;
-	sl::Array <HyperlinkXMapEntry> m_hyperlinkXMap;
+	sl::Array<HyperlinkXMapEntry> m_hyperlinkXMap;
 
 public:
-	HyperText ()
+	HyperText()
 	{
 	}
 
-	HyperText (const sl::StringRef& source)
+	HyperText(const sl::StringRef& source)
 	{
-		setHyperText (source);
+		setHyperText(source);
 	}
 
-	HyperText (
+	HyperText(
 		const gui::TextAttr& baseAttr,
 		const sl::StringRef& source
 		)
 	{
-		setHyperText (baseAttr, source);
+		setHyperText(baseAttr, source);
 	}
 
 	const sl::String&
-	getSource () const
+	getSource() const
 	{
 		return m_source;
 	}
 
 	const sl::String_utf32&
-	getText () const
+	getText() const
 	{
 		return m_text;
 	}
 
 	const TextAttrAnchorArray*
-	getAttrArray () const
+	getAttrArray() const
 	{
 		return &m_attrArray;
 	}
 
 	void
-	clear ();
+	clear();
 
 	size_t
-	setHyperText (
+	setHyperText(
 		const TextAttr& baseAttr,
 		const sl::StringRef& text
 		)
 	{
-		clear ();
-		return appendHyperText (baseAttr, text);
+		clear();
+		return appendHyperText(baseAttr, text);
 	}
 
 	size_t
-	setHyperText (const sl::StringRef& text)
+	setHyperText(const sl::StringRef& text)
 	{
-		return setHyperText (TextAttr (), text);
+		return setHyperText(TextAttr(), text);
 	}
 
 	size_t
-	setPlainText (const sl::StringRef& text)
+	setPlainText(const sl::StringRef& text)
 	{
-		clear ();
-		return appendPlainText (text);
+		clear();
+		return appendPlainText(text);
 	}
 
 	size_t
-	setChar (
+	setChar(
 		utf32_t c,
 		size_t count = 1
 		)
 	{
-		clear ();
-		return appendChar (c, count);
+		clear();
+		return appendChar(c, count);
 	}
 
 	size_t
-	appendHyperText (
+	appendHyperText(
 		const TextAttr& baseAttr,
 		const sl::StringRef& text
 		);
 
 	size_t
-	appendHyperText (const sl::StringRef& text)
+	appendHyperText(const sl::StringRef& text)
 	{
-		return appendHyperText (TextAttr (), text);
+		return appendHyperText(TextAttr(), text);
 	}
 
 	size_t
-	appendPlainText (const sl::StringRef& text);
+	appendPlainText(const sl::StringRef& text);
 
 	size_t
-	appendChar (
+	appendChar(
 		utf32_t c,
 		size_t count = 1
 		);
 
 	size_t
-	backspace (size_t backLength);
+	backspace(size_t backLength);
 
 	Size
-	calcTextSize (Font* font) const;
+	calcTextSize(Font* font) const;
 
 	void
-	calcHyperlinkXMap (Font* font);
+	calcHyperlinkXMap(Font* font);
 
 	const HyperlinkAnchor*
-	findHyperlinkByX (int x) const;
+	findHyperlinkByX(int x) const;
 
 	const HyperlinkAnchor*
-	findHyperlinkByOffset (size_t offset) const
+	findHyperlinkByOffset(size_t offset) const
 	{
-		const HyperlinkAnchor* anchor = m_hyperlinkArray.find (offset);
-		return anchor && !anchor->m_hyperlink.isEmpty () ? anchor : NULL;
+		const HyperlinkAnchor* anchor = m_hyperlinkArray.find(offset);
+		return anchor && !anchor->m_hyperlink.isEmpty() ? anchor : NULL;
 	}
 };
 

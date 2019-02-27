@@ -26,7 +26,7 @@ class Base32Encoding
 public:
 	static
 	size_t
-	encode (
+	encode(
 		sl::String* string,
 		const void* p,
 		size_t size,
@@ -35,30 +35,30 @@ public:
 
 	static
 	sl::String
-	encode (
+	encode(
 		const void* p,
 		size_t size,
 		size_t hyphenDistance = 5
 		)
 	{
 		sl::String string;
-		encode (&string, p, size, hyphenDistance);
+		encode(&string, p, size, hyphenDistance);
 		return string;
 	}
 
 	static
 	size_t
-	decode (
-		sl::Array <char>* buffer,
+	decode(
+		sl::Array<char>* buffer,
 		const sl::StringRef& string
 		);
 
 	static
-	sl::Array <char>
-	decode (const sl::StringRef& string)
+	sl::Array<char>
+	decode(const sl::StringRef& string)
 	{
-		sl::Array <char> buffer;
-		decode (&buffer, string);
+		sl::Array<char> buffer;
+		decode(&buffer, string);
 		return buffer;
 	}
 };

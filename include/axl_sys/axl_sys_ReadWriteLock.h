@@ -49,47 +49,47 @@ protected:
 	NameableEvent m_writeEvent;
 
 public:
-	ReadWriteLock ()
+	ReadWriteLock()
 	{
 		m_data = NULL;
 	}
 
-	~ReadWriteLock ()
+	~ReadWriteLock()
 	{
-		close ();
+		close();
 	}
 
 	void
-	close ();
+	close();
 
 	bool
-	create ();
+	create();
 
 	bool
-	create (
+	create(
 		const sl::StringRef& mappingName,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName
 		);
 
 	bool
-	open (
+	open(
 		const sl::StringRef& mappingName,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName
 		);
 
 	bool
-	readLock (uint_t timeout = -1);
+	readLock(uint_t timeout = -1);
 
 	void
-	readUnlock ();
+	readUnlock();
 
 	bool
-	writeLock (uint_t timeout = -1);
+	writeLock(uint_t timeout = -1);
 
 	void
-	writeUnlock ();
+	writeUnlock();
 };
 
 //..............................................................................

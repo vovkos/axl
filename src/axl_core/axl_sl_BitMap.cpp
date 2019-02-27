@@ -19,7 +19,7 @@ namespace sl {
 //..............................................................................
 
 bool
-getBit (
+getBit(
 	const size_t* map,
 	size_t pageCount,
 	size_t bit)
@@ -30,11 +30,11 @@ getBit (
 
 	size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
 
-	return (map [page] & mask) != 0;
+	return (map[page] & mask) != 0;
 }
 
 bool
-setBit (
+setBit(
 	size_t* map,
 	size_t pageCount,
 	size_t bit,
@@ -58,7 +58,7 @@ setBit (
 }
 
 bool
-setBitRange (
+setBitRange(
 	size_t* map,
 	size_t pageCount,
 	size_t from,
@@ -91,12 +91,12 @@ setBitRange (
 
 		if (to < AXL_PTR_BITS)
 		{
-			mask = getBitmask (from, to);
+			mask = getBitmask(from, to);
 			*p |= mask;
 			return *p != old;
 		}
 
-		mask = getHiBitmask (from);
+		mask = getHiBitmask(from);
 		*p |= mask;
 
 		if (*p != old)
@@ -117,7 +117,7 @@ setBitRange (
 
 		if (to)
 		{
-			mask = getLoBitmask (to);
+			mask = getLoBitmask(to);
 			old = *p;
 			*p |= mask;
 
@@ -131,12 +131,12 @@ setBitRange (
 
 		if (to < AXL_PTR_BITS)
 		{
-			mask = getBitmask (from, to);
+			mask = getBitmask(from, to);
 			*p &= ~mask;
 			return *p != old;
 		}
 
-		mask = getHiBitmask (from);
+		mask = getHiBitmask(from);
 		*p &= ~mask;
 
 		if (*p != old)
@@ -157,7 +157,7 @@ setBitRange (
 
 		if (to)
 		{
-			mask = getLoBitmask (to);
+			mask = getLoBitmask(to);
 			old = *p;
 			*p &= ~mask;
 
@@ -170,7 +170,7 @@ setBitRange (
 }
 
 bool
-mergeBitMaps (
+mergeBitMaps(
 	size_t* map,
 	const size_t* map2,
 	size_t pageCount,
@@ -185,7 +185,7 @@ mergeBitMaps (
 	size_t* end = p + pageCount;
 	const size_t* p2 = map2;
 
-	switch (op)
+	switch(op)
 	{
 	case BitOpKind_Or:
 		for (; p < end; p++, p2++)
@@ -232,14 +232,14 @@ mergeBitMaps (
 		break;
 
 	default:
-		ASSERT (false);
+		ASSERT(false);
 	}
 
 	return hasChanged;
 }
 
 size_t
-findBit (
+findBit(
 	const size_t* map,
 	size_t pageCount,
 	size_t from,
@@ -256,28 +256,28 @@ findBit (
 
 	if (value)
 	{
-		size_t x = *p & getHiBitmask (from);
+		size_t x = *p & getHiBitmask(from);
 
 		if (x)
-			return i * AXL_PTR_BITS + getLoBitIdx (x);
+			return i * AXL_PTR_BITS + getLoBitIdx(x);
 
 		for (i++, p++; i < pageCount; i++, p++)
 		{
 			if (*p != 0)
-				return i * AXL_PTR_BITS + getLoBitIdx (*p);
+				return i * AXL_PTR_BITS + getLoBitIdx(*p);
 		}
 	}
 	else
 	{
-		size_t x = ~*p & getHiBitmask (from);
+		size_t x = ~*p & getHiBitmask(from);
 
 		if (x)
-			return i * AXL_PTR_BITS + getLoBitIdx (x);
+			return i * AXL_PTR_BITS + getLoBitIdx(x);
 
 		for (i++, p++; i < pageCount; i++, p++)
 		{
 			if (*p != -1)
-				return i * AXL_PTR_BITS + getLoBitIdx (~*p);
+				return i * AXL_PTR_BITS + getLoBitIdx(~*p);
 		}
 	}
 
@@ -287,60 +287,60 @@ findBit (
 //..............................................................................
 
 bool
-BitMap::create (size_t bitCount)
+BitMap::create(size_t bitCount)
 {
-	bool result = setBitCount (bitCount);
+	bool result = setBitCount(bitCount);
 	if (!result)
 		return false;
 
-	clear ();
+	clear();
 	return true;
 }
 
 bool
-BitMap::setBitCount (size_t bitCount)
+BitMap::setBitCount(size_t bitCount)
 {
 	size_t pageCount = bitCount / AXL_PTR_BITS;
 	if (bitCount & (AXL_PTR_BITS - 1))
 		pageCount++;
 
-	return m_map.setCountZeroConstruct (pageCount);
+	return m_map.setCountZeroConstruct(pageCount);
 }
 
 int
-BitMap::cmp (const BitMap& src) const
+BitMap::cmp(const BitMap& src) const
 {
-	size_t count = m_map.getCount ();
-	size_t count2 = src.m_map.getCount ();
+	size_t count = m_map.getCount();
+	size_t count2 = src.m_map.getCount();
 
 	return
 		count < count2 ? -1 :
 		count > count2 ? 1 :
-		memcmp (m_map, src.m_map, count * sizeof (size_t));
+		memcmp(m_map, src.m_map, count * sizeof(size_t));
 }
 
 bool
-BitMap::merge (
+BitMap::merge(
 	const BitMap& bitMap2,
 	BitOpKind op
 	)
 {
-	size_t pageCount = m_map.getCount ();
-	size_t pageCount2 = bitMap2.m_map.getCount ();
+	size_t pageCount = m_map.getCount();
+	size_t pageCount2 = bitMap2.m_map.getCount();
 
-	return sl::mergeBitMaps (m_map, bitMap2.m_map, AXL_MIN (pageCount, pageCount2), op);
+	return sl::mergeBitMaps(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2), op);
 }
 
 bool
-BitMap::mergeResize (
+BitMap::mergeResize(
 	const BitMap& bitMap2,
 	BitOpKind op
 	)
 {
-	size_t pageCount2 = bitMap2.m_map.getCount ();
-	size_t pageCount = m_map.ensureCountZeroConstruct (pageCount2);
+	size_t pageCount2 = bitMap2.m_map.getCount();
+	size_t pageCount = m_map.ensureCountZeroConstruct(pageCount2);
 
-	return sl::mergeBitMaps (m_map, bitMap2.m_map, AXL_MIN (pageCount, pageCount2), op);
+	return sl::mergeBitMaps(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2), op);
 }
 
 //..............................................................................

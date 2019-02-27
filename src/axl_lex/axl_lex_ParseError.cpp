@@ -19,20 +19,20 @@ namespace lex {
 //..............................................................................
 
 void
-decodeSrcPosError (
+decodeSrcPosError(
 	sl::StringRef* filePath_o,
 	LineCol* lineCol,
 	const err::ErrorHdr* error
 	)
 {
-	ASSERT (isSrcPosError (error));
+	ASSERT(isSrcPosError(error));
 
-	sl::Unpacker unpacker (error + 2, error [1].m_size - sizeof (err::ErrorHdr));
+	sl::Unpacker unpacker(error + 2, error[1].m_size - sizeof(err::ErrorHdr));
 
 	const char* filePath;
-	unpacker.unpack (&filePath);
-	unpacker.unpack (&lineCol->m_line);
-	unpacker.unpack (&lineCol->m_col);
+	unpacker.unpack(&filePath);
+	unpacker.unpack(&lineCol->m_line);
+	unpacker.unpack(&lineCol->m_col);
 
 	if (filePath_o)
 		*filePath_o = filePath;
@@ -41,11 +41,11 @@ decodeSrcPosError (
 //..............................................................................
 
 sl::StringRef
-ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
+ParseErrorProvider::getErrorDescription(const err::ErrorRef& error)
 {
-	sl::Unpacker unpacker (error + 1, error->m_size - sizeof (err::ErrorHdr));
+	sl::Unpacker unpacker(error + 1, error->m_size - sizeof(err::ErrorHdr));
 
-	switch (error->m_code)
+	switch(error->m_code)
 	{
 	case ParseErrorCode_SrcPos:
 		{
@@ -53,11 +53,11 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 		int line;
 		int col;
 
-		unpacker.unpack (&filePath);
-		unpacker.unpack (&line);
-		unpacker.unpack (&col);
+		unpacker.unpack(&filePath);
+		unpacker.unpack(&line);
+		unpacker.unpack(&col);
 
-		return sl::formatString ("%s(%d,%d)", filePath, line + 1, col + 1);
+		return sl::formatString("%s(%d,%d)", filePath, line + 1, col + 1);
 		}
 
 	case ParseErrorCode_InvalidSyntax:
@@ -67,8 +67,8 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 		{
 		const char* location;
 
-		unpacker.unpack (&location);
-		return sl::formatString ("invalid syntax in '%s'", location);
+		unpacker.unpack(&location);
+		return sl::formatString("invalid syntax in '%s'", location);
 		}
 
 	case ParseErrorCode_ExpectedToken:
@@ -76,17 +76,17 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 		const char* expectedToken;
 		const char* actualToken;
 
-		unpacker.unpack (&expectedToken);
-		unpacker.unpack (&actualToken);
-		return sl::formatString ("expected '%s' before '%s'", expectedToken, actualToken);
+		unpacker.unpack(&expectedToken);
+		unpacker.unpack(&actualToken);
+		return sl::formatString("expected '%s' before '%s'", expectedToken, actualToken);
 		}
 
 	case ParseErrorCode_UnexpectedToken:
 		{
 		const char* token;
 
-		unpacker.unpack (&token);
-		return sl::formatString ("unexpected '%s'", token);
+		unpacker.unpack(&token);
+		return sl::formatString("unexpected '%s'", token);
 		}
 
 	case ParseErrorCode_UnexpectedTokenIn:
@@ -94,9 +94,9 @@ ParseErrorProvider::getErrorDescription (const err::ErrorRef& error)
 		const char* token;
 		const char* location;
 
-		unpacker.unpack (&token);
-		unpacker.unpack (&location);
-		return sl::formatString ("unexpected '%s' in '%s'", token, location);
+		unpacker.unpack(&token);
+		unpacker.unpack(&location);
+		return sl::formatString("unexpected '%s' in '%s'", token, location);
 		}
 
 	default:

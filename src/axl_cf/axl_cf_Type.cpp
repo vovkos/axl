@@ -19,15 +19,15 @@ namespace cf {
 //..............................................................................
 
 sl::String
-getStringFromCfString (CFStringRef cfString)
+getStringFromCfString(CFStringRef cfString)
 {
-	size_t length = ::CFStringGetLength (cfString);
+	size_t length = ::CFStringGetLength(cfString);
 	if (!length)
-		return sl::String ();
+		return sl::String();
 
 	CFRange range = { 0, length };
 	CFIndex bufferLength = 0;
-	::CFStringGetBytes (
+	::CFStringGetBytes(
 		cfString,
 		range,
 		kCFStringEncodingUTF8,
@@ -39,18 +39,18 @@ getStringFromCfString (CFStringRef cfString)
 		);
 
 	if (!bufferLength)
-		return sl::String ();
+		return sl::String();
 
 	sl::String string;
-	char* p = string.createBuffer (bufferLength);
+	char* p = string.createBuffer(bufferLength);
 	if (p)
-		::CFStringGetBytes (
+		::CFStringGetBytes(
 			cfString,
 			range,
 			kCFStringEncodingUTF8,
 			0,
 			false,
-			(UInt8*) p,
+			(UInt8*)p,
 			bufferLength,
 			&bufferLength
 			);
@@ -59,61 +59,61 @@ getStringFromCfString (CFStringRef cfString)
 }
 
 sl::String
-getTypeIdDescription (CFTypeID typeId)
+getTypeIdDescription(CFTypeID typeId)
 {
-	CFStringRef p = ::CFCopyTypeIDDescription (typeId);
-	sl::String string = getStringFromCfString (p);
-	::CFRelease (p);
+	CFStringRef p = ::CFCopyTypeIDDescription(typeId);
+	sl::String string = getStringFromCfString(p);
+	::CFRelease(p);
 	return string;
 }
 
 sl::String
-cfTypeToString (
+cfTypeToString(
 	CFTypeRef cfType,
 	bool isVerbose
 	)
 {
-	CFTypeID typeId = ::CFGetTypeID (cfType);
-	if (typeId == getStringTypeId ())
+	CFTypeID typeId = ::CFGetTypeID(cfType);
+	if (typeId == getStringTypeId())
 	{
-		CFStringRef cfString = (CFStringRef) cfType;
-		return getStringFromCfString (cfString);
+		CFStringRef cfString = (CFStringRef)cfType;
+		return getStringFromCfString(cfString);
 	}
-	else if (typeId == getBooleanTypeId ())
+	else if (typeId == getBooleanTypeId())
 	{
-		CFBooleanRef cfBoolean = (CFBooleanRef) cfType;
-		bool b = ::CFBooleanGetValue (cfBoolean);
+		CFBooleanRef cfBoolean = (CFBooleanRef)cfType;
+		bool b = ::CFBooleanGetValue(cfBoolean);
 		return b ? "true" : "false";
 	}
-	else if (typeId == getNumberTypeId ())
+	else if (typeId == getNumberTypeId())
 	{
-		CFNumberRef cfNumber = (CFNumberRef) cfType;
+		CFNumberRef cfNumber = (CFNumberRef)cfType;
 		bool isFloat = ::CFNumberIsFloatType(cfNumber);
 		if (isFloat)
 		{
 			double x = 0;
-			::CFNumberGetValue (cfNumber, kCFNumberDoubleType, &x);
-			return sl::formatString ("%f", x);
+			::CFNumberGetValue(cfNumber, kCFNumberDoubleType, &x);
+			return sl::formatString("%f", x);
 		}
 		else
 		{
 			long long x = 0;
-			::CFNumberGetValue (cfNumber, kCFNumberLongLongType, &x);
-			return sl::formatString ("%lld", x);
+			::CFNumberGetValue(cfNumber, kCFNumberLongLongType, &x);
+			return sl::formatString("%lld", x);
 		}
 
 	}
 	else if (isVerbose)
 	{
-		CFStringRef cfString = ::CFCopyDescription (cfType);
-		sl::String string = getStringFromCfString (cfString);
-		::CFRelease (cfString);
+		CFStringRef cfString = ::CFCopyDescription(cfType);
+		sl::String string = getStringFromCfString(cfString);
+		::CFRelease(cfString);
 
 		return string;
 	}
 	else
 	{
-		return getTypeIdDescription (typeId);
+		return getTypeIdDescription(typeId);
 	}
 }
 

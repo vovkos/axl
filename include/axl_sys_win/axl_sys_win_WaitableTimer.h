@@ -25,33 +25,33 @@ class WaitableTimer: public WaitableHandle
 {
 public:
 	bool
-	create (
+	create(
 		SECURITY_ATTRIBUTES* secAttr = NULL,
 		bool isManualReset = false,
 		const sl::StringRef_w& name = NULL
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::CreateWaitableTimerW (secAttr, isManualReset, name);
-		return err::complete (m_h != NULL);
+		m_h = ::CreateWaitableTimerW(secAttr, isManualReset, name);
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	open (
+	open(
 		uint_t access = EVENT_ALL_ACCESS,
 		bool doInheritHandle = false,
 		const sl::StringRef_w& name = NULL
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::OpenWaitableTimerW (access, doInheritHandle, name);
-		return err::complete (m_h != NULL);
+		m_h = ::OpenWaitableTimerW(access, doInheritHandle, name);
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	setTimer (
+	setTimer(
 		uint64_t dueTime,
 		uint_t period = 0,
 		PTIMERAPCROUTINE completionRoutine = NULL,
@@ -59,12 +59,12 @@ public:
 		bool resume = false
 		)
 	{
-		bool_t result = ::SetWaitableTimer (m_h, (LARGE_INTEGER*) &dueTime, period, completionRoutine, completionContext, resume);
-		return err::complete (result);
+		bool_t result = ::SetWaitableTimer(m_h, (LARGE_INTEGER*) &dueTime, period, completionRoutine, completionContext, resume);
+		return err::complete(result);
 	}
 
 	bool
-	setRelativeTimer (
+	setRelativeTimer(
 		uint_t timeout,
 		uint_t period = 0,
 		PTIMERAPCROUTINE completionRoutine = NULL,
@@ -73,14 +73,14 @@ public:
 		)
 	{
 		uint64_t dueTime = (int64_t) -10000 * timeout;
-		return setTimer (dueTime, period, completionRoutine, completionContext, resume);
+		return setTimer(dueTime, period, completionRoutine, completionContext, resume);
 	}
 
 	bool
-	cancel ()
+	cancel()
 	{
-		bool_t result = ::CancelWaitableTimer (m_h);
-		return err::complete (result);
+		bool_t result = ::CancelWaitableTimer(m_h);
+		return err::complete(result);
 	}
 };
 

@@ -25,33 +25,33 @@ struct ColorAttr
 	uint_t m_foreColor;
 	uint_t m_backColor;
 
-	ColorAttr ()
+	ColorAttr()
 	{
-		setup (-1, -1);
+		setup(-1, -1);
 	}
 
-	ColorAttr (
+	ColorAttr(
 		uint_t foreColor,
 		uint_t backColor = -1
 		)
 	{
-		setup (foreColor, backColor);
+		setup(foreColor, backColor);
 	}
 
 	int
-	cmp (const ColorAttr& attr)
+	cmp(const ColorAttr& attr)
 	{
-		return memcmp (this, &attr, sizeof (ColorAttr));
+		return memcmp(this, &attr, sizeof(ColorAttr));
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		setup (-1, -1);
+		setup(-1, -1);
 	}
 
 	void
-	setup (
+	setup(
 		uint_t foreColor,
 		uint_t backColor = -1
 		)
@@ -61,19 +61,19 @@ struct ColorAttr
 	}
 
 	void
-	overlay (
+	overlay(
 		const ColorAttr& baseAttr,
 		const ColorAttr& overlayAttr
 		)
 	{
-		m_foreColor = overlayColor (baseAttr.m_foreColor, overlayAttr.m_foreColor);
-		m_backColor = overlayColor (baseAttr.m_backColor, overlayAttr.m_backColor);
+		m_foreColor = overlayColor(baseAttr.m_foreColor, overlayAttr.m_foreColor);
+		m_backColor = overlayColor(baseAttr.m_backColor, overlayAttr.m_backColor);
 	}
 
 	void
-	overlay (const ColorAttr& overlayAttr)
+	overlay(const ColorAttr& overlayAttr)
 	{
-		overlay (*this, overlayAttr);
+		overlay(*this, overlayAttr);
 	}
 };
 

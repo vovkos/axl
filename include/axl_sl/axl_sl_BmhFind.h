@@ -29,120 +29,120 @@ namespace sl {
 class BmhFind
 {
 protected:
-	Array <uchar_t> m_buffer; // work size of buffer is 2 * m_PatternSize
+	Array<uchar_t> m_buffer; // work size of buffer is 2 * m_PatternSize
 	size_t m_patternSize;
 	size_t m_incFindOffset;
 	size_t m_incFindTailSize; // IncrementalFind temporary storage size -- always < m_PatternSize
-	size_t m_nextBadCharTable [256];
-	size_t m_prevBadCharTable [256];
+	size_t m_nextBadCharTable[256];
+	size_t m_prevBadCharTable[256];
 	bool m_doMatchCase;
 
 public:
-	BmhFind ();
+	BmhFind();
 
 	void
-	clear ();
+	clear();
 
 	bool
-	isEmpty ()
+	isEmpty()
 	{
 		return m_patternSize == 0;
 	}
 
 	size_t
-	getPatternSize ()
+	getPatternSize()
 	{
 		return m_patternSize;
 	}
 
 	const void*
-	getPattern ()
+	getPattern()
 	{
 		return m_buffer;
 	}
 
 	bool
-	setPattern (
+	setPattern(
 		const void* p,
 		size_t size,
 		bool doMatchCase = true
 		);
 
 	size_t
-	find (
+	find(
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	reverseFind (
+	reverseFind(
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	incrementalFind (
+	incrementalFind(
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	reverseIncrementalFind (
+	reverseIncrementalFind(
 		const void* p,
 		size_t size
 		);
 
 	void
-	resetIncrementalFind (size_t incFindOffset = 0)
+	resetIncrementalFind(size_t incFindOffset = 0)
 	{
 		m_incFindOffset = incFindOffset;
 		m_incFindTailSize = 0;
 	}
 
 	size_t
-	getIncrementalFindOffset ()
+	getIncrementalFindOffset()
 	{
 		return m_incFindOffset;
 	}
 
 	size_t
-	getIncrementalFindTailSize ()
+	getIncrementalFindTailSize()
 	{
 		return m_incFindTailSize;
 	}
 
 protected:
 	void
-	rebuildTables ();
+	rebuildTables();
 
 	size_t
-	cmpPattern (uchar_t* _p);
+	cmpPattern(uchar_t* _p);
 
 	size_t
-	reverseCmpPattern (uchar_t* _p);
+	reverseCmpPattern(uchar_t* _p);
 
 	size_t
-	incrementalCmpPattern (
+	incrementalCmpPattern(
 		uchar_t* _p,
 		size_t i
 		);
 
 	size_t
-	reverseIncrementalCmpPattern (
+	reverseIncrementalCmpPattern(
 		uchar_t* _p,
 		size_t size,
 		size_t i
 		);
 
 	void
-	updateIncrementalTail (
+	updateIncrementalTail(
 		uchar_t* p,
 		size_t size,
 		size_t tailSize
 		);
 
 	void
-	updateReverseIncrementalTail (
+	updateReverseIncrementalTail(
 		uchar_t* p,
 		size_t size,
 		size_t tailSize

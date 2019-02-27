@@ -18,144 +18,144 @@
 #if (_AXL_OS_WIN)
 
 void
-printAdapterAddress (const IP_ADDR_STRING* ipAddrString)
+printAdapterAddress(const IP_ADDR_STRING* ipAddrString)
 {
 	for (size_t i = 1; ipAddrString; ipAddrString = ipAddrString->Next, i++)
 	{
-		printf ("  #%-2d IP:   %s\n", i, ipAddrString->IpAddress.String);
-		printf ("  #%-2d MASK: %s\n", i, ipAddrString->IpMask.String);
+		printf("  #%-2d IP:   %s\n", i, ipAddrString->IpAddress.String);
+		printf("  #%-2d MASK: %s\n", i, ipAddrString->IpMask.String);
 	}
 }
 
 void
-printAdapterInfo (IP_ADAPTER_INFO* ipAdapter)
+printAdapterInfo(IP_ADAPTER_INFO* ipAdapter)
 {
-	switch (ipAdapter->Type)
+	switch(ipAdapter->Type)
 	{
 	case MIB_IF_TYPE_LOOPBACK:
-		printf ("MIB_IF_TYPE_LOOPBACK\n");
+		printf("MIB_IF_TYPE_LOOPBACK\n");
 		break;
 
 	case MIB_IF_TYPE_ETHERNET:
-		printf ("MIB_IF_TYPE_ETHERNET\n");
+		printf("MIB_IF_TYPE_ETHERNET\n");
 		break;
 
 	case IF_TYPE_IEEE80211:
-		printf ("IF_TYPE_IEEE80211\n");
+		printf("IF_TYPE_IEEE80211\n");
 		break;
 
 	case MIB_IF_TYPE_PPP:
-		printf ("MIB_IF_TYPE_PPP\n");
+		printf("MIB_IF_TYPE_PPP\n");
 		break;
 
 	case MIB_IF_TYPE_TOKENRING:
-		printf ("MIB_IF_TYPE_TOKENRING\n");
+		printf("MIB_IF_TYPE_TOKENRING\n");
 		break;
 
 	case MIB_IF_TYPE_SLIP:
-		printf ("MIB_IF_TYPE_SLIP\n");
+		printf("MIB_IF_TYPE_SLIP\n");
 		break;
 
 	default:
-		printf ("unknown adapter type #%d\n", ipAdapter->Type);
+		printf("unknown adapter type #%d\n", ipAdapter->Type);
 	}
 
-	printf ("AdapterName = %s\n", ipAdapter->AdapterName);
-	printf ("Description = %s\n", ipAdapter->Description);
-	printf ("MAC         = %02x:%02x:%02x:%02x:%02x:%02x\n",
-		ipAdapter->Address [0],
-		ipAdapter->Address [1],
-		ipAdapter->Address [2],
-		ipAdapter->Address [3],
-		ipAdapter->Address [4],
-		ipAdapter->Address [5]
+	printf("AdapterName = %s\n", ipAdapter->AdapterName);
+	printf("Description = %s\n", ipAdapter->Description);
+	printf("MAC         = %02x:%02x:%02x:%02x:%02x:%02x\n",
+		ipAdapter->Address[0],
+		ipAdapter->Address[1],
+		ipAdapter->Address[2],
+		ipAdapter->Address[3],
+		ipAdapter->Address[4],
+		ipAdapter->Address[5]
 		);
-	printf ("DHCP        = %d\n", ipAdapter->DhcpEnabled);
+	printf("DHCP        = %d\n", ipAdapter->DhcpEnabled);
 
-	printf ("ADDRESS:\n");
-	printAdapterAddress (&ipAdapter->IpAddressList);
+	printf("ADDRESS:\n");
+	printAdapterAddress(&ipAdapter->IpAddressList);
 
-	printf ("GATEWAY:\n");
-	printAdapterAddress (&ipAdapter->GatewayList);
+	printf("GATEWAY:\n");
+	printAdapterAddress(&ipAdapter->GatewayList);
 
-	printf ("DHCP:\n");
-	printAdapterAddress (&ipAdapter->DhcpServer);
+	printf("DHCP:\n");
+	printAdapterAddress(&ipAdapter->DhcpServer);
 
-	printf ("---\n\n");
+	printf("---\n\n");
 }
 
 void
-testWinNetworkAdapterList ()
+testWinNetworkAdapterList()
 {
-	printf ("Using GetAdaptersInfo...\n\n");
+	printf("Using GetAdaptersInfo...\n\n");
 
 	dword_t size = 0;
-	dword_t error = ::GetAdaptersInfo (NULL, &size);
+	dword_t error = ::GetAdaptersInfo(NULL, &size);
 	if (error != ERROR_BUFFER_OVERFLOW)
 	{
-		printf ("GetAdaptersInfo failed (%d)\n", error);
+		printf("GetAdaptersInfo failed (%d)\n", error);
 		return;
 	}
 
-	char buffer [256];
-	sl::Array <char> bufferArray (ref::BufKind_Stack, buffer, sizeof (buffer));
-	bufferArray.setCount (size);
+	char buffer[256];
+	sl::Array<char> bufferArray(ref::BufKind_Stack, buffer, sizeof(buffer));
+	bufferArray.setCount(size);
 
-	IP_ADAPTER_INFO* ipAdapter = (IP_ADAPTER_INFO*) bufferArray.p ();
-	error = ::GetAdaptersInfo (ipAdapter, &size);
+	IP_ADAPTER_INFO* ipAdapter = (IP_ADAPTER_INFO*)bufferArray.p();
+	error = ::GetAdaptersInfo(ipAdapter, &size);
 	if (error != ERROR_SUCCESS)
 	{
-		printf ("GetAdaptersInfo failed (%d)\n", error);
+		printf("GetAdaptersInfo failed (%d)\n", error);
 		return;
 	}
 
 	size_t count = 0;
 	for (; ipAdapter; ipAdapter = ipAdapter->Next, count++)
-		printAdapterInfo (ipAdapter);
+		printAdapterInfo(ipAdapter);
 
-	printf ("%d adapters found\n---------------------------------\n\n", count);
+	printf("%d adapters found\n---------------------------------\n\n", count);
 }
 
 void
-testWinNetworkAdapterList2 ()
+testWinNetworkAdapterList2()
 {
-	printf ("Using WinIoctl...\n\n");
+	printf("Using WinIoctl...\n\n");
 
-	printf (
+	printf(
 		"sizeof (sockaddr) = %d\n"
 		"sizeof (sockaddr_in) = %d\n"
 		"sizeof (sockaddr_in6) = %d\n"
 		"sizeof (sockaddr_storage) = %d\n"
 		"sizeof (io::SockAddr) = %d\n",
-		sizeof (sockaddr),
-		sizeof (sockaddr_in),
-		sizeof (sockaddr_in6),
-		sizeof (sockaddr_storage),
-		sizeof (io::SockAddr)
+		sizeof(sockaddr),
+		sizeof(sockaddr_in),
+		sizeof(sockaddr_in6),
+		sizeof(sockaddr_storage),
+		sizeof(io::SockAddr)
 		);
 
 	io::win::Socket socket;
-	bool result = socket.wsaOpen (AF_INET, SOCK_DGRAM, 0);
+	bool result = socket.wsaOpen(AF_INET, SOCK_DGRAM, 0);
 	if (!result)
 	{
-		printf ("socket.wsaOpen failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("socket.wsaOpen failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	size_t size = 16 * sizeof (INTERFACE_INFO);
-	sl::Array <char> buffer;
-	buffer.setCount (size);
+	size_t size = 16 * sizeof(INTERFACE_INFO);
+	sl::Array<char> buffer;
+	buffer.setCount(size);
 
 	dword_t actualSize;
 
 	for (;;)
 	{
-		int result = ::WSAIoctl (
+		int result = ::WSAIoctl(
 			socket,
 			SIO_GET_INTERFACE_LIST,
 			NULL,
 			0,
-			buffer.p (),
+			buffer.p(),
 			size,
 			&actualSize,
 			NULL,
@@ -165,26 +165,26 @@ testWinNetworkAdapterList2 ()
 		if (result == ERROR_SUCCESS)
 			break;
 
-		dword_t error = ::WSAGetLastError ();
+		dword_t error = ::WSAGetLastError();
 		if (error != WSAENOBUFS)
 		{
-			printf ("WSAIoctl failed (%s)\n", err::Error (error).getDescription ().sz ());
+			printf("WSAIoctl failed (%s)\n", err::Error (error).getDescription ().sz ());
 			return;
 		}
 
 		size *= 2;
-		buffer.setCount (size);
+		buffer.setCount(size);
 	}
 
-	const INTERFACE_INFO* iface = (const INTERFACE_INFO*) buffer.cp ();
-	size_t ifaceCount = actualSize / sizeof (INTERFACE_INFO);
+	const INTERFACE_INFO* iface = (const INTERFACE_INFO*) buffer.cp();
+	size_t ifaceCount = actualSize / sizeof(INTERFACE_INFO);
 
 	for (size_t i = 0; i < ifaceCount; iface++, i++)
 	{
-		printf ("Interface #%d\n", i);
-		printf ("  Address   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiAddress).sz ());
-		printf ("  Broadcast = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiBroadcastAddress).sz ());
-		printf ("  Netmask   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiNetmask).sz ());
+		printf("Interface #%d\n", i);
+		printf("  Address   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiAddress).sz ());
+		printf("  Broadcast = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiBroadcastAddress).sz ());
+		printf("  Netmask   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiNetmask).sz ());
 
 /*		cout << endl;
 
@@ -210,84 +210,84 @@ testWinNetworkAdapterList2 ()
 		cout << endl; */
 	}
 
-	printf ("%d adapters found\n---------------------------------\n\n", ifaceCount);
+	printf("%d adapters found\n---------------------------------\n\n", ifaceCount);
 }
 
 bool
-getFileTimes_nt (const char* fileName)
+getFileTimes_nt(const char* fileName)
 {
 	using namespace axl::sys::win;
 
 	io::File file;
-	bool result = file.open (fileName);
+	bool result = file.open(fileName);
 	if (!result)
 	{
-		printf ("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
+		printf("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
 	IO_STATUS_BLOCK ioStatus;
 	FILE_BASIC_INFORMATION basicInfo = { 0 };
 
-	NTSTATUS status = ntQueryInformationFile (
-		(HANDLE) file.m_file,
+	NTSTATUS status = ntQueryInformationFile(
+		(HANDLE)file.m_file,
 		&ioStatus,
 		&basicInfo,
-		sizeof (FILE_BASIC_INFORMATION),
+		sizeof(FILE_BASIC_INFORMATION),
 		FileBasicInformation
 		);
 
 	if (status < 0)
 	{
-		printf ("can't query file information: %s: %s\n", fileName, sys::win::NtStatus (status).getDescription ().sz ());
+		printf("can't query file information: %s: %s\n", fileName, sys::win::NtStatus (status).getDescription ().sz ());
 		return false;
 	}
 
-	printf ("NT File times for: %s\n", fileName);
-	printf ("  CreationTime:   %s\n", sys::Time (basicInfo.CreationTime.QuadPart).format ().sz ());
-	printf ("  LastWriteTime:  %s\n", sys::Time (basicInfo.LastWriteTime.QuadPart).format ().sz ());
-	printf ("  LastAccessTime: %s\n", sys::Time (basicInfo.LastAccessTime.QuadPart).format ().sz ());
-	printf ("  ChangeTime:     %s\n", sys::Time (basicInfo.ChangeTime.QuadPart).format ().sz ());
+	printf("NT File times for: %s\n", fileName);
+	printf("  CreationTime:   %s\n", sys::Time (basicInfo.CreationTime.QuadPart).format ().sz ());
+	printf("  LastWriteTime:  %s\n", sys::Time (basicInfo.LastWriteTime.QuadPart).format ().sz ());
+	printf("  LastAccessTime: %s\n", sys::Time (basicInfo.LastAccessTime.QuadPart).format ().sz ());
+	printf("  ChangeTime:     %s\n", sys::Time (basicInfo.ChangeTime.QuadPart).format ().sz ());
 
 	return true;
 }
 
 bool
-getFileTimes_win (const char* fileName)
+getFileTimes_win(const char* fileName)
 {
 	io::File file;
-	bool result = file.open (fileName);
+	bool result = file.open(fileName);
 	if (!result)
 	{
-		printf ("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
+		printf("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
 	FILE_BASIC_INFO basicInfo2 = { 0 };
-	result = ::GetFileInformationByHandleEx (file.m_file, FileBasicInfo, &basicInfo2, sizeof (basicInfo2)) != 0;
+	result = ::GetFileInformationByHandleEx(file.m_file, FileBasicInfo, &basicInfo2, sizeof(basicInfo2)) != 0;
 	if (!result)
 	{
-		err::setLastSystemError ();
-		printf ("can't query file information: %s, %s\n", fileName, err::getLastErrorDescription ().sz ());
+		err::setLastSystemError();
+		printf("can't query file information: %s, %s\n", fileName, err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
-	printf ("WIN File times for: %s\n", fileName);
-	printf ("  CreationTime:   %s\n", sys::Time (basicInfo2.CreationTime.QuadPart).format ().sz ());
-	printf ("  LastWriteTime:  %s\n", sys::Time (basicInfo2.LastWriteTime.QuadPart).format ().sz ());
-	printf ("  LastAccessTime: %s\n", sys::Time (basicInfo2.LastAccessTime.QuadPart).format ().sz ());
-	printf ("  ChangeTime:     %s\n", sys::Time (basicInfo2.ChangeTime.QuadPart).format ().sz ());
+	printf("WIN File times for: %s\n", fileName);
+	printf("  CreationTime:   %s\n", sys::Time (basicInfo2.CreationTime.QuadPart).format ().sz ());
+	printf("  LastWriteTime:  %s\n", sys::Time (basicInfo2.LastWriteTime.QuadPart).format ().sz ());
+	printf("  LastAccessTime: %s\n", sys::Time (basicInfo2.LastAccessTime.QuadPart).format ().sz ());
+	printf("  ChangeTime:     %s\n", sys::Time (basicInfo2.ChangeTime.QuadPart).format ().sz ());
 
 	return true;
 }
 
 void
-testFileTime ()
+testFileTime()
 {
-	getFileTimes_win ("c:/1/far/ioninja-3.7.4/bin/ioninja.exe");
-	getFileTimes_nt ("c:/1/far/ioninja-3.7.4/bin/ioninja.exe");
-	getFileTimes_win ("c:/1/7z/ioninja-3.7.4/bin/ioninja.exe");
-	getFileTimes_nt ("c:/1/7z/ioninja-3.7.4/bin/ioninja.exe");
+	getFileTimes_win("c:/1/far/ioninja-3.7.4/bin/ioninja.exe");
+	getFileTimes_nt("c:/1/far/ioninja-3.7.4/bin/ioninja.exe");
+	getFileTimes_win("c:/1/7z/ioninja-3.7.4/bin/ioninja.exe");
+	getFileTimes_nt("c:/1/7z/ioninja-3.7.4/bin/ioninja.exe");
 }
 
 #endif
@@ -295,70 +295,70 @@ testFileTime ()
 //..............................................................................
 
 void
-testNetworkAdapterList ()
+testNetworkAdapterList()
 {
-	sl::List <io::NetworkAdapterDesc> adapterList;
-	io::createNetworkAdapterDescList (&adapterList);
+	sl::List<io::NetworkAdapterDesc> adapterList;
+	io::createNetworkAdapterDescList(&adapterList);
 
-	sl::Iterator <io::NetworkAdapterDesc> adapterIt = adapterList.getHead ();
+	sl::Iterator<io::NetworkAdapterDesc> adapterIt = adapterList.getHead();
 	for (; adapterIt; adapterIt++)
 	{
 		io::NetworkAdapterDesc* adapter = *adapterIt;
 
-		printf ("Name        = %s\n", adapter->getName ().sz ());
-		printf ("Description = %s\n", adapter->getDescription ().sz ());
-		printf ("Type        = %s\n", io::getNetworkAdapterTypeString (adapter->getType ()));
-		printf ("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).sz ());
+		printf("Name        = %s\n", adapter->getName ().sz ());
+		printf("Description = %s\n", adapter->getDescription ().sz ());
+		printf("Type        = %s\n", io::getNetworkAdapterTypeString (adapter->getType ()));
+		printf("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).sz ());
 
-		sl::ConstList <io::NetworkAdapterAddress> addressList = adapter->getAddressList ();
-		sl::ConstIterator <io::NetworkAdapterAddress> addressIt = addressList.getHead ();
+		sl::ConstList<io::NetworkAdapterAddress> addressList = adapter->getAddressList();
+		sl::ConstIterator<io::NetworkAdapterAddress> addressIt = addressList.getHead();
 		for (size_t i = 1; addressIt; addressIt++, i++)
 		{
 			const io::NetworkAdapterAddress* address = *addressIt;
 
 			uint_t family = address->m_address.m_addr.sa_family;
-			printf ("%-11s = %s",
-				io::getSockAddrFamilyString (family),
-				address->m_address.getString ().sz ()
+			printf("%-11s = %s",
+				io::getSockAddrFamilyString(family),
+				address->m_address.getString().sz()
 				);
 
 			if (family == AF_INET)
 			{
 				io::SockAddr netMask;
-				netMask.createNetMask_ip4 (address->m_netMaskBitCount);
-				printf (" (mask %s)\n", netMask.getString ().sz ());
+				netMask.createNetMask_ip4(address->m_netMaskBitCount);
+				printf(" (mask %s)\n", netMask.getString ().sz ());
 			}
 			else
 			{
-				printf ("/%d\n", address->m_netMaskBitCount);
+				printf("/%d\n", address->m_netMaskBitCount);
 			}
 		}
 
-		printf ("\n");
+		printf("\n");
 	}
 
-	printf ("%d adapters found\n", adapterList.getCount ());
+	printf("%d adapters found\n", adapterList.getCount ());
 }
 
 //..............................................................................
 
 void
-testParseFormatIp6 ()
+testParseFormatIp6()
 {
-	printf ("main ()\n");
+	printf("main ()\n");
 
 	bool result;
 
 	io::SockAddr sockAddr;
 
-	result = sockAddr.parse ("6");
-	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
+	result = sockAddr.parse("6");
+	printf("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
 
-	result = sockAddr.parse ("[1::2:3:4:5]:6");
-	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
+	result = sockAddr.parse("[1::2:3:4:5]:6");
+	printf("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
 
-	result = sockAddr.parse ("[fe80::c990:d16e:a986:d56b%11]:10001");
-	printf ("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
+	result = sockAddr.parse("[fe80::c990:d16e:a986:d56b%11]:10001");
+	printf("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
 
 	sockaddr_in6 addr = { 0 };
 	addr.sin6_family = AF_INET6;
@@ -367,37 +367,37 @@ testParseFormatIp6 ()
 	{
 		uint16_t* ip = (uint16_t*) &addr.sin6_addr;
 
-		ip [0] = rand () % 2 ? rand () : 0;
-		ip [1] = rand () % 2 ? rand () : 0;
-		ip [2] = rand () % 2 ? rand () : 0;
-		ip [3] = rand () % 2 ? rand () : 0;
-		ip [4] = rand () % 2 ? rand () : 0;
-		ip [5] = rand () % 2 ? rand () : rand () % 2 ? 0xffff : 0;
-		ip [6] = rand () % 2 ? rand () : 0;
-		ip [7] = rand () % 2 ? rand () : 0;
+		ip[0] = rand() % 2 ? rand() : 0;
+		ip[1] = rand() % 2 ? rand() : 0;
+		ip[2] = rand() % 2 ? rand() : 0;
+		ip[3] = rand() % 2 ? rand() : 0;
+		ip[4] = rand() % 2 ? rand() : 0;
+		ip[5] = rand() % 2 ? rand() : rand() % 2 ? 0xffff : 0;
+		ip[6] = rand() % 2 ? rand() : 0;
+		ip[7] = rand() % 2 ? rand() : 0;
 #if (_AXL_OS_WIN)
-		addr.sin6_port = rand () % 2 ? rand () : 0;
-		addr.sin6_scope_id = rand () % 2 ? rand () : 0;
+		addr.sin6_port = rand() % 2 ? rand() : 0;
+		addr.sin6_scope_id = rand() % 2 ? rand() : 0;
 #endif
 
-		sl::String addrString = io::getSockAddrString ((const sockaddr*) &addr).sz ();
-		printf ("addr1 = %s\n", addrString.sz ());
+		sl::String addrString = io::getSockAddrString((const sockaddr*) &addr).sz();
+		printf("addr1 = %s\n", addrString.sz ());
 
-		char addrString2 [1024] = { 0 };
-		dword_t size = sizeof (addrString2);
+		char addrString2[1024] = { 0 };
+		dword_t size = sizeof(addrString2);
 
 #if (_AXL_OS_WIN)
-		WSAAddressToStringA ((sockaddr*) &addr, sizeof (addr), NULL, addrString2, &size);
+		WSAAddressToStringA((sockaddr*) &addr, sizeof(addr), NULL, addrString2, &size);
 #elif (_AXL_OS_POSIX)
-		inet_ntop (AF_INET6, &addr.sin6_addr, addrString2, size);
+		inet_ntop(AF_INET6, &addr.sin6_addr, addrString2, size);
 #endif
 
-		printf ("addr2 = %s\n\n", addrString2);
-		ASSERT (addrString.cmp (addrString2) == 0);
+		printf("addr2 = %s\n\n", addrString2);
+		ASSERT(addrString.cmp(addrString2) == 0);
 
 		sockaddr_in6 addr2;
-		result = io::parseSockAddr ((sockaddr*) &addr2, sizeof (addr2), addrString);
-		ASSERT (result && memcmp (&addr, &addr2, sizeof (addr)) == 0);
+		result = io::parseSockAddr((sockaddr*) &addr2, sizeof(addr2), addrString);
+		ASSERT(result && memcmp(&addr, &addr2, sizeof(addr)) == 0);
 	}
 }
 
@@ -412,204 +412,204 @@ testParseFormatIp6 ()
 #endif
 
 void
-testKeepAlives (const sl::StringRef& addrString)
+testKeepAlives(const sl::StringRef& addrString)
 {
 	dword_t value = 1;
 	dword_t delay = 3;
 
 	io::Socket socket;
 
-	printf ("Opening a TCP socket (%d sec keep-alives)...\n", delay);
+	printf("Opening a TCP socket (%d sec keep-alives)...\n", delay);
 
 	bool result =
-		socket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
-		socket.setOption (SOL_SOCKET, SO_KEEPALIVE, &value, sizeof (value)) &&
-		socket.setOption (IPPROTO_TCP, TCP_KEEPIDLE, &delay, sizeof (delay)) &&
-		socket.setOption (IPPROTO_TCP, TCP_KEEPINTVL, &delay, sizeof (delay));
+		socket.open(AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
+		socket.setOption(SOL_SOCKET, SO_KEEPALIVE, &value, sizeof(value)) &&
+		socket.setOption(IPPROTO_TCP, TCP_KEEPIDLE, &delay, sizeof(delay)) &&
+		socket.setOption(IPPROTO_TCP, TCP_KEEPINTVL, &delay, sizeof(delay));
 
 	if (!result)
 	{
-		printf ("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("Parsing address '%s'...\n", addrString.sz ());
+	printf("Parsing address '%s'...\n", addrString.sz ());
 
 	io::SockAddr addr;
-	result = addr.parse (addrString);
+	result = addr.parse(addrString);
 	if (!result)
 	{
-		printf ("addr.parse failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("addr.parse failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("Connecting to %s...\n", addr.getString ().sz ());
+	printf("Connecting to %s...\n", addr.getString ().sz ());
 
-	result = socket.connect (addr);
+	result = socket.connect(addr);
 	if (!result)
 	{
-		printf ("socket.connect failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("socket.connect failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("Press CTRL+C to exit...\n");
+	printf("Press CTRL+C to exit...\n");
 
 	for (;;)
 	{
-		sys::sleep (1000);
+		sys::sleep(1000);
 	}
 }
 
 //..............................................................................
 
 void
-testAddrInfoIp6 ()
+testAddrInfoIp6()
 {
 	const char* name = "tibbo.com";
 
-	sl::Array <io::SockAddr> addrArray;
-	bool result = io::resolveHostName (&addrArray, name, AF_INET6);
+	sl::Array<io::SockAddr> addrArray;
+	bool result = io::resolveHostName(&addrArray, name, AF_INET6);
 	if (!result)
 	{
-		printf ("io::resolveHostName failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("io::resolveHostName failed (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("host name %s resolved to:\n", name);
+	printf("host name %s resolved to:\n", name);
 
-	size_t count = addrArray.getCount ();
+	size_t count = addrArray.getCount();
 	for (size_t i = 0; i < count; i++)
-		printf ("    %s\n", addrArray [i].getString ().sz ());
+		printf("    %s\n", addrArray [i].getString ().sz ());
 }
 
 //..............................................................................
 
 void
-testDynamicLibrary ()
+testDynamicLibrary()
 {
 	sys::DynamicLibrary dl;
 
-	bool result = dl.open ("libc.so.6");
+	bool result = dl.open("libc.so.6");
 	if (!result)
 	{
-		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	typedef int Printf (const char*, ...);
-	Printf* prn = (Printf*) dl.getFunction ("printf");
+	typedef int Printf(const char*, ...);
+	Printf* prn = (Printf*)dl.getFunction("printf");
 	if (!prn)
 	{
-		printf ("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	prn ("hui govno i muravei %d\n", 123);
+	prn("hui govno i muravei %d\n", 123);
 }
 
 //..............................................................................
 
 void
-bar ()
+bar()
 {
-	printf ("bar -- throwing...\n");
-	AXL_SYS_SJLJ_THROW ();
+	printf("bar -- throwing...\n");
+	AXL_SYS_SJLJ_THROW();
 }
 
 void
-testLongJmpTry ()
+testLongJmpTry()
 {
-	AXL_SYS_BEGIN_SJLJ_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY()
 	{
-		bar ();
+		bar();
 	}
-	AXL_SYS_SJLJ_CATCH ()
+	AXL_SYS_SJLJ_CATCH()
 	{
-		printf ("exception caught\n");
+		printf("exception caught\n");
 	}
-	AXL_SYS_SJLJ_FINALLY ()
+	AXL_SYS_SJLJ_FINALLY()
 	{
-		printf ("finally\n");
+		printf("finally\n");
 	}
-	AXL_SYS_END_SJLJ_TRY ()
+	AXL_SYS_END_SJLJ_TRY()
 
-	AXL_SYS_BEGIN_SJLJ_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY()
 	{
-		bar ();
+		bar();
 	}
-	AXL_SYS_SJLJ_CATCH ()
+	AXL_SYS_SJLJ_CATCH()
 	{
-		printf ("exception caught\n");
+		printf("exception caught\n");
 	}
-	AXL_SYS_END_SJLJ_TRY ()
+	AXL_SYS_END_SJLJ_TRY()
 
-	AXL_SYS_BEGIN_SJLJ_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY()
 	{
-		bar ();
+		bar();
 	}
-	AXL_SYS_SJLJ_FINALLY ()
+	AXL_SYS_SJLJ_FINALLY()
 	{
-		printf ("finally\n");
+		printf("finally\n");
 	}
-	AXL_SYS_END_SJLJ_TRY ()
+	AXL_SYS_END_SJLJ_TRY()
 
-	AXL_SYS_BEGIN_SJLJ_TRY ()
+	AXL_SYS_BEGIN_SJLJ_TRY()
 	{
-		bar ();
+		bar();
 	}
-	AXL_SYS_END_SJLJ_TRY ()
+	AXL_SYS_END_SJLJ_TRY()
 
-	printf ("done\n");
+	printf("done\n");
 }
 
 //..............................................................................
 
 void
-testRegex ()
+testRegex()
 {
 	fsm::StdRegexNameMgr nameMgr;
 
-	nameMgr.addName ("ws",  "[ \\t\\r\\n]");
-	nameMgr.addName ("dec", "[0-9]");
+	nameMgr.addName("ws",  "[ \\t\\r\\n]");
+	nameMgr.addName("dec", "[0-9]");
 
 	uint_t flags = 0; // fsm::RegexCompiler::Flag_SparseSyntax;
 
 	fsm::Regex regex;
-	fsm::RegexCompiler regexCompiler (flags, &regex, &nameMgr);
+	fsm::RegexCompiler regexCompiler(flags, &regex, &nameMgr);
 
-/*	char const* src [] =
+/*	char const* src[] =
 	{
 		"'\\x02' V '\\r'",
 	};
 
-	for (size_t i = 0; i < countof (src); i++)
+	for (size_t i = 0; i < countof(src); i++)
 	{
-		bool result = regexCompiler.incrementalCompile (src [i]);
+		bool result = regexCompiler.incrementalCompile(src[i]);
 		if (!result)
 		{
-			printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+			printf("error: %s\n", err::getLastErrorDescription ().sz ());
 			return;
 		}
 	}
 
-	regexCompiler.finalize ();
-	regex.print ();
+	regexCompiler.finalize();
+	regex.print();
 */
 
-	bool result = regexCompiler.compile ("ab|cd");
+	bool result = regexCompiler.compile("ab|cd");
 
 /*	bool result =
-		regexCompiler.incrementalCompile ("(\\h{2})   ' '+ (\\d{2})") &&
-		regexCompiler.incrementalCompile ("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
+		regexCompiler.incrementalCompile("(\\h{2})   ' '+ (\\d{2})") &&
+		regexCompiler.incrementalCompile("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
 */
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	regexCompiler.finalize ();
-	regex.print ();
+	regexCompiler.finalize();
+	regex.print();
 }
 
 //..............................................................................
@@ -626,17 +626,17 @@ enum
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-testNamedPipes ()
+testNamedPipes()
 {
 	using namespace axl::sys::win;
 
 	NTSTATUS status;
 
-	HMODULE ntdll = ::GetModuleHandleW (L"ntdll.dll");
-	ASSERT (ntdll);
+	HMODULE ntdll = ::GetModuleHandleW(L"ntdll.dll");
+	ASSERT(ntdll);
 
 	io::win::File pipeDir;
-	bool result = pipeDir.create (
+	bool result = pipeDir.create(
 		L"\\\\.\\pipe\\",
 		GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -647,13 +647,13 @@ testNamedPipes ()
 
 	if (!result)
 	{
-		err::setLastSystemError ();
-		printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
+		err::setLastSystemError();
+		printf("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	sl::Array <char> dirBuffer;
-	dirBuffer.setCount (BufferSize);
+	sl::Array<char> dirBuffer;
+	dirBuffer.setCount(BufferSize);
 
 	sl::String_utf16 fileName;
 
@@ -663,14 +663,14 @@ testNamedPipes ()
 	{
 		IO_STATUS_BLOCK ioStatus;
 
-		status = ntQueryDirectoryFile (
+		status = ntQueryDirectoryFile(
 			pipeDir,
 			NULL,
 			NULL,
 			0,
 			&ioStatus,
 			dirBuffer,
-			dirBuffer.getCount (),
+			dirBuffer.getCount(),
 			sys::win::FileDirectoryInformation,
 			FALSE,
 			NULL,
@@ -682,19 +682,19 @@ testNamedPipes ()
 			if (status == STATUS_NO_MORE_FILES)
 				break;
 
-			err::setError (sys::win::NtStatus (status));
-			printf ("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
+			err::setError(sys::win::NtStatus(status));
+			printf("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
 			return;
 		}
 
-		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*) dirBuffer.p ();
+		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*)dirBuffer.p();
 		for (;;)
 		{
-			fileName.copy (dirInfo->FileName, dirInfo->FileNameLength / 2);
+			fileName.copy(dirInfo->FileName, dirInfo->FileNameLength / 2);
 
-			printf (
+			printf(
 				dirInfo->AllocationSize.LowPart == -1 ? "%S (%d)\n" : "%S (%d of %d)\n",
-				fileName.sz (),
+				fileName.sz(),
 				dirInfo->EndOfFile.LowPart,
 				dirInfo->AllocationSize.LowPart
 				);
@@ -702,7 +702,7 @@ testNamedPipes ()
 			if (!dirInfo->NextEntryOffset)
 				break;
 
-			dirInfo = (FILE_DIRECTORY_INFORMATION*) ((char*) dirInfo + dirInfo->NextEntryOffset);
+			dirInfo = (FILE_DIRECTORY_INFORMATION*)((char*)dirInfo + dirInfo->NextEntryOffset);
 		}
 
 		isFirstQuery = FALSE;
@@ -712,7 +712,7 @@ testNamedPipes ()
 //..............................................................................
 
 bool
-querySymbolicLink (
+querySymbolicLink(
 	sl::String_utf16* string,
 	HANDLE dir,
 	UNICODE_STRING* uniName
@@ -722,49 +722,49 @@ querySymbolicLink (
 
 	NTSTATUS status;
 
-	string->clear ();
+	string->clear();
 
 	OBJECT_ATTRIBUTES oa = { 0 };
-	oa.Length = sizeof (oa);
+	oa.Length = sizeof(oa);
 	oa.RootDirectory = dir;
 	oa.ObjectName = uniName;
 
 	io::win::File link;
-	status = ntOpenSymbolicLinkObject (
-		link.p (),
+	status = ntOpenSymbolicLinkObject(
+		link.p(),
 		GENERIC_READ,
 		&oa
 		);
 
 	if (status < 0)
 	{
-		err::setError (sys::win::NtStatus (status));
-		printf ("cannot open symbolic link: %s\n", err::getLastErrorDescription ().sz ());
+		err::setError(sys::win::NtStatus(status));
+		printf("cannot open symbolic link: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
-	wchar_t* p = string->createBuffer (BufferSize);
-	size_t length = string->getLength ();
+	wchar_t* p = string->createBuffer(BufferSize);
+	size_t length = string->getLength();
 
 	UNICODE_STRING uniTarget;
 	uniTarget.Buffer = p;
 	uniTarget.Length = 0;
-	uniTarget.MaximumLength = length + sizeof (wchar_t);
+	uniTarget.MaximumLength = length + sizeof(wchar_t);
 
-	status = ntQuerySymbolicLinkObject (link, &uniTarget, NULL);
+	status = ntQuerySymbolicLinkObject(link, &uniTarget, NULL);
 	if (status < 0)
 	{
-		err::setError (sys::win::NtStatus (status));
-		printf ("cannot query symbolic link: %s\n", err::getLastErrorDescription ().sz ());
+		err::setError(sys::win::NtStatus(status));
+		printf("cannot query symbolic link: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
-	string->setReducedLength (uniTarget.Length / sizeof (wchar_t));
+	string->setReducedLength(uniTarget.Length / sizeof(wchar_t));
 	return true;
 }
 
 void
-enumerateDirectory (
+enumerateDirectory(
 	HANDLE baseDir,
 	const wchar_t* name,
 	size_t level
@@ -775,31 +775,31 @@ enumerateDirectory (
 	NTSTATUS status;
 
 	UNICODE_STRING uniName;
-	uniName.Buffer = (wchar_t*) name;
-	uniName.Length = wcslen_s (name) * sizeof (wchar_t);
-	uniName.MaximumLength = uniName.Length + sizeof (wchar_t);
+	uniName.Buffer = (wchar_t*)name;
+	uniName.Length = wcslen_s(name)* sizeof(wchar_t);
+	uniName.MaximumLength = uniName.Length + sizeof(wchar_t);
 
 	OBJECT_ATTRIBUTES oa = { 0 };
-	oa.Length = sizeof (oa);
+	oa.Length = sizeof(oa);
 	oa.RootDirectory = baseDir;
 	oa.ObjectName = &uniName;
 
 	io::win::File dir;
-	status = ntOpenDirectoryObject (
-		dir.p (),
+	status = ntOpenDirectoryObject(
+		dir.p(),
 		DIRECTORY_QUERY | DIRECTORY_TRAVERSE,
 		&oa
 		);
 
 	if (status < 0)
 	{
-		err::setError (sys::win::NtStatus (status));
-		printf ("cannot open directory: %s\n", err::getLastErrorDescription ().sz ());
+		err::setError(sys::win::NtStatus(status));
+		printf("cannot open directory: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	sl::Array <char> buffer;
-	buffer.setCount (BufferSize);
+	sl::Array<char> buffer;
+	buffer.setCount(BufferSize);
 
 	ULONG queryContext = 0;
 	BOOLEAN isFirstQuery = TRUE;
@@ -809,16 +809,16 @@ enumerateDirectory (
 	sl::String_utf16 symLinkTargetName;
 
 	level++;
-	sl::String indent ((utf32_t) ' ', level * 2);
+	sl::String indent((utf32_t) ' ', level * 2);
 
 	for (;;)
 	{
 		ULONG actualSize;
 
-		status = ntQueryDirectoryObject (
+		status = ntQueryDirectoryObject(
 			dir,
 			buffer,
-			buffer.getCount (),
+			buffer.getCount(),
 			FALSE,
 			isFirstQuery,
 			&queryContext,
@@ -830,28 +830,28 @@ enumerateDirectory (
 			if (status == STATUS_NO_MORE_ENTRIES)
 				break;
 
-			err::setError (sys::win::NtStatus (status));
-			printf ("cannot query directory: %s\n", err::getLastErrorDescription ().sz ());
+			err::setError(sys::win::NtStatus(status));
+			printf("cannot query directory: %s\n", err::getLastErrorDescription ().sz ());
 			return;
 		}
 
-		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*) buffer.p ();
+		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)buffer.p();
 		for (; dirInfo->Name.Buffer; dirInfo++)
 		{
-			dirName.copy (dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof (wchar_t));
-			dirTypeName.copy (dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof (wchar_t));
+			dirName.copy(dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof(wchar_t));
+			dirTypeName.copy(dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof(wchar_t));
 
-			printf ("%s%S (%S)\n", indent.sz (), dirName.sz (), dirTypeName.sz ());
+			printf("%s%S (%S)\n", indent.sz (), dirName.sz (), dirTypeName.sz ());
 
-			if (dirTypeName.cmp (L"Directory") == 0)
+			if (dirTypeName.cmp(L"Directory") == 0)
 			{
-				enumerateDirectory (dir, dirName, level);
+				enumerateDirectory(dir, dirName, level);
 			}
-			else if (dirTypeName.cmp (L"SymbolicLink") == 0)
+			else if (dirTypeName.cmp(L"SymbolicLink") == 0)
 			{
-				bool result = querySymbolicLink (&symLinkTargetName, dir, &dirInfo->Name);
+				bool result = querySymbolicLink(&symLinkTargetName, dir, &dirInfo->Name);
 				if (result)
-					printf ("%s  --> %S\n", indent.sz (), symLinkTargetName.sz ());
+					printf("%s  --> %S\n", indent.sz (), symLinkTargetName.sz ());
 			}
 
 		}
@@ -861,92 +861,92 @@ enumerateDirectory (
 }
 
 void
-testDirectoryObjects ()
+testDirectoryObjects()
 {
 	using namespace axl::sys::win;
 
 	sl::String_utf16 s;
 
 	io::win::File f;
-	bool result = f.create (L"COM3", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING);
+	bool result = f.create(L"COM3", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING);
 
 	struct ObjectInfo: OBJECT_NAME_INFORMATION
 	{
-		char m_buffer [1024];
+		char m_buffer[1024];
 	} objectNameInfo;
 
 	ULONG actualSize;
-	NTSTATUS status = ntQueryObject (f, ObjectNameInformation, &objectNameInfo, sizeof (objectNameInfo), &actualSize);
+	NTSTATUS status = ntQueryObject(f, ObjectNameInformation, &objectNameInfo, sizeof(objectNameInfo), &actualSize);
 
 	sl::String ss;
-	result = io::getSymbolicLinkTarget (&ss, "COM3");
+	result = io::getSymbolicLinkTarget(&ss, "COM3");
 
 	WCHAR* linkName = L"\\\\.\\COM3";
-	size_t length = wcslen (linkName);
+	size_t length = wcslen(linkName);
 
 	UNICODE_STRING uniLink;
 	uniLink.Buffer = linkName;
-	uniLink.Length = length * sizeof (WCHAR);
-	uniLink.MaximumLength = (length + 1) * sizeof (wchar_t);
+	uniLink.Length = length * sizeof(WCHAR);
+	uniLink.MaximumLength = (length + 1) * sizeof(wchar_t);
 
-	querySymbolicLink (&s, NULL, &uniLink);
+	querySymbolicLink(&s, NULL, &uniLink);
 
-	printf ("target: %S\n", s.sz ());
+	printf("target: %S\n", s.sz ());
 
 
-	printf ("\\\n");
-	enumerateDirectory (NULL, L"\\", 0);
+	printf("\\\n");
+	enumerateDirectory(NULL, L"\\", 0);
 }
 
 #endif
 
 void
-testTcp ()
+testTcp()
 {
 #if (_AXL_OS_WIN)
-	SOCKET s = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 #else
-	int s = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	int s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 #endif
-	ASSERT (s != -1);
+	ASSERT(s != -1);
 
 	linger l;
 	l.l_onoff = 1;
 	l.l_linger = 0;
-	setsockopt (s, SOL_SOCKET, SO_LINGER, (const char*) &l, sizeof (l));
+	setsockopt(s, SOL_SOCKET, SO_LINGER, (const char*) &l, sizeof(l));
 
 	sockaddr_in a = { 0 };
 	a.sin_family = AF_INET;
-	a.sin_addr.s_addr = inet_addr ("127.0.0.1");
-	a.sin_port = htons (10001);
+	a.sin_addr.s_addr = inet_addr("127.0.0.1");
+	a.sin_port = htons(10001);
 
-	printf ("connecting...\n");
-	int result = connect (s, (const sockaddr*) &a, sizeof (a));
-	printf ("result = %d\n", result);
+	printf("connecting...\n");
+	int result = connect(s, (const sockaddr*) &a, sizeof(a));
+	printf("result = %d\n", result);
 
-	char buf [512];
-	scanf ("%d", buf);
+	char buf[512];
+	scanf("%d", buf);
 
 	int error = 0;
-	socklen_t len = sizeof (error);
-	result = getsockopt (s, SOL_SOCKET, SO_ERROR, (char*) &error, &len);
+	socklen_t len = sizeof(error);
+	result = getsockopt(s, SOL_SOCKET, SO_ERROR, (char*) &error, &len);
 
-	printf ("receiving...\n");
-	result = recv (s, buf, sizeof (buf), 0);
-	printf ("result = %d\n", result);
+	printf("receiving...\n");
+	result = recv(s, buf, sizeof(buf), 0);
+	printf("result = %d\n", result);
 
-	printf ("receiving...\n");
-	result = recv (s, buf, 0, 0);
-	printf ("result = %d\n", result);
+	printf("receiving...\n");
+	result = recv(s, buf, 0, 0);
+	printf("result = %d\n", result);
 
-	printf ("closing...\n");
+	printf("closing...\n");
 #if (_AXL_OS_WIN)
-	closesocket (s);
+	closesocket(s);
 #elif (_AXL_OS_POSIX)
-	close (s);
+	close(s);
 #endif
 
-	printf ("done.\n");
+	printf("done.\n");
 }
 
 //..............................................................................
@@ -954,7 +954,7 @@ testTcp ()
 #if (_AXL_OS_WIN)
 
 void
-printWinErrorDescription (
+printWinErrorDescription(
 	dword_t code,
 	uint_t langId,
 	uint_t subLangId
@@ -962,54 +962,54 @@ printWinErrorDescription (
 {
 	wchar_t* message = NULL;
 
-	::FormatMessageW (
+	::FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS |
 		FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
 		NULL,
 		code,
-		MAKELANGID (langId, subLangId),
+		MAKELANGID(langId, subLangId),
 		(LPWSTR) &message,
 		0,
 		NULL
 		);
 
 	sl::String description = message;
-	::LocalFree (message);
+	::LocalFree(message);
 
-	printf ("%d/%d: %s\n", langId, subLangId, description.sz ());
+	printf("%d/%d: %s\n", langId, subLangId, description.sz ());
 }
 
 void
-testWinError ()
+testWinError()
 {
 	dword_t error = ERROR_ACCESS_DENIED;
 
-	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_NEUTRAL);
-	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_DEFAULT);
-	printWinErrorDescription (error, LANG_NEUTRAL, SUBLANG_SYS_DEFAULT);
+	printWinErrorDescription(error, LANG_NEUTRAL, SUBLANG_NEUTRAL);
+	printWinErrorDescription(error, LANG_NEUTRAL, SUBLANG_DEFAULT);
+	printWinErrorDescription(error, LANG_NEUTRAL, SUBLANG_SYS_DEFAULT);
 
-	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_NEUTRAL);
-	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_DEFAULT);
-	printWinErrorDescription (error, LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT);
+	printWinErrorDescription(error, LANG_SYSTEM_DEFAULT, SUBLANG_NEUTRAL);
+	printWinErrorDescription(error, LANG_SYSTEM_DEFAULT, SUBLANG_DEFAULT);
+	printWinErrorDescription(error, LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT);
 
-	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_NEUTRAL);
-	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_DEFAULT);
-	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_SYS_DEFAULT);
-	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_ENGLISH_US);
-	printWinErrorDescription (error, LANG_ENGLISH, SUBLANG_ENGLISH_UK);
+	printWinErrorDescription(error, LANG_ENGLISH, SUBLANG_NEUTRAL);
+	printWinErrorDescription(error, LANG_ENGLISH, SUBLANG_DEFAULT);
+	printWinErrorDescription(error, LANG_ENGLISH, SUBLANG_SYS_DEFAULT);
+	printWinErrorDescription(error, LANG_ENGLISH, SUBLANG_ENGLISH_US);
+	printWinErrorDescription(error, LANG_ENGLISH, SUBLANG_ENGLISH_UK);
 }
 
 #endif
 
 void
-testTimestamp ()
+testTimestamp()
 {
 	for (int i = 0; i < 20; i++)
 	{
-		uint64_t t1 = sys::getTimestamp ();
-		printf ("%s: %llu\n", sys::Time (t1).format ("%h:%m:%s.%l.%c").sz (), t1);
+		uint64_t t1 = sys::getTimestamp();
+		printf("%s: %llu\n", sys::Time (t1).format ("%h:%m:%s.%l.%c").sz (), t1);
 	}
 }
 
@@ -1018,146 +1018,146 @@ testTimestamp ()
 #ifdef _AXL_IO_USB
 
 sl::String
-getUsbStringDescriptorText (
+getUsbStringDescriptorText(
 	io::UsbDevice* device,
 	size_t index
 	)
 {
 	sl::String text;
 
-	if (!device->isOpen ())
+	if (!device->isOpen())
 	{
 		text = "NOT OPENED";
 	}
 	else
 	{
-		bool result = device->getStringDesrciptor (index, &text);
+		bool result = device->getStringDesrciptor(index, &text);
 		if (!result)
-			text.format ("ERROR (%s)", err::getLastErrorDescription ().sz ());
+			text.format("ERROR (%s)", err::getLastErrorDescription ().sz ());
 	}
 
 	return text;
 }
 
 void
-printUsbIfaceDesc (const libusb_interface_descriptor* ifaceDesc)
+printUsbIfaceDesc(const libusb_interface_descriptor* ifaceDesc)
 {
-	printf ("    Interface:   %d\n", ifaceDesc->bInterfaceNumber);
-	printf ("    Alt setting: %d\n", ifaceDesc->bAlternateSetting);
-	printf ("    Class:       %s\n", io::getUsbClassCodeString ((libusb_class_code) ifaceDesc->bInterfaceClass));
-	printf ("    Subclass:    %d\n", ifaceDesc->bInterfaceSubClass);
-	printf ("    Protocol:    %d\n", ifaceDesc->bInterfaceProtocol);
-	printf ("    Endpoints:   %d\n", ifaceDesc->bNumEndpoints);
+	printf("    Interface:   %d\n", ifaceDesc->bInterfaceNumber);
+	printf("    Alt setting: %d\n", ifaceDesc->bAlternateSetting);
+	printf("    Class:       %s\n", io::getUsbClassCodeString ((libusb_class_code) ifaceDesc->bInterfaceClass));
+	printf("    Subclass:    %d\n", ifaceDesc->bInterfaceSubClass);
+	printf("    Protocol:    %d\n", ifaceDesc->bInterfaceProtocol);
+	printf("    Endpoints:   %d\n", ifaceDesc->bNumEndpoints);
 
 	for (size_t i = 0; i < ifaceDesc->bNumEndpoints; i++)
 	{
-		const libusb_endpoint_descriptor* endpointDesc = &ifaceDesc->endpoint [i];
+		const libusb_endpoint_descriptor* endpointDesc = &ifaceDesc->endpoint[i];
 
-		printf ("\n");
+		printf("\n");
 
-		printf ("      Endpoint:        0x%02x\n", endpointDesc->bEndpointAddress);
-		printf ("      Direction:       %s\n", (endpointDesc->bEndpointAddress & LIBUSB_ENDPOINT_IN) ? "In" : "Out");
-		printf ("      Type:            %s\n", io::getUsbTransferTypeString ((libusb_transfer_type) (endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK)));
-		printf ("      Max packet size: %d\n", endpointDesc->wMaxPacketSize);
+		printf("      Endpoint:        0x%02x\n", endpointDesc->bEndpointAddress);
+		printf("      Direction:       %s\n", (endpointDesc->bEndpointAddress & LIBUSB_ENDPOINT_IN) ? "In" : "Out");
+		printf("      Type:            %s\n", io::getUsbTransferTypeString ((libusb_transfer_type) (endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK)));
+		printf("      Max packet size: %d\n", endpointDesc->wMaxPacketSize);
 	}
 }
 
 void
-printUsbConfigDesc (const libusb_config_descriptor* configDesc)
+printUsbConfigDesc(const libusb_config_descriptor* configDesc)
 {
-	printf ("  Configuration: %d\n", configDesc->bConfigurationValue);
-	printf ("  Max power:     %d mA\n", configDesc->MaxPower * 2);
-	printf ("  Interfaces:    %d\n", configDesc->bNumInterfaces);
+	printf("  Configuration: %d\n", configDesc->bConfigurationValue);
+	printf("  Max power:     %d mA\n", configDesc->MaxPower * 2);
+	printf("  Interfaces:    %d\n", configDesc->bNumInterfaces);
 
 	for (size_t i = 0; i < configDesc->bNumInterfaces; i++)
 	{
-		const libusb_interface* iface = &configDesc->interface [i];
+		const libusb_interface* iface = &configDesc->interface[i];
 
 		if (!iface->num_altsetting)
 		{
-			printf ("\n    Interface #%d is not configured\n", i);
+			printf("\n    Interface #%d is not configured\n", i);
 		}
-		else for (size_t j = 0; j < (size_t) iface->num_altsetting; j++)
+		else for (size_t j = 0; j < (size_t)iface->num_altsetting; j++)
 		{
-			printf ("\n");
-			printUsbIfaceDesc (&iface->altsetting [j]);
+			printf("\n");
+			printUsbIfaceDesc(&iface->altsetting[j]);
 		}
 	}
 }
 
 void
-printUsbDevice (io::UsbDevice* device)
+printUsbDevice(io::UsbDevice* device)
 {
 	bool result;
 
 	libusb_device_descriptor deviceDesc;
-	result = device->getDeviceDescriptor (&deviceDesc);
+	result = device->getDeviceDescriptor(&deviceDesc);
 	if (!result)
 	{
-		printf ("Cannot get device descriptor (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("Cannot get device descriptor (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("HWID:           VID_%04x&PID_%04x\n", deviceDesc.idVendor, deviceDesc.idProduct);
-	printf ("Class:          %s\n", io::getUsbClassCodeString ((libusb_class_code) deviceDesc.bDeviceClass));
-	printf ("Manufacturer:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iManufacturer).sz ());
-	printf ("Product name:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iProduct).sz ());
-	printf ("Serial number:  %s\n", getUsbStringDescriptorText (device, deviceDesc.iSerialNumber).sz ());
+	printf("HWID:           VID_%04x&PID_%04x\n", deviceDesc.idVendor, deviceDesc.idProduct);
+	printf("Class:          %s\n", io::getUsbClassCodeString ((libusb_class_code) deviceDesc.bDeviceClass));
+	printf("Manufacturer:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iManufacturer).sz ());
+	printf("Product name:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iProduct).sz ());
+	printf("Serial number:  %s\n", getUsbStringDescriptorText (device, deviceDesc.iSerialNumber).sz ());
 
-	printf ("Address:        %d\n", device->getDeviceAddress ());
-	printf ("Bus:            %d\n", device->getBusNumber ());
+	printf("Address:        %d\n", device->getDeviceAddress ());
+	printf("Bus:            %d\n", device->getBusNumber ());
 #if (_AXL_IO_USBDEVICE_PORT)
-	printf ("Port:           %d\n", device->getPortNumber ());
+	printf("Port:           %d\n", device->getPortNumber ());
 #endif
-	printf ("Speed:          %s\n", io::getUsbSpeedString (device->getDeviceSpeed ()));
-	printf ("Port path:      ");
+	printf("Speed:          %s\n", io::getUsbSpeedString (device->getDeviceSpeed ()));
+	printf("Port path:      ");
 
 #if (_AXL_IO_USBDEVICE_PORT)
-	uint8_t path [8];
-	size_t pathLength = device->getPortPath (path, countof (path));
+	uint8_t path[8];
+	size_t pathLength = device->getPortPath(path, countof(path));
 	if (pathLength == -1)
 	{
-		printf ("ERROR (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("ERROR (%s)\n", err::getLastErrorDescription ().sz ());
 	}
 	else if (pathLength != -1)
 	{
 		for (size_t i = 0; i < pathLength; i++)
-			printf ("-> %d", path [i]);
+			printf("-> %d", path [i]);
 
-		printf ("\n");
+		printf("\n");
 	}
 #else
-	printf ("\n");
+	printf("\n");
 #endif
 
-	printf ("Configurations: %d\n", deviceDesc.bNumConfigurations);
+	printf("Configurations: %d\n", deviceDesc.bNumConfigurations);
 
 	for (size_t i = 0; i < deviceDesc.bNumConfigurations; i++)
 	{
-		printf ("\n");
+		printf("\n");
 
 		io::UsbConfigDescriptor configDesc;
-		bool result = device->getConfigDescriptor (i, &configDesc);
+		bool result = device->getConfigDescriptor(i, &configDesc);
 		if (!result)
-			printf ("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription ().sz ());
+			printf("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription ().sz ());
 		else
-			printUsbConfigDesc (configDesc);
+			printUsbConfigDesc(configDesc);
 	}
 }
 
 void
-testUsbEnum ()
+testUsbEnum()
 {
 	bool result;
 
-	io::registerUsbErrorProvider ();
-	io::getUsbDefaultContext ()->createDefault ();
+	io::registerUsbErrorProvider();
+	io::getUsbDefaultContext()->createDefault();
 
 	io::UsbDeviceList deviceList;
-	size_t count = deviceList.enumerateDevices ();
+	size_t count = deviceList.enumerateDevices();
 	if (count == -1)
 	{
-		printf ("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -1166,16 +1166,16 @@ testUsbEnum ()
 	libusb_device** pp = deviceList;
 	for (size_t i = 0; *pp; pp++, i++)
 	{
-		printf ("----------------------\nDevice #%d\n", i);
+		printf("----------------------\nDevice #%d\n", i);
 
 		io::UsbDevice device;
-		device.setDevice (*pp);
+		device.setDevice(*pp);
 
-		result = device.open ();
+		result = device.open();
 		if (!result)
-			printf ("Cannot open device (%s)\n", err::getLastErrorDescription ().sz ());
+			printf("Cannot open device (%s)\n", err::getLastErrorDescription ().sz ());
 
-		printUsbDevice (&device); // even if not opened
+		printUsbDevice(&device); // even if not opened
 	}
 }
 
@@ -1189,7 +1189,7 @@ protected:
 	uint_t m_timeout;
 
 public:
-	UsbRead (
+	UsbRead(
 		io::UsbDevice* device,
 		uint_t endpointId,
 		uint_t timeout = 1000
@@ -1200,59 +1200,59 @@ public:
 		m_timeout = timeout;
 
 		io::UsbConfigDescriptor configDesc;
-		m_device->getActiveConfigDescriptor (&configDesc);
-		const libusb_endpoint_descriptor* endpointDesc = io::findUsbEndpointDescriptor (configDesc, m_endpointId);
-		ASSERT (endpointDesc);
+		m_device->getActiveConfigDescriptor(&configDesc);
+		const libusb_endpoint_descriptor* endpointDesc = io::findUsbEndpointDescriptor(configDesc, m_endpointId);
+		ASSERT(endpointDesc);
 
-		m_endpointType = (libusb_transfer_type) (endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK);
+		m_endpointType = (libusb_transfer_type)(endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK);
 		m_maxPacketSize = endpointDesc->wMaxPacketSize;
 	}
 };
 
 class UsbReadThread:
-	public sys::ThreadImpl <UsbReadThread>,
+	public sys::ThreadImpl<UsbReadThread>,
 	public UsbRead
 {
 public:
-	UsbReadThread (
+	UsbReadThread(
 		io::UsbDevice* device,
 		uint_t endpointId,
 		uint_t timeout = 1000
-		): UsbRead (device, endpointId, timeout)
+		): UsbRead(device, endpointId, timeout)
 	{
 	}
 
 	void
-	threadFunc ()
+	threadFunc()
 	{
-		sl::Array <char> buffer;
-		buffer.setCount (m_maxPacketSize);
+		sl::Array<char> buffer;
+		buffer.setCount(m_maxPacketSize);
 
 		size_t totalSize = 0;
 		while (totalSize < 1024)
 		{
 			size_t size;
-			switch (m_endpointType)
+			switch(m_endpointType)
 			{
 			case LIBUSB_TRANSFER_TYPE_BULK:
-				size = m_device->bulkTransfer (m_endpointId, buffer, m_maxPacketSize, m_timeout);
+				size = m_device->bulkTransfer(m_endpointId, buffer, m_maxPacketSize, m_timeout);
 				break;
 
 			case LIBUSB_TRANSFER_TYPE_INTERRUPT:
-				size = m_device->interruptTransfer (m_endpointId, buffer, m_maxPacketSize, m_timeout);
+				size = m_device->interruptTransfer(m_endpointId, buffer, m_maxPacketSize, m_timeout);
 				break;
 
 			default:
-				ASSERT (false);
+				ASSERT(false);
 			}
 
 			if (size == -1)
 			{
-				printf ("interrupt transfer error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("interrupt transfer error: %s\n", err::getLastErrorDescription ().sz ());
 			}
 			else
 			{
-				printf ("received %d bytes\n", size);
+				printf("received %d bytes\n", size);
 				totalSize += size;
 			}
 		}
@@ -1260,34 +1260,34 @@ public:
 };
 
 class UsbAsyncTransfer:
-	public sys::ThreadImpl <UsbReadThread>,
+	public sys::ThreadImpl<UsbReadThread>,
 	public UsbRead
 {
 protected:
 	io::UsbTransfer m_transfer;
 	sys::NotificationEvent m_completionEvent;
-	sl::Array <char> m_buffer;
+	sl::Array<char> m_buffer;
 	size_t m_totalSize;
 
 public:
-	UsbAsyncTransfer (
+	UsbAsyncTransfer(
 		io::UsbDevice* device,
 		uint_t endpointId,
 		uint_t timeout = 1000
-		): UsbRead (device, endpointId, timeout)
+		): UsbRead(device, endpointId, timeout)
 	{
-		m_transfer.create ();
-		m_buffer.setCount (m_maxPacketSize);
+		m_transfer.create();
+		m_buffer.setCount(m_maxPacketSize);
 		m_totalSize = 0;
 	}
 
 	bool
-	next ()
+	next()
 	{
-		switch (m_endpointType)
+		switch(m_endpointType)
 		{
 		case LIBUSB_TRANSFER_TYPE_BULK:
-			m_transfer.fillBulkTransfer (
+			m_transfer.fillBulkTransfer(
 				m_device->getOpenHandle(),
 				m_endpointId,
 				m_buffer,
@@ -1300,7 +1300,7 @@ public:
 			break;
 
 		case LIBUSB_TRANSFER_TYPE_INTERRUPT:
-			m_transfer.fillInterruptTransfer (
+			m_transfer.fillInterruptTransfer(
 				m_device->getOpenHandle(),
 				m_endpointId,
 				m_buffer,
@@ -1312,31 +1312,31 @@ public:
 			break;
 
 		default:
-			ASSERT (false);
+			ASSERT(false);
 		}
 
-		return m_transfer.submit ();
+		return m_transfer.submit();
 	}
 
 	bool
-	wait (uint_t timeout = -1)
+	wait(uint_t timeout = -1)
 	{
-		return m_completionEvent.wait (timeout);
+		return m_completionEvent.wait(timeout);
 	}
 
 protected:
 	static
 	void
 	LIBUSB_CALL
-	onCompleted (libusb_transfer* transfer)
+	onCompleted(libusb_transfer* transfer)
 	{
-		UsbAsyncTransfer* self = (UsbAsyncTransfer*) transfer->user_data;
+		UsbAsyncTransfer* self = (UsbAsyncTransfer*)transfer->user_data;
 
-		printf (
+		printf(
 			"libusb_transfer completed:\n"
 			"    status:        %s (%x)\n"
 			"    actual length: %d\n",
-			io::getUsbTransferStatusString (transfer->status),
+			io::getUsbTransferStatusString(transfer->status),
 			transfer->status,
 			transfer->actual_length
 			);
@@ -1346,17 +1346,17 @@ protected:
 			self->m_totalSize += transfer->actual_length;
 			if (self->m_totalSize > 1024)
 			{
-				self->m_completionEvent.signal ();
+				self->m_completionEvent.signal();
 				return;
 			}
 		}
 
-		self->next ();
+		self->next();
 	}
 };
 
 void
-testUsbMouse ()
+testUsbMouse()
 {
 	enum
 	{
@@ -1370,72 +1370,72 @@ testUsbMouse ()
 
 	bool result;
 
-	io::registerUsbErrorProvider ();
-	io::getUsbDefaultContext ()->createDefault ();
-	io::getUsbDefaultContextEventThread ()->start ();
+	io::registerUsbErrorProvider();
+	io::getUsbDefaultContext()->createDefault();
+	io::getUsbDefaultContextEventThread()->start();
 
-	printf ("Opening device...\n");
+	printf("Opening device...\n");
 
 	io::UsbDevice device;
-	result = device.open (VendorId, ProductId);
+	result = device.open(VendorId, ProductId);
 	if (!result)
 	{
-		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("Reading device properties...\n");
-	printUsbDevice (&device);
+	printf("Reading device properties...\n");
+	printUsbDevice(&device);
 
-	if (io::hasUsbCapability (LIBUSB_CAP_SUPPORTS_DETACH_KERNEL_DRIVER))
+	if (io::hasUsbCapability(LIBUSB_CAP_SUPPORTS_DETACH_KERNEL_DRIVER))
 	{
-		printf ("Setting auto-detach for kernel driver...\n");
-		result = device.setAutoDetachKernelDriver (true);
+		printf("Setting auto-detach for kernel driver...\n");
+		result = device.setAutoDetachKernelDriver(true);
 		if (!result)
 		{
-			printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+			printf("Error: %s\n", err::getLastErrorDescription ().sz ());
 			return;
 		}
 	}
 
-	printf ("Claiming interface #%d...\n", InterfaceId);
-	result = device.claimInterface (InterfaceId);
+	printf("Claiming interface #%d...\n", InterfaceId);
+	result = device.claimInterface(InterfaceId);
 	if (!result)
 	{
-		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
 	io::UsbConfigDescriptor configDesc;
-	device.getActiveConfigDescriptor (&configDesc);
-	const libusb_endpoint_descriptor* endpointDesc = io::findUsbEndpointDescriptor (configDesc, EndpointId);
-	ASSERT (endpointDesc);
+	device.getActiveConfigDescriptor(&configDesc);
+	const libusb_endpoint_descriptor* endpointDesc = io::findUsbEndpointDescriptor(configDesc, EndpointId);
+	ASSERT(endpointDesc);
 
-	printf ("Sync read...\n");
+	printf("Sync read...\n");
 
-	sl::Array <char> buffer;
-	buffer.setCount (endpointDesc->wMaxPacketSize);
-	size_t size = device.interruptTransfer (EndpointId, buffer, endpointDesc->wMaxPacketSize);
+	sl::Array<char> buffer;
+	buffer.setCount(endpointDesc->wMaxPacketSize);
+	size_t size = device.interruptTransfer(EndpointId, buffer, endpointDesc->wMaxPacketSize);
 
 	if (size == -1)
 	{
-		printf ("Error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("%d bytes read...\n", size);
+	printf("%d bytes read...\n", size);
 
-/*	UsbReadThread readThread (&device, EndpointId);
-	printf ("Starting read thread...\n");
-	readThread.start ();
-	readThread.waitAndClose (); */
+/*	UsbReadThread readThread(&device, EndpointId);
+	printf("Starting read thread...\n");
+	readThread.start();
+	readThread.waitAndClose(); */
 
-	UsbAsyncTransfer asyncTransfer (&device, EndpointId);
-	printf ("Starting async transfer...\n");
-	asyncTransfer.next ();
-	asyncTransfer.wait ();
+	UsbAsyncTransfer asyncTransfer(&device, EndpointId);
+	printf("Starting async transfer...\n");
+	asyncTransfer.next();
+	asyncTransfer.wait();
 
-	device.releaseInterface (InterfaceId);
+	device.releaseInterface(InterfaceId);
 }
 
 #endif
@@ -1444,31 +1444,31 @@ testUsbMouse ()
 
 #if (_AXL_OS_POSIX)
 
-class MyThread: public sys::ThreadImpl <MyThread>
+class MyThread: public sys::ThreadImpl<MyThread>
 {
 public:
 	volatile bool m_terminateFlag;
 
-	MyThread ()
+	MyThread()
 	{
 		m_terminateFlag = false;
 	}
 
 	void
-	threadFunc ()
+	threadFunc()
 	{
-		uint64_t tid = getThreadId ();
+		uint64_t tid = getThreadId();
 
 		for (;;)
 		{
-			sys::sleep (1000);
-			printf ("MyThread -- TID: %lld\n", tid);
+			sys::sleep(1000);
+			printf("MyThread -- TID: %lld\n", tid);
 
 			if (m_terminateFlag)
 				break;
 		}
 
-		printf ("MyThread -- TID: %lld -- TERMINATE\n", tid);
+		printf("MyThread -- TID: %lld -- TERMINATE\n", tid);
 	}
 };
 
@@ -1544,49 +1544,49 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
 #else
 	sigsegv_outp("Not printing stack strace.");
 #endif
-	_exit (-1);
+	_exit(-1);
 }
 
 #endif
 
-void* suspendThread (pthread_t thread)
+void* suspendThread(pthread_t thread)
 {
 	return NULL;
 }
 
-bool resumeThread (pthread_t thread)
+bool resumeThread(pthread_t thread)
 {
 	return false;
 }
 
-void testSuspendThread ()
+void testSuspendThread()
 {
 	MyThread thread1;
 	MyThread thread2;
 
-	thread1.start ();
-	sys::sleep (500);
-	thread2.start ();
+	thread1.start();
+	sys::sleep(500);
+	thread2.start();
 
-	sys::sleep (3000);
+	sys::sleep(3000);
 
-	suspendThread (thread2.m_thread);
-	printf ("thread2 is suspended...\n");
+	suspendThread(thread2.m_thread);
+	printf("thread2 is suspended...\n");
 
-	sys::sleep (3000);
+	sys::sleep(3000);
 
-	printf ("thread2 is resumed...\n");
-	resumeThread (thread2.m_thread);
+	printf("thread2 is resumed...\n");
+	resumeThread(thread2.m_thread);
 
-	sys::sleep (3000);
+	sys::sleep(3000);
 
-	printf ("terminating threads...\n");
+	printf("terminating threads...\n");
 
 	thread1.m_terminateFlag = true;
 	thread2.m_terminateFlag = true;
 
-	thread1.waitAndClose ();
-	thread2.waitAndClose ();
+	thread1.waitAndClose();
+	thread2.waitAndClose();
 
 /*
 	sigaction action = { 0 };
@@ -1597,7 +1597,7 @@ void testSuspendThread ()
 		perror("sigaction");
 
 
-	threadArray [i].suspend ();
+	threadArray[i].suspend();
 */
 
 }
@@ -1624,8 +1624,8 @@ protected:
 protected:
 	io::psx::Mapping m_guardPage;
 
-	sl::Array <uint64_t> m_threadArray;
-	sl::HashTable <uint64_t, bool, sl::HashId <uint64_t> > m_threadMap;
+	sl::Array<uint64_t> m_threadArray;
+	sl::HashTable<uint64_t, bool, sl::HashId<uint64_t> > m_threadMap;
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
@@ -1639,9 +1639,9 @@ protected:
 	sigset_t m_signalWaitMask;
 
 public:
-	Gc ()
+	Gc()
 	{
-		m_guardPage.map (
+		m_guardPage.map(
 			NULL,
 			4 * 1024, // typical page size -- OS will not give us less than that, anyway
 			PROT_READ | PROT_WRITE,
@@ -1651,56 +1651,56 @@ public:
 			);
 
 		m_handshakeKind = HandshakeKind_None;
-		installSignalHandlers ();
+		installSignalHandlers();
 	}
 
 	void
-	gcSafePoint ()
+	gcSafePoint()
 	{
-		*(volatile int*) m_guardPage.p () = 0;
+		*(volatile int*) m_guardPage.p() = 0;
 	}
 
 	void
-	stopTheWorld ()
+	stopTheWorld()
 	{
 		m_handshakeKind = HandshakeKind_StopTheWorld;
-		m_handshakeCounter = m_threadMap.getCount ();
-		m_guardPage.protect (PROT_NONE);
-		m_handshakeSem.wait ();
+		m_handshakeCounter = m_threadMap.getCount();
+		m_guardPage.protect(PROT_NONE);
+		m_handshakeSem.wait();
 		m_handshakeKind = HandshakeKind_None;
 	}
 
 	void
-	resumeTheWorld ()
+	resumeTheWorld()
 	{
-		m_guardPage.protect (PROT_READ | PROT_WRITE);
+		m_guardPage.protect(PROT_READ | PROT_WRITE);
 
 		m_handshakeKind = HandshakeKind_ResumeTheWorld;
-		m_handshakeCounter = m_threadArray.getCount ();
+		m_handshakeCounter = m_threadArray.getCount();
 		for (size_t i = 0; i < m_handshakeCounter; i++)
-			pthread_kill ((pthread_t) m_threadArray [i], SIGUSR1); // resume
+			pthread_kill((pthread_t)m_threadArray[i], SIGUSR1); // resume
 
-		m_handshakeSem.wait ();
+		m_handshakeSem.wait();
 		m_handshakeKind = HandshakeKind_None;
 	}
 
 	bool
-	registerThread (uint64_t threadId)
+	registerThread(uint64_t threadId)
 	{
-		sl::HashTableIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
+		sl::HashTableIterator<uint64_t, bool> it = m_threadMap.visit(threadId);
 		if (it->m_value)
 			return false;
 
-		m_threadArray.append (threadId);
+		m_threadArray.append(threadId);
 		it->m_value = true;
 		return true;
 	}
 
 protected:
 	bool
-	installSignalHandlers ()
+	installSignalHandlers()
 	{
-		sigemptyset (&m_signalWaitMask); // don't block any signals when servicing SIGSEGV
+		sigemptyset(&m_signalWaitMask); // don't block any signals when servicing SIGSEGV
 
 		struct sigaction sigAction = { 0 };
 		sigAction.sa_flags = SA_SIGINFO;
@@ -1708,20 +1708,20 @@ protected:
 		sigAction.sa_mask = m_signalWaitMask;
 
 		struct sigaction prevSigAction;
-		int result = sigaction (SIGSEGV, &sigAction, &prevSigAction);
-		ASSERT (result == 0);
+		int result = sigaction(SIGSEGV, &sigAction, &prevSigAction);
+		ASSERT(result == 0);
 
 		sigAction.sa_flags = 0;
 		sigAction.sa_handler = signalHandler_SIGUSR1;
-		result = sigaction (SIGUSR1, &sigAction, &prevSigAction);
-		ASSERT (result == 0);
+		result = sigaction(SIGUSR1, &sigAction, &prevSigAction);
+		ASSERT(result == 0);
 
 		return true;
 	}
 
 	static
 	void
-	signalHandler_SIGSEGV (
+	signalHandler_SIGSEGV(
 		int signal,
 		siginfo_t* signalInfo,
 		void* context
@@ -1732,23 +1732,23 @@ protected:
 			g_gc->m_handshakeKind != HandshakeKind_StopTheWorld)
 			return; // ignore
 
-		int32_t count = sys::atomicDec (&g_gc->m_handshakeCounter);
+		int32_t count = sys::atomicDec(&g_gc->m_handshakeCounter);
 		if (!count)
-			g_gc->m_handshakeSem.signal ();
+			g_gc->m_handshakeSem.signal();
 
 		do
 		{
-			sigsuspend (&g_gc->m_signalWaitMask);
+			sigsuspend(&g_gc->m_signalWaitMask);
 		} while (g_gc->m_handshakeKind != HandshakeKind_ResumeTheWorld);
 
-		count = sys::atomicDec (&g_gc->m_handshakeCounter);
+		count = sys::atomicDec(&g_gc->m_handshakeCounter);
 		if (!count)
-			g_gc->m_handshakeSem.signal ();
+			g_gc->m_handshakeSem.signal();
 	}
 
 	static
 	void
-	signalHandler_SIGUSR1 (int signal)
+	signalHandler_SIGUSR1(int signal)
 	{
 		// do nothing (we handshake manually). but we still need a handler
 	}
@@ -1772,7 +1772,7 @@ protected:
 protected:
 	sys::win::VirtualMemory m_guardPage;
 
-	sl::HashTable <uint64_t, bool, sl::HashId <uint64_t> > m_threadMap;
+	sl::HashTable<uint64_t, bool, sl::HashId<uint64_t> > m_threadMap;
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
@@ -1780,50 +1780,50 @@ protected:
 	sys::NotificationEvent m_resumeEvent;
 
 public:
-	Gc ()
+	Gc()
 	{
-		m_guardPage.alloc (4 * 1024);
+		m_guardPage.alloc(4 * 1024);
 		m_handshakeKind = HandshakeKind_None;
 	}
 
-	~Gc ()
+	~Gc()
 	{
 	}
 
 	void
-	gcSafePoint ()
+	gcSafePoint()
 	{
-		sys::atomicXchg ((volatile int*) m_guardPage.p (), 0);
+		sys::atomicXchg((volatile int*) m_guardPage.p(), 0);
 	}
 
 	void
-	stopTheWorld ()
+	stopTheWorld()
 	{
 		m_handshakeKind = HandshakeKind_StopTheWorld;
-		m_handshakeCounter = m_threadMap.getCount ();
-		m_resumeEvent.reset ();
-		m_guardPage.protect (PAGE_NOACCESS);
-		m_handshakeEvent.wait ();
+		m_handshakeCounter = m_threadMap.getCount();
+		m_resumeEvent.reset();
+		m_guardPage.protect(PAGE_NOACCESS);
+		m_handshakeEvent.wait();
 		m_handshakeKind = HandshakeKind_None;
 	}
 
 	void
-	resumeTheWorld ()
+	resumeTheWorld()
 	{
-		m_guardPage.protect (PAGE_READWRITE);
+		m_guardPage.protect(PAGE_READWRITE);
 
 		m_handshakeKind = HandshakeKind_ResumeTheWorld;
-		m_handshakeCounter = m_threadMap.getCount ();
-		m_resumeEvent.signal ();
-		m_handshakeEvent.wait ();
+		m_handshakeCounter = m_threadMap.getCount();
+		m_resumeEvent.signal();
+		m_handshakeEvent.wait();
 		m_handshakeKind = HandshakeKind_None;
-		m_resumeEvent.reset ();
+		m_resumeEvent.reset();
 	}
 
 	bool
-	registerThread (uint64_t threadId)
+	registerThread(uint64_t threadId)
 	{
-		sl::HashTableIterator <uint64_t, bool> it = m_threadMap.visit (threadId);
+		sl::HashTableIterator<uint64_t, bool> it = m_threadMap.visit(threadId);
 		if (it->m_value)
 			return false;
 
@@ -1832,117 +1832,117 @@ public:
 	}
 
 	int
-	handleException (
+	handleException(
 		uint_t code,
 		EXCEPTION_POINTERS* exceptionPointers
 		)
 	{
 		if (code != EXCEPTION_ACCESS_VIOLATION ||
-		   exceptionPointers->ExceptionRecord->ExceptionInformation [1] != (uintptr_t) m_guardPage.p () ||
+		   exceptionPointers->ExceptionRecord->ExceptionInformation[1] != (uintptr_t)m_guardPage.p() ||
 		   m_handshakeKind != HandshakeKind_StopTheWorld)
 		  return EXCEPTION_CONTINUE_SEARCH;
 
-		int32_t count = sys::atomicDec (&g_gc->m_handshakeCounter);
+		int32_t count = sys::atomicDec(&g_gc->m_handshakeCounter);
 		if (!count)
-			g_gc->m_handshakeEvent.signal ();
+			g_gc->m_handshakeEvent.signal();
 
 		do
 		{
-			g_gc->m_resumeEvent.wait ();
+			g_gc->m_resumeEvent.wait();
 		} while (m_handshakeKind != HandshakeKind_ResumeTheWorld);
 
-		count = sys::atomicDec (&g_gc->m_handshakeCounter);
+		count = sys::atomicDec(&g_gc->m_handshakeCounter);
 		if (!count)
-			g_gc->m_handshakeEvent.signal ();
+			g_gc->m_handshakeEvent.signal();
 
 		return EXCEPTION_CONTINUE_EXECUTION;
 	}
 };
 
 #define GC_BEGIN() __try {
-#define GC_END() } __except (g_gc->handleException (GetExceptionCode (), GetExceptionInformation ())) { }
+#define GC_END() } __except(g_gc->handleException(GetExceptionCode(), GetExceptionInformation())) { }
 
 #endif
 
-class MutatorThread: public sys::ThreadImpl <MutatorThread>
+class MutatorThread: public sys::ThreadImpl<MutatorThread>
 {
 protected:
 	volatile bool m_terminateFlag;
 
 public:
-	MutatorThread ()
+	MutatorThread()
 	{
 		m_terminateFlag = false;
 	}
 
 	void
-	stop ()
+	stop()
 	{
 		m_terminateFlag = true;
-		waitAndClose ();
+		waitAndClose();
 		m_terminateFlag = false;
 	}
 
 	void
-	threadFunc ()
+	threadFunc()
 	{
-		uint64_t threadId = sys::getCurrentThreadId ();
+		uint64_t threadId = sys::getCurrentThreadId();
 
-		GC_BEGIN ()
+		GC_BEGIN()
 
 		for (;;)
 		{
 			if (m_terminateFlag)
 				break;
 
-			printf ("  mutator thread TID:%lld is working...\n", threadId);
-			sys::sleep (200);
-			g_gc->gcSafePoint ();
+			printf("  mutator thread TID:%lld is working...\n", threadId);
+			sys::sleep(200);
+			g_gc->gcSafePoint();
 		}
 
-		printf ("  mutator thread TID:%lld is finished.\n", threadId);
+		printf("  mutator thread TID:%lld is finished.\n", threadId);
 
-		GC_END ()
+		GC_END()
 	}
 };
 
 void
-testGcSafePoints ()
+testGcSafePoints()
 {
 	Gc gc;
 
 	g_gc = &gc;
 
-	printf ("starting mutator threads...\n");
+	printf("starting mutator threads...\n");
 
 	MutatorThread thread1;
 	MutatorThread thread2;
 
-	thread1.start ();
-	thread2.start ();
+	thread1.start();
+	thread2.start();
 
-	gc.registerThread (thread1.getThreadId ());
-	gc.registerThread (thread2.getThreadId ());
+	gc.registerThread(thread1.getThreadId());
+	gc.registerThread(thread2.getThreadId());
 
-	sys::sleep (1000);
+	sys::sleep(1000);
 
-	printf ("stopping the world...\n");
-	gc.stopTheWorld ();
-	printf ("the world is stopped.\n");
+	printf("stopping the world...\n");
+	gc.stopTheWorld();
+	printf("the world is stopped.\n");
 
-	sys::sleep (2000);
+	sys::sleep(2000);
 
-	printf ("resuming the world...\n");
-	gc.resumeTheWorld ();
+	printf("resuming the world...\n");
+	gc.resumeTheWorld();
 
-	sys::sleep (1000);
+	sys::sleep(1000);
 
-	printf ("stopping mutator threads...\n");
+	printf("stopping mutator threads...\n");
 
-	thread1.stop ();
-	thread2.stop ();
+	thread1.stop();
+	thread2.stop();
 
-	printf ("done.\n");
+	printf("done.\n");
 
 	g_gc = NULL;
 }
@@ -1959,64 +1959,64 @@ struct IfaceHdr
 class Foo: public IfaceHdr
 {
 public:
-	Foo ()
+	Foo()
 	{
-		printf ("m_p1 = %s; m_p2 = %s; m_p3 = %s\n", m_p1, m_p2, m_p3);
+		printf("m_p1 = %s; m_p2 = %s; m_p3 = %s\n", m_p1, m_p2, m_p3);
 	}
 };
 
 void
-testInheritance ()
+testInheritance()
 {
-	char buffer [sizeof (Foo)];
-	IfaceHdr* iface = (IfaceHdr*) buffer;
+	char buffer[sizeof(Foo)];
+	IfaceHdr* iface = (IfaceHdr*)buffer;
 	iface->m_p1 = "hui";
 	iface->m_p2 = "govno";
 	iface->m_p3 = "muravei";
 
-	new (buffer) Foo ();
+	new(buffer)Foo();
 }
 
 //..............................................................................
 
 void
-testTimestamps ()
+testTimestamps()
 {
-	uint64_t ts1 = sys::getTimestamp ();
-	uint64_t ts2 = sys::getPreciseTimestamp ();
+	uint64_t ts1 = sys::getTimestamp();
+	uint64_t ts2 = sys::getPreciseTimestamp();
 
-	printf ("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
-	printf ("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
+	printf("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
+	printf("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
 
-	uint64_t t0 = sys::getPreciseTimestamp ();
+	uint64_t t0 = sys::getPreciseTimestamp();
 
 	size_t n = 10000000;
 
 	for (size_t i = 0; i < n; i++)
 	{
-		sys::getTimestamp ();
+		sys::getTimestamp();
 	}
 
-	uint64_t t2 = sys::getPreciseTimestamp ();
+	uint64_t t2 = sys::getPreciseTimestamp();
 	uint64_t d = t2 - t0;
-	printf ("time (ts1) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
+	printf("time (ts1) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
 
-	t0 = sys::getPreciseTimestamp ();
+	t0 = sys::getPreciseTimestamp();
 
 	for (size_t i = 0; i < n; i++)
 	{
-		sys::getPreciseTimestamp ();
+		sys::getPreciseTimestamp();
 	}
 
-	t2 = sys::getPreciseTimestamp ();
+	t2 = sys::getPreciseTimestamp();
 	d = t2 - t0;
-	printf ("time (ts2) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
+	printf("time (ts2) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
 
-	ts1 = sys::getTimestamp ();
-	ts2 = sys::getPreciseTimestamp ();
+	ts1 = sys::getTimestamp();
+	ts2 = sys::getPreciseTimestamp();
 
-	printf ("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
-	printf ("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
+	printf("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
+	printf("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
 
 }
 
@@ -2024,22 +2024,22 @@ testTimestamps ()
 
 #if (_AXL_OS_WIN)
 void
-testProcess ()
+testProcess()
 {
-	sl::Array <char> output;
+	sl::Array<char> output;
 	dword_t exitCode;
 
 	const wchar_t* cmdLine = L"C:\\Projects\\ioninja\\devmon\\build\\msvc10\\bin\\Debug\\tdevmon.exe --start-core-service";
 
-	bool result = sys::win::syncExec (cmdLine, &output, &exitCode);
+	bool result = sys::win::syncExec(cmdLine, &output, &exitCode);
 	if (!result)
 	{
-		printf ("sys::win::syncExec failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("sys::win::syncExec failed: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	output.append (0);
-	printf ("process returned %d:\n%s\n", exitCode, output.cp ());
+	output.append(0);
+	printf("process returned %d:\n%s\n", exitCode, output.cp ());
 }
 #endif
 
@@ -2073,11 +2073,11 @@ class Transport
 public:
 	virtual
 	size_t
-	readMessage (sl::Array <char>* buffer) = 0;
+	readMessage(sl::Array<char>* buffer) = 0;
 
 	virtual
 	bool
-	writeMessage (
+	writeMessage(
 		const ReqHdr* hdr,
 		const void* p,
 		size_t size
@@ -2086,77 +2086,77 @@ public:
 
 //..............................................................................
 
-class ServerThread: public sys::ThreadImpl <ServerThread>
+class ServerThread: public sys::ThreadImpl<ServerThread>
 {
 public:
 	Transport* m_transport;
 
 public:
-	ServerThread (Transport* transport)
+	ServerThread(Transport* transport)
 	{
 		m_transport = transport;
 	}
 
 	uint_t
-	threadFunc ()
+	threadFunc()
 	{
-		ASSERT (m_transport);
+		ASSERT(m_transport);
 
-		sl::Array <char> buffer;
+		sl::Array<char> buffer;
 
 #if (_SHM_TEST_ONE_WAY)
 		for (;;)
 		{
-			size_t size = m_transport->readMessage (&buffer);
+			size_t size = m_transport->readMessage(&buffer);
 			if (size == -1)
 			{
-				printf ("server: read error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("server: read error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
-			if (size < sizeof (ReqHdr))
+			if (size < sizeof(ReqHdr))
 			{
-				printf ("server: buffer too small\n");
+				printf("server: buffer too small\n");
 				return -1;
 			}
 
-			ReqHdr* command = (ReqHdr*) buffer.cp ();
-			if (command->m_code != ReqCode_Command || sizeof (ReqHdr) + command->m_size != size)
+			ReqHdr* command = (ReqHdr*)buffer.cp();
+			if (command->m_code != ReqCode_Command || sizeof(ReqHdr) + command->m_size != size)
 			{
-				printf ("server: invalid command: %d (%d)\n", command->m_code, command->m_size);
+				printf("server: invalid command: %d (%d)\n", command->m_code, command->m_size);
 				return -1;
 			}
 		}
 #else
-		static char data [MaxBlockSize] = { 0 };
+		static char data[MaxBlockSize] = { 0 };
 
 		for (;;)
 		{
-			size_t size = m_transport->readMessage (&buffer);
+			size_t size = m_transport->readMessage(&buffer);
 			if (size == -1)
 			{
-				printf ("server: read error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("server: read error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
-			if (size < sizeof (ReqHdr))
+			if (size < sizeof(ReqHdr))
 			{
-				printf ("server: buffer too small\n");
+				printf("server: buffer too small\n");
 				return -1;
 			}
 
-			ReqHdr* command = (ReqHdr*) buffer.cp ();
-			if (command->m_code != ReqCode_Command || sizeof (ReqHdr) + command->m_size != size)
+			ReqHdr* command = (ReqHdr*)buffer.cp();
+			if (command->m_code != ReqCode_Command || sizeof(ReqHdr) + command->m_size != size)
 			{
-				printf ("server: invalid command: %d (%d)\n", command->m_code, command->m_size);
+				printf("server: invalid command: %d (%d)\n", command->m_code, command->m_size);
 				return -1;
 			}
 
 			ReqHdr reply;
 			reply.m_code = ReqCode_Reply;
-			reply.m_size = ::rand () % MaxBlockSize;
+			reply.m_size = ::rand() % MaxBlockSize;
 
-			m_transport->writeMessage (&reply, data, reply.m_size);
+			m_transport->writeMessage(&reply, data, reply.m_size);
 		}
 
 #endif
@@ -2167,54 +2167,54 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ClientThread: public sys::ThreadImpl <ClientThread>
+class ClientThread: public sys::ThreadImpl<ClientThread>
 {
 protected:
 	Transport* m_transport;
 
 public:
-	ClientThread (Transport* transport)
+	ClientThread(Transport* transport)
 	{
 		m_transport = transport;
 	}
 
 	uint_t
-	threadFunc ()
+	threadFunc()
 	{
-		ASSERT (m_transport);
+		ASSERT(m_transport);
 
 		int percentage = 0;
 		size_t totalSize = 0;
 
 #if (_SHM_TEST_ONE_WAY)
-		static char data [MaxBlockSize] = { 0 };
+		static char data[MaxBlockSize] = { 0 };
 
 		while (totalSize < TotalSize)
 		{
-			size_t blockSize = rand () % MaxBlockSize;
+			size_t blockSize = rand() % MaxBlockSize;
 
 			ReqHdr command;
 			command.m_code = ReqCode_Command;
 			command.m_size = blockSize;
 
-			bool result = m_transport->writeMessage (&command, data, blockSize);
+			bool result = m_transport->writeMessage(&command, data, blockSize);
 			if (!result)
 			{
-				printf ("client: write error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("client: write error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
 			totalSize += blockSize;
 
-			int newPercentage = (uint64_t) totalSize * 100 / TotalSize;
+			int newPercentage = (uint64_t)totalSize * 100 / TotalSize;
 			if (newPercentage != percentage)
 			{
 				percentage = newPercentage;
-				printf ("\b\b\b\b%d%%", percentage);
+				printf("\b\b\b\b%d%%", percentage);
 			}
 		}
 #else
-		sl::Array <char> buffer;
+		sl::Array<char> buffer;
 
 		while (totalSize < TotalSize)
 		{
@@ -2222,45 +2222,45 @@ public:
 			command.m_code = ReqCode_Command;
 			command.m_size = 0;
 
-			bool result = m_transport->writeMessage (&command, NULL, 0);
+			bool result = m_transport->writeMessage(&command, NULL, 0);
 			if (!result)
 			{
-				printf ("client: write error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("client: write error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
-			size_t receivedSize = m_transport->readMessage (&buffer);
+			size_t receivedSize = m_transport->readMessage(&buffer);
 			if (receivedSize == -1)
 			{
-				printf ("client: read error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("client: read error: %s\n", err::getLastErrorDescription ().sz ());
 				return -1;
 			}
 
-			if (receivedSize < sizeof (ReqHdr))
+			if (receivedSize < sizeof(ReqHdr))
 			{
-				printf ("client: buffer too small\n");
+				printf("client: buffer too small\n");
 				return -1;
 			}
 
-			ReqHdr* reply = (ReqHdr*) buffer.cp ();
-			if (reply->m_code != ReqCode_Reply || sizeof (ReqHdr) + reply->m_size != receivedSize)
+			ReqHdr* reply = (ReqHdr*)buffer.cp();
+			if (reply->m_code != ReqCode_Reply || sizeof(ReqHdr) + reply->m_size != receivedSize)
 			{
-				printf ("client: invalid reply: %d (%d)\n", reply->m_code, reply->m_size);
+				printf("client: invalid reply: %d (%d)\n", reply->m_code, reply->m_size);
 				return -1;
 			}
 
 			totalSize += reply->m_size;
 
-			int newPercentage = (uint64_t) totalSize * 100 / TotalSize;
+			int newPercentage = (uint64_t)totalSize * 100 / TotalSize;
 			if (newPercentage != percentage)
 			{
 				percentage = newPercentage;
-				printf ("\b\b\b\b%d%%", percentage);
+				printf("\b\b\b\b%d%%", percentage);
 			}
 		}
 #endif
 
-		printf ("\b\b\b\b100%% (done)\n");
+		printf("\b\b\b\b100%% (done)\n");
 		return 0;
 	}
 };
@@ -2276,26 +2276,26 @@ public:
 public:
 	virtual
 	size_t
-	readMessage (sl::Array <char>* buffer)
+	readMessage(sl::Array<char>* buffer)
 	{
-		return m_reader.read (buffer);
+		return m_reader.read(buffer);
 	}
 
 	virtual
 	bool
-	writeMessage (
+	writeMessage(
 		const ReqHdr* hdr,
 		const void* p,
 		size_t size
 		)
 	{
 		if (!size)
-			return m_writer.write (hdr, sizeof (ReqHdr)) != -1;
+			return m_writer.write(hdr, sizeof(ReqHdr)) != -1;
 
-		const void* blockArray [] = { hdr, p };
-		size_t sizeArray [] = { sizeof (ReqHdr), size };
+		const void* blockArray[] = { hdr, p };
+		size_t sizeArray[] = { sizeof(ReqHdr), size };
 
-		return m_writer.write (blockArray, sizeArray, 2) != -1;
+		return m_writer.write(blockArray, sizeArray, 2) != -1;
 	}
 };
 
@@ -2312,80 +2312,80 @@ public:
 	int m_writePipe;
 #endif
 
-	sl::Array <char> m_leftover;
+	sl::Array<char> m_leftover;
 
 public:
 	virtual
 	size_t
-	readMessage (sl::Array <char>* buffer)
+	readMessage(sl::Array<char>* buffer)
 	{
 		size_t size = 0;
 
-		size_t bufferSize = buffer->getCount ();
+		size_t bufferSize = buffer->getCount();
 
-		if (bufferSize < sizeof (ReqHdr))
-			buffer->setCount (sizeof (ReqHdr));
+		if (bufferSize < sizeof(ReqHdr))
+			buffer->setCount(sizeof(ReqHdr));
 
-		bufferSize = sizeof (ReqHdr);
+		bufferSize = sizeof(ReqHdr);
 
 		while (size < bufferSize)
 		{
 #if (_AXL_OS_WIN)
 			dword_t actualSize;
-			bool_t result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
+			bool_t result = ::ReadFile(m_readPipe, buffer->p() + size, bufferSize - size, &actualSize, NULL);
 #elif (_AXL_OS_POSIX)
-			int actualSize = ::read (m_readPipe, buffer->p () + size, bufferSize - size);
+			int actualSize = ::read(m_readPipe, buffer->p() + size, bufferSize - size);
 			bool result = actualSize != -1;
 #endif
 
 			if (!result)
 			{
-				err::setLastSystemError ();
+				err::setLastSystemError();
 				return -1;
 			}
 
 			size += actualSize;
 		}
 
-		ASSERT (size == bufferSize);
+		ASSERT(size == bufferSize);
 
-		ReqHdr* hdr = (ReqHdr*) buffer->p ();
+		ReqHdr* hdr = (ReqHdr*)buffer->p();
 		if (!hdr->m_size)
 		{
-			ASSERT (size == sizeof (ReqHdr));
-			buffer->setCount (sizeof (ReqHdr));
-			return sizeof (ReqHdr);
+			ASSERT(size == sizeof(ReqHdr));
+			buffer->setCount(sizeof(ReqHdr));
+			return sizeof(ReqHdr);
 		}
 
-		bufferSize = sizeof (ReqHdr) + hdr->m_size;
-		buffer->setCount (bufferSize);
+		bufferSize = sizeof(ReqHdr) + hdr->m_size;
+		buffer->setCount(bufferSize);
 
 		while (size < bufferSize)
 		{
 #if (_AXL_OS_WIN)
 			dword_t actualSize;
-			bool_t result = ::ReadFile (m_readPipe, buffer->p () + size, bufferSize - size, &actualSize, NULL);
+			bool_t result = ::ReadFile(m_readPipe, buffer->p() + size, bufferSize - size, &actualSize, NULL);
 #elif (_AXL_OS_POSIX)
-			int actualSize = ::read (m_readPipe, buffer->p () + size, bufferSize - size);
+			int actualSize = ::read(m_readPipe, buffer->p() + size, bufferSize - size);
 			bool result = actualSize != -1;
 #endif
 
 			if (!result)
 			{
-				err::setLastSystemError ();
+				err::setLastSystemError();
 				return -1;
 			}
 
 			size += actualSize;
 		}
 
-		ASSERT (size == bufferSize);
+		ASSERT(size == bufferSize);
 		return size;
 	}
 
 	virtual
 	bool
-	writeMessage (
+	writeMessage(
 		const ReqHdr* hdr,
 		const void* p,
 		size_t size
@@ -2394,15 +2394,15 @@ public:
 #if (_AXL_OS_WIN)
 		dword_t actualSize;
 
-		bool result = ::WriteFile (m_writePipe, hdr, sizeof (ReqHdr), &actualSize, NULL) != 0;
+		bool result = ::WriteFile(m_writePipe, hdr, sizeof(ReqHdr), &actualSize, NULL) != 0;
 
 		if (result && size)
-			result = ::WriteFile (m_writePipe, p, size, &actualSize, NULL) != 0;
+			result = ::WriteFile(m_writePipe, p, size, &actualSize, NULL) != 0;
 #elif (_AXL_OS_POSIX)
-		bool result = ::write (m_writePipe, hdr, sizeof (ReqHdr)) != -1;
+		bool result = ::write(m_writePipe, hdr, sizeof(ReqHdr)) != -1;
 
 		if (result && size)
-			result = ::write (m_writePipe, p, size) != -1;
+			result = ::write(m_writePipe, p, size) != -1;
 #endif
 
 		return result;
@@ -2414,7 +2414,7 @@ public:
 //..............................................................................
 
 void
-testSharedMemoryTransport ()
+testSharedMemoryTransport()
 {
 	using namespace shm_test;
 
@@ -2427,30 +2427,30 @@ testSharedMemoryTransport ()
 #	define HOME_DIR "C:/Users/Vladimir"
 #elif (_AXL_OS_POSIX)
 #	define HOME_DIR "/home/vladimir"
-	setvbuf (stdout, NULL, _IONBF, 0);
+	setvbuf(stdout, NULL, _IONBF, 0);
 
-	::sem_unlink ("shmt-test-cli-srv-r");
-	::sem_unlink ("shmt-test-cli-srv-w");
-	::sem_unlink ("shmt-test-srv-cli-r");
-	::sem_unlink ("shmt-test-srv-cli-w");
+	::sem_unlink("shmt-test-cli-srv-r");
+	::sem_unlink("shmt-test-cli-srv-w");
+	::sem_unlink("shmt-test-srv-cli-r");
+	::sem_unlink("shmt-test-srv-cli-w");
 #endif
 
 	result =
-		serverTransport.m_reader.open (
+		serverTransport.m_reader.open(
 			HOME_DIR "/shmt-test-cli-srv",
 			"shmt-test-cli-srv-r",
 			"shmt-test-cli-srv-w",
 			io::SharedMemoryTransportFlag_Message |
 			io::FileFlag_DeleteOnClose
 			) &&
-		serverTransport.m_writer.open (
+		serverTransport.m_writer.open(
 			HOME_DIR "/shmt-test-srv-cli",
 			"shmt-test-srv-cli-r",
 			"shmt-test-srv-cli-w",
 			io::SharedMemoryTransportFlag_Message |
 			io::FileFlag_DeleteOnClose
 			) &&
-		clientTransport.m_reader.open (
+		clientTransport.m_reader.open(
 			HOME_DIR "/shmt-test-srv-cli",
 			"shmt-test-srv-cli-r",
 			"shmt-test-srv-cli-w",
@@ -2458,7 +2458,7 @@ testSharedMemoryTransport ()
 			io::FileFlag_OpenExisting |
 			io::FileFlag_Unlink
 			) &&
-		clientTransport.m_writer.open (
+		clientTransport.m_writer.open(
 			HOME_DIR "/shmt-test-cli-srv",
 			"shmt-test-cli-srv-r",
 			"shmt-test-cli-srv-w",
@@ -2469,34 +2469,34 @@ testSharedMemoryTransport ()
 
 	if (!result)
 	{
-		printf ("can't initialize: %s\n", err::getLastErrorDescription ().sz ());
+		printf("can't initialize: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	ServerThread serverThread (&serverTransport);
-	ClientThread clientThread (&clientTransport);
+	ServerThread serverThread(&serverTransport);
+	ClientThread clientThread(&clientTransport);
 
-	uint64_t time0 = sys::getTimestamp ();
+	uint64_t time0 = sys::getTimestamp();
 
-	serverThread.start ();
-	clientThread.start ();
+	serverThread.start();
+	clientThread.start();
 
-	clientThread.waitAndClose ();
+	clientThread.waitAndClose();
 
-	clientTransport.m_reader.disconnect ();
-	clientTransport.m_writer.disconnect ();
+	clientTransport.m_reader.disconnect();
+	clientTransport.m_writer.disconnect();
 
-	serverThread.waitAndClose ();
+	serverThread.waitAndClose();
 
-	uint64_t time2 = sys::getTimestamp ();
+	uint64_t time2 = sys::getTimestamp();
 
-	printf ("shm test completed: %s\n", sys::Time (time2 - time0, 0).format ("%m:%s.%l").sz ());
+	printf("shm test completed: %s\n", sys::Time (time2 - time0, 0).format ("%m:%s.%l").sz ());
 }
 
 //..............................................................................
 
 void
-testPipeTransport ()
+testPipeTransport()
 {
 	using namespace shm_test;
 
@@ -2506,159 +2506,159 @@ testPipeTransport ()
 	PipeTransport clientTransport;
 
 #if (_AXL_OS_WIN)
-	HANDLE pipeA [2] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
-	HANDLE pipeB [2] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
+	HANDLE pipeA[2] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
+	HANDLE pipeB[2] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
 
 	result =
-		::CreatePipe (&pipeA [0], &pipeA [1], NULL, 0) &&
-		::CreatePipe (&pipeB [0], &pipeB [1], NULL, 0);
+		::CreatePipe(&pipeA[0], &pipeA[1], NULL, 0) &&
+		::CreatePipe(&pipeB[0], &pipeB[1], NULL, 0);
 
 #elif (_AXL_OS_POSIX)
-	setvbuf (stdout, NULL, _IONBF, 0);
+	setvbuf(stdout, NULL, _IONBF, 0);
 
-	int pipeA [2] = { 0 };
-	int pipeB [2] = { 0 };
+	int pipeA[2] = { 0 };
+	int pipeB[2] = { 0 };
 
 	result =
-		::pipe (pipeA) == 0 &&
-		::pipe (pipeB) == 0;
+		::pipe(pipeA) == 0 &&
+		::pipe(pipeB) == 0;
 #endif
 
 	if (!result)
 	{
-		err::setLastSystemError ();
-		printf ("can't initialize: %s\n", err::getLastErrorDescription ().sz ());
+		err::setLastSystemError();
+		printf("can't initialize: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	serverTransport.m_readPipe = pipeA [0];
-	serverTransport.m_writePipe = pipeB [1];
-	clientTransport.m_readPipe = pipeB [0];
-	clientTransport.m_writePipe = pipeA [1];
+	serverTransport.m_readPipe = pipeA[0];
+	serverTransport.m_writePipe = pipeB[1];
+	clientTransport.m_readPipe = pipeB[0];
+	clientTransport.m_writePipe = pipeA[1];
 
-	ServerThread serverThread (&serverTransport);
-	ClientThread clientThread (&clientTransport);
+	ServerThread serverThread(&serverTransport);
+	ClientThread clientThread(&clientTransport);
 
-	uint64_t time0 = sys::getTimestamp ();
+	uint64_t time0 = sys::getTimestamp();
 
-	serverThread.start ();
-	clientThread.start ();
+	serverThread.start();
+	clientThread.start();
 
-	clientThread.waitAndClose ();
+	clientThread.waitAndClose();
 
 	// first close the writer side
 
 #if (_AXL_OS_WIN)
-	::CloseHandle (pipeA [1]);
-	::CloseHandle (pipeB [1]);
-	::CloseHandle (pipeA [0]);
-	::CloseHandle (pipeB [0]);
+	::CloseHandle(pipeA[1]);
+	::CloseHandle(pipeB[1]);
+	::CloseHandle(pipeA[0]);
+	::CloseHandle(pipeB[0]);
 #elif (_AXL_OS_POSIX)
-	::close (pipeA [1]);
-	::close (pipeB [1]);
-	::close (pipeA [0]);
-	::close (pipeB [0]);
+	::close(pipeA[1]);
+	::close(pipeB[1]);
+	::close(pipeA[0]);
+	::close(pipeB[0]);
 #endif
 
-	serverThread.waitAndClose ();
+	serverThread.waitAndClose();
 
-	uint64_t time2 = sys::getTimestamp ();
+	uint64_t time2 = sys::getTimestamp();
 
-	printf ("pipe test completed: %s\n", sys::Time (time2 - time0, 0).format ("%m:%s.%l").sz ());
+	printf("pipe test completed: %s\n", sys::Time (time2 - time0, 0).format ("%m:%s.%l").sz ());
 }
 
 //..............................................................................
 
 void
-testZip ()
+testZip()
 {
 	bool result;
 
 	zip::ZipReader reader;
 
-	result = reader.openFile ("C:/Program Files/Tibbo/Ninja 3/bin/io_base.jncx");
+	result = reader.openFile("C:/Program Files/Tibbo/Ninja 3/bin/io_base.jncx");
 	if (!result)
 	{
-		printf ("can't open file: %s\n", err::getLastErrorDescription ().sz ());
+		printf("can't open file: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	sl::Array <char> buffer;
+	sl::Array<char> buffer;
 
 	sl::String dir = "C:/\xd0\xa1\xd1\x83\xd0\xba\xd0\xb0/";
 
-	size_t count = reader.getFileCount ();
+	size_t count = reader.getFileCount();
 	for (size_t i = 0; i < count; i++)
 	{
-		sl::String fileName = reader.getFileName (i);
+		sl::String fileName = reader.getFileName(i);
 
 		zip::ZipFileInfo fileInfo;
-		reader.getFileInfo (i, &fileInfo);
+		reader.getFileInfo(i, &fileInfo);
 
-		bool isDir = reader.isDirectoryFile (i);
+		bool isDir = reader.isDirectoryFile(i);
 
-		printf (
+		printf(
 			"%-10s         %s\n"
 			"compressed size:   %d\n"
 			"uncompressed size: %d\n"
 			"timestamp:         %s\n"
 			"method:            %d\n",
 			isDir ? "directory:" : "file:",
-			fileName.sz (),
-			(size_t) fileInfo.m_compressedSize,
-			(size_t) fileInfo.m_uncompressedSize,
-			sys::Time (fileInfo.m_timestamp).format ().sz (),
+			fileName.sz(),
+			(size_t)fileInfo.m_compressedSize,
+			(size_t)fileInfo.m_uncompressedSize,
+			sys::Time(fileInfo.m_timestamp).format().sz(),
 			fileInfo.m_method
 			);
 
 		if (!isDir)
 		{
-			reader.extractFileToMem (i, &buffer);
-			printf ("<<<\n%s\n>>>\n", buffer.cp ());
+			reader.extractFileToMem(i, &buffer);
+			printf("<<<\n%s\n>>>\n", buffer.cp ());
 
 			sl::String dstFileName = dir + fileName;
-			result = reader.extractFileToFile (i, dstFileName);
+			result = reader.extractFileToFile(i, dstFileName);
 			if (!result)
 			{
-				printf ("can't extract file: %s\n", err::getLastErrorDescription ().sz ());
+				printf("can't extract file: %s\n", err::getLastErrorDescription ().sz ());
 				return;
 			}
 		}
 
-		printf ("\n");
+		printf("\n");
 	}
 }
 
 //..............................................................................
 
 void
-testEnumSerial ()
+testEnumSerial()
 {
-	sl::List <io::SerialPortDesc> portList;
-	io::createSerialPortDescList (&portList);
+	sl::List<io::SerialPortDesc> portList;
+	io::createSerialPortDescList(&portList);
 
-	sl::Iterator <io::SerialPortDesc> it = portList.getHead ();
+	sl::Iterator<io::SerialPortDesc> it = portList.getHead();
 	for (; it; it++)
-		printf ("device name: %s\ndescription: %s\n\n", it->getDeviceName ().sz (), it->getDescription ().sz ());
+		printf("device name: %s\ndescription: %s\n\n", it->getDeviceName ().sz (), it->getDescription ().sz ());
 
-	printf ("%d ports total\n", portList.getCount ());
+	printf("%d ports total\n", portList.getCount ());
 }
 
 //..............................................................................
 
 void
-testEncoding ()
+testEncoding()
 {
 	sl::String s;
-	enc::EscapeEncoding::encode (&s, "\\\\.\\pipe\\mypipe");
-	printf ("%s\n", s.sz ());
+	enc::EscapeEncoding::encode(&s, "\\\\.\\pipe\\mypipe");
+	printf("%s\n", s.sz ());
 }
 
 //..............................................................................
 
 // AXL_NO_ASAN
 void
-testAddressSanitizer ()
+testAddressSanitizer()
 {
 	char c = 10;
 	char* p = &c;
@@ -2666,14 +2666,14 @@ testAddressSanitizer ()
 	*p = 0;
 }
 
-int foo (jmp_buf buf)
+int foo(jmp_buf buf)
 {
 	return 0;
 }
 
 //..............................................................................
 
-#pragma pack ()
+#pragma pack()
 
 struct F0
 {
@@ -2682,7 +2682,7 @@ struct F0
 	uint8_t m_int8_2;
 } AXL_GCC_MSC_STRUCT;
 
-#pragma pack (1)
+#pragma pack(1)
 
 struct F1
 {
@@ -2691,7 +2691,7 @@ struct F1
 	uint8_t m_int8_2;
 } AXL_GCC_MSC_STRUCT;
 
-#pragma pack (2)
+#pragma pack(2)
 
 struct F2
 {
@@ -2700,7 +2700,7 @@ struct F2
 	uint8_t m_int8_2;
 } AXL_GCC_MSC_STRUCT;
 
-#pragma pack (4)
+#pragma pack(4)
 
 struct F4
 {
@@ -2709,7 +2709,7 @@ struct F4
 	uint8_t m_int8_2;
 } AXL_GCC_MSC_STRUCT;
 
-#pragma pack (8)
+#pragma pack(8)
 
 struct F8
 {
@@ -2719,26 +2719,26 @@ struct F8
 } AXL_GCC_MSC_STRUCT;
 
 void
-testPacking ()
+testPacking()
 {
-	size_t s0 = sizeof (F0);
-	size_t s1 = sizeof (F1);
-	size_t s2 = sizeof (F2);
-	size_t s4 = sizeof (F4);
-	size_t s8 = sizeof (F8);
+	size_t s0 = sizeof(F0);
+	size_t s1 = sizeof(F1);
+	size_t s2 = sizeof(F2);
+	size_t s4 = sizeof(F4);
+	size_t s8 = sizeof(F8);
 
-	printf ("s0 = %d; s1 = %d; s2 = %d; s4 = %d; s8 = %d\n", s0, s1, s2, s4, s8);
+	printf("s0 = %d; s1 = %d; s2 = %d; s4 = %d; s8 = %d\n", s0, s1, s2, s4, s8);
 }
 
 //..............................................................................
 
-uint16_t crc16_ansi (
+uint16_t crc16_ansi(
 	void const* p,
 	size_t size,
 	uint16_t seed = 0
 	)
 {
-	static uint16_t const crcTable [256] =
+	static uint16_t const crcTable[256] =
 	{
 		0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241,
 		0xc601, 0x06c0, 0x0780, 0xc741, 0x0500, 0xc5c1, 0xc481, 0x0440,
@@ -2780,19 +2780,19 @@ uint16_t crc16_ansi (
 	for (; size; size--)
 	{
 		uint8_t j = *b++ ^ crc;
-		crc = (crc >> 8) ^ crcTable [j];
+		crc = (crc >> 8) ^ crcTable[j];
 	}
 
 	return crc;
 }
 
-uint16_t crc16_ccit (
+uint16_t crc16_ccit(
 	uint8_t const* p,
 	size_t size,
 	uint16_t seed = 0
 	)
 {
-	static uint16_t const crcTable [256] =
+	static uint16_t const crcTable[256] =
 	{
 		0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 		0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
@@ -2834,29 +2834,29 @@ uint16_t crc16_ccit (
 	for (; size; size--)
 	{
 		uint8_t j = *b++ ^ (crc >> 8);
-		crc = (crc << 8) ^ crcTable [j];
+		crc = (crc << 8) ^ crcTable[j];
 	}
 
-	return (uint16_t) crc;
+	return (uint16_t)crc;
 }
 
 void
-testModBus ()
+testModBus()
 {
-	uint8_t packet [] =
+	uint8_t packet[] =
 	{
 		0x01, 0x03, 0x00, 0x30, 0x00, 0x01, // 0x00, 0x00,
 	};
 
-	printf (
+	printf(
 		"crc16        = %04x\n"
 		"crc16 modbus = %04x\n"
 		"crc16 xmodem = %04x\n"
 		"crc16 ffff   = %04x\n",
-		crc16_ansi (packet, sizeof (packet), 0),
-		crc16_ansi (packet, sizeof (packet), 0xffff),
-		crc16_ccit (packet, sizeof (packet), 0),
-		crc16_ccit (packet, sizeof (packet), 0xffff)
+		crc16_ansi(packet, sizeof(packet), 0),
+		crc16_ansi(packet, sizeof(packet), 0xffff),
+		crc16_ccit(packet, sizeof(packet), 0),
+		crc16_ccit(packet, sizeof(packet), 0xffff)
 		);
 
 	uint_t baud = 19200;
@@ -2875,15 +2875,15 @@ testModBus ()
 		timeout_3_5 = 350000000 / baud;
 	}
 
-	sl::String s_1_5 = sys::Time (timeout_1_5, false).format ("%s.%l.%c");
-	sl::String s_3_5 = sys::Time (timeout_3_5, false).format ("%s.%l.%c");
+	sl::String s_1_5 = sys::Time(timeout_1_5, false).format("%s.%l.%c");
+	sl::String s_3_5 = sys::Time(timeout_3_5, false).format("%s.%l.%c");
 
-	printf ("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.sz (), s_3_5.sz ());
+	printf("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.sz (), s_3_5.sz ());
 }
 
 //..............................................................................
 
-uint_t calcChecksum16 (
+uint_t calcChecksum16(
 	const uint8_t* p0,
 	size_t size
 	)
@@ -2894,7 +2894,7 @@ uint_t calcChecksum16 (
 	uint_t checksum = 0;
 
 	for (; p < end; p++)
-		checksum += htons (*p);
+		checksum += htons(*p);
 
 	if (size & 1)
 		checksum += *(uint8_t const*) p << 8;
@@ -2902,52 +2902,52 @@ uint_t calcChecksum16 (
 	return checksum;
 }
 
-uint16_t adjustIpCheckSum (uint_t checksum)
+uint16_t adjustIpCheckSum(uint_t checksum)
 {
 	checksum = (checksum >> 16) + (checksum & 0xffff);
 	checksum += checksum >> 16;
 	return ~checksum;
 }
 
-uint16_t calcIpHdrChecksum (const uint8_t* ipHdr, size_t size)
+uint16_t calcIpHdrChecksum(const uint8_t* ipHdr, size_t size)
 {
-	uint_t checksum = calcChecksum16 (ipHdr, size);
-	return adjustIpCheckSum (checksum);
+	uint_t checksum = calcChecksum16(ipHdr, size);
+	return adjustIpCheckSum(checksum);
 }
 
 void
-testIpChecksum ()
+testIpChecksum()
 {
-	uint8_t data1_0 [] =
+	uint8_t data1_0[] =
 	{
 		0x45, 0x00, 0x00, 0x1e, 0x7e, 0x8b, 0x00, 0x00, 0x80, 0x11, 0x37, 0x7d, 0xc0, 0xa8, 0x01, 0x77,
 		0xc0, 0xa8, 0x01, 0xff
 	};
 
-	uint8_t data1 [] =
+	uint8_t data1[] =
 	{
 		0x45, 0x00, 0x00, 0x1e, 0x7e, 0x8b, 0x00, 0x00, 0x80, 0x11, 0x00, 0x00, 0xc0, 0xa8, 0x01, 0x77,
 		0xc0, 0xa8, 0x01, 0xff
 	};
 
-	uint8_t data2_0 [] =
+	uint8_t data2_0[] =
 	{
 		0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00, 0x40, 0x11, 0xb8, 0x61, 0xc0, 0xa8, 0x00, 0x01,
 		0xc0, 0xa8, 0x00, 0xc7
 	};
 
-	uint8_t data2 [] =
+	uint8_t data2[] =
 	{
 		0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00, 0x40, 0x11, 0x00, 0x00, 0xc0, 0xa8, 0x00, 0x01,
 		0xc0, 0xa8, 0x00, 0xc7
 	};
 
-	uint16_t x = calcIpHdrChecksum (data2, sizeof (data2));
-	printf ("%x\n", x);
+	uint16_t x = calcIpHdrChecksum(data2, sizeof(data2));
+	printf("%x\n", x);
 }
 
 size_t
-encodeNetBiosName (
+encodeNetBiosName(
 	char* buffer,
 	const char* name,
 	char paddingChar
@@ -2958,14 +2958,14 @@ encodeNetBiosName (
 
 	for (; i < 16; i++)
 	{
-		uchar_t c = name [i];
+		uchar_t c = name[i];
 		if (!c)
 			break;
 
-		c = toupper (c);
+		c = toupper(c);
 
-		buffer [j++] = 'A' + (c >> 4);
-		buffer [j++] = 'A' + (c & 0x0f);
+		buffer[j++] = 'A' + (c >> 4);
+		buffer[j++] = 'A' + (c & 0x0f);
 	}
 
 	char paddingByteHi = 'A' + (paddingChar >> 4);
@@ -2973,48 +2973,48 @@ encodeNetBiosName (
 
 	while (j < 32)
 	{
-		buffer [j++] = paddingByteHi;
-		buffer [j++] = paddingByteLo;
+		buffer[j++] = paddingByteHi;
+		buffer[j++] = paddingByteLo;
 	}
 
 	return j;
 }
 
 size_t
-decodeNetBiosName (
+decodeNetBiosName(
 	char* buffer,
 	const char* name,
 	size_t length
 	)
 {
-	ASSERT (!(length & 1)); // must be even
+	ASSERT(!(length & 1)); // must be even
 
 	size_t i = 0;
 	size_t j = 0;
 
 	while (i < length)
 	{
-		uchar_t hi = name [i++] - 'A';
-		uchar_t lo = name [i++] - 'A';
+		uchar_t hi = name[i++] - 'A';
+		uchar_t lo = name[i++] - 'A';
 
-		buffer [j++] = lo + (hi << 4);
+		buffer[j++] = lo + (hi << 4);
 	}
 
 	return j;
 }
 
 void
-testNetBios ()
+testNetBios()
 {
 	const char* name = "*";
 
-	char buffer [1024] = "CKAAAAAAA" "AAAAAAAAAAAAAAAA" "AAAAAAA"; //{ 0 };
+	char buffer[1024] = "CKAAAAAAA" "AAAAAAAAAAAAAAAA" "AAAAAAA"; //{ 0 };
 	size_t length = 32; //encodeNetBiosName (buffer, name);
-	printf ("%s\n", buffer);
+	printf("%s\n", buffer);
 
-	char buffer2 [1024] = { 0 };
-	decodeNetBiosName (buffer2, buffer, length);
-	printf ("%s\n", buffer2);
+	char buffer2[1024] = { 0 };
+	decodeNetBiosName(buffer2, buffer, length);
+	printf("%s\n", buffer2);
 }
 
 //..............................................................................
@@ -3028,9 +3028,9 @@ BOOL WriteSlot(HANDLE hSlot, const char* lpszMessage)
 
    fResult = ::WriteFile(hSlot,
 	 lpszMessage,
-	 strlen (lpszMessage),
+	 strlen(lpszMessage),
 	 &cbWritten,
-	 (LPOVERLAPPED) NULL);
+	 (LPOVERLAPPED)NULL);
 
    if (!fResult)
    {
@@ -3048,35 +3048,35 @@ BOOL ReadSlot(HANDLE hSlot)
    BOOL fResult;
    DWORD cbRead;
 
-   char buffer [256];
+   char buffer[256];
 
-   fResult = ReadFile (hSlot, buffer, sizeof (buffer) - 1, &cbRead, NULL);
+   fResult = ReadFile(hSlot, buffer, sizeof(buffer) - 1, &cbRead, NULL);
    if (!fResult)
    {
 	  printf("ReadFile failed with %d.\n", GetLastError());
 	  return FALSE;
    }
 
-   buffer [cbRead] = 0;
+   buffer[cbRead] = 0;
    printf("Read from slot: %s\n", buffer);
 
    return TRUE;
 }
 
 void
-testMailSlot ()
+testMailSlot()
 {
-	printf ("1 for server, 2 for client:\n");
-	char buffer [256];
-	fgets (buffer, countof (buffer), stdin);
+	printf("1 for server, 2 for client:\n");
+	char buffer[256];
+	fgets(buffer, countof(buffer), stdin);
 
-	if (buffer [0] == '1')
+	if (buffer[0] == '1')
 	{
-	char slotName [256];
-	printf ("slot name (e.g. \\\\.\\mailslot\\foo):\n");
-	fgets (slotName, countof(slotName), stdin);
+	char slotName[256];
+	printf("slot name (e.g. \\\\.\\mailslot\\foo):\n");
+	fgets(slotName, countof(slotName), stdin);
 
-		HANDLE hFile = CreateMailslotA (slotName, 0, -1, NULL);
+		HANDLE hFile = CreateMailslotA(slotName, 0, -1, NULL);
 	   if (hFile == INVALID_HANDLE_VALUE)
 	   {
 		  printf("CreateMailslot failed with %d.\n", GetLastError());
@@ -3093,20 +3093,20 @@ testMailSlot ()
 	else for (;;)
 	{
 
-	char slotName [256];
-	printf ("slot name (e.g. \\\\*\\mailslot\\foo):\n");
-	fgets (slotName, countof(slotName), stdin);
+	char slotName[256];
+	printf("slot name (e.g. \\\\*\\mailslot\\foo):\n");
+	fgets(slotName, countof(slotName), stdin);
 
 		HANDLE hFile;
 
-	   hFile = CreateFileA (
+	   hFile = CreateFileA(
 		   slotName,
 		 GENERIC_READ | GENERIC_WRITE,
 		 FILE_SHARE_READ | FILE_SHARE_WRITE,
-		 (LPSECURITY_ATTRIBUTES) NULL,
+		 (LPSECURITY_ATTRIBUTES)NULL,
 		 OPEN_EXISTING,
 		 FILE_ATTRIBUTE_NORMAL,
-		 (HANDLE) NULL);
+		 (HANDLE)NULL);
 
 	   if (hFile == INVALID_HANDLE_VALUE)
 	   {
@@ -3129,118 +3129,118 @@ testMailSlot ()
 
 #ifdef _AXL_XML
 
-class MyXmlParser: public xml::ExpatParser <MyXmlParser>
+class MyXmlParser: public xml::ExpatParser<MyXmlParser>
 {
 protected:
 	size_t m_indent;
 
 public:
-	MyXmlParser ()
+	MyXmlParser()
 	{
 		m_indent = 0;
 	}
 
 	void
-	onStartElement (
+	onStartElement(
 		const char* name,
 		const char** attributes
 		)
 	{
-		printIndent ();
-		printf ("<%s", name);
+		printIndent();
+		printf("<%s", name);
 
 		if (*attributes)
 		{
-			printf ("\n");
+			printf("\n");
 			m_indent++;
 
 			while (*attributes)
 			{
-				printIndent ();
-				printf ("%s = %s\n", attributes [0], attributes [1]);
+				printIndent();
+				printf("%s = %s\n", attributes [0], attributes [1]);
 				attributes += 2;
 			}
 
 			m_indent--;
-			printIndent ();
+			printIndent();
 		}
 
-		printf (">\n");
+		printf(">\n");
 		m_indent++;
 	}
 
 	void
-	onEndElement (const char* name)
+	onEndElement(const char* name)
 	{
 		m_indent--;
-		printIndent ();
-		printf ("</%s>\n", name);
+		printIndent();
+		printf("</%s>\n", name);
 	}
 
 	void
-	onCharacterData (
+	onCharacterData(
 		const char* string,
 		size_t length
 		)
 	{
-		printIndent ();
-		printf ("%s\n", sl::String (string, length).sz ());
+		printIndent();
+		printf("%s\n", sl::String (string, length).sz ());
 	}
 
 protected:
 	void
-	printIndent ()
+	printIndent()
 	{
 		for (size_t i = 0; i < m_indent; i++)
-			printf ("  ");
+			printf("  ");
 	}
 };
 
 void
-testXml ()
+testXml()
 {
 	bool result;
 
 	MyXmlParser parser;
-	result = parser.parseFile ("c:/projects/playground/doxygen/xml/index.xml", 100);
+	result = parser.parseFile("c:/projects/playground/doxygen/xml/index.xml", 100);
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("success\n");
+	printf("success\n");
 }
 
 #endif
 
 void
-testFileEnum ()
+testFileEnum()
 {
 	io::FileEnumerator fileEnum;
-	bool result = fileEnum.openDir (".");
+	bool result = fileEnum.openDir(".");
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	while (fileEnum.hasNextFile ())
+	while (fileEnum.hasNextFile())
 	{
-		sl::String fileName = fileEnum.getNextFileName ();
-		printf ("%s\n", fileName.sz ());
+		sl::String fileName = fileEnum.getNextFileName();
+		printf("%s\n", fileName.sz ());
 	}
 }
 
 void
-testStringCase ()
+testStringCase()
 {
 	sl::String s = "Hui Govno i Muravei";
-	s.makeLowerCase ();
-	printf ("s = %s\n", s.sz ());
+	s.makeLowerCase();
+	printf("s = %s\n", s.sz ());
 
-	s.makeUpperCase ();
-	printf ("s = %s\n", s.sz ());
+	s.makeUpperCase();
+	printf("s = %s\n", s.sz ());
 }
 
 //..............................................................................
@@ -3257,74 +3257,74 @@ enum CmdLineSwitchKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE (CmdLineSwitchTable, CmdLineSwitchKind)
-	AXL_SL_CMD_LINE_SWITCH_2 (
+AXL_SL_BEGIN_CMD_LINE_SWITCH_TABLE(CmdLineSwitchTable, CmdLineSwitchKind)
+	AXL_SL_CMD_LINE_SWITCH_2(
 		CmdLineSwitchKind_Help,
 		"h", "help", NULL,
 		"Display this help"
 		)
-	AXL_SL_CMD_LINE_SWITCH_2 (
+	AXL_SL_CMD_LINE_SWITCH_2(
 		CmdLineSwitchKind_Version,
 		"v", "version", NULL,
 		"Display version"
 		)
-	AXL_SL_CMD_LINE_SWITCH_2 (
+	AXL_SL_CMD_LINE_SWITCH_2(
 		CmdLineSwitchKind_Verbose,
 		"z", "verbose", NULL,
 		"Verbose mode"
 		)
-	AXL_SL_CMD_LINE_SWITCH_2 (
+	AXL_SL_CMD_LINE_SWITCH_2(
 		CmdLineSwitchKind_Add,
 		"a", "add", "<item>",
 		"Add item <item>"
 		)
-	AXL_SL_CMD_LINE_SWITCH_2 (
+	AXL_SL_CMD_LINE_SWITCH_2(
 		CmdLineSwitchKind_Remove,
 		"r", "remove", "<item>",
 		"Remove item <item>"
 		)
-AXL_SL_END_CMD_LINE_SWITCH_TABLE ()
+AXL_SL_END_CMD_LINE_SWITCH_TABLE()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CmdLineParser: public sl::CmdLineParser <CmdLineParser, CmdLineSwitchTable>
+class CmdLineParser: public sl::CmdLineParser<CmdLineParser, CmdLineSwitchTable>
 {
-	friend class sl::CmdLineParser <CmdLineParser, CmdLineSwitchTable>;
+	friend class sl::CmdLineParser<CmdLineParser, CmdLineSwitchTable>;
 
 protected:
 	bool
-	onValue (const sl::StringRef& value)
+	onValue(const sl::StringRef& value)
 	{
-		printf ("onValue (%s)\n", value.sz ());
+		printf("onValue (%s)\n", value.sz ());
 		return true;
 	}
 
 	bool
-	onSwitch (
+	onSwitch(
 		SwitchKind switchKind,
 		const sl::StringRef& value
 		)
 	{
-		switch (switchKind)
+		switch(switchKind)
 		{
 		case CmdLineSwitchKind_Help:
-			printf ("CmdLineSwitchKind_Help\n");
+			printf("CmdLineSwitchKind_Help\n");
 			break;
 
 		case CmdLineSwitchKind_Version:
-			printf ("CmdLineSwitchKind_Version\n");
+			printf("CmdLineSwitchKind_Version\n");
 			break;
 
 		case CmdLineSwitchKind_Verbose:
-			printf ("CmdLineSwitchKind_Verbose\n");
+			printf("CmdLineSwitchKind_Verbose\n");
 			break;
 
 		case CmdLineSwitchKind_Add:
-			printf ("CmdLineSwitchKind_Add (%s)\n", value.sz ());
+			printf("CmdLineSwitchKind_Add (%s)\n", value.sz ());
 			break;
 
 		case CmdLineSwitchKind_Remove:
-			printf ("CmdLineSwitchKind_Remove (%s)\n", value.sz ());
+			printf("CmdLineSwitchKind_Remove (%s)\n", value.sz ());
 			break;
 
 		};
@@ -3335,134 +3335,134 @@ protected:
 
 #if (_AXL_OS_WIN)
 void
-testCmdLine (
+testCmdLine(
 	int argc,
-	wchar_t* argv []
+	wchar_t* argv[]
 	)
 #else
 void
-testCmdLine (
+testCmdLine(
 	int argc,
-	char* argv []
+	char* argv[]
 	)
 #endif
 {
 	CmdLineParser parser;
-	bool result = parser.parse (argc, argv);
+	bool result = parser.parse(argc, argv);
 	if (!result)
-		printf ("Error parsing command line: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error parsing command line: %s\n", err::getLastErrorDescription ().sz ());
 }
 
 //..............................................................................
 
-class ServerThread: public sys::ThreadImpl <ServerThread>
+class ServerThread: public sys::ThreadImpl<ServerThread>
 {
 public:
 	sys::Event m_startEvent;
 
 public:
-	intptr_t threadFunc ()
+	intptr_t threadFunc()
 	{
 		io::SockAddr addr;
-		addr.parse ("0.0.0.0:1002");
+		addr.parse("0.0.0.0:1002");
 
-		printf ("listening on TCP %s...\n", addr.getString ().sz ());
+		printf("listening on TCP %s...\n", addr.getString ().sz ());
 
 		io::Socket serverSocket;
 		io::Socket clientSocket;
 
 		bool result =
-			serverSocket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
-			serverSocket.bind (addr) &&
-			serverSocket.listen (8);
+			serverSocket.open(AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
+			serverSocket.bind(addr) &&
+			serverSocket.listen(8);
 
-		m_startEvent.signal ();
+		m_startEvent.signal();
 
-		printf ("waiting for clients...\n");
-		result = serverSocket.accept (&clientSocket, &addr);
+		printf("waiting for clients...\n");
+		result = serverSocket.accept(&clientSocket, &addr);
 		if (!result)
 		{
-			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
 			return -1;
 		}
 
 
-		printf ("client connected from: %s\n", addr.getString ().sz ());
+		printf("client connected from: %s\n", addr.getString ().sz ());
 
 		for (;;)
 		{
-			char buffer [1024];
-			int x = clientSocket.recv (buffer, sizeof (buffer) - 1);
+			char buffer[1024];
+			int x = clientSocket.recv(buffer, sizeof(buffer) - 1);
 
 			if (x > 0)
 			{
-				buffer [x] = 0;
-				printf ("client sent %d bytes: %s\n", x, buffer);
+				buffer[x] = 0;
+				printf("client sent %d bytes: %s\n", x, buffer);
 			}
 			else if (x < 0)
 			{
-				printf ("client reset.\n");
+				printf("client reset.\n");
 				break;
 			}
 			else
 			{
-				printf ("client disconnected.\n");
+				printf("client disconnected.\n");
 				break;
 			}
 		}
 
-		printf ("server thread done.\n");
+		printf("server thread done.\n");
 
 		return 0;
 	}
 };
 
 bool
-testConn ()
+testConn()
 {
-/*	printf ("startion server thread...\n");
+/*	printf("startion server thread...\n");
 
 	ServerThread thread;
-	thread.start ();
-	thread.m_startEvent.wait ();
+	thread.start();
+	thread.m_startEvent.wait();
 */
 	io::SockAddr addr;
-	addr.parse ("127.0.0.1:1002");
+	addr.parse("127.0.0.1:1002");
 
-	printf ("connecting to %s...\n", addr.getString ().sz ());
+	printf("connecting to %s...\n", addr.getString ().sz ());
 
 	io::Socket socket;
 	bool result =
-		socket.open (AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
-		socket.connect (addr);
+		socket.open(AF_INET, SOCK_STREAM, IPPROTO_TCP) &&
+		socket.connect(addr);
 
 	if (!result)
 	{
-		printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("failed: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
-	static char data [] = "hui govno i muravei";
+	static char data[] = "hui govno i muravei";
 
-	printf ("sending %d bytes...\n", sizeof (data));
-	socket.send (data, sizeof (data));
+	printf("sending %d bytes...\n", sizeof (data));
+	socket.send(data, sizeof(data));
 
-	printf ("closing...\n");
-	socket.close ();
+	printf("closing...\n");
+	socket.close();
 
 //	printf ("waiting for server thread...\n");
 //	thread.wait ();
 
-	printf ("done.\n");
+	printf("done.\n");
 	return true;
 }
 
 bool
-testSerial ()
+testSerial()
 {
 	char const* port = "COM1";
 
-	printf ("opening %s...\n", port);
+	printf("opening %s...\n", port);
 
 	io::SerialSettings settings;
 	settings.m_baudRate = 38400;
@@ -3473,129 +3473,129 @@ testSerial ()
 
 	io::Serial serial;
 	bool result =
-		serial.open (port) &&
-		serial.setSettings (&settings);
+		serial.open(port) &&
+		serial.setSettings(&settings);
 
 	if (!result)
 	{
-		printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("failed: %s\n", err::getLastErrorDescription ().sz ());
 		return false;
 	}
 
-	serial.m_serial.setWaitMask (EV_ERR);
+	serial.m_serial.setWaitMask(EV_ERR);
 
 	for (;;)
 	{
-		char buf [1024] = { 0 };
+		char buf[1024] = { 0 };
 
-		size_t result = serial.read (buf, sizeof (buf));
+		size_t result = serial.read(buf, sizeof(buf));
 		if (result == -1)
 		{
-			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
 			return false;
 		}
 
-		buf [result] = 0;
-		printf ("received: %s\n", buf);
+		buf[result] = 0;
+		printf("received: %s\n", buf);
 
 		dword_t events;
-		bool result2 = serial.m_serial.wait (&events);
+		bool result2 = serial.m_serial.wait(&events);
 		if (!result2)
 		{
-			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
 			return false;
 		}
 
-		printf ("events: %x\n", events);
+		printf("events: %x\n", events);
 
 		dword_t errors;
 		COMSTAT stat;
-		result2 = serial.m_serial.clearError (&errors, &stat);
+		result2 = serial.m_serial.clearError(&errors, &stat);
 		if (!result2)
 		{
-			printf ("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
 			return false;
 		}
 
-		printf ("errors: %x\n", errors);
+		printf("errors: %x\n", errors);
 	}
 
 	size_t totalSize = 0;
 	size_t targetSize = 20 * 1024;
 
-	printf ("\rwriting... %3d%%; bytes: %5d", totalSize * 100 / targetSize, totalSize);
+	printf("\rwriting... %3d%%; bytes: %5d", totalSize * 100 / targetSize, totalSize);
 
 	while (totalSize < targetSize)
 	{
-		static char data [] = "123456789abcdef";
-		size_t size = serial.write (data, sizeof (data));
+		static char data[] = "123456789abcdef";
+		size_t size = serial.write(data, sizeof(data));
 		if (size == -1)
 		{
-			printf ("can't write: %s\n", err::getLastErrorDescription ().sz ());
+			printf("can't write: %s\n", err::getLastErrorDescription ().sz ());
 			return false;
 		}
 
 		totalSize += size;
-		printf ("\rwriting... %3d%%; bytes: %5d", totalSize * 100 / targetSize, totalSize);
+		printf("\rwriting... %3d%%; bytes: %5d", totalSize * 100 / targetSize, totalSize);
 	}
 
-	printf ("\ndone\n");
+	printf("\ndone\n");
 	return true;
 }
 
 void
-testStringReplace ()
+testStringReplace()
 {
 	sl::String title = "contains: < (less-than) > (greater-than) & (ampersand)";
-	title.replace ("<", "&lt;");
-	title.replace (">", "&gt;");
-	title.replace ("&", "&amp;");
+	title.replace("<", "&lt;");
+	title.replace(">", "&gt;");
+	title.replace("&", "&amp;");
 
-	printf ("title = %s\n", title.sz ());
+	printf("title = %s\n", title.sz ());
 }
 
 //..............................................................................
 
 void
-testEvent ()
+testEvent()
 {
 	for (int i = 0; i < 10; i++)
 	{
 		sys::NotificationEvent e;
 
-		bool r = e.wait (500);
+		bool r = e.wait(500);
 		if (!r)
-			printf ("[%s] ---wait failed: %s\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz (), err::getLastErrorDescription ().sz ());
+			printf("[%s] ---wait failed: %s\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz (), err::getLastErrorDescription ().sz ());
 		else
-			printf ("[%s] ---wait SUCCEEDED! (WTF?!)\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz ());
+			printf("[%s] ---wait SUCCEEDED! (WTF?!)\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz ());
 	}
 }
 
 //..............................................................................
 
 void
-testBase32 ()
+testBase32()
 {
-	sl::Array <char> source;
+	sl::Array<char> source;
 
 	for (int i = 0; i < 500; i++)
 	{
-		size_t size = rand () % 64 + 16;
-		source.setCount (size);
+		size_t size = rand() % 64 + 16;
+		source.setCount(size);
 		for (size_t j = 0; j < size; j++)
-			source [j] = rand () % 256;
+			source[j] = rand() % 256;
 
-		sl::String enc = enc::Base32Encoding::encode (source, size);
-		sl::Array <char> dec = enc::Base32Encoding::decode (enc);
+		sl::String enc = enc::Base32Encoding::encode(source, size);
+		sl::Array<char> dec = enc::Base32Encoding::decode(enc);
 
-		ASSERT (dec.getCount () == size && memcmp (dec, source, size) == 0);
+		ASSERT(dec.getCount() == size && memcmp(dec, source, size) == 0);
 	}
 }
 
 //..............................................................................
 
 void
-testTime ()
+testTime()
 {
 	// windows:
 	// timestamp = 0x1d245fe80cc7e08; time = Thursday 24 November 2016 10:57:33
@@ -3607,19 +3607,19 @@ testTime ()
 	// timestamp = 0x1d2460277e1f810; time = Thursday 24 November 2016 11:25:56
 	// timestamp = 0x1d2460280f3b836; time = Thursday 24 November 2016 11:26:11
 
-	uint64_t timestamp = sys::getTimestamp ();
-	printf ("timestamp = 0x%llx; time = %s\n", timestamp, sys::Time (timestamp).format ().sz ());
+	uint64_t timestamp = sys::getTimestamp();
+	printf("timestamp = 0x%llx; time = %s\n", timestamp, sys::Time (timestamp).format ().sz ());
 }
 
 //..............................................................................
 
 void
-testSerial2 ()
+testSerial2()
 {
 	bool result;
 
 	io::Serial serial;
-	result = serial.open ("/dev/ttyUSB0");
+	result = serial.open("/dev/ttyUSB0");
 
 	io::SerialSettings settings;
 	settings.m_baudRate = 115200;
@@ -3628,73 +3628,73 @@ testSerial2 ()
 	settings.m_flowControl = io::SerialFlowControl_None;
 	settings.m_parity = io::SerialParity_None;
 
-	result = serial.setSettings (&settings);
+	result = serial.setSettings(&settings);
 
-	serial.write ("\r", 1);
+	serial.write("\r", 1);
 
-	char buffer [1024];
-	size_t size = serial.read (buffer, sizeof (buffer));
+	char buffer[1024];
+	size_t size = serial.read(buffer, sizeof(buffer));
 
 	sl::String s0 = "takie dela";
 
-	sl::String s = enc::HexEncoding::encode (buffer, size);
-	printf ("incoming: %s\n", s.sz ());
+	sl::String s = enc::HexEncoding::encode(buffer, size);
+	printf("incoming: %s\n", s.sz ());
 }
 
 //..............................................................................
 
 void
-testSymbolicLinks ()
+testSymbolicLinks()
 {
 	sl::String target;
-	bool result = io::getSymbolicLinkTarget (&target, "/home/vladimir/a");
+	bool result = io::getSymbolicLinkTarget(&target, "/home/vladimir/a");
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("target: %s\n", target.sz ());
+	printf("target: %s\n", target.sz ());
 }
 
 //..............................................................................
 
 void
-testBoyerMoore ()
+testBoyerMoore()
 {
 #if (0)
-	static const char pattern [] = "muravei";
+	static const char pattern[] = "muravei";
 
 	sl::BinaryBoyerMooreFind find;
-	find.setPattern (pattern, lengthof (pattern), sl::BoyerMooreFlag_Reverse);
+	find.setPattern(pattern, lengthof(pattern), sl::BoyerMooreFlag_Reverse);
 
-	static const char chunk1 [] = "vei! mura";
-	static const char chunk2 [] = "vei, go";
+	static const char chunk1[] = "vei! mura";
+	static const char chunk2[] = "vei, go";
 
 	size_t offset;
 
 	sl::BinaryBoyerMooreFind::IncrementalContext incrementalContext;
-	offset = find.find (&incrementalContext, 0, chunk2, lengthof (chunk2));
-	offset = find.find (&incrementalContext, 0, chunk1, lengthof (chunk1));
+	offset = find.find(&incrementalContext, 0, chunk2, lengthof(chunk2));
+	offset = find.find(&incrementalContext, 0, chunk1, lengthof(chunk1));
 
-	printf ("offset = %d\n", offset);
+	printf("offset = %d\n", offset);
 #else
-	static const char pattern [] = "s";
+	static const char pattern[] = "s";
 
 	sl::TextBoyerMooreFind find;
-	find.setPattern (
+	find.setPattern(
 		enc::CharCodecKind_Utf8,
 		pattern,
-		lengthof (pattern),
+		lengthof(pattern),
 		sl::BoyerMooreFlag_Reverse | sl::TextBoyerMooreFlag_CaseInsensitive
 		);
 
-	static const utf32_t chunk1 [] = { 'S', 'e' };
+	static const utf32_t chunk1[] = { 'S', 'e' };
 
 	size_t offset;
 
 	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
-	offset = find.find (&incrementalContext, enc::CharCodecKind_Utf32, 0, chunk1, sizeof (chunk1));
+	offset = find.find(&incrementalContext, enc::CharCodecKind_Utf32, 0, chunk1, sizeof(chunk1));
 
 #endif
 }
@@ -3731,7 +3731,7 @@ struct Record
 };
 
 void
-testIoPerformance ()
+testIoPerformance()
 {
 	#define _READ_ONLY 0
 	#define _DUMMY_WRITE 0
@@ -3741,14 +3741,14 @@ testIoPerformance ()
 	io::File simpleFileDst;
 #endif
 
-	static char fileNameSrc [] = "G:/Temp/Test MTK TCP/Test MTK TCP.njlog";
-	static char fileNameDst_s [] = "G:/Temp/Test MTK TCP/Test MTK TCP - 2.njlog";
-	static char fileNameDst_m [] = "G:/Temp/Test MTK TCP/Test MTK TCP - 3.njlog";
+	static char fileNameSrc[] = "G:/Temp/Test MTK TCP/Test MTK TCP.njlog";
+	static char fileNameDst_s[] = "G:/Temp/Test MTK TCP/Test MTK TCP - 2.njlog";
+	static char fileNameDst_m[] = "G:/Temp/Test MTK TCP/Test MTK TCP - 3.njlog";
 
-	bool result = simpleFileSrc.open (fileNameSrc, io::FileFlag_ReadOnly);
+	bool result = simpleFileSrc.open(fileNameSrc, io::FileFlag_ReadOnly);
 	if (!result)
 	{
-		printf ("can't open %s: %s\n", fileNameSrc, err::getLastErrorDescription ().sz ());
+		printf("can't open %s: %s\n", fileNameSrc, err::getLastErrorDescription ().sz ());
 		return;
 	}
 
@@ -3756,92 +3756,92 @@ testIoPerformance ()
 	uint64_t time;
 	uint64_t offset;
 
-	sl::Array <char> buffer;
+	sl::Array<char> buffer;
 
 	struct Rec: Record
 	{
-		char m_data [1024];
+		char m_data[1024];
 	};
 
 	Rec staticRec;
-	memset (&staticRec, 0, sizeof (staticRec));
-	staticRec.m_dataSize = sizeof (staticRec.m_data);
+	memset(&staticRec, 0, sizeof(staticRec));
+	staticRec.m_dataSize = sizeof(staticRec.m_data);
 
 	io::MappedFile mappedFileSrc;
 	io::MappedFile mappedFileDst;
 
-	result = mappedFileSrc.open (fileNameSrc, io::FileFlag_ReadOnly);
+	result = mappedFileSrc.open(fileNameSrc, io::FileFlag_ReadOnly);
 
 #if (!_READ_ONLY)
 	result =
 		result &&
-		mappedFileDst.open (fileNameDst_m) &&
-		mappedFileDst.setSize (0);
+		mappedFileDst.open(fileNameDst_m) &&
+		mappedFileDst.setSize(0);
 #endif
 
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("testing mapped file...\n");
-	baseTimestamp = sys::getTimestamp ();
+	printf("testing mapped file...\n");
+	baseTimestamp = sys::getTimestamp();
 
-	RecordFileHdr* hdr2 = (RecordFileHdr*) mappedFileSrc.view (0, sizeof (RecordFileHdr), true);
+	RecordFileHdr* hdr2 = (RecordFileHdr*)mappedFileSrc.view(0, sizeof(RecordFileHdr), true);
 
 #if (!_READ_ONLY)
-	RecordFileHdr* hdr3 = (RecordFileHdr*) mappedFileDst.view (0, sizeof (RecordFileHdr), true);
+	RecordFileHdr* hdr3 = (RecordFileHdr*)mappedFileDst.view(0, sizeof(RecordFileHdr), true);
 	*hdr3 = *hdr2;
 #endif
 
-	offset = sizeof (RecordFileHdr);
+	offset = sizeof(RecordFileHdr);
 	uint64_t endOffset = offset + hdr2->m_totalRecordSize;
 
 	while (offset < endOffset)
 	{
 #if (_DUMMY_WRITE)
 		Record* rec = &staticRec;
-		size_t recSize = sizeof (rec);
+		size_t recSize = sizeof(rec);
 #else
-		Record* rec = (Record*) mappedFileSrc.view (offset, sizeof (Record));
-		size_t recSize = sizeof (Record) + rec->m_dataSize;
+		Record* rec = (Record*)mappedFileSrc.view(offset, sizeof(Record));
+		size_t recSize = sizeof(Record) + rec->m_dataSize;
 		if (rec->m_dataSize)
-			rec = (Record*) mappedFileSrc.view (offset, recSize);
+			rec = (Record*)mappedFileSrc.view(offset, recSize);
 #endif
 
 #if (!_READ_ONLY)
-		void* p = mappedFileDst.view (offset, recSize);
-		memcpy (p, rec, recSize);
+		void* p = mappedFileDst.view(offset, recSize);
+		memcpy(p, rec, recSize);
 #endif
 
 		offset += recSize;
 	}
 
-	time = sys::getTimestamp () - baseTimestamp;
-	printf ("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
+	time = sys::getTimestamp() - baseTimestamp;
+	printf("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
 
 #if (!_READ_ONLY)
 	result =
 		result	&&
-		simpleFileDst.open (fileNameDst_s) &&
-		simpleFileDst.setSize (0);
+		simpleFileDst.open(fileNameDst_s) &&
+		simpleFileDst.setSize(0);
 #endif
 
 	if (!result)
 	{
-		printf ("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	printf ("testing simple file...\n");
-	baseTimestamp = sys::getTimestamp ();
+	printf("testing simple file...\n");
+	baseTimestamp = sys::getTimestamp();
 
 	RecordFileHdr hdr;
-	simpleFileSrc.read (&hdr, sizeof (hdr));
+	simpleFileSrc.read(&hdr, sizeof(hdr));
 
 #if (!_READ_ONLY)
-	simpleFileDst.write (&hdr, sizeof (hdr));
+	simpleFileDst.write(&hdr, sizeof(hdr));
 #endif
 
 	offset = 0;
@@ -3849,27 +3849,27 @@ testIoPerformance ()
 	{
 #if (!_DUMMY_WRITE)
 		Record rec;
-		simpleFileSrc.read (&rec, sizeof (rec));
+		simpleFileSrc.read(&rec, sizeof(rec));
 		if (rec.m_dataSize)
 		{
-			buffer.setCount (rec.m_dataSize);
-			simpleFileSrc.read (buffer, rec.m_dataSize);
+			buffer.setCount(rec.m_dataSize);
+			simpleFileSrc.read(buffer, rec.m_dataSize);
 		}
 
 #	if (!_READ_ONLY)
-		simpleFileDst.write (&rec, sizeof (rec));
-		simpleFileDst.write (buffer, rec.m_dataSize);
+		simpleFileDst.write(&rec, sizeof(rec));
+		simpleFileDst.write(buffer, rec.m_dataSize);
 #	endif
 
-		offset += sizeof (rec) + rec.m_dataSize;
+		offset += sizeof(rec) + rec.m_dataSize;
 #else
-		simpleFileDst.write (&staticRec, sizeof (staticRec));
-		offset += sizeof (staticRec);
+		simpleFileDst.write(&staticRec, sizeof(staticRec));
+		offset += sizeof(staticRec);
 #endif
 	}
 
-	time = sys::getTimestamp () - baseTimestamp;
-	printf ("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
+	time = sys::getTimestamp() - baseTimestamp;
+	printf("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
 }
 
 //..............................................................................
@@ -3879,7 +3879,7 @@ volatile size_t g_writerCount = 0;
 
 class RwLockThread:
 	public sl::ListLink,
-	public sys::ThreadImpl <RwLockThread>
+	public sys::ThreadImpl<RwLockThread>
 {
 public:
 	enum
@@ -3894,7 +3894,7 @@ protected:
 	bool m_isWriter;
 
 public:
-	RwLockThread (
+	RwLockThread(
 		sys::ReadWriteLock* lock,
 		size_t index,
 		size_t iterationCount,
@@ -3908,38 +3908,38 @@ public:
 	}
 
 	void
-	threadFunc ()
+	threadFunc()
 	{
-		uint64_t tid = sys::getCurrentThreadId ();
+		uint64_t tid = sys::getCurrentThreadId();
 
 		if (m_isWriter)
 			for (size_t i = 0; i < m_iterationCount; i++)
 			{
-				m_lock->writeLock ();
-				ASSERT (g_readerCount == 0);
-				ASSERT (g_writerCount == 0);
-				sys::atomicInc (&g_writerCount);
-				printf ("writer #%d (TID:%llx) is writing (%d/%d)...\n", m_index, tid, i, m_iterationCount);
-				sys::sleep (rand () % MaxSleepTime);
-				sys::atomicDec (&g_writerCount);
-				m_lock->writeUnlock ();
+				m_lock->writeLock();
+				ASSERT(g_readerCount == 0);
+				ASSERT(g_writerCount == 0);
+				sys::atomicInc(&g_writerCount);
+				printf("writer #%d (TID:%llx) is writing (%d/%d)...\n", m_index, tid, i, m_iterationCount);
+				sys::sleep(rand() % MaxSleepTime);
+				sys::atomicDec(&g_writerCount);
+				m_lock->writeUnlock();
 			}
 		else
 			for (size_t i = 0; i < m_iterationCount; i++)
 			{
-				m_lock->readLock ();
-				ASSERT (g_writerCount == 0);
-				sys::atomicInc (&g_readerCount);
-				printf ("reader #%d (TID:%llx) is reading (%d/%d; %d readers total)...\n", m_index, tid, i, m_iterationCount, g_readerCount);
-				sys::sleep (rand () % MaxSleepTime);
-				sys::atomicDec (&g_readerCount);
-				m_lock->readUnlock ();
+				m_lock->readLock();
+				ASSERT(g_writerCount == 0);
+				sys::atomicInc(&g_readerCount);
+				printf("reader #%d (TID:%llx) is reading (%d/%d; %d readers total)...\n", m_index, tid, i, m_iterationCount, g_readerCount);
+				sys::sleep(rand() % MaxSleepTime);
+				sys::atomicDec(&g_readerCount);
+				m_lock->readUnlock();
 			}
 	}
 };
 
 void
-testReadWriteLock ()
+testReadWriteLock()
 {
 	enum
 	{
@@ -3951,43 +3951,43 @@ testReadWriteLock ()
 	};
 
 	sys::ReadWriteLock lock;
-	lock.create ();
+	lock.create();
 
-	sl::List <RwLockThread> threadList;
+	sl::List<RwLockThread> threadList;
 
 	for (size_t i = 0; i < ReaderCount; i++)
 	{
-		RwLockThread* thread = AXL_MEM_NEW_ARGS (RwLockThread, (&lock, i, ReaderIterationCount, false));
-		thread->start ();
-		threadList.insertTail (thread);
+		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (&lock, i, ReaderIterationCount, false));
+		thread->start();
+		threadList.insertTail(thread);
 	}
 
 	for (size_t i = 0; i < ReaderCount; i++)
 	{
-		RwLockThread* thread = AXL_MEM_NEW_ARGS (RwLockThread, (&lock, i, WriterIterationCount, true));
-		thread->start ();
-		threadList.insertTail (thread);
+		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (&lock, i, WriterIterationCount, true));
+		thread->start();
+		threadList.insertTail(thread);
 	}
 
-	sl::Iterator <RwLockThread> it = threadList.getHead ();
+	sl::Iterator<RwLockThread> it = threadList.getHead();
 	for (; it; it++)
-		it->waitAndClose ();
+		it->waitAndClose();
 }
 
 //..............................................................................
 
 template <typename T>
 void
-foo (T* p)
+foo(T* p)
 {
-	printf ("foo - 1\n");
+	printf("foo - 1\n");
 }
 
 template <typename T>
 void
-foo (const T* p)
+foo(const T* p)
 {
-	printf ("foo - 2\n");
+	printf("foo - 2\n");
 }
 
 struct Point: sl::ListLink
@@ -3997,22 +3997,22 @@ struct Point: sl::ListLink
 };
 
 void
-testConstList ()
+testConstList()
 {
-	sl::List <Point> list;
+	sl::List<Point> list;
 
-	Point* point = AXL_MEM_NEW (Point);
+	Point* point = AXL_MEM_NEW(Point);
 	point->m_x = 10;
 	point->m_y = 20;
-	list.insertTail (point);
+	list.insertTail(point);
 
-	point = AXL_MEM_NEW (Point);
+	point = AXL_MEM_NEW(Point);
 	point->m_x = 30;
 	point->m_y = 40;
-	list.insertTail (point);
+	list.insertTail(point);
 
-	sl::Iterator <Point> it = list.getHead ();
-	sl::ConstIterator <Point> it2 = it;
+	sl::Iterator<Point> it = list.getHead();
+	sl::ConstIterator<Point> it2 = it;
 	it2 = it;
 	it2++;
 
@@ -4028,33 +4028,33 @@ testConstList ()
 }
 
 void
-testBitIdx ()
+testBitIdx()
 {
-	size_t size = sl::getAllocSize (0);
-	ASSERT (size == 0);
+	size_t size = sl::getAllocSize(0);
+	ASSERT(size == 0);
 
-	size_t x = sl::getPowerOf2Ge (0);
-	ASSERT (x == 0);
+	size_t x = sl::getPowerOf2Ge(0);
+	ASSERT(x == 0);
 
-	size_t y = sl::getHiBit (0);
-	ASSERT (y == 0);
+	size_t y = sl::getHiBit(0);
+	ASSERT(y == 0);
 
-	size_t z = sl::getLoBit (0);
-	ASSERT (z == 0);
+	size_t z = sl::getLoBit(0);
+	ASSERT(z == 0);
 
 	for (size_t i = 1; i < 128 * 1024 * 1024; i++)
 	{
-		size_t size = sl::getAllocSize (i);
-		ASSERT (size >= i);
+		size_t size = sl::getAllocSize(i);
+		ASSERT(size >= i);
 
-		size_t x = sl::getPowerOf2Ge (i);
-		ASSERT (x >= i);
+		size_t x = sl::getPowerOf2Ge(i);
+		ASSERT(x >= i);
 
-		size_t y = sl::getHiBit (i);
-		ASSERT ((i & y) && y <= i);
+		size_t y = sl::getHiBit(i);
+		ASSERT((i & y) && y <= i);
 
-		size_t z = sl::getLoBit (i);
-		ASSERT ((i & z) && z <= y);
+		size_t z = sl::getLoBit(i);
+		ASSERT((i & z) && z <= y);
 	}
 }
 
@@ -4062,31 +4062,31 @@ testBitIdx ()
 
 #if (_AXL_OS_WIN)
 int
-wmain (
+wmain(
 	int argc,
-	wchar_t* argv []
+	wchar_t* argv[]
 	)
 #else
 int
-main (
+main(
 	int argc,
-	char* argv []
+	char* argv[]
 	)
 #endif
 {
 #if (_AXL_OS_POSIX)
-	setvbuf (stdout, NULL, _IOLBF, 1024);
+	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
 
-	g::getModule ()->setTag ("axl_test_con");
-	srand ((uint_t) sys::getTimestamp ());
+	g::getModule()->setTag("axl_test_con");
+	srand((uint_t)sys::getTimestamp());
 
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
-	WSAStartup (0x0202, &wsaData);
+	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testSerial ();
+	testSerial();
 	// testKeepAlives (sl::String (argv [1]));
 
 	return 0;

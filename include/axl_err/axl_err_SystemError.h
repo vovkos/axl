@@ -66,9 +66,9 @@ enum SystemErrorCode
 
 inline
 uint_t
-getLastSystemErrorCode ()
+getLastSystemErrorCode()
 {
-	return ::GetLastError ();
+	return ::GetLastError();
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -105,7 +105,7 @@ enum SystemErrorCode
 
 inline
 uint_t
-getLastSystemErrorCode ()
+getLastSystemErrorCode()
 {
 	return errno;
 }

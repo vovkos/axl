@@ -21,35 +21,35 @@ namespace gui {
 //..............................................................................
 
 bool
-buildLogFont (
+buildLogFont(
 	LOGFONTW* logFont,
 	const sl::StringRef_w& family,
 	size_t pointSize,
 	uint_t flags
 	)
 {
-	memset (logFont, 0, sizeof (LOGFONT));
+	memset(logFont, 0, sizeof(LOGFONT));
 
-	size_t length = family.getLength ();
+	size_t length = family.getLength();
 
-	memcpy (
+	memcpy(
 		logFont->lfFaceName,
 		family,
-		AXL_MIN (countof (logFont->lfFaceName), length) * sizeof (wchar_t)
+		AXL_MIN(countof(logFont->lfFaceName), length) * sizeof(wchar_t)
 		);
 
 	logFont->lfCharSet = DEFAULT_CHARSET;
 
 	ScreenDc screenDc;
-	::SetMapMode (screenDc, MM_TEXT);
-	logFont->lfHeight = -::MulDiv (pointSize, ::GetDeviceCaps (screenDc, LOGPIXELSY), 72);
+	::SetMapMode(screenDc, MM_TEXT);
+	logFont->lfHeight = -::MulDiv(pointSize, ::GetDeviceCaps(screenDc, LOGPIXELSY), 72);
 
-	modifyLogFont (logFont, flags);
+	modifyLogFont(logFont, flags);
 	return true;
 }
 
 void
-modifyLogFont (
+modifyLogFont(
 	LOGFONTW* logFont,
 	uint_t flags
 	)
@@ -61,25 +61,25 @@ modifyLogFont (
 }
 
 bool
-getFontDescFromLogFont (
+getFontDescFromLogFont(
 	const LOGFONT* logFont,
 	FontDesc* fontDesc
 	)
 {
-	memset (fontDesc, 0, sizeof (FontDesc));
+	memset(fontDesc, 0, sizeof(FontDesc));
 
-	memcpy (
+	memcpy(
 		fontDesc->m_family,
 		logFont->lfFaceName,
-		(AXL_MIN (countof (logFont->lfFaceName), countof (fontDesc->m_family)) - 1) * sizeof (char)
+		(AXL_MIN(countof(logFont->lfFaceName), countof(fontDesc->m_family)) - 1) * sizeof(char)
 		);
 
 	ScreenDc screenDc;
-	::SetMapMode (screenDc, MM_TEXT);
+	::SetMapMode(screenDc, MM_TEXT);
 
 	fontDesc->m_pointSize =
 		logFont->lfHeight > 0 ? logFont->lfHeight :
-		::MulDiv (-logFont->lfHeight, 72, ::GetDeviceCaps (screenDc, LOGPIXELSY));
+		::MulDiv(-logFont->lfHeight, 72, ::GetDeviceCaps(screenDc, LOGPIXELSY));
 
 	if (logFont->lfWeight >= FW_BOLD)
 		fontDesc->m_flags |= FontFlag_Bold;
@@ -98,60 +98,60 @@ getFontDescFromLogFont (
 
 //..............................................................................
 
-GdiFont::GdiFont ()
+GdiFont::GdiFont()
 {
-	m_engine = GdiEngine::getSingleton ();
+	m_engine = GdiEngine::getSingleton();
 }
 
 bool
-GdiFont::getLogFont (LOGFONTW* logFont)
+GdiFont::getLogFont(LOGFONTW* logFont)
 {
-	bool_t result = ::GetObject (m_h, sizeof (LOGFONT), logFont);
-	return err::complete (result);
+	bool_t result = ::GetObject(m_h, sizeof(LOGFONT), logFont);
+	return err::complete(result);
 }
 
 bool
-GdiFont::isMonospace ()
+GdiFont::isMonospace()
 {
 	LOGFONT logFont;
-	getLogFont (&logFont);
+	getLogFont(&logFont);
 	return logFont.lfPitchAndFamily == FIXED_PITCH;
 }
 
 Size
-GdiFont::calcTextSize_utf8 (const sl::StringRef_utf8& text)
+GdiFont::calcTextSize_utf8(const sl::StringRef_utf8& text)
 {
-	char buffer [256];
-	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
+	char buffer[256];
+	sl::String_w string(ref::BufKind_Stack, buffer, sizeof(buffer));
+	string.copy(text, length);
 
-	return calcTextSize_utf16 (string, string.getLength ());
+	return calcTextSize_utf16(string, string.getLength());
 }
 
 Size
-GdiFont::calcTextSize_utf16 (const sl::StringRef_utf16& text)
+GdiFont::calcTextSize_utf16(const sl::StringRef_utf16& text)
 {
 	if (length == -1)
-		length = wcslen_s (text);
+		length = wcslen_s(text);
 
 	ScreenDc screenDc;
-	HFONT hOldFont = (HFONT) ::SelectObject (screenDc, m_h);
+	HFONT hOldFont = (HFONT) ::SelectObject(screenDc, m_h);
 
 	SIZE size;
-	::GetTextExtentPoint32W (screenDc, text, length, &size);
-	::SelectObject (screenDc, hOldFont);
+	::GetTextExtentPoint32W(screenDc, text, length, &size);
+	::SelectObject(screenDc, hOldFont);
 
-	return Size (size.cx, size.cy);
+	return Size(size.cx, size.cy);
 }
 
 Size
-GdiFont::calcTextSize_utf32 (const sl::StringRef_utf32& text)
+GdiFont::calcTextSize_utf32(const sl::StringRef_utf32& text)
 {
-	char buffer [256];
-	sl::String_w string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.copy (text, length);
+	char buffer[256];
+	sl::String_w string(ref::BufKind_Stack, buffer, sizeof(buffer));
+	string.copy(text, length);
 
-	return calcTextSize_utf16 (string, string.getLength ());
+	return calcTextSize_utf16(string, string.getLength());
 }
 
 //..............................................................................

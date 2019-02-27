@@ -19,20 +19,20 @@ namespace mem {
 //..............................................................................
 
 void
-addTrackerBlock (TrackerBlockHdr* hdr)
+addTrackerBlock(TrackerBlockHdr* hdr)
 {
-	g::getModule ()->getMemTracker ()->add (hdr);
+	g::getModule()->getMemTracker()->add(hdr);
 }
 
 void
-removeTrackerBlock (TrackerBlockHdr* hdr)
+removeTrackerBlock(TrackerBlockHdr* hdr)
 {
-	g::getModule ()->getMemTracker ()->remove (hdr);
+	g::getModule()->getMemTracker()->remove(hdr);
 }
 
 //..............................................................................
 
-Tracker::Tracker ()
+Tracker::Tracker()
 {
 	m_peakBlockCount = 0;
 	m_totalBlockCount = 0;
@@ -42,18 +42,18 @@ Tracker::Tracker ()
 }
 
 void
-Tracker::add (TrackerBlockHdr* hdr)
+Tracker::add(TrackerBlockHdr* hdr)
 {
-	m_lock.lock ();
+	m_lock.lock();
 
 	hdr->m_seqNum = m_totalBlockCount;
 
 	m_totalBlockCount++;
 	m_totalSize += hdr->m_size;
 
-	m_blockList.insertTail (hdr);
+	m_blockList.insertTail(hdr);
 
-	size_t blockCount = m_blockList.getCount ();
+	size_t blockCount = m_blockList.getCount();
 	if (blockCount > m_peakBlockCount)
 		m_peakBlockCount = blockCount;
 
@@ -62,52 +62,52 @@ Tracker::add (TrackerBlockHdr* hdr)
 	if (m_size > m_peakSize)
 		m_peakSize = m_size;
 
-	m_lock.unlock ();
+	m_lock.unlock();
 }
 
 void
-Tracker::remove (TrackerBlockHdr* hdr)
+Tracker::remove(TrackerBlockHdr* hdr)
 {
-	m_lock.lock ();
+	m_lock.lock();
 
-	m_blockList.remove (hdr);
+	m_blockList.remove(hdr);
 	m_size -= hdr->m_size;
 
-	m_lock.unlock ();
+	m_lock.unlock();
 }
 
 void
-Tracker::trace ()
+Tracker::trace()
 {
-	m_lock.lock ();
+	m_lock.lock();
 
-	TRACE (
+	TRACE(
 		"%s: AXL memory stats:\n"
 		"    Current...%d bytes (%d blocks)\n"
 		"    Peak......%d bytes (%d blocks)\n"
 		"    Total.....%d bytes (%d blocks)\n",
-		g::getModule ()->getTag (),
+		g::getModule()->getTag(),
 		m_size,
-		m_blockList.getCount (),
+		m_blockList.getCount(),
 		m_peakSize,
 		m_peakBlockCount,
 		m_totalSize,
 		m_totalBlockCount
 		);
 
-	if (!m_blockList.isEmpty ())
+	if (!m_blockList.isEmpty())
 	{
-		TRACE (
+		TRACE(
 			"*** Found %d unfreed blocks:\n",
-			m_blockList.getCount ()
+			m_blockList.getCount()
 			);
 
-		sl::Iterator <TrackerBlockHdr> it = m_blockList.getHead ();
+		sl::Iterator<TrackerBlockHdr> it = m_blockList.getHead();
 		for (; it; it++)
 		{
 			TrackerBlockHdr* blockHdr = *it;
 
-			TRACE (
+			TRACE(
 				"    %s(%d): %s; seq = #%d; size = %d;\n",
 				blockHdr->m_filePath,
 				blockHdr->m_line,
@@ -118,7 +118,7 @@ Tracker::trace ()
 		}
 	}
 
-	m_lock.unlock ();
+	m_lock.unlock();
 }
 
 //..............................................................................

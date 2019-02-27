@@ -27,26 +27,26 @@ protected:
 	uint_t m_threadId;
 
 public:
-	Thread ()
+	Thread()
 	{
 		m_threadId = -1;
 	}
 
 	uint_t
-	getThreadId ()
+	getThreadId()
 	{
 		return m_threadId;
 	}
 
 	void
-	close ()
+	close()
 	{
-		WaitableHandle::close ();
+		WaitableHandle::close();
 		m_threadId = -1;
 	}
 
 	bool
-	create (
+	create(
 		SECURITY_ATTRIBUTES* secAttr,
 		size_t stackSize,
 		PTHREAD_START_ROUTINE threadFunc,
@@ -55,24 +55,24 @@ public:
 		);
 
 	bool
-	setPriority (int priority)
+	setPriority(int priority)
 	{
-		bool_t result = ::SetThreadPriority (m_h, priority);
-		return err::complete (result);
+		bool_t result = ::SetThreadPriority(m_h, priority);
+		return err::complete(result);
 	}
 
 	bool
-	terminate (dword_t exitCode)
+	terminate(dword_t exitCode)
 	{
-		bool_t result = ::TerminateThread (m_h, exitCode);
-		return err::complete (result);
+		bool_t result = ::TerminateThread(m_h, exitCode);
+		return err::complete(result);
 	}
 
 	bool
-	getExitCode (dword_t* exitCode)
+	getExitCode(dword_t* exitCode)
 	{
-		bool_t result = ::GetExitCodeThread (m_h, exitCode);
-		return err::complete (result);
+		bool_t result = ::GetExitCodeThread(m_h, exitCode);
+		return err::complete(result);
 	}
 };
 

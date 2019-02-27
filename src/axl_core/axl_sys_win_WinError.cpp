@@ -20,7 +20,7 @@ namespace win {
 
 inline
 wchar_t*
-getSystemMessage (dword_t code)
+getSystemMessage(dword_t code)
 {
 	enum
 	{
@@ -30,35 +30,35 @@ getSystemMessage (dword_t code)
 			FORMAT_MESSAGE_IGNORE_INSERTS |
 			FORMAT_MESSAGE_MAX_WIDTH_MASK, // no line breaks please
 
-		EnglishLangId = MAKELANGID (LANG_ENGLISH, SUBLANG_ENGLISH_US),
-		NeutralLangId = MAKELANGID (LANG_NEUTRAL, SUBLANG_NEUTRAL),
+		EnglishLangId = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+		NeutralLangId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
 	};
 
 	// prefer english message, fall back localized defaults if failed
 
 	wchar_t* message = NULL;
-	::FormatMessageW (Flags, NULL, code, EnglishLangId, (LPWSTR) &message, 0, NULL);
+	::FormatMessageW(Flags, NULL, code, EnglishLangId, (LPWSTR) &message, 0, NULL);
 
 	if (!message)
-		::FormatMessageW (Flags, NULL, code, NeutralLangId, (LPWSTR) &message, 0, NULL);
+		::FormatMessageW(Flags, NULL, code, NeutralLangId, (LPWSTR) &message, 0, NULL);
 
 	return message;
 }
 
 sl::String
-WinErrorProvider::getErrorDescription (dword_t code)
+WinErrorProvider::getErrorDescription(dword_t code)
 {
-	wchar_t* message = getSystemMessage (code);
+	wchar_t* message = getSystemMessage(code);
 	if (!message) // try again with HRESULT_FROM_SETUPAPI
 	{
-		HRESULT hresult = HRESULT_FROM_SETUPAPI (code);
-		message = getSystemMessage (hresult);
+		HRESULT hresult = HRESULT_FROM_SETUPAPI(code);
+		message = getSystemMessage(hresult);
 		if (!message)
-			return sl::formatString ("winerror #%d", code);
+			return sl::formatString("winerror #%d", code);
 	}
 
 	sl::String description = message;
-	::LocalFree (message);
+	::LocalFree(message);
 
 	return description;
 }
@@ -66,16 +66,16 @@ WinErrorProvider::getErrorDescription (dword_t code)
 //..............................................................................
 
 size_t
-WinError::create (dword_t code)
+WinError::create(dword_t code)
 {
-	err::ErrorHdr* error = createBuffer (sizeof (err::ErrorHdr));
+	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
 	if (!error)
 		return -1;
 
-	error->m_size = sizeof (err::ErrorHdr);
+	error->m_size = sizeof(err::ErrorHdr);
 	error->m_guid = g_winErrorGuid;
 	error->m_code = code;
-	return sizeof (err::ErrorHdr);
+	return sizeof(err::ErrorHdr);
 }
 
 //..............................................................................

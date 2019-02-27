@@ -24,10 +24,10 @@ class InitCharLiteralTable
 {
 public:
 	void
-	operator () (char literalTable [] [4]) const
+	operator () (char literalTable[] [4]) const
 	{
 		for (int i = 0; i < 256; i++)
-			_snprintf (literalTable [i], 4, "%c", i);
+			_snprintf(literalTable[i], 4, "%c", i);
 	}
 };
 
@@ -35,11 +35,11 @@ public:
 
 inline
 const char*
-getCharLiteral (uchar_t c)
+getCharLiteral(uchar_t c)
 {
-	static char literalTable [256] [4];
-	sl::callOnce (InitCharLiteralTable (), literalTable);
-	return literalTable [c];
+	static char literalTable[256] [4];
+	sl::callOnce(InitCharLiteralTable(), literalTable);
+	return literalTable[c];
 }
 
 //..............................................................................
@@ -48,10 +48,10 @@ class InitCharCodeTable
 {
 public:
 	void
-	operator () (char literalTable [] [4]) const
+	operator () (char literalTable[] [4]) const
 	{
 		for (int i = 0; i < 256; i++)
-			_snprintf (literalTable [i], 4, "\\%02x", i);
+			_snprintf(literalTable[i], 4, "\\%02x", i);
 	}
 };
 
@@ -59,11 +59,11 @@ public:
 
 inline
 const char*
-getCharCodeLiteral (uchar_t c)
+getCharCodeLiteral(uchar_t c)
 {
-	static char literalTable [256] [4];
-	sl::callOnce (InitCharCodeTable (), literalTable);
-	return literalTable [c];
+	static char literalTable[256] [4];
+	sl::callOnce(InitCharCodeTable(), literalTable);
+	return literalTable[c];
 }
 
 //..............................................................................

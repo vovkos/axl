@@ -19,12 +19,12 @@ namespace win {
 //..............................................................................
 
 bool
-Library::loadLibrary (const sl::StringRef_w& fileName)
+Library::loadLibrary(const sl::StringRef_w& fileName)
 {
-	close ();
+	close();
 
-	m_h = ::LoadLibraryW (fileName.sz ());
-	return err::complete (m_h != NULL);
+	m_h = ::LoadLibraryW(fileName.sz());
+	return err::complete(m_h != NULL);
 }
 
 //..............................................................................

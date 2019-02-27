@@ -22,31 +22,31 @@ namespace psx {
 //..............................................................................
 
 bool
-Thread::create (
+Thread::create(
 	const pthread_attr_t* attr,
 	ThreadFunc* threadFunc,
 	void* context
 	)
 {
-	detach ();
+	detach();
 
-	int result = ::pthread_create (&m_threadId, attr, threadFunc, context);
+	int result = ::pthread_create(&m_threadId, attr, threadFunc, context);
 	if (result != 0)
-		return err::fail (result);
+		return err::fail(result);
 
 	m_isOpen = true;
 	return true;
 }
 
 bool
-Thread::join (void** retVal)
+Thread::join(void** retVal)
 {
 	if (!m_isOpen)
 		return true;
 
-	int result = ::pthread_join (m_threadId, retVal);
+	int result = ::pthread_join(m_threadId, retVal);
 	if (result != 0)
-		return err::fail (result);
+		return err::fail(result);
 
 	m_isOpen = false;
 	return true;
@@ -54,21 +54,21 @@ Thread::join (void** retVal)
 
 #if (!_AXL_OS_DARWIN)
 bool
-Thread::tryJoin (void** retVal)
+Thread::tryJoin(void** retVal)
 {
 	if (!m_isOpen)
 		return true;
 
-	int result = ::pthread_tryjoin_np (m_threadId, retVal);
+	int result = ::pthread_tryjoin_np(m_threadId, retVal);
 	if (result != 0)
-		return err::fail (result);
+		return err::fail(result);
 
 	m_isOpen = false;
 	return true;
 }
 
 bool
-Thread::join (
+Thread::join(
 	uint_t timeout,
 	void** retVal
 	)
@@ -78,24 +78,24 @@ Thread::join (
 
 	int result;
 
-	switch (timeout)
+	switch(timeout)
 	{
 	case 0:
-		result = ::pthread_tryjoin_np (m_threadId, retVal);
+		result = ::pthread_tryjoin_np(m_threadId, retVal);
 		break;
 
 	case -1:
-		result = ::pthread_join (m_threadId, retVal);
+		result = ::pthread_join(m_threadId, retVal);
 		break;
 
 	default:
 		timespec timespec = { 0 };
-		sys::getAbsTimespecFromTimeout (timeout, &timespec);
-		result = ::pthread_timedjoin_np (m_threadId, retVal, &timespec);
+		sys::getAbsTimespecFromTimeout(timeout, &timespec);
+		result = ::pthread_timedjoin_np(m_threadId, retVal, &timespec);
 	}
 
 	if (result != 0)
-		return err::fail (result);
+		return err::fail(result);
 
 	m_isOpen = false;
 	return true;
@@ -103,14 +103,14 @@ Thread::join (
 #endif
 
 bool
-Thread::detach ()
+Thread::detach()
 {
 	if (!m_isOpen)
 		return true;
 
-	int result = ::pthread_detach (m_threadId);
+	int result = ::pthread_detach(m_threadId);
 	if (result != 0)
-		return err::fail (result);
+		return err::fail(result);
 
 	m_isOpen = false;
 	return true;

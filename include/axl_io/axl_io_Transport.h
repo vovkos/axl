@@ -25,14 +25,14 @@ class Transport
 public:
 	virtual
 	size_t
-	transmit (
+	transmit(
 		const void* p,
 		size_t size
 		) = 0;
 
 	virtual
 	size_t
-	receive (
+	receive(
 		void* p,
 		size_t size
 		) = 0;

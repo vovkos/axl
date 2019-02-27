@@ -31,30 +31,30 @@ protected:
 	Rect m_rect;
 
 public:
-	QtCaret ()
+	QtCaret()
 	{
 		m_isVisible = false;
 		m_widgetDriver = NULL;
 	}
 
 	bool
-	isVisible ()
+	isVisible()
 	{
 		return m_isVisible;
 	}
 
 	bool
-	show (
+	show(
 		WidgetDriver* widgetDriver,
 		const Rect& rect,
 		uint_t interval = 500
 		);
 
 	void
-	hide (WidgetDriver* widgetDriver);
+	hide(WidgetDriver* widgetDriver);
 
 protected:
-	virtual void timerEvent (QTimerEvent* e);
+	virtual void timerEvent(QTimerEvent* e);
 };
 
 //..............................................................................

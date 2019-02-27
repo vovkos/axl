@@ -25,7 +25,7 @@ class Mapping: public sys::win::Handle
 {
 public:
 	bool
-	create (
+	create(
 		HANDLE hFile,
 		SECURITY_ATTRIBUTES* secAttr,
 		uint_t pageProtection,
@@ -34,7 +34,7 @@ public:
 		);
 
 	bool
-	open (
+	open(
 		uint_t access,
 		bool doInheritHandle,
 		const sl::StringRef_w& name
@@ -49,17 +49,17 @@ public:
 	void
 	operator () (void* p)
 	{
-		::UnmapViewOfFile (p);
+		::UnmapViewOfFile(p);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MappedView: public sl::Handle <void*, UnmapViewOfFile>
+class MappedView: public sl::Handle<void*, UnmapViewOfFile>
 {
 public:
 	void*
-	view (
+	view(
 		HANDLE hMapping,
 		uint_t access,
 		uint64_t offset,

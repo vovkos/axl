@@ -27,125 +27,125 @@ public:
 	void
 	operator () (int h)
 	{
-		::close (h);
+		::close(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class File: public sl::Handle <int, CloseFile, sl::MinusOne <int> >
+class File: public sl::Handle<int, CloseFile, sl::MinusOne<int> >
 {
 public:
-	File ()
+	File()
 	{
 	}
 
-	File (int h):
-		sl::Handle <int, CloseFile, sl::MinusOne <int> > (h)
+	File(int h):
+		sl::Handle<int, CloseFile, sl::MinusOne<int> > (h)
 	{
 	}
 
 	bool
-	open (
+	open(
 		const sl::StringRef& fileName,
 		uint_t openFlags = O_RDWR | O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 		);
 
 	bool
-	duplicate (int fd);
+	duplicate(int fd);
 
 	bool
-	setBlockingMode (bool isBlocking);
+	setBlockingMode(bool isBlocking);
 
 	uint64_t
-	getSize () const;
+	getSize() const;
 
 	bool
-	setSize (uint64_t size)
+	setSize(uint64_t size)
 	{
 #if (_AXL_OS_DARWIN)
-		int result = ::ftruncate (m_h, size);
+		int result = ::ftruncate(m_h, size);
 #else
-		int result = ::ftruncate64 (m_h, size);
+		int result = ::ftruncate64(m_h, size);
 #endif
-		return err::complete (result != -1);
+		return err::complete(result != -1);
 	}
 
 	uint64_t
-	getPosition () const;
+	getPosition() const;
 
 	bool
-	setPosition (uint64_t offset) const
+	setPosition(uint64_t offset) const
 	{
 #if (_AXL_OS_DARWIN)
-		uint64_t actualOffset = ::lseek (m_h, offset, SEEK_SET);
+		uint64_t actualOffset = ::lseek(m_h, offset, SEEK_SET);
 #else
-		uint64_t actualOffset = ::lseek64 (m_h, offset, SEEK_SET);
+		uint64_t actualOffset = ::lseek64(m_h, offset, SEEK_SET);
 #endif
-		return err::complete (actualOffset != -1);
+		return err::complete(actualOffset != -1);
 	}
 
 	size_t
-	getIncomingDataSize ();
+	getIncomingDataSize();
 
 	bool
-	flush ()
+	flush()
 	{
-		int result = ::fsync (m_h);
-		return err::complete (result != -1);
+		int result = ::fsync(m_h);
+		return err::complete(result != -1);
 	}
 
 	int
-	ioctl (int code)
+	ioctl(int code)
 	{
-		int result = ::ioctl (m_h, code);
-		return err::complete (result, -1);
+		int result = ::ioctl(m_h, code);
+		return err::complete(result, -1);
 	}
 
 	template <typename T>
 	int
-	ioctl (
+	ioctl(
 		int code,
 		T param
 		)
 	{
-		int result = ::ioctl (m_h, code, param);
+		int result = ::ioctl(m_h, code, param);
 		if (result == -1)
-			err::setLastSystemError ();
+			err::setLastSystemError();
 
 		return result;
 	}
 
 	int
-	fcntl (int code)
+	fcntl(int code)
 	{
-		int result = ::fcntl (m_h, code);
-		return err::complete (result, -1);
+		int result = ::fcntl(m_h, code);
+		return err::complete(result, -1);
 	}
 
 	template <typename T>
 	int
-	fcntl (
+	fcntl(
 		int code,
 		T param
 		)
 	{
-		int result = ::fcntl (m_h, code, param);
+		int result = ::fcntl(m_h, code, param);
 		if (result == -1)
-			err::setLastSystemError ();
+			err::setLastSystemError();
 
 		return result;
 	}
 
 	size_t
-	read (
+	read(
 		void* p,
 		size_t size
 		) const;
 
 	size_t
-	write (
+	write(
 		const void* p,
 		size_t size
 		);

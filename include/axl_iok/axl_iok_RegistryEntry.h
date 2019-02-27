@@ -22,70 +22,70 @@ namespace iok {
 
 //..............................................................................
 
-class RegistryEntry: public ObjectBase <io_registry_entry_t>
+class RegistryEntry: public ObjectBase<io_registry_entry_t>
 {
 public:
-	RegistryEntry ()
+	RegistryEntry()
 	{
 	}
 
-	RegistryEntry (const RegistryEntry& src)
+	RegistryEntry(const RegistryEntry& src)
 	{
-		copy (src);
+		copy(src);
 	}
 
-	RegistryEntry (
+	RegistryEntry(
 		io_registry_entry_t p,
 		bool isAttach = false
 		)
 	{
-		isAttach ? copy (p) : attach (p);
+		isAttach ? copy(p) : attach(p);
 	}
 
 	bool
-	isInPlane (const char* plane) const
+	isInPlane(const char* plane) const
 	{
 		return ::IORegistryEntryInPlane(m_p, plane);
 	}
 
 	sl::String
-	getName () const;
+	getName() const;
 
 	sl::String
-	getNameInPlane (const char* plane) const;
+	getNameInPlane(const char* plane) const;
 
 	sl::String
-	getPath (const char* plane = kIOServicePlane) const;
+	getPath(const char* plane = kIOServicePlane) const;
 
 	cf::MutableDictionaryRef
-	getAllProperties () const;
+	getAllProperties() const;
 
 	cf::TypeRef
-	getProperty (const char* key) const
+	getProperty(const char* key) const
 	{
-		CFTypeRef p = ::IORegistryEntryCreateCFProperty (m_p, cf::StringRef (key), kCFAllocatorDefault, 0);
-		return cf::TypeRef (p, true);
+		CFTypeRef p = ::IORegistryEntryCreateCFProperty(m_p, cf::StringRef(key), kCFAllocatorDefault, 0);
+		return cf::TypeRef(p, true);
 	}
 
 	RegistryEntry
-	getParentEntry (const char* plane = kIOServicePlane) const;
+	getParentEntry(const char* plane = kIOServicePlane) const;
 
 	RegistryEntry
-	getChildEntry (const char* plane = kIOServicePlane) const;
+	getChildEntry(const char* plane = kIOServicePlane) const;
 };
 
 //..............................................................................
 
 inline
 cf::MutableDictionaryRef
-createServiceMatchingDictionary (const char* service)
+createServiceMatchingDictionary(const char* service)
 {
-	CFMutableDictionaryRef p = ::IOServiceMatching (service);
-	return cf::MutableDictionaryRef (p, true);
+	CFMutableDictionaryRef p = ::IOServiceMatching(service);
+	return cf::MutableDictionaryRef(p, true);
 }
 
 Iterator
-findMatchingServices (CFMutableDictionaryRef dict);
+findMatchingServices(CFMutableDictionaryRef dict);
 
 //..............................................................................
 

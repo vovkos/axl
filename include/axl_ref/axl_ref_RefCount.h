@@ -30,7 +30,7 @@ namespace ref {
 
 typedef
 void
-FreeFunc (void* p);
+FreeFunc(void* p);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -66,7 +66,7 @@ enum RefCountFlag
 
 class RefCount
 {
-	AXL_DISABLE_COPY (RefCount)
+	AXL_DISABLE_COPY(RefCount)
 
 protected:
 	volatile int32_t m_refCount;
@@ -75,64 +75,64 @@ protected:
 	uint_t m_flags;
 
 public:
-	RefCount ();
+	RefCount();
 
 	virtual
-	~RefCount ()
+	~RefCount()
 	{
-		ASSERT (m_refCount == 0 && m_weakRefCount > 0);
+		ASSERT(m_refCount == 0 && m_weakRefCount > 0);
 	}
 
 	void
-	prime (
+	prime(
 		RefCount* parent,
 		uint_t flags = 0
 		);
 
 	size_t
-	getRefCount ()
+	getRefCount()
 	{
 		return m_refCount;
 	}
 
 	size_t
-	getWeakRefCount ()
+	getWeakRefCount()
 	{
 		return m_weakRefCount;
 	}
 
 	uint_t
-	getFlags ()
+	getFlags()
 	{
 		return m_flags;
 	}
 
 	size_t
-	addRef ()
+	addRef()
 	{
-		return sys::atomicInc (&m_refCount);
+		return sys::atomicInc(&m_refCount);
 	}
 
 	size_t
-	release ();
+	release();
 
 	size_t
-	addWeakRef ()
+	addWeakRef()
 	{
-		return sys::atomicInc (&m_weakRefCount);
+		return sys::atomicInc(&m_weakRefCount);
 	}
 
 	size_t
-	weakRelease ();
+	weakRelease();
 
 	size_t
-	addRefByWeakPtr ();
+	addRefByWeakPtr();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-RefCount::RefCount ()
+RefCount::RefCount()
 {
 	m_refCount = 0;
 	m_weakRefCount = 1;
@@ -142,12 +142,12 @@ RefCount::RefCount ()
 
 inline
 void
-RefCount::prime (
+RefCount::prime(
 	RefCount* parent,
 	uint_t flags
 	)
 {
-	ASSERT (m_refCount == 0); // should only be called once in the very beginning
+	ASSERT(m_refCount == 0); // should only be called once in the very beginning
 
 	if (!parent)
 	{
@@ -155,9 +155,9 @@ RefCount::prime (
 	}
 	else
 	{
-		ASSERT (parent < this);
-		m_parentOffset = (uint_t) ((char*) this - (char*) parent);
-		parent->addWeakRef ();
+		ASSERT(parent < this);
+		m_parentOffset = (uint_t)((char*)this - (char*)parent);
+		parent->addWeakRef();
 	}
 
 	m_flags = flags;
@@ -165,14 +165,14 @@ RefCount::prime (
 
 inline
 size_t
-RefCount::release ()
+RefCount::release()
 {
-	intptr_t refCount = sys::atomicDec (&m_refCount);
+	intptr_t refCount = sys::atomicDec(&m_refCount);
 
 	if (!refCount)
 	{
-		this->~RefCount ();
-		weakRelease (); // weakRelease () should be here, not in ~RefCount ()
+		this->~RefCount();
+		weakRelease(); // weakRelease () should be here, not in ~RefCount ()
 	}
 
 	return refCount;
@@ -180,20 +180,20 @@ RefCount::release ()
 
 inline
 size_t
-RefCount::weakRelease ()
+RefCount::weakRelease()
 {
-	intptr_t refCount = sys::atomicDec (&m_weakRefCount);
+	intptr_t refCount = sys::atomicDec(&m_weakRefCount);
 
 	if (!refCount)
 		if (m_flags & RefCountFlag_Allocated)
 		{
-			RefCountAllocHdr* hdr = (RefCountAllocHdr*) this - 1;
-			hdr->m_freeFunc (hdr);
+			RefCountAllocHdr* hdr = (RefCountAllocHdr*)this - 1;
+			hdr->m_freeFunc(hdr);
 		}
 		else if (m_parentOffset)
 		{
-			RefCount* parent = (RefCount*) ((char*) this - m_parentOffset);
-			parent->weakRelease ();
+			RefCount* parent = (RefCount*)((char*)this - m_parentOffset);
+			parent->weakRelease();
 		}
 
 	return refCount;
@@ -201,7 +201,7 @@ RefCount::weakRelease ()
 
 inline
 size_t
-RefCount::addRefByWeakPtr ()
+RefCount::addRefByWeakPtr()
 {
 	for (;;)
 	{
@@ -209,7 +209,7 @@ RefCount::addRefByWeakPtr ()
 		if (old == 0)
 			return 0;
 
-		if (sys::atomicCmpXchg (&m_refCount, old, old + 1) == old)
+		if (sys::atomicCmpXchg(&m_refCount, old, old + 1) == old)
 			return old + 1;
 	}
 }
@@ -232,7 +232,7 @@ public:
 	void
 	operator () (T* p) const
 	{
-		p->release ();
+		p->release();
 	}
 };
 
@@ -245,7 +245,7 @@ public:
 	void
 	operator () (T* p) const
 	{
-		p->weakRelease ();
+		p->weakRelease();
 	}
 };
 

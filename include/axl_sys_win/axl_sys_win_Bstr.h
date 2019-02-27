@@ -28,83 +28,83 @@ public:
 	void
 	operator () (BSTR h)
 	{
-		::SysFreeString (h);
+		::SysFreeString(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Bstr: public sl::Handle <BSTR, FreeBstr>
+class Bstr: public sl::Handle<BSTR, FreeBstr>
 {
 public:
-	Bstr ()
+	Bstr()
 	{
 	}
 
-	Bstr (const Bstr& src)
+	Bstr(const Bstr& src)
 	{
-		copy (src.m_h);
+		copy(src.m_h);
 	}
 
-	Bstr (const sl::StringRef& string)
+	Bstr(const sl::StringRef& string)
 	{
-		copy (string);
+		copy(string);
 	}
 
-	Bstr (const sl::StringRef_w& string)
+	Bstr(const sl::StringRef_w& string)
 	{
-		copy (string);
+		copy(string);
 	}
 
 	Bstr&
 	operator = (const Bstr& src)
 	{
-		copy (src.m_h);
+		copy(src.m_h);
 		return *this;
 	}
 
 	Bstr&
 	operator = (const sl::StringRef& string)
 	{
-		copy (string);
+		copy(string);
 		return *this;
 	}
 
 	Bstr&
 	operator = (const sl::StringRef_w& string)
 	{
-		copy (string);
+		copy(string);
 		return *this;
 	}
 
 	size_t
-	getLength () const
+	getLength() const
 	{
-		return ::SysStringLen (m_h);
+		return ::SysStringLen(m_h);
 	}
 
 	size_t
-	getByteLength () const
+	getByteLength() const
 	{
-		return ::SysStringByteLen (m_h);
+		return ::SysStringByteLen(m_h);
 	}
 
 	bool
-	copy (
+	copy(
 		BSTR p,
 		size_t length
 		);
 
 	bool
-	copy (const sl::StringRef& string)
+	copy(const sl::StringRef& string)
 	{
-		return copy (sl::String_w (string));
+		return copy(sl::String_w(string));
 	}
 
 	bool
-	copy (const sl::StringRef_w& string)
+	copy(const sl::StringRef_w& string)
 	{
-		return copy ((BSTR) string.cp (), string.getLength ());
+		return copy((BSTR)string.cp(), string.getLength());
 	}
 };
 
@@ -115,19 +115,19 @@ public:
 
 template <typename T>
 HRESULT
-createBstrFromString (
+createBstrFromString(
 	BSTR* p,
-	const sl::StringRefBase <T>& string
+	const sl::StringRefBase<T>& string
 	)
 {
-	ASSERT (p);
+	ASSERT(p);
 
 	Bstr bstr;
-	bool result = bstr.copy (string);
+	bool result = bstr.copy(string);
 	if (!result)
 		return E_OUTOFMEMORY;
 
-	*p = bstr.detach ();
+	*p = bstr.detach();
 	return S_OK;
 }
 

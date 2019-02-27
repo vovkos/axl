@@ -27,7 +27,7 @@ class Process: public Handle
 {
 public:
 	bool
-	createProcess (
+	createProcess(
 		const sl::StringRef_w& appName,
 		const sl::StringRef_w& cmdLine,
 		const SECURITY_ATTRIBUTES* processAttr,
@@ -41,14 +41,14 @@ public:
 		);
 
 	bool
-	createProcess (
+	createProcess(
 		const sl::StringRef_w& cmdLine,
 		bool inheritHandles,
 		dword_t flags,
 		const STARTUPINFOW* startupInfo
 		)
 	{
-		return createProcess (
+		return createProcess(
 			NULL,
 			cmdLine,
 			NULL,
@@ -63,26 +63,26 @@ public:
 	}
 
 	dword_t
-	getProcessId ()
+	getProcessId()
 	{
-		dword_t id = ::GetProcessId (m_h);
-		return err::complete <dword_t> (id, -1);
+		dword_t id = ::GetProcessId(m_h);
+		return err::complete<dword_t> (id, -1);
 	}
 
 	bool
-	getExitCode (dword_t* exitCode)
+	getExitCode(dword_t* exitCode)
 	{
-		bool_t result = ::GetExitCodeProcess (m_h, exitCode);
-		return err::complete (result);
+		bool_t result = ::GetExitCodeProcess(m_h, exitCode);
+		return err::complete(result);
 	}
 };
 
 //..............................................................................
 
 bool
-syncExec (
+syncExec(
 	const sl::StringRef_w& cmdLine,
-	sl::Array <char>* output,
+	sl::Array<char>* output,
 	dword_t* exitCode = NULL
 	);
 

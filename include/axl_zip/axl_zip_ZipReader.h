@@ -46,76 +46,76 @@ protected:
 	mz_zip_archive_tag* m_zip;
 
 public:
-	ZipReader ()
+	ZipReader()
 	{
 		m_zip = NULL;
 	}
 
-	~ZipReader ()
+	~ZipReader()
 	{
-		close ();
+		close();
 	}
 
 	bool
-	isOpen ()
+	isOpen()
 	{
 		return m_zip != NULL;
 	}
 
 	void
-	close ();
+	close();
 
 	bool
-	openFile (const sl::StringRef& fileName);
+	openFile(const sl::StringRef& fileName);
 
 	bool
-	openMem (
+	openMem(
 		const void* p,
 		size_t size
 		);
 
 	size_t
-	getFileCount ();
+	getFileCount();
 
 	sl::String
-	getFileName (size_t index);
+	getFileName(size_t index);
 
 	bool
-	getFileInfo (
+	getFileInfo(
 		size_t index,
 		ZipFileInfo* fileInfo,
 		sl::String* comment = NULL
 		);
 
 	bool
-	isDirectoryFile (size_t index);
+	isDirectoryFile(size_t index);
 
 	bool
-	isFileEncrypted (size_t index);
+	isFileEncrypted(size_t index);
 
 	bool
-	extractFileToMem (
+	extractFileToMem(
 		size_t index,
 		void* p,
 		size_t size
 		);
 
 	bool
-	extractFileToMem (
+	extractFileToMem(
 		size_t index,
-		sl::Array <char>* buffer
+		sl::Array<char>* buffer
 		);
 
-	sl::Array <char>
-	extractFileToMem (size_t index)
+	sl::Array<char>
+	extractFileToMem(size_t index)
 	{
-		sl::Array <char> buffer;
-		extractFileToMem (index, &buffer);
+		sl::Array<char> buffer;
+		extractFileToMem(index, &buffer);
 		return buffer;
 	}
 
 	bool
-	extractFileToFile (
+	extractFileToFile(
 		size_t index,
 		const sl::StringRef& fileName
 		);

@@ -38,7 +38,7 @@ enum NetworkAdapterType
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const char*
-getNetworkAdapterTypeString (NetworkAdapterType adapterKind);
+getNetworkAdapterTypeString(NetworkAdapterType adapterKind);
 
 //..............................................................................
 
@@ -56,16 +56,16 @@ enum NetworkAdapterFlag
 
 inline
 NetworkAdapterFlag
-getFirstNetworkAdapterFlag (uint_t flags)
+getFirstNetworkAdapterFlag(uint_t flags)
 {
-	return (NetworkAdapterFlag) (1 << sl::getLoBitIdx (flags));
+	return (NetworkAdapterFlag)(1 << sl::getLoBitIdx(flags));
 }
 
 const char*
-getNetworkAdapterFlagString (NetworkAdapterFlag flag);
+getNetworkAdapterFlagString(NetworkAdapterFlag flag);
 
 sl::String
-getNetworkAdapterFlagString (uint_t flags);
+getNetworkAdapterFlagString(uint_t flags);
 
 //..............................................................................
 
@@ -86,44 +86,44 @@ protected:
 	uint_t m_flags;
 	sl::String m_name;
 	sl::String m_description;
-	uchar_t m_mac [6];
-	sl::List <NetworkAdapterAddress> m_addressList;
+	uchar_t m_mac[6];
+	sl::List<NetworkAdapterAddress> m_addressList;
 
 public:
-	NetworkAdapterDesc ();
+	NetworkAdapterDesc();
 
 	NetworkAdapterType
-	getType () const
+	getType() const
 	{
 		return m_type;
 	}
 
 	uint_t
-	getFlags () const
+	getFlags() const
 	{
 		return m_flags;
 	}
 
 	const sl::String&
-	getName () const
+	getName() const
 	{
 		return m_name;
 	}
 
 	const sl::String&
-	getDescription () const
+	getDescription() const
 	{
 		return m_description;
 	}
 
 	const uchar_t*
-	getMac () const
+	getMac() const
 	{
 		return m_mac;
 	}
 
-	sl::ConstList <NetworkAdapterAddress>
-	getAddressList () const
+	sl::ConstList<NetworkAdapterAddress>
+	getAddressList() const
 	{
 		return m_addressList;
 	}
@@ -132,7 +132,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-createNetworkAdapterDescList (sl::List <NetworkAdapterDesc>* adapterList);
+createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList);
 
 //..............................................................................
 

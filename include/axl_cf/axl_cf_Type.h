@@ -21,36 +21,36 @@ namespace cf {
 //..............................................................................
 
 sl::String
-getStringFromCfString (CFStringRef cfString);
+getStringFromCfString(CFStringRef cfString);
 
 sl::String
-cfTypeToString (
+cfTypeToString(
 	CFTypeRef cfType,
 	bool isVerbose = false
 	);
 
 sl::String
-getTypeIdDescription (CFTypeID typeId);
+getTypeIdDescription(CFTypeID typeId);
 
 inline
 CFTypeID
-getStringTypeId ()
+getStringTypeId()
 {
-	return ::CFStringGetTypeID ();
+	return ::CFStringGetTypeID();
 }
 
 inline
 CFTypeID
-getBooleanTypeId ()
+getBooleanTypeId()
 {
-	return ::CFBooleanGetTypeID ();
+	return ::CFBooleanGetTypeID();
 }
 
 inline
 CFTypeID
-getNumberTypeId ()
+getNumberTypeId()
 {
-	return ::CFNumberGetTypeID ();
+	return ::CFNumberGetTypeID();
 }
 
 //..............................................................................
@@ -62,36 +62,36 @@ protected:
 	T m_p;
 
 public:
-	TypeRefBase ()
+	TypeRefBase()
 	{
 		m_p = NULL;
 	}
 
-	TypeRefBase (const TypeRefBase& src)
+	TypeRefBase(const TypeRefBase& src)
 	{
 		if (src.m_p)
-			::CFRetain (src.m_p);
+			::CFRetain(src.m_p);
 
 		m_p = src.m_p;
 	}
 
-	TypeRefBase (
+	TypeRefBase(
 		T p,
 		bool isAttach = false
 		)
 	{
 		if (p && !isAttach)
-			::CFRetain (p);
+			::CFRetain(p);
 
 		m_p = p;
 	}
 
-	~TypeRefBase ()
+	~TypeRefBase()
 	{
-		clear ();
+		clear();
 	}
 
-	operator T () const
+	operator T() const
 	{
 		return m_p;
 	}
@@ -99,32 +99,32 @@ public:
 	TypeRefBase&
 	operator = (const TypeRefBase& src)
 	{
-		copy (src.m_p);
+		copy(src.m_p);
 		return *this;
 	}
 
 	TypeRefBase&
 	operator = (T p)
 	{
-		copy (p);
+		copy(p);
 		return *this;
 	}
 
 	T
-	p () const
+	p() const
 	{
 		return m_p;
 	}
 
 	void
-	attach (T p)
+	attach(T p)
 	{
-		clear ();
+		clear();
 		m_p = p;
 	}
 
 	T
-	detach ()
+	detach()
 	{
 		T p = m_p;
 		m_p = NULL;
@@ -132,96 +132,96 @@ public:
 	}
 
 	void
-	clear ()
+	clear()
 	{
 		if (m_p)
-			::CFRelease (m_p);
+			::CFRelease(m_p);
 
 		m_p = NULL;
 	}
 
 	void
-	copy (T p)
+	copy(T p)
 	{
 		if (m_p == p)
 			return;
 
 		if (p)
-			::CFRetain (p);
+			::CFRetain(p);
 
 		if (m_p)
-			::CFRelease (m_p);
+			::CFRelease(m_p);
 
 		m_p = p;
 	}
 
 	intptr_t
-	getRetainCount () const
+	getRetainCount() const
 	{
-		return ::CFGetRetainCount (m_p);
+		return ::CFGetRetainCount(m_p);
 	}
 
 	void
-	retain ()
+	retain()
 	{
-		::CFRetain (m_p);
+		::CFRetain(m_p);
 	}
 
 	void
-	release ()
+	release()
 	{
-		::CFRelease (m_p);
+		::CFRelease(m_p);
 	}
 
 	bool
-	isEqual (T type) const
+	isEqual(T type) const
 	{
-		return ::CFEqual (m_p, type);
+		return ::CFEqual(m_p, type);
 	}
 
 	CFHashCode
-	getHash () const
+	getHash() const
 	{
-		return ::CFHash (m_p);
+		return ::CFHash(m_p);
 	}
 
 	CFTypeID
-	getTypeId () const
+	getTypeId() const
 	{
-		return ::CFGetTypeID (m_p);
+		return ::CFGetTypeID(m_p);
 	}
 
 	sl::String
-	getDescription () const
+	getDescription() const
 	{
-		CFStringRef cfString = ::CFCopyDescription (m_p);
-		sl::String string = getStringFromCfString (cfString);
-		::CFRelease (cfString);
+		CFStringRef cfString = ::CFCopyDescription(m_p);
+		sl::String string = getStringFromCfString(cfString);
+		::CFRelease(cfString);
 		return string;
 	}
 
 	sl::String
-	getTypeIdDescription () const
+	getTypeIdDescription() const
 	{
-		return getTypeIdDescription (getTypeId ());
+		return getTypeIdDescription(getTypeId());
 	}
 
 	void
-	show () const
+	show() const
 	{
-		::CFShow (m_p);
+		::CFShow(m_p);
 	}
 
 	sl::String
-	toString ()
+	toString()
 	{
-		return cfTypeToString (m_p);
+		return cfTypeToString(m_p);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef TypeRefBase <CFTypeRef> TypeRef;
+typedef TypeRefBase<CFTypeRef> TypeRef;
 
 //..............................................................................
 

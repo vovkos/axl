@@ -17,9 +17,9 @@ namespace gui {
 
 //..............................................................................
 
-Engine::Engine ()
+Engine::Engine()
 {
-	static uint_t colorInitTable [StdPalColor__Count] =
+	static uint_t colorInitTable[StdPalColor__Count] =
 	{
 		StdColor_AnsiBlack,         // StdColor_AnsiBlack,
 		StdColor_AnsiRed,           // StdPalColor_AnsiRed,
@@ -75,8 +75,8 @@ Engine::Engine ()
 		StdColor_PastelPurple,      // StdPalColor_PastelPurple,
 	};
 
-	ASSERT (sizeof (colorInitTable) == sizeof (m_stdPalColorTable));
-	memcpy (m_stdPalColorTable, colorInitTable, sizeof (m_stdPalColorTable));
+	ASSERT(sizeof(colorInitTable) == sizeof(m_stdPalColorTable));
+	memcpy(m_stdPalColorTable, colorInitTable, sizeof(m_stdPalColorTable));
 };
 
 //..............................................................................

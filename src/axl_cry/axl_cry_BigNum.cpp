@@ -18,12 +18,12 @@ namespace cry {
 //..............................................................................
 
 BIGNUM*
-BnCtx::getBigNum ()
+BnCtx::getBigNum()
 {
-	BIGNUM* result = BN_CTX_get (m_h);
+	BIGNUM* result = BN_CTX_get(m_h);
 	if (!result)
 	{
-		setLastCryptoError ();
+		setLastCryptoError();
 		return NULL;
 	}
 
@@ -33,35 +33,35 @@ BnCtx::getBigNum ()
 //..............................................................................
 
 bool
-BigNum::create ()
+BigNum::create()
 {
-	close ();
+	close();
 
-	m_h = BN_new ();
-	return completeWithLastCryptoError (m_h != NULL);
+	m_h = BN_new();
+	return completeWithLastCryptoError(m_h != NULL);
 }
 
 bool
-BigNum::createCopy (BIGNUM* src)
+BigNum::createCopy(BIGNUM* src)
 {
-	close ();
+	close();
 
-	m_h = BN_dup (src);
-	return completeWithLastCryptoError (m_h != NULL);
+	m_h = BN_dup(src);
+	return completeWithLastCryptoError(m_h != NULL);
 }
 
 size_t
-BigNum::getData (
+BigNum::getData(
 	void* p,
 	size_t size
 	)
 {
-	ASSERT (size >= getSize ());
+	ASSERT(size >= getSize());
 
-	int result = BN_bn2bin (m_h, (uchar_t*) p);
+	int result = BN_bn2bin(m_h, (uchar_t*)p);
 	if (result <= 0)
 	{
-		setLastCryptoError ();
+		setLastCryptoError();
 		return -1;
 	}
 
@@ -69,32 +69,32 @@ BigNum::getData (
 }
 
 bool
-BigNum::getDecString (sl::String* string)
+BigNum::getDecString(sl::String* string)
 {
-	char* p = BN_bn2dec (m_h);
+	char* p = BN_bn2dec(m_h);
 	if (!p)
 	{
-		setLastCryptoError ();
+		setLastCryptoError();
 		return false;
 	}
 
 	*string = p;
-	OPENSSL_free (p);
+	OPENSSL_free(p);
 	return true;
 }
 
 bool
-BigNum::getHexString (sl::String* string)
+BigNum::getHexString(sl::String* string)
 {
-	char* p = BN_bn2hex (m_h);
+	char* p = BN_bn2hex(m_h);
 	if (!p)
 	{
-		setLastCryptoError ();
+		setLastCryptoError();
 		return false;
 	}
 
 	*string = p;
-	OPENSSL_free (p);
+	OPENSSL_free(p);
 	return true;
 }
 

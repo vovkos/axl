@@ -29,14 +29,14 @@ protected:
 	pthread_condattr_t m_attr;
 
 public:
-	CondAttr ()
+	CondAttr()
 	{
-		::pthread_condattr_init (&m_attr);
+		::pthread_condattr_init(&m_attr);
 	}
 
-	~CondAttr ()
+	~CondAttr()
 	{
-		::pthread_condattr_destroy (&m_attr);
+		::pthread_condattr_destroy(&m_attr);
 	}
 
 	operator const pthread_condattr_t* () const
@@ -50,17 +50,17 @@ public:
 	}
 
 	bool
-	getProcessShared (int* value) const
+	getProcessShared(int* value) const
 	{
-		int result = ::pthread_condattr_getpshared (&m_attr, value);
-		return result == 0 ? true : err::fail (result);
+		int result = ::pthread_condattr_getpshared(&m_attr, value);
+		return result == 0 ? true : err::fail(result);
 	}
 
 	bool
-	setProcessShared (int value)
+	setProcessShared(int value)
 	{
-		int result = ::pthread_condattr_setpshared (&m_attr, value);
-		return result == 0 ? true : err::fail (result);
+		int result = ::pthread_condattr_setpshared(&m_attr, value);
+		return result == 0 ? true : err::fail(result);
 	}
 };
 
@@ -72,14 +72,14 @@ protected:
 	pthread_cond_t m_cond;
 
 public:
-	Cond (const pthread_condattr_t* attr = NULL)
+	Cond(const pthread_condattr_t* attr = NULL)
 	{
-		::pthread_cond_init (&m_cond, attr);
+		::pthread_cond_init(&m_cond, attr);
 	}
 
-	~Cond ()
+	~Cond()
 	{
-		::pthread_cond_destroy (&m_cond);
+		::pthread_cond_destroy(&m_cond);
 	}
 
 	operator pthread_cond_t* ()
@@ -88,28 +88,28 @@ public:
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		int result = ::pthread_cond_signal (&m_cond);
-		return result == 0 ? true : err::fail (result);
+		int result = ::pthread_cond_signal(&m_cond);
+		return result == 0 ? true : err::fail(result);
 	}
 
 	bool
-	broadcast ()
+	broadcast()
 	{
-		int result = ::pthread_cond_broadcast (&m_cond);
-		return result == 0 ? true : err::fail (result);
+		int result = ::pthread_cond_broadcast(&m_cond);
+		return result == 0 ? true : err::fail(result);
 	}
 
 	bool
-	wait (pthread_mutex_t* mutex)
+	wait(pthread_mutex_t* mutex)
 	{
-		int result = ::pthread_cond_wait (&m_cond, mutex);
-		return result == 0 ? true : err::fail (result);
+		int result = ::pthread_cond_wait(&m_cond, mutex);
+		return result == 0 ? true : err::fail(result);
 	}
 
 	bool
-	wait (
+	wait(
 		pthread_mutex_t* mutex,
 		uint_t timeout
 		);
@@ -124,59 +124,59 @@ protected:
 	Mutex m_mutex;
 
 public:
-	CondMutexPair ()
+	CondMutexPair()
 	{
 	}
 
-	CondMutexPair (
+	CondMutexPair(
 		const pthread_condattr_t* condAttr,
 		const pthread_mutexattr_t* mutexAttr
 		):
-		m_cond (condAttr),
-		m_mutex (mutexAttr)
+		m_cond(condAttr),
+		m_mutex(mutexAttr)
 	{
 	}
 
 	bool
-	tryLock ()
+	tryLock()
 	{
-		return m_mutex.tryLock ();
+		return m_mutex.tryLock();
 	}
 
 	void
-	lock ()
+	lock()
 	{
-		m_mutex.lock ();
+		m_mutex.lock();
 	}
 
 	void
-	unlock ()
+	unlock()
 	{
-		m_mutex.unlock ();
+		m_mutex.unlock();
 	}
 
 	bool
-	signal ()
+	signal()
 	{
-		return m_cond.signal ();
+		return m_cond.signal();
 	}
 
 	bool
-	broadcast ()
+	broadcast()
 	{
-		return m_cond.broadcast ();
+		return m_cond.broadcast();
 	}
 
 	bool
-	wait ()
+	wait()
 	{
-		return m_cond.wait (m_mutex);
+		return m_cond.wait(m_mutex);
 	}
 
 	bool
-	wait (uint_t timeout)
+	wait(uint_t timeout)
 	{
-		return m_cond.wait (m_mutex, timeout);
+		return m_cond.wait(m_mutex, timeout);
 	}
 };
 

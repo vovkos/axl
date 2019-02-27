@@ -22,7 +22,7 @@ namespace gui {
 //..............................................................................
 
 bool
-buildLogFont (
+buildLogFont(
 	LOGFONTW* logFont,
 	const sl::StringRef_w& family,
 	size_t pointSize,
@@ -31,27 +31,27 @@ buildLogFont (
 
 inline
 bool
-getLogFontFromFontDesc (
+getLogFontFromFontDesc(
 	const FontDesc& fontDesc,
 	LOGFONTW* logFont
 	)
 {
-	return buildLogFont (
+	return buildLogFont(
 		logFont,
-		sl::String_w (fontDesc.m_family),
+		sl::String_w(fontDesc.m_family),
 		fontDesc.m_pointSize,
 		fontDesc.m_flags
 		);
 }
 
 void
-modifyLogFont (
+modifyLogFont(
 	LOGFONTW* logFont,
 	uint_t flags
 	);
 
 bool
-getFontDescFromLogFont (
+getFontDescFromLogFont(
 	const LOGFONTW* logFont,
 	FontDesc* fontDesc
 	);
@@ -60,36 +60,36 @@ getFontDescFromLogFont (
 
 class GdiFont:
 	public Font,
-	public GdiObjectHandle <HFONT>
+	public GdiObjectHandle<HFONT>
 {
 	friend class GdiEngine;
 
 public:
-	GdiFont ();
+	GdiFont();
 
 	bool
-	getLogFont (LOGFONTW* logFont);
+	getLogFont(LOGFONTW* logFont);
 
 	virtual
 	bool
-	isMonospace ();
+	isMonospace();
 
 	virtual
 	Size
-	calcTextSize_utf8 (const sl::StringRef_utf8& text);
+	calcTextSize_utf8(const sl::StringRef_utf8& text);
 
 	virtual
 	Size
-	calcTextSize_utf16 (const sl::StringRef_utf16& text);
+	calcTextSize_utf16(const sl::StringRef_utf16& text);
 
 	virtual
 	Size
-	calcTextSize_utf32 (const sl::StringRef_utf32& text);
+	calcTextSize_utf32(const sl::StringRef_utf32& text);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef FontTuple <GdiFont> GdiFontuple;
+typedef FontTuple<GdiFont> GdiFontuple;
 
 //..............................................................................
 

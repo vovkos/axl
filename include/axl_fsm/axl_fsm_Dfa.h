@@ -37,19 +37,19 @@ struct DfaState: sl::ListLink
 	uint_t m_acceptNfaStateId;
 	void* m_acceptContext;
 
-	sl::List <DfaTransition> m_transitionList;
+	sl::List<DfaTransition> m_transitionList;
 
 	NfaStateSet m_nfaStateSet;
 	sl::BitMap m_openCaptureIdSet;
 	sl::BitMap m_closeCaptureIdSet;
 
-	DfaState ();
+	DfaState();
 
 	bool
-	addNfaState (NfaState* state);
+	addNfaState(NfaState* state);
 
 	void
-	makeEpsilonClosure ();
+	makeEpsilonClosure();
 };
 
 //..............................................................................

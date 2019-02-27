@@ -9,7 +9,7 @@
 #
 #...............................................................................
 
-set (
+set(
 	_LUA_LIB_NAME_LIST
 	lua
 	lua5
@@ -21,49 +21,49 @@ set (
 	lua5.1
 	)
 
-if (NOT LUA_INC_DIR)
-	axl_find_inc_dir (
+if(NOT LUA_INC_DIR)
+	axl_find_inc_dir(
 		LUA_INC_DIR
 		lua.h
 		PATH_SUFFIXES . ${_LUA_LIB_NAME_LIST}
 		)
-endif ()
+endif()
 
-if (NOT LUA_LIB_DIR)
-	if (NOT LUA_LIB_NAME)
-		axl_find_lib_dir_ex (
+if(NOT LUA_LIB_DIR)
+	if(NOT LUA_LIB_NAME)
+		axl_find_lib_dir_ex(
 			RESULT_LIB_DIR LUA_LIB_DIR
 			RESULT_LIB_NAME LUA_LIB_NAME
 			LIB_NAME ${_LUA_LIB_NAME_LIST}
 			)
-	else ()
-		axl_find_lib_dir_ex (
+	else()
+		axl_find_lib_dir_ex(
 			RESULT_LIB_DIR LUA_LIB_DIR
 			LIB_NAME ${LUA_LIB_NAME}
 			)
-	endif ()
-elseif (NOT LUA_LIB_NAME)
-	axl_find_lib_dir_ex (
+	endif()
+elseif(NOT LUA_LIB_NAME)
+	axl_find_lib_dir_ex(
 		RESULT_LIB_NAME LUA_LIB_NAME
 		LIB_DIR ${LUA_LIB_DIR}
 		LIB_NAME ${_LUA_LIB_NAME_LIST}
 		)
-endif ()
+endif()
 
-if (EXISTS ${LUA_INC_DIR}/lua.h AND LUA_LIB_DIR AND LUA_LIB_NAME)
-	axl_message ("Lua paths:")
-	axl_message ("    Includes:"  "${LUA_INC_DIR}")
-	axl_message ("    Libraries:" "${LUA_LIB_DIR}")
+if(EXISTS ${LUA_INC_DIR}/lua.h AND LUA_LIB_DIR AND LUA_LIB_NAME)
+	axl_message("Lua paths:")
+	axl_message("    Includes:"  "${LUA_INC_DIR}")
+	axl_message("    Libraries:" "${LUA_LIB_DIR}")
 
-	if (LUA_DLL_DIR)
-		axl_message ("    DLLs:" "${LUA_DLL_DIR}")
-	endif ()
+	if(LUA_DLL_DIR)
+		axl_message("    DLLs:" "${LUA_DLL_DIR}")
+	endif()
 
-	axl_message ("    Library name:" "${LUA_LIB_NAME}")
+	axl_message("    Library name:" "${LUA_LIB_NAME}")
 
-	set (LUA_FOUND TRUE)
-else ()
-	set (LUA_FOUND FALSE)
-endif ()
+	set(LUA_FOUND TRUE)
+else()
+	set(LUA_FOUND FALSE)
+endif()
 
 #...............................................................................

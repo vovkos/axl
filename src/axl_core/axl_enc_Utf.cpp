@@ -25,9 +25,9 @@ namespace enc {
 //..............................................................................
 
 const char*
-getUtfKindString (UtfKind utfKind)
+getUtfKindString(UtfKind utfKind)
 {
-	static const char* stringTable [] =
+	static const char* stringTable[] =
 	{
 		"UTF-8",                // UtfKind_Utf8 = 0,
 		"UTF-16",               // UtfKind_Utf16,
@@ -36,8 +36,8 @@ getUtfKindString (UtfKind utfKind)
 		"UTF-32 (big-endian)",  // UtfKind_Utf32_be,
 	};
 
-	return (size_t) utfKind < countof (stringTable) ?
-		stringTable [utfKind] :
+	return (size_t)utfKind < countof(stringTable) ?
+		stringTable[utfKind] :
 		"undefined-utf-kind";
 }
 
@@ -81,11 +81,11 @@ static const uint8_t flagsOffset[256]={
 /*
  * Get the value of an optional-value slot where HAS_SLOT(excWord, idx).
  *
- * @param excWord (in) initial exceptions word
- * @param idx (in) desired slot index
- * @param pExc16 (in/out) const uint16_t * after excWord=*pExc16++;
+ * @param excWord(in)initial exceptions word
+ * @param idx(in)desired slot index
+ * @param pExc16(in/out) const uint16_t * after excWord=*pExc16++;
  *               moved to the last uint16_t of the value, use +1 for beginning of next slot
- * @param value (out) int32_t or uint32_t output if hasSlot, otherwise not modified
+ * @param value(out)int32_t or uint32_t output if hasSlot, otherwise not modified
  */
 #define GET_SLOT_VALUE(excWord, idx, pExc16, value) \
 	if(((excWord)&UCASE_EXC_DOUBLE_SLOTS)==0) { \
@@ -100,7 +100,7 @@ static const uint8_t flagsOffset[256]={
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 bool
-utfIsPrintable (utf32_t c)
+utfIsPrintable(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -108,7 +108,7 @@ utfIsPrintable (utf32_t c)
 }
 
 bool
-utfIsPrintableNonMark (utf32_t c)
+utfIsPrintableNonMark(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -117,7 +117,7 @@ utfIsPrintableNonMark (utf32_t c)
 }
 
 bool
-utfIsSpace (utf32_t c)
+utfIsSpace(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -125,7 +125,7 @@ utfIsSpace (utf32_t c)
 }
 
 bool
-utfIsPunctuation (utf32_t c)
+utfIsPunctuation(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -133,7 +133,7 @@ utfIsPunctuation (utf32_t c)
 }
 
 bool
-utfIsLetter (utf32_t c)
+utfIsLetter(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -141,7 +141,7 @@ utfIsLetter (utf32_t c)
 }
 
 bool
-utfIsDigit (utf32_t c)
+utfIsDigit(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -149,7 +149,7 @@ utfIsDigit (utf32_t c)
 }
 
 bool
-utfIsNumber (utf32_t c)
+utfIsNumber(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -157,7 +157,7 @@ utfIsNumber (utf32_t c)
 }
 
 bool
-utfIsLetterOrDigit (utf32_t c)
+utfIsLetterOrDigit(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -165,7 +165,7 @@ utfIsLetterOrDigit (utf32_t c)
 }
 
 bool
-utfIsLetterOrNumber (utf32_t c)
+utfIsLetterOrNumber(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -173,7 +173,7 @@ utfIsLetterOrNumber (utf32_t c)
 }
 
 bool
-utfIsLowerCase (utf32_t c)
+utfIsLowerCase(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -181,7 +181,7 @@ utfIsLowerCase (utf32_t c)
 }
 
 bool
-utfIsUpperCase (utf32_t c)
+utfIsUpperCase(utf32_t c)
 {
 	uint32_t props;
 	GET_PROPS(c, props);
@@ -189,7 +189,7 @@ utfIsUpperCase (utf32_t c)
 }
 
 utf32_t
-utfToLowerCase (utf32_t c)
+utfToLowerCase(utf32_t c)
 {
 	const UCaseProps *csp = GET_CASE_PROPS();
 	uint16_t props=UTRIE2_GET16(&csp->trie, c);
@@ -208,7 +208,7 @@ utfToLowerCase (utf32_t c)
 }
 
 utf32_t
-utfToUpperCase (utf32_t c)
+utfToUpperCase(utf32_t c)
 {
 	const UCaseProps *csp = GET_CASE_PROPS();
 	uint16_t props=UTRIE2_GET16(&csp->trie, c);
@@ -227,7 +227,7 @@ utfToUpperCase (utf32_t c)
 }
 
 utf32_t
-utfToCaseFolded (utf32_t c)
+utfToCaseFolded(utf32_t c)
 {
 	uint32_t options = U_FOLD_CASE_DEFAULT;
 

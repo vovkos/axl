@@ -25,67 +25,67 @@ class Serial: public File
 {
 public:
 	bool
-	open (
+	open(
 		const sl::StringRef& name,
 		uint_t openFlags = O_RDWR | O_NOCTTY
 		)
 	{
-		return File::open (name, openFlags, 0);
+		return File::open(name, openFlags, 0);
 	}
 
 	bool
-	getAttr (termios* attr) const
+	getAttr(termios* attr) const
 	{
-		int result = ::tcgetattr (m_h, attr);
-		return err::complete (result != -1);
+		int result = ::tcgetattr(m_h, attr);
+		return err::complete(result != -1);
 	}
 
 	bool
-	setAttr (
+	setAttr(
 		const termios* attr,
 		int action = TCSANOW
 		)
 	{
-		int result = ::tcsetattr (m_h, action, attr);
-		return err::complete (result != -1);
+		int result = ::tcsetattr(m_h, action, attr);
+		return err::complete(result != -1);
 	}
 
 	bool
-	drain ()
+	drain()
 	{
-		int result = ::tcdrain (m_h);
-		return err::complete (result != -1);
+		int result = ::tcdrain(m_h);
+		return err::complete(result != -1);
 	}
 
 	bool
-	flush (int queueSelector = TCIOFLUSH)
+	flush(int queueSelector = TCIOFLUSH)
 	{
-		int result = ::tcflush (m_h, queueSelector);
-		return err::complete (result != -1);
+		int result = ::tcflush(m_h, queueSelector);
+		return err::complete(result != -1);
 	}
 
 	bool
-	flow (int action)
+	flow(int action)
 	{
-		int result = ::tcflow (m_h, action);
-		return err::complete (result != -1);
+		int result = ::tcflow(m_h, action);
+		return err::complete(result != -1);
 	}
 
 	uint_t
-	getStatusLines () const;
+	getStatusLines() const;
 
 	bool
-	setDtr (bool isSet);
+	setDtr(bool isSet);
 
 	bool
-	setRts (bool isSet);
+	setRts(bool isSet);
 
 #if (!_AXL_OS_DARWIN)
 	bool
-	wait (uint_t mask)
+	wait(uint_t mask)
 	{
-		int result = ::ioctl (m_h, TIOCMIWAIT, mask);
-		return err::complete (result != -1);
+		int result = ::ioctl(m_h, TIOCMIWAIT, mask);
+		return err::complete(result != -1);
 	}
 #endif
 };

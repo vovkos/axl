@@ -21,7 +21,7 @@ namespace lex {
 //..............................................................................
 
 // {56FC601E-5D2C-4bbe-B455-3D8B81AAD8FF}
-AXL_SL_DEFINE_GUID (g_parseErrorGuid, 0x56fc601e, 0x5d2c, 0x4bbe, 0xb4, 0x55, 0x3d, 0x8b, 0x81, 0xaa, 0xd8, 0xff);
+AXL_SL_DEFINE_GUID(g_parseErrorGuid, 0x56fc601e, 0x5d2c, 0x4bbe, 0xb4, 0x55, 0x3d, 0x8b, 0x81, 0xaa, 0xd8, 0xff);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -42,7 +42,7 @@ class ParseErrorProvider: public err::ErrorProvider
 public:
 	virtual
 	sl::StringRef
-	getErrorDescription (const err::ErrorRef& error);
+	getErrorDescription(const err::ErrorRef& error);
 };
 
 //..............................................................................
@@ -51,26 +51,26 @@ public:
 
 inline
 void
-registerParseErrorProvider ()
+registerParseErrorProvider()
 {
-	err::getErrorMgr ()->registerProvider (
+	err::getErrorMgr()->registerProvider(
 		g_parseErrorGuid,
-		sl::getSimpleSingleton <ParseErrorProvider> ()
+		sl::getSimpleSingleton<ParseErrorProvider> ()
 		);
 }
 
 inline
 size_t
-pushSrcPosError (
+pushSrcPosError(
 	const sl::StringRef& filePath,
 	int line,
 	int col = 0
 	)
 {
-	return err::pushPackError <sl::PackSeq_3 <const char*, int, int> > (
+	return err::pushPackError<sl::PackSeq_3<const char*, int, int> > (
 		g_parseErrorGuid,
 		ParseErrorCode_SrcPos,
-		filePath.sz (),
+		filePath.sz(),
 		line,
 		col
 		);
@@ -78,32 +78,32 @@ pushSrcPosError (
 
 inline
 size_t
-pushSrcPosError (
+pushSrcPosError(
 	const sl::StringRef& filePath,
 	const LineCol& lineCol
 	)
 {
-	return pushSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
+	return pushSrcPosError(filePath, lineCol.m_line, lineCol.m_col);
 }
 
 inline
 size_t
-pushSrcPosError (const SrcPos& srcPos)
+pushSrcPosError(const SrcPos& srcPos)
 {
-	return pushSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
+	return pushSrcPosError(srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
 inline
 bool
-isSrcPosError (const err::ErrorHdr* error)
+isSrcPosError(const err::ErrorHdr* error)
 {
 	return
-		error->m_size >= sizeof (err::ErrorHdr) * 2 + sizeof (char) + sizeof (int) * 2 &&
-		error->isStackTopKindOf (g_parseErrorGuid, ParseErrorCode_SrcPos);
+		error->m_size >= sizeof(err::ErrorHdr)* 2 + sizeof(char) + sizeof(int)* 2 &&
+		error->isStackTopKindOf(g_parseErrorGuid, ParseErrorCode_SrcPos);
 }
 
 void
-decodeSrcPosError (
+decodeSrcPosError(
 	sl::StringRef* filePath,
 	LineCol* lineCol,
 	const err::ErrorHdr* error
@@ -111,116 +111,116 @@ decodeSrcPosError (
 
 inline
 void
-decodeSrcPosError (
+decodeSrcPosError(
 	LineCol* lineCol,
 	const err::ErrorHdr* error
 	)
 {
-	decodeSrcPosError (NULL, lineCol, error);
+	decodeSrcPosError(NULL, lineCol, error);
 }
 
 inline
 void
-decodeSrcPosError (
+decodeSrcPosError(
 	SrcPos* srcPos,
 	const err::ErrorHdr* error
 	)
 {
-	decodeSrcPosError (&srcPos->m_filePath, srcPos, error);
+	decodeSrcPosError(&srcPos->m_filePath, srcPos, error);
 }
 
 inline
 bool
-isLastSrcPosError ()
+isLastSrcPosError()
 {
-	return isSrcPosError (err::getLastError ());
+	return isSrcPosError(err::getLastError());
 }
 
 inline
 void
-ensureSrcPosError (
+ensureSrcPosError(
 	const sl::StringRef& filePath,
 	int line,
 	int col = 0
 	)
 {
-	if (!isLastSrcPosError ())
-		pushSrcPosError (filePath, line, col);
+	if (!isLastSrcPosError())
+		pushSrcPosError(filePath, line, col);
 }
 
 inline
 void
-ensureSrcPosError (
+ensureSrcPosError(
 	const sl::StringRef& filePath,
 	const LineCol& lineCol
 	)
 {
-	ensureSrcPosError (filePath, lineCol.m_line, lineCol.m_col);
+	ensureSrcPosError(filePath, lineCol.m_line, lineCol.m_col);
 }
 
 inline
 void
-ensureSrcPosError (const SrcPos& srcPos)
+ensureSrcPosError(const SrcPos& srcPos)
 {
-	ensureSrcPosError (srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
+	ensureSrcPosError(srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
 }
 
 inline
 size_t
-setSyntaxError ()
+setSyntaxError()
 {
-	return err::setError (g_parseErrorGuid, ParseErrorCode_InvalidSyntax);
+	return err::setError(g_parseErrorGuid, ParseErrorCode_InvalidSyntax);
 }
 
 inline
 size_t
-setSyntaxError (const sl::StringRef& location)
+setSyntaxError(const sl::StringRef& location)
 {
-	return err::setPackError <sl::Pack <const char*> > (
+	return err::setPackError<sl::Pack<const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_InvalidSyntaxIn,
-		location.sz ()
+		location.sz()
 		);
 }
 
 inline
 size_t
-setExpectedTokenError (
+setExpectedTokenError(
 	const sl::StringRef& expectedToken,
 	const sl::StringRef& actualToken
 	)
 {
-	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
+	return err::setPackError<sl::PackSeq_2<const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_ExpectedToken,
-		expectedToken.sz (),
-		actualToken.sz ()
+		expectedToken.sz(),
+		actualToken.sz()
 		);
 }
 
 inline
 size_t
-setUnexpectedTokenError (const sl::StringRef& token)
+setUnexpectedTokenError(const sl::StringRef& token)
 {
-	return err::setPackError <sl::Pack <const char*> > (
+	return err::setPackError<sl::Pack<const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedToken,
-		token.sz ()
+		token.sz()
 		);
 }
 
 inline
 size_t
-setUnexpectedTokenError (
+setUnexpectedTokenError(
 	const sl::StringRef& token,
 	const sl::StringRef& location
 	)
 {
-	return err::setPackError <sl::PackSeq_2 <const char*, const char*> > (
+	return err::setPackError<sl::PackSeq_2<const char*, const char*> > (
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedTokenIn,
-		token.sz (),
-		location.sz ()
+		token.sz(),
+		location.sz()
 		);
 }
 

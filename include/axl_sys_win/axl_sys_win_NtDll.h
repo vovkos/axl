@@ -126,13 +126,13 @@ struct FILE_DIRECTORY_INFORMATION
 	LARGE_INTEGER AllocationSize;
 	ULONG FileAttributes;
 	ULONG FileNameLength;
-	WCHAR FileName [1];
+	WCHAR FileName[1];
 };
 
 struct OBJECT_NAME_INFORMATION
 {
 	UNICODE_STRING Name; // defined in winternl.h
-	WCHAR NameBuffer [1];
+	WCHAR NameBuffer[1];
 };
 
 struct OBJECT_DIRECTORY_INFORMATION
@@ -146,7 +146,7 @@ struct OBJECT_DIRECTORY_INFORMATION
 typedef
 NTSTATUS
 NTAPI
-NtQueryDirectoryFileFunc (
+NtQueryDirectoryFileFunc(
 	IN HANDLE FileHandle,
 	IN HANDLE Event,
 	IN PVOID ApcRoutine,
@@ -163,7 +163,7 @@ NtQueryDirectoryFileFunc (
 typedef
 NTSTATUS
 NTAPI
-NtOpenDirectoryObjectFunc (
+NtOpenDirectoryObjectFunc(
 	OUT PHANDLE DirectoryHandle,
 	IN ACCESS_MASK DesiredAccess,
 	IN POBJECT_ATTRIBUTES ObjectAttributes
@@ -172,7 +172,7 @@ NtOpenDirectoryObjectFunc (
 typedef
 NTSTATUS
 NTAPI
-NtQueryDirectoryObjectFunc (
+NtQueryDirectoryObjectFunc(
 	IN HANDLE DirectoryHandle,
 	OUT PVOID Buffer,
 	IN ULONG Length,
@@ -185,7 +185,7 @@ NtQueryDirectoryObjectFunc (
 typedef
 NTSTATUS
 NTAPI
-NtOpenSymbolicLinkObjectFunc (
+NtOpenSymbolicLinkObjectFunc(
 	OUT PHANDLE LinkHandle,
 	IN ACCESS_MASK DesiredAccess,
 	IN POBJECT_ATTRIBUTES ObjectAttributes
@@ -194,7 +194,7 @@ NtOpenSymbolicLinkObjectFunc (
 typedef
 NTSTATUS
 NTAPI
-NtQuerySymbolicLinkObjectFunc (
+NtQuerySymbolicLinkObjectFunc(
 	IN HANDLE LinkHandle,
 	OUT PUNICODE_STRING LinkTarget,
 	OUT PULONG ReturnedLength
@@ -203,7 +203,7 @@ NtQuerySymbolicLinkObjectFunc (
 typedef
 NTSTATUS
 NTAPI
-NtQueryInformationFileFunc (
+NtQueryInformationFileFunc(
 	HANDLE FileHandle,
 	PIO_STATUS_BLOCK IoStatusBlock,
 	PVOID FileInformation,
@@ -214,7 +214,7 @@ NtQueryInformationFileFunc (
 typedef
 NTSTATUS
 NTAPI
-NtQueryObjectFunc (
+NtQueryObjectFunc(
 	IN HANDLE FileHandle,
 	IN OBJECT_INFORMATION_CLASS InformationClass,
 	OUT PVOID Buffer,
@@ -235,7 +235,7 @@ extern AXL_SELECT_ANY NtQueryObjectFunc* ntQueryObject = NULL;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-initNtDllFunctions ();
+initNtDllFunctions();
 
 //..............................................................................
 

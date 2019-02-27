@@ -18,12 +18,12 @@ namespace iok {
 //..............................................................................
 
 Object
-Iterator::next ()
+Iterator::next()
 {
-	io_object_t p = ::IOIteratorNext (m_p);
+	io_object_t p = ::IOIteratorNext(m_p);
 
 	Object object;
-	object.attach (p);
+	object.attach(p);
 	return object;
 }
 

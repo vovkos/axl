@@ -28,11 +28,11 @@ public:
 	T m_value;
 
 public:
-	BoxListEntry ()
+	BoxListEntry()
 	{
 	}
 
-	BoxListEntry (const T& value)
+	BoxListEntry(const T& value)
 	{
 		m_value = value;
 	}
@@ -46,35 +46,35 @@ template <
 	typename Entry,
 	typename Link
 	>
-class BoxIteratorImpl: public IteratorBase <
+class BoxIteratorImpl: public IteratorBase<
 	T,
 	Entry,
 	Link,
-	ImplicitCast <Entry*, Link*>
+	ImplicitCast<Entry*, Link*>
 	>
 {
 public:
 	Value&
 	operator * () const
 	{
-		return r ();
+		return r();
 	}
 
 	Value*
 	operator -> () const
 	{
-		return p ();
+		return p();
 	}
 
 	Value&
-	r () const
+	r() const
 	{
-		ASSERT (this->m_p);
+		ASSERT(this->m_p);
 		return this->m_p->m_value;
 	}
 
 	Value*
-	p () const
+	p() const
 	{
 		return this->m_p ? &this->m_p->m_value : NULL;
 	}
@@ -83,19 +83,19 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class BoxIterator: public BoxIteratorImpl <
-	BoxIterator <T>,
+class BoxIterator: public BoxIteratorImpl<
+	BoxIterator<T>,
 	T,
-	BoxListEntry <T>,
+	BoxListEntry<T>,
 	ListLink
 	>
 {
 public:
-	BoxIterator ()
+	BoxIterator()
 	{
 	}
 
-	BoxIterator (BoxListEntry <T>* p)
+	BoxIterator(BoxListEntry<T>* p)
 	{
 		this->m_p = p;
 	}
@@ -104,26 +104,26 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class ConstBoxIterator: public BoxIteratorImpl <
-	ConstBoxIterator <T>,
+class ConstBoxIterator: public BoxIteratorImpl<
+	ConstBoxIterator<T>,
 	const T,
-	const BoxListEntry <T>,
+	const BoxListEntry<T>,
 	const ListLink
 	>
 {
 public:
-	ConstBoxIterator ()
+	ConstBoxIterator()
 	{
 	}
 
-	ConstBoxIterator (const BoxListEntry <T>* p)
+	ConstBoxIterator(const BoxListEntry<T>* p)
 	{
 		this->m_p = p;
 	}
 
-	ConstBoxIterator (const BoxIterator <T>& it)
+	ConstBoxIterator(const BoxIterator<T>& it)
 	{
-		this->m_p = it.getEntry ();
+		this->m_p = it.getEntry();
 	}
 };
 
@@ -131,23 +131,23 @@ public:
 
 template <
 	typename T,
-	typename ValueArg = typename ArgType <T>::Type
+	typename ValueArg = typename ArgType<T>::Type
 	>
-class BoxList: public ListBase <
-	BoxListEntry <T>,
-	ImplicitPtrCast <BoxListEntry <T>, ListLink>,
-	BoxIterator <T>,
-	ConstBoxIterator <T>,
-	typename mem::StdDelete <BoxListEntry <T> >
+class BoxList: public ListBase<
+	BoxListEntry<T>,
+	ImplicitPtrCast<BoxListEntry<T>, ListLink>,
+	BoxIterator<T>,
+	ConstBoxIterator<T>,
+	typename mem::StdDelete<BoxListEntry<T> >
 	>
 {
 public:
-	typedef ListBase <
-		BoxListEntry <T>,
-		ImplicitPtrCast <BoxListEntry <T>, ListLink>,
-		BoxIterator <T>,
-		ConstBoxIterator <T>,
-		typename mem::StdDelete <BoxListEntry <T> >
+	typedef ListBase<
+		BoxListEntry<T>,
+		ImplicitPtrCast<BoxListEntry<T>, ListLink>,
+		BoxIterator<T>,
+		ConstBoxIterator<T>,
+		typename mem::StdDelete<BoxListEntry<T> >
 		> BaseType;
 
 	typedef typename BaseType::Entry Entry;
@@ -156,186 +156,186 @@ public:
 public:
 	template <typename L>
 	void
-	copy (const L& list)
+	copy(const L& list)
 	{
-		this->clear ();
+		this->clear();
 
-		typename L::Iterator it = list.getHead ();
+		typename L::Iterator it = list.getHead();
 		for (; it; it++)
-			insertTail (*it);
+			insertTail(*it);
 	}
 
 	T
-	remove (Iterator it)
+	remove(Iterator it)
 	{
 		T value = *it;
-		Entry* entry = it.getEntry ();
-		BaseType::remove (entry);
-		AXL_MEM_DELETE (entry);
+		Entry* entry = it.getEntry();
+		BaseType::remove(entry);
+		AXL_MEM_DELETE(entry);
 		return value;
 	}
 
 	T
-	removeHead ()
+	removeHead()
 	{
-		return this->m_head ? remove (this->m_head) : T ();
+		return this->m_head ? remove(this->m_head) : T();
 	}
 
 	T
-	removeTail ()
+	removeTail()
 	{
-		return this->m_tail ? remove (this->m_tail) : T ();
+		return this->m_tail ? remove(this->m_tail) : T();
 	}
 
 	Iterator
-	insertHead (ValueArg value)
+	insertHead(ValueArg value)
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
+		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
-		return insertHeadEntry (entry);
+		return insertHeadEntry(entry);
 	}
 
 	Iterator
-	insertTail (ValueArg value)
+	insertTail(ValueArg value)
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
+		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
-		return insertTailEntry (entry);
+		return insertTailEntry(entry);
 	}
 
 	Iterator
-	insertBefore (
+	insertBefore(
 		ValueArg value,
 		Iterator before
 		)
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
+		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
-		return insertBeforeEntry (entry, before);
+		return insertBeforeEntry(entry, before);
 	}
 
 	Iterator
-	insertAfter (
+	insertAfter(
 		ValueArg value,
 		Iterator after
 		)
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
+		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
-		return insertAfterEntry (entry, after);
+		return insertAfterEntry(entry, after);
 	}
 
 	// empty element insertion
 
 	Iterator
-	insertHead ()
+	insertHead()
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
-		return insertHeadEntry (entry);
+		Entry* entry = AXL_MEM_NEW(Entry);
+		return insertHeadEntry(entry);
 	}
 
 	Iterator
-	insertTail ()
+	insertTail()
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
-		return insertTailEntry (entry);
+		Entry* entry = AXL_MEM_NEW(Entry);
+		return insertTailEntry(entry);
 	}
 
 	Iterator
-	insertBefore (Iterator before)
+	insertBefore(Iterator before)
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
-		return insertBeforeEntry (entry, before);
+		Entry* entry = AXL_MEM_NEW(Entry);
+		return insertBeforeEntry(entry, before);
 	}
 
 	Iterator
-	insertAfter (Iterator after)
+	insertAfter(Iterator after)
 	{
-		Entry* entry = AXL_MEM_NEW (Entry);
-		return insertAfterEntry (entry, after);
+		Entry* entry = AXL_MEM_NEW(Entry);
+		return insertAfterEntry(entry, after);
 	}
 
 	// direct access to entries
 
 	Entry*
-	removeEntry (Iterator it)
+	removeEntry(Iterator it)
 	{
-		return BaseType::remove (it);
+		return BaseType::remove(it);
 	}
 
 	Entry*
-	removeHeadEntry ()
+	removeHeadEntry()
 	{
-		return BaseType::removeHead ();
+		return BaseType::removeHead();
 	}
 
 	Entry*
-	removeTailEntry ()
+	removeTailEntry()
 	{
-		return BaseType::removeTail ();
+		return BaseType::removeTail();
 	}
 
 	Iterator
-	insertHeadEntry (Entry* entry)
+	insertHeadEntry(Entry* entry)
 	{
-		return BaseType::insertHead (entry);
+		return BaseType::insertHead(entry);
 	}
 
 	Iterator
-	insertTailEntry (Entry* entry)
+	insertTailEntry(Entry* entry)
 	{
-		return BaseType::insertTail (entry);
+		return BaseType::insertTail(entry);
 	}
 
 	Iterator
-	insertBeforeEntry (
+	insertBeforeEntry(
 		Entry* entry,
 		Iterator before
 		)
 	{
-		return BaseType::insertBefore (entry, before);
+		return BaseType::insertBefore(entry, before);
 	}
 
 	Iterator
-	insertAfterEntry (
+	insertAfterEntry(
 		Entry* entry,
 		Iterator after
 		)
 	{
-		return BaseType::insertAfter (entry, after);
+		return BaseType::insertAfter(entry, after);
 	}
 };
 
 //..............................................................................
 
 template <typename T>
-class ConstBoxList: public ConstListBase <
-	BoxListEntry <T>,
-	ImplicitPtrCast <BoxListEntry <T>, ListLink>,
-	ConstBoxIterator <T>
+class ConstBoxList: public ConstListBase<
+	BoxListEntry<T>,
+	ImplicitPtrCast<BoxListEntry<T>, ListLink>,
+	ConstBoxIterator<T>
 	>
 {
 public:
-	ConstBoxList ()
+	ConstBoxList()
 	{
 	}
 
 	template <typename ValueArg>
-	ConstBoxList (const BoxList <T, ValueArg>& list)
+	ConstBoxList(const BoxList<T, ValueArg>& list)
 	{
-		this->m_listData = list.getListData ();
+		this->m_listData = list.getListData();
 	}
 
 	template <typename Delete>
-	ConstBoxList (
-		const List <
-			BoxListEntry <T>,
+	ConstBoxList(
+		const List<
+			BoxListEntry<T>,
 			typename ConstBoxList::GetLink,
 			Delete
 			>& list
 		)
 	{
-		this->m_listData = list.getListData ();
+		this->m_listData = list.getListData();
 	}
 };
 

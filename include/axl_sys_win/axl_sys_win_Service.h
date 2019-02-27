@@ -28,13 +28,13 @@ public:
 	void
 	operator () (SC_HANDLE h)
 	{
-		::CloseServiceHandle (h);
+		::CloseServiceHandle(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef sl::Handle <SC_HANDLE, CloseServiceHandle> ServiceHandle;
+typedef sl::Handle<SC_HANDLE, CloseServiceHandle> ServiceHandle;
 
 //..............................................................................
 
@@ -42,75 +42,75 @@ class Service: public ServiceHandle
 {
 public:
 	bool
-	start (
-		const wchar_t* argv [],
+	start(
+		const wchar_t* argv[],
 		size_t argc
 		)
 	{
-		bool_t result = ::StartServiceW (m_h, argc, argv);
-		return err::complete (result);
+		bool_t result = ::StartServiceW(m_h, argc, argv);
+		return err::complete(result);
 	}
 
 	bool
-	start ()
+	start()
 	{
-		return start (NULL, 0);
+		return start(NULL, 0);
 	}
 
 	bool
-	stop ()
+	stop()
 	{
 		SERVICE_STATUS serviceStatus;
-		return control (SERVICE_CONTROL_STOP, &serviceStatus);
+		return control(SERVICE_CONTROL_STOP, &serviceStatus);
 	}
 
 	bool
-	control (
+	control(
 		dword_t code,
 		SERVICE_STATUS* serviceStatus
 		)
 	{
-		bool_t result = ::ControlService (m_h, code, serviceStatus);
-		return err::complete (result);
+		bool_t result = ::ControlService(m_h, code, serviceStatus);
+		return err::complete(result);
 	}
 
 	bool
-	remove ()
+	remove()
 	{
-		bool_t result = ::DeleteService (m_h);
-		return err::complete (result);
+		bool_t result = ::DeleteService(m_h);
+		return err::complete(result);
 	}
 
 	bool
-	setServiceType (dword_t serviceType)
+	setServiceType(dword_t serviceType)
 	{
-		return changeServiceConfig (serviceType, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE);
+		return changeServiceConfig(serviceType, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE);
 	}
 
 	bool
-	setStartType (dword_t startType)
+	setStartType(dword_t startType)
 	{
-		return changeServiceConfig (SERVICE_NO_CHANGE, startType, SERVICE_NO_CHANGE);
+		return changeServiceConfig(SERVICE_NO_CHANGE, startType, SERVICE_NO_CHANGE);
 	}
 
 	bool
-	setErrorControl (dword_t errorControl)
+	setErrorControl(dword_t errorControl)
 	{
-		return changeServiceConfig (SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, errorControl);
+		return changeServiceConfig(SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, errorControl);
 	}
 
 	bool
-	setDescription (const sl::StringRef_w& description);
+	setDescription(const sl::StringRef_w& description);
 
 	bool
-	queryServiceStatus (SERVICE_STATUS* serviceStatus)
+	queryServiceStatus(SERVICE_STATUS* serviceStatus)
 	{
-		bool_t result = ::QueryServiceStatus (m_h, serviceStatus);
-		return err::complete (result);
+		bool_t result = ::QueryServiceStatus(m_h, serviceStatus);
+		return err::complete(result);
 	}
 
 	bool
-	changeServiceConfig (
+	changeServiceConfig(
 		dword_t serviceType,
 		dword_t startType,
 		dword_t errorControl,
@@ -123,31 +123,31 @@ public:
 		const sl::StringRef_w& displayName = NULL
 		)
 	{
-		bool_t result = ::ChangeServiceConfigW (
+		bool_t result = ::ChangeServiceConfigW(
 			m_h,
 			serviceType,
 			startType,
 			errorControl,
-			binaryFilePath.szn (),
-			loadOrderGroup.szn (),
+			binaryFilePath.szn(),
+			loadOrderGroup.szn(),
 			tagId,
-			dependencies.szn (),
-			serviceStartName.szn (),
-			password.szn (),
-			displayName.szn ()
+			dependencies.szn(),
+			serviceStartName.szn(),
+			password.szn(),
+			displayName.szn()
 			);
 
-		return err::complete (result);
+		return err::complete(result);
 	}
 
 	bool
-	changeServiceConfig2 (
+	changeServiceConfig2(
 		dword_t infoLevel,
 		const void* info
 		)
 	{
-		bool_t result = ::ChangeServiceConfig2W (m_h, infoLevel, (void*) info);
-		return err::complete (result);
+		bool_t result = ::ChangeServiceConfig2W(m_h, infoLevel, (void*)info);
+		return err::complete(result);
 	}
 };
 

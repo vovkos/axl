@@ -26,7 +26,7 @@ class Tracker
 {
 protected:
 	sys::Lock m_lock;
-	sl::AuxList <TrackerBlockHdr> m_blockList;
+	sl::AuxList<TrackerBlockHdr> m_blockList;
 
 	size_t m_peakBlockCount;
 	size_t m_totalBlockCount;
@@ -35,16 +35,16 @@ protected:
 	size_t m_totalSize;
 
 public:
-	Tracker ();
+	Tracker();
 
 	void
-	add (TrackerBlockHdr* hdr);
+	add(TrackerBlockHdr* hdr);
 
 	void
-	remove (TrackerBlockHdr* hdr);
+	remove(TrackerBlockHdr* hdr);
 
 	void
-	trace ();
+	trace();
 };
 
 //..............................................................................

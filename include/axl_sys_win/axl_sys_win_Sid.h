@@ -57,156 +57,156 @@ public:
 	size_t
 	operator () (const SID* sid)
 	{
-		return ::GetLengthSid ((PSID) sid);
+		return ::GetLengthSid((PSID)sid);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Sid: public ref::Buf <SID, SizeOfSid>
+class Sid: public ref::Buf<SID, SizeOfSid>
 {
 public:
-	Sid ()
+	Sid()
 	{
 	}
 
-	Sid (const SID* sid)
+	Sid(const SID* sid)
 	{
-		copy (sid);
+		copy(sid);
 	}
 
-	Sid (
+	Sid(
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
 		...
 		)
 	{
-		AXL_VA_DECL (va, subAuthorityCount);
-		create_va (identifierAuthority, subAuthorityCount, va);
+		AXL_VA_DECL(va, subAuthorityCount);
+		create_va(identifierAuthority, subAuthorityCount, va);
 	}
 
 	Sid&
 	operator = (const Sid& src)
 	{
-		copy (src);
+		copy(src);
 		return *this;
 	}
 
 	Sid&
 	operator = (const SID* sid)
 	{
-		copy (sid);
+		copy(sid);
 		return *this;
 	}
 
 	bool
-	create (
+	create(
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
 		...
 		)
 	{
-		AXL_VA_DECL (va, subAuthorityCount);
-		return create_va (identifierAuthority, subAuthorityCount, va);
+		AXL_VA_DECL(va, subAuthorityCount);
+		return create_va(identifierAuthority, subAuthorityCount, va);
 	}
 
 	bool
-	create_va (
+	create_va(
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
 		axl_va_list va
 		);
 
 	bool
-	parse (const sl::StringRef& string);
+	parse(const sl::StringRef& string);
 
 	bool
-	parse (const sl::StringRef_w& string);
+	parse(const sl::StringRef_w& string);
 
 	bool
-	getString (sl::String* string) const;
+	getString(sl::String* string) const;
 
 	sl::String
-	getString () const
+	getString() const
 	{
 		sl::String string;
-		getString (&string);
+		getString(&string);
 		return string;
 	}
 
 	bool
-	lookupAccountName (
+	lookupAccountName(
 		const sl::StringRef& systemName,
 		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
 		);
 
 	bool
-	lookupAccountName (
+	lookupAccountName(
 		const sl::StringRef_w& systemName,
 		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
 		);
 
 	bool
-	lookupAccountName (
+	lookupAccountName(
 		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
-		return lookupAccountName (NULL, accountName, sidType);
+		return lookupAccountName(NULL, accountName, sidType);
 	}
 
 	bool
-	lookupAccountName (
+	lookupAccountName(
 		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
-		return lookupAccountName (NULL, accountName, sidType);
+		return lookupAccountName(NULL, accountName, sidType);
 	}
 
 	bool
-	lookupAccountSid (
+	lookupAccountSid(
 		const sl::StringRef& systemName,
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
-		return lookupAccountSid (systemName, m_p, accountName, sidType);
+		return lookupAccountSid(systemName, m_p, accountName, sidType);
 	}
 
 	bool
-	lookupAccountSid (
+	lookupAccountSid(
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
-		return lookupAccountSid (NULL, m_p, accountName, sidType);
+		return lookupAccountSid(NULL, m_p, accountName, sidType);
 	}
 
 	sl::String
-	lookupAccountSid (
+	lookupAccountSid(
 		const sl::StringRef& systemName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
 		sl::String accountName;
-		lookupAccountSid (systemName, m_p, &accountName, sidType);
+		lookupAccountSid(systemName, m_p, &accountName, sidType);
 		return accountName;
 	}
 
 	sl::String
-	lookupAccountSid (SID_NAME_USE* sidType = NULL)
+	lookupAccountSid(SID_NAME_USE* sidType = NULL)
 	{
 		sl::String accountName;
-		lookupAccountSid (NULL, m_p, &accountName, sidType);
+		lookupAccountSid(NULL, m_p, &accountName, sidType);
 		return accountName;
 	}
 
 	static
 	bool
-	lookupAccountSid (
+	lookupAccountSid(
 		const sl::StringRef& systemName,
 		const SID* sid,
 		sl::String* accountName,
@@ -215,36 +215,36 @@ public:
 
 	static
 	bool
-	lookupAccountSid (
+	lookupAccountSid(
 		const SID* sid,
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
-		return lookupAccountSid (NULL, sid, accountName, sidType);
+		return lookupAccountSid(NULL, sid, accountName, sidType);
 	}
 
 	static
 	sl::String
-	lookupAccountSid (
+	lookupAccountSid(
 		const sl::StringRef& systemName,
 		const SID* sid,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
 		sl::String accountName;
-		lookupAccountSid (systemName, sid, &accountName, sidType);
+		lookupAccountSid(systemName, sid, &accountName, sidType);
 		return accountName;
 	}
 
 	static
 	sl::String
-	lookupAccountSid (
+	lookupAccountSid(
 		const SID* sid,
 		SID_NAME_USE* sidType = NULL
 		)
 	{
-		return lookupAccountSid (NULL, sid, sidType);
+		return lookupAccountSid(NULL, sid, sidType);
 	}
 };
 

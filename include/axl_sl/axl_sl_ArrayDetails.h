@@ -25,12 +25,12 @@ template <typename T>
 class ReverseArray
 {
 public:
-	typedef typename ArgType <T>::Type ValueArg;
+	typedef typename ArgType<T>::Type ValueArg;
 
 public:
 	static
 	void
-	reverse (
+	reverse(
 		T* dst,
 		size_t count
 		)
@@ -49,7 +49,7 @@ public:
 
 	static
 	void
-	copyReverse (
+	copyReverse(
 		T* dst,
 		const T* src,
 		size_t count
@@ -57,34 +57,34 @@ public:
 	{
 		if (src == dst) // in-place
 		{
-			reverse (dst, count);
+			reverse(dst, count);
 		}
 		else if (src + count <= dst || dst + count <= src)
 		{
-			copyReverseImpl (dst, src, count);
+			copyReverseImpl(dst, src, count);
 		}
 		else if (src < dst)// random overlap
 		{
 			size_t nonOverlapCount = dst - src;
 			size_t overlapCount = count - nonOverlapCount;
 
-			reverse (dst, overlapCount);
-			copyReverseImpl (dst + overlapCount, src, nonOverlapCount);
+			reverse(dst, overlapCount);
+			copyReverseImpl(dst + overlapCount, src, nonOverlapCount);
 		}
 		else
 		{
 			size_t nonOverlapCount = src - dst;
 			size_t overlapCount = count - nonOverlapCount;
 
-			reverse (dst + nonOverlapCount, overlapCount);
-			copyReverseImpl (dst, src + overlapCount, nonOverlapCount);
+			reverse(dst + nonOverlapCount, overlapCount);
+			copyReverseImpl(dst, src + overlapCount, nonOverlapCount);
 		}
 	}
 
 protected:
 	static
 	void
-	copyReverseImpl (
+	copyReverseImpl(
 		T* dst,
 		const T* src,
 		size_t count
@@ -102,7 +102,7 @@ protected:
 // general case: full cycle of construction, copy, destruction
 
 template <typename T>
-class ArrayDetails: public ReverseArray <T>
+class ArrayDetails: public ReverseArray<T>
 {
 public:
 	class Hdr: public ref::BufHdr
@@ -110,9 +110,9 @@ public:
 	public:
 		size_t m_count;
 
-		~Hdr ()
+		~Hdr()
 		{
-			destruct ((T*) (this + 1), m_count);
+			destruct((T*)(this + 1), m_count);
 		}
 	};
 
@@ -132,7 +132,7 @@ public:
 		{
 			T* end = p + count;
 			for (; p < end; p++)
-				new (p) T;
+				new(p)T;
 		}
 	};
 
@@ -145,15 +145,15 @@ public:
 			size_t count
 			) const
 		{
-			memset (p, 0, count * sizeof (T));
-			Construct () (p, count);
+			memset(p, 0, count * sizeof(T));
+			Construct() (p, count);
 		}
 	};
 
 public:
 	static
 	void
-	setHdrCount (
+	setHdrCount(
 		Hdr* hdr,
 		size_t count
 		)
@@ -163,7 +163,7 @@ public:
 
 	static
 	void
-	constructCopy (
+	constructCopy(
 		T* dst,
 		const T* src,
 		size_t count
@@ -171,24 +171,24 @@ public:
 	{
 		T* end = dst + count;
 		for (; dst < end; dst++, src++)
-			new (dst) T (*src);
+			new(dst)T(*src);
 	}
 
 	static
 	void
-	destruct (
+	destruct(
 		T* p,
 		size_t count
 		)
 	{
 		T* end = p + count;
 		for (; p < end; p++)
-			p->~T ();
+			p->~T();
 	}
 
 	static
 	void
-	copy (
+	copy(
 		T* dst,
 		const T* src,
 		size_t count
@@ -222,7 +222,7 @@ public:
 // fast memory block operations for types that do not need ctor/dtor
 
 template <typename T>
-class SimpleArrayDetails: public ReverseArray <T>
+class SimpleArrayDetails: public ReverseArray<T>
 {
 public:
 	typedef ref::BufHdr Hdr;
@@ -253,14 +253,14 @@ public:
 			size_t count
 			) const
 		{
-			memset (p, 0, count * sizeof (T));
+			memset(p, 0, count * sizeof(T));
 		}
 	};
 
 public:
 	static
 	void
-	setHdrCount (
+	setHdrCount(
 		Hdr* hdr,
 		size_t count
 		)
@@ -269,18 +269,18 @@ public:
 
 	static
 	void
-	constructCopy (
+	constructCopy(
 		T* dst,
 		const T* src,
 		size_t count
 		)
 	{
-		memcpy (dst, src, count * sizeof (T));
+		memcpy(dst, src, count * sizeof(T));
 	}
 
 	static
 	void
-	destruct (
+	destruct(
 		T* p,
 		size_t count
 		)
@@ -289,13 +289,13 @@ public:
 
 	static
 	void
-	copy (
+	copy(
 		T* dst,
 		const T* src,
 		size_t count
 		)
 	{
-		memmove (dst, src, count * sizeof (T));
+		memmove(dst, src, count * sizeof(T));
 	}
 };
 
@@ -304,62 +304,62 @@ public:
 // specialization for primitive types
 
 template <>
-class ArrayDetails <char>: public SimpleArrayDetails <char>
+class ArrayDetails<char>: public SimpleArrayDetails<char>
 {
 };
 
 template <>
-class ArrayDetails <wchar_t>: public SimpleArrayDetails <wchar_t>
+class ArrayDetails<wchar_t>: public SimpleArrayDetails<wchar_t>
 {
 };
 
 template <>
-class ArrayDetails <float>: public SimpleArrayDetails <float>
+class ArrayDetails<float>: public SimpleArrayDetails<float>
 {
 };
 
 template <>
-class ArrayDetails <double>: public SimpleArrayDetails <double>
+class ArrayDetails<double>: public SimpleArrayDetails<double>
 {
 };
 
 template <>
-class ArrayDetails <int8_t>: public SimpleArrayDetails <int8_t>
+class ArrayDetails<int8_t>: public SimpleArrayDetails<int8_t>
 {
 };
 
 template <>
-class ArrayDetails <uint8_t>: public SimpleArrayDetails <uint8_t>
+class ArrayDetails<uint8_t>: public SimpleArrayDetails<uint8_t>
 {
 };
 
 template <>
-class ArrayDetails <int16_t>: public SimpleArrayDetails <int16_t>
+class ArrayDetails<int16_t>: public SimpleArrayDetails<int16_t>
 {
 };
 
 template <>
-class ArrayDetails <uint16_t>: public SimpleArrayDetails <uint16_t>
+class ArrayDetails<uint16_t>: public SimpleArrayDetails<uint16_t>
 {
 };
 
 template <>
-class ArrayDetails <int32_t>: public SimpleArrayDetails <int32_t>
+class ArrayDetails<int32_t>: public SimpleArrayDetails<int32_t>
 {
 };
 
 template <>
-class ArrayDetails <uint32_t>: public SimpleArrayDetails <uint32_t>
+class ArrayDetails<uint32_t>: public SimpleArrayDetails<uint32_t>
 {
 };
 
 template <>
-class ArrayDetails <int64_t>: public SimpleArrayDetails <int64_t>
+class ArrayDetails<int64_t>: public SimpleArrayDetails<int64_t>
 {
 };
 
 template <>
-class ArrayDetails <uint64_t>: public SimpleArrayDetails <uint64_t>
+class ArrayDetails<uint64_t>: public SimpleArrayDetails<uint64_t>
 {
 };
 
@@ -368,7 +368,7 @@ class ArrayDetails <uint64_t>: public SimpleArrayDetails <uint64_t>
 // specialization for pointers
 
 template <typename T>
-class ArrayDetails <T*>: public SimpleArrayDetails <T*>
+class ArrayDetails<T*>: public SimpleArrayDetails<T*>
 {
 };
 

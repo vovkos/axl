@@ -22,9 +22,9 @@ namespace sl {
 
 template <typename T>
 void
-construct (T* p)
+construct(T* p)
 {
-	new (p) T;
+	new(p)T;
 }
 
 template <
@@ -32,12 +32,12 @@ template <
 	typename Arg
 	>
 void
-construct (
+construct(
 	T* p,
 	Arg arg
 	)
 {
-	new (p) T (arg);
+	new(p)T(arg);
 }
 
 template <
@@ -46,13 +46,13 @@ template <
 	typename Arg2
 	>
 void
-construct (
+construct(
 	T* p,
 	Arg1 arg1,
 	Arg2 arg2
 	)
 {
-	new (p) T (arg1, arg2);
+	new(p)T(arg1, arg2);
 }
 
 template <
@@ -62,14 +62,14 @@ template <
 	typename Arg3
 	>
 void
-construct (
+construct(
 	T* p,
 	Arg1 arg1,
 	Arg2 arg2,
 	Arg3 arg3
 	)
 {
-	new (p) T (arg1, arg2, arg3);
+	new(p)T(arg1, arg2, arg3);
 }
 
 template <
@@ -80,7 +80,7 @@ template <
 	typename Arg4
 	>
 void
-construct (
+construct(
 	T* p,
 	Arg1 arg1,
 	Arg2 arg2,
@@ -88,21 +88,21 @@ construct (
 	Arg4 arg4
 	)
 {
-	new (p) T (arg1, arg2, arg3, arg4);
+	new(p)T(arg1, arg2, arg3, arg4);
 }
 
 template <typename T>
 void
-destruct (T* p)
+destruct(T* p)
 {
-	p->~T ();
+	p->~T();
 }
 
 // be careful to only use takeOver where its applicable
 
 template <typename T>
 void
-takeOver (
+takeOver(
 	T* dst,
 	T* src
 	)
@@ -110,9 +110,9 @@ takeOver (
 	if (dst == src)
 		return;
 
-	dst->~T ();
-	memcpy (dst, src, sizeof (T));
-	new (src) T;
+	dst->~T();
+	memcpy(dst, src, sizeof(T));
+	new(src)T;
 }
 
 //..............................................................................
@@ -124,7 +124,7 @@ public:
 	void
 	operator () (T* p) const
 	{
-		new (p) T;
+		new(p)T;
 	}
 };
 
@@ -137,7 +137,7 @@ public:
 	void
 	operator () (T* p) const
 	{
-		p->~T ();
+		p->~T();
 	}
 };
 

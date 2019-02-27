@@ -29,7 +29,7 @@ public:
 	void
 	operator () (void* p)
 	{
-		new (p) T;
+		new(p)T;
 	}
 };
 
@@ -37,11 +37,11 @@ public:
 
 template <typename T>
 T*
-getSimpleSingleton (volatile int32_t* flag = NULL)
+getSimpleSingleton(volatile int32_t* flag = NULL)
 {
-	static uchar_t buffer [sizeof (T)] = { 0 };
-	callOnce (ConstructSimpleSingleton <T> (), buffer, flag);
-	return (T*) buffer;
+	static uchar_t buffer[sizeof(T)] = { 0 };
+	callOnce(ConstructSimpleSingleton<T> (), buffer, flag);
+	return (T*)buffer;
 }
 
 //..............................................................................

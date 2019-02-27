@@ -28,11 +28,11 @@ public:
 	void
 	operator () (HANDLE h)
 	{
-		::FindClose (h);
+		::FindClose(h);
 	}
 };
 
-typedef sl::Handle <HANDLE, CloseFileEnumeratorHandle, sl::MinusOne <HANDLE> > FileEnumeratorHandle;
+typedef sl::Handle<HANDLE, CloseFileEnumeratorHandle, sl::MinusOne<HANDLE> > FileEnumeratorHandle;
 
 #elif (_AXL_OS_POSIX)
 
@@ -42,11 +42,11 @@ public:
 	void
 	operator () (DIR* h)
 	{
-		::closedir (h);
+		::closedir(h);
 	}
 };
 
-typedef sl::Handle <DIR*, CloseFileEnumeratorHandle> FileEnumeratorHandle;
+typedef sl::Handle<DIR*, CloseFileEnumeratorHandle> FileEnumeratorHandle;
 
 #endif
 
@@ -57,16 +57,16 @@ protected:
 
 public:
 	bool
-	openDir (const sl::StringRef& dir);
+	openDir(const sl::StringRef& dir);
 
 	bool
-	hasNextFile ()
+	hasNextFile()
 	{
-		return !m_nextFileName.isEmpty ();
+		return !m_nextFileName.isEmpty();
 	}
 
 	sl::String
-	getNextFileName ();
+	getNextFileName();
 };
 
 //..............................................................................

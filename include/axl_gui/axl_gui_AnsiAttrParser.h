@@ -36,10 +36,10 @@ protected:
 	uint_t* m_backColor;
 
 public:
-	AnsiAttrParser ();
+	AnsiAttrParser();
 
 	size_t // returns attr count
-	parse (
+	parse(
 		TextAttr* targetAttr,
 		const TextAttr& baseAttr,
 		const sl::StringRef& string
@@ -47,108 +47,108 @@ public:
 
 protected:
 	void
-	clear (uint_t);
+	clear(uint_t);
 
 	void
-	setFontFlag (uint_t flag);
+	setFontFlag(uint_t flag);
 
 	void
-	clearFontFlag (uint_t flag);
+	clearFontFlag(uint_t flag);
 
 	void
-	setBoldOn (uint_t)
+	setBoldOn(uint_t)
 	{
-		setFontFlag (FontFlag_Bold);
+		setFontFlag(FontFlag_Bold);
 	}
 
 	void
-	setBoldOff (uint_t)
+	setBoldOff(uint_t)
 	{
-		clearFontFlag (FontFlag_Bold);
+		clearFontFlag(FontFlag_Bold);
 	}
 
 	void
-	setItalicOn (uint_t)
+	setItalicOn(uint_t)
 	{
-		setFontFlag (FontFlag_Italic);
+		setFontFlag(FontFlag_Italic);
 	}
 
 	void
-	setItalicOff (uint_t)
+	setItalicOff(uint_t)
 	{
-		clearFontFlag (FontFlag_Italic);
+		clearFontFlag(FontFlag_Italic);
 	}
 
 	void
-	setUnderlineOn (uint_t)
+	setUnderlineOn(uint_t)
 	{
-		setFontFlag (FontFlag_Underline);
+		setFontFlag(FontFlag_Underline);
 	}
 
 	void
-	setUnderlineOff (uint_t)
+	setUnderlineOff(uint_t)
 	{
-		clearFontFlag (FontFlag_Underline);
+		clearFontFlag(FontFlag_Underline);
 	}
 
 	void
-	setFont (uint_t font)
+	setFont(uint_t font)
 	{
-		ASSERT (font >= 10 && font < 20);
+		ASSERT(font >= 10 && font < 20);
 		m_targetAttr->m_fontFlags = m_baseAttr.m_fontFlags;
 	}
 
 	void
-	setInverse (bool isInversed);
+	setInverse(bool isInversed);
 
 	void
-	setInverseOn (uint_t)
+	setInverseOn(uint_t)
 	{
-		setInverse (true);
+		setInverse(true);
 	}
 
 	void
-	setInverseOff (uint_t)
+	setInverseOff(uint_t)
 	{
-		setInverse (false);
+		setInverse(false);
 	}
 
 	void
-	setTextColor (uint_t color)
+	setTextColor(uint_t color)
 	{
-		ASSERT (color >= 30 && color < 38);
+		ASSERT(color >= 30 && color < 38);
 		*m_textColor = StdPalColor_AnsiBlack + color - 30;
 	}
 
 	void
-	setBrightTextColor (uint_t color)
+	setBrightTextColor(uint_t color)
 	{
-		ASSERT (color >= 90 && color < 98);
+		ASSERT(color >= 90 && color < 98);
 		*m_textColor = StdPalColor_AnsiBrightBlack + color - 90;
 	}
 
 	void
-	setBaseTextColor (uint_t)
+	setBaseTextColor(uint_t)
 	{
 		*m_textColor = m_baseAttr.m_foreColor;
 	}
 
 	void
-	setBackColor (uint_t color)
+	setBackColor(uint_t color)
 	{
-		ASSERT (color >= 40 && color < 48);
+		ASSERT(color >= 40 && color < 48);
 		*m_backColor = StdPalColor_AnsiBlack + color - 40;
 	}
 
 	void
-	setBrightBackColor (uint_t color)
+	setBrightBackColor(uint_t color)
 	{
-		ASSERT (color >= 100 && color < 108);
+		ASSERT(color >= 100 && color < 108);
 		*m_backColor = StdPalColor_AnsiBrightBlack + color - 100;
 	}
 
 	void
-	setBaseBackColor (uint_t)
+	setBaseBackColor(uint_t)
 	{
 		*m_backColor = m_baseAttr.m_backColor;
 	}

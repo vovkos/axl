@@ -21,7 +21,7 @@ namespace st {
 //..............................................................................
 
 bool
-gotoEndOfScriptSnippet (
+gotoEndOfScriptSnippet(
 	Lexer* lexer,
 	lex::RagelTokenPos* endPos
 	);
@@ -41,17 +41,17 @@ protected:
 	};
 
 protected:
-	sl::AuxList <EmitContext> m_emitContextStack;
+	sl::AuxList<EmitContext> m_emitContextStack;
 
 public:
 	void
-	clear ()
+	clear()
 	{
-		m_emitContextStack.clear ();
+		m_emitContextStack.clear();
 	}
 
 	bool
-	process (
+	process(
 		sl::String* output,
 		const sl::StringRef& fileName,
 		const sl::StringRef& frame
@@ -61,27 +61,27 @@ public:
 
 		if (output)
 		{
-			output->clear ();
-			output->reserve (frame.getLength ());
+			output->clear();
+			output->reserve(frame.getLength());
 		}
-		else if (!m_emitContextStack.isEmpty ())
+		else if (!m_emitContextStack.isEmpty())
 		{
-			output = m_emitContextStack.getTail ()->m_output; // append to the last output buffer
+			output = m_emitContextStack.getTail()->m_output; // append to the last output buffer
 		}
 		else
 		{
-			err::setError (err::SystemErrorCode_InvalidParameter);
+			err::setError(err::SystemErrorCode_InvalidParameter);
 			return false;
 		}
 
 		sl::String scriptSource;
-		result = createScript (&scriptSource, fileName, frame);
+		result = createScript(&scriptSource, fileName, frame);
 		if (!result)
 			return false;
 
-		if (scriptSource.isEmpty ())
+		if (scriptSource.isEmpty())
 		{
-			output->copy (frame);
+			output->copy(frame);
 			return true;
 		}
 
@@ -89,18 +89,18 @@ public:
 		emitContext.m_self = this;
 		emitContext.m_output = output;
 		emitContext.m_frame = frame;
-		m_emitContextStack.insertTail (&emitContext);
+		m_emitContextStack.insertTail(&emitContext);
 
-		result = static_cast <T*> (this)->runScript (fileName, scriptSource);
+		result = static_cast<T*> (this)->runScript(fileName, scriptSource);
 
-		ASSERT (*m_emitContextStack.getTail () == &emitContext);
-		m_emitContextStack.removeTail ();
+		ASSERT(*m_emitContextStack.getTail() == &emitContext);
+		m_emitContextStack.removeTail();
 
 		return result;
 	}
 
 	bool
-	processFile (
+	processFile(
 		sl::String* output,
 		const sl::StringRef& fileName
 		)
@@ -108,16 +108,16 @@ public:
 		io::SimpleMappedFile file;
 
 		return
-			file.open (fileName, io::FileFlag_ReadOnly) &&
-			process (
+			file.open(fileName, io::FileFlag_ReadOnly) &&
+			process(
 				output,
 				fileName,
-				sl::StringRef ((const char*) file.p (), file.getMappingSize ())
+				sl::StringRef((const char*) file.p(), file.getMappingSize())
 				);
 	}
 
 	bool
-	processFileToFile (
+	processFileToFile(
 		const sl::StringRef& targetFileName,
 		const sl::StringRef& frameFileName
 		)
@@ -125,28 +125,28 @@ public:
 		bool result;
 
 		sl::String stringBuffer;
-		result = processFile (&stringBuffer, frameFileName);
+		result = processFile(&stringBuffer, frameFileName);
 		if (!result)
 			return false;
 
 		io::File targetFile;
-		result = targetFile.open (targetFileName);
+		result = targetFile.open(targetFileName);
 		if (!result)
 			return false;
 
-		size_t size = stringBuffer.getLength ();
+		size_t size = stringBuffer.getLength();
 
-		result = targetFile.write (stringBuffer, size) != -1;
+		result = targetFile.write(stringBuffer, size) != -1;
 		if (!result)
 			return false;
 
-		targetFile.setSize (size);
+		targetFile.setSize(size);
 		return true;
 	}
 
 protected:
 	bool
-	createScript (
+	createScript(
 		sl::String* scriptSource,
 		const sl::StringRef& fileName,
 		const sl::StringRef& frame
@@ -155,9 +155,9 @@ protected:
 		bool result;
 
 		Lexer lexer;
-		lexer.create (fileName, frame);
+		lexer.create(fileName, frame);
 
-		scriptSource->clear ();
+		scriptSource->clear();
 
 		size_t offset = 0;
 		Token::Pos pos;
@@ -166,16 +166,16 @@ protected:
 
 		for (;;)
 		{
-			const Token* token = lexer.getToken ();
+			const Token* token = lexer.getToken();
 
 			if (token->m_token == TokenKind_Error)
 			{
-				err::setFormatStringError ("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
+				err::setFormatStringError("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 				return false;
 			}
 
 			if (token->m_pos.m_offset > offset)
-				static_cast <T*> (this)->createPassthroughCall (
+				static_cast<T*> (this)->createPassthroughCall(
 					scriptSource,
 					offset,
 					token->m_pos.m_offset - offset
@@ -185,25 +185,25 @@ protected:
 				return true;
 
 			if (token->m_pos.m_line > line)
-				scriptSource->append ('\n', token->m_pos.m_line - line);
+				scriptSource->append('\n', token->m_pos.m_line - line);
 
 			offset = token->m_pos.m_offset + token->m_pos.m_length;
 
-			switch (token->m_token)
+			switch(token->m_token)
 			{
 			case TokenKind_Data:
-				static_cast <T*> (this)->createEmitCall (scriptSource, token->m_data.m_string);
+				static_cast<T*> (this)->createEmitCall(scriptSource, token->m_data.m_string);
 				pos = token->m_pos;
-				lexer.nextToken ();
+				lexer.nextToken();
 				break;
 
 			case TokenKind_OpenCode:
-				result = gotoEndOfScriptSnippet (&lexer, &pos);
+				result = gotoEndOfScriptSnippet(&lexer, &pos);
 				if (!result)
 					return false;
 
-				scriptSource->append (frame.getSubString (offset, pos.m_offset - offset));
-				scriptSource->append (";");
+				scriptSource->append(frame.getSubString(offset, pos.m_offset - offset));
+				scriptSource->append(";");
 
 				if (*(pos.m_p + pos.m_length - 1) == '\n')
 					pos.m_line--; // fix line cause we have eaten a line-feed with close bracket
@@ -211,18 +211,18 @@ protected:
 
 			case TokenKind_OpenData_r:
 			case TokenKind_OpenData_c:
-				result = gotoEndOfScriptSnippet (&lexer, &pos);
+				result = gotoEndOfScriptSnippet(&lexer, &pos);
 				if (!result)
 					return false;
 
-				static_cast <T*> (this)->createEmitCall (
+				static_cast<T*> (this)->createEmitCall(
 					scriptSource,
-					frame.getSubString (offset, pos.m_offset - offset)
+					frame.getSubString(offset, pos.m_offset - offset)
 					);
 				break;
 
 			default:
-				ASSERT (false);
+				ASSERT(false);
 			}
 
 			offset = pos.m_offset + pos.m_length;

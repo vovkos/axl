@@ -33,7 +33,7 @@ protected:
 
 	struct ViewEntry;
 
-	typedef sl::RbTree <uint64_t, ViewEntry*> ViewMap;
+	typedef sl::RbTree<uint64_t, ViewEntry*> ViewMap;
 
 	struct ViewEntry: sl::ListLink
 	{
@@ -48,38 +48,38 @@ protected:
 	};
 
 protected:
-	sl::List <ViewEntry> m_viewList;
+	sl::List<ViewEntry> m_viewList;
 	ViewMap m_viewMap;
 	size_t m_parentOffset;
 
 protected:
-	MappedViewMgr (size_t offset) // protected construction only
+	MappedViewMgr(size_t offset) // protected construction only
 	{
 		m_parentOffset = offset;
 	}
 
 public:
 	MappedFile*
-	getMappedFile ()
+	getMappedFile()
 	{
-		return (MappedFile*) ((char*) this - m_parentOffset);
+		return (MappedFile*)((char*)this - m_parentOffset);
 	}
 
 	bool
-	isEmpty ()
+	isEmpty()
 	{
-		return m_viewList.isEmpty ();
+		return m_viewList.isEmpty();
 	}
 
 	void*
-	find (
+	find(
 		uint64_t begin,
 		uint64_t end,
 		uint64_t* actualEnd
 		);
 
 	void*
-	view (
+	view(
 		uint64_t begin,
 		uint64_t end,
 		uint64_t origBegin,
@@ -87,14 +87,14 @@ public:
 		);
 
 	void
-	clear ()
+	clear()
 	{
-		m_viewList.clear ();
-		m_viewMap.clear ();
+		m_viewList.clear();
+		m_viewMap.clear();
 	}
 
 	void
-	limitViewCount (size_t maxViewCount);
+	limitViewCount(size_t maxViewCount);
 };
 
 //..............................................................................
@@ -126,113 +126,113 @@ protected:
 	uint_t m_fileFlags;
 
 public:
-	MappedFile ();
+	MappedFile();
 
-	~MappedFile ()
+	~MappedFile()
 	{
-		close ();
+		close();
 	}
 
 	bool
-	isOpen () const
+	isOpen() const
 	{
-		return m_file.isOpen ();
+		return m_file.isOpen();
 	}
 
 	uint_t
-	getFlags () const
+	getFlags() const
 	{
 		return m_fileFlags;
 	}
 
 	const File*
-	getFile () const
+	getFile() const
 	{
 		return &m_file;
 	}
 
 	uint64_t
-	getSize () const
+	getSize() const
 	{
-		return m_file.getSize ();
+		return m_file.getSize();
 	}
 
 	bool
-	setSize (uint64_t size); // can only be called when no views are mapped
+	setSize(uint64_t size); // can only be called when no views are mapped
 
 	void
-	close ();
+	close();
 
 	bool
-	open (
+	open(
 		const sl::StringRef& fileName,
 		uint_t flags = 0 // FileFlag
 		);
 
 	bool
-	duplicate (
+	duplicate(
 		File::Handle fileHandle,
 		uint_t flags = 0 // FileFlag
 		);
 
 	bool
-	duplicate (
+	duplicate(
 		const File* file,
 		uint_t flags = 0 // FileFlag
 		)
 	{
-		ASSERT (file->isOpen ());
-		return duplicate (file->getHandle (), flags);
+		ASSERT(file->isOpen());
+		return duplicate(file->getHandle(), flags);
 	}
 
 	void
-	attach (
+	attach(
 		File::Handle fileHandle,
 		uint_t flags = 0 // FileFlag
 		);
 
 	File::Handle
-	detach ();
+	detach();
 
 	bool
-	setup (
+	setup(
 		size_t maxDynamicViewCount,
 		size_t readAheadSize
 		);
 
 	const void*
-	view (
+	view(
 		uint64_t offset = 0,
 		size_t size = 0,
 		bool isPermanent = false
 		) const
 	{
-		return ((MappedFile*) this)->view (offset, size, isPermanent);
+		return ((MappedFile*)this)->view(offset, size, isPermanent);
 	}
 
 	void*
-	view (
+	view(
 		uint64_t offset = 0,
 		size_t size = 0,
 		bool isPermanent = false
 		)
 	{
-		return view (offset, size, NULL, isPermanent);
+		return view(offset, size, NULL, isPermanent);
 	}
 
 	const void*
-	view (
+	view(
 		uint64_t offset,
 		size_t size,
 		size_t* actualSize,
 		bool isPermanent = false
 		) const
 	{
-		return ((MappedFile*) this)->view (offset, size, actualSize, isPermanent);
+		return ((MappedFile*)this)->view(offset, size, actualSize, isPermanent);
 	}
 
 	void*
-	view (
+	view(
 		uint64_t offset,
 		size_t size,
 		size_t* actualSize,
@@ -240,11 +240,11 @@ public:
 		);
 
 	void
-	unmapAllViews ();
+	unmapAllViews();
 
 protected:
 	void*
-	viewImpl (
+	viewImpl(
 		uint64_t offset,
 		uint64_t end,
 		uint64_t* actualEnd,
@@ -262,21 +262,21 @@ protected:
 	uint_t m_openFlags;
 
 public:
-	SimpleMappedFile ()
+	SimpleMappedFile()
 	{
 		m_openFlags = 0;
 	}
 
 	bool
-	isOpen ()
+	isOpen()
 	{
-		return m_mapping.isOpen ();
+		return m_mapping.isOpen();
 	}
 
 	void*
-	p ()
+	p()
 	{
-		return m_mapping.p ();
+		return m_mapping.p();
 	}
 
 	operator void* ()
@@ -285,19 +285,19 @@ public:
 	}
 
 	uint64_t
-	getFileSize ()
+	getFileSize()
 	{
-		return m_file.getSize ();
+		return m_file.getSize();
 	}
 
 	size_t
-	getMappingSize ()
+	getMappingSize()
 	{
-		return m_mapping.getSize ();
+		return m_mapping.getSize();
 	}
 
 	bool
-	open (
+	open(
 		const sl::StringRef& fileName,
 		uint64_t offset,
 		size_t size,
@@ -305,28 +305,28 @@ public:
 		);
 
 	bool
-	open (
+	open(
 		const sl::StringRef& fileName,
 		uint_t flags = 0 // FileFlag
 		)
 	{
-		return open (fileName, 0, -1, flags);
+		return open(fileName, 0, -1, flags);
 	}
 
 	void*
-	view (
+	view(
 		uint64_t offset,
 		size_t size
 		)
 	{
-		return m_mapping.open (&m_file, offset, size, m_openFlags);
+		return m_mapping.open(&m_file, offset, size, m_openFlags);
 	}
 
 	void
-	close ()
+	close()
 	{
-		m_file.close ();
-		m_mapping.close ();
+		m_file.close();
+		m_mapping.close();
 		m_openFlags = 0;
 	}
 };

@@ -19,25 +19,25 @@ namespace cry {
 //..............................................................................
 
 bool
-Rsa::readPublicKey (BIO* bio)
+Rsa::readPublicKey(BIO* bio)
 {
-	close ();
+	close();
 
-	bool result = PEM_read_bio_RSA_PUBKEY (bio, &m_h, 0, NULL) != NULL;
-	return completeWithLastCryptoError (result);
+	bool result = PEM_read_bio_RSA_PUBKEY(bio, &m_h, 0, NULL) != NULL;
+	return completeWithLastCryptoError(result);
 }
 
 bool
-Rsa::readPrivateKey (BIO* bio)
+Rsa::readPrivateKey(BIO* bio)
 {
-	close ();
+	close();
 
-	bool result = PEM_read_bio_RSAPrivateKey (bio, &m_h, 0, NULL) != NULL;
-	return completeWithLastCryptoError (result);
+	bool result = PEM_read_bio_RSAPrivateKey(bio, &m_h, 0, NULL) != NULL;
+	return completeWithLastCryptoError(result);
 }
 
 size_t
-Rsa::signHash (
+Rsa::signHash(
 	int type,
 	void* signatureBuffer,
 	size_t signatureBufferSize,
@@ -45,47 +45,47 @@ Rsa::signHash (
 	size_t hashSize
 	)
 {
-	ASSERT (signatureBufferSize >= getSize ());
+	ASSERT(signatureBufferSize >= getSize());
 
-	uint_t signatureSize = (uint_t) signatureBufferSize;
-	int result = RSA_sign (
+	uint_t signatureSize = (uint_t)signatureBufferSize;
+	int result = RSA_sign(
 		type,
 		(const uchar_t*) hash,
-		(int) hashSize,
-		(uchar_t*) signatureBuffer,
+		(int)hashSize,
+		(uchar_t*)signatureBuffer,
 		&signatureSize,
 		m_h
 		);
 
 	if (!result)
 	{
-		setLastCryptoError ();
+		setLastCryptoError();
 		return -1;
 	}
 
-	ASSERT (signatureSize <= signatureBufferSize);
+	ASSERT(signatureSize <= signatureBufferSize);
 	return signatureSize;
 }
 
 bool
-Rsa::signHash (
+Rsa::signHash(
 	int type,
-	sl::Array <char>* signature,
+	sl::Array<char>* signature,
 	const void* hash,
 	size_t hashSize
 	)
 {
-	size_t signatureBufferSize = getSize ();
-	bool result = signature->setCount (signatureBufferSize);
+	size_t signatureBufferSize = getSize();
+	bool result = signature->setCount(signatureBufferSize);
 	if (!result)
 		return false;
 
-	size_t size = signHash (type, *signature, signatureBufferSize, hash, hashSize);
+	size_t size = signHash(type, *signature, signatureBufferSize, hash, hashSize);
 	if (size == -1)
 		return false;
 
-	ASSERT (size <= signatureBufferSize);
-	signature->setCount (size);
+	ASSERT(size <= signatureBufferSize);
+	signature->setCount(size);
 	return true;
 }
 

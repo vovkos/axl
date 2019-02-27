@@ -55,34 +55,34 @@ protected:
 	int cs;
 
 protected: // should only be used as part of ini::CParser
-	Lexer ()
+	Lexer()
 	{
-		reset ();
+		reset();
 	}
 
 	bool
-	create (
+	create(
 		const sl::StringRef& filePath,
 		const sl::StringRef& source
 		);
 
 	void
-	parseSection (
+	parseSection(
 		const char* p,
 		const char* end
 		);
 
 	void
-	parseKeyValue (
+	parseKeyValue(
 		const char* p,
 		const char* end
 		);
 
 	ScanResultKind
-	scanLine ();
+	scanLine();
 
 	void
-	setLineCol (
+	setLineCol(
 		int line,
 		int col
 		)
@@ -92,22 +92,22 @@ protected: // should only be used as part of ini::CParser
 	}
 
 	void
-	setLineCol (const lex::LineCol& lineCol)
+	setLineCol(const lex::LineCol& lineCol)
 	{
-		setLineCol (lineCol.m_line, lineCol.m_col);
+		setLineCol(lineCol.m_line, lineCol.m_col);
 	}
 
 	void
-	reset ();
+	reset();
 
 protected:
 	// these are to be called from withing ragel scanner (*.rl)
 
 	void
-	newLine (char* line);
+	newLine(char* line);
 
 	void
-	stop ()
+	stop()
 	{
 		pe = p + 1;
 	}
@@ -115,10 +115,10 @@ protected:
 	// implemented in lexer.rl
 
 	void
-	init ();
+	init();
 
 	bool
-	exec ();
+	exec();
 };
 
 //..............................................................................

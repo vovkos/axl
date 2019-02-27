@@ -28,21 +28,21 @@ protected:
 	File* m_receiveFile;
 
 public:
-	FileTransport ()
+	FileTransport()
 	{
 		m_transmitFile = NULL;
 		m_receiveFile = NULL;
 	}
 
 	void
-	attach (File* file)
+	attach(File* file)
 	{
 		m_transmitFile = file;
 		m_receiveFile = file;
 	}
 
 	void
-	attach (
+	attach(
 		File* transmitFile,
 		File* receiveFile
 		)
@@ -52,7 +52,7 @@ public:
 	}
 
 	void
-	detach ()
+	detach()
 	{
 		m_transmitFile = NULL;
 		m_receiveFile = NULL;
@@ -60,24 +60,24 @@ public:
 
 	virtual
 	size_t
-	transmit (
+	transmit(
 		const void* p,
 		size_t size
 		)
 	{
-		ASSERT (m_transmitFile);
-		return m_transmitFile->write (p, size);
+		ASSERT(m_transmitFile);
+		return m_transmitFile->write(p, size);
 	}
 
 	virtual
 	size_t
-	receive (
+	receive(
 		void* p,
 		size_t size
 		)
 	{
-		ASSERT (m_receiveFile);
-		return m_receiveFile->read (p, size);
+		ASSERT(m_receiveFile);
+		return m_receiveFile->read(p, size);
 	}
 };
 

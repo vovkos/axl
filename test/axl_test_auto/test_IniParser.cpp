@@ -16,7 +16,7 @@ namespace {
 
 //..............................................................................
 
-class MyParser: public ini::Parser <MyParser>
+class MyParser: public ini::Parser<MyParser>
 {
 protected:
 	enum SectionKind
@@ -37,72 +37,72 @@ protected:
 		KeyKind_SessionClass,
 	};
 
-	AXL_SL_BEGIN_STRING_HASH_TABLE (SectionNameMap, SectionKind)
-		AXL_SL_HASH_TABLE_ENTRY ("session", SectionKind_Session)
-		AXL_SL_HASH_TABLE_ENTRY ("scripts", SectionKind_Scripts)
-	AXL_SL_END_HASH_TABLE ()
+	AXL_SL_BEGIN_STRING_HASH_TABLE(SectionNameMap, SectionKind)
+		AXL_SL_HASH_TABLE_ENTRY("session", SectionKind_Session)
+		AXL_SL_HASH_TABLE_ENTRY("scripts", SectionKind_Scripts)
+	AXL_SL_END_HASH_TABLE()
 
-	AXL_SL_BEGIN_STRING_HASH_TABLE (KeyNameMap, KeyKind)
-		AXL_SL_HASH_TABLE_ENTRY ("name", KeyKind_Name)
-		AXL_SL_HASH_TABLE_ENTRY ("description", KeyKind_Description)
-		AXL_SL_HASH_TABLE_ENTRY ("guid", KeyKind_Guid)
-		AXL_SL_HASH_TABLE_ENTRY ("icon", KeyKind_Icon)
-		AXL_SL_HASH_TABLE_ENTRY ("session-class", KeyKind_SessionClass)
-		AXL_SL_HASH_TABLE_ENTRY ("log-representer-class", KeyKind_LogRepresenterClass)
-	AXL_SL_END_HASH_TABLE ()
+	AXL_SL_BEGIN_STRING_HASH_TABLE(KeyNameMap, KeyKind)
+		AXL_SL_HASH_TABLE_ENTRY("name", KeyKind_Name)
+		AXL_SL_HASH_TABLE_ENTRY("description", KeyKind_Description)
+		AXL_SL_HASH_TABLE_ENTRY("guid", KeyKind_Guid)
+		AXL_SL_HASH_TABLE_ENTRY("icon", KeyKind_Icon)
+		AXL_SL_HASH_TABLE_ENTRY("session-class", KeyKind_SessionClass)
+		AXL_SL_HASH_TABLE_ENTRY("log-representer-class", KeyKind_LogRepresenterClass)
+	AXL_SL_END_HASH_TABLE()
 
 public:
 	bool
-	onSection (const char* name)
+	onSection(const char* name)
 	{
-		SectionNameMap::Iterator it = SectionNameMap::find (name);
+		SectionNameMap::Iterator it = SectionNameMap::find(name);
 		SectionKind section = it ? it->m_value : SectionKind_Undefined;
-		printf ("OnSection '%s'\n", name);
+		printf("OnSection '%s'\n", name);
 		return true;
 	}
 
 	bool
-	onKeyValue (
+	onKeyValue(
 		const char* name,
 		const char* value
 		)
 	{
-		KeyNameMap::Iterator it = KeyNameMap::find (name);
+		KeyNameMap::Iterator it = KeyNameMap::find(name);
 		KeyKind key = it ? it->m_value : KeyKind_Undefined;
-		printf ("OnKeyValue '%s' = '%s'\n", name, value);
+		printf("OnKeyValue '%s' = '%s'\n", name, value);
 		return true;
 	}
 };
 
 void
-run ()
+run()
 {
 	bool result;
 
 	const char* filePath = "D:/Prj/Ninja/ioninja/scripts/nj_ssn/nj_ssn_Serial/nj_ssn_Serial.njini";
 
 	io::MappedFile file;
-	result = file.open (filePath, io::FileFlag_ReadOnly);
+	result = file.open(filePath, io::FileFlag_ReadOnly);
 	if (!result)
 	{
-		printf ("error opening file: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error opening file: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 
-	const char* p = (const char*) file.view ();
-	uint64_t size = file.getSize ();
+	const char* p = (const char*) file.view();
+	uint64_t size = file.getSize();
 
 	MyParser parser;
-	result = parser.parse (filePath, sl::StringRef (p, (size_t) size));
+	result = parser.parse(filePath, sl::StringRef(p, (size_t)size));
 	if (!result)
 	{
-		printf ("error parsing file: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error parsing file: %s\n", err::getLastErrorDescription ().sz ());
 		return;
 	}
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_IniParser", run)
+ADD_TEST_CASE("test_IniParser", run)
 
 }

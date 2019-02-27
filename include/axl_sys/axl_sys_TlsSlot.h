@@ -26,18 +26,18 @@ protected:
 	size_t m_slot;
 
 public:
-	TlsSlot ()
+	TlsSlot()
 	{
-		m_slot = getTlsMgr ()->createSlot ();
+		m_slot = getTlsMgr()->createSlot();
 	}
 
 	size_t
-	getSlot ()
+	getSlot()
 	{
 		return m_slot;
 	}
 
-	operator size_t ()
+	operator size_t()
 	{
 		return m_slot;
 	}
@@ -50,15 +50,15 @@ class TlsPtrSlot: public TlsSlot
 {
 public:
 	T*
-	getValue ()
+	getValue()
 	{
-		return (T*) getTlsMgr ()->getSlotValue (m_slot).p ();
+		return (T*)getTlsMgr()->getSlotValue(m_slot).p();
 	}
 
 	T*
-	setValue (T* p)
+	setValue(T* p)
 	{
-		return (T*) getTlsMgr ()->setSlotValue (m_slot, sys::TlsValue (p, NULL)).p ();
+		return (T*)getTlsMgr()->setSlotValue(m_slot, sys::TlsValue(p, NULL)).p();
 	}
 };
 
@@ -66,18 +66,18 @@ public:
 
 template <typename T>
 T*
-getTlsPtrSlotValue ()
+getTlsPtrSlotValue()
 {
-	return sl::getSimpleSingleton <TlsPtrSlot <T> > ()->getValue ();
+	return sl::getSimpleSingleton<TlsPtrSlot<T> > ()->getValue();
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 T*
-setTlsPtrSlotValue (T* p)
+setTlsPtrSlotValue(T* p)
 {
-	return sl::getSimpleSingleton <TlsPtrSlot <T> > ()->setValue (p);
+	return sl::getSimpleSingleton<TlsPtrSlot<T> > ()->setValue(p);
 }
 
 //..............................................................................
@@ -89,14 +89,14 @@ protected:
 	T* m_prevValue;
 
 public:
-	ScopedTlsPtrSlot (T* p)
+	ScopedTlsPtrSlot(T* p)
 	{
-		m_prevValue = setTlsPtrSlotValue <T> (p);
+		m_prevValue = setTlsPtrSlotValue<T> (p);
 	}
 
-	~ScopedTlsPtrSlot ()
+	~ScopedTlsPtrSlot()
 	{
-		setTlsPtrSlotValue <T> (m_prevValue);
+		setTlsPtrSlotValue<T> (m_prevValue);
 	}
 };
 

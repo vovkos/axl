@@ -36,75 +36,75 @@ protected:
 	RefCount* m_refCount;
 
 public:
-	WeakPtr ()
+	WeakPtr()
 	{
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	WeakPtr (const NullPtr&)
+	WeakPtr(const NullPtr&)
 	{
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	WeakPtr (const WeakPtr& src)
+	WeakPtr(const WeakPtr& src)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (src.m_p, src.m_refCount);
+		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	WeakPtr (const WeakPtr <T2>& src)
+	WeakPtr(const WeakPtr<T2>& src)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (src.m_p, src.m_refCount);
+		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	WeakPtr (const Ptr <T2>& src)
+	WeakPtr(const Ptr<T2>& src)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (src.m_p, src.m_refCount);
+		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	WeakPtr (T2* p)
+	WeakPtr(T2* p)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (p, p);
+		copy(p, p);
 	}
 
-	WeakPtr (
+	WeakPtr(
 		T* p,
 		RefCount* refCount
 		)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy (p, refCount);
+		copy(p, refCount);
 	}
 
-	~WeakPtr ()
+	~WeakPtr()
 	{
-		clear ();
+		clear();
 	}
 
 	WeakPtr&
 	operator = (const NullPtr&)
 	{
-		clear ();
+		clear();
 		return *this;
 	}
 
 	WeakPtr&
 	operator = (const WeakPtr& src)
 	{
-		copy (src.m_p, src.m_refCount);
+		copy(src.m_p, src.m_refCount);
 		return *this;
 	}
 
 	void
-	copy (
+	copy(
 		T* p,
 		RefCount* refCount
 		)
@@ -115,29 +115,29 @@ public:
 			return;
 
 		if (refCount)
-			refCount->addWeakRef ();
+			refCount->addWeakRef();
 
 		if (m_refCount)
-			m_refCount->weakRelease ();
+			m_refCount->weakRelease();
 
 		m_refCount = refCount;
 	}
 
 	void
-	attach (
+	attach(
 		T* p,
 		RefCount* refCount
 		)
 	{
 		if (m_refCount)
-			m_refCount->weakRelease ();
+			m_refCount->weakRelease();
 
 		m_p = p;
 		m_refCount = refCount;
 	}
 
 	void
-	detach (
+	detach(
 		T** pp_o = NULL,
 		RefCount** refCount_o = NULL
 		)
@@ -153,17 +153,17 @@ public:
 	}
 
 	void
-	clear ()
+	clear()
 	{
 		if (m_refCount)
-			m_refCount->weakRelease ();
+			m_refCount->weakRelease();
 
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
 	RefCount*
-	getRefCount () const
+	getRefCount() const
 	{
 		return m_refCount;
 	}

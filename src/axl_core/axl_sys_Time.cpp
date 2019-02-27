@@ -25,17 +25,17 @@ namespace sys {
 typedef
 void
 WINAPI
-GetSystemTimePreciseAsFileTimeFunc (FILETIME* time);
+GetSystemTimePreciseAsFileTimeFunc(FILETIME* time);
 
 static GetSystemTimePreciseAsFileTimeFunc* systemTimePreciseAsFileTime = NULL;
 
 void
-initPreciseTimestamps ()
+initPreciseTimestamps()
 {
-	HMODULE kernel32 = ::GetModuleHandleW (L"kernel32.dll");
-	ASSERT (kernel32);
+	HMODULE kernel32 = ::GetModuleHandleW(L"kernel32.dll");
+	ASSERT(kernel32);
 
-	systemTimePreciseAsFileTime = (GetSystemTimePreciseAsFileTimeFunc*) ::GetProcAddress (kernel32, "GetSystemTimePreciseAsFileTime");
+	systemTimePreciseAsFileTime = (GetSystemTimePreciseAsFileTimeFunc*) ::GetProcAddress(kernel32, "GetSystemTimePreciseAsFileTime");
 	if (!systemTimePreciseAsFileTime)
 		systemTimePreciseAsFileTime = ::GetSystemTimeAsFileTime;
 }
@@ -47,17 +47,17 @@ static uint64_t g_machBaseAbsoluteTime = 0;
 static mach_timebase_info_data_t g_machTimeBaseInfo = { 0 };
 
 void
-initPreciseTimestamps ()
+initPreciseTimestamps()
 {
-	mach_timebase_info (&g_machTimeBaseInfo);
-	g_machBaseTimestamp = sys::getTimestamp ();
-	g_machBaseAbsoluteTime = mach_absolute_time ();
+	mach_timebase_info(&g_machTimeBaseInfo);
+	g_machBaseTimestamp = sys::getTimestamp();
+	g_machBaseAbsoluteTime = mach_absolute_time();
 }
 
 #else
 
 void
-initPreciseTimestamps ()
+initPreciseTimestamps()
 {
 }
 
@@ -66,49 +66,49 @@ initPreciseTimestamps ()
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint64_t
-getTimestamp ()
+getTimestamp()
 {
 	uint64_t timestamp;
 
 #if (_AXL_OS_WIN)
-	::GetSystemTimeAsFileTime ((FILETIME*) &timestamp);
+	::GetSystemTimeAsFileTime((FILETIME*) &timestamp);
 #elif (_AXL_OS_DARWIN)
 	timeval tval;
-	gettimeofday (&tval, NULL);
-	timestamp = (uint64_t) (tval.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tval.tv_usec * 10;
+	gettimeofday(&tval, NULL);
+	timestamp = (uint64_t)(tval.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tval.tv_usec * 10;
 #else
 	timespec tspec;
 #	if (defined CLOCK_REALTIME_COARSE)
-	clock_gettime (CLOCK_REALTIME_COARSE, &tspec);
+	clock_gettime(CLOCK_REALTIME_COARSE, &tspec);
 #	else
-	clock_gettime (CLOCK_REALTIME, &tspec);
+	clock_gettime(CLOCK_REALTIME, &tspec);
 #	endif
-	timestamp = (uint64_t) (tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
+	timestamp = (uint64_t)(tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
 #endif
 
 	return timestamp;
 }
 
 uint64_t
-getPreciseTimestamp ()
+getPreciseTimestamp()
 {
 	uint64_t timestamp;
 
 #if (_AXL_OS_WIN)
-	systemTimePreciseAsFileTime ((FILETIME*) &timestamp);
+	systemTimePreciseAsFileTime((FILETIME*) &timestamp);
 #elif (_AXL_OS_DARWIN)
 #	if (_AXL_SYS_USE_MACH_ABSOULTE_TIME)
-	uint64_t elapsed = mach_absolute_time () - g_machBaseAbsoluteTime;
+	uint64_t elapsed = mach_absolute_time() - g_machBaseAbsoluteTime;
 	timestamp = g_machBaseTimestamp + elapsed * g_machTimeBaseInfo.numer / g_machTimeBaseInfo.denom / 100;
 #	else
 	timeval tval;
-	gettimeofday (&tval, NULL);
-	timestamp = (uint64_t) (tval.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tval.tv_usec * 10;
+	gettimeofday(&tval, NULL);
+	timestamp = (uint64_t)(tval.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tval.tv_usec * 10;
 #	endif
 #else
 	timespec tspec;
-	clock_gettime (CLOCK_REALTIME, &tspec);
-	timestamp = (uint64_t) (tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
+	clock_gettime(CLOCK_REALTIME, &tspec);
+	timestamp = (uint64_t)(tspec.tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + tspec.tv_nsec / 100;
 #endif
 
 	return timestamp;
@@ -117,21 +117,21 @@ getPreciseTimestamp ()
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-sleep (uint32_t msCount)
+sleep(uint32_t msCount)
 {
 #if (_AXL_OS_WIN)
-	::Sleep (msCount);
+	::Sleep(msCount);
 #else
 	timespec timespec;
-	getTimespecFromTimeout (msCount, &timespec);
-	nanosleep (&timespec, NULL);
+	getTimespecFromTimeout(msCount, &timespec);
+	nanosleep(&timespec, NULL);
 #endif
 }
 
 //..............................................................................
 
 uint64_t
-Time::getTimestampImpl (
+Time::getTimestampImpl(
 	bool isLocal,
 	int timeZone
 	) const
@@ -147,12 +147,12 @@ Time::getTimestampImpl (
 	sysTime.wMinute = m_minute;
 	sysTime.wSecond = m_second;
 
-	::SystemTimeToFileTime (&sysTime, (FILETIME*) &timestamp);
+	::SystemTimeToFileTime(&sysTime, (FILETIME*) &timestamp);
 
 	if (isLocal)
-		::FileTimeToLocalFileTime ((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
+		::FileTimeToLocalFileTime((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
 	else
-		timestamp += (int64_t) getTimeZoneOffsetInMinutes (timeZone) * 60 * 10000000;
+		timestamp += (int64_t)getTimeZoneOffsetInMinutes(timeZone)* 60 * 10000000;
 
 #else
 	tm tmStruct = { 0 };
@@ -164,10 +164,10 @@ Time::getTimestampImpl (
 	tmStruct.tm_sec  = m_second;
 
 	time_t posixTime = isLocal ?
-		mktime (&tmStruct) :
-		timegm (&tmStruct) + getTimeZoneOffsetInMinutes (timeZone) * 60;
+		mktime(&tmStruct) :
+		timegm(&tmStruct) + getTimeZoneOffsetInMinutes(timeZone)* 60;
 
-	timestamp = (uint64_t) (posixTime + AXL_SYS_EPOCH_DIFF) * 10000000;
+	timestamp = (uint64_t)(posixTime + AXL_SYS_EPOCH_DIFF) * 10000000;
 #endif
 
 	return
@@ -178,7 +178,7 @@ Time::getTimestampImpl (
 }
 
 void
-Time::setTimestampImpl (
+Time::setTimestampImpl(
 	uint64_t timestamp,
 	bool isLocal,
 	int timeZone
@@ -188,11 +188,11 @@ Time::setTimestampImpl (
 	SYSTEMTIME sysTime = { 0 };
 
 	if (isLocal)
-		::FileTimeToLocalFileTime ((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
+		::FileTimeToLocalFileTime((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
 	else
-		timestamp += (int64_t) getTimeZoneOffsetInMinutes (timeZone) * 60 * 10000000;
+		timestamp += (int64_t)getTimeZoneOffsetInMinutes(timeZone)* 60 * 10000000;
 
-	::FileTimeToSystemTime ((const FILETIME*) &timestamp, &sysTime);
+	::FileTimeToSystemTime((const FILETIME*) &timestamp, &sysTime);
 
 	m_year        = sysTime.wYear;
 	m_month       = sysTime.wMonth - 1;
@@ -209,12 +209,12 @@ Time::setTimestampImpl (
 
 	if (isLocal)
 	{
-		tmStruct = localtime (&posixTime);
+		tmStruct = localtime(&posixTime);
 	}
 	else
 	{
-		posixTime += getTimeZoneOffsetInMinutes (timeZone) * 60;
-		tmStruct = gmtime (&posixTime);
+		posixTime += getTimeZoneOffsetInMinutes(timeZone)* 60;
+		tmStruct = gmtime(&posixTime);
 	}
 
 	m_year        = tmStruct->tm_year + 1900;
@@ -238,27 +238,27 @@ Time::setTimestampImpl (
 	%s	second
 	%l	millisecond
 	%c	microsecond
-	%p	p/a (lower-case pm/am)
-	%P	P/A (upper-case PM/AM)
+	%p	p/a(lower-case pm/am)
+	%P	P/A(upper-case PM/AM)
 	%y	2-digit year
 	%Y	4-digit year
-	%D	day of month (leading zero if one-digit)
-	%d	day of month (no leading-zero)
-	%M	month number (leading zero if one-digit)
-	%o	month number (no leading-zero)
-	%n	month name (short)
-	%N	month name (full)
-	%w	day of week (short)
-	%W	day of week (full)
+	%D	day of month(leading zero if one-digit)
+	%d	day of month(no leading-zero)
+	%M	month number(leading zero if one-digit)
+	%o	month number(no leading-zero)
+	%n	month name(short)
+	%N	month name(full)
+	%w	day of week(short)
+	%W	day of week(full)
 */
 
 size_t
-Time::format (
+Time::format(
 	sl::String* string,
 	const sl::StringRef& formatString
 	) const
 {
-	static const char* weekDayShortNameTable [7] =
+	static const char* weekDayShortNameTable[7] =
 	{
 		"Sun",
 		"Mon",
@@ -269,7 +269,7 @@ Time::format (
 		"Sat",
 	};
 
-	static const char* weekDayFullNameTable [7] =
+	static const char* weekDayFullNameTable[7] =
 	{
 		"Sunday",
 		"Monday",
@@ -280,7 +280,7 @@ Time::format (
 		"Saturday",
 	};
 
-	static const char* monthShortNameTable [12] =
+	static const char* monthShortNameTable[12] =
 	{
 		"Jan",
 		"Feb",
@@ -296,7 +296,7 @@ Time::format (
 		"Dec",
 	};
 
-	static const char* monthFullNameTable [12] =
+	static const char* monthFullNameTable[12] =
 	{
 		"January",
 		"February",
@@ -312,10 +312,10 @@ Time::format (
 		"December",
 	};
 
-	string->clear ();
+	string->clear();
 
-	const char* p = formatString.cp ();
-	const char* end = formatString.getEnd ();
+	const char* p = formatString.cp();
+	const char* end = formatString.getEnd();
 	const char* p0 = p;
 
 	for (; p < end; p++)
@@ -323,98 +323,98 @@ Time::format (
 		if (*p != '%')
 			continue;
 
-		string->append (p0, p - p0);
+		string->append(p0, p - p0);
 
 		p++;
 		if (p >= end)
-			return string->getLength ();
+			return string->getLength();
 
 		int h12;
 
-		switch (*p)
+		switch(*p)
 		{
 		case 'h':
-			string->appendFormat ("%02d", m_hour);
+			string->appendFormat("%02d", m_hour);
 			break;
 
 		case 'H':
 			h12 = m_hour % 12;
-			string->appendFormat ("%d", h12 ? h12 : 12);
+			string->appendFormat("%d", h12 ? h12 : 12);
 			break;
 
 		case 'm':
-			string->appendFormat ("%02d", m_minute);
+			string->appendFormat("%02d", m_minute);
 			break;
 
 		case 's':
-			string->appendFormat ("%02d", m_second);
+			string->appendFormat("%02d", m_second);
 			break;
 
 		case 'l':
-			string->appendFormat ("%03d", m_milliSecond);
+			string->appendFormat("%03d", m_milliSecond);
 			break;
 
 		case 'c':
-			string->appendFormat ("%03d", m_microSecond);
+			string->appendFormat("%03d", m_microSecond);
 			break;
 
 		case 'p':
-			string->append (m_hour >= 12 ? 'p' : 'a');
+			string->append(m_hour >= 12 ? 'p' : 'a');
 			break;
 
 		case 'P':
-			string->append (m_hour >= 12 ? 'P' : 'A');
+			string->append(m_hour >= 12 ? 'P' : 'A');
 			break;
 
 		case 'y':
-			string->appendFormat ("%02d", m_year % 100);
+			string->appendFormat("%02d", m_year % 100);
 			break;
 
 		case 'Y':
-			string->appendFormat ("%04d", m_year);
+			string->appendFormat("%04d", m_year);
 			break;
 
 		case 'D':
-			string->appendFormat ("%02d", m_monthDay);
+			string->appendFormat("%02d", m_monthDay);
 			break;
 
 		case 'd':
-			string->appendFormat ("%d", m_monthDay);
+			string->appendFormat("%d", m_monthDay);
 			break;
 
 		case 'M':
-			string->appendFormat ("%02d", m_month + 1);
+			string->appendFormat("%02d", m_month + 1);
 			break;
 
 		case 'o':
-			string->appendFormat ("%d", m_month + 1);
+			string->appendFormat("%d", m_month + 1);
 			break;
 
 		case 'n':
-			string->append (monthShortNameTable [m_month % 12]);
+			string->append(monthShortNameTable[m_month % 12]);
 			break;
 
 		case 'N':
-			string->append (monthFullNameTable [m_month % 12]);
+			string->append(monthFullNameTable[m_month % 12]);
 			break;
 
 		case 'w':
-			string->append (weekDayShortNameTable [m_dayOfWeek % 7]);
+			string->append(weekDayShortNameTable[m_dayOfWeek % 7]);
 			break;
 
 		case 'W':
-			string->append (weekDayFullNameTable [m_dayOfWeek % 7]);
+			string->append(weekDayFullNameTable[m_dayOfWeek % 7]);
 			break;
 
 		default:
-			string->append (*p);
+			string->append(*p);
 		}
 
 		p0 = p + 1;
 	}
 
-	string->append (p0, p - p0);
-	return string->getLength ();
+	string->append(p0, p - p0);
+	return string->getLength();
 }
 
 //..............................................................................
@@ -422,22 +422,22 @@ Time::format (
 #if (_AXL_OS_POSIX)
 
 void
-getAbsTimespecFromTimeout (
+getAbsTimespecFromTimeout(
 	uint_t timeout,
 	timespec* tspec
 	)
 {
 #if (_AXL_OS_DARWIN)
 	timeval tval;
-	gettimeofday (&tval, NULL);
+	gettimeofday(&tval, NULL);
 	tspec->tv_sec = tval.tv_sec;
 	tspec->tv_nsec = tval.tv_usec * 1000;
 #else
-	int result = clock_gettime (CLOCK_REALTIME, tspec);
-	ASSERT (result == 0);
+	int result = clock_gettime(CLOCK_REALTIME, tspec);
+	ASSERT(result == 0);
 #endif
 
-	uint64_t nsec = tspec->tv_nsec + (uint64_t) (timeout % 1000) * 1000000;
+	uint64_t nsec = tspec->tv_nsec + (uint64_t)(timeout % 1000) * 1000000;
 	tspec->tv_sec += timeout / 1000 + nsec / 1000000000ULL;
 	tspec->tv_nsec = nsec % 1000000000ULL;
 }

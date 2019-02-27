@@ -21,7 +21,7 @@ namespace io {
 #if (_AXL_OS_WIN)
 
 bool
-Serial::open (
+Serial::open(
 	const sl::StringRef& name,
 	uint_t flags
 	)
@@ -32,19 +32,19 @@ Serial::open (
 
 	uint_t flagsAttributes = (flags & FileFlag_Asynchronous) ? FILE_FLAG_OVERLAPPED : 0;
 
-	return m_serial.open (name, accessMode, flagsAttributes);
+	return m_serial.open(name, accessMode, flagsAttributes);
 }
 
 bool
-Serial::setSettings (
+Serial::setSettings(
 	const SerialSettings* settings,
 	uint_t mask
 	)
 {
 	DCB dcb;
-	dcb.DCBlength = sizeof (dcb);
+	dcb.DCBlength = sizeof(dcb);
 
-	bool result = m_serial.getSettings (&dcb);
+	bool result = m_serial.getSettings(&dcb);
 	if (!result)
 		return false;
 
@@ -74,7 +74,7 @@ Serial::setSettings (
 		dcb.fDtrControl = settings->m_dtr ? DTR_CONTROL_ENABLE : DTR_CONTROL_DISABLE;
 		dcb.fRtsControl = settings->m_rts ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE;
 
-		switch (settings->m_flowControl)
+		switch(settings->m_flowControl)
 		{
 		case SerialFlowControl_RtsCts:
 			dcb.fOutxCtsFlow = TRUE;
@@ -89,7 +89,7 @@ Serial::setSettings (
 	}
 
 	if (!(mask & SerialSettingId_ReadInterval))
-		return m_serial.setSettings (&dcb);
+		return m_serial.setSettings(&dcb);
 
 	COMMTIMEOUTS timeouts = { 0 };
 	timeouts.ReadIntervalTimeout =
@@ -98,35 +98,35 @@ Serial::setSettings (
 		settings->m_readInterval;
 
 	return
-		m_serial.setSettings (&dcb) &&
-		m_serial.setTimeouts (&timeouts);
+		m_serial.setSettings(&dcb) &&
+		m_serial.setTimeouts(&timeouts);
 }
 
 bool
-Serial::getSettings (SerialSettings* settings)
+Serial::getSettings(SerialSettings* settings)
 {
 	DCB dcb;
-	dcb.DCBlength = sizeof (dcb);
+	dcb.DCBlength = sizeof(dcb);
 
-	bool result = m_serial.getSettings (&dcb);
+	bool result = m_serial.getSettings(&dcb);
 	if (!result)
 		return false;
 
-	settings->setDcb (&dcb);
+	settings->setDcb(&dcb);
 	return true;
 }
 
 uint_t
-Serial::getStatusLines ()
+Serial::getStatusLines()
 {
-	uint_t lines = m_serial.getStatusLines ();
+	uint_t lines = m_serial.getStatusLines();
 	return lines != -1 ? (lines & 0xf0) >> 4 : -1;
 }
 
 #elif (_AXL_OS_POSIX)
 
 bool
-Serial::open (
+Serial::open(
 	const sl::StringRef& name,
 	uint_t flags
 	)
@@ -140,17 +140,17 @@ Serial::open (
 
 	posixFlags |= O_NOCTTY;
 
-	return m_serial.open (name, posixFlags);
+	return m_serial.open(name, posixFlags);
 }
 
 bool
-Serial::setSettings (
+Serial::setSettings(
 	const SerialSettings* settings,
 	uint_t mask
 	)
 {
 	termios attr;
-	bool result = m_serial.getAttr (&attr);
+	bool result = m_serial.getAttr(&attr);
 	if (!result)
 		return false;
 
@@ -158,7 +158,7 @@ Serial::setSettings (
 	{
 		speed_t speed;
 
-		switch (settings->m_baudRate)
+		switch(settings->m_baudRate)
 		{
 		case 110:
 			speed = B110;
@@ -209,15 +209,15 @@ Serial::setSettings (
 			speed = B38400;
 		}
 
-		cfsetispeed (&attr, speed);
-		cfsetospeed (&attr, speed);
+		cfsetispeed(&attr, speed);
+		cfsetospeed(&attr, speed);
 	}
 
 	if (mask & SerialSettingId_DataBits)
 	{
 		attr.c_cflag &= ~CSIZE;
 
-		switch (settings->m_dataBits)
+		switch(settings->m_dataBits)
 		{
 		case 5:
 			attr.c_cflag |= CS5;
@@ -251,7 +251,7 @@ Serial::setSettings (
 		attr.c_iflag &= ~(PARMRK | INPCK);
 		attr.c_iflag |= IGNPAR;
 
-		switch (settings->m_parity)
+		switch(settings->m_parity)
 		{
 		case SerialParity_None:
 			attr.c_cflag &= ~PARENB;
@@ -289,7 +289,7 @@ Serial::setSettings (
 		attr.c_cflag &= ~CRTSCTS;
 		attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 
-		switch (settings->m_flowControl)
+		switch(settings->m_flowControl)
 		{
 		case SerialFlowControl_RtsCts:
 			attr.c_cflag |= CRTSCTS;
@@ -309,25 +309,25 @@ Serial::setSettings (
 	attr.c_cflag |= CREAD | CLOCAL;
 	attr.c_lflag = 0;
 
-	for (size_t i = 0; i < countof (attr.c_cc); i++)
-		attr.c_cc [i] = _POSIX_VDISABLE;
+	for (size_t i = 0; i < countof(attr.c_cc); i++)
+		attr.c_cc[i] = _POSIX_VDISABLE;
 
-	attr.c_cc [VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
-	attr.c_cc [VMIN]  = 1;
+	attr.c_cc[VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
+	attr.c_cc[VMIN]  = 1;
 
-	result = m_serial.setAttr (&attr);
+	result = m_serial.setAttr(&attr);
 	if (!result)
 		return false;
 
 	if (mask & SerialSettingId_FlowControl) // also, adjust DTR & RTS lines
 	{
-		result = m_serial.setDtr (settings->m_dtr);
+		result = m_serial.setDtr(settings->m_dtr);
 		if (!result)
 			return false;
 
 		if (settings->m_flowControl != SerialFlowControl_RtsCts)
 		{
-			result = m_serial.setRts (settings->m_rts);
+			result = m_serial.setRts(settings->m_rts);
 			if (!result)
 				return false;
 		}
@@ -337,21 +337,21 @@ Serial::setSettings (
 }
 
 bool
-Serial::getSettings (SerialSettings* settings)
+Serial::getSettings(SerialSettings* settings)
 {
 	termios attr;
-	bool result = m_serial.getAttr (&attr);
+	bool result = m_serial.getAttr(&attr);
 	if (!result)
 		return false;
 
-	settings->setAttr (&attr);
+	settings->setAttr(&attr);
 	return true;
 }
 
 uint_t
-Serial::getStatusLines ()
+Serial::getStatusLines()
 {
-	uint_t result = m_serial.getStatusLines ();
+	uint_t result = m_serial.getStatusLines();
 	if (result == -1)
 		return -1;
 

@@ -19,17 +19,17 @@ namespace win {
 //..............................................................................
 
 size_t
-JobObject::queryInformation (
+JobObject::queryInformation(
 	JOBOBJECTINFOCLASS infoClass,
 	void* p,
 	size_t size
 	)
 {
 	dword_t resultSize;
-	bool_t result = ::QueryInformationJobObject (m_h, infoClass, p,  (dword_t) size, &resultSize);
+	bool_t result = ::QueryInformationJobObject(m_h, infoClass, p,  (dword_t)size, &resultSize);
 	if (!result)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return -1;
 	}
 

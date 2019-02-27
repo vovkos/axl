@@ -22,7 +22,7 @@ namespace sl {
 
 template <typename T>
 void
-swap (
+swap(
 	T* a,
 	T* b
 	)
@@ -42,7 +42,7 @@ public:
 		T* b
 		) const
 	{
-		swap (a, b);
+		swap(a, b);
 	}
 };
 

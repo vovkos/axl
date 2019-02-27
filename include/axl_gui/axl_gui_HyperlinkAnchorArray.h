@@ -25,7 +25,7 @@ struct HyperlinkAnchor: sl::ListLink
 	size_t m_offset;
 	sl::String m_hyperlink;
 
-	HyperlinkAnchor ()
+	HyperlinkAnchor()
 	{
 		m_offset = 0;
 	}
@@ -36,58 +36,58 @@ struct HyperlinkAnchor: sl::ListLink
 class HyperlinkAnchorArray
 {
 protected:
-	sl::List <HyperlinkAnchor> m_list;
-	sl::Array <HyperlinkAnchor*> m_array;
+	sl::List<HyperlinkAnchor> m_list;
+	sl::Array<HyperlinkAnchor*> m_array;
 
 public:
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
-		return m_list.isEmpty ();
+		return m_list.isEmpty();
 	}
 
 	bool
-	isHyperlinkOpened () const
+	isHyperlinkOpened() const
 	{
-		return !m_list.isEmpty () && !m_list.getTail ()->m_hyperlink.isEmpty ();
+		return !m_list.isEmpty() && !m_list.getTail()->m_hyperlink.isEmpty();
 	}
 
 	size_t
-	getCount () const
+	getCount() const
 	{
-		return m_list.getCount ();
+		return m_list.getCount();
 	}
 
-	sl::ConstIterator <HyperlinkAnchor>
-	getHead () const
+	sl::ConstIterator<HyperlinkAnchor>
+	getHead() const
 	{
-		return m_list.getHead ();
+		return m_list.getHead();
 	}
 
-	sl::ConstIterator <HyperlinkAnchor>
-	getTail () const
+	sl::ConstIterator<HyperlinkAnchor>
+	getTail() const
 	{
-		return m_list.getHead ();
+		return m_list.getHead();
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		m_list.clear ();
-		m_array.clear ();
+		m_list.clear();
+		m_array.clear();
 	}
 
 	const HyperlinkAnchor*
-	find (size_t offset) const;
+	find(size_t offset) const;
 
 	HyperlinkAnchor*
-	openHyperlink (
+	openHyperlink(
 		size_t offset,
 		const sl::StringRef& hyperlink
 		);
 
 	HyperlinkAnchor*
-	closeHyperlink (
+	closeHyperlink(
 		size_t offset,
 		bool closeEmpty = false
 		);

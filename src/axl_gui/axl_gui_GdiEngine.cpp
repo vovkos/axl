@@ -20,155 +20,155 @@ namespace gui {
 
 //..............................................................................
 
-GdiEngine::GdiEngine ()
+GdiEngine::GdiEngine()
 {
 	m_hWndClipboardOwner = NULL;
-	updateStdPalette ();
+	updateStdPalette();
 }
 
-GdiEngine::~GdiEngine ()
+GdiEngine::~GdiEngine()
 {
 	if (m_hWndClipboardOwner)
-		::DestroyWindow (m_hWndClipboardOwner);
+		::DestroyWindow(m_hWndClipboardOwner);
 }
 
 void
-GdiEngine::updateStdPalette ()
+GdiEngine::updateStdPalette()
 {
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetText]    = inverseRgb (::GetSysColor (COLOR_WINDOWTEXT));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_WidgetBack]    = inverseRgb (::GetSysColor (COLOR_WINDOW));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_GrayText]      = inverseRgb (::GetSysColor (COLOR_GRAYTEXT));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionText] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHTTEXT));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_SelectionBack] = inverseRgb (::GetSysColor (COLOR_HIGHLIGHT));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DFace]        = inverseRgb (::GetSysColor (COLOR_3DFACE));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DShadow]      = inverseRgb (::GetSysColor (COLOR_3DSHADOW));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DDarkShadow]  = inverseRgb (::GetSysColor (COLOR_3DDKSHADOW));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DLight]       = inverseRgb (::GetSysColor (COLOR_3DLIGHT));
-	g_stdPalColorArray [~ColorFlag_Index & StdPalColor_3DHiLight]     = inverseRgb (::GetSysColor (COLOR_3DHILIGHT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetText]    = inverseRgb(::GetSysColor(COLOR_WINDOWTEXT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetBack]    = inverseRgb(::GetSysColor(COLOR_WINDOW));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_GrayText]      = inverseRgb(::GetSysColor(COLOR_GRAYTEXT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_SelectionText] = inverseRgb(::GetSysColor(COLOR_HIGHLIGHTTEXT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_SelectionBack] = inverseRgb(::GetSysColor(COLOR_HIGHLIGHT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DFace]        = inverseRgb(::GetSysColor(COLOR_3DFACE));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DShadow]      = inverseRgb(::GetSysColor(COLOR_3DSHADOW));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DDarkShadow]  = inverseRgb(::GetSysColor(COLOR_3DDKSHADOW));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DLight]       = inverseRgb(::GetSysColor(COLOR_3DLIGHT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DHiLight]     = inverseRgb(::GetSysColor(COLOR_3DHILIGHT));
 }
 
-ref::Ptr <Font>
-GdiEngine::createStdFont (StdFontKind fontKind)
+ref::Ptr<Font>
+GdiEngine::createStdFont(StdFontKind fontKind)
 {
 	LOGFONTW logFont;
 	HFONT hFont;
 
-	switch (fontKind)
+	switch(fontKind)
 	{
 	case StdFontKind_Gui:
-		return createStockFont (DEFAULT_GUI_FONT);
+		return createStockFont(DEFAULT_GUI_FONT);
 
 	case StdFontKind_Monospace:
-		buildLogFont (&logFont, L"Courier New", 10);
+		buildLogFont(&logFont, L"Courier New", 10);
 		logFont.lfPitchAndFamily = FIXED_PITCH;
 
-		hFont = ::CreateFontIndirectW (&logFont);
-		ASSERT (hFont);
+		hFont = ::CreateFontIndirectW(&logFont);
+		ASSERT(hFont);
 
-		return createFont (hFont);
+		return createFont(hFont);
 
 	default:
 		return ref::g_nullPtr;
 	}
 }
 
-ref::Ptr <Font>
-GdiEngine::createFont (
+ref::Ptr<Font>
+GdiEngine::createFont(
 	const sl::StringRef& family,
 	size_t pointSize,
 	uint_t flags
 	)
 {
 	LOGFONTW logFont;
-	buildLogFont (&logFont, family, pointSize, flags);
+	buildLogFont(&logFont, family, pointSize, flags);
 
-	HFONT hFont = ::CreateFontIndirect (&logFont);
+	HFONT hFont = ::CreateFontIndirect(&logFont);
 	if (!hFont)
-		return err::failWithLastSystemError (ref::g_nullPtr);
+		return err::failWithLastSystemError(ref::g_nullPtr);
 
-	return createFont (hFont);
+	return createFont(hFont);
 }
 
-ref::Ptr <Font>
-GdiEngine::createStockFont (int stockFontKind)
+ref::Ptr<Font>
+GdiEngine::createStockFont(int stockFontKind)
 {
-	HGDIOBJ h = ::GetStockObject (stockFontKind);
-	dword_t gdiObjectType = ::GetObjectType (h);
+	HGDIOBJ h = ::GetStockObject(stockFontKind);
+	dword_t gdiObjectType = ::GetObjectType(h);
 	if (gdiObjectType != OBJ_FONT)
 	{
-		err::setError (err::SystemErrorCode_InvalidHandle);
+		err::setError(err::SystemErrorCode_InvalidHandle);
 		return ref::g_nullPtr;
 	}
 
-	return createFont ((HFONT) h);
+	return createFont((HFONT)h);
 }
 
-ref::Ptr <Font>
-GdiEngine::createFont (HFONT hFont)
+ref::Ptr<Font>
+GdiEngine::createFont(HFONT hFont)
 {
-	GdiFont* font = AXL_MEM_NEW (GdiFont);
+	GdiFont* font = AXL_MEM_NEW(GdiFont);
 
 	LOGFONTW logFont;
-	::GetObjectW (hFont, sizeof (logFont), &logFont);
-	getFontDescFromLogFont (&logFont, &font->m_fontDesc);
+	::GetObjectW(hFont, sizeof(logFont), &logFont);
+	getFontDescFromLogFont(&logFont, &font->m_fontDesc);
 
-	ref::Ptr <GdiFontuple> fontTuple = AXL_REF_NEW (GdiFontuple);
+	ref::Ptr<GdiFontuple> fontTuple = AXL_REF_NEW(GdiFontuple);
 	fontTuple->m_baseFont = font;
-	fontTuple->m_fontModArray [font->m_fontDesc.m_flags] = font;
+	fontTuple->m_fontModArray[font->m_fontDesc.m_flags] = font;
 
 	font->m_h = hFont;
 	font->m_tuple = fontTuple;
 
-	return ref::Ptr <Font> (font, fontTuple);
+	return ref::Ptr<Font> (font, fontTuple);
 }
 
 Font*
-GdiEngine::getFontMod (
+GdiEngine::getFontMod(
 	Font* _pBaseFont,
 	uint_t flags
 	)
 {
-	ASSERT (_pBaseFont->getEngine () == this);
+	ASSERT(_pBaseFont->getEngine() == this);
 
-	GdiFont* baseFont = (GdiFont*) _pBaseFont;
-	GdiFontuple* fontTuple = (GdiFontuple*) baseFont->m_tuple;
+	GdiFont* baseFont = (GdiFont*)_pBaseFont;
+	GdiFontuple* fontTuple = (GdiFontuple*)baseFont->m_tuple;
 
 	LOGFONTW logFont;
-	getLogFontFromFontDesc (*fontTuple->m_baseFont->getFontDesc (), &logFont);
-	modifyLogFont (&logFont, flags);
+	getLogFontFromFontDesc(*fontTuple->m_baseFont->getFontDesc(), &logFont);
+	modifyLogFont(&logFont, flags);
 
-	HFONT hFont = ::CreateFontIndirect (&logFont);
+	HFONT hFont = ::CreateFontIndirect(&logFont);
 	if (!hFont)
-		return err::failWithLastSystemError ((Font*) NULL);
+		return err::failWithLastSystemError((Font*)NULL);
 
-	GdiFont* font = AXL_MEM_NEW (GdiFont);
+	GdiFont* font = AXL_MEM_NEW(GdiFont);
 	font->m_fontDesc = baseFont->m_fontDesc;
 	font->m_fontDesc.m_flags = flags;
 	font->m_h = hFont;
 
-	ASSERT (!(flags & FontFlag_Transparent) && flags < countof (fontTuple->m_fontModArray));
-	ASSERT (!fontTuple->m_fontModArray [flags]);
+	ASSERT(!(flags & FontFlag_Transparent) && flags < countof(fontTuple->m_fontModArray));
+	ASSERT(!fontTuple->m_fontModArray[flags]);
 
-	fontTuple->m_fontModArray [flags] = font;
+	fontTuple->m_fontModArray[flags] = font;
 	return font;
 }
 
-ref::Ptr <Cursor>
-GdiEngine::createStockCursor (LPCTSTR stockCursorRes)
+ref::Ptr<Cursor>
+GdiEngine::createStockCursor(LPCTSTR stockCursorRes)
 {
-	HCURSOR h = ::LoadCursor (NULL, stockCursorRes);
+	HCURSOR h = ::LoadCursor(NULL, stockCursorRes);
 	if (!h)
-		return err::failWithLastSystemError (ref::g_nullPtr);
+		return err::failWithLastSystemError(ref::g_nullPtr);
 
-	ref::Ptr <GdiCursor> cursor = AXL_REF_NEW (ref::Box <GdiCursor>);
+	ref::Ptr<GdiCursor> cursor = AXL_REF_NEW(ref::Box<GdiCursor>);
 	cursor->m_h = h;
 	return cursor;
 }
 
-ref::Ptr <Cursor>
-GdiEngine::createStdCursor (StdCursorKind cursorKind)
+ref::Ptr<Cursor>
+GdiEngine::createStdCursor(StdCursorKind cursorKind)
 {
-	static LPCTSTR stockCursorResTable [StdCursorKind__Count] =
+	static LPCTSTR stockCursorResTable[StdCursorKind__Count] =
 	{
 		IDC_ARROW,    // StdCursorKind_Arrow = 0,
 		IDC_WAIT,     // StdCursorKind_Wait,
@@ -181,19 +181,19 @@ GdiEngine::createStdCursor (StdCursorKind cursorKind)
 		IDC_SIZEALL,  // StdCursorKind_SizeAll,
 	};
 
-	ASSERT (cursorKind < StdCursorKind__Count);
-	return createStockCursor (stockCursorResTable [cursorKind]);
+	ASSERT(cursorKind < StdCursorKind__Count);
+	return createStockCursor(stockCursorResTable[cursorKind]);
 }
 
-ref::Ptr <Image>
-GdiEngine::createImage ()
+ref::Ptr<Image>
+GdiEngine::createImage()
 {
-	ref::Ptr <GdiImage> image = AXL_REF_NEW (ref::Box <GdiImage>);
+	ref::Ptr<GdiImage> image = AXL_REF_NEW(ref::Box<GdiImage>);
 	return image;
 }
 
-ref::Ptr <Image>
-GdiEngine::createImage (
+ref::Ptr<Image>
+GdiEngine::createImage(
 	int width,
 	int height,
 	PixelFormat pixelFormat,
@@ -203,7 +203,7 @@ GdiEngine::createImage (
 {
 	uint_t bitCount;
 
-	switch (pixelFormat)
+	switch(pixelFormat)
 	{
 	case PixelFormat_Rgba:
 		bitCount = 32;
@@ -214,14 +214,14 @@ GdiEngine::createImage (
 		break;
 
 	default:
-		err::setFormatStringError ("unsupported pixel format '%s'", getPixelFormatString (pixelFormat));
+		err::setFormatStringError("unsupported pixel format '%s'", getPixelFormatString (pixelFormat));
 	};
 
 	HBITMAP hBitmap;
 
 	if (!isScreenCompatible)
 	{
-		hBitmap = ::CreateBitmap (
+		hBitmap = ::CreateBitmap(
 			width,
 			height,
 			1,
@@ -230,12 +230,12 @@ GdiEngine::createImage (
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError (ref::g_nullPtr);
+			return err::failWithLastSystemError(ref::g_nullPtr);
 	}
 	else
 	{
 		BITMAPINFO bitmapInfo = { 0 };
-		bitmapInfo.bmiHeader.biSize = sizeof (bitmapInfo.bmiHeader);
+		bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
 		bitmapInfo.bmiHeader.biPlanes = 1;
 		bitmapInfo.bmiHeader.biBitCount = bitCount;
 		bitmapInfo.bmiHeader.biCompression = BI_RGB;
@@ -244,16 +244,16 @@ GdiEngine::createImage (
 
 		ScreenDc screenDc;
 
-		hBitmap = ::CreateCompatibleBitmap (
+		hBitmap = ::CreateCompatibleBitmap(
 			screenDc,
 			width,
 			height
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError (ref::g_nullPtr);
+			return err::failWithLastSystemError(ref::g_nullPtr);
 
-		bool_t result = ::SetDIBits (
+		bool_t result = ::SetDIBits(
 			screenDc,
 			hBitmap,
 			0,
@@ -264,125 +264,125 @@ GdiEngine::createImage (
 			);
 
 		if (!result)
-			return err::failWithLastSystemError (ref::g_nullPtr);
+			return err::failWithLastSystemError(ref::g_nullPtr);
 	}
 
-	ref::Ptr <GdiImage> image = AXL_REF_NEW (ref::Box <GdiImage>);
+	ref::Ptr<GdiImage> image = AXL_REF_NEW(ref::Box<GdiImage>);
 	image->m_h = hBitmap;
 	return image;
 }
 
-ref::Ptr <Canvas>
-GdiEngine::createOffscreenCanvas (
+ref::Ptr<Canvas>
+GdiEngine::createOffscreenCanvas(
 	int width,
 	int height
 	)
 {
 	ScreenDc screenDc;
-	HBITMAP hBitmap = ::CreateCompatibleBitmap (screenDc, width, height);
+	HBITMAP hBitmap = ::CreateCompatibleBitmap(screenDc, width, height);
 	if (!hBitmap)
-		return err::failWithLastSystemError (ref::g_nullPtr);
+		return err::failWithLastSystemError(ref::g_nullPtr);
 
-	HDC hdc = ::CreateCompatibleDC (screenDc);
+	HDC hdc = ::CreateCompatibleDC(screenDc);
 
-	ref::Ptr <GdiCanvas> dc = AXL_REF_NEW (ref::Box <GdiCanvas>);
-	dc->attach (hdc, NULL, GdiCanvas::DestructKind_DeleteDc);
+	ref::Ptr<GdiCanvas> dc = AXL_REF_NEW(ref::Box<GdiCanvas>);
+	dc->attach(hdc, NULL, GdiCanvas::DestructKind_DeleteDc);
 	dc->m_hBitmap = hBitmap;
-	dc->m_hPrevBitmap = (HBITMAP) ::SelectObject (hdc, hBitmap);
+	dc->m_hPrevBitmap = (HBITMAP) ::SelectObject(hdc, hBitmap);
 
 	return dc;
 }
 
 uintptr_t
-GdiEngine::registerClipboardFormat (const sl::StringRef& formatName)
+GdiEngine::registerClipboardFormat(const sl::StringRef& formatName)
 {
-	err::setError (err::SystemErrorCode_NotImplemented);
+	err::setError(err::SystemErrorCode_NotImplemented);
 	return -1;
 }
 
 bool
-GdiEngine::readClipboard (sl::String* string)
+GdiEngine::readClipboard(sl::String* string)
 {
-	bool result = openClipboard ();
+	bool result = openClipboard();
 	if (!result)
 		return false;
 
-	HANDLE hData = ::GetClipboardData (CF_TEXT);
+	HANDLE hData = ::GetClipboardData(CF_TEXT);
 	if (!hData)
 	{
 		::CloseClipboard();
 
-		err::setError (err::SystemErrorCode_InvalidDeviceRequest);
+		err::setError(err::SystemErrorCode_InvalidDeviceRequest);
 		return false;
 	}
 
-	string->clear ();
+	string->clear();
 
-	size_t size = ::GlobalSize (hData);
+	size_t size = ::GlobalSize(hData);
 	if (!size)
 	{
 		::CloseClipboard();
 		return true;
 	}
 
-	void* data = ::GlobalLock (hData);
-	ASSERT (data);
+	void* data = ::GlobalLock(hData);
+	ASSERT(data);
 
-	string->copy ((char*) data);
+	string->copy((char*)data);
 
 	::GlobalUnlock(data);
 
-	::CloseClipboard ();
+	::CloseClipboard();
 	return true;
 }
 
 bool
-GdiEngine::readClipboard (
+GdiEngine::readClipboard(
 	uintptr_t format,
-	sl::Array <char>* data
+	sl::Array<char>* data
 	)
 {
-	err::setError (err::SystemErrorCode_NotImplemented);
+	err::setError(err::SystemErrorCode_NotImplemented);
 	return false;
 }
 
 bool
-GdiEngine::writeClipboard (const sl::StringRef& string)
+GdiEngine::writeClipboard(const sl::StringRef& string)
 {
-	bool result = openClipboard ();
+	bool result = openClipboard();
 	if (!result)
 		return false;
 
-	HGLOBAL hData = ::GlobalAlloc (GMEM_MOVEABLE | GMEM_ZEROINIT, length + 1);
-	void* p = ::GlobalLock (hData);
-	memcpy (p, string, length);
-	((char*) p) [length] = 0;
-	::GlobalUnlock (hData);
+	HGLOBAL hData = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, length + 1);
+	void* p = ::GlobalLock(hData);
+	memcpy(p, string, length);
+	((char*)p) [length] = 0;
+	::GlobalUnlock(hData);
 
-	::SetClipboardData (CF_TEXT, hData);
-	::CloseClipboard ();
+	::SetClipboardData(CF_TEXT, hData);
+	::CloseClipboard();
 	return true;
 }
 
 bool
-GdiEngine::writeClipboard (
+GdiEngine::writeClipboard(
 	uintptr_t format,
 	const void* data,
 	size_t size
 	)
 {
-	err::setError (err::SystemErrorCode_NotImplemented);
+	err::setError(err::SystemErrorCode_NotImplemented);
 	return false;
 }
 
 bool
-GdiEngine::openClipboard ()
+GdiEngine::openClipboard()
 {
 	bool_t result;
 
 	if (!m_hWndClipboardOwner)
 	{
-		m_hWndClipboardOwner = ::CreateWindowExW (
+		m_hWndClipboardOwner = ::CreateWindowExW(
 			0,
 			L"STATIC",
 			NULL,
@@ -393,20 +393,20 @@ GdiEngine::openClipboard ()
 			CW_USEDEFAULT,
 			NULL,
 			NULL,
-			g::getModule ()->getModuleHandle (),
+			g::getModule()->getModuleHandle(),
 			NULL
 			);
 
 		if (!m_hWndClipboardOwner)
-			return err::failWithLastSystemError ();
+			return err::failWithLastSystemError();
 	}
 
-	result = ::OpenClipboard (m_hWndClipboardOwner);
-	return err::complete (result);
+	result = ::OpenClipboard(m_hWndClipboardOwner);
+	return err::complete(result);
 }
 
 bool
-GdiEngine::showCaret (
+GdiEngine::showCaret(
 	Widget* widget,
 	const Rect& rect
 	)
@@ -415,7 +415,7 @@ GdiEngine::showCaret (
 }
 
 void
-GdiEngine::hideCaret ()
+GdiEngine::hideCaret()
 {
 }
 

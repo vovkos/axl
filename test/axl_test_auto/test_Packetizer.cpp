@@ -16,56 +16,56 @@ namespace {
 
 //..............................................................................
 
-class MyPacketizer: public sl::Packetizer <MyPacketizer>
+class MyPacketizer: public sl::Packetizer<MyPacketizer>
 {
 public:
 	void
-	onPacket (
+	onPacket(
 		const void* p,
 		size_t size
 		)
 	{
-		printf ("packet received: %s\n", p);
+		printf("packet received: %s\n", p);
 	}
 };
 
 void
-run ()
+run()
 {
-	printf ("test_Packetizer::Run ()\n");
+	printf("test_Packetizer::Run ()\n");
 
 	MyPacketizer packetizer;
 
-	char data [] = "papapaapak:\xf\0\0\0pizda ivanovna";
+	char data[] = "papapaapak:\xf\0\0\0pizda ivanovna";
 
 	for (size_t i = 0; i < 64; i++)
 	{
 		char* p = data;
-		size_t size = sizeof (data);
+		size_t size = sizeof(data);
 
 		size_t j = 0;
 		for (; size; j++)
 		{
-			size_t chunkSize = rand () % (sizeof (data) + 1);
+			size_t chunkSize = rand() % (sizeof(data) + 1);
 			if (chunkSize > size)
 				chunkSize = size;
 
-			packetizer.write (p, chunkSize);
+			packetizer.write(p, chunkSize);
 			p += chunkSize;
 			size -= chunkSize;
 		}
 
-		printf ("complete (%d, %d chunks).\n", i, j);
+		printf("complete (%d, %d chunks).\n", i, j);
 	}
 
 	sl::String s = "dsjsdljsdkl";
-	s.clear ();
+	s.clear();
 
-	printf ("done.\n");
+	printf("done.\n");
 }
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_Packetizer", run)
+ADD_TEST_CASE("test_Packetizer", run)
 
 }

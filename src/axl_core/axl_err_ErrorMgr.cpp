@@ -26,69 +26,69 @@ namespace err {
 
 //..............................................................................
 
-ErrorMgr::ErrorMgr ()
+ErrorMgr::ErrorMgr()
 {
-	m_tlsSlot = sys::getTlsMgr ()->createSlot ();
+	m_tlsSlot = sys::getTlsMgr()->createSlot();
 	m_forwardRouter = NULL;
 
-	registerProvider (g_stdErrorGuid, sl::getSimpleSingleton <StdErrorProvider> ());
-	registerProvider (g_errnoGuid, sl::getSimpleSingleton <ErrnoProvider> ());
+	registerProvider(g_stdErrorGuid, sl::getSimpleSingleton<StdErrorProvider> ());
+	registerProvider(g_errnoGuid, sl::getSimpleSingleton<ErrnoProvider> ());
 
 #if (_AXL_OS_WIN)
-	registerProvider (sys::win::g_winErrorGuid, sl::getSimpleSingleton <sys::win::WinErrorProvider> ());
-	registerProvider (sys::win::g_ntStatusGuid, sl::getSimpleSingleton <sys::win::NtStatusProvider> ());
+	registerProvider(sys::win::g_winErrorGuid, sl::getSimpleSingleton<sys::win::WinErrorProvider> ());
+	registerProvider(sys::win::g_ntStatusGuid, sl::getSimpleSingleton<sys::win::NtStatusProvider> ());
 #elif (_AXL_OS_DARWIN)
-	registerProvider (sys::drw::g_MachErrorGuid, sl::getSimpleSingleton <sys::drw::MachErrorProvider> ());
+	registerProvider(sys::drw::g_MachErrorGuid, sl::getSimpleSingleton<sys::drw::MachErrorProvider> ());
 #endif
 }
 
 void
-ErrorMgr::registerProvider (
+ErrorMgr::registerProvider(
 	const sl::Guid& guid,
 	ErrorProvider* provider
 	)
 {
-	sys::ScopeLock scopeLock (&m_lock);
-	m_providerMap.visit (guid)->m_value = provider;
+	sys::ScopeLock scopeLock(&m_lock);
+	m_providerMap.visit(guid)->m_value = provider;
 }
 
 ErrorProvider*
-ErrorMgr::findProvider (const sl::Guid& guid)
+ErrorMgr::findProvider(const sl::Guid& guid)
 {
-	sys::ScopeLock scopeLock (&m_lock);
-	sl::HashTableIterator <sl::Guid, ErrorProvider*> it = m_providerMap.find (guid);
+	sys::ScopeLock scopeLock(&m_lock);
+	sl::HashTableIterator<sl::Guid, ErrorProvider*> it = m_providerMap.find(guid);
 	return it ? it->m_value : NULL;
 }
 
 ErrorRef
-ErrorMgr::getLastError ()
+ErrorMgr::getLastError()
 {
-	ThreadEntry* entry = findThreadEntry ();
-	if (entry && !entry->m_error.isEmpty ())
+	ThreadEntry* entry = findThreadEntry();
+	if (entry && !entry->m_error.isEmpty())
 		return entry->m_error;
 
 	return &g_noError;
 }
 
 void
-ErrorMgr::setError (const ErrorRef& error)
+ErrorMgr::setError(const ErrorRef& error)
 {
-	ThreadEntry* entry = getThreadEntry ();
+	ThreadEntry* entry = getThreadEntry();
 	entry->m_error = error;
 
 	if (m_forwardRouter)
-		m_forwardRouter->routeError (error);
+		m_forwardRouter->routeError(error);
 }
 
 ErrorMgr::ThreadEntry*
-ErrorMgr::getThreadEntry ()
+ErrorMgr::getThreadEntry()
 {
-	ThreadEntry* entry = findThreadEntry ();
+	ThreadEntry* entry = findThreadEntry();
 	if (entry)
 		return entry;
 
-	ref::Ptr <ThreadEntry> newEntry = AXL_REF_NEW (ref::Box <ThreadEntry>);
-	sys::getTlsMgr ()->setSlotValue (m_tlsSlot, newEntry);
+	ref::Ptr<ThreadEntry> newEntry = AXL_REF_NEW(ref::Box<ThreadEntry>);
+	sys::getTlsMgr()->setSlotValue(m_tlsSlot, newEntry);
 	return newEntry;
 }
 

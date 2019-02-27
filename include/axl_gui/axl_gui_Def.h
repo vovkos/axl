@@ -34,9 +34,9 @@ enum MouseButton
 
 inline
 MouseButton
-getFirstMouseButton (uint_t buttons)
+getFirstMouseButton(uint_t buttons)
 {
-	return (MouseButton) sl::getLoBitIdx32 (buttons);
+	return (MouseButton)sl::getLoBitIdx32(buttons);
 }
 
 //..............................................................................
@@ -53,9 +53,9 @@ enum ModifierKey
 
 inline
 ModifierKey
-getFirstModifierKey (uint_t modifierKeys)
+getFirstModifierKey(uint_t modifierKeys)
 {
-	return (ModifierKey) sl::getLoBitIdx32 (modifierKeys);
+	return (ModifierKey)sl::getLoBitIdx32(modifierKeys);
 }
 
 //..............................................................................
@@ -126,13 +126,13 @@ struct Point
 		};
 	};
 
-	Point ()
+	Point()
 	{
 		m_x = 0;
 		m_y = 0;
 	}
 
-	Point (
+	Point(
 		int x,
 		int y
 		)
@@ -144,17 +144,17 @@ struct Point
 	Point
 	operator + (const Point& point2)
 	{
-		return Point (m_x + point2.m_x, m_y + point2.m_y);
+		return Point(m_x + point2.m_x, m_y + point2.m_y);
 	}
 
 	Point
 	operator - (const Point& point2)
 	{
-		return Point (m_x - point2.m_x, m_y - point2.m_y);
+		return Point(m_x - point2.m_x, m_y - point2.m_y);
 	}
 
 	void
-	setup (
+	setup(
 		int x,
 		int y
 		)
@@ -164,7 +164,7 @@ struct Point
 	}
 
 	void
-	clipNegative ()
+	clipNegative()
 	{
 		if (m_x < 0)
 			m_x = 0;
@@ -195,13 +195,13 @@ struct Size
 		};
 	};
 
-	Size ()
+	Size()
 	{
 		m_width = 0;
 		m_height = 0;
 	}
 
-	Size (
+	Size(
 		int width,
 		int height
 		)
@@ -213,17 +213,17 @@ struct Size
 	Size
 	operator + (const Size& size2)
 	{
-		return Size (m_width + size2.m_width, m_height + size2.m_height);
+		return Size(m_width + size2.m_width, m_height + size2.m_height);
 	}
 
 	Size
 	operator - (const Size& size2)
 	{
-		return Size (m_width - size2.m_width, m_height - size2.m_height);
+		return Size(m_width - size2.m_width, m_height - size2.m_height);
 	}
 
 	void
-	setup (
+	setup(
 		int width,
 		int height
 		)
@@ -233,7 +233,7 @@ struct Size
 	}
 
 	void
-	clipNegative ()
+	clipNegative()
 	{
 		if (m_width < 0)
 			m_width = 0;
@@ -268,7 +268,7 @@ struct Rect
 		};
 	};
 
-	Rect ()
+	Rect()
 	{
 		m_left = 0;
 		m_top = 0;
@@ -276,7 +276,7 @@ struct Rect
 		m_bottom = 0;
 	}
 
-	Rect (
+	Rect(
 		int left,
 		int top,
 		int right,
@@ -289,7 +289,7 @@ struct Rect
 		m_bottom = bottom;
 	}
 
-	Rect (
+	Rect(
 		int left,
 		int top
 		)
@@ -300,7 +300,7 @@ struct Rect
 		m_bottom = top;
 	}
 
-	Rect (
+	Rect(
 		const Point& leftTop,
 		const Point& rightBottom
 		)
@@ -311,7 +311,7 @@ struct Rect
 		m_bottom = rightBottom.m_y;
 	}
 
-	Rect (const Point& leftTop)
+	Rect(const Point& leftTop)
 	{
 		m_left = leftTop.m_x;
 		m_top = leftTop.m_y;
@@ -319,7 +319,7 @@ struct Rect
 		m_bottom = leftTop.m_y;
 	}
 
-	Rect (
+	Rect(
 		const Point& leftTop,
 		const Size& size
 		)
@@ -331,31 +331,31 @@ struct Rect
 	}
 
 	bool
-	isEmpty () const
+	isEmpty() const
 	{
 		return m_right == m_left || m_bottom == m_top;
 	}
 
 	int
-	getWidth () const
+	getWidth() const
 	{
 		return m_right - m_left;
 	}
 
 	int
-	getHeight () const
+	getHeight() const
 	{
 		return m_bottom - m_top;
 	}
 
 	Size
-	getSize () const
+	getSize() const
 	{
-		return Size (getWidth (), getHeight ());
+		return Size(getWidth(), getHeight());
 	}
 
 	void
-	setup (
+	setup(
 		int left,
 		int top,
 		int right,
@@ -369,7 +369,7 @@ struct Rect
 	}
 
 	void
-	clipNegative ()
+	clipNegative()
 	{
 		if (m_left < 0)
 			m_left = 0;
@@ -406,58 +406,58 @@ struct CaretPos
 		};
 	};
 
-	CaretPos ()
+	CaretPos()
 	{
 		m_line = 0;
 		m_col = 0;
 	}
 
-	CaretPos (
+	CaretPos(
 		int line,
 		int col
 		)
 	{
-		setup (line, col);
+		setup(line, col);
 	}
 
 	bool
 	operator == (const CaretPos& pos2) const
 	{
-		return cmp (pos2) == 0;
+		return cmp(pos2) == 0;
 	}
 
 	bool
 	operator != (const CaretPos& pos2) const
 	{
-		return cmp (pos2) != 0;
+		return cmp(pos2) != 0;
 	}
 
 	bool
 	operator < (const CaretPos& pos2) const
 	{
-		return cmp (pos2) < 0;
+		return cmp(pos2) < 0;
 	}
 
 	bool
 	operator <= (const CaretPos& pos2) const
 	{
-		return cmp (pos2) <= 0;
+		return cmp(pos2) <= 0;
 	}
 
 	bool
 	operator > (const CaretPos& pos2) const
 	{
-		return cmp (pos2) > 0;
+		return cmp(pos2) > 0;
 	}
 
 	bool
 	operator >= (const CaretPos& pos2) const
 	{
-		return cmp (pos2) >= 0;
+		return cmp(pos2) >= 0;
 	}
 
 	int
-	cmp (const CaretPos& pos2) const
+	cmp(const CaretPos& pos2) const
 	{
 		return
 			m_line < pos2.m_line ? -1 :
@@ -467,7 +467,7 @@ struct CaretPos
 	}
 
 	int
-	cmp_u (const CaretPos& pos2) const
+	cmp_u(const CaretPos& pos2) const
 	{
 		return
 			m_line_u < pos2.m_line_u ? -1 :
@@ -477,7 +477,7 @@ struct CaretPos
 	}
 
 	void
-	setup (
+	setup(
 		int line,
 		int col
 		)
@@ -487,7 +487,7 @@ struct CaretPos
 	}
 
 	void
-	clipNegative ()
+	clipNegative()
 	{
 		if (m_line < 0)
 			m_line = 0;
@@ -520,7 +520,7 @@ enum FormFactor
 
 inline
 FormFactor
-getFormFactor (
+getFormFactor(
 	int width,
 	int height,
 	int stripThreshold = 8
@@ -534,12 +534,12 @@ getFormFactor (
 
 inline
 FormFactor
-getFormFactor (
+getFormFactor(
 	const Size& size,
 	int stripThreshold = 8
 	)
 {
-	return getFormFactor (size.m_width, size.m_height, stripThreshold);
+	return getFormFactor(size.m_width, size.m_height, stripThreshold);
 }
 
 //..............................................................................
@@ -550,13 +550,13 @@ protected:
 	Engine* m_engine;
 
 public:
-	GuiItem (Engine* engine)
+	GuiItem(Engine* engine)
 	{
 		m_engine = engine;
 	}
 
 	Engine*
-	getEngine ()
+	getEngine()
 	{
 		return m_engine;
 	}

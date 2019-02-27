@@ -19,26 +19,26 @@ namespace io {
 //..............................................................................
 
 bool
-UsbEventThread::start (libusb_context* context)
+UsbEventThread::start(libusb_context* context)
 {
-	stop ();
+	stop();
 
 	m_context = context;
 	m_isTerminating = false;
 
-	return ThreadImpl <UsbEventThread>::start ();
+	return ThreadImpl<UsbEventThread>::start();
 }
 
 void
-UsbEventThread::threadFunc ()
+UsbEventThread::threadFunc()
 {
 	UsbContext context;
-	context.attach (m_context);
+	context.attach(m_context);
 
 	while (!m_isTerminating)
-		context.handleEvents (TimerGranularity);
+		context.handleEvents(TimerGranularity);
 
-	context.detach ();
+	context.detach();
 }
 
 //..............................................................................

@@ -26,20 +26,20 @@ mz_fopen(
 	)
 {
 	FILE* file = NULL;
-	_wfopen_s(&file, axl::sl::String_w (fileName), axl::sl::String_w (mode));
+	_wfopen_s(&file, axl::sl::String_w(fileName), axl::sl::String_w(mode));
 	return file;
 }
 
 static
 FILE*
-mz_freopen (
+mz_freopen(
 	const char* path,
 	const char* mode,
 	FILE* stream
 	)
 {
 	FILE* file = NULL;
-	if (_wfreopen_s(&file, axl::sl::String_w (path), axl::sl::String_w (mode), stream))
+	if (_wfreopen_s(&file, axl::sl::String_w(path), axl::sl::String_w(mode), stream))
 		return NULL;
 
 	return file;
@@ -60,72 +60,72 @@ namespace zip {
 //..............................................................................
 
 void
-ZipReader::close ()
+ZipReader::close()
 {
 	if (!m_zip)
 		return;
 
-	mz_zip_reader_end (m_zip);
-	AXL_MEM_FREE (m_zip);
+	mz_zip_reader_end(m_zip);
+	AXL_MEM_FREE(m_zip);
 	m_zip = NULL;
 }
 
 bool
-ZipReader::openFile (const sl::StringRef& fileName)
+ZipReader::openFile(const sl::StringRef& fileName)
 {
-	close ();
+	close();
 
-	m_zip = AXL_MEM_ZERO_NEW (mz_zip_archive);
-	mz_bool result = mz_zip_reader_init_file (m_zip, fileName.sz (), MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
-	return result ? true : err::fail (err::SystemErrorCode_Unsuccessful);
+	m_zip = AXL_MEM_ZERO_NEW(mz_zip_archive);
+	mz_bool result = mz_zip_reader_init_file(m_zip, fileName.sz(), MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
+	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }
 
 bool
-ZipReader::openMem (
+ZipReader::openMem(
 	const void* p,
 	size_t size
 	)
 {
-	close ();
+	close();
 
-	m_zip = AXL_MEM_ZERO_NEW (mz_zip_archive);
-	mz_bool result = mz_zip_reader_init_mem (m_zip, p, size, MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
-	return result ? true : err::fail (err::SystemErrorCode_Unsuccessful);
+	m_zip = AXL_MEM_ZERO_NEW(mz_zip_archive);
+	mz_bool result = mz_zip_reader_init_mem(m_zip, p, size, MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
+	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }
 
 size_t
-ZipReader::getFileCount ()
+ZipReader::getFileCount()
 {
-	ASSERT (isOpen ());
-	return mz_zip_reader_get_num_files (m_zip);
+	ASSERT(isOpen());
+	return mz_zip_reader_get_num_files(m_zip);
 }
 
 sl::String
-ZipReader::getFileName (size_t index)
+ZipReader::getFileName(size_t index)
 {
-	ASSERT (isOpen ());
-	size_t size = mz_zip_reader_get_filename (m_zip, index, NULL, 0);
+	ASSERT(isOpen());
+	size_t size = mz_zip_reader_get_filename(m_zip, index, NULL, 0);
 
 	sl::String fileName;
-	char* p = fileName.createBuffer (size);
-	mz_zip_reader_get_filename (m_zip, index, p, size);
-	fileName.chop (1);
+	char* p = fileName.createBuffer(size);
+	mz_zip_reader_get_filename(m_zip, index, p, size);
+	fileName.chop(1);
 	return fileName;
 }
 
 bool
-ZipReader::getFileInfo (
+ZipReader::getFileInfo(
 	size_t index,
 	ZipFileInfo* fileInfo,
 	sl::String* comment
 	)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
 	mz_zip_archive_file_stat stat;
-	mz_bool result = mz_zip_reader_file_stat (m_zip, index, &stat);
+	mz_bool result = mz_zip_reader_file_stat(m_zip, index, &stat);
 	if (!result)
-		return err::fail (err::SystemErrorCode_Unsuccessful);
+		return err::fail(err::SystemErrorCode_Unsuccessful);
 
 	fileInfo->m_centralDirOffset = stat.m_central_dir_ofs;
 	fileInfo->m_versionMadeBy = stat.m_version_made_by;
@@ -147,80 +147,80 @@ ZipReader::getFileInfo (
 }
 
 bool
-ZipReader::isDirectoryFile (size_t index)
+ZipReader::isDirectoryFile(size_t index)
 {
-	ASSERT (isOpen ());
-	return mz_zip_reader_is_file_a_directory (m_zip, index) != 0;
+	ASSERT(isOpen());
+	return mz_zip_reader_is_file_a_directory(m_zip, index) != 0;
 }
 
 bool
-ZipReader::isFileEncrypted (size_t index)
+ZipReader::isFileEncrypted(size_t index)
 {
-	ASSERT (isOpen ());
-	return mz_zip_reader_is_file_encrypted (m_zip, index) != 0;
+	ASSERT(isOpen());
+	return mz_zip_reader_is_file_encrypted(m_zip, index) != 0;
 }
 
 bool
-ZipReader::extractFileToMem (
+ZipReader::extractFileToMem(
 	size_t index,
 	void* p,
 	size_t size
 	)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
-	char readBuffer [1024];
-	mz_bool result = mz_zip_reader_extract_to_mem_no_alloc (
+	char readBuffer[1024];
+	mz_bool result = mz_zip_reader_extract_to_mem_no_alloc(
 		m_zip,
 		index,
 		p,
 		size,
 		0,
 		readBuffer,
-		sizeof (readBuffer)
+		sizeof(readBuffer)
 		);
 
-	return result ? true : err::fail (err::SystemErrorCode_Unsuccessful);
+	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }
 
 bool
-ZipReader::extractFileToMem (
+ZipReader::extractFileToMem(
 	size_t index,
-	sl::Array <char>* buffer
+	sl::Array<char>* buffer
 	)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
 	mz_zip_archive_file_stat stat;
 	bool result =
-		mz_zip_reader_file_stat (m_zip, index, &stat) &&
-		buffer->reserve ((size_t) stat.m_uncomp_size + 1);
+		mz_zip_reader_file_stat(m_zip, index, &stat) &&
+		buffer->reserve((size_t)stat.m_uncomp_size + 1);
 
 	if (!result)
 		return false;
 
-	buffer->p () [(size_t) stat.m_uncomp_size] = 0; // ensure zero termination
-	buffer->setCount ((size_t) stat.m_uncomp_size);
+	buffer->p() [(size_t)stat.m_uncomp_size] = 0; // ensure zero termination
+	buffer->setCount((size_t)stat.m_uncomp_size);
 
-	return extractFileToMem (index, buffer->p (), (size_t) stat.m_uncomp_size);
+	return extractFileToMem(index, buffer->p(), (size_t)stat.m_uncomp_size);
 }
 
 bool
-ZipReader::extractFileToFile (
+ZipReader::extractFileToFile(
 	size_t index,
 	const sl::StringRef& fileName
 	)
 {
-	ASSERT (isOpen ());
+	ASSERT(isOpen());
 
-	mz_bool result = mz_zip_reader_extract_to_file (
+	mz_bool result = mz_zip_reader_extract_to_file(
 		m_zip,
 		index,
-		fileName.sz (),
+		fileName.sz(),
 		0
 		);
 
-	return result ? true : err::fail (err::SystemErrorCode_Unsuccessful);
+	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }
 
 //..............................................................................

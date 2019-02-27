@@ -27,101 +27,101 @@ public:
 	void
 	operator () (RSA* h)
 	{
-		RSA_free (h);
+		RSA_free(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Rsa: public sl::Handle <RSA*, FreeRsa>
+class Rsa: public sl::Handle<RSA*, FreeRsa>
 {
 public:
-	Rsa ()
+	Rsa()
 	{
 	}
 
 	size_t
-	getSize ()
+	getSize()
 	{
-		return RSA_size (m_h);
+		return RSA_size(m_h);
 	}
 
 	bool
-	readPublicKey (BIO* bio);
+	readPublicKey(BIO* bio);
 
 	bool
-	readPublicKey (
+	readPublicKey(
 		const void* pem,
 		size_t size
 		)
 	{
 		Bio bio;
-		return bio.create (pem, size) && readPublicKey (bio);
+		return bio.create(pem, size) && readPublicKey(bio);
 	}
 
 	bool
-	readPrivateKey (BIO* bio);
+	readPrivateKey(BIO* bio);
 
 	bool
-	readPrivateKey (
+	readPrivateKey(
 		const void* pem,
 		size_t size
 		)
 	{
 		Bio bio;
-		return bio.create (pem, size) && readPrivateKey (bio);
+		return bio.create(pem, size) && readPrivateKey(bio);
 	}
 
 	size_t
-	publicEncrypt (
+	publicEncrypt(
 		void* dst,
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 		)
 	{
-		int result = RSA_public_encrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
-		return completeWithLastCryptoError <size_t> (result, -1);
+		int result = RSA_public_encrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
 	size_t
-	privateEncrypt (
+	privateEncrypt(
 		void* dst,
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 		)
 	{
-		int result = RSA_private_encrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
-		return completeWithLastCryptoError <size_t> (result, -1);
+		int result = RSA_private_encrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
 	size_t
-	publicDecrypt (
+	publicDecrypt(
 		void* dst,
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 		)
 	{
-		int result = RSA_public_decrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
-		return completeWithLastCryptoError <size_t> (result, -1);
+		int result = RSA_public_decrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
 	size_t
-	privateDecrypt (
+	privateDecrypt(
 		void* dst,
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 		)
 	{
-		int result = RSA_private_decrypt (size, (const uchar_t*) src, (uchar_t*) dst, m_h, padding);
-		return completeWithLastCryptoError <size_t> (result, -1);
+		int result = RSA_private_decrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
 	size_t
-	signHash (
+	signHash(
 		int type,
 		void* signature,
 		size_t signatureSize,
@@ -130,50 +130,50 @@ public:
 		);
 
 	bool
-	signHash (
+	signHash(
 		int type,
-		sl::Array <char>* signature,
+		sl::Array<char>* signature,
 		const void* hash,
 		size_t hashSize
 		);
 
-	sl::Array <char>
-	signHash (
+	sl::Array<char>
+	signHash(
 		int type,
 		const void* hash,
 		size_t hashSize
 		)
 	{
-		sl::Array <char> signature;
-		signHash (type, &signature, hash, hashSize);
+		sl::Array<char> signature;
+		signHash(type, &signature, hash, hashSize);
 		return signature;
 	}
 
 	bool
-	sign (
-		sl::Array <char>* signature,
+	sign(
+		sl::Array<char>* signature,
 		const void* p,
 		size_t size
 		)
 	{
-		char hash [MD5_DIGEST_LENGTH];
-		MD5 ((const uchar_t*) p, size, (uchar_t*) hash);
-		return signHash (NID_md5, signature, hash, sizeof (hash));
+		char hash[MD5_DIGEST_LENGTH];
+		MD5((const uchar_t*) p, size, (uchar_t*)hash);
+		return signHash(NID_md5, signature, hash, sizeof(hash));
 	}
 
-	sl::Array <char>
-	sign (
+	sl::Array<char>
+	sign(
 		const void* p,
 		size_t size
 		)
 	{
-		sl::Array <char> signature;
-		sign (&signature, p, size);
+		sl::Array<char> signature;
+		sign(&signature, p, size);
 		return signature;
 	}
 
 	bool
-	verifyHash (
+	verifyHash(
 		int type,
 		const void* hash,
 		size_t hashSize,
@@ -181,27 +181,27 @@ public:
 		size_t signatureSize
 		)
 	{
-		return RSA_verify (
+		return RSA_verify(
 			type,
 			(const uchar_t*) hash,
-			(int) hashSize,
+			(int)hashSize,
 			(const uchar_t*) signature,
-			(int) signatureSize,
+			(int)signatureSize,
 			m_h
 			) == 1;
 	}
 
 	bool
-	verify (
+	verify(
 		const void* p,
 		size_t size,
 		const void* signature,
 		size_t signatureSize
 		)
 	{
-		char hash [MD5_DIGEST_LENGTH];
-		MD5 ((const uchar_t*) p, size, (uchar_t*) hash);
-		return verifyHash (NID_md5, hash, sizeof (hash), signature, signatureSize);
+		char hash[MD5_DIGEST_LENGTH];
+		MD5((const uchar_t*) p, size, (uchar_t*)hash);
+		return verifyHash(NID_md5, hash, sizeof(hash), signature, signatureSize);
 	}
 };
 

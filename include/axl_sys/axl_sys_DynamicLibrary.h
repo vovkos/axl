@@ -36,37 +36,37 @@ protected:
 
 public:
 	bool
-	isOpen () const
+	isOpen() const
 	{
-		return m_library.isOpen ();
+		return m_library.isOpen();
 	}
 
 	bool
-	open (const sl::StringRef& fileName)
+	open(const sl::StringRef& fileName)
 	{
-		char buffer [256];
-		sl::String_w fileName_w (ref::BufKind_Stack, buffer, sizeof (buffer));
+		char buffer[256];
+		sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
 		fileName_w = fileName;
 
-		return m_library.loadLibrary (fileName_w);
+		return m_library.loadLibrary(fileName_w);
 	}
 
 	void
-	close ()
+	close()
 	{
-		m_library.close ();
+		m_library.close();
 	}
 
 	void
-	detach ()
+	detach()
 	{
-		m_library.detach ();
+		m_library.detach();
 	}
 
 	void*
-	getFunction (const sl::StringRef& name)
+	getFunction(const sl::StringRef& name)
 	{
-		return m_library.getProcAddress (name);
+		return m_library.getProcAddress(name);
 	}
 };
 
@@ -81,33 +81,33 @@ protected:
 
 public:
 	bool
-	isOpen () const
+	isOpen() const
 	{
-		return m_library.isOpen ();
+		return m_library.isOpen();
 	}
 
 	bool
-	open (const sl::StringRef& fileName)
+	open(const sl::StringRef& fileName)
 	{
-		return m_library.open (fileName);
+		return m_library.open(fileName);
 	}
 
 	void
-	close ()
+	close()
 	{
-		m_library.close ();
+		m_library.close();
 	}
 
 	void
-	detach ()
+	detach()
 	{
-		m_library.detach ();
+		m_library.detach();
 	}
 
 	void*
-	getFunction (const sl::StringRef& name)
+	getFunction(const sl::StringRef& name)
 	{
-		return m_library.getSymbol (name);
+		return m_library.getSymbol(name);
 	}
 };
 

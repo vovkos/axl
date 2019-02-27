@@ -19,39 +19,39 @@ namespace st {
 //..............................................................................
 
 void
-LuaStringTemplate::close ()
+LuaStringTemplate::close()
 {
-	m_luaState.close ();
-	StringTemplate <LuaStringTemplate>::clear ();
+	m_luaState.close();
+	StringTemplate<LuaStringTemplate>::clear();
 	m_argCount = 0;
 }
 
 bool
-LuaStringTemplate::create ()
+LuaStringTemplate::create()
 {
-	close ();
+	close();
 
-	bool result = m_luaState.create ();
+	bool result = m_luaState.create();
 	if (!result)
 		return false;
 
-	m_luaState.openLibs ();
+	m_luaState.openLibs();
 
-	m_luaState.registerFunction ("getLine", getLine_lua, this);
-	m_luaState.registerFunction ("getCol", getCol_lua, this);
-	m_luaState.registerFunction ("emit", emit_lua, this);
-	m_luaState.registerFunction ("passthrough", passthrough_lua, this);
+	m_luaState.registerFunction("getLine", getLine_lua, this);
+	m_luaState.registerFunction("getCol", getCol_lua, this);
+	m_luaState.registerFunction("emit", emit_lua, this);
+	m_luaState.registerFunction("passthrough", passthrough_lua, this);
 
 	return true;
 }
 
 bool
-LuaStringTemplate::setArgCount (size_t count)
+LuaStringTemplate::setArgCount(size_t count)
 {
-	int top = m_luaState.getTop ();
-	if (count > (size_t) top)
+	int top = m_luaState.getTop();
+	if (count > (size_t)top)
 	{
-		err::setError (err::SystemErrorCode_InvalidParameter);
+		err::setError(err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
 
@@ -60,111 +60,111 @@ LuaStringTemplate::setArgCount (size_t count)
 }
 
 bool
-LuaStringTemplate::runScript (
+LuaStringTemplate::runScript(
 	const sl::StringRef& fileName,
 	const sl::StringRef& source
 	)
 {
-	int top = m_luaState.getTop ();
+	int top = m_luaState.getTop();
 
-	bool result = m_luaState.load (fileName, source);
+	bool result = m_luaState.load(fileName, source);
 	if (!result)
 		return false;
 
 	if (m_argCount)
 	{
-		ASSERT (m_argCount <= (size_t) top);
+		ASSERT(m_argCount <= (size_t)top);
 
 		for (int i = top - m_argCount + 1; i <= top; i++)
-			m_luaState.pushValue (i);
+			m_luaState.pushValue(i);
 	}
 
-	result = m_luaState.PCall (m_argCount, 0);
+	result = m_luaState.PCall(m_argCount, 0);
 
 	m_argCount = 0;
 
 	// clean up even on failure
 
-	m_luaState.setTop (top);
+	m_luaState.setTop(top);
 
 	return result;
 }
 
 void
-LuaStringTemplate::createEmitCall (
+LuaStringTemplate::createEmitCall(
 	sl::String* script,
 	const sl::StringRef& value
 	)
 {
-	script->append ("emit (");
-	script->append (value);
-	script->append (");");
+	script->append("emit (");
+	script->append(value);
+	script->append(");");
 }
 
 int
-LuaStringTemplate::getLine_lua (lua_State* h)
+LuaStringTemplate::getLine_lua(lua_State* h)
 {
-	lua::LuaNonOwnerState luaState (h);
-	LuaStringTemplate* self = (LuaStringTemplate*) luaState.getContext ();
-	ASSERT (self->m_luaState == h && !self->m_emitContextStack.isEmpty ());
+	lua::LuaNonOwnerState luaState(h);
+	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
+	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
 
-	EmitContext* context = *self->m_emitContextStack.getTail ();
+	EmitContext* context = *self->m_emitContextStack.getTail();
 
-	luaState.pushInteger (context->m_lineCol.m_line);
+	luaState.pushInteger(context->m_lineCol.m_line);
 
-	luaState.detach ();
+	luaState.detach();
 	return 1;
 }
 
 int
-LuaStringTemplate::getCol_lua (lua_State* h)
+LuaStringTemplate::getCol_lua(lua_State* h)
 {
-	lua::LuaNonOwnerState luaState (h);
-	LuaStringTemplate* self = (LuaStringTemplate*) luaState.getContext ();
-	ASSERT (self->m_luaState == h && !self->m_emitContextStack.isEmpty ());
+	lua::LuaNonOwnerState luaState(h);
+	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
+	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
 
-	EmitContext* context = *self->m_emitContextStack.getTail ();
-	ASSERT (self->m_luaState == h);
+	EmitContext* context = *self->m_emitContextStack.getTail();
+	ASSERT(self->m_luaState == h);
 
-	luaState.pushInteger (context->m_lineCol.m_col);
+	luaState.pushInteger(context->m_lineCol.m_col);
 	return 1;
 }
 
 int
-LuaStringTemplate::emit_lua (lua_State* h)
+LuaStringTemplate::emit_lua(lua_State* h)
 {
-	lua::LuaNonOwnerState luaState (h);
-	LuaStringTemplate* self = (LuaStringTemplate*) luaState.getContext ();
-	ASSERT (self->m_luaState == h && !self->m_emitContextStack.isEmpty ());
+	lua::LuaNonOwnerState luaState(h);
+	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
+	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
 
-	EmitContext* context = *self->m_emitContextStack.getTail ();
+	EmitContext* context = *self->m_emitContextStack.getTail();
 
-	size_t count = luaState.getTop ();
+	size_t count = luaState.getTop();
 	for (size_t i = 1; i <= count; i++)
 	{
-		sl::StringRef string = luaState.getString (i);
-		context->m_output->append (string);
-		context->m_lineCol.incrementalCount (string);
+		sl::StringRef string = luaState.getString(i);
+		context->m_output->append(string);
+		context->m_lineCol.incrementalCount(string);
 	}
 
 	return 0;
 }
 
 int
-LuaStringTemplate::passthrough_lua (lua_State* h)
+LuaStringTemplate::passthrough_lua(lua_State* h)
 {
-	lua::LuaNonOwnerState luaState (h);
-	LuaStringTemplate* self = (LuaStringTemplate*) luaState.getContext ();
-	ASSERT (self->m_luaState == h && !self->m_emitContextStack.isEmpty ());
+	lua::LuaNonOwnerState luaState(h);
+	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
+	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
 
-	EmitContext* context = *self->m_emitContextStack.getTail ();
+	EmitContext* context = *self->m_emitContextStack.getTail();
 
-	size_t offset = (size_t) luaState.getInteger (1);
-	size_t length = (size_t) luaState.getInteger (2);
+	size_t offset = (size_t)luaState.getInteger(1);
+	size_t length = (size_t)luaState.getInteger(2);
 
-	sl::StringRef string = context->m_frame.getSubString (offset, length);
-	context->m_output->append (string);
-	context->m_lineCol.incrementalCount (string);
+	sl::StringRef string = context->m_frame.getSubString(offset, length);
+	context->m_output->append(string);
+	context->m_lineCol.incrementalCount(string);
 
 	return 0;
 }

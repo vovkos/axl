@@ -24,13 +24,13 @@ namespace sys {
 // note that Windows FILETIME epoch is different from POSIX time epoch which is January 1, 1970
 
 uint64_t
-getTimestamp ();
+getTimestamp();
 
 uint64_t
-getPreciseTimestamp ();
+getPreciseTimestamp();
 
 void
-sleep (uint32_t msCount);
+sleep(uint32_t msCount);
 
 //..............................................................................
 
@@ -38,7 +38,7 @@ sleep (uint32_t msCount);
 
 inline
 int
-getTimeZoneOffsetInMinutes (int timeZone)
+getTimeZoneOffsetInMinutes(int timeZone)
 {
 	return timeZone <= -100 || timeZone >= 100 ?
 		(timeZone / 100) * 60 + timeZone % 100 :
@@ -61,74 +61,74 @@ struct Time
 	uint16_t m_nanoSecond;
 
 public:
-	Time ()
+	Time()
 	{
-		memset (this, 0, sizeof (Time));
+		memset(this, 0, sizeof(Time));
 	}
 
-	Time (uint64_t timestamp)
+	Time(uint64_t timestamp)
 	{
-		setTimestampImpl (timestamp, true, 0);
+		setTimestampImpl(timestamp, true, 0);
 	}
 
-	Time (
+	Time(
 		uint64_t timestamp,
 		int timeZone
 		)
 	{
-		setTimestampImpl (timestamp, false, timeZone);
+		setTimestampImpl(timestamp, false, timeZone);
 	}
 
 	uint64_t
-	getTimestamp () const
+	getTimestamp() const
 	{
-		return getTimestampImpl (true, 0);
+		return getTimestampImpl(true, 0);
 	}
 
 	uint64_t
-	getTimestamp (int timeZone) const
+	getTimestamp(int timeZone) const
 	{
-		return getTimestampImpl (false, timeZone);
+		return getTimestampImpl(false, timeZone);
 	}
 
 	void
-	setTimestamp (uint64_t timestamp)
+	setTimestamp(uint64_t timestamp)
 	{
-		setTimestampImpl (timestamp, true, 0);
+		setTimestampImpl(timestamp, true, 0);
 	}
 
 	void
-	setTimestamp (
+	setTimestamp(
 		uint64_t timestamp,
 		int timeZone
 		)
 	{
-		setTimestampImpl (timestamp, false, timeZone);
+		setTimestampImpl(timestamp, false, timeZone);
 	}
 
 	size_t
-	format (
+	format(
 		sl::String* string,
 		const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s"
 		) const;
 
 	sl::String
-	format (const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s") const
+	format(const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s") const
 	{
 		sl::String string;
-		format (&string, formatString);
+		format(&string, formatString);
 		return string;
 	}
 
 protected:
 	uint64_t
-	getTimestampImpl (
+	getTimestampImpl(
 		bool isLocal,
 		int timeZone
 		) const;
 
 	void
-	setTimestampImpl (
+	setTimestampImpl(
 		uint64_t timestamp,
 		bool isLocal,
 		int timeZone
@@ -164,17 +164,17 @@ protected:
 
 inline
 void
-getTimespecFromTimeout (
+getTimespecFromTimeout(
 	uint_t timeout,
 	timespec* tspec
 	)
 {
 	tspec->tv_sec = timeout / 1000;
-	tspec->tv_nsec = (uint64_t) (timeout % 1000) * 1000000;
+	tspec->tv_nsec = (uint64_t)(timeout % 1000) * 1000000;
 }
 
 void
-getAbsTimespecFromTimeout (
+getAbsTimespecFromTimeout(
 	uint_t timeout,
 	timespec* tspec
 	);
@@ -187,9 +187,9 @@ getAbsTimespecFromTimeout (
 
 inline
 uint64_t
-getTimestampFromTimeval (const timeval* tval)
+getTimestampFromTimeval(const timeval* tval)
 {
-	return ((uint64_t) tval->tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + (uint64_t) tval->tv_usec * 10;
+	return ((uint64_t)tval->tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + (uint64_t)tval->tv_usec * 10;
 }
 
 //..............................................................................

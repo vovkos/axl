@@ -19,9 +19,9 @@ namespace io {
 //..............................................................................
 
 const char*
-getNetworkAdapterTypeString (NetworkAdapterType adapterKind)
+getNetworkAdapterTypeString(NetworkAdapterType adapterKind)
 {
-	static const char* stringTable [NetworkAdapterType__Count] =
+	static const char* stringTable[NetworkAdapterType__Count] =
 	{
 		"unknown-adapter-kind", // NetworkAdapterType_Unknown,
 		"loopback",             // NetworkAdapterType_Loopback,
@@ -33,17 +33,17 @@ getNetworkAdapterTypeString (NetworkAdapterType adapterKind)
 		"tunnel",               // NetworkAdapterType_Tunnel,
 	};
 
-	return (size_t) adapterKind < countof (stringTable) ?
-		stringTable [adapterKind] :
-		stringTable [NetworkAdapterType_Unknown];
+	return (size_t)adapterKind < countof(stringTable) ?
+		stringTable[adapterKind] :
+		stringTable[NetworkAdapterType_Unknown];
 }
 
 //..............................................................................
 
 const char*
-getNetworkAdapterFlagString (NetworkAdapterFlag flag)
+getNetworkAdapterFlagString(NetworkAdapterFlag flag)
 {
-	static const char* stringTable [] =
+	static const char* stringTable[] =
 	{
 		"DHCP",      // NetworkAdapterFlag_Dhcp      = 0x01,
 		"DDNS",      // NetworkAdapterFlag_Ddns      = 0x02,
@@ -53,28 +53,28 @@ getNetworkAdapterFlagString (NetworkAdapterFlag flag)
 		"IPv6",      // NetworkAdapterFlag_Ip6       = 0x20,
 	};
 
-	size_t i = sl::getLoBitIdx32 (flag);
-	return i < countof (stringTable) ?
-		stringTable [i] :
+	size_t i = sl::getLoBitIdx32(flag);
+	return i < countof(stringTable) ?
+		stringTable[i] :
 		"undefined-adapter-flag";
 }
 
 sl::String
-getNetworkAdapterFlagString (uint_t flags)
+getNetworkAdapterFlagString(uint_t flags)
 {
 	if (!flags)
-		return sl::String ();
+		return sl::String();
 
-	NetworkAdapterFlag flag = getFirstNetworkAdapterFlag (flags);
-	sl::String string = getNetworkAdapterFlagString (flag);
+	NetworkAdapterFlag flag = getFirstNetworkAdapterFlag(flags);
+	sl::String string = getNetworkAdapterFlagString(flag);
 	flags &= ~flag;
 
 	while (flags)
 	{
-		flag = getFirstNetworkAdapterFlag (flags);
+		flag = getFirstNetworkAdapterFlag(flags);
 
 		string += ' ';
-		string += getNetworkAdapterFlagString (flag);
+		string += getNetworkAdapterFlagString(flag);
 
 		flags &= ~flag;
 	}
@@ -84,11 +84,11 @@ getNetworkAdapterFlagString (uint_t flags)
 
 //..............................................................................
 
-NetworkAdapterDesc::NetworkAdapterDesc ()
+NetworkAdapterDesc::NetworkAdapterDesc()
 {
 	m_type = NetworkAdapterType_Unknown;
 	m_flags = 0;
-	memset (m_mac, 0, sizeof (m_mac));
+	memset(m_mac, 0, sizeof(m_mac));
 }
 
 //..............................................................................

@@ -21,42 +21,42 @@ namespace io {
 //..............................................................................
 
 const char*
-getSockAddrFamilyString (uint_t family);
+getSockAddrFamilyString(uint_t family);
 
 size_t
-getSockAddrFamilySize (uint_t family);
+getSockAddrFamilySize(uint_t family);
 
 inline
 size_t
-getSockAddrSize (const sockaddr* addr)
+getSockAddrSize(const sockaddr* addr)
 {
-	return getSockAddrFamilySize (addr->sa_family);
+	return getSockAddrFamilySize(addr->sa_family);
 }
 
 const char*
-getSockProtoString (uint_t proto);
+getSockProtoString(uint_t proto);
 
 //..............................................................................
 
 size_t
-getSockAddrNetMaskBitCount_ip4 (const sockaddr_in* addr);
+getSockAddrNetMaskBitCount_ip4(const sockaddr_in* addr);
 
 size_t
-getSockAddrNetMaskBitCount_ip6 (const sockaddr_in6* addr);
+getSockAddrNetMaskBitCount_ip6(const sockaddr_in6* addr);
 
 size_t
-getSockAddrNetMaskBitCount (const sockaddr* addr);
+getSockAddrNetMaskBitCount(const sockaddr* addr);
 
 //..............................................................................
 
 void
-createSockAddrNetMask_ip4 (
+createSockAddrNetMask_ip4(
 	sockaddr_in* addr,
 	size_t bitCount
 	);
 
 void
-createSockAddrNetMask_ip6 (
+createSockAddrNetMask_ip6(
 	sockaddr_in6* addr,
 	size_t bitCount
 	);
@@ -64,19 +64,19 @@ createSockAddrNetMask_ip6 (
 //..............................................................................
 
 bool
-isSockAddrEqual_ip4 (
+isSockAddrEqual_ip4(
 	const sockaddr_in* addr1,
 	const sockaddr_in* addr2
 	);
 
 bool
-isSockAddrEqual_ip6 (
+isSockAddrEqual_ip6(
 	const sockaddr_in6* addr1,
 	const sockaddr_in6* addr2
 	);
 
 bool
-isSockAddrEqual (
+isSockAddrEqual(
 	const sockaddr* addr1,
 	const sockaddr* addr2
 	);
@@ -84,19 +84,19 @@ isSockAddrEqual (
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
-isSockAddrMatch_ip4 (
+isSockAddrMatch_ip4(
 	const sockaddr_in* addr,
 	const sockaddr_in* filterAddr
 	);
 
 bool
-isSockAddrMatch_ip6 (
+isSockAddrMatch_ip6(
 	const sockaddr_in6* addr,
 	const sockaddr_in6* filterAddr
 	);
 
 bool
-isSockAddrMatch (
+isSockAddrMatch(
 	const sockaddr* addr,
 	const sockaddr* filterAddr
 	);
@@ -104,13 +104,13 @@ isSockAddrMatch (
 //..............................................................................
 
 bool
-parseAddr_ip4 (
+parseAddr_ip4(
 	in_addr* addr,
 	const sl::StringRef& string
 	);
 
 bool
-parseAddr_ip6 (
+parseAddr_ip6(
 	in6_addr* addr,
 	const sl::StringRef& string
 	);
@@ -118,19 +118,19 @@ parseAddr_ip6 (
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
-parseSockAddr_ip4 (
+parseSockAddr_ip4(
 	sockaddr_in* addr,
 	const sl::StringRef& string
 	);
 
 bool
-parseSockAddr_ip6 (
+parseSockAddr_ip6(
 	sockaddr_in6* addr,
 	const sl::StringRef& string
 	);
 
 bool
-parseSockAddr (
+parseSockAddr(
 	sockaddr* addr,
 	size_t size,
 	const sl::StringRef& string
@@ -139,79 +139,79 @@ parseSockAddr (
 //..............................................................................
 
 size_t
-getAddrString_ip4 (
+getAddrString_ip4(
 	sl::String* string,
 	const in_addr* addr
 	);
 
 inline
 sl::String
-getAddrString_ip4 (const in_addr* addr)
+getAddrString_ip4(const in_addr* addr)
 {
 	sl::String string;
-	getAddrString_ip4 (&string, addr);
+	getAddrString_ip4(&string, addr);
 	return string;
 }
 
 size_t
-getAddrString_ip6 (
+getAddrString_ip6(
 	sl::String* string,
 	const in6_addr* addr
 	);
 
 inline
 sl::String
-getAddrString_ip6 (const in6_addr* addr)
+getAddrString_ip6(const in6_addr* addr)
 {
 	sl::String string;
-	getAddrString_ip6 (&string, addr);
+	getAddrString_ip6(&string, addr);
 	return string;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-getSockAddrString_ip4 (
+getSockAddrString_ip4(
 	sl::String* string,
 	const sockaddr_in* addr
 	);
 
 inline
 sl::String
-getSockAddrString_ip4 (const sockaddr_in* addr)
+getSockAddrString_ip4(const sockaddr_in* addr)
 {
 	sl::String string;
-	getSockAddrString_ip4 (&string, addr);
+	getSockAddrString_ip4(&string, addr);
 	return string;
 }
 
 size_t
-getSockAddrString_ip6 (
+getSockAddrString_ip6(
 	sl::String* string,
 	const sockaddr_in6* addr
 	);
 
 inline
 sl::String
-getSockAddrString_ip6 (const sockaddr_in6* addr)
+getSockAddrString_ip6(const sockaddr_in6* addr)
 {
 	sl::String string;
-	getSockAddrString_ip6 (&string, addr);
+	getSockAddrString_ip6(&string, addr);
 	return string;
 }
 
 size_t
-getSockAddrString (
+getSockAddrString(
 	sl::String* string,
 	const sockaddr* addr
 	);
 
 inline
 sl::String
-getSockAddrString (const sockaddr* addr)
+getSockAddrString(const sockaddr* addr)
 {
 	sl::String string;
-	getSockAddrString (&string, addr);
+	getSockAddrString(&string, addr);
 	return string;
 }
 
@@ -227,53 +227,53 @@ struct SockAddr
 		sockaddr_in6 m_addr_ip6;
 	};
 
-	SockAddr ()
+	SockAddr()
 	{
-		clear ();
+		clear();
 	}
 
-	SockAddr (const sockaddr* addr)
+	SockAddr(const sockaddr* addr)
 	{
-		setup (addr);
+		setup(addr);
 	}
 
-	SockAddr (
+	SockAddr(
 		const in_addr* addr,
 		uint_t port = 0
 		)
 	{
-		setup_ip4 (addr, port);
+		setup_ip4(addr, port);
 	}
 
-	SockAddr (
+	SockAddr(
 		uint_t ip,
 		uint_t port = 0
 		)
 	{
-		setup_ip4 (ip, port);
+		setup_ip4(ip, port);
 	}
 
-	SockAddr (
+	SockAddr(
 		const in6_addr* addr,
 		uint_t port = 0,
 		uint_t scope = 0
 		)
 	{
-		setup_ip6 (addr, port, scope);
+		setup_ip6(addr, port, scope);
 	}
 
-	SockAddr (
+	SockAddr(
 		const uint16_t* ip,
 		uint_t port = 0,
 		uint_t scope = 0
 		)
 	{
-		setup_ip6 (ip, port, scope);
+		setup_ip6(ip, port, scope);
 	}
 
-	SockAddr (const sl::StringRef& string)
+	SockAddr(const sl::StringRef& string)
 	{
-		parse (string);
+		parse(string);
 	}
 
 	operator const sockaddr* () const
@@ -292,199 +292,199 @@ struct SockAddr
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		memset (this, 0, sizeof (SockAddr));
+		memset(this, 0, sizeof(SockAddr));
 	}
 
 	bool
-	isEqual (const sockaddr* addr) const
+	isEqual(const sockaddr* addr) const
 	{
-		return isSockAddrEqual (&m_addr, addr);
+		return isSockAddrEqual(&m_addr, addr);
 	}
 
 	bool
-	isEqual (const SockAddr* addr) const
+	isEqual(const SockAddr* addr) const
 	{
-		return isSockAddrEqual (&m_addr, &addr->m_addr);
+		return isSockAddrEqual(&m_addr, &addr->m_addr);
 	}
 
 	bool
-	isMatch (const sockaddr* addr) const
+	isMatch(const sockaddr* addr) const
 	{
-		return isSockAddrMatch (&m_addr, addr);
+		return isSockAddrMatch(&m_addr, addr);
 	}
 
 	bool
-	isMatch (const SockAddr* addr) const
+	isMatch(const SockAddr* addr) const
 	{
-		return isSockAddrMatch (&m_addr, &addr->m_addr);
+		return isSockAddrMatch(&m_addr, &addr->m_addr);
 	}
 
 	uint_t
-	getPort ()
+	getPort()
 	{
-		return sl::swapByteOrder16 (m_addr_ip4.sin_port);
+		return sl::swapByteOrder16(m_addr_ip4.sin_port);
 	}
 
 	void
-	setPort (uint_t port)
+	setPort(uint_t port)
 	{
-		m_addr_ip4.sin_port = sl::swapByteOrder16 ((uint16_t) port);
+		m_addr_ip4.sin_port = sl::swapByteOrder16((uint16_t)port);
 	}
 
 	void
-	setup (const sockaddr* addr);
+	setup(const sockaddr* addr);
 
 	void
-	setup (
+	setup(
 		uint_t family,
 		const void* addr,
 		size_t size
 		);
 
 	void
-	setup_ip4 (
+	setup_ip4(
 		const in_addr* addr,
 		uint_t port = 0
 		);
 
 	void
-	setup_ip4 (
+	setup_ip4(
 		uint_t ip,
 		uint_t port = 0
 		)
 	{
-		setup_ip4 ((const in_addr*) &ip, port);
+		setup_ip4((const in_addr*) &ip, port);
 	}
 
 	void
-	setup_ip6 (
+	setup_ip6(
 		const in6_addr* addr,
 		uint_t port = 0,
 		uint_t scope = 0
 		);
 
 	void
-	setup_ip6 (
+	setup_ip6(
 		const uint16_t* ip,
 		uint_t port = 0,
 		uint_t scope = 0
 		)
 	{
-		setup_ip6 ((const in6_addr*) ip, port);
+		setup_ip6((const in6_addr*) ip, port);
 	}
 
 	size_t
-	getNetMaskBitCount ()
+	getNetMaskBitCount()
 	{
-		return getSockAddrNetMaskBitCount (&m_addr);
+		return getSockAddrNetMaskBitCount(&m_addr);
 	}
 
 	size_t
-	getNetMaskBitCount_ip4 ()
+	getNetMaskBitCount_ip4()
 	{
-		return getSockAddrNetMaskBitCount_ip4 (&m_addr_ip4);
+		return getSockAddrNetMaskBitCount_ip4(&m_addr_ip4);
 	}
 
 	size_t
-	getNetMaskBitCount_ip6 ()
+	getNetMaskBitCount_ip6()
 	{
-		return getSockAddrNetMaskBitCount_ip6 (&m_addr_ip6);
+		return getSockAddrNetMaskBitCount_ip6(&m_addr_ip6);
 	}
 
 	void
-	createNetMask (
+	createNetMask(
 		uint_t family,
 		size_t bitCount
 		);
 
 	void
-	createNetMask_ip4 (size_t bitCount)
+	createNetMask_ip4(size_t bitCount)
 	{
-		createSockAddrNetMask_ip4 (&m_addr_ip4, bitCount);
+		createSockAddrNetMask_ip4(&m_addr_ip4, bitCount);
 	}
 
 	void
-	createNetMask_ip6 (size_t bitCount)
+	createNetMask_ip6(size_t bitCount)
 	{
-		createSockAddrNetMask_ip6 (&m_addr_ip6, bitCount);
+		createSockAddrNetMask_ip6(&m_addr_ip6, bitCount);
 	}
 
 	bool
-	parse (const sl::StringRef& string)
+	parse(const sl::StringRef& string)
 	{
-		return parseSockAddr (&m_addr, sizeof (SockAddr), string);
+		return parseSockAddr(&m_addr, sizeof(SockAddr), string);
 	}
 
 	bool
-	parse_ip4 (const sl::StringRef& string)
+	parse_ip4(const sl::StringRef& string)
 	{
-		return parseSockAddr_ip4 (&m_addr_ip4, string);
+		return parseSockAddr_ip4(&m_addr_ip4, string);
 	}
 
 	bool
-	parse_ip6 (const sl::StringRef& string)
+	parse_ip6(const sl::StringRef& string)
 	{
-		return parseSockAddr_ip6 (&m_addr_ip6, string);
+		return parseSockAddr_ip6(&m_addr_ip6, string);
 	}
 
 	size_t
-	getString (sl::String* string) const
+	getString(sl::String* string) const
 	{
-		return getSockAddrString (string, &m_addr);
+		return getSockAddrString(string, &m_addr);
 	}
 
 	inline
 	sl::String
-	getString () const
+	getString() const
 	{
-		return getSockAddrString (&m_addr);
+		return getSockAddrString(&m_addr);
 	}
 
 	size_t
-	getString_ip4 (sl::String* string) const
+	getString_ip4(sl::String* string) const
 	{
-		return getSockAddrString_ip4 (string, &m_addr_ip4);
+		return getSockAddrString_ip4(string, &m_addr_ip4);
 	}
 
 	sl::String
-	getString_ip4 () const
+	getString_ip4() const
 	{
-		return getSockAddrString_ip4 (&m_addr_ip4);
+		return getSockAddrString_ip4(&m_addr_ip4);
 	}
 
 	size_t
-	getString_ip6 (sl::String* string) const
+	getString_ip6(sl::String* string) const
 	{
-		return getSockAddrString_ip6 (string, &m_addr_ip6);
+		return getSockAddrString_ip6(string, &m_addr_ip6);
 	}
 
 	sl::String
-	getString_ip6 (const sockaddr_in6* addr) const
+	getString_ip6(const sockaddr_in6* addr) const
 	{
-		return getSockAddrString_ip6 (&m_addr_ip6);
+		return getSockAddrString_ip6(&m_addr_ip6);
 	}
 };
 
 //..............................................................................
 
 bool
-resolveHostName (
-	sl::Array <SockAddr>* addrArray,
+resolveHostName(
+	sl::Array<SockAddr>* addrArray,
 	const sl::StringRef& name,
 	uint_t family = AF_UNSPEC
 	);
 
 inline
-sl::Array <SockAddr>
-resolveHostName (
+sl::Array<SockAddr>
+resolveHostName(
 	const sl::StringRef& name,
 	uint_t family = AF_UNSPEC
 	)
 {
-	sl::Array <SockAddr> addrArray;
-	resolveHostName (&addrArray, name, family);
+	sl::Array<SockAddr> addrArray;
+	resolveHostName(&addrArray, name, family);
 	return addrArray;
 }
 

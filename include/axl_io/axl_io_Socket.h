@@ -54,167 +54,167 @@ public:
 
 public:
 	bool
-	isOpen ()
+	isOpen()
 	{
-		return m_socket.isOpen ();
+		return m_socket.isOpen();
 	}
 
 	bool
-	open (
+	open(
 		int addressFamily,
 		int sockKind,
 		int protocol
 		)
 	{
-		return m_socket.open (addressFamily, sockKind, protocol);
+		return m_socket.open(addressFamily, sockKind, protocol);
 	}
 
 	void
-	close ()
+	close()
 	{
-		m_socket.close ();
+		m_socket.close();
 	}
 
 	int
-	getError ()
+	getError()
 	{
-		return m_socket.getError ();
+		return m_socket.getError();
 	}
 
 	bool
-	setBlockingMode (bool isBlocking)
+	setBlockingMode(bool isBlocking)
 	{
-		return m_socket.setBlockingMode (isBlocking);
+		return m_socket.setBlockingMode(isBlocking);
 	}
 
 	size_t
-	getIncomingDataSize ()
+	getIncomingDataSize()
 	{
-		return m_socket.getIncomingDataSize ();
+		return m_socket.getIncomingDataSize();
 	}
 
 	bool
-	bind (const sockaddr* addr)
+	bind(const sockaddr* addr)
 	{
-		return m_socket.bind (addr);
+		return m_socket.bind(addr);
 	}
 
 	bool
-	bind (const SockAddr& addr)
+	bind(const SockAddr& addr)
 	{
-		return m_socket.bind (addr);
+		return m_socket.bind(addr);
 	}
 
 	bool
-	getAddress (SockAddr* addr)
+	getAddress(SockAddr* addr)
 	{
-		return m_socket.getAddress (addr);
+		return m_socket.getAddress(addr);
 	}
 
 	bool
-	getPeerAddress (SockAddr* addr)
+	getPeerAddress(SockAddr* addr)
 	{
-		return m_socket.getPeerAddress (addr);
+		return m_socket.getPeerAddress(addr);
 	}
 
 	bool
-	getOption (
+	getOption(
 		int level,
 		int option,
 		void* p,
 		size_t size
 		)
 	{
-		return m_socket.getOption (level, option, p, size);
+		return m_socket.getOption(level, option, p, size);
 	}
 
 	bool
-	setOption (
+	setOption(
 		int level,
 		int option,
 		const void* p,
 		size_t size
 		)
 	{
-		return m_socket.setOption (level, option, p, size);
+		return m_socket.setOption(level, option, p, size);
 	}
 
 	bool
-	listen (size_t backLog)
+	listen(size_t backLog)
 	{
-		return m_socket.listen (backLog);
+		return m_socket.listen(backLog);
 	}
 
 	bool
-	accept (
+	accept(
 		Socket* socket,
 		SockAddr* addr = NULL
 		);
 
 	bool
-	connect (const sockaddr* addr)
+	connect(const sockaddr* addr)
 	{
-		return m_socket.connect (addr);
+		return m_socket.connect(addr);
 	}
 
 	bool
-	connect (const SockAddr& addr)
+	connect(const SockAddr& addr)
 	{
-		return m_socket.connect (addr);
+		return m_socket.connect(addr);
 	}
 
 	bool
-	shutdown (SocketShutdownKind shutdownKind = SocketShutdownKind_All)
+	shutdown(SocketShutdownKind shutdownKind = SocketShutdownKind_All)
 	{
-		return m_socket.shutdown (shutdownKind);
+		return m_socket.shutdown(shutdownKind);
 	}
 
 	size_t
-	send (
+	send(
 		const void* p,
 		size_t size
 		)
 	{
-		return m_socket.send (p, size);
+		return m_socket.send(p, size);
 	}
 
 	size_t
-	recv (
+	recv(
 		void* p,
 		size_t size
 		)
 	{
-		return m_socket.recv (p, size);
+		return m_socket.recv(p, size);
 	}
 
 	size_t
-	sendTo (
+	sendTo(
 		void* p,
 		size_t size,
 		const sockaddr* addr
 		)
 	{
-		return m_socket.sendTo (p, size, addr);
+		return m_socket.sendTo(p, size, addr);
 	}
 
 	size_t
-	sendTo (
+	sendTo(
 		void* p,
 		size_t size,
 		const SockAddr& addr
 		)
 	{
-		return m_socket.sendTo (p, size, addr);
+		return m_socket.sendTo(p, size, addr);
 	}
 
 	size_t
-	recvFrom (
+	recvFrom(
 		void* p,
 		size_t size,
 		SockAddr* addr
 		)
 	{
-		return m_socket.recvFrom (p, size, addr);
+		return m_socket.recvFrom(p, size, addr);
 	}
 };
 

@@ -22,54 +22,54 @@ namespace win {
 
 //..............................................................................
 
-class JobObject: public sl::Handle <HANDLE, CloseHandle, sl::Zero <HANDLE> >
+class JobObject: public sl::Handle<HANDLE, CloseHandle, sl::Zero<HANDLE> >
 {
 public:
 	bool
-	create (
+	create(
 		SECURITY_ATTRIBUTES* secAttr,
 		const sl::StringRef_w& name
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::CreateJobObjectW (secAttr, name.szn ());
-		return err::complete (m_h != NULL);
+		m_h = ::CreateJobObjectW(secAttr, name.szn());
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	open (
+	open(
 		uint_t access,
 		bool doInheritHandle,
 		const sl::StringRef_w& name
 		)
 	{
-		close ();
+		close();
 
-		m_h = ::OpenJobObjectW (access, doInheritHandle, name.szn ());
-		return err::complete (m_h != NULL);
+		m_h = ::OpenJobObjectW(access, doInheritHandle, name.szn());
+		return err::complete(m_h != NULL);
 	}
 
 	bool
-	assignProcess (HANDLE process)
+	assignProcess(HANDLE process)
 	{
-		bool_t result = ::AssignProcessToJobObject (m_h, process);
-		return err::complete (result);
+		bool_t result = ::AssignProcessToJobObject(m_h, process);
+		return err::complete(result);
 	}
 
 	bool
-	setInformation (
+	setInformation(
 		JOBOBJECTINFOCLASS infoClass,
 		const void* p,
 		size_t size
 		)
 	{
-		bool_t result = ::SetInformationJobObject (m_h, infoClass, (void*) p,  (dword_t) size);
-		return err::complete (result);
+		bool_t result = ::SetInformationJobObject(m_h, infoClass, (void*)p,  (dword_t)size);
+		return err::complete(result);
 	}
 
 	size_t
-	queryInformation (
+	queryInformation(
 		JOBOBJECTINFOCLASS infoClass,
 		void* p,
 		size_t size

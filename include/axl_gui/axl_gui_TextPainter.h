@@ -32,7 +32,7 @@ protected:
 protected:
 	TextAttrAnchorArray m_selOverlayBuffer;
 	sl::String m_stringBuffer;
-	sl::Array <utf32_t> m_binTextBuffer;
+	sl::Array<utf32_t> m_binTextBuffer;
 
 public:
 	Canvas* m_canvas;
@@ -43,18 +43,18 @@ public:
 	utf32_t m_unprintableChar;
 
 public:
-	TextPainter ()
+	TextPainter()
 	{
-		init ();
+		init();
 	}
 
-	TextPainter (Canvas* canvas)
+	TextPainter(Canvas* canvas)
 	{
-		init (canvas);
+		init(canvas);
 	}
 
 	Point
-	getPoint ()
+	getPoint()
 	{
 		return m_point;
 	}
@@ -62,59 +62,59 @@ public:
 	// space
 
 	int
-	drawSpace (
+	drawSpace(
 		size_t length,
 		uint_t color
 		);
 
 	int
-	drawSpace (size_t length)
+	drawSpace(size_t length)
 	{
-		return drawSpace (length, m_canvas->m_colorAttr.m_backColor);
+		return drawSpace(length, m_canvas->m_colorAttr.m_backColor);
 	}
 
 	int
-	drawSpace_p (
+	drawSpace_p(
 		int width, // in pixels
 		uint_t color
 		);
 
 	int
-	drawSpace_p (int width) // in pixels
+	drawSpace_p(int width) // in pixels
 	{
-		return drawSpace_p (width, m_canvas->m_colorAttr.m_backColor);
+		return drawSpace_p(width, m_canvas->m_colorAttr.m_backColor);
 	}
 
 	// text
 
 	int
-	drawText (
+	drawText(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (textColor, backColor, fontFlags, text);
+		return drawText_utf8(textColor, backColor, fontFlags, text);
 	}
 
 	int
-	drawText (
+	drawText(
 		const TextAttr& attr,
 		const sl::StringRef& text
 		)
 	{
-		return drawText_utf8 (attr, text);
+		return drawText_utf8(attr, text);
 	}
 
 	int
-	drawText (const sl::StringRef& text)
+	drawText(const sl::StringRef& text)
 	{
-		return drawText_utf8 (text);
+		return drawText_utf8(text);
 	}
 
 	int
-	drawText_utf8 (
+	drawText_utf8(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -122,12 +122,12 @@ public:
 		);
 
 	int
-	drawText_utf8 (
+	drawText_utf8(
 		const TextAttr& attr,
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawText_utf8 (
+		return drawText_utf8(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -136,9 +136,9 @@ public:
 	}
 
 	int
-	drawText_utf8 (const sl::StringRef_utf8& text)
+	drawText_utf8(const sl::StringRef_utf8& text)
 	{
-		return drawText_utf8 (
+		return drawText_utf8(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -147,7 +147,7 @@ public:
 	}
 
 	int
-	drawText_utf32 (
+	drawText_utf32(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -155,12 +155,12 @@ public:
 		);
 
 	int
-	drawText_utf32 (
+	drawText_utf32(
 		const TextAttr& attr,
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawText_utf32 (
+		return drawText_utf32(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -169,9 +169,9 @@ public:
 	}
 
 	int
-	drawText_utf32 (const sl::StringRef_utf32& text)
+	drawText_utf32(const sl::StringRef_utf32& text)
 	{
-		return drawText_utf32 (
+		return drawText_utf32(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -182,7 +182,7 @@ public:
 	// hypertext
 
 	int
-	drawHyperText (
+	drawHyperText(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -190,7 +190,7 @@ public:
 		const sl::StringRef& text
 		)
 	{
-		return drawHyperText_utf8 (
+		return drawHyperText_utf8(
 			textColor,
 			backColor,
 			fontFlags,
@@ -200,26 +200,26 @@ public:
 	}
 
 	int
-	drawHyperText (
+	drawHyperText(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef& text
 		)
 	{
-		return drawHyperText_utf8 (attr, attrArray, text);
+		return drawHyperText_utf8(attr, attrArray, text);
 	}
 
 	int
-	drawHyperText (
+	drawHyperText(
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef& text
 		)
 	{
-		return drawHyperText_utf8 (attrArray, text);
+		return drawHyperText_utf8(attrArray, text);
 	}
 
 	int
-	drawHyperText_utf8 (
+	drawHyperText_utf8(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -228,13 +228,13 @@ public:
 		);
 
 	int
-	drawHyperText_utf8 (
+	drawHyperText_utf8(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawHyperText_utf8 (
+		return drawHyperText_utf8(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -244,12 +244,12 @@ public:
 	}
 
 	int
-	drawHyperText_utf8 (
+	drawHyperText_utf8(
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawHyperText_utf8 (
+		return drawHyperText_utf8(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -259,7 +259,7 @@ public:
 	}
 
 	int
-	drawHyperText_utf32 (
+	drawHyperText_utf32(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -268,13 +268,13 @@ public:
 		);
 
 	int
-	drawHyperText_utf32 (
+	drawHyperText_utf32(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawHyperText_utf32 (
+		return drawHyperText_utf32(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -284,12 +284,12 @@ public:
 	}
 
 	int
-	drawHyperText_utf32 (
+	drawHyperText_utf32(
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawHyperText_utf32 (
+		return drawHyperText_utf32(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -301,7 +301,7 @@ public:
 	// hypertext with selection
 
 	int
-	drawSelHyperText (
+	drawSelHyperText(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -312,7 +312,7 @@ public:
 		const sl::StringRef& text
 		)
 	{
-		return drawSelHyperText_utf8 (
+		return drawSelHyperText_utf8(
 			textColor,
 			backColor,
 			fontFlags,
@@ -325,7 +325,7 @@ public:
 	}
 
 	int
-	drawSelHyperText (
+	drawSelHyperText(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
@@ -334,7 +334,7 @@ public:
 		const sl::StringRef& text
 		)
 	{
-		return drawSelHyperText_utf8 (
+		return drawSelHyperText_utf8(
 			attr,
 			attrArray,
 			selAttr,
@@ -345,7 +345,7 @@ public:
 	}
 
 	int
-	drawSelHyperText (
+	drawSelHyperText(
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
 		size_t selStart,
@@ -353,7 +353,7 @@ public:
 		const sl::StringRef& text
 		)
 	{
-		return drawSelHyperText_utf8 (
+		return drawSelHyperText_utf8(
 			attrArray,
 			selAttr,
 			selStart,
@@ -363,7 +363,7 @@ public:
 	}
 
 	int
-	drawSelHyperText_utf8 (
+	drawSelHyperText_utf8(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -375,7 +375,7 @@ public:
 		);
 
 	int
-	drawSelHyperText_utf8 (
+	drawSelHyperText_utf8(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
@@ -384,7 +384,7 @@ public:
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawSelHyperText_utf8 (
+		return drawSelHyperText_utf8(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -397,7 +397,7 @@ public:
 	}
 
 	int
-	drawSelHyperText_utf8 (
+	drawSelHyperText_utf8(
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
 		size_t selStart,
@@ -405,7 +405,7 @@ public:
 		const sl::StringRef_utf8& text
 		)
 	{
-		return drawSelHyperText_utf8 (
+		return drawSelHyperText_utf8(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -418,7 +418,7 @@ public:
 	}
 
 	int
-	drawSelHyperText_utf32 (
+	drawSelHyperText_utf32(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -430,7 +430,7 @@ public:
 		);
 
 	int
-	drawSelHyperText_utf32 (
+	drawSelHyperText_utf32(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
@@ -439,7 +439,7 @@ public:
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawSelHyperText_utf32 (
+		return drawSelHyperText_utf32(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -452,7 +452,7 @@ public:
 	}
 
 	int
-	drawSelHyperText_utf32 (
+	drawSelHyperText_utf32(
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
 		size_t selStart,
@@ -460,7 +460,7 @@ public:
 		const sl::StringRef_utf32& text
 		)
 	{
-		return drawSelHyperText_utf32 (
+		return drawSelHyperText_utf32(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -475,7 +475,7 @@ public:
 	// bin hex
 
 	int
-	drawBinHex (
+	drawBinHex(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -485,14 +485,14 @@ public:
 		);
 
 	int
-	drawBinHex (
+	drawBinHex(
 		const TextAttr& attr,
 		size_t halfBitOffset,
 		const void* p,
 		size_t size
 		)
 	{
-		return drawBinHex (
+		return drawBinHex(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -503,13 +503,13 @@ public:
 	}
 
 	int
-	drawBinHex (
+	drawBinHex(
 		size_t halfBitOffset,
 		const void* p,
 		size_t size
 		)
 	{
-		return drawBinHex (
+		return drawBinHex(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -520,7 +520,7 @@ public:
 	}
 
 	int
-	drawHyperBinHex (
+	drawHyperBinHex(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -531,7 +531,7 @@ public:
 		);
 
 	int
-	drawHyperBinHex (
+	drawHyperBinHex(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		size_t halfBitOffset,
@@ -539,7 +539,7 @@ public:
 		size_t size
 		)
 	{
-		return drawHyperBinHex (
+		return drawHyperBinHex(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -551,14 +551,14 @@ public:
 	}
 
 	int
-	drawHyperBinHex (
+	drawHyperBinHex(
 		const TextAttrAnchorArray* attrArray,
 		size_t halfBitOffset,
 		const void* p,
 		size_t size
 		)
 	{
-		return drawHyperBinHex (
+		return drawHyperBinHex(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -570,7 +570,7 @@ public:
 	}
 
 	int
-	drawSelHyperBinHex (
+	drawSelHyperBinHex(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -584,7 +584,7 @@ public:
 		);
 
 	int
-	drawSelHyperBinHex (
+	drawSelHyperBinHex(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
@@ -595,7 +595,7 @@ public:
 		size_t size
 		)
 	{
-		return drawSelHyperBinHex (
+		return drawSelHyperBinHex(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -610,7 +610,7 @@ public:
 	}
 
 	int
-	drawSelHyperBinHex (
+	drawSelHyperBinHex(
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
 		size_t selStart,
@@ -620,7 +620,7 @@ public:
 		size_t size
 		)
 	{
-		return drawSelHyperBinHex (
+		return drawSelHyperBinHex(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -637,7 +637,7 @@ public:
 	// bin text
 
 	int
-	drawBinText (
+	drawBinText(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -648,7 +648,7 @@ public:
 		);
 
 	int
-	drawBinText (
+	drawBinText(
 		const TextAttr& attr,
 		enc::CharCodec* codec,
 		const void* p,
@@ -656,7 +656,7 @@ public:
 		size_t bufferSize
 		)
 	{
-		return drawBinText (
+		return drawBinText(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -668,14 +668,14 @@ public:
 	}
 
 	int
-	drawBinText (
+	drawBinText(
 		enc::CharCodec* codec,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
 		)
 	{
-		return drawBinText (
+		return drawBinText(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -687,7 +687,7 @@ public:
 	}
 
 	int
-	drawHyperBinText (
+	drawHyperBinText(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -699,7 +699,7 @@ public:
 		);
 
 	int
-	drawHyperBinText (
+	drawHyperBinText(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
@@ -708,7 +708,7 @@ public:
 		size_t bufferSize
 		)
 	{
-		return drawHyperBinText (
+		return drawHyperBinText(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -721,7 +721,7 @@ public:
 	}
 
 	int
-	drawHyperBinText (
+	drawHyperBinText(
 		const TextAttrAnchorArray* attrArray,
 		enc::CharCodec* codec,
 		const void* p,
@@ -729,7 +729,7 @@ public:
 		size_t bufferSize
 		)
 	{
-		return drawHyperBinText (
+		return drawHyperBinText(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -742,7 +742,7 @@ public:
 	}
 
 	int
-	drawSelHyperBinText (
+	drawSelHyperBinText(
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
@@ -757,7 +757,7 @@ public:
 		);
 
 	int
-	drawSelHyperBinText (
+	drawSelHyperBinText(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
@@ -769,7 +769,7 @@ public:
 		size_t bufferSize
 		)
 	{
-		return drawSelHyperBinText (
+		return drawSelHyperBinText(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
@@ -785,7 +785,7 @@ public:
 	}
 
 	int
-	drawSelHyperBinText (
+	drawSelHyperBinText(
 		const TextAttrAnchorArray* attrArray,
 		const TextAttr& selAttr,
 		size_t selStart,
@@ -796,7 +796,7 @@ public:
 		size_t bufferSize
 		)
 	{
-		return drawSelHyperBinText (
+		return drawSelHyperBinText(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
@@ -813,8 +813,8 @@ public:
 
 	static
 	size_t
-	buildBinTextString (
-		sl::Array <utf32_t>* binTextBuffer,
+	buildBinTextString(
+		sl::Array<utf32_t>* binTextBuffer,
 		sl::String* stringBuffer,
 		enc::CharCodec* codec,
 		const void* p,
@@ -825,7 +825,7 @@ public:
 
 	static
 	sl::String
-	buildBinTextString (
+	buildBinTextString(
 		enc::CharCodec* codec,
 		const void* p,
 		size_t dataSize,
@@ -835,12 +835,12 @@ public:
 
 protected:
 	void
-	init (Canvas* canvas = NULL);
+	init(Canvas* canvas = NULL);
 
 	static
 	size_t
-	buildBinTextBuffer (
-		sl::Array <utf32_t>* binTextBuffer,
+	buildBinTextBuffer(
+		sl::Array<utf32_t>* binTextBuffer,
 		enc::CharCodec* codec,
 		const void* p,
 		size_t dataSize,
@@ -849,14 +849,14 @@ protected:
 		);
 
 	size_t
-	buildBinTextBuffer (
+	buildBinTextBuffer(
 		enc::CharCodec* codec,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
 		)
 	{
-		return buildBinTextBuffer (
+		return buildBinTextBuffer(
 			&m_binTextBuffer,
 			codec,
 			p,

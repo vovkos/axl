@@ -20,12 +20,12 @@ namespace win {
 //..............................................................................
 
 WaitResult
-WaitableHandle::completeWait (dword_t result)
+WaitableHandle::completeWait(dword_t result)
 {
-	switch (result)
+	switch(result)
 	{
 	case WAIT_FAILED:
-		return err::failWithLastSystemError (WaitResult_Fail);
+		return err::failWithLastSystemError(WaitResult_Fail);
 
 	case WAIT_TIMEOUT:
 		return WaitResult_Timeout;
@@ -38,10 +38,10 @@ WaitableHandle::completeWait (dword_t result)
 			result <= WAIT_OBJECT_0 + MAXIMUM_WAIT_OBJECTS
 			)
 		{
-			return (WaitResult) (WaitResult_Object0 + result - WAIT_OBJECT_0);
+			return (WaitResult)(WaitResult_Object0 + result - WAIT_OBJECT_0);
 		}
 
-		err::setError (err::SystemErrorCode_InvalidParameter);
+		err::setError(err::SystemErrorCode_InvalidParameter);
 		return WaitResult_Fail;
 	}
 }

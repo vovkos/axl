@@ -30,57 +30,57 @@ template <
 	typename Key,
 	typename Value
 	>
-class MapIteratorX: public sl::Iterator <sl::MapEntry <Key, Value> >
+class MapIteratorX: public sl::Iterator<sl::MapEntry<Key, Value> >
 {
 public:
-	MapIteratorX ()
+	MapIteratorX()
 	{
 	}
 
 	template <typename T>
-	MapIteratorX (const sl::Iterator <T>& src)
+	MapIteratorX(const sl::Iterator<T>& src)
 	{
-		this->m_p = src.getEntry ();
+		this->m_p = src.getEntry();
 	}
 };
 
 void
-run ()
+run()
 {
-	sl::Iterator <Derived> itDerived;
-	sl::Iterator <Base> itBase;
+	sl::Iterator<Derived> itDerived;
+	sl::Iterator<Base> itBase;
 
 	itBase = itDerived;
 
-	sl::RbTree <int, int> tree;
-	sl::RbTree <int, int>::Iterator it;
+	sl::RbTree<int, int> tree;
+	sl::RbTree<int, int>::Iterator it;
 
-	MapIteratorX <int, int> it2 = tree.find (100);
+	MapIteratorX<int, int> it2 = tree.find(100);
 
 	it2 = it;
 
 	for (size_t i = 0; i < 50; i++)
-		tree.visit (rand () % 50);
+		tree.visit(rand() % 50);
 
-	it = tree.getHead ();
+	it = tree.getHead();
 	for (; it; it++)
-		printf ("%d\n", it->getKey ());
+		printf("%d\n", it->getKey ());
 
-	printf (".........\n");
+	printf(".........\n");
 
 	for (size_t i = 0; i < 50; i++)
-		tree.eraseKey (rand () % 50);
+		tree.eraseKey(rand() % 50);
 
-	it = tree.getHead ();
+	it = tree.getHead();
 	for (; it; it++)
-		printf ("%d\n", it->getKey ());
+		printf("%d\n", it->getKey ());
 
-	printf (".........\n");
+	printf(".........\n");
 }
 
 
 //..............................................................................
 
-ADD_TEST_CASE ("test_RbTree", run)
+ADD_TEST_CASE("test_RbTree", run)
 
 }

@@ -25,78 +25,78 @@ class Parser: protected Lexer
 {
 public:
 	bool
-	parseFile (const sl::StringRef& filePath)
+	parseFile(const sl::StringRef& filePath)
 	{
 		io::SimpleMappedFile file;
 		return
-			file.open (filePath, io::FileFlag_ReadOnly) &&
-			parse (filePath, sl::StringRef ((const char*) file.p (), file.getMappingSize ()));
+			file.open(filePath, io::FileFlag_ReadOnly) &&
+			parse(filePath, sl::StringRef((const char*) file.p(), file.getMappingSize()));
 	}
 
 	bool
-	parse (const sl::StringRef& source)
+	parse(const sl::StringRef& source)
 	{
-		return parse ("INI", source);
+		return parse("INI", source);
 	}
 
 	bool
-	parse (
+	parse(
 		const sl::StringRef& filePath,
 		const sl::StringRef& source
 		)
 	{
 		bool result;
 
-		Lexer::create (filePath, source);
+		Lexer::create(filePath, source);
 
 		for (;;)
 		{
-			ScanResultKind scanResult = scanLine ();
-			switch (scanResult)
+			ScanResultKind scanResult = scanLine();
+			switch(scanResult)
 			{
 			case ScanResultKind_Error:
 				return false;
 
 			case ScanResultKind_Eof:
-				return static_cast <T*> (this)->finalize ();
+				return static_cast<T*> (this)->finalize();
 
 			case ScanResultKind_Section:
-				result = static_cast <T*> (this)->onSection (m_sectionName);
+				result = static_cast<T*> (this)->onSection(m_sectionName);
 				if (!result)
 					return false;
 
 				break;
 
 			case ScanResultKind_KeyValue:
-				result = static_cast <T*> (this)->onKeyValue (m_keyName, m_value);
+				result = static_cast<T*> (this)->onKeyValue(m_keyName, m_value);
 				if (!result)
 					return false;
 
 				break;
 
 			default:
-				ASSERT (false);
+				ASSERT(false);
 			}
 		}
 	}
 
 	bool
-	onSection (const sl::StringRef& sectionName) // overridable
+	onSection(const sl::StringRef& sectionName) // overridable
 	{
 		return true;
 	}
 
 	bool
-	finalize () // overridable
+	finalize() // overridable
 	{
 		return true;
 	}
 
 	static
 	bool
-	parseBoolValue (const sl::StringRef& value)
+	parseBoolValue(const sl::StringRef& value)
 	{
-		return _stricmp (value.sz (), "true") == 0 || atoi (value.sz ()) != 0;
+		return _stricmp(value.sz(), "true") == 0 || atoi (value.sz ()) != 0;
 	}
 };
 

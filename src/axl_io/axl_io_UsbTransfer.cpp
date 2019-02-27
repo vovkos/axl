@@ -19,9 +19,9 @@ namespace io {
 //..............................................................................
 
 const char*
-getUsbTransferStatusString (libusb_transfer_status status)
+getUsbTransferStatusString(libusb_transfer_status status)
 {
-	const char* stringTable [] =
+	const char* stringTable[] =
 	{
 		"LIBUSB_TRANSFER_COMPLETED",
 		"LIBUSB_TRANSFER_ERROR",
@@ -32,22 +32,22 @@ getUsbTransferStatusString (libusb_transfer_status status)
 		"LIBUSB_TRANSFER_OVERFLOW",
 	};
 
-	return (size_t) status < countof (stringTable) ?
-		stringTable [(size_t) status] :
+	return (size_t)status < countof(stringTable) ?
+		stringTable[(size_t)status] :
 		"libusb-undefined-status";
 }
 
 //..............................................................................
 
 bool
-UsbTransfer::create (size_t isochronousPacketCount)
+UsbTransfer::create(size_t isochronousPacketCount)
 {
-	close ();
+	close();
 
-	m_h = libusb_alloc_transfer (isochronousPacketCount);
+	m_h = libusb_alloc_transfer(isochronousPacketCount);
 	if (!m_h)
 	{
-		err::setError (err::SystemErrorCode_InsufficientResources);
+		err::setError(err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
 
@@ -55,21 +55,21 @@ UsbTransfer::create (size_t isochronousPacketCount)
 }
 
 bool
-UsbTransfer::submit ()
+UsbTransfer::submit()
 {
-	ASSERT (m_h);
+	ASSERT(m_h);
 
-	int result = libusb_submit_transfer (m_h);
-	return result == 0 ? true : err::fail (UsbError (result));
+	int result = libusb_submit_transfer(m_h);
+	return result == 0 ? true : err::fail(UsbError(result));
 }
 
 bool
-UsbTransfer::cancel ()
+UsbTransfer::cancel()
 {
-	ASSERT (m_h);
+	ASSERT(m_h);
 
-	int result = libusb_cancel_transfer (m_h);
-	return result == 0 ? true : err::fail (UsbError (result));
+	int result = libusb_cancel_transfer(m_h);
+	return result == 0 ? true : err::fail(UsbError(result));
 }
 
 //..............................................................................

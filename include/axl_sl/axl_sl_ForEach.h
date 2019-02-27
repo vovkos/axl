@@ -25,7 +25,7 @@ template <
 	typename Action
 	>
 void
-loopArray (
+loopArray(
 	T* p,
 	size_t count,
 	Action action
@@ -34,7 +34,7 @@ loopArray (
 	T* end = p + count;
 
 	for (; p < end; p++)
-		action (*p);
+		action(*p);
 }
 
 template <
@@ -42,13 +42,13 @@ template <
 	typename Action
 	>
 void
-loopIterator (
+loopIterator(
 	Iterator it,
 	Action action
 	)
 {
 	for (; it; it++)
-		action (*it);
+		action(*it);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -59,7 +59,7 @@ template <
 	typename Action
 	>
 size_t
-filteredLoopArray (
+filteredLoopArray(
 	T* p,
 	size_t count,
 	Filter filter,
@@ -71,9 +71,9 @@ filteredLoopArray (
 	size_t filterPassCount = 0;
 
 	for (; p < end; p++)
-		if (filter (*p))
+		if (filter(*p))
 		{
-			action (*p);
+			action(*p);
 			filterPassCount++;
 		}
 
@@ -86,7 +86,7 @@ template <
 	typename Action
 	>
 size_t
-filteredLoopIterator (
+filteredLoopIterator(
 	Iterator it,
 	Filter filter,
 	Action action
@@ -95,9 +95,9 @@ filteredLoopIterator (
 	size_t filterPassCount = 0;
 
 	for (; it; it++)
-		if (filter (*it))
+		if (filter(*it))
 		{
-			action (*it);
+			action(*it);
 			filterPassCount++;
 		}
 

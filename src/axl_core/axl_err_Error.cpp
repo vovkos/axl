@@ -23,86 +23,86 @@ namespace err {
 // this is a dedicated function for marking out-of-memory incidents
 
 void
-setOutOfMemoryError ()
+setOutOfMemoryError()
 {
-	setError (SystemErrorCode_InsufficientResources);
+	setError(SystemErrorCode_InsufficientResources);
 }
 
 //..............................................................................
 
 sl::StringRef
-ErrorHdr::getDescription () const
+ErrorHdr::getDescription() const
 {
-	ErrorProvider* provider = getErrorMgr ()->findProvider (m_guid);
+	ErrorProvider* provider = getErrorMgr()->findProvider(m_guid);
 
 	return provider ?
-		provider->getErrorDescription (this) :
-		sl::formatString ("%s::%d", m_guid.getString ().sz (), m_code);
+		provider->getErrorDescription(this) :
+		sl::formatString("%s::%d", m_guid.getString ().sz (), m_code);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::String
-ErrorRef::getDescription () const
+ErrorRef::getDescription() const
 {
-	return !isEmpty () ? m_p->getDescription () : g_noError.getDescription ();
+	return !isEmpty() ? m_p->getDescription() : g_noError.getDescription();
 }
 
 //..............................................................................
 
 size_t
-Error::push (const ErrorRef& error)
+Error::push(const ErrorRef& error)
 {
 	if (!m_p)
-		return copy (error);
+		return copy(error);
 
 	size_t base = 0;
 	size_t baseSize = m_p->m_size;
 
-	if (isKindOf (g_stdErrorGuid, StdErrorCode_Stack))
+	if (isKindOf(g_stdErrorGuid, StdErrorCode_Stack))
 	{
-		base += sizeof (ErrorHdr);
-		baseSize -= sizeof (ErrorHdr);
+		base += sizeof(ErrorHdr);
+		baseSize -= sizeof(ErrorHdr);
 	}
 
-	size_t size = sizeof (ErrorHdr) + error->m_size + baseSize;
+	size_t size = sizeof(ErrorHdr) + error->m_size + baseSize;
 
-	createBuffer (size, true);
+	createBuffer(size, true);
 	if (!m_p)
 		return -1;
 
-	memmove (
-		(uchar_t*) m_p + sizeof (ErrorHdr) + error->m_size,
-		(uchar_t*) m_p + base,
+	memmove(
+		(uchar_t*)m_p + sizeof(ErrorHdr) + error->m_size,
+		(uchar_t*)m_p + base,
 		baseSize
 		);
 
-	m_p->m_size = (uint32_t) size;
+	m_p->m_size = (uint32_t)size;
 	m_p->m_guid = g_stdErrorGuid;
 	m_p->m_code = StdErrorCode_Stack;
 
-	memcpy (m_p + 1, error, error->m_size);
+	memcpy(m_p + 1, error, error->m_size);
 	return size;
 }
 
 size_t
-Error::createSimpleError (
+Error::createSimpleError(
 	const sl::Guid& guid,
 	uint_t code
 	)
 {
-	createBuffer (sizeof (ErrorHdr));
+	createBuffer(sizeof(ErrorHdr));
 	if (!m_p)
 		return -1;
 
-	m_p->m_size = sizeof (ErrorHdr);
+	m_p->m_size = sizeof(ErrorHdr);
 	m_p->m_guid = guid;
 	m_p->m_code = code;
-	return sizeof (ErrorHdr);
+	return sizeof(ErrorHdr);
 }
 
 size_t
-Error::format_va (
+Error::format_va(
 	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
@@ -110,93 +110,93 @@ Error::format_va (
 	)
 {
 	sl::PackerSeq packer;
-	packer.format (formatString);
+	packer.format(formatString);
 
 	size_t packSize;
-	packer.pack_va (NULL, &packSize, va);
+	packer.pack_va(NULL, &packSize, va);
 
-	size_t size = sizeof (ErrorHdr) + packSize;
+	size_t size = sizeof(ErrorHdr) + packSize;
 
-	createBuffer (size);
+	createBuffer(size);
 	if (!m_p)
 		return -1;
 
-	m_p->m_size = (uint32_t) size;
+	m_p->m_size = (uint32_t)size;
 	m_p->m_guid = guid;
 	m_p->m_code = code;
 
-	packer.pack_va (m_p + 1, &packSize, va);
+	packer.pack_va(m_p + 1, &packSize, va);
 	return size;
 }
 
 size_t
-Error::createStringError (const sl::StringRef& string)
+Error::createStringError(const sl::StringRef& string)
 {
-	size_t length = string.getLength ();
-	size_t size = sizeof (ErrorHdr) + length + 1;
+	size_t length = string.getLength();
+	size_t size = sizeof(ErrorHdr) + length + 1;
 
-	ErrorHdr* error = createBuffer (size);
+	ErrorHdr* error = createBuffer(size);
 	if (!error)
 		return -1;
 
-	error->m_size = (uint32_t) size;
+	error->m_size = (uint32_t)size;
 	error->m_guid = g_stdErrorGuid;
 	error->m_code = StdErrorCode_String;
 
-	char* dst = (char*) (error + 1);
+	char* dst = (char*)(error + 1);
 
-	memcpy (dst, string.cp (), length);
-	dst [length] = 0;
+	memcpy(dst, string.cp(), length);
+	dst[length] = 0;
 
 	return size;
 }
 
 size_t
-Error::formatStringError_va (
+Error::formatStringError_va(
 	const char* formatString,
 	axl_va_list va
 	)
 {
-	char buffer [256];
-	sl::String string (ref::BufKind_Stack, buffer, sizeof (buffer));
-	string.format_va (formatString, va);
-	return createStringError (string);
+	char buffer[256];
+	sl::String string(ref::BufKind_Stack, buffer, sizeof(buffer));
+	string.format_va(formatString, va);
+	return createStringError(string);
 }
 
 //..............................................................................
 
 ErrorRef
-getLastError ()
+getLastError()
 {
-	return getErrorMgr ()->getLastError ();
+	return getErrorMgr()->getLastError();
 }
 
 size_t
-setError (const ErrorRef& error)
+setError(const ErrorRef& error)
 {
-	getErrorMgr ()->setError (error);
-	return error.getSize ();
+	getErrorMgr()->setError(error);
+	return error.getSize();
 }
 
 size_t
-pushError (const ErrorRef& error)
+pushError(const ErrorRef& error)
 {
-	Error stack = getLastError ();
-	ASSERT (!stack.isKindOf (g_stdErrorGuid, StdErrorCode_NoError));
-	size_t result = stack.push (error);
-	return result != -1 ? setError (stack) : -1;
+	Error stack = getLastError();
+	ASSERT(!stack.isKindOf(g_stdErrorGuid, StdErrorCode_NoError));
+	size_t result = stack.push(error);
+	return result != -1 ? setError(stack) : -1;
 }
 
 sl::String
-getLastErrorDescription ()
+getLastErrorDescription()
 {
-	return getErrorMgr ()->getLastError ().getDescription ();
+	return getErrorMgr()->getLastError().getDescription();
 }
 
 //..............................................................................
 
 size_t
-setFormatError_va (
+setFormatError_va(
 	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
@@ -204,12 +204,12 @@ setFormatError_va (
 	)
 {
 	Error error;
-	size_t result = error.format_va (guid, code, formatString, va);
-	return result != -1 ? setError (error) : -1;
+	size_t result = error.format_va(guid, code, formatString, va);
+	return result != -1 ? setError(error) : -1;
 }
 
 size_t
-pushFormatError_va (
+pushFormatError_va(
 	const sl::Guid& guid,
 	uint_t code,
 	const char* formatString,
@@ -217,97 +217,97 @@ pushFormatError_va (
 	)
 {
 	Error error;
-	size_t result = error.format_va (guid, code, formatString, va);
-	return result != -1 ? pushError (error) : -1;
+	size_t result = error.format_va(guid, code, formatString, va);
+	return result != -1 ? pushError(error) : -1;
 }
 
 size_t
-setError (const sl::StringRef& string)
+setError(const sl::StringRef& string)
 {
 	Error error;
-	size_t result = error.createStringError (string);
-	return result != -1 ? setError (error) : -1;
+	size_t result = error.createStringError(string);
+	return result != -1 ? setError(error) : -1;
 }
 
 size_t
-pushError (const sl::StringRef& string)
+pushError(const sl::StringRef& string)
 {
 	Error error;
-	size_t result = error.createStringError (string);
-	return result != -1 ? pushError (error) : -1;
+	size_t result = error.createStringError(string);
+	return result != -1 ? pushError(error) : -1;
 }
 
 size_t
-setFormatStringError_va (
+setFormatStringError_va(
 	const char* formatString,
 	axl_va_list va
 	)
 {
 	Error error;
-	size_t result = error.formatStringError_va (formatString, va);
-	return result != -1 ? setError (error) : -1;
+	size_t result = error.formatStringError_va(formatString, va);
+	return result != -1 ? setError(error) : -1;
 }
 
 size_t
-pushFormatStringError_va (
+pushFormatStringError_va(
 	const char* formatString,
 	axl_va_list va
 	)
 {
 	Error error;
-	size_t result = error.formatStringError_va (formatString, va);
-	return result != -1 ? pushError (error) : -1;
+	size_t result = error.formatStringError_va(formatString, va);
+	return result != -1 ? pushError(error) : -1;
 }
 
 //..............................................................................
 
 sl::StringRef
-StdErrorProvider::getErrorDescription (const ErrorRef& error)
+StdErrorProvider::getErrorDescription(const ErrorRef& error)
 {
-	if (error->m_size < sizeof (ErrorHdr))
-		return sl::String ();
+	if (error->m_size < sizeof(ErrorHdr))
+		return sl::String();
 
 	const char* p;
 	size_t stringSize;
 
-	switch (error->m_code)
+	switch(error->m_code)
 	{
 	case StdErrorCode_NoError:
 		return "no error";
 
 	case StdErrorCode_String:
 		p = (const char*) (error + 1);
-		stringSize = error->m_size - sizeof (ErrorHdr);
+		stringSize = error->m_size - sizeof(ErrorHdr);
 
-		return stringSize && !p [stringSize - 1] ?
-			sl::StringRef (error.getHdr (), p, stringSize - 1, true) :
-			sl::StringRef (error.getHdr (), p, stringSize, false);
+		return stringSize && !p[stringSize - 1] ?
+			sl::StringRef(error.getHdr(), p, stringSize - 1, true) :
+			sl::StringRef(error.getHdr(), p, stringSize, false);
 
 	case StdErrorCode_Stack:
-		return getStackErrorDescription (error);
+		return getStackErrorDescription(error);
 
 	default:
-		return sl::formatString ("error #%d");
+		return sl::formatString("error #%d");
 	}
 }
 
 sl::String
-StdErrorProvider::getStackErrorDescription (const ErrorRef& error)
+StdErrorProvider::getStackErrorDescription(const ErrorRef& error)
 {
 	sl::String string;
 
 	const ErrorHdr* p = error + 1;
-	const void* end = error.getEnd ();
+	const void* end = error.getEnd();
 
 	while (p < end)
 	{
-		ASSERT (p->m_size >= sizeof (ErrorHdr));
+		ASSERT(p->m_size >= sizeof(ErrorHdr));
 
-		if (!string.isEmpty ())
+		if (!string.isEmpty())
 			string += ": ";
 
-		string += ErrorRef (p).getDescription ();
-		p = (ErrorHdr*) ((uchar_t*) p + p->m_size);
+		string += ErrorRef(p).getDescription();
+		p = (ErrorHdr*)((uchar_t*)p + p->m_size);
 	}
 
 	return string;

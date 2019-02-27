@@ -24,12 +24,12 @@ class NetworkAdapterEnumerator
 public:
 	static
 	size_t
-	createAdapterList (sl::List <NetworkAdapterDesc>* adapterList);
+	createAdapterList(sl::List<NetworkAdapterDesc>* adapterList);
 
 protected:
 	static
 	void
-	setupAdapter (
+	setupAdapter(
 		NetworkAdapterDesc* adapter,
 		IP_ADAPTER_ADDRESSES* srcAdapter
 		);
@@ -38,16 +38,16 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::createAdapterList (sl::List <NetworkAdapterDesc>* adapterList)
+NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapterList)
 {
-	adapterList->clear ();
+	adapterList->clear();
 
 	ulong_t size = 15 * 1024; // Microsoft recommends starting with 15K
 
-	sl::Array <char> buffer;
-	buffer.setCount (size);
+	sl::Array<char> buffer;
+	buffer.setCount(size);
 
-	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*) buffer.p ();
+	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*)buffer.p();
 
 	ulong_t flags =
 		GAA_FLAG_SKIP_ANYCAST |
@@ -56,34 +56,34 @@ NetworkAdapterEnumerator::createAdapterList (sl::List <NetworkAdapterDesc>* adap
 
 	for (;;)
 	{
-		ulong_t error = ::GetAdaptersAddresses (AF_UNSPEC, flags, NULL, srcAdapter, &size);
+		ulong_t error = ::GetAdaptersAddresses(AF_UNSPEC, flags, NULL, srcAdapter, &size);
 		if (error == ERROR_SUCCESS)
 			break;
 
 		if (error != ERROR_BUFFER_OVERFLOW)
 		{
-			err::setError (error);
+			err::setError(error);
 			return -1;
 		}
 	}
 
 	for (; srcAdapter; srcAdapter = srcAdapter->Next)
 	{
-		NetworkAdapterDesc* adapter = AXL_MEM_NEW (NetworkAdapterDesc);
-		setupAdapter (adapter, srcAdapter);
-		adapterList->insertTail (adapter);
+		NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
+		setupAdapter(adapter, srcAdapter);
+		adapterList->insertTail(adapter);
 	}
 
-	return adapterList->getCount ();
+	return adapterList->getCount();
 }
 
 void
-NetworkAdapterEnumerator::setupAdapter (
+NetworkAdapterEnumerator::setupAdapter(
 	NetworkAdapterDesc* adapter,
 	IP_ADAPTER_ADDRESSES* srcAdapter
 	)
 {
-	switch (srcAdapter->IfType)
+	switch(srcAdapter->IfType)
 	{
 	case IF_TYPE_SOFTWARE_LOOPBACK:
 		adapter->m_type = NetworkAdapterType_Loopback;
@@ -136,30 +136,30 @@ NetworkAdapterEnumerator::setupAdapter (
 
 	adapter->m_name = srcAdapter->AdapterName;
 	adapter->m_description = srcAdapter->Description;
-	memcpy (adapter->m_mac, srcAdapter->PhysicalAddress, 6);
+	memcpy(adapter->m_mac, srcAdapter->PhysicalAddress, 6);
 
 	IP_ADAPTER_UNICAST_ADDRESS* srcAddress = srcAdapter->FirstUnicastAddress;
 	for (; srcAddress; srcAddress = srcAddress->Next)
 	{
-		if (!srcAddress->Address.lpSockaddr || srcAddress->Address.iSockaddrLength > sizeof (io::SockAddr))
+		if (!srcAddress->Address.lpSockaddr || srcAddress->Address.iSockaddrLength > sizeof(io::SockAddr))
 			continue;
 
-		NetworkAdapterAddress* address = AXL_MEM_NEW (NetworkAdapterAddress);
-		memcpy (&address->m_address, srcAddress->Address.lpSockaddr, srcAddress->Address.iSockaddrLength);
+		NetworkAdapterAddress* address = AXL_MEM_NEW(NetworkAdapterAddress);
+		memcpy(&address->m_address, srcAddress->Address.lpSockaddr, srcAddress->Address.iSockaddrLength);
 
-		if (srcAddress->Length >= sizeof (IP_ADAPTER_UNICAST_ADDRESS))
+		if (srcAddress->Length >= sizeof(IP_ADAPTER_UNICAST_ADDRESS))
 			address->m_netMaskBitCount = srcAddress->OnLinkPrefixLength;
 
-		adapter->m_addressList.insertTail (address);
+		adapter->m_addressList.insertTail(address);
 	}
 }
 
 //..............................................................................
 
 size_t
-createNetworkAdapterDescList (sl::List <NetworkAdapterDesc>* adapterList)
+createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList)
 {
-	return NetworkAdapterEnumerator::createAdapterList (adapterList);
+	return NetworkAdapterEnumerator::createAdapterList(adapterList);
 }
 
 //..............................................................................

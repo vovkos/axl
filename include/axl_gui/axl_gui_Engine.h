@@ -59,38 +59,38 @@ enum StdCursorKind
 class Engine
 {
 protected:
-	uint_t m_stdPalColorTable [StdPalColor__Count];
+	uint_t m_stdPalColorTable[StdPalColor__Count];
 
 public:
-	Engine ();
+	Engine();
 
 	Palette
-	getStdPalette ()
+	getStdPalette()
 	{
-		return Palette (m_stdPalColorTable, countof (m_stdPalColorTable));
+		return Palette(m_stdPalColorTable, countof(m_stdPalColorTable));
 	}
 
 	virtual
 	void
-	updateStdPalette () = 0;
+	updateStdPalette() = 0;
 
 	// canvas
 
 	virtual
 	bool
-	createOffscreenCanvas (
+	createOffscreenCanvas(
 		Canvas* canvas,
 		uint_t width,
 		uint_t height
 		) = 0;
 
 	bool
-	createOffscreenCanvas (
+	createOffscreenCanvas(
 		Canvas* canvas,
 		const Size& size
 		)
 	{
-		return createOffscreenCanvas (
+		return createOffscreenCanvas(
 			canvas,
 			size.m_width,
 			size.m_height
@@ -99,19 +99,19 @@ public:
 
 	virtual
 	bool
-	releaseOffscreenCanvas (Canvas* canvas) = 0;
+	releaseOffscreenCanvas(Canvas* canvas) = 0;
 
 	virtual
 	Canvas*
-	getSharedOffscreenCanvas (
+	getSharedOffscreenCanvas(
 		uint_t width,
 		uint_t height
 		) = 0;
 
 	Canvas*
-	getSharedOffscreenCanvas (const Size& size)
+	getSharedOffscreenCanvas(const Size& size)
 	{
-		return getSharedOffscreenCanvas (
+		return getSharedOffscreenCanvas(
 			size.m_width,
 			size.m_height
 			);
@@ -119,11 +119,11 @@ public:
 
 	virtual
 	void
-	releaseAllSharedOffscreenCanvases () = 0;
+	releaseAllSharedOffscreenCanvases() = 0;
 
 	virtual
 	bool
-	drawRect (
+	drawRect(
 		Canvas* canvas,
 		int left,
 		int top,
@@ -134,7 +134,7 @@ public:
 
 	virtual
 	bool
-	drawAlphaRect (
+	drawAlphaRect(
 		Canvas* canvas,
 		int left,
 		int top,
@@ -144,12 +144,12 @@ public:
 		uint_t alpha
 		)
 	{
-		return drawRect (canvas, left, top, right, bottom, color); // draw opaque rect by default
+		return drawRect(canvas, left, top, right, bottom, color); // draw opaque rect by default
 	}
 
 	virtual
 	bool
-	drawText_utf8 (
+	drawText_utf8(
 		Canvas* canvas,
 		int x,
 		int y,
@@ -165,7 +165,7 @@ public:
 
 	virtual
 	bool
-	drawText_utf16 (
+	drawText_utf16(
 		Canvas* canvas,
 		int x,
 		int y,
@@ -181,7 +181,7 @@ public:
 
 	virtual
 	bool
-	drawText_utf32 (
+	drawText_utf32(
 		Canvas* canvas,
 		int x,
 		int y,
@@ -197,7 +197,7 @@ public:
 
 	virtual
 	bool
-	drawImage (
+	drawImage(
 		Canvas* canvas,
 		int x,
 		int y,
@@ -210,7 +210,7 @@ public:
 
 	virtual
 	bool
-	copyRect (
+	copyRect(
 		Canvas* canvas,
 		int x,
 		int y,
@@ -225,22 +225,22 @@ public:
 
 	virtual
 	void
-	clearFontTuple (FontTuple* fontTuple) = 0;
+	clearFontTuple(FontTuple* fontTuple) = 0;
 
 	virtual
 	FontTuple*
-	getStdFontTuple (StdFontKind fontKind) = 0;
+	getStdFontTuple(StdFontKind fontKind) = 0;
 
 	inline
 	Font*
-	getStdFont (
+	getStdFont(
 		StdFontKind fontKind,
 		uint_t flags = 0
 		);
 
 	virtual
 	Font*
-	createFont (
+	createFont(
 		FontTuple* fontTuple,
 		const sl::StringRef& family,
 		size_t pointSize,
@@ -248,12 +248,12 @@ public:
 		) = 0;
 
 	Font*
-	createFont (
+	createFont(
 		FontTuple* fontTuple,
 		const FontDesc& fontDesc
 		)
 	{
-		return createFont (
+		return createFont(
 			fontTuple,
 			fontDesc.m_family,
 			fontDesc.m_pointSize,
@@ -263,39 +263,39 @@ public:
 
 	virtual
 	Font*
-	getFontMod (
+	getFontMod(
 		FontTuple* fontTuple,
 		uint_t flags
 		) = 0;
 
 	virtual
 	bool
-	getFontDesc (
+	getFontDesc(
 		Font* font,
 		FontDesc* fontDesc
 		) = 0;
 
 	virtual
 	bool
-	isMonospaceFont (Font* font) = 0;
+	isMonospaceFont(Font* font) = 0;
 
 	virtual
 	Size
-	calcTextSize_utf8 (
+	calcTextSize_utf8(
 		Font* font,
 		const sl::StringRef_utf8& text
 		) = 0;
 
 	virtual
 	Size
-	calcTextSize_utf16 (
+	calcTextSize_utf16(
 		Font* font,
 		const sl::StringRef_utf16& text
 		) = 0;
 
 	virtual
 	Size
-	calcTextSize_utf32 (
+	calcTextSize_utf32(
 		Font* font,
 		const sl::StringRef_utf32& text
 		) = 0;
@@ -304,7 +304,7 @@ public:
 
 	virtual
 	bool
-	createImage (
+	createImage(
 		Image* image,
 		uint_t width,
 		uint_t height,
@@ -312,12 +312,12 @@ public:
 		) = 0;
 
 	bool
-	createImage (
+	createImage(
 		Image* image,
 		const ImageDesc& imageDesc
 		)
 	{
-		return createImage (
+		return createImage(
 			image,
 			imageDesc.m_size.m_width,
 			imageDesc.m_size.m_height,
@@ -327,86 +327,86 @@ public:
 
 	virtual
 	bool
-	getImageDesc (
+	getImageDesc(
 		Image* image,
 		ImageDesc* imageDesc
 		) = 0;
 
 	virtual
 	Cursor*
-	getStdCursor (StdCursorKind cursorKind) = 0;
+	getStdCursor(StdCursorKind cursorKind) = 0;
 
 	// clipboard
 
 	virtual
 	uintptr_t
-	registerClipboardFormat (const sl::StringRef& formatName) = 0;
+	registerClipboardFormat(const sl::StringRef& formatName) = 0;
 
 	virtual
 	bool
-	readClipboard (sl::String* string) = 0;
+	readClipboard(sl::String* string) = 0;
 
 	virtual
 	bool
-	readClipboard (
+	readClipboard(
 		uintptr_t format,
-		sl::Array <char>* data
+		sl::Array<char>* data
 		) = 0;
 
 	sl::String
-	readClipboard ()
+	readClipboard()
 	{
 		sl::String string;
-		readClipboard (&string);
+		readClipboard(&string);
 		return string;
 	}
 
-	sl::Array <char>
-	readClipboard (uintptr_t format)
+	sl::Array<char>
+	readClipboard(uintptr_t format)
 	{
-		sl::Array <char> data;
-		readClipboard (format, &data);
+		sl::Array<char> data;
+		readClipboard(format, &data);
 		return data;
 	}
 
 	virtual
 	bool
-	writeClipboard (const sl::StringRef& string) = 0;
+	writeClipboard(const sl::StringRef& string) = 0;
 
 	virtual
 	bool
-	writeClipboard (
+	writeClipboard(
 		uintptr_t format,
 		const void* data,
 		size_t size
 		) = 0;
 
 	bool
-	writeClipboard (
+	writeClipboard(
 		uintptr_t format,
-		const sl::Array <char>& data
+		const sl::Array<char>& data
 		)
 	{
-		return writeClipboard (format, data, data.getCount ());
+		return writeClipboard(format, data, data.getCount());
 	}
 
 	virtual
 	bool
-	commitClipboard () = 0;
+	commitClipboard() = 0;
 
 	// widget
 
 	virtual
 	bool
-	isWidgetFocused (WidgetDriver* widgetDriver) = 0;
+	isWidgetFocused(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool
-	setWidgetFocus (WidgetDriver* widgetDriver) = 0;
+	setWidgetFocus(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool
-	redrawWidget (
+	redrawWidget(
 		WidgetDriver* widgetDriver,
 		int left,
 		int top,
@@ -416,7 +416,7 @@ public:
 
 	virtual
 	bool
-	redrawWidgetImmediate (
+	redrawWidgetImmediate(
 		WidgetDriver* widgetDriver,
 		int left,
 		int top,
@@ -426,7 +426,7 @@ public:
 
 	virtual
 	bool
-	scrollWidget (
+	scrollWidget(
 		WidgetDriver* widgetDriver,
 		int dx,
 		int dy
@@ -434,7 +434,7 @@ public:
 
 	virtual
 	bool
-	scrollWidgetRect (
+	scrollWidgetRect(
 		WidgetDriver* widgetDriver,
 		int left,
 		int top,
@@ -446,29 +446,29 @@ public:
 
 	virtual
 	bool
-	setWidgetCursor (
+	setWidgetCursor(
 		WidgetDriver* widgetDriver,
 		Cursor* cursor
 		) = 0;
 
 	virtual
 	bool
-	setMouseCapture (WidgetDriver* widgetDriver) = 0;
+	setMouseCapture(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool
-	releaseMouse (WidgetDriver* widgetDriver) = 0;
+	releaseMouse(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool
-	updateWidgetScrollBar (
+	updateWidgetScrollBar(
 		WidgetDriver* widgetDriver,
 		Orientation orientation
 		) = 0;
 
 	virtual
 	void
-	sendWidgetNotification (
+	sendWidgetNotification(
 		WidgetDriver* widgetDriver,
 		uint_t code,
 		const void* params = NULL
@@ -476,45 +476,45 @@ public:
 
 	virtual
 	bool
-	postWidgetThreadMsg (
+	postWidgetThreadMsg(
 		WidgetDriver* widgetDriver,
 		uint_t code,
-		const ref::Ptr <void>& params
+		const ref::Ptr<void>& params
 		) = 0;
 
 	virtual
 	bool
-	startWidgetAnimation (WidgetDriver* widgetDriver) = 0;
+	startWidgetAnimation(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	void
-	stopWidgetAnimation (WidgetDriver* widgetDriver) = 0;
+	stopWidgetAnimation(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool
-	showCaret (
+	showCaret(
 		WidgetDriver* widgetDriver,
 		const Rect& rect
 		) = 0;
 
 	virtual
 	void
-	hideCaret (WidgetDriver* widgetDriver) = 0;
+	hideCaret(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool
-	scheduleToolTipMsg (
+	scheduleToolTipMsg(
 		WidgetDriver* widgetDriver,
 		uint_t timeout
 		) = 0;
 
 	virtual
 	bool
-	cancelToolTipMsg (WidgetDriver* widgetDriver) = 0;
+	cancelToolTipMsg(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	bool
-	showToolTip (
+	showToolTip(
 		WidgetDriver* widgetDriver,
 		int x,
 		int y,
@@ -523,11 +523,11 @@ public:
 
 	virtual
 	bool
-	hideToolTip (WidgetDriver* widgetDriver) = 0;
+	hideToolTip(WidgetDriver* widgetDriver) = 0;
 
 	virtual
 	void
-	processUiEvents (uint32_t timeLimit = -1) = 0;
+	processUiEvents(uint32_t timeLimit = -1) = 0;
 };
 
 //..............................................................................

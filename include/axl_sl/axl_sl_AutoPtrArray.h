@@ -23,67 +23,67 @@ namespace sl {
 
 template <
 	typename T,
-	typename Delete0 = typename mem::StdDelete <T>
+	typename Delete0 = typename mem::StdDelete<T>
 	>
-class AutoPtrArray: public Array <T*>
+class AutoPtrArray: public Array<T*>
 {
-	AXL_DISABLE_COPY (AutoPtrArray)
+	AXL_DISABLE_COPY(AutoPtrArray)
 
 public:
-	typedef Array <T*> BaseType;
+	typedef Array<T*> BaseType;
 	typedef Delete0 Delete;
 
 public:
-	AutoPtrArray ():
-		BaseType ()
+	AutoPtrArray():
+		BaseType()
 	{
 	}
 
-	AutoPtrArray (T* e):
-		BaseType (e)
+	AutoPtrArray(T* e):
+		BaseType(e)
 	{
 	}
 
-	AutoPtrArray (
+	AutoPtrArray(
 		T* const* p,
 		size_t count
 		):
-		BaseType (p, count)
+		BaseType(p, count)
 	{
 	}
 
-	AutoPtrArray (
+	AutoPtrArray(
 		ref::BufKind bufKind,
 		void* p,
 		size_t size
 		):
-		BaseType (bufKind, p, size)
+		BaseType(bufKind, p, size)
 	{
 	}
 
-	~AutoPtrArray ()
+	~AutoPtrArray()
 	{
-		deleteElements ();
+		deleteElements();
 	}
 
 	void
-	clear ()
+	clear()
 	{
-		deleteElements ();
-		BaseType::clear ();
+		deleteElements();
+		BaseType::clear();
 	}
 
 protected:
 	void
-	deleteElements ()
+	deleteElements()
 	{
-		size_t count = this->getCount ();
+		size_t count = this->getCount();
 
 		for (size_t i = 0; i < count; i++)
 		{
-			T* e = this->m_p [i];
+			T* e = this->m_p[i];
 			if (e)
-				Delete () (e);
+				Delete() (e);
 		}
 	}
 };

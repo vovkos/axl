@@ -21,28 +21,28 @@ namespace sys {
 
 bool TlsMgr::m_isDead = false;
 
-TlsMgr::TlsMgr ()
+TlsMgr::TlsMgr()
 {
-	m_tlsIdx = ::TlsAlloc ();
+	m_tlsIdx = ::TlsAlloc();
 	m_slotCount = 0;
 }
 
-TlsMgr::~TlsMgr ()
+TlsMgr::~TlsMgr()
 {
-	Page* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage();
 	if (page)
 	{
-		AXL_MEM_DELETE (page);
-		setCurrentThreadPage (NULL);
+		AXL_MEM_DELETE(page);
+		setCurrentThreadPage(NULL);
 	}
 
-	::TlsFree (m_tlsIdx);
+	::TlsFree(m_tlsIdx);
 	m_isDead = true;
 }
 
 void
 NTAPI
-TlsMgr::tlsCallback (
+TlsMgr::tlsCallback(
 	HANDLE hModule,
 	dword_t reason,
 	void* reserved
@@ -51,51 +51,51 @@ TlsMgr::tlsCallback (
 	if (reason != DLL_THREAD_DETACH || m_isDead)
 		return;
 
-	TlsMgr* self = getTlsMgr ();
+	TlsMgr* self = getTlsMgr();
 
-	Page* page = self->findCurrentThreadPage ();
+	Page* page = self->findCurrentThreadPage();
 	if (!page)
 		return;
 
-	AXL_MEM_DELETE (page);
+	AXL_MEM_DELETE(page);
 
-	::TlsSetValue (self->m_tlsIdx, NULL);
+	::TlsSetValue(self->m_tlsIdx, NULL);
 }
 
 #elif (_AXL_OS_POSIX)
 
-TlsMgr::TlsMgr ()
+TlsMgr::TlsMgr()
 {
-	::pthread_key_create (&m_tlsKey, tlsDestructor);
+	::pthread_key_create(&m_tlsKey, tlsDestructor);
 	m_slotCount = 0;
 }
 
-TlsMgr::~TlsMgr ()
+TlsMgr::~TlsMgr()
 {
-	Page* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage();
 	if (page)
 	{
-		AXL_MEM_DELETE (page);
-		setCurrentThreadPage (NULL);
+		AXL_MEM_DELETE(page);
+		setCurrentThreadPage(NULL);
 	}
 
-	::pthread_key_delete (m_tlsKey);
+	::pthread_key_delete(m_tlsKey);
 }
 
 #endif
 
 TlsValue
-TlsMgr::getSlotValue (size_t slot)
+TlsMgr::getSlotValue(size_t slot)
 {
-	Page* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage();
 	if (!page)
 		return ref::g_nullPtr;
 
-	size_t count = page->m_array.getCount ();
+	size_t count = page->m_array.getCount();
 	if (slot >= count)
 		return ref::g_nullPtr;
 
-	sl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
+	sl::BoxListEntry<TlsValue>* entry = page->m_array[slot];
 	if (!entry)
 		return ref::g_nullPtr;
 
@@ -103,23 +103,23 @@ TlsMgr::getSlotValue (size_t slot)
 }
 
 TlsValue
-TlsMgr::setSlotValue (
+TlsMgr::setSlotValue(
 	size_t slot,
 	const TlsValue& value
 	)
 {
-	Page* page = getCurrentThreadPage ();
+	Page* page = getCurrentThreadPage();
 
-	size_t count = page->m_array.getCount ();
+	size_t count = page->m_array.getCount();
 	if (slot >= count)
 	{
 		if (!value)
-			return TlsValue ();
+			return TlsValue();
 
-		page->m_array.setCountZeroConstruct (slot + 1);
+		page->m_array.setCountZeroConstruct(slot + 1);
 	}
 
-	sl::BoxListEntry <TlsValue>* entry = page->m_array [slot];
+	sl::BoxListEntry<TlsValue>* entry = page->m_array[slot];
 
 	TlsValue oldValue;
 
@@ -133,28 +133,28 @@ TlsMgr::setSlotValue (
 		}
 		else
 		{
-			page->m_valueList.remove (entry);
-			page->m_array [slot] = NULL;
+			page->m_valueList.remove(entry);
+			page->m_array[slot] = NULL;
 		}
 	}
 	else if (value)
 	{
-		entry = page->m_valueList.insertTail (value).getEntry ();
-		page->m_array [slot] = entry;
+		entry = page->m_valueList.insertTail(value).getEntry();
+		page->m_array[slot] = entry;
 	}
 
 	return oldValue;
 }
 
 TlsMgr::Page*
-TlsMgr::getCurrentThreadPage ()
+TlsMgr::getCurrentThreadPage()
 {
-	Page* page = findCurrentThreadPage ();
+	Page* page = findCurrentThreadPage();
 	if (page)
 		return page;
 
-	page = AXL_MEM_NEW (Page);
-	setCurrentThreadPage (page);
+	page = AXL_MEM_NEW(Page);
+	setCurrentThreadPage(page);
 	return page;
 }
 
@@ -167,18 +167,18 @@ TlsMgr::getCurrentThreadPage ()
 
 #if (_AXL_OS_WIN)
 
-#pragma section (AXL_SYS_TLS_CALLBACK_SECTION, long, read)
+#pragma section(AXL_SYS_TLS_CALLBACK_SECTION, long, read)
 
 extern "C"
-__declspec(allocate (AXL_SYS_TLS_CALLBACK_SECTION))
+__declspec(allocate(AXL_SYS_TLS_CALLBACK_SECTION))
 PIMAGE_TLS_CALLBACK axl_g_sys_pfTlsCallback = axl::sys::TlsMgr::tlsCallback;
 
 #ifdef _WIN64
-#	pragma comment (linker, "/INCLUDE:_tls_used")
-#	pragma comment (linker, "/INCLUDE:axl_g_sys_pfTlsCallback")
+#	pragma comment(linker, "/INCLUDE:_tls_used")
+#	pragma comment(linker, "/INCLUDE:axl_g_sys_pfTlsCallback")
 #else
-#	pragma comment (linker, "/INCLUDE:__tls_used")
-#	pragma comment (linker, "/INCLUDE:_axl_g_sys_pfTlsCallback")
+#	pragma comment(linker, "/INCLUDE:__tls_used")
+#	pragma comment(linker, "/INCLUDE:_axl_g_sys_pfTlsCallback")
 #endif
 
 #endif

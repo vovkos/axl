@@ -19,7 +19,7 @@ namespace win {
 //..............................................................................
 
 bool
-Thread::create (
+Thread::create(
 	SECURITY_ATTRIBUTES* secAttr,
 	size_t stackSize,
 	PTHREAD_START_ROUTINE threadFunc,
@@ -27,13 +27,13 @@ Thread::create (
 	uint_t flags
 	)
 {
-	close ();
+	close();
 
 	dword_t threadId;
-	m_h = ::CreateThread (secAttr, stackSize, threadFunc, context, flags, &threadId);
+	m_h = ::CreateThread(secAttr, stackSize, threadFunc, context, flags, &threadId);
 	if (!m_h)
 	{
-		err::setLastSystemError ();
+		err::setLastSystemError();
 		return false;
 	}
 
