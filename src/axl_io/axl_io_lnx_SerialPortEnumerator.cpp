@@ -92,7 +92,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 		portList->insertTail(portDesc);
 	}
 #else
-	static const char* deviceNameTable[] [2] =
+	static const char* deviceNameTable[][2] =
 	{
 		{ "/dev/ttyS0",   "Serial device /dev/ttyS0" },
 		{ "/dev/ttyS1",   "Serial device /dev/ttyS1" },
@@ -103,8 +103,8 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 	for (size_t i = 0; i < countof(deviceNameTable); i++)
 	{
 		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
-		portDesc->m_deviceName = deviceNameTable[i] [0];
-		portDesc->m_description = deviceNameTable[i] [1];
+		portDesc->m_deviceName = deviceNameTable[i][0];
+		portDesc->m_description = deviceNameTable[i][1];
 		portList->insertTail(portDesc);
 	}
 #endif

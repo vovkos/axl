@@ -139,7 +139,7 @@ getCmdLineHelpString(const ConstList<SwitchInfo>& switchInfoList)
 			if (!switchInfo->m_nameTable[i])
 				break;
 
-			if (switchInfo->m_nameTable[i] [1])
+			if (switchInfo->m_nameTable[i][1])
 			{
 				switchLength += 2; // "--"
 				switchLength += strlen_s(switchInfo->m_nameTable[i]);
@@ -188,7 +188,7 @@ getCmdLineHelpString(const ConstList<SwitchInfo>& switchInfoList)
 			lineString.copy(' ', indentSize);
 
 			ASSERT(switchInfo->m_nameTable[0]);
-			if (switchInfo->m_nameTable[0] [1])
+			if (switchInfo->m_nameTable[0][1])
 			{
 				lineString += "--";
 				lineString += switchInfo->m_nameTable[0];
@@ -196,7 +196,7 @@ getCmdLineHelpString(const ConstList<SwitchInfo>& switchInfoList)
 			else
 			{
 				lineString += '-';
-				lineString += switchInfo->m_nameTable[0] [0];
+				lineString += switchInfo->m_nameTable[0][0];
 			}
 
 			for (size_t i = 1; i < countof(switchInfo->m_nameTable); i++)
@@ -206,7 +206,7 @@ getCmdLineHelpString(const ConstList<SwitchInfo>& switchInfoList)
 
 				lineString += ", ";
 
-				if (switchInfo->m_nameTable[i] [1])
+				if (switchInfo->m_nameTable[i][1])
 				{
 					lineString += "--";
 					lineString += switchInfo->m_nameTable[i];
@@ -214,7 +214,7 @@ getCmdLineHelpString(const ConstList<SwitchInfo>& switchInfoList)
 				else
 				{
 					lineString += '-';
-					lineString += switchInfo->m_nameTable[i] [0];
+					lineString += switchInfo->m_nameTable[i][0];
 				}
 			}
 

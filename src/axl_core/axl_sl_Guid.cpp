@@ -102,7 +102,7 @@ Guid::parse(const sl::StringRef& string)
 sl::String
 Guid::getString(uint_t flags) const
 {
-	static const char* formatTable[2] [2] =
+	static const char* formatTable[2][2] =
 	{
 		{
 			"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
@@ -118,7 +118,7 @@ Guid::getString(uint_t flags) const
 	size_t i2 = (flags & GuidStringFlag_UpperCase) ? 1 : 0;
 
 	return sl::formatString(
-		formatTable[i1] [i2],
+		formatTable[i1][i2],
 		m_data1,
 		m_data2,
 		m_data3,

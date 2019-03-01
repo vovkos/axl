@@ -57,7 +57,7 @@ void test_IntHashTable()
 
 void test_StringHashTableIgnoreCase()
 {
-	static char stringTable[] [80] =
+	static char stringTable[][80] =
 	{
 		"Multi-function",      // LIBUSB_CLASS_PER_INTERFACE = 0,
 		"Audio",               // LIBUSB_CLASS_AUDIO = 1,
@@ -94,7 +94,7 @@ void test_StringHashTableIgnoreCase()
 	{
 		size_t length = strlen(stringTable[i]);
 		for (size_t j = 0; j < length; j++)
-			stringTable[i] [j] = (rand() & 1) ? tolower(stringTable[i] [j]) : toupper(stringTable[i] [j]);
+			stringTable[i][j] = (rand() & 1) ? tolower(stringTable[i][j]) : toupper(stringTable[i][j]);
 
 		printf("map_pcu: looking for %s...", stringTable [i]);
 		it = map_pcu.find(stringTable[i]);
