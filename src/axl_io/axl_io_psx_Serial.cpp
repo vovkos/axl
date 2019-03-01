@@ -49,6 +49,13 @@ Serial::setRts(bool isSet)
 	return err::complete(result != -1);
 }
 
+bool
+Serial::setBreakCondition(bool isSet)
+{
+	int result = ::ioctl(m_h, isSet ? TIOCSBRK : TIOCCBRK);
+	return err::complete(result != -1);
+}
+
 //..............................................................................
 
 } // namespace psx

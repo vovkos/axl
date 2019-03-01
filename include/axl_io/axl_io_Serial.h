@@ -76,6 +76,12 @@ public:
 		return m_serial.setRts(isSet);
 	}
 
+	bool
+	setBreakCondition(bool isSet)
+	{
+		return m_serial.setBreakCondition(isSet);
+	}
+
 	uint_t
 	getStatusLines();
 

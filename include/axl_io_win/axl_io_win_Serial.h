@@ -91,6 +91,12 @@ public:
 		return escape(isSet ? SETRTS : CLRRTS);
 	}
 
+	bool
+	setBreakCondition(bool isSet)
+	{
+		return escape(isSet ? SETBREAK : CLRBREAK);
+	}
+
 	dword_t
 	getWaitMask();
 

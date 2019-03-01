@@ -80,6 +80,16 @@ public:
 	bool
 	setRts(bool isSet);
 
+	bool
+	setBreakCondition(bool isSet);
+
+	bool
+	sendBreak(uint_t duration = 0)
+	{
+		int result = ::tcsendbreak(m_h, duration);
+		return err::complete(result != -1);
+	}
+
 #if (!_AXL_OS_DARWIN)
 	bool
 	wait(uint_t mask)
