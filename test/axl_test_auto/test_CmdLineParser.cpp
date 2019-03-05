@@ -41,7 +41,7 @@ public:
 	bool
 	onValue(const sl::StringRef& value)
 	{
-		printf("OnValue '%s'\n", value.sz ());
+		printf("OnValue '%s'\n", value.sz());
 		return true;
 	}
 
@@ -51,7 +51,7 @@ public:
 		const sl::StringRef& value
 		)
 	{
-		printf("OnSwitch #%d = '%s'\n", switchKind, value.sz ());
+		printf("OnSwitch #%d = '%s'\n", switchKind, value.sz());
 		return true;
 	}
 };

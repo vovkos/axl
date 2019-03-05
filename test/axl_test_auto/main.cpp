@@ -101,7 +101,7 @@ main(
 			if (it)
 				passed += runTest(i, total, it->getKey(), it->m_value);
 			else
-				printf("TEST NOT FOUND: %s\n", name.sz ());
+				printf("TEST NOT FOUND: %s\n", name.sz());
 		}
 	}
 

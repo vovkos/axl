@@ -190,7 +190,7 @@ public:
 
 		if (!result)
 		{
-			printf("cannot open reader (%s)\n", err::getLastErrorDescription ().sz ());
+			printf("cannot open reader (%s)\n", err::getLastErrorDescription().sz());
 			return;
 		}
 
@@ -203,7 +203,7 @@ public:
 			size_t size = m_reader.read(&buffer);
 			if (size == -1)
 			{
-				printf("cannot read (%s)\n", err::getLastErrorDescription ().sz ());
+				printf("cannot read (%s)\n", err::getLastErrorDescription().sz());
 				return;
 			}
 
@@ -240,7 +240,7 @@ public:
 
 		if (!result)
 		{
-			printf("cannot open writer (%s)\n", err::getLastErrorDescription ().sz ());
+			printf("cannot open writer (%s)\n", err::getLastErrorDescription().sz());
 			return;
 		}
 
@@ -264,7 +264,7 @@ public:
 			size_t result = m_writer.write(p, size);
 			if (result == -1)
 			{
-				printf("cannot write (%s)\n", err::getLastErrorDescription ().sz ());
+				printf("cannot write (%s)\n", err::getLastErrorDescription().sz());
 				return;
 			}
 		}
@@ -489,7 +489,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %d %s\n", counter, sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %d %s\n", counter, sys::Time(time, 0).format("%m:%s.%l").sz());
 
 	printf("Testing old index-based search...\n");
 	baseTimestamp = sys::getTimestamp();
@@ -503,7 +503,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %d %s\n", counter, sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %d %s\n", counter, sys::Time(time, 0).format("%m:%s.%l").sz());
 
 #if (_AXL_OS_WIN)
 	printf("Testing Interlocked (intrinsic, i32)...\n");
@@ -519,7 +519,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 
 	printf("Testing Interlocked (winapi, i32)...\n");
 	baseTimestamp = sys::getTimestamp();
@@ -531,7 +531,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 
 #if (_AXL_CPU_AMD64)
 	printf("Testing Interlocked (intrinsic, i64)...\n");
@@ -544,7 +544,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 #endif
 
 	printf("Testing Interlocked (winapi, i64)...\n");
@@ -557,7 +557,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 #endif
 
 	printf("Testing STL...\n");
@@ -574,7 +574,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 
 	printf("Testing STL (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp();
@@ -585,7 +585,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 
 	printf("Testing QT...\n");
 	baseTimestamp = sys::getTimestamp();
@@ -601,7 +601,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 
 	printf("Testing QT (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp();
@@ -612,7 +612,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 
 	printf("Testing AXL...\n");
 	baseTimestamp = sys::getTimestamp();
@@ -628,7 +628,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 
 	printf("Testing AXL (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp();
@@ -639,7 +639,7 @@ void benchFormat()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m:%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m:%s.%l").sz());
 }
 
 
@@ -672,7 +672,7 @@ main(
 	bool result = regex.compile(src);
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return -1;
 	}
 

@@ -49,7 +49,7 @@ printDeviceProperties(const iok::RegistryEntry& device)
 	for (size_t i = 0; i < indent; i++)
 		printf("\t");
 
-	printf("deviceName = %s\n", device.getName ().sz ());
+	printf("deviceName = %s\n", device.getName().sz());
 	for (size_t i = 0; i < count; i++)
 	{
 		for (size_t i = 0; i < indent; i++)

@@ -81,7 +81,7 @@ getMatchConditionString(const MatchCondition* condition)
 		break;
 
 	case MatchConditionKind_CharSet:
-		string.format("[%s]", getCharSetString (&condition->m_charSet).sz ());
+		string.format("[%s]", getCharSetString(&condition->m_charSet).sz());
 		break;
 
 	case MatchConditionKind_Any:
@@ -145,7 +145,7 @@ Regex::print() const
 		if (nfaState->m_flags & NfaStateFlag_Match)
 		{
 			ASSERT(nfaState->m_outState && !nfaState->m_outState2);
-			printf("%s -> %02d", getMatchConditionString (&nfaState->m_matchCondition).sz (), nfaState->m_outState->m_id);
+			printf("%s -> %02d", getMatchConditionString(&nfaState->m_matchCondition).sz(), nfaState->m_outState->m_id);
 		}
 		else if (nfaState->m_flags & NfaStateFlag_EpsilonLink)
 		{
@@ -216,7 +216,7 @@ Regex::print() const
 		for (; dfaTransitionIt; dfaTransitionIt++)
 		{
 			const DfaTransition* transition = *dfaTransitionIt;
-			printf("    %s -> %02d\n", getMatchConditionString (&transition->m_matchCondition).sz (), transition->m_outState->m_id);
+			printf("    %s -> %02d\n", getMatchConditionString(&transition->m_matchCondition).sz(), transition->m_outState->m_id);
 		}
 	}
 }
@@ -1491,14 +1491,14 @@ RegexCompiler::namedRegex(const sl::StringRef& name)
 {
 	if (!m_nameMgr)
 	{
-		err::setFormatStringError("named regexp '%s' is used but name manager is not set", name.sz ());
+		err::setFormatStringError("named regexp '%s' is used but name manager is not set", name.sz());
 		return NULL;
 	}
 
 	sl::StringRef source = m_nameMgr->findName(name);
 	if (source.isEmpty())
 	{
-		err::setFormatStringError("named regexp '%s' is not defined", name.sz ());
+		err::setFormatStringError("named regexp '%s' is not defined", name.sz());
 		return NULL;
 	}
 

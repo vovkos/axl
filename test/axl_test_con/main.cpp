@@ -138,7 +138,7 @@ testWinNetworkAdapterList2()
 	bool result = socket.wsaOpen(AF_INET, SOCK_DGRAM, 0);
 	if (!result)
 	{
-		printf("socket.wsaOpen failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("socket.wsaOpen failed (%s)\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -168,7 +168,7 @@ testWinNetworkAdapterList2()
 		dword_t error = ::WSAGetLastError();
 		if (error != WSAENOBUFS)
 		{
-			printf("WSAIoctl failed (%s)\n", err::Error (error).getDescription ().sz ());
+			printf("WSAIoctl failed (%s)\n", err::Error (error).getDescription().sz());
 			return;
 		}
 
@@ -182,9 +182,9 @@ testWinNetworkAdapterList2()
 	for (size_t i = 0; i < ifaceCount; iface++, i++)
 	{
 		printf("Interface #%d\n", i);
-		printf("  Address   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiAddress).sz ());
-		printf("  Broadcast = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiBroadcastAddress).sz ());
-		printf("  Netmask   = %s\n", io::getSockAddrString ((const sockaddr*) &iface->iiNetmask).sz ());
+		printf("  Address   = %s\n", io::getSockAddrString((const sockaddr*) &iface->iiAddress).sz());
+		printf("  Broadcast = %s\n", io::getSockAddrString((const sockaddr*) &iface->iiBroadcastAddress).sz());
+		printf("  Netmask   = %s\n", io::getSockAddrString((const sockaddr*) &iface->iiNetmask).sz());
 
 /*		cout << endl;
 
@@ -222,7 +222,7 @@ getFileTimes_nt(const char* fileName)
 	bool result = file.open(fileName);
 	if (!result)
 	{
-		printf("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
+		printf("can't open %s: %s\n", fileName, err::getLastErrorDescription().sz());
 		return false;
 	}
 
@@ -239,15 +239,15 @@ getFileTimes_nt(const char* fileName)
 
 	if (status < 0)
 	{
-		printf("can't query file information: %s: %s\n", fileName, sys::win::NtStatus (status).getDescription ().sz ());
+		printf("can't query file information: %s: %s\n", fileName, sys::win::NtStatus (status).getDescription().sz());
 		return false;
 	}
 
 	printf("NT File times for: %s\n", fileName);
-	printf("  CreationTime:   %s\n", sys::Time (basicInfo.CreationTime.QuadPart).format ().sz ());
-	printf("  LastWriteTime:  %s\n", sys::Time (basicInfo.LastWriteTime.QuadPart).format ().sz ());
-	printf("  LastAccessTime: %s\n", sys::Time (basicInfo.LastAccessTime.QuadPart).format ().sz ());
-	printf("  ChangeTime:     %s\n", sys::Time (basicInfo.ChangeTime.QuadPart).format ().sz ());
+	printf("  CreationTime:   %s\n", sys::Time(basicInfo.CreationTime.QuadPart).format().sz());
+	printf("  LastWriteTime:  %s\n", sys::Time(basicInfo.LastWriteTime.QuadPart).format().sz());
+	printf("  LastAccessTime: %s\n", sys::Time(basicInfo.LastAccessTime.QuadPart).format().sz());
+	printf("  ChangeTime:     %s\n", sys::Time(basicInfo.ChangeTime.QuadPart).format().sz());
 
 	return true;
 }
@@ -259,7 +259,7 @@ getFileTimes_win(const char* fileName)
 	bool result = file.open(fileName);
 	if (!result)
 	{
-		printf("can't open %s: %s\n", fileName, err::getLastErrorDescription ().sz ());
+		printf("can't open %s: %s\n", fileName, err::getLastErrorDescription().sz());
 		return false;
 	}
 
@@ -268,15 +268,15 @@ getFileTimes_win(const char* fileName)
 	if (!result)
 	{
 		err::setLastSystemError();
-		printf("can't query file information: %s, %s\n", fileName, err::getLastErrorDescription ().sz ());
+		printf("can't query file information: %s, %s\n", fileName, err::getLastErrorDescription().sz());
 		return false;
 	}
 
 	printf("WIN File times for: %s\n", fileName);
-	printf("  CreationTime:   %s\n", sys::Time (basicInfo2.CreationTime.QuadPart).format ().sz ());
-	printf("  LastWriteTime:  %s\n", sys::Time (basicInfo2.LastWriteTime.QuadPart).format ().sz ());
-	printf("  LastAccessTime: %s\n", sys::Time (basicInfo2.LastAccessTime.QuadPart).format ().sz ());
-	printf("  ChangeTime:     %s\n", sys::Time (basicInfo2.ChangeTime.QuadPart).format ().sz ());
+	printf("  CreationTime:   %s\n", sys::Time(basicInfo2.CreationTime.QuadPart).format().sz());
+	printf("  LastWriteTime:  %s\n", sys::Time(basicInfo2.LastWriteTime.QuadPart).format().sz());
+	printf("  LastAccessTime: %s\n", sys::Time(basicInfo2.LastAccessTime.QuadPart).format().sz());
+	printf("  ChangeTime:     %s\n", sys::Time(basicInfo2.ChangeTime.QuadPart).format().sz());
 
 	return true;
 }
@@ -305,10 +305,10 @@ testNetworkAdapterList()
 	{
 		io::NetworkAdapterDesc* adapter = *adapterIt;
 
-		printf("Name        = %s\n", adapter->getName ().sz ());
-		printf("Description = %s\n", adapter->getDescription ().sz ());
-		printf("Type        = %s\n", io::getNetworkAdapterTypeString (adapter->getType ()));
-		printf("Flags       = %s\n", io::getNetworkAdapterFlagString (adapter->getFlags ()).sz ());
+		printf("Name        = %s\n", adapter->getName().sz());
+		printf("Description = %s\n", adapter->getDescription().sz());
+		printf("Type        = %s\n", io::getNetworkAdapterTypeString(adapter->getType ()));
+		printf("Flags       = %s\n", io::getNetworkAdapterFlagString(adapter->getFlags ()).sz());
 
 		sl::ConstList<io::NetworkAdapterAddress> addressList = adapter->getAddressList();
 		sl::ConstIterator<io::NetworkAdapterAddress> addressIt = addressList.getHead();
@@ -326,7 +326,7 @@ testNetworkAdapterList()
 			{
 				io::SockAddr netMask;
 				netMask.createNetMask_ip4(address->m_netMaskBitCount);
-				printf(" (mask %s)\n", netMask.getString ().sz ());
+				printf(" (mask %s)\n", netMask.getString().sz());
 			}
 			else
 			{
@@ -337,7 +337,7 @@ testNetworkAdapterList()
 		printf("\n");
 	}
 
-	printf("%d adapters found\n", adapterList.getCount ());
+	printf("%d adapters found\n", adapterList.getCount());
 }
 
 //..............................................................................
@@ -352,13 +352,13 @@ testParseFormatIp6()
 	io::SockAddr sockAddr;
 
 	result = sockAddr.parse("6");
-	printf("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
+	printf("result = %d, addr = %s\n", result, sockAddr.getString().sz());
 
 	result = sockAddr.parse("[1::2:3:4:5]:6");
-	printf("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
+	printf("result = %d, addr = %s\n", result, sockAddr.getString().sz());
 
 	result = sockAddr.parse("[fe80::c990:d16e:a986:d56b%11]:10001");
-	printf("result = %d, addr = %s\n", result, sockAddr.getString ().sz ());
+	printf("result = %d, addr = %s\n", result, sockAddr.getString().sz());
 
 	sockaddr_in6 addr = { 0 };
 	addr.sin6_family = AF_INET6;
@@ -381,7 +381,7 @@ testParseFormatIp6()
 #endif
 
 		sl::String addrString = io::getSockAddrString((const sockaddr*) &addr).sz();
-		printf("addr1 = %s\n", addrString.sz ());
+		printf("addr1 = %s\n", addrString.sz());
 
 		char addrString2[1024] = { 0 };
 		dword_t size = sizeof(addrString2);
@@ -429,26 +429,26 @@ testKeepAlives(const sl::StringRef& addrString)
 
 	if (!result)
 	{
-		printf("socket.open failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("socket.open failed (%s)\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
-	printf("Parsing address '%s'...\n", addrString.sz ());
+	printf("Parsing address '%s'...\n", addrString.sz());
 
 	io::SockAddr addr;
 	result = addr.parse(addrString);
 	if (!result)
 	{
-		printf("addr.parse failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("addr.parse failed (%s)\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
-	printf("Connecting to %s...\n", addr.getString ().sz ());
+	printf("Connecting to %s...\n", addr.getString().sz());
 
 	result = socket.connect(addr);
 	if (!result)
 	{
-		printf("socket.connect failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("socket.connect failed (%s)\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -471,7 +471,7 @@ testAddrInfoIp6()
 	bool result = io::resolveHostName(&addrArray, name, AF_INET6);
 	if (!result)
 	{
-		printf("io::resolveHostName failed (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("io::resolveHostName failed (%s)\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -479,7 +479,7 @@ testAddrInfoIp6()
 
 	size_t count = addrArray.getCount();
 	for (size_t i = 0; i < count; i++)
-		printf("    %s\n", addrArray [i].getString ().sz ());
+		printf("    %s\n", addrArray [i].getString().sz());
 }
 
 //..............................................................................
@@ -492,7 +492,7 @@ testDynamicLibrary()
 	bool result = dl.open("libc.so.6");
 	if (!result)
 	{
-		printf("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("dl.load failed: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -500,7 +500,7 @@ testDynamicLibrary()
 	Printf* prn = (Printf*)dl.getFunction("printf");
 	if (!prn)
 	{
-		printf("dl.load failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("dl.load failed: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -587,7 +587,7 @@ testRegex()
 		bool result = regexCompiler.incrementalCompile(src[i]);
 		if (!result)
 		{
-			printf("error: %s\n", err::getLastErrorDescription ().sz ());
+			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
 		}
 	}
@@ -604,7 +604,7 @@ testRegex()
 */
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -648,7 +648,7 @@ testNamedPipes()
 	if (!result)
 	{
 		err::setLastSystemError();
-		printf("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
+		printf("cannot open pipe dir: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -683,7 +683,7 @@ testNamedPipes()
 				break;
 
 			err::setError(sys::win::NtStatus(status));
-			printf("cannot open pipe dir: %s\n", err::getLastErrorDescription ().sz ());
+			printf("cannot open pipe dir: %s\n", err::getLastErrorDescription().sz());
 			return;
 		}
 
@@ -739,7 +739,7 @@ querySymbolicLink(
 	if (status < 0)
 	{
 		err::setError(sys::win::NtStatus(status));
-		printf("cannot open symbolic link: %s\n", err::getLastErrorDescription ().sz ());
+		printf("cannot open symbolic link: %s\n", err::getLastErrorDescription().sz());
 		return false;
 	}
 
@@ -755,7 +755,7 @@ querySymbolicLink(
 	if (status < 0)
 	{
 		err::setError(sys::win::NtStatus(status));
-		printf("cannot query symbolic link: %s\n", err::getLastErrorDescription ().sz ());
+		printf("cannot query symbolic link: %s\n", err::getLastErrorDescription().sz());
 		return false;
 	}
 
@@ -794,7 +794,7 @@ enumerateDirectory(
 	if (status < 0)
 	{
 		err::setError(sys::win::NtStatus(status));
-		printf("cannot open directory: %s\n", err::getLastErrorDescription ().sz ());
+		printf("cannot open directory: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -831,7 +831,7 @@ enumerateDirectory(
 				break;
 
 			err::setError(sys::win::NtStatus(status));
-			printf("cannot query directory: %s\n", err::getLastErrorDescription ().sz ());
+			printf("cannot query directory: %s\n", err::getLastErrorDescription().sz());
 			return;
 		}
 
@@ -841,7 +841,7 @@ enumerateDirectory(
 			dirName.copy(dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof(wchar_t));
 			dirTypeName.copy(dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof(wchar_t));
 
-			printf("%s%S (%S)\n", indent.sz (), dirName.sz (), dirTypeName.sz ());
+			printf("%s%S (%S)\n", indent.sz(), dirName.sz(), dirTypeName.sz());
 
 			if (dirTypeName.cmp(L"Directory") == 0)
 			{
@@ -851,7 +851,7 @@ enumerateDirectory(
 			{
 				bool result = querySymbolicLink(&symLinkTargetName, dir, &dirInfo->Name);
 				if (result)
-					printf("%s  --> %S\n", indent.sz (), symLinkTargetName.sz ());
+					printf("%s  --> %S\n", indent.sz(), symLinkTargetName.sz());
 			}
 
 		}
@@ -891,7 +891,7 @@ testDirectoryObjects()
 
 	querySymbolicLink(&s, NULL, &uniLink);
 
-	printf("target: %S\n", s.sz ());
+	printf("target: %S\n", s.sz());
 
 
 	printf("\\\n");
@@ -978,7 +978,7 @@ printWinErrorDescription(
 	sl::String description = message;
 	::LocalFree(message);
 
-	printf("%d/%d: %s\n", langId, subLangId, description.sz ());
+	printf("%d/%d: %s\n", langId, subLangId, description.sz());
 }
 
 void
@@ -1009,7 +1009,7 @@ testTimestamp()
 	for (int i = 0; i < 20; i++)
 	{
 		uint64_t t1 = sys::getTimestamp();
-		printf("%s: %llu\n", sys::Time (t1).format ("%h:%m:%s.%l.%c").sz (), t1);
+		printf("%s: %llu\n", sys::Time(t1).format("%h:%m:%s.%l.%c").sz(), t1);
 	}
 }
 
@@ -1033,7 +1033,7 @@ getUsbStringDescriptorText(
 	{
 		bool result = device->getStringDesrciptor(index, &text);
 		if (!result)
-			text.format("ERROR (%s)", err::getLastErrorDescription ().sz ());
+			text.format("ERROR (%s)", err::getLastErrorDescription().sz());
 	}
 
 	return text;
@@ -1044,7 +1044,7 @@ printUsbIfaceDesc(const libusb_interface_descriptor* ifaceDesc)
 {
 	printf("    Interface:   %d\n", ifaceDesc->bInterfaceNumber);
 	printf("    Alt setting: %d\n", ifaceDesc->bAlternateSetting);
-	printf("    Class:       %s\n", io::getUsbClassCodeString ((libusb_class_code) ifaceDesc->bInterfaceClass));
+	printf("    Class:       %s\n", io::getUsbClassCodeString((libusb_class_code) ifaceDesc->bInterfaceClass));
 	printf("    Subclass:    %d\n", ifaceDesc->bInterfaceSubClass);
 	printf("    Protocol:    %d\n", ifaceDesc->bInterfaceProtocol);
 	printf("    Endpoints:   %d\n", ifaceDesc->bNumEndpoints);
@@ -1057,7 +1057,7 @@ printUsbIfaceDesc(const libusb_interface_descriptor* ifaceDesc)
 
 		printf("      Endpoint:        0x%02x\n", endpointDesc->bEndpointAddress);
 		printf("      Direction:       %s\n", (endpointDesc->bEndpointAddress & LIBUSB_ENDPOINT_IN) ? "In" : "Out");
-		printf("      Type:            %s\n", io::getUsbTransferTypeString ((libusb_transfer_type) (endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK)));
+		printf("      Type:            %s\n", io::getUsbTransferTypeString((libusb_transfer_type) (endpointDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK)));
 		printf("      Max packet size: %d\n", endpointDesc->wMaxPacketSize);
 	}
 }
@@ -1094,22 +1094,22 @@ printUsbDevice(io::UsbDevice* device)
 	result = device->getDeviceDescriptor(&deviceDesc);
 	if (!result)
 	{
-		printf("Cannot get device descriptor (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("Cannot get device descriptor (%s)\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
 	printf("HWID:           VID_%04x&PID_%04x\n", deviceDesc.idVendor, deviceDesc.idProduct);
-	printf("Class:          %s\n", io::getUsbClassCodeString ((libusb_class_code) deviceDesc.bDeviceClass));
-	printf("Manufacturer:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iManufacturer).sz ());
-	printf("Product name:   %s\n", getUsbStringDescriptorText (device, deviceDesc.iProduct).sz ());
-	printf("Serial number:  %s\n", getUsbStringDescriptorText (device, deviceDesc.iSerialNumber).sz ());
+	printf("Class:          %s\n", io::getUsbClassCodeString((libusb_class_code) deviceDesc.bDeviceClass));
+	printf("Manufacturer:   %s\n", getUsbStringDescriptorText(device, deviceDesc.iManufacturer).sz());
+	printf("Product name:   %s\n", getUsbStringDescriptorText(device, deviceDesc.iProduct).sz());
+	printf("Serial number:  %s\n", getUsbStringDescriptorText(device, deviceDesc.iSerialNumber).sz());
 
 	printf("Address:        %d\n", device->getDeviceAddress ());
 	printf("Bus:            %d\n", device->getBusNumber ());
 #if (_AXL_IO_USBDEVICE_PORT)
 	printf("Port:           %d\n", device->getPortNumber ());
 #endif
-	printf("Speed:          %s\n", io::getUsbSpeedString (device->getDeviceSpeed ()));
+	printf("Speed:          %s\n", io::getUsbSpeedString(device->getDeviceSpeed ()));
 	printf("Port path:      ");
 
 #if (_AXL_IO_USBDEVICE_PORT)
@@ -1117,7 +1117,7 @@ printUsbDevice(io::UsbDevice* device)
 	size_t pathLength = device->getPortPath(path, countof(path));
 	if (pathLength == -1)
 	{
-		printf("ERROR (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("ERROR (%s)\n", err::getLastErrorDescription().sz());
 	}
 	else if (pathLength != -1)
 	{
@@ -1139,7 +1139,7 @@ printUsbDevice(io::UsbDevice* device)
 		io::UsbConfigDescriptor configDesc;
 		bool result = device->getConfigDescriptor(i, &configDesc);
 		if (!result)
-			printf("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription ().sz ());
+			printf("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription().sz());
 		else
 			printUsbConfigDesc(configDesc);
 	}
@@ -1157,7 +1157,7 @@ testUsbEnum()
 	size_t count = deviceList.enumerateDevices();
 	if (count == -1)
 	{
-		printf("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -1173,7 +1173,7 @@ testUsbEnum()
 
 		result = device.open();
 		if (!result)
-			printf("Cannot open device (%s)\n", err::getLastErrorDescription ().sz ());
+			printf("Cannot open device (%s)\n", err::getLastErrorDescription().sz());
 
 		printUsbDevice(&device); // even if not opened
 	}
@@ -1248,7 +1248,7 @@ public:
 
 			if (size == -1)
 			{
-				printf("interrupt transfer error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("interrupt transfer error: %s\n", err::getLastErrorDescription().sz());
 			}
 			else
 			{
@@ -1380,7 +1380,7 @@ testUsbMouse()
 	result = device.open(VendorId, ProductId);
 	if (!result)
 	{
-		printf("Error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -1393,7 +1393,7 @@ testUsbMouse()
 		result = device.setAutoDetachKernelDriver(true);
 		if (!result)
 		{
-			printf("Error: %s\n", err::getLastErrorDescription ().sz ());
+			printf("Error: %s\n", err::getLastErrorDescription().sz());
 			return;
 		}
 	}
@@ -1402,7 +1402,7 @@ testUsbMouse()
 	result = device.claimInterface(InterfaceId);
 	if (!result)
 	{
-		printf("Error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -1419,7 +1419,7 @@ testUsbMouse()
 
 	if (size == -1)
 	{
-		printf("Error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -1985,8 +1985,8 @@ testTimestamps()
 	uint64_t ts1 = sys::getTimestamp();
 	uint64_t ts2 = sys::getPreciseTimestamp();
 
-	printf("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
-	printf("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
+	printf("ts1 = %s\n", sys::Time(ts1).format("%h:%m:%s.%l.%c").sz());
+	printf("ts2 = %s\n", sys::Time(ts2).format("%h:%m:%s.%l.%c").sz());
 
 	uint64_t t0 = sys::getPreciseTimestamp();
 
@@ -1999,7 +1999,7 @@ testTimestamps()
 
 	uint64_t t2 = sys::getPreciseTimestamp();
 	uint64_t d = t2 - t0;
-	printf("time (ts1) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
+	printf("time (ts1) = %s\n", sys::Time(d, 0).format("%h:%m:%s.%l.%c").sz());
 
 	t0 = sys::getPreciseTimestamp();
 
@@ -2010,13 +2010,13 @@ testTimestamps()
 
 	t2 = sys::getPreciseTimestamp();
 	d = t2 - t0;
-	printf("time (ts2) = %s\n", sys::Time (d, 0).format ("%h:%m:%s.%l.%c").sz ());
+	printf("time (ts2) = %s\n", sys::Time(d, 0).format("%h:%m:%s.%l.%c").sz());
 
 	ts1 = sys::getTimestamp();
 	ts2 = sys::getPreciseTimestamp();
 
-	printf("ts1 = %s\n", sys::Time (ts1).format ("%h:%m:%s.%l.%c").sz ());
-	printf("ts2 = %s\n", sys::Time (ts2).format ("%h:%m:%s.%l.%c").sz ());
+	printf("ts1 = %s\n", sys::Time(ts1).format("%h:%m:%s.%l.%c").sz());
+	printf("ts2 = %s\n", sys::Time(ts2).format("%h:%m:%s.%l.%c").sz());
 
 }
 
@@ -2034,7 +2034,7 @@ testProcess()
 	bool result = sys::win::syncExec(cmdLine, &output, &exitCode);
 	if (!result)
 	{
-		printf("sys::win::syncExec failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("sys::win::syncExec failed: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -2110,7 +2110,7 @@ public:
 			size_t size = m_transport->readMessage(&buffer);
 			if (size == -1)
 			{
-				printf("server: read error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("server: read error: %s\n", err::getLastErrorDescription().sz());
 				return -1;
 			}
 
@@ -2135,7 +2135,7 @@ public:
 			size_t size = m_transport->readMessage(&buffer);
 			if (size == -1)
 			{
-				printf("server: read error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("server: read error: %s\n", err::getLastErrorDescription().sz());
 				return -1;
 			}
 
@@ -2200,7 +2200,7 @@ public:
 			bool result = m_transport->writeMessage(&command, data, blockSize);
 			if (!result)
 			{
-				printf("client: write error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("client: write error: %s\n", err::getLastErrorDescription().sz());
 				return -1;
 			}
 
@@ -2225,14 +2225,14 @@ public:
 			bool result = m_transport->writeMessage(&command, NULL, 0);
 			if (!result)
 			{
-				printf("client: write error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("client: write error: %s\n", err::getLastErrorDescription().sz());
 				return -1;
 			}
 
 			size_t receivedSize = m_transport->readMessage(&buffer);
 			if (receivedSize == -1)
 			{
-				printf("client: read error: %s\n", err::getLastErrorDescription ().sz ());
+				printf("client: read error: %s\n", err::getLastErrorDescription().sz());
 				return -1;
 			}
 
@@ -2469,7 +2469,7 @@ testSharedMemoryTransport()
 
 	if (!result)
 	{
-		printf("can't initialize: %s\n", err::getLastErrorDescription ().sz ());
+		printf("can't initialize: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -2490,7 +2490,7 @@ testSharedMemoryTransport()
 
 	uint64_t time2 = sys::getTimestamp();
 
-	printf("shm test completed: %s\n", sys::Time (time2 - time0, 0).format ("%m:%s.%l").sz ());
+	printf("shm test completed: %s\n", sys::Time(time2 - time0, 0).format("%m:%s.%l").sz());
 }
 
 //..............................................................................
@@ -2527,7 +2527,7 @@ testPipeTransport()
 	if (!result)
 	{
 		err::setLastSystemError();
-		printf("can't initialize: %s\n", err::getLastErrorDescription ().sz ());
+		printf("can't initialize: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -2564,7 +2564,7 @@ testPipeTransport()
 
 	uint64_t time2 = sys::getTimestamp();
 
-	printf("pipe test completed: %s\n", sys::Time (time2 - time0, 0).format ("%m:%s.%l").sz ());
+	printf("pipe test completed: %s\n", sys::Time(time2 - time0, 0).format("%m:%s.%l").sz());
 }
 
 //..............................................................................
@@ -2579,7 +2579,7 @@ testZip()
 	result = reader.openFile("C:/Program Files/Tibbo/Ninja 3/bin/io_base.jncx");
 	if (!result)
 	{
-		printf("can't open file: %s\n", err::getLastErrorDescription ().sz ());
+		printf("can't open file: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -2620,7 +2620,7 @@ testZip()
 			result = reader.extractFileToFile(i, dstFileName);
 			if (!result)
 			{
-				printf("can't extract file: %s\n", err::getLastErrorDescription ().sz ());
+				printf("can't extract file: %s\n", err::getLastErrorDescription().sz());
 				return;
 			}
 		}
@@ -2639,9 +2639,9 @@ testEnumSerial()
 
 	sl::Iterator<io::SerialPortDesc> it = portList.getHead();
 	for (; it; it++)
-		printf("device name: %s\ndescription: %s\n\n", it->getDeviceName ().sz (), it->getDescription ().sz ());
+		printf("device name: %s\ndescription: %s\n\n", it->getDeviceName ().sz(), it->getDescription().sz());
 
-	printf("%d ports total\n", portList.getCount ());
+	printf("%d ports total\n", portList.getCount());
 }
 
 //..............................................................................
@@ -2651,7 +2651,7 @@ testEncoding()
 {
 	sl::String s;
 	enc::EscapeEncoding::encode(&s, "\\\\.\\pipe\\mypipe");
-	printf("%s\n", s.sz ());
+	printf("%s\n", s.sz());
 }
 
 //..............................................................................
@@ -2878,7 +2878,7 @@ testModBus()
 	sl::String s_1_5 = sys::Time(timeout_1_5, false).format("%s.%l.%c");
 	sl::String s_3_5 = sys::Time(timeout_3_5, false).format("%s.%l.%c");
 
-	printf("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.sz (), s_3_5.sz ());
+	printf("t_1_5 = %s\nt_3_5 = %s\n", s_1_5.sz(), s_3_5.sz());
 }
 
 //..............................................................................
@@ -3184,7 +3184,7 @@ public:
 		)
 	{
 		printIndent();
-		printf("%s\n", sl::String (string, length).sz ());
+		printf("%s\n", sl::String(string, length).sz());
 	}
 
 protected:
@@ -3205,7 +3205,7 @@ testXml()
 	result = parser.parseFile("c:/projects/playground/doxygen/xml/index.xml", 100);
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -3221,14 +3221,14 @@ testFileEnum()
 	bool result = fileEnum.openDir(".");
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
 	while (fileEnum.hasNextFile())
 	{
 		sl::String fileName = fileEnum.getNextFileName();
-		printf("%s\n", fileName.sz ());
+		printf("%s\n", fileName.sz());
 	}
 }
 
@@ -3237,10 +3237,10 @@ testStringCase()
 {
 	sl::String s = "Hui Govno i Muravei";
 	s.makeLowerCase();
-	printf("s = %s\n", s.sz ());
+	printf("s = %s\n", s.sz());
 
 	s.makeUpperCase();
-	printf("s = %s\n", s.sz ());
+	printf("s = %s\n", s.sz());
 }
 
 //..............................................................................
@@ -3295,7 +3295,7 @@ protected:
 	bool
 	onValue(const sl::StringRef& value)
 	{
-		printf("onValue (%s)\n", value.sz ());
+		printf("onValue (%s)\n", value.sz());
 		return true;
 	}
 
@@ -3320,11 +3320,11 @@ protected:
 			break;
 
 		case CmdLineSwitchKind_Add:
-			printf("CmdLineSwitchKind_Add (%s)\n", value.sz ());
+			printf("CmdLineSwitchKind_Add (%s)\n", value.sz());
 			break;
 
 		case CmdLineSwitchKind_Remove:
-			printf("CmdLineSwitchKind_Remove (%s)\n", value.sz ());
+			printf("CmdLineSwitchKind_Remove (%s)\n", value.sz());
 			break;
 
 		};
@@ -3350,7 +3350,7 @@ testCmdLine(
 	CmdLineParser parser;
 	bool result = parser.parse(argc, argv);
 	if (!result)
-		printf("Error parsing command line: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Error parsing command line: %s\n", err::getLastErrorDescription().sz());
 }
 
 //..............................................................................
@@ -3366,7 +3366,7 @@ public:
 		io::SockAddr addr;
 		addr.parse("0.0.0.0:1002");
 
-		printf("listening on TCP %s...\n", addr.getString ().sz ());
+		printf("listening on TCP %s...\n", addr.getString().sz());
 
 		io::Socket serverSocket;
 		io::Socket clientSocket;
@@ -3382,12 +3382,12 @@ public:
 		result = serverSocket.accept(&clientSocket, &addr);
 		if (!result)
 		{
-			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription().sz());
 			return -1;
 		}
 
 
-		printf("client connected from: %s\n", addr.getString ().sz ());
+		printf("client connected from: %s\n", addr.getString().sz());
 
 		for (;;)
 		{
@@ -3429,7 +3429,7 @@ testConn()
 	io::SockAddr addr;
 	addr.parse("127.0.0.1:1002");
 
-	printf("connecting to %s...\n", addr.getString ().sz ());
+	printf("connecting to %s...\n", addr.getString().sz());
 
 	io::Socket socket;
 	bool result =
@@ -3438,7 +3438,7 @@ testConn()
 
 	if (!result)
 	{
-		printf("failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("failed: %s\n", err::getLastErrorDescription().sz());
 		return false;
 	}
 
@@ -3478,7 +3478,7 @@ testSerial()
 
 	if (!result)
 	{
-		printf("failed: %s\n", err::getLastErrorDescription ().sz ());
+		printf("failed: %s\n", err::getLastErrorDescription().sz());
 		return false;
 	}
 
@@ -3491,7 +3491,7 @@ testSerial()
 		size_t result = serial.read(buf, sizeof(buf));
 		if (result == -1)
 		{
-			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription().sz());
 			return false;
 		}
 
@@ -3502,7 +3502,7 @@ testSerial()
 		bool result2 = serial.m_serial.wait(&events);
 		if (!result2)
 		{
-			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription().sz());
 			return false;
 		}
 
@@ -3513,7 +3513,7 @@ testSerial()
 		result2 = serial.m_serial.clearError(&errors, &stat);
 		if (!result2)
 		{
-			printf("failed: %s\n", err::getLastErrorDescription ().sz ());
+			printf("failed: %s\n", err::getLastErrorDescription().sz());
 			return false;
 		}
 
@@ -3531,7 +3531,7 @@ testSerial()
 		size_t size = serial.write(data, sizeof(data));
 		if (size == -1)
 		{
-			printf("can't write: %s\n", err::getLastErrorDescription ().sz ());
+			printf("can't write: %s\n", err::getLastErrorDescription().sz());
 			return false;
 		}
 
@@ -3551,7 +3551,7 @@ testStringReplace()
 	title.replace(">", "&gt;");
 	title.replace("&", "&amp;");
 
-	printf("title = %s\n", title.sz ());
+	printf("title = %s\n", title.sz());
 }
 
 //..............................................................................
@@ -3565,9 +3565,9 @@ testEvent()
 
 		bool r = e.wait(500);
 		if (!r)
-			printf("[%s] ---wait failed: %s\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz (), err::getLastErrorDescription ().sz ());
+			printf("[%s] ---wait failed: %s\n", sys::Time(sys::getTimestamp ()).format("%h:%m:%s.%l").sz(), err::getLastErrorDescription().sz());
 		else
-			printf("[%s] ---wait SUCCEEDED! (WTF?!)\n", sys::Time (sys::getTimestamp ()).format ("%h:%m:%s.%l").sz ());
+			printf("[%s] ---wait SUCCEEDED! (WTF?!)\n", sys::Time(sys::getTimestamp ()).format("%h:%m:%s.%l").sz());
 	}
 }
 
@@ -3608,7 +3608,7 @@ testTime()
 	// timestamp = 0x1d2460280f3b836; time = Thursday 24 November 2016 11:26:11
 
 	uint64_t timestamp = sys::getTimestamp();
-	printf("timestamp = 0x%llx; time = %s\n", timestamp, sys::Time (timestamp).format ().sz ());
+	printf("timestamp = 0x%llx; time = %s\n", timestamp, sys::Time(timestamp).format().sz());
 }
 
 //..............................................................................
@@ -3638,7 +3638,7 @@ testSerial2()
 	sl::String s0 = "takie dela";
 
 	sl::String s = enc::HexEncoding::encode(buffer, size);
-	printf("incoming: %s\n", s.sz ());
+	printf("incoming: %s\n", s.sz());
 }
 
 //..............................................................................
@@ -3650,11 +3650,11 @@ testSymbolicLinks()
 	bool result = io::getSymbolicLinkTarget(&target, "/home/vladimir/a");
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
-	printf("target: %s\n", target.sz ());
+	printf("target: %s\n", target.sz());
 }
 
 //..............................................................................
@@ -3748,7 +3748,7 @@ testIoPerformance()
 	bool result = simpleFileSrc.open(fileNameSrc, io::FileFlag_ReadOnly);
 	if (!result)
 	{
-		printf("can't open %s: %s\n", fileNameSrc, err::getLastErrorDescription ().sz ());
+		printf("can't open %s: %s\n", fileNameSrc, err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -3781,7 +3781,7 @@ testIoPerformance()
 
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -3819,7 +3819,7 @@ testIoPerformance()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m.%s.%l").sz());
 
 #if (!_READ_ONLY)
 	result =
@@ -3830,7 +3830,7 @@ testIoPerformance()
 
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -3869,7 +3869,7 @@ testIoPerformance()
 	}
 
 	time = sys::getTimestamp() - baseTimestamp;
-	printf("Done: %s\n", sys::Time (time, 0).format ("%m.%s.%l").sz ());
+	printf("Done: %s\n", sys::Time(time, 0).format("%m.%s.%l").sz());
 }
 
 //..............................................................................
@@ -4087,7 +4087,7 @@ main(
 #endif
 
 	testSerial();
-	// testKeepAlives (sl::String (argv [1]));
+	// testKeepAlives (sl::String(argv [1]));
 
 	return 0;
 }

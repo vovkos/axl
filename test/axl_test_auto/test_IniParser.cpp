@@ -85,7 +85,7 @@ run()
 	result = file.open(filePath, io::FileFlag_ReadOnly);
 	if (!result)
 	{
-		printf("error opening file: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error opening file: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -96,7 +96,7 @@ run()
 	result = parser.parse(filePath, sl::StringRef(p, (size_t)size));
 	if (!result)
 	{
-		printf("error parsing file: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error parsing file: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 }

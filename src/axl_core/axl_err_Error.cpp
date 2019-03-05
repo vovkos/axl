@@ -37,7 +37,7 @@ ErrorHdr::getDescription() const
 
 	return provider ?
 		provider->getErrorDescription(this) :
-		sl::formatString("%s::%d", m_guid.getString ().sz (), m_code);
+		sl::formatString("%s::%d", m_guid.getString().sz(), m_code);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

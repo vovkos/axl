@@ -27,7 +27,7 @@ run()
 	bool result = io::getUsbDefaultContext()->createDefault();
 	if (!result)
 	{
-		printf("Cannot initialize libusb: %s\n", err::getLastErrorDescription ().sz ());
+		printf("Cannot initialize libusb: %s\n", err::getLastErrorDescription().sz());
 		// travis-ci on linux VMs fails here with LIBUSB_ERROR_OTHER
 		// keep assert commented until finding a workaround
 		// ASSERT (false);
@@ -38,7 +38,7 @@ run()
 	size_t count = deviceList.enumerateDevices();
 	if (count == -1)
 	{
-		printf("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription ().sz ());
+		printf("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription().sz());
 		ASSERT(false);
 		return;
 	}
@@ -69,15 +69,15 @@ run()
 
 		result = device.getStringDesrciptor(descriptor.iManufacturer, &bufferString);
 		if (result)
-			printf("\tManufacturer:  %s\n", bufferString.sz ());
+			printf("\tManufacturer:  %s\n", bufferString.sz());
 
 		result = device.getStringDesrciptor(descriptor.iProduct, &bufferString);
 		if (result)
-			printf("\tProduct name:  %s\n", bufferString.sz ());
+			printf("\tProduct name:  %s\n", bufferString.sz());
 
 		result = device.getStringDesrciptor(descriptor.iSerialNumber, &bufferString);
 		if (result)
-			printf("\tSerial number: %s\n", bufferString.sz ());
+			printf("\tSerial number: %s\n", bufferString.sz());
 	}
 }
 

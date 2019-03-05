@@ -28,7 +28,7 @@ run()
 	result = file.open(fileName, io::FileFlag_ReadOnly);
 	if (!result)
 	{
-		printf("error: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
@@ -41,11 +41,11 @@ run()
 	result = st.process(&resultString, fileName, sl::StringRef(p, size));
 	if (!result)
 	{
-		printf("error processing string template: %s\n", err::getLastErrorDescription ().sz ());
+		printf("error processing string template: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
-	printf("result string:\n%s\n", resultString.sz ());
+	printf("result string:\n%s\n", resultString.sz());
 }
 
 //..............................................................................

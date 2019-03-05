@@ -33,7 +33,7 @@ run()
 		);
 
 	sl::String s = enc::HexEncoding::encode(error.cp(), error.getSize());
-	printf("error: %s\n", s.sz ());
+	printf("error: %s\n", s.sz());
 
 	err::Error error2;
 	error2.format(
@@ -44,7 +44,7 @@ run()
 		);
 
 	s = enc::HexEncoding::encode(error.cp(), error.getSize());
-	printf("error: %s\n", s.sz ());
+	printf("error: %s\n", s.sz());
 }
 
 //..............................................................................

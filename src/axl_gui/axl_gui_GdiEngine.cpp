@@ -214,7 +214,7 @@ GdiEngine::createImage(
 		break;
 
 	default:
-		err::setFormatStringError("unsupported pixel format '%s'", getPixelFormatString (pixelFormat));
+		err::setFormatStringError("unsupported pixel format '%s'", getPixelFormatString(pixelFormat));
 	};
 
 	HBITMAP hBitmap;
