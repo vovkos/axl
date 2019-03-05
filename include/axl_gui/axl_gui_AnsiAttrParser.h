@@ -92,6 +92,18 @@ protected:
 	}
 
 	void
+	setStrikeoutOn(uint_t)
+	{
+		setFontFlag(FontFlag_Strikeout);
+	}
+
+	void
+	setStrikeoutOff(uint_t)
+	{
+		clearFontFlag(FontFlag_Strikeout);
+	}
+
+	void
 	setFont(uint_t font)
 	{
 		ASSERT(font >= 10 && font < 20);

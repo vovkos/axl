@@ -41,6 +41,7 @@ AnsiAttrParser::parse(
 		setAttrFuncTable[3] = &AnsiAttrParser::setItalicOn;
 		setAttrFuncTable[4] = &AnsiAttrParser::setUnderlineOn;
 		setAttrFuncTable[7] = &AnsiAttrParser::setInverseOn;
+		setAttrFuncTable[9] = &AnsiAttrParser::setStrikeoutOn;
 
 		for (size_t i = 10; i < 20; i++)
 			setAttrFuncTable[i] = &AnsiAttrParser::setFont;
@@ -49,6 +50,7 @@ AnsiAttrParser::parse(
 		setAttrFuncTable[23] = &AnsiAttrParser::setItalicOff;
 		setAttrFuncTable[24] = &AnsiAttrParser::setUnderlineOff;
 		setAttrFuncTable[27] = &AnsiAttrParser::setInverseOff;
+		setAttrFuncTable[29] = &AnsiAttrParser::setStrikeoutOff;
 
 		for (size_t i = 30; i < 38; i++)
 			setAttrFuncTable[i] = &AnsiAttrParser::setTextColor;
