@@ -3482,6 +3482,7 @@ testSerial()
 		return false;
 	}
 
+#if (_AXL_OS_WIN)
 	serial.m_serial.setWaitMask(EV_ERR);
 
 	for (;;)
@@ -3519,6 +3520,7 @@ testSerial()
 
 		printf("errors: %x\n", errors);
 	}
+#endif
 
 	size_t totalSize = 0;
 	size_t targetSize = 20 * 1024;
