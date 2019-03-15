@@ -70,6 +70,7 @@ target_link_llvm_jit_libraries
 		_COMPONENT_LIST
 		native
 		MCJIT
+		IPO
 		)
 
 	if(${LLVM_VERSION} VERSION_LESS 3.6)
