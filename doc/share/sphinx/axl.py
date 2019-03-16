@@ -12,6 +12,7 @@
 import re
 from docutils.parsers.rst import Directive, directives
 from docutils import nodes
+import os.path
 
 
 class DefineMacroDirective(Directive):
@@ -88,6 +89,20 @@ class ExpandMacroDirective(Directive):
         return [node]
 
 
+def on_builder_inited(app):
+    css_dir = os.path.dirname(os.path.realpath(__file__)) + '/css/'
+    app.config.html_static_path += [css_dir + 'axl-pygments.css']
+    app.add_stylesheet('axl-pygments.css')
+
+    supported_themes = {'sphinx_rtd_theme', 'sphinxdoc'}
+
+    if app.config.html_theme in supported_themes:
+        css_file = 'axl-' + app.config.html_theme + '.css'
+        app.config.html_static_path += [css_dir + css_file];
+        app.add_stylesheet(css_file);
+
+
 def setup(app):
     directives.register_directive('define-macro', DefineMacroDirective)
     directives.register_directive('expand-macro', ExpandMacroDirective)
+    app.connect('builder-inited', on_builder_inited)
