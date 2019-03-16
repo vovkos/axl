@@ -81,6 +81,7 @@ using namespace axl;
 #	include <netdb.h>
 #	include <signal.h>
 #	include <sys/ucontext.h>
+#	include <netinet/tcp.h>
 #endif
 
 #ifdef _AXL_IO_USB
