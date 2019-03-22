@@ -294,13 +294,14 @@ TextPainter::drawBinHex(
 	uint_t fontFlags,
 	size_t halfBitOffset,
 	const void* p,
-	size_t size
+	size_t size,
+	uint_t flags
 	)
 {
 	if (!size)
 		return m_point.m_x;
 
-	enc::HexEncoding::encode(&m_stringBuffer, p, size, 0);
+	enc::HexEncoding::encode(&m_stringBuffer, p, size, flags);
 	m_stringBuffer.append(' ');
 
 	if (halfBitOffset < size)
@@ -331,11 +332,12 @@ TextPainter::drawHyperBinHex(
 	const TextAttrAnchorArray* attrArray,
 	size_t halfBitOffset,
 	const void* p0,
-	size_t size
+	size_t size,
+	uint_t flags
 	)
 {
 	if (!attrArray || attrArray->isEmpty())
-		return drawBinHex(textColor0, backColor0, fontFlags0, halfBitOffset, p0, size);
+		return drawBinHex(textColor0, backColor0, fontFlags0, halfBitOffset, p0, size, flags);
 
 	if (!size)
 		return m_point.m_x;
@@ -360,9 +362,9 @@ TextPainter::drawHyperBinHex(
 		size_t leftover = size - offset;
 		size_t chunk = nextAttr->m_offset - offset;
 		if (chunk >= leftover)
-			return drawBinHex(attr, halfBitOffset, p, leftover);
+			return drawBinHex(attr, halfBitOffset, p, leftover, flags);
 
-		drawBinHex(attr, halfBitOffset, p, chunk);
+		drawBinHex(attr, halfBitOffset, p, chunk, flags);
 
 		attr.overlay(attr0, nextAttr->m_attr);
 		nextAttr++;
@@ -374,7 +376,7 @@ TextPainter::drawHyperBinHex(
 	if (offset < size)
 	{
 		size_t leftover = size - offset;
-		drawBinHex(attr, halfBitOffset, p, leftover);
+		drawBinHex(attr, halfBitOffset, p, leftover, flags);
 	}
 
 	return m_point.m_x;
@@ -391,11 +393,12 @@ TextPainter::drawSelHyperBinHex(
 	size_t selEnd,
 	size_t halfBitOffset,
 	const void* p,
-	size_t size
+	size_t size,
+	uint_t flags
 	)
 {
 	if (selStart >= selEnd)
-		return drawHyperBinHex(textColor0, backColor0, fontFlags0, attrArray, halfBitOffset, p, size);
+		return drawHyperBinHex(textColor0, backColor0, fontFlags0, attrArray, halfBitOffset, p, size, flags);
 
 	if (attrArray)
 		m_selOverlayBuffer.copy(attrArray->cp(), attrArray->getCount());
@@ -403,7 +406,7 @@ TextPainter::drawSelHyperBinHex(
 		m_selOverlayBuffer.clear();
 
 	m_selOverlayBuffer.setAttr(selStart, selEnd, selAttr);
-	return drawHyperBinHex(textColor0, backColor0, fontFlags0, &m_selOverlayBuffer, halfBitOffset, p, size);
+	return drawHyperBinHex(textColor0, backColor0, fontFlags0, &m_selOverlayBuffer, halfBitOffset, p, size, flags);
 }
 
 // bin text

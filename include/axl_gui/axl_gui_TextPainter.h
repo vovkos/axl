@@ -481,7 +481,8 @@ public:
 		uint_t fontFlags,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		);
 
 	int
@@ -489,7 +490,8 @@ public:
 		const TextAttr& attr,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
 		return drawBinHex(
@@ -498,7 +500,8 @@ public:
 			attr.m_fontFlags,
 			halfBitOffset,
 			p,
-			size
+			size,
+			flags
 			);
 	}
 
@@ -506,7 +509,8 @@ public:
 	drawBinHex(
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
 		return drawBinHex(
@@ -515,7 +519,8 @@ public:
 			-1,
 			halfBitOffset,
 			p,
-			size
+			size,
+			flags
 			);
 	}
 
@@ -527,7 +532,8 @@ public:
 		const TextAttrAnchorArray* attrArray,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		);
 
 	int
@@ -536,7 +542,8 @@ public:
 		const TextAttrAnchorArray* attrArray,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
 		return drawHyperBinHex(
@@ -546,7 +553,8 @@ public:
 			attrArray,
 			halfBitOffset,
 			p,
-			size
+			size,
+			flags
 			);
 	}
 
@@ -555,7 +563,8 @@ public:
 		const TextAttrAnchorArray* attrArray,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
 		return drawHyperBinHex(
@@ -565,7 +574,8 @@ public:
 			attrArray,
 			halfBitOffset,
 			p,
-			size
+			size,
+			flags
 			);
 	}
 
@@ -580,7 +590,8 @@ public:
 		size_t selEnd,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		);
 
 	int
@@ -592,7 +603,8 @@ public:
 		size_t selEnd,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
 		return drawSelHyperBinHex(
@@ -605,7 +617,8 @@ public:
 			selEnd,
 			halfBitOffset,
 			p,
-			size
+			size,
+			flags
 			);
 	}
 
@@ -617,7 +630,8 @@ public:
 		size_t selEnd,
 		size_t halfBitOffset,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
 		return drawSelHyperBinHex(
@@ -630,7 +644,8 @@ public:
 			selEnd,
 			halfBitOffset,
 			p,
-			size
+			size,
+			flags
 			);
 	}
 
