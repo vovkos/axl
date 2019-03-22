@@ -108,8 +108,13 @@ axl_trace_va(
 {
 	char buffer[512] = { 0 };
 	axl::sl::String string(axl::ref::BufKind_Stack, buffer, sizeof(buffer));
-	string.format_va(formatString, va);
+	size_t length = string.format_va(formatString, va);
+
+	// send it both to the debugger and to stdout
+
 	::OutputDebugStringA(string);
+	fwrite(string, length, 1, stdout);
+	fflush(stdout);
 }
 #endif
 
