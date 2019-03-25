@@ -189,7 +189,7 @@ protected:
 
 			offset = token->m_pos.m_offset + token->m_pos.m_length;
 
-			switch(token->m_token)
+			switch (token->m_token)
 			{
 			case TokenKind_Data:
 				static_cast<T*> (this)->createEmitCall(scriptSource, token->m_data.m_string);

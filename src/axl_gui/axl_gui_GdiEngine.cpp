@@ -53,7 +53,7 @@ GdiEngine::createStdFont(StdFontKind fontKind)
 	LOGFONTW logFont;
 	HFONT hFont;
 
-	switch(fontKind)
+	switch (fontKind)
 	{
 	case StdFontKind_Gui:
 		return createStockFont(DEFAULT_GUI_FONT);
@@ -203,7 +203,7 @@ GdiEngine::createImage(
 {
 	uint_t bitCount;
 
-	switch(pixelFormat)
+	switch (pixelFormat)
 	{
 	case PixelFormat_Rgba:
 		bitCount = 32;

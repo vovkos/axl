@@ -78,7 +78,7 @@ Thread::join(
 
 	int result;
 
-	switch(timeout)
+	switch (timeout)
 	{
 	case 0:
 		result = ::pthread_tryjoin_np(m_threadId, retVal);

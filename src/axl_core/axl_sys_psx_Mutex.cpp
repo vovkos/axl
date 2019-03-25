@@ -63,7 +63,7 @@ Mutex::lock(uint_t timeout)
 {
 	int result;
 
-	switch(timeout)
+	switch (timeout)
 	{
 	case 0:
 		result = ::pthread_mutex_trylock(&m_mutex);

@@ -188,7 +188,7 @@ public: \
 	const char* \
 	operator () (int tokenKind) \
 	{ \
-		switch(tokenKind) \
+		switch (tokenKind) \
 		{
 
 #define AXL_LEX_TOKEN_NAME(tokenKind, name) \

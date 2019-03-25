@@ -124,7 +124,7 @@ Base32Encoding::encode(
 	{
 		uchar_t y = *src;
 
-		switch(i)
+		switch (i)
 		{
 		case 0:
 			writer.write(y);

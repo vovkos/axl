@@ -70,7 +70,7 @@ void
 SerialSettings::setAttr(const termios* attr)
 {
 	speed_t speed = cfgetispeed(attr);
-	switch(speed)
+	switch (speed)
 	{
 	case B110:
 		m_baudRate = 110;
@@ -122,7 +122,7 @@ SerialSettings::setAttr(const termios* attr)
 	}
 
 	uint_t byteSize = attr->c_cflag & CSIZE;
-	switch(byteSize)
+	switch (byteSize)
 	{
 	case CS5:
 		m_dataBits = 5;

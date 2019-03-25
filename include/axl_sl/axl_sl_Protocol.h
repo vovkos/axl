@@ -447,7 +447,7 @@ struct ProtoMsg_4: ProtoMsg
 		if (size < sizeof(axl::sl::ProtoMsg)) \
 			return; \
 		axl::sl::ProtoMsg* hdr = (axl::sl::ProtoMsg*)p; \
-		switch(hdr->m_code) \
+		switch (hdr->m_code) \
 		{ \
 
 #define AXL_SL_END_PROTO_RECV_MAP() \

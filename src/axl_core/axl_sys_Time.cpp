@@ -331,7 +331,7 @@ Time::format(
 
 		int h12;
 
-		switch(*p)
+		switch (*p)
 		{
 		case 'h':
 			string->appendFormat("%02d", m_hour);

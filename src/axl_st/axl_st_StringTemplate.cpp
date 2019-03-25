@@ -28,7 +28,7 @@ gotoEndOfScriptSnippet(
 	LexerMachineKind machine;
 
 	const Token* token = lexer->getToken();
-	switch(token->m_token)
+	switch (token->m_token)
 	{
 	case TokenKind_OpenData_r:
 		openBracket = '(';

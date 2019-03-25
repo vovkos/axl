@@ -61,7 +61,7 @@ GdiCanvas::release()
 	if (m_hCompatibleDc)
 		::DeleteDC(m_hCompatibleDc);
 
-	switch(m_destructKind)
+	switch (m_destructKind)
 	{
 	case DestructKind_DeleteDc:
 		::DeleteDC(m_h);

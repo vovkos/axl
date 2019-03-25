@@ -184,7 +184,7 @@ public:
 		}
 
 		ASSERT(node || prevNode);
-		switch(relOp)
+		switch (relOp)
 		{
 		case BinTreeFindRelOp_Lt:
 			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();

@@ -83,7 +83,7 @@ NetworkAdapterEnumerator::setupAdapter(
 	IP_ADAPTER_ADDRESSES* srcAdapter
 	)
 {
-	switch(srcAdapter->IfType)
+	switch (srcAdapter->IfType)
 	{
 	case IF_TYPE_SOFTWARE_LOOPBACK:
 		adapter->m_type = NetworkAdapterType_Loopback;

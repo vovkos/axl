@@ -67,7 +67,7 @@ LuaState::trace()
 		int type = getType(i);
 		const void* p = lua_topointer(m_h, i);
 
-		switch(type)
+		switch (type)
 		{
 		case LUA_TSTRING:
 			TRACE("%08x %s\n", p, getString(i).sz());

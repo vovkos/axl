@@ -244,7 +244,7 @@ public:
 
 	ref::Ptr<IMyInterface> getChild(int i)
 	{
-		switch(i)
+		switch (i)
 		{
 		case 0:
 			return &m_child1;
@@ -290,7 +290,7 @@ public:
 
 	ref::Ptr<IMyInterface> getChild(int i)
 	{
-		switch(i)
+		switch (i)
 		{
 		case 0:
 			return &m_child1;

@@ -30,7 +30,7 @@ printAdapterAddress(const IP_ADDR_STRING* ipAddrString)
 void
 printAdapterInfo(IP_ADAPTER_INFO* ipAdapter)
 {
-	switch(ipAdapter->Type)
+	switch (ipAdapter->Type)
 	{
 	case MIB_IF_TYPE_LOOPBACK:
 		printf("MIB_IF_TYPE_LOOPBACK\n");
@@ -1232,7 +1232,7 @@ public:
 		while (totalSize < 1024)
 		{
 			size_t size;
-			switch(m_endpointType)
+			switch (m_endpointType)
 			{
 			case LIBUSB_TRANSFER_TYPE_BULK:
 				size = m_device->bulkTransfer(m_endpointId, buffer, m_maxPacketSize, m_timeout);
@@ -1284,7 +1284,7 @@ public:
 	bool
 	next()
 	{
-		switch(m_endpointType)
+		switch (m_endpointType)
 		{
 		case LIBUSB_TRANSFER_TYPE_BULK:
 			m_transfer.fillBulkTransfer(
@@ -3305,7 +3305,7 @@ protected:
 		const sl::StringRef& value
 		)
 	{
-		switch(switchKind)
+		switch (switchKind)
 		{
 		case CmdLineSwitchKind_Help:
 			printf("CmdLineSwitchKind_Help\n");

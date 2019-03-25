@@ -61,7 +61,7 @@ getUsbClassCodeString(libusb_class_code classCode)
 	if ((size_t)classCode < countof(stringTable))
 		return stringTable[classCode];
 
-	switch(classCode)
+	switch (classCode)
 	{
 	case LIBUSB_CLASS_DIAGNOSTIC_DEVICE:
 		return "Diagnostic";

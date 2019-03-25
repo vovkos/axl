@@ -26,7 +26,7 @@ MatchCondition::MatchCondition()
 void
 MatchCondition::addChar(uchar_t c)
 {
-	switch(m_conditionKind)
+	switch (m_conditionKind)
 	{
 	case MatchConditionKind_Char:
 		if (m_char == c)
@@ -128,7 +128,7 @@ NfaTransitionMgr::addMatchState(NfaState* state)
 {
 	ASSERT(state->m_flags & NfaStateFlag_Match);
 
-	switch(state->m_matchCondition.m_conditionKind)
+	switch (state->m_matchCondition.m_conditionKind)
 	{
 	case MatchConditionKind_Char:
 		addMatchCharTransition(state->m_matchCondition.m_char, state->m_outState);

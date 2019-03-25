@@ -70,7 +70,7 @@ PackerSeq::appendFormat(const char* formatString)
 
 		pF++;
 
-		switch(*pF)
+		switch (*pF)
 		{
 		case 'd':
 		case 'i':

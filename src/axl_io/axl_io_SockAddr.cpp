@@ -23,7 +23,7 @@ namespace io {
 const char*
 getSockAddrFamilyString(uint_t family)
 {
-	switch(family)
+	switch (family)
 	{
 	case AF_INET:
 		return "IPv4";
@@ -39,7 +39,7 @@ getSockAddrFamilyString(uint_t family)
 size_t
 getSockAddrFamilySize(uint_t family)
 {
-	switch(family)
+	switch (family)
 	{
 	case AF_INET:
 		return sizeof(sockaddr_in);
@@ -55,7 +55,7 @@ getSockAddrFamilySize(uint_t family)
 const char*
 getSockProtoString(uint_t proto)
 {
-	switch(proto)
+	switch (proto)
 	{
 	case IPPROTO_ICMP:
 		return "ICMP";
@@ -96,7 +96,7 @@ getSockAddrNetMaskBitCount_ip6(const sockaddr_in6* addr)
 size_t
 getSockAddrNetMaskBitCount(const sockaddr* addr)
 {
-	switch(addr->sa_family)
+	switch (addr->sa_family)
 	{
 	case AF_INET:
 		return getSockAddrNetMaskBitCount_ip4((const sockaddr_in*) addr);
@@ -182,7 +182,7 @@ isSockAddrEqual(
 	if (addr1->sa_family != addr2->sa_family)
 		return false;
 
-	switch(addr1->sa_family)
+	switch (addr1->sa_family)
 	{
 	case AF_INET:
 		return isSockAddrEqual_ip4((const sockaddr_in*) addr1, (const sockaddr_in*) addr2);
@@ -231,7 +231,7 @@ isSockAddrMatch(
 	const sockaddr* filterAddr
 	)
 {
-	switch(filterAddr->sa_family)
+	switch (filterAddr->sa_family)
 	{
 	case AF_INET:
 		return
@@ -482,7 +482,7 @@ getSockAddrString(
 	const sockaddr* addr
 	)
 {
-	switch(addr->sa_family)
+	switch (addr->sa_family)
 	{
 	case AF_INET:
 		return getSockAddrString_ip4(string, (const sockaddr_in*) addr);
@@ -501,7 +501,7 @@ getSockAddrString(
 void
 SockAddr::setup(const sockaddr* addr)
 {
-	switch(addr->sa_family)
+	switch (addr->sa_family)
 	{
 	case AF_INET:
 		m_addr_ip4 = *(sockaddr_in*)addr;
@@ -523,7 +523,7 @@ SockAddr::setup(
 	size_t size
 	)
 {
-	switch(family)
+	switch (family)
 	{
 	case AF_INET:
 		if (size >= sizeof(in_addr))
@@ -569,7 +569,7 @@ SockAddr::createNetMask(
 	size_t bitCount
 	)
 {
-	switch(family)
+	switch (family)
 	{
 	case AF_INET:
 		createNetMask_ip4(bitCount);

@@ -45,7 +45,7 @@ ParseErrorProvider::getErrorDescription(const err::ErrorRef& error)
 {
 	sl::Unpacker unpacker(error + 1, error->m_size - sizeof(err::ErrorHdr));
 
-	switch(error->m_code)
+	switch (error->m_code)
 	{
 	case ParseErrorCode_SrcPos:
 		{

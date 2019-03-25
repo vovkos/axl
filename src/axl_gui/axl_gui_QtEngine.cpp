@@ -387,7 +387,7 @@ QtEngine::getStdFontTuple(StdFontKind fontKind)
 	m_stdFontTupleArray[fontKind] = fontTuple;
 	fontTuple->m_fontModArray[0] = font;
 
-	switch(fontKind)
+	switch (fontKind)
 	{
 	case StdFontKind_Gui:
 		font->m_qtFont = QApplication::font();

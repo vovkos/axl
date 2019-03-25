@@ -52,7 +52,7 @@ public:
 		for (;;)
 		{
 			ScanResultKind scanResult = scanLine();
-			switch(scanResult)
+			switch (scanResult)
 			{
 			case ScanResultKind_Error:
 				return false;

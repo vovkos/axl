@@ -74,7 +74,7 @@ getMatchConditionString(const MatchCondition* condition)
 {
 	sl::String string;
 
-	switch(condition->m_conditionKind)
+	switch (condition->m_conditionKind)
 	{
 	case MatchConditionKind_Char:
 		string.format(isprint(condition->m_char) ? "'%c'" : "'\\x%02x'", condition->m_char);
@@ -498,7 +498,7 @@ RegexCompiler::readEscapeSequence(uchar_t* c)
 		return false;
 	}
 
-	switch(*m_p)
+	switch (*m_p)
 	{
 	case '0':
 		*c = '\0';
@@ -561,7 +561,7 @@ RegexCompiler::readLiteral(sl::String* string)
 			return false;
 		}
 
-		switch(*p)
+		switch (*p)
 		{
 		case '\\':
 			if (++p >= m_end)
@@ -604,7 +604,7 @@ RegexCompiler::readHexLiteral(sl::String* string)
 			return false;
 		}
 
-		switch(*p)
+		switch (*p)
 		{
 		case '"':
 		case '\'':
@@ -692,7 +692,7 @@ RegexCompiler::getToken(Token* token)
 				return true;
 			}
 
-			switch(*m_p)
+			switch (*m_p)
 			{
 			case '\\':
 				if (m_p + 1 >= m_end)
@@ -701,7 +701,7 @@ RegexCompiler::getToken(Token* token)
 					return false;
 				}
 
-				switch(m_p[1])
+				switch (m_p[1])
 				{
 				case 's':
 				case 'S':
@@ -768,7 +768,7 @@ RegexCompiler::getToken(Token* token)
 				return true;
 			}
 
-			switch(*m_p)
+			switch (*m_p)
 			{
 			case '\\':
 				if (m_p + 1 >= m_end)
@@ -777,7 +777,7 @@ RegexCompiler::getToken(Token* token)
 					return false;
 				}
 
-				switch(m_p[1])
+				switch (m_p[1])
 				{
 				case 's':
 				case 'S':
@@ -979,7 +979,7 @@ RegexCompiler::repeat()
 		return NULL;
 
 	if (token.m_tokenKind == TokenKind_SpecialChar)
-		switch(token.m_char)
+		switch (token.m_char)
 		{
 		case '?':
 			return question(start);
@@ -1120,10 +1120,10 @@ RegexCompiler::single()
 	if (!result)
 		return NULL;
 
-	switch(token.m_tokenKind)
+	switch (token.m_tokenKind)
 	{
 	case TokenKind_SpecialChar:
-		switch(token.m_char)
+		switch (token.m_char)
 		{
 		case '(':
 			if (m_p + 1 < m_end && m_p[0] == '?' && m_p[1] == ':')
@@ -1282,7 +1282,7 @@ RegexCompiler::charClassItem(sl::BitMap* charSet)
 	uchar_t c1;
 	uchar_t c2;
 
-	switch(*m_p)
+	switch (*m_p)
 	{
 	case '\\':
 		if (m_p + 1 >= m_end)
@@ -1291,7 +1291,7 @@ RegexCompiler::charClassItem(sl::BitMap* charSet)
 			return false;
 		}
 
-		switch(m_p[1])
+		switch (m_p[1])
 		{
 		case 'd':
 		case 'D':
@@ -1330,7 +1330,7 @@ RegexCompiler::charClassItem(sl::BitMap* charSet)
 		return false;
 	}
 
-	switch(*m_p)
+	switch (*m_p)
 	{
 	case '\\':
 		result = readEscapeSequence(&c2);
@@ -1380,7 +1380,7 @@ RegexCompiler::stdCharClass(
 {
 	bool isInverted = false;
 
-	switch(c)
+	switch (c)
 	{
 	case 'D':
 		isInverted = true;

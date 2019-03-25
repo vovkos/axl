@@ -141,7 +141,7 @@ HyperText::appendHyperText(
 			if (p >= end)
 				break;
 
-			switch(*p)
+			switch (*p)
 			{
 			case 'm':
 				m_hyperlinkArray.closeHyperlink(textLength);

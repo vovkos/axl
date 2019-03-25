@@ -167,7 +167,7 @@ HexEncoding::decode(
 	{
 		bool_t isSpace = isspace(*p);
 
-		switch(state)
+		switch (state)
 		{
 		case State_Normal:
 			if (isSpace)

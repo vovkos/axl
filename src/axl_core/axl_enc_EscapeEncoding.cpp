@@ -21,7 +21,7 @@ namespace enc {
 char
 EscapeEncoding::findEscapeChar(char x)
 {
-	switch(x)
+	switch (x)
 	{
 	case '\0':
 		return '0';
@@ -58,7 +58,7 @@ EscapeEncoding::findEscapeChar(char x)
 char
 EscapeEncoding::findEscapeReplaceChar(char x)
 {
-	switch(x)
+	switch (x)
 	{
 	case '0':
 		return '\0';
@@ -190,7 +190,7 @@ EscapeEncoding::decode(
 
 	for (; p < end; p++)
 	{
-		switch(state)
+		switch (state)
 		{
 		case State_Normal:
 			if (*p == '\\')
@@ -202,7 +202,7 @@ EscapeEncoding::decode(
 			break;
 
 		case State_Escape:
-			switch(*p)
+			switch (*p)
 			{
 			case 'x':
 				state = State_Hex;

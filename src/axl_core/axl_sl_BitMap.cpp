@@ -185,7 +185,7 @@ mergeBitMaps(
 	size_t* end = p + pageCount;
 	const size_t* p2 = map2;
 
-	switch(op)
+	switch (op)
 	{
 	case BitOpKind_Or:
 		for (; p < end; p++, p2++)

@@ -107,7 +107,7 @@ GdiWidgetImpl::windowProc(
 	}
 
 	LRESULT lResult = 0;
-	switch(wmMsg)
+	switch (wmMsg)
 	{
 	case WM_DESTROY:
 		if (checkMsgMap(WidgetMsgCode_Close))
@@ -489,7 +489,7 @@ GdiWidgetImpl::processWmScroll(
 	intptr_t newPos = scrollInfo.nPos;
 	intptr_t maxPos = scrollBar->getMaxPos();
 
-	switch(code)
+	switch (code)
 	{
 	case SB_TOP:
 		newPos = 0;

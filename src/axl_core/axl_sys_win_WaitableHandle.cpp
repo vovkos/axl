@@ -22,7 +22,7 @@ namespace win {
 WaitResult
 WaitableHandle::completeWait(dword_t result)
 {
-	switch(result)
+	switch (result)
 	{
 	case WAIT_FAILED:
 		return err::failWithLastSystemError(WaitResult_Fail);

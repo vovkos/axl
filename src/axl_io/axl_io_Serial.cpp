@@ -74,7 +74,7 @@ Serial::setSettings(
 		dcb.fDtrControl = settings->m_dtr ? DTR_CONTROL_ENABLE : DTR_CONTROL_DISABLE;
 		dcb.fRtsControl = settings->m_rts ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE;
 
-		switch(settings->m_flowControl)
+		switch (settings->m_flowControl)
 		{
 		case SerialFlowControl_RtsCts:
 			dcb.fOutxCtsFlow = TRUE;
@@ -158,7 +158,7 @@ Serial::setSettings(
 	{
 		speed_t speed;
 
-		switch(settings->m_baudRate)
+		switch (settings->m_baudRate)
 		{
 		case 110:
 			speed = B110;
@@ -217,7 +217,7 @@ Serial::setSettings(
 	{
 		attr.c_cflag &= ~CSIZE;
 
-		switch(settings->m_dataBits)
+		switch (settings->m_dataBits)
 		{
 		case 5:
 			attr.c_cflag |= CS5;
@@ -251,7 +251,7 @@ Serial::setSettings(
 		attr.c_iflag &= ~(PARMRK | INPCK);
 		attr.c_iflag |= IGNPAR;
 
-		switch(settings->m_parity)
+		switch (settings->m_parity)
 		{
 		case SerialParity_None:
 			attr.c_cflag &= ~PARENB;
@@ -289,7 +289,7 @@ Serial::setSettings(
 		attr.c_cflag &= ~CRTSCTS;
 		attr.c_iflag &= ~(IXON | IXOFF | IXANY);
 
-		switch(settings->m_flowControl)
+		switch (settings->m_flowControl)
 		{
 		case SerialFlowControl_RtsCts:
 			attr.c_cflag |= CRTSCTS;

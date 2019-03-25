@@ -69,7 +69,7 @@ swapByteOrder(
 	size_t size
 	)
 {
-	switch(size)
+	switch (size)
 	{
 	case 2:
 		*(uint16_t*)dst = swapByteOrder16(*(uint16_t*)  src);

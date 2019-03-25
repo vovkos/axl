@@ -270,7 +270,7 @@ StdErrorProvider::getErrorDescription(const ErrorRef& error)
 	const char* p;
 	size_t stringSize;
 
-	switch(error->m_code)
+	switch (error->m_code)
 	{
 	case StdErrorCode_NoError:
 		return "no error";

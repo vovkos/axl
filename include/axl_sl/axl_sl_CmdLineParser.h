@@ -238,7 +238,7 @@ protected:
 		sl::String value;
 
 		ArgKind argKind = getArgKind(arg);
-		switch(argKind)
+		switch (argKind)
 		{
 		case ArgKind_Value:
 			return processValue(arg);

@@ -26,7 +26,7 @@ Sem::wait(uint_t timeout)
 {
 	int result;
 
-	switch(timeout)
+	switch (timeout)
 	{
 	case 0:
 		result = ::sem_trywait(&m_sem);
@@ -69,7 +69,7 @@ NamedSem::wait(uint_t timeout)
 {
 	int result;
 
-	switch(timeout)
+	switch (timeout)
 	{
 	case 0:
 		result = ::sem_trywait(m_h);

@@ -28,7 +28,7 @@ Cond::wait(
 {
 	int result;
 
-	switch(timeout)
+	switch (timeout)
 	{
 	case -1:
 		result = ::pthread_cond_wait(&m_cond, mutex);
