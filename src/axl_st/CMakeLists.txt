@@ -13,26 +13,26 @@
 # lib folder
 #
 
-set (
+set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_st/axl_st_StringTemplate.h
 	${AXL_INC_DIR}/axl_st/axl_st_StringTemplateLexer.h
 	${AXL_INC_DIR}/axl_st/axl_st_LuaStringTemplate.h
 	)
 
-set (
+set(
 	LIB_CPP_LIST
 	axl_st_StringTemplate.cpp
 	axl_st_StringTemplateLexer.cpp
 	axl_st_LuaStringTemplate.cpp
 	)
 
-set (
+set(
 	LIB_RL_LIST
 	axl_st_StringTemplateLexer.rl
 	)
 
-source_group (
+source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
@@ -45,26 +45,26 @@ source_group (
 # gen folder
 #
 
-set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
-file (MAKE_DIRECTORY ${GEN_DIR})
+set(GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+file(MAKE_DIRECTORY ${GEN_DIR})
 
-axl_push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
+axl_push_and_set(CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
 
-add_ragel_step (
+add_ragel_step(
 	axl_st_StringTemplateLexer.rl.cpp
 	axl_st_StringTemplateLexer.rl
 	)
 
-axl_pop (CMAKE_CURRENT_BINARY_DIR)
+axl_pop(CMAKE_CURRENT_BINARY_DIR)
 
-set (
+set(
 	GEN_RL_CPP_LIST
 	${GEN_DIR}/axl_st_StringTemplateLexer.rl.cpp
 	)
 
-axl_exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
+axl_exclude_from_build(${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
 
-source_group (
+source_group(
 	gen
 	FILES
 	${GEN_RL_CPP_LIST}
@@ -75,16 +75,16 @@ source_group (
 # pch folder
 #
 
-set (PCH_H   pch.h)
-set (PCH_CPP pch.cpp)
+set(PCH_H   pch.h)
+set(PCH_CPP pch.cpp)
 
-set (
+set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_st/axl_st_Pch.h
 	)
 
-source_group (
+source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
@@ -96,13 +96,13 @@ source_group (
 # axl_st library
 #
 
-include_directories (
+include_directories(
 	${LUA_INC_DIR}
 	${AXL_INC_DIR}
 	${GEN_DIR}
 	)
 
-add_library (
+add_library(
 	axl_st
 	${PCH_H_LIST}
 	${PCH_CPP}
@@ -112,7 +112,7 @@ add_library (
 	${GEN_RL_CPP_LIST}
 	)
 
-axl_set_pch (
+axl_set_pch(
 	axl_st
 	${PCH_H}
 	${PCH_CPP}
@@ -120,13 +120,13 @@ axl_set_pch (
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_st
 	${LIB_H_LIST}
 	)
 
-install (
+install(
 	TARGETS axl_st
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)

@@ -13,25 +13,25 @@
 # ini folder
 #
 
-set (
+set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_ini/axl_ini_Lexer.h
 	${AXL_INC_DIR}/axl_ini/axl_ini_Parser.h
 	${AXL_INC_DIR}/axl_ini/axl_ini_GenericParser.h
 	)
 
-set (
+set(
 	LIB_CPP_LIST
 	axl_ini_Lexer.cpp
 	axl_ini_GenericParser.cpp
 	)
 
-set (
+set(
 	LIB_RL_LIST
 	axl_ini_Lexer.rl
 	)
 
-source_group (
+source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
@@ -44,26 +44,26 @@ source_group (
 # gen folder
 #
 
-set (GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
-file (MAKE_DIRECTORY ${GEN_DIR})
+set(GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+file(MAKE_DIRECTORY ${GEN_DIR})
 
-axl_push_and_set (CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
+axl_push_and_set(CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
 
-add_ragel_step (
+add_ragel_step(
 	axl_ini_Lexer.rl.cpp
 	axl_ini_Lexer.rl
 	)
 
-axl_pop (CMAKE_CURRENT_BINARY_DIR)
+axl_pop(CMAKE_CURRENT_BINARY_DIR)
 
-set (
+set(
 	GEN_RL_CPP_LIST
 	${GEN_DIR}/axl_ini_Lexer.rl.cpp
 	)
 
-axl_exclude_from_build (${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
+axl_exclude_from_build(${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
 
-source_group (
+source_group(
 	gen
 	FILES
 	${GEN_RL_CPP_LIST}
@@ -74,16 +74,16 @@ source_group (
 # pch folder
 #
 
-set (PCH_H   pch.h)
-set (PCH_CPP pch.cpp)
+set(PCH_H   pch.h)
+set(PCH_CPP pch.cpp)
 
-set (
+set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_ini/axl_ini_Pch.h
 	)
 
-source_group (
+source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
@@ -95,12 +95,12 @@ source_group (
 # axl_ini library
 #
 
-include_directories (
+include_directories(
 	${AXL_INC_DIR}
 	${GEN_DIR}
 	)
 
-add_library (
+add_library(
 	axl_ini
 	${PCH_H_LIST}
 	${PCH_CPP}
@@ -110,7 +110,7 @@ add_library (
 	${GEN_RL_CPP_LIST}
 	)
 
-axl_set_pch (
+axl_set_pch(
 	axl_ini
 	${PCH_H}
 	${PCH_CPP}
@@ -118,13 +118,13 @@ axl_set_pch (
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_ini
 	${LIB_H_LIST}
 	)
 
-install (
+install(
 	TARGETS axl_ini
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)

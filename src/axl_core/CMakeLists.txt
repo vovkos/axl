@@ -13,17 +13,17 @@
 # g folder
 #
 
-set (
+set(
 	G_H_LIST
 	${AXL_INC_DIR}/axl_g/axl_g_Module.h
 	)
 
-set (
+set(
 	G_CPP_LIST
 	axl_g_Module.cpp
 	)
 
-source_group (
+source_group(
 	g
 	FILES
 	${G_H_LIST}
@@ -35,7 +35,7 @@ source_group (
 # mem folder
 #
 
-set (
+set(
 	MEM_H_LIST
 	${AXL_INC_DIR}/axl_mem/axl_mem_Allocator.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Block.h
@@ -45,12 +45,12 @@ set (
 	${AXL_INC_DIR}/axl_mem/axl_mem_TrackerBlock.h
 	)
 
-set (
+set(
 	MEM_CPP_LIST
 	axl_mem_Tracker.cpp
 	)
 
-source_group (
+source_group(
 	mem
 	FILES
 	${MEM_H_LIST}
@@ -62,7 +62,7 @@ source_group (
 # ref folder
 #
 
-set (
+set(
 	REF_H_LIST
 	${AXL_INC_DIR}/axl_ref/axl_ref_Buf.h
 	${AXL_INC_DIR}/axl_ref/axl_ref_Child.h
@@ -73,12 +73,12 @@ set (
 	${AXL_INC_DIR}/axl_ref/axl_ref_WeakPtr.h
 	)
 
-set (
+set(
 	REF_CPP_LIST
 	axl_ref_RefCount.cpp
 	)
 
-source_group (
+source_group(
 	ref
 	FILES
 	${REF_H_LIST}
@@ -90,7 +90,7 @@ source_group (
 # err folder
 #
 
-set (
+set(
 	ERR_H_LIST
 	${AXL_INC_DIR}/axl_err/axl_err_Error.h
 	${AXL_INC_DIR}/axl_err/axl_err_ErrorMgr.h
@@ -98,14 +98,14 @@ set (
 	${AXL_INC_DIR}/axl_err/axl_err_Errno.h
 	)
 
-set (
+set(
 	ERR_CPP_LIST
 	axl_err_Errno.cpp
 	axl_err_Error.cpp
 	axl_err_ErrorMgr.cpp
 	)
 
-source_group (
+source_group(
 	err
 	FILES
 	${ERR_H_LIST}
@@ -117,7 +117,7 @@ source_group (
 # sl folder
 #
 
-set (
+set(
 	SL_H_LIST
 	${AXL_INC_DIR}/axl_sl/axl_sl_ArgType.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Operator.h
@@ -164,7 +164,7 @@ set (
 	${AXL_INC_DIR}/axl_sl/axl_sl_CircularBuffer.h
 	)
 
-set (
+set(
 	SL_CPP_LIST
 	axl_sl_BitMap.cpp
 	axl_sl_BmhFind.cpp
@@ -181,7 +181,7 @@ set (
 	axl_sl_CircularBuffer.cpp
 	)
 
-source_group (
+source_group(
 	sl
 	FILES
 	${SL_H_LIST}
@@ -193,7 +193,7 @@ source_group (
 # enc folder
 #
 
-set (
+set(
 	ENC_H_LIST
 	${AXL_INC_DIR}/axl_enc/axl_enc_Base32Encoding.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_CharCodec.h
@@ -205,7 +205,7 @@ set (
 	icu_ucase_props_data.h
 	)
 
-set (
+set(
 	ENC_CPP_LIST
 	axl_enc_Base32Encoding.cpp
 	axl_enc_CharCodec.cpp
@@ -214,7 +214,7 @@ set (
 	axl_enc_Utf.cpp
 	)
 
-source_group (
+source_group(
 	enc
 	FILES
 	${ENC_H_LIST}
@@ -226,7 +226,7 @@ source_group (
 # sys folder
 #
 
-set (
+set(
 	SYS_H_LIST
 	${AXL_INC_DIR}/axl_sys/axl_sys_Atomic.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_Event.h
@@ -243,14 +243,14 @@ set (
 	${AXL_INC_DIR}/axl_sys/axl_sys_Time.h
 	)
 
-set (
+set(
 	SYS_CPP_LIST
 	axl_sys_TlsMgr.cpp
 	axl_sys_Time.cpp
 	axl_sys_ReadWriteLock.cpp
 	)
 
-source_group (
+source_group(
 	sys
 	FILES
 	${SYS_H_LIST}
@@ -262,7 +262,7 @@ source_group (
 # sys_psx folder
 #
 
-set (
+set(
 	SYS_PSX_H_LIST
 	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Cond.h
 	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Mutex.h
@@ -271,7 +271,7 @@ set (
 	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_DynamicLibrary.h
 	)
 
-set (
+set(
 	SYS_PSX_CPP_LIST
 	axl_sys_psx_Cond.cpp
 	axl_sys_psx_Mutex.cpp
@@ -280,23 +280,23 @@ set (
 	axl_sys_psx_DynamicLibrary.cpp
 	)
 
-source_group (
+source_group(
 	sys_psx
 	FILES
 	${SYS_PSX_H_LIST}
 	${SYS_PSX_CPP_LIST}
 	)
 
-if (NOT UNIX)
-	axl_exclude_from_build (${SYS_PSX_CPP_LIST})
-endif ()
+if(NOT UNIX)
+	axl_exclude_from_build(${SYS_PSX_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # sys_win folder
 #
 
-set (
+set(
 	SYS_WIN_H_LIST
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Bstr.h
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WinError.h
@@ -321,7 +321,7 @@ set (
 	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_VirtualMemory.h
 	)
 
-set (
+set(
 	SYS_WIN_CPP_LIST
 	axl_sys_win_Bstr.cpp
 	axl_sys_win_WinError.cpp
@@ -340,91 +340,91 @@ set (
 	axl_sys_win_VirtualMemory.cpp
 	)
 
-source_group (
+source_group(
 	sys_win
 	FILES
 	${SYS_WIN_H_LIST}
 	${SYS_WIN_CPP_LIST}
 	)
 
-if (NOT WIN32)
-	axl_exclude_from_build (${SYS_WIN_CPP_LIST})
-endif ()
+if(NOT WIN32)
+	axl_exclude_from_build(${SYS_WIN_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # sys_lnx folder
 #
 
-set (
+set(
 	SYS_LNX_H_LIST
 	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_Udev.h
 	)
 
-set (
+set(
 	SYS_LNX_LIBUDEV_CPP_LIST
 	axl_sys_lnx_Udev.cpp
 	)
 
-set (
+set(
 	SYS_LNX_CPP_LIST
 	${SYS_LNX_LIBUDEV_CPP_LIST}
 	)
 
-source_group (
+source_group(
 	sys_lnx
 	FILES
 	${SYS_LNX_H_LIST}
 	${SYS_LNX_CPP_LIST}
 	)
 
-if (NOT LINUX)
-	axl_exclude_from_build (${SYS_LNX_CPP_LIST})
-endif ()
+if(NOT LINUX)
+	axl_exclude_from_build(${SYS_LNX_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # sys_drw folder
 #
 
-set (
+set(
 	SYS_DRW_H_LIST
 	${AXL_INC_DIR}/axl_sys_drw/axl_sys_drw_MachError.h
 	${AXL_INC_DIR}/axl_sys_drw/axl_sys_drw_Semaphore.h
 	)
 
-set (
+set(
 	SYS_DRW_CPP_LIST
 	axl_sys_drw_MachError.cpp
 	axl_sys_drw_Semaphore.cpp
 	)
 
-source_group (
+source_group(
 	sys_drw
 	FILES
 	${SYS_DRW_H_LIST}
 	${SYS_DRW_CPP_LIST}
 	)
 
-if (NOT APPLE)
-	axl_exclude_from_build (${SYS_DRW_CPP_LIST})
-endif ()
+if(NOT APPLE)
+	axl_exclude_from_build(${SYS_DRW_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # pch folder
 #
 
-set (PCH_H   pch.h)
-set (PCH_CPP pch.cpp)
+set(PCH_H   pch.h)
+set(PCH_CPP pch.cpp)
 
-set (
+set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_g/axl_g_Pch.h
 	)
 
-source_group (
+source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
@@ -436,15 +436,15 @@ source_group (
 # axl_core library
 #
 
-include_directories (${AXL_INC_DIR})
+include_directories(${AXL_INC_DIR})
 
-if (BUILD_AXL_SYS_LNX_LIBUDEV)
-	add_definitions (-D_AXL_SYS_LNX_LIBUDEV=1)
-else ()
-	axl_exclude_from_build (${SYS_LNX_LIBUDEV_CPP_LIST})
-endif ()
+if(BUILD_AXL_SYS_LNX_LIBUDEV)
+	add_definitions(-D_AXL_SYS_LNX_LIBUDEV=1)
+else()
+	axl_exclude_from_build(${SYS_LNX_LIBUDEV_CPP_LIST})
+endif()
 
-add_library (
+add_library(
 	axl_core
 	${PCH_H_LIST}
 	${PCH_CPP}
@@ -472,7 +472,7 @@ add_library (
 	${SYS_DRW_CPP_LIST}
 	)
 
-axl_set_pch (
+axl_set_pch(
 	axl_core
 	${PCH_H}
 	${PCH_CPP}
@@ -480,81 +480,81 @@ axl_set_pch (
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_g
 	${G_H_LIST}
 	)
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_err
 	${ERR_H_LIST}
 	)
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_mem
 	${MEM_H_LIST}
 	)
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_ref
 	${REF_H_LIST}
 	)
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_sl
 	${SL_H_LIST}
 	)
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_enc
 	${ENC_H_LIST}
 	)
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_sys
 	${SYS_H_LIST}
 	)
 
-if (WIN32)
-	axl_install_redirected_includes (
+if(WIN32)
+	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
 		axl_sys_win
 		${SYS_WIN_H_LIST}
 		)
-endif ()
+endif()
 
-if (UNIX)
-	axl_install_redirected_includes (
+if(UNIX)
+	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
 		axl_sys_psx
 		${SYS_PSX_H_LIST}
 		)
-endif ()
+endif()
 
-if (LINUX)
-	axl_install_redirected_includes (
+if(LINUX)
+	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
 		axl_sys_lnx
 		${SYS_LNX_H_LIST}
 		)
-endif ()
+endif()
 
-if (APPLE)
-	axl_install_redirected_includes (
+if(APPLE)
+	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
 		axl_sys_drw
 		${SYS_DRW_H_LIST}
 		)
-endif ()
+endif()
 
-install (
+install(
 	TARGETS axl_core
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)

@@ -9,15 +9,15 @@
 #
 #...............................................................................
 
-string (REGEX REPLACE "[a-z]+" ".." AXL_INSTALL_ROOT_SUBDIR ${AXL_INSTALL_CMAKE_SUBDIR})
+string(REGEX REPLACE "[a-z]+" ".." AXL_INSTALL_ROOT_SUBDIR ${AXL_INSTALL_CMAKE_SUBDIR})
 
-configure_file (
+configure_file(
 	axl_config_build.cmake.in
 	axl_config.cmake
 	@ONLY
 	)
 
-configure_file (
+configure_file(
 	axl_config_install.cmake.in
 	axl_config_install.cmake
 	@ONLY
@@ -25,7 +25,7 @@ configure_file (
 
 # make AXL_CMAKE_DIR available to any project within the same source tree
 
-set (
+set(
 	AXL_CMAKE_DIR
 	${CMAKE_CURRENT_LIST_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -35,19 +35,19 @@ set (
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-install (
+install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/
 	DESTINATION ${AXL_INSTALL_CMAKE_SUBDIR}
 	FILES_MATCHING PATTERN *.cmake
 	)
 
-install (
+install(
 	FILES ${CMAKE_CURRENT_BINARY_DIR}/axl_config_install.cmake
 	RENAME axl_config.cmake
 	DESTINATION ${AXL_INSTALL_CMAKE_SUBDIR}
 	)
 
-install (
+install(
 	FILES ${AXL_ROOT_DIR}/version.cmake
 	RENAME axl_version.cmake
 	DESTINATION ${AXL_INSTALL_CMAKE_SUBDIR}

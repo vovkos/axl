@@ -9,13 +9,13 @@
 #
 #...............................................................................
 
-if (SPHINX_FOUND)
-	add_subdirectory (index)
-	add_subdirectory (build-guide)
+if(SPHINX_FOUND)
+	add_subdirectory(index)
+	add_subdirectory(build-guide)
 
-	if (DOXYGEN_FOUND AND DOXYREST_FOUND)
-		add_subdirectory (manual)
-	endif ()
-endif ()
+	if(DOXYGEN_FOUND AND DOXYREST_FOUND)
+		add_subdirectory(manual)
+	endif()
+endif()
 
 #...............................................................................

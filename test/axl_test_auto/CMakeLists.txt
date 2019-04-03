@@ -13,12 +13,12 @@
 # app folder
 #
 
-set (
+set(
 	APP_H_LIST
 	test.h
 	)
 
-set (
+set(
 	APP_CPP_LIST
 	main.cpp
 	test_BoyerMooreFind.cpp
@@ -39,26 +39,26 @@ set (
 	test_Bstr.cpp
 	)
 
-source_group (
+source_group(
 	app
 	FILES
 	${APP_H_LIST}
 	${APP_CPP_LIST}
 	)
 
-if (NOT WIN32)
-	axl_exclude_from_build (test_Bstr.cpp)
-endif ()
+if(NOT WIN32)
+	axl_exclude_from_build(test_Bstr.cpp)
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # pch folder
 #
 
-set (PCH_H   pch.h)
-set (PCH_CPP pch.cpp)
+set(PCH_H   pch.h)
+set(PCH_CPP pch.cpp)
 
-source_group (
+source_group(
 	pch
 	FILES
 	${PCH_H}
@@ -70,45 +70,45 @@ source_group (
 # axl_test_auto automated testing app
 #
 
-include_directories (${AXL_INC_DIR})
-link_directories (${AXL_LIB_DIR})
+include_directories(${AXL_INC_DIR})
+link_directories(${AXL_LIB_DIR})
 
-set (OPT_LIB_LIST)
+set(OPT_LIB_LIST)
 
-if (BUILD_AXL_CRY)
-	include_directories (${OPENSSL_INC_DIR})
-	link_directories (${OPENSSL_LIB_DIR})
-	add_definitions (-D_AXL_CRY=1)
-	list (APPEND OPT_LIB_LIST axl_cry ${OPENSSL_CRYPTO_LIB_NAME})
-else ()
-	axl_exclude_from_build (test_Crypto.cpp)
-endif ()
+if(BUILD_AXL_CRY)
+	include_directories(${OPENSSL_INC_DIR})
+	link_directories(${OPENSSL_LIB_DIR})
+	add_definitions(-D_AXL_CRY=1)
+	list(APPEND OPT_LIB_LIST axl_cry ${OPENSSL_CRYPTO_LIB_NAME})
+else()
+	axl_exclude_from_build(test_Crypto.cpp)
+endif()
 
-if (BUILD_AXL_IO_USB)
-	include_directories (${LIBUSB_INC_DIR})
-	link_directories (${LIBUSB_LIB_DIR})
-	add_definitions (-D_AXL_IO_USB=1)
-	list (APPEND OPT_LIB_LIST ${LIBUSB_LIB_NAME})
-else ()
-	axl_exclude_from_build (test_Usb.cpp)
-endif ()
+if(BUILD_AXL_IO_USB)
+	include_directories(${LIBUSB_INC_DIR})
+	link_directories(${LIBUSB_LIB_DIR})
+	add_definitions(-D_AXL_IO_USB=1)
+	list(APPEND OPT_LIB_LIST ${LIBUSB_LIB_NAME})
+else()
+	axl_exclude_from_build(test_Usb.cpp)
+endif()
 
-if (BUILD_AXL_ST)
-	include_directories (${LUA_INC_DIR})
-	link_directories (${LUA_LIB_DIR})
-	add_definitions (-D_AXL_LUA=1)
-	list (APPEND OPT_LIB_LIST axl_st axl_lua ${LUA_LIB_NAME})
-else ()
-	axl_exclude_from_build (test_StringTemplate.cpp)
-endif ()
+if(BUILD_AXL_ST)
+	include_directories(${LUA_INC_DIR})
+	link_directories(${LUA_LIB_DIR})
+	add_definitions(-D_AXL_LUA=1)
+	list(APPEND OPT_LIB_LIST axl_st axl_lua ${LUA_LIB_NAME})
+else()
+	axl_exclude_from_build(test_StringTemplate.cpp)
+endif()
 
-if (BUILD_AXL_INI)
-	list (APPEND OPT_LIB_LIST axl_ini)
-else ()
-	axl_exclude_from_build (test_IniParser.cpp)
-endif ()
+if(BUILD_AXL_INI)
+	list(APPEND OPT_LIB_LIST axl_ini)
+else()
+	axl_exclude_from_build(test_IniParser.cpp)
+endif()
 
-add_executable (
+add_executable(
 	axl_test_auto
 	${PCH_H}
 	${PCH_CPP}
@@ -116,19 +116,19 @@ add_executable (
 	${APP_CPP_LIST}
 	)
 
-axl_set_pch (
+axl_set_pch(
 	axl_test_auto
 	${PCH_H}
 	${PCH_CPP}
 	)
 
-set_target_properties (
+set_target_properties(
 	axl_test_auto
 	PROPERTIES
 	FOLDER test
 	)
 
-target_link_libraries (
+target_link_libraries(
 	axl_test_auto
 	${OPT_LIB_LIST}
 	axl_lex
@@ -136,56 +136,56 @@ target_link_libraries (
 	axl_core
 	)
 
-if (UNIX)
-	target_link_libraries (
+if(UNIX)
+	target_link_libraries(
 		axl_test_auto
 		pthread
 		dl
 		)
 
-	if (LINUX AND LIBUDEV_FOUND)
-		target_link_libraries (
+	if(LINUX AND LIBUDEV_FOUND)
+		target_link_libraries(
 			axl_test_auto
 			udev
 			)
-	endif ()
+	endif()
 
-	if (APPLE)
-		find_library (CORE_FOUNDATION_FRAMEWORK CoreFoundation)
-		find_library (IOKIT_FRAMEWORK IOKit)
+	if(APPLE)
+		find_library(CORE_FOUNDATION_FRAMEWORK CoreFoundation)
+		find_library(IOKIT_FRAMEWORK IOKit)
 
-		target_link_libraries (
+		target_link_libraries(
 			axl_test_auto
 			axl_cf
 			axl_iok
 			${CORE_FOUNDATION_FRAMEWORK}
 			${IOKIT_FRAMEWORK}
 			)
-	else ()
-		target_link_libraries (
+	else()
+		target_link_libraries(
 			axl_test_auto
 			rt
 			)
-	endif ()
-endif ()
+	endif()
+endif()
 
-if (WIN32)
-	set (_DLL_LIST)
+if(WIN32)
+	set(_DLL_LIST)
 
-	if (BUILD_AXL_CRY AND OPENSSL_DLL_DIR)
-		list (APPEND _DLL_LIST ${OPENSSL_DLL_DIR}/${OPENSSL_CRYPTO_DLL_NAME}.dll)
-	endif ()
+	if(BUILD_AXL_CRY AND OPENSSL_DLL_DIR)
+		list(APPEND _DLL_LIST ${OPENSSL_DLL_DIR}/${OPENSSL_CRYPTO_DLL_NAME}.dll)
+	endif()
 
-	if (BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
-		list (APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
-	endif ()
+	if(BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
+		list(APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
+	endif()
 
-	if (BUILD_AXL_LUA AND LUA_DLL_DIR)
-		list (APPEND _DLL_LIST ${LUA_DLL_DIR}/${LUA_LIB_NAME}.dll)
-	endif ()
+	if(BUILD_AXL_LUA AND LUA_DLL_DIR)
+		list(APPEND _DLL_LIST ${LUA_DLL_DIR}/${LUA_LIB_NAME}.dll)
+	endif()
 
-	if (_DLL_LIST)
-		add_custom_command (
+	if(_DLL_LIST)
+		add_custom_command(
 			TARGET axl_test_auto
 			POST_BUILD
 			COMMAND
@@ -195,30 +195,30 @@ if (WIN32)
 				${_DLL_LIST}
 				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CONFIGURATION}
 			)
-	endif ()
-endif ()
+	endif()
+endif()
 
 #...............................................................................
 
-file (
+file(
 	GLOB
 	TEST_CPP_LIST
 	RELATIVE ${CMAKE_CURRENT_LIST_DIR}
 	test_*.cpp
 	)
 
-foreach (_FILE_NAME ${TEST_CPP_LIST})
-	axl_is_excluded_from_build (_IS_EXCLUDED ${_FILE_NAME})
+foreach(_FILE_NAME ${TEST_CPP_LIST})
+	axl_is_excluded_from_build(_IS_EXCLUDED ${_FILE_NAME})
 
-	if (NOT _IS_EXCLUDED)
-		get_filename_component (_TEST_NAME ${_FILE_NAME} NAME_WE)
+	if(NOT _IS_EXCLUDED)
+		get_filename_component(_TEST_NAME ${_FILE_NAME} NAME_WE)
 
-		add_test (
+		add_test(
 			NAME axl-${_TEST_NAME}
 			WORKING_DIRECTORY ${_DIR}
 			COMMAND axl_test_auto ${_TEST_NAME}
 			)
-	endif ()
-endforeach ()
+	endif()
+endforeach()
 
 #...............................................................................

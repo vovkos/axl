@@ -13,7 +13,7 @@
 # gui folder
 #
 
-set (
+set(
 	GUI_H_LIST
 	${AXL_INC_DIR}/axl_gui/axl_gui_AnsiAttrParser.h
 	${AXL_INC_DIR}/axl_gui/axl_gui_Canvas.h
@@ -33,7 +33,7 @@ set (
 	${AXL_INC_DIR}/axl_gui/axl_gui_Widget.h
 	)
 
-set (
+set(
 	GUI_CPP_LIST
 	axl_gui_AnsiAttrParser.cpp
 	axl_gui_Color.cpp
@@ -48,7 +48,7 @@ set (
 	axl_gui_Widget.cpp
 	)
 
-source_group (
+source_group(
 	gui
 	FILES
 	${GUI_H_LIST}
@@ -60,7 +60,7 @@ source_group (
 # gui_gdi folder
 #
 
-set (
+set(
 	GUI_GDI_H_LIST
 	${AXL_INC_DIR}/axl_gui/axl_gui_GdiCanvas.h
 	${AXL_INC_DIR}/axl_gui/axl_gui_GdiCursor.h
@@ -71,7 +71,7 @@ set (
 	${AXL_INC_DIR}/axl_gui/axl_gui_GdiWidget.h
 	)
 
-set (
+set(
 	GUI_GDI_CPP_LIST
 	axl_gui_GdiCanvas.cpp
 	axl_gui_GdiCursor.cpp
@@ -81,56 +81,56 @@ set (
 	axl_gui_GdiWidget.cpp
 	)
 
-source_group (
+source_group(
 	gui_gdi
 	FILES
 	${GUI_GDI_H_LIST}
 	${GUI_GDI_CPP_LIST}
 	)
 
-if (NOT BUILD_AXL_GUI_GDI)
-	axl_exclude_from_build (${GUI_GDI_CPP_LIST})
-endif ()
+if(NOT BUILD_AXL_GUI_GDI)
+	axl_exclude_from_build(${GUI_GDI_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # gui_qt folder
 #
 
-set (
+set(
 	GUI_QT_H_LIST
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtCaret.h
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtEngine.h
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtWidget.h
 	)
 
-set (
+set(
 	GUI_QT_CPP_LIST
 	axl_gui_QtCaret.cpp
 	axl_gui_QtEngine.cpp
 	axl_gui_QtWidget.cpp
 	)
 
-source_group (
+source_group(
 	gui_qt
 	FILES
 	${GUI_QT_H_LIST}
 	${GUI_QT_CPP_LIST}
 	)
 
-if (NOT BUILD_AXL_GUI_QT)
-	axl_exclude_from_build (${GUI_QT_CPP_LIST})
-endif ()
+if(NOT BUILD_AXL_GUI_QT)
+	axl_exclude_from_build(${GUI_QT_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # pch folder
 #
 
-set (PCH_H   pch.h)
-set (PCH_CPP pch.cpp)
+set(PCH_H   pch.h)
+set(PCH_CPP pch.cpp)
 
-set (
+set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_gui/axl_gui_Pch.h
@@ -138,7 +138,7 @@ set (
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtPch.h
 	)
 
-source_group (
+source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
@@ -150,19 +150,19 @@ source_group (
 # axl_gui library
 #
 
-include_directories (${AXL_INC_DIR})
+include_directories(${AXL_INC_DIR})
 
-if (BUILD_AXL_GUI_QT)
-	add_definitions (
+if(BUILD_AXL_GUI_QT)
+	add_definitions(
 		-D_AXL_GUI_QT=1
 		-DQT_COMPILING_QSTRING_COMPAT_CPP
 		-DQT_COMPILING_QIMAGE_COMPAT_CPP
 		)
 
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
-endif ()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+endif()
 
-add_library (
+add_library(
 	axl_gui
 	${PCH_H_LIST}
 	${PCH_CPP}
@@ -174,11 +174,11 @@ add_library (
 	${GUI_QT_CPP_LIST}
 	)
 
-if (BUILD_AXL_GUI_QT)
-	qt5_use_modules (axl_gui Widgets)
-endif ()
+if(BUILD_AXL_GUI_QT)
+	qt5_use_modules(axl_gui Widgets)
+endif()
 
-axl_set_pch (
+axl_set_pch(
 	axl_gui
 	${PCH_H}
 	${PCH_CPP}
@@ -186,13 +186,13 @@ axl_set_pch (
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-axl_install_redirected_includes (
+axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_gui
 	${LIB_H_LIST}
 	)
 
-install (
+install(
 	TARGETS axl_gui
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)
