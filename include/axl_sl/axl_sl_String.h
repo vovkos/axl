@@ -2052,8 +2052,35 @@ public:
 	typedef const StringRef_utf32& Type;
 };
 
-
 //..............................................................................
+
+// to support string-literal + axl::sl::String
+
+template <typename C>
+StringBase<C>
+operator + (
+	const char* p,
+	const StringRefBase<C>& src
+	)
+{
+	StringBase<C> string(p);
+	string += src;
+	return string;
+}
+
+template <typename C>
+StringBase<C>
+operator + (
+	const wchar_t* p,
+	const StringRefBase<C>& src
+	)
+{
+	StringBase<C> string(p);
+	string += src;
+	return string;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 String
