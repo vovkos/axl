@@ -502,7 +502,7 @@ CodePointDecoder::decodeImpl(
 		&takenSize
 		);
 
-	if (takenSize < size)
+	if (takenBufferLength < bufferLength && takenSize < size)
 	{
 		ASSERT(size - takenSize < sizeof(m_accumulator));
 		m_accumulatorCount = size - takenSize;
@@ -537,7 +537,7 @@ CodePointDecoder::decodeImpl(
 		&takenSize
 		);
 
-	if (takenSize < size)
+	if (takenBufferLength < bufferLength && takenSize < size)
 	{
 		ASSERT(size - takenSize < sizeof(m_accumulator));
 		m_accumulatorCount = size - takenSize;
