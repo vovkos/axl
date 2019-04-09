@@ -77,10 +77,26 @@ endif()
 
 #...............................................................................
 
+if(RAGEL_FOUND)
+	option(
+		BUILD_AXL_DOX
+		"Build axl_dox library (Doxygen comment processor)"
+		ON
+		)
+else()
+	unset(BUILD_AXL_DOX CACHE)
+endif()
+
+if(BUILD_AXL_DOX)
+	add_subdirectory(axl_dox)
+endif()
+
+#...............................................................................
+
 if(EXPAT_FOUND)
 	option(
 		BUILD_AXL_XML
-		"Build axl_xml library(Expat XML Parser wrappers)"
+		"Build axl_xml library (Expat XML Parser wrappers)"
 		ON
 		)
 else()
@@ -95,7 +111,7 @@ endif()
 
 option(
 	BUILD_AXL_FSM
-	"Build axl_fsm library(finite state machines)"
+	"Build axl_fsm library (finite state machines)"
 	ON
 	)
 
@@ -168,7 +184,7 @@ endif()
 if(RAGEL_FOUND AND LUA_FOUND)
 	option(
 		BUILD_AXL_ST
-		"Build axl_st library(string templates)"
+		"Build axl_st library (string templates)"
 		ON
 		)
 else()
@@ -183,7 +199,7 @@ endif()
 
 option(
 	BUILD_AXL_ZIP
-	"Build axl_zip library(miniz wrapper)"
+	"Build axl_zip library (miniz wrapper)"
 	ON
 	)
 
@@ -212,13 +228,13 @@ endif()
 if(APPLE)
 	option(
 		BUILD_AXL_CF
-		"Build axl_cf library(Core Foundation Framework wrappers)"
+		"Build axl_cf library (Core Foundation Framework wrappers)"
 		ON
 		)
 
 	option(
 		BUILD_AXL_IOK
-		"Build axl_iok library(IOKit Framework wrappers)"
+		"Build axl_iok library (IOKit Framework wrappers)"
 		ON
 		)
 endif()
