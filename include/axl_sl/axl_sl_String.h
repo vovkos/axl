@@ -610,7 +610,7 @@ public:
 	}
 
 	String
-	getLowerCaseString(CaseConvertMethod method = CaseConvertMethod_Default)
+	getLowerCaseString(CaseConvertMethod method = CaseConvertMethod_Default) const
 	{
 		String string = *this;
 		string.makeLowerCase(method);
@@ -618,7 +618,7 @@ public:
 	}
 
 	String
-	getUpperCaseString(CaseConvertMethod method = CaseConvertMethod_Default)
+	getUpperCaseString(CaseConvertMethod method = CaseConvertMethod_Default) const
 	{
 		String string = *this;
 		string.makeUpperCase(method);
@@ -626,7 +626,7 @@ public:
 	}
 
 	String
-	getCaseFoldedString(CaseConvertMethod method = CaseConvertMethod_Default)
+	getCaseFoldedString(CaseConvertMethod method = CaseConvertMethod_Default) const
 	{
 		String string = *this;
 		string.makeCaseFolded(method);
