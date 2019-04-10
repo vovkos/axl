@@ -59,6 +59,7 @@ public:
 	Parser(Module* module)
 	{
 		init();
+		m_module = module;
 	}
 
 	void
