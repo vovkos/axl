@@ -28,6 +28,7 @@ Parser::init()
 	m_blockTargetKind = BlockTargetKind_None;
 	m_descriptionKind = DescriptionKind_Detailed;
 	m_overloadIdx = 0;
+	m_lastPos.clear();
 }
 
 void
@@ -116,11 +117,13 @@ void
 Parser::addComment(
 	const sl::StringRef& comment,
 	const lex::LineCol& pos,
-	bool canAppend,
+	bool isSingleLine,
 	handle_t lastDeclaredItem
 	)
 {
 	Host* host = m_module->getHost();
+
+	bool canAppend = isSingleLine && pos.m_line == m_lastPos.m_line + 1;
 
 	if (!m_block || !canAppend)
 	{
@@ -128,6 +131,9 @@ Parser::addComment(
 		m_blockTargetKind = BlockTargetKind_None;
 		m_descriptionKind = DescriptionKind_Detailed;
 	}
+
+	if (isSingleLine)
+		m_lastPos = pos;
 
 	if (lastDeclaredItem)
 	{
@@ -337,8 +343,8 @@ Parser::addComment(
 			description = &m_block->m_seeAlsoDescription;
 			break;
 
-		case TokenKind_OtherCommand:
-			// maybe, treat it as normal text?
+		case TokenKind_CustomCommand:
+			host->processCustomCommand(token->m_data.m_string, m_block);
 			break;
 
 		case TokenKind_Text:

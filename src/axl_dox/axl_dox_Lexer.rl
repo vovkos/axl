@@ -80,7 +80,7 @@ main := |*
 '\\sa'            { createToken(TokenKind_SeeAlso); };
 '\\footnote'      { createToken(TokenKind_Footnote); };
 
-'\\' rc*          { createTextToken(TokenKind_OtherCommand); };
+'\\' rc*          { createTextToken(TokenKind_CustomCommand, 1); };
 
 '@{'              { createToken(TokenKind_OpeningBrace); };
 '@}'              { createToken(TokenKind_ClosingBrace); };

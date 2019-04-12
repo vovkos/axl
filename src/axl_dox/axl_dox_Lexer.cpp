@@ -19,10 +19,13 @@ namespace dox {
 //..............................................................................
 
 DoxyToken*
-Lexer::createTextToken(TokenKind tokenKind)
+Lexer::createTextToken(
+	TokenKind tokenKind,
+	size_t left
+	)
 {
 	Token* token = createToken(tokenKind);
-	token->m_data.m_string = sl::StringRef(ts, te - ts);
+	token->m_data.m_string = sl::StringRef(ts + left, te - ts - left);
 	return token;
 }
 

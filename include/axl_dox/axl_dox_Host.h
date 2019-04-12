@@ -61,6 +61,15 @@ struct Host
 		sl::String* itemXml,
 		sl::String* indexXml
 		) = 0;
+
+	virtual
+	void
+	processCustomCommand(
+		const sl::StringRef& command,
+		BlockData* block
+		)
+	{
+	}
 };
 
 //..............................................................................

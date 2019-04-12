@@ -18,6 +18,7 @@ namespace dox {
 
 struct Host;
 class Module;
+class Block;
 class Group;
 
 //..............................................................................
@@ -31,13 +32,8 @@ enum BlockKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Block: public sl::ListLink
+struct BlockData
 {
-	friend class Module;
-	friend class Parser;
-
-protected:
-	Host* m_host;
 	BlockKind m_blockKind;
 	Group* m_group;
 
@@ -49,6 +45,19 @@ protected:
 	sl::String m_internalDescription;
 	sl::BoxList<sl::String> m_importList;
 	sl::Array<Block*> m_footnoteArray;
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class Block:
+	public sl::ListLink,
+	protected BlockData
+{
+	friend class Module;
+	friend class Parser;
+
+protected:
+	Host* m_host;
 
 public:
 	handle_t m_item;
@@ -99,6 +108,12 @@ public:
 	getSeeAlsoDescription()
 	{
 		return m_seeAlsoDescription;
+	}
+
+	const sl::String&
+	getInternalDescription()
+	{
+		return m_internalDescription;
 	}
 
 	bool

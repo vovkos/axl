@@ -23,7 +23,7 @@ enum TokenKind
 	TokenKind_Eof = 0,
 	TokenKind_Error = -1,
 	TokenKind_Text = 256,
-	TokenKind_OtherCommand,
+	TokenKind_CustomCommand,
 	TokenKind_OpeningBrace,
 	TokenKind_ClosingBrace,
 
@@ -58,7 +58,7 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP(TokenName)
 	AXL_LEX_TOKEN_NAME(TokenKind_Eof,           "eof")
 	AXL_LEX_TOKEN_NAME(TokenKind_Error,         "error")
 	AXL_LEX_TOKEN_NAME(TokenKind_Text,          "text")
-	AXL_LEX_TOKEN_NAME(TokenKind_OtherCommand,  "other-command")
+	AXL_LEX_TOKEN_NAME(TokenKind_CustomCommand, "custom-command")
 	AXL_LEX_TOKEN_NAME(TokenKind_OpeningBrace,  "@{")
 	AXL_LEX_TOKEN_NAME(TokenKind_ClosingBrace,  "@}")
 
@@ -99,7 +99,10 @@ class Lexer: public lex::RagelLexer<Lexer, DoxyToken>
 
 protected:
 	DoxyToken*
-	createTextToken(TokenKind tokenKind);
+	createTextToken(
+		TokenKind tokenKind,
+		size_t left = 0
+		);
 
 	DoxyToken*
 	createNewLineToken();

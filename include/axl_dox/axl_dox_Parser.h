@@ -53,6 +53,7 @@ protected:
 	sl::String m_firstIndent;
 	sl::String m_indent;
 	sl::String m_overloadName;
+	lex::LineCol m_lastPos;
 	size_t m_overloadIdx;
 
 public:
@@ -71,8 +72,8 @@ public:
 	void
 	addComment(
 		const sl::StringRef& comment,
-		const lex::LineCol& lineCol,
-		bool canAppend,
+		const lex::LineCol& pos,
+		bool isSingleLine,
 		handle_t lastDeclaredItem
 		);
 
