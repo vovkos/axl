@@ -56,6 +56,24 @@ LuaState::load(
 	return complete(result);
 }
 
+bool
+LuaState::loadFile(const sl::StringRef& fileName)
+{
+	ASSERT(isOpen());
+
+	int result = luaL_loadfile(m_h, fileName.cp());
+	return complete(result);
+}
+
+bool
+LuaState::doFile(const sl::StringRef& fileName)
+{
+	ASSERT(isOpen());
+
+	int result = luaL_dofile(m_h, fileName.cp());
+	return complete(result);
+}
+
 #ifdef _AXL_DEBUG
 void
 LuaState::trace()

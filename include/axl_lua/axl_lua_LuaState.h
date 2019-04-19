@@ -53,6 +53,12 @@ public:
 		const sl::StringRef& source
 		);
 
+	bool
+	loadFile(const sl::StringRef& fileName);
+
+	bool
+	doFile(const sl::StringRef& fileName);
+
 #ifdef _AXL_DEBUG
 	void
 	trace();
