@@ -469,51 +469,111 @@ public:
 	}
 
 	size_t
-	find(C c) const
+	find(
+		C c,
+		size_t index = 0
+		) const
 	{
-		return Details::find(m_p, m_length, c);
+		if (index >= m_length)
+			return -1;
+
+		if (index == 0)
+			return Details::find(m_p, m_length, c);
+
+		size_t result = Details::find(m_p + index, m_length - index, c);
+		return result != -1 ? result + index : -1;
 	}
 
 	size_t
-	find(const StringRef& subString) const
+	find(
+		const StringRef& subString,
+		size_t index = 0
+		) const
 	{
-		return Details::find(m_p, m_length, subString.m_p, subString.m_length);
+		if (index >= m_length)
+			return -1;
+
+		if (index == 0)
+			Details::find(m_p, m_length, subString.m_p, subString.m_length);
+
+		size_t result = Details::find(m_p + index, m_length - index, subString.m_p, subString.m_length);
+		return result != -1 ? result + index : -1;
 	}
 
 	size_t
-	findOneOf(const StringRef& charSet) const
+	findOneOf(
+		const StringRef& charSet,
+		size_t index = 0
+		) const
 	{
-		return Details::findOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
+		if (index >= m_length)
+			return -1;
+
+		if (index == 0)
+			Details::findOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
+
+		size_t result = Details::findOneOf(m_p + index, m_length - index, charSet.m_p, charSet.m_length);
+		return result != -1 ? result + index : -1;
 	}
 
 	size_t
-	findNotOneOf(const StringRef& charSet) const
+	findNotOneOf(
+		const StringRef& charSet,
+		size_t index = 0
+		) const
 	{
-		return Details::findNotOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
+		if (index >= m_length)
+			return -1;
+
+		if (index == 0)
+			Details::findNotOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
+
+		size_t result = Details::findNotOneOf(m_p + index, m_length - index, charSet.m_p, charSet.m_length);
+		return result != -1 ? result + index : -1;
 	}
 
 	size_t
-	reverseFind(C c) const
+	reverseFind(
+		C c,
+		size_t index = -1
+		) const
 	{
-		return Details::reverseFind(m_p, m_length, c);
+		return index < m_length ?
+			Details::reverseFind(m_p, index + 1, c) :
+			Details::reverseFind(m_p, m_length, c);
 	}
 
 	size_t
-	reverseFind(const StringRef& subString) const
+	reverseFind(
+		const StringRef& subString,
+		size_t index = -1
+		) const
 	{
-		return Details::reverseFind(m_p, m_length, subString.m_p, subString.m_length);
+		return index < m_length ?
+			Details::reverseFind(m_p, index + 1, subString.m_p, subString.m_length) :
+			Details::reverseFind(m_p, m_length, subString.m_p, subString.m_length);
 	}
 
 	size_t
-	reverseFindOneOf(const StringRef& charSet) const
+	reverseFindOneOf(
+		const StringRef& charSet,
+		size_t index = -1
+		) const
 	{
-		return Details::reverseFindOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
+		return index < m_length ?
+			Details::reverseFindOneOf(m_p, index + 1, charSet.m_p, charSet.m_length) :
+			Details::reverseFindOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
 	}
 
 	size_t
-	reverseFindNotOneOf(const StringRef& charSet) const
+	reverseFindNotOneOf(
+		const StringRef& charSet,
+		size_t index = -1
+		) const
 	{
-		return Details::reverseFindNotOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
+		return index < m_length ?
+			Details::reverseFindNotOneOf(m_p, index + 1, charSet.m_p, charSet.m_length) :
+			Details::reverseFindNotOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
 	}
 
 	StringRef
