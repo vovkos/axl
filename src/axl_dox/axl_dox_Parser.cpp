@@ -132,6 +132,11 @@ Parser::addComment(
 		m_descriptionKind = DescriptionKind_Detailed;
 	}
 
+	if (!m_block->m_source.isEmpty())
+		m_block->m_source.append('\n');
+
+	m_block->m_source.append(comment);
+
 	if (isSingleLine)
 		m_lastPos = pos;
 

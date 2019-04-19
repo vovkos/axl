@@ -37,6 +37,7 @@ struct BlockData
 	BlockKind m_blockKind;
 	Group* m_group;
 
+	sl::String m_source;
 	sl::String m_refId;
 	sl::String m_title;
 	sl::String m_briefDescription;
@@ -81,6 +82,12 @@ public:
 	getItem()
 	{
 		return m_item;
+	}
+
+	const sl::String&
+	getSource()
+	{
+		return m_source;
 	}
 
 	const sl::String&
