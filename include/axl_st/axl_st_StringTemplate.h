@@ -144,6 +144,18 @@ public:
 		return true;
 	}
 
+	bool
+	append(const sl::StringRef& string)
+	{
+		if (m_emitContextStack.isEmpty())
+		{
+			err::setError(err::SystemErrorCode_InvalidParameter);
+			return false;
+		}
+
+		return m_emitContextStack.getTail()->m_output->append(string) != -1;
+	}
+
 protected:
 	bool
 	createScript(
