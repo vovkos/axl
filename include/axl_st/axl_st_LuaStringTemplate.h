@@ -89,6 +89,10 @@ protected:
 	static
 	int
 	passthrough_lua(lua_State* h);
+
+	static
+	int
+	trimOutput_lua(lua_State* h);
 };
 
 //..............................................................................

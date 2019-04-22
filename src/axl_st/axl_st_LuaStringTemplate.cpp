@@ -41,6 +41,7 @@ LuaStringTemplate::create()
 	m_luaState.registerFunction("getCol", getCol_lua, this);
 	m_luaState.registerFunction("emit", emit_lua, this);
 	m_luaState.registerFunction("passthrough", passthrough_lua, this);
+	m_luaState.registerFunction("trimOutput", trimOutput_lua, this);
 
 	return true;
 }
@@ -165,6 +166,21 @@ LuaStringTemplate::passthrough_lua(lua_State* h)
 	sl::StringRef string = context->m_frame.getSubString(offset, length);
 	context->m_output->append(string);
 	context->m_lineCol.incrementalCount(string);
+
+	return 0;
+}
+
+int
+LuaStringTemplate::trimOutput_lua(lua_State* h)
+{
+	lua::LuaNonOwnerState luaState(h);
+	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
+	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
+
+	EmitContext* context = *self->m_emitContextStack.getTail();
+
+	context->m_output->trimRight();
+	context->m_lineCol.count(*context->m_output);
 
 	return 0;
 }
