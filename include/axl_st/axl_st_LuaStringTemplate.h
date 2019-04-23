@@ -84,6 +84,10 @@ protected:
 
 	static
 	int
+	getLineText_lua(lua_State* h);
+
+	static
+	int
 	emit_lua(lua_State* h);
 
 	static
