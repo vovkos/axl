@@ -75,9 +75,11 @@ main := |*
 '\\subgroup'      { createToken(TokenKind_SubGroup); };
 '\\title'         { createToken(TokenKind_Title); };
 '\\brief'         { createToken(TokenKind_Brief); };
+'\\details'       { createToken(TokenKind_Details); };
 '\\see'           { createToken(TokenKind_SeeAlso); };
 '\\seealso'       { createToken(TokenKind_SeeAlso); };
 '\\sa'            { createToken(TokenKind_SeeAlso); };
+'\\internal'      { createToken(TokenKind_Internal); };
 '\\footnote'      { createToken(TokenKind_Footnote); };
 
 '\\' rc*          { createTextToken(TokenKind_CustomCommand, 1); };

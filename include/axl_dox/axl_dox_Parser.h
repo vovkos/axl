@@ -34,6 +34,7 @@ protected:
 		DescriptionKind_Detailed = 0,
 		DescriptionKind_Brief,
 		DescriptionKind_SeeAlso,
+		DescriptionKind_Internal,
 	};
 
 	enum BlockTargetKind

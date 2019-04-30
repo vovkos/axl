@@ -47,7 +47,9 @@ enum TokenKind
 	TokenKind_SubGroup,
 	TokenKind_Title,
 	TokenKind_Brief,
+	TokenKind_Details,
 	TokenKind_SeeAlso,
+	TokenKind_Internal,
 	TokenKind_Footnote,
 };
 
@@ -82,7 +84,9 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP(TokenName)
 	AXL_LEX_TOKEN_NAME(TokenKind_SubGroup,      "\\subgroup")
 	AXL_LEX_TOKEN_NAME(TokenKind_Title,         "\\title")
 	AXL_LEX_TOKEN_NAME(TokenKind_Brief,         "\\brief")
+	AXL_LEX_TOKEN_NAME(TokenKind_Details,       "\\details")
 	AXL_LEX_TOKEN_NAME(TokenKind_SeeAlso,       "\\see")
+	AXL_LEX_TOKEN_NAME(TokenKind_Internal,      "\\internal")
 	AXL_LEX_TOKEN_NAME(TokenKind_Footnote,      "\\footnote")
 
 AXL_LEX_END_TOKEN_NAME_MAP();

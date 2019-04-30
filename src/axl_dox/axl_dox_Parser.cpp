@@ -157,6 +157,10 @@ Parser::addComment(
 		description = &m_block->m_seeAlsoDescription;
 		break;
 
+	case DescriptionKind_Internal:
+		description = &m_block->m_internalDescription;
+		break;
+
 	case DescriptionKind_Detailed:
 	default:
 		description = &m_block->m_detailedDescription;
@@ -343,9 +347,23 @@ Parser::addComment(
 
 			break;
 
+		case TokenKind_Details:
+			m_descriptionKind = DescriptionKind_Detailed;
+			description = &m_block->m_briefDescription;
+
+			if (!description->isEmpty())
+				description->append('\n');
+
+			break;
+
 		case TokenKind_SeeAlso:
 			m_descriptionKind = DescriptionKind_SeeAlso;
 			description = &m_block->m_seeAlsoDescription;
+			break;
+
+		case TokenKind_Internal:
+			m_descriptionKind = DescriptionKind_Internal;
+			description = &m_block->m_internalDescription;
 			break;
 
 		case TokenKind_CustomCommand:
