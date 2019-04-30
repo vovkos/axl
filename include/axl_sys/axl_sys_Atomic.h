@@ -28,25 +28,25 @@ namespace sys {
 
 // spoiler: no difference on amd64; about 15% speed up on x86
 
-#if (_AXL_USE_WINAPI_INTERLOCKED)
-#	define AXL_INTERLOCKED_FUNC32(name) (::Interlocked ## name)
-#	define AXL_INTERLOCKED_FUNC64(name) (::Interlocked ## name)
-#else // use intrinsics
-#	pragma intrinsic(_InterlockedExchange)
-#	pragma intrinsic(_InterlockedCompareExchange)
-#	pragma intrinsic(_InterlockedIncrement)
-#	pragma intrinsic(_InterlockedDecrement)
-#	define AXL_INTERLOCKED_FUNC32(name) (_Interlocked ## name)
-#	if (_AXL_CPU_AMD64)
-#		pragma intrinsic(_InterlockedExchange64)
-#		pragma intrinsic(_InterlockedCompareExchange64)
-#		pragma intrinsic(_InterlockedIncrement64)
-#		pragma intrinsic(_InterlockedDecrement64)
-#		define AXL_INTERLOCKED_FUNC64(name) (_Interlocked ## name)
-#	else
+#	if (_AXL_USE_WINAPI_INTERLOCKED)
+#		define AXL_INTERLOCKED_FUNC32(name) (::Interlocked ## name)
 #		define AXL_INTERLOCKED_FUNC64(name) (::Interlocked ## name)
+#	else // use intrinsics
+#		pragma intrinsic(_InterlockedExchange)
+#		pragma intrinsic(_InterlockedCompareExchange)
+#		pragma intrinsic(_InterlockedIncrement)
+#		pragma intrinsic(_InterlockedDecrement)
+#		define AXL_INTERLOCKED_FUNC32(name) (_Interlocked ## name)
+#		if (_AXL_CPU_AMD64)
+#			pragma intrinsic(_InterlockedExchange64)
+#			pragma intrinsic(_InterlockedCompareExchange64)
+#			pragma intrinsic(_InterlockedIncrement64)
+#			pragma intrinsic(_InterlockedDecrement64)
+#			define AXL_INTERLOCKED_FUNC64(name) (_Interlocked ## name)
+#		else
+#			define AXL_INTERLOCKED_FUNC64(name) (::Interlocked ## name)
+#		endif
 #	endif
-#endif
 
 inline
 int32_t
@@ -125,7 +125,7 @@ atomicDec(volatile int64_t* p)
 	return AXL_INTERLOCKED_FUNC64(Decrement64)(p);
 }
 
-#if (AXL_PTR_BITS == 64)
+#	if (AXL_PTR_BITS == 64)
 
 inline
 int64_t
@@ -176,7 +176,7 @@ atomicDec(volatile size_t* p)
 	return AXL_INTERLOCKED_FUNC64(Decrement64)((int64_t*)p);
 }
 
-#else
+#	else // AXL_PTR_BITS == 64
 
 inline
 int64_t
@@ -227,8 +227,7 @@ atomicDec(volatile size_t* p)
 	return AXL_INTERLOCKED_FUNC32(Decrement)((long*)p);
 }
 
-#endif
-
+#	endif // AXL_PTR_BITS == 64
 #elif (_AXL_CPP_GCC)
 
 inline
@@ -343,7 +342,7 @@ atomicDec(volatile size_t* p)
 	return __sync_sub_and_fetch(p, 1);
 }
 
-#if (_AXL_OS_DARWIN)
+#	if (_AXL_OS_DARWIN)
 
 inline
 intptr_t
@@ -380,9 +379,8 @@ atomicDec(volatile intptr_t* p)
 	return __sync_sub_and_fetch(p, 1);
 }
 
-#endif
-
-#if (AXL_PTR_BITS == 64)
+#	endif // _AXL_OS_DARWIN
+#	if (AXL_PTR_BITS == 64)
 
 inline
 int64_t
@@ -391,49 +389,7 @@ atomicLoad(volatile int64_t* p)
 	return *p;
 }
 
-inline
-int128_t
-atomicLoad(volatile int128_t* p)
-{
-	return __sync_val_compare_and_swap(p, 0, 0); // any value will do
-}
-
-inline
-int128_t
-atomicXchg(
-	volatile int128_t* p,
-	int128_t value
-	)
-{
-	return __sync_lock_test_and_set(p, value);
-}
-
-inline
-int128_t
-atomicCmpXchg(
-	volatile int128_t* p,
-	int128_t cmpValue,
-	int128_t newValue
-	)
-{
-	return __sync_val_compare_and_swap(p, cmpValue, newValue);
-}
-
-inline
-int128_t
-atomicInc(volatile int128_t* p)
-{
-	return __sync_add_and_fetch(p, 1);
-}
-
-inline
-int128_t
-atomicDec(volatile int128_t* p)
-{
-	return __sync_sub_and_fetch(p, 1);
-}
-
-#else // 32
+#	else // AXL_PTR_BITS == 64
 
 inline
 int64_t
@@ -442,9 +398,8 @@ atomicLoad(volatile int64_t* p)
 	return __sync_val_compare_and_swap(p, 0, 0); // any value will do
 }
 
-#endif
-
-#endif
+#	endif // AXL_PTR_BITS == 64
+#endif // _AXL_OS_WIN / _AXL_CPP_GCC
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

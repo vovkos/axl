@@ -292,22 +292,7 @@ typedef ulong_t           dword_t;
 typedef uint32_t          dword_t;
 #endif
 
-#if (AXL_PTR_BITS == 64)
-#	if (_AXL_CPP_GCC)
-typedef __int128          int128_t;
-typedef unsigned __int128 uint128_t;
-typedef int128_t          intdptr_t;
-typedef uint128_t         uintdptr_t;
-#	endif
-#else
-typedef int64_t           intdptr_t;
-typedef uint64_t          uintdptr_t;
-#endif
-
 typedef void*             handle_t;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 typedef char              utf8_t;
 
 #if (WCHAR_MAX <= 0xffff)
