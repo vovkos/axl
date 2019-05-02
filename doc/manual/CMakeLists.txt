@@ -138,7 +138,7 @@ if(WIN32)
 else()
 	axl_configure_file_w_permissions(
 		${AXL_DOC_SHARE_DIR}/sh/build-xml.sh.in
-		${AXL_DOC_SHARE_DIR}/sh/build-xml.sh
+		build-xml.sh
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE
 		GROUP_READ GROUP_WRITE GROUP_EXECUTE
 		WORLD_READ WORLD_WRITE WORLD_EXECUTE
@@ -146,7 +146,7 @@ else()
 
 	axl_configure_file_w_permissions(
 		${AXL_DOC_SHARE_DIR}/sh/build-rst.sh.in
-		${AXL_DOC_SHARE_DIR}/sh/build-rst.sh
+		build-rst.sh
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE
 		GROUP_READ GROUP_WRITE GROUP_EXECUTE
 		WORLD_READ WORLD_WRITE WORLD_EXECUTE
@@ -154,7 +154,7 @@ else()
 
 	axl_configure_file_w_permissions(
 		${AXL_DOC_SHARE_DIR}/sh/build-html.sh.in
-		${AXL_DOC_SHARE_DIR}/sh/build-html.sh
+		build-html.sh
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE
 		GROUP_READ GROUP_WRITE GROUP_EXECUTE
 		WORLD_READ WORLD_WRITE WORLD_EXECUTE
@@ -162,7 +162,7 @@ else()
 
 	axl_configure_file_w_permissions(
 		${AXL_DOC_SHARE_DIR}/sh/build-pdf.sh.in
-		${AXL_DOC_SHARE_DIR}/sh/build-pdf.sh
+		build-pdf.sh
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE
 		GROUP_READ GROUP_WRITE GROUP_EXECUTE
 		WORLD_READ WORLD_WRITE WORLD_EXECUTE
