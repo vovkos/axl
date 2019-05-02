@@ -1205,6 +1205,27 @@ axl_make_path
 endmacro()
 
 macro(
+axl_does_file_exist_w_configuration
+	_RESULT
+	_FILE_NAME
+	)
+
+	set(${_RESULT} FALSE)
+	set(_REGEX "\\$\\((Configuration|CONFIGURATION)\\)")
+
+	if(EXISTS ${_FILE_NAME})
+		set(${_RESULT} TRUE)
+	elseif(${_FILE_NAME} MATCHES ${_REGEX})
+		string(REGEX REPLACE ${_REGEX} "Debug" _FILE_NAME_DEBUG ${_FILE_NAME})
+		string(REGEX REPLACE ${_REGEX} "Release" _FILE_NAME_RELEASE ${_FILE_NAME})
+
+		if(EXISTS ${_FILE_NAME_DEBUG} OR EXISTS ${_FILE_NAME_RELEASE})
+			set(${_RESULT} TRUE)
+		endif()
+	endif()
+endmacro()
+
+macro(
 axl_ensure_file_exists
 	_FILE_PATH
 	_TEMPLATE_FILE_PATH
