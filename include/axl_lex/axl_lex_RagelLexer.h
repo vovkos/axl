@@ -156,9 +156,9 @@ public:
 		p = (char*)source.cp();
 		if (!isBomNeeded)
 		{
-			size_t bomLength = Utf8::getBomLength();
+			size_t bomLength = enc::Utf8::getBomLength();
 			if (source.getLength() >= bomLength &&
-				memcmp(p, Utf8::getBom(), bomLength) == 0)
+				memcmp(p, enc::Utf8::getBom(), bomLength) == 0)
 				p += bomLength;
 		}
 
