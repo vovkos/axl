@@ -133,10 +133,11 @@ public:
 	create(
 		int state,
 		const sl::StringRef& filePath,
-		const sl::StringRef& source
+		const sl::StringRef& source,
+		bool isBomNeeded = false
 		)
 	{
-		create(filePath, source);
+		create(filePath, source, isBomNeeded);
 		cs = state;
 		return true;
 	}
@@ -144,16 +145,24 @@ public:
 	bool
 	create(
 		const sl::StringRef& filePath,
-		const sl::StringRef& source
+		const sl::StringRef& source,
+		bool isBomNeeded = false
 		)
 	{
 		this->reset();
 
 		static_cast<T*> (this)->init();
 
-		p   = (char*)source.cp();
-		eof = (char*)source.getEnd();
+		p = (char*)source.cp();
+		if (!isBomNeeded)
+		{
+			size_t bomLength = Utf8::getBomLength();
+			if (source.getLength() >= bomLength &&
+				memcmp(p, Utf8::getBom(), bomLength) == 0)
+				p += bomLength;
+		}
 
+		eof = (char*)source.getEnd();
 		m_filePath = filePath;
 		m_begin = p;
 
