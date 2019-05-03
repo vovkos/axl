@@ -18,6 +18,19 @@ namespace dox {
 
 //..............................................................................
 
+sl::String
+Lexer::getCommandParam()
+{
+	const DoxyToken* commandToken = getToken();
+	const DoxyToken* nextToken = getToken(1);
+
+	return
+		nextToken->m_token == TokenKind_Text &&
+		nextToken->m_pos.m_line == commandToken->m_pos.m_line ?
+		nextToken->m_data.m_string.getTrimmedString() :
+		sl::String();
+}
+
 DoxyToken*
 Lexer::createTextToken(
 	TokenKind tokenKind,

@@ -66,6 +66,7 @@ struct Host
 	void
 	processCustomCommand(
 		const sl::StringRef& command,
+		const sl::StringRef& param,
 		BlockData* block
 		)
 	{

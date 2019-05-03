@@ -101,6 +101,10 @@ class Lexer: public lex::RagelLexer<Lexer, DoxyToken>
 {
 	friend class lex::RagelLexer<Lexer, DoxyToken>;
 
+public:
+	sl::String
+	getCommandParam();
+
 protected:
 	DoxyToken*
 	createTextToken(

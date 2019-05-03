@@ -175,11 +175,10 @@ Parser::addComment(
 	for (;;)
 	{
 		const DoxyToken* token = lexer.getToken();
-		const DoxyToken* nextToken;
 		Footnote* footnote;
 		size_t i;
 
-		sl::StringRef name;
+		sl::StringRef param;
 		bool isParentBlock = false;
 
 		switch (token->m_token)
@@ -210,8 +209,8 @@ Parser::addComment(
 		case TokenKind_Property:
 		case TokenKind_Event:
 		case TokenKind_Typedef:
-			nextToken = lexer.getToken(1);
-			if (nextToken->m_token != TokenKind_Text)
+			param = lexer.getCommandParam();
+			if (param.isEmpty())
 				break; // ignore
 
 			if (m_blockTargetKind || m_block->getBlockKind() == BlockKind_Footnote) // create a new one
@@ -224,25 +223,24 @@ Parser::addComment(
 			if (isParentBlock)
 				m_parentBlock = m_block;
 
-			name = nextToken->m_data.m_string.getTrimmedString();
-			setBlockTarget((TokenKind)token->m_token, name);
+			setBlockTarget((TokenKind)token->m_token, param);
 			lexer.nextToken();
 			break;
 
 		case TokenKind_Group:
-			nextToken = lexer.getToken(1);
-			if (nextToken->m_token != TokenKind_Text)
+			param = lexer.getCommandParam();
+			if (param.isEmpty())
 				break; // ignore
 
-			i = nextToken->m_data.m_string.findOneOf(" \t");
+			i = param.findOneOf(" \t");
 			if (i == -1)
 			{
-				m_block = m_module->getGroup(nextToken->m_data.m_string);
+				m_block = m_module->getGroup(param);
 			}
 			else
 			{
-				Group* group = m_module->getGroup(nextToken->m_data.m_string.getSubString(0, i));
-				group->m_title = nextToken->m_data.m_string.getSubString(i + 1).getLeftTrimmedString();
+				Group* group = m_module->getGroup(param.getSubString(0, i));
+				group->m_title = param.getSubString(i + 1).getLeftTrimmedString();
 
 				m_block = group;
 			}
@@ -255,13 +253,13 @@ Parser::addComment(
 			break;
 
 		case TokenKind_InGroup:
-			nextToken = lexer.getToken(1);
-			if (nextToken->m_token != TokenKind_Text)
+			param = lexer.getCommandParam();
+			if (param.isEmpty())
 				break; // ignore
 
 			if (!m_block->m_group)
 			{
-				Group* group = m_module->getGroup(nextToken->m_data.m_string);
+				Group* group = m_module->getGroup(param);
 				m_block->m_group = group;
 				if (m_block->getBlockKind() == BlockKind_Group)
 				{
@@ -289,20 +287,20 @@ Parser::addComment(
 			break;
 
 		case TokenKind_Title:
-			nextToken = lexer.getToken(1);
-			if (nextToken->m_token != TokenKind_Text)
+			param = lexer.getCommandParam();
+			if (param.isEmpty())
 				break; // ignore
 
-			m_block->m_title = nextToken->m_data.m_string;
+			m_block->m_title = param;
 			lexer.nextToken();
 			break;
 
 		case TokenKind_Import:
-			nextToken = lexer.getToken(1);
-			if (nextToken->m_token != TokenKind_Text)
+			param = lexer.getCommandParam();
+			if (param.isEmpty())
 				break; // ignore
 
-			m_block->m_importList.insertTail(nextToken->m_data.m_string);
+			m_block->m_importList.insertTail(param);
 			lexer.nextToken();
 			break;
 
@@ -311,8 +309,8 @@ Parser::addComment(
 			break;
 
 		case TokenKind_Footnote:
-			nextToken = lexer.getToken(1);
-			if (nextToken->m_token != TokenKind_Text)
+			param = lexer.getCommandParam();
+			if (param.isEmpty())
 				break; // ignore
 
 			if (m_block->getBlockKind() == BlockKind_Footnote)
@@ -320,15 +318,14 @@ Parser::addComment(
 				m_block = ((Footnote*)m_block)->getParent();
 				ASSERT(m_block->getBlockKind() != BlockKind_Footnote);
 			}
-			else if (m_blockTargetKind == BlockTargetKind_Member && m_parentBlock)
+			else if (description->isEmpty() && m_parentBlock)
 			{
-				// use parent block for non-compounds (if exists)
+				// standalone footnotes go to the parent block
 				m_block = m_parentBlock;
 			}
 
-			name = nextToken->m_data.m_string.getTrimmedString();
 			footnote = m_module->createFootnote();
-			footnote->m_refId = name;
+			footnote->m_refId = param;
 			footnote->m_parent = m_block;
 			footnote->m_parent->m_footnoteArray.append(footnote);
 
@@ -367,7 +364,11 @@ Parser::addComment(
 			break;
 
 		case TokenKind_CustomCommand:
-			host->processCustomCommand(token->m_data.m_string, m_block);
+			param = lexer.getCommandParam();
+			host->processCustomCommand(token->m_data.m_string, param, m_block);
+
+			if (!param.isEmpty())
+				lexer.nextToken();
 			break;
 
 		case TokenKind_Text:
@@ -394,6 +395,9 @@ Parser::addComment(
 
 					m_indent.clear(); // do this once per line
 				}
+
+				if (!description->isEmpty() && !isspace(description->getEnd()[-1]))
+					description->append(' ');
 
 				description->append(token->m_data.m_string);
 			}
