@@ -204,8 +204,6 @@ Module::generateDocumentation(
 		return false;
 	}
 
-	deleteEmptyGroups();
-
 	result = generateGroupDocumentation(outputDir, &indexXml);
 	if (!result)
 		return false;
