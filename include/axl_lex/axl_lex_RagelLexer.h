@@ -154,6 +154,11 @@ public:
 		static_cast<T*> (this)->init();
 
 		p = (char*)source.cp();
+		eof = (char*)source.getEnd();
+
+		m_begin = p;
+		m_filePath = filePath;
+
 		if (!isBomNeeded)
 		{
 			size_t bomLength = enc::Utf8::getBomLength();
@@ -161,10 +166,6 @@ public:
 				memcmp(p, enc::Utf8::getBom(), bomLength) == 0)
 				p += bomLength;
 		}
-
-		eof = (char*)source.getEnd();
-		m_filePath = filePath;
-		m_begin = p;
 
 		return true;
 	}
