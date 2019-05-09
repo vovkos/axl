@@ -324,6 +324,7 @@ Parser::addComment(
 				break; // ignore
 
 			m_block->m_internalDescription += ":grouporder(" + commandParam + "):";
+			lexer.nextToken();
 			break;
 
 		case TokenKind_Footnote:
