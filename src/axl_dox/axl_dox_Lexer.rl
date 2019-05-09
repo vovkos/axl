@@ -87,10 +87,10 @@ main := |*
 [@\\] 'internal'   { createToken(TokenKind_Internal); };
 [@\\] 'footnote'   { createToken(TokenKind_Footnote); };
 
-[@\\] rc*          { createTextToken(TokenKind_CustomCommand, 1); };
-
 '@{'               { createToken(TokenKind_OpeningBrace); };
 '@}'               { createToken(TokenKind_ClosingBrace); };
+
+[@\\] rc*          { createTextToken(TokenKind_CustomCommand, 1); };
 
 rc ([^\n]* nws)?   { createTextToken(TokenKind_Text); };
 
