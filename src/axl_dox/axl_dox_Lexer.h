@@ -45,9 +45,12 @@ enum TokenKind
 	TokenKind_Group,
 	TokenKind_InGroup,
 	TokenKind_SubGroup,
+	TokenKind_GroupOrder,
 	TokenKind_Title,
 	TokenKind_Brief,
 	TokenKind_Details,
+	TokenKind_Param,
+	TokenKind_Return,
 	TokenKind_SeeAlso,
 	TokenKind_Internal,
 	TokenKind_Footnote,
@@ -82,9 +85,12 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP(TokenName)
 	AXL_LEX_TOKEN_NAME(TokenKind_Group,         "\\group")
 	AXL_LEX_TOKEN_NAME(TokenKind_InGroup,       "\\ingroup")
 	AXL_LEX_TOKEN_NAME(TokenKind_SubGroup,      "\\subgroup")
+	AXL_LEX_TOKEN_NAME(TokenKind_GroupOrder,    "\\grouporder")
 	AXL_LEX_TOKEN_NAME(TokenKind_Title,         "\\title")
 	AXL_LEX_TOKEN_NAME(TokenKind_Brief,         "\\brief")
 	AXL_LEX_TOKEN_NAME(TokenKind_Details,       "\\details")
+	AXL_LEX_TOKEN_NAME(TokenKind_Param,         "\\param")
+	AXL_LEX_TOKEN_NAME(TokenKind_Return,        "\\return")
 	AXL_LEX_TOKEN_NAME(TokenKind_SeeAlso,       "\\see")
 	AXL_LEX_TOKEN_NAME(TokenKind_Internal,      "\\internal")
 	AXL_LEX_TOKEN_NAME(TokenKind_Footnote,      "\\footnote")

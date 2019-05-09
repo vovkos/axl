@@ -45,6 +45,7 @@ Block::getDescriptionString()
 
 	m_briefDescription.trim();
 	m_detailedDescription.trim();
+	m_returnDescription.trim();
 	m_seeAlsoDescription.trim();
 
 	if (!m_briefDescription.isEmpty())
@@ -54,37 +55,62 @@ Block::getDescriptionString()
 		string.append("</para></briefdescription>\n");
 	}
 
-	if (!m_detailedDescription.isEmpty() ||
-		!m_seeAlsoDescription.isEmpty() ||
-		!m_internalDescription.isEmpty()
+	if (m_detailedDescription.isEmpty() &&
+		m_paramList.isEmpty() &&
+		m_returnDescription.isEmpty() &&
+		m_seeAlsoDescription.isEmpty() &&
+		m_internalDescription.isEmpty()
 		)
+		return string;
+
+	string.append("<detaileddescription>\n");
+
+	if (!m_detailedDescription.isEmpty())
 	{
-		string.append("<detaileddescription>\n");
-
-		if (!m_detailedDescription.isEmpty())
-		{
-			string.append("<para>");
-			appendXmlElementContents(&string, m_detailedDescription);
-			string.append("</para>\n");
-		}
-
-		if (!m_seeAlsoDescription.isEmpty())
-		{
-			string.append("<para><simplesect kind='see'><para>");
-			appendXmlElementContents(&string, m_seeAlsoDescription);
-			string.append("</para></simplesect></para>\n");
-		}
-
-		if (!m_internalDescription.isEmpty())
-		{
-			string.append("<internal><para>");
-			appendXmlElementContents(&string, m_internalDescription);
-			string.append("</para></internal>\n");
-		}
-
-		string.append("</detaileddescription>\n");
+		string.append("<para>");
+		appendXmlElementContents(&string, m_detailedDescription);
+		string.append("</para>\n");
 	}
 
+	if (!m_paramList.isEmpty())
+	{
+		string.append("<para><parameterlist kind=\"param\">\n");
+
+		sl::Iterator<Param> it = m_paramList.getHead();
+		for (; it; it++)
+		{
+			string.append("<parameteritem><parameternamelist><parametername>");
+			string.append(it->m_name);
+			string.append("</parametername></parameternamelist>\n<parameterdescription><para>");
+			appendXmlElementContents(&string, it->m_description);
+			string.append("</para></parameterdescription></parameteritem>\n");
+		}
+
+		string.append("</parameterlist></para>\n");
+	}
+
+	if (!m_returnDescription.isEmpty())
+	{
+		string.append("<para><simplesect kind='return'><para>");
+		appendXmlElementContents(&string, m_returnDescription);
+		string.append("</para></simplesect></para>\n");
+	}
+
+	if (!m_seeAlsoDescription.isEmpty())
+	{
+		string.append("<para><simplesect kind='see'><para>");
+		appendXmlElementContents(&string, m_seeAlsoDescription);
+		string.append("</para></simplesect></para>\n");
+	}
+
+	if (!m_internalDescription.isEmpty())
+	{
+		string.append("<internal><para>");
+		appendXmlElementContents(&string, m_internalDescription);
+		string.append("</para></internal>\n");
+	}
+
+	string.append("</detaileddescription>\n");
 	return string;
 }
 

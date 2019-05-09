@@ -153,6 +153,15 @@ Parser::addComment(
 		description = &m_block->m_briefDescription;
 		break;
 
+	case DescriptionKind_Param:
+		ASSERT(!m_block->m_paramList.isEmpty());
+		description = &m_block->m_paramList.getTail()->m_description;
+		break;
+
+	case DescriptionKind_Return:
+		description = &m_block->m_internalDescription;
+		break;
+
 	case DescriptionKind_SeeAlso:
 		description = &m_block->m_seeAlsoDescription;
 		break;
@@ -176,9 +185,10 @@ Parser::addComment(
 	{
 		const DoxyToken* token = lexer.getToken();
 		Footnote* footnote;
+		Param* param;
 		size_t i;
 
-		sl::StringRef param;
+		sl::StringRef commandParam;
 		bool isParentBlock = false;
 
 		switch (token->m_token)
@@ -209,8 +219,8 @@ Parser::addComment(
 		case TokenKind_Property:
 		case TokenKind_Event:
 		case TokenKind_Typedef:
-			param = lexer.getCommandParam();
-			if (param.isEmpty())
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
 				break; // ignore
 
 			if (m_blockTargetKind || m_block->getBlockKind() == BlockKind_Footnote) // create a new one
@@ -223,24 +233,24 @@ Parser::addComment(
 			if (isParentBlock)
 				m_parentBlock = m_block;
 
-			setBlockTarget((TokenKind)token->m_token, param);
+			setBlockTarget((TokenKind)token->m_token, commandParam);
 			lexer.nextToken();
 			break;
 
 		case TokenKind_Group:
-			param = lexer.getCommandParam();
-			if (param.isEmpty())
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
 				break; // ignore
 
-			i = param.findOneOf(" \t");
+			i = commandParam.findOneOf(" \t");
 			if (i == -1)
 			{
-				m_block = m_module->getGroup(param);
+				m_block = m_module->getGroup(commandParam);
 			}
 			else
 			{
-				Group* group = m_module->getGroup(param.getSubString(0, i));
-				group->m_title = param.getSubString(i + 1).getLeftTrimmedString();
+				Group* group = m_module->getGroup(commandParam.getSubString(0, i));
+				group->m_title = commandParam.getSubString(i + 1).getLeftTrimmedString();
 
 				m_block = group;
 			}
@@ -253,13 +263,13 @@ Parser::addComment(
 			break;
 
 		case TokenKind_InGroup:
-			param = lexer.getCommandParam();
-			if (param.isEmpty())
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
 				break; // ignore
 
 			if (!m_block->m_group)
 			{
-				Group* group = m_module->getGroup(param);
+				Group* group = m_module->getGroup(commandParam);
 				m_block->m_group = group;
 				if (m_block->getBlockKind() == BlockKind_Group)
 				{
@@ -287,20 +297,20 @@ Parser::addComment(
 			break;
 
 		case TokenKind_Title:
-			param = lexer.getCommandParam();
-			if (param.isEmpty())
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
 				break; // ignore
 
-			m_block->m_title = param;
+			m_block->m_title = commandParam;
 			lexer.nextToken();
 			break;
 
 		case TokenKind_Import:
-			param = lexer.getCommandParam();
-			if (param.isEmpty())
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
 				break; // ignore
 
-			m_block->m_importList.insertTail(param);
+			m_block->m_importList.insertTail(commandParam);
 			lexer.nextToken();
 			break;
 
@@ -308,9 +318,17 @@ Parser::addComment(
 			m_block->m_internalDescription += ":subgroup:";
 			break;
 
+		case TokenKind_GroupOrder:
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
+				break; // ignore
+
+			m_block->m_internalDescription += ":grouporder(" + commandParam + "):";
+			break;
+
 		case TokenKind_Footnote:
-			param = lexer.getCommandParam();
-			if (param.isEmpty())
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
 				break; // ignore
 
 			if (m_block->getBlockKind() == BlockKind_Footnote)
@@ -325,7 +343,7 @@ Parser::addComment(
 			}
 
 			footnote = m_module->createFootnote();
-			footnote->m_refId = param;
+			footnote->m_refId = commandParam;
 			footnote->m_parent = m_block;
 			footnote->m_parent->m_footnoteArray.append(footnote);
 
@@ -353,6 +371,35 @@ Parser::addComment(
 
 			break;
 
+		case TokenKind_Param:
+			commandParam = lexer.getCommandParam();
+			if (commandParam.isEmpty())
+				break; // ignore
+
+			param = AXL_MEM_NEW(Param);
+
+			i = commandParam.findOneOf(" \t");
+			if (i == -1)
+			{
+				param->m_name = commandParam;
+			}
+			else
+			{
+				param->m_name = commandParam.getSubString(0, i);
+				param->m_description = commandParam.getSubString(i + 1).getLeftTrimmedString();
+			}
+
+			m_block->m_paramList.insertTail(param);
+			m_descriptionKind = DescriptionKind_Param;
+			description = &param->m_description;
+			lexer.nextToken();
+			break;
+
+		case TokenKind_Return:
+			m_descriptionKind = DescriptionKind_Return;
+			description = &m_block->m_returnDescription;
+			break;
+
 		case TokenKind_SeeAlso:
 			m_descriptionKind = DescriptionKind_SeeAlso;
 			description = &m_block->m_seeAlsoDescription;
@@ -364,10 +411,10 @@ Parser::addComment(
 			break;
 
 		case TokenKind_CustomCommand:
-			param = lexer.getCommandParam();
-			host->processCustomCommand(token->m_data.m_string, param, m_block);
+			commandParam = lexer.getCommandParam();
+			host->processCustomCommand(token->m_data.m_string, commandParam, m_block);
 
-			if (!param.isEmpty())
+			if (!commandParam.isEmpty())
 				lexer.nextToken();
 			break;
 
@@ -407,7 +454,7 @@ Parser::addComment(
 		case '\n':
 			if (lastTokenLine != token->m_pos.m_line &&
 				m_descriptionKind &&
-				!description->isEmpty()) // empty line ends \brief or \seealso description
+				!description->isEmpty()) // empty line ends paragraph
 			{
 				m_descriptionKind = DescriptionKind_Detailed;
 				description = &m_block->m_detailedDescription;

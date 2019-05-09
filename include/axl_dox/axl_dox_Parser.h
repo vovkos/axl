@@ -33,6 +33,8 @@ protected:
 	{
 		DescriptionKind_Detailed = 0,
 		DescriptionKind_Brief,
+		DescriptionKind_Param,
+		DescriptionKind_Return,
 		DescriptionKind_SeeAlso,
 		DescriptionKind_Internal,
 	};
