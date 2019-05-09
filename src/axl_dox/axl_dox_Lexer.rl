@@ -47,50 +47,55 @@ rc = [^ \t\r\n\\];
 
 main := |*
 
-'\\headerfile'    { createToken(TokenKind_Import); };
-'\\importfile'    { createToken(TokenKind_Import); };
-'\\import'        { createToken(TokenKind_Import); };
-'\\enum'          { createToken(TokenKind_Enum); };
-'\\enumvalue'     { createToken(TokenKind_EnumValue); };
-'\\struct'        { createToken(TokenKind_Struct); };
-'\\union'         { createToken(TokenKind_Union); };
-'\\class'         { createToken(TokenKind_Class); };
-'\\alias'         { createToken(TokenKind_Alias); };
-'\\var'           { createToken(TokenKind_Variable); };
-'\\variable'      { createToken(TokenKind_Variable); };
-'\\field'         { createToken(TokenKind_Field); };
-'\\fn'            { createToken(TokenKind_Function); };
-'\\function'      { createToken(TokenKind_Function); };
-'\\method'        { createToken(TokenKind_Function); };
-'\\overload'      { createToken(TokenKind_Overload); };
-'\\prop'          { createToken(TokenKind_Property); };
-'\\property'      { createToken(TokenKind_Property); };
-'\\event'         { createToken(TokenKind_Event); };
-'\\typedef'       { createToken(TokenKind_Typedef); };
-'\\namespace'     { createToken(TokenKind_Namespace); };
-'\\group'         { createToken(TokenKind_Group); };
-'\\defgroup'      { createToken(TokenKind_Group); };
-'\\addtogroup'    { createToken(TokenKind_Group); };
-'\\ingroup'       { createToken(TokenKind_InGroup); };
-'\\subgroup'      { createToken(TokenKind_SubGroup); };
-'\\title'         { createToken(TokenKind_Title); };
-'\\brief'         { createToken(TokenKind_Brief); };
-'\\details'       { createToken(TokenKind_Details); };
-'\\see'           { createToken(TokenKind_SeeAlso); };
-'\\seealso'       { createToken(TokenKind_SeeAlso); };
-'\\sa'            { createToken(TokenKind_SeeAlso); };
-'\\internal'      { createToken(TokenKind_Internal); };
-'\\footnote'      { createToken(TokenKind_Footnote); };
+[@\\] 'headerfile' { createToken(TokenKind_Import); };
+[@\\] 'importfile' { createToken(TokenKind_Import); };
+[@\\] 'import'     { createToken(TokenKind_Import); };
+[@\\] 'enum'       { createToken(TokenKind_Enum); };
+[@\\] 'enumvalue'  { createToken(TokenKind_EnumValue); };
+[@\\] 'struct'     { createToken(TokenKind_Struct); };
+[@\\] 'union'      { createToken(TokenKind_Union); };
+[@\\] 'class'      { createToken(TokenKind_Class); };
+[@\\] 'alias'      { createToken(TokenKind_Alias); };
+[@\\] 'var'        { createToken(TokenKind_Variable); };
+[@\\] 'variable'   { createToken(TokenKind_Variable); };
+[@\\] 'field'      { createToken(TokenKind_Field); };
+[@\\] 'fn'         { createToken(TokenKind_Function); };
+[@\\] 'function'   { createToken(TokenKind_Function); };
+[@\\] 'method'     { createToken(TokenKind_Function); };
+[@\\] 'overload'   { createToken(TokenKind_Overload); };
+[@\\] 'prop'       { createToken(TokenKind_Property); };
+[@\\] 'property'   { createToken(TokenKind_Property); };
+[@\\] 'event'      { createToken(TokenKind_Event); };
+[@\\] 'typedef'    { createToken(TokenKind_Typedef); };
+[@\\] 'namespace'  { createToken(TokenKind_Namespace); };
+[@\\] 'group'      { createToken(TokenKind_Group); };
+[@\\] 'defgroup'   { createToken(TokenKind_Group); };
+[@\\] 'addtogroup' { createToken(TokenKind_Group); };
+[@\\] 'ingroup'    { createToken(TokenKind_InGroup); };
+[@\\] 'subgroup'   { createToken(TokenKind_SubGroup); };
+[@\\] 'grouporder' { createToken(TokenKind_GroupOrder); };
+[@\\] 'title'      { createToken(TokenKind_Title); };
+[@\\] 'brief'      { createToken(TokenKind_Brief); };
+[@\\] 'details'    { createToken(TokenKind_Details); };
+[@\\] 'param'      { createToken(TokenKind_Param); };
+[@\\] 'result'     { createToken(TokenKind_Return); };
+[@\\] 'return'     { createToken(TokenKind_Return); };
+[@\\] 'returns'    { createToken(TokenKind_Return); };
+[@\\] 'see'        { createToken(TokenKind_SeeAlso); };
+[@\\] 'seealso'    { createToken(TokenKind_SeeAlso); };
+[@\\] 'sa'         { createToken(TokenKind_SeeAlso); };
+[@\\] 'internal'   { createToken(TokenKind_Internal); };
+[@\\] 'footnote'   { createToken(TokenKind_Footnote); };
 
-'\\' rc*          { createTextToken(TokenKind_CustomCommand, 1); };
+[@\\] rc*          { createTextToken(TokenKind_CustomCommand, 1); };
 
-'@{'              { createToken(TokenKind_OpeningBrace); };
-'@}'              { createToken(TokenKind_ClosingBrace); };
+'@{'               { createToken(TokenKind_OpeningBrace); };
+'@}'               { createToken(TokenKind_ClosingBrace); };
 
-rc ([^\n]* nws)?  { createTextToken(TokenKind_Text); };
+rc ([^\n]* nws)?   { createTextToken(TokenKind_Text); };
 
-'\n' ws?          { createNewLineToken(), newLine(ts + 1); };
-ws                ;
+'\n' ws?           { createNewLineToken(), newLine(ts + 1); };
+ws                 ;
 
 *|;
 
