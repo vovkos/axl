@@ -98,7 +98,7 @@ LuaStringTemplate::createEmitCall(
 	const sl::StringRef& value
 	)
 {
-	script->append("emit (");
+	script->append("emit(");
 	script->append(value);
 	script->append(");");
 }

@@ -53,9 +53,13 @@ struct BlockData
 	sl::String m_seeAlsoDescription;
 	sl::String m_internalDescription;
 	sl::String m_returnDescription;
+	sl::String* m_currentDescription;
+
 	sl::List<Param> m_paramList;
 	sl::BoxList<sl::String> m_importList;
 	sl::Array<Block*> m_footnoteArray;
+
+	BlockData();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

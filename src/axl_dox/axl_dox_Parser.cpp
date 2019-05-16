@@ -26,7 +26,6 @@ Parser::init()
 	m_block = NULL;
 	m_parentBlock = NULL;
 	m_blockTargetKind = BlockTargetKind_None;
-	m_descriptionKind = DescriptionKind_Detailed;
 	m_overloadIdx = 0;
 	m_lastPos.clear();
 }
@@ -94,7 +93,6 @@ Parser::popBlock()
 
 	m_block = NULL;
 	m_blockTargetKind = BlockTargetKind_None;
-	m_descriptionKind = DescriptionKind_Detailed;
 
 	if (!m_groupStack.isEmpty())
 	{
@@ -129,7 +127,6 @@ Parser::addComment(
 	{
 		m_block = m_module->createBlock();
 		m_blockTargetKind = BlockTargetKind_None;
-		m_descriptionKind = DescriptionKind_Detailed;
 	}
 
 	if (!m_block->m_source.isEmpty())
@@ -146,35 +143,6 @@ Parser::addComment(
 		m_blockTargetKind = BlockTargetKind_Member;
 	}
 
-	sl::String* description;
-	switch (m_descriptionKind)
-	{
-	case DescriptionKind_Brief:
-		description = &m_block->m_briefDescription;
-		break;
-
-	case DescriptionKind_Param:
-		ASSERT(!m_block->m_paramList.isEmpty());
-		description = &m_block->m_paramList.getTail()->m_description;
-		break;
-
-	case DescriptionKind_Return:
-		description = &m_block->m_internalDescription;
-		break;
-
-	case DescriptionKind_SeeAlso:
-		description = &m_block->m_seeAlsoDescription;
-		break;
-
-	case DescriptionKind_Internal:
-		description = &m_block->m_internalDescription;
-		break;
-
-	case DescriptionKind_Detailed:
-	default:
-		description = &m_block->m_detailedDescription;
-	}
-
 	Lexer lexer;
 	lexer.create("doxy", comment);
 	lexer.setLineCol(pos);
@@ -187,6 +155,7 @@ Parser::addComment(
 		Footnote* footnote;
 		Param* param;
 		size_t i;
+		bool isParamUsed;
 
 		sl::StringRef commandParam;
 		bool isParentBlock = false;
@@ -196,7 +165,6 @@ Parser::addComment(
 		case TokenKind_Error:
 			m_block = NULL;
 			m_blockTargetKind = BlockTargetKind_None;
-			m_descriptionKind = DescriptionKind_Detailed;
 			return;
 
 		case TokenKind_Eof:
@@ -224,11 +192,7 @@ Parser::addComment(
 				break; // ignore
 
 			if (m_blockTargetKind || m_block->getBlockKind() == BlockKind_Footnote) // create a new one
-			{
 				m_block = m_module->createBlock();
-				m_descriptionKind = DescriptionKind_Detailed;
-				description = &m_block->m_detailedDescription;
-			}
 
 			if (isParentBlock)
 				m_parentBlock = m_block;
@@ -257,8 +221,7 @@ Parser::addComment(
 
 			m_parentBlock = m_block;
 			m_blockTargetKind = BlockTargetKind_Compound;
-			m_descriptionKind = DescriptionKind_Detailed;
-			description = &m_block->m_detailedDescription;
+			m_block->m_currentDescription = &m_block->m_detailedDescription;
 			lexer.nextToken();
 			break;
 
@@ -315,7 +278,7 @@ Parser::addComment(
 			break;
 
 		case TokenKind_SubGroup:
-			m_block->m_internalDescription += ":subgroup:";
+			m_block->m_internalDescription += "%subgroup%";
 			break;
 
 		case TokenKind_GroupOrder:
@@ -323,7 +286,7 @@ Parser::addComment(
 			if (commandParam.isEmpty())
 				break; // ignore
 
-			m_block->m_internalDescription += ":grouporder(" + commandParam + "):";
+			m_block->m_internalDescription += "%grouporder(" + commandParam + ")";
 			lexer.nextToken();
 			break;
 
@@ -337,7 +300,7 @@ Parser::addComment(
 				m_block = ((Footnote*)m_block)->getParent();
 				ASSERT(m_block->getBlockKind() != BlockKind_Footnote);
 			}
-			else if (description->isEmpty() && m_parentBlock)
+			else if (m_block->m_currentDescription->isEmpty() && m_parentBlock)
 			{
 				// standalone footnotes go to the parent block
 				m_block = m_parentBlock;
@@ -349,26 +312,22 @@ Parser::addComment(
 			footnote->m_parent->m_footnoteArray.append(footnote);
 
 			m_block = footnote;
-			m_descriptionKind = DescriptionKind_Detailed;
-			description = &m_block->m_detailedDescription;
 			lexer.nextToken();
 			break;
 
 		case TokenKind_Brief:
-			m_descriptionKind = DescriptionKind_Brief;
-			description = &m_block->m_briefDescription;
+			m_block->m_currentDescription = &m_block->m_briefDescription;
 
-			if (!description->isEmpty())
-				description->append('\n');
+			if (!m_block->m_currentDescription->isEmpty())
+				m_block->m_currentDescription->append('\n');
 
 			break;
 
 		case TokenKind_Details:
-			m_descriptionKind = DescriptionKind_Detailed;
-			description = &m_block->m_briefDescription;
+			m_block->m_currentDescription = &m_block->m_detailedDescription;
 
-			if (!description->isEmpty())
-				description->append('\n');
+			if (!m_block->m_currentDescription->isEmpty())
+				m_block->m_currentDescription->append('\n');
 
 			break;
 
@@ -391,38 +350,34 @@ Parser::addComment(
 			}
 
 			m_block->m_paramList.insertTail(param);
-			m_descriptionKind = DescriptionKind_Param;
-			description = &param->m_description;
+			m_block->m_currentDescription = &param->m_description;
 			lexer.nextToken();
 			break;
 
 		case TokenKind_Return:
-			m_descriptionKind = DescriptionKind_Return;
-			description = &m_block->m_returnDescription;
+			m_block->m_currentDescription = &m_block->m_returnDescription;
 			break;
 
 		case TokenKind_SeeAlso:
-			m_descriptionKind = DescriptionKind_SeeAlso;
-			description = &m_block->m_seeAlsoDescription;
+			m_block->m_currentDescription = &m_block->m_seeAlsoDescription;
 			break;
 
 		case TokenKind_Internal:
-			m_descriptionKind = DescriptionKind_Internal;
-			description = &m_block->m_internalDescription;
+			m_block->m_currentDescription = &m_block->m_internalDescription;
 			break;
 
 		case TokenKind_CustomCommand:
 			commandParam = lexer.getCommandParam();
-			host->processCustomCommand(token->m_data.m_string, commandParam, m_block);
+			isParamUsed = host->processCustomCommand(token->m_data.m_string, commandParam, m_block);
 
-			if (!commandParam.isEmpty())
+			if (!commandParam.isEmpty() && isParamUsed)
 				lexer.nextToken();
 			break;
 
 		case TokenKind_Text:
-			if (description->isEmpty())
+			if (m_block->m_currentDescription->isEmpty())
 			{
-				description->copy(token->m_data.m_string.getLeftTrimmedString());
+				m_block->m_currentDescription->copy(token->m_data.m_string.getLeftTrimmedString());
 				m_firstIndent = m_indent;
 			}
 			else
@@ -439,30 +394,30 @@ Parser::addComment(
 							break;
 
 					if (i < indentLength)
-						description->append(m_indent.sz() + i, indentLength - i);
+						m_block->m_currentDescription->append(m_indent.sz() + i, indentLength - i);
 
 					m_indent.clear(); // do this once per line
 				}
 
-				if (!description->isEmpty() && !isspace(description->getEnd()[-1]))
-					description->append(' ');
+				if (!m_block->m_currentDescription->isEmpty() &&
+					!isspace(m_block->m_currentDescription->getEnd()[-1]))
+					m_block->m_currentDescription->append(' ');
 
-				description->append(token->m_data.m_string);
+				m_block->m_currentDescription->append(token->m_data.m_string);
 			}
 
 			break;
 
 		case '\n':
 			if (lastTokenLine != token->m_pos.m_line &&
-				m_descriptionKind &&
-				!description->isEmpty()) // empty line ends paragraph
+				m_block->m_currentDescription != &m_block->m_detailedDescription &&
+				!m_block->m_currentDescription->isEmpty()) // empty line ends paragraph
 			{
-				m_descriptionKind = DescriptionKind_Detailed;
-				description = &m_block->m_detailedDescription;
+				m_block->m_currentDescription = &m_block->m_detailedDescription;
 			}
-			else if (!description->isEmpty())
+			else if (!m_block->m_currentDescription->isEmpty())
 			{
-				description->append('\n');
+				m_block->m_currentDescription->append('\n');
 			}
 
 			m_indent = token->m_data.m_string;

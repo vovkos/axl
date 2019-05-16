@@ -65,7 +65,7 @@ protected:
 		size_t length
 		)
 	{
-		script->appendFormat("passthrough (%d, %d);", offset, length);
+		script->appendFormat("passthrough(%d, %d);", offset, length);
 	}
 
 	void

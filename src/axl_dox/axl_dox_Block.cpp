@@ -19,11 +19,18 @@ namespace dox {
 
 //..............................................................................
 
+BlockData::BlockData()
+{
+	m_blockKind = BlockKind_Normal;
+	m_currentDescription = &m_detailedDescription;
+	m_group = NULL;
+}
+
+//..............................................................................
+
 Block::Block(Host* host)
 {
 	m_host = host;
-	m_blockKind = BlockKind_Normal;
-	m_group = NULL;
 	m_item = NULL;
 }
 

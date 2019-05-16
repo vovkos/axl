@@ -29,16 +29,6 @@ protected:
 		Group* m_group;
 	};
 
-	enum DescriptionKind
-	{
-		DescriptionKind_Detailed = 0,
-		DescriptionKind_Brief,
-		DescriptionKind_Param,
-		DescriptionKind_Return,
-		DescriptionKind_SeeAlso,
-		DescriptionKind_Internal,
-	};
-
 	enum BlockTargetKind
 	{
 		BlockTargetKind_None = 0,
@@ -52,7 +42,6 @@ protected:
 	Block* m_parentBlock;
 	sl::Array<GroupStackEntry> m_groupStack;
 	BlockTargetKind m_blockTargetKind;
-	DescriptionKind m_descriptionKind;
 	sl::String m_firstIndent;
 	sl::String m_indent;
 	sl::String m_overloadName;

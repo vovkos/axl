@@ -94,7 +94,6 @@ AXL_LEX_BEGIN_TOKEN_NAME_MAP(TokenName)
 	AXL_LEX_TOKEN_NAME(TokenKind_SeeAlso,       "\\see")
 	AXL_LEX_TOKEN_NAME(TokenKind_Internal,      "\\internal")
 	AXL_LEX_TOKEN_NAME(TokenKind_Footnote,      "\\footnote")
-
 AXL_LEX_END_TOKEN_NAME_MAP();
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

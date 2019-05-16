@@ -62,14 +62,17 @@ struct Host
 		sl::String* indexXml
 		) = 0;
 
+	// return true if param was used
+
 	virtual
-	void
+	bool
 	processCustomCommand(
 		const sl::StringRef& command,
 		const sl::StringRef& param,
 		BlockData* block
 		)
 	{
+		return false;
 	}
 };
 
