@@ -278,7 +278,7 @@ Parser::addComment(
 			break;
 
 		case TokenKind_SubGroup:
-			m_block->m_internalDescription += "%subgroup%";
+			m_block->m_internalDescription += ":subgroup:";
 			break;
 
 		case TokenKind_GroupOrder:
@@ -286,7 +286,7 @@ Parser::addComment(
 			if (commandParam.isEmpty())
 				break; // ignore
 
-			m_block->m_internalDescription += "%grouporder(" + commandParam + ")";
+			m_block->m_internalDescription += ":grouporder(" + commandParam + ")";
 			lexer.nextToken();
 			break;
 
