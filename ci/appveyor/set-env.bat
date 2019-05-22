@@ -17,6 +17,7 @@ if "%1" == "" goto :finalize
 if /i "%1" == "msvc10" goto :msvc10
 if /i "%1" == "msvc12" goto :msvc12
 if /i "%1" == "msvc14" goto :msvc14
+if /i "%1" == "msvc15" goto :msvc15
 if /i "%1" == "x86" goto :x86
 if /i "%1" == "i386" goto :x86
 if /i "%1" == "amd64" goto :amd64
@@ -48,6 +49,13 @@ goto :loop
 set TOOLCHAIN=msvc14
 set CMAKE_GENERATOR=Visual Studio 14 2015
 set LUA_TOOLCHAIN=dll14
+shift
+goto :loop
+
+:msvc15
+set TOOLCHAIN=msvc15
+set CMAKE_GENERATOR=Visual Studio 15 2017
+set LUA_TOOLCHAIN=dll15
 shift
 goto :loop
 
