@@ -385,7 +385,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize
+		size_t* takenSize = NULL
 		)
 	{
 		return AsciiToUtfConvert<Utf8>::convert(
@@ -791,7 +791,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL
+		size_t* takenSize
 		);
 
 	size_t
@@ -801,7 +801,7 @@ public:
 		size_t bufferLength,
 		const void* p,
 		size_t size,
-		size_t* takenSize = NULL
+		size_t* takenSize
 		);
 
 protected:
