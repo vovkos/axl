@@ -43,9 +43,11 @@ lit_sq = "'" ([^'\n\\] | esc)* (['\\] | nl);
 
 user_data := |*
 
-[(){}]       { createToken (ts [0]); };
-nl           ;
-any          ;
+[(){}]        { createToken (ts [0]); };
+lit_dq        ;
+lit_sq        ;
+nl            ;
+any           ;
 
 *|;
 
@@ -55,6 +57,8 @@ user_code := |*
 
 '{'           { createToken ('{'); };
 '}' (ws* nl)? { createToken ('}'); };
+lit_dq        ;
+lit_sq        ;
 nl            ;
 any           ;
 
@@ -64,12 +68,12 @@ any           ;
 
 main := |*
 
-'%{'         { createToken (TokenKind_OpenCode); };
-'${'         { createToken (TokenKind_OpenData_c); };
-'$('         { createToken (TokenKind_OpenData_r); };
-'$' id       { createStringToken (TokenKind_Data, 1); };
-nl           ;
-any          ;
+'%{'          { createToken (TokenKind_OpenCode); };
+'${'          { createToken (TokenKind_OpenData_c); };
+'$('          { createToken (TokenKind_OpenData_r); };
+'$' id        { createStringToken (TokenKind_Data, 1); };
+nl            ;
+any           ;
 
 *|;
 
