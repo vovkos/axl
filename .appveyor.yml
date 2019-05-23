@@ -49,7 +49,6 @@ matrix:
         -   image: Visual Studio 2017
             TOOLCHAIN: msvc14
 
-
 install:
     - call ci\appveyor\set-env.bat %TOOLCHAIN% %PLATFORM%
     - call ci\appveyor\install.bat
