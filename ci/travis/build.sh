@@ -13,9 +13,23 @@ THIS_DIR=`pwd`
 
 mkdir build
 pushd build
-cmake .. -DTARGET_CPU=$TARGET_CPU -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
-make
-ctest --output-on-failure
+
+if [ $TRAVIS_OS_NAME == "windows" ]; then
+	CMAKE_GENERATOR="Visual Studio 15 2017"
+
+	if [ $TARGET_CPU == "amd64" ]; then
+		CMAKE_GENERATOR="$CMAKE_GENERATOR Win64"
+	fi
+
+	cmake .. -G "$CMAKE_GENERATOR"
+	cmake --build . --config $BUILD_CONFIGURATION
+	ctest -C $BUILD_CONFIGURATION --output-on-failure
+else
+	cmake .. -DTARGET_CPU=$TARGET_CPU -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
+	make
+	ctest --output-on-failure
+fi
+
 popd
 
 if [ "$GET_COVERAGE" != "" ]; then
