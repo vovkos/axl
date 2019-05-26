@@ -22,14 +22,7 @@ if [ $TRAVIS_OS_NAME == "windows" ]; then
 	fi
 
 	cmake .. -G "$CMAKE_GENERATOR"
-
-	echo "CMAKE_GENERATOR: $CMAKE_GENERATOR"
-	echo +++++++++++++
-
 	cmake --build . --config $BUILD_CONFIGURATION
-
-	echo -------------
-
 	ctest -C $BUILD_CONFIGURATION --output-on-failure
 else
 	cmake .. -DTARGET_CPU=$TARGET_CPU -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION

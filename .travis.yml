@@ -14,7 +14,6 @@ sudo:     required
 language: cpp
 
 os:
-    - windows
     - linux
     - osx
 
@@ -36,9 +35,6 @@ matrix:
     exclude:
         - os:       osx
           compiler: gcc
-
-        - os:       windows
-          compiler: clang
 
         - os:  osx
           env: TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
