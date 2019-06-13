@@ -72,7 +72,7 @@ protected:
 	volatile int32_t m_refCount;
 	volatile int32_t m_weakRefCount;
 	uint_t m_parentOffset;
-	uint_t m_flags;
+	uint_t m_refCountFlags;
 
 public:
 	RefCount();
@@ -102,9 +102,9 @@ public:
 	}
 
 	uint_t
-	getFlags()
+	getRefCountFlags()
 	{
-		return m_flags;
+		return m_refCountFlags;
 	}
 
 	size_t
@@ -137,7 +137,7 @@ RefCount::RefCount()
 	m_refCount = 0;
 	m_weakRefCount = 1;
 	m_parentOffset = 0;
-	m_flags = 0;
+	m_refCountFlags = 0;
 }
 
 inline
@@ -160,7 +160,7 @@ RefCount::prime(
 		parent->addWeakRef();
 	}
 
-	m_flags = flags;
+	m_refCountFlags = flags;
 }
 
 inline
@@ -185,7 +185,7 @@ RefCount::weakRelease()
 	intptr_t refCount = sys::atomicDec(&m_weakRefCount);
 
 	if (!refCount)
-		if (m_flags & RefCountFlag_Allocated)
+		if (m_refCountFlags & RefCountFlag_Allocated)
 		{
 			RefCountAllocHdr* hdr = (RefCountAllocHdr*)this - 1;
 			hdr->m_freeFunc(hdr);

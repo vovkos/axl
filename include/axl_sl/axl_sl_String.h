@@ -1208,7 +1208,7 @@ public:
 		}
 
 		ref::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getFlags() & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated())
+		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated())
 		{
 			copy(src.cp(), src.getLength());
 			src.release();
@@ -1233,7 +1233,7 @@ public:
 		}
 
 		ref::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getFlags() & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated())
+		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated())
 			return copy(src.cp(), src.getLength());
 
 		this->attach(src);

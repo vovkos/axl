@@ -483,7 +483,7 @@ public:
 		}
 
 		Hdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getFlags() & ref::BufHdrFlag_Exclusive))
+		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive))
 		{
 			copy(src, src.getCount());
 			src.release();
@@ -508,7 +508,7 @@ public:
 		}
 
 		Hdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getFlags() & ref::BufHdrFlag_Exclusive))
+		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive))
 			return copy(src, src.getCount());
 
 		this->attach(src);
