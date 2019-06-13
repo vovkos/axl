@@ -32,20 +32,19 @@ HexEncoding::encode(
 	}
 
 	const uchar_t* src = (const uchar_t*) p;
-	const uchar_t* srcEnd = src + size;
 
 	size_t length;
-	if ((flags & Flag_NoSpace))
+	if ((flags & HexEncodingFlag_NoSpace))
 	{
 		length = size * 2;
 		char* dst = string->createBuffer(length);
 		if (!dst)
 			return -1;
 
-		if (flags & Flag_UpperCase)
-			encode_nsu(dst, src, srcEnd);
+		if (flags & HexEncodingFlag_UpperCase)
+			encodeImpl<GetHexChar_u, InsertNoSpace>(dst, src, size);
 		else
-			encode_nsl(dst, src, srcEnd);
+			encodeImpl<GetHexChar_l, InsertNoSpace>(dst, src, size);
 	}
 	else
 	{
@@ -54,87 +53,19 @@ HexEncoding::encode(
 		if (!dst)
 			return -1;
 
-		if (flags & Flag_UpperCase)
-			encode_u(dst, src, srcEnd);
+		if (flags & HexEncodingFlag_Multiline)
+			if (flags & HexEncodingFlag_UpperCase)
+				encodeImpl<GetHexChar_u, InsertSpaceMultiline>(dst, src, size);
+			else
+				encodeImpl<GetHexChar_l, InsertSpaceMultiline>(dst, src, size);
 		else
-			encode_l(dst, src, srcEnd);
+			if (flags & HexEncodingFlag_UpperCase)
+				encodeImpl<GetHexChar_u, InsertSpace>(dst, src, size);
+			else
+				encodeImpl<GetHexChar_l, InsertSpace>(dst, src, size);
 	}
 
 	return length;
-}
-
-void
-HexEncoding::encode_l(
-	char* dst,
-	const uchar_t* src,
-	const uchar_t* srcEnd
-	)
-{
-	uchar_t x = *src;
-	*dst++ = getHexChar_l(x >> 4);
-	*dst++ = getHexChar_l(x);
-
-	for (src++; src < srcEnd; src++)
-	{
-		uchar_t x = *src;
-
-		*dst++ = ' ';
-		*dst++ = getHexChar_l(x >> 4);
-		*dst++ = getHexChar_l(x);
-	}
-}
-
-void
-HexEncoding::encode_u(
-	char* dst,
-	const uchar_t* src,
-	const uchar_t* srcEnd
-	)
-{
-	uchar_t x = *src;
-	*dst++ = getHexChar_u(x >> 4);
-	*dst++ = getHexChar_u(x);
-
-	for (src++; src < srcEnd; src++)
-	{
-		uchar_t x = *src;
-
-		*dst++ = ' ';
-		*dst++ = getHexChar_u(x >> 4);
-		*dst++ = getHexChar_u(x);
-	}
-}
-
-void
-HexEncoding::encode_nsl(
-	char* dst,
-	const uchar_t* src,
-	const uchar_t* srcEnd
-	)
-{
-	for (; src < srcEnd; src++)
-	{
-		uchar_t x = *src;
-
-		*dst++ = getHexChar_l(x >> 4);
-		*dst++ = getHexChar_l(x);
-	}
-}
-
-void
-HexEncoding::encode_nsu(
-	char* dst,
-	const uchar_t* src,
-	const uchar_t* srcEnd
-	)
-{
-	for (; src < srcEnd; src++)
-	{
-		uchar_t x = *src;
-
-		*dst++ = getHexChar_u(x >> 4);
-		*dst++ = getHexChar_u(x);
-	}
 }
 
 size_t

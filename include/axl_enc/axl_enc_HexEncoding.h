@@ -21,13 +21,79 @@ namespace enc {
 
 //..............................................................................
 
+enum HexEncodingFlag
+{
+	HexEncodingFlag_UpperCase = 1,
+	HexEncodingFlag_NoSpace   = 2,
+	HexEncodingFlag_Multiline = 4,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class HexEncoding
 {
-public:
-	enum Flag
+protected:
+	class GetHexChar_l
 	{
-		Flag_UpperCase = 1,
-		Flag_NoSpace   = 2,
+	public:
+		char
+		operator () (uchar_t x)
+		{
+			static char charTable[] = "0123456789abcdef";
+			return charTable[x & 0xf];
+		}
+	};
+
+	class GetHexChar_u
+	{
+	public:
+		char
+		operator () (uchar_t x)
+		{
+			static char charTable[] = "0123456789ABCDEF";
+			return charTable[x & 0xf];
+		}
+	};
+
+	class InsertNoSpace
+	{
+	public:
+		size_t
+		operator () (
+			char* p,
+			size_t i
+			)
+		{
+			return 0;
+		}
+	};
+
+	class InsertSpace
+	{
+	public:
+		size_t
+		operator () (
+			char* p,
+			size_t i
+			)
+		{
+			*p = ' ';
+			return 1;
+		}
+	};
+
+	class InsertSpaceMultiline
+	{
+	public:
+		size_t
+		operator () (
+			char* p,
+			size_t i
+			)
+		{
+			*p = (i & 0xf) ? ' ' : '\n';
+			return 1;
+		}
 	};
 
 public:
@@ -35,16 +101,14 @@ public:
 	char
 	getHexChar_l(uchar_t x)
 	{
-		static char charTable[] = "0123456789abcdef";
-		return charTable[x & 0xf];
+		return GetHexChar_l()(x);
 	}
 
 	static
 	char
 	getHexChar_u(uchar_t x)
 	{
-		static char charTable[] = "0123456789ABCDEF";
-		return charTable[x & 0xf];
+		return GetHexChar_u()(x);
 	}
 
 	static
@@ -96,37 +160,31 @@ public:
 	}
 
 protected:
+	template <
+		typename GetHexChar,
+		typename InsertSpace
+		>
 	static
 	void
-	encode_l(
+	encodeImpl(
 		char* dst,
 		const uchar_t* src,
-		const uchar_t* srcEnd
-		);
+		size_t size
+		)
+	{
+		uchar_t x = src[0];
+		*dst++ = GetHexChar()(x >> 4);
+		*dst++ = GetHexChar()(x);
 
-	static
-	void
-	encode_u(
-		char* dst,
-		const uchar_t* src,
-		const uchar_t* srcEnd
-		);
+		for (size_t i = 1; i < size; i++)
+		{
+			dst += InsertSpace()(dst, i);
 
-	static
-	void
-	encode_nsl(
-		char* dst,
-		const uchar_t* src,
-		const uchar_t* srcEnd
-		);
-
-	static
-	void
-	encode_nsu(
-		char* dst,
-		const uchar_t* src,
-		const uchar_t* srcEnd
-		);
+			uchar_t x = src[i];
+			*dst++ = GetHexChar()(x >> 4);
+			*dst++ = GetHexChar()(x);
+		}
+	}
 };
 
 //..............................................................................
