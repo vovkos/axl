@@ -94,10 +94,10 @@ WidgetDriver::updateScrollBars(uint_t mask)
 {
 	bool result = true;
 
-	if (mask & Orientation_Vertical)
+	if (mask & (1 << Orientation_Vertical))
 		result = updateScrollBar(Orientation_Vertical);
 
-	if (mask & Orientation_Horizontal)
+	if (mask & (1 << Orientation_Horizontal))
 		result = updateScrollBar(Orientation_Horizontal) || result;
 
 	return true;
