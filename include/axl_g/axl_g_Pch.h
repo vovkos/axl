@@ -314,6 +314,7 @@ typedef wchar_t           utf32_t;
 #	define _snprintf   snprintf
 #	define _snwprintf  swprintf
 #	define _alloca     alloca
+#	define _atoi64     atoll
 #	define _strtoi64   strtoll
 #	define _strtoui64  strtoull
 
