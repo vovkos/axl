@@ -770,6 +770,8 @@ public:
 		size_t count = 1
 		)
 	{
+		bool result;
+
 		if (count == 0)
 			return this->m_count;
 
@@ -777,12 +779,13 @@ public:
 		if (index >= oldCount)
 			return this->m_count;
 
-		if (count == -1)
-			count = oldCount - index;
-		else if (index + count >= oldCount)
-			return setCount(index);
+		if (count == -1 || index + count >= oldCount)
+		{
+			result = setCount(index);
+			return result ? index : -1;
+		}
 
-		bool result = ensureExclusive();
+		result = ensureExclusive();
 		if (!result)
 			return -1;
 

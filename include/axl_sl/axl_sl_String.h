@@ -1606,7 +1606,7 @@ public:
 		if (index >= oldLength)
 			return this->m_length;
 
-		if (index + count >= oldLength)
+		if (count == -1 || index + count >= oldLength)
 		{
 			result = setReducedLength(index);
 			return result ? index : -1;
