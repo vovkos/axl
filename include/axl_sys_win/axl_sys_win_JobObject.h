@@ -26,6 +26,12 @@ class JobObject: public sl::Handle<HANDLE, CloseHandle, sl::Zero<HANDLE> >
 {
 public:
 	bool
+	create()
+	{
+		return create(NULL, NULL);
+	}
+
+	bool
 	create(
 		SECURITY_ATTRIBUTES* secAttr,
 		const sl::StringRef_w& name
