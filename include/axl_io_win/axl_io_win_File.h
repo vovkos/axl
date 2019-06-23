@@ -219,6 +219,13 @@ public:
 
 	size_t
 	getOverlappedResult(OVERLAPPED* overlapped) const;
+
+	bool
+	cancelIo(OVERLAPPED* overlapped)
+	{
+		bool_t result = ::CancelIo(m_h);
+		return err::complete(result);
+	}
 };
 
 //..............................................................................
