@@ -284,6 +284,14 @@ public:
 		return result;
 	}
 
+	String
+	operator + (utf32_t c) const
+	{
+		String result = *this;
+		result.append(c);
+		return result;
+	}
+
 	const C&
 	operator [] (intptr_t i) const
 	{
@@ -2114,7 +2122,7 @@ public:
 
 //..............................................................................
 
-// to support string-literal + axl::sl::String
+// to support literal + axl::sl::String
 
 template <typename C>
 StringBase<C>
@@ -2136,6 +2144,18 @@ operator + (
 	)
 {
 	StringBase<C> string(p);
+	string += src;
+	return string;
+}
+
+template <typename C>
+StringBase<C>
+operator + (
+	utf32_t c,
+	const StringRefBase<C>& src
+	)
+{
+	StringBase<C> string(c);
 	string += src;
 	return string;
 }
