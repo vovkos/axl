@@ -1,5 +1,14 @@
-﻿pre { font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important; }
-code { font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important; }
+﻿code { font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important; }
+
+pre {
+	font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important;
+	border: 1px solid #ccc !important;
+	background-color: #fff !important;
+}
+
+div[class^="highlight"] {
+	border: none !important;
+}
 
 code a { color:#000000 !important; text-decoration: underline !important }
 code a:visited:hover { color: #3091d1 !important }

@@ -1,2 +1,7 @@
-pre { font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important }
 code { font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important }
+
+pre {
+	font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important
+	border: 1px solid #ccc !important;
+	background-color: #fff !important;
+}
