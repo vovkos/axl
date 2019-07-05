@@ -1,0 +1,28 @@
+#include <spawn.h>
+
+__asm__(".symver posix_spawn,  posix_spawn@GLIBC_2.2.5");
+__asm__(".symver posix_spawnp, posix_spawnp@GLIBC_2.2.5");
+
+int __wrap_posix_spawn(
+	pid_t* pid,
+	const char* path,
+	const posix_spawn_file_actions_t* file_actions,
+	const posix_spawnattr_t* attrp,
+	char* const argv[],
+	char* const envp[]
+	)
+{
+	return posix_spawn(pid, path, file_actions, attrp, argv, envp);
+}
+
+int __wrap_posix_spawnp(
+	pid_t* pid,
+	const char* file,
+	const posix_spawn_file_actions_t* file_actions,
+	const posix_spawnattr_t* attrp,
+	char* const argv[],
+	char* const envp[]
+	)
+{
+	return posix_spawnp(pid, file, file_actions, attrp, argv, envp);
+}

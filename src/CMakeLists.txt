@@ -29,6 +29,10 @@ endif()
 
 add_subdirectory(axl_core)
 
+if (GCC_LINK_GLIBC_WRAPPERS)
+	add_subdirectory(axl_glibc)
+endif()
+
 #...............................................................................
 
 if(WIN32)

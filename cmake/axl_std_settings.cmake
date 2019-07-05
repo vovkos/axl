@@ -320,8 +320,14 @@ axl_create_gcc_settings)
 
 	if(NOT APPLE)
 		option(
-			GCC_LINK_FLAG_EXPORTLESS_EXE
+			GCC_LINK_EXPORTLESS_EXE
 			"Don't export ANYTHING from executables"
+			ON
+			)
+
+		option(
+			GCC_LINK_GLIBC_WRAPPERS
+			"Wrap a subset of GLIBC functions for improved compatibility"
 			ON
 			)
 	endif()
@@ -469,10 +475,20 @@ axl_apply_gcc_settings)
 	axl_apply_compiler_flag(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
 	axl_apply_compiler_flag(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
 
-	if(GCC_LINK_FLAG_EXPORTLESS_EXE AND NOT APPLE)
-		set(_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
-		file(WRITE ${_VERSION_SCRIPT} "{ local: *; };")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_VERSION_SCRIPT}'")
+	if (NOT APPLE)
+		if(GCC_LINK_EXPORTLESS_EXE)
+			set(_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
+			file(WRITE ${_VERSION_SCRIPT} "{ local: *; };")
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_VERSION_SCRIPT}'")
+		endif()
+
+		if(GCC_LINK_GLIBC_WRAPPERS)
+			set(_WRAPPER_FLAGS "-Wl,--wrap=memcpy,--wrap=posix_spawn -u __wrap_memcpy")
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
+			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
+			set(CMAKE_C_STANDARD_LIBRARIES ${CMAKE_C_STANDARD_LIBRARIES} -laxl_glibc)
+			set(CMAKE_CXX_STANDARD_LIBRARIES ${CMAKE_CXX_STANDARD_LIBRARIES} -laxl_glibc)
+		endif()
 	endif()
 
 	# cppcheck
