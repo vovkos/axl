@@ -29,7 +29,7 @@
 #include "axl_io_SharedMemoryTransport.h"
 
 #include "axl_sys_SjljTry.h"
-#include "axl_sys_DynamicLibrary.h"
+#include "axl_sys_DynamicLib.h"
 #include "axl_sys_Time.h"
 #include "axl_sys_Event.h"
 #include "axl_sys_ReadWriteLock.h"

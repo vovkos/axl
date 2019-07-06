@@ -19,7 +19,7 @@
 #	include "axl_sys_win_Library.h"
 #	include "axl_sl_String.h"
 #elif (_AXL_OS_POSIX)
-#	include "axl_sys_psx_DynamicLibrary.h"
+#	include "axl_sys_psx_DynamicLib.h"
 #endif
 
 namespace axl {
@@ -29,7 +29,7 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-class DynamicLibrary
+class DynamicLib
 {
 protected:
 	win::Library m_library;
@@ -74,10 +74,10 @@ public:
 
 #elif (_AXL_OS_POSIX)
 
-class DynamicLibrary
+class DynamicLib
 {
 protected:
-	psx::DynamicLibrary m_library;
+	psx::DynamicLib m_library;
 
 public:
 	bool

@@ -22,7 +22,7 @@ namespace psx {
 
 //..............................................................................
 
-class CloseDynamicLibrary
+class CloseDynamicLib
 {
 public:
 	void
@@ -34,7 +34,7 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class DynamicLibrary: public sl::Handle<void*, CloseDynamicLibrary>
+class DynamicLib: public sl::Handle<void*, CloseDynamicLib>
 {
 public:
 	bool

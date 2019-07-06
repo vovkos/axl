@@ -485,9 +485,9 @@ testAddrInfoIp6()
 //..............................................................................
 
 void
-testDynamicLibrary()
+testDynamicLib()
 {
-	sys::DynamicLibrary dl;
+	sys::DynamicLib dl;
 
 	bool result = dl.open("libc.so.6");
 	if (!result)

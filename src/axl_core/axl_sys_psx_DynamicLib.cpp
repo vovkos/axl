@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_sys_psx_DynamicLibrary.h"
+#include "axl_sys_psx_DynamicLib.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -20,7 +20,7 @@ namespace psx {
 //..............................................................................
 
 bool
-DynamicLibrary::open(
+DynamicLib::open(
 	const sl::StringRef& name,
 	int flags
 	)
@@ -38,7 +38,7 @@ DynamicLibrary::open(
 }
 
 void*
-DynamicLibrary::getSymbol(const sl::StringRef& name)
+DynamicLib::getSymbol(const sl::StringRef& name)
 {
 	void* p = ::dlsym(m_h, name.sz());
 	if (!p)
