@@ -325,11 +325,15 @@ axl_create_gcc_settings)
 			ON
 			)
 
-		option(
-			GCC_LINK_GLIBC_WRAPPERS
-			"Wrap a subset of GLIBC functions for improved compatibility"
-			ON
-			)
+		if (${TARGET_CPU} STREQUAL "amd64")
+			option(
+				GCC_LINK_GLIBC_WRAPPERS
+				"Wrap a subset of GLIBC functions for improved compatibility"
+				ON
+				)
+		else()
+			unset(GCC_LINK_GLIBC_WRAPPERS CACHE)
+		endif()
 	endif()
 
 	# alas, warning suppressions must be passed in command line, not pragma-ed
