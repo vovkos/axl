@@ -2151,7 +2151,19 @@ operator + (
 template <typename C>
 StringBase<C>
 operator + (
-	utf32_t c,
+	char c,
+	const StringRefBase<C>& src
+	)
+{
+	StringBase<C> string(c);
+	string += src;
+	return string;
+}
+
+template <typename C>
+StringBase<C>
+operator + (
+	wchar_t c,
 	const StringRefBase<C>& src
 	)
 {
