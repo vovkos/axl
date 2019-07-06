@@ -22,6 +22,10 @@ if(LINUX)
 			"Build wrappers for new functions in LibUdev(e.g. udev_device_get_sysattr_value)"
 			OFF
 			)
+
+		if(BUILD_AXL_SYS_LNX_LIBUDEV)
+			add_definitions(-D_AXL_SYS_LNX_LIBUDEV=1)
+		endif()
 	else()
 		unset(BUILD_AXL_SYS_LNX_LIBUDEV CACHE)
 	endif()

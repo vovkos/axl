@@ -359,12 +359,22 @@ endif()
 set(
 	SYS_LNX_H_LIST
 	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_Udev.h
+	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevContext.h
+	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevDevice.h
+	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevMonitor.h
+	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevEnumerator.h
 	)
 
 set(
 	SYS_LNX_LIBUDEV_CPP_LIST
 	axl_sys_lnx_Udev.cpp
 	)
+
+if(NOT BUILD_AXL_SYS_LNX_LIBUDEV)
+	axl_exclude_from_build(${SYS_LNX_LIBUDEV_CPP_LIST})
+elseif(BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API)
+	add_definitions(-D_AXL_SYS_LNX_LIBUDEV_NEW_API=1)
+endif()
 
 set(
 	SYS_LNX_CPP_LIST
@@ -437,12 +447,6 @@ source_group(
 #
 
 include_directories(${AXL_INC_DIR})
-
-if(BUILD_AXL_SYS_LNX_LIBUDEV)
-	add_definitions(-D_AXL_SYS_LNX_LIBUDEV=1)
-else()
-	axl_exclude_from_build(${SYS_LNX_LIBUDEV_CPP_LIST})
-endif()
 
 add_library(
 	axl_core

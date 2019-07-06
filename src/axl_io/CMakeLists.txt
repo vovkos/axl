@@ -298,14 +298,6 @@ else()
 	axl_exclude_from_build(${IO_USB_CPP_LIST})
 endif()
 
-if(BUILD_AXL_SYS_LNX_LIBUDEV)
-	add_definitions(-D_AXL_SYS_LNX_LIBUDEV=1)
-
-	if(BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API)
-		add_definitions(-D_AXL_SYS_LNX_LIBUDEV_NEW_API=1)
-	endif()
-endif()
-
 add_library(
 	axl_io
 	${PCH_H_LIST}

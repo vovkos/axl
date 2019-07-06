@@ -37,8 +37,8 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 	portList->clear();
 
 #ifdef _AXL_SYS_LNX_LIBUDEV
-	sys::lnx::UdevContext udev;
-	sys::lnx::UdevEnumerator enumerator = udev.createEnumerator();
+	sys::lnx::DynamicUdevContext udev;
+	sys::lnx::DynamicUdevEnumerator enumerator = udev.createEnumerator();
 
 	bool result =
 		enumerator.addMatchSubsystem("tty") &&
@@ -47,15 +47,15 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 	if (!result)
 		return 0;
 
-	sys::lnx::UdevListEntry it = enumerator.getListEntry();
+	sys::lnx::DynamicUdevListEntry it = enumerator.getListEntry();
 	for (; it; it++)
 	{
 		sl::StringRef path = it.getName();
-		sys::lnx::UdevDevice device = udev.getDeviceFromSysPath(path);
+		sys::lnx::DynamicUdevDevice device = udev.getDeviceFromSysPath(path);
 		if (!device)
 			continue;
 
-		sys::lnx::UdevDevice parentDevice = device.getParent();
+		sys::lnx::DynamicUdevDevice parentDevice = device.getParent();
 		if (!parentDevice) // no parent device, this is a virtual tty
 			continue;
 
