@@ -325,10 +325,10 @@ axl_create_gcc_settings)
 			ON
 			)
 
-		if (${TARGET_CPU} STREQUAL "amd64")
+		if("${TARGET_CPU}" STREQUAL "amd64" OR "${TARGET_CPU}" STREQUAL "x86")
 			option(
 				GCC_LINK_GLIBC_WRAPPERS
-				"Wrap a subset of GLIBC functions for improved compatibility"
+				"Add wraps to a set of versioned GLIBC functions for improved compatibility"
 				ON
 				)
 		else()
@@ -487,7 +487,28 @@ axl_apply_gcc_settings)
 		endif()
 
 		if(GCC_LINK_GLIBC_WRAPPERS)
-			set(_WRAPPER_FLAGS "-Wl,--wrap=memcpy,--wrap=posix_spawn -u __wrap_memcpy")
+			set(
+				_FUNC_LIST
+				memcpy
+				posix_spawn
+				posix_spawnp
+				pow
+				exp
+				exp2
+				log
+				log2
+				)
+
+			if (${TARGET_CPU} STREQUAL "x86")
+				list(APPEND _FUNC_LIST fcntl)
+			endif()
+
+			set(_WRAPPER_FLAGS "-u __wrap_memcpy -Wl") # link memcpy even if not directly used (it is used in libstdc++)
+
+			foreach (_FUNC ${_FUNC_LIST})
+				string(APPEND _WRAPPER_FLAGS ",--wrap=${_FUNC}")
+			endforeach()
+
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
 			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
 			set(CMAKE_C_STANDARD_LIBRARIES ${CMAKE_C_STANDARD_LIBRARIES} -laxl_glibc)

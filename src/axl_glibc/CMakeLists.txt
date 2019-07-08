@@ -14,9 +14,15 @@
 #
 
 set(
+	LIB_H_LIST
+	)
+
+set(
 	LIB_C_LIST
+	axl_fcntl.c
 	axl_memcpy.c
 	axl_spawn.c
+	axl_math.c
 	)
 
 source_group(
@@ -25,6 +31,10 @@ source_group(
 	${LIB_C_LIST}
 	)
 
+if(NOT "${TARGET_CPU}" STREQUAL "x86")
+	axl_exclude_from_build(axl_fcntl.c)
+endif()
+
 #...............................................................................
 #
 # axl_glibc library
@@ -32,6 +42,7 @@ source_group(
 
 add_library(
 	axl_glibc
+	${LIB_H_LIST}
 	${LIB_C_LIST}
 	)
 

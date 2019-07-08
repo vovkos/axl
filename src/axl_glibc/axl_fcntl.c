@@ -10,25 +10,24 @@
 //..............................................................................
 
 #include <string.h>
+#include <fcntl.h>
 
-#if (defined __amd64__)
-__asm__(".symver memcpy, memcpy@GLIBC_2.2.5");
-#elif (defined __i386__)
-__asm__(".symver memcpy, memcpy@GLIBC_2.0");
+#if (__i386__)
+__asm__(".symver fcntl, fcntl@GLIBC_2.0");
 #else
 #	error unsupported CPU architecture
 #endif
 
 //..............................................................................
 
-void*
-__wrap_memcpy(
-	void* dst,
-	const void *src,
-	size_t size
+int
+__wrap_fcntl(
+	int fd,
+	int cmd,
+	char* arg
 	)
 {
-	return memcpy(dst, src, size);
+	return fcntl(fd, cmd, arg);
 }
 
 //..............................................................................

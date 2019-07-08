@@ -11,10 +11,20 @@
 
 #include <spawn.h>
 
+#if (defined __amd64__)
 __asm__(".symver posix_spawn,  posix_spawn@GLIBC_2.2.5");
 __asm__(".symver posix_spawnp, posix_spawnp@GLIBC_2.2.5");
+#elif (defined __i386__)
+__asm__(".symver posix_spawn,  posix_spawn@GLIBC_2.2");
+__asm__(".symver posix_spawnp, posix_spawnp@GLIBC_2.2");
+#else
+#	error unsupported CPU architecture
+#endif
 
-int __wrap_posix_spawn(
+//..............................................................................
+
+int
+__wrap_posix_spawn(
 	pid_t* pid,
 	const char* path,
 	const posix_spawn_file_actions_t* file_actions,
@@ -26,7 +36,8 @@ int __wrap_posix_spawn(
 	return posix_spawn(pid, path, file_actions, attrp, argv, envp);
 }
 
-int __wrap_posix_spawnp(
+int
+__wrap_posix_spawnp(
 	pid_t* pid,
 	const char* file,
 	const posix_spawn_file_actions_t* file_actions,
@@ -37,3 +48,5 @@ int __wrap_posix_spawnp(
 {
 	return posix_spawnp(pid, file, file_actions, attrp, argv, envp);
 }
+
+//..............................................................................
