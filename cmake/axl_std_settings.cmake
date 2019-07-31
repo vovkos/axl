@@ -499,11 +499,12 @@ axl_apply_gcc_settings)
 				log2
 				)
 
+			set(_WRAPPER_FLAGS "-u __wrap_memcpy -Wl") # link memcpy even if not directly called (used in libstdc++)
+
 			if (${TARGET_CPU} STREQUAL "x86")
+				set(_WRAPPER_FLAGS "-u __wrap_fcntl ${_WRAPPER_FLAGS}") # link fcntl even if not directly called (used when compiled with -coverage)
 				list(APPEND _FUNC_LIST fcntl)
 			endif()
-
-			set(_WRAPPER_FLAGS "-u __wrap_memcpy -Wl") # link memcpy even if not directly used (it is used in libstdc++)
 
 			foreach (_FUNC ${_FUNC_LIST})
 				string(APPEND _WRAPPER_FLAGS ",--wrap=${_FUNC}")
