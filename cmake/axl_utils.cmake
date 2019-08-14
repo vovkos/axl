@@ -1376,4 +1376,19 @@ axl_install_redirected_includes
 		)
 endmacro()
 
+macro(
+axl_replace_configuration_for_install
+	_DST_LIST
+	# ...
+	)
+
+	set(_SRC_LIST ${ARGN})
+	set(${_DST_LIST})
+
+	foreach(_SRC ${_SRC_LIST})
+		string(REPLACE "$(Configuration)" "$<CONFIGURATION>" _DST ${_SRC})
+		list(APPEND ${_DST_LIST} ${_DST})
+	endforeach()
+endmacro()
+
 #...............................................................................
