@@ -10,6 +10,16 @@
 #...............................................................................
 
 option(
+	BUILD_AXL_TESTS
+	"Build AXL tests"
+	ON
+	)
+
+if(NOT BUILD_AXL_TESTS)
+	return()
+endif()
+	
+option(
 	BUILD_AXL_TEST_AUTO
 	"Build axl_test_auto(misc automated tests - smoke, unit, integration etc)"
 	ON
