@@ -325,7 +325,7 @@ protected:
 	{
 		Token* token = createToken(-1);
 		token->m_data.m_integer = c;
-		postCreateToken();
+		stop();
 		return token;
 	}
 
