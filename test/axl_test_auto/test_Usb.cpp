@@ -30,7 +30,7 @@ run()
 		printf("Cannot initialize libusb: %s\n", err::getLastErrorDescription().sz());
 		// travis-ci on linux VMs fails here with LIBUSB_ERROR_OTHER
 		// keep assert commented until finding a workaround
-		// ASSERT (false);
+		// ASSERT(false);
 		return;
 	}
 

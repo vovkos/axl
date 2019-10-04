@@ -97,13 +97,13 @@ BuddyAllocMap::Level::setBitRange(
 		if (to < AXL_PTR_BITS)
 		{
 			mask = getBitmask(from, to);
-			// ASSERT ((pPage->m_Map & Mask) == 0);
+			// ASSERT((pPage->m_Map & Mask) == 0);
 			setPageMap(page, page->m_map | mask);
 			return;
 		}
 
 		mask = getHiBitmask(from);
-		// ASSERT ((pPage->m_Map & Mask) == 0);
+		// ASSERT((pPage->m_Map & Mask) == 0);
 		setPageMap(page, page->m_map | mask);
 
 		to -= AXL_PTR_BITS;
@@ -111,7 +111,7 @@ BuddyAllocMap::Level::setBitRange(
 
 		while (to >= AXL_PTR_BITS)
 		{
-			// ASSERT (pPage->m_Map == 0);
+			// ASSERT(pPage->m_Map == 0);
 			page->m_map = -1;
 			to -= AXL_PTR_BITS;
 			page++;
@@ -120,7 +120,7 @@ BuddyAllocMap::Level::setBitRange(
 		if (to)
 		{
 			mask = getLoBitmask(to);
-			// ASSERT ((pPage->m_Map & Mask) == 0);
+			// ASSERT((pPage->m_Map & Mask) == 0);
 			setPageMap(page, page->m_map | mask);
 		}
 	}
@@ -129,13 +129,13 @@ BuddyAllocMap::Level::setBitRange(
 		if (to < AXL_PTR_BITS)
 		{
 			mask = getBitmask(from, to);
-			// ASSERT ((pPage->m_Map & Mask) == Mask);
+			// ASSERT((pPage->m_Map & Mask) == Mask);
 			setPageMap(page, page->m_map & ~mask);
 			return;
 		}
 
 		mask = getHiBitmask(from);
-		// ASSERT ((pPage->m_Map & Mask) == Mask);
+		// ASSERT((pPage->m_Map & Mask) == Mask);
 		setPageMap(page, page->m_map & ~mask);
 
 		to -= AXL_PTR_BITS;
@@ -143,7 +143,7 @@ BuddyAllocMap::Level::setBitRange(
 
 		while (to >= AXL_PTR_BITS)
 		{
-			// ASSERT (pPage->m_Map == -1);
+			// ASSERT(pPage->m_Map == -1);
 			page->m_map = 0;
 			to -= AXL_PTR_BITS;
 			page++;
@@ -152,7 +152,7 @@ BuddyAllocMap::Level::setBitRange(
 		if (to)
 		{
 			mask = getLoBitmask(to);
-			// ASSERT ((pPage->m_Map & Mask) == Mask);
+			// ASSERT((pPage->m_Map & Mask) == Mask);
 			setPageMap(page, page->m_map & ~mask);
 		}
 	}

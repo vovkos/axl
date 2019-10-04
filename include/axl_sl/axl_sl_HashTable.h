@@ -467,7 +467,7 @@ protected: \
 };
 
 #define AXL_SL_BEGIN_HASH_TABLE(Class, Key, Value, Hash) \
-	AXL_SL_BEGIN_HASH_TABLE_EX ( \
+	AXL_SL_BEGIN_HASH_TABLE_EX( \
 		Class, \
 		Key, \
 		Value, \
@@ -480,7 +480,7 @@ protected: \
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_SIMPLE_HASH_TABLE(Class, Key, Value) \
-	AXL_SL_BEGIN_HASH_TABLE ( \
+	AXL_SL_BEGIN_HASH_TABLE( \
 		Class, \
 		Key, \
 		Value, \
@@ -493,7 +493,7 @@ protected: \
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE(Class, Key, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_EX ( \
+	AXL_SL_BEGIN_HASH_TABLE_EX( \
 		Class, \
 		Key, \
 		Value, \

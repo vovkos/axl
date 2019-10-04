@@ -385,7 +385,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCU(Class, Value) \
-	AXL_SL_HASH_TABLE_EX ( \
+	AXL_SL_HASH_TABLE_EX( \
 		Class, \
 		axl::sl::String, \
 		Value, \
@@ -401,7 +401,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCP(Class, Value) \
-	AXL_SL_HASH_TABLE_EX ( \
+	AXL_SL_HASH_TABLE_EX( \
 		Class, \
 		axl::sl::String, \
 		Value, \

@@ -53,6 +53,6 @@ public:
 #undef ASSERT
 #define ASSERT(e) ((bool) (e) ? \
 	(void) 0 : \
-	(void)(throw "Assertion failure at: " __FILE__ "(" AXL_ITOA (__LINE__) "): " #e))
+	(void)(throw "Assertion failure at: " __FILE__ "(" AXL_ITOA(__LINE__) "): " #e))
 
 //..............................................................................

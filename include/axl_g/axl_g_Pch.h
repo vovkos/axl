@@ -450,16 +450,16 @@ private: \
 // TODO reminders
 
 // usage:
-//   AXL_TODO ("implement new feature")
+//   AXL_TODO("implement new feature")
 
 #define AXL_ITOA_IMPL(n) #n
 #define AXL_ITOA(n)  AXL_ITOA_IMPL(n)
 
 #if (_AXL_CPP_MSC)
-#	define AXL_SRC_POS  __FILE__ "(" AXL_ITOA (__LINE__) ")"
+#	define AXL_SRC_POS  __FILE__ "(" AXL_ITOA(__LINE__) ")"
 #	define AXL_TODO(s) __pragma(message(AXL_SRC_POS ": TODO: " s))
 #elif (_AXL_CPP_GCC)
-#	define AXL_SRC_POS  __FILE__ ":" AXL_ITOA (__LINE__)
+#	define AXL_SRC_POS  __FILE__ ":" AXL_ITOA(__LINE__)
 #	define AXL_PRAGMA_IMPL(p) _Pragma(#p)
 #	define AXL_TODO(s) AXL_PRAGMA_IMPL(message "TODO: " s)
 #endif
