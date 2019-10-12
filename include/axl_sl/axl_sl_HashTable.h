@@ -89,6 +89,11 @@ public:
 	{
 	}
 
+	ConstHashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src)
+	{
+		this->m_p = src.getEntry();
+	}
+
 	ConstHashTableIterator(const ConstIterator<HashTableEntry<Key, Value> >& src)
 	{
 		this->m_p = src.getEntry();

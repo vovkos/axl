@@ -26,15 +26,6 @@ template <
 	>
 class HandleTableIteratorBase: public Iterator<HashTableEntry<Key, Value> >
 {
-public:
-	HandleTableIteratorBase()
-	{
-	}
-
-	HandleTableIteratorBase(const Iterator<HashTableEntry<Key, Value> >& src)
-	{
-		this->m_p = src.getEntry();
-	}
 };
 
 template <
@@ -43,15 +34,6 @@ template <
 	>
 class ConstHandleTableIteratorBase: public ConstIterator<HashTableEntry<Key, Value> >
 {
-public:
-	ConstHandleTableIteratorBase()
-	{
-	}
-
-	ConstHandleTableIteratorBase(const ConstIterator<HashTableEntry<Key, Value> >& src)
-	{
-		this->m_p = src.getEntry();
-	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -76,6 +58,11 @@ class ConstHandleTableIterator: public ConstHandleTableIteratorBase<uintptr_t, T
 public:
 	ConstHandleTableIterator()
 	{
+	}
+
+	ConstHandleTableIterator(const Iterator<HashTableEntry<uintptr_t, T> >& src)
+	{
+		this->m_p = src.getEntry();
 	}
 
 	ConstHandleTableIterator(const ConstIterator<HashTableEntry<uintptr_t, T> >& src)

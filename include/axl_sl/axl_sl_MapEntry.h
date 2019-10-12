@@ -72,6 +72,12 @@ public:
 	}
 
 	template <typename T>
+	ConstMapIterator(const Iterator<T>& src)
+	{
+		this->m_p = src.getEntry();
+	}
+
+	template <typename T>
 	ConstMapIterator(const ConstIterator<T>& src)
 	{
 		this->m_p = src.getEntry();
