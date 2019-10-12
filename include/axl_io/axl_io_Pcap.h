@@ -30,7 +30,7 @@ public:
 	}
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Pcap: public sl::Handle<pcap_t*, ClosePcap>
 {
@@ -47,10 +47,51 @@ public:
 	openFile(const sl::StringRef& fileName);
 
 	bool
-	setFilter(const sl::StringRef& filter);
+	openDead(
+		size_t snapshotSize,
+		int linkType
+		);
+
+	sl::StringRef
+	getLastErrorDescription()
+	{
+		ASSERT(m_h);
+		return ::pcap_geterr(m_h);
+	}
+
+	size_t
+	setLastError()
+	{
+		ASSERT(m_h);
+		return err::setError(getLastErrorDescription());
+	}
+
+	bool
+	setFilter(const bpf_program* filter);
+
+	bool
+	setFilter(
+		const sl::StringRef& filter,
+		bool isOptimized = true,
+		uint32_t netMask = PCAP_NETMASK_UNKNOWN
+		);
 
 	bool
 	setBlockingMode(bool isBlocking);
+
+	int
+	getLinkType()
+	{
+		ASSERT(m_h);
+		return ::pcap_datalink(m_h);
+	}
+
+	size_t
+	getSnapshotSize()
+	{
+		ASSERT(m_h);
+		return ::pcap_snapshot(m_h);
+	}
 
 	size_t
 	read(

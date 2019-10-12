@@ -11,8 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_Pcap.h"
-#include "axl_err_Error.h"
-#include "axl_sys_Time.h"
+#include "axl_io_PcapFilter.h"
 
 namespace axl {
 namespace io {
@@ -30,7 +29,7 @@ Pcap::openDevice(
 	close();
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
-	m_h = pcap_open_live(
+	m_h = ::pcap_open_live(
 		device.sz(),
 		snapshotSize,
 		isPromiscious,
@@ -53,7 +52,7 @@ Pcap::openFile(const sl::StringRef& fileName)
 	close();
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
-	m_h = pcap_open_offline(fileName.sz(), errorBuffer);
+	m_h = ::pcap_open_offline(fileName.sz(), errorBuffer);
 	if (!m_h)
 	{
 		err::setError(errorBuffer);
@@ -64,30 +63,64 @@ Pcap::openFile(const sl::StringRef& fileName)
 }
 
 bool
-Pcap::setFilter(const sl::StringRef& filter)
+Pcap::openDead(
+	size_t snapshotSize,
+	int linkType
+	)
 {
-	bpf_program program;
+	close();
 
-	int result = pcap_compile(m_h, &program, (char*)(const char*) filter.sz(), true, 0);
-	if (result == -1)
+	m_h = ::pcap_open_dead((int)snapshotSize, linkType);
+	if (!m_h)
 	{
-		err::setError(pcap_geterr(m_h));
+		err::setError("pcap_open_dead failed");
 		return false;
 	}
 
-	result = pcap_setfilter(m_h, &program);
-	pcap_freecode(&program);
-	return result == 0;
+	return true;
+}
+
+bool
+Pcap::setFilter(const bpf_program* filter)
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_setfilter(m_h, (bpf_program*)filter);
+	if (result == -1)
+	{
+		setLastError();
+		return false;
+	}
+
+	return true;
+}
+
+bool
+Pcap::setFilter(
+	const sl::StringRef& source,
+	bool isOptimized,
+	uint32_t netMask
+	)
+{
+	ASSERT(m_h);
+
+	PcapFilter filter;
+
+	return
+		filter.compile(m_h, source, isOptimized, netMask) &&
+		setFilter(&filter);
 }
 
 bool
 Pcap::setBlockingMode(bool isBlocking)
 {
+	ASSERT(m_h);
+
 	char errorBuffer[PCAP_ERRBUF_SIZE];
-	int result = pcap_setnonblock(m_h, !isBlocking, errorBuffer);
+	int result = ::pcap_setnonblock(m_h, !isBlocking, errorBuffer);
 	if (result == -1)
 	{
-		err::setError(errorBuffer);
+		setLastError();
 		return false;
 	}
 
@@ -101,13 +134,15 @@ Pcap::read(
 	uint64_t* timestamp
 	)
 {
+	ASSERT(m_h);
+
 	pcap_pkthdr* hdr;
 	const uchar_t* data;
 
-	int result = pcap_next_ex(m_h, &hdr, &data);
+	int result = ::pcap_next_ex(m_h, &hdr, &data);
 	if (result == -1)
 	{
-		err::setError(pcap_geterr(m_h));
+		setLastError();
 		return -1;
 	}
 
@@ -129,14 +164,16 @@ Pcap::write(
 	size_t size
 	)
 {
+	ASSERT(m_h);
+
 #if (_AXL_OS_WIN)
-	int result = pcap_sendpacket(m_h, (const u_char*) p, (int)size);
+	int result = ::pcap_sendpacket(m_h, (const u_char*) p, (int)size);
 #else
-	int result = pcap_inject(m_h, p, (int)size);
+	int result = ::pcap_inject(m_h, p, (int)size);
 #endif
 	if (result == -1)
 	{
-		err::setError(pcap_geterr(m_h));
+		setLastError();
 		return -1;
 	}
 

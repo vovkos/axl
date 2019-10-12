@@ -73,11 +73,13 @@ source_group(
 set(
 	IO_PCAP_H_LIST
 	${AXL_INC_DIR}/axl_io/axl_io_Pcap.h
+	${AXL_INC_DIR}/axl_io/axl_io_PcapFilter.h
 	)
 
 set(
 	IO_PCAP_CPP_LIST
 	axl_io_Pcap.cpp
+	axl_io_PcapFilter.cpp
 	)
 
 source_group(

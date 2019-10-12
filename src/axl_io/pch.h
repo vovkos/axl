@@ -22,6 +22,8 @@
 #endif
 
 #include "axl_g_Module.h"
+#include "axl_err_Error.h"
+#include "axl_sys_Time.h"
 
 #if (_AXL_OS_WIN)
 #	include <iphlpapi.h>
