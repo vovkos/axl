@@ -192,6 +192,40 @@ public:
 		uint_t alpha
 		);
 
+	virtual
+	bool
+	drawGradientRect(
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		int x1,
+		int y1,
+		uint_t color1,
+		int x2,
+		int y2,
+		uint_t color2
+		);
+
+	virtual
+	bool
+	drawAlphaGradientRect(
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		int x1,
+		int y1,
+		uint_t color1,
+		uint_t alpha1,
+		int x2,
+		int y2,
+		uint_t color2,
+		uint_t alpha2
+		);
+
 	bool
 	drawText_qt(
 		Canvas* canvas,

@@ -31,6 +31,7 @@
 #include <QMimeData>
 #include <QPainter>
 #include <QPixmap>
+#include <QLinearGradient>
 #include <QScrollBar>
 #include <QWidget>
 #include <QToolTip>

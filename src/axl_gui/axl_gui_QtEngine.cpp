@@ -145,6 +145,70 @@ QtEngine::drawAlphaRect(
 }
 
 bool
+QtEngine::drawGradientRect(
+	Canvas* canvas,
+	int left,
+	int top,
+	int right,
+	int bottom,
+	int x1,
+	int y1,
+	uint_t color1,
+	int x2,
+	int y2,
+	uint_t color2
+	)
+{
+	ASSERT(canvas->getEngine() == this);
+	QtCanvas* qtCanvas = (QtCanvas*)canvas;
+
+	ASSERT(!(color1 & ColorFlag_Undefined) && !(color2 & ColorFlag_Undefined));
+	QColor qtColor1 = qtCanvas->m_palette.getColorRgb(color1);
+	QColor qtColor2 = qtCanvas->m_palette.getColorRgb(color2);
+
+	QLinearGradient gradient(x1, y1, x2, y2);
+	gradient.setColorAt(0, qtColor1);
+	gradient.setColorAt(1, qtColor2);
+
+	qtCanvas->m_qtPainter.fillRect(left, top, right - left, bottom - top, gradient);
+	return true;
+}
+
+bool
+QtEngine::drawAlphaGradientRect(
+	Canvas* canvas,
+	int left,
+	int top,
+	int right,
+	int bottom,
+	int x1,
+	int y1,
+	uint_t color1,
+	uint_t alpha1,
+	int x2,
+	int y2,
+	uint_t color2,
+	uint_t alpha2
+	)
+{
+	ASSERT(canvas->getEngine() == this);
+	QtCanvas* qtCanvas = (QtCanvas*)canvas;
+
+	ASSERT(!(color1 & ColorFlag_Undefined) && !(color2 & ColorFlag_Undefined));
+	QColor qtColor1 = qtCanvas->m_palette.getColorRgb(color1);
+	QColor qtColor2 = qtCanvas->m_palette.getColorRgb(color2);
+	qtColor1.setAlpha(alpha1);
+	qtColor2.setAlpha(alpha2);
+
+	QLinearGradient gradient(x1, y1, x2, y2);
+	gradient.setColorAt(0, qtColor1);
+	gradient.setColorAt(1, qtColor2);
+
+	qtCanvas->m_qtPainter.fillRect(left, top, right - left, bottom - top, gradient);
+	return true;
+}
+
+bool
 QtEngine::drawText_qt(
 	Canvas* canvas,
 	int x,

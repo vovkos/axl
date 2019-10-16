@@ -165,6 +165,124 @@ public:
 			);
 	}
 
+	// gradient rect drawing
+
+	bool
+	drawGradientRect(
+		int left,
+		int top,
+		int right,
+		int bottom,
+		int x1,
+		int y1,
+		uint_t color1,
+		int x2,
+		int y2,
+		uint_t color2
+		)
+	{
+		return m_engine->drawGradientRect(
+			this,
+			left,
+			top,
+			right,
+			bottom,
+			x1,
+			y1,
+			color1,
+			x2,
+			y2,
+			color2
+			);
+	}
+
+	bool
+	drawGradientRect(
+		const Rect& rect,
+		const Point& point1,
+		uint_t color1,
+		const Point& point2,
+		uint_t color2
+		)
+	{
+		return m_engine->drawGradientRect(
+			this,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			point1.m_x,
+			point1.m_y,
+			color1,
+			point2.m_x,
+			point2.m_y,
+			color2
+			);
+	}
+
+	// alpha gradient rect drawing
+
+	bool
+	drawAlphaGradientRect(
+		int left,
+		int top,
+		int right,
+		int bottom,
+		int x1,
+		int y1,
+		uint_t color1,
+		uint_t alpha1,
+		int x2,
+		int y2,
+		uint_t color2,
+		uint_t alpha2
+		)
+	{
+		return m_engine->drawAlphaGradientRect(
+			this,
+			left,
+			top,
+			right,
+			bottom,
+			x1,
+			y1,
+			color1,
+			alpha1,
+			x2,
+			y2,
+			color2,
+			alpha2
+			);
+	}
+
+	bool
+	drawAlphaGradientRect(
+		const Rect& rect,
+		const Point& point1,
+		uint_t color1,
+		uint_t alpha1,
+		const Point& point2,
+		uint_t color2,
+		uint_t alpha2
+		)
+	{
+		return m_engine->drawAlphaGradientRect(
+			this,
+			rect.m_left,
+			rect.m_top,
+			rect.m_right,
+			rect.m_bottom,
+			point1.m_x,
+			point1.m_y,
+			color1,
+			alpha1,
+			point2.m_x,
+			point2.m_y,
+			color2,
+			alpha2
+			);
+	}
+
 	// default to utf8
 
 	bool

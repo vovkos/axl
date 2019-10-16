@@ -144,7 +144,47 @@ public:
 		uint_t alpha
 		)
 	{
-		return drawRect(canvas, left, top, right, bottom, color); // draw opaque rect by default
+		return drawRect(canvas, left, top, right, bottom, color); // draw simple opaque rect by default
+	}
+
+	virtual
+	bool
+	drawGradientRect(
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		int x1,
+		int y1,
+		uint_t color1,
+		int x2,
+		int y2,
+		uint_t color2
+		)
+	{
+		return drawRect(canvas, left, top, right, bottom, color1); // draw simple opaque rect by default
+	}
+
+	virtual
+	bool
+	drawAlphaGradientRect(
+		Canvas* canvas,
+		int left,
+		int top,
+		int right,
+		int bottom,
+		int x1,
+		int y1,
+		uint_t color1,
+		uint_t alpha1,
+		int x2,
+		int y2,
+		uint_t color2,
+		uint_t alpha2
+		)
+	{
+		return drawGradientRect(canvas, left, top, right, bottom, x1, y1, color1, x2, y2, color2);
 	}
 
 	virtual
