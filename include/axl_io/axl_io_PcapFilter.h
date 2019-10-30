@@ -41,6 +41,12 @@ public:
 	}
 
 	bool
+	isEmpty()
+	{
+		return bf_insns == NULL;
+	}
+
+	bool
 	compile(
 		pcap_t* pcap,
 		const sl::StringRef& filter,
