@@ -50,8 +50,8 @@ public:
 
 	bool
 	compile(
-		size_t snapshotSize,
 		int linkType,
+		size_t snapshotSize,
 		const sl::StringRef& filter,
 		bool isOptimized = true,
 		uint32_t netMask = PCAP_NETMASK_UNKNOWN

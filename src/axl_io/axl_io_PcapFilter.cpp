@@ -40,8 +40,8 @@ PcapFilter::compile(
 
 bool
 PcapFilter::compile(
-	size_t snapshotSize,
 	int linkType,
+	size_t snapshotSize,
 	const sl::StringRef& filter,
 	bool isOptimized,
 	uint32_t netMask
@@ -50,7 +50,7 @@ PcapFilter::compile(
 	Pcap pcap;
 
 	return
-		pcap.openDead(snapshotSize, linkType) &&
+		pcap.openDead(linkType, snapshotSize) &&
 		compile(pcap, filter, isOptimized, netMask);
 }
 

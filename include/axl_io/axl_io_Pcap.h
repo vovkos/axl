@@ -48,8 +48,8 @@ public:
 
 	bool
 	openDead(
-		size_t snapshotSize,
-		int linkType
+		int linkType,
+		size_t snapshotSize
 		);
 
 	sl::StringRef

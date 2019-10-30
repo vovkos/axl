@@ -64,13 +64,13 @@ Pcap::openFile(const sl::StringRef& fileName)
 
 bool
 Pcap::openDead(
-	size_t snapshotSize,
-	int linkType
+	int linkType,
+	size_t snapshotSize
 	)
 {
 	close();
 
-	m_h = ::pcap_open_dead((int)snapshotSize, linkType);
+	m_h = ::pcap_open_dead(linkType, (int)snapshotSize);
 	if (!m_h)
 	{
 		err::setError("pcap_open_dead failed");
