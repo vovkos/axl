@@ -120,7 +120,7 @@ EscapeEncoding::encode(
 		}
 		else
 		{
-			if (isprint(*p))
+			if (isprint(*(uchar_t*)p))
 				continue;
 
 			string->append(base, p - base);
