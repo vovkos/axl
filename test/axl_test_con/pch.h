@@ -53,6 +53,11 @@
 #	include "axl_io_UsbTransfer.h"
 #endif
 
+#ifdef _AXL_IO_PCAP
+#	include "axl_io_PcapPch.h"
+#	include "axl_io_Pcap.h"
+#endif
+
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_VirtualMemory.h"
 #	include "axl_sys_win_Process.h"

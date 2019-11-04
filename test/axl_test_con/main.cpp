@@ -4062,6 +4062,35 @@ testBitIdx()
 
 //..............................................................................
 
+#if (_AXL_OS_WIN && _AXL_IO_PCAP)
+
+void
+testPcap()
+{
+	::SetDllDirectoryW(io::win::getSystemDir() + L"\\npcap");
+
+	const char* version = pcap_lib_version();
+	printf("version: %s\n", version);
+
+	pcap_if* ifaceList = NULL;
+	char errorBuffer[PCAP_ERRBUF_SIZE] = { 0 };
+	int result = pcap_findalldevs(&ifaceList, errorBuffer);
+	if (result == -1)
+	{
+		printf("error: %s\n", errorBuffer);
+		return;
+	}
+
+	size_t count = 0;
+
+	for (pcap_if* iface = ifaceList; iface; iface = iface->next, count++)
+		printf("%s - %s\n", iface->name, iface->description);
+}
+
+#endif
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -4088,7 +4117,11 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testSerial();
+#if (_AXL_OS_WIN && _AXL_IO_PCAP)
+	testPcap();
+#endif
+
+	// testSerial();
 	// testKeepAlives (sl::String(argv [1]));
 
 	return 0;

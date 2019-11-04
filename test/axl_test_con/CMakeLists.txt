@@ -61,6 +61,13 @@ if(BUILD_AXL_IO_USB)
 	list(APPEND OPT_LIB_LIST ${LIBUSB_LIB_NAME})
 endif()
 
+if(BUILD_AXL_IO_PCAP)
+	include_directories(${PCAP_INC_DIR})
+	link_directories(${PCAP_LIB_DIR})
+	add_definitions(-D_AXL_IO_PCAP=1)
+	list(APPEND OPT_LIB_LIST wpcap)
+endif()
+
 if(BUILD_AXL_XML)
 	include_directories(${EXPAT_INC_DIR})
 	link_directories(${EXPAT_LIB_DIR})
@@ -102,6 +109,14 @@ if(WIN32)
 		axl_test_con
 		setupapi
 		)
+
+	if(BUILD_AXL_IO_PCAP)
+		set_target_properties(
+			axl_test_con
+			PROPERTIES
+			LINK_FLAGS "/DELAYLOAD:wpcap.dll"
+			)
+	endif()
 endif()
 
 if(UNIX)
