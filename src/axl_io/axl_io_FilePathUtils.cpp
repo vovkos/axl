@@ -514,5 +514,43 @@ getSymbolicLinkTarget(
 
 //..............................................................................
 
+#if (_AXL_OS_WIN)
+
+namespace win {
+
+sl::String_w
+getWindowsDir()
+{
+	uint_t length = ::GetWindowsDirectoryW(NULL, 0);
+
+	sl::String_w dir;
+	wchar_t* p = dir.createBuffer(length);
+	if (!p)
+		return sl::String_w();
+
+	::GetWindowsDirectoryW(p, length + 1);
+	dir.updateLength();
+	return dir;
+}
+
+sl::String_w
+getSystemDir()
+{
+	uint_t length = ::GetSystemDirectoryW(NULL, 0);
+
+	sl::String_w dir;
+	wchar_t* p = dir.createBuffer(length);
+	if (!p)
+		return sl::String_w();
+
+	::GetSystemDirectoryW(p, length + 1);
+	dir.updateLength();
+	return dir;
+}
+
+} // namespace win
+
+#endif
+
 } // namespace io
 } // namespace axl

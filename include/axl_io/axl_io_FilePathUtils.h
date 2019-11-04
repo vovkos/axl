@@ -100,5 +100,20 @@ getSymbolicLinkTarget(
 
 //..............................................................................
 
+#if (_AXL_OS_WIN)
+
+namespace win {
+
+sl::String_w
+getWindowsDir();
+
+sl::String_w
+getSystemDir();
+
+} // namespace win
+
+#endif
+
+
 } // namespace io
 } // namespace axl
