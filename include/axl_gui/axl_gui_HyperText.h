@@ -101,6 +101,15 @@ public:
 	}
 
 	size_t
+	setText(
+		bool isHyperText,
+		const sl::StringRef& text
+		)
+	{
+		return isHyperText ? setHyperText(text) : setPlainText(text);
+	}
+
+	size_t
 	setChar(
 		utf32_t c,
 		size_t count = 1
@@ -124,6 +133,15 @@ public:
 
 	size_t
 	appendPlainText(const sl::StringRef& text);
+
+	size_t
+	appendText(
+		bool isHyperText,
+		const sl::StringRef& text
+		)
+	{
+		return isHyperText ? appendHyperText(text) : appendPlainText(text);
+	}
 
 	size_t
 	appendChar(
