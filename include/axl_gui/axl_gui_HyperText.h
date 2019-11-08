@@ -162,11 +162,7 @@ public:
 	findHyperlinkByX(int x) const;
 
 	const HyperlinkAnchor*
-	findHyperlinkByOffset(size_t offset) const
-	{
-		const HyperlinkAnchor* anchor = m_hyperlinkArray.find(offset);
-		return anchor && !anchor->m_hyperlink.isEmpty() ? anchor : NULL;
-	}
+	findHyperlinkByOffset(size_t offset) const;
 };
 
 //..............................................................................

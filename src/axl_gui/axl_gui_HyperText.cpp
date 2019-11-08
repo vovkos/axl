@@ -205,6 +205,16 @@ HyperText::findHyperlinkByX(int x) const
 	return result && !result->m_hyperlink.isEmpty() ? result : NULL;
 }
 
+const HyperlinkAnchor*
+HyperText::findHyperlinkByOffset(size_t offset) const
+{
+	if (offset >= m_text.getLength())
+		return NULL;
+
+	const HyperlinkAnchor* anchor = m_hyperlinkArray.find(offset);
+	return anchor && !anchor->m_hyperlink.isEmpty() ? anchor : NULL;
+}
+
 void
 HyperText::calcHyperlinkXMap(Font* baseFont)
 {
