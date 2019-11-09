@@ -12,6 +12,41 @@
 #include "pch.h"
 #include "axl_lua_LuaState.h"
 
+//..............................................................................
+
+#if (LUA_VERSION_NUM < 502)
+
+void
+lua_len_impl(
+	lua_State* state,
+	int index
+	)
+{
+	int type = lua_type(state, index);
+	switch (type)
+	{
+	case LUA_TSTRING:
+		lua_pushinteger(state, lua_objlen(state, index));
+		break;
+
+	case LUA_TTABLE:
+		if (!luaL_callmeta(state, index, "__len"))
+			lua_pushinteger(state, lua_objlen(state, index));
+		break;
+
+	case LUA_TUSERDATA:
+		if (luaL_callmeta(state, index, "__len"))
+			break;
+
+		// fallthrough
+
+	default:
+		luaL_error(state, "invalid lua_len on %s", lua_typename(state, type));
+	}
+}
+
+#endif
+
 namespace axl {
 namespace lua {
 
@@ -209,6 +244,8 @@ LuaState::setGlobalMember(
 	setMember(member);
 	pop();
 }
+
+
 
 //..............................................................................
 

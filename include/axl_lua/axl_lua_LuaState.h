@@ -15,6 +15,19 @@
 
 #include "axl_lua_Pch.h"
 
+#if (LUA_VERSION_NUM < 502)
+
+void
+lua_len_impl(
+	lua_State* state,
+	int index
+	);
+
+#	define LUA_OK 0
+#	define lua_rawlen lua_objlen
+#	define lua_len lua_len_impl
+#endif
+
 namespace axl {
 namespace lua {
 
