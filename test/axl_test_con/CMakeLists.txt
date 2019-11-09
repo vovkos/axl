@@ -65,7 +65,10 @@ if(BUILD_AXL_IO_PCAP)
 	include_directories(${PCAP_INC_DIR})
 	link_directories(${PCAP_LIB_DIR})
 	add_definitions(-D_AXL_IO_PCAP=1)
-	list(APPEND OPT_LIB_LIST wpcap)
+
+	if(WIN32)
+		list(APPEND OPT_LIB_LIST wpcap)
+	endif()
 endif()
 
 if(BUILD_AXL_XML)
