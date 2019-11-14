@@ -43,11 +43,13 @@ set(
 	${AXL_INC_DIR}/axl_mem/axl_mem_Pool.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Tracker.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_TrackerBlock.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_ScatterGather.h
 	)
 
 set(
 	MEM_CPP_LIST
 	axl_mem_Tracker.cpp
+	axl_mem_ScatterGather.cpp
 	)
 
 source_group(

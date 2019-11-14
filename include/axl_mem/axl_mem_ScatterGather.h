@@ -11,45 +11,35 @@
 
 #pragma once
 
-#define _AXL_MEM_BLOCK_H
+#define _AXL_MEM_SCATTERGATHER_H
 
-#include "axl_g_Pch.h"
+#include "axl_mem_Block.h"
 
 namespace axl {
 namespace mem {
 
 //..............................................................................
 
-// memory block descriptor
+size_t
+getScatterGatherSize(
+	const Block* blockArray,
+	size_t blockCount
+	);
 
-struct Block
-{
-	const void* m_p;
-	size_t m_size;
+size_t
+copyScatterGather(
+	void* buffer,
+	const Block* blockArray,
+	size_t blockCount
+	);
 
-	Block()
-	{
-		setup(NULL, 0);
-	}
-
-	Block(
-		const void* p,
-		size_t size
-		)
-	{
-		setup(p, size);
-	}
-
-	void
-	setup(
-		const void* p,
-		size_t size
-		)
-	{
-		m_p = p;
-		m_size = size;
-	}
-};
+size_t
+safeCopyScatterGather(
+	void* buffer,
+	size_t bufferSize,
+	const Block* blockArray,
+	size_t blockCount
+	);
 
 //..............................................................................
 
