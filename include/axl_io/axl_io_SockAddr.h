@@ -355,7 +355,8 @@ struct SockAddr
 		uint_t port = 0
 		)
 	{
-		setup_ip4((const in_addr*) &ip, port);
+		ip = sl::swapByteOrder32(ip);
+		setup_ip4((const in_addr*)&ip, port);
 	}
 
 	void

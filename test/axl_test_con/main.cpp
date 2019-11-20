@@ -4091,6 +4091,52 @@ testPcap()
 
 //..............................................................................
 
+class UdpThread: public sys::ThreadImpl<UdpThread>
+{
+protected:
+	io::Socket m_socket;
+
+public:
+	void threadFunc()
+	{
+		io::Socket socket;
+
+		bool result =
+			socket.open(AF_INET, SOCK_DGRAM, IPPROTO_UDP) &&
+			socket.bind(io::SockAddr((uint_t)0, 1234));
+
+		printf("socket opened: %d\n", result);
+
+		for (;;)
+		{
+			char buffer[256];
+			io::SockAddr addr;
+			size_t result = socket.recvFrom(buffer, sizeof(buffer), &addr);
+			printf("received: %d from: %s\n", result, addr.getString().sz());
+		}
+	}
+};
+
+void
+testUdp()
+{
+	UdpThread thread;
+	thread.start();
+
+	io::SockAddr addr(0x7f000001, 1234);
+
+	for (;;)
+	{
+		io::Socket socket;
+		socket.open(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		size_t result = socket.sendTo(NULL, 0, addr);
+		printf("result: %zd\n", result);
+		sys::sleep(1000);
+	}
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -4117,12 +4163,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_OS_WIN && _AXL_IO_PCAP)
-	testPcap();
-#endif
-
-	// testSerial();
-	// testKeepAlives (sl::String(argv [1]));
+//	testUdp();
 
 	return 0;
 }
