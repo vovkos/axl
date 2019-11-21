@@ -153,6 +153,13 @@ if(UNIX)
 			rt
 			)
 	endif()
+
+	if(BUILD_AXL_IO_PCAP)
+		target_link_libraries(
+			axl_test_con
+			pcap
+			)
+	endif()
 endif()
 
 if(WIN32)

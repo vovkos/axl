@@ -4062,12 +4062,34 @@ testBitIdx()
 
 //..............................................................................
 
-#if (_AXL_OS_WIN && _AXL_IO_PCAP)
+#if (_AXL_IO_PCAP)
+
+class PcapThread: public sys::ThreadImpl<PcapThread>
+{
+public:
+	io::Pcap m_pcap;
+
+public:
+	void threadFunc()
+	{
+		for (;;)
+		{
+			char buffer[1024];
+			size_t result = m_pcap.read(buffer, sizeof(buffer));
+			printf("result: %d\n", result);
+
+			if (result == 0)
+				sys::sleep(1000);
+		}
+	}
+};
 
 void
 testPcap()
 {
+#if (_AXL_OS_WIN)
 	::SetDllDirectoryW(io::win::getSystemDir() + L"\\npcap");
+#endif
 
 	const char* version = pcap_lib_version();
 	printf("version: %s\n", version);
@@ -4083,8 +4105,27 @@ testPcap()
 
 	size_t count = 0;
 
+	sl::String s;
+
 	for (pcap_if* iface = ifaceList; iface; iface = iface->next, count++)
 		printf("%s - %s\n", iface->name, iface->description);
+
+	PcapThread thread;
+
+	result = thread.m_pcap.openDevice("lo", 4096, true, 200);
+	if (!result)
+	{
+		printf("error opening lo: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	thread.m_pcap.setBlockingMode(false);
+
+	thread.start();
+
+	printf("main thread is waiting now...\n");
+	for (;;)
+		sys::sleep(1000);
 }
 
 #endif
@@ -4135,6 +4176,7 @@ testUdp()
 	}
 }
 
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -4163,7 +4205,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-//	testUdp();
+	testPcap();
 
 	return 0;
 }

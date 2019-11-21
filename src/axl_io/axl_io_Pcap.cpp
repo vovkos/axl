@@ -112,6 +112,17 @@ Pcap::setFilter(
 }
 
 bool
+Pcap::getBlockingMode()
+{
+	ASSERT(m_h);
+
+	char errorBuffer[PCAP_ERRBUF_SIZE];
+	int result = ::pcap_getnonblock(m_h, errorBuffer);
+
+	return result == 0;
+}
+
+bool
 Pcap::setBlockingMode(bool isBlocking)
 {
 	ASSERT(m_h);
@@ -125,6 +136,25 @@ Pcap::setBlockingMode(bool isBlocking)
 	}
 
 	return true;
+}
+
+size_t
+Pcap::dispatch(
+	size_t count,
+	::pcap_handler handler,
+	void* context
+	)
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_dispatch(m_h, count, handler, (u_char*)context);
+	if (result == -1)
+	{
+		setLastError();
+		return -1;
+	}
+
+	return (intptr_t)result; // propagate potential -2
 }
 
 size_t

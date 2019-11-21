@@ -52,6 +52,20 @@ public:
 		size_t snapshotSize
 		);
 
+	int
+	getLinkType()
+	{
+		ASSERT(m_h);
+		return ::pcap_datalink(m_h);
+	}
+
+	size_t
+	getSnapshotSize()
+	{
+		ASSERT(m_h);
+		return ::pcap_snapshot(m_h);
+	}
+
 	sl::StringRef
 	getLastErrorDescription()
 	{
@@ -77,37 +91,24 @@ public:
 		);
 
 	bool
+	getBlockingMode();
+
+	bool
 	setBlockingMode(bool isBlocking);
 
-	int
-	getLinkType()
-	{
-		ASSERT(m_h);
-		return ::pcap_datalink(m_h);
-	}
-
 	size_t
-	getSnapshotSize()
-	{
-		ASSERT(m_h);
-		return ::pcap_snapshot(m_h);
-	}
-
-	size_t
-	read(
-		void* p,
-		size_t size,
-		uint64_t* timestamp
+	dispatch(
+		size_t count,
+		::pcap_handler handler,
+		void* context
 		);
 
 	size_t
 	read(
 		void* p,
-		size_t size
-		)
-	{
-		return read(p, size, NULL);
-	}
+		size_t size,
+		uint64_t* timestamp = NULL
+		);
 
 	size_t
 	write(
