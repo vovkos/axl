@@ -138,6 +138,22 @@ Pcap::setBlockingMode(bool isBlocking)
 	return true;
 }
 
+PcapLoopResult
+Pcap::loop(
+	size_t count,
+	::pcap_handler handler,
+	void* context
+	)
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_loop(m_h, count, handler, (u_char*)context);
+	if (result == -1)
+		setLastError();
+
+	return (PcapLoopResult)result;
+}
+
 size_t
 Pcap::dispatch(
 	size_t count,

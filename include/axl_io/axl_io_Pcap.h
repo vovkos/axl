@@ -32,6 +32,15 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum PcapLoopResult
+{
+	PcapLoopResult_Success = 0,
+	PcapLoopResult_Error   = -1,
+	PcapLoopResult_Break   = -2,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class Pcap: public sl::Handle<pcap_t*, ClosePcap>
 {
 public:
@@ -90,11 +99,34 @@ public:
 		uint32_t netMask = PCAP_NETMASK_UNKNOWN
 		);
 
+#if (_AXL_POSIX)
+	int
+	getSelectableFd()
+	{
+		ASSERT(m_h);
+		return ::pcap_get_selectable_fd(m_h);
+	}
+#endif
+
 	bool
 	getBlockingMode();
 
 	bool
 	setBlockingMode(bool isBlocking);
+
+	void
+	breakLoop()
+	{
+		ASSERT(m_h);
+		::pcap_breakloop(m_h);
+	}
+
+	PcapLoopResult
+	loop(
+		size_t count,
+		::pcap_handler handler,
+		void* context
+		);
 
 	size_t
 	dispatch(
