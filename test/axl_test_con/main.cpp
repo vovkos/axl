@@ -4205,7 +4205,9 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
+#if (_AXL_IO_PCAP)
 	testPcap();
+#endif
 
 	return 0;
 }
