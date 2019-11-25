@@ -57,6 +57,11 @@ public:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+AXL_SELECT_ANY ListLink g_nullListLink; // we can't use { 0 } here, but it's
+                                        // guaranteed to be zero-initialized
+
 //..............................................................................
 
 template <
