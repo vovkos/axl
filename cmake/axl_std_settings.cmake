@@ -251,6 +251,13 @@ axl_create_gcc_settings)
 		)
 
 	axl_create_compiler_flag_setting(
+		GCC_FLAG_DEBUG_INFO_RELEASE
+		DESCRIPTION "Add debugging information to Release builds"
+		DEFAULT " "
+		" " "-g"
+		)
+
+	axl_create_compiler_flag_setting(
 		GCC_FLAG_C_STANDARD
 		DESCRIPTION "Specify the C standard to use"
 		"-std=c90" "-std=c99" "-std=c11" "-std=gnu90" "-std=gnu99" "-std=gnu11"
