@@ -253,7 +253,7 @@ inline
 uint64_t
 getCurrentThreadId()
 {
-	return (uint64_t) ::pthread_self();
+	return (uint64_t)::pthread_self();
 }
 
 #endif

@@ -74,5 +74,5 @@ setNtStatus(long status)
 //..............................................................................
 
 } // namespace win
-} // namespace err
+} // namespace sys
 } // namespace axl

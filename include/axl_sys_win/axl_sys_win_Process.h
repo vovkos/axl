@@ -86,6 +86,9 @@ syncExec(
 	dword_t* exitCode = NULL
 	);
 
+sl::String_w
+getProcessImageName(dword_t pid);
+
 //..............................................................................
 
 } // namespace win

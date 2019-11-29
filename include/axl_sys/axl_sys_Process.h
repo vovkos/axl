@@ -15,6 +15,10 @@
 
 #include "axl_err_Error.h"
 
+#if (_AXL_OS_WIN)
+#	include "axl_sys_win_Process.h"
+#endif
+
 namespace axl {
 namespace sys {
 
@@ -30,6 +34,18 @@ createProcess(const sl::StringRef& commandLine)
 #else
 	// TODO
 	return true;
+#endif
+}
+
+inline
+sl::String
+getProcessImageName(uint_t pid)
+{
+#if (_AXL_OS_WIN)
+	return sys::win::getProcessImageName(pid);
+#else
+	// TODO
+	return sl::String();
 #endif
 }
 

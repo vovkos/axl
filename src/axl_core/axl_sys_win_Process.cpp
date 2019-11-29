@@ -11,6 +11,8 @@
 
 #include "pch.h"
 #include "axl_sys_win_Process.h"
+#include "axl_sys_win_NtDll.h"
+#include "axl_sys_win_NtStatus.h"
 #include "axl_io_win_File.h"
 #include "axl_sl_String.h"
 #include "axl_sl_Array.h"
@@ -135,6 +137,58 @@ syncExec(
 		process.getExitCode(exitCode);
 
 	return true;
+}
+
+sl::String_w
+getProcessImageName(dword_t pid)
+{
+	HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+	if (!hProcess)
+	{
+		err::setLastSystemError();
+		return NULL;
+	}
+
+	char stackBuffer[512];
+	sl::Array<char> heapBuffer;
+
+	ulong_t length;
+	UNICODE_STRING* name = (UNICODE_STRING*)stackBuffer;
+
+	NTSTATUS status = ntQueryInformationProcess(
+		hProcess,
+		ProcessImageFileName,
+		name,
+		sizeof(stackBuffer),
+		&length
+		);
+
+
+	if (status == STATUS_INFO_LENGTH_MISMATCH)
+	{
+		bool result = heapBuffer.setCount(length);
+		if (!result)
+			return NULL;
+
+		name = (UNICODE_STRING*)heapBuffer.p();
+
+		status = ntQueryInformationProcess(
+			hProcess,
+			ProcessImageFileName,
+			name,
+			length,
+			&length
+			);
+	}
+
+	if (!NT_SUCCESS(status))
+	{
+		err::setError(NtStatus(status));
+		return NULL;
+	}
+
+	length = name->Length / sizeof(wchar_t);
+	return sl::String_w(name->Buffer, length);
 }
 
 //..............................................................................

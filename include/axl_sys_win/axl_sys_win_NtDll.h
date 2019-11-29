@@ -28,6 +28,7 @@ enum
 {
 	STATUS_NO_MORE_FILES          = 0x80000006,
 	STATUS_NO_MORE_ENTRIES        = 0x8000001a,
+	STATUS_INFO_LENGTH_MISMATCH   = 0xc0000004,
 	STATUS_BUFFER_TOO_SMALL       = 0xc0000023,
 
 	DIRECTORY_QUERY               = 0x0001,
@@ -95,6 +96,63 @@ enum FILE_INFORMATION_CLASS
 	FileRemoteProtocolInformation,           // 55
 	FileMaximumInformation
 };
+
+enum PROCESSINFOCLASS
+{
+    ProcessBasicInformation,
+    ProcessQuotaLimits,
+    ProcessIoCounters,
+    ProcessVmCounters,
+    ProcessTimes,
+    ProcessBasePriority,
+    ProcessRaisePriority,
+    ProcessDebugPort,
+    ProcessExceptionPort,
+    ProcessAccessToken,
+    ProcessLdtInformation,
+    ProcessLdtSize,
+    ProcessDefaultHardErrorMode,
+    ProcessIoPortHandlers,
+    ProcessPooledUsageAndLimits,
+    ProcessWorkingSetWatch,
+    ProcessUserModeIOPL,
+    ProcessEnableAlignmentFaultFixup,
+    ProcessPriorityClass,
+    ProcessWx86Information,
+    ProcessHandleCount,
+    ProcessAffinityMask,
+    ProcessPriorityBoost,
+    ProcessDeviceMap,
+    ProcessSessionInformation,
+    ProcessForegroundInformation,
+    ProcessWow64Information,
+    ProcessImageFileName,
+    ProcessLUIDDeviceMapsEnabled,
+    ProcessBreakOnTermination,
+    ProcessDebugObjectHandle,
+    ProcessDebugFlags,
+    ProcessHandleTracing,
+    ProcessIoPriority,
+    ProcessExecuteFlags,
+    ProcessTlsInformation,
+    ProcessCookie,
+    ProcessImageInformation,
+    ProcessCycleTime,
+    ProcessPagePriority,
+    ProcessInstrumentationCallback,
+    ProcessThreadStackAllocation,
+    ProcessWorkingSetWatchEx,
+    ProcessImageFileNameWin32,
+    ProcessImageFileMapping,
+    ProcessAffinityUpdateMode,
+    ProcessMemoryAllocationMode,
+    ProcessGroupInformation,
+    ProcessTokenVirtualizationEnabled,
+    ProcessConsoleHostProcess,
+    ProcessWindowInformation,
+    MaxProcessInfoClass
+};
+
 
 enum OBJECT_INFORMATION_CLASS
 {
@@ -214,6 +272,17 @@ NtQueryInformationFileFunc(
 typedef
 NTSTATUS
 NTAPI
+NtQueryInformationProcessFunc(
+	HANDLE ProcessHandle,
+	PROCESSINFOCLASS ProcessInformationClass,
+	PVOID ProcessInformation,
+	ULONG ProcessInformationLength,
+	PULONG ReturnLength
+	);
+
+typedef
+NTSTATUS
+NTAPI
 NtQueryObjectFunc(
 	IN HANDLE FileHandle,
 	IN OBJECT_INFORMATION_CLASS InformationClass,
@@ -230,6 +299,7 @@ extern AXL_SELECT_ANY NtQueryDirectoryObjectFunc* ntQueryDirectoryObject = NULL;
 extern AXL_SELECT_ANY NtOpenSymbolicLinkObjectFunc* ntOpenSymbolicLinkObject = NULL;
 extern AXL_SELECT_ANY NtQuerySymbolicLinkObjectFunc* ntQuerySymbolicLinkObject = NULL;
 extern AXL_SELECT_ANY NtQueryInformationFileFunc* ntQueryInformationFile = NULL;
+extern AXL_SELECT_ANY NtQueryInformationProcessFunc* ntQueryInformationProcess = NULL;
 extern AXL_SELECT_ANY NtQueryObjectFunc* ntQueryObject = NULL;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
