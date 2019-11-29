@@ -32,6 +32,7 @@
 #include "axl_sys_DynamicLib.h"
 #include "axl_sys_Time.h"
 #include "axl_sys_Event.h"
+#include "axl_sys_Process.h"
 #include "axl_sys_ReadWriteLock.h"
 
 #include "axl_fsm_Regex.h"

@@ -4176,6 +4176,22 @@ testUdp()
 	}
 }
 
+//..............................................................................
+
+void testProcName()
+{
+	uint_t pidTable[] =
+	{
+		9336,
+		12712,
+	};
+
+	for (size_t i = 0; i < countof(pidTable); i++)
+	{
+		uint_t pid = pidTable[i];
+		printf("%d: %s\n", pid, sys::getProcessImageName(pid).sz());
+	}
+}
 
 //..............................................................................
 
@@ -4205,10 +4221,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_IO_PCAP)
-	testPcap();
-#endif
-
+	testProcName();
 	return 0;
 }
 
