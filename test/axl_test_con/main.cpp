@@ -4182,8 +4182,7 @@ void testProcName()
 {
 	uint_t pidTable[] =
 	{
-		9336,
-		12712,
+		1012,
 	};
 
 	for (size_t i = 0; i < countof(pidTable); i++)
@@ -4192,6 +4191,30 @@ void testProcName()
 		printf("%d: %s\n", pid, sys::getProcessImageName(pid).sz());
 	}
 }
+
+//..............................................................................
+
+#if (_AXL_OS_WIN)
+
+void testUnnamedPipes()
+{
+	HANDLE hReadPipe;
+	HANDLE hWritePipe;
+	dword_t actualSize;
+
+	::CreatePipe(&hReadPipe, &hWritePipe, NULL, 0);
+
+	char data[] = "hui, govno i muravei";
+	::WriteFile(hWritePipe, data, sizeof(data), &actualSize, NULL);
+
+	char buffer[1024];
+	::ReadFile(hReadPipe, buffer, sizeof(buffer), &actualSize, NULL);
+
+	::CloseHandle(hReadPipe);
+	::CloseHandle(hWritePipe);
+}
+
+#endif
 
 //..............................................................................
 
@@ -4221,7 +4244,10 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testProcName();
+#if (_AXL_OS_WIN)
+	testUnnamedPipes();
+#endif
+
 	return 0;
 }
 

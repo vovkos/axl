@@ -506,8 +506,26 @@ setError(const ErrorRef& error);
 size_t
 pushError(const ErrorRef& error);
 
+inline
 sl::String
-getLastErrorDescription();
+getLastErrorDescription()
+{
+	return getLastError().getDescription();
+}
+
+inline
+Error
+getLastSystemError()
+{
+	return Error(getLastSystemErrorCode());
+}
+
+inline
+sl::String
+getLastSystemErrorDescription()
+{
+	return getLastSystemError().getDescription();
+}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

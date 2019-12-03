@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_ERR_ERROR_H
+#define _AXL_ERR_SYSTEMERROR_H
 
 #include "axl_sl_Guid.h"
 

@@ -187,12 +187,6 @@ pushError(const ErrorRef& error)
 	return result != -1 ? setError(stack) : -1;
 }
 
-sl::String
-getLastErrorDescription()
-{
-	return getErrorMgr()->getLastError().getDescription();
-}
-
 //..............................................................................
 
 size_t
