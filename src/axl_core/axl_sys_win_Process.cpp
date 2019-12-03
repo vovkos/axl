@@ -145,8 +145,14 @@ getProcessImageName(dword_t pid)
 	HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	if (!hProcess)
 	{
-		err::setLastSystemError();
-		return NULL;
+		if (::GetLastError() == ERROR_ACCESS_DENIED)
+			hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+
+		if (!hProcess)
+		{
+			err::setLastSystemError();
+			return NULL;
+		}
 	}
 
 	char stackBuffer[512];
