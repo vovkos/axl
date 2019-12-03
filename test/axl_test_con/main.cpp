@@ -4182,7 +4182,10 @@ void testProcName()
 {
 	uint_t pidTable[] =
 	{
-		1012,
+		1,
+		2,
+		3,
+		4,
 	};
 
 	for (size_t i = 0; i < countof(pidTable); i++)
@@ -4244,10 +4247,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_OS_WIN)
-	testUnnamedPipes();
-#endif
-
+	testProcName();
 	return 0;
 }
 

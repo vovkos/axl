@@ -270,6 +270,7 @@ set(
 	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Mutex.h
 	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Sem.h
 	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Thread.h
+	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Process.h
 	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_DynamicLib.h
 	)
 
@@ -279,6 +280,7 @@ set(
 	axl_sys_psx_Mutex.cpp
 	axl_sys_psx_Sem.cpp
 	axl_sys_psx_Thread.cpp
+	axl_sys_psx_Process.cpp
 	axl_sys_psx_DynamicLib.cpp
 	)
 

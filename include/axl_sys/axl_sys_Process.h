@@ -17,6 +17,8 @@
 
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_Process.h"
+#elif (_AXL_OS_POSIX)
+#	include "axl_sys_psx_Process.h"
 #endif
 
 namespace axl {
@@ -54,9 +56,8 @@ getProcessImageName(uint_t pid)
 {
 #if (_AXL_OS_WIN)
 	return sys::win::getProcessImageName(pid);
-#else
-	// TODO
-	return sl::String();
+#elif (_AXL_OS_POSIX)
+	return sys::psx::getProcessImageName(pid);
 #endif
 }
 
