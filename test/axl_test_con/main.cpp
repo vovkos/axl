@@ -4183,9 +4183,9 @@ void testProcName()
 	uint_t pidTable[] =
 	{
 		1,
-		2,
-		3,
-		4,
+		272,
+		279,
+		476,
 	};
 
 	for (size_t i = 0; i < countof(pidTable); i++)

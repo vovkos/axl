@@ -23,18 +23,32 @@ sl::String
 getProcessImageName(uint_t pid)
 {
 	char buffer[256]; // enough
-	sprintf(buffer, "/proc/%d/comm", pid);
+	sprintf(buffer, "/proc/%d/cmdline", pid);
 	io::File file;
 	bool result = file.open(buffer, io::FileFlag_ReadOnly);
 	if (!result)
 		return sl::String();
 
-	size_t size = file.read(buffer, sizeof(buffer) - 1);
-	if (size == -1)
-		return sl::String();
+	sl::String string;
 
-	sl::String string(buffer, size);
-	string.trimRight();
+	for (;;)
+	{
+		size_t size = file.read(buffer, sizeof(buffer) - 1);
+		if (size == -1)
+			return sl::String();
+		else if (size == 0)
+			break;
+
+		char* p = (char*)memchr(buffer, 0, size);
+		if (p)
+		{
+			string.append(buffer, p - buffer);
+			break;
+		}
+
+		string.append(buffer, size);
+	}
+
 	return string;
 }
 
