@@ -25,6 +25,17 @@ namespace sys {
 //..............................................................................
 
 inline
+uint_t
+getCurrentProcessId()
+{
+#if (_AXL_OS_WIN)
+	return ::GetCurrentProcessId();
+#else
+	return (uint_t)::getpid();
+#endif
+}
+
+inline
 bool
 createProcess(const sl::StringRef& commandLine)
 {
