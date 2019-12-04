@@ -63,7 +63,7 @@ public:
 		)
 	{
 		initialize();
-		attach(NULL, p, count);
+		attach(NULL, (T*)p, count);
 	}
 
 	ArrayRef(
@@ -72,7 +72,7 @@ public:
 		)
 	{
 		initialize();
-		attach(NULL, p, (T*)end - p);
+		attach(NULL, (T*)p, (const T*)end - p);
 	}
 
 	ArrayRef(
@@ -82,7 +82,7 @@ public:
 		)
 	{
 		initialize();
-		attach(hdr, p, count);
+		attach(hdr, (T*)p, count);
 	}
 
 	ArrayRef(
@@ -92,7 +92,7 @@ public:
 		)
 	{
 		initialize();
-		attach(hdr, p, (T*)end - p);
+		attach(hdr, (T*)p, (const T*)end - p);
 	}
 
 
