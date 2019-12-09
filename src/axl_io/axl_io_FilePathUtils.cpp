@@ -552,5 +552,101 @@ getSystemDir()
 
 #endif
 
+//..............................................................................
+
+// based on:
+// http://www.drdobbs.com/architecture-and-design/matching-wildcards-an-empirical-way-to-t/240169123
+
+bool
+matchWildcard(
+	const sl::StringRef& string0,
+	const sl::StringRef& wildcard0
+	)
+{
+	const char* wildcard = wildcard0.sz();
+
+	if (string0.isEmpty()) // empty input shortcut
+	{
+		while (*wildcard == '*')
+			wildcard++;
+
+		return *wildcard == '\0';
+	}
+
+	const char* string = string0.sz();
+	const char* stringBookmark = NULL;
+	const char* wildcardBookmark = NULL;
+	char c;
+
+	for (;;)
+	{
+		if (*wildcard == '*')
+		{
+			while (*++wildcard == '*')
+				;
+
+			if (!*wildcard)
+				return true;
+
+			if (*wildcard != '?')
+			{
+				while (*string != *wildcard)
+				{
+					if (!(*(++string)))
+						return false;
+				}
+			}
+
+			wildcardBookmark = wildcard;
+			stringBookmark = string;
+		}
+		else
+		{
+			c = *string;
+			if (c != *wildcard && *wildcard != '?')
+			{
+				if (wildcardBookmark)
+				{
+					if (wildcard != wildcardBookmark)
+					{
+						wildcard = wildcardBookmark;
+
+						if (c != *wildcard)
+						{
+							string = ++stringBookmark;
+							continue;
+						}
+						else
+						{
+							wildcard++;
+						}
+					}
+
+					if (*string)
+					{
+						string++;
+						continue;
+					}
+				}
+
+				return false;
+			}
+		}
+
+		string++;
+		wildcard++;
+
+		if (!*string)
+		{
+			while (*wildcard == '*')
+				wildcard++;
+
+			return !*wildcard;
+		}
+	}
+}
+
+//..............................................................................
+
 } // namespace io
 } // namespace axl

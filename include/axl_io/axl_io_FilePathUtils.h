@@ -98,6 +98,12 @@ getSymbolicLinkTarget(
 	const sl::StringRef& linkName
 	);
 
+bool
+matchWildcard(
+	const sl::StringRef& string0,
+	const sl::StringRef& wildcard
+	);
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
