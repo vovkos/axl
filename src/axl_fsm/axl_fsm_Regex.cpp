@@ -110,7 +110,31 @@ Regex::clear()
 bool
 Regex::match(const sl::StringRef& string)
 {
-	return false;
+	if (isEmpty())
+		return true;
+
+	DfaState* state = *m_dfaStateList.getHead();
+	char const* p = string.cp();
+	char const* end = string.getEnd();
+
+	for (; p < end; p++)
+	{
+		sl::ConstIterator<DfaTransition> it = state->m_transitionList.getHead();
+		for (; it; it++)
+		{
+			bool isMatch = it->m_matchCondition.isMatch(*p);
+			if (isMatch)
+			{
+				state = it->m_outState;
+				break;
+			}
+		}
+
+		if (!it)
+			return false;
+	}
+
+	return state->m_isAccept;
 }
 
 bool
@@ -210,7 +234,6 @@ Regex::print() const
 		}
 
 		printf("\n");
-
 
 		sl::ConstIterator<DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead();
 		for (; dfaTransitionIt; dfaTransitionIt++)

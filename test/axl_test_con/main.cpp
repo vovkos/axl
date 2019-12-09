@@ -596,7 +596,7 @@ testRegex()
 	regex.print();
 */
 
-	bool result = regexCompiler.compile("ab|cd");
+	bool result = regexCompiler.compile(".*ray[.].*");
 
 /*	bool result =
 		regexCompiler.incrementalCompile("(\\h{2})   ' '+ (\\d{2})") &&
@@ -610,6 +610,10 @@ testRegex()
 
 	regexCompiler.finalize();
 	regex.print();
+
+	char fileName[] = "C:\\Projects\\repos\\ioninja\\jancy\\src\\jnc_ext\\jnc_std\\jnc\\std_Array.jnc";
+	result = regex.match(fileName);
+	printf("match: %d\n", result);
 }
 
 //..............................................................................
@@ -4247,7 +4251,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testProcName();
+	testRegex();
 	return 0;
 }
 

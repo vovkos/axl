@@ -40,6 +40,9 @@ struct MatchCondition
 
 	void
 	addChar(uchar_t c);
+
+	bool
+	isMatch(uchar_t c) const;
 };
 
 //..............................................................................

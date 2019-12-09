@@ -51,6 +51,26 @@ MatchCondition::addChar(uchar_t c)
 	}
 }
 
+bool
+MatchCondition::isMatch(uchar_t c) const
+{
+	switch (m_conditionKind)
+	{
+	case MatchConditionKind_Char:
+		return c == m_char;
+
+	case MatchConditionKind_CharSet:
+		return m_charSet.getBit(c);
+
+	case MatchConditionKind_Any:
+		return true;
+
+	default:
+		ASSERT(false);
+		return false;
+	}
+}
+
 //..............................................................................
 
 NfaState::NfaState()
