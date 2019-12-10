@@ -53,22 +53,49 @@ public:
 		return sl::StringRef(this->m_pos.m_p, this->m_pos.m_length);
 	}
 
+	template <typename IsSpaceNeeded>
 	static
 	sl::String
-	getTokenListString(const sl::ConstBoxList<RagelToken>& list)
+	getTokenListString(
+		const sl::BoxList<RagelToken>& list,
+		const IsSpaceNeeded& isSpaceNeeded
+		)
 	{
 		if (list.isEmpty())
 			return sl::String();
 
 		sl::ConstBoxIterator<RagelToken> token = list.getHead();
+		int prevToken = token->m_token;
 		sl::String string(token->m_pos.m_p, token->m_pos.m_length);
+
 		for (token++; token; token++)
 		{
-			string.append(' ');
+			if (isSpaceNeeded(prevToken, token->m_token))
+				string.append(' ');
+
 			string.append(token->m_pos.m_p, token->m_pos.m_length);
+			prevToken = token->m_token;
 		}
 
 		return string;
+	}
+
+	static
+	sl::String
+	getTokenListString(const sl::BoxList<RagelToken>& list)
+	{
+		return getTokenListString(list, isSpaceNeededStd);
+	}
+
+protected:
+	static
+	bool
+	isSpaceNeededStd(
+		int token1,
+		int token2
+		)
+	{
+		return token1 != '.' && token2 != '.' && token2 != ',' && token2 != ';';
 	}
 };
 
