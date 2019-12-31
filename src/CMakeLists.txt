@@ -135,28 +135,56 @@ option(
 	ON
 	)
 
+if(BUILD_AXL_IO)
+	add_subdirectory(axl_io)
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 if(PCAP_FOUND)
 	option(
 		BUILD_AXL_IO_PCAP
-		"Build Pcap wrappers for axl_io library"
+		"Build axl_io_pcap library (Pcap wrappers)"
 		ON
 		)
 else()
 	unset(BUILD_AXL_IO_PCAP CACHE)
 endif()
 
+if(BUILD_AXL_IO_PCAP)
+	add_subdirectory(axl_io_pcap)
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 if(LIBUSB_FOUND)
 	option(
 		BUILD_AXL_IO_USB
-		"Build LibUSB wrappers for axl_io library"
+		"Build axl_io library (LibUSB wrappers)"
 		ON
 		)
 else()
 	unset(BUILD_AXL_IO_USB CACHE)
 endif()
 
-if(BUILD_AXL_IO)
-	add_subdirectory(axl_io)
+if(BUILD_AXL_IO_USB)
+	add_subdirectory(axl_io_usb)
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+if(OPENSSL_FOUND)
+	option(
+		BUILD_AXL_IO_SSL
+		"Build axl_io_ssl library (OpenSSL libssl wrappers)"
+		ON
+		)
+else()
+	unset(BUILD_AXL_IO_SSL CACHE)
+endif()
+
+if(BUILD_AXL_IO_SSL)
+	add_subdirectory(axl_io_ssl)
 endif()
 
 #...............................................................................
@@ -220,7 +248,7 @@ endif()
 if(OPENSSL_FOUND)
 	option(
 		BUILD_AXL_CRY
-		"Build axl_cry library"
+		"Build axl_cry library (OpenSSL libcrypto wrappers)"
 		ON
 		)
 else()

@@ -9,12 +9,4 @@
 //
 //..............................................................................
 
-#pragma once
-
-#include "axl_sl_Handle.h"
-
-#include <pcap/pcap.h>
-
-#ifndef PCAP_NETMASK_UNKNOWN
-#	define PCAP_NETMASK_UNKNOWN 0xffffffff
-#endif
+#include "pch.h"

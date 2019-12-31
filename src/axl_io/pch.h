@@ -12,15 +12,6 @@
 #pragma once
 
 #include "axl_io_Pch.h"
-
-#ifdef _AXL_IO_PCAP
-#	include "axl_io_PcapPch.h"
-#endif
-
-#ifdef _AXL_IO_USB
-#	include "axl_io_UsbPch.h"
-#endif
-
 #include "axl_g_Module.h"
 #include "axl_err_Error.h"
 #include "axl_sys_Time.h"

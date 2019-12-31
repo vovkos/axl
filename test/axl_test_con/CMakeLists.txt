@@ -58,7 +58,7 @@ if(BUILD_AXL_IO_USB)
 	include_directories(${LIBUSB_INC_DIR})
 	link_directories(${LIBUSB_LIB_DIR})
 	add_definitions(-D_AXL_IO_USB=1)
-	list(APPEND OPT_LIB_LIST ${LIBUSB_LIB_NAME})
+	list(APPEND OPT_LIB_LIST axl_io_usb ${LIBUSB_LIB_NAME})
 endif()
 
 if(BUILD_AXL_IO_PCAP)
@@ -67,8 +67,15 @@ if(BUILD_AXL_IO_PCAP)
 	add_definitions(-D_AXL_IO_PCAP=1)
 
 	if(WIN32)
-		list(APPEND OPT_LIB_LIST wpcap)
+		list(APPEND OPT_LIB_LIST axl_io_pcap wpcap)
 	endif()
+endif()
+
+if(BUILD_AXL_IO_SSL)
+	include_directories(${OPENSSL_INC_DIR})
+	link_directories(${OPENSSL_LIB_DIR})
+	add_definitions(-D_AXL_IO_SSL=1)
+	list(APPEND OPT_LIB_LIST axl_io_ssl ${OPENSSL_SSL_LIB_NAME} ${OPENSSL_CRYPTO_LIB_NAME})
 endif()
 
 if(BUILD_AXL_XML)
@@ -163,11 +170,19 @@ if(UNIX)
 endif()
 
 if(WIN32)
-	if(BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
+	if(BUILD_AXL_IO_USB)
 		list(APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
 	endif()
 
-	if(BUILD_AXL_XML AND EXPAT_DLL_DIR)
+	if(BUILD_AXL_IO_SSL)
+		list(
+			APPEND _DLL_LIST
+			${OPENSSL_DLL_DIR}/${OPENSSL_SSL_LIB_NAME}.dll
+			${OPENSSL_DLL_DIR}/${OPENSSL_CRYPTO_LIB_NAME}.dll
+			)
+	endif()
+
+	if(BUILD_AXL_XML)
 		list(APPEND _DLL_LIST ${EXPAT_DLL_DIR}/expat.dll)
 	endif()
 

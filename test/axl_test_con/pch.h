@@ -59,6 +59,13 @@
 #	include "axl_io_Pcap.h"
 #endif
 
+#ifdef _AXL_IO_SSL
+#	include "axl_io_SslError.h"
+#	include "axl_io_SslCtx.h"
+#	include "axl_io_SslBio.h"
+#	include "axl_io_Ssl.h"
+#endif
+
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_VirtualMemory.h"
 #	include "axl_sys_win_Process.h"

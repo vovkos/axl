@@ -10,11 +10,11 @@
 #...............................................................................
 
 #
-# io folder
+# lib folder
 #
 
 set(
-	IO_H_LIST
+	LIB_H_LIST
 	${AXL_INC_DIR}/axl_io/axl_io_File.h
 	${AXL_INC_DIR}/axl_io/axl_io_FilePathUtils.h
 	${AXL_INC_DIR}/axl_io/axl_io_FileEnumerator.h
@@ -33,7 +33,7 @@ set(
 	)
 
 set(
-	IO_CPP_LIST
+	LIB_CPP_LIST
 	axl_io_File.cpp
 	axl_io_FilePathUtils.cpp
 	axl_io_FileEnumerator.cpp
@@ -59,82 +59,28 @@ axl_exclude_from_build(
 	)
 
 source_group(
-	io
+	lib
 	FILES
-	${IO_H_LIST}
-	${IO_CPP_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
 	)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# io_pcap folder
+# lib_psx folder
 #
 
 set(
-	IO_PCAP_H_LIST
-	${AXL_INC_DIR}/axl_io/axl_io_Pcap.h
-	${AXL_INC_DIR}/axl_io/axl_io_PcapFilter.h
+	LIB_PSX_H_LIST
+	${AXL_INC_DIR}/axl_io/axl_io_psx_File.h
+	${AXL_INC_DIR}/axl_io/axl_io_psx_Mapping.h
+	${AXL_INC_DIR}/axl_io/axl_io_psx_Pipe.h
+	${AXL_INC_DIR}/axl_io/axl_io_psx_Serial.h
+	${AXL_INC_DIR}/axl_io/axl_io_psx_Socket.h
 	)
 
 set(
-	IO_PCAP_CPP_LIST
-	axl_io_Pcap.cpp
-	axl_io_PcapFilter.cpp
-	)
-
-source_group(
-	io_pcap
-	FILES
-	${IO_PCAP_H_LIST}
-	${IO_PCAP_CPP_LIST}
-	)
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# io_usb folder
-#
-
-set(
-	IO_USB_H_LIST
-	${AXL_INC_DIR}/axl_io/axl_io_UsbContext.h
-	${AXL_INC_DIR}/axl_io/axl_io_UsbEventThread.h
-	${AXL_INC_DIR}/axl_io/axl_io_UsbDevice.h
-	${AXL_INC_DIR}/axl_io/axl_io_UsbTransfer.h
-	${AXL_INC_DIR}/axl_io/axl_io_UsbError.h
-	)
-
-set(
-	IO_USB_CPP_LIST
-	axl_io_UsbContext.cpp
-	axl_io_UsbEventThread.cpp
-	axl_io_UsbDevice.cpp
-	axl_io_UsbTransfer.cpp
-	axl_io_UsbError.cpp
-	)
-
-source_group(
-	io_usb
-	FILES
-	${IO_USB_H_LIST}
-	${IO_USB_CPP_LIST}
-	)
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-# io_psx folder
-#
-
-set(
-	IO_PSX_H_LIST
-	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_File.h
-	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Mapping.h
-	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Pipe.h
-	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Serial.h
-	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Socket.h
-	)
-
-set(
-	IO_PSX_CPP_LIST
+	LIB_PSX_CPP_LIST
 	axl_io_psx_File.cpp
 	axl_io_psx_Mapping.cpp
 	axl_io_psx_Pipe.cpp
@@ -144,33 +90,33 @@ set(
 	)
 
 source_group(
-	io_psx
+	lib_psx
 	FILES
-	${IO_PSX_H_LIST}
-	${IO_PSX_CPP_LIST}
+	${LIB_PSX_H_LIST}
+	${LIB_PSX_CPP_LIST}
 	)
 
 if(NOT UNIX)
-	axl_exclude_from_build(${IO_PSX_CPP_LIST})
+	axl_exclude_from_build(${LIB_PSX_CPP_LIST})
 endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# io_win folder
+# lib_win folder
 #
 
 set(
-	IO_WIN_H_LIST
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_File.h
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_Iocp.h
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_Mapping.h
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_NamedPipe.h
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_Serial.h
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_Socket.h
+	LIB_WIN_H_LIST
+	${AXL_INC_DIR}/axl_io/axl_io_win_File.h
+	${AXL_INC_DIR}/axl_io/axl_io_win_Iocp.h
+	${AXL_INC_DIR}/axl_io/axl_io_win_Mapping.h
+	${AXL_INC_DIR}/axl_io/axl_io_win_NamedPipe.h
+	${AXL_INC_DIR}/axl_io/axl_io_win_Serial.h
+	${AXL_INC_DIR}/axl_io/axl_io_win_Socket.h
 	)
 
 set(
-	IO_WIN_CPP_LIST
+	LIB_WIN_CPP_LIST
 	axl_io_win_File.cpp
 	axl_io_win_Iocp.cpp
 	axl_io_win_Mapping.cpp
@@ -182,64 +128,64 @@ set(
 	)
 
 source_group(
-	io_win
+	lib_win
 	FILES
-	${IO_WIN_H_LIST}
-	${IO_WIN_CPP_LIST}
+	${LIB_WIN_H_LIST}
+	${LIB_WIN_CPP_LIST}
 	)
 
 if(NOT WIN32)
-	axl_exclude_from_build(${IO_WIN_CPP_LIST})
+	axl_exclude_from_build(${LIB_WIN_CPP_LIST})
 endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# io_lnx folder
+# lib_lnx folder
 #
 
 set(
-	IO_LNX_H_LIST
+	LIB_LNX_H_LIST
 	)
 
 set(
-	IO_LNX_CPP_LIST
+	LIB_LNX_CPP_LIST
 	axl_io_lnx_SerialPortEnumerator.cpp
 	)
 
 source_group(
-	io_lnx
+	lib_lnx
 	FILES
-	${IO_LNX_H_LIST}
-	${IO_LNX_CPP_LIST}
+	${LIB_LNX_H_LIST}
+	${LIB_LNX_CPP_LIST}
 	)
 
 if(NOT LINUX)
-	axl_exclude_from_build(${IO_LNX_CPP_LIST})
+	axl_exclude_from_build(${LIB_LNX_CPP_LIST})
 endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# io_drw folder
+# lib_drw folder
 #
 
 set(
-	IO_DRW_H_LIST
+	LIB_DRW_H_LIST
 	)
 
 set(
-	IO_DRW_CPP_LIST
+	LIB_DRW_CPP_LIST
 	axl_io_drw_SerialPortEnumerator.cpp
 	)
 
 source_group(
-	io_drw
+	lib_drw
 	FILES
-	${IO_DRW_H_LIST}
-	${IO_DRW_CPP_LIST}
+	${LIB_DRW_H_LIST}
+	${LIB_DRW_CPP_LIST}
 	)
 
 if(NOT APPLE)
-	axl_exclude_from_build(${IO_DRW_CPP_LIST})
+	axl_exclude_from_build(${LIB_DRW_CPP_LIST})
 endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -254,10 +200,8 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_io/axl_io_Pch.h
-	${AXL_INC_DIR}/axl_io/axl_io_UsbPch.h
-	${AXL_INC_DIR}/axl_io/axl_io_PcapPch.h
-	${AXL_INC_DIR}/axl_io_psx/axl_io_psx_Pch.h
-	${AXL_INC_DIR}/axl_io_win/axl_io_win_Pch.h
+	${AXL_INC_DIR}/axl_io/axl_io_psx_Pch.h
+	${AXL_INC_DIR}/axl_io/axl_io_win_Pch.h
 	)
 
 source_group(
@@ -274,50 +218,20 @@ source_group(
 
 include_directories(${AXL_INC_DIR})
 
-if(BUILD_AXL_IO_PCAP)
-	include_directories(${PCAP_INC_DIR})
-	add_definitions(-D_AXL_IO_PCAP=1)
-
-	axl_install_redirected_includes(
-		${AXL_INSTALL_INC_SUBDIR}
-		axl_io
-		${IO_PCAP_H_LIST}
-		)
-else()
-	axl_exclude_from_build(${IO_PCAP_CPP_LIST})
-endif()
-
-if(BUILD_AXL_IO_USB)
-	include_directories(${LIBUSB_INC_DIR})
-	add_definitions(-D_AXL_IO_USB=1)
-
-	axl_install_redirected_includes(
-		${AXL_INSTALL_INC_SUBDIR}
-		axl_io
-		${IO_USB_H_LIST}
-		)
-else()
-	axl_exclude_from_build(${IO_USB_CPP_LIST})
-endif()
-
 add_library(
 	axl_io
 	${PCH_H_LIST}
 	${PCH_CPP}
-	${IO_H_LIST}
-	${IO_CPP_LIST}
-	${IO_PCAP_H_LIST}
-	${IO_PCAP_CPP_LIST}
-	${IO_USB_H_LIST}
-	${IO_USB_CPP_LIST}
-	${IO_WIN_H_LIST}
-	${IO_WIN_CPP_LIST}
-	${IO_PSX_H_LIST}
-	${IO_PSX_CPP_LIST}
-	${IO_LNX_H_LIST}
-	${IO_LNX_CPP_LIST}
-	${IO_DRW_H_LIST}
-	${IO_DRW_CPP_LIST}
+	${LIB_H_LIST}
+	${LIB_CPP_LIST}
+	${LIB_WIN_H_LIST}
+	${LIB_WIN_CPP_LIST}
+	${LIB_PSX_H_LIST}
+	${LIB_PSX_CPP_LIST}
+	${LIB_LNX_H_LIST}
+	${LIB_LNX_CPP_LIST}
+	${LIB_DRW_H_LIST}
+	${LIB_DRW_CPP_LIST}
 	)
 
 axl_set_pch(
@@ -326,28 +240,25 @@ axl_set_pch(
 	${PCH_CPP}
 	)
 
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_io
-	${IO_H_LIST}
+	${LIB_H_LIST}
 	)
 
 if(WIN32)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
 		axl_io_win
-		${IO_WIN_H_LIST}
+		${LIB_WIN_H_LIST}
 		)
 endif()
-
 
 if(UNIX)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
 		axl_io_psx
-		${IO_PSX_H_LIST}
+		${LIB_PSX_H_LIST}
 		)
 endif()
 

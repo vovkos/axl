@@ -70,7 +70,10 @@ public:
 	}
 
 	size_t
-	create(int code);
+	create(int code)
+	{
+		return createSimpleError(g_usbErrorGuid, code);
+	}
 };
 
 //..............................................................................

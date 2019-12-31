@@ -266,12 +266,12 @@ source_group(
 
 set(
 	SYS_PSX_H_LIST
-	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Cond.h
-	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Mutex.h
-	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Sem.h
-	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Thread.h
-	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_Process.h
-	${AXL_INC_DIR}/axl_sys_psx/axl_sys_psx_DynamicLib.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Cond.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Mutex.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Sem.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Thread.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Process.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_DynamicLib.h
 	)
 
 set(
@@ -302,27 +302,27 @@ endif()
 
 set(
 	SYS_WIN_H_LIST
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Bstr.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WinError.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_NtStatus.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_NtDll.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_CriticalSection.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Event.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Semaphore.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Thread.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WaitableHandle.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_WaitableTimer.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Handle.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_PerfCounter.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_JobObject.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Library.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Service.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_ServiceMgr.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_DeviceInfo.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Process.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_AccessToken.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_Sid.h
-	${AXL_INC_DIR}/axl_sys_win/axl_sys_win_VirtualMemory.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Bstr.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_WinError.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_NtStatus.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_NtDll.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_CriticalSection.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Event.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Semaphore.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Thread.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_WaitableHandle.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_WaitableTimer.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Handle.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_PerfCounter.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_JobObject.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Library.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Service.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_ServiceMgr.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_DeviceInfo.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Process.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_AccessToken.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Sid.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_VirtualMemory.h
 	)
 
 set(
@@ -362,11 +362,11 @@ endif()
 
 set(
 	SYS_LNX_H_LIST
-	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_Udev.h
-	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevContext.h
-	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevDevice.h
-	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevMonitor.h
-	${AXL_INC_DIR}/axl_sys_lnx/axl_sys_lnx_UdevEnumerator.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_Udev.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevContext.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevDevice.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevMonitor.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevEnumerator.h
 	)
 
 set(
@@ -403,8 +403,8 @@ endif()
 
 set(
 	SYS_DRW_H_LIST
-	${AXL_INC_DIR}/axl_sys_drw/axl_sys_drw_MachError.h
-	${AXL_INC_DIR}/axl_sys_drw/axl_sys_drw_Semaphore.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_drw_MachError.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_drw_Semaphore.h
 	)
 
 set(

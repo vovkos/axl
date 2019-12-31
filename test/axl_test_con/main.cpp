@@ -4225,6 +4225,131 @@ void testUnnamedPipes()
 
 //..............................................................................
 
+int
+sslVerifyCallback(
+	int isPreVerifyOk,
+	X509_STORE_CTX* ctx
+	)
+{
+	printf("sslVerifyCallback(%d, %p)\n", isPreVerifyOk, ctx);
+
+    char buffer[256];
+	X509 *cert = X509_STORE_CTX_get_current_cert(ctx);
+    int depth = X509_STORE_CTX_get_error_depth(ctx);
+    int err = X509_STORE_CTX_get_error(ctx);
+    fprintf(stderr, "Certificate at depth: %i\n", depth);
+    X509_NAME_oneline(X509_get_issuer_name(cert), buffer, sizeof(buffer));
+    fprintf(stderr, "   issuer = %s\n", buffer);
+    X509_NAME_oneline(X509_get_subject_name(cert), buffer, sizeof(buffer));
+    fprintf(stderr, "   subject = %s\n", buffer);
+    fprintf(stderr, "   err %i:%s\n", err, X509_verify_cert_error_string(err));
+
+	return true;
+}
+
+void
+sslInfoCallback(
+	const SSL* ssl,
+	int type,
+	int value
+	)
+{
+	printf("sslInfoCallback(0x%x, %d) -> %s\n", type, value, SSL_state_string_long(ssl));
+}
+
+void testSsl()
+{
+	bool result;
+
+	SSL_library_init();
+	io::registerSslErrorProviders();
+
+//	const char* ipString = "216.58.200.238"; // google.com
+	const char* ipString = "104.236.152.161"; // ioninja.com
+	int port = 443;
+
+	io::SockAddr addr;
+	addr.parse_ip4(ipString);
+	addr.setPort(port);
+
+	io::Socket socket;
+	printf("connecting to %s:%d...\n", ipString, port);
+
+	result =
+		socket.open(AF_INET, SOCK_STREAM, IPPROTO_IP) &&
+		socket.connect(addr);
+
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	io::SslBio bio;
+	io::SslCtx ctx;
+	io::Ssl ssl;
+
+	result =
+		ctx.create() &&
+		ctx.loadVerifyLocations("C:/Users/Vladimir/DigiCertSHA2ExtendedValidationServerCA.pem") &&
+		//ctx.loadVerifyLocations("c:/ubuntu/etc/ssl/certs/ca-certificates.crt") &&
+		ssl.create(ctx) &&
+		bio.createSocket(socket.m_socket);
+
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	ssl.setVerifyDepth(100);
+	ssl.setVerify(SSL_VERIFY_PEER, sslVerifyCallback);
+	ssl.setInfoCallback(sslInfoCallback);
+	ssl.setBio(bio.detach());
+	ssl.setConnectState();
+
+	printf("handshaking...\n");
+
+	result = ssl.doHandshake();
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("------------------------\n");
+
+	long verifyResult = ssl.getVerifyResult();
+	printf("verify result: %s\n", io::SslX509Error(verifyResult).getDescription().sz());
+
+	printf("getting front page...\n");
+
+	const char get[] =
+		"GET / HTTP/1.1\n"
+		"Host: www.ioninja.com\n"
+		"\n\n";
+
+	ssl.write(get, lengthof(get));
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		char buffer[256] = { 0 };
+		size_t size = ssl.read(buffer, sizeof(buffer) - 1);
+		if (size != -1)
+			printf("%s", buffer);
+		else
+			sys::sleep(200);
+	}
+
+	printf("\nshutting down...\n");
+
+	ssl.shutdown();
+
+	printf("done.\n");
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -4251,7 +4376,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testRegex();
+	testSsl();
 	return 0;
 }
 
