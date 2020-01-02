@@ -20,7 +20,7 @@ namespace psx {
 //..............................................................................
 
 sl::String
-getProcessImageName(uint_t pid)
+getProcessImageName(pid_t pid)
 {
 	char buffer[256]; // enough
 	sprintf(buffer, "/proc/%d/cmdline", pid);
