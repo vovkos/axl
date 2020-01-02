@@ -67,8 +67,12 @@ if(BUILD_AXL_IO_PCAP)
 	add_definitions(-D_AXL_IO_PCAP=1)
 
 	if(WIN32)
-		list(APPEND OPT_LIB_LIST axl_io_pcap wpcap)
+		set(PCAP_LIB_NAME wpcap)
+	else()
+		set(PCAP_LIB_NAME pcap)
 	endif()
+
+	list(APPEND OPT_LIB_LIST axl_io_pcap ${PCAP_LIB_NAME})
 endif()
 
 if(BUILD_AXL_IO_SSL)
@@ -158,13 +162,6 @@ if(UNIX)
 		target_link_libraries(
 			axl_test_con
 			rt
-			)
-	endif()
-
-	if(BUILD_AXL_IO_PCAP)
-		target_link_libraries(
-			axl_test_con
-			pcap
 			)
 	endif()
 endif()
