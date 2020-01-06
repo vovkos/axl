@@ -24,7 +24,7 @@ namespace win {
 //..............................................................................
 
 bool
-Process::createProcess(
+Process::create(
 	const sl::StringRef_w& appName,
 	const sl::StringRef_w& cmdLine,
 	const SECURITY_ATTRIBUTES* processAttr,
@@ -100,12 +100,12 @@ syncExec(
 	startupInfo.cb = sizeof(STARTUPINFO);
 	startupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 	startupInfo.hStdOutput = childStdOut;
-	startupInfo.hStdInput  = childStdIn;
-	startupInfo.hStdError  = childStdOut;
+	startupInfo.hStdInput = childStdIn;
+	startupInfo.hStdError = childStdOut;
 	startupInfo.wShowWindow = SW_HIDE;
 
 	Process process;
-	result = process.createProcess(cmdLine, true, CREATE_NEW_CONSOLE, &startupInfo);
+	result = process.create(cmdLine, true, CREATE_NEW_CONSOLE, &startupInfo);
 	if (!result)
 		return false;
 

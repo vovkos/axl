@@ -13,7 +13,7 @@
 
 #define _AXL_SYS_WIN_PROCESS_H
 
-#include "axl_sys_win_Handle.h"
+#include "axl_sys_win_WaitableHandle.h"
 #include "axl_sl_String.h"
 #include "axl_sl_Array.h"
 
@@ -23,11 +23,11 @@ namespace win {
 
 //..............................................................................
 
-class Process: public Handle
+class Process: public WaitableHandle
 {
 public:
 	bool
-	createProcess(
+	create(
 		const sl::StringRef_w& appName,
 		const sl::StringRef_w& cmdLine,
 		const SECURITY_ATTRIBUTES* processAttr,
@@ -41,14 +41,14 @@ public:
 		);
 
 	bool
-	createProcess(
+	create(
 		const sl::StringRef_w& cmdLine,
 		bool inheritHandles,
 		dword_t flags,
 		const STARTUPINFOW* startupInfo
 		)
 	{
-		return createProcess(
+		return create(
 			NULL,
 			cmdLine,
 			NULL,
@@ -73,6 +73,13 @@ public:
 	getExitCode(dword_t* exitCode)
 	{
 		bool_t result = ::GetExitCodeProcess(m_h, exitCode);
+		return err::complete(result);
+	}
+
+	bool
+	terminate(uint_t exitCode)
+	{
+		bool_t result = ::TerminateProcess(m_h, exitCode);
 		return err::complete(result);
 	}
 };
