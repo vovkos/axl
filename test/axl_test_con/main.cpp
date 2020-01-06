@@ -4327,6 +4327,7 @@ void testSsl()
 	const char get[] =
 		"GET / HTTP/1.1\n"
 		"Host: www.ioninja.com\n"
+		"Connection: close\n"
 		"\n\n";
 
 	ssl.write(get, lengthof(get));

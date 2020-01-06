@@ -44,6 +44,12 @@ public:
 		dword_t options
 		);
 
+	dword_t
+	getType() const
+	{
+		return ::GetFileType(m_h);
+	}
+
 	uint64_t
 	getSize() const;
 
