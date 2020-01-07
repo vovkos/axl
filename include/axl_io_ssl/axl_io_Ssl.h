@@ -14,6 +14,7 @@
 #define _AXL_IO_SSL_H
 
 #include "axl_io_SslCtx.h"
+#include "axl_io_SslError.h"
 
 namespace axl {
 namespace io {
@@ -37,6 +38,19 @@ class Ssl: public sl::Handle<SSL*, FreeSsl>
 public:
 	bool
 	create(SSL_CTX* ctx);
+
+	int
+	getError(int retCode)
+	{
+		return ::SSL_get_error(m_h, retCode);
+	}
+
+	void
+	setError(int retCode)
+	{
+		int error = getError(retCode);
+		err::setError(SslError(error));
+	}
 
 	void
 	setBio(BIO* bio)

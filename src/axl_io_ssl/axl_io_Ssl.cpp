@@ -31,8 +31,14 @@ bool
 Ssl::setCipherList(const sl::StringRef& listString)
 {
 	ASSERT(m_h);
-	bool_t result = ::SSL_set_cipher_list(m_h, listString.sz());
-	return completeSslOp(result);
+	int result = ::SSL_set_cipher_list(m_h, listString.sz());
+	if (result <= 0)
+	{
+		setError(result);
+		return false;
+	}
+
+	return true;
 }
 
 bool
@@ -40,7 +46,13 @@ Ssl::doHandshake()
 {
 	ASSERT(m_h);
 	int result = ::SSL_do_handshake(m_h);
-	return completeSslOp(result);
+	if (result <= 0)
+	{
+		setError(result);
+		return false;
+	}
+
+	return true;
 }
 
 bool
@@ -48,7 +60,13 @@ Ssl::shutdown()
 {
 	ASSERT(m_h);
 	int result = ::SSL_shutdown(m_h);
-	return completeSslOp(result);
+	if (result < 0) // 0 here means shutdown in progress
+	{
+		setError(result);
+		return false;
+	}
+
+	return true;
 }
 
 size_t
@@ -59,7 +77,13 @@ Ssl::write(
 {
 	ASSERT(m_h);
 	int result = ::SSL_write(m_h, p, (int)size);
-	return completeSslOp<size_t>(result, -1);
+	if (result < 0)
+	{
+		setError(result);
+		return -1;
+	}
+
+	return result;
 }
 
 size_t
@@ -70,7 +94,13 @@ Ssl::read(
 {
 	ASSERT(m_h);
 	int result = ::SSL_read(m_h, p, (int)size);
-	return completeSslOp<size_t>(result, -1);
+	if (result < 0)
+	{
+		setError(result);
+		return -1;
+	}
+
+	return result;
 }
 
 //..............................................................................
