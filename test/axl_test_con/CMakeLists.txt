@@ -79,7 +79,14 @@ if(BUILD_AXL_IO_SSL)
 	include_directories(${OPENSSL_INC_DIR})
 	link_directories(${OPENSSL_LIB_DIR})
 	add_definitions(-D_AXL_IO_SSL=1)
-	list(APPEND OPT_LIB_LIST axl_io_ssl ${OPENSSL_SSL_LIB_NAME} ${OPENSSL_CRYPTO_LIB_NAME})
+
+	list(
+		APPEND OPT_LIB_LIST
+		axl_io_ssl
+		axl_cry
+		${OPENSSL_SSL_LIB_NAME}
+		${OPENSSL_CRYPTO_LIB_NAME}
+		)
 endif()
 
 if(BUILD_AXL_XML)

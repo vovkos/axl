@@ -64,6 +64,8 @@
 #	include "axl_io_SslCtx.h"
 #	include "axl_io_SslBio.h"
 #	include "axl_io_Ssl.h"
+#	include "axl_cry_BigNum.h"
+#	include "axl_cry_Bio.h"
 #endif
 
 #if (_AXL_OS_WIN)

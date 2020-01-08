@@ -4225,6 +4225,81 @@ void testUnnamedPipes()
 
 //..............................................................................
 
+sl::String
+asn1TimeToString(const ASN1_TIME* time)
+{
+	BIO *bio = BIO_new(BIO_s_mem());
+	ASN1_TIME_print(bio, time);
+
+	BUF_MEM* mem;
+	BIO_get_mem_ptr(bio, &mem);
+	sl::String resultString(mem->data, mem->length);
+	BIO_free(bio);
+
+	return resultString;
+}
+
+sl::String
+asn1StringToString(const ASN1_STRING* string)
+{
+	BIO *bio = BIO_new(BIO_s_mem());
+	ASN1_STRING_print(bio, string);
+
+	BUF_MEM* mem;
+	BIO_get_mem_ptr(bio, &mem);
+	sl::String resultString(mem->data, mem->length);
+	BIO_free(bio);
+
+	return resultString;
+}
+
+sl::String
+asn1ObjectToString(const ASN1_OBJECT* object)
+{
+	char buffer[256];
+	OBJ_obj2txt(buffer, sizeof(buffer), object, 0);
+	return buffer;
+}
+
+void
+printX509Name(X509_name_st* name)
+{
+	int count = X509_NAME_entry_count(name);
+	for (int i = 0; i < count; i++)
+	{
+		X509_NAME_ENTRY* entry = X509_NAME_get_entry(name, i);
+		ASN1_OBJECT* object = X509_NAME_ENTRY_get_object(entry);
+		ASN1_STRING* data = X509_NAME_ENTRY_get_data(entry);
+
+		printf("    %s: %s\n", asn1ObjectToString(object).sz(), asn1StringToString(data).sz());
+	}
+}
+
+void
+printSslCertificate(X509* cert)
+{
+//	int result;
+
+	ASN1_INTEGER* serialNumber = X509_get_serialNumber(cert);
+	ASN1_TIME* notBeforeTime = X509_get_notBefore(cert);
+	ASN1_TIME* notAfterTime = X509_get_notAfter(cert);
+	X509_name_st* subjectName = X509_get_subject_name(cert);
+	X509_name_st* issuerName = X509_get_issuer_name(cert);
+
+	cry::BigNum bigNum;
+	bigNum.create();
+	ASN1_INTEGER_to_BN(serialNumber, bigNum);
+	printf("  serial:     %s\n", bigNum.getHexString().sz());
+	printf("  valid from: %s\n", asn1TimeToString(notBeforeTime).sz());
+	printf("  valid to:   %s\n", asn1TimeToString(notAfterTime).sz());
+
+	printf("  subject:\n");
+	printX509Name(subjectName);
+
+	printf("  issuer:\n");
+	printX509Name(issuerName);
+}
+
 int
 sslVerifyCallback(
 	int isPreVerifyOk,
@@ -4233,16 +4308,10 @@ sslVerifyCallback(
 {
 	printf("sslVerifyCallback(%d, %p)\n", isPreVerifyOk, ctx);
 
-    char buffer[256];
-	X509 *cert = X509_STORE_CTX_get_current_cert(ctx);
-    int depth = X509_STORE_CTX_get_error_depth(ctx);
-    int err = X509_STORE_CTX_get_error(ctx);
-    fprintf(stderr, "Certificate at depth: %i\n", depth);
-    X509_NAME_oneline(X509_get_issuer_name(cert), buffer, sizeof(buffer));
-    fprintf(stderr, "   issuer = %s\n", buffer);
-    X509_NAME_oneline(X509_get_subject_name(cert), buffer, sizeof(buffer));
-    fprintf(stderr, "   subject = %s\n", buffer);
-    fprintf(stderr, "   err %i:%s\n", err, X509_verify_cert_error_string(err));
+	X509* cert = X509_STORE_CTX_get_current_cert(ctx);
+	printSslCertificate(cert);
+	int err = X509_STORE_CTX_get_error(ctx);
+    printf("  error: %d: %s\n", err, X509_verify_cert_error_string(err));
 
 	return true;
 }
@@ -4264,8 +4333,9 @@ void testSsl()
 	SSL_library_init();
 	io::registerSslErrorProviders();
 
-//	const char* ipString = "216.58.200.238"; // google.com
+//	const char* ipString = "216.58.200.238";  // google.com
 	const char* ipString = "104.236.152.161"; // ioninja.com
+//	const char* ipString = "93.174.104.89";   // tibbo.com
 	int port = 443;
 
 	io::SockAddr addr;
@@ -4302,7 +4372,6 @@ void testSsl()
 		return;
 	}
 
-	ssl.setVerifyDepth(100);
 	ssl.setVerify(SSL_VERIFY_PEER, sslVerifyCallback);
 	ssl.setInfoCallback(sslInfoCallback);
 	ssl.setBio(bio.detach());
@@ -4318,6 +4387,23 @@ void testSsl()
 	}
 
 	printf("------------------------\n");
+
+	STACK_OF(X509)* chain = ssl.getPeerCertificateChain();
+
+	printf("Peer certificate(s):\n");
+
+	int count = sk_X509_num(chain);
+	if (count == 1)
+	{
+		X509* cert = sk_X509_value(chain, 0);
+		printSslCertificate(cert);
+	}
+	else for (int i = 0; i < count; i++)
+	{
+		printf("Certificate[%d]:\n", i);
+		X509* cert = sk_X509_value(chain, i);
+		printSslCertificate(cert);
+	}
 
 	long verifyResult = ssl.getVerifyResult();
 	printf("verify result: %s\n", io::SslX509Error(verifyResult).getDescription().sz());
