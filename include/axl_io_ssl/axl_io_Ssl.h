@@ -159,18 +159,52 @@ public:
 		::SSL_set_read_ahead(m_h, isReadAhead);
 	}
 
+	int
+	getState()
+	{
+		ASSERT(m_h);
+		return ::SSL_get_state(m_h);
+	}
+
 	const char*
 	getStateString()
 	{
 		ASSERT(m_h);
-		::SSL_state_string(m_h);
+		return ::SSL_state_string(m_h);
 	}
 
 	const char*
-	getLongStateString()
+	getStateStringLong()
 	{
 		ASSERT(m_h);
-		::SSL_state_string_long(m_h);
+		return ::SSL_state_string_long(m_h);
+	}
+
+	void*
+	getExtraData(int index)
+	{
+		ASSERT(m_h);
+		return ::SSL_get_ex_data(m_h, index);
+	}
+
+	bool
+	setExtraData(
+		int index,
+		void* p
+		);
+
+	X509*
+	getPeerCertificate()
+	{
+		ASSERT(m_h);
+		return ::SSL_get_peer_certificate(m_h);
+	}
+
+	STACK_OF(X509)*
+	getPeerCertificateChain()
+	{
+		ASSERT(m_h);
+		return ::SSL_get_peer_cert_chain(m_h);
 	}
 
 	bool

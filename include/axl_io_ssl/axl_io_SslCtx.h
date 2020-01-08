@@ -36,8 +36,8 @@ typedef
 void
 SslInfoCallbackFunc(
 	const SSL* ssl,
-	int type,
-	int value
+	int where,
+	int ret
 	);
 
 typedef
