@@ -22,9 +22,3 @@
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
-
-#if (_AXL_OS_WIN)
-typedef SOCKET socket_t;
-#else
-typedef int socket_t;
-#endif

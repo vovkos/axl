@@ -11,7 +11,6 @@
 
 #include "pch.h"
 #include "axl_io_Ssl.h"
-#include "axl_io_SslError.h"
 
 namespace axl {
 namespace io {
@@ -24,7 +23,7 @@ Ssl::create(SSL_CTX* ctx)
 	close();
 
 	m_h = SSL_new(ctx);
-	return completeSslOp(m_h != NULL);
+	return cry::completeWithLastCryptoError(m_h != NULL);
 }
 
 bool

@@ -11,7 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_SslCtx.h"
-#include "axl_io_SslError.h"
+#include "axl_cry_CryptoError.h"
 
 namespace axl {
 namespace io {
@@ -23,7 +23,7 @@ SslCtx::create(const SSL_METHOD* method)
 {
 	close();
 	m_h = SSL_CTX_new(method);
-	return completeSslOp(m_h != NULL);
+	return cry::completeWithLastCryptoError(m_h != NULL);
 }
 
 bool
@@ -40,7 +40,7 @@ SslCtx::loadVerifyLocations(
 		!caDir.isEmpty() ? caDir.sz() : NULL
 		);
 
-	return completeSslOp(result);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
@@ -48,7 +48,7 @@ SslCtx::setCipherList(const sl::StringRef& listString)
 {
 	ASSERT(m_h);
 	bool_t result = ::SSL_CTX_set_cipher_list(m_h, listString.sz());
-	return completeSslOp(result);
+	return cry::completeWithLastCryptoError(result);
 }
 
 //..............................................................................

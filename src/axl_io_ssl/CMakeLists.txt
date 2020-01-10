@@ -15,17 +15,13 @@
 
 set(
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_io_ssl/axl_io_SslError.h
 	${AXL_INC_DIR}/axl_io_ssl/axl_io_SslCtx.h
-	${AXL_INC_DIR}/axl_io_ssl/axl_io_SslBio.h
 	${AXL_INC_DIR}/axl_io_ssl/axl_io_Ssl.h
 	)
 
 set(
 	LIB_CPP_LIST
-	axl_io_SslError.cpp
 	axl_io_SslCtx.cpp
-	axl_io_SslBio.cpp
 	axl_io_Ssl.cpp
 	)
 

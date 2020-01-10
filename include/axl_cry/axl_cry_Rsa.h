@@ -56,7 +56,7 @@ public:
 		)
 	{
 		Bio bio;
-		return bio.create(pem, size) && readPublicKey(bio);
+		return bio.createMemBuf(pem, size) && readPublicKey(bio);
 	}
 
 	bool
@@ -69,7 +69,7 @@ public:
 		)
 	{
 		Bio bio;
-		return bio.create(pem, size) && readPrivateKey(bio);
+		return bio.createMemBuf(pem, size) && readPrivateKey(bio);
 	}
 
 	size_t

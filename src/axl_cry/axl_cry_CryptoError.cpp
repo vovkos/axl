@@ -17,6 +17,22 @@ namespace cry {
 
 //..............................................................................
 
+void
+registerCryptoErrorProviders()
+{
+	err::getErrorMgr()->registerProvider(
+		g_cryptoErrorGuid,
+		sl::getSimpleSingleton<CryptoErrorProvider> ()
+		);
+
+	err::getErrorMgr()->registerProvider(
+		g_x509ErrorGuid,
+		sl::getSimpleSingleton<X509ErrorProvider> ()
+		);
+}
+
+//..............................................................................
+
 class LoadCryptoStrings
 {
 public:
@@ -30,10 +46,14 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::StringRef
-CryptoErrorProvider::getErrorDescription(const err::ErrorRef& error)
+CryptoErrorProvider::getErrorDescription(ulong_t code)
 {
 	sl::callOnce(LoadCryptoStrings(), 0);
-	return ERR_reason_error_string(error->m_code);
+
+	const char* functionString = ::ERR_func_error_string(code);
+	const char* reasonString = ::ERR_reason_error_string(code);
+
+	return sl::formatString("%s: %s", functionString, reasonString);
 }
 
 //..............................................................................

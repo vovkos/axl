@@ -24,29 +24,30 @@ AXL_SL_DEFINE_GUID(
 	0x0216b513, 0xa6bf, 0x4d0e, 0x91, 0x85, 0xdd, 0x12, 0x60, 0xc7, 0x53, 0x56
 	);
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// {A5C41EB8-75FF-487D-B04E-BD2336388B38}
+AXL_SL_DEFINE_GUID(
+	g_x509ErrorGuid,
+	0xa5c41eb8, 0x75ff, 0x487d, 0xb0, 0x4e, 0xbd, 0x23, 0x36, 0x38, 0x8b, 0x38
+	);
+
+//..............................................................................
 
 class CryptoErrorProvider: public err::ErrorProvider
 {
 public:
+	static
+	sl::StringRef
+	getErrorDescription(ulong_t code);
+
 	virtual
 	sl::StringRef
-	getErrorDescription(const err::ErrorRef& error);
+	getErrorDescription(const err::ErrorRef& error)
+	{
+		return getErrorDescription(error->m_code);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-void
-registerCryptoErrorProvider()
-{
-	err::getErrorMgr()->registerProvider(
-		g_cryptoErrorGuid,
-		sl::getSimpleSingleton<CryptoErrorProvider> ()
-		);
-}
-
-//..............................................................................
 
 class CryptoError: public err::Error
 {
@@ -55,13 +56,13 @@ public:
 	{
 	}
 
-	CryptoError(int code)
+	CryptoError(ulong_t code)
 	{
 		create(code);
 	}
 
 	size_t
-	create(int code)
+	create(ulong_t code)
 	{
 		return createSimpleError(g_cryptoErrorGuid, code);
 	}
@@ -69,44 +70,69 @@ public:
 
 //..............................................................................
 
+class X509ErrorProvider: public err::ErrorProvider
+{
+public:
+	static
+	sl::StringRef
+	getErrorDescription(long code)
+	{
+		return ::X509_verify_cert_error_string(code);
+	}
+
+	virtual
+	sl::StringRef
+	getErrorDescription(const err::ErrorRef& error)
+	{
+		return getErrorDescription(error->m_code);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class X509Error: public err::Error
+{
+public:
+	X509Error()
+	{
+	}
+
+	X509Error(long code)
+	{
+		create(code);
+	}
+
+	size_t
+	create(long code)
+	{
+		return createSimpleError(g_x509ErrorGuid, (uint_t)code);
+	}
+};
+
+//..............................................................................
+
+void
+registerCryptoErrorProviders();
+
 inline
 size_t
-setCryptoError(int code)
+setCryptoError(ulong_t code)
 {
 	return setError(CryptoError(code));
+}
+
+inline
+void
+clearCryptoError()
+{
+	while (ERR_get_error());
 }
 
 inline
 size_t
 setLastCryptoError()
 {
-	size_t result = setError(CryptoError(ERR_peek_last_error()));
-	ERR_clear_error();
-	return result;
-}
-
-template <typename T>
-T
-completeWithCryptoError(
-	T result,
-	T failResult,
-	int errorCode
-	)
-{
-	if (result == failResult)
-		setCryptoError(errorCode);
-
-	return result;
-}
-
-inline
-bool
-completeWithCryptoError(
-	int result,
-	int errorCode
-	)
-{
-	return completeWithCryptoError<bool> (result != 0, false, errorCode);
+	return setError(CryptoError(ERR_peek_last_error()));
 }
 
 template <typename T>
@@ -122,12 +148,11 @@ completeWithLastCryptoError(
 	return result;
 }
 
-
 inline
 bool
 completeWithLastCryptoError(int result)
 {
-	return completeWithLastCryptoError<bool> (result != 0, false);
+	return completeWithLastCryptoError<bool>(result != 0, false);
 }
 
 //..............................................................................

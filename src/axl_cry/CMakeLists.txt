@@ -16,6 +16,7 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_cry/axl_cry_CryptoError.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_Asn1.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Bio.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_BigNum.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_EcKey.h
@@ -27,6 +28,7 @@ set(
 set(
 	LIB_CPP_LIST
 	axl_cry_CryptoError.cpp
+	axl_cry_Asn1.cpp
 	axl_cry_Bio.cpp
 	axl_cry_BigNum.cpp
 	axl_cry_EcKey.cpp

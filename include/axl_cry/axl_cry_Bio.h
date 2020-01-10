@@ -18,6 +18,12 @@
 namespace axl {
 namespace cry {
 
+#if (_AXL_OS_WIN)
+typedef SOCKET socket_t;
+#else
+typedef int socket_t;
+#endif
+
 //..............................................................................
 
 class FreeBio
@@ -26,7 +32,7 @@ public:
 	void
 	operator () (BIO* h)
 	{
-		BIO_free(h);
+		::BIO_free(h);
 	}
 };
 
@@ -39,19 +45,48 @@ public:
 	{
 	}
 
-	Bio(
-		const void* p,
-		size_t size = -1
-		)
+	bool
+	create(BIO_METHOD* method);
+
+	bool
+	createMem()
 	{
-		create(p, size);
+		return create(BIO_s_mem());
 	}
 
 	bool
-	create(
+	createMemBuf(
 		const void* p,
 		size_t size = -1
 		);
+
+	bool
+	createSocket(
+		socket_t socket,
+		bool isAutoClose = false
+		);
+
+	bool
+	createFp(
+		FILE* file,
+		bool isAutoClose = false
+		);
+
+	bool
+	createFd(
+		int fd,
+		bool isAutoClose = false
+		);
+
+	void
+	freeAll()
+	{
+		ASSERT(m_h);
+		::BIO_free_all(detach());
+	}
+
+	BUF_MEM*
+	getBufMem();
 };
 
 //..............................................................................

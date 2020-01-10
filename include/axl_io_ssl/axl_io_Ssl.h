@@ -14,7 +14,7 @@
 #define _AXL_IO_SSL_H
 
 #include "axl_io_SslCtx.h"
-#include "axl_io_SslError.h"
+#include "axl_cry_CryptoError.h"
 
 namespace axl {
 namespace io {
@@ -49,7 +49,7 @@ public:
 	setError(int retCode)
 	{
 		int error = getError(retCode);
-		err::setError(SslError(error));
+		err::setError(cry::CryptoError(error));
 	}
 
 	void
