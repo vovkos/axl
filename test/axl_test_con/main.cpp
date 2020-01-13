@@ -4235,7 +4235,7 @@ printX509Name(X509_name_st* name)
 		ASN1_OBJECT* object = X509_NAME_ENTRY_get_object(entry);
 		ASN1_STRING* data = X509_NAME_ENTRY_get_data(entry);
 
-		printf("    %s: %s\n", cry::getAsn1ObjectString(object).sz(), cry::getAsn1StringString(data).sz());
+		printf("    %4d: %s: %s\n", OBJ_obj2nid(object), cry::getAsn1ObjectString(object).sz(), cry::getAsn1StringString(data).sz());
 	}
 }
 
