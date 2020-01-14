@@ -45,8 +45,13 @@ public:
 	{
 	}
 
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000)
+	bool
+	create(const BIO_METHOD* method);
+#else
 	bool
 	create(BIO_METHOD* method);
+#endif
 
 	bool
 	createMem()

@@ -18,8 +18,13 @@ namespace cry {
 
 //..............................................................................
 
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000)
+bool
+Bio::create(const BIO_METHOD* method)
+#else
 bool
 Bio::create(BIO_METHOD* method)
+#endif
 {
 	close();
 	m_h = BIO_new(method);
