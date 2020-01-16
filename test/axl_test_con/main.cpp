@@ -4225,6 +4225,8 @@ void testUnnamedPipes()
 
 //..............................................................................
 
+#if (_AXL_IO_SSL)
+
 void
 printX509Name(X509_name_st* name)
 {
@@ -4400,6 +4402,8 @@ void testSsl()
 	printf("done.\n");
 }
 
+#endif
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -4428,7 +4432,10 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
+#if (_AXL_IO_SSL)
 	testSsl();
+#endif
+
 	return 0;
 }
 
