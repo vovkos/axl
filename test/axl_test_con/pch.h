@@ -63,6 +63,7 @@
 #	include "axl_cry_BigNum.h"
 #	include "axl_cry_Bio.h"
 #	include "axl_cry_Asn1.h"
+#	include "axl_cry_X509.h"
 #	include "axl_cry_CryptoError.h"
 #	include "axl_io_SslCtx.h"
 #	include "axl_io_Ssl.h"

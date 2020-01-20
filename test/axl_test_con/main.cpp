@@ -4241,6 +4241,7 @@ printX509Name(X509_name_st* name)
 	}
 }
 
+
 void
 printSslCertificate(X509* cert)
 {
@@ -4264,6 +4265,22 @@ printSslCertificate(X509* cert)
 
 	printf("  issuer:\n");
 	printX509Name(issuerName);
+}
+
+void
+copyPrintSslCertificate(X509* cert)
+{
+	sl::Array<char> buffer = cry::saveX509_der(cert);
+	X509* copyCert = cry::loadX509_der(buffer);
+	printf("DER-copy:\n");
+	printSslCertificate(copyCert);
+	X509_free(copyCert);
+
+	sl::String string = cry::saveX509_pem(cert);
+	copyCert = cry::loadX509_pem(string);
+	printf("PEM-copy:\n");
+	printSslCertificate(copyCert);
+	X509_free(copyCert);
 }
 
 int
@@ -4364,12 +4381,14 @@ void testSsl()
 	{
 		X509* cert = sk_X509_value(chain, 0);
 		printSslCertificate(cert);
+		copyPrintSslCertificate(cert);
 	}
 	else for (int i = 0; i < count; i++)
 	{
 		printf("Certificate[%d]:\n", i);
 		X509* cert = sk_X509_value(chain, i);
 		printSslCertificate(cert);
+		copyPrintSslCertificate(cert);
 	}
 
 	long verifyResult = ssl.getVerifyResult();

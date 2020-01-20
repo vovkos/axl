@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_cry_Asn1.h"
 #include "axl_cry_Bio.h"
+#include "axl_cry_CryptoError.h"
 
 namespace axl {
 namespace cry {
