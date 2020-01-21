@@ -34,21 +34,59 @@ SslCtx::loadVerifyLocations(
 {
 	ASSERT(m_h);
 
-	bool_t result = ::SSL_CTX_load_verify_locations(
+	int result = ::SSL_CTX_load_verify_locations(
 		m_h,
 		!caFileName.isEmpty() ? caFileName.sz() : NULL,
 		!caDir.isEmpty() ? caDir.sz() : NULL
 		);
 
-	return cry::completeWithLastCryptoError(result);
+	return cry::completeWithLastCryptoError(result > 0);
 }
 
 bool
 SslCtx::setCipherList(const sl::StringRef& listString)
 {
 	ASSERT(m_h);
-	bool_t result = ::SSL_CTX_set_cipher_list(m_h, listString.sz());
-	return cry::completeWithLastCryptoError(result);
+	int result = ::SSL_CTX_set_cipher_list(m_h, listString.sz());
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+SslCtx::useCertificate(const X509* cert)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_use_certificate(m_h, (X509*)cert);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+SslCtx::useCertificateFile(
+	const sl::StringRef& fileName,
+	int fileType
+	)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_use_certificate_file(m_h, fileName.sz(), fileType);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+SslCtx::usePrivateKeyFile(
+	const sl::StringRef& fileName,
+	int fileType
+	)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_use_PrivateKey_file(m_h, fileName.sz(), fileType);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+SslCtx::addExtraChainCertificate(const X509* cert)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_add_extra_chain_cert(m_h, (X509*)cert);
+	return cry::completeWithLastCryptoError(result > 0);
 }
 
 //..............................................................................

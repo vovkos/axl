@@ -115,6 +115,31 @@ public:
 
 	bool
 	setCipherList(const sl::StringRef& listString);
+
+	bool
+	useCertificate(const X509* cert);
+
+	bool
+	useCertificateFile(
+		const sl::StringRef& fileName,
+		int fileType = SSL_FILETYPE_PEM
+		);
+
+	bool
+	usePrivateKeyFile(
+		const sl::StringRef& fileName,
+		int fileType = SSL_FILETYPE_PEM
+		);
+
+	bool
+	addExtraChainCertificate(const X509* cert);
+
+	void
+	clearExtraChainCertificates()
+	{
+		ASSERT(m_h);
+		::SSL_CTX_clear_chain_certs(m_h);
+	}
 };
 
 //..............................................................................

@@ -27,18 +27,21 @@ Ssl::create(SSL_CTX* ctx)
 }
 
 bool
+Ssl::complete(int result)
+{
+	if (result > 0)
+		return true;
+
+	setError(result);
+	return false;
+}
+
+bool
 Ssl::setCipherList(const sl::StringRef& listString)
 {
 	ASSERT(m_h);
-
 	int result = ::SSL_set_cipher_list(m_h, listString.sz());
-	if (result <= 0)
-	{
-		setError(result);
-		return false;
-	}
-
-	return true;
+	return complete(result);
 }
 
 bool
@@ -48,15 +51,16 @@ Ssl::setExtraData(
 	)
 {
 	ASSERT(m_h);
-
 	int result = ::SSL_set_ex_data(m_h, index, p);
-	if (result <= 0)
-	{
-		setError(result);
-		return false;
-	}
+	return complete(result);
+}
 
-	return true;
+bool
+Ssl::useCertificate(const X509* cert)
+{
+	ASSERT(m_h);
+	int result = ::SSL_use_certificate(m_h, (X509*)cert);
+	return complete(result);
 }
 
 bool

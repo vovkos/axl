@@ -193,6 +193,9 @@ public:
 		void* p
 		);
 
+	bool
+	useCertificate(const X509* cert);
+
 	X509*
 	getPeerCertificate()
 	{
@@ -231,6 +234,10 @@ public:
 		ASSERT(m_h);
 		return ::SSL_pending(m_h);
 	}
+
+protected:
+	bool
+	complete(int result);
 };
 
 //..............................................................................
