@@ -30,11 +30,15 @@ public:
 	virtual
 	void
 	routeError(const ErrorHdr* error) = 0;
+
+	virtual
+	const char*
+	routeErrorDescription(const ErrorHdr* error) = 0;
 };
 
 //..............................................................................
 
-class ErrorMgr: public ErrorRouter
+class ErrorMgr: protected ErrorRouter
 {
 protected:
 	struct ThreadEntry
@@ -46,7 +50,7 @@ protected:
 	sys::Lock m_lock;
 	size_t m_tlsSlot;
 	sl::DuckTypeHashTable<sl::Guid, ErrorProvider*> m_providerMap;
-	ErrorRouter* m_forwardRouter;
+	ErrorRouter* m_router;
 
 public:
 	ErrorMgr();
@@ -60,25 +64,29 @@ public:
 	ErrorProvider*
 	findProvider(const sl::Guid& guid);
 
+	ErrorRouter*
+	getRouter()
+	{
+		return m_router;
+	}
+
+	void
+	setRouter(ErrorRouter* router)
+	{
+		ASSERT(!m_router && router != this);
+		m_router = router;
+	}
+
 	ErrorRef
 	getLastError();
 
 	void
 	setError(const ErrorRef& error);
 
-	ErrorRouter*
-	getForwardRouter()
-	{
-		return m_forwardRouter;
-	}
+	sl::StringRef
+	getErrorDescription(const ErrorRef& error);
 
-	void
-	setForwardRouter(ErrorRouter* router)
-	{
-		ASSERT(!m_forwardRouter && router != this);
-		m_forwardRouter = router;
-	}
-
+protected:
 	virtual
 	void
 	routeError(const ErrorHdr* error)
@@ -86,7 +94,10 @@ public:
 		setError(error);
 	}
 
-protected:
+	virtual
+	const char*
+	routeErrorDescription(const ErrorHdr* error);
+
 	ThreadEntry*
 	findThreadEntry()
 	{

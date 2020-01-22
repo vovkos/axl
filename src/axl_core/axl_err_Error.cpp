@@ -33,11 +33,7 @@ setOutOfMemoryError()
 sl::StringRef
 ErrorHdr::getDescription() const
 {
-	ErrorProvider* provider = getErrorMgr()->findProvider(m_guid);
-
-	return provider ?
-		provider->getErrorDescription(this) :
-		sl::formatString("%s::%d", m_guid.getString().sz(), m_code);
+	return getErrorMgr()->getErrorDescription(this);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
