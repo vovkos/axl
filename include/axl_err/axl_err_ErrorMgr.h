@@ -38,7 +38,7 @@ public:
 
 //..............................................................................
 
-class ErrorMgr: protected ErrorRouter
+class ErrorMgr: public ErrorRouter
 {
 protected:
 	struct ThreadEntry
