@@ -44,6 +44,28 @@ Ssl::setCipherList(const sl::StringRef& listString)
 	return complete(result);
 }
 
+sl::String
+Ssl::getCurrentCipherDescription()
+{
+	ASSERT(m_h);
+	const SSL_CIPHER* cipher = ::SSL_get_current_cipher(m_h);
+	if (!cipher)
+		return sl::String();
+
+	char buffer[256];
+	::SSL_CIPHER_description(cipher, buffer, sizeof(buffer));
+	return buffer;
+}
+
+int
+Ssl::getCurrentCipherBits()
+{
+	ASSERT(m_h);
+	int bits = 0;
+	::SSL_CIPHER_get_bits(SSL_get_current_cipher(m_h), &bits);
+	return bits;
+}
+
 bool
 Ssl::setExtraData(
 	int index,

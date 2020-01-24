@@ -180,6 +180,19 @@ public:
 		return ::SSL_state_string_long(m_h);
 	}
 
+	const char*
+	getCurrentCipherName()
+	{
+		ASSERT(m_h);
+		return ::SSL_CIPHER_get_name(SSL_get_current_cipher(m_h));
+	}
+
+	sl::String
+	getCurrentCipherDescription();
+
+	int
+	getCurrentCipherBits();
+
 	void*
 	getExtraData(int index)
 	{
