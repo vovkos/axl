@@ -29,31 +29,28 @@ registerCryptoErrorProviders()
 		g_x509ErrorGuid,
 		sl::getSimpleSingleton<X509ErrorProvider> ()
 		);
+
+	ERR_load_crypto_strings();
 }
 
 //..............................................................................
 
-class LoadCryptoStrings
-{
-public:
-	void
-	operator () (int)
-	{
-		ERR_load_crypto_strings();
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 sl::StringRef
 CryptoErrorProvider::getErrorDescription(ulong_t code)
 {
-	sl::callOnce(LoadCryptoStrings(), 0);
-
 	const char* functionString = ::ERR_func_error_string(code);
 	const char* reasonString = ::ERR_reason_error_string(code);
 
-	return sl::formatString("%s: %s", functionString, reasonString);
+	sl::String errorString;
+	errorString.format("OpenSSL error %d", code);
+
+	if (functionString)
+		errorString.appendFormat(" in %s", functionString);
+
+	if (reasonString)
+		errorString.appendFormat(": %s", reasonString);
+
+	return errorString;
 }
 
 //..............................................................................
