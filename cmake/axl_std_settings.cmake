@@ -414,24 +414,6 @@ axl_create_gcc_settings)
 		"-Wno-stringop-overflow"
 		)
 
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_MISSING_BRACES
-		DESCRIPTION "Warn about missing braces in aggregate initializers"
-		"-Wmissing-braces" "-Wno-missing-braces"
-		)
-
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_UNUSED_VARIABLE
-		DESCRIPTION "Warn about unused variables"
-		"-Wunused-variable" "-Wno-unused-variable"
-		)
-
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_UNUSED_VALUE
-		DESCRIPTION "Warn about unused expressions"
-		"-Wunused-value" "-Wno-unused-value"
-		)
-
 	# C++ specific warnings
 
 	axl_create_compiler_flag_setting(
@@ -448,11 +430,37 @@ axl_create_gcc_settings)
 		"-Wnarrowing" "-Wno-narrowing"
 		)
 
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_CPP_WARNING_DELETE_NON_VIRTUAL_DTOR
-		DESCRIPTION "Warn about calling non-virtual dtor of a class with virtual funtions"
-		"-Wdelete-non-virtual-dtor" "-Wno-delete-non-virtual-dtor"
-		)
+	# these warnings only pop up with -Wmost (hardcoded by the Xcode generator)
+
+	if (CMAKE_GENERATOR MATCHES "Xcode")
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_MISSING_BRACES
+			DESCRIPTION "Warn about missing braces in aggregate initializers"
+			DEFAULT "-Wno-missing-braces"
+			"-Wmissing-braces" "-Wno-missing-braces"
+			)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_UNUSED_VARIABLE
+			DESCRIPTION "Warn about unused variables"
+			DEFAULT "-Wno-unused-variable"
+			"-Wunused-variable" "-Wno-unused-variable"
+			)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_UNUSED_VALUE
+			DESCRIPTION "Warn about unused expressions"
+			DEFAULT "-Wno-unused-value"
+			"-Wunused-value" "-Wno-unused-value"
+			)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_CPP_WARNING_DELETE_NON_VIRTUAL_DTOR
+			DESCRIPTION "Warn about calling non-virtual dtor of a class with virtual funtions"
+			DEFAULT "-Wno-delete-non-virtual-dtor"
+			"-Wdelete-non-virtual-dtor" "-Wno-delete-non-virtual-dtor"
+			)
+	endif()
 
 	# the cppcheck static analyzer (introduced in CMake 3.10)
 
