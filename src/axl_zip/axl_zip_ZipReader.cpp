@@ -26,7 +26,7 @@ mz_fopen(
 	)
 {
 	FILE* file = NULL;
-	_wfopen_s(&file, axl::sl::String_w(fileName), axl::sl::String_w(mode));
+	_wfopen_s(&file, axl::sl::String_w(fileName), axl::sl::String_w(mode) + L'N');
 	return file;
 }
 
@@ -39,7 +39,7 @@ mz_freopen(
 	)
 {
 	FILE* file = NULL;
-	if (_wfreopen_s(&file, axl::sl::String_w(path), axl::sl::String_w(mode), stream))
+	if (_wfreopen_s(&file, axl::sl::String_w(path), axl::sl::String_w(mode) + L'N', stream))
 		return NULL;
 
 	return file;
