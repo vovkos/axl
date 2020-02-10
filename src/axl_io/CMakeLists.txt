@@ -73,6 +73,7 @@ source_group(
 set(
 	LIB_PSX_H_LIST
 	${AXL_INC_DIR}/axl_io/axl_io_psx_File.h
+	${AXL_INC_DIR}/axl_io/axl_io_psx_Pty.h
 	${AXL_INC_DIR}/axl_io/axl_io_psx_Mapping.h
 	${AXL_INC_DIR}/axl_io/axl_io_psx_Pipe.h
 	${AXL_INC_DIR}/axl_io/axl_io_psx_Serial.h
@@ -82,6 +83,7 @@ set(
 set(
 	LIB_PSX_CPP_LIST
 	axl_io_psx_File.cpp
+	axl_io_psx_Pty.cpp
 	axl_io_psx_Mapping.cpp
 	axl_io_psx_Pipe.cpp
 	axl_io_psx_Serial.cpp

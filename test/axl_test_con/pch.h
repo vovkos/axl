@@ -76,6 +76,7 @@
 #	include "axl_sys_win_NtStatus.h"
 #elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
+#	include "axl_io_psx_Pty.h"
 #	include "axl_sys_psx_Sem.h"
 #	if (_AXL_OS_DARWIN)
 #		include "axl_sys_drw_Semaphore.h"

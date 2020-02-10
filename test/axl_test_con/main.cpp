@@ -4425,6 +4425,280 @@ void testSsl()
 
 //..............................................................................
 
+#include "axl_io_psx_Pipe.h"
+
+void
+exec(const sl::StringRef& commandLine) // returns on failure only
+{
+	char buffer[256];
+	sl::Array<char*> argv(ref::BufKind_Stack, buffer, sizeof(buffer));
+
+	sl::String string = commandLine;
+
+	size_t length = string.getLength();
+	for (;;)
+	{
+		string.trimLeft();
+		if (string.isEmpty())
+			break;
+
+		argv.append(string.p());
+
+		size_t pos = string.findOneOf(sl::StringDetails::getWhitespace());
+		if (pos == -1)
+			break;
+
+		string[pos] = 0;
+		string = string.getSubString(pos + 1);
+	}
+
+	if (argv.isEmpty())
+	{
+		err::setError("empty command line");
+		return;
+	}
+
+	argv.append(NULL);
+
+	int result = ::execvp(argv[0], argv.p());
+	ASSERT(result == -1);
+	err::setLastSystemError();
+}
+
+FILE* g_log = fopen("/home/vladimir/child-stdio-log.txt", "w");
+
+bool
+pump(
+	const char* prefix,
+	int fin,
+	int fout
+	)
+{
+	sl::String hexString;
+	char buffer[4 * 1024];
+
+	for (;;)
+	{
+		ssize_t result = ::read(fin, buffer, sizeof(buffer));
+		if (result < 0)
+			return errno == EAGAIN;
+
+		if (result == 0)
+			return true;
+
+		::write(fout, buffer, result);
+
+		enc::HexEncoding::encode(
+			&hexString,
+			buffer,
+			result,
+			enc::HexEncodingFlag_Multiline
+			);
+
+		fprintf(g_log, "%s (%d bytes):\n%s\n", prefix, result, hexString.sz());
+		fflush(g_log);
+	}
+}
+
+void
+pumpChildStdio(
+	int childStdinFd,
+	int childStdoutFd,
+	int childStderrFd
+	)
+{
+	int result;
+	int tmp = AXL_MAX(childStdoutFd, childStderrFd);
+	int selectFd = AXL_MAX(tmp, STDIN_FILENO) + 1;
+
+	for (;;)
+	{
+		fd_set readSet = { 0 };
+
+		FD_SET(STDIN_FILENO, &readSet);
+		FD_SET(childStdoutFd, &readSet);
+
+		if (childStderrFd != -1)
+			FD_SET(childStderrFd, &readSet);
+
+		result = ::select(selectFd, &readSet, NULL, NULL, NULL);
+		if (result == -1)
+			break;
+
+		if (FD_ISSET(STDIN_FILENO, &readSet))
+			if (!pump("STDIN", STDIN_FILENO, childStdinFd))
+				break;
+
+		if (FD_ISSET(childStdoutFd, &readSet))
+			if (!pump("STDOUT", childStdoutFd, STDOUT_FILENO))
+				break;
+
+		if (FD_ISSET(childStderrFd, &readSet))
+			if (!pump("STDERR", childStderrFd, STDERR_FILENO))
+				break;
+	}
+
+	printf("PROCESS FINISHED!\n");
+}
+
+bool
+testExecPassthrough(const sl::StringRef& cmdLine)
+{
+	axl::io::psx::Pipe stdinPipe;
+	axl::io::psx::Pipe stdoutPipe;
+	axl::io::psx::Pipe stderrPipe;
+	axl::io::psx::Pipe execPipe;
+
+	bool result =
+		stdinPipe.create() &&
+		stdinPipe.m_writeFile.setBlockingMode(false) &&
+		stdoutPipe.create() &&
+		stdoutPipe.m_readFile.setBlockingMode(false) &&
+		stderrPipe.create() &&
+		stderrPipe.m_readFile.setBlockingMode(false) &&
+		execPipe.create();
+
+	if (!result)
+		return false;
+
+	execPipe.m_writeFile.fcntl(F_SETFD, FD_CLOEXEC);
+
+	err::Error error;
+
+	pid_t pid = ::fork();
+	switch (pid)
+	{
+	case -1:
+		err::setLastSystemError();
+		return false;
+
+	case 0:
+		::dup2(stdinPipe.m_readFile, STDIN_FILENO);
+		::dup2(stdoutPipe.m_writeFile, STDOUT_FILENO);
+		::dup2(stderrPipe.m_writeFile, STDERR_FILENO);
+
+		exec(cmdLine);
+
+		error = err::getLastError();
+		execPipe.m_writeFile.write(error, error->m_size);
+		execPipe.m_writeFile.flush();
+
+		::_exit(-1);
+		ASSERT(false);
+
+	default:
+		execPipe.m_writeFile.close();
+
+		fd_set rdset;
+		FD_ZERO(&rdset);
+		FD_SET(execPipe.m_readFile, &rdset);
+
+		char buffer[256];
+		size_t size = execPipe.m_readFile.read(buffer, sizeof(buffer));
+		if (size == 0 || size == -1)
+			break;
+
+		if (((err::ErrorHdr*)buffer)->m_size == size)
+			err::setError((err::ErrorHdr*)buffer);
+		else
+			err::setError("POSIX execvp failed"); // unlikely fallback
+
+		return false;
+	}
+
+	axl::io::psx::File stdinFile;
+	stdinFile.attach(STDIN_FILENO);
+	stdinFile.setBlockingMode(false);
+
+	pumpChildStdio(stdinPipe.m_writeFile, stdoutPipe.m_readFile, stderrPipe.m_readFile);
+	return true;
+}
+
+bool
+testPty(const sl::StringRef& cmdLine)
+{
+	printf("Opening master PTY...\n");
+
+	axl::io::psx::Pty masterPty;
+	axl::io::psx::File slavePty;
+	axl::io::psx::Pipe execPipe;
+
+	bool result =
+		masterPty.open() &&
+		masterPty.grant() &&
+		masterPty.unlock() &&
+		masterPty.setBlockingMode(false) &&
+		slavePty.open(masterPty.getSlaveFileName()) &&
+		slavePty.setBlockingMode(false) &&
+		execPipe.create();
+
+	if (!result)
+		return false;
+
+	execPipe.m_writeFile.fcntl(F_SETFD, FD_CLOEXEC);
+	err::Error error;
+
+	pid_t pid = ::fork();
+	switch (pid)
+	{
+	case -1:
+		err::setLastSystemError();
+		return false;
+
+	case 0:
+		::setsid();
+
+		slavePty.ioctl(TIOCSCTTY, (int)0);
+
+		struct winsize winSize;
+		winSize.ws_col = 80;
+		winSize.ws_row = 25;
+
+		slavePty.ioctl(TIOCSWINSZ, &winSize);
+
+		::dup2(slavePty, STDIN_FILENO);
+		::dup2(slavePty, STDOUT_FILENO);
+		::dup2(slavePty, STDERR_FILENO);
+
+		exec(cmdLine);
+
+		error = err::getLastError();
+		execPipe.m_writeFile.write(error, error->m_size);
+		execPipe.m_writeFile.flush();
+
+		::_exit(-1);
+		ASSERT(false);
+
+	default:
+		execPipe.m_writeFile.close();
+
+		fd_set rdset;
+		FD_ZERO(&rdset);
+		FD_SET(execPipe.m_readFile, &rdset);
+
+		char buffer[256];
+		size_t size = execPipe.m_readFile.read(buffer, sizeof(buffer));
+		if (size == 0 || size == -1)
+			break;
+
+		if (((err::ErrorHdr*)buffer)->m_size == size)
+			err::setError((err::ErrorHdr*)buffer);
+		else
+			err::setError("POSIX execvp failed"); // unlikely fallback
+
+		return false;
+	}
+
+	axl::io::psx::File stdinFile;
+	stdinFile.attach(STDIN_FILENO);
+	stdinFile.setBlockingMode(false);
+
+	pumpChildStdio(masterPty, masterPty, -1);
+	return true;
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -4451,9 +4725,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_IO_SSL)
-	testSsl();
-#endif
+	testPty("bash");
 
 	return 0;
 }
