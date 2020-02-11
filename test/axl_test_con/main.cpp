@@ -4629,7 +4629,6 @@ testPty(const sl::StringRef& cmdLine)
 		masterPty.unlock() &&
 		masterPty.setBlockingMode(false) &&
 		slavePty.open(masterPty.getSlaveFileName()) &&
-		slavePty.setBlockingMode(false) &&
 		execPipe.create();
 
 	if (!result)
@@ -4650,15 +4649,11 @@ testPty(const sl::StringRef& cmdLine)
 
 		slavePty.ioctl(TIOCSCTTY, (int)0);
 
-		struct winsize winSize;
-		winSize.ws_col = 80;
-		winSize.ws_row = 25;
-
-		slavePty.ioctl(TIOCSWINSZ, &winSize);
-
 		::dup2(slavePty, STDIN_FILENO);
 		::dup2(slavePty, STDOUT_FILENO);
 		::dup2(slavePty, STDERR_FILENO);
+
+		slavePty.close();
 
 		exec(cmdLine);
 
@@ -4671,6 +4666,7 @@ testPty(const sl::StringRef& cmdLine)
 
 	default:
 		execPipe.m_writeFile.close();
+		slavePty.close();
 
 		fd_set rdset;
 		FD_ZERO(&rdset);
@@ -4684,7 +4680,7 @@ testPty(const sl::StringRef& cmdLine)
 		if (((err::ErrorHdr*)buffer)->m_size == size)
 			err::setError((err::ErrorHdr*)buffer);
 		else
-			err::setError("POSIX execvp failed"); // unlikely fallback
+			err::setError("POSIX execvpe failed"); // unlikely fallback
 
 		return false;
 	}
@@ -4692,6 +4688,11 @@ testPty(const sl::StringRef& cmdLine)
 	axl::io::psx::File stdinFile;
 	stdinFile.attach(STDIN_FILENO);
 	stdinFile.setBlockingMode(false);
+
+	struct winsize winSize;
+	winSize.ws_col = 90;
+	winSize.ws_row = 40;
+	masterPty.ioctl(TIOCSWINSZ, &winSize);
 
 	pumpChildStdio(masterPty, masterPty, -1);
 	return true;
@@ -4725,7 +4726,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testPty("bash");
+	testPty("mc");
 
 	return 0;
 }
