@@ -4425,6 +4425,8 @@ void testSsl()
 
 //..............................................................................
 
+#if (_AXL_OS_POSIX)
+
 #include "axl_io_psx_Pipe.h"
 
 void
@@ -4698,6 +4700,8 @@ testPty(const sl::StringRef& cmdLine)
 	return true;
 }
 
+#endif
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -4726,7 +4730,9 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
+#if (_AXL_OS_POSIX)
 	testPty("mc");
+#endif
 
 	return 0;
 }
