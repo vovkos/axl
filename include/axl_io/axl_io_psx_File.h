@@ -97,7 +97,7 @@ public:
 	}
 
 	int
-	ioctl(int code)
+	ioctl(uint_t code)
 	{
 		int result = ::ioctl(m_h, code);
 		return err::complete(result, -1);
@@ -106,7 +106,7 @@ public:
 	template <typename T>
 	int
 	ioctl(
-		int code,
+		uint_t code,
 		T param
 		)
 	{
@@ -118,7 +118,7 @@ public:
 	}
 
 	int
-	fcntl(int code)
+	fcntl(uint_t code)
 	{
 		int result = ::fcntl(m_h, code);
 		return err::complete(result, -1);
@@ -127,7 +127,7 @@ public:
 	template <typename T>
 	int
 	fcntl(
-		int code,
+		uint_t code,
 		T param
 		)
 	{
