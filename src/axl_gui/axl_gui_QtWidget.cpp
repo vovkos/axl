@@ -389,8 +389,9 @@ QtWidgetBase::keyEventImpl(
 	}
 	else
 	{
+		QString text = e->text();
 		msg.m_key = qtKey;
-		msg.m_char = e->text().at(0).unicode();
+		msg.m_char = !text.isEmpty() ? e->text().at(0).unicode() : msg.m_key;
 	}
 
 	msg.m_modifierKeys = getModifierKeysFromQtModifiers(e->modifiers());
