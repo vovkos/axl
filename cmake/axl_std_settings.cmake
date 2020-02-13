@@ -253,8 +253,7 @@ axl_create_gcc_settings)
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_DEBUG_INFO_RELEASE
 		DESCRIPTION "Add debugging information to Release builds"
-		DEFAULT " "
-		" " "-g"
+		"-g"
 		)
 
 	axl_create_compiler_flag_setting(
