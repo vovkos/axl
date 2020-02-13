@@ -455,6 +455,13 @@ axl_create_gcc_settings)
 			)
 
 		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_CHAR_SUBSCRIPTS
+			DESCRIPTION "Warn about array subsciprts of type 'char'"
+			DEFAULT "-Wno-char-subscripts"
+			"-Wchar-subscripts" "-Wno-char-subscripts"
+			)
+
+		axl_create_compiler_flag_setting(
 			GCC_FLAG_CPP_WARNING_DELETE_NON_VIRTUAL_DTOR
 			DESCRIPTION "Warn about calling non-virtual dtor of a class with virtual funtions"
 			DEFAULT "-Wno-delete-non-virtual-dtor"
