@@ -163,13 +163,16 @@ SharedMemoryTransportBase::disconnect()
 	m_hdr->m_state |= SharedMemoryTransportState_Disconnected;
 
 	if (m_hdr->m_readSemaphoreWaitCount)
+	{
 		m_readSemaphore.signal(m_hdr->m_readSemaphoreWaitCount);
+		m_hdr->m_readSemaphoreWaitCount = 0;
+	}
 
 	if (m_hdr->m_writeSemaphoreWaitCount)
+	{
 		m_writeSemaphore.signal(m_hdr->m_writeSemaphoreWaitCount);
-
-	m_hdr->m_readSemaphoreWaitCount = 0;
-	m_hdr->m_writeSemaphoreWaitCount = 0;
+		m_hdr->m_writeSemaphoreWaitCount = 0;
+	}
 
 	sys::atomicUnlock(&m_hdr->m_lock);
 }
@@ -347,9 +350,11 @@ SharedMemoryReader::read(sl::Array<char>* buffer)
 	m_hdr->m_dataSize -= readSize;
 
 	if (m_hdr->m_readSemaphoreWaitCount)
+	{
 		m_readSemaphore.signal(m_hdr->m_readSemaphoreWaitCount);
+		m_hdr->m_readSemaphoreWaitCount = 0;
+	}
 
-	m_hdr->m_readSemaphoreWaitCount = 0;
 	sys::atomicUnlock(&m_hdr->m_lock);
 
 	return readSize;
@@ -492,9 +497,11 @@ SharedMemoryWriter::write(
 	m_hdr->m_dataSize += chainSize;
 
 	if (m_hdr->m_writeSemaphoreWaitCount)
+	{
 		m_writeSemaphore.signal(m_hdr->m_writeSemaphoreWaitCount);
+		m_hdr->m_writeSemaphoreWaitCount = 0;
+	}
 
-	m_hdr->m_writeSemaphoreWaitCount = 0;
 	sys::atomicUnlock(&m_hdr->m_lock);
 
 	return chainSize;
