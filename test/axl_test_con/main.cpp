@@ -2051,8 +2051,6 @@ testProcess()
 
 namespace shm_test {
 
-#define _SHM_TEST_ONE_WAY 1
-
 const size_t TotalSize = 64 * 1024 * 1024;
 const size_t MaxBlockSize = 64;
 
@@ -2108,30 +2106,6 @@ public:
 
 		sl::Array<char> buffer;
 
-#if (_SHM_TEST_ONE_WAY)
-		for (;;)
-		{
-			size_t size = m_transport->readMessage(&buffer);
-			if (size == -1)
-			{
-				printf("server: read error: %s\n", err::getLastErrorDescription().sz());
-				return -1;
-			}
-
-			if (size < sizeof(ReqHdr))
-			{
-				printf("server: buffer too small\n");
-				return -1;
-			}
-
-			ReqHdr* command = (ReqHdr*)buffer.cp();
-			if (command->m_code != ReqCode_Command || sizeof(ReqHdr) + command->m_size != size)
-			{
-				printf("server: invalid command: %d (%d)\n", command->m_code, command->m_size);
-				return -1;
-			}
-		}
-#else
 		static char data[MaxBlockSize] = { 0 };
 
 		for (;;)
@@ -2158,12 +2132,10 @@ public:
 
 			ReqHdr reply;
 			reply.m_code = ReqCode_Reply;
-			reply.m_size = ::rand() % MaxBlockSize;
+			reply.m_size = command->m_size;
 
 			m_transport->writeMessage(&reply, data, reply.m_size);
 		}
-
-#endif
 
 		return 0;
 	}
@@ -2171,13 +2143,57 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ClientThread: public sys::ThreadImpl<ClientThread>
+class ClientWriterThread: public sys::ThreadImpl<ClientWriterThread>
 {
 protected:
 	Transport* m_transport;
 
 public:
-	ClientThread(Transport* transport)
+	ClientWriterThread(Transport* transport)
+	{
+		m_transport = transport;
+	}
+
+	uint_t
+	threadFunc()
+	{
+		ASSERT(m_transport);
+
+		size_t totalSize = 0;
+
+		sl::Array<char> buffer;
+		static char data[MaxBlockSize] = { 0 };
+
+		while (totalSize < TotalSize)
+		{
+			ReqHdr command;
+			command.m_code = ReqCode_Command;
+			command.m_size = ::rand() % MaxBlockSize;;
+
+			bool result = m_transport->writeMessage(&command, data, command.m_size);
+			if (!result)
+			{
+				printf("client: write error: %s\n", err::getLastErrorDescription().sz());
+				return -1;
+			}
+
+			totalSize += command.m_size;
+		}
+
+		printf("\nWriting 100%% (done), %zd bytes\n", totalSize);
+		return 0;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class ClientReaderThread: public sys::ThreadImpl<ClientReaderThread>
+{
+protected:
+	Transport* m_transport;
+
+public:
+	ClientReaderThread(Transport* transport)
 	{
 		m_transport = transport;
 	}
@@ -2190,49 +2206,10 @@ public:
 		int percentage = 0;
 		size_t totalSize = 0;
 
-#if (_SHM_TEST_ONE_WAY)
-		static char data[MaxBlockSize] = { 0 };
-
-		while (totalSize < TotalSize)
-		{
-			size_t blockSize = rand() % MaxBlockSize;
-
-			ReqHdr command;
-			command.m_code = ReqCode_Command;
-			command.m_size = blockSize;
-
-			bool result = m_transport->writeMessage(&command, data, blockSize);
-			if (!result)
-			{
-				printf("client: write error: %s\n", err::getLastErrorDescription().sz());
-				return -1;
-			}
-
-			totalSize += blockSize;
-
-			int newPercentage = (uint64_t)totalSize * 100 / TotalSize;
-			if (newPercentage != percentage)
-			{
-				percentage = newPercentage;
-				printf("\b\b\b\b%d%%", percentage);
-			}
-		}
-#else
 		sl::Array<char> buffer;
 
 		while (totalSize < TotalSize)
 		{
-			ReqHdr command;
-			command.m_code = ReqCode_Command;
-			command.m_size = 0;
-
-			bool result = m_transport->writeMessage(&command, NULL, 0);
-			if (!result)
-			{
-				printf("client: write error: %s\n", err::getLastErrorDescription().sz());
-				return -1;
-			}
-
 			size_t receivedSize = m_transport->readMessage(&buffer);
 			if (receivedSize == -1)
 			{
@@ -2262,9 +2239,8 @@ public:
 				printf("\b\b\b\b%d%%", percentage);
 			}
 		}
-#endif
 
-		printf("\b\b\b\b100%% (done)\n");
+		printf("\nReading 100%% (done), %zd bytes\n", totalSize);
 		return 0;
 	}
 };
@@ -2429,10 +2405,14 @@ testSharedMemoryTransport()
 
 #if (_AXL_OS_WIN)
 #	define HOME_DIR "C:/Users/Vladimir"
-#elif (_AXL_OS_POSIX)
+#elif (_AXL_OS_LINUX)
 #	define HOME_DIR "/home/vladimir"
-	setvbuf(stdout, NULL, _IONBF, 0);
+#elif (_AXL_OS_DARWIN)
+#	define HOME_DIR "/Users/vladimir"
+#endif
 
+#if (_AXL_OS_POSIX)
+	setvbuf(stdout, NULL, _IONBF, 0);
 	::sem_unlink("shmt-test-cli-srv-r");
 	::sem_unlink("shmt-test-cli-srv-w");
 	::sem_unlink("shmt-test-srv-cli-r");
@@ -2478,18 +2458,21 @@ testSharedMemoryTransport()
 	}
 
 	ServerThread serverThread(&serverTransport);
-	ClientThread clientThread(&clientTransport);
+	ClientWriterThread clientWriterThread(&clientTransport);
+	ClientReaderThread clientReaderThread(&clientTransport);
 
 	uint64_t time0 = sys::getTimestamp();
 
 	serverThread.start();
-	clientThread.start();
+	clientReaderThread.start();
+	clientWriterThread.start();
 
-	clientThread.waitAndClose();
+	clientReaderThread.waitAndClose();
 
 	clientTransport.m_reader.disconnect();
 	clientTransport.m_writer.disconnect();
 
+	clientWriterThread.waitAndClose();
 	serverThread.waitAndClose();
 
 	uint64_t time2 = sys::getTimestamp();
@@ -2541,14 +2524,16 @@ testPipeTransport()
 	clientTransport.m_writePipe = pipeA[1];
 
 	ServerThread serverThread(&serverTransport);
-	ClientThread clientThread(&clientTransport);
+	ClientReaderThread clientReaderThread(&clientTransport);
+	ClientWriterThread clientWriterThread(&clientTransport);
 
 	uint64_t time0 = sys::getTimestamp();
 
 	serverThread.start();
-	clientThread.start();
+	clientReaderThread.start();
+	clientWriterThread.start();
 
-	clientThread.waitAndClose();
+	clientReaderThread.waitAndClose();
 
 	// first close the writer side
 
@@ -2564,6 +2549,7 @@ testPipeTransport()
 	::close(pipeB[0]);
 #endif
 
+	clientWriterThread.waitAndClose();
 	serverThread.waitAndClose();
 
 	uint64_t time2 = sys::getTimestamp();
@@ -4730,10 +4716,8 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_OS_POSIX)
-	testPty("mc");
-#endif
-
+	testSharedMemoryTransport();
+	testPipeTransport();
 	return 0;
 }
 
