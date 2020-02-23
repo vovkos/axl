@@ -600,6 +600,31 @@ public:
 		return StringRef(m_hdr, m_p + first, end - first);
 	}
 
+	size_t
+	setSubString(
+		size_t first,
+		size_t length = -1
+		)
+	{
+		if (first == 0 && length >= m_length)
+			return m_length;
+
+		if (first > m_length)
+		{
+			m_p += m_length;
+			m_length = 0;
+			return 0;
+		}
+
+		size_t end = length == -1 ? m_length : first + length;
+		if (end > m_length)
+			end = m_length;
+
+		m_p += first;
+		m_length = end - first;
+		return m_length;
+	}
+
 	StringRef
 	getLeftSubString(size_t length) const
 	{
@@ -609,6 +634,16 @@ public:
 		return StringRef(m_hdr, m_p, length);
 	}
 
+	size_t
+	setLeftSubString(size_t length)
+	{
+		if (length >= m_length)
+			return m_length;
+
+		m_length = length;
+		return length;
+	}
+
 	StringRef
 	getRightSubString(size_t length) const
 	{
@@ -616,6 +651,17 @@ public:
 			return *this;
 
 		return StringRef(m_hdr, m_p + m_length - length, length);
+	}
+
+	size_t
+	setRightSubString(size_t length)
+	{
+		if (length >= m_length)
+			return m_length;
+
+		m_p += m_p + m_length - length;
+		m_length = length;
+		return length;
 	}
 
 	StringRef
