@@ -42,7 +42,8 @@ public:
 	int
 	getError(int retCode)
 	{
-		return ::SSL_get_error(m_h, retCode);
+		int error = ::SSL_get_error(m_h, retCode);
+		return error == SSL_ERROR_SSL ? ::ERR_peek_last_error() : error;
 	}
 
 	void
