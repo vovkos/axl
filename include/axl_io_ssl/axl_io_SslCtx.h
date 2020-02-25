@@ -116,6 +116,13 @@ public:
 	bool
 	setCipherList(const sl::StringRef& listString);
 
+	X509*
+	getCertificate() const
+	{
+		ASSERT(m_h);
+		return ::SSL_CTX_get0_certificate(m_h);
+	}
+
 	bool
 	useCertificate(const X509* cert);
 
@@ -124,6 +131,16 @@ public:
 		const sl::StringRef& fileName,
 		int fileType = SSL_FILETYPE_PEM
 		);
+
+	EVP_PKEY*
+	getPrivateKey() const
+	{
+		ASSERT(m_h);
+		return ::SSL_CTX_get0_privatekey(m_h);
+	}
+
+	bool
+	usePrivateKey(const EVP_PKEY* key);
 
 	bool
 	usePrivateKeyFile(

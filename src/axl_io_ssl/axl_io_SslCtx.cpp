@@ -71,6 +71,14 @@ SslCtx::useCertificateFile(
 }
 
 bool
+SslCtx::usePrivateKey(const EVP_PKEY* key)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_use_PrivateKey(m_h, (EVP_PKEY*)key);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
 SslCtx::usePrivateKeyFile(
 	const sl::StringRef& fileName,
 	int fileType

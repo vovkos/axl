@@ -129,6 +129,20 @@ public:
 		::SSL_set_verify(m_h, mode, callbackFunc);
 	}
 
+	STACK_OF(SSL_CIPHER)
+	getCiphers()
+	{
+		ASSERT(m_h);
+		::SSL_get_ciphers(m_h);
+	}
+
+	const char*
+	getCipherName(int priority)
+	{
+		ASSERT(m_h);
+		return ::SSL_get_cipher_list(m_h, priority);
+	}
+
 	bool
 	setCipherList(const sl::StringRef& listString);
 
@@ -207,18 +221,47 @@ public:
 		void* p
 		);
 
+	X509*
+	getCertificate() const
+	{
+		ASSERT(m_h);
+		return ::SSL_get_certificate(m_h);
+	}
+
 	bool
 	useCertificate(const X509* cert);
 
+	bool
+	useCertificateFile(
+		const sl::StringRef& fileName,
+		int fileType = SSL_FILETYPE_PEM
+		);
+
+	EVP_PKEY*
+	getPrivateKey() const
+	{
+		ASSERT(m_h);
+		return ::SSL_get_privatekey(m_h);
+	}
+
+	bool
+	usePrivateKey(const EVP_PKEY* key);
+
+	bool
+	usePrivateKeyFile(
+		const sl::StringRef& fileName,
+		int fileType = SSL_FILETYPE_PEM
+		);
+
 	X509*
-	getPeerCertificate()
+	getPeerCertificate() const
 	{
 		ASSERT(m_h);
 		return ::SSL_get_peer_certificate(m_h);
 	}
 
 	STACK_OF(X509)*
-	getPeerCertificateChain()
+	getPeerCertificateChain() const
 	{
 		ASSERT(m_h);
 		return ::SSL_get_peer_cert_chain(m_h);

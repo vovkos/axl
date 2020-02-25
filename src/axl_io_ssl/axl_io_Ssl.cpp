@@ -86,6 +86,36 @@ Ssl::useCertificate(const X509* cert)
 }
 
 bool
+Ssl::useCertificateFile(
+	const sl::StringRef& fileName,
+	int fileType
+	)
+{
+	ASSERT(m_h);
+	int result = ::SSL_use_certificate_file(m_h, fileName.sz(), fileType);
+	return complete(result);
+}
+
+bool
+Ssl::usePrivateKey(const EVP_PKEY* key)
+{
+	ASSERT(m_h);
+	int result = ::SSL_use_PrivateKey(m_h, (EVP_PKEY*)key);
+	return complete(result);
+}
+
+bool
+Ssl::usePrivateKeyFile(
+	const sl::StringRef& fileName,
+	int fileType
+	)
+{
+	ASSERT(m_h);
+	int result = ::SSL_use_PrivateKey_file(m_h, fileName.sz(), fileType);
+	return complete(result);
+}
+
+bool
 Ssl::doHandshake()
 {
 	ASSERT(m_h);
