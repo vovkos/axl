@@ -44,6 +44,30 @@ SslCtx::loadVerifyLocations(
 }
 
 bool
+SslCtx::setTmpDh(DH* dh)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_set_tmp_dh(m_h, dh);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+SslCtx::setTmpRsa(RSA* rsa)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_set_tmp_rsa(m_h, rsa);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+SslCtx::setTmpEcdh(EC_KEY* ecKey)
+{
+	ASSERT(m_h);
+	int result = ::SSL_CTX_set_tmp_ecdh(m_h, ecKey);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
 SslCtx::setCipherList(const sl::StringRef& listString)
 {
 	ASSERT(m_h);

@@ -37,6 +37,30 @@ Ssl::complete(int result)
 }
 
 bool
+Ssl::setTmpDh(DH* dh)
+{
+	ASSERT(m_h);
+	int result = ::SSL_set_tmp_dh(m_h, dh);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+Ssl::setTmpRsa(RSA* rsa)
+{
+	ASSERT(m_h);
+	int result = ::SSL_set_tmp_rsa(m_h, rsa);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+Ssl::setTmpEcdh(EC_KEY* ec)
+{
+	ASSERT(m_h);
+	int result = ::SSL_set_tmp_ecdh(m_h, ec);
+	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
 Ssl::setCipherList(const sl::StringRef& listString)
 {
 	ASSERT(m_h);

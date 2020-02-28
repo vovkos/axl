@@ -47,6 +47,22 @@ SslVerifyCallbackFunc(
 	X509_STORE_CTX* ctx
 	);
 
+typedef
+DH*
+SslTmpDhCallbackFunc(
+	SSL* ssl,
+	int isExport,
+	int keyLength
+	);
+
+typedef
+RSA*
+SslTmpRsaCallbackFunc(
+	SSL* ssl,
+	int isExport,
+	int keyLength
+	);
+
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class SslCtx: public sl::Handle<SSL_CTX*, FreeSslCtx>
@@ -76,6 +92,13 @@ public:
 		return ::SSL_CTX_clear_options(m_h, options);
 	}
 
+	void
+	setInfoCallback(SslInfoCallbackFunc* callbackFunc)
+	{
+		ASSERT(m_h);
+		::SSL_CTX_set_info_callback(m_h, callbackFunc);
+	}
+
 	int
 	getVerifyDepth()
 	{
@@ -88,13 +111,6 @@ public:
 	{
 		ASSERT(m_h);
 		::SSL_CTX_set_verify_depth(m_h, depth);
-	}
-
-	void
-	setInfoCallback(SslInfoCallbackFunc* callbackFunc)
-	{
-		ASSERT(m_h);
-		::SSL_CTX_set_info_callback(m_h, callbackFunc);
 	}
 
 	void
@@ -112,6 +128,29 @@ public:
 		const sl::StringRef& caFileName,
 		const sl::StringRef& caDir = NULL
 		);
+
+	bool
+	setTmpDh(DH* dh);
+
+	void
+	setTmpDhCallback(SslTmpDhCallbackFunc* callback)
+	{
+		ASSERT(m_h);
+		::SSL_CTX_set_tmp_dh_callback(m_h, callback);
+	}
+
+	bool
+	setTmpRsa(RSA* rsa);
+
+	void
+	setTmpDhCallback(SslTmpRsaCallbackFunc* callback)
+	{
+		ASSERT(m_h);
+		::SSL_CTX_set_tmp_rsa_callback(m_h, callback);
+	}
+
+	bool
+	setTmpEcdh(EC_KEY* ecKey);
 
 	bool
 	setCipherList(const sl::StringRef& listString);

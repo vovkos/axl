@@ -91,6 +91,13 @@ public:
 		return ::SSL_clear_options(m_h, options);
 	}
 
+	void
+	setInfoCallback(SslInfoCallbackFunc* callbackFunc)
+	{
+		ASSERT(m_h);
+		::SSL_set_info_callback(m_h, callbackFunc);
+	}
+
 	long
 	getVerifyResult()
 	{
@@ -113,13 +120,6 @@ public:
 	}
 
 	void
-	setInfoCallback(SslInfoCallbackFunc* callbackFunc)
-	{
-		ASSERT(m_h);
-		::SSL_set_info_callback(m_h, callbackFunc);
-	}
-
-	void
 	setVerify(
 		int mode,
 		SslVerifyCallbackFunc* callbackFunc = NULL
@@ -128,6 +128,29 @@ public:
 		ASSERT(m_h);
 		::SSL_set_verify(m_h, mode, callbackFunc);
 	}
+
+	bool
+	setTmpDh(DH* dh);
+
+	void
+	setTmpDhCallback(SslTmpDhCallbackFunc* callback)
+	{
+		ASSERT(m_h);
+		::SSL_set_tmp_dh_callback(m_h, callback);
+	}
+
+	bool
+	setTmpRsa(RSA* rsa);
+
+	void
+	setTmpDhCallback(SslTmpRsaCallbackFunc* callback)
+	{
+		ASSERT(m_h);
+		::SSL_set_tmp_rsa_callback(m_h, callback);
+	}
+
+	bool
+	setTmpEcdh(EC_KEY* ec);
 
 	STACK_OF(SSL_CIPHER)
 	getCiphers()
