@@ -47,6 +47,9 @@ public:
 	}
 
 	bool
+	create();
+
+	bool
 	readPublicKey(BIO* bio);
 
 	bool
@@ -71,6 +74,20 @@ public:
 		Bio bio;
 		return bio.createMemBuf(pem, size) && readPrivateKey(bio);
 	}
+
+	bool
+	generate(
+		uint_t keyLength,
+		BIGNUM* publicExponent,
+		BN_GENCB* callback = NULL
+		);
+
+	bool
+	generate(
+		uint_t keyLength,
+		uint_t publicExponent = RSA_F4,
+		BN_GENCB* callback = NULL
+		);
 
 	size_t
 	publicEncrypt(

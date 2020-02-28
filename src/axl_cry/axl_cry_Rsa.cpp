@@ -11,7 +11,7 @@
 
 #include "pch.h"
 #include "axl_cry_Rsa.h"
-#include "axl_cry_CryptoError.h"
+#include "axl_cry_BigNum.h"
 
 namespace axl {
 namespace cry {
@@ -19,11 +19,20 @@ namespace cry {
 //..............................................................................
 
 bool
+Rsa::create()
+{
+	close();
+
+	m_h = ::RSA_new();
+	return completeWithLastCryptoError(m_h != NULL);
+}
+
+bool
 Rsa::readPublicKey(BIO* bio)
 {
 	close();
 
-	bool result = PEM_read_bio_RSA_PUBKEY(bio, &m_h, 0, NULL) != NULL;
+	bool result = ::PEM_read_bio_RSA_PUBKEY(bio, &m_h, 0, NULL) != NULL;
 	return completeWithLastCryptoError(result);
 }
 
@@ -32,8 +41,34 @@ Rsa::readPrivateKey(BIO* bio)
 {
 	close();
 
-	bool result = PEM_read_bio_RSAPrivateKey(bio, &m_h, 0, NULL) != NULL;
+	bool result = ::PEM_read_bio_RSAPrivateKey(bio, &m_h, 0, NULL) != NULL;
 	return completeWithLastCryptoError(result);
+}
+
+bool
+Rsa::generate(
+	uint_t keyLength,
+	BIGNUM* publicExponent,
+	BN_GENCB* callback
+	)
+{
+	int result = ::RSA_generate_key_ex(m_h, keyLength, publicExponent, callback);
+	return completeWithLastCryptoError(result);
+}
+
+bool
+Rsa::generate(
+	uint_t keyLength,
+	uint_t publicExponent,
+	BN_GENCB* callback
+	)
+{
+	BigNum bigNum;
+
+	return
+		bigNum.create() &&
+		bigNum.setWord(publicExponent) &&
+		generate(keyLength, bigNum, callback);
 }
 
 size_t
