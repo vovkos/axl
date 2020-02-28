@@ -22,6 +22,7 @@ set(
 	${AXL_INC_DIR}/axl_cry/axl_cry_EcKey.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_EcPoint.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Rsa.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_Dh.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Aes.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_X509.h
 	)
@@ -35,6 +36,7 @@ set(
 	axl_cry_EcKey.cpp
 	axl_cry_EcPoint.cpp
 	axl_cry_Rsa.cpp
+	axl_cry_Dh.cpp
 	axl_cry_X509.cpp
 	)
 
