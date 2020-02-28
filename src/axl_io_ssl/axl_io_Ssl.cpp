@@ -48,7 +48,7 @@ bool
 Ssl::setTmpRsa(RSA* rsa)
 {
 	ASSERT(m_h);
-	int result = ::SSL_set_tmp_rsa(m_h, rsa);
+	int result = SSL_set_tmp_rsa(m_h, rsa);
 	return cry::completeWithLastCryptoError(result > 0);
 }
 

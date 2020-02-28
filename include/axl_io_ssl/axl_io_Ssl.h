@@ -143,20 +143,20 @@ public:
 	setTmpRsa(RSA* rsa);
 
 	void
-	setTmpDhCallback(SslTmpRsaCallbackFunc* callback)
+	setTmpRsaCallback(SslTmpRsaCallbackFunc* callback)
 	{
 		ASSERT(m_h);
-		::SSL_set_tmp_rsa_callback(m_h, callback);
+		SSL_set_tmp_rsa_callback(m_h, callback);
 	}
 
 	bool
 	setTmpEcdh(EC_KEY* ec);
 
-	STACK_OF(SSL_CIPHER)
+	STACK_OF(SSL_CIPHER)*
 	getCiphers()
 	{
 		ASSERT(m_h);
-		::SSL_get_ciphers(m_h);
+		return ::SSL_get_ciphers(m_h);
 	}
 
 	const char*

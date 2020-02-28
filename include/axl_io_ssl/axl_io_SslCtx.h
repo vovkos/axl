@@ -143,10 +143,10 @@ public:
 	setTmpRsa(RSA* rsa);
 
 	void
-	setTmpDhCallback(SslTmpRsaCallbackFunc* callback)
+	setTmpRsaCallback(SslTmpRsaCallbackFunc* callback)
 	{
 		ASSERT(m_h);
-		::SSL_CTX_set_tmp_rsa_callback(m_h, callback);
+		SSL_CTX_set_tmp_rsa_callback(m_h, callback);
 	}
 
 	bool
