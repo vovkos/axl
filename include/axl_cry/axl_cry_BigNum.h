@@ -180,6 +180,19 @@ public:
 		return completeWithLastCryptoError(result);
 	}
 
+	BN_ULONG
+	getWord()
+	{
+		return BN_get_word(m_h);
+	}
+
+	bool
+	setWord(BN_ULONG word)
+	{
+		int result = BN_set_word(m_h, word);
+		return completeWithLastCryptoError(result);
+	}
+
 	bool
 	rand(int bitCount)
 	{
