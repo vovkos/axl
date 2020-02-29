@@ -55,14 +55,6 @@ SslTmpDhCallbackFunc(
 	int keyLength
 	);
 
-typedef
-RSA*
-SslTmpRsaCallbackFunc(
-	SSL* ssl,
-	int isExport,
-	int keyLength
-	);
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class SslCtx: public sl::Handle<SSL_CTX*, FreeSslCtx>
@@ -137,16 +129,6 @@ public:
 	{
 		ASSERT(m_h);
 		::SSL_CTX_set_tmp_dh_callback(m_h, callback);
-	}
-
-	bool
-	setTmpRsa(RSA* rsa);
-
-	void
-	setTmpRsaCallback(SslTmpRsaCallbackFunc* callback)
-	{
-		ASSERT(m_h);
-		SSL_CTX_set_tmp_rsa_callback(m_h, callback);
 	}
 
 	bool

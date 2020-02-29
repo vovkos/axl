@@ -45,14 +45,6 @@ Ssl::setTmpDh(DH* dh)
 }
 
 bool
-Ssl::setTmpRsa(RSA* rsa)
-{
-	ASSERT(m_h);
-	int result = SSL_set_tmp_rsa(m_h, rsa);
-	return cry::completeWithLastCryptoError(result > 0);
-}
-
-bool
 Ssl::setTmpEcdh(EC_KEY* ec)
 {
 	ASSERT(m_h);

@@ -140,16 +140,6 @@ public:
 	}
 
 	bool
-	setTmpRsa(RSA* rsa);
-
-	void
-	setTmpRsaCallback(SslTmpRsaCallbackFunc* callback)
-	{
-		ASSERT(m_h);
-		SSL_set_tmp_rsa_callback(m_h, callback);
-	}
-
-	bool
 	setTmpEcdh(EC_KEY* ec);
 
 	STACK_OF(SSL_CIPHER)*
