@@ -119,10 +119,24 @@ public:
 		::SSL_set_verify_depth(m_h, depth);
 	}
 
+	int
+	getVerifyMode()
+	{
+		ASSERT(m_h);
+		return ::SSL_get_verify_mode(m_h);
+	}
+
+	void
+	setVerifyMode(int mode)
+	{
+		ASSERT(m_h);
+		::SSL_set_verify(m_h, mode, NULL);
+	}
+
 	void
 	setVerify(
 		int mode,
-		SslVerifyCallbackFunc* callbackFunc = NULL
+		SslVerifyCallbackFunc* callbackFunc
 		)
 	{
 		ASSERT(m_h);

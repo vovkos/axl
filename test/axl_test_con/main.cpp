@@ -4716,8 +4716,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testSharedMemoryTransport();
-	testPipeTransport();
+	testSsl();
 	return 0;
 }
 

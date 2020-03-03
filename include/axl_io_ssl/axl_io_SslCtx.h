@@ -105,10 +105,24 @@ public:
 		::SSL_CTX_set_verify_depth(m_h, depth);
 	}
 
+	int
+	getVerifyMode()
+	{
+		ASSERT(m_h);
+		return ::SSL_CTX_get_verify_mode(m_h);
+	}
+
+	void
+	setVerifyMode(int mode)
+	{
+		ASSERT(m_h);
+		::SSL_CTX_set_verify(m_h, mode, NULL);
+	}
+
 	void
 	setVerify(
 		int mode,
-		SslVerifyCallbackFunc* callbackFunc = NULL
+		SslVerifyCallbackFunc* callbackFunc
 		)
 	{
 		ASSERT(m_h);
@@ -118,7 +132,7 @@ public:
 	bool
 	loadVerifyLocations(
 		const sl::StringRef& caFileName,
-		const sl::StringRef& caDir = NULL
+		const sl::StringRef& caDir = sl::StringRef()
 		);
 
 	bool
