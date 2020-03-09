@@ -42,7 +42,7 @@ CryptoErrorProvider::getErrorDescription(ulong_t code)
 	const char* reasonString = ::ERR_reason_error_string(code);
 
 	sl::String errorString;
-	errorString.format("OpenSSL error %d", code);
+	errorString.format("OpenSSL error 0x%x", code);
 
 	if (functionString)
 		errorString.appendFormat(" in %s", functionString);
