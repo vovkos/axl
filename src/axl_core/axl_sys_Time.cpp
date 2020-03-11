@@ -11,9 +11,26 @@
 
 #include "pch.h"
 #include "axl_sys_Time.h"
-#include "axl_sl_CallOnce.h"
 
 // #define _AXL_SYS_USE_MACH_ABSOULTE_TIME 1
+
+#if (_AXL_OS_POSIX)
+#	if (AXL_PTR_SIZE < 8)
+#		include "time64.h"
+#		include "time64.c"
+
+typedef int64_t time64_t;
+
+#	else
+#		define localtime64_r localtime_r
+#		define gmtime64_r    gmtime_r
+#		define timegm64      timegm
+#		define mktime64      mktime
+
+typedef time_t time64_t;
+
+#	endif
+#endif
 
 namespace axl {
 namespace sys {
@@ -35,7 +52,7 @@ initPreciseTimestamps()
 	HMODULE kernel32 = ::GetModuleHandleW(L"kernel32.dll");
 	ASSERT(kernel32);
 
-	systemTimePreciseAsFileTime = (GetSystemTimePreciseAsFileTimeFunc*) ::GetProcAddress(kernel32, "GetSystemTimePreciseAsFileTime");
+	systemTimePreciseAsFileTime = (GetSystemTimePreciseAsFileTimeFunc*)::GetProcAddress(kernel32, "GetSystemTimePreciseAsFileTime");
 	if (!systemTimePreciseAsFileTime)
 		systemTimePreciseAsFileTime = ::GetSystemTimeAsFileTime;
 }
@@ -71,7 +88,7 @@ getTimestamp()
 	uint64_t timestamp;
 
 #if (_AXL_OS_WIN)
-	::GetSystemTimeAsFileTime((FILETIME*) &timestamp);
+	::GetSystemTimeAsFileTime((FILETIME*)&timestamp);
 #elif (_AXL_OS_DARWIN)
 	timeval tval;
 	gettimeofday(&tval, NULL);
@@ -95,7 +112,7 @@ getPreciseTimestamp()
 	uint64_t timestamp;
 
 #if (_AXL_OS_WIN)
-	systemTimePreciseAsFileTime((FILETIME*) &timestamp);
+	systemTimePreciseAsFileTime((FILETIME*)&timestamp);
 #elif (_AXL_OS_DARWIN)
 #	if (_AXL_SYS_USE_MACH_ABSOULTE_TIME)
 	uint64_t elapsed = mach_absolute_time() - g_machBaseAbsoluteTime;
@@ -147,12 +164,12 @@ Time::getTimestampImpl(
 	sysTime.wMinute = m_minute;
 	sysTime.wSecond = m_second;
 
-	::SystemTimeToFileTime(&sysTime, (FILETIME*) &timestamp);
+	::SystemTimeToFileTime(&sysTime, (FILETIME*)&timestamp);
 
 	if (isLocal)
-		::FileTimeToLocalFileTime((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
+		::FileTimeToLocalFileTime((const FILETIME*)&timestamp, (FILETIME*)&timestamp);
 	else
-		timestamp += (int64_t)getTimeZoneOffsetInMinutes(timeZone)* 60 * 10000000;
+		timestamp += (int64_t)getTimeZoneOffsetInMinutes(timeZone) * 60 * 10000000;
 
 #else
 	tm tmStruct = { 0 };
@@ -163,9 +180,9 @@ Time::getTimestampImpl(
 	tmStruct.tm_min  = m_minute;
 	tmStruct.tm_sec  = m_second;
 
-	time_t posixTime = isLocal ?
-		mktime(&tmStruct) :
-		timegm(&tmStruct) + getTimeZoneOffsetInMinutes(timeZone)* 60;
+	time64_t posixTime = isLocal ?
+		mktime64(&tmStruct) :
+		timegm64(&tmStruct) + getTimeZoneOffsetInMinutes(timeZone) * 60;
 
 	timestamp = (uint64_t)(posixTime + AXL_SYS_EPOCH_DIFF) * 10000000;
 #endif
@@ -188,11 +205,11 @@ Time::setTimestampImpl(
 	SYSTEMTIME sysTime = { 0 };
 
 	if (isLocal)
-		::FileTimeToLocalFileTime((const FILETIME*) &timestamp, (FILETIME*) &timestamp);
+		::FileTimeToLocalFileTime((const FILETIME*)&timestamp, (FILETIME*)&timestamp);
 	else
-		timestamp += (int64_t)getTimeZoneOffsetInMinutes(timeZone)* 60 * 10000000;
+		timestamp += (int64_t)getTimeZoneOffsetInMinutes(timeZone) * 60 * 10000000;
 
-	::FileTimeToSystemTime((const FILETIME*) &timestamp, &sysTime);
+	::FileTimeToSystemTime((const FILETIME*)&timestamp, &sysTime);
 
 	m_year        = sysTime.wYear;
 	m_month       = sysTime.wMonth - 1;
@@ -203,27 +220,27 @@ Time::setTimestampImpl(
 	m_second      = sysTime.wSecond;
 
 #else
-	tm* tmStruct;
+	struct tm tmStruct;
 
-	time_t posixTime = timestamp / 10000000 - AXL_SYS_EPOCH_DIFF;
+	time64_t posixTime = timestamp / 10000000 - AXL_SYS_EPOCH_DIFF;
 
 	if (isLocal)
 	{
-		tmStruct = localtime(&posixTime);
+		localtime64_r(&posixTime, &tmStruct);
 	}
 	else
 	{
-		posixTime += getTimeZoneOffsetInMinutes(timeZone)* 60;
-		tmStruct = gmtime(&posixTime);
+		posixTime += getTimeZoneOffsetInMinutes(timeZone) * 60;
+		gmtime64_r(&posixTime, &tmStruct);
 	}
 
-	m_year        = tmStruct->tm_year + 1900;
-	m_month       = tmStruct->tm_mon;
-	m_monthDay    = tmStruct->tm_mday;
-	m_dayOfWeek   = tmStruct->tm_wday;
-	m_hour        = tmStruct->tm_hour;
-	m_minute      = tmStruct->tm_min;
-	m_second      = tmStruct->tm_sec;
+	m_year        = tmStruct.tm_year + 1900;
+	m_month       = tmStruct.tm_mon;
+	m_monthDay    = tmStruct.tm_mday;
+	m_dayOfWeek   = tmStruct.tm_wday;
+	m_hour        = tmStruct.tm_hour;
+	m_minute      = tmStruct.tm_min;
+	m_second      = tmStruct.tm_sec;
 #endif
 
 	m_milliSecond = (timestamp / 10000) % 1000;

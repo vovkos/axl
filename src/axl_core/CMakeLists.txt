@@ -243,6 +243,9 @@ set(
 	${AXL_INC_DIR}/axl_sys/axl_sys_DynamicLib.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_Process.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_Time.h
+	time64.h
+	time64_config.h
+	time64_limits.h
 	)
 
 set(
@@ -251,6 +254,13 @@ set(
 	axl_sys_Time.cpp
 	axl_sys_ReadWriteLock.cpp
 	)
+
+set(
+	SYS_C_LIST
+	time64.c
+	)
+
+axl_exclude_from_build(${SYS_C_LIST}) # include it directly
 
 source_group(
 	sys
@@ -470,6 +480,7 @@ add_library(
 	${ENC_CPP_LIST}
 	${SYS_H_LIST}
 	${SYS_CPP_LIST}
+	${SYS_C_LIST}
 	${SYS_WIN_H_LIST}
 	${SYS_WIN_CPP_LIST}
 	${SYS_PSX_H_LIST}

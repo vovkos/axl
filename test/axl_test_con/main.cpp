@@ -1989,6 +1989,7 @@ testTimestamps()
 	uint64_t ts1 = sys::getTimestamp();
 	uint64_t ts2 = sys::getPreciseTimestamp();
 
+	printf("time (0) = %s\n", sys::Time(0, 0).format("%h:%m:%s.%l.%c").sz());
 	printf("ts1 = %s\n", sys::Time(ts1).format("%h:%m:%s.%l.%c").sz());
 	printf("ts2 = %s\n", sys::Time(ts2).format("%h:%m:%s.%l.%c").sz());
 
@@ -4716,7 +4717,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testSsl();
+	testTimestamps();
 	return 0;
 }
 
