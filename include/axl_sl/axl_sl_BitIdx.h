@@ -383,7 +383,6 @@ getBitmask64(
 //..............................................................................
 
 template <typename T>
-inline
 bool
 isPowerOf2(T x)
 {
@@ -391,7 +390,6 @@ isPowerOf2(T x)
 }
 
 template <typename T>
-inline
 bool
 isAligned(
 	T x,
@@ -406,7 +404,7 @@ template <
 	size_t factor,
 	typename T
 	>
-T
+bool
 isAligned(T x)
 {
 	ASSERT(isPowerOf2(factor));
@@ -414,7 +412,6 @@ isAligned(T x)
 }
 
 template <typename T>
-inline
 T
 align(
 	T x,
