@@ -29,7 +29,7 @@
 #	elif (_AXL_OS_DARWIN)
 #		include <libproc.h>
 #		include <mach-o/dyld.h>
-
+#		include <net/if_dl.h>
 #		include "axl_iok_Pch.h"
 #	endif
 #endif

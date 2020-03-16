@@ -72,18 +72,16 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 			continue;
 
 		sl::StringHashTableIterator<NetworkAdapterDesc*> it = adapterMap.visit(iface->ifa_name);
-		if (it->m_value)
+		if (!it->m_value)
 		{
-			if (iface->ifa_addr)
-				addAdapterAddress(it->m_value, iface->ifa_addr, iface->ifa_netmask);
-
-			continue;
+			NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
+			setupAdapter(adapter, iface, &socket);
+			adapterList->insertTail(adapter);
+			it->m_value = adapter;
 		}
 
-		NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
-		setupAdapter(adapter, iface, &socket);
-		adapterList->insertTail(adapter);
-		it->m_value = adapter;
+		if (iface->ifa_addr)
+			addAdapterAddress(it->m_value, iface->ifa_addr, iface->ifa_netmask);
 	}
 
 	::freeifaddrs(ifaceAddressList);
@@ -113,16 +111,16 @@ NetworkAdapterEnumerator::setupAdapter(
 	adapter->m_name = iface->ifa_name;
 	adapter->m_description = iface->ifa_name; // no special description
 
-	// try to get Mac
-
-	if (socket->isOpen())
+#if (!_AXL_OS_DARWIN)
+	if (socket->isOpen()) // try to get MAC-address
 	{
 		struct ifreq req;
 		strncpy(req.ifr_name, iface->ifa_name, countof(req.ifr_name));
 		int result = socket->ioctl(SIOCGIFHWADDR, &req);
 		if (result >= 0)
-			memcpy(adapter->m_macAddress, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
+			memcpy(adapter->m_macAddress, req.ifr_ifru.ifru_hwaddr.sa_data, sizeof(adapter->m_macAddress));
 	}
+#endif
 }
 
 void
@@ -132,6 +130,15 @@ NetworkAdapterEnumerator::addAdapterAddress(
 	const sockaddr* netMask
 	)
 {
+#if (_AXL_OS_DARWIN)
+	if (addr->sa_family == AF_LINK)
+	{
+		const sockaddr_dl* sdl = (sockaddr_dl*)addr;
+		memcpy(adapter->m_macAddress, LLADDR(sdl), sizeof(adapter->m_macAddress));
+		return;
+	}
+#endif
+
 	NetworkAdapterAddress* address = AXL_MEM_NEW(NetworkAdapterAddress);
 	address->m_address.setup(addr);
 	address->m_netMaskBitCount = netMask ? getSockAddrNetMaskBitCount(netMask) : 0;
