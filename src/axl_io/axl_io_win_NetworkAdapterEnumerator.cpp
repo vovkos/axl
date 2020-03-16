@@ -136,7 +136,7 @@ NetworkAdapterEnumerator::setupAdapter(
 
 	adapter->m_name = srcAdapter->AdapterName;
 	adapter->m_description = srcAdapter->Description;
-	memcpy(adapter->m_mac, srcAdapter->PhysicalAddress, 6);
+	memcpy(adapter->m_macAddress, srcAdapter->PhysicalAddress, 6);
 
 	IP_ADAPTER_UNICAST_ADDRESS* srcAddress = srcAdapter->FirstUnicastAddress;
 	for (; srcAddress; srcAddress = srcAddress->Next)
