@@ -17,7 +17,7 @@
 #include "axl_io_Socket.h"
 
 #ifdef SIOCGIFHWADDR
-#	define _AXL_IO_USE_SIOCGIFHWADDR 0
+#	define _AXL_IO_USE_SIOCGIFHWADDR 1
 #endif
 
 namespace axl {
@@ -120,7 +120,7 @@ NetworkAdapterEnumerator::setupAdapter(
 #if (_AXL_IO_USE_SIOCGIFHWADDR)
 	if (socket->isOpen()) // try to get MAC-address
 	{
-		struct ifreq req;
+		ifreq req;
 		strncpy(req.ifr_name, iface->ifa_name, countof(req.ifr_name));
 		int result = socket->ioctl(SIOCGIFHWADDR, &req);
 		if (result >= 0)
