@@ -16,6 +16,10 @@
 #include "axl_sl_BitMap.h"
 #include "axl_io_Socket.h"
 
+#ifdef SIOCGIFHWADDR
+#	define _AXL_IO_USE_SIOCGIFHWADDR 0
+#endif
+
 namespace axl {
 namespace io {
 
@@ -62,7 +66,9 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 	}
 
 	io::psx::Socket socket;
+#if (_AXL_IO_USE_SIOCGIFHWADDR)
 	socket.open(PF_INET, SOCK_DGRAM, 0);
+#endif
 
 	sl::StringHashTable<NetworkAdapterDesc*> adapterMap;
 
@@ -111,7 +117,7 @@ NetworkAdapterEnumerator::setupAdapter(
 	adapter->m_name = iface->ifa_name;
 	adapter->m_description = iface->ifa_name; // no special description
 
-#if (!_AXL_OS_DARWIN)
+#if (_AXL_IO_USE_SIOCGIFHWADDR)
 	if (socket->isOpen()) // try to get MAC-address
 	{
 		struct ifreq req;
@@ -135,6 +141,13 @@ NetworkAdapterEnumerator::addAdapterAddress(
 	{
 		const sockaddr_dl* sdl = (sockaddr_dl*)addr;
 		memcpy(adapter->m_macAddress, LLADDR(sdl), sizeof(adapter->m_macAddress));
+		return;
+	}
+#elif (_AXL_OS_LINUX)
+	if (addr->sa_family == AF_PACKET)
+	{
+		const sockaddr_ll* sll = (sockaddr_ll*)addr;
+		memcpy(adapter->m_macAddress, sll->sll_addr, sizeof(adapter->m_macAddress));
 		return;
 	}
 #endif
