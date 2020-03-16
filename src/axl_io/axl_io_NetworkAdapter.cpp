@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_NetworkAdapter.h"
+#include "axl_enc_HexEncoding.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -84,11 +85,37 @@ getNetworkAdapterFlagString(uint_t flags)
 
 //..............................................................................
 
+size_t
+getMacAddressString(
+	sl::String* string,
+	const uchar_t* macAddress,
+	uint_t flags
+	)
+{
+	return string->format(
+		(flags & enc::HexEncodingFlag_NoSpace) ?
+			(flags & enc::HexEncodingFlag_UpperCase) ?
+				"%02X%02X%02X%02X%02X%02X" :
+				"%02x%02x%02x%02x%02x%02x" :
+			(flags & enc::HexEncodingFlag_UpperCase) ?
+				"%02X:%02X:%02X:%02X:%02X:%02X" :
+				"%02x:%02x:%02x:%02x:%02x:%02x",
+		macAddress[0],
+		macAddress[1],
+		macAddress[2],
+		macAddress[3],
+		macAddress[4],
+		macAddress[5]
+		);
+}
+
+//..............................................................................
+
 NetworkAdapterDesc::NetworkAdapterDesc()
 {
 	m_type = NetworkAdapterType_Unknown;
 	m_flags = 0;
-	memset(m_mac, 0, sizeof(m_mac));
+	memset(m_macAddress, 0, sizeof(m_macAddress));
 }
 
 //..............................................................................

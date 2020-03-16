@@ -307,8 +307,9 @@ testNetworkAdapterList()
 
 		printf("Name        = %s\n", adapter->getName().sz());
 		printf("Description = %s\n", adapter->getDescription().sz());
-		printf("Type        = %s\n", io::getNetworkAdapterTypeString(adapter->getType ()));
-		printf("Flags       = %s\n", io::getNetworkAdapterFlagString(adapter->getFlags ()).sz());
+		printf("Type        = %s\n", io::getNetworkAdapterTypeString(adapter->getType()));
+		printf("Flags       = %s\n", io::getNetworkAdapterFlagString(adapter->getFlags()).sz());
+		printf("Mac         = %s\n", io::getMacAddressString(adapter->getMacAddress()).sz());
 
 		sl::ConstList<io::NetworkAdapterAddress> addressList = adapter->getAddressList();
 		sl::ConstIterator<io::NetworkAdapterAddress> addressIt = addressList.getHead();
@@ -4717,7 +4718,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testTimestamps();
+	testNetworkAdapterList();
 	return 0;
 }
 

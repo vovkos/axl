@@ -67,6 +67,27 @@ getNetworkAdapterFlagString(NetworkAdapterFlag flag);
 sl::String
 getNetworkAdapterFlagString(uint_t flags);
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+size_t
+getMacAddressString(
+	sl::String* string,
+	const uchar_t* macAddress,
+	uint_t flags = 0 // HexEncodingFlag-s
+	);
+
+inline
+sl::String
+getMacAddressString(
+	const uchar_t* macAddress,
+	uint_t flags = 0 // HexEncodingFlag-s
+	)
+{
+	sl::String string;
+	getMacAddressString(&string, macAddress, flags);
+	return string;
+}
+
 //..............................................................................
 
 struct NetworkAdapterAddress: sl::ListLink
@@ -86,7 +107,7 @@ protected:
 	uint_t m_flags;
 	sl::String m_name;
 	sl::String m_description;
-	uchar_t m_mac[6];
+	uchar_t m_macAddress[6];
 	sl::List<NetworkAdapterAddress> m_addressList;
 
 public:
@@ -117,9 +138,9 @@ public:
 	}
 
 	const uchar_t*
-	getMac() const
+	getMacAddress() const
 	{
-		return m_mac;
+		return m_macAddress;
 	}
 
 	sl::ConstList<NetworkAdapterAddress>

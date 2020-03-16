@@ -33,7 +33,8 @@ protected:
 	void
 	setupAdapter(
 		NetworkAdapterDesc* adapter,
-		ifaddrs* iface
+		ifaddrs* iface,
+		io::psx::Socket* socket
 		);
 
 	static
@@ -53,12 +54,15 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 	adapterList->clear();
 
 	ifaddrs* ifaceAddressList = NULL;
-	int result = getifaddrs(&ifaceAddressList);
+	int result = ::getifaddrs(&ifaceAddressList);
 	if (result != 0 || !ifaceAddressList)
 	{
 		err::setLastSystemError();
 		return -1;
 	}
+
+	io::psx::Socket socket;
+	socket.open(PF_INET, SOCK_DGRAM, 0);
 
 	sl::StringHashTable<NetworkAdapterDesc*> adapterMap;
 
@@ -77,20 +81,20 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 		}
 
 		NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
-		setupAdapter(adapter, iface);
+		setupAdapter(adapter, iface, &socket);
 		adapterList->insertTail(adapter);
-
 		it->m_value = adapter;
 	}
 
-	freeifaddrs(ifaceAddressList);
+	::freeifaddrs(ifaceAddressList);
 	return adapterList->getCount();
 }
 
 void
 NetworkAdapterEnumerator::setupAdapter(
 	NetworkAdapterDesc* adapter,
-	ifaddrs* iface
+	ifaddrs* iface,
+	io::psx::Socket* socket
 	)
 {
 	adapter->m_type =
@@ -108,6 +112,17 @@ NetworkAdapterEnumerator::setupAdapter(
 
 	adapter->m_name = iface->ifa_name;
 	adapter->m_description = iface->ifa_name; // no special description
+
+	// try to get Mac
+
+	if (socket->isOpen())
+	{
+		struct ifreq req;
+		strncpy(req.ifr_name, iface->ifa_name, countof(req.ifr_name));
+		int result = socket->ioctl(SIOCGIFHWADDR, &req);
+		if (result >= 0)
+			memcpy(adapter->m_macAddress, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
+	}
 }
 
 void
