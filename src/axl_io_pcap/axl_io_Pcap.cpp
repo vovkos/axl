@@ -81,6 +81,36 @@ Pcap::openDead(
 }
 
 bool
+Pcap::setSnapshotSize(size_t size)
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_set_snaplen(m_h, size);
+	if (result == -1)
+	{
+		setLastError();
+		return false;
+	}
+
+	return true;
+}
+
+bool
+Pcap::setBufferSize(size_t size)
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_set_buffer_size(m_h, size);
+	if (result == -1)
+	{
+		setLastError();
+		return false;
+	}
+
+	return true;
+}
+
+bool
 Pcap::setFilter(const bpf_program* filter)
 {
 	ASSERT(m_h);
@@ -131,7 +161,7 @@ Pcap::setBlockingMode(bool isBlocking)
 	int result = ::pcap_setnonblock(m_h, !isBlocking, errorBuffer);
 	if (result == -1)
 	{
-		setLastError();
+		err::setError(errorBuffer);
 		return false;
 	}
 

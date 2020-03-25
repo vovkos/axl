@@ -75,6 +75,12 @@ public:
 		return ::pcap_snapshot(m_h);
 	}
 
+	bool
+	setSnapshotSize(size_t size);
+
+	bool
+	setBufferSize(size_t size);
+
 	sl::StringRef
 	getLastErrorDescription()
 	{
