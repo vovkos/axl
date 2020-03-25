@@ -4104,7 +4104,7 @@ testPcap()
 
 	PcapThread thread;
 
-	result = thread.m_pcap.openDevice("lo", 4096, true, 200);
+	result = thread.m_pcap.openLive("lo", 4096, true, 200);
 	if (!result)
 	{
 		printf("error opening lo: %s\n", err::getLastErrorDescription().sz());
