@@ -45,11 +45,14 @@ class Pcap: public sl::Handle<pcap_t*, ClosePcap>
 {
 public:
 	bool
-	openDevice(
+	openDevice(const sl::StringRef& device);
+
+	bool
+	openLive(
 		const sl::StringRef& device,
 		size_t snapshotSize,
 		bool isPromiscious,
-		uint_t readTimeout
+		uint_t timeout
 		);
 
 	bool
@@ -60,6 +63,9 @@ public:
 		int linkType,
 		size_t snapshotSize
 		);
+
+	bool
+	activate();
 
 	int
 	getLinkType()
@@ -80,6 +86,12 @@ public:
 
 	bool
 	setBufferSize(size_t size);
+
+	bool
+	setPromiscious(bool isPromiscious);
+
+	bool
+	setTimeout(uint_t timeout);
 
 	sl::StringRef
 	getLastErrorDescription()
@@ -153,6 +165,10 @@ public:
 		const void* p,
 		size_t size
 		);
+
+protected:
+	bool
+	complete(bool result);
 };
 
 //..............................................................................

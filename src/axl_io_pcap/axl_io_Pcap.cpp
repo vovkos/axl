@@ -19,11 +19,27 @@ namespace io {
 //..............................................................................
 
 bool
-Pcap::openDevice(
+Pcap::openDevice(const sl::StringRef& device)
+{
+	close();
+
+	char errorBuffer[PCAP_ERRBUF_SIZE];
+	m_h = ::pcap_create(device.sz(), errorBuffer);
+	if (!m_h)
+	{
+		err::setError(errorBuffer);
+		return false;
+	}
+
+	return true;
+}
+
+bool
+Pcap::openLive(
 	const sl::StringRef& device,
 	size_t snapshotSize,
 	bool isPromiscious,
-	uint_t readTimeout
+	uint_t timeout
 	)
 {
 	close();
@@ -33,7 +49,7 @@ Pcap::openDevice(
 		device.sz(),
 		snapshotSize,
 		isPromiscious,
-		readTimeout,
+		timeout,
 		errorBuffer
 		);
 
@@ -81,18 +97,21 @@ Pcap::openDead(
 }
 
 bool
+Pcap::activate()
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_activate(m_h);
+	return complete(result == 0);
+}
+
+bool
 Pcap::setSnapshotSize(size_t size)
 {
 	ASSERT(m_h);
 
 	int result = ::pcap_set_snaplen(m_h, size);
-	if (result == -1)
-	{
-		setLastError();
-		return false;
-	}
-
-	return true;
+	return complete(result == 0);
 }
 
 bool
@@ -101,13 +120,25 @@ Pcap::setBufferSize(size_t size)
 	ASSERT(m_h);
 
 	int result = ::pcap_set_buffer_size(m_h, size);
-	if (result == -1)
-	{
-		setLastError();
-		return false;
-	}
+	return complete(result == 0);
+}
 
-	return true;
+bool
+Pcap::setPromiscious(bool isPromiscious)
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_set_promisc(m_h, isPromiscious);
+	return complete(result == 0);
+}
+
+bool
+Pcap::setTimeout(uint_t timeout)
+{
+	ASSERT(m_h);
+
+	int result = ::pcap_set_timeout(m_h, timeout);
+	return complete(result == 0);
 }
 
 bool
@@ -223,7 +254,7 @@ Pcap::read(
 	}
 
 	if (result != 1) // special values
-		return result != -2 ? result : 0; // -2 means EOF
+		return (intptr_t)result;
 
 	size_t copySize = AXL_MIN(hdr->caplen, size);
 	memcpy(p, data, copySize);
@@ -258,6 +289,15 @@ Pcap::write(
 #else
 	return result;
 #endif
+}
+
+bool
+Pcap::complete(bool result)
+{
+	if (!result)
+		setLastError();
+
+	return result;
 }
 
 //..............................................................................
