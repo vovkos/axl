@@ -28,15 +28,16 @@ namespace io {
 
 enum FileFlag
 {
-	FileFlag_ReadOnly      = 0x0001,
-	FileFlag_WriteOnly     = 0x0002,
-	FileFlag_OpenExisting  = 0x0004,
-	FileFlag_Exclusive     = 0x0008,
-	FileFlag_ShareWrite    = 0x0010,
-	FileFlag_DeleteOnClose = 0x0020, // windows only
-	FileFlag_Unlink        = 0x0040, // POSIX only
-	FileFlag_Clear         = 0x0080,
-	FileFlag_Asynchronous  = 0x0100,
+	FileFlag_ReadOnly        = 0x0001,
+	FileFlag_WriteOnly       = 0x0002,
+	FileFlag_OpenExisting    = 0x0004,
+	FileFlag_Exclusive       = 0x0008,
+	FileFlag_ShareWrite      = 0x0010,
+	FileFlag_DeleteOnClose   = 0x0020, // windows only
+	FileFlag_Unlink          = 0x0040, // POSIX only
+	FileFlag_Clear           = 0x0080,
+	FileFlag_Asynchronous    = 0x0100,
+	FileFlag_WriteAttributes = 0x0200, // windows only
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

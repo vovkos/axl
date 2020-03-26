@@ -30,6 +30,9 @@ File::open(
 		(flags & FileFlag_ReadOnly) ? GENERIC_READ :
 		(flags & FileFlag_WriteOnly) ? GENERIC_WRITE : GENERIC_READ | GENERIC_WRITE;
 
+	if (flags & FileFlag_WriteAttributes)
+		accessMode |= FILE_WRITE_ATTRIBUTES;
+
 	uint_t shareMode =
 		(flags & FileFlag_Exclusive) ? 0 :
 		(flags & (FileFlag_ReadOnly | FileFlag_ShareWrite)) ?
