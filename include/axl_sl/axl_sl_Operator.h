@@ -477,6 +477,25 @@ template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
 	>
+class EqBin
+{
+public:
+	bool
+	operator () (
+		Arg a,
+		Arg b
+		) const
+	{
+		return memcmp(&a, &b, sizeof(T)) == 0;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = typename ArgType<T>::Type
+	>
 class EqDuckType
 {
 public:
@@ -498,6 +517,8 @@ public:
 		return a->isEqual(*b);
 	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class EqDuckTypePtr

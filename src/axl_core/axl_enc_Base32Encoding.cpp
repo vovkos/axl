@@ -177,7 +177,6 @@ Base32Encoding::decode(
 	const sl::StringRef& string
 	)
 {
-
 	size_t sizeGuess = (string.getLength() * 5) / 8;
 	buffer->reserve(sizeGuess);
 	buffer->clear();
