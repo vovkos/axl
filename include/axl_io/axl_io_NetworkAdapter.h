@@ -137,6 +137,13 @@ public:
 		return m_description;
 	}
 
+	bool
+	isNullMacAddress() const
+	{
+		static uchar_t nullMacAddress[6] = { 0 };
+		return memcmp(m_macAddress, nullMacAddress, 6) == 0;
+	}
+
 	const uchar_t*
 	getMacAddress() const
 	{
