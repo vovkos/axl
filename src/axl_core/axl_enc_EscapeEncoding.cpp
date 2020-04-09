@@ -281,7 +281,9 @@ EscapeEncoding::decode(
 		}
 	}
 
-	string->append(base, p - base);
+	if (state == State_Normal) // otherwise, unterminated escape
+		string->append(base, p - base);
+
 	return string->getLength();
 }
 
