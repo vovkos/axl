@@ -3343,6 +3343,15 @@ testCmdLine(
 	bool result = parser.parse(argc, argv);
 	if (!result)
 		printf("Error parsing command line: %s\n", err::getLastErrorDescription().sz());
+
+#if (_AXL_OS_WIN)
+
+	printf("Now, using GetCommandLineW()...\n");
+
+	result = parser.parse(sl::String(::GetCommandLineW()));
+	if (!result)
+		printf("Error parsing command line: %s\n", err::getLastErrorDescription().sz());
+#endif
 }
 
 //..............................................................................
@@ -4718,7 +4727,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testNetworkAdapterList();
+	testCmdLine(argc, argv);
 	return 0;
 }
 

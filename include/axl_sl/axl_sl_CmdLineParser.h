@@ -82,8 +82,8 @@ protected:
 	static
 	size_t
 	extractArg(
-		const sl::StringRef& cmdLine,
-		sl::String* arg
+		sl::String* arg,
+		const sl::StringRef& cmdLine
 		);
 
 	static
@@ -123,10 +123,7 @@ public:
 
 		for (m_argIdx = 0; !cmdLine.isEmpty(); m_argIdx++)
 		{
-			size_t length = extractArg(cmdLine, &arg);
-			if (length == -1)
-				return false;
-
+			size_t length = extractArg(&arg, cmdLine);
 			if (arg.isEmpty())
 				break;
 

@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_sl_CmdLineParser.h"
+#include "axl_enc_EscapeEncoding.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -20,8 +21,8 @@ namespace sl {
 
 size_t
 CmdLineParserRoot::extractArg(
-	const sl::StringRef& cmdLine,
-	sl::String* arg
+	sl::String* arg,
+	const sl::StringRef& cmdLine
 	)
 {
 	const char* p = cmdLine.cp();
@@ -36,35 +37,74 @@ CmdLineParserRoot::extractArg(
 		return p - cmdLine.cp();
 	}
 
-	const char* p1 = p;
+#if (_AXL_OS_WIN) // only supports escaped quotation marks
+	arg->clear();
 
 	if (*p != '\"')
 	{
+		const char* p0 = p;
+
 		while (p < end && !isspace(*p))
-			p++;
+			if (*p++ == '\\' && p < end && *p == '\"')
+			{
+				arg->append(p0, p - p0 - 1);
+				p0 = p;
+				p++;
+			}
+
+		arg->append(p0, p - p0);
 	}
 	else
 	{
-		p1++;
+		p++;
+		const char* p0 = p;
 
-		while (p < end)
-		{
-			if (*p == '\"')
-				break;
-			else if (*p == '\\')
+		while (p < end && *p != '\"')
+			if (*p++ == '\\' && p < end && *p == '\"')
+			{
+				arg->append(p0, p - p0 - 1);
+				p0 = p;
+				p++;
+			}
+
+		arg->append(p0, p - p0);
+
+		if (p < end)
+			p++; // skip trailing quotation mark
+	}
+#else
+	if (*p != '\"')
+	{
+		const char* p0 = p;
+
+		for (; p < end && !isspace(*p); p++)
+			if (*p == '\\')
 				p++;
 
-			p++;
-		}
+		if (p > end) // unterminated escape
+			p = end;
 
-		if (p > end)
-		{
-			err::setError("unterminated escape sequence");
-			return -1;
-		}
+		enc::EscapeEncoding::decode(arg, sl::StringRef(p0, p - p0));
 	}
+	else
+	{
+		p++;
+		const char* p0 = p;
 
-	arg->copy(p1, p - p1);
+		for (; p < end && *p != '\"'; p++)
+			if (*p == '\\')
+				p++;
+
+		if (p > end) // unterminated escape
+			p = end;
+
+		enc::EscapeEncoding::decode(arg, sl::StringRef(p0, p - p0));
+
+		if (p < end)
+			p++; // skip trailing quotation mark
+	}
+#endif
+
 	return p - cmdLine.cp();
 }
 
