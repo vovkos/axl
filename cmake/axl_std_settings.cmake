@@ -513,6 +513,8 @@ axl_apply_gcc_settings)
 				memcpy
 				posix_spawn
 				posix_spawnp
+				clock_gettime
+				secure_getenv
 				pow
 				exp
 				exp2

@@ -19,10 +19,12 @@ set(
 
 set(
 	LIB_C_LIST
+	axl_clock.c
 	axl_fcntl.c
+	axl_getenv.c
+	axl_math.c
 	axl_memcpy.c
 	axl_spawn.c
-	axl_math.c
 	)
 
 source_group(
