@@ -9,7 +9,11 @@
 //
 //..............................................................................
 
-#include <stdlib.h>
+// secure_getenv is in <stdlib.h> but it's a GNU extension
+// and its declaration may be ifdef-ed out
+
+char*
+secure_getenv(const char *name);
 
 #if (defined __amd64__)
 __asm__(".symver secure_getenv, __secure_getenv@GLIBC_2.2.5");
