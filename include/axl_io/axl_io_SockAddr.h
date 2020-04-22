@@ -304,21 +304,9 @@ struct SockAddr
 	}
 
 	bool
-	isEqual(const SockAddr* addr) const
-	{
-		return isSockAddrEqual(&m_addr, &addr->m_addr);
-	}
-
-	bool
 	isMatch(const sockaddr* addr) const
 	{
 		return isSockAddrMatch(&m_addr, addr);
-	}
-
-	bool
-	isMatch(const SockAddr* addr) const
-	{
-		return isSockAddrMatch(&m_addr, &addr->m_addr);
 	}
 
 	uint_t
