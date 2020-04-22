@@ -92,22 +92,27 @@ setCurrentDir(const sl::StringRef& dir)
 sl::String
 getExeFilePath()
 {
-	char buffer[1024] = { 0 };
-
 #if (_AXL_OS_WIN)
-	::GetModuleFileNameA(::GetModuleHandle(NULL), buffer, countof(buffer) - 1);
-#elif (_AXL_OS_POSIX)
-#	if (_AXL_OS_LINUX)
-	::readlink("/proc/self/exe", buffer, countof (buffer) - 1);
-#	elif (_AXL_OS_DARWIN)
-	uint32_t size = sizeof(buffer);
-	_NSGetExecutablePath(buffer, &size);
-#	else
-#		error unsupported POSIX flavor
-#	endif
-#endif
-
+	wchar_t buffer[1024] = { 0 };
+	::GetModuleFileNameW(::GetModuleHandle(NULL), buffer, countof(buffer) - 1);
 	return buffer;
+#elif (_AXL_OS_LINUX)
+	return getSymbolicLinkTarget("/proc/self/exe");
+#elif (_AXL_OS_DARWIN)
+	uint32_t size = 0;
+	_NSGetExecutablePath(NULL, &size);
+
+	char buffer[256];
+	sl::Array<char> path(ref::BufKind_Stack, buffer, sizeof(buffer));
+	bool result = path.setCount(size);
+	if (!result)
+		return sl::String();
+
+	_NSGetExecutablePath(path, &size);
+	return getFullFilePath(path.cp());
+#else
+#	error unsupported OS
+#endif
 }
 
 sl::String
@@ -479,6 +484,14 @@ getSymbolicLinkTarget(
 }
 
 #elif (_AXL_OS_POSIX)
+
+bool
+isSymbolicLink(const sl::StringRef& fileName)
+{
+	struct stat fileStat;
+	int result = ::lstat(fileName.sz(), &fileStat);
+	return result != -1 && S_ISLNK(fileStat.st_mode);
+}
 
 bool
 getSymbolicLinkTarget(

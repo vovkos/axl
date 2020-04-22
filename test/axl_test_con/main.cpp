@@ -4727,7 +4727,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testCmdLine(argc, argv);
+	printf("exe: %s\n", io::getExeFilePath().sz());
 	return 0;
 }
 

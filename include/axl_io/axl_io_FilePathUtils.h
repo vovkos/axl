@@ -93,10 +93,22 @@ findFilePath(
 }
 
 bool
+isSymbolicLink(const sl::StringRef& fileName);
+
+bool
 getSymbolicLinkTarget(
 	sl::String* targetName,
 	const sl::StringRef& linkName
 	);
+
+inline
+sl::String
+getSymbolicLinkTarget(const sl::StringRef& linkName)
+{
+	sl::String targetName;
+	getSymbolicLinkTarget(&targetName, linkName);
+	return targetName;
+}
 
 bool
 matchWildcard(
