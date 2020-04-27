@@ -107,15 +107,19 @@ class Lexer: public lex::RagelLexer<Lexer, DoxyToken>
 	friend class lex::RagelLexer<Lexer, DoxyToken>;
 
 public:
-	sl::String
+	sl::StringRef
 	getCommandParam();
 
 protected:
 	DoxyToken*
 	createTextToken(
 		TokenKind tokenKind,
-		size_t left = 0
+		size_t left = 0,
+		size_t right = 0
 		);
+
+	DoxyToken*
+	createCustomCommandParamToken();
 
 	DoxyToken*
 	createNewLineToken();

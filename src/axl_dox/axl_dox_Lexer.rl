@@ -40,6 +40,21 @@ nws = [^ \t\r\n]+;
 
 rc = [^ \t\r\n\\];
 
+# custom-command char (non-whitespace, non-escape, and non curly)
+
+ccc = [^ {\t\r\n\\];
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# custom-command param machine
+#
+
+cmd_param := |*
+
+[^}\n]* '}'? { createCustomCommandParamToken(); fgoto main; };
+
+*|;
+
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # main machine
@@ -90,7 +105,8 @@ main := |*
 '@{'               { createToken(TokenKind_OpeningBrace); };
 '@}'               { createToken(TokenKind_ClosingBrace); };
 
-[@\\] rc*          { createTextToken(TokenKind_CustomCommand, 1); };
+[@\\] ccc+ '{'     { createTextToken(TokenKind_CustomCommand, 1, 1); fgoto cmd_param; };
+[@\\] ccc+         { createTextToken(TokenKind_CustomCommand, 1); };
 
 rc ([^\n]* nws)?   { createTextToken(TokenKind_Text); };
 

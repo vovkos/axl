@@ -18,7 +18,7 @@ namespace dox {
 
 //..............................................................................
 
-sl::String
+sl::StringRef
 Lexer::getCommandParam()
 {
 	const DoxyToken* commandToken = getToken();
@@ -34,11 +34,24 @@ Lexer::getCommandParam()
 DoxyToken*
 Lexer::createTextToken(
 	TokenKind tokenKind,
-	size_t left
+	size_t left,
+	size_t right
 	)
 {
 	Token* token = createToken(tokenKind);
-	token->m_data.m_string = sl::StringRef(ts + left, te - ts - left);
+	token->m_data.m_string = sl::StringRef(ts + left, te - ts - left - right);
+	return token;
+}
+
+DoxyToken*
+Lexer::createCustomCommandParamToken()
+{
+	size_t length = te - ts;
+	if (*(te - 1) == '}')
+		length--;
+
+	Token* token = createToken(TokenKind_Text);
+	token->m_data.m_string = sl::StringRef(ts, length).getTrimmedString();
 	return token;
 }
 
