@@ -153,10 +153,10 @@ public:
 	backspace(size_t backLength);
 
 	Size
-	calcTextSize(Font* font) const;
+	calcTextSize(Widget* widget) const;
 
 	void
-	calcHyperlinkXMap(Font* font);
+	calcHyperlinkXMap(Widget* widget);
 
 	const HyperlinkAnchor*
 	findHyperlinkByX(int x) const;

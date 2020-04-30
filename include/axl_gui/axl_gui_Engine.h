@@ -25,6 +25,7 @@ class FontTuple;
 class Image;
 class Cursor;
 class Canvas;
+class Widget;
 class WidgetDriver;
 
 //..............................................................................
@@ -321,8 +322,33 @@ public:
 
 	virtual
 	Size
+	calcCharSize(
+		Font* font,
+		Canvas* canvas,
+		utf32_t c
+		) = 0;
+
+	virtual
+	Size
+	calcCharSize(
+		Font* font,
+		Widget* widget,
+		utf32_t c
+		) = 0;
+
+	virtual
+	Size
 	calcTextSize_utf8(
 		Font* font,
+		Canvas* canvas,
+		const sl::StringRef_utf8& text
+		) = 0;
+
+	virtual
+	Size
+	calcTextSize_utf8(
+		Font* font,
+		Widget* widget,
 		const sl::StringRef_utf8& text
 		) = 0;
 
@@ -330,6 +356,15 @@ public:
 	Size
 	calcTextSize_utf16(
 		Font* font,
+		Canvas* canvas,
+		const sl::StringRef_utf16& text
+		) = 0;
+
+	virtual
+	Size
+	calcTextSize_utf16(
+		Font* font,
+		Widget* widget,
 		const sl::StringRef_utf16& text
 		) = 0;
 
@@ -337,6 +372,15 @@ public:
 	Size
 	calcTextSize_utf32(
 		Font* font,
+		Canvas* canvas,
+		const sl::StringRef_utf32& text
+		) = 0;
+
+	virtual
+	Size
+	calcTextSize_utf32(
+		Font* font,
+		Widget* widget,
 		const sl::StringRef_utf32& text
 		) = 0;
 

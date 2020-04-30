@@ -283,6 +283,30 @@ public:
 			);
 	}
 
+	Size
+	calcCharSize(utf32_t c)
+	{
+		return m_engine->calcCharSize(m_font, this, c);
+	}
+
+	Size
+	calcTextSize_utf8(const sl::StringRef_utf8& text)
+	{
+		return m_engine->calcTextSize_utf8(m_font, this, text);
+	}
+
+	Size
+	calcTextSize_utf16(const sl::StringRef_utf16& text)
+	{
+		return m_engine->calcTextSize_utf16(m_font, this, text);
+	}
+
+	Size
+	calcTextSize_utf32(const sl::StringRef_utf32& text)
+	{
+		return m_engine->calcTextSize_utf32(m_font, this, text);
+	}
+
 	// default to utf8
 
 	bool

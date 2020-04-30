@@ -353,15 +353,48 @@ public:
 	isMonospaceFont(Font* font);
 
 	Size
+	calcCharSize_qt(
+		const QFont& font,
+		QPaintDevice* device,
+		QChar c
+		);
+
+	Size
 	calcTextSize_qt(
-		Font* font,
+		const QFont& font,
+		QPaintDevice* device,
 		const QString& string
+		);
+
+	virtual
+	Size
+	calcCharSize(
+		Font* font,
+		Canvas* canvas,
+		utf32_t c
+		);
+
+	virtual
+	Size
+	calcCharSize(
+		Font* font,
+		Widget* widget,
+		utf32_t c
 		);
 
 	virtual
 	Size
 	calcTextSize_utf8(
 		Font* font,
+		Canvas* canvas,
+		const sl::StringRef_utf8& text
+		);
+
+	virtual
+	Size
+	calcTextSize_utf8(
+		Font* font,
+		Widget* widget,
 		const sl::StringRef_utf8& text
 		);
 
@@ -369,6 +402,15 @@ public:
 	Size
 	calcTextSize_utf16(
 		Font* font,
+		Canvas* canvas,
+		const sl::StringRef_utf16& text
+		);
+
+	virtual
+	Size
+	calcTextSize_utf16(
+		Font* font,
+		Widget* widget,
 		const sl::StringRef_utf16& text
 		);
 
@@ -376,6 +418,15 @@ public:
 	Size
 	calcTextSize_utf32(
 		Font* font,
+		Canvas* canvas,
+		const sl::StringRef_utf32& text
+		);
+
+	virtual
+	Size
+	calcTextSize_utf32(
+		Font* font,
+		Widget* widget,
 		const sl::StringRef_utf32& text
 		);
 

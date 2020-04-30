@@ -52,11 +52,6 @@ enum WidgetMsgCode
 	WidgetMsgCode_Animate,                 // WidgetMsg
 	WidgetMsgCode_ToolTip,                 // WidgetMouseMsg
 
-	WidgetMsgCode_Gdi,                     // WidgetGdiMsg
-	WidgetMsgCode_Qt,                      // WidgetQtMsg
-	WidgetMsgCode_Gtk,                     // WidgetGtkMsg
-	WidgetMsgCode_User,                    // WidgetMsg
-
 	WidgetMsgCode__Count,
 };
 
@@ -168,68 +163,6 @@ struct WidgetThreadMsg: WidgetMsg
 	uint_t m_code;
 	ref::Ptr<void> m_params;
 };
-
-//..............................................................................
-
-// engine-specific messages
-
-#if (_AXL_OS_WIN)
-
-struct WidgetGdiMsg: WidgetMsg
-{
-	intptr_t m_wmMsg;
-	intptr_t m_wParam;
-	intptr_t m_lParam;
-	intptr_t m_lResult;
-
-	WidgetGdiMsg(
-		intptr_t wmMsg,
-		intptr_t wParam = 0,
-		intptr_t lParam = 0
-		):
-		WidgetMsg(WidgetMsgCode_Gdi)
-	{
-		m_wmMsg = wmMsg;
-		m_wParam = wParam;
-		m_lParam = lParam;
-		m_lResult = 0;
-	}
-};
-
-#endif
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#if (_AXL_GUI_QT)
-
-struct WidgetQtMsg: WidgetMsg
-{
-	QEvent* m_event;
-
-	WidgetQtMsg():
-		WidgetMsg(WidgetMsgCode_Qt)
-	{
-		m_event = NULL;
-	}
-};
-
-#endif
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#if (_AXL_GTK)
-
-struct WidgetGtkMsg: WidgetMsg
-{
-	// not yet
-
-	WidgetGtkMsg():
-		WidgetMsg(WidgetMsgCode_Gtk)
-	{
-	}
-};
-
-#endif
 
 //..............................................................................
 
@@ -718,20 +651,13 @@ class Widget
 {
 	friend class WidgetDriver;
 
-protected:
+public:
 	WidgetDriver m_widgetDriver;
 
 protected:
 	Widget(const WidgetConstructParam& param):
 		m_widgetDriver(param)
 	{
-	}
-
-public:
-	Engine*
-	getGuiEngine()
-	{
-		return m_widgetDriver.getEngine();
 	}
 
 protected:

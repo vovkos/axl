@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_gui_HyperText.h"
 #include "axl_gui_AnsiAttrParser.h"
+#include "axl_gui_Widget.h"
 
 namespace axl {
 namespace gui {
@@ -216,8 +217,11 @@ HyperText::findHyperlinkByOffset(size_t offset) const
 }
 
 void
-HyperText::calcHyperlinkXMap(Font* baseFont)
+HyperText::calcHyperlinkXMap(Widget* widget)
 {
+	Engine* engine = widget->m_widgetDriver.getEngine();
+	Font* baseFont = widget->m_widgetDriver.getFont();
+
 	int x = 0;
 	size_t offset = 0;
 	size_t length = m_text.getLength();
@@ -245,7 +249,11 @@ HyperText::calcHyperlinkXMap(Font* baseFont)
 			if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 				continue;
 
-			size = font->calcTextSize_utf32(m_text.getSubString(offset, attrAnchor->m_offset - offset));
+			size = engine->calcTextSize_utf32(
+				font,
+				widget,
+				m_text.getSubString(offset, attrAnchor->m_offset - offset)
+				);
 
 			x += size.m_width;
 			offset = attrAnchor->m_offset;
@@ -254,7 +262,11 @@ HyperText::calcHyperlinkXMap(Font* baseFont)
 			font = baseFont->getFontMod(fontFlags);
 		}
 
-		size = font->calcTextSize_utf32(m_text.getSubString(offset, hyperlinkAnchor->m_offset - offset));
+		size = engine->calcTextSize_utf32(
+			font,
+			widget,
+			m_text.getSubString(offset, hyperlinkAnchor->m_offset - offset)
+			);
 
 		x += size.m_width;
 		offset = hyperlinkAnchor->m_offset;
@@ -268,8 +280,11 @@ HyperText::calcHyperlinkXMap(Font* baseFont)
 }
 
 Size
-HyperText::calcTextSize(Font* baseFont) const
+HyperText::calcTextSize(Widget* widget) const
 {
+	Engine* engine = widget->m_widgetDriver.getEngine();
+	Font* baseFont = widget->m_widgetDriver.getFont();
+
 	Size size;
 
 	int x = 0;
@@ -287,7 +302,11 @@ HyperText::calcTextSize(Font* baseFont) const
 		if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 			continue;
 
-		size = font->calcTextSize_utf32(m_text.getSubString(offset, attrAnchor->m_offset - offset));
+		size = engine->calcTextSize_utf32(
+			font,
+			widget,
+			m_text.getSubString(offset, attrAnchor->m_offset - offset)
+			);
 
 		x += size.m_width;
 		offset = attrAnchor->m_offset;
@@ -296,7 +315,12 @@ HyperText::calcTextSize(Font* baseFont) const
 		font = baseFont->getFontMod(fontFlags);
 	}
 
-	size = font->calcTextSize_utf32(m_text.getSubString(offset, length - offset));
+	size = engine->calcTextSize_utf32(
+		font,
+		widget,
+		m_text.getSubString(offset, length - offset)
+		);
+
 	size.m_width += x;
 
 	return size;

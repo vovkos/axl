@@ -102,36 +102,6 @@ public:
 	{
 		return m_engine->isMonospaceFont(this);
 	}
-
-	Size
-	calcTextSize(const sl::StringRef& text)
-	{
-		return calcTextSize_utf8(text);
-	}
-
-	Size
-	calcTextSize_utf8(const sl::StringRef_utf8& text)
-	{
-		return m_engine->calcTextSize_utf8(this, text);
-	}
-
-	Size
-	calcTextSize_utf16(const sl::StringRef_utf16& text)
-	{
-		return m_engine->calcTextSize_utf16(this, text);
-	}
-
-	Size
-	calcTextSize_utf32(const sl::StringRef_utf32& text)
-	{
-		return m_engine->calcTextSize_utf32(this, text);
-	}
-
-	Size
-	calcTextSize(utf32_t c)
-	{
-		return calcTextSize_utf32(sl::StringRef_utf32(&c, 1));
-	}
 };
 
 //..............................................................................

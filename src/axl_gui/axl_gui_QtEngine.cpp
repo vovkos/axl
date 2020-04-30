@@ -587,46 +587,161 @@ QtEngine::isMonospaceFont(Font* font)
 }
 
 Size
+QtEngine::calcCharSize_qt(
+	const QFont& font,
+	QPaintDevice* device,
+	QChar c
+	)
+{
+	QFontMetrics fontMetrics(font, device);
+
+	return Size(
+		fontMetrics.width(c),
+		fontMetrics.height()
+		);
+}
+
+Size
 QtEngine::calcTextSize_qt(
-	Font* font,
+	const QFont& font,
+	QPaintDevice* device,
 	const QString& string
 	)
 {
-	ASSERT(font->getEngine() == this);
-	QtFont* qtFont = (QtFont*)font;
-	QFontMetrics qtFontMetrics(qtFont->m_qtFont);
+	QFontMetrics fontMetrics(font, device);
 
-	Size size;
-	size.m_width = qtFontMetrics.width(string);
-	size.m_height = qtFontMetrics.height();
-	return size;
+	return Size(
+		fontMetrics.width(string),
+		fontMetrics.height()
+		);
+}
+
+Size
+QtEngine::calcCharSize(
+	Font* font,
+	Canvas* canvas,
+	utf32_t c
+	)
+{
+	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
+
+	return calcCharSize_qt(
+		((QtFont*)font)->m_qtFont,
+		((QtCanvas*)canvas)->m_qtPainter.device(),
+		c
+		);
+}
+
+Size
+QtEngine::calcCharSize(
+	Font* font,
+	Widget* widget,
+	utf32_t c
+	)
+{
+	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
+
+	return calcCharSize_qt(
+		((QtFont*)font)->m_qtFont,
+		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
+		c
+		);
 }
 
 Size
 QtEngine::calcTextSize_utf8(
 	Font* font,
+	Canvas* canvas,
 	const sl::StringRef_utf8& text
 	)
 {
-	return calcTextSize_qt(font, QString::fromUtf8(text.cp(), text.getLength()));
+	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
+
+	return calcTextSize_qt(
+		((QtFont*)font)->m_qtFont,
+		((QtCanvas*)canvas)->m_qtPainter.device(),
+		QString::fromUtf8(text.cp(), text.getLength())
+		);
+}
+
+Size
+QtEngine::calcTextSize_utf8(
+	Font* font,
+	Widget* widget,
+	const sl::StringRef_utf8& text
+	)
+{
+	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
+
+	return calcTextSize_qt(
+		((QtFont*)font)->m_qtFont,
+		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
+		QString::fromUtf8(text.cp(), text.getLength())
+		);
 }
 
 Size
 QtEngine::calcTextSize_utf16(
 	Font* font,
+	Canvas* canvas,
 	const sl::StringRef_utf16& text
 	)
 {
-	return calcTextSize_qt(font, QString((const QChar*) text.cp(), text.getLength()));
+	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
+
+	return calcTextSize_qt(
+		((QtFont*)font)->m_qtFont,
+		((QtCanvas*)canvas)->m_qtPainter.device(),
+		QString((const QChar*) text.cp(), text.getLength())
+		);
+}
+
+Size
+QtEngine::calcTextSize_utf16(
+	Font* font,
+	Widget* widget,
+	const sl::StringRef_utf16& text
+	)
+{
+	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
+
+	return calcTextSize_qt(
+		((QtFont*)font)->m_qtFont,
+		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
+		QString((const QChar*) text.cp(), text.getLength())
+		);
 }
 
 Size
 QtEngine::calcTextSize_utf32(
 	Font* font,
+	Canvas* canvas,
 	const sl::StringRef_utf32& text
 	)
 {
-	return calcTextSize_qt(font, QString::fromUcs4((const uint*) text.cp(), text.getLength()));
+	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
+
+	return calcTextSize_qt(
+		((QtFont*)font)->m_qtFont,
+		((QtCanvas*)canvas)->m_qtPainter.device(),
+		QString::fromUcs4((const uint*) text.cp(), text.getLength())
+		);
+}
+
+Size
+QtEngine::calcTextSize_utf32(
+	Font* font,
+	Widget* widget,
+	const sl::StringRef_utf32& text
+	)
+{
+	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
+
+	return calcTextSize_qt(
+		((QtFont*)font)->m_qtFont,
+		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
+		QString::fromUcs4((const uint*) text.cp(), text.getLength())
+		);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

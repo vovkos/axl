@@ -55,7 +55,7 @@ TextPainter::drawSpace(
 	uint_t color
 	)
 {
-	Size size = m_canvas->m_font->calcTextSize(sl::StringRef(" ", 1));
+	Size size = m_canvas->calcCharSize(' ');
 	return drawSpace_p(length * size.m_width, color);
 }
 
@@ -72,8 +72,9 @@ TextPainter::drawText_utf8(
 	if (text.isEmpty())
 		return m_point.m_x;
 
+	Engine* engine = m_canvas->getEngine();
 	Font* font = m_canvas->m_font->getFontMod(fontFlags);
-	Size size = font->calcTextSize_utf8(text);
+	Size size = engine->calcTextSize_utf8(font, m_canvas, text);
 	int right = m_point.m_x + size.m_width;
 
 	m_canvas->drawText_utf8(
@@ -104,8 +105,9 @@ TextPainter::drawText_utf32(
 	if (text.isEmpty())
 		return m_point.m_x;
 
+	Engine* engine = m_canvas->getEngine();
 	Font* font = m_canvas->m_font->getFontMod(fontFlags);
-	Size size = font->calcTextSize_utf32(text);
+	Size size = engine->calcTextSize_utf32(font, m_canvas, text);
 	int right = m_point.m_x + size.m_width;
 
 	m_canvas->drawText_utf32(

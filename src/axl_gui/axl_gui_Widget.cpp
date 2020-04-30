@@ -28,9 +28,11 @@ WidgetDriver::WidgetDriver(const WidgetConstructParam& param):
 	m_msgMap = NULL;
 	m_colorAttr.m_foreColor = StdPalColor_WidgetText;
 	m_colorAttr.m_backColor = StdPalColor_WidgetBack;
-	m_caretSize.m_width = 2;
-	m_caretSize.m_height = m_font->calcTextSize('|').m_height;
 	m_isCaretVisible = false;
+
+	Widget* widget = containerof(this, Widget, m_widgetDriver);
+	m_caretSize.m_width = 2;
+	m_caretSize.m_height = m_engine->calcCharSize(m_font, widget, '|').m_height;
 }
 
 bool
@@ -39,8 +41,9 @@ WidgetDriver::setFont(Font* font)
 	if (m_font == font)
 		return true;
 
+	Widget* widget = containerof(this, Widget, m_widgetDriver);
 	m_font = font;
-	m_caretSize.m_height = m_font->calcTextSize('|').m_height;
+	m_caretSize.m_height = m_engine->calcCharSize(m_font, widget, '|').m_height;
 	return true;
 }
 
