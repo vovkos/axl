@@ -284,3 +284,15 @@ if(BUILD_AXL_IOK)
 endif()
 
 #...............................................................................
+
+option(
+	BUILD_AXL_SPY
+	"Build axl_spy library (API spying engine)"
+	ON
+	)
+
+if(BUILD_AXL_SPY)
+	add_subdirectory(axl_spy)
+endif()
+
+#...............................................................................
