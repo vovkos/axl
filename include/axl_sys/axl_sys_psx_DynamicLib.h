@@ -46,11 +46,13 @@ public:
 	void*
 	getSymbol(const sl::StringRef& name);
 
+#if (!_AXL_OS_DARWIN)
 	bool
 	getInfo(
 		int request,
 		void* p
 		);
+#endif
 };
 
 //..............................................................................

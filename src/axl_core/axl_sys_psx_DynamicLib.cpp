@@ -50,6 +50,8 @@ DynamicLib::getSymbol(const sl::StringRef& name)
 	return p;
 }
 
+#if (!_AXL_OS_DARWIN)
+
 bool
 DynamicLib::getInfo(
 	int request,
@@ -65,6 +67,8 @@ DynamicLib::getInfo(
 
 	return true;
 }
+
+#endif
 
 //..............................................................................
 
