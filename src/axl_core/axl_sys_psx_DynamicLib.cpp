@@ -50,6 +50,22 @@ DynamicLib::getSymbol(const sl::StringRef& name)
 	return p;
 }
 
+bool
+DynamicLib::getInfo(
+	int request,
+	void* p
+	)
+{
+	int result = ::dlinfo(m_h, request, p);
+	if (!p)
+	{
+		err::setError(::dlerror());
+		return NULL;
+	}
+
+	return true;
+}
+
 //..............................................................................
 
 } // namespace psx

@@ -45,6 +45,12 @@ public:
 
 	void*
 	getSymbol(const sl::StringRef& name);
+
+	bool
+	getInfo(
+		int request,
+		void* p
+		);
 };
 
 //..............................................................................
