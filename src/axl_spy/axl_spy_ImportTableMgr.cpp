@@ -1,10 +1,13 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "axl_err_Error.h"
 #include "axl_spy_ImportTableMgr.h"
+#include "axl_sl_Array.h"
 
-#if (_AXL_OS_POSIX)
+#if (_AXL_OS_LINUX)
 #	include "axl_sys_psx_DynamicLib.h"
 #	include <link.h>
+#elif (_AXL_OS_DARWIN)
+#   include <mach-o/dyld.h>
 #endif
 
 namespace axl {
@@ -162,22 +165,22 @@ ImportTableMgr::enumerateImports(void* module)
 {
 	bool result;
 
+	link_map* linkMap;
+
 	sys::psx::DynamicLib exe;
 	if (!module)
 	{
-		result = exe.open(NULL, RTLD_LAZY | RTLD_NOLOAD);
-		if (!result)
-			return -1;
-
-		module = exe;
+		result =
+			exe.open(NULL, RTLD_LAZY | RTLD_NOLOAD) &&
+			exe.getInfo(RTLD_DI_LINKMAP, &linkMap);
 	}
-
-	link_map* linkMap;
-
-	sys::psx::DynamicLib lib;
-	lib.attach(module);
-	result = exe.getInfo(RTLD_DI_LINKMAP, &linkMap);
-	lib.detach();
+	else
+	{
+		sys::psx::DynamicLib lib;
+		lib.attach(module);
+		result = lib.getInfo(RTLD_DI_LINKMAP, &linkMap);
+		lib.detach();
+	}
 
 	if (!result)
 		return -1;
@@ -243,10 +246,147 @@ ImportTableMgr::enumerateImports(void* module)
 			);
 	}
 
-	return 0;
+	return pltCount + gotCount;
 }
 
 #elif (_AXL_OS_DARWIN)
+
+uint64_t uleb128(const uint8_t** p)
+{
+	uint64_t r = 0;
+	int s = 0;
+
+	do
+	{
+		r |= (uint64_t)(**p & 0x7f) << s;
+		s += 7;
+	} while (*(*p)++ >= 0x80);
+
+	return r;
+}
+
+int64_t sleb128(const uint8_t** p)
+{
+	int64_t r = 0;
+	int s = 0;
+	for (;;)
+	{
+		uint8_t b = *(*p)++;
+		if (b < 0x80)
+		{
+			if (b & 0x40)
+				r -= (0x80 - b) << s;
+			else
+				r |= (b & 0x3f) << s;
+
+			break;
+		}
+
+		r |= (b & 0x7f) << s;
+		s += 7;
+	}
+
+	return r;
+}
+
+size_t
+ImportTableMgr::enumerateImports(void* module)
+{
+	uint8_t* slide = (uint8_t*)_dyld_get_image_vmaddr_slide(0);
+	mach_header_64* machHdr = (mach_header_64*)_dyld_get_image_header(0);
+	load_command* cmd = (load_command*)(machHdr + 1);
+
+	sl::Array<segment_command_64*> segmentCmdArray;
+	size_t linkEditSegmentIdx = -1;
+	size_t lazyBindOffset = -1;
+	size_t lazyBindSize = -1;
+
+	for (uint_t i = 0; i < machHdr->ncmds; i++)
+	{
+		printf("load_command: 0x%x\n", cmd->cmd);
+
+		switch (cmd->cmd)
+		{
+			segment_command_64* segmentCmd;
+			dyld_info_command* dyldInfoCmd;
+
+		case LC_SEGMENT_64:
+			segmentCmd = (segment_command_64*)cmd;
+
+			if (strcmp(segmentCmd->segname, "__LINKEDIT") == 0)
+				linkEditSegmentIdx = segmentCmdArray.getCount();
+
+			segmentCmdArray.append(segmentCmd);
+			break;
+
+		case LC_DYLD_INFO_ONLY:
+			dyldInfoCmd = (dyld_info_command*)cmd;
+			lazyBindOffset = dyldInfoCmd->lazy_bind_off;
+			lazyBindSize = dyldInfoCmd->lazy_bind_size;
+			break;
+		}
+
+		cmd = (load_command*)((char*)cmd + cmd->cmdsize);
+	}
+
+	if (linkEditSegmentIdx == -1 ||
+		lazyBindOffset == -1 ||
+		lazyBindSize == -1)
+	{
+		err::setError("invalid MACH-O file");
+		return -1;
+	}
+
+	segment_command_64* linkEditSegmentCmd = segmentCmdArray[linkEditSegmentIdx];
+
+	const uint8_t* p = slide + linkEditSegmentCmd->vmaddr - linkEditSegmentCmd->fileoff + lazyBindOffset;
+	const uint8_t* end = p + lazyBindSize;
+
+	while (p < end)
+	{
+		uint8_t op = *p & BIND_OPCODE_MASK;
+		uint8_t imm = *p & BIND_IMMEDIATE_MASK;
+		p++;
+
+		switch (op)
+		{
+		case BIND_OPCODE_DONE:
+		case BIND_OPCODE_DO_BIND:
+		case BIND_OPCODE_SET_TYPE_IMM:
+		case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
+		case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
+		case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
+			break;
+
+		case BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM:
+			printf("  %s\n", p);
+			p += strlen((char*)p) + 1;
+			break;
+
+		case BIND_OPCODE_SET_ADDEND_SLEB:
+			sleb128(&p);
+			break;
+
+		case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
+		case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
+		case BIND_OPCODE_ADD_ADDR_ULEB:
+		case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
+			uleb128(&p);
+			break;
+
+		case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
+			uleb128(&p);
+			uleb128(&p);
+			break;
+
+		default:
+			printf("*** unexpected bind op: 0x%02x\n", op);
+		}
+	}
+
+	return -1;
+}
+
 #endif
 
 //..............................................................................
