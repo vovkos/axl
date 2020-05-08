@@ -9,10 +9,18 @@
 //
 //..............................................................................
 
-#pragma once
+#include "pch.h"
+#include "axl_sys_drw_Dyld.h"
+#include "axl_err_Error.h"
 
-#include "axl_g_Pch.h"
+namespace axl {
+namespace sys {
+namespace drw {
 
-#if (_AXL_OS_WIN)
-#	include <dbghelp.h>
-#endif
+//..............................................................................
+
+//..............................................................................
+
+} // namespace drw
+} // namespace sys
+} // namespace axl

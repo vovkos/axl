@@ -121,7 +121,7 @@ enum ThunkCodeOffset
 	ThunkCodeOffset_HookPtr1         = 0x31,
 	ThunkCodeOffset_HookEnterPtr     = 0x42,
 	ThunkCodeOffset_HookRetPtr       = 0x7a,
-	ThunkCodeOffset_TargetPtr        = 0x88,
+	ThunkCodeOffset_TargetFuncPtr    = 0x88,
 	ThunkCodeOffset_HookRet          = 0x92,
 	ThunkCodeOffset_HookPtr2         = 0xa7,
 	ThunkCodeOffset_HookLeavePtr     = 0xb7,
@@ -336,7 +336,7 @@ allocateHook(
 	memcpy(hook->m_thunkCode, g_thunkCode, sizeof(g_thunkCode));
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookPtr1) = hook;
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookPtr2) = hook;
-	*(void**)(hook->m_thunkCode + ThunkCodeOffset_TargetPtr) = targetFunc;
+	*(void**)(hook->m_thunkCode + ThunkCodeOffset_TargetFuncPtr) = targetFunc;
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookRetPtr) = hook->m_thunkCode + ThunkCodeOffset_HookRet;
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookEnterPtr) = (void*)hookEnter;
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookLeavePtr) = (void*)hookLeave;
@@ -369,6 +369,15 @@ void
 freeHook(Hook* hook)
 {
 	::VirtualFree(hook, sizeof(Hook), MEM_RELEASE);
+}
+
+void
+setHookTargetFunc(
+	Hook* hook,
+	void* targetFunc
+	)
+{
+	*(void**)(hook->m_thunkCode + ThunkCodeOffset_TargetFuncPtr) = targetFunc;
 }
 
 void

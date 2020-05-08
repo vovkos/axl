@@ -15,12 +15,14 @@
 
 set(
 	LIB_H_LIST
+	${AXL_INC_DIR}/axl_spy/axl_spy_ImportTableMgr.h
 	${AXL_INC_DIR}/axl_spy/axl_spy_Hook.h
-	${AXL_INC_DIR}/axl_spy/axl_spy_HookMgr.h
+	axl_spy_HookMgr.h
 	)
 
 set(
 	LIB_CPP_LIST
+	axl_spy_ImportTableMgr.cpp
 	axl_spy_HookMgr.cpp
 	axl_spy_Hook_amd64_msc.cpp
 	axl_spy_Hook_amd64_gcc.cpp

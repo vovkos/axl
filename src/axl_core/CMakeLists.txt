@@ -333,6 +333,7 @@ set(
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_AccessToken.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_Sid.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_VirtualMemory.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Iat.h
 	)
 
 set(
@@ -352,6 +353,7 @@ set(
 	axl_sys_win_AccessToken.cpp
 	axl_sys_win_Sid.cpp
 	axl_sys_win_VirtualMemory.cpp
+	axl_sys_win_Iat.cpp
 	)
 
 source_group(
@@ -377,6 +379,7 @@ set(
 	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevDevice.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevMonitor.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevEnumerator.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_Plt.h
 	)
 
 set(
@@ -393,6 +396,7 @@ endif()
 set(
 	SYS_LNX_CPP_LIST
 	${SYS_LNX_LIBUDEV_CPP_LIST}
+	axl_sys_lnx_Plt.cpp
 	)
 
 source_group(
@@ -415,12 +419,14 @@ set(
 	SYS_DRW_H_LIST
 	${AXL_INC_DIR}/axl_sys/axl_sys_drw_MachError.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_drw_Semaphore.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_drw_Dyld.h
 	)
 
 set(
 	SYS_DRW_CPP_LIST
 	axl_sys_drw_MachError.cpp
 	axl_sys_drw_Semaphore.cpp
+	axl_sys_drw_Dyld.cpp
 	)
 
 source_group(

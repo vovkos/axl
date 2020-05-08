@@ -4701,6 +4701,15 @@ testPty(const sl::StringRef& cmdLine)
 
 //..............................................................................
 
+void
+spyTest()
+{
+	spy::ImportTableMgr importTableMgr;
+	importTableMgr.enumerateImports(NULL);
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -4727,7 +4736,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	printf("exe: %s\n", io::getExeFilePath().sz());
+	spyTest();
 	return 0;
 }
 

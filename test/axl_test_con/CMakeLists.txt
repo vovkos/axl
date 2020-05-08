@@ -118,6 +118,7 @@ set_target_properties(
 
 target_link_libraries(
 	axl_test_con
+	axl_spy
 	axl_io
 	axl_fsm
 	axl_zip

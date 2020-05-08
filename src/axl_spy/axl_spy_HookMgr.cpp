@@ -45,7 +45,6 @@ HookMgr::findOriginalRet(size_t frameBase)
 	return it->m_value;
 }
 
-
 void
 HookMgr::cleanup(const sl::RbTreeIterator<size_t, size_t>& it)
 {

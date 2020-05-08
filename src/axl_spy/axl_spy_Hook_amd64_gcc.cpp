@@ -173,6 +173,15 @@ freeHook(Hook* hook)
 	free(hook);
 }
 
+void
+setHookTargetFunc(
+	Hook* hook,
+	void* targetFunc
+	)
+{
+	*(void**)(hook->m_thunkCode + ThunkCodeOffset_TargetFuncPtr) = targetFunc;
+}
+
 //..............................................................................
 
 } // namespace spy
