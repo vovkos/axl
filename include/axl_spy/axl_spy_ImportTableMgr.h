@@ -11,7 +11,7 @@ class ImportTableMgr
 {
 public:
 	size_t
-	enumerateImports(HMODULE hModule = NULL);
+	enumerateImports(void* module = NULL);
 };
 
 //..............................................................................

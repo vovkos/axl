@@ -4705,7 +4705,7 @@ void
 spyTest()
 {
 	spy::ImportTableMgr importTableMgr;
-	importTableMgr.enumerateImports(NULL);
+	importTableMgr.enumerateImports();
 }
 
 //..............................................................................
@@ -4727,6 +4727,8 @@ main(
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
+
+	FILE* f = stdout;
 
 	g::getModule()->setTag("axl_test_con");
 	srand((uint_t)sys::getTimestamp());
