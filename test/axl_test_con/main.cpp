@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_sys_Thread.h"
 #include "axl_err_Errno.h"
+#include "../../include/axl_spy_ImportEnumerator.h"
 
 //..............................................................................
 
@@ -4701,11 +4702,332 @@ testPty(const sl::StringRef& cmdLine)
 
 //..............................................................................
 
-void
-spyTest()
+thread_local int g_indent = 0;
+
+spy::HookAction
+hookEnter(
+	void* targetFunc,
+	void* callbackParam,
+	size_t frameBase
+	)
 {
-	spy::ImportTableMgr importTableMgr;
-	importTableMgr.enumerateImports();
+	printf(
+		"%*sTID %d: +%s\n",
+		g_indent * 2,
+		"",
+		sys::getCurrentThreadId(),
+		(char*)callbackParam
+		);
+
+	g_indent++;
+	return spy::HookAction_Default;
+}
+
+void
+hookLeave(
+	void* targetFunc,
+	void* callbackParam,
+	size_t frameBase
+	)
+{
+	g_indent--;
+
+	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
+
+	printf(
+		"%*sTID %lld: -%s -> %zd/0x%zx\n",
+		g_indent * 2,
+		"",
+		sys::getCurrentThreadId(),
+		(char*)callbackParam,
+		regRetBlock->m_rax,
+		regRetBlock->m_rax
+		);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#define _SPY_TEST_TRACE_HOOKING_MODULE   1
+#define _SPY_TEST_TRACE_HOOKING_FUNCTION 0
+
+bool
+spyModule(
+	void* module,
+	const sl::StringRef& moduleName
+	)
+{
+	sl::Array<char> backup;
+	bool result = spy::disableImportTableWriteProtection(module, &backup);
+	if (!result)
+		return false;
+
+	static int32_t stringCacheFlag = 0;
+	static int32_t hookArenaFlag = 0;
+
+	sl::BoxList<sl::String>* stringCache = sl::getSingleton<sl::BoxList<sl::String> >(&stringCacheFlag);
+	spy::HookArena* hookArena = sl::getSingleton<spy::HookArena>(&hookArenaFlag);
+
+	spy::ImportIterator it = spy::enumerateImports(module);
+
+	char const* currentModuleName = NULL;
+
+#if (_AXL_OS_WIN)
+	for (; it; it++)
+	{
+		sl::String& functionName = *stringCache->insertTail();
+		functionName = moduleName + ":" + it.getModuleName() + ":";
+
+		if (it.getOrdinal() != -1)
+			functionName.appendFormat("%s@%d", it.getModuleName().sz(), it.getOrdinal());
+		else
+			functionName += it.getName();
+
+		if (functionName == "TlsAlloc" ||
+			functionName == "TlsGetValue" ||
+			functionName == "TlsSetValue")
+		{
+			printf("  skipping %s for now...\n", functionName.sz());
+			continue;
+		}
+
+#	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
+		printf("  hooking %s...\n", functionName.sz());
+#	endif
+
+		void** slot = it.getSlot();
+		void* targetFunc = *slot;
+		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
+		*slot = hook;
+	}
+#else
+	for (; it; it++)
+		printf("%p %s\n", *it.getSlot(), it.getName().sz());
+#endif
+
+	result = spy::restoreImportTableWriteProtection(module, backup);
+	ASSERT(result);
+	return true;
+}
+
+int
+spyGlobalTest()
+{
+	spy::ModuleIterator it = spy::enumerateModules();
+	for (; it; it++)
+	{
+#if (_SPY_TEST_TRACE_HOOKING_MODULE)
+		printf("Hooking %s...\n", it.getModuleFileName().sz());
+#endif
+		sl::String fileName = io::getFileName(it.getModuleFileName());
+		spyModule(it.getModule(), fileName);
+	}
+
+	printf("Hooking done, enabling hooks...\n");
+
+	spy::enableHooks();
+	sl::String dir = io::getCurrentDir();
+	return 0;
+}
+
+namespace spy_test {
+
+//..............................................................................
+
+// target function -- all register arguments are used up
+
+int foo(
+	int a, double b,
+	int c, double d,
+	int e, double f,  // on microsoft x64, e passed on stack
+	int g, double h,
+	int i, double j,
+	int k, double l,
+	int m, double n,  // on systemv amd64, m passed on stack
+	int o, double p,
+	int q, double r   // on systemv amd64, r passed on stack
+	)
+{
+	printf(
+		"foo("
+		"%d, %f, %d, %f, %d, %f, "
+		"%d, %f, %d, %f, %d, %f, "
+		"%d, %f, %d, %f, %d, %f)\n",
+		a, b, c, d, e, f,
+		g, h, i, j, k, l,
+		m, n, o, p, q, r
+		);
+
+	return 123;
+}
+
+//..............................................................................
+
+spy::HookAction
+fooHookEnter(
+	void* targetFunc,
+	void* callbackParam,
+	size_t frameBase
+	)
+{
+	printf(
+		"fooHookEnter(func: %p, param: %p, frame: %p)\n",
+		targetFunc,
+		callbackParam,
+		(void*)frameBase
+		);
+
+#if (_AXL_CPU_AMD64)
+#	if (_AXL_CPP_MSC)
+	spy::RegArgBlock* regArgBlock = (spy::RegArgBlock*)(frameBase + spy::FrameOffset_RegArgBlock);
+
+	int a    = (int)regArgBlock->m_rcx;
+	double b = regArgBlock->m_xmm1[0];
+	int c    = (int)regArgBlock->m_r8;
+	double d = regArgBlock->m_xmm3[0];
+
+	spy::VaList va;
+	spy::vaStart(va, frameBase);
+
+	int e = spy::vaArg<int>(va);
+	double f = spy::vaArg<double>(va);
+	int g = spy::vaArg<int>(va);
+	double h = spy::vaArg<double>(va);
+	int i = spy::vaArg<int>(va);
+	double j = spy::vaArg<double>(va);
+	int k = spy::vaArg<int>(va);
+	double l = spy::vaArg<double>(va);
+	int m = spy::vaArg<int>(va);
+	double n = spy::vaArg<double>(va);
+	int o = spy::vaArg<int>(va);
+	double p = spy::vaArg<double>(va);
+	int q = spy::vaArg<int>(va);
+	double r = spy::vaArg<double>(va);
+
+#	elif (_AXL_CPP_GCC)
+	spy::RegArgBlock* regArgBlock = (spy::RegArgBlock*)(frameBase + spy::FrameOffset_RegArgBlock);
+
+	int a = (int)regArgBlock->m_rdi;
+	int c = (int)regArgBlock->m_rsi;
+	int e = (int)regArgBlock->m_rdx;
+	int g = (int)regArgBlock->m_rcx;
+	int i = (int)regArgBlock->m_r8;
+	int k = (int)regArgBlock->m_r9;
+	double b = regArgBlock->m_xmm0[0];
+	double d = regArgBlock->m_xmm1[0];
+	double f = regArgBlock->m_xmm2[0];
+	double h = regArgBlock->m_xmm3[0];
+	double j = regArgBlock->m_xmm4[0];
+	double l = regArgBlock->m_xmm5[0];
+	double n = regArgBlock->m_xmm6[0];
+	double p = regArgBlock->m_xmm7[0];
+
+	spy::VaList va;
+	spy::vaStart(va, frameBase);
+
+	int m = spy::vaArg<int>(va);
+	int o = spy::vaArg<int>(va);
+	int q = spy::vaArg<int>(va);
+	double r = spy::vaArg<double>(va);
+
+#	endif
+#elif (_AXL_CPU_X86)
+	spy::VaList va;
+	spy::vaStart(va, frameBase);
+
+	int a = spy::vaArg<int>(va);
+	double b = spy::vaArg<double>(va);
+	int c = spy::vaArg<int>(va);
+	double d = spy::vaArg<double>(va);
+	int e = spy::vaArg<int>(va);
+	double f = spy::vaArg<double>(va);
+	int g = spy::vaArg<int>(va);
+	double h = spy::vaArg<double>(va);
+	int i = spy::vaArg<int>(va);
+	double j = spy::vaArg<double>(va);
+	int k = spy::vaArg<int>(va);
+	double l = spy::vaArg<double>(va);
+	int m = spy::vaArg<int>(va);
+	double n = spy::vaArg<double>(va);
+	int o = spy::vaArg<int>(va);
+	double p = spy::vaArg<double>(va);
+	int q = spy::vaArg<int>(va);
+	double r = spy::vaArg<double>(va);
+
+#endif
+
+	printf(
+		"  ("
+		"%d, %f, %d, %f, %d, %f, "
+		"%d, %f, %d, %f, %d, %f, "
+		"%d, %f, %d, %f, %d, %f)\n",
+		a, b, c, d, e, f,
+		g, h, i, j, k, l,
+		m, n, o, p, q, r
+		);
+
+	return spy::HookAction_Default;
+}
+
+void
+fooHookLeave(
+	void* targetFunc,
+	void* callbackParam,
+	size_t frameBase
+	)
+{
+	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
+
+	printf(
+		"fooHookLeave(func: %p, param: %p, frame: %p, retval: %zd/0x%zx)\n",
+		targetFunc,
+		callbackParam,
+		(void*)frameBase,
+		regRetBlock->m_rax,
+		regRetBlock->m_rax
+		);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+} // namespace spy_test
+
+int
+spyParamTest()
+{
+	typedef int FooFunc(
+		int, double,
+		int, double,
+		int, double,
+		int, double,
+		int, double,
+		int, double,
+		int, double,
+		int, double,
+		int, double
+		);
+
+	spy::HookArena arena;
+
+	spy::Hook* fooHook = arena.allocate(
+		(void*)spy_test::foo,
+		(void*)0xabcdef,
+		spy_test::fooHookEnter,
+		spy_test::fooHookLeave
+		);
+
+	((FooFunc*)fooHook)(
+		1, 10.1,
+		2, 20.2,
+		3, 30.3,
+		4, 40.4,
+		5, 50.5,
+		6, 60.6,
+		7, 70.7,
+		8, 80.8,
+		9, 90.9
+		);
+
+	return 0;
 }
 
 //..............................................................................
@@ -4738,7 +5060,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	spyTest();
+	spyGlobalTest();
 	return 0;
 }
 

@@ -33,7 +33,20 @@ struct RegArgBlock
 	double m_xmm3[2];
 };
 
+struct RegRetBlock
+{
+	uint64_t m_rax;
+};
+
 #	elif (_AXL_CPP_GCC)
+
+struct RegRetBlock
+{
+	uint64_t m_rax;
+	uint64_t m_rdx;
+	double m_xmm0[2];
+	double m_xmm1[2];
+};
 
 struct RegArgBlock
 {
@@ -54,6 +67,13 @@ struct RegArgBlock
 };
 
 #	endif
+#elif (_AXL_CPU_X86)
+
+struct RegRetBlock
+{
+	uint32_t m_rax;
+};
+
 #endif
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -62,12 +82,15 @@ enum FrameOffset
 {
 #if (_AXL_CPU_X86)
 	FrameOffset_StackArgBlock = 8,
+	FrameOffset_RegRetBlock   = -(int)sizeof(RegRetBlock),
 #elif (_AXL_CPU_AMD64)
 #	if (_AXL_CPP_MSC)
 	FrameOffset_RegArgBlock   = -(int)sizeof(RegArgBlock),
+	FrameOffset_RegRetBlock   = -(int)(sizeof(RegArgBlock) + sizeof(RegRetBlock) + 8),
 	FrameOffset_StackArgBlock = 16 + 8 * 4,
 #	elif (_AXL_CPP_GCC)
 	FrameOffset_RegArgBlock   = -(int)sizeof(RegArgBlock),
+	FrameOffset_RegRetBlock   = -(int)(sizeof(RegArgBlock) + sizeof(RegRetBlock)),
 	FrameOffset_StackArgBlock = 16,
 #	endif
 #endif
@@ -107,8 +130,17 @@ vaEnd(VaList& va)
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum HookAction
+{
+	HookAction_Default    = 0,
+	HookAction_Return     = 0x01,
+	HookAction_JumpTarget = 0x02,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 typedef
-void
+HookAction
 HookEnterFunc(
 	void* targetFunc,
 	void* callbackParam,
@@ -120,8 +152,7 @@ void
 HookLeaveFunc(
 	void* targetFunc,
 	void* callbackParam,
-	size_t frameBase,
-	size_t returnValue
+	size_t frameBase
 	);
 
 #if (_AXL_CPP_MSC && _AXL_CPU_AMD64)
@@ -142,16 +173,30 @@ HookExceptionFunc(
 
 struct Hook; // ABI-dependent
 
-Hook*
-allocateHook(
-	void* targetFunc,
-	void* callbackParam,
-	HookEnterFunc* enterFunc,
-	HookLeaveFunc* leaveFunc
-	);
+class HookArena
+{
+protected:
+	void* m_impl;
 
-void
-freeHook(Hook* hook);
+public:
+	HookArena();
+	~HookArena(); // does NOT free allocated executable pages
+
+	Hook*
+	allocate(
+		void* targetFunc,
+		void* callbackParam,
+		HookEnterFunc* enterFunc,
+		HookLeaveFunc* leaveFunc
+		);
+
+	void
+	free(); // CAUTION: normally, you DO NOT WANT to ever unhook and free thunks
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// for trampoline-based hooking, we need to adjust targetFunc AFTER injection
 
 void
 setHookTargetFunc(
@@ -168,6 +213,20 @@ setHookExceptionFunc(
 	);
 
 #endif
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+enableHooks();
+
+void
+disableHooks();
+
+void
+enableCurrentThreadHooks();
+
+void
+disableCurrentThreadHooks();
 
 //..............................................................................
 

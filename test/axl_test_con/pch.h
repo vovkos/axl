@@ -84,7 +84,8 @@
 #endif
 
 #include "axl_io_FileEnumerator.h"
-#include "axl_spy_ImportTableMgr.h"
+#include "axl_spy_ImportEnumerator.h"
+#include "axl_spy_ModuleEnumerator.h"
 #include "axl_spy_Hook.h"
 
 using namespace axl;

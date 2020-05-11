@@ -44,12 +44,14 @@ set(
 	${AXL_INC_DIR}/axl_mem/axl_mem_Tracker.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_TrackerBlock.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_ScatterGather.h
+	${AXL_INC_DIR}/axl_mem/axl_mem_ExecutableBlockArena.h
 	)
 
 set(
 	MEM_CPP_LIST
 	axl_mem_Tracker.cpp
 	axl_mem_ScatterGather.cpp
+	axl_mem_ExecutableBlockArena.cpp
 	)
 
 source_group(

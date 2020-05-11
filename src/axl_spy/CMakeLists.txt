@@ -15,15 +15,19 @@
 
 set(
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_spy/axl_spy_ImportTableMgr.h
+	${AXL_INC_DIR}/axl_spy/axl_spy_ImportEnumerator.h
+	${AXL_INC_DIR}/axl_spy/axl_spy_ModuleEnumerator.h
 	${AXL_INC_DIR}/axl_spy/axl_spy_Hook.h
-	axl_spy_HookMgr.h
+	axl_spy_ThreadState.h
+	axl_spy_HookCommon.h
 	)
 
 set(
 	LIB_CPP_LIST
-	axl_spy_ImportTableMgr.cpp
-	axl_spy_HookMgr.cpp
+	axl_spy_ImportEnumerator.cpp
+	axl_spy_ModuleEnumerator.cpp
+	axl_spy_ThreadState.cpp
+	axl_spy_HookCommon.cpp
 	axl_spy_Hook_amd64_msc.cpp
 	axl_spy_Hook_amd64_gcc.cpp
 	axl_spy_Hook_x86.cpp

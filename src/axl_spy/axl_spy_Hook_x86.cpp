@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "axl_spy_Hook.h"
-#include "axl_spy_HookMgr.h"
+#include "axl_spy_HookCommon.h"
+#include "axl_mem_ExecutableBlockArena.h"
 
 namespace axl {
 namespace spy {
@@ -10,7 +11,7 @@ namespace spy {
 // nasm -fwin32 -lthunk_x86.asm.lst thunk_x86.asm
 // perl nasm-list-to-cpp.pl thunk_x86.asm.lst
 
-uint8_t g_thunkCode[] =
+const uint8_t g_thunkCode[] =
 {
 	0x55,                                      // 00000000  push    ebp
 	0x89, 0xE5,                                // 00000001  mov     ebp, esp
@@ -67,27 +68,19 @@ enum ThunkCodeOffset
 struct Hook
 {
 	uint8_t m_thunkCode[(ThunkCodeOffset_End & ~7) + 8]; // align on 8
-	void* m_targetFunc;
-	void* m_callbackParam;
-	HookEnterFunc* m_enterFunc;
-	HookLeaveFunc* m_leaveFunc;
+	HookCommonContext m_context;
 };
 
 //..............................................................................
 
-thread_local HookMgr g_hookMgr;
-
-void
+HookAction
 hookEnter(
 	Hook* hook,
 	uint32_t ebp,
 	uint32_t originalRet
 	)
 {
-	if (hook->m_enterFunc)
-		hook->m_enterFunc(hook->m_targetFunc, hook->m_callbackParam, ebp);
-
-	g_hookMgr.addFrame(ebp, originalRet);
+	return hookEnterCommon(&hook->m_context, ebp, originalRet);
 }
 
 uint32_t
@@ -97,43 +90,33 @@ hookLeave(
 	uint32_t eax
 	)
 {
-	if (hook->m_leaveFunc)
-		hook->m_leaveFunc(hook->m_targetFunc, hook->m_callbackParam, ebp, eax);
-
-	return g_hookMgr.removeFrame(ebp);
+	return hookLeaveCommon(&hook->m_context, ebp);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+HookArena::HookArena()
+{
+	m_impl = AXL_MEM_NEW(mem::ExecutableBlockArena<Hook>);
+}
+
+HookArena::~HookArena()
+{
+	((mem::ExecutableBlockArena<Hook>*)m_impl)->detach(); // don't free unless explicitly requested
+	AXL_MEM_DELETE((mem::ExecutableBlockArena<Hook>*)m_impl);
+}
+
 Hook*
-allocateHook(
+HookArena::allocate(
 	void* targetFunc,
 	void* callbackParam,
 	HookEnterFunc* enterFunc,
 	HookLeaveFunc* leaveFunc
-	)
+)
 {
-#if (_WIN32)
-	Hook* hook = (Hook*)::VirtualAlloc(
-		NULL,
-		sizeof(Hook),
-		MEM_COMMIT | MEM_RESERVE,
-		PAGE_EXECUTE_READWRITE
-		);
-
+	Hook* hook = ((mem::ExecutableBlockArena<Hook>*)m_impl)->allocate();
 	if (!hook)
 		return NULL;
-#else
-	Hook* hook = (Hook*)malloc(sizeof(Hook));
-	if (!hook)
-		return NULL;
-
-	int pageSize = ::getpagesize();
-	size_t pageAddr = (size_t)hook & ~(pageSize - 1);
-	int result = ::mprotect((void*)pageAddr, pageSize, PROT_READ | PROT_WRITE | PROT_EXEC);
-	if (result != 0)
-		return NULL;
-#endif
 
 	memcpy(hook->m_thunkCode, g_thunkCode, sizeof(g_thunkCode));
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookPtr1) = hook;
@@ -143,28 +126,26 @@ allocateHook(
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookEnterPtr) = (void*)hookEnter;
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_HookLeavePtr) = (void*)hookLeave;
 
-	hook->m_targetFunc = targetFunc;
-	hook->m_callbackParam = callbackParam;
-	hook->m_enterFunc = enterFunc;
-	hook->m_leaveFunc = leaveFunc;
+	hook->m_context.m_targetFunc = targetFunc;
+	hook->m_context.m_callbackParam = callbackParam;
+	hook->m_context.m_enterFunc = enterFunc;
+	hook->m_context.m_leaveFunc = leaveFunc;
 	return hook;
 }
 
 void
-freeHook(Hook* hook)
+HookArena::free()
 {
-#if (_WIN32)
-	::VirtualFree(hook, sizeof(Hook), MEM_RELEASE);
-#else
-	free(hook);
-#endif
+	((mem::ExecutableBlockArena<Hook>*)m_impl)->free();
 }
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 setHookTargetFunc(
 	Hook* hook,
 	void* targetFunc
-	)
+)
 {
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_TargetFuncPtr) = targetFunc;
 }

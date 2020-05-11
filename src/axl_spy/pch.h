@@ -14,5 +14,10 @@
 #include "axl_g_Pch.h"
 
 #if (_AXL_OS_WIN)
+#	include <psapi.h>
 #	include <dbghelp.h>
+#elif (_AXL_OS_LINUX)
+#	include <link.h>
+#elif (_AXL_OS_DARWIN)
+#   include <mach-o/dyld.h>
 #endif

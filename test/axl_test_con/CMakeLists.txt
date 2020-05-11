@@ -130,6 +130,7 @@ if(WIN32)
 	target_link_libraries(
 		axl_test_con
 		setupapi
+		psapi
 		)
 
 	if(BUILD_AXL_IO_PCAP)
