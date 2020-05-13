@@ -55,6 +55,11 @@ public:
 	psx::Mutex m_mutex;
 
 public:
+	Lock():
+		m_mutex(PTHREAD_MUTEX_RECURSIVE) // consistent with CRITITCAL_SECTION
+	{
+	}
+
 	void
 	lock()
 	{

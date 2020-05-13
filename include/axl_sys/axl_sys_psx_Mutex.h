@@ -32,6 +32,12 @@ public:
 		::pthread_mutexattr_init(&m_attr);
 	}
 
+	MutexAttr(int type)
+	{
+		::pthread_mutexattr_init(&m_attr);
+		setType(type);
+	}
+
 	~MutexAttr()
 	{
 		::pthread_mutexattr_destroy(&m_attr);
@@ -70,6 +76,12 @@ protected:
 public:
 	Mutex(const pthread_mutexattr_t* attr = NULL)
 	{
+		::pthread_mutex_init(&m_mutex, attr);
+	}
+
+	Mutex(int type)
+	{
+		MutexAttr attr(type);
 		::pthread_mutex_init(&m_mutex, attr);
 	}
 
