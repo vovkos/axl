@@ -561,12 +561,10 @@ enumerateImports(
 	ElfW(Dyn)* dynTable[DT_NUM] = { 0 };
 	ElfW(Dyn)* dyn = linkMap->l_ld;
 	for (; dyn->d_tag; dyn++)
-	{
 		if (dyn->d_tag < countof(dynTable))
 			dynTable[dyn->d_tag] = dyn;
-	}
 
-	// sanity checks
+	// sanity check
 
 	if (!dynTable[DT_SYMTAB] ||
 		!dynTable[DT_SYMENT] ||
@@ -576,7 +574,7 @@ enumerateImports(
 		!dynTable[DT_GOT_REL] != !dynTable[DT_GOT_RELENT] ||
 		!dynTable[DT_JMPREL] != !dynTable[DT_PLTRELSZ] ||
 		dynTable[DT_SYMENT]->d_un.d_val != sizeof(ElfW(Sym)) ||
-		dynTable[DT_GOT_RELENT]->d_un.d_val != sizeof(ElfRel))
+		dynTable[DT_GOT_RELENT] && dynTable[DT_GOT_RELENT]->d_un.d_val != sizeof(ElfRel))
 	{
 		err::setError("invalid ELF (missing or bad section(s))");
 		return false;
@@ -596,31 +594,93 @@ enumerateImports(
 	enumeration->m_symbolTable = (ElfW(Sym)*)dynTable[DT_SYMTAB]->d_un.d_ptr;
 	enumeration->m_stringTable = (char*)dynTable[DT_STRTAB]->d_un.d_ptr;
 	enumeration->m_stringTableSize = dynTable[DT_STRSZ]->d_un.d_val;
-	enumeration->m_pltRelTable = (ElfRel*)dynTable[DT_JMPREL]->d_un.d_ptr;
+	enumeration->m_pltRelTable = dynTable[DT_JMPREL] ? (ElfRel*)dynTable[DT_JMPREL]->d_un.d_ptr : NULL;
 	enumeration->m_pltRelCount = pltRelCount;
-	enumeration->m_gotRelTable = (ElfRel*)dynTable[DT_GOT_REL]->d_un.d_ptr;
+	enumeration->m_gotRelTable = dynTable[DT_GOT_REL] ? (ElfRel*)dynTable[DT_GOT_REL]->d_un.d_ptr : NULL;
 	enumeration->m_gotRelCount = gotRelCount;
 
 	*iterator = ImportIterator(enumeration);
 	return true;
 }
 
+struct ImportTableWriteProtectionBackup
+{
+	void* m_p;
+	size_t m_size;
+	uint_t m_flags;
+};
+
 bool
 disableImportTableWriteProtection(
 	void* module,
-	sl::Array<char>* backup
+	sl::Array<char>* backupBuffer
 	)
 {
+	link_map* linkMap = (link_map*)module;
+	size_t moduleBase = (size_t)linkMap->l_addr;
+	ElfW(Ehdr)* ehdr = (ElfW(Ehdr)*)moduleBase;
+	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
+
+	size_t p = moduleBase + ehdr->e_phoff;
+	for (size_t i = 0; i < ehdr->e_phnum; i++, p += ehdr->e_phentsize)
+	{
+		ElfW(Phdr)* phdr = (ElfW(Phdr)*)p;
+		if (phdr->p_type != PT_GNU_RELRO) // read-only-after-relocation (contains GOT)
+			continue;
+
+		size_t begin = moduleBase + phdr->p_vaddr;
+		size_t end = begin + phdr->p_memsz;
+		begin &= ~(pageSize - 1);
+		end = (end + pageSize - 1) & ~(pageSize - 1);
+
+		void* p = (char*)begin;
+		size_t size = end - begin;
+
+		int result = ::mprotect(p, size, PROT_READ | PROT_WRITE | PROT_EXEC);
+		if (result == -1)
+			return err::failWithLastSystemError();
+
+		ImportTableWriteProtectionBackup backup;
+		backup.m_p = p;
+		backup.m_size = size;
+		backup.m_flags = phdr->p_flags;
+		backupBuffer->copy((char*)&backup, sizeof(backup));
+		return true;
+	}
+
+	// GOT not found, still OK
+
+	backupBuffer->clear();
 	return true;
 }
 
 bool
 restoreImportTableWriteProtection(
 	void* module,
-	const sl::ArrayRef<char>& backup
+	const sl::ArrayRef<char>& backupBuffer
 	)
 {
-	return true;
+	if (backupBuffer.isEmpty())
+		return true;
+
+	if (backupBuffer.getCount() < sizeof(ImportTableWriteProtectionBackup))
+		return err::fail(err::SystemErrorCode_BufferTooSmall);
+
+	const ImportTableWriteProtectionBackup* backup = (const ImportTableWriteProtectionBackup*)backupBuffer.cp();
+
+	int prot = 0;
+
+	if (backup->m_flags & PF_R)
+		prot |= PROT_READ;
+
+	if (backup->m_flags & PF_W)
+		prot |= PROT_WRITE;
+
+	if (backup->m_flags & PF_X)
+		prot |= PROT_EXEC;
+
+	int result = ::mprotect(backup->m_p, backup->m_size, prot);
+	return err::complete(result != -1);
 }
 
 #elif (_AXL_OS_DARWIN)

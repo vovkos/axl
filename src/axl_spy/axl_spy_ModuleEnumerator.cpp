@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "axl_err_Error.h"
 #include "axl_spy_ModuleEnumerator.h"
+#include "axl_io_FilePathUtils.h"
 
 namespace axl {
 namespace spy {
@@ -24,14 +24,6 @@ ModuleIterator::operator ++ ()
 	m_index++;
 	m_moduleFileName.clear();
 	return *this;
-}
-
-ModuleIterator
-ModuleIterator::operator ++ (int)
-{
-	ModuleIterator it = *this;
-	operator ++ ();
-	return it;
 }
 
 const sl::String&
@@ -82,8 +74,52 @@ enumerateModules(ModuleIterator* iterator)
 }
 
 #elif (_AXL_OS_LINUX)
+
+ModuleIterator&
+ModuleIterator::operator ++ ()
+{
+	if (m_linkMap)
+	{
+		m_linkMap = m_linkMap->l_next;
+		m_moduleFileName.clear();
+	}
+
+	return *this;
+}
+
+const sl::StringRef&
+ModuleIterator::prepareModuleFileName()
+{
+	if (!m_linkMap)
+		return m_moduleFileName;
+
+	m_moduleFileName = m_linkMap->l_name;
+
+	if (m_moduleFileName.isEmpty())
+		m_moduleFileName = io::getExeFilePath();
+
+	return m_moduleFileName;
+}
+
+bool
+enumerateModules(ModuleIterator* iterator)
+{
+	*iterator = ModuleIterator(_r_debug.r_map);
+	return true;
+}
+
 #elif (_AXL_OS_DARWIN)
 #endif
+
+//..............................................................................
+
+ModuleIterator
+ModuleIterator::operator ++ (int)
+{
+	ModuleIterator it = *this;
+	operator ++ ();
+	return it;
+}
 
 //..............................................................................
 

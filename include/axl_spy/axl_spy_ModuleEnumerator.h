@@ -56,6 +56,47 @@ protected:
 
 class ModuleIterator
 {
+protected:
+	sl::StringRef m_moduleFileName;
+	link_map* m_linkMap;
+
+public:
+	ModuleIterator()
+	{
+		m_linkMap = NULL;
+	}
+
+	ModuleIterator(link_map* linkMap)
+	{
+		m_linkMap = linkMap;
+	}
+
+	operator bool ()
+	{
+		return m_linkMap != NULL;
+	}
+
+	ModuleIterator&
+	operator ++ ();
+
+	ModuleIterator
+	operator ++ (int);
+
+	void*
+	getModule()
+	{
+		return m_linkMap;
+	}
+
+	const sl::StringRef&
+	getModuleFileName()
+	{
+		return !m_moduleFileName.isEmpty() ? m_moduleFileName : prepareModuleFileName();
+	}
+
+protected:
+	const sl::StringRef&
+	prepareModuleFileName();
 };
 
 #elif (_AXL_OS_DARWIN)

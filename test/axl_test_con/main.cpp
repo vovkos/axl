@@ -14,6 +14,10 @@
 #include "axl_err_Errno.h"
 #include "../../include/axl_spy_ImportEnumerator.h"
 
+#include "axl_spy_ImportEnumerator.h"
+#include "axl_spy_ModuleEnumerator.h"
+#include "axl_spy_Hook.h"
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -4712,7 +4716,7 @@ hookEnter(
 	)
 {
 	printf(
-		"%*sTID %d: +%s\n",
+		"%*sTID %llx: +%s\n",
 		g_indent * 2,
 		"",
 		sys::getCurrentThreadId(),
@@ -4735,7 +4739,7 @@ hookLeave(
 	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
 
 	printf(
-		"%*sTID %lld: -%s -> %zd/0x%zx\n",
+		"%*sTID %llx: -%s -> %zd/0x%zx\n",
 		g_indent * 2,
 		"",
 		sys::getCurrentThreadId(),
@@ -4748,7 +4752,7 @@ hookLeave(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define _SPY_TEST_TRACE_HOOKING_MODULE   1
-#define _SPY_TEST_TRACE_HOOKING_FUNCTION 0
+#define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
 
 bool
 spyModule(
@@ -4771,9 +4775,9 @@ spyModule(
 
 	char const* currentModuleName = NULL;
 
-#if (_AXL_OS_WIN)
 	for (; it; it++)
 	{
+#if (_AXL_OS_WIN)
 		sl::String& functionName = *stringCache->insertTail();
 		functionName = moduleName + ":" + it.getModuleName() + ":";
 
@@ -4782,27 +4786,42 @@ spyModule(
 		else
 			functionName += it.getName();
 
-		if (functionName == "TlsAlloc" ||
-			functionName == "TlsGetValue" ||
-			functionName == "TlsSetValue")
+		if (it.getName() == "TlsAlloc" ||
+			it.getName() == "TlsGetValue" ||
+			it.getName() == "TlsSetValue")
 		{
 			printf("  skipping %s for now...\n", functionName.sz());
 			continue;
 		}
 
+		void** slot = it.getSlot();
+		void* targetFunc = *slot;
+		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
-		printf("  hooking %s...\n", functionName.sz());
+		printf("  hooking [%p] %p -> %p: %s...\n", slot, targetFunc, hook, functionName.sz());
 #	endif
+		*slot = hook;
+#else
+		sl::String& functionName = *stringCache->insertTail();
+		functionName = moduleName + ":" + it.getName();
+
+		if (it.getName() == "pthread_key_create" ||
+			it.getName() == "pthread_get_specific" ||
+			it.getName() == "pthread_set_specific")
+		{
+			printf("  skipping %s for now...\n", functionName.sz());
+			continue;
+		}
 
 		void** slot = it.getSlot();
 		void* targetFunc = *slot;
 		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
+#	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
+		printf("  hooking [%p] %p -> %p: %s...\n", slot, targetFunc, hook, functionName.sz());
+#	endif
 		*slot = hook;
-	}
-#else
-	for (; it; it++)
-		printf("%p %s\n", *it.getSlot(), it.getName().sz());
 #endif
+	}
 
 	result = spy::restoreImportTableWriteProtection(module, backup);
 	ASSERT(result);
@@ -4812,6 +4831,8 @@ spyModule(
 int
 spyGlobalTest()
 {
+	printf("PID: %d\n", sys::getCurrentProcessId());
+
 	spy::ModuleIterator it = spy::enumerateModules();
 	for (; it; it++)
 	{
@@ -4823,8 +4844,9 @@ spyGlobalTest()
 	}
 
 	printf("Hooking done, enabling hooks...\n");
-
 	spy::enableHooks();
+
+	// for testing, don't use printf as it will mess up the output
 	sl::String dir = io::getCurrentDir();
 	return 0;
 }
