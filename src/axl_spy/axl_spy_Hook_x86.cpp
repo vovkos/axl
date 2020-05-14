@@ -15,7 +15,7 @@ const uint8_t g_thunkCode[] =
 {
 	0x55,                                      // 00000000  push    ebp
 	0x89, 0xE5,                                // 00000001  mov     ebp, esp
-	0x83, 0xEC, 0x08,                          // 00000003  sub     esp, STACK_FRAME_SIZE
+	0x83, 0xEC, 0x08,                          // 00000003  sub     esp, StackFrameSize
 	0x83, 0xEC, 0x10,                          // 00000006  sub     esp, 16
 	0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00,  // 00000009  mov     dword [esp + 0], hook
 	0x89, 0x6C, 0x24, 0x04,                    // 00000010  mov     [esp + 4], ebp
@@ -24,29 +24,35 @@ const uint8_t g_thunkCode[] =
 	0xB8, 0x00, 0x00, 0x00, 0x00,              // 0000001B  mov     eax, hookEnter
 	0xFF, 0xD0,                                // 00000020  call    eax
 	0x83, 0xC4, 0x10,                          // 00000022  add     esp, 16
-	0x83, 0xC4, 0x08,                          // 00000025  add     esp, STACK_FRAME_SIZE
-	0x5D,                                      // 00000028  pop     ebp
-	0xB8, 0x00, 0x00, 0x00, 0x00,              // 00000029  mov     eax, hookRet
-	0x89, 0x04, 0x24,                          // 0000002E  mov     [esp], eax
-	0xB8, 0x00, 0x00, 0x00, 0x00,              // 00000031  mov     eax, targetFunc
-	0xFF, 0xE0,                                // 00000036  jmp     eax
-	0x83, 0xEC, 0x04,                          // 00000038  sub     esp, 4  ; <<< hook_ret
-	0x55,                                      // 0000003B  push    ebp
-	0x89, 0xE5,                                // 0000003C  mov     ebp, esp
-	0x83, 0xEC, 0x08,                          // 0000003E  sub     esp, STACK_FRAME_SIZE
-	0x89, 0x45, 0xFC,                          // 00000041  mov     [ebp - 4], eax
-	0x83, 0xEC, 0x10,                          // 00000044  sub     esp, 16
-	0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00,  // 00000047  mov     dword [esp + 0], hook
-	0x89, 0x6C, 0x24, 0x04,                    // 0000004E  mov     [esp + 4], ebp
-	0x89, 0x44, 0x24, 0x08,                    // 00000052  mov     [esp + 8], eax
-	0xB8, 0x00, 0x00, 0x00, 0x00,              // 00000056  mov     eax, hookLeave
-	0xFF, 0xD0,                                // 0000005B  call    eax
-	0x83, 0xC4, 0x10,                          // 0000005D  add     esp, 16
-	0x89, 0x45, 0x04,                          // 00000060  mov     [ebp + 4], eax
-	0x8B, 0x45, 0xFC,                          // 00000063  mov     eax, [ebp - 4]
-	0x83, 0xC4, 0x08,                          // 00000066  add     esp, STACK_FRAME_SIZE
-	0x5D,                                      // 00000069  pop     ebp
-	0xC3,                                      // 0000006A  ret
+	0xA9, 0x01, 0x00, 0x00, 0x00,              // 00000025  test    eax, HookAction_Return
+	0x75, 0x1A,                                // 0000002A  jnz     ret_now
+	0x83, 0xC4, 0x08,                          // 0000002C  add     esp, StackFrameSize
+	0x5D,                                      // 0000002F  pop     ebp
+	0xA9, 0x02, 0x00, 0x00, 0x00,              // 00000030  test    eax, HookAction_JumpTarget
+	0x75, 0x08,                                // 00000035  jnz     jump_target
+	0xB8, 0x00, 0x00, 0x00, 0x00,              // 00000037  mov     eax, hookRet
+	0x89, 0x04, 0x24,                          // 0000003C  mov     [esp], eax
+	0xB8, 0x00, 0x00, 0x00, 0x00,              // 0000003F  mov     eax, targetFunc
+	0xFF, 0xE0,                                // 00000044  jmp     eax
+	0x8B, 0x45, 0xF8,                          // 00000046  mov     eax, [ebp - RegRetBlockSize]
+	0xC3,                                      // 00000049  ret
+	0x83, 0xEC, 0x04,                          // 0000004A  sub     esp, 4  ; <<< hookRet
+	0x55,                                      // 0000004D  push    ebp
+	0x89, 0xE5,                                // 0000004E  mov     ebp, esp
+	0x83, 0xEC, 0x08,                          // 00000050  sub     esp, StackFrameSize
+	0x89, 0x45, 0xF8,                          // 00000053  mov     [ebp - RegRetBlockSize], eax
+	0x83, 0xEC, 0x10,                          // 00000056  sub     esp, 16
+	0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00,  // 00000059  mov     dword [esp + 0], hook
+	0x89, 0x6C, 0x24, 0x04,                    // 00000060  mov     [esp + 4], ebp
+	0x89, 0x44, 0x24, 0x08,                    // 00000064  mov     [esp + 8], eax
+	0xB8, 0x00, 0x00, 0x00, 0x00,              // 00000068  mov     eax, hookLeave
+	0xFF, 0xD0,                                // 0000006D  call    eax
+	0x83, 0xC4, 0x10,                          // 0000006F  add     esp, 16
+	0x89, 0x45, 0x04,                          // 00000072  mov     [ebp + 4], eax
+	0x8B, 0x45, 0xF8,                          // 00000075  mov     eax, [ebp - RegRetBlockSize]
+	0x83, 0xC4, 0x08,                          // 00000078  add     esp, StackFrameSize
+	0x5D,                                      // 0000007B  pop     ebp
+	0xC3,                                      // 0000007C  ret
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -55,11 +61,11 @@ enum ThunkCodeOffset
 {
 	ThunkCodeOffset_HookPtr1      = 0x0c,
 	ThunkCodeOffset_HookEnterPtr  = 0x1c,
-	ThunkCodeOffset_HookRetPtr    = 0x2a,
-	ThunkCodeOffset_TargetFuncPtr = 0x32,
-	ThunkCodeOffset_HookRet       = 0x38,
-	ThunkCodeOffset_HookPtr2      = 0x4a,
-	ThunkCodeOffset_HookLeavePtr  = 0x57,
+	ThunkCodeOffset_HookRetPtr    = 0x38,
+	ThunkCodeOffset_TargetFuncPtr = 0x40,
+	ThunkCodeOffset_HookRet       = 0x4a,
+	ThunkCodeOffset_HookPtr2      = 0x5c,
+	ThunkCodeOffset_HookLeavePtr  = 0x69,
 	ThunkCodeOffset_End           = sizeof(g_thunkCode),
 };
 
