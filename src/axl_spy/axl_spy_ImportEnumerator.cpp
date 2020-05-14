@@ -305,9 +305,9 @@ ImportIterator::readThunk()
 		{
 #if (_AXL_SPY_TRACE_NON_CODE_IMPORT)
 			if (m_ordinal != -1)
-				printf("  *** NON-CODE %s@%d\n", m_exportModuleName.sz(), m_ordinal);
+				printf("  *** Non-code: %s@%d\n", m_exportModuleName.sz(), m_ordinal);
 			else
-				printf("  *** NON-CODE %s:%s\n", m_exportModuleName.sz(), m_name.sz());
+				printf("  *** Non-code: %s:%s\n", m_exportModuleName.sz(), m_name.sz());
 #	if (_AXL_SPY_ANALYZE_NON_CODE_ADDRESS)
 			m_codeMap->analyzeNonCodeAddress(m_addrThunk->u1.Function);
 #	endif

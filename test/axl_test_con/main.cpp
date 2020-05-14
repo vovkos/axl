@@ -4717,10 +4717,11 @@ hookEnter(
 	)
 {
 	printf(
-		"%*sTID %llx: +%s\n",
+		"%*sTID %llx: sp: %p +%s\n",
 		g_indent * 2,
 		"",
 		sys::getCurrentThreadId(),
+		(void*)frameBase,
 		(char*)callbackParam
 		);
 
@@ -4740,10 +4741,11 @@ hookLeave(
 	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
 
 	printf(
-		"%*sTID %llx: -%s -> %zd/0x%zx\n",
+		"%*sTID %llx: sp: %p -%s -> %zd/0x%zx\n",
 		g_indent * 2,
 		"",
 		sys::getCurrentThreadId(),
+		(void*)frameBase,
 		(char*)callbackParam,
 		regRetBlock->m_rax,
 		regRetBlock->m_rax
@@ -4753,7 +4755,7 @@ hookLeave(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define _SPY_TEST_TRACE_HOOKING_MODULE   1
-#define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
+#define _SPY_TEST_TRACE_HOOKING_FUNCTION 0
 
 bool
 spyModule(

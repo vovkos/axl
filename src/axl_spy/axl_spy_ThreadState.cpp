@@ -30,7 +30,11 @@ ThreadState::addFrame(
 size_t
 ThreadState::removeFrame(size_t frameBase)
 {
+#if (_AXL_CPU_X86) // allowance for stdcall ret <n>
+	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase, sl::BinTreeFindRelOp_Le);
+#else
 	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase);
+#endif
 	if (!it)
 	{
 		ASSERT(false && "protolesshooks: FATAL ERROR: return address not found");
@@ -51,7 +55,11 @@ ThreadState::removeFrame(size_t frameBase)
 size_t
 ThreadState::getOriginalRet(size_t frameBase)
 {
+#if (_AXL_CPU_X86) // allowance for stdcall ret <n>
+	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase, sl::BinTreeFindRelOp_Le);
+#else
 	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase);
+#endif
 	if (!it)
 	{
 		ASSERT(false && "protolesshooks: FATAL ERROR: return address not found");
