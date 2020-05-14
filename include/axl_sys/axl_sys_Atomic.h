@@ -56,6 +56,13 @@ atomicLoad(volatile int32_t* p)
 }
 
 inline
+size_t
+atomicLoad(volatile size_t* p)
+{
+	return *p;
+}
+
+inline
 int32_t
 atomicXchg(
 	volatile int32_t* p,
@@ -130,13 +137,6 @@ atomicDec(volatile int64_t* p)
 inline
 int64_t
 atomicLoad(volatile int64_t* p)
-{
-	return *p;
-}
-
-inline
-size_t
-atomicLoad(volatile size_t* p)
 {
 	return *p;
 }
@@ -233,6 +233,13 @@ atomicDec(volatile size_t* p)
 inline
 int32_t
 atomicLoad(volatile int32_t* p)
+{
+	return *p;
+}
+
+inline
+size_t
+atomicLoad(volatile size_t* p)
 {
 	return *p;
 }
