@@ -9,7 +9,7 @@ namespace spy {
 
 //..............................................................................
 
-extern volatile intptr_t g_enableCount;
+extern volatile int32_t g_enableCount;
 extern thread_local bool g_threadStateDestructed;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

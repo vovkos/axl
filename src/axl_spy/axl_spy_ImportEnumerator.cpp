@@ -4,6 +4,8 @@
 
 #if (_AXL_OS_LINUX)
 #	include "axl_sys_psx_DynamicLib.h"
+#elif (_AXL_OS_DARWIN)
+#	include "axl_enc_Leb128.h"
 #endif
 
 namespace axl {
@@ -245,14 +247,6 @@ ImportIterator::operator ++ ()
 	return *this;
 }
 
-ImportIterator
-ImportIterator::operator ++ (int)
-{
-	ImportIterator it = *this;
-	operator ++ ();
-	return it;
-}
-
 bool
 ImportIterator::openImportDesc()
 {
@@ -379,14 +373,6 @@ ImportIterator::operator ++ ()
 	return *this;
 }
 
-ImportIterator
-ImportIterator::operator ++ (int)
-{
-	ImportIterator it = *this;
-	operator ++ ();
-	return it;
-}
-
 bool
 ImportIterator::readRel()
 {
@@ -445,7 +431,7 @@ bool
 enumerateImports(
 	ImportIterator* iterator,
 	void* module
-)
+	)
 {
 	link_map* linkMap = module ? (link_map*)module : _r_debug.r_map;
 
@@ -496,132 +482,135 @@ enumerateImports(
 
 #elif (_AXL_OS_DARWIN)
 
-uint64_t uleb128(const uint8_t** p)
+ImportIterator::ImportIterator()
 {
-	uint64_t r = 0;
-	int s = 0;
-
-	do
-	{
-		r |= (uint64_t)(**p & 0x7f) << s;
-		s += 7;
-	} while (*(*p)++ >= 0x80);
-
-	return r;
+	m_p = NULL;
+	m_end = NULL;
+	m_isDone = true;
+	m_segmentIdx = 0;
+	m_segmentOffset = 0;
 }
 
-int64_t sleb128(const uint8_t** p)
+ImportIterator::ImportIterator(
+	ImportEnumeration* enumeration,
+	const void* bind,
+	size_t size
+	)
 {
-	int64_t r = 0;
-	int s = 0;
-	for (;;)
-	{
-		uint8_t b = *(*p)++;
-		if (b < 0x80)
-		{
-			if (b & 0x40)
-				r -= (0x80 - b) << s;
-			else
-				r |= (b & 0x3f) << s;
-
-			break;
-		}
-
-		r |= (b & 0x7f) << s;
-		s += 7;
-	}
-
-	return r;
+	m_enumeration = enumeration;
+	m_p = (char*)bind;
+	m_end = m_p + size;
+	m_isDone = size != 0;
+	m_segmentIdx = 0;
+	m_segmentOffset = 0;
+	next();
 }
 
-size_t
-ImportTableMgr::enumerateImports(void* module)
+ImportIterator&
+ImportIterator::operator ++ ()
 {
-	uint8_t* slide = (uint8_t*)_dyld_get_image_vmaddr_slide(0);
-	mach_header_64* machHdr = (mach_header_64*)_dyld_get_image_header(0);
-	load_command* cmd = (load_command*)(machHdr + 1);
-
-	sl::Array<segment_command_64*> segmentCmdArray;
-	size_t linkEditSegmentIdx = -1;
-	size_t lazyBindOffset = -1;
-	size_t lazyBindSize = -1;
-
-	for (uint_t i = 0; i < machHdr->ncmds; i++)
+	if (m_isDone || m_p >= m_end)
 	{
-		printf("load_command: 0x%x\n", cmd->cmd);
-
-		switch (cmd->cmd)
-		{
-			segment_command_64* segmentCmd;
-			dyld_info_command* dyldInfoCmd;
-
-		case LC_SEGMENT_64:
-			segmentCmd = (segment_command_64*)cmd;
-
-			if (strcmp(segmentCmd->segname, "__LINKEDIT") == 0)
-				linkEditSegmentIdx = segmentCmdArray.getCount();
-
-			segmentCmdArray.append(segmentCmd);
-			break;
-
-		case LC_DYLD_INFO_ONLY:
-			dyldInfoCmd = (dyld_info_command*)cmd;
-			lazyBindOffset = dyldInfoCmd->lazy_bind_off;
-			lazyBindSize = dyldInfoCmd->lazy_bind_size;
-			break;
-		}
-
-		cmd = (load_command*)((char*)cmd + cmd->cmdsize);
+		reset();
+		return *this;
 	}
 
-	if (linkEditSegmentIdx == -1 ||
-		lazyBindOffset == -1 ||
-		lazyBindSize == -1)
+	next();
+	return *this;
+}
+
+bool
+ImportIterator::next()
+{
+	bool result;
+
+	m_slot = NULL;
+
+	while (m_p < m_end && !m_isDone)
 	{
-		err::setError("invalid MACH-O file");
-		return -1;
-	}
-
-	segment_command_64* linkEditSegmentCmd = segmentCmdArray[linkEditSegmentIdx];
-
-	const uint8_t* p = slide + linkEditSegmentCmd->vmaddr - linkEditSegmentCmd->fileoff + lazyBindOffset;
-	const uint8_t* end = p + lazyBindSize;
-
-	while (p < end)
-	{
-		uint8_t op = *p & BIND_OPCODE_MASK;
-		uint8_t imm = *p & BIND_IMMEDIATE_MASK;
-		p++;
+		uint8_t c = *m_p++;
+		uint8_t op = c & BIND_OPCODE_MASK;
+		uint8_t imm = c & BIND_IMMEDIATE_MASK;
+		uint64_t uleb;
+		uint64_t uleb2;
+		int64_t sleb;
 
 		switch (op)
 		{
 		case BIND_OPCODE_DONE:
-		case BIND_OPCODE_DO_BIND:
-		case BIND_OPCODE_SET_TYPE_IMM:
+			m_isDone = true;
+			break;
+
 		case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
 		case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
-		case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
+		case BIND_OPCODE_SET_TYPE_IMM:
 			break;
 
 		case BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM:
-			printf("  %s\n", p);
-			p += strlen((char*)p) + 1;
+			m_name = m_p;
+			m_p += m_name.getLength() + 1;
 			break;
 
 		case BIND_OPCODE_SET_ADDEND_SLEB:
-			sleb128(&p);
+			m_p += enc::sleb128(m_p, m_end - m_p, &sleb);
 			break;
 
 		case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
-		case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
-		case BIND_OPCODE_ADD_ADDR_ULEB:
-		case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
-			uleb128(&p);
+			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
 			break;
 
+		case BIND_OPCODE_DO_BIND:
+			return bind();
+
+		case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
+			result = bind();
+			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+			m_segmentOffset += uleb;
+			return result;
+
+		case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
+			result = bind();
+			m_segmentOffset += imm * sizeof(void*);
+			return result;
+
 		case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
-			uleb128(&p);
-			uleb128(&p);
+			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+			m_p += enc::uleb128(m_p, m_end - m_p, &uleb2);
+
+			result = true;
+			for (uint64_t i = 0; i < uleb; i++, m_segmentOffset += uleb2)
+			{
+				bool result2 = bind();
+				result = result && result2;
+			}
+
+			return result;
+
+		case BIND_OPCODE_ADD_ADDR_ULEB:
+			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+			m_segmentOffset += uleb;
+			break;
+
+		case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
+			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+			m_segmentIdx = imm;
+			m_segmentOffset = uleb;
+			break;
+
+		case BIND_OPCODE_THREADED:
+			switch (imm)
+			{
+			case BIND_SUBOPCODE_THREADED_SET_BIND_ORDINAL_TABLE_SIZE_ULEB:
+				m_p += enc::uleb128(m_p, m_end - m_p);
+				break;
+
+			case BIND_SUBOPCODE_THREADED_APPLY:
+				break;
+
+			default:
+				printf("*** unexpected sub op for BIND_OPCODE_THREADED: 0x%02x\n", imm);
+			}
+
 			break;
 
 		default:
@@ -629,10 +618,115 @@ ImportTableMgr::enumerateImports(void* module)
 		}
 	}
 
-	return -1;
+	return m_slot != NULL;
+}
+
+bool
+ImportIterator::bind()
+{
+	if (m_segmentIdx >= m_enumeration->m_segmentArray.getCount())
+		return false;
+
+	const segment_command_64* segment = m_enumeration->m_segmentArray[m_segmentIdx];
+	if (m_segmentOffset >= segment->vmsize)
+		return false;
+
+	void** slot = (void**)(m_enumeration->m_slide + segment->vmaddr - segment->fileoff + m_segmentOffset);
+	if (!m_slot)
+		m_slot = slot;
+	else
+		m_pendingSlotArray.append(slot);
+
+	return true;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
+enumerateImports(
+	ImportIterator* iterator,
+	size_t imageIndex
+	)
+{
+	char* slide = (char*)::_dyld_get_image_vmaddr_slide(imageIndex);
+	mach_header_64* machHdr = (mach_header_64*)::_dyld_get_image_header(imageIndex);
+
+	sl::Array<struct segment_command_64*> segmentArray;
+	segment_command_64* linkEditSegmentCmd = NULL;
+	dyld_info_command* dyldInfoCmd = NULL;
+
+	load_command* cmd = (load_command*)(machHdr + 1);
+	for (uint_t i = 0; i < machHdr->ncmds; i++)
+	{
+		segment_command_64* segmentCmd;
+		switch (cmd->cmd)
+		{
+		case LC_SEGMENT_64:
+			segmentCmd = (segment_command_64*)cmd;
+			segmentArray.append(segmentCmd);
+
+			if (strcmp(segmentCmd->segname, "__LINKEDIT") == 0)
+				linkEditSegmentCmd = segmentCmd;
+
+			break;
+
+		case LC_DYLD_INFO_ONLY:
+			dyldInfoCmd = (dyld_info_command*)cmd;
+			break;
+		}
+
+		cmd = (load_command*)((char*)cmd + cmd->cmdsize);
+	}
+
+	if (!linkEditSegmentCmd || !dyldInfoCmd)
+	{
+		err::setError("invalid MACH-O file");
+		return false;
+	}
+
+	ref::Ptr<ImportEnumeration> enumeration = AXL_REF_NEW(ImportEnumeration);
+	enumeration->m_slide = slide;
+	enumeration->m_segmentArray = segmentArray;
+
+	*iterator = ImportIterator(
+		enumeration,
+		slide + linkEditSegmentCmd->vmaddr - linkEditSegmentCmd->fileoff + dyldInfoCmd->lazy_bind_off,
+		dyldInfoCmd->lazy_bind_size
+		);
+
+	return true;
+}
+
+bool
+enumerateImports(
+	ImportIterator* importIterator,
+	const ModuleIterator& moduleIterator
+	)
+{
+	return enumerateImports(importIterator, moduleIterator.getImageIndex());
+}
+
+bool
+enumerateImports(
+	ImportIterator* iterator,
+	void* module
+	)
+{
+	size_t index = 0;
+	return enumerateImports(iterator, index);
 }
 
 #endif
+
+//..............................................................................
+
+ImportIterator
+ImportIterator::operator ++ (int)
+{
+	ImportIterator it = *this;
+	operator ++ ();
+	return it;
+}
 
 //..............................................................................
 

@@ -4755,16 +4755,16 @@ hookLeave(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define _SPY_TEST_TRACE_HOOKING_MODULE   1
-#define _SPY_TEST_TRACE_HOOKING_FUNCTION 0
+#define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
 
 bool
 spyModule(
-	void* module,
+	const spy::ModuleIterator& moduleIt,
 	const sl::StringRef& moduleName
 	)
 {
 	spy::ImportWriteProtectionBackup backup;
-	bool result = spy::disableImportWriteProtection(module, &backup);
+	bool result = spy::disableImportWriteProtection(moduleIt, &backup);
 	if (!result)
 		return false;
 
@@ -4774,7 +4774,7 @@ spyModule(
 	sl::BoxList<sl::String>* stringCache = sl::getSingleton<sl::BoxList<sl::String> >(&stringCacheFlag);
 	spy::HookArena* hookArena = sl::getSingleton<spy::HookArena>(&hookArenaFlag);
 
-	spy::ImportIterator it = spy::enumerateImports(module);
+	spy::ImportIterator it = spy::enumerateImports(moduleIt);
 
 	char const* currentModuleName = NULL;
 
@@ -4822,11 +4822,11 @@ spyModule(
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
 		printf("  hooking [%p] %p -> %p: %s...\n", slot, targetFunc, hook, functionName.sz());
 #	endif
-		*slot = hook;
+		// *slot = hook;
 #endif
 	}
 
-	result = spy::restoreImportWriteProtection(module, &backup);
+	result = spy::restoreImportWriteProtection(&backup);
 	ASSERT(result);
 	return true;
 }
@@ -4843,7 +4843,7 @@ spyGlobalTest()
 		printf("Hooking %s...\n", it.getModuleFileName().sz());
 #endif
 		sl::String fileName = io::getFileName(it.getModuleFileName());
-		spyModule(it.getModule(), fileName);
+		spyModule(it, fileName);
 	}
 
 	printf("Hooking done, enabling hooks...\n");
@@ -5164,7 +5164,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	spyStdcallTest();
+	spyGlobalTest();
 	return 0;
 }
 

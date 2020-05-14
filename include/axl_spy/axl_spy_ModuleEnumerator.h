@@ -1,6 +1,9 @@
 #pragma once
 
 #include "axl_sl_Array.h"
+#if (_AXL_OS_DARWIN)
+#	include "axl_sys_psx_DynamicLib.h"
+#endif
 
 namespace axl {
 namespace spy {
@@ -12,9 +15,9 @@ namespace spy {
 class ModuleIterator
 {
 protected:
-	size_t m_index;
+	mutable sl::String m_moduleFileName;
 	sl::ArrayRef<HMODULE> m_moduleArray;
-	sl::String m_moduleFileName;
+	size_t m_index;
 
 public:
     ModuleIterator()
@@ -24,7 +27,7 @@ public:
 
 	ModuleIterator(const sl::ArrayRef<HMODULE>& moduleArray);
 
-	operator bool ()
+	operator bool () const
 	{
 		return m_index < m_moduleArray.getCount();
 	}
@@ -36,20 +39,20 @@ public:
 	operator ++ (int);
 
 	void*
-	getModule()
+	getModule() const
 	{
 		return m_index < m_moduleArray.getCount() ? m_moduleArray[m_index] : NULL;
 	}
 
 	const sl::String&
-	getModuleFileName()
+	getModuleFileName() const
 	{
 		return !m_moduleFileName.isEmpty() ? m_moduleFileName : prepareModuleFileName();
 	}
 
 protected:
 	const sl::String&
-	prepareModuleFileName();
+	prepareModuleFileName() const;
 };
 
 #elif (_AXL_OS_LINUX)
@@ -57,7 +60,7 @@ protected:
 class ModuleIterator
 {
 protected:
-	sl::StringRef m_moduleFileName;
+	mutable sl::StringRef m_moduleFileName;
 	link_map* m_linkMap;
 
 public:
@@ -71,7 +74,7 @@ public:
 		m_linkMap = linkMap;
 	}
 
-	operator bool ()
+	operator bool () const
 	{
 		return m_linkMap != NULL;
 	}
@@ -83,23 +86,72 @@ public:
 	operator ++ (int);
 
 	void*
-	getModule()
+	getModule() const
 	{
 		return m_linkMap;
 	}
 
 	const sl::StringRef&
-	getModuleFileName()
+	getModuleFileName() const
 	{
 		return !m_moduleFileName.isEmpty() ? m_moduleFileName : prepareModuleFileName();
 	}
 
 protected:
 	const sl::StringRef&
-	prepareModuleFileName();
+	prepareModuleFileName() const;
 };
 
 #elif (_AXL_OS_DARWIN)
+
+class ModuleIterator
+{
+protected:
+	mutable sys::psx::DynamicLib m_module;
+	mutable sl::StringRef m_moduleFileName;
+	size_t m_count;
+	size_t m_index;
+
+public:
+	ModuleIterator(size_t count = 0);
+
+	operator bool ()
+	{
+		return m_index < m_count;
+	}
+
+	ModuleIterator&
+	operator ++ ();
+
+	ModuleIterator
+	operator ++ (int);
+
+	void*
+	getModule() const
+	{
+		return m_module.isOpen() ? (void*)m_module : prepareModule();
+	}
+
+	const sl::StringRef&
+	getModuleFileName() const
+	{
+		return !m_moduleFileName.isEmpty() ? m_moduleFileName : prepareModuleFileName();
+	}
+
+	size_t
+	getImageIndex() const
+	{
+		return m_index;
+	}
+
+protected:
+	void*
+	prepareModule() const;
+
+	const sl::StringRef&
+	prepareModuleFileName() const;
+};
+
 #endif
 
 bool

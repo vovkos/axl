@@ -27,7 +27,7 @@ ModuleIterator::operator ++ ()
 }
 
 const sl::String&
-ModuleIterator::prepareModuleFileName()
+ModuleIterator::prepareModuleFileName() const
 {
 	ASSERT(m_moduleFileName.isEmpty());
 
@@ -88,7 +88,7 @@ ModuleIterator::operator ++ ()
 }
 
 const sl::StringRef&
-ModuleIterator::prepareModuleFileName()
+ModuleIterator::prepareModuleFileName() const
 {
 	if (!m_linkMap)
 		return m_moduleFileName;
@@ -109,6 +109,53 @@ enumerateModules(ModuleIterator* iterator)
 }
 
 #elif (_AXL_OS_DARWIN)
+
+ModuleIterator::ModuleIterator(size_t count)
+{
+	m_count = count;
+	m_index = 0;
+}
+
+ModuleIterator&
+ModuleIterator::operator ++ ()
+{
+	if (m_index >= m_count)
+		return *this;
+
+	m_index++;
+	m_moduleFileName.clear();
+	return *this;
+}
+
+void*
+ModuleIterator::prepareModule() const
+{
+	ASSERT(!m_module.isOpen());
+
+	if (m_index < m_count)
+		m_module.open(getModuleFileName());
+
+	return m_module;
+}
+
+const sl::StringRef&
+ModuleIterator::prepareModuleFileName() const
+{
+	ASSERT(m_moduleFileName.isEmpty());
+
+	if (m_index < m_count)
+		m_moduleFileName = _dyld_get_image_name(m_index);
+
+	return m_moduleFileName;
+}
+
+bool
+enumerateModules(ModuleIterator* iterator)
+{
+	*iterator = ModuleIterator(_dyld_image_count());
+	return true;
+}
+
 #endif
 
 //..............................................................................

@@ -52,10 +52,16 @@ disableImportWriteProtection(
 }
 
 bool
-restoreImportWriteProtection(
-	void* module,
-	const ImportWriteProtectionBackup* backup
+disableImportWriteProtection(
+	const ModuleIterator& moduleIterator,
+	ImportWriteProtectionBackup* backup
 	)
+{
+	return disableImportWriteProtection(moduleIterator.getModule(), backup);
+}
+
+bool
+restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 {
 	dword_t oldProtect;
 
@@ -110,10 +116,16 @@ disableImportWriteProtection(
 }
 
 bool
-restoreImportWriteProtection(
-	void* module,
-	const ImportWriteProtectionBackup* backup
+disableImportWriteProtection(
+	const ModuleIterator& moduleIterator,
+	ImportWriteProtectionBackup* backup
 	)
+{
+	return disableImportWriteProtection(moduleIterator.getModule(), backup);
+}
+
+bool
+restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 {
 	int prot = 0;
 
@@ -131,6 +143,40 @@ restoreImportWriteProtection(
 }
 
 #elif (_AXL_OS_DARWIN)
+
+bool
+disableImportWriteProtection(
+	size_t imageIndex,
+	ImportWriteProtectionBackup* backup
+	)
+{
+	return true;
+}
+
+bool
+disableImportWriteProtection(
+	void* module,
+	ImportWriteProtectionBackup* backup
+	)
+{
+	return true;
+}
+
+bool
+disableImportWriteProtection(
+	const ModuleIterator& moduleIterator,
+	ImportWriteProtectionBackup* backup
+	)
+{
+	return disableImportWriteProtection(moduleIterator.getImageIndex(), backup);
+}
+
+bool
+restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
+{
+	return true;
+}
+
 #endif
 
 //..............................................................................

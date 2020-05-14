@@ -1,6 +1,6 @@
 #pragma once
 
-#include "axl_g_Pch.h"
+#include "axl_spy_ModuleEnumerator.h"
 
 namespace axl {
 namespace spy {
@@ -28,10 +28,13 @@ disableImportWriteProtection(
 	);
 
 bool
-restoreImportWriteProtection(
-	void* module,
-	const ImportWriteProtectionBackup* backup
+disableImportWriteProtection(
+	const ModuleIterator& moduleIterator,
+	ImportWriteProtectionBackup* backup
 	);
+
+bool
+restoreImportWriteProtection(const ImportWriteProtectionBackup* backup);
 
 //..............................................................................
 

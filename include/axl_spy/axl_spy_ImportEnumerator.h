@@ -2,6 +2,7 @@
 
 #include "axl_sl_String.h"
 #include "axl_sl_Array.h"
+#include "axl_spy_ModuleEnumerator.h"
 
 #if (_AXL_OS_WIN)
 #	include "axl_sl_RbTree.h"
@@ -254,6 +255,49 @@ protected:
 };
 
 #elif (_AXL_OS_DARWIN)
+
+struct ImportEnumeration: ref::RefCount
+{
+	char* m_slide;
+	sl::Array<struct segment_command_64*> m_segmentArray;
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class ImportIterator: public ImportIteratorBase
+{
+protected:
+	ref::Ptr<ImportEnumeration> m_enumeration;
+	sl::Array<void**> m_pendingSlotArray; // from BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB
+	const char* m_p;
+	const char* m_end;
+	bool m_isDone;
+	size_t m_segmentIdx;
+	size_t m_segmentOffset;
+
+public:
+	ImportIterator();
+
+	ImportIterator(
+		ImportEnumeration* enumeration,
+		const void* bind,
+		size_t size
+		);
+
+	ImportIterator&
+	operator ++ ();
+
+	ImportIterator
+	operator ++ (int);
+
+protected:
+	bool
+	next();
+
+	bool
+	bind();
+};
+
 #endif
 
 //..............................................................................
@@ -264,6 +308,12 @@ enumerateImports(
     void* module = NULL
 	);
 
+bool
+enumerateImports(
+	ImportIterator* importIterator,
+	const ModuleIterator& moduleIterator
+	);
+
 inline
 ImportIterator
 enumerateImports(void* module = NULL)
@@ -271,6 +321,15 @@ enumerateImports(void* module = NULL)
 	ImportIterator iterator;
 	enumerateImports(&iterator, module);
 	return iterator;
+}
+
+inline
+ImportIterator
+enumerateImports(const ModuleIterator& moduleIterator)
+{
+	ImportIterator importIterator;
+	enumerateImports(&importIterator, moduleIterator);
+	return importIterator;
 }
 
 //..............................................................................

@@ -9,7 +9,7 @@ namespace spy {
 
 thread_local ThreadState g_threadState;
 thread_local bool g_threadStateDestructed = false;
-volatile intptr_t g_enableCount = 0;
+volatile int32_t g_enableCount = 0;
 
 //..............................................................................
 
