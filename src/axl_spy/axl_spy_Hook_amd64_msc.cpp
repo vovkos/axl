@@ -86,13 +86,13 @@ const uint8_t g_thunkCode[] =
 	0x48, 0xB8,                                      // 00000096  mov     rax, targetFunc
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 00000098
 	0xFF, 0xE0,                                      // 000000A0  jmp     rax
-	0x48, 0x8B, 0x45, 0x90,                          // 000000A2  mov     rax, [rbp - 16 * 4 - 8 * 4 - 8 * 2]
+	0x48, 0x8B, 0x45, 0x90,                          // 000000A2  mov     rax, [rbp - RegArgBlockSize - RegRetBlockSize]
 	0xC3,                                            // 000000A6  ret
 	0x48, 0x83, 0xEC, 0x08,                          // 000000A7  sub     rsp, 8  ; <<< hookRet
 	0x55,                                            // 000000AB  push    rbp
 	0x48, 0x89, 0xE5,                                // 000000AC  mov     rbp, rsp
 	0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,        // 000000AF  sub     rsp, StackFrameSize
-	0x48, 0x89, 0x45, 0x90,                          // 000000B6  mov     [rbp - 16 * 4 - 8 * 4 - 8 * 2], rax
+	0x48, 0x89, 0x45, 0x90,                          // 000000B6  mov     [rbp - RegArgBlockSize - RegRetBlockSize], rax
 	0x48, 0xB9,                                      // 000000BA  mov     rcx, hook
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000BC
 	0x48, 0x89, 0xEA,                                // 000000C4  mov     rdx, rbp
@@ -100,7 +100,7 @@ const uint8_t g_thunkCode[] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000C9
 	0xFF, 0xD0,                                      // 000000D1  call    rax
 	0x48, 0x89, 0x45, 0x08,                          // 000000D3  mov     [rbp + 8], rax
-	0x48, 0x8B, 0x45, 0x90,                          // 000000D7  mov     rax, [rbp - 16 * 4 - 8 * 4 - 8 * 2]
+	0x48, 0x8B, 0x45, 0x90,                          // 000000D7  mov     rax, [rbp - RegArgBlockSize - RegRetBlockSize]
 	0x48, 0x81, 0xC4, 0x90, 0x00, 0x00, 0x00,        // 000000DB  add     rsp, StackFrameSize
 	0x5D,                                            // 000000E2  pop     rbp
 	0xC3,                                            // 000000E3  ret

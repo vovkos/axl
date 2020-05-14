@@ -76,6 +76,8 @@ thunk_entry:
 	add     rsp, StackFrameSize
 	pop     rbp
 
+	; skip the exit hook?
+
 	test    rax, HookAction_JumpTarget
 	jnz     jump_target
 
@@ -85,6 +87,7 @@ thunk_entry:
 	mov     [rsp], rax
 
 jump_target:
+
 	; jump to target function
 
 	mov     rax, targetFunc

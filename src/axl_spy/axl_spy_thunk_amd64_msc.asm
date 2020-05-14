@@ -21,9 +21,6 @@ section .text
 
 thunk_entry:
 
-	mov     rax, targetFunc
-	jmp     rax
-
 	; standard prologue (leaves rsp & rpb 16-byte aligned)
 
 	push    rbp
@@ -70,6 +67,8 @@ thunk_entry:
 	add     rsp, StackFrameSize
 	pop     rbp
 
+	; skip the exit hook?
+
 	test    rax, HookAction_JumpTarget
 	jnz     jump_target
 
@@ -89,7 +88,7 @@ ret_now:
 
 	; grab rax from the reg-ret-block and return
 
-	mov     rax, [rbp - 16 * 4 - 8 * 4 - 8 * 2]
+	mov     rax, [rbp - RegArgBlockSize - RegRetBlockSize]
 	ret
 
 hook_ret:
@@ -105,7 +104,7 @@ hook_ret:
 
 	; save the original retval in reg-ret-block
 
-	mov     [rbp - 16 * 4 - 8 * 4 - 8 * 2], rax
+	mov     [rbp - RegArgBlockSize - RegRetBlockSize], rax
 
 	; call the hook-leave function
 
@@ -119,7 +118,7 @@ hook_ret:
 	; restore the original return pointer and retval
 
 	mov     [rbp + 8], rax
-	mov     rax, [rbp - 16 * 4 - 8 * 4 - 8 * 2]
+	mov     rax, [rbp - RegArgBlockSize - RegRetBlockSize]
 
 	; standard epilogue
 
