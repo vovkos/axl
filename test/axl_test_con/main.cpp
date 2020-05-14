@@ -4854,7 +4854,7 @@ spyGlobalTest()
 	return 0;
 }
 
-namespace spy_test {
+namespace spy_param_test {
 
 //..............................................................................
 
@@ -5014,7 +5014,7 @@ fooHookLeave(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-} // namespace spy_test
+} // namespace spy_param_test
 
 int
 spyParamTest()
@@ -5034,10 +5034,10 @@ spyParamTest()
 	spy::HookArena arena;
 
 	spy::Hook* fooHook = arena.allocate(
-		(void*)spy_test::foo,
+		(void*)spy_param_test::foo,
 		(void*)0xabcdef,
-		spy_test::fooHookEnter,
-		spy_test::fooHookLeave
+		spy_param_test::fooHookEnter,
+		spy_param_test::fooHookLeave
 		);
 
 	((FooFunc*)fooHook)(
@@ -5052,6 +5052,85 @@ spyParamTest()
 		9, 90.9
 		);
 
+	return 0;
+}
+
+//..............................................................................
+
+namespace spy_stdcall_test {
+
+int
+AXL_STDCALL
+foo(int a) // one argument is all it takes for ret <n> to mess up the stack
+{
+	printf("foo(%d)\n", a);
+	return 10;
+}
+
+spy::HookAction
+fooHookEnter(
+	void* targetFunc,
+	void* callbackParam,
+	size_t frameBase
+	)
+{
+	printf(
+		"fooHookEnter(func: %p, param: %p, frame: %p)\n",
+		targetFunc,
+		callbackParam,
+		(void*)frameBase
+		);
+
+#if (_AXL_CPU_X86)
+	spy::VaList va;
+	spy::vaStart(va, frameBase);
+	int a = spy::vaArg<int>(va);
+	printf("  (%d)\n", a);
+#endif
+
+	return spy::HookAction_Default;
+}
+
+void
+fooHookLeave(
+	void* targetFunc,
+	void* callbackParam,
+	size_t frameBase
+	)
+{
+	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
+
+	printf(
+		"fooHookLeave(func: %p, param: %p, frame: %p, retval: %zd/0x%zx)\n",
+		targetFunc,
+		callbackParam,
+		(void*)frameBase,
+		regRetBlock->m_rax,
+		regRetBlock->m_rax
+		);
+}
+
+} // namespace spy_stdcall_test
+
+int
+spyStdcallTest()
+{
+	typedef
+	int
+	AXL_STDCALL
+	FooFunc(int);
+
+	spy::HookArena arena;
+
+	spy::Hook* fooHook = arena.allocate(
+		(void*)spy_stdcall_test::foo,
+		(void*)0xabcdef,
+		spy_stdcall_test::fooHookEnter,
+		spy_stdcall_test::fooHookLeave
+		);
+
+	spy::enableHooks();
+	((FooFunc*)fooHook)(10);
 	return 0;
 }
 
@@ -5085,7 +5164,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	spyGlobalTest();
+	spyStdcallTest();
 	return 0;
 }
 
