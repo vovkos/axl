@@ -61,7 +61,7 @@ class ModuleIterator
 {
 protected:
 	mutable sl::StringRef m_moduleFileName;
-	link_map* m_linkMap;
+	struct link_map* m_linkMap;
 
 public:
 	ModuleIterator()
@@ -69,7 +69,7 @@ public:
 		m_linkMap = NULL;
 	}
 
-	ModuleIterator(link_map* linkMap)
+	ModuleIterator(struct link_map* linkMap)
 	{
 		m_linkMap = linkMap;
 	}

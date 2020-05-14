@@ -480,6 +480,15 @@ enumerateImports(
 	return true;
 }
 
+bool
+enumerateImports(
+	ImportIterator* importIterator,
+	const ModuleIterator& moduleIterator
+	)
+{
+	return enumerateImports(importIterator, moduleIterator.getModule());
+}
+
 #elif (_AXL_OS_DARWIN)
 
 ImportIterator::ImportIterator()

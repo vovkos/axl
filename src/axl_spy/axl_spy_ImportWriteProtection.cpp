@@ -111,7 +111,9 @@ disableImportWriteProtection(
 
 	// GOT not found, still OK
 
-	backupBuffer->clear();
+	backup->m_p = NULL;
+	backup->m_size = 0;
+	backup->m_flags = 0;
 	return true;
 }
 
@@ -127,6 +129,9 @@ disableImportWriteProtection(
 bool
 restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 {
+	if (!backup->m_p) // no need to restore anything
+		return true;
+
 	int prot = 0;
 
 	if (backup->m_flags & PF_R)

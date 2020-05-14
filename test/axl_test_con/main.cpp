@@ -4822,7 +4822,7 @@ spyModule(
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
 		printf("  hooking [%p] %p -> %p: %s...\n", slot, targetFunc, hook, functionName.sz());
 #	endif
-		// *slot = hook;
+		*slot = hook;
 #endif
 	}
 
