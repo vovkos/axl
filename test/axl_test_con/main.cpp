@@ -15,6 +15,7 @@
 #include "../../include/axl_spy_ImportEnumerator.h"
 
 #include "axl_spy_ImportEnumerator.h"
+#include "axl_spy_ImportWriteProtection.h"
 #include "axl_spy_ModuleEnumerator.h"
 #include "axl_spy_Hook.h"
 
@@ -4760,8 +4761,8 @@ spyModule(
 	const sl::StringRef& moduleName
 	)
 {
-	sl::Array<char> backup;
-	bool result = spy::disableImportTableWriteProtection(module, &backup);
+	spy::ImportWriteProtectionBackup backup;
+	bool result = spy::disableImportWriteProtection(module, &backup);
 	if (!result)
 		return false;
 
@@ -4823,7 +4824,7 @@ spyModule(
 #endif
 	}
 
-	result = spy::restoreImportTableWriteProtection(module, backup);
+	result = spy::restoreImportWriteProtection(module, &backup);
 	ASSERT(result);
 	return true;
 }

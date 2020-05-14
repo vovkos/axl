@@ -275,19 +275,5 @@ enumerateImports(void* module = NULL)
 
 //..............................................................................
 
-bool
-disableImportTableWriteProtection(
-	void* module,
-	sl::Array<char>* backup
-	);
-
-bool
-restoreImportTableWriteProtection(
-	void* module,
-	const sl::ArrayRef<char>& backup
-	);
-
-//..............................................................................
-
 } // namespace spy
 } // namespace axl

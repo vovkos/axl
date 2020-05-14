@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "axl_err_Error.h"
 #include "axl_spy_ImportEnumerator.h"
 #include "axl_g_Module.h"
 
@@ -350,99 +349,6 @@ enumerateImports(
 	return true;
 }
 
-bool
-disableImportTableWriteProtection(
-	void* module,
-	sl::Array<char>* backup
-	)
-{
-	if (!module)
-		module = ::GetModuleHandle(NULL);
-
-	MODULEINFO moduleInfo;
-
-	bool_t result = ::GetModuleInformation(
-		::GetCurrentProcess(),
-		(HMODULE)module,
-		&moduleInfo,
-		sizeof(moduleInfo)
-		);
-
-	if (!result)
-		return err::failWithLastSystemError();
-
-	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
-	size_t alignedModuleSize = sl::align(moduleInfo.SizeOfImage, pageSize);
-	size_t pageCount = alignedModuleSize / pageSize;
-
-	backup->setCount(pageCount * sizeof(dword_t));
-
-	char* p = (char*)module;
-	for (size_t i = 0; i < pageCount; i++, p += pageSize)
-	{
-		result = ::VirtualProtect(
-			p,
-			pageSize,
-			PAGE_EXECUTE_READWRITE,
-			(dword_t*)backup->p() + i
-			);
-
-		if (!result)
-			return err::failWithLastSystemError();
-	}
-
-	return true;
-}
-
-bool
-restoreImportTableWriteProtection(
-	void* module,
-	const sl::ArrayRef<char>& backup
-	)
-{
-	if (!module)
-		module = ::GetModuleHandle(NULL);
-
-
-
-	MODULEINFO moduleInfo;
-
-	bool_t result = ::GetModuleInformation(
-		::GetCurrentProcess(),
-		(HMODULE)module,
-		&moduleInfo,
-		sizeof(moduleInfo)
-		);
-
-	if (!result)
-		return err::failWithLastSystemError();
-
-	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
-	size_t alignedModuleSize = sl::align(moduleInfo.SizeOfImage, pageSize);
-	size_t pageCount = alignedModuleSize / pageSize;
-
-	if (backup.getCount() < pageCount * sizeof(dword_t))
-		return err::fail(err::Error("backup buffer too small"));
-
-	char* p = (char*)module;
-	for (size_t i = 0; i < pageCount; i++, p += pageSize)
-	{
-		dword_t oldProtect;
-
-		result = ::VirtualProtect(
-			p,
-			pageSize,
-			*((const dword_t*)backup.cp() + i),
-			&oldProtect
-			);
-
-		if (!result)
-			return err::failWithLastSystemError();
-	}
-
-	return true;
-}
-
 #elif (_AXL_OS_LINUX)
 
 ImportIterator::ImportIterator(ElfImportEnumeration* enumeration)
@@ -541,22 +447,7 @@ enumerateImports(
 	void* module
 )
 {
-	link_map* linkMap;
-
-	if (!module)
-	{
-		linkMap = _r_debug.r_map;
-	}
-	else
-	{
-		sys::psx::DynamicLib lib;
-		lib.attach(module);
-		bool result = lib.getInfo(RTLD_DI_LINKMAP, &linkMap);
-		lib.detach();
-
-		if (!result)
-			return false;
-	}
+	link_map* linkMap = module ? (link_map*)module : _r_debug.r_map;
 
 	ElfW(Dyn)* dynTable[DT_NUM] = { 0 };
 	ElfW(Dyn)* dyn = linkMap->l_ld;
@@ -601,86 +492,6 @@ enumerateImports(
 
 	*iterator = ImportIterator(enumeration);
 	return true;
-}
-
-struct ImportTableWriteProtectionBackup
-{
-	void* m_p;
-	size_t m_size;
-	uint_t m_flags;
-};
-
-bool
-disableImportTableWriteProtection(
-	void* module,
-	sl::Array<char>* backupBuffer
-	)
-{
-	link_map* linkMap = (link_map*)module;
-	size_t moduleBase = (size_t)linkMap->l_addr;
-	ElfW(Ehdr)* ehdr = (ElfW(Ehdr)*)moduleBase;
-	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
-
-	size_t p = moduleBase + ehdr->e_phoff;
-	for (size_t i = 0; i < ehdr->e_phnum; i++, p += ehdr->e_phentsize)
-	{
-		ElfW(Phdr)* phdr = (ElfW(Phdr)*)p;
-		if (phdr->p_type != PT_GNU_RELRO) // read-only-after-relocation (contains GOT)
-			continue;
-
-		size_t begin = moduleBase + phdr->p_vaddr;
-		size_t end = begin + phdr->p_memsz;
-		begin &= ~(pageSize - 1);
-		end = (end + pageSize - 1) & ~(pageSize - 1);
-
-		void* p = (char*)begin;
-		size_t size = end - begin;
-
-		int result = ::mprotect(p, size, PROT_READ | PROT_WRITE | PROT_EXEC);
-		if (result == -1)
-			return err::failWithLastSystemError();
-
-		ImportTableWriteProtectionBackup backup;
-		backup.m_p = p;
-		backup.m_size = size;
-		backup.m_flags = phdr->p_flags;
-		backupBuffer->copy((char*)&backup, sizeof(backup));
-		return true;
-	}
-
-	// GOT not found, still OK
-
-	backupBuffer->clear();
-	return true;
-}
-
-bool
-restoreImportTableWriteProtection(
-	void* module,
-	const sl::ArrayRef<char>& backupBuffer
-	)
-{
-	if (backupBuffer.isEmpty())
-		return true;
-
-	if (backupBuffer.getCount() < sizeof(ImportTableWriteProtectionBackup))
-		return err::fail(err::SystemErrorCode_BufferTooSmall);
-
-	const ImportTableWriteProtectionBackup* backup = (const ImportTableWriteProtectionBackup*)backupBuffer.cp();
-
-	int prot = 0;
-
-	if (backup->m_flags & PF_R)
-		prot |= PROT_READ;
-
-	if (backup->m_flags & PF_W)
-		prot |= PROT_WRITE;
-
-	if (backup->m_flags & PF_X)
-		prot |= PROT_EXEC;
-
-	int result = ::mprotect(backup->m_p, backup->m_size, prot);
-	return err::complete(result != -1);
 }
 
 #elif (_AXL_OS_DARWIN)

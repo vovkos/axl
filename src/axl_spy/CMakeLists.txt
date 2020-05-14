@@ -16,6 +16,7 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_spy/axl_spy_ImportEnumerator.h
+	${AXL_INC_DIR}/axl_spy/axl_spy_ImportWriteProtection.h
 	${AXL_INC_DIR}/axl_spy/axl_spy_ModuleEnumerator.h
 	${AXL_INC_DIR}/axl_spy/axl_spy_Hook.h
 	axl_spy_ThreadState.h
@@ -25,6 +26,7 @@ set(
 set(
 	LIB_CPP_LIST
 	axl_spy_ImportEnumerator.cpp
+	axl_spy_ImportWriteProtection.cpp
 	axl_spy_ModuleEnumerator.cpp
 	axl_spy_ThreadState.cpp
 	axl_spy_HookCommon.cpp
