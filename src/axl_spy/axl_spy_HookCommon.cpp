@@ -33,7 +33,7 @@ hookEnterCommon(
 	return action;
 }
 
-uint64_t
+size_t
 hookLeaveCommon(
 	HookCommonContext* context,
 	size_t frameBase
@@ -45,7 +45,7 @@ hookLeaveCommon(
 	if (wasEnabled)
 		context->m_leaveFunc(context->m_targetFunc, context->m_callbackParam, frameBase);
 
-	uint64_t originalRet = g_threadState.removeFrame(frameBase);
+	size_t originalRet = g_threadState.removeFrame(frameBase);
 	g_threadState.enable();
 	return originalRet;
 }

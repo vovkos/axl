@@ -24,7 +24,7 @@ hookEnterCommon(
 	size_t originalRet
 	);
 
-uint64_t
+size_t
 hookLeaveCommon(
 	HookCommonContext* context,
 	size_t frameBase

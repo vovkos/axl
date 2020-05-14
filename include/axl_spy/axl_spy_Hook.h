@@ -82,7 +82,7 @@ enum FrameOffset
 {
 #if (_AXL_CPU_X86)
 	FrameOffset_StackArgBlock = 8,
-	FrameOffset_RegRetBlock   = -(int)sizeof(RegRetBlock),
+	FrameOffset_RegRetBlock   = -(int)(sizeof(RegRetBlock) + 4),
 #elif (_AXL_CPU_AMD64)
 #	if (_AXL_CPP_MSC)
 	FrameOffset_RegArgBlock   = -(int)sizeof(RegArgBlock),
