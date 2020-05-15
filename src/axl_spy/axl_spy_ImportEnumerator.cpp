@@ -491,34 +491,27 @@ enumerateImports(
 
 #elif (_AXL_OS_DARWIN)
 
-ImportIterator::ImportIterator()
+ImportIterator::ImportIterator(ImportEnumeration* enumeration)
 {
-	m_p = NULL;
-	m_end = NULL;
-	m_isDone = true;
-	m_segmentIdx = 0;
-	m_segmentOffset = 0;
+	init();
+	m_enumeration = enumeration;
+	next();
 }
 
-ImportIterator::ImportIterator(
-	ImportEnumeration* enumeration,
-	const void* bind,
-	size_t size
-	)
+void
+ImportIterator::init()
 {
-	m_enumeration = enumeration;
-	m_p = (char*)bind;
-	m_end = m_p + size;
-	m_isDone = size != 0;
+	m_state = State_Idle;
+	m_p = NULL;
+	m_end = NULL;
 	m_segmentIdx = 0;
 	m_segmentOffset = 0;
-	next();
 }
 
 ImportIterator&
 ImportIterator::operator ++ ()
 {
-	if (m_isDone || m_p >= m_end)
+	if (!m_enumeration || m_state == State_Done)
 	{
 		reset();
 		return *this;
@@ -531,103 +524,157 @@ ImportIterator::operator ++ ()
 bool
 ImportIterator::next()
 {
-	bool result;
-
 	m_slot = NULL;
 
-	while (m_p < m_end && !m_isDone)
+	while (!m_pendingSlotArray.isEmpty())
 	{
-		uint8_t c = *m_p++;
-		uint8_t op = c & BIND_OPCODE_MASK;
-		uint8_t imm = c & BIND_IMMEDIATE_MASK;
-		uint64_t uleb;
-		uint64_t uleb2;
-		int64_t sleb;
+		size_t slotVmAddr = m_pendingSlotArray.getBackAndPop();
+		setSlot(slotVmAddr);
+		if (m_slot)
+			return true;
+	}
 
-		switch (op)
+	do
+	{
+		bool isDone = false;
+		while (m_p < m_end && !m_slot && !isDone)
 		{
-		case BIND_OPCODE_DONE:
-			m_isDone = true;
-			break;
+			uint8_t c = *m_p++;
+			uint8_t op = c & BIND_OPCODE_MASK;
+			uint8_t imm = c & BIND_IMMEDIATE_MASK;
+			uint64_t uleb;
+			uint64_t uleb2;
+			int64_t sleb;
 
-		case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
-		case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
-		case BIND_OPCODE_SET_TYPE_IMM:
-			break;
-
-		case BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM:
-			m_name = m_p;
-			m_p += m_name.getLength() + 1;
-			break;
-
-		case BIND_OPCODE_SET_ADDEND_SLEB:
-			m_p += enc::sleb128(m_p, m_end - m_p, &sleb);
-			break;
-
-		case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
-			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
-			break;
-
-		case BIND_OPCODE_DO_BIND:
-			return bind();
-
-		case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
-			result = bind();
-			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
-			m_segmentOffset += uleb;
-			return result;
-
-		case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
-			result = bind();
-			m_segmentOffset += imm * sizeof(void*);
-			return result;
-
-		case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
-			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
-			m_p += enc::uleb128(m_p, m_end - m_p, &uleb2);
-
-			result = true;
-			for (uint64_t i = 0; i < uleb; i++, m_segmentOffset += uleb2)
+			switch (op)
 			{
-				bool result2 = bind();
-				result = result && result2;
-			}
-
-			return result;
-
-		case BIND_OPCODE_ADD_ADDR_ULEB:
-			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
-			m_segmentOffset += uleb;
-			break;
-
-		case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
-			m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
-			m_segmentIdx = imm;
-			m_segmentOffset = uleb;
-			break;
-
-		case BIND_OPCODE_THREADED:
-			switch (imm)
-			{
-			case BIND_SUBOPCODE_THREADED_SET_BIND_ORDINAL_TABLE_SIZE_ULEB:
-				m_p += enc::uleb128(m_p, m_end - m_p);
+			case BIND_OPCODE_DONE:
+				if (m_state != State_LazyBind)
+					isDone = true;
+				else
+					m_segmentOffset = m_p - m_begin;
 				break;
 
-			case BIND_SUBOPCODE_THREADED_APPLY:
+			case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
+				m_moduleName = getDylibName(imm);
+				break;
+
+			case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
+				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_moduleName = getDylibName(uleb);
+				break;
+
+			case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
+				m_moduleName = getDylibName(imm ? BIND_OPCODE_MASK | imm : 0);
+				break;
+
+			case BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM:
+				m_symbolName = m_p;
+				m_p += m_symbolName.getLength() + 1;
+				break;
+
+			case BIND_OPCODE_SET_TYPE_IMM:
+				break;
+
+			case BIND_OPCODE_SET_ADDEND_SLEB:
+				m_p += enc::sleb128(m_p, m_end - m_p, &sleb);
+				break;
+
+			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
+				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_segmentIdx = imm;
+				m_segmentOffset = uleb;
+				break;
+
+			case BIND_OPCODE_ADD_ADDR_ULEB:
+				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_segmentOffset += uleb;
+				break;
+
+			case BIND_OPCODE_DO_BIND:
+				bind();
+				if (m_state != State_LazyBind)
+					m_segmentOffset += sizeof(void*);
+				break;
+
+			case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
+				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				bind();
+				m_segmentOffset += uleb;
+
+				if (m_state != State_LazyBind)
+					m_segmentOffset += sizeof(void*);
+
+				break;
+
+			case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
+				bind();
+				m_segmentOffset += imm * sizeof(void*);
+
+				if (m_state != State_LazyBind)
+					m_segmentOffset += sizeof(void*);
+
+				break;
+
+			case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
+				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_p += enc::uleb128(m_p, m_end - m_p, &uleb2);
+
+				for (uint64_t i = 0; i < uleb; i++)
+				{
+					bind();
+					m_segmentOffset += uleb2;
+
+					if (m_state != State_LazyBind)
+						m_segmentOffset += sizeof(void*);
+				}
+
 				break;
 
 			default:
-				printf("*** unexpected sub op for BIND_OPCODE_THREADED: 0x%02x\n", imm);
+				printf("*** unexpected bind op: 0x%02x\n", op);
 			}
+		}
 
+		if (m_slot)
+			return true;
+
+		// advance to the next bind kind
+
+		switch (m_state)
+		{
+		case State_Idle:
+			printf("---> State_Bind\n");
+			m_state = State_Bind;
+			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->bind_off;
+			m_end = m_begin + m_enumeration->m_dyldInfoCmd->bind_size;
 			break;
 
-		default:
-			printf("*** unexpected bind op: 0x%02x\n", op);
-		}
-	}
+		case State_Bind:
+			printf("---> State_WeakBind\n");
+			m_state = State_WeakBind;
+			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->weak_bind_off;
+			m_end = m_begin + m_enumeration->m_dyldInfoCmd->weak_bind_size;
+			break;
 
-	return m_slot != NULL;
+		case State_WeakBind:
+			printf("---> State_LazyBind\n");
+			m_state = State_LazyBind;
+			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->lazy_bind_off;
+			m_end = m_begin + m_enumeration->m_dyldInfoCmd->lazy_bind_size;
+			break;
+
+		case State_LazyBind:
+			printf("---> State_Done\n");
+			m_state = State_Done;
+			break;
+		}
+
+		m_p = m_begin;
+	} while (m_state != State_Done);
+
+	ASSERT(!m_slot);
+	return false;
 }
 
 bool
@@ -640,13 +687,73 @@ ImportIterator::bind()
 	if (m_segmentOffset >= segment->vmsize)
 		return false;
 
-	void** slot = (void**)(m_enumeration->m_slide + segment->vmaddr - segment->fileoff + m_segmentOffset);
-	if (!m_slot)
-		m_slot = slot;
-	else
-		m_pendingSlotArray.append(slot);
+	m_segmentName = segment->segname;
 
+	size_t slotVmAddr = segment->vmaddr + m_segmentOffset;
+	if (!m_slot)
+	{
+		setSlot(slotVmAddr);
+		return m_slot != NULL;
+	}
+
+	m_pendingSlotArray.append(slotVmAddr);
 	return true;
+}
+
+bool
+ImportIterator::setSlot(size_t slotVmAddr)
+{
+	ASSERT(m_segmentIdx < m_enumeration->m_segmentArray.getCount());
+	const segment_command_64* segment = m_enumeration->m_segmentArray[m_segmentIdx];
+
+	const section_64* section = findSection(segment, slotVmAddr);
+	if (!section) // wrong section type
+		return false;
+
+	uint8_t sectionType = section->flags & SECTION_TYPE;
+	if (sectionType != S_LAZY_SYMBOL_POINTERS) // wrong section type
+		return false;
+
+	m_slot = (void**)(m_enumeration->m_slide + slotVmAddr);
+	m_slotVmAddr = slotVmAddr;
+	m_sectionName = section->sectname;
+	return true;
+}
+
+const section_64*
+ImportIterator::findSection(
+	const segment_command_64* segment,
+	size_t slotVmAddr
+	)
+{
+	const section_64* section = (section_64*)(segment + 1);
+	const section_64* end = section + segment->nsects;
+	for (; section < end; section++)
+		if (slotVmAddr >= section->addr && slotVmAddr < section->addr + section->size)
+			return section;
+
+	return NULL;
+}
+
+sl::StringRef
+ImportIterator::getDylibName(int ordinal)
+{
+	switch (ordinal)
+	{
+	case BIND_SPECIAL_DYLIB_SELF:
+		return "this-image";
+
+	case BIND_SPECIAL_DYLIB_MAIN_EXECUTABLE:
+		return "main-executable";
+
+	case BIND_SPECIAL_DYLIB_FLAT_LOOKUP:
+		return "flat-namespace";
+	}
+
+	return
+		ordinal < BIND_SPECIAL_DYLIB_FLAT_LOOKUP ? "unknown-special-ordinal" :
+		ordinal <= m_enumeration->m_dylibNameArray.getCount() ? m_enumeration->m_dylibNameArray[ordinal - 1] :
+		"dylib-name-out-of-range";
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -661,6 +768,7 @@ enumerateImports(
 	mach_header_64* machHdr = (mach_header_64*)::_dyld_get_image_header(imageIndex);
 
 	sl::Array<struct segment_command_64*> segmentArray;
+	sl::Array<const char*> dylibNameArray;
 	segment_command_64* linkEditSegmentCmd = NULL;
 	dyld_info_command* dyldInfoCmd = NULL;
 
@@ -668,8 +776,17 @@ enumerateImports(
 	for (uint_t i = 0; i < machHdr->ncmds; i++)
 	{
 		segment_command_64* segmentCmd;
+		dylib_command* dylibCmd;
 		switch (cmd->cmd)
 		{
+		case LC_LOAD_DYLIB:
+		case LC_LOAD_WEAK_DYLIB:
+		case LC_REEXPORT_DYLIB:
+		case LC_LAZY_LOAD_DYLIB:
+			dylibCmd = (dylib_command*)cmd;
+			dylibNameArray.append((char*)cmd + dylibCmd->dylib.name.offset);
+			break;
+
 		case LC_SEGMENT_64:
 			segmentCmd = (segment_command_64*)cmd;
 			segmentArray.append(segmentCmd);
@@ -694,15 +811,13 @@ enumerateImports(
 	}
 
 	ref::Ptr<ImportEnumeration> enumeration = AXL_REF_NEW(ImportEnumeration);
-	enumeration->m_slide = slide;
 	enumeration->m_segmentArray = segmentArray;
+	enumeration->m_dylibNameArray = dylibNameArray;
+	enumeration->m_slide = slide;
+	enumeration->m_linkEditSegmentBase = slide + linkEditSegmentCmd->vmaddr - linkEditSegmentCmd->fileoff;
+	enumeration->m_dyldInfoCmd = dyldInfoCmd;
 
-	*iterator = ImportIterator(
-		enumeration,
-		slide + linkEditSegmentCmd->vmaddr - linkEditSegmentCmd->fileoff + dyldInfoCmd->lazy_bind_off,
-		dyldInfoCmd->lazy_bind_size
-		);
-
+	*iterator = ImportIterator(enumeration);
 	return true;
 }
 

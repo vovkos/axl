@@ -144,7 +144,7 @@ ModuleIterator::prepareModuleFileName() const
 	ASSERT(m_moduleFileName.isEmpty());
 
 	if (m_index < m_count)
-		m_moduleFileName = _dyld_get_image_name(m_index);
+		m_moduleFileName = ::_dyld_get_image_name(m_index);
 
 	return m_moduleFileName;
 }

@@ -4758,11 +4758,15 @@ hookLeave(
 #define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
 
 bool
-spyModule(
-	const spy::ModuleIterator& moduleIt,
-	const sl::StringRef& moduleName
-	)
+spyModule(const spy::ModuleIterator& moduleIt)
 {
+	sl::String fileName = moduleIt.getModuleFileName();
+	sl::String moduleName = io::getFileName(fileName);
+
+#if (_SPY_TEST_TRACE_HOOKING_MODULE)
+	printf("Hooking %s...\n", fileName.sz());
+#endif
+
 	spy::ImportWriteProtectionBackup backup;
 	bool result = spy::disableImportWriteProtection(moduleIt, &backup);
 	if (!result)
@@ -4789,9 +4793,10 @@ spyModule(
 		else
 			functionName += it.getName();
 
-		if (it.getName() == "TlsAlloc" ||
+		if (it.isPrefix("Tls") &&
+			(it.getName() == "TlsAlloc" ||
 			it.getName() == "TlsGetValue" ||
-			it.getName() == "TlsSetValue")
+			it.getName() == "TlsSetValue"))
 		{
 			printf("  skipping %s for now...\n", functionName.sz());
 			continue;
@@ -4801,28 +4806,31 @@ spyModule(
 		void* targetFunc = *slot;
 		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
-		printf("  hooking [%p] %p -> %p: %s...\n", slot, targetFunc, hook, functionName.sz());
+		printf("  hooking [%p] %p: %s...\n", slot, targetFunc, functionName.sz());
 #	endif
 		*slot = hook;
 #else
 		sl::String& functionName = *stringCache->insertTail();
-		functionName = moduleName + ":" + it.getName();
+		sl::String exportModuleFileName = io::getFileName(it.getModuleName());
+		functionName = moduleName + ":" + exportModuleFileName + ":" + it.getSymbolName();
 
-		if (it.getName() == "pthread_key_create" ||
-			it.getName() == "pthread_get_specific" ||
-			it.getName() == "pthread_set_specific")
+		if (it.getSymbolName().isPrefix("pthread_") &&
+			(it.getSymbolName() == "pthread_key_create" ||
+			it.getSymbolName() == "pthread_get_specific" ||
+			it.getSymbolName() == "pthread_set_specific"))
 		{
 			printf("  skipping %s for now...\n", functionName.sz());
 			continue;
 		}
 
 		void** slot = it.getSlot();
+		size_t slotVmAddr = it.getSlotVmAddr();
 		void* targetFunc = *slot;
 		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
-		printf("  hooking [%p] %p -> %p: %s...\n", slot, targetFunc, hook, functionName.sz());
+		printf("  hooking %16s:%16s [%08llx] %p %s...\n", it.getSegmentName().sz(), it.getSectionName().sz(), slotVmAddr, targetFunc, functionName.sz());
 #	endif
-		*slot = hook;
+//		*slot = hook;
 #endif
 	}
 
@@ -4835,16 +4843,11 @@ int
 spyGlobalTest()
 {
 	printf("PID: %d\n", sys::getCurrentProcessId());
+	printf("memcmp: %p\n", (void*)memcmp);
 
 	spy::ModuleIterator it = spy::enumerateModules();
 	for (; it; it++)
-	{
-#if (_SPY_TEST_TRACE_HOOKING_MODULE)
-		printf("Hooking %s...\n", it.getModuleFileName().sz());
-#endif
-		sl::String fileName = io::getFileName(it.getModuleFileName());
-		spyModule(it, fileName);
-	}
+		spyModule(it);
 
 	printf("Hooking done, enabling hooks...\n");
 	spy::enableHooks();

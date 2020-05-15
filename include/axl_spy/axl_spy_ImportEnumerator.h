@@ -66,7 +66,8 @@ namespace spy {
 class ImportIteratorBase
 {
 protected:
-    sl::StringRef m_name;
+    sl::StringRef m_symbolName;
+	sl::StringRef m_moduleName;
     void** m_slot;
 
 public:
@@ -80,23 +81,30 @@ public:
 		return m_slot != NULL;
 	}
 
-    const sl::StringRef&
-    getName() const
-    {
-        return m_name;
-    }
+	const sl::StringRef&
+	getSymbolName() const
+	{
+		return m_symbolName;
+	}
 
-    void**
-    getSlot() const
-    {
-        return m_slot;
-    }
+	const sl::StringRef&
+	getModuleName() const
+	{
+		return m_moduleName;
+	}
+
+	void**
+	getSlot() const
+	{
+		return m_slot;
+	}
 
 protected:
 	void
 	reset()
 	{
-    	m_name.clear();
+		m_symbolName.clear();
+		m_moduleName.clear();
     	m_slot = NULL;
 	}
 };
@@ -154,12 +162,9 @@ struct PeImportEnumeration: ref::RefCount
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class ImportIterator: public ImportIteratorBase
 {
 protected:
-	sl::StringRef m_exportModuleName;
 	uint_t m_ordinal;
 	uint_t m_hint;
 
@@ -178,12 +183,6 @@ public:
 
 	ImportIterator
 	operator ++ (int);
-
-	const sl::StringRef&
-	getModuleName()
-	{
-		return m_exportModuleName;
-	}
 
 	uint_t
 	getOrdinal()
@@ -258,8 +257,11 @@ protected:
 
 struct ImportEnumeration: ref::RefCount
 {
-	char* m_slide;
 	sl::Array<struct segment_command_64*> m_segmentArray;
+	sl::Array<const char*> m_dylibNameArray;
+	char* m_slide;
+	char* m_linkEditSegmentBase;
+	struct dyld_info_command* m_dyldInfoCmd;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -267,22 +269,36 @@ struct ImportEnumeration: ref::RefCount
 class ImportIterator: public ImportIteratorBase
 {
 protected:
+	enum State
+	{
+		State_Idle,
+		State_Bind,
+		State_WeakBind,
+		State_LazyBind,
+		State_Done,
+	};
+
+protected:
+	size_t m_slotVmAddr;
+	sl::StringRef m_segmentName;
+	sl::StringRef m_sectionName;
+
 	ref::Ptr<ImportEnumeration> m_enumeration;
-	sl::Array<void**> m_pendingSlotArray; // from BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB
+	sl::Array<size_t> m_pendingSlotArray; // from BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB
+	State m_state;
 	const char* m_p;
+	const char* m_begin;
 	const char* m_end;
-	bool m_isDone;
 	size_t m_segmentIdx;
 	size_t m_segmentOffset;
 
 public:
-	ImportIterator();
+	ImportIterator()
+	{
+		init();
+	}
 
-	ImportIterator(
-		ImportEnumeration* enumeration,
-		const void* bind,
-		size_t size
-		);
+	ImportIterator(ImportEnumeration* enumeration);
 
 	ImportIterator&
 	operator ++ ();
@@ -290,12 +306,45 @@ public:
 	ImportIterator
 	operator ++ (int);
 
+	const sl::StringRef&
+	getSegmentName() const
+	{
+		return m_segmentName;
+	}
+
+	const sl::StringRef&
+	getSectionName() const
+	{
+		return m_sectionName;
+	}
+
+	size_t
+	getSlotVmAddr()
+	{
+		return m_slotVmAddr;
+	}
+
 protected:
+	void
+	init();
+
 	bool
 	next();
 
 	bool
 	bind();
+
+	bool
+	setSlot(size_t slotVmAddr);
+
+	const struct section_64*
+	findSection(
+		const struct segment_command_64* segment,
+		size_t slotVmAddr
+		);
+
+	sl::StringRef
+	getDylibName(int ordinal);
 };
 
 #endif
