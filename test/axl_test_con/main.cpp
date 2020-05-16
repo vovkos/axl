@@ -4771,16 +4771,17 @@ hookLeave(
 #define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
 
 bool
-spyModule(
-	sl::SimpleHashTable<void*, bool>* hookSet,
-	const spy::ModuleIterator& moduleIt
-	)
+spyModule(const spy::ModuleIterator& moduleIt)
 {
 	sl::String fileName = moduleIt.getModuleFileName();
 	sl::String moduleName = io::getFileName(fileName);
 
 #if (_SPY_TEST_TRACE_HOOKING_MODULE)
 	printf("Hooking %s...\n", fileName.sz());
+#endif
+
+#if (_AXL_OS_DARWIN)
+	sl::SimpleHashTable<size_t, bool> hookSet;
 #endif
 
 	spy::ImportWriteProtectionBackup backup;
@@ -4826,10 +4827,35 @@ spyModule(
 #	endif
 		*slot = hook;
 #elif (_AXL_OS_LINUX)
+		sl::String& functionName = *stringCache->insertTail();
+		functionName = moduleName + ":" + it.getSymbolName();
+
+		if (it.getSymbolName().isPrefix("pthread_") &&
+			(it.getSymbolName() == "pthread_key_create" ||
+			 it.getSymbolName() == "pthread_getspecific" ||
+			 it.getSymbolName() == "pthread_setspecific"))
+		{
+			printf("  skipping %s for now...\n", functionName.sz());
+			continue;
+		}
+
+		void** slot = it.getSlot();
+		void* targetFunc = *slot;
+		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
+#	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
+		printf(
+			"  hooking [%p] %p -> %p %s...\n",
+			slot,
+			targetFunc,
+			hook,
+			functionName.sz()
+		);
+#	endif
+		*slot = hook;
 #elif (_AXL_OS_DARWIN)
 		sl::String& functionName = *stringCache->insertTail();
-		sl::String exportModuleFileName = io::getFileName(it.getModuleName());
-		functionName = moduleName + ":" + exportModuleFileName + ":" + it.getSymbolName();
+		sl::String exportModuleName = io::getFileName(it.getModuleName()); // on darwin, it's a full path
+		functionName = moduleName + ":" + exportModuleName + ":" + it.getSymbolName();
 
 		if (it.getSymbolName() == "_strncmp" ||
 			it.getSymbolName().isPrefix("_pthread_") &&
@@ -4841,24 +4867,15 @@ spyModule(
 			continue;
 		}
 
-		void** slot = it.getSlot();
 		size_t slotVmAddr = it.getSlotVmAddr();
-
-		sl::MapIterator<void*, bool> it2 = hookSet->visit(slot);
-		if (it2->m_value)
+		bool isUnique = hookSet.addIfNotExists(slotVmAddr, true);
+		if (!isUnique)
 		{
-			printf(
-				"  already %16s:%16s [%08llx] %s\n",
-				it.getSegmentName().sz(),
-				it.getSectionName().sz(),
-				slotVmAddr,
-				functionName.sz()
-				);
+			printf("  already hooked [%08llx] %s\n", slotVmAddr, functionName.sz());
 			continue;
 		}
 
-		it2->m_value = true;
-
+		void** slot = it.getSlot();
 		void* targetFunc = *slot;
 		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
@@ -4887,10 +4904,9 @@ spyGlobalTest()
 	printf("PID: %d\n", sys::getCurrentProcessId());
 	printf("memcmp: %p\n", (void*)memcmp);
 
-	sl::SimpleHashTable<void*, bool> hookSet;
 	spy::ModuleIterator it = spy::enumerateModules();
 	for (; it; it++)
-		spyModule(&hookSet, it);
+		spyModule(it);
 
 	printf("Hooking done, enabling hooks...\n");
 	spy::enableHooks();

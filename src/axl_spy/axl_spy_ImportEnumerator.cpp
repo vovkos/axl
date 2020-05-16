@@ -422,7 +422,7 @@ ImportIterator::readRel()
 			continue;
 		}
 
-		m_name = m_enumeration->m_stringTable + sym->st_name;
+		m_symbolName = m_enumeration->m_stringTable + sym->st_name;
 		m_slot = (void**)(m_enumeration->m_moduleBase + rel->r_offset);
 		return true;
 	}
