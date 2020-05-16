@@ -266,7 +266,7 @@ ImportIterator::openImportDesc()
 		result = readThunk();
 		if (result)
 		{
-			m_exportModuleName = m_enumeration->m_moduleBase + p->Name;
+			m_moduleName = m_enumeration->m_moduleBase + p->Name;
 			return true;
 		}
 	}
@@ -285,23 +285,23 @@ ImportIterator::readThunk()
 		if (IMAGE_SNAP_BY_ORDINAL(m_nameThunk->u1.Ordinal))
 		{
 			m_ordinal = IMAGE_ORDINAL(m_nameThunk->u1.Ordinal);
-			m_name.clear();
+			m_symbolName.clear();
 		}
 		else
 		{
 			IMAGE_IMPORT_BY_NAME* name = (IMAGE_IMPORT_BY_NAME*)(m_enumeration->m_moduleBase + m_nameThunk->u1.AddressOfData);
 			m_ordinal = -1;
 			m_hint = name->Hint;
-			m_name = name->Name;
+			m_symbolName = name->Name;
 		}
 
 		if (!isCode(m_addrThunk->u1.Function))
 		{
 #if (_AXL_SPY_TRACE_NON_CODE_IMPORT)
 			if (m_ordinal != -1)
-				printf("  *** Non-code: %s@%d\n", m_exportModuleName.sz(), m_ordinal);
+				AXL_TRACE("Non-code import: %s@%d\n", m_moduleName.sz(), m_ordinal);
 			else
-				printf("  *** Non-code: %s:%s\n", m_exportModuleName.sz(), m_name.sz());
+				AXL_TRACE("Non-code import: %s:%s\n", m_moduleName.sz(), m_symbolName.sz());
 #	if (_AXL_SPY_ANALYZE_NON_CODE_ADDRESS)
 			m_codeMap->analyzeNonCodeAddress(m_addrThunk->u1.Function);
 #	endif
@@ -341,6 +341,15 @@ enumerateImports(
 
 	*iterator = ImportIterator(enumeration);
 	return true;
+}
+
+bool
+enumerateImports(
+	ImportIterator* importIterator,
+	const ModuleIterator& moduleIterator
+	)
+{
+	return enumerateImports(importIterator, moduleIterator.getModule());
 }
 
 #elif (_AXL_OS_LINUX)

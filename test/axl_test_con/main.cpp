@@ -4805,14 +4805,14 @@ spyModule(
 		functionName = moduleName + ":" + it.getModuleName() + ":";
 
 		if (it.getOrdinal() != -1)
-			functionName.appendFormat("%s@%d", it.getModuleName().sz(), it.getOrdinal());
+			functionName.appendFormat("@%d", it.getOrdinal());
 		else
-			functionName += it.getName();
+			functionName += it.getSymbolName();
 
-		if (it.isPrefix("Tls") &&
-			(it.getName() == "TlsAlloc" ||
-			it.getName() == "TlsGetValue" ||
-			it.getName() == "TlsSetValue"))
+		if (it.getSymbolName().isPrefix("Tls") &&
+			(it.getSymbolName() == "TlsAlloc" ||
+			it.getSymbolName() == "TlsGetValue" ||
+			it.getSymbolName() == "TlsSetValue"))
 		{
 			printf("  skipping %s for now...\n", functionName.sz());
 			continue;
@@ -5058,7 +5058,7 @@ fooHookLeave(
 	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
 
 #if (_AXL_CPU_AMD64)
-	int retval = regRetBlock->m_rax;
+	int retval = (int)regRetBlock->m_rax;
 #elif (_AXL_CPU_X86)
 	int retval = regRetBlock->m_eax;
 #endif
@@ -5067,7 +5067,6 @@ fooHookLeave(
 		"-foo(func: %p, param: %p) -> %d\n",
 		targetFunc,
 		callbackParam,
-		(void*)frameBase,
 		retval
 		);
 }
