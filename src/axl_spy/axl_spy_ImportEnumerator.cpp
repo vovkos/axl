@@ -749,9 +749,9 @@ ImportIterator::getDylibName(int ordinal)
 	}
 
 	return
-		ordinal < BIND_SPECIAL_DYLIB_FLAT_LOOKUP ? "unknown-special-ordinal" :
+		ordinal < 0 ? "unknown-special-ordinal" :
 		ordinal <= m_enumeration->m_dylibNameArray.getCount() ? m_enumeration->m_dylibNameArray[ordinal - 1] :
-		"dylib-name-out-of-range";
+		"dylib-index-out-of-range";
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -780,6 +780,7 @@ enumerateImports(
 		case LC_LOAD_DYLIB:
 		case LC_LOAD_WEAK_DYLIB:
 		case LC_REEXPORT_DYLIB:
+		case LC_LOAD_UPWARD_DYLIB:
 		case LC_LAZY_LOAD_DYLIB:
 			dylibCmd = (dylib_command*)cmd;
 			dylibNameArray.append((char*)cmd + dylibCmd->dylib.name.offset);
@@ -834,8 +835,19 @@ enumerateImports(
 	void* module
 	)
 {
-	size_t index = 0;
-	return enumerateImports(iterator, index);
+	size_t i = 0;
+	size_t count = _dyld_image_count();
+	for (size_t i = 0; i < count; i++)
+	{
+		sys::psx::DynamicLib lib;
+		const char* imageName = _dyld_get_image_name(i);
+		bool result = lib.open(imageName, RTLD_NOLOAD);
+		if (result && lib == module)
+			return enumerateImports(iterator, i);
+	}
+
+	err::setError("module not found");
+	return false;
 }
 
 #endif

@@ -4902,7 +4902,6 @@ int
 spyGlobalTest()
 {
 	printf("PID: %d\n", sys::getCurrentProcessId());
-	printf("memcmp: %p\n", (void*)memcmp);
 
 	spy::ModuleIterator it = spy::enumerateModules();
 	for (; it; it++)
