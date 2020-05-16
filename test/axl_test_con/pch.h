@@ -19,6 +19,7 @@
 #include "axl_sl_AutoPtrArray.h"
 #include "axl_sl_CmdLineParser.h"
 #include "axl_sl_BoyerMooreFind.h"
+#include "axl_sl_HashTable.h"
 
 #include "axl_io_Socket.h"
 #include "axl_io_Serial.h"
@@ -116,3 +117,5 @@ extern "C" {
 #endif
 
 //..............................................................................
+
+#include <string> // for spy testing

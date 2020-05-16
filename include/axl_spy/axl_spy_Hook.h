@@ -152,7 +152,7 @@ void
 HookLeaveFunc(
 	void* targetFunc,
 	void* callbackParam,
-	size_t frameBase
+	size_t frameBase // if zero, it's an abandoned frame (due to SJLJ/SEH/thread-destruction/etc)
 	);
 
 #if (_AXL_CPP_MSC && _AXL_CPU_AMD64)
@@ -196,7 +196,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// for trampoline-based hooking, we need to adjust targetFunc AFTER injection
+// for trampoline-based hooking, we need to adjust targetFunc AFTER injection,
+// i.e. after a trampoline has been generated
 
 void
 setHookTargetFunc(

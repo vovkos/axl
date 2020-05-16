@@ -8,22 +8,31 @@ namespace axl {
 namespace spy {
 
 thread_local ThreadState g_threadState;
-thread_local bool g_threadStateDestructed = false;
+thread_local bool g_isThreadStateDestructed = false;
 volatile int32_t g_enableCount = 0;
 
 //..............................................................................
 
+ThreadState::~ThreadState()
+{
+	g_isThreadStateDestructed = true;
+	restoreOriginalRets();
+	cleanup(sl::RbTreeIterator<size_t, Frame>());
+}
+
 void
 ThreadState::addFrame(
+	HookCommonContext* context,
 	size_t frameBase,
 	size_t originalRet
 	)
 {
 	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.visit(frameBase);
-	if (it->m_value.m_originalRet)
-		it->m_value.m_chainedRetStack.append(it->m_value.m_originalRet);
+	if (it->m_value.m_ret.m_originalRet)
+		it->m_value.m_chainedRetStack.append(it->m_value.m_ret);
 
-	it->m_value.m_originalRet = originalRet;
+	it->m_value.m_ret.m_context = context;
+	it->m_value.m_ret.m_originalRet = originalRet;
 	cleanup(it);
 }
 
@@ -41,11 +50,11 @@ ThreadState::removeFrame(size_t frameBase)
 		return 0;
 	}
 
-	size_t originalRet = it->m_value.m_originalRet;
+	size_t originalRet = it->m_value.m_ret.m_originalRet;
 	cleanup(it);
 
 	if (!it->m_value.m_chainedRetStack.isEmpty())
-		it->m_value.m_originalRet = it->m_value.m_chainedRetStack.getBackAndPop();
+		it->m_value.m_ret = it->m_value.m_chainedRetStack.getBackAndPop();
 	else
 		m_frameMap.erase(it);
 
@@ -66,22 +75,50 @@ ThreadState::getOriginalRet(size_t frameBase)
 		return 0;
 	}
 
-	return it->m_value.m_originalRet;
+	return it->m_value.m_ret.m_originalRet;
+}
+
+inline
+void
+callHookLeaveFunc(HookCommonContext* context)
+{
+	if (context->m_leaveFunc)
+		context->m_leaveFunc(context->m_targetFunc, context->m_callbackParam, 0);
 }
 
 void
 ThreadState::cleanup(const sl::RbTreeIterator<size_t, Frame>& it)
 {
 	// we may end up with abandoned frames (e.g., due to SEH or longjmp-s)
-	// this loop cleans up all frames *above* the current one
+	// this loop cleans up all frames *above* `it` (or all if `it` is NULL)
 
-	for (;;)
+	while (m_frameMap.getHead() != it)
 	{
-		sl::RbTreeIterator<size_t, Frame> prevIt = it.getPrev();
-		if (!prevIt)
-			break;
+		Frame* frame = &m_frameMap.getHead()->m_value;
 
-		m_frameMap.erase(prevIt);
+		size_t chainedRetCount = frame->m_chainedRetStack.getCount();
+		for (intptr_t i = chainedRetCount - 1; i >= 0; i--)
+			callHookLeaveFunc(frame->m_chainedRetStack[i].m_context);
+
+		callHookLeaveFunc(frame->m_ret.m_context);
+		m_frameMap.erase(m_frameMap.getHead());
+	}
+}
+
+void
+ThreadState::restoreOriginalRets()
+{
+	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.getHead();
+	for (; it; it++)
+	{
+		size_t frameBase = it->getKey();
+		Frame* frame = &it->m_value;
+
+		size_t originalRet = !frame->m_chainedRetStack.isEmpty() ?
+			frame->m_chainedRetStack[0].m_originalRet :
+			frame->m_ret.m_originalRet;
+
+		*((size_t*)frameBase + 1) = originalRet; // return address is one slot below rpb/ebp
 	}
 }
 

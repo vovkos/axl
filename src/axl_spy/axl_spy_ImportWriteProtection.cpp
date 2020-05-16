@@ -32,8 +32,6 @@ disableImportWriteProtection(
 	size_t begin = (size_t)module + iatDir->VirtualAddress;
 	size_t end = begin + iatDir->Size;
 
-	// align just in case
-
 	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
 	begin &= ~(pageSize - 1);
 	end = (end + pageSize - 1) & ~(pageSize - 1);
@@ -129,7 +127,7 @@ disableImportWriteProtection(
 bool
 restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 {
-	if (!backup->m_p) // no need to restore anything
+	if (!backup->m_p) // nothing to restore
 		return true;
 
 	int prot = 0;
@@ -149,14 +147,7 @@ restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 
 #elif (_AXL_OS_DARWIN)
 
-bool
-disableImportWriteProtection(
-	size_t imageIndex,
-	ImportWriteProtectionBackup* backup
-	)
-{
-	return true;
-}
+// the lazy-bind section is unprotected on darwin
 
 bool
 disableImportWriteProtection(
@@ -173,7 +164,7 @@ disableImportWriteProtection(
 	ImportWriteProtectionBackup* backup
 	)
 {
-	return disableImportWriteProtection(moduleIterator.getImageIndex(), backup);
+	return true;
 }
 
 bool

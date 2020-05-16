@@ -4738,6 +4738,19 @@ hookLeave(
 {
 	g_indent--;
 
+	if (!frameBase) // abandoned
+	{
+		printf(
+			"%*sTID %llx: ~%s\n",
+			g_indent * 2,
+			"",
+			sys::getCurrentThreadId(),
+			(char*)callbackParam
+			);
+
+		return;
+	}
+
 	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
 
 	printf(
@@ -4758,7 +4771,10 @@ hookLeave(
 #define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
 
 bool
-spyModule(const spy::ModuleIterator& moduleIt)
+spyModule(
+	sl::SimpleHashTable<void*, bool>* hookSet,
+	const spy::ModuleIterator& moduleIt
+	)
 {
 	sl::String fileName = moduleIt.getModuleFileName();
 	sl::String moduleName = io::getFileName(fileName);
@@ -4806,18 +4822,20 @@ spyModule(const spy::ModuleIterator& moduleIt)
 		void* targetFunc = *slot;
 		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
-		printf("  hooking [%p] %p: %s...\n", slot, targetFunc, functionName.sz());
+		printf("  hooking [%p] %p -> %p: %s...\n", slot, targetFunc, hook, functionName.sz());
 #	endif
 		*slot = hook;
-#else
+#elif (_AXL_OS_LINUX)
+#elif (_AXL_OS_DARWIN)
 		sl::String& functionName = *stringCache->insertTail();
 		sl::String exportModuleFileName = io::getFileName(it.getModuleName());
 		functionName = moduleName + ":" + exportModuleFileName + ":" + it.getSymbolName();
 
-		if (it.getSymbolName().isPrefix("pthread_") &&
-			(it.getSymbolName() == "pthread_key_create" ||
-			it.getSymbolName() == "pthread_get_specific" ||
-			it.getSymbolName() == "pthread_set_specific"))
+		if (it.getSymbolName() == "_strncmp" ||
+			it.getSymbolName().isPrefix("_pthread_") &&
+			(it.getSymbolName() == "_pthread_key_create" ||
+			it.getSymbolName() == "_pthread_getspecific" ||
+			it.getSymbolName() == "_pthread_setspecific"))
 		{
 			printf("  skipping %s for now...\n", functionName.sz());
 			continue;
@@ -4825,12 +4843,36 @@ spyModule(const spy::ModuleIterator& moduleIt)
 
 		void** slot = it.getSlot();
 		size_t slotVmAddr = it.getSlotVmAddr();
+
+		sl::MapIterator<void*, bool> it2 = hookSet->visit(slot);
+		if (it2->m_value)
+		{
+			printf(
+				"  already %16s:%16s [%08llx] %s\n",
+				it.getSegmentName().sz(),
+				it.getSectionName().sz(),
+				slotVmAddr,
+				functionName.sz()
+				);
+			continue;
+		}
+
+		it2->m_value = true;
+
 		void* targetFunc = *slot;
 		spy::Hook* hook = hookArena->allocate(targetFunc, functionName.p(), hookEnter, hookLeave);
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
-		printf("  hooking %16s:%16s [%08llx] %p %s...\n", it.getSegmentName().sz(), it.getSectionName().sz(), slotVmAddr, targetFunc, functionName.sz());
+		printf(
+			"  hooking %16s:%16s [%08llx] %p -> %p %s...\n",
+			it.getSegmentName().sz(),
+			it.getSectionName().sz(),
+			slotVmAddr,
+			targetFunc,
+			hook,
+			functionName.sz()
+			);
 #	endif
-//		*slot = hook;
+		*slot = hook;
 #endif
 	}
 
@@ -4845,15 +4887,20 @@ spyGlobalTest()
 	printf("PID: %d\n", sys::getCurrentProcessId());
 	printf("memcmp: %p\n", (void*)memcmp);
 
+	sl::SimpleHashTable<void*, bool> hookSet;
 	spy::ModuleIterator it = spy::enumerateModules();
 	for (; it; it++)
-		spyModule(it);
+		spyModule(&hookSet, it);
 
 	printf("Hooking done, enabling hooks...\n");
 	spy::enableHooks();
 
 	// for testing, don't use printf as it will mess up the output
 	sl::String dir = io::getCurrentDir();
+
+	std::string* p = new std::string;
+	delete p;
+
 	return 0;
 }
 
@@ -4898,10 +4945,9 @@ fooHookEnter(
 	)
 {
 	printf(
-		"fooHookEnter(func: %p, param: %p, frame: %p)\n",
+		"+foo(func: %p, param: %p):\n",
 		targetFunc,
-		callbackParam,
-		(void*)frameBase
+		callbackParam
 		);
 
 #if (_AXL_CPU_AMD64)
@@ -5003,15 +5049,26 @@ fooHookLeave(
 	size_t frameBase
 	)
 {
+	if (!frameBase) // abandoned
+	{
+		printf("~foo(func: %p, param: %p)\n", targetFunc, callbackParam);
+		return;
+	}
+
 	spy::RegRetBlock* regRetBlock = (spy::RegRetBlock*)(frameBase + spy::FrameOffset_RegRetBlock);
 
+#if (_AXL_CPU_AMD64)
+	int retval = regRetBlock->m_rax;
+#elif (_AXL_CPU_X86)
+	int retval = regRetBlock->m_eax;
+#endif
+
 	printf(
-		"fooHookLeave(func: %p, param: %p, frame: %p, retval: %zd/0x%zx)\n",
+		"-foo(func: %p, param: %p) -> %d\n",
 		targetFunc,
 		callbackParam,
 		(void*)frameBase,
-		regRetBlock->m_rax,
-		regRetBlock->m_rax
+		retval
 		);
 }
 

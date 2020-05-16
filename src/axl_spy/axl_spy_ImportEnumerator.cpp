@@ -521,6 +521,8 @@ ImportIterator::operator ++ ()
 	return *this;
 }
 
+// bind-opcode handling logic is taken from dyldinfo.cpp
+
 bool
 ImportIterator::next()
 {
@@ -537,14 +539,16 @@ ImportIterator::next()
 	do
 	{
 		bool isDone = false;
+		size_t bindOffsetDelta = m_state == State_LazyBind ? 0 : sizeof(void*);
+
 		while (m_p < m_end && !m_slot && !isDone)
 		{
 			uint8_t c = *m_p++;
 			uint8_t op = c & BIND_OPCODE_MASK;
 			uint8_t imm = c & BIND_IMMEDIATE_MASK;
-			uint64_t uleb;
-			uint64_t uleb2;
 			int64_t sleb;
+			uint64_t uleb;
+			uint64_t skip;
 
 			switch (op)
 			{
@@ -593,46 +597,35 @@ ImportIterator::next()
 
 			case BIND_OPCODE_DO_BIND:
 				bind();
-				if (m_state != State_LazyBind)
-					m_segmentOffset += sizeof(void*);
+				m_segmentOffset += bindOffsetDelta;
 				break;
 
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
 				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
 				bind();
-				m_segmentOffset += uleb;
-
-				if (m_state != State_LazyBind)
-					m_segmentOffset += sizeof(void*);
-
+				m_segmentOffset += uleb + bindOffsetDelta;
 				break;
 
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
 				bind();
-				m_segmentOffset += imm * sizeof(void*);
-
-				if (m_state != State_LazyBind)
-					m_segmentOffset += sizeof(void*);
-
+				m_segmentOffset += imm * sizeof(void*) + bindOffsetDelta;
 				break;
 
 			case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
 				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
-				m_p += enc::uleb128(m_p, m_end - m_p, &uleb2);
+				m_p += enc::uleb128(m_p, m_end - m_p, &skip);
+				skip += bindOffsetDelta;
 
 				for (uint64_t i = 0; i < uleb; i++)
 				{
 					bind();
-					m_segmentOffset += uleb2;
-
-					if (m_state != State_LazyBind)
-						m_segmentOffset += sizeof(void*);
+					m_segmentOffset += skip;
 				}
 
 				break;
 
 			default:
-				printf("*** unexpected bind op: 0x%02x\n", op);
+				AXL_TRACE("WARNING: unexpected bind op: 0x%02x\n", op);
 			}
 		}
 
@@ -644,28 +637,24 @@ ImportIterator::next()
 		switch (m_state)
 		{
 		case State_Idle:
-			printf("---> State_Bind\n");
 			m_state = State_Bind;
 			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->bind_off;
 			m_end = m_begin + m_enumeration->m_dyldInfoCmd->bind_size;
 			break;
 
 		case State_Bind:
-			printf("---> State_WeakBind\n");
 			m_state = State_WeakBind;
 			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->weak_bind_off;
 			m_end = m_begin + m_enumeration->m_dyldInfoCmd->weak_bind_size;
 			break;
 
 		case State_WeakBind:
-			printf("---> State_LazyBind\n");
 			m_state = State_LazyBind;
 			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->lazy_bind_off;
 			m_end = m_begin + m_enumeration->m_dyldInfoCmd->lazy_bind_size;
 			break;
 
 		case State_LazyBind:
-			printf("---> State_Done\n");
 			m_state = State_Done;
 			break;
 		}
