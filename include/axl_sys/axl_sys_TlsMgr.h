@@ -41,7 +41,7 @@ protected:
 protected:
 #if (_AXL_OS_WIN)
 	uint_t m_tlsIdx;
-	static bool m_isDead;
+	static bool m_isDestructed;
 #elif (_AXL_OS_POSIX)
 	pthread_key_t m_tlsKey;
 #endif
@@ -50,7 +50,6 @@ protected:
 
 public:
 	TlsMgr();
-
 	~TlsMgr();
 
 	size_t
@@ -87,7 +86,7 @@ protected:
 	Page*
 	findCurrentThreadPage()
 	{
-		return (Page*) ::TlsGetValue(m_tlsIdx);
+		return (Page*)::TlsGetValue(m_tlsIdx);
 	}
 
 	void
@@ -99,7 +98,7 @@ protected:
 	Page*
 	findCurrentThreadPage()
 	{
-		return (Page*) ::pthread_getspecific(m_tlsKey);
+		return (Page*)::pthread_getspecific(m_tlsKey);
 	}
 
 	void
@@ -127,6 +126,55 @@ getTlsMgr()
 	return sl::getSingleton<TlsMgr> ();
 }
 
+//..............................................................................
+
+size_t
+createSimpleTlsSlot();
+
+bool
+deleteSimpleTlsSlot(size_t slot);
+
+#if (_AXL_OS_WIN)
+
+inline
+intptr_t
+getSimpleTlsValue(size_t slot)
+{
+	return (intptr_t)::TlsGetValue(slot);
+}
+
+inline
+bool
+setSimpleTlsValue(
+	size_t slot,
+	intptr_t value
+	)
+{
+	bool_t result = ::TlsSetValue(slot, (void*)value);
+	return err::complete(result);
+}
+
+#else
+
+inline
+intptr_t
+getSimpleTlsValue(size_t slot)
+{
+	return (intptr_t)::pthread_getspecific((pthread_key_t)slot);
+}
+
+inline
+intptr_t
+setSimpleTlsValue(
+	size_t slot,
+	intptr_t value
+	)
+{
+	int result = ::pthread_setspecific((pthread_key_t)slot, (void*)value);
+	return result != 0 ? err::fail(result) : true;
+}
+
+#endif
 //..............................................................................
 
 } // namespace sys

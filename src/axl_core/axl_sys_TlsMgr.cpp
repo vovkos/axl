@@ -19,7 +19,7 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-bool TlsMgr::m_isDead = false;
+bool TlsMgr::m_isDestructed = false;
 
 TlsMgr::TlsMgr()
 {
@@ -37,7 +37,7 @@ TlsMgr::~TlsMgr()
 	}
 
 	::TlsFree(m_tlsIdx);
-	m_isDead = true;
+	m_isDestructed = true;
 }
 
 void
@@ -48,7 +48,7 @@ TlsMgr::tlsCallback(
 	void* reserved
 	)
 {
-	if (reason != DLL_THREAD_DETACH || m_isDead)
+	if (reason != DLL_THREAD_DETACH || m_isDestructed)
 		return;
 
 	TlsMgr* self = getTlsMgr();
@@ -159,6 +159,57 @@ TlsMgr::getCurrentThreadPage()
 }
 
 //..............................................................................
+
+#if (_AXL_OS_WIN)
+
+size_t
+createSimpleTlsSlot()
+{
+	dword_t slot = ::TlsAlloc();
+	if (slot == TLS_OUT_OF_INDEXES)
+	{
+		err::setLastSystemError();
+		return -1;
+	}
+
+	return slot;
+}
+
+bool
+deleteSimpleTlsSlot(size_t slot)
+{
+	bool_t result = ::TlsFree(slot);
+	return err::complete(result);
+}
+
+#else
+
+size_t
+createSimpleTlsSlot()
+{
+	pthread_key_t key;
+	int result = ::pthread_key_create(&key, NULL);
+	if (result != 0)
+	{
+		err::setError(result);
+		return -1;
+	}
+
+	ASSERT(sizeof(key) <= sizeof(size_t));
+	return (size_t)key;
+}
+
+bool
+deleteSimpleTlsSlot(size_t key)
+{
+	int result = ::pthread_key_delete((pthread_key_t)key);
+	return result != 0 ? err::fail(result) : true;
+}
+
+#endif
+
+//..............................................................................
+
 
 } // namespace sys
 } // namespace axl
