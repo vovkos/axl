@@ -4780,7 +4780,7 @@ hookLeave(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define _SPY_TEST_TRACE_HOOKING_MODULE   1
-#define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
+// #define _SPY_TEST_TRACE_HOOKING_FUNCTION 1
 
 bool
 spyModule(const spy::ModuleIterator& moduleIt)
@@ -4869,8 +4869,7 @@ spyModule(const spy::ModuleIterator& moduleIt)
 		sl::String exportModuleName = io::getFileName(it.getModuleName()); // on darwin, it's a full path
 		functionName = moduleName + ":" + exportModuleName + ":" + it.getSymbolName();
 
-		if (it.getSymbolName() == "_strncmp" ||
-			it.getSymbolName().isPrefix("_pthread_") &&
+		if (it.getSymbolName().isPrefix("_pthread_") &&
 			(it.getSymbolName() == "_pthread_key_create" ||
 			it.getSymbolName() == "_pthread_getspecific" ||
 			it.getSymbolName() == "_pthread_setspecific"))
@@ -4883,7 +4882,9 @@ spyModule(const spy::ModuleIterator& moduleIt)
 		bool isUnique = hookSet.addIfNotExists(slotVmAddr, true);
 		if (!isUnique)
 		{
+#	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
 			printf("  already hooked [%08llx] %s\n", slotVmAddr, functionName.sz());
+#	endif
 			continue;
 		}
 
