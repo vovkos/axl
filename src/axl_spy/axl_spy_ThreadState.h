@@ -10,12 +10,7 @@ namespace spy {
 
 //..............................................................................
 
-extern thread_local bool g_isThreadStateDestructed;
-extern volatile int32_t g_enableCount;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class ThreadState
+class ThreadState: public ref::RefCount
 {
 protected:
 	struct Ret
@@ -38,34 +33,9 @@ protected:
 
 protected:
 	sl::RbTree<size_t, Frame> m_frameMap;
-	size_t m_disableCount;
 
 public:
-	ThreadState()
-	{
-		m_disableCount = 0;
-	}
-
 	~ThreadState();
-
-	bool
-	isEnabled()
-	{
-		return sys::atomicLoad(&g_enableCount) > 0 && !g_isThreadStateDestructed && !m_disableCount;
-	}
-
-	bool
-	disable()
-	{
-		return ++m_disableCount == 1;
-	}
-
-	bool
-	enable()
-	{
-		ASSERT(m_disableCount);
-		return --m_disableCount == 0;
-	}
 
 	void
 	addFrame(
@@ -90,7 +60,11 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-extern thread_local ThreadState g_threadState;
+bool
+areHooksEnabled();
+
+ThreadState*
+getCurrentThreadState(bool createIfNotExists = true);
 
 //..............................................................................
 

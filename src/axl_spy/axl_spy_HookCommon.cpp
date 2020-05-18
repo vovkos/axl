@@ -14,10 +14,12 @@ hookEnterCommon(
 	size_t originalRet
 	)
 {
-	if (!g_threadState.isEnabled())
+	if (!areHooksEnabled())
 		return HookAction_JumpTarget;
 
-	g_threadState.disable();
+	disableCurrentThreadHooks();
+
+	ThreadState* threadState = getCurrentThreadState();
 
 	HookAction action = context->m_enterFunc ?
 		action = context->m_enterFunc(context->m_targetFunc, context->m_callbackParam, frameBase) :
@@ -27,9 +29,9 @@ hookEnterCommon(
 		action = HookAction_JumpTarget;
 
 	if (action == HookAction_Default)
-		g_threadState.addFrame(context, frameBase, originalRet);
+		threadState->addFrame(context, frameBase, originalRet);
 
-	g_threadState.enable();
+	enableCurrentThreadHooks();
 	return action;
 }
 
@@ -39,12 +41,12 @@ hookLeaveCommon(
 	size_t frameBase
 	)
 {
-	ASSERT(context->m_leaveFunc && !g_isThreadStateDestructed);
-
-	g_threadState.disable();
+	disableCurrentThreadHooks();
+	ThreadState* threadState = getCurrentThreadState(false);
+	ASSERT(threadState && context->m_leaveFunc);
 	context->m_leaveFunc(context->m_targetFunc, context->m_callbackParam, frameBase);
-	size_t originalRet = g_threadState.removeFrame(frameBase);
-	g_threadState.enable();
+	size_t originalRet = threadState->removeFrame(frameBase);
+	enableCurrentThreadHooks();
 	return originalRet;
 }
 

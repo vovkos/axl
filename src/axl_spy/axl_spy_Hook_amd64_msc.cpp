@@ -218,12 +218,16 @@ dispatchException(
 		dispatcherContext.HistoryTable = NULL;
 		dispatcherContext.ScopeIndex = 0;
 
+		enableCurrentThreadHooks(); // exception routine might unwind and never return
+
 		EXCEPTION_DISPOSITION disposition = exceptionRoutine(
 			exceptionRecord,
 			(void*)establisherFrame,
 			exceptionContext,
 			&dispatcherContext
 			);
+
+		disableCurrentThreadHooks();
 
 		switch (disposition)
 		{
@@ -282,12 +286,15 @@ hookException(
 	PLH_DISPATCHER_CONTEXT* dispatcherContext
 	)
 {
-	bool wasEnabled = g_threadState.disable();
+	disableCurrentThreadHooks();
+
+	ThreadState* threadState = getCurrentThreadState(false);
+	ASSERT(threadState);
 
 	Hook* hook = CONTAINING_RECORD(dispatcherContext->HandlerData, Hook, m_exceptionHandlerParamPadding);
 	uint64_t rbp = establisherFrame - 2 * 8;
 
-	if (wasEnabled && hook->m_exceptionFunc)
+	if (hook->m_exceptionFunc)
 		hook->m_exceptionFunc(
 			hook->m_commonContext.m_targetFunc,
 			hook->m_commonContext.m_callbackParam,
@@ -296,9 +303,9 @@ hookException(
 			contextRecord
 			);
 
-	uint64_t originalRet = g_threadState.getOriginalRet(rbp);
+	uint64_t originalRet = threadState->getOriginalRet(rbp);
 	if (!originalRet)
-		return -1; // not need to enable, we are about to crash and burn
+		return -1; // no need to enable, we are about to crash and burn
 
 	bool result = dispatchException(
 		exceptionRecord,
@@ -307,7 +314,7 @@ hookException(
 		establisherFrame
 		);
 
-	g_threadState.enable();
+	enableCurrentThreadHooks();
 	return result ? 0 : originalRet; // returning NULL means ExceptionContinueExecution
 }
 

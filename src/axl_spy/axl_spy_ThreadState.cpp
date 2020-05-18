@@ -3,19 +3,112 @@
 #include "axl_sl_CallOnce.h"
 #include "axl_g_Module.h"
 #include "axl_ref_New.h"
+#include "axl_sys_TlsMgr.h"
 
 namespace axl {
 namespace spy {
 
-thread_local ThreadState g_threadState;
-thread_local bool g_isThreadStateDestructed = false;
-volatile int32_t g_enableCount = 0;
+//..............................................................................
+
+static volatile int32_t g_enableCount = 0;
+static size_t g_threadDisableCountSlot = -1;
+static size_t g_threadStateSlot = -1;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class HookFinalizer:
+	public ref::RefCount,
+	public g::Finalizer
+{
+public:
+	virtual
+	void
+	finalize()
+	{
+		g_enableCount = INT_MIN / 2; // compensate for possible unbalanced enable calls
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+void
+initializeHooks(int)
+{
+	g_threadDisableCountSlot = sys::createSimpleTlsSlot();
+	g_threadStateSlot = sys::getTlsMgr()->createSlot();
+	g::getModule()->addFinalizer(AXL_REF_NEW(HookFinalizer));
+}
+
+size_t
+getCurrentThreadDisableCount()
+{
+	ASSERT(g_threadDisableCountSlot != -1);
+	return sys::getSimpleTlsValue(g_threadDisableCountSlot);
+}
+
+bool
+areHooksEnabled()
+{
+	return
+		sys::atomicLoad(&g_enableCount) > 0 &&
+		getCurrentThreadDisableCount() == 0;
+}
+
+void
+enableHooks()
+{
+	sl::callOnce(initializeHooks, 0);
+	sys::atomicInc(&g_enableCount);
+}
+
+void
+disableHooks()
+{
+	sys::atomicDec(&g_enableCount);
+}
+
+inline
+void
+incrementCurrentThreadDisableCount(intptr_t delta)
+{
+	ASSERT(g_threadDisableCountSlot != -1);
+	size_t count = sys::getSimpleTlsValue(g_threadDisableCountSlot);
+	sys::setSimpleTlsValue(g_threadDisableCountSlot, count + delta);
+}
+
+void
+disableCurrentThreadHooks()
+{
+	incrementCurrentThreadDisableCount(1);
+}
+
+void
+enableCurrentThreadHooks()
+{
+	incrementCurrentThreadDisableCount(-1);
+}
+
+ThreadState*
+getCurrentThreadState(bool createIfNotExists)
+{
+	ASSERT(g_threadStateSlot != -1);
+	ASSERT(getCurrentThreadDisableCount());
+
+	sys::TlsMgr* tlsMgr = sys::getTlsMgr();
+	sys::TlsValue currentState = tlsMgr->getSlotValue(g_threadStateSlot);
+	if (currentState || !createIfNotExists)
+		return (ThreadState*)currentState.p();
+
+	ref::Ptr<ThreadState> newState = AXL_REF_NEW(ThreadState);
+	tlsMgr->setSlotValue(g_threadStateSlot, newState);
+	return newState;
+}
 
 //..............................................................................
 
 ThreadState::~ThreadState()
 {
-	g_isThreadStateDestructed = true;
 	restoreOriginalRets();
 	cleanup(sl::RbTreeIterator<size_t, Frame>());
 }
@@ -120,52 +213,6 @@ ThreadState::restoreOriginalRets()
 
 		*((size_t*)frameBase + 1) = originalRet; // return address is one slot below rpb/ebp
 	}
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class HookFinalizer:
-	public ref::RefCount,
-	public g::Finalizer
-{
-public:
-	virtual
-	void
-	finalize()
-	{
-		g_enableCount = INT_MIN / 2; // compensate for possible unbalnaced enable calls
-	}
-};
-
-void
-addHookFinalizer(int)
-{
-	g::getModule()->addFinalizer(AXL_REF_NEW(HookFinalizer));
-}
-
-void
-enableHooks()
-{
-	sl::callOnce(addHookFinalizer, 0);
-	sys::atomicInc(&g_enableCount);
-}
-
-void
-disableHooks()
-{
-	sys::atomicDec(&g_enableCount);
-}
-
-void
-disableCurrentThreadHooks()
-{
-	g_threadState.disable();
-}
-
-void
-enableCurrentThreadHooks()
-{
-	g_threadState.enable();
 }
 
 //..............................................................................

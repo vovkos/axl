@@ -4707,7 +4707,17 @@ testPty(const sl::StringRef& cmdLine)
 
 //..............................................................................
 
-thread_local int g_indent = 0;
+size_t g_indentSlot;
+
+size_t
+incrementIndent(intptr_t delta)
+{
+	size_t indent = sys::getSimpleTlsValue(g_indentSlot);
+	sys::setSimpleTlsValue(g_indentSlot, indent + delta);
+	return indent;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 spy::HookAction
 hookEnter(
@@ -4716,16 +4726,18 @@ hookEnter(
 	size_t frameBase
 	)
 {
+	size_t indent = incrementIndent(1);
+
 	printf(
 		"%*sTID %llx: sp: %p +%s\n",
-		g_indent * 2,
+		indent * 2,
 		"",
 		sys::getCurrentThreadId(),
 		(void*)frameBase,
 		(char*)callbackParam
 		);
 
-	g_indent++;
+
 	return spy::HookAction_Default;
 }
 
@@ -4736,13 +4748,13 @@ hookLeave(
 	size_t frameBase
 	)
 {
-	g_indent--;
+	size_t indent = incrementIndent(-1) - 1;
 
 	if (!frameBase) // abandoned
 	{
 		printf(
 			"%*sTID %llx: ~%s\n",
-			g_indent * 2,
+			indent * 2,
 			"",
 			sys::getCurrentThreadId(),
 			(char*)callbackParam
@@ -4755,7 +4767,7 @@ hookLeave(
 
 	printf(
 		"%*sTID %llx: sp: %p -%s -> %zd/0x%zx\n",
-		g_indent * 2,
+		indent * 2,
 		"",
 		sys::getCurrentThreadId(),
 		(void*)frameBase,
@@ -4902,6 +4914,8 @@ int
 spyGlobalTest()
 {
 	printf("PID: %d\n", sys::getCurrentProcessId());
+
+	g_indentSlot = sys::createSimpleTlsSlot();
 
 	spy::ModuleIterator it = spy::enumerateModules();
 	for (; it; it++)
