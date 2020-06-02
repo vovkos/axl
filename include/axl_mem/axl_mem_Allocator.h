@@ -212,8 +212,8 @@ typedef TrackingFree<DirectAllocator>      StdFree;
 
 #else
 
-typedef DirectAllocator            StdAllocator;
-typedef ZeroAllocator              StdZeroAllocator;
+typedef DirectAllocator           StdAllocator;
+typedef ZeroAllocator             StdZeroAllocator;
 typedef Allocate<DirectAllocator> StdAllocate;
 typedef Allocate<ZeroAllocator>   StdZeroAllocate;
 typedef Free<DirectAllocator>     StdFree;

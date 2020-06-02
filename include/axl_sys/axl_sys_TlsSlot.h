@@ -60,6 +60,13 @@ public:
 	{
 		return (T*)getTlsMgr()->setSlotValue(m_slot, sys::TlsValue(p, NULL)).p();
 	}
+
+	ref::Ptr<T>
+	setValue(const ref::Ptr<T>& ptr)
+	{
+		TlsValue prev = getTlsMgr()->setSlotValue(m_slot, ptr);
+		return ref::Ptr<T>((T*)prev.p(), prev.getRefCount());
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -78,6 +85,13 @@ T*
 setTlsPtrSlotValue(T* p)
 {
 	return sl::getSimpleSingleton<TlsPtrSlot<T> > ()->setValue(p);
+}
+
+template <typename T>
+ref::Ptr<T>
+setTlsPtrSlotValue(const ref::Ptr<T>& ptr)
+{
+	return sl::getSimpleSingleton<TlsPtrSlot<T> > ()->setValue(ptr);
 }
 
 //..............................................................................
