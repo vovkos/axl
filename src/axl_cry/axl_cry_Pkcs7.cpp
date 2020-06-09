@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_cry_X509.h"
+#include "axl_cry_Pkcs7.h"
 #include "axl_cry_Bio.h"
 #include "axl_cry_CryptoError.h"
 
@@ -20,13 +20,13 @@ namespace cry {
 //..............................................................................
 
 size_t
-saveX509_der(
+savePkcs7_der(
 	sl::Array<char>* buffer,
-	const X509* cert
+	const PKCS7* msg
 	)
 {
 	uchar_t* p = NULL;
-	int length = i2d_X509((X509*)cert, &p);
+	int length = i2d_PKCS7((PKCS7*)msg, &p);
 	if (length <= 0)
 	{
 		cry::setLastCryptoError();
@@ -40,43 +40,43 @@ saveX509_der(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-X509*
-loadX509_der(
+PKCS7*
+loadPkcs7_der(
 	const void* p0,
 	size_t size
 	)
 {
 	const uchar_t* p = (uchar_t*)p0;
-	X509* cert = X509_new();
-	X509* result = d2i_X509(&cert, &p, size);
+	PKCS7* msg = PKCS7_new();
+	PKCS7* result = d2i_PKCS7(&msg, &p, size);
 	if (!result)
 	{
-		ASSERT(cert == NULL); // should have been freed already
+		ASSERT(msg == NULL); // should have been freed already
 		cry::setLastCryptoError();
 		return NULL;
 	}
 
-	return cert;
+	return msg;
 }
 
 //..............................................................................
 
 size_t
-saveX509_pem(
+savePkcs7_pem(
 	sl::String* string,
-	const X509* cert
+	const PKCS7* msg
 	)
 {
 	Bio bio;
 	bio.createMem();
-	PEM_write_bio_X509(bio, (X509*)cert);
+	PEM_write_bio_PKCS7(bio, (PKCS7*)msg);
 
 	BUF_MEM* mem = bio.getBufMem();
 	return string->copy(mem->data, mem->length);
 }
 
-X509*
-loadX509_pem(
+PKCS7*
+loadPkcs7_pem(
 	const void* p,
 	size_t size
 	)
@@ -84,16 +84,16 @@ loadX509_pem(
 	Bio bio;
 	bio.createMemBuf(p, size);
 
-	X509* cert = X509_new();
-	X509* result = PEM_read_bio_X509(bio, &cert, NULL, NULL);
+	PKCS7* msg = PKCS7_new();
+	PKCS7* result = PEM_read_bio_PKCS7(bio, &msg, NULL, NULL);
 	if (!result)
 	{
-		ASSERT(cert == NULL); // should have been freed already
+		ASSERT(msg == NULL); // should have been freed already
 		cry::setLastCryptoError();
 		return NULL;
 	}
 
-	return cert;
+	return msg;
 }
 //..............................................................................
 

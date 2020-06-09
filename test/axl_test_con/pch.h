@@ -60,12 +60,16 @@
 #	include "axl_io_Pcap.h"
 #endif
 
-#ifdef _AXL_IO_SSL
+#ifdef _AXL_CRY
 #	include "axl_cry_BigNum.h"
 #	include "axl_cry_Bio.h"
 #	include "axl_cry_Asn1.h"
 #	include "axl_cry_X509.h"
+#	include "axl_cry_Pkcs7.h"
 #	include "axl_cry_CryptoError.h"
+#endif
+
+#ifdef _AXL_IO_SSL
 #	include "axl_io_SslCtx.h"
 #	include "axl_io_Ssl.h"
 #endif
