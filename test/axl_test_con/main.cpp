@@ -5226,17 +5226,317 @@ spyStdcallTest()
 
 //..............................................................................
 
-#if (_AXL_OS_DARWIN)
+struct AppReceipt
+{
+	sl::String m_bundleId;
+	sl::String m_appVersion;
+	sl::String m_originalAppVersion;
+	sl::String m_receiptCreationDate;
+	sl::String m_receiptExpirationDate;
+	sl::Array<char> m_opaque;
+	sl::Array<char> m_sha1Hash;
+
+	void
+	clear();
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+AppReceipt::clear()
+{
+	m_bundleId.clear();
+	m_appVersion.clear();
+	m_originalAppVersion.clear();
+	m_opaque.clear();
+	m_sha1Hash.clear();
+}
+
+//..............................................................................
+
+class AppReceiptParser
+{
+protected:
+	enum State
+	{
+		State_Idle = 0,
+		State_Receipt,
+		State_Attribute,
+		State_AttributeType,
+		State_AttributeVersion,
+		State_AttributeValue,
+		State_AttributeStringValue,
+	};
+
+	enum AttributeId
+	{
+		AttributeId_Undefined             = 0,
+		AttributeId_BundleId              = 2,
+		AttributeId_AppVersion            = 3,
+		AttributeId_Opaque                = 4,
+		AttributeId_Sha1Hash              = 5,
+		AttributeId_ReceiptCreationDate   = 12,
+		AttributeId_OriginalAppVersion    = 19,
+		AttributeId_ReceiptExpirationDate = 21,
+	};
+
+	AppReceipt* m_receipt;
+	AttributeId m_attributeId;
+	sl::String* m_attributeString;
+
+public:
+	AppReceiptParser();
+
+	bool
+	parse(
+		AppReceipt* receipt,
+		const void* p,
+		size_t size
+		);
+
+protected:
+	const char*
+	decode(
+		State state,
+		int expectedTag,
+		const char* unexpectedTagError,
+		const char* p,
+		size_t size
+		);
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+AppReceiptParser::AppReceiptParser()
+{
+	m_receipt = NULL;
+	m_attributeId = AttributeId_Undefined;
+	m_attributeString = NULL;
+}
+
+bool
+AppReceiptParser::parse(
+	AppReceipt* receipt,
+	const void* p,
+	size_t size
+	)
+{
+	m_receipt = receipt;
+	m_attributeId = AttributeId_Undefined;
+	m_attributeString = NULL;
+
+	return decode(
+		State_Receipt,
+		V_ASN1_SET,
+		"invalid app receipt (expected ASN1 SET)",
+		(char*)p,
+		size
+		) != NULL;
+}
+
+const char*
+AppReceiptParser::decode(
+	State state,
+	int expectedTag,
+	const char* unexpectedTagError,
+	const char* p,
+	size_t size
+	)
+{
+	long length;
+	int tag;
+	int cls;
+
+	int retCode = ASN1_get_object((const uchar_t**)&p, &length, &tag, &cls, size);
+	if (retCode & 0x80)
+	{
+		cry::setLastCryptoError();
+		return NULL;
+	}
+
+	if (tag != expectedTag)
+	{
+		err::setError(unexpectedTagError);
+		return NULL;
+	}
+
+	const char* end = p + length;
+
+	switch (state)
+	{
+	case State_Receipt:
+		while (p < end)
+		{
+			p = decode(
+				State_Attribute,
+				V_ASN1_SEQUENCE,
+				"invalid app receipt attribute (expected ASN1 SEQUENCE)",
+				p,
+				end - p
+				);
+
+			if (!p)
+				return NULL;
+		}
+
+		break;
+
+	case State_Attribute:
+		m_attributeId = AttributeId_Undefined;
+		m_attributeString = NULL;
+
+		p = decode(
+			State_AttributeType,
+			V_ASN1_INTEGER,
+			"invalid app receipt attribute type (expected ASN1 INTEGER)",
+			p,
+			end - p
+			);
+
+		if (!p)
+			return NULL;
+
+		p = decode(
+			State_AttributeVersion,
+			V_ASN1_INTEGER,
+			"invalid app receipt attribute version (expected ASN1 INTEGER)",
+			p,
+			end - p
+			);
+
+		if (!p)
+			return NULL;
+
+		p = decode(
+			State_AttributeValue,
+			V_ASN1_OCTET_STRING,
+			"invalid app receipt attribute value (expected ASN1 OCTET STRING)",
+			p,
+			end - p
+			);
+
+		if (!p)
+			return NULL;
+
+		break;
+
+	case State_AttributeType:
+		memcpy(&m_attributeId, p, AXL_MIN(length, sizeof(m_attributeId)));
+		break;
+
+	case State_AttributeVersion:
+		break; // ignore
+
+	case State_AttributeValue:
+		switch (m_attributeId)
+		{
+		case AttributeId_BundleId:
+			m_attributeString = &m_receipt->m_bundleId;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_UTF8STRING,
+				"invalid app receipt bundle ID (expected ASN1 UTF8 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_AppVersion:
+			m_attributeString = &m_receipt->m_appVersion;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_UTF8STRING,
+				"invalid app receipt version (expected ASN1 UTF8 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_ReceiptCreationDate:
+			m_attributeString = &m_receipt->m_receiptCreationDate;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_IA5STRING,
+				"invalid app receipt creation date (expected ASN1 IA5 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_OriginalAppVersion:
+			m_attributeString = &m_receipt->m_originalAppVersion;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_UTF8STRING,
+				"invalid app receipt original version (expected ASN1 UTF8 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_ReceiptExpirationDate:
+			m_attributeString = &m_receipt->m_receiptExpirationDate;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_IA5STRING,
+				"invalid app receipt expiration date (expected ASN1 IA5 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_Opaque:
+			m_receipt->m_opaque.copy(p, length);
+			break;
+
+		case AttributeId_Sha1Hash:
+			m_receipt->m_sha1Hash.copy(p, length);
+			break;
+		}
+
+		if (!p)
+			return NULL;
+
+		break;
+
+	case State_AttributeStringValue:
+		ASSERT(m_attributeString);
+		m_attributeString->copy(p, length);
+		break;
+
+	default:
+		ASSERT(false);
+	}
+
+	return end;
+}
+
+//..............................................................................
 
 int
 receiptTest()
 {
+	OpenSSL_add_all_algorithms();
 	cry::registerCryptoErrorProviders();
 
 	bool result;
 	int retCode;
 
+#if (_AXL_OS_WIN)
+	const char* filePath = "C:/Projects/playground/receipt/xcode-receipt";
+#elif (_AXL_OS_DARWIN)
 	const char* filePath = "/Users/vladimir/Projects/playground/receipt/xcode-receipt";
+#endif
 
 	io::SimpleMappedFile file;
 	result = file.open(filePath, io::FileFlag_ReadOnly);
@@ -5257,7 +5557,7 @@ receiptTest()
 
 	printf("Receipt type: %s\n", cry::getAsn1ObjectString(p7->type).sz());
 
-	const char appleCertPem[] =
+	static const char appleRootCertPem[] =
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIIEuzCCA6OgAwIBAgIBAjANBgkqhkiG9w0BAQUFADBiMQswCQYDVQQGEwJVUzET\n"
 		"MBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBwbGUgQ2VydGlmaWNhdGlv\n"
@@ -5287,15 +5587,9 @@ receiptTest()
 		"UKqK1drk/NAJBzewdXUh\n"
 		"-----END CERTIFICATE-----\n";
 
-	cry::X509Handle appleCert = cry::loadX509_pem(appleCertPem);
-
+	cry::X509Handle appleRootCert = cry::loadX509_pem(appleRootCertPem);
 	cry::X509StoreHandle store = X509_STORE_new();
-	retCode = X509_STORE_add_cert(store, appleCert);
-	if (!retCode)
-	{
-		cry::setLastCryptoError();
-		printf("add cert error: %s\n", err::getLastErrorDescription().sz());
-	}
+	X509_STORE_add_cert(store, appleRootCert);
 
 	cry::Bio bio;
 	bio.createMem();
@@ -5304,14 +5598,43 @@ receiptTest()
 	{
 		cry::setLastCryptoError();
 		printf("verify error: %s\n", err::getLastErrorDescription().sz());
+		return -1;
 	}
 
+	BUF_MEM* bufMem = bio.getBufMem();
 
+	AppReceipt receipt;
+	AppReceiptParser parser;
+	result = parser.parse(&receipt, bufMem->data, bufMem->length);
+	if (!result)
+	{
+		printf("parse error: %s\n", err::getLastErrorDescription().sz());
+		return -1;
+	}
+
+	printf(
+		"RECEIPT:\n"
+		"  bundle ID:               %s\n"
+		"  app version:             %s\n"
+		"  original app version:    %s\n"
+		"  receipt creation date:   %s\n"
+		"  receipt expiration date: %s\n"
+		"  ------------------------\n"
+		"  SHA1 hash: %s\n"
+		"  opaque:    %s\n",
+		receipt.m_bundleId.sz(),
+		receipt.m_appVersion.sz(),
+		receipt.m_originalAppVersion.sz(),
+		receipt.m_receiptCreationDate.sz(),
+		receipt.m_receiptExpirationDate.sz(),
+		enc::HexEncoding::encode(receipt.m_sha1Hash, receipt.m_sha1Hash.getCount()).sz(),
+		enc::HexEncoding::encode(receipt.m_opaque, receipt.m_opaque.getCount()).sz()
+		);
 
 	return 0;
 }
 
-#endif
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 int
@@ -5341,9 +5664,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_OS_DARWIN)
 	receiptTest();
-#endif
 
 	return 0;
 }
