@@ -5238,7 +5238,6 @@ receiptTest()
 	cry::registerCryptoErrorProviders();
 
 	bool result;
-	int retCode;
 
 #if (_AXL_OS_WIN)
 	const char* filePath = "C:/Projects/playground/receipt/xcode-receipt";
@@ -5259,7 +5258,7 @@ receiptTest()
 #if (_AXL_OS_DARWIN)
 	uint_t flags = 0;
 #else
-	uint_t flags = cry::VerifyAppReceiptFlag_SkipHashCheck;
+	uint_t flags = cry::VerifyAppStoreReceiptFlag_SkipHashCheck;
 #endif
 
 	cry::AppStoreReceipt receipt;
