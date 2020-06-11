@@ -18,12 +18,14 @@ set(
 	${AXL_INC_DIR}/axl_iok/axl_iok_Object.h
 	${AXL_INC_DIR}/axl_iok/axl_iok_Iterator.h
 	${AXL_INC_DIR}/axl_iok/axl_iok_RegistryEntry.h
+	${AXL_INC_DIR}/axl_iok/axl_iok_ComputerGuid.h
 	)
 
 set(
 	LIB_CPP_LIST
 	axl_iok_Iterator.cpp
 	axl_iok_RegistryEntry.cpp
+	axl_iok_ComputerGuid.cpp
 	)
 
 source_group(
