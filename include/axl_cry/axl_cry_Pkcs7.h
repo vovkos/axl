@@ -32,82 +32,73 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef sl::Handle<PKCS7*, FreePkcs7> Pkcs7Handle;
-
-//..............................................................................
-
-// DER-encoding
-
-size_t
-savePkcs7_der(
-	sl::Array<char>* buffer,
-	const PKCS7* msg
-	);
-
-inline
-sl::Array<char>
-savePkcs7_der(const PKCS7* msg)
+class Pkcs7: public sl::Handle<PKCS7*, FreePkcs7>
 {
-	sl::Array<char> buffer;
-	savePkcs7_der(&buffer, msg);
-	return buffer;
-}
+public:
+	Pkcs7()
+	{
+	}
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+	Pkcs7(PKCS7* src)
+	{
+		attach(src);
+	}
 
-PKCS7*
-loadPkcs7_der(
-	const void* p,
-	size_t size
-	);
+	bool
+	create();
 
-inline
-PKCS7*
-loadPkcs7_der(const sl::ArrayRef<char>& buffer)
-{
-	return loadPkcs7_der(buffer.cp(), buffer.getCount());
-}
+	bool
+	loadDer(
+		const void* p,
+		size_t size
+		);
 
-//..............................................................................
+	size_t
+	saveDer(sl::Array<char>* buffer) const;
 
-// PEM-encoding
+	inline
+	sl::Array<char>
+	saveDer() const
+	{
+		sl::Array<char> buffer;
+		saveDer(&buffer);
+		return buffer;
+	}
 
-size_t
-savePkcs7_pem(
-	sl::String* string,
-	const PKCS7* msg
-	);
+	bool
+	loadPem(
+		const void* p,
+		size_t size
+		);
 
-inline
-sl::String
-savePkcs7_pem(const PKCS7* msg)
-{
-	sl::String string;
-	savePkcs7_pem(&string, msg);
-	return string;
-}
+	inline
+	bool
+	loadPem(const sl::StringRef& string)
+	{
+		return loadPem(string.cp(), string.getLength());
+	}
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+	size_t
+	savePem(sl::String* string) const;
 
-PKCS7*
-loadPkcs7_pem(
-	const void* p,
-	size_t size
-	);
+	inline
+	sl::String
+	savePem()
+	{
+		sl::String string;
+		savePem(&string);
+		return string;
+	}
 
-inline
-PKCS7*
-loadPkcs7_pem(const sl::ArrayRef<char>& buffer)
-{
-	return loadPkcs7_pem(buffer.cp(), buffer.getCount());
-}
-
-inline
-PKCS7*
-loadPkcs7_pem(const sl::StringRef& string)
-{
-	return loadPkcs7_pem(string.cp(), string.getLength());
-}
+	bool
+	verify(
+		STACK_OF(X509)* certStack,
+		X509_STORE* store,
+		BIO* inData,
+		BIO* outData,
+		int flags = 0
+		);
+};
 
 //..............................................................................
 
