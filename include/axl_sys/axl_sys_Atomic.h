@@ -187,13 +187,6 @@ atomicLoad(volatile int64_t* p)
 
 inline
 size_t
-atomicLoad(volatile size_t* p)
-{
-	return *p;
-}
-
-inline
-size_t
 atomicXchg(
 	volatile size_t* p,
 	size_t value
