@@ -71,7 +71,7 @@ struct RegArgBlock
 
 struct RegRetBlock
 {
-	uint32_t m_rax;
+	uint32_t m_eax;
 };
 
 #endif

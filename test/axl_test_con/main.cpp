@@ -4778,8 +4778,13 @@ hookLeave(
 		sys::getCurrentThreadId(),
 		(void*)frameBase,
 		(char*)callbackParam,
+#if (_AXL_CPU_AMD64)
 		regRetBlock->m_rax,
 		regRetBlock->m_rax
+#elif (_AXL_CPU_X86)
+		regRetBlock->m_eax,
+		regRetBlock->m_eax
+#endif
 		);
 }
 
@@ -5200,8 +5205,13 @@ fooHookLeave(
 		targetFunc,
 		callbackParam,
 		(void*)frameBase,
+#if (_AXL_CPU_AMD64)
 		regRetBlock->m_rax,
 		regRetBlock->m_rax
+#elif (_AXL_CPU_X86)
+		regRetBlock->m_eax,
+		regRetBlock->m_eax
+#endif
 		);
 }
 
