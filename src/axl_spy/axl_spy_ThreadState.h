@@ -1,9 +1,6 @@
 ﻿#pragma once
 
 #include "axl_spy_HookCommon.h"
-#include "axl_sl_RbTree.h"
-#include "axl_sl_Array.h"
-#include "axl_sys_Atomic.h"
 
 namespace axl {
 namespace spy {
@@ -51,11 +48,18 @@ public:
 	getOriginalRet(size_t frameBase);
 
 protected:
-	void
-	cleanup(const sl::RbTreeIterator<size_t, Frame>& it);
+	sl::RbTreeIterator<size_t, Frame>
+	findFrame(size_t frameBase)
+	{
+	#if (!_AXL_CPU_X86)
+		return m_frameMap.find(frameBase);
+	#else // allowance for stdcall ret <n>
+		return m_frameMap.find(frameBase, sl::BinTreeFindRelOp_Le);
+	#endif
+	}
 
 	void
-	restoreOriginalRets();
+	cleanup(const sl::RbTreeIterator<size_t, Frame>& it);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

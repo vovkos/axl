@@ -25,11 +25,11 @@ hookEnterCommon(
 		action = context->m_enterFunc(context->m_targetFunc, context->m_callbackParam, frameBase) :
 		HookAction_Default;
 
-	if (!context->m_leaveFunc)
-		action = HookAction_JumpTarget;
-
 	if (action == HookAction_Default)
-		threadState->addFrame(context, frameBase, originalRet);
+		if (!context->m_leaveFunc)
+			action = HookAction_JumpTarget;
+		else
+			threadState->addFrame(context, frameBase, originalRet);
 
 	enableCurrentThreadHooks();
 	return action;
@@ -43,7 +43,9 @@ hookLeaveCommon(
 {
 	disableCurrentThreadHooks();
 	ThreadState* threadState = getCurrentThreadState(false);
-	ASSERT(threadState && context->m_leaveFunc);
+	ASSERT(threadState && "missing thread-state in leave-hook");
+	ASSERT(context->m_leaveFunc && "missing user leave-hook func");
+
 	context->m_leaveFunc(context->m_targetFunc, context->m_callbackParam, frameBase);
 	size_t originalRet = threadState->removeFrame(frameBase);
 	enableCurrentThreadHooks();

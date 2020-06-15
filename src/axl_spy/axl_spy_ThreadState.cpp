@@ -1,16 +1,12 @@
 ﻿#include "pch.h"
 #include "axl_spy_ThreadState.h"
-#include "axl_sl_CallOnce.h"
-#include "axl_g_Module.h"
-#include "axl_ref_New.h"
-#include "axl_sys_TlsMgr.h"
 
 namespace axl {
 namespace spy {
 
 //..............................................................................
 
-static volatile int32_t g_enableCount = 0;
+static volatile int32_t g_enableCount;
 static size_t g_threadDisableCountSlot = -1;
 static size_t g_threadStateSlot = -1;
 
@@ -31,7 +27,6 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-
 void
 initializeHooks(int)
 {
@@ -43,7 +38,6 @@ initializeHooks(int)
 size_t
 getCurrentThreadDisableCount()
 {
-	ASSERT(g_threadDisableCountSlot != -1);
 	return sys::getSimpleTlsValue(g_threadDisableCountSlot);
 }
 
@@ -72,7 +66,6 @@ inline
 void
 incrementCurrentThreadDisableCount(intptr_t delta)
 {
-	ASSERT(g_threadDisableCountSlot != -1);
 	size_t count = sys::getSimpleTlsValue(g_threadDisableCountSlot);
 	sys::setSimpleTlsValue(g_threadDisableCountSlot, count + delta);
 }
@@ -92,8 +85,7 @@ enableCurrentThreadHooks()
 ThreadState*
 getCurrentThreadState(bool createIfNotExists)
 {
-	ASSERT(g_threadStateSlot != -1);
-	ASSERT(getCurrentThreadDisableCount());
+	ASSERT(getCurrentThreadDisableCount() && "thread hooks are not disabled (should be)");
 
 	sys::TlsMgr* tlsMgr = sys::getTlsMgr();
 	sys::TlsValue currentState = tlsMgr->getSlotValue(g_threadStateSlot);
@@ -109,8 +101,8 @@ getCurrentThreadState(bool createIfNotExists)
 
 ThreadState::~ThreadState()
 {
-	restoreOriginalRets();
 	cleanup(sl::RbTreeIterator<size_t, Frame>());
+	sys::setSimpleTlsValue(g_threadDisableCountSlot, INT_MAX); // compensate for possibly unbalanced enable calls
 }
 
 void
@@ -132,11 +124,7 @@ ThreadState::addFrame(
 size_t
 ThreadState::removeFrame(size_t frameBase)
 {
-#if (_AXL_CPU_X86) // allowance for stdcall ret <n>
-	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase, sl::BinTreeFindRelOp_Le);
-#else
-	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase);
-#endif
+	sl::RbTreeIterator<size_t, Frame> it = findFrame(frameBase);
 	if (!it)
 	{
 		ASSERT(false && "protolesshooks: FATAL ERROR: return address not found");
@@ -157,11 +145,7 @@ ThreadState::removeFrame(size_t frameBase)
 size_t
 ThreadState::getOriginalRet(size_t frameBase)
 {
-#if (_AXL_CPU_X86) // allowance for stdcall ret <n>
-	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase, sl::BinTreeFindRelOp_Le);
-#else
-	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.find(frameBase);
-#endif
+	sl::RbTreeIterator<size_t, Frame> it = findFrame(frameBase);
 	if (!it)
 	{
 		ASSERT(false && "protolesshooks: FATAL ERROR: return address not found");
@@ -195,23 +179,6 @@ ThreadState::cleanup(const sl::RbTreeIterator<size_t, Frame>& it)
 
 		callHookLeaveFunc(frame->m_ret.m_context);
 		m_frameMap.erase(m_frameMap.getHead());
-	}
-}
-
-void
-ThreadState::restoreOriginalRets()
-{
-	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.getHead();
-	for (; it; it++)
-	{
-		size_t frameBase = it->getKey();
-		Frame* frame = &it->m_value;
-
-		size_t originalRet = !frame->m_chainedRetStack.isEmpty() ?
-			frame->m_chainedRetStack[0].m_originalRet :
-			frame->m_ret.m_originalRet;
-
-		*((size_t*)frameBase + 1) = originalRet; // return address is one slot below rpb/ebp
 	}
 }
 

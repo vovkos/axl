@@ -2,18 +2,17 @@
 #include "axl_spy_Hook.h"
 #include "axl_spy_HookCommon.h"
 #include "axl_spy_ThreadState.h"
-#include "axl_mem_ExecutableBlockArena.h"
 
 //..............................................................................
 
 // depending on Windows SDK, these declarations may be missing from winnt.h
-// prefix structs with PLH_ to avoid name collisions when they ARE in winnt.h
+// prefix structs with AXL_ to avoid name collisions when they ARE in winnt.h
 
 #ifndef UNW_FLAG_EHANDLER
 #	define UNW_FLAG_EHANDLER       0x1
 #endif
 
-struct PLH_UNWIND_INFO
+struct AXL_UNWIND_INFO
 {
 	UCHAR Version       : 3;
 	UCHAR Flags         : 5;
@@ -23,7 +22,7 @@ struct PLH_UNWIND_INFO
 	UCHAR FrameOffset   : 4;
 };
 
-struct PLH_DISPATCHER_CONTEXT
+struct AXL_DISPATCHER_CONTEXT
 {
 	DWORD64 ControlPc;
 	DWORD64 ImageBase;
@@ -48,7 +47,7 @@ namespace spy {
 
 const uint8_t g_thunkCode[] =
 {
-	0x55,                                            // 00000000  push    rbp
+	0x55,                                           // 00000000  push    rbp
 	0x48, 0x89, 0xE5,                                // 00000001  mov     rbp, rsp
 	0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,        // 00000004  sub     rsp, StackFrameSize
 	0x66, 0x0F, 0x7F, 0x5D, 0xF0,                    // 0000000B  movdqa  [rbp - 16 * 1], xmm3
@@ -87,38 +86,40 @@ const uint8_t g_thunkCode[] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 00000098
 	0xFF, 0xE0,                                      // 000000A0  jmp     rax
 	0x48, 0x8B, 0x45, 0x90,                          // 000000A2  mov     rax, [rbp - RegArgBlockSize - RegRetBlockSize]
-	0xC3,                                            // 000000A6  ret
-	0x48, 0x83, 0xEC, 0x08,                          // 000000A7  sub     rsp, 8  ; <<< hookRet
-	0x55,                                            // 000000AB  push    rbp
-	0x48, 0x89, 0xE5,                                // 000000AC  mov     rbp, rsp
-	0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,        // 000000AF  sub     rsp, StackFrameSize
-	0x48, 0x89, 0x45, 0x90,                          // 000000B6  mov     [rbp - RegArgBlockSize - RegRetBlockSize], rax
-	0x48, 0xB9,                                      // 000000BA  mov     rcx, hook
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000BC
-	0x48, 0x89, 0xEA,                                // 000000C4  mov     rdx, rbp
-	0x48, 0xB8,                                      // 000000C7  mov     rax, hookLeave
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000C9
-	0xFF, 0xD0,                                      // 000000D1  call    rax
-	0x48, 0x89, 0x45, 0x08,                          // 000000D3  mov     [rbp + 8], rax
-	0x48, 0x8B, 0x45, 0x90,                          // 000000D7  mov     rax, [rbp - RegArgBlockSize - RegRetBlockSize]
-	0x48, 0x81, 0xC4, 0x90, 0x00, 0x00, 0x00,        // 000000DB  add     rsp, StackFrameSize
-	0x5D,                                            // 000000E2  pop     rbp
-	0xC3,                                            // 000000E3  ret
-	0x55,                                            // 000000E4  push    rbp  ; <<< sehHandler
-	0x48, 0x89, 0xE5,                                // 000000E5  mov     rbp, rsp
-	0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,        // 000000E8  sub     rsp, StackFrameSize
-	0x48, 0x89, 0x55, 0xF8,                          // 000000EF  mov     [rbp - 8], rdx
-	0x48, 0xB8,                                      // 000000F3  mov     rax, hookException
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000F5
-	0xFF, 0xD0,                                      // 000000FD  call    rax
-	0x48, 0x85, 0xC0,                                // 000000FF  test    rax, rax
-	0x74, 0x0D,                                      // 00000102  jz      seh_epilogue
-	0x48, 0x8B, 0x55, 0xF8,                          // 00000104  mov     rdx,  [rbp - 8]
-	0x48, 0x89, 0x42, 0xF8,                          // 00000108  mov     [rdx - 16 + 8], rax
-	0xB8, 0x00, 0x00, 0x00, 0x00,                    // 0000010C  mov     rax, 0
-	0x48, 0x81, 0xC4, 0x90, 0x00, 0x00, 0x00,        // 00000111  add     rsp, StackFrameSize
-	0x5D,                                            // 00000118  pop     rbp
-	0xC3,                                            // 00000119  ret
+	0x48, 0x81, 0xC4, 0x90, 0x00, 0x00, 0x00,        // 000000A6  add     rsp, StackFrameSize
+	0x5D,                                            // 000000AD  pop     rbp
+	0xC3,                                            // 000000AE  ret
+	0x48, 0x83, 0xEC, 0x08,                          // 000000AF  sub     rsp, 8  ; <<< hookRet
+	0x55,                                            // 000000B3  push    rbp
+	0x48, 0x89, 0xE5,                                // 000000B4  mov     rbp, rsp
+	0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,        // 000000B7  sub     rsp, StackFrameSize
+	0x48, 0x89, 0x45, 0x90,                          // 000000BE  mov     [rbp - RegArgBlockSize - RegRetBlockSize], rax
+	0x48, 0xB9,                                      // 000000C2  mov     rcx, hook
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000C4
+	0x48, 0x89, 0xEA,                                // 000000CC  mov     rdx, rbp
+	0x48, 0xB8,                                      // 000000CF  mov     rax, hookLeave
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000D1
+	0xFF, 0xD0,                                      // 000000D9  call    rax
+	0x48, 0x89, 0x45, 0x08,                          // 000000DB  mov     [rbp + 8], rax
+	0x48, 0x8B, 0x45, 0x90,                          // 000000DF  mov     rax, [rbp - RegArgBlockSize - RegRetBlockSize]
+	0x48, 0x81, 0xC4, 0x90, 0x00, 0x00, 0x00,        // 000000E3  add     rsp, StackFrameSize
+	0x5D,                                            // 000000EA  pop     rbp
+	0xC3,                                            // 000000EB  ret
+	0x55,                                            // 000000EC  push    rbp  ; <<< sehHandler
+	0x48, 0x89, 0xE5,                                // 000000ED  mov     rbp, rsp
+	0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,        // 000000F0  sub     rsp, StackFrameSize
+	0x48, 0x89, 0x55, 0xF8,                          // 000000F7  mov     [rbp - 8], rdx
+	0x48, 0xB8,                                      // 000000FB  mov     rax, hookException
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 000000FD
+	0xFF, 0xD0,                                      // 00000105  call    rax
+	0x48, 0x85, 0xC0,                                // 00000107  test    rax, rax
+	0x74, 0x0D,                                      // 0000010A  jz      seh_epilogue
+	0x48, 0x8B, 0x55, 0xF8,                          // 0000010C  mov     rdx,  [rbp - 8]
+	0x48, 0x89, 0x42, 0xF8,                          // 00000110  mov     [rdx - 16 + 8], rax
+	0xB8, 0x00, 0x00, 0x00, 0x00,                    // 00000114  mov     rax, 0
+	0x48, 0x81, 0xC4, 0x90, 0x00, 0x00, 0x00,        // 00000119  add     rsp, StackFrameSize
+	0x5D,                                            // 00000120  pop     rbp
+	0xC3,                                            // 00000121  ret
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -129,11 +130,11 @@ enum ThunkCodeOffset
 	ThunkCodeOffset_HookEnterPtr     = 0x0042,
 	ThunkCodeOffset_HookRetPtr       = 0x008a,
 	ThunkCodeOffset_TargetFuncPtr    = 0x0098,
-	ThunkCodeOffset_HookRet          = 0x00a7,
-	ThunkCodeOffset_HookPtr2         = 0x00bc,
-	ThunkCodeOffset_HookLeavePtr     = 0x00c9,
-	ThunkCodeOffset_HookSehHandler   = 0x00e4,
-	ThunkCodeOffset_HookExceptionPtr = 0x00f5,
+	ThunkCodeOffset_HookRet          = 0x00af,
+	ThunkCodeOffset_HookPtr2         = 0x00c4,
+	ThunkCodeOffset_HookLeavePtr     = 0x00d1,
+	ThunkCodeOffset_HookSehHandler   = 0x00ec,
+	ThunkCodeOffset_HookExceptionPtr = 0x00fd,
 	ThunkCodeOffset_End              = sizeof(g_thunkCode),
 };
 
@@ -143,7 +144,7 @@ struct Hook
 {
 	uint8_t m_thunkCode[(ThunkCodeOffset_End & ~7) + 8]; // align on 8
 	RUNTIME_FUNCTION m_runtimeFunction;
-	PLH_UNWIND_INFO m_unwindInfo;
+	AXL_UNWIND_INFO m_unwindInfo;
 	ULONG m_exceptionHandler;
 	ULONG m_exceptionHandlerParamPadding;
 	HookCommonContext m_commonContext;
@@ -207,7 +208,7 @@ dispatchException(
 		if (!exceptionRoutine)
 			continue;
 
-		PLH_DISPATCHER_CONTEXT dispatcherContext;
+		AXL_DISPATCHER_CONTEXT dispatcherContext;
 		dispatcherContext.ControlPc = handlerRip;
 		dispatcherContext.ImageBase = imageBase;
 		dispatcherContext.FunctionEntry = function;
@@ -241,7 +242,7 @@ dispatchException(
 			// shouldn't ever get here -- ExceptionNestedException is returned by RtlpExceptionHandler,
 			// but we call a language-specific handler directly (without RtlpExecuteHandlerForException)
 
-			ASSERT(false);
+			ASSERT(false && "ExceptionNestedException returned by the language-specific handler");
 			return false;
 
 		case ExceptionCollidedUnwind:
@@ -283,13 +284,13 @@ hookException(
 	EXCEPTION_RECORD* exceptionRecord,
 	uint64_t establisherFrame,
 	CONTEXT* contextRecord,
-	PLH_DISPATCHER_CONTEXT* dispatcherContext
+	AXL_DISPATCHER_CONTEXT* dispatcherContext
 	)
 {
 	disableCurrentThreadHooks();
 
 	ThreadState* threadState = getCurrentThreadState(false);
-	ASSERT(threadState);
+	ASSERT(threadState && "missing thread-state in seh-hook");
 
 	Hook* hook = CONTAINING_RECORD(dispatcherContext->HandlerData, Hook, m_exceptionHandlerParamPadding);
 	uint64_t rbp = establisherFrame - 2 * 8;

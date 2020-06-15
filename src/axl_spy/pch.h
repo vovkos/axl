@@ -11,7 +11,17 @@
 
 #pragma once
 
-#include "axl_g_Pch.h"
+#include "axl_spy_Pch.h"
+#include "axl_sl_RbTree.h"
+#include "axl_sl_CallOnce.h"
+#include "axl_sys_Atomic.h"
+#include "axl_sys_TlsMgr.h"
+#include "axl_mem_ExecutableBlockArena.h"
+#include "axl_g_Module.h"
+
+#if (_AXL_OS_DARWIN)
+#	include "axl_enc_Leb128.h"
+#endif
 
 #if (_AXL_OS_WIN)
 #	include <psapi.h>

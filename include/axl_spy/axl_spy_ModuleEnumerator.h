@@ -1,9 +1,6 @@
 #pragma once
 
-#include "axl_sl_Array.h"
-#if (_AXL_OS_DARWIN)
-#	include "axl_sys_psx_DynamicLib.h"
-#endif
+#include "axl_spy_Pch.h"
 
 namespace axl {
 namespace spy {
@@ -153,6 +150,8 @@ protected:
 };
 
 #endif
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
 enumerateModules(ModuleIterator* iterator);

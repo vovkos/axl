@@ -1,15 +1,8 @@
 #pragma once
 
-#include "axl_sl_String.h"
-#include "axl_sl_Array.h"
 #include "axl_spy_ModuleEnumerator.h"
 
-#if (_AXL_OS_WIN)
-#	include "axl_sl_RbTree.h"
-#elif (_AXL_OS_LINUX)
-#   include "axl_sys_psx_DynamicLib.h"
-#	include <link.h>
-
+#if (_AXL_OS_LINUX)
 #	if (_AXL_CPU_X86)
 #	    define ELF_R_TYPE    ELF32_R_TYPE
 #	    define ELF_R_SYM     ELF32_R_SYM
@@ -101,12 +94,7 @@ public:
 
 protected:
 	void
-	reset()
-	{
-		m_symbolName.clear();
-		m_moduleName.clear();
-    	m_slot = NULL;
-	}
+	reset();
 };
 
 #if (_AXL_OS_WIN)
@@ -257,11 +245,11 @@ protected:
 
 struct ImportEnumeration: ref::RefCount
 {
-	sl::Array<struct segment_command_64*> m_segmentArray;
+	sl::Array<segment_command_64*> m_segmentArray;
 	sl::Array<const char*> m_dylibNameArray;
 	char* m_slide;
 	char* m_linkEditSegmentBase;
-	struct dyld_info_command* m_dyldInfoCmd;
+	dyld_info_command* m_dyldInfoCmd;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

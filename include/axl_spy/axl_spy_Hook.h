@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "axl_g_Pch.h"
+#include "axl_spy_Pch.h"
 
 namespace axl {
 namespace spy {
@@ -36,6 +36,7 @@ struct RegArgBlock
 struct RegRetBlock
 {
 	uint64_t m_rax;
+	uint64_t _m_padding;
 };
 
 #	elif (_AXL_CPP_GCC)
@@ -72,6 +73,15 @@ struct RegArgBlock
 struct RegRetBlock
 {
 	uint32_t m_eax;
+	uint32_t m_edx;
+};
+
+struct RegArgBlock // MSC __thiscall/__fastcall; GCC __attribute__((regparm(n)))
+{
+	uint32_t m_ecx;
+	uint32_t m_edx;
+	uint32_t m_eax;
+	uint32_t _m_padding;
 };
 
 #endif

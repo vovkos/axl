@@ -1,7 +1,35 @@
 #include "pch.h"
 #include "axl_spy_ImportWriteProtection.h"
-#include "axl_g_Module.h"
-#include "axl_err_Error.h"
+
+#if (_AXL_OS_LINUX)
+#	if (_AXL_CPU_AMD64 || _AXL_CPU_X86)
+#		define DT_THISPROCNUM 0
+#	endif
+
+// we use undocumented fields in the link map; it's a bit hackish, but
+// there's no clean way of mapping module handle to Elf headers anyway
+
+struct link_map_full: link_map
+{
+	link_map* l_real;
+	Lmid_t l_ns;
+	struct libname_list* l_libname;
+
+	ElfW(Dyn)* l_info[
+		DT_NUM +
+		DT_THISPROCNUM +
+		DT_VERSIONTAGNUM +
+		DT_EXTRANUM +
+		DT_VALNUM +
+		DT_ADDRNUM
+		];
+
+	const ElfW(Phdr)* l_phdr;
+	ElfW(Addr) l_entry;
+	ElfW(Half) l_phnum;
+	ElfW(Half) l_ldnum;
+};
+#endif
 
 namespace axl {
 namespace spy {
@@ -31,22 +59,20 @@ disableImportWriteProtection(
 	IMAGE_DATA_DIRECTORY* iatDir = (IMAGE_DATA_DIRECTORY*)&peHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IAT];
 	size_t begin = (size_t)module + iatDir->VirtualAddress;
 	size_t end = begin + iatDir->Size;
-
 	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
+
 	begin &= ~(pageSize - 1);
 	end = (end + pageSize - 1) & ~(pageSize - 1);
 
 	backup->m_p = (char*)begin;
 	backup->m_size = end - begin;
 
-	bool_t result = ::VirtualProtect(
+	return ::VirtualProtect(
 		backup->m_p,
 		backup->m_size,
 		PAGE_EXECUTE_READWRITE,
-		&backup->m_oldProtection
-		);
-
-	return err::complete(result);
+		(DWORD*)&backup->m_oldProtection
+		) != 0;
 }
 
 bool
@@ -61,16 +87,14 @@ disableImportWriteProtection(
 bool
 restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 {
-	dword_t oldProtect;
+	DWORD oldProtect;
 
-	bool_t result = ::VirtualProtect(
+	return ::VirtualProtect(
 		backup->m_p,
 		backup->m_size,
 		backup->m_oldProtection,
 		&oldProtect
-		);
-
-	return err::complete(result);
+		) != 0;
 }
 
 #elif (_AXL_OS_LINUX)
@@ -81,21 +105,18 @@ disableImportWriteProtection(
 	ImportWriteProtectionBackup* backup
 	)
 {
-	link_map* linkMap = (link_map*)module;
-	size_t moduleBase = (size_t)linkMap->l_addr;
-	ElfW(Ehdr)* ehdr = (ElfW(Ehdr)*)moduleBase;
+	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
 
-	size_t p = moduleBase + ehdr->e_phoff;
-	for (size_t i = 0; i < ehdr->e_phnum; i++, p += ehdr->e_phentsize)
+	link_map_full* linkMap = (link_map_full*)module;
+	for (size_t i = 0; i < linkMap->l_phnum; i++)
 	{
-		ElfW(Phdr)* phdr = (ElfW(Phdr)*)p;
+		const ElfW(Phdr)* phdr = &linkMap->l_phdr[i];
 		if (phdr->p_type != PT_GNU_RELRO) // read-only-after-relocation (contains GOT)
 			continue;
 
-		size_t begin = moduleBase + phdr->p_vaddr;
+		size_t begin = linkMap->l_addr + phdr->p_vaddr;
 		size_t end = begin + phdr->p_memsz;
 
-		size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
 		begin &= ~(pageSize - 1);
 		end = (end + pageSize - 1) & ~(pageSize - 1);
 
@@ -104,7 +125,7 @@ disableImportWriteProtection(
 		backup->m_flags = phdr->p_flags;
 
 		int result = ::mprotect(backup->m_p, backup->m_size, PROT_READ | PROT_WRITE | PROT_EXEC);
-		return err::complete(result != -1);
+		return result != -1;
 	}
 
 	// GOT not found, still OK
@@ -142,7 +163,7 @@ restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 		prot |= PROT_EXEC;
 
 	int result = ::mprotect(backup->m_p, backup->m_size, prot);
-	return err::complete(result != -1);
+	return result != -1;
 }
 
 #elif (_AXL_OS_DARWIN)

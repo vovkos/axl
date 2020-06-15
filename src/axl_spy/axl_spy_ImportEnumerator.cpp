@@ -1,23 +1,26 @@
 #include "pch.h"
 #include "axl_spy_ImportEnumerator.h"
-#include "axl_g_Module.h"
-
-#if (_AXL_OS_LINUX)
-#	include "axl_sys_psx_DynamicLib.h"
-#elif (_AXL_OS_DARWIN)
-#	include "axl_enc_Leb128.h"
-#endif
 
 namespace axl {
 namespace spy {
 
 //..............................................................................
 
-#if (_AXL_OS_WIN)
+void
+ImportIteratorBase::reset()
+{
+	m_symbolName = NULL;
+	m_moduleName = NULL;
+	m_slot = NULL;
+}
+
+//..............................................................................
+
+#if (_WIN32)
 #	define _AXL_SPY_USE_RAW_SIZE 1
-#	if (_AXL_DEBUG)
+#	if (_DEBUG)
 #		define _AXL_SPY_TRACE_NON_CODE_IMPORT    1
-#		define _AXL_SPY_ANALYZE_NON_CODE_ADDRESS 0
+#		define _AXL_SPY_ANALYZE_NON_CODE_ADDRESS 1
 #	endif
 
 IMAGE_NT_HEADERS*
@@ -70,7 +73,7 @@ PeCodeMap::analyzeNonCodeAddress(size_t address)
 	ModuleCodeMap* map = getModuleCodeMap(address);
 	if (!map)
 	{
-		printf("  *** parent module not found for %p\n", address);
+		printf("  *** parent module not found for %p\n", (void*)address);
 		return;
 	}
 
@@ -93,13 +96,12 @@ PeCodeMap::analyzeNonCodeAddress(size_t address)
 		"    end:       %p\n"
 		"    size:      %zd\n"
 		"  sections:\n",
-
-		address,
-		rva,
+		(void*)address,
+		(void*)rva,
 		baseName,
 		fileName,
-		map->m_moduleBase,
-		map->m_moduleEnd,
+		(void*)map->m_moduleBase,
+		(void*)map->m_moduleEnd,
 		map->m_moduleEnd - map->m_moduleBase
 		);
 
@@ -116,10 +118,10 @@ PeCodeMap::analyzeNonCodeAddress(size_t address)
 	size_t moduleBase = (size_t)hModule;
 	for (; p < end; p++)
 	{
-		size_t sectionEnd = p->VirtualAddress + p->Misc.VirtualSize;
+		DWORD sectionEnd = p->VirtualAddress + p->Misc.VirtualSize;
 
 		printf(
-			"    %c%8s: %08zx .. %08zx\n",
+			"    %c%8s: %08x .. %08x\n",
 			rva >= p->VirtualAddress && rva < sectionEnd ? '>' : ' ',
 			p->Name,
 			p->VirtualAddress,
@@ -385,7 +387,7 @@ ImportIterator::operator ++ ()
 bool
 ImportIterator::readRel()
 {
-	ASSERT(m_enumeration);
+	ASSERT(m_enumeration && "attempt to read ElfRel from a null-iterator");
 
 	int relType;
 	ElfRel* rel;
@@ -423,7 +425,7 @@ ImportIterator::readRel()
 		}
 
 		m_symbolName = m_enumeration->m_stringTable + sym->st_name;
-		m_slot = (void**)(m_enumeration->m_moduleBase + rel->r_offset);
+		m_slot = (void**)(m_enumeration->m_baseAddress + rel->r_offset);
 		return true;
 	}
 
@@ -476,7 +478,7 @@ enumerateImports(
 	}
 
 	ref::Ptr<ElfImportEnumeration> enumeration = AXL_REF_NEW(ElfImportEnumeration);
-	enumeration->m_moduleBase = (char*)linkMap->l_addr;
+	enumeration->m_baseAddress = linkMap->l_addr;
 	enumeration->m_symbolTable = (ElfW(Sym)*)dynTable[DT_SYMTAB]->d_un.d_ptr;
 	enumeration->m_stringTable = (char*)dynTable[DT_STRTAB]->d_un.d_ptr;
 	enumeration->m_stringTableSize = dynTable[DT_STRSZ]->d_un.d_val;
@@ -508,11 +510,22 @@ ImportIterator::ImportIterator(ImportEnumeration* enumeration)
 }
 
 void
-ImportIterator::init()
+ImportIterator::setState(
+	State state,
+	const char* begin,
+	size_t size
+	)
 {
-	m_state = State_Idle;
-	m_p = NULL;
-	m_end = NULL;
+	m_state = state;
+	m_slot = NULL;
+	m_slotVmAddr = 0;
+	m_moduleName = NULL;
+	m_symbolName = NULL;
+	m_segmentName = NULL;
+	m_sectionName = NULL;
+	m_begin = begin;
+	m_end = begin + size;
+	m_p = begin;
 	m_segmentIdx = 0;
 	m_segmentOffset = 0;
 }
@@ -646,32 +659,42 @@ ImportIterator::next()
 		switch (m_state)
 		{
 		case State_Idle:
-			m_state = State_Bind;
-			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->bind_off;
-			m_end = m_begin + m_enumeration->m_dyldInfoCmd->bind_size;
+			setState(
+				State_Bind,
+				m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->bind_off,
+				m_enumeration->m_dyldInfoCmd->bind_size
+				);
 			break;
 
 		case State_Bind:
-			m_state = State_WeakBind;
-			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->weak_bind_off;
-			m_end = m_begin + m_enumeration->m_dyldInfoCmd->weak_bind_size;
+			setState(
+				State_WeakBind,
+				m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->weak_bind_off,
+				m_enumeration->m_dyldInfoCmd->weak_bind_size
+				);
 			break;
 
 		case State_WeakBind:
-			m_state = State_LazyBind;
-			m_begin = m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->lazy_bind_off;
-			m_end = m_begin + m_enumeration->m_dyldInfoCmd->lazy_bind_size;
+			setState(
+				State_LazyBind,
+				m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->lazy_bind_off,
+				m_enumeration->m_dyldInfoCmd->lazy_bind_size
+				);
 			break;
 
 		case State_LazyBind:
-			m_state = State_Done;
+			setState(State_Done,NULL, 0);
+			break;
+
+		default:
+			ASSERT(false && "invalid state inside the 'next' loop");
 			break;
 		}
 
 		m_p = m_begin;
 	} while (m_state != State_Done);
 
-	ASSERT(!m_slot);
+	ASSERT(!m_slot && "at the end of binding info with a non-null slot");
 	return false;
 }
 
@@ -694,14 +717,14 @@ ImportIterator::bind()
 		return m_slot != NULL;
 	}
 
-	m_pendingSlotArray.append(slotVmAddr);
+	m_pendingSlotArray.push_back(slotVmAddr);
 	return true;
 }
 
 bool
 ImportIterator::setSlot(size_t slotVmAddr)
 {
-	ASSERT(m_segmentIdx < m_enumeration->m_segmentArray.getCount());
+	ASSERT(m_segmentIdx < m_enumeration->m_segmentArray.size() && "segment index out-of-bounds");
 	const segment_command_64* segment = m_enumeration->m_segmentArray[m_segmentIdx];
 
 	const section_64* section = findSection(segment, slotVmAddr);
@@ -733,7 +756,7 @@ ImportIterator::findSection(
 	return NULL;
 }
 
-sl::StringRef
+const char*
 ImportIterator::getDylibName(int ordinal)
 {
 	switch (ordinal)
@@ -765,13 +788,13 @@ enumerateImports(
 	char* slide = (char*)::_dyld_get_image_vmaddr_slide(imageIndex);
 	mach_header_64* machHdr = (mach_header_64*)::_dyld_get_image_header(imageIndex);
 
-	sl::Array<struct segment_command_64*> segmentArray;
-	sl::Array<const char*> dylibNameArray;
+	std::vector<struct segment_command_64*> segmentArray;
+	std::vector<const char*> dylibNameArray;
 	segment_command_64* linkEditSegmentCmd = NULL;
 	dyld_info_command* dyldInfoCmd = NULL;
 
 	load_command* cmd = (load_command*)(machHdr + 1);
-	for (uint_t i = 0; i < machHdr->ncmds; i++)
+	for (size_t i = 0; i < machHdr->ncmds; i++)
 	{
 		segment_command_64* segmentCmd;
 		dylib_command* dylibCmd;

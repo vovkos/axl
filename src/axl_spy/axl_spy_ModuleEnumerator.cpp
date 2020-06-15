@@ -130,10 +130,10 @@ ModuleIterator::operator ++ ()
 void*
 ModuleIterator::prepareModule() const
 {
-	ASSERT(!m_module.isOpen());
+	ASSERT(!m_module.isOpen() && "module handle is already set");
 
 	if (m_index < m_count)
-		m_module.open(getModuleFileName());
+		m_module.open(getModuleFileName(), RTLD_NOLOAD);
 
 	return m_module;
 }
@@ -141,7 +141,7 @@ ModuleIterator::prepareModule() const
 const sl::StringRef&
 ModuleIterator::prepareModuleFileName() const
 {
-	ASSERT(m_moduleFileName.isEmpty());
+	ASSERT(!m_moduleFileName && "module file name is already set");
 
 	if (m_index < m_count)
 		m_moduleFileName = ::_dyld_get_image_name(m_index);
