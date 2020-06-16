@@ -1166,6 +1166,7 @@ testUsbEnum()
 
 	io::registerUsbErrorProvider();
 	io::getUsbDefaultContext()->createDefault();
+	io::getUsbDefaultContext()->setDebugLevel(LIBUSB_LOG_LEVEL_DEBUG);
 
 	io::UsbDeviceList deviceList;
 	size_t count = deviceList.enumerateDevices();
@@ -5331,7 +5332,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	receiptTest();
+	testUsbEnum();
 
 	return 0;
 }
