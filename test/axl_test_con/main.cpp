@@ -5305,6 +5305,81 @@ receiptTest()
 //..............................................................................
 
 #if (_AXL_OS_WIN)
+
+namespace axl {
+namespace sys {
+namespace win {
+
+int ShowAuthenticodeInfo(LPCWSTR pszFileName);
+}
+}
+}
+
+int
+authenticodeTest(const wchar_t* fileName = NULL)
+{
+	if (!fileName)
+	{
+		static const wchar_t* fileNameArray[] =
+		{
+			L"C:/Windows/system32/kernel32.dll",
+			L"C:/Program Files/Tibbo/TDST/tdsman.exe",
+			L"C:/Program Files/Tibbo/TDST/tvspman.exe",
+			L"C:/Program Files/Tibbo/Ninja 3/bin/ioninja.exe",
+		};
+
+		for (size_t i = 0; i < countof(fileNameArray); i++)
+			authenticodeTest(fileNameArray[i]);
+
+		return 0;
+	}
+
+	printf("%S...\n", fileName);
+
+	sl::Array<char> serialNumber;
+	sl::String_w programName;
+	sl::String_w subjectName;
+	sl::String_w issuerName;
+	uint64_t timestamp;
+
+	bool result = sys::win::verifyAuthenticodeSignature(
+		fileName,
+		&serialNumber,
+		&programName,
+		&subjectName,
+		&issuerName,
+		&timestamp
+		);
+
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return -1;
+	}
+
+	printf(
+		"serial:    %s\n"
+		"program:   %S\n"
+		"subject:   %S\n"
+		"issuer:    %S\n"
+		"timestamp: %s\n",
+		enc::HexEncoding::encode(serialNumber, serialNumber.getCount()).sz(),
+		programName.sz(),
+		subjectName.sz(),
+		issuerName.sz(),
+		timestamp ? sys::Time(timestamp).format("%Y-%M-%d %h:%m:%s").sz() : "?"
+		);
+
+	printf("---------------\n");
+	sys::win::ShowAuthenticodeInfo(fileName);
+
+	return 0;
+}
+
+#endif
+//..............................................................................
+
+#if (_AXL_OS_WIN)
 int
 wmain(
 	int argc,
@@ -5332,7 +5407,9 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testUsbEnum();
+#if (_AXL_OS_WIN)
+	authenticodeTest();
+#endif
 
 	return 0;
 }

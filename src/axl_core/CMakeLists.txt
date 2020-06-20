@@ -337,7 +337,11 @@ set(
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_AccessToken.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_Sid.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_VirtualMemory.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_win_Iat.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_WinTrust.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_WinCrypt.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Certificate.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_CryptMsg.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_Authenticode.h
 	)
 
 set(
@@ -357,7 +361,11 @@ set(
 	axl_sys_win_AccessToken.cpp
 	axl_sys_win_Sid.cpp
 	axl_sys_win_VirtualMemory.cpp
-	axl_sys_win_Iat.cpp
+	axl_sys_win_WinTrust.cpp
+	axl_sys_win_WinCrypt.cpp
+	axl_sys_win_Certificate.cpp
+	axl_sys_win_CryptMsg.cpp
+	axl_sys_win_Authenticode.cpp
 	)
 
 source_group(

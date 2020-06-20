@@ -79,6 +79,7 @@
 #	include "axl_sys_win_Process.h"
 #	include "axl_sys_win_NtDll.h"
 #	include "axl_sys_win_NtStatus.h"
+#	include "axl_sys_win_Authenticode.h"
 #elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_io_psx_Pty.h"
@@ -99,6 +100,8 @@ using namespace axl;
 #	include <iphlpapi.h>
 #	pragma comment(lib, "ws2_32.lib")
 #	pragma comment(lib, "iphlpapi.lib")
+#	pragma comment(lib, "wintrust.lib")
+#	pragma comment(lib, "crypt32.lib")
 #elif (_AXL_OS_POSIX)
 #	include <netdb.h>
 #	include <signal.h>

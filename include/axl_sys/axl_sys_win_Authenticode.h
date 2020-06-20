@@ -9,15 +9,28 @@
 //
 //..............................................................................
 
-#include "pch.h"
-#include "axl_sys_win_Iat.h"
-#include "axl_err_Error.h"
+#pragma once
+
+#define _AXL_SYS_WIN_AUTHENTICODE_H
+
+#include "axl_sl_Array.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace sys {
 namespace win {
 
 //..............................................................................
+
+bool
+verifyAuthenticodeSignature(
+	const sl::StringRef_w& fileName,
+	sl::Array<char>* serialNumber,
+	sl::String_w* programName,
+	sl::String_w* subjectName,
+	sl::String_w* issuerName,
+	uint64_t* timestamp
+	);
 
 //..............................................................................
 

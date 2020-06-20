@@ -15,6 +15,9 @@
 
 #if (_AXL_OS_WIN)
 #	include <sddl.h>
+#	include <wintrust.h>
+#	include <wincrypt.h>
+#	include <softpub.h>
 #elif (_AXL_OS_LINUX && defined _AXL_SYS_LNX_LIBUDEV)
 #	include <libudev.h>
 #elif (_AXL_OS_DARWIN)
