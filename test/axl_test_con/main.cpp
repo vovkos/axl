@@ -5306,15 +5306,6 @@ receiptTest()
 
 #if (_AXL_OS_WIN)
 
-namespace axl {
-namespace sys {
-namespace win {
-
-int ShowAuthenticodeInfo(LPCWSTR pszFileName);
-}
-}
-}
-
 int
 authenticodeTest(const wchar_t* fileName = NULL)
 {
@@ -5369,9 +5360,6 @@ authenticodeTest(const wchar_t* fileName = NULL)
 		issuerName.sz(),
 		timestamp ? sys::Time(timestamp).format("%Y-%M-%d %h:%m:%s").sz() : "?"
 		);
-
-	printf("---------------\n");
-	sys::win::ShowAuthenticodeInfo(fileName);
 
 	return 0;
 }

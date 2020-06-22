@@ -46,6 +46,23 @@ public:
 		attach(h);
 	}
 
+	bool
+	openToDecode(
+		dword_t encodingType,
+		dword_t msgFlags,
+		dword_t msgType,
+		HCRYPTPROV_LEGACY hCryptProv = NULL,
+		CERT_INFO* recipientInfo = NULL,
+		CMSG_STREAM_INFO* streamInfo = NULL
+		);
+
+	bool
+	update(
+		const void* p,
+		size_t size,
+		bool isFinal = true
+		);
+
 	size_t
 	getParam(
 		dword_t type,
@@ -58,7 +75,7 @@ public:
 	getParam(
 		sl::Array<char>* buffer,
 		dword_t type,
-		dword_t index
+		dword_t index = 0
 		);
 };
 

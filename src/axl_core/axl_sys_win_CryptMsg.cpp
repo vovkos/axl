@@ -19,6 +19,43 @@ namespace win {
 
 //..............................................................................
 
+bool
+CryptMsg::openToDecode(
+    dword_t encodingType,
+    dword_t msgFlags,
+    dword_t msgType,
+    HCRYPTPROV_LEGACY hCryptProv,
+    CERT_INFO* recipientInfo,
+    CMSG_STREAM_INFO* streamInfo
+	)
+{
+	close();
+
+	m_h = ::CryptMsgOpenToDecode(
+		encodingType,
+		msgFlags,
+		msgType,
+		hCryptProv,
+		recipientInfo,
+		streamInfo
+		);
+
+	return err::complete(m_h != NULL);
+}
+
+bool
+CryptMsg::update(
+	const void* p,
+	size_t size,
+	bool isFinal
+	)
+{
+	ASSERT(m_h);
+
+	bool_t result = ::CryptMsgUpdate(m_h, (uchar_t*)p, size, isFinal);
+	return err::complete(result);
+}
+
 size_t
 CryptMsg::getParam(
 	dword_t type,
@@ -114,13 +151,29 @@ getCryptMsgSignerInfoProgramName(
 	return programName->getLength();
 }
 
+static
 bool
-getCryptMsgSignerInfoTimestamp(
+getRsaCounterSignTimestamp(
 	uint64_t* timestamp,
-	const CMSG_SIGNER_INFO* signerInfo
+	const void* p,
+	size_t size
 	)
 {
-	size_t timestampIdx = findCryptAttr(&signerInfo->AuthAttrs, szOID_RSA_signingTime);
+	sl::Array<char> counterSignerInfoBuffer;
+
+	bool result = cryptDecodeObject(
+		&counterSignerInfoBuffer,
+		X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		PKCS7_SIGNER_INFO,
+		p,
+		size
+		) != -1;
+
+	if (!result)
+		return false;
+
+	const CMSG_SIGNER_INFO* counterSignerInfo = (CMSG_SIGNER_INFO*)counterSignerInfoBuffer.cp();
+	size_t timestampIdx = findCryptAttr(&counterSignerInfo->AuthAttrs, szOID_RSA_signingTime);
 	if (timestampIdx == -1)
 	{
 		err::setError(err::SystemErrorCode_ObjectNameNotFound);
@@ -132,9 +185,85 @@ getCryptMsgSignerInfoTimestamp(
 		sizeof(uint64_t),
 		X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 		szOID_RSA_signingTime,
-		signerInfo->AuthAttrs.rgAttr[timestampIdx].rgValue[0].pbData,
-		signerInfo->AuthAttrs.rgAttr[timestampIdx].rgValue[0].cbData
+		counterSignerInfo->AuthAttrs.rgAttr[timestampIdx].rgValue[0].pbData,
+		counterSignerInfo->AuthAttrs.rgAttr[timestampIdx].rgValue[0].cbData
 		) != -1;
+}
+
+#pragma pack(push, 1)
+struct TimestampInfoRfc3161
+{
+	uintptr_t m_unknown[9];
+	uint64_t m_timestamp;
+};
+#pragma pack(pop)
+
+static
+bool
+getRfc3161CounterSignTimestamp(
+	uint64_t* timestamp,
+	const void* p,
+	size_t size
+	)
+{
+	sl::Array<char> contentBuffer;
+
+	CryptMsg msg;
+	bool result =
+		msg.openToDecode(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 0, 0) &&
+		msg.update(p, size) &&
+		msg.getParam(&contentBuffer, CMSG_CONTENT_PARAM) != -1;
+
+	if (!result)
+		return false;
+
+	sl::Array<char> timestampBuffer;
+	result = cryptDecodeObject(
+		&timestampBuffer,
+		X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+		TIMESTAMP_INFO,
+		contentBuffer,
+		contentBuffer.getCount()
+		) != -1;
+
+	if (!result)
+		return false;
+
+	if (timestampBuffer.getCount() < sizeof(TimestampInfoRfc3161))
+	{
+		err::setError(err::SystemErrorCode_BufferTooSmall);
+		return false;
+	}
+
+	const TimestampInfoRfc3161* timestampInfo = (TimestampInfoRfc3161*)timestampBuffer.cp();
+	*timestamp = timestampInfo->m_timestamp;
+	return true;
+}
+
+bool
+getCryptMsgSignerInfoTimestamp(
+	uint64_t* timestamp,
+	const CMSG_SIGNER_INFO* signerInfo
+	)
+{
+	size_t crossCertIdx = findCryptAttr(&signerInfo->UnauthAttrs, szOID_RSA_counterSign);
+	if (crossCertIdx != -1)
+		return getRsaCounterSignTimestamp(
+			timestamp,
+			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->pbData,
+			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->cbData
+			);
+
+	crossCertIdx = findCryptAttr(&signerInfo->UnauthAttrs, szOID_RFC3161_counterSign);
+	if (crossCertIdx != -1)
+		return getRfc3161CounterSignTimestamp(
+			timestamp,
+			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->pbData,
+			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->cbData
+			);
+
+	err::setError(err::SystemErrorCode_ObjectNameNotFound);
+	return false;
 }
 
 //..............................................................................
