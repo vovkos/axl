@@ -717,14 +717,13 @@ ImportIterator::bind()
 		return m_slot != NULL;
 	}
 
-	m_pendingSlotArray.push_back(slotVmAddr);
+	m_pendingSlotArray.append(slotVmAddr);
 	return true;
 }
 
 bool
 ImportIterator::setSlot(size_t slotVmAddr)
 {
-	ASSERT(m_segmentIdx < m_enumeration->m_segmentArray.size() && "segment index out-of-bounds");
 	const segment_command_64* segment = m_enumeration->m_segmentArray[m_segmentIdx];
 
 	const section_64* section = findSection(segment, slotVmAddr);
@@ -788,8 +787,8 @@ enumerateImports(
 	char* slide = (char*)::_dyld_get_image_vmaddr_slide(imageIndex);
 	mach_header_64* machHdr = (mach_header_64*)::_dyld_get_image_header(imageIndex);
 
-	std::vector<struct segment_command_64*> segmentArray;
-	std::vector<const char*> dylibNameArray;
+	sl::Array<struct segment_command_64*> segmentArray;
+	sl::Array<const char*> dylibNameArray;
 	segment_command_64* linkEditSegmentCmd = NULL;
 	dyld_info_command* dyldInfoCmd = NULL;
 

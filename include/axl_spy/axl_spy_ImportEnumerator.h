@@ -314,7 +314,17 @@ public:
 
 protected:
 	void
-	init();
+	init()
+	{
+		setState(State_Idle, NULL, 0);
+	}
+
+	void
+	setState(
+		State state,
+		const char* p,
+		size_t size
+		);
 
 	bool
 	next();
@@ -331,7 +341,7 @@ protected:
 		size_t slotVmAddr
 		);
 
-	sl::StringRef
+	const char*
 	getDylibName(int ordinal);
 };
 

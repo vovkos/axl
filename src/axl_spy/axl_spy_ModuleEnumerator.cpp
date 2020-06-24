@@ -141,7 +141,7 @@ ModuleIterator::prepareModule() const
 const sl::StringRef&
 ModuleIterator::prepareModuleFileName() const
 {
-	ASSERT(!m_moduleFileName && "module file name is already set");
+	ASSERT(m_moduleFileName.isEmpty() && "module file name is already set");
 
 	if (m_index < m_count)
 		m_moduleFileName = ::_dyld_get_image_name(m_index);
