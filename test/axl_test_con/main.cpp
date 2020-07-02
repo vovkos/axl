@@ -4003,7 +4003,7 @@ foo(const T* p)
 	printf("foo - 2\n");
 }
 
-struct Point: sl::ListLink
+struct Point2d : sl::ListLink
 {
 	int m_x;
 	int m_y;
@@ -4012,20 +4012,20 @@ struct Point: sl::ListLink
 void
 testConstList()
 {
-	sl::List<Point> list;
+	sl::List<Point2d> list;
 
-	Point* point = AXL_MEM_NEW(Point);
+	Point2d* point = AXL_MEM_NEW(Point2d);
 	point->m_x = 10;
 	point->m_y = 20;
 	list.insertTail(point);
 
-	point = AXL_MEM_NEW(Point);
+	point = AXL_MEM_NEW(Point2d);
 	point->m_x = 30;
 	point->m_y = 40;
 	list.insertTail(point);
 
-	sl::Iterator<Point> it = list.getHead();
-	sl::ConstIterator<Point> it2 = it;
+	sl::Iterator<Point2d> it = list.getHead();
+	sl::ConstIterator<Point2d> it2 = it;
 	it2 = it;
 	it2++;
 
@@ -5365,6 +5365,59 @@ authenticodeTest(const wchar_t* fileName = NULL)
 }
 
 #endif
+
+#if (_AXL_OS_DARWIN)
+
+void
+bookmarkTest()
+{
+	bool result;
+
+	bool isSandbox = ::getenv("APP_SANDBOX_CONTAINER_ID") != NULL;
+	printf("is sandbox: %d\n", isSandbox);
+
+	printf("creating URL...\n");
+
+	cf::Url url;
+	url.create("/Users/vladimir/abc.njlg", kCFURLPOSIXPathStyle, false);
+	printf("url: %s\n", url.getString().sz());
+
+	printf("start accessing security-scoped resource...\n");
+
+	result = url.startAccessingSecurityScopedResource();
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("creating bookmark...\n");
+
+	cf::Data bookmark;
+	result = url.createBookmark(&bookmark, kCFURLBookmarkCreationMinimalBookmarkMask | kCFURLBookmarkCreationWithSecurityScope);
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("bookmark: %s\n", enc::HexEncoding::encode(bookmark.getBytePtr(), bookmark.getLength()).sz());
+
+	printf("resolving bookmark...\n");
+
+	cf::Url url2;
+	result = url2.resolveBookmark(bookmark, kCFURLBookmarkResolutionWithoutUIMask | kCFURLBookmarkResolutionWithSecurityScope);
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("url2: %s\n", url2.getString().sz());
+}
+
+#endif
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -5397,6 +5450,10 @@ main(
 
 #if (_AXL_OS_WIN)
 	authenticodeTest();
+#endif
+
+#if (_AXL_OS_DARWIN)
+	bookmarkTest();
 #endif
 
 	return 0;
