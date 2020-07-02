@@ -57,8 +57,9 @@ getTempDir()
 	wchar_t dir[1024] = { 0 };
 	::GetTempPathW(countof(dir) - 1, dir);
 	return dir;
-#elif (_AXL_OS_POSIX)
-	return "/tmp";
+#else
+	sl::String tmpDir = ::getenv("TMPDIR");
+	return !tmpDir.isEmpty() ? tmpDir : "/tmp";
 #endif
 }
 
