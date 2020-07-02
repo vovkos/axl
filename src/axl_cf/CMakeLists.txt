@@ -17,16 +17,22 @@ set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_cf/axl_cf_Type.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_Number.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_Data.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_String.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_Dictionary.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_Url.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_SecScopedBookmark.h
 	)
 
 set(
 	LIB_CPP_LIST
 	axl_cf_Type.cpp
 	axl_cf_Number.cpp
+	axl_cf_Data.cpp
 	axl_cf_String.cpp
 	axl_cf_Dictionary.cpp
+	axl_cf_Url.cpp
+	axl_cf_SecScopedBookmark.cpp
 	)
 
 source_group(
