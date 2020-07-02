@@ -56,18 +56,18 @@ getNumberTypeId()
 //..............................................................................
 
 template <typename T>
-class TypeRefBase
+class TypeBase
 {
 protected:
 	T m_p;
 
 public:
-	TypeRefBase()
+	TypeBase()
 	{
 		m_p = NULL;
 	}
 
-	TypeRefBase(const TypeRefBase& src)
+	TypeBase(const TypeBase& src)
 	{
 		if (src.m_p)
 			::CFRetain(src.m_p);
@@ -75,7 +75,15 @@ public:
 		m_p = src.m_p;
 	}
 
-	TypeRefBase(
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	TypeBase(TypeBase&& src)
+	{
+		m_p = src.m_p;
+		src.m_p = NULL;
+	}
+#endif
+
+	TypeBase(
 		T p,
 		bool isAttach = false
 		)
@@ -86,7 +94,7 @@ public:
 		m_p = p;
 	}
 
-	~TypeRefBase()
+	~TypeBase()
 	{
 		clear();
 	}
@@ -96,14 +104,23 @@ public:
 		return m_p;
 	}
 
-	TypeRefBase&
-	operator = (const TypeRefBase& src)
+	TypeBase&
+	operator = (const TypeBase& src)
 	{
 		copy(src.m_p);
 		return *this;
 	}
 
-	TypeRefBase&
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	TypeBase&
+	operator = (TypeBase&& src)
+	{
+		move(std::move(src));
+		return *this;
+	}
+#endif
+
+	TypeBase&
 	operator = (T p)
 	{
 		copy(p);
@@ -155,45 +172,64 @@ public:
 		m_p = p;
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move(TypeBase&& src)
+	{
+		if (m_p)
+			::CFRelease(m_p);
+
+		m_p = src.m_p;
+		src.m_p = NULL;
+	}
+#endif
+
 	intptr_t
 	getRetainCount() const
 	{
+		ASSERT(m_p);
 		return ::CFGetRetainCount(m_p);
 	}
 
 	void
 	retain()
 	{
+		ASSERT(m_p);
 		::CFRetain(m_p);
 	}
 
 	void
 	release()
 	{
+		ASSERT(m_p);
 		::CFRelease(m_p);
 	}
 
 	bool
 	isEqual(T type) const
 	{
+		ASSERT(m_p);
 		return ::CFEqual(m_p, type);
 	}
 
 	CFHashCode
 	getHash() const
 	{
+		ASSERT(m_p);
 		return ::CFHash(m_p);
 	}
 
 	CFTypeID
 	getTypeId() const
 	{
+		ASSERT(m_p);
 		return ::CFGetTypeID(m_p);
 	}
 
 	sl::String
 	getDescription() const
 	{
+		ASSERT(m_p);
 		CFStringRef cfString = ::CFCopyDescription(m_p);
 		sl::String string = getStringFromCfString(cfString);
 		::CFRelease(cfString);
@@ -209,19 +245,21 @@ public:
 	void
 	show() const
 	{
+		ASSERT(m_p);
 		::CFShow(m_p);
 	}
 
 	sl::String
 	toString()
 	{
+		ASSERT(m_p);
 		return cfTypeToString(m_p);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef TypeRefBase<CFTypeRef> TypeRef;
+typedef TypeBase<CFTypeRef> Type;
 
 //..............................................................................
 

@@ -20,125 +20,134 @@ namespace cf {
 
 //..............................................................................
 
-class NumberRef: public TypeRefBase<CFNumberRef>
+class Number: public TypeBase<CFNumberRef>
 {
 public:
-	NumberRef()
+	Number()
 	{
 	}
 
-	NumberRef(const NumberRef& src)
+	Number(const Number& src):
+		TypeBase<CFNumberRef>(src)
 	{
-		copy(src);
 	}
 
-	NumberRef(
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Number(Number&& src):
+		TypeBase<CFNumberRef>(std::move(src))
+	{
+	}
+#endif
+
+	Number(
 		CFNumberRef p,
 		bool isAttach = false
-		)
+		):
+		TypeBase<CFNumberRef>(p, isAttach)
 	{
-		isAttach ? copy(p) : attach(p);
 	}
 
-	NumberRef(char x)
+	Number(char x)
 	{
-		m_p = NULL;
 		create(kCFNumberCharType, &x);
 	}
 
-	NumberRef(short x)
+	Number(short x)
 	{
-		m_p = NULL;
 		create(kCFNumberShortType, &x);
 	}
 
-	NumberRef(int x)
+	Number(int x)
 	{
-		m_p = NULL;
 		create(kCFNumberIntType, &x);
 	}
 
-	NumberRef(long x)
+	Number(long x)
 	{
-		m_p = NULL;
 		create(kCFNumberLongType, &x);
 	}
 
-	NumberRef(long long x)
+	Number(long long x)
 	{
-		m_p = NULL;
 		create(kCFNumberLongLongType, &x);
 	}
 
-	NumberRef(float x)
+	Number(float x)
 	{
-		m_p = NULL;
 		create(kCFNumberFloatType, &x);
 	}
 
-	NumberRef(double x)
+	Number(double x)
 	{
-		m_p = NULL;
 		create(kCFNumberDoubleType, &x);
 	}
 
-	NumberRef&
-	operator = (const NumberRef& src)
+	Number&
+	operator = (const Number& src)
 	{
 		copy(src);
 		return *this;
 	}
 
-	NumberRef&
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Number&
+	operator = (Number&& src)
+	{
+		move(std::move(src));
+		return *this;
+	}
+#endif
+
+	Number&
 	operator = (CFNumberRef p)
 	{
 		copy(p);
 		return *this;
 	}
 
-	NumberRef&
+	Number&
 	operator = (char x)
 	{
 		create(kCFNumberCharType, &x);
 		return *this;
 	}
 
-	NumberRef&
+	Number&
 	operator = (short x)
 	{
 		create(kCFNumberShortType, &x);
 		return *this;
 	}
 
-	NumberRef&
+	Number&
 	operator = (int x)
 	{
 		create(kCFNumberIntType, &x);
 		return *this;
 	}
 
-	NumberRef&
+	Number&
 	operator = (long x)
 	{
 		create(kCFNumberLongType, &x);
 		return *this;
 	}
 
-	NumberRef&
+	Number&
 	operator = (long long x)
 	{
 		create(kCFNumberLongLongType, &x);
 		return *this;
 	}
 
-	NumberRef&
+	Number&
 	operator = (float x)
 	{
 		create(kCFNumberFloatType, &x);
 		return *this;
 	}
 
-	NumberRef&
+	Number&
 	operator = (double x)
 	{
 		create(kCFNumberDoubleType, &x);
@@ -196,12 +205,14 @@ public:
 	bool
 	isFloat() const
 	{
+		ASSERT(m_p);
 		return ::CFNumberIsFloatType(m_p);
 	}
 
 	CFComparisonResult
 	compare(CFNumberRef p2) const
 	{
+		ASSERT(m_p);
 		return ::CFNumberCompare(m_p, p2, NULL);
 	}
 };

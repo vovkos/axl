@@ -19,7 +19,7 @@ namespace cf {
 //..............................................................................
 
 bool
-NumberRef::create(
+Number::create(
 	CFNumberType type,
 	const void* p
 	)

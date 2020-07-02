@@ -18,13 +18,13 @@ namespace cf {
 //..............................................................................
 
 bool
-MutableDictionaryRef::create(CFDictionaryRef src)
+MutableDictionary::create(CFDictionaryRef src)
 {
 	CFMutableDictionaryRef newDictionary = ::CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, src);
 	if (!newDictionary)
 		return err::fail(err::SystemErrorCode_InsufficientResources);
 
-	this->attach(newDictionary);
+	attach(newDictionary);
 	return true;
 }
 

@@ -19,7 +19,7 @@ namespace cf {
 //..............................................................................
 
 bool
-StringRef::create(CFStringRef src)
+String::create(CFStringRef src)
 {
 	CFStringRef newString = ::CFStringCreateCopy(kCFAllocatorDefault, src);
 	if (!newString)
@@ -30,7 +30,7 @@ StringRef::create(CFStringRef src)
 }
 
 bool
-StringRef::create(
+String::create(
 	const char* p,
 	size_t length
 	)
@@ -40,11 +40,11 @@ StringRef::create(
 
 	CFStringRef newString = ::CFStringCreateWithBytes(
 		kCFAllocatorDefault,
-	   (const UInt8*) p,
-	   length,
-	   kCFStringEncodingUTF8,
-	   false
-	   );
+		(const UInt8*)p,
+		length,
+		kCFStringEncodingUTF8,
+		false
+		);
 
 	if (!newString)
 		return err::fail(err::SystemErrorCode_InsufficientResources);

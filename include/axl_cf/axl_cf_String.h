@@ -14,55 +14,85 @@
 #define _AXL_CF_STRING_H
 
 #include "axl_cf_Type.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace cf {
 
 //..............................................................................
 
-class StringRef: public TypeRefBase<CFStringRef>
+class String: public TypeBase<CFStringRef>
 {
 public:
-	StringRef()
+	String()
 	{
 	}
 
-	StringRef(const StringRef& src)
+	String(const String& src):
+		TypeBase<CFStringRef>(src)
 	{
-		copy(src);
 	}
 
-	StringRef(
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	String(String&& src)
+	{
+		m_p = src.m_p;
+		src.m_p = NULL;
+	}
+#endif
+
+	String(
 		CFStringRef p,
 		bool isAttach = false
-		)
+		):
+		TypeBase<CFStringRef>(p, isAttach)
 	{
-		isAttach ? copy(p) : attach(p);
 	}
 
-	StringRef(
-	   const char* p,
-	   size_t length = -1
+	String(
+		const char* p,
+		size_t length = -1
 		)
 	{
 		create(p, length);
 	}
 
-	StringRef&
-	operator = (const StringRef& src)
+	String(const sl::StringRef& string)
+	{
+		create(string);
+	}
+
+	String&
+	operator = (const String& src)
 	{
 		copy(src);
 		return *this;
 	}
 
-	StringRef&
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	String&
+	operator = (String&& src)
+	{
+		move(std::move(src));
+		return *this;
+	}
+#endif
+
+	String&
 	operator = (CFStringRef p)
 	{
 		copy(p);
 		return *this;
 	}
 
-	StringRef&
+	String&
+	operator = (const sl::StringRef& string)
+	{
+		create(string);
+		return *this;
+	}
+
+	String&
 	operator = (const char* p)
 	{
 		create(p);
@@ -74,13 +104,20 @@ public:
 
 	bool
 	create(
-			const char* p,
-			size_t length = -1
-			);
+		const char* p,
+		size_t length = -1
+		);
+
+	bool
+	create(const sl::StringRef& string)
+	{
+		return create(string.cp(), string.getLength());
+	}
 
 	size_t
 	getLength() const
 	{
+		ASSERT(m_p);
 		return ::CFStringGetLength(m_p);
 	}
 
@@ -90,12 +127,14 @@ public:
 		CFStringCompareFlags flags
 		) const
 	{
+		ASSERT(m_p);
 		return ::CFStringCompare(m_p, p2, flags);
 	}
 
 	sl::String
 	getString() const
 	{
+		ASSERT(m_p);
 		return getStringFromCfString(m_p);
 	}
 };
