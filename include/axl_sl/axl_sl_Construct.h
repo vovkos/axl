@@ -13,7 +13,7 @@
 
 #define _AXL_SL_CONSTRUCT_H
 
-#include "axl_g_Pch.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace sl {
@@ -111,7 +111,7 @@ takeOver(
 		return;
 
 	dst->~T();
-	memcpy(dst, src, sizeof(T));
+	memcpy(dst, src, SizeOfNoReusableTailPadding<T>()());
 	new(src)T;
 }
 

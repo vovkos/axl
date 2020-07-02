@@ -153,6 +153,12 @@ class SizeOf
 {
 public:
 	size_t
+	operator () () const
+	{
+		return sizeof(T);
+	}
+
+	size_t
 	operator () (const T* x) const
 	{
 		return sizeof(T);
@@ -162,6 +168,36 @@ public:
 	operator () (const T& x) const
 	{
 		return sizeof(T);
+	}
+};
+
+template <typename T>
+class SizeOfNoReusableTailPadding
+{
+protected:
+	struct Calc
+	{
+		T m_a;
+		char m_b; // this field might be allocated in T's tail-padding
+	};
+
+public:
+	size_t
+	operator () () const
+	{
+		return offsetof(Calc, m_b);
+	}
+
+	size_t
+	operator () (const T* x) const
+	{
+		return offsetof(Calc, m_b);
+	}
+
+	size_t
+	operator () (const T& x) const
+	{
+		return offsetof(Calc, m_b);
 	}
 };
 
