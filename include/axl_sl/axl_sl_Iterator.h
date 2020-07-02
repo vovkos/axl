@@ -34,8 +34,7 @@ struct ListLink
 		typename T,
 		typename GetLink,
 		typename Iterator,
-		typename ConstIterator,
-		typename Delete
+		typename ConstIterator
 		>
 	friend class ListBase;
 

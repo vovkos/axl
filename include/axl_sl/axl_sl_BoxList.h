@@ -133,7 +133,7 @@ template <
 	typename T,
 	typename ValueArg = typename ArgType<T>::Type
 	>
-class BoxList: public ListBase<
+class BoxList: public OwningListBase<
 	BoxListEntry<T>,
 	ImplicitPtrCast<BoxListEntry<T>, ListLink>,
 	BoxIterator<T>,
@@ -142,7 +142,7 @@ class BoxList: public ListBase<
 	>
 {
 public:
-	typedef ListBase<
+	typedef OwningListBase<
 		BoxListEntry<T>,
 		ImplicitPtrCast<BoxListEntry<T>, ListLink>,
 		BoxIterator<T>,
