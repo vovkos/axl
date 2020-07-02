@@ -38,7 +38,7 @@ printDeviceProperties(const iok::RegistryEntry& device)
 	if (parent)
 		indent = printDeviceProperties(parent);
 
-	cf::MutableDictionaryRef propDict = device.getAllProperties();
+	cf::MutableDictionary propDict = device.getAllProperties();
 
 	sl::Array<const void*> keyArray;
 	sl::Array<const void*> valueArray;
@@ -57,8 +57,8 @@ printDeviceProperties(const iok::RegistryEntry& device)
 
 		printf(
 			"%s = %s\n",
-			cf::TypeRef(keyArray[i]).toString().sz(),
-			cf::TypeRef(valueArray[i]).toString().sz()
+			cf::Type(keyArray[i]).toString().sz(),
+			cf::Type(valueArray[i]).toString().sz()
 			);
 	}
 
@@ -73,7 +73,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 {
 	portList->clear();
 
-	cf::MutableDictionaryRef dict = iok::createServiceMatchingDictionary(kIOSerialBSDServiceValue);
+	cf::MutableDictionary dict = iok::createServiceMatchingDictionary(kIOSerialBSDServiceValue);
 	dict.setValue(CFSTR(kIOSerialBSDTypeKey), CFSTR(kIOSerialBSDAllTypes));
 
 	iok::Iterator it = iok::findMatchingServices(dict);
@@ -87,7 +87,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 		sl::String name;
 		sl::String description;
 
-		cf::TypeRef prop = port.getProperty(kIOCalloutDeviceKey);
+		cf::Type prop = port.getProperty(kIOCalloutDeviceKey);
 		if (!prop)
 		{
 			prop = port.getProperty(kIODialinDeviceKey);

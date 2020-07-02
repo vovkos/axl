@@ -42,12 +42,12 @@ RegistryEntry::getPath(const char* plane) const
 	return buffer;
 }
 
-cf::MutableDictionaryRef
+cf::MutableDictionary
 RegistryEntry::getAllProperties() const
 {
 	CFMutableDictionaryRef p = NULL;
 	::IORegistryEntryCreateCFProperties(m_p, &p, kCFAllocatorDefault, 0);
-	return cf::MutableDictionaryRef(p, true);
+	return cf::MutableDictionary(p, true);
 }
 
 RegistryEntry

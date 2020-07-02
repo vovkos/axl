@@ -57,14 +57,14 @@ public:
 	sl::String
 	getPath(const char* plane = kIOServicePlane) const;
 
-	cf::MutableDictionaryRef
+	cf::MutableDictionary
 	getAllProperties() const;
 
-	cf::TypeRef
+	cf::Type
 	getProperty(const char* key) const
 	{
-		CFTypeRef p = ::IORegistryEntryCreateCFProperty(m_p, cf::StringRef(key), kCFAllocatorDefault, 0);
-		return cf::TypeRef(p, true);
+		CFTypeRef p = ::IORegistryEntryCreateCFProperty(m_p, cf::String(key), kCFAllocatorDefault, 0);
+		return cf::Type(p, true);
 	}
 
 	RegistryEntry
@@ -77,11 +77,11 @@ public:
 //..............................................................................
 
 inline
-cf::MutableDictionaryRef
+cf::MutableDictionary
 createServiceMatchingDictionary(const char* service)
 {
 	CFMutableDictionaryRef p = ::IOServiceMatching(service);
-	return cf::MutableDictionaryRef(p, true);
+	return cf::MutableDictionary(p, true);
 }
 
 Iterator
