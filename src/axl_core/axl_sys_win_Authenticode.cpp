@@ -61,7 +61,7 @@ verifyAuthenticodeSignature(
 		store.p(),
 		msg.p(),
 		NULL
-		);
+		) != 0;
 
 	sl::Array<char> signerInfoBuffer;
 	result = msg.getParam(&signerInfoBuffer, CMSG_SIGNER_INFO_PARAM) != -1;
