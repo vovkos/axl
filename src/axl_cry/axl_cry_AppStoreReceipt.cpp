@@ -329,15 +329,14 @@ verifyAppStoreReceipt(
 	if (flags & VerifyAppStoreReceiptFlag_SkipHashCheck)
 		return true;
 
-	EVP_MD_CTX evpCtx;
-	EVP_MD_CTX_init(&evpCtx);
-	EVP_DigestInit_ex(&evpCtx, EVP_sha1(), NULL);
-	EVP_DigestUpdate(&evpCtx, computerGuid, computerGuidSize);
-	EVP_DigestUpdate(&evpCtx, receipt->m_opaque, receipt->m_opaque.getCount());
-	EVP_DigestUpdate(&evpCtx, receipt->m_rawBundleId, receipt->m_rawBundleId.getCount());
+	char buffer[256];
+	sl::Array<char> message(ref::BufKind_Stack, buffer, sizeof(buffer));
+	message.append((char*)computerGuid, computerGuidSize);
+	message.append(receipt->m_opaque, receipt->m_opaque.getCount());
+	message.append(receipt->m_rawBundleId, receipt->m_rawBundleId.getCount());
 
 	uchar_t digest[20];
-	EVP_DigestFinal_ex(&evpCtx, digest, NULL);
+	EVP_Digest(message, message.getCount(), digest, NULL, EVP_sha1(), NULL);
 
 	bool isMatch =
 		receipt->m_sha1Hash.getCount() == sizeof(digest) &&

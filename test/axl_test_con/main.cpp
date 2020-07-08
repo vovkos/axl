@@ -5448,14 +5448,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_OS_WIN)
-	authenticodeTest();
-#endif
-
-#if (_AXL_OS_DARWIN)
-	bookmarkTest();
-#endif
-
+	receiptTest();
 	return 0;
 }
 
