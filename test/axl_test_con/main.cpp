@@ -5254,6 +5254,8 @@ receiptTest()
 	const char* filePath = "C:/Projects/playground/receipt/xcode-receipt";
 #elif (_AXL_OS_DARWIN)
 	const char* filePath = "/Users/vladimir/Projects/playground/receipt/xcode-receipt";
+#elif (_AXL_OS_LINUX)
+	const char* filePath = "/home/vladimir/Projects/playground/receipt/xcode-receipt";
 #endif
 
 	io::SimpleMappedFile file;
