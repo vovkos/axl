@@ -4,47 +4,47 @@
 
 #if (_AXL_OS_LINUX)
 #	if (_AXL_CPU_X86)
-#	    define ELF_R_TYPE    ELF32_R_TYPE
-#	    define ELF_R_SYM     ELF32_R_SYM
-#	    define ELF_ST_TYPE   ELF32_ST_TYPE
-#	    define ELF_ST_BIND   ELF32_ST_BIND
+#		define ELF_R_TYPE	ELF32_R_TYPE
+#		define ELF_R_SYM	 ELF32_R_SYM
+#		define ELF_ST_TYPE   ELF32_ST_TYPE
+#		define ELF_ST_BIND   ELF32_ST_BIND
 
-#       define DT_GOT_REL    DT_REL
-#       define DT_GOT_RELSZ  DT_RELSZ
-#       define DT_GOT_RELENT DT_RELENT
+#		define DT_GOT_REL	DT_REL
+#		define DT_GOT_RELSZ  DT_RELSZ
+#		define DT_GOT_RELENT DT_RELENT
 
-#		define R_GLOB_DAT     R_386_GLOB_DAT
-#		define R_JUMP_SLOT    R_386_JMP_SLOT
+#		define R_GLOB_DAT	 R_386_GLOB_DAT
+#		define R_JUMP_SLOT	R_386_JMP_SLOT
 
 typedef ElfW(Rel) ElfRel;
 
 #	elif (_AXL_CPU_AMD64)
-#	    define ELF_R_TYPE    ELF64_R_TYPE
-#	    define ELF_R_SYM     ELF64_R_SYM
-#	    define ELF_ST_TYPE   ELF64_ST_TYPE
-#	    define ELF_ST_BIND   ELF64_ST_BIND
+#		define ELF_R_TYPE	ELF64_R_TYPE
+#		define ELF_R_SYM	 ELF64_R_SYM
+#		define ELF_ST_TYPE   ELF64_ST_TYPE
+#		define ELF_ST_BIND   ELF64_ST_BIND
 
-#       define DT_GOT_REL    DT_RELA
-#       define DT_GOT_RELSZ  DT_RELASZ
-#       define DT_GOT_RELENT DT_RELAENT
+#		define DT_GOT_REL	DT_RELA
+#		define DT_GOT_RELSZ  DT_RELASZ
+#		define DT_GOT_RELENT DT_RELAENT
 
-#       define R_GLOB_DAT    R_X86_64_GLOB_DAT
-#       define R_JUMP_SLOT   R_X86_64_JUMP_SLOT
+#		define R_GLOB_DAT	R_X86_64_GLOB_DAT
+#		define R_JUMP_SLOT   R_X86_64_JUMP_SLOT
 
 typedef ElfW(Rela) ElfRel;
 
 #	elif (_AXL_CPU_ARM32)
-#	    define ELF_R_TYPE    ELF32_R_TYPE
-#	    define ELF_R_SYM     ELF32_R_SYM
-#	    define ELF_ST_TYPE   ELF32_ST_TYPE
-#	    define ELF_ST_BIND   ELF32_ST_BIND
+#		define ELF_R_TYPE	ELF32_R_TYPE
+#		define ELF_R_SYM	 ELF32_R_SYM
+#		define ELF_ST_TYPE   ELF32_ST_TYPE
+#		define ELF_ST_BIND   ELF32_ST_BIND
 
-#       define DT_GOT_REL    DT_REL
-#       define DT_GOT_RELSZ  DT_RELSZ
-#       define DT_GOT_RELENT DT_RELENT
+#		define DT_GOT_REL	DT_REL
+#		define DT_GOT_RELSZ  DT_RELSZ
+#		define DT_GOT_RELENT DT_RELENT
 
-#       define R_GLOB_DAT    R_ARM_GLOB_DAT
-#       define R_JUMP_SLOT   R_ARM_JUMP_SLOT
+#		define R_GLOB_DAT	R_ARM_GLOB_DAT
+#		define R_JUMP_SLOT   R_ARM_JUMP_SLOT
 
 	typedef ElfW(Rel) ElfRel;
 
@@ -59,9 +59,9 @@ namespace spy {
 class ImportIteratorBase
 {
 protected:
-    sl::StringRef m_symbolName;
+	sl::StringRef m_symbolName;
 	sl::StringRef m_moduleName;
-    void** m_slot;
+	void** m_slot;
 
 public:
 	ImportIteratorBase()
@@ -143,8 +143,8 @@ protected:
 
 struct PeImportEnumeration: ref::RefCount
 {
-    char* m_moduleBase;
-    IMAGE_IMPORT_DESCRIPTOR* m_importDir;
+	char* m_moduleBase;
+	IMAGE_IMPORT_DESCRIPTOR* m_importDir;
 	size_t m_importDescCount;
 };
 
@@ -160,14 +160,14 @@ protected:
 	ref::Ptr<PeCodeMap> m_codeMap;
 	size_t m_importDescIdx;
 	IMAGE_THUNK_DATA* m_nameThunk;
-    IMAGE_THUNK_DATA* m_addrThunk;
+	IMAGE_THUNK_DATA* m_addrThunk;
 
 public:
-    ImportIterator();
+	ImportIterator();
 	ImportIterator(PeImportEnumeration* enumeration);
 
-    ImportIterator&
-    operator ++ ();
+	ImportIterator&
+	operator ++ ();
 
 	ImportIterator
 	operator ++ (int);
@@ -204,14 +204,14 @@ protected:
 
 struct ElfImportEnumeration: ref::RefCount
 {
-    char* m_moduleBase;
-    ElfW(Sym)* m_symbolTable;
-    char* m_stringTable;
-    size_t m_stringTableSize;
-    ElfRel* m_pltRelTable;
-    size_t m_pltRelCount;
-    ElfRel* m_gotRelTable;
-    size_t m_gotRelCount;
+	size_t m_baseAddress; // relocation difference, not an absolute address
+	ElfW(Sym)* m_symbolTable;
+	char* m_stringTable;
+	size_t m_stringTableSize;
+	ElfRel* m_pltRelTable;
+	size_t m_pltRelCount;
+	ElfRel* m_gotRelTable;
+	size_t m_gotRelCount;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -219,19 +219,19 @@ struct ElfImportEnumeration: ref::RefCount
 class ImportIterator: public ImportIteratorBase
 {
 protected:
-    ref::Ptr<ElfImportEnumeration> m_enumeration;
-    size_t m_index;
+	ref::Ptr<ElfImportEnumeration> m_enumeration;
+	size_t m_index;
 
 public:
-    ImportIterator()
+	ImportIterator()
 	{
-    	m_index = -1;
+		m_index = -1;
 	}
 
 	ImportIterator(ElfImportEnumeration* enumeration);
 
-    ImportIterator&
-    operator ++ ();
+	ImportIterator&
+	operator ++ ();
 
 	ImportIterator
 	operator ++ (int);
@@ -352,7 +352,7 @@ protected:
 bool
 enumerateImports(
 	ImportIterator* iterator,
-    void* module = NULL
+	void* module = NULL
 	);
 
 bool
