@@ -104,6 +104,11 @@ if(BUILD_AXL_XML)
 	list(APPEND OPT_LIB_LIST axl_xml expat)
 endif()
 
+if(BUILD_AXL_SPY)
+	add_definitions(-D_AXL_SPY=1)
+	list(APPEND OPT_LIB_LIST axl_spy)
+endif()
+
 add_executable(
 	axl_test_con
 	${PCH_H}
@@ -126,7 +131,6 @@ set_target_properties(
 
 target_link_libraries(
 	axl_test_con
-	axl_spy
 	axl_io
 	axl_fsm
 	axl_zip

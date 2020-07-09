@@ -28,6 +28,7 @@
 #include "axl_io_FilePathUtils.h"
 #include "axl_io_NetworkAdapter.h"
 #include "axl_io_SharedMemoryTransport.h"
+#include "axl_io_FileEnumerator.h"
 
 #include "axl_sys_SjljTry.h"
 #include "axl_sys_DynamicLib.h"
@@ -35,10 +36,12 @@
 #include "axl_sys_Event.h"
 #include "axl_sys_Process.h"
 #include "axl_sys_ReadWriteLock.h"
+#include "axl_sys_Thread.h"
 
 #include "axl_fsm_Regex.h"
 #include "axl_fsm_StdRegexNameMgr.h"
 #include "axl_zip_ZipReader.h"
+#include "axl_err_Errno.h"
 
 #include "axl_enc_EscapeEncoding.h"
 #include "axl_enc_Base32Encoding.h"
@@ -67,11 +70,19 @@
 #	include "axl_cry_X509.h"
 #	include "axl_cry_Pkcs7.h"
 #	include "axl_cry_CryptoError.h"
+#	include "axl_cry_AppStoreReceipt.h"
 #endif
 
 #ifdef _AXL_IO_SSL
 #	include "axl_io_SslCtx.h"
 #	include "axl_io_Ssl.h"
+#endif
+
+#ifdef _AXL_SPY
+#	include "axl_spy_ImportEnumerator.h"
+#	include "axl_spy_ImportWriteProtection.h"
+#	include "axl_spy_ModuleEnumerator.h"
+#	include "axl_spy_Hook.h"
 #endif
 
 #if (_AXL_OS_WIN)
@@ -89,8 +100,6 @@
 #		include "axl_cf_Url.h"
 #	endif
 #endif
-
-#include "axl_io_FileEnumerator.h"
 
 using namespace axl;
 
@@ -118,10 +127,6 @@ using namespace axl;
 extern "C" {
 #	include <libusb-1.0/libusb.h>
 } // extern "C" {
-#endif
-
-#ifdef _AXL_XML
-#	include "axl_xml_Pch.h"
 #endif
 
 //..............................................................................

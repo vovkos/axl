@@ -285,11 +285,13 @@ endif()
 
 #...............................................................................
 
-option(
-	BUILD_AXL_SPY
-	"Build axl_spy library (API spying engine)"
-	ON
-	)
+if("${TARGET_CPU}" MATCHES "x86|amd64")
+	option(
+		BUILD_AXL_SPY
+		"Build axl_spy library (API spying engine)"
+		ON
+		)
+endif()
 
 if(BUILD_AXL_SPY)
 	add_subdirectory(axl_spy)

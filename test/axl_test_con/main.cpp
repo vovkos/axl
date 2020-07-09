@@ -9,18 +9,7 @@
 //
 //..............................................................................
 
-#include <axl_cry_X509.h>
 #include "pch.h"
-#include "axl_sys_Thread.h"
-#include "axl_err_Errno.h"
-#include "../../include/axl_spy_ImportEnumerator.h"
-
-#include "axl_spy_ImportEnumerator.h"
-#include "axl_spy_ImportWriteProtection.h"
-#include "axl_spy_ModuleEnumerator.h"
-#include "axl_spy_Hook.h"
-
-#include "axl_cry_AppStoreReceipt.h"
 
 //..............................................................................
 
@@ -4714,6 +4703,8 @@ testPty(const sl::StringRef& cmdLine)
 
 //..............................................................................
 
+#if (_AXL_SPY)
+
 size_t g_indentSlot;
 
 size_t
@@ -5239,6 +5230,8 @@ spyStdcallTest()
 	((FooFunc*)fooHook)(10);
 	return 0;
 }
+
+#endif // _AXL_SPY
 
 //..............................................................................
 

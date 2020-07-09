@@ -2,8 +2,12 @@
 #include "axl_spy_ImportWriteProtection.h"
 
 #if (_AXL_OS_LINUX)
-#	if (_AXL_CPU_AMD64 || _AXL_CPU_X86)
+#	if (_AXL_CPU_AMD64 || _AXL_CPU_X86 || _AXL_CPU_ARM32)
 #		define DT_THISPROCNUM 0
+#	elif (_AXL_CPU_ARM64)
+#		define DT_THISPROCNUM 6
+#	else
+#		error unsupported CPU architecture
 #	endif
 
 // we use undocumented fields in the link map; it's a bit hackish, but
