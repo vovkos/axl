@@ -82,19 +82,10 @@ if(BUILD_AXL_CRY)
 
 	if(BUILD_AXL_IO_SSL)
 		add_definitions(-D_AXL_IO_SSL=1)
-
-		list(
-			APPEND OPT_LIB_LIST
-			axl_io_ssl
-			${OPENSSL_SSL_LIB_NAME}
-			)
+		list(APPEND OPT_LIB_LIST axl_io_ssl ${OPENSSL_SSL_LIB_NAME})
 	endif()
 
-	list(
-		APPEND OPT_LIB_LIST
-		axl_cry
-		${OPENSSL_CRYPTO_LIB_NAME}
-		)
+	list(APPEND OPT_LIB_LIST axl_cry ${OPENSSL_CRYPTO_LIB_NAME})
 endif()
 
 if(BUILD_AXL_XML)
@@ -131,11 +122,11 @@ set_target_properties(
 
 target_link_libraries(
 	axl_test_con
+	${OPT_LIB_LIST}
 	axl_io
 	axl_fsm
 	axl_zip
 	axl_core
-	${OPT_LIB_LIST}
 	)
 
 if(WIN32)
