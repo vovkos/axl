@@ -5235,6 +5235,8 @@ spyStdcallTest()
 
 //..............................................................................
 
+#ifdef _AXL_CRY
+
 int
 receiptTest()
 {
@@ -5296,6 +5298,8 @@ receiptTest()
 
 	return 0;
 }
+
+#endif // _AXL_CRY
 
 //..............................................................................
 
@@ -5443,7 +5447,10 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
+#ifdef _AXL_CRY
 	receiptTest();
+#endif
+
 	return 0;
 }
 
