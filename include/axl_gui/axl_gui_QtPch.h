@@ -34,5 +34,6 @@
 #include <QLinearGradient>
 #include <QScrollBar>
 #include <QWidget>
+#include <QSyntaxHighlighter>
 #include <QToolTip>
 #include <QTimer>

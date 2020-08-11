@@ -102,6 +102,7 @@ set(
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtCaret.h
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtEngine.h
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtWidget.h
+	${AXL_INC_DIR}/axl_gui/axl_gui_QtRagelSyntaxHighlighter.h
 	)
 
 set(
