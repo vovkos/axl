@@ -16,6 +16,7 @@
 #include "axl_cry_Asn1.h"
 #include "axl_cry_X509.h"
 #include "axl_cry_Bio.h"
+#include "axl_sys_Time.h"
 
 #if (_AXL_OS_DARWIN)
 #	include "axl_iok_ComputerGuid.h"
@@ -26,12 +27,65 @@ namespace cry {
 
 //..............................................................................
 
+// decoding assumes GMT (which seems to always be the case with Apple receipts)
+
+static
+uint64_t
+decodeRfc3339Timestamp(const sl::StringRef& string)
+{
+	int year = 0;
+	int month = 0;
+	int monthDay = 0;
+	int hour = 0;
+	int minute = 0;
+	int second = 0;
+
+	int result = sscanf(
+		string.sz(),
+		"%d-%d-%dT%d:%d:%d",
+		&year,
+		&month,
+		&monthDay,
+		&hour,
+		&minute,
+		&second
+		);
+
+	if (result < 3)
+	{
+		err::setError(err::SystemErrorCode_InvalidParameter);
+		return 0;
+	}
+
+	sys::Time time;
+	time.m_year = year;
+	time.m_month = month - 1;
+	time.m_monthDay = monthDay;
+	time.m_hour = hour;
+	time.m_minute = minute;
+	time.m_second = second;
+
+	return time.getTimestamp(0);
+}
+
+//..............................................................................
+
+AppStoreReceipt::AppStoreReceipt()
+{
+	m_receiptCreationTimestamp = 0;
+	m_receiptExpirationTimestamp = 0;
+}
+
 void
 AppStoreReceipt::clear()
 {
 	m_bundleId.clear();
 	m_appVersion.clear();
 	m_originalAppVersion.clear();
+	m_receiptCreationDateString.clear();
+	m_receiptExpirationDateString.clear();
+	m_receiptCreationTimestamp = 0;
+	m_receiptExpirationTimestamp = 0;
 	m_opaque.clear();
 	m_sha1Hash.clear();
 }
@@ -186,19 +240,6 @@ AppStoreReceiptPayloadParser::decode(
 
 			break;
 
-		case AttributeId_ReceiptCreationDate:
-			m_attributeString = &m_receipt->m_receiptCreationDate;
-
-			p = decode(
-				State_AttributeStringValue,
-				V_ASN1_IA5STRING,
-				"invalid app receipt creation date (expected ASN1 IA5 STRING)",
-				p,
-				length
-				);
-
-			break;
-
 		case AttributeId_OriginalAppVersion:
 			m_attributeString = &m_receipt->m_originalAppVersion;
 
@@ -212,8 +253,22 @@ AppStoreReceiptPayloadParser::decode(
 
 			break;
 
+		case AttributeId_ReceiptCreationDate:
+			m_attributeString = &m_receipt->m_receiptCreationDateString;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_IA5STRING,
+				"invalid app receipt creation date (expected ASN1 IA5 STRING)",
+				p,
+				length
+				);
+
+			m_receipt->m_receiptCreationTimestamp = decodeRfc3339Timestamp(m_receipt->m_receiptCreationDateString);
+			break;
+
 		case AttributeId_ReceiptExpirationDate:
-			m_attributeString = &m_receipt->m_receiptExpirationDate;
+			m_attributeString = &m_receipt->m_receiptExpirationDateString;
 
 			p = decode(
 				State_AttributeStringValue,
@@ -223,6 +278,7 @@ AppStoreReceiptPayloadParser::decode(
 				length
 				);
 
+			m_receipt->m_receiptExpirationTimestamp = decodeRfc3339Timestamp(m_receipt->m_receiptExpirationDateString);
 			break;
 
 		case AttributeId_Opaque:

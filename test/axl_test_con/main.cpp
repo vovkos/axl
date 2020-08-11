@@ -5282,16 +5282,22 @@ receiptTest()
 		"  bundle ID:               %s\n"
 		"  app version:             %s\n"
 		"  original app version:    %s\n"
-		"  receipt creation date:   %s\n"
-		"  receipt expiration date: %s\n"
+		"  receipt creation date:   %s%s\n"
+		"  receipt expiration date: %s%sn"
 		"  ------------------------\n"
 		"  SHA1 hash: %s\n"
 		"  opaque:    %s\n",
 		receipt.m_bundleId.sz(),
 		receipt.m_appVersion.sz(),
 		receipt.m_originalAppVersion.sz(),
-		receipt.m_receiptCreationDate.sz(),
-		receipt.m_receiptExpirationDate.sz(),
+		receipt.m_receiptCreationDateString.sz(),
+		receipt.m_receiptCreationTimestamp ?
+			sys::Time(receipt.m_receiptCreationTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
+			"",
+		receipt.m_receiptExpirationDateString.sz(),
+		receipt.m_receiptExpirationTimestamp ?
+			sys::Time(receipt.m_receiptExpirationTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
+			"",
 		enc::HexEncoding::encode(receipt.m_sha1Hash, receipt.m_sha1Hash.getCount()).sz(),
 		enc::HexEncoding::encode(receipt.m_opaque, receipt.m_opaque.getCount()).sz()
 		);

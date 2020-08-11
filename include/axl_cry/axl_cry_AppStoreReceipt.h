@@ -26,12 +26,17 @@ struct AppStoreReceipt
 	sl::String m_bundleId;
 	sl::String m_appVersion;
 	sl::String m_originalAppVersion;
-	sl::String m_receiptCreationDate;
-	sl::String m_receiptExpirationDate;
+	sl::String m_receiptCreationDateString;
+	sl::String m_receiptExpirationDateString;
+
+	uint64_t m_receiptCreationTimestamp;
+	uint64_t m_receiptExpirationTimestamp;
 
 	sl::Array<char> m_rawBundleId;
 	sl::Array<char> m_opaque;
 	sl::Array<char> m_sha1Hash;
+
+	AppStoreReceipt();
 
 	void
 	clear();
