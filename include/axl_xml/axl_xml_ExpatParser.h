@@ -434,7 +434,7 @@ protected:
 	bool
 	setHandlers()
 	{
-		setUserData(static_cast<T*> (this));
+		setUserData(static_cast<T*>(this));
 
 		if (&T::onStartElement != &ExpatParser::onStartElement)
 			setStartElementHandler(startElementHandler);

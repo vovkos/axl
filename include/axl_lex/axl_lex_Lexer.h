@@ -57,7 +57,7 @@ public:
 		m_freeTokenList.insertListTail(&m_tokenList);
 		m_lastTokenPos.clear();
 
-		static_cast<T*> (this)->onReset();
+		static_cast<T*>(this)->onReset();
 	}
 
 	const Token*

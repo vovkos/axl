@@ -30,7 +30,7 @@ public:
 		size_t size
 		)
 	{
-		static_cast<T*> (this)->sendMsgEx(&p, &size, 1);
+		static_cast<T*>(this)->sendMsgEx(&p, &size, 1);
 	}
 
 	void
@@ -44,7 +44,7 @@ public:
 		const void* blockArray[] = { p, extra };
 		size_t sizeArray[] = { size, extraSize };
 
-		static_cast<T*> (this)->sendMsgEx(blockArray, sizeArray, 2);
+		static_cast<T*>(this)->sendMsgEx(blockArray, sizeArray, 2);
 	}
 
 	// T must implement:

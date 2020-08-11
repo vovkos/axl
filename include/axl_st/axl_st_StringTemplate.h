@@ -91,7 +91,7 @@ public:
 		emitContext.m_frame = frame;
 		m_emitContextStack.insertTail(&emitContext);
 
-		result = static_cast<T*> (this)->runScript(fileName, scriptSource);
+		result = static_cast<T*>(this)->runScript(fileName, scriptSource);
 
 		ASSERT(*m_emitContextStack.getTail() == &emitContext);
 		m_emitContextStack.removeTail();
@@ -187,7 +187,7 @@ protected:
 			}
 
 			if (token->m_pos.m_offset > offset)
-				static_cast<T*> (this)->createPassthroughCall(
+				static_cast<T*>(this)->createPassthroughCall(
 					scriptSource,
 					offset,
 					token->m_pos.m_offset - offset
@@ -204,7 +204,7 @@ protected:
 			switch (token->m_token)
 			{
 			case TokenKind_Data:
-				static_cast<T*> (this)->createEmitCall(scriptSource, token->m_data.m_string);
+				static_cast<T*>(this)->createEmitCall(scriptSource, token->m_data.m_string);
 				pos = token->m_pos;
 				lexer.nextToken();
 				break;
@@ -227,7 +227,7 @@ protected:
 				if (!result)
 					return false;
 
-				static_cast<T*> (this)->createEmitCall(
+				static_cast<T*>(this)->createEmitCall(
 					scriptSource,
 					frame.getSubString(offset, pos.m_offset - offset)
 					);

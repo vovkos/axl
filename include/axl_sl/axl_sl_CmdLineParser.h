@@ -136,7 +136,7 @@ public:
 
 		return
 			checkMissingValue() &&
-			static_cast<T*> (this)->finalize();
+			static_cast<T*>(this)->finalize();
 	}
 
 	bool
@@ -157,7 +157,7 @@ public:
 
 		return
 			checkMissingValue() &&
-			static_cast<T*> (this)->finalize();
+			static_cast<T*>(this)->finalize();
 	}
 
 	bool
@@ -178,7 +178,7 @@ public:
 
 		return
 			checkMissingValue() &&
-			static_cast<T*> (this)->finalize();
+			static_cast<T*>(this)->finalize();
 	}
 
 	// overridables
@@ -226,7 +226,7 @@ protected:
 	{
 		bool result;
 
-		T* self = static_cast<T*> (this);
+		T* self = static_cast<T*>(this);
 
 		if (m_flags & Flag_Forward)
 			return self->onValue(arg);
@@ -283,7 +283,7 @@ protected:
 	bool
 	processValue(const sl::StringRef& value)
 	{
-		T* self = static_cast<T*> (this);
+		T* self = static_cast<T*>(this);
 
 		if (!m_valueSwitchKind)
 			return m_argIdx == 0 ? self->onValue0(value) : self->onValue(value);
@@ -305,7 +305,7 @@ protected:
 	{
 		bool result;
 
-		T* self = static_cast<T*> (this);
+		T* self = static_cast<T*>(this);
 
 		result = checkMissingValue();
 		if (!result)

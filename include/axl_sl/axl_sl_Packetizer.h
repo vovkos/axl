@@ -74,7 +74,7 @@ public:
 			ASSERT(m_buffer.getCount() >= sizeof(uint64_t));
 			size_t dataSize = m_buffer.getCount() - sizeof(uint64_t);
 			if (dataSize)
-				static_cast<T*> (this)->onPacket(m_buffer.p() + sizeof(uint64_t), dataSize);
+				static_cast<T*>(this)->onPacket(m_buffer.p() + sizeof(uint64_t), dataSize);
 
 			reset();
 
@@ -146,7 +146,7 @@ public:
 			ASSERT(m_buffer.getCount() >= sizeof(uint64_t));
 			size_t dataSize = m_buffer.getCount() - sizeof(uint64_t);
 			if (dataSize)
-				static_cast<T*> (this)->onPacket(m_buffer.p() + sizeof(uint64_t), dataSize);
+				static_cast<T*>(this)->onPacket(m_buffer.p() + sizeof(uint64_t), dataSize);
 
 			reset();
 

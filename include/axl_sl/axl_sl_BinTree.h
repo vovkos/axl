@@ -278,7 +278,7 @@ public:
 			m_nodeList.insertAfter(node, parent);
 		}
 
-		static_cast<T*> (this)->onInsert(node);
+		static_cast<T*>(this)->onInsert(node);
 		return node;
 	}
 
@@ -329,7 +329,7 @@ public:
 			xcg(node, next);
 		}
 
-		static_cast<T*> (this)->onErase(node);
+		static_cast<T*>(this)->onErase(node);
 		m_nodeList.erase(node);
 	}
 

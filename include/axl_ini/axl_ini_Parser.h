@@ -58,17 +58,17 @@ public:
 				return false;
 
 			case ScanResultKind_Eof:
-				return static_cast<T*> (this)->finalize();
+				return static_cast<T*>(this)->finalize();
 
 			case ScanResultKind_Section:
-				result = static_cast<T*> (this)->onSection(m_sectionName);
+				result = static_cast<T*>(this)->onSection(m_sectionName);
 				if (!result)
 					return false;
 
 				break;
 
 			case ScanResultKind_KeyValue:
-				result = static_cast<T*> (this)->onKeyValue(m_keyName, m_value);
+				result = static_cast<T*>(this)->onKeyValue(m_keyName, m_value);
 				if (!result)
 					return false;
 
