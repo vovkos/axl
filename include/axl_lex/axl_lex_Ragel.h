@@ -9,30 +9,75 @@
 //
 //..............................................................................
 
-#include "pch.h"
-#include "axl_lex_Token.h"
+#pragma once
+
+#define _AXL_LEX_RAGEL_H
+
+#include "axl_lex_Lexer.h"
 
 namespace axl {
 namespace lex {
 
 //..............................................................................
 
-void
-LineCol::incrementalCount(const sl::StringRef& string)
+class Ragel
 {
-	const char* p = string.cp();
-	const char* end = string.getEnd();
-	const char* line = p;
+protected:
+	sl::Array<int> m_stack; // stack of states
+	char* m_begin;
 
-	for (; p < end; p++)
-		if (*p == '\n')
-		{
-			m_line++;
-			line = p + 1;
-		}
+	// ragel interface variables
 
-	m_col = (int)(p - line);
-}
+	char* p;
+	char* pe;
+	char* eof;
+	char* ts;
+	char* te;
+	int* stack;
+	int act;
+	int cs;
+	int top;
+
+public:
+	Ragel()
+	{
+		clear();
+	}
+
+	void
+	setSource(
+		const sl::StringRef& source,
+		bool isBomNeeded = false
+		);
+
+protected:
+	int*
+	prePush();
+
+	void
+	postPop();
+
+	void
+	stop()
+	{
+		pe = p + 1;
+	}
+
+	void
+	clear();
+
+	// to be implemented:
+
+	// void
+	// init ()
+	// {
+	// }
+
+	// void
+	// exec ()
+	// {
+	// }
+};
 
 //..............................................................................
 

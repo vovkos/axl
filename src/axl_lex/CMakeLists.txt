@@ -16,6 +16,7 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_lex/axl_lex_Lexer.h
+	${AXL_INC_DIR}/axl_lex/axl_lex_Ragel.h
 	${AXL_INC_DIR}/axl_lex/axl_lex_RagelLexer.h
 	${AXL_INC_DIR}/axl_lex/axl_lex_Token.h
 	${AXL_INC_DIR}/axl_lex/axl_lex_ParseError.h
@@ -25,6 +26,7 @@ set(
 	LIB_CPP_LIST
 	axl_lex_ParseError.cpp
 	axl_lex_Token.cpp
+	axl_lex_Ragel.cpp
 	)
 
 source_group(

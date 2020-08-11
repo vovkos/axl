@@ -14,6 +14,7 @@
 #define _AXL_LEX_RAGELLEXER_H
 
 #include "axl_lex_Lexer.h"
+#include "axl_lex_Ragel.h"
 
 namespace axl {
 namespace lex {
@@ -109,7 +110,9 @@ template <
 	typename T,
 	typename Token = StdRagelToken
 	>
-class RagelLexer: public Lexer<T, Token>
+class RagelLexer:
+	public Lexer<T, Token>,
+	public Ragel
 {
 	friend class Lexer<T, Token>;
 
@@ -119,23 +122,8 @@ protected:
 
 	sl::StringRef m_filePath;
 
-	char* m_begin;
 	int m_line;
 	size_t m_lineOffset;
-
-	sl::Array<int> m_stack; // stack of states
-
-	// ragel interface variables
-
-	char* p;
-	char* pe;
-	char* eof;
-	char* ts;
-	char* te;
-	int act;
-	int cs;
-	int top;
-	int* stack;
 
 public:
 	RagelLexer()
@@ -156,7 +144,7 @@ public:
 		m_tokenizeLimit = tokenizeLimit;
 	}
 
-	bool
+	void
 	create(
 		int state,
 		const sl::StringRef& filePath,
@@ -166,10 +154,9 @@ public:
 	{
 		create(filePath, source, isBomNeeded);
 		cs = state;
-		return true;
 	}
 
-	bool
+	void
 	create(
 		const sl::StringRef& filePath,
 		const sl::StringRef& source,
@@ -177,24 +164,9 @@ public:
 		)
 	{
 		this->reset();
-
-		static_cast<T*> (this)->init();
-
-		p = (char*)source.cp();
-		eof = (char*)source.getEnd();
-
-		m_begin = p;
+		static_cast<T*>(this)->init();
 		m_filePath = filePath;
-
-		if (!isBomNeeded)
-		{
-			size_t bomLength = enc::Utf8::getBomLength();
-			if (source.getLength() >= bomLength &&
-				memcmp(p, enc::Utf8::getBom(), bomLength) == 0)
-				p += bomLength;
-		}
-
-		return true;
+		Ragel::setSource(source, isBomNeeded);
 	}
 
 	const Token*
@@ -240,17 +212,6 @@ public:
 	}
 
 	void
-	callState(int state)
-	{
-		int oldState = cs;
-
-		gotoState(state);
-
-		stack = prePush();
-		stack[top++] = oldState;
-	}
-
-	void
 	setLineCol(
 		int line,
 		int col
@@ -276,31 +237,6 @@ protected:
 
 		m_lineOffset = line - m_begin;
 		m_line++;
-	}
-
-	int*
-	prePush()
-	{
-		size_t count = m_stack.getCount();
-		m_stack.setCount(count + 1);
-		stack = m_stack;
-		return stack;
-	}
-
-	void
-	postPop()
-	{
-		size_t count = m_stack.getCount();
-		if (!count)
-			return;
-
-		m_stack.setCount(count - 1);
-	}
-
-	void
-	stop()
-	{
-		pe = p + 1;
 	}
 
 	void
@@ -359,24 +295,14 @@ protected:
 	void
 	onReset()
 	{
-		p = NULL;
-		pe = NULL;
-		eof = NULL;
-		ts = NULL;
-		te = NULL;
-		act = 0;
-		cs = 0;
-		top = 0;
-		stack = NULL;
+		Ragel::clear();
 
-		m_begin = NULL;
 		m_line = 0;
 		m_lineOffset = 0;
 		m_tokenizeLimit = 8;
 		m_tokenizeCount = 0;
 
 		m_filePath.clear();
-		m_stack.clear();
 	}
 
 	void
@@ -386,7 +312,7 @@ protected:
 		{
 			pe = eof;
 			m_tokenizeCount = 0;
-			static_cast<T*> (this)->exec();
+			static_cast<T*>(this)->exec();
 		}
 		else
 		{
