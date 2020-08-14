@@ -21,20 +21,17 @@ namespace lex {
 
 //..............................................................................
 
-class RagelTokenPos: public LineCol
+class RagelTokenPos: public LineColOffset
 {
 public:
-	size_t m_offset;
-	size_t m_length;
-
 	char* m_p;
+	size_t m_length;
 
 public:
 	RagelTokenPos()
 	{
-		m_offset = 0;
-		m_length = 0;
 		m_p = NULL;
+		m_length = 0;
 	}
 };
 

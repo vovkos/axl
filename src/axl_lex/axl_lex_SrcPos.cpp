@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_lex_Token.h"
+#include "axl_lex_SrcPos.h"
 
 namespace axl {
 namespace lex {
