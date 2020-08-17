@@ -219,9 +219,26 @@ public:
 	}
 
 	void
-	setLineCol(const LineCol& lineCol)
+	setLineColOffset(
+		int line,
+		int col,
+		size_t offset
+		)
 	{
-		setLineCol(lineCol.m_line, lineCol.m_col);
+		setLineCol(line, col);
+		m_begin -= offset;
+	}
+
+	void
+	setLineCol(const LineCol& pos)
+	{
+		setLineCol(pos.m_line, pos.m_col);
+	}
+
+	void
+	setLineColOffset(const LineColOffset& pos)
+	{
+		setLineColOffset(pos.m_line, pos.m_col, pos.m_offset);
 	}
 
 protected:
