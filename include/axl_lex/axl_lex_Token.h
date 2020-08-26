@@ -48,7 +48,7 @@ struct StdTokenData
 
 enum TokenChannelMask
 {
-	TokenChannelMask_Main = 1,
+	TokenChannelMask_Main = 0x01,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -75,7 +75,11 @@ struct Token
 		wchar_t m_WCharToken;
 	};
 
-	uint_t m_channelMask;
+	union
+	{
+		uint_t m_channelMask;
+		uint_t m_flags;
+	};
 
 	Data m_data;
 	Pos m_pos;
