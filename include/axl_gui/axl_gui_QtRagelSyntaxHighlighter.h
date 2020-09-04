@@ -63,6 +63,18 @@ protected:
 		setFormat(ts - m_begin, te - ts, color);
 	}
 
+	void
+	highlightLastToken(
+		const QColor& color,
+		const QVariant& userData
+		)
+	{
+	    QTextCharFormat format;
+		format.setForeground(color);
+		format.setProperty(QTextFormat::UserFormat, userData);
+		highlightLastToken(format);
+	}
+
 	// to be implemented in lexer instance:
 
 	// void
