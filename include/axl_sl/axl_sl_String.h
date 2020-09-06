@@ -439,6 +439,12 @@ public:
 	}
 
 	bool
+	isPrefix(C c) const
+	{
+		return m_length && m_p[0] == c;
+	}
+
+	bool
 	isPrefix(const StringRef& string) const
 	{
 		return
@@ -455,6 +461,12 @@ public:
 		return
 			m_length >= string.m_length &&
 			getLeftSubString(string.m_length).isEqualIgnoreCase(string, method);
+	}
+
+	bool
+	isSuffix(C c) const
+	{
+		return m_length && m_p[m_length - 1] == c;
 	}
 
 	bool
