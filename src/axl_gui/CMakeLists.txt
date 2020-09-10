@@ -159,8 +159,6 @@ if(BUILD_AXL_GUI_QT)
 		-DQT_COMPILING_QSTRING_COMPAT_CPP
 		-DQT_COMPILING_QIMAGE_COMPAT_CPP
 		)
-
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 endif()
 
 add_library(
@@ -176,7 +174,7 @@ add_library(
 	)
 
 if(BUILD_AXL_GUI_QT)
-	qt5_use_modules(axl_gui Widgets)
+	qt5_use_modules_alt(axl_gui Widgets)
 endif()
 
 axl_set_pch(

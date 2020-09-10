@@ -125,6 +125,27 @@ endmacro()
 
 #...............................................................................
 
+# this macro is similar to qt5_use_modules but doesn't touch the target's
+# POSITION_INDEPENDENT_CODE property which MAY cause some QT statics to be
+# instantiated and exported from the executable -- ultimately resulting in
+# possible ABI versioning issues with newer QT versions (e.g. users start to
+# experience crashes after upgrading to qt-5.15)
+#
+# crucial for qt-5.0.x through 5.3.x; starting with 5.4.x QT macros are fixed
+
+macro(
+qt5_use_modules_alt
+	_TARGET
+	# ...
+	)
+
+	get_target_property(_PREV_PIC ${_TARGET} POSITION_INDEPENDENT_CODE)
+	qt5_use_modules(${_TARGET} ${ARGN})
+	set_target_properties(${_TARGET} PROPERTIES POSITION_INDEPENDENT_CODE ${_PREV_PIC})
+endmacro()
+
+#...............................................................................
+
 macro(
 add_qt_rpath_link)
 	if(NOT QT_FOUND)

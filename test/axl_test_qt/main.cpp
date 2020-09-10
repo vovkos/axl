@@ -653,16 +653,18 @@ main(
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
 
+#if (0)
 	g::getModule()->setTag("axl_test_qt");
 	benchFormat();
 	return 0;
+#endif
 
-#if 0
+#if (0)
 	testUtf();
 	return 0;
 #endif
 
-#if 0
+#if (0)
 
 //	char const* src = "abc";
 //	char const* src = "a*(b|cd?)+";

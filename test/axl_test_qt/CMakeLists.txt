@@ -9,6 +9,13 @@
 #
 #...............................................................................
 
+if(LINUX AND NOT ${TARGET_CPU} STREQUAL "x86") # if cross-compiling and64 -> x86, we gotta set rpath
+	set(AXL_TEST_QT_SKIP_BUILD_RPATH_DEFAULT TRUE)
+endif()
+
+option(AXL_TEST_QT_SKIP_BUILD_RPATH "Skip build rpath (i.e. which QT to use)" ${AXL_TEST_QT_SKIP_BUILD_RPATH_DEFAULT})
+
+#...............................................................................
 #
 # src folder
 #
@@ -83,6 +90,10 @@ source_group(
 # axl_test_qt compiler test
 #
 
+if(AXL_TEST_QT_SKIP_BUILD_RPATH)
+	set(CMAKE_SKIP_BUILD_RPATH TRUE)
+endif()
+
 include_directories(
 	${AXL_INC_DIR}
 	${GEN_DIR}
@@ -104,13 +115,12 @@ add_executable(
 	${GEN_MOC_CPP_LIST}
 	)
 
-qt5_use_modules(axl_test_qt Widgets)
+qt5_use_modules_alt(axl_test_qt Widgets)
 
 axl_set_pch(
 	axl_test_qt
 	${PCH_H}
 	${PCH_CPP}
-	${Qt5Core_EXECUTABLE_COMPILE_FLAGS}
 	)
 
 set_target_properties(
@@ -140,7 +150,7 @@ if(UNIX)
 	endif()
 endif()
 
-if(UNIX AND NOT APPLE)
+if(LINUX AND NOT AXL_TEST_QT_SKIP_BUILD_RPATH)
 	add_qt_rpath_link()
 endif()
 
