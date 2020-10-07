@@ -24,6 +24,7 @@ namespace cry {
 struct AppStoreIap: sl::ListLink
 {
 	size_t m_quantity;
+	uint_t m_webOrderLineItemId;
 
 	sl::String m_productId;
 	sl::String m_transactionId;
@@ -37,8 +38,6 @@ struct AppStoreIap: sl::ListLink
 	uint64_t m_originalPurchaseTimestamp;
 	uint64_t m_subscriptionExpirationTimestamp;
 	uint64_t m_cancellationTimestamp;
-
-	uint_t m_webOrderLineId;
 
 	AppStoreIap();
 };

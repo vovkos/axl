@@ -73,11 +73,11 @@ decodeRfc3339Timestamp(const sl::StringRef& string)
 AppStoreIap::AppStoreIap()
 {
 	m_quantity = 0;
+	m_webOrderLineItemId = 0;
 	m_purchaseTimestamp = 0;
 	m_originalPurchaseTimestamp = 0;
 	m_subscriptionExpirationTimestamp = 0;
 	m_cancellationTimestamp = 0;
-	m_webOrderLineId = 0;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -419,13 +419,13 @@ AppStoreReceiptPayloadParser::decode(
 			if (!m_iap)
 				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
 
-			m_attributeInteger = &m_iap->m_webOrderLineId;
-			m_attributeIntegerSize = sizeof(m_iap->m_webOrderLineId);
+			m_attributeInteger = &m_iap->m_webOrderLineItemId;
+			m_attributeIntegerSize = sizeof(m_iap->m_webOrderLineItemId);
 
 			p = decode(
 				State_AttributeIntegerValue,
 				V_ASN1_INTEGER,
-				"invalid app receipt IAP web order line ID (expected ASN1 INTEGER)",
+				"invalid app receipt IAP web order line item ID (expected ASN1 INTEGER)",
 				p,
 				length
 				);

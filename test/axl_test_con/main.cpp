@@ -5248,7 +5248,7 @@ receiptTest()
 #if (_AXL_OS_WIN)
 	const char* filePath = "C:/Projects/playground/receipt/iap-receipt";
 #elif (_AXL_OS_DARWIN)
-	const char* filePath = "/Users/vladimir/Projects/playground/receipt/xcode-receipt";
+	const char* filePath = "/Users/vladimir/Projects/playground/receipt/iap-receipt";
 #elif (_AXL_OS_LINUX)
 	const char* filePath = "/home/vladimir/Projects/playground/receipt/xcode-receipt";
 #endif
@@ -5264,7 +5264,8 @@ receiptTest()
 	printf("file size: %d\n", file.getFileSize());
 
 #if (_AXL_OS_DARWIN)
-	uint_t flags = 0;
+	uint_t flags = cry::VerifyAppStoreReceiptFlag_SkipHashCheck | cry::VerifyAppStoreReceiptFlag_SkipSignatureCheck;
+//	uint_t flags = 0;
 #else
 	uint_t flags = cry::VerifyAppStoreReceiptFlag_SkipHashCheck;
 #endif
@@ -5308,17 +5309,21 @@ receiptTest()
 		cry::AppStoreIap* iap = *it;
 
 		printf(
-			"IAT:\n"
+			"IAP:\n"
 			"  quantity:                %d\n"
 			"  product ID:              %s\n"
 			"  transaction ID:          %s\n"
 			"  original transaction ID: %s\n"
+  			"  web order line ID        %d\n"
 			"  purchase date:           %s%s\n"
-			"  original purchase date:  %s%s\n",
+			"  original purchase date:  %s%s\n"
+			"  subs expiration date:    %s%s\n"
+			"  cancellation date:       %s%s\n",
 			iap->m_quantity,
 			iap->m_productId.sz(),
 			iap->m_transactionId.sz(),
 			iap->m_originalTransactionId.sz(),
+			iap->m_webOrderLineItemId,
 			iap->m_purchaseDateString.sz(),
 			iap->m_purchaseTimestamp ?
 				sys::Time(iap->m_purchaseTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
@@ -5326,6 +5331,14 @@ receiptTest()
 			iap->m_originalPurchaseDateString.sz(),
 			iap->m_originalPurchaseTimestamp ?
 				sys::Time(iap->m_originalPurchaseTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
+				"",
+			iap->m_subscriptionExpirationDateString.sz(),
+			iap->m_subscriptionExpirationTimestamp ?
+				sys::Time(iap->m_subscriptionExpirationTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
+				"",
+			iap->m_cancellationDateString.sz(),
+			iap->m_cancellationTimestamp ?
+				sys::Time(iap->m_cancellationTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
 				""
 			);
 	}
