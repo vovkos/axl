@@ -123,6 +123,8 @@ public:
 	}
 
 	ErrorRef(uint_t code);
+	ErrorRef(const sl::StringRef& string);
+	ErrorRef(const char* string); // for overload resolving
 
 	ErrorRef(
 		const sl::Guid& guid,
@@ -212,7 +214,7 @@ public:
 		createStringError(string);
 	}
 
-	Error(const char* string) // may be useful for overload resolving
+	Error(const char* string) // for overload resolving
 	{
 		createStringError(string);
 	}
@@ -485,6 +487,18 @@ ErrorRef::ErrorRef(uint_t code):
 }
 
 inline
+ErrorRef::ErrorRef(const sl::StringRef& string):
+	BaseType(Error(string))
+{
+}
+
+inline
+ErrorRef::ErrorRef(const char* string):
+	BaseType(Error(string))
+{
+}
+
+inline
 ErrorRef::ErrorRef(
 	const sl::Guid& guid,
 	uint_t code
@@ -654,12 +668,6 @@ pushError(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // string error
-
-size_t
-setError(const sl::StringRef& string);
-
-size_t
-pushError(const sl::StringRef& string);
 
 size_t
 setFormatStringError_va(
