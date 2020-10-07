@@ -70,6 +70,18 @@ decodeRfc3339Timestamp(const sl::StringRef& string)
 
 //..............................................................................
 
+AppStoreIap::AppStoreIap()
+{
+	m_quantity = 0;
+	m_purchaseTimestamp = 0;
+	m_originalPurchaseTimestamp = 0;
+	m_subscriptionExpirationTimestamp = 0;
+	m_cancellationTimestamp = 0;
+	m_webOrderLineId = 0;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 AppStoreReceipt::AppStoreReceipt()
 {
 	m_receiptCreationTimestamp = 0;
@@ -95,8 +107,11 @@ AppStoreReceipt::clear()
 AppStoreReceiptPayloadParser::AppStoreReceiptPayloadParser()
 {
 	m_receipt = NULL;
+	m_iap = NULL;
 	m_attributeId = AttributeId_Undefined;
 	m_attributeString = NULL;
+	m_attributeInteger = NULL;
+	m_attributeIntegerSize = 0;
 }
 
 bool
@@ -109,7 +124,7 @@ AppStoreReceiptPayloadParser::parse(
 	m_receipt = receipt;
 
 	return decode(
-		State_Receipt,
+		State_Set,
 		V_ASN1_SET,
 		"invalid app receipt (expected ASN1 SET)",
 		(char*)p,
@@ -126,6 +141,8 @@ AppStoreReceiptPayloadParser::decode(
 	size_t size
 	)
 {
+	ASSERT(m_receipt);
+
 	long length;
 	int tag;
 	int cls;
@@ -138,16 +155,13 @@ AppStoreReceiptPayloadParser::decode(
 	}
 
 	if (tag != expectedTag)
-	{
-		err::setError(unexpectedTagError);
-		return NULL;
-	}
+		return err::fail<const char*>(NULL, unexpectedTagError);
 
 	const char* end = p + length;
 
 	switch (state)
 	{
-	case State_Receipt:
+	case State_Set:
 		while (p < end)
 		{
 			p = decode(
@@ -167,9 +181,11 @@ AppStoreReceiptPayloadParser::decode(
 	case State_Attribute:
 		m_attributeId = AttributeId_Undefined;
 		m_attributeString = NULL;
+		m_attributeInteger = &m_attributeId;
+		m_attributeIntegerSize = sizeof(m_attributeId);
 
 		p = decode(
-			State_AttributeType,
+			State_AttributeIntegerValue,
 			V_ASN1_INTEGER,
 			"invalid app receipt attribute type (expected ASN1 INTEGER)",
 			p,
@@ -179,8 +195,10 @@ AppStoreReceiptPayloadParser::decode(
 		if (!p)
 			return NULL;
 
+		m_attributeInteger = NULL; // ignore attribute version value
+
 		p = decode(
-			State_AttributeVersion,
+			State_AttributeIntegerValue,
 			V_ASN1_INTEGER,
 			"invalid app receipt attribute version (expected ASN1 INTEGER)",
 			p,
@@ -202,13 +220,6 @@ AppStoreReceiptPayloadParser::decode(
 			return NULL;
 
 		break;
-
-	case State_AttributeType:
-		memcpy(&m_attributeId, p, AXL_MIN(length, sizeof(m_attributeId)));
-		break;
-
-	case State_AttributeVersion:
-		break; // ignore
 
 	case State_AttributeValue:
 		switch (m_attributeId)
@@ -267,18 +278,18 @@ AppStoreReceiptPayloadParser::decode(
 			m_receipt->m_receiptCreationTimestamp = decodeRfc3339Timestamp(m_receipt->m_receiptCreationDateString);
 			break;
 
-		case AttributeId_ReceiptExpirationDate:
-			m_attributeString = &m_receipt->m_receiptExpirationDateString;
+		case AttributeId_Iap:
+			m_iap = *m_receipt->m_iapList.insertTail(AXL_MEM_NEW(AppStoreIap));
 
 			p = decode(
-				State_AttributeStringValue,
-				V_ASN1_IA5STRING,
-				"invalid app receipt expiration date (expected ASN1 IA5 STRING)",
+				State_Set,
+				V_ASN1_SET,
+				"invalid app receipt IAP (expected ASN1 SET)",
 				p,
-				length
+				end - p
 				);
 
-			m_receipt->m_receiptExpirationTimestamp = decodeRfc3339Timestamp(m_receipt->m_receiptExpirationDateString);
+			m_iap = NULL;
 			break;
 
 		case AttributeId_Opaque:
@@ -288,6 +299,158 @@ AppStoreReceiptPayloadParser::decode(
 		case AttributeId_Sha1Hash:
 			m_receipt->m_sha1Hash.copy(p, length);
 			break;
+
+		case AttributeId_IapQuantity:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeInteger = &m_iap->m_quantity;
+			m_attributeIntegerSize = sizeof(m_iap->m_quantity);
+
+			p = decode(
+				State_AttributeIntegerValue,
+				V_ASN1_INTEGER,
+				"invalid app receipt IAP quantity (expected ASN1 INTEGER)",
+				p,
+				length
+				);
+			break;
+
+		case AttributeId_IapProductId:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeString = &m_iap->m_productId;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_UTF8STRING,
+				"invalid app receipt IAP product ID (expected ASN1 UTF8 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_IapTransactionId:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeString = &m_iap->m_transactionId;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_UTF8STRING,
+				"invalid app receipt IAP transaction ID (expected ASN1 UTF8 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_IapPurchaseDate:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeString = &m_iap->m_purchaseDateString;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_IA5STRING,
+				"invalid app receipt IAP purchase date (expected ASN1 IA5 STRING)",
+				p,
+				length
+				);
+
+			m_iap->m_purchaseTimestamp = decodeRfc3339Timestamp(m_iap->m_purchaseDateString);
+			break;
+
+		case AttributeId_IapOriginalTransactionId:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeString = &m_iap->m_originalTransactionId;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_UTF8STRING,
+				"invalid app receipt IAP original transaction ID (expected ASN1 UTF8 STRING)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_IapOriginalPurchaseDate:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeString = &m_iap->m_originalPurchaseDateString;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_IA5STRING,
+				"invalid app receipt IAP original purchase date (expected ASN1 IA5 STRING)",
+				p,
+				length
+				);
+
+			m_iap->m_originalPurchaseTimestamp = decodeRfc3339Timestamp(m_iap->m_originalPurchaseDateString);
+			break;
+
+		case AttributeId_IapSubscriptionExpirationDate:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeString = &m_iap->m_subscriptionExpirationDateString;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_IA5STRING,
+				"invalid app receipt IAP subscription expiration date (expected ASN1 IA5 STRING)",
+				p,
+				length
+				);
+
+			m_iap->m_subscriptionExpirationTimestamp = decodeRfc3339Timestamp(m_iap->m_subscriptionExpirationDateString);
+			break;
+
+		case AttributeId_IapWebOrderLineItemId:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeInteger = &m_iap->m_webOrderLineId;
+			m_attributeIntegerSize = sizeof(m_iap->m_webOrderLineId);
+
+			p = decode(
+				State_AttributeIntegerValue,
+				V_ASN1_INTEGER,
+				"invalid app receipt IAP web order line ID (expected ASN1 INTEGER)",
+				p,
+				length
+				);
+
+			break;
+
+		case AttributeId_IapCancellationDate:
+			if (!m_iap)
+				return err::fail<const char*>(NULL, "unexpected IAP attribute in app receipt");
+
+			m_attributeString = &m_iap->m_cancellationDateString;
+
+			p = decode(
+				State_AttributeStringValue,
+				V_ASN1_IA5STRING,
+				"invalid app receipt IAP purchase date (expected ASN1 IA5 STRING)",
+				p,
+				length
+				);
+
+			m_iap->m_cancellationTimestamp = decodeRfc3339Timestamp(m_iap->m_cancellationDateString);
+			break;
+
+		default:
+			AXL_TRACE("WARNING: unsupported AppStore Receipt attribute ID: 0x%x\n", m_attributeId);
 		}
 
 		if (!p)
@@ -298,6 +461,15 @@ AppStoreReceiptPayloadParser::decode(
 	case State_AttributeStringValue:
 		ASSERT(m_attributeString);
 		m_attributeString->copy(p, length);
+		break;
+
+	case State_AttributeIntegerValue:
+		if (m_attributeInteger)
+		{
+			size_t size = AXL_MIN(length, m_attributeIntegerSize);
+			sl::ArrayDetails<char>::copyReverse((char*)m_attributeInteger, p, size); // big-endian
+		}
+
 		break;
 
 	default:
@@ -399,10 +571,7 @@ verifyAppStoreReceipt(
 		memcmp(receipt->m_sha1Hash, digest, sizeof(digest)) == 0;
 
 	if (!isMatch)
-	{
-		err::setError("app receipt SHA1 hash mismatch");
-		return false;
-	}
+		return err::fail("app receipt SHA1 hash mismatch");
 
 	return true;
 }

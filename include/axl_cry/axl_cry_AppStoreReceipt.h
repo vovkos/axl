@@ -21,6 +21,30 @@ namespace cry {
 
 //..............................................................................
 
+struct AppStoreIap: sl::ListLink
+{
+	size_t m_quantity;
+
+	sl::String m_productId;
+	sl::String m_transactionId;
+	sl::String m_originalTransactionId;
+	sl::String m_purchaseDateString;
+	sl::String m_originalPurchaseDateString;
+	sl::String m_subscriptionExpirationDateString;
+	sl::String m_cancellationDateString;
+
+	uint64_t m_purchaseTimestamp;
+	uint64_t m_originalPurchaseTimestamp;
+	uint64_t m_subscriptionExpirationTimestamp;
+	uint64_t m_cancellationTimestamp;
+
+	uint_t m_webOrderLineId;
+
+	AppStoreIap();
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 struct AppStoreReceipt
 {
 	sl::String m_bundleId;
@@ -36,6 +60,8 @@ struct AppStoreReceipt
 	sl::Array<char> m_opaque;
 	sl::Array<char> m_sha1Hash;
 
+	sl::List<AppStoreIap> m_iapList;
+
 	AppStoreReceipt();
 
 	void
@@ -50,12 +76,11 @@ protected:
 	enum State
 	{
 		State_Idle = 0,
-		State_Receipt,
+		State_Set,
 		State_Attribute,
-		State_AttributeType,
-		State_AttributeVersion,
 		State_AttributeValue,
 		State_AttributeStringValue,
+		State_AttributeIntegerValue,
 	};
 
 	enum AttributeId
@@ -66,13 +91,27 @@ protected:
 		AttributeId_Opaque                = 4,
 		AttributeId_Sha1Hash              = 5,
 		AttributeId_ReceiptCreationDate   = 12,
+		AttributeId_Iap                   = 17,
 		AttributeId_OriginalAppVersion    = 19,
 		AttributeId_ReceiptExpirationDate = 21,
+
+		AttributeId_IapQuantity                   = 1701,
+		AttributeId_IapProductId                  = 1702,
+		AttributeId_IapTransactionId              = 1703,
+		AttributeId_IapPurchaseDate               = 1704,
+		AttributeId_IapOriginalTransactionId      = 1705,
+		AttributeId_IapOriginalPurchaseDate       = 1706,
+		AttributeId_IapSubscriptionExpirationDate = 1708,
+		AttributeId_IapWebOrderLineItemId         = 1711,
+		AttributeId_IapCancellationDate           = 1712,
 	};
 
 	AppStoreReceipt* m_receipt;
+	AppStoreIap* m_iap;
 	AttributeId m_attributeId;
 	sl::String* m_attributeString;
+	void* m_attributeInteger;
+	size_t m_attributeIntegerSize;
 
 public:
 	AppStoreReceiptPayloadParser();

@@ -5246,7 +5246,7 @@ receiptTest()
 	bool result;
 
 #if (_AXL_OS_WIN)
-	const char* filePath = "C:/Projects/playground/receipt/xcode-receipt";
+	const char* filePath = "C:/Projects/playground/receipt/iap-receipt";
 #elif (_AXL_OS_DARWIN)
 	const char* filePath = "/Users/vladimir/Projects/playground/receipt/xcode-receipt";
 #elif (_AXL_OS_LINUX)
@@ -5283,7 +5283,7 @@ receiptTest()
 		"  app version:             %s\n"
 		"  original app version:    %s\n"
 		"  receipt creation date:   %s%s\n"
-		"  receipt expiration date: %s%sn"
+		"  receipt expiration date: %s%s\n"
 		"  ------------------------\n"
 		"  SHA1 hash: %s\n"
 		"  opaque:    %s\n",
@@ -5301,6 +5301,34 @@ receiptTest()
 		enc::HexEncoding::encode(receipt.m_sha1Hash, receipt.m_sha1Hash.getCount()).sz(),
 		enc::HexEncoding::encode(receipt.m_opaque, receipt.m_opaque.getCount()).sz()
 		);
+
+	sl::Iterator<cry::AppStoreIap> it = receipt.m_iapList.getHead();
+	for (; it; it++)
+	{
+		cry::AppStoreIap* iap = *it;
+
+		printf(
+			"IAT:\n"
+			"  quantity:                %d\n"
+			"  product ID:              %s\n"
+			"  transaction ID:          %s\n"
+			"  original transaction ID: %s\n"
+			"  purchase date:           %s%s\n"
+			"  original purchase date:  %s%s\n",
+			iap->m_quantity,
+			iap->m_productId.sz(),
+			iap->m_transactionId.sz(),
+			iap->m_originalTransactionId.sz(),
+			iap->m_purchaseDateString.sz(),
+			iap->m_purchaseTimestamp ?
+				sys::Time(iap->m_purchaseTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
+				"",
+			iap->m_originalPurchaseDateString.sz(),
+			iap->m_originalPurchaseTimestamp ?
+				sys::Time(iap->m_originalPurchaseTimestamp).format(" (%Y-%M-%D %h:%m:%s)").sz() :
+				""
+			);
+	}
 
 	return 0;
 }
