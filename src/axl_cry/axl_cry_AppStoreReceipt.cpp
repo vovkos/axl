@@ -466,7 +466,7 @@ AppStoreReceiptPayloadParser::decode(
 	case State_AttributeIntegerValue:
 		if (m_attributeInteger)
 		{
-			size_t size = AXL_MIN(length, m_attributeIntegerSize);
+			size_t size = AXL_MIN((size_t)length, m_attributeIntegerSize);
 			sl::ArrayDetails<char>::copyReverse((char*)m_attributeInteger, p, size); // big-endian
 		}
 
