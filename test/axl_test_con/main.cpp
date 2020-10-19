@@ -295,8 +295,12 @@ testFileTime()
 void
 testNetworkAdapterList()
 {
+	printf("Enumerating adapters...\n");
+
 	sl::List<io::NetworkAdapterDesc> adapterList;
 	io::createNetworkAdapterDescList(&adapterList);
+
+	printf("%d adapters found.\n", adapterList.getCount());
 
 	sl::Iterator<io::NetworkAdapterDesc> adapterIt = adapterList.getHead();
 	for (; adapterIt; adapterIt++)
@@ -5484,8 +5488,6 @@ main(
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
 
-	FILE* f = stdout;
-
 	g::getModule()->setTag("axl_test_con");
 	srand((uint_t)sys::getTimestamp());
 
@@ -5495,8 +5497,10 @@ main(
 #endif
 
 #ifdef _AXL_CRY
-	receiptTest();
+	// receiptTest();
 #endif
+
+	testNetworkAdapterList();
 
 	return 0;
 }

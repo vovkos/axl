@@ -42,21 +42,21 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 {
 	adapterList->clear();
 
-	ulong_t size = 15 * 1024; // Microsoft recommends starting with 15K
-
-	sl::Array<char> buffer;
-	buffer.setCount(size);
-
-	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*)buffer.p();
-
 	ulong_t flags =
 		GAA_FLAG_SKIP_ANYCAST |
 		GAA_FLAG_SKIP_MULTICAST |
 		GAA_FLAG_SKIP_DNS_SERVER;
 
+	sl::Array<char> buffer;
+	ulong_t size = 15 * 1024; // Microsoft recommends starting with 15K
+
 	for (;;)
 	{
-		ulong_t error = ::GetAdaptersAddresses(AF_UNSPEC, flags, NULL, srcAdapter, &size);
+		bool result = buffer.setCount(size);
+		if (!result)
+			return -1;
+
+		ulong_t error = ::GetAdaptersAddresses(AF_UNSPEC, flags, NULL, (IP_ADAPTER_ADDRESSES*)buffer.p(), &size);
 		if (error == ERROR_SUCCESS)
 			break;
 
@@ -67,6 +67,7 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 		}
 	}
 
+	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*)buffer.p();
 	for (; srcAdapter; srcAdapter = srcAdapter->Next)
 	{
 		NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
