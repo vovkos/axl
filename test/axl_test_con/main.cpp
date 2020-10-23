@@ -5470,6 +5470,14 @@ bookmarkTest()
 
 //..............................................................................
 
+void
+testHomeDir()
+{
+	printf("Home dir: %s\n", io::getHomeDir().sz());
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5500,7 +5508,7 @@ main(
 	// receiptTest();
 #endif
 
-	testNetworkAdapterList();
+	testHomeDir();
 
 	return 0;
 }

@@ -24,6 +24,9 @@ sl::String
 getTempDir();
 
 sl::String
+getHomeDir();
+
+sl::String
 getCurrentDir();
 
 bool

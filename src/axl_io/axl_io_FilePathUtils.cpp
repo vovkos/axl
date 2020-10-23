@@ -64,6 +64,23 @@ getTempDir()
 }
 
 sl::String
+getHomeDir()
+{
+#if (_AXL_OS_WIN)
+	wchar_t buffer_w[MAX_PATH];
+	HRESULT result = ::SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, buffer_w);
+	return SUCCEEDED(result) ? sl::String(buffer_w) : NULL;
+#else
+	sl::String homeDir = getenv("HOME");
+	if (!homeDir.isEmpty())
+		return homeDir;
+
+	struct passwd* pw = ::getpwuid(::getuid());
+	return pw->pw_dir;
+#endif
+}
+
+sl::String
 getCurrentDir()
 {
 #if (_AXL_OS_WIN)
