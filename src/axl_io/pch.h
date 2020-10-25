@@ -24,6 +24,7 @@
 #	include <ifaddrs.h>
 #	include <net/if.h>
 #	include <netdb.h>
+#	include <pwd.h>
 #	if (_AXL_OS_LINUX)
 #		include <linux/if_packet.h>
 #		if (_AXL_SYS_LNX_LIBUDEV)
