@@ -1392,3 +1392,51 @@ axl_replace_configuration_for_install
 endmacro()
 
 #...............................................................................
+
+macro(
+axl_add_twin_library
+	_NEW_TARGET
+	_OLD_TARGET
+	_EXCLUDE_PATTERN
+	_PCH_H
+	_PCH_CPP
+	)
+
+	# create a new twin library target
+
+	get_target_property(_SOURCE_DIR ${_OLD_TARGET} SOURCE_DIR)
+	get_target_property(_SOURCES ${_OLD_TARGET} SOURCES)
+
+	set(_SOURCE_PATH_LIST)
+
+	foreach(_SOURCE ${_SOURCES})
+		if(NOT IS_ABSOLUTE ${_SOURCE})
+			set(_SOURCE ${_SOURCE_DIR}/${_SOURCE})
+		endif()
+
+		if(${_SOURCE} MATCHES ${_EXCLUDE_PATTERN})
+			axl_exclude_from_build(${_SOURCE})
+		endif()
+
+		list(
+			APPEND
+			_SOURCE_PATH_LIST
+			${_SOURCE}
+			)
+	endforeach()
+
+	add_library(
+		${_NEW_TARGET}
+		${_SOURCE_PATH_LIST}
+		)
+
+	if(NOT "${_PCH_H}" STREQUAL "")
+		axl_set_pch(
+			${_NEW_TARGET}
+			${_PCH_H}
+			${_SOURCE_DIR}/${_PCH_CPP}
+			)
+	endif()
+endmacro()
+
+#...............................................................................

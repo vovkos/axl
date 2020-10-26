@@ -298,3 +298,16 @@ if(BUILD_AXL_SPY)
 endif()
 
 #...............................................................................
+
+if(MSVC)
+	set(
+		AXL_LIBCMT_TWIN_LIB_LIST
+		"axl_core;axl_io"
+		CACHE STRING
+		"List of AXL libraries to build LIBCMT twins for"
+		)
+
+	add_subdirectory(axl_libcmt)
+endif()
+
+#...............................................................................
