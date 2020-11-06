@@ -5478,6 +5478,24 @@ testHomeDir()
 
 //..............................................................................
 
+namespace trace_test {
+
+int
+traceArg()
+{
+	return printf("traceArg\n");
+}
+
+void
+testTrace()
+{
+	TRACE("testTrace(%d)\n", traceArg());
+}
+
+} // namespace trace_test
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5508,7 +5526,7 @@ main(
 	// receiptTest();
 #endif
 
-	testHomeDir();
+	trace_test::testTrace();
 
 	return 0;
 }

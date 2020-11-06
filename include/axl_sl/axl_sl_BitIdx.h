@@ -435,21 +435,19 @@ align(T x)
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <
-	size_t alignFactor,
-	size_t growLimit
-	>
+template <size_t growLimit>
 size_t
 getAllocSize(size_t size)
 {
-	return size < growLimit ? getPowerOf2Ge(size) : align<alignFactor> (size);
+	ASSERT(isPowerOf2(growLimit));
+	return size < growLimit ? getPowerOf2Ge(size) : align<growLimit> (size);
 }
 
 inline
 size_t
 getAllocSize(size_t size)
 {
-	return getAllocSize<AXL_PTR_SIZE, AXL_PTR_SIZE * 1024 * 1024> (size);
+	return getAllocSize<AXL_PTR_SIZE * 1024 * 1024> (size);
 }
 
 //..............................................................................
