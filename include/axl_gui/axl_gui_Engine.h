@@ -468,7 +468,7 @@ public:
 	bool
 	writeClipboard(
 		uintptr_t format,
-		const sl::Array<char>& data
+		const sl::ArrayRef<char>& data
 		)
 	{
 		return writeClipboard(format, data, data.getCount());
