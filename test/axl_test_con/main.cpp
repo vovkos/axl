@@ -5496,6 +5496,97 @@ testTrace()
 
 //..............................................................................
 
+#ifdef _AXL_INI
+
+class MyParser: public ini::Parser<MyParser>
+{
+protected:
+	enum SectionKind
+	{
+		SectionKind_Undefined,
+		SectionKind_Session,
+		SectionKind_Scripts,
+	};
+
+	enum KeyKind
+	{
+		KeyKind_Undefined,
+		KeyKind_Name,
+		KeyKind_Description,
+		KeyKind_Guid,
+		KeyKind_Icon,
+		KeyKind_LogRepresenterClass,
+		KeyKind_SessionClass,
+	};
+
+	AXL_SL_BEGIN_STRING_HASH_TABLE(SectionNameMap, SectionKind)
+		AXL_SL_HASH_TABLE_ENTRY("session", SectionKind_Session)
+		AXL_SL_HASH_TABLE_ENTRY("scripts", SectionKind_Scripts)
+	AXL_SL_END_HASH_TABLE()
+
+	AXL_SL_BEGIN_STRING_HASH_TABLE(KeyNameMap, KeyKind)
+		AXL_SL_HASH_TABLE_ENTRY("name", KeyKind_Name)
+		AXL_SL_HASH_TABLE_ENTRY("description", KeyKind_Description)
+		AXL_SL_HASH_TABLE_ENTRY("guid", KeyKind_Guid)
+		AXL_SL_HASH_TABLE_ENTRY("icon", KeyKind_Icon)
+		AXL_SL_HASH_TABLE_ENTRY("session-class", KeyKind_SessionClass)
+		AXL_SL_HASH_TABLE_ENTRY("log-representer-class", KeyKind_LogRepresenterClass)
+	AXL_SL_END_HASH_TABLE()
+
+public:
+	bool
+	onSection(const char* name)
+	{
+		SectionNameMap::Iterator it = SectionNameMap::find(name);
+		SectionKind section = it ? it->m_value : SectionKind_Undefined;
+		printf("OnSection '%s'\n", name);
+		return true;
+	}
+
+	bool
+	onKeyValue(
+		const char* name,
+		const char* value
+		)
+	{
+		KeyNameMap::Iterator it = KeyNameMap::find(name);
+		KeyKind key = it ? it->m_value : KeyKind_Undefined;
+		printf("OnKeyValue '%s' = '%s'\n", name, value);
+		return true;
+	}
+};
+
+void
+iniTest()
+{
+	bool result;
+
+	const char* filePath = "c:/projects/repos/ioninja/ioninja/conf/ias.conf";
+
+	io::MappedFile file;
+	result = file.open(filePath, io::FileFlag_ReadOnly);
+	if (!result)
+	{
+		printf("error opening file: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	const char* p = (const char*) file.view();
+	uint64_t size = file.getSize();
+
+	MyParser parser;
+	result = parser.parse(filePath, sl::StringRef(p, (size_t)size));
+	if (!result)
+	{
+		printf("error parsing file: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+}
+
+#endif
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5522,11 +5613,9 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#ifdef _AXL_CRY
-	// receiptTest();
+#ifdef _AXL_INI
+	iniTest();
 #endif
-
-	trace_test::testTrace();
 
 	return 0;
 }

@@ -100,6 +100,11 @@ if(BUILD_AXL_SPY)
 	list(APPEND OPT_LIB_LIST axl_spy)
 endif()
 
+if(BUILD_AXL_INI)
+	add_definitions(-D_AXL_INI=1)
+	list(APPEND OPT_LIB_LIST axl_ini)
+endif()
+
 add_executable(
 	axl_test_con
 	${PCH_H}
