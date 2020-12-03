@@ -33,7 +33,6 @@ Lexer::create(
 
 	m_filePath = filePath;
 	m_begin = p;
-
 	return true;
 }
 
@@ -44,6 +43,14 @@ Lexer::parseSection(
 	)
 {
 	ASSERT(*p == '[' && end[-1] == ']');
+
+	if (m_isLineContinuation)
+	{
+		err::setError("incomplete multi-line value");
+		lex::pushSrcPosError(m_filePath, m_line, p - m_begin - m_lineOffset);
+		m_scanResultKind = ScanResultKind_Error;
+		return;
+	}
 
 	p++;
 	end--;
@@ -57,8 +64,6 @@ Lexer::parseSection(
 	if (p < end)
 		m_sectionName.copy(p, end - p);
 
-	stop();
-
 	m_scanResultKind = ScanResultKind_Section;
 }
 
@@ -69,6 +74,12 @@ Lexer::parseKeyValue(
 	)
 {
 	ASSERT(!isspace(*p));
+
+	if (m_isLineContinuation)
+	{
+		parseValue(p, end);
+		return;
+	}
 
 	const char* p0 = p;
 
@@ -83,26 +94,47 @@ Lexer::parseKeyValue(
 	if (*p == '=')
 	{
 		p++;
+		parseValue(p, end);
+	}
+	else
+	{
+		m_scanResultKind = ScanResultKind_KeyValue;
+	}
+}
 
-		while (p < end && isspace(*p))
-			p++;
+void
+Lexer::parseValue(
+	const char* p,
+	const char* end
+	)
+{
+	while (p < end && isspace(*p))
+		p++;
 
+	while (p < end && isspace(end[-1]))
+		end--;
+
+	bool isLineContinuation = p < end && end[-1] == '\\';
+	if (isLineContinuation)
+	{
+		end--;
 		while (p < end && isspace(end[-1]))
 			end--;
-
-		if (p < end)
-		{
-			size_t length = end - p;
-			m_value.copy(p, length);
-
-			if (m_value[0] == '"' && m_value [length - 1] == '"')
-				m_value = enc::EscapeEncoding::decode(m_value.getSubString(1, length - 2));
-		}
 	}
 
-	stop();
+	size_t length = end - p;
 
-	m_scanResultKind = ScanResultKind_KeyValue;
+	sl::StringRef value = length >= 2 && p[0] == '"' && end[-1] == '"' ?
+		sl::StringRef(enc::EscapeEncoding::decode(sl::StringRef(p + 1, length - 2))) :
+		sl::StringRef(p, length);
+
+	if (m_isLineContinuation)
+		m_value += value;
+	else
+		m_value = value;
+
+	m_scanResultKind = isLineContinuation ? ScanResultKind_LineContinuation : ScanResultKind_KeyValue;
+	m_isLineContinuation = isLineContinuation;
 }
 
 Lexer::ScanResultKind
@@ -113,8 +145,13 @@ Lexer::scanLine()
 
 	pe = eof;
 	m_sectionName.clear();
-	m_keyName.clear();
-	m_value.clear();
+
+	if (!m_isLineContinuation)
+	{
+		m_keyName.clear();
+		m_value.clear();
+	}
+
 	m_scanResultKind = ScanResultKind_Eof; // assume eof
 
 	bool result = exec();
@@ -142,6 +179,7 @@ Lexer::reset()
 	m_begin = NULL;
 	m_line = 0;
 	m_lineOffset = 0;
+	m_isLineContinuation = false;
 
 	m_filePath.clear();
 	m_sectionName.clear();

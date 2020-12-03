@@ -29,6 +29,7 @@ public:
 		ScanResultKind_Eof   = 0,
 		ScanResultKind_Section,
 		ScanResultKind_KeyValue,
+		ScanResultKind_LineContinuation,
 	};
 
 protected:
@@ -37,6 +38,7 @@ protected:
 	char* m_begin;
 	int m_line;
 	size_t m_lineOffset;
+	bool m_isLineContinuation;
 
 	sl::String m_sectionName;
 	sl::String m_keyName;
@@ -74,6 +76,12 @@ protected: // should only be used as part of ini::CParser
 
 	void
 	parseKeyValue(
+		const char* p,
+		const char* end
+		);
+
+	void
+	parseValue(
 		const char* p,
 		const char* end
 		);

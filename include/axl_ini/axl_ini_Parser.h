@@ -58,6 +58,13 @@ public:
 				return false;
 
 			case ScanResultKind_Eof:
+				if (m_isLineContinuation)
+				{
+					result = static_cast<T*>(this)->onKeyValue(m_keyName, m_value);
+					if (!result)
+						return false;
+				}
+
 				return static_cast<T*>(this)->finalize();
 
 			case ScanResultKind_Section:
@@ -72,6 +79,9 @@ public:
 				if (!result)
 					return false;
 
+				break;
+
+			case ScanResultKind_LineContinuation:
 				break;
 
 			default:
