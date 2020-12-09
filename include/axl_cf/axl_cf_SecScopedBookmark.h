@@ -27,7 +27,7 @@ class SecScopedBookmark
 {
 protected:
 	sl::String m_filePath;
-	sl::Array<char> m_dataCache;
+	mutable sl::Array<char> m_dataCache;
 	Url m_accessUrl;
 	bool m_isDirectory;
 
@@ -68,14 +68,20 @@ public:
 	}
 #endif
 
+	bool
+	isEmpty() const
+	{
+		return m_filePath.isEmpty();
+	}
+
 	const sl::String&
-	getFilePath()
+	getFilePath() const
 	{
 		return m_filePath;
 	}
 
 	bool
-	isDirectory()
+	isDirectory() const
 	{
 		return m_isDirectory;
 	}
@@ -104,10 +110,10 @@ public:
 		);
 
 	bool
-	save(sl::Array<char>* buffer);
+	save(sl::Array<char>* buffer) const;
 
 	sl::Array<char>
-	save()
+	save() const
 	{
 		sl::Array<char> buffer;
 		save(&buffer);

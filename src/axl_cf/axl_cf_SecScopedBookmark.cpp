@@ -103,7 +103,7 @@ SecScopedBookmark::load(
 }
 
 bool
-SecScopedBookmark::save(sl::Array<char>* buffer)
+SecScopedBookmark::save(sl::Array<char>* buffer) const
 {
 	if (!m_dataCache.isEmpty())
 	{
