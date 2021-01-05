@@ -65,7 +65,7 @@ public:
 	void
 	close()
 	{
-		unmap();
+		unmap(m_size);
 	}
 
 	void*
@@ -86,7 +86,7 @@ public:
 	}
 
 	void
-	unmap(size_t size = -1);
+	unmap(size_t size);
 };
 
 //..............................................................................

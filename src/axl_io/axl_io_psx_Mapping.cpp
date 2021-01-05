@@ -48,7 +48,9 @@ Mapping::unmap(size_t size)
 	if (!isOpen())
 		return;
 
-	::munmap(m_p, size);
+	int result = ::munmap(m_p, size);
+	ASSERT(result == 0);
+
 	m_p = NULL;
 	m_size = 0;
 }
