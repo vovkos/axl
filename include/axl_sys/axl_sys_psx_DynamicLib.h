@@ -28,7 +28,8 @@ public:
 	void
 	operator () (void* h)
 	{
-		::dlclose(h);
+		int result = ::dlclose(h);
+		ASSERT(result == 0);
 	}
 };
 

@@ -28,7 +28,8 @@ public:
 	void
 	operator () (HANDLE h)
 	{
-		::CloseHandle(h);
+		bool_t result = ::CloseHandle(h);
+		ASSERT(result);
 	}
 };
 
@@ -44,7 +45,8 @@ public:
 	void
 	operator () (HKEY h)
 	{
-		::RegCloseKey(h);
+		bool_t result = ::RegCloseKey(h);
+		ASSERT(result);
 	}
 };
 

@@ -29,12 +29,14 @@ protected:
 public:
 	ThreadAttr()
 	{
-		::pthread_attr_init(&m_attr);
+		int result = ::pthread_attr_init(&m_attr);
+		ASSERT(result == 0);
 	}
 
 	~ThreadAttr()
 	{
-		::pthread_attr_destroy(&m_attr);
+		int result = ::pthread_attr_destroy(&m_attr);
+		ASSERT(result == 0);
 	}
 
 	operator const pthread_attr_t* () const
@@ -102,7 +104,8 @@ public:
 
 	~Thread()
 	{
-		detach();
+		bool result = detach();
+		ASSERT(result);
 	}
 
 	operator pthread_t()

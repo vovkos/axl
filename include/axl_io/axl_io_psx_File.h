@@ -27,7 +27,8 @@ public:
 	void
 	operator () (int h)
 	{
-		::close(h);
+		int result = ::close(h);
+		ASSERT(result == 0);
 	}
 };
 

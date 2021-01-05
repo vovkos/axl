@@ -29,18 +29,21 @@ protected:
 public:
 	MutexAttr()
 	{
-		::pthread_mutexattr_init(&m_attr);
+		int result = ::pthread_mutexattr_init(&m_attr);
+		ASSERT(result == 0);
 	}
 
 	MutexAttr(int type)
 	{
-		::pthread_mutexattr_init(&m_attr);
+		int result = ::pthread_mutexattr_init(&m_attr);
+		ASSERT(result == 0);
 		setType(type);
 	}
 
 	~MutexAttr()
 	{
-		::pthread_mutexattr_destroy(&m_attr);
+		int result = ::pthread_mutexattr_destroy(&m_attr);
+		ASSERT(result == 0);
 	}
 
 	operator const pthread_mutexattr_t* () const
@@ -76,18 +79,21 @@ protected:
 public:
 	Mutex(const pthread_mutexattr_t* attr = NULL)
 	{
-		::pthread_mutex_init(&m_mutex, attr);
+		int result = ::pthread_mutex_init(&m_mutex, attr);
+		ASSERT(result == 0);
 	}
 
 	Mutex(int type)
 	{
 		MutexAttr attr(type);
-		::pthread_mutex_init(&m_mutex, attr);
+		int result = ::pthread_mutex_init(&m_mutex, attr);
+		ASSERT(result == 0);
 	}
 
 	~Mutex()
 	{
-		::pthread_mutex_destroy(&m_mutex);
+		int result = ::pthread_mutex_destroy(&m_mutex);
+		ASSERT(result == 0);
 	}
 
 	operator pthread_mutex_t* ()

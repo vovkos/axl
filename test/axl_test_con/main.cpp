@@ -5587,6 +5587,23 @@ iniTest()
 
 //..............................................................................
 
+void
+mappedFileTest()
+{
+	io::SimpleMappedFile file;
+	bool result = file.open("/home/vladimir/test.jnc");
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	void* p = file.p();
+	size_t size = file.getMappingSize();
+
+	file.close();
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5613,9 +5630,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#ifdef _AXL_INI
-	iniTest();
-#endif
+	mappedFileTest();
 
 	return 0;
 }

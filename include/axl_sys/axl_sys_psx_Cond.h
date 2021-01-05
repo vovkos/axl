@@ -31,12 +31,14 @@ protected:
 public:
 	CondAttr()
 	{
-		::pthread_condattr_init(&m_attr);
+		int result = ::pthread_condattr_init(&m_attr);
+		ASSERT(result == 0);
 	}
 
 	~CondAttr()
 	{
-		::pthread_condattr_destroy(&m_attr);
+		int result = ::pthread_condattr_destroy(&m_attr);
+		ASSERT(result == 0);
 	}
 
 	operator const pthread_condattr_t* () const
@@ -74,12 +76,14 @@ protected:
 public:
 	Cond(const pthread_condattr_t* attr = NULL)
 	{
-		::pthread_cond_init(&m_cond, attr);
+		int result = ::pthread_cond_init(&m_cond, attr);
+		ASSERT(result == 0);
 	}
 
 	~Cond()
 	{
-		::pthread_cond_destroy(&m_cond);
+		int result = ::pthread_cond_destroy(&m_cond);
+		ASSERT(result == 0);
 	}
 
 	operator pthread_cond_t* ()
