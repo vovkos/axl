@@ -77,7 +77,7 @@ Tracker::remove(TrackerBlockHdr* hdr)
 }
 
 void
-Tracker::trace()
+Tracker::trace(bool isDetailed)
 {
 	m_lock.lock();
 
@@ -95,7 +95,7 @@ Tracker::trace()
 		m_totalBlockCount
 		);
 
-	if (!m_blockList.isEmpty())
+	if (isDetailed && !m_blockList.isEmpty())
 	{
 		TRACE(
 			"*** Found %d unfreed blocks:\n",

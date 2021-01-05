@@ -37,6 +37,42 @@ protected:
 public:
 	Tracker();
 
+	size_t
+	getBlockCount()
+	{
+		return m_blockList.getCount();
+	}
+
+	size_t
+	getPeakBlockCount()
+	{
+		return m_peakBlockCount;
+	}
+
+	size_t
+	getTotalBlockCount()
+	{
+		return m_totalBlockCount;
+	}
+
+	size_t
+	getSize()
+	{
+		return m_size;
+	}
+
+	size_t
+	getPeakSize()
+	{
+		return m_peakSize;
+	}
+
+	size_t
+	getTotalSize()
+	{
+		return m_totalSize;
+	}
+
 	void
 	add(TrackerBlockHdr* hdr);
 
@@ -44,7 +80,7 @@ public:
 	remove(TrackerBlockHdr* hdr);
 
 	void
-	trace();
+	trace(bool isDetailed = true);
 };
 
 //..............................................................................
