@@ -1,0 +1,23 @@
+.. index:: pair: enum; ParseErrorCode
+.. _doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4ba:
+
+enum axl::lex::ParseErrorCode
+=============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_ParseError.h>
+
+	enum ParseErrorCode
+	{
+	    :target:`ParseErrorCode_SrcPos<doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4baa61f105ac5684d2548b766e49f2e013d9>`,
+	    :target:`ParseErrorCode_InvalidSyntax<doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4baac99bf522ffe571e2fe57f1b23d2ccf51>`,
+	    :target:`ParseErrorCode_InvalidSyntaxIn<doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4baa3325265f78cd25c7ba1db8aaef320737>`,
+	    :target:`ParseErrorCode_ExpectedToken<doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4baa1ba053d90529cb21c61d6d8d9a2bcf61>`,
+	    :target:`ParseErrorCode_UnexpectedToken<doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4baafbc549854e3c8fa9d4386c0068677f26>`,
+	    :target:`ParseErrorCode_UnexpectedTokenIn<doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4baa9202f190b22be3be59bfafd03b02a750>`,
+	};
+

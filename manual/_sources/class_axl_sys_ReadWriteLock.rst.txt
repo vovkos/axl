@@ -1,0 +1,65 @@
+.. index:: pair: class; axl::sys::ReadWriteLock
+.. _doxid-classaxl_1_1sys_1_1_read_write_lock:
+
+class axl::sys::ReadWriteLock
+=============================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_sys_ReadWriteLock_Data.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_ReadWriteLock.h>
+	
+	class ReadWriteLock
+	{
+	public:
+		// structs
+	
+		struct :ref:`Data<doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data>`;
+
+		// construction
+	
+		:target:`ReadWriteLock<doxid-classaxl_1_1sys_1_1_read_write_lock_1a59e7a1aa303a50476d3fa92e7bd24ba1>`();
+		:target:`~ReadWriteLock<doxid-classaxl_1_1sys_1_1_read_write_lock_1afe22fba5718afaf2a96d97d25fef8845>`();
+
+		// methods
+	
+		void
+		:target:`close<doxid-classaxl_1_1sys_1_1_read_write_lock_1aaf2c8a46b15648412a28b5f117f55659>`();
+	
+		bool
+		:target:`create<doxid-classaxl_1_1sys_1_1_read_write_lock_1ad44ee8062d0ff52b68e630e2dce92868>`();
+	
+		bool
+		:target:`create<doxid-classaxl_1_1sys_1_1_read_write_lock_1a33e6c57feee622ba5d1e470700aa1e98>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& mappingName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& readEventName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& writeEventName
+			);
+	
+		bool
+		:target:`open<doxid-classaxl_1_1sys_1_1_read_write_lock_1a0b32a62c7f724b278ff904de76b7d5c8>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& mappingName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& readEventName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& writeEventName
+			);
+	
+		bool
+		:target:`readLock<doxid-classaxl_1_1sys_1_1_read_write_lock_1a2f4baaceebeb0a28cdb3a562cde9f45b>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout = -1);
+	
+		void
+		:target:`readUnlock<doxid-classaxl_1_1sys_1_1_read_write_lock_1a642da3c5aea575691f251e84c1d1fef3>`();
+	
+		bool
+		:target:`writeLock<doxid-classaxl_1_1sys_1_1_read_write_lock_1a4df9f7138cc9947fc4dcd937ccd061db>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout = -1);
+	
+		void
+		:target:`writeUnlock<doxid-classaxl_1_1sys_1_1_read_write_lock_1aa38fa039c11e3f0c0d747f963d5c0b5b>`();
+	};

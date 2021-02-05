@@ -1,0 +1,29 @@
+.. index:: pair: class; axl::sl::ImplicitCast
+.. _doxid-classaxl_1_1sl_1_1_implicit_cast:
+
+template class axl::sl::ImplicitCast
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename A,
+		typename B
+		>
+	class ImplicitCast
+	{
+	public:
+		// methods
+	
+		B
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_implicit_cast_1a968aba5c7e1a365bf4cfb27f62e4be37>`(A x) const;
+	};

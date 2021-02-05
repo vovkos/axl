@@ -1,0 +1,35 @@
+.. index:: pair: class; axl::sl::BoyerMooreIncrementalContext
+.. _doxid-classaxl_1_1sl_1_1_boyer_moore_incremental_context:
+
+template class axl::sl::BoyerMooreIncrementalContext
+====================================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BoyerMooreFind.h>
+	
+	template <typename T>
+	class BoyerMooreIncrementalContext
+	{
+	public:
+		// fields
+	
+		:ref:`Array<doxid-classaxl_1_1sl_1_1_array>`<T> :target:`m_tail<doxid-classaxl_1_1sl_1_1_boyer_moore_incremental_context_1a2fa9405f0a324848eee676e6ec4ae6e8>`;
+		:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` :target:`m_prefix<doxid-classaxl_1_1sl_1_1_boyer_moore_incremental_context_1a74f76b432781335021d680d17b24a156>`;
+
+		// construction
+	
+		:target:`BoyerMooreIncrementalContext<doxid-classaxl_1_1sl_1_1_boyer_moore_incremental_context_1a453654594d23cd3e50ec0997016dfb06>`();
+
+		// methods
+	
+		void
+		:target:`reset<doxid-classaxl_1_1sl_1_1_boyer_moore_incremental_context_1a45b044ae4ecceecc9fc3e95b87594229>`();
+	};

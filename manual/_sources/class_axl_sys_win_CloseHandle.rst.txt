@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::win::CloseHandle
+.. _doxid-classaxl_1_1sys_1_1win_1_1_close_handle:
+
+class axl::sys::win::CloseHandle
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_Handle.h>
+	
+	class CloseHandle
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1win_1_1_close_handle_1ad09b2f6e37e7bdde51f51c5229b6ae18>`(HANDLE h);
+	};

@@ -1,0 +1,27 @@
+.. index:: pair: class; axl::enc::HexEncoding::InsertSpace
+.. _doxid-classaxl_1_1enc_1_1_hex_encoding_1_1_insert_space:
+
+class axl::enc::HexEncoding::InsertSpace
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	class InsertSpace
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1enc_1_1_hex_encoding_1_1_insert_space_1ab9d5374dbde8b0ec3bfd0c0b6e66d754>`(
+			char* p,
+			size_t i
+			);
+	};

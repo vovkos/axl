@@ -1,0 +1,26 @@
+.. index:: pair: enum; NetworkAdapterType
+.. _doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98:
+
+enum axl::io::NetworkAdapterType
+================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_NetworkAdapter.h>
+
+	enum NetworkAdapterType
+	{
+	    :target:`NetworkAdapterType_Unknown<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98a2c5fceb003d83ca57e28563b22c7d987>`,
+	    :target:`NetworkAdapterType_Loopback<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98ae1d703d80d46e85eb3886828b07ab953>`,
+	    :target:`NetworkAdapterType_Ethernet<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98a1e5c63c3ff6448de8b35d4105ed1bd54>`,
+	    :target:`NetworkAdapterType_Wireless<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98acc0ee2689a1ce69e7bc72fdfd16132e8>`,
+	    :target:`NetworkAdapterType_Ppp<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98ae49b6b71f6c7777cafa49f9879efa0a5>`,
+	    :target:`NetworkAdapterType_TokenRing<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98aa68661350d6abb4175a4ca37bb0fb4bf>`,
+	    :target:`NetworkAdapterType_Slip<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98adaad334741c31f462396e0694beb9003>`,
+	    :target:`NetworkAdapterType_Tunnel<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98a78ba23b6f637533c4d39217936c66ebd>`,
+	    :target:`NetworkAdapterType__Count<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98ab1045d05ced0224a5cf8f0e19823078a>`,
+	};
+

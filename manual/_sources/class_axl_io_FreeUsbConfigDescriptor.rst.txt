@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::FreeUsbConfigDescriptor
+.. _doxid-classaxl_1_1io_1_1_free_usb_config_descriptor:
+
+class axl::io::FreeUsbConfigDescriptor
+======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_UsbDevice.h>
+	
+	class FreeUsbConfigDescriptor
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1_free_usb_config_descriptor_1aa66815321105b8e02b5aa3023a8b1f0c>`(libusb_config_descriptor* h);
+	};

@@ -1,0 +1,73 @@
+.. index:: pair: enum; FILE_INFORMATION_CLASS
+.. _doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57f:
+
+enum axl::sys::win::FILE_INFORMATION_CLASS
+==========================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_NtDll.h>
+
+	enum FILE_INFORMATION_CLASS
+	{
+	    :target:`FileDirectoryInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa51049cf47f197484dc630c7d6ba26147>`                =  1,
+	    :target:`FileFullDirectoryInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faf01398b773cccc43bb413987505150b8>`,
+	    :target:`FileBothDirectoryInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa008e846e5cdb371e6509b14bb9a95b80>`,
+	    :target:`FileBasicInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fac85a3da27cd0fec65f2cbfb47635eeec>`,
+	    :target:`FileStandardInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fab46c3e3afae87c0acf0cd1ea3edc4a38>`,
+	    :target:`FileInternalInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa8221567ff983f6dda82067cce2264f63>`,
+	    :target:`FileEaInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa585c4fb2f45450cccde620471e95150f>`,
+	    :target:`FileAccessInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fabb9925909852af800514c79412b34186>`,
+	    :target:`FileNameInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa5263c062d2a03d0e74b16b050d4e8846>`,
+	    :target:`FileRenameInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fae29999b44bd18d4536d4a45697c6d62e>`,
+	    :target:`FileLinkInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faa0627a53ca624f3b9219bbab7ac96820>`,
+	    :target:`FileNamesInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa539246b84b461307d4dcd80f925ae54d>`,
+	    :target:`FileDispositionInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faabab7cecceff95698a1deae84d1b907a>`,
+	    :target:`FilePositionInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fac540bd6b8e8de8c9e1410a8c87f4e44c>`,
+	    :target:`FileFullEaInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faafd0796e97d1038c0747027145549715>`,
+	    :target:`FileModeInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa7f374a6515b60d9b4b81f37f9ba5e6e2>`,
+	    :target:`FileAlignmentInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fab6a895ebca21a9c4249e602aad1d82a2>`,
+	    :target:`FileAllInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa75f9e14566f50565062a8f2ea4ea969a>`,
+	    :target:`FileAllocationInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fad2b9de9fa15220e333c1e24b7d636db6>`,
+	    :target:`FileEndOfFileInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa9e535d410dabe9ac42f8f9f1a6f26f02>`,
+	    :target:`FileAlternateNameInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faf5551a8f7518df2b8a264ac16738ca60>`,
+	    :target:`FileStreamInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa11446fd9ecf7c867f18fc94a6d548b23>`,
+	    :target:`FilePipeInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fac7c1717b0257371144cbd954d012bf5c>`,
+	    :target:`FilePipeLocalInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa3a0fdb46055a461a4d8fa4cc0b0cd04d>`,
+	    :target:`FilePipeRemoteInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faae3f4d43ca31d1870a9f3ba7bf71a1a4>`,
+	    :target:`FileMailslotQueryInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa35cf467686e6d0e93eb5eef64b4f5c2b>`,
+	    :target:`FileMailslotSetInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fabb1ae4230d461b86dd964b5d1e4bd0e6>`,
+	    :target:`FileCompressionInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57facc9b8638c27d0d113733efcd5872f6d0>`,
+	    :target:`FileObjectIdInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fabbbb2a6b22330125c65c544edebeb9fd>`,
+	    :target:`FileCompletionInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fada15bf4088f0885b6c0bb95bcd36e522>`,
+	    :target:`FileMoveClusterInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fadded1d8ab572c6b42f63f953c82b43dc>`,
+	    :target:`FileQuotaInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa7d12e7a608d86854b6f8e32b5f00db89>`,
+	    :target:`FileReparsePointInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa80ff277f378573268ec8f1a678bf0255>`,
+	    :target:`FileNetworkOpenInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa7702a92d401eac28859077c8c2974928>`,
+	    :target:`FileAttributeTagInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faad967cacbbafea3c278b4a6318a359e2>`,
+	    :target:`FileTrackingInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fada003aecbb77df4704a4d99d6d13edcf>`,
+	    :target:`FileIdBothDirectoryInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa630a2ea0b4b70f4ef74bf3e839b2ab9e>`,
+	    :target:`FileIdFullDirectoryInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa168cdd00a940cadfe4d7bbcffbba064e>`,
+	    :target:`FileValidDataLengthInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa8dcc3b12958eb193ad3679c7a01e009c>`,
+	    :target:`FileShortNameInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa1746528977a3262ab7a54fe572bd033d>`,
+	    :target:`FileIoCompletionNotificationInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57face58a415e6029a8d62eb0a9fc5a99af3>`,
+	    :target:`FileIoStatusBlockRangeInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa29d028763a5cac6654c87e4d02a45b77>`,
+	    :target:`FileIoPriorityHintInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa1fe652241d88f20002bdee6326b7279f>`,
+	    :target:`FileSfioReserveInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faced3bd254419eecfa647e8a37fb1be61>`,
+	    :target:`FileSfioVolumeInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fab74810fd646493a0552b2dc8f3e635bc>`,
+	    :target:`FileHardLinkInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa1eca4a1708f263753ee02c1c99aedaac>`,
+	    :target:`FileProcessIdsUsingFileInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faa98a7ed28a2d43da98831c600bb492cb>`,
+	    :target:`FileNormalizedNameInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faec9f688497a046006e4af22974926390>`,
+	    :target:`FileNetworkPhysicalNameInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa1996d01e4173c107addb65d1d3a949bf>`,
+	    :target:`FileIdGlobalTxDirectoryInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faa5f19e389009a2aeaad222ecc73918f6>`,
+	    :target:`FileIsRemoteDeviceInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57faa0a91e7868d3568b512b641595287811>`,
+	    :target:`FileAttributeCacheInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa7b4ae303d7c9f210325f1ff01e81fe8d>`,
+	    :target:`FileNumaNodeInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fafb371a7828a267ffbd43c6f5c58ee763>`,
+	    :target:`FileStandardLinkInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57facb4d1675d676a4e57381a901617387d5>`,
+	    :target:`FileRemoteProtocolInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa2c5d426a7c52ce0fce3d372059887d69>`,
+	    :target:`FileMaximumInformation<doxid-namespaceaxl_1_1sys_1_1win_1a0294c03dc070067b45047ca8d93fa57fa9043e28b60184881380e63fcbb45aeab>`,
+	};
+

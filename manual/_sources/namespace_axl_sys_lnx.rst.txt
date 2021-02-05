@@ -1,0 +1,89 @@
+.. index:: pair: namespace; axl::sys::lnx
+.. _doxid-namespaceaxl_1_1sys_1_1lnx:
+
+namespace axl::sys::lnx
+=======================
+
+.. toctree::
+	:hidden:
+
+	class_axl_sys_lnx_Udev.rst
+	class_axl_sys_lnx_UdevContextBase.rst
+	class_axl_sys_lnx_UdevDeviceBase.rst
+	class_axl_sys_lnx_UdevEnumeratorBase.rst
+	class_axl_sys_lnx_UdevLib.rst
+	class_axl_sys_lnx_UdevListEntryBase.rst
+	class_axl_sys_lnx_UdevMonitorBase.rst
+	class_axl_sys_lnx_UnrefUdevContext.rst
+	class_axl_sys_lnx_UnrefUdevDevice.rst
+	class_axl_sys_lnx_UnrefUdevEnumerator.rst
+	class_axl_sys_lnx_UnrefUdevMonitor.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace lnx {
+
+	// typedefs
+
+	typedef :ref:`UdevContextBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_context_base>`<:ref:`Udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev>`> :target:`UdevContext_s<doxid-namespaceaxl_1_1sys_1_1lnx_1a300b93b2b9a243aa2442b2bc3ff4602c>`;
+	typedef :ref:`UdevDeviceBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_device_base>`<:ref:`Udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev>`> :target:`UdevDevice_s<doxid-namespaceaxl_1_1sys_1_1lnx_1a4a53552ce928b1a0e38af4fb7f6d2f05>`;
+	typedef :ref:`UdevEnumeratorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_enumerator_base>`<:ref:`Udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev>`> :target:`UdevEnumerator_s<doxid-namespaceaxl_1_1sys_1_1lnx_1aa5ea0a3543880fe9df762dffa311f1cf>`;
+	typedef :ref:`UdevListEntryBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_list_entry_base>`<:ref:`Udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev>`> :target:`UdevListEntry_s<doxid-namespaceaxl_1_1sys_1_1lnx_1a86e2f5759e68dd5e19d94ec9579ec333>`;
+	typedef :ref:`UdevMonitorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base>`<:ref:`Udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev>`> :target:`UdevMonitor_s<doxid-namespaceaxl_1_1sys_1_1lnx_1a5f1bccd8b71d26c214ab4cc2fc70fc06>`;
+	typedef :ref:`UdevContextBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_context_base>`<:ref:`UdevLib<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_lib>`> :target:`DynamicUdevContext<doxid-namespaceaxl_1_1sys_1_1lnx_1a0b7ddb7763c793d8304653a9d3d7f600>`;
+	typedef :ref:`UdevDeviceBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_device_base>`<:ref:`UdevLib<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_lib>`> :target:`DynamicUdevDevice<doxid-namespaceaxl_1_1sys_1_1lnx_1a88c927604e95e9279670bc51b24e132c>`;
+	typedef :ref:`UdevEnumeratorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_enumerator_base>`<:ref:`UdevLib<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_lib>`> :target:`DynamicUdevEnumerator<doxid-namespaceaxl_1_1sys_1_1lnx_1ab91ff0035afd084d52492e02e0591d03>`;
+	typedef :ref:`UdevListEntryBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_list_entry_base>`<:ref:`UdevLib<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_lib>`> :target:`DynamicUdevListEntry<doxid-namespaceaxl_1_1sys_1_1lnx_1a0745280914c4f3fc27ebf4e94caa7a18>`;
+	typedef :ref:`UdevMonitorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base>`<:ref:`UdevLib<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_lib>`> :target:`DynamicUdevMonitor<doxid-namespaceaxl_1_1sys_1_1lnx_1a33129ed9b29e719c48c22a6a52fc1a69>`;
+
+	// classes
+
+	class :ref:`Udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev>`;
+
+	template <typename T>
+	class :ref:`UdevContextBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_context_base>`;
+
+	template <typename T>
+	class :ref:`UdevDeviceBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_device_base>`;
+
+	template <typename T>
+	class :ref:`UdevEnumeratorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_enumerator_base>`;
+
+	class :ref:`UdevLib<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_lib>`;
+
+	template <typename T>
+	class :ref:`UdevListEntryBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_list_entry_base>`;
+
+	template <typename T>
+	class :ref:`UdevMonitorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base>`;
+
+	template <typename T>
+	class :ref:`UnrefUdevContext<doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_context>`;
+
+	template <typename T>
+	class :ref:`UnrefUdevDevice<doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_device>`;
+
+	template <typename T>
+	class :ref:`UnrefUdevEnumerator<doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_enumerator>`;
+
+	template <typename T>
+	class :ref:`UnrefUdevMonitor<doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_monitor>`;
+
+	// global functions
+
+	template <typename T>
+	T
+	:target:`completeUdev<doxid-namespaceaxl_1_1sys_1_1lnx_1af5f13a9e74b54b39b3db3ff218f2d8c2>`(
+		T result,
+		const char* functionName
+		);
+
+	bool
+	:target:`completeUdevErrno<doxid-namespaceaxl_1_1sys_1_1lnx_1abcf48e709a70468d67df0b691738e162>`(int result);
+
+	} // namespace lnx

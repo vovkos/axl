@@ -1,0 +1,86 @@
+.. index:: pair: class; axl::sl::BitMapN
+.. _doxid-classaxl_1_1sl_1_1_bit_map_n:
+
+template class axl::sl::BitMapN
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BitMap.h>
+	
+	template <size_t bitCount>
+	class BitMapN
+	{
+	public:
+		// enums
+	
+		enum
+		{
+		    :target:`pageCount<doxid-classaxl_1_1sl_1_1_bit_map_n_1a4ee3710a188a5be2f9174c58d7c286f0a0226a9730a2eb2b345b660a71334ded2>` = bitCount / AXL_PTR_BITS + bitCount % AXL_PTR_BITS ? 1 : 0,
+		};
+
+		// construction
+	
+		:target:`BitMapN<doxid-classaxl_1_1sl_1_1_bit_map_n_1a2d78e3d9907917e855b4c458381bb573>`();
+
+		// methods
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_bit_map_n_1a5478f74cb41f9303ac0e29a82c2ebe15>`();
+	
+		void
+		:target:`copy<doxid-classaxl_1_1sl_1_1_bit_map_n_1aee94afe2aa285e5550ae69547548849c>`(const BitMapN& src);
+	
+		size_t
+		:target:`hash<doxid-classaxl_1_1sl_1_1_bit_map_n_1ab25fb11e97b7f4c923aa921070c740ea>`() const;
+	
+		int
+		:target:`cmp<doxid-classaxl_1_1sl_1_1_bit_map_n_1a9bc6f80a529fcc4efc6f3df61ca7e5e0>`(const BitMapN& src) const;
+	
+		const size_t*
+		:target:`getMap<doxid-classaxl_1_1sl_1_1_bit_map_n_1ac5226e5b90a9be850e7e5c29ce99238c>`() const;
+	
+		size_t*
+		:target:`getMap<doxid-classaxl_1_1sl_1_1_bit_map_n_1a6722702036687d575f02a2e80a2a4f5b>`();
+	
+		size_t
+		:target:`getPageCount<doxid-classaxl_1_1sl_1_1_bit_map_n_1aa10fb39be8e9a9ba17f2577824f73ac5>`() const;
+	
+		bool
+		:target:`getBit<doxid-classaxl_1_1sl_1_1_bit_map_n_1a4588b2729bef1b6f9d3fd59f0545de06>`(size_t bit) const;
+	
+		bool
+		:target:`setBit<doxid-classaxl_1_1sl_1_1_bit_map_n_1a22192fffa37b9fc234869e11e4b29c31>`(
+			size_t bit,
+			bool value = true
+			);
+	
+		bool
+		:target:`setBitRange<doxid-classaxl_1_1sl_1_1_bit_map_n_1a0dbb3c0d23c3e8156850bf7b0f027021>`(
+			size_t from,
+			size_t to,
+			bool value = true
+			);
+	
+		bool
+		:target:`merge<doxid-classaxl_1_1sl_1_1_bit_map_n_1a7fea39f3c8bff0d9a6a0fd51824da824>`(
+			const BitMapN& bitMap2,
+			:ref:`BitOpKind<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157>` op
+			);
+	
+		void
+		:target:`inverse<doxid-classaxl_1_1sl_1_1_bit_map_n_1a9e42d618de05aee59da9991ddfcdb873>`();
+	
+		size_t
+		:target:`findBit<doxid-classaxl_1_1sl_1_1_bit_map_n_1aa23f6db5340cf446a66c455153eaef20>`(
+			size_t start,
+			bool value = true
+			) const;
+	};

@@ -1,0 +1,356 @@
+.. index:: pair: class; axl::lua::LuaState
+.. _doxid-classaxl_1_1lua_1_1_lua_state:
+
+class axl::lua::LuaState
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lua_LuaState.h>
+	
+	class LuaState: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// construction
+	
+		:target:`LuaState<doxid-classaxl_1_1lua_1_1_lua_state_1aa731f1b01eeb6e9cc3ed25b5b3900595>`();
+		:target:`LuaState<doxid-classaxl_1_1lua_1_1_lua_state_1ab0fe56040a4893e69ae67bef967484e1>`(lua_State* h);
+
+		// methods
+	
+		bool
+		:target:`create<doxid-classaxl_1_1lua_1_1_lua_state_1a278417dbd6ad9d9826f3b07cfe475409>`();
+	
+		bool
+		:target:`load<doxid-classaxl_1_1lua_1_1_lua_state_1a54c3e6ef9267addcb3c523ed41c54ec3>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source
+			);
+	
+		bool
+		:target:`loadFile<doxid-classaxl_1_1lua_1_1_lua_state_1a30e4db90f77be999547c065cfb559799>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+	
+		bool
+		:target:`doFile<doxid-classaxl_1_1lua_1_1_lua_state_1aaf18016242019aa71c981f7a26a6a2ba>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+	
+		void
+		:target:`openLibs<doxid-classaxl_1_1lua_1_1_lua_state_1a180ca8ee705db846a53eabf702001d2b>`();
+	
+		void
+		:target:`where<doxid-classaxl_1_1lua_1_1_lua_state_1a26d4249f4e114c1ca00088addf548199>`(int level = 1);
+	
+		void
+		:target:`prepareErrorString<doxid-classaxl_1_1lua_1_1_lua_state_1a5a85ae89d5ff35f177902c2d20103026>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	
+		void
+		:target:`prepareLastErrorString<doxid-classaxl_1_1lua_1_1_lua_state_1a6a20c6b241b78724e1629ab9cb7f3812>`();
+	
+		void
+		:target:`error<doxid-classaxl_1_1lua_1_1_lua_state_1ad37fb27c24340990aed1a1091d6c9e2f>`();
+	
+		void
+		:target:`clearStack<doxid-classaxl_1_1lua_1_1_lua_state_1a7fc5205b96078b1a3b45f8397bd5222c>`();
+	
+		int
+		:target:`getTop<doxid-classaxl_1_1lua_1_1_lua_state_1a72cc20c436717c9de3b358c270437429>`();
+	
+		void
+		:target:`setTop<doxid-classaxl_1_1lua_1_1_lua_state_1a3b033cd6fee3e30d2e966fca6e7d6056>`(int index);
+	
+		bool
+		:target:`tryCheckStack<doxid-classaxl_1_1lua_1_1_lua_state_1a47369619e7949c590ff054396130a929>`(int extraSlotCount);
+	
+		void
+		:target:`checkStack<doxid-classaxl_1_1lua_1_1_lua_state_1a160f83c38c8bd3ef7163cbfb4b6f490b>`(int extraSlotCount);
+	
+		int
+		:target:`getType<doxid-classaxl_1_1lua_1_1_lua_state_1a1156ab9fcd159f057976114fcfc16463>`(int index);
+	
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getTypeName<doxid-classaxl_1_1lua_1_1_lua_state_1ab535d29d9d6d5d3858d2b6daed58e2af>`(int type);
+	
+		void
+		:target:`getLen<doxid-classaxl_1_1lua_1_1_lua_state_1a743c9b6d88a138f2d46d4ff40f2e8b35>`(int index = -1);
+	
+		size_t
+		:target:`getRawLen<doxid-classaxl_1_1lua_1_1_lua_state_1a141a72026b5daedfb91288168835f590>`(int index = -1);
+	
+		void
+		:target:`insert<doxid-classaxl_1_1lua_1_1_lua_state_1aa6a12710d63aace7091d5f666767f18f>`(int index);
+	
+		void
+		:target:`remove<doxid-classaxl_1_1lua_1_1_lua_state_1ab9299e89bee0bba2c0ddb0171fea027b>`(int index);
+	
+		void
+		:target:`swap<doxid-classaxl_1_1lua_1_1_lua_state_1a1eb58413600a40e653c9a1252dd24b88>`();
+	
+		void
+		:target:`concatenate<doxid-classaxl_1_1lua_1_1_lua_state_1ad7173305f8bbcd6d4e66a399d82a385c>`(int count = 2);
+	
+		void
+		:target:`pushNil<doxid-classaxl_1_1lua_1_1_lua_state_1adc4049157958869c20ee41fa78559a5d>`();
+	
+		void
+		:target:`pushValue<doxid-classaxl_1_1lua_1_1_lua_state_1a1f1a79269a19fcb11d843b1d62f6dc2c>`(int index = -1);
+	
+		void
+		:target:`pushInteger<doxid-classaxl_1_1lua_1_1_lua_state_1a1acfece70b8247a279df04c46f1612a3>`(lua_Integer value);
+	
+		void
+		:target:`pushBoolean<doxid-classaxl_1_1lua_1_1_lua_state_1a20ce2d4737bf0c6abc3f87456dfff1ec>`(bool value);
+	
+		void
+		:target:`pushString<doxid-classaxl_1_1lua_1_1_lua_state_1acc5b20955266aec90be8afcb6d1a79f9>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	
+		void
+		:target:`pushFormatString_va<doxid-classaxl_1_1lua_1_1_lua_state_1a538c9bb2e214351a9d563ae3a0c0203c>`(
+			const char* format,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+	
+		void
+		:target:`pushFormatString<doxid-classaxl_1_1lua_1_1_lua_state_1a0928f1d1bf6b1ce4841f7640dab71eaf>`(
+			const char* format,
+			...
+			);
+	
+		void
+		:target:`pushClosure<doxid-classaxl_1_1lua_1_1_lua_state_1a4e2e4de50baa028ee836584f5bb7b1de>`(
+			lua_CFunction func,
+			size_t contextArgumentCount
+			);
+	
+		void
+		:target:`pushFunction<doxid-classaxl_1_1lua_1_1_lua_state_1a31651134414ce8577fbcd753776a15b6>`(lua_CFunction func);
+	
+		void
+		:target:`pushFunction<doxid-classaxl_1_1lua_1_1_lua_state_1ace37044fdf9002cb05a20513bfb59a4f>`(
+			lua_CFunction func,
+			void* context
+			);
+	
+		bool
+		:target:`tryCreateTable<doxid-classaxl_1_1lua_1_1_lua_state_1ae013c066d93998822707c1efe4bee0a7>`(
+			size_t elementCount = 0,
+			size_t memberCount = 0,
+			size_t extraStackSlotCount = LUA_MINSTACK
+			);
+	
+		void
+		:target:`createTable<doxid-classaxl_1_1lua_1_1_lua_state_1a28d5d433d9259b84f9e734f1a58a42b3>`(
+			size_t elementCount = 0,
+			size_t memberCount = 0,
+			size_t extraStackSlotCount = LUA_MINSTACK
+			);
+	
+		void
+		:target:`getTable<doxid-classaxl_1_1lua_1_1_lua_state_1a4db85f626cf44ca6b8da77e66a8d6f70>`(int index = -2);
+	
+		void
+		:target:`setTable<doxid-classaxl_1_1lua_1_1_lua_state_1a8ec2de9a4bc17c559f4f95052ed5b742>`(int index = -3);
+	
+		void
+		:target:`getMember<doxid-classaxl_1_1lua_1_1_lua_state_1a31d44d0823c56ebf97a27f1a9debab70>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`setMember<doxid-classaxl_1_1lua_1_1_lua_state_1a5e79d1ca75f87aaab849e592fe4ccc41>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`getArrayElement<doxid-classaxl_1_1lua_1_1_lua_state_1a868c584951a28643b58af8e29f0ff95f>`(int index);
+	
+		void
+		:target:`setArrayElement<doxid-classaxl_1_1lua_1_1_lua_state_1abea106050f8f5331029eb5f2d85aae81>`(int index);
+	
+		void
+		:target:`setMemberInteger<doxid-classaxl_1_1lua_1_1_lua_state_1a569a3e7471479f391c87c73e498f0611>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			lua_Integer value
+			);
+	
+		void
+		:target:`setMemberBoolean<doxid-classaxl_1_1lua_1_1_lua_state_1a613dc397b16894caa84e74960fb20c0f>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			bool value
+			);
+	
+		void
+		:target:`setMemberString<doxid-classaxl_1_1lua_1_1_lua_state_1aae7d816ea134bee46da892c169019e04>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+			);
+	
+		void
+		:target:`setArrayElementInteger<doxid-classaxl_1_1lua_1_1_lua_state_1a3ee41a7ff5f2053103287f761e586e8a>`(
+			int index,
+			lua_Integer value
+			);
+	
+		void
+		:target:`setArrayElementString<doxid-classaxl_1_1lua_1_1_lua_state_1a14e19a9e41c7b10e6208289df1da708f>`(
+			int index,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+			);
+	
+		void
+		:target:`pop<doxid-classaxl_1_1lua_1_1_lua_state_1ac45cf9889b2945b5cf7d4ab8418aac31>`(size_t count = 1);
+	
+		lua_Integer
+		:target:`getInteger<doxid-classaxl_1_1lua_1_1_lua_state_1ad206a205877694783ae3a8cdee618456>`(int index = -1);
+	
+		lua_Number
+		:target:`getNumber<doxid-classaxl_1_1lua_1_1_lua_state_1a287a1fce1601baaf17d92f6d029aec26>`(int index = -1);
+	
+		bool
+		:target:`getBoolean<doxid-classaxl_1_1lua_1_1_lua_state_1abc7548dd09c77991e8f2f4febd31e67a>`(int index = -1);
+	
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getString<doxid-classaxl_1_1lua_1_1_lua_state_1aad93a4a3fdc0d1764c198977dc7b6985>`(int index = -1);
+	
+		lua_Integer
+		:target:`popInteger<doxid-classaxl_1_1lua_1_1_lua_state_1a1180b1ac8cd2b785de4cfd35caadbaf7>`();
+	
+		bool
+		:target:`popBoolean<doxid-classaxl_1_1lua_1_1_lua_state_1acd9b815026f6fb35dfeb37b81a86d68b>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`popString<doxid-classaxl_1_1lua_1_1_lua_state_1a708bc7a2ce409768832a261c539d491a>`();
+	
+		void
+		:target:`getGlobal<doxid-classaxl_1_1lua_1_1_lua_state_1aec9e742be1624ee537575e0a18369681>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`setGlobal<doxid-classaxl_1_1lua_1_1_lua_state_1aa28945d18603789bd991bf0d874a9e80>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		int
+		:target:`getGlobalArrayLen<doxid-classaxl_1_1lua_1_1_lua_state_1aa524b20bab11a8db3ca026ce0ec9a033>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`getGlobalArrayElement<doxid-classaxl_1_1lua_1_1_lua_state_1a09136004f4af7c4c3138115b8016898f>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			int index
+			);
+	
+		void
+		:target:`setGlobalArrayElement<doxid-classaxl_1_1lua_1_1_lua_state_1a978b52ec0e861b647667ddbaaf43e7a7>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			int index
+			);
+	
+		void
+		:target:`getGlobalMember<doxid-classaxl_1_1lua_1_1_lua_state_1a22a510c399d24b7c2f74ca4564080202>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& member
+			);
+	
+		void
+		:target:`setGlobalMember<doxid-classaxl_1_1lua_1_1_lua_state_1a667fb89866970aacf43c2ac188411e59>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& member
+			);
+	
+		lua_Integer
+		:target:`getGlobalInteger<doxid-classaxl_1_1lua_1_1_lua_state_1a2997d929a2d4f81cf490ce92561b723c>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`setGlobalInteger<doxid-classaxl_1_1lua_1_1_lua_state_1af29a535c5e18c8a48b9a294478cda764>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			lua_Integer value
+			);
+	
+		bool
+		:target:`getGlobalBoolean<doxid-classaxl_1_1lua_1_1_lua_state_1a6934d55617b95539d7ffb461a8f6cfc7>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`setGlobalBoolean<doxid-classaxl_1_1lua_1_1_lua_state_1a267e5c7ca951422963258c341eb10ba7>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			bool value
+			);
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getGlobalString<doxid-classaxl_1_1lua_1_1_lua_state_1a9085eb13362ae049b9ea9d554a66c943>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`setGlobalString<doxid-classaxl_1_1lua_1_1_lua_state_1a6094046ab3ed537842abede7dfba43d8>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+			);
+	
+		void
+		:target:`registerFunction<doxid-classaxl_1_1lua_1_1_lua_state_1a14b3eb7447964927ab9a5365d470e6cb>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			lua_CFunction func
+			);
+	
+		void
+		:target:`registerFunction<doxid-classaxl_1_1lua_1_1_lua_state_1acf1bca233157f1fd80f182ee8cc25722>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			lua_CFunction func,
+			void* context
+			);
+	
+		void*
+		:target:`getContext<doxid-classaxl_1_1lua_1_1_lua_state_1a3c157ef766d118a5648193c58a04c30a>`();
+	
+		int
+		:target:`getUpValueIndex<doxid-classaxl_1_1lua_1_1_lua_state_1a247c148219c6ac358333855aa7c07ab8>`(int index = 1);
+	
+		void
+		:target:`call<doxid-classaxl_1_1lua_1_1_lua_state_1a5874f915e4c3e36631afa612749a09c4>`(
+			size_t argumentCount,
+			size_t resultCount = LUA_MULTRET
+			);
+	
+		bool
+		:target:`PCall<doxid-classaxl_1_1lua_1_1_lua_state_1a963f4fed702918a8cfc4a081871ab7a0>`(
+			size_t argumentCount,
+			size_t resultCount = LUA_MULTRET
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

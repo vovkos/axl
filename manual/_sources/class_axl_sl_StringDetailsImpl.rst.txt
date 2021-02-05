@@ -1,0 +1,148 @@
+.. index:: pair: class; axl::sl::StringDetailsImpl
+.. _doxid-classaxl_1_1sl_1_1_string_details_impl:
+
+template class axl::sl::StringDetailsImpl
+=========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_StringDetails.h>
+	
+	template <typename T>
+	class StringDetailsImpl
+	{
+	public:
+		// methods
+	
+		static
+		const T*
+		:target:`getEmptyString<doxid-classaxl_1_1sl_1_1_string_details_impl_1ab35c9374c43942b08fbcf409f37b035d>`();
+	
+		static
+		const T*
+		:target:`getCrLf<doxid-classaxl_1_1sl_1_1_string_details_impl_1a2256ca8576e252de523b76cc686eb528>`();
+	
+		static
+		const T*
+		:target:`getWhitespace<doxid-classaxl_1_1sl_1_1_string_details_impl_1a0778029362717088cbf528b0e6312155>`();
+	
+		static
+		size_t
+		:target:`calcLength<doxid-classaxl_1_1sl_1_1_string_details_impl_1a7735a73251012ab27f2eae82aa4f2bad>`(const T* p);
+	
+		static
+		size_t
+		:target:`calcLength<doxid-classaxl_1_1sl_1_1_string_details_impl_1a92fb236f60e1e4e455e46507da447e14>`(
+			const T* p,
+			size_t maxLength
+			);
+	
+		static
+		int
+		:target:`cmp<doxid-classaxl_1_1sl_1_1_string_details_impl_1a054155de13136f2a8ee44e7845f9c448>`(
+			const T* p1,
+			const T* p2,
+			size_t length
+			);
+	
+		static
+		size_t
+		:target:`find<doxid-classaxl_1_1sl_1_1_string_details_impl_1ab093af78d4ec3f90dab3c27856aab8d4>`(
+			const T* p,
+			size_t length,
+			T c
+			);
+	
+		static
+		size_t
+		:target:`find<doxid-classaxl_1_1sl_1_1_string_details_impl_1a3003920fa0fb3feacad4976f90ebedac>`(
+			const T* p,
+			size_t length,
+			const T* subString,
+			size_t subStringLength
+			);
+	
+		static
+		size_t
+		:target:`findOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1a790963f8e89529229d097e9757176dde>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		size_t
+		:target:`findNotOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1ae6f838e6e278b19d2d808be9195aad9e>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		size_t
+		:target:`reverseFind<doxid-classaxl_1_1sl_1_1_string_details_impl_1a11a0e9620844673ae7d408b538bcfedc>`(
+			const T* p,
+			size_t length,
+			T c
+			);
+	
+		static
+		size_t
+		:target:`reverseFind<doxid-classaxl_1_1sl_1_1_string_details_impl_1adf912022175277b4db32d80941d37b64>`(
+			const T* p,
+			size_t length,
+			const T* subString,
+			size_t subStringLength
+			);
+	
+		static
+		size_t
+		:target:`reverseFindOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1adb8a3ddbf3eee510ec7d08147f4e4318>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		size_t
+		:target:`reverseFindNotOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1a6b52c44614402262cd79b1b92a94b53e>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		void
+		:target:`fill<doxid-classaxl_1_1sl_1_1_string_details_impl_1a4e7a12e700c1a24bc10e353145eafa68>`(
+			T* p,
+			T c,
+			size_t count
+			);
+	
+		static
+		void
+		:target:`copy<doxid-classaxl_1_1sl_1_1_string_details_impl_1a1d8b0f8843cb84992ad1f2906f0bf2c5>`(
+			T* dst,
+			const T* src,
+			size_t length
+			);
+	
+		static
+		void
+		:target:`move<doxid-classaxl_1_1sl_1_1_string_details_impl_1aeab9edce047e06375c1dd6be05a936d6>`(
+			T* dst,
+			const T* src,
+			size_t length
+			);
+	};

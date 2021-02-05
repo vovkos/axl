@@ -1,0 +1,58 @@
+.. index:: pair: struct; axl::fsm::DfaState
+.. _doxid-structaxl_1_1fsm_1_1_dfa_state:
+
+struct axl::fsm::DfaState
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_fsm_Dfa.h>
+	
+	struct DfaState: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+		// fields
+	
+		bool :target:`m_isAccept<doxid-structaxl_1_1fsm_1_1_dfa_state_1a58cdacb31f3c019888f13dfad1e64382>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_id<doxid-structaxl_1_1fsm_1_1_dfa_state_1ad379341f59e89e2a83f2a63a96d58d1c>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_acceptNfaStateId<doxid-structaxl_1_1fsm_1_1_dfa_state_1a8fec5efa52fb1310edbc611832f69aa5>`;
+		void* :target:`m_acceptContext<doxid-structaxl_1_1fsm_1_1_dfa_state_1a463bce62811fbfd657bc08e7232a8c81>`;
+		:ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<:ref:`DfaTransition<doxid-structaxl_1_1fsm_1_1_dfa_transition>`> :target:`m_transitionList<doxid-structaxl_1_1fsm_1_1_dfa_state_1aeca7fdf560a379f6b6e0bd39d7917e5b>`;
+		:ref:`NfaStateSet<doxid-structaxl_1_1fsm_1_1_nfa_state_set>` :target:`m_nfaStateSet<doxid-structaxl_1_1fsm_1_1_dfa_state_1a46c8cbab2c9c6d0711ada2d2f4da55c7>`;
+		:ref:`sl::BitMap<doxid-classaxl_1_1sl_1_1_bit_map>` :target:`m_openCaptureIdSet<doxid-structaxl_1_1fsm_1_1_dfa_state_1a04d31a15feead16aae33ae04d402c7e8>`;
+		:ref:`sl::BitMap<doxid-classaxl_1_1sl_1_1_bit_map>` :target:`m_closeCaptureIdSet<doxid-structaxl_1_1fsm_1_1_dfa_state_1a434a366a5cd1d2451fca80ef7eae5246>`;
+
+		// construction
+	
+		:target:`DfaState<doxid-structaxl_1_1fsm_1_1_dfa_state_1ad3a476a12938b328d4f2b738f6738742>`();
+
+		// methods
+	
+		bool
+		:target:`addNfaState<doxid-structaxl_1_1fsm_1_1_dfa_state_1a78f65fdfa0445348bce146b58e4f77ba>`(:ref:`NfaState<doxid-structaxl_1_1fsm_1_1_nfa_state>`* state);
+	
+		void
+		:target:`makeEpsilonClosure<doxid-structaxl_1_1fsm_1_1_dfa_state_1ade6fdb6263d7577f64075953d0f724f7>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

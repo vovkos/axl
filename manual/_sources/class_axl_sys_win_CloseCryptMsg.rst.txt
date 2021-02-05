@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::win::CloseCryptMsg
+.. _doxid-classaxl_1_1sys_1_1win_1_1_close_crypt_msg:
+
+class axl::sys::win::CloseCryptMsg
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_CryptMsg.h>
+	
+	class CloseCryptMsg
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1win_1_1_close_crypt_msg_1a86befb2a5966018e1bb351c0ff1287a2>`(HCRYPTMSG h);
+	};

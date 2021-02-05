@@ -1,0 +1,181 @@
+.. index:: pair: namespace; axl::lex
+.. _doxid-namespaceaxl_1_1lex:
+
+namespace axl::lex
+==================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_lex_ParseErrorCode.rst
+	enum_axl_lex_TokenChannelMask.rst
+	struct_axl_lex_LineCol.rst
+	struct_axl_lex_LineColOffset.rst
+	struct_axl_lex_SrcPos.rst
+	struct_axl_lex_StdTokenData.rst
+	struct_axl_lex_Token.rst
+	class_axl_lex_Lexer.rst
+	class_axl_lex_ParseErrorProvider.rst
+	class_axl_lex_Ragel.rst
+	class_axl_lex_RagelLexer.rst
+	class_axl_lex_RagelToken.rst
+	class_axl_lex_RagelTokenPos.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace lex {
+
+	// typedefs
+
+	typedef :ref:`RagelToken<doxid-classaxl_1_1lex_1_1_ragel_token>`<int, :ref:`StdTokenData<doxid-structaxl_1_1lex_1_1_std_token_data>`> :target:`StdRagelToken<doxid-namespaceaxl_1_1lex_1a6c006868a5c54ec62c3ea99b0e3cfda1>`;
+
+	// enums
+
+	enum :ref:`ParseErrorCode<doxid-namespaceaxl_1_1lex_1ac88ec776a09181bc3fa08243e90ee4ba>`;
+	enum :ref:`TokenChannelMask<doxid-namespaceaxl_1_1lex_1a01d68a76f43a322ad7d770c3f99cd92d>`;
+
+	// structs
+
+	struct :ref:`LineCol<doxid-structaxl_1_1lex_1_1_line_col>`;
+	struct :ref:`LineColOffset<doxid-structaxl_1_1lex_1_1_line_col_offset>`;
+	struct :ref:`SrcPos<doxid-structaxl_1_1lex_1_1_src_pos>`;
+	struct :ref:`StdTokenData<doxid-structaxl_1_1lex_1_1_std_token_data>`;
+
+	template <
+		typename TokenKind0,
+		typename Name0,
+		typename Data0 = StdTokenData,
+		typename Pos0 = LineCol
+		>
+	struct :ref:`Token<doxid-structaxl_1_1lex_1_1_token>`;
+
+	// classes
+
+	template <
+		typename T,
+		typename Token0
+		>
+	class :ref:`Lexer<doxid-classaxl_1_1lex_1_1_lexer>`;
+
+	class :ref:`ParseErrorProvider<doxid-classaxl_1_1lex_1_1_parse_error_provider>`;
+	class :ref:`Ragel<doxid-classaxl_1_1lex_1_1_ragel>`;
+
+	template <
+		typename T,
+		typename Token = StdRagelToken
+		>
+	class :ref:`RagelLexer<doxid-classaxl_1_1lex_1_1_ragel_lexer>`;
+
+	template <
+		typename Enum,
+		typename GetName,
+		typename Data = StdTokenData
+		>
+	class :ref:`RagelToken<doxid-classaxl_1_1lex_1_1_ragel_token>`;
+
+	class :ref:`RagelTokenPos<doxid-classaxl_1_1lex_1_1_ragel_token_pos>`;
+
+	// global functions
+
+	:target:`AXL_SL_DEFINE_GUID<doxid-namespaceaxl_1_1lex_1a3a1607175efab07b3bba64f685404e2d>`(
+		g_parseErrorGuid,
+		0x56fc601e,
+		0x5d2c,
+		0x4bbe,
+		0xb4,
+		0x55,
+		0x3d,
+		0x8b,
+		0x81,
+		0xaa,
+		0xd8,
+		0xff
+		);
+
+	void
+	:target:`registerParseErrorProvider<doxid-namespaceaxl_1_1lex_1a9c59f46f6d9e83e4e91451c96b23b55c>`();
+
+	size_t
+	:target:`pushSrcPosError<doxid-namespaceaxl_1_1lex_1a6b6ebf067c5f30e5cac6d4f500613fa2>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath,
+		int line,
+		int col = 0
+		);
+
+	size_t
+	:target:`pushSrcPosError<doxid-namespaceaxl_1_1lex_1a6ee23ceb9307d819f32701c4312eddc3>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath,
+		const :ref:`LineCol<doxid-structaxl_1_1lex_1_1_line_col>`& lineCol
+		);
+
+	size_t
+	:target:`pushSrcPosError<doxid-namespaceaxl_1_1lex_1aef110882ceef5b6821649cfc88e5cc1e>`(const :ref:`SrcPos<doxid-structaxl_1_1lex_1_1_src_pos>`& srcPos);
+
+	bool
+	:target:`isSrcPosError<doxid-namespaceaxl_1_1lex_1afdbdf4bd07c6049bf629f63fc246914e>`(const :ref:`err::ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error);
+
+	void
+	:target:`decodeSrcPosError<doxid-namespaceaxl_1_1lex_1a474378b333c29bfc6e62a9f5d31900be>`(
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`* filePath,
+		:ref:`LineCol<doxid-structaxl_1_1lex_1_1_line_col>`* lineCol,
+		const :ref:`err::ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error
+		);
+
+	void
+	:target:`decodeSrcPosError<doxid-namespaceaxl_1_1lex_1a25ef075c5e1b8f2915a43cbc5d7bfe0d>`(
+		:ref:`LineCol<doxid-structaxl_1_1lex_1_1_line_col>`* lineCol,
+		const :ref:`err::ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error
+		);
+
+	void
+	:target:`decodeSrcPosError<doxid-namespaceaxl_1_1lex_1a8096893270a0ddab6e6e1a09fbd152ed>`(
+		:ref:`SrcPos<doxid-structaxl_1_1lex_1_1_src_pos>`* srcPos,
+		const :ref:`err::ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error
+		);
+
+	bool
+	:target:`isLastSrcPosError<doxid-namespaceaxl_1_1lex_1acd81f6734e57b03859e20d4f7cacc108>`();
+
+	void
+	:target:`ensureSrcPosError<doxid-namespaceaxl_1_1lex_1a2b62a76db3c7112de8dd34661f092ce2>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath,
+		int line,
+		int col = 0
+		);
+
+	void
+	:target:`ensureSrcPosError<doxid-namespaceaxl_1_1lex_1a5cb62315c95e891eee4eec05433c0456>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath,
+		const :ref:`LineCol<doxid-structaxl_1_1lex_1_1_line_col>`& lineCol
+		);
+
+	void
+	:target:`ensureSrcPosError<doxid-namespaceaxl_1_1lex_1a5d34655861a69b541e8ed2c52f421972>`(const :ref:`SrcPos<doxid-structaxl_1_1lex_1_1_src_pos>`& srcPos);
+
+	size_t
+	:target:`setSyntaxError<doxid-namespaceaxl_1_1lex_1ad49cad1e7f0e4a9ee41c5ba0e8332c26>`();
+
+	size_t
+	:target:`setSyntaxError<doxid-namespaceaxl_1_1lex_1aa834f72dd9aa5f1de0614fd542163cb3>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& location);
+
+	size_t
+	:target:`setExpectedTokenError<doxid-namespaceaxl_1_1lex_1ac285bd48a5709bc01fbba94bd5606c2b>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& expectedToken,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& actualToken
+		);
+
+	size_t
+	:target:`setUnexpectedTokenError<doxid-namespaceaxl_1_1lex_1a6cfc84896ae9ac2423cc0e6701b04e49>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& token);
+
+	size_t
+	:target:`setUnexpectedTokenError<doxid-namespaceaxl_1_1lex_1a5b9b4d5c6fd9ef517cb0323493c823ea>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& token,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& location
+		);
+
+	} // namespace lex

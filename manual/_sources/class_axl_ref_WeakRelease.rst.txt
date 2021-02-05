@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::ref::WeakRelease
+.. _doxid-classaxl_1_1ref_1_1_weak_release:
+
+template class axl::ref::WeakRelease
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ref_RefCount.h>
+	
+	template <typename T>
+	class WeakRelease
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1ref_1_1_weak_release_1af4d540e674afa8453b710a73ae1b31f4>`(T* p) const;
+	};

@@ -1,0 +1,46 @@
+.. index:: pair: class; axl::gui::OffscreenCanvasCache
+.. _doxid-classaxl_1_1gui_1_1_offscreen_canvas_cache:
+
+template class axl::gui::OffscreenCanvasCache
+=============================================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_gui_OffscreenCanvasCache_Entry.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Canvas.h>
+	
+	template <typename T>
+	class OffscreenCanvasCache
+	{
+	public:
+		// structs
+	
+		struct :ref:`Entry<doxid-structaxl_1_1gui_1_1_offscreen_canvas_cache_1_1_entry>`;
+
+		// construction
+	
+		:target:`OffscreenCanvasCache<doxid-classaxl_1_1gui_1_1_offscreen_canvas_cache_1aa111f1ad5798ccd26e983398e9ffb355>`(:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`* engine);
+		:target:`~OffscreenCanvasCache<doxid-classaxl_1_1gui_1_1_offscreen_canvas_cache_1a5f77aa48cdb43c22dd3b0169914332be>`();
+
+		// methods
+	
+		void
+		:target:`clear<doxid-classaxl_1_1gui_1_1_offscreen_canvas_cache_1a736c3a29ff339435afc7311e47ad4a66>`();
+	
+		T*
+		:target:`getCanvas<doxid-classaxl_1_1gui_1_1_offscreen_canvas_cache_1a320e3bad1b04bcdf9f25b4707e047a89>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` width,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` height
+			);
+	
+		T*
+		:target:`getCanvas<doxid-classaxl_1_1gui_1_1_offscreen_canvas_cache_1a36e2f6fbfde81477e86c588d1628eb0b>`(const :ref:`Size<doxid-structaxl_1_1gui_1_1_size>`& size);
+	};

@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreeBnCtx
+.. _doxid-classaxl_1_1cry_1_1_free_bn_ctx:
+
+class axl::cry::FreeBnCtx
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_BigNum.h>
+	
+	class FreeBnCtx
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_bn_ctx_1ae5c6544328312deeffceb3cc89bcdea4>`(BN_CTX* h);
+	};

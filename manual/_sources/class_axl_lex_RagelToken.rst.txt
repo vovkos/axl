@@ -1,0 +1,81 @@
+.. index:: pair: class; axl::lex::RagelToken
+.. _doxid-classaxl_1_1lex_1_1_ragel_token:
+
+template class axl::lex::RagelToken
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_RagelLexer.h>
+	
+	template <
+		typename Enum,
+		typename GetName,
+		typename Data = StdTokenData
+		>
+	class RagelToken: public :ref:`axl::lex::Token<doxid-structaxl_1_1lex_1_1_token>`
+	{
+	public:
+		// methods
+	
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getText<doxid-classaxl_1_1lex_1_1_ragel_token_1a6af81d6dd74841f266547f4327c262e4>`() const;
+	
+		template <typename IsSpaceNeeded>
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getTokenListString<doxid-classaxl_1_1lex_1_1_ragel_token_1a42f37321b468ccad2c408296fc143012>`(
+			const :ref:`sl::BoxList<doxid-classaxl_1_1sl_1_1_box_list>`<RagelToken>& list,
+			const IsSpaceNeeded& isSpaceNeeded
+			);
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getTokenListString<doxid-classaxl_1_1lex_1_1_ragel_token_1a2084b66cbc068defdcde08e4b699bf07>`(const :ref:`sl::BoxList<doxid-classaxl_1_1sl_1_1_box_list>`<RagelToken>& list);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef TokenKind0 :ref:`TokenKind<doxid-structaxl_1_1lex_1_1_token_1a6058dfaa39ee17ab2ca189fc20297a32>`;
+		typedef Name0 :ref:`Name<doxid-structaxl_1_1lex_1_1_token_1a2a67eb810e1615ced0d13e6996f33a0d>`;
+		typedef Data0 :ref:`Data<doxid-structaxl_1_1lex_1_1_token_1aa1016cef649063f38781055b80f93bfd>`;
+		typedef Pos0 :ref:`Pos<doxid-structaxl_1_1lex_1_1_token_1a8a9389de522790a6fa4301361f7374de>`;
+
+		// fields
+	
+		union
+		{
+			int :ref:`m_token<doxid-structaxl_1_1lex_1_1_token_1a7413888cf6c94b64c0c3fec84e19548e>`;
+			:ref:`TokenKind<doxid-structaxl_1_1lex_1_1_token_1a6058dfaa39ee17ab2ca189fc20297a32>` :ref:`m_tokenKind<doxid-structaxl_1_1lex_1_1_token_1a0674dacbb37712ede578ff285d715d9a>`;
+			char :ref:`m_charToken<doxid-structaxl_1_1lex_1_1_token_1af7d7076c7a3f3fde37c8b5b0371fe002>`;
+			wchar_t :ref:`m_WCharToken<doxid-structaxl_1_1lex_1_1_token_1a255328dbdb201ba7b4edbb4e1bb52afe>`;
+		};
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :ref:`m_channelMask<doxid-structaxl_1_1lex_1_1_token_1a0dd3ceaa43623c041049f5c0f425d21c>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :ref:`m_flags<doxid-structaxl_1_1lex_1_1_token_1acae86f5b68cf27182db42057c371bfe9>`;
+		:ref:`Data<doxid-structaxl_1_1lex_1_1_token_1aa1016cef649063f38781055b80f93bfd>` :ref:`m_data<doxid-structaxl_1_1lex_1_1_token_1a979e87ed15766ae074f853474c2a7445>`;
+		:ref:`Pos<doxid-structaxl_1_1lex_1_1_token_1a8a9389de522790a6fa4301361f7374de>` :ref:`m_pos<doxid-structaxl_1_1lex_1_1_token_1a1a6d2d4c310651d34977e3dd2f7f53bc>`;
+
+		// methods
+	
+		const char*
+		:ref:`getName<doxid-structaxl_1_1lex_1_1_token_1ae08ffc2aa4c31106ed05408d3f035e5f>`() const;
+	
+		static
+		const char*
+		:ref:`getName<doxid-structaxl_1_1lex_1_1_token_1a608316d64fa42b8ae4c5982727efad13>`(int token);
+

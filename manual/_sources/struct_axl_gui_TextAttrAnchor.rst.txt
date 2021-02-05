@@ -1,0 +1,33 @@
+.. index:: pair: struct; axl::gui::TextAttrAnchor
+.. _doxid-structaxl_1_1gui_1_1_text_attr_anchor:
+
+struct axl::gui::TextAttrAnchor
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_TextAttrAnchorArray.h>
+	
+	struct TextAttrAnchor
+	{
+		// fields
+	
+		size_t :target:`m_offset<doxid-structaxl_1_1gui_1_1_text_attr_anchor_1aad3d0461780b290aae26194a2481c166>`;
+		:ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>` :target:`m_attr<doxid-structaxl_1_1gui_1_1_text_attr_anchor_1a8495daccb618177e5fd03f3c1ea4b119>`;
+
+		// construction
+	
+		:target:`TextAttrAnchor<doxid-structaxl_1_1gui_1_1_text_attr_anchor_1a817fb3d4b71bf096b1b29c13af6c0ed2>`();
+	
+		:target:`TextAttrAnchor<doxid-structaxl_1_1gui_1_1_text_attr_anchor_1ad0a8e36bb4714dcb1d54b25fca4c64f9>`(
+			size_t offset,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr
+			);
+	};

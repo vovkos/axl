@@ -1,0 +1,23 @@
+.. index:: pair: enum; NfaStateFlag
+.. _doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498:
+
+enum axl::fsm::NfaStateFlag
+===========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_fsm_Nfa.h>
+
+	enum NfaStateFlag
+	{
+	    :target:`NfaStateFlag_Match<doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498a0a06c196b324a5156b61a1fce6610fc3>`          = 0x0001,
+	    :target:`NfaStateFlag_EpsilonLink<doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498a7a263932864ad0809ea27b98ff757c3d>`    = 0x0002,
+	    :target:`NfaStateFlag_Accept<doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498a225226959bad9a1a1c7d304da56c02d9>`         = 0x0004,
+	    :target:`NfaStateFlag_TransitionMask<doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498a7b89130aec404580b15b7ef1b1d3c9aa>` = 0x0007,
+	    :target:`NfaStateFlag_OpenCapture<doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498afdd1f5b691b8015081066a0ff592cead>`    = 0x0010,
+	    :target:`NfaStateFlag_CloseCapture<doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498abcba48011210b27d933650287d98349a>`   = 0x0020,
+	};
+

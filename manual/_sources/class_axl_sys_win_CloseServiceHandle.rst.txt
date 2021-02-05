@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::win::CloseServiceHandle
+.. _doxid-classaxl_1_1sys_1_1win_1_1_close_service_handle:
+
+class axl::sys::win::CloseServiceHandle
+=======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_Service.h>
+	
+	class CloseServiceHandle
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1win_1_1_close_service_handle_1af62cec993cf0bea8c33e28d69d41fea0>`(SC_HANDLE h);
+	};

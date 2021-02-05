@@ -1,0 +1,21 @@
+.. index:: pair: enum; MatchConditionKind
+.. _doxid-namespaceaxl_1_1fsm_1af5eec6b5a26db45fc8e6ca754173bbc5:
+
+enum axl::fsm::MatchConditionKind
+=================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_fsm_Nfa.h>
+
+	enum MatchConditionKind
+	{
+	    :target:`MatchConditionKind_Undefined<doxid-namespaceaxl_1_1fsm_1af5eec6b5a26db45fc8e6ca754173bbc5a1bf96423482e0dbb496ff2c53bb572ed>`,
+	    :target:`MatchConditionKind_Char<doxid-namespaceaxl_1_1fsm_1af5eec6b5a26db45fc8e6ca754173bbc5aeff5968db070d7eab5455341b2d76cf8>`,
+	    :target:`MatchConditionKind_CharSet<doxid-namespaceaxl_1_1fsm_1af5eec6b5a26db45fc8e6ca754173bbc5a6c7b3b3483fe91aff4b456be584bf34a>`,
+	    :target:`MatchConditionKind_Any<doxid-namespaceaxl_1_1fsm_1af5eec6b5a26db45fc8e6ca754173bbc5a2384912cd7b99067245523931c375a73>`,
+	};
+

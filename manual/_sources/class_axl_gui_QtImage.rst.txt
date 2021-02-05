@@ -1,0 +1,47 @@
+.. index:: pair: class; axl::gui::QtImage
+.. _doxid-classaxl_1_1gui_1_1_qt_image:
+
+class axl::gui::QtImage
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_QtEngine.h>
+	
+	class QtImage: public :ref:`axl::gui::Image<doxid-classaxl_1_1gui_1_1_image>`
+	{
+	public:
+		// fields
+	
+		QImage :target:`m_qtImage<doxid-classaxl_1_1gui_1_1_qt_image_1ae3727c46bac2ddb4672c5d74fd49b21d>`;
+
+		// construction
+	
+		:target:`QtImage<doxid-classaxl_1_1gui_1_1_qt_image_1a13e606aea6ae0441a6e720f12ae7b5cd>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:ref:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+	
+		bool
+		:ref:`getImageDesc<doxid-classaxl_1_1gui_1_1_image_1a1163e0f4b2218d4c366e6394df6e43b9>`(:ref:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc>`* imageDesc);
+	
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:ref:`getSize<doxid-classaxl_1_1gui_1_1_image_1adcc8b057269619b30ecb25b9498b1355>`();
+

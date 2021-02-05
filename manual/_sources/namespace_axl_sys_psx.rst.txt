@@ -1,0 +1,56 @@
+.. index:: pair: namespace; axl::sys::psx
+.. _doxid-namespaceaxl_1_1sys_1_1psx:
+
+namespace axl::sys::psx
+=======================
+
+.. toctree::
+	:hidden:
+
+	class_axl_sys_psx_CloseDynamicLib.rst
+	class_axl_sys_psx_CloseNamedSem.rst
+	class_axl_sys_psx_Cond.rst
+	class_axl_sys_psx_CondAttr.rst
+	class_axl_sys_psx_CondMutexPair.rst
+	class_axl_sys_psx_DynamicLib.rst
+	class_axl_sys_psx_Mutex.rst
+	class_axl_sys_psx_MutexAttr.rst
+	class_axl_sys_psx_NamedSem.rst
+	class_axl_sys_psx_Sem.rst
+	class_axl_sys_psx_Thread.rst
+	class_axl_sys_psx_ThreadAttr.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace psx {
+
+	// typedefs
+
+	typedef void* :target:`ThreadFunc<doxid-namespaceaxl_1_1sys_1_1psx_1a2618d9318bbefdeeeadbf39e1028c774>`(void *context);
+
+	// classes
+
+	class :ref:`CloseDynamicLib<doxid-classaxl_1_1sys_1_1psx_1_1_close_dynamic_lib>`;
+	class :ref:`CloseNamedSem<doxid-classaxl_1_1sys_1_1psx_1_1_close_named_sem>`;
+	class :ref:`Cond<doxid-classaxl_1_1sys_1_1psx_1_1_cond>`;
+	class :ref:`CondAttr<doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr>`;
+	class :ref:`CondMutexPair<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair>`;
+	class :ref:`DynamicLib<doxid-classaxl_1_1sys_1_1psx_1_1_dynamic_lib>`;
+	class :ref:`Mutex<doxid-classaxl_1_1sys_1_1psx_1_1_mutex>`;
+	class :ref:`MutexAttr<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr>`;
+	class :ref:`NamedSem<doxid-classaxl_1_1sys_1_1psx_1_1_named_sem>`;
+	class :ref:`Sem<doxid-classaxl_1_1sys_1_1psx_1_1_sem>`;
+	class :ref:`Thread<doxid-classaxl_1_1sys_1_1psx_1_1_thread>`;
+	class :ref:`ThreadAttr<doxid-classaxl_1_1sys_1_1psx_1_1_thread_attr>`;
+
+	// global functions
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getProcessImageName<doxid-namespaceaxl_1_1sys_1_1psx_1a1ee03e1a8d1172ec9a8b063d21c4f84f>`(pid_t pid);
+
+	} // namespace psx

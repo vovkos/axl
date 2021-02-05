@@ -1,0 +1,39 @@
+.. index:: pair: class; axl::ref::RefCountAllocBuffer
+.. _doxid-classaxl_1_1ref_1_1_ref_count_alloc_buffer:
+
+template class axl::ref::RefCountAllocBuffer
+============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ref_RefCount.h>
+	
+	template <typename T>
+	class RefCountAllocBuffer:
+	    public :ref:`axl::ref::RefCountAllocHdr<doxid-structaxl_1_1ref_1_1_ref_count_alloc_hdr>`,
+	    public T
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		union
+		{
+			:ref:`FreeFunc<doxid-namespaceaxl_1_1ref_1af541b716701291ac2ae6295297475483>`* :ref:`m_freeFunc<doxid-structaxl_1_1ref_1_1_ref_count_alloc_hdr_1aa121e6da61f18a4a51bb95f19294edc9>`;
+			uint64_t :ref:`m_padding<doxid-structaxl_1_1ref_1_1_ref_count_alloc_hdr_1a0a8aef2047a7dd17359d2d34c70d9cac>`;
+		};
+

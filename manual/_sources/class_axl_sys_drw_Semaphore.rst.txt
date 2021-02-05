@@ -1,0 +1,41 @@
+.. index:: pair: class; axl::sys::drw::Semaphore
+.. _doxid-classaxl_1_1sys_1_1drw_1_1_semaphore:
+
+class axl::sys::drw::Semaphore
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_drw_Semaphore.h>
+	
+	class Semaphore
+	{
+	public:
+		// construction
+	
+		:target:`Semaphore<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore_1afa0ea8c8c907685ce29d7cb30f6b904a>`();
+		:target:`~Semaphore<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore_1ab8407ec2e5d0189554ae2b58709bc803>`();
+
+		// methods
+	
+		:target:`operator semaphore_t *<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore_1a4613d1543db1232c8a8d1e7d15073e83>`();
+	
+		bool
+		:target:`signal<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore_1a9708c219bccfc7b753b624554640d84f>`();
+	
+		bool
+		:target:`signalAll<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore_1a9585c32fd828b4885e2b9203d46e2961>`();
+	
+		bool
+		:target:`wait<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore_1a3f23e81ccf6a8f426ace018023538c3a>`();
+	
+		bool
+		:target:`wait<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore_1aa31079b42ba9498b7add947446df3a10>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout);
+	};

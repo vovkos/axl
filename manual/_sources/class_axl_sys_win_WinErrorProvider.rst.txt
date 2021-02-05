@@ -1,0 +1,44 @@
+.. index:: pair: class; axl::sys::win::WinErrorProvider
+.. _doxid-classaxl_1_1sys_1_1win_1_1_win_error_provider:
+
+class axl::sys::win::WinErrorProvider
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_WinError.h>
+	
+	class WinErrorProvider: public :ref:`axl::err::ErrorProvider<doxid-classaxl_1_1err_1_1_error_provider>`
+	{
+	public:
+		// methods
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getErrorDescription<doxid-classaxl_1_1sys_1_1win_1_1_win_error_provider_1a6f366d9a772e543abb108f58b546355a>`(:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` code);
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getErrorDescription<doxid-classaxl_1_1sys_1_1win_1_1_win_error_provider_1a195914e84fddb5ee3d850fa39b388949>`(const :ref:`err::ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:ref:`getErrorDescription<doxid-classaxl_1_1err_1_1_error_provider_1ab5b93bdd78d1dac4be43abbed2bd7adf>`(const :ref:`ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error) = 0;
+

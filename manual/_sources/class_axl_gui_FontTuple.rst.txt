@@ -1,0 +1,56 @@
+.. index:: pair: class; axl::gui::FontTuple
+.. _doxid-classaxl_1_1gui_1_1_font_tuple:
+
+class axl::gui::FontTuple
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Font.h>
+	
+	class FontTuple: public :ref:`axl::gui::GuiItem<doxid-classaxl_1_1gui_1_1_gui_item>`
+	{
+	public:
+		// methods
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:target:`createFont<doxid-classaxl_1_1gui_1_1_font_tuple_1af47085a65f6d483aa31269911b986753>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& family,
+			size_t pointSize,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:target:`createFont<doxid-classaxl_1_1gui_1_1_font_tuple_1a1b6a6d88f8273cc388752ddbf0870a3e>`(const :ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`& fontDesc);
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:target:`getFont<doxid-classaxl_1_1gui_1_1_font_tuple_1a1f6e0ba99a275a7c1c5dc841e3d2a717>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0);
+	
+		void
+		:target:`clear<doxid-classaxl_1_1gui_1_1_font_tuple_1a1e0f031d00d5ebf3124150023c70e188>`();
+
+	private:
+		// construction
+	
+		:target:`~FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple_1adb477a3bae75e1f0c417c49aaa2beed9>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:ref:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+

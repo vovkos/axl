@@ -1,0 +1,19 @@
+.. index:: pair: enum; Def
+.. _doxid-classaxl_1_1sl_1_1_hash_table_1a273fc71ec3c09b6f9b2a3b79659b3dd0:
+
+enum axl::sl::HashTable::Def
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_HashTable.h>
+
+	enum Def
+	{
+	    :target:`Def_InitialBucketCount<doxid-classaxl_1_1sl_1_1_hash_table_1a273fc71ec3c09b6f9b2a3b79659b3dd0a741e28f326282bb9ccf719ee14dcba4c>` = 32,
+	    :target:`Def_ResizeThreshold<doxid-classaxl_1_1sl_1_1_hash_table_1a273fc71ec3c09b6f9b2a3b79659b3dd0a793f97aa8c7e7d46f3c4aee3ee06c278>`    = 75,
+	};
+

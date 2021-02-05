@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::psx::CloseDynamicLib
+.. _doxid-classaxl_1_1sys_1_1psx_1_1_close_dynamic_lib:
+
+class axl::sys::psx::CloseDynamicLib
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_psx_DynamicLib.h>
+	
+	class CloseDynamicLib
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1psx_1_1_close_dynamic_lib_1ae2915f695a78ac57ddd51638f0210a20>`(void* h);
+	};

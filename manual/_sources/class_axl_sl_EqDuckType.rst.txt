@@ -1,0 +1,38 @@
+.. index:: pair: class; axl::sl::EqDuckType
+.. _doxid-classaxl_1_1sl_1_1_eq_duck_type:
+
+template class axl::sl::EqDuckType
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class EqDuckType
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_eq_duck_type_1a16fdd3cf2f281f75d7b39dc1b64bf3ae>`(
+			Arg a,
+			Arg b
+			) const;
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_eq_duck_type_1a2a54166e977d0bde64aae8637723da01>`(
+			const T* a,
+			const T* b
+			) const;
+	};

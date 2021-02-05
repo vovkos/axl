@@ -1,0 +1,35 @@
+.. index:: pair: class; axl::sl::CmpDuckTypePtr
+.. _doxid-classaxl_1_1sl_1_1_cmp_duck_type_ptr:
+
+template class axl::sl::CmpDuckTypePtr
+======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Cmp.h>
+	
+	template <typename T>
+	class CmpDuckTypePtr
+	{
+	public:
+		// methods
+	
+		int
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_cmp_duck_type_ptr_1ad2c7a9b64dcdd6d995ac8f1c5c9cd2ac>`(
+			const T& a,
+			const T& b
+			) const;
+	
+		int
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_cmp_duck_type_ptr_1af4044fa8b1118cc8341d30f39e5a9485>`(
+			const T* a,
+			const T* b
+			) const;
+	};

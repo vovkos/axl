@@ -1,0 +1,23 @@
+.. index:: pair: struct; axl::dox::Parser::GroupStackEntry
+.. _doxid-structaxl_1_1dox_1_1_parser_1_1_group_stack_entry:
+
+struct axl::dox::Parser::GroupStackEntry
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct GroupStackEntry
+	{
+		// fields
+	
+		:ref:`handle_t<doxid-axl__g_2axl__g___pch_8h_1a50e1c0ee54e9888891a7c7889eb17e5f>` :target:`m_namespace<doxid-structaxl_1_1dox_1_1_parser_1_1_group_stack_entry_1a1ab7a348159a92d0e8a908f194086eb6>`;
+		:ref:`Group<doxid-classaxl_1_1dox_1_1_group>`* :target:`m_group<doxid-structaxl_1_1dox_1_1_parser_1_1_group_stack_entry_1af914ed52b4ede3d2fd093da9188e98a3>`;
+	};

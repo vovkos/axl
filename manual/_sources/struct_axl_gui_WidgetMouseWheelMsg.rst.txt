@@ -1,0 +1,43 @@
+.. index:: pair: struct; axl::gui::WidgetMouseWheelMsg
+.. _doxid-structaxl_1_1gui_1_1_widget_mouse_wheel_msg:
+
+struct axl::gui::WidgetMouseWheelMsg
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	struct WidgetMouseWheelMsg: public :ref:`axl::gui::WidgetMouseMsg<doxid-structaxl_1_1gui_1_1_widget_mouse_msg>`
+	{
+		// fields
+	
+		int :target:`m_wheelDelta<doxid-structaxl_1_1gui_1_1_widget_mouse_wheel_msg_1a7401f5376a2c19fc0992b96d2f79dcc8>`;
+
+		// construction
+	
+		:target:`WidgetMouseWheelMsg<doxid-structaxl_1_1gui_1_1_widget_mouse_wheel_msg_1a2f6e497045a2bf604bcdbb8c92bb256e>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` :ref:`m_msgCode<doxid-structaxl_1_1gui_1_1_widget_msg_1a53c70210a5ed27e06bbd68bcda502bf0>`;
+		:ref:`Point<doxid-structaxl_1_1gui_1_1_point>` :ref:`m_point<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1a1f2e71e236fa8bed9c05dff488984851>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :ref:`m_buttons<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1ae528d8f2d6c3b379f4eb830975f5ccee>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :ref:`m_modifierKeys<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1aad910e5d827e460a7d0dcb063a0ebdb0>`;
+		:ref:`MouseButton<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41c>` :ref:`m_button<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1a482bc726ba5295051f035c3a746d7e1f>`;
+

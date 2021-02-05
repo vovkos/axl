@@ -1,0 +1,19 @@
+.. index:: pair: enum; DefaultsKind
+.. _doxid-classaxl_1_1io_1_1_mapped_file_1a304ad65e73e6d304b29a5d8bf3f71f4b:
+
+enum axl::io::MappedFile::DefaultsKind
+======================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_MappedFile.h>
+
+	enum DefaultsKind
+	{
+	    :target:`DefaultsKind_MaxDynamicViewCount<doxid-classaxl_1_1io_1_1_mapped_file_1a304ad65e73e6d304b29a5d8bf3f71f4ba7d231e8534672e815e819e49247adf3a>` = 32,
+	    :target:`DefaultsKind_ReadAheadSize<doxid-classaxl_1_1io_1_1_mapped_file_1a304ad65e73e6d304b29a5d8bf3f71f4bae51213d6f622c25943bb782b02f54269>`       = 64* 1024,
+	};
+

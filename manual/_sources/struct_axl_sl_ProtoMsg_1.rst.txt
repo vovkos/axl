@@ -1,0 +1,36 @@
+.. index:: pair: struct; axl::sl::ProtoMsg_1
+.. _doxid-structaxl_1_1sl_1_1_proto_msg__1:
+
+template struct axl::sl::ProtoMsg_1
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Protocol.h>
+	
+	template <typename T>
+	struct ProtoMsg_1: public :ref:`axl::sl::ProtoMsg<doxid-structaxl_1_1sl_1_1_proto_msg>`
+	{
+		// fields
+	
+		T :target:`m_arg1<doxid-structaxl_1_1sl_1_1_proto_msg__1_1a6c9d745cce91da77f1204c6472c1b7fe>`;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		uint32_t :ref:`m_code<doxid-structaxl_1_1sl_1_1_proto_msg_1a060a445fdf82e9393cff76c21bc7f71b>`;
+

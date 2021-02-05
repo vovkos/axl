@@ -1,0 +1,67 @@
+.. index:: pair: struct; axl::lex::SrcPos
+.. _doxid-structaxl_1_1lex_1_1_src_pos:
+
+struct axl::lex::SrcPos
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_SrcPos.h>
+	
+	struct SrcPos: public :ref:`axl::lex::LineCol<doxid-structaxl_1_1lex_1_1_line_col>`
+	{
+		// fields
+	
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>` :target:`m_filePath<doxid-structaxl_1_1lex_1_1_src_pos_1a4040189e32cec2e2cbd746e82cbe01cf>`;
+
+		// construction
+	
+		:target:`SrcPos<doxid-structaxl_1_1lex_1_1_src_pos_1a1260b417b2a36a54711da994d2c45a10>`();
+	
+		:target:`SrcPos<doxid-structaxl_1_1lex_1_1_src_pos_1a02a408432f93ec89713c9ee8e4c2ea20>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath,
+			const :ref:`LineCol<doxid-structaxl_1_1lex_1_1_line_col>`& lineCol
+			);
+	
+		:target:`SrcPos<doxid-structaxl_1_1lex_1_1_src_pos_1af3660f1ce457d643f74c1775e144cf69>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath,
+			int line,
+			int col
+			);
+
+		// methods
+	
+		SrcPos&
+		:target:`operator=<doxid-structaxl_1_1lex_1_1_src_pos_1a6377546bf3c2fff1627f11db88ea248a>`(const :ref:`LineCol<doxid-structaxl_1_1lex_1_1_line_col>`& lineCol);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		int :ref:`m_line<doxid-structaxl_1_1lex_1_1_line_col_1a11b6f489d7e364951984fd39741d5ea4>`;
+		int :ref:`m_col<doxid-structaxl_1_1lex_1_1_line_col_1a32f30414b9c0a165090f90513dea112f>`;
+
+		// methods
+	
+		void
+		:ref:`clear<doxid-structaxl_1_1lex_1_1_line_col_1a92a535f86d798578986585b69b8dc00c>`();
+	
+		void
+		:ref:`count<doxid-structaxl_1_1lex_1_1_line_col_1a468a9954bea6f3f3bd4417924711a88e>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	
+		void
+		:ref:`incrementalCount<doxid-structaxl_1_1lex_1_1_line_col_1a6c00976199970b4f1ef8ee1734b16f03>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+

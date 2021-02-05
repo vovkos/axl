@@ -1,0 +1,60 @@
+.. index:: pair: struct; axl::lex::Token
+.. _doxid-structaxl_1_1lex_1_1_token:
+
+template struct axl::lex::Token
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_Token.h>
+	
+	template <
+		typename TokenKind0,
+		typename Name0,
+		typename Data0 = StdTokenData,
+		typename Pos0 = LineCol
+		>
+	struct Token
+	{
+		// typedefs
+	
+		typedef TokenKind0 :target:`TokenKind<doxid-structaxl_1_1lex_1_1_token_1a6058dfaa39ee17ab2ca189fc20297a32>`;
+		typedef Name0 :target:`Name<doxid-structaxl_1_1lex_1_1_token_1a2a67eb810e1615ced0d13e6996f33a0d>`;
+		typedef Data0 :target:`Data<doxid-structaxl_1_1lex_1_1_token_1aa1016cef649063f38781055b80f93bfd>`;
+		typedef Pos0 :target:`Pos<doxid-structaxl_1_1lex_1_1_token_1a8a9389de522790a6fa4301361f7374de>`;
+
+		// fields
+	
+		union
+		{
+			int :target:`m_token<doxid-structaxl_1_1lex_1_1_token_1a7413888cf6c94b64c0c3fec84e19548e>`;
+			:ref:`TokenKind<doxid-structaxl_1_1lex_1_1_token_1a6058dfaa39ee17ab2ca189fc20297a32>` :target:`m_tokenKind<doxid-structaxl_1_1lex_1_1_token_1a0674dacbb37712ede578ff285d715d9a>`;
+			char :target:`m_charToken<doxid-structaxl_1_1lex_1_1_token_1af7d7076c7a3f3fde37c8b5b0371fe002>`;
+			wchar_t :target:`m_WCharToken<doxid-structaxl_1_1lex_1_1_token_1a255328dbdb201ba7b4edbb4e1bb52afe>`;
+		};
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_channelMask<doxid-structaxl_1_1lex_1_1_token_1a0dd3ceaa43623c041049f5c0f425d21c>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_flags<doxid-structaxl_1_1lex_1_1_token_1acae86f5b68cf27182db42057c371bfe9>`;
+		:ref:`Data<doxid-structaxl_1_1lex_1_1_token_1aa1016cef649063f38781055b80f93bfd>` :target:`m_data<doxid-structaxl_1_1lex_1_1_token_1a979e87ed15766ae074f853474c2a7445>`;
+		:ref:`Pos<doxid-structaxl_1_1lex_1_1_token_1a8a9389de522790a6fa4301361f7374de>` :target:`m_pos<doxid-structaxl_1_1lex_1_1_token_1a1a6d2d4c310651d34977e3dd2f7f53bc>`;
+
+		// construction
+	
+		:target:`Token<doxid-structaxl_1_1lex_1_1_token_1ae8f0cf11cebfbf7dd857e6a672403345>`();
+
+		// methods
+	
+		const char*
+		:target:`getName<doxid-structaxl_1_1lex_1_1_token_1ae08ffc2aa4c31106ed05408d3f035e5f>`() const;
+	
+		static
+		const char*
+		:target:`getName<doxid-structaxl_1_1lex_1_1_token_1a608316d64fa42b8ae4c5982727efad13>`(int token);
+	};

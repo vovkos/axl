@@ -1,0 +1,19 @@
+.. index:: pair: enum; Flag
+.. _doxid-classaxl_1_1fsm_1_1_regex_compiler_1a4c90b30a1b1332e7ae6a8445e33cfdfc:
+
+enum axl::fsm::RegexCompiler::Flag
+==================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_fsm_Regex.h>
+
+	enum Flag
+	{
+	    :target:`Flag_NonCapturingGroups<doxid-classaxl_1_1fsm_1_1_regex_compiler_1a4c90b30a1b1332e7ae6a8445e33cfdfcaf2df8e8fa6ac89b41519df746b39d84c>` = 0x01,
+	    :target:`Flag_SparseSyntax<doxid-classaxl_1_1fsm_1_1_regex_compiler_1a4c90b30a1b1332e7ae6a8445e33cfdfca4af9ba29bef2f398806697efe9cc6d6a>`       = 0x02,
+	};
+

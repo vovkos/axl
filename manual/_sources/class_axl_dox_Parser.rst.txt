@@ -1,0 +1,46 @@
+.. index:: pair: class; axl::dox::Parser
+.. _doxid-classaxl_1_1dox_1_1_parser:
+
+class axl::dox::Parser
+======================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_dox_Parser_GroupStackEntry.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_dox_Parser.h>
+	
+	class Parser
+	{
+	public:
+		// structs
+	
+		struct :ref:`GroupStackEntry<doxid-structaxl_1_1dox_1_1_parser_1_1_group_stack_entry>`;
+
+		// construction
+	
+		:target:`Parser<doxid-classaxl_1_1dox_1_1_parser_1a3e6292f797e79cbbdc07e3912bb0cdc7>`(:ref:`Module<doxid-classaxl_1_1dox_1_1_module>`* module);
+
+		// methods
+	
+		void
+		:target:`reset<doxid-classaxl_1_1dox_1_1_parser_1a6f99c0cca083f752a41ad0b0a3cf00b4>`();
+	
+		:ref:`Block<doxid-classaxl_1_1dox_1_1_block>`*
+		:target:`popBlock<doxid-classaxl_1_1dox_1_1_parser_1ade11f101cb2f26c1b31bccc4244e2698>`();
+	
+		void
+		:target:`addComment<doxid-classaxl_1_1dox_1_1_parser_1a925f1c79bdc5fe56aea5300a366e83cf>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& comment,
+			const :ref:`lex::LineCol<doxid-structaxl_1_1lex_1_1_line_col>`& pos,
+			bool isSingleLine,
+			:ref:`handle_t<doxid-axl__g_2axl__g___pch_8h_1a50e1c0ee54e9888891a7c7889eb17e5f>` lastDeclaredItem
+			);
+	};

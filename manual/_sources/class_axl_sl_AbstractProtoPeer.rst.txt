@@ -1,0 +1,54 @@
+.. index:: pair: class; axl::sl::AbstractProtoPeer
+.. _doxid-classaxl_1_1sl_1_1_abstract_proto_peer:
+
+class axl::sl::AbstractProtoPeer
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Protocol.h>
+	
+	class AbstractProtoPeer: public :ref:`axl::sl::ProtoPeer<doxid-classaxl_1_1sl_1_1_proto_peer>`
+	{
+	public:
+		// methods
+	
+		virtual
+		void
+		:target:`sendMsgEx<doxid-classaxl_1_1sl_1_1_abstract_proto_peer_1a1f8f974b3f7b0ed8e97add786c0764ca>`(
+			const void*const* blockArray,
+			size_t const* sizeArray,
+			size_t count
+			) = 0;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		void
+		:ref:`sendMsg<doxid-classaxl_1_1sl_1_1_proto_peer_1aaf2389c17395deac63e24571e976e8a0>`(
+			const void* p,
+			size_t size
+			);
+	
+		void
+		:ref:`sendMsg<doxid-classaxl_1_1sl_1_1_proto_peer_1ab6cd8fc674304df1304a751f0547a279>`(
+			const void* p,
+			size_t size,
+			const void* extra,
+			size_t extraSize
+			);
+

@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::enc::UtfToCaseFolded
+.. _doxid-classaxl_1_1enc_1_1_utf_to_case_folded:
+
+class axl::enc::UtfToCaseFolded
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Utf.h>
+	
+	class UtfToCaseFolded
+	{
+	public:
+		// methods
+	
+		:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`
+		:target:`operator()<doxid-classaxl_1_1enc_1_1_utf_to_case_folded_1ae8f46b92a5a5f93eb0ec49d471d888a3>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` x) const;
+	};

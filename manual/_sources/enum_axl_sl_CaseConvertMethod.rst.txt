@@ -1,0 +1,20 @@
+.. index:: pair: enum; CaseConvertMethod
+.. _doxid-namespaceaxl_1_1sl_1aa2bde0cbbe6fbeb645d23a5c85f8fb57:
+
+enum axl::sl::CaseConvertMethod
+===============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_String.h>
+
+	enum CaseConvertMethod
+	{
+	    :target:`CaseConvertMethod_PerCodePoint<doxid-namespaceaxl_1_1sl_1aa2bde0cbbe6fbeb645d23a5c85f8fb57ac77f4e190de992be96b7d8aa5aaed04f>` = 0,
+	    :target:`CaseConvertMethod_PerCodeUnit<doxid-namespaceaxl_1_1sl_1aa2bde0cbbe6fbeb645d23a5c85f8fb57a626ce892cabde0187645f491832924d0>`,
+	    :target:`CaseConvertMethod_Default<doxid-namespaceaxl_1_1sl_1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da>`      = CaseConvertMethod_PerCodePoint,
+	};
+

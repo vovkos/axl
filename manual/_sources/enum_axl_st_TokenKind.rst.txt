@@ -1,0 +1,23 @@
+.. index:: pair: enum; TokenKind
+.. _doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11:
+
+enum axl::st::TokenKind
+=======================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_st_StringTemplateLexer.h>
+
+	enum TokenKind
+	{
+	    :target:`TokenKind_Eof<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11a93f5cf506406173c3fc711dc3c159389>`        = 0,
+	    :target:`TokenKind_Error<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11ac262cb3b4f26cecc6afc76063e097d27>`      = -1,
+	    :target:`TokenKind_OpenCode<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11ad1f305941651ab2fe811a9a46623be1a>`   = 256,
+	    :target:`TokenKind_OpenData_r<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11aa1675bdb1bce81337baa843347c307d7>`,
+	    :target:`TokenKind_OpenData_c<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11a6526de3e1908c3e39afe8e68aa54cdab>`,
+	    :target:`TokenKind_Data<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11a906f91078df92771393b119eda6f483a>`,
+	};
+

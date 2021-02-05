@@ -1,0 +1,32 @@
+.. index:: pair: struct; axl::fsm::RegexCompiler::Token
+.. _doxid-structaxl_1_1fsm_1_1_regex_compiler_1_1_token:
+
+struct axl::fsm::RegexCompiler::Token
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct Token
+	{
+		// fields
+	
+		TokenKind :target:`m_tokenKind<doxid-structaxl_1_1fsm_1_1_regex_compiler_1_1_token_1a6f30dc53e75c1fda51769cf25172f45c>`;
+		:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` :target:`m_char<doxid-structaxl_1_1fsm_1_1_regex_compiler_1_1_token_1aa9d45109a202c82cb02fe8bbec610282>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_string<doxid-structaxl_1_1fsm_1_1_regex_compiler_1_1_token_1ac1488a4673b831235d0181af3816fd6e>`;
+
+		// methods
+	
+		bool
+		:target:`isSpecialChar<doxid-structaxl_1_1fsm_1_1_regex_compiler_1_1_token_1abbe18a824a7f9fe77a541b35cfcc5bc9>`(char c);
+	
+		bool
+		:target:`isValidSingle<doxid-structaxl_1_1fsm_1_1_regex_compiler_1_1_token_1a2f7c4c3cebf8322cba5beec8a77d08f9>`();
+	};

@@ -1,0 +1,52 @@
+.. index:: pair: class; axl::sys::psx::CondMutexPair
+.. _doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair:
+
+class axl::sys::psx::CondMutexPair
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_psx_Cond.h>
+	
+	class CondMutexPair
+	{
+	public:
+		// construction
+	
+		:target:`CondMutexPair<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1ae21ef292766fddfd44ce48dac0285136>`();
+	
+		:target:`CondMutexPair<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1a0ddac56d037486020a46c5d996387696>`(
+			const pthread_condattr_t* condAttr,
+			const pthread_mutexattr_t* mutexAttr
+			);
+
+		// methods
+	
+		bool
+		:target:`tryLock<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1aa0789d70c96ed3fc9bc6235c4e79b785>`();
+	
+		void
+		:target:`lock<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1a950f0d028b74dc708bac47d25e8c5f54>`();
+	
+		void
+		:target:`unlock<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1a8b92b33a8d97e16732f44733dc531bb8>`();
+	
+		bool
+		:target:`signal<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1a09d6da2e84a166240024078a9a726406>`();
+	
+		bool
+		:target:`broadcast<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1a6e778df1f3a7310906b51122cbebff55>`();
+	
+		bool
+		:target:`wait<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1af165746b730815d1589d84bb4661fa33>`();
+	
+		bool
+		:target:`wait<doxid-classaxl_1_1sys_1_1psx_1_1_cond_mutex_pair_1a55726baf60ed17ea486a43b4f458b302>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout);
+	};

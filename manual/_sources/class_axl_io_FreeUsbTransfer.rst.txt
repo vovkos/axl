@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::FreeUsbTransfer
+.. _doxid-classaxl_1_1io_1_1_free_usb_transfer:
+
+class axl::io::FreeUsbTransfer
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_UsbTransfer.h>
+	
+	class FreeUsbTransfer
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1_free_usb_transfer_1af622de9f1f7ab911b6e28f888659596b>`(libusb_transfer* h);
+	};

@@ -1,0 +1,42 @@
+.. index:: pair: class; axl::ref::RtFactory
+.. _doxid-classaxl_1_1ref_1_1_rt_factory:
+
+template class axl::ref::RtFactory
+==================================
+
+.. toctree::
+	:hidden:
+
+	class_axl_ref_RtFactory_Box.rst
+	class_axl_ref_RtFactory_New.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ref_RtFactory.h>
+	
+	template <typename Alloc = mem::StdAllocator>
+	class RtFactory
+	{
+	public:
+		// typedefs
+	
+		typedef :ref:`Alloc<doxid-classaxl_1_1ref_1_1_rt_factory_1a38ff73c2996e9cc0b4d3bc24585f4bb5>` :target:`Alloc<doxid-classaxl_1_1ref_1_1_rt_factory_1a38ff73c2996e9cc0b4d3bc24585f4bb5>`;
+
+		// classes
+	
+		class :ref:`Box<doxid-classaxl_1_1ref_1_1_rt_factory_1_1_box>`;
+		class :ref:`New<doxid-classaxl_1_1ref_1_1_rt_factory_1_1_new>`;
+
+		// methods
+	
+		static
+		:ref:`Ptr<doxid-classaxl_1_1ref_1_1_ptr>`<void>
+		:target:`operatorNew<doxid-classaxl_1_1ref_1_1_rt_factory_1a50fcfa5a6eefc16cf631d46d585fd2da>`(
+			obj::IType* type,
+			size_t extra = 0
+			);
+	};

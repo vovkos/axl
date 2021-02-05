@@ -1,0 +1,80 @@
+.. index:: pair: struct; axl::gui::CaretPos
+.. _doxid-structaxl_1_1gui_1_1_caret_pos:
+
+struct axl::gui::CaretPos
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+	
+	struct CaretPos
+	{
+		// fields
+	
+		union
+		{
+			struct
+			{
+				int :target:`m_line<doxid-structaxl_1_1gui_1_1_caret_pos_1a21425900e747d02410277cc3fe8fb82c>`;
+				int :target:`m_col<doxid-structaxl_1_1gui_1_1_caret_pos_1ac77c885dd4cea7b816002706b0fd4fbe>`;
+			};
+	
+			struct
+			{
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_line_u<doxid-structaxl_1_1gui_1_1_caret_pos_1a87facf54eea3fadaebf366c3aecdf217>`;
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_col_u<doxid-structaxl_1_1gui_1_1_caret_pos_1ae08047fcf3daf7881f21ed21c3a33b93>`;
+			};
+		};
+
+		// construction
+	
+		:target:`CaretPos<doxid-structaxl_1_1gui_1_1_caret_pos_1a7c109de42bbeb9ebb6a5eb7bd3239011>`();
+	
+		:target:`CaretPos<doxid-structaxl_1_1gui_1_1_caret_pos_1a4e1be24973863858b74dfd33b37dceb8>`(
+			int line,
+			int col
+			);
+
+		// methods
+	
+		bool
+		:target:`operator==<doxid-structaxl_1_1gui_1_1_caret_pos_1a65a409ed4f134ba2c29c0c7eb9106530>`(const CaretPos& pos2) const;
+	
+		bool
+		:target:`operator!=<doxid-structaxl_1_1gui_1_1_caret_pos_1a28d4accff583fcd4853e40400aecbd48>`(const CaretPos& pos2) const;
+	
+		bool
+		:target:`operator<<doxid-structaxl_1_1gui_1_1_caret_pos_1a33808e65ffac5b832abc0364a03653cd>`(const CaretPos& pos2) const;
+	
+		bool
+		:target:`operator<=<doxid-structaxl_1_1gui_1_1_caret_pos_1ade5d69ce540cf709919db79982c47186>`(const CaretPos& pos2) const;
+	
+		bool
+		:target:`operator><doxid-structaxl_1_1gui_1_1_caret_pos_1aa0c1b7c0ddf4680c504f562511709ac3>`(const CaretPos& pos2) const;
+	
+		bool
+		:target:`operator>=<doxid-structaxl_1_1gui_1_1_caret_pos_1a91a08d8c98053aadc6e8104edb8f9abf>`(const CaretPos& pos2) const;
+	
+		int
+		:target:`cmp<doxid-structaxl_1_1gui_1_1_caret_pos_1add3198edae99c8580cdc796fe8970bab>`(const CaretPos& pos2) const;
+	
+		int
+		:target:`cmp_u<doxid-structaxl_1_1gui_1_1_caret_pos_1a329a673e9113300dbda331ef13db6422>`(const CaretPos& pos2) const;
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_caret_pos_1afb78fefb8635ae88cb6af67500413bfc>`(
+			int line,
+			int col
+			);
+	
+		void
+		:target:`clipNegative<doxid-structaxl_1_1gui_1_1_caret_pos_1aa02009404b431af6c6621706a8c83e5a>`();
+	};

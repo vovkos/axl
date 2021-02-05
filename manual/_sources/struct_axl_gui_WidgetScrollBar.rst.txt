@@ -1,0 +1,46 @@
+.. index:: pair: struct; axl::gui::WidgetScrollBar
+.. _doxid-structaxl_1_1gui_1_1_widget_scroll_bar:
+
+struct axl::gui::WidgetScrollBar
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	struct WidgetScrollBar
+	{
+		// fields
+	
+		size_t :target:`m_end<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1aa2b2033d12b6e179e6b06f9bbf37d0a2>`;
+		size_t :target:`m_page<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1a9579bcb6095f15d83253f4185ec77c11>`;
+		size_t :target:`m_pos<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1af76f35cd4479862cbf1aba06dee01fb2>`;
+
+		// construction
+	
+		:target:`WidgetScrollBar<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1af81963a5176db038c0adab80ca5d015a>`();
+	
+		:target:`WidgetScrollBar<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1aa9d43494e34a95096f1ddb1bad0f7b51>`(
+			size_t end,
+			size_t page,
+			size_t pos = 0
+			);
+
+		// methods
+	
+		bool
+		:target:`isRelevant<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1a2b3faaa608842084f9b8afce26240201>`() const;
+	
+		bool
+		:target:`isMaxed<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1a24074002853a65f5977182a00de47511>`() const;
+	
+		size_t
+		:target:`getMaxPos<doxid-structaxl_1_1gui_1_1_widget_scroll_bar_1a423234f07d78237a0e962878dc4a8aa2>`();
+	};

@@ -1,0 +1,69 @@
+.. index:: pair: enum; PROCESSINFOCLASS
+.. _doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630ed:
+
+enum axl::sys::win::PROCESSINFOCLASS
+====================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_NtDll.h>
+
+	enum PROCESSINFOCLASS
+	{
+	    :target:`ProcessBasicInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edafa89776c92decd6b9f393506fd842fb1>`,
+	    :target:`ProcessQuotaLimits<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edad5fa4b7431630cf8328ceb47a65667d6>`,
+	    :target:`ProcessIoCounters<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda05869394bc1779291c4382ecfd1ea0ad>`,
+	    :target:`ProcessVmCounters<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda3b945adeca979a910440a016669147ac>`,
+	    :target:`ProcessTimes<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda89789dc27fa3b475083124d456fe0330>`,
+	    :target:`ProcessBasePriority<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda178d360438daee79e86b86ce4e34fd7d>`,
+	    :target:`ProcessRaisePriority<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaafa4a19c8f8581db723a8b8052509b53>`,
+	    :target:`ProcessDebugPort<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda22893d2edca9e23076f81bbca3017407>`,
+	    :target:`ProcessExceptionPort<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edac90a4ac1c14c98a7102fa9e71c88fe39>`,
+	    :target:`ProcessAccessToken<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaa5de8c294a910e469850a60125dafc53>`,
+	    :target:`ProcessLdtInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda188c4e931131fc948d65ff45a7151711>`,
+	    :target:`ProcessLdtSize<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaeb46af478827c5a4b6f81f73d86b138c>`,
+	    :target:`ProcessDefaultHardErrorMode<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda5926c1cfff92c5a287f18725ff8a8d20>`,
+	    :target:`ProcessIoPortHandlers<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaf7b5af6e5cd30326859c83ce7c64478d>`,
+	    :target:`ProcessPooledUsageAndLimits<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda5c318f1e067d5b09ab27f2182c88eae8>`,
+	    :target:`ProcessWorkingSetWatch<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaa28da3cb4e98e8e67a8a1c5b2ab5aa11>`,
+	    :target:`ProcessUserModeIOPL<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaab22e9092158cbb53c76297f98a2ee19>`,
+	    :target:`ProcessEnableAlignmentFaultFixup<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda55f0b12e0dfc700b898c8a2a0d547aaf>`,
+	    :target:`ProcessPriorityClass<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda27877faa126cc1088d0156cad116a980>`,
+	    :target:`ProcessWx86Information<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda259ad9a886b178b9c8ff444398942371>`,
+	    :target:`ProcessHandleCount<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda829f76b52de0a4ab648ae77f4f07926e>`,
+	    :target:`ProcessAffinityMask<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda02dcecc5bc420b8cecf3aab44b00a38e>`,
+	    :target:`ProcessPriorityBoost<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda40e4f9b44737046de4a9070f79ca1873>`,
+	    :target:`ProcessDeviceMap<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edab2037ad7712eebccbe249adda4636f64>`,
+	    :target:`ProcessSessionInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edac4fd9ea2d173920a51e6f96e1cc4f6a0>`,
+	    :target:`ProcessForegroundInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda1d72b5efa63ee6aad8a487e31ca75f46>`,
+	    :target:`ProcessWow64Information<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edad3cb1485a792f3efd1049888ecab6e91>`,
+	    :target:`ProcessImageFileName<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda548f6d70856af5345d5ac8eebb1e8635>`,
+	    :target:`ProcessLUIDDeviceMapsEnabled<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda2f1206fa2f8a982f56d7e3165023e297>`,
+	    :target:`ProcessBreakOnTermination<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edad3e76fe8cb7c2a8a3c0f0fbef9388302>`,
+	    :target:`ProcessDebugObjectHandle<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaaacf6f47700e7ebae45b9bb5a8361201>`,
+	    :target:`ProcessDebugFlags<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda55968bfd01daa4b44ac27c6505aabe50>`,
+	    :target:`ProcessHandleTracing<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda905ed0161ce72e0430082b851718551b>`,
+	    :target:`ProcessIoPriority<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda0f7a4927c27dc6dc63ebd375aab76dd2>`,
+	    :target:`ProcessExecuteFlags<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda3f6cbc087ac0786f670ac09d398ff599>`,
+	    :target:`ProcessTlsInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda687c428be06dce1308cdae4baf200e4e>`,
+	    :target:`ProcessCookie<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edad8396b3ecfe24da5e1d9be123d1d3981>`,
+	    :target:`ProcessImageInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edace6d5f435f907a23a7ccd890b0eb2fad>`,
+	    :target:`ProcessCycleTime<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda15ab9e7b77c00be2cdcab925fe437c6f>`,
+	    :target:`ProcessPagePriority<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edaed6f6eba9d8a9dcfc0b046cb40d178c0>`,
+	    :target:`ProcessInstrumentationCallback<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edabad5f347baf8cfd78bdec271e857bcdd>`,
+	    :target:`ProcessThreadStackAllocation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda14d1940fbafcacb4d29f7a7aecf7843b>`,
+	    :target:`ProcessWorkingSetWatchEx<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda032002464fb3aa80db3ede7b1545f5f7>`,
+	    :target:`ProcessImageFileNameWin32<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda65ab336b163668d4dc45ce7add13b214>`,
+	    :target:`ProcessImageFileMapping<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda4ec976e9f96596881602c19d5a1a8333>`,
+	    :target:`ProcessAffinityUpdateMode<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630edad28cc2cac9f25c018f6d0cb314272381>`,
+	    :target:`ProcessMemoryAllocationMode<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda2c64a8cfbb550c1337da2e9e36257e5d>`,
+	    :target:`ProcessGroupInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda4149c2f5c9e4a4b0a4877ad5c92373f2>`,
+	    :target:`ProcessTokenVirtualizationEnabled<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda84592de47c6c1c16590b32ca2f7305e7>`,
+	    :target:`ProcessConsoleHostProcess<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda3293cdd046015712fb32fa5451b07f34>`,
+	    :target:`ProcessWindowInformation<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda255f3b3d5a4187ece95c19f89fc2a79e>`,
+	    :target:`MaxProcessInfoClass<doxid-namespaceaxl_1_1sys_1_1win_1ae1c55ddcfa904c6f63d62de9a97630eda036f7b254a0ce4f93ea6725e4516fbd0>`,
+	};
+

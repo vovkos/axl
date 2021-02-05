@@ -1,0 +1,20 @@
+.. index:: pair: enum; StdErrorCode
+.. _doxid-namespaceaxl_1_1err_1a11afff17c58c9909abaff9c3ff0d68e8:
+
+enum axl::err::StdErrorCode
+===========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_err_Error.h>
+
+	enum StdErrorCode
+	{
+	    :target:`StdErrorCode_NoError<doxid-namespaceaxl_1_1err_1a11afff17c58c9909abaff9c3ff0d68e8af907b7c6950cde696212a932b3dd2896>`,
+	    :target:`StdErrorCode_String<doxid-namespaceaxl_1_1err_1a11afff17c58c9909abaff9c3ff0d68e8ab21c838b32a411c33538c9bfdc682e2c>`,
+	    :target:`StdErrorCode_Stack<doxid-namespaceaxl_1_1err_1a11afff17c58c9909abaff9c3ff0d68e8abf8fa8e7b4a8d0c34770bae4289b0fe9>`,
+	};
+

@@ -1,0 +1,51 @@
+.. index:: pair: class; axl::sl::ConstListBase
+.. _doxid-classaxl_1_1sl_1_1_const_list_base:
+
+template class axl::sl::ConstListBase
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_List.h>
+	
+	template <
+		typename T,
+		typename GetLink0,
+		typename Iterator0
+		>
+	class ConstListBase
+	{
+	public:
+		// typedefs
+	
+		typedef T :target:`Entry<doxid-classaxl_1_1sl_1_1_const_list_base_1aa304c8f60d89bd5a8f84e132c99f3f19>`;
+		typedef GetLink0 :target:`GetLink<doxid-classaxl_1_1sl_1_1_const_list_base_1a7c1dfd149b2243998e08cba19f63efb3>`;
+		typedef Iterator0 :target:`Iterator<doxid-classaxl_1_1sl_1_1_const_list_base_1ae14164c87f5853352bb7845a962049e6>`;
+		typedef Iterator0 :target:`ConstIterator<doxid-classaxl_1_1sl_1_1_const_list_base_1a64ef3204ca291e245098c0e5e53288c1>`;
+		typedef :ref:`sl::ListData<doxid-structaxl_1_1sl_1_1_list_data>`<T> :target:`ListData<doxid-classaxl_1_1sl_1_1_const_list_base_1aa5190ea33c8c524677dacf240c2cb882>`;
+
+		// construction
+	
+		:target:`ConstListBase<doxid-classaxl_1_1sl_1_1_const_list_base_1a4e6af51f709cb16ff92662b2ac57d7e3>`();
+
+		// methods
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1sl_1_1_const_list_base_1acda99be8cc822e8e220413ed6ca8153b>`() const;
+	
+		size_t
+		:target:`getCount<doxid-classaxl_1_1sl_1_1_const_list_base_1afedb6ba38576eada7f28b3156e8d01cb>`() const;
+	
+		:ref:`ConstIterator<doxid-classaxl_1_1sl_1_1_const_list_base_1a64ef3204ca291e245098c0e5e53288c1>`
+		:target:`getHead<doxid-classaxl_1_1sl_1_1_const_list_base_1a78576b0aa7caf67aef23dc5316327ae7>`() const;
+	
+		:ref:`ConstIterator<doxid-classaxl_1_1sl_1_1_const_list_base_1a64ef3204ca291e245098c0e5e53288c1>`
+		:target:`getTail<doxid-classaxl_1_1sl_1_1_const_list_base_1a36bdbe0292fbcebbfb53d30ca4f9aa2c>`() const;
+	};

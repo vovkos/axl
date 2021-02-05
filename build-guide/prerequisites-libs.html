@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Libraries &mdash; AXL Build Guide</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/axl-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/axl-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuring" href="configure.html" />
+    <link rel="prev" title="Tools" href="prerequisites-tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Build Guide
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="prerequisites.html">Prerequisites</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="prerequisites-cpp.html">C++ Compilers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prerequisites-tools.html">Tools</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configure.html">Configuring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Build Guide</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="prerequisites.html">Prerequisites</a> &raquo;</li>
+        
+      <li>Libraries</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="libraries">
+<h1>Libraries</h1>
+<p>All these libraries are <strong>optional</strong>. If they are missing, the corresponding module of AXL library will not be built.</p>
+<ul>
+<li><p class="first">Lua</p>
+<blockquote>
+<div><p>AXL has two modules which require Lua:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">axl_lua</span></code> provides C++ wrappers for Lua library;</li>
+<li><code class="docutils literal notranslate"><span class="pre">axl_st</span></code> provides Lua-based string template module.</li>
+</ul>
+</div></blockquote>
+<p>Note that only Lua headers and libraries are needed (Lua executables are not necessary). If Lua library is not installed, neither <code class="docutils literal notranslate"><span class="pre">axl_lua</span></code> nor <code class="docutils literal notranslate"><span class="pre">axl_st</span></code> will be built.</p>
+<p><p>Lua executables, header files and both static and dynamic libraries are available in official repositories of most Linux distributions.</p>
+<p>Lua sources, as well as the links to pre-compiled binaries (of both executables and libraries), could be found at the official Lua website: <a class="reference external" href="http://www.lua.org">http://www.lua.org</a></p>
+<p>Both 5.2.x and 5.3.x branches should be fine.</p>
+</p>
+</div></blockquote>
+</li>
+<li><p class="first">Pcap/WinPcap</p>
+<blockquote>
+<div><p>Pcap (called WinPcap on Windows) library is required to build <code class="docutils literal notranslate"><span class="pre">axl_io_pcap</span></code> module (C++ wrappers for Pcap). If Pcap is missing, <code class="docutils literal notranslate"><span class="pre">axl_io_pcap</span></code> will not be built.</p>
+<p><p>Pcap library provides facilities for low-level network packet management including filtering, capturing and injecting network traffic.</p>
+<p>Pcap is part of Mac OS X SDK and is usually available out-of-the-box in many Linux distributions as well. On Windows systems sources, pre-compiled libraries and drivers could be downloaded from the official WinPcap website: <a class="reference external" href="http://www.winpcap.org">http://www.winpcap.org</a></p>
+</p>
+</div></blockquote>
+</li>
+<li><p class="first">LibUSB</p>
+<blockquote>
+<div><p>LibUSB is required to build <code class="docutils literal notranslate"><span class="pre">axl_io_usb</span></code> module (C++ wrappers for LibUSB). If LibUSB is missing, <code class="docutils literal notranslate"><span class="pre">axl_io_usb</span></code> will not be build.</p>
+<p><p>LibUSB is a library providing applications with access for controlling data transfer to and from USB devices on Unix and non-Unix systems, without the need for kernel-mode drivers.</p>
+<p>LibUSB is available in official repositories of most Linux distributions. Sources and Windows binaries could be downloaded from the official website: <a class="reference external" href="http://libusb.info">http://libusb.info</a></p>
+<p>Note that pre-compiled Windows libraries are built with /MD option (dynamic version of C runtime library). If you need to use LibUSB in a project built with /MT rather than /MD option, you need to re-compile LibUSB from sources.</p>
+</p>
+</div></blockquote>
+</li>
+<li><p class="first">OpenSSL</p>
+<blockquote>
+<div><p>OpenSSL is required to build <code class="docutils literal notranslate"><span class="pre">axl_cry</span></code> module (C++ wrappers for OpenSSL in general and ECC in particular). If OpenSSL is missing, <code class="docutils literal notranslate"><span class="pre">axl_cry</span></code> will not be build.</p>
+<p><p>OpenSSL is available in official repositories of most Linux distributions. Alternatively, it can be built from sources available at the official website: <a class="reference external" href="http://www.openssl.org">http://www.openssl.org</a></p>
+<p>There is also a number of unofficial projects on the web offering pre-compiled libraries for OpenSSL.</p>
+</p>
+</div></blockquote>
+</li>
+<li><p class="first">Expat</p>
+<blockquote>
+<div><p>Expat is required to build <code class="docutils literal notranslate"><span class="pre">axl_xml</span></code> module (C++ wrappers for Expat). If Expat is missing, <code class="docutils literal notranslate"><span class="pre">axl_xml</span></code> will not be build.</p>
+<p><p>LibExpat is an XML parser library written in C. It is a stream-oriented parser in which an application registers handlers for things the parser might find in the XML document (like start tags).</p>
+<p>LibExpat is available in official repositories of most Linux distributions. Sources and Windows binaries could be downloaded from the official project page: <a class="reference external" href="https://sourceforge.net/projects/expat">https://sourceforge.net/projects/expat</a></p>
+</p>
+</div></blockquote>
+</li>
+<li><p class="first">QT 5.x</p>
+<blockquote>
+<div><p>QT is required to build <code class="docutils literal notranslate"><span class="pre">axl_gui_qt</span></code> module, which serves as a driver for <code class="docutils literal notranslate"><span class="pre">axl_gui</span></code> lightweight GUI abstraction framework.</p>
+<p>The idea behind this <code class="docutils literal notranslate"><span class="pre">axl_gui</span></code> abstraction framework is to allow writing simple widgets which could use QT, GTK or talk directly to the lower-level subsystems such as GDI or X11.</p>
+<p><p>Any QT version 5.x should be fine. However, newer versions of QT may not be compatible with Visual Studio 2010. Here in Tibbo, we use QT 5.4.2 to build the official packages of <a class="reference external" href="http://tibbo.com/ninja">IO Ninja</a>.</p>
+<p>QT official download archive is available at: <a class="reference external" href="http://download.qt.io/archive/qt">http://download.qt.io/archive/qt</a></p>
+</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="configure.html" class="btn btn-neutral float-right" title="Configuring" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="prerequisites-tools.html" class="btn btn-neutral float-left" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

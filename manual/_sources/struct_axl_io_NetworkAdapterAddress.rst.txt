@@ -1,0 +1,40 @@
+.. index:: pair: struct; axl::io::NetworkAdapterAddress
+.. _doxid-structaxl_1_1io_1_1_network_adapter_address:
+
+struct axl::io::NetworkAdapterAddress
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_NetworkAdapter.h>
+	
+	struct NetworkAdapterAddress: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+		// fields
+	
+		:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>` :target:`m_address<doxid-structaxl_1_1io_1_1_network_adapter_address_1ae067288a1a3ac696612cd5fe08e3d421>`;
+		size_t :target:`m_netMaskBitCount<doxid-structaxl_1_1io_1_1_network_adapter_address_1a7ea47b2830008508831deb1fbfa92c4d>`;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

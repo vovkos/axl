@@ -1,0 +1,23 @@
+.. index:: pair: struct; axl::spy::VaList
+.. _doxid-structaxl_1_1spy_1_1_va_list:
+
+struct axl::spy::VaList
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_spy_Hook.h>
+	
+	struct VaList
+	{
+		// fields
+	
+		char* :target:`m_p<doxid-structaxl_1_1spy_1_1_va_list_1aa5f472ade6d57d5916e41b7b36a94637>`;
+	};

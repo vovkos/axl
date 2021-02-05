@@ -1,0 +1,53 @@
+.. index:: pair: class; axl::mem::Tracker
+.. _doxid-classaxl_1_1mem_1_1_tracker:
+
+class axl::mem::Tracker
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Tracker.h>
+	
+	class Tracker
+	{
+	public:
+		// construction
+	
+		:target:`Tracker<doxid-classaxl_1_1mem_1_1_tracker_1a3d0f143ea2b71107e48297390c9bc7b0>`();
+
+		// methods
+	
+		size_t
+		:target:`getBlockCount<doxid-classaxl_1_1mem_1_1_tracker_1a7d2b16aa71afcb0446c3e172f20d137b>`();
+	
+		size_t
+		:target:`getPeakBlockCount<doxid-classaxl_1_1mem_1_1_tracker_1a2dd683159ec359be1f7abbbf6896086c>`();
+	
+		size_t
+		:target:`getTotalBlockCount<doxid-classaxl_1_1mem_1_1_tracker_1adbd0e81c99ec089a84e8ee68b7a033f7>`();
+	
+		size_t
+		:target:`getSize<doxid-classaxl_1_1mem_1_1_tracker_1a8982345634d6e958a931a5f4f781062e>`();
+	
+		size_t
+		:target:`getPeakSize<doxid-classaxl_1_1mem_1_1_tracker_1ac03ef44ed42c90a405d82916184bd1ca>`();
+	
+		size_t
+		:target:`getTotalSize<doxid-classaxl_1_1mem_1_1_tracker_1a9f7aa9130a1d899da9d29c197d231efd>`();
+	
+		void
+		:target:`add<doxid-classaxl_1_1mem_1_1_tracker_1a0437e122934420883cc2a523b6479253>`(:ref:`TrackerBlockHdr<doxid-structaxl_1_1mem_1_1_tracker_block_hdr>`* hdr);
+	
+		void
+		:target:`remove<doxid-classaxl_1_1mem_1_1_tracker_1a556a072cfe8092084318847c0b3d9448>`(:ref:`TrackerBlockHdr<doxid-structaxl_1_1mem_1_1_tracker_block_hdr>`* hdr);
+	
+		void
+		:target:`trace<doxid-classaxl_1_1mem_1_1_tracker_1a5cbdb543535510ef7b29c097f34531ac>`(bool isDetailed = true);
+	};

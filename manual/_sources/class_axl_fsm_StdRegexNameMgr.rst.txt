@@ -1,0 +1,52 @@
+.. index:: pair: class; axl::fsm::StdRegexNameMgr
+.. _doxid-classaxl_1_1fsm_1_1_std_regex_name_mgr:
+
+class axl::fsm::StdRegexNameMgr
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_fsm_StdRegexNameMgr.h>
+	
+	class StdRegexNameMgr: public :ref:`axl::fsm::RegexNameMgr<doxid-classaxl_1_1fsm_1_1_regex_name_mgr>`
+	{
+	public:
+		// methods
+	
+		void
+		:target:`clear<doxid-classaxl_1_1fsm_1_1_std_regex_name_mgr_1aa50b9707c4ec5cdd7a5f25e6d1b91c4e>`();
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`findName<doxid-classaxl_1_1fsm_1_1_std_regex_name_mgr_1a150c5cc136d63ca5f87e99598dbda48d>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	
+		void
+		:target:`addName<doxid-classaxl_1_1fsm_1_1_std_regex_name_mgr_1ab2fb969ff76fa9f106bb1206ec55329e>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source
+			);
+	
+		bool
+		:target:`removeName<doxid-classaxl_1_1fsm_1_1_std_regex_name_mgr_1adceee46965efd37f4c62432b15e96cef>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:ref:`findName<doxid-classaxl_1_1fsm_1_1_regex_name_mgr_1a179ded60a28034a041391a69cfeffd10>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name) = 0;
+

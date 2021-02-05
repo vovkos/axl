@@ -1,0 +1,63 @@
+.. index:: pair: class; axl::dox::Module
+.. _doxid-classaxl_1_1dox_1_1_module:
+
+class axl::dox::Module
+======================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_dox_Module_Target.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_dox_Module.h>
+	
+	class Module
+	{
+	public:
+		// structs
+	
+		struct :ref:`Target<doxid-structaxl_1_1dox_1_1_module_1_1_target>`;
+
+		// construction
+	
+		:target:`Module<doxid-classaxl_1_1dox_1_1_module_1a0f238bbf8cc6eafa47c56b3065018370>`(:ref:`Host<doxid-structaxl_1_1dox_1_1_host>`* host);
+
+		// methods
+	
+		:ref:`Host<doxid-structaxl_1_1dox_1_1_host>`*
+		:target:`getHost<doxid-classaxl_1_1dox_1_1_module_1ac2584ea17c6821947a7118cbbef31eda>`();
+	
+		void
+		:target:`clear<doxid-classaxl_1_1dox_1_1_module_1a4a3ff2c46d127341feda2204b74c2c6d>`();
+	
+		:ref:`sl::ConstList<doxid-classaxl_1_1sl_1_1_const_list>`<:ref:`Block<doxid-classaxl_1_1dox_1_1_block>`>
+		:target:`getBlockList<doxid-classaxl_1_1dox_1_1_module_1a720fc9f1b19b621af4e96172a8a7e9a0>`();
+	
+		:ref:`sl::ConstList<doxid-classaxl_1_1sl_1_1_const_list>`<:ref:`Group<doxid-classaxl_1_1dox_1_1_group>`>
+		:target:`getGroupList<doxid-classaxl_1_1dox_1_1_module_1a7de79eb7b34334f58e70f2e4857c0490>`();
+	
+		:ref:`Block<doxid-classaxl_1_1dox_1_1_block>`*
+		:target:`createBlock<doxid-classaxl_1_1dox_1_1_module_1a78f05f2e4e0b3aac9d6cc25abf1b5f5a>`(:ref:`handle_t<doxid-axl__g_2axl__g___pch_8h_1a50e1c0ee54e9888891a7c7889eb17e5f>` item = NULL);
+	
+		bool
+		:target:`resolveBlockTargets<doxid-classaxl_1_1dox_1_1_module_1a9a632da3c00d1aeac6b9d6f46a9268ca>`();
+	
+		void
+		:target:`deleteEmptyGroups<doxid-classaxl_1_1dox_1_1_module_1a64fa9425cfb0ee794ea70127893b6365>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`adjustRefId<doxid-classaxl_1_1dox_1_1_module_1a812a645a0edb06c88cdc32f76358dc41>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& refId);
+	
+		bool
+		:target:`generateDocumentation<doxid-classaxl_1_1dox_1_1_module_1aad903da77d4b6aeea4c53cf667d9869c>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& outputDir,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& indexFileName = "index.xml",
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& globalNamespaceFileName = "global.xml"
+			);
+	};

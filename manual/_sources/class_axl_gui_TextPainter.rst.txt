@@ -1,0 +1,487 @@
+.. index:: pair: class; axl::gui::TextPainter
+.. _doxid-classaxl_1_1gui_1_1_text_painter:
+
+class axl::gui::TextPainter
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_TextPainter.h>
+	
+	class TextPainter
+	{
+	public:
+		// fields
+	
+		:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* :target:`m_canvas<doxid-classaxl_1_1gui_1_1_text_painter_1a4596e2c724125edc78f248fa5fda3854>`;
+		:ref:`Point<doxid-structaxl_1_1gui_1_1_point>` :target:`m_point<doxid-classaxl_1_1gui_1_1_text_painter_1add6dfd6ec361a47a5d98d431cc32abf0>`;
+		int :target:`m_top<doxid-classaxl_1_1gui_1_1_text_painter_1a58162620c60a1075a43518c42c7895e3>`;
+		int :target:`m_bottom<doxid-classaxl_1_1gui_1_1_text_painter_1a17b80d5ebcb6fdfffa21c4484d809481>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_hexEncodingFlags<doxid-classaxl_1_1gui_1_1_text_painter_1a8a6736ecc14e055f714b33d210076c78>`;
+		:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` :target:`m_unprintableChar<doxid-classaxl_1_1gui_1_1_text_painter_1a23a9e497f1c015cd446af256250141ad>`;
+
+		// construction
+	
+		:target:`TextPainter<doxid-classaxl_1_1gui_1_1_text_painter_1a39f7ce96efa830c49973f8fe44042c01>`();
+		:target:`TextPainter<doxid-classaxl_1_1gui_1_1_text_painter_1a989922460d705bbad3eddab4f929e9a0>`(:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas);
+
+		// methods
+	
+		:ref:`Point<doxid-structaxl_1_1gui_1_1_point>`
+		:target:`getPoint<doxid-classaxl_1_1gui_1_1_text_painter_1afdd836508559e762e92b64fcf45a4f0c>`();
+	
+		int
+		:target:`drawSpace<doxid-classaxl_1_1gui_1_1_text_painter_1a37b8077956e0052643cff773e8329648>`(
+			size_t length,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color
+			);
+	
+		int
+		:target:`drawSpace<doxid-classaxl_1_1gui_1_1_text_painter_1a5486d5187aa9f6349c9a67baa5c641e3>`(size_t length);
+	
+		int
+		:target:`drawSpace_p<doxid-classaxl_1_1gui_1_1_text_painter_1a646497e66a016d87a809ba87c1212bac>`(
+			int width,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color
+			);
+	
+		int
+		:target:`drawSpace_p<doxid-classaxl_1_1gui_1_1_text_painter_1ae1d6aa4b2edd4f56f76f6479f8d8490f>`(int width);
+	
+		int
+		:target:`drawText<doxid-classaxl_1_1gui_1_1_text_painter_1a2c6839208c68d07cb5ff7ec0ec87be0f>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawText<doxid-classaxl_1_1gui_1_1_text_painter_1a6debc14b39d34773276eeeff7fd2b491>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawText<doxid-classaxl_1_1gui_1_1_text_painter_1aebf35ed9e0b268a47e219b0a140ebda2>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text);
+	
+		int
+		:target:`drawText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1a6eddaadfc63def45f189e72d7a10823b>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1aa61fa816f638c4a7730dec36ac7af978>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1afef88b04fa38e15aa346bf94abe4308f>`(const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text);
+	
+		int
+		:target:`drawText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1a7dabc310d00d829706a5e11cd0b7d6a1>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1a1b731408384244d3b574ec59255fcc27>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1a9cd4e4d0480c1e99e43eb983be200314>`(const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text);
+	
+		int
+		:target:`drawHyperText<doxid-classaxl_1_1gui_1_1_text_painter_1a80c7caa82ea24b294e38e3753f3202f0>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawHyperText<doxid-classaxl_1_1gui_1_1_text_painter_1a624d32daad69fb9299860faee3cadac8>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawHyperText<doxid-classaxl_1_1gui_1_1_text_painter_1a4aacdbf2c528754f428414d4eab49d73>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawHyperText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1a9f53f27523a9a14527a8508bceff4d80>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawHyperText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1af4c0e6c2a5cb71d10ff91b1c923ffc80>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawHyperText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1a116155814fddfc1deb89f3a9d2509d9e>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawHyperText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1af246aadb32e230675b6b3f9205e293ec>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawHyperText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1ad448303bd5f3011f3fa6bdd9ac8d8d2d>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawHyperText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1ac3743a73ac69cc9b8f8cc4d07f8f545a>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText<doxid-classaxl_1_1gui_1_1_text_painter_1ae8b1acc0f5d38e9080996d899ef76046>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText<doxid-classaxl_1_1gui_1_1_text_painter_1a00ce3ed94182a4ae3a33f972bd2b5030>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText<doxid-classaxl_1_1gui_1_1_text_painter_1a615bdcb012b742207ac1018f65703f15>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1a4bb49ba428878058f2b21a574a5179b9>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1ae295f54eab830fe6de71ffbb07dd5a7d>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText_utf8<doxid-classaxl_1_1gui_1_1_text_painter_1a21f61fd7b33a12a90be7ea2d26ddbaaa>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1aa6320ff16f4fcc15407674f5256e207e>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1ab7319579d628eab061709757be89e075>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawSelHyperText_utf32<doxid-classaxl_1_1gui_1_1_text_painter_1a16311be841f0c02e46ec335ca0ff8507>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			);
+	
+		int
+		:target:`drawBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1ae3663b500730bff6f19ae3cc5b4f3734>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1a37433208f5448a28fc59c0d59c617c9d>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1a7f4529c356a23f904d07b4af40efcd7e>`(
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawHyperBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1a49352e26adc9ee5aad3a5f7840540c3b>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawHyperBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1a236b1ba926c37386cd6e22fee8731d85>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawHyperBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1ad23b04ab7b63aea3d1c8fe4239c9ccf6>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawSelHyperBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1a40848b9d1ad1a030f3d2bc32bc30efc4>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawSelHyperBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1a4fc7409d5bcde4c3c106c92230d5bea2>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawSelHyperBinHex<doxid-classaxl_1_1gui_1_1_text_painter_1a3b61dffd69b3e231b59f342637c7841f>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			size_t halfBitOffset,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		int
+		:target:`drawBinText<doxid-classaxl_1_1gui_1_1_text_painter_1a550af70cd9230cee10b3bd7fc803c9c5>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawBinText<doxid-classaxl_1_1gui_1_1_text_painter_1abc8b09d96c828eb752af6837f69077b6>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawBinText<doxid-classaxl_1_1gui_1_1_text_painter_1a801a3240dd2b27d9fa40e98b4ede4e96>`(
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawHyperBinText<doxid-classaxl_1_1gui_1_1_text_painter_1a05afa7c585aa1a89ce1a92b468f41310>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawHyperBinText<doxid-classaxl_1_1gui_1_1_text_painter_1a34d44337a8ea5fbfb6f5d30538129140>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawHyperBinText<doxid-classaxl_1_1gui_1_1_text_painter_1ac4cda88db1b4a44681852c0ae9caef06>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawSelHyperBinText<doxid-classaxl_1_1gui_1_1_text_painter_1a48cffd18f4f4ca548101a01a5d08fbb9>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawSelHyperBinText<doxid-classaxl_1_1gui_1_1_text_painter_1ac37d3067636e3d9ce8bf65bcea23f15e>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& attr,
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		int
+		:target:`drawSelHyperBinText<doxid-classaxl_1_1gui_1_1_text_painter_1a36834c546df7fe903c8fffe345b588a4>`(
+			const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`* attrArray,
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& selAttr,
+			size_t selStart,
+			size_t selEnd,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize
+			);
+	
+		static
+		size_t
+		:target:`buildBinTextString<doxid-classaxl_1_1gui_1_1_text_painter_1a4f92e787acc84d998454242ddaf9dc26>`(
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`>* binTextBuffer,
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* stringBuffer,
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize,
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` unprintableChar = '.'
+			);
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`buildBinTextString<doxid-classaxl_1_1gui_1_1_text_painter_1afc8544acdb873497f5fa318328af5ea1>`(
+			:ref:`enc::CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			const void* p,
+			size_t dataSize,
+			size_t bufferSize,
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` unprintableChar = '.'
+			);
+	};

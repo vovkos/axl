@@ -1,0 +1,33 @@
+.. index:: pair: class; axl::sys::win::CriticalSection
+.. _doxid-classaxl_1_1sys_1_1win_1_1_critical_section:
+
+class axl::sys::win::CriticalSection
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_CriticalSection.h>
+	
+	class CriticalSection: public CRITICAL_SECTION
+	{
+	public:
+		// construction
+	
+		:target:`CriticalSection<doxid-classaxl_1_1sys_1_1win_1_1_critical_section_1ab1ce787e940739a53563fb3dbc6e3a30>`();
+		:target:`~CriticalSection<doxid-classaxl_1_1sys_1_1win_1_1_critical_section_1aa3ea1b23b7d4d11be9afd269ec212db6>`();
+
+		// methods
+	
+		void
+		:target:`enter<doxid-classaxl_1_1sys_1_1win_1_1_critical_section_1a4113da92ad5b08a17b2f2a6c99f8e2c7>`();
+	
+		void
+		:target:`leave<doxid-classaxl_1_1sys_1_1win_1_1_critical_section_1adfb2f8903e24630c44aca681917037cd>`();
+	};

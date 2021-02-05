@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::lex::Ragel
+.. _doxid-classaxl_1_1lex_1_1_ragel:
+
+class axl::lex::Ragel
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_Ragel.h>
+	
+	class Ragel
+	{
+	public:
+		// construction
+	
+		:target:`Ragel<doxid-classaxl_1_1lex_1_1_ragel_1ad4624c19defd4355decb47f582d8f6c9>`();
+
+		// methods
+	
+		void
+		:target:`setSource<doxid-classaxl_1_1lex_1_1_ragel_1a9d02c13e33c145d85b56129ef311ead5>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source,
+			bool isBomNeeded = false
+			);
+	};

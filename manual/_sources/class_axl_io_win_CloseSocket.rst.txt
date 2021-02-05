@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::win::CloseSocket
+.. _doxid-classaxl_1_1io_1_1win_1_1_close_socket:
+
+class axl::io::win::CloseSocket
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_win_Socket.h>
+	
+	class CloseSocket
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1win_1_1_close_socket_1a8fa432cc66a5b5dd10e0673fa53653e8>`(SOCKET socket);
+	};

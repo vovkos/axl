@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::sl::Void
+.. _doxid-classaxl_1_1sl_1_1_void:
+
+template class axl::sl::Void
+============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <typename T>
+	class Void
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_void_1a61a6cbb4afcd6a4c779ef3749fb7df99>`(T x) const;
+	};

@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::sl::MinusOne
+.. _doxid-classaxl_1_1sl_1_1_minus_one:
+
+template class axl::sl::MinusOne
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <typename T>
+	class MinusOne
+	{
+	public:
+		// methods
+	
+		T
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_minus_one_1a1e2ed2274cb57c7284b003da212bb9cd>`() const;
+	};

@@ -1,0 +1,62 @@
+.. index:: pair: struct; axl::gui::Size
+.. _doxid-structaxl_1_1gui_1_1_size:
+
+struct axl::gui::Size
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+	
+	struct Size
+	{
+		// fields
+	
+		union
+		{
+			struct
+			{
+				int :target:`m_width<doxid-structaxl_1_1gui_1_1_size_1a999f8a97057f7d27ddb6b5a329d5455d>`;
+				int :target:`m_height<doxid-structaxl_1_1gui_1_1_size_1ac72d4633beb03b5476514b753e975b43>`;
+			};
+	
+			struct
+			{
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_width_u<doxid-structaxl_1_1gui_1_1_size_1ab7f9b156cbb301c3b16a67662f05c8f5>`;
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_height_u<doxid-structaxl_1_1gui_1_1_size_1a24597f6749324cb66e32fb371be36e8f>`;
+			};
+		};
+
+		// construction
+	
+		:target:`Size<doxid-structaxl_1_1gui_1_1_size_1ad4bb23d8ad7687859c94ce5c5276a7d9>`();
+	
+		:target:`Size<doxid-structaxl_1_1gui_1_1_size_1a5e467af870707bbc8f3463df23ea3a21>`(
+			int width,
+			int height
+			);
+
+		// methods
+	
+		Size
+		:target:`operator+<doxid-structaxl_1_1gui_1_1_size_1a8546043e880c4746404d09589ecfa2fc>`(const Size& size2);
+	
+		Size
+		:target:`operator-<doxid-structaxl_1_1gui_1_1_size_1a0e79b1286bcf3ca2df073eb27c9d8d1a>`(const Size& size2);
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_size_1a7b65a0f6b808af4ca64c92372881d93b>`(
+			int width,
+			int height
+			);
+	
+		void
+		:target:`clipNegative<doxid-structaxl_1_1gui_1_1_size_1a5f07acfb4a1f85309b6f9be892ecc041>`();
+	};

@@ -1,0 +1,28 @@
+.. index:: pair: class; axl::ini::GenericIni
+.. _doxid-classaxl_1_1ini_1_1_generic_ini:
+
+class axl::ini::GenericIni
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ini_GenericParser.h>
+	
+	class GenericIni
+	{
+	public:
+		// methods
+	
+		:ref:`Section<doxid-classaxl_1_1ini_1_1_section>`*
+		:target:`getSection<doxid-classaxl_1_1ini_1_1_generic_ini_1a88399999e214de9049d0c509ec5ce029>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name) const;
+	
+		const :ref:`Section<doxid-classaxl_1_1ini_1_1_section>`*
+		:target:`getUnnamedSection<doxid-classaxl_1_1ini_1_1_generic_ini_1a07564a2506deb94cc4c821220c416ab1>`() const;
+	};

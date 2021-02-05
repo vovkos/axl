@@ -1,0 +1,33 @@
+.. index:: pair: struct; axl::sys::win::FILE_DIRECTORY_INFORMATION
+.. _doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n:
+
+struct axl::sys::win::FILE_DIRECTORY_INFORMATION
+================================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_NtDll.h>
+	
+	struct FILE_DIRECTORY_INFORMATION
+	{
+		// fields
+	
+		ULONG :target:`NextEntryOffset<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1a74ddbd13f25b247eb4a9db7e39d8cbec>`;
+		ULONG :target:`FileIndex<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1af73ec48083e9b60d45747cd8f31e12b6>`;
+		LARGE_INTEGER :target:`CreationTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1a81eea773c6249a5644729c0c5abf328a>`;
+		LARGE_INTEGER :target:`LastAccessTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1ad05d755871ad5b6ebc0a305e33ec3933>`;
+		LARGE_INTEGER :target:`LastWriteTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1ac7af061c1340a4864365d6b18cce8d86>`;
+		LARGE_INTEGER :target:`ChangeTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1a0fabc8fec5ffc04d98473a82eeb668a1>`;
+		LARGE_INTEGER :target:`EndOfFile<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1af6cf991b4b45cafede552b013db9512c>`;
+		LARGE_INTEGER :target:`AllocationSize<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1a017978010eaa4087ab79e1192407a52f>`;
+		ULONG :target:`FileAttributes<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1aa8a55255760b567c2629e5080db68d5f>`;
+		ULONG :target:`FileNameLength<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1ab55f5ec0b1802c5cc460c34d452d0294>`;
+		WCHAR :target:`FileName<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___d_i_r_e_c_t_o_r_y___i_n_f_o_r_m_a_t_i_o_n_1afde84e1522ff58cebff9679b7f24f4ce>`[1];
+	};

@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>enum axl::fsm::NfaStateFlag &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="struct axl::fsm::DfaState" href="struct_axl_fsm_DfaState.html" />
+    <link rel="prev" title="enum axl::fsm::MatchConditionKind" href="enum_axl_fsm_MatchConditionKind.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_fsm.html">namespace axl::fsm</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_fsm_MatchConditionKind.html">enum axl::fsm::MatchConditionKind</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">enum axl::fsm::NfaStateFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_fsm_DfaState.html">struct axl::fsm::DfaState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_fsm_DfaTransition.html">struct axl::fsm::DfaTransition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_fsm_MatchCondition.html">struct axl::fsm::MatchCondition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_fsm_NfaState.html">struct axl::fsm::NfaState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_fsm_NfaStateSet.html">struct axl::fsm::NfaStateSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_fsm_NfaTransition.html">struct axl::fsm::NfaTransition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_fsm_NfaStateSetMap.html">template class axl::fsm::NfaStateSetMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_fsm_NfaTransitionMgr.html">class axl::fsm::NfaTransitionMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_fsm_Regex.html">class axl::fsm::Regex</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_fsm_RegexCompiler.html">class axl::fsm::RegexCompiler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_fsm_RegexNameMgr.html">class axl::fsm::RegexNameMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_fsm_StdRegexNameMgr.html">class axl::fsm::StdRegexNameMgr</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ref.html">namespace axl::ref</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_fsm.html">namespace axl::fsm</a> &raquo;</li>
+        
+      <li>enum axl::fsm::NfaStateFlag</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="enum-axl-fsm-nfastateflag">
+<span id="doxid-namespaceaxl-1-1fsm-1a6f6670973c3befa663e74c6bf229f498"></span><span id="index-0"></span><h1>enum axl::fsm::NfaStateFlag</h1>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_fsm_Nfa.h&gt;</span><span class="cp"></span>
+
+<span class="k">enum</span> <span class="n">NfaStateFlag</span>
+<span class="p">{</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1fsm-1a6f6670973c3befa663e74c6bf229f498a0a06c196b324a5156b61a1fce6610fc3"><span></span><span class="n">NfaStateFlag_Match</span></span><span></span>          <span class="o">=</span> <span class="mh">0x0001</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1fsm-1a6f6670973c3befa663e74c6bf229f498a7a263932864ad0809ea27b98ff757c3d"><span></span><span class="n">NfaStateFlag_EpsilonLink</span></span><span></span>    <span class="o">=</span> <span class="mh">0x0002</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1fsm-1a6f6670973c3befa663e74c6bf229f498a225226959bad9a1a1c7d304da56c02d9"><span></span><span class="n">NfaStateFlag_Accept</span></span><span></span>         <span class="o">=</span> <span class="mh">0x0004</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1fsm-1a6f6670973c3befa663e74c6bf229f498a7b89130aec404580b15b7ef1b1d3c9aa"><span></span><span class="n">NfaStateFlag_TransitionMask</span></span><span></span> <span class="o">=</span> <span class="mh">0x0007</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1fsm-1a6f6670973c3befa663e74c6bf229f498afdd1f5b691b8015081066a0ff592cead"><span></span><span class="n">NfaStateFlag_OpenCapture</span></span><span></span>    <span class="o">=</span> <span class="mh">0x0010</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1fsm-1a6f6670973c3befa663e74c6bf229f498abcba48011210b27d933650287d98349a"><span></span><span class="n">NfaStateFlag_CloseCapture</span></span><span></span>   <span class="o">=</span> <span class="mh">0x0020</span><span class="p">,</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="struct_axl_fsm_DfaState.html" class="btn btn-neutral float-right" title="struct axl::fsm::DfaState" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="enum_axl_fsm_MatchConditionKind.html" class="btn btn-neutral float-left" title="enum axl::fsm::MatchConditionKind" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

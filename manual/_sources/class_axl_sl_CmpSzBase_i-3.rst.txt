@@ -1,0 +1,11 @@
+.. index:: pair: class; axl::sl::CmpSzBase_i
+.. _doxid-classaxl_1_1sl_1_1_cmp_sz_base__i:
+
+template class axl::sl::CmpSzBase_i
+===================================
+
+.. toctree::
+	:hidden:
+
+
+

@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::mem::StdDelete
+.. _doxid-classaxl_1_1mem_1_1_std_delete:
+
+template class axl::mem::StdDelete
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_New.h>
+	
+	template <typename T>
+	class StdDelete
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1mem_1_1_std_delete_1a0abfaa9e845e1fc609145a8ae15c8749>`(T* p) const;
+	};

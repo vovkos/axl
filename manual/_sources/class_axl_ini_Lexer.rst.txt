@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::ini::Lexer
+.. _doxid-classaxl_1_1ini_1_1_lexer:
+
+class axl::ini::Lexer
+=====================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_ini_Lexer_ScanResultKind.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ini_Lexer.h>
+	
+	class Lexer
+	{
+	public:
+		// enums
+	
+		enum :ref:`ScanResultKind<doxid-classaxl_1_1ini_1_1_lexer_1a682594063e2363b37ae98827175dff6e>`;
+	};

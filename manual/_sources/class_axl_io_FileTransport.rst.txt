@@ -1,0 +1,76 @@
+.. index:: pair: class; axl::io::FileTransport
+.. _doxid-classaxl_1_1io_1_1_file_transport:
+
+class axl::io::FileTransport
+============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_FileTransport.h>
+	
+	class FileTransport: public :ref:`axl::io::Transport<doxid-classaxl_1_1io_1_1_transport>`
+	{
+	public:
+		// construction
+	
+		:target:`FileTransport<doxid-classaxl_1_1io_1_1_file_transport_1a54239f83385690642288572f0f5caada>`();
+
+		// methods
+	
+		void
+		:target:`attach<doxid-classaxl_1_1io_1_1_file_transport_1a65696821ce6346860e72d876f12bf1fe>`(:ref:`File<doxid-classaxl_1_1io_1_1_file>`* file);
+	
+		void
+		:target:`attach<doxid-classaxl_1_1io_1_1_file_transport_1abe0006926b817d92d8e0e7c3fa48d265>`(
+			:ref:`File<doxid-classaxl_1_1io_1_1_file>`* transmitFile,
+			:ref:`File<doxid-classaxl_1_1io_1_1_file>`* receiveFile
+			);
+	
+		void
+		:target:`detach<doxid-classaxl_1_1io_1_1_file_transport_1a49ebf9a13ab5d217ea5818e3dd533ef6>`();
+	
+		virtual
+		size_t
+		:target:`transmit<doxid-classaxl_1_1io_1_1_file_transport_1a78cb89ecb548aab621752ca1b8023add>`(
+			const void* p,
+			size_t size
+			);
+	
+		virtual
+		size_t
+		:target:`receive<doxid-classaxl_1_1io_1_1_file_transport_1a0c63c97569553d8d00ac0c58171a0d0f>`(
+			void* p,
+			size_t size
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		size_t
+		:ref:`transmit<doxid-classaxl_1_1io_1_1_transport_1ae739f7d6d3dcebe4a4b1253e46db2ff7>`(
+			const void* p,
+			size_t size
+			) = 0;
+	
+		virtual
+		size_t
+		:ref:`receive<doxid-classaxl_1_1io_1_1_transport_1a94b757f3ee72b2511c294af4474f1468>`(
+			void* p,
+			size_t size
+			) = 0;
+

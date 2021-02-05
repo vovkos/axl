@@ -1,0 +1,30 @@
+.. index:: pair: class; axl::mem::DirectAllocator
+.. _doxid-classaxl_1_1mem_1_1_direct_allocator:
+
+class axl::mem::DirectAllocator
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Allocator.h>
+	
+	class DirectAllocator
+	{
+	public:
+		// methods
+	
+		static
+		void*
+		:target:`allocate<doxid-classaxl_1_1mem_1_1_direct_allocator_1a369c08addc2b4e424c18d46d4ce7222f>`(size_t size);
+	
+		static
+		void
+		:target:`free<doxid-classaxl_1_1mem_1_1_direct_allocator_1aa95c153bf124f4661ff10888e793b17c>`(void* p);
+	};

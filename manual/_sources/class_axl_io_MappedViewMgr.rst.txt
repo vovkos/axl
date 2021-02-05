@@ -1,0 +1,55 @@
+.. index:: pair: class; axl::io::MappedViewMgr
+.. _doxid-classaxl_1_1io_1_1_mapped_view_mgr:
+
+class axl::io::MappedViewMgr
+============================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_io_MappedViewMgr_ViewEntry.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_MappedFile.h>
+	
+	class MappedViewMgr
+	{
+	public:
+		// structs
+	
+		struct :ref:`ViewEntry<doxid-structaxl_1_1io_1_1_mapped_view_mgr_1_1_view_entry>`;
+
+		// methods
+	
+		:ref:`MappedFile<doxid-classaxl_1_1io_1_1_mapped_file>`*
+		:target:`getMappedFile<doxid-classaxl_1_1io_1_1_mapped_view_mgr_1a36c114d44803d4cff0658efca65ff944>`();
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1io_1_1_mapped_view_mgr_1a91641b24da27c1ef984174a8dc8fe97d>`();
+	
+		void*
+		:target:`find<doxid-classaxl_1_1io_1_1_mapped_view_mgr_1a824d7c9c26c413eb67b6c0960fd283b5>`(
+			uint64_t begin,
+			uint64_t end,
+			uint64_t* actualEnd
+			);
+	
+		void*
+		:target:`view<doxid-classaxl_1_1io_1_1_mapped_view_mgr_1a51d6c3f389b4d25c8eb34a7a28ca084c>`(
+			uint64_t begin,
+			uint64_t end,
+			uint64_t origBegin,
+			uint64_t origEnd
+			);
+	
+		void
+		:target:`clear<doxid-classaxl_1_1io_1_1_mapped_view_mgr_1ac557740e601fc7d6621f37ccefd29079>`();
+	
+		void
+		:target:`limitViewCount<doxid-classaxl_1_1io_1_1_mapped_view_mgr_1a30a4c835858ab393894522dd082cb792>`(size_t maxViewCount);
+	};

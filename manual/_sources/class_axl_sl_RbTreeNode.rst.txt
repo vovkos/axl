@@ -1,0 +1,47 @@
+.. index:: pair: class; axl::sl::RbTreeNode
+.. _doxid-classaxl_1_1sl_1_1_rb_tree_node:
+
+template class axl::sl::RbTreeNode
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_RbTree.h>
+	
+	template <
+		typename Key,
+		typename Value
+		>
+	class RbTreeNode: public :ref:`axl::sl::BinTreeNodeBase<doxid-structaxl_1_1sl_1_1_bin_tree_node_base>`
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		Value :ref:`m_value<doxid-structaxl_1_1sl_1_1_map_entry_1a8e3c472c441f67adac3ad8d33cfe0690>`;
+
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+	
+		const Key&
+		:ref:`getKey<doxid-structaxl_1_1sl_1_1_map_entry_1a435dbc84bc2e8f1071359ae588ac9b78>`() const;
+

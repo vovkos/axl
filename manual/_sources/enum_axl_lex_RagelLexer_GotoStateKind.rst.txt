@@ -1,0 +1,19 @@
+.. index:: pair: enum; GotoStateKind
+.. _doxid-classaxl_1_1lex_1_1_ragel_lexer_1a2d18bd191ebae24136ae676753ceba78:
+
+enum axl::lex::RagelLexer::GotoStateKind
+========================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_RagelLexer.h>
+
+	enum GotoStateKind
+	{
+	    :target:`GotoStateKind_ReparseToken<doxid-classaxl_1_1lex_1_1_ragel_lexer_1a2d18bd191ebae24136ae676753ceba78ad84a3cc9e8ed29d1162fc7cff48edac4>`,
+	    :target:`GotoStateKind_EatToken<doxid-classaxl_1_1lex_1_1_ragel_lexer_1a2d18bd191ebae24136ae676753ceba78a6287638d1692309f0463750019a1bcd1>`,
+	};
+

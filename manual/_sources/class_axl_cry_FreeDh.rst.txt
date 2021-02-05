@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreeDh
+.. _doxid-classaxl_1_1cry_1_1_free_dh:
+
+class axl::cry::FreeDh
+======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_Dh.h>
+	
+	class FreeDh
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_dh_1ae453b5d667162cb09ce5a62f39c0fe15>`(DH* h);
+	};

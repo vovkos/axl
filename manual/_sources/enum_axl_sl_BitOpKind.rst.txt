@@ -1,0 +1,21 @@
+.. index:: pair: enum; BitOpKind
+.. _doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157:
+
+enum axl::sl::BitOpKind
+=======================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BitMap.h>
+
+	enum BitOpKind
+	{
+	    :target:`BitOpKind_Or<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157aaa15d755b2086e6b190132191595882c>`     = 0,
+	    :target:`BitOpKind_Xor<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157a47488a92e703c3b5e96e5f3b9b8f87e1>`,
+	    :target:`BitOpKind_And<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157aa5b0b9d756e3dffb870724da4c32065d>`,
+	    :target:`BitOpKind_AndNot<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157a54448a3e8e2c7490161730adb83be007>`,
+	};
+

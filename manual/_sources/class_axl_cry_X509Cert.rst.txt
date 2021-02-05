@@ -1,0 +1,98 @@
+.. index:: pair: class; axl::cry::X509Cert
+.. _doxid-classaxl_1_1cry_1_1_x509_cert:
+
+class axl::cry::X509Cert
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_X509.h>
+	
+	class X509Cert: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// construction
+	
+		:target:`X509Cert<doxid-classaxl_1_1cry_1_1_x509_cert_1a0a47c0a798507bcbb31968eaad8e501f>`();
+		:target:`X509Cert<doxid-classaxl_1_1cry_1_1_x509_cert_1ab5fcb7eb46d44b791472bebc4617a82a>`(X509* cert);
+
+		// methods
+	
+		bool
+		:target:`create<doxid-classaxl_1_1cry_1_1_x509_cert_1a7c31d8e9d7d19903faf8d9234302f497>`();
+	
+		bool
+		:target:`loadDer<doxid-classaxl_1_1cry_1_1_x509_cert_1a5b577d0db3c1f5502a803997cd889316>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`saveDer<doxid-classaxl_1_1cry_1_1_x509_cert_1a3d51c17481c29fbb65bc7c7601d3b0cd>`(:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer) const;
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`saveDer<doxid-classaxl_1_1cry_1_1_x509_cert_1aac2f55fbe076b90d802860422e6af1fa>`() const;
+	
+		bool
+		:target:`loadPem<doxid-classaxl_1_1cry_1_1_x509_cert_1a6b338ebcdf4a3b8f5df784d86e43719a>`(
+			const void* p,
+			size_t size
+			);
+	
+		bool
+		:target:`loadPem<doxid-classaxl_1_1cry_1_1_x509_cert_1ab0e02160e568066c1338a55110ca4403>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	
+		size_t
+		:target:`savePem<doxid-classaxl_1_1cry_1_1_x509_cert_1a7cb82fefbe901d226bab971ff5a4b0f4>`(:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string) const;
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`savePem<doxid-classaxl_1_1cry_1_1_x509_cert_1ab7d7c8d7fe5d97cc9c4f55f2322b433a>`() const;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

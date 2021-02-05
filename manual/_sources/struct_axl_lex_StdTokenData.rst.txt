@@ -1,0 +1,38 @@
+.. index:: pair: struct; axl::lex::StdTokenData
+.. _doxid-structaxl_1_1lex_1_1_std_token_data:
+
+struct axl::lex::StdTokenData
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_Token.h>
+	
+	struct StdTokenData
+	{
+		// fields
+	
+		union
+		{
+			int :target:`m_integer<doxid-structaxl_1_1lex_1_1_std_token_data_1a58d6aef6d790ce3d087c517a3e3745b6>`;
+			int32_t :target:`m_int32<doxid-structaxl_1_1lex_1_1_std_token_data_1a76a280787a73943c99636710dfdec974>`;
+			uint32_t :target:`m_int32_u<doxid-structaxl_1_1lex_1_1_std_token_data_1aaee5d312694d4d43146c684469b3a6a1>`;
+			int64_t :target:`m_int64<doxid-structaxl_1_1lex_1_1_std_token_data_1a3240ff39eb8aa053d1e298a55f2cf5b8>`;
+			uint64_t :target:`m_int64_u<doxid-structaxl_1_1lex_1_1_std_token_data_1ade70e01d3bf2374728db1710e93c1aac>`;
+			float :target:`m_float<doxid-structaxl_1_1lex_1_1_std_token_data_1a722e13390f8858d37204ceb652d32213>`;
+			double :target:`m_double<doxid-structaxl_1_1lex_1_1_std_token_data_1af03a04a821d3d64e0e4ad7062cf9b855>`;
+		};
+	
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>` :target:`m_string<doxid-structaxl_1_1lex_1_1_std_token_data_1a82746e6ffba8456fb16f3ba07fdd2008>`;
+
+		// construction
+	
+		:target:`StdTokenData<doxid-structaxl_1_1lex_1_1_std_token_data_1a99fc40b4986bf61b0d90ae3e9c674b9f>`();
+	};

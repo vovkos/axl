@@ -1,0 +1,42 @@
+.. index:: pair: class; axl::ref::Child
+.. _doxid-classaxl_1_1ref_1_1_child:
+
+template class axl::ref::Child
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ref_Child.h>
+	
+	template <
+		typename T,
+		size_t extra = 0
+		>
+	class Child
+	{
+	public:
+		// construction
+	
+		:target:`Child<doxid-classaxl_1_1ref_1_1_child_1a623329638c5025980728bd770e18b5d9>`(:ref:`RefCount<doxid-classaxl_1_1ref_1_1_ref_count>`* parent);
+		:target:`~Child<doxid-classaxl_1_1ref_1_1_child_1adcf4e41abb71d67217b79b101146371b>`();
+
+		// methods
+	
+		:target:`operator T *<doxid-classaxl_1_1ref_1_1_child_1a1e4a01e4986878a6d58722f75bc76f17>`();
+	
+		T*
+		:target:`operator&<doxid-classaxl_1_1ref_1_1_child_1a5804f248fe9f28a1791d08c98db03864>`();
+	
+		T*
+		:target:`operator-><doxid-classaxl_1_1ref_1_1_child_1ad2ae8ffcc42cac175d78d1ad746b9c10>`();
+	
+		T*
+		:target:`p<doxid-classaxl_1_1ref_1_1_child_1ad3e5293348f2cb9dda18df7db31fbe1f>`();
+	};

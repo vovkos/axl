@@ -1,0 +1,22 @@
+.. index:: pair: enum; BufKind
+.. _doxid-namespaceaxl_1_1ref_1a62ea49a96b2632e17411a7f09238edbd:
+
+enum axl::ref::BufKind
+======================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ref_Buf.h>
+
+	enum BufKind
+	{
+	    :target:`BufKind_Exclusive<doxid-namespaceaxl_1_1ref_1a62ea49a96b2632e17411a7f09238edbda2983a0bc13ac1d97877060e14a880ca2>`,
+	    :target:`BufKind_Shared<doxid-namespaceaxl_1_1ref_1a62ea49a96b2632e17411a7f09238edbda5a669a8934a6217db4ffd778fa39ed41>`,
+	    :target:`BufKind_Static<doxid-namespaceaxl_1_1ref_1a62ea49a96b2632e17411a7f09238edbdaf849ae9d1cd34319fc400f08a6658b40>`    = BufKind_Shared,
+	    :target:`BufKind_Stack<doxid-namespaceaxl_1_1ref_1a62ea49a96b2632e17411a7f09238edbdae8bd20ba3a81df302fb4f5abafd300b6>`     = BufKind_Exclusive,
+	    :target:`BufKind_Field<doxid-namespaceaxl_1_1ref_1a62ea49a96b2632e17411a7f09238edbdaf53244d652f6c0e9ec7cda7aa494c451>`     = BufKind_Exclusive,
+	};
+

@@ -1,0 +1,17 @@
+.. index:: pair: enum; FrameOffset
+.. _doxid-namespaceaxl_1_1spy_1a3c75ab55ea7e882307c9aae1eb1296c7:
+
+enum axl::spy::FrameOffset
+==========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_spy_Hook.h>
+
+	enum FrameOffset
+	{
+	};
+

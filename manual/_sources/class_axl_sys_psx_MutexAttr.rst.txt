@@ -1,0 +1,43 @@
+.. index:: pair: class; axl::sys::psx::MutexAttr
+.. _doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr:
+
+class axl::sys::psx::MutexAttr
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_psx_Mutex.h>
+	
+	class MutexAttr
+	{
+	public:
+		// construction
+	
+		:target:`MutexAttr<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1ad6a58d96d672d503439e7bc50d45d166>`();
+		:target:`MutexAttr<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1a4592f8c8757f3a6fe15427b7b3faab81>`(int type);
+		:target:`~MutexAttr<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1a8d63e063dd6e174695653e603645f425>`();
+
+		// methods
+	
+		:target:`operator const pthread_mutexattr_t *<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1aff95ce4fd93c11c916e70acb8939dd76>`() const;
+		:target:`operator pthread_mutexattr_t *<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1a3bace58da2fe0977b492d6d24c394d9e>`();
+	
+		bool
+		:target:`getProcessShared<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1a7d5f717fb1ef0fb72e9ec110c92caf5e>`(int* value) const;
+	
+		bool
+		:target:`setProcessShared<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1aa7c03446399ed9cc80ff4977d78c1ebf>`(int value);
+	
+		bool
+		:target:`getType<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1a189f91298e8154c21f1ca9dd6c7fc612>`(int* value) const;
+	
+		bool
+		:target:`setType<doxid-classaxl_1_1sys_1_1psx_1_1_mutex_attr_1a1c60dd0f4382dba6c1b8c3c7272a5f90>`(int value);
+	};

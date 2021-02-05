@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::ClosePcap
+.. _doxid-classaxl_1_1io_1_1_close_pcap:
+
+class axl::io::ClosePcap
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_Pcap.h>
+	
+	class ClosePcap
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1_close_pcap_1a250293a888e78c8cd36c46d68046794b>`(pcap_t* h);
+	};

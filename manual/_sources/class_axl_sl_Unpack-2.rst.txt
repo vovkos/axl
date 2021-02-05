@@ -1,0 +1,38 @@
+.. index:: pair: class; axl::sl::Unpack<T*>
+.. _doxid-classaxl_1_1sl_1_1_unpack_3_01_t_01_5_01_4:
+
+template class axl::sl::Unpack<T*>
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Unpacker.h>
+	
+	template <typename T>
+	class Unpack<T*>: public :ref:`axl::sl::UnpackPtr<doxid-classaxl_1_1sl_1_1_unpack_ptr>`
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		size_t
+		:ref:`operator()<doxid-classaxl_1_1sl_1_1_unpack_ptr_1ab1b5afec1e0adf7fa4482ac39d4d6d2e>`(
+			const void* p,
+			size_t size,
+			T** value
+			);
+

@@ -1,0 +1,27 @@
+.. index:: pair: struct; axl::sys::win::FILE_BASIC_INFORMATION
+.. _doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___b_a_s_i_c___i_n_f_o_r_m_a_t_i_o_n:
+
+struct axl::sys::win::FILE_BASIC_INFORMATION
+============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_NtDll.h>
+	
+	struct FILE_BASIC_INFORMATION
+	{
+		// fields
+	
+		LARGE_INTEGER :target:`CreationTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___b_a_s_i_c___i_n_f_o_r_m_a_t_i_o_n_1a2d5a089169868e13379500dc888116cb>`;
+		LARGE_INTEGER :target:`LastAccessTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___b_a_s_i_c___i_n_f_o_r_m_a_t_i_o_n_1a9e8098b48124b2bfee120fe42129f058>`;
+		LARGE_INTEGER :target:`LastWriteTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___b_a_s_i_c___i_n_f_o_r_m_a_t_i_o_n_1aff4685ec591b7e69eb55d6e419e128ad>`;
+		LARGE_INTEGER :target:`ChangeTime<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___b_a_s_i_c___i_n_f_o_r_m_a_t_i_o_n_1a7a81e9408ed04aabb735d7147bb1de19>`;
+		ULONG :target:`FileAttributes<doxid-structaxl_1_1sys_1_1win_1_1_f_i_l_e___b_a_s_i_c___i_n_f_o_r_m_a_t_i_o_n_1ab028983dc939faddc4fc9cf4df7888b2>`;
+	};

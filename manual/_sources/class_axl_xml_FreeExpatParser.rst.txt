@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::xml::FreeExpatParser
+.. _doxid-classaxl_1_1xml_1_1_free_expat_parser:
+
+class axl::xml::FreeExpatParser
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_xml_ExpatParser.h>
+	
+	class FreeExpatParser
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1xml_1_1_free_expat_parser_1aa21b018da8f352ea731f66e353dca0d0>`(XML_Parser h);
+	};

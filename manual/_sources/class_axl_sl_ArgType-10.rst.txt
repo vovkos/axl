@@ -1,0 +1,33 @@
+.. index:: pair: class; axl::sl::ArgType<int64_t>
+.. _doxid-classaxl_1_1sl_1_1_arg_type_3_01int64__t_01_4:
+
+template class axl::sl::ArgType<int64_t>
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_ArgType.h>
+	
+	template <>
+	class ArgType<int64_t>: public :ref:`axl::sl::SimpleArgType<doxid-classaxl_1_1sl_1_1_simple_arg_type>`
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`Type<doxid-classaxl_1_1sl_1_1_simple_arg_type_1af149694f0304b446435e23645b3c58c9>`;
+

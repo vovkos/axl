@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sys::win::PerfCounter
+.. _doxid-classaxl_1_1sys_1_1win_1_1_perf_counter:
+
+class axl::sys::win::PerfCounter
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_PerfCounter.h>
+	
+	class PerfCounter
+	{
+	public:
+		// construction
+	
+		:target:`PerfCounter<doxid-classaxl_1_1sys_1_1win_1_1_perf_counter_1ae8386880f186552650c32a77c613d869>`();
+
+		// methods
+	
+		bool
+		:target:`start<doxid-classaxl_1_1sys_1_1win_1_1_perf_counter_1a9ffaa746dbec391a9480dc5934140ac9>`();
+	
+		uint64_t
+		:target:`getElapsedTime<doxid-classaxl_1_1sys_1_1win_1_1_perf_counter_1a4147a11f87a6c636e209e255ecc83143>`();
+	};

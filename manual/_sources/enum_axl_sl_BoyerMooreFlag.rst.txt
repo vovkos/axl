@@ -1,0 +1,19 @@
+.. index:: pair: enum; BoyerMooreFlag
+.. _doxid-namespaceaxl_1_1sl_1a0a74cd97637712c617b63a1db6213bc4:
+
+enum axl::sl::BoyerMooreFlag
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BoyerMooreFind.h>
+
+	enum BoyerMooreFlag
+	{
+	    :target:`BoyerMooreFlag_Reverse<doxid-namespaceaxl_1_1sl_1a0a74cd97637712c617b63a1db6213bc4a0c062f872707ab7327b770e705dbb9b1>`  = 0x01,
+	    :target:`BoyerMooreFlag_Horspool<doxid-namespaceaxl_1_1sl_1a0a74cd97637712c617b63a1db6213bc4a190369966d27e3c624e28b79fc6f57a4>` = 0x02,
+	};
+

@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreePkcs7
+.. _doxid-classaxl_1_1cry_1_1_free_pkcs7:
+
+class axl::cry::FreePkcs7
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_Pkcs7.h>
+	
+	class FreePkcs7
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_pkcs7_1aeba1618da4aa6047136453758478e768>`(PKCS7* msg);
+	};

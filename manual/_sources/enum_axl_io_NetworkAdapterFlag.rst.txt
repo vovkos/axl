@@ -1,0 +1,23 @@
+.. index:: pair: enum; NetworkAdapterFlag
+.. _doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1:
+
+enum axl::io::NetworkAdapterFlag
+================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_NetworkAdapter.h>
+
+	enum NetworkAdapterFlag
+	{
+	    :target:`NetworkAdapterFlag_Dhcp<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1a5d620f60287667fe1aa6882e76a5b208>`      = 0x01,
+	    :target:`NetworkAdapterFlag_Ddns<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1ab2a4b67c6239d8c1c2ccd72d9a1f8803>`      = 0x02,
+	    :target:`NetworkAdapterFlag_Broadcast<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1ae46cb3d67c90a25e6a265456da8baace>` = 0x04,
+	    :target:`NetworkAdapterFlag_Multicast<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1a638a112a1074c4a1be4a54608e1db118>` = 0x08,
+	    :target:`NetworkAdapterFlag_Ip4<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1a23e434b20795f2e80ca7bc21d4ffec75>`       = 0x10,
+	    :target:`NetworkAdapterFlag_Ip6<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1a697e7ca11bb7d4c39c21ade9a10acb4f>`       = 0x20,
+	};
+

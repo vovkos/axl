@@ -1,0 +1,44 @@
+.. index:: pair: struct; axl::gui::FontDesc
+.. _doxid-structaxl_1_1gui_1_1_font_desc:
+
+struct axl::gui::FontDesc
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_FontDesc.h>
+	
+	struct FontDesc
+	{
+		// fields
+	
+		char :target:`m_family<doxid-structaxl_1_1gui_1_1_font_desc_1afa53a40d068ed84cfafdbc3227efdda9>`[32];
+		size_t :target:`m_pointSize<doxid-structaxl_1_1gui_1_1_font_desc_1afaece841b4ece4cdc74add4c295d75d6>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_flags<doxid-structaxl_1_1gui_1_1_font_desc_1ac45b166ec83223098af2d2c7b0faf975>`;
+
+		// construction
+	
+		:target:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc_1af97f14dc01e86b1e74a2cd19bf93e0a1>`();
+	
+		:target:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc_1a487bf8b021edebbf5dd5c699dfa96d0a>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& family,
+			size_t pointSize = 0,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+
+		// methods
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_font_desc_1ab3e1d3a1590af025ccf5a076b5f3986f>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& family,
+			size_t pointSize = 0,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	};

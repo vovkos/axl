@@ -1,0 +1,46 @@
+.. index:: pair: class; axl::sl::BoxListEntry
+.. _doxid-classaxl_1_1sl_1_1_box_list_entry:
+
+template class axl::sl::BoxListEntry
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BoxList.h>
+	
+	template <typename T>
+	class BoxListEntry: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+	public:
+		// fields
+	
+		T :target:`m_value<doxid-classaxl_1_1sl_1_1_box_list_entry_1a9837e1bd3ee16e7be769f524db7d4001>`;
+
+		// construction
+	
+		:target:`BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry_1a05a767fd3aa36e492e9cec74bff2f38a>`();
+		:target:`BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry_1a1ce774636a82c76cd01be27b262f19f3>`(const T& value);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

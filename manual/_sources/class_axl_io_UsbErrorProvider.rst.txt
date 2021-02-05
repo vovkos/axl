@@ -1,0 +1,44 @@
+.. index:: pair: class; axl::io::UsbErrorProvider
+.. _doxid-classaxl_1_1io_1_1_usb_error_provider:
+
+class axl::io::UsbErrorProvider
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_UsbError.h>
+	
+	class UsbErrorProvider: public :ref:`axl::err::ErrorProvider<doxid-classaxl_1_1err_1_1_error_provider>`
+	{
+	public:
+		// methods
+	
+		static
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getErrorDescription<doxid-classaxl_1_1io_1_1_usb_error_provider_1a97d17fad7e7bdcdf6fe7ca4ee76ed791>`(int code);
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getErrorDescription<doxid-classaxl_1_1io_1_1_usb_error_provider_1a58a51ddfdd6c87f984e68106ea530bb3>`(const :ref:`err::ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:ref:`getErrorDescription<doxid-classaxl_1_1err_1_1_error_provider_1ab5b93bdd78d1dac4be43abbed2bd7adf>`(const :ref:`ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error) = 0;
+

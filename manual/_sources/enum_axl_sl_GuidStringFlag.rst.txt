@@ -1,0 +1,19 @@
+.. index:: pair: enum; GuidStringFlag
+.. _doxid-namespaceaxl_1_1sl_1a16e350d5159557219d6561c22ea68740:
+
+enum axl::sl::GuidStringFlag
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Guid.h>
+
+	enum GuidStringFlag
+	{
+	    :target:`GuidStringFlag_UpperCase<doxid-namespaceaxl_1_1sl_1a16e350d5159557219d6561c22ea68740a5bf4a8b49e675cabbce9f2b4ce71314e>`   = 0x01,
+	    :target:`GuidStringFlag_CurlyBraces<doxid-namespaceaxl_1_1sl_1a16e350d5159557219d6561c22ea68740ab4f2787a690329f3e9e1beae7f08508c>` = 0x02,
+	};
+

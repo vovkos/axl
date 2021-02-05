@@ -1,0 +1,38 @@
+.. index:: pair: struct; axl::fsm::NfaStateSet
+.. _doxid-structaxl_1_1fsm_1_1_nfa_state_set:
+
+struct axl::fsm::NfaStateSet
+============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_fsm_Nfa.h>
+	
+	struct NfaStateSet
+	{
+		// fields
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`NfaState<doxid-structaxl_1_1fsm_1_1_nfa_state>`*> :target:`m_stateArray<doxid-structaxl_1_1fsm_1_1_nfa_state_set_1a542df0efaac7cb4565de363990543d71>`;
+		:ref:`sl::BitMap<doxid-classaxl_1_1sl_1_1_bit_map>` :target:`m_stateSet<doxid-structaxl_1_1fsm_1_1_nfa_state_set_1af56000952118c17c70b25ef1c4c9b497>`;
+
+		// methods
+	
+		bool
+		:target:`addState<doxid-structaxl_1_1fsm_1_1_nfa_state_set_1acf6dd9ee5ad4a3abea4314e514b2befe>`(:ref:`NfaState<doxid-structaxl_1_1fsm_1_1_nfa_state>`* state);
+	
+		int
+		:target:`cmp<doxid-structaxl_1_1fsm_1_1_nfa_state_set_1a85f1212f9fe5ca17a6ddcf6f2e9045fe>`(const NfaStateSet& set) const;
+	
+		bool
+		:target:`isEqual<doxid-structaxl_1_1fsm_1_1_nfa_state_set_1a00d2fe9b4775f18e607965748970371a>`(const NfaStateSet& set) const;
+	
+		size_t
+		:target:`hash<doxid-structaxl_1_1fsm_1_1_nfa_state_set_1a079b0c5c88a8acd169172580bb723366>`() const;
+	};

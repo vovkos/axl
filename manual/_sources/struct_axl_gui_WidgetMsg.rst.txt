@@ -1,0 +1,28 @@
+.. index:: pair: struct; axl::gui::WidgetMsg
+.. _doxid-structaxl_1_1gui_1_1_widget_msg:
+
+struct axl::gui::WidgetMsg
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	struct WidgetMsg
+	{
+		// fields
+	
+		:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` :target:`m_msgCode<doxid-structaxl_1_1gui_1_1_widget_msg_1a53c70210a5ed27e06bbd68bcda502bf0>`;
+
+		// construction
+	
+		:target:`WidgetMsg<doxid-structaxl_1_1gui_1_1_widget_msg_1adb80e4b7cc1e6044fe5e62d8140b7bca>`();
+		:target:`WidgetMsg<doxid-structaxl_1_1gui_1_1_widget_msg_1a15a609deee4f16edd69804131f6fbd42>`(:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` msgCode);
+	};

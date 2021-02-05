@@ -1,0 +1,89 @@
+.. index:: pair: class; axl::enc::CodePointDecoder
+.. _doxid-classaxl_1_1enc_1_1_code_point_decoder:
+
+class axl::enc::CodePointDecoder
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_CharCodec.h>
+	
+	class CodePointDecoder
+	{
+	public:
+		// fields
+	
+		char :target:`m_accumulator<doxid-classaxl_1_1enc_1_1_code_point_decoder_1afe5014b3fc5f27cac8dd34fba2c5f1a6>`[4];
+		uint32_t :target:`m_accumulator_i32<doxid-classaxl_1_1enc_1_1_code_point_decoder_1abdc25628411992d5f6a3e47fd4159c51>`;
+
+		// construction
+	
+		:target:`CodePointDecoder<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a8567c3f044977ca35d724aa991db59b0>`(
+			:ref:`CharCodecKind<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670e>` codecKind = :ref:`CharCodecKind_Utf8<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670ead06da24e1f2e04695ee424adce192b50>`,
+			uint32_t state = 0
+			);
+
+		// methods
+	
+		:ref:`CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`*
+		:target:`getCharCodec<doxid-classaxl_1_1enc_1_1_code_point_decoder_1aff51f424a7152853a039c8343badcd4c>`();
+	
+		size_t
+		:target:`getAccumulatorCount<doxid-classaxl_1_1enc_1_1_code_point_decoder_1ac9ab8a0a390471278904dca26f0ef1cd>`();
+	
+		const char*
+		:target:`getAccumulator<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a34da8d3e188a11b6a2b7977d5d8d0276>`();
+	
+		uint32_t
+		:target:`getAccumulator_i32<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a6d917a9b89a49db500473f217a133b6b>`();
+	
+		void
+		:target:`setup<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a7b753fe6bd2f7146563f0181cc3f7beb>`(
+			:ref:`CharCodecKind<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670e>` codecKind,
+			uint32_t state = 0
+			);
+	
+		void
+		:target:`setup<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a7465cc34c4eae7061f559e0e04a487a4>`(
+			:ref:`CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`* codec,
+			uint32_t state = 0
+			);
+	
+		void
+		:target:`clear<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a1ed442adbd5caa1078ca1bc212a90ab8>`();
+	
+		void
+		:target:`resetAccumulator<doxid-classaxl_1_1enc_1_1_code_point_decoder_1ac7a2b5203e10cc60e2f7f0cda532c046>`();
+	
+		void
+		:target:`loadState<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a547e648dcc5a1aaba7b2940c14eed22d>`(uint32_t state);
+	
+		uint32_t
+		:target:`saveState<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a04f9d340cc39b8cde94177db7cf84ec9>`();
+	
+		size_t
+		:target:`decode<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a046ce59ec3584f42765016e0ad5a304f>`(
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`* buffer,
+			size_t bufferLength,
+			const void* p,
+			size_t size,
+			size_t* takenSize
+			);
+	
+		size_t
+		:target:`decode<doxid-classaxl_1_1enc_1_1_code_point_decoder_1a57bea2d0da586fdd08e08f8f5a2ad251>`(
+			:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>`* cplBuffer,
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`* textBuffer,
+			size_t bufferLength,
+			const void* p,
+			size_t size,
+			size_t* takenSize
+			);
+	};

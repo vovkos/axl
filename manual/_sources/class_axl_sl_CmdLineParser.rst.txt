@@ -1,0 +1,60 @@
+.. index:: pair: class; axl::sl::CmdLineParser
+.. _doxid-classaxl_1_1sl_1_1_cmd_line_parser:
+
+template class axl::sl::CmdLineParser
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_CmdLineParser.h>
+	
+	template <
+		typename T,
+		typename SwitchTable
+		>
+	class CmdLineParser: private :ref:`axl::sl::CmdLineParserRoot<doxid-classaxl_1_1sl_1_1_cmd_line_parser_root>`
+	{
+	public:
+		// typedefs
+	
+		typedef SwitchTable::SwitchKind :target:`SwitchKind<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1a8284d4f9d9da8b68decae3eb8a8e6adf>`;
+
+		// methods
+	
+		bool
+		:target:`parse<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1aba90998b087ade40caf860857c7b336f>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& cmdLine0);
+	
+		bool
+		:target:`parse<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1ae0ae48926e07b5ef0909450bdf5d262f>`(
+			int argc,
+			const char*const* argv
+			);
+	
+		bool
+		:target:`parse<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1a51d8e31e4742ec6ff7fdc27c26f5a262>`(
+			int argc,
+			const wchar_t*const* argv
+			);
+	
+		bool
+		:target:`onValue0<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1ad869bbe705a95e5e9c02c35882d96915>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& value);
+	
+		bool
+		:target:`onValue<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1a68c5494fccf3af06cd321332a4229473>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& value);
+	
+		bool
+		:target:`onSwitch<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1adf284c9874c2059bc78bdfc45ed4a425>`(
+			:ref:`SwitchKind<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1a8284d4f9d9da8b68decae3eb8a8e6adf>` switchKind,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& value
+			);
+	
+		bool
+		:target:`finalize<doxid-classaxl_1_1sl_1_1_cmd_line_parser_1a9e1724602504288d5bd12929d6f9f26b>`();
+	};

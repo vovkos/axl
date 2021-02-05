@@ -1,0 +1,22 @@
+.. index:: pair: enum; SerialParity
+.. _doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3:
+
+enum axl::io::SerialParity
+==========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SerialSettings.h>
+
+	enum SerialParity
+	{
+	    :target:`SerialParity_None<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3a2e614494f42620b3aac82d6002bb7549>`  = 0,
+	    :target:`SerialParity_Odd<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3af2e363749a77e3a1fc6eaedd78f2da23>`   = 1,
+	    :target:`SerialParity_Even<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3a1d4b4c6a2bc56081eab9aa94ed7d2a64>`  = 2,
+	    :target:`SerialParity_Mark<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3a337d08ae115894b9ccc1d134696a3cd7>`  = 3,
+	    :target:`SerialParity_Space<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3a53675774cf64492441bc0c9d7605925e>` = 4,
+	};
+

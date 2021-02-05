@@ -1,0 +1,78 @@
+.. index:: pair: class; axl::sl::BmhFind
+.. _doxid-classaxl_1_1sl_1_1_bmh_find:
+
+class axl::sl::BmhFind
+======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BmhFind.h>
+	
+	class BmhFind
+	{
+	public:
+		// construction
+	
+		:target:`BmhFind<doxid-classaxl_1_1sl_1_1_bmh_find_1ae734b21decaf24325c80d083ac726749>`();
+
+		// methods
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_bmh_find_1a428a231005d8740358336bf38c1c6f3e>`();
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1sl_1_1_bmh_find_1a634d60d5ffabae3bd11e1b7bfa8e20d9>`();
+	
+		size_t
+		:target:`getPatternSize<doxid-classaxl_1_1sl_1_1_bmh_find_1a6f32b29d51af2b19292c60b9a35725ec>`();
+	
+		const void*
+		:target:`getPattern<doxid-classaxl_1_1sl_1_1_bmh_find_1ac5a690d922cfd1f88af939a7f9817824>`();
+	
+		bool
+		:target:`setPattern<doxid-classaxl_1_1sl_1_1_bmh_find_1ae9f4b445b7daba9d3c5e1072c2039633>`(
+			const void* p,
+			size_t size,
+			bool doMatchCase = true
+			);
+	
+		size_t
+		:target:`find<doxid-classaxl_1_1sl_1_1_bmh_find_1a26e14ca4cdbbf08a62100b9cfa0d381a>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`reverseFind<doxid-classaxl_1_1sl_1_1_bmh_find_1aabddce93d38e39b3db53fe9450e0f77a>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`incrementalFind<doxid-classaxl_1_1sl_1_1_bmh_find_1aca589a6c2cc82948e2d3f96861e29108>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`reverseIncrementalFind<doxid-classaxl_1_1sl_1_1_bmh_find_1a3149ae19a3f03b56c83ea2adbd34d9c2>`(
+			const void* p,
+			size_t size
+			);
+	
+		void
+		:target:`resetIncrementalFind<doxid-classaxl_1_1sl_1_1_bmh_find_1a209439a9222368d98422619a7c2b3b7e>`(size_t incFindOffset = 0);
+	
+		size_t
+		:target:`getIncrementalFindOffset<doxid-classaxl_1_1sl_1_1_bmh_find_1abb9f91a3daf44ab76ae5f845e018bf60>`();
+	
+		size_t
+		:target:`getIncrementalFindTailSize<doxid-classaxl_1_1sl_1_1_bmh_find_1a9f799aa3434b487571708f0f69764878>`();
+	};

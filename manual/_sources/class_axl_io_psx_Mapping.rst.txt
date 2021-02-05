@@ -1,0 +1,57 @@
+.. index:: pair: class; axl::io::psx::Mapping
+.. _doxid-classaxl_1_1io_1_1psx_1_1_mapping:
+
+class axl::io::psx::Mapping
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_psx_Mapping.h>
+	
+	class Mapping
+	{
+	public:
+		// construction
+	
+		:target:`Mapping<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a8347961ee4a2dc6ab271e9ea8a9f9406>`();
+		:target:`~Mapping<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a4566f75b2e970f2462a2752cffe2fb56>`();
+
+		// methods
+	
+		:target:`operator void *<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1af25b6c65804d9c0eb94e2f8d4b761cd2>`() const;
+	
+		void*
+		:target:`p<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a88f16266620547d9f4d548fc5181b427>`() const;
+	
+		size_t
+		:target:`getSize<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a5f822dc31f872be16938477f6acc089e>`();
+	
+		bool
+		:target:`isOpen<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a47507301b0d0e63d248dd32a324f5e79>`() const;
+	
+		void
+		:target:`close<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a03ce4697a651c6bfc56f9d6e10a21169>`();
+	
+		void*
+		:target:`map<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a1560cf44914d32b16ce14468276c588a>`(
+			void* addrHint,
+			size_t size,
+			int protection,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags,
+			int fd,
+			size_t offset = 0
+			);
+	
+		bool
+		:target:`protect<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1a0250204cc0508ea6df126facca56cfe5>`(int protection);
+	
+		void
+		:target:`unmap<doxid-classaxl_1_1io_1_1psx_1_1_mapping_1ae8bbc960025fdaf29dfb17308e02ac5e>`(size_t size);
+	};

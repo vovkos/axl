@@ -1,0 +1,38 @@
+.. index:: pair: class; axl::sl::Pack<const char*>
+.. _doxid-classaxl_1_1sl_1_1_pack_3_01const_01char_01_5_01_4:
+
+template class axl::sl::Pack<const char*>
+=========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Pack.h>
+	
+	template <>
+	class Pack<const char*>: public :ref:`axl::sl::PackStringBase<doxid-classaxl_1_1sl_1_1_pack_string_base>`
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`axl_va_list<doxid-classaxl__va__list>`
+		:ref:`operator()<doxid-classaxl_1_1sl_1_1_pack_string_base_1ae992e4ffc62a592e908955223c656a0a>`(
+			void* p,
+			size_t* size,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+

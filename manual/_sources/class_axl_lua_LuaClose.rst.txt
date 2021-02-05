@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::lua::LuaClose
+.. _doxid-classaxl_1_1lua_1_1_lua_close:
+
+class axl::lua::LuaClose
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lua_LuaState.h>
+	
+	class LuaClose
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1lua_1_1_lua_close_1a46a9a8a55512f91be7a21e0e01432732>`(lua_State* lua);
+	};

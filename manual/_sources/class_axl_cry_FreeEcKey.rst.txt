@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreeEcKey
+.. _doxid-classaxl_1_1cry_1_1_free_ec_key:
+
+class axl::cry::FreeEcKey
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_EcKey.h>
+	
+	class FreeEcKey
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_ec_key_1a2d3329fe86b316548b9db9c9412c0724>`(EC_KEY* h);
+	};

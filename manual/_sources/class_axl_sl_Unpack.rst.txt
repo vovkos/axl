@@ -1,0 +1,38 @@
+.. index:: pair: class; axl::sl::Unpack<err::ErrorHdr*>
+.. _doxid-classaxl_1_1sl_1_1_unpack_3_01err_1_1_error_hdr_01_5_01_4:
+
+template class axl::sl::Unpack<err::ErrorHdr*>
+==============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Unpacker.h>
+	
+	template <>
+	class Unpack<err::ErrorHdr*>: public :ref:`axl::sl::UnpackSelfSizedPtr<doxid-classaxl_1_1sl_1_1_unpack_self_sized_ptr>`
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		size_t
+		:ref:`operator()<doxid-classaxl_1_1sl_1_1_unpack_self_sized_ptr_1a09db2f4e54d1da10860e44116e9a9dad>`(
+			const void* p,
+			size_t size,
+			T** value
+			);
+

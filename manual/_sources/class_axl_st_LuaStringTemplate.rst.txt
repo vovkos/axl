@@ -1,0 +1,81 @@
+.. index:: pair: class; axl::st::LuaStringTemplate
+.. _doxid-classaxl_1_1st_1_1_lua_string_template:
+
+class axl::st::LuaStringTemplate
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_st_LuaStringTemplate.h>
+	
+	class LuaStringTemplate: public :ref:`axl::st::StringTemplate<doxid-classaxl_1_1st_1_1_string_template>`
+	{
+	public:
+		// fields
+	
+		:ref:`lua::LuaState<doxid-classaxl_1_1lua_1_1_lua_state>` :target:`m_luaState<doxid-classaxl_1_1st_1_1_lua_string_template_1a54bf7dd0a49ad3606c6bf58c2a0f2a91>`;
+
+		// construction
+	
+		:target:`LuaStringTemplate<doxid-classaxl_1_1st_1_1_lua_string_template_1a2373080e36b80ec8f52878af1e84f076>`();
+
+		// methods
+	
+		void
+		:target:`close<doxid-classaxl_1_1st_1_1_lua_string_template_1a04b485dbba95aa9b835d35670520af66>`();
+	
+		bool
+		:target:`create<doxid-classaxl_1_1st_1_1_lua_string_template_1a0231f4b23aa333a025402b30fd39f771>`();
+	
+		size_t
+		:target:`getArgCount<doxid-classaxl_1_1st_1_1_lua_string_template_1a0ae7a19053bf4066a614b1207a1a6154>`();
+	
+		bool
+		:target:`setArgCount<doxid-classaxl_1_1st_1_1_lua_string_template_1a27e0698cf21b857c5f9915772a785256>`(size_t count);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// structs
+	
+		struct :ref:`EmitContext<doxid-structaxl_1_1st_1_1_string_template_1_1_emit_context>`;
+
+		// methods
+	
+		void
+		:ref:`clear<doxid-classaxl_1_1st_1_1_string_template_1a6cc24f6b779dcafc4c97d3727a37e046>`();
+	
+		bool
+		:ref:`process<doxid-classaxl_1_1st_1_1_string_template_1a0952cf5fd5cc145dccd80e2e685077e4>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* output,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& frame
+			);
+	
+		bool
+		:ref:`processFile<doxid-classaxl_1_1st_1_1_string_template_1af046500fe641ca27af7fe68775cf9d87>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* output,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName
+			);
+	
+		bool
+		:ref:`processFileToFile<doxid-classaxl_1_1st_1_1_string_template_1abe4a452a84976710deb18c5e473cc0c7>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& targetFileName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& frameFileName
+			);
+	
+		bool
+		:ref:`append<doxid-classaxl_1_1st_1_1_string_template_1a4904a2d10d905e7739ba634fdf753abe>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+

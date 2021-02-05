@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::Min
+.. _doxid-classaxl_1_1sl_1_1_min:
+
+template class axl::sl::Min
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class Min
+	{
+	public:
+		// methods
+	
+		T
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_min_1a5774a88b3ce779e717f365954774e137>`(
+			Arg a,
+			Arg b
+			) const;
+	};

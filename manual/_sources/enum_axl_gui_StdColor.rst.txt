@@ -1,0 +1,54 @@
+.. index:: pair: enum; StdColor
+.. _doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7c:
+
+enum axl::gui::StdColor
+=======================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Color.h>
+
+	enum StdColor
+	{
+	    :target:`StdColor_AnsiBlack<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cafe5104b90aca725a70066f29e37c6609>`         = 0x000000,
+	    :target:`StdColor_AnsiRed<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca8884cfb2a8c794d1de9bb652678566dd>`           = 0xbb0000,
+	    :target:`StdColor_AnsiGreen<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca7c87dc7175d4bfd6f6dfe1b063025f1d>`         = 0x00bb00,
+	    :target:`StdColor_AnsiYellow<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca435fef4225b701e7994595477e6e23b5>`        = 0xbbbb00,
+	    :target:`StdColor_AnsiBlue<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cac1905550973df64d5448428ae16d3acc>`          = 0x0000bb,
+	    :target:`StdColor_AnsiMagenta<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca089c3f2bf45467d3ca8795d765c04dc9>`       = 0xbb00bb,
+	    :target:`StdColor_AnsiCyan<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca930c0754239e1f2780040dd1e83990f0>`          = 0x00bbbb,
+	    :target:`StdColor_AnsiWhite<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca214e5e41e1d6e6fbe100bfb073e2941a>`         = 0xbbbbbb,
+	    :target:`StdColor_AnsiBrightBlack<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca319aa3f44a0b8c992a7c54d16611fd5f>`   = 0x555555,
+	    :target:`StdColor_AnsiBrightRed<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca4ceaf40ab96c0c81650360bd18729f5a>`     = 0xff5555,
+	    :target:`StdColor_AnsiBrightGreen<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca11823f1d9fa09a7f15a3c101cdb462fa>`   = 0x55ff55,
+	    :target:`StdColor_AnsiBrightYellow<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca59d2e24ea47741ea1670eb6596eb3e2e>`  = 0xffff55,
+	    :target:`StdColor_AnsiBrightBlue<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7caaced95fdafab4ff3dc1208609d60fd54>`    = 0x5555ff,
+	    :target:`StdColor_AnsiBrightMagenta<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca9d77c7cf5b975628d5e246657784c5bf>` = 0xff55ff,
+	    :target:`StdColor_AnsiBrightCyan<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cae9d5c55328687a7b3861d9dffb7cd745>`    = 0x55ffff,
+	    :target:`StdColor_AnsiBrightWhite<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cafbe61bd5b26bdd1695628c1168668c9f>`   = 0xffffff,
+	    :target:`StdColor_Black<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cae3c3cb055d58cc13f5141f07337000f6>`             = 0x000000,
+	    :target:`StdColor_White<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca162d1d8e553e1c37540476ff31509530>`             = 0xffffff,
+	    :target:`StdColor_Gray<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca2b82cb271dfb694b81246104032c5567>`              = 0x808080,
+	    :target:`StdColor_Red<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca65369ef2f1c645852930ed086e9053bf>`               = 0x800000,
+	    :target:`StdColor_Green<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cafe77e30fcd4bb97e4ed9a6e9e979abba>`             = 0x008000,
+	    :target:`StdColor_Blue<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca82b281b7c6fb4b6b78f783e76546b724>`              = 0x000080,
+	    :target:`StdColor_Purple<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca83a15195997ef71c926b1844646b035b>`            = 0x800080,
+	    :target:`StdColor_Cyan<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca2780aa679cf4e74865c08fa3a4007287>`              = 0x008080,
+	    :target:`StdColor_LightRed<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7caa0136f5899f1ba37b6211b318f3a9102>`          = 0xff0000,
+	    :target:`StdColor_LightGreen<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cab9cdd4d3dfcc76c609d5052e35810512>`        = 0x00ff00,
+	    :target:`StdColor_LightBlue<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cabb430eaa70224df2a227da1eb8692d1e>`         = 0x0000ff,
+	    :target:`StdColor_LightPurple<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca42cf8c490505974b0ded0de780be4b96>`       = 0xff00ff,
+	    :target:`StdColor_LightCyan<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cae334d723ac201a4b46879ad80518e3e9>`         = 0x00ffff,
+	    :target:`StdColor_PastelGray<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca804360a9f85129ce3dc387be0cfbc3d7>`        = 0xefefef,
+	    :target:`StdColor_PastelRed<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca1a5acdaa1d7d98dbd0ed588aa30e9a5b>`         = 0xffe4e1,
+	    :target:`StdColor_PastelOrange<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cabee15f172dee93b7eb5ed5cf5b2aec29>`      = 0xfffacd,
+	    :target:`StdColor_PastelYellow<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7caf514e2609a532fcac8dd777e1af22428>`      = 0xffffc0,
+	    :target:`StdColor_PastelGreen<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca5afff1d8d50a951192a1bdddd681b4dc>`       = 0xe1fada,
+	    :target:`StdColor_PastelCyan<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca93e6bbb514af43b0b059ab190a169413>`        = 0xcdfaff,
+	    :target:`StdColor_PastelBlue<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7ca32330f6854323072217ef9b14e8bb2d8>`        = 0xe2edff,
+	    :target:`StdColor_PastelPurple<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7cacf9f115ddc23e6b9a412d646eed3679a>`      = 0xe2dafd,
+	};
+

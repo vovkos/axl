@@ -1,0 +1,27 @@
+.. index:: pair: class; axl::enc::HexEncoding::InsertNoSpace
+.. _doxid-classaxl_1_1enc_1_1_hex_encoding_1_1_insert_no_space:
+
+class axl::enc::HexEncoding::InsertNoSpace
+==========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	class InsertNoSpace
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1enc_1_1_hex_encoding_1_1_insert_no_space_1aae1063c26f466bee52c6008c6609ec42>`(
+			char* p,
+			size_t i
+			);
+	};

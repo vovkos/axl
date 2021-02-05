@@ -1,0 +1,34 @@
+.. index:: pair: struct; axl::zip::ZipFileInfo
+.. _doxid-structaxl_1_1zip_1_1_zip_file_info:
+
+struct axl::zip::ZipFileInfo
+============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_zip_ZipReader.h>
+	
+	struct ZipFileInfo
+	{
+		// fields
+	
+		uint32_t :target:`m_centralDirOffset<doxid-structaxl_1_1zip_1_1_zip_file_info_1a6c57cc109fb94d25bcedcc4df183f075>`;
+		uint16_t :target:`m_versionMadeBy<doxid-structaxl_1_1zip_1_1_zip_file_info_1a413875fdf42937ab9d897e3ad4dd4bc7>`;
+		uint16_t :target:`m_versionNeeded<doxid-structaxl_1_1zip_1_1_zip_file_info_1a83a0f6de764ab731812859209cbb7111>`;
+		uint16_t :target:`m_bitFlags<doxid-structaxl_1_1zip_1_1_zip_file_info_1a78cb19c9b58499c38bfe17a7b1ed1c29>`;
+		uint16_t :target:`m_method<doxid-structaxl_1_1zip_1_1_zip_file_info_1acafb36b0cf9fbfd2a36d440785a1f839>`;
+		uint64_t :target:`m_timestamp<doxid-structaxl_1_1zip_1_1_zip_file_info_1aca0f4fc7cf175c94fd266dc891dcb3a0>`;
+		uint32_t :target:`m_crc32<doxid-structaxl_1_1zip_1_1_zip_file_info_1ab6a8d359690cefe777ab016713e6e463>`;
+		uint64_t :target:`m_compressedSize<doxid-structaxl_1_1zip_1_1_zip_file_info_1aa8f1355074cf6b2fd94da21d969b8817>`;
+		uint64_t :target:`m_uncompressedSize<doxid-structaxl_1_1zip_1_1_zip_file_info_1a6b0c199a209650fddbca46edd80d8483>`;
+		uint16_t :target:`m_internalAttr<doxid-structaxl_1_1zip_1_1_zip_file_info_1afdf11d40a20e060733e28b7f7bb6e260>`;
+		uint32_t :target:`m_externalAttr<doxid-structaxl_1_1zip_1_1_zip_file_info_1a4960d0846d1c34e0468ac9ea99cc53df>`;
+		uint64_t :target:`m_localHeaderOffset<doxid-structaxl_1_1zip_1_1_zip_file_info_1abf514671284f87a0f6792541ceefbbde>`;
+	};

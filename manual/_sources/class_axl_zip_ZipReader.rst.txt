@@ -1,0 +1,83 @@
+.. index:: pair: class; axl::zip::ZipReader
+.. _doxid-classaxl_1_1zip_1_1_zip_reader:
+
+class axl::zip::ZipReader
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_zip_ZipReader.h>
+	
+	class ZipReader
+	{
+	public:
+		// construction
+	
+		:target:`ZipReader<doxid-classaxl_1_1zip_1_1_zip_reader_1a827511cad12062e97ad54c50f08b6fc9>`();
+		:target:`~ZipReader<doxid-classaxl_1_1zip_1_1_zip_reader_1a8f25867e4cce418cfa45868515e1b0cb>`();
+
+		// methods
+	
+		bool
+		:target:`isOpen<doxid-classaxl_1_1zip_1_1_zip_reader_1aea46fa1d31c2744c7076a75290a3aa60>`();
+	
+		void
+		:target:`close<doxid-classaxl_1_1zip_1_1_zip_reader_1a09ccbe967e269db78c6b832263cd87e7>`();
+	
+		bool
+		:target:`openFile<doxid-classaxl_1_1zip_1_1_zip_reader_1af9135842da7bc398a1e79d3802c6ff75>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+	
+		bool
+		:target:`openMem<doxid-classaxl_1_1zip_1_1_zip_reader_1adb718db5abb58ae250727753917626b9>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`getFileCount<doxid-classaxl_1_1zip_1_1_zip_reader_1ab628b54180ce993aef6d2dd95b78da54>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getFileName<doxid-classaxl_1_1zip_1_1_zip_reader_1a6711da65b1e862b7fe84a34234c498b7>`(size_t index);
+	
+		bool
+		:target:`getFileInfo<doxid-classaxl_1_1zip_1_1_zip_reader_1acf1017c9e96ef1fe7030ff8e95c7da81>`(
+			size_t index,
+			:ref:`ZipFileInfo<doxid-structaxl_1_1zip_1_1_zip_file_info>`* fileInfo,
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* comment = NULL
+			);
+	
+		bool
+		:target:`isDirectoryFile<doxid-classaxl_1_1zip_1_1_zip_reader_1acdc9b4648aa53026b46b3728125a566d>`(size_t index);
+	
+		bool
+		:target:`isFileEncrypted<doxid-classaxl_1_1zip_1_1_zip_reader_1a4af654f97d2b26e603f7f754af8c574e>`(size_t index);
+	
+		bool
+		:target:`extractFileToMem<doxid-classaxl_1_1zip_1_1_zip_reader_1a3a0ae015a0a3d892fba33d180847f212>`(
+			size_t index,
+			void* p,
+			size_t size
+			);
+	
+		bool
+		:target:`extractFileToMem<doxid-classaxl_1_1zip_1_1_zip_reader_1a8e52304529a58b6a5af5b728a5ac7b47>`(
+			size_t index,
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer
+			);
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`extractFileToMem<doxid-classaxl_1_1zip_1_1_zip_reader_1a218f7c384976c30d316d3b328f27afd1>`(size_t index);
+	
+		bool
+		:target:`extractFileToFile<doxid-classaxl_1_1zip_1_1_zip_reader_1af00c9aa27a556410377032eb61678c9b>`(
+			size_t index,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName
+			);
+	};

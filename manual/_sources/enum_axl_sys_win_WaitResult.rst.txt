@@ -1,0 +1,21 @@
+.. index:: pair: enum; WaitResult
+.. _doxid-namespaceaxl_1_1sys_1_1win_1a5228e60d504126e6486748ac545c55d8:
+
+enum axl::sys::win::WaitResult
+==============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_WaitableHandle.h>
+
+	enum WaitResult
+	{
+	    :target:`WaitResult_Fail<doxid-namespaceaxl_1_1sys_1_1win_1a5228e60d504126e6486748ac545c55d8ab0e8a7e516cb27e77ef051c7d92bc868>`         = -1,
+	    :target:`WaitResult_Timeout<doxid-namespaceaxl_1_1sys_1_1win_1a5228e60d504126e6486748ac545c55d8a428b938b5c10cb6b049ef73ace519e37>`      = -2,
+	    :target:`WaitResult_Object0<doxid-namespaceaxl_1_1sys_1_1win_1a5228e60d504126e6486748ac545c55d8ae052ce02fc9a805080d6ea772cd9df21>`      = 0,
+	    :target:`WaitResult_IoCompletion<doxid-namespaceaxl_1_1sys_1_1win_1a5228e60d504126e6486748ac545c55d8ada64824bc7d40acbbb975511162c13e2>` = 0x100,
+	};
+

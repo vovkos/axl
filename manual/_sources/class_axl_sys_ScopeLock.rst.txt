@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::ScopeLock
+.. _doxid-classaxl_1_1sys_1_1_scope_lock:
+
+class axl::sys::ScopeLock
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_Lock.h>
+	
+	class ScopeLock
+	{
+	public:
+		// construction
+	
+		:target:`ScopeLock<doxid-classaxl_1_1sys_1_1_scope_lock_1ada07c3b90929516bc864e9dca2c905fb>`(Lock* lock);
+		:target:`~ScopeLock<doxid-classaxl_1_1sys_1_1_scope_lock_1af4c254cc0a562dde698ccef596686598>`();
+	};

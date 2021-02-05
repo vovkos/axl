@@ -1,0 +1,198 @@
+.. index:: pair: class; axl::io::UsbDevice
+.. _doxid-classaxl_1_1io_1_1_usb_device:
+
+class axl::io::UsbDevice
+========================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_io_UsbDevice_Def.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_UsbDevice.h>
+	
+	class UsbDevice
+	{
+	public:
+		// enums
+	
+		enum :ref:`Def<doxid-classaxl_1_1io_1_1_usb_device_1a5dfffbeccaa6840426133321ff43f2fb>`;
+
+		// construction
+	
+		:target:`UsbDevice<doxid-classaxl_1_1io_1_1_usb_device_1a24d25a9934b87a9038fda9b0ffac7014>`();
+		:target:`~UsbDevice<doxid-classaxl_1_1io_1_1_usb_device_1a3f688b2ed9e18c196a90ba13b9556453>`();
+
+		// methods
+	
+		libusb_device*
+		:target:`getDevice<doxid-classaxl_1_1io_1_1_usb_device_1a753ac7403e1d35b50718338c46426bee>`();
+	
+		libusb_device_handle*
+		:target:`getOpenHandle<doxid-classaxl_1_1io_1_1_usb_device_1a9a2ad397d07821e13bfa16f24a5fead3>`();
+	
+		bool
+		:target:`isOpen<doxid-classaxl_1_1io_1_1_usb_device_1a67ce5651bed8596e11feeeb5ebb3eefe>`();
+	
+		uint8_t
+		:target:`getDeviceAddress<doxid-classaxl_1_1io_1_1_usb_device_1a09e832443c0cdcc5aa99a63e251876a1>`();
+	
+		uint8_t
+		:target:`getBusNumber<doxid-classaxl_1_1io_1_1_usb_device_1a4b4eb07b55e511c2452de1b8a3164038>`();
+	
+		libusb_speed
+		:target:`getDeviceSpeed<doxid-classaxl_1_1io_1_1_usb_device_1ab3a10c84fec1b7f310f39a6fb33fddba>`();
+	
+		size_t
+		:target:`getMaxPacketSize<doxid-classaxl_1_1io_1_1_usb_device_1ac71bec0aad5a7b90513038024fb13bcb>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` endpointId);
+	
+		size_t
+		:target:`getMaxIsoPacketSize<doxid-classaxl_1_1io_1_1_usb_device_1a99f8d6387a139f7bfa6569abff42c60d>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` endpointId);
+	
+		void
+		:target:`refDevice<doxid-classaxl_1_1io_1_1_usb_device_1a8a801ee242ac232230f388bef20c2562>`();
+	
+		void
+		:target:`unrefDevice<doxid-classaxl_1_1io_1_1_usb_device_1ae699d9f47808619f7f8195fe31d26964>`();
+	
+		void
+		:target:`setDevice<doxid-classaxl_1_1io_1_1_usb_device_1af08b516b139123c78856214bf5aa4d4a>`(libusb_device* device);
+	
+		void
+		:target:`close<doxid-classaxl_1_1io_1_1_usb_device_1ae4da53cfd8424cb63b829ce60f2cde93>`();
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1_usb_device_1a662e25ae5a888eb7860676abcf7dc231>`();
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1_usb_device_1a166bda885afe7d8ace54cb6f4f2fbd0c>`(libusb_device* device);
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1_usb_device_1a0ff79e6458bae23ae7d098ee52c87358>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` vendorId,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` productId
+			);
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1_usb_device_1ac9c7da6404122f25123343c515671df1>`(
+			libusb_context* context,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` vendorId,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` productId
+			);
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+		:target:`getConfiguration<doxid-classaxl_1_1io_1_1_usb_device_1a03c683509acb08de4f26baff060d9df6>`();
+	
+		bool
+		:target:`setConfiguration<doxid-classaxl_1_1io_1_1_usb_device_1aaa163d30e2add2c5c6f4f5264a52dacb>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` configurationId);
+	
+		bool
+		:target:`claimInterface<doxid-classaxl_1_1io_1_1_usb_device_1a36614d9d047a8b26dbe9521a71b74053>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` ifaceId);
+	
+		bool
+		:target:`releaseInterface<doxid-classaxl_1_1io_1_1_usb_device_1a1b39391355f637d3acfeb716b24ce23c>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` ifaceId);
+	
+		bool
+		:target:`setInterfaceAltSetting<doxid-classaxl_1_1io_1_1_usb_device_1aeff911389e6a5185148d42e38b11714d>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` ifaceId,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` altSettingId
+			);
+	
+		bool
+		:target:`clearHalt<doxid-classaxl_1_1io_1_1_usb_device_1aad824746fadb4e1cd2640b37bb2037e2>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` endpointId);
+	
+		bool
+		:target:`resetDevice<doxid-classaxl_1_1io_1_1_usb_device_1acebf8ce4e8098dfd37b1dc204ae94c0d>`();
+	
+		bool
+		:target:`isKernelDriverActive<doxid-classaxl_1_1io_1_1_usb_device_1a6a48029793f8b83e5116977586bc9ece>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` ifaceId);
+	
+		bool
+		:target:`attachKernelDriver<doxid-classaxl_1_1io_1_1_usb_device_1a17b27100843d6dea50b86d4c7553da33>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` ifaceId);
+	
+		bool
+		:target:`detachKernelDriver<doxid-classaxl_1_1io_1_1_usb_device_1a106cdd7377ac43db5b5cb6d27c1365fd>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` ifaceId);
+	
+		bool
+		:target:`setAutoDetachKernelDriver<doxid-classaxl_1_1io_1_1_usb_device_1a72de15b18d07ed7d0b60e2e3417f2e2e>`(bool isAutoDetach);
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`getDescriptor<doxid-classaxl_1_1io_1_1_usb_device_1a66769fc863b88aa058ba645f9831e1fa>`(
+			libusb_descriptor_type descriptorType,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` descriptorId
+			);
+	
+		bool
+		:target:`getDescriptor<doxid-classaxl_1_1io_1_1_usb_device_1a1d25d29163c00d4d4a794670bec27dd5>`(
+			libusb_descriptor_type descriptorType,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` descriptorId,
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* descriptor
+			);
+	
+		bool
+		:target:`getDeviceDescriptor<doxid-classaxl_1_1io_1_1_usb_device_1a2ba0d78b4029156d7ec204e0ffae1d1b>`(libusb_device_descriptor* descriptor);
+	
+		bool
+		:target:`getConfigDescriptor<doxid-classaxl_1_1io_1_1_usb_device_1aceec4473845fdcccb9654c711e413d6c>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` configurationId,
+			:ref:`UsbConfigDescriptor<doxid-namespaceaxl_1_1io_1a011daccc763cf8e05587b001bc3c4f2b>`* desc
+			);
+	
+		bool
+		:target:`getActiveConfigDescriptor<doxid-classaxl_1_1io_1_1_usb_device_1a062f9d0dcddbd87bff0acdcfc97fb81a>`(:ref:`UsbConfigDescriptor<doxid-namespaceaxl_1_1io_1a011daccc763cf8e05587b001bc3c4f2b>`* desc);
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getStringDesrciptor<doxid-classaxl_1_1io_1_1_usb_device_1a4f9944d61d06ad7e9eb100cc3c19677a>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` stringId,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` langId
+			);
+	
+		bool
+		:target:`getStringDesrciptor<doxid-classaxl_1_1io_1_1_usb_device_1a446ec603827b48f5e884dec4be2edd25>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` stringId,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` langId,
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string
+			);
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getStringDesrciptor<doxid-classaxl_1_1io_1_1_usb_device_1a8eadef2cb8dd3feae2c6206d068534fd>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` stringId);
+	
+		bool
+		:target:`getStringDesrciptor<doxid-classaxl_1_1io_1_1_usb_device_1a91f6143ec0323bc177a019dac8af8a76>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` stringId,
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string
+			);
+	
+		size_t
+		:target:`controlTransfer<doxid-classaxl_1_1io_1_1_usb_device_1a15781d671b27864f136366e672fbd258>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` requestType,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` requestCode,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` value,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` index,
+			void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout = -1
+			);
+	
+		size_t
+		:target:`bulkTransfer<doxid-classaxl_1_1io_1_1_usb_device_1aaf10e892acf11cd0276c6b95ac3478c6>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` endpointId,
+			void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout = -1
+			);
+	
+		size_t
+		:target:`interruptTransfer<doxid-classaxl_1_1io_1_1_usb_device_1a9f14bd15a1795133ec4799ff085265a7>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` endpointId,
+			void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout = -1
+			);
+	};

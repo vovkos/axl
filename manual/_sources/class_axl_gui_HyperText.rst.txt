@@ -1,0 +1,113 @@
+.. index:: pair: class; axl::gui::HyperText
+.. _doxid-classaxl_1_1gui_1_1_hyper_text:
+
+class axl::gui::HyperText
+=========================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_gui_HyperText_HyperlinkXMapEntry.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_HyperText.h>
+	
+	class HyperText
+	{
+	public:
+		// structs
+	
+		struct :ref:`HyperlinkXMapEntry<doxid-structaxl_1_1gui_1_1_hyper_text_1_1_hyperlink_x_map_entry>`;
+
+		// construction
+	
+		:target:`HyperText<doxid-classaxl_1_1gui_1_1_hyper_text_1ab43622a04fb0b78feb26c41c14442453>`();
+		:target:`HyperText<doxid-classaxl_1_1gui_1_1_hyper_text_1ac048a880fea08d16480770a5845c65ae>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source);
+	
+		:target:`HyperText<doxid-classaxl_1_1gui_1_1_hyper_text_1ac0efe7e6467adcf4cf7d95c45aa27a49>`(
+			const :ref:`gui::TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& baseAttr,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source
+			);
+
+		// methods
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:target:`getSource<doxid-classaxl_1_1gui_1_1_hyper_text_1ad60b01a600cb3cc2a16873478eb0353b>`() const;
+	
+		const :ref:`sl::String_utf32<doxid-namespaceaxl_1_1sl_1a91fa57951585eea6694e64bc857471ec>`&
+		:target:`getText<doxid-classaxl_1_1gui_1_1_hyper_text_1a0e9ceb9d12a9ebb646699aac53e363ea>`() const;
+	
+		const :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`*
+		:target:`getAttrArray<doxid-classaxl_1_1gui_1_1_hyper_text_1afe0f1f7fb3e610d4f2ad3e7863cd9d82>`() const;
+	
+		void
+		:target:`clear<doxid-classaxl_1_1gui_1_1_hyper_text_1a61919ced1c06645db77e0f4db6f63c4d>`();
+	
+		size_t
+		:target:`setHyperText<doxid-classaxl_1_1gui_1_1_hyper_text_1a8f2c657ace56b83ce2a24d97ae4c4fa8>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& baseAttr,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		size_t
+		:target:`setHyperText<doxid-classaxl_1_1gui_1_1_hyper_text_1a9c708e6d9c886338005f7ec6c9c354fa>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text);
+	
+		size_t
+		:target:`setPlainText<doxid-classaxl_1_1gui_1_1_hyper_text_1a2983b3b2bdf4eb78abdd901d39015fac>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text);
+	
+		size_t
+		:target:`setText<doxid-classaxl_1_1gui_1_1_hyper_text_1a3eeb8335ff2b025384c0f3a687418b08>`(
+			bool isHyperText,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		size_t
+		:target:`setChar<doxid-classaxl_1_1gui_1_1_hyper_text_1ab91823532fbafb0ac0784e1277bb60fc>`(
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c,
+			size_t count = 1
+			);
+	
+		size_t
+		:target:`appendHyperText<doxid-classaxl_1_1gui_1_1_hyper_text_1a67a0d6fd87cf300e28151d89036dbf69>`(
+			const :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`& baseAttr,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		size_t
+		:target:`appendHyperText<doxid-classaxl_1_1gui_1_1_hyper_text_1a0c86686b3ecc6baaa557b35a7f80b930>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text);
+	
+		size_t
+		:target:`appendPlainText<doxid-classaxl_1_1gui_1_1_hyper_text_1a87ef5443e5dcd7f4df8717ce93865c16>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text);
+	
+		size_t
+		:target:`appendText<doxid-classaxl_1_1gui_1_1_hyper_text_1afc19a47a7929b779dfa725ed0b3cbed6>`(
+			bool isHyperText,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& text
+			);
+	
+		size_t
+		:target:`appendChar<doxid-classaxl_1_1gui_1_1_hyper_text_1a0fd5d1bbb739c0372a029551d0ad86eb>`(
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c,
+			size_t count = 1
+			);
+	
+		size_t
+		:target:`backspace<doxid-classaxl_1_1gui_1_1_hyper_text_1a01cea91597dcebd2bdf30c1d75f94421>`(size_t backLength);
+	
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize<doxid-classaxl_1_1gui_1_1_hyper_text_1a7ef7e3ebebc4bc364d4ecce7fd72c9f9>`(:ref:`Widget<doxid-classaxl_1_1gui_1_1_widget>`* widget) const;
+	
+		void
+		:target:`calcHyperlinkXMap<doxid-classaxl_1_1gui_1_1_hyper_text_1aff4784df75790fa478bb77a339face1d>`(:ref:`Widget<doxid-classaxl_1_1gui_1_1_widget>`* widget);
+	
+		const :ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`*
+		:target:`findHyperlinkByX<doxid-classaxl_1_1gui_1_1_hyper_text_1afbb73f8f7fc71a361b8fe06fe57c738a>`(int x) const;
+	
+		const :ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`*
+		:target:`findHyperlinkByOffset<doxid-classaxl_1_1gui_1_1_hyper_text_1a449b30f7e19a00a8920074fca0210a70>`(size_t offset) const;
+	};

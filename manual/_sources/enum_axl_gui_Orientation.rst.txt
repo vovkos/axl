@@ -1,0 +1,19 @@
+.. index:: pair: enum; Orientation
+.. _doxid-namespaceaxl_1_1gui_1abbb4c75e7541835676229cd86d7180e6:
+
+enum axl::gui::Orientation
+==========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+
+	enum Orientation
+	{
+	    :target:`Orientation_Vertical<doxid-namespaceaxl_1_1gui_1abbb4c75e7541835676229cd86d7180e6a2962b6d2a40b2de8dd65e046de8d9108>`   = 0,
+	    :target:`Orientation_Horizontal<doxid-namespaceaxl_1_1gui_1abbb4c75e7541835676229cd86d7180e6afe6742d660fc833c6f875a7c125733c6>`,
+	};
+

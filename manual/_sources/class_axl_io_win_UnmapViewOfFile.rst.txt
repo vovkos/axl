@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::win::UnmapViewOfFile
+.. _doxid-classaxl_1_1io_1_1win_1_1_unmap_view_of_file:
+
+class axl::io::win::UnmapViewOfFile
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_win_Mapping.h>
+	
+	class UnmapViewOfFile
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1win_1_1_unmap_view_of_file_1a2673ca916c03445e83e960642bc835c0>`(void* p);
+	};

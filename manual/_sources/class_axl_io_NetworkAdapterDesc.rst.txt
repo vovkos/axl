@@ -1,0 +1,63 @@
+.. index:: pair: class; axl::io::NetworkAdapterDesc
+.. _doxid-classaxl_1_1io_1_1_network_adapter_desc:
+
+class axl::io::NetworkAdapterDesc
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_NetworkAdapter.h>
+	
+	class NetworkAdapterDesc: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+	public:
+		// construction
+	
+		:target:`NetworkAdapterDesc<doxid-classaxl_1_1io_1_1_network_adapter_desc_1a7f3fda2f33d0a33a63dd4bbad4051d32>`();
+
+		// methods
+	
+		:ref:`NetworkAdapterType<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98>`
+		:target:`getType<doxid-classaxl_1_1io_1_1_network_adapter_desc_1a068705da78ca0458340e0def0cc81b54>`() const;
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+		:target:`getFlags<doxid-classaxl_1_1io_1_1_network_adapter_desc_1a6155e31903dd233c1b61f3737a3519a0>`() const;
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:target:`getName<doxid-classaxl_1_1io_1_1_network_adapter_desc_1a53dbb3940df169f03e69bd4c2619c944>`() const;
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:target:`getDescription<doxid-classaxl_1_1io_1_1_network_adapter_desc_1acfe696b482b496f569367c85b2486fbc>`() const;
+	
+		bool
+		:target:`isNullMacAddress<doxid-classaxl_1_1io_1_1_network_adapter_desc_1a153644f9f9e4d378144c51ca77d91617>`() const;
+	
+		const :ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>`*
+		:target:`getMacAddress<doxid-classaxl_1_1io_1_1_network_adapter_desc_1a900a19fe402ef1fb4ada77f1ff7f23c0>`() const;
+	
+		:ref:`sl::ConstList<doxid-classaxl_1_1sl_1_1_const_list>`<:ref:`NetworkAdapterAddress<doxid-structaxl_1_1io_1_1_network_adapter_address>`>
+		:target:`getAddressList<doxid-classaxl_1_1io_1_1_network_adapter_desc_1ad1f20010a48d97071e3af54b8054c91d>`() const;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

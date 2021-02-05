@@ -1,0 +1,104 @@
+.. index:: pair: struct; axl::gui::TextAttr
+.. _doxid-structaxl_1_1gui_1_1_text_attr:
+
+struct axl::gui::TextAttr
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_TextAttr.h>
+	
+	struct TextAttr: public :ref:`axl::gui::ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`
+	{
+		// fields
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_fontFlags<doxid-structaxl_1_1gui_1_1_text_attr_1a8738d6c9fd3a8fae9939c03384f79275>`;
+
+		// construction
+	
+		:target:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr_1a4177c3f38db8d668b071ea979d4f133e>`();
+	
+		:target:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr_1a398bbd15ce61f8bb40da6c724ca1b214>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` foreColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor = -1,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags = -1
+			);
+	
+		:target:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr_1aca8a233e8ad30a3a9bfdf31d7df236cc>`(
+			const :ref:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`& colorAttr,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags = -1
+			);
+
+		// methods
+	
+		int
+		:target:`cmp<doxid-structaxl_1_1gui_1_1_text_attr_1a6b4399f6d686040e95f6a3aff6b995b5>`(const TextAttr& attr);
+	
+		void
+		:target:`clear<doxid-structaxl_1_1gui_1_1_text_attr_1ae57e753833bfaee1aa68d4904a7241b9>`();
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_text_attr_1aa5d9d02c6172792605070c664fddb265>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` foreColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags
+			);
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_text_attr_1a2256dba1153a5dc8745c4587147a64c8>`(
+			const :ref:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`& colorAttr,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags
+			);
+	
+		void
+		:target:`overlay<doxid-structaxl_1_1gui_1_1_text_attr_1a4c1a160d6832d3fa973fba88e475cede>`(
+			const TextAttr& baseAttr,
+			const TextAttr& overlayAttr
+			);
+	
+		void
+		:target:`overlay<doxid-structaxl_1_1gui_1_1_text_attr_1a6bbac67f5c2e5319da79724725ec71f2>`(const TextAttr& overlayAttr);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :ref:`m_foreColor<doxid-structaxl_1_1gui_1_1_color_attr_1a1dba91ba1db8fd80f023cd8a5162a354>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :ref:`m_backColor<doxid-structaxl_1_1gui_1_1_color_attr_1a3924cd2e611a61508115c291afbd958e>`;
+
+		// methods
+	
+		int
+		:ref:`cmp<doxid-structaxl_1_1gui_1_1_color_attr_1a0d8f48f14f3a888eecb2cc9a8648e8ba>`(const :ref:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`& attr);
+	
+		void
+		:ref:`clear<doxid-structaxl_1_1gui_1_1_color_attr_1ae5e7a64438f7fbfd781dc391f932e2a1>`();
+	
+		void
+		:ref:`setup<doxid-structaxl_1_1gui_1_1_color_attr_1af19b424bbf66f06e3b6fc35498697007>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` foreColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor = -1
+			);
+	
+		void
+		:ref:`overlay<doxid-structaxl_1_1gui_1_1_color_attr_1a658d2a7c35393d3689b8b63a18b6a62a>`(
+			const :ref:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`& baseAttr,
+			const :ref:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`& overlayAttr
+			);
+	
+		void
+		:ref:`overlay<doxid-structaxl_1_1gui_1_1_color_attr_1ab5ee91d6bd432bb62df926e390e7a6c0>`(const :ref:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`& overlayAttr);
+

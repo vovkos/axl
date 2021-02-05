@@ -1,0 +1,62 @@
+.. index:: pair: class; axl::enc::UtfConvert
+.. _doxid-classaxl_1_1enc_1_1_utf_convert:
+
+template class axl::enc::UtfConvert
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Utf.h>
+	
+	template <
+		typename DstEncoding0,
+		typename SrcEncoding0,
+		typename CaseOp = sl::NoOp<utf32_t>
+		>
+	class UtfConvert
+	{
+	public:
+		// typedefs
+	
+		typedef DstEncoding0 :target:`DstEncoding<doxid-classaxl_1_1enc_1_1_utf_convert_1a66b85bc6d13afee82e6b1ba40e7a3ce5>`;
+		typedef SrcEncoding0 :target:`SrcEncoding<doxid-classaxl_1_1enc_1_1_utf_convert_1a3262855b20708d2f078baddd695bbd28>`;
+		typedef DstEncoding::C :target:`DstUnit<doxid-classaxl_1_1enc_1_1_utf_convert_1aea4971ab696f6e3eb9006a145af597ef>`;
+		typedef SrcEncoding::C :target:`SrcUnit<doxid-classaxl_1_1enc_1_1_utf_convert_1a52475e999a6ee957e9f236429fdb3658>`;
+
+		// methods
+	
+		static
+		size_t
+		:target:`calcRequiredLength<doxid-classaxl_1_1enc_1_1_utf_convert_1a4b8e96bb65a3c286d274566ad7a1af16>`(
+			const :ref:`SrcUnit<doxid-classaxl_1_1enc_1_1_utf_convert_1a52475e999a6ee957e9f236429fdb3658>`* p,
+			size_t length
+			);
+	
+		static
+		size_t
+		:target:`convert<doxid-classaxl_1_1enc_1_1_utf_convert_1abe3f3ca3e904fd23b310e4821a2669fc>`(
+			:ref:`DstUnit<doxid-classaxl_1_1enc_1_1_utf_convert_1aea4971ab696f6e3eb9006a145af597ef>`* dst,
+			size_t dstLength,
+			const :ref:`SrcUnit<doxid-classaxl_1_1enc_1_1_utf_convert_1a52475e999a6ee957e9f236429fdb3658>`* src,
+			size_t srcLength,
+			size_t* takenSrcLength_o = NULL
+			);
+	
+		static
+		size_t
+		:target:`convert<doxid-classaxl_1_1enc_1_1_utf_convert_1ae268419da0033e4d4249eb2912dd05c6>`(
+			:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>`* cpl,
+			:ref:`DstUnit<doxid-classaxl_1_1enc_1_1_utf_convert_1aea4971ab696f6e3eb9006a145af597ef>`* dst,
+			size_t dstLength,
+			const :ref:`SrcUnit<doxid-classaxl_1_1enc_1_1_utf_convert_1a52475e999a6ee957e9f236429fdb3658>`* src,
+			size_t srcLength,
+			size_t* takenSrcLength_o = NULL
+			);
+	};

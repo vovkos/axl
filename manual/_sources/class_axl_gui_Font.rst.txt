@@ -1,0 +1,44 @@
+.. index:: pair: class; axl::gui::Font
+.. _doxid-classaxl_1_1gui_1_1_font:
+
+class axl::gui::Font
+====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Font.h>
+	
+	class Font: public :ref:`axl::gui::GuiItem<doxid-classaxl_1_1gui_1_1_gui_item>`
+	{
+	public:
+		// methods
+	
+		Font*
+		:target:`getFontMod<doxid-classaxl_1_1gui_1_1_font_1acdea6fb0df2ee62491b578cf29c0117d>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags);
+	
+		bool
+		:target:`getFontDesc<doxid-classaxl_1_1gui_1_1_font_1a7610714a3ffa1b3a226a9857bd3f404b>`(:ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`* fontDesc);
+	
+		bool
+		:target:`isMonospace<doxid-classaxl_1_1gui_1_1_font_1a3a253bab478fc25fa13b0e19f7bfbd92>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:ref:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+

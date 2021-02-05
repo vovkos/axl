@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::g::Finalizer
+.. _doxid-classaxl_1_1g_1_1_finalizer:
+
+class axl::g::Finalizer
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_g_Module.h>
+	
+	class Finalizer
+	{
+	public:
+		// methods
+	
+		virtual
+		void
+		:target:`finalize<doxid-classaxl_1_1g_1_1_finalizer_1a237b25cb057bd0a5bb3214a4df967673>`() = 0;
+	};

@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::sl::HashSzBase<char>
+.. _doxid-classaxl_1_1sl_1_1_hash_sz_base_3_01char_01_4:
+
+template class axl::sl::HashSzBase<char>
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Hash.h>
+	
+	template <>
+	class HashSzBase<char>
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_hash_sz_base_3_01char_01_4_1ade79cacae73b002c4b1c257be3f33797>`(const char* p) const;
+	};

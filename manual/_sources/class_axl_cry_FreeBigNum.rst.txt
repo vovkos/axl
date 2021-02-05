@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreeBigNum
+.. _doxid-classaxl_1_1cry_1_1_free_big_num:
+
+class axl::cry::FreeBigNum
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_BigNum.h>
+	
+	class FreeBigNum
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_big_num_1ae40c96a62a0deb2af943b3990fc5a991>`(BIGNUM* h);
+	};

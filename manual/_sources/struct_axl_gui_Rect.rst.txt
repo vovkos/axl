@@ -1,0 +1,93 @@
+.. index:: pair: struct; axl::gui::Rect
+.. _doxid-structaxl_1_1gui_1_1_rect:
+
+struct axl::gui::Rect
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+	
+	struct Rect
+	{
+		// fields
+	
+		union
+		{
+			struct
+			{
+				int :target:`m_left<doxid-structaxl_1_1gui_1_1_rect_1aaaf4d2f1f2831af92b72f3df2de23017>`;
+				int :target:`m_top<doxid-structaxl_1_1gui_1_1_rect_1a16955c5940146857e267cd27839eeaca>`;
+				int :target:`m_right<doxid-structaxl_1_1gui_1_1_rect_1a1d26391040e1e899145bb3c3a32f50ff>`;
+				int :target:`m_bottom<doxid-structaxl_1_1gui_1_1_rect_1aacc0cb036c57183cfceef2f58046a1f7>`;
+			};
+	
+			struct
+			{
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_left_u<doxid-structaxl_1_1gui_1_1_rect_1a67bd1dd7c82bdda8000fa4a9238964e0>`;
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_top_u<doxid-structaxl_1_1gui_1_1_rect_1a229f8798bd6f1e0f4d33e31436c1be39>`;
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_right_u<doxid-structaxl_1_1gui_1_1_rect_1a87a9dadeeb55d1cc823fdcf4eca00dc1>`;
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_bottom_u<doxid-structaxl_1_1gui_1_1_rect_1a9316c34c96e329d61cdee531317dcf44>`;
+			};
+		};
+
+		// construction
+	
+		:target:`Rect<doxid-structaxl_1_1gui_1_1_rect_1a92be9a77604219c02ffe6813515ce365>`();
+	
+		:target:`Rect<doxid-structaxl_1_1gui_1_1_rect_1acc02ce2a240c826a97e303ea91dfb5e3>`(
+			int left,
+			int top,
+			int right,
+			int bottom
+			);
+	
+		:target:`Rect<doxid-structaxl_1_1gui_1_1_rect_1a82a93b944a95bcad745f249b856a5350>`(
+			int left,
+			int top
+			);
+	
+		:target:`Rect<doxid-structaxl_1_1gui_1_1_rect_1a48417f3d098299c49e2799a506b1e346>`(
+			const :ref:`Point<doxid-structaxl_1_1gui_1_1_point>`& leftTop,
+			const :ref:`Point<doxid-structaxl_1_1gui_1_1_point>`& rightBottom
+			);
+	
+		:target:`Rect<doxid-structaxl_1_1gui_1_1_rect_1a2952595f5fc9a897efd260df9faa026f>`(const :ref:`Point<doxid-structaxl_1_1gui_1_1_point>`& leftTop);
+	
+		:target:`Rect<doxid-structaxl_1_1gui_1_1_rect_1a9f58871f27a7e805be7b8b7bc96b35f5>`(
+			const :ref:`Point<doxid-structaxl_1_1gui_1_1_point>`& leftTop,
+			const :ref:`Size<doxid-structaxl_1_1gui_1_1_size>`& size
+			);
+
+		// methods
+	
+		bool
+		:target:`isEmpty<doxid-structaxl_1_1gui_1_1_rect_1a65b2b563fc510710971eee426dd8c527>`() const;
+	
+		int
+		:target:`getWidth<doxid-structaxl_1_1gui_1_1_rect_1ad702b2265eadde1d1ae61667b94ab662>`() const;
+	
+		int
+		:target:`getHeight<doxid-structaxl_1_1gui_1_1_rect_1a76b4c16745538d0f9b894ba514d1b29b>`() const;
+	
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`getSize<doxid-structaxl_1_1gui_1_1_rect_1a89eca053b71e781b361c0b268ef2a787>`() const;
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_rect_1ab71957e0e26f74a2d9d3c92fe383e5e2>`(
+			int left,
+			int top,
+			int right,
+			int bottom
+			);
+	
+		void
+		:target:`clipNegative<doxid-structaxl_1_1gui_1_1_rect_1a2ced8b73ab66670ed9dc0c123ef7da0f>`();
+	};

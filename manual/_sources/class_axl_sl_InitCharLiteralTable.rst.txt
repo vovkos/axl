@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sl::InitCharLiteralTable
+.. _doxid-classaxl_1_1sl_1_1_init_char_literal_table:
+
+class axl::sl::InitCharLiteralTable
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_CharLiteral.h>
+	
+	class InitCharLiteralTable
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_init_char_literal_table_1a895758cacbc22960e72cf8e84229c33d>`(char literalTable[][4]) const;
+	};

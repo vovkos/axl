@@ -1,0 +1,20 @@
+.. index:: pair: enum; HookAction
+.. _doxid-namespaceaxl_1_1spy_1a2866178a1aedb255fc1471f9bd2d5a32:
+
+enum axl::spy::HookAction
+=========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_spy_Hook.h>
+
+	enum HookAction
+	{
+	    :target:`HookAction_Default<doxid-namespaceaxl_1_1spy_1a2866178a1aedb255fc1471f9bd2d5a32a03634ba9f170af0f42959313fc1b4dd0>`    = 0,
+	    :target:`HookAction_Return<doxid-namespaceaxl_1_1spy_1a2866178a1aedb255fc1471f9bd2d5a32a797c7928b94ba0135bd1d4e4719ed0de>`     = 0x01,
+	    :target:`HookAction_JumpTarget<doxid-namespaceaxl_1_1spy_1a2866178a1aedb255fc1471f9bd2d5a32af15c7f14dbf2d048d8ab25af0ff5e2bd>` = 0x02,
+	};
+

@@ -1,0 +1,24 @@
+.. index:: pair: struct; axl::sl::LegacyPacketizerRoot::PacketHdr
+.. _doxid-structaxl_1_1sl_1_1_legacy_packetizer_root_1_1_packet_hdr:
+
+struct axl::sl::LegacyPacketizerRoot::PacketHdr
+===============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct PacketHdr
+	{
+		// fields
+	
+		uint32_t :target:`m_signature<doxid-structaxl_1_1sl_1_1_legacy_packetizer_root_1_1_packet_hdr_1addbd1788f45d2defe81eb8141fcd951f>`;
+		uint16_t :target:`m_dataSize<doxid-structaxl_1_1sl_1_1_legacy_packetizer_root_1_1_packet_hdr_1a5f3a28239623c61a3490d8aa3362ecad>`;
+		uint16_t :target:`m_checksum<doxid-structaxl_1_1sl_1_1_legacy_packetizer_root_1_1_packet_hdr_1a672dc89adcffc5627617fc68466dd2f2>`;
+	};

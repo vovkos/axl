@@ -1,0 +1,38 @@
+.. index:: pair: namespace; axl::ini
+.. _doxid-namespaceaxl_1_1ini:
+
+namespace axl::ini
+==================
+
+.. toctree::
+	:hidden:
+
+	class_axl_ini_GenericIni.rst
+	class_axl_ini_GenericParser.rst
+	class_axl_ini_Lexer.rst
+	class_axl_ini_NamedValue.rst
+	class_axl_ini_Parser.rst
+	class_axl_ini_Section.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace ini {
+
+	// classes
+
+	class :ref:`GenericIni<doxid-classaxl_1_1ini_1_1_generic_ini>`;
+	class :ref:`GenericParser<doxid-classaxl_1_1ini_1_1_generic_parser>`;
+	class :ref:`Lexer<doxid-classaxl_1_1ini_1_1_lexer>`;
+	class :ref:`NamedValue<doxid-classaxl_1_1ini_1_1_named_value>`;
+
+	template <typename T>
+	class :ref:`Parser<doxid-classaxl_1_1ini_1_1_parser>`;
+
+	class :ref:`Section<doxid-classaxl_1_1ini_1_1_section>`;
+
+	} // namespace ini

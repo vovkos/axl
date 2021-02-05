@@ -1,0 +1,63 @@
+.. index:: pair: class; axl::sys::psx::Thread
+.. _doxid-classaxl_1_1sys_1_1psx_1_1_thread:
+
+class axl::sys::psx::Thread
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_psx_Thread.h>
+	
+	class Thread
+	{
+	public:
+		// construction
+	
+		:target:`Thread<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1aad612f5eeaaa2b2d41d8f9eb6c5d7ce0>`();
+		:target:`~Thread<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a4e33d615db86ece719dc6f1e557fcc40>`();
+
+		// methods
+	
+		:target:`operator pthread_t<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a1c51d4eeacb389502f7d18ad6d0f068a>`();
+	
+		bool
+		:target:`isOpen<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a6463edaa8cd7b596d5a787d418d6511d>`();
+	
+		bool
+		:target:`create<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a7605b3e10df66d2040b1c59277d1d174>`(
+			const pthread_attr_t* attr,
+			:ref:`ThreadFunc<doxid-namespaceaxl_1_1sys_1_1psx_1a2618d9318bbefdeeeadbf39e1028c774>`* threadFunc,
+			void* context = NULL
+			);
+	
+		bool
+		:target:`create<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a095256ccc4726a5395a1e47b8dbff71e>`(
+			:ref:`ThreadFunc<doxid-namespaceaxl_1_1sys_1_1psx_1a2618d9318bbefdeeeadbf39e1028c774>`* threadFunc,
+			void* context = NULL
+			);
+	
+		bool
+		:target:`cancel<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a3439d301514fd2072b5ce0e01d23149c>`();
+	
+		bool
+		:target:`join<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1adf6ec87913d7b2b9c94a32bedc27cff2>`(void** retVal = NULL);
+	
+		bool
+		:target:`tryJoin<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1ac522d0e14f884fb620ca5d9be6ef0c85>`(void** retVal = NULL);
+	
+		bool
+		:target:`join<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a908da24f821ee694517230f6bcc39cee>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout,
+			void** retVal = NULL
+			);
+	
+		bool
+		:target:`detach<doxid-classaxl_1_1sys_1_1psx_1_1_thread_1a349dca2b24fc2303dc9ccbf15109a733>`();
+	};

@@ -1,0 +1,20 @@
+.. index:: pair: class; axl::sl::CmdLineParserRoot
+.. _doxid-classaxl_1_1sl_1_1_cmd_line_parser_root:
+
+class axl::sl::CmdLineParserRoot
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_CmdLineParser.h>
+	
+	class CmdLineParserRoot
+	{
+	};

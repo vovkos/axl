@@ -1,0 +1,122 @@
+.. index:: pair: class; axl::sl::BitMap
+.. _doxid-classaxl_1_1sl_1_1_bit_map:
+
+class axl::sl::BitMap
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BitMap.h>
+	
+	class BitMap
+	{
+	public:
+		// construction
+	
+		:target:`BitMap<doxid-classaxl_1_1sl_1_1_bit_map_1a0ba80966bfb64269f919a6f9ec94b900>`(size_t bitCount = 0);
+		:target:`BitMap<doxid-classaxl_1_1sl_1_1_bit_map_1a69e7b38b4f1c27c335dc53b9757525b2>`(const BitMap& src);
+
+		// methods
+	
+		BitMap&
+		:target:`operator=<doxid-classaxl_1_1sl_1_1_bit_map_1a47b094e911edf127eb92c24186fc32da>`(const BitMap& src);
+	
+		bool
+		:target:`operator==<doxid-classaxl_1_1sl_1_1_bit_map_1af5b61b88274bae1e2c92566131ab771a>`(const BitMap& src) const;
+	
+		bool
+		:target:`operator!=<doxid-classaxl_1_1sl_1_1_bit_map_1ac79b709756f8fb0a4705468f27119901>`(const BitMap& src) const;
+	
+		const size_t*
+		:target:`getMap<doxid-classaxl_1_1sl_1_1_bit_map_1af4790eb4155d3c488c2dbb24ee173455>`() const;
+	
+		size_t*
+		:target:`getMap<doxid-classaxl_1_1sl_1_1_bit_map_1a9a2fa59b0c524a1e194ff7c6a2991c06>`();
+	
+		size_t
+		:target:`getPageCount<doxid-classaxl_1_1sl_1_1_bit_map_1a39a191763839288ec71ad7a620182254>`() const;
+	
+		size_t
+		:target:`getBitCount<doxid-classaxl_1_1sl_1_1_bit_map_1a4754a396ff7e0f76071ad3a521aefe72>`() const;
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_bit_map_1a54c031a8accc05549affa258aa3a8c05>`();
+	
+		void
+		:target:`copy<doxid-classaxl_1_1sl_1_1_bit_map_1aefc835afe101e6df4ea9acaf4ff25684>`(const BitMap& src);
+	
+		size_t
+		:target:`hash<doxid-classaxl_1_1sl_1_1_bit_map_1a69978190040976f50b60aedf4e327e04>`() const;
+	
+		int
+		:target:`cmp<doxid-classaxl_1_1sl_1_1_bit_map_1acf2b91d003438ebfff91c0e1cedf8ce6>`(const BitMap& src) const;
+	
+		bool
+		:target:`isEqual<doxid-classaxl_1_1sl_1_1_bit_map_1a9c05b599765c7645fd266c1345185b2b>`(const BitMap& src) const;
+	
+		bool
+		:target:`create<doxid-classaxl_1_1sl_1_1_bit_map_1a60dc225f5c10ec255509b289a89c0e50>`(size_t bitCount);
+	
+		bool
+		:target:`setBitCount<doxid-classaxl_1_1sl_1_1_bit_map_1a9e96dc38444750837c41660e1f55e1a2>`(size_t bitCount);
+	
+		bool
+		:target:`ensureBitCount<doxid-classaxl_1_1sl_1_1_bit_map_1ad0562aa9f6e1b27502bedf23af7aff1a>`(size_t bitCount);
+	
+		bool
+		:target:`getBit<doxid-classaxl_1_1sl_1_1_bit_map_1a5d186061105df48b38b836a7f6ed528d>`(size_t bit) const;
+	
+		bool
+		:target:`setBit<doxid-classaxl_1_1sl_1_1_bit_map_1a3f34c389894d7a95d92176fcca723476>`(
+			size_t bit,
+			bool value = true
+			);
+	
+		bool
+		:target:`setBitResize<doxid-classaxl_1_1sl_1_1_bit_map_1a2d194fb91d9001fad7df1408dfbef7fc>`(
+			size_t bit,
+			bool value = true
+			);
+	
+		bool
+		:target:`setBitRange<doxid-classaxl_1_1sl_1_1_bit_map_1ad02a22391cd0af2799ee02b1b7cb1818>`(
+			size_t from,
+			size_t to,
+			bool value = true
+			);
+	
+		bool
+		:target:`setBitRangeResize<doxid-classaxl_1_1sl_1_1_bit_map_1a282b513e349640438371ac998b2ae107>`(
+			size_t from,
+			size_t to,
+			bool value = true
+			);
+	
+		bool
+		:target:`merge<doxid-classaxl_1_1sl_1_1_bit_map_1a2b34ff373f6113b49c076c5511ca586d>`(
+			const BitMap& bitMap2,
+			:ref:`BitOpKind<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157>` op
+			);
+	
+		bool
+		:target:`mergeResize<doxid-classaxl_1_1sl_1_1_bit_map_1a981645c2ebf1aa80d051363aa144feb2>`(
+			const BitMap& bitMap2,
+			:ref:`BitOpKind<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157>` op
+			);
+	
+		void
+		:target:`inverse<doxid-classaxl_1_1sl_1_1_bit_map_1a25a5b8b46bbe825fa91a1cb757b88185>`();
+	
+		size_t
+		:target:`findBit<doxid-classaxl_1_1sl_1_1_bit_map_1aa8a25d9c2c12df960caec2ac5ac68182>`(
+			size_t start,
+			bool value = true
+			) const;
+	};

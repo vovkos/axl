@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreeBio
+.. _doxid-classaxl_1_1cry_1_1_free_bio:
+
+class axl::cry::FreeBio
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_Bio.h>
+	
+	class FreeBio
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_bio_1a2cb0e795eac689ee9ebddafa88b1f329>`(BIO* h);
+	};

@@ -1,0 +1,52 @@
+.. index:: pair: class; axl::enc::EscapeEncoding
+.. _doxid-classaxl_1_1enc_1_1_escape_encoding:
+
+class axl::enc::EscapeEncoding
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_EscapeEncoding.h>
+	
+	class EscapeEncoding
+	{
+	public:
+		// methods
+	
+		static
+		char
+		:target:`findEscapeChar<doxid-classaxl_1_1enc_1_1_escape_encoding_1ae4ae29342b10288daf23c60a2ac372fc>`(char x);
+	
+		static
+		char
+		:target:`findEscapeReplaceChar<doxid-classaxl_1_1enc_1_1_escape_encoding_1a5ed660c4ad456ee877cf2da63e9ebc81>`(char x);
+	
+		static
+		size_t
+		:target:`encode<doxid-classaxl_1_1enc_1_1_escape_encoding_1a24aefda1ef92a2297a0480b398e89833>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source
+			);
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`encode<doxid-classaxl_1_1enc_1_1_escape_encoding_1aa417c4eb3d40e61a29ce96b344977b1c>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source);
+	
+		static
+		size_t
+		:target:`decode<doxid-classaxl_1_1enc_1_1_escape_encoding_1aa48859a2763d358ea903b361edb63c03>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source
+			);
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`decode<doxid-classaxl_1_1enc_1_1_escape_encoding_1ae1498349b4e03f3500a4a3731bf9176a>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source);
+	};

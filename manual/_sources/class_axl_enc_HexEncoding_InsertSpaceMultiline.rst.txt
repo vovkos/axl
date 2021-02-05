@@ -1,0 +1,27 @@
+.. index:: pair: class; axl::enc::HexEncoding::InsertSpaceMultiline
+.. _doxid-classaxl_1_1enc_1_1_hex_encoding_1_1_insert_space_multiline:
+
+class axl::enc::HexEncoding::InsertSpaceMultiline
+=================================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	class InsertSpaceMultiline
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1enc_1_1_hex_encoding_1_1_insert_space_multiline_1a58f50c460d4d865ecbaeff6110b0d61a>`(
+			char* p,
+			size_t i
+			);
+	};

@@ -1,0 +1,29 @@
+.. index:: pair: class; axl::sl::CmpBin
+.. _doxid-classaxl_1_1sl_1_1_cmp_bin:
+
+template class axl::sl::CmpBin
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Cmp.h>
+	
+	template <typename T>
+	class CmpBin
+	{
+	public:
+		// methods
+	
+		int
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_cmp_bin_1a3741e373cf129b1bdf9aeebfad5e3f5d>`(
+			const T& a,
+			const T& b
+			) const;
+	};

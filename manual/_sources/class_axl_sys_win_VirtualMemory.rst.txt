@@ -1,0 +1,110 @@
+.. index:: pair: class; axl::sys::win::VirtualMemory
+.. _doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory:
+
+class axl::sys::win::VirtualMemory
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_VirtualMemory.h>
+	
+	class VirtualMemory
+	{
+	public:
+		// construction
+	
+		:target:`VirtualMemory<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1acf56d59c449059c3d5018836e0e6987a>`();
+		:target:`~VirtualMemory<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a5be5bef55e628761503ffe30c0f9a36f>`();
+
+		// methods
+	
+		:target:`operator void *<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a60226fa8bd007678219c9aef1af6f2d2>`() const;
+	
+		void*
+		:target:`p<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a85c18c2b081f12c826376da569da2340>`() const;
+	
+		size_t
+		:target:`getSize<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a6caa825667a57ad30203fad41d706234>`() const;
+	
+		void*
+		:target:`alloc<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a2c84e8764ea8a42c7ce93eb050760481>`(
+			void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` allocationFlags = MEM_RESERVE|MEM_COMMIT,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` protection = PAGE_READWRITE
+			);
+	
+		void*
+		:target:`alloc<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1ab4091c016f156ebe71f72b41bc9c9e82>`(
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` allocationFlags = MEM_RESERVE|MEM_COMMIT,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` protectionFlags = PAGE_READWRITE
+			);
+	
+		bool
+		:target:`commit<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a265b9ee9c187850a4f8e51cc49ea6a86>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` protectionFlags = PAGE_READWRITE);
+	
+		bool
+		:target:`decommit<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1abf6448c550c1be3b2ab20b3c0ec48964>`();
+	
+		void
+		:target:`release<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1ad9950bb018ca9d11f4fedc238c6af690>`();
+	
+		bool
+		:target:`protect<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1aa44468d0600ca3541d399dd72ce0f4bf>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` protectionFlags,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`* prevProtectionFlags = NULL
+			);
+	
+		bool
+		:target:`lock<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a0d346978e245cd66b080409296e8a42a>`();
+	
+		bool
+		:target:`unlock<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a1294cfe485ad7dba03db629c1c49b4f8>`();
+	
+		bool
+		:target:`query<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1aa6e4623a719279b4b06dd00a20b209a1>`(MEMORY_BASIC_INFORMATION* information);
+	
+		static
+		bool
+		:target:`commit<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a8548f64ebf8b02026632edb02349e1d3>`(
+			void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` protectionFlags = PAGE_READWRITE
+			);
+	
+		static
+		bool
+		:target:`decommit<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1aeeed18b41cc33cb7b9eef03d04682a3b>`(
+			void* p,
+			size_t size
+			);
+	
+		static
+		bool
+		:target:`lock<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a0924b49d15afaab6638979e4998aa1ce>`(
+			void* p,
+			size_t size
+			);
+	
+		static
+		bool
+		:target:`unlock<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1acdfdd6e4513e4300514cb55ebb70980f>`(
+			void* p,
+			size_t size
+			);
+	
+		static
+		bool
+		:target:`query<doxid-classaxl_1_1sys_1_1win_1_1_virtual_memory_1a8d4f870df130778b63921bf916164b91>`(
+			void* p,
+			MEMORY_BASIC_INFORMATION* information
+			);
+	};

@@ -1,0 +1,23 @@
+.. index:: pair: struct; axl::sys::SjljFrame
+.. _doxid-structaxl_1_1sys_1_1_sjlj_frame:
+
+struct axl::sys::SjljFrame
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_SjljTry.h>
+	
+	struct SjljFrame
+	{
+		// fields
+	
+		jmp_buf :target:`m_jmpBuf<doxid-structaxl_1_1sys_1_1_sjlj_frame_1a95998554c3fd763e68ca6520d9be9cce>`;
+	};

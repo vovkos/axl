@@ -1,0 +1,44 @@
+.. index:: pair: class; axl::sys::psx::Cond
+.. _doxid-classaxl_1_1sys_1_1psx_1_1_cond:
+
+class axl::sys::psx::Cond
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_psx_Cond.h>
+	
+	class Cond
+	{
+	public:
+		// construction
+	
+		:target:`Cond<doxid-classaxl_1_1sys_1_1psx_1_1_cond_1aac6a3e0e1327a3e98ba9f7489d1908ef>`(const pthread_condattr_t* attr = NULL);
+		:target:`~Cond<doxid-classaxl_1_1sys_1_1psx_1_1_cond_1a3702a1ded2c6fe7484016d3941d90c9b>`();
+
+		// methods
+	
+		:target:`operator pthread_cond_t *<doxid-classaxl_1_1sys_1_1psx_1_1_cond_1a251d2c07a73ee351ef3b8f4246d9c939>`();
+	
+		bool
+		:target:`signal<doxid-classaxl_1_1sys_1_1psx_1_1_cond_1a7b6f5e40784b8b5c588403d3613ba8b9>`();
+	
+		bool
+		:target:`broadcast<doxid-classaxl_1_1sys_1_1psx_1_1_cond_1a3da06d270ddc3c07140a01cf79731063>`();
+	
+		bool
+		:target:`wait<doxid-classaxl_1_1sys_1_1psx_1_1_cond_1aa7c552407dfd0f375d0fae46042bf2a3>`(pthread_mutex_t* mutex);
+	
+		bool
+		:target:`wait<doxid-classaxl_1_1sys_1_1psx_1_1_cond_1ae3654d55ef4f6c3225bfdefe5985861c>`(
+			pthread_mutex_t* mutex,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout
+			);
+	};

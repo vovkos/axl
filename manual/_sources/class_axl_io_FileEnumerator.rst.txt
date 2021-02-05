@@ -1,0 +1,31 @@
+.. index:: pair: class; axl::io::FileEnumerator
+.. _doxid-classaxl_1_1io_1_1_file_enumerator:
+
+class axl::io::FileEnumerator
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_FileEnumerator.h>
+	
+	class FileEnumerator: public FileEnumeratorHandle
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`openDir<doxid-classaxl_1_1io_1_1_file_enumerator_1ab538e98801dcee0ea9a10c5daaf6a86a>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& dir);
+	
+		bool
+		:target:`hasNextFile<doxid-classaxl_1_1io_1_1_file_enumerator_1a03f16e9ee7a932bc0e82b920df2fb116>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getNextFileName<doxid-classaxl_1_1io_1_1_file_enumerator_1adb0a76f8e11c19600426d2aa3322bb90>`();
+	};

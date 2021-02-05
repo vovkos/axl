@@ -1,0 +1,31 @@
+.. index:: pair: class; axl::sys::TlsSlot
+.. _doxid-classaxl_1_1sys_1_1_tls_slot:
+
+class axl::sys::TlsSlot
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_TlsSlot.h>
+	
+	class TlsSlot
+	{
+	public:
+		// construction
+	
+		:target:`TlsSlot<doxid-classaxl_1_1sys_1_1_tls_slot_1abe8fa99d4463ad8dd5bac9557fff17d8>`();
+
+		// methods
+	
+		size_t
+		:target:`getSlot<doxid-classaxl_1_1sys_1_1_tls_slot_1a151100852fd1240947bb7ecb0bf75f41>`();
+	
+		:target:`operator size_t<doxid-classaxl_1_1sys_1_1_tls_slot_1a5587a5fdd9d677c8c22a075fb832e9a3>`();
+	};

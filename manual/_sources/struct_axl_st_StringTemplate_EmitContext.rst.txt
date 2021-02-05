@@ -1,0 +1,41 @@
+.. index:: pair: struct; axl::st::StringTemplate::EmitContext
+.. _doxid-structaxl_1_1st_1_1_string_template_1_1_emit_context:
+
+struct axl::st::StringTemplate::EmitContext
+===========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct EmitContext: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+		// fields
+	
+		:ref:`StringTemplate<doxid-classaxl_1_1st_1_1_string_template>`* :target:`m_self<doxid-structaxl_1_1st_1_1_string_template_1_1_emit_context_1aa1b48482b266aaefa58206ff8c26fe16>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* :target:`m_output<doxid-structaxl_1_1st_1_1_string_template_1_1_emit_context_1a720d6091696ed14f0746ab93b684012d>`;
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>` :target:`m_frame<doxid-structaxl_1_1st_1_1_string_template_1_1_emit_context_1a26faa157d03206bfaf5ffb60ef894bf5>`;
+		:ref:`lex::LineCol<doxid-structaxl_1_1lex_1_1_line_col>` :target:`m_lineCol<doxid-structaxl_1_1st_1_1_string_template_1_1_emit_context_1abc9fa7b461dd9a2d478be951578430d1>`;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

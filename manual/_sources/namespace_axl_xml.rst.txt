@@ -1,0 +1,59 @@
+.. index:: pair: namespace; axl::xml
+.. _doxid-namespaceaxl_1_1xml:
+
+namespace axl::xml
+==================
+
+.. toctree::
+	:hidden:
+
+	class_axl_xml_ExpatError.rst
+	class_axl_xml_ExpatErrorProvider.rst
+	class_axl_xml_ExpatParser.rst
+	class_axl_xml_ExpatParserRoot.rst
+	class_axl_xml_FreeExpatParser.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace xml {
+
+	// classes
+
+	class :ref:`ExpatError<doxid-classaxl_1_1xml_1_1_expat_error>`;
+	class :ref:`ExpatErrorProvider<doxid-classaxl_1_1xml_1_1_expat_error_provider>`;
+
+	template <typename T>
+	class :ref:`ExpatParser<doxid-classaxl_1_1xml_1_1_expat_parser>`;
+
+	class :ref:`ExpatParserRoot<doxid-classaxl_1_1xml_1_1_expat_parser_root>`;
+	class :ref:`FreeExpatParser<doxid-classaxl_1_1xml_1_1_free_expat_parser>`;
+
+	// global functions
+
+	:target:`AXL_SL_DEFINE_GUID<doxid-namespaceaxl_1_1xml_1a8655f326626ef5416d8c6abed0dfd3cf>`(
+		g_expatErrorGuid,
+		0x34b6d20,
+		0x64f7,
+		0x4ec1,
+		0x8c,
+		0x5f,
+		0xb2,
+		0x3f,
+		0x14,
+		0x6c,
+		0x87,
+		0x65
+		);
+
+	void
+	:target:`registerExpatErrorProvider<doxid-namespaceaxl_1_1xml_1a73b3d57507f9f63a593928b9c5ae1de9>`();
+
+	size_t
+	:target:`setExpatError<doxid-namespaceaxl_1_1xml_1a78b0ccb1b18df26b3c20342e2dbc6a3e>`(XML_Error code);
+
+	} // namespace xml

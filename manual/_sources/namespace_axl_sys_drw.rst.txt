@@ -1,0 +1,49 @@
+.. index:: pair: namespace; axl::sys::drw
+.. _doxid-namespaceaxl_1_1sys_1_1drw:
+
+namespace axl::sys::drw
+=======================
+
+.. toctree::
+	:hidden:
+
+	class_axl_sys_drw_MachError.rst
+	class_axl_sys_drw_MachErrorProvider.rst
+	class_axl_sys_drw_Semaphore.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace drw {
+
+	// classes
+
+	class :ref:`MachError<doxid-classaxl_1_1sys_1_1drw_1_1_mach_error>`;
+	class :ref:`MachErrorProvider<doxid-classaxl_1_1sys_1_1drw_1_1_mach_error_provider>`;
+	class :ref:`Semaphore<doxid-classaxl_1_1sys_1_1drw_1_1_semaphore>`;
+
+	// global functions
+
+	:target:`AXL_SL_DEFINE_GUID<doxid-namespaceaxl_1_1sys_1_1drw_1a65c4de87de23f031b8ff477647445b91>`(
+		g_MachErrorGuid,
+		0xe8840a46,
+		0x6de7,
+		0x4427,
+		0xb3,
+		0x56,
+		0x24,
+		0xb2,
+		0xed,
+		0x4b,
+		0x8,
+		0xd1
+		);
+
+	size_t
+	:target:`setMachError<doxid-namespaceaxl_1_1sys_1_1drw_1aa176e017f7678d632cf60a77c2210042>`(mach_error_t code);
+
+	} // namespace drw

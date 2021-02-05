@@ -1,0 +1,55 @@
+.. index:: pair: class; axl::gui::HyperlinkAnchorArray
+.. _doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array:
+
+class axl::gui::HyperlinkAnchorArray
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_HyperlinkAnchorArray.h>
+	
+	class HyperlinkAnchorArray
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a664a717da64204092f429bf8733e82e7>`() const;
+	
+		bool
+		:target:`isHyperlinkOpened<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a5b9bb63b64e41c2a0d66c5779084f823>`() const;
+	
+		size_t
+		:target:`getCount<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a0600db3a7475db8cafece2590e460e97>`() const;
+	
+		:ref:`sl::ConstIterator<doxid-classaxl_1_1sl_1_1_const_iterator>`<:ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`>
+		:target:`getHead<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a3fd7d9511a4bb2eea5fe53d601948425>`() const;
+	
+		:ref:`sl::ConstIterator<doxid-classaxl_1_1sl_1_1_const_iterator>`<:ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`>
+		:target:`getTail<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a63b9e19f2b9c46e00fbb441617ad0eaf>`() const;
+	
+		void
+		:target:`clear<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a518022fc91fdea5c8d62cdf3b2f13aaa>`();
+	
+		const :ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`*
+		:target:`find<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1ad2a4fbb59f5cfd8adcb7324ab14bcc3e>`(size_t offset) const;
+	
+		:ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`*
+		:target:`openHyperlink<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a9dfe6d9fefa966ad34c31bbb037153bd>`(
+			size_t offset,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& hyperlink
+			);
+	
+		:ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`*
+		:target:`closeHyperlink<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array_1a00043eadb9996c89412f1fbcc5c5acbd>`(
+			size_t offset,
+			bool closeEmpty = false
+			);
+	};

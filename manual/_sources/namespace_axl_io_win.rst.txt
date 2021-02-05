@@ -1,0 +1,43 @@
+.. index:: pair: namespace; axl::io::win
+.. _doxid-namespaceaxl_1_1io_1_1win:
+
+namespace axl::io::win
+======================
+
+.. toctree::
+	:hidden:
+
+	class_axl_io_win_CloseSocket.rst
+	class_axl_io_win_File.rst
+	class_axl_io_win_Iocp.rst
+	class_axl_io_win_MappedView.rst
+	class_axl_io_win_Mapping.rst
+	class_axl_io_win_NamedPipe.rst
+	class_axl_io_win_Serial.rst
+	class_axl_io_win_Socket.rst
+	class_axl_io_win_StdOverlapped.rst
+	class_axl_io_win_UnmapViewOfFile.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace win {
+
+	// classes
+
+	class :ref:`CloseSocket<doxid-classaxl_1_1io_1_1win_1_1_close_socket>`;
+	class :ref:`File<doxid-classaxl_1_1io_1_1win_1_1_file>`;
+	class :ref:`Iocp<doxid-classaxl_1_1io_1_1win_1_1_iocp>`;
+	class :ref:`MappedView<doxid-classaxl_1_1io_1_1win_1_1_mapped_view>`;
+	class :ref:`Mapping<doxid-classaxl_1_1io_1_1win_1_1_mapping>`;
+	class :ref:`NamedPipe<doxid-classaxl_1_1io_1_1win_1_1_named_pipe>`;
+	class :ref:`Serial<doxid-classaxl_1_1io_1_1win_1_1_serial>`;
+	class :ref:`Socket<doxid-classaxl_1_1io_1_1win_1_1_socket>`;
+	class :ref:`StdOverlapped<doxid-classaxl_1_1io_1_1win_1_1_std_overlapped>`;
+	class :ref:`UnmapViewOfFile<doxid-classaxl_1_1io_1_1win_1_1_unmap_view_of_file>`;
+
+	} // namespace win

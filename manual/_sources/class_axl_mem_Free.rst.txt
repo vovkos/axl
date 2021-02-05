@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::mem::Free
+.. _doxid-classaxl_1_1mem_1_1_free:
+
+template class axl::mem::Free
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Allocator.h>
+	
+	template <typename BaseAllocator>
+	class Free
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1mem_1_1_free_1a94da2f7d42c23995a89d8fd91e733722>`(void* p) const;
+	};

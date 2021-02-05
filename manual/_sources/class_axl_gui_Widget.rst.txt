@@ -1,0 +1,24 @@
+.. index:: pair: class; axl::gui::Widget
+.. _doxid-classaxl_1_1gui_1_1_widget:
+
+class axl::gui::Widget
+======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	class Widget
+	{
+	public:
+		// fields
+	
+		:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>` :target:`m_widgetDriver<doxid-classaxl_1_1gui_1_1_widget_1a6c7bf6ad16b2667d7cc9798e295f4f65>`;
+	};

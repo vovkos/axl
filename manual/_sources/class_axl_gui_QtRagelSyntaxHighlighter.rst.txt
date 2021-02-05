@@ -1,0 +1,50 @@
+.. index:: pair: class; axl::gui::QtRagelSyntaxHighlighter
+.. _doxid-classaxl_1_1gui_1_1_qt_ragel_syntax_highlighter:
+
+template class axl::gui::QtRagelSyntaxHighlighter
+=================================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_QtRagelSyntaxHighlighter.h>
+	
+	template <typename T>
+	class QtRagelSyntaxHighlighter:
+	    public QSyntaxHighlighter,
+	    public :ref:`axl::lex::Ragel<doxid-classaxl_1_1lex_1_1_ragel>`
+	{
+	public:
+		// construction
+	
+		:target:`QtRagelSyntaxHighlighter<doxid-classaxl_1_1gui_1_1_qt_ragel_syntax_highlighter_1a536b78e0c63dc38d757b160cf27650ac>`(QObject* parent);
+		:target:`QtRagelSyntaxHighlighter<doxid-classaxl_1_1gui_1_1_qt_ragel_syntax_highlighter_1a4659f1b7c4ac9c14af9a19dc903f6bce>`(QTextDocument* parent);
+
+		// methods
+	
+		virtual
+		void
+		:target:`highlightBlock<doxid-classaxl_1_1gui_1_1_qt_ragel_syntax_highlighter_1ad2f4259536476db1e857f4c20ce07c17>`(const QString& text);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		void
+		:ref:`setSource<doxid-classaxl_1_1lex_1_1_ragel_1a9d02c13e33c145d85b56129ef311ead5>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source,
+			bool isBomNeeded = false
+			);
+

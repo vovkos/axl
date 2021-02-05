@@ -1,0 +1,59 @@
+.. index:: pair: namespace; axl::fsm
+.. _doxid-namespaceaxl_1_1fsm:
+
+namespace axl::fsm
+==================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_fsm_MatchConditionKind.rst
+	enum_axl_fsm_NfaStateFlag.rst
+	struct_axl_fsm_DfaState.rst
+	struct_axl_fsm_DfaTransition.rst
+	struct_axl_fsm_MatchCondition.rst
+	struct_axl_fsm_NfaState.rst
+	struct_axl_fsm_NfaStateSet.rst
+	struct_axl_fsm_NfaTransition.rst
+	class_axl_fsm_NfaStateSetMap.rst
+	class_axl_fsm_NfaTransitionMgr.rst
+	class_axl_fsm_Regex.rst
+	class_axl_fsm_RegexCompiler.rst
+	class_axl_fsm_RegexNameMgr.rst
+	class_axl_fsm_StdRegexNameMgr.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace fsm {
+
+	// enums
+
+	enum :ref:`MatchConditionKind<doxid-namespaceaxl_1_1fsm_1af5eec6b5a26db45fc8e6ca754173bbc5>`;
+	enum :ref:`NfaStateFlag<doxid-namespaceaxl_1_1fsm_1a6f6670973c3befa663e74c6bf229f498>`;
+
+	// structs
+
+	struct :ref:`DfaState<doxid-structaxl_1_1fsm_1_1_dfa_state>`;
+	struct :ref:`DfaTransition<doxid-structaxl_1_1fsm_1_1_dfa_transition>`;
+	struct :ref:`MatchCondition<doxid-structaxl_1_1fsm_1_1_match_condition>`;
+	struct :ref:`NfaState<doxid-structaxl_1_1fsm_1_1_nfa_state>`;
+	struct :ref:`NfaStateSet<doxid-structaxl_1_1fsm_1_1_nfa_state_set>`;
+	struct :ref:`NfaTransition<doxid-structaxl_1_1fsm_1_1_nfa_transition>`;
+
+	// classes
+
+	template <typename T>
+	class :ref:`NfaStateSetMap<doxid-classaxl_1_1fsm_1_1_nfa_state_set_map>`;
+
+	class :ref:`NfaTransitionMgr<doxid-classaxl_1_1fsm_1_1_nfa_transition_mgr>`;
+	class :ref:`Regex<doxid-classaxl_1_1fsm_1_1_regex>`;
+	class :ref:`RegexCompiler<doxid-classaxl_1_1fsm_1_1_regex_compiler>`;
+	class :ref:`RegexNameMgr<doxid-classaxl_1_1fsm_1_1_regex_name_mgr>`;
+	class :ref:`StdRegexNameMgr<doxid-classaxl_1_1fsm_1_1_std_regex_name_mgr>`;
+
+	} // namespace fsm

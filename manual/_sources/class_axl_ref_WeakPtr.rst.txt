@@ -1,0 +1,74 @@
+.. index:: pair: class; axl::ref::WeakPtr
+.. _doxid-classaxl_1_1ref_1_1_weak_ptr:
+
+template class axl::ref::WeakPtr
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ref_RefCount.h>
+	
+	template <typename T>
+	class WeakPtr
+	{
+	public:
+		// construction
+	
+		:target:`WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1adc925b4fdbe866e9f5ffa6d0eb00d163>`();
+		:target:`WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1abdbc51a2b566e802fbd706a2eb3b4ca5>`(const :ref:`NullPtr<doxid-structaxl_1_1ref_1_1_null_ptr>`&);
+		:target:`WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1afd97607ab39fb01c855efaf688220c06>`(const WeakPtr& src);
+	
+		template <typename T2>
+		:target:`WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1ac703700695237361f93600696db38179>`(const WeakPtr<T2>& src);
+	
+		template <typename T2>
+		:target:`WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1a78f5cee4277a88a2cd1bd70e109c2b6e>`(const :ref:`Ptr<doxid-classaxl_1_1ref_1_1_ptr>`<T2>& src);
+	
+		template <typename T2>
+		:target:`WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1a28b39273d2aa3b3592e62eea721f9dcb>`(T2* p);
+	
+		:target:`WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1a10cbf12c67a7b059d99ddb415203f5da>`(
+			T* p,
+			:ref:`RefCount<doxid-classaxl_1_1ref_1_1_ref_count>`* refCount
+			);
+		:target:`~WeakPtr<doxid-classaxl_1_1ref_1_1_weak_ptr_1a229baadbc4b8a3273428e8b9da8e68d1>`();
+
+		// methods
+	
+		WeakPtr&
+		:target:`operator=<doxid-classaxl_1_1ref_1_1_weak_ptr_1a10433744fecff54172831f42301eb25d>`(const :ref:`NullPtr<doxid-structaxl_1_1ref_1_1_null_ptr>`&);
+	
+		WeakPtr&
+		:target:`operator=<doxid-classaxl_1_1ref_1_1_weak_ptr_1a57072119d560e54faac335d176dd5294>`(const WeakPtr& src);
+	
+		void
+		:target:`copy<doxid-classaxl_1_1ref_1_1_weak_ptr_1a51f748ee32087c961c83f097ddf7796e>`(
+			T* p,
+			:ref:`RefCount<doxid-classaxl_1_1ref_1_1_ref_count>`* refCount
+			);
+	
+		void
+		:target:`attach<doxid-classaxl_1_1ref_1_1_weak_ptr_1a1d6e574d51c55b149c0f23960d5ac7e4>`(
+			T* p,
+			:ref:`RefCount<doxid-classaxl_1_1ref_1_1_ref_count>`* refCount
+			);
+	
+		void
+		:target:`detach<doxid-classaxl_1_1ref_1_1_weak_ptr_1aa8f3c931f85f2460bd4d11b41bd40eab>`(
+			T** pp_o = NULL,
+			:ref:`RefCount<doxid-classaxl_1_1ref_1_1_ref_count>`** refCount_o = NULL
+			);
+	
+		void
+		:target:`clear<doxid-classaxl_1_1ref_1_1_weak_ptr_1ac880675a4ab7d243d8bdb5fa93d9b490>`();
+	
+		:ref:`RefCount<doxid-classaxl_1_1ref_1_1_ref_count>`*
+		:target:`getRefCount<doxid-classaxl_1_1ref_1_1_weak_ptr_1a9e0b2cb4f5d546a3eaa5b550ed9d6fa5>`() const;
+	};

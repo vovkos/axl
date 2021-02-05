@@ -1,0 +1,51 @@
+.. index:: pair: enum; Key
+.. _doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482:
+
+enum axl::gui::Key
+==================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+
+	enum Key
+	{
+	    :target:`Key_Backspace<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a2b90c39ffc24a0a567dbae07182aaed7>`  = 0x08,
+	    :target:`Key_Tab<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a2fe21964996822df124dbd915533f1f3>`        = 0x09,
+	    :target:`Key_Enter<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482afd5b947eac2f74a692fb44c84ad56f72>`      = 0x0d,
+	    :target:`Key_Esc<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482ab0721edecf6b827bcbf9370f85218edc>`        = 0x1b,
+	    :target:`Key_Pause<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482ab636c57a4dc0b24eb3d406163348f916>`      = 0x10000013,
+	    :target:`Key_Print<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482ae0d32530a0b9e89c43da76d12fbfa6dd>`      = 0x1000002a,
+	    :target:`Key_CapsLock<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482af915e02fa038ebcbf7d5c728b12a80a5>`   = 0x10000014,
+	    :target:`Key_NumLock<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a24d950468e969c73cc9b2090088e96f6>`    = 0x10000090,
+	    :target:`Key_ScrollLock<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482ab2cffed9b2bd7757da3ec34a2a143bde>` = 0x10000091,
+	    :target:`Key_Shift<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a6d3f530b1a3f0a9b16f5fc809a23edee>`      = 0x10000010,
+	    :target:`Key_Ctrl<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a29b5a4c42f7779d18402f62ddac96897>`       = 0x10000011,
+	    :target:`Key_Alt<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482aeb935e154cdc9fe08dcc7af8b5fcd564>`        = 0x10000012,
+	    :target:`Key_PageUp<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a9fbde77e2492cca749f5ee255e7b4eb3>`     = 0x10000021,
+	    :target:`Key_PageDown<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a1f20d71e6bc4e1e31d05af384fc3afc1>`   = 0x10000022,
+	    :target:`Key_End<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a6f317c8d17592df74f7ad7454ca80453>`        = 0x10000023,
+	    :target:`Key_Home<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482ae7d5124442b20d030716940e36f72527>`       = 0x10000024,
+	    :target:`Key_Left<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a0651b3e3d9dbc2bc7a930da74087e5c1>`       = 0x10000025,
+	    :target:`Key_Up<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482aa45b0b016242d13a1cc85bf81b4a2e78>`         = 0x10000026,
+	    :target:`Key_Right<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a16218ceb9cf25ba0ca428e3de35371eb>`      = 0x10000027,
+	    :target:`Key_Down<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a992c05e934b2dfe0a58e35a35801740d>`       = 0x10000028,
+	    :target:`Key_Insert<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a58e62ae7f8719fc28450b6a7dbd6b03a>`     = 0x1000002d,
+	    :target:`Key_Delete<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a55579fdbfb19b995e7a2ea5737a48b9c>`     = 0x1000002e,
+	    :target:`Key_F1<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482ac9e7d851bd953b711148da0aa3fe7b2a>`         = 0x10000070,
+	    :target:`Key_F2<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a6b7d147db831d38a90b44982453fb2b9>`         = 0x10000071,
+	    :target:`Key_F3<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a379e83fbbea9790b3211541065074891>`         = 0x10000072,
+	    :target:`Key_F4<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a8e97a5eda2d2fb85ed93c7463ad314e4>`         = 0x10000073,
+	    :target:`Key_F5<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a635116c62589155bbb1fa75aeed0dc89>`         = 0x10000074,
+	    :target:`Key_F6<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a45ecaca9b48abf8f64b0159f3b28d399>`         = 0x10000075,
+	    :target:`Key_F7<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a2ebd136f126588b1eba252cc98f3d002>`         = 0x10000076,
+	    :target:`Key_F8<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a08dbf3bb062f8fc1845cab6396959abb>`         = 0x10000077,
+	    :target:`Key_F9<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482add654f6e6c912c21600f8471d6125bef>`         = 0x10000078,
+	    :target:`Key_F10<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482ab6ea1e1e13a5dfec1ba0cd6e2d6e9543>`        = 0x10000079,
+	    :target:`Key_F11<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482a8d03db26db60a83c83b7e5ada4bc317f>`        = 0x1000007a,
+	    :target:`Key_F12<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482af4858ccaad6a0a2a90a161580dabb9ec>`        = 0x1000007b,
+	};
+

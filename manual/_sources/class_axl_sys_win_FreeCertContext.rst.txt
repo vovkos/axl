@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::win::FreeCertContext
+.. _doxid-classaxl_1_1sys_1_1win_1_1_free_cert_context:
+
+class axl::sys::win::FreeCertContext
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_Certificate.h>
+	
+	class FreeCertContext
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1win_1_1_free_cert_context_1abe284cec832c84a6c56a68ef204910a5>`(const CERT_CONTEXT* p);
+	};
