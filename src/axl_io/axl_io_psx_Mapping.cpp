@@ -31,13 +31,14 @@ Mapping::map(
 {
 	close();
 
-	m_p = ::mmap(addrHint, size, protection, flags, fd, offset);
-	if (m_p == (void*) -1)
+	void* p = ::mmap(addrHint, size, protection, flags, fd, offset);
+	if (p == (void*)-1)
 	{
 		err::setLastSystemError();
 		return NULL;
 	}
 
+	m_p = p;
 	m_size = size;
 	return m_p;
 }
