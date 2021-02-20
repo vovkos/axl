@@ -160,7 +160,7 @@ endif()
 if(LIBUSB_FOUND)
 	option(
 		BUILD_AXL_IO_USB
-		"Build axl_io library (LibUSB wrappers)"
+		"Build axl_io_usb library (LibUSB wrappers)"
 		ON
 		)
 else()
@@ -308,6 +308,18 @@ if(MSVC)
 		)
 
 	add_subdirectory(axl_libcmt)
+endif()
+
+#...............................................................................
+
+option(
+	BUILD_AXL_SYS_CA
+	"Build axl_sys_ca library (code authentication)"
+	ON
+	)
+
+if(BUILD_AXL_SYS_CA)
+	add_subdirectory(axl_sys_ca)
 endif()
 
 #...............................................................................
