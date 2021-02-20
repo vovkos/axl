@@ -25,10 +25,10 @@ namespace win {
 bool
 verifyAuthenticodeSignature(
 	const sl::StringRef_w& fileName,
-	sl::Array<char>* serialNumber,
 	sl::String_w* programName,
 	sl::String_w* subjectName,
 	sl::String_w* issuerName,
+	sl::Array<char>* serialNumber,
 	uint64_t* timestamp
 	);
 

@@ -25,19 +25,13 @@ namespace win {
 bool
 verifyAuthenticodeSignature(
 	const sl::StringRef_w& fileName,
-	sl::Array<char>* serialNumber,
 	sl::String_w* programName,
 	sl::String_w* subjectName,
 	sl::String_w* issuerName,
+	sl::Array<char>* serialNumber,
 	uint64_t* timestamp
 	)
 {
-	serialNumber->clear();
-	programName->clear();
-	subjectName->clear();
-	issuerName->clear();
-	*timestamp = 0;
-
 	bool result = verifyTrustFile(fileName);
 	if (!result)
 		return false;
@@ -69,9 +63,15 @@ verifyAuthenticodeSignature(
 		return false;
 
 	const CMSG_SIGNER_INFO* signerInfo = (CMSG_SIGNER_INFO*)signerInfoBuffer.cp();
-	serialNumber->copyReverse((char*)signerInfo->SerialNumber.pbData, signerInfo->SerialNumber.cbData);
-	getCryptMsgSignerInfoProgramName(programName, signerInfo);
-	getCryptMsgSignerInfoTimestamp(timestamp, signerInfo);
+
+	if (serialNumber)
+		serialNumber->copyReverse((char*)signerInfo->SerialNumber.pbData, signerInfo->SerialNumber.cbData);
+
+	if (programName)
+		getCryptMsgSignerInfoProgramName(programName, signerInfo);
+
+	if (timestamp)
+		getCryptMsgSignerInfoTimestamp(timestamp, signerInfo);
 
 	CERT_INFO certInfo = { 0 };
 	certInfo.Issuer = signerInfo->Issuer;
@@ -89,8 +89,12 @@ verifyAuthenticodeSignature(
 	if (!result)
 		return false;
 
-	certificate.getSubjectName(subjectName);
-	certificate.getIssuerName(issuerName);
+	if (subjectName)
+		certificate.getSubjectName(subjectName);
+
+	if (issuerName)
+		certificate.getIssuerName(issuerName);
+
 	return true;
 }
 

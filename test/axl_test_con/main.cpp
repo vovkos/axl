@@ -5385,10 +5385,10 @@ authenticodeTest(const wchar_t* fileName = NULL)
 
 	bool result = sys::win::verifyAuthenticodeSignature(
 		fileName,
-		&serialNumber,
 		&programName,
 		&subjectName,
 		&issuerName,
+		&serialNumber,
 		&timestamp
 		);
 
@@ -5399,15 +5399,15 @@ authenticodeTest(const wchar_t* fileName = NULL)
 	}
 
 	printf(
-		"serial:    %s\n"
 		"program:   %S\n"
 		"subject:   %S\n"
 		"issuer:    %S\n"
+		"serial:    %s\n"
 		"timestamp: %s\n",
-		enc::HexEncoding::encode(serialNumber, serialNumber.getCount()).sz(),
 		programName.sz(),
 		subjectName.sz(),
 		issuerName.sz(),
+		enc::HexEncoding::encode(serialNumber, serialNumber.getCount()).sz(),
 		timestamp ? sys::Time(timestamp).format("%Y-%M-%d %h:%m:%s").sz() : "?"
 		);
 
@@ -5628,9 +5628,10 @@ main(
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WSAStartup(0x0202, &wsaData);
+	authenticodeTest();
 #endif
 
-	mappedFileTest();
+	// mappedFileTest();
 
 	return 0;
 }
