@@ -12,10 +12,12 @@
 #pragma once
 
 #include "axl_sl_String.h"
-#include "axl_sl_Array.h"
 
 #if (_AXL_OS_WIN)
+#	include "axl_sl_Array.h"
 #	include "axl_sys_win_Authenticode.h"
 #elif (_AXL_OS_LINUX)
+#	include "axl_cry_Rsa.h"
+#	include "axl_mem_Block.h"
 #elif (_AXL_OS_DARWIN)
 #endif

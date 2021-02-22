@@ -12,3 +12,8 @@
 #pragma once
 
 #include "axl_sys_CaPch.h"
+
+#if (_AXL_OS_LINUX)
+#	include "axl_io_MappedFile.h"
+#	include <link.h>
+#endif

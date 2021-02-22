@@ -30,6 +30,11 @@ source_group(
 	${LIB_CPP_LIST}
 	)
 
+if (LINUX)
+	list(APPEND LIB_H_LIST axl_sys_lnx_ElfParser.h)
+	list(APPEND LIB_CPP_LIST axl_sys_lnx_ElfParser.cpp)
+endif()
+
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 # pch folder

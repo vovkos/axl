@@ -80,6 +80,11 @@ if(BUILD_AXL_CRY)
 	link_directories(${OPENSSL_LIB_DIR})
 	add_definitions(-D_AXL_CRY=1)
 
+	if(BUILD_AXL_SYS_CA)
+		add_definitions(-D_AXL_SYS_CA=1)
+		list(APPEND OPT_LIB_LIST axl_sys_ca)
+	endif()
+
 	if(BUILD_AXL_IO_SSL)
 		add_definitions(-D_AXL_IO_SSL=1)
 		list(APPEND OPT_LIB_LIST axl_io_ssl ${OPENSSL_SSL_LIB_NAME})

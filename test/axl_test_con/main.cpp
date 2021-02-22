@@ -5604,6 +5604,49 @@ mappedFileTest()
 	file.close();
 }
 
+//..............................................................................
+
+void
+codeAuthenticatorTest()
+{
+	#define JNC_LIB_DIR "/home/vladimir/Projects/repos/ioninja/jancy/build/make-amd64/lib/Debug"
+
+	const char* fileNameTable[] =
+	{
+		JNC_LIB_DIR "/io_base-amd64.bin",
+		JNC_LIB_DIR "/io_devmon-amd64.bin",
+		JNC_LIB_DIR "/io_pcap-amd64.bin",
+		JNC_LIB_DIR "/io_ssh-amd64.bin",
+		JNC_LIB_DIR "/io_ssl-amd64.bin",
+	};
+
+	const char publicKeyPem[] =
+		"-----BEGIN PUBLIC KEY-----\n"
+		"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqlJw5tH4SYipoxczk3S9\n"
+		"pIYV/H5old8TGzQ0Mq2AFLhW0aBewsuQOJUxLdzu4ym+KNpV2+6tp9qZFpa/zu7S\n"
+		"qzztgvnWsL4EsdqXGLfTDa+rM9GlhsrDchF4a13V10fKBtBlCn1OSBLYY1BWkrjK\n"
+		"66rv4J/8uGuhZi9ufZh3jML0aFUklPIiPly6ndRMnxKFqqwqSy6ymDn3kAdHZfMp\n"
+		"c21hG26vjG7guYflmd4krvF8++yBUGJV9ToT5BKF4pzUGh9Pt7lt+MAUdJnTT9ZF\n"
+		"6SyVnDkMM8s5DK8lblKrxur4LRsX0CJ1557T6fFWgXsEnyqFWUm8fVJKaRoozOjl\n"
+		"zQIDAQAB\n"
+		 "-----END PUBLIC KEY-----\n";
+
+	sys::CodeAuthenticator authenticator;
+	authenticator.setup(".njsig", publicKeyPem);
+
+	for (size_t i = 0; i < countof(fileNameTable); i++)
+	{
+		const char* fileName = fileNameTable[i];
+		printf("Verifying %s...\n", fileName);
+
+		bool result = authenticator.verifyFile(fileName);
+		if (!result)
+			fprintf(stderr, "Error: %s...\n", err::getLastErrorDescription().sz());
+	}
+
+	printf("Done.\n");
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5631,8 +5674,7 @@ main(
 	authenticodeTest();
 #endif
 
-	// mappedFileTest();
-
+	codeAuthenticatorTest();
 	return 0;
 }
 

@@ -89,6 +89,10 @@
 #	include "axl_ini_Parser.h"
 #endif
 
+#ifdef _AXL_SYS_CA
+#	include "axl_sys_CodeAuthenticator.h"
+#endif
+
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_VirtualMemory.h"
 #	include "axl_sys_win_Process.h"

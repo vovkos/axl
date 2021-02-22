@@ -13,8 +13,7 @@
 
 #define _AXL_SYS_CODEAUTHENTICATOR_H
 
-#include "axl_sl_String.h"
-#include "axl_sl_Array.h"
+#include "axl_sys_CaPch.h"
 
 namespace axl {
 namespace sys {
@@ -96,7 +95,90 @@ public:
 };
 
 #elif (_AXL_OS_LINUX)
-#	error CodeAuthenticator for Linux is not implemented yet
+
+class CodeHashGenerator
+{
+protected:
+	sl::String m_signatureSectionName;
+
+protected:
+	bool
+	generateCodeHash(
+		const sl::StringRef& fileName,
+		uchar_t md5[MD5_DIGEST_LENGTH],
+		mem::Block* signatureSection = NULL
+		);
+};
+
+//..............................................................................
+
+class CodeAuthenticator: CodeHashGenerator
+{
+protected:
+	cry::Rsa m_publicKey;
+
+public:
+	CodeAuthenticator()
+	{
+	}
+
+	CodeAuthenticator(
+		sl::StringRef& signatureSectionName,
+		const sl::StringRef& publicKeyPem
+		)
+	{
+		setup(signatureSectionName, publicKeyPem);
+	}
+
+	bool
+	setup(
+		const sl::StringRef& signatureSectionName,
+		const sl::StringRef& publicKeyPem
+		);
+
+	bool
+	verifyFile(const sl::StringRef& fileName);
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class CodeSignatureGenerator: public CodeHashGenerator
+{
+protected:
+	cry::Rsa m_privateKey;
+
+public:
+	CodeSignatureGenerator()
+	{
+	}
+
+	CodeSignatureGenerator(
+		sl::StringRef& signatureSectionName,
+		const sl::StringRef& privateKeyPem
+		)
+	{
+		setup(signatureSectionName, privateKeyPem);
+	}
+
+	bool
+	setup(
+		const sl::StringRef& signatureSectionName,
+		const sl::StringRef& privateKeyPem
+		);
+
+	size_t
+	getSignatureSize()
+	{
+		return m_privateKey.getSize();
+	}
+
+	bool
+	generateSignature(
+		const sl::StringRef& fileName,
+		sl::Array<char>* signature
+		);
+};
+
 #elif (_AXL_OS_DARWIN)
 #	error CodeAuthenticator for Darwin is not implemented yet
 #endif

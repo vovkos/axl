@@ -63,6 +63,12 @@ public:
 	}
 
 	bool
+	readPublicKey(const sl::StringRef& pem)
+	{
+		return readPublicKey(pem.cp(), pem.getLength());
+	}
+
+	bool
 	readPrivateKey(BIO* bio);
 
 	bool
@@ -73,6 +79,12 @@ public:
 	{
 		Bio bio;
 		return bio.createMemBuf(pem, size) && readPrivateKey(bio);
+	}
+
+	bool
+	readPrivateKey(const sl::StringRef& pem)
+	{
+		return readPrivateKey(pem.cp(), pem.getLength());
 	}
 
 	bool

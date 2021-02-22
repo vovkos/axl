@@ -11,6 +11,10 @@
 
 #include "pch.h"
 #include "axl_sys_CodeAuthenticator.h"
+#if (_AXL_OS_LINUX)
+#	include "axl_sys_lnx_ElfParser.h"
+#	include "axl_mem/axl_mem_Block.h"
+#endif
 
 namespace axl {
 namespace sys {
@@ -81,7 +85,107 @@ CodeAuthenticator::setup(
 
 #elif (_AXL_OS_LINUX)
 
-#	error CodeAuthenticator for Linux is not implemented yet
+//..............................................................................
+
+bool
+CodeHashGenerator::generateCodeHash(
+	const sl::StringRef& fileName,
+	uchar_t md5[MD5_DIGEST_LENGTH],
+	mem::Block* signatureSection
+	)
+{
+	io::SimpleMappedFile file;
+	lnx::ElfParser elf;
+
+	bool result =
+		file.open(fileName, io::FileFlag_ReadOnly) &&
+		elf.open(file.p(), file.getMappingSize());
+
+	if (!result)
+		return false;
+
+	char* p = (char*)file.p();
+	MD5_CTX md5Ctx;
+	MD5_Init(&md5Ctx);
+
+	const ElfW(Shdr)* shdr = elf.getSectionHdrTable();
+	const ElfW(Shdr)* shdrEnd= shdr + elf.getElfHdr()->e_shnum;
+	for (; shdr < shdrEnd; shdr++)
+	{
+		const char* name = elf.getString(shdr->sh_name);
+		if (m_signatureSectionName != name)
+			MD5_Update(&md5Ctx, p + shdr->sh_offset, shdr->sh_size);
+		else if (signatureSection)
+			signatureSection->setup(p + shdr->sh_offset, shdr->sh_size);
+	}
+
+	MD5_Final(md5, &md5Ctx);
+	return true;
+}
+
+//..............................................................................
+
+bool
+CodeAuthenticator::setup(
+	const sl::StringRef& signatureSectionName,
+	const sl::StringRef& publicKeyPem
+	)
+{
+	m_signatureSectionName = signatureSectionName;
+	return m_publicKey.readPublicKey(publicKeyPem);
+}
+
+bool
+CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
+{
+	uchar_t md5[MD5_DIGEST_LENGTH];
+	mem::Block signatureSection;
+
+	bool result = generateCodeHash(fileName, md5, &signatureSection);
+	if (!result)
+		return false;
+
+	if (!signatureSection.m_p)
+		return err::fail("ELF-file signature not found");
+
+	result = m_publicKey.verifyHash(
+		NID_md5,
+		md5,
+		sizeof(md5),
+		signatureSection.m_p,
+		signatureSection.m_size
+		);
+
+	if (!result)
+		return err::fail("ELF-file signature mismatch");
+
+	return true;
+}
+
+//..............................................................................
+
+bool
+CodeSignatureGenerator::setup(
+	const sl::StringRef& signatureSectionName,
+	const sl::StringRef& privateKeyPem
+	)
+{
+	m_signatureSectionName = signatureSectionName;
+	return m_privateKey.readPublicKey(privateKeyPem);
+}
+
+bool
+CodeSignatureGenerator::generateSignature(
+	const sl::StringRef& fileName,
+	sl::Array<char>* signature
+	)
+{
+	uchar_t md5[MD5_DIGEST_LENGTH];
+
+	return
+		generateCodeHash(fileName, md5),
+		m_privateKey.signHash(NID_md5, signature, md5, sizeof(md5));
+}
 
 #elif (_AXL_OS_DARWIN)
 
