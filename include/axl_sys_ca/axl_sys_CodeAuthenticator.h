@@ -96,23 +96,30 @@ public:
 
 #elif (_AXL_OS_LINUX)
 
-class CodeHashGenerator
+namespace lnx {
+
+//..............................................................................
+
+class ElfHashGenerator
 {
 protected:
 	sl::String m_signatureSectionName;
 
 protected:
 	bool
-	generateCodeHash(
-		const sl::StringRef& fileName,
-		uchar_t md5[MD5_DIGEST_LENGTH],
+	generateHash(
+		const void* elfBase,
+		size_t elfSize,
+		uchar_t hash[SHA_DIGEST_LENGTH],
 		mem::Block* signatureSection = NULL
-		);
+	);
 };
 
 //..............................................................................
 
-class CodeAuthenticator: CodeHashGenerator
+} // namespace lnx
+
+class CodeAuthenticator: lnx::ElfHashGenerator
 {
 protected:
 	cry::Rsa m_publicKey;
@@ -140,19 +147,21 @@ public:
 	verifyFile(const sl::StringRef& fileName);
 };
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+namespace lnx {
 
-class CodeSignatureGenerator: public CodeHashGenerator
+//..............................................................................
+
+class ElfSignatureGenerator: public ElfHashGenerator
 {
 protected:
 	cry::Rsa m_privateKey;
 
 public:
-	CodeSignatureGenerator()
+	ElfSignatureGenerator()
 	{
 	}
 
-	CodeSignatureGenerator(
+	ElfSignatureGenerator(
 		sl::StringRef& signatureSectionName,
 		const sl::StringRef& privateKeyPem
 		)
@@ -178,6 +187,10 @@ public:
 		sl::Array<char>* signature
 		);
 };
+
+//..............................................................................
+
+} // namespace lnx
 
 #elif (_AXL_OS_DARWIN)
 #	error CodeAuthenticator for Darwin is not implemented yet

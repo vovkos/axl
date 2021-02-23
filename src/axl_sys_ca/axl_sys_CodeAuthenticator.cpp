@@ -85,45 +85,46 @@ CodeAuthenticator::setup(
 
 #elif (_AXL_OS_LINUX)
 
+namespace lnx {
+
 //..............................................................................
 
 bool
-CodeHashGenerator::generateCodeHash(
-	const sl::StringRef& fileName,
-	uchar_t md5[MD5_DIGEST_LENGTH],
+ElfHashGenerator::generateHash(
+	const void* elfBase,
+	size_t elfSize,
+	uchar_t hash[SHA_DIGEST_LENGTH],
 	mem::Block* signatureSection
 	)
 {
-	io::SimpleMappedFile file;
 	lnx::ElfParser elf;
 
-	bool result =
-		file.open(fileName, io::FileFlag_ReadOnly) &&
-		elf.open(file.p(), file.getMappingSize());
-
+	bool result = elf.open(elfBase, elfSize);
 	if (!result)
 		return false;
 
-	char* p = (char*)file.p();
-	MD5_CTX md5Ctx;
-	MD5_Init(&md5Ctx);
+	char* p = (char*)elfBase;
+	SHA_CTX shaCtx;
+	SHA1_Init(&shaCtx);
 
 	const ElfW(Shdr)* shdr = elf.getSectionHdrTable();
-	const ElfW(Shdr)* shdrEnd= shdr + elf.getElfHdr()->e_shnum;
+	const ElfW(Shdr)* shdrEnd = shdr + elf.getElfHdr()->e_shnum;
 	for (; shdr < shdrEnd; shdr++)
 	{
 		const char* name = elf.getString(shdr->sh_name);
 		if (m_signatureSectionName != name)
-			MD5_Update(&md5Ctx, p + shdr->sh_offset, shdr->sh_size);
+			SHA1_Update(&shaCtx, p + shdr->sh_offset, shdr->sh_size);
 		else if (signatureSection)
 			signatureSection->setup(p + shdr->sh_offset, shdr->sh_size);
 	}
 
-	MD5_Final(md5, &md5Ctx);
+	SHA1_Final(hash, &shaCtx);
 	return true;
 }
 
 //..............................................................................
+
+} // namespace lnx
 
 bool
 CodeAuthenticator::setup(
@@ -138,10 +139,14 @@ CodeAuthenticator::setup(
 bool
 CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
 {
-	uchar_t md5[MD5_DIGEST_LENGTH];
+	io::SimpleMappedFile file;
+	uchar_t hash[SHA_DIGEST_LENGTH];
 	mem::Block signatureSection;
 
-	bool result = generateCodeHash(fileName, md5, &signatureSection);
+	bool result =
+		file.open(fileName, io::FileFlag_ReadOnly) &&
+		generateHash(file.p(), file.getMappingSize(), hash, &signatureSection);
+
 	if (!result)
 		return false;
 
@@ -149,9 +154,9 @@ CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
 		return err::fail("ELF-file signature not found");
 
 	result = m_publicKey.verifyHash(
-		NID_md5,
-		md5,
-		sizeof(md5),
+		NID_sha1,
+		hash,
+		sizeof(hash),
 		signatureSection.m_p,
 		signatureSection.m_size
 		);
@@ -162,30 +167,38 @@ CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
 	return true;
 }
 
+namespace lnx {
+
 //..............................................................................
 
 bool
-CodeSignatureGenerator::setup(
+ElfSignatureGenerator::setup(
 	const sl::StringRef& signatureSectionName,
 	const sl::StringRef& privateKeyPem
 	)
 {
 	m_signatureSectionName = signatureSectionName;
-	return m_privateKey.readPublicKey(privateKeyPem);
+	return m_privateKey.readPrivateKey(privateKeyPem);
 }
 
 bool
-CodeSignatureGenerator::generateSignature(
+ElfSignatureGenerator::generateSignature(
 	const sl::StringRef& fileName,
 	sl::Array<char>* signature
 	)
 {
-	uchar_t md5[MD5_DIGEST_LENGTH];
+	io::SimpleMappedFile file;
+	uchar_t hash[SHA_DIGEST_LENGTH];
 
 	return
-		generateCodeHash(fileName, md5),
-		m_privateKey.signHash(NID_md5, signature, md5, sizeof(md5));
+		file.open(fileName, io::FileFlag_ReadOnly) &&
+		generateHash(file.p(), file.getMappingSize(), hash) &&
+		m_privateKey.signHash(NID_sha1, signature, hash, sizeof(hash));
 }
+
+//..............................................................................
+
+} // namespace lnx
 
 #elif (_AXL_OS_DARWIN)
 
