@@ -124,7 +124,7 @@ public:
 	CFComparisonResult
 	compare(
 		CFStringRef p2,
-		CFStringCompareFlags flags
+		CFStringCompareFlags flags = 0
 		) const
 	{
 		ASSERT(m_p);

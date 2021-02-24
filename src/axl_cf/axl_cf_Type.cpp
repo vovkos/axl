@@ -61,10 +61,8 @@ getStringFromCfString(CFStringRef cfString)
 sl::String
 getTypeIdDescription(CFTypeID typeId)
 {
-	CFStringRef p = ::CFCopyTypeIDDescription(typeId);
-	sl::String string = getStringFromCfString(p);
-	::CFRelease(p);
-	return string;
+	CFStringRef cfString = ::CFCopyTypeIDDescription(typeId);
+	return String(cfString, true).getString();
 }
 
 sl::String
@@ -106,10 +104,7 @@ cfTypeToString(
 	else if (isVerbose)
 	{
 		CFStringRef cfString = ::CFCopyDescription(cfType);
-		sl::String string = getStringFromCfString(cfString);
-		::CFRelease(cfString);
-
-		return string;
+		return String(cfString, true).getString();
 	}
 	else
 	{

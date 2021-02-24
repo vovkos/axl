@@ -49,13 +49,6 @@ public:
 	{
 	}
 
-	Url(
-		const sl::StringRef& string,
-		CFURLRef baseUrl
-		)
-	{
-		create(string, baseUrl);
-	}
 	Url&
 	operator = (const Url& src)
 	{

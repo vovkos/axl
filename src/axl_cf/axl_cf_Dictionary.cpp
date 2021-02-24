@@ -18,7 +18,7 @@ namespace cf {
 //..............................................................................
 
 bool
-MutableDictionary::create(CFDictionaryRef src)
+MutableDictionary::clone(CFDictionaryRef src)
 {
 	CFMutableDictionaryRef newDictionary = ::CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, src);
 	if (!newDictionary)

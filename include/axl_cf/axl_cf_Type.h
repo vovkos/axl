@@ -127,10 +127,17 @@ public:
 		return *this;
 	}
 
-	T
-	p() const
+	bool
+	isNull() const
 	{
-		return m_p;
+		return !m_p;
+	}
+
+	T*
+	p()
+	{
+		ASSERT(!m_p);
+		return &m_p;
 	}
 
 	void

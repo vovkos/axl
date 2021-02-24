@@ -72,7 +72,7 @@ public:
 	}
 
 	bool
-	create(CFDictionaryRef src)
+	clone(CFDictionaryRef src)
 	{
 		CFDictionaryRef newDictionary = ::CFDictionaryCreateCopy(kCFAllocatorDefault, src);
 		if (!newDictionary)
@@ -215,7 +215,7 @@ public:
 	}
 
 	bool
-	create(CFDictionaryRef src);
+	clone(CFDictionaryRef src);
 
 	void
 	addValue(
