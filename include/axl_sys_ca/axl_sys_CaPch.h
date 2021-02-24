@@ -20,4 +20,5 @@
 #	include "axl_cry_Rsa.h"
 #	include "axl_mem_Block.h"
 #elif (_AXL_OS_DARWIN)
+#	include "axl_cf_String.h"
 #endif

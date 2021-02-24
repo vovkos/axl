@@ -193,7 +193,47 @@ public:
 } // namespace lnx
 
 #elif (_AXL_OS_DARWIN)
-#	error CodeAuthenticator for Darwin is not implemented yet
+
+class CodeAuthenticator
+{
+protected:
+	cf::String m_expectedProgramId;
+	cf::String m_expectedTeamId;
+
+public:
+	CodeAuthenticator()
+	{
+	}
+
+	CodeAuthenticator(const sl::StringRef& expectedIssuerName)
+	{
+		setup(expectedIssuerName);
+	}
+
+	CodeAuthenticator(
+		const sl::StringRef& expectedProgramId,
+		const sl::StringRef& expectedTeamId
+		)
+	{
+		setup(expectedProgramId, expectedTeamId);
+	}
+
+	void
+	setup(const sl::StringRef& expectedTeamId)
+	{
+		setup(sl::StringRef(), expectedTeamId);
+	}
+
+	void
+	setup(
+		const sl::StringRef& expectedProgramId,
+		const sl::StringRef& expectedTeamId
+		);
+
+	bool
+	verifyFile(const sl::StringRef& fileName);
+};
+
 #endif
 
 //..............................................................................

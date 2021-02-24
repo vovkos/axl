@@ -13,7 +13,6 @@
 #include "axl_sys_CodeAuthenticator.h"
 #if (_AXL_OS_LINUX)
 #	include "axl_sys_lnx_ElfParser.h"
-#	include "axl_mem/axl_mem_Block.h"
 #endif
 
 namespace axl {
@@ -202,7 +201,49 @@ ElfSignatureGenerator::generateSignature(
 
 #elif (_AXL_OS_DARWIN)
 
-#	error CodeAuthenticator for Darwin is not implemented yet
+void
+CodeAuthenticator::setup(
+	const sl::StringRef& expectedProgramId,
+	const sl::StringRef& expectedTeamId
+	)
+{
+	if (!expectedProgramId.isEmpty())
+		m_expectedProgramId = expectedProgramId;
+	else
+		m_expectedProgramId.clear();
+
+	if (!expectedTeamId.isEmpty())
+		m_expectedTeamId = expectedTeamId;
+	else
+		m_expectedTeamId.clear();
+}
+
+bool
+CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
+{
+	sec::StaticCode code;
+	cf::Dictionary dictionary;
+
+	bool result =
+		code.createWithPath(fileName, false) &&
+		code.copySigningInformation(kSecCSSigningInformation, dictionary.p());
+
+	if (!result)
+		return false;
+
+	CFStringRef programId = (CFStringRef)dictionary.getValue(kSecCodeInfoIdentifier);
+	if (!programId)
+		return err::fail("code is not signed");
+
+	if (!m_expectedProgramId.isNull() && m_expectedProgramId.compare(programId))
+		return err::fail("program identifier mismatch");
+
+	CFStringRef teamId = (CFStringRef)dictionary.getValue(kSecCodeInfoTeamIdentifier);
+	if (!m_expectedTeamId.isNull() && m_expectedTeamId.compare(teamId))
+		return err::fail("team identifier mismatch");
+
+	return true;
+}
 
 #endif
 
