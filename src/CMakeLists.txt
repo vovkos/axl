@@ -273,14 +273,24 @@ if(APPLE)
 		"Build axl_iok library (IOKit Framework wrappers)"
 		ON
 		)
-endif()
 
-if(BUILD_AXL_CF)
-	add_subdirectory(axl_cf)
-endif()
+	option(
+		BUILD_AXL_SEC
+		"Build axl_sec library (Security Framework wrappers)"
+		ON
+		)
 
-if(BUILD_AXL_IOK)
-	add_subdirectory(axl_iok)
+	if(BUILD_AXL_CF)
+		add_subdirectory(axl_cf)
+	endif()
+
+	if(BUILD_AXL_IOK)
+		add_subdirectory(axl_iok)
+	endif()
+
+	if(BUILD_AXL_SEC)
+		add_subdirectory(axl_sec)
+	endif()
 endif()
 
 #...............................................................................
