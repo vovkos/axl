@@ -105,6 +105,7 @@
 #	include "axl_sys_psx_Sem.h"
 #	if (_AXL_OS_DARWIN)
 #		include "axl_sys_drw_Semaphore.h"
+#		include "axl_sec_Error.h"
 #		include "axl_cf_Url.h"
 #	endif
 #endif

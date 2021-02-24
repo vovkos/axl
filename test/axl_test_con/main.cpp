@@ -5609,16 +5609,14 @@ mappedFileTest()
 void
 codeAuthenticatorTest()
 {
-	#define JNC_LIB_DIR "/home/vladimir/Projects/repos/ioninja/jancy/build/make-amd64/lib/Debug"
+	sys::CodeAuthenticator authenticator;
 
-	const char* fileNameTable[] =
-	{
-		JNC_LIB_DIR "/io_base-amd64.bin",
-		JNC_LIB_DIR "/io_devmon-amd64.bin",
-		JNC_LIB_DIR "/io_pcap-amd64.bin",
-		JNC_LIB_DIR "/io_ssh-amd64.bin",
-		JNC_LIB_DIR "/io_ssl-amd64.bin",
-	};
+#if (_AXL_OS_WIN)
+#	define JNC_LIB_DIR "c:/Projects/repos/ioninja/jancy/build/make-amd64/bin/Debug"
+
+	authenticator.setup("Tibbo Technology Inc.");
+#elif (_AXL_OS_LINUX)
+#	define JNC_LIB_DIR "/home/vladimir/Projects/repos/ioninja/jancy/build/make-amd64/lib/Debug"
 
 	const char publicKeyPem[] =
 		"-----BEGIN PUBLIC KEY-----\n"
@@ -5631,8 +5629,22 @@ codeAuthenticatorTest()
 		"zQIDAQAB\n"
 		 "-----END PUBLIC KEY-----\n";
 
-	sys::CodeAuthenticator authenticator;
 	authenticator.setup(".njsig", publicKeyPem);
+#elif (_AXL_OS_DARWIN)
+#	define JNC_LIB_DIR "/Users/vladimir/Projects/ioninja/jancy/build/make-amd64/lib/Debug"
+
+	sec::registerErrorProvider();
+	authenticator.setup("MHV447DZEV");
+#endif
+
+	const char* fileNameTable[] =
+	{
+		JNC_LIB_DIR "/io_base-amd64.bin",
+		JNC_LIB_DIR "/io_pcap-amd64.bin",
+		JNC_LIB_DIR "/io_ssh-amd64.bin",
+		JNC_LIB_DIR "/io_ssl-amd64.bin",
+		JNC_LIB_DIR "/io_usb-amd64.bin",
+	};
 
 	for (size_t i = 0; i < countof(fileNameTable); i++)
 	{

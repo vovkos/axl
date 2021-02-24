@@ -110,6 +110,11 @@ if(BUILD_AXL_INI)
 	list(APPEND OPT_LIB_LIST axl_ini)
 endif()
 
+if(BUILD_AXL_SEC)
+	add_definitions(-D_AXL_SEC=1)
+	list(APPEND OPT_LIB_LIST axl_sec)
+endif()
+
 add_executable(
 	axl_test_con
 	${PCH_H}
@@ -172,6 +177,7 @@ if(UNIX)
 	if(APPLE)
 		find_library(CORE_FOUNDATION_FRAMEWORK CoreFoundation)
 		find_library(IOKIT_FRAMEWORK IOKit)
+		find_library(SECURITY_FRAMEWORK Security)
 
 		target_link_libraries(
 			axl_test_con
@@ -179,6 +185,7 @@ if(UNIX)
 			axl_iok
 			${CORE_FOUNDATION_FRAMEWORK}
 			${IOKIT_FRAMEWORK}
+			${SECURITY_FRAMEWORK}
 			)
 	else()
 		target_link_libraries(
