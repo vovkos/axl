@@ -722,7 +722,7 @@ inline
 bool
 fail(const ErrorRef& error)
 {
-	return fail<bool> (false, error);
+	return fail<bool>(false, error);
 }
 
 inline

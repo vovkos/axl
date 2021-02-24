@@ -36,7 +36,7 @@ protected:
 public:
 	Handle()
 	{
-		m_h = GetInvalidHandle() ();
+		m_h = GetInvalidHandle()();
 	}
 
 	Handle(T h)
@@ -53,7 +53,7 @@ public:
 	T
 	getInvalidHandle()
 	{
-		return GetInvalidHandle() ();
+		return GetInvalidHandle()();
 	}
 
 	operator T() const
@@ -76,7 +76,7 @@ public:
 	bool
 	isOpen() const
 	{
-		return m_h != GetInvalidHandle() ();
+		return m_h != GetInvalidHandle()();
 	}
 
 	void
@@ -85,7 +85,7 @@ public:
 		if (isOpen())
 		{
 			Close() (m_h);
-			m_h = GetInvalidHandle() ();
+			m_h = GetInvalidHandle()();
 		}
 	}
 
@@ -100,13 +100,14 @@ public:
 	detach()
 	{
 		T h = m_h;
-		m_h = GetInvalidHandle() ();
+		m_h = GetInvalidHandle()();
 		return h;
 	}
 
 	T*
 	p()
 	{
+		ASSERT(m_h == GetInvalidHandle()());
 		return &m_h;
 	}
 };
