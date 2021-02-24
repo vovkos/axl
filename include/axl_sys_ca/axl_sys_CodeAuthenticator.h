@@ -22,17 +22,6 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-bool
-verifyFileCodeAuthenticity(
-	const sl::StringRef_w& fileName,
-	const sl::StringRef_w& expectedProgramName,
-	const sl::StringRef_w& expectedSubjectName,
-	const sl::StringRef_w& expectedIssuerName,
-	const sl::ArrayRef<char>& expectedSerialNumber
-	);
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class CodeAuthenticator
 {
 protected:
@@ -76,22 +65,7 @@ public:
 		);
 
 	bool
-	verifyFile(const sl::StringRef& fileName)
-	{
-		return verifyFile(sl::String_w(fileName));
-	}
-
-	bool
-	verifyFile(const sl::StringRef_w& fileName)
-	{
-		return verifyFileCodeAuthenticity(
-			sl::String_w(fileName),
-			m_expectedProgramName,
-			m_expectedSubjectName,
-			m_expectedIssuerName,
-			m_expectedSerialNumber
-			);
-	}
+	verifyFile(const sl::StringRef& fileName);
 };
 
 #elif (_AXL_OS_LINUX)

@@ -22,52 +22,6 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-bool
-verifyFileCodeAuthenticity(
-	const sl::StringRef_w& fileName,
-	const sl::StringRef_w& expectedProgramName,
-	const sl::StringRef_w& expectedSubjectName,
-	const sl::StringRef_w& expectedIssuerName,
-	const sl::ArrayRef<char>& expectedSerialNumber
-	)
-{
-	sl::String_w programName;
-	sl::String_w subjectName;
-	sl::String_w issuerName;
-	sl::Array<char> serialNumber;
-
-	bool result = win::verifyAuthenticodeSignature(
-		fileName,
-		!expectedProgramName.isEmpty() ? &programName : NULL,
-		!expectedSubjectName.isEmpty() ? &subjectName : NULL,
-		!expectedIssuerName.isEmpty() ? &issuerName : NULL,
-		!expectedSerialNumber.isEmpty() ? &serialNumber : NULL,
-		NULL
-		);
-
-	if (!result)
-		return false;
-
-	if (!expectedProgramName.isEmpty() && expectedProgramName != programName)
-		return err::fail("program name mismatch");
-
-	if (!expectedSubjectName.isEmpty() && expectedSubjectName != subjectName)
-		return err::fail("Authenticode signer mismatch");
-
-	if (!expectedIssuerName.isEmpty() && expectedIssuerName != issuerName)
-		return err::fail("Authenticode CA name mismatch");
-
-	if (!expectedSerialNumber.isEmpty() &&
-		(expectedSerialNumber.getCount() != serialNumber.getCount() ||
-		memcmp(expectedSerialNumber, serialNumber, serialNumber.getCount()) != 0
-		))
-		return err::fail("Authenticode serial number mismatch");
-
-	return true;
-}
-
-//..............................................................................
-
 void
 CodeAuthenticator::setup(
 	const sl::StringRef& expectedProgramName,
@@ -80,6 +34,44 @@ CodeAuthenticator::setup(
 	m_expectedSubjectName = expectedSubjectName;
 	m_expectedIssuerName = expectedIssuerName;
 	m_expectedSerialNumber = expectedSerialNumber;
+}
+
+bool
+CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
+{
+	sl::String_w programName;
+	sl::String_w subjectName;
+	sl::String_w issuerName;
+	sl::Array<char> serialNumber;
+
+	bool result = win::verifyAuthenticodeSignature(
+		sl::String_w(fileName),
+		!m_expectedProgramName.isEmpty() ? &programName : NULL,
+		!m_expectedSubjectName.isEmpty() ? &subjectName : NULL,
+		!m_expectedIssuerName.isEmpty() ? &issuerName : NULL,
+		!m_expectedSerialNumber.isEmpty() ? &serialNumber : NULL,
+		NULL
+		);
+
+	if (!result)
+		return false;
+
+	if (!m_expectedProgramName.isEmpty() && m_expectedProgramName != programName)
+		return err::fail("program name mismatch");
+
+	if (!m_expectedSubjectName.isEmpty() && m_expectedSubjectName != subjectName)
+		return err::fail("Authenticode signer mismatch");
+
+	if (!m_expectedIssuerName.isEmpty() && m_expectedIssuerName != issuerName)
+		return err::fail("Authenticode CA name mismatch");
+
+	if (!m_expectedSerialNumber.isEmpty() &&
+		(m_expectedSerialNumber.getCount() != serialNumber.getCount() ||
+		memcmp(m_expectedSerialNumber, serialNumber, serialNumber.getCount()) != 0
+		))
+		return err::fail("Authenticode serial number mismatch");
+
+	return true;
 }
 
 #elif (_AXL_OS_LINUX)
