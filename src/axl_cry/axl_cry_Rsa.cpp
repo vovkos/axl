@@ -93,10 +93,7 @@ Rsa::signHash(
 		);
 
 	if (!result)
-	{
-		setLastCryptoError();
-		return -1;
-	}
+		return failWithLastCryptoError<size_t>(-1);
 
 	ASSERT(signatureSize <= signatureBufferSize);
 	return signatureSize;

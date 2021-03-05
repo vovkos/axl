@@ -48,22 +48,13 @@ EcPoint::getData(
 {
 	int result = EC_POINT_point2oct(group, m_h, form, NULL, 0, ctx);
 	if (result <= 0)
-	{
-		setLastCryptoError();
-		return false;
-	}
+		return failWithLastCryptoError();
 
 	size_t size = result;
 	data->setCount(result);
 
 	result = EC_POINT_point2oct(group, m_h, form, (uchar_t*)data->p(), size, ctx);
-	if (result <= 0)
-	{
-		setLastCryptoError();
-		return false;
-	}
-
-	return true;
+	return completeWithLastCryptoError(result > 0);
 }
 
 bool

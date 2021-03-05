@@ -42,8 +42,7 @@ Pkcs7::loadDer(
 	if (!result)
 	{
 		ASSERT(pkcs7 == NULL); // should have been freed already
-		cry::setLastCryptoError();
-		return false;
+		return failWithLastCryptoError();
 	}
 
 	attach(pkcs7);
@@ -58,10 +57,7 @@ Pkcs7::saveDer(sl::Array<char>* buffer) const
 	uchar_t* p = NULL;
 	int length = i2d_PKCS7(m_h, &p);
 	if (length <= 0)
-	{
-		cry::setLastCryptoError();
-		return -1;
-	}
+		return failWithLastCryptoError<size_t>(-1);
 
 	size_t result = buffer->copy((char*)p, length);
 	OPENSSL_free(p);
@@ -84,8 +80,7 @@ Pkcs7::loadPem(
 	if (!result)
 	{
 		ASSERT(pkcs7 == NULL); // should have been freed already
-		cry::setLastCryptoError();
-		return false;
+		return failWithLastCryptoError();
 	}
 
 	attach(pkcs7);
@@ -116,13 +111,7 @@ Pkcs7::verify(
 {
 	ASSERT(m_h);
 	int result = PKCS7_verify(m_h, certStack, store, inData, outData, flags);
-	if (!result)
-	{
-		setLastCryptoError();
-		return false;
-	}
-
-	return true;
+	return completeWithLastCryptoError(result);
 }
 
 //..............................................................................

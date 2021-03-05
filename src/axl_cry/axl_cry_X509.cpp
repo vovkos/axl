@@ -42,8 +42,7 @@ X509Cert::loadDer(
 	if (!result)
 	{
 		ASSERT(cert == NULL); // should have been freed already
-		setLastCryptoError();
-		return false;
+		return failWithLastCryptoError();
 	}
 
 	attach(cert);
@@ -56,10 +55,7 @@ X509Cert::saveDer(sl::Array<char>* buffer) const
 	uchar_t* p = NULL;
 	int length = i2d_X509(m_h, &p);
 	if (length <= 0)
-	{
-		setLastCryptoError();
-		return -1;
-	}
+		return failWithLastCryptoError<size_t>(-1);
 
 	size_t result = buffer->copy((char*)p, length);
 	OPENSSL_free(p);
@@ -82,8 +78,7 @@ X509Cert::loadPem(
 	if (!result)
 	{
 		ASSERT(cert == NULL); // should have been freed already
-		setLastCryptoError();
-		return false;
+		return failWithLastCryptoError();
 	}
 
 	attach(cert);

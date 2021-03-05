@@ -118,10 +118,7 @@ EcKey::signHash(
 		);
 
 	if (!result)
-	{
-		setLastCryptoError();
-		return -1;
-	}
+		return failWithLastCryptoError<size_t>(-1);
 
 	ASSERT(resultSize <= signatureBufferSize);
 	return resultSize;

@@ -149,10 +149,7 @@ AppStoreReceiptPayloadParser::decode(
 
 	int retCode = ASN1_get_object((const uchar_t**)&p, &length, &tag, &cls, size);
 	if (retCode & 0x80)
-	{
-		setLastCryptoError();
-		return NULL;
-	}
+		return failWithLastCryptoError<const char*>(NULL);
 
 	if (tag != expectedTag)
 		return err::fail<const char*>(NULL, unexpectedTagError);

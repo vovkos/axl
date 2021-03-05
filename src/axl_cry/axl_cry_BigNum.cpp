@@ -21,13 +21,7 @@ BIGNUM*
 BnCtx::getBigNum()
 {
 	BIGNUM* result = BN_CTX_get(m_h);
-	if (!result)
-	{
-		setLastCryptoError();
-		return NULL;
-	}
-
-	return result;
+	return completeWithLastCryptoError<BIGNUM*>(result, NULL);
 }
 
 //..............................................................................
@@ -60,10 +54,7 @@ BigNum::getData(
 
 	int result = BN_bn2bin(m_h, (uchar_t*)p);
 	if (result <= 0)
-	{
-		setLastCryptoError();
-		return -1;
-	}
+		return failWithLastCryptoError<size_t>(-1);
 
 	return result;
 }
@@ -73,10 +64,7 @@ BigNum::getDecString(sl::String* string)
 {
 	char* p = BN_bn2dec(m_h);
 	if (!p)
-	{
-		setLastCryptoError();
-		return false;
-	}
+		return failWithLastCryptoError();
 
 	*string = p;
 	OPENSSL_free(p);
@@ -88,10 +76,7 @@ BigNum::getHexString(sl::String* string)
 {
 	char* p = BN_bn2hex(m_h);
 	if (!p)
-	{
-		setLastCryptoError();
-		return false;
-	}
+		return failWithLastCryptoError();
 
 	*string = p;
 	OPENSSL_free(p);

@@ -132,7 +132,22 @@ inline
 size_t
 setLastCryptoError()
 {
-	return setError(CryptoError(ERR_peek_last_error()));
+	return setError(CryptoError(::ERR_peek_last_error()));
+}
+
+template <typename T>
+T
+failWithLastCryptoError(T failResult)
+{
+	setLastCryptoError();
+	return failResult;
+}
+
+inline
+bool
+failWithLastCryptoError()
+{
+	return failWithLastCryptoError<bool>(false);
 }
 
 template <typename T>
