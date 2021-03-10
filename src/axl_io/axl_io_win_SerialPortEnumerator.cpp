@@ -74,7 +74,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 SerialPortDesc*
 SerialPortEnumerator::createPortDesc(sys::win::DeviceInfo* deviceInfo)
 {
-	int result;
+	long result;
 
 	sys::win::RegKeyHandle devRegKey = deviceInfo->openDeviceRegistryKey(KEY_QUERY_VALUE);
 	if (devRegKey == INVALID_HANDLE_VALUE)

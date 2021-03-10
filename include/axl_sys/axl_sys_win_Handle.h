@@ -45,8 +45,8 @@ public:
 	void
 	operator () (HKEY h)
 	{
-		bool_t result = ::RegCloseKey(h);
-		ASSERT(result);
+		long result = ::RegCloseKey(h);
+		ASSERT(result == ERROR_SUCCESS);
 	}
 };
 
