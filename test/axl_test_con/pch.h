@@ -71,6 +71,7 @@
 #	include "axl_cry_Pkcs7.h"
 #	include "axl_cry_CryptoError.h"
 #	include "axl_cry_AppStoreReceipt.h"
+#	include "axl_cry_Pem.h"
 #endif
 
 #ifdef _AXL_IO_SSL

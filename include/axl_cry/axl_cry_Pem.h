@@ -42,7 +42,7 @@ encodePem(
 }
 
 inline
-const sl::String
+sl::String
 encodePem(
 	const sl::StringRef& name,
 	const sl::StringRef& header,
@@ -56,7 +56,7 @@ encodePem(
 }
 
 inline
-const sl::String
+sl::String
 encodePem(
 	const sl::StringRef& name,
 	const void* p,
