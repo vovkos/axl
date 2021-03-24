@@ -53,10 +53,10 @@ public:
 			return 'b';
 
 		case '\t':
-			return (flags & EscapeEncodingFlag_NoTabEscape) ? '\t' : 't';
+			return (flags & EscapeEncodingFlag_NoTabEscape) ? 0 : 't';
 
 		case '\n':
-			return (flags & EscapeEncodingFlag_NoLfEscape) ? '\n' : 'n';
+			return (flags & EscapeEncodingFlag_NoLfEscape) ? 0 : 'n';
 
 		case '\f':
 			return 'f';
@@ -65,7 +65,7 @@ public:
 			return 'v';
 
 		case '\r':
-			return (flags & EscapeEncodingFlag_NoCrEscape) ? '\r' : 'r';
+			return (flags & EscapeEncodingFlag_NoCrEscape) ? 0 : 'r';
 
 		case '\x1b':
 			return 'e';
@@ -130,7 +130,7 @@ protected:
 		>
 	static
 	size_t
-	appendHexCodeEscapeSequence(
+	buildHexCodeEscapeSequence(
 		C* escapeSequence,
 		utf32_t c
 		)
@@ -231,22 +231,23 @@ public:
 					if (utfIsPrintable(c))
 						continue;
 
+					utf32_t escape = findEscapeChar(c, flags);
+					if (!escape)
+						continue;
+
 					string->append(base, p - base);
 
 					size_t escapeSequenceLength;
-					utf32_t escape = findEscapeChar(c, flags);
 					if (escape != c)
 					{
 						escapeSequence[1] = (C)escape;
 						escapeSequenceLength = 2;
 					}
-					else if (flags & EscapeEncodingFlag_UpperCase)
-					{
-						escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c);
-					}
 					else
 					{
-						escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
+						escapeSequenceLength = (flags & EscapeEncodingFlag_UpperCase) ?
+							buildHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c) :
+							buildHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
 					}
 
 					string->append(escapeSequence, escapeSequenceLength);

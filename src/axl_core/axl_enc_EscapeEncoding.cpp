@@ -103,22 +103,23 @@ EscapeEncodingDynamic::encode(
 				if (utfIsPrintable(c))
 					continue;
 
+				utf32_t escape = findEscapeChar(c, flags);
+				if (!escape)
+					continue;
+
 				appendEncoded_utf32(codec, buffer, &encodeBuffer, base, p - base);
 
 				size_t escapeSequenceLength;
-				utf32_t escape = findEscapeChar(c, flags);
 				if (escape != c)
 				{
 					escapeSequence[1] = (char)escape;
-					appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, 2);
-				}
-				else if (flags & EscapeEncodingFlag_UpperCase)
-				{
-					escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c);
+					escapeSequenceLength = 2;
 				}
 				else
 				{
-					escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
+					escapeSequenceLength = (flags & EscapeEncodingFlag_UpperCase) ?
+						buildHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c) :
+						buildHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
 				}
 
 				appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, escapeSequenceLength);
