@@ -122,7 +122,7 @@ EscapeEncodingDynamic::encode(
 				else if ((uint32_t)c <= 0xffff)
 				{
 					escapeSequence[1] = 'u';
-					escapeSequence[2] = HexEncoding::getHexChar_l(c >> 16);
+					escapeSequence[2] = HexEncoding::getHexChar_l(c >> 12);
 					escapeSequence[3] = HexEncoding::getHexChar_l(c >> 8);
 					escapeSequence[4] = HexEncoding::getHexChar_l(c >> 4);
 					escapeSequence[5] = HexEncoding::getHexChar_l(c);

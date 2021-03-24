@@ -2644,9 +2644,43 @@ testEnumSerial()
 void
 testEncoding()
 {
-	sl::String s;
-	enc::EscapeEncoding::encode(&s, "\\\\.\\pipe\\mypipe");
-	printf("%s\n", s.sz());
+	const char source[] = "abc\x80 def";
+	const wchar_t source_w[] = L"abc\x80 def";
+
+	sl::String s, s2;
+	sl::String_w sw, sw2;
+	sl::Array<char> b, b2;
+
+	enc::EscapeEncoding::encode(&s, source);
+	printf("ESC (char): %s\n", s.sz());
+
+	enc::EscapeEncoding_w::encode(&sw, source_w);
+	printf("ESC (wchar_t): %S\n", sw.sz());
+
+	enc::EscapeEncoding::decode(&s, source);
+	enc::HexEncoding::encode(&s2, s.cp(), s.getLength());
+	printf("HEX (char): %s\n", s2.sz());
+
+	enc::EscapeEncoding_w::decode(&sw, source_w);
+	enc::HexEncoding::encode(&s2, sw.cp(), sw.getLength() * sizeof(wchar_t));
+	printf("HEX (wchar_t): %s\n", s2.sz());
+
+	enc::EscapeEncodingDynamic::decode(enc::CharCodecKind_Utf8, &b, source, lengthof(source));
+	enc::HexEncoding::encode(&s, b.cp(), b.getCount());
+	printf("HEX (char, dynamic): %s\n", s.sz());
+
+	enc::EscapeEncodingDynamic::encode(enc::CharCodecKind_Utf8, &b2, b.cp(), b.getCount());
+	b2.append(0);
+	printf("ESC (char, dynamic): %s\n", b2.cp());
+
+	enc::EscapeEncodingDynamic::decode(enc::CharCodecKind_Utf16, &b, source_w, lengthof(source_w) * sizeof(wchar_t));
+	enc::HexEncoding::encode(&s, b.cp(), b.getCount());
+	printf("HEX (wchar_t, dynamic): %s\n", s.sz());
+
+	enc::EscapeEncodingDynamic::encode(enc::CharCodecKind_Utf16, &b2, b.cp(), b.getCount());
+	b2.append(0);
+	b2.append(0);
+	printf("ESC (wchar_t, dynamic): %S\n", b2.cp());
 }
 
 //..............................................................................
@@ -5683,10 +5717,9 @@ main(
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WSAStartup(0x0202, &wsaData);
-	authenticodeTest();
 #endif
 
-	codeAuthenticatorTest();
+	testEncoding();
 	return 0;
 }
 
