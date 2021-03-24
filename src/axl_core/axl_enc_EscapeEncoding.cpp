@@ -52,7 +52,8 @@ EscapeEncodingDynamic::encode(
 	CharCodec* codec,
 	sl::Array<char>* buffer,
 	const void* p0,
-	size_t size
+	size_t size,
+	uint_t flags
 	)
 {
 	buffer->clear();
@@ -93,10 +94,8 @@ EscapeEncodingDynamic::encode(
 			if (c == '\\')
 			{
 				escapeSequence[1] = '\\';
-
 				appendEncoded_utf32(codec, buffer, &encodeBuffer, base, p - base);
 				appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, 2);
-
 				base = p + 1;
 			}
 			else
@@ -106,42 +105,23 @@ EscapeEncodingDynamic::encode(
 
 				appendEncoded_utf32(codec, buffer, &encodeBuffer, base, p - base);
 
-				utf32_t escape = findEscapeChar(c);
+				size_t escapeSequenceLength;
+				utf32_t escape = findEscapeChar(c, flags);
 				if (escape != c)
 				{
 					escapeSequence[1] = (char)escape;
 					appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, 2);
 				}
-				else if ((uint32_t)c <= 0xff)
+				else if (flags & EscapeEncodingFlag_UpperCase)
 				{
-					escapeSequence[1] = 'x';
-					escapeSequence[2] = HexEncoding::getHexChar_l(c >> 4);
-					escapeSequence[3] = HexEncoding::getHexChar_l(c);
-					appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, 4);
-				}
-				else if ((uint32_t)c <= 0xffff)
-				{
-					escapeSequence[1] = 'u';
-					escapeSequence[2] = HexEncoding::getHexChar_l(c >> 12);
-					escapeSequence[3] = HexEncoding::getHexChar_l(c >> 8);
-					escapeSequence[4] = HexEncoding::getHexChar_l(c >> 4);
-					escapeSequence[5] = HexEncoding::getHexChar_l(c);
-					appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, 6);
+					escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c);
 				}
 				else
 				{
-					escapeSequence[1] = 'U';
-					escapeSequence[2] = HexEncoding::getHexChar_l(c >> 28);
-					escapeSequence[3] = HexEncoding::getHexChar_l(c >> 24);
-					escapeSequence[4] = HexEncoding::getHexChar_l(c >> 20);
-					escapeSequence[5] = HexEncoding::getHexChar_l(c >> 16);
-					escapeSequence[6] = HexEncoding::getHexChar_l(c >> 12);
-					escapeSequence[7] = HexEncoding::getHexChar_l(c >> 8);
-					escapeSequence[8] = HexEncoding::getHexChar_l(c >> 4);
-					escapeSequence[9] = HexEncoding::getHexChar_l(c);
-					appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, 10);
+					escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
 				}
 
+				appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, escapeSequenceLength);
 				base = p + 1;
 			}
 		}

@@ -33,28 +33,6 @@ enum HexEncodingFlag
 class HexEncoding
 {
 protected:
-	class GetHexChar_l
-	{
-	public:
-		char
-		operator () (uchar_t x)
-		{
-			static char charTable[] = "0123456789abcdef";
-			return charTable[x & 0xf];
-		}
-	};
-
-	class GetHexChar_u
-	{
-	public:
-		char
-		operator () (uchar_t x)
-		{
-			static char charTable[] = "0123456789ABCDEF";
-			return charTable[x & 0xf];
-		}
-	};
-
 	class InsertNoSpace
 	{
 	public:
@@ -93,6 +71,29 @@ protected:
 		{
 			*p = (i & 0xf) ? ' ' : '\n';
 			return 1;
+		}
+	};
+
+public:
+	class GetHexChar_l
+	{
+	public:
+		char
+		operator () (uchar_t x)
+		{
+			static char charTable[] = "0123456789abcdef";
+			return charTable[x & 0xf];
+		}
+	};
+
+	class GetHexChar_u
+	{
+	public:
+		char
+		operator () (uchar_t x)
+		{
+			static char charTable[] = "0123456789ABCDEF";
+			return charTable[x & 0xf];
 		}
 	};
 

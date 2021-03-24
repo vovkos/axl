@@ -21,12 +21,25 @@ namespace enc {
 
 //..............................................................................
 
+enum EscapeEncodingFlag
+{
+	EscapeEncodingFlag_UpperCase   = 1,
+	EscapeEncodingFlag_NoTabEscape = 2,
+	EscapeEncodingFlag_NoCrEscape  = 4,
+	EscapeEncodingFlag_NoLfEscape  = 8,
+};
+
+//..............................................................................
+
 class EscapeEncodingRoot
 {
 public:
 	static
 	utf32_t
-	findEscapeChar(utf32_t c)
+	findEscapeChar(
+		utf32_t c,
+		uint_t flags = 0
+		)
 	{
 		switch (c)
 		{
@@ -40,10 +53,10 @@ public:
 			return 'b';
 
 		case '\t':
-			return 't';
+			return (flags & EscapeEncodingFlag_NoTabEscape) ? '\t' : 't';
 
 		case '\n':
-			return 'n';
+			return (flags & EscapeEncodingFlag_NoLfEscape) ? '\n' : 'n';
 
 		case '\f':
 			return 'f';
@@ -52,7 +65,7 @@ public:
 			return 'v';
 
 		case '\r':
-			return 'r';
+			return (flags & EscapeEncodingFlag_NoCrEscape) ? '\r' : 'r';
 
 		case '\x1b':
 			return 'e';
@@ -109,6 +122,49 @@ public:
 			c >= 'a' && c <= 'f' ||
 			c >= 'A' && c <= 'F';
 	}
+
+protected:
+	template <
+		typename GetHexChar,
+		typename C
+		>
+	static
+	size_t
+	appendHexCodeEscapeSequence(
+		C* escapeSequence,
+		utf32_t c
+		)
+	{
+		if ((uint32_t)c <= 0xff)
+		{
+			escapeSequence[1] = 'x';
+			escapeSequence[2] = GetHexChar()(c >> 4);
+			escapeSequence[3] = GetHexChar()(c);
+			return 4;
+		}
+
+		if ((uint32_t)c <= 0xffff)
+		{
+			escapeSequence[1] = 'u';
+			escapeSequence[2] = GetHexChar()(c >> 12);
+			escapeSequence[3] = GetHexChar()(c >> 8);
+			escapeSequence[4] = GetHexChar()(c >> 4);
+			escapeSequence[5] = GetHexChar()(c);
+			return 6;
+		}
+
+		escapeSequence[1] = 'U';
+		escapeSequence[2] = GetHexChar()(c >> 28);
+		escapeSequence[3] = GetHexChar()(c >> 24);
+		escapeSequence[4] = GetHexChar()(c >> 20);
+		escapeSequence[5] = GetHexChar()(c >> 16);
+		escapeSequence[6] = GetHexChar()(c >> 12);
+		escapeSequence[7] = GetHexChar()(c >> 8);
+		escapeSequence[8] = GetHexChar()(c >> 4);
+		escapeSequence[9] = GetHexChar()(c);
+		return 10;
+	}
+
 };
 
 //..............................................................................
@@ -125,7 +181,8 @@ public:
 	size_t
 	encode(
 		sl::StringBase<C>* string,
-		const sl::StringRefBase<C>& source
+		const sl::StringRefBase<C>& source,
+		uint_t flags = 0
 		)
 	{
 		string->clear();
@@ -165,10 +222,8 @@ public:
 				if (c == '\\')
 				{
 					escapeSequence[1] = '\\';
-
 					string->append(base, p - base);
 					string->append(escapeSequence, 2);
-
 					base = p + 1;
 				}
 				else
@@ -178,42 +233,23 @@ public:
 
 					string->append(base, p - base);
 
-					utf32_t escape = findEscapeChar(c);
+					size_t escapeSequenceLength;
+					utf32_t escape = findEscapeChar(c, flags);
 					if (escape != c)
 					{
 						escapeSequence[1] = (C)escape;
-						string->append(escapeSequence, 2);
+						escapeSequenceLength = 2;
 					}
-					else if ((uint32_t)c <= 0xff)
+					else if (flags & EscapeEncodingFlag_UpperCase)
 					{
-						escapeSequence[1] = 'x';
-						escapeSequence[2] = HexEncoding::getHexChar_l(c >> 4);
-						escapeSequence[3] = HexEncoding::getHexChar_l(c);
-						string->append(escapeSequence, 4);
-					}
-					else if ((uint32_t)c <= 0xffff)
-					{
-						escapeSequence[1] = 'u';
-						escapeSequence[2] = HexEncoding::getHexChar_l(c >> 12);
-						escapeSequence[3] = HexEncoding::getHexChar_l(c >> 8);
-						escapeSequence[4] = HexEncoding::getHexChar_l(c >> 4);
-						escapeSequence[5] = HexEncoding::getHexChar_l(c);
-						string->append(escapeSequence, 6);
+						escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c);
 					}
 					else
 					{
-						escapeSequence[1] = 'U';
-						escapeSequence[2] = HexEncoding::getHexChar_l(c >> 28);
-						escapeSequence[3] = HexEncoding::getHexChar_l(c >> 24);
-						escapeSequence[4] = HexEncoding::getHexChar_l(c >> 20);
-						escapeSequence[5] = HexEncoding::getHexChar_l(c >> 16);
-						escapeSequence[6] = HexEncoding::getHexChar_l(c >> 12);
-						escapeSequence[7] = HexEncoding::getHexChar_l(c >> 8);
-						escapeSequence[8] = HexEncoding::getHexChar_l(c >> 4);
-						escapeSequence[9] = HexEncoding::getHexChar_l(c);
-						string->append(escapeSequence, 10);
+						escapeSequenceLength = appendHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
 					}
 
+					string->append(escapeSequence, escapeSequenceLength);
 					base = p + 1;
 				}
 			}
@@ -226,10 +262,13 @@ public:
 
 	static
 	sl::StringBase<C>
-	encode(const sl::StringRefBase<C>& source)
+	encode(
+		const sl::StringRefBase<C>& source,
+		uint_t flags = 0
+		)
 	{
 		sl::StringBase<C> string;
-		encode(&string, source);
+		encode(&string, source, flags);
 		return string;
 	}
 
@@ -383,7 +422,8 @@ public:
 		CharCodec* codec,
 		sl::Array<char>* buffer,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		);
 
 	static
@@ -392,10 +432,11 @@ public:
 		CharCodecKind codecKind,
 		sl::Array<char>* buffer,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
-		return encode(getCharCodec(codecKind), buffer, p, size);
+		return encode(getCharCodec(codecKind), buffer, p, size, flags);
 	}
 
 	static
@@ -403,11 +444,12 @@ public:
 	encode(
 		CharCodec* codec,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
 		sl::Array<char> buffer;
-		encode(codec, &buffer, p, size);
+		encode(codec, &buffer, p, size, flags);
 		return buffer;
 	}
 
@@ -416,10 +458,11 @@ public:
 	encode(
 		CharCodecKind codecKind,
 		const void* p,
-		size_t size
+		size_t size,
+		uint_t flags = 0
 		)
 	{
-		return encode(getCharCodec(codecKind), p, size);
+		return encode(getCharCodec(codecKind), p, size, flags);
 	}
 
 	static
