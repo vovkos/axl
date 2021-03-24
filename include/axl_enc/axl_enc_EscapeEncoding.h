@@ -173,7 +173,7 @@ public:
 				}
 				else
 				{
-					if (isprint(c))
+					if (utfIsPrintable(c))
 						continue;
 
 					string->append(base, p - base);

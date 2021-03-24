@@ -101,7 +101,7 @@ EscapeEncodingDynamic::encode(
 			}
 			else
 			{
-				if (isprint(c))
+				if (utfIsPrintable(c))
 					continue;
 
 				appendEncoded_utf32(codec, buffer, &encodeBuffer, base, p - base);
