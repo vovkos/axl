@@ -20,28 +20,90 @@ namespace enc {
 
 //..............................................................................
 
-class EscapeEncodingRoot
-{
-public:
-	static
-	char
-	findEscapeChar(char x);
-
-	static
-	char
-	findEscapeReplaceChar(char x);
-};
-
-//..............................................................................
-
 template <typename T>
-class EscapeEncodingBase: public EscapeEncodingRoot
+class EscapeEncodingBase
 {
 public:
 	typedef T C;
 	typedef typename sl::StringDetailsBase<T>::Encoding UtfEncoding;
 
 public:
+	static
+	utf32_t
+	findEscapeChar(utf32_t x)
+	{
+		switch (x)
+		{
+		case '\0':
+			return '0';
+
+		case '\a':
+			return 'a';
+
+		case '\b':
+			return 'b';
+
+		case '\t':
+			return 't';
+
+		case '\n':
+			return 'n';
+
+		case '\f':
+			return 'f';
+
+		case '\v':
+			return 'v';
+
+		case '\r':
+			return 'r';
+
+		case '\x1b':
+			return 'e';
+
+		default:
+			return x;
+		};
+	}
+
+	static
+	C
+	findEscapeReplaceChar(C x)
+	{
+		switch (x)
+		{
+		case '0':
+			return '\0';
+
+		case 'a':
+			return '\a';
+
+		case 'b':
+			return '\b';
+
+		case 't':
+			return '\t';
+
+		case 'n':
+			return '\n';
+
+		case 'f':
+			return '\f';
+
+		case 'v':
+			return '\v';
+
+		case 'r':
+			return '\r';
+
+		case 'e':
+			return '\x1b';
+
+		default:
+			return x;
+		};
+	}
+
 	static
 	size_t
 	encode(
@@ -52,49 +114,95 @@ public:
 		string->clear();
 		string->reserve(source.getLength());
 
-		C escapeSequence[4] = { '\\' };
+		C escapeSequence[16] = { '\\' };
 
-		const C* p = source.cp();
-		const C* end = source.getEnd();
-		const C* base = p;
+		const C* src = source.cp();
+		const C* srcEnd = source.getEnd();
 
-		for (; p < end; p++)
+		while (src < srcEnd)
 		{
-			if (*p == '\\')
+			utf32_t buffer[64];
+
+			size_t takenSrcLength;
+			size_t takenBufferLength = UtfConvert<Utf32, UtfEncoding>::convert(
+				buffer,
+				countof(buffer),
+				src,
+				srcEnd - src,
+				&takenSrcLength
+				);
+
+			if (!takenSrcLength)
+				break;
+
+			src += takenSrcLength;
+
+			const utf32_t* p = buffer;
+			const utf32_t* end = p + takenBufferLength;
+			const utf32_t* base = p;
+
+			for (; p < end; p++)
 			{
-				string->append(base, p - base);
+				utf32_t c = *p;
 
-				escapeSequence[1] = '\\';
-				string->append(escapeSequence, 2);
-
-				base = p + 1;
-			}
-			else
-			{
-				if (isprint(*(uchar_t*)p))
-					continue;
-
-				string->append(base, p - base);
-
-				char escape = findEscapeChar(*p);
-				if (escape != *p)
+				if (c == '\\')
 				{
-					escapeSequence[1] = escape;
+					escapeSequence[1] = '\\';
+
+					string->append(base, p - base);
 					string->append(escapeSequence, 2);
+
+					base = p + 1;
 				}
 				else
 				{
-					escapeSequence[1] = 'x';
-					escapeSequence[2] = HexEncoding::getHexChar_l(*p >> 4);
-					escapeSequence[3] = HexEncoding::getHexChar_l(*p);
-					string->append(escapeSequence, 4);
+					if (isprint(c))
+						continue;
+
+					string->append(base, p - base);
+
+					utf32_t escape = findEscapeChar(c);
+					if (escape != c)
+					{
+						escapeSequence[1] = (C)escape;
+						string->append(escapeSequence, 2);
+					}
+					else if ((uint32_t)c <= 0xff)
+					{
+						escapeSequence[1] = 'x';
+						escapeSequence[2] = HexEncoding::getHexChar_l(c >> 4);
+						escapeSequence[3] = HexEncoding::getHexChar_l(c);
+						string->append(escapeSequence, 4);
+					}
+					else if ((uint32_t)c <= 0xffff)
+					{
+						escapeSequence[1] = 'u';
+						escapeSequence[2] = HexEncoding::getHexChar_l(c >> 16);
+						escapeSequence[3] = HexEncoding::getHexChar_l(c >> 8);
+						escapeSequence[4] = HexEncoding::getHexChar_l(c >> 4);
+						escapeSequence[5] = HexEncoding::getHexChar_l(c);
+						string->append(escapeSequence, 6);
+					}
+					else
+					{
+						escapeSequence[1] = 'U';
+						escapeSequence[2] = HexEncoding::getHexChar_l(c >> 28);
+						escapeSequence[3] = HexEncoding::getHexChar_l(c >> 24);
+						escapeSequence[4] = HexEncoding::getHexChar_l(c >> 20);
+						escapeSequence[5] = HexEncoding::getHexChar_l(c >> 16);
+						escapeSequence[6] = HexEncoding::getHexChar_l(c >> 12);
+						escapeSequence[7] = HexEncoding::getHexChar_l(c >> 8);
+						escapeSequence[8] = HexEncoding::getHexChar_l(c >> 4);
+						escapeSequence[9] = HexEncoding::getHexChar_l(c);
+						string->append(escapeSequence, 10);
+					}
+
+					base = p + 1;
 				}
-
-				base = p + 1;
 			}
-		}
 
-		string->append(base, p - base);
+			string->append(sl::StringRef_utf32(base, p - base));
+		}
 
 		return string->getLength();
 	}
@@ -127,7 +235,6 @@ public:
 		string->clear();
 		string->reserve(source.getLength() / 2);
 
-		char replace;
 		char hexCodeString[16];
 		size_t hexCodeLen;
 		size_t hexCodeMaxLen;
@@ -139,10 +246,12 @@ public:
 
 		for (; p < end; p++)
 		{
+			C c = *p;
+
 			switch (state)
 			{
 			case State_Normal:
-				if (*p == '\\')
+				if (c == '\\')
 				{
 					string->append(base, p - base);
 					state = State_Escape;
@@ -151,7 +260,7 @@ public:
 				break;
 
 			case State_Escape:
-				switch (*p)
+				switch (c)
 				{
 				case 'x':
 					state = State_Hex;
@@ -172,8 +281,8 @@ public:
 					break;
 
 				default:
-					replace = findEscapeReplaceChar(*p);
-					if (replace != *p)
+					C replace = findEscapeReplaceChar(c);
+					if (replace != c)
 					{
 						string->append(replace, 1);
 						base = p + 1;
@@ -189,9 +298,9 @@ public:
 				break;
 
 			case State_Hex:
-				if (isHexChar(*p))
+				if (isHexChar(c))
 				{
-					hexCodeString[hexCodeLen++] = *p;
+					hexCodeString[hexCodeLen++] = (char)c;
 					if (hexCodeLen < hexCodeMaxLen)
 						break;
 
@@ -216,7 +325,7 @@ public:
 					{
 						string->append((const C*)&hexCode, 1);
 					}
-					else // \u
+					else // \u or \U
 					{
 						C buffer[4];
 						size_t length = UtfEncoding::getEncodeCodePointLength(hexCode);
