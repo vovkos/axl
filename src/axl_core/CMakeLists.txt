@@ -214,6 +214,7 @@ set(
 	ENC_CPP_LIST
 	axl_enc_Base32Encoding.cpp
 	axl_enc_CharCodec.cpp
+	axl_enc_EscapeEncoding.cpp
 	axl_enc_HexEncoding.cpp
 	axl_enc_Utf.cpp
 	axl_enc_Leb128.cpp
