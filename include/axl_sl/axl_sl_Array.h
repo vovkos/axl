@@ -342,7 +342,7 @@ public:
 
 	operator T* ()
 	{
-		return this->m_p;
+		return p();
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
@@ -384,7 +384,10 @@ public:
 	T&
 	operator [] (intptr_t i)
 	{
-		return (T&) ArrayRef::operator [] (i);
+		bool result = ensureExclusive();
+		ASSERT(result);
+
+		return (T&)ArrayRef::operator [] (i);
 	}
 
 	T*

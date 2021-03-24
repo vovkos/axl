@@ -1205,15 +1205,16 @@ public:
 	const C&
 	operator [] (intptr_t i) const
 	{
-		ASSERT((size_t)i < this->m_length);
-		return this->m_p[(size_t)i];
+		return StringRef::operator [] (i);
 	}
 
 	C&
 	operator [] (intptr_t i)
 	{
-		ASSERT((size_t)i < this->m_length);
-		return this->m_p[(size_t)i];
+		bool result = ensureExclusive();
+		ASSERT(result);
+
+		return (C&)StringRef::operator [] (i);
 	}
 
 	C*
