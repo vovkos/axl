@@ -50,9 +50,7 @@ CharCodec::encode_utf8(
 	)
 {
 	buffer->clear();
-	bool result = buffer->reserve(length * m_unitSize);
-	if (!result)
-		return -1;
+	buffer->reserve(length * m_unitSize);
 
 	const utf8_t* end = p + length;
 	while (p < end)
@@ -64,7 +62,7 @@ CharCodec::encode_utf8(
 		if (!takenLength)
 			break;
 
-		result = buffer->append(tmpBuffer, takenBufferSize) != -1;
+		bool result = buffer->append(tmpBuffer, takenBufferSize) != -1;
 		if (!result)
 			return -1;
 
@@ -82,9 +80,7 @@ CharCodec::encode_utf16(
 	)
 {
 	buffer->clear();
-	bool result = buffer->reserve(length * m_unitSize);
-	if (!result)
-		return -1;
+	buffer->reserve(length * m_unitSize);
 
 	const utf16_t* end = p + length;
 	while (p < end)
@@ -96,7 +92,7 @@ CharCodec::encode_utf16(
 		if (!takenLength)
 			break;
 
-		result = buffer->append(tmpBuffer, takenBufferSize) != -1;
+		bool result = buffer->append(tmpBuffer, takenBufferSize) != -1;
 		if (!result)
 			return -1;
 
@@ -114,9 +110,7 @@ CharCodec::encode_utf32(
 	)
 {
 	buffer->clear();
-	bool result = buffer->reserve(length * m_unitSize);
-	if (!result)
-		return -1;
+	buffer->reserve(length * m_unitSize);
 
 	const utf32_t* end = p + length;
 	while (p < end)
@@ -128,7 +122,7 @@ CharCodec::encode_utf32(
 		if (!takenLength)
 			break;
 
-		result = buffer->append(tmpBuffer, takenBufferSize) != -1;
+		bool result = buffer->append(tmpBuffer, takenBufferSize) != -1;
 		if (!result)
 			return -1;
 
@@ -151,9 +145,7 @@ CharCodec::decode_utf8(
 	size_t leftover = size % m_unitSize;
 
 	string->clear();
-	bool result = string->reserve(length);
-	if (!result)
-		return -1;
+	string->reserve(length);
 
 	const char* p = (const char*) _p;
 	const char* end = p + size - leftover;
@@ -166,7 +158,7 @@ CharCodec::decode_utf8(
 		if (!takenBufferLength)
 			break;
 
-		result = string->append(tmpBuffer, takenBufferLength) != -1;
+		bool result = string->append(tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
@@ -187,9 +179,7 @@ CharCodec::decode_utf16(
 	size_t leftover = size % m_unitSize;
 
 	string->clear();
-	bool result = string->reserve(length);
-	if (!result)
-		return -1;
+	string->reserve(length);
 
 	const char* p = (const char*) _p;
 	const char* end = p + size - leftover;
@@ -202,7 +192,7 @@ CharCodec::decode_utf16(
 		if (!takenBufferLength)
 			break;
 
-		result = string->append(tmpBuffer, takenBufferLength) != -1;
+		bool result = string->append(tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
@@ -223,9 +213,7 @@ CharCodec::decode_utf32(
 	size_t leftover = size % m_unitSize;
 
 	string->clear();
-	bool result = string->reserve(length);
-	if (!result)
-		return -1;
+	string->reserve(length);
 
 	const char* p = (const char*) _p;
 	const char* end = p + size - leftover;
@@ -238,7 +226,7 @@ CharCodec::decode_utf32(
 		if (!takenBufferLength)
 			break;
 
-		result = string->append(tmpBuffer, takenBufferLength) != -1;
+		bool result = string->append(tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
