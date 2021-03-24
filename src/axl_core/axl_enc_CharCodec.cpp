@@ -20,7 +20,7 @@ namespace enc {
 CharCodec*
 getCharCodec(CharCodecKind codecKind)
 {
-	static AsciiCodec          asciiCodec;
+	static AsciiCodec         asciiCodec;
 	static UtfCodec<Utf8>     utf8Codec;
 	static UtfCodec<Utf16>    utf16Codec;
 	static UtfCodec<Utf16_be> utf16Codec_be;
@@ -43,7 +43,7 @@ getCharCodec(CharCodecKind codecKind)
 //..............................................................................
 
 size_t
-CharCodec::encodeFromUtf8(
+CharCodec::encode_utf8(
 	sl::Array<char>* buffer,
 	const utf8_t* p,
 	size_t length
@@ -60,7 +60,7 @@ CharCodec::encodeFromUtf8(
 		char tmpBuffer[256];
 
 		size_t takenLength;
-		size_t takenBufferSize = encodeFromUtf8(tmpBuffer, sizeof(tmpBuffer), p, end - p, &takenLength);
+		size_t takenBufferSize = encode_utf8(tmpBuffer, sizeof(tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -75,7 +75,7 @@ CharCodec::encodeFromUtf8(
 }
 
 size_t
-CharCodec::encodeFromUtf16(
+CharCodec::encode_utf16(
 	sl::Array<char>* buffer,
 	const utf16_t* p,
 	size_t length
@@ -92,7 +92,7 @@ CharCodec::encodeFromUtf16(
 		char tmpBuffer[256];
 
 		size_t takenLength;
-		size_t takenBufferSize = encodeFromUtf16(tmpBuffer, sizeof(tmpBuffer), p, end - p, &takenLength);
+		size_t takenBufferSize = encode_utf16(tmpBuffer, sizeof(tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -107,7 +107,7 @@ CharCodec::encodeFromUtf16(
 }
 
 size_t
-CharCodec::encodeFromUtf32(
+CharCodec::encode_utf32(
 	sl::Array<char>* buffer,
 	const utf32_t* p,
 	size_t length
@@ -124,7 +124,7 @@ CharCodec::encodeFromUtf32(
 		char tmpBuffer[256];
 
 		size_t takenLength;
-		size_t takenBufferSize = encodeFromUtf32(tmpBuffer, sizeof(tmpBuffer), p, end - p, &takenLength);
+		size_t takenBufferSize = encode_utf32(tmpBuffer, sizeof(tmpBuffer), p, end - p, &takenLength);
 		if (!takenLength)
 			break;
 
@@ -140,44 +140,9 @@ CharCodec::encodeFromUtf32(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sl::Array<char>
-CharCodec::encodeFromUtf8(
-	const utf8_t* p,
-	size_t length
-	)
-{
-	sl::Array<char> buffer;
-	encodeFromUtf8(&buffer, p, length);
-	return buffer;
-}
-
-sl::Array<char>
-CharCodec::encodeFromUtf16(
-	const utf16_t* p,
-	size_t length
-	)
-{
-	sl::Array<char> buffer;
-	encodeFromUtf16(&buffer, p, length);
-	return buffer;
-}
-
-sl::Array<char>
-CharCodec::encodeFromUtf32(
-	const utf32_t* p,
-	size_t length
-	)
-{
-	sl::Array<char> buffer;
-	encodeFromUtf32(&buffer, p, length);
-	return buffer;
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 size_t
-CharCodec::decodeToUtf8(
-	sl::Array<utf8_t>* buffer,
+CharCodec::decode_utf8(
+	sl::String_utf8* string,
 	const void* _p,
 	size_t size
 	)
@@ -185,8 +150,8 @@ CharCodec::decodeToUtf8(
 	size_t length = size / m_unitSize;
 	size_t leftover = size % m_unitSize;
 
-	buffer->clear();
-	bool result = buffer->reserve(length);
+	string->clear();
+	bool result = string->reserve(length);
 	if (!result)
 		return -1;
 
@@ -197,23 +162,23 @@ CharCodec::decodeToUtf8(
 		utf8_t tmpBuffer[256];
 
 		size_t takenSize;
-		size_t takenBufferLength = decodeToUtf8(tmpBuffer, countof(tmpBuffer), p, end - p, &takenSize);
+		size_t takenBufferLength = decode_utf8(tmpBuffer, countof(tmpBuffer), p, end - p, &takenSize);
 		if (!takenBufferLength)
 			break;
 
-		result = buffer->append(tmpBuffer, takenBufferLength) != -1;
+		result = string->append(tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
 		p += takenSize;
 	}
 
-	return buffer->getCount();
+	return string->getLength();
 }
 
 size_t
-CharCodec::decodeToUtf16(
-	sl::Array<utf16_t>* buffer,
+CharCodec::decode_utf16(
+	sl::String_utf16* string,
 	const void* _p,
 	size_t size
 	)
@@ -221,8 +186,8 @@ CharCodec::decodeToUtf16(
 	size_t length = size / m_unitSize;
 	size_t leftover = size % m_unitSize;
 
-	buffer->clear();
-	bool result = buffer->reserve(length);
+	string->clear();
+	bool result = string->reserve(length);
 	if (!result)
 		return -1;
 
@@ -233,23 +198,23 @@ CharCodec::decodeToUtf16(
 		utf16_t tmpBuffer[256];
 
 		size_t takenSize;
-		size_t takenBufferLength = decodeToUtf16(tmpBuffer, countof(tmpBuffer), p, end - p, &takenSize);
+		size_t takenBufferLength = decode_utf16(tmpBuffer, countof(tmpBuffer), p, end - p, &takenSize);
 		if (!takenBufferLength)
 			break;
 
-		result = buffer->append(tmpBuffer, takenBufferLength) != -1;
+		result = string->append(tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
 		p += takenSize;
 	}
 
-	return buffer->getCount();
+	return string->getLength();
 }
 
 size_t
-CharCodec::decodeToUtf32(
-	sl::Array<utf32_t>* buffer,
+CharCodec::decode_utf32(
+	sl::String_utf32* string,
 	const void* _p,
 	size_t size
 	)
@@ -257,8 +222,8 @@ CharCodec::decodeToUtf32(
 	size_t length = size / m_unitSize;
 	size_t leftover = size % m_unitSize;
 
-	buffer->clear();
-	bool result = buffer->reserve(length);
+	string->clear();
+	bool result = string->reserve(length);
 	if (!result)
 		return -1;
 
@@ -269,51 +234,18 @@ CharCodec::decodeToUtf32(
 		utf32_t tmpBuffer[256];
 
 		size_t takenSize;
-		size_t takenBufferLength = decodeToUtf32(tmpBuffer, countof(tmpBuffer), p, end - p, &takenSize);
+		size_t takenBufferLength = decode_utf32(tmpBuffer, countof(tmpBuffer), p, end - p, &takenSize);
 		if (!takenBufferLength)
 			break;
 
-		result = buffer->append(tmpBuffer, takenBufferLength) != -1;
+		result = string->append(tmpBuffer, takenBufferLength) != -1;
 		if (!result)
 			return -1;
 
 		p += takenSize;
 	}
 
-	return buffer->getCount();
-}
-
-sl::Array<utf8_t>
-CharCodec::decodeToUtf8(
-	const void* p,
-	size_t size
-	)
-{
-	sl::Array<utf8_t> buffer;
-	decodeToUtf8(&buffer, p, size);
-	return buffer;
-}
-
-sl::Array<utf16_t>
-CharCodec::decodeToUtf16(
-	const void* p,
-	size_t size
-	)
-{
-	sl::Array<utf16_t> buffer;
-	decodeToUtf16(&buffer, p, size);
-	return buffer;
-}
-
-sl::Array<utf32_t>
-CharCodec::decodeToUtf32(
-	const void* p,
-	size_t size
-	)
-{
-	sl::Array<utf32_t> buffer;
-	decodeToUtf32(&buffer, p, size);
-	return buffer;
+	return string->getLength();
 }
 
 //..............................................................................
@@ -362,7 +294,7 @@ CodePointDecoder::decode(
 
 	memcpy(m_accumulator + m_accumulatorCount, p, copySize);
 
-	takenBufferLength = m_charCodec->decodeToUtf32(
+	takenBufferLength = m_charCodec->decode_utf32(
 		buffer,
 		1,
 		m_accumulator,
@@ -436,7 +368,7 @@ CodePointDecoder::decode(
 
 	memcpy(m_accumulator + m_accumulatorCount, p, copySize);
 
-	takenBufferLength = m_charCodec->decodeToUtf32(
+	takenBufferLength = m_charCodec->decode_utf32(
 		cplBuffer,
 		textBuffer,
 		1,
@@ -494,7 +426,7 @@ CodePointDecoder::decodeImpl(
 	ASSERT(takenSize_o);
 
 	size_t takenSize;
-	size_t takenBufferLength = m_charCodec->decodeToUtf32(
+	size_t takenBufferLength = m_charCodec->decode_utf32(
 		buffer,
 		bufferLength,
 		p,
@@ -528,7 +460,7 @@ CodePointDecoder::decodeImpl(
 
 	size_t takenSize;
 
-	size_t takenBufferLength = m_charCodec->decodeToUtf32(
+	size_t takenBufferLength = m_charCodec->decode_utf32(
 		cplBuffer,
 		textBuffer,
 		bufferLength,

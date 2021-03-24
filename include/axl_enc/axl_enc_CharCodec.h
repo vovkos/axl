@@ -15,6 +15,7 @@
 
 #include "axl_enc_Utf.h"
 #include "axl_sl_Array.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace enc {
@@ -54,69 +55,52 @@ public:
 		return m_unitSize;
 	}
 
+	// calc encode buffer
+
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf8(
+	calcRequiredBufferSizeToEncode_utf8(
 		const utf8_t* p,
 		size_t length
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf16(
+	calcRequiredBufferSizeToEncode_utf16(
 		const utf16_t* p,
 		size_t length
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf32(
+	calcRequiredBufferSizeToEncode_utf32(
 		const utf32_t* p,
 		size_t length
 		) = 0;
 
 	size_t
-	encodeFromUtf8(
-		sl::Array<char>* buffer,
-		const utf8_t* p,
-		size_t length
-		);
+	calcRequiredBufferSizeToEncode_utf8(const sl::StringRef_utf8& string)
+	{
+		return calcRequiredBufferSizeToEncode_utf8(string.cp(), string.getLength());
+	}
 
 	size_t
-	encodeFromUtf16(
-		sl::Array<char>* buffer,
-		const utf16_t* p,
-		size_t length
-		);
+	calcRequiredBufferSizeToEncode_utf16(const sl::StringRef_utf16& string)
+	{
+		return calcRequiredBufferSizeToEncode_utf16(string.cp(), string.getLength());
+	}
 
 	size_t
-	encodeFromUtf32(
-		sl::Array<char>* buffer,
-		const utf32_t* p,
-		size_t length
-		);
+	calcRequiredBufferSizeToEncode_utf32(const sl::StringRef_utf32& string)
+	{
+		return calcRequiredBufferSizeToEncode_utf32(string.cp(), string.getLength());
+	}
 
-	sl::Array<char>
-	encodeFromUtf8(
-		const utf8_t* p,
-		size_t length
-		);
-
-	sl::Array<char>
-	encodeFromUtf16(
-		const utf16_t* p,
-		size_t length
-		);
-
-	sl::Array<char>
-	encodeFromUtf32(
-		const utf32_t* p,
-		size_t length
-		);
+	// encode
 
 	virtual
 	size_t
-	encodeFromUtf8(
+	encode_utf8(
 		void* buffer,
 		size_t bufferSize,
 		const utf8_t* p,
@@ -126,7 +110,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf16(
+	encode_utf16(
 		void* buffer,
 		size_t bufferSize,
 		const utf16_t* p,
@@ -136,7 +120,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf32(
+	encode_utf32(
 		void* buffer,
 		size_t bufferSize,
 		const utf32_t* p,
@@ -144,69 +128,133 @@ public:
 		size_t* takenLength = NULL
 		) = 0;
 
+	size_t
+	encode_utf8(
+		sl::Array<char>* buffer,
+		const utf8_t* p,
+		size_t length
+		);
+
+	size_t
+	encode_utf16(
+		sl::Array<char>* buffer,
+		const utf16_t* p,
+		size_t length
+		);
+
+	size_t
+	encode_utf32(
+		sl::Array<char>* buffer,
+		const utf32_t* p,
+		size_t length
+		);
+
+	size_t
+	encode_utf8(
+		sl::Array<char>* buffer,
+		const sl::StringRef_utf8& string
+		)
+	{
+		encode_utf8(buffer, string.cp(), string.getLength());
+	}
+
+	size_t
+	encode_utf16(
+		sl::Array<char>* buffer,
+		const sl::StringRef_utf16& string
+		)
+	{
+		encode_utf16(buffer, string.cp(), string.getLength());
+	}
+
+	size_t
+	encode_utf32(
+		sl::Array<char>* buffer,
+		const sl::StringRef_utf32& string
+		)
+	{
+		encode_utf32(buffer, string.cp(), string.getLength());
+	}
+
+	sl::Array<char>
+	encode_utf8(
+		const utf8_t* p,
+		size_t length
+		)
+	{
+		sl::Array<char> buffer;
+		encode_utf8(&buffer, p, length);
+		return buffer;
+	}
+
+	sl::Array<char>
+	encode_utf16(
+		const utf16_t* p,
+		size_t length
+		)
+	{
+		sl::Array<char> buffer;
+		encode_utf16(&buffer, p, length);
+		return buffer;
+	}
+
+	sl::Array<char>
+	encode_utf32(
+		const utf32_t* p,
+		size_t length
+		)
+	{
+		sl::Array<char> buffer;
+		encode_utf32(&buffer, p, length);
+		return buffer;
+	}
+
+	sl::Array<char>
+	encode_utf8(const sl::StringRef_utf8& string)
+	{
+		return encode_utf8(string.cp(), string.getLength());
+	}
+
+	sl::Array<char>
+	encode_utf16(const sl::StringRef_utf16& string)
+	{
+		return encode_utf16(string.cp(), string.getLength());
+	}
+
+	sl::Array<char>
+	encode_utf32(const sl::StringRef_utf32& string)
+	{
+		return encode_utf32(string.cp(), string.getLength());
+	}
+
+	// calc decode buffer
+
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf8(
+	calcRequiredBufferLengthToDecode_utf8(
 		const void* p,
 		size_t size
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf16(
+	calcRequiredBufferLengthToDecode_utf16(
 		const void* p,
 		size_t size
 		) = 0;
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf32(
+	calcRequiredBufferLengthToDecode_utf32(
 		const void* p,
 		size_t size
 		) = 0;
 
-	size_t
-	decodeToUtf8(
-		sl::Array<utf8_t>* buffer,
-		const void* p,
-		size_t size
-		);
-
-	size_t
-	decodeToUtf16(
-		sl::Array<utf16_t>* buffer,
-		const void* p,
-		size_t size
-		);
-
-	size_t
-	decodeToUtf32(
-		sl::Array<utf32_t>* buffer,
-		const void* p,
-		size_t size
-		);
-
-	sl::Array<utf8_t>
-	decodeToUtf8(
-		const void* p,
-		size_t size
-		);
-
-	sl::Array<utf16_t>
-	decodeToUtf16(
-		const void* p,
-		size_t size
-		);
-
-	sl::Array<utf32_t>
-	decodeToUtf32(
-		const void* p,
-		size_t size
-		);
+	// decode buffer
 
 	virtual
 	size_t
-	decodeToUtf8(
+	decode_utf8(
 		utf8_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -216,7 +264,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf16(
+	decode_utf16(
 		utf16_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -226,7 +274,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32(
+	decode_utf32(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -236,7 +284,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32(
+	decode_utf32(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,
@@ -244,6 +292,60 @@ public:
 		size_t size,
 		size_t* takenSize = NULL
 		) = 0;
+
+	size_t
+	decode_utf8(
+		sl::String_utf8* string,
+		const void* p,
+		size_t size
+		);
+
+	size_t
+	decode_utf16(
+		sl::String_utf16* string,
+		const void* p,
+		size_t size
+		);
+
+	size_t
+	decode_utf32(
+		sl::String_utf32* string,
+		const void* p,
+		size_t size
+		);
+
+	sl::String_utf8
+	decode_utf8(
+		const void* p,
+		size_t size
+		)
+	{
+		sl::String_utf8 string;
+		decode_utf8(&string, p, size);
+		return string;
+	}
+
+	sl::String_utf16
+	decode_utf16(
+		const void* p,
+		size_t size
+		)
+	{
+		sl::String_utf16 string;
+		decode_utf16(&string, p, size);
+		return string;
+	}
+
+	sl::String_utf32
+	decode_utf32(
+		const void* p,
+		size_t size
+		)
+	{
+		sl::String_utf32 string;
+		decode_utf32(&string, p, size);
+		return string;
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -263,7 +365,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf8(
+	calcRequiredBufferSizeToEncode_utf8(
 		const utf8_t* p,
 		size_t length
 		)
@@ -273,7 +375,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf16(
+	calcRequiredBufferSizeToEncode_utf16(
 		const utf16_t* p,
 		size_t length
 		)
@@ -283,7 +385,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf32(
+	calcRequiredBufferSizeToEncode_utf32(
 		const utf32_t* p,
 		size_t length
 		)
@@ -293,7 +395,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf8(
+	encode_utf8(
 		void* buffer,
 		size_t bufferSize,
 		const utf8_t* p,
@@ -312,7 +414,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf16(
+	encode_utf16(
 		void* buffer,
 		size_t bufferSize,
 		const utf16_t* p,
@@ -331,7 +433,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf32(
+	encode_utf32(
 		void* buffer,
 		size_t bufferSize,
 		const utf32_t* p,
@@ -350,7 +452,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf8(
+	calcRequiredBufferLengthToDecode_utf8(
 		const void* p,
 		size_t size
 		)
@@ -360,7 +462,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf16(
+	calcRequiredBufferLengthToDecode_utf16(
 		const void* p,
 		size_t size
 		)
@@ -370,7 +472,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf32(
+	calcRequiredBufferLengthToDecode_utf32(
 		const void* p,
 		size_t size
 		)
@@ -380,7 +482,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf8(
+	decode_utf8(
 		utf8_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -399,7 +501,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf16(
+	decode_utf16(
 		utf16_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -418,7 +520,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32(
+	decode_utf32(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -437,7 +539,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32(
+	decode_utf32(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,
@@ -472,7 +574,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf8(
+	calcRequiredBufferSizeToEncode_utf8(
 		const utf8_t* p,
 		size_t length
 		)
@@ -482,7 +584,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf16(
+	calcRequiredBufferSizeToEncode_utf16(
 		const utf16_t* p,
 		size_t length
 		)
@@ -492,7 +594,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferSizeToEncodeFromUtf32(
+	calcRequiredBufferSizeToEncode_utf32(
 		const utf32_t* p,
 		size_t length
 		)
@@ -502,7 +604,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf8(
+	encode_utf8(
 		void* buffer,
 		size_t bufferSize,
 		const utf8_t* p,
@@ -521,7 +623,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf16(
+	encode_utf16(
 		void* buffer,
 		size_t bufferSize,
 		const utf16_t* p,
@@ -540,7 +642,7 @@ public:
 
 	virtual
 	size_t
-	encodeFromUtf32(
+	encode_utf32(
 		void* buffer,
 		size_t bufferSize,
 		const utf32_t* p,
@@ -559,7 +661,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf8(
+	calcRequiredBufferLengthToDecode_utf8(
 		const void* p,
 		size_t size
 		)
@@ -572,7 +674,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf16(
+	calcRequiredBufferLengthToDecode_utf16(
 		const void* p,
 		size_t size
 		)
@@ -585,7 +687,7 @@ public:
 
 	virtual
 	size_t
-	calcRequiredBufferLengthToDecodeToUtf32(
+	calcRequiredBufferLengthToDecode_utf32(
 		const void* p,
 		size_t size
 		)
@@ -598,7 +700,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf8(
+	decode_utf8(
 		utf8_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -623,7 +725,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf16(
+	decode_utf16(
 		utf16_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -648,7 +750,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32(
+	decode_utf32(
 		utf32_t* buffer,
 		size_t bufferLength,
 		const void* p,
@@ -673,7 +775,7 @@ public:
 
 	virtual
 	size_t
-	decodeToUtf32(
+	decode_utf32(
 		uchar_t* cplBuffer,
 		utf32_t* textBuffer,
 		size_t bufferLength,
