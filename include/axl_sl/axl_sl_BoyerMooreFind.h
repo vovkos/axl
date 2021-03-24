@@ -232,7 +232,7 @@ public:
 	};
 
 protected:
-	Array<utf32_t> m_buffer;
+	sl::String_utf32 m_buffer;
 
 public:
 	bool

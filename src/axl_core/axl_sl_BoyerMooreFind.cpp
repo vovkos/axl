@@ -211,12 +211,16 @@ TextBoyerMooreFind::setPattern(
 	uint_t flags
 	)
 {
-	size_t length = codec->decodeToUtf32(&m_pattern, p, size);
+	sl::String_utf32 text = codec->decode_utf32(p, size);
+	size_t length = text.getLength();
 	if (!length)
 	{
 		clear();
 		return true;
 	}
+
+	m_pattern = sl::ArrayRef<utf32_t>(text.getHdr(), text.cp(), length);
+	text.release(); // release before modifying m_pattern!
 
 	if (flags & TextBoyerMooreFlag_CaseInsensitive)
 		for (size_t i = 0; i < length; i++)
@@ -267,7 +271,7 @@ TextBoyerMooreFind::find(
 	if (!patternLength)
 		return 0;
 
-	size_t length = codec->decodeToUtf32(&m_buffer, p, size);
+	size_t length = codec->decode_utf32(&m_buffer, p, size);
 	if (length == -1)
 		return -1;
 
@@ -279,11 +283,11 @@ TextBoyerMooreFind::find(
 
 	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ?
 		(m_flags & BoyerMooreFlag_Reverse) ?
-			findImpl(TextBoyerMooreCaseFoldedReverseAccessor(m_buffer + length - 1), length, length) :
-			findImpl(TextBoyerMooreCaseFoldedAccessor(m_buffer), length, length) :
+			findImpl(TextBoyerMooreCaseFoldedReverseAccessor(m_buffer.cp() + length - 1), length, length) :
+			findImpl(TextBoyerMooreCaseFoldedAccessor(m_buffer.cp()), length, length) :
 		(m_flags & BoyerMooreFlag_Reverse) ?
-			findImpl(TextBoyerMooreReverseAccessor(m_buffer + length - 1), length, length) :
-			findImpl(TextBoyerMooreAccessor(m_buffer), length, length);
+			findImpl(TextBoyerMooreReverseAccessor(m_buffer.cp() + length - 1), length, length) :
+			findImpl(TextBoyerMooreAccessor(m_buffer.cp()), length, length);
 
 	if (result == -1)
 		return -1;
@@ -292,7 +296,7 @@ TextBoyerMooreFind::find(
 		result = length - result - patternLength;
 
 	ASSERT(result <= length);
-	return codec->calcRequiredBufferSizeToEncodeFromUtf32(m_buffer, result);
+	return codec->calcRequiredBufferSizeToEncode_utf32(m_buffer.cp(), result);
 }
 
 size_t
@@ -308,7 +312,7 @@ TextBoyerMooreFind::find(
 	if (!patternLength)
 		return offset;
 
-	size_t chunkLength = codec->decodeToUtf32(&m_buffer, p, size);
+	size_t chunkLength = codec->decode_utf32(&m_buffer, p, size);
 	if (chunkLength == -1 || chunkLength == 0)
 		return -1;
 
@@ -322,9 +326,9 @@ TextBoyerMooreFind::find(
 	if (end < patternLength)
 	{
 		if (m_flags & BoyerMooreFlag_Reverse)
-			incrementalContext->m_tail.appendReverse(m_buffer, chunkLength);
+			incrementalContext->m_tail.appendReverse(m_buffer.cp(), chunkLength);
 		else
-			incrementalContext->m_tail.append(m_buffer, chunkLength);
+			incrementalContext->m_tail.append(m_buffer.cp(), chunkLength);
 
 		return -1;
 	}
@@ -332,23 +336,23 @@ TextBoyerMooreFind::find(
 	size_t result = (m_flags & TextBoyerMooreFlag_CaseInsensitive) ?
 		(m_flags & BoyerMooreFlag_Reverse) ?
 			findImpl(
-				TextBoyerMooreCaseFoldedIncrementalReverseAccessor(m_buffer + chunkLength - 1, incrementalContext),
+				TextBoyerMooreCaseFoldedIncrementalReverseAccessor(m_buffer.cp() + chunkLength - 1, incrementalContext),
 				end,
 				fullLength
 				) :
 			findImpl(
-				TextBoyerMooreCaseFoldedIncrementalAccessor(m_buffer, incrementalContext),
+				TextBoyerMooreCaseFoldedIncrementalAccessor(m_buffer.cp(), incrementalContext),
 				end,
 				fullLength
 				) :
 		(m_flags & BoyerMooreFlag_Reverse) ?
 			findImpl(
-				TextBoyerMooreIncrementalReverseAccessor(m_buffer + chunkLength - 1, incrementalContext),
+				TextBoyerMooreIncrementalReverseAccessor(m_buffer.cp() + chunkLength - 1, incrementalContext),
 				end,
 				fullLength
 				) :
 			findImpl(
-				TextBoyerMooreIncrementalAccessor(m_buffer, incrementalContext),
+				TextBoyerMooreIncrementalAccessor(m_buffer.cp(), incrementalContext),
 				end,
 				fullLength
 				);
@@ -364,12 +368,12 @@ TextBoyerMooreFind::find(
 	if ((intptr_t)result < 0)
 	{
 		ASSERT(-result <= tailLength);
-		result = -codec->calcRequiredBufferSizeToEncodeFromUtf32(incrementalContext->m_tail, -result);
+		result = -codec->calcRequiredBufferSizeToEncode_utf32(incrementalContext->m_tail, -result);
 	}
 	else if (result)
 	{
 		ASSERT(result <= chunkLength);
-		result = codec->calcRequiredBufferSizeToEncodeFromUtf32(m_buffer, result);
+		result = codec->calcRequiredBufferSizeToEncode_utf32(m_buffer.cp(), result);
 	}
 
 	incrementalContext->reset();

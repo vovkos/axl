@@ -471,7 +471,7 @@ TextPainter::buildBinTextBuffer(
 		size_t takenSize;
 		size_t leftover = end - p;
 
-		codec->decodeToUtf32(&codePoint, 1, p, leftover, &takenSize);
+		codec->decode_utf32(&codePoint, 1, p, leftover, &takenSize);
 		if (!takenSize)
 		{
 			size_t end = i + leftover;
