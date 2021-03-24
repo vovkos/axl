@@ -98,6 +98,16 @@ protected:
 
 public:
 	static
+	uchar_t
+	getHexCharValue(char x)
+	{
+		return
+			x >= '0' && x <= '9' ? x - '0' :
+			x >= 'a' && x <= 'f' ? 10 + x - 'a' :
+			x >= 'A' && x <= 'F' ? 10 + x - 'A' : 0;
+	}
+
+	static
 	char
 	getHexChar_l(uchar_t x)
 	{
@@ -109,16 +119,6 @@ public:
 	getHexChar_u(uchar_t x)
 	{
 		return GetHexChar_u()(x);
-	}
-
-	static
-	uchar_t
-	getHexCharValue(char x)
-	{
-		return
-			x >= '0' && x <= '9' ? x - '0' :
-			x >= 'a' && x <= 'f' ? 10 + x - 'a' :
-			x >= 'A' && x <= 'F' ? 10 + x - 'A' : 0;
 	}
 
 	static
