@@ -155,7 +155,7 @@ public:
 		const sl::StringRef_utf8& string
 		)
 	{
-		encode_utf8(buffer, string.cp(), string.getLength());
+		return encode_utf8(buffer, string.cp(), string.getLength());
 	}
 
 	size_t
@@ -164,7 +164,7 @@ public:
 		const sl::StringRef_utf16& string
 		)
 	{
-		encode_utf16(buffer, string.cp(), string.getLength());
+		return encode_utf16(buffer, string.cp(), string.getLength());
 	}
 
 	size_t
@@ -173,7 +173,7 @@ public:
 		const sl::StringRef_utf32& string
 		)
 	{
-		encode_utf32(buffer, string.cp(), string.getLength());
+		return encode_utf32(buffer, string.cp(), string.getLength());
 	}
 
 	sl::Array<char>

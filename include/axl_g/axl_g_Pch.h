@@ -249,7 +249,7 @@
 #		include <mach/semaphore.h>
 #		include <sys/time.h>
 #	else
-#		include "byteswap.h"
+#		include <byteswap.h>
 #	endif
 #endif
 
