@@ -3658,17 +3658,47 @@ testSerial2()
 {
 	bool result;
 
+#if (_AXL_OS_POSIX)
+	printf(
+		"TCSETS:   %x\nTCSETSW:  %x\nTCSETSF:  %x\n",
+		TCSETS,
+		TCSETSW,
+		TCSETSF
+		);
+#	if (defined TCSETS2)
+	printf(
+		"TCSETS2:  %x\nTCSETSW2: %x\nTCSETSF2: %x\n",
+		TCSETS2,
+		TCSETSW2,
+		TCSETSF2
+		);
+#	endif
+#endif
+
 	io::Serial serial;
 	result = serial.open("/dev/ttyUSB0");
+	if (!result)
+	{
+		printf("open error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
 
 	io::SerialSettings settings;
-	settings.m_baudRate = 115200;
+	settings.m_baudRate = 12345678;
 	settings.m_dataBits = 8;
 	settings.m_stopBits = io::SerialStopBits_1;
 	settings.m_flowControl = io::SerialFlowControl_None;
 	settings.m_parity = io::SerialParity_None;
 
 	result = serial.setSettings(&settings);
+	if (!result)
+	{
+		printf("settings error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("port successfully opened\n");
+	return;
 
 	serial.write("\r", 1);
 
@@ -5719,7 +5749,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testEncoding();
+	testSerial2();
 	return 0;
 }
 

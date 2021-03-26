@@ -13,6 +13,8 @@
 #include "axl_io_Serial.h"
 #include "axl_sys_Event.h"
 
+#include "axl_enc_HexEncoding.h"
+
 namespace axl {
 namespace io {
 
@@ -149,68 +151,139 @@ Serial::setSettings(
 	uint_t mask
 	)
 {
+#if (_AXL_IO_PSX_TERMIOS2)
+	termios2 attr;
+#else
 	termios attr;
+#endif
+
 	bool result = m_serial.getAttr(&attr);
 	if (!result)
 		return false;
 
 	if (mask & SerialSettingId_BaudRate)
 	{
-		speed_t speed;
+		speed_t stdSpeed;
 
 		switch (settings->m_baudRate)
 		{
 		case 110:
-			speed = B110;
+			stdSpeed = B110;
 			break;
 
 		case 300:
-			speed = B300;
+			stdSpeed = B300;
 			break;
 
 		case 600:
-			speed = B600;
+			stdSpeed = B600;
 			break;
 
 		case 1200:
-			speed = B1200;
+			stdSpeed = B1200;
 			break;
 
 		case 2400:
-			speed = B2400;
+			stdSpeed = B2400;
 			break;
 
 		case 4800:
-			speed = B4800;
+			stdSpeed = B4800;
 			break;
 
 		case 9600:
-			speed = B9600;
+			stdSpeed = B9600;
 			break;
 
 		case 19200:
-			speed = B19200;
+			stdSpeed = B19200;
 			break;
 
 		case 38400:
-			speed = B38400;
+			stdSpeed = B38400;
 			break;
 
 		case 57600:
-			speed = B57600;
+			stdSpeed = B57600;
 			break;
 
 		case 115200:
-			speed = B115200;
+			stdSpeed = B115200;
+			break;
+
+		case 230400:
+			stdSpeed = B230400;
+			break;
+
+		case 460800:
+			stdSpeed = B460800;
+			break;
+
+		case 500000:
+			stdSpeed = B500000;
+			break;
+
+		case 576000:
+			stdSpeed = B576000;
+			break;
+
+		case 921600:
+			stdSpeed = B921600;
+			break;
+
+		case 1000000:
+			stdSpeed = B1000000;
+			break;
+
+		case 1152000:
+			stdSpeed = B1152000;
+			break;
+
+		case 1500000:
+			stdSpeed = B1500000;
+			break;
+
+		case 2000000:
+			stdSpeed = B2000000;
+			break;
+
+		case 2500000:
+			stdSpeed = B2500000;
+			break;
+
+		case 3000000:
+			stdSpeed = B3000000;
+			break;
+
+		case 3500000:
+			stdSpeed = B3500000;
+			break;
+
+		case 4000000:
+			stdSpeed = B4000000;
 			break;
 
 		default:
-			// TODO: custom baud rate (currently fall back to 38400)
-			speed = B38400;
+#if (_AXL_IO_PSX_TERMIOS2)
+			stdSpeed = 0;
+			attr.c_cflag &= ~CBAUD;
+			attr.c_cflag |= CBAUDEX;
+			attr.c_ispeed = settings->m_baudRate;
+			attr.c_ospeed = settings->m_baudRate;
+#else
+			return err::fail(err::SystemErrorCode_InvalidParameter);
+#endif
 		}
 
-		cfsetispeed(&attr, speed);
-		cfsetospeed(&attr, speed);
+		if (stdSpeed != 0)
+		{
+			attr.c_cflag &= ~(CBAUD | CBAUDEX);
+			attr.c_cflag |= stdSpeed;
+#if (_AXL_IO_PSX_TERMIOS2 || _HAVE_STRUCT_TERMIOS_C_ISPEED)
+			attr.c_ispeed = stdSpeed;
+			attr.c_ospeed = stdSpeed;
+#endif
+		}
 	}
 
 	if (mask & SerialSettingId_DataBits)
@@ -309,9 +382,7 @@ Serial::setSettings(
 	attr.c_cflag |= CREAD | CLOCAL;
 	attr.c_lflag = 0;
 
-	for (size_t i = 0; i < countof(attr.c_cc); i++)
-		attr.c_cc[i] = _POSIX_VDISABLE;
-
+	memset(attr.c_cc, sizeof(attr.c_cc), _POSIX_VDISABLE);
 	attr.c_cc[VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
 	attr.c_cc[VMIN]  = 1;
 

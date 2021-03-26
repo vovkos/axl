@@ -15,6 +15,24 @@
 
 #include "axl_io_psx_File.h"
 
+#if (defined TCGETS2 && defined TCGETS2)
+#	define _AXL_IO_PSX_TERMIOS2 1
+#	define NCCS2 19 // for x86, amd64, arm32, arm64
+
+struct termios2
+{
+	tcflag_t c_iflag;
+	tcflag_t c_oflag;
+	tcflag_t c_cflag;
+	tcflag_t c_lflag;
+	cc_t c_line;
+	cc_t c_cc[NCCS2];
+	speed_t c_ispeed;
+	speed_t c_ospeed;
+};
+
+#endif
+
 namespace axl {
 namespace io {
 namespace psx {
@@ -43,12 +61,28 @@ public:
 	bool
 	setAttr(
 		const termios* attr,
-		int action = TCSANOW
+		int actions = TCSANOW
 		)
 	{
-		int result = ::tcsetattr(m_h, action, attr);
+		int result = ::tcsetattr(m_h, actions, attr);
 		return err::complete(result != -1);
 	}
+
+#if (_AXL_IO_PSX_TERMIOS2)
+	bool
+	getAttr(termios2* attr) const
+	{
+		int result = ::ioctl(m_h, TCGETS2, attr);
+		return err::complete(result != -1);
+	}
+
+	bool
+	setAttr(const termios2* attr)
+	{
+		int result = ::ioctl(m_h, TCSETS2, attr);
+		return err::complete(result != -1);
+	}
+#endif
 
 	bool
 	drain()
