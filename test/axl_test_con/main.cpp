@@ -3654,37 +3654,43 @@ testTime()
 //..............................................................................
 
 void
-testSerial2()
+testSerial2(uint_t baud)
 {
 	bool result;
 
-#if (_AXL_OS_POSIX)
+#ifdef TCSETS
 	printf(
 		"TCSETS:   %x\nTCSETSW:  %x\nTCSETSF:  %x\n",
 		TCSETS,
 		TCSETSW,
 		TCSETSF
 		);
-#	if (defined TCSETS2)
+#endif
+
+#ifdef TCSETS2
 	printf(
 		"TCSETS2:  %x\nTCSETSW2: %x\nTCSETSF2: %x\n",
 		TCSETS2,
 		TCSETSW2,
 		TCSETSF2
 		);
-#	endif
 #endif
 
 	io::Serial serial;
-	result = serial.open("/dev/ttyUSB0");
+
+	printf("opening port...\n");
+
+	result = serial.open("/dev/cu.usbserial-1460");
 	if (!result)
 	{
 		printf("open error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
+	printf("port successfully opened\n");
+
 	io::SerialSettings settings;
-	settings.m_baudRate = 12345678;
+	settings.m_baudRate = baud;
 	settings.m_dataBits = 8;
 	settings.m_stopBits = io::SerialStopBits_1;
 	settings.m_flowControl = io::SerialFlowControl_None;
@@ -3697,7 +3703,11 @@ testSerial2()
 		return;
 	}
 
-	printf("port successfully opened\n");
+	printf("port successfully configured\n");
+	serial.write("hui", 3);
+
+	sys::sleep(500);
+	serial.close();
 	return;
 
 	serial.write("\r", 1);
@@ -5749,7 +5759,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testSerial2();
+	testSerial2(argc >= 2 ? atoi(argv[1]) : 38400);
 	return 0;
 }
 

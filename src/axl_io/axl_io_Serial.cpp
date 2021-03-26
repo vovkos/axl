@@ -161,10 +161,10 @@ Serial::setSettings(
 	if (!result)
 		return false;
 
+	speed_t stdSpeed = -1;
+
 	if (mask & SerialSettingId_BaudRate)
 	{
-		speed_t stdSpeed;
-
 		switch (settings->m_baudRate)
 		{
 		case 110:
@@ -211,77 +211,94 @@ Serial::setSettings(
 			stdSpeed = B115200;
 			break;
 
+#ifdef B230400
 		case 230400:
 			stdSpeed = B230400;
 			break;
-
+#endif
+#ifdef B460800
 		case 460800:
 			stdSpeed = B460800;
 			break;
-
+#endif
+#ifdef B500000
 		case 500000:
 			stdSpeed = B500000;
 			break;
-
+#endif
+#ifdef B576000
 		case 576000:
 			stdSpeed = B576000;
 			break;
-
+#endif
+#ifdef B921600
 		case 921600:
 			stdSpeed = B921600;
 			break;
-
+#endif
+#ifdef B1000000
 		case 1000000:
 			stdSpeed = B1000000;
 			break;
-
+#endif
+#ifdef B1152000
 		case 1152000:
 			stdSpeed = B1152000;
 			break;
-
+#endif
+#ifdef B1500000
 		case 1500000:
 			stdSpeed = B1500000;
 			break;
-
+#endif
+#ifdef B2000000
 		case 2000000:
 			stdSpeed = B2000000;
 			break;
-
+#endif
+#ifdef B2500000
 		case 2500000:
 			stdSpeed = B2500000;
 			break;
-
+#endif
+#ifdef B3000000
 		case 3000000:
 			stdSpeed = B3000000;
 			break;
-
+#endif
+#ifdef B3500000
 		case 3500000:
 			stdSpeed = B3500000;
 			break;
-
+#endif
+#ifdef B4000000
 		case 4000000:
 			stdSpeed = B4000000;
 			break;
-
+#endif
 		default:
-#if (_AXL_IO_PSX_TERMIOS2)
 			stdSpeed = 0;
+
+#if (_AXL_IO_PSX_TERMIOS2)
 			attr.c_cflag &= ~CBAUD;
 			attr.c_cflag |= CBAUDEX;
 			attr.c_ispeed = settings->m_baudRate;
 			attr.c_ospeed = settings->m_baudRate;
-#else
+#elif (!defined IOSSIOSPEED)
 			return err::fail(err::SystemErrorCode_InvalidParameter);
 #endif
 		}
 
 		if (stdSpeed != 0)
 		{
+#if (_AXL_IO_PSX_TERMIOS2)
 			attr.c_cflag &= ~(CBAUD | CBAUDEX);
 			attr.c_cflag |= stdSpeed;
-#if (_AXL_IO_PSX_TERMIOS2 || _HAVE_STRUCT_TERMIOS_C_ISPEED)
 			attr.c_ispeed = stdSpeed;
 			attr.c_ospeed = stdSpeed;
+#else
+			cfsetispeed(&attr, stdSpeed);
+			cfsetospeed(&attr, stdSpeed);
 #endif
 		}
 	}
@@ -382,13 +399,23 @@ Serial::setSettings(
 	attr.c_cflag |= CREAD | CLOCAL;
 	attr.c_lflag = 0;
 
-	memset(attr.c_cc, sizeof(attr.c_cc), _POSIX_VDISABLE);
+	memset(attr.c_cc, _POSIX_VDISABLE, sizeof(attr.c_cc));
 	attr.c_cc[VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
 	attr.c_cc[VMIN]  = 1;
 
 	result = m_serial.setAttr(&attr);
 	if (!result)
 		return false;
+
+#ifdef IOSSIOSPEED
+	if (!stdSpeed)
+	{
+		speed_t speed = settings->m_baudRate;
+		result = m_serial.ioctl(IOSSIOSPEED, &speed) != -1;
+		if (!result)
+			return false;
+	}
+#endif
 
 	if (mask & SerialSettingId_FlowControl) // also, adjust DTR & RTS lines
 	{
