@@ -1,4 +1,4 @@
-//..............................................................................
+	//..............................................................................
 //
 //  This file is part of the AXL library.
 //
@@ -15,6 +15,62 @@
 #include "test.h"
 
 namespace {
+
+//..............................................................................
+
+bool
+generateEcProductKey(
+	EC_KEY* ecKey0,
+	sl::String* productKey,
+	const sl::StringRef& userName,
+	size_t hyphenDistance = 6
+	)
+{
+	char buffer[256];
+	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
+
+	cry::EcKey ecKey(ecKey0);
+
+	bool result =
+		ecKey.sign(&signature, userName.cp(), userName.getLength()) &&
+		enc::Base32Encoding_nj::encode(productKey, signature, signature.getCount(), hyphenDistance) != -1;
+
+	ecKey.detach();
+	return result;
+}
+
+inline
+sl::String
+generateEcProductKey(
+	EC_KEY* ecKey,
+	const sl::StringRef& userName,
+	size_t hyphenDistance = 6
+	)
+{
+	sl::String productKey;
+	generateEcProductKey(ecKey, &productKey, userName, hyphenDistance);
+	return productKey;
+}
+
+bool
+verifyEcProductKey(
+	EC_KEY* ecKey0,
+	const sl::StringRef& userName,
+	const sl::StringRef& productKey
+	)
+{
+	char buffer[256];
+	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
+
+	cry::EcKey ecKey(ecKey0);
+
+	bool result =
+		enc::Base32Encoding_nj::decode(&signature, productKey) != -1 &&
+		ecKey.verify(userName.cp(), userName.getLength(), signature, signature.getCount());
+
+	ecKey.detach();
+	return result;
+}
 
 //..............................................................................
 

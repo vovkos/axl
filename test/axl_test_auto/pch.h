@@ -34,6 +34,7 @@
 
 #include "axl_ini_Parser.h"
 #include "axl_enc_Base32Encoding.h"
+#include "axl_enc_Base32Encoding_nj.h"
 #include "axl_sys_Time.h"
 
 using namespace axl;

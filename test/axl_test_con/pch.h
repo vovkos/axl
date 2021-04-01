@@ -45,6 +45,7 @@
 
 #include "axl_enc_EscapeEncoding.h"
 #include "axl_enc_Base32Encoding.h"
+#include "axl_enc_Base64Encoding.h"
 #include "axl_enc_HexEncoding.h"
 
 #ifdef _AXL_XML

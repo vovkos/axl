@@ -3616,6 +3616,17 @@ testEvent()
 void
 testBase32()
 {
+	char s[] = "NB2WSLBAM5XXM3TPEBUSA3LVOJQXMZLJFQQG25LSMF3GK2JMEBTW65TON4QGSIDIOVUSCIJBEE======";
+
+	sl::Array<char> dec = enc::Base32Encoding::decode(s);
+	dec.append(0);
+	printf("decoded: %s\n", dec.cp());
+
+	sl::String enc = enc::Base32Encoding::encode(dec, dec.getCount() - 1);
+	printf("encoded: %s\n", enc.sz());
+	printf("orginal: %s\n", s);
+	ASSERT(enc == s);
+
 	sl::Array<char> source;
 
 	for (int i = 0; i < 500; i++)
@@ -3623,11 +3634,39 @@ testBase32()
 		size_t size = rand() % 64 + 16;
 		source.setCount(size);
 		for (size_t j = 0; j < size; j++)
-			source[j] = rand() % 256;
+			source[j] = (char)rand();
 
 		sl::String enc = enc::Base32Encoding::encode(source, size);
 		sl::Array<char> dec = enc::Base32Encoding::decode(enc);
+		ASSERT(dec.getCount() == size && memcmp(dec, source, size) == 0);
+	}
+}
 
+void
+testBase64()
+{
+	char s[] = "aHVpLCBnb3ZubyBpIG11cmF2ZWk7IG11cmF2ZWksIGdvdm5vIGkgaHVpISEhIQ==";
+
+	sl::Array<char> dec = enc::Base64Encoding::decode(s);
+	dec.append(0);
+	printf("decoded: %s\n", dec.cp());
+
+	sl::String enc = enc::Base64Encoding::encode(dec, dec.getCount() - 1);
+	printf("encoded: %s\n", enc.sz());
+	printf("orginal: %s\n", s);
+	ASSERT(enc == s);
+
+	sl::Array<char> source;
+
+	for (int i = 0; i < 500; i++)
+	{
+		size_t size = rand() % 64 + 16;
+		source.setCount(size);
+		for (size_t j = 0; j < size; j++)
+			source[j] = (char)rand();
+
+		sl::String enc = enc::Base64Encoding::encode(source, size);
+		sl::Array<char> dec = enc::Base64Encoding::decode(enc);
 		ASSERT(dec.getCount() == size && memcmp(dec, source, size) == 0);
 	}
 }
@@ -5733,6 +5772,8 @@ codeAuthenticatorTest()
 	printf("Done.\n");
 }
 
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5759,7 +5800,14 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-	testSerial2(argc >= 2 ? atoi(argv[1]) : 38400);
+#if (_AXL_OS_WIN)
+	uint_t baudRate = argc >= 2 ? (uint_t)wcstoul(argv[1], NULL, 10) : 38400;
+#else
+	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
+#endif
+
+	testBase32();
+	testBase64();
 	return 0;
 }
 
