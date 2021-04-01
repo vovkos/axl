@@ -21,82 +21,43 @@ namespace enc {
 
 //..............................................................................
 
+class GetHexChar_l
+{
+public:
+	char
+	operator () (uchar_t x)
+	{
+		static char charTable[] = "0123456789abcdef";
+		return charTable[x & 0xf];
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class GetHexChar_u
+{
+public:
+	char
+	operator () (uchar_t x)
+	{
+		static char charTable[] = "0123456789ABCDEF";
+		return charTable[x & 0xf];
+	}
+};
+
+//..............................................................................
+
 enum HexEncodingFlag
 {
-	HexEncodingFlag_UpperCase = 1,
-	HexEncodingFlag_NoSpace   = 2,
-	HexEncodingFlag_Multiline = 4,
+	HexEncodingFlag_UpperCase = 0x01,
+	HexEncodingFlag_NoSpace   = 0x02,
+	HexEncodingFlag_Multiline = 0x04,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class HexEncoding
 {
-protected:
-	class InsertNoSpace
-	{
-	public:
-		size_t
-		operator () (
-			char* p,
-			size_t i
-			)
-		{
-			return 0;
-		}
-	};
-
-	class InsertSpace
-	{
-	public:
-		size_t
-		operator () (
-			char* p,
-			size_t i
-			)
-		{
-			*p = ' ';
-			return 1;
-		}
-	};
-
-	class InsertSpaceMultiline
-	{
-	public:
-		size_t
-		operator () (
-			char* p,
-			size_t i
-			)
-		{
-			*p = (i & 0xf) ? ' ' : '\n';
-			return 1;
-		}
-	};
-
-public:
-	class GetHexChar_l
-	{
-	public:
-		char
-		operator () (uchar_t x)
-		{
-			static char charTable[] = "0123456789abcdef";
-			return charTable[x & 0xf];
-		}
-	};
-
-	class GetHexChar_u
-	{
-	public:
-		char
-		operator () (uchar_t x)
-		{
-			static char charTable[] = "0123456789ABCDEF";
-			return charTable[x & 0xf];
-		}
-	};
-
 public:
 	static
 	uchar_t
@@ -158,33 +119,6 @@ public:
 		sl::Array<char> buffer;
 		decode(&buffer, source);
 		return buffer;
-	}
-
-protected:
-	template <
-		typename GetHexChar,
-		typename InsertSpace
-		>
-	static
-	void
-	encodeImpl(
-		char* dst,
-		const uchar_t* src,
-		size_t size
-		)
-	{
-		uchar_t x = src[0];
-		*dst++ = GetHexChar()(x >> 4);
-		*dst++ = GetHexChar()(x);
-
-		for (size_t i = 1; i < size; i++)
-		{
-			dst += InsertSpace()(dst, i);
-
-			uchar_t x = src[i];
-			*dst++ = GetHexChar()(x >> 4);
-			*dst++ = GetHexChar()(x);
-		}
 	}
 };
 

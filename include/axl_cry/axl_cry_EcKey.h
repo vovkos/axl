@@ -278,35 +278,5 @@ public:
 
 //..............................................................................
 
-bool
-generateEcProductKey(
-	EC_KEY* ecKey,
-	sl::String* productKey,
-	const sl::StringRef& userName,
-	size_t hyphenDistance = 6
-	);
-
-inline
-sl::String
-generateEcProductKey(
-	EC_KEY* ecKey,
-	const sl::StringRef& userName,
-	size_t hyphenDistance = 6
-	)
-{
-	sl::String productKey;
-	generateEcProductKey(ecKey, &productKey, userName, hyphenDistance);
-	return productKey;
-}
-
-bool
-verifyEcProductKey(
-	EC_KEY* ecKey,
-	const sl::StringRef& userName,
-	const sl::StringRef& productKey
-	);
-
-//..............................................................................
-
 } // namespace cry
 } // namespace axl

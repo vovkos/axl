@@ -200,6 +200,8 @@ source_group(
 set(
 	ENC_H_LIST
 	${AXL_INC_DIR}/axl_enc/axl_enc_Base32Encoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Base32Encoding_nj.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Base64Encoding.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_CharCodec.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_EscapeEncoding.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_HexEncoding.h
@@ -213,6 +215,8 @@ set(
 set(
 	ENC_CPP_LIST
 	axl_enc_Base32Encoding.cpp
+	axl_enc_Base32Encoding_nj.cpp
+	axl_enc_Base64Encoding.cpp
 	axl_enc_CharCodec.cpp
 	axl_enc_EscapeEncoding.cpp
 	axl_enc_HexEncoding.cpp

@@ -118,8 +118,8 @@ EscapeEncodingDynamic::encode(
 				else
 				{
 					escapeSequenceLength = (flags & EscapeEncodingFlag_UpperCase) ?
-						buildHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c) :
-						buildHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
+						buildHexCodeEscapeSequence<GetHexChar_u>(escapeSequence, c) :
+						buildHexCodeEscapeSequence<GetHexChar_l>(escapeSequence, c);
 				}
 
 				appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, escapeSequenceLength);

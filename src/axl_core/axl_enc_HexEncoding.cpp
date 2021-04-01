@@ -17,6 +17,92 @@ namespace enc {
 
 //..............................................................................
 
+class InsertNoSpace
+{
+public:
+	size_t
+	operator () (
+		char* p,
+		size_t i
+		)
+	{
+		return 0;
+	}
+};
+
+class InsertNoSpaceMultiline
+{
+public:
+	size_t
+	operator () (
+		char* p,
+		size_t i
+		)
+	{
+		if (i & 0x0f)
+			return 0;
+
+		*p = '\n';
+		return 1;
+	}
+};
+
+class InsertSpace
+{
+public:
+	size_t
+	operator () (
+		char* p,
+		size_t i
+		)
+	{
+		*p = ' ';
+		return 1;
+	}
+};
+
+class InsertSpaceMultiline
+{
+public:
+	size_t
+	operator () (
+		char* p,
+		size_t i
+		)
+	{
+		*p = (i & 0x0f) ? ' ' : '\n';
+		return 1;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename GetHexChar,
+	typename InsertSpace
+	>
+void
+encodeImpl(
+	char* dst,
+	const uchar_t* src,
+	size_t size
+	)
+{
+	uchar_t x = src[0];
+	*dst++ = GetHexChar()(x >> 4);
+	*dst++ = GetHexChar()(x);
+
+	for (size_t i = 1; i < size; i++)
+	{
+		uchar_t x = src[i];
+		dst += InsertSpace()(dst, i);
+		*dst++ = GetHexChar()(x >> 4);
+		*dst++ = GetHexChar()(x);
+	}
+}
+
+//..............................................................................
+
 size_t
 HexEncoding::encode(
 	sl::String* string,
@@ -37,14 +123,29 @@ HexEncoding::encode(
 	if ((flags & HexEncodingFlag_NoSpace))
 	{
 		length = size * 2;
+		if (flags & HexEncodingFlag_Multiline)
+		{
+			size_t lineCount = length / 16;
+			if (lineCount & 0x0f)
+				lineCount++;
+
+			length += lineCount - 1;
+		}
+
 		char* dst = string->createBuffer(length);
 		if (!dst)
 			return -1;
 
-		if (flags & HexEncodingFlag_UpperCase)
-			encodeImpl<GetHexChar_u, InsertNoSpace>(dst, src, size);
+		if (flags & HexEncodingFlag_Multiline)
+			if (flags & HexEncodingFlag_UpperCase)
+				encodeImpl<GetHexChar_u, InsertNoSpaceMultiline>(dst, src, size);
+			else
+				encodeImpl<GetHexChar_l, InsertNoSpaceMultiline>(dst, src, size);
 		else
-			encodeImpl<GetHexChar_l, InsertNoSpace>(dst, src, size);
+			if (flags & HexEncodingFlag_UpperCase)
+				encodeImpl<GetHexChar_u, InsertNoSpace>(dst, src, size);
+			else
+				encodeImpl<GetHexChar_l, InsertNoSpace>(dst, src, size);
 	}
 	else
 	{

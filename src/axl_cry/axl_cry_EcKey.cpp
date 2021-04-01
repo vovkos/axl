@@ -11,7 +11,6 @@
 
 #include "pch.h"
 #include "axl_cry_EcKey.h"
-#include "axl_enc_Base32Encoding.h"
 
 namespace axl {
 namespace cry {
@@ -143,49 +142,6 @@ EcKey::signHash(
 	ASSERT(size <= maxSize);
 	signature->setCount(size);
 	return true;
-}
-
-//..............................................................................
-
-bool
-generateEcProductKey(
-	EC_KEY* ecKey0,
-	sl::String* productKey,
-	const sl::StringRef& userName,
-	size_t hyphenDistance
-	)
-{
-	char buffer[256];
-	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
-
-	EcKey ecKey(ecKey0);
-
-	bool result =
-		ecKey.sign(&signature, userName.cp(), userName.getLength()) &&
-		enc::Base32Encoding::encode(productKey, signature, signature.getCount(), hyphenDistance) != -1;
-
-	ecKey.detach();
-	return result;
-}
-
-bool
-verifyEcProductKey(
-	EC_KEY* ecKey0,
-	const sl::StringRef& userName,
-	const sl::StringRef& productKey
-	)
-{
-	char buffer[256];
-	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
-
-	EcKey ecKey(ecKey0);
-
-	bool result =
-		enc::Base32Encoding::decode(&signature, productKey) != -1 &&
-		ecKey.verify(userName.cp(), userName.getLength(), signature, signature.getCount());
-
-	ecKey.detach();
-	return result;
 }
 
 //..............................................................................

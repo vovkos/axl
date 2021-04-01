@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_ENC_BASE32ENCODING_H
+#define _AXL_ENC_BASE32ENCODING_NJ_H
 
 #include "axl_sl_String.h"
 #include "axl_sl_Array.h"
@@ -21,28 +21,7 @@ namespace enc {
 
 //..............................................................................
 
-class GetBase32Char
-{
-public:
-	char
-	operator () (uchar_t x)
-	{
-		static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-		return charTable[x & 0x1f];
-	}
-};
-
-//..............................................................................
-
-enum Base32EncodingFlag
-{
-	Base32EncodingFlag_NoPadding  = 0x01,
-	Base32EncodingFlag_Multiline  = 0x02,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class Base32Encoding
+class Base32Encoding_nj
 {
 public:
 	static
@@ -51,7 +30,7 @@ public:
 		sl::String* string,
 		const void* p,
 		size_t size,
-		uint_t flags = 0
+		size_t hyphenDistance = 5
 		);
 
 	static
@@ -59,11 +38,11 @@ public:
 	encode(
 		const void* p,
 		size_t size,
-		uint_t flags = 0
+		size_t hyphenDistance = 5
 		)
 	{
 		sl::String string;
-		encode(&string, p, size, flags);
+		encode(&string, p, size, hyphenDistance);
 		return string;
 	}
 

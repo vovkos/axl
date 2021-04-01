@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_enc_Base32Encoding.h"
+#include "axl_enc_Base64Encoding.h"
 
 namespace axl {
 namespace enc {
@@ -52,7 +52,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename GetBase32Char,
+	typename GetBase64Char,
 	typename InsertNl
 	>
 static
@@ -76,16 +76,16 @@ encodeImpl(
 		x |= *src;
 		b += 8;
 
-		while (b >= 5)
+		while (b >= 6)
 		{
-			b -= 5;
+			b -= 6;
 			dst += InsertNl()(dst, i++);
-			*dst++ = GetBase32Char()(x >> b);
+			*dst++ = GetBase64Char()(x >> b);
 		}
 	}
 
 	if (b) // can't be a newline here
-		*dst++ = GetBase32Char()(x << (5 - b));
+		*dst++ = GetBase64Char()(x << (6 - b));
 
 	while (dst < dstEnd)
 		*dst++ = '=';
@@ -96,7 +96,7 @@ encodeImpl(
 //..............................................................................
 
 size_t
-Base32Encoding::encode(
+Base64Encoding::encode(
 	sl::String* string,
 	const void* p,
 	size_t size,
@@ -110,14 +110,14 @@ Base32Encoding::encode(
 	}
 
 	size_t bitCount = size * 8;
-	size_t length = bitCount / 5;
-	if (bitCount % 5)
+	size_t length = bitCount / 6;
+	if (bitCount % 6)
 		length++;
 
-	if (!(flags & Base32EncodingFlag_NoPadding))
-		length += 7 - ((length - 1) & 7);
+	if (!(flags & Base64EncodingFlag_NoPadding))
+		length += 3 - ((length - 1) & 3);
 
-	if (flags & Base32EncodingFlag_Multiline)
+	if (flags & Base64EncodingFlag_Multiline)
 	{
 		size_t lineCount = length / 64;
 		if (lineCount & 0x3f)
@@ -130,29 +130,47 @@ Base32Encoding::encode(
 	if (!dst)
 		return -1;
 
-	if (flags & Base32EncodingFlag_Multiline)
-		encodeImpl<GetBase32Char, InsertNl>(dst, length, (uchar_t*)p, size);
+	if (flags & Base64EncodingFlag_Multiline)
+	{
+		if (flags & Base64EncodingFlag_UrlChars)
+			encodeImpl<GetBase64UrlChar, InsertNl>(dst, length, (uchar_t*)p, size);
+		else
+			encodeImpl<GetBase64Char, InsertNl>(dst, length, (uchar_t*)p, size);
+	}
 	else
-		encodeImpl<GetBase32Char, InsertNoNl>(dst, length, (uchar_t*)p, size);
+	{
+		if (flags & Base64EncodingFlag_UrlChars)
+			encodeImpl<GetBase64UrlChar, InsertNoNl>(dst, length, (uchar_t*)p, size);
+		else
+			encodeImpl<GetBase64Char, InsertNoNl>(dst, length, (uchar_t*)p, size);
+	}
 
 	return length;
 }
 
 size_t
-Base32Encoding::decode(
+Base64Encoding::decode(
 	sl::Array<char>* buffer,
 	const sl::StringRef& string
 	)
 {
-	static const uchar_t charMap['Z' - '2' + 1] =
+	static const uchar_t charMap['z' - '+' + 1] =
 	{
-		26, 27, 28, 29, 30, 31,                             //  2 .. 7
-		-1, -1, -1, -1, -1, -1, -1, -1, -1,                 //  8  9  :  ;  <  =  >  ?  @
+		62, 63, 62,                                         //  +  ,  -
+		-1,                                                 //  .
+		63,                                                 //  /
+		52, 53, 54, 55, 56, 57, 58, 59, 60, 61,             //  0 .. 9
+		-1, -1, -1, -1, -1, -1, -1,                         //  :  ;  <  =  >  ?  @
 		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, //  A .. M
 		13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, //  N .. Z
+		-1, -1, -1, -1,                                     //  [ \ ] ^
+		63,                                                 //  _
+		-1,                                                 //  `
+		26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, //  a .. m
+		39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, //  n .. z
 	};
 
-	size_t sizeGuess = (string.getLength() * 5) / 8;
+	size_t sizeGuess = (string.getLength() * 6) / 8;
 	buffer->reserve(sizeGuess);
 	buffer->clear();
 
@@ -164,16 +182,16 @@ Base32Encoding::decode(
 	for (; p < end; p++)
 	{
 		char c = *p;
-		if (c < '2' || c > 'Z')
+		if (c < '+' || c > 'z')
 			continue; // ignore padding & whitespace
 
-		uchar_t y = charMap[c - '2'];
-		if (y > 31)
-			continue; // ignore padding & non-Base32 chars
+		uchar_t y = charMap[c - '+'];
+		if (y > 63)
+			continue; // ignore padding & non-base64 chars
 
-		x <<= 5;
+		x <<= 6;
 		x |= y;
-		i += 5;
+		i += 6;
 
 		if (i >= 8)
 		{

@@ -23,13 +23,13 @@ namespace enc {
 
 enum EscapeEncodingFlag
 {
-	EscapeEncodingFlag_UpperCase   = 1,
-	EscapeEncodingFlag_NoTabEscape = 2,
-	EscapeEncodingFlag_NoCrEscape  = 4,
-	EscapeEncodingFlag_NoLfEscape  = 8,
+	EscapeEncodingFlag_UpperCase   = 0x01,
+	EscapeEncodingFlag_NoTabEscape = 0x02,
+	EscapeEncodingFlag_NoCrEscape  = 0x04,
+	EscapeEncodingFlag_NoLfEscape  = 0x08,
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class EscapeEncodingRoot
 {
@@ -246,8 +246,8 @@ public:
 					else
 					{
 						escapeSequenceLength = (flags & EscapeEncodingFlag_UpperCase) ?
-							buildHexCodeEscapeSequence<HexEncoding::GetHexChar_u>(escapeSequence, c) :
-							buildHexCodeEscapeSequence<HexEncoding::GetHexChar_l>(escapeSequence, c);
+							buildHexCodeEscapeSequence<GetHexChar_u>(escapeSequence, c) :
+							buildHexCodeEscapeSequence<GetHexChar_l>(escapeSequence, c);
 					}
 
 					string->append(escapeSequence, escapeSequenceLength);

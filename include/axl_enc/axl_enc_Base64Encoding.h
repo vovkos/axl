@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_ENC_BASE32ENCODING_H
+#define _AXL_ENC_BASE64ENCODING_H
 
 #include "axl_sl_String.h"
 #include "axl_sl_Array.h"
@@ -21,28 +21,43 @@ namespace enc {
 
 //..............................................................................
 
-class GetBase32Char
+class GetBase64Char
 {
 public:
 	char
 	operator () (uchar_t x)
 	{
-		static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-		return charTable[x & 0x1f];
+		static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		return charTable[x & 0x3f];
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class GetBase64UrlChar
+{
+public:
+	char
+	operator () (uchar_t x)
+	{
+		static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+		return charTable[x & 0x3f];
 	}
 };
 
 //..............................................................................
 
-enum Base32EncodingFlag
+enum Base64EncodingFlag
 {
-	Base32EncodingFlag_NoPadding  = 0x01,
-	Base32EncodingFlag_Multiline  = 0x02,
+	Base64EncodingFlag_NoPadding  = 0x01,
+	Base64EncodingFlag_UrlChars   = 0x02,
+	Base64EncodingFlag_Url        = Base64EncodingFlag_UrlChars | Base64EncodingFlag_NoPadding,
+	Base64EncodingFlag_Multiline  = 0x08,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Base32Encoding
+class Base64Encoding
 {
 public:
 	static
