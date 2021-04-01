@@ -410,12 +410,12 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCU(Class, Value) \
-	AXL_SL_HASH_TABLE_EX( \
+	AXL_SL_BEGIN_HASH_TABLE_EX( \
 		Class, \
 		axl::sl::String, \
 		Value, \
-		HashStringIgnoreCase_pcu, \
-		EqStringIgnoreCase_pcu, \
+		axl::sl::HashStringIgnoreCase_pcu, \
+		axl::sl::EqStringIgnoreCase_pcu, \
 		axl::sl::StringRef, \
 		axl::sl::ArgType<Value>::Type \
 		)
@@ -426,12 +426,12 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCP(Class, Value) \
-	AXL_SL_HASH_TABLE_EX( \
+	AXL_SL_BEGIN_HASH_TABLE_EX( \
 		Class, \
 		axl::sl::String, \
 		Value, \
-		HashStringIgnoreCase_pcp, \
-		EqStringIgnoreCase_pcp, \
+		axl::sl::HashStringIgnoreCase_pcp, \
+		axl::sl::EqStringIgnoreCase_pcp, \
 		axl::sl::StringRef, \
 		axl::sl::ArgType<Value>::Type \
 		)
