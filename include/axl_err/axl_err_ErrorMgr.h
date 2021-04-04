@@ -73,7 +73,7 @@ public:
 	void
 	setRouter(ErrorRouter* router)
 	{
-		ASSERT(!m_router && router != this);
+		ASSERT(router != this);
 		m_router = router;
 	}
 
