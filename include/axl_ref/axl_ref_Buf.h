@@ -177,7 +177,7 @@ public:
 	const T*
 	operator -> () const
 	{
-		ASSERT(m_p);
+		ASSERT(m_size >= sizeof(T));
 		return m_p;
 	}
 
@@ -376,14 +376,14 @@ public:
 	const T*
 	operator -> () const
 	{
-		ASSERT(this->m_p);
+		ASSERT(this->m_size >= sizeof(T));
 		return this->m_p;
 	}
 
 	T*
 	operator -> ()
 	{
-		ASSERT(this->m_p);
+		ASSERT(this->m_size >= sizeof(T));
 		return this->m_p;
 	}
 
