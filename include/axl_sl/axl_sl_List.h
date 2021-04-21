@@ -15,6 +15,7 @@
 
 #include "axl_sl_Iterator.h"
 #include "axl_sl_Construct.h"
+#include "axl_sl_Array.h"
 #include "axl_mem_New.h"
 
 namespace axl {
@@ -308,6 +309,51 @@ public:
 		T* p = it.getEntry();
 		remove(it);
 		insertTail(p);
+	}
+
+	template <class Compare = Lt<T> >
+	bool
+	sort()
+	{
+		if (this->m_count < 2)
+			return true;
+
+		sl::Array<T*> array;
+		bool result = array.setCount(this->m_count);
+		if (!result)
+			return false;
+
+		Iterator it = getHead();
+		for (size_t i = 0; i < this->m_count; i++, it++)
+			array[i] = it.getEntry();
+
+		ASSERT(!it);
+		std::sort(array.getBegin(), array.getEnd(), Compare());
+
+		// insertTail() would do a lot of unnecessary assignments:
+		//   link->m_next = NULL;
+		//   this->m_tail = link;
+		//   this->m_count++;
+
+		T** p = array;
+		T** end = p + this->m_count;
+
+		ListLink* link = GetLink()(*p++);
+		link->m_prev = NULL;
+
+		while (p < end)
+		{
+			ListLink* prevLink = link;
+			link = GetLink()(*p++);
+			link->m_prev = prevLink;
+			prevLink->m_next = link;
+			prevLink = link;
+		}
+
+		link->m_next = NULL;
+		this->m_head = array.getFront();
+		this->m_tail = array.getBack();
+		return true;
 	}
 
 protected:

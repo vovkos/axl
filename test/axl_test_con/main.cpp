@@ -5774,6 +5774,30 @@ codeAuthenticatorTest()
 
 //..............................................................................
 
+void
+testListSort()
+{
+	sl::BoxList<int> list;
+
+	for (size_t i = 0; i < 10; i++)
+		list.insertTail(rand());
+
+	sl::BoxIterator<int> it = list.getHead();
+	for (; it; it++)
+		printf("%d ", *it);
+
+	printf("\nSorting...\n");
+	list.sort();
+
+	it = list.getHead();
+	for (; it; it++)
+		printf("%d ", *it);
+
+	printf("\n");
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5806,8 +5830,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testBase32();
-	testBase64();
+	testListSort();
 	return 0;
 }
 

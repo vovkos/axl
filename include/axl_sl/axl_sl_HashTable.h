@@ -369,6 +369,20 @@ public:
 		erase(it);
 		return true;
 	}
+
+	template <class Compare = Lt<Key, KeyArg> >
+	bool
+	sortByKey()
+	{
+		return m_list.sort<CompareMapEntryKey<Key, Value, Compare> >();
+	}
+
+	template <class Compare = Lt<Value, ValueArg> >
+	bool
+	sortByValue()
+	{
+		return m_list.sort<CompareMapEntryValue<Key, Value, Compare> >();
+	}
 };
 
 //..............................................................................

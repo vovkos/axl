@@ -201,6 +201,7 @@
 
 #include <new>
 #include <utility>
+#include <algorithm>
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

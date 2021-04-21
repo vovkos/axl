@@ -44,6 +44,64 @@ public:
 
 template <
 	typename Key,
+	typename Value,
+	typename Compare
+	>
+class CompareMapEntryKey
+{
+public:
+	bool
+	operator () (
+		const MapEntry<Key, Value>& entry1,
+		const MapEntry<Key, Value>& entry2
+		) const
+	{
+		return Compare()(entry1.getKey(), entry2.getKey());
+	}
+
+	bool
+	operator () (
+		const MapEntry<Key, Value>* entry1,
+		const MapEntry<Key, Value>* entry2
+		) const
+	{
+		return Compare()(entry1->getKey(), entry2->getKey());
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename Key,
+	typename Value,
+	typename Compare
+	>
+class CompareMapEntryValue
+{
+public:
+	bool
+	operator () (
+		const MapEntry<Key, Value>& entry1,
+		const MapEntry<Key, Value>& entry2
+		) const
+	{
+		return Compare()(entry1.m_value, entry2.m_value);
+	}
+
+	bool
+	operator () (
+		const MapEntry<Key, Value>* entry1,
+		const MapEntry<Key, Value>* entry2
+		) const
+	{
+		return Compare()(entry1->m_value, entry2->m_value);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename Key,
 	typename Value
 	>
 class MapIterator: public Iterator<MapEntry<Key, Value> >

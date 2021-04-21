@@ -38,6 +38,34 @@ public:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Compare
+	>
+class CompareBoxListEntry
+{
+public:
+	bool
+	operator () (
+		const BoxListEntry<T>& entry1,
+		const BoxListEntry<T>& entry2
+		) const
+	{
+		return Compare()(entry1.m_value, entry2.m_value);
+	}
+
+	bool
+	operator () (
+		const BoxListEntry<T>* entry1,
+		const BoxListEntry<T>* entry2
+		) const
+	{
+		return Compare()(entry1->m_value, entry2->m_value);
+	}
+};
+
 //..............................................................................
 
 template <
@@ -303,6 +331,13 @@ public:
 		)
 	{
 		return BaseType::insertAfter(entry, after);
+	}
+
+	template <class Compare = Lt<T, ValueArg> >
+	bool
+	sort()
+	{
+		return BaseType::sort<CompareBoxListEntry<T, Compare> >();
 	}
 };
 
