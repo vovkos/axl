@@ -370,18 +370,18 @@ public:
 		return true;
 	}
 
-	template <class Compare = Lt<Key, KeyArg> >
+	template <typename Compare = Lt<Key, KeyArg> >
 	bool
 	sortByKey()
 	{
-		return m_list.sort<CompareMapEntryKey<Key, Value, Compare> >();
+		return m_list.template sort<CompareMapEntryKey<Key, Value, Compare> >();
 	}
 
-	template <class Compare = Lt<Value, ValueArg> >
+	template <typename Compare = Lt<Value, ValueArg> >
 	bool
 	sortByValue()
 	{
-		return m_list.sort<CompareMapEntryValue<Key, Value, Compare> >();
+		return m_list.template sort<CompareMapEntryValue<Key, Value, Compare> >();
 	}
 };
 

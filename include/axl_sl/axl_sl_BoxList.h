@@ -333,11 +333,11 @@ public:
 		return BaseType::insertAfter(entry, after);
 	}
 
-	template <class Compare = Lt<T, ValueArg> >
+	template <typename Compare = Lt<T, ValueArg> >
 	bool
 	sort()
 	{
-		return BaseType::sort<CompareBoxListEntry<T, Compare> >();
+		return BaseType::template sort<CompareBoxListEntry<T, Compare> >();
 	}
 };
 

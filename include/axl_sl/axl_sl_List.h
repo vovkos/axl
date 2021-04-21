@@ -311,7 +311,7 @@ public:
 		insertTail(p);
 	}
 
-	template <class Compare = Lt<T> >
+	template <typename Compare = Lt<T> >
 	bool
 	sort()
 	{
