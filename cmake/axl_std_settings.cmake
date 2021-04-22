@@ -429,6 +429,13 @@ axl_create_gcc_settings)
 		"-Wnarrowing" "-Wno-narrowing"
 		)
 
+	axl_create_compiler_flag_setting(
+		GCC_FLAG_CPP_WARNING_C11EXTENSION
+		DESCRIPTION "Warn about C++11 extensions"
+		DEFAULT "-Wno-c++11-extensions"
+		"-Wc++11-extensions" "-Wno-c++11-extensions"
+		)
+
 	# these warnings only pop up with -Wmost (hardcoded by the Xcode generator)
 
 	if (CMAKE_GENERATOR MATCHES "Xcode")
