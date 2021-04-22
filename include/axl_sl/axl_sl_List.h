@@ -311,9 +311,15 @@ public:
 		insertTail(p);
 	}
 
-	template <typename Compare = Lt<T> >
 	bool
 	sort()
+	{
+		return sort(Lt<T>());
+	}
+
+	template <typename Compare>
+	bool
+	sort(Compare compare)
 	{
 		if (this->m_count < 2)
 			return true;
@@ -328,7 +334,7 @@ public:
 			array[i] = it.getEntry();
 
 		ASSERT(!it);
-		std::sort(array.getBegin(), array.getEnd(), Compare());
+		std::sort(array.getBegin(), array.getEnd(), compare);
 
 		// insertTail() would do a lot of unnecessary assignments:
 		//   link->m_next = NULL;

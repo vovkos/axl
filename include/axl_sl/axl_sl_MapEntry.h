@@ -49,14 +49,22 @@ template <
 	>
 class CompareMapEntryKey
 {
+protected:
+	Compare m_compare;
+
 public:
+	CompareMapEntryKey(Compare compare):
+		m_compare(compare)
+	{
+	}
+
 	bool
 	operator () (
 		const MapEntry<Key, Value>& entry1,
 		const MapEntry<Key, Value>& entry2
 		) const
 	{
-		return Compare()(entry1.getKey(), entry2.getKey());
+		return m_compare(entry1.getKey(), entry2.getKey());
 	}
 
 	bool
@@ -65,7 +73,7 @@ public:
 		const MapEntry<Key, Value>* entry2
 		) const
 	{
-		return Compare()(entry1->getKey(), entry2->getKey());
+		return m_compare(entry1->getKey(), entry2->getKey());
 	}
 };
 

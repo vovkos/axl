@@ -46,14 +46,22 @@ template <
 	>
 class CompareBoxListEntry
 {
+protected:
+	Compare m_compare;
+
 public:
+	CompareBoxListEntry(Compare compare):
+		m_compare(compare)
+	{
+	}
+
 	bool
 	operator () (
 		const BoxListEntry<T>& entry1,
 		const BoxListEntry<T>& entry2
 		) const
 	{
-		return Compare()(entry1.m_value, entry2.m_value);
+		return m_compare(entry1.m_value, entry2.m_value);
 	}
 
 	bool
@@ -62,7 +70,7 @@ public:
 		const BoxListEntry<T>* entry2
 		) const
 	{
-		return Compare()(entry1->m_value, entry2->m_value);
+		return m_compare(entry1->m_value, entry2->m_value);
 	}
 };
 
@@ -333,11 +341,17 @@ public:
 		return BaseType::insertAfter(entry, after);
 	}
 
-	template <typename Compare = Lt<T, ValueArg> >
 	bool
 	sort()
 	{
-		return BaseType::template sort<CompareBoxListEntry<T, Compare> >();
+		return sort(Lt<T, ValueArg>());
+	}
+
+	template <typename Compare>
+	bool
+	sort(Compare compare)
+	{
+		return BaseType::sort(CompareBoxListEntry<T, Compare>(compare));
 	}
 };
 
