@@ -15,7 +15,7 @@
 
 #include "axl_sl_StringDetails.h"
 #include "axl_sl_Hash.h"
-#include "axl_ref_Buf.h"
+#include "axl_rc_Buf.h"
 
 namespace axl {
 namespace sl {
@@ -62,7 +62,7 @@ public:
 
 protected:
 	mutable C* m_p;
-	mutable ref::BufHdr* m_hdr;
+	mutable rc::BufHdr* m_hdr;
 	size_t m_length;
 	mutable bool m_isNullTerminated;
 
@@ -113,7 +113,7 @@ public:
 	}
 
 	StringRefBase(
-		ref::BufHdr* hdr,
+		rc::BufHdr* hdr,
 		const C* p
 		)
 	{
@@ -122,7 +122,7 @@ public:
 	}
 
 	StringRefBase(
-		ref::BufHdr* hdr,
+		rc::BufHdr* hdr,
 		const C* p,
 		size_t length,
 		bool isNullTerminated = false
@@ -133,7 +133,7 @@ public:
 	}
 
 	StringRefBase(
-		ref::BufHdr* hdr,
+		rc::BufHdr* hdr,
 		const C* p,
 		const void* end,
 		bool isNullTerminated = false
@@ -335,7 +335,7 @@ public:
 		return m_length;
 	}
 
-	ref::BufHdr*
+	rc::BufHdr*
 	getHdr() const
 	{
 		return m_hdr;
@@ -804,7 +804,7 @@ protected:
 #endif
 
 	void
-	attachBufHdr(ref::BufHdr* hdr) const
+	attachBufHdr(rc::BufHdr* hdr) const
 	{
 		if (hdr == m_hdr)
 			return; // try to avoid unnecessary interlocked ops
@@ -827,7 +827,7 @@ protected:
 
 	void
 	attach(
-		ref::BufHdr* hdr,
+		rc::BufHdr* hdr,
 		const C* p,
 		size_t length,
 		bool isNullTerminated
@@ -1068,7 +1068,7 @@ public:
 	}
 
 	StringBase(
-		ref::BufKind kind,
+		rc::BufKind kind,
 		void* p,
 		size_t size
 		)
@@ -1274,8 +1274,8 @@ public:
 			return 0;
 		}
 
-		ref::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated())
+		rc::BufHdr* hdr = src.getHdr();
+		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated())
 		{
 			copy(src.cp(), src.getLength());
 			src.release();
@@ -1299,8 +1299,8 @@ public:
 			return 0;
 		}
 
-		ref::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive) || !src.isNullTerminated())
+		rc::BufHdr* hdr = src.getHdr();
+		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated())
 			return copy(src.cp(), src.getLength());
 
 		this->attach(src);
@@ -1549,7 +1549,7 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		ref::Ptr<void> shadow;
+		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
 
@@ -1980,7 +1980,7 @@ public:
 
 		size_t bufferSize = getAllocSize(size);
 
-		ref::Ptr<ref::BufHdr> hdr = AXL_REF_NEW_EXTRA(ref::BufHdr, bufferSize);
+		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_EXTRA(rc::BufHdr, bufferSize);
 		if (!hdr)
 			return NULL;
 
@@ -2008,17 +2008,17 @@ public:
 
 	size_t
 	setBuffer(
-		ref::BufKind kind,
+		rc::BufKind kind,
 		void* p,
 		size_t size
 		)
 	{
-		ASSERT(size >= sizeof(ref::BufHdr) + sizeof(C));
+		ASSERT(size >= sizeof(rc::BufHdr) + sizeof(C));
 
-		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
-		size_t bufferSize = size - sizeof(ref::BufHdr);
+		uint_t flags = kind != rc::BufKind_Static ? rc::BufHdrFlag_Exclusive : 0;
+		size_t bufferSize = size - sizeof(rc::BufHdr);
 
-		ref::Ptr<ref::BufHdr> hdr = AXL_REF_NEW_INPLACE(ref::BufHdr, p, NULL, flags);
+		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_INPLACE(rc::BufHdr, p, NULL, flags);
 		hdr->m_bufferSize = bufferSize;
 
 		if (this->m_hdr)

@@ -13,7 +13,7 @@ static size_t g_threadStateSlot = -1;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class HookFinalizer:
-	public ref::RefCount,
+	public rc::RefCount,
 	public g::Finalizer
 {
 public:
@@ -32,7 +32,7 @@ initializeHooks(int)
 {
 	g_threadDisableCountSlot = sys::createSimpleTlsSlot();
 	g_threadStateSlot = sys::getTlsMgr()->createSlot();
-	g::getModule()->addFinalizer(AXL_REF_NEW(HookFinalizer));
+	g::getModule()->addFinalizer(AXL_RC_NEW(HookFinalizer));
 }
 
 size_t
@@ -92,7 +92,7 @@ getCurrentThreadState(bool createIfNotExists)
 	if (currentState || !createIfNotExists)
 		return (ThreadState*)currentState.p();
 
-	ref::Ptr<ThreadState> newState = AXL_REF_NEW(ThreadState);
+	rc::Ptr<ThreadState> newState = AXL_RC_NEW(ThreadState);
 	tlsMgr->setSlotValue(g_threadStateSlot, newState);
 	return newState;
 }

@@ -51,7 +51,7 @@ File::open(
 		flagsAttributes |= FILE_FLAG_OVERLAPPED;
 
 	char buffer[256];
-	sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	fileName_w = fileName;
 
 	bool result = m_file.create(

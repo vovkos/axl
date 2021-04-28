@@ -122,7 +122,7 @@ Size
 GdiFont::calcTextSize_utf8(const sl::StringRef_utf8& text)
 {
 	char buffer[256];
-	sl::String_w string(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w string(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.copy(text, length);
 
 	return calcTextSize_utf16(string, string.getLength());
@@ -148,7 +148,7 @@ Size
 GdiFont::calcTextSize_utf32(const sl::StringRef_utf32& text)
 {
 	char buffer[256];
-	sl::String_w string(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w string(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.copy(text, length);
 
 	return calcTextSize_utf16(string, string.getLength());

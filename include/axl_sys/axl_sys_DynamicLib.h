@@ -45,7 +45,7 @@ public:
 	open(const sl::StringRef& fileName)
 	{
 		char buffer[256];
-		sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+		sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 		fileName_w = fileName;
 
 		return m_library.loadLibrary(fileName_w);

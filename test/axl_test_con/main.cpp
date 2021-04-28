@@ -96,7 +96,7 @@ testWinNetworkAdapterList()
 	}
 
 	char buffer[256];
-	sl::Array<char> bufferArray(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<char> bufferArray(rc::BufKind_Stack, buffer, sizeof(buffer));
 	bufferArray.setCount(size);
 
 	IP_ADAPTER_INFO* ipAdapter = (IP_ADAPTER_INFO*)bufferArray.p();
@@ -570,15 +570,15 @@ testLongJmpTry()
 void
 testRegex()
 {
-	fsm::StdRegexNameMgr nameMgr;
+	re::StdRegexNameMgr nameMgr;
 
 	nameMgr.addName("ws",  "[ \\t\\r\\n]");
 	nameMgr.addName("dec", "[0-9]");
 
-	uint_t flags = 0; // fsm::RegexCompiler::Flag_SparseSyntax;
+	uint_t flags = 0; // re::RegexCompiler::Flag_SparseSyntax;
 
-	fsm::Regex regex;
-	fsm::RegexCompiler regexCompiler(flags, &regex, &nameMgr);
+	re::Regex regex;
+	re::RegexCompiler regexCompiler(flags, &regex, &nameMgr);
 
 /*	char const* src[] =
 	{
@@ -612,6 +612,7 @@ testRegex()
 	}
 
 	regexCompiler.finalize();
+	regexCompiler.print();
 	regex.print();
 
 	char fileName[] = "C:\\Projects\\repos\\ioninja\\jancy\\src\\jnc_ext\\jnc_std\\jnc\\std_Array.jnc";
@@ -4549,7 +4550,7 @@ void
 exec(const sl::StringRef& commandLine) // returns on failure only
 {
 	char buffer[256];
-	sl::Array<char*> argv(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<char*> argv(rc::BufKind_Stack, buffer, sizeof(buffer));
 
 	sl::String string = commandLine;
 
@@ -5830,7 +5831,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testListSort();
+	testRegex();
 	return 0;
 }
 

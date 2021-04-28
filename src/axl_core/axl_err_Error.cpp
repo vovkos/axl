@@ -154,7 +154,7 @@ Error::formatStringError_va(
 	)
 {
 	char buffer[256];
-	sl::String string(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String string(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.format_va(formatString, va);
 	return createStringError(string);
 }

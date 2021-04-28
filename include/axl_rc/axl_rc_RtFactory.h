@@ -11,13 +11,13 @@
 
 #pragma once
 
-#define _AXL_REF_RTFACTORY_H
+#define _axl_rc_RTFACTORY_H
 
-#include "axl_ref_Ptr.h"
+#include "axl_rc_Ptr.h"
 #include "axl_mem_New.h"
 
 namespace axl {
-namespace ref {
+namespace rc {
 
 //..............................................................................
 
@@ -176,23 +176,23 @@ typedef RtFactory<mem::StdAllocator> RtFactory;
 
 #ifdef _AXL_DEBUG
 
-#define AXL_REF_RT_NEW(Type) \
-	ref::RtFactory::operatorNew(Type, __FILE__, __LINE__)
+#define axl_rc_RT_NEW(Type) \
+	rc::RtFactory::operatorNew(Type, __FILE__, __LINE__)
 
-#define AXL_REF_RT_NEW_EXTRA(Type, extra) \
-	ref::RtFactory::operatorNew(Type, __FILE__, __LINE__, extra)
+#define axl_rc_RT_NEW_EXTRA(Type, extra) \
+	rc::RtFactory::operatorNew(Type, __FILE__, __LINE__, extra)
 
 #else
 
-#define AXL_REF_RT_NEW(Type) \
-	ref::RtFactory::operatorNew(Type)
+#define axl_rc_RT_NEW(Type) \
+	rc::RtFactory::operatorNew(Type)
 
-#define AXL_REF_RT_NEW_EXTRA(Type, extra) \
-	ref::RtFactory::operatorNew(Type, extra)
+#define axl_rc_RT_NEW_EXTRA(Type, extra) \
+	rc::RtFactory::operatorNew(Type, extra)
 
 #endif
 
 //..............................................................................
 
-} // namespace ref
+} // namespace rc
 } // namespace axl

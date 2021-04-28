@@ -13,7 +13,7 @@
 
 #define _AXL_ERR_ERROR_H
 
-#include "axl_ref_Buf.h"
+#include "axl_rc_Buf.h"
 #include "axl_err_SystemError.h"
 
 namespace axl {
@@ -95,10 +95,10 @@ extern AXL_SELECT_ANY const ErrorHdr g_noError =
 
 //..............................................................................
 
-class ErrorRef: public ref::BufRef<ErrorHdr, SizeOfError>
+class ErrorRef: public rc::BufRef<ErrorHdr, SizeOfError>
 {
 public:
-	typedef ref::BufRef<ErrorHdr, SizeOfError> BaseType;
+	typedef rc::BufRef<ErrorHdr, SizeOfError> BaseType;
 
 public:
 	ErrorRef()
@@ -162,7 +162,7 @@ public:
 
 //..............................................................................
 
-class Error: public ref::Buf<ErrorHdr, SizeOfError, ErrorRef>
+class Error: public rc::Buf<ErrorHdr, SizeOfError, ErrorRef>
 {
 public:
 	Error()
@@ -220,7 +220,7 @@ public:
 	}
 
 	Error(
-		ref::BufKind kind,
+		rc::BufKind kind,
 		void* p,
 		size_t size
 		)

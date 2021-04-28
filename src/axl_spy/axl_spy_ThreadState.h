@@ -7,7 +7,7 @@ namespace spy {
 
 //..............................................................................
 
-class ThreadState: public ref::RefCount
+class ThreadState: public rc::RefCount
 {
 protected:
 	struct Ret

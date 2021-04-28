@@ -75,12 +75,12 @@ getMouseButtons()
 
 //..............................................................................
 
-ref::Ptr<Canvas>
+rc::Ptr<Canvas>
 GdiWidgetImpl::getCanvas(HWND hWnd)
 {
 	HDC hdc = ::GetDC(hWnd);
 
-	ref::Ptr<GdiCanvas> dc = AXL_REF_NEW(ref::Box<GdiCanvas>);
+	rc::Ptr<GdiCanvas> dc = AXL_RC_NEW(rc::Box<GdiCanvas>);
 	dc->attach(hdc, hWnd, GdiCanvas::DestructKind_ReleaseDc);
 	return dc;
 }

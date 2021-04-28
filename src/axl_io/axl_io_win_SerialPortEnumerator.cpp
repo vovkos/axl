@@ -88,7 +88,7 @@ SerialPortEnumerator::createPortDesc(sys::win::DeviceInfo* deviceInfo)
 		return NULL;
 
 	char buffer[256];
-	sl::Array<char> bufferString(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<char> bufferString(rc::BufKind_Stack, buffer, sizeof(buffer));
 	bufferString.setCount(size);
 
 	result = ::RegQueryValueExA(

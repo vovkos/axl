@@ -112,7 +112,7 @@ ErrorMgr::getThreadEntry()
 	if (entry)
 		return entry;
 
-	ref::Ptr<ThreadEntry> newEntry = AXL_REF_NEW(ref::Box<ThreadEntry>);
+	rc::Ptr<ThreadEntry> newEntry = AXL_RC_NEW(rc::Box<ThreadEntry>);
 	sys::getTlsMgr()->setSlotValue(m_tlsSlot, newEntry);
 	return newEntry;
 }

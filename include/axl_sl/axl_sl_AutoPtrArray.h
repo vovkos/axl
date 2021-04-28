@@ -53,7 +53,7 @@ public:
 	}
 
 	AutoPtrArray(
-		ref::BufKind bufKind,
+		rc::BufKind bufKind,
 		void* p,
 		size_t size
 		):

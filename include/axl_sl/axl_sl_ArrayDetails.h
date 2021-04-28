@@ -13,7 +13,7 @@
 
 #define _AXL_SL_ARRAYDETAILS_H
 
-#include "axl_ref_Buf.h"
+#include "axl_rc_Buf.h"
 #include "axl_sl_ArgType.h"
 
 namespace axl {
@@ -105,7 +105,7 @@ template <typename T>
 class ArrayDetails: public ReverseArray<T>
 {
 public:
-	class Hdr: public ref::BufHdr
+	class Hdr: public rc::BufHdr
 	{
 	public:
 		size_t m_count;
@@ -225,7 +225,7 @@ template <typename T>
 class SimpleArrayDetails: public ReverseArray<T>
 {
 public:
-	typedef ref::BufHdr Hdr;
+	typedef rc::BufHdr Hdr;
 
 	enum
 	{

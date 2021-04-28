@@ -27,7 +27,7 @@ generateEcProductKey(
 	)
 {
 	char buffer[256];
-	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<char> signature(rc::BufKind_Stack, buffer, sizeof(buffer));
 
 	cry::EcKey ecKey(ecKey0);
 
@@ -60,7 +60,7 @@ verifyEcProductKey(
 	)
 {
 	char buffer[256];
-	sl::Array<char> signature(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<char> signature(rc::BufKind_Stack, buffer, sizeof(buffer));
 
 	cry::EcKey ecKey(ecKey0);
 

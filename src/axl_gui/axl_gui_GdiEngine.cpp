@@ -11,7 +11,7 @@
 
 #include "pch.h"
 #include "axl_gui_GdiEngine.h"
-#include "axl_ref_New.h"
+#include "axl_rc_New.h"
 #include "axl_err_Error.h"
 #include "axl_gui_Widget.h"
 
@@ -47,7 +47,7 @@ GdiEngine::updateStdPalette()
 	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DHiLight]     = inverseRgb(::GetSysColor(COLOR_3DHILIGHT));
 }
 
-ref::Ptr<Font>
+rc::Ptr<Font>
 GdiEngine::createStdFont(StdFontKind fontKind)
 {
 	LOGFONTW logFont;
@@ -68,11 +68,11 @@ GdiEngine::createStdFont(StdFontKind fontKind)
 		return createFont(hFont);
 
 	default:
-		return ref::g_nullPtr;
+		return rc::g_nullPtr;
 	}
 }
 
-ref::Ptr<Font>
+rc::Ptr<Font>
 GdiEngine::createFont(
 	const sl::StringRef& family,
 	size_t pointSize,
@@ -84,12 +84,12 @@ GdiEngine::createFont(
 
 	HFONT hFont = ::CreateFontIndirect(&logFont);
 	if (!hFont)
-		return err::failWithLastSystemError(ref::g_nullPtr);
+		return err::failWithLastSystemError(rc::g_nullPtr);
 
 	return createFont(hFont);
 }
 
-ref::Ptr<Font>
+rc::Ptr<Font>
 GdiEngine::createStockFont(int stockFontKind)
 {
 	HGDIOBJ h = ::GetStockObject(stockFontKind);
@@ -97,13 +97,13 @@ GdiEngine::createStockFont(int stockFontKind)
 	if (gdiObjectType != OBJ_FONT)
 	{
 		err::setError(err::SystemErrorCode_InvalidHandle);
-		return ref::g_nullPtr;
+		return rc::g_nullPtr;
 	}
 
 	return createFont((HFONT)h);
 }
 
-ref::Ptr<Font>
+rc::Ptr<Font>
 GdiEngine::createFont(HFONT hFont)
 {
 	GdiFont* font = AXL_MEM_NEW(GdiFont);
@@ -112,14 +112,14 @@ GdiEngine::createFont(HFONT hFont)
 	::GetObjectW(hFont, sizeof(logFont), &logFont);
 	getFontDescFromLogFont(&logFont, &font->m_fontDesc);
 
-	ref::Ptr<GdiFontuple> fontTuple = AXL_REF_NEW(GdiFontuple);
+	rc::Ptr<GdiFontuple> fontTuple = AXL_RC_NEW(GdiFontuple);
 	fontTuple->m_baseFont = font;
 	fontTuple->m_fontModArray[font->m_fontDesc.m_flags] = font;
 
 	font->m_h = hFont;
 	font->m_tuple = fontTuple;
 
-	return ref::Ptr<Font> (font, fontTuple);
+	return rc::Ptr<Font> (font, fontTuple);
 }
 
 Font*
@@ -153,19 +153,19 @@ GdiEngine::getFontMod(
 	return font;
 }
 
-ref::Ptr<Cursor>
+rc::Ptr<Cursor>
 GdiEngine::createStockCursor(LPCTSTR stockCursorRes)
 {
 	HCURSOR h = ::LoadCursor(NULL, stockCursorRes);
 	if (!h)
-		return err::failWithLastSystemError(ref::g_nullPtr);
+		return err::failWithLastSystemError(rc::g_nullPtr);
 
-	ref::Ptr<GdiCursor> cursor = AXL_REF_NEW(ref::Box<GdiCursor>);
+	rc::Ptr<GdiCursor> cursor = AXL_RC_NEW(rc::Box<GdiCursor>);
 	cursor->m_h = h;
 	return cursor;
 }
 
-ref::Ptr<Cursor>
+rc::Ptr<Cursor>
 GdiEngine::createStdCursor(StdCursorKind cursorKind)
 {
 	static LPCTSTR stockCursorResTable[StdCursorKind__Count] =
@@ -185,14 +185,14 @@ GdiEngine::createStdCursor(StdCursorKind cursorKind)
 	return createStockCursor(stockCursorResTable[cursorKind]);
 }
 
-ref::Ptr<Image>
+rc::Ptr<Image>
 GdiEngine::createImage()
 {
-	ref::Ptr<GdiImage> image = AXL_REF_NEW(ref::Box<GdiImage>);
+	rc::Ptr<GdiImage> image = AXL_RC_NEW(rc::Box<GdiImage>);
 	return image;
 }
 
-ref::Ptr<Image>
+rc::Ptr<Image>
 GdiEngine::createImage(
 	int width,
 	int height,
@@ -230,7 +230,7 @@ GdiEngine::createImage(
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError(ref::g_nullPtr);
+			return err::failWithLastSystemError(rc::g_nullPtr);
 	}
 	else
 	{
@@ -251,7 +251,7 @@ GdiEngine::createImage(
 			);
 
 		if (!hBitmap)
-			return err::failWithLastSystemError(ref::g_nullPtr);
+			return err::failWithLastSystemError(rc::g_nullPtr);
 
 		bool_t result = ::SetDIBits(
 			screenDc,
@@ -264,15 +264,15 @@ GdiEngine::createImage(
 			);
 
 		if (!result)
-			return err::failWithLastSystemError(ref::g_nullPtr);
+			return err::failWithLastSystemError(rc::g_nullPtr);
 	}
 
-	ref::Ptr<GdiImage> image = AXL_REF_NEW(ref::Box<GdiImage>);
+	rc::Ptr<GdiImage> image = AXL_RC_NEW(rc::Box<GdiImage>);
 	image->m_h = hBitmap;
 	return image;
 }
 
-ref::Ptr<Canvas>
+rc::Ptr<Canvas>
 GdiEngine::createOffscreenCanvas(
 	int width,
 	int height
@@ -281,11 +281,11 @@ GdiEngine::createOffscreenCanvas(
 	ScreenDc screenDc;
 	HBITMAP hBitmap = ::CreateCompatibleBitmap(screenDc, width, height);
 	if (!hBitmap)
-		return err::failWithLastSystemError(ref::g_nullPtr);
+		return err::failWithLastSystemError(rc::g_nullPtr);
 
 	HDC hdc = ::CreateCompatibleDC(screenDc);
 
-	ref::Ptr<GdiCanvas> dc = AXL_REF_NEW(ref::Box<GdiCanvas>);
+	rc::Ptr<GdiCanvas> dc = AXL_RC_NEW(rc::Box<GdiCanvas>);
 	dc->attach(hdc, NULL, GdiCanvas::DestructKind_DeleteDc);
 	dc->m_hBitmap = hBitmap;
 	dc->m_hPrevBitmap = (HBITMAP) ::SelectObject(hdc, hBitmap);

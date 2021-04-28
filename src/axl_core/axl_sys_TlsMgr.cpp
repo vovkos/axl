@@ -89,15 +89,15 @@ TlsMgr::getSlotValue(size_t slot)
 {
 	Page* page = findCurrentThreadPage();
 	if (!page)
-		return ref::g_nullPtr;
+		return rc::g_nullPtr;
 
 	size_t count = page->m_array.getCount();
 	if (slot >= count)
-		return ref::g_nullPtr;
+		return rc::g_nullPtr;
 
 	sl::BoxListEntry<TlsValue>* entry = page->m_array[slot];
 	if (!entry)
-		return ref::g_nullPtr;
+		return rc::g_nullPtr;
 
 	return entry->m_value;
 }

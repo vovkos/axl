@@ -11,12 +11,12 @@
 
 #pragma once
 
-#define _AXL_REF_REFCOUNT_H
+#define _axl_rc_REFCOUNT_H
 
 #include "axl_sys_Atomic.h"
 
 namespace axl {
-namespace ref {
+namespace rc {
 
 // RefCount decouples destruction and freeing -- this is done to allow overriding allocation at run-time.
 
@@ -265,5 +265,5 @@ AXL_SELECT_ANY struct NullPtr
 
 //..............................................................................
 
-} // namespace ref
+} // namespace rc
 } // namespace axl

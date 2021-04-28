@@ -10,12 +10,12 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_ref_RefCount.h"
-#include "axl_ref_New.h"
+#include "axl_rc_RefCount.h"
+#include "axl_rc_New.h"
 
 namespace axl {
-namespace ref {
+namespace rc {
 
 
 } // namespace axl
-} // namespace ref
+} // namespace rc

@@ -11,65 +11,48 @@
 
 #pragma once
 
-#define _AXL_REF_CHILD_H
+#define _AXL_RE_DFA_H
 
-#include "axl_ref_RefCount.h"
+#include "axl_re_Nfa.h"
 
 namespace axl {
-namespace ref {
+namespace re {
+
+struct DfaState;
 
 //..............................................................................
 
-// creatable child ref-counted object
-
-template <
-	typename T,
-	size_t extra = 0
-	>
-class Child
+struct DfaTransition: sl::ListLink
 {
-	AXL_DISABLE_COPY(Child)
-
-protected:
-	char m_buffer[sizeof(T) + extra];
-
-public:
-	Child(RefCount* parent)
-	{
-		memset(m_buffer, 0, sizeof(m_buffer));
-		T* p = AXL_REF_NEW_INPLACE(T, m_buffer, parent, 0);
-		p->addRef();
-	}
-
-	~Child()
-	{
-		p()->release();
-	}
-
-	operator T* ()
-	{
-		return p();
-	}
-
-	T*
-	operator & ()
-	{
-		return p();
-	}
-
-	T*
-	operator -> ()
-	{
-		return p();
-	}
-
-	T* p()
-	{
-		return (T*)m_buffer;
-	}
+	MatchCondition m_matchCondition;
+	DfaState* m_outState;
 };
 
 //..............................................................................
 
-} // namespace ref
+struct DfaState: sl::ListLink
+{
+	bool m_isAccept;
+	uint_t m_id;
+	uint_t m_acceptNfaStateId;
+	void* m_acceptContext;
+
+	sl::List<DfaTransition> m_transitionList;
+
+	NfaStateSet m_nfaStateSet;
+	sl::BitMap m_openCaptureIdSet;
+	sl::BitMap m_closeCaptureIdSet;
+
+	DfaState();
+
+	bool
+	addNfaState(NfaState* state);
+
+	void
+	makeEpsilonClosure();
+};
+
+//..............................................................................
+
+} // namespace re
 } // namespace axl

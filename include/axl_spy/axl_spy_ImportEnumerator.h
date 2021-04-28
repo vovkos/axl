@@ -101,7 +101,7 @@ protected:
 
 //..............................................................................
 
-class PeCodeMap: public ref::RefCount
+class PeCodeMap: public rc::RefCount
 {
 protected:
 	struct AddressRange
@@ -141,7 +141,7 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct PeImportEnumeration: ref::RefCount
+struct PeImportEnumeration: rc::RefCount
 {
 	char* m_moduleBase;
 	IMAGE_IMPORT_DESCRIPTOR* m_importDir;
@@ -156,8 +156,8 @@ protected:
 	uint_t m_ordinal;
 	uint_t m_hint;
 
-	ref::Ptr<PeImportEnumeration> m_enumeration;
-	ref::Ptr<PeCodeMap> m_codeMap;
+	rc::Ptr<PeImportEnumeration> m_enumeration;
+	rc::Ptr<PeCodeMap> m_codeMap;
 	size_t m_importDescIdx;
 	IMAGE_THUNK_DATA* m_nameThunk;
 	IMAGE_THUNK_DATA* m_addrThunk;
@@ -191,7 +191,7 @@ protected:
 	bool
 	isCode(size_t address)
 	{
-		return (m_codeMap ? m_codeMap : m_codeMap = AXL_REF_NEW(PeCodeMap))->isCode(address);
+		return (m_codeMap ? m_codeMap : m_codeMap = AXL_RC_NEW(PeCodeMap))->isCode(address);
 	}
 
 	bool
@@ -202,7 +202,7 @@ protected:
 
 //..............................................................................
 
-struct ElfImportEnumeration: ref::RefCount
+struct ElfImportEnumeration: rc::RefCount
 {
 	size_t m_baseAddress; // relocation difference, not an absolute address
 	ElfW(Sym)* m_symbolTable;
@@ -219,7 +219,7 @@ struct ElfImportEnumeration: ref::RefCount
 class ImportIterator: public ImportIteratorBase
 {
 protected:
-	ref::Ptr<ElfImportEnumeration> m_enumeration;
+	rc::Ptr<ElfImportEnumeration> m_enumeration;
 	size_t m_index;
 
 public:
@@ -243,7 +243,7 @@ protected:
 
 #elif (_AXL_OS_DARWIN)
 
-struct ImportEnumeration: ref::RefCount
+struct ImportEnumeration: rc::RefCount
 {
 	sl::Array<segment_command_64*> m_segmentArray;
 	sl::Array<const char*> m_dylibNameArray;
@@ -271,7 +271,7 @@ protected:
 	sl::StringRef m_segmentName;
 	sl::StringRef m_sectionName;
 
-	ref::Ptr<ImportEnumeration> m_enumeration;
+	rc::Ptr<ImportEnumeration> m_enumeration;
 	sl::Array<size_t> m_pendingSlotArray; // from BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB
 	State m_state;
 	const char* m_p;

@@ -10,10 +10,10 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_fsm_Dfa.h"
+#include "axl_re_Dfa.h"
 
 namespace axl {
-namespace fsm {
+namespace re {
 
 //..............................................................................
 
@@ -83,5 +83,5 @@ DfaState::makeEpsilonClosure()
 
 //..............................................................................
 
-} // namespace fsm
+} // namespace re
 } // namespace axl

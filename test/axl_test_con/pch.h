@@ -38,8 +38,7 @@
 #include "axl_sys_ReadWriteLock.h"
 #include "axl_sys_Thread.h"
 
-#include "axl_fsm_Regex.h"
-#include "axl_fsm_StdRegexNameMgr.h"
+#include "axl_re_Regex.h"
 #include "axl_zip_ZipReader.h"
 #include "axl_err_Errno.h"
 

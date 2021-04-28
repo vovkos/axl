@@ -19,7 +19,7 @@ namespace {
 void
 run()
 {
-	ref::Ptr<mem::Block> package = sl::formatPackage(
+	rc::Ptr<mem::Block> package = sl::formatPackage(
 		"%s %d %s %d",
 		"hui", 10, "govno", 20
 		);

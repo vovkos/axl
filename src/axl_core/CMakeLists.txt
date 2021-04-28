@@ -63,30 +63,30 @@ source_group(
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# ref folder
+# rc folder
 #
 
 set(
-	REF_H_LIST
-	${AXL_INC_DIR}/axl_ref/axl_ref_Buf.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_Child.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_New.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_Ptr.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_RefCount.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_RtFactory.h
-	${AXL_INC_DIR}/axl_ref/axl_ref_WeakPtr.h
+	RC_H_LIST
+	${AXL_INC_DIR}/axl_rc/axl_rc_Buf.h
+	${AXL_INC_DIR}/axl_rc/axl_rc_Child.h
+	${AXL_INC_DIR}/axl_rc/axl_rc_New.h
+	${AXL_INC_DIR}/axl_rc/axl_rc_Ptr.h
+	${AXL_INC_DIR}/axl_rc/axl_rc_RefCount.h
+	${AXL_INC_DIR}/axl_rc/axl_rc_RtFactory.h
+	${AXL_INC_DIR}/axl_rc/axl_rc_WeakPtr.h
 	)
 
 set(
-	REF_CPP_LIST
-	axl_ref_RefCount.cpp
+	RC_CPP_LIST
+	axl_rc_RefCount.cpp
 	)
 
 source_group(
 	ref
 	FILES
-	${REF_H_LIST}
-	${REF_CPP_LIST}
+	${RC_H_LIST}
+	${RC_CPP_LIST}
 	)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

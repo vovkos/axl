@@ -15,7 +15,7 @@
 
 #include "axl_sl_BoxList.h"
 #include "axl_sl_Array.h"
-#include "axl_ref_Ptr.h"
+#include "axl_rc_Ptr.h"
 #include "axl_sl_Singleton.h"
 
 #if (_AXL_OS_WIN)
@@ -27,7 +27,7 @@ namespace sys {
 
 //..............................................................................
 
-typedef ref::Ptr<void> TlsValue;
+typedef rc::Ptr<void> TlsValue;
 
 class TlsMgr
 {

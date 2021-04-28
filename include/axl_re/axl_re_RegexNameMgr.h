@@ -11,12 +11,20 @@
 
 #pragma once
 
-#define _AXL_FSM_STDREGEXNAMEMGR_H
-
-#include "axl_fsm_Regex.h"
+#define _AXL_RE_REGEXNAMEMGR_H
 
 namespace axl {
-namespace fsm {
+namespace re {
+
+//..............................................................................
+
+class RegexNameMgr
+{
+public:
+	virtual
+	sl::StringRef
+	findName(const sl::StringRef& name) = 0;
+};
 
 //..............................................................................
 
@@ -57,5 +65,5 @@ public:
 
 //..............................................................................
 
-} // namespace fsm
+} // namespace re
 } // namespace axl

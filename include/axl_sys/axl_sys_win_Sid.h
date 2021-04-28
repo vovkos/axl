@@ -63,7 +63,7 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Sid: public ref::Buf<SID, SizeOfSid>
+class Sid: public rc::Buf<SID, SizeOfSid>
 {
 public:
 	Sid()

@@ -15,18 +15,17 @@
 
 set(
 	LIB_H_LIST
-	${AXL_INC_DIR}/axl_fsm/axl_fsm_Nfa.h
-	${AXL_INC_DIR}/axl_fsm/axl_fsm_Dfa.h
-	${AXL_INC_DIR}/axl_fsm/axl_fsm_Regex.h
-	${AXL_INC_DIR}/axl_fsm/axl_fsm_StdRegexNameMgr.h
+	${AXL_INC_DIR}/axl_re/axl_re_Nfa.h
+	${AXL_INC_DIR}/axl_re/axl_re_Dfa.h
+	${AXL_INC_DIR}/axl_re/axl_re_Regex.h
+	${AXL_INC_DIR}/axl_re/axl_re_RegexNameMgr.h
 	)
 
 set(
 	LIB_CPP_LIST
-	axl_fsm_Nfa.cpp
-	axl_fsm_Dfa.cpp
-	axl_fsm_Regex.cpp
-	axl_fsm_StdRegexNameMgr.cpp
+	axl_re_Nfa.cpp
+	axl_re_Dfa.cpp
+	axl_re_Regex.cpp
 	)
 
 source_group(
@@ -47,7 +46,7 @@ set(PCH_CPP pch.cpp)
 set(
 	PCH_H_LIST
 	${PCH_H}
-	${AXL_INC_DIR}/axl_fsm/axl_fsm_Pch.h
+	${AXL_INC_DIR}/axl_re/axl_re_Pch.h
 	)
 
 source_group(
@@ -59,13 +58,13 @@ source_group(
 
 #...............................................................................
 #
-# axl_fsm library (finite state machines)
+# axl_re library (finite state machines)
 #
 
 include_directories(${AXL_INC_DIR})
 
 add_library(
-	axl_fsm
+	axl_re
 	${PCH_H_LIST}
 	${PCH_CPP}
 	${LIB_H_LIST}
@@ -73,7 +72,7 @@ add_library(
 	)
 
 axl_set_pch(
-	axl_fsm
+	axl_re
 	${PCH_H}
 	${PCH_CPP}
 	)
@@ -82,12 +81,12 @@ axl_set_pch(
 
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
-	axl_fsm
+	axl_re
 	${LIB_H_LIST}
 	)
 
 install(
-	TARGETS axl_fsm
+	TARGETS axl_re
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 	)
 

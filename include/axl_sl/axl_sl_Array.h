@@ -327,7 +327,7 @@ public:
 	}
 
 	Array(
-		ref::BufKind bufKind,
+		rc::BufKind bufKind,
 		void* p,
 		size_t size
 		)
@@ -486,7 +486,7 @@ public:
 		}
 
 		Hdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive))
+		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive))
 		{
 			copy(src, src.getCount());
 			src.release();
@@ -511,7 +511,7 @@ public:
 		}
 
 		Hdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & ref::BufHdrFlag_Exclusive))
+		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive))
 			return copy(src, src.getCount());
 
 		this->attach(src);
@@ -536,7 +536,7 @@ public:
 			return 0;
 		}
 
-		ref::Ptr<void> shadow;
+		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			if (Details::IsSimple)
 			{
@@ -574,7 +574,7 @@ public:
 			return 0;
 		}
 
-		ref::Ptr<void> shadow;
+		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
 
@@ -681,7 +681,7 @@ public:
 		size_t count
 		)
 	{
-		ref::Ptr<void> shadow;
+		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
 
@@ -702,7 +702,7 @@ public:
 		size_t count
 		)
 	{
-		ref::Ptr<void> shadow;
+		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
 
@@ -879,7 +879,7 @@ public:
 
 		size_t bufferSize = getAllocSize(size);
 
-		ref::Ptr<Hdr> hdr = AXL_REF_NEW_EXTRA(Hdr, bufferSize);
+		rc::Ptr<Hdr> hdr = AXL_RC_NEW_EXTRA(Hdr, bufferSize);
 		if (!hdr)
 			return false;
 
@@ -931,17 +931,17 @@ public:
 
 	size_t
 	setBuffer(
-		ref::BufKind kind,
+		rc::BufKind kind,
 		void* p,
 		size_t size
 		)
 	{
 		ASSERT(size >= sizeof(Hdr) + sizeof(T));
 
-		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
+		uint_t flags = kind != rc::BufKind_Static ? rc::BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof(Hdr);
 
-		ref::Ptr<Hdr> hdr = AXL_REF_NEW_INPLACE(Hdr, p, NULL, flags);
+		rc::Ptr<Hdr> hdr = AXL_RC_NEW_INPLACE(Hdr, p, NULL, flags);
 		hdr->m_bufferSize = bufferSize;
 		Details::setHdrCount(hdr, 0);
 
@@ -1025,7 +1025,7 @@ protected:
 
 		size_t bufferSize = getAllocSize(size);
 
-		ref::Ptr<Hdr> hdr = AXL_REF_NEW_EXTRA(Hdr, bufferSize);
+		rc::Ptr<Hdr> hdr = AXL_RC_NEW_EXTRA(Hdr, bufferSize);
 		if (!hdr)
 			return false;
 

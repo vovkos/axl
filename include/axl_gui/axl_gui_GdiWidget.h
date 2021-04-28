@@ -77,7 +77,7 @@ public:
 		);
 
 	static
-	ref::Ptr<Canvas>
+	rc::Ptr<Canvas>
 	getCanvas(HWND hWnd);
 
 protected:
@@ -150,7 +150,7 @@ public:
 	}
 
 	virtual
-	ref::Ptr<Canvas>
+	rc::Ptr<Canvas>
 	getCanvas()
 	{
 		return getGdiWidget()->getCanvas(m_h);
@@ -282,7 +282,7 @@ public:
 	void
 	postThreadMsg(
 		uint_t code,
-		const ref::Ptr<void>& params
+		const rc::Ptr<void>& params
 		)
 	{
 		WidgetThreadMsg* msg = AXL_MEM_NEW(WidgetThreadMsg);

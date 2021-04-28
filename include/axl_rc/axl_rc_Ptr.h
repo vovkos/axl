@@ -11,19 +11,17 @@
 
 #pragma once
 
-#define _AXL_REF_WEAKPTR_H
+#define _axl_rc_PTR_H
 
-#include "axl_ref_RefCount.h"
+#include "axl_rc_RefCount.h"
 
 namespace axl {
-namespace ref {
+namespace rc {
 
 //..............................................................................
 
-// weak ptr
-
 template <typename T>
-class WeakPtr
+class Ptr
 {
 	template <typename T2>
 	friend class Ptr;
@@ -36,46 +34,47 @@ protected:
 	RefCount* m_refCount;
 
 public:
-	WeakPtr()
+	Ptr()
 	{
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	WeakPtr(const NullPtr&)
+	Ptr(const NullPtr&)
 	{
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	WeakPtr(const WeakPtr& src)
+	Ptr(const Ptr& src)
 	{
 		m_p = NULL, m_refCount = NULL;
 		copy(src.m_p, src.m_refCount);
 	}
 
-	template <typename T2>
-	WeakPtr(const WeakPtr<T2>& src)
+	template <typename A>
+	Ptr(const Ptr<A>& src)
 	{
 		m_p = NULL, m_refCount = NULL;
 		copy(src.m_p, src.m_refCount);
 	}
 
-	template <typename T2>
-	WeakPtr(const Ptr<T2>& src)
+	template <typename A>
+	Ptr(const WeakPtr<A>& src)
 	{
 		m_p = NULL, m_refCount = NULL;
-		copy(src.m_p, src.m_refCount);
+		if (src.m_refCount && src.m_refCount->addRefByWeakPtr())
+			attach(src.m_p, src.m_refCount);
 	}
 
-	template <typename T2>
-	WeakPtr(T2* p)
+	template <typename A>
+	Ptr(A* p)
 	{
 		m_p = NULL, m_refCount = NULL;
 		copy(p, p);
 	}
 
-	WeakPtr(
+	Ptr(
 		T* p,
 		RefCount* refCount
 		)
@@ -84,23 +83,47 @@ public:
 		copy(p, refCount);
 	}
 
-	~WeakPtr()
+	~Ptr()
 	{
 		clear();
 	}
 
-	WeakPtr&
+	operator T* () const
+	{
+		return m_p;
+	}
+
+	T*
+	operator -> () const
+	{
+		ASSERT(m_p);
+		return m_p;
+	}
+
+	Ptr&
 	operator = (const NullPtr&)
 	{
 		clear();
 		return *this;
 	}
 
-	WeakPtr&
-	operator = (const WeakPtr& src)
+	Ptr&
+	operator = (const Ptr& src)
 	{
 		copy(src.m_p, src.m_refCount);
 		return *this;
+	}
+
+	T*
+	p() const
+	{
+		return m_p;
+	}
+
+	RefCount*
+	getRefCount() const
+	{
+		return m_refCount;
 	}
 
 	void
@@ -115,10 +138,10 @@ public:
 			return;
 
 		if (refCount)
-			refCount->addWeakRef();
+			refCount->addRef();
 
 		if (m_refCount)
-			m_refCount->weakRelease();
+			m_refCount->release();
 
 		m_refCount = refCount;
 	}
@@ -130,46 +153,37 @@ public:
 		)
 	{
 		if (m_refCount)
-			m_refCount->weakRelease();
+			m_refCount->release();
 
 		m_p = p;
 		m_refCount = refCount;
 	}
 
-	void
-	detach(
-		T** pp_o = NULL,
-		RefCount** refCount_o = NULL
-		)
+	T*
+	detach(RefCount** refCount = NULL)
 	{
-		if (pp_o)
-			*pp_o = m_p;
+		T* p = m_p;
 
-		if (refCount_o)
-			*refCount_o = m_refCount;
+		if (refCount)
+			*refCount = m_refCount;
 
 		m_p = NULL;
 		m_refCount = NULL;
+		return p;
 	}
 
 	void
 	clear()
 	{
 		if (m_refCount)
-			m_refCount->weakRelease();
+			m_refCount->release();
 
 		m_p = NULL;
 		m_refCount = NULL;
-	}
-
-	RefCount*
-	getRefCount() const
-	{
-		return m_refCount;
 	}
 };
 
 //..............................................................................
 
-} // namespace ref
+} // namespace rc
 } // namespace axl

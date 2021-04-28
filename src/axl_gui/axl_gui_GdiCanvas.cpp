@@ -119,7 +119,7 @@ GdiCanvas::drawText_utf8(
 	)
 {
 	char buffer[256];
-	sl::String_w text_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w text_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	text_w.copy(text);
 
 	return drawText_utf16(
@@ -207,7 +207,7 @@ GdiCanvas::drawText_utf32(
 	)
 {
 	char buffer[256];
-	sl::String_w text_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w text_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.copy(text, length);
 
 	return drawText_utf16(

@@ -10,10 +10,10 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_fsm_Nfa.h"
+#include "axl_re_Nfa.h"
 
 namespace axl {
-namespace fsm {
+namespace re {
 
 //..............................................................................
 
@@ -219,5 +219,5 @@ NfaTransitionMgr::addMatchCharTransition(
 
 //..............................................................................
 
-} // namespace fsm
+} // namespace re
 } // namespace axl

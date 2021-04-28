@@ -17,7 +17,7 @@
 #include "axl_sys_Lock.h"
 #include "axl_sl_CallOnce.h"
 #include "axl_mem_Tracker.h"
-#include "axl_ref_Ptr.h"
+#include "axl_rc_Ptr.h"
 
 namespace axl {
 namespace g {
@@ -48,7 +48,7 @@ class Module
 protected:
 	struct FinalizerEntry: sl::ListLink
 	{
-		ref::Ptr<Finalizer> m_finalizer;
+		rc::Ptr<Finalizer> m_finalizer;
 	};
 
 protected:
@@ -119,7 +119,7 @@ public:
 	}
 
 	bool
-	addFinalizer(const ref::Ptr<Finalizer>& finalizer);
+	addFinalizer(const rc::Ptr<Finalizer>& finalizer);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

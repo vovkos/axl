@@ -17,7 +17,7 @@ namespace {
 //..............................................................................
 
 class MyFinalizer:
-	public ref::RefCount,
+	public rc::RefCount,
 	public g::Finalizer
 {
 public:
@@ -44,7 +44,7 @@ public:
 void
 run()
 {
-	ref::Ptr<MyFinalizer> fin = AXL_REF_NEW(MyFinalizer);
+	rc::Ptr<MyFinalizer> fin = AXL_RC_NEW(MyFinalizer);
 	g::getModule()->addFinalizer(fin);
 }
 

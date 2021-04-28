@@ -133,7 +133,7 @@ QtWidgetBase::QtWidgetBase(
 void
 QtWidgetBase::postThreadMsg(
 	uint_t code,
-	const ref::Ptr<void>& params
+	const rc::Ptr<void>& params
 	)
 {
 	WidgetThreadMsg* msg = AXL_MEM_NEW(WidgetThreadMsg);

@@ -45,7 +45,7 @@ public:
 	void
 	postThreadMsg(
 		uint_t code,
-		const ref::Ptr<void>& params
+		const rc::Ptr<void>& params
 		);
 
 	virtual

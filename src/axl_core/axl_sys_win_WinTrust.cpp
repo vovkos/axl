@@ -23,7 +23,7 @@ bool
 verifyTrustFile(const sl::StringRef& fileName)
 {
 	char buffer[256];
-	sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	return verifyTrustFile(fileName_w);
 }
 

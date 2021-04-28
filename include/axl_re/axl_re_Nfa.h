@@ -11,12 +11,12 @@
 
 #pragma once
 
-#define _AXL_FSM_NFA_H
+#define _AXL_RE_NFA_H
 
-#include "axl_fsm_Pch.h"
+#include "axl_re_Pch.h"
 
 namespace axl {
-namespace fsm {
+namespace re {
 
 //..............................................................................
 
@@ -183,5 +183,5 @@ protected:
 
 //..............................................................................
 
-} // namespace fsm
+} // namespace re
 } // namespace axl

@@ -83,7 +83,7 @@ Module::~Module()
 }
 
 bool
-Module::addFinalizer(const ref::Ptr<Finalizer>& finalizer)
+Module::addFinalizer(const rc::Ptr<Finalizer>& finalizer)
 {
 	FinalizerEntry* finalizerEntry = AXL_MEM_NEW(FinalizerEntry);
 	finalizerEntry->m_finalizer = finalizer;
@@ -107,7 +107,7 @@ axl_trace_va(
 	)
 {
 	char buffer[512] = { 0 };
-	axl::sl::String string(axl::ref::BufKind_Stack, buffer, sizeof(buffer));
+	axl::sl::String string(axl::rc::BufKind_Stack, buffer, sizeof(buffer));
 	size_t length = string.format_va(formatString, va);
 
 	// send it both to the debugger and to stdout

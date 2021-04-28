@@ -1,4 +1,5 @@
 #...............................................................................
+#...............................................................................
 #
 #  This file is part of the AXL library.
 #
@@ -118,13 +119,13 @@ endif()
 #...............................................................................
 
 option(
-	BUILD_AXL_FSM
-	"Build axl_fsm library (finite state machines)"
+	BUILD_AXL_RE
+	"Build axl_re library (regular expressions)"
 	ON
 	)
 
-if(BUILD_AXL_FSM)
-	add_subdirectory(axl_fsm)
+if(BUILD_AXL_RE)
+	add_subdirectory(axl_re)
 endif()
 
 #...............................................................................

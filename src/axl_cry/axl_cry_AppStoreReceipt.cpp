@@ -555,7 +555,7 @@ verifyAppStoreReceipt(
 		return true;
 
 	char buffer[256];
-	sl::Array<char> message(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<char> message(rc::BufKind_Stack, buffer, sizeof(buffer));
 	message.append((char*)computerGuid, computerGuidSize);
 	message.append(receipt->m_opaque, receipt->m_opaque.getCount());
 	message.append(receipt->m_rawBundleId, receipt->m_rawBundleId.getCount());

@@ -496,15 +496,15 @@ class PackSeq_6: public PackSeqEx_6<
 //..............................................................................
 
 template <typename T>
-ref::Ptr<mem::Block>
+rc::Ptr<mem::Block>
 createPackage_va(axl_va_list va)
 {
 	size_t size = 0;
 	T() (NULL, &size, va);
 
-	typedef ref::Box<mem::Block> Package;
+	typedef rc::Box<mem::Block> Package;
 
-	ref::Ptr<Package> package = AXL_REF_NEW_EXTRA(Package, size);
+	rc::Ptr<Package> package = AXL_RC_NEW_EXTRA(Package, size);
 	package->m_p = package + 1;
 	package->m_size = size;
 
@@ -516,7 +516,7 @@ createPackage_va(axl_va_list va)
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-ref::Ptr<mem::Block>
+rc::Ptr<mem::Block>
 createPackage(
 	int unused,
 	...

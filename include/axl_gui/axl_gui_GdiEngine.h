@@ -51,32 +51,32 @@ public:
 	getDefaultMonospaceFont();
 
 	virtual
-	ref::Ptr<Font>
+	rc::Ptr<Font>
 	createFont(
 		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
 		);
 
-	ref::Ptr<Font>
+	rc::Ptr<Font>
 	createStockFont(int stockFontKind);
 
-	ref::Ptr<Font>
+	rc::Ptr<Font>
 	createFont(HFONT hFont);
 
 	// cursors
 
-	ref::Ptr<Cursor>
+	rc::Ptr<Cursor>
 	createStockCursor(LPCTSTR stockCursorRes);
 
 	// images
 
 	virtual
-	ref::Ptr<Image>
+	rc::Ptr<Image>
 	createImage();
 
 	virtual
-	ref::Ptr<Image>
+	rc::Ptr<Image>
 	createImage(
 		int width,
 		int height,
@@ -86,7 +86,7 @@ public:
 		);
 
 	virtual
-	ref::Ptr<Canvas>
+	rc::Ptr<Canvas>
 	createOffscreenCanvas(
 		int width,
 		int height
@@ -153,11 +153,11 @@ protected:
 		);
 
 	virtual
-	ref::Ptr<Font>
+	rc::Ptr<Font>
 	createStdFont(StdFontKind fontKind);
 
 	virtual
-	ref::Ptr<Cursor>
+	rc::Ptr<Cursor>
 	createStdCursor(StdCursorKind cursorKind);
 };
 

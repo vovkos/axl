@@ -121,7 +121,7 @@ getExeFilePath()
 	_NSGetExecutablePath(NULL, &size);
 
 	char buffer[256];
-	sl::Array<char> path(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<char> path(rc::BufKind_Stack, buffer, sizeof(buffer));
 	bool result = path.setCount(size);
 	if (!result)
 		return sl::String();
@@ -144,7 +144,7 @@ doesFileExist(const sl::StringRef& fileName)
 {
 #if (_AXL_OS_WIN)
 	char buffer[256];
-	sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	fileName_w = fileName;
 	dword_t attributes = ::GetFileAttributesW(fileName_w);
 	return attributes != INVALID_FILE_ATTRIBUTES;
@@ -165,7 +165,7 @@ bool
 isDir(const sl::StringRef& fileName)
 {
 	char buffer[256];
-	sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	return isDir(fileName_w);
 }
 
@@ -173,7 +173,7 @@ bool
 ensureDirExists(const sl::StringRef& fileName)
 {
 	char buffer[256] = { 0 };
-	sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	fileName_w = fileName;
 
 	if (fileName_w.isEmpty() || isDir(fileName_w))
@@ -274,7 +274,7 @@ getFullFilePath(const sl::StringRef& fileName)
 {
 #if (_AXL_OS_WIN)
 	char buffer[256];
-	sl::String_w fileName_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	fileName_w = fileName;
 
 	size_t bufferLength = ::GetFullPathNameW(fileName_w, 0, NULL, NULL);
@@ -313,7 +313,7 @@ getDir(const sl::StringRef& filePath)
 {
 #if (_AXL_OS_WIN)
 	char buffer[256];
-	sl::String_w filePath_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w filePath_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	filePath_w = filePath;
 
 	wchar_t drive[4] = { 0 };
@@ -342,7 +342,7 @@ getFileName(const sl::StringRef& filePath)
 {
 #if (_AXL_OS_WIN)
 	char buffer[256];
-	sl::String_w filePath_w(ref::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w filePath_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	filePath_w = filePath;
 
 	wchar_t fileName[1024] = { 0 };

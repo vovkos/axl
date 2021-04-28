@@ -11,22 +11,13 @@
 
 #pragma once
 
-#define _AXL_FSM_REGEX_H
+#define _AXL_RE_REGEX_H
 
-#include "axl_fsm_Dfa.h"
+#include "axl_re_Dfa.h"
+#include "axl_re_RegexNameMgr.h"
 
 namespace axl {
-namespace fsm {
-
-//..............................................................................
-
-class RegexNameMgr
-{
-public:
-	virtual
-	sl::StringRef
-	findName(const sl::StringRef& name) = 0;
-};
+namespace re {
 
 //..............................................................................
 
@@ -35,12 +26,8 @@ class Regex
 	friend class RegexCompiler;
 
 protected:
-	sl::List<NfaState> m_nfaStateList;
-	sl::Array<NfaState*> m_nfaStateArray;
-
 	sl::List<DfaState> m_dfaStateList;
 	sl::Array<DfaState*> m_dfaStateArray;
-
 	size_t m_groupCount;
 
 public:
@@ -52,7 +39,7 @@ public:
 	bool
 	isEmpty() const
 	{
-		return m_nfaStateList.isEmpty();
+		return m_dfaStateList.isEmpty();
 	}
 
 	size_t
@@ -61,25 +48,13 @@ public:
 		return m_groupCount;
 	}
 
-	sl::ConstList<NfaState>
-	getNfaStateList() const
-	{
-		return m_nfaStateList;
-	}
-
-	sl::Array<NfaState*>
-	getNfaStateArray() const
-	{
-		return m_nfaStateArray;
-	}
-
-	sl::ConstList<DfaState>
+	const sl::List<DfaState>&
 	getDfaStateList() const
 	{
 		return m_dfaStateList;
 	}
 
-	sl::Array<DfaState*>
+	const sl::Array<DfaState*>&
 	getDfaStateArray() const
 	{
 		return m_dfaStateArray;
@@ -94,8 +69,10 @@ public:
 	bool
 	match(const sl::StringRef& string);
 
+#if (_AXL_DEBUG)
 	void
 	print() const;
+#endif
 };
 
 //..............................................................................
@@ -144,6 +121,7 @@ protected:
 protected:
 	Regex* m_regex;
 	RegexNameMgr* m_nameMgr;
+	sl::List<NfaState> m_nfaStateList;
 	uint_t m_flags;
 
 	const char* m_p;
@@ -182,6 +160,11 @@ public:
 
 	void
 	finalize();
+
+#if (_AXL_DEBUG)
+	void
+	print();
+#endif
 
 protected:
 	void
@@ -305,5 +288,5 @@ protected:
 
 //..............................................................................
 
-} // namespace fsm
+} // namespace re
 } // namespace axl

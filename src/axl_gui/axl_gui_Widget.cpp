@@ -114,13 +114,13 @@ WidgetDriver::postThreadMsg(
 	)
 {
 	if (!p || !size)
-		return m_engine->postWidgetThreadMsg(this, code, ref::Ptr<void> ());
+		return m_engine->postWidgetThreadMsg(this, code, rc::Ptr<void> ());
 
-	ref::RefCount* refCount = AXL_REF_NEW_EXTRA(ref::RefCount, size);
+	rc::RefCount* refCount = AXL_RC_NEW_EXTRA(rc::RefCount, size);
 	if (!refCount)
 		return false;
 
-	ref::Ptr<void> params(refCount + 1, refCount);
+	rc::Ptr<void> params(refCount + 1, refCount);
 	memcpy(params, p, size);
 	return m_engine->postWidgetThreadMsg(this, code, params);
 }

@@ -1070,7 +1070,7 @@ bool
 QtEngine::postWidgetThreadMsg(
 	WidgetDriver* widgetDriver,
 	uint_t code,
-	const ref::Ptr<void>& params
+	const rc::Ptr<void>& params
 	)
 {
 	ASSERT(widgetDriver->getEngine() == this);

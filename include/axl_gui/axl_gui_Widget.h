@@ -161,7 +161,7 @@ struct WidgetKeyMsg: WidgetMsg
 struct WidgetThreadMsg: WidgetMsg
 {
 	uint_t m_code;
-	ref::Ptr<void> m_params;
+	rc::Ptr<void> m_params;
 };
 
 //..............................................................................
@@ -591,7 +591,7 @@ public:
 	bool
 	postThreadMsg(
 		uint_t code,
-		const ref::Ptr<void>& params
+		const rc::Ptr<void>& params
 		)
 	{
 		return m_engine->postWidgetThreadMsg(this, code, params);
@@ -610,13 +610,13 @@ public:
 		uintptr_t param
 		)
 	{
-		return m_engine->postWidgetThreadMsg(this, code, ref::Ptr<void> ((void*)param, NULL));
+		return m_engine->postWidgetThreadMsg(this, code, rc::Ptr<void> ((void*)param, NULL));
 	}
 
 	bool
 	postThreadMsg(uint_t code)
 	{
-		return m_engine->postWidgetThreadMsg(this, code, ref::Ptr<void> (NULL, NULL));
+		return m_engine->postWidgetThreadMsg(this, code, rc::Ptr<void> (NULL, NULL));
 	}
 
 	bool

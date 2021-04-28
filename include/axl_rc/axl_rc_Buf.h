@@ -11,14 +11,14 @@
 
 #pragma once
 
-#define _AXL_REF_BUF_H
+#define _AXL_RС_BUF_H
 
-#include "axl_ref_New.h"
+#include "axl_rc_New.h"
 #include "axl_sl_Operator.h"
 #include "axl_sl_BitIdx.h"
 
 namespace axl {
-namespace ref {
+namespace rc {
 
 //..............................................................................
 
@@ -597,7 +597,7 @@ public:
 
 		size_t bufferSize = sl::getAllocSize(size);
 
-		Ptr<Hdr> hdr = AXL_REF_NEW_EXTRA(Hdr, bufferSize);
+		Ptr<Hdr> hdr = AXL_RC_NEW_EXTRA(Hdr, bufferSize);
 		if (!hdr)
 			return NULL;
 
@@ -628,17 +628,17 @@ public:
 
 	size_t
 	setBuffer(
-		ref::BufKind kind,
+		BufKind kind,
 		void* p,
 		size_t size
 		)
 	{
 		ASSERT(size >= MinBufSize);
 
-		uint_t flags = kind != ref::BufKind_Static ? ref::BufHdrFlag_Exclusive : 0;
-		size_t bufferSize = size - sizeof(ref::BufHdr);
+		uint_t flags = kind != BufKind_Static ? BufHdrFlag_Exclusive : 0;
+		size_t bufferSize = size - sizeof(BufHdr);
 
-		Ptr<Hdr> hdr = AXL_REF_NEW_INPLACE(Hdr, p, NULL, flags);
+		Ptr<Hdr> hdr = AXL_RC_NEW_INPLACE(Hdr, p, NULL, flags);
 		hdr->m_bufferSize = bufferSize;
 
 		if (this->m_hdr)
@@ -654,5 +654,5 @@ public:
 
 //..............................................................................
 
-} // namespace ref
+} // namespace rc
 } // namespace axl

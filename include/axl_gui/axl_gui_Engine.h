@@ -563,7 +563,7 @@ public:
 	postWidgetThreadMsg(
 		WidgetDriver* widgetDriver,
 		uint_t code,
-		const ref::Ptr<void>& params
+		const rc::Ptr<void>& params
 		) = 0;
 
 	virtual

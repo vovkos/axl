@@ -336,7 +336,7 @@ enumerateImports(
 	char* moduleBase = (char*)module;
 	IMAGE_DATA_DIRECTORY* importDir = (IMAGE_DATA_DIRECTORY*)&peHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
 
-	ref::Ptr<PeImportEnumeration> enumeration = AXL_REF_NEW(PeImportEnumeration);
+	rc::Ptr<PeImportEnumeration> enumeration = AXL_RC_NEW(PeImportEnumeration);
 	enumeration->m_moduleBase = moduleBase;
 	enumeration->m_importDir = (IMAGE_IMPORT_DESCRIPTOR*)(moduleBase + importDir->VirtualAddress);
 	enumeration->m_importDescCount = importDir->Size / sizeof(IMAGE_IMPORT_DESCRIPTOR);
@@ -477,7 +477,7 @@ enumerateImports(
 		return true;
 	}
 
-	ref::Ptr<ElfImportEnumeration> enumeration = AXL_REF_NEW(ElfImportEnumeration);
+	rc::Ptr<ElfImportEnumeration> enumeration = AXL_RC_NEW(ElfImportEnumeration);
 	enumeration->m_baseAddress = linkMap->l_addr;
 	enumeration->m_symbolTable = (ElfW(Sym)*)dynTable[DT_SYMTAB]->d_un.d_ptr;
 	enumeration->m_stringTable = (char*)dynTable[DT_STRTAB]->d_un.d_ptr;
@@ -831,7 +831,7 @@ enumerateImports(
 		return false;
 	}
 
-	ref::Ptr<ImportEnumeration> enumeration = AXL_REF_NEW(ImportEnumeration);
+	rc::Ptr<ImportEnumeration> enumeration = AXL_RC_NEW(ImportEnumeration);
 	enumeration->m_segmentArray = segmentArray;
 	enumeration->m_dylibNameArray = dylibNameArray;
 	enumeration->m_slide = slide;

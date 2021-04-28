@@ -91,7 +91,7 @@ public:
 	}
 };
 
-typedef ref::Buf<Point> PointBuf;
+typedef rc::Buf<Point> PointBuf;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -111,25 +111,25 @@ run_Buf()
 	arr2[0] = 10;
 
 #if (_AXL_OS_WIN)
-	ref::Buf<DCB, DcbGetSize> dcb;
+	rc::Buf<DCB, DcbGetSize> dcb;
 	dcb.getBuffer();
 	dcb->DCBlength = 240;
 	dcb->BaudRate = 38400;
 
-	ref::Buf<DCB, DcbGetSize> dcb2 = dcb;
+	rc::Buf<DCB, DcbGetSize> dcb2 = dcb;
 	dcb2.getBuffer();
 #endif
 	MyClass a;
 	a.m_x = 1;
 	a.m_y = 2;
 
-	ref::Buf<MyClass> b1;
+	rc::Buf<MyClass> b1;
 
 	b1 = &a;
 	b1->m_x = 10;
 	b1->m_y = 20;
 
-	ref::Buf<MyClass> b2 = b1;
+	rc::Buf<MyClass> b2 = b1;
 
 	b1.getBuffer();
 	b1.release();
@@ -138,8 +138,8 @@ run_Buf()
 
 	//b2 = b1;
 
-	size_t bufSize = sizeof(Point) + sizeof(ref::BufHdr);
-	PointBuf point(ref::BufKind_Stack, _alloca(bufSize), bufSize);
+	size_t bufSize = sizeof(Point) + sizeof(rc::BufHdr);
+	PointBuf point(rc::BufKind_Stack, _alloca(bufSize), bufSize);
 	point.createBuffer();
 
 	PointBuf point2 = point;
@@ -154,7 +154,7 @@ run_Buf()
 	printf("point2: %d, %d\n", point2->x, point2->y);
 
 	char buf[80];
-	sl::String string(ref::BufKind_Stack, buf, sizeof(buf));
+	sl::String string(rc::BufKind_Stack, buf, sizeof(buf));
 
 	string.format("hui %d %d %d", 1, 2, 3);
 	string.append("govno");
@@ -164,7 +164,7 @@ run_Buf()
 
 //..............................................................................
 
-class MyClass2: public ref::RefCount
+class MyClass2: public rc::RefCount
 {
 public:
 	MyClass2()
@@ -183,11 +183,11 @@ public:
 void
 run_WeakRef()
 {
-	ref::Ptr<MyClass2> p = AXL_REF_NEW(MyClass2);
-//	ref::CPtrT <MyClass2> p2 = ref::GetPtrOrClone ((MyClass2*) p);
-//	ref::CPtrT <MyClass2> p3 = ref::Clone (p);
-	ref::WeakPtr<MyClass2> w = p;
-	p = ref::g_nullPtr;
+	rc::Ptr<MyClass2> p = AXL_RC_NEW(MyClass2);
+//	rc::CPtrT <MyClass2> p2 = rc::GetPtrOrClone ((MyClass2*) p);
+//	rc::CPtrT <MyClass2> p3 = rc::Clone (p);
+	rc::WeakPtr<MyClass2> w = p;
+	p = rc::g_nullPtr;
 	p = w;
 }
 
@@ -195,7 +195,7 @@ run_WeakRef()
 
 struct IMyInterface
 {
-	virtual ref::Ptr<IMyInterface> getChild(int i) = 0;
+	virtual rc::Ptr<IMyInterface> getChild(int i) = 0;
 	virtual void doSomething() = 0;
 	virtual void doSomethingElse() = 0;
 };
@@ -211,8 +211,8 @@ public:
 	~MyClass4()
 		{ printf("MyClass4::~MyClass4 ()\n"); }
 
-	ref::Ptr<IMyInterface> getChild(int i)
-		{ return ref::g_nullPtr; }
+	rc::Ptr<IMyInterface> getChild(int i)
+		{ return rc::g_nullPtr; }
 
 	virtual void doSomething()
 		{ printf("MyClass4::doSomething ()\n"); }
@@ -224,13 +224,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class MyContainer:
-	public ref::RefCount,
+	public rc::RefCount,
 	public IMyInterface
 {
 public:
-	ref::Child<ref::Box<MyClass4> > m_child1;
-	ref::Child<ref::Box<MyClass4> > m_child2;
-	ref::Child<ref::Box<MyClass4> > m_child3;
+	rc::Child<rc::Box<MyClass4> > m_child1;
+	rc::Child<rc::Box<MyClass4> > m_child2;
+	rc::Child<rc::Box<MyClass4> > m_child3;
 
 public:
 	MyContainer() :
@@ -242,7 +242,7 @@ public:
 	~MyContainer()
 		{ printf("MyContainer::~MyContainer ()\n"); }
 
-	ref::Ptr<IMyInterface> getChild(int i)
+	rc::Ptr<IMyInterface> getChild(int i)
 	{
 		switch (i)
 		{
@@ -256,7 +256,7 @@ public:
 			return &m_child3;
 
 		default:
-			return ref::g_nullPtr;
+			return rc::g_nullPtr;
 		}
 	}
 
@@ -270,13 +270,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class MySuperContainer:
-	public ref::RefCount,
+	public rc::RefCount,
 	public IMyInterface
 {
 public:
-	ref::Child<MyContainer> m_child1;
-	ref::Child<MyContainer> m_child2;
-	ref::Child<ref::Box<MyClass4> > m_child3;
+	rc::Child<MyContainer> m_child1;
+	rc::Child<MyContainer> m_child2;
+	rc::Child<rc::Box<MyClass4> > m_child3;
 
 public:
 	MySuperContainer() :
@@ -288,7 +288,7 @@ public:
 	~MySuperContainer()
 		{ printf("MySuperContainer::~MySuperContainer ()\n"); }
 
-	ref::Ptr<IMyInterface> getChild(int i)
+	rc::Ptr<IMyInterface> getChild(int i)
 	{
 		switch (i)
 		{
@@ -302,7 +302,7 @@ public:
 			return &m_child3;
 
 		default:
-			return ref::g_nullPtr;
+			return rc::g_nullPtr;
 		}
 	}
 
@@ -318,11 +318,11 @@ public:
 void
 run_Container()
 {
-	ref::Ptr<IMyInterface> p;
-	ref::Ptr<IMyInterface> p2;
-	ref::Ptr<IMyInterface> p3;
+	rc::Ptr<IMyInterface> p;
+	rc::Ptr<IMyInterface> p2;
+	rc::Ptr<IMyInterface> p3;
 
-	p = AXL_REF_NEW(MySuperContainer);
+	p = AXL_RC_NEW(MySuperContainer);
 	p->doSomething();
 	p->doSomethingElse();
 
@@ -334,17 +334,17 @@ run_Container()
 	p->getChild(2)->doSomething();
 	p->getChild(2)->doSomethingElse();
 
-	p = ref::g_nullPtr;
+	p = rc::g_nullPtr;
 
 //	p2->doSomething ();
-//	p2 = ref::g_nullPtr;
+//	p2 = rc::g_nullPtr;
 
-	p3 = AXL_REF_NEW(ref::Box<MyClass4>);
+	p3 = AXL_RC_NEW(rc::Box<MyClass4>);
 
-	ref::WeakPtr<IMyInterface> w = p3;
+	rc::WeakPtr<IMyInterface> w = p3;
 	p3->doSomethingElse();
 
-	p3 = ref::g_nullPtr;
+	p3 = rc::g_nullPtr;
 
 	p = w;
 }
