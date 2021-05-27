@@ -26,6 +26,7 @@ class Regex
 	friend class RegexCompiler;
 
 protected:
+	sl::List<NfaState> m_nfaStateList;
 	sl::List<DfaState> m_dfaStateList;
 	sl::Array<DfaState*> m_dfaStateArray;
 	size_t m_groupCount;
@@ -121,7 +122,6 @@ protected:
 protected:
 	Regex* m_regex;
 	RegexNameMgr* m_nameMgr;
-	sl::List<NfaState> m_nfaStateList;
 	uint_t m_flags;
 
 	const char* m_p;
@@ -160,11 +160,6 @@ public:
 
 	void
 	finalize();
-
-#if (_AXL_DEBUG)
-	void
-	print();
-#endif
 
 protected:
 	void

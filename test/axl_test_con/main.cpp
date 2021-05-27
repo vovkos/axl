@@ -612,8 +612,9 @@ testRegex()
 	}
 
 	regexCompiler.finalize();
-	regexCompiler.print();
+#if (_AXL_DEBUG)
 	regex.print();
+#endif
 
 	char fileName[] = "C:\\Projects\\repos\\ioninja\\jancy\\src\\jnc_ext\\jnc_std\\jnc\\std_Array.jnc";
 	result = regex.match(fileName);
