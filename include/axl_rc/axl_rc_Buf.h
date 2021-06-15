@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_RС_BUF_H
+#define _AXL_RC_BUF_H
 
 #include "axl_rc_New.h"
 #include "axl_sl_Operator.h"
