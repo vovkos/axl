@@ -1,0 +1,50 @@
+.. index:: pair: class; axl::sl::LegacyPacketizer
+.. _doxid-classaxl_1_1sl_1_1_legacy_packetizer:
+
+template class axl::sl::LegacyPacketizer
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Packetizer.h>
+	
+	template <typename T>
+	class LegacyPacketizer: public :ref:`axl::sl::LegacyPacketizerRoot<doxid-classaxl_1_1sl_1_1_legacy_packetizer_root>`
+	{
+	public:
+		// methods
+	
+		void
+		:target:`write<doxid-classaxl_1_1sl_1_1_legacy_packetizer_1a48b953b0d8c7b48570fb13999268d389>`(
+			const void* p,
+			size_t size
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// structs
+	
+		struct :ref:`PacketHdr<doxid-structaxl_1_1sl_1_1_legacy_packetizer_root_1_1_packet_hdr>`;
+
+		// methods
+	
+		void
+		:ref:`reset<doxid-classaxl_1_1sl_1_1_legacy_packetizer_root_1a104744dcb94d78f731ff274faab43500>`();
+	
+		static
+		uint64_t
+		:ref:`createHdr<doxid-classaxl_1_1sl_1_1_legacy_packetizer_root_1a1808b6f6d23877f1051ff77b733db38e>`(size_t size);
+

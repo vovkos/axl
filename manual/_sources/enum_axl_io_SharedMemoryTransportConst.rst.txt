@@ -1,0 +1,21 @@
+.. index:: pair: enum; SharedMemoryTransportConst
+.. _doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298:
+
+enum axl::io::SharedMemoryTransportConst
+========================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SharedMemoryTransport.h>
+
+	enum SharedMemoryTransportConst
+	{
+	    :target:`SharedMemoryTransportConst_FileSignature<doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298adca320f51daf57db932e8e22d520c575>`    = ':mhs',
+	    :target:`SharedMemoryTransportConst_MessageSignature<doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298a724761d0bc11fb8bae9d2a45864fa725>` = ':sm\n',
+	    :target:`SharedMemoryTransportConst_DefMappingSize<doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298aef2c35b90ef6662745ad2d0b0ace409a>`   = 64* 1024,
+	    :target:`SharedMemoryTransportConst_DefSizeLimitHint<doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298a87514eda3cc2248b8c2c895b80382be7>` = 1024* 1024,
+	};
+

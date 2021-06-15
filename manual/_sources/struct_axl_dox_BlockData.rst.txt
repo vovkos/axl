@@ -1,0 +1,40 @@
+.. index:: pair: struct; axl::dox::BlockData
+.. _doxid-structaxl_1_1dox_1_1_block_data:
+
+struct axl::dox::BlockData
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_dox_Block.h>
+	
+	struct BlockData
+	{
+		// fields
+	
+		:ref:`BlockKind<doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009a>` :target:`m_blockKind<doxid-structaxl_1_1dox_1_1_block_data_1ab122c9024f7542ad4b35b6e2ffdc4262>`;
+		:ref:`Group<doxid-classaxl_1_1dox_1_1_group>`* :target:`m_group<doxid-structaxl_1_1dox_1_1_block_data_1a197147ac6b91d7ae5f20eaa40045e217>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_source<doxid-structaxl_1_1dox_1_1_block_data_1abc43b901e0a3cbcef9f1af30d9ed3924>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_refId<doxid-structaxl_1_1dox_1_1_block_data_1a9a505553761ea0a9ea3d8e5ac4f954d8>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_title<doxid-structaxl_1_1dox_1_1_block_data_1af2da7af02b1b55b22e99b301f2f1de57>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_briefDescription<doxid-structaxl_1_1dox_1_1_block_data_1a1c2cdd84862f664231b6e79df9fb4eac>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_detailedDescription<doxid-structaxl_1_1dox_1_1_block_data_1a7d5711b3aaa9a325d98cd7d8c0af5f26>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_seeAlsoDescription<doxid-structaxl_1_1dox_1_1_block_data_1af4c421bb8799e6c682ef0db7fae24122>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_internalDescription<doxid-structaxl_1_1dox_1_1_block_data_1a00bd683a640e7bbb016dc664cc1e3dcc>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_returnDescription<doxid-structaxl_1_1dox_1_1_block_data_1a58447d55dcd2ba012eac1987aefd5385>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* :target:`m_currentDescription<doxid-structaxl_1_1dox_1_1_block_data_1a006337f4395aa567a418d1411257b04b>`;
+		:ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<:ref:`Param<doxid-structaxl_1_1dox_1_1_param>`> :target:`m_paramList<doxid-structaxl_1_1dox_1_1_block_data_1a809d26bb37a63c956745e8793e1ea4f9>`;
+		:ref:`sl::BoxList<doxid-classaxl_1_1sl_1_1_box_list>`<:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`> :target:`m_importList<doxid-structaxl_1_1dox_1_1_block_data_1ac5fdd2bd85704af2fd7bc472e8a6da71>`;
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`Block<doxid-classaxl_1_1dox_1_1_block>`*> :target:`m_footnoteArray<doxid-structaxl_1_1dox_1_1_block_data_1a1bbc9254ea0f04dd80043ec4a6a6e700>`;
+
+		// construction
+	
+		:target:`BlockData<doxid-structaxl_1_1dox_1_1_block_data_1a0b456b5157e7f0a77a9d5a8e67be676a>`();
+	};

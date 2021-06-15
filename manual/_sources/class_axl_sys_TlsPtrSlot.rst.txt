@@ -1,0 +1,47 @@
+.. index:: pair: class; axl::sys::TlsPtrSlot
+.. _doxid-classaxl_1_1sys_1_1_tls_ptr_slot:
+
+template class axl::sys::TlsPtrSlot
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_TlsSlot.h>
+	
+	template <typename T>
+	class TlsPtrSlot: public :ref:`axl::sys::TlsSlot<doxid-classaxl_1_1sys_1_1_tls_slot>`
+	{
+	public:
+		// methods
+	
+		T*
+		:target:`getValue<doxid-classaxl_1_1sys_1_1_tls_ptr_slot_1a0aa6be3db59e65273c9ce47a65226206>`();
+	
+		T*
+		:target:`setValue<doxid-classaxl_1_1sys_1_1_tls_ptr_slot_1aba78d32dbe7a9323ed8d246cb9eafe86>`(T* p);
+	
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<T>
+		:target:`setValue<doxid-classaxl_1_1sys_1_1_tls_ptr_slot_1a302b592993a0a4cef493c08bb4d0d99a>`(const :ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<T>& ptr);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		size_t
+		:ref:`getSlot<doxid-classaxl_1_1sys_1_1_tls_slot_1a151100852fd1240947bb7ecb0bf75f41>`();
+	
+		:ref:`operator size_t<doxid-classaxl_1_1sys_1_1_tls_slot_1a5587a5fdd9d677c8c22a075fb832e9a3>`();
+

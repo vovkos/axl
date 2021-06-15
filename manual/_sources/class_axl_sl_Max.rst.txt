@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::Max
+.. _doxid-classaxl_1_1sl_1_1_max:
+
+template class axl::sl::Max
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class Max
+	{
+	public:
+		// methods
+	
+		T
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_max_1a58fadc9e1297f1ea978a434d323e26d0>`(
+			Arg a,
+			Arg b
+			) const;
+	};

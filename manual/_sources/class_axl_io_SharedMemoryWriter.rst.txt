@@ -1,0 +1,98 @@
+.. index:: pair: class; axl::io::SharedMemoryWriter
+.. _doxid-classaxl_1_1io_1_1_shared_memory_writer:
+
+class axl::io::SharedMemoryWriter
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SharedMemoryTransport.h>
+	
+	class SharedMemoryWriter: public :ref:`axl::io::SharedMemoryTransportBase<doxid-classaxl_1_1io_1_1_shared_memory_transport_base>`
+	{
+	public:
+		// construction
+	
+		:target:`SharedMemoryWriter<doxid-classaxl_1_1io_1_1_shared_memory_writer_1a7419fb1512c149ec2200038ccb5fceea>`();
+
+		// methods
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1_shared_memory_writer_1a6a4498039f1ff4257d7a43db76c64053>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& readEventName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& writeEventName,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags,
+			size_t sizeLimitHint = :ref:`SharedMemoryTransportConst_DefSizeLimitHint<doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298a87514eda3cc2248b8c2c895b80382be7>`
+			);
+	
+		bool
+		:target:`attach<doxid-classaxl_1_1io_1_1_shared_memory_writer_1a39b69f4c37bcc4e414f96b846c704af0>`(
+			:ref:`File::Handle<doxid-classaxl_1_1io_1_1_file_1a42882ce983138a65b41c04e58c63b857>` fileHandle,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& readEventName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& writeEventName,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags,
+			size_t sizeLimitHint = :ref:`SharedMemoryTransportConst_DefSizeLimitHint<doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298a87514eda3cc2248b8c2c895b80382be7>`
+			);
+	
+		size_t
+		:target:`write<doxid-classaxl_1_1io_1_1_shared_memory_writer_1a29ab04325129309832974759071369df>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`write<doxid-classaxl_1_1io_1_1_shared_memory_writer_1ac8c006f7d67c1ab1eff548d003c20ada>`(
+			const void*const* blockArray,
+			const size_t* sizeArray,
+			size_t count
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+		:ref:`getFlags<doxid-classaxl_1_1io_1_1_shared_memory_transport_base_1ac76c419387e58060f0c6860aea2edd96>`();
+	
+		const :ref:`File<doxid-classaxl_1_1io_1_1_file>`*
+		:ref:`getFile<doxid-classaxl_1_1io_1_1_shared_memory_transport_base_1a930aa30fd7c88e150568f45551b71711>`() const;
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1io_1_1_shared_memory_transport_base_1a89dbce3dfc03ccd8c6a33c1ebb2d5572>`();
+	
+		void
+		:ref:`close<doxid-classaxl_1_1io_1_1_shared_memory_transport_base_1a026341716cd6d2b851c361b506905b6d>`();
+	
+		bool
+		:ref:`open<doxid-classaxl_1_1io_1_1_shared_memory_transport_base_1a6a257d7fd63ea9618c2e6a5836bd24b9>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& readSemaphoreName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& writeSemaphoreName,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags
+			);
+	
+		bool
+		:ref:`attach<doxid-classaxl_1_1io_1_1_shared_memory_transport_base_1a1d371834f3a88bad1589aaff1d6b751d>`(
+			:ref:`File::Handle<doxid-classaxl_1_1io_1_1_file_1a42882ce983138a65b41c04e58c63b857>` fileHandle,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& readSemaphoreName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& writeSemaphoreName,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags
+			);
+	
+		void
+		:ref:`disconnect<doxid-classaxl_1_1io_1_1_shared_memory_transport_base_1a37133ba8d3bcc759b9726b6b4ab264d7>`();
+

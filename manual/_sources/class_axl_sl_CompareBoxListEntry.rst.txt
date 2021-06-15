@@ -1,0 +1,42 @@
+.. index:: pair: class; axl::sl::CompareBoxListEntry
+.. _doxid-classaxl_1_1sl_1_1_compare_box_list_entry:
+
+template class axl::sl::CompareBoxListEntry
+===========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BoxList.h>
+	
+	template <
+		typename T,
+		typename Compare
+		>
+	class CompareBoxListEntry
+	{
+	public:
+		// construction
+	
+		:target:`CompareBoxListEntry<doxid-classaxl_1_1sl_1_1_compare_box_list_entry_1adea7a0c8757ff74b6c2669e4cce21f07>`(Compare compare);
+
+		// methods
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_compare_box_list_entry_1a02f8cbebd68ce812ce68fb4e8c650294>`(
+			const :ref:`BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry>`<T>& entry1,
+			const :ref:`BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry>`<T>& entry2
+			) const;
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_compare_box_list_entry_1a21b6cfa924933797f0d0d6c75fee04de>`(
+			const :ref:`BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry>`<T>* entry1,
+			const :ref:`BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry>`<T>* entry2
+			) const;
+	};

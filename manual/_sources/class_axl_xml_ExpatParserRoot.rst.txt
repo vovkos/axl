@@ -1,0 +1,190 @@
+.. index:: pair: class; axl::xml::ExpatParserRoot
+.. _doxid-classaxl_1_1xml_1_1_expat_parser_root:
+
+class axl::xml::ExpatParserRoot
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_xml_ExpatParser.h>
+	
+	class ExpatParserRoot: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`create<doxid-classaxl_1_1xml_1_1_expat_parser_root_1afad9f2d5f1d8f711d88f031eb1c12ec4>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& encoding = NULL);
+	
+		bool
+		:target:`createNs<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a43d8499b47e0a582d35e2c15d4a43fbe>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& encoding,
+			char separator
+			);
+	
+		bool
+		:target:`createNs<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a895e7e2aaea9e25b3800710a340ae5d7>`(char separator);
+	
+		XML_Error
+		:target:`getLastErrorCode<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a45e497bb5a6e47e72e57d6fffb6d9869>`() const;
+	
+		:ref:`err::Error<doxid-classaxl_1_1err_1_1_error>`
+		:target:`getLastError<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a39c3aab014745b73a053c50c9ec007e0>`() const;
+	
+		int
+		:target:`getLineNumber<doxid-classaxl_1_1xml_1_1_expat_parser_root_1aca83d18a2b295271218348c0c4cb0e6c>`() const;
+	
+		int
+		:target:`getColumnNumber<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a749c8fe7cfb5441789121dbb0c530461>`() const;
+	
+		size_t
+		:target:`getByteOffset<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a8a51d7d8a2c49087282d178aba3b4caf>`() const;
+	
+		void*
+		:target:`getUserData<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a8f341db9d835a49eacffbad8ea5daa41>`();
+	
+		void
+		:target:`setUserData<doxid-classaxl_1_1xml_1_1_expat_parser_root_1ae74409911a65f5c98f6d837d2efd834f>`(void* userData);
+	
+		void
+		:target:`setElementHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a871243d0a8ddd872803d9637b69701fd>`(
+			XML_StartElementHandler startHandler,
+			XML_EndElementHandler endHandler
+			);
+	
+		void
+		:target:`setStartElementHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a00e2582f359bb4de4a61f36820cd36ad>`(XML_StartElementHandler handler);
+	
+		void
+		:target:`setEndElementHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1aba8e0a441d4de518d1a0a19aab93b03c>`(XML_EndElementHandler handler);
+	
+		void
+		:target:`setCharacterDataHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1afa9051afb0dcafbf68225ed1b5c28f7c>`(XML_CharacterDataHandler handler);
+	
+		void
+		:target:`setProcessingInstructionHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a0b763579015b17b73f88df0d2423d382>`(XML_ProcessingInstructionHandler handler);
+	
+		void
+		:target:`setCommentHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1ad7c97253942e3fd0c3ddb82f0f8bc649>`(XML_CommentHandler handler);
+	
+		void
+		:target:`setCdataSectionHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a81217a725a79325fe51ccd895d3cc9f4>`(
+			XML_StartCdataSectionHandler startHandler,
+			XML_EndCdataSectionHandler endHandler
+			);
+	
+		void
+		:target:`setStartCdataSectionHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a0834e7c3835f7ccba8dff115d518e62a>`(XML_StartCdataSectionHandler handler);
+	
+		void
+		:target:`setEndCdataSectionHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1aec4f6926ed25c14ff42f894c05d524f7>`(XML_EndCdataSectionHandler handler);
+	
+		void
+		:target:`setDefaultHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a2513c850ef5af949466cba3e9827707b>`(XML_DefaultHandler handler);
+	
+		void
+		:target:`setDefaultHandlerExpand<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a28b875651150aae4478b9403c4e81840>`(XML_DefaultHandler handler);
+	
+		void
+		:target:`setDoctypeDeclHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1afbbffb701ff3ee836905ae185a21bf5c>`(
+			XML_StartDoctypeDeclHandler startHandler,
+			XML_EndDoctypeDeclHandler endHandler
+			);
+	
+		void
+		:target:`setStartDoctypeDeclHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1ac4bcd26b4350f1d8d130164b7ef60756>`(XML_StartDoctypeDeclHandler handler);
+	
+		void
+		:target:`setEndDoctypeDeclHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1ad865880135d9a52056ef8e837ebb236a>`(XML_EndDoctypeDeclHandler handler);
+	
+		void
+		:target:`setNotationDeclHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a12414adb6fe8423e2c4244a93ca3fa71>`(XML_NotationDeclHandler handler);
+	
+		void
+		:target:`setNamespaceDeclHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1af4c0425ce0a51d0cab74dc11f63144f8>`(
+			XML_StartNamespaceDeclHandler startHandler,
+			XML_EndNamespaceDeclHandler endHandler
+			);
+	
+		void
+		:target:`setStartNamespaceDeclHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a9a49dc2525fbca033ae01c30858eb26d>`(XML_StartNamespaceDeclHandler handler);
+	
+		void
+		:target:`setEndNamespaceDeclHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1af1dd75343ac61626eea9162537833cec>`(XML_EndNamespaceDeclHandler handler);
+	
+		void
+		:target:`setNotStandaloneHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1ab88c7145833d8eee2d232aea28d15dc9>`(XML_NotStandaloneHandler handler);
+	
+		void
+		:target:`setUnknownEncodingHandler<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a73ef109afba7af770be2b2f808c009e1>`(XML_UnknownEncodingHandler handler);
+	
+		bool
+		:target:`parse<doxid-classaxl_1_1xml_1_1_expat_parser_root_1ad357b714c537b02ac88bf71500da9c42>`(
+			const void* p,
+			size_t size,
+			bool isFinal
+			);
+	
+		bool
+		:target:`parseBuffer<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a89c4c90f160eb3306e950f8e35d26513>`(
+			size_t size,
+			bool isFinal
+			);
+	
+		bool
+		:target:`parseFile<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a969186c87b58da5517ed1f6f35c8cfd8>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			size_t blockSize = -1
+			);
+	
+		void*
+		:target:`getBuffer<doxid-classaxl_1_1xml_1_1_expat_parser_root_1a3cf166da7f18ba8c1605f6e161b1c2af>`(size_t size);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

@@ -1,0 +1,31 @@
+.. index:: pair: struct; axl::gui::WidgetConstructParam
+.. _doxid-structaxl_1_1gui_1_1_widget_construct_param:
+
+struct axl::gui::WidgetConstructParam
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	struct WidgetConstructParam
+	{
+		// fields
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`* :target:`m_engine<doxid-structaxl_1_1gui_1_1_widget_construct_param_1aef36105ec8ead223a3406b36b4af62aa>`;
+		void* :target:`m_engineWidget<doxid-structaxl_1_1gui_1_1_widget_construct_param_1a6c90b3271422c1b6500d467ff5a7a543>`;
+
+		// construction
+	
+		:target:`WidgetConstructParam<doxid-structaxl_1_1gui_1_1_widget_construct_param_1a9ea6b026dd5e800e006bdbceb5f83f3b>`(
+			:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`* engine,
+			void* engineWidget
+			);
+	};

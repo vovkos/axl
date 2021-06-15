@@ -1,0 +1,24 @@
+.. index:: pair: enum; CharCodecKind
+.. _doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670e:
+
+enum axl::enc::CharCodecKind
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_CharCodec.h>
+
+	enum CharCodecKind
+	{
+	    :target:`CharCodecKind_Ascii<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670ea9f4da11b5113fd2d4bf276a3b5a16c57>`    = 0,
+	    :target:`CharCodecKind_Utf8<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670ead06da24e1f2e04695ee424adce192b50>`,
+	    :target:`CharCodecKind_Utf16<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670eab9fcf64472fa3c275c4476f71e2050af>`,
+	    :target:`CharCodecKind_Utf16_be<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670eaf56c4eb7fc63c58af1de80468aec9f12>`,
+	    :target:`CharCodecKind_Utf32<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670ea31ec14979595e26b0ea6d2769b73e562>`,
+	    :target:`CharCodecKind_Utf32_be<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670eafff29ed9a524a2ffe45eeac0ac34eafe>`,
+	    :target:`CharCodecKind__Count<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670ea0c8382c163b1e5b1ec157b3cf8e30db0>`,
+	};
+

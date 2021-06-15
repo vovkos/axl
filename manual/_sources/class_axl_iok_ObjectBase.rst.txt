@@ -1,0 +1,62 @@
+.. index:: pair: class; axl::iok::ObjectBase
+.. _doxid-classaxl_1_1iok_1_1_object_base:
+
+template class axl::iok::ObjectBase
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_iok_Object.h>
+	
+	template <typename T>
+	class ObjectBase
+	{
+	public:
+		// construction
+	
+		:target:`ObjectBase<doxid-classaxl_1_1iok_1_1_object_base_1aa33ddcf656b7c24284388fe85fc20de9>`();
+		:target:`ObjectBase<doxid-classaxl_1_1iok_1_1_object_base_1a5114b019fea1c524301603620c9b869d>`(const ObjectBase& src);
+	
+		:target:`ObjectBase<doxid-classaxl_1_1iok_1_1_object_base_1a96661c80716c1099837c915baf918360>`(
+			T p,
+			bool isAttach = false
+			);
+
+		// methods
+	
+		:target:`operator T<doxid-classaxl_1_1iok_1_1_object_base_1adc51df0d1db95fe1e0b4a0235a400ddd>`() const;
+	
+		ObjectBase&
+		:target:`operator=<doxid-classaxl_1_1iok_1_1_object_base_1a03a0af8d7cab2cb549547d2abc3e4054>`(const ObjectBase& src);
+	
+		ObjectBase&
+		:target:`operator=<doxid-classaxl_1_1iok_1_1_object_base_1a0fa01f29b6e3bd2574cb044c624f3dbe>`(T p);
+	
+		T
+		:target:`p<doxid-classaxl_1_1iok_1_1_object_base_1a586c76e07bd6644b8905e946f08a752e>`() const;
+	
+		void
+		:target:`attach<doxid-classaxl_1_1iok_1_1_object_base_1a04b347a0b2348ea9df039bbf8505df13>`(T p);
+	
+		T
+		:target:`detach<doxid-classaxl_1_1iok_1_1_object_base_1a9cf3388c763070f4f3a39fc81b7b0662>`();
+	
+		void
+		:target:`clear<doxid-classaxl_1_1iok_1_1_object_base_1a0adfba2686bbc592651f7040cabaec95>`();
+	
+		void
+		:target:`copy<doxid-classaxl_1_1iok_1_1_object_base_1a046a1fc83338e8b0663bf818ab26372d>`(T p);
+	
+		void
+		:target:`retain<doxid-classaxl_1_1iok_1_1_object_base_1aa1e4b48bd7e2bae3422995013dfe9e8b>`();
+	
+		void
+		:target:`release<doxid-classaxl_1_1iok_1_1_object_base_1a94c28d88f5b21a3af93e93d8fe8050f6>`();
+	};

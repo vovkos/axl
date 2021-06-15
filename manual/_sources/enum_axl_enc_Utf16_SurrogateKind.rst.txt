@@ -1,0 +1,21 @@
+.. index:: pair: enum; SurrogateKind
+.. _doxid-classaxl_1_1enc_1_1_utf16_1a6f342810ffb2e07794e771382ce576eb:
+
+enum axl::enc::Utf16::SurrogateKind
+===================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Utf.h>
+
+	enum SurrogateKind
+	{
+	    :target:`SurrogateKind_MinLead<doxid-classaxl_1_1enc_1_1_utf16_1a6f342810ffb2e07794e771382ce576eba9a9198593f6c8942e4e9e0a8a879dc1a>`  = 0xd800,
+	    :target:`SurrogateKind_MaxLead<doxid-classaxl_1_1enc_1_1_utf16_1a6f342810ffb2e07794e771382ce576ebad8ce011ecdd05e46e65da01539efed57>`  = 0xdbff,
+	    :target:`SurrogateKind_MinTrail<doxid-classaxl_1_1enc_1_1_utf16_1a6f342810ffb2e07794e771382ce576ebaf81a5cfe284dbbcbf70272f43f719fcc>` = 0xdc00,
+	    :target:`SurrogateKind_MaxTrail<doxid-classaxl_1_1enc_1_1_utf16_1a6f342810ffb2e07794e771382ce576eba890cc69280df0e09ded8bda110c3aa39>` = 0xdfff,
+	};
+

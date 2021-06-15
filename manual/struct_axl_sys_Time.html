@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>struct axl::sys::Time &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::sys::InvertedSemaphore" href="class_axl_sys_InvertedSemaphore.html" />
+    <link rel="prev" title="struct axl::sys::SjljFrame" href="struct_axl_sys_SjljFrame.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_drw.html">namespace axl::sys::drw</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_lnx.html">namespace axl::sys::lnx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_psx.html">namespace axl::sys::psx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_win.html">namespace axl::sys::win</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sys_SjljFrame.html">struct axl::sys::SjljFrame</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">struct axl::sys::Time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_InvertedSemaphore.html">class axl::sys::InvertedSemaphore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ReadWriteLock.html">class axl::sys::ReadWriteLock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ScopeLock.html">class axl::sys::ScopeLock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ScopedTlsPtrSlot.html">template class axl::sys::ScopedTlsPtrSlot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsMgr.html">class axl::sys::TlsMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsPtrSlot.html">template class axl::sys::TlsPtrSlot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsSlot.html">class axl::sys::TlsSlot</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_sys.html">namespace axl::sys</a> &raquo;</li>
+        
+      <li>struct axl::sys::Time</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="struct-axl-sys-time">
+<span id="doxid-structaxl-1-1sys-1-1-time"></span><span id="index-0"></span><h1>struct axl::sys::Time</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_sys_Time.h&gt;</span><span class="cp"></span>
+
+<span class="k">struct</span> <span class="n">Time</span>
+<span class="p">{</span>
+    <span class="c1">// fields</span>
+
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a43d2b8cdd8e088734e6af0e241529ca8"><span></span><span class="n">m_year</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a74497e6573b2a713f21af20af4b9f4f8"><span></span><span class="n">m_month</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1ad8570224c65c022b9e977d210400a1ea"><span></span><span class="n">m_monthDay</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a575de675b2a7fd015bcceca7f209e2f3"><span></span><span class="n">m_dayOfWeek</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a44c4ad8de2262f683a9eb2f9ff3e60c6"><span></span><span class="n">m_hour</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a779126e15df7a02e04900860f0f10490"><span></span><span class="n">m_minute</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a4c7680b3fae37d6fb8826c466f9f5a7a"><span></span><span class="n">m_second</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a4df31c3837ff74a0f9debf0ba8ef7916"><span></span><span class="n">m_milliSecond</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a257610c85ac3a1a1bb0efb95950ec5be"><span></span><span class="n">m_microSecond</span></span><span></span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a24e1c2a4f919dabb7da757d8d42659c1"><span></span><span class="n">m_nanoSecond</span></span><span></span><span class="p">;</span>
+
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1ac9f15c62befc340ded17a15b7fcc51f3"><span></span><span class="n">Time</span></span><span></span><span class="p">();</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1adfe43752197f1e3e3682d257e8cb8c25"><span></span><span class="n">Time</span></span><span></span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">timestamp</span><span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1ace7bb2f04ff172dd736e1e181221252f"><span></span><span class="n">Time</span></span><span></span><span class="p">(</span>
+        <span class="kt">uint64_t</span> <span class="n">timestamp</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">timeZone</span>
+        <span class="p">);</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="kt">uint64_t</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1ab63b6fef96e3a4c6bb155d150144117e"><span></span><span class="n">getTimestamp</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">uint64_t</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a0fd766f7bd46632ebfced52bb382715e"><span></span><span class="n">getTimestamp</span></span><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">timeZone</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a2dae76a4bea8b88db98f7dedeb260632"><span></span><span class="n">setTimestamp</span></span><span></span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">timestamp</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a5c00253a5ef442dbeda383d0d75883a4"><span></span><span class="n">setTimestamp</span></span><span></span><span class="p">(</span>
+        <span class="kt">uint64_t</span> <span class="n">timestamp</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">timeZone</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a0a278482d902bf3498046d55faee305f"><span></span><span class="n">format</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">string</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">formatString</span> <span class="o">=</span> <span class="s">&quot;%W %D %N %Y %h:%m:%s&quot;</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1sys-1-1-time-1a9cd1a8a228bca33b2bcec430d299a8c8"><span></span><span class="n">format</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">formatString</span> <span class="o">=</span> <span class="s">&quot;%W %D %N %Y %h:%m:%s&quot;</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_sys_InvertedSemaphore.html" class="btn btn-neutral float-right" title="class axl::sys::InvertedSemaphore" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="struct_axl_sys_SjljFrame.html" class="btn btn-neutral float-left" title="struct axl::sys::SjljFrame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

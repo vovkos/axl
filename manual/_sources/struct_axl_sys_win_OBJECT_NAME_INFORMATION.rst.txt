@@ -1,0 +1,24 @@
+.. index:: pair: struct; axl::sys::win::OBJECT_NAME_INFORMATION
+.. _doxid-structaxl_1_1sys_1_1win_1_1_o_b_j_e_c_t___n_a_m_e___i_n_f_o_r_m_a_t_i_o_n:
+
+struct axl::sys::win::OBJECT_NAME_INFORMATION
+=============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_NtDll.h>
+	
+	struct OBJECT_NAME_INFORMATION
+	{
+		// fields
+	
+		UNICODE_STRING :target:`Name<doxid-structaxl_1_1sys_1_1win_1_1_o_b_j_e_c_t___n_a_m_e___i_n_f_o_r_m_a_t_i_o_n_1aa342140783a4e17a4521de88d9ee585a>`;
+		WCHAR :target:`NameBuffer<doxid-structaxl_1_1sys_1_1win_1_1_o_b_j_e_c_t___n_a_m_e___i_n_f_o_r_m_a_t_i_o_n_1ab1b98e4d9fbb0035abb57fb06f6c8ae8>`[1];
+	};

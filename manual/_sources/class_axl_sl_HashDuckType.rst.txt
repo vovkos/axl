@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::HashDuckType
+.. _doxid-classaxl_1_1sl_1_1_hash_duck_type:
+
+template class axl::sl::HashDuckType
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Hash.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class HashDuckType
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_hash_duck_type_1a1085a4072fc0043b6e0999b830dde055>`(Arg a) const;
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_hash_duck_type_1ab1b75f990f5f796be9f9e7e25e645788>`(const T* a) const;
+	};

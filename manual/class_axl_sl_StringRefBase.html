@@ -1,0 +1,829 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>template class axl::sl::StringRefBase &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="template class axl::sl::Sub" href="class_axl_sl_Sub.html" />
+    <link rel="prev" title="template class axl::sl::StringHashTable_w" href="class_axl_sl_StringHashTable_w.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_sl_BinTreeFindRelOp.html">enum axl::sl::BinTreeFindRelOp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_sl_BitOpKind.html">enum axl::sl::BitOpKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_sl_BoyerMooreFlag.html">enum axl::sl::BoyerMooreFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html">enum axl::sl::CaseConvertMethod</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_sl_GuidStringFlag.html">enum axl::sl::GuidStringFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_sl_RbColor.html">enum axl::sl::RbColor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_sl_TextBoyerMooreFlag.html">enum axl::sl::TextBoyerMooreFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_BinTreeNodeBase.html">template struct axl::sl::BinTreeNodeBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_Guid.html">struct axl::sl::Guid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_HashTableEntry.html">template struct axl::sl::HashTableEntry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_ListData.html">template struct axl::sl::ListData</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_ListLink.html">struct axl::sl::ListLink</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_MapEntry.html">template struct axl::sl::MapEntry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_ProtoMsg.html">struct axl::sl::ProtoMsg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_ProtoMsg_1.html">template struct axl::sl::ProtoMsg_1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_ProtoMsg_2.html">template struct axl::sl::ProtoMsg_2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_ProtoMsg_3.html">template struct axl::sl::ProtoMsg_3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_ProtoMsg_4.html">template struct axl::sl::ProtoMsg_4</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sl_SwitchInfo.html">struct axl::sl::SwitchInfo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_AbstractProtoPeer.html">class axl::sl::AbstractProtoPeer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Add.html">template class axl::sl::Add</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_And.html">template class axl::sl::And</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType.html">template class axl::sl::ArgType&lt;T*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-2.html">template class axl::sl::ArgType&lt;uint16_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-3.html">template class axl::sl::ArgType&lt;uint32_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-4.html">template class axl::sl::ArgType&lt;uint64_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-5.html">template class axl::sl::ArgType&lt;uint8_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-6.html">template class axl::sl::ArgType&lt;String_utf32&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-7.html">template class axl::sl::ArgType&lt;wchar_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-8.html">template class axl::sl::ArgType&lt;String_utf16&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-9.html">template class axl::sl::ArgType&lt;String_utf8&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-10.html">template class axl::sl::ArgType&lt;int64_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-11.html">template class axl::sl::ArgType&lt;double&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-12.html">template class axl::sl::ArgType&lt;char&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-13.html">template class axl::sl::ArgType&lt;int8_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-14.html">template class axl::sl::ArgType&lt;float&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-15.html">template class axl::sl::ArgType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-16.html">template class axl::sl::ArgType&lt;int32_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArgType-17.html">template class axl::sl::ArgType&lt;int16_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Array.html">template class axl::sl::Array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails.html">template class axl::sl::ArrayDetails&lt;uint32_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-2.html">template class axl::sl::ArrayDetails&lt;T*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-3.html">template class axl::sl::ArrayDetails&lt;uint64_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-4.html">template class axl::sl::ArrayDetails&lt;uint8_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-5.html">template class axl::sl::ArrayDetails&lt;int8_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-6.html">template class axl::sl::ArrayDetails&lt;wchar_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-7.html">template class axl::sl::ArrayDetails&lt;int64_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-8.html">template class axl::sl::ArrayDetails&lt;uint16_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-9.html">template class axl::sl::ArrayDetails&lt;int16_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-10.html">template class axl::sl::ArrayDetails&lt;double&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-11.html">template class axl::sl::ArrayDetails&lt;char&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-12.html">template class axl::sl::ArrayDetails&lt;float&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-13.html">template class axl::sl::ArrayDetails&lt;int32_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayDetails-14.html">template class axl::sl::ArrayDetails</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ArrayRef.html">template class axl::sl::ArrayRef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Assign.html">template class axl::sl::Assign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_AssignClosure_L.html">template class axl::sl::AssignClosure_L</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_AssignClosure_R.html">template class axl::sl::AssignClosure_R</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_AutoPtrArray.html">template class axl::sl::AutoPtrArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_AuxList.html">template class axl::sl::AuxList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BinClosure_1.html">template class axl::sl::BinClosure_1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BinClosure_2.html">template class axl::sl::BinClosure_2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BinTreeBase.html">template class axl::sl::BinTreeBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BinaryBoyerMooreFind.html">class axl::sl::BinaryBoyerMooreFind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BitMap.html">class axl::sl::BitMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BitMapN.html">template class axl::sl::BitMapN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BmhFind.html">class axl::sl::BmhFind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BoxIterator.html">template class axl::sl::BoxIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BoxIteratorImpl.html">template class axl::sl::BoxIteratorImpl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BoxList.html">template class axl::sl::BoxList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BoxListEntry.html">template class axl::sl::BoxListEntry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BoyerMooreFindBase.html">template class axl::sl::BoyerMooreFindBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BoyerMooreIncrementalContext.html">template class axl::sl::BoyerMooreIncrementalContext</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_BuddyAllocMap.html">class axl::sl::BuddyAllocMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CircularBuffer.html">class axl::sl::CircularBuffer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmdLineParser.html">template class axl::sl::CmdLineParser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmdLineParserRoot.html">class axl::sl::CmdLineParserRoot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Cmp.html">template class axl::sl::Cmp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpBin.html">template class axl::sl::CmpBin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpDuckType.html">template class axl::sl::CmpDuckType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpDuckTypePtr.html">template class axl::sl::CmpDuckTypePtr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpPtr.html">template class axl::sl::CmpPtr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpSzBase.html">template class axl::sl::CmpSzBase&lt;wchar_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpSzBase-2.html">template class axl::sl::CmpSzBase&lt;char&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpSzBase-3.html">template class axl::sl::CmpSzBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpSzBase_i.html">template class axl::sl::CmpSzBase_i&lt;char&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpSzBase_i-2.html">template class axl::sl::CmpSzBase_i&lt;wchar_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CmpSzBase_i-3.html">template class axl::sl::CmpSzBase_i</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CompareBoxListEntry.html">template class axl::sl::CompareBoxListEntry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CompareMapEntryKey.html">template class axl::sl::CompareMapEntryKey</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CompareMapEntryValue.html">template class axl::sl::CompareMapEntryValue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstBoxIterator.html">template class axl::sl::ConstBoxIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstBoxList.html">template class axl::sl::ConstBoxList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstHandleTableIterator.html">template class axl::sl::ConstHandleTableIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstHandleTableIteratorBase.html">template class axl::sl::ConstHandleTableIteratorBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstHashTableIterator.html">template class axl::sl::ConstHashTableIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstIterator.html">template class axl::sl::ConstIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstList.html">template class axl::sl::ConstList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstListBase.html">template class axl::sl::ConstListBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstMapIterator.html">template class axl::sl::ConstMapIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstStringHashTableIterator.html">template class axl::sl::ConstStringHashTableIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstStringHashTableIterator_utf16.html">template class axl::sl::ConstStringHashTableIterator_utf16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstStringHashTableIterator_utf32.html">template class axl::sl::ConstStringHashTableIterator_utf32</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstStringHashTableIterator_utf8.html">template class axl::sl::ConstStringHashTableIterator_utf8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstStringHashTableIterator_w.html">template class axl::sl::ConstStringHashTableIterator_w</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Construct.html">template class axl::sl::Construct</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstructSimpleSingleton.html">template class axl::sl::ConstructSimpleSingleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ConstructSingleton.html">template class axl::sl::ConstructSingleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_CppList.html">template class axl::sl::CppList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Destruct.html">template class axl::sl::Destruct</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_DestructSingleton.html">template class axl::sl::DestructSingleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Div.html">template class axl::sl::Div</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_DuckTypeHashTable.html">template class axl::sl::DuckTypeHashTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_DuckTypePtrHashTable.html">template class axl::sl::DuckTypePtrHashTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Eq.html">template class axl::sl::Eq</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_EqBin.html">template class axl::sl::EqBin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_EqDuckType.html">template class axl::sl::EqDuckType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_EqDuckTypePtr.html">template class axl::sl::EqDuckTypePtr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_EqStringIgnoreCaseBase_pcp.html">template class axl::sl::EqStringIgnoreCaseBase_pcp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_EqStringIgnoreCaseBase_pcu.html">template class axl::sl::EqStringIgnoreCaseBase_pcu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ExplicitCast.html">template class axl::sl::ExplicitCast</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ExplicitPtrCast.html">template class axl::sl::ExplicitPtrCast</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_False.html">template class axl::sl::False</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Ge.html">template class axl::sl::Ge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Gt.html">template class axl::sl::Gt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Handle.html">template class axl::sl::Handle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HandleTable.html">template class axl::sl::HandleTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HandleTableBase.html">template class axl::sl::HandleTableBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HandleTableIterator.html">template class axl::sl::HandleTableIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HandleTableIteratorBase.html">template class axl::sl::HandleTableIteratorBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashChecksum16.html">template class axl::sl::HashChecksum16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashDjb2.html">template class axl::sl::HashDjb2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashDuckType.html">template class axl::sl::HashDuckType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashId.html">template class axl::sl::HashId</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashPtr.html">template class axl::sl::HashPtr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashStringIgnoreCaseBase_pcp.html">template class axl::sl::HashStringIgnoreCaseBase_pcp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashStringIgnoreCaseBase_pcu.html">template class axl::sl::HashStringIgnoreCaseBase_pcu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashSzBase.html">template class axl::sl::HashSzBase&lt;char&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashSzBase-2.html">template class axl::sl::HashSzBase&lt;wchar_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashSzBase-3.html">template class axl::sl::HashSzBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashSzBase_i.html">template class axl::sl::HashSzBase_i&lt;char&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashSzBase_i-2.html">template class axl::sl::HashSzBase_i</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashSzBase_i-3.html">template class axl::sl::HashSzBase_i&lt;wchar_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashTable.html">template class axl::sl::HashTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_HashTableIterator.html">template class axl::sl::HashTableIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ImplicitCast.html">template class axl::sl::ImplicitCast</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ImplicitPtrCast.html">template class axl::sl::ImplicitPtrCast</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_InitCharCodeTable.html">class axl::sl::InitCharCodeTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_InitCharLiteralTable.html">class axl::sl::InitCharLiteralTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Iterator.html">template class axl::sl::Iterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_IteratorBase.html">template class axl::sl::IteratorBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_IteratorImpl.html">template class axl::sl::IteratorImpl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Le.html">template class axl::sl::Le</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_LegacyPacketizer.html">template class axl::sl::LegacyPacketizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_LegacyPacketizerRoot.html">class axl::sl::LegacyPacketizerRoot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_List.html">template class axl::sl::List</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ListBase.html">template class axl::sl::ListBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Lt.html">template class axl::sl::Lt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_MapIterator.html">template class axl::sl::MapIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Max.html">template class axl::sl::Max</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Min.html">template class axl::sl::Min</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Minus.html">template class axl::sl::Minus</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_MinusOne.html">template class axl::sl::MinusOne</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Mod.html">template class axl::sl::Mod</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Mul.html">template class axl::sl::Mul</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Ne.html">template class axl::sl::Ne</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_NoOp.html">template class axl::sl::NoOp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Not.html">template class axl::sl::Not</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Offset.html">template class axl::sl::Offset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_OffsetOf.html">template class axl::sl::OffsetOf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_OpAssign.html">template class axl::sl::OpAssign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Or.html">template class axl::sl::Or</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_OwningListBase.html">template class axl::sl::OwningListBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack.html">template class axl::sl::Pack&lt;T*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-2.html">template class axl::sl::Pack&lt;uint16_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-3.html">template class axl::sl::Pack&lt;uint8_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-4.html">template class axl::sl::Pack&lt;wchar_t*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-5.html">template class axl::sl::Pack&lt;wchar_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-6.html">template class axl::sl::Pack&lt;int16_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-7.html">template class axl::sl::Pack&lt;err::ErrorHdr*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-8.html">template class axl::sl::Pack&lt;int8_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-9.html">template class axl::sl::Pack&lt;const wchar_t*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-10.html">template class axl::sl::Pack&lt;char*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-11.html">template class axl::sl::Pack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-12.html">template class axl::sl::Pack&lt;char&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-13.html">template class axl::sl::Pack&lt;const err::ErrorHdr*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Pack-14.html">template class axl::sl::Pack&lt;const char*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackIntTrunc.html">template class axl::sl::PackIntTrunc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackLastError.html">class axl::sl::PackLastError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackPtrSize.html">class axl::sl::PackPtrSize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSelfSizedPtr.html">template class axl::sl::PackSelfSizedPtr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeqEx.html">template class axl::sl::PackSeqEx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeqEx_2.html">template class axl::sl::PackSeqEx_2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeqEx_3.html">template class axl::sl::PackSeqEx_3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeqEx_4.html">template class axl::sl::PackSeqEx_4</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeqEx_5.html">template class axl::sl::PackSeqEx_5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeqEx_6.html">template class axl::sl::PackSeqEx_6</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeq_2.html">template class axl::sl::PackSeq_2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeq_3.html">template class axl::sl::PackSeq_3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeq_4.html">template class axl::sl::PackSeq_4</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeq_5.html">template class axl::sl::PackSeq_5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackSeq_6.html">template class axl::sl::PackSeq_6</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackStringBase.html">template class axl::sl::PackStringBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Package.html">class axl::sl::Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Packer.html">class axl::sl::Packer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackerImpl.html">template class axl::sl::PackerImpl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PackerSeq.html">class axl::sl::PackerSeq</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Packetizer.html">template class axl::sl::Packetizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_PacketizerRoot.html">class axl::sl::PacketizerRoot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ProtoPeer.html">template class axl::sl::ProtoPeer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_RbTree.html">template class axl::sl::RbTree</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_RbTreeIterator.html">template class axl::sl::RbTreeIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_RbTreeNode.html">template class axl::sl::RbTreeNode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_ReverseArray.html">template class axl::sl::ReverseArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Shl.html">template class axl::sl::Shl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Shr.html">template class axl::sl::Shr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_SimpleArgType.html">template class axl::sl::SimpleArgType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_SimpleArrayDetails.html">template class axl::sl::SimpleArrayDetails</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_SimpleHashTable.html">template class axl::sl::SimpleHashTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_SizeOf.html">template class axl::sl::SizeOf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_SizeOfNoReusableTailPadding.html">template class axl::sl::SizeOfNoReusableTailPadding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StdArrayList.html">template class axl::sl::StdArrayList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringBase.html">template class axl::sl::StringBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringDetailsBase.html">template class axl::sl::StringDetailsBase&lt;utf8_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringDetailsBase-2.html">template class axl::sl::StringDetailsBase&lt;utf32_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringDetailsBase-3.html">template class axl::sl::StringDetailsBase&lt;utf16_t&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringDetailsBase-4.html">template class axl::sl::StringDetailsBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringDetailsImpl.html">template class axl::sl::StringDetailsImpl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTable.html">template class axl::sl::StringHashTable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcp.html">template class axl::sl::StringHashTableIgnoreCase_pcp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcp_utf16.html">template class axl::sl::StringHashTableIgnoreCase_pcp_utf16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcp_utf32.html">template class axl::sl::StringHashTableIgnoreCase_pcp_utf32</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcp_utf8.html">template class axl::sl::StringHashTableIgnoreCase_pcp_utf8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcp_w.html">template class axl::sl::StringHashTableIgnoreCase_pcp_w</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcu.html">template class axl::sl::StringHashTableIgnoreCase_pcu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcu_utf16.html">template class axl::sl::StringHashTableIgnoreCase_pcu_utf16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcu_utf32.html">template class axl::sl::StringHashTableIgnoreCase_pcu_utf32</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcu_utf8.html">template class axl::sl::StringHashTableIgnoreCase_pcu_utf8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIgnoreCase_pcu_w.html">template class axl::sl::StringHashTableIgnoreCase_pcu_w</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIterator.html">template class axl::sl::StringHashTableIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIterator_utf16.html">template class axl::sl::StringHashTableIterator_utf16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIterator_utf32.html">template class axl::sl::StringHashTableIterator_utf32</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIterator_utf8.html">template class axl::sl::StringHashTableIterator_utf8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTableIterator_w.html">template class axl::sl::StringHashTableIterator_w</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTable_utf16.html">template class axl::sl::StringHashTable_utf16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTable_utf32.html">template class axl::sl::StringHashTable_utf32</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTable_utf8.html">template class axl::sl::StringHashTable_utf8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_StringHashTable_w.html">template class axl::sl::StringHashTable_w</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">template class axl::sl::StringRefBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Sub.html">template class axl::sl::Sub</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Swap.html">template class axl::sl::Swap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_TextBoyerMooreFind.html">class axl::sl::TextBoyerMooreFind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_True.html">template class axl::sl::True</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack.html">template class axl::sl::Unpack&lt;err::ErrorHdr*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack-2.html">template class axl::sl::Unpack&lt;T*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack-3.html">template class axl::sl::Unpack&lt;wchar_t*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack-4.html">template class axl::sl::Unpack&lt;const wchar_t*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack-5.html">template class axl::sl::Unpack&lt;const err::ErrorHdr*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack-6.html">template class axl::sl::Unpack&lt;const char*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack-7.html">template class axl::sl::Unpack&lt;char*&gt;</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpack-8.html">template class axl::sl::Unpack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_UnpackPtr.html">template class axl::sl::UnpackPtr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_UnpackSelfSizedPtr.html">template class axl::sl::UnpackSelfSizedPtr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_UnpackStringBase.html">template class axl::sl::UnpackStringBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Unpacker.html">class axl::sl::Unpacker</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Void.html">template class axl::sl::Void</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Xor.html">template class axl::sl::Xor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sl_Zero.html">template class axl::sl::Zero</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_sl.html">namespace axl::sl</a> &raquo;</li>
+        
+      <li>template class axl::sl::StringRefBase</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="template-class-axl-sl-stringrefbase">
+<span id="doxid-classaxl-1-1sl-1-1-string-ref-base"></span><span id="index-0"></span><h1>template class axl::sl::StringRefBase</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_sl_String.h&gt;</span><span class="cp"></span>
+
+<span class="k">template</span> <span class="o">&lt;</span>
+    <span class="k">typename</span> <span class="n">T</span><span class="p">,</span>
+    <span class="k">typename</span> <span class="n">Details0</span> <span class="o">=</span> <span class="n">StringDetailsBase</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>
+    <span class="o">&gt;</span>
+<span class="k">class</span> <span class="n">StringRefBase</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// typedefs</span>
+
+    <span class="k">typedef</span> <span class="n">Details0</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a91fcd444fb5bfaec397d595a9b55f66d"><span></span><span class="n">Details</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details</span><span class="o">::</span><span class="n">Details2</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a1db55200876b040373a44935a34d2e73"><span></span><span class="n">Details2</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details</span><span class="o">::</span><span class="n">Details3</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a24e7e0424647f3998db56648bc4d2b74"><span></span><span class="n">Details3</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details</span><span class="o">::</span><span class="n">C</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span></span><span class="n">C</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details</span><span class="o">::</span><span class="n">C2</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a7019a7da7ddbf369da3de732cdcdd622"><span></span><span class="n">C2</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details</span><span class="o">::</span><span class="n">C3</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ac6c831d0332338eea015061936736e44"><span></span><span class="n">C3</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details</span><span class="o">::</span><span class="n">Encoding</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a536b67b7aabe32b01eaf3ecc5a530826"><span></span><span class="n">Encoding</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details2</span><span class="o">::</span><span class="n">Encoding</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aef3863957d2c5b9583ae0a33b4a7cc00"><span></span><span class="n">Encoding2</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">Details3</span><span class="o">::</span><span class="n">Encoding</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ae3ee39d151470e8efd0be372c253daa7"><span></span><span class="n">Encoding3</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">StringRefBase</span><span class="o">&lt;</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="p">,</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a91fcd444fb5bfaec397d595a9b55f66d"><span class="std std-ref">Details</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span></span><span class="n">StringRef</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">StringRefBase</span><span class="o">&lt;</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a7019a7da7ddbf369da3de732cdcdd622"><span class="std std-ref">C2</span></a><span></span><span class="p">,</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a1db55200876b040373a44935a34d2e73"><span class="std std-ref">Details2</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ae6b70b593909e86d3965313bb4286e90"><span></span><span class="n">StringRef2</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <span class="n">StringRefBase</span><span class="o">&lt;</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1ac6c831d0332338eea015061936736e44"><span class="std std-ref">C3</span></a><span></span><span class="p">,</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a24e7e0424647f3998db56648bc4d2b74"><span class="std std-ref">Details3</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1adb753c25da413cf8d304600ba999405d"><span></span><span class="n">StringRef3</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_StringBase.html#doxid-classaxl-1-1sl-1-1-string-base"><span class="std std-ref">StringBase</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="p">,</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a91fcd444fb5bfaec397d595a9b55f66d"><span class="std std-ref">Details</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span></span><span class="n">String</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_StringBase.html#doxid-classaxl-1-1sl-1-1-string-base"><span class="std std-ref">StringBase</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a7019a7da7ddbf369da3de732cdcdd622"><span class="std std-ref">C2</span></a><span></span><span class="p">,</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a1db55200876b040373a44935a34d2e73"><span class="std std-ref">Details2</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a929581b9ae7329be0ff09797f5e1499a"><span></span><span class="n">String2</span></span><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_StringBase.html#doxid-classaxl-1-1sl-1-1-string-base"><span class="std std-ref">StringBase</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1ac6c831d0332338eea015061936736e44"><span class="std std-ref">C3</span></a><span></span><span class="p">,</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a24e7e0424647f3998db56648bc4d2b74"><span class="std std-ref">Details3</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ace8ab98414b43bcb28f217bb91147649"><span></span><span class="n">String3</span></span><span></span><span class="p">;</span>
+
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a2c83e15dff64f52bdc7914bd2d0140ba"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">();</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ab050414f2e9b3797d7cd8e0f0f423b18"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a6bf09728d02edd4f57e86ec9d38fcdf8"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a195544e0521a5b6e9eee12ce3de14521"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">length</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">isNullTerminated</span> <span class="o">=</span> <span class="nb">false</span>
+        <span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a534dee696f66f5e4e7581209beea70b8"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">end</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">isNullTerminated</span> <span class="o">=</span> <span class="nb">false</span>
+        <span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ab187c47ec6da5977ba8a30d48e18baa3"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="struct_axl_rc_BufHdr.html#doxid-structaxl-1-1rc-1-1-buf-hdr"><span class="std std-ref">rc::BufHdr</span></a><span></span><span class="o">*</span> <span class="n">hdr</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span>
+        <span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a2e76ef259c309fe3e92fe4dd19231a17"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="struct_axl_rc_BufHdr.html#doxid-structaxl-1-1rc-1-1-buf-hdr"><span class="std std-ref">rc::BufHdr</span></a><span></span><span class="o">*</span> <span class="n">hdr</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">length</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">isNullTerminated</span> <span class="o">=</span> <span class="nb">false</span>
+        <span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a63d9d924b09fdd0a37f9bac137b0f776"><span></span><span class="n">StringRefBase</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="struct_axl_rc_BufHdr.html#doxid-structaxl-1-1rc-1-1-buf-hdr"><span class="std std-ref">rc::BufHdr</span></a><span></span><span class="o">*</span> <span class="n">hdr</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">end</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">isNullTerminated</span> <span class="o">=</span> <span class="nb">false</span>
+        <span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a418b64d4ede4aabfa7c477ecf1a36c75"><span></span><span class="o">~</span><span class="n">StringRefBase</span></span><span></span><span class="p">();</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="n">StringRefBase</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a43a14510a56613f4105244caafebc124"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ab2f0d440a03332c8b7c1dd64209c81d6"><span></span><span class="k">operator</span><span class="o">==</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a6452bc0d055273b6cfd27a2c91e0369c"><span></span><span class="k">operator</span><span class="o">!=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a8511122b8dd1ff08d7edaad8bbb864f4"><span></span><span class="k">operator</span><span class="o">&lt;</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a15e1decf4c9f865bdb1190c7a421223c"><span></span><span class="k">operator</span><span class="o">&lt;=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ae7a2ebd3b6b9258df095c2490613f0ab"><span></span><span class="k">operator</span><span class="o">&gt;</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ab674e5d830e5bb13b6b4eec01b8fae3e"><span></span><span class="k">operator</span><span class="o">&gt;=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a4426104d91b6657a080ae496dd8c1017"><span></span><span class="k">operator</span><span class="o">==</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ae906da6aa51de751b6f4257a95e29619"><span></span><span class="k">operator</span><span class="o">!=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1acf521eb2c70b20d7033eefbcfc11023b"><span></span><span class="k">operator</span><span class="o">&lt;</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a9074041601bf6f07fd8aaf975bbddd7b"><span></span><span class="k">operator</span><span class="o">&lt;=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1af3dc1ae9da6701d235052773dd16f370"><span></span><span class="k">operator</span><span class="o">&gt;</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1adcc6f4c98e5a0578f578a17fec5e5f3e"><span></span><span class="k">operator</span><span class="o">&gt;=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a33200af4e79179d90b74217a784ae369"><span></span><span class="k">operator</span><span class="o">+</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a96da27d5ea674a3ab3dc65640ac64cc5"><span></span><span class="k">operator</span><span class="o">+</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1ae6b70b593909e86d3965313bb4286e90"><span class="std std-ref">StringRef2</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aba5e82466d6479ddfc9477ea503db56d"><span></span><span class="k">operator</span><span class="o">+</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1adb753c25da413cf8d304600ba999405d"><span class="std std-ref">StringRef3</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aa2ee711886c4a4f8b56496ed6c101af1"><span></span><span class="k">operator</span><span class="o">+</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a2c0378dc8c4dd07278cc0403fbb1b3c6"><span></span><span class="k">operator</span><span class="o">+</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a7019a7da7ddbf369da3de732cdcdd622"><span class="std std-ref">C2</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a915077a2cdb464b2b4e88a2c1ef68527"><span></span><span class="k">operator</span><span class="o">+</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1ac6c831d0332338eea015061936736e44"><span class="std std-ref">C3</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ad3c907eebb50695aa704b313125a4d0e"><span></span><span class="k">operator</span><span class="o">+</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span> <span class="n">c</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a768f5c8720ff051da12a2736280ecc23"><span></span><span class="k">operator</span><span class="p">[]</span></span><span></span><span class="p">(</span><span class="kt">intptr_t</span> <span class="n">i</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a02e6f3c7745ed0d83a3f5a2b8dac74b4"><span></span><span class="n">cp</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ad9366c0844c37e551038cefa4a66c335"><span></span><span class="n">sz</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1acfe591e85bc2a59b9c95a96dad39d937"><span></span><span class="n">szn</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a929581b9ae7329be0ff09797f5e1499a"><span class="std std-ref">String2</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a2577c76ce891c80b68cc9f9cc12a8bf4"><span></span><span class="n">s2</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1ace8ab98414b43bcb28f217bb91147649"><span class="std std-ref">String3</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ac20529af48f296bfb8bc7f3b43aed2b6"><span></span><span class="n">s3</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1adb9e759d6f78898069bfa104951c05c5"><span></span><span class="n">getLength</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="struct_axl_rc_BufHdr.html#doxid-structaxl-1-1rc-1-1-buf-hdr"><span class="std std-ref">rc::BufHdr</span></a><span></span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ace26ff62299f5f88a2e2741b182fe6fb"><span></span><span class="n">getHdr</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a9a52a2417a115212de2b78606ac35071"><span></span><span class="n">getEnd</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a3a7dc4f23fce6c8edf8c6ecfb77d654d"><span></span><span class="n">isEmpty</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a6d431b67a9c2920e61e627bff62615b9"><span></span><span class="n">isNullTerminated</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a08042809828de67427f44baf0c3cd872"><span></span><span class="n">clear</span></span><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aa9b48df18df86197ef1a4d3ffadcb172"><span></span><span class="n">release</span></span><span></span><span class="p">();</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aacc997a9ec1e5622db834530ec53b079"><span></span><span class="n">offset</span></span><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">length</span><span class="p">);</span>
+
+    <span class="kt">int</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a795d2be0763323860127765180d8c2d8"><span></span><span class="n">cmp</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">int</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a578ff3e6c8d05d1f5b3feee1aea5f67a"><span></span><span class="n">cmpIgnoreCase</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">,</span>
+        <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a0f013d1785be7b570d0aee04cd561fcb"><span></span><span class="n">hash</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ae46cf36eb7f50a6e016a202c0a49777c"><span></span><span class="n">hashIgnoreCase</span></span><span></span><span class="p">(</span><a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1afb8ddb4f3ed7526cb69a2ff8bb31b0ca"><span></span><span class="n">isEqual</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a7da0e255c5fa2ea27b30df0c4513f423"><span></span><span class="n">isEqualIgnoreCase</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">,</span>
+        <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aafce3c6dc98be83fc800e98c52374772"><span></span><span class="n">isPrefix</span></span><span></span><span class="p">(</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span> <span class="n">c</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aeaaefafdeff80cd1cb76049c4dc70b88"><span></span><span class="n">isPrefix</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ac5e958f227cef3b942554d4c8ca9b6b8"><span></span><span class="n">isPrefixIgnoreCase</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">,</span>
+        <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aa2521fe5211bda2a0b3ad9b1ebf633c9"><span></span><span class="n">isSuffix</span></span><span></span><span class="p">(</span><a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span> <span class="n">c</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ad4ce224cdc33a01e05b61e9a17910f01"><span></span><span class="n">isSuffix</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1ac47de411c96cd8e49dc6377613a3b56f"><span></span><span class="n">isSuffixIgnoreCase</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">,</span>
+        <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a34071c56c077eb648273b9367d0b30f0"><span></span><span class="n">find</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span> <span class="n">c</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a89cdb6ef390b2131ba245759540b7e52"><span></span><span class="n">find</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">subString</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a03bfe1d7fbd4688c368f3d893196ce0c"><span></span><span class="n">findOneOf</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">charSet</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a61bbf7022eb2598859524ade35561bc3"><span></span><span class="n">findNotOneOf</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">charSet</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a877f840a24f4ce9df9fd1576b4bf5347"><span></span><span class="n">reverseFind</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aa5f44988d5adb6e09c7491765f0e3e45"><span class="std std-ref">C</span></a><span></span> <span class="n">c</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1afb0302a7020ed494d358430691cf420a"><span></span><span class="n">reverseFind</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">subString</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1acd0873acd958ef795be059de89d7e77a"><span></span><span class="n">reverseFindOneOf</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">charSet</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aefe2b6a652b731c58516aa45037045e4"><span></span><span class="n">reverseFindNotOneOf</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">charSet</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a24e033bcda0b970fcf124c4930bd6494"><span></span><span class="n">getSubString</span></span><span></span><span class="p">(</span>
+        <span class="kt">size_t</span> <span class="n">first</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">length</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1abccc8d713f59368fe2045c852edb5362"><span></span><span class="n">setSubString</span></span><span></span><span class="p">(</span>
+        <span class="kt">size_t</span> <span class="n">first</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">length</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">);</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aa078eb6ec3d0c2c47f60e806b05c03de"><span></span><span class="n">getLeftSubString</span></span><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a122f3cc3d40c220c229f96d0f63a6b05"><span></span><span class="n">setLeftSubString</span></span><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">length</span><span class="p">);</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a5362383b048880a2b0b3da96402db8f8"><span></span><span class="n">getRightSubString</span></span><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1adc3228c49199e2f31ebdcf1067c9a07b"><span></span><span class="n">setRightSubString</span></span><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">length</span><span class="p">);</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a46ea4449547cb300c0fd6dc6fb2b2956"><span></span><span class="n">getLeftTrimmedString</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a6530cbccc202a4ef4e91896cbcaa0708"><span></span><span class="n">getRightTimmedString</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1a2007b728bdbe1f48ec05c10653036009"><span class="std std-ref">StringRef</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a694023f0624fd6d5818f3b7afd099ff8"><span></span><span class="n">getTrimmedString</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1af8ca242683e992109c0e4b4ced646d54"><span></span><span class="n">getLowerCaseString</span></span><span></span><span class="p">(</span><a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1a884e4e8692895a9b13276127e2873e02"><span></span><span class="n">getUpperCaseString</span></span><span></span><span class="p">(</span><a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="#doxid-classaxl-1-1sl-1-1-string-ref-base-1aafbc52f6bd6c5c506795da2ec519f33c"><span class="std std-ref">String</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sl-1-1-string-ref-base-1aafed785fa067516ef9dfabccc30fb8cf"><span></span><span class="n">getCaseFoldedString</span></span><span></span><span class="p">(</span><a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57"><span class="std std-ref">CaseConvertMethod</span></a><span></span> <span class="n">method</span> <span class="o">=</span> <a class="reference internal" href="enum_axl_sl_CaseConvertMethod.html#doxid-namespaceaxl-1-1sl-1aa2bde0cbbe6fbeb645d23a5c85f8fb57a61cc3dadd3d44d2142f509705a0219da"><span class="std std-ref">CaseConvertMethod_Default</span></a><span></span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_sl_Sub.html" class="btn btn-neutral float-right" title="template class axl::sl::Sub" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_sl_StringHashTable_w.html" class="btn btn-neutral float-left" title="template class axl::sl::StringHashTable_w" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

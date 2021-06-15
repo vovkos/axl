@@ -1,0 +1,20 @@
+.. index:: pair: enum; SharedMemoryTransportState
+.. _doxid-namespaceaxl_1_1io_1a8c8e5fe113ef497db30439bb8ab9b3dc:
+
+enum axl::io::SharedMemoryTransportState
+========================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SharedMemoryTransport.h>
+
+	enum SharedMemoryTransportState
+	{
+	    :target:`SharedMemoryTransportState_MasterConnected<doxid-namespaceaxl_1_1io_1a8c8e5fe113ef497db30439bb8ab9b3dca423236721bf196f5540971beaf5d1618>` = 0x01,
+	    :target:`SharedMemoryTransportState_SlaveConnected<doxid-namespaceaxl_1_1io_1a8c8e5fe113ef497db30439bb8ab9b3dcaef173bff13bcc1a4bb69a309e5fd2056>`  = 0x02,
+	    :target:`SharedMemoryTransportState_Disconnected<doxid-namespaceaxl_1_1io_1a8c8e5fe113ef497db30439bb8ab9b3dcad6cf875df67f1494857d5082e84e8b67>`    = 0x04,
+	};
+

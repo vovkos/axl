@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::mem::TrackingFree
+.. _doxid-classaxl_1_1mem_1_1_tracking_free:
+
+template class axl::mem::TrackingFree
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Allocator.h>
+	
+	template <typename BaseAllocator>
+	class TrackingFree
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1mem_1_1_tracking_free_1a98bcf5b63d99488375fe57a9b4f3b988>`(void* p) const;
+	};

@@ -1,0 +1,42 @@
+.. index:: pair: struct; axl::gui::WidgetPaintMsg
+.. _doxid-structaxl_1_1gui_1_1_widget_paint_msg:
+
+struct axl::gui::WidgetPaintMsg
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	struct WidgetPaintMsg: public :ref:`axl::gui::WidgetMsg<doxid-structaxl_1_1gui_1_1_widget_msg>`
+	{
+		// fields
+	
+		:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* :target:`m_canvas<doxid-structaxl_1_1gui_1_1_widget_paint_msg_1add564099fc524611b97b959f30199486>`;
+		:ref:`Rect<doxid-structaxl_1_1gui_1_1_rect>` :target:`m_rect<doxid-structaxl_1_1gui_1_1_widget_paint_msg_1a490c2d12e9e1b02752c9f060941e9185>`;
+		:ref:`Rect<doxid-structaxl_1_1gui_1_1_rect>` :target:`m_region<doxid-structaxl_1_1gui_1_1_widget_paint_msg_1a1f6cdcaeffb37b0af1930ef7a5046ab8>`[4];
+		size_t :target:`m_regionRectCount<doxid-structaxl_1_1gui_1_1_widget_paint_msg_1adc67bdf9286bd3cf1cb0488029890595>`;
+
+		// construction
+	
+		:target:`WidgetPaintMsg<doxid-structaxl_1_1gui_1_1_widget_paint_msg_1abb4b90bd5f0a74e994403ac460422333>`(:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` :ref:`m_msgCode<doxid-structaxl_1_1gui_1_1_widget_msg_1a53c70210a5ed27e06bbd68bcda502bf0>`;
+

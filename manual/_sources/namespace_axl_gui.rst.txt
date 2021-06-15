@@ -1,0 +1,299 @@
+.. index:: pair: namespace; axl::gui
+.. _doxid-namespaceaxl_1_1gui:
+
+namespace axl::gui
+==================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_gui_FontFlag.rst
+	enum_axl_gui_FormFactor.rst
+	enum_axl_gui_Key.rst
+	enum_axl_gui_ModifierKey.rst
+	enum_axl_gui_MouseButton.rst
+	enum_axl_gui_Orientation.rst
+	enum_axl_gui_PixelFormat.rst
+	enum_axl_gui_StdColor.rst
+	enum_axl_gui_StdCursorKind.rst
+	enum_axl_gui_StdFontKind.rst
+	enum_axl_gui_StdPalColor.rst
+	enum_axl_gui_WidgetMsgCode.rst
+	enum_axl_gui_WmKind.rst
+	struct_axl_gui_CaretPos.rst
+	struct_axl_gui_ColorAttr.rst
+	struct_axl_gui_FontDesc.rst
+	struct_axl_gui_HyperlinkAnchor.rst
+	struct_axl_gui_ImageDesc.rst
+	struct_axl_gui_Notify.rst
+	struct_axl_gui_Palette.rst
+	struct_axl_gui_Point.rst
+	struct_axl_gui_Rect.rst
+	struct_axl_gui_Size.rst
+	struct_axl_gui_TextAttr.rst
+	struct_axl_gui_TextAttrAnchor.rst
+	struct_axl_gui_WidgetConstructParam.rst
+	struct_axl_gui_WidgetKeyMsg.rst
+	struct_axl_gui_WidgetMouseMsg.rst
+	struct_axl_gui_WidgetMouseWheelMsg.rst
+	struct_axl_gui_WidgetMsg.rst
+	struct_axl_gui_WidgetMsgMap.rst
+	struct_axl_gui_WidgetMsgParam.rst
+	struct_axl_gui_WidgetPaintMsg.rst
+	struct_axl_gui_WidgetScrollBar.rst
+	struct_axl_gui_WidgetThreadMsg.rst
+	class_axl_gui_AnsiAttrParser.rst
+	class_axl_gui_Canvas.rst
+	class_axl_gui_Cursor.rst
+	class_axl_gui_DeleteGdiObject.rst
+	class_axl_gui_Engine.rst
+	class_axl_gui_Font.rst
+	class_axl_gui_FontTuple.rst
+	class_axl_gui_GdiCanvas.rst
+	class_axl_gui_GdiCursor.rst
+	class_axl_gui_GdiEngine.rst
+	class_axl_gui_GdiFont.rst
+	class_axl_gui_GdiImage.rst
+	class_axl_gui_GdiObjectHandle.rst
+	class_axl_gui_GdiWidget.rst
+	class_axl_gui_GdiWidgetImpl.rst
+	class_axl_gui_GuiItem.rst
+	class_axl_gui_HyperText.rst
+	class_axl_gui_HyperlinkAnchorArray.rst
+	class_axl_gui_Image.rst
+	class_axl_gui_OffscreenCanvasCache.rst
+	class_axl_gui_QtCanvas.rst
+	class_axl_gui_QtCaret.rst
+	class_axl_gui_QtCursor.rst
+	class_axl_gui_QtEngine.rst
+	class_axl_gui_QtFont.rst
+	class_axl_gui_QtFontTuple.rst
+	class_axl_gui_QtImage.rst
+	class_axl_gui_QtRagelSyntaxHighlighter.rst
+	class_axl_gui_QtWidget.rst
+	class_axl_gui_QtWidgetBase.rst
+	class_axl_gui_ScreenDc.rst
+	class_axl_gui_TextAttrAnchorArray.rst
+	class_axl_gui_TextPainter.rst
+	class_axl_gui_Widget.rst
+	class_axl_gui_WidgetDriver.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace gui {
+
+	// typedefs
+
+	typedef :ref:`FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`<:ref:`GdiFont<doxid-classaxl_1_1gui_1_1_gdi_font>`> :target:`GdiFontuple<doxid-namespaceaxl_1_1gui_1a5dd4558975c8d644128779a468e80ae6>`;
+
+	typedef void(Widget::* :target:`WidgetMsgProc<doxid-namespaceaxl_1_1gui_1a18a743430a4938189d65dc704cc27fa4>`)(
+		const WidgetMsg *msg,
+		bool *isHandled
+		);
+
+	// enums
+
+	enum
+	{
+	    :target:`ColorFlag_Undefined<doxid-namespaceaxl_1_1gui_1a7ec9aa8adf64350c9de83f1e0713d021ad282a430ba5d566e10523ec09087dfff>` = 0x80000000,
+	    :target:`ColorFlag_Index<doxid-namespaceaxl_1_1gui_1a7ec9aa8adf64350c9de83f1e0713d021ac6cd9c52ab75aa1537b98e2acd077853>`     = 0x40000000,
+	    :target:`ColorFlag_IndexMask<doxid-namespaceaxl_1_1gui_1a7ec9aa8adf64350c9de83f1e0713d021abf831ac62515210ce39164b528d74016>` = 0x3fffffff,
+	    :target:`ColorFlag_RgbMask<doxid-namespaceaxl_1_1gui_1a7ec9aa8adf64350c9de83f1e0713d021a6c6541e9a141072c02e7e16a70904c97>`   = 0x00ffffff,
+	};
+
+	enum :ref:`FontFlag<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14b>`;
+	enum :ref:`FormFactor<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893>`;
+	enum :ref:`Key<doxid-namespaceaxl_1_1gui_1a20d5a700a1be383d3e84e874d6e95482>`;
+	enum :ref:`ModifierKey<doxid-namespaceaxl_1_1gui_1ac1593361b10dd524258ec7de24fcfb77>`;
+	enum :ref:`MouseButton<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41c>`;
+	enum :ref:`Orientation<doxid-namespaceaxl_1_1gui_1abbb4c75e7541835676229cd86d7180e6>`;
+	enum :ref:`PixelFormat<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4f>`;
+	enum :ref:`StdColor<doxid-namespaceaxl_1_1gui_1af8c81f3e36d12414820568a09097fa7c>`;
+	enum :ref:`StdCursorKind<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bb>`;
+	enum :ref:`StdFontKind<doxid-namespaceaxl_1_1gui_1a456c44e84a2ffe5c46ea2b7baeb075d2>`;
+	enum :ref:`StdPalColor<doxid-namespaceaxl_1_1gui_1a92cfb4f4e1f9504aba0d23dd166de801>`;
+	enum :ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>`;
+	enum :ref:`WmKind<doxid-namespaceaxl_1_1gui_1a564290a8b3722f7c27f301218c6d56e0>`;
+
+	// structs
+
+	struct :ref:`CaretPos<doxid-structaxl_1_1gui_1_1_caret_pos>`;
+	struct :ref:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr>`;
+	struct :ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`;
+	struct :ref:`HyperlinkAnchor<doxid-structaxl_1_1gui_1_1_hyperlink_anchor>`;
+	struct :ref:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc>`;
+	struct :ref:`Notify<doxid-structaxl_1_1gui_1_1_notify>`;
+	struct :ref:`Palette<doxid-structaxl_1_1gui_1_1_palette>`;
+	struct :ref:`Point<doxid-structaxl_1_1gui_1_1_point>`;
+	struct :ref:`Rect<doxid-structaxl_1_1gui_1_1_rect>`;
+	struct :ref:`Size<doxid-structaxl_1_1gui_1_1_size>`;
+	struct :ref:`TextAttr<doxid-structaxl_1_1gui_1_1_text_attr>`;
+	struct :ref:`TextAttrAnchor<doxid-structaxl_1_1gui_1_1_text_attr_anchor>`;
+	struct :ref:`WidgetConstructParam<doxid-structaxl_1_1gui_1_1_widget_construct_param>`;
+	struct :ref:`WidgetKeyMsg<doxid-structaxl_1_1gui_1_1_widget_key_msg>`;
+	struct :ref:`WidgetMouseMsg<doxid-structaxl_1_1gui_1_1_widget_mouse_msg>`;
+	struct :ref:`WidgetMouseWheelMsg<doxid-structaxl_1_1gui_1_1_widget_mouse_wheel_msg>`;
+	struct :ref:`WidgetMsg<doxid-structaxl_1_1gui_1_1_widget_msg>`;
+	struct :ref:`WidgetMsgMap<doxid-structaxl_1_1gui_1_1_widget_msg_map>`;
+
+	template <typename T>
+	struct :ref:`WidgetMsgParam<doxid-structaxl_1_1gui_1_1_widget_msg_param>`;
+
+	struct :ref:`WidgetPaintMsg<doxid-structaxl_1_1gui_1_1_widget_paint_msg>`;
+	struct :ref:`WidgetScrollBar<doxid-structaxl_1_1gui_1_1_widget_scroll_bar>`;
+	struct :ref:`WidgetThreadMsg<doxid-structaxl_1_1gui_1_1_widget_thread_msg>`;
+
+	// classes
+
+	class :ref:`AnsiAttrParser<doxid-classaxl_1_1gui_1_1_ansi_attr_parser>`;
+	class :ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`;
+	class :ref:`Cursor<doxid-classaxl_1_1gui_1_1_cursor>`;
+	class :ref:`DeleteGdiObject<doxid-classaxl_1_1gui_1_1_delete_gdi_object>`;
+	class :ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`;
+	class :ref:`Font<doxid-classaxl_1_1gui_1_1_font>`;
+	class :ref:`FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`;
+	class :ref:`GdiCanvas<doxid-classaxl_1_1gui_1_1_gdi_canvas>`;
+	class :ref:`GdiCursor<doxid-classaxl_1_1gui_1_1_gdi_cursor>`;
+	class :ref:`GdiEngine<doxid-classaxl_1_1gui_1_1_gdi_engine>`;
+	class :ref:`GdiFont<doxid-classaxl_1_1gui_1_1_gdi_font>`;
+	class :ref:`GdiImage<doxid-classaxl_1_1gui_1_1_gdi_image>`;
+
+	template <typename T>
+	class :ref:`GdiObjectHandle<doxid-classaxl_1_1gui_1_1_gdi_object_handle>`;
+
+	template <typename T>
+	class :ref:`GdiWidget<doxid-classaxl_1_1gui_1_1_gdi_widget>`;
+
+	class :ref:`GdiWidgetImpl<doxid-classaxl_1_1gui_1_1_gdi_widget_impl>`;
+	class :ref:`GuiItem<doxid-classaxl_1_1gui_1_1_gui_item>`;
+	class :ref:`HyperText<doxid-classaxl_1_1gui_1_1_hyper_text>`;
+	class :ref:`HyperlinkAnchorArray<doxid-classaxl_1_1gui_1_1_hyperlink_anchor_array>`;
+	class :ref:`Image<doxid-classaxl_1_1gui_1_1_image>`;
+
+	template <typename T>
+	class :ref:`OffscreenCanvasCache<doxid-classaxl_1_1gui_1_1_offscreen_canvas_cache>`;
+
+	class :ref:`QtCanvas<doxid-classaxl_1_1gui_1_1_qt_canvas>`;
+	class :ref:`QtCaret<doxid-classaxl_1_1gui_1_1_qt_caret>`;
+	class :ref:`QtCursor<doxid-classaxl_1_1gui_1_1_qt_cursor>`;
+	class :ref:`QtEngine<doxid-classaxl_1_1gui_1_1_qt_engine>`;
+	class :ref:`QtFont<doxid-classaxl_1_1gui_1_1_qt_font>`;
+	class :ref:`QtFontTuple<doxid-classaxl_1_1gui_1_1_qt_font_tuple>`;
+	class :ref:`QtImage<doxid-classaxl_1_1gui_1_1_qt_image>`;
+
+	template <typename T>
+	class :ref:`QtRagelSyntaxHighlighter<doxid-classaxl_1_1gui_1_1_qt_ragel_syntax_highlighter>`;
+
+	template <typename T>
+	class :ref:`QtWidget<doxid-classaxl_1_1gui_1_1_qt_widget>`;
+
+	class :ref:`QtWidgetBase<doxid-classaxl_1_1gui_1_1_qt_widget_base>`;
+	class :ref:`ScreenDc<doxid-classaxl_1_1gui_1_1_screen_dc>`;
+	class :ref:`TextAttrAnchorArray<doxid-classaxl_1_1gui_1_1_text_attr_anchor_array>`;
+	class :ref:`TextPainter<doxid-classaxl_1_1gui_1_1_text_painter>`;
+	class :ref:`Widget<doxid-classaxl_1_1gui_1_1_widget>`;
+	class :ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`;
+
+	// global functions
+
+	:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+	:target:`getColorIndex<doxid-namespaceaxl_1_1gui_1a54d2969ec2cdec9fd79ed6b6b614ce5e>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color);
+
+	:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+	:target:`overlayColor<doxid-namespaceaxl_1_1gui_1a4a1227f54f976e05c2f4ca2a7abfb999>`(
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` baseColor,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` overlayColor
+		);
+
+	:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+	:target:`inverseRgb<doxid-namespaceaxl_1_1gui_1a7fc259566b79c07337a251cac10dae40>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` rgb);
+
+	:ref:`MouseButton<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41c>`
+	:target:`getFirstMouseButton<doxid-namespaceaxl_1_1gui_1a0b36acb73746f52b46cb200ec25b56af>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` buttons);
+
+	:ref:`ModifierKey<doxid-namespaceaxl_1_1gui_1ac1593361b10dd524258ec7de24fcfb77>`
+	:target:`getFirstModifierKey<doxid-namespaceaxl_1_1gui_1abd6f114558cb0f102c6000a1df7ed06d>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` modifierKeys);
+
+	:ref:`FormFactor<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893>`
+	:target:`getFormFactor<doxid-namespaceaxl_1_1gui_1aafd4ca90ee37a743e2dc974c51b02bdf>`(
+		int width,
+		int height,
+		int stripThreshold = 8
+		);
+
+	:ref:`FormFactor<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893>`
+	:target:`getFormFactor<doxid-namespaceaxl_1_1gui_1a11f586264c542980ac088a60e4f13c88>`(
+		const :ref:`Size<doxid-structaxl_1_1gui_1_1_size>`& size,
+		int stripThreshold = 8
+		);
+
+	:ref:`FontFlag<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14b>`
+	:target:`getFirstFontFlag<doxid-namespaceaxl_1_1gui_1a6e322e897647b7a9ad34c4d30505ebd3>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags);
+
+	const char*
+	:target:`getFontFlagString<doxid-namespaceaxl_1_1gui_1ac01eb1443a16bcf73311889d83a666e3>`(:ref:`FontFlag<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14b>` flag);
+
+	const char*
+	:target:`getFontFlagString<doxid-namespaceaxl_1_1gui_1a2794b1dead0a04ebb2aa5c96e8c4d4c4>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags);
+
+	:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+	:target:`overlayFontFlags<doxid-namespaceaxl_1_1gui_1ae25c54997527ddeb3563c2edd073bd52>`(
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` baseFontFlags,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` overlayFontFlags
+		);
+
+	bool
+	:target:`buildLogFont<doxid-namespaceaxl_1_1gui_1a6cbb6ffb8d1fdb9bc439625accd49238>`(
+		LOGFONTW* logFont,
+		const :ref:`sl::StringRef_w<doxid-namespaceaxl_1_1sl_1a7375808d9fca58d1037da98f92680ad7>`& family,
+		size_t pointSize,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+		);
+
+	bool
+	:target:`getLogFontFromFontDesc<doxid-namespaceaxl_1_1gui_1a6d94a4d7845237949891d303555ffb40>`(
+		const :ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`& fontDesc,
+		LOGFONTW* logFont
+		);
+
+	void
+	:target:`modifyLogFont<doxid-namespaceaxl_1_1gui_1ab1e6abca7c97c35aed504c7c5163f056>`(
+		LOGFONTW* logFont,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags
+		);
+
+	bool
+	:target:`getFontDescFromLogFont<doxid-namespaceaxl_1_1gui_1a94bd1e2bf587999d096e48613250755e>`(
+		const LOGFONTW* logFont,
+		:ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`* fontDesc
+		);
+
+	int
+	:target:`getScrollBarFromOrientation<doxid-namespaceaxl_1_1gui_1a278649f137adb46fbd0739ece10bced1>`(:ref:`Orientation<doxid-namespaceaxl_1_1gui_1abbb4c75e7541835676229cd86d7180e6>` orientation);
+
+	void
+	:target:`buildScrollInfo<doxid-namespaceaxl_1_1gui_1a419b087923cad8316ed899e398f51620>`(
+		SCROLLINFO* scrollInfo,
+		size_t max,
+		size_t page,
+		size_t pos
+		);
+
+	void
+	:target:`getScrollInfoFromScrollBar<doxid-namespaceaxl_1_1gui_1ac686e475c71ccfc6adb4a94c714b4970>`(
+		const :ref:`WidgetScrollBar<doxid-structaxl_1_1gui_1_1_widget_scroll_bar>`& scrollBar,
+		SCROLLINFO* scrollInfo
+		);
+
+	const char*
+	:target:`getPixelFormatString<doxid-namespaceaxl_1_1gui_1a1bf6a59694913b3f106661c97d24b1b3>`(:ref:`PixelFormat<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4f>` pixelFormat);
+
+	:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+	:target:`getQtEngine<doxid-namespaceaxl_1_1gui_1a76413625916fb5febb14dc4d3e4cca62>`();
+
+	} // namespace gui

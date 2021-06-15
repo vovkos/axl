@@ -1,0 +1,23 @@
+.. index:: pair: struct; axl::gui::Notify
+.. _doxid-structaxl_1_1gui_1_1_notify:
+
+struct axl::gui::Notify
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_GdiWidget.h>
+	
+	struct Notify: public NMHDR
+	{
+		// fields
+	
+		void* :target:`param<doxid-structaxl_1_1gui_1_1_notify_1ad1881fd26e6b3023550d5242e0fa96cd>`;
+	};

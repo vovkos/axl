@@ -1,0 +1,55 @@
+.. index:: pair: namespace; axl::dox
+.. _doxid-namespaceaxl_1_1dox:
+
+namespace axl::dox
+==================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_dox_BlockKind.rst
+	struct_axl_dox_BlockData.rst
+	struct_axl_dox_Host.rst
+	struct_axl_dox_Param.rst
+	class_axl_dox_Block.rst
+	class_axl_dox_Footnote.rst
+	class_axl_dox_Group.rst
+	class_axl_dox_Module.rst
+	class_axl_dox_Parser.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace dox {
+
+	// enums
+
+	enum :ref:`BlockKind<doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009a>`;
+
+	// structs
+
+	struct :ref:`BlockData<doxid-structaxl_1_1dox_1_1_block_data>`;
+	struct :ref:`Host<doxid-structaxl_1_1dox_1_1_host>`;
+	struct :ref:`Param<doxid-structaxl_1_1dox_1_1_param>`;
+
+	// classes
+
+	class :ref:`Block<doxid-classaxl_1_1dox_1_1_block>`;
+	class :ref:`Footnote<doxid-classaxl_1_1dox_1_1_footnote>`;
+	class :ref:`Group<doxid-classaxl_1_1dox_1_1_group>`;
+	class :ref:`Module<doxid-classaxl_1_1dox_1_1_module>`;
+	class :ref:`Parser<doxid-classaxl_1_1dox_1_1_parser>`;
+
+	// global functions
+
+	void
+	:target:`appendXmlElementContents<doxid-namespaceaxl_1_1dox_1a90ea0e4ea26c03bdc9e4c9529252aeba>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& contents
+		);
+
+	} // namespace dox

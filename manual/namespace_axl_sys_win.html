@@ -1,0 +1,577 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>namespace axl::sys::win &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="enum axl::sys::win::FILE_INFORMATION_CLASS" href="enum_axl_sys_win_FILE_INFORMATION_CLASS.html" />
+    <link rel="prev" title="class axl::sys::psx::ThreadAttr" href="class_axl_sys_psx_ThreadAttr.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_drw.html">namespace axl::sys::drw</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_lnx.html">namespace axl::sys::lnx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_psx.html">namespace axl::sys::psx</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">namespace axl::sys::win</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sys_SjljFrame.html">struct axl::sys::SjljFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sys_Time.html">struct axl::sys::Time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_InvertedSemaphore.html">class axl::sys::InvertedSemaphore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ReadWriteLock.html">class axl::sys::ReadWriteLock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ScopeLock.html">class axl::sys::ScopeLock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ScopedTlsPtrSlot.html">template class axl::sys::ScopedTlsPtrSlot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsMgr.html">class axl::sys::TlsMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsPtrSlot.html">template class axl::sys::TlsPtrSlot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsSlot.html">class axl::sys::TlsSlot</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_sys.html">namespace axl::sys</a> &raquo;</li>
+        
+      <li>namespace axl::sys::win</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="namespace-axl-sys-win">
+<span id="doxid-namespaceaxl-1-1sys-1-1win"></span><span id="index-0"></span><h1>namespace axl::sys::win</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="k">namespace</span> <span class="n">win</span> <span class="p">{</span>
+
+<span class="c1">// typedefs</span>
+
+<span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">sl::Handle</span></a><span></span><span class="o">&lt;</span><span class="n">HANDLE</span><span class="p">,</span> <a class="reference internal" href="class_axl_sys_win_CloseHandle.html#doxid-classaxl-1-1sys-1-1win-1-1-close-handle"><span class="std std-ref">CloseHandle</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a33e12f5072657f6c60fe2fc2aa51ad12"><span></span><span class="n">Handle</span></span><span></span><span class="p">;</span>
+<span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">sl::Handle</span></a><span></span><span class="o">&lt;</span><span class="n">HKEY</span><span class="p">,</span> <a class="reference internal" href="class_axl_sys_win_CloseRegKey.html#doxid-classaxl-1-1sys-1-1win-1-1-close-reg-key"><span class="std std-ref">CloseRegKey</span></a><span></span><span class="p">,</span> <a class="reference internal" href="class_axl_sl_MinusOne.html#doxid-classaxl-1-1sl-1-1-minus-one"><span class="std std-ref">sl::MinusOne</span></a><span></span><span class="o">&lt;</span><span class="n">HKEY</span><span class="o">&gt;&gt;</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a0a80d112536e45b836ec27ad16779e3d"><span></span><span class="n">RegKeyHandle</span></span><span></span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a3005b2d3fd61142ecac5c139b6d04cf2"><span></span><span class="n">NtQueryDirectoryFileFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">IN</span> <span class="n">HANDLE</span> <span class="n">FileHandle</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">HANDLE</span> <span class="n">Event</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">PVOID</span> <span class="n">ApcRoutine</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">PVOID</span> <span class="n">ApcContext</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PIO_STATUS_BLOCK</span> <span class="n">IoStatusBlock</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PVOID</span> <span class="n">FileInformation</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">ULONG</span> <span class="n">Length</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">INT</span> <span class="n">FileInformationClass</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">BOOLEAN</span> <span class="n">ReturnSingleEntry</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">PVOID</span> <span class="n">FileName</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">BOOLEAN</span> <span class="n">RestartScan</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a5762a83cd4fb7a1c8287315e5444e5f4"><span></span><span class="n">NtOpenDirectoryObjectFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">OUT</span> <span class="n">PHANDLE</span> <span class="n">DirectoryHandle</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">ACCESS_MASK</span> <span class="n">DesiredAccess</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">POBJECT_ATTRIBUTES</span> <span class="n">ObjectAttributes</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a489a41e80e9cb4230d461d834b70d018"><span></span><span class="n">NtQueryDirectoryObjectFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">IN</span> <span class="n">HANDLE</span> <span class="n">DirectoryHandle</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PVOID</span> <span class="n">Buffer</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">ULONG</span> <span class="n">Length</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">BOOLEAN</span> <span class="n">ReturnSingleEntry</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">BOOLEAN</span> <span class="n">RestartScan</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">PULONG</span> <span class="n">Context</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PULONG</span> <span class="n">ReturnLength</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a5032072c8c1c26b7b673497dc3bbd860"><span></span><span class="n">NtOpenSymbolicLinkObjectFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">OUT</span> <span class="n">PHANDLE</span> <span class="n">LinkHandle</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">ACCESS_MASK</span> <span class="n">DesiredAccess</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">POBJECT_ATTRIBUTES</span> <span class="n">ObjectAttributes</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ad7d29f13f6d1df842734391139166816"><span></span><span class="n">NtQuerySymbolicLinkObjectFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">IN</span> <span class="n">HANDLE</span> <span class="n">LinkHandle</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PUNICODE_STRING</span> <span class="n">LinkTarget</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PULONG</span> <span class="n">ReturnedLength</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1afc3d046ddb384d810e3afec2429decd3"><span></span><span class="n">NtQueryInformationFileFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">HANDLE</span> <span class="n">FileHandle</span><span class="p">,</span>
+    <span class="n">PIO_STATUS_BLOCK</span> <span class="n">IoStatusBlock</span><span class="p">,</span>
+    <span class="n">PVOID</span> <span class="n">FileInformation</span><span class="p">,</span>
+    <span class="n">ULONG</span> <span class="n">Length</span><span class="p">,</span>
+    <span class="n">FILE_INFORMATION_CLASS</span> <span class="n">FileInformationClass</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a22a1ea892fa20efb39df306e74a03f11"><span></span><span class="n">NtQueryInformationProcessFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">HANDLE</span> <span class="n">ProcessHandle</span><span class="p">,</span>
+    <span class="n">PROCESSINFOCLASS</span> <span class="n">ProcessInformationClass</span><span class="p">,</span>
+    <span class="n">PVOID</span> <span class="n">ProcessInformation</span><span class="p">,</span>
+    <span class="n">ULONG</span> <span class="n">ProcessInformationLength</span><span class="p">,</span>
+    <span class="n">PULONG</span> <span class="n">ReturnLength</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">NTSTATUS</span> <span class="n">NTAPI</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1acf520f36103885ac51b993df05173d21"><span></span><span class="n">NtQueryObjectFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">IN</span> <span class="n">HANDLE</span> <span class="n">FileHandle</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">OBJECT_INFORMATION_CLASS</span> <span class="n">InformationClass</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PVOID</span> <span class="n">Buffer</span><span class="p">,</span>
+    <span class="n">IN</span> <span class="n">ULONG</span> <span class="n">BufferSize</span><span class="p">,</span>
+    <span class="n">OUT</span> <span class="n">PULONG</span> <span class="n">ReturnedLength</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">sl::Handle</span></a><span></span><span class="o">&lt;</span><span class="n">SC_HANDLE</span><span class="p">,</span> <a class="reference internal" href="class_axl_sys_win_CloseServiceHandle.html#doxid-classaxl-1-1sys-1-1win-1-1-close-service-handle"><span class="std std-ref">CloseServiceHandle</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a6a12057ce9b5e5beb69cccfad0a537ce"><span></span><span class="n">ServiceHandle</span></span><span></span><span class="p">;</span>
+
+<span class="c1">// enums</span>
+
+<span class="k">enum</span>
+<span class="p">{</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77af98366fae9afdf03ff0fea6b65ed7373"><span></span><span class="n">STATUS_NO_MORE_FILES</span></span><span></span>          <span class="o">=</span> <span class="mh">0x80000006</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77a8246c2443465a5551bca950b6c836f23"><span></span><span class="n">STATUS_NO_MORE_ENTRIES</span></span><span></span>        <span class="o">=</span> <span class="mh">0x8000001a</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77a70ca8f7d7103ddef2e956d4ab60b8efd"><span></span><span class="n">STATUS_INFO_LENGTH_MISMATCH</span></span><span></span>   <span class="o">=</span> <span class="mh">0xc0000004</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77a8dbebbadc9403ed0b7bfa09c45a7f638"><span></span><span class="n">STATUS_BUFFER_TOO_SMALL</span></span><span></span>       <span class="o">=</span> <span class="mh">0xc0000023</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77aaa0e5df26d7d5be1bf4fb5459a75ca4f"><span></span><span class="n">DIRECTORY_QUERY</span></span><span></span>               <span class="o">=</span> <span class="mh">0x0001</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77a5eedf855c80082d49ff668c188efa395"><span></span><span class="n">DIRECTORY_TRAVERSE</span></span><span></span>            <span class="o">=</span> <span class="mh">0x0002</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77a0fbf21f6a51710516b5a69b467341d3f"><span></span><span class="n">DIRECTORY_CREATE_OBJECT</span></span><span></span>       <span class="o">=</span> <span class="mh">0x0004</span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a415d54e65e7c658afda1921f514d8a77a60444ba89579b92081af0b36680d6198"><span></span><span class="n">DIRECTORY_CREATE_SUBDIRECTORY</span></span><span></span> <span class="o">=</span> <span class="mh">0x0008</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_sys_win_FILE_INFORMATION_CLASS.html#doxid-namespaceaxl-1-1sys-1-1win-1a0294c03dc070067b45047ca8d93fa57f"><span class="std std-ref">FILE_INFORMATION_CLASS</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_sys_win_OBJECT_INFORMATION_CLASS.html#doxid-namespaceaxl-1-1sys-1-1win-1a04e8b34a5a6563fa122beac657f948a3"><span class="std std-ref">OBJECT_INFORMATION_CLASS</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_sys_win_PROCESSINFOCLASS.html#doxid-namespaceaxl-1-1sys-1-1win-1ae1c55ddcfa904c6f63d62de9a97630ed"><span class="std std-ref">PROCESSINFOCLASS</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_sys_win_WaitResult.html#doxid-namespaceaxl-1-1sys-1-1win-1a5228e60d504126e6486748ac545c55d8"><span class="std std-ref">WaitResult</span></a><span></span><span class="p">;</span>
+
+<span class="c1">// structs</span>
+
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_sys_win_FILE_BASIC_INFORMATION.html#doxid-structaxl-1-1sys-1-1win-1-1-f-i-l-e-b-a-s-i-c-i-n-f-o-r-m-a-t-i-o-n"><span class="std std-ref">FILE_BASIC_INFORMATION</span></a><span></span><span class="p">;</span>
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_sys_win_FILE_DIRECTORY_INFORMATION.html#doxid-structaxl-1-1sys-1-1win-1-1-f-i-l-e-d-i-r-e-c-t-o-r-y-i-n-f-o-r-m-a-t-i-o-n"><span class="std std-ref">FILE_DIRECTORY_INFORMATION</span></a><span></span><span class="p">;</span>
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_sys_win_OBJECT_DIRECTORY_INFORMATION.html#doxid-structaxl-1-1sys-1-1win-1-1-o-b-j-e-c-t-d-i-r-e-c-t-o-r-y-i-n-f-o-r-m-a-t-i-o-n"><span class="std std-ref">OBJECT_DIRECTORY_INFORMATION</span></a><span></span><span class="p">;</span>
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_sys_win_OBJECT_NAME_INFORMATION.html#doxid-structaxl-1-1sys-1-1win-1-1-o-b-j-e-c-t-n-a-m-e-i-n-f-o-r-m-a-t-i-o-n"><span class="std std-ref">OBJECT_NAME_INFORMATION</span></a><span></span><span class="p">;</span>
+
+<span class="c1">// classes</span>
+
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_AccessToken.html#doxid-classaxl-1-1sys-1-1win-1-1-access-token"><span class="std std-ref">AccessToken</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Bstr.html#doxid-classaxl-1-1sys-1-1win-1-1-bstr"><span class="std std-ref">Bstr</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CertStore.html#doxid-classaxl-1-1sys-1-1win-1-1-cert-store"><span class="std std-ref">CertStore</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Certificate.html#doxid-classaxl-1-1sys-1-1win-1-1-certificate"><span class="std std-ref">Certificate</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CloseCertStore.html#doxid-classaxl-1-1sys-1-1win-1-1-close-cert-store"><span class="std std-ref">CloseCertStore</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CloseCryptMsg.html#doxid-classaxl-1-1sys-1-1win-1-1-close-crypt-msg"><span class="std std-ref">CloseCryptMsg</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CloseHandle.html#doxid-classaxl-1-1sys-1-1win-1-1-close-handle"><span class="std std-ref">CloseHandle</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CloseRegKey.html#doxid-classaxl-1-1sys-1-1win-1-1-close-reg-key"><span class="std std-ref">CloseRegKey</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CloseServiceHandle.html#doxid-classaxl-1-1sys-1-1win-1-1-close-service-handle"><span class="std std-ref">CloseServiceHandle</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CriticalSection.html#doxid-classaxl-1-1sys-1-1win-1-1-critical-section"><span class="std std-ref">CriticalSection</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_CryptMsg.html#doxid-classaxl-1-1sys-1-1win-1-1-crypt-msg"><span class="std std-ref">CryptMsg</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_DestroyDeviceInfoSet.html#doxid-classaxl-1-1sys-1-1win-1-1-destroy-device-info-set"><span class="std std-ref">DestroyDeviceInfoSet</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_DeviceInfo.html#doxid-classaxl-1-1sys-1-1win-1-1-device-info"><span class="std std-ref">DeviceInfo</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_DeviceInfoSet.html#doxid-classaxl-1-1sys-1-1win-1-1-device-info-set"><span class="std std-ref">DeviceInfoSet</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Event.html#doxid-classaxl-1-1sys-1-1win-1-1-event"><span class="std std-ref">Event</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_FreeBstr.html#doxid-classaxl-1-1sys-1-1win-1-1-free-bstr"><span class="std std-ref">FreeBstr</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_FreeCertContext.html#doxid-classaxl-1-1sys-1-1win-1-1-free-cert-context"><span class="std std-ref">FreeCertContext</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_FreeLibrary.html#doxid-classaxl-1-1sys-1-1win-1-1-free-library"><span class="std std-ref">FreeLibrary</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_JobObject.html#doxid-classaxl-1-1sys-1-1win-1-1-job-object"><span class="std std-ref">JobObject</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Library.html#doxid-classaxl-1-1sys-1-1win-1-1-library"><span class="std std-ref">Library</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_NtStatus.html#doxid-classaxl-1-1sys-1-1win-1-1-nt-status"><span class="std std-ref">NtStatus</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_NtStatusProvider.html#doxid-classaxl-1-1sys-1-1win-1-1-nt-status-provider"><span class="std std-ref">NtStatusProvider</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_PerfCounter.html#doxid-classaxl-1-1sys-1-1win-1-1-perf-counter"><span class="std std-ref">PerfCounter</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Process.html#doxid-classaxl-1-1sys-1-1win-1-1-process"><span class="std std-ref">Process</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Semaphore.html#doxid-classaxl-1-1sys-1-1win-1-1-semaphore"><span class="std std-ref">Semaphore</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Service.html#doxid-classaxl-1-1sys-1-1win-1-1-service"><span class="std std-ref">Service</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_ServiceMgr.html#doxid-classaxl-1-1sys-1-1win-1-1-service-mgr"><span class="std std-ref">ServiceMgr</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Sid.html#doxid-classaxl-1-1sys-1-1win-1-1-sid"><span class="std std-ref">Sid</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_SizeOfSid.html#doxid-classaxl-1-1sys-1-1win-1-1-size-of-sid"><span class="std std-ref">SizeOfSid</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_Thread.html#doxid-classaxl-1-1sys-1-1win-1-1-thread"><span class="std std-ref">Thread</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_VirtualMemory.html#doxid-classaxl-1-1sys-1-1win-1-1-virtual-memory"><span class="std std-ref">VirtualMemory</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_WaitableHandle.html#doxid-classaxl-1-1sys-1-1win-1-1-waitable-handle"><span class="std std-ref">WaitableHandle</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_WaitableTimer.html#doxid-classaxl-1-1sys-1-1win-1-1-waitable-timer"><span class="std std-ref">WaitableTimer</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_WinError.html#doxid-classaxl-1-1sys-1-1win-1-1-win-error"><span class="std std-ref">WinError</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_sys_win_WinErrorProvider.html#doxid-classaxl-1-1sys-1-1win-1-1-win-error-provider"><span class="std std-ref">WinErrorProvider</span></a><span></span><span class="p">;</span>
+
+<span class="c1">// global variables</span>
+
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SP_DEVINFO_DATA</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a245eeb431b308701973801a0261387b3"><span></span><span class="n">g_nullDevInfoData</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SP_DEVINFO_DATA</span><span class="p">)</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1a3005b2d3fd61142ecac5c139b6d04cf2"><span class="std std-ref">NtQueryDirectoryFileFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ae25113caaa9b43c1e23d718b9b921ab9"><span></span><span class="n">ntQueryDirectoryFile</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1a5762a83cd4fb7a1c8287315e5444e5f4"><span class="std std-ref">NtOpenDirectoryObjectFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a1af2435eb0b44f5d5cc4eb3112bcbdbe"><span></span><span class="n">ntOpenDirectoryObject</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1a489a41e80e9cb4230d461d834b70d018"><span class="std std-ref">NtQueryDirectoryObjectFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a584528d98f7dc33fd8c7413acd6ab5a0"><span></span><span class="n">ntQueryDirectoryObject</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1a5032072c8c1c26b7b673497dc3bbd860"><span class="std std-ref">NtOpenSymbolicLinkObjectFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a2e5c838ca3b352d0f68ddb9662953a6b"><span></span><span class="n">ntOpenSymbolicLinkObject</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1ad7d29f13f6d1df842734391139166816"><span class="std std-ref">NtQuerySymbolicLinkObjectFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a00f8dbdad5efd5268d0fb7948244ba4a"><span></span><span class="n">ntQuerySymbolicLinkObject</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1afc3d046ddb384d810e3afec2429decd3"><span class="std std-ref">NtQueryInformationFileFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ad5745f2eb590efac0044beb9a48f0010"><span></span><span class="n">ntQueryInformationFile</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1a22a1ea892fa20efb39df306e74a03f11"><span class="std std-ref">NtQueryInformationProcessFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1af97d0b5a9df2e83be191f268615e33f0"><span></span><span class="n">ntQueryInformationProcess</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <a class="reference internal" href="#doxid-namespaceaxl-1-1sys-1-1win-1acf520f36103885ac51b993df05173d21"><span class="std std-ref">NtQueryObjectFunc</span></a><span></span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ad7f25ae166e28a0373e24a27073cfa9e"><span></span><span class="n">ntQueryObject</span></span><span></span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID_IDENTIFIER_AUTHORITY</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a4d70a99aeda4e769c59acdb60a3178b3"><span></span><span class="n">g_nullSidAuthority</span></span><span></span> <span class="o">=</span> <span class="n">SECURITY_NULL_SID_AUTHORITY</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID_IDENTIFIER_AUTHORITY</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a3e2439babcee573723b2dde849109833"><span></span><span class="n">g_worldSidAuthority</span></span><span></span> <span class="o">=</span> <span class="n">SECURITY_WORLD_SID_AUTHORITY</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID_IDENTIFIER_AUTHORITY</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a7c249223315f6aaab9d0b1c9ddba7aef"><span></span><span class="n">g_localSidAuthority</span></span><span></span> <span class="o">=</span> <span class="n">SECURITY_LOCAL_SID_AUTHORITY</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID_IDENTIFIER_AUTHORITY</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a5b25cca7d9ab6459fddf1795a1d25395"><span></span><span class="n">g_creatorSidAuthority</span></span><span></span> <span class="o">=</span> <span class="n">SECURITY_CREATOR_SID_AUTHORITY</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID_IDENTIFIER_AUTHORITY</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a0f0c3c911ac6b745f2e978ff6b2118ab"><span></span><span class="n">g_nonUniqueSidAuthority</span></span><span></span> <span class="o">=</span> <span class="n">SECURITY_NON_UNIQUE_AUTHORITY</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID_IDENTIFIER_AUTHORITY</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a67c2421347bcb93c6e22eb440ee735d1"><span></span><span class="n">g_resMgrSidAuthority</span></span><span></span> <span class="o">=</span> <span class="n">SECURITY_RESOURCE_MANAGER_AUTHORITY</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID_IDENTIFIER_AUTHORITY</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1acdf545fdfa46b100c900665ea6af84d0"><span></span><span class="n">g_ntSidAuthority</span></span><span></span> <span class="o">=</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">;</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a508a994f192257b6da3bb7c3fce31c52"><span></span><span class="n">g_worldSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_WORLD_SID_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_WORLD_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1aa0c3c40c651755e946710660bdfbce84"><span></span><span class="n">g_localSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_LOCAL_SID_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_LOCAL_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a9c2f752290fed7ed0f2008e48725d223"><span></span><span class="n">g_creatorOwnerSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_CREATOR_SID_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_CREATOR_OWNER_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a382310031baef8100e4d73bb4de00f9a"><span></span><span class="n">g_creatorGroupSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_CREATOR_SID_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_CREATOR_GROUP_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a2ffb6e99a94aa6a9d75054f42ad78d17"><span></span><span class="n">g_dialupSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_DIALUP_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a03a0189642a49153e1f10c661e2ab18f"><span></span><span class="n">g_networkSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_NETWORK_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ab8a48d834cc87a378c0dc2b46a9f18e7"><span></span><span class="n">g_batchSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_BATCH_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1aaba4ea89ff74fee5c2c9d49e7f26d31f"><span></span><span class="n">g_interactiveSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_INTERACTIVE_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1aa24c698097f7beed75ca4fd4a88144f0"><span></span><span class="n">g_serviceSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_SERVICE_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a5f1ac6826bd40c455e520850c2cac91a"><span></span><span class="n">g_anonymousSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_ANONYMOUS_LOGON_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a870720d495745b4302a17fea05e7ad71"><span></span><span class="n">g_proxySid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_PROXY_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a6136a35d0652c19b75b2de746941d3dc"><span></span><span class="n">g_enterpriseSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_ENTERPRISE_CONTROLLERS_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1af095361d552a5636a2fd9206859efec7"><span></span><span class="n">g_selfSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_PRINCIPAL_SELF_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a915d5b7fb8309b38612e61d4cd627607"><span></span><span class="n">g_authenticatedSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_AUTHENTICATED_USER_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1adb7c5b56e9a2e7ba24320d12ac7cc27d"><span></span><span class="n">g_terminalServerSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_TERMINAL_SERVER_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a3b8203be7007ff02d56b9860a91d1dca"><span></span><span class="n">g_systemSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_LOCAL_SYSTEM_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ae954809b0bd5c813d2a816ec7aeedac9"><span></span><span class="n">g_localServiceSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_LOCAL_SERVICE_RID</span> <span class="p">};</span>
+<span class="n">AXL_SELECT_ANY</span> <span class="n">SID</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1aefd08f26cc1c72d933b237074f5174ae"><span></span><span class="n">g_networkServiceSid</span></span><span></span> <span class="o">=</span> <span class="p">{</span> <span class="n">SID_REVISION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SECURITY_NT_AUTHORITY</span><span class="p">,</span> <span class="n">SECURITY_NETWORK_SERVICE_RID</span> <span class="p">};</span>
+
+<span class="c1">// global functions</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ae6f30d76ad3011562fd93daf548e5740"><span></span><span class="n">verifyAuthenticodeSignature</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a7375808d9fca58d1037da98f92680ad7"><span class="std std-ref">sl::StringRef_w</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">,</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1af48c091365c4e43d1fe0621316b75161"><span class="std std-ref">sl::String_w</span></a><span></span><span class="o">*</span> <span class="n">programName</span><span class="p">,</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1af48c091365c4e43d1fe0621316b75161"><span class="std std-ref">sl::String_w</span></a><span></span><span class="o">*</span> <span class="n">subjectName</span><span class="p">,</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1af48c091365c4e43d1fe0621316b75161"><span class="std std-ref">sl::String_w</span></a><span></span><span class="o">*</span> <span class="n">issuerName</span><span class="p">,</span>
+    <a class="reference internal" href="class_axl_sl_Array.html#doxid-classaxl-1-1sl-1-1-array"><span class="std std-ref">sl::Array</span></a><span></span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;*</span> <span class="n">serialNumber</span><span class="p">,</span>
+    <span class="kt">uint64_t</span><span class="o">*</span> <span class="n">timestamp</span>
+    <span class="p">);</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">HRESULT</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1adc9ea3a9cdb2b6d3df106af90c2dc81c"><span></span><span class="n">createBstrFromString</span></span><span></span><span class="p">(</span>
+    <span class="n">BSTR</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="class_axl_sl_StringRefBase.html#doxid-classaxl-1-1sl-1-1-string-ref-base"><span class="std std-ref">sl::StringRefBase</span></a><span></span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">string</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a9fb954c5d7834d39db713be07e3de349"><span></span><span class="n">findCryptAttr</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">CRYPT_ATTRIBUTES</span><span class="o">*</span> <span class="n">attributes</span><span class="p">,</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">oid</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a82a3a914db409fe69c6eadb03164eca4"><span></span><span class="n">getCryptMsgSignerInfoProgramName</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1af48c091365c4e43d1fe0621316b75161"><span class="std std-ref">sl::String_w</span></a><span></span><span class="o">*</span> <span class="n">programName</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">CMSG_SIGNER_INFO</span><span class="o">*</span> <span class="n">signerInfo</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1af48c091365c4e43d1fe0621316b75161"><span class="std std-ref">sl::String_w</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a5915f56771c22c8b3947f2593fac34d2"><span></span><span class="n">getCryptMsgSignerInfoProgramName</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">CMSG_SIGNER_INFO</span><span class="o">*</span> <span class="n">signerInfo</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a46a404c290cdd45c0ae7689ae2587535"><span></span><span class="n">getCryptMsgSignerInfoTimestamp</span></span><span></span><span class="p">(</span>
+    <span class="kt">uint64_t</span><span class="o">*</span> <span class="n">timestamp</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">CMSG_SIGNER_INFO</span><span class="o">*</span> <span class="n">signerInfo</span>
+    <span class="p">);</span>
+
+<span class="kt">uint64_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a13d1da18bf9946cf4989855d2ee02231"><span></span><span class="n">getCryptMsgSignerInfoTimestamp</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">CMSG_SIGNER_INFO</span><span class="o">*</span> <span class="n">signerInfo</span><span class="p">);</span>
+
+<span class="kt">void</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1aa87ae9ee73dbdc5fbef525be452e2e89"><span></span><span class="n">initNtDllFunctions</span></span><span></span><span class="p">();</span>
+
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a12d6e7a99a0ba1309a8d5060c6241053"><span></span><span class="n">AXL_SL_DEFINE_GUID</span></span><span></span><span class="p">(</span>
+    <span class="n">g_ntStatusGuid</span><span class="p">,</span>
+    <span class="mh">0x81443347</span><span class="p">,</span>
+    <span class="mh">0x3bc9</span><span class="p">,</span>
+    <span class="mh">0x4d5e</span><span class="p">,</span>
+    <span class="mh">0x8b</span><span class="p">,</span>
+    <span class="mh">0x23</span><span class="p">,</span>
+    <span class="mh">0x32</span><span class="p">,</span>
+    <span class="mh">0xd7</span><span class="p">,</span>
+    <span class="mh">0x80</span><span class="p">,</span>
+    <span class="mh">0xed</span><span class="p">,</span>
+    <span class="mh">0xb5</span><span class="p">,</span>
+    <span class="mh">0x2b</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a9c7483cc6b4156d12d240a34651d74f1"><span></span><span class="n">setNtStatus</span></span><span></span><span class="p">(</span><span class="kt">long</span> <span class="n">status</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a54170f0504169ce5c7b99cad5337391b"><span></span><span class="n">syncExec</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a7375808d9fca58d1037da98f92680ad7"><span class="std std-ref">sl::StringRef_w</span></a><span></span><span class="o">&amp;</span> <span class="n">cmdLine</span><span class="p">,</span>
+    <a class="reference internal" href="class_axl_sl_Array.html#doxid-classaxl-1-1sl-1-1-array"><span class="std std-ref">sl::Array</span></a><span></span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;*</span> <span class="n">output</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">exitCode</span> <span class="o">=</span> <span class="nb">NULL</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1af48c091365c4e43d1fe0621316b75161"><span class="std std-ref">sl::String_w</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1ade1cabe770b6e18de92b4b94d2ea556f"><span></span><span class="n">getProcessImageName</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">pid</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a2922bb74d7441216ae4bace8779c814c"><span></span><span class="n">cryptQueryObjectFile</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a7375808d9fca58d1037da98f92680ad7"><span class="std std-ref">sl::StringRef_w</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">expectedContentTypeFlags</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">expectedFormatTypeFlags</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">flags</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">encodingType</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">contentType</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">formatType</span><span class="p">,</span>
+    <span class="n">HCERTSTORE</span><span class="o">*</span> <span class="n">certStore</span><span class="p">,</span>
+    <span class="n">HCRYPTMSG</span><span class="o">*</span> <span class="n">cryptMsg</span><span class="p">,</span>
+    <span class="k">const</span> <span class="kt">void</span><span class="o">**</span> <span class="n">context</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a2fe67fbba2299fbea8141ddcf6ee38d6"><span></span><span class="n">cryptDecodeObject</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="class_axl_sl_Array.html#doxid-classaxl-1-1sl-1-1-array"><span class="std std-ref">sl::Array</span></a><span></span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;*</span> <span class="n">buffer</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">encodingType</span><span class="p">,</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">oid</span><span class="p">,</span>
+    <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+    <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a55499637ca9c7545d8e81f7e4706bef9"><span></span><span class="n">cryptDecodeObject</span></span><span></span><span class="p">(</span>
+    <span class="kt">void</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span>
+    <span class="kt">size_t</span> <span class="n">bufferSize</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">encodingType</span><span class="p">,</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">oid</span><span class="p">,</span>
+    <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+    <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">);</span>
+
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a0d3175cfab34e9f88ee2c72b8c99b85f"><span></span><span class="n">AXL_SL_DEFINE_GUID</span></span><span></span><span class="p">(</span>
+    <span class="n">g_winErrorGuid</span><span class="p">,</span>
+    <span class="mh">0x54e100e8</span><span class="p">,</span>
+    <span class="mh">0x2137</span><span class="p">,</span>
+    <span class="mh">0x40b8</span><span class="p">,</span>
+    <span class="mh">0xbc</span><span class="p">,</span>
+    <span class="mh">0xd8</span><span class="p">,</span>
+    <span class="mh">0x0</span><span class="p">,</span>
+    <span class="mh">0xac</span><span class="p">,</span>
+    <span class="mh">0x1d</span><span class="p">,</span>
+    <span class="mh">0xb</span><span class="p">,</span>
+    <span class="mh">0xaa</span><span class="p">,</span>
+    <span class="mh">0x16</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1aa8d3f1904406b0bebd917a445310ae3c"><span></span><span class="n">setWinError</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">code</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a1fafdab6b15a7790477b7c7d0b564354"><span></span><span class="n">verifyTrustFile</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a7375808d9fca58d1037da98f92680ad7"><span class="std std-ref">sl::StringRef_w</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1sys-1-1win-1a358615a6dcd68ce918f853c6e8f7ad28"><span></span><span class="n">verifyTrustFile</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+<span class="p">}</span> <span class="c1">// namespace win</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="enum_axl_sys_win_FILE_INFORMATION_CLASS.html" class="btn btn-neutral float-right" title="enum axl::sys::win::FILE_INFORMATION_CLASS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_sys_psx_ThreadAttr.html" class="btn btn-neutral float-left" title="class axl::sys::psx::ThreadAttr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

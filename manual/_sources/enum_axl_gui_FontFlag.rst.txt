@@ -1,0 +1,22 @@
+.. index:: pair: enum; FontFlag
+.. _doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14b:
+
+enum axl::gui::FontFlag
+=======================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_FontDesc.h>
+
+	enum FontFlag
+	{
+	    :target:`FontFlag_Undefined<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14ba6d956c622a98f22d4d4671e3bdede459>` = 0x10,
+	    :target:`FontFlag_Bold<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14ba74952bfcf07c97b3c06c4e7a13aee14a>`      = 0x01,
+	    :target:`FontFlag_Italic<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14ba11ac828655d7736215c6c4e7a3411160>`    = 0x02,
+	    :target:`FontFlag_Underline<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14ba25304fd7589953f1db2bcb8a811c7918>` = 0x04,
+	    :target:`FontFlag_Strikeout<doxid-namespaceaxl_1_1gui_1ae730ecbfc44a7e363fb57e069409d14ba4d913d51dbffb2e5f30cf123656a570b>` = 0x08,
+	};
+

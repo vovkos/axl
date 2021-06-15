@@ -1,0 +1,99 @@
+.. index:: pair: class; axl::sl::ArrayDetails
+.. _doxid-classaxl_1_1sl_1_1_array_details:
+
+template class axl::sl::ArrayDetails
+====================================
+
+.. toctree::
+	:hidden:
+
+	class_axl_sl_ArrayDetails_Construct.rst
+	class_axl_sl_ArrayDetails_Hdr.rst
+	class_axl_sl_ArrayDetails_ZeroConstruct.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_ArrayDetails.h>
+	
+	template <typename T>
+	class ArrayDetails: public :ref:`axl::sl::ReverseArray<doxid-classaxl_1_1sl_1_1_reverse_array>`
+	{
+	public:
+		// enums
+	
+		enum
+		{
+		    :target:`IsSimple<doxid-classaxl_1_1sl_1_1_array_details_1a569c0ae8493327a4949c35f175fa31ada021e5c7df1a4b4142a8753600eb1dc3d>` = false,
+		};
+
+		// classes
+	
+		class :ref:`Construct<doxid-classaxl_1_1sl_1_1_array_details_1_1_construct>`;
+		class :ref:`Hdr<doxid-classaxl_1_1sl_1_1_array_details_1_1_hdr>`;
+		class :ref:`ZeroConstruct<doxid-classaxl_1_1sl_1_1_array_details_1_1_zero_construct>`;
+
+		// methods
+	
+		static
+		void
+		:target:`setHdrCount<doxid-classaxl_1_1sl_1_1_array_details_1a6796757b124854ea95357681cc44ded6>`(
+			:ref:`Hdr<doxid-classaxl_1_1sl_1_1_array_details_1_1_hdr>`* hdr,
+			size_t count
+			);
+	
+		static
+		void
+		:target:`constructCopy<doxid-classaxl_1_1sl_1_1_array_details_1a62834cf3d4b7f7f3e3f47bdfb48ef7c2>`(
+			T* dst,
+			const T* src,
+			size_t count
+			);
+	
+		static
+		void
+		:target:`destruct<doxid-classaxl_1_1sl_1_1_array_details_1a11b67414908fc435c2758c91661a2e6c>`(
+			T* p,
+			size_t count
+			);
+	
+		static
+		void
+		:target:`copy<doxid-classaxl_1_1sl_1_1_array_details_1a028d295983b893b908c5a8b442a7ffbd>`(
+			T* dst,
+			const T* src,
+			size_t count
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef :ref:`ArgType<doxid-classaxl_1_1sl_1_1_arg_type>`<T>::Type :ref:`ValueArg<doxid-classaxl_1_1sl_1_1_reverse_array_1a3f2a2e3e291b32f903a240b451886f25>`;
+
+		// methods
+	
+		static
+		void
+		:ref:`reverse<doxid-classaxl_1_1sl_1_1_reverse_array_1a896bf438ee00d674f17c8c762a4a527c>`(
+			T* dst,
+			size_t count
+			);
+	
+		static
+		void
+		:ref:`copyReverse<doxid-classaxl_1_1sl_1_1_reverse_array_1af13a9685e4c8c51c1ea6c380f53ad152>`(
+			T* dst,
+			const T* src,
+			size_t count
+			);
+

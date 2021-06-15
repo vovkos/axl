@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>template class axl::re::NfaStateSetMap &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::re::NfaTransitionMgr" href="class_axl_re_NfaTransitionMgr.html" />
+    <link rel="prev" title="struct axl::re::NfaTransition" href="struct_axl_re_NfaTransition.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_re_MatchConditionKind.html">enum axl::re::MatchConditionKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_re_NfaStateFlag.html">enum axl::re::NfaStateFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_DfaState.html">struct axl::re::DfaState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_DfaTransition.html">struct axl::re::DfaTransition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_MatchCondition.html">struct axl::re::MatchCondition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_NfaState.html">struct axl::re::NfaState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_NfaStateSet.html">struct axl::re::NfaStateSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_NfaTransition.html">struct axl::re::NfaTransition</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">template class axl::re::NfaStateSetMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_NfaTransitionMgr.html">class axl::re::NfaTransitionMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_Regex.html">class axl::re::Regex</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_RegexCompiler.html">class axl::re::RegexCompiler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_RegexNameMgr.html">class axl::re::RegexNameMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_StdRegexNameMgr.html">class axl::re::StdRegexNameMgr</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_re.html">namespace axl::re</a> &raquo;</li>
+        
+      <li>template class axl::re::NfaStateSetMap</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="template-class-axl-re-nfastatesetmap">
+<span id="doxid-classaxl-1-1re-1-1-nfa-state-set-map"></span><span id="index-0"></span><h1>template class axl::re::NfaStateSetMap</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_re_Nfa.h&gt;</span><span class="cp"></span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nl">NfaStateSetMap</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table"><span class="std std-ref">axl::sl::HashTable</span></a><span></span>
+<span class="p">{</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// typedefs</span>
+
+    <span class="k">typedef</span> <a class="reference internal" href="struct_axl_sl_HashTableEntry.html#doxid-structaxl-1-1sl-1-1-hash-table-entry"><span class="std std-ref">HashTableEntry</span></a><span></span><span class="o">&lt;</span><span class="n">Key</span><span class="p">,</span> <span class="n">Value</span><span class="o">&gt;</span> <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1adf26d9eae5caea4517c36a24f350af25"><span class="std std-ref">Entry</span></a><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_Iterator.html#doxid-classaxl-1-1sl-1-1-iterator"><span class="std std-ref">sl::Iterator</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1adf26d9eae5caea4517c36a24f350af25"><span class="std std-ref">Entry</span></a><span></span><span class="o">&gt;</span> <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_ConstIterator.html#doxid-classaxl-1-1sl-1-1-const-iterator"><span class="std std-ref">sl::ConstIterator</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1adf26d9eae5caea4517c36a24f350af25"><span class="std std-ref">Entry</span></a><span></span><span class="o">&gt;</span> <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a883e0e64ee3007571ace6623eb4cdf53"><span class="std std-ref">ConstIterator</span></a><span></span><span class="p">;</span>
+    <span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_AuxList.html#doxid-classaxl-1-1sl-1-1-aux-list"><span class="std std-ref">Entry::Bucket</span></a><span></span> <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1afeabeafa14ad28ac13587139a12b5e7e"><span class="std std-ref">Bucket</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// enums</span>
+
+    <span class="k">enum</span> <a class="reference internal" href="enum_axl_sl_HashTable_Def.html#doxid-classaxl-1-1sl-1-1-hash-table-1a273fc71ec3c09b6f9b2a3b79659b3dd0"><span class="std std-ref">Def</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="n">Value</span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a6da1e74e45b527e6544b335cb1c167e3"><span class="std std-ref">operator[]</span></a><span></span><span class="p">(</span><span class="n">KeyArg</span> <span class="n">key</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a3678a84bf593a28a59d0e22827853a5c"><span class="std std-ref">clear</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a5b8d65d5c211762b678ae66ce0ef66ab"><span class="std std-ref">isEmpty</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1aeab1ef790aa7c738d14a48d1e25ad568"><span class="std std-ref">getHead</span></a><span></span><span class="p">();</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a883e0e64ee3007571ace6623eb4cdf53"><span class="std std-ref">ConstIterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a3b46191ee4e6aafcc22dd2ad93b0aa1a"><span class="std std-ref">getHead</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1aa5a8c885293b47cad1704e7d25c96b6e"><span class="std std-ref">getTail</span></a><span></span><span class="p">();</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a883e0e64ee3007571ace6623eb4cdf53"><span class="std std-ref">ConstIterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a2e68cf873987ba3004bd14e35f121ac8"><span class="std std-ref">getTail</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a7f93da7bd35a87a1708813a5e88e535d"><span class="std std-ref">getCount</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1af2d59a0578d52b4e0451d79b81e2d931"><span class="std std-ref">getBucketCount</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a78f6021d05ce03908ce0d5c084c68bed"><span class="std std-ref">setBucketCount</span></a><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">bucketCount</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1ab8e764d81ea0643dbeae97dd54b86086"><span class="std std-ref">getResizeThreshold</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a29a9130670bcafa6d21c3cfe19ddc43f"><span class="std std-ref">setResizeThreshold</span></a><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">resizeThreshold</span><span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a92d42933423f9599d91856b13ca35804"><span class="std std-ref">find</span></a><span></span><span class="p">(</span><span class="n">KeyArg</span> <span class="n">key</span><span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a883e0e64ee3007571ace6623eb4cdf53"><span class="std std-ref">ConstIterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a0270f9f301676d8d5dc89021920146e6"><span class="std std-ref">find</span></a><span></span><span class="p">(</span><span class="n">KeyArg</span> <span class="n">key</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">Value</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a0572ceba7fa74219e65c31cf889884a7"><span class="std std-ref">findValue</span></a><span></span><span class="p">(</span>
+        <span class="n">KeyArg</span> <span class="n">key</span><span class="p">,</span>
+        <span class="n">ValueArg</span> <span class="n">undefinedValue</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1ae93f7dda1316575f4c23bc98f9b09c7a"><span class="std std-ref">visit</span></a><span></span><span class="p">(</span><span class="n">KeyArg</span> <span class="n">key</span><span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a6b2c876e07c3ccb064cc8261deccd76c"><span class="std std-ref">add</span></a><span></span><span class="p">(</span>
+        <span class="n">KeyArg</span> <span class="n">key</span><span class="p">,</span>
+        <span class="n">ValueArg</span> <span class="n">value</span><span class="p">,</span>
+        <span class="kt">bool</span><span class="o">*</span> <span class="n">isNew</span> <span class="o">=</span> <span class="nb">NULL</span>
+        <span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1adfbecf2258d5dab85c337ea3c233dd04"><span class="std std-ref">addIfNotExists</span></a><span></span><span class="p">(</span>
+        <span class="n">KeyArg</span> <span class="n">key</span><span class="p">,</span>
+        <span class="n">ValueArg</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1abc46d570087d441a4b0c3f874d46add6"><span class="std std-ref">erase</span></a><span></span><span class="p">(</span><a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a60afcc4ba4486871d191fd9634dba55d"><span class="std std-ref">Iterator</span></a><span></span> <span class="n">it</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1ac6fe3c70cb7ad4a670be30629d17d55e"><span class="std std-ref">eraseKey</span></a><span></span><span class="p">(</span><span class="n">KeyArg</span> <span class="n">key</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1ac037367a9a8fe3a82172817afbb0ce8c"><span class="std std-ref">sortByKey</span></a><span></span><span class="p">();</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Compare</span><span class="o">&gt;</span>
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1acecda62d0a3d99a73709d53a1870f162"><span class="std std-ref">sortByKey</span></a><span></span><span class="p">(</span><span class="n">Compare</span> <span class="n">compare</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1a8504d4084373adffcec89fb62815fee9"><span class="std std-ref">sortByValue</span></a><span></span><span class="p">();</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Compare</span><span class="o">&gt;</span>
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_HashTable.html#doxid-classaxl-1-1sl-1-1-hash-table-1addc9b6e2e87bdfab1210f06447d47d46"><span class="std std-ref">sortByValue</span></a><span></span><span class="p">(</span><span class="n">Compare</span> <span class="n">compare</span><span class="p">);</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_re_NfaTransitionMgr.html" class="btn btn-neutral float-right" title="class axl::re::NfaTransitionMgr" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="struct_axl_re_NfaTransition.html" class="btn btn-neutral float-left" title="struct axl::re::NfaTransition" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

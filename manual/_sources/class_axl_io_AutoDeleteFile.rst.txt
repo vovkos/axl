@@ -1,0 +1,30 @@
+.. index:: pair: class; axl::io::AutoDeleteFile
+.. _doxid-classaxl_1_1io_1_1_auto_delete_file:
+
+class axl::io::AutoDeleteFile
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_File.h>
+	
+	class AutoDeleteFile
+	{
+	public:
+		// fields
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_fileName<doxid-classaxl_1_1io_1_1_auto_delete_file_1a97fe92f4e1426d78b92b78ce6eb185a1>`;
+
+		// construction
+	
+		:target:`AutoDeleteFile<doxid-classaxl_1_1io_1_1_auto_delete_file_1a9dcce5ce302030faad8fd126887387b0>`();
+		:target:`AutoDeleteFile<doxid-classaxl_1_1io_1_1_auto_delete_file_1a135a63fe3b8f3bab25447b8a338c2165>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+		:target:`~AutoDeleteFile<doxid-classaxl_1_1io_1_1_auto_delete_file_1a7f9796027438f79c8db44c0e84c133d1>`();
+	};

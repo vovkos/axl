@@ -1,0 +1,45 @@
+.. index:: pair: class; axl::sys::TlsMgr
+.. _doxid-classaxl_1_1sys_1_1_tls_mgr:
+
+class axl::sys::TlsMgr
+======================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_sys_TlsMgr_Page.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_TlsMgr.h>
+	
+	class TlsMgr
+	{
+	public:
+		// structs
+	
+		struct :ref:`Page<doxid-structaxl_1_1sys_1_1_tls_mgr_1_1_page>`;
+
+		// construction
+	
+		:target:`TlsMgr<doxid-classaxl_1_1sys_1_1_tls_mgr_1a9e7c8182063569cf7787068b6d3050d3>`();
+		:target:`~TlsMgr<doxid-classaxl_1_1sys_1_1_tls_mgr_1a4f2f71024b12ed0387cbb916b549c824>`();
+
+		// methods
+	
+		size_t
+		:target:`createSlot<doxid-classaxl_1_1sys_1_1_tls_mgr_1a14f2f1d5feabdca9c1c5533a0bb09296>`();
+	
+		:ref:`TlsValue<doxid-namespaceaxl_1_1sys_1a3f3f51bbf35d0223f5d73049daee1c01>`
+		:target:`getSlotValue<doxid-classaxl_1_1sys_1_1_tls_mgr_1a165636e0ce042c11e9caf1d6d3c4dd73>`(size_t slot);
+	
+		:ref:`TlsValue<doxid-namespaceaxl_1_1sys_1a3f3f51bbf35d0223f5d73049daee1c01>`
+		:target:`setSlotValue<doxid-classaxl_1_1sys_1_1_tls_mgr_1abb972bc6de55c6cbefbce675ca5d1185>`(
+			size_t slot,
+			const :ref:`TlsValue<doxid-namespaceaxl_1_1sys_1a3f3f51bbf35d0223f5d73049daee1c01>`& value
+			);
+	};

@@ -1,0 +1,337 @@
+.. index:: pair: class; axl::sys::lnx::Udev
+.. _doxid-classaxl_1_1sys_1_1lnx_1_1_udev:
+
+class axl::sys::lnx::Udev
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_lnx_Udev.h>
+	
+	class Udev
+	{
+	public:
+		// methods
+	
+		static
+		struct udev*
+		:target:`udev_ref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ac4c832ae1cd9ebf120f9fdd53836baa1>`(struct udev* context);
+	
+		static
+		struct udev*
+		:target:`udev_unref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a9804bb158e27c5491d14f5c7a85d3da2>`(struct udev* context);
+	
+		static
+		struct udev*
+		:target:`udev_new<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ac23c868d7c1ac1f2a9b492f06f651d06>`();
+	
+		static
+		struct udev_device*
+		:target:`udev_device_new_from_syspath<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a1f48c0e8a73e1e6aba35dd2ccd9cd6a0>`(
+			struct udev* context,
+			const char* syspath
+			);
+	
+		static
+		struct udev_device*
+		:target:`udev_device_new_from_devnum<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a657ba427d89053f4fdb6b310aece1452>`(
+			struct udev* context,
+			char type,
+			dev_t devnum
+			);
+	
+		static
+		struct udev_device*
+		:target:`udev_device_new_from_subsystem_sysname<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a484014c1eba294c54e78a89dc5073aa0>`(
+			struct udev* context,
+			const char* subsystem,
+			const char* sysname
+			);
+	
+		static
+		struct udev_device*
+		:target:`udev_device_new_from_environment<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a7a38ec976bf6039f44d310039c417489>`(struct udev* context);
+	
+		static
+		struct udev_enumerate*
+		:target:`udev_enumerate_new<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a2efa31de6ccab344e07f8aa404e798a8>`(struct udev* context);
+	
+		static
+		struct udev_monitor*
+		:target:`udev_monitor_new_from_netlink<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ab3d9bcf719ceca3caf5062ceae3292b1>`(
+			struct udev* context,
+			const char* name
+			);
+	
+		static
+		struct udev_device*
+		:target:`udev_device_ref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ae97f68727205789aaf6b7008f3f52fde>`(struct udev_device* device);
+	
+		static
+		struct udev_device*
+		:target:`udev_device_unref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1aed672b5a881b70409335cc23c924f479>`(struct udev_device* device);
+	
+		static
+		struct udev*
+		:target:`udev_device_get_udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a9acd42879c92839d4c532b645a3fd41d>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_syspath<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a19c6ee5508eebec37ba90f82d08ac24c>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_sysname<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a88ba6bda6093318a1b28f8dda00c72af>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_sysnum<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1aafffe7d5738ed7a6defc794a8fa1456e>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_devpath<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1aec850ee345acf10f789e699344a5fb43>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_devnode<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1addd9d73d78ad13a4f609a0bdada8ea65>`(struct udev_device* device);
+	
+		static
+		dev_t
+		:target:`udev_device_get_devnum<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a329a7cc832c3ca6a53f0794a55e6a82c>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_devtype<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a25afa9cb34927800a550bc3a5b069dbf>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_subsystem<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a3039d38328bcafb928a744836987b03c>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_driver<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1adff35db5bf201a6e162f851df9508852>`(struct udev_device* device);
+	
+		static
+		struct udev_device*
+		:target:`udev_device_get_parent<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a823e92bd3ffb2d429f6a44f8067ebb0d>`(struct udev_device* device);
+	
+		static
+		struct udev_device*
+		:target:`udev_device_get_parent_with_subsystem_devtype<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a2b62d68588f5e522abeadf7d47e9f9e3>`(
+			struct udev_device* device,
+			const char* subsystem,
+			const char* devtype
+			);
+	
+		static
+		bool
+		:target:`udev_device_get_is_initialized<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a5dc6227e195cc7ca175e18fe63dea7c8>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_action<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a9c9ccfae5bc4990190a8f08ee84f9849>`(struct udev_device* device);
+	
+		static
+		struct udev_list_entry*
+		:target:`udev_device_get_devlinks_list_entry<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a8a6d4f5026edf00f8cd41446eeeba373>`(struct udev_device* device);
+	
+		static
+		struct udev_list_entry*
+		:target:`udev_device_get_properties_list_entry<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1aeefdc6dd23034f9551c184927fcad852>`(struct udev_device* device);
+	
+		static
+		struct udev_list_entry*
+		:target:`udev_device_get_tags_list_entry<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a131e70657e67adc950cfbf2d0f7853db>`(struct udev_device* device);
+	
+		static
+		struct udev_list_entry*
+		:target:`udev_device_get_sysattr_list_entry<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1aa1a23de765cc516495cb5faabeb3aefb>`(struct udev_device* device);
+	
+		static
+		const char*
+		:target:`udev_device_get_property_value<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1aaaebc7a7a68d60228deab6c1f7535810>`(
+			struct udev_device* device,
+			const char* key
+			);
+	
+		static
+		int
+		:target:`udev_device_has_tag<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a1521f32767e9e6b2f58894bcd90c03b5>`(
+			struct udev_device* device,
+			const char* tag
+			);
+	
+		static
+		struct udev_enumerate*
+		:target:`udev_enumerate_ref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a183a9a2e6351ba00a7e1f8ccffb09ed2>`(struct udev_enumerate* enumerate);
+	
+		static
+		struct udev_enumerate*
+		:target:`udev_enumerate_unref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a56a5c11da8809ca230e7602c49c003d3>`(struct udev_enumerate* enumerate);
+	
+		static
+		struct udev*
+		:target:`udev_enumerate_get_udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a888f4d735fb023c9125d99a89a3a5125>`(struct udev_enumerate* enumerate);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_match_subsystem_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ae18f43a1681eac43a4e2ccf84376206a>`(
+			struct udev_enumerate* enumerate,
+			const char* subsystem
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_nomatch_subsystem_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a6e8aebf6f7d670332d004b0993ddf675>`(
+			struct udev_enumerate* enumerate,
+			const char* subsystem
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_match_sysattr_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1af504fd2564be6f502bec932feb92f942>`(
+			struct udev_enumerate* enumerate,
+			const char* sysattr,
+			const char* value
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_nomatch_sysattr_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ad59fd74151c9d1ab0d0ef82d64c17af8>`(
+			struct udev_enumerate* enumerate,
+			const char* sysattr,
+			const char* value
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_match_property_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a50bdd21f2b357a6fb17ca224988412cf>`(
+			struct udev_enumerate* enumerate,
+			const char* property,
+			const char* value
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_match_sysname_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ad56be3f387af1f1017ea359ef5673494>`(
+			struct udev_enumerate* enumerate,
+			const char* sysname
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_match_tag_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1acf3bea981e3886797df668a3eeb143f7>`(
+			struct udev_enumerate* enumerate,
+			const char* tag
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_match_parent_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a2e8a9bb388667ee09d124fc83783381c>`(
+			struct udev_enumerate* enumerate,
+			struct udev_device* parent
+			);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_match_is_initialized_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a05dc553dbf91066f00ef0a1bd054e20b>`(struct udev_enumerate* enumerate);
+	
+		static
+		bool
+		:target:`udev_enumerate_scan_devices_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a44de4a63ade03fcf8a1a9fb068df42ce>`(struct udev_enumerate* enumerate);
+	
+		static
+		bool
+		:target:`udev_enumerate_scan_subsystems_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a9a20f285c49579b351dcd334b5d4af12>`(struct udev_enumerate* enumerate);
+	
+		static
+		bool
+		:target:`udev_enumerate_add_syspath_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a57b5d5fcd5a8f1c968bf2dba3d255896>`(
+			struct udev_enumerate* enumerate,
+			const char* syspath
+			);
+	
+		static
+		struct udev_list_entry*
+		:target:`udev_enumerate_get_list_entry<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1adf39da2f5954f460fbcb5929159b9f12>`(struct udev_enumerate* enumerate);
+	
+		static
+		struct udev_list_entry*
+		:target:`udev_list_entry_get_next<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1abc298a4a81f6a2d78d06a2bfbe30efd4>`(struct udev_list_entry* entry);
+	
+		static
+		struct udev_list_entry*
+		:target:`udev_list_entry_get_by_name<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a4671795b942a9e890f191304646d4e71>`(
+			struct udev_list_entry* entry,
+			const char* name
+			);
+	
+		static
+		const char*
+		:target:`udev_list_entry_get_name<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a3a82f1160ce33cd9224f4f5f0fb4a086>`(struct udev_list_entry* entry);
+	
+		static
+		const char*
+		:target:`udev_list_entry_get_value<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a7759bb3740bc32822107ec06daa92c5f>`(struct udev_list_entry* entry);
+	
+		static
+		struct udev_monitor*
+		:target:`udev_monitor_ref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a043e0ad9a58f634de742f71378afd371>`(struct udev_monitor* monitor);
+	
+		static
+		struct udev_monitor*
+		:target:`udev_monitor_unref<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a5ae1d7cc4b58647714b26c1ced6808c0>`(struct udev_monitor* monitor);
+	
+		static
+		struct udev*
+		:target:`udev_monitor_get_udev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a330644e389433074ded40015db1cedeb>`(struct udev_monitor* monitor);
+	
+		static
+		int
+		:target:`udev_monitor_get_fd<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a7d7005ddced6c0aed706d5a7da91add6>`(struct udev_monitor* monitor);
+	
+		static
+		bool
+		:target:`udev_monitor_filter_update_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ac6c77290e547c1be53033d8f4ab15104>`(struct udev_monitor* monitor);
+	
+		static
+		bool
+		:target:`udev_monitor_filter_remove_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a2b6eab3c2af754172ed2f368c5992c5e>`(struct udev_monitor* monitor);
+	
+		static
+		bool
+		:target:`udev_monitor_filter_add_match_subsystem_devtype_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ac625ba5743677ffd9397a79654f3ad41>`(
+			struct udev_monitor* monitor,
+			const char* subsystem,
+			const char* devtype
+			);
+	
+		static
+		bool
+		:target:`udev_monitor_filter_add_match_tag_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1aae494727996be314d94f203e20b007b6>`(
+			struct udev_monitor* monitor,
+			const char* tag
+			);
+	
+		static
+		bool
+		:target:`udev_monitor_set_receive_buffer_size_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1ae805ce1bb88d99505f88df8ca0406e5f>`(
+			struct udev_monitor* monitor,
+			int size
+			);
+	
+		static
+		bool
+		:target:`udev_monitor_enable_receiving_b<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a7a4b318152da2004d0274427abc24fd9>`(struct udev_monitor* monitor);
+	
+		static
+		struct udev_device*
+		:target:`udev_monitor_receive_device<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_1a036f3789660410beaa0abbb359a88ed8>`(struct udev_monitor* monitor);
+	};

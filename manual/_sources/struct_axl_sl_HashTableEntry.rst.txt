@@ -1,0 +1,52 @@
+.. index:: pair: struct; axl::sl::HashTableEntry
+.. _doxid-structaxl_1_1sl_1_1_hash_table_entry:
+
+template struct axl::sl::HashTableEntry
+=======================================
+
+.. toctree::
+	:hidden:
+
+	class_axl_sl_HashTableEntry_BucketLink.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_HashTable.h>
+	
+	template <
+		typename Key,
+		typename Value
+		>
+	struct HashTableEntry: public :ref:`axl::sl::MapEntry<doxid-structaxl_1_1sl_1_1_map_entry>`
+	{
+		// classes
+	
+		class :ref:`BucketLink<doxid-classaxl_1_1sl_1_1_hash_table_entry_1_1_bucket_link>`;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		Value :ref:`m_value<doxid-structaxl_1_1sl_1_1_map_entry_1a8e3c472c441f67adac3ad8d33cfe0690>`;
+
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+	
+		const Key&
+		:ref:`getKey<doxid-structaxl_1_1sl_1_1_map_entry_1a435dbc84bc2e8f1071359ae588ac9b78>`() const;
+

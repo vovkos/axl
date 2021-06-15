@@ -1,0 +1,27 @@
+.. index:: pair: enum; StdCursorKind
+.. _doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bb:
+
+enum axl::gui::StdCursorKind
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Engine.h>
+
+	enum StdCursorKind
+	{
+	    :target:`StdCursorKind_Arrow<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bba4867e3671c6e3e17f7c2f85139156032>`     = 0,
+	    :target:`StdCursorKind_Wait<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bbab81c1b026779f34fa884ba0f86549015>`,
+	    :target:`StdCursorKind_IBeam<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bbab22595b2ec68363144ac4cac6c9ef25a>`,
+	    :target:`StdCursorKind_Hyperlink<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bba4b7e17afac7efa2b642239b04752cbf6>`,
+	    :target:`StdCursorKind_SizeNS<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bba405b01f1cdc2c36b7982d6c59516bec9>`,
+	    :target:`StdCursorKind_SizeWE<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bbad91acda9ff1270dfb587ad05de6c8ce4>`,
+	    :target:`StdCursorKind_SizeNWSE<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bba0deab33a66e608616ceb143eaace2b9c>`,
+	    :target:`StdCursorKind_SizeNESW<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bba5280c2c453fd64b8a5cafd3c74f59a23>`,
+	    :target:`StdCursorKind_SizeAll<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bba88cb4c67a897064e80b9749f95e126dd>`,
+	    :target:`StdCursorKind__Count<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bbaf2b6fa7e74ed674f354d258d87e97165>`,
+	};
+

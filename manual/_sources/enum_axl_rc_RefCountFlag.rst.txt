@@ -1,0 +1,18 @@
+.. index:: pair: enum; RefCountFlag
+.. _doxid-namespaceaxl_1_1rc_1a5d0642b89bf2b50fc413f7be3d7f8187:
+
+enum axl::rc::RefCountFlag
+==========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_rc_RefCount.h>
+
+	enum RefCountFlag
+	{
+	    :target:`RefCountFlag_Allocated<doxid-namespaceaxl_1_1rc_1a5d0642b89bf2b50fc413f7be3d7f8187a1f86f2c2aa4593e109b2d7d98a0d7880>` = 0x01,
+	};
+

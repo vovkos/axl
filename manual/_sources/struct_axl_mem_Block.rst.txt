@@ -1,0 +1,41 @@
+.. index:: pair: struct; axl::mem::Block
+.. _doxid-structaxl_1_1mem_1_1_block:
+
+struct axl::mem::Block
+======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Block.h>
+	
+	struct Block
+	{
+		// fields
+	
+		const void* :target:`m_p<doxid-structaxl_1_1mem_1_1_block_1af23699757ab254676ac70e58e08e1d1d>`;
+		size_t :target:`m_size<doxid-structaxl_1_1mem_1_1_block_1a92e1628dfc390905abb4a43411f5941c>`;
+
+		// construction
+	
+		:target:`Block<doxid-structaxl_1_1mem_1_1_block_1a0318906a585c5822edfb28bd45731147>`();
+	
+		:target:`Block<doxid-structaxl_1_1mem_1_1_block_1a85a72c813091a7b22724f3b98b8192b9>`(
+			const void* p,
+			size_t size
+			);
+
+		// methods
+	
+		void
+		:target:`setup<doxid-structaxl_1_1mem_1_1_block_1ada2756ae8351ec18570c3ee71a44d74e>`(
+			const void* p,
+			size_t size
+			);
+	};

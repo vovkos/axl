@@ -1,0 +1,593 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::lua::LuaNonOwnerState &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::lua::LuaState" href="class_axl_lua_LuaState.html" />
+    <link rel="prev" title="class axl::lua::LuaClose" href="class_axl_lua_LuaClose.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lua_LuaClose.html">class axl::lua::LuaClose</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">class axl::lua::LuaNonOwnerState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lua_LuaState.html">class axl::lua::LuaState</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_lua.html">namespace axl::lua</a> &raquo;</li>
+        
+      <li>class axl::lua::LuaNonOwnerState</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-lua-luanonownerstate">
+<span id="doxid-classaxl-1-1lua-1-1-lua-non-owner-state"></span><span id="index-0"></span><h1>class axl::lua::LuaNonOwnerState</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_lua_LuaState.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nl">LuaNonOwnerState</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state"><span class="std std-ref">axl::lua::LuaState</span></a><span></span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1lua-1-1-lua-non-owner-state-1a9c50043738246c5862e8bcaef38151a1"><span></span><span class="n">LuaNonOwnerState</span></span><span></span><span class="p">(</span><span class="n">lua_State</span><span class="o">*</span> <span class="n">h</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1lua-1-1-lua-non-owner-state-1aadf506b17e9d0006a1c3454ee5312287"><span></span><span class="o">~</span><span class="n">LuaNonOwnerState</span></span><span></span><span class="p">();</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// typedefs</span>
+
+    <span class="k">typedef</span> <span class="n">T</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a188765028bffca96ef6ed6638ce9f654"><span class="std std-ref">H</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ada6ac10b3fc0a5d2778b1dfc8adc6ca2"><span class="std std-ref">operator T</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0f0fad98719a4350af69d32a66d3e7ad"><span class="std std-ref">operator-&gt;</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">Handle</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0a34799e733a133110e663af5c695bb2"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a88cceffbbd3a1caeffaa998ac9c0c616"><span class="std std-ref">isOpen</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a4f4349dda184939edffd0c8229b20872"><span class="std std-ref">close</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a51e30365c2f9c7372a534dd776b1da9a"><span class="std std-ref">attach</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1aba1f7ac04018f2f403e94ddff96b7051"><span class="std std-ref">detach</span></a><span></span><span class="p">();</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1af56d375af50768cf2e1ea3ca06828db9"><span class="std std-ref">p</span></a><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ad0019f565f53583938191aafffb378e1"><span class="std std-ref">getInvalidHandle</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a278417dbd6ad9d9826f3b07cfe475409"><span class="std std-ref">create</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a54c3e6ef9267addcb3c523ed41c54ec3"><span class="std std-ref">load</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">source</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a30e4db90f77be999547c065cfb559799"><span class="std std-ref">loadFile</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1aaf18016242019aa71c981f7a26a6a2ba"><span class="std std-ref">doFile</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a180ca8ee705db846a53eabf702001d2b"><span class="std std-ref">openLibs</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a26d4249f4e114c1ca00088addf548199"><span class="std std-ref">where</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a5a85ae89d5ff35f177902c2d20103026"><span class="std std-ref">prepareErrorString</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a6a20c6b241b78724e1629ab9cb7f3812"><span class="std std-ref">prepareLastErrorString</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ad37fb27c24340990aed1a1091d6c9e2f"><span class="std std-ref">error</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a7fc5205b96078b1a3b45f8397bd5222c"><span class="std std-ref">clearStack</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">int</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a72cc20c436717c9de3b358c270437429"><span class="std std-ref">getTop</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a3b033cd6fee3e30d2e966fca6e7d6056"><span class="std std-ref">setTop</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a47369619e7949c590ff054396130a929"><span class="std std-ref">tryCheckStack</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">extraSlotCount</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a160f83c38c8bd3ef7163cbfb4b6f490b"><span class="std std-ref">checkStack</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">extraSlotCount</span><span class="p">);</span>
+
+    <span class="kt">int</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a1156ab9fcd159f057976114fcfc16463"><span class="std std-ref">getType</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">);</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ab535d29d9d6d5d3858d2b6daed58e2af"><span class="std std-ref">getTypeName</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">type</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a743c9b6d88a138f2d46d4ff40f2e8b35"><span class="std std-ref">getLen</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a141a72026b5daedfb91288168835f590"><span class="std std-ref">getRawLen</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1aa6a12710d63aace7091d5f666767f18f"><span class="std std-ref">insert</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ab9299e89bee0bba2c0ddb0171fea027b"><span class="std std-ref">remove</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a1eb58413600a40e653c9a1252dd24b88"><span class="std std-ref">swap</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ad7173305f8bbcd6d4e66a399d82a385c"><span class="std std-ref">concatenate</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1adc4049157958869c20ee41fa78559a5d"><span class="std std-ref">pushNil</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a1f1a79269a19fcb11d843b1d62f6dc2c"><span class="std std-ref">pushValue</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a1acfece70b8247a279df04c46f1612a3"><span class="std std-ref">pushInteger</span></a><span></span><span class="p">(</span><span class="n">lua_Integer</span> <span class="n">value</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a20ce2d4737bf0c6abc3f87456dfff1ec"><span class="std std-ref">pushBoolean</span></a><span></span><span class="p">(</span><span class="kt">bool</span> <span class="n">value</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1acc5b20955266aec90be8afcb6d1a79f9"><span class="std std-ref">pushString</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a538c9bb2e214351a9d563ae3a0c0203c"><span class="std std-ref">pushFormatString_va</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_va_list.html#doxid-classaxl-va-list"><span class="std std-ref">axl_va_list</span></a><span></span> <span class="n">va</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a0928f1d1bf6b1ce4841f7640dab71eaf"><span class="std std-ref">pushFormatString</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">format</span><span class="p">,</span>
+        <span class="p">...</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a4e2e4de50baa028ee836584f5bb7b1de"><span class="std std-ref">pushClosure</span></a><span></span><span class="p">(</span>
+        <span class="n">lua_CFunction</span> <span class="n">func</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">contextArgumentCount</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a31651134414ce8577fbcd753776a15b6"><span class="std std-ref">pushFunction</span></a><span></span><span class="p">(</span><span class="n">lua_CFunction</span> <span class="n">func</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ace37044fdf9002cb05a20513bfb59a4f"><span class="std std-ref">pushFunction</span></a><span></span><span class="p">(</span>
+        <span class="n">lua_CFunction</span> <span class="n">func</span><span class="p">,</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">context</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ae013c066d93998822707c1efe4bee0a7"><span class="std std-ref">tryCreateTable</span></a><span></span><span class="p">(</span>
+        <span class="kt">size_t</span> <span class="n">elementCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">memberCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">extraStackSlotCount</span> <span class="o">=</span> <span class="n">LUA_MINSTACK</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a28d5d433d9259b84f9e734f1a58a42b3"><span class="std std-ref">createTable</span></a><span></span><span class="p">(</span>
+        <span class="kt">size_t</span> <span class="n">elementCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">memberCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">extraStackSlotCount</span> <span class="o">=</span> <span class="n">LUA_MINSTACK</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a4db85f626cf44ca6b8da77e66a8d6f70"><span class="std std-ref">getTable</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a8ec2de9a4bc17c559f4f95052ed5b742"><span class="std std-ref">setTable</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a31d44d0823c56ebf97a27f1a9debab70"><span class="std std-ref">getMember</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a5e79d1ca75f87aaab849e592fe4ccc41"><span class="std std-ref">setMember</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a868c584951a28643b58af8e29f0ff95f"><span class="std std-ref">getArrayElement</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1abea106050f8f5331029eb5f2d85aae81"><span class="std std-ref">setArrayElement</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a569a3e7471479f391c87c73e498f0611"><span class="std std-ref">setMemberInteger</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="n">lua_Integer</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a613dc397b16894caa84e74960fb20c0f"><span class="std std-ref">setMemberBoolean</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1aae7d816ea134bee46da892c169019e04"><span class="std std-ref">setMemberString</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a3ee41a7ff5f2053103287f761e586e8a"><span class="std std-ref">setArrayElementInteger</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">index</span><span class="p">,</span>
+        <span class="n">lua_Integer</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a14e19a9e41c7b10e6208289df1da708f"><span class="std std-ref">setArrayElementString</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">index</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ac45cf9889b2945b5cf7d4ab8418aac31"><span class="std std-ref">pop</span></a><span></span><span class="p">(</span><span class="kt">size_t</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">lua_Integer</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1ad206a205877694783ae3a8cdee618456"><span class="std std-ref">getInteger</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">lua_Number</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a287a1fce1601baaf17d92f6d029aec26"><span class="std std-ref">getNumber</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1abc7548dd09c77991e8f2f4febd31e67a"><span class="std std-ref">getBoolean</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1aad93a4a3fdc0d1764c198977dc7b6985"><span class="std std-ref">getString</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">lua_Integer</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a1180b1ac8cd2b785de4cfd35caadbaf7"><span class="std std-ref">popInteger</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1acd9b815026f6fb35dfeb37b81a86d68b"><span class="std std-ref">popBoolean</span></a><span></span><span class="p">();</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a708bc7a2ce409768832a261c539d491a"><span class="std std-ref">popString</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1aec9e742be1624ee537575e0a18369681"><span class="std std-ref">getGlobal</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1aa28945d18603789bd991bf0d874a9e80"><span class="std std-ref">setGlobal</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">int</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1aa524b20bab11a8db3ca026ce0ec9a033"><span class="std std-ref">getGlobalArrayLen</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a09136004f4af7c4c3138115b8016898f"><span class="std std-ref">getGlobalArrayElement</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">index</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a978b52ec0e861b647667ddbaaf43e7a7"><span class="std std-ref">setGlobalArrayElement</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">index</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a22a510c399d24b7c2f74ca4564080202"><span class="std std-ref">getGlobalMember</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">member</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a667fb89866970aacf43c2ac188411e59"><span class="std std-ref">setGlobalMember</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">member</span>
+        <span class="p">);</span>
+
+    <span class="n">lua_Integer</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a2997d929a2d4f81cf490ce92561b723c"><span class="std std-ref">getGlobalInteger</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1af29a535c5e18c8a48b9a294478cda764"><span class="std std-ref">setGlobalInteger</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="n">lua_Integer</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a6934d55617b95539d7ffb461a8f6cfc7"><span class="std std-ref">getGlobalBoolean</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a267e5c7ca951422963258c341eb10ba7"><span class="std std-ref">setGlobalBoolean</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a9085eb13362ae049b9ea9d554a66c943"><span class="std std-ref">getGlobalString</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a6094046ab3ed537842abede7dfba43d8"><span class="std std-ref">setGlobalString</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a14b3eb7447964927ab9a5365d470e6cb"><span class="std std-ref">registerFunction</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="n">lua_CFunction</span> <span class="n">func</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1acf1bca233157f1fd80f182ee8cc25722"><span class="std std-ref">registerFunction</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <span class="n">lua_CFunction</span> <span class="n">func</span><span class="p">,</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">context</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a3c157ef766d118a5648193c58a04c30a"><span class="std std-ref">getContext</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">int</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a247c148219c6ac358333855aa7c07ab8"><span class="std std-ref">getUpValueIndex</span></a><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a5874f915e4c3e36631afa612749a09c4"><span class="std std-ref">call</span></a><span></span><span class="p">(</span>
+        <span class="kt">size_t</span> <span class="n">argumentCount</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">resultCount</span> <span class="o">=</span> <span class="n">LUA_MULTRET</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_lua_LuaState.html#doxid-classaxl-1-1lua-1-1-lua-state-1a963f4fed702918a8cfc4a081871ab7a0"><span class="std std-ref">PCall</span></a><span></span><span class="p">(</span>
+        <span class="kt">size_t</span> <span class="n">argumentCount</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">resultCount</span> <span class="o">=</span> <span class="n">LUA_MULTRET</span>
+        <span class="p">);</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_lua_LuaState.html" class="btn btn-neutral float-right" title="class axl::lua::LuaState" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_lua_LuaClose.html" class="btn btn-neutral float-left" title="class axl::lua::LuaClose" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

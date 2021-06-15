@@ -1,0 +1,316 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>struct axl::re::NfaState &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="struct axl::re::NfaStateSet" href="struct_axl_re_NfaStateSet.html" />
+    <link rel="prev" title="struct axl::re::MatchCondition" href="struct_axl_re_MatchCondition.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_re_MatchConditionKind.html">enum axl::re::MatchConditionKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_re_NfaStateFlag.html">enum axl::re::NfaStateFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_DfaState.html">struct axl::re::DfaState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_DfaTransition.html">struct axl::re::DfaTransition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_MatchCondition.html">struct axl::re::MatchCondition</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">struct axl::re::NfaState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_NfaStateSet.html">struct axl::re::NfaStateSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_re_NfaTransition.html">struct axl::re::NfaTransition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_NfaStateSetMap.html">template class axl::re::NfaStateSetMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_NfaTransitionMgr.html">class axl::re::NfaTransitionMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_Regex.html">class axl::re::Regex</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_RegexCompiler.html">class axl::re::RegexCompiler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_RegexNameMgr.html">class axl::re::RegexNameMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_re_StdRegexNameMgr.html">class axl::re::StdRegexNameMgr</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_re.html">namespace axl::re</a> &raquo;</li>
+        
+      <li>struct axl::re::NfaState</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="struct-axl-re-nfastate">
+<span id="doxid-structaxl-1-1re-1-1-nfa-state"></span><span id="index-0"></span><h1>struct axl::re::NfaState</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_re_Nfa.h&gt;</span><span class="cp"></span>
+
+<span class="k">struct</span> <span class="nl">NfaState</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="struct_axl_sl_ListLink.html#doxid-structaxl-1-1sl-1-1-list-link"><span class="std std-ref">axl::sl::ListLink</span></a><span></span>
+<span class="p">{</span>
+    <span class="c1">// fields</span>
+
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1ad2d4a8898bc049561b410a2091a34c46"><span></span><span class="n">m_id</span></span><span></span><span class="p">;</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1ae6fb181001a98bf561c9d718c989cdc1"><span></span><span class="n">m_flags</span></span><span></span><span class="p">;</span>
+    <span class="kt">void</span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1aeca2bbf76b0c9d022da29b0bb590628e"><span></span><span class="n">m_acceptContext</span></span><span></span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1a2b6f6c26d44d8dd805a891fa63deb745"><span></span><span class="n">m_captureId</span></span><span></span><span class="p">;</span>
+    <a class="reference internal" href="struct_axl_re_MatchCondition.html#doxid-structaxl-1-1re-1-1-match-condition"><span class="std std-ref">MatchCondition</span></a><span></span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1a2a10853ffbd603afde0faaef7dbe3ef8"><span></span><span class="n">m_matchCondition</span></span><span></span><span class="p">;</span>
+    <span class="n">NfaState</span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1aae08d4e59abaf9dc5b7391d41f7408f0"><span></span><span class="n">m_outState</span></span><span></span><span class="p">;</span>
+    <span class="n">NfaState</span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1aa4244b6c95e09849b25a33e562692e7e"><span></span><span class="n">m_outState2</span></span><span></span><span class="p">;</span>
+
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1a44a7b70cf9f3dbe9203a55597b94c273"><span></span><span class="n">NfaState</span></span><span></span><span class="p">();</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1a686afed708ba116d7dd012f367db65ea"><span></span><span class="n">createEpsilonLink</span></span><span></span><span class="p">(</span><span class="n">NfaState</span><span class="o">*</span> <span class="n">outState</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1a12eea2bb686a6854be2b8df30405f572"><span></span><span class="n">createEpsilonLink</span></span><span></span><span class="p">(</span>
+        <span class="n">NfaState</span><span class="o">*</span> <span class="n">outState</span><span class="p">,</span>
+        <span class="n">NfaState</span><span class="o">*</span> <span class="n">outState2</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1re-1-1-nfa-state-1a4c947547a77d2adca8294f3a935b5322"><span></span><span class="n">createCharMatch</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">c</span><span class="p">,</span>
+        <span class="n">NfaState</span><span class="o">*</span> <span class="n">outState</span>
+        <span class="p">);</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// methods</span>
+
+    <a class="reference internal" href="struct_axl_sl_ListLink.html#doxid-structaxl-1-1sl-1-1-list-link"><span class="std std-ref">ListLink</span></a><span></span><span class="o">*</span>
+    <a class="reference internal" href="struct_axl_sl_ListLink.html#doxid-structaxl-1-1sl-1-1-list-link-1ae7042c139305c20a6bf47e434f048480"><span class="std std-ref">getNext</span></a><span></span><span class="p">();</span>
+
+    <a class="reference internal" href="struct_axl_sl_ListLink.html#doxid-structaxl-1-1sl-1-1-list-link"><span class="std std-ref">ListLink</span></a><span></span><span class="o">*</span>
+    <a class="reference internal" href="struct_axl_sl_ListLink.html#doxid-structaxl-1-1sl-1-1-list-link-1aea63e8eb30d13618c2c507e5ff35fbf8"><span class="std std-ref">getPrev</span></a><span></span><span class="p">();</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="struct_axl_re_NfaStateSet.html" class="btn btn-neutral float-right" title="struct axl::re::NfaStateSet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="struct_axl_re_MatchCondition.html" class="btn btn-neutral float-left" title="struct axl::re::MatchCondition" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

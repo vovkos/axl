@@ -1,0 +1,26 @@
+.. index:: pair: struct; axl::spy::ImportWriteProtectionBackup
+.. _doxid-structaxl_1_1spy_1_1_import_write_protection_backup:
+
+struct axl::spy::ImportWriteProtectionBackup
+============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_spy_ImportWriteProtection.h>
+	
+	struct ImportWriteProtectionBackup
+	{
+		// fields
+	
+		void* :target:`m_p<doxid-structaxl_1_1spy_1_1_import_write_protection_backup_1ac04bdb75a48ac03bc669f300871b4694>`;
+		size_t :target:`m_size<doxid-structaxl_1_1spy_1_1_import_write_protection_backup_1a94bcfb2ae9ae39e91db80e289ee88937>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_flags<doxid-structaxl_1_1spy_1_1_import_write_protection_backup_1a95e418e2f1817fd3fcca8d6e3929ea68>`;
+		:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` :target:`m_oldProtection<doxid-structaxl_1_1spy_1_1_import_write_protection_backup_1ad2b9be6ce42bdee2f97b621033e59087>`;
+	};

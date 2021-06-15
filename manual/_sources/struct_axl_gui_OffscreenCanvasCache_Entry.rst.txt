@@ -1,0 +1,23 @@
+.. index:: pair: struct; axl::gui::OffscreenCanvasCache::Entry
+.. _doxid-structaxl_1_1gui_1_1_offscreen_canvas_cache_1_1_entry:
+
+struct axl::gui::OffscreenCanvasCache::Entry
+============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct Entry
+	{
+		// fields
+	
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>` :target:`m_size<doxid-structaxl_1_1gui_1_1_offscreen_canvas_cache_1_1_entry_1afca32ff4b9d74d6a42640a12beb23c66>`;
+		T :target:`m_canvas<doxid-structaxl_1_1gui_1_1_offscreen_canvas_cache_1_1_entry_1aed1921b2ee30ef6508d767c2034987b4>`;
+	};

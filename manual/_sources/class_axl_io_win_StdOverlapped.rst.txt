@@ -1,0 +1,28 @@
+.. index:: pair: class; axl::io::win::StdOverlapped
+.. _doxid-classaxl_1_1io_1_1win_1_1_std_overlapped:
+
+class axl::io::win::StdOverlapped
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_win_File.h>
+	
+	class StdOverlapped: public OVERLAPPED
+	{
+	public:
+		// fields
+	
+		:ref:`sys::NotificationEvent<doxid-namespaceaxl_1_1sys_1a7e759a24ab51968d1d6bd4362dc287bf>` :target:`m_completionEvent<doxid-classaxl_1_1io_1_1win_1_1_std_overlapped_1a8acbfcb8348fa3c1eab07dd311c128be>`;
+
+		// construction
+	
+		:target:`StdOverlapped<doxid-classaxl_1_1io_1_1win_1_1_std_overlapped_1a21549a0ebf8a04260df0ff22ad28531f>`();
+	};

@@ -1,0 +1,89 @@
+.. index:: pair: class; axl::sl::PackerSeq
+.. _doxid-classaxl_1_1sl_1_1_packer_seq:
+
+class axl::sl::PackerSeq
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Packer.h>
+	
+	class PackerSeq: public :ref:`axl::sl::Packer<doxid-classaxl_1_1sl_1_1_packer>`
+	{
+	public:
+		// methods
+	
+		virtual
+		:ref:`axl_va_list<doxid-classaxl__va__list>`
+		:target:`pack_va<doxid-classaxl_1_1sl_1_1_packer_seq_1a9d361b45ebfec290652c831abaf0fc1e>`(
+			void* p,
+			size_t* size,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_packer_seq_1ac3d0dd27562cecbc72b9d4ce7efe4845>`();
+	
+		size_t
+		:target:`append<doxid-classaxl_1_1sl_1_1_packer_seq_1aa75b2c9db268e7f00fca9a488301337a>`(:ref:`Packer<doxid-classaxl_1_1sl_1_1_packer>`* packer);
+	
+		template <typename T>
+		size_t
+		:target:`append<doxid-classaxl_1_1sl_1_1_packer_seq_1a82a83fe1630c5883de0ce47f71fb372c>`();
+	
+		size_t
+		:target:`appendFormat<doxid-classaxl_1_1sl_1_1_packer_seq_1a5d81db56fce160003ace7ce705c3608f>`(const char* formatString);
+	
+		size_t
+		:target:`format<doxid-classaxl_1_1sl_1_1_packer_seq_1a6ecd9bd9a4c83e6dda00805b09085caa>`(const char* formatString);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		:ref:`axl_va_list<doxid-classaxl__va__list>`
+		:ref:`pack_va<doxid-classaxl_1_1sl_1_1_packer_1afbd371f4814c0a1a696b941576acde85>`(
+			void* p,
+			size_t* size,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			) = 0;
+	
+		void
+		:ref:`pack<doxid-classaxl_1_1sl_1_1_packer_1a416da3d7d52e83de1c797dbade821e24>`(
+			void* p,
+			size_t* size,
+			...
+			);
+	
+		size_t
+		:ref:`count_va<doxid-classaxl_1_1sl_1_1_packer_1a02dbf3d84ba2937ca15e3854e2b16009>`(:ref:`axl_va_list<doxid-classaxl__va__list>` va);
+	
+		size_t
+		:ref:`count<doxid-classaxl_1_1sl_1_1_packer_1aff462c4ab43cb6dfac403383d34e545a>`(
+			int unused,
+			...
+			);
+	
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+		:ref:`createPackage_va<doxid-classaxl_1_1sl_1_1_packer_1a1a0ad1359d1731fbd978c45aee81a547>`(:ref:`axl_va_list<doxid-classaxl__va__list>` va);
+	
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+		:ref:`createPackage<doxid-classaxl_1_1sl_1_1_packer_1acb507c3694cad419ebbef7e82aac5b6f>`(
+			int unused,
+			...
+			);
+

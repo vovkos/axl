@@ -1,0 +1,42 @@
+.. index:: pair: struct; axl::sl::SwitchInfo
+.. _doxid-structaxl_1_1sl_1_1_switch_info:
+
+struct axl::sl::SwitchInfo
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_CmdLineParser.h>
+	
+	struct SwitchInfo: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+		// fields
+	
+		int :target:`m_switchKind<doxid-structaxl_1_1sl_1_1_switch_info_1a760ce299a1042d8baab8d6139d5218cf>`;
+		const char* :target:`m_nameTable<doxid-structaxl_1_1sl_1_1_switch_info_1a8856419063c32ce3b73b11432004e08d>`[4];
+		const char* :target:`m_value<doxid-structaxl_1_1sl_1_1_switch_info_1a4769de8832bccb81cb032e7d41abd754>`;
+		const char* :target:`m_description<doxid-structaxl_1_1sl_1_1_switch_info_1a2b4a35d34fc3907581f38e26759a02db>`;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

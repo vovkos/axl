@@ -1,0 +1,53 @@
+.. index:: pair: class; axl_va_list
+.. _doxid-classaxl__va__list:
+
+class axl_va_list
+=================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_g_Pch.h>
+	
+	class axl_va_list
+	{
+	public:
+		// construction
+	
+		:target:`axl_va_list<doxid-classaxl__va__list_1a8c14b3f9109bfb0c4d7711a68d49c0d5>`();
+		:target:`axl_va_list<doxid-classaxl__va__list_1a34c47bf3f8c551d606c07c0f075844d6>`(const axl_va_list& src);
+		:target:`axl_va_list<doxid-classaxl__va__list_1a6b28a78e3883c88bf6e79567b79cbac1>`(va_list va);
+		:target:`~axl_va_list<doxid-classaxl__va__list_1ab258eec210f3259b7edef6aa032963d7>`();
+
+		// methods
+	
+		axl_va_list&
+		:target:`operator=<doxid-classaxl__va__list_1a7794bbaa472419ef9fb36f96ca07dd42>`(const axl_va_list& src);
+	
+		axl_va_list&
+		:target:`operator=<doxid-classaxl__va__list_1aa7d31fce3b9e8f24821a9e987f70b897>`(va_list va);
+	
+		:target:`operator va_list &<doxid-classaxl__va__list_1a310d827e8118138551906c017fd191db>`();
+	
+		va_list*
+		:target:`initialize<doxid-classaxl__va__list_1a01129a86c870be9564ae6f8d849bf944>`();
+	
+		void
+		:target:`end<doxid-classaxl__va__list_1af0e599762ff6d9d8025c60a72fe1503f>`();
+	
+		void
+		:target:`copy<doxid-classaxl__va__list_1a35a4035d34c3d94a65ad837160eaa841>`(const axl_va_list& src);
+	
+		void
+		:target:`copy<doxid-classaxl__va__list_1aa1da3146776dc03455f7c8f3dea73796>`(va_list va);
+	
+		template <typename T>
+		T
+		:target:`arg<doxid-classaxl__va__list_1a2a566580e8a430c0873f98ae9dbbd1c4>`();
+	};

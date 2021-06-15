@@ -1,0 +1,36 @@
+.. index:: pair: class; axl::sys::psx::CondAttr
+.. _doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr:
+
+class axl::sys::psx::CondAttr
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_psx_Cond.h>
+	
+	class CondAttr
+	{
+	public:
+		// construction
+	
+		:target:`CondAttr<doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr_1a175cfb242f4708d91bb94aedaa0fd0e9>`();
+		:target:`~CondAttr<doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr_1a21635ca33eb9260c2ccfe2550e644388>`();
+
+		// methods
+	
+		:target:`operator const pthread_condattr_t *<doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr_1a1f6d714c70e040af881dabd82fca612b>`() const;
+		:target:`operator pthread_condattr_t *<doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr_1a9a2daf3152eb568ec0fbfb693249d544>`();
+	
+		bool
+		:target:`getProcessShared<doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr_1a73113148229de9c381ccf2e5b4ab740e>`(int* value) const;
+	
+		bool
+		:target:`setProcessShared<doxid-classaxl_1_1sys_1_1psx_1_1_cond_attr_1ac66738bef2be7e7884d695db165d895b>`(int value);
+	};

@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sl::SimpleArgType
+.. _doxid-classaxl_1_1sl_1_1_simple_arg_type:
+
+template class axl::sl::SimpleArgType
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_ArgType.h>
+	
+	template <typename T>
+	class SimpleArgType
+	{
+	public:
+		// typedefs
+	
+		typedef T :target:`Type<doxid-classaxl_1_1sl_1_1_simple_arg_type_1af149694f0304b446435e23645b3c58c9>`;
+	};

@@ -1,0 +1,37 @@
+.. index:: pair: class; axl::spy::ImportIteratorBase
+.. _doxid-classaxl_1_1spy_1_1_import_iterator_base:
+
+class axl::spy::ImportIteratorBase
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_spy_ImportEnumerator.h>
+	
+	class ImportIteratorBase
+	{
+	public:
+		// construction
+	
+		:target:`ImportIteratorBase<doxid-classaxl_1_1spy_1_1_import_iterator_base_1a841fb855c9fb51f53deb30783f3243a7>`();
+
+		// methods
+	
+		:target:`operator bool<doxid-classaxl_1_1spy_1_1_import_iterator_base_1a3d0ac602e89d822bb808cc08fb7c3d68>`();
+	
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`&
+		:target:`getSymbolName<doxid-classaxl_1_1spy_1_1_import_iterator_base_1a8b5bb2551b597160220c87f357991126>`() const;
+	
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`&
+		:target:`getModuleName<doxid-classaxl_1_1spy_1_1_import_iterator_base_1a33d9e0eb190cb4d9e46b39dacb4d5ba5>`() const;
+	
+		void**
+		:target:`getSlot<doxid-classaxl_1_1spy_1_1_import_iterator_base_1a73bbaf8e775d0a7b4f91dc9f2f497070>`() const;
+	};

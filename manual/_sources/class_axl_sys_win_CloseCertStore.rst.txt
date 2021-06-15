@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::win::CloseCertStore
+.. _doxid-classaxl_1_1sys_1_1win_1_1_close_cert_store:
+
+class axl::sys::win::CloseCertStore
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_Certificate.h>
+	
+	class CloseCertStore
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1win_1_1_close_cert_store_1ab72e0ee675fc9d899dcd1df3d0dc01b9>`(HCERTSTORE h);
+	};

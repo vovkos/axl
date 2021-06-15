@@ -1,0 +1,143 @@
+.. index:: pair: namespace; axl::sys
+.. _doxid-namespaceaxl_1_1sys:
+
+namespace axl::sys
+==================
+
+.. toctree::
+	:hidden:
+
+	namespace_axl_sys_drw.rst
+	namespace_axl_sys_lnx.rst
+	namespace_axl_sys_psx.rst
+	namespace_axl_sys_win.rst
+	struct_axl_sys_SjljFrame.rst
+	struct_axl_sys_Time.rst
+	class_axl_sys_InvertedSemaphore.rst
+	class_axl_sys_ReadWriteLock.rst
+	class_axl_sys_ScopeLock.rst
+	class_axl_sys_ScopedTlsPtrSlot.rst
+	class_axl_sys_TlsMgr.rst
+	class_axl_sys_TlsPtrSlot.rst
+	class_axl_sys_TlsSlot.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace sys {
+
+	// namespaces
+
+	namespace :ref:`axl::sys::drw<doxid-namespaceaxl_1_1sys_1_1drw>`;
+	namespace :ref:`axl::sys::lnx<doxid-namespaceaxl_1_1sys_1_1lnx>`;
+	namespace :ref:`axl::sys::psx<doxid-namespaceaxl_1_1sys_1_1psx>`;
+	namespace :ref:`axl::sys::win<doxid-namespaceaxl_1_1sys_1_1win>`;
+
+	// typedefs
+
+	typedef EventBase<:ref:`sl::False<doxid-classaxl_1_1sl_1_1_false>`<bool>> :target:`Event<doxid-namespaceaxl_1_1sys_1a9f63c021a9ecb5db1559b62d7df2469d>`;
+	typedef EventBase<:ref:`sl::True<doxid-classaxl_1_1sl_1_1_true>`<bool>> :target:`NotificationEvent<doxid-namespaceaxl_1_1sys_1a7e759a24ab51968d1d6bd4362dc287bf>`;
+	typedef NameableEventBase<:ref:`sl::False<doxid-classaxl_1_1sl_1_1_false>`<bool>> :target:`NameableEvent<doxid-namespaceaxl_1_1sys_1aa127c78c710a3f2e212fac6786e0e7d7>`;
+	typedef NameableEventBase<:ref:`sl::True<doxid-classaxl_1_1sl_1_1_true>`<bool>> :target:`NameableNotificationEvent<doxid-namespaceaxl_1_1sys_1a6eca57def7f840c7d148a6af67d1c7f1>`;
+	typedef :ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<void> :target:`TlsValue<doxid-namespaceaxl_1_1sys_1a3f3f51bbf35d0223f5d73049daee1c01>`;
+
+	// structs
+
+	struct :ref:`SjljFrame<doxid-structaxl_1_1sys_1_1_sjlj_frame>`;
+	struct :ref:`Time<doxid-structaxl_1_1sys_1_1_time>`;
+
+	// classes
+
+	class :ref:`InvertedSemaphore<doxid-classaxl_1_1sys_1_1_inverted_semaphore>`;
+	class :ref:`ReadWriteLock<doxid-classaxl_1_1sys_1_1_read_write_lock>`;
+	class :ref:`ScopeLock<doxid-classaxl_1_1sys_1_1_scope_lock>`;
+
+	template <typename T>
+	class :ref:`ScopedTlsPtrSlot<doxid-classaxl_1_1sys_1_1_scoped_tls_ptr_slot>`;
+
+	class :ref:`TlsMgr<doxid-classaxl_1_1sys_1_1_tls_mgr>`;
+
+	template <typename T>
+	class :ref:`TlsPtrSlot<doxid-classaxl_1_1sys_1_1_tls_ptr_slot>`;
+
+	class :ref:`TlsSlot<doxid-classaxl_1_1sys_1_1_tls_slot>`;
+
+	// global functions
+
+	void
+	:target:`atomicUpdatePeak<doxid-namespaceaxl_1_1sys_1af793944042bfe9c020e3d59f4c252e05>`(
+		volatile int32_t* peak,
+		int32_t current
+		);
+
+	void
+	:target:`yieldProcessor<doxid-namespaceaxl_1_1sys_1a9db8a7f91a82888e0ff7db14c068b435>`();
+
+	void
+	:target:`atomicLock<doxid-namespaceaxl_1_1sys_1aa82ad312bea77824de03e897928d3774>`(volatile int32_t* lock);
+
+	void
+	:target:`atomicUnlock<doxid-namespaceaxl_1_1sys_1acedb4c8266f2783ee185851090f3e012>`(volatile int32_t* lock);
+
+	:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+	:target:`getCurrentProcessId<doxid-namespaceaxl_1_1sys_1aeb7fc95d6b5b144e876cc014feeb8a71>`();
+
+	bool
+	:target:`createProcess<doxid-namespaceaxl_1_1sys_1a4ce338aedf63b8738d8bd503512c9293>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& commandLine);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getProcessImageName<doxid-namespaceaxl_1_1sys_1ac8240b9b53da8422575724f964833f47>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` pid);
+
+	void
+	:target:`sjljThrow<doxid-namespaceaxl_1_1sys_1acb9659fb4beaf229f1c9d47bbcabd207>`();
+
+	uint64_t
+	:target:`getTimestamp<doxid-namespaceaxl_1_1sys_1ae33f6e9801a26bb78bbc621f3f4c3ca2>`();
+
+	uint64_t
+	:target:`getPreciseTimestamp<doxid-namespaceaxl_1_1sys_1a4e4ba1708be0f5390962db5e4a725286>`();
+
+	void
+	:target:`sleep<doxid-namespaceaxl_1_1sys_1abd081b58ffaa784f0b7d2b6f85b47783>`(uint32_t msCount);
+
+	int
+	:target:`getTimeZoneOffsetInMinutes<doxid-namespaceaxl_1_1sys_1ab84798d7418204758c01f8adf3aea24b>`(int timeZone);
+
+	uint64_t
+	:target:`getTimestampFromTimeval<doxid-namespaceaxl_1_1sys_1a18c122a354b1420813fd4b282b380fd4>`(const timeval* tval);
+
+	:ref:`TlsMgr<doxid-classaxl_1_1sys_1_1_tls_mgr>`*
+	:target:`getTlsMgr<doxid-namespaceaxl_1_1sys_1a0fd1cde7037ff42a5815a03a1a4a64fb>`();
+
+	size_t
+	:target:`createSimpleTlsSlot<doxid-namespaceaxl_1_1sys_1adb2e36bb9a29a5f37566902c87c301c0>`();
+
+	bool
+	:target:`deleteSimpleTlsSlot<doxid-namespaceaxl_1_1sys_1a5775c6f050e6e18a12132e843f0f647f>`(size_t slot);
+
+	intptr_t
+	:target:`getSimpleTlsValue<doxid-namespaceaxl_1_1sys_1aeccb32e3b64cfb2c3d30cae0e2826aba>`(size_t slot);
+
+	intptr_t
+	:target:`setSimpleTlsValue<doxid-namespaceaxl_1_1sys_1afd75f4e17c60520c54d853bd2fa6ba9b>`(
+		size_t slot,
+		intptr_t value
+		);
+
+	template <typename T>
+	T*
+	:target:`getTlsPtrSlotValue<doxid-namespaceaxl_1_1sys_1a68de0720f7f7dfcde0de8966b5dd4e2f>`();
+
+	template <typename T>
+	T*
+	:target:`setTlsPtrSlotValue<doxid-namespaceaxl_1_1sys_1a2397b32ed7a49b913ba1b5186dcfde09>`(T* p);
+
+	template <typename T>
+	:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<T>
+	:target:`setTlsPtrSlotValue<doxid-namespaceaxl_1_1sys_1a4e5ab7b5fbfeb580e2181a76a5500313>`(const :ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<T>& ptr);
+
+	} // namespace sys

@@ -1,0 +1,233 @@
+.. index:: pair: class; axl::io::win::Socket
+.. _doxid-classaxl_1_1io_1_1win_1_1_socket:
+
+class axl::io::win::Socket
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_win_Socket.h>
+	
+	class Socket: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1win_1_1_socket_1a09db9cf34029f6ca47378a2f96fafeed>`(
+			int addressFamily,
+			int sockKind,
+			int protocol
+			);
+	
+		int
+		:target:`getError<doxid-classaxl_1_1io_1_1win_1_1_socket_1a38be6625d645362464e5d763b755a56a>`();
+	
+		bool
+		:target:`setBlockingMode<doxid-classaxl_1_1io_1_1win_1_1_socket_1ab82c5a2b508b57a9a2962bc8f17b1bcf>`(bool isBlocking);
+	
+		size_t
+		:target:`getIncomingDataSize<doxid-classaxl_1_1io_1_1win_1_1_socket_1a642d275fa5d1eae6057983add1549033>`();
+	
+		bool
+		:target:`bind<doxid-classaxl_1_1io_1_1win_1_1_socket_1a7fca1d3808fba38c0c3ff53c36e7bf76>`(const sockaddr* addr);
+	
+		bool
+		:target:`getAddress<doxid-classaxl_1_1io_1_1win_1_1_socket_1a5bd2d8dd52d3ffdde2ceaa26c22227de>`(:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr);
+	
+		bool
+		:target:`getPeerAddress<doxid-classaxl_1_1io_1_1win_1_1_socket_1a0b3006f336bb9e808503f4f6b8af915b>`(:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr);
+	
+		bool
+		:target:`getOption<doxid-classaxl_1_1io_1_1win_1_1_socket_1a2aa89306532072f1b2eaaff49376b6d2>`(
+			int level,
+			int option,
+			void* p,
+			size_t size
+			);
+	
+		bool
+		:target:`setOption<doxid-classaxl_1_1io_1_1win_1_1_socket_1ab4c23b7e6b4f4a1fe5079514b31ebcf3>`(
+			int level,
+			int option,
+			const void* p,
+			size_t size
+			);
+	
+		bool
+		:target:`listen<doxid-classaxl_1_1io_1_1win_1_1_socket_1a862724fbfca945653d0f5ec4f7859e15>`(size_t backLog);
+	
+		SOCKET
+		:target:`accept<doxid-classaxl_1_1io_1_1win_1_1_socket_1ae3360a1299937fbb3de5204c5f221add>`(:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr = NULL);
+	
+		bool
+		:target:`connect<doxid-classaxl_1_1io_1_1win_1_1_socket_1a90eb919664df8e3876fe76a0e21f3552>`(const sockaddr* addr);
+	
+		bool
+		:target:`shutdown<doxid-classaxl_1_1io_1_1win_1_1_socket_1a9ed9a50c226f4decc085580823b46059>`(int mode = SD_BOTH);
+	
+		size_t
+		:target:`send<doxid-classaxl_1_1io_1_1win_1_1_socket_1aa1ca7cb9b7471e2999dbad886537ff78>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`recv<doxid-classaxl_1_1io_1_1win_1_1_socket_1ad363e79370cdef202be11925c3f1f9ef>`(
+			void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`sendTo<doxid-classaxl_1_1io_1_1win_1_1_socket_1af59807a812c94cc62ebb773bee0fb2c5>`(
+			void* p,
+			size_t size,
+			const sockaddr* addr
+			);
+	
+		size_t
+		:target:`recvFrom<doxid-classaxl_1_1io_1_1win_1_1_socket_1a98c378f8cc00d0c0135a3d63211a7130>`(
+			void* p,
+			size_t size,
+			:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr
+			);
+	
+		bool
+		:target:`wsaOpen<doxid-classaxl_1_1io_1_1win_1_1_socket_1a3aa26715e3a239efa0cb14e021daa345>`(
+			int addressFamily,
+			int sockKind,
+			int protocol,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` flags = WSA_FLAG_OVERLAPPED
+			);
+	
+		bool
+		:target:`wsaEventSelect<doxid-classaxl_1_1io_1_1win_1_1_socket_1ad89f2bc0fe15ae098345a7170d8c0b09>`(
+			HANDLE hEvent,
+			int mask
+			);
+	
+		bool
+		:target:`wsaEnumEvents<doxid-classaxl_1_1io_1_1win_1_1_socket_1ab93c82cea895f6980b90ba4dc070f738>`(
+			WSANETWORKEVENTS* events,
+			HANDLE hEvent = NULL
+			);
+	
+		bool
+		:target:`wsaConnect<doxid-classaxl_1_1io_1_1win_1_1_socket_1aeb8a7ba4a75ff9e7291b5d0b4bb238c5>`(const sockaddr* addr);
+	
+		SOCKET
+		:target:`wsaAccept<doxid-classaxl_1_1io_1_1win_1_1_socket_1a591467fe6d0e6f139872625b09f412c0>`(:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr);
+	
+		bool
+		:target:`wsaSend<doxid-classaxl_1_1io_1_1win_1_1_socket_1aa24d6e987510fa2e44ea6f266113e637>`(
+			const void* p,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` size,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* actualSize,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` flags,
+			WSAOVERLAPPED* overlapped,
+			LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
+			);
+	
+		bool
+		:target:`wsaRecv<doxid-classaxl_1_1io_1_1win_1_1_socket_1ad8a446e41255d4d0533c086338314656>`(
+			void* p,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` size,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* actualSize,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* flags,
+			WSAOVERLAPPED* overlapped,
+			LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
+			);
+	
+		bool
+		:target:`wsaSendTo<doxid-classaxl_1_1io_1_1win_1_1_socket_1a3cf205958559f50b5b1607d0851b926f>`(
+			const void* p,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` size,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* actualSize,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` flags,
+			const sockaddr* addr,
+			WSAOVERLAPPED* overlapped,
+			LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
+			);
+	
+		bool
+		:target:`wsaRecvFrom<doxid-classaxl_1_1io_1_1win_1_1_socket_1a7a9c96bbd19d973c86adb6bee5c98e9c>`(
+			void* p,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` size,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* actualSize,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* flags,
+			:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr,
+			socklen_t* addrSize,
+			WSAOVERLAPPED* overlapped,
+			LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
+			);
+	
+		bool
+		:target:`wsaIoctl<doxid-classaxl_1_1io_1_1win_1_1_socket_1af6dfe3436cfd657164aa01c97d3c9b8b>`(
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` ioctlCode,
+			const void* inBuffer,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` inBufferSize,
+			void* outBuffer,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` outBufferSize,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* actualSize,
+			WSAOVERLAPPED* overlapped,
+			LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
+			);
+	
+		bool
+		:target:`wsaGetOverlappedResult<doxid-classaxl_1_1io_1_1win_1_1_socket_1ac74a3bae7656ba2f3a825c9d24110a25>`(
+			WSAOVERLAPPED* overlapped,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* actualSize,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* flags = NULL
+			) const;
+	
+		size_t
+		:target:`wsaGetOverlappedResult<doxid-classaxl_1_1io_1_1win_1_1_socket_1a5362a11fc5510501c38ba6ec76006db5>`(WSAOVERLAPPED* overlapped) const;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

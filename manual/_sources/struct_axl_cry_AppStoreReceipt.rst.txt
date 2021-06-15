@@ -1,0 +1,42 @@
+.. index:: pair: struct; axl::cry::AppStoreReceipt
+.. _doxid-structaxl_1_1cry_1_1_app_store_receipt:
+
+struct axl::cry::AppStoreReceipt
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_AppStoreReceipt.h>
+	
+	struct AppStoreReceipt
+	{
+		// fields
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_bundleId<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a4d475ceddd2b0a37e1453ae763eba334>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_appVersion<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a065dbee7799cd7bbf764616e77cea0c9>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_originalAppVersion<doxid-structaxl_1_1cry_1_1_app_store_receipt_1adaa519ded5ff953a070fe67ca8044c90>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_receiptCreationDateString<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a10026212b2eabe58696fcf84c5cedf6c>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_receiptExpirationDateString<doxid-structaxl_1_1cry_1_1_app_store_receipt_1abc9aa586a03d62f28496eb7391889006>`;
+		uint64_t :target:`m_receiptCreationTimestamp<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a374807b603475fd4fc3f745b7ad808d6>`;
+		uint64_t :target:`m_receiptExpirationTimestamp<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a2328cf81574d0bee72d6e4a4961e6ea0>`;
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char> :target:`m_rawBundleId<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a95c0136a53553481b0ac026369c47c8f>`;
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char> :target:`m_opaque<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a39b062eae634da019b8dbc2dac4da72e>`;
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char> :target:`m_sha1Hash<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a08dc0d0705e652f7110027466f72b00e>`;
+		:ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<:ref:`AppStoreIap<doxid-structaxl_1_1cry_1_1_app_store_iap>`> :target:`m_iapList<doxid-structaxl_1_1cry_1_1_app_store_receipt_1aff8795b2f05ac45ea92d7a04c663a5a0>`;
+
+		// construction
+	
+		:target:`AppStoreReceipt<doxid-structaxl_1_1cry_1_1_app_store_receipt_1af85119fc13452a82ee5a18301c3d7894>`();
+
+		// methods
+	
+		void
+		:target:`clear<doxid-structaxl_1_1cry_1_1_app_store_receipt_1a4ba9585f17ba3d31441375d843afb40a>`();
+	};

@@ -1,0 +1,62 @@
+.. index:: pair: struct; axl::gui::Point
+.. _doxid-structaxl_1_1gui_1_1_point:
+
+struct axl::gui::Point
+======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+	
+	struct Point
+	{
+		// fields
+	
+		union
+		{
+			struct
+			{
+				int :target:`m_x<doxid-structaxl_1_1gui_1_1_point_1ad14343a3dbb2cd015e3ab79efb82c0a8>`;
+				int :target:`m_y<doxid-structaxl_1_1gui_1_1_point_1a7b57be076e51da3b98d6e1463fd93584>`;
+			};
+	
+			struct
+			{
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_x_u<doxid-structaxl_1_1gui_1_1_point_1ae2a8775c1e7d57d21a2f3eb7713706c2>`;
+				:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_y_u<doxid-structaxl_1_1gui_1_1_point_1a284e358bc6c6433d7423e0522d5d4261>`;
+			};
+		};
+
+		// construction
+	
+		:target:`Point<doxid-structaxl_1_1gui_1_1_point_1a96f4d93475cbff86fd3b3cb7760667c8>`();
+	
+		:target:`Point<doxid-structaxl_1_1gui_1_1_point_1ace2f93b048bc84598fec1ccface62696>`(
+			int x,
+			int y
+			);
+
+		// methods
+	
+		Point
+		:target:`operator+<doxid-structaxl_1_1gui_1_1_point_1a06c63d4a159cd6c6983f9fe3eba02bb9>`(const Point& point2);
+	
+		Point
+		:target:`operator-<doxid-structaxl_1_1gui_1_1_point_1a7f98c7e7124f313e831357f79f1d7744>`(const Point& point2);
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_point_1a660c47158f80a7072a53b143234828a5>`(
+			int x,
+			int y
+			);
+	
+		void
+		:target:`clipNegative<doxid-structaxl_1_1gui_1_1_point_1a9fbd9081605f80cc639c6ba18bb28783>`();
+	};

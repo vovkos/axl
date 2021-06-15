@@ -1,0 +1,25 @@
+.. index:: pair: struct; axl::g::SystemInfo
+.. _doxid-structaxl_1_1g_1_1_system_info:
+
+struct axl::g::SystemInfo
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_g_Module.h>
+	
+	struct SystemInfo
+	{
+		// fields
+	
+		size_t :target:`m_processorCount<doxid-structaxl_1_1g_1_1_system_info_1a02d2125f5ae87333218ea3380941ef32>`;
+		size_t :target:`m_pageSize<doxid-structaxl_1_1g_1_1_system_info_1acfde9b5466eda9d71d4cd3cc11ca4878>`;
+		size_t :target:`m_mappingAlignFactor<doxid-structaxl_1_1g_1_1_system_info_1a604ed372849e5e100df6bbcbd19c4b9d>`;
+	};

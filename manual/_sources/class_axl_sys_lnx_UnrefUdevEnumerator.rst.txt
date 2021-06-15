@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::sys::lnx::UnrefUdevEnumerator
+.. _doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_enumerator:
+
+template class axl::sys::lnx::UnrefUdevEnumerator
+=================================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_lnx_UdevEnumerator.h>
+	
+	template <typename T>
+	class UnrefUdevEnumerator
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_enumerator_1acae1c07e7d6ebf9f0d7e7e854e3261c7>`(udev_enumerate* h);
+	};

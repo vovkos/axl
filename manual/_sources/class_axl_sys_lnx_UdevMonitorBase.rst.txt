@@ -1,0 +1,102 @@
+.. index:: pair: class; axl::sys::lnx::UdevMonitorBase
+.. _doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base:
+
+template class axl::sys::lnx::UdevMonitorBase
+=============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_lnx_UdevMonitor.h>
+	
+	template <typename T>
+	class UdevMonitorBase: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// construction
+	
+		:target:`UdevMonitorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a526abd59a65e810f2dd073c83d1323d0>`();
+		:target:`UdevMonitorBase<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1ae821f4848a5f1b6089dccb4d156e0dd6>`(udev_monitor* h);
+
+		// methods
+	
+		void
+		:target:`addRef<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1abc13934af7753b8627c3193b9288541c>`();
+	
+		udev*
+		:target:`getUdev<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a5ad5ecd4d01472ce961ffbb27fba6bd7>`();
+	
+		int
+		:target:`getFd<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a77f3e698ce19e0d5347db25e0148553a>`();
+	
+		bool
+		:target:`updateFilter<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a68ec782fcb6631527a812b17bdaa104c>`();
+	
+		bool
+		:target:`removeFilter<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a08ac434cbae6e37b5a9028699b574e66>`();
+	
+		bool
+		:target:`addMatchSubsystemDevTypeFilter<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a1fc408c467d221ac85f661a272928207>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& subsystem,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& devType
+			);
+	
+		bool
+		:target:`addMatchTagFilter<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a2ad06ff7ff352ea101638800835a74fb>`(const char* tag);
+	
+		bool
+		:target:`setReceiveBufferSize<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a24fbbcc6615ba7fc2d8db4a8fb54d62b>`(size_t size);
+	
+		bool
+		:target:`enableReceiving<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a681765fd4769bc11bd18058b329d8e9a>`();
+	
+		udev_device*
+		:target:`receiveDevice<doxid-classaxl_1_1sys_1_1lnx_1_1_udev_monitor_base_1a2af49234d6eb0c63f2764b670f92ba68>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

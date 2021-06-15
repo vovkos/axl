@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::FreeSsl
+.. _doxid-classaxl_1_1io_1_1_free_ssl:
+
+class axl::io::FreeSsl
+======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_Ssl.h>
+	
+	class FreeSsl
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1_free_ssl_1a6e1b21eca2af76edf101104c1ec25fcf>`(SSL* h);
+	};

@@ -1,0 +1,29 @@
+.. index:: pair: class; axl::sl::HashDjb2
+.. _doxid-classaxl_1_1sl_1_1_hash_djb2:
+
+template class axl::sl::HashDjb2
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Hash.h>
+	
+	template <typename T>
+	class HashDjb2
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_hash_djb2_1a005d8b1259aad3a3ba49f877dba0825d>`(const T* key) const;
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_hash_djb2_1a49065ec56ff1643b0235ac8052fa523c>`(const T& key) const;
+	};

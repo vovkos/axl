@@ -1,0 +1,22 @@
+.. index:: pair: enum; UtfKind
+.. _doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5:
+
+enum axl::enc::UtfKind
+======================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Utf.h>
+
+	enum UtfKind
+	{
+	    :target:`UtfKind_Utf8<doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5a1f1493d639f3c60538caeb8894fb5ee6>`     = 0,
+	    :target:`UtfKind_Utf16<doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5ac998d5859c1e9115efec8d4c17be14d6>`,
+	    :target:`UtfKind_Utf16_be<doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5a8e5b41f209b959b27e7b9cfa4cf5a4a4>`,
+	    :target:`UtfKind_Utf32<doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5a82a0cf5281f776d39cfa90a670fec000>`,
+	    :target:`UtfKind_Utf32_be<doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5ad96601c8bead84a2766e7313d5e2530e>`,
+	};
+

@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreeX509
+.. _doxid-classaxl_1_1cry_1_1_free_x509:
+
+class axl::cry::FreeX509
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_X509.h>
+	
+	class FreeX509
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_x509_1a581087c2145ffab56093ff3e15aef6ac>`(X509* cert);
+	};

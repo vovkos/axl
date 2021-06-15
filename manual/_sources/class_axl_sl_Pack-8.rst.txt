@@ -1,0 +1,38 @@
+.. index:: pair: class; axl::sl::Pack<int8_t>
+.. _doxid-classaxl_1_1sl_1_1_pack_3_01int8__t_01_4:
+
+template class axl::sl::Pack<int8_t>
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Pack.h>
+	
+	template <>
+	class Pack<int8_t>: public :ref:`axl::sl::PackIntTrunc<doxid-classaxl_1_1sl_1_1_pack_int_trunc>`
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`axl_va_list<doxid-classaxl__va__list>`
+		:ref:`operator()<doxid-classaxl_1_1sl_1_1_pack_int_trunc_1a7a3fa9a6e59f3cae900f51b0a33c91e3>`(
+			void* p,
+			size_t* size,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+

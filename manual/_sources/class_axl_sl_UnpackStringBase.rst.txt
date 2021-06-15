@@ -1,0 +1,37 @@
+.. index:: pair: class; axl::sl::UnpackStringBase
+.. _doxid-classaxl_1_1sl_1_1_unpack_string_base:
+
+template class axl::sl::UnpackStringBase
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Unpacker.h>
+	
+	template <typename T>
+	class UnpackStringBase
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_unpack_string_base_1af2e3301864186d48e89e4abbaff77bf4>`(
+			const void* p,
+			size_t size,
+			const T** value
+			);
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_unpack_string_base_1aa8856d642123abad719fce9d8291ddd3>`(
+			const void* p,
+			size_t size,
+			T** value
+			);
+	};

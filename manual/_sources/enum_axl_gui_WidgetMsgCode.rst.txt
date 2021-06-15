@@ -1,0 +1,37 @@
+.. index:: pair: enum; WidgetMsgCode
+.. _doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a:
+
+enum axl::gui::WidgetMsgCode
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+
+	enum WidgetMsgCode
+	{
+	    :target:`WidgetMsgCode_Undefined<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa12e77f4326a078691293f63dba3b1d19>`              = 0,
+	    :target:`WidgetMsgCode_Close<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aaff5ad23f89fffb35e27f51335aa838ed>`,
+	    :target:`WidgetMsgCode_SetFocus<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aad7ac79aafec46e57cd446de3aec2ac17>`,
+	    :target:`WidgetMsgCode_KillFocus<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aac604b73ac307e71caab1e73f0a5c92a2>`,
+	    :target:`WidgetMsgCode_Size<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aaf67b399235328b6acd63602a7220dcc5>`,
+	    :target:`WidgetMsgCode_Scroll<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa71419c00188990f064a3c2b4f69d92fe>`,
+	    :target:`WidgetMsgCode_Paint<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa7d32bece8f1b6a861dbacf31edd4c5af>`,
+	    :target:`WidgetMsgCode_MouseMove<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa97f48132a694b397fab4326e19263209>`,
+	    :target:`WidgetMsgCode_MouseLeave<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa555f10af6bbc544b95115e40469bcfc7>`,
+	    :target:`WidgetMsgCode_MouseButtonDown<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aae5270721980df5f7cafb354eb1e77efc>`,
+	    :target:`WidgetMsgCode_MouseButtonUp<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa642acc10bbf204c787a3f9c2a251beea>`,
+	    :target:`WidgetMsgCode_MouseButtonDoubleClick<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa7607e5832e4b3d5ecf9b3c20fdb2536f>`,
+	    :target:`WidgetMsgCode_MouseWheel<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa4d96ea4bbc7ee34044482d097670bb4c>`,
+	    :target:`WidgetMsgCode_MouseCaptureLost<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aacab15ba110bf944e4e57bbd58e906355>`,
+	    :target:`WidgetMsgCode_KeyDown<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa97d46e3c67b36aa049a5d66c9d8f1206>`,
+	    :target:`WidgetMsgCode_KeyUp<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa83b7ba0ad2c58ff96542c1d89bfea3a2>`,
+	    :target:`WidgetMsgCode_ThreadMsg<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aaa67fc1786c10dfc5abfe3200874a59f2>`,
+	    :target:`WidgetMsgCode_Animate<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aaf96a00690d45a03e8ceb1fdd825127a8>`,
+	    :target:`WidgetMsgCode_ToolTip<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aaf505f24d2fdc81462fdfe1a2912fb149>`,
+	    :target:`WidgetMsgCode__Count<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1aa90d3c438c549ada0ed16fe9fc7f14b33>`,
+	};
+

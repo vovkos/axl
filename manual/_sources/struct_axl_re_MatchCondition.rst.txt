@@ -1,0 +1,37 @@
+.. index:: pair: struct; axl::re::MatchCondition
+.. _doxid-structaxl_1_1re_1_1_match_condition:
+
+struct axl::re::MatchCondition
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_re_Nfa.h>
+	
+	struct MatchCondition
+	{
+		// fields
+	
+		:ref:`MatchConditionKind<doxid-namespaceaxl_1_1re_1aa7ab33ee1cfebd150cd62642e7d8d253>` :target:`m_conditionKind<doxid-structaxl_1_1re_1_1_match_condition_1acbdac6f6b07777ff65a38b8b71756237>`;
+		:ref:`sl::BitMap<doxid-classaxl_1_1sl_1_1_bit_map>` :target:`m_charSet<doxid-structaxl_1_1re_1_1_match_condition_1a1ab97428cd76edded391e41b69c5d77b>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_char<doxid-structaxl_1_1re_1_1_match_condition_1ab51c8ff3890636e5b20e696d9d63520b>`;
+
+		// construction
+	
+		:target:`MatchCondition<doxid-structaxl_1_1re_1_1_match_condition_1a2a2a103909a075b867360f0ffc010026>`();
+
+		// methods
+	
+		void
+		:target:`addChar<doxid-structaxl_1_1re_1_1_match_condition_1aafd9894069b693f241fe1156b0b9da20>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` c);
+	
+		bool
+		:target:`isMatch<doxid-structaxl_1_1re_1_1_match_condition_1a293a1f4cab79a9127d09e45b1ea8da4f>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` c) const;
+	};

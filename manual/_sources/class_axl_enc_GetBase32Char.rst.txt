@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::enc::GetBase32Char
+.. _doxid-classaxl_1_1enc_1_1_get_base32_char:
+
+class axl::enc::GetBase32Char
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Base32Encoding.h>
+	
+	class GetBase32Char
+	{
+	public:
+		// methods
+	
+		char
+		:target:`operator()<doxid-classaxl_1_1enc_1_1_get_base32_char_1a9941cc139942a251219a621c6a3cece0>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` x);
+	};

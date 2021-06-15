@@ -1,0 +1,29 @@
+.. index:: pair: namespace; axl::lua
+.. _doxid-namespaceaxl_1_1lua:
+
+namespace axl::lua
+==================
+
+.. toctree::
+	:hidden:
+
+	class_axl_lua_LuaClose.rst
+	class_axl_lua_LuaNonOwnerState.rst
+	class_axl_lua_LuaState.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace lua {
+
+	// classes
+
+	class :ref:`LuaClose<doxid-classaxl_1_1lua_1_1_lua_close>`;
+	class :ref:`LuaNonOwnerState<doxid-classaxl_1_1lua_1_1_lua_non_owner_state>`;
+	class :ref:`LuaState<doxid-classaxl_1_1lua_1_1_lua_state>`;
+
+	} // namespace lua

@@ -1,0 +1,52 @@
+.. index:: pair: namespace; axl::st
+.. _doxid-namespaceaxl_1_1st:
+
+namespace axl::st
+=================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_st_LexerMachineKind.rst
+	enum_axl_st_TokenKind.rst
+	class_axl_st_Lexer.rst
+	class_axl_st_LuaStringTemplate.rst
+	class_axl_st_StringTemplate.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace st {
+
+	// typedefs
+
+	typedef :ref:`lex::RagelToken<doxid-classaxl_1_1lex_1_1_ragel_token>`<:ref:`TokenKind<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11>`, TokenName> :target:`Token<doxid-namespaceaxl_1_1st_1a905286e302b2f7f81b4f0c1ce5e67543>`;
+
+	// enums
+
+	enum :ref:`LexerMachineKind<doxid-namespaceaxl_1_1st_1acb17cf3d056fac4b1aa2a143a404b7fe>`;
+	enum :ref:`TokenKind<doxid-namespaceaxl_1_1st_1aa9c3df8a8c534d5af5655cb354f52e11>`;
+
+	// classes
+
+	class :ref:`Lexer<doxid-classaxl_1_1st_1_1_lexer>`;
+	class :ref:`LuaStringTemplate<doxid-classaxl_1_1st_1_1_lua_string_template>`;
+
+	template <typename T>
+	class :ref:`StringTemplate<doxid-classaxl_1_1st_1_1_string_template>`;
+
+	// global functions
+
+	bool
+	:target:`gotoEndOfScriptSnippet<doxid-namespaceaxl_1_1st_1a63a5184a597974a8c1dd0bfff4d42e94>`(
+		:ref:`Lexer<doxid-classaxl_1_1st_1_1_lexer>`* lexer,
+		:ref:`lex::RagelTokenPos<doxid-classaxl_1_1lex_1_1_ragel_token_pos>`* endPos
+		);
+
+	:target:`AXL_LEX_END_TOKEN_NAME_MAP<doxid-namespaceaxl_1_1st_1a99a98647809e846b2092429593363c91>`();
+
+	} // namespace st

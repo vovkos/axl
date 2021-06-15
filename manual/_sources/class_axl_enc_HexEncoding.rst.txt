@@ -1,0 +1,62 @@
+.. index:: pair: class; axl::enc::HexEncoding
+.. _doxid-classaxl_1_1enc_1_1_hex_encoding:
+
+class axl::enc::HexEncoding
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_HexEncoding.h>
+	
+	class HexEncoding
+	{
+	public:
+		// methods
+	
+		static
+		:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>`
+		:target:`getHexCharValue<doxid-classaxl_1_1enc_1_1_hex_encoding_1ac2d3a066fe47d4fc1b663dd6007ffdd9>`(char x);
+	
+		static
+		char
+		:target:`getHexChar_l<doxid-classaxl_1_1enc_1_1_hex_encoding_1a7edcbd1b5ce628183cda772783c1508f>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` x);
+	
+		static
+		char
+		:target:`getHexChar_u<doxid-classaxl_1_1enc_1_1_hex_encoding_1ac1f5015e78c54142712a937b6ed2503b>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` x);
+	
+		static
+		size_t
+		:target:`encode<doxid-classaxl_1_1enc_1_1_hex_encoding_1afa0e9a4f62583e633ed133658e8e53a3>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`encode<doxid-classaxl_1_1enc_1_1_hex_encoding_1a75d3cbff05ff4ef0feb68636e575f190>`(
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		static
+		size_t
+		:target:`decode<doxid-classaxl_1_1enc_1_1_hex_encoding_1a8837a5bfd9f7fb86ca04653ecf95bf22>`(
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source
+			);
+	
+		static
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`decode<doxid-classaxl_1_1enc_1_1_hex_encoding_1a26650ee870021fd449e246420127a493>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source);
+	};

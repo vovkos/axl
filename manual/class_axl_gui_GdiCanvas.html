@@ -1,0 +1,790 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::gui::GdiCanvas &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::gui::GdiCursor" href="class_axl_gui_GdiCursor.html" />
+    <link rel="prev" title="class axl::gui::FontTuple" href="class_axl_gui_FontTuple.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_FontFlag.html">enum axl::gui::FontFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_FormFactor.html">enum axl::gui::FormFactor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_Key.html">enum axl::gui::Key</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_ModifierKey.html">enum axl::gui::ModifierKey</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_MouseButton.html">enum axl::gui::MouseButton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_Orientation.html">enum axl::gui::Orientation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_PixelFormat.html">enum axl::gui::PixelFormat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_StdColor.html">enum axl::gui::StdColor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_StdCursorKind.html">enum axl::gui::StdCursorKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_StdFontKind.html">enum axl::gui::StdFontKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_StdPalColor.html">enum axl::gui::StdPalColor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_WidgetMsgCode.html">enum axl::gui::WidgetMsgCode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_gui_WmKind.html">enum axl::gui::WmKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_CaretPos.html">struct axl::gui::CaretPos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_ColorAttr.html">struct axl::gui::ColorAttr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_FontDesc.html">struct axl::gui::FontDesc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_HyperlinkAnchor.html">struct axl::gui::HyperlinkAnchor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_ImageDesc.html">struct axl::gui::ImageDesc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_Notify.html">struct axl::gui::Notify</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_Palette.html">struct axl::gui::Palette</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_Point.html">struct axl::gui::Point</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_Rect.html">struct axl::gui::Rect</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_Size.html">struct axl::gui::Size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_TextAttr.html">struct axl::gui::TextAttr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_TextAttrAnchor.html">struct axl::gui::TextAttrAnchor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetConstructParam.html">struct axl::gui::WidgetConstructParam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetKeyMsg.html">struct axl::gui::WidgetKeyMsg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetMouseMsg.html">struct axl::gui::WidgetMouseMsg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetMouseWheelMsg.html">struct axl::gui::WidgetMouseWheelMsg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetMsg.html">struct axl::gui::WidgetMsg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetMsgMap.html">struct axl::gui::WidgetMsgMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetMsgParam.html">template struct axl::gui::WidgetMsgParam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetPaintMsg.html">struct axl::gui::WidgetPaintMsg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetScrollBar.html">struct axl::gui::WidgetScrollBar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_gui_WidgetThreadMsg.html">struct axl::gui::WidgetThreadMsg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_AnsiAttrParser.html">class axl::gui::AnsiAttrParser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_Canvas.html">class axl::gui::Canvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_Cursor.html">class axl::gui::Cursor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_DeleteGdiObject.html">class axl::gui::DeleteGdiObject</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_Engine.html">class axl::gui::Engine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_Font.html">class axl::gui::Font</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_FontTuple.html">class axl::gui::FontTuple</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">class axl::gui::GdiCanvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GdiCursor.html">class axl::gui::GdiCursor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GdiEngine.html">class axl::gui::GdiEngine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GdiFont.html">class axl::gui::GdiFont</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GdiImage.html">class axl::gui::GdiImage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GdiObjectHandle.html">template class axl::gui::GdiObjectHandle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GdiWidget.html">template class axl::gui::GdiWidget</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GdiWidgetImpl.html">class axl::gui::GdiWidgetImpl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_GuiItem.html">class axl::gui::GuiItem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_HyperText.html">class axl::gui::HyperText</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_HyperlinkAnchorArray.html">class axl::gui::HyperlinkAnchorArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_Image.html">class axl::gui::Image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_OffscreenCanvasCache.html">template class axl::gui::OffscreenCanvasCache</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtCanvas.html">class axl::gui::QtCanvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtCaret.html">class axl::gui::QtCaret</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtCursor.html">class axl::gui::QtCursor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtEngine.html">class axl::gui::QtEngine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtFont.html">class axl::gui::QtFont</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtFontTuple.html">class axl::gui::QtFontTuple</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtImage.html">class axl::gui::QtImage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtRagelSyntaxHighlighter.html">template class axl::gui::QtRagelSyntaxHighlighter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtWidget.html">template class axl::gui::QtWidget</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_QtWidgetBase.html">class axl::gui::QtWidgetBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_ScreenDc.html">class axl::gui::ScreenDc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_TextAttrAnchorArray.html">class axl::gui::TextAttrAnchorArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_TextPainter.html">class axl::gui::TextPainter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_Widget.html">class axl::gui::Widget</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_gui_WidgetDriver.html">class axl::gui::WidgetDriver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_gui.html">namespace axl::gui</a> &raquo;</li>
+        
+      <li>class axl::gui::GdiCanvas</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-gui-gdicanvas">
+<span id="doxid-classaxl-1-1gui-1-1-gdi-canvas"></span><span id="index-0"></span><h1>class axl::gui::GdiCanvas</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_gui_GdiCanvas.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nl">GdiCanvas</span><span class="p">:</span>
+    <span class="k">public</span> <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas"><span class="std std-ref">axl::gui::Canvas</span></a><span></span><span class="p">,</span>
+    <span class="k">public</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">axl::sl::Handle</span></a><span></span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1aae186f877dc5849ffe80595787ccf181"><span></span><span class="n">GdiCanvas</span></span><span></span><span class="p">();</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1aa310d2303ed0ee6c920a861baf82bfbe"><span></span><span class="o">~</span><span class="n">GdiCanvas</span></span><span></span><span class="p">();</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1aab14770b621680199f5f8400e5404cc9"><span></span><span class="n">attach</span></span><span></span><span class="p">(</span>
+        <span class="n">HDC</span> <span class="n">hdc</span><span class="p">,</span>
+        <span class="n">HWND</span> <span class="n">hWnd</span><span class="p">,</span>
+        <span class="n">DestructKind</span> <span class="n">destructKind</span>
+        <span class="p">);</span>
+
+    <span class="k">virtual</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1aec6c58790878761f09a9870418c09555"><span></span><span class="n">drawRect</span></span><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color</span>
+        <span class="p">);</span>
+
+    <span class="k">virtual</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1a6f2933c4e5ce2681fd676bda45a8853a"><span></span><span class="n">drawText_utf8</span></span><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">textColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">backColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">fontFlags</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a14981db8a0b963084ec6459f5f30dd4f"><span class="std std-ref">sl::StringRef_utf8</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="k">virtual</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1a9473c342943f89b657e9c256f9e9b8f5"><span></span><span class="n">drawText_utf16</span></span><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">textColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">backColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">fontFlags</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a5038487798790b54b7cf85af8fa4c08d"><span class="std std-ref">sl::StringRef_utf16</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="k">virtual</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1a100ddb770f9de57b7dc5dcbcef91b7c7"><span></span><span class="n">drawText_utf32</span></span><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">textColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">backColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">fontFlags</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a77a0507413b5118e0079dd6dcd5c5156"><span class="std std-ref">sl::StringRef_utf32</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="k">virtual</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1ab2c704de84a0c9aebffb18bd620d1081"><span></span><span class="n">drawImage</span></span><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_gui_Image.html#doxid-classaxl-1-1gui-1-1-image"><span class="std std-ref">Image</span></a><span></span><span class="o">*</span> <span class="n">image</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span>
+        <span class="p">);</span>
+
+    <span class="k">virtual</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1gui-1-1-gdi-canvas-1af7d54a0f7ca06dbec7233b4fb25dd691"><span></span><span class="n">copyRect</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas"><span class="std std-ref">Canvas</span></a><span></span><span class="o">*</span> <span class="n">srcCanvas</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">xDst</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">yDst</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">xSrc</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">ySrc</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">width</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">height</span>
+        <span class="p">);</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// typedefs</span>
+
+    <span class="k">typedef</span> <span class="n">T</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a188765028bffca96ef6ed6638ce9f654"><span class="std std-ref">H</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// fields</span>
+
+    <a class="reference internal" href="class_axl_gui_Font.html#doxid-classaxl-1-1gui-1-1-font"><span class="std std-ref">Font</span></a><span></span><span class="o">*</span> <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a916e6f27f74f1771e20f5b9fe08c46f4"><span class="std std-ref">m_font</span></a><span></span><span class="p">;</span>
+    <a class="reference internal" href="struct_axl_gui_ColorAttr.html#doxid-structaxl-1-1gui-1-1-color-attr"><span class="std std-ref">ColorAttr</span></a><span></span> <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a0747ab6f5171e2a63a3b249a430d01d1"><span class="std std-ref">m_colorAttr</span></a><span></span><span class="p">;</span>
+    <a class="reference internal" href="struct_axl_gui_Palette.html#doxid-structaxl-1-1gui-1-1-palette"><span class="std std-ref">Palette</span></a><span></span> <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ad15a0173156de79808b9cd3f1ab15759"><span class="std std-ref">m_palette</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <a class="reference internal" href="class_axl_gui_Engine.html#doxid-classaxl-1-1gui-1-1-engine"><span class="std std-ref">Engine</span></a><span></span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_gui_GuiItem.html#doxid-classaxl-1-1gui-1-1-gui-item-1a2333ad546313fbcafbab4fa0009d5ffc"><span class="std std-ref">getEngine</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1aabd8569560d5e0d6a9407138c47d9336"><span class="std std-ref">setTextAttr</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="struct_axl_gui_TextAttr.html#doxid-structaxl-1-1gui-1-1-text-attr"><span class="std std-ref">TextAttr</span></a><span></span><span class="o">&amp;</span> <span class="n">attr</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a93c086933f7dcf3388a478bcd6d5ca69"><span class="std std-ref">drawRect</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a6375709eadad2183cb0c206796c112fa"><span class="std std-ref">drawRect</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a9c4d72d1d9d3532a35b4db16823e8251"><span class="std std-ref">drawRect</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1af0b6dfd88b53e4fe99c8ec25613c6984"><span class="std std-ref">drawRect</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ab9ff3fdbc2bf67e601c6451f50f441af"><span class="std std-ref">drawAlphaRect</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a0d55ae6ce60aceb57a653414d5676fbf"><span class="std std-ref">drawAlphaRect</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1af2dc0c559a45e6024df8a6c9be43ebfc"><span class="std std-ref">drawAlphaRect</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a5b655752e6b64af88dcc6b1bf54f9695"><span class="std std-ref">drawAlphaRect</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ad7d83a9f5f5d19b0a6b0313a81be1ce3"><span class="std std-ref">drawGradientRect</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">x1</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y1</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color1</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">x2</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y2</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color2</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ad2c49c633e77c1705f96f9afc98a9faa"><span class="std std-ref">drawGradientRect</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point1</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color1</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point2</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color2</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a4d7e208b5485acb2bb200c06add8b3b3"><span class="std std-ref">drawAlphaGradientRect</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">x1</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y1</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color1</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha1</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">x2</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y2</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color2</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha2</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a8e2fb11ca28b4ccc31a97ceb053f7c1b"><span class="std std-ref">drawAlphaGradientRect</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point1</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color1</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha1</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point2</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">color2</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">alpha2</span>
+        <span class="p">);</span>
+
+    <a class="reference internal" href="struct_axl_gui_Size.html#doxid-structaxl-1-1gui-1-1-size"><span class="std std-ref">Size</span></a><span></span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a4c0b98ac37f11091dc4d2415477d51be"><span class="std std-ref">calcCharSize</span></a><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span> <span class="n">c</span><span class="p">);</span>
+
+    <a class="reference internal" href="struct_axl_gui_Size.html#doxid-structaxl-1-1gui-1-1-size"><span class="std std-ref">Size</span></a><span></span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a154bfdd715246fe82a98ffb3ea626353"><span class="std std-ref">calcTextSize_utf8</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a14981db8a0b963084ec6459f5f30dd4f"><span class="std std-ref">sl::StringRef_utf8</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span><span class="p">);</span>
+
+    <a class="reference internal" href="struct_axl_gui_Size.html#doxid-structaxl-1-1gui-1-1-size"><span class="std std-ref">Size</span></a><span></span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a9a3e24e6569a1108c491804d0548bed5"><span class="std std-ref">calcTextSize_utf16</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a5038487798790b54b7cf85af8fa4c08d"><span class="std std-ref">sl::StringRef_utf16</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span><span class="p">);</span>
+
+    <a class="reference internal" href="struct_axl_gui_Size.html#doxid-structaxl-1-1gui-1-1-size"><span class="std std-ref">Size</span></a><span></span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a8a4aca781c19b4bba02c1f91bf181135"><span class="std std-ref">calcTextSize_utf32</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a77a0507413b5118e0079dd6dcd5c5156"><span class="std std-ref">sl::StringRef_utf32</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a7460c66e139c7c4af5dae78c77e9b137"><span class="std std-ref">drawText</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">textColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">backColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">fontFlags</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1af146480337c56cd62d4f20ff21128080"><span class="std std-ref">drawText</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a3a084ed1f36580524c0b40e39a76352e"><span class="std std-ref">drawText</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_TextAttr.html#doxid-structaxl-1-1gui-1-1-text-attr"><span class="std std-ref">TextAttr</span></a><span></span><span class="o">&amp;</span> <span class="n">textAttr</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a303305e2b030eaf79ee25f2b46f5ee5a"><span class="std std-ref">drawText</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ad0a3a98102fc41dbf77c61ecd3800f89"><span class="std std-ref">drawText_utf8</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">textColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">backColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">fontFlags</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a14981db8a0b963084ec6459f5f30dd4f"><span class="std std-ref">sl::StringRef_utf8</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ab8732d8619ca70cac18d1d921091574f"><span class="std std-ref">drawText_utf8</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a14981db8a0b963084ec6459f5f30dd4f"><span class="std std-ref">sl::StringRef_utf8</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a60d00e2f69df80197b309a6da1be6127"><span class="std std-ref">drawText_utf8</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_TextAttr.html#doxid-structaxl-1-1gui-1-1-text-attr"><span class="std std-ref">TextAttr</span></a><span></span><span class="o">&amp;</span> <span class="n">textAttr</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a14981db8a0b963084ec6459f5f30dd4f"><span class="std std-ref">sl::StringRef_utf8</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1af4582c5bf13be3f9a6aef97429deaeb9"><span class="std std-ref">drawText_utf8</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a14981db8a0b963084ec6459f5f30dd4f"><span class="std std-ref">sl::StringRef_utf8</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a05d1545e7b08ac98e1fff5ffeb4b0f6d"><span class="std std-ref">drawText_utf16</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">textColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">backColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">fontFlags</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a5038487798790b54b7cf85af8fa4c08d"><span class="std std-ref">sl::StringRef_utf16</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1afe1ba22c277b04b9d2b7ec9c5ec3bd77"><span class="std std-ref">drawText_utf16</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a5038487798790b54b7cf85af8fa4c08d"><span class="std std-ref">sl::StringRef_utf16</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a56e3d99200622c9239c8e410186c61e9"><span class="std std-ref">drawText_utf16</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_TextAttr.html#doxid-structaxl-1-1gui-1-1-text-attr"><span class="std std-ref">TextAttr</span></a><span></span><span class="o">&amp;</span> <span class="n">textAttr</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a5038487798790b54b7cf85af8fa4c08d"><span class="std std-ref">sl::StringRef_utf16</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1aa420d55acb2b24c4843e213beceee7bf"><span class="std std-ref">drawText_utf16</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a5038487798790b54b7cf85af8fa4c08d"><span class="std std-ref">sl::StringRef_utf16</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a597b7a7c04ccd55983489ccdc6d7b800"><span class="std std-ref">drawText_utf32</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">textColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">backColor</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">fontFlags</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a77a0507413b5118e0079dd6dcd5c5156"><span class="std std-ref">sl::StringRef_utf32</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a9668e8e19fa341fd5ee5844db00ef8a8"><span class="std std-ref">drawText_utf32</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a77a0507413b5118e0079dd6dcd5c5156"><span class="std std-ref">sl::StringRef_utf32</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a9a020b1e2f628fb5739a9ec7c4e68985"><span class="std std-ref">drawText_utf32</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_TextAttr.html#doxid-structaxl-1-1gui-1-1-text-attr"><span class="std std-ref">TextAttr</span></a><span></span><span class="o">&amp;</span> <span class="n">textAttr</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a77a0507413b5118e0079dd6dcd5c5156"><span class="std std-ref">sl::StringRef_utf32</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a3369e2f2a341ae9b84490fc4ad9e712c"><span class="std std-ref">drawText_utf32</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a77a0507413b5118e0079dd6dcd5c5156"><span class="std std-ref">sl::StringRef_utf32</span></a><span></span><span class="o">&amp;</span> <span class="n">text</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a7d8c4d2ac915094b5af65fd11eca8215"><span class="std std-ref">drawImage</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_gui_Image.html#doxid-classaxl-1-1gui-1-1-image"><span class="std std-ref">Image</span></a><span></span><span class="o">*</span> <span class="n">image</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ac56bdaf8dac2f296205d7d0851e13efa"><span class="std std-ref">drawImage</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_gui_Image.html#doxid-classaxl-1-1gui-1-1-image"><span class="std std-ref">Image</span></a><span></span><span class="o">*</span> <span class="n">image</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">rect</span> <span class="o">=</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="p">()</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1ad87e8be151bc17192fc2ef0f4c09dd7f"><span class="std std-ref">copyRect</span></a><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas"><span class="std std-ref">Canvas</span></a><span></span><span class="o">*</span> <span class="n">srcCanvas</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">left</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">top</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">right</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">bottom</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas-1a81780fb4fcf9565ed04a4da511bcc15b"><span class="std std-ref">copyRect</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Point.html#doxid-structaxl-1-1gui-1-1-point"><span class="std std-ref">Point</span></a><span></span><span class="o">&amp;</span> <span class="n">point</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_gui_Canvas.html#doxid-classaxl-1-1gui-1-1-canvas"><span class="std std-ref">Canvas</span></a><span></span><span class="o">*</span> <span class="n">srcCanvas</span><span class="p">,</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_gui_Rect.html#doxid-structaxl-1-1gui-1-1-rect"><span class="std std-ref">Rect</span></a><span></span><span class="o">&amp;</span> <span class="n">srcRect</span>
+        <span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ada6ac10b3fc0a5d2778b1dfc8adc6ca2"><span class="std std-ref">operator T</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0f0fad98719a4350af69d32a66d3e7ad"><span class="std std-ref">operator-&gt;</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">Handle</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0a34799e733a133110e663af5c695bb2"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a88cceffbbd3a1caeffaa998ac9c0c616"><span class="std std-ref">isOpen</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a4f4349dda184939edffd0c8229b20872"><span class="std std-ref">close</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a51e30365c2f9c7372a534dd776b1da9a"><span class="std std-ref">attach</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1aba1f7ac04018f2f403e94ddff96b7051"><span class="std std-ref">detach</span></a><span></span><span class="p">();</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1af56d375af50768cf2e1ea3ca06828db9"><span class="std std-ref">p</span></a><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ad0019f565f53583938191aafffb378e1"><span class="std std-ref">getInvalidHandle</span></a><span></span><span class="p">();</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_gui_GdiCursor.html" class="btn btn-neutral float-right" title="class axl::gui::GdiCursor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_gui_FontTuple.html" class="btn btn-neutral float-left" title="class axl::gui::FontTuple" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

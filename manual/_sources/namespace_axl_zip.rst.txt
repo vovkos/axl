@@ -1,0 +1,30 @@
+.. index:: pair: namespace; axl::zip
+.. _doxid-namespaceaxl_1_1zip:
+
+namespace axl::zip
+==================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_zip_ZipFileInfo.rst
+	class_axl_zip_ZipReader.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace zip {
+
+	// structs
+
+	struct :ref:`ZipFileInfo<doxid-structaxl_1_1zip_1_1_zip_file_info>`;
+
+	// classes
+
+	class :ref:`ZipReader<doxid-classaxl_1_1zip_1_1_zip_reader>`;
+
+	} // namespace zip

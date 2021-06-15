@@ -1,0 +1,43 @@
+.. index:: pair: class; axl::gui::QtWidgetBase
+.. _doxid-classaxl_1_1gui_1_1_qt_widget_base:
+
+class axl::gui::QtWidgetBase
+============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_QtWidget.h>
+	
+	class QtWidgetBase: public QAbstractScrollArea
+	{
+	public:
+		// construction
+	
+		:target:`QtWidgetBase<doxid-classaxl_1_1gui_1_1_qt_widget_base_1aef845c004e31cdd01ebf70f2df854d99>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			QWidget* parent = NULL
+			);
+		:target:`~QtWidgetBase<doxid-classaxl_1_1gui_1_1_qt_widget_base_1a303d586ef1ec4aadc878837e4be1ee4a>`();
+
+		// methods
+	
+		void
+		:target:`postThreadMsg<doxid-classaxl_1_1gui_1_1_qt_widget_base_1a277052b0d948678a9f4a986b1f83695e>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` code,
+			const :ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<void>& params
+			);
+	
+		virtual
+		void
+		:target:`emitNotificationSignal<doxid-classaxl_1_1gui_1_1_qt_widget_base_1a50b2eab56ddac4837ac2b18a12dfb12b>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` code,
+			const void* param
+			);
+	};

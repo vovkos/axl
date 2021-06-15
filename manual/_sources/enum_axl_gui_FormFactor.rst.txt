@@ -1,0 +1,22 @@
+.. index:: pair: enum; FormFactor
+.. _doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893:
+
+enum axl::gui::FormFactor
+=========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+
+	enum FormFactor
+	{
+	    :target:`FormFactor_Landscape<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893aee846a73d406f9519b39e19bbf78583b>`,
+	    :target:`FormFactor_Portrait<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893ab1e26aab289fa56a02160a57fe3081a4>`,
+	    :target:`FormFactor_LineStrip<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893a61394586aeec2c41d50e2b5635ed339a>`,
+	    :target:`FormFactor_ColumnStrip<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893a1b0a8c3cf9ba1e091b34935aa27dcd4a>`,
+	    :target:`FormFactor__Count<doxid-namespaceaxl_1_1gui_1a3dedabc4ff19c083d877e353f9736893ab51dfe404cbf2876c4b2c60890152012>`,
+	};
+

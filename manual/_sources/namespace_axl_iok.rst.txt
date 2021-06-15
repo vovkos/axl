@@ -1,0 +1,50 @@
+.. index:: pair: namespace; axl::iok
+.. _doxid-namespaceaxl_1_1iok:
+
+namespace axl::iok
+==================
+
+.. toctree::
+	:hidden:
+
+	class_axl_iok_Iterator.rst
+	class_axl_iok_ObjectBase.rst
+	class_axl_iok_RegistryEntry.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace iok {
+
+	// typedefs
+
+	typedef :ref:`ObjectBase<doxid-classaxl_1_1iok_1_1_object_base>`<io_object_t> :target:`Object<doxid-namespaceaxl_1_1iok_1a54f19be616f10104bf829d51e575b1c5>`;
+
+	// classes
+
+	class :ref:`Iterator<doxid-classaxl_1_1iok_1_1_iterator>`;
+
+	template <typename T>
+	class :ref:`ObjectBase<doxid-classaxl_1_1iok_1_1_object_base>`;
+
+	class :ref:`RegistryEntry<doxid-classaxl_1_1iok_1_1_registry_entry>`;
+
+	// global functions
+
+	size_t
+	:target:`getComputerGuid<doxid-namespaceaxl_1_1iok_1a824e3b06606d0fc8d8d0f4b268f1db7e>`(:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* guid);
+
+	:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+	:target:`getComputerGuid<doxid-namespaceaxl_1_1iok_1a09be7a0a727e5891ece3c6b97fe704ec>`();
+
+	:ref:`cf::MutableDictionary<doxid-classaxl_1_1cf_1_1_mutable_dictionary>`
+	:target:`createServiceMatchingDictionary<doxid-namespaceaxl_1_1iok_1a0cdb1060a2bdfe1b8752f9c58b3f1a32>`(const char* service);
+
+	:ref:`Iterator<doxid-classaxl_1_1iok_1_1_iterator>`
+	:target:`findMatchingServices<doxid-namespaceaxl_1_1iok_1a70b44cab00d33ae5698533c4671d9703>`(CFMutableDictionaryRef dict);
+
+	} // namespace iok

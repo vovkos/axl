@@ -1,0 +1,21 @@
+.. index:: pair: enum; EscapeEncodingFlag
+.. _doxid-namespaceaxl_1_1enc_1a400df063cd3d660ee6d5831900d6291d:
+
+enum axl::enc::EscapeEncodingFlag
+=================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_EscapeEncoding.h>
+
+	enum EscapeEncodingFlag
+	{
+	    :target:`EscapeEncodingFlag_UpperCase<doxid-namespaceaxl_1_1enc_1a400df063cd3d660ee6d5831900d6291dad6eac82c1affec9d22b3c1942448d474>`   = 0x01,
+	    :target:`EscapeEncodingFlag_NoTabEscape<doxid-namespaceaxl_1_1enc_1a400df063cd3d660ee6d5831900d6291dae12eea8ea95553acc5f5855b45bfa228>` = 0x02,
+	    :target:`EscapeEncodingFlag_NoCrEscape<doxid-namespaceaxl_1_1enc_1a400df063cd3d660ee6d5831900d6291da4fd09706e3285d32d7d9de8639c08b02>`  = 0x04,
+	    :target:`EscapeEncodingFlag_NoLfEscape<doxid-namespaceaxl_1_1enc_1a400df063cd3d660ee6d5831900d6291daba27963efacf4166324584383ccc12a0>`  = 0x08,
+	};
+

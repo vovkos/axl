@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::ExplicitPtrCast
+.. _doxid-classaxl_1_1sl_1_1_explicit_ptr_cast:
+
+template class axl::sl::ExplicitPtrCast
+=======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename A,
+		typename B
+		>
+	class ExplicitPtrCast
+	{
+	public:
+		// methods
+	
+		B*
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_explicit_ptr_cast_1a274224f092c7a3eecff0c6d6f6925ba4>`(A* x) const;
+	
+		const B*
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_explicit_ptr_cast_1a93e8ac9241887f31245b7fde38227507>`(const A* x) const;
+	};

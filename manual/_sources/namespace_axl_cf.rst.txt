@@ -1,0 +1,73 @@
+.. index:: pair: namespace; axl::cf
+.. _doxid-namespaceaxl_1_1cf:
+
+namespace axl::cf
+=================
+
+.. toctree::
+	:hidden:
+
+	class_axl_cf_Data.rst
+	class_axl_cf_DictionaryBase.rst
+	class_axl_cf_MutableDictionary.rst
+	class_axl_cf_Number.rst
+	class_axl_cf_SecScopedBookmark.rst
+	class_axl_cf_String.rst
+	class_axl_cf_TypeBase.rst
+	class_axl_cf_Url.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace cf {
+
+	// typedefs
+
+	typedef :ref:`DictionaryBase<doxid-classaxl_1_1cf_1_1_dictionary_base>`<CFDictionaryRef> :target:`Dictionary<doxid-namespaceaxl_1_1cf_1ae7e87d9f64fd131fe28db5cba935f9d5>`;
+	typedef :ref:`TypeBase<doxid-classaxl_1_1cf_1_1_type_base>`<CFTypeRef> :target:`Type<doxid-namespaceaxl_1_1cf_1a538b3b296a2176c248d2514512d2bc69>`;
+
+	// classes
+
+	class :ref:`Data<doxid-classaxl_1_1cf_1_1_data>`;
+
+	template <typename T>
+	class :ref:`DictionaryBase<doxid-classaxl_1_1cf_1_1_dictionary_base>`;
+
+	class :ref:`MutableDictionary<doxid-classaxl_1_1cf_1_1_mutable_dictionary>`;
+	class :ref:`Number<doxid-classaxl_1_1cf_1_1_number>`;
+	class :ref:`SecScopedBookmark<doxid-classaxl_1_1cf_1_1_sec_scoped_bookmark>`;
+	class :ref:`String<doxid-classaxl_1_1cf_1_1_string>`;
+
+	template <typename T>
+	class :ref:`TypeBase<doxid-classaxl_1_1cf_1_1_type_base>`;
+
+	class :ref:`Url<doxid-classaxl_1_1cf_1_1_url>`;
+
+	// global functions
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getStringFromCfString<doxid-namespaceaxl_1_1cf_1a2cebd9261e111ded29b765891971baf2>`(CFStringRef cfString);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`cfTypeToString<doxid-namespaceaxl_1_1cf_1ac294e6d5fac2ea5a5e91b65459f5d01a>`(
+		CFTypeRef cfType,
+		bool isVerbose = false
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getTypeIdDescription<doxid-namespaceaxl_1_1cf_1a1c325b3e241e6983716a898207b2d6e0>`(CFTypeID typeId);
+
+	CFTypeID
+	:target:`getStringTypeId<doxid-namespaceaxl_1_1cf_1a005dce57a3741cf131f30d0d7a78fec2>`();
+
+	CFTypeID
+	:target:`getBooleanTypeId<doxid-namespaceaxl_1_1cf_1ac890fdcec1464292387bd138a6ea2658>`();
+
+	CFTypeID
+	:target:`getNumberTypeId<doxid-namespaceaxl_1_1cf_1a0127ce5eabbedf79f305603f8ce82c1b>`();
+
+	} // namespace cf

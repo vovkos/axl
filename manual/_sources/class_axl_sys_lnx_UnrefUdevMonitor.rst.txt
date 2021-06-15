@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::sys::lnx::UnrefUdevMonitor
+.. _doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_monitor:
+
+template class axl::sys::lnx::UnrefUdevMonitor
+==============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_lnx_UdevMonitor.h>
+	
+	template <typename T>
+	class UnrefUdevMonitor
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1lnx_1_1_unref_udev_monitor_1aa9416e2d333737653d59bc9da32eea62>`(udev_monitor* h);
+	};

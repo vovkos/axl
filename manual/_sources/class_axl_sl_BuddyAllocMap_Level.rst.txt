@@ -1,0 +1,54 @@
+.. index:: pair: class; axl::sl::BuddyAllocMap::Level
+.. _doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level:
+
+class axl::sl::BuddyAllocMap::Level
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	class Level
+	{
+	public:
+		// methods
+	
+		Page*
+		:target:`getFirstPage<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level_1a91d385cc1ec560fbdea345f517f01222>`();
+	
+		Page*
+		:target:`getFirstAvailablePage<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level_1a9ebdf8dfb4556ec537d928eb3a9b4f51>`();
+	
+		void
+		:target:`format<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level_1a17ccae0068a5350fba4850315fea9306>`(
+			Page* page,
+			size_t count
+			);
+	
+		void
+		:target:`setPageMap<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level_1aa09535d645cece64ca8343162d414e22>`(
+			Page* page,
+			size_t map
+			);
+	
+		void
+		:target:`setBit<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level_1a198df80c596957fed22e75255e9f2318>`(
+			Page* page,
+			size_t bit,
+			bool value
+			);
+	
+		void
+		:target:`setBitRange<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level_1a237808b2e3e6367f32f0098d014b9d38>`(
+			Page* page,
+			size_t from,
+			size_t to,
+			bool value
+			);
+	};

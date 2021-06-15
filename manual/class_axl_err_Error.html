@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::err::Error &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::err::ErrorMgr" href="class_axl_err_ErrorMgr.html" />
+    <link rel="prev" title="class axl::err::ErrnoProvider" href="class_axl_err_ErrnoProvider.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_err_StdErrorCode.html">enum axl::err::StdErrorCode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_err_ErrorHdr.html">struct axl::err::ErrorHdr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_Errno.html">class axl::err::Errno</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_ErrnoProvider.html">class axl::err::ErrnoProvider</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">class axl::err::Error</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_ErrorMgr.html">class axl::err::ErrorMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_ErrorProvider.html">class axl::err::ErrorProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_ErrorRef.html">class axl::err::ErrorRef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_ErrorRouter.html">class axl::err::ErrorRouter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_SizeOfError.html">class axl::err::SizeOfError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_err_StdErrorProvider.html">class axl::err::StdErrorProvider</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_err.html">namespace axl::err</a> &raquo;</li>
+        
+      <li>class axl::err::Error</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-err-error">
+<span id="doxid-classaxl-1-1err-1-1-error"></span><span id="index-0"></span><h1>class axl::err::Error</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_err_Error.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nl">Error</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf"><span class="std std-ref">axl::rc::Buf</span></a><span></span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1abd05544ebf89382d0a5f367d24d57e0c"><span></span><span class="n">Error</span></span><span></span><span class="p">();</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1ae816bea390ed251349db0fcfc056ae80"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">Error</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1af5a4c5ee3e913804cd41637c3fd523b1"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="class_axl_err_ErrorRef.html#doxid-classaxl-1-1err-1-1-error-ref"><span class="std std-ref">ErrorRef</span></a><span></span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a203e9f77e6082bf2f187ab85b6fb539e"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="struct_axl_err_ErrorHdr.html#doxid-structaxl-1-1err-1-1-error-hdr"><span class="std std-ref">ErrorHdr</span></a><span></span><span class="o">*</span> <span class="n">src</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a83f9458e84c61e4a0cb2ee6e3ad212ab"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a94c41a50a5d42b36fa139dd90eb1deb2"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span>
+        <span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a5ad21cb0b34dad49771ffbd0f737a055"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a70dcade430d07864f244bc9b8aae57b8"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">string</span><span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1abf6ccad95aae3cc9989bed876474340d"><span></span><span class="n">Error</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="enum_axl_rc_BufKind.html#doxid-namespaceaxl-1-1rc-1a26a3b8c02d23ba7102e57659d211c077"><span class="std std-ref">rc::BufKind</span></a><span></span> <span class="n">kind</span><span class="p">,</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">);</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="n">Error</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a6f367295943643b8f9444796e89a27e5"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">Error</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="n">Error</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a9058b7031b0fadf44a53fc442399ac0c"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="class_axl_err_ErrorRef.html#doxid-classaxl-1-1err-1-1-error-ref"><span class="std std-ref">ErrorRef</span></a><span></span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="n">Error</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a3f4646ccb204f498758b54dbd80f85e7"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="struct_axl_err_ErrorHdr.html#doxid-structaxl-1-1err-1-1-error-hdr"><span class="std std-ref">ErrorHdr</span></a><span></span><span class="o">*</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="n">Error</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1af905577d83d2320409ff955ff1af3b15"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a89eb9d2465b3bb76bef313a60fe562fc"><span></span><span class="n">push</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="class_axl_err_ErrorRef.html#doxid-classaxl-1-1err-1-1-error-ref"><span class="std std-ref">ErrorRef</span></a><span></span><span class="o">&amp;</span> <span class="n">error</span><span class="p">);</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Pack</span><span class="o">&gt;</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a2ee91209ba7fe6ff97bf2a8d1d682ca7"><span></span><span class="n">pack_va</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_va_list.html#doxid-classaxl-va-list"><span class="std std-ref">axl_va_list</span></a><span></span> <span class="n">va</span>
+        <span class="p">);</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Pack</span><span class="o">&gt;</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a94171451e395435d00ff844da890c450"><span></span><span class="n">pack</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="p">...</span>
+        <span class="p">);</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Pack</span><span class="o">&gt;</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a3acdf0204a96bf8d9a9488e1870eb845"><span></span><span class="n">pushPack_va</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_va_list.html#doxid-classaxl-va-list"><span class="std std-ref">axl_va_list</span></a><span></span> <span class="n">va</span>
+        <span class="p">);</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Pack</span><span class="o">&gt;</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a7a63daf6def4176fb9d9a6659d75567c"><span></span><span class="n">pushPack</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="p">...</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1aa7ea7aa4eb61ca7ddb88b7e48dc07c8b"><span></span><span class="n">format_va</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_va_list.html#doxid-classaxl-va-list"><span class="std std-ref">axl_va_list</span></a><span></span> <span class="n">va</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a6dc3bec02d73d1f6b07881d02061175f"><span></span><span class="n">format</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <span class="p">...</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1abe82770a619be62a3fddf819578fdc86"><span></span><span class="n">pushFormat_va</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_va_list.html#doxid-classaxl-va-list"><span class="std std-ref">axl_va_list</span></a><span></span> <span class="n">va</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a4b74e94ac466a373658a512672d08914"><span></span><span class="n">pushFormat</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <span class="p">...</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a3ff8387329830ac3e267bb7498604e1b"><span></span><span class="n">createSystemError</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1af3d441eb029084b65f9f3a611347c3a3"><span></span><span class="n">createSimpleError</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1ac27f7fb9e8ac1bf8b1f175b484bbb252"><span></span><span class="n">pushSimpleError</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="struct_axl_sl_Guid.html#doxid-structaxl-1-1sl-1-1-guid"><span class="std std-ref">sl::Guid</span></a><span></span><span class="o">&amp;</span> <span class="n">guid</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">code</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a76afcc17c97ca7a7d3f30e11daa724a8"><span></span><span class="n">createStringError</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a4adbce21037740bc2f46b4079b97823a"><span></span><span class="n">pushStringError</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1ac279944414e4ac3a0def3dee33701c38"><span></span><span class="n">formatStringError_va</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_va_list.html#doxid-classaxl-va-list"><span class="std std-ref">axl_va_list</span></a><span></span> <span class="n">va</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a26faa5ab2f39971ebd19d299c500b1de"><span></span><span class="n">formatStringError</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <span class="p">...</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1aba671aa99facb017c601d3e8084be940"><span></span><span class="n">pushFormatStringError_va</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <a class="reference internal" href="class_axl_va_list.html#doxid-classaxl-va-list"><span class="std std-ref">axl_va_list</span></a><span></span> <span class="n">va</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1err-1-1-error-1a6b9320a4a4fcd71091b02cb96586e102"><span></span><span class="n">pushFormatStringError</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">formatString</span><span class="p">,</span>
+        <span class="p">...</span>
+        <span class="p">);</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// classes</span>
+
+    <span class="k">class</span> <a class="reference internal" href="class_axl_rc_Buf_Hdr.html#doxid-classaxl-1-1rc-1-1-buf-1-1-hdr"><span class="std std-ref">Hdr</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a901c3da88531006fad642c43502a1b59"><span class="std std-ref">operator const T *</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1ae6d15997ab5039e690c867958ac721e7"><span class="std std-ref">operator T *</span></a><span></span><span class="p">();</span>
+
+    <span class="k">const</span> <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a8ef346fb761fae112588a6dc68880b63"><span class="std std-ref">operator-&gt;</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1ab8a9b415a06ef1419113d6799c25fc91"><span class="std std-ref">operator-&gt;</span></a><span></span><span class="p">();</span>
+
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf"><span class="std std-ref">Buf</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1ab98bb427e2f8c68d892455ce51477993"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf"><span class="std std-ref">Buf</span></a><span></span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf"><span class="std std-ref">Buf</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a051d080dcafec8fb9eea9022b6acdf16"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="k">const</span> <span class="n">Ref</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf"><span class="std std-ref">Buf</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1afa8aaba677a3bfd8fe8c69e53c1b3f2b"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">p</span><span class="p">);</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a3acd708e697680c9a462d633b7ffbd78"><span class="std std-ref">p</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a416e08bf07c6f985fe151e1cb889ccd9"><span class="std std-ref">clear</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a3c11609545193ec2c523b0c0a4336e99"><span class="std std-ref">copy</span></a><span></span><span class="p">(</span><span class="k">const</span> <span class="n">Ref</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1ad8196a280725e5769b460b721a652c42"><span class="std std-ref">copy</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a8c7ec1a9331f1d4e0fb58d7f8eb9cc67"><span class="std std-ref">isExclusive</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1ae2b6362eb02b5e9978276b8993f9d425"><span class="std std-ref">ensureExclusive</span></a><span></span><span class="p">();</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a687da6fd4a45e547041a17c6365718d5"><span class="std std-ref">getBuffer</span></a><span></span><span class="p">(</span><span class="kt">size_t</span><span class="o">*</span> <span class="n">size</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a9b0f8092f48e1a89abbdc444ff1cf9f1"><span class="std std-ref">createBuffer</span></a><span></span><span class="p">(</span>
+        <span class="kt">size_t</span> <span class="n">size</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">T</span><span class="p">),</span>
+        <span class="kt">bool</span> <span class="n">saveContents</span> <span class="o">=</span> <span class="nb">false</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_rc_Buf.html#doxid-classaxl-1-1rc-1-1-buf-1a1d9cda532e74e030332036c072fc4aea"><span class="std std-ref">setBuffer</span></a><span></span><span class="p">(</span>
+        <a class="reference internal" href="enum_axl_rc_BufKind.html#doxid-namespaceaxl-1-1rc-1a26a3b8c02d23ba7102e57659d211c077"><span class="std std-ref">BufKind</span></a><span></span> <span class="n">kind</span><span class="p">,</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">);</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_err_ErrorMgr.html" class="btn btn-neutral float-right" title="class axl::err::ErrorMgr" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_err_ErrnoProvider.html" class="btn btn-neutral float-left" title="class axl::err::ErrnoProvider" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

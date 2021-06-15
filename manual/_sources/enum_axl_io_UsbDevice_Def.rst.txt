@@ -1,0 +1,18 @@
+.. index:: pair: enum; Def
+.. _doxid-classaxl_1_1io_1_1_usb_device_1a5dfffbeccaa6840426133321ff43f2fb:
+
+enum axl::io::UsbDevice::Def
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_UsbDevice.h>
+
+	enum Def
+	{
+	    :target:`Def_BufferSize<doxid-classaxl_1_1io_1_1_usb_device_1a5dfffbeccaa6840426133321ff43f2fbae88a5ebde1c1f94cd8f6120e887f9962>` = 256,
+	};
+

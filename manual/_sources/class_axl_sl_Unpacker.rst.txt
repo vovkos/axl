@@ -1,0 +1,75 @@
+.. index:: pair: class; axl::sl::Unpacker
+.. _doxid-classaxl_1_1sl_1_1_unpacker:
+
+class axl::sl::Unpacker
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Unpacker.h>
+	
+	class Unpacker
+	{
+	public:
+		// construction
+	
+		:target:`Unpacker<doxid-classaxl_1_1sl_1_1_unpacker_1a0c4c4bb3eda7bf4cda4d21e55fad5360>`();
+	
+		:target:`Unpacker<doxid-classaxl_1_1sl_1_1_unpacker_1a5eabfe024a4ae380e8981b19bbb69d7e>`(
+			const void* p,
+			size_t size
+			);
+
+		// methods
+	
+		void
+		:target:`setup<doxid-classaxl_1_1sl_1_1_unpacker_1a46b5e46af986713ad4733a6bafce3088>`(
+			const void* p,
+			size_t size
+			);
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_unpacker_1a691b6cd38f01b6dfdf196ffa7efebbc3>`();
+	
+		void
+		:target:`rewind<doxid-classaxl_1_1sl_1_1_unpacker_1ab0e0c9b17de9d7b7c9740bc8ba867d24>`();
+	
+		size_t
+		:target:`getLeftoverSize<doxid-classaxl_1_1sl_1_1_unpacker_1a10d15d835a9d447e3da9b639da77b41e>`();
+	
+		bool
+		:target:`unpack<doxid-classaxl_1_1sl_1_1_unpacker_1a37d790f557876d262d2d1f31b3945399>`(
+			void* p,
+			size_t size
+			);
+	
+		template <
+			typename T,
+			typename Unpack
+			>
+		bool
+		:target:`unpack<doxid-classaxl_1_1sl_1_1_unpacker_1afd07edfb577f8605846797c72abf177e>`(T* value);
+	
+		template <typename T>
+		bool
+		:target:`unpack<doxid-classaxl_1_1sl_1_1_unpacker_1aba94fb1a8f00655f3b756eb076b940f3>`(T* value);
+	
+		size_t
+		:target:`scan_va<doxid-classaxl_1_1sl_1_1_unpacker_1aca8b21d012ea8667e9577b9aaec1c78d>`(
+			const char* formatString,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+	
+		size_t
+		:target:`scan<doxid-classaxl_1_1sl_1_1_unpacker_1ad3058fe1d30cafd07c9741a97b2567ea>`(
+			const char* formatString,
+			...
+			);
+	};

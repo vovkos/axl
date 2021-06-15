@@ -1,0 +1,56 @@
+.. index:: pair: class; axl::io::PcapFilter
+.. _doxid-classaxl_1_1io_1_1_pcap_filter:
+
+class axl::io::PcapFilter
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_PcapFilter.h>
+	
+	class PcapFilter: public bpf_program
+	{
+	public:
+		// construction
+	
+		:target:`PcapFilter<doxid-classaxl_1_1io_1_1_pcap_filter_1a9c4f83e456c84c7851016d171842894e>`();
+		:target:`~PcapFilter<doxid-classaxl_1_1io_1_1_pcap_filter_1a055e979ed5f39ad0fbd167c615e2a991>`();
+
+		// methods
+	
+		void
+		:target:`free<doxid-classaxl_1_1io_1_1_pcap_filter_1a112db232689865bc6dc42cb871c4d6fa>`();
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1io_1_1_pcap_filter_1adc914fbf4a1f537af2ea46dada8454e5>`();
+	
+		bool
+		:target:`compile<doxid-classaxl_1_1io_1_1_pcap_filter_1acf93f9420c69c99674c301ecda32e481>`(
+			pcap_t* pcap,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filter,
+			bool isOptimized = true,
+			uint32_t netMask = 0xffffffff
+			);
+	
+		bool
+		:target:`compile<doxid-classaxl_1_1io_1_1_pcap_filter_1a5d8597af9416f8bf19f0e7fc982a9227>`(
+			int linkType,
+			size_t snapshotSize,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filter,
+			bool isOptimized = true,
+			uint32_t netMask = 0xffffffff
+			);
+	
+		bool
+		:target:`match<doxid-classaxl_1_1io_1_1_pcap_filter_1a08684a5c02698a3f714fae39115ea623>`(
+			const void* p,
+			size_t size
+			);
+	};

@@ -1,0 +1,29 @@
+.. index:: pair: class; axl::gui::GuiItem
+.. _doxid-classaxl_1_1gui_1_1_gui_item:
+
+class axl::gui::GuiItem
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+	
+	class GuiItem
+	{
+	public:
+		// construction
+	
+		:target:`GuiItem<doxid-classaxl_1_1gui_1_1_gui_item_1a84216fef97fb30d01e0083430fa141e3>`(:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`* engine);
+
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:target:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+	};

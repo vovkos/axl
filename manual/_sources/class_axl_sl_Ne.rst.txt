@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::Ne
+.. _doxid-classaxl_1_1sl_1_1_ne:
+
+template class axl::sl::Ne
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class Ne
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_ne_1a35928256098bf0632c6de317704ee3bb>`(
+			Arg a,
+			Arg b
+			) const;
+	};

@@ -1,0 +1,22 @@
+.. index:: pair: struct; axl::err::ErrorMgr::ThreadEntry
+.. _doxid-structaxl_1_1err_1_1_error_mgr_1_1_thread_entry:
+
+struct axl::err::ErrorMgr::ThreadEntry
+======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct ThreadEntry
+	{
+		// fields
+	
+		:ref:`Error<doxid-classaxl_1_1err_1_1_error>` :target:`m_error<doxid-structaxl_1_1err_1_1_error_mgr_1_1_thread_entry_1a9f0346e6d639890a1e45f138d05e1983>`;
+	};

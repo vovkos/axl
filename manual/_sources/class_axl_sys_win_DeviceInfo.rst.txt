@@ -1,0 +1,101 @@
+.. index:: pair: class; axl::sys::win::DeviceInfo
+.. _doxid-classaxl_1_1sys_1_1win_1_1_device_info:
+
+class axl::sys::win::DeviceInfo
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_DeviceInfo.h>
+	
+	class DeviceInfo
+	{
+	public:
+		// construction
+	
+		:target:`DeviceInfo<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1a5f2d045d63f2be1e6c6aaee15f24d2bc>`();
+	
+		:target:`DeviceInfo<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1ae17b17a06e23db0057704000596337c4>`(
+			HDEVINFO devInfoSet,
+			const SP_DEVINFO_DATA* devInfoData
+			);
+
+		// methods
+	
+		HDEVINFO
+		:target:`getDevInfoSet<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1ac8b5c397678aa84cddc1ad92c14a6557>`();
+	
+		SP_DEVINFO_DATA*
+		:target:`getDevInfoData<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1adba4c7ce77a7a1a7e38661b6630cd48d>`();
+	
+		bool
+		:target:`getDeviceRegistryProperty<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1a3ba4d2844cf58cdb2d27e47111eedc77>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` propId,
+			void* buffer,
+			size_t size,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* requiredSize
+			);
+	
+		bool
+		:target:`getDeviceRegistryProperty<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1af471d3767882816311aac1a57c68c1f3>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` propId,
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer
+			);
+	
+		bool
+		:target:`getDeviceRegistryProperty<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1a82b4f259b7e1322ba14091b1b8aebb1f>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` propId,
+			:ref:`sl::String_w<doxid-namespaceaxl_1_1sl_1af48c091365c4e43d1fe0621316b75161>`* string
+			);
+	
+		bool
+		:target:`getDeviceRegistryProperty<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1a6cf49d2047eb7a8990f9373b44e182f4>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` propId,
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string
+			);
+	
+		bool
+		:target:`setDeviceRegistryProperty<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1a55222b301b7b789ecdeacb2467102a7d>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` propId,
+			const void* buffer,
+			size_t size
+			);
+	
+		HKEY
+		:target:`openDeviceRegistryKey<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1af5acf647eaef4685f28bca7132386213>`(REGSAM keyAccess);
+	
+		bool
+		:target:`getDeviceInstallParams<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1ae8cd472f537c9e5054fc90b0205b4914>`(SP_DEVINSTALL_PARAMS_W* params);
+	
+		bool
+		:target:`setDeviceInstallParams<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1a5626060f9071502fd50d3cf1acc6eeec>`(const SP_DEVINSTALL_PARAMS_W* params);
+	
+		bool
+		:target:`getClassInstallParams<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1af13934269bd65f9e9ddcbdac68e5c844>`(
+			void* buffer,
+			size_t size,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* requiredSize
+			);
+	
+		bool
+		:target:`getClassInstallParams<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1aab7693bd4592bb6e5c14e4b4f06ee7be>`(:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer);
+	
+		bool
+		:target:`setClassInstallParams<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1ab69477d4d9f9e8c0ee1fbd69b39063e9>`(
+			const void* params,
+			size_t size
+			);
+	
+		bool
+		:target:`callClassInstaller<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1a2f2e51572de9f67891a6b34c5e8ea936>`(DI_FUNCTION function);
+	
+		bool
+		:target:`restartDevice<doxid-classaxl_1_1sys_1_1win_1_1_device_info_1af349e3dabff1af8fc136dc8c7a6630f3>`(bool* isRebootRequired);
+	};

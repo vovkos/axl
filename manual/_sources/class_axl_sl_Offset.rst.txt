@@ -1,0 +1,30 @@
+.. index:: pair: class; axl::sl::Offset
+.. _doxid-classaxl_1_1sl_1_1_offset:
+
+template class axl::sl::Offset
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename A,
+		typename B,
+		size_t offset
+		>
+	class Offset
+	{
+	public:
+		// methods
+	
+		B*
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_offset_1af2248f180befa356b9e9f697887fb413>`(A* p) const;
+	};

@@ -1,0 +1,58 @@
+.. index:: pair: class; axl::gui::QtFontTuple
+.. _doxid-classaxl_1_1gui_1_1_qt_font_tuple:
+
+class axl::gui::QtFontTuple
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_QtEngine.h>
+	
+	class QtFontTuple: public :ref:`axl::gui::FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`
+	{
+	public:
+		// construction
+	
+		:target:`QtFontTuple<doxid-classaxl_1_1gui_1_1_qt_font_tuple_1a948981d5c27403fc5e335193318894af>`();
+
+		// methods
+	
+		:ref:`QtFont<doxid-classaxl_1_1gui_1_1_qt_font>`*
+		:target:`attachFont<doxid-classaxl_1_1gui_1_1_qt_font_tuple_1afdf443f090d53d7c9dc820b0d543bb7b>`(QFont qtFont);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:ref:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:ref:`createFont<doxid-classaxl_1_1gui_1_1_font_tuple_1af47085a65f6d483aa31269911b986753>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& family,
+			size_t pointSize,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:ref:`createFont<doxid-classaxl_1_1gui_1_1_font_tuple_1a1b6a6d88f8273cc388752ddbf0870a3e>`(const :ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`& fontDesc);
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:ref:`getFont<doxid-classaxl_1_1gui_1_1_font_tuple_1a1f6e0ba99a275a7c1c5dc841e3d2a717>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0);
+	
+		void
+		:ref:`clear<doxid-classaxl_1_1gui_1_1_font_tuple_1a1e0f031d00d5ebf3124150023c70e188>`();
+

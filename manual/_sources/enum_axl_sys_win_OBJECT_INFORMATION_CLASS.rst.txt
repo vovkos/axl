@@ -1,0 +1,22 @@
+.. index:: pair: enum; OBJECT_INFORMATION_CLASS
+.. _doxid-namespaceaxl_1_1sys_1_1win_1a04e8b34a5a6563fa122beac657f948a3:
+
+enum axl::sys::win::OBJECT_INFORMATION_CLASS
+============================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_NtDll.h>
+
+	enum OBJECT_INFORMATION_CLASS
+	{
+	    :target:`ObjectBasicInformation<doxid-namespaceaxl_1_1sys_1_1win_1a04e8b34a5a6563fa122beac657f948a3a5ac73c85c95e19a90cc0f50df96a5a76>`,
+	    :target:`ObjectNameInformation<doxid-namespaceaxl_1_1sys_1_1win_1a04e8b34a5a6563fa122beac657f948a3ae18b28f0da92e1cf0c49bc0a45b94090>`,
+	    :target:`ObjectTypeInformation<doxid-namespaceaxl_1_1sys_1_1win_1a04e8b34a5a6563fa122beac657f948a3ab1cc676af7e094b78557df274614de67>`,
+	    :target:`ObjectAllInformation<doxid-namespaceaxl_1_1sys_1_1win_1a04e8b34a5a6563fa122beac657f948a3af01174bf35325ef6615b04cbd4f54c62>`,
+	    :target:`ObjectDataInformation<doxid-namespaceaxl_1_1sys_1_1win_1a04e8b34a5a6563fa122beac657f948a3a706d88a61971efd4049a7e933cb3627e>`,
+	};
+

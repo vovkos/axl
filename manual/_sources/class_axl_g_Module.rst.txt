@@ -1,0 +1,48 @@
+.. index:: pair: class; axl::g::Module
+.. _doxid-classaxl_1_1g_1_1_module:
+
+class axl::g::Module
+====================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_g_Module_FinalizerEntry.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_g_Module.h>
+	
+	class Module
+	{
+	public:
+		// structs
+	
+		struct :ref:`FinalizerEntry<doxid-structaxl_1_1g_1_1_module_1_1_finalizer_entry>`;
+
+		// construction
+	
+		:target:`Module<doxid-classaxl_1_1g_1_1_module_1aba9a272825d01a845707bca37c6b12ec>`();
+		:target:`~Module<doxid-classaxl_1_1g_1_1_module_1a9f37f437df703611bdd4beeec6f9c8aa>`();
+
+		// methods
+	
+		const char*
+		:target:`getTag<doxid-classaxl_1_1g_1_1_module_1adeb4c274b2d640505e4a9495e6cb80fb>`();
+	
+		void
+		:target:`setTag<doxid-classaxl_1_1g_1_1_module_1a8d23c4222b986e42da95bc8441a09072>`(const char* tag);
+	
+		const :ref:`SystemInfo<doxid-structaxl_1_1g_1_1_system_info>`*
+		:target:`getSystemInfo<doxid-classaxl_1_1g_1_1_module_1a4f6586558ed7223afe98a5fce4a588f7>`();
+	
+		:ref:`mem::Tracker<doxid-classaxl_1_1mem_1_1_tracker>`*
+		:target:`getMemTracker<doxid-classaxl_1_1g_1_1_module_1ad69805df978e3d24f301d8624d16b968>`();
+	
+		bool
+		:target:`addFinalizer<doxid-classaxl_1_1g_1_1_module_1a429898d3ec97aa19583b8ce64f776209>`(const :ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`Finalizer<doxid-classaxl_1_1g_1_1_finalizer>`>& finalizer);
+	};

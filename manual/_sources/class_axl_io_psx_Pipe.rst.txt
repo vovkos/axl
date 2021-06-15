@@ -1,0 +1,45 @@
+.. index:: pair: class; axl::io::psx::Pipe
+.. _doxid-classaxl_1_1io_1_1psx_1_1_pipe:
+
+class axl::io::psx::Pipe
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_psx_Pipe.h>
+	
+	class Pipe
+	{
+	public:
+		// fields
+	
+		:ref:`File<doxid-classaxl_1_1io_1_1psx_1_1_file>` :target:`m_readFile<doxid-classaxl_1_1io_1_1psx_1_1_pipe_1a049fbb9ef3fcb98193511bdf0d00e007>`;
+		:ref:`File<doxid-classaxl_1_1io_1_1psx_1_1_file>` :target:`m_writeFile<doxid-classaxl_1_1io_1_1psx_1_1_pipe_1afbe66e4e5b61170c90b7080ad134161d>`;
+
+		// methods
+	
+		bool
+		:target:`create<doxid-classaxl_1_1io_1_1psx_1_1_pipe_1a6f0eb52b61abf307c1f1f78ff073aca0>`();
+	
+		void
+		:target:`close<doxid-classaxl_1_1io_1_1psx_1_1_pipe_1a330c81da638c6d8ad7e3764340d8ffe9>`();
+	
+		size_t
+		:target:`read<doxid-classaxl_1_1io_1_1psx_1_1_pipe_1a8a0f29e553ca52e10d1c0db677d2aa3c>`(
+			void* p,
+			size_t size
+			) const;
+	
+		size_t
+		:target:`write<doxid-classaxl_1_1io_1_1psx_1_1_pipe_1a184cb5e8a21bf85b7e609afb4c1d0a56>`(
+			const void* p,
+			size_t size
+			);
+	};

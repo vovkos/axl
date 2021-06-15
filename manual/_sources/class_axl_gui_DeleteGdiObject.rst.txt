@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::gui::DeleteGdiObject
+.. _doxid-classaxl_1_1gui_1_1_delete_gdi_object:
+
+class axl::gui::DeleteGdiObject
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_GdiObjectHandle.h>
+	
+	class DeleteGdiObject
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1gui_1_1_delete_gdi_object_1a58b21a1b9a7cbc7d62c706006e4086ee>`(HGDIOBJ h);
+	};

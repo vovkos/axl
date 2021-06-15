@@ -1,0 +1,18 @@
+.. index:: pair: enum; BufHdrFlag
+.. _doxid-namespaceaxl_1_1rc_1a5c213f07e076442249963f5841068c32:
+
+enum axl::rc::BufHdrFlag
+========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_rc_Buf.h>
+
+	enum BufHdrFlag
+	{
+	    :target:`BufHdrFlag_Exclusive<doxid-namespaceaxl_1_1rc_1a5c213f07e076442249963f5841068c32ad9bb5f08a44d652d3a7676dce33364ca>` = 0x04,
+	};
+

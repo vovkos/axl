@@ -1,0 +1,59 @@
+.. index:: pair: struct; axl::io::SerialSettings
+.. _doxid-structaxl_1_1io_1_1_serial_settings:
+
+struct axl::io::SerialSettings
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SerialSettings.h>
+	
+	struct SerialSettings
+	{
+		// fields
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_baudRate<doxid-structaxl_1_1io_1_1_serial_settings_1a76e9ea0f1455da90e989be3fa915db4b>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_dataBits<doxid-structaxl_1_1io_1_1_serial_settings_1aea64caa88cea4d2c3e1e2cf5cffa4f0e>`;
+		:ref:`SerialStopBits<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188b>` :target:`m_stopBits<doxid-structaxl_1_1io_1_1_serial_settings_1ad3a770c05583e66e57fc7c41db2d17b6>`;
+		:ref:`SerialParity<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3>` :target:`m_parity<doxid-structaxl_1_1io_1_1_serial_settings_1aec0be3f4cfeb42eb51bf2548dada7d8f>`;
+		:ref:`SerialFlowControl<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1>` :target:`m_flowControl<doxid-structaxl_1_1io_1_1_serial_settings_1a948ddd6eb98572afbe77c3e2e5ffe32b>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_readInterval<doxid-structaxl_1_1io_1_1_serial_settings_1adf572f02dbed5a781846fd205ae7f255>`;
+		bool :target:`m_dtr<doxid-structaxl_1_1io_1_1_serial_settings_1a2350d4da4adb86669d01cf4138319f9c>`;
+		bool :target:`m_rts<doxid-structaxl_1_1io_1_1_serial_settings_1afa5a72ef1d7c2308e8a71f13dcb53852>`;
+
+		// construction
+	
+		:target:`SerialSettings<doxid-structaxl_1_1io_1_1_serial_settings_1af0a08b2f889c47a062715b6d236df765>`();
+	
+		:target:`SerialSettings<doxid-structaxl_1_1io_1_1_serial_settings_1a8a0e5f9cd080077143f8d55555f9057b>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` baudRate,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` dataBits = 8,
+			:ref:`SerialStopBits<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188b>` stopBits = :ref:`SerialStopBits_1<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188ba326ec7b7b38f87c7223d32a19634cbee>`,
+			:ref:`SerialParity<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3>` parity = :ref:`SerialParity_None<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3a2e614494f42620b3aac82d6002bb7549>`,
+			:ref:`SerialFlowControl<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1>` flowControl = :ref:`SerialFlowControl_None<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1ae5f4c9047d3d83f12ad012094ce20627>`,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` readInterval = 10,
+			bool dtr = true,
+			bool rts = true
+			);
+
+		// methods
+	
+		void
+		:target:`setup<doxid-structaxl_1_1io_1_1_serial_settings_1aead1456014bac3850ca1f3b07aadc482>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` baudRate,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` dataBits = 8,
+			:ref:`SerialStopBits<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188b>` stopBits = :ref:`SerialStopBits_1<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188ba326ec7b7b38f87c7223d32a19634cbee>`,
+			:ref:`SerialParity<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3>` parity = :ref:`SerialParity_None<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3a2e614494f42620b3aac82d6002bb7549>`,
+			:ref:`SerialFlowControl<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1>` flowControl = :ref:`SerialFlowControl_None<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1ae5f4c9047d3d83f12ad012094ce20627>`,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` readInterval = 10,
+			bool dtr = true,
+			bool rts = true
+			);
+	};

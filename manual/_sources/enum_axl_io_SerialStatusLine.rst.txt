@@ -1,0 +1,21 @@
+.. index:: pair: enum; SerialStatusLine
+.. _doxid-namespaceaxl_1_1io_1a7398276977773f4357806d5c44a7400a:
+
+enum axl::io::SerialStatusLine
+==============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SerialSettings.h>
+
+	enum SerialStatusLine
+	{
+	    :target:`SerialStatusLine_Cts<doxid-namespaceaxl_1_1io_1a7398276977773f4357806d5c44a7400aa5ffadf1044f5d3846e543a6343f7fc35>`  = 0x01,
+	    :target:`SerialStatusLine_Dsr<doxid-namespaceaxl_1_1io_1a7398276977773f4357806d5c44a7400aaf67801bf0591b9e58ad7154a22d14cc2>`  = 0x02,
+	    :target:`SerialStatusLine_Ring<doxid-namespaceaxl_1_1io_1a7398276977773f4357806d5c44a7400aa062bd630207c72d1823d5263f416fc3d>` = 0x04,
+	    :target:`SerialStatusLine_Dcd<doxid-namespaceaxl_1_1io_1a7398276977773f4357806d5c44a7400aa8507a7f0d427a7bb6152af4c2c7ec01d>`  = 0x08,
+	};
+

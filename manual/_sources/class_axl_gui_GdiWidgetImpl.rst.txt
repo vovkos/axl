@@ -1,0 +1,47 @@
+.. index:: pair: class; axl::gui::GdiWidgetImpl
+.. _doxid-classaxl_1_1gui_1_1_gdi_widget_impl:
+
+class axl::gui::GdiWidgetImpl
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_GdiWidget.h>
+	
+	class GdiWidgetImpl: public :ref:`axl::gui::Widget<doxid-classaxl_1_1gui_1_1_widget>`
+	{
+	public:
+		// methods
+	
+		LRESULT
+		:target:`windowProc<doxid-classaxl_1_1gui_1_1_gdi_widget_impl_1afc7b21ee1025fba1d167e6c98210f4a0>`(
+			HWND hWnd,
+			UINT wmMsg,
+			WPARAM wParam,
+			LPARAM lParam,
+			bool* isHandled_o
+			);
+	
+		static
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`>
+		:target:`getCanvas<doxid-classaxl_1_1gui_1_1_gdi_widget_impl_1a2c572207860dd42b10cf7f14df17b9de>`(HWND hWnd);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>` :ref:`m_widgetDriver<doxid-classaxl_1_1gui_1_1_widget_1a6c7bf6ad16b2667d7cc9798e295f4f65>`;
+

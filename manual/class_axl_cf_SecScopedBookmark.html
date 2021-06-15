@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::cf::SecScopedBookmark &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::cf::String" href="class_axl_cf_String.html" />
+    <link rel="prev" title="class axl::cf::Number" href="class_axl_cf_Number.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_Data.html">class axl::cf::Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_DictionaryBase.html">template class axl::cf::DictionaryBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_MutableDictionary.html">class axl::cf::MutableDictionary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_Number.html">class axl::cf::Number</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">class axl::cf::SecScopedBookmark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_String.html">class axl::cf::String</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_TypeBase.html">template class axl::cf::TypeBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_Url.html">class axl::cf::Url</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_cf.html">namespace axl::cf</a> &raquo;</li>
+        
+      <li>class axl::cf::SecScopedBookmark</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-cf-secscopedbookmark">
+<span id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark"></span><span id="index-0"></span><h1>class axl::cf::SecScopedBookmark</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_cf_SecScopedBookmark.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="n">SecScopedBookmark</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a96b2bb02e69ac8a8fc36c257651503b2"><span></span><span class="n">SecScopedBookmark</span></span><span></span><span class="p">();</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1ae83a0bb4a52061a3aab8ada6af540467"><span></span><span class="n">SecScopedBookmark</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">SecScopedBookmark</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1ab7e423834280536e45dc9f0c5c6972e2"><span></span><span class="n">SecScopedBookmark</span></span><span></span><span class="p">(</span><span class="n">SecScopedBookmark</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a3ca3e29f0451b7d73690c72270823f62"><span></span><span class="o">~</span><span class="n">SecScopedBookmark</span></span><span></span><span class="p">();</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="n">SecScopedBookmark</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a60f8a115eff09384cc08a66f688f9c84"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">SecScopedBookmark</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1ada443d5e0fc584d1c0a9f537f3a13773"><span></span><span class="n">isEmpty</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a3a5652b1763f24b520af61afc7aa873d"><span></span><span class="n">getFilePath</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a283f4b06722237ce7c56497656e0a497"><span></span><span class="n">isDirectory</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a5b81fddb987d0e535f01428ff84a2211"><span></span><span class="n">close</span></span><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a0a9ef16e1187a9b57a608dfe71549bbb"><span></span><span class="n">create</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">filePath</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">isDirectory</span>
+        <span class="p">);</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a6779d997d656399fbcf58404ee277aa3"><span></span><span class="n">copy</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">SecScopedBookmark</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a8d7055dcb99d13033b2c7ad13eda83ac"><span></span><span class="n">load</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a304d268c213aa83a1e754c0ca6f83ec2"><span></span><span class="n">save</span></span><span></span><span class="p">(</span><a class="reference internal" href="class_axl_sl_Array.html#doxid-classaxl-1-1sl-1-1-array"><span class="std std-ref">sl::Array</span></a><span></span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;*</span> <span class="n">buffer</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="class_axl_sl_Array.html#doxid-classaxl-1-1sl-1-1-array"><span class="std std-ref">sl::Array</span></a><span></span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a60e194c4323635496ff9798333fd5fce"><span></span><span class="n">save</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-sec-scoped-bookmark-1a7026c143582bc2c4040418747eb12888"><span></span><span class="n">stopAccess</span></span><span></span><span class="p">();</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_cf_String.html" class="btn btn-neutral float-right" title="class axl::cf::String" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_cf_Number.html" class="btn btn-neutral float-left" title="class axl::cf::Number" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

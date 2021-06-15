@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::cf::Number &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::cf::SecScopedBookmark" href="class_axl_cf_SecScopedBookmark.html" />
+    <link rel="prev" title="class axl::cf::MutableDictionary" href="class_axl_cf_MutableDictionary.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_Data.html">class axl::cf::Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_DictionaryBase.html">template class axl::cf::DictionaryBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_MutableDictionary.html">class axl::cf::MutableDictionary</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">class axl::cf::Number</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_SecScopedBookmark.html">class axl::cf::SecScopedBookmark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_String.html">class axl::cf::String</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_TypeBase.html">template class axl::cf::TypeBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cf_Url.html">class axl::cf::Url</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_cf.html">namespace axl::cf</a> &raquo;</li>
+        
+      <li>class axl::cf::Number</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-cf-number">
+<span id="doxid-classaxl-1-1cf-1-1-number"></span><span id="index-0"></span><h1>class axl::cf::Number</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_cf_Number.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nl">Number</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base"><span class="std std-ref">axl::cf::TypeBase</span></a><span></span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1ae00995ec37f809fb06e367a9fa7c3d2f"><span></span><span class="n">Number</span></span><span></span><span class="p">();</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1ad210176c3ac14a7a95eb14dd33126b19"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">Number</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a239365a408f71f19a19e22e2dbd3abb1"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span>
+        <span class="n">CFNumberRef</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">isAttach</span> <span class="o">=</span> <span class="nb">false</span>
+        <span class="p">);</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a9cbaac135b25042b73dc1c296903af41"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="kt">char</span> <span class="n">x</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a5f4ac689769d26c8a13e7877b6c7df3a"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="kt">short</span> <span class="n">x</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1ab4652e06e137b1f6609e58d9f7da8ff7"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a8155cccf36b9bb0c1f3b1c767d0d641c"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="kt">long</span> <span class="n">x</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a4443f3e654a891ff3fb77b9cbb511d1d"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">x</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a9dcb23c6133f213a20e7419ac1d603a6"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="kt">float</span> <span class="n">x</span><span class="p">);</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1ac66013aadf1c085b3bc24c3392e8f404"><span></span><span class="n">Number</span></span><span></span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a15b713fcc29ff22d81f3efe703a9aef2"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">Number</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a0018ead71dd908b6b0d5ae9169be90e8"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="n">CFNumberRef</span> <span class="n">p</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1ada16b48bc100baf971a61c89613fab98"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="kt">char</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a87709092e470b0189caefc66774236c6"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="kt">short</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a3293a2742c092db276025edfcd803ac5"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a36b00ba7d2bd52ace4cde4bcc6e7fbfd"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="kt">long</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1ae320718e7550e2b153f7d122f8766883"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1aa534ad7686d7c4aee11fc90bf0af1f12"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="kt">float</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="n">Number</span><span class="o">&amp;</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1adbfd167c1ec7b50f2a17c869e29b8955"><span></span><span class="k">operator</span><span class="o">=</span></span><span></span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1aebaac4365e1f998b157c939d8d57528d"><span></span><span class="n">create</span></span><span></span><span class="p">(</span>
+        <span class="n">CFNumberType</span> <span class="n">type</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1ac9cd75a3d3b6e610a5b3e69b4d9bebb3"><span></span><span class="n">create</span></span><span></span><span class="p">(</span><span class="kt">char</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a0f04fb03faf4ffc7dfe95625e54a3d77"><span></span><span class="n">create</span></span><span></span><span class="p">(</span><span class="kt">short</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a07a7fbda32dac11cf87470741a5f5f1c"><span></span><span class="n">create</span></span><span></span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a980f6c454a28b89effdf1bab21b26343"><span></span><span class="n">create</span></span><span></span><span class="p">(</span><span class="kt">long</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1af876ff27fc910a0cdd5554744b8b4450"><span></span><span class="n">create</span></span><span></span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a6370f3b40327c72a00cd0dcc040f1812"><span></span><span class="n">create</span></span><span></span><span class="p">(</span><span class="kt">float</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1a1960450bd5b0d2026f8745aadd26c0b5"><span></span><span class="n">create</span></span><span></span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1afd6b39367ee02330c56d67b05929d236"><span></span><span class="n">isFloat</span></span><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">CFComparisonResult</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cf-1-1-number-1afdb54d4223ac0718d976297d0b50a1e6"><span></span><span class="n">compare</span></span><span></span><span class="p">(</span><span class="n">CFNumberRef</span> <span class="n">p2</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// methods</span>
+
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1ac0e2f8f5480c09157147808d52d83b2d"><span class="std std-ref">operator T</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base"><span class="std std-ref">TypeBase</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a64d7f33f371a6508b535cf15341a5fef"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base"><span class="std std-ref">TypeBase</span></a><span></span><span class="o">&amp;</span> <span class="n">src</span><span class="p">);</span>
+
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base"><span class="std std-ref">TypeBase</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1ad11b8e6269b5be2e560eb8b7325b5d1c"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">p</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a396c91075eeb768946c4274194abecf8"><span class="std std-ref">isNull</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1ac8377cb1de3255f06f7929da712eedad"><span class="std std-ref">p</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a25d26470e3a20f2381c30b94155b8892"><span class="std std-ref">attach</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">p</span><span class="p">);</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1aec8c448c469d4496ade39215a6c21fef"><span class="std std-ref">detach</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a6fef074b299ef4efc6c2bc34b73c30af"><span class="std std-ref">clear</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1ae80f68bd80d75c261f3a485b2ea4a24e"><span class="std std-ref">copy</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">p</span><span class="p">);</span>
+
+    <span class="kt">intptr_t</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a5e2ce977961ab3518b10dbd01a671a60"><span class="std std-ref">getRetainCount</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a490062160a12624fef778f36be369de1"><span class="std std-ref">retain</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a5f6eb84b760b56df920b0f7d0d29512a"><span class="std std-ref">release</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1afada20c31717fdcc72208b609fd8b379"><span class="std std-ref">isEqual</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">type</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">CFHashCode</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a363d445a843900c7ca1a7789b238f880"><span class="std std-ref">getHash</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">CFTypeID</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1ac6dd2f3d46948db0124477d059c95e0f"><span class="std std-ref">getTypeId</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a5541393f893bf76425c81a9cace82140"><span class="std std-ref">getDescription</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1afcf46745943c4c2dcee4029f31a61769"><span class="std std-ref">getTypeIdDescription</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a97d548c265ba52031b2f9524edb99a8e"><span class="std std-ref">show</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+    <a class="reference internal" href="class_axl_cf_TypeBase.html#doxid-classaxl-1-1cf-1-1-type-base-1a0b10e162a2a3199a08e601892123ac1e"><span class="std std-ref">toString</span></a><span></span><span class="p">();</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_cf_SecScopedBookmark.html" class="btn btn-neutral float-right" title="class axl::cf::SecScopedBookmark" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_cf_MutableDictionary.html" class="btn btn-neutral float-left" title="class axl::cf::MutableDictionary" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

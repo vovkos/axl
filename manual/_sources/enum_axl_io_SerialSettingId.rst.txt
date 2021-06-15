@@ -1,0 +1,23 @@
+.. index:: pair: enum; SerialSettingId
+.. _doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5:
+
+enum axl::io::SerialSettingId
+=============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SerialSettings.h>
+
+	enum SerialSettingId
+	{
+	    :target:`SerialSettingId_BaudRate<doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5a7233ffc8baa2f90887d9062609cea3e6>`     = 0x01,
+	    :target:`SerialSettingId_FlowControl<doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5a3bc3a6e623057bbb00e68b1e30a7eee2>`  = 0x02,
+	    :target:`SerialSettingId_DataBits<doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5a5fc765c14d32add6c3b045e6d0cc026c>`     = 0x04,
+	    :target:`SerialSettingId_StopBits<doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5aee2f09607516fffb6f95961e286ec20e>`     = 0x08,
+	    :target:`SerialSettingId_Parity<doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5ac656a1761ed52ce48b7fba2ddfc6c260>`       = 0x10,
+	    :target:`SerialSettingId_ReadInterval<doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5a088b0d440a89b3a6d7b91d7bedb833c6>` = 0x20,
+	};
+

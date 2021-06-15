@@ -1,0 +1,37 @@
+.. index:: pair: class; axl::mem::ExecutableBlockArena
+.. _doxid-classaxl_1_1mem_1_1_executable_block_arena:
+
+template class axl::mem::ExecutableBlockArena
+=============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_ExecutableBlockArena.h>
+	
+	template <typename T>
+	class ExecutableBlockArena
+	{
+	public:
+		// construction
+	
+		:target:`ExecutableBlockArena<doxid-classaxl_1_1mem_1_1_executable_block_arena_1a15d87a777db81ef3323fc177127b6f21>`(size_t allocMultiplier = 1);
+		:target:`~ExecutableBlockArena<doxid-classaxl_1_1mem_1_1_executable_block_arena_1ac79fbcc91b05bc069129f147634a2734>`();
+
+		// methods
+	
+		T*
+		:target:`allocate<doxid-classaxl_1_1mem_1_1_executable_block_arena_1a427f677c3038f0601aad37629ecf4883>`();
+	
+		void
+		:target:`free<doxid-classaxl_1_1mem_1_1_executable_block_arena_1a5fcaaf40267584a42bb5af1d4778a302>`();
+	
+		void
+		:target:`detach<doxid-classaxl_1_1mem_1_1_executable_block_arena_1ae01d632ad99b2168e968f1aabcb00991>`();
+	};

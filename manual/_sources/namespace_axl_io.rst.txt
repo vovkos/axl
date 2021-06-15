@@ -1,0 +1,522 @@
+.. index:: pair: namespace; axl::io
+.. _doxid-namespaceaxl_1_1io:
+
+namespace axl::io
+=================
+
+.. toctree::
+	:hidden:
+
+	namespace_axl_io_psx.rst
+	namespace_axl_io_win.rst
+	enum_axl_io_FileFlag.rst
+	enum_axl_io_NetworkAdapterFlag.rst
+	enum_axl_io_NetworkAdapterType.rst
+	enum_axl_io_PcapLoopResult.rst
+	enum_axl_io_SerialFlowControl.rst
+	enum_axl_io_SerialParity.rst
+	enum_axl_io_SerialSettingId.rst
+	enum_axl_io_SerialStatusLine.rst
+	enum_axl_io_SerialStopBits.rst
+	enum_axl_io_SharedMemoryTransportConst.rst
+	enum_axl_io_SharedMemoryTransportFlag.rst
+	enum_axl_io_SharedMemoryTransportState.rst
+	enum_axl_io_SocketShutdownKind.rst
+	struct_axl_io_NetworkAdapterAddress.rst
+	struct_axl_io_SerialSettings.rst
+	struct_axl_io_SharedMemoryTransportHdr.rst
+	struct_axl_io_SharedMemoryTransportMessageHdr.rst
+	struct_axl_io_SockAddr.rst
+	class_axl_io_AutoDeleteFile.rst
+	class_axl_io_ClosePcap.rst
+	class_axl_io_CloseUsbContext.rst
+	class_axl_io_File.rst
+	class_axl_io_FileEnumerator.rst
+	class_axl_io_FileTransport.rst
+	class_axl_io_FreeSsl.rst
+	class_axl_io_FreeSslCtx.rst
+	class_axl_io_FreeUsbConfigDescriptor.rst
+	class_axl_io_FreeUsbDeviceList.rst
+	class_axl_io_FreeUsbTransfer.rst
+	class_axl_io_MappedFile.rst
+	class_axl_io_MappedViewMgr.rst
+	class_axl_io_Mapping.rst
+	class_axl_io_NetworkAdapterDesc.rst
+	class_axl_io_Pcap.rst
+	class_axl_io_PcapFilter.rst
+	class_axl_io_Serial.rst
+	class_axl_io_SerialPortDesc.rst
+	class_axl_io_SharedMemoryReader.rst
+	class_axl_io_SharedMemoryTransportBase.rst
+	class_axl_io_SharedMemoryWriter.rst
+	class_axl_io_SimpleMappedFile.rst
+	class_axl_io_Socket.rst
+	class_axl_io_Socketransport.rst
+	class_axl_io_Ssl.rst
+	class_axl_io_SslCtx.rst
+	class_axl_io_Transport.rst
+	class_axl_io_UsbContext.rst
+	class_axl_io_UsbDevice.rst
+	class_axl_io_UsbDeviceList.rst
+	class_axl_io_UsbError.rst
+	class_axl_io_UsbErrorProvider.rst
+	class_axl_io_UsbEventThread.rst
+	class_axl_io_UsbTransfer.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace io {
+
+	// namespaces
+
+	namespace :ref:`axl::io::psx<doxid-namespaceaxl_1_1io_1_1psx>`;
+	namespace :ref:`axl::io::win<doxid-namespaceaxl_1_1io_1_1win>`;
+
+	// typedefs
+
+	typedef void :target:`SslInfoCallbackFunc<doxid-namespaceaxl_1_1io_1a1da481087567230ce6772888551c3d1f>`(
+		const SSL *ssl,
+		int where,
+		int ret
+		);
+
+	typedef int :target:`SslVerifyCallbackFunc<doxid-namespaceaxl_1_1io_1a98cf70a3991100a68def144dacdfc67d>`(
+		int isPreVerifyOk,
+		X509_STORE_CTX *ctx
+		);
+
+	typedef DH* :target:`SslTmpDhCallbackFunc<doxid-namespaceaxl_1_1io_1a4e50d90db5291555fbe6e756502a5437>`(
+		SSL *ssl,
+		int isExport,
+		int keyLength
+		);
+
+	typedef :ref:`sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`<libusb_config_descriptor*, :ref:`FreeUsbConfigDescriptor<doxid-classaxl_1_1io_1_1_free_usb_config_descriptor>`> :target:`UsbConfigDescriptor<doxid-namespaceaxl_1_1io_1a011daccc763cf8e05587b001bc3c4f2b>`;
+
+	// enums
+
+	enum :ref:`FileFlag<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09a>`;
+	enum :ref:`NetworkAdapterFlag<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1>`;
+	enum :ref:`NetworkAdapterType<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98>`;
+	enum :ref:`PcapLoopResult<doxid-namespaceaxl_1_1io_1ab6035c16c93080934ed6df7ab9c0913c>`;
+	enum :ref:`SerialFlowControl<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1>`;
+	enum :ref:`SerialParity<doxid-namespaceaxl_1_1io_1a717002475211856f988cfdf559f75aa3>`;
+	enum :ref:`SerialSettingId<doxid-namespaceaxl_1_1io_1afd39f5bb039c3caaf56d2a3730a66be5>`;
+	enum :ref:`SerialStatusLine<doxid-namespaceaxl_1_1io_1a7398276977773f4357806d5c44a7400a>`;
+	enum :ref:`SerialStopBits<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188b>`;
+	enum :ref:`SharedMemoryTransportConst<doxid-namespaceaxl_1_1io_1ad15247f2e48b01c49930df361a18e298>`;
+	enum :ref:`SharedMemoryTransportFlag<doxid-namespaceaxl_1_1io_1a0e27cc2733fb67cca1061d311e55c4d1>`;
+	enum :ref:`SharedMemoryTransportState<doxid-namespaceaxl_1_1io_1a8c8e5fe113ef497db30439bb8ab9b3dc>`;
+	enum :ref:`SocketShutdownKind<doxid-namespaceaxl_1_1io_1a8ab41aad2d8946c39cdc9cf786f0f079>`;
+
+	// structs
+
+	struct :ref:`NetworkAdapterAddress<doxid-structaxl_1_1io_1_1_network_adapter_address>`;
+	struct :ref:`SerialSettings<doxid-structaxl_1_1io_1_1_serial_settings>`;
+	struct :ref:`SharedMemoryTransportHdr<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr>`;
+	struct :ref:`SharedMemoryTransportMessageHdr<doxid-structaxl_1_1io_1_1_shared_memory_transport_message_hdr>`;
+	struct :ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`;
+
+	// classes
+
+	class :ref:`AutoDeleteFile<doxid-classaxl_1_1io_1_1_auto_delete_file>`;
+	class :ref:`ClosePcap<doxid-classaxl_1_1io_1_1_close_pcap>`;
+	class :ref:`CloseUsbContext<doxid-classaxl_1_1io_1_1_close_usb_context>`;
+	class :ref:`File<doxid-classaxl_1_1io_1_1_file>`;
+	class :ref:`FileEnumerator<doxid-classaxl_1_1io_1_1_file_enumerator>`;
+	class :ref:`FileTransport<doxid-classaxl_1_1io_1_1_file_transport>`;
+	class :ref:`FreeSsl<doxid-classaxl_1_1io_1_1_free_ssl>`;
+	class :ref:`FreeSslCtx<doxid-classaxl_1_1io_1_1_free_ssl_ctx>`;
+	class :ref:`FreeUsbConfigDescriptor<doxid-classaxl_1_1io_1_1_free_usb_config_descriptor>`;
+	class :ref:`FreeUsbDeviceList<doxid-classaxl_1_1io_1_1_free_usb_device_list>`;
+	class :ref:`FreeUsbTransfer<doxid-classaxl_1_1io_1_1_free_usb_transfer>`;
+	class :ref:`MappedFile<doxid-classaxl_1_1io_1_1_mapped_file>`;
+	class :ref:`MappedViewMgr<doxid-classaxl_1_1io_1_1_mapped_view_mgr>`;
+	class :ref:`Mapping<doxid-classaxl_1_1io_1_1_mapping>`;
+	class :ref:`NetworkAdapterDesc<doxid-classaxl_1_1io_1_1_network_adapter_desc>`;
+	class :ref:`Pcap<doxid-classaxl_1_1io_1_1_pcap>`;
+	class :ref:`PcapFilter<doxid-classaxl_1_1io_1_1_pcap_filter>`;
+	class :ref:`Serial<doxid-classaxl_1_1io_1_1_serial>`;
+	class :ref:`SerialPortDesc<doxid-classaxl_1_1io_1_1_serial_port_desc>`;
+	class :ref:`SharedMemoryReader<doxid-classaxl_1_1io_1_1_shared_memory_reader>`;
+	class :ref:`SharedMemoryTransportBase<doxid-classaxl_1_1io_1_1_shared_memory_transport_base>`;
+	class :ref:`SharedMemoryWriter<doxid-classaxl_1_1io_1_1_shared_memory_writer>`;
+	class :ref:`SimpleMappedFile<doxid-classaxl_1_1io_1_1_simple_mapped_file>`;
+	class :ref:`Socket<doxid-classaxl_1_1io_1_1_socket>`;
+	class :ref:`Socketransport<doxid-classaxl_1_1io_1_1_socketransport>`;
+	class :ref:`Ssl<doxid-classaxl_1_1io_1_1_ssl>`;
+	class :ref:`SslCtx<doxid-classaxl_1_1io_1_1_ssl_ctx>`;
+	class :ref:`Transport<doxid-classaxl_1_1io_1_1_transport>`;
+	class :ref:`UsbContext<doxid-classaxl_1_1io_1_1_usb_context>`;
+	class :ref:`UsbDevice<doxid-classaxl_1_1io_1_1_usb_device>`;
+	class :ref:`UsbDeviceList<doxid-classaxl_1_1io_1_1_usb_device_list>`;
+	class :ref:`UsbError<doxid-classaxl_1_1io_1_1_usb_error>`;
+	class :ref:`UsbErrorProvider<doxid-classaxl_1_1io_1_1_usb_error_provider>`;
+	class :ref:`UsbEventThread<doxid-classaxl_1_1io_1_1_usb_event_thread>`;
+	class :ref:`UsbTransfer<doxid-classaxl_1_1io_1_1_usb_transfer>`;
+
+	// global functions
+
+	uint64_t
+	:target:`copyFile<doxid-namespaceaxl_1_1io_1aeefe9edc1af8534406882e5cab77d3ec>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& srcFileName,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& dstFileName,
+		uint64_t size = -1
+		);
+
+	uint64_t
+	:target:`copyFile<doxid-namespaceaxl_1_1io_1a22ff15c2b74d7c3c2188fdd84cbc8e60>`(
+		const :ref:`io::File<doxid-classaxl_1_1io_1_1_file>`* srcFile,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& dstFileName,
+		uint64_t size = -1
+		);
+
+	uint64_t
+	:target:`copyFile<doxid-namespaceaxl_1_1io_1aa81bca4cd9a966303e334f8ca64352a6>`(
+		const :ref:`io::File<doxid-classaxl_1_1io_1_1_file>`* srcFile,
+		:ref:`io::File<doxid-classaxl_1_1io_1_1_file>`* dstFile,
+		uint64_t size = -1
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getTempDir<doxid-namespaceaxl_1_1io_1a0c8210f82e39c227f26bad679cc73a09>`();
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getHomeDir<doxid-namespaceaxl_1_1io_1a76d670695f91b435dd2ad971efe56e53>`();
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getCurrentDir<doxid-namespaceaxl_1_1io_1adff2abe418529c48683e2152b69509da>`();
+
+	bool
+	:target:`setCurrentDir<doxid-namespaceaxl_1_1io_1a0cd35fbd1debf8075b1fe0b89d781dfb>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& dir);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getExeFilePath<doxid-namespaceaxl_1_1io_1af4dc2f1052491fb3e463623f49137416>`();
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getExeDir<doxid-namespaceaxl_1_1io_1a336e4b3d9d222757683a718964163dc9>`();
+
+	bool
+	:target:`doesFileExist<doxid-namespaceaxl_1_1io_1a573548de0478809871bde506c523fb52>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+
+	bool
+	:target:`ensureDirExists<doxid-namespaceaxl_1_1io_1a1c0c3f76b5d846ab51947988454c55f2>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+
+	bool
+	:target:`isDir<doxid-namespaceaxl_1_1io_1a6c76ff501ad2156bfed2116df1e05f2d>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getFullFilePath<doxid-namespaceaxl_1_1io_1a49ec1c6a56ab05b2a2d2c4069ed63677>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getDir<doxid-namespaceaxl_1_1io_1a95020a75ec2d849490543db2434fa13c>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getFileName<doxid-namespaceaxl_1_1io_1a4d3d82d0dadaa83e1c58d1781b98d3df>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getExtension<doxid-namespaceaxl_1_1io_1a0cad426e00d8ece021557f5931cd0849>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& filePath);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`concatFilePath<doxid-namespaceaxl_1_1io_1aef851b74e4f014648d91fb9de2e60a01>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* filePath,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`concatFilePath<doxid-namespaceaxl_1_1io_1a31d6d0f7915274025a20f162c94025e1>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& dir,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`findFilePath<doxid-namespaceaxl_1_1io_1a6214cb4877d17f874708a7741a408c3b>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& firstDir,
+		const :ref:`sl::BoxList<doxid-classaxl_1_1sl_1_1_box_list>`<:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`>* dirList,
+		bool doFindInCurrentDir = true
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`findFilePath<doxid-namespaceaxl_1_1io_1a8d55758f7c5a3ab4b3e10a63e4db960d>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+		const :ref:`sl::BoxList<doxid-classaxl_1_1sl_1_1_box_list>`<:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`>* dirList,
+		bool doFindInCurrentDir = true
+		);
+
+	bool
+	:target:`isSymbolicLink<doxid-namespaceaxl_1_1io_1a816dae9b2227060bdd9e715fac9dd62a>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName);
+
+	bool
+	:target:`getSymbolicLinkTarget<doxid-namespaceaxl_1_1io_1ae8390a5ab1cfcc558fb20f7723e4bf1e>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* targetName,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& linkName
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getSymbolicLinkTarget<doxid-namespaceaxl_1_1io_1a4909eff1f72d08aa9f08fe6200a696b8>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& linkName);
+
+	bool
+	:target:`matchWildcard<doxid-namespaceaxl_1_1io_1a09d5a805d105beda691e415c0846d2c5>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string0,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& wildcard
+		);
+
+	const char*
+	:target:`getNetworkAdapterTypeString<doxid-namespaceaxl_1_1io_1a1f5713873eb436cccd97940592734c7c>`(:ref:`NetworkAdapterType<doxid-namespaceaxl_1_1io_1a1784f4641e9267d50e8505999741fb98>` adapterKind);
+
+	:ref:`NetworkAdapterFlag<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1>`
+	:target:`getFirstNetworkAdapterFlag<doxid-namespaceaxl_1_1io_1ad6cfe906a1d2abf5544ab6ca11d99edd>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags);
+
+	const char*
+	:target:`getNetworkAdapterFlagString<doxid-namespaceaxl_1_1io_1aec75eafd7dfe3cd67aff3d9bbe19e46a>`(:ref:`NetworkAdapterFlag<doxid-namespaceaxl_1_1io_1a794af8cdbb3de1cecc47edc0a4fd24f1>` flag);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getNetworkAdapterFlagString<doxid-namespaceaxl_1_1io_1a80304f532396efd6d6bd5aa215c6244d>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags);
+
+	size_t
+	:target:`getMacAddressString<doxid-namespaceaxl_1_1io_1ab96cddee1a47d12e5d5b49b4cad8e568>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+		const :ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>`* macAddress,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getMacAddressString<doxid-namespaceaxl_1_1io_1a7d568d99b050d97ffe2d8ae30d788c37>`(
+		const :ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>`* macAddress,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+		);
+
+	size_t
+	:target:`createNetworkAdapterDescList<doxid-namespaceaxl_1_1io_1a523430000f99f603c009426fea785937>`(:ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<:ref:`NetworkAdapterDesc<doxid-classaxl_1_1io_1_1_network_adapter_desc>`>* adapterList);
+
+	size_t
+	:target:`createSerialPortDescList<doxid-namespaceaxl_1_1io_1af91111e8fa195154718f57537bc03376>`(:ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<:ref:`SerialPortDesc<doxid-classaxl_1_1io_1_1_serial_port_desc>`>* portList);
+
+	const char*
+	:target:`getSockAddrFamilyString<doxid-namespaceaxl_1_1io_1a3c1aebcf9a53e0fe81d48aec1a308f55>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` family);
+
+	size_t
+	:target:`getSockAddrFamilySize<doxid-namespaceaxl_1_1io_1abae929016d9f49ae8536369ed3815b84>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` family);
+
+	size_t
+	:target:`getSockAddrSize<doxid-namespaceaxl_1_1io_1a816a41adfea186eac776bedc1f99bd58>`(const sockaddr* addr);
+
+	const char*
+	:target:`getSockProtoString<doxid-namespaceaxl_1_1io_1a442a50e0b5df5a27065f8293d0d125ce>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` proto);
+
+	size_t
+	:target:`getSockAddrNetMaskBitCount_ip4<doxid-namespaceaxl_1_1io_1a36ae4965f616d572760d5e077948dcac>`(const sockaddr_in* addr);
+
+	size_t
+	:target:`getSockAddrNetMaskBitCount_ip6<doxid-namespaceaxl_1_1io_1a354ec51159a4a3e9c656ea916b0e43ef>`(const sockaddr_in6* addr);
+
+	size_t
+	:target:`getSockAddrNetMaskBitCount<doxid-namespaceaxl_1_1io_1a74e493df68a27949acc597e59df50df8>`(const sockaddr* addr);
+
+	void
+	:target:`createSockAddrNetMask_ip4<doxid-namespaceaxl_1_1io_1a0257e8fed8f8ee85745833bc84903af7>`(
+		sockaddr_in* addr,
+		size_t bitCount
+		);
+
+	void
+	:target:`createSockAddrNetMask_ip6<doxid-namespaceaxl_1_1io_1a4d1321ae8cf2dcbd9dc9ae9969936642>`(
+		sockaddr_in6* addr,
+		size_t bitCount
+		);
+
+	bool
+	:target:`isSockAddrEqual_ip4<doxid-namespaceaxl_1_1io_1a1925ff337fa0e0c5519873aa6c980bfa>`(
+		const sockaddr_in* addr1,
+		const sockaddr_in* addr2
+		);
+
+	bool
+	:target:`isSockAddrEqual_ip6<doxid-namespaceaxl_1_1io_1a376f7c841f413629eca06eacc49796b5>`(
+		const sockaddr_in6* addr1,
+		const sockaddr_in6* addr2
+		);
+
+	bool
+	:target:`isSockAddrEqual<doxid-namespaceaxl_1_1io_1ac4ef7c8120471480a515c8b7e46d031d>`(
+		const sockaddr* addr1,
+		const sockaddr* addr2
+		);
+
+	bool
+	:target:`isSockAddrMatch_ip4<doxid-namespaceaxl_1_1io_1acf8bc672027f827054f5849bddf5fef9>`(
+		const sockaddr_in* addr,
+		const sockaddr_in* filterAddr
+		);
+
+	bool
+	:target:`isSockAddrMatch_ip6<doxid-namespaceaxl_1_1io_1a4a48a96b7ef1ae44349beefac0ddf045>`(
+		const sockaddr_in6* addr,
+		const sockaddr_in6* filterAddr
+		);
+
+	bool
+	:target:`isSockAddrMatch<doxid-namespaceaxl_1_1io_1a4f6863b88e60285f6c4b6fba64c29cdf>`(
+		const sockaddr* addr,
+		const sockaddr* filterAddr
+		);
+
+	bool
+	:target:`parseAddr_ip4<doxid-namespaceaxl_1_1io_1a00b2056ab0aaec56282c6c6a34286312>`(
+		in_addr* addr,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+		);
+
+	bool
+	:target:`parseAddr_ip6<doxid-namespaceaxl_1_1io_1a9a81f78b3aa7fb15a873355e0faad5ab>`(
+		in6_addr* addr,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+		);
+
+	bool
+	:target:`parseSockAddr_ip4<doxid-namespaceaxl_1_1io_1a2da4712e830b7aa20b564fdb365ba3b6>`(
+		sockaddr_in* addr,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+		);
+
+	bool
+	:target:`parseSockAddr_ip6<doxid-namespaceaxl_1_1io_1afce1ca5a6c15d1aa969ca201b0bb08a1>`(
+		sockaddr_in6* addr,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+		);
+
+	bool
+	:target:`parseSockAddr<doxid-namespaceaxl_1_1io_1aff6689dce52961933fd787f40c216359>`(
+		sockaddr* addr,
+		size_t size,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+		);
+
+	size_t
+	:target:`getAddrString_ip4<doxid-namespaceaxl_1_1io_1a0b5482b9ca95e294a49a8e37d7c963fe>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+		const in_addr* addr
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getAddrString_ip4<doxid-namespaceaxl_1_1io_1ae27e68f5cba56a3895f96213e7f409e3>`(const in_addr* addr);
+
+	size_t
+	:target:`getAddrString_ip6<doxid-namespaceaxl_1_1io_1a29021f290c3b7c35c14d37b10ebdd164>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+		const in6_addr* addr
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getAddrString_ip6<doxid-namespaceaxl_1_1io_1ab40d260e4fc12833b9cb535cbcd18fed>`(const in6_addr* addr);
+
+	size_t
+	:target:`getSockAddrString_ip4<doxid-namespaceaxl_1_1io_1a20c8df56373d7001bdc29e0c5d52044e>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+		const sockaddr_in* addr
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getSockAddrString_ip4<doxid-namespaceaxl_1_1io_1a26fce715659e06586152957fdc324bc7>`(const sockaddr_in* addr);
+
+	size_t
+	:target:`getSockAddrString_ip6<doxid-namespaceaxl_1_1io_1ad150dec6a4a20965f7726d9a39865ce0>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+		const sockaddr_in6* addr
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getSockAddrString_ip6<doxid-namespaceaxl_1_1io_1a373db149c07c1e81ee7ef70870ee41d5>`(const sockaddr_in6* addr);
+
+	size_t
+	:target:`getSockAddrString<doxid-namespaceaxl_1_1io_1aaf2c2bf993eea4ee0e69ddc2fe49b109>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+		const sockaddr* addr
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getSockAddrString<doxid-namespaceaxl_1_1io_1adeb7cea95a20c490a63bc0a6058443ad>`(const sockaddr* addr);
+
+	bool
+	:target:`resolveHostName<doxid-namespaceaxl_1_1io_1a10a1ee88d5cbe350cc49e3c97ad9f340>`(
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`>* addrArray,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` family = AF_UNSPEC
+		);
+
+	:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`>
+	:target:`resolveHostName<doxid-namespaceaxl_1_1io_1a2eb2f2ee9b4351287cefbc61a2a839d3>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` family = AF_UNSPEC
+		);
+
+	void
+	:target:`registerSslErrorProvider<doxid-namespaceaxl_1_1io_1aba01241b37a4e2c650a445257778750e>`();
+
+	:ref:`UsbContext<doxid-classaxl_1_1io_1_1_usb_context>`*
+	:target:`getUsbDefaultContext<doxid-namespaceaxl_1_1io_1ad68acb98aa02870d48b22a9a5cd4e4ee>`();
+
+	bool
+	:target:`hasUsbCapability<doxid-namespaceaxl_1_1io_1a7427832c57f11ce7d7523b0ba1c032ce>`(uint32_t capability);
+
+	const char*
+	:target:`getUsbSpeedString<doxid-namespaceaxl_1_1io_1acdbfa085a3aabf3848bcc0efbd54816b>`(libusb_speed speed);
+
+	const char*
+	:target:`getUsbClassCodeString<doxid-namespaceaxl_1_1io_1a47cfc671c111001f41e5bd946729826a>`(libusb_class_code classCode);
+
+	const char*
+	:target:`getUsbTransferTypeString<doxid-namespaceaxl_1_1io_1ac0366eb6696a3cea55dfde8b1d411999>`(libusb_transfer_type transferType);
+
+	const libusb_interface_descriptor*
+	:target:`findUsbInterfaceDescriptor<doxid-namespaceaxl_1_1io_1ac477daf521eb1956e4dba91672961382>`(
+		const libusb_config_descriptor* configDesc,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` interfaceId,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` altSettingId
+		);
+
+	const libusb_endpoint_descriptor*
+	:target:`findUsbEndpointDescriptor<doxid-namespaceaxl_1_1io_1af51d3a32f08aafccb2ec67d039a1abdc>`(
+		const libusb_interface_descriptor* ifaceDesc,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` endpointId
+		);
+
+	const libusb_endpoint_descriptor*
+	:target:`findUsbEndpointDescriptor<doxid-namespaceaxl_1_1io_1ade901f32614dad9ff90870720990a5ca>`(
+		const libusb_config_descriptor* configDesc,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` endpointId,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` interfaceId = 0,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` altSettingId = 0
+		);
+
+	:target:`AXL_SL_DEFINE_GUID<doxid-namespaceaxl_1_1io_1a38b3e371f555c221ea1133369e79de89>`(
+		g_usbErrorGuid,
+		0x87ea0738,
+		0x52e9,
+		0x4769,
+		0xb7,
+		0x27,
+		0x7a,
+		0x17,
+		0x37,
+		0x7b,
+		0x92,
+		0x1e
+		);
+
+	void
+	:target:`registerUsbErrorProvider<doxid-namespaceaxl_1_1io_1a53a40f2c8e3ceada15d3fcf168d112b4>`();
+
+	:ref:`UsbEventThread<doxid-classaxl_1_1io_1_1_usb_event_thread>`*
+	:target:`getUsbDefaultContextEventThread<doxid-namespaceaxl_1_1io_1a4762e64bac18ad4b154ce73af8ab6083>`();
+
+	const char*
+	:target:`getUsbTransferStatusString<doxid-namespaceaxl_1_1io_1a5a2d40eafaeae8d0d3261c5e2bf30063>`(libusb_transfer_status status);
+
+	} // namespace io

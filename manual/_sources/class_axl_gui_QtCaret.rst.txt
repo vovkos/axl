@@ -1,0 +1,39 @@
+.. index:: pair: class; axl::gui::QtCaret
+.. _doxid-classaxl_1_1gui_1_1_qt_caret:
+
+class axl::gui::QtCaret
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_QtCaret.h>
+	
+	class QtCaret: public QTimer
+	{
+	public:
+		// construction
+	
+		:target:`QtCaret<doxid-classaxl_1_1gui_1_1_qt_caret_1a4b732adbc562e9b5d2711525e0d1b251>`();
+
+		// methods
+	
+		bool
+		:target:`isVisible<doxid-classaxl_1_1gui_1_1_qt_caret_1a8dc5056b4ceec45bd91b211aa39d3be3>`();
+	
+		bool
+		:target:`show<doxid-classaxl_1_1gui_1_1_qt_caret_1afde454fdc8c0af08d24c8c7cd4f8ed70>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			const :ref:`Rect<doxid-structaxl_1_1gui_1_1_rect>`& rect,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` interval = 500
+			);
+	
+		void
+		:target:`hide<doxid-classaxl_1_1gui_1_1_qt_caret_1a5c1357e4f07b7957d09af45c3e810c4f>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver);
+	};

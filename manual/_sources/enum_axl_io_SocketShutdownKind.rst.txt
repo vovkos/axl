@@ -1,0 +1,17 @@
+.. index:: pair: enum; SocketShutdownKind
+.. _doxid-namespaceaxl_1_1io_1a8ab41aad2d8946c39cdc9cf786f0f079:
+
+enum axl::io::SocketShutdownKind
+================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_Socket.h>
+
+	enum SocketShutdownKind
+	{
+	};
+

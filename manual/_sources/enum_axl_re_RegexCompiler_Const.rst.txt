@@ -1,0 +1,18 @@
+.. index:: pair: enum; Const
+.. _doxid-classaxl_1_1re_1_1_regex_compiler_1ac65999e91442678cdf5f6af51725e09a:
+
+enum axl::re::RegexCompiler::Const
+==================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_re_Regex.h>
+
+	enum Const
+	{
+	    :target:`Const_MaxQuantifier<doxid-classaxl_1_1re_1_1_regex_compiler_1ac65999e91442678cdf5f6af51725e09aa76641a9a90716793f8bab3cdbef332b8>` = 32,
+	};
+

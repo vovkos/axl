@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>AXL C++ Library Reference &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Global Namespace" href="global.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="global.html">Global Namespace</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>AXL C++ Library Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="axl-c-library-reference">
+<h1>AXL C++ Library Reference</h1>
+<p>Every large C/C++ project needs a <strong>support library</strong>. Period. If you’re able to get by with just libc/STL/boost/QT – your project is not large enough.</p>
+<p>Thing is, no matter how comprehensive a framework of your choise is (both QT and Boost are <strong>extremely</strong> comprehensive), when you are working on a large project with multiple sub-modules, sooner or later you inevitably will face a situation when desired functionality is <strong>missing</strong>. So you may need to bring in additional C library and write C++ wrappers consistent with the rest of your project; maybe you will find it’s more appropriate to implement an additional layer of functionality yourself; most likely, you will end up doing a little bit of both.</p>
+<p>AXL was born as a cross-platform C/C++ support library for <a class="reference external" href="http://tibbo.com">Tibbo</a> projects such as <a class="reference external" href="http://tibbo.com/soi/software.html">TDST</a>, <a class="reference external" href="http://tibbo.com/programmable.html#tide">TIDE</a>, <a class="reference external" href="http://tibbo.com/jancy">Jancy</a>, <a class="reference external" href="http://github.com/vovkos/graco">Graco</a>, <a class="reference external" href="http://github.com/vovkos/doxyrest">Doxyrest</a>, <a class="reference external" href="http://github.com/vovkos/ecckey">ECCKey</a>, <a class="reference external" href="http://tibbo.com/ninja">IO Ninja</a>. It coveres our <strong>specialized needs</strong> for compiler/parser writing, asynchronous IO, device management, cryptography, and so on – all that while providing <strong>consistency</strong> in naming conventions and error handling model.</p>
+<p>Will it cover <strong>everything</strong> you may need in your own large project? Unlikely. Like I said, no framework could <em>single-handedly</em> provide all the needed functionality, and AXL is no exception. If you choose to use AXL you still likely will need to build your own support library on top of AXL – e.g., use it as a foundation framework.</p>
+<p>But why would you want to use AXL in the first place?</p>
+<div class="section" id="why-use-axl">
+<h2>Why Use AXL?</h2>
+<ul>
+<li><p class="first">Contribute to <a class="reference external" href="http://github.com/vovkos/jancy">Jancy</a>/<a class="reference external" href="http://github.com/vovkos/graco">Graco</a>/<a class="reference external" href="http://github.com/vovkos/doxyrest">Doxyrest</a>/<a class="reference external" href="http://github.com/vovkos/ecckey">ECCKey</a></p>
+<blockquote>
+<div><p>If you are willing to <strong>contribute</strong> to any of the aforementioned open-source projects (e.g. apply a bugfix or add a feature), you simply have no other choise but to use AXL – these projects <strong>already employ AXL</strong> as a support library.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Java naming convention</p>
+<blockquote>
+<div><p>Whether this is a good thing or not is of course a matter of personal preference. It also may depend on what style the rest of your project is written in. However, if you <strong>do prefer</strong> to use <strong>Java naming convention</strong> over old-fashioned C-style which creeped its way into STL, boost and many other C++ libraries – you might consider using AXL.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Lightweight</p>
+<blockquote>
+<div><p>AXL is <strong>extremely lightweight</strong> compared to QT – both in <strong>code- and data-memory</strong> footprint. Most modules of AXL are orthogonal and don’t bring additional dependencies (of course, if it’s not a C-library wrapper; if you link to <code class="docutils literal notranslate"><span class="pre">axl_lua</span></code> you surely will also need <code class="docutils literal notranslate"><span class="pre">liblua</span></code>)</p>
+</div></blockquote>
+</li>
+<li><p class="first">Non-zero-terminated strings</p>
+<blockquote>
+<div><p>AXL is probably the only C++ framework which uses <strong>non-zero-terminated UTF-8 string slices</strong> as the default for string passing and returning. Zero-terminated strings is an ancient evil which follows C/C++ programmers everywhere. String slices is a <strong>much more efficient</strong> way of dealing with strings, and in AXL it’s the default. Zero-terminated strings will only be allocated when (and if!) needed.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Advanced reference counting model</p>
+<blockquote>
+<div><p>Allocate multiple ref-counted objects on the <strong>same memory block</strong>, store temporary ref-counted objects on <strong>stack</strong> buffers for efficiency, use <strong>weak/strong</strong> reference semantics and more. Since ref-counting is <strong>unified across AXL</strong>, you can also pass <strong>strings as arrays</strong>, <strong>arrays as strings</strong>, and share memory buffers between objects in <strong>all kinds of ways</strong>.</p>
+</div></blockquote>
+</li>
+<li><p class="first">TLS-based error handling model</p>
+<blockquote>
+<div><p>AXL purposely does not employ C++ exceptions as a standard mechanism for error handling (detailed discussion of C++ exception-related issues is beyond the scope of this introduction). Instead, a classic C <strong>error-code model</strong> is used. Unlike most C libraries, however, AXL does not limit your capabilities of describing the error with 32 (or 64) bits of an integer error code; neither does it require you to pass an error buffer to every function. With AXL you <strong>store as much information</strong> about the error as needed in <strong>TLS-based</strong> error buffer. Later the caller of your function inspects and gets human-readable description of it.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Contained memory allocation</p>
+<blockquote>
+<div><p>AXL allocates all of its memory using a pair of pre-defined functions, making it easy to both <strong>replace</strong> the allocator and to <strong>isolate memory leaks</strong>. Default memory allocator <strong>dumps</strong> all AXL-related memory leaks in <strong>debug build</strong>.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Configurable CMake-based build system</p>
+<blockquote>
+<div><p>AXL features a <strong>highly configurable</strong> and reusable CMake-based build infrastructure, with <strong>cascading sheets</strong> for external tool library/tool <strong>path definitions</strong> and adjustment of compiler/linker <strong>switch settings</strong>, easy configuration of <strong>cross-compilation</strong>, <strong>precompiled headers</strong> for the big three of C++ compilers (MSVC, GCC, Clang) and a lot more.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Built-in wrappers for many popular libraries/tools/services</p>
+<blockquote>
+<div><ul class="simple">
+<li>OpenSSL</li>
+<li>LibSSH2</li>
+<li>LibLua</li>
+<li>LinPCap</li>
+<li>LibUSB</li>
+<li>LibExpat</li>
+<li>MiniZ</li>
+<li>Ragel</li>
+<li>CoreFoundation</li>
+<li>IOKit</li>
+<li>LibUDev</li>
+<li>Windows Service Control Manager</li>
+<li>Windows Setup API</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Built-in special features</p>
+<blockquote>
+<div><ul class="simple">
+<li>Lua string templates</li>
+<li>Incremental Boyer-Moore</li>
+<li>Incremental regular expressions</li>
+<li>Shared memory transport</li>
+<li>Map-on-demand memory mapped files</li>
+<li>Widget creation abstraction layer</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p class="rubric">Reference and Index:</p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="global.html"><span class="doc">Global Namespace</span></a></div>
+<div class="line"><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="global.html" class="btn btn-neutral float-right" title="Global Namespace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

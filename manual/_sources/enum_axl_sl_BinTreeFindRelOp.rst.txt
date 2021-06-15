@@ -1,0 +1,22 @@
+.. index:: pair: enum; BinTreeFindRelOp
+.. _doxid-namespaceaxl_1_1sl_1a801434f03b824389c897256b34ff7a33:
+
+enum axl::sl::BinTreeFindRelOp
+==============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BinTree.h>
+
+	enum BinTreeFindRelOp
+	{
+	    :target:`BinTreeFindRelOp_Eq<doxid-namespaceaxl_1_1sl_1a801434f03b824389c897256b34ff7a33a22d525d077dc4923d401eed403d4e24b>` = 0,
+	    :target:`BinTreeFindRelOp_Lt<doxid-namespaceaxl_1_1sl_1a801434f03b824389c897256b34ff7a33aa679828bf3267bbc3bf2577f36520bd5>`,
+	    :target:`BinTreeFindRelOp_Le<doxid-namespaceaxl_1_1sl_1a801434f03b824389c897256b34ff7a33a094a4bb4e51f4b657b09afc63ed3c89f>`,
+	    :target:`BinTreeFindRelOp_Gt<doxid-namespaceaxl_1_1sl_1a801434f03b824389c897256b34ff7a33a3ad3e623b36d614abc12516b1b2ebde9>`,
+	    :target:`BinTreeFindRelOp_Ge<doxid-namespaceaxl_1_1sl_1a801434f03b824389c897256b34ff7a33abc6c41da1f9740776ea288cfb8194341>`,
+	};
+

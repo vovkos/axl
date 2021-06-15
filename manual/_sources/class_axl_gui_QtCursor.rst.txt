@@ -1,0 +1,41 @@
+.. index:: pair: class; axl::gui::QtCursor
+.. _doxid-classaxl_1_1gui_1_1_qt_cursor:
+
+class axl::gui::QtCursor
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_QtEngine.h>
+	
+	class QtCursor: public :ref:`axl::gui::Cursor<doxid-classaxl_1_1gui_1_1_cursor>`
+	{
+	public:
+		// fields
+	
+		QCursor :target:`m_qtCursor<doxid-classaxl_1_1gui_1_1_qt_cursor_1a579a3107432417d6d5329f85ee324dee>`;
+
+		// construction
+	
+		:target:`QtCursor<doxid-classaxl_1_1gui_1_1_qt_cursor_1ad1502bf8ada48cec4e9396477bd9f8d8>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:ref:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+

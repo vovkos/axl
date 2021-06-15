@@ -1,0 +1,20 @@
+.. index:: pair: enum; BlockKind
+.. _doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009a:
+
+enum axl::dox::BlockKind
+========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_dox_Block.h>
+
+	enum BlockKind
+	{
+	    :target:`BlockKind_Normal<doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009aa7a402aec938b4427959d45d109e4d1e6>`,
+	    :target:`BlockKind_Group<doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009aaa2b0b2791a2b0d9239debf701257fadf>`,
+	    :target:`BlockKind_Footnote<doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009aa138a5757a6bdc8a4c1d4d3fad1368ce4>`,
+	};
+

@@ -1,0 +1,98 @@
+.. index:: pair: class; axl::gui::GdiWidget
+.. _doxid-classaxl_1_1gui_1_1_gdi_widget:
+
+template class axl::gui::GdiWidget
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_GdiWidget.h>
+	
+	template <typename T>
+	class GdiWidget:
+	    public T,
+	    public g::win::WindowImpl< GdiWidget< T > >
+	{
+	public:
+		// construction
+	
+		:target:`GdiWidget<doxid-classaxl_1_1gui_1_1_gdi_widget_1a21a4823c6758434a1b6fa0ce975c7b42>`();
+
+		// methods
+	
+		virtual
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`>
+		:target:`getCanvas<doxid-classaxl_1_1gui_1_1_gdi_widget_1a2b4075baa2c680fbcf1ae50e4e1664f1>`();
+	
+		virtual
+		bool
+		:target:`redraw<doxid-classaxl_1_1gui_1_1_gdi_widget_1ab85f93c302b9ea12243f60cac04bd3e7>`(
+			int left,
+			int top,
+			int right,
+			int bottom
+			);
+	
+		virtual
+		bool
+		:target:`isFocused<doxid-classaxl_1_1gui_1_1_gdi_widget_1a477cef9351d0a2eee125474c21e63881>`();
+	
+		virtual
+		bool
+		:target:`setFocus<doxid-classaxl_1_1gui_1_1_gdi_widget_1acfa4fa0452c9dd0117e7d6c5b8612f9b>`();
+	
+		virtual
+		bool
+		:target:`setCursor<doxid-classaxl_1_1gui_1_1_gdi_widget_1ab1ba2de4b2f4c031bc2f7d13345764ab>`(:ref:`Cursor<doxid-classaxl_1_1gui_1_1_cursor>`* cursor);
+	
+		virtual
+		bool
+		:target:`setMouseCapture<doxid-classaxl_1_1gui_1_1_gdi_widget_1a4fe5c0dbdfbcb32be0ecfb619f8f25b2>`();
+	
+		virtual
+		bool
+		:target:`releaseMouseCapture<doxid-classaxl_1_1gui_1_1_gdi_widget_1a8022e58138145828f74a1d53abd087d0>`();
+	
+		virtual
+		bool
+		:target:`setCaretVisible<doxid-classaxl_1_1gui_1_1_gdi_widget_1a65630b0d02d766a37b9ba25a0219b51b>`(bool isVisible);
+	
+		virtual
+		bool
+		:target:`setCaretPos<doxid-classaxl_1_1gui_1_1_gdi_widget_1a26828e5a72f614711e503d0c38e31818>`(
+			int x,
+			int y
+			);
+	
+		virtual
+		bool
+		:target:`setCaretSize<doxid-classaxl_1_1gui_1_1_gdi_widget_1a361c9911d5f319d8c3c3a704f166dc3c>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` width,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` height
+			);
+	
+		virtual
+		bool
+		:target:`updateScrollBar<doxid-classaxl_1_1gui_1_1_gdi_widget_1aff03b630028d2b6811b807ab763e1775>`(:ref:`Orientation<doxid-namespaceaxl_1_1gui_1abbb4c75e7541835676229cd86d7180e6>` orientation);
+	
+		virtual
+		intptr_t
+		:target:`notifyParent<doxid-classaxl_1_1gui_1_1_gdi_widget_1a9c0242cb4a58ab478951c11a1894fb55>`(
+			intptr_t notifyCode,
+			void* param = NULL
+			);
+	
+		virtual
+		void
+		:target:`postThreadMsg<doxid-classaxl_1_1gui_1_1_gdi_widget_1a5de50c184a0d70efa523cd21e9442146>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` code,
+			const :ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<void>& params
+			);
+	};

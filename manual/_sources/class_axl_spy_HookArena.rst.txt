@@ -1,0 +1,38 @@
+.. index:: pair: class; axl::spy::HookArena
+.. _doxid-classaxl_1_1spy_1_1_hook_arena:
+
+class axl::spy::HookArena
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_spy_Hook.h>
+	
+	class HookArena
+	{
+	public:
+		// construction
+	
+		:target:`HookArena<doxid-classaxl_1_1spy_1_1_hook_arena_1a9268e6799ba4d2a2889d9c4a694464a8>`();
+		:target:`~HookArena<doxid-classaxl_1_1spy_1_1_hook_arena_1ac717b4d73687e9887a33fa6b75fe8709>`();
+
+		// methods
+	
+		Hook*
+		:target:`allocate<doxid-classaxl_1_1spy_1_1_hook_arena_1a7cd812195f30d1eeb600a599094a1a34>`(
+			void* targetFunc,
+			void* callbackParam,
+			:ref:`HookEnterFunc<doxid-namespaceaxl_1_1spy_1afdac909ea77b12df15bde82555dd372b>`* enterFunc,
+			:ref:`HookLeaveFunc<doxid-namespaceaxl_1_1spy_1ac0cf338d4d299f76635e4ca1438f4eae>`* leaveFunc
+			);
+	
+		void
+		:target:`free<doxid-classaxl_1_1spy_1_1_hook_arena_1ab6729a27ef0d594b22bcbc50a59e4c67>`();
+	};

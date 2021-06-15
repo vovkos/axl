@@ -1,0 +1,19 @@
+.. index:: pair: enum; RbColor
+.. _doxid-namespaceaxl_1_1sl_1aa9ba4889485830a3fb66bb1d39d799a3:
+
+enum axl::sl::RbColor
+=====================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_RbTree.h>
+
+	enum RbColor
+	{
+	    :target:`RbColor_Black<doxid-namespaceaxl_1_1sl_1aa9ba4889485830a3fb66bb1d39d799a3adf9370b6fff84b107608a9509d5063ea>` = 0,
+	    :target:`RbColor_Red<doxid-namespaceaxl_1_1sl_1aa9ba4889485830a3fb66bb1d39d799a3af41a222b78ed6b03b4f52a5d103c582b>`   = 1,
+	};
+

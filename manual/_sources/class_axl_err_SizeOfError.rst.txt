@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::err::SizeOfError
+.. _doxid-classaxl_1_1err_1_1_size_of_error:
+
+class axl::err::SizeOfError
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_err_Error.h>
+	
+	class SizeOfError
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1err_1_1_size_of_error_1a49648d835771ef22dd63f435dab25e3e>`(const :ref:`ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error) const;
+	};

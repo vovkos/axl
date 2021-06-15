@@ -1,0 +1,30 @@
+.. index:: pair: class; axl::sl::ConstructSingleton
+.. _doxid-classaxl_1_1sl_1_1_construct_singleton:
+
+template class axl::sl::ConstructSingleton
+==========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Singleton.h>
+	
+	template <class T>
+	class ConstructSingleton
+	{
+	public:
+		// typedefs
+	
+		typedef :ref:`DestructSingleton<doxid-classaxl_1_1sl_1_1_destruct_singleton>`<T> :target:`Destruct<doxid-classaxl_1_1sl_1_1_construct_singleton_1a0717584794755cdd0546da9a22188fe0>`;
+
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_construct_singleton_1aee01482fefab78d85ef034fe215aaf0e>`(void* p);
+	};

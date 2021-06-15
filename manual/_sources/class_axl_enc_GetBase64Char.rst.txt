@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::enc::GetBase64Char
+.. _doxid-classaxl_1_1enc_1_1_get_base64_char:
+
+class axl::enc::GetBase64Char
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Base64Encoding.h>
+	
+	class GetBase64Char
+	{
+	public:
+		// methods
+	
+		char
+		:target:`operator()<doxid-classaxl_1_1enc_1_1_get_base64_char_1ac019955f0b479d26dee32f5189f5c55b>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` x);
+	};

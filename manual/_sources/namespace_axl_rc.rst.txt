@@ -1,0 +1,122 @@
+.. index:: pair: namespace; axl::rc
+.. _doxid-namespaceaxl_1_1rc:
+
+namespace axl::rc
+=================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_rc_BufHdrFlag.rst
+	enum_axl_rc_BufKind.rst
+	enum_axl_rc_RefCountFlag.rst
+	struct_axl_rc_BufHdr.rst
+	struct_axl_rc_NullPtr.rst
+	struct_axl_rc_RefCountAllocHdr.rst
+	class_axl_rc_Box.rst
+	class_axl_rc_Buf.rst
+	class_axl_rc_BufRef.rst
+	class_axl_rc_Child.rst
+	class_axl_rc_Ptr.rst
+	class_axl_rc_RefCount.rst
+	class_axl_rc_RefCountAllocBuffer.rst
+	class_axl_rc_Release.rst
+	class_axl_rc_RtFactory.rst
+	class_axl_rc_WeakPtr.rst
+	class_axl_rc_WeakRelease.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace rc {
+
+	// typedefs
+
+	typedef void :target:`FreeFunc<doxid-namespaceaxl_1_1rc_1a7c31c61d3d89f1a747823dea8b7b189d>`(void *p);
+	typedef :ref:`RtFactory<doxid-classaxl_1_1rc_1_1_rt_factory>`<:ref:`mem::StdAllocator<doxid-namespaceaxl_1_1mem_1a5b8776522c0cdfd5cb5fd0f6b4ad31b9>`> :target:`RtFactory<doxid-namespaceaxl_1_1rc_1ad42ee9c2ae27f585901512dcb211ebe0>`;
+
+	// enums
+
+	enum :ref:`BufHdrFlag<doxid-namespaceaxl_1_1rc_1a5c213f07e076442249963f5841068c32>`;
+	enum :ref:`BufKind<doxid-namespaceaxl_1_1rc_1a26a3b8c02d23ba7102e57659d211c077>`;
+	enum :ref:`RefCountFlag<doxid-namespaceaxl_1_1rc_1a5d0642b89bf2b50fc413f7be3d7f8187>`;
+
+	// structs
+
+	struct :ref:`BufHdr<doxid-structaxl_1_1rc_1_1_buf_hdr>`;
+	struct :ref:`NullPtr<doxid-structaxl_1_1rc_1_1_null_ptr>`;
+	struct :ref:`RefCountAllocHdr<doxid-structaxl_1_1rc_1_1_ref_count_alloc_hdr>`;
+
+	// classes
+
+	template <typename T>
+	class :ref:`Box<doxid-classaxl_1_1rc_1_1_box>`;
+
+	template <
+		typename T,
+		typename SizeOf = sl::SizeOf<T>,
+		typename Ref = BufRef<T, SizeOf>
+		>
+	class :ref:`Buf<doxid-classaxl_1_1rc_1_1_buf>`;
+
+	template <
+		typename T,
+		typename SizeOf = sl::SizeOf<T>
+		>
+	class :ref:`BufRef<doxid-classaxl_1_1rc_1_1_buf_ref>`;
+
+	template <
+		typename T,
+		size_t extra = 0
+		>
+	class :ref:`Child<doxid-classaxl_1_1rc_1_1_child>`;
+
+	template <typename T>
+	class :ref:`Ptr<doxid-classaxl_1_1rc_1_1_ptr>`;
+
+	class :ref:`RefCount<doxid-classaxl_1_1rc_1_1_ref_count>`;
+
+	template <typename T>
+	class :ref:`RefCountAllocBuffer<doxid-classaxl_1_1rc_1_1_ref_count_alloc_buffer>`;
+
+	template <typename T>
+	class :ref:`Release<doxid-classaxl_1_1rc_1_1_release>`;
+
+	template <typename Alloc = mem::StdAllocator>
+	class :ref:`RtFactory<doxid-classaxl_1_1rc_1_1_rt_factory>`;
+
+	template <typename T>
+	class :ref:`WeakPtr<doxid-classaxl_1_1rc_1_1_weak_ptr>`;
+
+	template <typename T>
+	class :ref:`WeakRelease<doxid-classaxl_1_1rc_1_1_weak_release>`;
+
+	// global variables
+
+	AXL_SELECT_ANY struct :ref:`axl::rc::NullPtr<doxid-structaxl_1_1rc_1_1_null_ptr>` :target:`g_nullPtr<doxid-namespaceaxl_1_1rc_1a8a97a4511ee37b1bc56a66b4a96118b0>`;
+
+	// global functions
+
+	void*
+	:target:`postAllocateRefCount<doxid-namespaceaxl_1_1rc_1adec3ae0fe178c76635da0f36de9ef56e>`(
+		void* p,
+		:ref:`FreeFunc<doxid-namespaceaxl_1_1rc_1a7c31c61d3d89f1a747823dea8b7b189d>`* freeFunc = &:ref:`mem::StdAllocator::free<doxid-classaxl_1_1mem_1_1_direct_allocator_1aa95c153bf124f4661ff10888e793b17c>`
+		);
+
+	template <typename T>
+	T*
+	:target:`primeAllocatedRefCount<doxid-namespaceaxl_1_1rc_1af24823ceea5620123bb5e9b092fa39f6>`(T* p);
+
+	template <typename T>
+	T*
+	:target:`primeInPlaceRefCount<doxid-namespaceaxl_1_1rc_1a4b7fe9ebbfc1eeba190c4d39354d61ea>`(
+		T* p,
+		:ref:`RefCount<doxid-classaxl_1_1rc_1_1_ref_count>`* parent,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags
+		);
+
+	} // namespace rc

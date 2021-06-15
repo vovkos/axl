@@ -1,0 +1,20 @@
+.. index:: pair: enum; PcapLoopResult
+.. _doxid-namespaceaxl_1_1io_1ab6035c16c93080934ed6df7ab9c0913c:
+
+enum axl::io::PcapLoopResult
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_Pcap.h>
+
+	enum PcapLoopResult
+	{
+	    :target:`PcapLoopResult_Success<doxid-namespaceaxl_1_1io_1ab6035c16c93080934ed6df7ab9c0913ca64cfe310ae28e509ca9959f630918f47>` = 0,
+	    :target:`PcapLoopResult_Error<doxid-namespaceaxl_1_1io_1ab6035c16c93080934ed6df7ab9c0913cac4593af94d9e7b6f6441e74054d6befd>`   = -1,
+	    :target:`PcapLoopResult_Break<doxid-namespaceaxl_1_1io_1ab6035c16c93080934ed6df7ab9c0913ca0b9a3cb9c7ee59837bbb151ae5ff6369>`   = -2,
+	};
+

@@ -1,0 +1,220 @@
+.. index:: pair: class; axl::io::Ssl
+.. _doxid-classaxl_1_1io_1_1_ssl:
+
+class axl::io::Ssl
+==================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_Ssl.h>
+	
+	class Ssl: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`create<doxid-classaxl_1_1io_1_1_ssl_1aba4226914eebcb48341b3fb878ec42b5>`(SSL_CTX* ctx);
+	
+		int
+		:target:`getError<doxid-classaxl_1_1io_1_1_ssl_1ad9f0c6098c7f0082c719ee928c34a3ce>`(int retCode);
+	
+		void
+		:target:`setError<doxid-classaxl_1_1io_1_1_ssl_1a6f5db915767f5d38ce52e32fa63a1eb0>`(int retCode);
+	
+		void
+		:target:`setBio<doxid-classaxl_1_1io_1_1_ssl_1a60c09f512654ae8e9cdb874f76731ca6>`(BIO* bio);
+	
+		void
+		:target:`setBio<doxid-classaxl_1_1io_1_1_ssl_1a306cb91dfb24ce84725b5cea8217f384>`(
+			BIO* rbio,
+			BIO* wbio
+			);
+	
+		long
+		:target:`getOptions<doxid-classaxl_1_1io_1_1_ssl_1a605bd3da9d9691560a6d2b273b5784c2>`();
+	
+		long
+		:target:`setOptions<doxid-classaxl_1_1io_1_1_ssl_1ac04c1e87555af108d552845d967212ac>`(long options);
+	
+		long
+		:target:`clearOptions<doxid-classaxl_1_1io_1_1_ssl_1a33d5b19af6e449867a5ba66f56f00a22>`(long options);
+	
+		void
+		:target:`setInfoCallback<doxid-classaxl_1_1io_1_1_ssl_1a528b28186477e627c29757b7cdab903f>`(:ref:`SslInfoCallbackFunc<doxid-namespaceaxl_1_1io_1a1da481087567230ce6772888551c3d1f>`* callbackFunc);
+	
+		long
+		:target:`getVerifyResult<doxid-classaxl_1_1io_1_1_ssl_1ac9fc6d108617a0bed64721cf4170aeae>`();
+	
+		int
+		:target:`getVerifyDepth<doxid-classaxl_1_1io_1_1_ssl_1af2c701e973a5782d43925f3003e0b46e>`();
+	
+		void
+		:target:`setVerifyDepth<doxid-classaxl_1_1io_1_1_ssl_1ab2fa3a590381589df14daead025ba555>`(int depth);
+	
+		int
+		:target:`getVerifyMode<doxid-classaxl_1_1io_1_1_ssl_1ad98415f8bd7cd1b5e3a8c342279009fb>`();
+	
+		void
+		:target:`setVerifyMode<doxid-classaxl_1_1io_1_1_ssl_1a58b71cef8b1ba6c92f12068b7e943289>`(int mode);
+	
+		void
+		:target:`setVerify<doxid-classaxl_1_1io_1_1_ssl_1acaf6313fb542abbfec6c901936700198>`(
+			int mode,
+			:ref:`SslVerifyCallbackFunc<doxid-namespaceaxl_1_1io_1a98cf70a3991100a68def144dacdfc67d>`* callbackFunc
+			);
+	
+		bool
+		:target:`setTmpDh<doxid-classaxl_1_1io_1_1_ssl_1acff0d2d0fa01378f74fb791d9876b3fb>`(DH* dh);
+	
+		void
+		:target:`setTmpDhCallback<doxid-classaxl_1_1io_1_1_ssl_1af0234f64f292a86ab35e340ae04253fd>`(:ref:`SslTmpDhCallbackFunc<doxid-namespaceaxl_1_1io_1a4e50d90db5291555fbe6e756502a5437>`* callback);
+	
+		bool
+		:target:`setTmpEcdh<doxid-classaxl_1_1io_1_1_ssl_1ae2cdef3128867af8a00fadd8b4b63121>`(EC_KEY* ec);
+	
+		:target:`STACK_OF<doxid-classaxl_1_1io_1_1_ssl_1afa2a812fe6690ac7c67bb857f8dcb8ba>`(SSL_CIPHER);
+	
+		const char*
+		:target:`getCipherName<doxid-classaxl_1_1io_1_1_ssl_1ab387836215526f0a1fdb43dd10e58e6b>`(int priority);
+	
+		bool
+		:target:`setCipherList<doxid-classaxl_1_1io_1_1_ssl_1a3a8073863464b76dbbc2ccdec91b493d>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& listString);
+	
+		void
+		:target:`setConnectState<doxid-classaxl_1_1io_1_1_ssl_1a39fc92f9aebc616fae6b333e08d7bbfd>`();
+	
+		void
+		:target:`setAcceptState<doxid-classaxl_1_1io_1_1_ssl_1a5014228304b81fe143bb6b196541df12>`();
+	
+		bool
+		:target:`getReadAhead<doxid-classaxl_1_1io_1_1_ssl_1aed61081febbaec4720ccc1ffb4b6a759>`();
+	
+		void
+		:target:`setReadAhead<doxid-classaxl_1_1io_1_1_ssl_1a66068fe236bb8d2706cec72d986b4877>`(bool isReadAhead);
+	
+		int
+		:target:`getState<doxid-classaxl_1_1io_1_1_ssl_1a5a683a5c20c1f998a4f61477ba59e517>`();
+	
+		const char*
+		:target:`getStateString<doxid-classaxl_1_1io_1_1_ssl_1a10eb362494aab4de7ff18edbd80319a5>`();
+	
+		const char*
+		:target:`getStateStringLong<doxid-classaxl_1_1io_1_1_ssl_1a279cfadd9e1ff635539c98715f8f6d97>`();
+	
+		const char*
+		:target:`getCurrentCipherName<doxid-classaxl_1_1io_1_1_ssl_1a4b51ee23b64d14fbff075281727b7ebf>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`getCurrentCipherDescription<doxid-classaxl_1_1io_1_1_ssl_1ab12aa2c2bb87e16f3d99bd5107a0633b>`();
+	
+		int
+		:target:`getCurrentCipherBits<doxid-classaxl_1_1io_1_1_ssl_1ae6ffc28e3bbeaca1b879cd0d61a93f0e>`();
+	
+		void*
+		:target:`getExtraData<doxid-classaxl_1_1io_1_1_ssl_1a0c3f53b847f82c63718ac72bf9859cdb>`(int index);
+	
+		bool
+		:target:`setExtraData<doxid-classaxl_1_1io_1_1_ssl_1a2902341724c22682c5fcbb0e8e11b66b>`(
+			int index,
+			void* p
+			);
+	
+		X509*
+		:target:`getCertificate<doxid-classaxl_1_1io_1_1_ssl_1a570e9ee5ddda5f30fa493bea87bc61c3>`() const;
+	
+		bool
+		:target:`useCertificate<doxid-classaxl_1_1io_1_1_ssl_1acbd0a0949af21452147d4d4d1da512cd>`(const X509* cert);
+	
+		bool
+		:target:`useCertificateFile<doxid-classaxl_1_1io_1_1_ssl_1aa0b0e86e6432ca91c7776ee9910ccf93>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			int fileType = SSL_FILETYPE_PEM
+			);
+	
+		EVP_PKEY*
+		:target:`getPrivateKey<doxid-classaxl_1_1io_1_1_ssl_1ab4e1e51159bb2b0e546e42860641578c>`() const;
+	
+		bool
+		:target:`usePrivateKey<doxid-classaxl_1_1io_1_1_ssl_1a87ee0b6c7056438a26d28191c4831670>`(const EVP_PKEY* key);
+	
+		bool
+		:target:`usePrivateKeyFile<doxid-classaxl_1_1io_1_1_ssl_1a17f98f1aee12e53ff3412cb54d84a754>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			int fileType = SSL_FILETYPE_PEM
+			);
+	
+		X509*
+		:target:`getPeerCertificate<doxid-classaxl_1_1io_1_1_ssl_1a865aa35558c3abf881f6f3c98e18e83e>`() const;
+	
+		:target:`STACK_OF<doxid-classaxl_1_1io_1_1_ssl_1ac7d250359c18ee94343e8a992558dbe3>`(X509) const;
+	
+		bool
+		:target:`doHandshake<doxid-classaxl_1_1io_1_1_ssl_1a9a8bd54185295587cebdc528b7e648b5>`();
+	
+		bool
+		:target:`shutdown<doxid-classaxl_1_1io_1_1_ssl_1a3d87264652fa81a056f06fa70d470f0f>`();
+	
+		size_t
+		:target:`read<doxid-classaxl_1_1io_1_1_ssl_1add4131e2119e163384e7c81754824ca1>`(
+			void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`write<doxid-classaxl_1_1io_1_1_ssl_1a872bfbf2af0fbb0fe6396be90f4f1519>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`getPendingReadSize<doxid-classaxl_1_1io_1_1_ssl_1a5999b75925ca20f2e264fe9383901834>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

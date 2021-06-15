@@ -1,0 +1,509 @@
+.. index:: pair: class; axl::gui::Engine
+.. _doxid-classaxl_1_1gui_1_1_engine:
+
+class axl::gui::Engine
+======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Engine.h>
+	
+	class Engine
+	{
+	public:
+		// construction
+	
+		:target:`Engine<doxid-classaxl_1_1gui_1_1_engine_1af35ae7daaa80002feb2605c71363f8fc>`();
+
+		// methods
+	
+		:ref:`Palette<doxid-structaxl_1_1gui_1_1_palette>`
+		:target:`getStdPalette<doxid-classaxl_1_1gui_1_1_engine_1a6169c17605118f70a28567a3327cd724>`();
+	
+		virtual
+		void
+		:target:`updateStdPalette<doxid-classaxl_1_1gui_1_1_engine_1a84521f9a6f8af58ee4b8ec325e784f84>`() = 0;
+	
+		virtual
+		bool
+		:target:`createOffscreenCanvas<doxid-classaxl_1_1gui_1_1_engine_1a096db40fbbba512603607397e747c31f>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` width,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` height
+			) = 0;
+	
+		bool
+		:target:`createOffscreenCanvas<doxid-classaxl_1_1gui_1_1_engine_1a5becb59c4fd03fad89100556a2b9b4d3>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			const :ref:`Size<doxid-structaxl_1_1gui_1_1_size>`& size
+			);
+	
+		virtual
+		bool
+		:target:`releaseOffscreenCanvas<doxid-classaxl_1_1gui_1_1_engine_1a2c2a1ed14efc66acf5b5b90a368d0b16>`(:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas) = 0;
+	
+		virtual
+		:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`*
+		:target:`getSharedOffscreenCanvas<doxid-classaxl_1_1gui_1_1_engine_1a3f907429173a9be3ddd539e3446f388d>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` width,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` height
+			) = 0;
+	
+		:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`*
+		:target:`getSharedOffscreenCanvas<doxid-classaxl_1_1gui_1_1_engine_1af515f69c5517fac0a447e90b74b98786>`(const :ref:`Size<doxid-structaxl_1_1gui_1_1_size>`& size);
+	
+		virtual
+		void
+		:target:`releaseAllSharedOffscreenCanvases<doxid-classaxl_1_1gui_1_1_engine_1a03468b6cc45bd9b3ff20577cbe8742a2>`() = 0;
+	
+		virtual
+		bool
+		:target:`drawRect<doxid-classaxl_1_1gui_1_1_engine_1a562d63497b6da3fbed5ff9482704f5c4>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color
+			) = 0;
+	
+		virtual
+		bool
+		:target:`drawAlphaRect<doxid-classaxl_1_1gui_1_1_engine_1a0f6cad7d0c4e6ab9d630307e09469b06>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` alpha
+			);
+	
+		virtual
+		bool
+		:target:`drawGradientRect<doxid-classaxl_1_1gui_1_1_engine_1af47cd024c6516d671e098d8f28cbdc33>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			int x1,
+			int y1,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color1,
+			int x2,
+			int y2,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color2
+			);
+	
+		virtual
+		bool
+		:target:`drawAlphaGradientRect<doxid-classaxl_1_1gui_1_1_engine_1ad11c509618a7f1f44a0a34dcdc79452a>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			int x1,
+			int y1,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color1,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` alpha1,
+			int x2,
+			int y2,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color2,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` alpha2
+			);
+	
+		virtual
+		bool
+		:target:`drawText_utf8<doxid-classaxl_1_1gui_1_1_engine_1af73bc94b06f32b306c44554d643d932d>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int x,
+			int y,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			) = 0;
+	
+		virtual
+		bool
+		:target:`drawText_utf16<doxid-classaxl_1_1gui_1_1_engine_1a2b46e3ee33ac7d22ebf656842fd8bda4>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int x,
+			int y,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`sl::StringRef_utf16<doxid-namespaceaxl_1_1sl_1a5038487798790b54b7cf85af8fa4c08d>`& text
+			) = 0;
+	
+		virtual
+		bool
+		:target:`drawText_utf32<doxid-classaxl_1_1gui_1_1_engine_1a72e017a1433cc0c5dfe66002d99c895e>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int x,
+			int y,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` textColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` fontFlags,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			) = 0;
+	
+		virtual
+		bool
+		:target:`drawImage<doxid-classaxl_1_1gui_1_1_engine_1a2c14a89e6c24bcef963e80b687e2d826>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int x,
+			int y,
+			:ref:`Image<doxid-classaxl_1_1gui_1_1_image>`* image,
+			int left,
+			int top,
+			int right,
+			int bottom
+			) = 0;
+	
+		virtual
+		bool
+		:target:`copyRect<doxid-classaxl_1_1gui_1_1_engine_1ac7edba35e61bd802f19d178ab07bacc2>`(
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			int x,
+			int y,
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* srcCanvas,
+			int left,
+			int top,
+			int right,
+			int bottom
+			) = 0;
+	
+		virtual
+		void
+		:target:`clearFontTuple<doxid-classaxl_1_1gui_1_1_engine_1a3aed0171c0264d5c780e494ae7e06206>`(:ref:`FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`* fontTuple) = 0;
+	
+		virtual
+		:ref:`FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`*
+		:target:`getStdFontTuple<doxid-classaxl_1_1gui_1_1_engine_1ab8e6c1981490edc440d44b3cffc78801>`(:ref:`StdFontKind<doxid-namespaceaxl_1_1gui_1a456c44e84a2ffe5c46ea2b7baeb075d2>` fontKind) = 0;
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:target:`getStdFont<doxid-classaxl_1_1gui_1_1_engine_1a9aa5bb53f9b00ea82bec75da82be1ccc>`(
+			:ref:`StdFontKind<doxid-namespaceaxl_1_1gui_1a456c44e84a2ffe5c46ea2b7baeb075d2>` fontKind,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		virtual
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:target:`createFont<doxid-classaxl_1_1gui_1_1_engine_1ab09bc06852e10b69bf300b61c83bd863>`(
+			:ref:`FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`* fontTuple,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& family,
+			size_t pointSize,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			) = 0;
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:target:`createFont<doxid-classaxl_1_1gui_1_1_engine_1aff696d4645b81bea4181abe867abdc0c>`(
+			:ref:`FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`* fontTuple,
+			const :ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`& fontDesc
+			);
+	
+		virtual
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:target:`getFontMod<doxid-classaxl_1_1gui_1_1_engine_1af7e96d9eefe4dafa02ce1ea6c27b4a10>`(
+			:ref:`FontTuple<doxid-classaxl_1_1gui_1_1_font_tuple>`* fontTuple,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags
+			) = 0;
+	
+		virtual
+		bool
+		:target:`getFontDesc<doxid-classaxl_1_1gui_1_1_engine_1a13851fc4c091e729fdabd7319c4b0ede>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`* fontDesc
+			) = 0;
+	
+		virtual
+		bool
+		:target:`isMonospaceFont<doxid-classaxl_1_1gui_1_1_engine_1a03ca43299dc5bfbbc739a73b706feeff>`(:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcCharSize<doxid-classaxl_1_1gui_1_1_engine_1a3bbc6786ba32ef271b66dc0f9b40060b>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c
+			) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcCharSize<doxid-classaxl_1_1gui_1_1_engine_1a1ad2d1350131ac943a48223def18c4c2>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Widget<doxid-classaxl_1_1gui_1_1_widget>`* widget,
+			:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c
+			) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf8<doxid-classaxl_1_1gui_1_1_engine_1a8539077301259b10bda54158e3129c9a>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf8<doxid-classaxl_1_1gui_1_1_engine_1aeaf3e2e4f35ae259d8b1dad55f349636>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Widget<doxid-classaxl_1_1gui_1_1_widget>`* widget,
+			const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text
+			) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf16<doxid-classaxl_1_1gui_1_1_engine_1a1db2ea1ee342012952c95d8e303ac290>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			const :ref:`sl::StringRef_utf16<doxid-namespaceaxl_1_1sl_1a5038487798790b54b7cf85af8fa4c08d>`& text
+			) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf16<doxid-classaxl_1_1gui_1_1_engine_1a24f4041e455b494dfff2a575cdfaefce>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Widget<doxid-classaxl_1_1gui_1_1_widget>`* widget,
+			const :ref:`sl::StringRef_utf16<doxid-namespaceaxl_1_1sl_1a5038487798790b54b7cf85af8fa4c08d>`& text
+			) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf32<doxid-classaxl_1_1gui_1_1_engine_1a547f9523350abb728e2d348f5f7fb7d3>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Canvas<doxid-classaxl_1_1gui_1_1_canvas>`* canvas,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			) = 0;
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf32<doxid-classaxl_1_1gui_1_1_engine_1aaba9faf694c13fa35c0d63f19a1dff52>`(
+			:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`* font,
+			:ref:`Widget<doxid-classaxl_1_1gui_1_1_widget>`* widget,
+			const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text
+			) = 0;
+	
+		virtual
+		bool
+		:target:`createImage<doxid-classaxl_1_1gui_1_1_engine_1a8d60f1ccfd2ff4d97aba87700eb29663>`(
+			:ref:`Image<doxid-classaxl_1_1gui_1_1_image>`* image,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` width,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` height,
+			:ref:`PixelFormat<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4f>` pixelFormat
+			) = 0;
+	
+		bool
+		:target:`createImage<doxid-classaxl_1_1gui_1_1_engine_1ad4c288335a78586da480058dd18b6295>`(
+			:ref:`Image<doxid-classaxl_1_1gui_1_1_image>`* image,
+			const :ref:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc>`& imageDesc
+			);
+	
+		virtual
+		bool
+		:target:`getImageDesc<doxid-classaxl_1_1gui_1_1_engine_1a2fea4d598ac96ad445612c56616a73e3>`(
+			:ref:`Image<doxid-classaxl_1_1gui_1_1_image>`* image,
+			:ref:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc>`* imageDesc
+			) = 0;
+	
+		virtual
+		:ref:`Cursor<doxid-classaxl_1_1gui_1_1_cursor>`*
+		:target:`getStdCursor<doxid-classaxl_1_1gui_1_1_engine_1abe913ef650e198afae9f110620a2520c>`(:ref:`StdCursorKind<doxid-namespaceaxl_1_1gui_1a1fa850a3a4e931836ee62a8c065529bb>` cursorKind) = 0;
+	
+		virtual
+		uintptr_t
+		:target:`registerClipboardFormat<doxid-classaxl_1_1gui_1_1_engine_1a08142e5e1408431da7ae13fb1f1bc7f1>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& formatName) = 0;
+	
+		virtual
+		bool
+		:target:`readClipboard<doxid-classaxl_1_1gui_1_1_engine_1ad7c316dd6c24728f8f1dcd25a9919dbb>`(:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string) = 0;
+	
+		virtual
+		bool
+		:target:`readClipboard<doxid-classaxl_1_1gui_1_1_engine_1a0b2e4cf4acaa35156774b0619c7a9534>`(
+			uintptr_t format,
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* data
+			) = 0;
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`readClipboard<doxid-classaxl_1_1gui_1_1_engine_1a9c701d16b6e2379f01ba705f2ab2a05e>`();
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`readClipboard<doxid-classaxl_1_1gui_1_1_engine_1a8b28b40f519a6da778537d7f4cd461d2>`(uintptr_t format);
+	
+		virtual
+		bool
+		:target:`writeClipboard<doxid-classaxl_1_1gui_1_1_engine_1a117c37ecbd561665d3d14a0dab4df6a1>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string) = 0;
+	
+		virtual
+		bool
+		:target:`writeClipboard<doxid-classaxl_1_1gui_1_1_engine_1ad84d62b24900628ba934ce7f4e694090>`(
+			uintptr_t format,
+			const void* data,
+			size_t size
+			) = 0;
+	
+		bool
+		:target:`writeClipboard<doxid-classaxl_1_1gui_1_1_engine_1a3cfeee9d3115c5dfcfa64681470b963d>`(
+			uintptr_t format,
+			const :ref:`sl::ArrayRef<doxid-classaxl_1_1sl_1_1_array_ref>`<char>& data
+			);
+	
+		virtual
+		bool
+		:target:`commitClipboard<doxid-classaxl_1_1gui_1_1_engine_1abd88e5d2d29ba03fde4ea74c136fb0c6>`() = 0;
+	
+		virtual
+		bool
+		:target:`isWidgetFocused<doxid-classaxl_1_1gui_1_1_engine_1a1044caa292736687c65f4581adc063f5>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		bool
+		:target:`setWidgetFocus<doxid-classaxl_1_1gui_1_1_engine_1acbc424a96ea232efe2c17ebf2f7c98d4>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		bool
+		:target:`redrawWidget<doxid-classaxl_1_1gui_1_1_engine_1a47340f9856b71a5731c6a88c1554603e>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			int left,
+			int top,
+			int right,
+			int bottom
+			) = 0;
+	
+		virtual
+		bool
+		:target:`redrawWidgetImmediate<doxid-classaxl_1_1gui_1_1_engine_1a49ce84eeaee296e44645e704d615089c>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			int left,
+			int top,
+			int right,
+			int bottom
+			) = 0;
+	
+		virtual
+		bool
+		:target:`scrollWidget<doxid-classaxl_1_1gui_1_1_engine_1a74780c3ed58d2e824d4491e3600a6717>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			int dx,
+			int dy
+			) = 0;
+	
+		virtual
+		bool
+		:target:`scrollWidgetRect<doxid-classaxl_1_1gui_1_1_engine_1a7de24bbf8b86fec01031605fdb3e6ffc>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			int left,
+			int top,
+			int right,
+			int bottom,
+			int dx,
+			int dy
+			) = 0;
+	
+		virtual
+		bool
+		:target:`setWidgetCursor<doxid-classaxl_1_1gui_1_1_engine_1ac4861fcbeba2a06151f6f224d0cc11ff>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			:ref:`Cursor<doxid-classaxl_1_1gui_1_1_cursor>`* cursor
+			) = 0;
+	
+		virtual
+		bool
+		:target:`setMouseCapture<doxid-classaxl_1_1gui_1_1_engine_1a15ffe3bb2c9e17927a2f6741f2be99f9>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		bool
+		:target:`releaseMouse<doxid-classaxl_1_1gui_1_1_engine_1a2401d3fcceda9b929cde86d035aec84a>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		bool
+		:target:`updateWidgetScrollBar<doxid-classaxl_1_1gui_1_1_engine_1a352581a664966eb1f8bc3b816e57b5e5>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			:ref:`Orientation<doxid-namespaceaxl_1_1gui_1abbb4c75e7541835676229cd86d7180e6>` orientation
+			) = 0;
+	
+		virtual
+		void
+		:target:`sendWidgetNotification<doxid-classaxl_1_1gui_1_1_engine_1ab1965a72a9717a0667c1a7a4feb10e3f>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` code,
+			const void* params = NULL
+			) = 0;
+	
+		virtual
+		bool
+		:target:`postWidgetThreadMsg<doxid-classaxl_1_1gui_1_1_engine_1a0e0724facdb3b1a85fadb03f812882f2>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` code,
+			const :ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<void>& params
+			) = 0;
+	
+		virtual
+		bool
+		:target:`startWidgetAnimation<doxid-classaxl_1_1gui_1_1_engine_1a5d8d64fe00196e2e587b58af1e600c2b>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		void
+		:target:`stopWidgetAnimation<doxid-classaxl_1_1gui_1_1_engine_1ae0729c8d2d276aafc20d8832a5a6616b>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		bool
+		:target:`showCaret<doxid-classaxl_1_1gui_1_1_engine_1a228b447c3481f8c6694d3433fc3689d2>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			const :ref:`Rect<doxid-structaxl_1_1gui_1_1_rect>`& rect
+			) = 0;
+	
+		virtual
+		void
+		:target:`hideCaret<doxid-classaxl_1_1gui_1_1_engine_1a7db75a89b91440135d02a3976bae6ed1>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		bool
+		:target:`scheduleToolTipMsg<doxid-classaxl_1_1gui_1_1_engine_1a4837307d503fb3641ea65e123a808d4e>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` timeout
+			) = 0;
+	
+		virtual
+		bool
+		:target:`cancelToolTipMsg<doxid-classaxl_1_1gui_1_1_engine_1a843eb066b1cc259d4341495468743899>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		bool
+		:target:`showToolTip<doxid-classaxl_1_1gui_1_1_engine_1a62cd11e73f49d2cea9c8ef103e8f0162>`(
+			:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver,
+			int x,
+			int y,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& toolTip
+			) = 0;
+	
+		virtual
+		bool
+		:target:`hideToolTip<doxid-classaxl_1_1gui_1_1_engine_1ad587c927086f6dfae1eafd512c642b56>`(:ref:`WidgetDriver<doxid-classaxl_1_1gui_1_1_widget_driver>`* widgetDriver) = 0;
+	
+		virtual
+		void
+		:target:`processUiEvents<doxid-classaxl_1_1gui_1_1_engine_1a79ddc93b5843472c8b2bb23cccb787df>`(uint32_t timeLimit = -1) = 0;
+	};

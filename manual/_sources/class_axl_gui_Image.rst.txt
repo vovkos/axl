@@ -1,0 +1,41 @@
+.. index:: pair: class; axl::gui::Image
+.. _doxid-classaxl_1_1gui_1_1_image:
+
+class axl::gui::Image
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Image.h>
+	
+	class Image: public :ref:`axl::gui::GuiItem<doxid-classaxl_1_1gui_1_1_gui_item>`
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`getImageDesc<doxid-classaxl_1_1gui_1_1_image_1a1163e0f4b2218d4c366e6394df6e43b9>`(:ref:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc>`* imageDesc);
+	
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`getSize<doxid-classaxl_1_1gui_1_1_image_1adcc8b057269619b30ecb25b9498b1355>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:ref:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+

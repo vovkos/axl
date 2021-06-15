@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::SizeOf
+.. _doxid-classaxl_1_1sl_1_1_size_of:
+
+template class axl::sl::SizeOf
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <typename T>
+	class SizeOf
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_size_of_1a8a82d97e2905ff8d9e9fe892283c6793>`() const;
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_size_of_1ab99650c0ec57f917482fbd583e8142ac>`(const T* x) const;
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_size_of_1a6f0d11fc2c3203486083b40e5745262b>`(const T& x) const;
+	};

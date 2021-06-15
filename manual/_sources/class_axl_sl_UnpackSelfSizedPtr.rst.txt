@@ -1,0 +1,33 @@
+.. index:: pair: class; axl::sl::UnpackSelfSizedPtr
+.. _doxid-classaxl_1_1sl_1_1_unpack_self_sized_ptr:
+
+template class axl::sl::UnpackSelfSizedPtr
+==========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Unpacker.h>
+	
+	template <
+		typename T,
+		typename SizeOf = sl::SizeOf<T>
+		>
+	class UnpackSelfSizedPtr
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_unpack_self_sized_ptr_1a09db2f4e54d1da10860e44116e9a9dad>`(
+			const void* p,
+			size_t size,
+			T** value
+			);
+	};

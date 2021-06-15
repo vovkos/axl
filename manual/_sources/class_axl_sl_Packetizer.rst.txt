@@ -1,0 +1,46 @@
+.. index:: pair: class; axl::sl::Packetizer
+.. _doxid-classaxl_1_1sl_1_1_packetizer:
+
+template class axl::sl::Packetizer
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Packetizer.h>
+	
+	template <typename T>
+	class Packetizer: public :ref:`axl::sl::PacketizerRoot<doxid-classaxl_1_1sl_1_1_packetizer_root>`
+	{
+	public:
+		// methods
+	
+		void
+		:target:`write<doxid-classaxl_1_1sl_1_1_packetizer_1a1a12b127b5b050c4fd9672b66f2827e6>`(
+			const void* p,
+			size_t size
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		void
+		:ref:`reset<doxid-classaxl_1_1sl_1_1_packetizer_root_1ace4faf370d43be2a614f33388afe0522>`();
+	
+		static
+		uint64_t
+		:ref:`createHdr<doxid-classaxl_1_1sl_1_1_packetizer_root_1a04f3a9402667e0b4319cbd6738b64ba2>`(size_t size);
+

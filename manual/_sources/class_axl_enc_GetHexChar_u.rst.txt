@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::enc::GetHexChar_u
+.. _doxid-classaxl_1_1enc_1_1_get_hex_char__u:
+
+class axl::enc::GetHexChar_u
+============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_HexEncoding.h>
+	
+	class GetHexChar_u
+	{
+	public:
+		// methods
+	
+		char
+		:target:`operator()<doxid-classaxl_1_1enc_1_1_get_hex_char__u_1a1ae6baf710e1fec29880e71f7adf9082>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` x);
+	};

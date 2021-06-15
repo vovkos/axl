@@ -1,0 +1,56 @@
+.. index:: pair: struct; axl::gui::ColorAttr
+.. _doxid-structaxl_1_1gui_1_1_color_attr:
+
+struct axl::gui::ColorAttr
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_ColorAttr.h>
+	
+	struct ColorAttr
+	{
+		// fields
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_foreColor<doxid-structaxl_1_1gui_1_1_color_attr_1a1dba91ba1db8fd80f023cd8a5162a354>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_backColor<doxid-structaxl_1_1gui_1_1_color_attr_1a3924cd2e611a61508115c291afbd958e>`;
+
+		// construction
+	
+		:target:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr_1a2076c33fcd3f57fef29e7187ddcecd01>`();
+	
+		:target:`ColorAttr<doxid-structaxl_1_1gui_1_1_color_attr_1aa6595fa111adfaec9c3e1a3d263f789b>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` foreColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor = -1
+			);
+
+		// methods
+	
+		int
+		:target:`cmp<doxid-structaxl_1_1gui_1_1_color_attr_1a0d8f48f14f3a888eecb2cc9a8648e8ba>`(const ColorAttr& attr);
+	
+		void
+		:target:`clear<doxid-structaxl_1_1gui_1_1_color_attr_1ae5e7a64438f7fbfd781dc391f932e2a1>`();
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_color_attr_1af19b424bbf66f06e3b6fc35498697007>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` foreColor,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` backColor = -1
+			);
+	
+		void
+		:target:`overlay<doxid-structaxl_1_1gui_1_1_color_attr_1a658d2a7c35393d3689b8b63a18b6a62a>`(
+			const ColorAttr& baseAttr,
+			const ColorAttr& overlayAttr
+			);
+	
+		void
+		:target:`overlay<doxid-structaxl_1_1gui_1_1_color_attr_1ab5ee91d6bd432bb62df926e390e7a6c0>`(const ColorAttr& overlayAttr);
+	};

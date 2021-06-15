@@ -1,0 +1,27 @@
+.. index:: pair: enum; FileFlag
+.. _doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09a:
+
+enum axl::io::FileFlag
+======================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_File.h>
+
+	enum FileFlag
+	{
+	    :target:`FileFlag_ReadOnly<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aa7c89e76a006fd75a0d2982079f5249d5>`        = 0x0001,
+	    :target:`FileFlag_WriteOnly<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aa82d55c354652967a731d99d159d29ed8>`       = 0x0002,
+	    :target:`FileFlag_OpenExisting<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aab2d2fc04707bffa191df1b04c38f80fb>`    = 0x0004,
+	    :target:`FileFlag_Exclusive<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aac74b3e54a304c87088dbdd382a5998ec>`       = 0x0008,
+	    :target:`FileFlag_ShareWrite<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aa245d086a8738e5771a06d92a9508f4f7>`      = 0x0010,
+	    :target:`FileFlag_DeleteOnClose<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aa56bbee8fc62983fa85091003ceb36d6c>`   = 0x0020,
+	    :target:`FileFlag_Unlink<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aa03dfef36ed35acdcb5d3a970651cd6cc>`          = 0x0040,
+	    :target:`FileFlag_Clear<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aa7dc0ef372d4d06cb27036629bf0e31d5>`           = 0x0080,
+	    :target:`FileFlag_Asynchronous<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aad96b7a1afa9eaf43021120d82b4f44ea>`    = 0x0100,
+	    :target:`FileFlag_WriteAttributes<doxid-namespaceaxl_1_1io_1af41ff39f41045fc4d7f4caa5634cc09aa1266cee62076cf24878e4fedad17b4cf>` = 0x0200,
+	};
+

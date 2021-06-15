@@ -1,0 +1,43 @@
+.. index:: pair: class; axl::sl::BoyerMooreFindBase
+.. _doxid-classaxl_1_1sl_1_1_boyer_moore_find_base:
+
+template class axl::sl::BoyerMooreFindBase
+==========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BoyerMooreFind.h>
+	
+	template <typename T>
+	class BoyerMooreFindBase
+	{
+	public:
+		// typedefs
+	
+		typedef :ref:`BoyerMooreIncrementalContext<doxid-classaxl_1_1sl_1_1_boyer_moore_incremental_context>`<T> :target:`IncrementalContext<doxid-classaxl_1_1sl_1_1_boyer_moore_find_base_1a6ad9b2e507807e8e16363f2c1bef6d73>`;
+
+		// construction
+	
+		:target:`BoyerMooreFindBase<doxid-classaxl_1_1sl_1_1_boyer_moore_find_base_1a49ed56a10ba5d25322fafdcc3bbbbf9e>`();
+
+		// methods
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1sl_1_1_boyer_moore_find_base_1a1f45a45922ed2de8fc8ca66ad86de10c>`();
+	
+		:ref:`Array<doxid-classaxl_1_1sl_1_1_array>`<T>
+		:target:`getPattern<doxid-classaxl_1_1sl_1_1_boyer_moore_find_base_1a621b1bb018133a32a803cf380dc2aa1f>`();
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+		:target:`getFlags<doxid-classaxl_1_1sl_1_1_boyer_moore_find_base_1a8c27182977b23d02cb5a48ef3a462b68>`();
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_boyer_moore_find_base_1a6ce3707d2f5aa069f6e723b77484b323>`();
+	};

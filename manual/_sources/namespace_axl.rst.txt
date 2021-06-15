@@ -1,0 +1,73 @@
+.. index:: pair: namespace; axl
+.. _doxid-namespaceaxl:
+
+namespace axl
+=============
+
+.. toctree::
+	:hidden:
+
+	namespace_axl_cf.rst
+	namespace_axl_cry.rst
+	namespace_axl_dox.rst
+	namespace_axl_enc.rst
+	namespace_axl_err.rst
+	namespace_axl_g.rst
+	namespace_axl_gui.rst
+	namespace_axl_ini.rst
+	namespace_axl_io.rst
+	namespace_axl_iok.rst
+	namespace_axl_lex.rst
+	namespace_axl_lua.rst
+	namespace_axl_mem.rst
+	namespace_axl_rc.rst
+	namespace_axl_re.rst
+	namespace_axl_sec.rst
+	namespace_axl_sl.rst
+	namespace_axl_spy.rst
+	namespace_axl_st.rst
+	namespace_axl_sys.rst
+	namespace_axl_xml.rst
+	namespace_axl_zip.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace axl {
+
+	// namespaces
+
+	namespace :ref:`axl::cf<doxid-namespaceaxl_1_1cf>`;
+	namespace :ref:`axl::cry<doxid-namespaceaxl_1_1cry>`;
+	namespace :ref:`axl::dox<doxid-namespaceaxl_1_1dox>`;
+	namespace :ref:`axl::enc<doxid-namespaceaxl_1_1enc>`;
+	namespace :ref:`axl::err<doxid-namespaceaxl_1_1err>`;
+	namespace :ref:`axl::g<doxid-namespaceaxl_1_1g>`;
+	namespace :ref:`axl::gui<doxid-namespaceaxl_1_1gui>`;
+	namespace :ref:`axl::ini<doxid-namespaceaxl_1_1ini>`;
+	namespace :ref:`axl::io<doxid-namespaceaxl_1_1io>`;
+		namespace :ref:`axl::io::psx<doxid-namespaceaxl_1_1io_1_1psx>`;
+		namespace :ref:`axl::io::win<doxid-namespaceaxl_1_1io_1_1win>`;
+	namespace :ref:`axl::iok<doxid-namespaceaxl_1_1iok>`;
+	namespace :ref:`axl::lex<doxid-namespaceaxl_1_1lex>`;
+	namespace :ref:`axl::lua<doxid-namespaceaxl_1_1lua>`;
+	namespace :ref:`axl::mem<doxid-namespaceaxl_1_1mem>`;
+	namespace :ref:`axl::rc<doxid-namespaceaxl_1_1rc>`;
+	namespace :ref:`axl::re<doxid-namespaceaxl_1_1re>`;
+	namespace :ref:`axl::sec<doxid-namespaceaxl_1_1sec>`;
+	namespace :ref:`axl::sl<doxid-namespaceaxl_1_1sl>`;
+	namespace :ref:`axl::spy<doxid-namespaceaxl_1_1spy>`;
+	namespace :ref:`axl::st<doxid-namespaceaxl_1_1st>`;
+	namespace :ref:`axl::sys<doxid-namespaceaxl_1_1sys>`;
+		namespace :ref:`axl::sys::drw<doxid-namespaceaxl_1_1sys_1_1drw>`;
+		namespace :ref:`axl::sys::lnx<doxid-namespaceaxl_1_1sys_1_1lnx>`;
+		namespace :ref:`axl::sys::psx<doxid-namespaceaxl_1_1sys_1_1psx>`;
+		namespace :ref:`axl::sys::win<doxid-namespaceaxl_1_1sys_1_1win>`;
+	namespace :ref:`axl::xml<doxid-namespaceaxl_1_1xml>`;
+	namespace :ref:`axl::zip<doxid-namespaceaxl_1_1zip>`;
+
+	} // namespace axl

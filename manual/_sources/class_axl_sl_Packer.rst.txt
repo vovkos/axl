@@ -1,0 +1,55 @@
+.. index:: pair: class; axl::sl::Packer
+.. _doxid-classaxl_1_1sl_1_1_packer:
+
+class axl::sl::Packer
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Packer.h>
+	
+	class Packer
+	{
+	public:
+		// methods
+	
+		virtual
+		:ref:`axl_va_list<doxid-classaxl__va__list>`
+		:target:`pack_va<doxid-classaxl_1_1sl_1_1_packer_1afbd371f4814c0a1a696b941576acde85>`(
+			void* p,
+			size_t* size,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			) = 0;
+	
+		void
+		:target:`pack<doxid-classaxl_1_1sl_1_1_packer_1a416da3d7d52e83de1c797dbade821e24>`(
+			void* p,
+			size_t* size,
+			...
+			);
+	
+		size_t
+		:target:`count_va<doxid-classaxl_1_1sl_1_1_packer_1a02dbf3d84ba2937ca15e3854e2b16009>`(:ref:`axl_va_list<doxid-classaxl__va__list>` va);
+	
+		size_t
+		:target:`count<doxid-classaxl_1_1sl_1_1_packer_1aff462c4ab43cb6dfac403383d34e545a>`(
+			int unused,
+			...
+			);
+	
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+		:target:`createPackage_va<doxid-classaxl_1_1sl_1_1_packer_1a1a0ad1359d1731fbd978c45aee81a547>`(:ref:`axl_va_list<doxid-classaxl__va__list>` va);
+	
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+		:target:`createPackage<doxid-classaxl_1_1sl_1_1_packer_1acb507c3694cad419ebbef7e82aac5b6f>`(
+			int unused,
+			...
+			);
+	};

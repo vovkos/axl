@@ -1,0 +1,11 @@
+.. index:: pair: struct; axl::rc::NullPtr
+.. _doxid-structaxl_1_1rc_1_1_null_ptr:
+
+struct axl::rc::NullPtr
+=======================
+
+.. toctree::
+	:hidden:
+
+
+

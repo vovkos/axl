@@ -1,0 +1,592 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::io::win::Serial &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::io::win::Socket" href="class_axl_io_win_Socket.html" />
+    <link rel="prev" title="class axl::io::win::NamedPipe" href="class_axl_io_win_NamedPipe.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_io_psx.html">namespace axl::io::psx</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="namespace_axl_io_win.html">namespace axl::io::win</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_FileFlag.html">enum axl::io::FileFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_NetworkAdapterFlag.html">enum axl::io::NetworkAdapterFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_NetworkAdapterType.html">enum axl::io::NetworkAdapterType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_PcapLoopResult.html">enum axl::io::PcapLoopResult</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialFlowControl.html">enum axl::io::SerialFlowControl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialParity.html">enum axl::io::SerialParity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialSettingId.html">enum axl::io::SerialSettingId</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialStatusLine.html">enum axl::io::SerialStatusLine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialStopBits.html">enum axl::io::SerialStopBits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SharedMemoryTransportConst.html">enum axl::io::SharedMemoryTransportConst</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SharedMemoryTransportFlag.html">enum axl::io::SharedMemoryTransportFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SharedMemoryTransportState.html">enum axl::io::SharedMemoryTransportState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SocketShutdownKind.html">enum axl::io::SocketShutdownKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_NetworkAdapterAddress.html">struct axl::io::NetworkAdapterAddress</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SerialSettings.html">struct axl::io::SerialSettings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SharedMemoryTransportHdr.html">struct axl::io::SharedMemoryTransportHdr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SharedMemoryTransportMessageHdr.html">struct axl::io::SharedMemoryTransportMessageHdr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SockAddr.html">struct axl::io::SockAddr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_AutoDeleteFile.html">class axl::io::AutoDeleteFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_ClosePcap.html">class axl::io::ClosePcap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_CloseUsbContext.html">class axl::io::CloseUsbContext</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_File.html">class axl::io::File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FileEnumerator.html">class axl::io::FileEnumerator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FileTransport.html">class axl::io::FileTransport</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeSsl.html">class axl::io::FreeSsl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeSslCtx.html">class axl::io::FreeSslCtx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeUsbConfigDescriptor.html">class axl::io::FreeUsbConfigDescriptor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeUsbDeviceList.html">class axl::io::FreeUsbDeviceList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeUsbTransfer.html">class axl::io::FreeUsbTransfer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_MappedFile.html">class axl::io::MappedFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_MappedViewMgr.html">class axl::io::MappedViewMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Mapping.html">class axl::io::Mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_NetworkAdapterDesc.html">class axl::io::NetworkAdapterDesc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Pcap.html">class axl::io::Pcap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_PcapFilter.html">class axl::io::PcapFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Serial.html">class axl::io::Serial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SerialPortDesc.html">class axl::io::SerialPortDesc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SharedMemoryReader.html">class axl::io::SharedMemoryReader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SharedMemoryTransportBase.html">class axl::io::SharedMemoryTransportBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SharedMemoryWriter.html">class axl::io::SharedMemoryWriter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SimpleMappedFile.html">class axl::io::SimpleMappedFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Socket.html">class axl::io::Socket</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Socketransport.html">class axl::io::Socketransport</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Ssl.html">class axl::io::Ssl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SslCtx.html">class axl::io::SslCtx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Transport.html">class axl::io::Transport</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbContext.html">class axl::io::UsbContext</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbDevice.html">class axl::io::UsbDevice</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbDeviceList.html">class axl::io::UsbDeviceList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbError.html">class axl::io::UsbError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbErrorProvider.html">class axl::io::UsbErrorProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbEventThread.html">class axl::io::UsbEventThread</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbTransfer.html">class axl::io::UsbTransfer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_io.html">namespace axl::io</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_io_win.html">namespace axl::io::win</a> &raquo;</li>
+        
+      <li>class axl::io::win::Serial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-io-win-serial">
+<span id="doxid-classaxl-1-1io-1-1win-1-1-serial"></span><span id="index-0"></span><h1>class axl::io::win::Serial</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_io_win_Serial.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nl">Serial</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file"><span class="std std-ref">axl::io::win::File</span></a><span></span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// methods</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a7d76bebc47f8d32d7bdad04512ade593"><span></span><span class="n">open</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">accessMode</span> <span class="o">=</span> <span class="n">GENERIC_READ</span><span class="o">|</span><span class="n">GENERIC_WRITE</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">flagsAttributes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a58c2566df5a165f4a76872696caa84a1"><span></span><span class="n">clearError</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">errors</span><span class="p">,</span>
+        <span class="n">COMSTAT</span><span class="o">*</span> <span class="n">stat</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a0e7edb649900303332e4290ab4a8a832"><span></span><span class="n">getSettings</span></span><span></span><span class="p">(</span><span class="n">DCB</span><span class="o">*</span> <span class="n">dcb</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1abc414923357cff967abdc6550718c6a5"><span></span><span class="n">setSettings</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">DCB</span><span class="o">*</span> <span class="n">dcb</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1aa77fb2ccd67e54b94e1bca83c728fd86"><span></span><span class="n">getTimeouts</span></span><span></span><span class="p">(</span><span class="n">COMMTIMEOUTS</span><span class="o">*</span> <span class="n">timeouts</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a04f47b62a3c8ca81057785cc6cb9e8c7"><span></span><span class="n">setTimeouts</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">COMMTIMEOUTS</span><span class="o">*</span> <span class="n">timeouts</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a05298e530d1c79c7fee30503c4009ae9"><span></span><span class="n">escape</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">function</span><span class="p">);</span>
+
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1ac12741b41014f3fe772f803deaf0215b"><span></span><span class="n">getStatusLines</span></span><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a70b83198508d84f6f60566bcdcec9f4c"><span></span><span class="n">setDtr</span></span><span></span><span class="p">(</span><span class="kt">bool</span> <span class="n">isSet</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1ae7604b44c2be9be8612ba888486acf51"><span></span><span class="n">setRts</span></span><span></span><span class="p">(</span><span class="kt">bool</span> <span class="n">isSet</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1afc0f9499548f171ca4b63eb3d389d7c1"><span></span><span class="n">setBreakCondition</span></span><span></span><span class="p">(</span><span class="kt">bool</span> <span class="n">isSet</span><span class="p">);</span>
+
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a739912ee6c4ea73016c196dd2ec5ea55"><span></span><span class="n">getWaitMask</span></span><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a4cde4608691209d6094894599dde2fc2"><span></span><span class="n">setWaitMask</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">mask</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a1c5cff6355bb5e995957619404a1e37a"><span></span><span class="n">wait</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">events</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a589d5ce945496b4cd6681b8fe9f17b33"><span></span><span class="n">overlappedWait</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">events</span><span class="p">,</span>
+        <span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a6a83e16483af894fa13fec81226d7ecc"><span></span><span class="n">overlappedWait</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">events</span><span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a5db5408ceb5b46b651189c9ddd13b479"><span></span><span class="n">read</span></span><span></span><span class="p">(</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1io-1-1win-1-1-serial-1a246d3abc9982d8f59a996e20c18b0342"><span></span><span class="n">write</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">);</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// typedefs</span>
+
+    <span class="k">typedef</span> <span class="n">T</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a188765028bffca96ef6ed6638ce9f654"><span class="std std-ref">H</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ada6ac10b3fc0a5d2778b1dfc8adc6ca2"><span class="std std-ref">operator T</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0f0fad98719a4350af69d32a66d3e7ad"><span class="std std-ref">operator-&gt;</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">Handle</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0a34799e733a133110e663af5c695bb2"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a88cceffbbd3a1caeffaa998ac9c0c616"><span class="std std-ref">isOpen</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a4f4349dda184939edffd0c8229b20872"><span class="std std-ref">close</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a51e30365c2f9c7372a534dd776b1da9a"><span class="std std-ref">attach</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1aba1f7ac04018f2f403e94ddff96b7051"><span class="std std-ref">detach</span></a><span></span><span class="p">();</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1af56d375af50768cf2e1ea3ca06828db9"><span class="std std-ref">p</span></a><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ad0019f565f53583938191aafffb378e1"><span class="std std-ref">getInvalidHandle</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a2a69e0b10244a670d905cba64c75ad1a"><span class="std std-ref">create</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a7375808d9fca58d1037da98f92680ad7"><span class="std std-ref">sl::StringRef_w</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">accessMode</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">shareMode</span><span class="p">,</span>
+        <span class="n">SECURITY_ATTRIBUTES</span><span class="o">*</span> <span class="n">secAttr</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">creationDisposition</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">flagsAttributes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1aabbfe56c25cb057dcc02708806c34c42"><span class="std std-ref">duplicate</span></a><span></span><span class="p">(</span>
+        <span class="n">HANDLE</span> <span class="n">sourceProcess</span><span class="p">,</span>
+        <span class="n">HANDLE</span> <span class="n">sourceHandle</span><span class="p">,</span>
+        <span class="n">HANDLE</span> <span class="n">targetProcess</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">accessMode</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">isInheritable</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">options</span>
+        <span class="p">);</span>
+
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1af508fe91f1c398857bde7d03f852e284"><span class="std std-ref">getType</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">uint64_t</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1acd1eb334c6aa6c513494bc223b932dff"><span class="std std-ref">getSize</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1aa58125201ad94835d38f7a56f68ec9ec"><span class="std std-ref">setSize</span></a><span></span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">size</span><span class="p">);</span>
+
+    <span class="kt">uint64_t</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a663b02f339169f701149bd31cdf0313e"><span class="std std-ref">getPosition</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1ab6da32558b36982a751867a54f7f1cda"><span class="std std-ref">setPosition</span></a><span></span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">offset</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a907853a463b6d9eb5ffb5a64c9fa0e6e"><span class="std std-ref">flush</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1ab8cdf49ab20304f0008ccd45e15d6e1d"><span class="std std-ref">read</span></a><span></span><span class="p">(</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">actualSize</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1ac4803c5449177168c8788da54b475d34"><span class="std std-ref">write</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">actualSize</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1aa850cdd5e96cb625e4225a0f17a4c977"><span class="std std-ref">ioctl</span></a><span></span><span class="p">(</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">inData</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">inDataSize</span><span class="p">,</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">outData</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">outDataSize</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">actualSize</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1ac597e8d166876c0648900b3e855f03d3"><span class="std std-ref">overlappedRead</span></a><span></span><span class="p">(</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a57afb09ea96688e03afb3e26ccb8b57f"><span class="std std-ref">overlappedWrite</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a761640c0a554b73975525ee2fb376787"><span class="std std-ref">overlappedIoctl</span></a><span></span><span class="p">(</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">inData</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">inDataSize</span><span class="p">,</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">outData</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">outDataSize</span><span class="p">,</span>
+        <span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1ac463a97eb71cb8e0e498def433ee7a75"><span class="std std-ref">readEx</span></a><span></span><span class="p">(</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span><span class="p">,</span>
+        <span class="n">LPOVERLAPPED_COMPLETION_ROUTINE</span> <span class="n">completionFunc</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a7596936bac46c304344c15812b8058d8"><span class="std std-ref">writeEx</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span><span class="p">,</span>
+        <span class="n">LPOVERLAPPED_COMPLETION_ROUTINE</span> <span class="n">completionFunc</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a971b3d239af7f09e8dfa64b6ba7b3878"><span class="std std-ref">read</span></a><span></span><span class="p">(</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a32612c934338bbb7ecd65e08abf54cca"><span class="std std-ref">write</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">);</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a9b6691af282ced3386932a12155473d1"><span class="std std-ref">overlappedRead</span></a><span></span><span class="p">(</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a559f45e8e3c506d5808229f16e306836"><span class="std std-ref">overlappedWrite</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">size</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1aa5ff6be6e6a5d9dc7d90762d0317f2dc"><span class="std std-ref">overlappedRead</span></a><span></span><span class="p">(</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">actualSize</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a7ab223e7f04aa82fb592d5271b000550"><span class="std std-ref">overlappedWrite</span></a><span></span><span class="p">(</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">size</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">actualSize</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a0edb7277784ae8b6a549edcdc34f627c"><span class="std std-ref">overlappedIoctl</span></a><span></span><span class="p">(</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">code</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">inData</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">inDataSize</span><span class="p">,</span>
+        <span class="kt">void</span><span class="o">*</span> <span class="n">outData</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span> <span class="n">outDataSize</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">actualSize</span>
+        <span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a86d3b2df752956dcfd03f4c09e985056"><span class="std std-ref">getOverlappedResult</span></a><span></span><span class="p">(</span>
+        <span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1abea8065ed82cda6a2a31592be9cd96b2"><span class="std std-ref">dword_t</span></a><span></span><span class="o">*</span> <span class="n">actualSize</span>
+        <span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">size_t</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1aa400aa0e2ff6903abeb3b23f704b8978"><span class="std std-ref">getOverlappedResult</span></a><span></span><span class="p">(</span><span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a724c10c4621a114cee25de54b84802d3"><span class="std std-ref">cancelIo</span></a><span></span><span class="p">(</span><span class="n">OVERLAPPED</span><span class="o">*</span> <span class="n">overlapped</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_io_win_File.html#doxid-classaxl-1-1io-1-1win-1-1-file-1a78d9e79c702686064fcf389becc0eaf6"><span class="std std-ref">completeOverlappedRequest</span></a><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a812d16e5494522586b3784e55d479912"><span class="std std-ref">bool_t</span></a><span></span> <span class="n">result</span><span class="p">);</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_io_win_Socket.html" class="btn btn-neutral float-right" title="class axl::io::win::Socket" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_io_win_NamedPipe.html" class="btn btn-neutral float-left" title="class axl::io::win::NamedPipe" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

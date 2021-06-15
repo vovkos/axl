@@ -1,0 +1,123 @@
+.. index:: pair: class; axl::io::Socket
+.. _doxid-classaxl_1_1io_1_1_socket:
+
+class axl::io::Socket
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_Socket.h>
+	
+	class Socket
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`isOpen<doxid-classaxl_1_1io_1_1_socket_1a55d684e8510cdc837b2e9677bf92b1aa>`();
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1_socket_1abf0b9857c962f70b4fb75f400d8353a0>`(
+			int addressFamily,
+			int sockKind,
+			int protocol
+			);
+	
+		void
+		:target:`close<doxid-classaxl_1_1io_1_1_socket_1a53d5659899b4857dc662c9a3f23a1294>`();
+	
+		int
+		:target:`getError<doxid-classaxl_1_1io_1_1_socket_1ae514bfb585250633de2e0333b2ec6b8d>`();
+	
+		bool
+		:target:`setBlockingMode<doxid-classaxl_1_1io_1_1_socket_1ad8537a01c03b73f2480157583a20d040>`(bool isBlocking);
+	
+		size_t
+		:target:`getIncomingDataSize<doxid-classaxl_1_1io_1_1_socket_1a34df573fefc7edd47716a3f6ebcc2ad8>`();
+	
+		bool
+		:target:`bind<doxid-classaxl_1_1io_1_1_socket_1a1b7d8c84e18c61769d10d9ec395ea3df>`(const sockaddr* addr);
+	
+		bool
+		:target:`bind<doxid-classaxl_1_1io_1_1_socket_1a0f3e248a411923fc7c7fdd66c840c803>`(const :ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`& addr);
+	
+		bool
+		:target:`getAddress<doxid-classaxl_1_1io_1_1_socket_1ad6df141025edad4ebaeba288fe3364e5>`(:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr);
+	
+		bool
+		:target:`getPeerAddress<doxid-classaxl_1_1io_1_1_socket_1abea18957bc507c91d04e3afd77f8125a>`(:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr);
+	
+		bool
+		:target:`getOption<doxid-classaxl_1_1io_1_1_socket_1aaa9e6130bb32fe69e9ac6c6a50c56594>`(
+			int level,
+			int option,
+			void* p,
+			size_t size
+			);
+	
+		bool
+		:target:`setOption<doxid-classaxl_1_1io_1_1_socket_1a8b23ce593270b4c9a1ee02961dcf5fa5>`(
+			int level,
+			int option,
+			const void* p,
+			size_t size
+			);
+	
+		bool
+		:target:`listen<doxid-classaxl_1_1io_1_1_socket_1af202c6283c938cfc009581f9bbe78abf>`(size_t backLog);
+	
+		bool
+		:target:`accept<doxid-classaxl_1_1io_1_1_socket_1a23dbfa4e356ae2f79cd8afa3c5394fea>`(
+			Socket* socket,
+			:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr = NULL
+			);
+	
+		bool
+		:target:`connect<doxid-classaxl_1_1io_1_1_socket_1a4372011cd84ac5a1504fd2ff71980f9f>`(const sockaddr* addr);
+	
+		bool
+		:target:`connect<doxid-classaxl_1_1io_1_1_socket_1a9b41e130fa69253115256010c2f23648>`(const :ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`& addr);
+	
+		bool
+		:target:`shutdown<doxid-classaxl_1_1io_1_1_socket_1ac43718344a303f1216253f7b27ce7c12>`(:ref:`SocketShutdownKind<doxid-namespaceaxl_1_1io_1a8ab41aad2d8946c39cdc9cf786f0f079>` shutdownKind = SocketShutdownKind_All);
+	
+		size_t
+		:target:`send<doxid-classaxl_1_1io_1_1_socket_1a08b6ad3dca596c3bc7898b4fdfcfd756>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`recv<doxid-classaxl_1_1io_1_1_socket_1af32f597bad6e34906ca4858d78a51e9c>`(
+			void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`sendTo<doxid-classaxl_1_1io_1_1_socket_1a7cd716ae758226a6158eb206bcb1e4b2>`(
+			void* p,
+			size_t size,
+			const sockaddr* addr
+			);
+	
+		size_t
+		:target:`sendTo<doxid-classaxl_1_1io_1_1_socket_1ad50c7337ab7d2458cdb3d8627bc293fa>`(
+			void* p,
+			size_t size,
+			const :ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`& addr
+			);
+	
+		size_t
+		:target:`recvFrom<doxid-classaxl_1_1io_1_1_socket_1a46c922a2055c576bb1d62f85d5ed19eb>`(
+			void* p,
+			size_t size,
+			:ref:`SockAddr<doxid-structaxl_1_1io_1_1_sock_addr>`* addr
+			);
+	};

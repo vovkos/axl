@@ -1,0 +1,35 @@
+.. index:: pair: class; axl::sl::BinClosure_1
+.. _doxid-classaxl_1_1sl_1_1_bin_closure__1:
+
+template class axl::sl::BinClosure_1
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Closure.h>
+	
+	template <
+		typename Func,
+		typename Result,
+		typename Arg,
+		typename ArgSave = Arg
+		>
+	class BinClosure_1
+	{
+	public:
+		// construction
+	
+		:target:`BinClosure_1<doxid-classaxl_1_1sl_1_1_bin_closure__1_1a17ba3a2cf073446e54d7286091da7cdd>`(Arg a);
+
+		// methods
+	
+		Result
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_bin_closure__1_1a154c38074e127477385ffcad6739a3dd>`(Arg b) const;
+	};

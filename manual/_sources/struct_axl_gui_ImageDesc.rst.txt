@@ -1,0 +1,39 @@
+.. index:: pair: struct; axl::gui::ImageDesc
+.. _doxid-structaxl_1_1gui_1_1_image_desc:
+
+struct axl::gui::ImageDesc
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_ImageDesc.h>
+	
+	struct ImageDesc
+	{
+		// fields
+	
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>` :target:`m_size<doxid-structaxl_1_1gui_1_1_image_desc_1a88e72bfab7b3536fe2fe2c02b9ceca41>`;
+		:ref:`PixelFormat<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4f>` :target:`m_pixelFormat<doxid-structaxl_1_1gui_1_1_image_desc_1a53d4e25398882cb190f0217d3713887a>`;
+
+		// construction
+	
+		:target:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc_1a4fe270fcafd136cf576b92359d5a9c42>`();
+	
+		:target:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc_1a062be4dd18bb2a39b981cd33e048c15f>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` width,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` height,
+			:ref:`PixelFormat<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4f>` pixelFormat = :ref:`PixelFormat_Rgba<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4fa535a9776bd0e9c48653fe34c0d2d1198>`
+			);
+	
+		:target:`ImageDesc<doxid-structaxl_1_1gui_1_1_image_desc_1ab13a334fc47cf204ad0354fa27f64ae2>`(
+			const :ref:`Size<doxid-structaxl_1_1gui_1_1_size>`& size,
+			:ref:`PixelFormat<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4f>` pixelFormat = :ref:`PixelFormat_Rgba<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4fa535a9776bd0e9c48653fe34c0d2d1198>`
+			);
+	};

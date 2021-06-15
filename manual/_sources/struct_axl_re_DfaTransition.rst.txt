@@ -1,0 +1,40 @@
+.. index:: pair: struct; axl::re::DfaTransition
+.. _doxid-structaxl_1_1re_1_1_dfa_transition:
+
+struct axl::re::DfaTransition
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_re_Dfa.h>
+	
+	struct DfaTransition: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+		// fields
+	
+		:ref:`MatchCondition<doxid-structaxl_1_1re_1_1_match_condition>` :target:`m_matchCondition<doxid-structaxl_1_1re_1_1_dfa_transition_1a8d2e10883206c5d9140166c080db3914>`;
+		:ref:`DfaState<doxid-structaxl_1_1re_1_1_dfa_state>`* :target:`m_outState<doxid-structaxl_1_1re_1_1_dfa_transition_1acace9225d9971e39a0bc4883bd2167e4>`;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

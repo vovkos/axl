@@ -1,0 +1,41 @@
+.. index:: pair: namespace; axl::io::psx
+.. _doxid-namespaceaxl_1_1io_1_1psx:
+
+namespace axl::io::psx
+======================
+
+.. toctree::
+	:hidden:
+
+	class_axl_io_psx_AutoUnlinkSharedMemory.rst
+	class_axl_io_psx_CloseFile.rst
+	class_axl_io_psx_File.rst
+	class_axl_io_psx_Mapping.rst
+	class_axl_io_psx_Pipe.rst
+	class_axl_io_psx_Pty.rst
+	class_axl_io_psx_Serial.rst
+	class_axl_io_psx_SharedMemory.rst
+	class_axl_io_psx_Socket.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace psx {
+
+	// classes
+
+	class :ref:`AutoUnlinkSharedMemory<doxid-classaxl_1_1io_1_1psx_1_1_auto_unlink_shared_memory>`;
+	class :ref:`CloseFile<doxid-classaxl_1_1io_1_1psx_1_1_close_file>`;
+	class :ref:`File<doxid-classaxl_1_1io_1_1psx_1_1_file>`;
+	class :ref:`Mapping<doxid-classaxl_1_1io_1_1psx_1_1_mapping>`;
+	class :ref:`Pipe<doxid-classaxl_1_1io_1_1psx_1_1_pipe>`;
+	class :ref:`Pty<doxid-classaxl_1_1io_1_1psx_1_1_pty>`;
+	class :ref:`Serial<doxid-classaxl_1_1io_1_1psx_1_1_serial>`;
+	class :ref:`SharedMemory<doxid-classaxl_1_1io_1_1psx_1_1_shared_memory>`;
+	class :ref:`Socket<doxid-classaxl_1_1io_1_1psx_1_1_socket>`;
+
+	} // namespace psx

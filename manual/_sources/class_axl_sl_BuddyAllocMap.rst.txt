@@ -1,0 +1,79 @@
+.. index:: pair: class; axl::sl::BuddyAllocMap
+.. _doxid-classaxl_1_1sl_1_1_buddy_alloc_map:
+
+class axl::sl::BuddyAllocMap
+============================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_sl_BuddyAllocMap_Page.rst
+	class_axl_sl_BuddyAllocMap_Level.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BuddyAllocMap.h>
+	
+	class BuddyAllocMap
+	{
+	public:
+		// structs
+	
+		struct :ref:`Page<doxid-structaxl_1_1sl_1_1_buddy_alloc_map_1_1_page>`;
+
+		// classes
+	
+		class :ref:`Level<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1_1_level>`;
+
+		// construction
+	
+		:target:`BuddyAllocMap<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1adbb71a5ccfe1da8fa1705476323baf2c>`();
+
+		// methods
+	
+		bool
+		:target:`create<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a993c238f5eca7424f44d7b9f094579f9>`(
+			size_t width,
+			size_t height
+			);
+	
+		void
+		:target:`close<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a783324e86b82b1aa4fb048f58363b04b>`();
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a34816359cdd343355c218c5187a47025>`();
+	
+		size_t
+		:target:`getFreeSizeTop<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a3a26468699c6325ca68a486bf122d216>`();
+	
+		size_t
+		:target:`getFreeSizeBottom<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a96fd13d20e3063df96050a4f8bbed043>`();
+	
+		size_t
+		:target:`getTotalSize<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a9f5f79d01793fd33ad4cdaf7d0d28dac>`();
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a34d74fd0ffa90df5f0d98f62be5cf455>`();
+	
+		size_t
+		:target:`allocate<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1afe7f0a992120ea750ffcb9ac33c0e7a5>`(size_t size);
+	
+		void
+		:target:`mark<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1aec65161b8dbde14cf734696e397855d6>`(
+			size_t address,
+			size_t size
+			);
+	
+		void
+		:target:`free<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a3ea888fab09020fcd408884ad41f1993>`(
+			size_t address,
+			size_t size
+			);
+	
+		bool
+		:target:`getBit<doxid-classaxl_1_1sl_1_1_buddy_alloc_map_1a9684648f05c640aafff5d5891b57060e>`(size_t address);
+	};

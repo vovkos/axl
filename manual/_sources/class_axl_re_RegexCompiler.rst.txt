@@ -1,0 +1,63 @@
+.. index:: pair: class; axl::re::RegexCompiler
+.. _doxid-classaxl_1_1re_1_1_regex_compiler:
+
+class axl::re::RegexCompiler
+============================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_re_RegexCompiler_Const.rst
+	enum_axl_re_RegexCompiler_Flag.rst
+	struct_axl_re_RegexCompiler_Token.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_re_Regex.h>
+	
+	class RegexCompiler
+	{
+	public:
+		// enums
+	
+		enum :ref:`Const<doxid-classaxl_1_1re_1_1_regex_compiler_1ac65999e91442678cdf5f6af51725e09a>`;
+		enum :ref:`Flag<doxid-classaxl_1_1re_1_1_regex_compiler_1ac6f1c778e6309b3b78ba5666f7d56b95>`;
+
+		// structs
+	
+		struct :ref:`Token<doxid-structaxl_1_1re_1_1_regex_compiler_1_1_token>`;
+
+		// construction
+	
+		:target:`RegexCompiler<doxid-classaxl_1_1re_1_1_regex_compiler_1abecf729f0df3417029b610c12d0a5429>`(
+			:ref:`Regex<doxid-classaxl_1_1re_1_1_regex>`* regex,
+			:ref:`RegexNameMgr<doxid-classaxl_1_1re_1_1_regex_name_mgr>`* nameMgr = NULL
+			);
+	
+		:target:`RegexCompiler<doxid-classaxl_1_1re_1_1_regex_compiler_1a2218fd24bd6e536bf8dd8fd9d425f8fc>`(
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags,
+			:ref:`Regex<doxid-classaxl_1_1re_1_1_regex>`* regex,
+			:ref:`RegexNameMgr<doxid-classaxl_1_1re_1_1_regex_name_mgr>`* nameMgr = NULL
+			);
+
+		// methods
+	
+		bool
+		:target:`compile<doxid-classaxl_1_1re_1_1_regex_compiler_1a7a0521d56dbbc94a83a7939b2c17580d>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source,
+			void* acceptContext = NULL
+			);
+	
+		bool
+		:target:`incrementalCompile<doxid-classaxl_1_1re_1_1_regex_compiler_1af4acc6e7d48753b37a181ef4526572bc>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& source,
+			void* acceptContext = NULL
+			);
+	
+		void
+		:target:`finalize<doxid-classaxl_1_1re_1_1_regex_compiler_1ac95e4a7d8250d2fb3cd6dc0c0ce6ae93>`();
+	};

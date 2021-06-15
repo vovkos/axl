@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>struct axl::lex::LineColOffset &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="struct axl::lex::SrcPos" href="struct_axl_lex_SrcPos.html" />
+    <link rel="prev" title="struct axl::lex::LineCol" href="struct_axl_lex_LineCol.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_lex_ParseErrorCode.html">enum axl::lex::ParseErrorCode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_lex_TokenChannelMask.html">enum axl::lex::TokenChannelMask</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_LineCol.html">struct axl::lex::LineCol</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">struct axl::lex::LineColOffset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_SrcPos.html">struct axl::lex::SrcPos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_StdTokenData.html">struct axl::lex::StdTokenData</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_Token.html">template struct axl::lex::Token</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_Lexer.html">template class axl::lex::Lexer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_ParseErrorProvider.html">class axl::lex::ParseErrorProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_Ragel.html">class axl::lex::Ragel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_RagelLexer.html">template class axl::lex::RagelLexer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_RagelToken.html">template class axl::lex::RagelToken</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_RagelTokenPos.html">class axl::lex::RagelTokenPos</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_lex.html">namespace axl::lex</a> &raquo;</li>
+        
+      <li>struct axl::lex::LineColOffset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="struct-axl-lex-linecoloffset">
+<span id="doxid-structaxl-1-1lex-1-1-line-col-offset"></span><span id="index-0"></span><h1>struct axl::lex::LineColOffset</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_lex_SrcPos.h&gt;</span><span class="cp"></span>
+
+<span class="k">struct</span> <span class="nl">LineColOffset</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="struct_axl_lex_LineCol.html#doxid-structaxl-1-1lex-1-1-line-col"><span class="std std-ref">axl::lex::LineCol</span></a><span></span>
+<span class="p">{</span>
+    <span class="c1">// fields</span>
+
+    <span class="kt">size_t</span> <span class="doxyrest-code-target target" id="doxid-structaxl-1-1lex-1-1-line-col-offset-1a2bf3f16b306e4a0dfd0319681833bc30"><span></span><span class="n">m_offset</span></span><span></span><span class="p">;</span>
+
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1lex-1-1-line-col-offset-1aa4a3991d4f88f2584c7a1262282c9bee"><span></span><span class="n">LineColOffset</span></span><span></span><span class="p">();</span>
+
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1lex-1-1-line-col-offset-1a7a3c394d7e580775acbe737fbd4fb3cd"><span></span><span class="n">LineColOffset</span></span><span></span><span class="p">(</span>
+        <span class="kt">int</span> <span class="n">line</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">col</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">offset</span>
+        <span class="p">);</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1lex-1-1-line-col-offset-1a0c2c6092f1d0b899127c27b9e3ebdd7e"><span></span><span class="n">clear</span></span><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1lex-1-1-line-col-offset-1a8b4630289143e0c67080eb45aa696303"><span></span><span class="n">count</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-structaxl-1-1lex-1-1-line-col-offset-1a8f9b273dc33dd54338058ef4cce7f06e"><span></span><span class="n">incrementalCount</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// fields</span>
+
+    <span class="kt">int</span> <a class="reference internal" href="struct_axl_lex_LineCol.html#doxid-structaxl-1-1lex-1-1-line-col-1a11b6f489d7e364951984fd39741d5ea4"><span class="std std-ref">m_line</span></a><span></span><span class="p">;</span>
+    <span class="kt">int</span> <a class="reference internal" href="struct_axl_lex_LineCol.html#doxid-structaxl-1-1lex-1-1-line-col-1a32f30414b9c0a165090f90513dea112f"><span class="std std-ref">m_col</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="struct_axl_lex_LineCol.html#doxid-structaxl-1-1lex-1-1-line-col-1a92a535f86d798578986585b69b8dc00c"><span class="std std-ref">clear</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="struct_axl_lex_LineCol.html#doxid-structaxl-1-1lex-1-1-line-col-1a468a9954bea6f3f3bd4417924711a88e"><span class="std std-ref">count</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="struct_axl_lex_LineCol.html#doxid-structaxl-1-1lex-1-1-line-col-1a6c00976199970b4f1ef8ee1734b16f03"><span class="std std-ref">incrementalCount</span></a><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span><span class="p">);</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="struct_axl_lex_SrcPos.html" class="btn btn-neutral float-right" title="struct axl::lex::SrcPos" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="struct_axl_lex_LineCol.html" class="btn btn-neutral float-left" title="struct axl::lex::LineCol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

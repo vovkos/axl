@@ -1,0 +1,19 @@
+.. index:: pair: enum; Base32EncodingFlag
+.. _doxid-namespaceaxl_1_1enc_1abf6421412d7db32177155c8d35807bc0:
+
+enum axl::enc::Base32EncodingFlag
+=================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Base32Encoding.h>
+
+	enum Base32EncodingFlag
+	{
+	    :target:`Base32EncodingFlag_NoPadding<doxid-namespaceaxl_1_1enc_1abf6421412d7db32177155c8d35807bc0a3dfbcd66337d55d5736c0934cb40a4c6>` = 0x01,
+	    :target:`Base32EncodingFlag_Multiline<doxid-namespaceaxl_1_1enc_1abf6421412d7db32177155c8d35807bc0aca78664cf9296d922a7b134d0ac16557>` = 0x02,
+	};
+

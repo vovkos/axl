@@ -1,0 +1,19 @@
+.. index:: pair: enum; PixelFormat
+.. _doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4f:
+
+enum axl::gui::PixelFormat
+==========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_ImageDesc.h>
+
+	enum PixelFormat
+	{
+	    :target:`PixelFormat_Rgba<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4fa535a9776bd0e9c48653fe34c0d2d1198>` = 0,
+	    :target:`PixelFormat_Rgb<doxid-namespaceaxl_1_1gui_1ae18192b34ea4efda05c608f47a48ec4faeead00754cc630e29f584a7a0f27bc52>`,
+	};
+

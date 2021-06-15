@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::Cmp
+.. _doxid-classaxl_1_1sl_1_1_cmp:
+
+template class axl::sl::Cmp
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Cmp.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class Cmp
+	{
+	public:
+		// methods
+	
+		int
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_cmp_1a4452162fb847e3cbea6d45f3e29bb97a>`(
+			Arg a,
+			Arg b
+			) const;
+	};

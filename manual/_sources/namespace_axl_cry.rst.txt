@@ -1,0 +1,241 @@
+.. index:: pair: namespace; axl::cry
+.. _doxid-namespaceaxl_1_1cry:
+
+namespace axl::cry
+==================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_cry_VerifyAppStoreReceiptFlag.rst
+	struct_axl_cry_AesKey.rst
+	struct_axl_cry_AppStoreIap.rst
+	struct_axl_cry_AppStoreReceipt.rst
+	class_axl_cry_AppStoreReceiptPayloadParser.rst
+	class_axl_cry_BigNum.rst
+	class_axl_cry_Bio.rst
+	class_axl_cry_BnCtx.rst
+	class_axl_cry_CryptoError.rst
+	class_axl_cry_CryptoErrorProvider.rst
+	class_axl_cry_Dh.rst
+	class_axl_cry_EcKey.rst
+	class_axl_cry_EcPoint.rst
+	class_axl_cry_FreeBigNum.rst
+	class_axl_cry_FreeBio.rst
+	class_axl_cry_FreeBnCtx.rst
+	class_axl_cry_FreeDh.rst
+	class_axl_cry_FreeEcKey.rst
+	class_axl_cry_FreeEcPoint.rst
+	class_axl_cry_FreePkcs7.rst
+	class_axl_cry_FreeRsa.rst
+	class_axl_cry_FreeX509.rst
+	class_axl_cry_FreeX509Store.rst
+	class_axl_cry_Pkcs7.rst
+	class_axl_cry_Rsa.rst
+	class_axl_cry_X509Cert.rst
+	class_axl_cry_X509Error.rst
+	class_axl_cry_X509ErrorProvider.rst
+	class_axl_cry_X509Store.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace cry {
+
+	// typedefs
+
+	typedef int :target:`socket_t<doxid-namespaceaxl_1_1cry_1ab4008a48c1f5a61ff5692b764e440621>`;
+
+	// enums
+
+	enum :ref:`VerifyAppStoreReceiptFlag<doxid-namespaceaxl_1_1cry_1ab8c512593ee55551501a11e2e5c3956f>`;
+
+	// structs
+
+	struct :ref:`AesKey<doxid-structaxl_1_1cry_1_1_aes_key>`;
+	struct :ref:`AppStoreIap<doxid-structaxl_1_1cry_1_1_app_store_iap>`;
+	struct :ref:`AppStoreReceipt<doxid-structaxl_1_1cry_1_1_app_store_receipt>`;
+
+	// classes
+
+	class :ref:`AppStoreReceiptPayloadParser<doxid-classaxl_1_1cry_1_1_app_store_receipt_payload_parser>`;
+	class :ref:`BigNum<doxid-classaxl_1_1cry_1_1_big_num>`;
+	class :ref:`Bio<doxid-classaxl_1_1cry_1_1_bio>`;
+	class :ref:`BnCtx<doxid-classaxl_1_1cry_1_1_bn_ctx>`;
+	class :ref:`CryptoError<doxid-classaxl_1_1cry_1_1_crypto_error>`;
+	class :ref:`CryptoErrorProvider<doxid-classaxl_1_1cry_1_1_crypto_error_provider>`;
+	class :ref:`Dh<doxid-classaxl_1_1cry_1_1_dh>`;
+	class :ref:`EcKey<doxid-classaxl_1_1cry_1_1_ec_key>`;
+	class :ref:`EcPoint<doxid-classaxl_1_1cry_1_1_ec_point>`;
+	class :ref:`FreeBigNum<doxid-classaxl_1_1cry_1_1_free_big_num>`;
+	class :ref:`FreeBio<doxid-classaxl_1_1cry_1_1_free_bio>`;
+	class :ref:`FreeBnCtx<doxid-classaxl_1_1cry_1_1_free_bn_ctx>`;
+	class :ref:`FreeDh<doxid-classaxl_1_1cry_1_1_free_dh>`;
+	class :ref:`FreeEcKey<doxid-classaxl_1_1cry_1_1_free_ec_key>`;
+	class :ref:`FreeEcPoint<doxid-classaxl_1_1cry_1_1_free_ec_point>`;
+	class :ref:`FreePkcs7<doxid-classaxl_1_1cry_1_1_free_pkcs7>`;
+	class :ref:`FreeRsa<doxid-classaxl_1_1cry_1_1_free_rsa>`;
+	class :ref:`FreeX509<doxid-classaxl_1_1cry_1_1_free_x509>`;
+	class :ref:`FreeX509Store<doxid-classaxl_1_1cry_1_1_free_x509_store>`;
+	class :ref:`Pkcs7<doxid-classaxl_1_1cry_1_1_pkcs7>`;
+	class :ref:`Rsa<doxid-classaxl_1_1cry_1_1_rsa>`;
+	class :ref:`X509Cert<doxid-classaxl_1_1cry_1_1_x509_cert>`;
+	class :ref:`X509Error<doxid-classaxl_1_1cry_1_1_x509_error>`;
+	class :ref:`X509ErrorProvider<doxid-classaxl_1_1cry_1_1_x509_error_provider>`;
+	class :ref:`X509Store<doxid-classaxl_1_1cry_1_1_x509_store>`;
+
+	// global functions
+
+	bool
+	:target:`verifyAppStoreReceipt<doxid-namespaceaxl_1_1cry_1a8cc7eff6810737e08a4e51f31651f256>`(
+		:ref:`AppStoreReceipt<doxid-structaxl_1_1cry_1_1_app_store_receipt>`* receipt,
+		const void* p,
+		size_t size,
+		const void* computerGuid,
+		size_t computerGuidSize,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+		);
+
+	bool
+	:target:`verifyAppStoreReceipt<doxid-namespaceaxl_1_1cry_1a6e673482676cf4916f0e67c4b0e87aa9>`(
+		:ref:`AppStoreReceipt<doxid-structaxl_1_1cry_1_1_app_store_receipt>`* receipt,
+		const void* p,
+		size_t size,
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getAsn1TimeString<doxid-namespaceaxl_1_1cry_1ac74fe08e3d000c85f2eb8dda0d6df924>`(const ASN1_TIME* time);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getAsn1StringString<doxid-namespaceaxl_1_1cry_1a08b01fd4bef11686981bb4aec90d701f>`(const ASN1_STRING* string);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getAsn1ObjectString<doxid-namespaceaxl_1_1cry_1afa109a34ad3dc38953cf0c6362129896>`(const ASN1_OBJECT* object);
+
+	:target:`AXL_SL_DEFINE_GUID<doxid-namespaceaxl_1_1cry_1ae2ecf0f1b60b6c0d5cee12953395fd16>`(
+		g_cryptoErrorGuid,
+		0x0216b513,
+		0xa6bf,
+		0x4d0e,
+		0x91,
+		0x85,
+		0xdd,
+		0x12,
+		0x60,
+		0xc7,
+		0x53,
+		0x56
+		);
+
+	:target:`AXL_SL_DEFINE_GUID<doxid-namespaceaxl_1_1cry_1adfb6565cebf4be08d70edbdfa6a11302>`(
+		g_x509ErrorGuid,
+		0xa5c41eb8,
+		0x75ff,
+		0x487d,
+		0xb0,
+		0x4e,
+		0xbd,
+		0x23,
+		0x36,
+		0x38,
+		0x8b,
+		0x38
+		);
+
+	void
+	:target:`registerCryptoErrorProviders<doxid-namespaceaxl_1_1cry_1a3ca24886174439bee78761337a9d457f>`();
+
+	size_t
+	:target:`setCryptoError<doxid-namespaceaxl_1_1cry_1a7a6ed1de072a328dc935d7d9abee4268>`(:ref:`ulong_t<doxid-axl__g_2axl__g___pch_8h_1a95c0f4cc152cbacf72a7d70d7077dc96>` code);
+
+	void
+	:target:`clearCryptoError<doxid-namespaceaxl_1_1cry_1a7e71e6b0944f0b226ff9128673dc9c51>`();
+
+	size_t
+	:target:`setLastCryptoError<doxid-namespaceaxl_1_1cry_1a7e0537c4bfff12966825d0db88621ef7>`();
+
+	template <typename T>
+	T
+	:target:`failWithLastCryptoError<doxid-namespaceaxl_1_1cry_1a64843932a11929e30564fdf8d1138a1f>`(T failResult);
+
+	bool
+	:target:`failWithLastCryptoError<doxid-namespaceaxl_1_1cry_1a66d1df1b1f3235289cb18b5219c0fb20>`();
+
+	template <typename T>
+	T
+	:target:`completeWithLastCryptoError<doxid-namespaceaxl_1_1cry_1aa4b6507417423938a301e3f2ea64520b>`(
+		T result,
+		T failResult
+		);
+
+	bool
+	:target:`completeWithLastCryptoError<doxid-namespaceaxl_1_1cry_1a68d2ea75df48e086ca9acc4ddc98c351>`(int result);
+
+	bool
+	:target:`encodePem<doxid-namespaceaxl_1_1cry_1aa5a54d3bcc63ae45762ce5f4ab121f88>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* buffer,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& header,
+		const void* p,
+		size_t size
+		);
+
+	bool
+	:target:`encodePem<doxid-namespaceaxl_1_1cry_1a866730430d6411ea5ec7edaad0d11f72>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* buffer,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+		const void* p,
+		size_t size
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`encodePem<doxid-namespaceaxl_1_1cry_1a81e06ca7c48d445ca8bec452abf9da8e>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& header,
+		const void* p,
+		size_t size
+		);
+
+	:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`encodePem<doxid-namespaceaxl_1_1cry_1ae2ea20175801078d0b0855676efad390>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name,
+		const void* p,
+		size_t size
+		);
+
+	bool
+	:target:`decodePem<doxid-namespaceaxl_1_1cry_1afd41a23961a2ca58d00316ae52272264>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* name,
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* header,
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& pem
+		);
+
+	bool
+	:target:`decodePem<doxid-namespaceaxl_1_1cry_1a08ff56c7cfc287aa9bfa8ec88759d615>`(
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* name,
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& pem
+		);
+
+	bool
+	:target:`decodePem<doxid-namespaceaxl_1_1cry_1a63027ab34a0467bec8bbba4e4daf0b95>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& expectedName,
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* header,
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& pem
+		);
+
+	bool
+	:target:`decodePem<doxid-namespaceaxl_1_1cry_1abf60941a68b786a3aa59a6d503f5962f>`(
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& expectedName,
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer,
+		const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& pem
+		);
+
+	} // namespace cry

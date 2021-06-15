@@ -1,0 +1,42 @@
+.. index:: pair: class; axl::sl::ReverseArray
+.. _doxid-classaxl_1_1sl_1_1_reverse_array:
+
+template class axl::sl::ReverseArray
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_ArrayDetails.h>
+	
+	template <typename T>
+	class ReverseArray
+	{
+	public:
+		// typedefs
+	
+		typedef :ref:`ArgType<doxid-classaxl_1_1sl_1_1_arg_type>`<T>::Type :target:`ValueArg<doxid-classaxl_1_1sl_1_1_reverse_array_1a3f2a2e3e291b32f903a240b451886f25>`;
+
+		// methods
+	
+		static
+		void
+		:target:`reverse<doxid-classaxl_1_1sl_1_1_reverse_array_1a896bf438ee00d674f17c8c762a4a527c>`(
+			T* dst,
+			size_t count
+			);
+	
+		static
+		void
+		:target:`copyReverse<doxid-classaxl_1_1sl_1_1_reverse_array_1af13a9685e4c8c51c1ea6c380f53ad152>`(
+			T* dst,
+			const T* src,
+			size_t count
+			);
+	};

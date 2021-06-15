@@ -1,0 +1,45 @@
+.. index:: pair: struct; axl::err::ErrorHdr
+.. _doxid-structaxl_1_1err_1_1_error_hdr:
+
+struct axl::err::ErrorHdr
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_err_Error.h>
+	
+	struct ErrorHdr
+	{
+		// fields
+	
+		uint32_t :target:`m_size<doxid-structaxl_1_1err_1_1_error_hdr_1adeb8544da5401bde056641082d3b2732>`;
+		:ref:`sl::Guid<doxid-structaxl_1_1sl_1_1_guid>` :target:`m_guid<doxid-structaxl_1_1err_1_1_error_hdr_1ac2e3354d7f465edf06ec19c97b0f5d62>`;
+		uint32_t :target:`m_code<doxid-structaxl_1_1err_1_1_error_hdr_1abe51911fff44b15d2503552719d92e6e>`;
+
+		// methods
+	
+		bool
+		:target:`isKindOf<doxid-structaxl_1_1err_1_1_error_hdr_1a75052e36cbb0e63efd723739ede48be8>`(
+			const :ref:`sl::Guid<doxid-structaxl_1_1sl_1_1_guid>`& guid,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` code
+			) const;
+	
+		bool
+		:target:`isStack<doxid-structaxl_1_1err_1_1_error_hdr_1ad9320b31579f9521249e75df39c4114e>`() const;
+	
+		bool
+		:target:`isStackTopKindOf<doxid-structaxl_1_1err_1_1_error_hdr_1a24823377241bd1fdee426347c17f3e2f>`(
+			const :ref:`sl::Guid<doxid-structaxl_1_1sl_1_1_guid>`& guid,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` code
+			) const;
+	
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getDescription<doxid-structaxl_1_1err_1_1_error_hdr_1abfe52904c4f1899ef4eecab52b2d7620>`() const;
+	};

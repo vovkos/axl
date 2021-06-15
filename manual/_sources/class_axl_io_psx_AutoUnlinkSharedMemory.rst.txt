@@ -1,0 +1,30 @@
+.. index:: pair: class; axl::io::psx::AutoUnlinkSharedMemory
+.. _doxid-classaxl_1_1io_1_1psx_1_1_auto_unlink_shared_memory:
+
+class axl::io::psx::AutoUnlinkSharedMemory
+==========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_psx_Mapping.h>
+	
+	class AutoUnlinkSharedMemory
+	{
+	public:
+		// fields
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :target:`m_name<doxid-classaxl_1_1io_1_1psx_1_1_auto_unlink_shared_memory_1a19f882bb0023d92cbfbfe643af97ecff>`;
+
+		// construction
+	
+		:target:`AutoUnlinkSharedMemory<doxid-classaxl_1_1io_1_1psx_1_1_auto_unlink_shared_memory_1ad11b71cb2182a116fc7fc685a47c754c>`();
+		:target:`AutoUnlinkSharedMemory<doxid-classaxl_1_1io_1_1psx_1_1_auto_unlink_shared_memory_1ae5477ba946bb75ffca9f07e30382add6>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name);
+		:target:`~AutoUnlinkSharedMemory<doxid-classaxl_1_1io_1_1psx_1_1_auto_unlink_shared_memory_1aba1c9d59828e692ce1a0fa2b461fc6e0>`();
+	};

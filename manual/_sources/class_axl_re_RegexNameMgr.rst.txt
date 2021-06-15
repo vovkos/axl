@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::re::RegexNameMgr
+.. _doxid-classaxl_1_1re_1_1_regex_name_mgr:
+
+class axl::re::RegexNameMgr
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_re_RegexNameMgr.h>
+	
+	class RegexNameMgr
+	{
+	public:
+		// methods
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`findName<doxid-classaxl_1_1re_1_1_regex_name_mgr_1af0f069d64709180175c9ab298a499fa5>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name) = 0;
+	};

@@ -1,0 +1,33 @@
+.. index:: pair: class; axl::cry::AppStoreReceiptPayloadParser
+.. _doxid-classaxl_1_1cry_1_1_app_store_receipt_payload_parser:
+
+class axl::cry::AppStoreReceiptPayloadParser
+============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_AppStoreReceipt.h>
+	
+	class AppStoreReceiptPayloadParser
+	{
+	public:
+		// construction
+	
+		:target:`AppStoreReceiptPayloadParser<doxid-classaxl_1_1cry_1_1_app_store_receipt_payload_parser_1a91430de66c670ade08786fe15e181aba>`();
+
+		// methods
+	
+		bool
+		:target:`parse<doxid-classaxl_1_1cry_1_1_app_store_receipt_payload_parser_1a3ed11ece169de53a28804963190629fe>`(
+			:ref:`AppStoreReceipt<doxid-structaxl_1_1cry_1_1_app_store_receipt>`* receipt,
+			const void* p,
+			size_t size
+			);
+	};

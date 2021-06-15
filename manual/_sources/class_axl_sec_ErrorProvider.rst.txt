@@ -1,0 +1,44 @@
+.. index:: pair: class; axl::sec::ErrorProvider
+.. _doxid-classaxl_1_1sec_1_1_error_provider:
+
+class axl::sec::ErrorProvider
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sec_Error.h>
+	
+	class ErrorProvider: public :ref:`axl::err::ErrorProvider<doxid-classaxl_1_1err_1_1_error_provider>`
+	{
+	public:
+		// methods
+	
+		static
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getErrorDescription<doxid-classaxl_1_1sec_1_1_error_provider_1a545836c771972beede805fac70c16dfc>`(OSStatus code);
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getErrorDescription<doxid-classaxl_1_1sec_1_1_error_provider_1a009b7211635bc890c7b8853531f5cf31>`(const :ref:`err::ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:ref:`getErrorDescription<doxid-classaxl_1_1err_1_1_error_provider_1ab5b93bdd78d1dac4be43abbed2bd7adf>`(const :ref:`ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error) = 0;
+

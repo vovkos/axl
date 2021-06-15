@@ -1,0 +1,757 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>namespace axl::io &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="namespace axl::io::psx" href="namespace_axl_io_psx.html" />
+    <link rel="prev" title="class axl::ini::Section" href="class_axl_ini_Section.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">namespace axl::io</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_io_psx.html">namespace axl::io::psx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_io_win.html">namespace axl::io::win</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_FileFlag.html">enum axl::io::FileFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_NetworkAdapterFlag.html">enum axl::io::NetworkAdapterFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_NetworkAdapterType.html">enum axl::io::NetworkAdapterType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_PcapLoopResult.html">enum axl::io::PcapLoopResult</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialFlowControl.html">enum axl::io::SerialFlowControl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialParity.html">enum axl::io::SerialParity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialSettingId.html">enum axl::io::SerialSettingId</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialStatusLine.html">enum axl::io::SerialStatusLine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SerialStopBits.html">enum axl::io::SerialStopBits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SharedMemoryTransportConst.html">enum axl::io::SharedMemoryTransportConst</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SharedMemoryTransportFlag.html">enum axl::io::SharedMemoryTransportFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SharedMemoryTransportState.html">enum axl::io::SharedMemoryTransportState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_io_SocketShutdownKind.html">enum axl::io::SocketShutdownKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_NetworkAdapterAddress.html">struct axl::io::NetworkAdapterAddress</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SerialSettings.html">struct axl::io::SerialSettings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SharedMemoryTransportHdr.html">struct axl::io::SharedMemoryTransportHdr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SharedMemoryTransportMessageHdr.html">struct axl::io::SharedMemoryTransportMessageHdr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_io_SockAddr.html">struct axl::io::SockAddr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_AutoDeleteFile.html">class axl::io::AutoDeleteFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_ClosePcap.html">class axl::io::ClosePcap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_CloseUsbContext.html">class axl::io::CloseUsbContext</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_File.html">class axl::io::File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FileEnumerator.html">class axl::io::FileEnumerator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FileTransport.html">class axl::io::FileTransport</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeSsl.html">class axl::io::FreeSsl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeSslCtx.html">class axl::io::FreeSslCtx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeUsbConfigDescriptor.html">class axl::io::FreeUsbConfigDescriptor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeUsbDeviceList.html">class axl::io::FreeUsbDeviceList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_FreeUsbTransfer.html">class axl::io::FreeUsbTransfer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_MappedFile.html">class axl::io::MappedFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_MappedViewMgr.html">class axl::io::MappedViewMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Mapping.html">class axl::io::Mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_NetworkAdapterDesc.html">class axl::io::NetworkAdapterDesc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Pcap.html">class axl::io::Pcap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_PcapFilter.html">class axl::io::PcapFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Serial.html">class axl::io::Serial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SerialPortDesc.html">class axl::io::SerialPortDesc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SharedMemoryReader.html">class axl::io::SharedMemoryReader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SharedMemoryTransportBase.html">class axl::io::SharedMemoryTransportBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SharedMemoryWriter.html">class axl::io::SharedMemoryWriter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SimpleMappedFile.html">class axl::io::SimpleMappedFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Socket.html">class axl::io::Socket</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Socketransport.html">class axl::io::Socketransport</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Ssl.html">class axl::io::Ssl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_SslCtx.html">class axl::io::SslCtx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_Transport.html">class axl::io::Transport</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbContext.html">class axl::io::UsbContext</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbDevice.html">class axl::io::UsbDevice</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbDeviceList.html">class axl::io::UsbDeviceList</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbError.html">class axl::io::UsbError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbErrorProvider.html">class axl::io::UsbErrorProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbEventThread.html">class axl::io::UsbEventThread</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_io_UsbTransfer.html">class axl::io::UsbTransfer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+      <li>namespace axl::io</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="namespace-axl-io">
+<span id="doxid-namespaceaxl-1-1io"></span><span id="index-0"></span><h1>namespace axl::io</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="k">namespace</span> <span class="n">io</span> <span class="p">{</span>
+
+<span class="c1">// namespaces</span>
+
+<span class="k">namespace</span> <a class="reference internal" href="namespace_axl_io_psx.html#doxid-namespaceaxl-1-1io-1-1psx"><span class="std std-ref">axl::io::psx</span></a><span></span><span class="p">;</span>
+<span class="k">namespace</span> <a class="reference internal" href="namespace_axl_io_win.html#doxid-namespaceaxl-1-1io-1-1win"><span class="std std-ref">axl::io::win</span></a><span></span><span class="p">;</span>
+
+<span class="c1">// typedefs</span>
+
+<span class="k">typedef</span> <span class="kt">void</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a1da481087567230ce6772888551c3d1f"><span></span><span class="n">SslInfoCallbackFunc</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">SSL</span> <span class="o">*</span><span class="n">ssl</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="n">where</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="n">ret</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="kt">int</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a98cf70a3991100a68def144dacdfc67d"><span></span><span class="n">SslVerifyCallbackFunc</span></span><span></span><span class="p">(</span>
+    <span class="kt">int</span> <span class="n">isPreVerifyOk</span><span class="p">,</span>
+    <span class="n">X509_STORE_CTX</span> <span class="o">*</span><span class="n">ctx</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="n">DH</span><span class="o">*</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a4e50d90db5291555fbe6e756502a5437"><span></span><span class="n">SslTmpDhCallbackFunc</span></span><span></span><span class="p">(</span>
+    <span class="n">SSL</span> <span class="o">*</span><span class="n">ssl</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="n">isExport</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="n">keyLength</span>
+    <span class="p">);</span>
+
+<span class="k">typedef</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">sl::Handle</span></a><span></span><span class="o">&lt;</span><span class="n">libusb_config_descriptor</span><span class="o">*</span><span class="p">,</span> <a class="reference internal" href="class_axl_io_FreeUsbConfigDescriptor.html#doxid-classaxl-1-1io-1-1-free-usb-config-descriptor"><span class="std std-ref">FreeUsbConfigDescriptor</span></a><span></span><span class="o">&gt;</span> <span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a011daccc763cf8e05587b001bc3c4f2b"><span></span><span class="n">UsbConfigDescriptor</span></span><span></span><span class="p">;</span>
+
+<span class="c1">// enums</span>
+
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_FileFlag.html#doxid-namespaceaxl-1-1io-1af41ff39f41045fc4d7f4caa5634cc09a"><span class="std std-ref">FileFlag</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_NetworkAdapterFlag.html#doxid-namespaceaxl-1-1io-1a794af8cdbb3de1cecc47edc0a4fd24f1"><span class="std std-ref">NetworkAdapterFlag</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_NetworkAdapterType.html#doxid-namespaceaxl-1-1io-1a1784f4641e9267d50e8505999741fb98"><span class="std std-ref">NetworkAdapterType</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_PcapLoopResult.html#doxid-namespaceaxl-1-1io-1ab6035c16c93080934ed6df7ab9c0913c"><span class="std std-ref">PcapLoopResult</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SerialFlowControl.html#doxid-namespaceaxl-1-1io-1a3be7da781905f6a051454c24ffce70a1"><span class="std std-ref">SerialFlowControl</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SerialParity.html#doxid-namespaceaxl-1-1io-1a717002475211856f988cfdf559f75aa3"><span class="std std-ref">SerialParity</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SerialSettingId.html#doxid-namespaceaxl-1-1io-1afd39f5bb039c3caaf56d2a3730a66be5"><span class="std std-ref">SerialSettingId</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SerialStatusLine.html#doxid-namespaceaxl-1-1io-1a7398276977773f4357806d5c44a7400a"><span class="std std-ref">SerialStatusLine</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SerialStopBits.html#doxid-namespaceaxl-1-1io-1a5685db4a123d003c414a2958b062188b"><span class="std std-ref">SerialStopBits</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SharedMemoryTransportConst.html#doxid-namespaceaxl-1-1io-1ad15247f2e48b01c49930df361a18e298"><span class="std std-ref">SharedMemoryTransportConst</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SharedMemoryTransportFlag.html#doxid-namespaceaxl-1-1io-1a0e27cc2733fb67cca1061d311e55c4d1"><span class="std std-ref">SharedMemoryTransportFlag</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SharedMemoryTransportState.html#doxid-namespaceaxl-1-1io-1a8c8e5fe113ef497db30439bb8ab9b3dc"><span class="std std-ref">SharedMemoryTransportState</span></a><span></span><span class="p">;</span>
+<span class="k">enum</span> <a class="reference internal" href="enum_axl_io_SocketShutdownKind.html#doxid-namespaceaxl-1-1io-1a8ab41aad2d8946c39cdc9cf786f0f079"><span class="std std-ref">SocketShutdownKind</span></a><span></span><span class="p">;</span>
+
+<span class="c1">// structs</span>
+
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_io_NetworkAdapterAddress.html#doxid-structaxl-1-1io-1-1-network-adapter-address"><span class="std std-ref">NetworkAdapterAddress</span></a><span></span><span class="p">;</span>
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_io_SerialSettings.html#doxid-structaxl-1-1io-1-1-serial-settings"><span class="std std-ref">SerialSettings</span></a><span></span><span class="p">;</span>
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_io_SharedMemoryTransportHdr.html#doxid-structaxl-1-1io-1-1-shared-memory-transport-hdr"><span class="std std-ref">SharedMemoryTransportHdr</span></a><span></span><span class="p">;</span>
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_io_SharedMemoryTransportMessageHdr.html#doxid-structaxl-1-1io-1-1-shared-memory-transport-message-hdr"><span class="std std-ref">SharedMemoryTransportMessageHdr</span></a><span></span><span class="p">;</span>
+<span class="k">struct</span> <a class="reference internal" href="struct_axl_io_SockAddr.html#doxid-structaxl-1-1io-1-1-sock-addr"><span class="std std-ref">SockAddr</span></a><span></span><span class="p">;</span>
+
+<span class="c1">// classes</span>
+
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_AutoDeleteFile.html#doxid-classaxl-1-1io-1-1-auto-delete-file"><span class="std std-ref">AutoDeleteFile</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_ClosePcap.html#doxid-classaxl-1-1io-1-1-close-pcap"><span class="std std-ref">ClosePcap</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_CloseUsbContext.html#doxid-classaxl-1-1io-1-1-close-usb-context"><span class="std std-ref">CloseUsbContext</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_File.html#doxid-classaxl-1-1io-1-1-file"><span class="std std-ref">File</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_FileEnumerator.html#doxid-classaxl-1-1io-1-1-file-enumerator"><span class="std std-ref">FileEnumerator</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_FileTransport.html#doxid-classaxl-1-1io-1-1-file-transport"><span class="std std-ref">FileTransport</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_FreeSsl.html#doxid-classaxl-1-1io-1-1-free-ssl"><span class="std std-ref">FreeSsl</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_FreeSslCtx.html#doxid-classaxl-1-1io-1-1-free-ssl-ctx"><span class="std std-ref">FreeSslCtx</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_FreeUsbConfigDescriptor.html#doxid-classaxl-1-1io-1-1-free-usb-config-descriptor"><span class="std std-ref">FreeUsbConfigDescriptor</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_FreeUsbDeviceList.html#doxid-classaxl-1-1io-1-1-free-usb-device-list"><span class="std std-ref">FreeUsbDeviceList</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_FreeUsbTransfer.html#doxid-classaxl-1-1io-1-1-free-usb-transfer"><span class="std std-ref">FreeUsbTransfer</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_MappedFile.html#doxid-classaxl-1-1io-1-1-mapped-file"><span class="std std-ref">MappedFile</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_MappedViewMgr.html#doxid-classaxl-1-1io-1-1-mapped-view-mgr"><span class="std std-ref">MappedViewMgr</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_Mapping.html#doxid-classaxl-1-1io-1-1-mapping"><span class="std std-ref">Mapping</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_NetworkAdapterDesc.html#doxid-classaxl-1-1io-1-1-network-adapter-desc"><span class="std std-ref">NetworkAdapterDesc</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_Pcap.html#doxid-classaxl-1-1io-1-1-pcap"><span class="std std-ref">Pcap</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_PcapFilter.html#doxid-classaxl-1-1io-1-1-pcap-filter"><span class="std std-ref">PcapFilter</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_Serial.html#doxid-classaxl-1-1io-1-1-serial"><span class="std std-ref">Serial</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_SerialPortDesc.html#doxid-classaxl-1-1io-1-1-serial-port-desc"><span class="std std-ref">SerialPortDesc</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_SharedMemoryReader.html#doxid-classaxl-1-1io-1-1-shared-memory-reader"><span class="std std-ref">SharedMemoryReader</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_SharedMemoryTransportBase.html#doxid-classaxl-1-1io-1-1-shared-memory-transport-base"><span class="std std-ref">SharedMemoryTransportBase</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_SharedMemoryWriter.html#doxid-classaxl-1-1io-1-1-shared-memory-writer"><span class="std std-ref">SharedMemoryWriter</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_SimpleMappedFile.html#doxid-classaxl-1-1io-1-1-simple-mapped-file"><span class="std std-ref">SimpleMappedFile</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_Socket.html#doxid-classaxl-1-1io-1-1-socket"><span class="std std-ref">Socket</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_Socketransport.html#doxid-classaxl-1-1io-1-1-socketransport"><span class="std std-ref">Socketransport</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_Ssl.html#doxid-classaxl-1-1io-1-1-ssl"><span class="std std-ref">Ssl</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_SslCtx.html#doxid-classaxl-1-1io-1-1-ssl-ctx"><span class="std std-ref">SslCtx</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_Transport.html#doxid-classaxl-1-1io-1-1-transport"><span class="std std-ref">Transport</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_UsbContext.html#doxid-classaxl-1-1io-1-1-usb-context"><span class="std std-ref">UsbContext</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_UsbDevice.html#doxid-classaxl-1-1io-1-1-usb-device"><span class="std std-ref">UsbDevice</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_UsbDeviceList.html#doxid-classaxl-1-1io-1-1-usb-device-list"><span class="std std-ref">UsbDeviceList</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_UsbError.html#doxid-classaxl-1-1io-1-1-usb-error"><span class="std std-ref">UsbError</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_UsbErrorProvider.html#doxid-classaxl-1-1io-1-1-usb-error-provider"><span class="std std-ref">UsbErrorProvider</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_UsbEventThread.html#doxid-classaxl-1-1io-1-1-usb-event-thread"><span class="std std-ref">UsbEventThread</span></a><span></span><span class="p">;</span>
+<span class="k">class</span> <a class="reference internal" href="class_axl_io_UsbTransfer.html#doxid-classaxl-1-1io-1-1-usb-transfer"><span class="std std-ref">UsbTransfer</span></a><span></span><span class="p">;</span>
+
+<span class="c1">// global functions</span>
+
+<span class="kt">uint64_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1aeefe9edc1af8534406882e5cab77d3ec"><span></span><span class="n">copyFile</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">srcFileName</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">dstFileName</span><span class="p">,</span>
+    <span class="kt">uint64_t</span> <span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="p">);</span>
+
+<span class="kt">uint64_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a22ff15c2b74d7c3c2188fdd84cbc8e60"><span></span><span class="n">copyFile</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="class_axl_io_File.html#doxid-classaxl-1-1io-1-1-file"><span class="std std-ref">io::File</span></a><span></span><span class="o">*</span> <span class="n">srcFile</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">dstFileName</span><span class="p">,</span>
+    <span class="kt">uint64_t</span> <span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="p">);</span>
+
+<span class="kt">uint64_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1aa81bca4cd9a966303e334f8ca64352a6"><span></span><span class="n">copyFile</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="class_axl_io_File.html#doxid-classaxl-1-1io-1-1-file"><span class="std std-ref">io::File</span></a><span></span><span class="o">*</span> <span class="n">srcFile</span><span class="p">,</span>
+    <a class="reference internal" href="class_axl_io_File.html#doxid-classaxl-1-1io-1-1-file"><span class="std std-ref">io::File</span></a><span></span><span class="o">*</span> <span class="n">dstFile</span><span class="p">,</span>
+    <span class="kt">uint64_t</span> <span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a0c8210f82e39c227f26bad679cc73a09"><span></span><span class="n">getTempDir</span></span><span></span><span class="p">();</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a76d670695f91b435dd2ad971efe56e53"><span></span><span class="n">getHomeDir</span></span><span></span><span class="p">();</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1adff2abe418529c48683e2152b69509da"><span></span><span class="n">getCurrentDir</span></span><span></span><span class="p">();</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a0cd35fbd1debf8075b1fe0b89d781dfb"><span></span><span class="n">setCurrentDir</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">dir</span><span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1af4dc2f1052491fb3e463623f49137416"><span></span><span class="n">getExeFilePath</span></span><span></span><span class="p">();</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a336e4b3d9d222757683a718964163dc9"><span></span><span class="n">getExeDir</span></span><span></span><span class="p">();</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a573548de0478809871bde506c523fb52"><span></span><span class="n">doesFileExist</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a1c0c3f76b5d846ab51947988454c55f2"><span></span><span class="n">ensureDirExists</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a6c76ff501ad2156bfed2116df1e05f2d"><span></span><span class="n">isDir</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a49ec1c6a56ab05b2a2d2c4069ed63677"><span></span><span class="n">getFullFilePath</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a95020a75ec2d849490543db2434fa13c"><span></span><span class="n">getDir</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">filePath</span><span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a4d3d82d0dadaa83e1c58d1781b98d3df"><span></span><span class="n">getFileName</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">filePath</span><span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a0cad426e00d8ece021557f5931cd0849"><span></span><span class="n">getExtension</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">filePath</span><span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1aef851b74e4f014648d91fb9de2e60a01"><span></span><span class="n">concatFilePath</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">filePath</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a31d6d0f7915274025a20f162c94025e1"><span></span><span class="n">concatFilePath</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">dir</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a6214cb4877d17f874708a7741a408c3b"><span></span><span class="n">findFilePath</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">firstDir</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="class_axl_sl_BoxList.html#doxid-classaxl-1-1sl-1-1-box-list"><span class="std std-ref">sl::BoxList</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">&gt;*</span> <span class="n">dirList</span><span class="p">,</span>
+    <span class="kt">bool</span> <span class="n">doFindInCurrentDir</span> <span class="o">=</span> <span class="nb">true</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a8d55758f7c5a3ab4b3e10a63e4db960d"><span></span><span class="n">findFilePath</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="class_axl_sl_BoxList.html#doxid-classaxl-1-1sl-1-1-box-list"><span class="std std-ref">sl::BoxList</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">&gt;*</span> <span class="n">dirList</span><span class="p">,</span>
+    <span class="kt">bool</span> <span class="n">doFindInCurrentDir</span> <span class="o">=</span> <span class="nb">true</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a816dae9b2227060bdd9e715fac9dd62a"><span></span><span class="n">isSymbolicLink</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">fileName</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ae8390a5ab1cfcc558fb20f7723e4bf1e"><span></span><span class="n">getSymbolicLinkTarget</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">targetName</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">linkName</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a4909eff1f72d08aa9f08fe6200a696b8"><span></span><span class="n">getSymbolicLinkTarget</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">linkName</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a09d5a805d105beda691e415c0846d2c5"><span></span><span class="n">matchWildcard</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string0</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">wildcard</span>
+    <span class="p">);</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a1f5713873eb436cccd97940592734c7c"><span></span><span class="n">getNetworkAdapterTypeString</span></span><span></span><span class="p">(</span><a class="reference internal" href="enum_axl_io_NetworkAdapterType.html#doxid-namespaceaxl-1-1io-1a1784f4641e9267d50e8505999741fb98"><span class="std std-ref">NetworkAdapterType</span></a><span></span> <span class="n">adapterKind</span><span class="p">);</span>
+
+<a class="reference internal" href="enum_axl_io_NetworkAdapterFlag.html#doxid-namespaceaxl-1-1io-1a794af8cdbb3de1cecc47edc0a4fd24f1"><span class="std std-ref">NetworkAdapterFlag</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ad6cfe906a1d2abf5544ab6ca11d99edd"><span></span><span class="n">getFirstNetworkAdapterFlag</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">flags</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1aec75eafd7dfe3cd67aff3d9bbe19e46a"><span></span><span class="n">getNetworkAdapterFlagString</span></span><span></span><span class="p">(</span><a class="reference internal" href="enum_axl_io_NetworkAdapterFlag.html#doxid-namespaceaxl-1-1io-1a794af8cdbb3de1cecc47edc0a4fd24f1"><span class="std std-ref">NetworkAdapterFlag</span></a><span></span> <span class="n">flag</span><span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a80304f532396efd6d6bd5aa215c6244d"><span></span><span class="n">getNetworkAdapterFlagString</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">flags</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ab96cddee1a47d12e5d5b49b4cad8e568"><span></span><span class="n">getMacAddressString</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">string</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a124ea0f8f4a23a0a286b5582137f0b8d"><span class="std std-ref">uchar_t</span></a><span></span><span class="o">*</span> <span class="n">macAddress</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a7d568d99b050d97ffe2d8ae30d788c37"><span></span><span class="n">getMacAddressString</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a124ea0f8f4a23a0a286b5582137f0b8d"><span class="std std-ref">uchar_t</span></a><span></span><span class="o">*</span> <span class="n">macAddress</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a523430000f99f603c009426fea785937"><span></span><span class="n">createNetworkAdapterDescList</span></span><span></span><span class="p">(</span><a class="reference internal" href="class_axl_sl_List.html#doxid-classaxl-1-1sl-1-1-list"><span class="std std-ref">sl::List</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="class_axl_io_NetworkAdapterDesc.html#doxid-classaxl-1-1io-1-1-network-adapter-desc"><span class="std std-ref">NetworkAdapterDesc</span></a><span></span><span class="o">&gt;*</span> <span class="n">adapterList</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1af91111e8fa195154718f57537bc03376"><span></span><span class="n">createSerialPortDescList</span></span><span></span><span class="p">(</span><a class="reference internal" href="class_axl_sl_List.html#doxid-classaxl-1-1sl-1-1-list"><span class="std std-ref">sl::List</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="class_axl_io_SerialPortDesc.html#doxid-classaxl-1-1io-1-1-serial-port-desc"><span class="std std-ref">SerialPortDesc</span></a><span></span><span class="o">&gt;*</span> <span class="n">portList</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a3c1aebcf9a53e0fe81d48aec1a308f55"><span></span><span class="n">getSockAddrFamilyString</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">family</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1abae929016d9f49ae8536369ed3815b84"><span></span><span class="n">getSockAddrFamilySize</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">family</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a816a41adfea186eac776bedc1f99bd58"><span></span><span class="n">getSockAddrSize</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a442a50e0b5df5a27065f8293d0d125ce"><span></span><span class="n">getSockProtoString</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">proto</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a36ae4965f616d572760d5e077948dcac"><span></span><span class="n">getSockAddrNetMaskBitCount_ip4</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a354ec51159a4a3e9c656ea916b0e43ef"><span></span><span class="n">getSockAddrNetMaskBitCount_ip6</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a74e493df68a27949acc597e59df50df8"><span></span><span class="n">getSockAddrNetMaskBitCount</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">void</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a0257e8fed8f8ee85745833bc84903af7"><span></span><span class="n">createSockAddrNetMask_ip4</span></span><span></span><span class="p">(</span>
+    <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="kt">size_t</span> <span class="n">bitCount</span>
+    <span class="p">);</span>
+
+<span class="kt">void</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a4d1321ae8cf2dcbd9dc9ae9969936642"><span></span><span class="n">createSockAddrNetMask_ip6</span></span><span></span><span class="p">(</span>
+    <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="kt">size_t</span> <span class="n">bitCount</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a1925ff337fa0e0c5519873aa6c980bfa"><span></span><span class="n">isSockAddrEqual_ip4</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr1</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr2</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a376f7c841f413629eca06eacc49796b5"><span></span><span class="n">isSockAddrEqual_ip6</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr1</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr2</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ac4ef7c8120471480a515c8b7e46d031d"><span></span><span class="n">isSockAddrEqual</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr1</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr2</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1acf8bc672027f827054f5849bddf5fef9"><span></span><span class="n">isSockAddrMatch_ip4</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">filterAddr</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a4a48a96b7ef1ae44349beefac0ddf045"><span></span><span class="n">isSockAddrMatch_ip6</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">filterAddr</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a4f6863b88e60285f6c4b6fba64c29cdf"><span></span><span class="n">isSockAddrMatch</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">filterAddr</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a00b2056ab0aaec56282c6c6a34286312"><span></span><span class="n">parseAddr_ip4</span></span><span></span><span class="p">(</span>
+    <span class="n">in_addr</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a9a81f78b3aa7fb15a873355e0faad5ab"><span></span><span class="n">parseAddr_ip6</span></span><span></span><span class="p">(</span>
+    <span class="n">in6_addr</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a2da4712e830b7aa20b564fdb365ba3b6"><span></span><span class="n">parseSockAddr_ip4</span></span><span></span><span class="p">(</span>
+    <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1afce1ca5a6c15d1aa969ca201b0bb08a1"><span></span><span class="n">parseSockAddr_ip6</span></span><span></span><span class="p">(</span>
+    <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+    <span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1aff6689dce52961933fd787f40c216359"><span></span><span class="n">parseSockAddr</span></span><span></span><span class="p">(</span>
+    <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr</span><span class="p">,</span>
+    <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">string</span>
+    <span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a0b5482b9ca95e294a49a8e37d7c963fe"><span></span><span class="n">getAddrString_ip4</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">string</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">in_addr</span><span class="o">*</span> <span class="n">addr</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ae27e68f5cba56a3895f96213e7f409e3"><span></span><span class="n">getAddrString_ip4</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">in_addr</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a29021f290c3b7c35c14d37b10ebdd164"><span></span><span class="n">getAddrString_ip6</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">string</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">in6_addr</span><span class="o">*</span> <span class="n">addr</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ab40d260e4fc12833b9cb535cbcd18fed"><span></span><span class="n">getAddrString_ip6</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">in6_addr</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a20c8df56373d7001bdc29e0c5d52044e"><span></span><span class="n">getSockAddrString_ip4</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">string</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a26fce715659e06586152957fdc324bc7"><span></span><span class="n">getSockAddrString_ip4</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">sockaddr_in</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ad150dec6a4a20965f7726d9a39865ce0"><span></span><span class="n">getSockAddrString_ip6</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">string</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a373db149c07c1e81ee7ef70870ee41d5"><span></span><span class="n">getSockAddrString_ip6</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">sockaddr_in6</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">size_t</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1aaf2c2bf993eea4ee0e69ddc2fe49b109"><span></span><span class="n">getSockAddrString</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span><span class="o">*</span> <span class="n">string</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1a9e4c66d3ff1af7d90d67101f6bbe7cbe"><span class="std std-ref">sl::String</span></a><span></span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1adeb7cea95a20c490a63bc0a6058443ad"><span></span><span class="n">getSockAddrString</span></span><span></span><span class="p">(</span><span class="k">const</span> <span class="n">sockaddr</span><span class="o">*</span> <span class="n">addr</span><span class="p">);</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a10a1ee88d5cbe350cc49e3c97ad9f340"><span></span><span class="n">resolveHostName</span></span><span></span><span class="p">(</span>
+    <a class="reference internal" href="class_axl_sl_Array.html#doxid-classaxl-1-1sl-1-1-array"><span class="std std-ref">sl::Array</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="struct_axl_io_SockAddr.html#doxid-structaxl-1-1io-1-1-sock-addr"><span class="std std-ref">SockAddr</span></a><span></span><span class="o">&gt;*</span> <span class="n">addrArray</span><span class="p">,</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">family</span> <span class="o">=</span> <span class="n">AF_UNSPEC</span>
+    <span class="p">);</span>
+
+<a class="reference internal" href="class_axl_sl_Array.html#doxid-classaxl-1-1sl-1-1-array"><span class="std std-ref">sl::Array</span></a><span></span><span class="o">&lt;</span><a class="reference internal" href="struct_axl_io_SockAddr.html#doxid-structaxl-1-1io-1-1-sock-addr"><span class="std std-ref">SockAddr</span></a><span></span><span class="o">&gt;</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a2eb2f2ee9b4351287cefbc61a2a839d3"><span></span><span class="n">resolveHostName</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <a class="reference internal" href="namespace_axl_sl.html#doxid-namespaceaxl-1-1sl-1ae3ce3de11e537230da00c6c0a571ef60"><span class="std std-ref">sl::StringRef</span></a><span></span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">family</span> <span class="o">=</span> <span class="n">AF_UNSPEC</span>
+    <span class="p">);</span>
+
+<span class="kt">void</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1aba01241b37a4e2c650a445257778750e"><span></span><span class="n">registerSslErrorProvider</span></span><span></span><span class="p">();</span>
+
+<a class="reference internal" href="class_axl_io_UsbContext.html#doxid-classaxl-1-1io-1-1-usb-context"><span class="std std-ref">UsbContext</span></a><span></span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ad68acb98aa02870d48b22a9a5cd4e4ee"><span></span><span class="n">getUsbDefaultContext</span></span><span></span><span class="p">();</span>
+
+<span class="kt">bool</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a7427832c57f11ce7d7523b0ba1c032ce"><span></span><span class="n">hasUsbCapability</span></span><span></span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">capability</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1acdbfa085a3aabf3848bcc0efbd54816b"><span></span><span class="n">getUsbSpeedString</span></span><span></span><span class="p">(</span><span class="n">libusb_speed</span> <span class="n">speed</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a47cfc671c111001f41e5bd946729826a"><span></span><span class="n">getUsbClassCodeString</span></span><span></span><span class="p">(</span><span class="n">libusb_class_code</span> <span class="n">classCode</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ac0366eb6696a3cea55dfde8b1d411999"><span></span><span class="n">getUsbTransferTypeString</span></span><span></span><span class="p">(</span><span class="n">libusb_transfer_type</span> <span class="n">transferType</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="n">libusb_interface_descriptor</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ac477daf521eb1956e4dba91672961382"><span></span><span class="n">findUsbInterfaceDescriptor</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">libusb_config_descriptor</span><span class="o">*</span> <span class="n">configDesc</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">interfaceId</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">altSettingId</span>
+    <span class="p">);</span>
+
+<span class="k">const</span> <span class="n">libusb_endpoint_descriptor</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1af51d3a32f08aafccb2ec67d039a1abdc"><span></span><span class="n">findUsbEndpointDescriptor</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">libusb_interface_descriptor</span><span class="o">*</span> <span class="n">ifaceDesc</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">endpointId</span>
+    <span class="p">);</span>
+
+<span class="k">const</span> <span class="n">libusb_endpoint_descriptor</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1ade901f32614dad9ff90870720990a5ca"><span></span><span class="n">findUsbEndpointDescriptor</span></span><span></span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">libusb_config_descriptor</span><span class="o">*</span> <span class="n">configDesc</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">endpointId</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">interfaceId</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1a12a1e9b3ce141648783a82445d02b58d"><span class="std std-ref">uint_t</span></a><span></span> <span class="n">altSettingId</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">);</span>
+
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a38b3e371f555c221ea1133369e79de89"><span></span><span class="n">AXL_SL_DEFINE_GUID</span></span><span></span><span class="p">(</span>
+    <span class="n">g_usbErrorGuid</span><span class="p">,</span>
+    <span class="mh">0x87ea0738</span><span class="p">,</span>
+    <span class="mh">0x52e9</span><span class="p">,</span>
+    <span class="mh">0x4769</span><span class="p">,</span>
+    <span class="mh">0xb7</span><span class="p">,</span>
+    <span class="mh">0x27</span><span class="p">,</span>
+    <span class="mh">0x7a</span><span class="p">,</span>
+    <span class="mh">0x17</span><span class="p">,</span>
+    <span class="mh">0x37</span><span class="p">,</span>
+    <span class="mh">0x7b</span><span class="p">,</span>
+    <span class="mh">0x92</span><span class="p">,</span>
+    <span class="mh">0x1e</span>
+    <span class="p">);</span>
+
+<span class="kt">void</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a53a40f2c8e3ceada15d3fcf168d112b4"><span></span><span class="n">registerUsbErrorProvider</span></span><span></span><span class="p">();</span>
+
+<a class="reference internal" href="class_axl_io_UsbEventThread.html#doxid-classaxl-1-1io-1-1-usb-event-thread"><span class="std std-ref">UsbEventThread</span></a><span></span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a4762e64bac18ad4b154ce73af8ab6083"><span></span><span class="n">getUsbDefaultContextEventThread</span></span><span></span><span class="p">();</span>
+
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+<span class="doxyrest-code-target target" id="doxid-namespaceaxl-1-1io-1a5a2d40eafaeae8d0d3261c5e2bf30063"><span></span><span class="n">getUsbTransferStatusString</span></span><span></span><span class="p">(</span><span class="n">libusb_transfer_status</span> <span class="n">status</span><span class="p">);</span>
+
+<span class="p">}</span> <span class="c1">// namespace io</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="namespace_axl_io_psx.html" class="btn btn-neutral float-right" title="namespace axl::io::psx" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_ini_Section.html" class="btn btn-neutral float-left" title="class axl::ini::Section" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+.. index:: pair: class; axl::sys::win::AccessToken
+.. _doxid-classaxl_1_1sys_1_1win_1_1_access_token:
+
+class axl::sys::win::AccessToken
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_AccessToken.h>
+	
+	class AccessToken: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`openProcessToken<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1a504b378bf99b6a1ad5b8f5894dc3eaef>`(
+			:ref:`handle_t<doxid-axl__g_2axl__g___pch_8h_1a50e1c0ee54e9888891a7c7889eb17e5f>` process,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` access = TOKEN_ALL_ACCESS
+			);
+	
+		bool
+		:target:`openProcessToken<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1a0d41f9b70282d23150537053e4add0f9>`(:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` access = TOKEN_ALL_ACCESS);
+	
+		bool
+		:target:`openThreadToken<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1a4e8b42aadad79290267330a7072c6d0f>`(
+			:ref:`handle_t<doxid-axl__g_2axl__g___pch_8h_1a50e1c0ee54e9888891a7c7889eb17e5f>` thread,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` access = TOKEN_ALL_ACCESS,
+			bool openAsSelf = false
+			);
+	
+		bool
+		:target:`openThreadToken<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1afe83acf17cf470785f0c5d3ef64e15ba>`(
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` access = TOKEN_ALL_ACCESS,
+			bool openAsSelf = false
+			);
+	
+		bool
+		:target:`getTokenInformation<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1a4d358e8c9f55aa6a8e4ffd00eccf3e09>`(
+			TOKEN_INFORMATION_CLASS infoClass,
+			void* p,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` size,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>`* actualSize
+			);
+	
+		bool
+		:target:`getTokenInformation<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1a328f4b490a60ddc5e93dd99ffe67f313>`(
+			TOKEN_INFORMATION_CLASS infoClass,
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer
+			);
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`getTokenInformation<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1aed1b9a641e4132de1ba6bfd661c2eeb8>`(TOKEN_INFORMATION_CLASS infoClass);
+	
+		bool
+		:target:`setTokenInformation<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1aba5d89f3eb624ace4e510dc23a7d167f>`(
+			TOKEN_INFORMATION_CLASS infoClass,
+			void* p,
+			:ref:`dword_t<doxid-axl__g_2axl__g___pch_8h_1abea8065ed82cda6a2a31592be9cd96b2>` size
+			);
+	
+		bool
+		:target:`isMemberOf<doxid-classaxl_1_1sys_1_1win_1_1_access_token_1abb95a7df73a83038b46120f9d5dd61bb>`(PSID group);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::mem::Allocate
+.. _doxid-classaxl_1_1mem_1_1_allocate:
+
+template class axl::mem::Allocate
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Allocator.h>
+	
+	template <typename BaseAllocator>
+	class Allocate
+	{
+	public:
+		// methods
+	
+		void*
+		:target:`operator()<doxid-classaxl_1_1mem_1_1_allocate_1a80c774c6382346e28d9586853c72049d>`(size_t size) const;
+	};

@@ -1,0 +1,40 @@
+.. index:: pair: class; axl::lex::ParseErrorProvider
+.. _doxid-classaxl_1_1lex_1_1_parse_error_provider:
+
+class axl::lex::ParseErrorProvider
+==================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_ParseError.h>
+	
+	class ParseErrorProvider: public :ref:`axl::err::ErrorProvider<doxid-classaxl_1_1err_1_1_error_provider>`
+	{
+	public:
+		// methods
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getErrorDescription<doxid-classaxl_1_1lex_1_1_parse_error_provider_1a6db0950d85a97c45f5d4143ee5d4c3c6>`(const :ref:`err::ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:ref:`getErrorDescription<doxid-classaxl_1_1err_1_1_error_provider_1ab5b93bdd78d1dac4be43abbed2bd7adf>`(const :ref:`ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error) = 0;
+

@@ -1,0 +1,41 @@
+.. index:: pair: class; axl::mem::Pool
+.. _doxid-classaxl_1_1mem_1_1_pool:
+
+template class axl::mem::Pool
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Pool.h>
+	
+	template <typename T>
+	class Pool
+	{
+	public:
+		// methods
+	
+		T*
+		:target:`get<doxid-classaxl_1_1mem_1_1_pool_1ae5a6f51715b1cecf011fed09c9aaacf3>`();
+	
+		void
+		:target:`put<doxid-classaxl_1_1mem_1_1_pool_1a61415d987063c53c10252f2c48a884d2>`(T* p);
+	
+		void
+		:target:`putFront<doxid-classaxl_1_1mem_1_1_pool_1a77bef67fdeb2be04cc672ed1bd8ac6ac>`(T* p);
+	
+		void
+		:target:`putBack<doxid-classaxl_1_1mem_1_1_pool_1adc8e6a6673b06a009bb2deb457207b4a>`(T* p);
+	
+		void
+		:target:`put<doxid-classaxl_1_1mem_1_1_pool_1addbac9f6e88d8dbfc55f418a257878d8>`(:ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<T>* list);
+	
+		bool
+		:target:`reserve<doxid-classaxl_1_1mem_1_1_pool_1a7940b350b90cb243b36a12a5008279a7>`(size_t count);
+	};

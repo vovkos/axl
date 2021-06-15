@@ -1,0 +1,20 @@
+.. index:: pair: enum; LexerMachineKind
+.. _doxid-namespaceaxl_1_1st_1acb17cf3d056fac4b1aa2a143a404b7fe:
+
+enum axl::st::LexerMachineKind
+==============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_st_StringTemplateLexer.h>
+
+	enum LexerMachineKind
+	{
+	    :target:`LexerMachineKind_Main<doxid-namespaceaxl_1_1st_1acb17cf3d056fac4b1aa2a143a404b7fea1e2e28629148b7ad5771cd0ea209709a>`,
+	    :target:`LexerMachineKind_UserData<doxid-namespaceaxl_1_1st_1acb17cf3d056fac4b1aa2a143a404b7fea56e2864815573f098a8f5f643f459874>`,
+	    :target:`LexerMachineKind_UserCode<doxid-namespaceaxl_1_1st_1acb17cf3d056fac4b1aa2a143a404b7feab656b8eabb666bbfcf462e0a4f009bac>`,
+	};
+

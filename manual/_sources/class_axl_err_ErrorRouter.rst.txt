@@ -1,0 +1,30 @@
+.. index:: pair: class; axl::err::ErrorRouter
+.. _doxid-classaxl_1_1err_1_1_error_router:
+
+class axl::err::ErrorRouter
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_err_ErrorMgr.h>
+	
+	class ErrorRouter
+	{
+	public:
+		// methods
+	
+		virtual
+		void
+		:target:`routeError<doxid-classaxl_1_1err_1_1_error_router_1a9cbcb10484e8dbfdddb90ef4db524f8f>`(const :ref:`ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error) = 0;
+	
+		virtual
+		const char*
+		:target:`routeErrorDescription<doxid-classaxl_1_1err_1_1_error_router_1af8037ef21d425730416715f863ad4277>`(const :ref:`ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error) = 0;
+	};

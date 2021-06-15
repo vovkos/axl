@@ -1,0 +1,274 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>enum axl::lex::RagelLexer::GotoStateKind &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="template class axl::lex::RagelToken" href="class_axl_lex_RagelToken.html" />
+    <link rel="prev" title="template class axl::lex::RagelLexer" href="class_axl_lex_RagelLexer.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_lex_ParseErrorCode.html">enum axl::lex::ParseErrorCode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_lex_TokenChannelMask.html">enum axl::lex::TokenChannelMask</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_LineCol.html">struct axl::lex::LineCol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_LineColOffset.html">struct axl::lex::LineColOffset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_SrcPos.html">struct axl::lex::SrcPos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_StdTokenData.html">struct axl::lex::StdTokenData</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_lex_Token.html">template struct axl::lex::Token</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_Lexer.html">template class axl::lex::Lexer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_ParseErrorProvider.html">class axl::lex::ParseErrorProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_Ragel.html">class axl::lex::Ragel</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="class_axl_lex_RagelLexer.html">template class axl::lex::RagelLexer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_RagelToken.html">template class axl::lex::RagelToken</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_lex_RagelTokenPos.html">class axl::lex::RagelTokenPos</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_lex.html">namespace axl::lex</a> &raquo;</li>
+        
+          <li><a href="class_axl_lex_RagelLexer.html">template class axl::lex::RagelLexer</a> &raquo;</li>
+        
+      <li>enum axl::lex::RagelLexer::GotoStateKind</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="enum-axl-lex-ragellexer-gotostatekind">
+<span id="doxid-classaxl-1-1lex-1-1-ragel-lexer-1a2d18bd191ebae24136ae676753ceba78"></span><span id="index-0"></span><h1>enum axl::lex::RagelLexer::GotoStateKind</h1>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_lex_RagelLexer.h&gt;</span><span class="cp"></span>
+
+<span class="k">enum</span> <span class="n">GotoStateKind</span>
+<span class="p">{</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1lex-1-1-ragel-lexer-1a2d18bd191ebae24136ae676753ceba78ad84a3cc9e8ed29d1162fc7cff48edac4"><span></span><span class="n">GotoStateKind_ReparseToken</span></span><span></span><span class="p">,</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1lex-1-1-ragel-lexer-1a2d18bd191ebae24136ae676753ceba78a6287638d1692309f0463750019a1bcd1"><span></span><span class="n">GotoStateKind_EatToken</span></span><span></span><span class="p">,</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_lex_RagelToken.html" class="btn btn-neutral float-right" title="template class axl::lex::RagelToken" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_lex_RagelLexer.html" class="btn btn-neutral float-left" title="template class axl::lex::RagelLexer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

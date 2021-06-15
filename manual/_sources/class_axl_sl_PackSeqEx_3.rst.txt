@@ -1,0 +1,42 @@
+.. index:: pair: class; axl::sl::PackSeqEx_3
+.. _doxid-classaxl_1_1sl_1_1_pack_seq_ex__3:
+
+template class axl::sl::PackSeqEx_3
+===================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Pack.h>
+	
+	template <
+		typename Pack1,
+		typename Pack2,
+		typename Pack3
+		>
+	class PackSeqEx_3: public :ref:`axl::sl::PackSeqEx<doxid-classaxl_1_1sl_1_1_pack_seq_ex>`
+	{
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`axl_va_list<doxid-classaxl__va__list>`
+		:ref:`operator()<doxid-classaxl_1_1sl_1_1_pack_seq_ex_1af227e5ecc784e21a44573500a0c77f97>`(
+			void* p,
+			size_t* size,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+

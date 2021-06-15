@@ -1,0 +1,591 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::sys::lnx::Udev &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="template class axl::sys::lnx::UdevContextBase" href="class_axl_sys_lnx_UdevContextBase.html" />
+    <link rel="prev" title="namespace axl::sys::lnx" href="namespace_axl_sys_lnx.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_drw.html">namespace axl::sys::drw</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="namespace_axl_sys_lnx.html">namespace axl::sys::lnx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_psx.html">namespace axl::sys::psx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="namespace_axl_sys_win.html">namespace axl::sys::win</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sys_SjljFrame.html">struct axl::sys::SjljFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_sys_Time.html">struct axl::sys::Time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_InvertedSemaphore.html">class axl::sys::InvertedSemaphore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ReadWriteLock.html">class axl::sys::ReadWriteLock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ScopeLock.html">class axl::sys::ScopeLock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_ScopedTlsPtrSlot.html">template class axl::sys::ScopedTlsPtrSlot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsMgr.html">class axl::sys::TlsMgr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsPtrSlot.html">template class axl::sys::TlsPtrSlot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_sys_TlsSlot.html">class axl::sys::TlsSlot</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_sys.html">namespace axl::sys</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_sys_lnx.html">namespace axl::sys::lnx</a> &raquo;</li>
+        
+      <li>class axl::sys::lnx::Udev</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-sys-lnx-udev">
+<span id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev"></span><span id="index-0"></span><h1>class axl::sys::lnx::Udev</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_sys_lnx_Udev.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="n">Udev</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// methods</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ac4c832ae1cd9ebf120f9fdd53836baa1"><span></span><span class="n">udev_ref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a9804bb158e27c5491d14f5c7a85d3da2"><span></span><span class="n">udev_unref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ac23c868d7c1ac1f2a9b492f06f651d06"><span></span><span class="n">udev_new</span></span><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a1f48c0e8a73e1e6aba35dd2ccd9cd6a0"><span></span><span class="n">udev_device_new_from_syspath</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">syspath</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a657ba427d89053f4fdb6b310aece1452"><span></span><span class="n">udev_device_new_from_devnum</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">,</span>
+        <span class="kt">char</span> <span class="n">type</span><span class="p">,</span>
+        <span class="kt">dev_t</span> <span class="n">devnum</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a484014c1eba294c54e78a89dc5073aa0"><span></span><span class="n">udev_device_new_from_subsystem_sysname</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">subsystem</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">sysname</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a7a38ec976bf6039f44d310039c417489"><span></span><span class="n">udev_device_new_from_environment</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a2efa31de6ccab344e07f8aa404e798a8"><span></span><span class="n">udev_enumerate_new</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ab3d9bcf719ceca3caf5062ceae3292b1"><span></span><span class="n">udev_monitor_new_from_netlink</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span> <span class="n">context</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ae97f68727205789aaf6b7008f3f52fde"><span></span><span class="n">udev_device_ref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1aed672b5a881b70409335cc23c924f479"><span></span><span class="n">udev_device_unref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a9acd42879c92839d4c532b645a3fd41d"><span></span><span class="n">udev_device_get_udev</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a19c6ee5508eebec37ba90f82d08ac24c"><span></span><span class="n">udev_device_get_syspath</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a88ba6bda6093318a1b28f8dda00c72af"><span></span><span class="n">udev_device_get_sysname</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1aafffe7d5738ed7a6defc794a8fa1456e"><span></span><span class="n">udev_device_get_sysnum</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1aec850ee345acf10f789e699344a5fb43"><span></span><span class="n">udev_device_get_devpath</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1addd9d73d78ad13a4f609a0bdada8ea65"><span></span><span class="n">udev_device_get_devnode</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">dev_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a329a7cc832c3ca6a53f0794a55e6a82c"><span></span><span class="n">udev_device_get_devnum</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a25afa9cb34927800a550bc3a5b069dbf"><span></span><span class="n">udev_device_get_devtype</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a3039d38328bcafb928a744836987b03c"><span></span><span class="n">udev_device_get_subsystem</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1adff35db5bf201a6e162f851df9508852"><span></span><span class="n">udev_device_get_driver</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a823e92bd3ffb2d429f6a44f8067ebb0d"><span></span><span class="n">udev_device_get_parent</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a2b62d68588f5e522abeadf7d47e9f9e3"><span></span><span class="n">udev_device_get_parent_with_subsystem_devtype</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">subsystem</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">devtype</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a5dc6227e195cc7ca175e18fe63dea7c8"><span></span><span class="n">udev_device_get_is_initialized</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a9c9ccfae5bc4990190a8f08ee84f9849"><span></span><span class="n">udev_device_get_action</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a8a6d4f5026edf00f8cd41446eeeba373"><span></span><span class="n">udev_device_get_devlinks_list_entry</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1aeefdc6dd23034f9551c184927fcad852"><span></span><span class="n">udev_device_get_properties_list_entry</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a131e70657e67adc950cfbf2d0f7853db"><span></span><span class="n">udev_device_get_tags_list_entry</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1aa1a23de765cc516495cb5faabeb3aefb"><span></span><span class="n">udev_device_get_sysattr_list_entry</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1aaaebc7a7a68d60228deab6c1f7535810"><span></span><span class="n">udev_device_get_property_value</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">key</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">int</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a1521f32767e9e6b2f58894bcd90c03b5"><span></span><span class="n">udev_device_has_tag</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">device</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">tag</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a183a9a2e6351ba00a7e1f8ccffb09ed2"><span></span><span class="n">udev_enumerate_ref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a56a5c11da8809ca230e7602c49c003d3"><span></span><span class="n">udev_enumerate_unref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a888f4d735fb023c9125d99a89a3a5125"><span></span><span class="n">udev_enumerate_get_udev</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ae18f43a1681eac43a4e2ccf84376206a"><span></span><span class="n">udev_enumerate_add_match_subsystem_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">subsystem</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a6e8aebf6f7d670332d004b0993ddf675"><span></span><span class="n">udev_enumerate_add_nomatch_subsystem_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">subsystem</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1af504fd2564be6f502bec932feb92f942"><span></span><span class="n">udev_enumerate_add_match_sysattr_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">sysattr</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ad59fd74151c9d1ab0d0ef82d64c17af8"><span></span><span class="n">udev_enumerate_add_nomatch_sysattr_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">sysattr</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a50bdd21f2b357a6fb17ca224988412cf"><span></span><span class="n">udev_enumerate_add_match_property_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">property</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">value</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ad56be3f387af1f1017ea359ef5673494"><span></span><span class="n">udev_enumerate_add_match_sysname_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">sysname</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1acf3bea981e3886797df668a3eeb143f7"><span></span><span class="n">udev_enumerate_add_match_tag_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">tag</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a2e8a9bb388667ee09d124fc83783381c"><span></span><span class="n">udev_enumerate_add_match_parent_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span> <span class="n">parent</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a05dc553dbf91066f00ef0a1bd054e20b"><span></span><span class="n">udev_enumerate_add_match_is_initialized_b</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a44de4a63ade03fcf8a1a9fb068df42ce"><span></span><span class="n">udev_enumerate_scan_devices_b</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a9a20f285c49579b351dcd334b5d4af12"><span></span><span class="n">udev_enumerate_scan_subsystems_b</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a57b5d5fcd5a8f1c968bf2dba3d255896"><span></span><span class="n">udev_enumerate_add_syspath_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">syspath</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1adf39da2f5954f460fbcb5929159b9f12"><span></span><span class="n">udev_enumerate_get_list_entry</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_enumerate</span><span class="o">*</span> <span class="n">enumerate</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1abc298a4a81f6a2d78d06a2bfbe30efd4"><span></span><span class="n">udev_list_entry_get_next</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span> <span class="n">entry</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a4671795b942a9e890f191304646d4e71"><span></span><span class="n">udev_list_entry_get_by_name</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span> <span class="n">entry</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a3a82f1160ce33cd9224f4f5f0fb4a086"><span></span><span class="n">udev_list_entry_get_name</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span> <span class="n">entry</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a7759bb3740bc32822107ec06daa92c5f"><span></span><span class="n">udev_list_entry_get_value</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_list_entry</span><span class="o">*</span> <span class="n">entry</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a043e0ad9a58f634de742f71378afd371"><span></span><span class="n">udev_monitor_ref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a5ae1d7cc4b58647714b26c1ced6808c0"><span></span><span class="n">udev_monitor_unref</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a330644e389433074ded40015db1cedeb"><span></span><span class="n">udev_monitor_get_udev</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">int</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a7d7005ddced6c0aed706d5a7da91add6"><span></span><span class="n">udev_monitor_get_fd</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ac6c77290e547c1be53033d8f4ab15104"><span></span><span class="n">udev_monitor_filter_update_b</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a2b6eab3c2af754172ed2f368c5992c5e"><span></span><span class="n">udev_monitor_filter_remove_b</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ac625ba5743677ffd9397a79654f3ad41"><span></span><span class="n">udev_monitor_filter_add_match_subsystem_devtype_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">subsystem</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">devtype</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1aae494727996be314d94f203e20b007b6"><span></span><span class="n">udev_monitor_filter_add_match_tag_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">,</span>
+        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">tag</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1ae805ce1bb88d99505f88df8ca0406e5f"><span></span><span class="n">udev_monitor_set_receive_buffer_size_b</span></span><span></span><span class="p">(</span>
+        <span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">,</span>
+        <span class="kt">int</span> <span class="n">size</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">bool</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a7a4b318152da2004d0274427abc24fd9"><span></span><span class="n">udev_monitor_enable_receiving_b</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="k">struct</span> <span class="n">udev_device</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1sys-1-1lnx-1-1-udev-1a036f3789660410beaa0abbb359a88ed8"><span></span><span class="n">udev_monitor_receive_device</span></span><span></span><span class="p">(</span><span class="k">struct</span> <span class="n">udev_monitor</span><span class="o">*</span> <span class="n">monitor</span><span class="p">);</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_sys_lnx_UdevContextBase.html" class="btn btn-neutral float-right" title="template class axl::sys::lnx::UdevContextBase" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="namespace_axl_sys_lnx.html" class="btn btn-neutral float-left" title="namespace axl::sys::lnx" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

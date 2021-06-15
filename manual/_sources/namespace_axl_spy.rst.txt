@@ -1,0 +1,127 @@
+.. index:: pair: namespace; axl::spy
+.. _doxid-namespaceaxl_1_1spy:
+
+namespace axl::spy
+==================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_spy_FrameOffset.rst
+	enum_axl_spy_HookAction.rst
+	struct_axl_spy_ImportWriteProtectionBackup.rst
+	struct_axl_spy_VaList.rst
+	class_axl_spy_HookArena.rst
+	class_axl_spy_ImportIteratorBase.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace spy {
+
+	// typedefs
+
+	typedef :ref:`HookAction<doxid-namespaceaxl_1_1spy_1a2866178a1aedb255fc1471f9bd2d5a32>` :target:`HookEnterFunc<doxid-namespaceaxl_1_1spy_1afdac909ea77b12df15bde82555dd372b>`(
+		void *targetFunc,
+		void *callbackParam,
+		size_t frameBase
+		);
+
+	typedef void :target:`HookLeaveFunc<doxid-namespaceaxl_1_1spy_1ac0cf338d4d299f76635e4ca1438f4eae>`(
+		void *targetFunc,
+		void *callbackParam,
+		size_t frameBase
+		);
+
+	// enums
+
+	enum :ref:`FrameOffset<doxid-namespaceaxl_1_1spy_1a3c75ab55ea7e882307c9aae1eb1296c7>`;
+	enum :ref:`HookAction<doxid-namespaceaxl_1_1spy_1a2866178a1aedb255fc1471f9bd2d5a32>`;
+
+	// structs
+
+	struct :ref:`ImportWriteProtectionBackup<doxid-structaxl_1_1spy_1_1_import_write_protection_backup>`;
+	struct :ref:`VaList<doxid-structaxl_1_1spy_1_1_va_list>`;
+
+	// classes
+
+	class :ref:`HookArena<doxid-classaxl_1_1spy_1_1_hook_arena>`;
+	class :ref:`ImportIteratorBase<doxid-classaxl_1_1spy_1_1_import_iterator_base>`;
+
+	// global functions
+
+	void
+	:target:`vaStart<doxid-namespaceaxl_1_1spy_1a6b596e9c062890fcdf2a4c6791afb9ba>`(
+		:ref:`VaList<doxid-structaxl_1_1spy_1_1_va_list>`& va,
+		size_t frameBase
+		);
+
+	template <typename T>
+	T&
+	:target:`vaArg<doxid-namespaceaxl_1_1spy_1a4b59e37bc3643e8387c2f07fc10332b3>`(:ref:`VaList<doxid-structaxl_1_1spy_1_1_va_list>`& va);
+
+	void
+	:target:`vaEnd<doxid-namespaceaxl_1_1spy_1ae3ef55d8adc2dd2b0033e1a5ebd220e3>`(:ref:`VaList<doxid-structaxl_1_1spy_1_1_va_list>`& va);
+
+	void
+	:target:`setHookTargetFunc<doxid-namespaceaxl_1_1spy_1a03b4f115819f35b877a30244421410ef>`(
+		Hook* hook,
+		void* targetFunc
+		);
+
+	void
+	:target:`enableHooks<doxid-namespaceaxl_1_1spy_1a38977d287682b14731ec6850c3bae3eb>`();
+
+	void
+	:target:`disableHooks<doxid-namespaceaxl_1_1spy_1aeb324d5694898b4711bb593ca8f75525>`();
+
+	void
+	:target:`enableCurrentThreadHooks<doxid-namespaceaxl_1_1spy_1afc20205d894599a3bcbc39b05c089468>`();
+
+	void
+	:target:`disableCurrentThreadHooks<doxid-namespaceaxl_1_1spy_1a5d815e7632289a3f5043a6d07b191cd6>`();
+
+	bool
+	:target:`enumerateImports<doxid-namespaceaxl_1_1spy_1af262a6787174cd362a653b4ef6d6ae14>`(
+		ImportIterator* iterator,
+		void* module = NULL
+		);
+
+	bool
+	:target:`enumerateImports<doxid-namespaceaxl_1_1spy_1a46afda147295fce9d215eb26a96c5c6d>`(
+		ImportIterator* importIterator,
+		const ModuleIterator& moduleIterator
+		);
+
+	ImportIterator
+	:target:`enumerateImports<doxid-namespaceaxl_1_1spy_1a8f357e5e7d8351b7bedf33135f7b8274>`(void* module = NULL);
+
+	ImportIterator
+	:target:`enumerateImports<doxid-namespaceaxl_1_1spy_1af7c0628edc7290d2a158462d8939a6c7>`(const ModuleIterator& moduleIterator);
+
+	bool
+	:target:`disableImportWriteProtection<doxid-namespaceaxl_1_1spy_1a42b9b14ec21ee8d9dd0915181b7fadfc>`(
+		void* module,
+		:ref:`ImportWriteProtectionBackup<doxid-structaxl_1_1spy_1_1_import_write_protection_backup>`* backup
+		);
+
+	bool
+	:target:`disableImportWriteProtection<doxid-namespaceaxl_1_1spy_1ae2d808c86e2c0159174b03de7b1b1b08>`(
+		const ModuleIterator& moduleIterator,
+		:ref:`ImportWriteProtectionBackup<doxid-structaxl_1_1spy_1_1_import_write_protection_backup>`* backup
+		);
+
+	bool
+	:target:`restoreImportWriteProtection<doxid-namespaceaxl_1_1spy_1a6bda71879a02ef5b08ad3e8c88ce4a32>`(const :ref:`ImportWriteProtectionBackup<doxid-structaxl_1_1spy_1_1_import_write_protection_backup>`* backup);
+
+	bool
+	:target:`enumerateModules<doxid-namespaceaxl_1_1spy_1a906532d08760da686f1eca5a0c0d9e56>`(ModuleIterator* iterator);
+
+	ModuleIterator
+	:target:`enumerateModules<doxid-namespaceaxl_1_1spy_1a485196a2247a1a3e57da745c3a81e122>`();
+
+	} // namespace spy

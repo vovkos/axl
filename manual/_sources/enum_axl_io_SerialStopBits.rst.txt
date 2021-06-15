@@ -1,0 +1,20 @@
+.. index:: pair: enum; SerialStopBits
+.. _doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188b:
+
+enum axl::io::SerialStopBits
+============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SerialSettings.h>
+
+	enum SerialStopBits
+	{
+	    :target:`SerialStopBits_1<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188ba326ec7b7b38f87c7223d32a19634cbee>`  = 0,
+	    :target:`SerialStopBits_15<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188ba8e504a7673ce68e9337015183c388037>` = 1,
+	    :target:`SerialStopBits_2<doxid-namespaceaxl_1_1io_1a5685db4a123d003c414a2958b062188baab336b852eace2098b74538753028eaa>`  = 2,
+	};
+

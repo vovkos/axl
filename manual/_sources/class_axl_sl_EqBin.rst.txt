@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::EqBin
+.. _doxid-classaxl_1_1sl_1_1_eq_bin:
+
+template class axl::sl::EqBin
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class EqBin
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_eq_bin_1a1a7dada09983b2bf70791a3841284d5b>`(
+			Arg a,
+			Arg b
+			) const;
+	};

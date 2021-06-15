@@ -1,0 +1,124 @@
+.. index:: pair: namespace; axl::mem
+.. _doxid-namespaceaxl_1_1mem:
+
+namespace axl::mem
+==================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_mem_Block.rst
+	struct_axl_mem_TrackerBlockHdr.rst
+	class_axl_mem_Allocate.rst
+	class_axl_mem_CppDelete.rst
+	class_axl_mem_DirectAllocator.rst
+	class_axl_mem_ExecutableBlockArena.rst
+	class_axl_mem_Free.rst
+	class_axl_mem_Pool.rst
+	class_axl_mem_StdDelete.rst
+	class_axl_mem_Tracker.rst
+	class_axl_mem_TrackingAllocate.rst
+	class_axl_mem_TrackingAllocator.rst
+	class_axl_mem_TrackingFree.rst
+	class_axl_mem_ZeroAllocator.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace mem {
+
+	// typedefs
+
+	typedef :ref:`DirectAllocator<doxid-classaxl_1_1mem_1_1_direct_allocator>` :target:`StdAllocator<doxid-namespaceaxl_1_1mem_1a5b8776522c0cdfd5cb5fd0f6b4ad31b9>`;
+	typedef :ref:`ZeroAllocator<doxid-classaxl_1_1mem_1_1_zero_allocator>` :target:`StdZeroAllocator<doxid-namespaceaxl_1_1mem_1ade3924967d4c051817b44187331a92df>`;
+	typedef :ref:`Allocate<doxid-classaxl_1_1mem_1_1_allocate>`<:ref:`DirectAllocator<doxid-classaxl_1_1mem_1_1_direct_allocator>`> :target:`StdAllocate<doxid-namespaceaxl_1_1mem_1ad352554937ff2c5b603e6a897404c94d>`;
+	typedef :ref:`Allocate<doxid-classaxl_1_1mem_1_1_allocate>`<:ref:`ZeroAllocator<doxid-classaxl_1_1mem_1_1_zero_allocator>`> :target:`StdZeroAllocate<doxid-namespaceaxl_1_1mem_1a672e692a17250aa9fa1e89e5f3dcae93>`;
+	typedef :ref:`Free<doxid-classaxl_1_1mem_1_1_free>`<:ref:`DirectAllocator<doxid-classaxl_1_1mem_1_1_direct_allocator>`> :target:`StdFree<doxid-namespaceaxl_1_1mem_1ad19f6435774e96fe9428221bdbbd0da4>`;
+
+	// structs
+
+	struct :ref:`Block<doxid-structaxl_1_1mem_1_1_block>`;
+	struct :ref:`TrackerBlockHdr<doxid-structaxl_1_1mem_1_1_tracker_block_hdr>`;
+
+	// classes
+
+	template <typename BaseAllocator>
+	class :ref:`Allocate<doxid-classaxl_1_1mem_1_1_allocate>`;
+
+	template <typename T>
+	class :ref:`CppDelete<doxid-classaxl_1_1mem_1_1_cpp_delete>`;
+
+	class :ref:`DirectAllocator<doxid-classaxl_1_1mem_1_1_direct_allocator>`;
+
+	template <typename T>
+	class :ref:`ExecutableBlockArena<doxid-classaxl_1_1mem_1_1_executable_block_arena>`;
+
+	template <typename BaseAllocator>
+	class :ref:`Free<doxid-classaxl_1_1mem_1_1_free>`;
+
+	template <typename T>
+	class :ref:`Pool<doxid-classaxl_1_1mem_1_1_pool>`;
+
+	template <typename T>
+	class :ref:`StdDelete<doxid-classaxl_1_1mem_1_1_std_delete>`;
+
+	class :ref:`Tracker<doxid-classaxl_1_1mem_1_1_tracker>`;
+
+	template <typename BaseAllocator>
+	class :ref:`TrackingAllocate<doxid-classaxl_1_1mem_1_1_tracking_allocate>`;
+
+	template <typename BaseAllocator>
+	class :ref:`TrackingAllocator<doxid-classaxl_1_1mem_1_1_tracking_allocator>`;
+
+	template <typename BaseAllocator>
+	class :ref:`TrackingFree<doxid-classaxl_1_1mem_1_1_tracking_free>`;
+
+	class :ref:`ZeroAllocator<doxid-classaxl_1_1mem_1_1_zero_allocator>`;
+
+	// global functions
+
+	void*
+	:target:`allocateExecutablePages<doxid-namespaceaxl_1_1mem_1a0bd3b2ec42b337c1edc5e41001971ff6>`(size_t size);
+
+	bool
+	:target:`freeExecutablePages<doxid-namespaceaxl_1_1mem_1a3412ced11df90213b085ca348921546f>`(
+		void* p,
+		size_t size
+		);
+
+	template <typename T>
+	void
+	:target:`stdDelete<doxid-namespaceaxl_1_1mem_1a757c9980bb8e8df9f65c59e30ea00c14>`(T* p);
+
+	size_t
+	:target:`getScatterGatherSize<doxid-namespaceaxl_1_1mem_1ab8b29eaeec7c6e1331c0b1a97122e796>`(
+		const :ref:`Block<doxid-structaxl_1_1mem_1_1_block>`* blockArray,
+		size_t blockCount
+		);
+
+	size_t
+	:target:`copyScatterGather<doxid-namespaceaxl_1_1mem_1a157f0a22b9f4fbbbf98ffc4ba30c556d>`(
+		void* buffer,
+		const :ref:`Block<doxid-structaxl_1_1mem_1_1_block>`* blockArray,
+		size_t blockCount
+		);
+
+	size_t
+	:target:`safeCopyScatterGather<doxid-namespaceaxl_1_1mem_1ad33d1d046d258989b56a885190809888>`(
+		void* buffer,
+		size_t bufferSize,
+		const :ref:`Block<doxid-structaxl_1_1mem_1_1_block>`* blockArray,
+		size_t blockCount
+		);
+
+	void
+	:target:`addTrackerBlock<doxid-namespaceaxl_1_1mem_1ac4ef28e7c27760f85b9275a5e63f16c1>`(:ref:`TrackerBlockHdr<doxid-structaxl_1_1mem_1_1_tracker_block_hdr>`* hdr);
+
+	void
+	:target:`removeTrackerBlock<doxid-namespaceaxl_1_1mem_1a3d7fe24f7f0cc20e795d2744c52162a2>`(:ref:`TrackerBlockHdr<doxid-structaxl_1_1mem_1_1_tracker_block_hdr>`* hdr);
+
+	} // namespace mem

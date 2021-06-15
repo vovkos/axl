@@ -1,0 +1,191 @@
+.. index:: pair: class; axl::sl::StringDetailsBase<utf16_t>
+.. _doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4:
+
+template class axl::sl::StringDetailsBase<utf16_t>
+==================================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_StringDetails.h>
+	
+	template <>
+	class StringDetailsBase<utf16_t>: public :ref:`axl::sl::StringDetailsImpl<doxid-classaxl_1_1sl_1_1_string_details_impl>`
+	{
+	public:
+		// typedefs
+	
+		typedef :ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>` :target:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>`;
+		typedef :ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>` :target:`C2<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a41c52e78e3d7d88ddecc32b9794c8d68>`;
+		typedef :ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` :target:`C3<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a959aa70e3c3f8e0e01268cfc7bcfde2b>`;
+		typedef :ref:`enc::Utf16<doxid-classaxl_1_1enc_1_1_utf16>` :target:`Encoding<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a8d58bc81ed285efd47bf67f60a4294ad>`;
+		typedef :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`<:ref:`C2<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a41c52e78e3d7d88ddecc32b9794c8d68>`> :target:`Details2<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a165e108eaf831ab7982f8f12e5afb7ee>`;
+		typedef :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`<:ref:`C3<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a959aa70e3c3f8e0e01268cfc7bcfde2b>`> :target:`Details3<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a22b04d9d24120d06203f5ed65da2d043>`;
+
+		// methods
+	
+		static
+		:ref:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>`
+		:target:`toLower<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1ae61eca5d8e539cd082eda78d9b992bad>`(:ref:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>` c);
+	
+		static
+		:ref:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>`
+		:target:`toUpper<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aaa96351dece3917a5853a231a7e3cb7f>`(:ref:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>` c);
+	
+		static
+		size_t
+		:target:`calcFormatLength_va<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1ab1cab6d9dcb771e2e83eeefc2c0155ae>`(
+			const :ref:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>`* formatString,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+	
+		static
+		void
+		:target:`format_va<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1a3559a45829a2ccf07e8a1a3e63751659>`(
+			:ref:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>`* buffer,
+			size_t bufferLength,
+			const :ref:`C<doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4_1aff1379800529762fabe4eaf2d550c083>`* formatString,
+			:ref:`axl_va_list<doxid-classaxl__va__list>` va
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		static
+		const T*
+		:ref:`getEmptyString<doxid-classaxl_1_1sl_1_1_string_details_impl_1ab35c9374c43942b08fbcf409f37b035d>`();
+	
+		static
+		const T*
+		:ref:`getCrLf<doxid-classaxl_1_1sl_1_1_string_details_impl_1a2256ca8576e252de523b76cc686eb528>`();
+	
+		static
+		const T*
+		:ref:`getWhitespace<doxid-classaxl_1_1sl_1_1_string_details_impl_1a0778029362717088cbf528b0e6312155>`();
+	
+		static
+		size_t
+		:ref:`calcLength<doxid-classaxl_1_1sl_1_1_string_details_impl_1a7735a73251012ab27f2eae82aa4f2bad>`(const T* p);
+	
+		static
+		size_t
+		:ref:`calcLength<doxid-classaxl_1_1sl_1_1_string_details_impl_1a92fb236f60e1e4e455e46507da447e14>`(
+			const T* p,
+			size_t maxLength
+			);
+	
+		static
+		int
+		:ref:`cmp<doxid-classaxl_1_1sl_1_1_string_details_impl_1a054155de13136f2a8ee44e7845f9c448>`(
+			const T* p1,
+			const T* p2,
+			size_t length
+			);
+	
+		static
+		size_t
+		:ref:`find<doxid-classaxl_1_1sl_1_1_string_details_impl_1ab093af78d4ec3f90dab3c27856aab8d4>`(
+			const T* p,
+			size_t length,
+			T c
+			);
+	
+		static
+		size_t
+		:ref:`find<doxid-classaxl_1_1sl_1_1_string_details_impl_1a3003920fa0fb3feacad4976f90ebedac>`(
+			const T* p,
+			size_t length,
+			const T* subString,
+			size_t subStringLength
+			);
+	
+		static
+		size_t
+		:ref:`findOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1a790963f8e89529229d097e9757176dde>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		size_t
+		:ref:`findNotOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1ae6f838e6e278b19d2d808be9195aad9e>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		size_t
+		:ref:`reverseFind<doxid-classaxl_1_1sl_1_1_string_details_impl_1a11a0e9620844673ae7d408b538bcfedc>`(
+			const T* p,
+			size_t length,
+			T c
+			);
+	
+		static
+		size_t
+		:ref:`reverseFind<doxid-classaxl_1_1sl_1_1_string_details_impl_1adf912022175277b4db32d80941d37b64>`(
+			const T* p,
+			size_t length,
+			const T* subString,
+			size_t subStringLength
+			);
+	
+		static
+		size_t
+		:ref:`reverseFindOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1adb8a3ddbf3eee510ec7d08147f4e4318>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		size_t
+		:ref:`reverseFindNotOneOf<doxid-classaxl_1_1sl_1_1_string_details_impl_1a6b52c44614402262cd79b1b92a94b53e>`(
+			const T* p,
+			size_t length,
+			const T* charSet,
+			size_t charCount
+			);
+	
+		static
+		void
+		:ref:`fill<doxid-classaxl_1_1sl_1_1_string_details_impl_1a4e7a12e700c1a24bc10e353145eafa68>`(
+			T* p,
+			T c,
+			size_t count
+			);
+	
+		static
+		void
+		:ref:`copy<doxid-classaxl_1_1sl_1_1_string_details_impl_1a1d8b0f8843cb84992ad1f2906f0bf2c5>`(
+			T* dst,
+			const T* src,
+			size_t length
+			);
+	
+		static
+		void
+		:ref:`move<doxid-classaxl_1_1sl_1_1_string_details_impl_1aeab9edce047e06375c1dd6be05a936d6>`(
+			T* dst,
+			const T* src,
+			size_t length
+			);
+

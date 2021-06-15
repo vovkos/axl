@@ -1,0 +1,91 @@
+.. index:: pair: class; axl::cry::Dh
+.. _doxid-classaxl_1_1cry_1_1_dh:
+
+class axl::cry::Dh
+==================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_Dh.h>
+	
+	class Dh: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// construction
+	
+		:target:`Dh<doxid-classaxl_1_1cry_1_1_dh_1aad37b1fba1fba97c6dfdbe32d868414e>`();
+
+		// methods
+	
+		bool
+		:target:`create<doxid-classaxl_1_1cry_1_1_dh_1a6a7321a9bccd093fe6d4ed92ddbdbce9>`();
+	
+		bool
+		:target:`create1024x160<doxid-classaxl_1_1cry_1_1_dh_1af22ef56b7e2b34782b67010f2430cf64>`();
+	
+		bool
+		:target:`create2048x224<doxid-classaxl_1_1cry_1_1_dh_1af5435b266fc24631e8c8a555f35bca9a>`();
+	
+		bool
+		:target:`create2048x256<doxid-classaxl_1_1cry_1_1_dh_1abadf3f4ede238c331b6237075ea00ecc>`();
+	
+		size_t
+		:target:`getSize<doxid-classaxl_1_1cry_1_1_dh_1ad744d4a03f8b94458bb91ecbf5c72772>`();
+	
+		bool
+		:target:`readParameters<doxid-classaxl_1_1cry_1_1_dh_1aeab1641fa647ccd2536c567e74b19f62>`(BIO* bio);
+	
+		bool
+		:target:`readParameters<doxid-classaxl_1_1cry_1_1_dh_1a8479a1478f5a09b877d0f30c07b6aa7a>`(
+			const void* pem,
+			size_t size
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

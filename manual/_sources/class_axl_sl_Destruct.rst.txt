@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::sl::Destruct
+.. _doxid-classaxl_1_1sl_1_1_destruct:
+
+template class axl::sl::Destruct
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Construct.h>
+	
+	template <typename T>
+	class Destruct
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_destruct_1ac8615a19b4d259a837e7637569ab6ec8>`(T* p) const;
+	};

@@ -1,0 +1,50 @@
+.. index:: pair: class; axl::enc::Base32Encoding_nj
+.. _doxid-classaxl_1_1enc_1_1_base32_encoding__nj:
+
+class axl::enc::Base32Encoding_nj
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Base32Encoding_nj.h>
+	
+	class Base32Encoding_nj
+	{
+	public:
+		// methods
+	
+		static
+		size_t
+		:target:`encode<doxid-classaxl_1_1enc_1_1_base32_encoding__nj_1ab2ccce67ec05eee7ad1ed057204bb193>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+			const void* p,
+			size_t size,
+			size_t hyphenDistance = 5
+			);
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`encode<doxid-classaxl_1_1enc_1_1_base32_encoding__nj_1afb5b6286a6ab04a28a6cbcf973312b9c>`(
+			const void* p,
+			size_t size,
+			size_t hyphenDistance = 5
+			);
+	
+		static
+		size_t
+		:target:`decode<doxid-classaxl_1_1enc_1_1_base32_encoding__nj_1ae7c6a02e359193cedcd747d8bd005b34>`(
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+			);
+	
+		static
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`decode<doxid-classaxl_1_1enc_1_1_base32_encoding__nj_1a25b61af62ee82ea1a2c296c6d6d82a72>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	};

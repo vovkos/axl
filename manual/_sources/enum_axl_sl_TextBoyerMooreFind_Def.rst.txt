@@ -1,0 +1,18 @@
+.. index:: pair: enum; Def
+.. _doxid-classaxl_1_1sl_1_1_text_boyer_moore_find_1a7939ecb67e6477786d600b24ebba3c2f:
+
+enum axl::sl::TextBoyerMooreFind::Def
+=====================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BoyerMooreFind.h>
+
+	enum Def
+	{
+	    :target:`Def_BadSkipTableSize<doxid-classaxl_1_1sl_1_1_text_boyer_moore_find_1a7939ecb67e6477786d600b24ebba3c2fa504513f960d59c41dfab157b43fa6ee4>` = 256,
+	};
+

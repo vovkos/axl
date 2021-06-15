@@ -1,0 +1,31 @@
+.. index:: pair: class; axl::mem::TrackingAllocate
+.. _doxid-classaxl_1_1mem_1_1_tracking_allocate:
+
+template class axl::mem::TrackingAllocate
+=========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Allocator.h>
+	
+	template <typename BaseAllocator>
+	class TrackingAllocate
+	{
+	public:
+		// methods
+	
+		void*
+		:target:`operator()<doxid-classaxl_1_1mem_1_1_tracking_allocate_1a2f24aa1fea7da1421fbd5857d62e0330>`(
+			size_t size,
+			const char* tag,
+			const char* filePath,
+			int line
+			) const;
+	};

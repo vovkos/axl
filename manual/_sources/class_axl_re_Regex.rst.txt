@@ -1,0 +1,47 @@
+.. index:: pair: class; axl::re::Regex
+.. _doxid-classaxl_1_1re_1_1_regex:
+
+class axl::re::Regex
+====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_re_Regex.h>
+	
+	class Regex
+	{
+	public:
+		// construction
+	
+		:target:`Regex<doxid-classaxl_1_1re_1_1_regex_1a4eae6842b025e4b276b8238fbc4ec054>`();
+
+		// methods
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1re_1_1_regex_1a073c9ce18272c0f807814b9b59f96418>`() const;
+	
+		size_t
+		:target:`getGroupCount<doxid-classaxl_1_1re_1_1_regex_1aaf9c9b8b57ceeed556efd5e86f18421d>`() const;
+	
+		const :ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<:ref:`DfaState<doxid-structaxl_1_1re_1_1_dfa_state>`>&
+		:target:`getDfaStateList<doxid-classaxl_1_1re_1_1_regex_1aae0f5c309da2a65f888e5bb9777544f7>`() const;
+	
+		const :ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`DfaState<doxid-structaxl_1_1re_1_1_dfa_state>`*>&
+		:target:`getDfaStateArray<doxid-classaxl_1_1re_1_1_regex_1a318122a5e19cd0d03dfda9a36e2a5110>`() const;
+	
+		void
+		:target:`clear<doxid-classaxl_1_1re_1_1_regex_1aa7cd05f7f5dc69af1a74543cf00e0964>`();
+	
+		bool
+		:target:`compile<doxid-classaxl_1_1re_1_1_regex_1ad8eb3ef17c6a250aa2ef81c84953ef2e>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& regexp);
+	
+		bool
+		:target:`match<doxid-classaxl_1_1re_1_1_regex_1ac857756e4ef416b75931b2b82853a30b>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	};

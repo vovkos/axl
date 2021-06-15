@@ -1,0 +1,342 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::cry::BnCtx &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::cry::CryptoError" href="class_axl_cry_CryptoError.html" />
+    <link rel="prev" title="class axl::cry::Bio" href="class_axl_cry_Bio.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_cry_VerifyAppStoreReceiptFlag.html">enum axl::cry::VerifyAppStoreReceiptFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_cry_AesKey.html">struct axl::cry::AesKey</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_cry_AppStoreIap.html">struct axl::cry::AppStoreIap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="struct_axl_cry_AppStoreReceipt.html">struct axl::cry::AppStoreReceipt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_AppStoreReceiptPayloadParser.html">class axl::cry::AppStoreReceiptPayloadParser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_BigNum.html">class axl::cry::BigNum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_Bio.html">class axl::cry::Bio</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">class axl::cry::BnCtx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_CryptoError.html">class axl::cry::CryptoError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_CryptoErrorProvider.html">class axl::cry::CryptoErrorProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_Dh.html">class axl::cry::Dh</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_EcKey.html">class axl::cry::EcKey</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_EcPoint.html">class axl::cry::EcPoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeBigNum.html">class axl::cry::FreeBigNum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeBio.html">class axl::cry::FreeBio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeBnCtx.html">class axl::cry::FreeBnCtx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeDh.html">class axl::cry::FreeDh</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeEcKey.html">class axl::cry::FreeEcKey</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeEcPoint.html">class axl::cry::FreeEcPoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreePkcs7.html">class axl::cry::FreePkcs7</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeRsa.html">class axl::cry::FreeRsa</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeX509.html">class axl::cry::FreeX509</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_FreeX509Store.html">class axl::cry::FreeX509Store</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_Pkcs7.html">class axl::cry::Pkcs7</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_Rsa.html">class axl::cry::Rsa</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_X509Cert.html">class axl::cry::X509Cert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_X509Error.html">class axl::cry::X509Error</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_X509ErrorProvider.html">class axl::cry::X509ErrorProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_cry_X509Store.html">class axl::cry::X509Store</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_cry.html">namespace axl::cry</a> &raquo;</li>
+        
+      <li>class axl::cry::BnCtx</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-cry-bnctx">
+<span id="doxid-classaxl-1-1cry-1-1-bn-ctx"></span><span id="index-0"></span><h1>class axl::cry::BnCtx</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_cry_BigNum.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nl">BnCtx</span><span class="p">:</span> <span class="k">public</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">axl::sl::Handle</span></a><span></span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// construction</span>
+
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cry-1-1-bn-ctx-1a822408f4be5b233e6989d2a99dd1a6b3"><span></span><span class="n">BnCtx</span></span><span></span><span class="p">();</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cry-1-1-bn-ctx-1abc37653b36bbaccb25c0a1b62ccdda1f"><span></span><span class="n">BnCtx</span></span><span></span><span class="p">(</span><span class="n">BN_CTX</span><span class="o">*</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cry-1-1-bn-ctx-1ad953da3265e1e7c6c208d0780922fb4d"><span></span><span class="n">start</span></span><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cry-1-1-bn-ctx-1a3242ce1f071c8bb5fa94108027352f34"><span></span><span class="n">end</span></span><span></span><span class="p">();</span>
+
+    <span class="n">BIGNUM</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1cry-1-1-bn-ctx-1accdba75fa360cd3a5e994bae3a7926a3"><span></span><span class="n">getBigNum</span></span><span></span><span class="p">();</span>
+<span class="p">};</span>
+</pre>
+<div class="section" id="inherited-members">
+<h2>Inherited Members</h2>
+<pre class="highlight doxyrest-overview-inherited-code-block literal-block">
+<span></span><span class="k">public</span><span class="o">:</span>
+    <span class="c1">// typedefs</span>
+
+    <span class="k">typedef</span> <span class="n">T</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a188765028bffca96ef6ed6638ce9f654"><span class="std std-ref">H</span></a><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ada6ac10b3fc0a5d2778b1dfc8adc6ca2"><span class="std std-ref">operator T</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0f0fad98719a4350af69d32a66d3e7ad"><span class="std std-ref">operator-&gt;</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="k">const</span> <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle"><span class="std std-ref">Handle</span></a><span></span><span class="o">&amp;</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a0a34799e733a133110e663af5c695bb2"><span class="std std-ref">operator=</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="kt">bool</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a88cceffbbd3a1caeffaa998ac9c0c616"><span class="std std-ref">isOpen</span></a><span></span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a4f4349dda184939edffd0c8229b20872"><span class="std std-ref">close</span></a><span></span><span class="p">();</span>
+
+    <span class="kt">void</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1a51e30365c2f9c7372a534dd776b1da9a"><span class="std std-ref">attach</span></a><span></span><span class="p">(</span><span class="n">T</span> <span class="n">h</span><span class="p">);</span>
+
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1aba1f7ac04018f2f403e94ddff96b7051"><span class="std std-ref">detach</span></a><span></span><span class="p">();</span>
+
+    <span class="n">T</span><span class="o">*</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1af56d375af50768cf2e1ea3ca06828db9"><span class="std std-ref">p</span></a><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="n">T</span>
+    <a class="reference internal" href="class_axl_sl_Handle.html#doxid-classaxl-1-1sl-1-1-handle-1ad0019f565f53583938191aafffb378e1"><span class="std std-ref">getInvalidHandle</span></a><span></span><span class="p">();</span>
+</pre>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_cry_CryptoError.html" class="btn btn-neutral float-right" title="class axl::cry::CryptoError" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_cry_Bio.html" class="btn btn-neutral float-left" title="class axl::cry::Bio" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

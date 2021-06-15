@@ -1,0 +1,84 @@
+.. index:: pair: class; axl::sl::ArrayDetails::Hdr
+.. _doxid-classaxl_1_1sl_1_1_array_details_1_1_hdr:
+
+class axl::sl::ArrayDetails::Hdr
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_ArrayDetails.h>
+	
+	class Hdr: public :ref:`axl::rc::BufHdr<doxid-structaxl_1_1rc_1_1_buf_hdr>`
+	{
+	public:
+		// fields
+	
+		size_t :target:`m_count<doxid-classaxl_1_1sl_1_1_array_details_1_1_hdr_1a41e429b573d46615f58073ca1ce04f52>`;
+
+		// construction
+	
+		:target:`~Hdr<doxid-classaxl_1_1sl_1_1_array_details_1_1_hdr_1abf10b22287fd18117257bd9716d3492b>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		size_t :ref:`m_bufferSize<doxid-structaxl_1_1rc_1_1_buf_hdr_1a9baca4794f4b8b0f2b0250477d3b5ebc>`;
+
+		// methods
+	
+		void
+		:ref:`prime<doxid-classaxl_1_1rc_1_1_ref_count_1a26ea26aa734060aab99644388c9a0355>`(
+			:ref:`RefCount<doxid-classaxl_1_1rc_1_1_ref_count>`* parent,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		size_t
+		:ref:`getRefCount<doxid-classaxl_1_1rc_1_1_ref_count_1a91967f1a0a3388b4f361ad6fd9ee190e>`();
+	
+		size_t
+		:ref:`getWeakRefCount<doxid-classaxl_1_1rc_1_1_ref_count_1a0a00ef60406b53b0f697dfdd1047749f>`();
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+		:ref:`getRefCountFlags<doxid-classaxl_1_1rc_1_1_ref_count_1aa0c963639ee678da338b5637fde50bf5>`();
+	
+		size_t
+		:ref:`addRef<doxid-classaxl_1_1rc_1_1_ref_count_1abc0e346ca3b89cae54460b5c2c6ef5d3>`();
+	
+		size_t
+		:ref:`release<doxid-classaxl_1_1rc_1_1_ref_count_1a78dcfd985a83fe28ae1c9367260c403d>`();
+	
+		size_t
+		:ref:`addWeakRef<doxid-classaxl_1_1rc_1_1_ref_count_1a11c893bdf47a314765c94306ae414cf8>`();
+	
+		size_t
+		:ref:`weakRelease<doxid-classaxl_1_1rc_1_1_ref_count_1ac68e4d27d37b4952bf360e207b6f5391>`();
+	
+		size_t
+		:ref:`addRefByWeakPtr<doxid-classaxl_1_1rc_1_1_ref_count_1a58de95baf561f92ee0ae65ac8d120de0>`();
+	
+		const void*
+		:ref:`cp<doxid-structaxl_1_1rc_1_1_buf_hdr_1a4f1ba5dbae877e32c504b3cc896ff358>`() const;
+	
+		const void*
+		:ref:`getEnd<doxid-structaxl_1_1rc_1_1_buf_hdr_1ae4bbb6cefeefe71fdb86fd3b583770d1>`() const;
+	
+		bool
+		:ref:`isInsideBuffer<doxid-structaxl_1_1rc_1_1_buf_hdr_1ad6891baa97fc3776030ad6704497f485>`(const void* p) const;
+	
+		size_t
+		:ref:`getLeftoverBufferSize<doxid-structaxl_1_1rc_1_1_buf_hdr_1a066b69eea8bd8578db1b7471175725e9>`(const void* p) const;
+

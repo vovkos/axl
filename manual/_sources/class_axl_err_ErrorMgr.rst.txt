@@ -1,0 +1,74 @@
+.. index:: pair: class; axl::err::ErrorMgr
+.. _doxid-classaxl_1_1err_1_1_error_mgr:
+
+class axl::err::ErrorMgr
+========================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_err_ErrorMgr_ThreadEntry.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_err_ErrorMgr.h>
+	
+	class ErrorMgr: public :ref:`axl::err::ErrorRouter<doxid-classaxl_1_1err_1_1_error_router>`
+	{
+	public:
+		// structs
+	
+		struct :ref:`ThreadEntry<doxid-structaxl_1_1err_1_1_error_mgr_1_1_thread_entry>`;
+
+		// construction
+	
+		:target:`ErrorMgr<doxid-classaxl_1_1err_1_1_error_mgr_1aa1f0d62bac4bfde3103bd8e3cd4250ed>`();
+
+		// methods
+	
+		void
+		:target:`registerProvider<doxid-classaxl_1_1err_1_1_error_mgr_1af855e7e372c8699ea30a42a3c22b8871>`(
+			const :ref:`sl::Guid<doxid-structaxl_1_1sl_1_1_guid>`& guid,
+			:ref:`ErrorProvider<doxid-classaxl_1_1err_1_1_error_provider>`* provider
+			);
+	
+		:ref:`ErrorProvider<doxid-classaxl_1_1err_1_1_error_provider>`*
+		:target:`findProvider<doxid-classaxl_1_1err_1_1_error_mgr_1ae55653200a7d204ea182dea549ec402c>`(const :ref:`sl::Guid<doxid-structaxl_1_1sl_1_1_guid>`& guid);
+	
+		:ref:`ErrorRouter<doxid-classaxl_1_1err_1_1_error_router>`*
+		:target:`getRouter<doxid-classaxl_1_1err_1_1_error_mgr_1a3513564bfc0fb555051b2678f5e85785>`();
+	
+		void
+		:target:`setRouter<doxid-classaxl_1_1err_1_1_error_mgr_1adffc26845f0224a823172dfbe3afb29e>`(:ref:`ErrorRouter<doxid-classaxl_1_1err_1_1_error_router>`* router);
+	
+		:ref:`ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`
+		:target:`getLastError<doxid-classaxl_1_1err_1_1_error_mgr_1ac903e411e2321c684a9422ca1feee2c9>`();
+	
+		void
+		:target:`setError<doxid-classaxl_1_1err_1_1_error_mgr_1a3d449f4bd28f1abaebbb3b6793280bcf>`(const :ref:`ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error);
+	
+		:ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`
+		:target:`getErrorDescription<doxid-classaxl_1_1err_1_1_error_mgr_1a7b8df3a8d39e606b4be0b1343edcb2d1>`(const :ref:`ErrorRef<doxid-classaxl_1_1err_1_1_error_ref>`& error);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		virtual
+		void
+		:ref:`routeError<doxid-classaxl_1_1err_1_1_error_router_1a9cbcb10484e8dbfdddb90ef4db524f8f>`(const :ref:`ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error) = 0;
+	
+		virtual
+		const char*
+		:ref:`routeErrorDescription<doxid-classaxl_1_1err_1_1_error_router_1af8037ef21d425730416715f863ad4277>`(const :ref:`ErrorHdr<doxid-structaxl_1_1err_1_1_error_hdr>`* error) = 0;
+

@@ -1,0 +1,59 @@
+.. index:: pair: class; axl::enc::AsciiToUtfConvert
+.. _doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert:
+
+template class axl::enc::AsciiToUtfConvert
+==========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Utf.h>
+	
+	template <
+		typename DstEncoding0,
+		typename CaseOp = sl::NoOp<utf32_t>
+		>
+	class AsciiToUtfConvert
+	{
+	public:
+		// typedefs
+	
+		typedef DstEncoding0 :target:`DstEncoding<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert_1a1deba47e2e189b9afe9b4aef416f4ab9>`;
+		typedef DstEncoding::C :target:`DstUnit<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert_1ad65c4e5a45bcfb0825d76c2e299189a8>`;
+
+		// methods
+	
+		static
+		size_t
+		:target:`calcRequiredLength<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert_1af16dfca36d0df95fec6c351217b5a042>`(
+			const char* p,
+			size_t length
+			);
+	
+		static
+		size_t
+		:target:`convert<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert_1ad5cc3d2c875c33c141c2b087d8e50b54>`(
+			:ref:`DstUnit<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert_1ad65c4e5a45bcfb0825d76c2e299189a8>`* dst,
+			size_t dstLength,
+			const char* src,
+			size_t srcLength,
+			size_t* takenSrcLength_o = NULL
+			);
+	
+		static
+		size_t
+		:target:`convert<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert_1af7e17e8eb37e72138bd0773fc9dfd9ae>`(
+			:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>`* cpl,
+			:ref:`DstUnit<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert_1ad65c4e5a45bcfb0825d76c2e299189a8>`* dst,
+			size_t dstLength,
+			const char* src,
+			size_t srcLength,
+			size_t* takenSrcLength_o = NULL
+			);
+	};

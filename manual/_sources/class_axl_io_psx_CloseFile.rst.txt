@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::psx::CloseFile
+.. _doxid-classaxl_1_1io_1_1psx_1_1_close_file:
+
+class axl::io::psx::CloseFile
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_psx_File.h>
+	
+	class CloseFile
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1psx_1_1_close_file_1a8f42dae7620a8ee821a9c55d0bac8618>`(int h);
+	};

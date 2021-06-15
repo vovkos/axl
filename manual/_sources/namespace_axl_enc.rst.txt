@@ -1,0 +1,194 @@
+.. index:: pair: namespace; axl::enc
+.. _doxid-namespaceaxl_1_1enc:
+
+namespace axl::enc
+==================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_enc_Base32EncodingFlag.rst
+	enum_axl_enc_Base64EncodingFlag.rst
+	enum_axl_enc_CharCodecKind.rst
+	enum_axl_enc_EscapeEncodingFlag.rst
+	enum_axl_enc_HexEncodingFlag.rst
+	enum_axl_enc_UtfKind.rst
+	class_axl_enc_AsciiCodec.rst
+	class_axl_enc_AsciiToUtfConvert.rst
+	class_axl_enc_Base32Encoding.rst
+	class_axl_enc_Base32Encoding_nj.rst
+	class_axl_enc_Base64Encoding.rst
+	class_axl_enc_CharCodec.rst
+	class_axl_enc_CodePointDecoder.rst
+	class_axl_enc_EscapeEncodingDynamic.rst
+	class_axl_enc_EscapeEncodingRoot.rst
+	class_axl_enc_EscapeEncodingUtf.rst
+	class_axl_enc_GetBase32Char.rst
+	class_axl_enc_GetBase64Char.rst
+	class_axl_enc_GetBase64UrlChar.rst
+	class_axl_enc_GetHexChar_l.rst
+	class_axl_enc_GetHexChar_u.rst
+	class_axl_enc_HexEncoding.rst
+	class_axl_enc_Utf16.rst
+	class_axl_enc_Utf16_be.rst
+	class_axl_enc_Utf32.rst
+	class_axl_enc_Utf32_be.rst
+	class_axl_enc_Utf8.rst
+	class_axl_enc_UtfCodec.rst
+	class_axl_enc_UtfConvert.rst
+	class_axl_enc_UtfToAsciiConvert.rst
+	class_axl_enc_UtfToCaseFolded.rst
+	class_axl_enc_UtfToLowerCase.rst
+	class_axl_enc_UtfToUpperCase.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace enc {
+
+	// typedefs
+
+	typedef :ref:`EscapeEncodingUtf<doxid-classaxl_1_1enc_1_1_escape_encoding_utf>`<char> :target:`EscapeEncoding<doxid-namespaceaxl_1_1enc_1a68ef85543bf5cd0724b566944631c70b>`;
+	typedef :ref:`EscapeEncodingUtf<doxid-classaxl_1_1enc_1_1_escape_encoding_utf>`<wchar_t> :target:`EscapeEncoding_w<doxid-namespaceaxl_1_1enc_1ad19de96c04d9d2cf753d33c5db418c88>`;
+	typedef :ref:`EscapeEncodingUtf<doxid-classaxl_1_1enc_1_1_escape_encoding_utf>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`EscapeEncoding_utf8<doxid-namespaceaxl_1_1enc_1ae98c285c9fedf693b838c79d6d0b1397>`;
+	typedef :ref:`EscapeEncodingUtf<doxid-classaxl_1_1enc_1_1_escape_encoding_utf>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`EscapeEncoding_utf16<doxid-namespaceaxl_1_1enc_1ae97dce6bebb54b80682b64bd59327ad9>`;
+	typedef :ref:`EscapeEncodingUtf<doxid-classaxl_1_1enc_1_1_escape_encoding_utf>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`EscapeEncoding_utf32<doxid-namespaceaxl_1_1enc_1ac1a753e2653516bf453111a072a8a335>`;
+
+	// enums
+
+	enum :ref:`Base32EncodingFlag<doxid-namespaceaxl_1_1enc_1abf6421412d7db32177155c8d35807bc0>`;
+	enum :ref:`Base64EncodingFlag<doxid-namespaceaxl_1_1enc_1a1d76bac16cbc2263548ba93025d70894>`;
+	enum :ref:`CharCodecKind<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670e>`;
+	enum :ref:`EscapeEncodingFlag<doxid-namespaceaxl_1_1enc_1a400df063cd3d660ee6d5831900d6291d>`;
+	enum :ref:`HexEncodingFlag<doxid-namespaceaxl_1_1enc_1aebce90a485ec30e7b6727e294d766f7b>`;
+	enum :ref:`UtfKind<doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5>`;
+
+	// classes
+
+	class :ref:`AsciiCodec<doxid-classaxl_1_1enc_1_1_ascii_codec>`;
+
+	template <
+		typename DstEncoding0,
+		typename CaseOp = sl::NoOp<utf32_t>
+		>
+	class :ref:`AsciiToUtfConvert<doxid-classaxl_1_1enc_1_1_ascii_to_utf_convert>`;
+
+	class :ref:`Base32Encoding<doxid-classaxl_1_1enc_1_1_base32_encoding>`;
+	class :ref:`Base32Encoding_nj<doxid-classaxl_1_1enc_1_1_base32_encoding__nj>`;
+	class :ref:`Base64Encoding<doxid-classaxl_1_1enc_1_1_base64_encoding>`;
+	class :ref:`CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`;
+	class :ref:`CodePointDecoder<doxid-classaxl_1_1enc_1_1_code_point_decoder>`;
+	class :ref:`EscapeEncodingDynamic<doxid-classaxl_1_1enc_1_1_escape_encoding_dynamic>`;
+	class :ref:`EscapeEncodingRoot<doxid-classaxl_1_1enc_1_1_escape_encoding_root>`;
+
+	template <typename T>
+	class :ref:`EscapeEncodingUtf<doxid-classaxl_1_1enc_1_1_escape_encoding_utf>`;
+
+	class :ref:`GetBase32Char<doxid-classaxl_1_1enc_1_1_get_base32_char>`;
+	class :ref:`GetBase64Char<doxid-classaxl_1_1enc_1_1_get_base64_char>`;
+	class :ref:`GetBase64UrlChar<doxid-classaxl_1_1enc_1_1_get_base64_url_char>`;
+	class :ref:`GetHexChar_l<doxid-classaxl_1_1enc_1_1_get_hex_char__l>`;
+	class :ref:`GetHexChar_u<doxid-classaxl_1_1enc_1_1_get_hex_char__u>`;
+	class :ref:`HexEncoding<doxid-classaxl_1_1enc_1_1_hex_encoding>`;
+	class :ref:`Utf16<doxid-classaxl_1_1enc_1_1_utf16>`;
+	class :ref:`Utf16_be<doxid-classaxl_1_1enc_1_1_utf16__be>`;
+	class :ref:`Utf32<doxid-classaxl_1_1enc_1_1_utf32>`;
+	class :ref:`Utf32_be<doxid-classaxl_1_1enc_1_1_utf32__be>`;
+	class :ref:`Utf8<doxid-classaxl_1_1enc_1_1_utf8>`;
+
+	template <typename T>
+	class :ref:`UtfCodec<doxid-classaxl_1_1enc_1_1_utf_codec>`;
+
+	template <
+		typename DstEncoding0,
+		typename SrcEncoding0,
+		typename CaseOp = sl::NoOp<utf32_t>
+		>
+	class :ref:`UtfConvert<doxid-classaxl_1_1enc_1_1_utf_convert>`;
+
+	template <
+		typename SrcEncoding0,
+		typename CaseOp = sl::NoOp<utf32_t>
+		>
+	class :ref:`UtfToAsciiConvert<doxid-classaxl_1_1enc_1_1_utf_to_ascii_convert>`;
+
+	class :ref:`UtfToCaseFolded<doxid-classaxl_1_1enc_1_1_utf_to_case_folded>`;
+	class :ref:`UtfToLowerCase<doxid-classaxl_1_1enc_1_1_utf_to_lower_case>`;
+	class :ref:`UtfToUpperCase<doxid-classaxl_1_1enc_1_1_utf_to_upper_case>`;
+
+	// global functions
+
+	:ref:`CharCodec<doxid-classaxl_1_1enc_1_1_char_codec>`*
+	:target:`getCharCodec<doxid-namespaceaxl_1_1enc_1a047d1cba92f0136d261f19627cacf967>`(:ref:`CharCodecKind<doxid-namespaceaxl_1_1enc_1ac71f276be81b8df2117319fd9f97670e>` codecKind);
+
+	size_t
+	:target:`uleb128<doxid-namespaceaxl_1_1enc_1a6f1de427331c3975f50b4975cc8535c5>`(
+		const void* p,
+		size_t size,
+		uint64_t* result = NULL
+		);
+
+	size_t
+	:target:`sleb128<doxid-namespaceaxl_1_1enc_1aa81310e8d0198c010e4685b642f63737>`(
+		const void* p,
+		size_t size,
+		int64_t* result = NULL
+		);
+
+	const char*
+	:target:`getUtfKindString<doxid-namespaceaxl_1_1enc_1aca29466f7454777590e9700be7831197>`(:ref:`UtfKind<doxid-namespaceaxl_1_1enc_1a12f6280a486b302cfeff8f58ec6643f5>` utfKind);
+
+	bool
+	:target:`utfIsPrintable<doxid-namespaceaxl_1_1enc_1ac8b920faad19450e06b901c80664bb33>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsPrintableNonMark<doxid-namespaceaxl_1_1enc_1ab02dbcf1184fd236531a4ccfcb5201b4>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsSpace<doxid-namespaceaxl_1_1enc_1a312b2f41945455a9001cfda351c7364e>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsPunctuation<doxid-namespaceaxl_1_1enc_1ae749f48cfbe338b2ad20a9f23e343da8>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsLetter<doxid-namespaceaxl_1_1enc_1a9a883f52294e0cdf852a8639ea1e194e>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsDigit<doxid-namespaceaxl_1_1enc_1a63c4dddbca2be1bfbbe90db3ca8b7f98>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsNumber<doxid-namespaceaxl_1_1enc_1a5ce33a79cb05fd6cefd2cf31d633c1c4>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsLetterOrDigit<doxid-namespaceaxl_1_1enc_1ac1d6195431d91efd09f26fdd03eb9d23>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsLetterOrNumber<doxid-namespaceaxl_1_1enc_1aaff9a45d29e8f5da31eace7a5f6b3895>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsLowerCase<doxid-namespaceaxl_1_1enc_1a8601c0e858928bd0639f7d61f603c300>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	bool
+	:target:`utfIsUpperCase<doxid-namespaceaxl_1_1enc_1aeeea0cc3edea255ddea321a20f575c2f>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`
+	:target:`utfToLowerCase<doxid-namespaceaxl_1_1enc_1a81cca86d0537b8d79445684f2e78d281>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`
+	:target:`utfToUpperCase<doxid-namespaceaxl_1_1enc_1a7f38dda3812a67c9ddf109241bdbb376>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`
+	:target:`utfToCaseFolded<doxid-namespaceaxl_1_1enc_1aec19d85cefc231a7f269b7fdb1d27b63>`(:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` c);
+
+	template <typename T>
+	size_t
+	:target:`calcUtfCodePointCount<doxid-namespaceaxl_1_1enc_1ab66217c46d10d8bd77e39fd96400c10d>`(
+		const typename T::C* p,
+		size_t length
+		);
+
+	} // namespace enc

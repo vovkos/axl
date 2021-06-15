@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::cry::FreeEcPoint
+.. _doxid-classaxl_1_1cry_1_1_free_ec_point:
+
+class axl::cry::FreeEcPoint
+===========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_EcPoint.h>
+	
+	class FreeEcPoint
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1cry_1_1_free_ec_point_1a14cc10a9a7d2aec10397f1d74cdb9154>`(EC_POINT* h);
+	};

@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::win::SizeOfSid
+.. _doxid-classaxl_1_1sys_1_1win_1_1_size_of_sid:
+
+class axl::sys::win::SizeOfSid
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_Sid.h>
+	
+	class SizeOfSid
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sys_1_1win_1_1_size_of_sid_1aa881bc3733cc8b567d876ab6bfa02e9c>`(const SID* sid);
+	};

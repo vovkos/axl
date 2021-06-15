@@ -1,0 +1,20 @@
+.. index:: pair: enum; HexEncodingFlag
+.. _doxid-namespaceaxl_1_1enc_1aebce90a485ec30e7b6727e294d766f7b:
+
+enum axl::enc::HexEncodingFlag
+==============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_HexEncoding.h>
+
+	enum HexEncodingFlag
+	{
+	    :target:`HexEncodingFlag_UpperCase<doxid-namespaceaxl_1_1enc_1aebce90a485ec30e7b6727e294d766f7ba84a705774cd8dc5203ae7f7bb4483178>` = 0x01,
+	    :target:`HexEncodingFlag_NoSpace<doxid-namespaceaxl_1_1enc_1aebce90a485ec30e7b6727e294d766f7babc0ff8e3bf7778816cf61ceb6cd9e0e3>`   = 0x02,
+	    :target:`HexEncodingFlag_Multiline<doxid-namespaceaxl_1_1enc_1aebce90a485ec30e7b6727e294d766f7ba7f5be702377bf258ae9d35e26c0d07d2>` = 0x04,
+	};
+

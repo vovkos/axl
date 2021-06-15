@@ -1,0 +1,23 @@
+.. index:: pair: struct; axl::sys::TlsMgr::Page
+.. _doxid-structaxl_1_1sys_1_1_tls_mgr_1_1_page:
+
+struct axl::sys::TlsMgr::Page
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct Page
+	{
+		// fields
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`sl::BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry>`<:ref:`TlsValue<doxid-namespaceaxl_1_1sys_1a3f3f51bbf35d0223f5d73049daee1c01>`>*> :target:`m_array<doxid-structaxl_1_1sys_1_1_tls_mgr_1_1_page_1a6af3016130788b5da61d5a4deeee49dd>`;
+		:ref:`sl::BoxList<doxid-classaxl_1_1sl_1_1_box_list>`<:ref:`TlsValue<doxid-namespaceaxl_1_1sys_1a3f3f51bbf35d0223f5d73049daee1c01>`> :target:`m_valueList<doxid-structaxl_1_1sys_1_1_tls_mgr_1_1_page_1a081079d054f4cd21967841a27e58846f>`;
+	};

@@ -1,0 +1,18 @@
+.. index:: pair: enum; SharedMemoryTransportFlag
+.. _doxid-namespaceaxl_1_1io_1a0e27cc2733fb67cca1061d311e55c4d1:
+
+enum axl::io::SharedMemoryTransportFlag
+=======================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SharedMemoryTransport.h>
+
+	enum SharedMemoryTransportFlag
+	{
+	    :target:`SharedMemoryTransportFlag_Message<doxid-namespaceaxl_1_1io_1a0e27cc2733fb67cca1061d311e55c4d1a558e2fcb83ac7af91bac2418d575e6b5>` = 0x010000,
+	};
+

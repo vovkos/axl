@@ -1,0 +1,20 @@
+.. index:: pair: enum; SerialFlowControl
+.. _doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1:
+
+enum axl::io::SerialFlowControl
+===============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SerialSettings.h>
+
+	enum SerialFlowControl
+	{
+	    :target:`SerialFlowControl_None<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1ae5f4c9047d3d83f12ad012094ce20627>`    = 0,
+	    :target:`SerialFlowControl_RtsCts<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1a5f63b8095f91e53921cd7dbd2f9cdc6b>`,
+	    :target:`SerialFlowControl_XonXoff<doxid-namespaceaxl_1_1io_1a3be7da781905f6a051454c24ffce70a1a624c96eba1ebe126f8b78a71a8b603ff>`,
+	};
+

@@ -1,0 +1,45 @@
+.. index:: pair: class; axl::sl::StdArrayList
+.. _doxid-classaxl_1_1sl_1_1_std_array_list:
+
+template class axl::sl::StdArrayList
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_ArrayList.h>
+	
+	template <typename T>
+	class StdArrayList
+	{
+	public:
+		// typedefs
+	
+		typedef :ref:`sl::Iterator<doxid-classaxl_1_1sl_1_1_iterator>`<T> :target:`Iterator<doxid-classaxl_1_1sl_1_1_std_array_list_1a22a56cdd5d70f9346d416e97fcae8bdf>`;
+
+		// methods
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1sl_1_1_std_array_list_1a13ef7a97064f8c453041f0eb7a8f5a16>`() const;
+	
+		size_t
+		:target:`getCount<doxid-classaxl_1_1sl_1_1_std_array_list_1ac44adb0984d79a22ca28e06112e70b14>`() const;
+	
+		:ref:`Iterator<doxid-classaxl_1_1sl_1_1_std_array_list_1a22a56cdd5d70f9346d416e97fcae8bdf>`
+		:target:`getHead<doxid-classaxl_1_1sl_1_1_std_array_list_1ac20944ce917ce0c73aa42e38cbc63eb9>`() const;
+	
+		:ref:`Iterator<doxid-classaxl_1_1sl_1_1_std_array_list_1a22a56cdd5d70f9346d416e97fcae8bdf>`
+		:target:`getTail<doxid-classaxl_1_1sl_1_1_std_array_list_1aa1c8c339b59817907a344343e241ecb4>`() const;
+	
+		T*
+		:target:`add<doxid-classaxl_1_1sl_1_1_std_array_list_1a99afd32eaeda35190d60268c5729377e>`();
+	
+		T*
+		:target:`get<doxid-classaxl_1_1sl_1_1_std_array_list_1ab723928312b9ad408ffd875289a370d3>`(size_t index);
+	};

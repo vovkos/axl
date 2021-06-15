@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>class axl::enc::Utf32 &mdash; AXL Reference</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/doxyrest-sphinx_rtd_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/target-highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class axl::enc::Utf32_be" href="class_axl_enc_Utf32_be.html" />
+    <link rel="prev" title="class axl::enc::Utf16_be" href="class_axl_enc_Utf16_be.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AXL Reference
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="global.html">Global Namespace</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="namespace_axl.html">namespace axl</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cf.html">namespace axl::cf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_cry.html">namespace axl::cry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_dox.html">namespace axl::dox</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="namespace_axl_enc.html">namespace axl::enc</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_enc_Base32EncodingFlag.html">enum axl::enc::Base32EncodingFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_enc_Base64EncodingFlag.html">enum axl::enc::Base64EncodingFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_enc_CharCodecKind.html">enum axl::enc::CharCodecKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_enc_EscapeEncodingFlag.html">enum axl::enc::EscapeEncodingFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_enc_HexEncodingFlag.html">enum axl::enc::HexEncodingFlag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="enum_axl_enc_UtfKind.html">enum axl::enc::UtfKind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_AsciiCodec.html">class axl::enc::AsciiCodec</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_AsciiToUtfConvert.html">template class axl::enc::AsciiToUtfConvert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_Base32Encoding.html">class axl::enc::Base32Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_Base32Encoding_nj.html">class axl::enc::Base32Encoding_nj</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_Base64Encoding.html">class axl::enc::Base64Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_CharCodec.html">class axl::enc::CharCodec</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_CodePointDecoder.html">class axl::enc::CodePointDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_EscapeEncodingDynamic.html">class axl::enc::EscapeEncodingDynamic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_EscapeEncodingRoot.html">class axl::enc::EscapeEncodingRoot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_EscapeEncodingUtf.html">template class axl::enc::EscapeEncodingUtf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_GetBase32Char.html">class axl::enc::GetBase32Char</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_GetBase64Char.html">class axl::enc::GetBase64Char</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_GetBase64UrlChar.html">class axl::enc::GetBase64UrlChar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_GetHexChar_l.html">class axl::enc::GetHexChar_l</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_GetHexChar_u.html">class axl::enc::GetHexChar_u</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_HexEncoding.html">class axl::enc::HexEncoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_Utf16.html">class axl::enc::Utf16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_Utf16_be.html">class axl::enc::Utf16_be</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">class axl::enc::Utf32</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_Utf32_be.html">class axl::enc::Utf32_be</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_Utf8.html">class axl::enc::Utf8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_UtfCodec.html">template class axl::enc::UtfCodec</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_UtfConvert.html">template class axl::enc::UtfConvert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_UtfToAsciiConvert.html">template class axl::enc::UtfToAsciiConvert</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_UtfToCaseFolded.html">class axl::enc::UtfToCaseFolded</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_UtfToLowerCase.html">class axl::enc::UtfToLowerCase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_axl_enc_UtfToUpperCase.html">class axl::enc::UtfToUpperCase</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_err.html">namespace axl::err</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_g.html">namespace axl::g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_gui.html">namespace axl::gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_ini.html">namespace axl::ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_io.html">namespace axl::io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_iok.html">namespace axl::iok</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lex.html">namespace axl::lex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_lua.html">namespace axl::lua</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_mem.html">namespace axl::mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_rc.html">namespace axl::rc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_re.html">namespace axl::re</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sec.html">namespace axl::sec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sl.html">namespace axl::sl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_spy.html">namespace axl::spy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_st.html">namespace axl::st</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_sys.html">namespace axl::sys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_xml.html">namespace axl::xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="namespace_axl_zip.html">namespace axl::zip</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_axl_va_list.html">class axl_va_list</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AXL Reference</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="global.html">Global Namespace</a> &raquo;</li>
+        
+          <li><a href="namespace_axl.html">namespace axl</a> &raquo;</li>
+        
+          <li><a href="namespace_axl_enc.html">namespace axl::enc</a> &raquo;</li>
+        
+      <li>class axl::enc::Utf32</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-axl-enc-utf32">
+<span id="doxid-classaxl-1-1enc-1-1-utf32"></span><span id="index-0"></span><h1>class axl::enc::Utf32</h1>
+<div class="toctree-wrapper compound">
+</div>
+<pre class="highlight doxyrest-overview-code-block literal-block">
+<span></span><span class="cp">#include</span> <span class="cpf">&lt;axl_enc_Utf.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="n">Utf32</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// typedefs</span>
+
+    <span class="k">typedef</span> <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span> <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1a1218af60eacf40c5990a0aa04fdcbbe1"><span></span><span class="n">C</span></span><span></span><span class="p">;</span>
+
+    <span class="c1">// methods</span>
+
+    <span class="k">static</span>
+    <a class="reference internal" href="enum_axl_enc_UtfKind.html#doxid-namespaceaxl-1-1enc-1a12f6280a486b302cfeff8f58ec6643f5"><span class="std std-ref">UtfKind</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1a89a950b919e85e9d8f0486edcc42865d"><span></span><span class="n">getUtfKind</span></span><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="k">const</span> <span class="kt">uint8_t</span><span class="o">*</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1afcda14ec8107b346d3adcb8cdb8ab6ad"><span></span><span class="n">getBom</span></span><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1ad72ad88365a86e181888fe878b832812"><span></span><span class="n">getBomLength</span></span><span></span><span class="p">();</span>
+
+    <span class="k">static</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1a2a17d60739a2fd995e205e3c3dea2de4"><span></span><span class="n">getDecodeCodePointLength</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span> <span class="n">c</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1af18e031d1b9993ce599b47ad9408d91f"><span></span><span class="n">getEncodeCodePointLength</span></span><span></span><span class="p">(</span><a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span> <span class="n">x</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1a2bdfe6ee2f9a8a9bca77cdac2739afe4"><span></span><span class="n">decodeCodePoint</span></span><span></span><span class="p">(</span><span class="k">const</span> <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">void</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1a25b0837b7a007b93078e39c0fa090e94"><span></span><span class="n">encodeCodePoint</span></span><span></span><span class="p">(</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <a class="reference internal" href="global.html#doxid-axl-g-2axl-g-pch-8h-1af41dd99b13a93c49aa9ce4461748356a"><span class="std std-ref">utf32_t</span></a><span></span> <span class="n">x</span>
+        <span class="p">);</span>
+
+    <span class="k">static</span>
+    <span class="kt">size_t</span>
+    <span class="doxyrest-code-target target" id="doxid-classaxl-1-1enc-1-1-utf32-1a6a97e8fe2e8ad143cb8b0d494234cc5f"><span></span><span class="n">calcCodePointCount</span></span><span></span><span class="p">(</span>
+        <span class="k">const</span> <a class="reference internal" href="#doxid-classaxl-1-1enc-1-1-utf32-1a1218af60eacf40c5990a0aa04fdcbbe1"><span class="std std-ref">C</span></a><span></span><span class="o">*</span> <span class="n">p</span><span class="p">,</span>
+        <span class="kt">size_t</span> <span class="n">length</span>
+        <span class="p">);</span>
+<span class="p">};</span>
+</pre>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="class_axl_enc_Utf32_be.html" class="btn btn-neutral float-right" title="class axl::enc::Utf32_be" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="class_axl_enc_Utf16_be.html" class="btn btn-neutral float-left" title="class axl::enc::Utf16_be" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2007-2021, Tibbo Technology Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

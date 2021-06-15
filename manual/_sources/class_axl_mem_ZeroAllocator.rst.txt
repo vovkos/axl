@@ -1,0 +1,44 @@
+.. index:: pair: class; axl::mem::ZeroAllocator
+.. _doxid-classaxl_1_1mem_1_1_zero_allocator:
+
+class axl::mem::ZeroAllocator
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_mem_Allocator.h>
+	
+	class ZeroAllocator: public :ref:`axl::mem::DirectAllocator<doxid-classaxl_1_1mem_1_1_direct_allocator>`
+	{
+	public:
+		// methods
+	
+		static
+		void*
+		:target:`allocate<doxid-classaxl_1_1mem_1_1_zero_allocator_1a3d4104ff2a2bb2ffbe18e879e4df78b4>`(size_t size);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		static
+		void*
+		:ref:`allocate<doxid-classaxl_1_1mem_1_1_direct_allocator_1a369c08addc2b4e424c18d46d4ce7222f>`(size_t size);
+	
+		static
+		void
+		:ref:`free<doxid-classaxl_1_1mem_1_1_direct_allocator_1aa95c153bf124f4661ff10888e793b17c>`(void* p);
+

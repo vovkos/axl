@@ -1,0 +1,117 @@
+.. index:: pair: class; axl::io::MappedFile
+.. _doxid-classaxl_1_1io_1_1_mapped_file:
+
+class axl::io::MappedFile
+=========================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_io_MappedFile_DefaultsKind.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_MappedFile.h>
+	
+	class MappedFile
+	{
+	public:
+		// enums
+	
+		enum :ref:`DefaultsKind<doxid-classaxl_1_1io_1_1_mapped_file_1a304ad65e73e6d304b29a5d8bf3f71f4b>`;
+
+		// construction
+	
+		:target:`MappedFile<doxid-classaxl_1_1io_1_1_mapped_file_1a00fe6d523bb2894a5f52b7a3b338480f>`();
+		:target:`~MappedFile<doxid-classaxl_1_1io_1_1_mapped_file_1aac3edcd1fabe2119bed2968194efd087>`();
+
+		// methods
+	
+		bool
+		:target:`isOpen<doxid-classaxl_1_1io_1_1_mapped_file_1a438126cdcc55ada4df5d4981d04acf30>`() const;
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+		:target:`getFlags<doxid-classaxl_1_1io_1_1_mapped_file_1ac042b86c70af934c676302995576e0a8>`() const;
+	
+		const :ref:`File<doxid-classaxl_1_1io_1_1_file>`*
+		:target:`getFile<doxid-classaxl_1_1io_1_1_mapped_file_1ae7aadfdbe227c4fd3a6b72d998462153>`() const;
+	
+		uint64_t
+		:target:`getSize<doxid-classaxl_1_1io_1_1_mapped_file_1a7e5205b832ad012c728c23cec310579c>`() const;
+	
+		bool
+		:target:`setSize<doxid-classaxl_1_1io_1_1_mapped_file_1ab0419c5168e68f618ee8eaf83c7a18c1>`(uint64_t size);
+	
+		void
+		:target:`close<doxid-classaxl_1_1io_1_1_mapped_file_1a5b69185a80622ca1d4b09392fd9a16ec>`();
+	
+		bool
+		:target:`open<doxid-classaxl_1_1io_1_1_mapped_file_1acefd94c1b88102e89f2208487c53b4c0>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		bool
+		:target:`duplicate<doxid-classaxl_1_1io_1_1_mapped_file_1a449dc97f63a5e77a9d14b4dc89738e01>`(
+			:ref:`File::Handle<doxid-classaxl_1_1io_1_1_file_1a42882ce983138a65b41c04e58c63b857>` fileHandle,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		bool
+		:target:`duplicate<doxid-classaxl_1_1io_1_1_mapped_file_1a90ee58c892ab7835e353f0941ec78812>`(
+			const :ref:`File<doxid-classaxl_1_1io_1_1_file>`* file,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		void
+		:target:`attach<doxid-classaxl_1_1io_1_1_mapped_file_1aac65d9779499f0867080b9eed2e9cdcd>`(
+			:ref:`File::Handle<doxid-classaxl_1_1io_1_1_file_1a42882ce983138a65b41c04e58c63b857>` fileHandle,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		:ref:`File::Handle<doxid-classaxl_1_1io_1_1_file_1a42882ce983138a65b41c04e58c63b857>`
+		:target:`detach<doxid-classaxl_1_1io_1_1_mapped_file_1a64e27e9c4c011d14b0183405be8a6e25>`();
+	
+		bool
+		:target:`setup<doxid-classaxl_1_1io_1_1_mapped_file_1aba5a3ead9846ad90262c5801f1fbd0ac>`(
+			size_t maxDynamicViewCount,
+			size_t readAheadSize
+			);
+	
+		const void*
+		:target:`view<doxid-classaxl_1_1io_1_1_mapped_file_1a0f900b1717e95df3177d4f609860632d>`(
+			uint64_t offset = 0,
+			size_t size = 0,
+			bool isPermanent = false
+			) const;
+	
+		void*
+		:target:`view<doxid-classaxl_1_1io_1_1_mapped_file_1a4240c589341eeebfa223fd82a7024b3c>`(
+			uint64_t offset = 0,
+			size_t size = 0,
+			bool isPermanent = false
+			);
+	
+		const void*
+		:target:`view<doxid-classaxl_1_1io_1_1_mapped_file_1aec1abdb38086b97c2eaf8d65c9a95f6f>`(
+			uint64_t offset,
+			size_t size,
+			size_t* actualSize,
+			bool isPermanent = false
+			) const;
+	
+		void*
+		:target:`view<doxid-classaxl_1_1io_1_1_mapped_file_1aaa21c8cbfa859f4011dce77fd0a744a3>`(
+			uint64_t offset,
+			size_t size,
+			size_t* actualSize,
+			bool isPermanent = false
+			);
+	
+		void
+		:target:`unmapAllViews<doxid-classaxl_1_1io_1_1_mapped_file_1a1f82d0e4f021280510e30bf05fa55e5c>`();
+	};

@@ -1,0 +1,105 @@
+.. index:: pair: class; axl::rc::Buf
+.. _doxid-classaxl_1_1rc_1_1_buf:
+
+template class axl::rc::Buf
+===========================
+
+.. toctree::
+	:hidden:
+
+	class_axl_rc_Buf_Hdr.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_rc_Buf.h>
+	
+	template <
+		typename T,
+		typename SizeOf = sl::SizeOf<T>,
+		typename Ref = BufRef<T, SizeOf>
+		>
+	class Buf: public Ref
+	{
+	public:
+		// classes
+	
+		class :ref:`Hdr<doxid-classaxl_1_1rc_1_1_buf_1_1_hdr>`;
+
+		// construction
+	
+		:target:`Buf<doxid-classaxl_1_1rc_1_1_buf_1a18cf84dae2e6bae1992a2092c73f16d1>`();
+		:target:`Buf<doxid-classaxl_1_1rc_1_1_buf_1a623f63ac1e8434f21059de125288fd33>`(const Buf& src);
+		:target:`Buf<doxid-classaxl_1_1rc_1_1_buf_1a7f8b62e9b116af11e984df57d3763c84>`(const Ref& src);
+	
+		:target:`Buf<doxid-classaxl_1_1rc_1_1_buf_1a39cf26e8b8acc06a66e7e5504ede9772>`(
+			const T* src,
+			size_t size = -1
+			);
+	
+		:target:`Buf<doxid-classaxl_1_1rc_1_1_buf_1ae45ac8ebb91133c3575b052e9892e5cc>`(
+			:ref:`BufKind<doxid-namespaceaxl_1_1rc_1a26a3b8c02d23ba7102e57659d211c077>` kind,
+			void* p,
+			size_t size
+			);
+
+		// methods
+	
+		:target:`operator const T *<doxid-classaxl_1_1rc_1_1_buf_1a901c3da88531006fad642c43502a1b59>`() const;
+		:target:`operator T *<doxid-classaxl_1_1rc_1_1_buf_1ae6d15997ab5039e690c867958ac721e7>`();
+	
+		const T*
+		:target:`operator-><doxid-classaxl_1_1rc_1_1_buf_1a8ef346fb761fae112588a6dc68880b63>`() const;
+	
+		T*
+		:target:`operator-><doxid-classaxl_1_1rc_1_1_buf_1ab8a9b415a06ef1419113d6799c25fc91>`();
+	
+		Buf&
+		:target:`operator=<doxid-classaxl_1_1rc_1_1_buf_1ab98bb427e2f8c68d892455ce51477993>`(const Buf& src);
+	
+		Buf&
+		:target:`operator=<doxid-classaxl_1_1rc_1_1_buf_1a051d080dcafec8fb9eea9022b6acdf16>`(const Ref& src);
+	
+		Buf&
+		:target:`operator=<doxid-classaxl_1_1rc_1_1_buf_1afa8aaba677a3bfd8fe8c69e53c1b3f2b>`(const T* p);
+	
+		T*
+		:target:`p<doxid-classaxl_1_1rc_1_1_buf_1a3acd708e697680c9a462d633b7ffbd78>`();
+	
+		void
+		:target:`clear<doxid-classaxl_1_1rc_1_1_buf_1a416e08bf07c6f985fe151e1cb889ccd9>`();
+	
+		size_t
+		:target:`copy<doxid-classaxl_1_1rc_1_1_buf_1a3c11609545193ec2c523b0c0a4336e99>`(const Ref& src);
+	
+		size_t
+		:target:`copy<doxid-classaxl_1_1rc_1_1_buf_1ad8196a280725e5769b460b721a652c42>`(
+			const T* p,
+			size_t size = -1
+			);
+	
+		bool
+		:target:`isExclusive<doxid-classaxl_1_1rc_1_1_buf_1a8c7ec1a9331f1d4e0fb58d7f8eb9cc67>`();
+	
+		bool
+		:target:`ensureExclusive<doxid-classaxl_1_1rc_1_1_buf_1ae2b6362eb02b5e9978276b8993f9d425>`();
+	
+		T*
+		:target:`getBuffer<doxid-classaxl_1_1rc_1_1_buf_1a687da6fd4a45e547041a17c6365718d5>`(size_t* size = NULL);
+	
+		T*
+		:target:`createBuffer<doxid-classaxl_1_1rc_1_1_buf_1a9b0f8092f48e1a89abbdc444ff1cf9f1>`(
+			size_t size = sizeof(T),
+			bool saveContents = false
+			);
+	
+		size_t
+		:target:`setBuffer<doxid-classaxl_1_1rc_1_1_buf_1a1d9cda532e74e030332036c072fc4aea>`(
+			:ref:`BufKind<doxid-namespaceaxl_1_1rc_1a26a3b8c02d23ba7102e57659d211c077>` kind,
+			void* p,
+			size_t size
+			);
+	};

@@ -1,0 +1,21 @@
+.. index:: pair: enum; MouseButton
+.. _doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41c:
+
+enum axl::gui::MouseButton
+==========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Def.h>
+
+	enum MouseButton
+	{
+	    :target:`MouseButton_None<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41ca4cc9a35ed54c81ce7b1242e2c657b94e>`   = 0x00,
+	    :target:`MouseButton_Left<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41ca9aec39f2ba10229ec75ee270e9b4f5b3>`   = 0x01,
+	    :target:`MouseButton_Right<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41cab4b97c64c244588c20b2e93aac61a4e0>`  = 0x02,
+	    :target:`MouseButton_Medium<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41ca82c92306062cc12a28cbf534d91b01cb>` = 0x04,
+	};
+

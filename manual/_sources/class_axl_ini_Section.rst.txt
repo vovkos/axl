@@ -1,0 +1,47 @@
+.. index:: pair: class; axl::ini::Section
+.. _doxid-classaxl_1_1ini_1_1_section:
+
+class axl::ini::Section
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_ini_GenericParser.h>
+	
+	class Section: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+	public:
+		// methods
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:target:`getName<doxid-classaxl_1_1ini_1_1_section_1a16b8cd49ce4119c4eb35acb39ab166cc>`();
+	
+		:ref:`NamedValue<doxid-classaxl_1_1ini_1_1_named_value>`*
+		:target:`getNamedValue<doxid-classaxl_1_1ini_1_1_section_1a537fe16e4ee5f6493454ff2ca4b88611>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& name) const;
+	
+		:ref:`sl::ConstBoxList<doxid-classaxl_1_1sl_1_1_const_box_list>`<:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`>
+		:target:`getUnnamedValueList<doxid-classaxl_1_1ini_1_1_section_1a8dc78f53086e893d732f2a039f4f2d1f>`() const;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

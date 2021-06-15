@@ -1,0 +1,18 @@
+.. index:: pair: enum; TokenChannelMask
+.. _doxid-namespaceaxl_1_1lex_1a01d68a76f43a322ad7d770c3f99cd92d:
+
+enum axl::lex::TokenChannelMask
+===============================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_lex_Token.h>
+
+	enum TokenChannelMask
+	{
+	    :target:`TokenChannelMask_Main<doxid-namespaceaxl_1_1lex_1a01d68a76f43a322ad7d770c3f99cd92da32289de077d23022580710685b21466b>` = 0x01,
+	};
+

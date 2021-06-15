@@ -1,0 +1,42 @@
+.. index:: pair: struct; axl::gui::WidgetMouseMsg
+.. _doxid-structaxl_1_1gui_1_1_widget_mouse_msg:
+
+struct axl::gui::WidgetMouseMsg
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	struct WidgetMouseMsg: public :ref:`axl::gui::WidgetMsg<doxid-structaxl_1_1gui_1_1_widget_msg>`
+	{
+		// fields
+	
+		:ref:`Point<doxid-structaxl_1_1gui_1_1_point>` :target:`m_point<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1a1f2e71e236fa8bed9c05dff488984851>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_buttons<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1ae528d8f2d6c3b379f4eb830975f5ccee>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_modifierKeys<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1aad910e5d827e460a7d0dcb063a0ebdb0>`;
+		:ref:`MouseButton<doxid-namespaceaxl_1_1gui_1a2a407bcd673c030991f190701a84f41c>` :target:`m_button<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1a482bc726ba5295051f035c3a746d7e1f>`;
+
+		// construction
+	
+		:target:`WidgetMouseMsg<doxid-structaxl_1_1gui_1_1_widget_mouse_msg_1a8c34586424a8df292aa308ce3c32096b>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` :ref:`m_msgCode<doxid-structaxl_1_1gui_1_1_widget_msg_1a53c70210a5ed27e06bbd68bcda502bf0>`;
+

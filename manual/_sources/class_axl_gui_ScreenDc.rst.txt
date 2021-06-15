@@ -1,0 +1,29 @@
+.. index:: pair: class; axl::gui::ScreenDc
+.. _doxid-classaxl_1_1gui_1_1_screen_dc:
+
+class axl::gui::ScreenDc
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_GdiCanvas.h>
+	
+	class ScreenDc
+	{
+	public:
+		// construction
+	
+		:target:`ScreenDc<doxid-classaxl_1_1gui_1_1_screen_dc_1a6277297f48504520b237a21901215e77>`();
+		:target:`~ScreenDc<doxid-classaxl_1_1gui_1_1_screen_dc_1a7ebbf62a2ef3bd91d0799adad5063b7e>`();
+
+		// methods
+	
+		:target:`operator HDC<doxid-classaxl_1_1gui_1_1_screen_dc_1a5688c77924ef9592338a68267fee05cc>`();
+	};

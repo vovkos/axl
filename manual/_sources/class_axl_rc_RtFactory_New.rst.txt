@@ -1,0 +1,28 @@
+.. index:: pair: class; axl::rc::RtFactory::New
+.. _doxid-classaxl_1_1rc_1_1_rt_factory_1_1_new:
+
+class axl::rc::RtFactory::New
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_rc_RtFactory.h>
+	
+	class New
+	{
+	public:
+		// methods
+	
+		:ref:`Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<void>
+		:target:`operator()<doxid-classaxl_1_1rc_1_1_rt_factory_1_1_new_1a87e3c93dce2329902eaf08701a3cd1c8>`(
+			obj::IType* type,
+			size_t extra = 0
+			) const;
+	};

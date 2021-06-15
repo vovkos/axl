@@ -1,0 +1,38 @@
+.. index:: pair: struct; axl::g::Module::FinalizerEntry
+.. _doxid-structaxl_1_1g_1_1_module_1_1_finalizer_entry:
+
+struct axl::g::Module::FinalizerEntry
+=====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct FinalizerEntry: public :ref:`axl::sl::ListLink<doxid-structaxl_1_1sl_1_1_list_link>`
+	{
+		// fields
+	
+		:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`Finalizer<doxid-classaxl_1_1g_1_1_finalizer>`> :target:`m_finalizer<doxid-structaxl_1_1g_1_1_module_1_1_finalizer_entry_1a8dccf84ea3d497ddc99083b64fa38b20>`;
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+

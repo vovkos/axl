@@ -1,0 +1,37 @@
+.. index:: pair: class; axl::sl::ProtoPeer
+.. _doxid-classaxl_1_1sl_1_1_proto_peer:
+
+template class axl::sl::ProtoPeer
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Protocol.h>
+	
+	template <typename T>
+	class ProtoPeer
+	{
+	public:
+		// methods
+	
+		void
+		:target:`sendMsg<doxid-classaxl_1_1sl_1_1_proto_peer_1aaf2389c17395deac63e24571e976e8a0>`(
+			const void* p,
+			size_t size
+			);
+	
+		void
+		:target:`sendMsg<doxid-classaxl_1_1sl_1_1_proto_peer_1ab6cd8fc674304df1304a751f0547a279>`(
+			const void* p,
+			size_t size,
+			const void* extra,
+			size_t extraSize
+			);
+	};

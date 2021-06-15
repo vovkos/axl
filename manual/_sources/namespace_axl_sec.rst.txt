@@ -1,0 +1,54 @@
+.. index:: pair: namespace; axl::sec
+.. _doxid-namespaceaxl_1_1sec:
+
+namespace axl::sec
+==================
+
+.. toctree::
+	:hidden:
+
+	class_axl_sec_Code.rst
+	class_axl_sec_Error.rst
+	class_axl_sec_ErrorProvider.rst
+	class_axl_sec_StaticCode.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace sec {
+
+	// classes
+
+	class :ref:`Code<doxid-classaxl_1_1sec_1_1_code>`;
+	class :ref:`Error<doxid-classaxl_1_1sec_1_1_error>`;
+	class :ref:`ErrorProvider<doxid-classaxl_1_1sec_1_1_error_provider>`;
+	class :ref:`StaticCode<doxid-classaxl_1_1sec_1_1_static_code>`;
+
+	// global functions
+
+	:target:`AXL_SL_DEFINE_GUID<doxid-namespaceaxl_1_1sec_1a06281efd05089e391ff0926635f5193a>`(
+		g_errorGuid,
+		0x9a5e82f3,
+		0xda70,
+		0x4177,
+		0xa3,
+		0xb9,
+		0x00,
+		0x30,
+		0xa2,
+		0x3b,
+		0x90,
+		0xdc
+		);
+
+	void
+	:target:`registerErrorProvider<doxid-namespaceaxl_1_1sec_1a98f41bc122dd25888d8aee1cd0ff048f>`();
+
+	bool
+	:target:`completeWithOsStatus<doxid-namespaceaxl_1_1sec_1a5516903fd220ce7878899895cbc389c7>`(OSStatus status);
+
+	} // namespace sec

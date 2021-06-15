@@ -1,0 +1,28 @@
+.. index:: pair: class; axl::sl::ArrayDetails::Construct
+.. _doxid-classaxl_1_1sl_1_1_array_details_1_1_construct:
+
+class axl::sl::ArrayDetails::Construct
+======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_ArrayDetails.h>
+	
+	class Construct
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_array_details_1_1_construct_1a58040db98e9c5ed0671053883f4e68a4>`(
+			T* p,
+			size_t count
+			) const;
+	};

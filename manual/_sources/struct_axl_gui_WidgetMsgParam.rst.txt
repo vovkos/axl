@@ -1,0 +1,45 @@
+.. index:: pair: struct; axl::gui::WidgetMsgParam
+.. _doxid-structaxl_1_1gui_1_1_widget_msg_param:
+
+template struct axl::gui::WidgetMsgParam
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	template <typename T>
+	struct WidgetMsgParam: public :ref:`axl::gui::WidgetMsg<doxid-structaxl_1_1gui_1_1_widget_msg>`
+	{
+		// fields
+	
+		T :target:`m_param<doxid-structaxl_1_1gui_1_1_widget_msg_param_1adc8f02d0dd59abd3195485daa03d3c71>`;
+
+		// construction
+	
+		:target:`WidgetMsgParam<doxid-structaxl_1_1gui_1_1_widget_msg_param_1afb8d90d49d93785e79a502c5c13d446f>`();
+	
+		:target:`WidgetMsgParam<doxid-structaxl_1_1gui_1_1_widget_msg_param_1a6bb9cd28755eb67088b3b8577eabea36>`(
+			:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` msgCode,
+			const T& param
+			);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` :ref:`m_msgCode<doxid-structaxl_1_1gui_1_1_widget_msg_1a53c70210a5ed27e06bbd68bcda502bf0>`;
+

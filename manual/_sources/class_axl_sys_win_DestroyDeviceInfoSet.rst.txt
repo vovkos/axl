@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sys::win::DestroyDeviceInfoSet
+.. _doxid-classaxl_1_1sys_1_1win_1_1_destroy_device_info_set:
+
+class axl::sys::win::DestroyDeviceInfoSet
+=========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_win_DeviceInfo.h>
+	
+	class DestroyDeviceInfoSet
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sys_1_1win_1_1_destroy_device_info_set_1a1633a33093dcd489c5154d5749e520e3>`(HDEVINFO h);
+	};

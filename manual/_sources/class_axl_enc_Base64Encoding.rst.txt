@@ -1,0 +1,50 @@
+.. index:: pair: class; axl::enc::Base64Encoding
+.. _doxid-classaxl_1_1enc_1_1_base64_encoding:
+
+class axl::enc::Base64Encoding
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Base64Encoding.h>
+	
+	class Base64Encoding
+	{
+	public:
+		// methods
+	
+		static
+		size_t
+		:target:`encode<doxid-classaxl_1_1enc_1_1_base64_encoding_1a2fe4b9be0748302bfd07de63509ba2ab>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* string,
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		static
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:target:`encode<doxid-classaxl_1_1enc_1_1_base64_encoding_1a495a97ec8bcb2e264e1ee5c08ae3ada9>`(
+			const void* p,
+			size_t size,
+			:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags = 0
+			);
+	
+		static
+		size_t
+		:target:`decode<doxid-classaxl_1_1enc_1_1_base64_encoding_1ad8ea2216f82b4307c26304aab99e6413>`(
+			:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string
+			);
+	
+		static
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`decode<doxid-classaxl_1_1enc_1_1_base64_encoding_1ac292d2642fd766ebb849824c3969fa9c>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	};

@@ -1,0 +1,41 @@
+.. index:: pair: struct; axl::gui::WidgetKeyMsg
+.. _doxid-structaxl_1_1gui_1_1_widget_key_msg:
+
+struct axl::gui::WidgetKeyMsg
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Widget.h>
+	
+	struct WidgetKeyMsg: public :ref:`axl::gui::WidgetMsg<doxid-structaxl_1_1gui_1_1_widget_msg>`
+	{
+		// fields
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_key<doxid-structaxl_1_1gui_1_1_widget_key_msg_1a453481b4013bda24fa62db7b6987d908>`;
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` :target:`m_modifierKeys<doxid-structaxl_1_1gui_1_1_widget_key_msg_1a0567049d4cf03ffcca2dc650eb752dea>`;
+		:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>` :target:`m_char<doxid-structaxl_1_1gui_1_1_widget_key_msg_1a57a8545acce1b0dd6b30ec68f5d84f14>`;
+
+		// construction
+	
+		:target:`WidgetKeyMsg<doxid-structaxl_1_1gui_1_1_widget_key_msg_1a7a01c8f4a0170bc3d04d88496fb8c629>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`WidgetMsgCode<doxid-namespaceaxl_1_1gui_1a6b8b08710f3fc02c9253871b2312eb1a>` :ref:`m_msgCode<doxid-structaxl_1_1gui_1_1_widget_msg_1a53c70210a5ed27e06bbd68bcda502bf0>`;
+

@@ -1,0 +1,43 @@
+.. index:: pair: class; axl::sl::CompareMapEntryKey
+.. _doxid-classaxl_1_1sl_1_1_compare_map_entry_key:
+
+template class axl::sl::CompareMapEntryKey
+==========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_MapEntry.h>
+	
+	template <
+		typename Key,
+		typename Value,
+		typename Compare
+		>
+	class CompareMapEntryKey
+	{
+	public:
+		// construction
+	
+		:target:`CompareMapEntryKey<doxid-classaxl_1_1sl_1_1_compare_map_entry_key_1a630407e811b479e1c9e409b64542eec2>`(Compare compare);
+
+		// methods
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_compare_map_entry_key_1ac9bd450af01afe4a74cbbe3a70fdadbe>`(
+			const :ref:`MapEntry<doxid-structaxl_1_1sl_1_1_map_entry>`<Key, Value>& entry1,
+			const :ref:`MapEntry<doxid-structaxl_1_1sl_1_1_map_entry>`<Key, Value>& entry2
+			) const;
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_compare_map_entry_key_1a696ad8117e793067eede1231a9a17e0d>`(
+			const :ref:`MapEntry<doxid-structaxl_1_1sl_1_1_map_entry>`<Key, Value>* entry1,
+			const :ref:`MapEntry<doxid-structaxl_1_1sl_1_1_map_entry>`<Key, Value>* entry2
+			) const;
+	};

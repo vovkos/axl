@@ -1,0 +1,30 @@
+.. index:: pair: class; axl::sl::UnpackPtr
+.. _doxid-classaxl_1_1sl_1_1_unpack_ptr:
+
+template class axl::sl::UnpackPtr
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Unpacker.h>
+	
+	template <typename T>
+	class UnpackPtr
+	{
+	public:
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_unpack_ptr_1ab1b5afec1e0adf7fa4482ac39d4d6d2e>`(
+			const void* p,
+			size_t size,
+			T** value
+			);
+	};

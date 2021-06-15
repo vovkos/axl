@@ -1,0 +1,26 @@
+.. index:: pair: class; axl::rc::Release
+.. _doxid-classaxl_1_1rc_1_1_release:
+
+template class axl::rc::Release
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_rc_RefCount.h>
+	
+	template <typename T>
+	class Release
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1rc_1_1_release_1a028517dd7a16ac11caccff7e086428b0>`(T* p) const;
+	};

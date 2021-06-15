@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::FreeSslCtx
+.. _doxid-classaxl_1_1io_1_1_free_ssl_ctx:
+
+class axl::io::FreeSslCtx
+=========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SslCtx.h>
+	
+	class FreeSslCtx
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1_free_ssl_ctx_1afd31bb4255f87fe545aa43397e5eb6a2>`(SSL_CTX* h);
+	};

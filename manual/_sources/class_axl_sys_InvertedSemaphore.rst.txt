@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sys::InvertedSemaphore
+.. _doxid-classaxl_1_1sys_1_1_inverted_semaphore:
+
+class axl::sys::InvertedSemaphore
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sys_InvertedSemaphore.h>
+	
+	class InvertedSemaphore: public NotificationEvent
+	{
+	public:
+		// construction
+	
+		:target:`InvertedSemaphore<doxid-classaxl_1_1sys_1_1_inverted_semaphore_1aa05f510118f47a78231e5c4756c9a4fb>`(intptr_t count = 0);
+
+		// methods
+	
+		void
+		:target:`set<doxid-classaxl_1_1sys_1_1_inverted_semaphore_1a1d61e95829d79c78de3336b78e5bd0ba>`(intptr_t count);
+	
+		void
+		:target:`add<doxid-classaxl_1_1sys_1_1_inverted_semaphore_1a09f7c048cb841a1d1d973a798adeb9a7>`(intptr_t delta);
+	};

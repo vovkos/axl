@@ -1,0 +1,2036 @@
+.. index:: pair: namespace; axl::sl
+.. _doxid-namespaceaxl_1_1sl:
+
+namespace axl::sl
+=================
+
+.. toctree::
+	:hidden:
+
+	enum_axl_sl_BinTreeFindRelOp.rst
+	enum_axl_sl_BitOpKind.rst
+	enum_axl_sl_BoyerMooreFlag.rst
+	enum_axl_sl_CaseConvertMethod.rst
+	enum_axl_sl_GuidStringFlag.rst
+	enum_axl_sl_RbColor.rst
+	enum_axl_sl_TextBoyerMooreFlag.rst
+	struct_axl_sl_BinTreeNodeBase.rst
+	struct_axl_sl_Guid.rst
+	struct_axl_sl_HashTableEntry.rst
+	struct_axl_sl_ListData.rst
+	struct_axl_sl_ListLink.rst
+	struct_axl_sl_MapEntry.rst
+	struct_axl_sl_ProtoMsg.rst
+	struct_axl_sl_ProtoMsg_1.rst
+	struct_axl_sl_ProtoMsg_2.rst
+	struct_axl_sl_ProtoMsg_3.rst
+	struct_axl_sl_ProtoMsg_4.rst
+	struct_axl_sl_SwitchInfo.rst
+	class_axl_sl_AbstractProtoPeer.rst
+	class_axl_sl_Add.rst
+	class_axl_sl_And.rst
+	class_axl_sl_ArgType.rst
+	class_axl_sl_ArgType-2.rst
+	class_axl_sl_ArgType-3.rst
+	class_axl_sl_ArgType-4.rst
+	class_axl_sl_ArgType-5.rst
+	class_axl_sl_ArgType-6.rst
+	class_axl_sl_ArgType-7.rst
+	class_axl_sl_ArgType-8.rst
+	class_axl_sl_ArgType-9.rst
+	class_axl_sl_ArgType-10.rst
+	class_axl_sl_ArgType-11.rst
+	class_axl_sl_ArgType-12.rst
+	class_axl_sl_ArgType-13.rst
+	class_axl_sl_ArgType-14.rst
+	class_axl_sl_ArgType-15.rst
+	class_axl_sl_ArgType-16.rst
+	class_axl_sl_ArgType-17.rst
+	class_axl_sl_Array.rst
+	class_axl_sl_ArrayDetails.rst
+	class_axl_sl_ArrayDetails-2.rst
+	class_axl_sl_ArrayDetails-3.rst
+	class_axl_sl_ArrayDetails-4.rst
+	class_axl_sl_ArrayDetails-5.rst
+	class_axl_sl_ArrayDetails-6.rst
+	class_axl_sl_ArrayDetails-7.rst
+	class_axl_sl_ArrayDetails-8.rst
+	class_axl_sl_ArrayDetails-9.rst
+	class_axl_sl_ArrayDetails-10.rst
+	class_axl_sl_ArrayDetails-11.rst
+	class_axl_sl_ArrayDetails-12.rst
+	class_axl_sl_ArrayDetails-13.rst
+	class_axl_sl_ArrayDetails-14.rst
+	class_axl_sl_ArrayRef.rst
+	class_axl_sl_Assign.rst
+	class_axl_sl_AssignClosure_L.rst
+	class_axl_sl_AssignClosure_R.rst
+	class_axl_sl_AutoPtrArray.rst
+	class_axl_sl_AuxList.rst
+	class_axl_sl_BinClosure_1.rst
+	class_axl_sl_BinClosure_2.rst
+	class_axl_sl_BinTreeBase.rst
+	class_axl_sl_BinaryBoyerMooreFind.rst
+	class_axl_sl_BitMap.rst
+	class_axl_sl_BitMapN.rst
+	class_axl_sl_BmhFind.rst
+	class_axl_sl_BoxIterator.rst
+	class_axl_sl_BoxIteratorImpl.rst
+	class_axl_sl_BoxList.rst
+	class_axl_sl_BoxListEntry.rst
+	class_axl_sl_BoyerMooreFindBase.rst
+	class_axl_sl_BoyerMooreIncrementalContext.rst
+	class_axl_sl_BuddyAllocMap.rst
+	class_axl_sl_CircularBuffer.rst
+	class_axl_sl_CmdLineParser.rst
+	class_axl_sl_CmdLineParserRoot.rst
+	class_axl_sl_Cmp.rst
+	class_axl_sl_CmpBin.rst
+	class_axl_sl_CmpDuckType.rst
+	class_axl_sl_CmpDuckTypePtr.rst
+	class_axl_sl_CmpPtr.rst
+	class_axl_sl_CmpSzBase.rst
+	class_axl_sl_CmpSzBase-2.rst
+	class_axl_sl_CmpSzBase-3.rst
+	class_axl_sl_CmpSzBase_i.rst
+	class_axl_sl_CmpSzBase_i-2.rst
+	class_axl_sl_CmpSzBase_i-3.rst
+	class_axl_sl_CompareBoxListEntry.rst
+	class_axl_sl_CompareMapEntryKey.rst
+	class_axl_sl_CompareMapEntryValue.rst
+	class_axl_sl_ConstBoxIterator.rst
+	class_axl_sl_ConstBoxList.rst
+	class_axl_sl_ConstHandleTableIterator.rst
+	class_axl_sl_ConstHandleTableIteratorBase.rst
+	class_axl_sl_ConstHashTableIterator.rst
+	class_axl_sl_ConstIterator.rst
+	class_axl_sl_ConstList.rst
+	class_axl_sl_ConstListBase.rst
+	class_axl_sl_ConstMapIterator.rst
+	class_axl_sl_ConstStringHashTableIterator.rst
+	class_axl_sl_ConstStringHashTableIterator_utf16.rst
+	class_axl_sl_ConstStringHashTableIterator_utf32.rst
+	class_axl_sl_ConstStringHashTableIterator_utf8.rst
+	class_axl_sl_ConstStringHashTableIterator_w.rst
+	class_axl_sl_Construct.rst
+	class_axl_sl_ConstructSimpleSingleton.rst
+	class_axl_sl_ConstructSingleton.rst
+	class_axl_sl_CppList.rst
+	class_axl_sl_Destruct.rst
+	class_axl_sl_DestructSingleton.rst
+	class_axl_sl_Div.rst
+	class_axl_sl_DuckTypeHashTable.rst
+	class_axl_sl_DuckTypePtrHashTable.rst
+	class_axl_sl_Eq.rst
+	class_axl_sl_EqBin.rst
+	class_axl_sl_EqDuckType.rst
+	class_axl_sl_EqDuckTypePtr.rst
+	class_axl_sl_EqStringIgnoreCaseBase_pcp.rst
+	class_axl_sl_EqStringIgnoreCaseBase_pcu.rst
+	class_axl_sl_ExplicitCast.rst
+	class_axl_sl_ExplicitPtrCast.rst
+	class_axl_sl_False.rst
+	class_axl_sl_Ge.rst
+	class_axl_sl_Gt.rst
+	class_axl_sl_Handle.rst
+	class_axl_sl_HandleTable.rst
+	class_axl_sl_HandleTableBase.rst
+	class_axl_sl_HandleTableIterator.rst
+	class_axl_sl_HandleTableIteratorBase.rst
+	class_axl_sl_HashChecksum16.rst
+	class_axl_sl_HashDjb2.rst
+	class_axl_sl_HashDuckType.rst
+	class_axl_sl_HashId.rst
+	class_axl_sl_HashPtr.rst
+	class_axl_sl_HashStringIgnoreCaseBase_pcp.rst
+	class_axl_sl_HashStringIgnoreCaseBase_pcu.rst
+	class_axl_sl_HashSzBase.rst
+	class_axl_sl_HashSzBase-2.rst
+	class_axl_sl_HashSzBase-3.rst
+	class_axl_sl_HashSzBase_i.rst
+	class_axl_sl_HashSzBase_i-2.rst
+	class_axl_sl_HashSzBase_i-3.rst
+	class_axl_sl_HashTable.rst
+	class_axl_sl_HashTableIterator.rst
+	class_axl_sl_ImplicitCast.rst
+	class_axl_sl_ImplicitPtrCast.rst
+	class_axl_sl_InitCharCodeTable.rst
+	class_axl_sl_InitCharLiteralTable.rst
+	class_axl_sl_Iterator.rst
+	class_axl_sl_IteratorBase.rst
+	class_axl_sl_IteratorImpl.rst
+	class_axl_sl_Le.rst
+	class_axl_sl_LegacyPacketizer.rst
+	class_axl_sl_LegacyPacketizerRoot.rst
+	class_axl_sl_List.rst
+	class_axl_sl_ListBase.rst
+	class_axl_sl_Lt.rst
+	class_axl_sl_MapIterator.rst
+	class_axl_sl_Max.rst
+	class_axl_sl_Min.rst
+	class_axl_sl_Minus.rst
+	class_axl_sl_MinusOne.rst
+	class_axl_sl_Mod.rst
+	class_axl_sl_Mul.rst
+	class_axl_sl_Ne.rst
+	class_axl_sl_NoOp.rst
+	class_axl_sl_Not.rst
+	class_axl_sl_Offset.rst
+	class_axl_sl_OffsetOf.rst
+	class_axl_sl_OpAssign.rst
+	class_axl_sl_Or.rst
+	class_axl_sl_OwningListBase.rst
+	class_axl_sl_Pack.rst
+	class_axl_sl_Pack-2.rst
+	class_axl_sl_Pack-3.rst
+	class_axl_sl_Pack-4.rst
+	class_axl_sl_Pack-5.rst
+	class_axl_sl_Pack-6.rst
+	class_axl_sl_Pack-7.rst
+	class_axl_sl_Pack-8.rst
+	class_axl_sl_Pack-9.rst
+	class_axl_sl_Pack-10.rst
+	class_axl_sl_Pack-11.rst
+	class_axl_sl_Pack-12.rst
+	class_axl_sl_Pack-13.rst
+	class_axl_sl_Pack-14.rst
+	class_axl_sl_PackIntTrunc.rst
+	class_axl_sl_PackLastError.rst
+	class_axl_sl_PackPtrSize.rst
+	class_axl_sl_PackSelfSizedPtr.rst
+	class_axl_sl_PackSeqEx.rst
+	class_axl_sl_PackSeqEx_2.rst
+	class_axl_sl_PackSeqEx_3.rst
+	class_axl_sl_PackSeqEx_4.rst
+	class_axl_sl_PackSeqEx_5.rst
+	class_axl_sl_PackSeqEx_6.rst
+	class_axl_sl_PackSeq_2.rst
+	class_axl_sl_PackSeq_3.rst
+	class_axl_sl_PackSeq_4.rst
+	class_axl_sl_PackSeq_5.rst
+	class_axl_sl_PackSeq_6.rst
+	class_axl_sl_PackStringBase.rst
+	class_axl_sl_Package.rst
+	class_axl_sl_Packer.rst
+	class_axl_sl_PackerImpl.rst
+	class_axl_sl_PackerSeq.rst
+	class_axl_sl_Packetizer.rst
+	class_axl_sl_PacketizerRoot.rst
+	class_axl_sl_ProtoPeer.rst
+	class_axl_sl_RbTree.rst
+	class_axl_sl_RbTreeIterator.rst
+	class_axl_sl_RbTreeNode.rst
+	class_axl_sl_ReverseArray.rst
+	class_axl_sl_Shl.rst
+	class_axl_sl_Shr.rst
+	class_axl_sl_SimpleArgType.rst
+	class_axl_sl_SimpleArrayDetails.rst
+	class_axl_sl_SimpleHashTable.rst
+	class_axl_sl_SizeOf.rst
+	class_axl_sl_SizeOfNoReusableTailPadding.rst
+	class_axl_sl_StdArrayList.rst
+	class_axl_sl_StringBase.rst
+	class_axl_sl_StringDetailsBase.rst
+	class_axl_sl_StringDetailsBase-2.rst
+	class_axl_sl_StringDetailsBase-3.rst
+	class_axl_sl_StringDetailsBase-4.rst
+	class_axl_sl_StringDetailsImpl.rst
+	class_axl_sl_StringHashTable.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcp.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcp_utf16.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcp_utf32.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcp_utf8.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcp_w.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcu.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcu_utf16.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcu_utf32.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcu_utf8.rst
+	class_axl_sl_StringHashTableIgnoreCase_pcu_w.rst
+	class_axl_sl_StringHashTableIterator.rst
+	class_axl_sl_StringHashTableIterator_utf16.rst
+	class_axl_sl_StringHashTableIterator_utf32.rst
+	class_axl_sl_StringHashTableIterator_utf8.rst
+	class_axl_sl_StringHashTableIterator_w.rst
+	class_axl_sl_StringHashTable_utf16.rst
+	class_axl_sl_StringHashTable_utf32.rst
+	class_axl_sl_StringHashTable_utf8.rst
+	class_axl_sl_StringHashTable_w.rst
+	class_axl_sl_StringRefBase.rst
+	class_axl_sl_Sub.rst
+	class_axl_sl_Swap.rst
+	class_axl_sl_TextBoyerMooreFind.rst
+	class_axl_sl_True.rst
+	class_axl_sl_Unpack.rst
+	class_axl_sl_Unpack-2.rst
+	class_axl_sl_Unpack-3.rst
+	class_axl_sl_Unpack-4.rst
+	class_axl_sl_Unpack-5.rst
+	class_axl_sl_Unpack-6.rst
+	class_axl_sl_Unpack-7.rst
+	class_axl_sl_Unpack-8.rst
+	class_axl_sl_UnpackPtr.rst
+	class_axl_sl_UnpackSelfSizedPtr.rst
+	class_axl_sl_UnpackStringBase.rst
+	class_axl_sl_Unpacker.rst
+	class_axl_sl_Void.rst
+	class_axl_sl_Xor.rst
+	class_axl_sl_Zero.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	namespace sl {
+
+	// typedefs
+
+	typedef :ref:`CmpSzBase<doxid-classaxl_1_1sl_1_1_cmp_sz_base>`<char> :target:`CmpSz<doxid-namespaceaxl_1_1sl_1a2e17736b4b4859b9f217d968ef36bdb0>`;
+	typedef :ref:`CmpSzBase<doxid-classaxl_1_1sl_1_1_cmp_sz_base>`<wchar_t> :target:`CmpSz_w<doxid-namespaceaxl_1_1sl_1a0a6c32451ac4304cc2c72a595d1ab05c>`;
+	typedef :ref:`CmpSzBase_i<doxid-classaxl_1_1sl_1_1_cmp_sz_base__i>`<char> :target:`CmpSz_i<doxid-namespaceaxl_1_1sl_1a3558a2525ee2d7d5bf0de81bc2cb0097>`;
+	typedef :ref:`CmpSzBase_i<doxid-classaxl_1_1sl_1_1_cmp_sz_base__i>`<wchar_t> :target:`CmpSz_wi<doxid-namespaceaxl_1_1sl_1af986e838a2043aa15f6c5e60b1a81149>`;
+	typedef :ref:`HashSzBase<doxid-classaxl_1_1sl_1_1_hash_sz_base>`<char> :target:`HashSz<doxid-namespaceaxl_1_1sl_1ae26358284c3f1dfaf560cb4d92d4d2c1>`;
+	typedef :ref:`HashSzBase<doxid-classaxl_1_1sl_1_1_hash_sz_base>`<wchar_t> :target:`HashSz_w<doxid-namespaceaxl_1_1sl_1a75c357f31c25974cb80e672ac7045c9b>`;
+	typedef :ref:`HashSzBase<doxid-classaxl_1_1sl_1_1_hash_sz_base>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`HashSz_utf8<doxid-namespaceaxl_1_1sl_1a6ba10fb85e9ee6de171b170eb92d9116>`;
+	typedef :ref:`HashSzBase<doxid-classaxl_1_1sl_1_1_hash_sz_base>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`HashSz_utf16<doxid-namespaceaxl_1_1sl_1aa7763ceb0fc20e54d3fac4ebccd65fe4>`;
+	typedef :ref:`HashSzBase<doxid-classaxl_1_1sl_1_1_hash_sz_base>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`HashSz_utf32<doxid-namespaceaxl_1_1sl_1a31dbf22f3b9b83a758fca81b4051ed9d>`;
+	typedef :ref:`HashSzBase_i<doxid-classaxl_1_1sl_1_1_hash_sz_base__i>`<char> :target:`HashSz_i<doxid-namespaceaxl_1_1sl_1af9881821d0bc950b6439085370ad81ee>`;
+	typedef :ref:`HashSzBase_i<doxid-classaxl_1_1sl_1_1_hash_sz_base__i>`<wchar_t> :target:`HashSz_i_w<doxid-namespaceaxl_1_1sl_1a6a1432f654e63db7ef08ccbe929c17be>`;
+	typedef :ref:`HashSzBase_i<doxid-classaxl_1_1sl_1_1_hash_sz_base__i>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`HashSz_i_utf8<doxid-namespaceaxl_1_1sl_1a0e1c70f950cb9b74c90ad82231f7d15c>`;
+	typedef :ref:`HashSzBase_i<doxid-classaxl_1_1sl_1_1_hash_sz_base__i>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`HashSz_i_utf16<doxid-namespaceaxl_1_1sl_1a751ac9ffa0df2eedd0ccfdb5bdd01c39>`;
+	typedef :ref:`HashSzBase_i<doxid-classaxl_1_1sl_1_1_hash_sz_base__i>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`HashSz_i_utf32<doxid-namespaceaxl_1_1sl_1a312cc8291e69dfcc29e0e3372830b060>`;
+	typedef :ref:`PackStringBase<doxid-classaxl_1_1sl_1_1_pack_string_base>`<char> :target:`PackString<doxid-namespaceaxl_1_1sl_1a71f6427a7d2e3dd3ce5eb1cd5d8716fe>`;
+	typedef :ref:`PackStringBase<doxid-classaxl_1_1sl_1_1_pack_string_base>`<wchar_t> :target:`PackString_w<doxid-namespaceaxl_1_1sl_1a6c80ba807e65b1069e9fd45f50fce40b>`;
+	typedef :ref:`PackStringBase<doxid-classaxl_1_1sl_1_1_pack_string_base>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`PackString_utf8<doxid-namespaceaxl_1_1sl_1a0a08abc2ffba58b637ae557d2de0371f>`;
+	typedef :ref:`PackStringBase<doxid-classaxl_1_1sl_1_1_pack_string_base>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`PackString_utf16<doxid-namespaceaxl_1_1sl_1a17e0f0313852aa76e5bdfd85cdbe3e9d>`;
+	typedef :ref:`PackStringBase<doxid-classaxl_1_1sl_1_1_pack_string_base>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`PackString_utf32<doxid-namespaceaxl_1_1sl_1a6d58b5f6a772a8368e25a051941d5b58>`;
+	typedef :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<char> :target:`StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`;
+	typedef :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<wchar_t> :target:`StringRef_w<doxid-namespaceaxl_1_1sl_1a7375808d9fca58d1037da98f92680ad7>`;
+	typedef :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`;
+	typedef :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`StringRef_utf16<doxid-namespaceaxl_1_1sl_1a5038487798790b54b7cf85af8fa4c08d>`;
+	typedef :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`;
+	typedef :ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<char> :target:`String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`;
+	typedef :ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<wchar_t> :target:`String_w<doxid-namespaceaxl_1_1sl_1af48c091365c4e43d1fe0621316b75161>`;
+	typedef :ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`String_utf8<doxid-namespaceaxl_1_1sl_1a32288fdc3708af0e605697db8d31bb0a>`;
+	typedef :ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`String_utf16<doxid-namespaceaxl_1_1sl_1a655d305b2123aece9c5a21c370f3cf20>`;
+	typedef :ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`String_utf32<doxid-namespaceaxl_1_1sl_1a91fa57951585eea6694e64bc857471ec>`;
+	typedef :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`<char> :target:`StringDetails<doxid-namespaceaxl_1_1sl_1ab6da044c27b12507f7379724c3a0907e>`;
+	typedef :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`<wchar_t> :target:`StringDetails_w<doxid-namespaceaxl_1_1sl_1aa1d3c1bda5f12273a9b3aacb638f35ad>`;
+	typedef :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`StringDetails_utf8<doxid-namespaceaxl_1_1sl_1a9411a0705f533b180c1b09acad2d7527>`;
+	typedef :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`StringDetails_utf16<doxid-namespaceaxl_1_1sl_1ac0c4ed9c1bf03a05b6368f2ef903c358>`;
+	typedef :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`StringDetails_utf32<doxid-namespaceaxl_1_1sl_1a37301208571f4dfc21cd83d4ce189836>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcu>`<char> :target:`EqStringIgnoreCase_pcu<doxid-namespaceaxl_1_1sl_1a7ac73c807101a1fb6662f1ed96d83c5d>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcu>`<wchar_t> :target:`EqStringIgnoreCase_pcu_w<doxid-namespaceaxl_1_1sl_1a1e1bdb9c815ff86c421f2edc9dc63db4>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcu>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`EqStringIgnoreCase_pcu_utf8<doxid-namespaceaxl_1_1sl_1af27751cbb36ba09c3324d99b56ea99a4>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcu>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`EqStringIgnoreCase_pcu_utf16<doxid-namespaceaxl_1_1sl_1a0b79fa3817f4944b59374f6841a834f5>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcu>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`EqStringIgnoreCase_pcu_utf32<doxid-namespaceaxl_1_1sl_1ae7ca6967b50fd109f0c87e1316311781>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcp>`<char> :target:`EqStringIgnoreCase_pcp<doxid-namespaceaxl_1_1sl_1a20ace22ba26896637a94f6ed27ddbebb>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcp>`<wchar_t> :target:`EqStringIgnoreCase_pcp_w<doxid-namespaceaxl_1_1sl_1a0f125ff439482510f0944f87c4e72571>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcp>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`EqStringIgnoreCase_pcp_utf8<doxid-namespaceaxl_1_1sl_1a5a60c9e7c00448c51b2bb3ccbb0d7edc>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcp>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`EqStringIgnoreCase_pcp_utf16<doxid-namespaceaxl_1_1sl_1ae1b0b09d9e77466be3c56584eed8918a>`;
+	typedef :ref:`EqStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcp>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`EqStringIgnoreCase_pcp_utf32<doxid-namespaceaxl_1_1sl_1a3c431bc0ce0edd11d9730748cd4e24b7>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcu>`<char> :target:`HashStringIgnoreCase_pcu<doxid-namespaceaxl_1_1sl_1a085c7f64d26e80adf38ef443cf17f011>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcu>`<wchar_t> :target:`HashStringIgnoreCase_pcu_w<doxid-namespaceaxl_1_1sl_1a4daaf9efa9ef5d4ad6b0fc513e9320b7>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcu>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`HashStringIgnoreCase_pcu_utf8<doxid-namespaceaxl_1_1sl_1a69ddb289f3dde3eb510f2f7c6172c8e2>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcu>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`HashStringIgnoreCase_pcu_utf16<doxid-namespaceaxl_1_1sl_1a2e56ee6614fe44bdf0c0132965eddfee>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcu>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`HashStringIgnoreCase_pcu_utf32<doxid-namespaceaxl_1_1sl_1a84618d1833cd46ea8f434f22f8b6d909>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcp>`<char> :target:`HashStringIgnoreCase_pcp<doxid-namespaceaxl_1_1sl_1a44ca6d1c40282a1fc2141416da47e00b>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcp>`<wchar_t> :target:`HashStringIgnoreCase_pcp_w<doxid-namespaceaxl_1_1sl_1a84df070279a826794086105eead22484>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcp>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`HashStringIgnoreCase_pcp_utf8<doxid-namespaceaxl_1_1sl_1a231de02818a0b647abcc0e8d5f27bd80>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcp>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`HashStringIgnoreCase_pcp_utf16<doxid-namespaceaxl_1_1sl_1a189a0ff7510d31ce44f8fb70fe99e031>`;
+	typedef :ref:`HashStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcp>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`HashStringIgnoreCase_pcp_utf32<doxid-namespaceaxl_1_1sl_1afe80da8091c658ced5f1d8b5ad5abb31>`;
+	typedef :ref:`UnpackStringBase<doxid-classaxl_1_1sl_1_1_unpack_string_base>`<char> :target:`UnpackString<doxid-namespaceaxl_1_1sl_1a83a967ae378a5ca767dd78d43253be0b>`;
+	typedef :ref:`UnpackStringBase<doxid-classaxl_1_1sl_1_1_unpack_string_base>`<wchar_t> :target:`UnpackString_w<doxid-namespaceaxl_1_1sl_1a08d3462a856cb61319bd2310d3841843>`;
+	typedef :ref:`UnpackStringBase<doxid-classaxl_1_1sl_1_1_unpack_string_base>`<:ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`> :target:`UnpackString_utf8<doxid-namespaceaxl_1_1sl_1ac80dde1a6a93066d156c6458e931acb8>`;
+	typedef :ref:`UnpackStringBase<doxid-classaxl_1_1sl_1_1_unpack_string_base>`<:ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`> :target:`UnpackString_utf16<doxid-namespaceaxl_1_1sl_1acf8c59263c152d2aa449ef146e10ab24>`;
+	typedef :ref:`UnpackStringBase<doxid-classaxl_1_1sl_1_1_unpack_string_base>`<:ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`> :target:`UnpackString_utf32<doxid-namespaceaxl_1_1sl_1a4730454b75f953a110c2447434a03594>`;
+
+	// enums
+
+	enum :ref:`BinTreeFindRelOp<doxid-namespaceaxl_1_1sl_1a801434f03b824389c897256b34ff7a33>`;
+	enum :ref:`BitOpKind<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157>`;
+	enum :ref:`BoyerMooreFlag<doxid-namespaceaxl_1_1sl_1a0a74cd97637712c617b63a1db6213bc4>`;
+	enum :ref:`CaseConvertMethod<doxid-namespaceaxl_1_1sl_1aa2bde0cbbe6fbeb645d23a5c85f8fb57>`;
+	enum :ref:`GuidStringFlag<doxid-namespaceaxl_1_1sl_1a16e350d5159557219d6561c22ea68740>`;
+	enum :ref:`RbColor<doxid-namespaceaxl_1_1sl_1aa9ba4889485830a3fb66bb1d39d799a3>`;
+	enum :ref:`TextBoyerMooreFlag<doxid-namespaceaxl_1_1sl_1a93276d1153f712a58b47061f786e3ca6>`;
+
+	// structs
+
+	template <
+		typename T,
+		typename Key,
+		typename Value
+		>
+	struct :ref:`BinTreeNodeBase<doxid-structaxl_1_1sl_1_1_bin_tree_node_base>`;
+
+	struct :ref:`Guid<doxid-structaxl_1_1sl_1_1_guid>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	struct :ref:`HashTableEntry<doxid-structaxl_1_1sl_1_1_hash_table_entry>`;
+
+	template <typename T>
+	struct :ref:`ListData<doxid-structaxl_1_1sl_1_1_list_data>`;
+
+	struct :ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	struct :ref:`MapEntry<doxid-structaxl_1_1sl_1_1_map_entry>`;
+
+	struct :ref:`ProtoMsg<doxid-structaxl_1_1sl_1_1_proto_msg>`;
+
+	template <typename T>
+	struct :ref:`ProtoMsg_1<doxid-structaxl_1_1sl_1_1_proto_msg__1>`;
+
+	template <
+		typename T1,
+		typename T2
+		>
+	struct :ref:`ProtoMsg_2<doxid-structaxl_1_1sl_1_1_proto_msg__2>`;
+
+	template <
+		typename T1,
+		typename T2,
+		typename T3
+		>
+	struct :ref:`ProtoMsg_3<doxid-structaxl_1_1sl_1_1_proto_msg__3>`;
+
+	template <
+		typename T1,
+		typename T2,
+		typename T3,
+		typename T4
+		>
+	struct :ref:`ProtoMsg_4<doxid-structaxl_1_1sl_1_1_proto_msg__4>`;
+
+	struct :ref:`SwitchInfo<doxid-structaxl_1_1sl_1_1_switch_info>`;
+
+	// classes
+
+	class :ref:`AbstractProtoPeer<doxid-classaxl_1_1sl_1_1_abstract_proto_peer>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Add<doxid-classaxl_1_1sl_1_1_add>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`And<doxid-classaxl_1_1sl_1_1_and>`;
+
+	template <typename T>
+	class :ref:`ArgType<T*><doxid-classaxl_1_1sl_1_1_arg_type_3_01_t_01_5_01_4>`;
+
+	template <>
+	class :ref:`ArgType<uint16_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01uint16__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<uint32_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01uint32__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<uint64_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01uint64__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<uint8_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01uint8__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<String_utf32><doxid-classaxl_1_1sl_1_1_arg_type_3_01_string__utf32_01_4>`;
+
+	template <>
+	class :ref:`ArgType<wchar_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01wchar__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<String_utf16><doxid-classaxl_1_1sl_1_1_arg_type_3_01_string__utf16_01_4>`;
+
+	template <>
+	class :ref:`ArgType<String_utf8><doxid-classaxl_1_1sl_1_1_arg_type_3_01_string__utf8_01_4>`;
+
+	template <>
+	class :ref:`ArgType<int64_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01int64__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<double><doxid-classaxl_1_1sl_1_1_arg_type_3_01double_01_4>`;
+
+	template <>
+	class :ref:`ArgType<char><doxid-classaxl_1_1sl_1_1_arg_type_3_01char_01_4>`;
+
+	template <>
+	class :ref:`ArgType<int8_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01int8__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<float><doxid-classaxl_1_1sl_1_1_arg_type_3_01float_01_4>`;
+
+	template <typename T>
+	class :ref:`ArgType<doxid-classaxl_1_1sl_1_1_arg_type>`;
+
+	template <>
+	class :ref:`ArgType<int32_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01int32__t_01_4>`;
+
+	template <>
+	class :ref:`ArgType<int16_t><doxid-classaxl_1_1sl_1_1_arg_type_3_01int16__t_01_4>`;
+
+	template <
+		typename T,
+		typename Details0 = ArrayDetails<T>
+		>
+	class :ref:`Array<doxid-classaxl_1_1sl_1_1_array>`;
+
+	template <>
+	class :ref:`ArrayDetails<uint32_t><doxid-classaxl_1_1sl_1_1_array_details_3_01uint32__t_01_4>`;
+
+	template <typename T>
+	class :ref:`ArrayDetails<T*><doxid-classaxl_1_1sl_1_1_array_details_3_01_t_01_5_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<uint64_t><doxid-classaxl_1_1sl_1_1_array_details_3_01uint64__t_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<uint8_t><doxid-classaxl_1_1sl_1_1_array_details_3_01uint8__t_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<int8_t><doxid-classaxl_1_1sl_1_1_array_details_3_01int8__t_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<wchar_t><doxid-classaxl_1_1sl_1_1_array_details_3_01wchar__t_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<int64_t><doxid-classaxl_1_1sl_1_1_array_details_3_01int64__t_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<uint16_t><doxid-classaxl_1_1sl_1_1_array_details_3_01uint16__t_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<int16_t><doxid-classaxl_1_1sl_1_1_array_details_3_01int16__t_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<double><doxid-classaxl_1_1sl_1_1_array_details_3_01double_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<char><doxid-classaxl_1_1sl_1_1_array_details_3_01char_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<float><doxid-classaxl_1_1sl_1_1_array_details_3_01float_01_4>`;
+
+	template <>
+	class :ref:`ArrayDetails<int32_t><doxid-classaxl_1_1sl_1_1_array_details_3_01int32__t_01_4>`;
+
+	template <typename T>
+	class :ref:`ArrayDetails<doxid-classaxl_1_1sl_1_1_array_details>`;
+
+	template <
+		typename T,
+		typename Details0 = ArrayDetails<T>
+		>
+	class :ref:`ArrayRef<doxid-classaxl_1_1sl_1_1_array_ref>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Assign<doxid-classaxl_1_1sl_1_1_assign>`;
+
+	template <
+		typename T,
+		typename Arg = T
+		>
+	class :ref:`AssignClosure_L<doxid-classaxl_1_1sl_1_1_assign_closure___l>`;
+
+	template <
+		typename T,
+		typename Arg = T
+		>
+	class :ref:`AssignClosure_R<doxid-classaxl_1_1sl_1_1_assign_closure___r>`;
+
+	template <
+		typename T,
+		typename Delete0 = typename mem::StdDelete<T>
+		>
+	class :ref:`AutoPtrArray<doxid-classaxl_1_1sl_1_1_auto_ptr_array>`;
+
+	template <
+		typename T,
+		typename GetLink = ImplicitPtrCast<T, ListLink>
+		>
+	class :ref:`AuxList<doxid-classaxl_1_1sl_1_1_aux_list>`;
+
+	template <
+		typename Func,
+		typename Result,
+		typename Arg,
+		typename ArgSave = Arg
+		>
+	class :ref:`BinClosure_1<doxid-classaxl_1_1sl_1_1_bin_closure__1>`;
+
+	template <
+		typename Func,
+		typename Result,
+		typename Arg,
+		typename ArgSave = Arg
+		>
+	class :ref:`BinClosure_2<doxid-classaxl_1_1sl_1_1_bin_closure__2>`;
+
+	template <
+		typename T,
+		typename Node,
+		typename Key,
+		typename Value,
+		typename Cmp,
+		typename KeyArg,
+		typename ValueArg
+		>
+	class :ref:`BinTreeBase<doxid-classaxl_1_1sl_1_1_bin_tree_base>`;
+
+	class :ref:`BinaryBoyerMooreFind<doxid-classaxl_1_1sl_1_1_binary_boyer_moore_find>`;
+	class :ref:`BitMap<doxid-classaxl_1_1sl_1_1_bit_map>`;
+
+	template <size_t bitCount>
+	class :ref:`BitMapN<doxid-classaxl_1_1sl_1_1_bit_map_n>`;
+
+	class :ref:`BmhFind<doxid-classaxl_1_1sl_1_1_bmh_find>`;
+
+	template <typename T>
+	class :ref:`BoxIterator<doxid-classaxl_1_1sl_1_1_box_iterator>`;
+
+	template <
+		typename T,
+		typename Value,
+		typename Entry,
+		typename Link
+		>
+	class :ref:`BoxIteratorImpl<doxid-classaxl_1_1sl_1_1_box_iterator_impl>`;
+
+	template <
+		typename T,
+		typename ValueArg = typename ArgType<T>::Type
+		>
+	class :ref:`BoxList<doxid-classaxl_1_1sl_1_1_box_list>`;
+
+	template <typename T>
+	class :ref:`BoxListEntry<doxid-classaxl_1_1sl_1_1_box_list_entry>`;
+
+	template <typename T>
+	class :ref:`BoyerMooreFindBase<doxid-classaxl_1_1sl_1_1_boyer_moore_find_base>`;
+
+	template <typename T>
+	class :ref:`BoyerMooreIncrementalContext<doxid-classaxl_1_1sl_1_1_boyer_moore_incremental_context>`;
+
+	class :ref:`BuddyAllocMap<doxid-classaxl_1_1sl_1_1_buddy_alloc_map>`;
+	class :ref:`CircularBuffer<doxid-classaxl_1_1sl_1_1_circular_buffer>`;
+
+	template <
+		typename T,
+		typename SwitchTable
+		>
+	class :ref:`CmdLineParser<doxid-classaxl_1_1sl_1_1_cmd_line_parser>`;
+
+	class :ref:`CmdLineParserRoot<doxid-classaxl_1_1sl_1_1_cmd_line_parser_root>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Cmp<doxid-classaxl_1_1sl_1_1_cmp>`;
+
+	template <typename T>
+	class :ref:`CmpBin<doxid-classaxl_1_1sl_1_1_cmp_bin>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`CmpDuckType<doxid-classaxl_1_1sl_1_1_cmp_duck_type>`;
+
+	template <typename T>
+	class :ref:`CmpDuckTypePtr<doxid-classaxl_1_1sl_1_1_cmp_duck_type_ptr>`;
+
+	template <
+		typename T,
+		typename C
+		>
+	class :ref:`CmpPtr<doxid-classaxl_1_1sl_1_1_cmp_ptr>`;
+
+	template <>
+	class :ref:`CmpSzBase<wchar_t><doxid-classaxl_1_1sl_1_1_cmp_sz_base_3_01wchar__t_01_4>`;
+
+	template <>
+	class :ref:`CmpSzBase<char><doxid-classaxl_1_1sl_1_1_cmp_sz_base_3_01char_01_4>`;
+
+	template <typename T>
+	class :ref:`CmpSzBase<doxid-classaxl_1_1sl_1_1_cmp_sz_base>`;
+
+	template <>
+	class :ref:`CmpSzBase_i<char><doxid-classaxl_1_1sl_1_1_cmp_sz_base__i_3_01char_01_4>`;
+
+	template <>
+	class :ref:`CmpSzBase_i<wchar_t><doxid-classaxl_1_1sl_1_1_cmp_sz_base__i_3_01wchar__t_01_4>`;
+
+	template <typename T>
+	class :ref:`CmpSzBase_i<doxid-classaxl_1_1sl_1_1_cmp_sz_base__i>`;
+
+	template <
+		typename T,
+		typename Compare
+		>
+	class :ref:`CompareBoxListEntry<doxid-classaxl_1_1sl_1_1_compare_box_list_entry>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename Compare
+		>
+	class :ref:`CompareMapEntryKey<doxid-classaxl_1_1sl_1_1_compare_map_entry_key>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename Compare
+		>
+	class :ref:`CompareMapEntryValue<doxid-classaxl_1_1sl_1_1_compare_map_entry_value>`;
+
+	template <typename T>
+	class :ref:`ConstBoxIterator<doxid-classaxl_1_1sl_1_1_const_box_iterator>`;
+
+	template <typename T>
+	class :ref:`ConstBoxList<doxid-classaxl_1_1sl_1_1_const_box_list>`;
+
+	template <typename T>
+	class :ref:`ConstHandleTableIterator<doxid-classaxl_1_1sl_1_1_const_handle_table_iterator>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`ConstHandleTableIteratorBase<doxid-classaxl_1_1sl_1_1_const_handle_table_iterator_base>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`ConstHashTableIterator<doxid-classaxl_1_1sl_1_1_const_hash_table_iterator>`;
+
+	template <
+		typename T,
+		typename GetLink = ImplicitPtrCast<T, ListLink>
+		>
+	class :ref:`ConstIterator<doxid-classaxl_1_1sl_1_1_const_iterator>`;
+
+	template <
+		typename T,
+		typename GetLink = ImplicitPtrCast<T, ListLink>
+		>
+	class :ref:`ConstList<doxid-classaxl_1_1sl_1_1_const_list>`;
+
+	template <
+		typename T,
+		typename GetLink0,
+		typename Iterator0
+		>
+	class :ref:`ConstListBase<doxid-classaxl_1_1sl_1_1_const_list_base>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`ConstMapIterator<doxid-classaxl_1_1sl_1_1_const_map_iterator>`;
+
+	template <typename Value>
+	class :ref:`ConstStringHashTableIterator<doxid-classaxl_1_1sl_1_1_const_string_hash_table_iterator>`;
+
+	template <typename Value>
+	class :ref:`ConstStringHashTableIterator_utf16<doxid-classaxl_1_1sl_1_1_const_string_hash_table_iterator__utf16>`;
+
+	template <typename Value>
+	class :ref:`ConstStringHashTableIterator_utf32<doxid-classaxl_1_1sl_1_1_const_string_hash_table_iterator__utf32>`;
+
+	template <typename Value>
+	class :ref:`ConstStringHashTableIterator_utf8<doxid-classaxl_1_1sl_1_1_const_string_hash_table_iterator__utf8>`;
+
+	template <typename Value>
+	class :ref:`ConstStringHashTableIterator_w<doxid-classaxl_1_1sl_1_1_const_string_hash_table_iterator__w>`;
+
+	template <typename T>
+	class :ref:`Construct<doxid-classaxl_1_1sl_1_1_construct>`;
+
+	template <class T>
+	class :ref:`ConstructSimpleSingleton<doxid-classaxl_1_1sl_1_1_construct_simple_singleton>`;
+
+	template <class T>
+	class :ref:`ConstructSingleton<doxid-classaxl_1_1sl_1_1_construct_singleton>`;
+
+	template <
+		typename T,
+		typename GetLink = ImplicitPtrCast<T, ListLink>
+		>
+	class :ref:`CppList<doxid-classaxl_1_1sl_1_1_cpp_list>`;
+
+	template <typename T>
+	class :ref:`Destruct<doxid-classaxl_1_1sl_1_1_destruct>`;
+
+	template <class T>
+	class :ref:`DestructSingleton<doxid-classaxl_1_1sl_1_1_destruct_singleton>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Div<doxid-classaxl_1_1sl_1_1_div>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename KeyArg = typename ArgType<Key>::Type,
+		typename ValueArg = typename ArgType<Value>::Type
+		>
+	class :ref:`DuckTypeHashTable<doxid-classaxl_1_1sl_1_1_duck_type_hash_table>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename ValueArg = typename ArgType<Value>::Type
+		>
+	class :ref:`DuckTypePtrHashTable<doxid-classaxl_1_1sl_1_1_duck_type_ptr_hash_table>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Eq<doxid-classaxl_1_1sl_1_1_eq>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`EqBin<doxid-classaxl_1_1sl_1_1_eq_bin>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`EqDuckType<doxid-classaxl_1_1sl_1_1_eq_duck_type>`;
+
+	template <typename T>
+	class :ref:`EqDuckTypePtr<doxid-classaxl_1_1sl_1_1_eq_duck_type_ptr>`;
+
+	template <typename T>
+	class :ref:`EqStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcp>`;
+
+	template <typename T>
+	class :ref:`EqStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_eq_string_ignore_case_base__pcu>`;
+
+	template <
+		typename A,
+		typename B
+		>
+	class :ref:`ExplicitCast<doxid-classaxl_1_1sl_1_1_explicit_cast>`;
+
+	template <
+		typename A,
+		typename B
+		>
+	class :ref:`ExplicitPtrCast<doxid-classaxl_1_1sl_1_1_explicit_ptr_cast>`;
+
+	template <typename T>
+	class :ref:`False<doxid-classaxl_1_1sl_1_1_false>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Ge<doxid-classaxl_1_1sl_1_1_ge>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Gt<doxid-classaxl_1_1sl_1_1_gt>`;
+
+	template <
+		typename T,
+		typename Close = Void<T>,
+		typename GetInvalidHandle = Zero<T>
+		>
+	class :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`HandleTable<doxid-classaxl_1_1sl_1_1_handle_table>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename ValueArg = typename ArgType<Value>::Type
+		>
+	class :ref:`HandleTableBase<doxid-classaxl_1_1sl_1_1_handle_table_base>`;
+
+	template <typename T>
+	class :ref:`HandleTableIterator<doxid-classaxl_1_1sl_1_1_handle_table_iterator>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`HandleTableIteratorBase<doxid-classaxl_1_1sl_1_1_handle_table_iterator_base>`;
+
+	template <typename T>
+	class :ref:`HashChecksum16<doxid-classaxl_1_1sl_1_1_hash_checksum16>`;
+
+	template <typename T>
+	class :ref:`HashDjb2<doxid-classaxl_1_1sl_1_1_hash_djb2>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`HashDuckType<doxid-classaxl_1_1sl_1_1_hash_duck_type>`;
+
+	template <typename T>
+	class :ref:`HashId<doxid-classaxl_1_1sl_1_1_hash_id>`;
+
+	template <
+		typename T,
+		typename H
+		>
+	class :ref:`HashPtr<doxid-classaxl_1_1sl_1_1_hash_ptr>`;
+
+	template <typename T>
+	class :ref:`HashStringIgnoreCaseBase_pcp<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcp>`;
+
+	template <typename T>
+	class :ref:`HashStringIgnoreCaseBase_pcu<doxid-classaxl_1_1sl_1_1_hash_string_ignore_case_base__pcu>`;
+
+	template <>
+	class :ref:`HashSzBase<char><doxid-classaxl_1_1sl_1_1_hash_sz_base_3_01char_01_4>`;
+
+	template <>
+	class :ref:`HashSzBase<wchar_t><doxid-classaxl_1_1sl_1_1_hash_sz_base_3_01wchar__t_01_4>`;
+
+	template <typename T>
+	class :ref:`HashSzBase<doxid-classaxl_1_1sl_1_1_hash_sz_base>`;
+
+	template <>
+	class :ref:`HashSzBase_i<char><doxid-classaxl_1_1sl_1_1_hash_sz_base__i_3_01char_01_4>`;
+
+	template <typename T>
+	class :ref:`HashSzBase_i<doxid-classaxl_1_1sl_1_1_hash_sz_base__i>`;
+
+	template <>
+	class :ref:`HashSzBase_i<wchar_t><doxid-classaxl_1_1sl_1_1_hash_sz_base__i_3_01wchar__t_01_4>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename Hash,
+		typename Eq = Eq<Key>,
+		typename KeyArg = typename ArgType<Key>::Type,
+		typename ValueArg = typename ArgType<Value>::Type
+		>
+	class :ref:`HashTable<doxid-classaxl_1_1sl_1_1_hash_table>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`HashTableIterator<doxid-classaxl_1_1sl_1_1_hash_table_iterator>`;
+
+	template <
+		typename A,
+		typename B
+		>
+	class :ref:`ImplicitCast<doxid-classaxl_1_1sl_1_1_implicit_cast>`;
+
+	template <
+		typename A,
+		typename B
+		>
+	class :ref:`ImplicitPtrCast<doxid-classaxl_1_1sl_1_1_implicit_ptr_cast>`;
+
+	class :ref:`InitCharCodeTable<doxid-classaxl_1_1sl_1_1_init_char_code_table>`;
+	class :ref:`InitCharLiteralTable<doxid-classaxl_1_1sl_1_1_init_char_literal_table>`;
+
+	template <
+		typename T,
+		typename GetLink = ImplicitPtrCast<T, ListLink>
+		>
+	class :ref:`Iterator<doxid-classaxl_1_1sl_1_1_iterator>`;
+
+	template <
+		typename T,
+		typename Entry0,
+		typename Link0,
+		typename GetLink0
+		>
+	class :ref:`IteratorBase<doxid-classaxl_1_1sl_1_1_iterator_base>`;
+
+	template <
+		typename T,
+		typename Entry,
+		typename Link,
+		typename GetLink = ImplicitPtrCast<T, ListLink>
+		>
+	class :ref:`IteratorImpl<doxid-classaxl_1_1sl_1_1_iterator_impl>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Le<doxid-classaxl_1_1sl_1_1_le>`;
+
+	template <typename T>
+	class :ref:`LegacyPacketizer<doxid-classaxl_1_1sl_1_1_legacy_packetizer>`;
+
+	class :ref:`LegacyPacketizerRoot<doxid-classaxl_1_1sl_1_1_legacy_packetizer_root>`;
+
+	template <
+		typename T,
+		typename GetLink = ImplicitPtrCast<T, ListLink>,
+		typename Delete = mem::StdDelete<T>
+		>
+	class :ref:`List<doxid-classaxl_1_1sl_1_1_list>`;
+
+	template <
+		typename T,
+		typename GetLink0,
+		typename Iterator0,
+		typename ConstIterator0
+		>
+	class :ref:`ListBase<doxid-classaxl_1_1sl_1_1_list_base>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Lt<doxid-classaxl_1_1sl_1_1_lt>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`MapIterator<doxid-classaxl_1_1sl_1_1_map_iterator>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Max<doxid-classaxl_1_1sl_1_1_max>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Min<doxid-classaxl_1_1sl_1_1_min>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Minus<doxid-classaxl_1_1sl_1_1_minus>`;
+
+	template <typename T>
+	class :ref:`MinusOne<doxid-classaxl_1_1sl_1_1_minus_one>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Mod<doxid-classaxl_1_1sl_1_1_mod>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Mul<doxid-classaxl_1_1sl_1_1_mul>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Ne<doxid-classaxl_1_1sl_1_1_ne>`;
+
+	template <typename T>
+	class :ref:`NoOp<doxid-classaxl_1_1sl_1_1_no_op>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Not<doxid-classaxl_1_1sl_1_1_not>`;
+
+	template <
+		typename A,
+		typename B,
+		size_t offset
+		>
+	class :ref:`Offset<doxid-classaxl_1_1sl_1_1_offset>`;
+
+	template <
+		typename C,
+		typename B
+		>
+	class :ref:`OffsetOf<doxid-classaxl_1_1sl_1_1_offset_of>`;
+
+	template <
+		typename Func,
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`OpAssign<doxid-classaxl_1_1sl_1_1_op_assign>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Or<doxid-classaxl_1_1sl_1_1_or>`;
+
+	template <
+		typename T,
+		typename GetLink,
+		typename Iterator,
+		typename ConstIterator,
+		typename Delete0
+		>
+	class :ref:`OwningListBase<doxid-classaxl_1_1sl_1_1_owning_list_base>`;
+
+	template <typename T>
+	class :ref:`Pack<T*><doxid-classaxl_1_1sl_1_1_pack_3_01_t_01_5_01_4>`;
+
+	template <>
+	class :ref:`Pack<uint16_t><doxid-classaxl_1_1sl_1_1_pack_3_01uint16__t_01_4>`;
+
+	template <>
+	class :ref:`Pack<uint8_t><doxid-classaxl_1_1sl_1_1_pack_3_01uint8__t_01_4>`;
+
+	template <>
+	class :ref:`Pack<wchar_t*><doxid-classaxl_1_1sl_1_1_pack_3_01wchar__t_01_5_01_4>`;
+
+	template <>
+	class :ref:`Pack<wchar_t><doxid-classaxl_1_1sl_1_1_pack_3_01wchar__t_01_4>`;
+
+	template <>
+	class :ref:`Pack<int16_t><doxid-classaxl_1_1sl_1_1_pack_3_01int16__t_01_4>`;
+
+	template <>
+	class :ref:`Pack<err::ErrorHdr*><doxid-classaxl_1_1sl_1_1_pack_3_01err_1_1_error_hdr_01_5_01_4>`;
+
+	template <>
+	class :ref:`Pack<int8_t><doxid-classaxl_1_1sl_1_1_pack_3_01int8__t_01_4>`;
+
+	template <>
+	class :ref:`Pack<const wchar_t*><doxid-classaxl_1_1sl_1_1_pack_3_01const_01wchar__t_01_5_01_4>`;
+
+	template <>
+	class :ref:`Pack<char*><doxid-classaxl_1_1sl_1_1_pack_3_01char_01_5_01_4>`;
+
+	template <typename T>
+	class :ref:`Pack<doxid-classaxl_1_1sl_1_1_pack>`;
+
+	template <>
+	class :ref:`Pack<char><doxid-classaxl_1_1sl_1_1_pack_3_01char_01_4>`;
+
+	template <>
+	class :ref:`Pack<const err::ErrorHdr*><doxid-classaxl_1_1sl_1_1_pack_3_01const_01err_1_1_error_hdr_01_5_01_4>`;
+
+	template <>
+	class :ref:`Pack<const char*><doxid-classaxl_1_1sl_1_1_pack_3_01const_01char_01_5_01_4>`;
+
+	template <typename T>
+	class :ref:`PackIntTrunc<doxid-classaxl_1_1sl_1_1_pack_int_trunc>`;
+
+	class :ref:`PackLastError<doxid-classaxl_1_1sl_1_1_pack_last_error>`;
+	class :ref:`PackPtrSize<doxid-classaxl_1_1sl_1_1_pack_ptr_size>`;
+
+	template <
+		typename T,
+		typename SizeOf = sl::SizeOf<T>
+		>
+	class :ref:`PackSelfSizedPtr<doxid-classaxl_1_1sl_1_1_pack_self_sized_ptr>`;
+
+	template <
+		typename Pack1,
+		typename Pack2
+		>
+	class :ref:`PackSeqEx<doxid-classaxl_1_1sl_1_1_pack_seq_ex>`;
+
+	template <
+		typename Pack1,
+		typename Pack2
+		>
+	class :ref:`PackSeqEx_2<doxid-classaxl_1_1sl_1_1_pack_seq_ex__2>`;
+
+	template <
+		typename Pack1,
+		typename Pack2,
+		typename Pack3
+		>
+	class :ref:`PackSeqEx_3<doxid-classaxl_1_1sl_1_1_pack_seq_ex__3>`;
+
+	template <
+		typename Pack1,
+		typename Pack2,
+		typename Pack3,
+		typename Pack4
+		>
+	class :ref:`PackSeqEx_4<doxid-classaxl_1_1sl_1_1_pack_seq_ex__4>`;
+
+	template <
+		typename Pack1,
+		typename Pack2,
+		typename Pack3,
+		typename Pack4,
+		typename Pack5
+		>
+	class :ref:`PackSeqEx_5<doxid-classaxl_1_1sl_1_1_pack_seq_ex__5>`;
+
+	template <
+		typename Pack1,
+		typename Pack2,
+		typename Pack3,
+		typename Pack4,
+		typename Pack5,
+		typename Pack6
+		>
+	class :ref:`PackSeqEx_6<doxid-classaxl_1_1sl_1_1_pack_seq_ex__6>`;
+
+	template <
+		typename T1,
+		typename T2
+		>
+	class :ref:`PackSeq_2<doxid-classaxl_1_1sl_1_1_pack_seq__2>`;
+
+	template <
+		typename T1,
+		typename T2,
+		typename T3
+		>
+	class :ref:`PackSeq_3<doxid-classaxl_1_1sl_1_1_pack_seq__3>`;
+
+	template <
+		typename T1,
+		typename T2,
+		typename T3,
+		typename T4
+		>
+	class :ref:`PackSeq_4<doxid-classaxl_1_1sl_1_1_pack_seq__4>`;
+
+	template <
+		typename T1,
+		typename T2,
+		typename T3,
+		typename T4,
+		typename T5
+		>
+	class :ref:`PackSeq_5<doxid-classaxl_1_1sl_1_1_pack_seq__5>`;
+
+	template <
+		typename T1,
+		typename T2,
+		typename T3,
+		typename T4,
+		typename T5,
+		typename T6
+		>
+	class :ref:`PackSeq_6<doxid-classaxl_1_1sl_1_1_pack_seq__6>`;
+
+	template <typename T>
+	class :ref:`PackStringBase<doxid-classaxl_1_1sl_1_1_pack_string_base>`;
+
+	class :ref:`Package<doxid-classaxl_1_1sl_1_1_package>`;
+	class :ref:`Packer<doxid-classaxl_1_1sl_1_1_packer>`;
+
+	template <typename Pack>
+	class :ref:`PackerImpl<doxid-classaxl_1_1sl_1_1_packer_impl>`;
+
+	class :ref:`PackerSeq<doxid-classaxl_1_1sl_1_1_packer_seq>`;
+
+	template <typename T>
+	class :ref:`Packetizer<doxid-classaxl_1_1sl_1_1_packetizer>`;
+
+	class :ref:`PacketizerRoot<doxid-classaxl_1_1sl_1_1_packetizer_root>`;
+
+	template <typename T>
+	class :ref:`ProtoPeer<doxid-classaxl_1_1sl_1_1_proto_peer>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename Cmp = Cmp<Key>,
+		typename KeyArg = typename ArgType<Key>::Type,
+		typename ValueArg = typename ArgType<Value>::Type
+		>
+	class :ref:`RbTree<doxid-classaxl_1_1sl_1_1_rb_tree>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`RbTreeIterator<doxid-classaxl_1_1sl_1_1_rb_tree_iterator>`;
+
+	template <
+		typename Key,
+		typename Value
+		>
+	class :ref:`RbTreeNode<doxid-classaxl_1_1sl_1_1_rb_tree_node>`;
+
+	template <typename T>
+	class :ref:`ReverseArray<doxid-classaxl_1_1sl_1_1_reverse_array>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Shl<doxid-classaxl_1_1sl_1_1_shl>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Shr<doxid-classaxl_1_1sl_1_1_shr>`;
+
+	template <typename T>
+	class :ref:`SimpleArgType<doxid-classaxl_1_1sl_1_1_simple_arg_type>`;
+
+	template <typename T>
+	class :ref:`SimpleArrayDetails<doxid-classaxl_1_1sl_1_1_simple_array_details>`;
+
+	template <
+		typename Key,
+		typename Value,
+		typename KeyArg = typename ArgType<Key>::Type,
+		typename ValueArg = typename ArgType<Value>::Type
+		>
+	class :ref:`SimpleHashTable<doxid-classaxl_1_1sl_1_1_simple_hash_table>`;
+
+	template <typename T>
+	class :ref:`SizeOf<doxid-classaxl_1_1sl_1_1_size_of>`;
+
+	template <typename T>
+	class :ref:`SizeOfNoReusableTailPadding<doxid-classaxl_1_1sl_1_1_size_of_no_reusable_tail_padding>`;
+
+	template <typename T>
+	class :ref:`StdArrayList<doxid-classaxl_1_1sl_1_1_std_array_list>`;
+
+	template <
+		typename T,
+		typename Details0 = StringDetailsBase<T>
+		>
+	class :ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`;
+
+	template <>
+	class :ref:`StringDetailsBase<utf8_t><doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf8__t_01_4>`;
+
+	template <>
+	class :ref:`StringDetailsBase<utf32_t><doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf32__t_01_4>`;
+
+	template <>
+	class :ref:`StringDetailsBase<utf16_t><doxid-classaxl_1_1sl_1_1_string_details_base_3_01utf16__t_01_4>`;
+
+	template <typename T>
+	class :ref:`StringDetailsBase<doxid-classaxl_1_1sl_1_1_string_details_base>`;
+
+	template <typename T>
+	class :ref:`StringDetailsImpl<doxid-classaxl_1_1sl_1_1_string_details_impl>`;
+
+	template <typename Value>
+	class :ref:`StringHashTable<doxid-classaxl_1_1sl_1_1_string_hash_table>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcp<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcp>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcp_utf16<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcp__utf16>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcp_utf32<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcp__utf32>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcp_utf8<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcp__utf8>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcp_w<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcp__w>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcu<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcu>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcu_utf16<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcu__utf16>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcu_utf32<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcu__utf32>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcu_utf8<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcu__utf8>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIgnoreCase_pcu_w<doxid-classaxl_1_1sl_1_1_string_hash_table_ignore_case__pcu__w>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIterator<doxid-classaxl_1_1sl_1_1_string_hash_table_iterator>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIterator_utf16<doxid-classaxl_1_1sl_1_1_string_hash_table_iterator__utf16>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIterator_utf32<doxid-classaxl_1_1sl_1_1_string_hash_table_iterator__utf32>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIterator_utf8<doxid-classaxl_1_1sl_1_1_string_hash_table_iterator__utf8>`;
+
+	template <typename Value>
+	class :ref:`StringHashTableIterator_w<doxid-classaxl_1_1sl_1_1_string_hash_table_iterator__w>`;
+
+	template <typename Value>
+	class :ref:`StringHashTable_utf16<doxid-classaxl_1_1sl_1_1_string_hash_table__utf16>`;
+
+	template <typename Value>
+	class :ref:`StringHashTable_utf32<doxid-classaxl_1_1sl_1_1_string_hash_table__utf32>`;
+
+	template <typename Value>
+	class :ref:`StringHashTable_utf8<doxid-classaxl_1_1sl_1_1_string_hash_table__utf8>`;
+
+	template <typename Value>
+	class :ref:`StringHashTable_w<doxid-classaxl_1_1sl_1_1_string_hash_table__w>`;
+
+	template <
+		typename T,
+		typename Details0 = StringDetailsBase<T>
+		>
+	class :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Sub<doxid-classaxl_1_1sl_1_1_sub>`;
+
+	template <typename T>
+	class :ref:`Swap<doxid-classaxl_1_1sl_1_1_swap>`;
+
+	class :ref:`TextBoyerMooreFind<doxid-classaxl_1_1sl_1_1_text_boyer_moore_find>`;
+
+	template <typename T>
+	class :ref:`True<doxid-classaxl_1_1sl_1_1_true>`;
+
+	template <>
+	class :ref:`Unpack<err::ErrorHdr*><doxid-classaxl_1_1sl_1_1_unpack_3_01err_1_1_error_hdr_01_5_01_4>`;
+
+	template <typename T>
+	class :ref:`Unpack<T*><doxid-classaxl_1_1sl_1_1_unpack_3_01_t_01_5_01_4>`;
+
+	template <>
+	class :ref:`Unpack<wchar_t*><doxid-classaxl_1_1sl_1_1_unpack_3_01wchar__t_01_5_01_4>`;
+
+	template <>
+	class :ref:`Unpack<const wchar_t*><doxid-classaxl_1_1sl_1_1_unpack_3_01const_01wchar__t_01_5_01_4>`;
+
+	template <>
+	class :ref:`Unpack<const err::ErrorHdr*><doxid-classaxl_1_1sl_1_1_unpack_3_01const_01err_1_1_error_hdr_01_5_01_4>`;
+
+	template <>
+	class :ref:`Unpack<const char*><doxid-classaxl_1_1sl_1_1_unpack_3_01const_01char_01_5_01_4>`;
+
+	template <>
+	class :ref:`Unpack<char*><doxid-classaxl_1_1sl_1_1_unpack_3_01char_01_5_01_4>`;
+
+	template <typename T>
+	class :ref:`Unpack<doxid-classaxl_1_1sl_1_1_unpack>`;
+
+	template <typename T>
+	class :ref:`UnpackPtr<doxid-classaxl_1_1sl_1_1_unpack_ptr>`;
+
+	template <
+		typename T,
+		typename SizeOf = sl::SizeOf<T>
+		>
+	class :ref:`UnpackSelfSizedPtr<doxid-classaxl_1_1sl_1_1_unpack_self_sized_ptr>`;
+
+	template <typename T>
+	class :ref:`UnpackStringBase<doxid-classaxl_1_1sl_1_1_unpack_string_base>`;
+
+	class :ref:`Unpacker<doxid-classaxl_1_1sl_1_1_unpacker>`;
+
+	template <typename T>
+	class :ref:`Void<doxid-classaxl_1_1sl_1_1_void>`;
+
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class :ref:`Xor<doxid-classaxl_1_1sl_1_1_xor>`;
+
+	template <typename T>
+	class :ref:`Zero<doxid-classaxl_1_1sl_1_1_zero>`;
+
+	// global variables
+
+	AXL_SELECT_ANY const :ref:`axl::sl::Guid<doxid-structaxl_1_1sl_1_1_guid>` :target:`g_nullGuid<doxid-namespaceaxl_1_1sl_1a4bff44524f27b7da2d708511df5457ba>` =   { { {  0x0 ,  0x0 ,  0x0 , {  0x0 ,  0x0 ,  0x0 ,  0x0 ,  0x0 ,  0x0 ,  0x0 ,  0x0  } } } };
+	AXL_SELECT_ANY :ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>` :target:`g_nullListLink<doxid-namespaceaxl_1_1sl_1af9bdffab88b21cafd5c299444c8e75ac>`;
+
+	// global functions
+
+	uint8_t
+	:target:`geLoBit8<doxid-namespaceaxl_1_1sl_1ad1e737dea1f42dfeb5ecb9ba4ce0549d>`(uint8_t x);
+
+	uint16_t
+	:target:`getLoBit16<doxid-namespaceaxl_1_1sl_1a81f94c05167a7924e9b6b10f990aee6c>`(uint16_t x);
+
+	uint32_t
+	:target:`getLoBit32<doxid-namespaceaxl_1_1sl_1a44477d9b24ea3a5a5cbb2eb124605141>`(uint32_t x);
+
+	uint64_t
+	:target:`getLoBit64<doxid-namespaceaxl_1_1sl_1a023c2125c51c9e01b9d768724a3c9b65>`(uint64_t x);
+
+	uint8_t
+	:target:`getHiBit8<doxid-namespaceaxl_1_1sl_1adba97ea74c28ebdb3af4e93f8ab5df3c>`(uint8_t x);
+
+	uint16_t
+	:target:`getHiBit16<doxid-namespaceaxl_1_1sl_1a86c6fa2d5d23128d95d9a6b16a0fa41c>`(uint16_t x);
+
+	uint32_t
+	:target:`getHiBit32<doxid-namespaceaxl_1_1sl_1a79053846091b2a508eb81b8ec417bde1>`(uint32_t x);
+
+	uint64_t
+	:target:`getHiBit64<doxid-namespaceaxl_1_1sl_1a962ad972b4b321948981b38d0acf919d>`(uint64_t x);
+
+	uint8_t
+	:target:`getPowerOf2Ge8<doxid-namespaceaxl_1_1sl_1a0fc0003991f41f05a7b36468f26a12d5>`(uint8_t x);
+
+	uint16_t
+	:target:`getPowerOf2Ge16<doxid-namespaceaxl_1_1sl_1a7485055015054ddb2f42e0e4d0b62f1b>`(uint16_t x);
+
+	uint32_t
+	:target:`getPowerOf2Ge32<doxid-namespaceaxl_1_1sl_1a6a7df83534325a6fa9a2000c5ed109ef>`(uint32_t x);
+
+	uint64_t
+	:target:`getPowerOf2Ge64<doxid-namespaceaxl_1_1sl_1a154ae47d3440887f61a340efbd4d7dfb>`(uint64_t x);
+
+	uint8_t
+	:target:`getLoBitIdx8<doxid-namespaceaxl_1_1sl_1a8f2b71d26c23fe5c292f904c711b8992>`(uint8_t x);
+
+	uint8_t
+	:target:`getLoBitIdx16<doxid-namespaceaxl_1_1sl_1af13fd90f414467562810a7d576558dfb>`(uint16_t x);
+
+	uint8_t
+	:target:`getLoBitIdx32<doxid-namespaceaxl_1_1sl_1a1fbbf477959a04a39c15dff97c80e002>`(uint32_t x);
+
+	uint8_t
+	:target:`getLoBitIdx64<doxid-namespaceaxl_1_1sl_1a1b2f0535d3d1372d0b9d5eb149110fcc>`(uint64_t x);
+
+	uint8_t
+	:target:`getHiBitIdx8<doxid-namespaceaxl_1_1sl_1aaa79facb73cd629dc8033d64c944c355>`(uint8_t x);
+
+	uint8_t
+	:target:`getHiBitIdx16<doxid-namespaceaxl_1_1sl_1a68abaa72a9a932ab1013a43a5ba64da0>`(uint16_t x);
+
+	uint8_t
+	:target:`getHiBitIdx32<doxid-namespaceaxl_1_1sl_1a64e2f1c68c1c9c91f9572a87af205545>`(uint32_t x);
+
+	uint8_t
+	:target:`getHiBitIdx64<doxid-namespaceaxl_1_1sl_1a679bbce16e23d0d6d27129fb895e2e12>`(uint64_t x);
+
+	uint8_t
+	:target:`getLoBitmask8<doxid-namespaceaxl_1_1sl_1ab7fe2192ed6368f030f29c6f1e3a1a91>`(size_t to);
+
+	uint8_t
+	:target:`getHiBitmask8<doxid-namespaceaxl_1_1sl_1ab9c07175448962a28ecfcfe4b0c68a49>`(size_t from);
+
+	uint8_t
+	:target:`getBitmask8<doxid-namespaceaxl_1_1sl_1a0f23a944fddef68fc925471572686d25>`(
+		size_t from,
+		size_t to
+		);
+
+	uint16_t
+	:target:`getLoBitmask16<doxid-namespaceaxl_1_1sl_1a227f26901ac5886a1c0cea1c0000b419>`(size_t to);
+
+	uint16_t
+	:target:`getHiBitmask16<doxid-namespaceaxl_1_1sl_1ab3d874f60794a2ea41f365a792c83f81>`(size_t from);
+
+	uint16_t
+	:target:`getBitmask16<doxid-namespaceaxl_1_1sl_1acba3e17e9a22daeb5e5fb110fdaef5ee>`(
+		size_t from,
+		size_t to
+		);
+
+	uint32_t
+	:target:`getLoBitmask32<doxid-namespaceaxl_1_1sl_1a5ff103e5b44b36af5a585ffc092063cf>`(size_t to);
+
+	uint32_t
+	:target:`getHiBitmask32<doxid-namespaceaxl_1_1sl_1afba7abf460192e9f2b6277994417589c>`(size_t from);
+
+	uint32_t
+	:target:`getBitmask32<doxid-namespaceaxl_1_1sl_1aa4f901dd0a217b52b8fbee7c028a9b3f>`(
+		size_t from,
+		size_t to
+		);
+
+	uint64_t
+	:target:`getLoBitmask64<doxid-namespaceaxl_1_1sl_1ab2c3a02949830f7bad7aac7d05587a9f>`(size_t to);
+
+	uint64_t
+	:target:`getHiBitmask64<doxid-namespaceaxl_1_1sl_1a4e336e9930957d5e9a186d0b29e5d313>`(size_t from);
+
+	uint64_t
+	:target:`getBitmask64<doxid-namespaceaxl_1_1sl_1a4a9996e4b63cab72186cda2b3a383689>`(
+		size_t from,
+		size_t to
+		);
+
+	template <typename T>
+	bool
+	:target:`isPowerOf2<doxid-namespaceaxl_1_1sl_1a70cdc164a868041fd56936f12e9f13ca>`(T x);
+
+	template <typename T>
+	bool
+	:target:`isAligned<doxid-namespaceaxl_1_1sl_1ab632fdd6fb391f797ab132d91ced8047>`(
+		T x,
+		size_t factor
+		);
+
+	template <
+		size_t factor,
+		typename T
+		>
+	bool
+	:target:`isAligned<doxid-namespaceaxl_1_1sl_1a1a8fd03ce589f544e41eacb9419e32b0>`(T x);
+
+	template <typename T>
+	T
+	:target:`align<doxid-namespaceaxl_1_1sl_1a57727144dbcd1a14b643b0957b094a40>`(
+		T x,
+		size_t factor
+		);
+
+	template <
+		size_t factor,
+		typename T
+		>
+	T
+	:target:`align<doxid-namespaceaxl_1_1sl_1a7e4874233dca3ed838b50addf4e60485>`(T x);
+
+	template <size_t growLimit>
+	size_t
+	:target:`getAllocSize<doxid-namespaceaxl_1_1sl_1a80056349f6811961c39096122971cda4>`(size_t size);
+
+	bool
+	:target:`getBit<doxid-namespaceaxl_1_1sl_1a3b6569a8b7b2ec13a71ee0f376763124>`(
+		const size_t* map,
+		size_t pageCount,
+		size_t bit
+		);
+
+	bool
+	:target:`setBit<doxid-namespaceaxl_1_1sl_1a68c0afac969b603b3ab33e0079a08744>`(
+		size_t* map,
+		size_t pageCount,
+		size_t bit,
+		bool value = true
+		);
+
+	bool
+	:target:`setBitRange<doxid-namespaceaxl_1_1sl_1af082695617c876f504776529bca76647>`(
+		size_t* map,
+		size_t pageCount,
+		size_t from,
+		size_t to,
+		bool value = true
+		);
+
+	bool
+	:target:`mergeBitMaps<doxid-namespaceaxl_1_1sl_1a4d590157bae658015582fb7fbd23b0a9>`(
+		size_t* map,
+		const size_t* map2,
+		size_t pageCount,
+		:ref:`BitOpKind<doxid-namespaceaxl_1_1sl_1a144f90741dcc145796ec2ae23244b157>` op
+		);
+
+	void
+	:target:`inverseBitMap<doxid-namespaceaxl_1_1sl_1ac1ca2cc593b3d9fbed2332d4cdfc894a>`(
+		size_t* map,
+		size_t pageCount
+		);
+
+	size_t
+	:target:`findBit<doxid-namespaceaxl_1_1sl_1aa635278d25090e9ad84a4e43efca8dd2>`(
+		const size_t* map,
+		size_t pageCount,
+		size_t from,
+		bool value = true
+		);
+
+	uint16_t
+	:target:`swapByteOrder16<doxid-namespaceaxl_1_1sl_1a7c165c516999ddbf6de9a395834023aa>`(uint16_t value);
+
+	uint32_t
+	:target:`swapByteOrder32<doxid-namespaceaxl_1_1sl_1a7aa08df34617741e7c846bae208f793f>`(uint32_t value);
+
+	uint64_t
+	:target:`swapByteOrder64<doxid-namespaceaxl_1_1sl_1af59b9910b00d29bd40e08b70fe6815b3>`(uint64_t value);
+
+	void
+	:target:`swapByteOrder<doxid-namespaceaxl_1_1sl_1a681062cb12c3a28ca270479118175b41>`(
+		void* dst,
+		const void* src,
+		size_t size
+		);
+
+	template <
+		typename Functor,
+		typename Argument
+		>
+	void
+	:target:`callOnce<doxid-namespaceaxl_1_1sl_1a000b5b64a9ab8e0cee51a4e6b38ea534>`(
+		Functor functor,
+		Argument argument,
+		volatile int32_t* flag = NULL
+		);
+
+	const char*
+	:target:`getCharLiteral<doxid-namespaceaxl_1_1sl_1abbb35713e4bd55c157536abbe1eea1dc>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` c);
+
+	const char*
+	:target:`getCharCodeLiteral<doxid-namespaceaxl_1_1sl_1a3aab4fdb3db3b3fe5037771878549a37>`(:ref:`uchar_t<doxid-axl__g_2axl__g___pch_8h_1a124ea0f8f4a23a0a286b5582137f0b8d>` c);
+
+	:ref:`String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`getCmdLineHelpString<doxid-namespaceaxl_1_1sl_1a72e4c5c62981aa21a59de38de2eeb6c2>`(const :ref:`ConstList<doxid-classaxl_1_1sl_1_1_const_list>`<:ref:`SwitchInfo<doxid-structaxl_1_1sl_1_1_switch_info>`>& switchInfoList);
+
+	template <typename T>
+	void
+	:target:`construct<doxid-namespaceaxl_1_1sl_1a3d15cce7547b231c96a5797bf0acfc67>`(T* p);
+
+	template <
+		typename T,
+		typename Arg
+		>
+	void
+	:target:`construct<doxid-namespaceaxl_1_1sl_1a064715538ed273b955497314ff46491f>`(
+		T* p,
+		Arg arg
+		);
+
+	template <
+		typename T,
+		typename Arg1,
+		typename Arg2
+		>
+	void
+	:target:`construct<doxid-namespaceaxl_1_1sl_1ae38ef486d11c8cfd7b59150d25488190>`(
+		T* p,
+		Arg1 arg1,
+		Arg2 arg2
+		);
+
+	template <
+		typename T,
+		typename Arg1,
+		typename Arg2,
+		typename Arg3
+		>
+	void
+	:target:`construct<doxid-namespaceaxl_1_1sl_1aee3821ede73fa94668bbfd921f4dddd9>`(
+		T* p,
+		Arg1 arg1,
+		Arg2 arg2,
+		Arg3 arg3
+		);
+
+	template <
+		typename T,
+		typename Arg1,
+		typename Arg2,
+		typename Arg3,
+		typename Arg4
+		>
+	void
+	:target:`construct<doxid-namespaceaxl_1_1sl_1a57d0786c1d12fc117ed916409415fad4>`(
+		T* p,
+		Arg1 arg1,
+		Arg2 arg2,
+		Arg3 arg3,
+		Arg4 arg4
+		);
+
+	template <typename T>
+	void
+	:target:`destruct<doxid-namespaceaxl_1_1sl_1a3804d6f5a2da0a51db0fecf81d6a5805>`(T* p);
+
+	template <typename T>
+	void
+	:target:`takeOver<doxid-namespaceaxl_1_1sl_1aaa616e3574b955e39fd92374c4deea21>`(
+		T* dst,
+		T* src
+		);
+
+	template <
+		typename T,
+		typename Action
+		>
+	void
+	:target:`loopArray<doxid-namespaceaxl_1_1sl_1a24dce0173e33ca6f4614e5014ac80aca>`(
+		T* p,
+		size_t count,
+		Action action
+		);
+
+	template <
+		typename Iterator,
+		typename Action
+		>
+	void
+	:target:`loopIterator<doxid-namespaceaxl_1_1sl_1a6d1eca11025c67d14cfbc168f5d574e3>`(
+		:ref:`Iterator<doxid-classaxl_1_1sl_1_1_iterator>` it,
+		Action action
+		);
+
+	template <
+		typename T,
+		typename Filter,
+		typename Action
+		>
+	size_t
+	:target:`filteredLoopArray<doxid-namespaceaxl_1_1sl_1a40b2f0f3a5bf6e190b549d8d1c1c366d>`(
+		T* p,
+		size_t count,
+		Filter filter,
+		Action action
+		);
+
+	template <
+		typename Iterator,
+		typename Filter,
+		typename Action
+		>
+	size_t
+	:target:`filteredLoopIterator<doxid-namespaceaxl_1_1sl_1a40b62a000a55a7b56c699596ae8d9e68>`(
+		:ref:`Iterator<doxid-classaxl_1_1sl_1_1_iterator>` it,
+		Filter filter,
+		Action action
+		);
+
+	:ref:`Guid<doxid-structaxl_1_1sl_1_1_guid>`
+	:target:`buildGuid<doxid-namespaceaxl_1_1sl_1a646c4e35b55757cf5b9494c408ca6e91>`(
+		uint32_t l,
+		uint16_t s1,
+		uint16_t s2,
+		uint8_t b1,
+		uint8_t b2,
+		uint8_t b3,
+		uint8_t b4,
+		uint8_t b5,
+		uint8_t b6,
+		uint8_t b7,
+		uint8_t b8
+		);
+
+	:ref:`Guid<doxid-structaxl_1_1sl_1_1_guid>`
+	:target:`parseGuid<doxid-namespaceaxl_1_1sl_1a1cede3ebef9f07ad567046b81da66cad>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+
+	:ref:`Guid<doxid-structaxl_1_1sl_1_1_guid>`
+	:target:`generateGuid<doxid-namespaceaxl_1_1sl_1a79bb90fb75bd55f6173156ad8419fb97>`();
+
+	size_t
+	:target:`djb2<doxid-namespaceaxl_1_1sl_1a7d8f47564f64ed6ded8e0c16798a8743>`();
+
+	size_t
+	:target:`djb2<doxid-namespaceaxl_1_1sl_1a66b1d6b66ec623f295f4bdf4cf79bee8>`(
+		size_t hash,
+		const void* p0,
+		size_t size
+		);
+
+	size_t
+	:target:`djb2<doxid-namespaceaxl_1_1sl_1a154686d51d807b3a41181caee5b1f39a>`(
+		const void* p,
+		size_t size
+		);
+
+	template <typename O>
+	size_t
+	:target:`djb2_op<doxid-namespaceaxl_1_1sl_1adf83a96cb406663381f1d1a5d4dca0cc>`(
+		O op,
+		size_t hash,
+		const :ref:`utf8_t<doxid-axl__g_2axl__g___pch_8h_1a7c11b6c8e64ae52835debfde24f748c0>`* p,
+		size_t length
+		);
+
+	template <typename O>
+	size_t
+	:target:`djb2_op<doxid-namespaceaxl_1_1sl_1a5292121e3980eac7c50d39f1c90d50fd>`(
+		O op,
+		size_t hash,
+		const :ref:`utf16_t<doxid-axl__g_2axl__g___pch_8h_1a106f39d3baa8aae83ab7ed73b5f296a9>`* p,
+		size_t length
+		);
+
+	template <typename O>
+	size_t
+	:target:`djb2_op<doxid-namespaceaxl_1_1sl_1a169352cd77dcf4abd2995e1b621aa733>`(
+		O op,
+		size_t hash,
+		const :ref:`utf32_t<doxid-axl__g_2axl__g___pch_8h_1af41dd99b13a93c49aa9ce4461748356a>`* p,
+		size_t length
+		);
+
+	template <
+		typename T,
+		typename O
+		>
+	size_t
+	:target:`djb2_op<doxid-namespaceaxl_1_1sl_1a0b3a69b3c8fbbe84c7741d36c371808a>`(
+		O op,
+		size_t hash,
+		const T* p,
+		size_t length
+		);
+
+	template <
+		typename T,
+		typename O
+		>
+	size_t
+	:target:`djb2_op<doxid-namespaceaxl_1_1sl_1ac2ac87020fb7042b253eae61db1a7fe4>`(
+		O op,
+		const T* p,
+		size_t length
+		);
+
+	uint16_t
+	:target:`checksum16<doxid-namespaceaxl_1_1sl_1ada6a3399eb579fabc225f22137d66330>`(
+		const void* p,
+		size_t size
+		);
+
+	const void*
+	:target:`memMem<doxid-namespaceaxl_1_1sl_1ab44e8f1e0ad04de965aaa80d9355c2b5>`(
+		const void* p1,
+		size_t size1,
+		const void* p2,
+		size_t size2
+		);
+
+	void*
+	:target:`memMem<doxid-namespaceaxl_1_1sl_1adceefdc2e271c50a575535e0849825c1>`(
+		void* p1,
+		size_t size1,
+		const void* p2,
+		size_t size2
+		);
+
+	const void*
+	:target:`reverseMemMem<doxid-namespaceaxl_1_1sl_1adf4e32975f3d9a8cf5f776250ac1b783>`(
+		const void* p1,
+		size_t size1,
+		const void* p2,
+		size_t size2
+		);
+
+	void*
+	:target:`reverseMemMem<doxid-namespaceaxl_1_1sl_1af70b818f915ae2bd742a29f78b558594>`(
+		void* p1,
+		size_t size1,
+		const void* p2,
+		size_t size2
+		);
+
+	template <typename T>
+	:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+	:target:`createPackage_va<doxid-namespaceaxl_1_1sl_1acdfdd692e36d1a87bd671ccccc9cf0a1>`(:ref:`axl_va_list<doxid-classaxl__va__list>` va);
+
+	template <typename T>
+	:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+	:target:`createPackage<doxid-namespaceaxl_1_1sl_1a68f448b594756568409e07cbaf227689>`(
+		int unused,
+		...
+		);
+
+	:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+	:target:`formatPackage_va<doxid-namespaceaxl_1_1sl_1a7de57dd23660d8e4eb06bae63bee6334>`(
+		const char* formatString,
+		:ref:`axl_va_list<doxid-classaxl__va__list>` va
+		);
+
+	:ref:`rc::Ptr<doxid-classaxl_1_1rc_1_1_ptr>`<:ref:`mem::Block<doxid-structaxl_1_1mem_1_1_block>`>
+	:target:`formatPackage<doxid-namespaceaxl_1_1sl_1aa5fa5b88a875c02c759453af004e59e0>`(
+		const char* formatString,
+		...
+		);
+
+	template <typename T>
+	T*
+	:target:`getSimpleSingleton<doxid-namespaceaxl_1_1sl_1a9b3d2dde56c5b77475af7f0b6e3c9d3f>`(volatile int32_t* flag = NULL);
+
+	template <typename T>
+	T*
+	:target:`getSingleton<doxid-namespaceaxl_1_1sl_1a7f007c6977ae1d6f4349e79faab9c578>`(volatile int32_t* flag = NULL);
+
+	template <typename C>
+	:ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<C>
+	:target:`operator+<doxid-namespaceaxl_1_1sl_1afdf824dd8be3212e1be0d04c2d689444>`(
+		const char* p,
+		const :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<C>& src
+		);
+
+	template <typename C>
+	:ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<C>
+	:target:`operator+<doxid-namespaceaxl_1_1sl_1ae39370fed450aab476a993da342d01e2>`(
+		const wchar_t* p,
+		const :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<C>& src
+		);
+
+	template <typename C>
+	:ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<C>
+	:target:`operator+<doxid-namespaceaxl_1_1sl_1a7b51f2c18633e91592120aeb11813f06>`(
+		char c,
+		const :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<C>& src
+		);
+
+	template <typename C>
+	:ref:`StringBase<doxid-classaxl_1_1sl_1_1_string_base>`<C>
+	:target:`operator+<doxid-namespaceaxl_1_1sl_1a4724a993c7fc4536cfcb6d515c409aa5>`(
+		wchar_t c,
+		const :ref:`StringRefBase<doxid-classaxl_1_1sl_1_1_string_ref_base>`<C>& src
+		);
+
+	:ref:`String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`formatString_va<doxid-namespaceaxl_1_1sl_1a6b25d47bffdf6cdc3dc1ab51c8ca172f>`(
+		const char* formatString,
+		:ref:`axl_va_list<doxid-classaxl__va__list>` va
+		);
+
+	:ref:`String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+	:target:`formatString<doxid-namespaceaxl_1_1sl_1ade9575e0a621a31e0b76b3a1982502e6>`(
+		const char* formatString,
+		...
+		);
+
+	:ref:`String_w<doxid-namespaceaxl_1_1sl_1af48c091365c4e43d1fe0621316b75161>`
+	:target:`formatString_w_va<doxid-namespaceaxl_1_1sl_1aaef71b0cd8ac607f562375497d3fc6cb>`(
+		const wchar_t* formatString,
+		:ref:`axl_va_list<doxid-classaxl__va__list>` va
+		);
+
+	:ref:`String_w<doxid-namespaceaxl_1_1sl_1af48c091365c4e43d1fe0621316b75161>`
+	:target:`formatString_w<doxid-namespaceaxl_1_1sl_1a99763b0b7faceaf31349fddcdbd188d6>`(
+		const wchar_t* formatString,
+		...
+		);
+
+	template <typename T>
+	void
+	:target:`swap<doxid-namespaceaxl_1_1sl_1ac8e1e83d48e8a6566700f5494dcdc6e0>`(
+		T* a,
+		T* b
+		);
+
+	} // namespace sl

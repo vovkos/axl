@@ -1,0 +1,21 @@
+.. index:: pair: enum; Base64EncodingFlag
+.. _doxid-namespaceaxl_1_1enc_1a1d76bac16cbc2263548ba93025d70894:
+
+enum axl::enc::Base64EncodingFlag
+=================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_enc_Base64Encoding.h>
+
+	enum Base64EncodingFlag
+	{
+	    :target:`Base64EncodingFlag_NoPadding<doxid-namespaceaxl_1_1enc_1a1d76bac16cbc2263548ba93025d70894a479d4d80daec98e7f617abbc39c37d67>` = 0x01,
+	    :target:`Base64EncodingFlag_UrlChars<doxid-namespaceaxl_1_1enc_1a1d76bac16cbc2263548ba93025d70894a47ab0c227eb942db38665bdd0c95336f>`  = 0x02,
+	    :target:`Base64EncodingFlag_Url<doxid-namespaceaxl_1_1enc_1a1d76bac16cbc2263548ba93025d70894a9875d51467672a6c7996d2792fb8c743>`       = Base64EncodingFlag_UrlChars | Base64EncodingFlag_NoPadding,
+	    :target:`Base64EncodingFlag_Multiline<doxid-namespaceaxl_1_1enc_1a1d76bac16cbc2263548ba93025d70894ac5adcccfa0a1abc03bc67c7d0af7c2cb>` = 0x08,
+	};
+

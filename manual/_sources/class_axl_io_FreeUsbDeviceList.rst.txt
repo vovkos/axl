@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::FreeUsbDeviceList
+.. _doxid-classaxl_1_1io_1_1_free_usb_device_list:
+
+class axl::io::FreeUsbDeviceList
+================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_UsbDevice.h>
+	
+	class FreeUsbDeviceList
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1_free_usb_device_list_1a3c1b8515fa57a191e0dce04226208900>`(libusb_device** h);
+	};

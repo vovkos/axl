@@ -1,0 +1,100 @@
+.. index:: pair: class; axl::gui::GdiFont
+.. _doxid-classaxl_1_1gui_1_1_gdi_font:
+
+class axl::gui::GdiFont
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_GdiFont.h>
+	
+	class GdiFont:
+	    public :ref:`axl::gui::Font<doxid-classaxl_1_1gui_1_1_font>`,
+	    public :ref:`axl::gui::GdiObjectHandle<doxid-classaxl_1_1gui_1_1_gdi_object_handle>`
+	{
+	public:
+		// construction
+	
+		:target:`GdiFont<doxid-classaxl_1_1gui_1_1_gdi_font_1a4d64ee3d2cfe23311c667664c25d293a>`();
+
+		// methods
+	
+		bool
+		:target:`getLogFont<doxid-classaxl_1_1gui_1_1_gdi_font_1a1aa4ed4a7f44faec08a2203d8315dbc7>`(LOGFONTW* logFont);
+	
+		virtual
+		bool
+		:target:`isMonospace<doxid-classaxl_1_1gui_1_1_gdi_font_1a0774cd2b6d712dad9c4774dff95fb69a>`();
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf8<doxid-classaxl_1_1gui_1_1_gdi_font_1a864c8b4935f2535d58c27e2bdf064a93>`(const :ref:`sl::StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& text);
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf16<doxid-classaxl_1_1gui_1_1_gdi_font_1ac4c66ca1d1ebf1a0fc978ef2b9b24040>`(const :ref:`sl::StringRef_utf16<doxid-namespaceaxl_1_1sl_1a5038487798790b54b7cf85af8fa4c08d>`& text);
+	
+		virtual
+		:ref:`Size<doxid-structaxl_1_1gui_1_1_size>`
+		:target:`calcTextSize_utf32<doxid-classaxl_1_1gui_1_1_gdi_font_1ac5e27d5b49ab137124198f242a2f5095>`(const :ref:`sl::StringRef_utf32<doxid-namespaceaxl_1_1sl_1a77a0507413b5118e0079dd6dcd5c5156>`& text);
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`Engine<doxid-classaxl_1_1gui_1_1_engine>`*
+		:ref:`getEngine<doxid-classaxl_1_1gui_1_1_gui_item_1a2333ad546313fbcafbab4fa0009d5ffc>`();
+	
+		:ref:`Font<doxid-classaxl_1_1gui_1_1_font>`*
+		:ref:`getFontMod<doxid-classaxl_1_1gui_1_1_font_1acdea6fb0df2ee62491b578cf29c0117d>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` flags);
+	
+		bool
+		:ref:`getFontDesc<doxid-classaxl_1_1gui_1_1_font_1a7610714a3ffa1b3a226a9857bd3f404b>`(:ref:`FontDesc<doxid-structaxl_1_1gui_1_1_font_desc>`* fontDesc);
+	
+		bool
+		:ref:`isMonospace<doxid-classaxl_1_1gui_1_1_font_1a3a253bab478fc25fa13b0e19f7bfbd92>`();
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

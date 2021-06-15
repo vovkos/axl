@@ -1,0 +1,19 @@
+.. index:: pair: enum; TextBoyerMooreFlag
+.. _doxid-namespaceaxl_1_1sl_1a93276d1153f712a58b47061f786e3ca6:
+
+enum axl::sl::TextBoyerMooreFlag
+================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_BoyerMooreFind.h>
+
+	enum TextBoyerMooreFlag
+	{
+	    :target:`TextBoyerMooreFlag_CaseInsensitive<doxid-namespaceaxl_1_1sl_1a93276d1153f712a58b47061f786e3ca6ae1e93ecb92c63379a956ebfbc0880bc5>` = 0x10,
+	    :target:`TextBoyerMooreFlag_WholeWord<doxid-namespaceaxl_1_1sl_1a93276d1153f712a58b47061f786e3ca6aa8337a22877849347c83dcbe57a7f66c>`       = 0x20,
+	};
+

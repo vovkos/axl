@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::io::CloseUsbContext
+.. _doxid-classaxl_1_1io_1_1_close_usb_context:
+
+class axl::io::CloseUsbContext
+==============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_UsbContext.h>
+	
+	class CloseUsbContext
+	{
+	public:
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1io_1_1_close_usb_context_1aba42a0650762b857a1b7154a24d7a983>`(libusb_context* h);
+	};

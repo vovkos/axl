@@ -1,0 +1,26 @@
+.. index:: pair: struct; axl::sl::ListData
+.. _doxid-structaxl_1_1sl_1_1_list_data:
+
+template struct axl::sl::ListData
+=================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_List.h>
+	
+	template <typename T>
+	struct ListData
+	{
+		// fields
+	
+		T* :target:`m_head<doxid-structaxl_1_1sl_1_1_list_data_1a4e6d9b495aeb6fb26a3435c169a394fe>`;
+		T* :target:`m_tail<doxid-structaxl_1_1sl_1_1_list_data_1a89680bafbd7190a73ca501da1bfd729e>`;
+		size_t :target:`m_count<doxid-structaxl_1_1sl_1_1_list_data_1ad92fe81db97dd94b66ef7a584ea2dfc4>`;
+	};

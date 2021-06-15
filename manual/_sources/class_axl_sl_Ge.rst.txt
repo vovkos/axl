@@ -1,0 +1,32 @@
+.. index:: pair: class; axl::sl::Ge
+.. _doxid-classaxl_1_1sl_1_1_ge:
+
+template class axl::sl::Ge
+==========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <
+		typename T,
+		typename Arg = typename ArgType<T>::Type
+		>
+	class Ge
+	{
+	public:
+		// methods
+	
+		bool
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_ge_1a8a54d395d0ee744558128649ff0e496b>`(
+			Arg a,
+			Arg b
+			) const;
+	};

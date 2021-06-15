@@ -1,0 +1,19 @@
+.. index:: pair: enum; WmKind
+.. _doxid-namespaceaxl_1_1gui_1a564290a8b3722f7c27f301218c6d56e0:
+
+enum axl::gui::WmKind
+=====================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_GdiWidget.h>
+
+	enum WmKind
+	{
+	    :target:`WmKind_First<doxid-namespaceaxl_1_1gui_1a564290a8b3722f7c27f301218c6d56e0accbd3d6c4654659c6fe0f8b2481a664b>`     = 0x0600,
+	    :target:`WmKind_ThreadMsg<doxid-namespaceaxl_1_1gui_1a564290a8b3722f7c27f301218c6d56e0a85b777e864453a7c6cec13e4d23b60b8>`,
+	};
+

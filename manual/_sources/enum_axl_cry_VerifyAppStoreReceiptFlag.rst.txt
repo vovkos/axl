@@ -1,0 +1,19 @@
+.. index:: pair: enum; VerifyAppStoreReceiptFlag
+.. _doxid-namespaceaxl_1_1cry_1ab8c512593ee55551501a11e2e5c3956f:
+
+enum axl::cry::VerifyAppStoreReceiptFlag
+========================================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_AppStoreReceipt.h>
+
+	enum VerifyAppStoreReceiptFlag
+	{
+	    :target:`VerifyAppStoreReceiptFlag_SkipSignatureCheck<doxid-namespaceaxl_1_1cry_1ab8c512593ee55551501a11e2e5c3956fab7ed9aca62f53912f0c558bd56431a6c>` = 0x01,
+	    :target:`VerifyAppStoreReceiptFlag_SkipHashCheck<doxid-namespaceaxl_1_1cry_1ab8c512593ee55551501a11e2e5c3956fae51c9d25b9d9947c70af34bb607963a9>`      = 0x02,
+	};
+

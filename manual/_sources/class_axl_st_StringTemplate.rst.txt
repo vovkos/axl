@@ -1,0 +1,54 @@
+.. index:: pair: class; axl::st::StringTemplate
+.. _doxid-classaxl_1_1st_1_1_string_template:
+
+template class axl::st::StringTemplate
+======================================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_st_StringTemplate_EmitContext.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_st_StringTemplate.h>
+	
+	template <typename T>
+	class StringTemplate
+	{
+	public:
+		// structs
+	
+		struct :ref:`EmitContext<doxid-structaxl_1_1st_1_1_string_template_1_1_emit_context>`;
+
+		// methods
+	
+		void
+		:target:`clear<doxid-classaxl_1_1st_1_1_string_template_1a6cc24f6b779dcafc4c97d3727a37e046>`();
+	
+		bool
+		:target:`process<doxid-classaxl_1_1st_1_1_string_template_1a0952cf5fd5cc145dccd80e2e685077e4>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* output,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& frame
+			);
+	
+		bool
+		:target:`processFile<doxid-classaxl_1_1st_1_1_string_template_1af046500fe641ca27af7fe68775cf9d87>`(
+			:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* output,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& fileName
+			);
+	
+		bool
+		:target:`processFileToFile<doxid-classaxl_1_1st_1_1_string_template_1abe4a452a84976710deb18c5e473cc0c7>`(
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& targetFileName,
+			const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& frameFileName
+			);
+	
+		bool
+		:target:`append<doxid-classaxl_1_1st_1_1_string_template_1a4904a2d10d905e7739ba634fdf753abe>`(const :ref:`sl::StringRef<doxid-namespaceaxl_1_1sl_1ae3ce3de11e537230da00c6c0a571ef60>`& string);
+	};

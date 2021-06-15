@@ -1,0 +1,32 @@
+.. index:: pair: struct; axl::io::SharedMemoryTransportHdr
+.. _doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr:
+
+struct axl::io::SharedMemoryTransportHdr
+========================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_io_SharedMemoryTransport.h>
+	
+	struct SharedMemoryTransportHdr
+	{
+		// fields
+	
+		uint32_t :target:`m_signature<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1a6fa8ec64c7765ba29b68dee2ce34f6a5>`;
+		uint32_t :target:`m_padding<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1a80210ece7e1feac01ffb2ca83feeca8b>`;
+		int32_t :target:`m_lock<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1a0dfc6be54bc90f7f5cfac1f8457a4b3f>`;
+		uint32_t :target:`m_state<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1ac12921a931ad6b1116c19cc8e65709dc>`;
+		uint32_t :target:`m_readSemaphoreWaitCount<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1a091c759c1fd6e4e5135f62052ee22b46>`;
+		uint32_t :target:`m_writeSemaphoreWaitCount<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1ab7b244126caf102648e0c53b6d264450>`;
+		uint32_t :target:`m_readOffset<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1a05ddae39c10420b737d357a891ab86be>`;
+		uint32_t :target:`m_writeOffset<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1a117f8fead0d3dabcb820bd9e737a9b43>`;
+		uint32_t :target:`m_endOffset<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1aa9165dff3b41dceeabbe59723defe3fc>`;
+		uint32_t :target:`m_dataSize<doxid-structaxl_1_1io_1_1_shared_memory_transport_hdr_1a302457fce10ae7b244f21921adc204f1>`;
+	};

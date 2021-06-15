@@ -1,0 +1,44 @@
+.. index:: pair: struct; axl::gui::Palette
+.. _doxid-structaxl_1_1gui_1_1_palette:
+
+struct axl::gui::Palette
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Color.h>
+	
+	struct Palette
+	{
+		// fields
+	
+		const :ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`* :target:`m_colorArray<doxid-structaxl_1_1gui_1_1_palette_1aa863bc06e0888267869890304ac5f17b>`;
+		size_t :target:`m_count<doxid-structaxl_1_1gui_1_1_palette_1ab3b656fcb19726e806b2311682c99f9f>`;
+
+		// construction
+	
+		:target:`Palette<doxid-structaxl_1_1gui_1_1_palette_1afdb9b51443423b1a31b2306429b076d5>`();
+	
+		:target:`Palette<doxid-structaxl_1_1gui_1_1_palette_1a7ecd3f82f77a62233cec95fa6e03b543>`(
+			const :ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`* colorTable,
+			size_t count
+			);
+
+		// methods
+	
+		:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`
+		:target:`getColorRgb<doxid-structaxl_1_1gui_1_1_palette_1a1c382f607d0cf9c67089e13d2895f344>`(:ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>` color);
+	
+		void
+		:target:`setup<doxid-structaxl_1_1gui_1_1_palette_1a2226fdb7e3c32cdc3ae0759c5732b65e>`(
+			const :ref:`uint_t<doxid-axl__g_2axl__g___pch_8h_1a12a1e9b3ce141648783a82445d02b58d>`* colorTable,
+			size_t count
+			);
+	};

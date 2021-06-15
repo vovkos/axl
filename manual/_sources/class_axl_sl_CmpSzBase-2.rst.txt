@@ -1,0 +1,29 @@
+.. index:: pair: class; axl::sl::CmpSzBase<char>
+.. _doxid-classaxl_1_1sl_1_1_cmp_sz_base_3_01char_01_4:
+
+template class axl::sl::CmpSzBase<char>
+=======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Cmp.h>
+	
+	template <>
+	class CmpSzBase<char>
+	{
+	public:
+		// methods
+	
+		int
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_cmp_sz_base_3_01char_01_4_1a217d53e1c0006ce443945d615fbc6af7>`(
+			const char* p1,
+			const char* p2
+			) const;
+	};

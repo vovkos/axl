@@ -1,0 +1,68 @@
+.. index:: pair: class; axl::sl::CircularBuffer
+.. _doxid-classaxl_1_1sl_1_1_circular_buffer:
+
+class axl::sl::CircularBuffer
+=============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_CircularBuffer.h>
+	
+	class CircularBuffer
+	{
+	public:
+		// construction
+	
+		:target:`CircularBuffer<doxid-classaxl_1_1sl_1_1_circular_buffer_1aabc57d2e626d7b774bc03e99ca7d4cf7>`();
+
+		// methods
+	
+		bool
+		:target:`isValid<doxid-classaxl_1_1sl_1_1_circular_buffer_1aca2e36ad0347c06db9ad4647cd34360d>`() const;
+	
+		bool
+		:target:`isEmpty<doxid-classaxl_1_1sl_1_1_circular_buffer_1a3eee6fd07e2d3e629572fe8c5aa05a51>`() const;
+	
+		bool
+		:target:`isFull<doxid-classaxl_1_1sl_1_1_circular_buffer_1a1a06ba797128d5ff06ca1828bef633c2>`() const;
+	
+		size_t
+		:target:`getBufferSize<doxid-classaxl_1_1sl_1_1_circular_buffer_1ae66379e59ffbe532bc87a7799672f5f3>`() const;
+	
+		bool
+		:target:`setBufferSize<doxid-classaxl_1_1sl_1_1_circular_buffer_1a6891554ab72036dbfee1437b18811611>`(size_t size);
+	
+		size_t
+		:target:`getDataSize<doxid-classaxl_1_1sl_1_1_circular_buffer_1ad2abf25e3bb0c77af67aaab0b993c947>`() const;
+	
+		void
+		:target:`clear<doxid-classaxl_1_1sl_1_1_circular_buffer_1a9d5c086f99ed075b8a7029293deeea26>`();
+	
+		size_t
+		:target:`readAll<doxid-classaxl_1_1sl_1_1_circular_buffer_1aece2b696d80265453399888d96a936cc>`(:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>* buffer);
+	
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<char>
+		:target:`readAll<doxid-classaxl_1_1sl_1_1_circular_buffer_1a589c694b421c26ae2c17a454277be1f7>`();
+	
+		size_t
+		:target:`read<doxid-classaxl_1_1sl_1_1_circular_buffer_1abff22eb719421369b39f2ef96e96f1cf>`(
+			void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`write<doxid-classaxl_1_1sl_1_1_circular_buffer_1a29ee643cea9e917fe7de2eab3834dc3a>`(
+			const void* p,
+			size_t size
+			);
+	
+		size_t
+		:target:`drop<doxid-classaxl_1_1sl_1_1_circular_buffer_1a58fe6dd16328419d76b74559afd89d37>`(size_t size);
+	};

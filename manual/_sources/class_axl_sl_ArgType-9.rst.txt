@@ -1,0 +1,25 @@
+.. index:: pair: class; axl::sl::ArgType<String_utf8>
+.. _doxid-classaxl_1_1sl_1_1_arg_type_3_01_string__utf8_01_4:
+
+template class axl::sl::ArgType<String_utf8>
+============================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_String.h>
+	
+	template <>
+	class ArgType<String_utf8>
+	{
+	public:
+		// typedefs
+	
+		typedef const :ref:`StringRef_utf8<doxid-namespaceaxl_1_1sl_1a14981db8a0b963084ec6459f5f30dd4f>`& :target:`Type<doxid-classaxl_1_1sl_1_1_arg_type_3_01_string__utf8_01_4_1ae5045bb6394a5e73d4e3bafe01256e6b>`;
+	};

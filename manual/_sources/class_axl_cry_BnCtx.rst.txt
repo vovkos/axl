@@ -1,0 +1,77 @@
+.. index:: pair: class; axl::cry::BnCtx
+.. _doxid-classaxl_1_1cry_1_1_bn_ctx:
+
+class axl::cry::BnCtx
+=====================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_BigNum.h>
+	
+	class BnCtx: public :ref:`axl::sl::Handle<doxid-classaxl_1_1sl_1_1_handle>`
+	{
+	public:
+		// construction
+	
+		:target:`BnCtx<doxid-classaxl_1_1cry_1_1_bn_ctx_1a822408f4be5b233e6989d2a99dd1a6b3>`();
+		:target:`BnCtx<doxid-classaxl_1_1cry_1_1_bn_ctx_1abc37653b36bbaccb25c0a1b62ccdda1f>`(BN_CTX* h);
+
+		// methods
+	
+		void
+		:target:`start<doxid-classaxl_1_1cry_1_1_bn_ctx_1ad953da3265e1e7c6c208d0780922fb4d>`();
+	
+		void
+		:target:`end<doxid-classaxl_1_1cry_1_1_bn_ctx_1a3242ce1f071c8bb5fa94108027352f34>`();
+	
+		BIGNUM*
+		:target:`getBigNum<doxid-classaxl_1_1cry_1_1_bn_ctx_1accdba75fa360cd3a5e994bae3a7926a3>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// typedefs
+	
+		typedef T :ref:`H<doxid-classaxl_1_1sl_1_1_handle_1a188765028bffca96ef6ed6638ce9f654>`;
+
+		// methods
+	
+		:ref:`operator T<doxid-classaxl_1_1sl_1_1_handle_1ada6ac10b3fc0a5d2778b1dfc8adc6ca2>`() const;
+	
+		T
+		:ref:`operator-><doxid-classaxl_1_1sl_1_1_handle_1a0f0fad98719a4350af69d32a66d3e7ad>`() const;
+	
+		const :ref:`Handle<doxid-classaxl_1_1sl_1_1_handle>`&
+		:ref:`operator=<doxid-classaxl_1_1sl_1_1_handle_1a0a34799e733a133110e663af5c695bb2>`(T h);
+	
+		bool
+		:ref:`isOpen<doxid-classaxl_1_1sl_1_1_handle_1a88cceffbbd3a1caeffaa998ac9c0c616>`() const;
+	
+		void
+		:ref:`close<doxid-classaxl_1_1sl_1_1_handle_1a4f4349dda184939edffd0c8229b20872>`();
+	
+		void
+		:ref:`attach<doxid-classaxl_1_1sl_1_1_handle_1a51e30365c2f9c7372a534dd776b1da9a>`(T h);
+	
+		T
+		:ref:`detach<doxid-classaxl_1_1sl_1_1_handle_1aba1f7ac04018f2f403e94ddff96b7051>`();
+	
+		T*
+		:ref:`p<doxid-classaxl_1_1sl_1_1_handle_1af56d375af50768cf2e1ea3ca06828db9>`();
+	
+		static
+		T
+		:ref:`getInvalidHandle<doxid-classaxl_1_1sl_1_1_handle_1ad0019f565f53583938191aafffb378e1>`();
+

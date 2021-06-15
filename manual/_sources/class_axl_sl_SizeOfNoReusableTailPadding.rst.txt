@@ -1,0 +1,38 @@
+.. index:: pair: class; axl::sl::SizeOfNoReusableTailPadding
+.. _doxid-classaxl_1_1sl_1_1_size_of_no_reusable_tail_padding:
+
+template class axl::sl::SizeOfNoReusableTailPadding
+===================================================
+
+.. toctree::
+	:hidden:
+
+	struct_axl_sl_SizeOfNoReusableTailPadding_Calc.rst
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Operator.h>
+	
+	template <typename T>
+	class SizeOfNoReusableTailPadding
+	{
+	public:
+		// structs
+	
+		struct :ref:`Calc<doxid-structaxl_1_1sl_1_1_size_of_no_reusable_tail_padding_1_1_calc>`;
+
+		// methods
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_size_of_no_reusable_tail_padding_1a3dc51247056720d36e22b3b87697784b>`() const;
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_size_of_no_reusable_tail_padding_1a8359f95446527aebfa4f07cc3377c1f8>`(const T* x) const;
+	
+		size_t
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_size_of_no_reusable_tail_padding_1a5973d5bf92ccef788520438036f94812>`(const T& x) const;
+	};

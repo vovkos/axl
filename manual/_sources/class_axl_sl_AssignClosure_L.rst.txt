@@ -1,0 +1,33 @@
+.. index:: pair: class; axl::sl::AssignClosure_L
+.. _doxid-classaxl_1_1sl_1_1_assign_closure___l:
+
+template class axl::sl::AssignClosure_L
+=======================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_sl_Closure.h>
+	
+	template <
+		typename T,
+		typename Arg = T
+		>
+	class AssignClosure_L
+	{
+	public:
+		// construction
+	
+		:target:`AssignClosure_L<doxid-classaxl_1_1sl_1_1_assign_closure___l_1a47d298f9dbe84dcac5b9afc4ab66dc82>`(T& a);
+
+		// methods
+	
+		void
+		:target:`operator()<doxid-classaxl_1_1sl_1_1_assign_closure___l_1a574903ee8fe4decb0ace617bbbdb9916>`(T& b) const;
+	};

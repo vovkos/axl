@@ -1,0 +1,34 @@
+.. index:: pair: class; axl::re::NfaTransitionMgr
+.. _doxid-classaxl_1_1re_1_1_nfa_transition_mgr:
+
+class axl::re::NfaTransitionMgr
+===============================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_re_Nfa.h>
+	
+	class NfaTransitionMgr
+	{
+	public:
+		// methods
+	
+		void
+		:target:`clear<doxid-classaxl_1_1re_1_1_nfa_transition_mgr_1a25a5e8bb1f0b7f8ae4d39790d1554c11>`();
+	
+		:ref:`sl::ConstList<doxid-classaxl_1_1sl_1_1_const_list>`<:ref:`NfaTransition<doxid-structaxl_1_1re_1_1_nfa_transition>`>
+		:target:`getTransitionList<doxid-classaxl_1_1re_1_1_nfa_transition_mgr_1adaf109d8398e006f2f39450b3e160738>`();
+	
+		void
+		:target:`addMatchState<doxid-classaxl_1_1re_1_1_nfa_transition_mgr_1aff7d3de54e5b7c8249b03670b5cab699>`(:ref:`NfaState<doxid-structaxl_1_1re_1_1_nfa_state>`* state);
+	
+		void
+		:target:`finalize<doxid-classaxl_1_1re_1_1_nfa_transition_mgr_1a565ee068fd73f6f538da6b936fe4e1a8>`();
+	};

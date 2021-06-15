@@ -1,0 +1,27 @@
+.. index:: pair: struct; axl::sys::ReadWriteLock::Data
+.. _doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data:
+
+struct axl::sys::ReadWriteLock::Data
+====================================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	
+	struct Data
+	{
+		// fields
+	
+		uint32_t :target:`m_signature<doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data_1a5018308191c3a6ce0add2b29c8ea7d63>`;
+		int32_t :target:`m_lock<doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data_1ae1fbae12cb2ee5a4a53162145b8a5aa9>`;
+		uint32_t :target:`m_activeReadCount<doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data_1a63c87ec54a87a0bd4e1b8526eec9911a>`;
+		uint32_t :target:`m_queuedReadCount<doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data_1adaf727e2142a7e3185752240eadf19b1>`;
+		uint32_t :target:`m_activeWriteCount<doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data_1a552079db91fe94f644211a4b734050ad>`;
+		uint32_t :target:`m_queuedWriteCount<doxid-structaxl_1_1sys_1_1_read_write_lock_1_1_data_1a5343702f71d6b65a0d08dba434e3d23a>`;
+	};

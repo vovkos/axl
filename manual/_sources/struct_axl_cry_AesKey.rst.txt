@@ -1,0 +1,53 @@
+.. index:: pair: struct; axl::cry::AesKey
+.. _doxid-structaxl_1_1cry_1_1_aes_key:
+
+struct axl::cry::AesKey
+=======================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_cry_Aes.h>
+	
+	struct AesKey: public AES_KEY
+	{
+		// construction
+	
+		:target:`AesKey<doxid-structaxl_1_1cry_1_1_aes_key_1aeebee49a27c595b1cdd925f652d18481>`();
+
+		// methods
+	
+		bool
+		:target:`setEncryptKey<doxid-structaxl_1_1cry_1_1_aes_key_1ab90e5ede50287c8ef2a134161f3fa7e6>`(
+			const void* p,
+			size_t bitCount
+			);
+	
+		bool
+		:target:`setDecryptKey<doxid-structaxl_1_1cry_1_1_aes_key_1a8425d742716259af6cd5e0ac99f94392>`(
+			const void* p,
+			size_t bitCount
+			);
+	
+		void
+		:target:`cbcEncrypt<doxid-structaxl_1_1cry_1_1_aes_key_1a77b964a5c9b73de8af638f09d1b13773>`(
+			void* dst,
+			const void* src,
+			size_t size,
+			void* iv
+			);
+	
+		void
+		:target:`cbcDecrypt<doxid-structaxl_1_1cry_1_1_aes_key_1a608f5bb1d68e55808fa2b32919d636b9>`(
+			void* dst,
+			const void* src,
+			size_t size,
+			void* iv
+			);
+	};

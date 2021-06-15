@@ -1,0 +1,20 @@
+.. index:: pair: enum; StdFontKind
+.. _doxid-namespaceaxl_1_1gui_1a456c44e84a2ffe5c46ea2b7baeb075d2:
+
+enum axl::gui::StdFontKind
+==========================
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_gui_Engine.h>
+
+	enum StdFontKind
+	{
+	    :target:`StdFontKind_Gui<doxid-namespaceaxl_1_1gui_1a456c44e84a2ffe5c46ea2b7baeb075d2a6bbd4d23a6f03cfd3db7474497793202>`       = 0,
+	    :target:`StdFontKind_Monospace<doxid-namespaceaxl_1_1gui_1a456c44e84a2ffe5c46ea2b7baeb075d2a83dbb8455e6f2f2040ca305958a6187b>`,
+	    :target:`StdFontKind__Count<doxid-namespaceaxl_1_1gui_1a456c44e84a2ffe5c46ea2b7baeb075d2ad7e42c0a8f003cd45bd5b14b841bdb8c>`,
+	};
+

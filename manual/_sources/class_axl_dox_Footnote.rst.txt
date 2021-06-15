@@ -1,0 +1,105 @@
+.. index:: pair: class; axl::dox::Footnote
+.. _doxid-classaxl_1_1dox_1_1_footnote:
+
+class axl::dox::Footnote
+========================
+
+.. toctree::
+	:hidden:
+
+
+
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-code-block
+
+	#include <axl_dox_Block.h>
+	
+	class Footnote: public :ref:`axl::dox::Block<doxid-classaxl_1_1dox_1_1_block>`
+	{
+	public:
+		// construction
+	
+		:target:`Footnote<doxid-classaxl_1_1dox_1_1_footnote_1a181c18f303f4ae2733e1739d3d905b4d>`(:ref:`Host<doxid-structaxl_1_1dox_1_1_host>`* host);
+
+		// methods
+	
+		:ref:`Block<doxid-classaxl_1_1dox_1_1_block>`*
+		:target:`getParent<doxid-classaxl_1_1dox_1_1_footnote_1afcc6e8ccd9b85243bd1804df121fff2a>`();
+	};
+
+Inherited Members
+-----------------
+
+.. ref-code-block:: cpp
+	:class: doxyrest-overview-inherited-code-block
+
+	public:
+		// fields
+	
+		:ref:`BlockKind<doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009a>` :ref:`m_blockKind<doxid-structaxl_1_1dox_1_1_block_data_1ab122c9024f7542ad4b35b6e2ffdc4262>`;
+		:ref:`Group<doxid-classaxl_1_1dox_1_1_group>`* :ref:`m_group<doxid-structaxl_1_1dox_1_1_block_data_1a197147ac6b91d7ae5f20eaa40045e217>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_source<doxid-structaxl_1_1dox_1_1_block_data_1abc43b901e0a3cbcef9f1af30d9ed3924>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_refId<doxid-structaxl_1_1dox_1_1_block_data_1a9a505553761ea0a9ea3d8e5ac4f954d8>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_title<doxid-structaxl_1_1dox_1_1_block_data_1af2da7af02b1b55b22e99b301f2f1de57>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_briefDescription<doxid-structaxl_1_1dox_1_1_block_data_1a1c2cdd84862f664231b6e79df9fb4eac>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_detailedDescription<doxid-structaxl_1_1dox_1_1_block_data_1a7d5711b3aaa9a325d98cd7d8c0af5f26>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_seeAlsoDescription<doxid-structaxl_1_1dox_1_1_block_data_1af4c421bb8799e6c682ef0db7fae24122>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_internalDescription<doxid-structaxl_1_1dox_1_1_block_data_1a00bd683a640e7bbb016dc664cc1e3dcc>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>` :ref:`m_returnDescription<doxid-structaxl_1_1dox_1_1_block_data_1a58447d55dcd2ba012eac1987aefd5385>`;
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`* :ref:`m_currentDescription<doxid-structaxl_1_1dox_1_1_block_data_1a006337f4395aa567a418d1411257b04b>`;
+		:ref:`sl::List<doxid-classaxl_1_1sl_1_1_list>`<:ref:`Param<doxid-structaxl_1_1dox_1_1_param>`> :ref:`m_paramList<doxid-structaxl_1_1dox_1_1_block_data_1a809d26bb37a63c956745e8793e1ea4f9>`;
+		:ref:`sl::BoxList<doxid-classaxl_1_1sl_1_1_box_list>`<:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`> :ref:`m_importList<doxid-structaxl_1_1dox_1_1_block_data_1ac5fdd2bd85704af2fd7bc472e8a6da71>`;
+		:ref:`sl::Array<doxid-classaxl_1_1sl_1_1_array>`<:ref:`Block<doxid-classaxl_1_1dox_1_1_block>`*> :ref:`m_footnoteArray<doxid-structaxl_1_1dox_1_1_block_data_1a1bbc9254ea0f04dd80043ec4a6a6e700>`;
+		:ref:`handle_t<doxid-axl__g_2axl__g___pch_8h_1a50e1c0ee54e9888891a7c7889eb17e5f>` :ref:`m_item<doxid-classaxl_1_1dox_1_1_block_1a667bb82006331c1a5962efe1ca540b1c>`;
+
+		// methods
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getNext<doxid-structaxl_1_1sl_1_1_list_link_1ae7042c139305c20a6bf47e434f048480>`();
+	
+		:ref:`ListLink<doxid-structaxl_1_1sl_1_1_list_link>`*
+		:ref:`getPrev<doxid-structaxl_1_1sl_1_1_list_link_1aea63e8eb30d13618c2c507e5ff35fbf8>`();
+	
+		:ref:`BlockKind<doxid-namespaceaxl_1_1dox_1ab22c947d40a783b0407d130078ca009a>`
+		:ref:`getBlockKind<doxid-classaxl_1_1dox_1_1_block_1a409aa5a360b5d8c66a7fb794610b547c>`();
+	
+		:ref:`Group<doxid-classaxl_1_1dox_1_1_group>`*
+		:ref:`getGroup<doxid-classaxl_1_1dox_1_1_block_1a62df0579fc4ab8c9fc0ab735a9b708e2>`();
+	
+		:ref:`handle_t<doxid-axl__g_2axl__g___pch_8h_1a50e1c0ee54e9888891a7c7889eb17e5f>`
+		:ref:`getItem<doxid-classaxl_1_1dox_1_1_block_1a2ba0be1caac32ccd3e832dbdf8eed8b5>`();
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:ref:`getSource<doxid-classaxl_1_1dox_1_1_block_1a0601a181e013ed50cc619c9ed7b21275>`();
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:ref:`getRefId<doxid-classaxl_1_1dox_1_1_block_1a824b922275536b1bb9fe075df415540a>`();
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:ref:`getTitle<doxid-classaxl_1_1dox_1_1_block_1aeff58ea0b221a80ffc52a7e370b6c6a1>`();
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:ref:`getBriefDescription<doxid-classaxl_1_1dox_1_1_block_1a7a29557fe2182f9c6fcc7a65289ea03b>`();
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:ref:`getDetailedDescription<doxid-classaxl_1_1dox_1_1_block_1ae12a793e28cf82270d90db97f2a18b54>`();
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:ref:`getSeeAlsoDescription<doxid-classaxl_1_1dox_1_1_block_1a57064c8c6bb70d4af160f2f0f0bee228>`();
+	
+		const :ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`&
+		:ref:`getInternalDescription<doxid-classaxl_1_1dox_1_1_block_1aa8ea97a641c2e43d704dc632995f4ab1>`();
+	
+		bool
+		:ref:`isDescriptionEmpty<doxid-classaxl_1_1dox_1_1_block_1a1835a6e64f85fcd3224801424d302aaa>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:ref:`getDescriptionString<doxid-classaxl_1_1dox_1_1_block_1ab7582fbc014979eff148c63a47967540>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:ref:`getFootnoteString<doxid-classaxl_1_1dox_1_1_block_1a254fec994611b921903a10973703c5e8>`();
+	
+		:ref:`sl::String<doxid-namespaceaxl_1_1sl_1a9e4c66d3ff1af7d90d67101f6bbe7cbe>`
+		:ref:`getImportString<doxid-classaxl_1_1dox_1_1_block_1ab115d23010ed76d275207df9a004b741>`();
+
