@@ -24,7 +24,7 @@ set(
 	)
 
 if(NOT OPENSSL_INC_DIR)
-	axl_find_inc_dir(OPENSSL_INC_DIR openssl/obj_mac.h)
+	axl_find_inc_dir(OPENSSL_INC_DIR openssl/opensslconf.h)
 endif()
 
 if(NOT OPENSSL_LIB_DIR)
@@ -56,7 +56,7 @@ if(NOT OPENSSL_SSL_LIB_NAME)
 		)
 endif()
 
-if(EXISTS ${OPENSSL_INC_DIR}/openssl/obj_mac.h)
+if(EXISTS ${OPENSSL_INC_DIR}/openssl/opensslconf.h)
 	axl_message("OpenSSL paths:")
 	axl_message("    Includes:"       "${OPENSSL_INC_DIR}")
 	axl_message("    Libraries:"      "${OPENSSL_LIB_DIR}")
