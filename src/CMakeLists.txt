@@ -323,11 +323,13 @@ endif()
 
 #...............................................................................
 
-option(
-	BUILD_AXL_SYS_CA
-	"Build axl_sys_ca library (code authentication)"
-	ON
-	)
+if(OPENSSL_FOUND)
+	option(
+		BUILD_AXL_SYS_CA
+		"Build axl_sys_ca library (code authentication)"
+		ON
+		)
+endif()
 
 if(BUILD_AXL_SYS_CA)
 	add_subdirectory(axl_sys_ca)
