@@ -1655,7 +1655,7 @@ public:
 			NULL,
 			4 * 1024, // typical page size -- OS will not give us less than that, anyway
 			PROT_READ | PROT_WRITE,
-			MAP_PRIVATE | MAP_ANONYMOUS,
+			MAP_PRIVATE | MAP_ANON,
 			-1,
 			0
 			);

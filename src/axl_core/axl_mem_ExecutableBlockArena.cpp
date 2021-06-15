@@ -43,7 +43,7 @@ allocateExecutablePages(size_t size)
 		NULL,
 		size,
 		PROT_EXEC | PROT_READ | PROT_WRITE,
-		MAP_PRIVATE | MAP_ANONYMOUS,
+		MAP_PRIVATE | MAP_ANON,
 		-1,
 		0
 		);
