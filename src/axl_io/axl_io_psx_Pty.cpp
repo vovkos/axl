@@ -31,12 +31,17 @@ Pty::open(uint_t openFlags)
 bool
 Pty::getSlaveFileName(sl::String* fileName)
 {
+#if (_AXL_OS_DARWIN) // ptsname_r is a GNU extension and missing on osx (at lease, on older versions)
+	*fileName = ptsname(m_h);
+#else
 	char buffer[256];
 	int result = ::ptsname_r(m_h, buffer, sizeof(buffer));
 	if (result != 0)	
 		return err::failWithLastSystemError();
 
 	*fileName = buffer;
+#endif
+
 	return true;
 }
 
