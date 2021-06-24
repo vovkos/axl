@@ -202,7 +202,7 @@ ReadWriteLock::writeLock(uint_t timeout)
 
 		if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount)
 		{
-			m_data->m_activeWriteCount++;
+			m_data->m_activeWriteCount = 1;
 			break;
 		}
 	}
@@ -224,6 +224,74 @@ ReadWriteLock::writeUnlock()
 		m_readEvent.signal();
 	else if (m_data->m_queuedWriteCount)
 		m_writeEvent.signal();
+
+	sys::atomicUnlock(&m_data->m_lock);
+}
+
+bool
+ReadWriteLock::upgradeReadLockToWriteLock(uint_t timeout)
+{
+	bool result;
+
+	sys::atomicLock(&m_data->m_lock);
+	ASSERT(m_data->m_activeReadCount >= 1);
+
+	if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
+	{
+		m_data->m_activeWriteCount = 1;
+		m_data->m_activeReadCount = 0;
+		sys::atomicUnlock(&m_data->m_lock);
+		return true;
+	}
+
+	m_data->m_queuedWriteCount++;
+
+	for (;;) // loop is STILL required (non-obvious)
+	{
+		m_writeEvent.reset();
+		sys::atomicUnlock(&m_data->m_lock);
+
+		// another writer might squeeze in here, finish and wake up readers
+		// one reader might start, finish and wake up this writer
+
+		result = m_writeEvent.wait(timeout);
+
+		// another reader woken up by the first writer might have read-locked
+
+		sys::atomicLock(&m_data->m_lock);
+
+		if (!result)
+		{
+			if (!m_data->m_activeWriteCount && m_data->m_queuedReadCount)
+				m_readEvent.signal();
+
+			break;
+		}
+
+		if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount)
+		{
+			m_data->m_activeWriteCount = 1;
+			m_data->m_activeReadCount = 0;
+			break;
+		}
+	}
+
+	m_data->m_queuedWriteCount--;
+	sys::atomicUnlock(&m_data->m_lock);
+
+	return result;
+}
+
+void
+ReadWriteLock::downgradeWriteLockToReadLock()
+{
+	sys::atomicLock(&m_data->m_lock);
+	ASSERT(m_data->m_activeReadCount == 0 && m_data->m_activeWriteCount == 1);
+	m_data->m_activeWriteCount = 0;
+	m_data->m_activeReadCount = 1;
+
+	if (m_data->m_queuedReadCount) // allow queued readers
+		m_readEvent.signal();
 
 	sys::atomicUnlock(&m_data->m_lock);
 }

@@ -90,6 +90,12 @@ public:
 
 	void
 	writeUnlock();
+
+	bool
+	upgradeReadLockToWriteLock(uint_t timeout = -1);
+
+	void
+	downgradeWriteLockToReadLock();
 };
 
 //..............................................................................
