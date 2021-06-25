@@ -132,6 +132,26 @@ atomicDec(volatile int64_t* p)
 	return AXL_INTERLOCKED_FUNC64(Decrement64)(p);
 }
 
+inline
+int32_t
+atomicAdd(
+	volatile int32_t* p,
+	int32_t x
+	)
+{
+	return AXL_INTERLOCKED_FUNC32(ExchangeAdd)((long*)p, x);
+}
+
+inline
+int64_t
+atomicAdd(
+	volatile int64_t* p,
+	int64_t x
+	)
+{
+	return AXL_INTERLOCKED_FUNC64(ExchangeAdd64)(p, x);
+}
+
 #	if (AXL_PTR_BITS == 64)
 
 inline
@@ -176,6 +196,16 @@ atomicDec(volatile size_t* p)
 	return AXL_INTERLOCKED_FUNC64(Decrement64)((int64_t*)p);
 }
 
+inline
+size_t
+atomicAdd(
+	volatile size_t* p,
+	size_t x
+	)
+{
+	return AXL_INTERLOCKED_FUNC64(ExchangeAdd64)((int64_t*)p, x);
+}
+
 #	else // AXL_PTR_BITS == 64
 
 inline
@@ -218,6 +248,16 @@ size_t
 atomicDec(volatile size_t* p)
 {
 	return AXL_INTERLOCKED_FUNC32(Decrement)((long*)p);
+}
+
+inline
+size_t
+atomicInc(
+	volatile size_t* p,
+	size_t x
+	)
+{
+	return AXL_INTERLOCKED_FUNC32(ExchangeAdd)((long*)p, x);
 }
 
 #	endif // AXL_PTR_BITS == 64
@@ -342,6 +382,36 @@ atomicDec(volatile size_t* p)
 	return __sync_sub_and_fetch(p, 1);
 }
 
+inline
+int32_t
+atomicAdd(
+	volatile int32_t* p,
+	int32_t x
+	)
+{
+	return __sync_add_and_fetch(p, x);
+}
+
+inline
+int64_t
+atomicAdd(
+	volatile int64_t* p,
+	int64_t x
+	)
+{
+	return __sync_add_and_fetch(p, x);
+}
+
+inline
+size_t
+atomicAdd(
+	volatile size_t* p,
+	size_t x
+	)
+{
+	return __sync_add_and_fetch(p, x);
+}
+
 #	if (_AXL_OS_DARWIN)
 
 inline
@@ -377,6 +447,16 @@ intptr_t
 atomicDec(volatile intptr_t* p)
 {
 	return __sync_sub_and_fetch(p, 1);
+}
+
+inline
+intptr_t
+atomicAdd(
+	volatile intptr_t* p,
+	intptr_t x
+	)
+{
+	return __sync_add_and_fetch(p, x);
 }
 
 #	endif // _AXL_OS_DARWIN
