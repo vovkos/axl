@@ -738,7 +738,7 @@ querySymbolicLink(
 	oa.RootDirectory = dir;
 	oa.ObjectName = uniName;
 
-	io::win::File link;
+	sys::win::Handle link; // NT uses NULL for invalid handle value
 	status = ntOpenSymbolicLinkObject(
 		link.p(),
 		GENERIC_READ,
@@ -793,7 +793,7 @@ enumerateDirectory(
 	oa.RootDirectory = baseDir;
 	oa.ObjectName = &uniName;
 
-	io::win::File dir;
+	sys::win::Handle dir; // NT uses NULL for invalid handle value
 	status = ntOpenDirectoryObject(
 		dir.p(),
 		DIRECTORY_QUERY | DIRECTORY_TRAVERSE,

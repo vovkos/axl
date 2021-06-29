@@ -458,7 +458,7 @@ getSymbolicLinkTarget(
 	oa.RootDirectory = NULL;
 	oa.ObjectName = &uniLinkName;
 
-	io::win::File link;
+	sys::win::Handle link; // NT uses NULL for invalid handle value
 	status = ntOpenSymbolicLinkObject(
 		link.p(),
 		GENERIC_READ,
