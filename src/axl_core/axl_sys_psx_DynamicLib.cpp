@@ -62,7 +62,7 @@ DynamicLib::getInfo(
 	if (!p)
 	{
 		err::setError(::dlerror());
-		return NULL;
+		return false;
 	}
 
 	return true;
