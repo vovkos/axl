@@ -29,12 +29,12 @@ jobs:
                     CONFIGURATION: release
         steps:
             -   script: |
-                call ci\azure-pipelines\set-env.bat msvc15 %TARGET_CPU% %CONFIGURATION%
-                mkdir build
-                cd build
-                cmake .. %CMAKE_CONFIGURE_FLAGS%
-                cmake --build . %CMAKE_BUILD_FLAGS%
-                ctest -C %CONFIGURATION%
+                    call ci\azure-pipelines\set-env.bat msvc15 %TARGET_CPU% %CONFIGURATION%
+                    mkdir build
+                    cd build
+                    cmake .. %CMAKE_CONFIGURE_FLAGS%
+                    cmake --build . %CMAKE_BUILD_FLAGS%
+                    ctest -C %CONFIGURATION%
 
     -   job: build-linux
         pool:
@@ -55,12 +55,12 @@ jobs:
                     CONFIGURATION: release
         steps:
             -   script: |
-                mkdir build
-                pushd build
-                cmake .. -DTARGET_CPU=$TARGET_CPU -DCMAKE_BUILD_TYPE=$CONFIGURATION
-                make
-                ctest --output-on-failure
-                popd
+                    mkdir build
+                    pushd build
+                    cmake .. -DTARGET_CPU=$TARGET_CPU -DCMAKE_BUILD_TYPE=$CONFIGURATION
+                    make
+                    ctest --output-on-failure
+                    popd
 
     -   job: build-macos
         pool:
@@ -73,9 +73,9 @@ jobs:
                     CONFIGURATION: release
         steps:
             -   script: |
-                mkdir build
-                pushd build
-                cmake .. -DCMAKE_BUILD_TYPE=$CONFIGURATION
-                make
-                ctest --output-on-failure
-                popd
+                    mkdir build
+                    pushd build
+                    cmake .. -DCMAKE_BUILD_TYPE=$CONFIGURATION
+                    make
+                    ctest --output-on-failure
+                    popd
