@@ -13,9 +13,9 @@ jobs:
             uses: actions/checkout@v2
 
         -   name: Build and test
-            run: |
-                mkdir build
-                cd build
-                cmake .. -G "Visual Studio 15 2017 Win64"
-                cmake --build . --config Debug
-                ctest -C Debug
+            run:
+            -   mkdir build
+            -   cd build
+            -   cmake .. -G "Visual Studio 15 2017 Win64"
+            -   cmake --build . --config Debug
+            -   ctest -C Debug
