@@ -13,11 +13,10 @@ jobs:
             uses: actions/checkout@v2
 
         -   name: Build and test
-            shell: pwsh
-            run: |
-                $ErrorActionPreference = "Stop"
+            shell: cmd
+            run:
                 mkdir build
                 cd build
-                cmake .. -G "Visual Studio 15 2017 Win64"
-                cmake --build . --config Debug
-                ctest -C Debug
+                cmake .. -G "Visual Studio 15 2017 Win64" || exit
+                cmake --build . --config Debug || exit
+                ctest -C Debug || exit
