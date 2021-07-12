@@ -12,10 +12,16 @@ jobs:
         -   name: Checkout repo
             uses: actions/checkout@v2
 
-        -   name: Build and test
-            run:
-            -   mkdir build
-            -   cd build
-            -   cmake .. -G "Visual Studio 15 2017 Win64"
-            -   cmake --build . --config Debug
-            -   ctest -C Debug
+        -   name: Prepare build directory
+            run: |
+                mkdir build
+                cd build
+
+        -   name: CMake configure
+            run:  cmake .. -G "Visual Studio 15 2017 Win64"
+
+        -   name: Build
+            run: cmake --build . --config Debug
+
+        -   name: Test
+            run: ctest -C Debug
