@@ -1,0 +1,17 @@
+name: Default CI Workflow
+
+on:
+-   push
+-   pull_request
+
+jobs:
+    ciWindows:
+        name: Windows Build (Visual Studio 15 2017)
+        runs-on: windows-2016
+        steps:
+        -   run: |
+                mkdir build
+                cd build
+                cmake .. -G "Visual Studio 15 2017 Win64"
+                cmake --build . --config Debug
+                ctest -C Debug
