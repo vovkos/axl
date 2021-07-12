@@ -1,0 +1,81 @@
+#...............................................................................
+#
+#  This file is part of the AXL library.
+#
+#  AXL is distributed under the MIT license.
+#  For details see accompanying license.txt file,
+#  the public copy of which is also available at:
+#  http://tibbo.com/downloads/archive/axl/license.txt
+#
+#...............................................................................
+
+jobs:
+    -   job: build-windows
+        pool:
+            vmImage: vs2017-win2016
+        strategy:
+            matrix:
+                amd64-debug:
+                    TARGET_CPU: amd64
+                    CONFIGURATION: debug
+                amd64-release:
+                    TARGET_CPU: amd64
+                    CONFIGURATION: release
+                x86-debug:
+                    TARGET_CPU: x86
+                    CONFIGURATION: debug
+                x86-release:
+                    TARGET_CPU: x86
+                    CONFIGURATION: release
+        steps:
+            -   script: |
+                call ci\azure-pipelines\set-env.bat msvc15 %TARGET_CPU% %CONFIGURATION%
+                mkdir build
+                cd build
+                cmake .. %CMAKE_CONFIGURE_FLAGS%
+                cmake --build . %CMAKE_BUILD_FLAGS%
+                ctest -C %CONFIGURATION%
+
+    -   job: build-linux
+        pool:
+            vmImage: ubuntu-18.04
+        strategy:
+            matrix:
+                amd64-debug:
+                    TARGET_CPU: amd64
+                    CONFIGURATION: debug
+                amd64-release:
+                    TARGET_CPU: amd64
+                    CONFIGURATION: release
+                x86-debug:
+                    TARGET_CPU: x86
+                    CONFIGURATION: debug
+                x86-release:
+                    TARGET_CPU: x86
+                    CONFIGURATION: release
+        steps:
+            -   script: |
+                mkdir build
+                pushd build
+                cmake .. -DTARGET_CPU=$TARGET_CPU -DCMAKE_BUILD_TYPE=$CONFIGURATION
+                make
+                ctest --output-on-failure
+                popd
+
+    -   job: build-macos
+        pool:
+            vmImage: macOS-10.14
+        strategy:
+            matrix:
+                debug:
+                    CONFIGURATION: debug
+                release:
+                    CONFIGURATION: release
+        steps:
+            -   script: |
+                mkdir build
+                pushd build
+                cmake .. -DCMAKE_BUILD_TYPE=$CONFIGURATION
+                make
+                ctest --output-on-failure
+                popd
