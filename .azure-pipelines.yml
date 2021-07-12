@@ -10,7 +10,7 @@
 #...............................................................................
 
 jobs:
-    -   job: build-windows
+    -   job: buildWindows
         pool:
             vmImage: vs2017-win2016
         strategy:
@@ -36,7 +36,7 @@ jobs:
                     cmake --build . %CMAKE_BUILD_FLAGS%
                     ctest -C %CONFIGURATION%
 
-    -   job: build-linux
+    -   job: buildLinux
         pool:
             vmImage: ubuntu-18.04
         strategy:
@@ -62,7 +62,7 @@ jobs:
                     ctest --output-on-failure
                     popd
 
-    -   job: build-macos
+    -   job: buildMacOs
         pool:
             vmImage: macOS-10.14
         strategy:
