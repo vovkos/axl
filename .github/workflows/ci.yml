@@ -9,7 +9,11 @@ jobs:
         name: Windows Build (Visual Studio 15 2017)
         runs-on: windows-2016
         steps:
-        -   run: |
+        -   name: Checkout repo
+            uses: actions/checkout@v2
+
+        -   name: Build and test
+            run: |
                 mkdir build
                 cd build
                 cmake .. -G "Visual Studio 15 2017 Win64"
