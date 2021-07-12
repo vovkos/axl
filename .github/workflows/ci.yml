@@ -8,15 +8,28 @@ jobs:
     ciWindows:
         name: Windows Build (Visual Studio 15 2017)
         runs-on: windows-2016
+        strategy:
+            matrix:
+                CONFIGURATION:
+                -   Debug
+                -   Release
+
+                TARGET_CPU:
+                -   x86
+                -   amd64
+
         steps:
         -   name: Checkout repo
             uses: actions/checkout@v2
 
         -   name: Build and test
             shell: cmd
-            run:
+            run: |
+                set CMAKE_GENERATOR_SUFFIX=
+                if "%TARGET_CPU%" == "amd64" (set CMAKE_GENERATOR_SUFFIX= Win64)
+
                 mkdir build
                 cd build
-                cmake .. -G "Visual Studio 15 2017 Win64" || exit
-                cmake --build . --config Debug || exit
-                ctest -C Debug || exit
+                cmake .. -G "Visual Studio 15 2017%CMAKE_GENERATOR_SUFFIX%" || exit
+                cmake --build . --config %CONFIGURATION% || exit
+                ctest -C %CONFIGURATION% || exit
