@@ -9,6 +9,7 @@ jobs:
         name: Windows Build (Visual Studio 15 2017)
         runs-on: windows-2016
         strategy:
+            fail-fast: false
             matrix:
                 CONFIGURATION:
                 -   Debug
@@ -26,10 +27,10 @@ jobs:
             shell: cmd
             run: |
                 set CMAKE_GENERATOR_SUFFIX=
-                if "%TARGET_CPU%" == "amd64" (set CMAKE_GENERATOR_SUFFIX= Win64)
+                if "${{TARGET_CPU}}" == "amd64" (set CMAKE_GENERATOR_SUFFIX= Win64)
 
                 mkdir build
                 cd build
                 cmake .. -G "Visual Studio 15 2017%CMAKE_GENERATOR_SUFFIX%" || exit
-                cmake --build . --config %CONFIGURATION% || exit
-                ctest -C %CONFIGURATION% || exit
+                cmake --build . --config ${{CONFIGURATION}} || exit
+                ctest -C ${{CONFIGURATION}} || exit
