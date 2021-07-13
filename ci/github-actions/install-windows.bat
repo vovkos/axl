@@ -45,20 +45,18 @@ echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
 
 echo Downloading OpenSSL...
 
-powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl.msi"
+mkdir %DOWNLOAD_DIR%\openssl
+powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
+7z x -y %DOWNLOAD_DIR%\openssl\openssl.zip -o%DOWNLOAD_DIR%\openssl
 
-echo Installing OpenSSL...
-start /wait msiexec /i %DOWNLOAD_DIR%\openssl.msi TARGET_DIR=%OPENSSL_DIR% /qn
-
-dir "C:\Program Files"
 dir %OPENSSL_DIR%
 
-echo set (OPENSSL_INC_DIR %OPENSSL_DIR%/include) >> paths.cmake
-echo set (OPENSSL_LIB_DIR %OPENSSL_DIR%/lib) >> paths.cmake
-echo set (OPENSSL_DLL_DIR %OPENSSL_DIR%/bin) >> paths.cmake
-echo set (OPENSSL_CRYPTO_LIB_NAME libeay32) >> paths.cmake
-echo set (OPENSSL_CRYPTO_DLL_NAME libeay32) >> paths.cmake
-echo set (OPENSSL_SSL_LIB_NAME ssleay32) >> paths.cmake
-echo set (OPENSSL_SSL_DLL_NAME ssleay32) >> paths.cmake
+echo set (OPENSSL_INC_DIR %DOWNLOAD_DIR_CMAKE%/openssl/%OPENSSL_PLATFORM%/include) >> paths.cmake
+echo set (OPENSSL_LIB_DIR %DOWNLOAD_DIR_CMAKE%/openssl/%OPENSSL_PLATFORM%/lib) >> paths.cmake
+echo set (OPENSSL_DLL_DIR %DOWNLOAD_DIR_CMAKE%/openssl/%OPENSSL_PLATFORM%/bin) >> paths.cmake
+echo set (OPENSSL_CRYPTO_LIB_NAME libcrypto) >> paths.cmake
+echo set (OPENSSL_CRYPTO_DLL_NAME libcrypto%OPENSSL_DLL_SUFFIX%) >> paths.cmake
+echo set (OPENSSL_SSL_LIB_NAME libssl) >> paths.cmake
+echo set (OPENSSL_SSL_DLL_NAME libssl%OPENSSL_DLL_SUFFIX%) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
