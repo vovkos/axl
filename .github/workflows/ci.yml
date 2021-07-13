@@ -1,4 +1,4 @@
-name: Default CI Workflow
+name: GitHub CI
 
 on:
 -   push
@@ -24,7 +24,7 @@ jobs:
             uses: actions/checkout@v2
 
         -   name: Install
-            shell: psh
+            shell: pwsh
             run: |
                 call ci\github-actions\set-env.bat msvc15 ${{matrix.TARGET_CPU}}
                 call ci\github-actions\install-windows.bat
@@ -64,6 +64,7 @@ jobs:
         -   name: Install
             shell: bash
             run: |
+                export TARGET_CPU=${{matrix.TARGET_CPU}}
                 source ./ci/github-actions/install-linux.sh
 
         -   name: Build and test

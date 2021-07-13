@@ -44,3 +44,5 @@ else
 	echo "set (PCAP_LIB_DIR /usr/lib/i386-linux-gnu)" >> paths.cmake
 	echo "set (LIBUSB_LIB_DIR /usr/lib/i386-linux-gnu)" >> paths.cmake
 fi
+
+sudo apt-get install ragel
