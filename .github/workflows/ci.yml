@@ -11,6 +11,10 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                TOOLCHAIN:
+                -   msvc10
+                -   msvc15
+
                 CONFIGURATION:
                 -   Debug
                 -   Release
@@ -26,18 +30,19 @@ jobs:
         -   name: Build and test
             shell: cmd
             run: |
-                set CMAKE_GENERATOR_SUFFIX=
-                if "${{matrix.TARGET_CPU}}" == "amd64" (set CMAKE_GENERATOR_SUFFIX= Win64)
+                call ci\github-actions\set-env.bat ${{matrix.TOOLCHAIN}} ${{matrix.TARGET_CPU}} ${{matrix.CONFIGURATION}}
 
+                set
                 dir C:\
+                dir "C:\Program Files\OpenSSL"
                 dir "C:\Program Files"
                 dir "C:\Program Files (x86)"
 
                 mkdir build
                 cd build
-                cmake .. -G "Visual Studio 15 2017%CMAKE_GENERATOR_SUFFIX%" || exit
-                cmake --build . --config ${{matrix.CONFIGURATION}} || exit
-                ctest -C ${{matrix.CONFIGURATION}} || exit
+                cmake .. %CMAKE_CONFIGURE_FLAGS% || exit
+                cmake --build . %CMAKE_BUILD_FLAGS% || exit
+                ctest -C %CONFIGURATION% || exit
 
     linuxBuild:
         name: Linux Build
@@ -54,6 +59,10 @@ jobs:
                 -   amd64
 
         steps:
+        -   name: Install
+            shell: bash
+            run: source /ci/github-actions/install-linux.sh
+
         -   name: Checkout repo
             uses: actions/checkout@v2
 
@@ -79,6 +88,10 @@ jobs:
         steps:
         -   name: Checkout repo
             uses: actions/checkout@v2
+
+        -   name: Install
+            shell: bash
+            run: source /ci/github-actions/install-osx.sh
 
         -   name: Build and test
             shell: bash
