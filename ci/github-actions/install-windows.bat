@@ -49,9 +49,13 @@ mkdir %DOWNLOAD_DIR%\openssl
 powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
 7z x -y %DOWNLOAD_DIR%\openssl\openssl.zip -o%DOWNLOAD_DIR%\openssl
 
-echo set (OPENSSL_INC_DIR %DOWNLOAD_DIR_CMAKE%/openssl/%OPENSSL_PLATFORM%/include) >> paths.cmake
-echo set (OPENSSL_LIB_DIR %DOWNLOAD_DIR_CMAKE%/openssl/%OPENSSL_PLATFORM%/lib) >> paths.cmake
-echo set (OPENSSL_DLL_DIR %DOWNLOAD_DIR_CMAKE%/openssl/%OPENSSL_PLATFORM%/bin) >> paths.cmake
+set OPENSSL_ROOT_DIR=%DOWNLOAD_DIR_CMAKE%/openssl/openssl-1.1
+
+dir %DOWNLOAD_DIR%\openssl\openssl-1.1
+
+echo set (OPENSSL_INC_DIR %OPENSSL_ROOT_DIR%/%OPENSSL_PLATFORM%/include) >> paths.cmake
+echo set (OPENSSL_LIB_DIR %OPENSSL_ROOT_DIR%/%OPENSSL_PLATFORM%/lib) >> paths.cmake
+echo set (OPENSSL_DLL_DIR %OPENSSL_ROOT_DIR%/%OPENSSL_PLATFORM%/bin) >> paths.cmake
 echo set (OPENSSL_CRYPTO_LIB_NAME libcrypto) >> paths.cmake
 echo set (OPENSSL_CRYPTO_DLL_NAME libcrypto%OPENSSL_DLL_SUFFIX%) >> paths.cmake
 echo set (OPENSSL_SSL_LIB_NAME libssl) >> paths.cmake
