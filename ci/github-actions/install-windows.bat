@@ -47,7 +47,9 @@ echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
 echo Downloading OpenSSL...
 
 mkdir %DOWNLOAD_DIR%\openssl
-powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
+powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.msi"
+
+echo Installing OpenSSL...
 msiexec /i /qn %DOWNLOAD_DIR%\openssl\openssl.msi
 
 dir c:\

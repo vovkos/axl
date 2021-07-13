@@ -43,64 +43,64 @@ jobs:
                 cmake --build . %CMAKE_BUILD_FLAGS% || exit
                 ctest --output-on-failure -C %CONFIGURATION% || exit
 
-    linuxBuild:
-        name: Linux Build
-        runs-on: ubuntu-18.04
-        strategy:
-            fail-fast: false
-            matrix:
-                CONFIGURATION:
-                -   Debug
-                -   Release
-
-                TARGET_CPU:
-                -   x86
-                -   amd64
-
-        steps:
-        -   name: Checkout repo
-            uses: actions/checkout@v2
-
-        -   name: Install
-            shell: bash
-            run: |
-                export TARGET_CPU=${{matrix.TARGET_CPU}}
-                source ./ci/github-actions/install-linux.sh
-
-        -   name: Build and test
-            shell: bash
-            run: |
-                mkdir build
-                cd build
-                cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
-                make
-                ctest --output-on-failure
-
-    macOsBuild:
-        name: macOS Build
-        runs-on: macos-10.15
-        strategy:
-            fail-fast: false
-            matrix:
-                CONFIGURATION:
-                -   Debug
-                -   Release
-
-        steps:
-        -   name: Checkout repo
-            uses: actions/checkout@v2
-
-        -   name: Install
-            shell: bash
-            run: |
-                pwd
-                source ./ci/github-actions/install-osx.sh
-
-        -   name: Build and test
-            shell: bash
-            run: |
-                mkdir build
-                cd build
-                cmake .. -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
-                make
-                ctest --output-on-failure
+#    linuxBuild:
+#        name: Linux Build
+#        runs-on: ubuntu-18.04
+#        strategy:
+#            fail-fast: false
+#            matrix:
+#                CONFIGURATION:
+#                -   Debug
+#                -   Release
+#
+#                TARGET_CPU:
+#                -   x86
+#                -   amd64
+#
+#        steps:
+#        -   name: Checkout repo
+#            uses: actions/checkout@v2
+#
+#        -   name: Install
+#            shell: bash
+#            run: |
+#                export TARGET_CPU=${{matrix.TARGET_CPU}}
+#                source ./ci/github-actions/install-linux.sh
+#
+#        -   name: Build and test
+#            shell: bash
+#            run: |
+#                mkdir build
+#                cd build
+#                cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+#                make
+#                ctest --output-on-failure
+#
+#    macOsBuild:
+#        name: macOS Build
+#        runs-on: macos-10.15
+#        strategy:
+#            fail-fast: false
+#            matrix:
+#                CONFIGURATION:
+#                -   Debug
+#                -   Release
+#
+#        steps:
+#        -   name: Checkout repo
+#            uses: actions/checkout@v2
+#
+#        -   name: Install
+#            shell: bash
+#            run: |
+#                pwd
+#                source ./ci/github-actions/install-osx.sh
+#
+#        -   name: Build and test
+#            shell: bash
+#            run: |
+#                mkdir build
+#                cd build
+#                cmake .. -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
+#                make
+#                ctest --output-on-failure
