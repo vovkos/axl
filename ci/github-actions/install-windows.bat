@@ -26,7 +26,7 @@ echo set (RAGEL_EXE %DOWNLOAD_DIR_CMAKE%/ragel.exe) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-:: Lua (download from SourceForge,)
+:: Lua (download from SourceForge, need PowerShell user agent to handle redirect)
 
 echo Downloading Lua...
 
@@ -45,9 +45,15 @@ echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
 
 echo Downloading OpenSSL...
 
-mkdir %DOWNLOAD_DIR%\openssl
-powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
-7z x -y %DOWNLOAD_DIR%\openssl\openssl.zip -o%DOWNLOAD_DIR%\openssl
+powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl.msi"
+
+echo Installing OpenSSL...
+
+start /wait msiexec /i %DOWNLOAD_DIR%\openssl.msi /qn
+
+echo Done!
+
+dir "C:\Program Files"
 
 set OPENSSL_ROOT_DIR=%DOWNLOAD_DIR_CMAKE%/openssl/openssl-1.1
 
