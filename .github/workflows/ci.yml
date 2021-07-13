@@ -5,7 +5,7 @@ on:
 -   pull_request
 
 jobs:
-    ciWindows:
+    windowsBuild:
         name: Windows Build (Visual Studio 15 2017)
         runs-on: windows-2016
         strategy:
@@ -29,8 +29,62 @@ jobs:
                 set CMAKE_GENERATOR_SUFFIX=
                 if "${{matrix.TARGET_CPU}}" == "amd64" (set CMAKE_GENERATOR_SUFFIX= Win64)
 
+                dir C:\
+                dir "C:\Program Files"
+                dir "C:\Program Files (x86)"
+
                 mkdir build
                 cd build
                 cmake .. -G "Visual Studio 15 2017%CMAKE_GENERATOR_SUFFIX%" || exit
                 cmake --build . --config ${{matrix.CONFIGURATION}} || exit
                 ctest -C ${{matrix.CONFIGURATION}} || exit
+
+    linuxBuild:
+        name: Linux Build
+        runs-on: ubuntu-18.04
+        strategy:
+            fail-fast: false
+            matrix:
+                CONFIGURATION:
+                -   Debug
+                -   Release
+
+                TARGET_CPU:
+                -   x86
+                -   amd64
+
+        steps:
+        -   name: Checkout repo
+            uses: actions/checkout@v2
+
+        -   name: Build and test
+            shell: bash
+            run: |
+                mkdir build
+                cd build
+                cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{CONFIGURATION}}
+                make
+                ctest --output-on-failure
+
+    macOsBuild:
+        name: macOS Build
+        runs-on: macos-10.15
+        strategy:
+            fail-fast: false
+            matrix:
+                CONFIGURATION:
+                -   Debug
+                -   Release
+
+        steps:
+        -   name: Checkout repo
+            uses: actions/checkout@v2
+
+        -   name: Build and test
+            shell: bash
+            run: |
+                mkdir build
+                cd build
+                cmake .. -DCMAKE_BUILD_TYPE=${{CONFIGURATION}}
+                make
+                ctest --output-on-failure
