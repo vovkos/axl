@@ -47,14 +47,14 @@ echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
 echo Downloading OpenSSL...
 
 mkdir %DOWNLOAD_DIR%\openssl
-powershell "Invoke-WebRequest -UserAgent -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
+powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
 7z x -y %DOWNLOAD_DIR%\openssl\openssl.zip -o%DOWNLOAD_DIR%\openssl
 
 dir %DOWNLOAD_DIR%/openssl
 
-echo set (OPENSSL_INC_DIR %DOWNLOAD_DIR%/openssl/include) >> paths.cmake
-echo set (OPENSSL_LIB_DIR %DOWNLOAD_DIR%/openssl/lib) >> paths.cmake
-echo set (OPENSSL_DLL_DIR %DOWNLOAD_DIR%/openssl/bin) >> paths.cmake
+echo set (OPENSSL_INC_DIR %DOWNLOAD_DIR_CMAKE%/openssl/include) >> paths.cmake
+echo set (OPENSSL_LIB_DIR %DOWNLOAD_DIR_CMAKE%/openssl/lib) >> paths.cmake
+echo set (OPENSSL_DLL_DIR %DOWNLOAD_DIR_CMAKE%/openssl/bin) >> paths.cmake
 echo set (OPENSSL_CRYPTO_LIB_NAME libeay32) >> paths.cmake
 echo set (OPENSSL_CRYPTO_DLL_NAME libeay32) >> paths.cmake
 echo set (OPENSSL_SSL_LIB_NAME ssleay32) >> paths.cmake
