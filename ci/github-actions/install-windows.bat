@@ -52,7 +52,7 @@ echo Installing OpenSSL...
 
 set OPENSSL_DIR=%DOWNLOAD_DIR%\openssl
 
-start /wait msiexec /i %DOWNLOAD_DIR%\openssl.msi TARGET_DIR=%OPENSSL_DIR% /qn
+start /wait msiexec /i %DOWNLOAD_DIR%\openssl.msi INSTALLDIR=%OPENSSL_DIR% TARGETDIR=%OPENSSL_DIR% /qn
 
 dir %DOWNLOAD_DIR%
 dir %OPENSSL_DIR%
