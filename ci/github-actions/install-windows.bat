@@ -50,11 +50,12 @@ powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR
 
 echo Installing OpenSSL...
 
-set OPENSSL_DIR=%DOWNLOAD_DIR%\openssl
+set OPENSSL_DIR=C:\Program Files\OpenSSL-%OPENSSL_PLATFORM%
 
-start /wait msiexec /i %DOWNLOAD_DIR%\openssl.msi INSTALLDIR=%OPENSSL_DIR% TARGETDIR=%OPENSSL_DIR% /qn
+start /wait msiexec /i %DOWNLOAD_DIR%\openssl.msi INSTALLDIR=%OPENSSL_DIR% TARGETDIR=%OPENSSL_DIR% /qn /L*V %DOWNLOAD_DIR%\openssl-install-log.txt
 
-dir %DOWNLOAD_DIR%
+type %DOWNLOAD_DIR%\openssl-install-log.txt
+
 dir %OPENSSL_DIR%
 
 echo set (OPENSSL_INC_DIR %OPENSSL_ROOT_DIR%/%OPENSSL_PLATFORM%/include) >> paths.cmake
