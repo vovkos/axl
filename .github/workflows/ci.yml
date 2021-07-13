@@ -6,7 +6,7 @@ on:
 
 jobs:
     windowsBuild:
-        name: Windows Build (Visual Studio 15 2017)
+        name: Windows Build
         runs-on: windows-2016
         strategy:
             fail-fast: false
@@ -30,7 +30,8 @@ jobs:
         -   name: Build and test
             shell: cmd
             run: |
-                call ci\github-actions\set-env.bat ${{matrix.TOOLCHAIN}} ${{matrix.TARGET_CPU}} ${{matrix.CONFIGURATION}}
+                set CONFIGURATION=${{matrix.CONFIGURATION}}
+                call ci\github-actions\set-env.bat ${{matrix.TOOLCHAIN}} ${{matrix.TARGET_CPU}}
 
                 set
                 dir C:\
@@ -61,7 +62,7 @@ jobs:
         steps:
         -   name: Install
             shell: bash
-            run: source /ci/github-actions/install-linux.sh
+            run: source ./ci/github-actions/install-linux.sh
 
         -   name: Checkout repo
             uses: actions/checkout@v2
@@ -91,7 +92,7 @@ jobs:
 
         -   name: Install
             shell: bash
-            run: source /ci/github-actions/install-osx.sh
+            run: source ./ci/github-actions/install-osx.sh
 
         -   name: Build and test
             shell: bash
