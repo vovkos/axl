@@ -18,6 +18,8 @@ set DOWNLOAD_DIR_CMAKE=%DOWNLOAD_DIR:\=/%
 
 :: Ragel
 
+echo Downloading Ragel...
+
 mkdir %DOWNLOAD_DIR%\ragel
 powershell "Invoke-WebRequest -Uri %RAGEL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\ragel.exe"
 
@@ -25,10 +27,12 @@ echo set (RAGEL_EXE %DOWNLOAD_DIR_CMAKE%/ragel.exe) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-:: Lua
+:: Lua (download from SourceForge,)
+
+echo Downloading Lua...
 
 mkdir %DOWNLOAD_DIR%\lua
-powershell "Invoke-WebRequest -Uri %LUA_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\lua\lua.zip"
+powershell "Invoke-WebRequest -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox -Uri %LUA_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\lua\lua.zip"
 7z x -y %DOWNLOAD_DIR%\lua\lua.zip -o%DOWNLOAD_DIR%\lua
 
 echo set (LUA_INC_DIR %DOWNLOAD_DIR_CMAKE%/lua/include) >> paths.cmake
@@ -40,11 +44,17 @@ echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
 
 :: OpenSSL
 
-set OPENSSL_DIR_CMAKE=%OPENSSL_DIR:\=/%
+echo Downloading OpenSSL...
 
-echo set (OPENSSL_INC_DIR %OPENSSL_DIR_CMAKE%/include) >> paths.cmake
-echo set (OPENSSL_LIB_DIR %OPENSSL_DIR_CMAKE%/lib) >> paths.cmake
-echo set (OPENSSL_DLL_DIR %OPENSSL_DIR_CMAKE%/bin) >> paths.cmake
+mkdir %DOWNLOAD_DIR%\openssl
+powershell "Invoke-WebRequest -UserAgent -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
+7z x -y %DOWNLOAD_DIR%\openssl\openssl.zip -o%DOWNLOAD_DIR%\openssl
+
+dir %DOWNLOAD_DIR%/openssl
+
+echo set (OPENSSL_INC_DIR %DOWNLOAD_DIR%/openssl/include) >> paths.cmake
+echo set (OPENSSL_LIB_DIR %DOWNLOAD_DIR%/openssl/lib) >> paths.cmake
+echo set (OPENSSL_DLL_DIR %DOWNLOAD_DIR%/openssl/bin) >> paths.cmake
 echo set (OPENSSL_CRYPTO_LIB_NAME libeay32) >> paths.cmake
 echo set (OPENSSL_CRYPTO_DLL_NAME libeay32) >> paths.cmake
 echo set (OPENSSL_SSL_LIB_NAME ssleay32) >> paths.cmake
