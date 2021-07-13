@@ -48,13 +48,13 @@ echo Downloading OpenSSL...
 
 mkdir %DOWNLOAD_DIR%\openssl
 powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.zip"
-7z x -y %DOWNLOAD_DIR%\openssl\openssl.zip -o%DOWNLOAD_DIR%\openssl
+msiexec /i /qn %DOWNLOAD_DIR%\openssl\openssl.msi
 
-dir %DOWNLOAD_DIR%\openssl
+dir c:\
 
-echo set (OPENSSL_INC_DIR %DOWNLOAD_DIR_CMAKE%/openssl/include) >> paths.cmake
-echo set (OPENSSL_LIB_DIR %DOWNLOAD_DIR_CMAKE%/openssl/lib) >> paths.cmake
-echo set (OPENSSL_DLL_DIR %DOWNLOAD_DIR_CMAKE%/openssl/bin) >> paths.cmake
+echo set (OPENSSL_INC_DIR %OPENSSL_DIR%/include) >> paths.cmake
+echo set (OPENSSL_LIB_DIR %OPENSSL_DIR%/lib) >> paths.cmake
+echo set (OPENSSL_DLL_DIR %OPENSSL_DIR%/bin) >> paths.cmake
 echo set (OPENSSL_CRYPTO_LIB_NAME libeay32) >> paths.cmake
 echo set (OPENSSL_CRYPTO_DLL_NAME libeay32) >> paths.cmake
 echo set (OPENSSL_SSL_LIB_NAME ssleay32) >> paths.cmake

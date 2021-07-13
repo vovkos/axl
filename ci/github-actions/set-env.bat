@@ -67,7 +67,7 @@ goto :loop
 set TARGET_CPU=x86
 set CMAKE_GENERATOR_SUFFIX=
 set LUA_PLATFORM=Win32
-set OPENSSL_PLATFORM=i386-win32
+set OPENSSL_PLATFORM=Win32
 shift
 goto :loop
 
@@ -75,7 +75,7 @@ goto :loop
 set TARGET_CPU=amd64
 set CMAKE_GENERATOR_SUFFIX= Win64
 set LUA_PLATFORM=Win64
-set OPENSSL_PLATFORM=x64_86-win64
+set OPENSSL_PLATFORM=Win64
 shift
 goto :loop
 
@@ -91,8 +91,9 @@ set LUA_VERSION=5.3.5
 set LUA_LIB_NAME=lua53
 set LUA_DOWNLOAD_URL=https://sourceforge.net/projects/luabinaries/files/%LUA_VERSION%/Windows%%20Libraries/Dynamic/lua-%LUA_VERSION%_%LUA_PLATFORM%_%LUA_TOOLCHAIN%_lib.zip/download
 
-set OPENSSL_VERSION=1.0.2s
-set OPENSSL_DOWNLOAD_URL=https://indy.fulgan.com/SSL/openssl-%OPENSSL_VERSION%-%OPENSSL_PLATFORM%.zip
+set OPENSSL_VERSION=1_1_1k
+set OPENSSL_DOWNLOAD_URL=https://slproweb.com/download/%OPENSSL_PLATFORM%OpenSSL_Light-%OPENSSL_VERSION%.msi
+set OPENSSL_DIR=C:\OpenSSL-%OPENSSL_PLATFORM%
 
 set RAGEL_DOWNLOAD_URL=https://github.com/eloraiby/ragel-windows/raw/master/ragel.exe
 
@@ -109,5 +110,6 @@ echo ---------------------------------------------------------------------------
 echo LUA_LIB_NAME:         %LUA_LIB_NAME%
 echo LUA_DOWNLOAD_URL:     %LUA_DOWNLOAD_URL%
 echo OPENSSL_DOWNLOAD_URL: %OPENSSL_DOWNLOAD_URL%
+echo OPENSSL_DIR:          %OPENSSL_DIR%
 echo RAGEL_DOWNLOAD_URL:   %RAGEL_DOWNLOAD_URL%
 echo ---------------------------------------------------------------------------
