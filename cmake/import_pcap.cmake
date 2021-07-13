@@ -17,7 +17,7 @@ if(NOT PCAP_LIB_DIR)
 	axl_find_lib_dir(PCAP_LIB_DIR pcap)
 endif()
 
-if(EXISTS ${PCAP_INC_DIR}/pcap/pcap.h)
+if(EXISTS ${PCAP_INC_DIR}/pcap/pcap.h AND PCAP_LIB_DIR)
 	axl_message("Pcap paths:")
 	axl_message("    Includes:"  "${PCAP_INC_DIR}")
 	axl_message("    Libraries:" "${PCAP_LIB_DIR}")

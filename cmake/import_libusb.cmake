@@ -40,7 +40,8 @@ elseif(NOT LIBUSB_LIB_NAME)
 		)
 endif()
 
-if(EXISTS ${LIBUSB_INC_DIR}/libusb-1.0/libusb.h)
+if(EXISTS ${LIBUSB_INC_DIR}/libusb-1.0/libusb.h AND LIBUSB_LIB_DIR AND LIBUSB_LIB_NAME)
+
 	axl_message("LibUSB paths:")
 	axl_message("    Includes:"  "${LIBUSB_INC_DIR}")
 	axl_message("    Libraries:" "${LIBUSB_LIB_DIR}")
