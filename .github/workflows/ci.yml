@@ -24,7 +24,7 @@ jobs:
             uses: actions/checkout@v2
 
         -   name: Install
-            shell: pwsh
+            shell: cmd
             run: |
                 call ci\github-actions\set-env.bat msvc15 ${{matrix.TARGET_CPU}}
                 call ci\github-actions\install-windows.bat
