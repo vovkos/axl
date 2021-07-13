@@ -18,16 +18,12 @@ set DOWNLOAD_DIR_CMAKE=%DOWNLOAD_DIR:\=/%
 
 :: Ragel
 
-:: echo Downloading Ragel...
-::
-:: mkdir %DOWNLOAD_DIR%
-:: powershell "Invoke-WebRequest -Uri %RAGEL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\ragel.exe"
-::
-:: echo set (RAGEL_EXE %DOWNLOAD_DIR_CMAKE%/ragel.exe) >> paths.cmake
+echo Downloading Ragel...
 
-echo Installing Ragel...
+mkdir %DOWNLOAD_DIR%
+powershell "Invoke-WebRequest -Uri %RAGEL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\ragel.exe"
 
-choco install ragel
+echo set (RAGEL_EXE %DOWNLOAD_DIR_CMAKE%/ragel.exe) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -54,7 +50,7 @@ choco install lua53
 
 echo Installing OpenSSL...
 
-choco install lua52
+choco install openssl
 
 :: %DOWNLOAD_DIR%\openssl-install-log.txt
 :: echo Downloading OpenSSL...
@@ -80,3 +76,5 @@ choco install lua52
 :: echo set (OPENSSL_SSL_DLL_NAME libssl%OPENSSL_DLL_SUFFIX%) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+dir C:\ProgramData\Chocolatey
