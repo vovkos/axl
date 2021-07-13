@@ -79,3 +79,6 @@ choco install openssl --no-progress
 
 dir C:\ProgramData\Chocolatey
 dir C:\ProgramData\Chocolatey\lib
+dir C:\ProgramData\Chocolatey\lib\lua53
+dir C:\ProgramData\Chocolatey\lib\openssl
+dir C:\ProgramData\Chocolatey\lib\openssl.light
