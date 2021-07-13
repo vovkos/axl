@@ -93,7 +93,7 @@ set LUA_DOWNLOAD_URL=https://sourceforge.net/projects/luabinaries/files/%LUA_VER
 
 set OPENSSL_VERSION=1_1_1k
 set OPENSSL_DOWNLOAD_URL=https://slproweb.com/download/%OPENSSL_PLATFORM%OpenSSL_Light-%OPENSSL_VERSION%.msi
-set OPENSSL_DIR=C:\OpenSSL-%OPENSSL_PLATFORM%
+set OPENSSL_DIR=C:\Program Files\OpenSSL-%OPENSSL_PLATFORM%
 
 set RAGEL_DOWNLOAD_URL=https://github.com/eloraiby/ragel-windows/raw/master/ragel.exe
 

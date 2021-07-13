@@ -20,7 +20,6 @@ set DOWNLOAD_DIR_CMAKE=%DOWNLOAD_DIR:\=/%
 
 echo Downloading Ragel...
 
-mkdir %DOWNLOAD_DIR%\ragel
 powershell "Invoke-WebRequest -Uri %RAGEL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\ragel.exe"
 
 echo set (RAGEL_EXE %DOWNLOAD_DIR_CMAKE%/ragel.exe) >> paths.cmake
@@ -46,13 +45,13 @@ echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
 
 echo Downloading OpenSSL...
 
-mkdir %DOWNLOAD_DIR%\openssl
-powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl\openssl.msi"
+powershell "Invoke-WebRequest -Uri %OPENSSL_DOWNLOAD_URL% -OutFile %DOWNLOAD_DIR%\openssl.msi"
 
 echo Installing OpenSSL...
-msiexec /i /qn %DOWNLOAD_DIR%\openssl\openssl.msi
+start /wait msiexec /i %DOWNLOAD_DIR%\openssl.msi TARGET_DIR=%OPENSSL_DIR% /qn
 
-dir c:\
+dir "C:\Program Files"
+dir %OPENSSL_DIR%
 
 echo set (OPENSSL_INC_DIR %OPENSSL_DIR%/include) >> paths.cmake
 echo set (OPENSSL_LIB_DIR %OPENSSL_DIR%/lib) >> paths.cmake
