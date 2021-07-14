@@ -31,7 +31,7 @@ echo set (RAGEL_EXE %DOWNLOAD_DIR_CMAKE%/ragel.exe) >> paths.cmake
 
 echo Installing Lua...
 
-choco install lua53 --no-progress --verbose
+choco install lua53 --no-progress
 
 set LUA_ROOT_DIR C:\ProgramData\Chocolatey\lib\lua53\tools
 
@@ -50,7 +50,7 @@ echo Installing OpenSSL...
 
 choco install openssl --no-progress
 
-set OPENSSL_ROOT_DIR "C:\Program Files\OpenSSL-%OPENSSL_PLATFORM%"
+set OPENSSL_ROOT_DIR=C:\Program Files\OpenSSL-%OPENSSL_PLATFORM%
 
 echo set (OPENSSL_INC_DIR %OPENSSL_ROOT_DIR%/include) >> paths.cmake
 echo set (OPENSSL_LIB_DIR %OPENSSL_ROOT_DIR%/lib) >> paths.cmake
