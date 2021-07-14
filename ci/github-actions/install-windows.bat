@@ -33,9 +33,9 @@ echo Installing Lua...
 
 choco install lua53 --no-progress
 
-set LUA_ROOT_DIR C:\ProgramData\Chocolatey\lib\lua53\tools
+set LUA_ROOT_DIR=C:/ProgramData/Chocolatey/lib/lua53/tools
 
-dir %LUA_ROOT_DIR%
+dir C:\ProgramData\Chocolatey\lib\lua53\tools
 
 echo set (LUA_INC_DIR %LUA_ROOT_DIR%/include) >> paths.cmake
 echo set (LUA_LIB_DIR %LUA_ROOT_DIR%) >> paths.cmake
@@ -50,7 +50,7 @@ echo Installing OpenSSL...
 
 choco install openssl --no-progress
 
-set OPENSSL_ROOT_DIR=C:\Program Files\OpenSSL-%OPENSSL_PLATFORM%
+set OPENSSL_ROOT_DIR=C:/Program Files/OpenSSL-%OPENSSL_PLATFORM%
 
 echo set (OPENSSL_INC_DIR %OPENSSL_ROOT_DIR%/include) >> paths.cmake
 echo set (OPENSSL_LIB_DIR %OPENSSL_ROOT_DIR%/lib) >> paths.cmake
