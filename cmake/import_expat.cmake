@@ -17,7 +17,7 @@ if(NOT EXPAT_LIB_DIR)
 	axl_find_lib_dir(EXPAT_LIB_DIR expat)
 endif()
 
-if(EXISTS ${EXPAT_INC_DIR}/expat.h)
+if(EXISTS ${EXPAT_INC_DIR}/expat.h AND EXPAT_LIB_DIR)
 	axl_message("Expat paths:")
 	axl_message("    Includes:"  "${EXPAT_INC_DIR}")
 	axl_message("    Libraries:" "${EXPAT_LIB_DIR}")

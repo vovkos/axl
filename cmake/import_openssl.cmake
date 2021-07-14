@@ -56,7 +56,11 @@ if(NOT OPENSSL_SSL_LIB_NAME)
 		)
 endif()
 
-if(EXISTS ${OPENSSL_INC_DIR}/openssl/opensslconf.h)
+if(EXISTS ${OPENSSL_INC_DIR}/openssl/opensslconf.h AND
+	OPENSSL_LIB_DIR AND
+	OPENSSL_CRYPTO_LIB_NAME AND
+	OPENSSL_SSL_LIB_NAME)
+
 	axl_message("OpenSSL paths:")
 	axl_message("    Includes:"       "${OPENSSL_INC_DIR}")
 	axl_message("    Libraries:"      "${OPENSSL_LIB_DIR}")
