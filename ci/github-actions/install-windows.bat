@@ -77,14 +77,11 @@ choco install openssl --no-progress --verbose
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-dir C:\
+dir "C:\"
 dir "C:\Program Files"
 dir "C:\Program Files (x86)"
 
-dir C:\ProgramData\Chocolatey
-dir C:\ProgramData\Chocolatey\lib
-dir C:\ProgramData\Chocolatey\lib\lua53
-dir C:\ProgramData\Chocolatey\lib\openssl
-dir C:\ProgramData\Chocolatey\lib\openssl.light
+dir "C:\Program Files\OpenSSL"
+dir "C:\Program Files\OpenSSL-Win64"
 
-dir C:\Chocolatey
+dir C:\ProgramData\Chocolatey\tools
