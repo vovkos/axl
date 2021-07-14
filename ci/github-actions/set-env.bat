@@ -69,6 +69,7 @@ set CMAKE_GENERATOR_SUFFIX=
 set LUA_PLATFORM=Win32
 set OPENSSL_PLATFORM=Win32
 set OPENSSL_DLL_SUFFIX=-1_1
+set CHOCO_PLATFORM=--x86
 shift
 goto :loop
 
@@ -78,6 +79,7 @@ set CMAKE_GENERATOR_SUFFIX= Win64
 set LUA_PLATFORM=Win64
 set OPENSSL_PLATFORM=Win64
 set OPENSSL_DLL_SUFFIX=-1_1-x64
+set CHOCO_PLATFORM=
 shift
 goto :loop
 
@@ -93,9 +95,6 @@ set LUA_VERSION=5.3.5
 set LUA_LIB_NAME=lua53
 set LUA_DOWNLOAD_URL=https://sourceforge.net/projects/luabinaries/files/%LUA_VERSION%/Windows%%20Libraries/Dynamic/lua-%LUA_VERSION%_%LUA_PLATFORM%_%LUA_TOOLCHAIN%_lib.zip/download
 
-set OPENSSL_VERSION=1_1_1k
-set OPENSSL_DOWNLOAD_URL=https://slproweb.com/download/%OPENSSL_PLATFORM%OpenSSL-%OPENSSL_VERSION%.msi
-
 set RAGEL_DOWNLOAD_URL=https://github.com/eloraiby/ragel-windows/raw/master/ragel.exe
 
 set CMAKE_CONFIGURE_FLAGS=-G "%CMAKE_GENERATOR%%CMAKE_GENERATOR_SUFFIX%"
@@ -110,7 +109,5 @@ set CMAKE_BUILD_FLAGS= ^
 echo ---------------------------------------------------------------------------
 echo LUA_LIB_NAME:         %LUA_LIB_NAME%
 echo LUA_DOWNLOAD_URL:     %LUA_DOWNLOAD_URL%
-echo OPENSSL_DOWNLOAD_URL: %OPENSSL_DOWNLOAD_URL%
-echo OPENSSL_DIR:          %OPENSSL_DIR%
 echo RAGEL_DOWNLOAD_URL:   %RAGEL_DOWNLOAD_URL%
 echo ---------------------------------------------------------------------------

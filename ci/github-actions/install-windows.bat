@@ -46,7 +46,7 @@ echo set (LUA_LIB_NAME %LUA_LIB_NAME%) >> paths.cmake
 
 echo Installing OpenSSL...
 
-choco install openssl --no-progress
+choco install openssl --no-progress %CHOCO_PLATFORM%
 
 set OPENSSL_ROOT_DIR=C:/Program Files/OpenSSL-%OPENSSL_PLATFORM%
 

@@ -16,7 +16,7 @@ jobs:
                 # -   Release
 
                 TARGET_CPU:
-                # -   x86
+                -   x86
                 -   amd64
 
         steps:
