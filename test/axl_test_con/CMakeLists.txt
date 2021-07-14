@@ -196,11 +196,11 @@ if(UNIX)
 endif()
 
 if(WIN32)
-	if(BUILD_AXL_IO_USB)
+	if(BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
 		list(APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
 	endif()
 
-	if(BUILD_AXL_IO_SSL)
+	if(BUILD_AXL_IO_SSL AND OPENSSL_DLL_DIR)
 		list(
 			APPEND _DLL_LIST
 			${OPENSSL_DLL_DIR}/${OPENSSL_SSL_DLL_NAME}.dll
@@ -208,7 +208,7 @@ if(WIN32)
 			)
 	endif()
 
-	if(BUILD_AXL_XML)
+	if(BUILD_AXL_XML AND EXPAT_DLL_DIR)
 		list(APPEND _DLL_LIST ${EXPAT_DLL_DIR}/expat.dll)
 	endif()
 
