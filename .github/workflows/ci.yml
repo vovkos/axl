@@ -57,6 +57,10 @@ jobs:
                 -   x86
                 -   amd64
 
+                COMPILER:
+                -   clang
+                -   gcc
+
         steps:
         -   name: Checkout repo
             uses: actions/checkout@v2
@@ -70,6 +74,8 @@ jobs:
         -   name: Build and test
             shell: bash
             run: |
+                export CC=$(which ${{matrix.COMPILER}})
+                export CXX=$(which ${{matrix.COMPILER}}++)
                 mkdir build
                 cd build
                 cmake .. -DTARGET_CPU=${{matrix.TARGET_CPU}} -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
