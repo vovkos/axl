@@ -48,7 +48,7 @@ echo Installing OpenSSL...
 
 choco install openssl --no-progress %CHOCO_PLATFORM%
 
-set OPENSSL_ROOT_DIR=C:/Program Files/OpenSSL-%OPENSSL_PLATFORM%
+set OPENSSL_ROOT_DIR=%PROGRAM_FILES_DIR%/OpenSSL-%OPENSSL_PLATFORM%
 
 echo set (OPENSSL_INC_DIR "%OPENSSL_ROOT_DIR%/include") >> paths.cmake
 echo set (OPENSSL_LIB_DIR "%OPENSSL_ROOT_DIR%/lib") >> paths.cmake

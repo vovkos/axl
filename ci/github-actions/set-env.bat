@@ -70,6 +70,7 @@ set LUA_PLATFORM=Win32
 set OPENSSL_PLATFORM=Win32
 set OPENSSL_DLL_SUFFIX=-1_1
 set CHOCO_PLATFORM=--x86
+set PROGRAM_FILES_DIR=C:\Program Files (x86)
 shift
 goto :loop
 
@@ -80,6 +81,7 @@ set LUA_PLATFORM=Win64
 set OPENSSL_PLATFORM=Win64
 set OPENSSL_DLL_SUFFIX=-1_1-x64
 set CHOCO_PLATFORM=
+set PROGRAM_FILES_DIR=C:\Program Files
 shift
 goto :loop
 
