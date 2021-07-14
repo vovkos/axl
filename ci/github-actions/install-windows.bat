@@ -59,7 +59,3 @@ echo set (OPENSSL_SSL_LIB_NAME libssl) >> paths.cmake
 echo set (OPENSSL_SSL_DLL_NAME libssl%OPENSSL_DLL_SUFFIX%) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-dir "C:\Program Files (x86)"
-dir "C:\Program Files (x86)\Microsoft Visual Studio"
-dir "C:\Program Files (x86)\Microsoft Visual Studio 10.0"
