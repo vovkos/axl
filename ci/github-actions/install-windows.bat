@@ -31,7 +31,7 @@ echo set (RAGEL_EXE %DOWNLOAD_DIR_CMAKE%/ragel.exe) >> paths.cmake
 
 echo Installing Lua...
 
-choco install lua53 --no-progress
+choco install lua53 --no-progress --verbose
 
 :: echo Downloading Lua...
 ::
@@ -50,7 +50,7 @@ choco install lua53 --no-progress
 
 echo Installing OpenSSL...
 
-choco install openssl --no-progress
+choco install openssl --no-progress --verbose
 
 :: %DOWNLOAD_DIR%\openssl-install-log.txt
 :: echo Downloading OpenSSL...
@@ -77,8 +77,14 @@ choco install openssl --no-progress
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+dir C:\
+dir "C:\Program Files"
+dir "C:\Program Files (x86)"
+
 dir C:\ProgramData\Chocolatey
 dir C:\ProgramData\Chocolatey\lib
 dir C:\ProgramData\Chocolatey\lib\lua53
 dir C:\ProgramData\Chocolatey\lib\openssl
 dir C:\ProgramData\Chocolatey\lib\openssl.light
+
+dir C:\Chocolatey
