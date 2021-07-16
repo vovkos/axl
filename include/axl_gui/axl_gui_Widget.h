@@ -189,7 +189,7 @@ struct WidgetScrollBar
 	{
 		m_end = end;
 		m_page = page;
-		m_pos = 0;
+		m_pos = pos;
 	}
 
 	bool
