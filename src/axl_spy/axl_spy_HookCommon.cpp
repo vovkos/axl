@@ -22,7 +22,7 @@ hookEnterCommon(
 	ThreadState* threadState = getCurrentThreadState();
 
 	HookAction action = context->m_enterFunc ?
-		action = context->m_enterFunc(context->m_targetFunc, context->m_callbackParam, frameBase) :
+		context->m_enterFunc(context->m_targetFunc, context->m_callbackParam, frameBase) :
 		HookAction_Default;
 
 	if (action == HookAction_Default)
