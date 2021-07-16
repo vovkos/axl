@@ -59,7 +59,7 @@ DynamicLib::getInfo(
 	)
 {
 	int result = ::dlinfo(m_h, request, p);
-	if (!p)
+	if (result == -1)
 	{
 		err::setError(::dlerror());
 		return false;
