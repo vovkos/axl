@@ -45,4 +45,4 @@ else
 	echo "set (LIBUSB_LIB_DIR /usr/lib/i386-linux-gnu)" >> paths.cmake
 fi
 
-sudo apt-get install ragel
+sudo apt-get install -y ragel
