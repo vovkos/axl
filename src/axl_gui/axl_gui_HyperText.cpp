@@ -224,7 +224,6 @@ HyperText::calcHyperlinkXMap(Widget* widget)
 
 	int x = 0;
 	size_t offset = 0;
-	size_t length = m_text.getLength();
 	size_t attrCount = m_attrArray.getCount();
 	size_t hyperlinkCount = m_hyperlinkArray.getCount();
 

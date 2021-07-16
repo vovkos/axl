@@ -457,9 +457,7 @@ TextPainter::buildBinTextBuffer(
 	binTextBuffer->setCount(dataSize);
 	utf32_t* buffer = binTextBuffer->p();
 
-	size_t unitSize = codec->getUnitSize();
 	size_t i = 0;
-
 	const char* p = (const char*) p0;
 	const char* end = p + bufferSize;
 
