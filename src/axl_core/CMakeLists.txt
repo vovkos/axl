@@ -245,6 +245,7 @@ set(
 	${AXL_INC_DIR}/axl_sys/axl_sys_Semaphore.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_InvertedSemaphore.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_ReadWriteLock.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_ExceptionError.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_Thread.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_TlsMgr.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_TlsSlot.h
@@ -261,6 +262,7 @@ set(
 	axl_sys_TlsMgr.cpp
 	axl_sys_Time.cpp
 	axl_sys_ReadWriteLock.cpp
+	axl_sys_ExceptionError.cpp
 	)
 
 set(
