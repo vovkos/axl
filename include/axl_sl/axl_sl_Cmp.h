@@ -51,6 +51,15 @@ public:
 	{
 		return memcmp(&a, &b, sizeof(T));
 	}
+
+	int
+	operator () (
+		const T* a,
+		const T* b
+		) const
+	{
+		return memcmp(a, b, sizeof(T));
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
