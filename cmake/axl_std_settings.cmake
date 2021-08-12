@@ -416,6 +416,13 @@ axl_create_gcc_settings)
 	# C++ specific warnings
 
 	axl_create_compiler_flag_setting(
+		GCC_FLAG_CPP_WARNING_REGISTER
+		DESCRIPTION "Warn about use of the 'register' keyword"
+		DEFAULT "-Wno-register"
+		"-Wregister" "-Wno-register"
+		)
+
+	axl_create_compiler_flag_setting(
 		GCC_FLAG_CPP_WARNING_INVALID_OFFSETOF
 		DESCRIPTION "Warn about applying the offsetof macro to a non-POD type"
 		DEFAULT "-Wno-invalid-offsetof"
