@@ -4009,20 +4009,22 @@ public:
 	};
 
 protected:
-	sys::ReadWriteLock* m_lock;
+	sys::ReadWriteLock m_lock;
 	size_t m_index;
 	size_t m_iterationCount;
 	bool m_isWriter;
 
 public:
 	RwLockThread(
-		sys::ReadWriteLock* lock,
+		const sl::StringRef& mappingName,
+		const sl::StringRef& readEventName,
+		const sl::StringRef& writeEventName,
 		size_t index,
 		size_t iterationCount,
 		bool isWriter
 		)
 	{
-		m_lock = lock;
+		m_lock.open(mappingName, readEventName, writeEventName);
 		m_index = index;
 		m_iterationCount = iterationCount;
 		m_isWriter = isWriter;
@@ -4036,25 +4038,25 @@ public:
 		if (m_isWriter)
 			for (size_t i = 0; i < m_iterationCount; i++)
 			{
-				m_lock->writeLock();
+				m_lock.writeLock();
 				ASSERT(g_readerCount == 0);
 				ASSERT(g_writerCount == 0);
 				sys::atomicInc(&g_writerCount);
 				printf("writer #%d (TID:%llx) is writing (%d/%d)...\n", m_index, tid, i, m_iterationCount);
 				sys::sleep(rand() % MaxSleepTime);
 				sys::atomicDec(&g_writerCount);
-				m_lock->writeUnlock();
+				m_lock.writeUnlock();
 			}
 		else
 			for (size_t i = 0; i < m_iterationCount; i++)
 			{
-				m_lock->readLock();
+				m_lock.readLock();
 				ASSERT(g_writerCount == 0);
 				sys::atomicInc(&g_readerCount);
 				printf("reader #%d (TID:%llx) is reading (%d/%d; %d readers total)...\n", m_index, tid, i, m_iterationCount, g_readerCount);
 				sys::sleep(rand() % MaxSleepTime);
 				sys::atomicDec(&g_readerCount);
-				m_lock->readUnlock();
+				m_lock.readUnlock();
 			}
 	}
 };
@@ -4064,28 +4066,23 @@ testReadWriteLock()
 {
 	enum
 	{
-		ReaderCount = 10,
-		ReaderIterationCount = 10,
-
-		WriterCount = 5,
-		WriterIterationCount = 10,
+		ReaderWriterCount = 32,
+		IterationCount    = 100,
 	};
 
+	static const char mappingName[] = "rwl-mapping";
+	static const char readEventName[] = "rwl-read-event";
+	static const char writeEventName[] = "rwl-write-event";
+
 	sys::ReadWriteLock lock;
-	lock.create();
+	lock.create(mappingName, readEventName, writeEventName);
 
 	sl::List<RwLockThread> threadList;
 
-	for (size_t i = 0; i < ReaderCount; i++)
+	for (size_t i = 0; i < ReaderWriterCount; i++)
 	{
-		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (&lock, i, ReaderIterationCount, false));
-		thread->start();
-		threadList.insertTail(thread);
-	}
-
-	for (size_t i = 0; i < ReaderCount; i++)
-	{
-		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (&lock, i, WriterIterationCount, true));
+		bool isWriter = (i & 1) != 0;
+		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (mappingName, readEventName, writeEventName, i, IterationCount, isWriter));
 		thread->start();
 		threadList.insertTail(thread);
 	}
@@ -5836,7 +5833,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testRegex();
+	testReadWriteLock();
 	return 0;
 }
 
