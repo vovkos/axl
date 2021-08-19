@@ -52,6 +52,12 @@ struct ErrorHdr
 	}
 
 	bool
+	isNoError() const
+	{
+		return isKindOf(g_stdErrorGuid, StdErrorCode_NoError);
+	}
+
+	bool
 	isStack() const
 	{
 		return
@@ -154,6 +160,12 @@ public:
 		) const
 	{
 		return !isEmpty() && m_p->isKindOf(guid, code);
+	}
+
+	bool
+	isNoError() const
+	{
+		return isEmpty() || m_p->isNoError();
 	}
 
 	sl::String
