@@ -96,7 +96,7 @@ ReadWriteLock::open(
 }
 
 bool
-ReadWriteLock::readLock(uint_t timeout)
+ReadWriteLock::readLock()
 {
 	bool result;
 
@@ -115,7 +115,7 @@ ReadWriteLock::readLock(uint_t timeout)
 		m_readEvent.reset();
 		sys::atomicUnlock(&m_data->m_lock);
 
-		result = m_readEvent.wait(timeout);
+		result = m_readEvent.wait();
 
 		// another reader might squeeze in here, finish and start a writer
 
@@ -164,7 +164,7 @@ ReadWriteLock::readUnlock()
 }
 
 bool
-ReadWriteLock::writeLock(uint_t timeout)
+ReadWriteLock::writeLock()
 {
 	bool result;
 
@@ -186,7 +186,7 @@ ReadWriteLock::writeLock(uint_t timeout)
 		// another writer might squeeze in here, finish and wake up readers
 		// one reader might start, finish and wake up this writer
 
-		result = m_writeEvent.wait(timeout);
+		result = m_writeEvent.wait();
 
 		// another reader woken up by the first writer might have read-locked
 
@@ -229,7 +229,7 @@ ReadWriteLock::writeUnlock()
 }
 
 bool
-ReadWriteLock::upgradeReadLockToWriteLock(uint_t timeout)
+ReadWriteLock::upgradeReadLockToWriteLock()
 {
 	bool result;
 
@@ -254,7 +254,7 @@ ReadWriteLock::upgradeReadLockToWriteLock(uint_t timeout)
 		// another writer might squeeze in here, finish and wake up readers
 		// one reader might start, finish and wake up this writer
 
-		result = m_writeEvent.wait(timeout);
+		result = m_writeEvent.wait();
 
 		// another reader woken up by the first writer might have read-locked
 

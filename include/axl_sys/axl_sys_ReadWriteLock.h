@@ -80,19 +80,19 @@ public:
 		);
 
 	bool
-	readLock(uint_t timeout = -1);
+	readLock();
 
 	void
 	readUnlock();
 
 	bool
-	writeLock(uint_t timeout = -1);
+	writeLock();
 
 	void
 	writeUnlock();
 
 	bool
-	upgradeReadLockToWriteLock(uint_t timeout = -1);
+	upgradeReadLockToWriteLock();
 
 	void
 	downgradeWriteLockToReadLock();
