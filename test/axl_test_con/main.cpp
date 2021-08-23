@@ -4024,7 +4024,9 @@ public:
 		bool isWriter
 		)
 	{
-		m_lock.open(mappingName, readEventName, writeEventName);
+		bool result = m_lock.open(mappingName, readEventName, writeEventName);
+		ASSERT(result);
+
 		m_index = index;
 		m_iterationCount = iterationCount;
 		m_isWriter = isWriter;
@@ -4034,6 +4036,7 @@ public:
 	threadFunc()
 	{
 		uint64_t tid = sys::getCurrentThreadId();
+		printf("Starting thread %llx\n", tid);
 
 		if (m_isWriter)
 			for (size_t i = 0; i < m_iterationCount; i++)
@@ -4046,6 +4049,7 @@ public:
 				sys::sleep(rand() % MaxSleepTime);
 				sys::atomicDec(&g_writerCount);
 				m_lock.writeUnlock();
+				sys::yieldProcessor();
 			}
 		else
 			for (size_t i = 0; i < m_iterationCount; i++)
@@ -4057,6 +4061,7 @@ public:
 				sys::sleep(rand() % MaxSleepTime);
 				sys::atomicDec(&g_readerCount);
 				m_lock.readUnlock();
+				sys::yieldProcessor();
 			}
 	}
 };
@@ -4066,16 +4071,31 @@ testReadWriteLock()
 {
 	enum
 	{
-		ReaderWriterCount = 32,
-		IterationCount    = 100,
+		ReaderWriterCount = 16,
+		IterationCount    = 64,
 	};
 
 	static const char mappingName[] = "rwl-mapping";
 	static const char readEventName[] = "rwl-read-event";
 	static const char writeEventName[] = "rwl-write-event";
 
+#if (_AXL_OS_POSIX)
+	io::psx::SharedMemory::unlink(mappingName);
+	io::psx::SharedMemory::unlink(readEventName);
+	sys::psx::NamedSem::unlink(readEventName);
+	io::psx::SharedMemory::unlink(writeEventName);
+	sys::psx::NamedSem::unlink(writeEventName);
+#endif
+
+	bool result;
+
 	sys::ReadWriteLock lock;
-	lock.create(mappingName, readEventName, writeEventName);
+	result = lock.create(mappingName, readEventName, writeEventName);
+	if (!result)
+	{
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
 
 	sl::List<RwLockThread> threadList;
 
