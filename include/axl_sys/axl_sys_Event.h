@@ -21,6 +21,7 @@
 #elif (_AXL_OS_POSIX)
 #	include "axl_sys_psx_Cond.h"
 #	include "axl_io_psx_Mapping.h"
+#	include "axl_sys_Semaphore.h"
 #endif
 
 namespace axl {
@@ -39,7 +40,7 @@ public:
 public:
 	EventBase()
 	{
-		m_event.create(NULL, IsNotificationEvent() (), false, NULL);
+		m_event.create(NULL, IsNotificationEvent()(), false, NULL);
 	}
 
 	bool
@@ -66,19 +67,19 @@ public:
 #elif (_AXL_OS_POSIX)
 
 template <typename IsNotificationEvent>
-class EventBase
+class CondMutexEventBase
 {
 protected:
 	psx::CondMutexPair m_condMutexPair;
 	volatile bool m_state;
 
 public:
-	EventBase()
+	CondMutexEventBase()
 	{
 		 m_state = false;
 	}
 
-	EventBase(
+	CondMutexEventBase(
 		const pthread_condattr_t* condAttr,
 		const pthread_mutexattr_t* mutexAttr
 		):
@@ -87,8 +88,25 @@ public:
 		m_state = false;
 	}
 
-	void
-	close();
+	bool
+	signal()
+	{
+		m_condMutexPair.lock();
+		if (m_state)
+		{
+			m_condMutexPair.unlock();
+			return true;
+		}
+
+		m_state = true;
+
+		bool result = IsNotificationEvent()() ?
+			m_condMutexPair.broadcast() :
+			m_condMutexPair.signal();
+
+		m_condMutexPair.unlock();
+		return result;
+	}
 
 	bool
 	reset()
@@ -106,7 +124,7 @@ public:
 
 		if (m_state)
 		{
-			if (!IsNotificationEvent() ())
+			if (!IsNotificationEvent()())
 				m_state = false;
 
 			m_condMutexPair.unlock();
@@ -120,37 +138,10 @@ public:
 			return false;
 		}
 
-		if (!IsNotificationEvent() ())
+		if (!IsNotificationEvent()())
 			m_state = false;
 
 		m_condMutexPair.unlock();
-
-		return true;
-	}
-
-	bool
-	signal()
-	{
-		m_condMutexPair.lock();
-		if (m_state)
-		{
-			m_condMutexPair.unlock();
-			return true;
-		}
-
-		bool result = IsNotificationEvent() () ?
-			m_condMutexPair.broadcast() :
-			m_condMutexPair.signal();
-
-		if (!result)
-		{
-			m_condMutexPair.unlock();
-			return false;
-		}
-
-		m_state = true;
-		m_condMutexPair.unlock();
-
 		return true;
 	}
 };
@@ -159,8 +150,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef EventBase<sl::False<bool> > Event;
-typedef EventBase<sl::True<bool> > NotificationEvent;
+typedef CondMutexEventBase<sl::False<bool> > Event;
+typedef CondMutexEventBase<sl::True<bool> > NotificationEvent;
 
 //..............................................................................
 
@@ -173,7 +164,9 @@ typedef EventBase<sl::True<bool> > NotificationEvent;
 // 2.b) named
 
 // on windows, everything maps directly to win::Event
-// on posix, we need to use a condvar/mutex/flags in a shared memory block
+// on linux, we can use a condvar/mutex/flags in a shared memory block
+// on darwin, support for PTHREAD_PROCESS_SHARED is questionable, and we need
+//    a hand-made implementation via a named semaphore and a shared memory block
 
 #if (_AXL_OS_WIN)
 
@@ -193,13 +186,13 @@ public:
 	bool
 	create()
 	{
-		return m_event.create(NULL, IsNotificationEvent() (), false);
+		return m_event.create(NULL, IsNotificationEvent()(), false);
 	}
 
 	bool
 	create(const sl::StringRef& name)
 	{
-		return m_event.create(NULL, IsNotificationEvent() (), false, name.s2());
+		return m_event.create(NULL, IsNotificationEvent()(), false, name.s2());
 	}
 
 	bool
@@ -230,14 +223,347 @@ public:
 //..............................................................................
 
 #elif (_AXL_OS_POSIX)
+#	if (_AXL_OS_DARWIN)
+
+template <typename IsNotificationEvent>
+class NamedSemEventBase
+{
+protected:
+	struct Data
+	{
+		int32_t m_lock;
+		uint32_t m_waitCount;
+
+		union
+		{
+			bool m_state;
+			uint64_t _m_align;
+		};
+	};
+
+protected:
+	sl::String m_name;
+	psx::NamedSem m_sem;
+	io::psx::Mapping m_mapping;
+	volatile Data* m_data;
+
+public:
+	NamedSemEventBase()
+	{
+		 m_data = NULL;
+	}
+
+	void
+	close()
+	{
+		if (!m_data)
+			return;
+
+		m_sem.close();
+		m_mapping.close();
+		m_data = NULL;
+
+		if (!m_name.isEmpty())
+		{
+			psx::NamedSem::unlink(m_name);
+			io::psx::SharedMemory::unlink(m_name);
+			m_name.clear();
+		}
+	}
+
+	bool
+	create(const sl::StringRef& name)
+	{
+		close();
+
+		io::psx::SharedMemory sharedMemory;
+		bool result = sharedMemory.open(name, O_RDWR | O_CREAT | O_EXCL);
+		if (!result)
+			return false;
+
+		result =
+			sharedMemory.setSize(sizeof(Data)) &&
+			(m_data = (Data*)m_mapping.map(
+				NULL,
+				sizeof(Data),
+				PROT_READ | PROT_WRITE,
+				MAP_SHARED,
+				sharedMemory
+				));
+
+		if (!result)
+		{
+			sharedMemory.unlink(name);
+			return false;
+		}
+
+		result = m_sem.open(name, O_CREAT | O_EXCL);
+		if (!result)
+		{
+			sharedMemory.unlink(name);
+			m_mapping.close();
+			m_data = NULL;
+			return false;
+		}
+
+		m_name = name;
+		return true;
+	}
+
+	bool
+	open(const sl::StringRef& name)
+	{
+		close();
+
+		io::psx::SharedMemory sharedMemory;
+		bool result = sharedMemory.open(name, O_RDWR);
+		if (!result)
+			return false;
+
+		m_data = (Data*)m_mapping.map(
+			NULL,
+			sizeof(Data),
+			PROT_READ | PROT_WRITE,
+			MAP_SHARED,
+			sharedMemory
+			);
+
+		if (!m_data)
+			return false;
+
+		result = m_sem.open(name, 0);
+		if (!result)
+		{
+			m_mapping.close();
+			m_data = NULL;
+			return false;
+		}
+
+		return true;
+	}
+
+	bool
+	signal()
+	{
+		ASSERT(m_data);
+
+		sys::atomicLock(&m_data->m_lock);
+		if (m_data->m_state)
+		{
+			sys::atomicUnlock(&m_data->m_lock);
+			return true;
+		}
+
+		m_data->m_state = true;
+
+		bool result = true;
+		if (IsNotificationEvent()())
+			for (uint32_t i = 0; i < m_data->m_waitCount; i++)
+				result = m_sem.signal() && result;
+		else if (m_data->m_waitCount)
+			result = m_sem.signal();
+
+		sys::atomicUnlock(&m_data->m_lock);
+		return result;
+	}
+
+	bool
+	reset()
+	{
+		ASSERT(m_data);
+
+		sys::atomicLock(&m_data->m_lock);
+		m_data->m_state = false;
+		sys::atomicUnlock(&m_data->m_lock);
+		return true;
+	}
+
+	bool
+	wait()
+	{
+		sys::atomicLock(&m_data->m_lock);
+		if (m_data->m_state)
+		{
+			if (!IsNotificationEvent()())
+				m_data->m_state = false;
+
+			sys::atomicUnlock(&m_data->m_lock);
+			return true;
+		}
+
+		m_data->m_waitCount++;
+
+		for (;;)
+		{
+			sys::atomicUnlock(&m_data->m_lock);
+
+			bool result = m_sem.wait();
+
+			sys::atomicLock(&m_data->m_lock);
+			if (!result || m_data->m_state)
+				break;
+		}
+
+		bool result = m_data->m_state;
+		if (result && !IsNotificationEvent()())
+			m_data->m_state = false;
+
+		m_data->m_waitCount--;
+		sys::atomicUnlock(&m_data->m_lock);
+		return result;
+	}
+};
 
 // cannot be destroyed while someone is waiting on it!
 
 template <typename IsNotificationEvent>
 class NameableEventBase
 {
+protected:
+	enum EventKind
+	{
+		EventKind_None = 0,
+		EventKind_Unnamed,
+		EventKind_Named,
+	};
+
+	typedef CondMutexEventBase<IsNotificationEvent> UnnamedEventImpl;
+	typedef NamedSemEventBase<IsNotificationEvent> NamedEventImpl;
+
+protected:
+	union
+	{
+		char m_eventBuffer[AXL_MAX(sizeof(UnnamedEventImpl), sizeof(NamedEventImpl))]; // avoid heap allocations
+		uint64_t _m_align;
+	};
+
+	EventKind m_eventKind;
+
 public:
-	typedef EventBase<IsNotificationEvent> EventImpl;
+	NameableEventBase()
+	{
+		m_eventKind = EventKind_None;
+		create();
+	}
+
+	~NameableEventBase()
+	{
+		close();
+	}
+
+	void
+	close()
+	{
+		if (!m_eventKind)
+			return;
+
+		m_eventKind == EventKind_Named ?
+			getNamedEvent()->~NamedEventImpl() :
+			getUnnamedEvent()->~UnnamedEventImpl();
+
+		m_eventKind = EventKind_None;
+	}
+
+	bool
+	create()
+	{
+		close();
+
+		new(m_eventBuffer) UnnamedEventImpl;
+		m_eventKind = EventKind_Unnamed;
+		return true;
+	}
+
+	bool
+	create(const sl::StringRef& name)
+	{
+		close();
+
+		new(m_eventBuffer) NamedEventImpl;
+		m_eventKind = EventKind_Named;
+
+		bool result = getNamedEvent()->create(name);
+		if (!result)
+		{
+			close();
+			return false;
+		}
+
+		return true;
+	}
+
+	bool
+	open(const sl::StringRef& name)
+	{
+		close();
+
+		new(m_eventBuffer) NamedEventImpl;
+		m_eventKind = EventKind_Named;
+
+		bool result = getNamedEvent()->open(name);
+		if (!result)
+		{
+			close();
+			return false;
+		}
+
+		return true;
+
+	}
+
+	bool
+	wait()
+	{
+		ASSERT(m_eventKind);
+		return m_eventKind == EventKind_Named ?
+			getNamedEvent()->wait() :
+			getUnnamedEvent()->wait();
+	}
+
+	bool
+	signal()
+	{
+		ASSERT(m_eventKind);
+		return m_eventKind == EventKind_Named ?
+			getNamedEvent()->signal() :
+			getUnnamedEvent()->signal();
+	}
+
+	bool
+	reset()
+	{
+		ASSERT(m_eventKind);
+		return m_eventKind == EventKind_Named ?
+			getNamedEvent()->reset() :
+			getUnnamedEvent()->reset();
+	}
+
+protected:
+	UnnamedEventImpl*
+	getUnnamedEvent()
+	{
+		ASSERT(m_eventKind == EventKind_Unnamed);
+		return (UnnamedEventImpl*)m_eventBuffer;
+	}
+
+	NamedEventImpl*
+	getNamedEvent()
+	{
+		ASSERT(m_eventKind == EventKind_Named);
+		return (NamedEventImpl*)m_eventBuffer;
+	}
+
+};
+
+#	else // _AXL_OS_DARWIN
+
+// cannot be destroyed while someone is waiting on it!
+
+template <typename IsNotificationEvent>
+class NameableEventBase
+{
+protected:
+	typedef CondMutexEventBase<IsNotificationEvent> EventImpl;
 
 protected:
 	EventImpl* m_event;
@@ -289,7 +615,7 @@ public:
 		close();
 
 		m_event = (EventImpl*)m_unnamedEventBuffer;
-		new(m_event)EventImpl;
+		new(m_event) EventImpl;
 		return true;
 	}
 
@@ -298,36 +624,38 @@ public:
 	{
 		close();
 
-		io::psx::SharedMemory sharedMemory;
+		psx::CondAttr condAttr;
+		psx::MutexAttr mutexAttr;
 
 		bool result =
-			sharedMemory.open(name) &&
-			sharedMemory.setSize(sizeof(EventImpl));
+			condAttr.setProcessShared(PTHREAD_PROCESS_SHARED) &&
+			mutexAttr.setProcessShared(PTHREAD_PROCESS_SHARED);
 
 		if (!result)
 			return false;
 
-		m_event = (EventImpl*)m_mapping.map(
-			NULL,
-			sizeof(EventImpl),
-			PROT_READ | PROT_WRITE,
-			MAP_SHARED,
-			sharedMemory
-			);
+		io::psx::SharedMemory sharedMemory;
+		result = sharedMemory.open(name, O_RDWR | O_CREAT | O_EXCL);
+		if (!result)
+			return false;
 
-		if (!m_event)
+		result =
+			sharedMemory.setSize(sizeof(EventImpl)) &&
+			(m_event = (EventImpl*)m_mapping.map(
+				NULL,
+				sizeof(EventImpl),
+				PROT_READ | PROT_WRITE,
+				MAP_SHARED,
+				sharedMemory
+				));
+
+		if (!result)
 		{
 			sharedMemory.unlink(name);
 			return false;
 		}
 
-		psx::CondAttr condAttr;
-		psx::MutexAttr mutexAttr;
-
-		condAttr.setProcessShared(PTHREAD_PROCESS_SHARED);
-		mutexAttr.setProcessShared(PTHREAD_PROCESS_SHARED);
-
-		new(m_event)EventImpl(condAttr, mutexAttr);
+		new (m_event) EventImpl(condAttr, mutexAttr);
 		m_name = name;
 		return true;
 	}
@@ -372,12 +700,12 @@ public:
 	reset()
 	{
 		ASSERT(m_event);
-		m_event->reset(); // returns void on POSIX
-		return true;
+		return m_event->reset();
 	}
 };
 
-#endif
+#	endif // _AXL_OS_DARWIN
+#endif    // _AXL_OS_POSIX
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
