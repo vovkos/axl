@@ -169,7 +169,7 @@ ReadWriteLock::writeLock()
 	bool result;
 
 	sys::atomicLock(&m_data->m_lock);
-	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
+	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount)
 	{
 		m_data->m_activeWriteCount = 1;
 		sys::atomicUnlock(&m_data->m_lock);
@@ -236,7 +236,7 @@ ReadWriteLock::upgradeReadLockToWriteLock()
 	sys::atomicLock(&m_data->m_lock);
 	ASSERT(m_data->m_activeReadCount >= 1);
 
-	if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
+	if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount)
 	{
 		m_data->m_activeWriteCount = 1;
 		m_data->m_activeReadCount = 0;
