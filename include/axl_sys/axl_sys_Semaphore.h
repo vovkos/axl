@@ -63,9 +63,9 @@ public:
 	}
 
 	bool
-	wait()
+	wait(uint_t timeout = -1)
 	{
-		return m_semaphore.wait(-1) == win::WaitResult_Object0;
+		return m_semaphore.wait(timeout) == win::WaitResult_Object0;
 	}
 };
 
@@ -131,6 +131,14 @@ public:
 	{
 		return m_sem.wait();
 	}
+
+#if (!_AXL_OS_DARWIN)
+	bool
+	wait(uint_t timeout)
+	{
+		return m_sem.wait(timeout);
+	}
+#endif
 };
 
 #endif
