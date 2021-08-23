@@ -180,7 +180,6 @@ ReadWriteLock::writeLock()
 
 	for (;;) // loop is STILL required (non-obvious)
 	{
-		m_writeEvent.reset();
 		sys::atomicUnlock(&m_data->m_lock);
 
 		// another writer might squeeze in here, finish and wake up readers
@@ -248,7 +247,6 @@ ReadWriteLock::upgradeReadLockToWriteLock()
 
 	for (;;) // loop is STILL required (non-obvious)
 	{
-		m_writeEvent.reset();
 		sys::atomicUnlock(&m_data->m_lock);
 
 		// another writer might squeeze in here, finish and wake up readers
