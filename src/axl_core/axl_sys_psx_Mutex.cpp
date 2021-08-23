@@ -20,6 +20,7 @@ namespace psx {
 
 //..............................................................................
 
+#if (!_AXL_OS_DARWIN)
 bool
 MutexAttr::getProcessShared(int* value) const
 {
@@ -33,6 +34,7 @@ MutexAttr::setProcessShared(int value)
 	int result = ::pthread_mutexattr_setpshared(&m_attr, value);
 	return result == 0 ? true : err::fail(result);
 }
+#endif
 
 bool
 MutexAttr::getType(int* value) const

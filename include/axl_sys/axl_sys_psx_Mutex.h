@@ -56,11 +56,13 @@ public:
 		return &m_attr;
 	}
 
+#if (!_AXL_OS_DARWIN) // PTHREAD_PROCESS_SHARED on Darwin is... weird, better not use it
 	bool
 	getProcessShared(int* value) const;
 
 	bool
 	setProcessShared(int value);
+#endif
 
 	bool
 	getType(int* value) const;

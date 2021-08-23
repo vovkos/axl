@@ -20,7 +20,6 @@ namespace axl {
 namespace sys {
 namespace psx {
 
-
 //..............................................................................
 
 class CondAttr
@@ -51,6 +50,7 @@ public:
 		return &m_attr;
 	}
 
+#if (!_AXL_OS_DARWIN) // PTHREAD_PROCESS_SHARED on Darwin is... weird, better not use it
 	bool
 	getProcessShared(int* value) const
 	{
@@ -64,6 +64,7 @@ public:
 		int result = ::pthread_condattr_setpshared(&m_attr, value);
 		return result == 0 ? true : err::fail(result);
 	}
+#endif
 };
 
 //..............................................................................
