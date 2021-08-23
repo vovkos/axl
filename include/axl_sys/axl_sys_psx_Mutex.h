@@ -121,7 +121,8 @@ public:
 	void
 	unlock()
 	{
-		::pthread_mutex_unlock(&m_mutex);
+		int result = ::pthread_mutex_unlock(&m_mutex);
+		ASSERT(result == 0);
 	}
 };
 
