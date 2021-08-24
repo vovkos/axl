@@ -62,6 +62,11 @@ public:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef EventBase<sl::False<bool> > Event;
+typedef EventBase<sl::True<bool> > NotificationEvent;
+
 //..............................................................................
 
 #elif (_AXL_OS_POSIX)
@@ -146,12 +151,12 @@ public:
 	}
 };
 
-#endif
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef CondMutexEventBase<sl::False<bool> > Event;
 typedef CondMutexEventBase<sl::True<bool> > NotificationEvent;
+
+#endif
 
 //..............................................................................
 
