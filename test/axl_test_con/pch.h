@@ -38,14 +38,20 @@
 #include "axl_sys_ReadWriteLock.h"
 #include "axl_sys_Thread.h"
 
-#include "axl_re_Regex.h"
-#include "axl_zip_ZipReader.h"
 #include "axl_err_Errno.h"
 
 #include "axl_enc_EscapeEncoding.h"
 #include "axl_enc_Base32Encoding.h"
 #include "axl_enc_Base64Encoding.h"
 #include "axl_enc_HexEncoding.h"
+
+#ifdef _AXL_RE
+#	include "axl_re_Regex.h"
+#endif
+
+#ifdef _AXL_ZIP
+#	include "axl_zip_ZipReader.h"
+#endif
 
 #ifdef _AXL_XML
 #	include "axl_xml_ExpatParser.h"

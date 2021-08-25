@@ -115,6 +115,16 @@ if(BUILD_AXL_SEC)
 	list(APPEND OPT_LIB_LIST axl_sec)
 endif()
 
+if (BUILD_AXL_RE)
+	add_definitions(-D_AXL_RE=1)
+	list(APPEND OPT_LIB_LIST axl_re)
+endif()
+
+if (BUILD_AXL_ZIP)
+	add_definitions(-D_AXL_ZIP=1)
+	list(APPEND OPT_LIB_LIST axl_zip)
+endif()
+
 add_executable(
 	axl_test_con
 	${PCH_H}
