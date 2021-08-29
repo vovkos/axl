@@ -75,7 +75,7 @@ typedef WinExceptionInfoBase<uint64_t> WinExceptionInfo64;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-struct PosixSignalInfoSignalBase
+struct PosixSignalInfoBase
 {
 	uint32_t m_signal;
 	uint32_t m_code;
@@ -85,9 +85,9 @@ struct PosixSignalInfoSignalBase
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef PosixSignalInfoSignalBase<uintptr_t> PosixSignalInfo;
-typedef PosixSignalInfoSignalBase<uint32_t> PosixSignalInfo32;
-typedef PosixSignalInfoSignalBase<uint64_t> PosixSignalInfo64;
+typedef PosixSignalInfoBase<uintptr_t> PosixSignalInfo;
+typedef PosixSignalInfoBase<uint32_t> PosixSignalInfo32;
+typedef PosixSignalInfoBase<uint64_t> PosixSignalInfo64;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
