@@ -92,7 +92,7 @@ setPosixSignalError(
 
 template <typename T>
 sl::StringRef
-getWinExceptionDescription(const T* exceptionInfo)
+getWinExceptionDescription(const WinExceptionInfoBase<T>* exceptionInfo)
 {
 	const char* pointerFormat = sizeof(exceptionInfo->m_codeAddress) == 8 ? "0x%016llx" : "0x%08x";
 
@@ -115,8 +115,8 @@ getWinExceptionDescription(const T* exceptionInfo)
 	if (exceptionInfo->m_ntstatus == 0xc0000005 ||
 		exceptionInfo->m_ntstatus == 0xc0000006)
 	{
-		uintptr_t op = exceptionInfo->m_paramTable[0];
-		uintptr_t faultAddress = exceptionInfo->m_paramTable[1];
+		T op = exceptionInfo->m_paramTable[0];
+		T faultAddress = exceptionInfo->m_paramTable[1];
 
 		string += " (";
 
@@ -245,7 +245,7 @@ getDarwinSignalName(int signal)
 template <typename T>
 sl::StringRef
 getPosixSignalDescription(
-	const T* signalInfo,
+	const PosixSignalInfoBase<T>* signalInfo,
 	const sl::StringRef& signalName,
 	bool hasFaultAddress
 	)
