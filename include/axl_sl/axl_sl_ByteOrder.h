@@ -88,6 +88,16 @@ swapByteOrder(
 	}
 }
 
+inline
+void
+swapByteOrder(
+	void* p,
+	size_t size
+	)
+{
+	swapByteOrder(p, p, size);
+}
+
 //..............................................................................
 
 } // namespace sl
