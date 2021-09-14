@@ -145,23 +145,3 @@ qt5_use_modules_alt
 endmacro()
 
 #...............................................................................
-
-macro(
-add_qt_rpath_link)
-	if(NOT QT_FOUND)
-		message(FATAL_ERROR "QT is required for add_qt_rpath_link() macro")
-	endif()
-
-	if(NOT UNIX OR APPLE)
-		message(FATAL_ERROR "add_qt_rpath_link should only be used on Unix")
-	endif()
-
-	if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-		set(
-			CMAKE_EXE_LINKER_FLAGS
-			"${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,'${QT_CMAKE_DIR}/..'"
-			)
-	endif()
-endmacro()
-
-#...............................................................................

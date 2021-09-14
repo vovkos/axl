@@ -9,13 +9,6 @@
 #
 #...............................................................................
 
-if(LINUX AND NOT ${TARGET_CPU} STREQUAL "x86") # if cross-compiling and64 -> x86, we gotta set rpath
-	set(AXL_TEST_QT_SKIP_BUILD_RPATH_DEFAULT TRUE)
-endif()
-
-option(AXL_TEST_QT_SKIP_BUILD_RPATH "Skip build rpath (i.e. which QT to use)" ${AXL_TEST_QT_SKIP_BUILD_RPATH_DEFAULT})
-
-#...............................................................................
 #
 # src folder
 #
@@ -90,10 +83,6 @@ source_group(
 # axl_test_qt compiler test
 #
 
-if(AXL_TEST_QT_SKIP_BUILD_RPATH)
-	set(CMAKE_SKIP_BUILD_RPATH TRUE)
-endif()
-
 include_directories(
 	${AXL_INC_DIR}
 	${GEN_DIR}
@@ -148,10 +137,6 @@ if(UNIX)
 			rt
 			)
 	endif()
-endif()
-
-if(LINUX AND NOT AXL_TEST_QT_SKIP_BUILD_RPATH)
-	add_qt_rpath_link()
 endif()
 
 if(WIN32 AND QT_DLL_DIR)
