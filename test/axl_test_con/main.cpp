@@ -4079,8 +4079,9 @@ testReadWriteLock()
 {
 	enum
 	{
-		ReaderWriterCount = 16,
-		IterationCount    = 64,
+		ReaderCount    = 8,
+		WriterCount    = 2,
+		IterationCount = -1, // infinite
 	};
 
 	static const char mappingName[] = "rwl-mapping";
@@ -4107,13 +4108,23 @@ testReadWriteLock()
 
 	sl::List<RwLockThread> threadList;
 
-	for (size_t i = 0; i < ReaderWriterCount; i++)
+	lock.writeLock();
+
+	for (size_t i = 0; i < ReaderCount; i++)
 	{
-		bool isWriter = (i & 1) != 0;
-		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (mappingName, readEventName, writeEventName, i, IterationCount, isWriter));
+		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (mappingName, readEventName, writeEventName, i, IterationCount, false));
 		thread->start();
 		threadList.insertTail(thread);
 	}
+
+	for (size_t i = 0; i < WriterCount; i++)
+	{
+		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (mappingName, readEventName, writeEventName, i, IterationCount, true));
+		thread->start();
+		threadList.insertTail(thread);
+	}
+
+	lock.writeUnlock();
 
 	sl::Iterator<RwLockThread> it = threadList.getHead();
 	for (; it; it++)
