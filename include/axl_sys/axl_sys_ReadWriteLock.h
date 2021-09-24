@@ -79,19 +79,19 @@ public:
 		const sl::StringRef& writeEventName
 		);
 
-	bool
+	void
 	readLock();
 
 	void
 	readUnlock();
 
-	bool
+	void
 	writeLock();
 
 	void
 	writeUnlock();
 
-	bool
+	void
 	upgradeReadLockToWriteLock();
 
 	void

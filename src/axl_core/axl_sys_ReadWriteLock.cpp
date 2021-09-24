@@ -95,7 +95,7 @@ ReadWriteLock::open(
 	return true;
 }
 
-bool
+void
 ReadWriteLock::readLock()
 {
 	bool result;
@@ -105,41 +105,32 @@ ReadWriteLock::readLock()
 	{
 		m_data->m_activeReadCount++;
 		sys::atomicUnlock(&m_data->m_lock);
-		return true;
+		return;
 	}
 
 	m_data->m_queuedReadCount++;
 
-	for (;;) // loop is required (obvious)
+	do
 	{
-		m_readEvent.reset();
 		sys::atomicUnlock(&m_data->m_lock);
 
 		result = m_readEvent.wait();
+		ASSERT(result);
+
+		if (!result) // in release, fall back to spin-locking
+			sys::yieldProcessor();
 
 		// another reader might squeeze in here, finish and start a writer
 
 		sys::atomicLock(&m_data->m_lock);
+	} while (m_data->m_activeWriteCount);
 
-		if (!result)
-		{
-			if (!m_data->m_activeReadCount && m_data->m_queuedWriteCount)
-				m_writeEvent.signal();
-
-			break;
-		}
-
-		if (!m_data->m_activeWriteCount)
-		{
-			m_data->m_activeReadCount++;
-			break;
-		}
-	}
+	if (m_data->m_queuedWriteCount) // don't wake new readers (so that we alternate)
+		m_readEvent.reset();
 
 	m_data->m_queuedReadCount--;
+	m_data->m_activeReadCount++;
 	sys::atomicUnlock(&m_data->m_lock);
-
-	return result;
 }
 
 void
@@ -149,67 +140,62 @@ ReadWriteLock::readUnlock()
 	ASSERT(m_data->m_activeReadCount && !m_data->m_activeWriteCount);
 	m_data->m_activeReadCount--;
 
-	if (m_data->m_queuedWriteCount) // check writers first, so we alternate
+	if (m_data->m_queuedWriteCount) // wake writers first (so that we alternate)
 	{
 		if (!m_data->m_activeReadCount)
-			m_writeEvent.signal();
+		{
+			bool result = m_writeEvent.signal();
+			ASSERT(result);
+		}
 	}
 	else
 	{
 		if (m_data->m_queuedReadCount)
-			m_readEvent.signal();
+		{
+			bool result = m_readEvent.signal();
+			ASSERT(result);
+		}
 	}
 
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
-bool
+void
 ReadWriteLock::writeLock()
 {
-	bool result;
-
 	sys::atomicLock(&m_data->m_lock);
 	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount)
 	{
+		m_readEvent.reset();
 		m_data->m_activeWriteCount = 1;
 		sys::atomicUnlock(&m_data->m_lock);
-		return true;
+		return;
 	}
 
 	m_data->m_queuedWriteCount++;
 
-	for (;;) // loop is STILL required (non-obvious)
+	do
 	{
 		sys::atomicUnlock(&m_data->m_lock);
 
 		// another writer might squeeze in here, finish and wake up readers
 		// one reader might start, finish and wake up this writer
 
-		result = m_writeEvent.wait();
+		bool result = m_writeEvent.wait();
+		ASSERT(result);
+
+		if (!result) // in release, fall back to spin-locking
+			sys::yieldProcessor();
 
 		// another reader woken up by the first writer might have read-locked
 
 		sys::atomicLock(&m_data->m_lock);
+	} while (m_data->m_activeReadCount || m_data->m_activeWriteCount);
 
-		if (!result)
-		{
-			if (!m_data->m_activeWriteCount && m_data->m_queuedReadCount)
-				m_readEvent.signal();
-
-			break;
-		}
-
-		if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount)
-		{
-			m_data->m_activeWriteCount = 1;
-			break;
-		}
-	}
-
+	m_readEvent.reset();
 	m_data->m_queuedWriteCount--;
+	m_data->m_activeWriteCount = 1;
 	sys::atomicUnlock(&m_data->m_lock);
-
-	return result;
 }
 
 void
@@ -219,15 +205,21 @@ ReadWriteLock::writeUnlock()
 	ASSERT(!m_data->m_activeReadCount && m_data->m_activeWriteCount == 1);
 	m_data->m_activeWriteCount = 0;
 
-	if (m_data->m_queuedReadCount) // check readers first, so we alternate
-		m_readEvent.signal();
+	if (m_data->m_queuedReadCount) // wake readers first (so that we alternate)
+	{
+		bool result = m_readEvent.signal();
+		ASSERT(result);
+	}
 	else if (m_data->m_queuedWriteCount)
-		m_writeEvent.signal();
+	{
+		bool result = m_writeEvent.signal();
+		ASSERT(result);
+	}
 
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
-bool
+void
 ReadWriteLock::upgradeReadLockToWriteLock()
 {
 	bool result;
@@ -237,15 +229,16 @@ ReadWriteLock::upgradeReadLockToWriteLock()
 
 	if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount)
 	{
+		m_readEvent.reset();
 		m_data->m_activeWriteCount = 1;
 		m_data->m_activeReadCount = 0;
 		sys::atomicUnlock(&m_data->m_lock);
-		return true;
+		return;
 	}
 
 	m_data->m_queuedWriteCount++;
 
-	for (;;) // loop is STILL required (non-obvious)
+	do
 	{
 		sys::atomicUnlock(&m_data->m_lock);
 
@@ -253,31 +246,21 @@ ReadWriteLock::upgradeReadLockToWriteLock()
 		// one reader might start, finish and wake up this writer
 
 		result = m_writeEvent.wait();
+		ASSERT(result);
+
+		if (!result) // in release, fall back to spin-locking
+			sys::yieldProcessor();
 
 		// another reader woken up by the first writer might have read-locked
 
 		sys::atomicLock(&m_data->m_lock);
+	} while (m_data->m_activeReadCount != 1 || m_data->m_activeWriteCount);
 
-		if (!result)
-		{
-			if (!m_data->m_activeWriteCount && m_data->m_queuedReadCount)
-				m_readEvent.signal();
-
-			break;
-		}
-
-		if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount)
-		{
-			m_data->m_activeWriteCount = 1;
-			m_data->m_activeReadCount = 0;
-			break;
-		}
-	}
-
+	m_readEvent.reset();
 	m_data->m_queuedWriteCount--;
+	m_data->m_activeWriteCount = 1;
+	m_data->m_activeReadCount = 0;
 	sys::atomicUnlock(&m_data->m_lock);
-
-	return result;
 }
 
 void
@@ -288,8 +271,11 @@ ReadWriteLock::downgradeWriteLockToReadLock()
 	m_data->m_activeWriteCount = 0;
 	m_data->m_activeReadCount = 1;
 
-	if (m_data->m_queuedReadCount) // allow queued readers
-		m_readEvent.signal();
+	if (m_data->m_queuedReadCount) // wake queued readers
+	{
+		bool result = m_readEvent.signal();
+		ASSERT(result);
+	}
 
 	sys::atomicUnlock(&m_data->m_lock);
 }
