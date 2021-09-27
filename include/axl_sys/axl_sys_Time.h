@@ -38,8 +38,7 @@ sleep(uint32_t msCount);
 
 inline
 int
-getTimeZoneOffsetInMinutes(int timeZone)
-{
+getTimeZoneOffsetInMinutes(int timeZone) {
 	return timeZone <= -100 || timeZone >= 100 ?
 		(timeZone / 100) * 60 + timeZone % 100 :
 		timeZone * 60;
@@ -47,8 +46,7 @@ getTimeZoneOffsetInMinutes(int timeZone)
 
 //..............................................................................
 
-struct Time
-{
+struct Time {
 	uint16_t m_year;
 	uint16_t m_month;
 	uint16_t m_monthDay;
@@ -61,39 +59,33 @@ struct Time
 	uint16_t m_nanoSecond;
 
 public:
-	Time()
-	{
+	Time() {
 		memset(this, 0, sizeof(Time));
 	}
 
-	Time(uint64_t timestamp)
-	{
+	Time(uint64_t timestamp) {
 		setTimestampImpl(timestamp, true, 0);
 	}
 
 	Time(
 		uint64_t timestamp,
 		int timeZone
-		)
-	{
+	) {
 		setTimestampImpl(timestamp, false, timeZone);
 	}
 
 	uint64_t
-	getTimestamp() const
-	{
+	getTimestamp() const {
 		return getTimestampImpl(true, 0);
 	}
 
 	uint64_t
-	getTimestamp(int timeZone) const
-	{
+	getTimestamp(int timeZone) const {
 		return getTimestampImpl(false, timeZone);
 	}
 
 	void
-	setTimestamp(uint64_t timestamp)
-	{
+	setTimestamp(uint64_t timestamp) {
 		setTimestampImpl(timestamp, true, 0);
 	}
 
@@ -101,8 +93,7 @@ public:
 	setTimestamp(
 		uint64_t timestamp,
 		int timeZone
-		)
-	{
+	) {
 		setTimestampImpl(timestamp, false, timeZone);
 	}
 
@@ -110,11 +101,10 @@ public:
 	format(
 		sl::String* string,
 		const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s"
-		) const;
+	) const;
 
 	sl::String
-	format(const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s") const
-	{
+	format(const sl::StringRef& formatString = "%W %D %N %Y %h:%m:%s") const {
 		sl::String string;
 		format(&string, formatString);
 		return string;
@@ -125,14 +115,14 @@ protected:
 	getTimestampImpl(
 		bool isLocal,
 		int timeZone
-		) const;
+	) const;
 
 	void
 	setTimestampImpl(
 		uint64_t timestamp,
 		bool isLocal,
 		int timeZone
-		);
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -167,8 +157,7 @@ void
 getTimespecFromTimeout(
 	uint_t timeout,
 	timespec* tspec
-	)
-{
+) {
 	tspec->tv_sec = timeout / 1000;
 	tspec->tv_nsec = (uint64_t)(timeout % 1000) * 1000000;
 }
@@ -177,7 +166,7 @@ void
 getAbsTimespecFromTimeout(
 	uint_t timeout,
 	timespec* tspec
-	);
+);
 
 #endif
 
@@ -187,8 +176,7 @@ getAbsTimespecFromTimeout(
 
 inline
 uint64_t
-getTimestampFromTimeval(const timeval* tval)
-{
+getTimestampFromTimeval(const timeval* tval) {
 	return ((uint64_t)tval->tv_sec + AXL_SYS_EPOCH_DIFF) * 10000000 + (uint64_t)tval->tv_usec * 10;
 }
 

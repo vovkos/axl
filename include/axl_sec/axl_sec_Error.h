@@ -25,12 +25,11 @@ namespace sec {
 AXL_SL_DEFINE_GUID(
 	g_errorGuid,
 	0x9a5e82f3, 0xda70, 0x4177, 0xa3, 0xb9, 0x00, 0x30, 0xa2, 0x3b, 0x90, 0xdc
-	);
+);
 
 //..............................................................................
 
-class ErrorProvider: public err::ErrorProvider
-{
+class ErrorProvider: public err::ErrorProvider {
 public:
 	static
 	sl::StringRef
@@ -38,8 +37,7 @@ public:
 
 	virtual
 	sl::StringRef
-	getErrorDescription(const err::ErrorRef& error)
-	{
+	getErrorDescription(const err::ErrorRef& error) {
 		return getErrorDescription(error->m_code);
 	}
 };
@@ -48,31 +46,25 @@ public:
 
 inline
 void
-registerErrorProvider()
-{
+registerErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_errorGuid,
 		sl::getSimpleSingleton<ErrorProvider> ()
-		);
+	);
 }
 
 //..............................................................................
 
-class Error: public err::Error
-{
+class Error: public err::Error {
 public:
-	Error()
-	{
-	}
+	Error() {}
 
-	Error(OSStatus status)
-	{
+	Error(OSStatus status) {
 		create(status);
 	}
 
 	size_t
-	create(OSStatus status)
-	{
+	create(OSStatus status) {
 		return createSimpleError(g_errorGuid, status);
 	}
 };
@@ -81,8 +73,7 @@ public:
 
 inline
 bool
-completeWithOsStatus(OSStatus status)
-{
+completeWithOsStatus(OSStatus status) {
 	return status == errSecSuccess ? true : err::fail(Error(status));
 }
 

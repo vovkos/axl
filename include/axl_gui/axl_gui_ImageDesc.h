@@ -20,8 +20,7 @@ namespace gui {
 
 //..............................................................................
 
-enum PixelFormat
-{
+enum PixelFormat {
 	PixelFormat_Rgba = 0,
 	PixelFormat_Rgb,
 };
@@ -33,13 +32,11 @@ getPixelFormatString(PixelFormat pixelFormat);
 
 //..............................................................................
 
-struct ImageDesc
-{
+struct ImageDesc {
 	Size m_size;
 	PixelFormat m_pixelFormat;
 
-	ImageDesc()
-	{
+	ImageDesc() {
 		memset(this, 0, sizeof(ImageDesc));
 	}
 
@@ -47,8 +44,7 @@ struct ImageDesc
 		uint_t width,
 		uint_t height,
 		PixelFormat pixelFormat = PixelFormat_Rgba
-		)
-	{
+	) {
 		m_size.setup(width, height);
 		m_pixelFormat = pixelFormat;
 	}
@@ -56,8 +52,7 @@ struct ImageDesc
 	ImageDesc(
 		const Size& size,
 		PixelFormat pixelFormat = PixelFormat_Rgba
-		)
-	{
+	) {
 		m_size = size;
 		m_pixelFormat = pixelFormat;
 	}

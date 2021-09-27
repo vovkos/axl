@@ -25,8 +25,7 @@ Certificate::getNameString(
 	dword_t type,
 	dword_t flags,
 	void* typeParam
-	)
-{
+) {
 	ASSERT(m_h);
 
 	dword_t size = ::CertGetNameStringW(
@@ -36,7 +35,7 @@ Certificate::getNameString(
 		typeParam,
 		NULL,
 		0
-		);
+	);
 
 	utf16_t* p = string->createBuffer(size);
 
@@ -47,7 +46,7 @@ Certificate::getNameString(
 		typeParam,
 		p,
 		size
-		);
+	);
 
 	return string->updateLength();
 }
@@ -62,8 +61,7 @@ CertStore::findCertificate(
 	dword_t findType,
 	const void* findParam,
 	const CERT_CONTEXT* prevCertificate
-	)
-{
+) {
 	ASSERT(m_h);
 
 	certificate->close();
@@ -75,7 +73,7 @@ CertStore::findCertificate(
 		findType,
 		findParam,
 		prevCertificate
-		);
+	);
 
 	if (!result)
 		return err::failWithLastSystemError();

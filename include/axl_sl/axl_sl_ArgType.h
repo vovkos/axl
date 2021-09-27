@@ -23,8 +23,7 @@ namespace sl {
 // for most aggregates, we want to pass it as a const-reference
 
 template <typename T>
-class ArgType
-{
+class ArgType {
 public:
 	typedef const T& Type;
 };
@@ -34,8 +33,7 @@ public:
 // for simple types, its more efficient to pass it as is
 
 template <typename T>
-class SimpleArgType
-{
+class SimpleArgType {
 public:
 	typedef T Type;
 };
@@ -45,63 +43,51 @@ public:
 // specialization for primitive types
 
 template <>
-class ArgType<char>: public SimpleArgType<char>
-{
+class ArgType<char>: public SimpleArgType<char> {
 };
 
 template <>
-class ArgType<wchar_t>: public SimpleArgType<wchar_t>
-{
+class ArgType<wchar_t>: public SimpleArgType<wchar_t> {
 };
 
 template <>
-class ArgType<float>: public SimpleArgType<float>
-{
+class ArgType<float>: public SimpleArgType<float> {
 };
 
 template <>
-class ArgType<double>: public SimpleArgType<double>
-{
+class ArgType<double>: public SimpleArgType<double> {
 };
 
 template <>
-class ArgType<int8_t>: public SimpleArgType<int8_t>
-{
+class ArgType<int8_t>: public SimpleArgType<int8_t> {
 };
 
 template <>
-class ArgType<uint8_t>: public SimpleArgType<uint8_t>
-{
+class ArgType<uint8_t>: public SimpleArgType<uint8_t> {
 };
 
 template <>
-class ArgType<int16_t>: public SimpleArgType<int16_t>
-{
+class ArgType<int16_t>: public SimpleArgType<int16_t> {
 };
 
 template <>
-class ArgType<uint16_t>: public SimpleArgType<uint16_t>
-{
+class ArgType<uint16_t>: public SimpleArgType<uint16_t> {
 };
 
 template <>
-class ArgType<int32_t>: public SimpleArgType<int32_t>
-{
+class ArgType<int32_t>: public SimpleArgType<int32_t> {
 };
 
 template <>
-class ArgType<uint32_t>: public SimpleArgType<uint32_t>
-{
+class ArgType<uint32_t>: public SimpleArgType<uint32_t> {
 };
 
 template <>
-class ArgType<int64_t>: public SimpleArgType<int64_t>
-{
+class ArgType<int64_t>: public SimpleArgType<int64_t> {
 };
 
 template <>
-class ArgType<uint64_t>: public SimpleArgType<uint64_t>
-{
+class ArgType<uint64_t>: public SimpleArgType<uint64_t> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -109,8 +95,7 @@ class ArgType<uint64_t>: public SimpleArgType<uint64_t>
 // specialization for pointers
 
 template <typename T>
-class ArgType<T*>: public SimpleArgType<T*>
-{
+class ArgType<T*>: public SimpleArgType<T*> {
 };
 
 //..............................................................................

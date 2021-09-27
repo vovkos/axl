@@ -23,18 +23,16 @@ namespace win {
 
 //..............................................................................
 
-class AccessToken: public Handle
-{
+class AccessToken: public Handle {
 public:
 	bool
 	openProcessToken(
 		handle_t process,
 		dword_t access = TOKEN_ALL_ACCESS
-		);
+	);
 
 	bool
-	openProcessToken(dword_t access = TOKEN_ALL_ACCESS)
-	{
+	openProcessToken(dword_t access = TOKEN_ALL_ACCESS) {
 		return openProcessToken(::GetCurrentProcess(), access);
 	}
 
@@ -43,14 +41,13 @@ public:
 		handle_t thread,
 		dword_t access = TOKEN_ALL_ACCESS,
 		bool openAsSelf = false
-		);
+	);
 
 	bool
 	openThreadToken(
 		dword_t access = TOKEN_ALL_ACCESS,
 		bool openAsSelf = false
-		)
-	{
+	) {
 		return openThreadToken(::GetCurrentThread(), access);
 	}
 
@@ -60,8 +57,7 @@ public:
 		void* p,
 		dword_t size,
 		dword_t* actualSize
-		)
-	{
+	) {
 		bool_t result = ::GetTokenInformation(m_h, infoClass, p, size, actualSize);
 		return err::complete(result);
 	}
@@ -70,11 +66,10 @@ public:
 	getTokenInformation(
 		TOKEN_INFORMATION_CLASS infoClass,
 		sl::Array<char>* buffer
-		);
+	);
 
 	sl::Array<char>
-	getTokenInformation(TOKEN_INFORMATION_CLASS infoClass)
-	{
+	getTokenInformation(TOKEN_INFORMATION_CLASS infoClass) {
 		sl::Array<char> buffer;
 		getTokenInformation(infoClass, &buffer);
 		return buffer;
@@ -85,8 +80,7 @@ public:
 		TOKEN_INFORMATION_CLASS infoClass,
 		void* p,
 		dword_t size
-		)
-	{
+	) {
 		bool_t result = ::SetTokenInformation(m_h, infoClass, p, size);
 		return err::complete(result);
 	}

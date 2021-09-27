@@ -34,10 +34,8 @@ FreeFunc(void* p);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct RefCountAllocHdr
-{
-	union
-	{
+struct RefCountAllocHdr {
+	union {
 		//! \unnamed{union}
 		FreeFunc* m_freeFunc;
 		uint64_t m_padding; // ensure 8-byte alignment
@@ -49,14 +47,12 @@ struct RefCountAllocHdr
 template <typename T>
 class RefCountAllocBuffer:
 	public RefCountAllocHdr,
-	public T
-{
+	public T {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum RefCountFlag
-{
+enum RefCountFlag {
 	RefCountFlag_Allocated = 0x01, // must be freed, free func is in hdr
 
 	// ok to define and use your own flags 0x08..0x80
@@ -64,8 +60,7 @@ enum RefCountFlag
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class RefCount
-{
+class RefCount {
 	AXL_DISABLE_COPY(RefCount)
 
 protected:
@@ -78,8 +73,7 @@ public:
 	RefCount();
 
 	virtual
-	~RefCount()
-	{
+	~RefCount() {
 		ASSERT(m_refCount == 0 && m_weakRefCount > 0);
 	}
 
@@ -87,29 +81,25 @@ public:
 	prime(
 		RefCount* parent,
 		uint_t flags = 0
-		);
+	);
 
 	size_t
-	getRefCount()
-	{
+	getRefCount() {
 		return m_refCount;
 	}
 
 	size_t
-	getWeakRefCount()
-	{
+	getWeakRefCount() {
 		return m_weakRefCount;
 	}
 
 	uint_t
-	getRefCountFlags()
-	{
+	getRefCountFlags() {
 		return m_refCountFlags;
 	}
 
 	size_t
-	addRef()
-	{
+	addRef() {
 		return sys::atomicInc(&m_refCount);
 	}
 
@@ -117,8 +107,7 @@ public:
 	release();
 
 	size_t
-	addWeakRef()
-	{
+	addWeakRef() {
 		return sys::atomicInc(&m_weakRefCount);
 	}
 
@@ -132,8 +121,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-RefCount::RefCount()
-{
+RefCount::RefCount() {
 	m_refCount = 0;
 	m_weakRefCount = 1;
 	m_parentOffset = 0;
@@ -145,16 +133,12 @@ void
 RefCount::prime(
 	RefCount* parent,
 	uint_t flags
-	)
-{
+) {
 	ASSERT(m_refCount == 0); // should only be called once in the very beginning
 
-	if (!parent)
-	{
+	if (!parent) {
 		m_parentOffset = 0;
-	}
-	else
-	{
+	} else {
 		ASSERT(parent < this);
 		m_parentOffset = (uint_t)((char*)this - (char*)parent);
 		parent->addWeakRef();
@@ -165,12 +149,10 @@ RefCount::prime(
 
 inline
 size_t
-RefCount::release()
-{
+RefCount::release() {
 	intptr_t refCount = sys::atomicDec(&m_refCount);
 
-	if (!refCount)
-	{
+	if (!refCount) {
 		this->~RefCount();
 		weakRelease(); // weakRelease () should be here, not in ~RefCount ()
 	}
@@ -180,18 +162,14 @@ RefCount::release()
 
 inline
 size_t
-RefCount::weakRelease()
-{
+RefCount::weakRelease() {
 	intptr_t refCount = sys::atomicDec(&m_weakRefCount);
 
 	if (!refCount)
-		if (m_refCountFlags & RefCountFlag_Allocated)
-		{
+		if (m_refCountFlags & RefCountFlag_Allocated) {
 			RefCountAllocHdr* hdr = (RefCountAllocHdr*)this - 1;
 			hdr->m_freeFunc(hdr);
-		}
-		else if (m_parentOffset)
-		{
+		} else if (m_parentOffset) {
 			RefCount* parent = (RefCount*)((char*)this - m_parentOffset);
 			parent->weakRelease();
 		}
@@ -201,10 +179,8 @@ RefCount::weakRelease()
 
 inline
 size_t
-RefCount::addRefByWeakPtr()
-{
-	for (;;)
-	{
+RefCount::addRefByWeakPtr() {
+	for (;;) {
 		int32_t old = m_refCount;
 		if (old == 0)
 			return 0;
@@ -219,19 +195,16 @@ RefCount::addRefByWeakPtr()
 template <typename T>
 class Box:
 	public RefCount,
-	public T
-{
+	public T {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class Release
-{
+class Release {
 public:
 	void
-	operator () (T* p) const
-	{
+	operator () (T* p) const {
 		p->release();
 	}
 };
@@ -239,12 +212,10 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class WeakRelease
-{
+class WeakRelease {
 public:
 	void
-	operator () (T* p) const
-	{
+	operator () (T* p) const {
 		p->weakRelease();
 	}
 };
@@ -259,8 +230,7 @@ class Ptr;
 template <typename T>
 class WeakPtr;
 
-AXL_SELECT_ANY struct NullPtr
-{
+AXL_SELECT_ANY struct NullPtr {
 } g_nullPtr;
 
 //..............................................................................

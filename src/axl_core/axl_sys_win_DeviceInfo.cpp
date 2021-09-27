@@ -22,8 +22,7 @@ bool
 DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::Array<char>* buffer
-	)
-{
+) {
 	dword_t requiredSize = 0;
 	getDeviceRegistryProperty(propId, NULL, 0, &requiredSize);
 
@@ -35,8 +34,7 @@ bool
 DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::String* string
-	)
-{
+) {
 	sl::Array<char> buffer;
 	bool result = getDeviceRegistryProperty(propId, &buffer);
 	if (!result)
@@ -50,8 +48,7 @@ bool
 DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::String_w* string
-	)
-{
+) {
 	sl::Array<char> buffer;
 	bool result = getDeviceRegistryProperty(propId, &buffer);
 	if (!result)
@@ -62,8 +59,7 @@ DeviceInfo::getDeviceRegistryProperty(
 }
 
 HKEY
-DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess)
-{
+DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) {
 	HKEY key = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
 	if (key == INVALID_HANDLE_VALUE)
 		err::setLastSystemError();
@@ -72,8 +68,7 @@ DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess)
 }
 
 bool
-DeviceInfo::getClassInstallParams(sl::Array<char>* buffer)
-{
+DeviceInfo::getClassInstallParams(sl::Array<char>* buffer) {
 	dword_t requiredSize = 0;
 	getClassInstallParams(NULL, 0, &requiredSize);
 
@@ -82,8 +77,7 @@ DeviceInfo::getClassInstallParams(sl::Array<char>* buffer)
 }
 
 bool
-DeviceInfo::restartDevice(bool* isRebootRequired)
-{
+DeviceInfo::restartDevice(bool* isRebootRequired) {
 	bool result;
 
 	SP_PROPCHANGE_PARAMS propChangeParams = { 0 };
@@ -125,8 +119,7 @@ DeviceInfo::restartDevice(bool* isRebootRequired)
 //..............................................................................
 
 bool
-DeviceInfoSet::create(uint_t flags)
-{
+DeviceInfoSet::create(uint_t flags) {
 	close();
 
 	m_h = ::SetupDiGetClassDevsW(NULL, NULL, NULL, flags | DIGCF_ALLCLASSES);
@@ -137,8 +130,7 @@ bool
 DeviceInfoSet::create(
 	const GUID& classGuid,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	m_h = ::SetupDiGetClassDevsW(&classGuid, NULL, NULL, flags);
@@ -149,8 +141,7 @@ bool
 DeviceInfoSet::create(
 	const sl::StringRef_w& enumerator,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	m_h = ::SetupDiGetClassDevsW(NULL, enumerator.szn(), NULL, flags);
@@ -161,8 +152,7 @@ bool
 DeviceInfoSet::getDeviceInfo(
 	size_t i,
 	DeviceInfo* deviceInfo
-	)
-{
+) {
 	bool_t result = ::SetupDiEnumDeviceInfo(m_h, (DWORD)i, &deviceInfo->m_devInfoData);
 	if (!result)
 		return err::failWithLastSystemError();
@@ -175,8 +165,7 @@ bool
 DeviceInfoSet::getDeviceClassGuids(
 	const sl::StringRef_w& name,
 	sl::Array<GUID>* buffer
-	)
-{
+) {
 	dword_t requiredCount = 0;
 	getDeviceClassGuids(name, NULL, 0, &requiredCount);
 

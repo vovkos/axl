@@ -40,13 +40,13 @@ findUsbInterfaceDescriptor(
 	const libusb_config_descriptor* configDesc,
 	uint_t interfaceId,
 	uint_t altSettingId
-	);
+);
 
 const libusb_endpoint_descriptor*
 findUsbEndpointDescriptor(
 	const libusb_interface_descriptor* ifaceDesc,
 	uint_t endpointId
-	);
+);
 
 inline
 const libusb_endpoint_descriptor*
@@ -55,28 +55,24 @@ findUsbEndpointDescriptor(
 	uint_t endpointId,
 	uint_t interfaceId = 0,
 	uint_t altSettingId = 0
-	)
-{
+) {
 	const libusb_interface_descriptor* ifaceDesc = findUsbInterfaceDescriptor(configDesc, interfaceId, altSettingId);
 	return ifaceDesc ? findUsbEndpointDescriptor(ifaceDesc, endpointId) : NULL;
 }
 
 //..............................................................................
 
-class FreeUsbDeviceList
-{
+class FreeUsbDeviceList {
 public:
 	void
-	operator () (libusb_device** h)
-	{
+	operator () (libusb_device** h) {
 		libusb_free_device_list(h, true);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbDeviceList: public sl::Handle<libusb_device**, FreeUsbDeviceList>
-{
+class UsbDeviceList: public sl::Handle<libusb_device**, FreeUsbDeviceList> {
 public:
 	size_t
 	enumerateDevices(libusb_context* context = NULL);
@@ -84,12 +80,10 @@ public:
 
 //..............................................................................
 
-class FreeUsbConfigDescriptor
-{
+class FreeUsbConfigDescriptor {
 public:
 	void
-	operator () (libusb_config_descriptor* h)
-	{
+	operator () (libusb_config_descriptor* h) {
 		libusb_free_config_descriptor(h);
 	}
 };
@@ -100,11 +94,9 @@ typedef sl::Handle<libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfig
 
 //..............................................................................
 
-class UsbDevice
-{
+class UsbDevice {
 public:
-	enum Def
-	{
+	enum Def {
 		Def_BufferSize = 256,
 	};
 
@@ -113,53 +105,45 @@ protected:
 	libusb_device_handle* m_openHandle;
 
 public:
-	UsbDevice()
-	{
+	UsbDevice() {
 		m_device = NULL;
 		m_openHandle = NULL;
 	}
 
-	~UsbDevice()
-	{
+	~UsbDevice() {
 		setDevice(NULL);
 	}
 
 	libusb_device*
-	getDevice()
-	{
+	getDevice() {
 		return m_device;
 	}
 
 	libusb_device_handle*
-	getOpenHandle()
-	{
+	getOpenHandle() {
 		return m_openHandle;
 	}
 
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_openHandle != NULL;
 	}
 
 	uint8_t
-	getDeviceAddress()
-	{
+	getDeviceAddress() {
 		ASSERT(m_device);
 		return libusb_get_device_address(m_device);
 	}
 
 	uint8_t
-	getBusNumber()
-	{
+	getBusNumber() {
 		ASSERT(m_device);
 		return libusb_get_bus_number(m_device);
 	}
 
 #if (_AXL_IO_USBDEVICE_PORT)
 	uint8_t
-	getPortNumber()
-	{
+	getPortNumber() {
 		ASSERT(m_device);
 		return libusb_get_port_number(m_device);
 	}
@@ -168,12 +152,11 @@ public:
 	getPortPath(
 		uint8_t* path,
 		size_t maxLength
-		);
+	);
 #endif
 
 	libusb_speed
-	getDeviceSpeed()
-	{
+	getDeviceSpeed() {
 		ASSERT(m_device);
 		return (libusb_speed)libusb_get_device_speed(m_device);
 	}
@@ -187,15 +170,13 @@ public:
 	// open-close
 
 	void
-	refDevice()
-	{
+	refDevice() {
 		ASSERT(m_device);
 		libusb_ref_device(m_device);
 	}
 
 	void
-	unrefDevice()
-	{
+	unrefDevice() {
 		ASSERT(m_device);
 		libusb_unref_device(m_device);
 	}
@@ -210,8 +191,7 @@ public:
 	open();
 
 	bool
-	open(libusb_device* device)
-	{
+	open(libusb_device* device) {
 		setDevice(device);
 		return open();
 	}
@@ -220,8 +200,7 @@ public:
 	open(
 		uint_t vendorId,
 		uint_t productId
-		)
-	{
+	) {
 		return open(NULL, vendorId, productId);
 	}
 
@@ -230,7 +209,7 @@ public:
 		libusb_context* context,
 		uint_t vendorId,
 		uint_t productId
-		);
+	);
 
 	uint_t
 	getConfiguration();
@@ -248,7 +227,7 @@ public:
 	setInterfaceAltSetting(
 		uint_t ifaceId,
 		uint_t altSettingId
-		);
+	);
 
 	bool
 	clearHalt(uint_t endpointId);
@@ -274,8 +253,7 @@ public:
 	getDescriptor(
 		libusb_descriptor_type descriptorType,
 		uint_t descriptorId
-		)
-	{
+	) {
 		sl::Array<char> descriptor;
 		getDescriptor(descriptorType, descriptorId, &descriptor);
 		return descriptor;
@@ -286,7 +264,7 @@ public:
 		libusb_descriptor_type descriptorType,
 		uint_t descriptorId,
 		sl::Array<char>* descriptor
-		);
+	);
 
 	bool
 	getDeviceDescriptor(libusb_device_descriptor* descriptor);
@@ -295,7 +273,7 @@ public:
 	getConfigDescriptor(
 		uint_t configurationId,
 		UsbConfigDescriptor* desc
-		);
+	);
 
 	bool
 	getActiveConfigDescriptor(UsbConfigDescriptor* desc);
@@ -304,8 +282,7 @@ public:
 	getStringDesrciptor(
 		uint_t stringId,
 		uint_t langId
-		)
-	{
+	) {
 		sl::String string;
 		getStringDesrciptor(stringId, langId, &string);
 		return string;
@@ -316,11 +293,10 @@ public:
 		uint_t stringId,
 		uint_t langId,
 		sl::String* string
-		);
+	);
 
 	sl::String
-	getStringDesrciptor(uint_t stringId)
-	{
+	getStringDesrciptor(uint_t stringId) {
 		sl::String string;
 		getStringDesrciptor(stringId, &string);
 		return string;
@@ -330,7 +306,7 @@ public:
 	getStringDesrciptor(
 		uint_t stringId,
 		sl::String* string
-		);
+	);
 
 	// synchronous transfers
 
@@ -343,7 +319,7 @@ public:
 		void* p,
 		size_t size,
 		uint_t timeout = -1
-		);
+	);
 
 	size_t
 	bulkTransfer(
@@ -351,7 +327,7 @@ public:
 		void* p,
 		size_t size,
 		uint_t timeout = -1
-		);
+	);
 
 	size_t
 	interruptTransfer(
@@ -359,7 +335,7 @@ public:
 		void* p,
 		size_t size,
 		uint_t timeout = -1
-		);
+	);
 };
 
 //..............................................................................

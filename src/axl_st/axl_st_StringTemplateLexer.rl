@@ -82,22 +82,18 @@ any           ;
 //..............................................................................
 
 void
-Lexer::init ()
-{
+Lexer::init () {
 	%% write init;
 }
 
 void
-Lexer::exec ()
-{
+Lexer::exec () {
 	%% write exec;
 }
 
 int
-Lexer::getMachineState (LexerMachineKind machine)
-{
-	switch (machine)
-	{
+Lexer::getMachineState (LexerMachineKind machine) {
+	switch (machine) {
 	case LexerMachineKind_Main:
 		return axl_lua_st_en_main;
 

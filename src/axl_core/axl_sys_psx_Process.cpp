@@ -20,8 +20,7 @@ namespace psx {
 //..............................................................................
 
 sl::String
-getProcessImageName(pid_t pid)
-{
+getProcessImageName(pid_t pid) {
 	char buffer[256]; // enough
 	sprintf(buffer, "/proc/%d/cmdline", pid);
 	io::File file;
@@ -31,8 +30,7 @@ getProcessImageName(pid_t pid)
 
 	sl::String string;
 
-	for (;;)
-	{
+	for (;;) {
 		size_t size = file.read(buffer, sizeof(buffer) - 1);
 		if (size == -1)
 			return sl::String();
@@ -40,8 +38,7 @@ getProcessImageName(pid_t pid)
 			break;
 
 		char* p = (char*)memchr(buffer, 0, size);
-		if (p)
-		{
+		if (p) {
 			string.append(buffer, p - buffer);
 			break;
 		}

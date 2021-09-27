@@ -21,8 +21,7 @@ namespace re {
 
 //..............................................................................
 
-class Regex
-{
+class Regex {
 	friend class RegexCompiler;
 
 protected:
@@ -32,32 +31,27 @@ protected:
 	size_t m_groupCount;
 
 public:
-	Regex()
-	{
+	Regex() {
 		m_groupCount = 0;
 	}
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_dfaStateList.isEmpty();
 	}
 
 	size_t
-	getGroupCount() const
-	{
+	getGroupCount() const {
 		return m_groupCount;
 	}
 
 	const sl::List<DfaState>&
-	getDfaStateList() const
-	{
+	getDfaStateList() const {
 		return m_dfaStateList;
 	}
 
 	const sl::Array<DfaState*>&
-	getDfaStateArray() const
-	{
+	getDfaStateArray() const {
 		return m_dfaStateArray;
 	}
 
@@ -78,23 +72,19 @@ public:
 
 //..............................................................................
 
-class RegexCompiler
-{
+class RegexCompiler {
 public:
-	enum Flag
-	{
+	enum Flag {
 		Flag_NonCapturingGroups = 0x01,
 		Flag_SparseSyntax       = 0x02,
 	};
 
-	enum Const
-	{
+	enum Const {
 		Const_MaxQuantifier = 32,
 	};
 
 protected:
-	enum TokenKind
-	{
+	enum TokenKind {
 		TokenKind_Undefined,
 		TokenKind_Char,
 		TokenKind_SpecialChar,
@@ -103,15 +93,13 @@ protected:
 		TokenKind_Quantifier,
 	};
 
-	struct Token
-	{
+	struct Token {
 		TokenKind m_tokenKind;
 		uchar_t m_char;
 		sl::String m_string;
 
 		bool
-		isSpecialChar(char c)
-		{
+		isSpecialChar(char c) {
 			return m_tokenKind == TokenKind_SpecialChar && m_char == c;
 		}
 
@@ -132,8 +120,7 @@ public:
 	RegexCompiler(
 		Regex* regex,
 		RegexNameMgr* nameMgr = NULL
-		)
-	{
+	) {
 		construct(0, regex, nameMgr);
 	}
 
@@ -141,8 +128,7 @@ public:
 		uint_t flags,
 		Regex* regex,
 		RegexNameMgr* nameMgr = NULL
-		)
-	{
+	) {
 		construct(flags, regex, nameMgr);
 	}
 
@@ -150,13 +136,13 @@ public:
 	compile(
 		const sl::StringRef& source,
 		void* acceptContext = NULL
-		);
+	);
 
 	bool
 	incrementalCompile(
 		const sl::StringRef& source,
 		void* acceptContext = NULL
-		);
+	);
 
 	void
 	finalize();
@@ -167,7 +153,7 @@ protected:
 		uint_t flags,
 		Regex* regex,
 		RegexNameMgr* nameMgr
-		);
+	);
 
 	bool
 	readHexEscapeSequence(uchar_t* c);
@@ -218,7 +204,7 @@ protected:
 	quantify(
 		NfaState* start,
 		size_t count
-		);
+	);
 
 	NfaState*
 	single();
@@ -236,7 +222,7 @@ protected:
 	stdCharClass(
 		uint_t c,
 		sl::BitMap* charSet
-		);
+	);
 
 	NfaState*
 	literal(const sl::StringRef& string);
@@ -248,7 +234,7 @@ protected:
 	ch(
 		uint_t c,
 		NfaState* start
-		);
+	);
 
 	NfaState*
 	any();
@@ -257,7 +243,7 @@ protected:
 	clone(
 		NfaState* first,
 		NfaState* last
-		);
+	);
 
 	bool
 	charClassItem(sl::BitMap* charSet);

@@ -30,7 +30,7 @@ verifyAuthenticodeSignature(
 	sl::String_w* issuerName,
 	sl::Array<char>* serialNumber,
 	uint64_t* timestamp
-	);
+);
 
 //..............................................................................
 

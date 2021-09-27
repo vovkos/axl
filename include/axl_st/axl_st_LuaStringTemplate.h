@@ -20,8 +20,7 @@ namespace st {
 
 //..............................................................................
 
-class LuaStringTemplate: public StringTemplate<LuaStringTemplate>
-{
+class LuaStringTemplate: public StringTemplate<LuaStringTemplate> {
 	friend class StringTemplate<LuaStringTemplate>;
 
 protected:
@@ -31,8 +30,7 @@ public:
 	lua::LuaState m_luaState;
 
 public:
-	LuaStringTemplate()
-	{
+	LuaStringTemplate() {
 		m_argCount = 0;
 	}
 
@@ -43,8 +41,7 @@ public:
 	create();
 
 	size_t
-	getArgCount()
-	{
+	getArgCount() {
 		return m_argCount;
 	}
 
@@ -56,15 +53,14 @@ protected:
 	runScript(
 		const sl::StringRef& fileName,
 		const sl::StringRef& source
-		);
+	);
 
 	void
 	createPassthroughCall(
 		sl::String* script,
 		size_t offset,
 		size_t length
-		)
-	{
+	) {
 		script->appendFormat("passthrough(%d, %d);", offset, length);
 	}
 
@@ -72,7 +68,7 @@ protected:
 	createEmitCall(
 		sl::String* script,
 		const sl::StringRef& value
-		);
+	);
 
 	static
 	int

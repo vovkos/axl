@@ -23,9 +23,8 @@ namespace sl {
 template <
 	typename Key,
 	typename Value
-	>
-struct MapEntry: ListLink
-{
+>
+struct MapEntry: ListLink {
 protected:
 	Key m_key;
 
@@ -34,8 +33,7 @@ public:
 
 public:
 	const Key&
-	getKey() const
-	{
+	getKey() const {
 		return m_key;
 	}
 };
@@ -46,24 +44,20 @@ template <
 	typename Key,
 	typename Value,
 	typename Compare
-	>
-class CompareMapEntryKey
-{
+>
+class CompareMapEntryKey {
 protected:
 	Compare m_compare;
 
 public:
 	CompareMapEntryKey(Compare compare):
-		m_compare(compare)
-	{
-	}
+		m_compare(compare) {}
 
 	bool
 	operator () (
 		const MapEntry<Key, Value>& entry1,
 		const MapEntry<Key, Value>& entry2
-		) const
-	{
+	) const {
 		return m_compare(entry1.getKey(), entry2.getKey());
 	}
 
@@ -71,8 +65,7 @@ public:
 	operator () (
 		const MapEntry<Key, Value>* entry1,
 		const MapEntry<Key, Value>* entry2
-		) const
-	{
+	) const {
 		return m_compare(entry1->getKey(), entry2->getKey());
 	}
 };
@@ -83,16 +76,14 @@ template <
 	typename Key,
 	typename Value,
 	typename Compare
-	>
-class CompareMapEntryValue
-{
+>
+class CompareMapEntryValue {
 public:
 	bool
 	operator () (
 		const MapEntry<Key, Value>& entry1,
 		const MapEntry<Key, Value>& entry2
-		) const
-	{
+	) const {
 		return Compare()(entry1.m_value, entry2.m_value);
 	}
 
@@ -100,8 +91,7 @@ public:
 	operator () (
 		const MapEntry<Key, Value>* entry1,
 		const MapEntry<Key, Value>* entry2
-		) const
-	{
+	) const {
 		return Compare()(entry1->m_value, entry2->m_value);
 	}
 };
@@ -111,17 +101,13 @@ public:
 template <
 	typename Key,
 	typename Value
-	>
-class MapIterator: public Iterator<MapEntry<Key, Value> >
-{
+>
+class MapIterator: public Iterator<MapEntry<Key, Value> > {
 public:
-	MapIterator()
-	{
-	}
+	MapIterator() {}
 
 	template <typename T>
-	MapIterator(const Iterator<T>& src)
-	{
+	MapIterator(const Iterator<T>& src) {
 		this->m_p = src.getEntry();
 	}
 };
@@ -129,23 +115,18 @@ public:
 template <
 	typename Key,
 	typename Value
-	>
-class ConstMapIterator: public ConstIterator<MapEntry<Key, Value> >
-{
+>
+class ConstMapIterator: public ConstIterator<MapEntry<Key, Value> > {
 public:
-	ConstMapIterator()
-	{
-	}
+	ConstMapIterator() {}
 
 	template <typename T>
-	ConstMapIterator(const Iterator<T>& src)
-	{
+	ConstMapIterator(const Iterator<T>& src) {
 		this->m_p = src.getEntry();
 	}
 
 	template <typename T>
-	ConstMapIterator(const ConstIterator<T>& src)
-	{
+	ConstMapIterator(const ConstIterator<T>& src) {
 		this->m_p = src.getEntry();
 	}
 };

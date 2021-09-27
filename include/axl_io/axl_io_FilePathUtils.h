@@ -63,15 +63,14 @@ sl::String
 concatFilePath(
 	sl::String* filePath,
 	const sl::StringRef& fileName
-	);
+);
 
 inline
 sl::String
 concatFilePath(
 	const sl::StringRef& dir,
 	const sl::StringRef& fileName
-	)
-{
+) {
 	sl::String filePath = dir;
 	return concatFilePath(&filePath, fileName);
 }
@@ -82,7 +81,7 @@ findFilePath(
 	const sl::StringRef& firstDir,
 	const sl::BoxList<sl::String>* dirList,
 	bool doFindInCurrentDir = true
-	);
+);
 
 inline
 sl::String
@@ -90,8 +89,7 @@ findFilePath(
 	const sl::StringRef& fileName,
 	const sl::BoxList<sl::String>* dirList,
 	bool doFindInCurrentDir = true
-	)
-{
+) {
 	return findFilePath(fileName, NULL, dirList, doFindInCurrentDir);
 }
 
@@ -102,12 +100,11 @@ bool
 getSymbolicLinkTarget(
 	sl::String* targetName,
 	const sl::StringRef& linkName
-	);
+);
 
 inline
 sl::String
-getSymbolicLinkTarget(const sl::StringRef& linkName)
-{
+getSymbolicLinkTarget(const sl::StringRef& linkName) {
 	sl::String targetName;
 	getSymbolicLinkTarget(&targetName, linkName);
 	return targetName;
@@ -117,7 +114,7 @@ bool
 matchWildcard(
 	const sl::StringRef& string0,
 	const sl::StringRef& wildcard
-	);
+);
 
 //..............................................................................
 

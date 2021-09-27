@@ -22,12 +22,10 @@ namespace win {
 
 //..............................................................................
 
-class JobObject: public sl::Handle<HANDLE, CloseHandle, sl::Zero<HANDLE> >
-{
+class JobObject: public sl::Handle<HANDLE, CloseHandle, sl::Zero<HANDLE> > {
 public:
 	bool
-	create()
-	{
+	create() {
 		return create(NULL, NULL);
 	}
 
@@ -35,8 +33,7 @@ public:
 	create(
 		SECURITY_ATTRIBUTES* secAttr,
 		const sl::StringRef_w& name
-		)
-	{
+	) {
 		close();
 
 		m_h = ::CreateJobObjectW(secAttr, name.szn());
@@ -48,8 +45,7 @@ public:
 		uint_t access,
 		bool doInheritHandle,
 		const sl::StringRef_w& name
-		)
-	{
+	) {
 		close();
 
 		m_h = ::OpenJobObjectW(access, doInheritHandle, name.szn());
@@ -57,8 +53,7 @@ public:
 	}
 
 	bool
-	assignProcess(HANDLE process)
-	{
+	assignProcess(HANDLE process) {
 		bool_t result = ::AssignProcessToJobObject(m_h, process);
 		return err::complete(result);
 	}
@@ -68,8 +63,7 @@ public:
 		JOBOBJECTINFOCLASS infoClass,
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		bool_t result = ::SetInformationJobObject(m_h, infoClass, (void*)p,  (dword_t)size);
 		return err::complete(result);
 	}
@@ -79,7 +73,7 @@ public:
 		JOBOBJECTINFOCLASS infoClass,
 		void* p,
 		size_t size
-		);
+	);
 };
 
 //..............................................................................

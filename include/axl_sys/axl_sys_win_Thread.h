@@ -21,26 +21,22 @@ namespace win {
 
 //..............................................................................
 
-class Thread: public WaitableHandle
-{
+class Thread: public WaitableHandle {
 protected:
 	uint_t m_threadId;
 
 public:
-	Thread()
-	{
+	Thread() {
 		m_threadId = -1;
 	}
 
 	uint_t
-	getThreadId()
-	{
+	getThreadId() {
 		return m_threadId;
 	}
 
 	void
-	close()
-	{
+	close() {
 		WaitableHandle::close();
 		m_threadId = -1;
 	}
@@ -52,25 +48,22 @@ public:
 		PTHREAD_START_ROUTINE threadFunc,
 		void* context,
 		uint_t flags
-		);
+	);
 
 	bool
-	setPriority(int priority)
-	{
+	setPriority(int priority) {
 		bool_t result = ::SetThreadPriority(m_h, priority);
 		return err::complete(result);
 	}
 
 	bool
-	terminate(dword_t exitCode)
-	{
+	terminate(dword_t exitCode) {
 		bool_t result = ::TerminateThread(m_h, exitCode);
 		return err::complete(result);
 	}
 
 	bool
-	getExitCode(dword_t* exitCode)
-	{
+	getExitCode(dword_t* exitCode) {
 		bool_t result = ::GetExitCodeThread(m_h, exitCode);
 		return err::complete(result);
 	}

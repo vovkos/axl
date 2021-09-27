@@ -17,8 +17,7 @@ namespace gui {
 
 //..............................................................................
 
-AnsiAttrParser::AnsiAttrParser()
-{
+AnsiAttrParser::AnsiAttrParser() {
 	m_targetAttr = NULL;
 	m_textColor = NULL;
 	m_backColor = NULL;
@@ -29,13 +28,11 @@ AnsiAttrParser::parse(
 	TextAttr* targetAttr,
 	const TextAttr& baseAttr,
 	const sl::StringRef& string
-	)
-{
+) {
 	static SetAttrFuncPtr setAttrFuncTable[108] = { 0 };
 	static bool once = false;
 
-	if (!once) // no need to use sl::callOnce here
-	{
+	if (!once) { // no need to use sl::callOnce here
 		setAttrFuncTable[0] = &AnsiAttrParser::clear;
 		setAttrFuncTable[1] = &AnsiAttrParser::setBoldOn;
 		setAttrFuncTable[3] = &AnsiAttrParser::setItalicOn;
@@ -81,8 +78,7 @@ AnsiAttrParser::parse(
 	const char* p = string.cp();
 	const char* end = string.getEnd();
 
-	while (p < end)
-	{
+	while (p < end) {
 		char* attrEnd;
 		uint_t attr = strtoul(p, &attrEnd, 10);
 		if (attrEnd == p)
@@ -90,18 +86,15 @@ AnsiAttrParser::parse(
 
 		attrCount++;
 
-		if (attr < countof(setAttrFuncTable))
-		{
+		if (attr < countof(setAttrFuncTable)) {
 			SetAttrFuncPtr setAttrFunc = setAttrFuncTable[attr];
 			if (setAttrFunc)
 				(this->*setAttrFunc) (attr);
 		}
 
 		p = attrEnd;
-		while (p < end)
-		{
-			if (*p == ';')
-			{
+		while (p < end) {
+			if (*p == ';') {
 				p++;
 				break;
 			}
@@ -117,16 +110,14 @@ AnsiAttrParser::parse(
 }
 
 void
-AnsiAttrParser::clear(uint_t)
-{
+AnsiAttrParser::clear(uint_t) {
 	*m_targetAttr = m_baseAttr;
 	m_textColor = &m_targetAttr->m_foreColor;
 	m_backColor = &m_targetAttr->m_backColor;
 }
 
 void
-AnsiAttrParser::setInverse(bool isInversed)
-{
+AnsiAttrParser::setInverse(bool isInversed) {
 	if (isInversed == (m_textColor == &m_targetAttr->m_backColor))
 		return;
 
@@ -140,8 +131,7 @@ AnsiAttrParser::setInverse(bool isInversed)
 }
 
 void
-AnsiAttrParser::setFontFlag(uint_t flag)
-{
+AnsiAttrParser::setFontFlag(uint_t flag) {
 	if (m_targetAttr->m_fontFlags & FontFlag_Undefined)
 		m_targetAttr->m_fontFlags = flag;
 	else
@@ -149,8 +139,7 @@ AnsiAttrParser::setFontFlag(uint_t flag)
 }
 
 void
-AnsiAttrParser::clearFontFlag(uint_t flag)
-{
+AnsiAttrParser::clearFontFlag(uint_t flag) {
 	if (m_targetAttr->m_fontFlags & FontFlag_Undefined)
 		return;
 

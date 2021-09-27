@@ -17,8 +17,7 @@ namespace enc {
 
 //..............................................................................
 
-class Base32Writer
-{
+class Base32Writer {
 protected:
 	char* m_p;
 	char* m_end;
@@ -30,7 +29,7 @@ public:
 		char* p,
 		size_t length,
 		size_t hyphenDistance
-		);
+	);
 
 	void
 	write(uchar_t x);
@@ -45,8 +44,7 @@ Base32Writer::Base32Writer(
 	char* p,
 	size_t length,
 	size_t hyphenDistance
-	)
-{
+) {
 	m_p = p;
 	m_end = p + length;
 	m_index = 0;
@@ -54,12 +52,10 @@ Base32Writer::Base32Writer(
 }
 
 void
-Base32Writer::write(uchar_t x)
-{
+Base32Writer::write(uchar_t x) {
 	static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
-	if (m_index && m_index % m_hyphenDistance == 0)
-	{
+	if (m_index && m_index % m_hyphenDistance == 0) {
 		ASSERT(m_p < m_end);
 		*m_p++ = '-';
 	}
@@ -70,8 +66,7 @@ Base32Writer::write(uchar_t x)
 }
 
 void
-Base32Writer::addPadding()
-{
+Base32Writer::addPadding() {
 	static const char paddingTable[] = "0189";
 
 	while (m_p < m_end)
@@ -86,10 +81,8 @@ Base32Encoding_nj::encode(
 	const void* p,
 	size_t size,
 	size_t hyphenDistance
-	)
-{
-	if (!size)
-	{
+) {
+	if (!size) {
 		string->clear();
 		return 0;
 	}
@@ -99,8 +92,7 @@ Base32Encoding_nj::encode(
 	if (bitCount % 5)
 		length++;
 
-	if (hyphenDistance != -1)
-	{
+	if (hyphenDistance != -1) {
 		size_t leftover = length % hyphenDistance;
 		if (leftover)
 			length += hyphenDistance - leftover;
@@ -120,12 +112,10 @@ Base32Encoding_nj::encode(
 
 	const uchar_t* src = (const uchar_t*) p;
 	const uchar_t* srcEnd = src + size;
-	for (; src < srcEnd; src++)
-	{
+	for (; src < srcEnd; src++) {
 		uchar_t y = *src;
 
-		switch (i)
-		{
+		switch (i) {
 		case 0:
 			writer.write(y);
 			x = y >> 5;
@@ -175,8 +165,7 @@ size_t
 Base32Encoding_nj::decode(
 	sl::Array<char>* buffer,
 	const sl::StringRef& string
-	)
-{
+) {
 	size_t sizeGuess = (string.getLength() * 5) / 8;
 	buffer->reserve(sizeGuess);
 	buffer->clear();
@@ -186,8 +175,7 @@ Base32Encoding_nj::decode(
 
 	const char* p = string.cp();
 	const char* end = string.getEnd();
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		char c = *p;
 
 		uchar_t y;
@@ -203,18 +191,13 @@ Base32Encoding_nj::decode(
 
 		x |= y << i;
 
-		if (i < 3)
-		{
+		if (i < 3) {
 			i += 5;
-		}
-		else if (i == 3)
-		{
+		} else if (i == 3) {
 			buffer->append(x);
 			x = 0;
 			i = 0;
-		}
-		else
-		{
+		} else {
 			buffer->append(x);
 			x = y >> (8 - i);
 			i -= 3;

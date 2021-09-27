@@ -17,30 +17,26 @@ namespace enc {
 
 //..............................................................................
 
-class InsertNoNl
-{
+class InsertNoNl {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		return 0;
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class InsertNl
-{
+class InsertNl {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		if (i & 0x3f)
 			return 0;
 
@@ -54,7 +50,7 @@ public:
 template <
 	typename GetBase64Char,
 	typename InsertNl
-	>
+>
 static
 void
 encodeImpl(
@@ -62,22 +58,19 @@ encodeImpl(
 	size_t dstSize,
 	const uchar_t* src,
 	size_t srcSize
-	)
-{
+) {
 	uint_t x = 0;
 	size_t b = 0;
 
 	char* dstEnd = dst + dstSize;
 	const uchar_t* srcEnd = src + srcSize;
 
-	for (size_t i = 0; src < srcEnd; src++)
-	{
+	for (size_t i = 0; src < srcEnd; src++) {
 		x <<= 8;
 		x |= *src;
 		b += 8;
 
-		while (b >= 6)
-		{
+		while (b >= 6) {
 			b -= 6;
 			dst += InsertNl()(dst, i++);
 			*dst++ = GetBase64Char()(x >> b);
@@ -101,10 +94,8 @@ Base64Encoding::encode(
 	const void* p,
 	size_t size,
 	uint_t flags
-	)
-{
-	if (!size)
-	{
+) {
+	if (!size) {
 		string->clear();
 		return 0;
 	}
@@ -117,8 +108,7 @@ Base64Encoding::encode(
 	if (!(flags & Base64EncodingFlag_NoPadding))
 		length += 3 - ((length - 1) & 3);
 
-	if (flags & Base64EncodingFlag_Multiline)
-	{
+	if (flags & Base64EncodingFlag_Multiline) {
 		size_t lineCount = length / 64;
 		if (lineCount & 0x3f)
 			lineCount++;
@@ -130,15 +120,12 @@ Base64Encoding::encode(
 	if (!dst)
 		return -1;
 
-	if (flags & Base64EncodingFlag_Multiline)
-	{
+	if (flags & Base64EncodingFlag_Multiline) {
 		if (flags & Base64EncodingFlag_UrlChars)
 			encodeImpl<GetBase64UrlChar, InsertNl>(dst, length, (uchar_t*)p, size);
 		else
 			encodeImpl<GetBase64Char, InsertNl>(dst, length, (uchar_t*)p, size);
-	}
-	else
-	{
+	} else {
 		if (flags & Base64EncodingFlag_UrlChars)
 			encodeImpl<GetBase64UrlChar, InsertNoNl>(dst, length, (uchar_t*)p, size);
 		else
@@ -152,10 +139,8 @@ size_t
 Base64Encoding::decode(
 	sl::Array<char>* buffer,
 	const sl::StringRef& string
-	)
-{
-	static const uchar_t charMap['z' - '+' + 1] =
-	{
+) {
+	static const uchar_t charMap['z' - '+' + 1] = {
 		62, 63, 62,                                         //  +  ,  -
 		-1,                                                 //  .
 		63,                                                 //  /
@@ -179,8 +164,7 @@ Base64Encoding::decode(
 
 	const char* p = string.cp();
 	const char* end = string.getEnd();
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		char c = *p;
 		if (c < '+' || c > 'z')
 			continue; // ignore padding & whitespace
@@ -193,8 +177,7 @@ Base64Encoding::decode(
 		x |= y;
 		i += 6;
 
-		if (i >= 8)
-		{
+		if (i >= 8) {
 			i -= 8;
 			buffer->append(x >> i);
 		}

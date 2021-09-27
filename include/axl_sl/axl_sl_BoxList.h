@@ -22,18 +22,14 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class BoxListEntry: public ListLink
-{
+class BoxListEntry: public ListLink {
 public:
 	T m_value;
 
 public:
-	BoxListEntry()
-	{
-	}
+	BoxListEntry() {}
 
-	BoxListEntry(const T& value)
-	{
+	BoxListEntry(const T& value) {
 		m_value = value;
 	}
 };
@@ -43,24 +39,20 @@ public:
 template <
 	typename T,
 	typename Compare
-	>
-class CompareBoxListEntry
-{
+>
+class CompareBoxListEntry {
 protected:
 	Compare m_compare;
 
 public:
 	CompareBoxListEntry(Compare compare):
-		m_compare(compare)
-	{
-	}
+		m_compare(compare) {}
 
 	bool
 	operator () (
 		const BoxListEntry<T>& entry1,
 		const BoxListEntry<T>& entry2
-		) const
-	{
+	) const {
 		return m_compare(entry1.m_value, entry2.m_value);
 	}
 
@@ -68,8 +60,7 @@ public:
 	operator () (
 		const BoxListEntry<T>* entry1,
 		const BoxListEntry<T>* entry2
-		) const
-	{
+	) const {
 		return m_compare(entry1->m_value, entry2->m_value);
 	}
 };
@@ -81,37 +72,32 @@ template <
 	typename Value,
 	typename Entry,
 	typename Link
-	>
+>
 class BoxIteratorImpl: public IteratorBase<
 	T,
 	Entry,
 	Link,
 	ImplicitCast<Entry*, Link*>
-	>
-{
+> {
 public:
 	Value&
-	operator * () const
-	{
+	operator * () const {
 		return r();
 	}
 
 	Value*
-	operator -> () const
-	{
+	operator -> () const {
 		return p();
 	}
 
 	Value&
-	r() const
-	{
+	r() const {
 		ASSERT(this->m_p);
 		return this->m_p->m_value;
 	}
 
 	Value*
-	p() const
-	{
+	p() const {
 		return this->m_p ? &this->m_p->m_value : NULL;
 	}
 };
@@ -124,15 +110,11 @@ class BoxIterator: public BoxIteratorImpl<
 	T,
 	BoxListEntry<T>,
 	ListLink
-	>
-{
+> {
 public:
-	BoxIterator()
-	{
-	}
+	BoxIterator() {}
 
-	BoxIterator(BoxListEntry<T>* p)
-	{
+	BoxIterator(BoxListEntry<T>* p) {
 		this->m_p = p;
 	}
 };
@@ -145,20 +127,15 @@ class ConstBoxIterator: public BoxIteratorImpl<
 	const T,
 	const BoxListEntry<T>,
 	const ListLink
-	>
-{
+> {
 public:
-	ConstBoxIterator()
-	{
-	}
+	ConstBoxIterator() {}
 
-	ConstBoxIterator(const BoxListEntry<T>* p)
-	{
+	ConstBoxIterator(const BoxListEntry<T>* p) {
 		this->m_p = p;
 	}
 
-	ConstBoxIterator(const BoxIterator<T>& it)
-	{
+	ConstBoxIterator(const BoxIterator<T>& it) {
 		this->m_p = it.getEntry();
 	}
 };
@@ -168,15 +145,14 @@ public:
 template <
 	typename T,
 	typename ValueArg = typename ArgType<T>::Type
-	>
+>
 class BoxList: public OwningListBase<
 	BoxListEntry<T>,
 	ImplicitPtrCast<BoxListEntry<T>, ListLink>,
 	BoxIterator<T>,
 	ConstBoxIterator<T>,
 	typename mem::StdDelete<BoxListEntry<T> >
-	>
-{
+> {
 public:
 	typedef OwningListBase<
 		BoxListEntry<T>,
@@ -184,7 +160,7 @@ public:
 		BoxIterator<T>,
 		ConstBoxIterator<T>,
 		typename mem::StdDelete<BoxListEntry<T> >
-		> BaseType;
+	> BaseType;
 
 	typedef typename BaseType::Entry Entry;
 	typedef typename BaseType::Iterator Iterator;
@@ -192,8 +168,7 @@ public:
 public:
 	template <typename L>
 	void
-	copy(const L& list)
-	{
+	copy(const L& list) {
 		this->clear();
 
 		typename L::Iterator it = list.getHead();
@@ -202,8 +177,7 @@ public:
 	}
 
 	T
-	remove(Iterator it)
-	{
+	remove(Iterator it) {
 		T value = *it;
 		Entry* entry = it.getEntry();
 		BaseType::remove(entry);
@@ -212,28 +186,24 @@ public:
 	}
 
 	T
-	removeHead()
-	{
+	removeHead() {
 		return this->m_head ? remove(this->m_head) : T();
 	}
 
 	T
-	removeTail()
-	{
+	removeTail() {
 		return this->m_tail ? remove(this->m_tail) : T();
 	}
 
 	Iterator
-	insertHead(ValueArg value)
-	{
+	insertHead(ValueArg value) {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
 		return insertHeadEntry(entry);
 	}
 
 	Iterator
-	insertTail(ValueArg value)
-	{
+	insertTail(ValueArg value) {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
 		return insertTailEntry(entry);
@@ -243,8 +213,7 @@ public:
 	insertBefore(
 		ValueArg value,
 		Iterator before
-		)
-	{
+	) {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
 		return insertBeforeEntry(entry, before);
@@ -254,8 +223,7 @@ public:
 	insertAfter(
 		ValueArg value,
 		Iterator after
-		)
-	{
+	) {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		entry->m_value = value;
 		return insertAfterEntry(entry, after);
@@ -264,29 +232,25 @@ public:
 	// empty element insertion
 
 	Iterator
-	insertHead()
-	{
+	insertHead() {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		return insertHeadEntry(entry);
 	}
 
 	Iterator
-	insertTail()
-	{
+	insertTail() {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		return insertTailEntry(entry);
 	}
 
 	Iterator
-	insertBefore(Iterator before)
-	{
+	insertBefore(Iterator before) {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		return insertBeforeEntry(entry, before);
 	}
 
 	Iterator
-	insertAfter(Iterator after)
-	{
+	insertAfter(Iterator after) {
 		Entry* entry = AXL_MEM_NEW(Entry);
 		return insertAfterEntry(entry, after);
 	}
@@ -294,32 +258,27 @@ public:
 	// direct access to entries
 
 	Entry*
-	removeEntry(Iterator it)
-	{
+	removeEntry(Iterator it) {
 		return BaseType::remove(it);
 	}
 
 	Entry*
-	removeHeadEntry()
-	{
+	removeHeadEntry() {
 		return BaseType::removeHead();
 	}
 
 	Entry*
-	removeTailEntry()
-	{
+	removeTailEntry() {
 		return BaseType::removeTail();
 	}
 
 	Iterator
-	insertHeadEntry(Entry* entry)
-	{
+	insertHeadEntry(Entry* entry) {
 		return BaseType::insertHead(entry);
 	}
 
 	Iterator
-	insertTailEntry(Entry* entry)
-	{
+	insertTailEntry(Entry* entry) {
 		return BaseType::insertTail(entry);
 	}
 
@@ -327,8 +286,7 @@ public:
 	insertBeforeEntry(
 		Entry* entry,
 		Iterator before
-		)
-	{
+	) {
 		return BaseType::insertBefore(entry, before);
 	}
 
@@ -336,21 +294,18 @@ public:
 	insertAfterEntry(
 		Entry* entry,
 		Iterator after
-		)
-	{
+	) {
 		return BaseType::insertAfter(entry, after);
 	}
 
 	bool
-	sort()
-	{
+	sort() {
 		return sort(Lt<T, ValueArg>());
 	}
 
 	template <typename Compare>
 	bool
-	sort(Compare compare)
-	{
+	sort(Compare compare) {
 		return BaseType::sort(CompareBoxListEntry<T, Compare>(compare));
 	}
 };
@@ -362,16 +317,12 @@ class ConstBoxList: public ConstListBase<
 	BoxListEntry<T>,
 	ImplicitPtrCast<BoxListEntry<T>, ListLink>,
 	ConstBoxIterator<T>
-	>
-{
+> {
 public:
-	ConstBoxList()
-	{
-	}
+	ConstBoxList() {}
 
 	template <typename ValueArg>
-	ConstBoxList(const BoxList<T, ValueArg>& list)
-	{
+	ConstBoxList(const BoxList<T, ValueArg>& list) {
 		this->m_listData = list.getListData();
 	}
 
@@ -381,9 +332,8 @@ public:
 			BoxListEntry<T>,
 			typename ConstBoxList::GetLink,
 			Delete
-			>& list
-		)
-	{
+		>& list
+	) {
 		this->m_listData = list.getListData();
 	}
 };

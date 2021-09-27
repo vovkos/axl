@@ -24,8 +24,7 @@ bool
 File::open(
 	const sl::StringRef& fileName,
 	uint_t flags
-	)
-{
+) {
 	uint_t accessMode =
 		(flags & FileFlag_ReadOnly) ? GENERIC_READ :
 		(flags & FileFlag_WriteOnly) ? GENERIC_WRITE : GENERIC_READ | GENERIC_WRITE;
@@ -61,7 +60,7 @@ File::open(
 		NULL,
 		creationDisposition,
 		flagsAttributes
-		);
+	);
 
 	if (!result)
 		return false;
@@ -78,8 +77,7 @@ bool
 File::open(
 	const sl::StringRef& fileName,
 	uint_t flags
-	)
-{
+) {
 	uint_t posixFlags =
 		(flags & FileFlag_ReadOnly) ? O_RDONLY :
 		(flags & FileFlag_WriteOnly) ? O_WRONLY : O_RDWR;
@@ -114,8 +112,7 @@ copyFile(
 	const sl::StringRef& srcFileName,
 	const sl::StringRef& dstFileName,
 	uint64_t size
-	)
-{
+) {
 	File srcFile;
 	bool result = srcFile.open(srcFileName, FileFlag_ReadOnly);
 	if (!result)
@@ -129,8 +126,7 @@ copyFile(
 	const io::File* srcFile,
 	const sl::StringRef& dstFileName,
 	uint64_t size
-	)
-{
+) {
 	File dstFile;
 	bool result = dstFile.open(dstFileName);
 	if (!result)
@@ -144,10 +140,8 @@ copyFile(
 	const io::File* srcFile,
 	io::File* dstFile,
 	uint64_t size
-	)
-{
-	enum
-	{
+) {
+	enum {
 		BaseBlockSize = 64 * 1024, // 64K
 	};
 
@@ -178,8 +172,7 @@ copyFile(
 	if (!result)
 		return -1;
 
-	while (size)
-	{
+	while (size) {
 		if (blockSize > size)
 			blockSize = (size_t)size;
 
@@ -203,8 +196,7 @@ copyFile(
 	psx::Mapping srcMapping;
 	psx::Mapping dstMapping;
 
-	while (size)
-	{
+	while (size) {
 		if (blockSize > size)
 			blockSize = (size_t)size;
 

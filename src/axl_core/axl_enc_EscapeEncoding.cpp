@@ -26,8 +26,7 @@ appendEncoded_utf32(
 	sl::Array<char>* encodeBuffer,
 	const utf32_t* p,
 	size_t length
-	)
-{
+) {
 	codec->encode_utf32(encodeBuffer, p, length);
 	return finalBuffer->append(*encodeBuffer);
 }
@@ -41,8 +40,7 @@ appendEncoded_utf8(
 	sl::Array<char>* encodeBuffer,
 	const utf8_t* p,
 	size_t length
-	)
-{
+) {
 	codec->encode_utf8(encodeBuffer, p, length);
 	return finalBuffer->append(*encodeBuffer);
 }
@@ -54,8 +52,7 @@ EscapeEncodingDynamic::encode(
 	const void* p0,
 	size_t size,
 	uint_t flags
-	)
-{
+) {
 	buffer->clear();
 	buffer->reserve(size);
 
@@ -65,8 +62,7 @@ EscapeEncodingDynamic::encode(
 	const char* src = (char*)p0;
 	const char* srcEnd = src + size;
 
-	while (src < srcEnd)
-	{
+	while (src < srcEnd) {
 		utf32_t decodeBuffer[64];
 
 		size_t takenSrcSize;
@@ -76,7 +72,7 @@ EscapeEncodingDynamic::encode(
 			src,
 			srcEnd - src,
 			&takenSrcSize
-			);
+		);
 
 		if (!takenSrcSize)
 			break;
@@ -87,19 +83,15 @@ EscapeEncodingDynamic::encode(
 		const utf32_t* end = p + takenBufferLength;
 		const utf32_t* base = p;
 
-		for (; p < end; p++)
-		{
+		for (; p < end; p++) {
 			utf32_t c = *p;
 
-			if (c == '\\')
-			{
+			if (c == '\\') {
 				escapeSequence[1] = '\\';
 				appendEncoded_utf32(codec, buffer, &encodeBuffer, base, p - base);
 				appendEncoded_utf8(codec, buffer, &encodeBuffer, escapeSequence, 2);
 				base = p + 1;
-			}
-			else
-			{
+			} else {
 				if (utfIsPrintable(c))
 					continue;
 
@@ -110,13 +102,10 @@ EscapeEncodingDynamic::encode(
 				appendEncoded_utf32(codec, buffer, &encodeBuffer, base, p - base);
 
 				size_t escapeSequenceLength;
-				if (escape != c)
-				{
+				if (escape != c) {
 					escapeSequence[1] = (char)escape;
 					escapeSequenceLength = 2;
-				}
-				else
-				{
+				} else {
 					escapeSequenceLength = (flags & EscapeEncodingFlag_UpperCase) ?
 						buildHexCodeEscapeSequence<GetHexChar_u>(escapeSequence, c) :
 						buildHexCodeEscapeSequence<GetHexChar_l>(escapeSequence, c);
@@ -139,10 +128,8 @@ EscapeEncodingDynamic::decode(
 	sl::Array<char>* buffer,
 	const void* p0,
 	size_t size
-	)
-{
-	enum State
-	{
+) {
+	enum State {
 		State_Normal = 0,
 		State_Escape,
 		State_Hex,
@@ -162,8 +149,7 @@ EscapeEncodingDynamic::decode(
 	const char* src = (char*)p0;
 	const char* srcEnd = src + size;
 
-	while (src < srcEnd)
-	{
+	while (src < srcEnd) {
 		utf32_t decodeBuffer[64];
 
 		size_t takenSrcSize;
@@ -173,7 +159,7 @@ EscapeEncodingDynamic::decode(
 			src,
 			srcEnd - src,
 			&takenSrcSize
-			);
+		);
 
 		if (!takenSrcSize)
 			break;
@@ -184,15 +170,12 @@ EscapeEncodingDynamic::decode(
 		const utf32_t* end = p + takenBufferLength;
 		const utf32_t* base = p;
 
-		for (; p < end; p++)
-		{
+		for (; p < end; p++) {
 			utf32_t c = *p;
 
-			switch (state)
-			{
+			switch (state) {
 			case State_Normal:
-				if (c == '\\')
-				{
+				if (c == '\\') {
 					appendEncoded_utf32(codec, buffer, &encodeBuffer, base, p - base);
 					state = State_Escape;
 				}
@@ -200,8 +183,7 @@ EscapeEncodingDynamic::decode(
 				break;
 
 			case State_Escape:
-				switch (c)
-				{
+				switch (c) {
 				case 'x':
 					state = State_Hex;
 					hexCodeLen = 0;
@@ -222,13 +204,10 @@ EscapeEncodingDynamic::decode(
 
 				default:
 					utf32_t replace = findEscapeReplaceChar(c);
-					if (replace != c)
-					{
+					if (replace != c) {
 						appendEncoded_utf32(codec, buffer, &encodeBuffer, &replace, 1);
 						base = p + 1;
-					}
-					else
-					{
+					} else {
 						base = p;
 					}
 
@@ -238,16 +217,13 @@ EscapeEncodingDynamic::decode(
 				break;
 
 			case State_Hex:
-				if (isHexChar(c))
-				{
+				if (isHexChar(c)) {
 					hexCodeString[hexCodeLen++] = (char)c;
 					if (hexCodeLen < hexCodeMaxLen)
 						break;
 
 					base = p + 1;
-				}
-				else
-				{
+				} else {
 					base = p;
 				}
 

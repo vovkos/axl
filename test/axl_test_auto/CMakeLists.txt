@@ -16,7 +16,7 @@
 set(
 	APP_H_LIST
 	test.h
-	)
+)
 
 set(
 	APP_CPP_LIST
@@ -37,14 +37,14 @@ set(
 	test_StringTemplate.cpp
 	test_Usb.cpp
 	test_Bstr.cpp
-	)
+)
 
 source_group(
 	app
 	FILES
 	${APP_H_LIST}
 	${APP_CPP_LIST}
-	)
+)
 
 if(NOT WIN32)
 	axl_exclude_from_build(test_Bstr.cpp)
@@ -63,7 +63,7 @@ source_group(
 	FILES
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -114,19 +114,19 @@ add_executable(
 	${PCH_CPP}
 	${APP_H_LIST}
 	${APP_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_test_auto
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 set_target_properties(
 	axl_test_auto
 	PROPERTIES
 	FOLDER test
-	)
+)
 
 target_link_libraries(
 	axl_test_auto
@@ -134,20 +134,20 @@ target_link_libraries(
 	axl_lex
 	axl_io
 	axl_core
-	)
+)
 
 if(UNIX)
 	target_link_libraries(
 		axl_test_auto
 		pthread
 		dl
-		)
+	)
 
 	if(LINUX AND LIBUDEV_FOUND)
 		target_link_libraries(
 			axl_test_auto
 			udev
-			)
+		)
 	endif()
 
 	if(APPLE)
@@ -160,12 +160,12 @@ if(UNIX)
 			axl_iok
 			${CORE_FOUNDATION_FRAMEWORK}
 			${IOKIT_FRAMEWORK}
-			)
+		)
 	else()
 		target_link_libraries(
 			axl_test_auto
 			rt
-			)
+		)
 	endif()
 endif()
 
@@ -205,7 +205,7 @@ file(
 	TEST_CPP_LIST
 	RELATIVE ${CMAKE_CURRENT_LIST_DIR}
 	test_*.cpp
-	)
+)
 
 foreach(_FILE_NAME ${TEST_CPP_LIST})
 	axl_is_excluded_from_build(_IS_EXCLUDED ${_FILE_NAME})
@@ -217,7 +217,7 @@ foreach(_FILE_NAME ${TEST_CPP_LIST})
 			NAME axl-${_TEST_NAME}
 			WORKING_DIRECTORY ${_DIR}
 			COMMAND axl_test_auto ${_TEST_NAME}
-			)
+		)
 	endif()
 endforeach()
 

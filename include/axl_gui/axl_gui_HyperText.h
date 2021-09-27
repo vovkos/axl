@@ -22,11 +22,9 @@ namespace gui {
 
 //..............................................................................
 
-class HyperText
-{
+class HyperText {
 protected:
-	struct HyperlinkXMapEntry
-	{
+	struct HyperlinkXMapEntry {
 		int m_x;
 		const HyperlinkAnchor* m_anchor;
 	};
@@ -39,38 +37,31 @@ protected:
 	sl::Array<HyperlinkXMapEntry> m_hyperlinkXMap;
 
 public:
-	HyperText()
-	{
-	}
+	HyperText() {}
 
-	HyperText(const sl::StringRef& source)
-	{
+	HyperText(const sl::StringRef& source) {
 		setHyperText(source);
 	}
 
 	HyperText(
 		const gui::TextAttr& baseAttr,
 		const sl::StringRef& source
-		)
-	{
+	) {
 		setHyperText(baseAttr, source);
 	}
 
 	const sl::String&
-	getSource() const
-	{
+	getSource() const {
 		return m_source;
 	}
 
 	const sl::String_utf32&
-	getText() const
-	{
+	getText() const {
 		return m_text;
 	}
 
 	const TextAttrAnchorArray*
-	getAttrArray() const
-	{
+	getAttrArray() const {
 		return &m_attrArray;
 	}
 
@@ -81,21 +72,18 @@ public:
 	setHyperText(
 		const TextAttr& baseAttr,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		clear();
 		return appendHyperText(baseAttr, text);
 	}
 
 	size_t
-	setHyperText(const sl::StringRef& text)
-	{
+	setHyperText(const sl::StringRef& text) {
 		return setHyperText(TextAttr(), text);
 	}
 
 	size_t
-	setPlainText(const sl::StringRef& text)
-	{
+	setPlainText(const sl::StringRef& text) {
 		clear();
 		return appendPlainText(text);
 	}
@@ -104,8 +92,7 @@ public:
 	setText(
 		bool isHyperText,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return isHyperText ? setHyperText(text) : setPlainText(text);
 	}
 
@@ -113,8 +100,7 @@ public:
 	setChar(
 		utf32_t c,
 		size_t count = 1
-		)
-	{
+	) {
 		clear();
 		return appendChar(c, count);
 	}
@@ -123,11 +109,10 @@ public:
 	appendHyperText(
 		const TextAttr& baseAttr,
 		const sl::StringRef& text
-		);
+	);
 
 	size_t
-	appendHyperText(const sl::StringRef& text)
-	{
+	appendHyperText(const sl::StringRef& text) {
 		return appendHyperText(TextAttr(), text);
 	}
 
@@ -138,8 +123,7 @@ public:
 	appendText(
 		bool isHyperText,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return isHyperText ? appendHyperText(text) : appendPlainText(text);
 	}
 
@@ -147,7 +131,7 @@ public:
 	appendChar(
 		utf32_t c,
 		size_t count = 1
-		);
+	);
 
 	size_t
 	backspace(size_t backLength);

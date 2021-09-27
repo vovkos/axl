@@ -26,8 +26,7 @@ __asm__(".symver secure_getenv, __secure_getenv@GLIBC_2.0");
 //..............................................................................
 
 char*
-__wrap_secure_getenv(const char *name)
-{
+__wrap_secure_getenv(const char *name) {
 	return secure_getenv(name);
 }
 

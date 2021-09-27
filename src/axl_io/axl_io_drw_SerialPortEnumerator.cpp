@@ -18,8 +18,7 @@ namespace io {
 
 //..............................................................................
 
-class SerialPortEnumerator
-{
+class SerialPortEnumerator {
 public:
 	static
 	size_t
@@ -30,8 +29,7 @@ public:
 
 #ifdef _AXL_DEBUG
 size_t
-printDeviceProperties(const iok::RegistryEntry& device)
-{
+printDeviceProperties(const iok::RegistryEntry& device) {
 	size_t indent = 0;
 
 	iok::RegistryEntry parent = device.getParentEntry();
@@ -50,8 +48,7 @@ printDeviceProperties(const iok::RegistryEntry& device)
 		printf("\t");
 
 	printf("deviceName = %s\n", device.getName().sz());
-	for (size_t i = 0; i < count; i++)
-	{
+	for (size_t i = 0; i < count; i++) {
 		for (size_t i = 0; i < indent; i++)
 			printf("\t");
 
@@ -59,7 +56,7 @@ printDeviceProperties(const iok::RegistryEntry& device)
 			"%s = %s\n",
 			cf::Type(keyArray[i]).toString().sz(),
 			cf::Type(valueArray[i]).toString().sz()
-			);
+		);
 	}
 
 	printf("\n");
@@ -69,8 +66,7 @@ printDeviceProperties(const iok::RegistryEntry& device)
 #endif
 
 size_t
-SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
-{
+SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList) {
 	portList->clear();
 
 	cf::MutableDictionary dict = iok::createServiceMatchingDictionary(kIOSerialBSDServiceValue);
@@ -78,8 +74,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 
 	iok::Iterator it = iok::findMatchingServices(dict);
 	iok::RegistryEntry port = it.next().p();
-	for (; port; port = it.next().p())
-	{
+	for (; port; port = it.next().p()) {
 #ifdef _AXL_DEBUG
 		printDeviceProperties(port);
 #endif
@@ -88,8 +83,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 		sl::String description;
 
 		cf::Type prop = port.getProperty(kIOCalloutDeviceKey);
-		if (!prop)
-		{
+		if (!prop) {
 			prop = port.getProperty(kIODialinDeviceKey);
 			if (!prop)
 				continue;
@@ -112,8 +106,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 //..............................................................................
 
 size_t
-createSerialPortDescList(sl::List<SerialPortDesc>* portList)
-{
+createSerialPortDescList(sl::List<SerialPortDesc>* portList) {
 	return SerialPortEnumerator::createPortList(portList);
 }
 

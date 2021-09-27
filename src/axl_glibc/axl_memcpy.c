@@ -26,8 +26,7 @@ __wrap_memcpy(
 	void* dst,
 	const void *src,
 	size_t size
-	)
-{
+) {
 	return memcpy(dst, src, size);
 }
 

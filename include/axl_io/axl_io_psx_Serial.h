@@ -19,8 +19,7 @@
 #	define _AXL_IO_PSX_TERMIOS2 1
 #	define NCCS2 19 // for x86, amd64, arm32, arm64
 
-struct termios2
-{
+struct termios2 {
 	tcflag_t c_iflag;
 	tcflag_t c_oflag;
 	tcflag_t c_cflag;
@@ -39,21 +38,18 @@ namespace psx {
 
 //..............................................................................
 
-class Serial: public File
-{
+class Serial: public File {
 public:
 	bool
 	open(
 		const sl::StringRef& name,
 		uint_t openFlags = O_RDWR | O_NOCTTY
-		)
-	{
+	) {
 		return File::open(name, openFlags, 0);
 	}
 
 	bool
-	getAttr(termios* attr) const
-	{
+	getAttr(termios* attr) const {
 		int result = ::tcgetattr(m_h, attr);
 		return err::complete(result != -1);
 	}
@@ -62,45 +58,39 @@ public:
 	setAttr(
 		const termios* attr,
 		int actions = TCSANOW
-		)
-	{
+	) {
 		int result = ::tcsetattr(m_h, actions, attr);
 		return err::complete(result != -1);
 	}
 
 #if (_AXL_IO_PSX_TERMIOS2)
 	bool
-	getAttr(termios2* attr) const
-	{
+	getAttr(termios2* attr) const {
 		int result = ::ioctl(m_h, TCGETS2, attr);
 		return err::complete(result != -1);
 	}
 
 	bool
-	setAttr(const termios2* attr)
-	{
+	setAttr(const termios2* attr) {
 		int result = ::ioctl(m_h, TCSETS2, attr);
 		return err::complete(result != -1);
 	}
 #endif
 
 	bool
-	drain()
-	{
+	drain() {
 		int result = ::tcdrain(m_h);
 		return err::complete(result != -1);
 	}
 
 	bool
-	flush(int queueSelector = TCIOFLUSH)
-	{
+	flush(int queueSelector = TCIOFLUSH) {
 		int result = ::tcflush(m_h, queueSelector);
 		return err::complete(result != -1);
 	}
 
 	bool
-	flow(int action)
-	{
+	flow(int action) {
 		int result = ::tcflow(m_h, action);
 		return err::complete(result != -1);
 	}
@@ -118,16 +108,14 @@ public:
 	setBreakCondition(bool isSet);
 
 	bool
-	sendBreak(uint_t duration = 0)
-	{
+	sendBreak(uint_t duration = 0) {
 		int result = ::tcsendbreak(m_h, duration);
 		return err::complete(result != -1);
 	}
 
 #if (!_AXL_OS_DARWIN)
 	bool
-	wait(uint_t mask)
-	{
+	wait(uint_t mask) {
 		int result = ::ioctl(m_h, TIOCMIWAIT, mask);
 		return err::complete(result != -1);
 	}

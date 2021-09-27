@@ -20,8 +20,7 @@ namespace io {
 
 //..............................................................................
 
-enum SerialFlowControl
-{
+enum SerialFlowControl {
 	SerialFlowControl_None = 0,
 	SerialFlowControl_RtsCts,
 	SerialFlowControl_XonXoff,
@@ -29,8 +28,7 @@ enum SerialFlowControl
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialStopBits
-{
+enum SerialStopBits {
 	SerialStopBits_1  = 0,
 	SerialStopBits_15 = 1,
 	SerialStopBits_2  = 2,
@@ -39,8 +37,7 @@ enum SerialStopBits
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialParity
-{
+enum SerialParity {
 	SerialParity_None  = 0,
 	SerialParity_Odd   = 1,
 	SerialParity_Even  = 2,
@@ -50,8 +47,7 @@ enum SerialParity
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialStatusLine
-{
+enum SerialStatusLine {
 	SerialStatusLine_Cts  = 0x01,
 	SerialStatusLine_Dsr  = 0x02,
 	SerialStatusLine_Ring = 0x04,
@@ -60,8 +56,7 @@ enum SerialStatusLine
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum SerialSettingId
-{
+enum SerialSettingId {
 	SerialSettingId_BaudRate     = 0x01,
 	SerialSettingId_FlowControl  = 0x02,
 	SerialSettingId_DataBits     = 0x04,
@@ -72,8 +67,7 @@ enum SerialSettingId
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct SerialSettings
-{
+struct SerialSettings {
 	uint_t m_baudRate;
 	uint_t m_dataBits;
 	SerialStopBits m_stopBits;
@@ -86,8 +80,7 @@ struct SerialSettings
 	bool m_dtr; // used when setting SerialSettingId_FlowControl
 	bool m_rts; // used when setting SerialSettingId_FlowControl
 
-	SerialSettings()
-	{
+	SerialSettings() {
 		setup(38400);
 	}
 
@@ -100,8 +93,7 @@ struct SerialSettings
 		uint_t readInterval = 10, // 10ms can be used in the most general case
 		bool dtr = true,
 		bool rts = true
-		)
-	{
+	) {
 		setup(baudRate, dataBits, stopBits, parity, flowControl, readInterval, dtr, rts);
 	}
 
@@ -115,7 +107,7 @@ struct SerialSettings
 		uint_t readInterval = 10,
 		bool dtr = true,
 		bool rts = true
-		);
+	);
 
 #if (_AXL_OS_WIN)
 	void

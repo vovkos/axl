@@ -19,8 +19,7 @@ namespace win {
 //..............................................................................
 
 bool
-Library::loadLibrary(const sl::StringRef_w& fileName)
-{
+Library::loadLibrary(const sl::StringRef_w& fileName) {
 	close();
 
 	m_h = ::LoadLibraryW(fileName.sz());

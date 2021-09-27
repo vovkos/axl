@@ -21,12 +21,10 @@ namespace psx {
 
 //..............................................................................
 
-class CloseFile
-{
+class CloseFile {
 public:
 	void
-	operator () (int h)
-	{
+	operator () (int h) {
 		int result = ::close(h);
 		ASSERT(result == 0);
 	}
@@ -34,24 +32,19 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class File: public sl::Handle<int, CloseFile, sl::MinusOne<int> >
-{
+class File: public sl::Handle<int, CloseFile, sl::MinusOne<int> > {
 public:
-	File()
-	{
-	}
+	File() {}
 
 	File(int h):
-		sl::Handle<int, CloseFile, sl::MinusOne<int> > (h)
-	{
-	}
+		sl::Handle<int, CloseFile, sl::MinusOne<int> > (h) {}
 
 	bool
 	open(
 		const sl::StringRef& fileName,
 		uint_t openFlags = O_RDWR | O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
-		);
+	);
 
 	bool
 	duplicate(int fd);
@@ -63,8 +56,7 @@ public:
 	getSize() const;
 
 	bool
-	setSize(uint64_t size)
-	{
+	setSize(uint64_t size) {
 #if (_AXL_OS_DARWIN)
 		int result = ::ftruncate(m_h, size);
 #else
@@ -77,8 +69,7 @@ public:
 	getPosition() const;
 
 	bool
-	setPosition(uint64_t offset) const
-	{
+	setPosition(uint64_t offset) const {
 #if (_AXL_OS_DARWIN)
 		uint64_t actualOffset = ::lseek(m_h, offset, SEEK_SET);
 #else
@@ -91,15 +82,13 @@ public:
 	getIncomingDataSize();
 
 	bool
-	flush()
-	{
+	flush() {
 		int result = ::fsync(m_h);
 		return err::complete(result != -1);
 	}
 
 	int
-	ioctl(uint_t code)
-	{
+	ioctl(uint_t code) {
 		int result = ::ioctl(m_h, code);
 		return err::complete(result, -1);
 	}
@@ -109,8 +98,7 @@ public:
 	ioctl(
 		uint_t code,
 		T param
-		)
-	{
+	) {
 		int result = ::ioctl(m_h, code, param);
 		if (result == -1)
 			err::setLastSystemError();
@@ -119,8 +107,7 @@ public:
 	}
 
 	int
-	fcntl(uint_t code)
-	{
+	fcntl(uint_t code) {
 		int result = ::fcntl(m_h, code);
 		return err::complete(result, -1);
 	}
@@ -130,8 +117,7 @@ public:
 	fcntl(
 		uint_t code,
 		T param
-		)
-	{
+	) {
 		int result = ::fcntl(m_h, code, param);
 		if (result == -1)
 			err::setLastSystemError();
@@ -143,13 +129,13 @@ public:
 	read(
 		void* p,
 		size_t size
-		) const;
+	) const;
 
 	size_t
 	write(
 		const void* p,
 		size_t size
-		);
+	);
 };
 
 //..............................................................................

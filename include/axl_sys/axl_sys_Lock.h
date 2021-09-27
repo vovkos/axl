@@ -28,47 +28,40 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-class Lock
-{
+class Lock {
 public:
 	win::CriticalSection m_criticalSection;
 
 public:
 	void
-	lock()
-	{
+	lock() {
 		m_criticalSection.enter();
 	}
 
 	void
-	unlock()
-	{
+	unlock() {
 		m_criticalSection.leave();
 	}
 };
 
 #elif (_AXL_OS_POSIX)
 
-class Lock
-{
+class Lock {
 public:
 	psx::Mutex m_mutex;
 
 public:
 	Lock():
-		m_mutex(PTHREAD_MUTEX_RECURSIVE) // consistent with CRITITCAL_SECTION
-	{
+		m_mutex(PTHREAD_MUTEX_RECURSIVE) { // consistent with CRITITCAL_SECTION
 	}
 
 	void
-	lock()
-	{
+	lock() {
 		m_mutex.lock();
 	}
 
 	void
-	unlock()
-	{
+	unlock() {
 		m_mutex.unlock();
 	}
 };
@@ -77,20 +70,17 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ScopeLock
-{
+class ScopeLock {
 protected:
 	Lock* m_lock;
 
 public:
-	ScopeLock(Lock* lock)
-	{
+	ScopeLock(Lock* lock) {
 		m_lock = lock;
 		lock->lock();
 	}
 
-	~ScopeLock()
-	{
+	~ScopeLock() {
 		m_lock->unlock();
 	}
 };

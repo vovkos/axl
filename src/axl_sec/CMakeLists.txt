@@ -18,21 +18,21 @@ set(
 	${AXL_INC_DIR}/axl_sec/axl_sec_Error.h
 	${AXL_INC_DIR}/axl_sec/axl_sec_Code.h
 	${AXL_INC_DIR}/axl_sec/axl_sec_StaticCode.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
 	axl_sec_Error.cpp
 	axl_sec_Code.cpp
 	axl_sec_StaticCode.cpp
-	)
+)
 
 source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -46,14 +46,14 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_sec/axl_sec_Pch.h
-	)
+)
 
 source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -68,13 +68,13 @@ add_library(
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_sec
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -82,11 +82,11 @@ axl_install_redirected_includes(
 	${INSTALL_INCLUDE_DIR}
 	axl_sec
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_sec
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

@@ -23,8 +23,7 @@ namespace rc {
 // weak ptr
 
 template <typename T>
-class WeakPtr
-{
+class WeakPtr {
 	template <typename T2>
 	friend class Ptr;
 
@@ -36,41 +35,35 @@ protected:
 	RefCount* m_refCount;
 
 public:
-	WeakPtr()
-	{
+	WeakPtr() {
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	WeakPtr(const NullPtr&)
-	{
+	WeakPtr(const NullPtr&) {
 		m_p = NULL;
 		m_refCount = NULL;
 	}
 
-	WeakPtr(const WeakPtr& src)
-	{
+	WeakPtr(const WeakPtr& src) {
 		m_p = NULL, m_refCount = NULL;
 		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	WeakPtr(const WeakPtr<T2>& src)
-	{
+	WeakPtr(const WeakPtr<T2>& src) {
 		m_p = NULL, m_refCount = NULL;
 		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	WeakPtr(const Ptr<T2>& src)
-	{
+	WeakPtr(const Ptr<T2>& src) {
 		m_p = NULL, m_refCount = NULL;
 		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename T2>
-	WeakPtr(T2* p)
-	{
+	WeakPtr(T2* p) {
 		m_p = NULL, m_refCount = NULL;
 		copy(p, p);
 	}
@@ -78,27 +71,23 @@ public:
 	WeakPtr(
 		T* p,
 		RefCount* refCount
-		)
-	{
+	) {
 		m_p = NULL, m_refCount = NULL;
 		copy(p, refCount);
 	}
 
-	~WeakPtr()
-	{
+	~WeakPtr() {
 		clear();
 	}
 
 	WeakPtr&
-	operator = (const NullPtr&)
-	{
+	operator = (const NullPtr&) {
 		clear();
 		return *this;
 	}
 
 	WeakPtr&
-	operator = (const WeakPtr& src)
-	{
+	operator = (const WeakPtr& src) {
 		copy(src.m_p, src.m_refCount);
 		return *this;
 	}
@@ -107,8 +96,7 @@ public:
 	copy(
 		T* p,
 		RefCount* refCount
-		)
-	{
+	) {
 		m_p = p;
 
 		if (m_refCount == refCount)
@@ -127,8 +115,7 @@ public:
 	attach(
 		T* p,
 		RefCount* refCount
-		)
-	{
+	) {
 		if (m_refCount)
 			m_refCount->weakRelease();
 
@@ -140,8 +127,7 @@ public:
 	detach(
 		T** pp_o = NULL,
 		RefCount** refCount_o = NULL
-		)
-	{
+	) {
 		if (pp_o)
 			*pp_o = m_p;
 
@@ -153,8 +139,7 @@ public:
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		if (m_refCount)
 			m_refCount->weakRelease();
 
@@ -163,8 +148,7 @@ public:
 	}
 
 	RefCount*
-	getRefCount() const
-	{
+	getRefCount() const {
 		return m_refCount;
 	}
 };

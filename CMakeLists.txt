@@ -55,7 +55,7 @@ add_subdirectory(test)
 install(
 	DIRECTORY license/
 	DESTINATION ${AXL_INSTALL_LICENSE_SUBDIR}
-	)
+)
 
 #...............................................................................
 

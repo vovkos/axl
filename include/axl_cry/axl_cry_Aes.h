@@ -21,10 +21,8 @@ namespace cry {
 
 //..............................................................................
 
-struct AesKey: AES_KEY
-{
-	AesKey()
-	{
+struct AesKey: AES_KEY {
+	AesKey() {
 		memset(this, 0, sizeof(AesKey));
 	}
 
@@ -32,8 +30,7 @@ struct AesKey: AES_KEY
 	setEncryptKey(
 		const void* p,
 		size_t bitCount
-		)
-	{
+	) {
 		int result = AES_set_encrypt_key((const uchar_t*) p, (int)bitCount, this);
 		return err::completeWithSystemError(result == 0, err::SystemErrorCode_InvalidParameter);
 	}
@@ -42,8 +39,7 @@ struct AesKey: AES_KEY
 	setDecryptKey(
 		const void* p,
 		size_t bitCount
-		)
-	{
+	) {
 		int result = AES_set_decrypt_key((const uchar_t*) p, (int)bitCount, this);
 		return err::completeWithSystemError(result == 0, err::SystemErrorCode_InvalidParameter);
 	}
@@ -53,8 +49,7 @@ struct AesKey: AES_KEY
 		const void* src,
 		size_t size,
 		void* iv
-		)
-	{
+	) {
 		AES_cbc_encrypt(
 			(const uchar_t*) src,
 			(uchar_t*)dst,
@@ -62,7 +57,7 @@ struct AesKey: AES_KEY
 			this,
 			(uchar_t*)iv,
 			AES_ENCRYPT
-			);
+		);
 	}
 
 	void cbcDecrypt(
@@ -70,8 +65,7 @@ struct AesKey: AES_KEY
 		const void* src,
 		size_t size,
 		void* iv
-		)
-	{
+	) {
 		AES_cbc_encrypt(
 			(const uchar_t*) src,
 			(uchar_t*)dst,
@@ -79,7 +73,7 @@ struct AesKey: AES_KEY
 			this,
 			(uchar_t*)iv,
 			AES_DECRYPT
-			);
+		);
 	}
 };
 

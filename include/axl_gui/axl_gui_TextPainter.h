@@ -21,11 +21,9 @@ namespace gui {
 
 //..............................................................................
 
-class TextPainter
-{
+class TextPainter {
 protected:
-	enum Def
-	{
+	enum Def {
 		Def_BinTextDecodeBufferLength = 2 * 1024, // 8K
 	};
 
@@ -43,19 +41,16 @@ public:
 	utf32_t m_unprintableChar;
 
 public:
-	TextPainter()
-	{
+	TextPainter() {
 		init();
 	}
 
-	TextPainter(Canvas* canvas)
-	{
+	TextPainter(Canvas* canvas) {
 		init(canvas);
 	}
 
 	Point
-	getPoint()
-	{
+	getPoint() {
 		return m_point;
 	}
 
@@ -65,11 +60,10 @@ public:
 	drawSpace(
 		size_t length,
 		uint_t color
-		);
+	);
 
 	int
-	drawSpace(size_t length)
-	{
+	drawSpace(size_t length) {
 		return drawSpace(length, m_canvas->m_colorAttr.m_backColor);
 	}
 
@@ -77,11 +71,10 @@ public:
 	drawSpace_p(
 		int width, // in pixels
 		uint_t color
-		);
+	);
 
 	int
-	drawSpace_p(int width) // in pixels
-	{
+	drawSpace_p(int width) { // in pixels
 		return drawSpace_p(width, m_canvas->m_colorAttr.m_backColor);
 	}
 
@@ -93,8 +86,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawText_utf8(textColor, backColor, fontFlags, text);
 	}
 
@@ -102,14 +94,12 @@ public:
 	drawText(
 		const TextAttr& attr,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawText_utf8(attr, text);
 	}
 
 	int
-	drawText(const sl::StringRef& text)
-	{
+	drawText(const sl::StringRef& text) {
 		return drawText_utf8(text);
 	}
 
@@ -119,31 +109,29 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf8& text
-		);
+	);
 
 	int
 	drawText_utf8(
 		const TextAttr& attr,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawText_utf8(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
 			text
-			);
+		);
 	}
 
 	int
-	drawText_utf8(const sl::StringRef_utf8& text)
-	{
+	drawText_utf8(const sl::StringRef_utf8& text) {
 		return drawText_utf8(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
 			text
-			);
+		);
 	}
 
 	int
@@ -152,31 +140,29 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf32& text
-		);
+	);
 
 	int
 	drawText_utf32(
 		const TextAttr& attr,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawText_utf32(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
 			text
-			);
+		);
 	}
 
 	int
-	drawText_utf32(const sl::StringRef_utf32& text)
-	{
+	drawText_utf32(const sl::StringRef_utf32& text) {
 		return drawText_utf32(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
 			text
-			);
+		);
 	}
 
 	// hypertext
@@ -188,15 +174,14 @@ public:
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawHyperText_utf8(
 			textColor,
 			backColor,
 			fontFlags,
 			attrArray,
 			text
-			);
+		);
 	}
 
 	int
@@ -204,8 +189,7 @@ public:
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawHyperText_utf8(attr, attrArray, text);
 	}
 
@@ -213,8 +197,7 @@ public:
 	drawHyperText(
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawHyperText_utf8(attrArray, text);
 	}
 
@@ -225,37 +208,35 @@ public:
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf8& text
-		);
+	);
 
 	int
 	drawHyperText_utf8(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawHyperText_utf8(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
 			attrArray,
 			text
-			);
+		);
 	}
 
 	int
 	drawHyperText_utf8(
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawHyperText_utf8(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
 			attrArray,
 			text
-			);
+		);
 	}
 
 	int
@@ -265,37 +246,35 @@ public:
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf32& text
-		);
+	);
 
 	int
 	drawHyperText_utf32(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawHyperText_utf32(
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
 			attrArray,
 			text
-			);
+		);
 	}
 
 	int
 	drawHyperText_utf32(
 		const TextAttrAnchorArray* attrArray,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawHyperText_utf32(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
 			attrArray,
 			text
-			);
+		);
 	}
 
 	// hypertext with selection
@@ -310,8 +289,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawSelHyperText_utf8(
 			textColor,
 			backColor,
@@ -321,7 +299,7 @@ public:
 			selStart,
 			selEnd,
 			text
-			);
+		);
 	}
 
 	int
@@ -332,8 +310,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawSelHyperText_utf8(
 			attr,
 			attrArray,
@@ -341,7 +318,7 @@ public:
 			selStart,
 			selEnd,
 			text
-			);
+		);
 	}
 
 	int
@@ -351,15 +328,14 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawSelHyperText_utf8(
 			attrArray,
 			selAttr,
 			selStart,
 			selEnd,
 			text
-			);
+		);
 	}
 
 	int
@@ -372,7 +348,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef_utf8& text
-		);
+	);
 
 	int
 	drawSelHyperText_utf8(
@@ -382,8 +358,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawSelHyperText_utf8(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -393,7 +368,7 @@ public:
 			selStart,
 			selEnd,
 			text
-			);
+		);
 	}
 
 	int
@@ -403,8 +378,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawSelHyperText_utf8(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -414,7 +388,7 @@ public:
 			selStart,
 			selEnd,
 			text
-			);
+		);
 	}
 
 	int
@@ -427,7 +401,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef_utf32& text
-		);
+	);
 
 	int
 	drawSelHyperText_utf32(
@@ -437,8 +411,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawSelHyperText_utf32(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -448,7 +421,7 @@ public:
 			selStart,
 			selEnd,
 			text
-			);
+		);
 	}
 
 	int
@@ -458,8 +431,7 @@ public:
 		size_t selStart,
 		size_t selEnd,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawSelHyperText_utf32(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -469,7 +441,7 @@ public:
 			selStart,
 			selEnd,
 			text
-			);
+		);
 	}
 
 	// bin hex
@@ -483,7 +455,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		);
+	);
 
 	int
 	drawBinHex(
@@ -492,8 +464,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return drawBinHex(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -502,7 +473,7 @@ public:
 			p,
 			size,
 			flags
-			);
+		);
 	}
 
 	int
@@ -511,8 +482,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return drawBinHex(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -521,7 +491,7 @@ public:
 			p,
 			size,
 			flags
-			);
+		);
 	}
 
 	int
@@ -534,7 +504,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		);
+	);
 
 	int
 	drawHyperBinHex(
@@ -544,8 +514,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return drawHyperBinHex(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -555,7 +524,7 @@ public:
 			p,
 			size,
 			flags
-			);
+		);
 	}
 
 	int
@@ -565,8 +534,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return drawHyperBinHex(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -576,7 +544,7 @@ public:
 			p,
 			size,
 			flags
-			);
+		);
 	}
 
 	int
@@ -592,7 +560,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		);
+	);
 
 	int
 	drawSelHyperBinHex(
@@ -605,8 +573,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return drawSelHyperBinHex(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -619,7 +586,7 @@ public:
 			p,
 			size,
 			flags
-			);
+		);
 	}
 
 	int
@@ -632,8 +599,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return drawSelHyperBinHex(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -646,7 +612,7 @@ public:
 			p,
 			size,
 			flags
-			);
+		);
 	}
 
 	// bin text
@@ -660,7 +626,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		);
+	);
 
 	int
 	drawBinText(
@@ -669,8 +635,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		)
-	{
+	) {
 		return drawBinText(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -679,7 +644,7 @@ public:
 			p,
 			dataSize,
 			bufferSize
-			);
+		);
 	}
 
 	int
@@ -688,8 +653,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		)
-	{
+	) {
 		return drawBinText(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -698,7 +662,7 @@ public:
 			p,
 			dataSize,
 			bufferSize
-			);
+		);
 	}
 
 	int
@@ -711,7 +675,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		);
+	);
 
 	int
 	drawHyperBinText(
@@ -721,8 +685,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		)
-	{
+	) {
 		return drawHyperBinText(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -732,7 +695,7 @@ public:
 			p,
 			dataSize,
 			bufferSize
-			);
+		);
 	}
 
 	int
@@ -742,8 +705,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		)
-	{
+	) {
 		return drawHyperBinText(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -753,7 +715,7 @@ public:
 			p,
 			dataSize,
 			bufferSize
-			);
+		);
 	}
 
 	int
@@ -769,7 +731,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		);
+	);
 
 	int
 	drawSelHyperBinText(
@@ -782,8 +744,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		)
-	{
+	) {
 		return drawSelHyperBinText(
 			attr.m_foreColor,
 			attr.m_backColor,
@@ -796,7 +757,7 @@ public:
 			p,
 			dataSize,
 			bufferSize
-			);
+		);
 	}
 
 	int
@@ -809,8 +770,7 @@ public:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		)
-	{
+	) {
 		return drawSelHyperBinText(
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
@@ -823,7 +783,7 @@ public:
 			p,
 			dataSize,
 			bufferSize
-			);
+		);
 	}
 
 	static
@@ -836,7 +796,7 @@ public:
 		size_t dataSize,
 		size_t bufferSize,
 		utf32_t unprintableChar = '.'
-		);
+	);
 
 	static
 	sl::String
@@ -846,7 +806,7 @@ public:
 		size_t dataSize,
 		size_t bufferSize,
 		utf32_t unprintableChar = '.'
-		);
+	);
 
 protected:
 	void
@@ -861,7 +821,7 @@ protected:
 		size_t dataSize,
 		size_t bufferSize,
 		utf32_t unprintableChar = '.'
-		);
+	);
 
 	size_t
 	buildBinTextBuffer(
@@ -869,8 +829,7 @@ protected:
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
-		)
-	{
+	) {
 		return buildBinTextBuffer(
 			&m_binTextBuffer,
 			codec,
@@ -878,7 +837,7 @@ protected:
 			dataSize,
 			bufferSize,
 			m_unprintableChar
-			);
+		);
 	}
 };
 

@@ -20,8 +20,7 @@ namespace psx {
 //..............................................................................
 
 bool
-Pty::open(uint_t openFlags)
-{
+Pty::open(uint_t openFlags) {
 	close();
 
 	m_h = ::posix_openpt(openFlags);
@@ -29,14 +28,13 @@ Pty::open(uint_t openFlags)
 }
 
 bool
-Pty::getSlaveFileName(sl::String* fileName)
-{
+Pty::getSlaveFileName(sl::String* fileName) {
 #if (_AXL_OS_DARWIN) // ptsname_r is a GNU extension and missing on osx (at lease, on older versions)
 	*fileName = ptsname(m_h);
 #else
 	char buffer[256];
 	int result = ::ptsname_r(m_h, buffer, sizeof(buffer));
-	if (result != 0)	
+	if (result != 0)
 		return err::failWithLastSystemError();
 
 	*fileName = buffer;

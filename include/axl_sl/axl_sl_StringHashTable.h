@@ -22,29 +22,25 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class EqStringIgnoreCaseBase_pcu
-{
+class EqStringIgnoreCaseBase_pcu {
 public:
 	bool
 	operator () (
 		const sl::StringRefBase<T>& string1,
 		const sl::StringRefBase<T>& string2
-		) const
-	{
+	) const {
 		return string1.isEqualIgnoreCase(string2, CaseConvertMethod_PerCodeUnit);
 	}
 };
 
 template <typename T>
-class EqStringIgnoreCaseBase_pcp
-{
+class EqStringIgnoreCaseBase_pcp {
 public:
 	bool
 	operator () (
 		const sl::StringRefBase<T>& string1,
 		const sl::StringRefBase<T>& string2
-		) const
-	{
+	) const {
 		return string1.isEqualIgnoreCase(string2, CaseConvertMethod_PerCodePoint);
 	}
 };
@@ -66,23 +62,19 @@ typedef EqStringIgnoreCaseBase_pcp<utf32_t> EqStringIgnoreCase_pcp_utf32;
 //..............................................................................
 
 template <typename T>
-class HashStringIgnoreCaseBase_pcu
-{
+class HashStringIgnoreCaseBase_pcu {
 public:
 	size_t
-	operator () (const sl::StringRefBase<T>& string) const
-	{
+	operator () (const sl::StringRefBase<T>& string) const {
 		return string.hashIgnoreCase(CaseConvertMethod_PerCodeUnit);
 	}
 };
 
 template <typename T>
-class HashStringIgnoreCaseBase_pcp
-{
+class HashStringIgnoreCaseBase_pcp {
 public:
 	size_t
-	operator () (const sl::StringRefBase<T>& string) const
-	{
+	operator () (const sl::StringRefBase<T>& string) const {
 		return string.hashIgnoreCase(CaseConvertMethod_PerCodePoint);
 	}
 };
@@ -104,28 +96,23 @@ typedef HashStringIgnoreCaseBase_pcp<utf32_t> HashStringIgnoreCase_pcp_utf32;
 //..............................................................................
 
 template <typename Value>
-class StringHashTable: public DuckTypeHashTable<String, Value>
-{
+class StringHashTable: public DuckTypeHashTable<String, Value> {
 };
 
 template <typename Value>
-class StringHashTable_w: public DuckTypeHashTable<String_w, Value>
-{
+class StringHashTable_w: public DuckTypeHashTable<String_w, Value> {
 };
 
 template <typename Value>
-class StringHashTable_utf8: public DuckTypeHashTable<String_utf8, Value>
-{
+class StringHashTable_utf8: public DuckTypeHashTable<String_utf8, Value> {
 };
 
 template <typename Value>
-class StringHashTable_utf16: public DuckTypeHashTable<String_utf16, Value>
-{
+class StringHashTable_utf16: public DuckTypeHashTable<String_utf16, Value> {
 };
 
 template <typename Value>
-class StringHashTable_utf32: public DuckTypeHashTable<String_utf32, Value>
-{
+class StringHashTable_utf32: public DuckTypeHashTable<String_utf32, Value> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -136,8 +123,7 @@ class StringHashTableIgnoreCase_pcu: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcu,
 	EqStringIgnoreCase_pcu
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -146,8 +132,7 @@ class StringHashTableIgnoreCase_pcu_w: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcu_w,
 	EqStringIgnoreCase_pcu_w
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -156,8 +141,7 @@ class StringHashTableIgnoreCase_pcu_utf8: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcu_utf8,
 	EqStringIgnoreCase_pcu_utf8
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -166,8 +150,7 @@ class StringHashTableIgnoreCase_pcu_utf16: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcu_utf16,
 	EqStringIgnoreCase_pcu_utf16
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -176,8 +159,7 @@ class StringHashTableIgnoreCase_pcu_utf32: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcu_utf32,
 	EqStringIgnoreCase_pcu_utf32
-	>
-{
+> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -188,8 +170,7 @@ class StringHashTableIgnoreCase_pcp: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcp,
 	EqStringIgnoreCase_pcp
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -198,8 +179,7 @@ class StringHashTableIgnoreCase_pcp_w: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcp_w,
 	EqStringIgnoreCase_pcp_w
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -208,8 +188,7 @@ class StringHashTableIgnoreCase_pcp_utf8: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcp_utf8,
 	EqStringIgnoreCase_pcp_utf8
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -218,8 +197,7 @@ class StringHashTableIgnoreCase_pcp_utf16: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcp_utf16,
 	EqStringIgnoreCase_pcp_utf16
-	>
-{
+> {
 };
 
 template <typename Value>
@@ -228,173 +206,127 @@ class StringHashTableIgnoreCase_pcp_utf32: public HashTable<
 	Value,
 	HashStringIgnoreCase_pcp_utf32,
 	EqStringIgnoreCase_pcp_utf32
-	>
-{
+> {
 };
 
 //..............................................................................
 
 template <typename Value>
-class StringHashTableIterator: public Iterator<HashTableEntry<String, Value> >
-{
+class StringHashTableIterator: public Iterator<HashTableEntry<String, Value> > {
 public:
-	StringHashTableIterator()
-	{
-	}
+	StringHashTableIterator() {}
 
-	StringHashTableIterator(const Iterator<HashTableEntry<String, Value> >& src)
-	{
+	StringHashTableIterator(const Iterator<HashTableEntry<String, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class ConstStringHashTableIterator: public ConstIterator<HashTableEntry<String, Value> >
-{
+class ConstStringHashTableIterator: public ConstIterator<HashTableEntry<String, Value> > {
 public:
-	ConstStringHashTableIterator()
-	{
-	}
+	ConstStringHashTableIterator() {}
 
-	ConstStringHashTableIterator(const Iterator<HashTableEntry<String, Value> >& src)
-	{
+	ConstStringHashTableIterator(const Iterator<HashTableEntry<String, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 
-	ConstStringHashTableIterator(const ConstIterator<HashTableEntry<String, Value> >& src)
-	{
+	ConstStringHashTableIterator(const ConstIterator<HashTableEntry<String, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class StringHashTableIterator_w: public Iterator<HashTableEntry<String_w, Value> >
-{
+class StringHashTableIterator_w: public Iterator<HashTableEntry<String_w, Value> > {
 public:
-	StringHashTableIterator_w()
-	{
-	}
+	StringHashTableIterator_w() {}
 
-	StringHashTableIterator_w(const Iterator<HashTableEntry<String_w, Value> >& src)
-	{
+	StringHashTableIterator_w(const Iterator<HashTableEntry<String_w, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class ConstStringHashTableIterator_w: public ConstIterator<HashTableEntry<String_w, Value> >
-{
+class ConstStringHashTableIterator_w: public ConstIterator<HashTableEntry<String_w, Value> > {
 public:
-	ConstStringHashTableIterator_w()
-	{
-	}
+	ConstStringHashTableIterator_w() {}
 
-	ConstStringHashTableIterator_w(const Iterator<HashTableEntry<String_w, Value> >& src)
-	{
+	ConstStringHashTableIterator_w(const Iterator<HashTableEntry<String_w, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 
-	ConstStringHashTableIterator_w(const ConstIterator<HashTableEntry<String_w, Value> >& src)
-	{
+	ConstStringHashTableIterator_w(const ConstIterator<HashTableEntry<String_w, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class StringHashTableIterator_utf8: public Iterator<HashTableEntry<String_utf8, Value> >
-{
+class StringHashTableIterator_utf8: public Iterator<HashTableEntry<String_utf8, Value> > {
 public:
-	StringHashTableIterator_utf8()
-	{
-	}
+	StringHashTableIterator_utf8() {}
 
-	StringHashTableIterator_utf8(const Iterator<HashTableEntry<String_utf8, Value> >& src)
-	{
+	StringHashTableIterator_utf8(const Iterator<HashTableEntry<String_utf8, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class ConstStringHashTableIterator_utf8: public ConstIterator<HashTableEntry<String_utf8, Value> >
-{
+class ConstStringHashTableIterator_utf8: public ConstIterator<HashTableEntry<String_utf8, Value> > {
 public:
-	ConstStringHashTableIterator_utf8()
-	{
-	}
+	ConstStringHashTableIterator_utf8() {}
 
-	ConstStringHashTableIterator_utf8(const Iterator<HashTableEntry<String_utf8, Value> >& src)
-	{
+	ConstStringHashTableIterator_utf8(const Iterator<HashTableEntry<String_utf8, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 
-	ConstStringHashTableIterator_utf8(const ConstIterator<HashTableEntry<String_utf8, Value> >& src)
-	{
+	ConstStringHashTableIterator_utf8(const ConstIterator<HashTableEntry<String_utf8, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class StringHashTableIterator_utf16: public Iterator<HashTableEntry<String_utf16, Value> >
-{
+class StringHashTableIterator_utf16: public Iterator<HashTableEntry<String_utf16, Value> > {
 public:
-	StringHashTableIterator_utf16()
-	{
-	}
+	StringHashTableIterator_utf16() {}
 
-	StringHashTableIterator_utf16(const Iterator<HashTableEntry<String_utf16, Value> >& src)
-	{
+	StringHashTableIterator_utf16(const Iterator<HashTableEntry<String_utf16, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class ConstStringHashTableIterator_utf16: public ConstIterator<HashTableEntry<String_utf16, Value> >
-{
+class ConstStringHashTableIterator_utf16: public ConstIterator<HashTableEntry<String_utf16, Value> > {
 public:
-	ConstStringHashTableIterator_utf16()
-	{
-	}
+	ConstStringHashTableIterator_utf16() {}
 
-	ConstStringHashTableIterator_utf16(const Iterator<HashTableEntry<String_utf16, Value> >& src)
-	{
+	ConstStringHashTableIterator_utf16(const Iterator<HashTableEntry<String_utf16, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 
-	ConstStringHashTableIterator_utf16(const ConstIterator<HashTableEntry<String_utf16, Value> >& src)
-	{
+	ConstStringHashTableIterator_utf16(const ConstIterator<HashTableEntry<String_utf16, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class StringHashTableIterator_utf32: public Iterator<HashTableEntry<String_utf32, Value> >
-{
+class StringHashTableIterator_utf32: public Iterator<HashTableEntry<String_utf32, Value> > {
 public:
-	StringHashTableIterator_utf32()
-	{
-	}
+	StringHashTableIterator_utf32() {}
 
-	StringHashTableIterator_utf32(const Iterator<HashTableEntry<String_utf32, Value> >& src)
-	{
+	StringHashTableIterator_utf32(const Iterator<HashTableEntry<String_utf32, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename Value>
-class ConstStringHashTableIterator_utf32: public ConstIterator<HashTableEntry<String_utf32, Value> >
-{
+class ConstStringHashTableIterator_utf32: public ConstIterator<HashTableEntry<String_utf32, Value> > {
 public:
-	ConstStringHashTableIterator_utf32()
-	{
-	}
+	ConstStringHashTableIterator_utf32() {}
 
-	ConstStringHashTableIterator_utf32(const Iterator<HashTableEntry<String_utf32, Value> >& src)
-	{
+	ConstStringHashTableIterator_utf32(const Iterator<HashTableEntry<String_utf32, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 
-	ConstStringHashTableIterator_utf32(const ConstIterator<HashTableEntry<String_utf32, Value> >& src)
-	{
+	ConstStringHashTableIterator_utf32(const ConstIterator<HashTableEntry<String_utf32, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
@@ -418,7 +350,7 @@ public:
 		axl::sl::EqStringIgnoreCase_pcu, \
 		axl::sl::StringRef, \
 		axl::sl::ArgType<Value>::Type \
-		)
+	)
 
 #define AXL_SL_END_STRING_HASH_TABLE_IGNORE_CASE_PCU() \
 	AXL_SL_END_HASH_TABLE()
@@ -434,7 +366,7 @@ public:
 		axl::sl::EqStringIgnoreCase_pcp, \
 		axl::sl::StringRef, \
 		axl::sl::ArgType<Value>::Type \
-		)
+	)
 
 #define AXL_SL_END_STRING_HASH_TABLE_IGNORE_CASE_PCP() \
 	AXL_SL_END_HASH_TABLE()

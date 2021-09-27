@@ -21,28 +21,22 @@ namespace cry {
 
 //..............................................................................
 
-class FreeRsa
-{
+class FreeRsa {
 public:
 	void
-	operator () (RSA* h)
-	{
+	operator () (RSA* h) {
 		RSA_free(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Rsa: public sl::Handle<RSA*, FreeRsa>
-{
+class Rsa: public sl::Handle<RSA*, FreeRsa> {
 public:
-	Rsa()
-	{
-	}
+	Rsa() {}
 
 	size_t
-	getSize()
-	{
+	getSize() {
 		return RSA_size(m_h);
 	}
 
@@ -56,15 +50,13 @@ public:
 	readPublicKey(
 		const void* pem,
 		size_t size
-		)
-	{
+	) {
 		Bio bio;
 		return bio.createMemBuf(pem, size) && readPublicKey(bio);
 	}
 
 	bool
-	readPublicKey(const sl::StringRef& pem)
-	{
+	readPublicKey(const sl::StringRef& pem) {
 		return readPublicKey(pem.cp(), pem.getLength());
 	}
 
@@ -75,15 +67,13 @@ public:
 	readPrivateKey(
 		const void* pem,
 		size_t size
-		)
-	{
+	) {
 		Bio bio;
 		return bio.createMemBuf(pem, size) && readPrivateKey(bio);
 	}
 
 	bool
-	readPrivateKey(const sl::StringRef& pem)
-	{
+	readPrivateKey(const sl::StringRef& pem) {
 		return readPrivateKey(pem.cp(), pem.getLength());
 	}
 
@@ -92,14 +82,14 @@ public:
 		uint_t keyLength,
 		BIGNUM* publicExponent,
 		BN_GENCB* callback = NULL
-		);
+	);
 
 	bool
 	generate(
 		uint_t keyLength,
 		uint_t publicExponent = RSA_F4,
 		BN_GENCB* callback = NULL
-		);
+	);
 
 	size_t
 	publicEncrypt(
@@ -107,8 +97,7 @@ public:
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
-		)
-	{
+	) {
 		int result = RSA_public_encrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
@@ -119,8 +108,7 @@ public:
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
-		)
-	{
+	) {
 		int result = RSA_private_encrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
@@ -131,8 +119,7 @@ public:
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
-		)
-	{
+	) {
 		int result = RSA_public_decrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
@@ -143,8 +130,7 @@ public:
 		const void* src,
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
-		)
-	{
+	) {
 		int result = RSA_private_decrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
@@ -156,7 +142,7 @@ public:
 		size_t signatureSize,
 		const void* hash,
 		size_t hashSize
-		);
+	);
 
 	bool
 	signHash(
@@ -164,15 +150,14 @@ public:
 		sl::Array<char>* signature,
 		const void* hash,
 		size_t hashSize
-		);
+	);
 
 	sl::Array<char>
 	signHash(
 		int type,
 		const void* hash,
 		size_t hashSize
-		)
-	{
+	) {
 		sl::Array<char> signature;
 		signHash(type, &signature, hash, hashSize);
 		return signature;
@@ -183,8 +168,7 @@ public:
 		sl::Array<char>* signature,
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		char hash[MD5_DIGEST_LENGTH];
 		MD5((const uchar_t*) p, size, (uchar_t*)hash);
 		return signHash(NID_md5, signature, hash, sizeof(hash));
@@ -194,8 +178,7 @@ public:
 	sign(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		sl::Array<char> signature;
 		sign(&signature, p, size);
 		return signature;
@@ -208,8 +191,7 @@ public:
 		size_t hashSize,
 		const void* signature,
 		size_t signatureSize
-		)
-	{
+	) {
 		return RSA_verify(
 			type,
 			(const uchar_t*) hash,
@@ -217,7 +199,7 @@ public:
 			(const uchar_t*) signature,
 			(int)signatureSize,
 			m_h
-			) == 1;
+		) == 1;
 	}
 
 	bool
@@ -226,8 +208,7 @@ public:
 		size_t size,
 		const void* signature,
 		size_t signatureSize
-		)
-	{
+	) {
 		char hash[MD5_DIGEST_LENGTH];
 		MD5((const uchar_t*) p, size, (uchar_t*)hash);
 		return verifyHash(NID_md5, hash, sizeof(hash), signature, signatureSize);

@@ -26,7 +26,7 @@ memMem(
 	size_t size1,
 	const void* p2,
 	size_t size2
-	);
+);
 
 inline
 void*
@@ -35,8 +35,7 @@ memMem(
 	size_t size1,
 	const void* p2,
 	size_t size2
-	)
-{
+) {
 	return (void*)memMem((const void*) p1, size1, p2, size2);
 }
 
@@ -46,7 +45,7 @@ reverseMemMem(
 	size_t size1,
 	const void* p2,
 	size_t size2
-	);
+);
 
 inline
 void*
@@ -55,8 +54,7 @@ reverseMemMem(
 	size_t size1,
 	const void* p2,
 	size_t size2
-	)
-{
+) {
 	return (void*)reverseMemMem((const void*) p1, size1, p2, size2);
 }
 

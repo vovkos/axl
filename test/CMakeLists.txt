@@ -13,17 +13,17 @@ option(
 	BUILD_AXL_TESTS
 	"Build AXL tests"
 	ON
-	)
+)
 
 if(NOT BUILD_AXL_TESTS)
 	return()
 endif()
-	
+
 option(
 	BUILD_AXL_TEST_AUTO
 	"Build axl_test_auto(misc automated tests - smoke, unit, integration etc)"
 	ON
-	)
+)
 
 if(BUILD_AXL_TEST_AUTO)
 	add_subdirectory(axl_test_auto)
@@ -36,7 +36,7 @@ if(${QT_FOUND})
 		BUILD_AXL_TEST_QT
 		"Build axl_test_qt(QT GUI general-purpose testig app)"
 		ON
-		)
+	)
 
 	if(BUILD_AXL_TEST_QT)
 		add_subdirectory(axl_test_qt)

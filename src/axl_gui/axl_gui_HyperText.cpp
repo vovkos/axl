@@ -20,8 +20,7 @@ namespace gui {
 //..............................................................................
 
 void
-HyperText::clear()
-{
+HyperText::clear() {
 	m_source.clear();
 	m_text.clear();
 	m_attrArray.clear();
@@ -30,15 +29,13 @@ HyperText::clear()
 }
 
 size_t
-HyperText::backspace(size_t backLength)
-{
+HyperText::backspace(size_t backLength) {
 	// don't touch m_Source!
 
 	// TODO: backspace attributes and hyperlinks
 
 	size_t length = m_text.getLength();
-	if (backLength >= length)
-	{
+	if (backLength >= length) {
 		m_text.clear();
 		return 0;
 	}
@@ -48,11 +45,9 @@ HyperText::backspace(size_t backLength)
 }
 
 size_t
-HyperText::appendPlainText(const sl::StringRef& text)
-{
+HyperText::appendPlainText(const sl::StringRef& text) {
 	size_t i = text.reverseFind('\x15'); // Ctrl+U -- clear
-	if (i != -1)
-	{
+	if (i != -1) {
 		clear();
 		return appendPlainText(text.getSubString(i + 1));
 	}
@@ -65,10 +60,8 @@ size_t
 HyperText::appendChar(
 	utf32_t c,
 	size_t count
-	)
-{
-	if (c == 0x15) // Ctrl+U -- clear
-	{
+) {
+	if (c == 0x15) { // Ctrl+U -- clear
 		clear();
 		return 0;
 	}
@@ -81,11 +74,9 @@ size_t
 HyperText::appendHyperText(
 	const TextAttr& baseAttr,
 	const sl::StringRef& text
-	)
-{
+) {
 	size_t i = text.reverseFind('\x15'); // Ctrl+U -- clear
-	if (i != -1)
-	{
+	if (i != -1) {
 		clear();
 		return appendHyperText(baseAttr, text.getSubString(i + 1));
 	}
@@ -100,8 +91,7 @@ HyperText::appendHyperText(
 
 	m_source.append(text);
 
-	for (;;)
-	{
+	for (;;) {
 		const char* token = p;
 		while (token < end && *token != 0x1b)
 			token++;
@@ -112,8 +102,7 @@ HyperText::appendHyperText(
 		if (p + 1 >= end)
 			break;
 
-		if (*p == '^') // hyperlink
-		{
+		if (*p == '^') { // hyperlink
 			p++;
 
 			const char* arg = p;
@@ -129,9 +118,7 @@ HyperText::appendHyperText(
 				p += 2;
 
 			m_hyperlinkArray.openHyperlink(textLength, sl::StringRef(arg, argEnd - arg));
-		}
-		else if (*p == '[') // CSI
-		{
+		} else if (*p == '[') { // CSI
 			p++;
 
 			const char* arg = p;
@@ -142,8 +129,7 @@ HyperText::appendHyperText(
 			if (p >= end)
 				break;
 
-			switch (*p)
-			{
+			switch (*p) {
 			case 'm':
 				m_hyperlinkArray.closeHyperlink(textLength);
 				m_attrArray.setAttr(lastLength, textLength, attr);
@@ -152,7 +138,7 @@ HyperText::appendHyperText(
 					&attr,
 					baseAttr,
 					sl::StringRef(arg, argEnd - arg)
-					);
+				);
 				break;
 
 			case 'D':
@@ -174,31 +160,25 @@ HyperText::appendHyperText(
 }
 
 const HyperlinkAnchor*
-HyperText::findHyperlinkByX(int x) const
-{
+HyperText::findHyperlinkByX(int x) const {
 	const HyperlinkAnchor* result = NULL;
 
 	size_t begin = 0;
 	size_t end = m_hyperlinkXMap.getCount();
 
-	while (begin < end)
-	{
+	while (begin < end) {
 		size_t mid = (begin + end) / 2;
 
 		const HyperlinkXMapEntry* mapEntry = &m_hyperlinkXMap[mid];
-		if (mapEntry->m_x == x)
-		{
+		if (mapEntry->m_x == x) {
 			result = mapEntry->m_anchor;
 			break;
 		}
 
-		if (mapEntry->m_x < x)
-		{
+		if (mapEntry->m_x < x) {
 			result = mapEntry->m_anchor;
 			begin = mid + 1;
-		}
-		else
-		{
+		} else {
 			end = mid;
 		}
 	}
@@ -207,8 +187,7 @@ HyperText::findHyperlinkByX(int x) const
 }
 
 const HyperlinkAnchor*
-HyperText::findHyperlinkByOffset(size_t offset) const
-{
+HyperText::findHyperlinkByOffset(size_t offset) const {
 	if (offset >= m_text.getLength())
 		return NULL;
 
@@ -217,8 +196,7 @@ HyperText::findHyperlinkByOffset(size_t offset) const
 }
 
 void
-HyperText::calcHyperlinkXMap(Widget* widget)
-{
+HyperText::calcHyperlinkXMap(Widget* widget) {
 	Engine* engine = widget->m_widgetDriver.getEngine();
 	Font* baseFont = widget->m_widgetDriver.getFont();
 
@@ -238,13 +216,11 @@ HyperText::calcHyperlinkXMap(Widget* widget)
 	hyperlinkXMapEntry = m_hyperlinkXMap;
 
 	sl::ConstIterator<HyperlinkAnchor> it = m_hyperlinkArray.getHead();
-	for (; it; it++)
-	{
+	for (; it; it++) {
 		const HyperlinkAnchor* hyperlinkAnchor = *it;
 		Size size;
 
-		for (; attrAnchor < attrEnd && attrAnchor->m_offset < hyperlinkAnchor->m_offset; attrAnchor++)
-		{
+		for (; attrAnchor < attrEnd && attrAnchor->m_offset < hyperlinkAnchor->m_offset; attrAnchor++) {
 			if (attrAnchor->m_attr.m_fontFlags == fontFlags)
 				continue;
 
@@ -252,7 +228,7 @@ HyperText::calcHyperlinkXMap(Widget* widget)
 				font,
 				widget,
 				m_text.getSubString(offset, attrAnchor->m_offset - offset)
-				);
+			);
 
 			x += size.m_width;
 			offset = attrAnchor->m_offset;
@@ -265,7 +241,7 @@ HyperText::calcHyperlinkXMap(Widget* widget)
 			font,
 			widget,
 			m_text.getSubString(offset, hyperlinkAnchor->m_offset - offset)
-			);
+		);
 
 		x += size.m_width;
 		offset = hyperlinkAnchor->m_offset;
@@ -279,8 +255,7 @@ HyperText::calcHyperlinkXMap(Widget* widget)
 }
 
 Size
-HyperText::calcTextSize(Widget* widget) const
-{
+HyperText::calcTextSize(Widget* widget) const {
 	Engine* engine = widget->m_widgetDriver.getEngine();
 	Font* baseFont = widget->m_widgetDriver.getFont();
 
@@ -294,8 +269,7 @@ HyperText::calcTextSize(Widget* widget) const
 	uint_t fontFlags = 0;
 	Font* font = baseFont->getFontMod(fontFlags);
 
-	for (size_t i = 0; i < attrCount; i++)
-	{
+	for (size_t i = 0; i < attrCount; i++) {
 		const TextAttrAnchor* attrAnchor = &m_attrArray[i];
 
 		if (attrAnchor->m_attr.m_fontFlags == fontFlags)
@@ -305,7 +279,7 @@ HyperText::calcTextSize(Widget* widget) const
 			font,
 			widget,
 			m_text.getSubString(offset, attrAnchor->m_offset - offset)
-			);
+		);
 
 		x += size.m_width;
 		offset = attrAnchor->m_offset;
@@ -318,7 +292,7 @@ HyperText::calcTextSize(Widget* widget) const
 		font,
 		widget,
 		m_text.getSubString(offset, length - offset)
-		);
+	);
 
 	size.m_width += x;
 

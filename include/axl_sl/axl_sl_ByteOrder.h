@@ -22,8 +22,7 @@ namespace sl {
 
 inline
 uint16_t
-swapByteOrder16(uint16_t value)
-{
+swapByteOrder16(uint16_t value) {
 #if (_AXL_CPP_MSC)
 	return _byteswap_ushort(value);
 #elif (_AXL_OS_DARWIN)
@@ -35,8 +34,7 @@ swapByteOrder16(uint16_t value)
 
 inline
 uint32_t
-swapByteOrder32(uint32_t value)
-{
+swapByteOrder32(uint32_t value) {
 #if (_AXL_CPP_MSC)
 	return _byteswap_ulong(value);
 #elif (_AXL_OS_DARWIN)
@@ -48,8 +46,7 @@ swapByteOrder32(uint32_t value)
 
 inline
 uint64_t
-swapByteOrder64(uint64_t value)
-{
+swapByteOrder64(uint64_t value) {
 #if (_AXL_CPP_MSC)
 	return _byteswap_uint64(value);
 #elif (_AXL_OS_DARWIN)
@@ -67,10 +64,8 @@ swapByteOrder(
 	void* dst,
 	const void* src,
 	size_t size
-	)
-{
-	switch (size)
-	{
+) {
+	switch (size) {
 	case 2:
 		*(uint16_t*)dst = swapByteOrder16(*(uint16_t*)  src);
 		break;
@@ -93,8 +88,7 @@ void
 swapByteOrder(
 	void* p,
 	size_t size
-	)
-{
+) {
 	swapByteOrder(p, p, size);
 }
 

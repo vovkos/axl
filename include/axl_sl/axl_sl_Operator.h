@@ -23,69 +23,56 @@ namespace sl {
 // cast operators
 
 template <typename T>
-class True
-{
+class True {
 public:
 	T
-	operator () () const
-	{
+	operator () () const {
 		return true;
 	}
 };
 
 template <typename T>
-class False
-{
+class False {
 public:
 	T
-	operator () () const
-	{
+	operator () () const {
 		return false;
 	}
 };
 
 template <typename T>
-class Zero
-{
+class Zero {
 public:
 	T
-	operator () () const
-	{
+	operator () () const {
 		return 0;
 	}
 };
 
 template <typename T>
-class MinusOne
-{
+class MinusOne {
 public:
 	T
-	operator () () const
-	{
+	operator () () const {
 		return (T) -1;
 	}
 };
 
 template <typename T>
-class Void
-{
+class Void {
 public:
 	void
-	operator () (T x) const
-	{
-	}
+	operator () (T x) const {}
 };
 
 template <
 	typename A,
 	typename B
-	>
-class ImplicitCast
-{
+>
+class ImplicitCast {
 public:
 	B
-	operator () (A x) const
-	{
+	operator () (A x) const {
 		return x;
 	}
 };
@@ -93,13 +80,11 @@ public:
 template <
 	typename A,
 	typename B
-	>
-class ExplicitCast
-{
+>
+class ExplicitCast {
 public:
 	B
-	operator () (A x) const
-	{
+	operator () (A x) const {
 		return (B)x;
 	}
 };
@@ -107,19 +92,16 @@ public:
 template <
 	typename A,
 	typename B
-	>
-class ImplicitPtrCast
-{
+>
+class ImplicitPtrCast {
 public:
 	B*
-	operator () (A* x) const
-	{
+	operator () (A* x) const {
 		return x;
 	}
 
 	const B*
-	operator () (const A* x) const
-	{
+	operator () (const A* x) const {
 		return x;
 	}
 };
@@ -127,19 +109,16 @@ public:
 template <
 	typename A,
 	typename B
-	>
-class ExplicitPtrCast
-{
+>
+class ExplicitPtrCast {
 public:
 	B*
-	operator () (A* x) const
-	{
+	operator () (A* x) const {
 		return (B*)x;
 	}
 
 	const B*
-	operator () (const A* x) const
-	{
+	operator () (const A* x) const {
 		return (const B*) x;
 	}
 };
@@ -149,54 +128,45 @@ public:
 // sizeof & offsetof operators
 
 template <typename T>
-class SizeOf
-{
+class SizeOf {
 public:
 	size_t
-	operator () () const
-	{
+	operator () () const {
 		return sizeof(T);
 	}
 
 	size_t
-	operator () (const T* x) const
-	{
+	operator () (const T* x) const {
 		return sizeof(T);
 	}
 
 	size_t
-	operator () (const T& x) const
-	{
+	operator () (const T& x) const {
 		return sizeof(T);
 	}
 };
 
 template <typename T>
-class SizeOfNoReusableTailPadding
-{
+class SizeOfNoReusableTailPadding {
 protected:
-	struct Calc
-	{
+	struct Calc {
 		T m_a;
 		char m_b; // this field might be allocated in T's tail-padding
 	};
 
 public:
 	size_t
-	operator () () const
-	{
+	operator () () const {
 		return offsetof(Calc, m_b);
 	}
 
 	size_t
-	operator () (const T* x) const
-	{
+	operator () (const T* x) const {
 		return offsetof(Calc, m_b);
 	}
 
 	size_t
-	operator () (const T& x) const
-	{
+	operator () (const T& x) const {
 		return offsetof(Calc, m_b);
 	}
 };
@@ -204,13 +174,11 @@ public:
 template <
 	typename C,
 	typename B
-	>
-class OffsetOf
-{
+>
+class OffsetOf {
 public:
 	size_t
-	operator () () const
-	{
+	operator () () const {
 		B* p = (C*) 1;
 		return (size_t)p - 1;
 	}
@@ -224,13 +192,11 @@ template <
 	typename A,
 	typename B,
 	size_t offset
-	>
-class Offset
-{
+>
+class Offset {
 public:
 	B*
-	operator () (A* p) const
-	{
+	operator () (A* p) const {
 		return (B*)((uchar_t*)p + offset);
 	}
 };
@@ -240,12 +206,10 @@ public:
 // no-op (identity)
 
 template <typename T>
-class NoOp
-{
+class NoOp {
 public:
 	T
-	operator () (T a) const
-	{
+	operator () (T a) const {
 		return a;
 	}
 };
@@ -257,13 +221,11 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Minus
-{
+>
+class Minus {
 public:
 	T
-	operator () (Arg a) const
-	{
+	operator () (Arg a) const {
 		return -a;
 	}
 };
@@ -271,13 +233,11 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Not
-{
+>
+class Not {
 public:
 	T
-	operator () (Arg a) const
-	{
+	operator () (Arg a) const {
 		return ~a;
 	}
 };
@@ -285,16 +245,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Add
-{
+>
+class Add {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a + b;
 	}
 };
@@ -302,16 +260,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Sub
-{
+>
+class Sub {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a - b;
 	}
 };
@@ -319,16 +275,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Mul
-{
+>
+class Mul {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a * b;
 	}
 };
@@ -336,16 +290,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Div
-{
+>
+class Div {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a / b;
 	}
 };
@@ -353,16 +305,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Mod
-{
+>
+class Mod {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a % b;
 	}
 };
@@ -370,16 +320,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Shl
-{
+>
+class Shl {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a << b;
 	}
 };
@@ -387,16 +335,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Shr
-{
+>
+class Shr {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a >> b;
 	}
 };
@@ -404,16 +350,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class And
-{
+>
+class And {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a & b;
 	}
 };
@@ -421,16 +365,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Xor
-{
+>
+class Xor {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a ^ b;
 	}
 };
@@ -438,16 +380,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Or
-{
+>
+class Or {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a | b;
 	}
 };
@@ -455,16 +395,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Min
-{
+>
+class Min {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a < b ? a : b;
 	}
 };
@@ -472,16 +410,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Max
-{
+>
+class Max {
 public:
 	T
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a > b ? a : b;
 	}
 };
@@ -493,16 +429,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Eq
-{
+>
+class Eq {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a == b;
 	}
 };
@@ -512,16 +446,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class EqBin
-{
+>
+class EqBin {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return memcmp(&a, &b, sizeof(T)) == 0;
 	}
 };
@@ -531,16 +463,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class EqDuckType
-{
+>
+class EqDuckType {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a.isEqual(b);
 	}
 
@@ -548,8 +478,7 @@ public:
 	operator () (
 		const T* a,
 		const T* b
-		) const
-	{
+	) const {
 		return a->isEqual(*b);
 	}
 };
@@ -557,15 +486,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class EqDuckTypePtr
-{
+class EqDuckTypePtr {
 public:
 	bool
 	operator () (
 		const T& a,
 		const T& b
-		) const
-	{
+	) const {
 		return a.isEqual(b);
 	}
 
@@ -573,8 +500,7 @@ public:
 	operator () (
 		const T* a,
 		const T* b
-		) const
-	{
+	) const {
 		return a->isEqual(b);
 	}
 };
@@ -584,16 +510,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Ne
-{
+>
+class Ne {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a != b;
 	}
 };
@@ -603,16 +527,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Lt
-{
+>
+class Lt {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a < b;
 	}
 };
@@ -622,16 +544,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Gt
-{
+>
+class Gt {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a > b;
 	}
 };
@@ -641,16 +561,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Le
-{
+>
+class Le {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a <= b;
 	}
 };
@@ -660,16 +578,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Ge
-{
+>
+class Ge {
 public:
 	bool
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a >= b;
 	}
 };
@@ -681,16 +597,14 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Assign
-{
+>
+class Assign {
 public:
 	void
 	operator () (
 		T& a,
 		Arg b
-		) const
-	{
+	) const {
 		a = b;
 	}
 };
@@ -701,16 +615,14 @@ template <
 	typename Func,
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class OpAssign
-{
+>
+class OpAssign {
 public:
 	void
 	operator () (
 		T& a,
 		Arg b
-		) const
-	{
+	) const {
 		a = Func() (a, b);
 	}
 };

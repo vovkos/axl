@@ -21,8 +21,7 @@ namespace dox {
 //..............................................................................
 
 void
-Parser::init()
-{
+Parser::init() {
 	m_block = NULL;
 	m_parentBlock = NULL;
 	m_blockTargetKind = BlockTargetKind_None;
@@ -31,8 +30,7 @@ Parser::init()
 }
 
 void
-Parser::reset()
-{
+Parser::reset() {
 	init();
 
 	m_firstIndent.clear();
@@ -45,13 +43,10 @@ void
 Parser::setBlockTarget(
 	int tokenKind,
 	const sl::StringRef& name
-	)
-{
-	switch (tokenKind)
-	{
+) {
+	switch (tokenKind) {
 	case TokenKind_Overload:
-		if (m_overloadName == name)
-		{
+		if (m_overloadName == name) {
 			m_overloadIdx++;
 			break;
 		}
@@ -76,14 +71,12 @@ Parser::setBlockTarget(
 }
 
 Block*
-Parser::popBlock()
-{
+Parser::popBlock() {
 	// only pick up unassigned non-group blocks
 
 	Block* doxyBlock = NULL;
 
-	if (m_block && !m_blockTargetKind)
-	{
+	if (m_block && !m_blockTargetKind) {
 		if (m_block->getBlockKind() == BlockKind_Footnote)
 			m_block = ((Footnote*)m_block)->getParent();
 
@@ -94,12 +87,10 @@ Parser::popBlock()
 	m_block = NULL;
 	m_blockTargetKind = BlockTargetKind_None;
 
-	if (!m_groupStack.isEmpty())
-	{
+	if (!m_groupStack.isEmpty()) {
 		GroupStackEntry entry = m_groupStack.getBack();
 
-		if (entry.m_namespace == m_module->getHost()->getCurrentNamespace())
-		{
+		if (entry.m_namespace == m_module->getHost()->getCurrentNamespace()) {
 			if (!doxyBlock)
 				doxyBlock = m_module->createBlock();
 
@@ -117,14 +108,12 @@ Parser::addComment(
 	const lex::LineCol& pos,
 	bool isSingleLine,
 	handle_t lastDeclaredItem
-	)
-{
+) {
 	Host* host = m_module->getHost();
 
 	bool canAppend = isSingleLine && pos.m_line == m_lastPos.m_line + 1;
 
-	if (!m_block || !canAppend)
-	{
+	if (!m_block || !canAppend) {
 		m_block = m_module->createBlock();
 		m_blockTargetKind = BlockTargetKind_None;
 	}
@@ -137,8 +126,7 @@ Parser::addComment(
 	if (isSingleLine)
 		m_lastPos = pos;
 
-	if (lastDeclaredItem)
-	{
+	if (lastDeclaredItem) {
 		host->setItemBlock(lastDeclaredItem, m_block);
 		m_blockTargetKind = BlockTargetKind_Member;
 	}
@@ -149,8 +137,7 @@ Parser::addComment(
 
 	int lastTokenLine = -1;
 
-	for (;;)
-	{
+	for (;;) {
 		const DoxyToken* token = lexer.getToken();
 		Footnote* footnote;
 		Param* param;
@@ -160,8 +147,7 @@ Parser::addComment(
 		sl::StringRef commandParam;
 		bool isParentBlock = false;
 
-		switch (token->m_token)
-		{
+		switch (token->m_token) {
 		case TokenKind_Error:
 			m_block = NULL;
 			m_blockTargetKind = BlockTargetKind_None;
@@ -207,12 +193,9 @@ Parser::addComment(
 				break; // ignore
 
 			i = commandParam.findOneOf(" \t");
-			if (i == -1)
-			{
+			if (i == -1) {
 				m_block = m_module->getGroup(commandParam);
-			}
-			else
-			{
+			} else {
 				Group* group = m_module->getGroup(commandParam.getSubString(0, i));
 				group->m_title = commandParam.getSubString(i + 1).getLeftTrimmedString();
 
@@ -230,12 +213,10 @@ Parser::addComment(
 			if (commandParam.isEmpty())
 				break; // ignore
 
-			if (!m_block->m_group)
-			{
+			if (!m_block->m_group) {
 				Group* group = m_module->getGroup(commandParam);
 				m_block->m_group = group;
-				if (m_block->getBlockKind() == BlockKind_Group)
-				{
+				if (m_block->getBlockKind() == BlockKind_Group) {
 					Group* innerGroup = (Group*)m_block;
 					innerGroup->m_parentGroupListIt = group->addGroup(innerGroup);
 				}
@@ -245,8 +226,7 @@ Parser::addComment(
 			break;
 
 		case TokenKind_OpeningBrace:
-			if (m_block->getBlockKind() == BlockKind_Group)
-			{
+			if (m_block->getBlockKind() == BlockKind_Group) {
 				GroupStackEntry entry;
 				entry.m_group = (Group*)m_block;
 				entry.m_namespace = host->getCurrentNamespace();
@@ -295,13 +275,10 @@ Parser::addComment(
 			if (commandParam.isEmpty())
 				break; // ignore
 
-			if (m_block->getBlockKind() == BlockKind_Footnote)
-			{
+			if (m_block->getBlockKind() == BlockKind_Footnote) {
 				m_block = ((Footnote*)m_block)->getParent();
 				ASSERT(m_block->getBlockKind() != BlockKind_Footnote);
-			}
-			else if (m_block->m_currentDescription->isEmpty() && m_parentBlock)
-			{
+			} else if (m_block->m_currentDescription->isEmpty() && m_parentBlock) {
 				// standalone footnotes go to the parent block
 				m_block = m_parentBlock;
 			}
@@ -339,12 +316,9 @@ Parser::addComment(
 			param = AXL_MEM_NEW(Param);
 
 			i = commandParam.findOneOf(" \t");
-			if (i == -1)
-			{
+			if (i == -1) {
 				param->m_name = commandParam;
-			}
-			else
-			{
+			} else {
 				param->m_name = commandParam.getSubString(0, i);
 				param->m_description = commandParam.getSubString(i + 1).getLeftTrimmedString();
 			}
@@ -375,15 +349,11 @@ Parser::addComment(
 			break;
 
 		case TokenKind_Text:
-			if (m_block->m_currentDescription->isEmpty())
-			{
+			if (m_block->m_currentDescription->isEmpty()) {
 				m_block->m_currentDescription->copy(token->m_data.m_string.getLeftTrimmedString());
 				m_firstIndent = m_indent;
-			}
-			else
-			{
-				if (!m_indent.isEmpty())
-				{
+			} else {
+				if (!m_indent.isEmpty()) {
 					size_t indentLength = m_indent.getLength();
 					size_t firstIndentLength = m_firstIndent.getLength();
 					size_t commonIndentLength = AXL_MIN(indentLength, firstIndentLength);
@@ -411,12 +381,9 @@ Parser::addComment(
 		case '\n':
 			if (lastTokenLine != token->m_pos.m_line &&
 				m_block->m_currentDescription != &m_block->m_detailedDescription &&
-				!m_block->m_currentDescription->isEmpty()) // empty line ends paragraph
-			{
+				!m_block->m_currentDescription->isEmpty()) { // empty line ends paragraph
 				m_block->m_currentDescription = &m_block->m_detailedDescription;
-			}
-			else if (!m_block->m_currentDescription->isEmpty())
-			{
+			} else if (!m_block->m_currentDescription->isEmpty()) {
 				m_block->m_currentDescription->append('\n');
 			}
 

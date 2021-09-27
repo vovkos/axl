@@ -51,27 +51,21 @@ AXL_SELECT_ANY SID g_networkServiceSid = { SID_REVISION, 1, SECURITY_NT_AUTHORIT
 
 //..............................................................................
 
-class SizeOfSid
-{
+class SizeOfSid {
 public:
 	size_t
-	operator () (const SID* sid)
-	{
+	operator () (const SID* sid) {
 		return ::GetLengthSid((PSID)sid);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Sid: public rc::Buf<SID, SizeOfSid>
-{
+class Sid: public rc::Buf<SID, SizeOfSid> {
 public:
-	Sid()
-	{
-	}
+	Sid() {}
 
-	Sid(const SID* sid)
-	{
+	Sid(const SID* sid) {
 		copy(sid);
 	}
 
@@ -79,22 +73,19 @@ public:
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, subAuthorityCount);
 		create_va(identifierAuthority, subAuthorityCount, va);
 	}
 
 	Sid&
-	operator = (const Sid& src)
-	{
+	operator = (const Sid& src) {
 		copy(src);
 		return *this;
 	}
 
 	Sid&
-	operator = (const SID* sid)
-	{
+	operator = (const SID* sid) {
 		copy(sid);
 		return *this;
 	}
@@ -104,8 +95,7 @@ public:
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, subAuthorityCount);
 		return create_va(identifierAuthority, subAuthorityCount, va);
 	}
@@ -115,7 +105,7 @@ public:
 		SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 		size_t subAuthorityCount,
 		axl_va_list va
-		);
+	);
 
 	bool
 	parse(const sl::StringRef& string);
@@ -127,8 +117,7 @@ public:
 	getString(sl::String* string) const;
 
 	sl::String
-	getString() const
-	{
+	getString() const {
 		sl::String string;
 		getString(&string);
 		return string;
@@ -139,21 +128,20 @@ public:
 		const sl::StringRef& systemName,
 		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
-		);
+	);
 
 	bool
 	lookupAccountName(
 		const sl::StringRef_w& systemName,
 		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
-		);
+	);
 
 	bool
 	lookupAccountName(
 		const sl::StringRef& accountName,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		return lookupAccountName(NULL, accountName, sidType);
 	}
 
@@ -161,8 +149,7 @@ public:
 	lookupAccountName(
 		const sl::StringRef_w& accountName,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		return lookupAccountName(NULL, accountName, sidType);
 	}
 
@@ -171,8 +158,7 @@ public:
 		const sl::StringRef& systemName,
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		return lookupAccountSid(systemName, m_p, accountName, sidType);
 	}
 
@@ -180,8 +166,7 @@ public:
 	lookupAccountSid(
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		return lookupAccountSid(NULL, m_p, accountName, sidType);
 	}
 
@@ -189,16 +174,14 @@ public:
 	lookupAccountSid(
 		const sl::StringRef& systemName,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		sl::String accountName;
 		lookupAccountSid(systemName, m_p, &accountName, sidType);
 		return accountName;
 	}
 
 	sl::String
-	lookupAccountSid(SID_NAME_USE* sidType = NULL)
-	{
+	lookupAccountSid(SID_NAME_USE* sidType = NULL) {
 		sl::String accountName;
 		lookupAccountSid(NULL, m_p, &accountName, sidType);
 		return accountName;
@@ -211,7 +194,7 @@ public:
 		const SID* sid,
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
-		);
+	);
 
 	static
 	bool
@@ -219,8 +202,7 @@ public:
 		const SID* sid,
 		sl::String* accountName,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		return lookupAccountSid(NULL, sid, accountName, sidType);
 	}
 
@@ -230,8 +212,7 @@ public:
 		const sl::StringRef& systemName,
 		const SID* sid,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		sl::String accountName;
 		lookupAccountSid(systemName, sid, &accountName, sidType);
 		return accountName;
@@ -242,8 +223,7 @@ public:
 	lookupAccountSid(
 		const SID* sid,
 		SID_NAME_USE* sidType = NULL
-		)
-	{
+	) {
 		return lookupAccountSid(NULL, sid, sidType);
 	}
 };

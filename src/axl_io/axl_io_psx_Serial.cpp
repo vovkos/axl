@@ -20,12 +20,10 @@ namespace psx {
 //..............................................................................
 
 uint_t
-Serial::getStatusLines() const
-{
+Serial::getStatusLines() const {
 	int lines = 0;
 	int result = ::ioctl(m_h, TIOCMGET, &lines);
-	if (result == -1)
-	{
+	if (result == -1) {
 		err::setLastSystemError();
 		return -1;
 	}
@@ -34,24 +32,21 @@ Serial::getStatusLines() const
 }
 
 bool
-Serial::setDtr(bool isSet)
-{
+Serial::setDtr(bool isSet) {
 	int lines = TIOCM_DTR;
 	int result = ::ioctl(m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
 	return err::complete(result != -1);
 }
 
 bool
-Serial::setRts(bool isSet)
-{
+Serial::setRts(bool isSet) {
 	int lines = TIOCM_RTS;
 	int result = ::ioctl(m_h, isSet ? TIOCMBIS : TIOCMBIC, &lines);
 	return err::complete(result != -1);
 }
 
 bool
-Serial::setBreakCondition(bool isSet)
-{
+Serial::setBreakCondition(bool isSet) {
 	int result = ::ioctl(m_h, isSet ? TIOCSBRK : TIOCCBRK);
 	return err::complete(result != -1);
 }

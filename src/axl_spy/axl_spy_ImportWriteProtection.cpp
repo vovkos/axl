@@ -13,8 +13,7 @@
 // we use undocumented fields in the link map; it's a bit hackish, but
 // there's no clean way of mapping module handle to Elf headers anyway
 
-struct link_map_full: link_map
-{
+struct link_map_full: link_map {
 	link_map* l_real;
 	Lmid_t l_ns;
 	struct libname_list* l_libname;
@@ -51,8 +50,7 @@ bool
 disableImportWriteProtection(
 	void* module,
 	ImportWriteProtectionBackup* backup
-	)
-{
+) {
 	if (!module)
 		module = ::GetModuleHandle(NULL);
 
@@ -76,21 +74,19 @@ disableImportWriteProtection(
 		backup->m_size,
 		PAGE_EXECUTE_READWRITE,
 		(DWORD*)&backup->m_oldProtection
-		) != 0;
+	) != 0;
 }
 
 bool
 disableImportWriteProtection(
 	const ModuleIterator& moduleIterator,
 	ImportWriteProtectionBackup* backup
-	)
-{
+) {
 	return disableImportWriteProtection(moduleIterator.getModule(), backup);
 }
 
 bool
-restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
-{
+restoreImportWriteProtection(const ImportWriteProtectionBackup* backup) {
 	DWORD oldProtect;
 
 	return ::VirtualProtect(
@@ -98,7 +94,7 @@ restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
 		backup->m_size,
 		backup->m_oldProtection,
 		&oldProtect
-		) != 0;
+	) != 0;
 }
 
 #elif (_AXL_OS_LINUX)
@@ -107,13 +103,11 @@ bool
 disableImportWriteProtection(
 	void* module,
 	ImportWriteProtectionBackup* backup
-	)
-{
+) {
 	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
 
 	link_map_full* linkMap = (link_map_full*)module;
-	for (size_t i = 0; i < linkMap->l_phnum; i++)
-	{
+	for (size_t i = 0; i < linkMap->l_phnum; i++) {
 		const ElfW(Phdr)* phdr = &linkMap->l_phdr[i];
 		if (phdr->p_type != PT_GNU_RELRO) // read-only-after-relocation (contains GOT)
 			continue;
@@ -144,14 +138,12 @@ bool
 disableImportWriteProtection(
 	const ModuleIterator& moduleIterator,
 	ImportWriteProtectionBackup* backup
-	)
-{
+) {
 	return disableImportWriteProtection(moduleIterator.getModule(), backup);
 }
 
 bool
-restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
-{
+restoreImportWriteProtection(const ImportWriteProtectionBackup* backup) {
 	if (!backup->m_p) // nothing to restore
 		return true;
 
@@ -178,8 +170,7 @@ bool
 disableImportWriteProtection(
 	void* module,
 	ImportWriteProtectionBackup* backup
-	)
-{
+) {
 	return true;
 }
 
@@ -187,14 +178,12 @@ bool
 disableImportWriteProtection(
 	const ModuleIterator& moduleIterator,
 	ImportWriteProtectionBackup* backup
-	)
-{
+) {
 	return true;
 }
 
 bool
-restoreImportWriteProtection(const ImportWriteProtectionBackup* backup)
-{
+restoreImportWriteProtection(const ImportWriteProtectionBackup* backup) {
 	return true;
 }
 

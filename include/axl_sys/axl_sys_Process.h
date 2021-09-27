@@ -28,8 +28,7 @@ namespace sys {
 
 inline
 uint_t
-getCurrentProcessId()
-{
+getCurrentProcessId() {
 #if (_AXL_OS_WIN)
 	return ::GetCurrentProcessId();
 #else
@@ -39,8 +38,7 @@ getCurrentProcessId()
 
 inline
 bool
-createProcess(const sl::StringRef& commandLine)
-{
+createProcess(const sl::StringRef& commandLine) {
 #if (_AXL_OS_WIN)
 	HINSTANCE hProcess = ::ShellExecuteW(0, L"open", sl::String_w (commandLine), 0, 0, SW_SHOWNORMAL);
 	return err::complete(hProcess != NULL);
@@ -52,8 +50,7 @@ createProcess(const sl::StringRef& commandLine)
 
 inline
 sl::String
-getProcessImageName(uint_t pid)
-{
+getProcessImageName(uint_t pid) {
 #if (_AXL_OS_WIN)
 	return sys::win::getProcessImageName(pid);
 #elif (_AXL_OS_POSIX)

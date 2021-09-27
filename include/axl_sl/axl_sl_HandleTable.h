@@ -23,50 +23,39 @@ namespace sl {
 template <
 	typename Key,
 	typename Value
-	>
-class HandleTableIteratorBase: public Iterator<HashTableEntry<Key, Value> >
-{
+>
+class HandleTableIteratorBase: public Iterator<HashTableEntry<Key, Value> > {
 };
 
 template <
 	typename Key,
 	typename Value
-	>
-class ConstHandleTableIteratorBase: public ConstIterator<HashTableEntry<Key, Value> >
-{
+>
+class ConstHandleTableIteratorBase: public ConstIterator<HashTableEntry<Key, Value> > {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class HandleTableIterator: public HandleTableIteratorBase<uintptr_t, T>
-{
+class HandleTableIterator: public HandleTableIteratorBase<uintptr_t, T> {
 public:
-	HandleTableIterator()
-	{
-	}
+	HandleTableIterator() {}
 
-	HandleTableIterator(const Iterator<HashTableEntry<uintptr_t, T> >& src)
-	{
+	HandleTableIterator(const Iterator<HashTableEntry<uintptr_t, T> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 template <typename T>
-class ConstHandleTableIterator: public ConstHandleTableIteratorBase<uintptr_t, T>
-{
+class ConstHandleTableIterator: public ConstHandleTableIteratorBase<uintptr_t, T> {
 public:
-	ConstHandleTableIterator()
-	{
-	}
+	ConstHandleTableIterator() {}
 
-	ConstHandleTableIterator(const Iterator<HashTableEntry<uintptr_t, T> >& src)
-	{
+	ConstHandleTableIterator(const Iterator<HashTableEntry<uintptr_t, T> >& src) {
 		this->m_p = src.getEntry();
 	}
 
-	ConstHandleTableIterator(const ConstIterator<HashTableEntry<uintptr_t, T> >& src)
-	{
+	ConstHandleTableIterator(const ConstIterator<HashTableEntry<uintptr_t, T> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
@@ -77,7 +66,7 @@ template <
 	typename Key,
 	typename Value,
 	typename ValueArg = typename ArgType<Value>::Type
-	>
+>
 class HandleTableBase: public HashTable<
 	Key,
 	Value,
@@ -85,27 +74,23 @@ class HandleTableBase: public HashTable<
 	Eq<Key>,
 	Key,
 	ValueArg
-	>
-{
+> {
 protected:
 	Key m_seed;
 
 public:
-	HandleTableBase(Key seed = 1)
-	{
+	HandleTableBase(Key seed = 1) {
 		m_seed = seed;
 	}
 
 	void
-	reset(Key seed = 1)
-	{
+	reset(Key seed = 1) {
 		this->clear();
 		m_seed = seed;
 	}
 
 	Key
-	add(ValueArg value)
-	{
+	add(ValueArg value) {
 		return add(m_seed, value);
 	}
 
@@ -113,10 +98,8 @@ public:
 	add(
 		Key key,
 		ValueArg value
-		)
-	{
-		for (;;)
-		{
+	) {
+		for (;;) {
 			if (!key)
 				key = 1; // never 0
 
@@ -139,14 +122,11 @@ public:
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class HandleTable: public HandleTableBase<uintptr_t, T, Arg>
-{
+>
+class HandleTable: public HandleTableBase<uintptr_t, T, Arg> {
 public:
 	HandleTable(uintptr_t seed = 1):
-		HandleTableBase<uintptr_t, T, Arg> (seed)
-	{
-	}
+		HandleTableBase<uintptr_t, T, Arg> (seed) {}
 };
 
 //..............................................................................

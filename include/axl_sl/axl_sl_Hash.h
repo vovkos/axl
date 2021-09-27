@@ -22,8 +22,7 @@ namespace sl {
 
 inline
 size_t
-djb2()
-{
+djb2() {
 	return 5381;
 }
 
@@ -33,8 +32,7 @@ djb2(
 	size_t hash,
 	const void* p0,
 	size_t size
-	)
-{
+) {
 	const uchar_t* p = (const uchar_t*) p0;
 	const uchar_t* end = p + size;
 
@@ -49,8 +47,7 @@ size_t
 djb2(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	return djb2(5381, p, size);
 }
 
@@ -65,11 +62,9 @@ djb2_op(
 	size_t hash,
 	const utf8_t* p,
 	size_t length
-	)
-{
+) {
 	const utf8_t* end = p + length;
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		utf8_t c = op(*p);
 		hash = ((hash << 5) + hash) + c;
 	}
@@ -84,11 +79,9 @@ djb2_op(
 	size_t hash,
 	const utf16_t* p,
 	size_t length
-	)
-{
+) {
 	const utf16_t* end = p + length;
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		utf16_t c = op(*p);
 		hash = ((hash << 5) + hash) + c & 0xff;
 		hash = ((hash << 5) + hash) + (c >> 8) & 0xff;
@@ -104,11 +97,9 @@ djb2_op(
 	size_t hash,
 	const utf32_t* p,
 	size_t length
-	)
-{
+) {
 	const utf32_t* end = p + length;
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		utf32_t c = op(*p);
 		hash = ((hash << 5) + hash) + c & 0xff;
 		hash = ((hash << 5) + hash) + (c >> 8) & 0xff;
@@ -122,18 +113,16 @@ djb2_op(
 template <
 	typename T,
 	typename O
-	>
+>
 size_t
 djb2_op(
 	O op,
 	size_t hash,
 	const T* p,
 	size_t length
-	)
-{
+) {
 	const T* end = p + length;
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		T c = op(*p);
 		hash = djb2(hash, &c, sizeof(c));
 	}
@@ -144,14 +133,13 @@ djb2_op(
 template <
 	typename T,
 	typename O
-	>
+>
 size_t
 djb2_op(
 	O op,
 	const T* p,
 	size_t length
-	)
-{
+) {
 	return djb2_op(op, 5381, p, length);
 }
 
@@ -161,23 +149,20 @@ uint16_t
 checksum16(
 	const void* p,
 	size_t size
-	);
+);
 
 //..............................................................................
 
 template <typename T>
-class HashDjb2
-{
+class HashDjb2 {
 public:
 	size_t
-	operator () (const T* key) const
-	{
+	operator () (const T* key) const {
 		return djb2(key, sizeof(T));
 	}
 
 	size_t
-	operator () (const T& key) const
-	{
+	operator () (const T& key) const {
 		return djb2(&key, sizeof(T));
 	}
 };
@@ -185,18 +170,15 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class HashChecksum16
-{
+class HashChecksum16 {
 public:
 	size_t
-	operator () (const T* key) const
-	{
+	operator () (const T* key) const {
 		return checksum16(key, sizeof(T));
 	}
 
 	size_t
-	operator () (const T& key) const
-	{
+	operator () (const T& key) const {
 		return checksum16(&key, sizeof(T));
 	}
 };
@@ -204,12 +186,10 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class HashId
-{
+class HashId {
 public:
 	size_t
-	operator () (T key) const
-	{
+	operator () (T key) const {
 		return (size_t)key;
 	}
 };
@@ -219,16 +199,14 @@ public:
 template <
 	typename T,
 	typename H
-	>
-class HashPtr
-{
+>
+class HashPtr {
 public:
 	size_t
 	operator () (
 		const T* a,
 		const T* b
-		) const
-	{
+	) const {
 		return H() (*a, *b);
 	}
 };
@@ -236,19 +214,16 @@ public:
 //..............................................................................
 
 template <typename T>
-class HashSzBase
-{
+class HashSzBase {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class HashSzBase<char>
-{
+class HashSzBase<char> {
 public:
 	size_t
-	operator () (const char* p) const
-	{
+	operator () (const char* p) const {
 		return djb2(p, strlen_s(p));
 	}
 };
@@ -256,12 +231,10 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class HashSzBase<wchar_t>
-{
+class HashSzBase<wchar_t> {
 public:
 	size_t
-	operator () (const wchar_t* p) const
-	{
+	operator () (const wchar_t* p) const {
 		return djb2(p, wcslen_s(p)* sizeof(wchar_t));
 	}
 };
@@ -277,19 +250,16 @@ typedef HashSzBase<utf32_t> HashSz_utf32;
 //..............................................................................
 
 template <typename T>
-class HashSzBase_i
-{
+class HashSzBase_i {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class HashSzBase_i<char>
-{
+class HashSzBase_i<char> {
 public:
 	size_t
-	operator () (const char* p) const
-	{
+	operator () (const char* p) const {
 		return djb2_op(tolower, p, strlen_s(p));
 	}
 };
@@ -297,12 +267,10 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class HashSzBase_i<wchar_t>
-{
+class HashSzBase_i<wchar_t> {
 public:
 	size_t
-	operator () (const wchar_t* p) const
-	{
+	operator () (const wchar_t* p) const {
 		return djb2_op(towlower, p, wcslen_s(p)* sizeof(wchar_t));
 	}
 };
@@ -320,19 +288,16 @@ typedef HashSzBase_i<utf32_t> HashSz_i_utf32;
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class HashDuckType
-{
+>
+class HashDuckType {
 public:
 	size_t
-	operator () (Arg a) const
-	{
+	operator () (Arg a) const {
 		return a.hash();
 	}
 
 	size_t
-	operator () (const T* a) const
-	{
+	operator () (const T* a) const {
 		return a->hash();
 	}
 };

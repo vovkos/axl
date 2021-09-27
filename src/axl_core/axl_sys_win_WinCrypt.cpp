@@ -33,8 +33,7 @@ cryptQueryObjectFile(
 	HCERTSTORE* certStore,
 	HCRYPTMSG* cryptMsg,
 	const void** context
-	)
-{
+) {
 	bool_t result = ::CryptQueryObject(
 		CERT_QUERY_OBJECT_FILE,
 		fileName.sz(),
@@ -47,7 +46,7 @@ cryptQueryObjectFile(
 		certStore,
 		cryptMsg,
 		context
-		);
+	);
 
 	return err::complete(result);
 }
@@ -63,8 +62,7 @@ cryptDecodeObject(
 	const void* p,
 	size_t size,
 	dword_t flags
-	)
-{
+) {
 	dword_t resultSize = buffer ? bufferSize : 0;
 
 	bool_t result = ::CryptDecodeObject(
@@ -75,7 +73,7 @@ cryptDecodeObject(
 		flags,
 		buffer,
 		&resultSize
-		);
+	);
 
 	if (!result)
 		return err::failWithLastSystemError<size_t>(-1);
@@ -91,8 +89,7 @@ cryptDecodeObject(
 	const void* p,
 	size_t size,
 	dword_t flags
-	)
-{
+) {
 	size_t resultSize = cryptDecodeObject(NULL, 0, encodingType, oid, p, size, flags);
 	if (resultSize == -1)
 		return -1;

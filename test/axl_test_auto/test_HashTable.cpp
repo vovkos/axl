@@ -16,13 +16,11 @@ namespace {
 
 //..............................................................................
 
-void test_IntHashTable()
-{
+void test_IntHashTable() {
 	sl::SimpleHashTable<int, int> map;
 	sl::HashTableIterator<int, int> it;
 
-	for (size_t i = 0; i < 50; i++)
-	{
+	for (size_t i = 0; i < 50; i++) {
 		int key = rand() % 50;
 		it = map.visit(key);
 		if (it->m_value)
@@ -37,16 +35,12 @@ void test_IntHashTable()
 
 	printf(".........\n");
 
-	for (size_t i = 0; i < 50; i++)
-	{
+	for (size_t i = 0; i < 50; i++) {
 		int key = rand() % 50;
 		it = map.find(key);
-		if (!it)
-		{
+		if (!it) {
 			printf("%d not found\n", key);
-		}
-		else
-		{
+		} else {
 			printf("%d = %d\n", key, it->m_value);
 			ASSERT(it->m_value == key * 10);
 		}
@@ -55,10 +49,8 @@ void test_IntHashTable()
 	printf(".........\n");
 }
 
-void test_StringHashTableIgnoreCase()
-{
-	static char stringTable[][80] =
-	{
+void test_StringHashTableIgnoreCase() {
+	static char stringTable[][80] = {
 		"Multi-function",      // LIBUSB_CLASS_PER_INTERFACE = 0,
 		"Audio",               // LIBUSB_CLASS_AUDIO = 1,
 		"Communication",       // LIBUSB_CLASS_COMM = 2,
@@ -81,8 +73,7 @@ void test_StringHashTableIgnoreCase()
 	sl::StringHashTableIgnoreCase_pcp<int> map_pcp;
 
 	sl::StringHashTableIterator<int> it;
-	for (size_t i = 0; i < countof(stringTable); i++)
-	{
+	for (size_t i = 0; i < countof(stringTable); i++) {
 		it = map_pcu.visit(stringTable[i]);
 		it->m_value = strlen(stringTable[i]);
 
@@ -90,8 +81,7 @@ void test_StringHashTableIgnoreCase()
 		it->m_value = strlen(stringTable[i]);
 	}
 
-	for (size_t i = 0; i < countof(stringTable); i++)
-	{
+	for (size_t i = 0; i < countof(stringTable); i++) {
 		size_t length = strlen(stringTable[i]);
 		for (size_t j = 0; j < length; j++)
 			stringTable[i][j] = (rand() & 1) ? tolower(stringTable[i][j]) : toupper(stringTable[i][j]);
@@ -110,8 +100,7 @@ void test_StringHashTableIgnoreCase()
 	}
 }
 
-void run()
-{
+void run() {
 	test_IntHashTable();
 	test_StringHashTableIgnoreCase();
 }

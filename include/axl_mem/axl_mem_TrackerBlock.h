@@ -20,8 +20,7 @@ namespace mem {
 
 //..............................................................................
 
-struct TrackerBlockHdr: sl::ListLink
-{
+struct TrackerBlockHdr: sl::ListLink {
 	size_t m_size;
 	size_t m_seqNum;
 	const char* m_tag;

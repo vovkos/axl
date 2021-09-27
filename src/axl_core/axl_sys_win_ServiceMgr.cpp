@@ -23,8 +23,7 @@ ServiceMgr::open(
 	const sl::StringRef_w& machineName,
 	const sl::StringRef_w& databaseName,
 	dword_t access
-	)
-{
+) {
 	close();
 
 	m_h = ::OpenSCManagerW(machineName.szn(), databaseName.szn(), access);
@@ -46,8 +45,7 @@ ServiceMgr::createService(
 	const sl::StringRef_w& dependencies,
 	const sl::StringRef_w& startName,
 	const sl::StringRef_w& password
-	)
-{
+) {
 	SC_HANDLE h = ::CreateServiceW(
 		m_h,
 		name.szn(),
@@ -62,10 +60,9 @@ ServiceMgr::createService(
 		dependencies.szn(),
 		startName.szn(),
 		password.szn()
-		);
+	);
 
-	if (!h)
-	{
+	if (!h) {
 		err::setLastSystemError();
 		return false;
 	}
@@ -79,11 +76,9 @@ ServiceMgr::openService(
 	Service* service,
 	const sl::StringRef_w& name,
 	dword_t access
-	)
-{
+) {
 	SC_HANDLE h = ::OpenServiceW(m_h, name.szn(), access);
-	if (!h)
-	{
+	if (!h) {
 		err::setLastSystemError();
 		return false;
 	}

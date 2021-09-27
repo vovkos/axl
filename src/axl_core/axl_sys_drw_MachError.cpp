@@ -19,8 +19,7 @@ namespace drw {
 //..............................................................................
 
 size_t
-MachError::create(mach_error_t code)
-{
+MachError::create(mach_error_t code) {
 	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
 	if (!error)
 		return -1;

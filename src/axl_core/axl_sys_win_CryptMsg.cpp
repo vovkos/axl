@@ -27,8 +27,7 @@ CryptMsg::openToDecode(
     HCRYPTPROV_LEGACY hCryptProv,
     CERT_INFO* recipientInfo,
     CMSG_STREAM_INFO* streamInfo
-	)
-{
+	) {
 	close();
 
 	m_h = ::CryptMsgOpenToDecode(
@@ -38,7 +37,7 @@ CryptMsg::openToDecode(
 		hCryptProv,
 		recipientInfo,
 		streamInfo
-		);
+	);
 
 	return err::complete(m_h != NULL);
 }
@@ -48,8 +47,7 @@ CryptMsg::update(
 	const void* p,
 	size_t size,
 	bool isFinal
-	)
-{
+) {
 	ASSERT(m_h);
 
 	bool_t result = ::CryptMsgUpdate(m_h, (uchar_t*)p, size, isFinal);
@@ -62,8 +60,7 @@ CryptMsg::getParam(
 	dword_t index,
 	void* p,
 	size_t size
-	)
-{
+) {
 	ASSERT(m_h);
 
 	dword_t resultSize = size;
@@ -74,10 +71,9 @@ CryptMsg::getParam(
 		index,
 		p,
 		&resultSize
-		);
+	);
 
-	if (!result)
-	{
+	if (!result) {
 		err::setLastSystemError();
 		return -1;
 	}
@@ -90,8 +86,7 @@ CryptMsg::getParam(
 	sl::Array<char>* buffer,
 	dword_t type,
 	dword_t index
-	)
-{
+) {
 	size_t size = getParam(type, index, NULL, 0);
 	if (size == -1)
 		return -1;
@@ -109,10 +104,8 @@ size_t
 findCryptAttr(
 	const CRYPT_ATTRIBUTES* attributes,
 	const char* oid
-	)
-{
-	for (size_t i = 0; i < attributes->cAttr; i++)
-	{
+) {
+	for (size_t i = 0; i < attributes->cAttr; i++) {
 		if (strcmp(attributes->rgAttr[i].pszObjId, oid) == 0)
 			return i;
 	}
@@ -124,11 +117,9 @@ size_t
 getCryptMsgSignerInfoProgramName(
 	sl::String_w* programName,
 	const CMSG_SIGNER_INFO* signerInfo
-	)
-{
+) {
 	size_t opusInfoIdx = findCryptAttr(&signerInfo->AuthAttrs, SPC_SP_OPUS_INFO_OBJID);
-	if (opusInfoIdx == -1)
-	{
+	if (opusInfoIdx == -1) {
 		err::setError(err::SystemErrorCode_ObjectNameNotFound);
 		return -1;
 	}
@@ -141,7 +132,7 @@ getCryptMsgSignerInfoProgramName(
 		SPC_SP_OPUS_INFO_OBJID,
 		signerInfo->AuthAttrs.rgAttr[opusInfoIdx].rgValue[0].pbData,
 		signerInfo->AuthAttrs.rgAttr[opusInfoIdx].rgValue[0].cbData
-		) != -1;
+	) != -1;
 
 	if (!result)
 		return -1;
@@ -157,8 +148,7 @@ getRsaCounterSignTimestamp(
 	uint64_t* timestamp,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	sl::Array<char> counterSignerInfoBuffer;
 
 	bool result = cryptDecodeObject(
@@ -167,15 +157,14 @@ getRsaCounterSignTimestamp(
 		PKCS7_SIGNER_INFO,
 		p,
 		size
-		) != -1;
+	) != -1;
 
 	if (!result)
 		return false;
 
 	const CMSG_SIGNER_INFO* counterSignerInfo = (CMSG_SIGNER_INFO*)counterSignerInfoBuffer.cp();
 	size_t timestampIdx = findCryptAttr(&counterSignerInfo->AuthAttrs, szOID_RSA_signingTime);
-	if (timestampIdx == -1)
-	{
+	if (timestampIdx == -1) {
 		err::setError(err::SystemErrorCode_ObjectNameNotFound);
 		return false;
 	}
@@ -187,12 +176,11 @@ getRsaCounterSignTimestamp(
 		szOID_RSA_signingTime,
 		counterSignerInfo->AuthAttrs.rgAttr[timestampIdx].rgValue[0].pbData,
 		counterSignerInfo->AuthAttrs.rgAttr[timestampIdx].rgValue[0].cbData
-		) != -1;
+	) != -1;
 }
 
 #pragma pack(push, 1)
-struct TimestampInfoRfc3161
-{
+struct TimestampInfoRfc3161 {
 	uintptr_t m_unknown[9];
 	uint64_t m_timestamp;
 };
@@ -204,8 +192,7 @@ getRfc3161CounterSignTimestamp(
 	uint64_t* timestamp,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	sl::Array<char> contentBuffer;
 
 	CryptMsg msg;
@@ -224,13 +211,12 @@ getRfc3161CounterSignTimestamp(
 		TIMESTAMP_INFO,
 		contentBuffer,
 		contentBuffer.getCount()
-		) != -1;
+	) != -1;
 
 	if (!result)
 		return false;
 
-	if (timestampBuffer.getCount() < sizeof(TimestampInfoRfc3161))
-	{
+	if (timestampBuffer.getCount() < sizeof(TimestampInfoRfc3161)) {
 		err::setError(err::SystemErrorCode_BufferTooSmall);
 		return false;
 	}
@@ -244,15 +230,14 @@ bool
 getCryptMsgSignerInfoTimestamp(
 	uint64_t* timestamp,
 	const CMSG_SIGNER_INFO* signerInfo
-	)
-{
+) {
 	size_t crossCertIdx = findCryptAttr(&signerInfo->UnauthAttrs, szOID_RSA_counterSign);
 	if (crossCertIdx != -1)
 		return getRsaCounterSignTimestamp(
 			timestamp,
 			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->pbData,
 			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->cbData
-			);
+		);
 
 	crossCertIdx = findCryptAttr(&signerInfo->UnauthAttrs, szOID_RFC3161_counterSign);
 	if (crossCertIdx != -1)
@@ -260,7 +245,7 @@ getCryptMsgSignerInfoTimestamp(
 			timestamp,
 			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->pbData,
 			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->cbData
-			);
+		);
 
 	err::setError(err::SystemErrorCode_ObjectNameNotFound);
 	return false;

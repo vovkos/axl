@@ -21,59 +21,47 @@ namespace cf {
 //..............................................................................
 
 template <typename T>
-class DictionaryBase: public TypeBase<T>
-{
+class DictionaryBase: public TypeBase<T> {
 public:
-	DictionaryBase()
-	{
-	}
+	DictionaryBase() {}
 
 	DictionaryBase(const DictionaryBase& src):
-		TypeBase<T>(src)
-	{
-	}
+		TypeBase<T>(src) {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	DictionaryBase(DictionaryBase&& src):
-		TypeBase<T>(std::move(src))
-	{
-	}
+		TypeBase<T>(std::move(src)) {}
 #endif
 
 	DictionaryBase(
 		T p,
 		bool isAttach = false
-		)
-	{
+	) {
 		isAttach ? this->copy(p) : this->attach(p);
 	}
 
 	DictionaryBase&
-	operator = (const DictionaryBase& src)
-	{
+	operator = (const DictionaryBase& src) {
 		this->copy(src);
 		return *this;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	DictionaryBase&
-	operator = (DictionaryBase&& src)
-	{
+	operator = (DictionaryBase&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	DictionaryBase&
-	operator = (T p)
-	{
+	operator = (T p) {
 		this->copy(p);
 		return *this;
 	}
 
 	bool
-	clone(CFDictionaryRef src)
-	{
+	clone(CFDictionaryRef src) {
 		CFDictionaryRef newDictionary = ::CFDictionaryCreateCopy(kCFAllocatorDefault, src);
 		if (!newDictionary)
 			return err::fail(err::SystemErrorCode_InsufficientResources);
@@ -83,29 +71,25 @@ public:
 	}
 
 	size_t
-	getCount() const
-	{
+	getCount() const {
 		ASSERT(this->m_p);
 		return ::CFDictionaryGetCount(this->m_p);
 	}
 
 	size_t
-	getCountOfKey(const void* key) const
-	{
+	getCountOfKey(const void* key) const {
 		ASSERT(this->m_p);
 		return ::CFDictionaryGetCountOfKey(this->m_p, key);
 	}
 
 	size_t
-	getCountOfValue(const void* value) const
-	{
+	getCountOfValue(const void* value) const {
 		ASSERT(this->m_p);
 		return ::CFDictionaryGetCountOfKey(this->m_p, value);
 	}
 
 	const void*
-	getValue(const void* key) const
-	{
+	getValue(const void* key) const {
 		ASSERT(this->m_p);
 		return ::CFDictionaryGetValue(this->m_p, key);
 	}
@@ -114,8 +98,7 @@ public:
 	getValueIfPresent(
 		const void* key,
 		const void** value
-		) const
-	{
+	) const {
 		ASSERT(this->m_p);
 		return ::CFDictionaryGetValueIfPresent(this->m_p, key, value);
 	}
@@ -124,8 +107,7 @@ public:
 	getKeysAndValues(
 		const void** keyArray,
 		const void** valueArray
-		) const
-	{
+	) const {
 		ASSERT(this->m_p);
 		return ::CFDictionaryGetKeysAndValues(this->m_p, keyArray, valueArray);
 	}
@@ -134,16 +116,14 @@ public:
 	getKeysAndValues(
 		sl::Array<const void*>* keyArray,
 		sl::Array<const void*>* valueArray
-		) const
-	{
+	) const {
 		bool result;
 		size_t count = getCount();
 
 		const void** keyBuffer = NULL;
 		const void** valueBuffer = NULL;
 
-		if (keyArray)
-		{
+		if (keyArray) {
 			result = keyArray->setCount(count);
 			if (!result)
 				return false;
@@ -151,8 +131,7 @@ public:
 			keyBuffer = *keyArray;
 		}
 
-		if (valueArray)
-		{
+		if (valueArray) {
 			result = valueArray->setCount(count);
 			if (!result)
 				return false;
@@ -171,45 +150,35 @@ typedef DictionaryBase<CFDictionaryRef> Dictionary;
 
 //..............................................................................
 
-class MutableDictionary: public DictionaryBase<CFMutableDictionaryRef>
-{
+class MutableDictionary: public DictionaryBase<CFMutableDictionaryRef> {
 public:
-	MutableDictionary()
-	{
-	}
+	MutableDictionary() {}
 
 	MutableDictionary(const MutableDictionary& src):
-		DictionaryBase<CFMutableDictionaryRef>(src)
-	{
-	}
+		DictionaryBase<CFMutableDictionaryRef>(src) {}
 
 	MutableDictionary(
 		CFMutableDictionaryRef p,
 		bool isAttach = false
-		):
-		DictionaryBase<CFMutableDictionaryRef>(p, isAttach)
-	{
-	}
+	):
+		DictionaryBase<CFMutableDictionaryRef>(p, isAttach) {}
 
 	MutableDictionary&
-	operator = (const MutableDictionary& src)
-	{
+	operator = (const MutableDictionary& src) {
 		copy(src);
 		return *this;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	MutableDictionary&
-	operator = (MutableDictionary&& src)
-	{
+	operator = (MutableDictionary&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	MutableDictionary&
-	operator = (CFMutableDictionaryRef p)
-	{
+	operator = (CFMutableDictionaryRef p) {
 		copy(p);
 		return *this;
 	}
@@ -221,22 +190,19 @@ public:
 	addValue(
 		const void* key,
 		const void* value
-		)
-	{
+	) {
 		ASSERT(m_p);
 		::CFDictionaryAddValue(m_p, key, value);
 	}
 
 	void
-	removeValue(const void* key)
-	{
+	removeValue(const void* key) {
 		ASSERT(m_p);
 		::CFDictionaryRemoveValue(m_p, key);
 	}
 
 	void
-	removeAllValues()
-	{
+	removeAllValues() {
 		ASSERT(m_p);
 		::CFDictionaryRemoveAllValues(m_p);
 	}
@@ -245,8 +211,7 @@ public:
 	setValue(
 		const void* key,
 		const void* value
-		)
-	{
+	) {
 		ASSERT(m_p);
 		::CFDictionarySetValue(m_p, key, value);
 	}
@@ -255,8 +220,7 @@ public:
 	replaceValue(
 		const void* key,
 		const void* value
-		)
-	{
+	) {
 		ASSERT(m_p);
 		::CFDictionaryReplaceValue(m_p, key, value);
 	}

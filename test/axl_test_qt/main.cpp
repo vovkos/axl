@@ -20,8 +20,7 @@
 #if 0
 
 bool
-trySudo()
-{
+trySudo() {
 	static char idPass[] = "55b828e362e44b9c8189e73d8eb01778";
 	static char idEcho[] = "bb05199f9ad34eb0876dac63300e2b62";
 
@@ -34,26 +33,23 @@ trySudo()
 	argList.append("echo");
 	argList.append(idEcho);
 
-	for (;;)
-	{
+	for (;;) {
 		QProcess process;
 		process.setReadChannelMode(QProcess::MergedChannels);
 		process.start(
 			exeName,
 			argList
-			);
+		);
 
 		process.waitForStarted();
 
 		QByteArray output;
-		do
-		{
+		do {
 			process.waitForReadyRead();
 			output += process.readAll();
 		} while (output.size() < sizeof(idEcho) - 1);
 
-		if (memcmp(output.cbegin(), idEcho, sizeof(idEcho) - 1) == 0)
-		{
+		if (memcmp(output.cbegin(), idEcho, sizeof(idEcho) - 1) == 0) {
 			printf("already a superuser\n");
 			process.waitForFinished();
 			return true;
@@ -65,8 +61,7 @@ trySudo()
 		scanf("%s", password);
 		size_t length = strlen(password);
 
-		if (length == 0)
-		{
+		if (length == 0) {
 			printf("cancelled\n");
 			process.waitForFinished();
 			return false;
@@ -82,8 +77,7 @@ trySudo()
 		length = output.size();
 
 		if (length >= sizeof(idEcho) - 1 &&
-			memcmp(output.cbegin(), idEcho, sizeof(idEcho) - 1) == 0)
-		{
+			memcmp(output.cbegin(), idEcho, sizeof(idEcho) - 1) == 0) {
 			printf("successfully authorized\n");
 			return true;
 		}
@@ -99,10 +93,8 @@ trySudo()
 int sendFd(
 	int sock,
 	int fd
-	)
-{
-	enum
-	{
+) {
+	enum {
 		ControlBufferLength = CMSG_LEN(sizeof(int))
 	};
 
@@ -132,10 +124,8 @@ int sendFd(
 	return sendmsg(sock, &msg, 0);
 }
 
-int recvFd(int sock)
-{
-	enum
-	{
+int recvFd(int sock) {
+	enum {
 		ControlBufferLength = CMSG_LEN(sizeof(int))
 	};
 
@@ -173,23 +163,20 @@ int recvFd(int sock)
 
 static char g_transmitData[] = "abcdefghijklmnopqrstuvwxyz";
 
-class ReaderThread: public mt::ThreadImpl<ReaderThread>
-{
+class ReaderThread: public mt::ThreadImpl<ReaderThread> {
 protected:
 	io::SharedMemoryReader m_reader;
 
 public:
-	void threadProc()
-	{
+	void threadProc() {
 		bool result = m_reader.open(
 			"/home/vladimir/test-transport",
 			"test-transport-read",
 			"test-transport-write",
 			io::SharedMemoryTransportFlag_Message | io::FileFlag_OpenExisting
-			);
+		);
 
-		if (!result)
-		{
+		if (!result) {
 			printf("cannot open reader (%s)\n", err::getLastErrorDescription().sz());
 			return;
 		}
@@ -198,18 +185,15 @@ public:
 
 		sl::Array<char> buffer;
 
-		for (;;)
-		{
+		for (;;) {
 			size_t size = m_reader.read(&buffer);
-			if (size == -1)
-			{
+			if (size == -1) {
 				printf("cannot read (%s)\n", err::getLastErrorDescription().sz());
 				return;
 			}
 
 			int cmpResult = memcmp(g_transmitData + offset, buffer, size);
-			if (cmpResult != 0)
-			{
+			if (cmpResult != 0) {
 				printf("wrong data!\n");
 				return;
 			}
@@ -221,14 +205,12 @@ public:
 	}
 };
 
-class WriterThread: public mt::ThreadImpl<WriterThread>
-{
+class WriterThread: public mt::ThreadImpl<WriterThread> {
 protected:
 	io::SharedMemoryWriter m_writer;
 
 public:
-	void threadProc()
-	{
+	void threadProc() {
 		unlink("/home/vladimir/test-transport");
 
 		bool result = m_writer.open(
@@ -236,34 +218,28 @@ public:
 			"test-transport-read",
 			"test-transport-write",
 			io::SharedMemoryTransportFlag_Message
-			);
+		);
 
-		if (!result)
-		{
+		if (!result) {
 			printf("cannot open writer (%s)\n", err::getLastErrorDescription().sz());
 			return;
 		}
 
 		size_t offset = 0;
 
-		for (;;)
-		{
+		for (;;) {
 			const char* p = g_transmitData + offset;
 			size_t size = 1 + rand() % (sizeof(g_transmitData) - 1);
 
-			if (offset + size < sizeof(g_transmitData))
-			{
+			if (offset + size < sizeof(g_transmitData)) {
 				offset += size;
-			}
-			else
-			{
+			} else {
 				size = sizeof(g_transmitData) - offset;
 				offset = 0;
 			}
 
 			size_t result = m_writer.write(p, size);
-			if (result == -1)
-			{
+			if (result == -1) {
 				printf("cannot write (%s)\n", err::getLastErrorDescription().sz());
 				return;
 			}
@@ -274,14 +250,12 @@ public:
 #endif
 
 void
-testUtf()
-{
+testUtf() {
 	setbuf(stdout, NULL);
 
 	printf("Testing UTF...\n");
 
-	for (uint_t c = 0; c < 0x10ffff; c++)
-	{
+	for (uint_t c = 0; c < 0x10ffff; c++) {
 		if (axl::enc::utfIsDigit(c) != QChar::isDigit(c))
 			printf("%x\taxl::enc::utfIsDigit -> %d\tQChar::isDigit -> %d\n", c, axl::enc::utfIsDigit (c), QChar::isDigit (c));
 
@@ -328,8 +302,7 @@ testUtf()
 	printf("Done\n");
 }
 
-void ulltoa(quint64 l, char* buff, size_t size)
-{
+void ulltoa(quint64 l, char* buff, size_t size) {
 	size_t last = size - 1;
 	memset(buff, 'a', last);
 	buff[last] = 0;
@@ -350,8 +323,7 @@ void ulltoa(quint64 l, char* buff, size_t size)
 	}
 }
 
-size_t formatIntegerWithThousandSep_stl(std::string* string, quint64 l)
-{
+size_t formatIntegerWithThousandSep_stl(std::string* string, quint64 l) {
 	char buff[65];
 	ulltoa(l, buff, sizeof(buff));
 
@@ -371,8 +343,7 @@ std::string
 #else
 void
 #endif
-formatIntegerWithThousandSep_stl(quint64 value)
-{
+formatIntegerWithThousandSep_stl(quint64 value) {
 	std::string string;
 	formatIntegerWithThousandSep_stl(&string, value);
 #if (_RETURN_STRING)
@@ -380,8 +351,7 @@ formatIntegerWithThousandSep_stl(quint64 value)
 #endif
 }
 
-size_t formatIntegerWithThousandSep_qt(QString* string, quint64 l)
-{
+size_t formatIntegerWithThousandSep_qt(QString* string, quint64 l) {
 	char buff[65];
 	ulltoa(l, buff, sizeof(buff));
 
@@ -399,8 +369,7 @@ QString
 #else
 void
 #endif
-formatIntegerWithThousandSep_qt(quint64 value)
-{
+formatIntegerWithThousandSep_qt(quint64 value) {
 	QString string;
 	formatIntegerWithThousandSep_qt(&string, value);
 #if (_RETURN_STRING)
@@ -408,8 +377,7 @@ formatIntegerWithThousandSep_qt(quint64 value)
 #endif
 }
 
-size_t formatIntegerWithThousandSep_axl(sl::String* string, quint64 l)
-{
+size_t formatIntegerWithThousandSep_axl(sl::String* string, quint64 l) {
 	char buff[65];
 	ulltoa(l, buff, sizeof(buff));
 
@@ -427,8 +395,7 @@ sl::String
 #else
 void
 #endif
-formatIntegerWithThousandSep_axl(quint64 value)
-{
+formatIntegerWithThousandSep_axl(quint64 value) {
 	sl::String string;
 	formatIntegerWithThousandSep_axl(&string, value);
 #if (_RETURN_STRING)
@@ -438,23 +405,19 @@ formatIntegerWithThousandSep_axl(quint64 value)
 
 inline
 size_t
-getMinPower2Gt(size_t size)
-{
+getMinPower2Gt(size_t size) {
 	ASSERT((intptr_t)size >= 0); // hi-bit is already set
 	return size ? 2 << sl::getHiBitIdx(size) : 1;
 }
 
 inline
 size_t
-getMinPower2Ge(size_t size)
-{
+getMinPower2Ge(size_t size) {
 	return !(size & (size - 1)) ? size : getMinPower2Gt(size);
 }
 
-void benchFormat()
-{
-	enum
-	{
+void benchFormat() {
+	enum {
 		IterationCount = 32 * 1024 * 1024,
 		InterlockedIterationCount = 32 * 1024,
 		BitIterationCount = 64 * 1024,
@@ -483,8 +446,7 @@ void benchFormat()
 	counter = 0;
 
 	for (size_t i = 0; i < BitIterationCount; i++)
-	for (size_t j = 0; j < BitIterationCount; j++)
-	{
+	for (size_t j = 0; j < BitIterationCount; j++) {
 		counter += sl::getPowerOf2Ge(j);
 	}
 
@@ -497,8 +459,7 @@ void benchFormat()
 	counter = 0;
 
 	for (size_t i = 0; i < BitIterationCount; i++)
-	for (size_t j = 0; j < BitIterationCount; j++)
-	{
+	for (size_t j = 0; j < BitIterationCount; j++) {
 		counter += getMinPower2Ge(j);
 	}
 
@@ -513,8 +474,7 @@ void benchFormat()
 	volatile long long i64;
 
 	for (size_t i = 0; i < InterlockedIterationCount; i++)
-	for (size_t j = 0; j < InterlockedIterationCount; j++)
-	{
+	for (size_t j = 0; j < InterlockedIterationCount; j++) {
 		_InterlockedIncrement(&i32);
 	}
 
@@ -525,8 +485,7 @@ void benchFormat()
 	baseTimestamp = sys::getTimestamp();
 
 	for (size_t i = 0; i < InterlockedIterationCount; i++)
-	for (size_t j = 0; j < InterlockedIterationCount; j++)
-	{
+	for (size_t j = 0; j < InterlockedIterationCount; j++) {
 		::InterlockedIncrement(&i32);
 	}
 
@@ -538,8 +497,7 @@ void benchFormat()
 	baseTimestamp = sys::getTimestamp();
 
 	for (size_t i = 0; i < InterlockedIterationCount; i++)
-	for (size_t j = 0; j < InterlockedIterationCount; j++)
-	{
+	for (size_t j = 0; j < InterlockedIterationCount; j++) {
 		_InterlockedIncrement64(&i64);
 	}
 
@@ -551,8 +509,7 @@ void benchFormat()
 	baseTimestamp = sys::getTimestamp();
 
 	for (size_t i = 0; i < InterlockedIterationCount; i++)
-	for (size_t j = 0; j < InterlockedIterationCount; j++)
-	{
+	for (size_t j = 0; j < InterlockedIterationCount; j++) {
 		::InterlockedIncrement64(&i64);
 	}
 
@@ -563,8 +520,7 @@ void benchFormat()
 	printf("Testing STL...\n");
 	baseTimestamp = sys::getTimestamp();
 
-	for (size_t i = 0; i < IterationCount; i++)
-	{
+	for (size_t i = 0; i < IterationCount; i++) {
 //		std::wstring s (L"abcdefghijklmnopqrstuvwxyz");
 #if (_RETURN_STRING)
 		stlString = formatIntegerWithThousandSep_stl(i);
@@ -579,8 +535,7 @@ void benchFormat()
 	printf("Testing STL (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp();
 
-	for (size_t i = 0; i < IterationCount; i++)
-	{
+	for (size_t i = 0; i < IterationCount; i++) {
 		formatIntegerWithThousandSep_stl(&stlString, i);
 	}
 
@@ -590,8 +545,7 @@ void benchFormat()
 	printf("Testing QT...\n");
 	baseTimestamp = sys::getTimestamp();
 
-	for (size_t i = 0; i < IterationCount; i++)
-	{
+	for (size_t i = 0; i < IterationCount; i++) {
 //		QString s ((QChar*) L"abcdefghijklmnopqrstuvwxyz");
 #if (_RETURN_STRING)
 		qtString = formatIntegerWithThousandSep_qt(i);
@@ -606,8 +560,7 @@ void benchFormat()
 	printf("Testing QT (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp();
 
-	for (size_t i = 0; i < IterationCount; i++)
-	{
+	for (size_t i = 0; i < IterationCount; i++) {
 		formatIntegerWithThousandSep_qt(&qtString, i);
 	}
 
@@ -617,8 +570,7 @@ void benchFormat()
 	printf("Testing AXL...\n");
 	baseTimestamp = sys::getTimestamp();
 
-	for (size_t i = 0; i < IterationCount; i++)
-	{
+	for (size_t i = 0; i < IterationCount; i++) {
 //		sl::String_w s (L"abcdefghijklmnopqrstuvwxyz");
 #if (_RETURN_STRING)
 		axlString = formatIntegerWithThousandSep_axl(i);
@@ -633,8 +585,7 @@ void benchFormat()
 	printf("Testing AXL (no alloc)...\n");
 	baseTimestamp = sys::getTimestamp();
 
-	for (size_t i = 0; i < IterationCount; i++)
-	{
+	for (size_t i = 0; i < IterationCount; i++) {
 		formatIntegerWithThousandSep_axl(&axlString, i);
 	}
 
@@ -647,8 +598,7 @@ int
 main(
 	int argc,
 	char *argv[]
-	)
-{
+) {
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
@@ -672,8 +622,7 @@ main(
 
 	re::Regex regex;
 	bool result = regex.compile(src);
-	if (!result)
-	{
+	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return -1;
 	}
@@ -695,8 +644,7 @@ main(
 
 #if 0
 	int fd = open("/home/vladimir/suka-bla", O_RDWR | O_CREAT, 0666);
-	if (fd == -1)
-	{
+	if (fd == -1) {
 		printf("error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
@@ -713,8 +661,7 @@ main(
 	mode_t mode = 0;
 
 	result = mkfifo(fifoName, 0666);
-	if (result == -1)
-	{
+	if (result == -1) {
 		printf("mkfifo error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
@@ -728,52 +675,45 @@ main(
 	memcpy(addr.sun_path, sockName, sizeof(sockName));
 
 	result = bind(sockServer, (const sockaddr*) &addr, sizeof(addr));
-	if (result == -1)
-	{
+	if (result == -1) {
 		printf("bind error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
 
 	result = listen(sockServer, 8);
-	if (result == -1)
-	{
+	if (result == -1) {
 		printf("listen error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
 
 	result = connect(sockClient, (const sockaddr*) &addr, sizeof(addr));
-	if (result == -1)
-	{
+	if (result == -1) {
 		printf("connect error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
 
 	socklen_t len = sizeof(addr);
 	int sockAccept = accept(sockServer, (sockaddr*) &addr, &len);
-	if (sockAccept == -1)
-	{
+	if (sockAccept == -1) {
 		printf("accept error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
 
 	result = sendFd(sockClient, fd);
-	if (result == -1)
-	{
+	if (result == -1) {
 		printf("sendmsg error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
 
 	int fd2 = recvFd(sockAccept);
-	if (fd2 == -1)
-	{
+	if (fd2 == -1) {
 		printf("recvmsg error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
 
 	char buffer[256] = { 0 };
 	result = read(fd2, buffer, sizeof(buffer));
-	if (result == -1)
-	{
+	if (result == -1) {
 		printf("read error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}

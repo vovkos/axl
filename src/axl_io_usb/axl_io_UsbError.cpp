@@ -18,10 +18,8 @@ namespace io {
 //..............................................................................
 
 sl::StringRef
-UsbErrorProvider::getErrorDescription(int code)
-{
-	static const char* errorTable[LIBUSB_ERROR_COUNT] =
-	{
+UsbErrorProvider::getErrorDescription(int code) {
+	static const char* errorTable[LIBUSB_ERROR_COUNT] = {
 		"Success",
 		"Input/Output Error",
 		"Invalid parameter",
@@ -38,8 +36,7 @@ UsbErrorProvider::getErrorDescription(int code)
 		"Other error",
 	};
 
-	static const char* transferStatusTable[LIBUSB_TRANSFER_OVERFLOW + 2] =
-	{
+	static const char* transferStatusTable[LIBUSB_TRANSFER_OVERFLOW + 2] = {
 		"Transfer completed without error",
 		"Transfer failed",
 		"Transfer timed out",

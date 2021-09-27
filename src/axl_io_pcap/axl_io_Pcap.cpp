@@ -19,14 +19,12 @@ namespace io {
 //..............................................................................
 
 bool
-Pcap::openDevice(const sl::StringRef& device)
-{
+Pcap::openDevice(const sl::StringRef& device) {
 	close();
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	m_h = ::pcap_create(device.sz(), errorBuffer);
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::setError(errorBuffer);
 		return false;
 	}
@@ -40,8 +38,7 @@ Pcap::openLive(
 	size_t snapshotSize,
 	bool isPromiscious,
 	uint_t timeout
-	)
-{
+) {
 	close();
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
@@ -51,10 +48,9 @@ Pcap::openLive(
 		isPromiscious,
 		timeout,
 		errorBuffer
-		);
+	);
 
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::setError(errorBuffer);
 		return false;
 	}
@@ -63,14 +59,12 @@ Pcap::openLive(
 }
 
 bool
-Pcap::openFile(const sl::StringRef& fileName)
-{
+Pcap::openFile(const sl::StringRef& fileName) {
 	close();
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	m_h = ::pcap_open_offline(fileName.sz(), errorBuffer);
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::setError(errorBuffer);
 		return false;
 	}
@@ -82,13 +76,11 @@ bool
 Pcap::openDead(
 	int linkType,
 	size_t snapshotSize
-	)
-{
+) {
 	close();
 
 	m_h = ::pcap_open_dead(linkType, (int)snapshotSize);
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::setError("pcap_open_dead failed");
 		return false;
 	}
@@ -97,8 +89,7 @@ Pcap::openDead(
 }
 
 bool
-Pcap::activate()
-{
+Pcap::activate() {
 	ASSERT(m_h);
 
 	int result = ::pcap_activate(m_h);
@@ -106,8 +97,7 @@ Pcap::activate()
 }
 
 bool
-Pcap::setSnapshotSize(size_t size)
-{
+Pcap::setSnapshotSize(size_t size) {
 	ASSERT(m_h);
 
 	int result = ::pcap_set_snaplen(m_h, size);
@@ -115,8 +105,7 @@ Pcap::setSnapshotSize(size_t size)
 }
 
 bool
-Pcap::setBufferSize(size_t size)
-{
+Pcap::setBufferSize(size_t size) {
 	ASSERT(m_h);
 
 	int result = ::pcap_set_buffer_size(m_h, size);
@@ -124,8 +113,7 @@ Pcap::setBufferSize(size_t size)
 }
 
 bool
-Pcap::setPromiscious(bool isPromiscious)
-{
+Pcap::setPromiscious(bool isPromiscious) {
 	ASSERT(m_h);
 
 	int result = ::pcap_set_promisc(m_h, isPromiscious);
@@ -133,8 +121,7 @@ Pcap::setPromiscious(bool isPromiscious)
 }
 
 bool
-Pcap::setTimeout(uint_t timeout)
-{
+Pcap::setTimeout(uint_t timeout) {
 	ASSERT(m_h);
 
 	int result = ::pcap_set_timeout(m_h, timeout);
@@ -142,13 +129,11 @@ Pcap::setTimeout(uint_t timeout)
 }
 
 bool
-Pcap::setFilter(const bpf_program* filter)
-{
+Pcap::setFilter(const bpf_program* filter) {
 	ASSERT(m_h);
 
 	int result = ::pcap_setfilter(m_h, (bpf_program*)filter);
-	if (result == -1)
-	{
+	if (result == -1) {
 		setLastError();
 		return false;
 	}
@@ -161,8 +146,7 @@ Pcap::setFilter(
 	const sl::StringRef& source,
 	bool isOptimized,
 	uint32_t netMask
-	)
-{
+) {
 	ASSERT(m_h);
 
 	PcapFilter filter;
@@ -173,8 +157,7 @@ Pcap::setFilter(
 }
 
 bool
-Pcap::getBlockingMode()
-{
+Pcap::getBlockingMode() {
 	ASSERT(m_h);
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
@@ -184,14 +167,12 @@ Pcap::getBlockingMode()
 }
 
 bool
-Pcap::setBlockingMode(bool isBlocking)
-{
+Pcap::setBlockingMode(bool isBlocking) {
 	ASSERT(m_h);
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	int result = ::pcap_setnonblock(m_h, !isBlocking, errorBuffer);
-	if (result == -1)
-	{
+	if (result == -1) {
 		err::setError(errorBuffer);
 		return false;
 	}
@@ -204,8 +185,7 @@ Pcap::loop(
 	size_t count,
 	::pcap_handler handler,
 	void* context
-	)
-{
+) {
 	ASSERT(m_h);
 
 	int result = ::pcap_loop(m_h, count, handler, (u_char*)context);
@@ -220,13 +200,11 @@ Pcap::dispatch(
 	size_t count,
 	::pcap_handler handler,
 	void* context
-	)
-{
+) {
 	ASSERT(m_h);
 
 	int result = ::pcap_dispatch(m_h, count, handler, (u_char*)context);
-	if (result == -1)
-	{
+	if (result == -1) {
 		setLastError();
 		return -1;
 	}
@@ -239,16 +217,14 @@ Pcap::read(
 	void* p,
 	size_t size,
 	uint64_t* timestamp
-	)
-{
+) {
 	ASSERT(m_h);
 
 	pcap_pkthdr* hdr;
 	const uchar_t* data;
 
 	int result = ::pcap_next_ex(m_h, &hdr, &data);
-	if (result == -1)
-	{
+	if (result == -1) {
 		setLastError();
 		return -1;
 	}
@@ -269,8 +245,7 @@ size_t
 Pcap::write(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	ASSERT(m_h);
 
 #if (_AXL_OS_WIN)
@@ -278,8 +253,7 @@ Pcap::write(
 #else
 	int result = ::pcap_inject(m_h, p, (int)size);
 #endif
-	if (result == -1)
-	{
+	if (result == -1) {
 		setLastError();
 		return -1;
 	}
@@ -292,8 +266,7 @@ Pcap::write(
 }
 
 bool
-Pcap::complete(bool result)
-{
+Pcap::complete(bool result) {
 	if (!result)
 		setLastError();
 

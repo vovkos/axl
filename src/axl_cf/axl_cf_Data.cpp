@@ -19,8 +19,7 @@ namespace cf {
 //..............................................................................
 
 bool
-Data::create(CFDataRef src)
-{
+Data::create(CFDataRef src) {
 	CFDataRef data = ::CFDataCreateCopy(kCFAllocatorDefault, src);
 	if (!data)
 		return err::fail(err::SystemErrorCode_InsufficientResources);
@@ -33,13 +32,12 @@ bool
 Data::create(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	CFDataRef data = ::CFDataCreate(
 		kCFAllocatorDefault,
 		(const UInt8*)p,
 		size
-		);
+	);
 
 	if (!data)
 		return err::fail(err::SystemErrorCode_InsufficientResources);

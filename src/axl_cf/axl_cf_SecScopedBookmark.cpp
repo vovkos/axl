@@ -18,8 +18,7 @@ namespace cf {
 //..............................................................................
 
 void
-SecScopedBookmark::close()
-{
+SecScopedBookmark::close() {
 	stopAccess();
 	m_filePath.clear();
 	m_isDirectory = false;
@@ -30,8 +29,7 @@ void
 SecScopedBookmark::create(
 	const sl::StringRef& filePath,
 	bool isDirectory
-	)
-{
+) {
 	if (m_filePath == filePath && m_isDirectory == isDirectory)
 		return;
 
@@ -42,8 +40,7 @@ SecScopedBookmark::create(
 }
 
 void
-SecScopedBookmark::copy(const SecScopedBookmark& src)
-{
+SecScopedBookmark::copy(const SecScopedBookmark& src) {
 	if (this == &src || m_filePath == src.m_filePath && m_isDirectory == src.m_isDirectory)
 		return;
 
@@ -65,8 +62,7 @@ SecScopedBookmark::copy(const SecScopedBookmark& src)
 #if (_AXL_CPP_HAS_RVALUE_REF)
 
 void
-SecScopedBookmark::move(SecScopedBookmark&& src)
-{
+SecScopedBookmark::move(SecScopedBookmark&& src) {
 	stopAccess();
 
 	m_filePath = std::move(src.m_filePath);
@@ -81,8 +77,7 @@ bool
 SecScopedBookmark::load(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	close();
 
 	Url url;
@@ -103,10 +98,8 @@ SecScopedBookmark::load(
 }
 
 bool
-SecScopedBookmark::save(sl::Array<char>* buffer) const
-{
-	if (!m_dataCache.isEmpty())
-	{
+SecScopedBookmark::save(sl::Array<char>* buffer) const {
+	if (!m_dataCache.isEmpty()) {
 		*buffer = m_dataCache;
 		return true;
 	}
@@ -125,8 +118,7 @@ SecScopedBookmark::save(sl::Array<char>* buffer) const
 }
 
 void
-SecScopedBookmark::stopAccess()
-{
+SecScopedBookmark::stopAccess() {
 	if (!m_accessUrl)
 		return;
 

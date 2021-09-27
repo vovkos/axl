@@ -21,8 +21,7 @@ namespace win {
 
 //..............................................................................
 
-class Mapping: public sys::win::Handle
-{
+class Mapping: public sys::win::Handle {
 public:
 	bool
 	create(
@@ -31,32 +30,29 @@ public:
 		uint_t pageProtection,
 		uint64_t maxSize,
 		const sl::StringRef_w& name = NULL
-		);
+	);
 
 	bool
 	open(
 		uint_t access,
 		bool doInheritHandle,
 		const sl::StringRef_w& name
-		);
+	);
 };
 
 //..............................................................................
 
-class UnmapViewOfFile
-{
+class UnmapViewOfFile {
 public:
 	void
-	operator () (void* p)
-	{
+	operator () (void* p) {
 		::UnmapViewOfFile(p);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MappedView: public sl::Handle<void*, UnmapViewOfFile>
-{
+class MappedView: public sl::Handle<void*, UnmapViewOfFile> {
 public:
 	void*
 	view(
@@ -64,7 +60,7 @@ public:
 		uint_t access,
 		uint64_t offset,
 		uint32_t size
-		);
+	);
 };
 
 //..............................................................................

@@ -21,24 +21,20 @@ namespace gui {
 
 //..............................................................................
 
-class ScreenDc
-{
+class ScreenDc {
 protected:
 	HDC m_hdc;
 
 public:
-	ScreenDc()
-	{
+	ScreenDc() {
 		m_hdc = ::GetDC(NULL);
 	};
 
-	~ScreenDc()
-	{
+	~ScreenDc() {
 		::ReleaseDC(NULL, m_hdc);
 	};
 
-	operator HDC()
-	{
+	operator HDC() {
 		return m_hdc;
 	}
 };
@@ -47,14 +43,12 @@ public:
 
 class GdiCanvas:
 	public Canvas,
-	public sl::Handle<HDC>
-{
+	public sl::Handle<HDC> {
 	friend class GdiEngine;
 	friend class GdiWidgetImpl;
 
 protected:
-	enum DestructKind
-	{
+	enum DestructKind {
 		DestructKind_None = 0,
 		DestructKind_DeleteDc,
 		DestructKind_ReleaseDc
@@ -72,8 +66,7 @@ protected:
 public:
 	GdiCanvas();
 
-	~GdiCanvas()
-	{
+	~GdiCanvas() {
 		release();
 	}
 
@@ -82,7 +75,7 @@ public:
 		HDC hdc,
 		HWND hWnd,
 		DestructKind destructKind
-		);
+	);
 
 	virtual
 	bool
@@ -92,7 +85,7 @@ public:
 		int right,
 		int bottom,
 		uint_t color
-		);
+	);
 
 	virtual
 	bool
@@ -107,7 +100,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf8& text
-		);
+	);
 
 	virtual
 	bool
@@ -122,7 +115,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf16& text
-		);
+	);
 
 	virtual
 	bool
@@ -137,7 +130,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf32& text
-		);
+	);
 
 	virtual
 	bool
@@ -149,7 +142,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		);
+	);
 
 	virtual
 	bool
@@ -161,7 +154,7 @@ public:
 		int ySrc,
 		int width,
 		int height
-		);
+	);
 
 protected:
 	void

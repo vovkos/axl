@@ -21,7 +21,7 @@ set(
 	${AXL_INC_DIR}/axl_spy/axl_spy_Hook.h
 	axl_spy_ThreadState.h
 	axl_spy_HookCommon.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
@@ -33,14 +33,14 @@ set(
 	axl_spy_Hook_amd64_msc.cpp
 	axl_spy_Hook_amd64_gcc.cpp
 	axl_spy_Hook_x86.cpp
-	)
+)
 
 set(
 	LIB_ASM_LIST
 	axl_spy_thunk_amd64_msc.asm
 	axl_spy_thunk_amd64_gcc.asm
 	axl_spy_thunk_x86.asm
-	)
+)
 
 source_group(
 	lib
@@ -48,7 +48,7 @@ source_group(
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_ASM_LIST}
-	)
+)
 
 if(${TARGET_CPU} STREQUAL "x86")
 	axl_exclude_from_build(axl_spy_Hook_amd64_msc.cpp)
@@ -75,7 +75,7 @@ source_group(
 	FILES
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -91,13 +91,13 @@ add_library(
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_ASM_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_spy
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -105,11 +105,11 @@ axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_spy
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_spy
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

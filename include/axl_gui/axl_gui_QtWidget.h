@@ -21,8 +21,7 @@ namespace gui {
 
 //..............................................................................
 
-class QtWidgetBase: public QAbstractScrollArea
-{
+class QtWidgetBase: public QAbstractScrollArea {
 	Q_OBJECT
 
 	friend class QtEngine;
@@ -35,10 +34,9 @@ public:
 	QtWidgetBase(
 		WidgetDriver* widgetDriver,
 		QWidget* parent = NULL
-		);
+	);
 
-	~QtWidgetBase()
-	{
+	~QtWidgetBase() {
 		m_widgetDriver->setCaretVisible(false); // important for QT
 	}
 
@@ -46,16 +44,14 @@ public:
 	postThreadMsg(
 		uint_t code,
 		const rc::Ptr<void>& params
-		);
+	);
 
 	virtual
 	void
 	emitNotificationSignal(
 		uint_t code,
 		const void* param
-		)
-	{
-	}
+	) {}
 
 private slots:
 	void
@@ -71,29 +67,25 @@ signals:
 protected:
 	virtual
 	void
-	mousePressEvent(QMouseEvent* e)
-	{
+	mousePressEvent(QMouseEvent* e) {
 		mouseEventImpl(e, WidgetMsgCode_MouseButtonDown);
 	}
 
 	virtual
 	void
-	mouseReleaseEvent(QMouseEvent* e)
-	{
+	mouseReleaseEvent(QMouseEvent* e) {
 		mouseEventImpl(e, WidgetMsgCode_MouseButtonUp);
 	}
 
 	virtual
 	void
-	mouseDoubleClickEvent(QMouseEvent* e)
-	{
+	mouseDoubleClickEvent(QMouseEvent* e) {
 		mouseEventImpl(e, WidgetMsgCode_MouseButtonDoubleClick);
 	}
 
 	virtual
 	void
-	mouseMoveEvent(QMouseEvent* e)
-	{
+	mouseMoveEvent(QMouseEvent* e) {
 		mouseEventImpl(e, WidgetMsgCode_MouseMove);
 	}
 
@@ -103,36 +95,31 @@ protected:
 
 	virtual
 	void
-	keyPressEvent(QKeyEvent* e)
-	{
+	keyPressEvent(QKeyEvent* e) {
 		keyEventImpl(e, WidgetMsgCode_KeyDown);
 	}
 
 	virtual
 	void
-	keyReleaseEvent(QKeyEvent* e)
-	{
+	keyReleaseEvent(QKeyEvent* e) {
 		keyEventImpl(e, WidgetMsgCode_KeyUp);
 	}
 
 	virtual
 	void
-	focusInEvent(QFocusEvent* e)
-	{
+	focusInEvent(QFocusEvent* e) {
 		genericEventImpl(e, WidgetMsgCode_SetFocus);
 	}
 
 	virtual
 	void
-	focusOutEvent(QFocusEvent* e)
-	{
+	focusOutEvent(QFocusEvent* e) {
 		genericEventImpl(e, WidgetMsgCode_KillFocus);
 	}
 
 	virtual
 	void
-	leaveEvent(QEvent* e)
-	{
+	leaveEvent(QEvent* e) {
 		genericEventImpl(e, WidgetMsgCode_MouseLeave);
 	}
 
@@ -146,15 +133,13 @@ protected:
 
 	virtual
 	void
-	closeEvent(QCloseEvent* e)
-	{
+	closeEvent(QCloseEvent* e) {
 		genericEventImpl(e, WidgetMsgCode_Close);
 	}
 
 	virtual
 	void
-	timerEvent(QTimerEvent* e)
-	{
+	timerEvent(QTimerEvent* e) {
 		if (e->timerId() == m_animationTimer.timerId())
 			genericEventImpl(e, WidgetMsgCode_Animate);
 	}
@@ -164,26 +149,26 @@ protected:
 	scrollContentsBy(
 		int dx,
 		int dy
-		);
+	);
 
 protected:
 	void
 	genericEventImpl(
 		QEvent* e,
 		WidgetMsgCode msgCode
-		);
+	);
 
 	void
 	mouseEventImpl(
 		QMouseEvent* e,
 		WidgetMsgCode msgCode
-		);
+	);
 
 	void
 	keyEventImpl(
 		QKeyEvent* e,
 		WidgetMsgCode msgCode
-		);
+	);
 };
 
 //..............................................................................
@@ -191,14 +176,11 @@ protected:
 template <typename T>
 class QtWidget:
 	public QtWidgetBase,
-	public T
-{
+	public T {
 public:
 	QtWidget(QWidget* parent = NULL):
 		QtWidgetBase(&(T::m_widgetDriver), parent),
-		T(WidgetConstructParam(getQtEngine(), (QtWidgetBase*)this))
-	{
-	}
+		T(WidgetConstructParam(getQtEngine(), (QtWidgetBase*)this)) {}
 };
 
 //..............................................................................

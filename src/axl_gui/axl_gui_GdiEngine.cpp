@@ -20,21 +20,18 @@ namespace gui {
 
 //..............................................................................
 
-GdiEngine::GdiEngine()
-{
+GdiEngine::GdiEngine() {
 	m_hWndClipboardOwner = NULL;
 	updateStdPalette();
 }
 
-GdiEngine::~GdiEngine()
-{
+GdiEngine::~GdiEngine() {
 	if (m_hWndClipboardOwner)
 		::DestroyWindow(m_hWndClipboardOwner);
 }
 
 void
-GdiEngine::updateStdPalette()
-{
+GdiEngine::updateStdPalette() {
 	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetText]    = inverseRgb(::GetSysColor(COLOR_WINDOWTEXT));
 	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetBack]    = inverseRgb(::GetSysColor(COLOR_WINDOW));
 	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_GrayText]      = inverseRgb(::GetSysColor(COLOR_GRAYTEXT));
@@ -48,13 +45,11 @@ GdiEngine::updateStdPalette()
 }
 
 rc::Ptr<Font>
-GdiEngine::createStdFont(StdFontKind fontKind)
-{
+GdiEngine::createStdFont(StdFontKind fontKind) {
 	LOGFONTW logFont;
 	HFONT hFont;
 
-	switch (fontKind)
-	{
+	switch (fontKind) {
 	case StdFontKind_Gui:
 		return createStockFont(DEFAULT_GUI_FONT);
 
@@ -77,8 +72,7 @@ GdiEngine::createFont(
 	const sl::StringRef& family,
 	size_t pointSize,
 	uint_t flags
-	)
-{
+) {
 	LOGFONTW logFont;
 	buildLogFont(&logFont, family, pointSize, flags);
 
@@ -90,12 +84,10 @@ GdiEngine::createFont(
 }
 
 rc::Ptr<Font>
-GdiEngine::createStockFont(int stockFontKind)
-{
+GdiEngine::createStockFont(int stockFontKind) {
 	HGDIOBJ h = ::GetStockObject(stockFontKind);
 	dword_t gdiObjectType = ::GetObjectType(h);
-	if (gdiObjectType != OBJ_FONT)
-	{
+	if (gdiObjectType != OBJ_FONT) {
 		err::setError(err::SystemErrorCode_InvalidHandle);
 		return rc::g_nullPtr;
 	}
@@ -104,8 +96,7 @@ GdiEngine::createStockFont(int stockFontKind)
 }
 
 rc::Ptr<Font>
-GdiEngine::createFont(HFONT hFont)
-{
+GdiEngine::createFont(HFONT hFont) {
 	GdiFont* font = AXL_MEM_NEW(GdiFont);
 
 	LOGFONTW logFont;
@@ -126,8 +117,7 @@ Font*
 GdiEngine::getFontMod(
 	Font* _pBaseFont,
 	uint_t flags
-	)
-{
+) {
 	ASSERT(_pBaseFont->getEngine() == this);
 
 	GdiFont* baseFont = (GdiFont*)_pBaseFont;
@@ -154,8 +144,7 @@ GdiEngine::getFontMod(
 }
 
 rc::Ptr<Cursor>
-GdiEngine::createStockCursor(LPCTSTR stockCursorRes)
-{
+GdiEngine::createStockCursor(LPCTSTR stockCursorRes) {
 	HCURSOR h = ::LoadCursor(NULL, stockCursorRes);
 	if (!h)
 		return err::failWithLastSystemError(rc::g_nullPtr);
@@ -166,10 +155,8 @@ GdiEngine::createStockCursor(LPCTSTR stockCursorRes)
 }
 
 rc::Ptr<Cursor>
-GdiEngine::createStdCursor(StdCursorKind cursorKind)
-{
-	static LPCTSTR stockCursorResTable[StdCursorKind__Count] =
-	{
+GdiEngine::createStdCursor(StdCursorKind cursorKind) {
+	static LPCTSTR stockCursorResTable[StdCursorKind__Count] = {
 		IDC_ARROW,    // StdCursorKind_Arrow = 0,
 		IDC_WAIT,     // StdCursorKind_Wait,
 		IDC_IBEAM,    // StdCursorKind_IBeam,
@@ -186,8 +173,7 @@ GdiEngine::createStdCursor(StdCursorKind cursorKind)
 }
 
 rc::Ptr<Image>
-GdiEngine::createImage()
-{
+GdiEngine::createImage() {
 	rc::Ptr<GdiImage> image = AXL_RC_NEW(rc::Box<GdiImage>);
 	return image;
 }
@@ -199,12 +185,10 @@ GdiEngine::createImage(
 	PixelFormat pixelFormat,
 	const void* data,
 	bool isScreenCompatible
-	)
-{
+) {
 	uint_t bitCount;
 
-	switch (pixelFormat)
-	{
+	switch (pixelFormat) {
 	case PixelFormat_Rgba:
 		bitCount = 32;
 		break;
@@ -219,21 +203,18 @@ GdiEngine::createImage(
 
 	HBITMAP hBitmap;
 
-	if (!isScreenCompatible)
-	{
+	if (!isScreenCompatible) {
 		hBitmap = ::CreateBitmap(
 			width,
 			height,
 			1,
 			bitCount,
 			data
-			);
+		);
 
 		if (!hBitmap)
 			return err::failWithLastSystemError(rc::g_nullPtr);
-	}
-	else
-	{
+	} else {
 		BITMAPINFO bitmapInfo = { 0 };
 		bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
 		bitmapInfo.bmiHeader.biPlanes = 1;
@@ -248,7 +229,7 @@ GdiEngine::createImage(
 			screenDc,
 			width,
 			height
-			);
+		);
 
 		if (!hBitmap)
 			return err::failWithLastSystemError(rc::g_nullPtr);
@@ -261,7 +242,7 @@ GdiEngine::createImage(
 			data,
 			&bitmapInfo,
 			DIB_RGB_COLORS
-			);
+		);
 
 		if (!result)
 			return err::failWithLastSystemError(rc::g_nullPtr);
@@ -276,8 +257,7 @@ rc::Ptr<Canvas>
 GdiEngine::createOffscreenCanvas(
 	int width,
 	int height
-	)
-{
+) {
 	ScreenDc screenDc;
 	HBITMAP hBitmap = ::CreateCompatibleBitmap(screenDc, width, height);
 	if (!hBitmap)
@@ -294,22 +274,19 @@ GdiEngine::createOffscreenCanvas(
 }
 
 uintptr_t
-GdiEngine::registerClipboardFormat(const sl::StringRef& formatName)
-{
+GdiEngine::registerClipboardFormat(const sl::StringRef& formatName) {
 	err::setError(err::SystemErrorCode_NotImplemented);
 	return -1;
 }
 
 bool
-GdiEngine::readClipboard(sl::String* string)
-{
+GdiEngine::readClipboard(sl::String* string) {
 	bool result = openClipboard();
 	if (!result)
 		return false;
 
 	HANDLE hData = ::GetClipboardData(CF_TEXT);
-	if (!hData)
-	{
+	if (!hData) {
 		::CloseClipboard();
 
 		err::setError(err::SystemErrorCode_InvalidDeviceRequest);
@@ -319,8 +296,7 @@ GdiEngine::readClipboard(sl::String* string)
 	string->clear();
 
 	size_t size = ::GlobalSize(hData);
-	if (!size)
-	{
+	if (!size) {
 		::CloseClipboard();
 		return true;
 	}
@@ -340,15 +316,13 @@ bool
 GdiEngine::readClipboard(
 	uintptr_t format,
 	sl::Array<char>* data
-	)
-{
+) {
 	err::setError(err::SystemErrorCode_NotImplemented);
 	return false;
 }
 
 bool
-GdiEngine::writeClipboard(const sl::StringRef& string)
-{
+GdiEngine::writeClipboard(const sl::StringRef& string) {
 	bool result = openClipboard();
 	if (!result)
 		return false;
@@ -369,19 +343,16 @@ GdiEngine::writeClipboard(
 	uintptr_t format,
 	const void* data,
 	size_t size
-	)
-{
+) {
 	err::setError(err::SystemErrorCode_NotImplemented);
 	return false;
 }
 
 bool
-GdiEngine::openClipboard()
-{
+GdiEngine::openClipboard() {
 	bool_t result;
 
-	if (!m_hWndClipboardOwner)
-	{
+	if (!m_hWndClipboardOwner) {
 		m_hWndClipboardOwner = ::CreateWindowExW(
 			0,
 			L"STATIC",
@@ -395,7 +366,7 @@ GdiEngine::openClipboard()
 			NULL,
 			g::getModule()->getModuleHandle(),
 			NULL
-			);
+		);
 
 		if (!m_hWndClipboardOwner)
 			return err::failWithLastSystemError();
@@ -409,15 +380,12 @@ bool
 GdiEngine::showCaret(
 	Widget* widget,
 	const Rect& rect
-	)
-{
+) {
 	return true;
 }
 
 void
-GdiEngine::hideCaret()
-{
-}
+GdiEngine::hideCaret() {}
 
 //..............................................................................
 

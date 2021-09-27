@@ -26,8 +26,7 @@ namespace sl {
 
 //..............................................................................
 
-class BmhFind
-{
+class BmhFind {
 protected:
 	Array<uchar_t> m_buffer; // work size of buffer is 2 * m_PatternSize
 	size_t m_patternSize;
@@ -44,20 +43,17 @@ public:
 	clear();
 
 	bool
-	isEmpty()
-	{
+	isEmpty() {
 		return m_patternSize == 0;
 	}
 
 	size_t
-	getPatternSize()
-	{
+	getPatternSize() {
 		return m_patternSize;
 	}
 
 	const void*
-	getPattern()
-	{
+	getPattern() {
 		return m_buffer;
 	}
 
@@ -66,48 +62,45 @@ public:
 		const void* p,
 		size_t size,
 		bool doMatchCase = true
-		);
+	);
 
 	size_t
 	find(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	reverseFind(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	incrementalFind(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	reverseIncrementalFind(
 		const void* p,
 		size_t size
-		);
+	);
 
 	void
-	resetIncrementalFind(size_t incFindOffset = 0)
-	{
+	resetIncrementalFind(size_t incFindOffset = 0) {
 		m_incFindOffset = incFindOffset;
 		m_incFindTailSize = 0;
 	}
 
 	size_t
-	getIncrementalFindOffset()
-	{
+	getIncrementalFindOffset() {
 		return m_incFindOffset;
 	}
 
 	size_t
-	getIncrementalFindTailSize()
-	{
+	getIncrementalFindTailSize() {
 		return m_incFindTailSize;
 	}
 
@@ -125,28 +118,28 @@ protected:
 	incrementalCmpPattern(
 		uchar_t* _p,
 		size_t i
-		);
+	);
 
 	size_t
 	reverseIncrementalCmpPattern(
 		uchar_t* _p,
 		size_t size,
 		size_t i
-		);
+	);
 
 	void
 	updateIncrementalTail(
 		uchar_t* p,
 		size_t size,
 		size_t tailSize
-		);
+	);
 
 	void
 	updateReverseIncrementalTail(
 		uchar_t* p,
 		size_t size,
 		size_t tailSize
-		);
+	);
 };
 
 //..............................................................................

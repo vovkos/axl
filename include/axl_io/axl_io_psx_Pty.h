@@ -21,22 +21,19 @@ namespace psx {
 
 //..............................................................................
 
-class Pty: public File
-{
+class Pty: public File {
 public:
 	bool
 	open(uint_t openFlags = O_RDWR);
 
 	bool
-	grant()
-	{
+	grant() {
 		int result = ::grantpt(m_h);
 		return err::complete(result == 0);
 	}
 
 	bool
-	unlock()
-	{
+	unlock() {
 		int result = ::unlockpt(m_h);
 		return err::complete(result == 0);
 	}
@@ -45,8 +42,7 @@ public:
 	getSlaveFileName(sl::String* fileName);
 
 	sl::String
-	getSlaveFileName()
-	{
+	getSlaveFileName() {
 		sl::String fileName;
 		getSlaveFileName(&fileName);
 		return fileName;

@@ -20,59 +20,50 @@ namespace gui {
 
 //..............................................................................
 
-struct HyperlinkAnchor: sl::ListLink
-{
+struct HyperlinkAnchor: sl::ListLink {
 	size_t m_offset;
 	sl::String m_hyperlink;
 
-	HyperlinkAnchor()
-	{
+	HyperlinkAnchor() {
 		m_offset = 0;
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class HyperlinkAnchorArray
-{
+class HyperlinkAnchorArray {
 protected:
 	sl::List<HyperlinkAnchor> m_list;
 	sl::Array<HyperlinkAnchor*> m_array;
 
 public:
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_list.isEmpty();
 	}
 
 	bool
-	isHyperlinkOpened() const
-	{
+	isHyperlinkOpened() const {
 		return !m_list.isEmpty() && !m_list.getTail()->m_hyperlink.isEmpty();
 	}
 
 	size_t
-	getCount() const
-	{
+	getCount() const {
 		return m_list.getCount();
 	}
 
 	sl::ConstIterator<HyperlinkAnchor>
-	getHead() const
-	{
+	getHead() const {
 		return m_list.getHead();
 	}
 
 	sl::ConstIterator<HyperlinkAnchor>
-	getTail() const
-	{
+	getTail() const {
 		return m_list.getHead();
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		m_list.clear();
 		m_array.clear();
 	}
@@ -84,13 +75,13 @@ public:
 	openHyperlink(
 		size_t offset,
 		const sl::StringRef& hyperlink
-		);
+	);
 
 	HyperlinkAnchor*
 	closeHyperlink(
 		size_t offset,
 		bool closeEmpty = false
-		);
+	);
 };
 
 //..............................................................................

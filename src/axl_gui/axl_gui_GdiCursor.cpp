@@ -18,8 +18,7 @@ namespace gui {
 
 //..............................................................................
 
-GdiCursor::GdiCursor()
-{
+GdiCursor::GdiCursor() {
 	m_engine = GdiEngine::getSingleton();
 }
 

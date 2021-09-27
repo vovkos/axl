@@ -21,8 +21,7 @@ bool
 Socket::accept(
 	Socket* socket,
 	SockAddr* addr
-	)
-{
+) {
 #if (_AXL_OS_WIN)
 	SOCKET h = m_socket.accept(addr);
 #else

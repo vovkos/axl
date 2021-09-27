@@ -21,19 +21,16 @@ namespace iok {
 //..............................................................................
 
 template <typename T>
-class ObjectBase
-{
+class ObjectBase {
 protected:
 	T m_p;
 
 public:
-	ObjectBase()
-	{
+	ObjectBase() {
 		m_p = MACH_PORT_NULL;
 	}
 
-	ObjectBase(const ObjectBase& src)
-	{
+	ObjectBase(const ObjectBase& src) {
 		if (src.m_p)
 			::IOObjectRetain(src.m_p);
 
@@ -43,57 +40,49 @@ public:
 	ObjectBase(
 		T p,
 		bool isAttach = false
-		)
-	{
+	) {
 		if (p && !isAttach)
 			::IOObjectRetain(p);
 
 		m_p = p;
 	}
 
-	operator T() const
-	{
+	operator T() const {
 		return m_p;
 	}
 
 	ObjectBase&
-	operator = (const ObjectBase& src)
-	{
+	operator = (const ObjectBase& src) {
 		copy(src.m_p);
 		return *this;
 	}
 
 	ObjectBase&
-	operator = (T p)
-	{
+	operator = (T p) {
 		copy(p);
 		return *this;
 	}
 
 	T
-	p() const
-	{
+	p() const {
 		return m_p;
 	}
 
 	void
-	attach(T p)
-	{
+	attach(T p) {
 		clear();
 		m_p = p;
 	}
 
 	T
-	detach()
-	{
+	detach() {
 		T p = m_p;
 		m_p = MACH_PORT_NULL;
 		return p;
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		if (m_p)
 			::IOObjectRelease(m_p);
 
@@ -101,8 +90,7 @@ public:
 	}
 
 	void
-	copy(T p)
-	{
+	copy(T p) {
 		if (m_p == p)
 			return;
 
@@ -116,14 +104,12 @@ public:
 	}
 
 	void
-	retain()
-	{
+	retain() {
 		::IOObjectRetain(m_p);
 	}
 
 	void
-	release()
-	{
+	release() {
 		::IOObjectRelease(m_p);
 	}
 };

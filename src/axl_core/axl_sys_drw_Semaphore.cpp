@@ -19,8 +19,7 @@ namespace drw {
 //..............................................................................
 
 bool
-Semaphore::wait(uint_t timeout)
-{
+Semaphore::wait(uint_t timeout) {
 	mach_timespec_t tspec;
 	tspec.tv_sec = timeout / 1000;
 	tspec.tv_nsec = (timeout % 1000) * 1000000;

@@ -22,8 +22,7 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class StdArrayList
-{
+class StdArrayList {
 public:
 	typedef sl::Iterator<T> Iterator;
 
@@ -33,33 +32,28 @@ protected:
 
 public:
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_list.isEmpty();
 	}
 
 	size_t
-	getCount() const
-	{
+	getCount() const {
 		ASSERT(m_list.getCount() == m_array.getCount());
 		return m_list.getCount();
 	}
 
 	Iterator
-	getHead() const
-	{
+	getHead() const {
 		return m_list.getHead();
 	}
 
 	Iterator
-	getTail() const
-	{
+	getTail() const {
 		return m_list.getTail();
 	}
 
 	T*
-	add()
-	{
+	add() {
 		T* p = AXL_MEM_NEW(T);
 		m_list.insertTail(p);
 
@@ -70,16 +64,14 @@ public:
 	}
 
 	T*
-	get(size_t index)
-	{
+	get(size_t index) {
 		size_t count = m_array.getCount();
 		if (index < count)
 			return m_array[index];
 
 		m_array.setCount(index + 1);
 
-		for (size_t i = count; i <= index; i++)
-		{
+		for (size_t i = count; i <= index; i++) {
 			T* p = AXL_MEM_NEW(T);
 			m_list.insertTail(p);
 			m_array[i] = p;

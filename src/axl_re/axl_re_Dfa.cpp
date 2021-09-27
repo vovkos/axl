@@ -17,8 +17,7 @@ namespace re {
 
 //..............................................................................
 
-DfaState::DfaState()
-{
+DfaState::DfaState() {
 	m_isAccept = false;
 	m_id = -1;
 	m_acceptNfaStateId = -1;
@@ -26,16 +25,13 @@ DfaState::DfaState()
 }
 
 bool
-DfaState::addNfaState(NfaState* nfaState)
-{
+DfaState::addNfaState(NfaState* nfaState) {
 	bool result = m_nfaStateSet.addState(nfaState);
 	if (!result)
 		return false;
 
-	if (nfaState->m_flags & NfaStateFlag_Accept)
-	{
-		if (!m_isAccept || nfaState->m_id < m_acceptNfaStateId)
-		{
+	if (nfaState->m_flags & NfaStateFlag_Accept) {
+		if (!m_isAccept || nfaState->m_id < m_acceptNfaStateId) {
 			m_acceptContext = nfaState->m_acceptContext;
 			m_acceptNfaStateId = nfaState->m_id;
 		}
@@ -43,14 +39,12 @@ DfaState::addNfaState(NfaState* nfaState)
 		m_isAccept = true;
 	}
 
-	if (nfaState->m_flags & NfaStateFlag_OpenCapture)
-	{
+	if (nfaState->m_flags & NfaStateFlag_OpenCapture) {
 		ASSERT(nfaState->m_captureId != -1);
 		m_openCaptureIdSet.setBitResize(nfaState->m_captureId);
 	}
 
-	if (nfaState->m_flags & NfaStateFlag_CloseCapture)
-	{
+	if (nfaState->m_flags & NfaStateFlag_CloseCapture) {
 		ASSERT(nfaState->m_captureId != -1);
 		m_closeCaptureIdSet.setBitResize(nfaState->m_captureId);
 	}
@@ -59,11 +53,9 @@ DfaState::addNfaState(NfaState* nfaState)
 }
 
 void
-DfaState::makeEpsilonClosure()
-{
+DfaState::makeEpsilonClosure() {
 	sl::Array<NfaState*> workingSet = m_nfaStateSet.m_stateArray;
-	while (!workingSet.isEmpty())
-	{
+	while (!workingSet.isEmpty()) {
 		NfaState* nfaState = workingSet.getBackAndPop();
 		if (!(nfaState->m_flags & NfaStateFlag_EpsilonLink))
 			continue;
@@ -72,8 +64,7 @@ DfaState::makeEpsilonClosure()
 		if (isAdded)
 			workingSet.append(nfaState->m_outState);
 
-		if (nfaState->m_outState2)
-		{
+		if (nfaState->m_outState2) {
 			isAdded = addNfaState(nfaState->m_outState2);
 			if (isAdded)
 				workingSet.append(nfaState->m_outState2);

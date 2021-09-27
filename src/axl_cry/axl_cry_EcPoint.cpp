@@ -18,8 +18,7 @@ namespace cry {
 //..............................................................................
 
 bool
-EcPoint::create(EC_GROUP* group)
-{
+EcPoint::create(EC_GROUP* group) {
 	close();
 
 	m_h = EC_POINT_new(group);
@@ -30,8 +29,7 @@ bool
 EcPoint::createCopy(
 	EC_POINT* src,
 	EC_GROUP* group
-	)
-{
+) {
 	close();
 
 	m_h = EC_POINT_dup(src, group);
@@ -44,8 +42,7 @@ EcPoint::getData(
 	EC_GROUP* group,
 	point_conversion_form_t form,
 	BN_CTX* ctx
-	)
-{
+) {
 	int result = EC_POINT_point2oct(group, m_h, form, NULL, 0, ctx);
 	if (result <= 0)
 		return failWithLastCryptoError();
@@ -63,8 +60,7 @@ EcPoint::getHexString(
 	EC_GROUP* group,
 	point_conversion_form_t form,
 	BN_CTX* ctx
-	)
-{
+) {
 	char* p = EC_POINT_point2hex(group, m_h, form, ctx);
 	*string = p;
 	OPENSSL_free(p);

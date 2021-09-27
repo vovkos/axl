@@ -23,40 +23,35 @@ namespace err {
 // this is a dedicated function for marking out-of-memory incidents
 
 void
-setOutOfMemoryError()
-{
+setOutOfMemoryError() {
 	setError(SystemErrorCode_InsufficientResources);
 }
 
 //..............................................................................
 
 sl::StringRef
-ErrorHdr::getDescription() const
-{
+ErrorHdr::getDescription() const {
 	return getErrorMgr()->getErrorDescription(this);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::String
-ErrorRef::getDescription() const
-{
+ErrorRef::getDescription() const {
 	return !isEmpty() ? m_p->getDescription() : g_noError.getDescription();
 }
 
 //..............................................................................
 
 size_t
-Error::push(const ErrorRef& error)
-{
+Error::push(const ErrorRef& error) {
 	if (!m_p)
 		return copy(error);
 
 	size_t base = 0;
 	size_t baseSize = m_p->m_size;
 
-	if (isKindOf(g_stdErrorGuid, StdErrorCode_Stack))
-	{
+	if (isKindOf(g_stdErrorGuid, StdErrorCode_Stack)) {
 		base += sizeof(ErrorHdr);
 		baseSize -= sizeof(ErrorHdr);
 	}
@@ -71,7 +66,7 @@ Error::push(const ErrorRef& error)
 		(uchar_t*)m_p + sizeof(ErrorHdr) + error->m_size,
 		(uchar_t*)m_p + base,
 		baseSize
-		);
+	);
 
 	m_p->m_size = (uint32_t)size;
 	m_p->m_guid = g_stdErrorGuid;
@@ -85,8 +80,7 @@ size_t
 Error::createSimpleError(
 	const sl::Guid& guid,
 	uint_t code
-	)
-{
+) {
 	createBuffer(sizeof(ErrorHdr));
 	if (!m_p)
 		return -1;
@@ -103,8 +97,7 @@ Error::format_va(
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	sl::PackerSeq packer;
 	packer.format(formatString);
 
@@ -126,8 +119,7 @@ Error::format_va(
 }
 
 size_t
-Error::createStringError(const sl::StringRef& string)
-{
+Error::createStringError(const sl::StringRef& string) {
 	size_t length = string.getLength();
 	size_t size = sizeof(ErrorHdr) + length + 1;
 
@@ -151,8 +143,7 @@ size_t
 Error::formatStringError_va(
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	char buffer[256];
 	sl::String string(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.format_va(formatString, va);
@@ -162,21 +153,18 @@ Error::formatStringError_va(
 //..............................................................................
 
 ErrorRef
-getLastError()
-{
+getLastError() {
 	return getErrorMgr()->getLastError();
 }
 
 size_t
-setError(const ErrorRef& error)
-{
+setError(const ErrorRef& error) {
 	getErrorMgr()->setError(error);
 	return error.getSize();
 }
 
 size_t
-pushError(const ErrorRef& error)
-{
+pushError(const ErrorRef& error) {
 	Error stack = getLastError();
 	ASSERT(!stack.isKindOf(g_stdErrorGuid, StdErrorCode_NoError));
 	size_t result = stack.push(error);
@@ -191,8 +179,7 @@ setFormatError_va(
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	Error error;
 	size_t result = error.format_va(guid, code, formatString, va);
 	return result != -1 ? setError(error) : -1;
@@ -204,24 +191,21 @@ pushFormatError_va(
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	Error error;
 	size_t result = error.format_va(guid, code, formatString, va);
 	return result != -1 ? pushError(error) : -1;
 }
 
 size_t
-setError(const sl::StringRef& string)
-{
+setError(const sl::StringRef& string) {
 	Error error;
 	size_t result = error.createStringError(string);
 	return result != -1 ? setError(error) : -1;
 }
 
 size_t
-pushError(const sl::StringRef& string)
-{
+pushError(const sl::StringRef& string) {
 	Error error;
 	size_t result = error.createStringError(string);
 	return result != -1 ? pushError(error) : -1;
@@ -231,8 +215,7 @@ size_t
 setFormatStringError_va(
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	Error error;
 	size_t result = error.formatStringError_va(formatString, va);
 	return result != -1 ? setError(error) : -1;
@@ -242,8 +225,7 @@ size_t
 pushFormatStringError_va(
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	Error error;
 	size_t result = error.formatStringError_va(formatString, va);
 	return result != -1 ? pushError(error) : -1;
@@ -252,16 +234,14 @@ pushFormatStringError_va(
 //..............................................................................
 
 sl::StringRef
-StdErrorProvider::getErrorDescription(const ErrorRef& error)
-{
+StdErrorProvider::getErrorDescription(const ErrorRef& error) {
 	if (error->m_size < sizeof(ErrorHdr))
 		return sl::String();
 
 	const char* p;
 	size_t stringSize;
 
-	switch (error->m_code)
-	{
+	switch (error->m_code) {
 	case StdErrorCode_NoError:
 		return "no error";
 
@@ -282,15 +262,13 @@ StdErrorProvider::getErrorDescription(const ErrorRef& error)
 }
 
 sl::String
-StdErrorProvider::getStackErrorDescription(const ErrorRef& error)
-{
+StdErrorProvider::getStackErrorDescription(const ErrorRef& error) {
 	sl::String string;
 
 	const ErrorHdr* p = error + 1;
 	const void* end = error.getEnd();
 
-	while (p < end)
-	{
+	while (p < end) {
 		ASSERT(p->m_size >= sizeof(ErrorHdr));
 
 		if (!string.isEmpty())

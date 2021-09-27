@@ -24,13 +24,12 @@ Group::generateDocumentation(
 	const sl::StringRef& outputDir,
 	sl::String* itemXml,
 	sl::String* indexXml
-	)
-{
+) {
 	indexXml->appendFormat(
 		"<compound kind='group' refid='%s'><name>%s</name></compound>\n",
 		m_refId.sz(),
 		m_name.sz()
-		);
+	);
 
 	itemXml->format(
 		"<compounddef kind='group' id='%s' language='Jancy'>\n"
@@ -38,7 +37,7 @@ Group::generateDocumentation(
 		"<title>",
 		m_refId.sz(),
 		m_name.sz()
-		);
+	);
 
 	appendXmlElementContents(itemXml, m_title);
 	itemXml->append("</title>\n");
@@ -46,20 +45,16 @@ Group::generateDocumentation(
 	sl::String sectionDef;
 
 	size_t count = m_itemArray.getCount();
-	for (size_t i = 0; i < count; i++)
-	{
+	for (size_t i = 0; i < count; i++) {
 		handle_t item = m_itemArray[i];
 		Block* doxyBlock = m_host->getItemBlock(item);
 		sl::String refId = doxyBlock->getRefId();
 
 		sl::StringRef compoundElementName = m_host->getItemCompoundElementName(item);
-		if (compoundElementName.isEmpty())
-		{
+		if (compoundElementName.isEmpty()) {
 			sectionDef.appendFormat("<memberdef id='%s'/>", refId.sz());
 			sectionDef.append('\n');
-		}
-		else
-		{
+		} else {
 			itemXml->appendFormat("<%s refid='%s'/>", compoundElementName.sz(), refId.sz());
 			itemXml->append('\n');
 		}
@@ -67,16 +62,14 @@ Group::generateDocumentation(
 
 	sectionDef += getFootnoteString();
 
-	if (!sectionDef.isEmpty())
-	{
+	if (!sectionDef.isEmpty()) {
 		itemXml->append("<sectiondef>\n");
 		itemXml->append(sectionDef);
 		itemXml->append("</sectiondef>\n");
 	}
 
 	sl::BoxIterator<Group*> groupIt = m_groupList.getHead();
-	for (; groupIt; groupIt++)
-	{
+	for (; groupIt; groupIt++) {
 		Group* group = *groupIt;
 		itemXml->appendFormat("<innergroup refid='%s'/>", group->m_refId.sz());
 		itemXml->append('\n');

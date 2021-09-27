@@ -18,17 +18,16 @@ namespace cry {
 //..............................................................................
 
 void
-registerCryptoErrorProviders()
-{
+registerCryptoErrorProviders() {
 	err::getErrorMgr()->registerProvider(
 		g_cryptoErrorGuid,
 		sl::getSimpleSingleton<CryptoErrorProvider> ()
-		);
+	);
 
 	err::getErrorMgr()->registerProvider(
 		g_x509ErrorGuid,
 		sl::getSimpleSingleton<X509ErrorProvider> ()
-		);
+	);
 
 	ERR_load_crypto_strings();
 }
@@ -36,8 +35,7 @@ registerCryptoErrorProviders()
 //..............................................................................
 
 sl::StringRef
-CryptoErrorProvider::getErrorDescription(ulong_t code)
-{
+CryptoErrorProvider::getErrorDescription(ulong_t code) {
 	const char* functionString = ::ERR_func_error_string(code);
 	const char* reasonString = ::ERR_reason_error_string(code);
 

@@ -18,13 +18,11 @@ namespace ini {
 //..............................................................................
 
 bool
-GenericParser::onSection(const sl::StringRef& sectionName)
-{
+GenericParser::onSection(const sl::StringRef& sectionName) {
 	ASSERT(m_ini);
 
 	sl::StringHashTableIterator<Section*> it = m_ini->m_namedSectionMap.find(sectionName);
-	if (it)
-	{
+	if (it) {
 		m_currentSection = it->m_value;
 		return true;
 	}
@@ -40,19 +38,16 @@ bool
 GenericParser::onKeyValue(
 	const sl::StringRef& keyName,
 	const sl::StringRef& value
-	)
-{
+) {
 	ASSERT(m_currentSection);
 
-	if (value.isEmpty())
-	{
+	if (value.isEmpty()) {
 		m_currentSection->m_unnamedValueList.insertTail(keyName);
 		return true;
 	}
 
 	sl::StringHashTableIterator<NamedValue*> it = m_currentSection->m_namedValueMap.find(keyName);
-	if (it)
-	{
+	if (it) {
 		it->m_value->m_value = value;
 		return true;
 	}

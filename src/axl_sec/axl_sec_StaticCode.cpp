@@ -22,8 +22,7 @@ bool
 StaticCode::createWithPath(
 	CFURLRef url,
 	SecCSFlags flags
-	)
-{
+) {
 	clear();
 	OSStatus status = ::SecStaticCodeCreateWithPath(url, flags, &m_p);
 	return completeWithOsStatus(status);
@@ -34,8 +33,7 @@ StaticCode::createWithPath(
 	const sl::StringRef& path,
 	bool isDirectory,
 	SecCSFlags flags
-	)
-{
+) {
 	cf::Url url;
 	url.create(path, kCFURLPOSIXPathStyle, isDirectory);
 	return createWithPath(url, flags);

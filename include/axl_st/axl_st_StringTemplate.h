@@ -24,16 +24,14 @@ bool
 gotoEndOfScriptSnippet(
 	Lexer* lexer,
 	lex::RagelTokenPos* endPos
-	);
+);
 
 //..............................................................................
 
 template <typename T>
-class StringTemplate
-{
+class StringTemplate {
 protected:
-	struct EmitContext: public sl::ListLink
-	{
+	struct EmitContext: public sl::ListLink {
 		StringTemplate* m_self;
 		sl::String* m_output;
 		sl::StringRef m_frame;
@@ -45,8 +43,7 @@ protected:
 
 public:
 	void
-	clear()
-	{
+	clear() {
 		m_emitContextStack.clear();
 	}
 
@@ -55,21 +52,15 @@ public:
 		sl::String* output,
 		const sl::StringRef& fileName,
 		const sl::StringRef& frame
-		)
-	{
+	) {
 		bool result;
 
-		if (output)
-		{
+		if (output) {
 			output->clear();
 			output->reserve(frame.getLength());
-		}
-		else if (!m_emitContextStack.isEmpty())
-		{
+		} else if (!m_emitContextStack.isEmpty()) {
 			output = m_emitContextStack.getTail()->m_output; // append to the last output buffer
-		}
-		else
-		{
+		} else {
 			err::setError(err::SystemErrorCode_InvalidParameter);
 			return false;
 		}
@@ -79,8 +70,7 @@ public:
 		if (!result)
 			return false;
 
-		if (scriptSource.isEmpty())
-		{
+		if (scriptSource.isEmpty()) {
 			output->copy(frame);
 			return true;
 		}
@@ -103,8 +93,7 @@ public:
 	processFile(
 		sl::String* output,
 		const sl::StringRef& fileName
-		)
-	{
+	) {
 		io::SimpleMappedFile file;
 
 		return
@@ -113,15 +102,14 @@ public:
 				output,
 				fileName,
 				sl::StringRef((const char*) file.p(), file.getMappingSize())
-				);
+			);
 	}
 
 	bool
 	processFileToFile(
 		const sl::StringRef& targetFileName,
 		const sl::StringRef& frameFileName
-		)
-	{
+	) {
 		bool result;
 
 		sl::String stringBuffer;
@@ -145,10 +133,8 @@ public:
 	}
 
 	bool
-	append(const sl::StringRef& string)
-	{
-		if (m_emitContextStack.isEmpty())
-		{
+	append(const sl::StringRef& string) {
+		if (m_emitContextStack.isEmpty()) {
 			err::setError(err::SystemErrorCode_InvalidParameter);
 			return false;
 		}
@@ -162,8 +148,7 @@ protected:
 		sl::String* scriptSource,
 		const sl::StringRef& fileName,
 		const sl::StringRef& frame
-		)
-	{
+	) {
 		bool result;
 
 		Lexer lexer;
@@ -176,12 +161,10 @@ protected:
 
 		int line = 0;
 
-		for (;;)
-		{
+		for (;;) {
 			const Token* token = lexer.getToken();
 
-			if (token->m_token == TokenKind_Error)
-			{
+			if (token->m_token == TokenKind_Error) {
 				err::setFormatStringError("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 				return false;
 			}
@@ -191,7 +174,7 @@ protected:
 					scriptSource,
 					offset,
 					token->m_pos.m_offset - offset
-					);
+				);
 
 			if (token->m_token == TokenKind_Eof)
 				return true;
@@ -201,8 +184,7 @@ protected:
 
 			offset = token->m_pos.m_offset + token->m_pos.m_length;
 
-			switch (token->m_token)
-			{
+			switch (token->m_token) {
 			case TokenKind_Data:
 				static_cast<T*>(this)->createEmitCall(scriptSource, token->m_data.m_string);
 				pos = token->m_pos;
@@ -230,7 +212,7 @@ protected:
 				static_cast<T*>(this)->createEmitCall(
 					scriptSource,
 					frame.getSubString(offset, pos.m_offset - offset)
-					);
+				);
 				break;
 
 			default:

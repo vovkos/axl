@@ -17,30 +17,26 @@ namespace enc {
 
 //..............................................................................
 
-class InsertNoNl
-{
+class InsertNoNl {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		return 0;
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class InsertNl
-{
+class InsertNl {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		if (i & 0x3f)
 			return 0;
 
@@ -54,7 +50,7 @@ public:
 template <
 	typename GetBase32Char,
 	typename InsertNl
-	>
+>
 static
 void
 encodeImpl(
@@ -62,22 +58,19 @@ encodeImpl(
 	size_t dstSize,
 	const uchar_t* src,
 	size_t srcSize
-	)
-{
+) {
 	uint_t x = 0;
 	size_t b = 0;
 
 	char* dstEnd = dst + dstSize;
 	const uchar_t* srcEnd = src + srcSize;
 
-	for (size_t i = 0; src < srcEnd; src++)
-	{
+	for (size_t i = 0; src < srcEnd; src++) {
 		x <<= 8;
 		x |= *src;
 		b += 8;
 
-		while (b >= 5)
-		{
+		while (b >= 5) {
 			b -= 5;
 			dst += InsertNl()(dst, i++);
 			*dst++ = GetBase32Char()(x >> b);
@@ -101,10 +94,8 @@ Base32Encoding::encode(
 	const void* p,
 	size_t size,
 	uint_t flags
-	)
-{
-	if (!size)
-	{
+) {
+	if (!size) {
 		string->clear();
 		return 0;
 	}
@@ -117,8 +108,7 @@ Base32Encoding::encode(
 	if (!(flags & Base32EncodingFlag_NoPadding))
 		length += 7 - ((length - 1) & 7);
 
-	if (flags & Base32EncodingFlag_Multiline)
-	{
+	if (flags & Base32EncodingFlag_Multiline) {
 		size_t lineCount = length / 64;
 		if (lineCount & 0x3f)
 			lineCount++;
@@ -142,10 +132,8 @@ size_t
 Base32Encoding::decode(
 	sl::Array<char>* buffer,
 	const sl::StringRef& string
-	)
-{
-	static const uchar_t charMap['Z' - '2' + 1] =
-	{
+) {
+	static const uchar_t charMap['Z' - '2' + 1] = {
 		26, 27, 28, 29, 30, 31,                             //  2 .. 7
 		-1, -1, -1, -1, -1, -1, -1, -1, -1,                 //  8  9  :  ;  <  =  >  ?  @
 		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, //  A .. M
@@ -161,8 +149,7 @@ Base32Encoding::decode(
 
 	const char* p = string.cp();
 	const char* end = string.getEnd();
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		char c = *p;
 		if (c < '2' || c > 'Z')
 			continue; // ignore padding & whitespace
@@ -175,8 +162,7 @@ Base32Encoding::decode(
 		x |= y;
 		i += 5;
 
-		if (i >= 8)
-		{
+		if (i >= 8) {
 			i -= 8;
 			buffer->append(x >> i);
 		}

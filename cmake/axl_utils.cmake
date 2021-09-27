@@ -15,7 +15,7 @@ macro(
 axl_calc_max_string_length
 	_RESULT
 	# ...
-	)
+)
 
 	set(_STRING_LIST ${ARGN})
 
@@ -35,7 +35,7 @@ axl_create_space_padding
 	_RESULT
 	_STRING
 	_MAX_LENGTH
-	)
+)
 
 	string(LENGTH ${_STRING} _LENGTH)
 	math(EXPR _PADDING_LENGTH "${_MAX_LENGTH} - ${_LENGTH}")
@@ -52,7 +52,7 @@ axl_print_variable_list
 	_INDENT
 	_MIN_ALIGN
 	# ...
-	)
+)
 
 	set(_VARIABLE_LIST ${ARGN})
 
@@ -77,7 +77,7 @@ axl_filter_list
 	_RESULT
 	_FILTER
 	# ...
-	)
+)
 
 	set(_LIST ${ARGN})
 	unset(_FILTERED_LIST)
@@ -101,7 +101,7 @@ macro(
 axl_message
 	_FIRST
 	# ...
-	)
+)
 
 	set(_ARG_LIST ${ARGN})
 
@@ -140,7 +140,7 @@ macro(
 	axl_create_empty_setting_file
 	_FILE_NAME
 	# ...
-	)
+)
 
 	set(_SETTING_LIST ${ARGN})
 
@@ -167,7 +167,7 @@ macro(
 axl_normalize_cpu
 	_RESULT
 	_CPU
-	)
+)
 
 	string(TOLOWER ${_CPU} _CPU_LC)
 
@@ -187,7 +187,7 @@ endmacro()
 macro(
 axl_detect_target_cpu
 	_CPU
-	)
+)
 
 	# TODO: replace with try_run and CPU detection C pre-processor code
 
@@ -211,7 +211,7 @@ endmacro()
 macro(
 axl_detect_host_cpu
 	_CPU
-	)
+)
 
 	axl_normalize_cpu(${_CPU} "${CMAKE_HOST_SYSTEM_PROCESSOR}")
 endmacro()
@@ -225,7 +225,7 @@ set(_AXL_G_STACK)
 macro(
 axl_push
 	_VALUE
-	)
+)
 
 	list(INSERT _AXL_G_STACK 0 ${_VALUE})
 endmacro()
@@ -233,7 +233,7 @@ endmacro()
 macro(
 axl_pop
 	_RESULT
-	)
+)
 
 	list(GET _AXL_G_STACK 0 ${_RESULT})
 	list(REMOVE_AT _AXL_G_STACK 0)
@@ -243,7 +243,7 @@ macro(
 axl_push_and_set
 	_VARIABLE
 	_VALUE
-	)
+)
 
 	axl_push(${${_VARIABLE}})
 	set(${_VARIABLE} ${_VALUE})
@@ -257,7 +257,7 @@ macro(
 axl_create_setting
 	_SETTING
 	# ...
-	)
+)
 
 	set(_ARG_LIST ${ARGN})
 
@@ -295,14 +295,14 @@ axl_create_setting
 	set(
 		${_SETTING} ${_DEFAULT_VALUE}
 		CACHE ${_TYPE} ${_DESCRIPTION} ${_FORCE}
-		)
+	)
 
 	if(_OPTION_LIST)
 		set_property(
 			CACHE ${_SETTING}
 			PROPERTY STRINGS
 			${_OPTION_LIST}
-			)
+		)
 	endif()
 endmacro()
 
@@ -310,7 +310,7 @@ macro(
 axl_override_setting
 	_SETTING
 	# ...
-	)
+)
 
 	set(_ARG_LIST ${ARGN})
 
@@ -324,13 +324,13 @@ axl_override_setting
 		_TYPE
 		CACHE ${_SETTING}
 		PROPERTY TYPE
-		)
+	)
 
 	get_property(
 		_DESCRIPTION
 		CACHE ${_SETTING}
 		PROPERTY HELPSTRING
-		)
+	)
 
 	if("${_TYPE}" STREQUAL "" OR "${_DESCRIPTION}" STREQUAL "")
 		message(FATAL_ERROR "${_SETTING} is not a cached setting")
@@ -339,14 +339,14 @@ axl_override_setting
 	set(
 		${_SETTING} ${_VALUE}
 		CACHE ${_TYPE} ${_DESCRIPTION} FORCE
-		)
+	)
 endmacro()
 
 macro(
 axl_override_setting_once
 	_SETTING
 	# ...
-	)
+)
 
 	if("${${_SETTING}_OVERRIDEN}" STREQUAL "")
 		axl_override_setting(${_SETTING} ${ARGN})
@@ -354,7 +354,7 @@ axl_override_setting_once
 		set(
 			${_SETTING}_OVERRIDEN TRUE
 			CACHE INTERNAL "${_SETTING} is overriden"
-			)
+		)
 	endif()
 endmacro()
 
@@ -370,7 +370,7 @@ macro(
 axl_create_compiler_flag_setting
 	_SETTING
 	# ...
-	)
+)
 
 	set(_ARG_LIST ${ARGN})
 
@@ -406,13 +406,13 @@ axl_create_compiler_flag_setting
 	set(
 		${_SETTING} ${_VALUE}
 		CACHE STRING ${_DESCRIPTION}
-		)
+	)
 
 	set_property(
 		CACHE ${_SETTING}
 		PROPERTY STRINGS
 		" " ${_OPTION_LIST}
-		)
+	)
 
 	list(APPEND _AXL_G_COMPILER_FLAG_SETTING_LIST ${_SETTING})
 endmacro()
@@ -420,7 +420,7 @@ endmacro()
 macro(
 axl_delete_compiler_flag_setting
 	_SETTING
-	)
+)
 
 	list(REMOVE_ITEM _AXL_G_COMPILER_FLAG_SETTING_LIST ${_SETTING})
 endmacro()
@@ -430,7 +430,7 @@ axl_get_compiler_flag_setting_current_value
 	_RESULT
 	_SETTING
 	# ...
-	)
+)
 
 	axl_create_compiler_flag_regex(_REGEX ${ARGN})
 
@@ -439,7 +439,7 @@ axl_get_compiler_flag_setting_current_value
 		_CONFIGURATION_SUFFIX
 		_IS_C_ONLY
 		_IS_CPP_ONLY
-		)
+	)
 
 	if(_IS_C_ONLY)
 		if("${_CONFIGURATION_SUFFIX}" STREQUAL "")
@@ -465,7 +465,7 @@ axl_get_compiler_flag_setting_traits
 	_CONFIGURATION_SUFFIX_RESULT
 	_IS_C_ONLY_RESULT
 	_IS_CPP_ONLY_RESULT
-	)
+)
 
 	# check whether this setting is per-configuration
 
@@ -509,7 +509,7 @@ endmacro()
 macro(
 axl_apply_compiler_flag_setting
 	_SETTING
-	)
+)
 
 	axl_create_compiler_flag_setting_regex(_REGEX ${_SETTING})
 
@@ -518,7 +518,7 @@ axl_apply_compiler_flag_setting
 		_CONFIGURATION_SUFFIX
 		_IS_C_ONLY
 		_IS_CPP_ONLY
-		)
+	)
 
 	# apply current setting value to C/C++ flags
 
@@ -527,14 +527,14 @@ axl_apply_compiler_flag_setting
 			axl_apply_compiler_flag(
 				CMAKE_C_FLAGS
 				${_REGEX}
-				)
+			)
 		endif()
 
 		axl_apply_compiler_flag(
 			CMAKE_C_FLAGS${_CONFIGURATION_SUFFIX}
 			${_REGEX}
 			${${_SETTING}}
-			)
+		)
 	endif()
 
 	if(NOT _IS_C_ONLY)
@@ -542,21 +542,21 @@ axl_apply_compiler_flag_setting
 			axl_apply_compiler_flag(
 				CMAKE_CXX_FLAGS
 				${_REGEX}
-				)
+			)
 		endif()
 
 		axl_apply_compiler_flag(
 			CMAKE_CXX_FLAGS${_CONFIGURATION_SUFFIX}
 			${_REGEX}
 			${${_SETTING}}
-			)
+		)
 	endif()
 endmacro()
 
 macro(
 axl_apply_compiler_flag_setting_list
 	# ...
-	)
+)
 
 	set(_SETTING_LIST ${ARGN})
 
@@ -574,7 +574,7 @@ macro(
 axl_create_compiler_flag_setting_regex
 	_RESULT
 	_SETTING
-	)
+)
 
 	# create regex from option list and
 
@@ -582,7 +582,7 @@ axl_create_compiler_flag_setting_regex
 		_OPTION_LIST
 		CACHE ${_SETTING}
 		PROPERTY STRINGS
-		)
+	)
 
 	if(NOT _OPTION_LIST)
 		message(FATAL_ERROR "${_SETTING} does not have an associated option list")
@@ -597,7 +597,7 @@ macro(
 axl_create_compiler_flag_regex
 	_RESULT
 	# ...
-	)
+)
 
 	set(_OPTION_LIST ${ARGN})
 
@@ -625,7 +625,7 @@ axl_apply_compiler_flag
 	_RESULT
 	_REGEX
 	# ... _VALUE
-	)
+)
 
 	set(_ARG_LIST ${ARGN})
 	if(_ARG_LIST)
@@ -644,7 +644,7 @@ axl_apply_compiler_flag
 		" "
 		_FLAGS
 		" ${_FLAGS} " # surround with spaces
-		)
+	)
 
 	string(STRIP "${_FLAGS}" _FLAGS)
 
@@ -663,7 +663,7 @@ macro(
 axl_apply_compiler_flag_setting_to_list
 	_SETTING
 	# ... _FLAG_LIST
-	)
+)
 
 	set(_FLAG_LIST ${ARGN})
 
@@ -678,7 +678,7 @@ macro(
 axl_set_export_version_script_gcc
 	_TARGET
 	# ... _EXPORT_LIST
-	)
+)
 
 	if(APPLE)
 		message(FATAL_ERROR "axl_set_export_version_script is not supported")
@@ -694,7 +694,7 @@ axl_set_export_version_script_gcc
 		APPEND_STRING
 		PROPERTY LINK_FLAGS
 		" -Wl,--version-script='${_VERSION_SCRIPT}'"
-		)
+	)
 endmacro()
 
 macro(
@@ -702,7 +702,7 @@ axl_create_predefined_macro_file_gcc
 	_COMPILER
 	_SOURCE_FILE
 	_OUTPUT_FILE
-	)
+)
 
 	file(WRITE ${_SOURCE_FILE}) # create an empty file
 
@@ -725,7 +725,7 @@ axl_set_pch_msvc
 	_TARGET
 	_PCH_H
 	_PCH_CPP
-	)
+)
 
 	get_filename_component(_PCH_NAME ${_PCH_H} NAME_WE)
 	set(_PCH_BIN "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET}.dir/$(Configuration)/${_PCH_NAME}.pch")
@@ -735,20 +735,20 @@ axl_set_pch_msvc
 		APPEND_STRING
 		PROPERTY COMPILE_FLAGS
 		" /Yu\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
-		)
+	)
 
 	set_property(
 		SOURCE ${_PCH_CPP}
 		APPEND_STRING
 		PROPERTY COMPILE_FLAGS
 		" /Yc\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
-		)
+	)
 
 	set_source_files_properties(
 		${_PCH_CPP}
 		PROPERTIES
 		OBJECT_OUTPUTS "${_PCH_BIN}"
-		)
+	)
 endmacro()
 
 macro(
@@ -756,7 +756,7 @@ axl_append_compile_flag_list
 	_FLAGS
 	_PREFIX
 	# ...
-	)
+)
 
 	set(_ARG_LIST ${ARGN})
 
@@ -778,7 +778,7 @@ axl_set_pch_gcc
 	_PCH_H
 	_PCH_CPP
 	# ...
-	)
+)
 
 	set(_EXTRA_FLAG_LIST ${ARGN})
 
@@ -840,7 +840,7 @@ axl_set_pch_gcc
 		${_DIR_FLAGS_2}
 		${_TARGET_FLAGS}
 		${_TARGET_FLAGS_2}
-		)
+	)
 
 	# add -isysroot on MacOS
 
@@ -850,7 +850,7 @@ axl_set_pch_gcc
 			_COMPILE_FLAGS
 			"-isysroot"
 			"${CMAKE_OSX_SYSROOT}"
-			)
+		)
 	endif()
 
 	# get and append INCLUDE_DIRECTORIES property
@@ -863,7 +863,7 @@ axl_set_pch_gcc
 		"-I"
 		${_DIR_FLAGS}
 		${_TARGET_FLAGS}
-		)
+	)
 
 	# append extra flags passed in vararg and finalize list
 
@@ -879,7 +879,7 @@ axl_set_pch_gcc
 		file(
 			WRITE ${_PCH_PROXY_H}
 			"\#include \"${CMAKE_CURRENT_SOURCE_DIR}/${_PCH_H}\"\n"
-			)
+		)
 	endif()
 
 	add_custom_command(
@@ -900,21 +900,21 @@ axl_set_pch_gcc
 		${_TARGET}
 		PUBLIC
 		${CMAKE_CURRENT_BINARY_DIR}
-		)
+	)
 
 	set_property(
 		TARGET ${_TARGET}
 		APPEND_STRING
 		PROPERTY COMPILE_FLAGS
 		" -include \"${_PCH_PROXY_H}\""
-		)
+	)
 
 	# add dependencies between target and pch binary
 
 	add_custom_target(
 		${_TARGET}_pch
 		DEPENDS ${_PCH_BIN}
-		)
+	)
 
 	add_dependencies(${_TARGET} ${_TARGET}_pch)
 endmacro()
@@ -924,7 +924,7 @@ axl_set_pch
 	_TARGET
 	_PCH_H
 	_PCH_CPP
-	)
+)
 	if(MSVC AND MSVC_USE_PCH)
 		axl_set_pch_msvc(${_TARGET} ${_PCH_H} ${_PCH_CPP} ${ARGN})
 	elseif(GCC AND GCC_USE_PCH AND NOT CMAKE_GENERATOR MATCHES "Xcode")
@@ -943,48 +943,48 @@ macro(
 axl_set_header_file_only
 	_IS_HEADER_FILE_ONLY
 	# ...
-	)
+)
 
 	set_source_files_properties(
 		${ARGN}
 		PROPERTIES
 		HEADER_FILE_ONLY ${_IS_HEADER_FILE_ONLY}
-		)
+	)
 endmacro()
 
 macro(
 axl_is_excluded_from_build
 	_RESULT
 	_FILE_NAME
-	)
+)
 
 	get_source_file_property(
 		${_RESULT}
 		${_FILE_NAME}
 		HEADER_FILE_ONLY
-		)
+	)
 endmacro()
 
 macro(
 axl_exclude_from_build
 	# ...
-	)
+)
 
 	axl_set_header_file_only(
 		TRUE
 		${ARGN}
-		)
+	)
 endmacro()
 
 macro(
 axl_undo_exclude_from_build
 	# ...
-	)
+)
 
 	axl_set_header_file_only(
 		FALSE
 		${ARGN}
-		)
+	)
 endmacro()
 
 #...............................................................................
@@ -995,14 +995,14 @@ macro(
 axl_find_executable
 	_RESULT
 	_FILE_NAME
-	)
+)
 
 	if(WIN32)
 		execute_process(
 			COMMAND where ${_FILE_NAME}
 			ERROR_FILE "NUL"
 			OUTPUT_VARIABLE _OUTPUT
-			)
+		)
 
 		if(NOT "${_OUTPUT}" STREQUAL "")
 			string(REGEX REPLACE "\n.*" "" _OUTPUT ${_OUTPUT})
@@ -1013,7 +1013,7 @@ axl_find_executable
 			COMMAND which ${_FILE_NAME}
 			ERROR_FILE /dev/null
 			OUTPUT_VARIABLE _OUTPUT
-			)
+		)
 	endif()
 
 	string(STRIP "${_OUTPUT}" _OUTPUT)
@@ -1029,7 +1029,7 @@ macro(
 axl_find_inc_dir
 	_RESULT
 	# ...
-	)
+)
 
 	unset(_DIR)
 	find_path(_DIR ${ARGN})
@@ -1048,7 +1048,7 @@ endmacro()
 macro(
 axl_find_lib_dir_ex
 	# ...
-	)
+)
 
 	set(_ARG_LIST ${ARGN})
 
@@ -1104,7 +1104,7 @@ axl_find_lib_dir
 	_RESULT
 	_LIB_NAME
 	# ... _OPTIONS
-	)
+)
 
 	unset(_PATH)
 	find_library(_PATH ${_LIB_NAME} ${ARGN})
@@ -1120,7 +1120,7 @@ axl_find_lib_dir
 			_DIR
 			${_PATH}
 			DIRECTORY
-			)
+		)
 
 		set(${_RESULT} ${_DIR})
 	endif()
@@ -1133,7 +1133,7 @@ axl_find_file
 	_RESULT
 	_FILE_NAME
 	# ...
-	)
+)
 
 	set(_DIR_LIST ${ARGN})
 
@@ -1154,7 +1154,7 @@ axl_find_file_recurse_parent_dirs
 	_RESULT
 	_FILE_NAME
 	_START_DIR
-	)
+)
 
 	set(_DIR ${_START_DIR})
 
@@ -1180,7 +1180,7 @@ endmacro()
 macro(
 axl_chain_include
 	_FILE_NAME
-	)
+)
 
 	axl_find_file_recurse_parent_dirs(_FILE_PATH ${_FILE_NAME} ${CMAKE_CURRENT_LIST_DIR}/..)
 
@@ -1194,7 +1194,7 @@ axl_make_path
 	_FILE_PATH
 	_FILE_NAME
 	_BASE_DIR
-	)
+)
 
 	if(IS_ABSOLUTE ${_FILE_NAME})
 		set(${_FILE_PATH} ${_FILE_NAME})
@@ -1208,7 +1208,7 @@ macro(
 axl_does_file_exist_w_configuration
 	_RESULT
 	_FILE_NAME
-	)
+)
 
 	set(${_RESULT} FALSE)
 	set(_REGEX "\\$\\((Configuration|CONFIGURATION)\\)")
@@ -1229,7 +1229,7 @@ macro(
 axl_ensure_file_exists
 	_FILE_PATH
 	_TEMPLATE_FILE_PATH
-	)
+)
 	if(NOT EXISTS ${_FILE_PATH})
 		file(READ ${_TEMPLATE_FILE_PATH} _BUFFER)
 		file(WRITE ${_FILE_PATH} ${_BUFFER})
@@ -1241,7 +1241,7 @@ axl_configure_file_w_permissions
 	_SRC_FILE
 	_DST_FILE
 	# ...
-	)
+)
 
 	set(_PERMISSION_LIST ${ARGN})
 	set(_TMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/tmp/${_DST_FILE})
@@ -1252,7 +1252,7 @@ axl_configure_file_w_permissions
 		COPY ${_TMP_FILE}
 		DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 		FILE_PERMISSIONS ${_PERMISSION_LIST}
-		)
+	)
 
 	file(REMOVE ${_TMP_FILE})
 endmacro()
@@ -1261,7 +1261,7 @@ macro(
 axl_enum_directories
 	_RESULT
 	_DIR
-	)
+)
 
 	file(GLOB _FILE_LIST RELATIVE ${_DIR} ${_DIR}/*)
 	set(_DIR_LIST)
@@ -1283,7 +1283,7 @@ macro(
 axl_include_import_file
 	_IMPORT
 	_IS_OPTIONAL
-	)
+)
 
 	set(${_IMPORT}_FOUND FALSE)
 	unset(_IMPORT_FILE_PATH)
@@ -1293,7 +1293,7 @@ axl_include_import_file
 		import_${_IMPORT}.cmake
 		${AXL_IMPORT_DIR_LIST} # AXL_IMPORT_DIR_LIST first (to allow overriding)
 		${CMAKE_CURRENT_LIST_DIR}
-		)
+	)
 
 	if(_IMPORT_FILE_PATH)
 		include(${_IMPORT_FILE_PATH})
@@ -1328,7 +1328,7 @@ endmacro()
 macro(
 axl_import
 	#...
-	)
+)
 
 	set(_IMPORT_LIST ${ARGN})
 	set(_IS_OPTIONAL FALSE)
@@ -1342,7 +1342,7 @@ axl_import
 			axl_include_import_file(
 				${_IMPORT}
 				_IS_OPTIONAL
-				)
+			)
 		endif()
 	endforeach()
 endmacro()
@@ -1354,14 +1354,14 @@ axl_install_redirected_includes
 	_TARGET_DIR
 	_SUB_DIR
 	# ...
-	)
+)
 
 	set(_H_LIST ${ARGN})
 
 	install(
 		FILES ${_H_LIST}
 		DESTINATION ${_TARGET_DIR}/${_SUB_DIR}
-		)
+	)
 
 	set(_REDIR_H_LIST)
 
@@ -1373,14 +1373,14 @@ axl_install_redirected_includes
 	install(
 		FILES ${_REDIR_H_LIST}
 		DESTINATION ${_TARGET_DIR}
-		)
+	)
 endmacro()
 
 macro(
 axl_replace_configuration_for_install
 	_DST_LIST
 	# ...
-	)
+)
 
 	set(_SRC_LIST ${ARGN})
 	set(${_DST_LIST})
@@ -1400,7 +1400,7 @@ axl_add_twin_library
 	_EXCLUDE_PATTERN
 	_PCH_H
 	_PCH_CPP
-	)
+)
 
 	# create a new twin library target
 
@@ -1422,20 +1422,20 @@ axl_add_twin_library
 			APPEND
 			_SOURCE_PATH_LIST
 			${_SOURCE}
-			)
+		)
 	endforeach()
 
 	add_library(
 		${_NEW_TARGET}
 		${_SOURCE_PATH_LIST}
-		)
+	)
 
 	if(NOT "${_PCH_H}" STREQUAL "")
 		axl_set_pch(
 			${_NEW_TARGET}
 			${_PCH_H}
 			${_SOURCE_DIR}/${_PCH_CPP}
-			)
+		)
 	endif()
 endmacro()
 

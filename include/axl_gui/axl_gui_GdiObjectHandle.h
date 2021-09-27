@@ -20,12 +20,10 @@ namespace gui {
 
 //..............................................................................
 
-class DeleteGdiObject
-{
+class DeleteGdiObject {
 public:
 	void
-	operator () (HGDIOBJ h)
-	{
+	operator () (HGDIOBJ h) {
 		::DeleteObject(h);
 	}
 };
@@ -33,17 +31,12 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class GdiObjectHandle: public sl::Handle<T, DeleteGdiObject>
-{
+class GdiObjectHandle: public sl::Handle<T, DeleteGdiObject> {
 public:
-	GdiObjectHandle()
-	{
-	}
+	GdiObjectHandle() {}
 
 	GdiObjectHandle(T h):
-		sl::Handle<T, DeleteGdiObject> (h)
-	{
-	}
+		sl::Handle<T, DeleteGdiObject> (h) {}
 };
 
 //..............................................................................

@@ -18,8 +18,7 @@ namespace cry {
 //..............................................................................
 
 BIGNUM*
-BnCtx::getBigNum()
-{
+BnCtx::getBigNum() {
 	BIGNUM* result = BN_CTX_get(m_h);
 	return completeWithLastCryptoError<BIGNUM*>(result, NULL);
 }
@@ -27,8 +26,7 @@ BnCtx::getBigNum()
 //..............................................................................
 
 bool
-BigNum::create()
-{
+BigNum::create() {
 	close();
 
 	m_h = BN_new();
@@ -36,8 +34,7 @@ BigNum::create()
 }
 
 bool
-BigNum::createCopy(BIGNUM* src)
-{
+BigNum::createCopy(BIGNUM* src) {
 	close();
 
 	m_h = BN_dup(src);
@@ -48,8 +45,7 @@ size_t
 BigNum::getData(
 	void* p,
 	size_t size
-	)
-{
+) {
 	ASSERT(size >= getSize());
 
 	int result = BN_bn2bin(m_h, (uchar_t*)p);
@@ -60,8 +56,7 @@ BigNum::getData(
 }
 
 bool
-BigNum::getDecString(sl::String* string)
-{
+BigNum::getDecString(sl::String* string) {
 	char* p = BN_bn2dec(m_h);
 	if (!p)
 		return failWithLastCryptoError();
@@ -72,8 +67,7 @@ BigNum::getDecString(sl::String* string)
 }
 
 bool
-BigNum::getHexString(sl::String* string)
-{
+BigNum::getHexString(sl::String* string) {
 	char* p = BN_bn2hex(m_h);
 	if (!p)
 		return failWithLastCryptoError();

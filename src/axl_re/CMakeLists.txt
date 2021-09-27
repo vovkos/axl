@@ -19,21 +19,21 @@ set(
 	${AXL_INC_DIR}/axl_re/axl_re_Dfa.h
 	${AXL_INC_DIR}/axl_re/axl_re_Regex.h
 	${AXL_INC_DIR}/axl_re/axl_re_RegexNameMgr.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
 	axl_re_Nfa.cpp
 	axl_re_Dfa.cpp
 	axl_re_Regex.cpp
-	)
+)
 
 source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -47,14 +47,14 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_re/axl_re_Pch.h
-	)
+)
 
 source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -69,13 +69,13 @@ add_library(
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_re
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -83,11 +83,11 @@ axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_re
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_re
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

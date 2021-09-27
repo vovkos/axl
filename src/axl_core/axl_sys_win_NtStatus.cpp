@@ -25,8 +25,7 @@ WINAPI
 RtlNtStatusToDosErrorFunc(long);
 
 sl::String
-NtStatusProvider::getErrorDescription(long status)
-{
+NtStatusProvider::getErrorDescription(long status) {
 	static HMODULE ntDll = ::GetModuleHandleW(L"ntdll.dll");
 	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress(ntDll, "RtlNtStatusToDosError");
 
@@ -52,7 +51,7 @@ NtStatusProvider::getErrorDescription(long status)
 		(LPWSTR) &message,
 		0,
 		NULL
-		);
+	);
 
 	if (!message)
 		return sl::formatString("ntstatus 0x%08x", status);
@@ -65,8 +64,7 @@ NtStatusProvider::getErrorDescription(long status)
 //..............................................................................
 
 size_t
-NtStatus::create(long status)
-{
+NtStatus::create(long status) {
 	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
 	if (!error)
 		return -1;

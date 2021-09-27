@@ -23,16 +23,14 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class Pack
-{
+class Pack {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		T a = va.arg<T> ();
 
 		*size = sizeof(T);
@@ -47,16 +45,14 @@ public:
 //..............................................................................
 
 template <typename T>
-class PackIntTrunc
-{
+class PackIntTrunc {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		int n = va.arg<int> ();
 
 		*size = sizeof(T);
@@ -71,33 +67,27 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class Pack<char>: public PackIntTrunc<char>
-{
+class Pack<char>: public PackIntTrunc<char> {
 };
 
 template <>
-class Pack<wchar_t>: public PackIntTrunc<wchar_t>
-{
+class Pack<wchar_t>: public PackIntTrunc<wchar_t> {
 };
 
 template <>
-class Pack<int8_t>: public PackIntTrunc<int8_t>
-{
+class Pack<int8_t>: public PackIntTrunc<int8_t> {
 };
 
 template <>
-class Pack<uint8_t>: public PackIntTrunc<uint8_t>
-{
+class Pack<uint8_t>: public PackIntTrunc<uint8_t> {
 };
 
 template <>
-class Pack<int16_t>: public PackIntTrunc<int16_t>
-{
+class Pack<int16_t>: public PackIntTrunc<int16_t> {
 };
 
 template <>
-class Pack<uint16_t>: public PackIntTrunc<uint16_t>
-{
+class Pack<uint16_t>: public PackIntTrunc<uint16_t> {
 };
 
 //..............................................................................
@@ -105,16 +95,14 @@ class Pack<uint16_t>: public PackIntTrunc<uint16_t>
 // pack string directly into buffer
 
 template <typename T>
-class PackStringBase
-{
+class PackStringBase {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		T* string = va.arg<T*> ();
 
 		size_t length = StringDetailsBase<T>::calcLength(string);
@@ -122,8 +110,7 @@ public:
 
 		*size = stringSize;
 
-		if (p)
-		{
+		if (p) {
 			if (string)
 				memcpy(p, string, stringSize);
 			else
@@ -145,23 +132,19 @@ typedef PackStringBase<utf32_t> PackString_utf32;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class Pack<const char*>: public PackStringBase<char>
-{
+class Pack<const char*>: public PackStringBase<char> {
 };
 
 template <>
-class Pack<char*>: public PackStringBase<char>
-{
+class Pack<char*>: public PackStringBase<char> {
 };
 
 template <>
-class Pack<const wchar_t*>: public PackStringBase<wchar_t>
-{
+class Pack<const wchar_t*>: public PackStringBase<wchar_t> {
 };
 
 template <>
-class Pack<wchar_t*>: public PackStringBase<wchar_t>
-{
+class Pack<wchar_t*>: public PackStringBase<wchar_t> {
 };
 
 //..............................................................................
@@ -169,22 +152,19 @@ class Pack<wchar_t*>: public PackStringBase<wchar_t>
 // general pointer
 
 template <typename T>
-class Pack<T*>
-{
+class Pack<T*> {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		T* obj = va.arg<T*> ();
 
 		*size = sizeof(T);
 
-		if (p)
-		{
+		if (p) {
 			if (obj)
 				memcpy(p, obj, sizeof(T));
 			else
@@ -202,25 +182,22 @@ public:
 template <
 	typename T,
 	typename SizeOf = sl::SizeOf<T>
-	>
-class PackSelfSizedPtr
-{
+>
+class PackSelfSizedPtr {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		T* obj = va.arg<T*> ();
 
 		size_t objSize = obj ? SizeOf() (obj) : sizeof(T);
 
 		*size = objSize;
 
-		if (p)
-		{
+		if (p) {
 			if (obj)
 				memcpy(p, obj, objSize);
 			else
@@ -235,16 +212,14 @@ public:
 
 // pack error last
 
-class PackLastError
-{
+class PackLastError {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		err::Error error = err::getLastError();
 
 		*size = error->m_size;
@@ -264,39 +239,34 @@ template <>
 class Pack<err::ErrorHdr*>: public PackSelfSizedPtr<
 	err::ErrorHdr,
 	err::SizeOfError
-	>
-{
+> {
 };
 
 template <>
 class Pack<const err::ErrorHdr*>: public PackSelfSizedPtr<
 	err::ErrorHdr,
 	err::SizeOfError
-	>
-{
+> {
 };
 
 //..............................................................................
 
 // pack object referenced by (void* p, size_t size) pair
 
-class PackPtrSize
-{
+class PackPtrSize {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		void* obj = va.arg<void*> ();
 		size_t objSize = va.arg<size_t> ();
 
 		*size = objSize;
 
-		if (p)
-		{
+		if (p) {
 			if (obj)
 				memcpy(p, obj, objSize);
 			else
@@ -314,27 +284,22 @@ public:
 template <
 	typename Pack1,
 	typename Pack2
-	>
-class PackSeqEx
-{
+>
+class PackSeqEx {
 public:
 	axl_va_list
 	operator () (
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		size_t size1 = 0;
 		size_t size2 = 0;
 
-		if (!p)
-		{
+		if (!p) {
 			va = Pack1() (NULL, &size1, va);
 			va = Pack2() (NULL, &size2, va);
-		}
-		else
-		{
+		} else {
 			va = Pack1() (p, &size1, va);
 			va = Pack2() ((uchar_t*)p + size1, &size2, va);
 		}
@@ -351,9 +316,8 @@ public:
 template <
 	typename Pack1,
 	typename Pack2
-	>
-class PackSeqEx_2: public PackSeqEx<Pack1, Pack2>
-{
+>
+class PackSeqEx_2: public PackSeqEx<Pack1, Pack2> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -362,9 +326,8 @@ template <
 	typename Pack1,
 	typename Pack2,
 	typename Pack3
-	>
-class PackSeqEx_3: public PackSeqEx<PackSeqEx<Pack1, Pack2>, Pack3>
-{
+>
+class PackSeqEx_3: public PackSeqEx<PackSeqEx<Pack1, Pack2>, Pack3> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -374,9 +337,8 @@ template <
 	typename Pack2,
 	typename Pack3,
 	typename Pack4
-	>
-class PackSeqEx_4: public PackSeqEx<PackSeqEx_3<Pack1, Pack2, Pack3>, Pack4>
-{
+>
+class PackSeqEx_4: public PackSeqEx<PackSeqEx_3<Pack1, Pack2, Pack3>, Pack4> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -387,9 +349,8 @@ template <
 	typename Pack3,
 	typename Pack4,
 	typename Pack5
-	>
-class PackSeqEx_5: public PackSeqEx<PackSeqEx_4<Pack1, Pack2, Pack3, Pack4>, Pack5>
-{
+>
+class PackSeqEx_5: public PackSeqEx<PackSeqEx_4<Pack1, Pack2, Pack3, Pack4>, Pack5> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -401,9 +362,8 @@ template <
 	typename Pack4,
 	typename Pack5,
 	typename Pack6
-	>
-class PackSeqEx_6: public PackSeqEx<PackSeqEx_5<Pack1, Pack2, Pack3, Pack4, Pack5>, Pack6>
-{
+>
+class PackSeqEx_6: public PackSeqEx<PackSeqEx_5<Pack1, Pack2, Pack3, Pack4, Pack5>, Pack6> {
 };
 
 //..............................................................................
@@ -413,12 +373,11 @@ class PackSeqEx_6: public PackSeqEx<PackSeqEx_5<Pack1, Pack2, Pack3, Pack4, Pack
 template <
 	typename T1,
 	typename T2
-	>
+>
 class PackSeq_2: public PackSeqEx<
 	Pack<T1>,
 	Pack<T2>
-	>
-{
+> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -427,13 +386,12 @@ template <
 	typename T1,
 	typename T2,
 	typename T3
-	>
+>
 class PackSeq_3: public PackSeqEx_3<
 	Pack<T1>,
 	Pack<T2>,
 	Pack<T3>
-	>
-{
+> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -443,14 +401,13 @@ template <
 	typename T2,
 	typename T3,
 	typename T4
-	>
+>
 class PackSeq_4: public PackSeqEx_4<
 	Pack<T1>,
 	Pack<T2>,
 	Pack<T3>,
 	Pack<T4>
-	>
-{
+> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -461,15 +418,14 @@ template <
 	typename T3,
 	typename T4,
 	typename T5
-	>
+>
 class PackSeq_5: public PackSeqEx_5<
 	Pack<T1>,
 	Pack<T2>,
 	Pack<T3>,
 	Pack<T4>,
 	Pack<T5>
-	>
-{
+> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -481,7 +437,7 @@ template <
 	typename T4,
 	typename T5,
 	typename T6
-	>
+>
 class PackSeq_6: public PackSeqEx_6<
 	Pack<T1>,
 	Pack<T2>,
@@ -489,16 +445,14 @@ class PackSeq_6: public PackSeqEx_6<
 	Pack<T4>,
 	Pack<T5>,
 	Pack<T6>
-	>
-{
+> {
 };
 
 //..............................................................................
 
 template <typename T>
 rc::Ptr<mem::Block>
-createPackage_va(axl_va_list va)
-{
+createPackage_va(axl_va_list va) {
 	size_t size = 0;
 	T() (NULL, &size, va);
 
@@ -520,8 +474,7 @@ rc::Ptr<mem::Block>
 createPackage(
 	int unused,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, unused);
 	return createPackage_va<T> (va);
 }

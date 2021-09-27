@@ -18,8 +18,7 @@ class Block;
 
 //..............................................................................
 
-struct Host
-{
+struct Host {
 	virtual
 	Block*
 	findItemBlock(handle_t item) = 0;
@@ -33,7 +32,7 @@ struct Host
 	setItemBlock(
 		handle_t item,
 		Block* block
-		) = 0;
+	) = 0;
 
 	virtual
 	sl::String
@@ -48,7 +47,7 @@ struct Host
 	findItem(
 		const sl::StringRef& name,
 		size_t overloadIdx
-		) = 0;
+	) = 0;
 
 	virtual
 	handle_t
@@ -60,7 +59,7 @@ struct Host
 		const sl::StringRef& outputDir,
 		sl::String* itemXml,
 		sl::String* indexXml
-		) = 0;
+	) = 0;
 
 	// return true if param was used
 
@@ -70,8 +69,7 @@ struct Host
 		const sl::StringRef& command,
 		const sl::StringRef& param,
 		BlockData* block
-		)
-	{
+	) {
 		return false;
 	}
 };

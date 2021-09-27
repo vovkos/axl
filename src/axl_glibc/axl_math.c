@@ -30,26 +30,22 @@ __asm__(".symver pow,  pow@GLIBC_2.0");
 //..............................................................................
 
 double
-__wrap_exp(double x)
-{
+__wrap_exp(double x) {
 	return exp(x);
 }
 
 double
-__wrap_exp2(double x)
-{
+__wrap_exp2(double x) {
 	return exp2(x);
 }
 
 double
-__wrap_log(double x)
-{
+__wrap_log(double x) {
 	return log(x);
 }
 
 double
-__wrap_log2(double x)
-{
+__wrap_log2(double x) {
 	return log2(x);
 }
 
@@ -57,8 +53,7 @@ double
 __wrap_pow(
 	double x,
 	double y
-	)
-{
+) {
 	return pow(x, y);
 }
 

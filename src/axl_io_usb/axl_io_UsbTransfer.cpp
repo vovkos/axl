@@ -19,10 +19,8 @@ namespace io {
 //..............................................................................
 
 const char*
-getUsbTransferStatusString(libusb_transfer_status status)
-{
-	const char* stringTable[] =
-	{
+getUsbTransferStatusString(libusb_transfer_status status) {
+	const char* stringTable[] = {
 		"LIBUSB_TRANSFER_COMPLETED",
 		"LIBUSB_TRANSFER_ERROR",
 		"LIBUSB_TRANSFER_TIMED_OUT",
@@ -40,13 +38,11 @@ getUsbTransferStatusString(libusb_transfer_status status)
 //..............................................................................
 
 bool
-UsbTransfer::create(size_t isochronousPacketCount)
-{
+UsbTransfer::create(size_t isochronousPacketCount) {
 	close();
 
 	m_h = libusb_alloc_transfer(isochronousPacketCount);
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::setError(err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
@@ -55,8 +51,7 @@ UsbTransfer::create(size_t isochronousPacketCount)
 }
 
 bool
-UsbTransfer::submit()
-{
+UsbTransfer::submit() {
 	ASSERT(m_h);
 
 	int result = libusb_submit_transfer(m_h);
@@ -64,8 +59,7 @@ UsbTransfer::submit()
 }
 
 bool
-UsbTransfer::cancel()
-{
+UsbTransfer::cancel() {
 	ASSERT(m_h);
 
 	int result = libusb_cancel_transfer(m_h);

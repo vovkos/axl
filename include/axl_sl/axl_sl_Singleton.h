@@ -25,16 +25,14 @@ namespace sl {
 template <class T>
 class DestructSingleton:
 	public rc::RefCount,
-	public g::Finalizer
-{
+	public g::Finalizer {
 public:
 	T* m_p;
 
 public:
 	virtual
 	void
-	finalize()
-	{
+	finalize() {
 		m_p->~T();
 	}
 };
@@ -42,15 +40,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <class T>
-class ConstructSingleton
-{
+class ConstructSingleton {
 public:
 	typedef DestructSingleton<T> Destruct;
 
 public:
 	void
-	operator () (void* p)
-	{
+	operator () (void* p) {
 		new(p)T;
 		rc::Ptr<Destruct> destruct = AXL_RC_NEW(Destruct);
 		destruct->m_p = (T*)p;
@@ -62,8 +58,7 @@ public:
 
 template <typename T>
 T*
-getSingleton(volatile int32_t* flag = NULL)
-{
+getSingleton(volatile int32_t* flag = NULL) {
 	static uchar_t buffer[sizeof(T)] = { 0 };
 	callOnce(ConstructSingleton<T> (), buffer, flag);
 	return (T*)buffer;

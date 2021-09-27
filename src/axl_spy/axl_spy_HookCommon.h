@@ -7,8 +7,7 @@ namespace spy {
 
 //..............................................................................
 
-struct HookCommonContext
-{
+struct HookCommonContext {
 	void* m_targetFunc;
 	void* m_callbackParam;
 	HookEnterFunc* m_enterFunc;
@@ -22,13 +21,13 @@ hookEnterCommon(
 	HookCommonContext* context,
 	size_t frameBase,
 	size_t originalRet
-	);
+);
 
 size_t
 hookLeaveCommon(
 	HookCommonContext* context,
 	size_t frameBase
-	);
+);
 
 //..............................................................................
 

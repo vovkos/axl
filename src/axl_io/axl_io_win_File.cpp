@@ -26,8 +26,7 @@ File::create(
 	SECURITY_ATTRIBUTES* secAttr,
 	uint_t creationDisposition,
 	uint_t flagsAttributes
-	)
-{
+) {
 	close();
 
 	m_h = ::CreateFileW(
@@ -38,7 +37,7 @@ File::create(
 		creationDisposition,
 		flagsAttributes,
 		NULL
-		);
+	);
 
 	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
@@ -51,8 +50,7 @@ File::duplicate(
 	dword_t accessMode,
 	bool isInheritable,
 	dword_t options
-	)
-{
+) {
 	close();
 
 	bool_t result = ::DuplicateHandle(
@@ -63,14 +61,13 @@ File::duplicate(
 		accessMode,
 		isInheritable,
 		options
-		);
+	);
 
 	return err::complete(result);
 }
 
 uint64_t
-File::getSize() const
-{
+File::getSize() const {
 	ULARGE_INTEGER size;
 
 	size.LowPart = ::GetFileSize(m_h, &size.HighPart);
@@ -81,8 +78,7 @@ File::getSize() const
 }
 
 bool
-File::setSize(uint64_t size)
-{
+File::setSize(uint64_t size) {
 	uint64_t position = getPosition();
 
 	bool_t result = setPosition(size);
@@ -98,8 +94,7 @@ File::setSize(uint64_t size)
 }
 
 uint64_t
-File::getPosition() const
-{
+File::getPosition() const {
 	LARGE_INTEGER offset = { 0 };
 
 	offset.LowPart = ::SetFilePointer(m_h, 0, &offset.HighPart, FILE_CURRENT);
@@ -110,8 +105,7 @@ File::getPosition() const
 }
 
 bool
-File::setPosition(uint64_t _Offset) const
-{
+File::setPosition(uint64_t _Offset) const {
 	LARGE_INTEGER offset;
 	offset.QuadPart = _Offset;
 
@@ -123,8 +117,7 @@ size_t
 File::read(
 	void* p,
 	size_t size
-	) const
-{
+) const {
 	dword_t actualSize;
 	bool result = read(p, (dword_t)size, &actualSize);
 	return result ? (size_t)actualSize : -1;
@@ -134,8 +127,7 @@ size_t
 File::write(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	dword_t actualSize;
 	bool result = write(p, (dword_t)size, &actualSize);
 	return result ? (size_t)actualSize : -1;
@@ -145,8 +137,7 @@ size_t
 File::overlappedRead(
 	void* p,
 	size_t size
-	) const
-{
+) const {
 	dword_t actualSize;
 	bool result = overlappedRead(p, (dword_t)size, &actualSize);
 	return result ? (size_t)actualSize : -1;
@@ -156,8 +147,7 @@ size_t
 File::overlappedWrite(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	dword_t actualSize;
 	bool result = overlappedWrite(p, (dword_t)size, &actualSize);
 	return result ? (size_t)actualSize : -1;
@@ -168,8 +158,7 @@ File::overlappedRead(
 	void* p,
 	dword_t size,
 	dword_t* actualSize
-	) const
-{
+) const {
 	StdOverlapped overlapped;
 	bool result = overlappedRead(p, size, &overlapped);
 	return result ? getOverlappedResult(&overlapped, actualSize) : false;
@@ -180,8 +169,7 @@ File::overlappedWrite(
 	const void* p,
 	dword_t size,
 	dword_t* actualSize
-	)
-{
+) {
 	StdOverlapped overlapped;
 	bool result = overlappedWrite(p, size, &overlapped);
 	return result ? getOverlappedResult(&overlapped, actualSize) : false;
@@ -195,22 +183,19 @@ File::overlappedIoctl(
 	void* outData,
 	dword_t outDataSize,
 	dword_t* actualSize
-	)
-{
+) {
 	StdOverlapped overlapped;
 	bool result = overlappedIoctl(code, inData, inDataSize, outData, outDataSize, &overlapped);
 	return result ? getOverlappedResult(&overlapped, actualSize) : false;
 }
 
 bool
-File::completeOverlappedRequest(bool_t result)
-{
+File::completeOverlappedRequest(bool_t result) {
 	if (result)
 		return true;
 
 	dword_t error = ::GetLastError();
-	if (error != ERROR_IO_PENDING)
-	{
+	if (error != ERROR_IO_PENDING) {
 		err::setError(error);
 		return false;
 	}
@@ -222,14 +207,11 @@ bool
 File::getOverlappedResult(
 	OVERLAPPED* overlapped,
 	dword_t* actualSize
-	) const
-{
+) const {
 	bool_t result = ::GetOverlappedResult(m_h, overlapped, actualSize, true);
-	if (!result)
-	{
+	if (!result) {
 		DWORD error = ::GetLastError();
-		if (error != ERROR_HANDLE_EOF)
-		{
+		if (error != ERROR_HANDLE_EOF) {
 			err::setError(error);
 			return false;
 		}
@@ -241,8 +223,7 @@ File::getOverlappedResult(
 }
 
 size_t
-File::getOverlappedResult(OVERLAPPED* overlapped) const
-{
+File::getOverlappedResult(OVERLAPPED* overlapped) const {
 	dword_t actualSize;
 	bool result = getOverlappedResult(overlapped, &actualSize);
 	return result ? (size_t)actualSize : -1;

@@ -28,8 +28,7 @@ CodeAuthenticator::setup(
 	const sl::StringRef& expectedSubjectName,
 	const sl::StringRef& expectedIssuerName,
 	const sl::ArrayRef<char>& expectedSerialNumber
-	)
-{
+) {
 	m_expectedProgramName = expectedProgramName;
 	m_expectedSubjectName = expectedSubjectName;
 	m_expectedIssuerName = expectedIssuerName;
@@ -37,8 +36,7 @@ CodeAuthenticator::setup(
 }
 
 bool
-CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
-{
+CodeAuthenticator::verifyFile(const sl::StringRef& fileName) {
 	sl::String_w programName;
 	sl::String_w subjectName;
 	sl::String_w issuerName;
@@ -51,7 +49,7 @@ CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
 		!m_expectedIssuerName.isEmpty() ? &issuerName : NULL,
 		!m_expectedSerialNumber.isEmpty() ? &serialNumber : NULL,
 		NULL
-		);
+	);
 
 	if (!result)
 		return false;
@@ -68,7 +66,7 @@ CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
 	if (!m_expectedSerialNumber.isEmpty() &&
 		(m_expectedSerialNumber.getCount() != serialNumber.getCount() ||
 		memcmp(m_expectedSerialNumber, serialNumber, serialNumber.getCount()) != 0
-		))
+	))
 		return err::fail("Authenticode serial number mismatch");
 
 	return true;
@@ -86,8 +84,7 @@ ElfHashGenerator::generateHash(
 	size_t elfSize,
 	uchar_t hash[SHA_DIGEST_LENGTH],
 	mem::Block* signatureSection
-	)
-{
+) {
 	lnx::ElfParser elf;
 
 	bool result = elf.open(elfBase, elfSize);
@@ -100,8 +97,7 @@ ElfHashGenerator::generateHash(
 
 	const ElfW(Shdr)* shdr = elf.getSectionHdrTable();
 	const ElfW(Shdr)* shdrEnd = shdr + elf.getElfHdr()->e_shnum;
-	for (; shdr < shdrEnd; shdr++)
-	{
+	for (; shdr < shdrEnd; shdr++) {
 		const char* name = elf.getString(shdr->sh_name);
 		if (m_signatureSectionName != name)
 			SHA1_Update(&shaCtx, p + shdr->sh_offset, shdr->sh_size);
@@ -121,15 +117,13 @@ bool
 CodeAuthenticator::setup(
 	const sl::StringRef& signatureSectionName,
 	const sl::StringRef& publicKeyPem
-	)
-{
+) {
 	m_signatureSectionName = signatureSectionName;
 	return m_publicKey.readPublicKey(publicKeyPem);
 }
 
 bool
-CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
-{
+CodeAuthenticator::verifyFile(const sl::StringRef& fileName) {
 	io::SimpleMappedFile file;
 	uchar_t hash[SHA_DIGEST_LENGTH];
 	mem::Block signatureSection;
@@ -150,7 +144,7 @@ CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
 		sizeof(hash),
 		signatureSection.m_p,
 		signatureSection.m_size
-		);
+	);
 
 	if (!result)
 		return err::fail("ELF-file signature mismatch");
@@ -166,8 +160,7 @@ bool
 ElfSignatureGenerator::setup(
 	const sl::StringRef& signatureSectionName,
 	const sl::StringRef& privateKeyPem
-	)
-{
+) {
 	m_signatureSectionName = signatureSectionName;
 	return m_privateKey.readPrivateKey(privateKeyPem);
 }
@@ -176,8 +169,7 @@ bool
 ElfSignatureGenerator::generateSignature(
 	const sl::StringRef& fileName,
 	sl::Array<char>* signature
-	)
-{
+) {
 	io::SimpleMappedFile file;
 	uchar_t hash[SHA_DIGEST_LENGTH];
 
@@ -197,8 +189,7 @@ void
 CodeAuthenticator::setup(
 	const sl::StringRef& expectedProgramId,
 	const sl::StringRef& expectedTeamId
-	)
-{
+) {
 	if (!expectedProgramId.isEmpty())
 		m_expectedProgramId = expectedProgramId;
 	else
@@ -211,8 +202,7 @@ CodeAuthenticator::setup(
 }
 
 bool
-CodeAuthenticator::verifyFile(const sl::StringRef& fileName)
-{
+CodeAuthenticator::verifyFile(const sl::StringRef& fileName) {
 	sec::StaticCode code;
 	cf::Dictionary dictionary;
 

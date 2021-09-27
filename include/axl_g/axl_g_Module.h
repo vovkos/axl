@@ -24,8 +24,7 @@ namespace g {
 
 //..............................................................................
 
-struct SystemInfo
-{
+struct SystemInfo {
 	size_t m_processorCount;
 	size_t m_pageSize;
 	size_t m_mappingAlignFactor;
@@ -33,8 +32,7 @@ struct SystemInfo
 
 //..............................................................................
 
-class Finalizer
-{
+class Finalizer {
 public:
 	virtual
 	void
@@ -43,11 +41,9 @@ public:
 
 //..............................................................................
 
-class Module
-{
+class Module {
 protected:
-	struct FinalizerEntry: sl::ListLink
-	{
+	struct FinalizerEntry: sl::ListLink {
 		rc::Ptr<Finalizer> m_finalizer;
 	};
 
@@ -75,46 +71,38 @@ public:
 
 #ifdef _AXL_DEBUG
 	const char*
-	getTag()
-	{
+	getTag() {
 		return m_tag;
 	}
 
 	void
-	setTag(const char* tag)
-	{
+	setTag(const char* tag) {
 		m_tag = tag;
 	}
 #else
 	const char*
-	getTag()
-	{
+	getTag() {
 		return "<untagged-module>";
 	}
 
 	void
-	setTag(const char* tag)
-	{
-	}
+	setTag(const char* tag) {}
 #endif
 
 #if (_AXL_OS_WIN)
 	HMODULE
-	getModuleHandle()
-	{
+	getModuleHandle() {
 		return m_hModule;
 	}
 #endif
 
 	const SystemInfo*
-	getSystemInfo()
-	{
+	getSystemInfo() {
 		return &m_systemInfo;
 	}
 
 	mem::Tracker*
-	getMemTracker()
-	{
+	getMemTracker() {
 		return &m_memTracker;
 	}
 
@@ -126,8 +114,7 @@ public:
 
 inline
 Module*
-getModule()
-{
+getModule() {
 	// guaranteed to be thread safe since C++11
 	// otherwise it's still OK -- unless going MT in static constructors
 

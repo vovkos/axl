@@ -22,8 +22,7 @@ class Engine;
 
 //..............................................................................
 
-enum MouseButton
-{
+enum MouseButton {
 	MouseButton_None   = 0x00,
 	MouseButton_Left   = 0x01,
 	MouseButton_Right  = 0x02,
@@ -34,15 +33,13 @@ enum MouseButton
 
 inline
 MouseButton
-getFirstMouseButton(uint_t buttons)
-{
+getFirstMouseButton(uint_t buttons) {
 	return (MouseButton)sl::getLoBitIdx32(buttons);
 }
 
 //..............................................................................
 
-enum ModifierKey
-{
+enum ModifierKey {
 	ModifierKey_None   = 0x00,
 	ModifierKey_Shift  = 0x01,
 	ModifierKey_Ctrl   = 0x02,
@@ -53,15 +50,13 @@ enum ModifierKey
 
 inline
 ModifierKey
-getFirstModifierKey(uint_t modifierKeys)
-{
+getFirstModifierKey(uint_t modifierKeys) {
 	return (ModifierKey)sl::getLoBitIdx32(modifierKeys);
 }
 
 //..............................................................................
 
-enum Key
-{
+enum Key {
 	Key_Backspace   = 0x08,
 	Key_Tab         = 0x09,
 	Key_Enter       = 0x0d,
@@ -107,27 +102,22 @@ enum Key
 
 //..............................................................................
 
-struct Point
-{
-	union
-	{
-		struct
-		{
+struct Point {
+	union {
+		struct {
 			//! \unnamed{union/struct:2}
 			int m_x;
 			int m_y;
 		};
 
-		struct
-		{
+		struct {
 			//! \unnamed{struct:2}
 			uint_t m_x_u;
 			uint_t m_y_u;
 		};
 	};
 
-	Point()
-	{
+	Point() {
 		m_x = 0;
 		m_y = 0;
 	}
@@ -135,21 +125,18 @@ struct Point
 	Point(
 		int x,
 		int y
-		)
-	{
+	) {
 		m_x = x;
 		m_y = y;
 	}
 
 	Point
-	operator + (const Point& point2)
-	{
+	operator + (const Point& point2) {
 		return Point(m_x + point2.m_x, m_y + point2.m_y);
 	}
 
 	Point
-	operator - (const Point& point2)
-	{
+	operator - (const Point& point2) {
 		return Point(m_x - point2.m_x, m_y - point2.m_y);
 	}
 
@@ -157,15 +144,13 @@ struct Point
 	setup(
 		int x,
 		int y
-		)
-	{
+	) {
 		m_x = x;
 		m_y = y;
 	}
 
 	void
-	clipNegative()
-	{
+	clipNegative() {
 		if (m_x < 0)
 			m_x = 0;
 
@@ -176,27 +161,22 @@ struct Point
 
 //..............................................................................
 
-struct Size
-{
-	union
-	{
-		struct
-		{
+struct Size {
+	union {
+		struct {
 			//! \unnamed{union/struct:2}
 			int m_width;
 			int m_height;
 		};
 
-		struct
-		{
+		struct {
 			//! \unnamed{struct:2}
 			uint_t m_width_u;
 			uint_t m_height_u;
 		};
 	};
 
-	Size()
-	{
+	Size() {
 		m_width = 0;
 		m_height = 0;
 	}
@@ -204,21 +184,18 @@ struct Size
 	Size(
 		int width,
 		int height
-		)
-	{
+	) {
 		m_width = width;
 		m_height = height;
 	}
 
 	Size
-	operator + (const Size& size2)
-	{
+	operator + (const Size& size2) {
 		return Size(m_width + size2.m_width, m_height + size2.m_height);
 	}
 
 	Size
-	operator - (const Size& size2)
-	{
+	operator - (const Size& size2) {
 		return Size(m_width - size2.m_width, m_height - size2.m_height);
 	}
 
@@ -226,15 +203,13 @@ struct Size
 	setup(
 		int width,
 		int height
-		)
-	{
+	) {
 		m_width = width;
 		m_height = height;
 	}
 
 	void
-	clipNegative()
-	{
+	clipNegative() {
 		if (m_width < 0)
 			m_width = 0;
 
@@ -245,12 +220,9 @@ struct Size
 
 //..............................................................................
 
-struct Rect
-{
-	union
-	{
-		struct
-		{
+struct Rect {
+	union {
+		struct {
 			//! \unnamed{union/struct:4}
 			int m_left;
 			int m_top;
@@ -258,8 +230,7 @@ struct Rect
 			int m_bottom;
 		};
 
-		struct
-		{
+		struct {
 			//! \unnamed{struct:4}
 			uint_t m_left_u;
 			uint_t m_top_u;
@@ -268,8 +239,7 @@ struct Rect
 		};
 	};
 
-	Rect()
-	{
+	Rect() {
 		m_left = 0;
 		m_top = 0;
 		m_right = 0;
@@ -281,8 +251,7 @@ struct Rect
 		int top,
 		int right,
 		int bottom
-		)
-	{
+	) {
 		m_left = left;
 		m_top = top;
 		m_right = right;
@@ -292,8 +261,7 @@ struct Rect
 	Rect(
 		int left,
 		int top
-		)
-	{
+	) {
 		m_left = left;
 		m_top = top;
 		m_right = left;
@@ -303,16 +271,14 @@ struct Rect
 	Rect(
 		const Point& leftTop,
 		const Point& rightBottom
-		)
-	{
+	) {
 		m_left = leftTop.m_x;
 		m_top = leftTop.m_y;
 		m_right = rightBottom.m_x;
 		m_bottom = rightBottom.m_y;
 	}
 
-	Rect(const Point& leftTop)
-	{
+	Rect(const Point& leftTop) {
 		m_left = leftTop.m_x;
 		m_top = leftTop.m_y;
 		m_right = leftTop.m_x;
@@ -322,8 +288,7 @@ struct Rect
 	Rect(
 		const Point& leftTop,
 		const Size& size
-		)
-	{
+	) {
 		m_left = leftTop.m_x;
 		m_top = leftTop.m_y;
 		m_right = leftTop.m_x + size.m_width;
@@ -331,26 +296,22 @@ struct Rect
 	}
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_right == m_left || m_bottom == m_top;
 	}
 
 	int
-	getWidth() const
-	{
+	getWidth() const {
 		return m_right - m_left;
 	}
 
 	int
-	getHeight() const
-	{
+	getHeight() const {
 		return m_bottom - m_top;
 	}
 
 	Size
-	getSize() const
-	{
+	getSize() const {
 		return Size(getWidth(), getHeight());
 	}
 
@@ -360,8 +321,7 @@ struct Rect
 		int top,
 		int right,
 		int bottom
-		)
-	{
+	) {
 		m_left = left;
 		m_top = top;
 		m_right = right;
@@ -369,8 +329,7 @@ struct Rect
 	}
 
 	void
-	clipNegative()
-	{
+	clipNegative() {
 		if (m_left < 0)
 			m_left = 0;
 
@@ -387,27 +346,22 @@ struct Rect
 
 //..............................................................................
 
-struct CaretPos
-{
-	union
-	{
-		struct
-		{
+struct CaretPos {
+	union {
+		struct {
 			//! \unnamed{union/struct:2}
 			int m_line;
 			int m_col;
 		};
 
-		struct
-		{
+		struct {
 			//! \unnamed{struct:2}
 			uint_t m_line_u;
 			uint_t m_col_u;
 		};
 	};
 
-	CaretPos()
-	{
+	CaretPos() {
 		m_line = 0;
 		m_col = 0;
 	}
@@ -415,50 +369,42 @@ struct CaretPos
 	CaretPos(
 		int line,
 		int col
-		)
-	{
+	) {
 		setup(line, col);
 	}
 
 	bool
-	operator == (const CaretPos& pos2) const
-	{
+	operator == (const CaretPos& pos2) const {
 		return cmp(pos2) == 0;
 	}
 
 	bool
-	operator != (const CaretPos& pos2) const
-	{
+	operator != (const CaretPos& pos2) const {
 		return cmp(pos2) != 0;
 	}
 
 	bool
-	operator < (const CaretPos& pos2) const
-	{
+	operator < (const CaretPos& pos2) const {
 		return cmp(pos2) < 0;
 	}
 
 	bool
-	operator <= (const CaretPos& pos2) const
-	{
+	operator <= (const CaretPos& pos2) const {
 		return cmp(pos2) <= 0;
 	}
 
 	bool
-	operator > (const CaretPos& pos2) const
-	{
+	operator > (const CaretPos& pos2) const {
 		return cmp(pos2) > 0;
 	}
 
 	bool
-	operator >= (const CaretPos& pos2) const
-	{
+	operator >= (const CaretPos& pos2) const {
 		return cmp(pos2) >= 0;
 	}
 
 	int
-	cmp(const CaretPos& pos2) const
-	{
+	cmp(const CaretPos& pos2) const {
 		return
 			m_line < pos2.m_line ? -1 :
 			m_line > pos2.m_line ?  1 :
@@ -467,8 +413,7 @@ struct CaretPos
 	}
 
 	int
-	cmp_u(const CaretPos& pos2) const
-	{
+	cmp_u(const CaretPos& pos2) const {
 		return
 			m_line_u < pos2.m_line_u ? -1 :
 			m_line_u > pos2.m_line_u ?  1 :
@@ -480,15 +425,13 @@ struct CaretPos
 	setup(
 		int line,
 		int col
-		)
-	{
+	) {
 		m_line = line;
 		m_col = col;
 	}
 
 	void
-	clipNegative()
-	{
+	clipNegative() {
 		if (m_line < 0)
 			m_line = 0;
 
@@ -499,16 +442,14 @@ struct CaretPos
 
 //..............................................................................
 
-enum Orientation
-{
+enum Orientation {
 	Orientation_Vertical = 0,
 	Orientation_Horizontal,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum FormFactor
-{
+enum FormFactor {
 	FormFactor_Landscape,
 	FormFactor_Portrait,
 	FormFactor_LineStrip,
@@ -524,8 +465,7 @@ getFormFactor(
 	int width,
 	int height,
 	int stripThreshold = 8
-	)
-{
+) {
 	return
 		height > width * stripThreshold ? FormFactor_LineStrip :
 		width > height * stripThreshold ? FormFactor_ColumnStrip :
@@ -537,27 +477,23 @@ FormFactor
 getFormFactor(
 	const Size& size,
 	int stripThreshold = 8
-	)
-{
+) {
 	return getFormFactor(size.m_width, size.m_height, stripThreshold);
 }
 
 //..............................................................................
 
-class GuiItem
-{
+class GuiItem {
 protected:
 	Engine* m_engine;
 
 public:
-	GuiItem(Engine* engine)
-	{
+	GuiItem(Engine* engine) {
 		m_engine = engine;
 	}
 
 	Engine*
-	getEngine()
-	{
+	getEngine() {
 		return m_engine;
 	}
 };

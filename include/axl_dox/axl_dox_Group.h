@@ -20,8 +20,7 @@ class Module;
 
 //..............................................................................
 
-class Group: public Block
-{
+class Group: public Block {
 	friend class Module;
 	friend class Parser;
 
@@ -33,44 +32,37 @@ protected:
 
 public:
 	Group(Host* host):
-		Block(host)
-	{
+		Block(host) {
 		m_blockKind = BlockKind_Group;
 	}
 
 	bool
-	isEmpty()
-	{
+	isEmpty() {
 		return m_itemArray.isEmpty() && m_groupList.isEmpty();
 	}
 
 	const sl::String&
-	getName()
-	{
+	getName() {
 		return m_name;
 	}
 
 	sl::Array<handle_t>
-	getItemArray()
-	{
+	getItemArray() {
 		return m_itemArray;
 	}
 
 	sl::ConstBoxList<Group*>
-	getGroupList()
-	{
+	getGroupList() {
 		return m_groupList;
 	}
 
 	void
-	addItem(handle_t item)
-	{
+	addItem(handle_t item) {
 		m_itemArray.append(item);
 	}
 
 	sl::BoxIterator<Group*>
-	addGroup(Group* group)
-	{
+	addGroup(Group* group) {
 		return m_groupList.insertTail(group);
 	}
 
@@ -79,7 +71,7 @@ public:
 		const sl::StringRef& outputDir,
 		sl::String* itemXml,
 		sl::String* indexXml
-		);
+	);
 };
 
 //..............................................................................

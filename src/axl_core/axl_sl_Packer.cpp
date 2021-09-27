@@ -22,26 +22,20 @@ PackerSeq::pack_va(
 	void* _p,
 	size_t* size,
 	axl_va_list va
-	)
-{
+) {
 	size_t count = m_sequence.getCount();
 	size_t totalSize = 0;
 
-	if (!_p)
-	{
-		for (size_t i = 0; i < count; i++)
-		{
+	if (!_p) {
+		for (size_t i = 0; i < count; i++) {
 			size_t size = 0;
 			va = m_sequence[i]->pack_va(NULL, &size, va);
 			totalSize += size;
 		}
-	}
-	else
-	{
+	} else {
 		uchar_t* p = (uchar_t*)_p;
 
-		for (size_t i = 0; i < count; i++)
-		{
+		for (size_t i = 0; i < count; i++) {
 			size_t size = 0;
 
 			va = m_sequence[i]->pack_va(p, &size, va);
@@ -56,22 +50,19 @@ PackerSeq::pack_va(
 }
 
 size_t
-PackerSeq::appendFormat(const char* formatString)
-{
+PackerSeq::appendFormat(const char* formatString) {
 	if (!formatString)
 		return m_sequence.getCount();
 
 	const char* pF = formatString;
 
-	for (; *pF; pF++)
-	{
+	for (; *pF; pF++) {
 		if (*pF != '%')
 			continue;
 
 		pF++;
 
-		switch (*pF)
-		{
+		switch (*pF) {
 		case 'd':
 		case 'i':
 		case 'o':
@@ -144,8 +135,7 @@ size_t
 Package::append_va(
 	Packer* packer,
 	axl_va_list va
-	)
-{
+) {
 	bool result;
 
 	size_t size;
@@ -166,8 +156,7 @@ size_t
 Package::append(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	bool result;
 
 	size_t oldSize = m_buffer.getCount();

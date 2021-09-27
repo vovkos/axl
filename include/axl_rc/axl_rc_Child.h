@@ -25,46 +25,39 @@ namespace rc {
 template <
 	typename T,
 	size_t extra = 0
-	>
-class Child
-{
+>
+class Child {
 	AXL_DISABLE_COPY(Child)
 
 protected:
 	char m_buffer[sizeof(T) + extra];
 
 public:
-	Child(RefCount* parent)
-	{
+	Child(RefCount* parent) {
 		memset(m_buffer, 0, sizeof(m_buffer));
 		T* p = AXL_RC_NEW_INPLACE(T, m_buffer, parent, 0);
 		p->addRef();
 	}
 
-	~Child()
-	{
+	~Child() {
 		p()->release();
 	}
 
-	operator T* ()
-	{
+	operator T* () {
 		return p();
 	}
 
 	T*
-	operator & ()
-	{
+	operator & () {
 		return p();
 	}
 
 	T*
-	operator -> ()
-	{
+	operator -> () {
 		return p();
 	}
 
-	T* p()
-	{
+	T* p() {
 		return (T*)m_buffer;
 	}
 };

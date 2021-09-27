@@ -17,12 +17,11 @@ namespace {
 //..............................................................................
 
 void
-run()
-{
+run() {
 	rc::Ptr<mem::Block> package = sl::formatPackage(
 		"%s %d %s %d",
 		"hui", 10, "govno", 20
-		);
+	);
 
 	sl::Unpacker unpacker(package->m_p, package->m_size);
 

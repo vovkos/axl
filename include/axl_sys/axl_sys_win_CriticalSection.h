@@ -21,28 +21,23 @@ namespace win {
 
 //..............................................................................
 
-class CriticalSection: public CRITICAL_SECTION
-{
+class CriticalSection: public CRITICAL_SECTION {
 public:
-	CriticalSection()
-	{
+	CriticalSection() {
 		::InitializeCriticalSection(this);
 	}
 
-	~CriticalSection()
-	{
+	~CriticalSection() {
 		::DeleteCriticalSection(this);
 	}
 
 	void
-	enter()
-	{
+	enter() {
 		::EnterCriticalSection(this);
 	}
 
 	void
-	leave()
-	{
+	leave() {
 		::LeaveCriticalSection(this);
 	}
 };

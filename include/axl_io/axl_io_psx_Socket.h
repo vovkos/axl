@@ -22,15 +22,14 @@ namespace psx {
 
 //..............................................................................
 
-class Socket: public File
-{
+class Socket: public File {
 public:
 	bool
 	open(
 		int addressFamily,
 		int sockKind,
 		int protocol
-		);
+	);
 
 	bool
 	setBlockingMode(bool isBlocking); // blocking mode is set a bit differently
@@ -39,8 +38,7 @@ public:
 	getError();
 
 	bool
-	bind(const sockaddr* addr)
-	{
+	bind(const sockaddr* addr) {
 		int result = ::bind(m_h, addr, getSockAddrSize(addr));
 		return err::complete(result != -1);
 	}
@@ -57,8 +55,7 @@ public:
 		int option,
 		void* p,
 		socklen_t size
-		)
-	{
+	) {
 		int result = ::getsockopt(m_h, level, option, p, &size);
 		return err::complete(result != -1);
 	}
@@ -69,15 +66,13 @@ public:
 		int option,
 		const void* p,
 		socklen_t size
-		)
-	{
+	) {
 		int result = ::setsockopt(m_h, level, option, p, size);
 		return err::complete(result != -1);
 	}
 
 	bool
-	listen(size_t backLog)
-	{
+	listen(size_t backLog) {
 		int result = ::listen(m_h, (int)backLog);
 		return err::complete(result != -1);
 	}
@@ -89,8 +84,7 @@ public:
 	connect(const sockaddr* addr);
 
 	bool
-	shutdown(int mode = SHUT_RDWR)
-	{
+	shutdown(int mode = SHUT_RDWR) {
 		int result = ::shutdown(m_h, mode);
 		return err::complete(result);
 	}
@@ -99,8 +93,7 @@ public:
 	send(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		int result = ::send(m_h, p, size, 0);
 		return err::complete(result, -1);
 	}
@@ -109,8 +102,7 @@ public:
 	recv(
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		int result = ::recv(m_h, p, size, 0);
 		return err::complete(result, -1);
 	}
@@ -120,8 +112,7 @@ public:
 		void* p,
 		size_t size,
 		const sockaddr* addr
-		)
-	{
+	) {
 		int result = ::sendto(m_h, p, size, 0, addr, getSockAddrSize(addr));
 		return err::complete(result, -1);
 	}
@@ -131,7 +122,7 @@ public:
 		void* p,
 		size_t size,
 		SockAddr* addr
-		);
+	);
 };
 
 //..............................................................................

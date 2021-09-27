@@ -22,8 +22,7 @@ bool
 Number::create(
 	CFNumberType type,
 	const void* p
-	)
-{
+) {
 	CFNumberRef newNumber = ::CFNumberCreate(kCFAllocatorDefault, type, p);
 	if (!newNumber)
 		return err::fail(err::SystemErrorCode_InsufficientResources);

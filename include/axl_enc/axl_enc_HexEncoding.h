@@ -21,12 +21,10 @@ namespace enc {
 
 //..............................................................................
 
-class GetHexChar_l
-{
+class GetHexChar_l {
 public:
 	char
-	operator () (uchar_t x)
-	{
+	operator () (uchar_t x) {
 		static char charTable[] = "0123456789abcdef";
 		return charTable[x & 0xf];
 	}
@@ -34,12 +32,10 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class GetHexChar_u
-{
+class GetHexChar_u {
 public:
 	char
-	operator () (uchar_t x)
-	{
+	operator () (uchar_t x) {
 		static char charTable[] = "0123456789ABCDEF";
 		return charTable[x & 0xf];
 	}
@@ -47,8 +43,7 @@ public:
 
 //..............................................................................
 
-enum HexEncodingFlag
-{
+enum HexEncodingFlag {
 	HexEncodingFlag_UpperCase = 0x01,
 	HexEncodingFlag_NoSpace   = 0x02,
 	HexEncodingFlag_Multiline = 0x04,
@@ -56,13 +51,11 @@ enum HexEncodingFlag
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class HexEncoding
-{
+class HexEncoding {
 public:
 	static
 	uchar_t
-	getHexCharValue(char x)
-	{
+	getHexCharValue(char x) {
 		return
 			x >= '0' && x <= '9' ? x - '0' :
 			x >= 'a' && x <= 'f' ? 10 + x - 'a' :
@@ -71,15 +64,13 @@ public:
 
 	static
 	char
-	getHexChar_l(uchar_t x)
-	{
+	getHexChar_l(uchar_t x) {
 		return GetHexChar_l()(x);
 	}
 
 	static
 	char
-	getHexChar_u(uchar_t x)
-	{
+	getHexChar_u(uchar_t x) {
 		return GetHexChar_u()(x);
 	}
 
@@ -90,7 +81,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		);
+	);
 
 	static
 	sl::String
@@ -98,8 +89,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		sl::String string;
 		encode(&string, p, size, flags);
 		return string;
@@ -110,12 +100,11 @@ public:
 	decode(
 		sl::Array<char>* buffer,
 		const sl::StringRef& source
-		);
+	);
 
 	static
 	sl::Array<char>
-	decode(const sl::StringRef& source)
-	{
+	decode(const sl::StringRef& source) {
 		sl::Array<char> buffer;
 		decode(&buffer, source);
 		return buffer;

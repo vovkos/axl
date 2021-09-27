@@ -15,13 +15,12 @@ bool
 freeExecutablePages(
 	void* p,
 	size_t size
-	);
+);
 
 //..............................................................................
 
 template <typename T>
-class ExecutableBlockArena
-{
+class ExecutableBlockArena {
 protected:
 	size_t m_allocSize;
 	sl::Array<void*> m_pageArray;
@@ -29,24 +28,20 @@ protected:
 	char* m_end;
 
 public:
-	ExecutableBlockArena(size_t allocMultiplier = 1)
-	{
+	ExecutableBlockArena(size_t allocMultiplier = 1) {
 		size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
 		m_allocSize = ((sizeof(T) + pageSize - 1) & ~(pageSize - 1)) * allocMultiplier;
 		m_current = NULL;
 		m_end = NULL;
 	}
 
-	~ExecutableBlockArena()
-	{
+	~ExecutableBlockArena() {
 		free();
 	}
 
 	T*
-	allocate()
-	{
-		if (m_end - m_current >= sizeof(T))
-		{
+	allocate() {
+		if (m_end - m_current >= sizeof(T)) {
 			T* p = (T*)m_current;
 			m_current += sizeof(T);
 			return p;
@@ -63,8 +58,7 @@ public:
 	}
 
 	void
-	free()
-	{
+	free() {
 		size_t count = m_pageArray.getCount();
 		for (size_t i = 0; i < count; i++)
 			freeExecutablePages(m_pageArray[i], m_allocSize);
@@ -75,8 +69,7 @@ public:
 	}
 
 	void
-	detach()
-	{
+	detach() {
 		m_pageArray.clear();
 		m_current = NULL;
 		m_end = NULL;

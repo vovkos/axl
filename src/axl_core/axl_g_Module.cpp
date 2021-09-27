@@ -31,11 +31,9 @@ namespace g {
 
 // ensure module creation at startup
 
-class ModuleCreator
-{
+class ModuleCreator {
 public:
-	ModuleCreator()
-	{
+	ModuleCreator() {
 		getModule();
 	}
 };
@@ -44,8 +42,7 @@ static ModuleCreator g_moduleCreator;
 
 //..............................................................................
 
-Module::Module()
-{
+Module::Module() {
 #ifdef _AXL_DEBUG
 	m_tag = "<untagged-module>";
 #endif
@@ -70,10 +67,8 @@ Module::Module()
 	sys::initPreciseTimestamps();
 }
 
-Module::~Module()
-{
-	while (!m_finalizerList.isEmpty())
-	{
+Module::~Module() {
+	while (!m_finalizerList.isEmpty()) {
 		FinalizerEntry* finalizerEntry = m_finalizerList.removeTail();
 		finalizerEntry->m_finalizer->finalize();
 		AXL_MEM_DELETE(finalizerEntry);
@@ -83,8 +78,7 @@ Module::~Module()
 }
 
 bool
-Module::addFinalizer(const rc::Ptr<Finalizer>& finalizer)
-{
+Module::addFinalizer(const rc::Ptr<Finalizer>& finalizer) {
 	FinalizerEntry* finalizerEntry = AXL_MEM_NEW(FinalizerEntry);
 	finalizerEntry->m_finalizer = finalizer;
 
@@ -104,8 +98,7 @@ void
 axl_trace_va(
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	char buffer[512] = { 0 };
 	axl::sl::String string(axl::rc::BufKind_Stack, buffer, sizeof(buffer));
 	size_t length = string.format_va(formatString, va);

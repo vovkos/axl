@@ -18,8 +18,7 @@ namespace xml {
 //..............................................................................
 
 bool
-ExpatParserRoot::create(const sl::StringRef& encoding)
-{
+ExpatParserRoot::create(const sl::StringRef& encoding) {
 	close();
 
 	m_h = XML_ParserCreate(encoding.szn());
@@ -30,8 +29,7 @@ bool
 ExpatParserRoot::createNs(
 	const sl::StringRef& encoding,
 	char separator
-	)
-{
+) {
 	close();
 
 	m_h = XML_ParserCreateNS(encoding.szn(), separator);
@@ -42,14 +40,12 @@ bool
 ExpatParserRoot::parseFile(
 	const sl::StringRef& fileName,
 	size_t blockSize
-	)
-{
+) {
 	bool result;
 
 	io::SimpleMappedFile mappedFile;
 
-	if (!blockSize || blockSize == -1)
-	{
+	if (!blockSize || blockSize == -1) {
 		return
 			mappedFile.open(fileName, io::FileFlag_ReadOnly) &&
 			parse(mappedFile.p(), (size_t)mappedFile.getFileSize(), true);
@@ -68,8 +64,7 @@ ExpatParserRoot::parseFile(
 	uint64_t offset = 0;
 	uint64_t size = mappedFile.getFileSize();
 
-	while (offset + blockSize < size)
-	{
+	while (offset + blockSize < size) {
 		result =
 			(p = mappedFile.view(offset, blockSize)) &&
 			parse(p, blockSize, false);

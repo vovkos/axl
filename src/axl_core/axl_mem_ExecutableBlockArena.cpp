@@ -9,14 +9,13 @@ namespace mem {
 #if (_AXL_OS_WIN)
 
 void*
-allocateExecutablePages(size_t size)
-{
+allocateExecutablePages(size_t size) {
 	void* pages = ::VirtualAlloc(
 		NULL,
 		size,
 		MEM_COMMIT | MEM_RESERVE,
 		PAGE_EXECUTE_READWRITE
-		);
+	);
 
 	if (!pages)
 		err::setLastSystemError();
@@ -28,8 +27,7 @@ bool
 freeExecutablePages(
 	void* pages,
 	size_t size
-	)
-{
+) {
 	bool_t result = ::VirtualFree(pages, size, MEM_RELEASE);
 	return err::complete(result);
 }
@@ -37,8 +35,7 @@ freeExecutablePages(
 #else
 
 void*
-allocateExecutablePages(size_t size)
-{
+allocateExecutablePages(size_t size) {
 	void* pages = ::mmap(
 		NULL,
 		size,
@@ -46,7 +43,7 @@ allocateExecutablePages(size_t size)
 		MAP_PRIVATE | MAP_ANON,
 		-1,
 		0
-		);
+	);
 
 	if (!pages)
 		err::setLastSystemError();
@@ -58,8 +55,7 @@ bool
 freeExecutablePages(
 	void* p,
 	size_t size
-	)
-{
+) {
 	int result = ::munmap(p, size);
 	return err::complete(result == 0);
 }

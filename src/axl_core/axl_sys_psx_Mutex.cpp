@@ -22,30 +22,26 @@ namespace psx {
 
 #if (!_AXL_OS_DARWIN)
 bool
-MutexAttr::getProcessShared(int* value) const
-{
+MutexAttr::getProcessShared(int* value) const {
 	int result = ::pthread_mutexattr_getpshared(&m_attr, value);
 	return result == 0 ? true : err::fail(result);
 }
 
 bool
-MutexAttr::setProcessShared(int value)
-{
+MutexAttr::setProcessShared(int value) {
 	int result = ::pthread_mutexattr_setpshared(&m_attr, value);
 	return result == 0 ? true : err::fail(result);
 }
 #endif
 
 bool
-MutexAttr::getType(int* value) const
-{
+MutexAttr::getType(int* value) const {
 	int result = ::pthread_mutexattr_gettype(&m_attr, value);
 	return result == 0 ? true : err::fail(result);
 }
 
 bool
-MutexAttr::setType(int value)
-{
+MutexAttr::setType(int value) {
 	int result = ::pthread_mutexattr_settype(&m_attr, value);
 	return result == 0 ? true : err::fail(result);
 }
@@ -53,20 +49,17 @@ MutexAttr::setType(int value)
 //..............................................................................
 
 bool
-Mutex::tryLock()
-{
+Mutex::tryLock() {
 	int result = ::pthread_mutex_trylock(&m_mutex);
 	return result == 0 ? true : err::fail(result);
 }
 
 #if (!_AXL_OS_DARWIN)
 bool
-Mutex::lock(uint_t timeout)
-{
+Mutex::lock(uint_t timeout) {
 	int result;
 
-	switch (timeout)
-	{
+	switch (timeout) {
 	case 0:
 		result = ::pthread_mutex_trylock(&m_mutex);
 		break;

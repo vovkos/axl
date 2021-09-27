@@ -26,8 +26,7 @@ Mapping::create(
 	uint_t pageProtection,
 	uint64_t _MaxSize,
 	const sl::StringRef_w& name
-	)
-{
+) {
 	close();
 
 	ULARGE_INTEGER maxSize;
@@ -40,7 +39,7 @@ Mapping::create(
 		maxSize.HighPart,
 		maxSize.LowPart,
 		name.sz()
-		);
+	);
 
 	return err::complete(m_h != NULL);
 }
@@ -50,8 +49,7 @@ Mapping::open(
 	uint_t access,
 	bool doInheritHandle,
 	const sl::StringRef_w& name
-	)
-{
+) {
 	close();
 
 	m_h = ::OpenFileMappingW(access, doInheritHandle, name.sz());
@@ -66,16 +64,14 @@ MappedView::view(
 	uint_t access,
 	uint64_t _offset,
 	uint32_t size
-	)
-{
+) {
 	close();
 
 	ULARGE_INTEGER offset;
 	offset.QuadPart = _offset;
 
 	m_h = ::MapViewOfFile(hMapping, access, offset.HighPart, offset.LowPart, size);
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::failWithLastSystemError();
 		return NULL;
 	}

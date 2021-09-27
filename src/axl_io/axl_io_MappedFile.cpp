@@ -24,16 +24,14 @@ MappedViewMgr::find(
 	uint64_t begin,
 	uint64_t end,
 	uint64_t* actualEnd
-	)
-{
+) {
 	// first check the last view
 
 	ViewEntry* viewEntry = *m_viewList.getHead();
 	if (!viewEntry)
 		return NULL;
 
-	if (viewEntry->m_begin <= begin && viewEntry->m_end >= end)
-	{
+	if (viewEntry->m_begin <= begin && viewEntry->m_end >= end) {
 		*actualEnd = viewEntry->m_end;
 		return (char*)(void*)viewEntry->m_view + begin - viewEntry->m_begin;
 	}
@@ -62,8 +60,7 @@ MappedViewMgr::view(
 	uint64_t end,
 	uint64_t origBegin,
 	uint64_t origEnd
-	)
-{
+) {
 	ViewEntry* viewEntry = AXL_MEM_NEW(ViewEntry);
 
 	MappedFile* mappedFile = getMappedFile();
@@ -88,11 +85,10 @@ MappedViewMgr::view(
 			MAP_SHARED,
 			mappedFile->m_file.m_file,
 			begin
-			);
+		);
 #endif
 
-	if (!p)
-	{
+	if (!p) {
 		AXL_MEM_DELETE(viewEntry);
 		return NULL;
 	}
@@ -105,8 +101,7 @@ MappedViewMgr::view(
 	// update viewmap
 
 	ViewMap::Iterator it = m_viewMap.visit(begin);
-	if (it->m_value)
-	{
+	if (it->m_value) {
 		ViewEntry* oldViewEntry = it->m_value;
 
 		ASSERT(oldViewEntry->m_mapIt == it);
@@ -122,8 +117,7 @@ MappedViewMgr::view(
 	// remove them from the map (but do not unmap yet, so recent View () results still valid)
 
 	it++;
-	while (it)
-	{
+	while (it) {
 		ViewEntry* oldViewEntry = it->m_value;
 		if (oldViewEntry->m_end > end) // nope, not overlapped
 			break;
@@ -144,10 +138,8 @@ MappedViewMgr::view(
 }
 
 void
-MappedViewMgr::limitViewCount(size_t maxViewCount)
-{
-	while (m_viewList.getCount() > maxViewCount)
-	{
+MappedViewMgr::limitViewCount(size_t maxViewCount) {
+	while (m_viewList.getCount() > maxViewCount) {
 		ViewEntry* view = m_viewList.removeTail();
 
 		if (view->m_mapIt)
@@ -161,8 +153,7 @@ MappedViewMgr::limitViewCount(size_t maxViewCount)
 
 MappedFile::MappedFile():
 	m_dynamicViewMgr(offsetof(MappedFile, m_dynamicViewMgr)),
-	m_permanentViewMgr(offsetof(MappedFile, m_permanentViewMgr))
-{
+	m_permanentViewMgr(offsetof(MappedFile, m_permanentViewMgr)) {
 	m_readAheadSize = DefaultsKind_ReadAheadSize;
 	m_maxDynamicViewCount = DefaultsKind_MaxDynamicViewCount;
 	m_fileFlags = 0;
@@ -173,8 +164,7 @@ MappedFile::MappedFile():
 }
 
 void
-MappedFile::close()
-{
+MappedFile::close() {
 	if (!isOpen())
 		return;
 
@@ -188,8 +178,7 @@ bool
 MappedFile::open(
 	const sl::StringRef& fileName,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	bool result = m_file.open(fileName, flags);
@@ -204,8 +193,7 @@ bool
 MappedFile::duplicate(
 	File::Handle fileHandle,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	bool result = m_file.duplicate(fileHandle);
@@ -220,8 +208,7 @@ void
 MappedFile::attach(
 	File::Handle fileHandle,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	m_file.m_file.attach(fileHandle);
@@ -229,8 +216,7 @@ MappedFile::attach(
 }
 
 File::Handle
-MappedFile::detach()
-{
+MappedFile::detach() {
 	if (!isOpen())
 		return File::getInvalidHandle();
 
@@ -241,11 +227,9 @@ MappedFile::detach()
 }
 
 bool
-MappedFile::setSize(uint64_t size)
-{
+MappedFile::setSize(uint64_t size) {
 	if (!m_permanentViewMgr.isEmpty() ||
-		!m_dynamicViewMgr.isEmpty())
-	{
+		!m_dynamicViewMgr.isEmpty()) {
 		err::setError(err::SystemErrorCode_InvalidDeviceState);
 		return false;
 	}
@@ -257,8 +241,7 @@ bool
 MappedFile::setup(
 	size_t maxDynamicViewCount,
 	size_t readAheadSize
-	)
-{
+) {
 	if (!maxDynamicViewCount)
 		return err::fail(err::SystemErrorCode_InvalidParameter);
 
@@ -275,8 +258,7 @@ MappedFile::view(
 	size_t size,
 	size_t* actualSize,
 	bool isPermanent
-	)
-{
+) {
 	uint64_t end = size ? offset + size : m_file.getSize();
 
 	uint64_t actualEnd;
@@ -296,8 +278,7 @@ MappedFile::viewImpl(
 	uint64_t end,
 	uint64_t* actualEnd,
 	bool isPermanent
-	)
-{
+) {
 	bool result;
 
 	if (!isOpen())
@@ -309,8 +290,7 @@ MappedFile::viewImpl(
 	if (p)
 		return p;
 
-	if (!isPermanent)
-	{
+	if (!isPermanent) {
 		p = m_dynamicViewMgr.find(offset, end, actualEnd);
 		if (p)
 			return p;
@@ -328,11 +308,9 @@ MappedFile::viewImpl(
 
 	// make sure we don't overextend beyond the end of read-only file
 
-	if (m_fileFlags & FileFlag_ReadOnly)
-	{
+	if (m_fileFlags & FileFlag_ReadOnly) {
 		uint64_t fileSize = m_file.getSize();
-		if (end > fileSize)
-		{
+		if (end > fileSize) {
 			err::setError(err::SystemErrorCode_InvalidDeviceRequest);
 			return NULL;
 		}
@@ -344,8 +322,7 @@ MappedFile::viewImpl(
 	// ensure mapping covers the view
 
 #if (_AXL_OS_WIN)
-	if (!m_mapping.isOpen() || viewEnd > m_mappingSize)
-	{
+	if (!m_mapping.isOpen() || viewEnd > m_mappingSize) {
 		uint_t protection = (m_fileFlags & FileFlag_ReadOnly) ? PAGE_READONLY : PAGE_READWRITE;
 
 		result = m_mapping.create(m_file.m_file, NULL, protection, viewEnd);
@@ -355,8 +332,7 @@ MappedFile::viewImpl(
 		m_mappingSize = viewEnd;
 	}
 #elif (_AXL_OS_POSIX)
-	if (viewEnd > m_file.getSize())
-	{
+	if (viewEnd > m_file.getSize()) {
 		result = m_file.setSize(viewEnd);
 		if (!result)
 			return NULL;
@@ -365,12 +341,9 @@ MappedFile::viewImpl(
 
 	// map the view
 
-	if (isPermanent)
-	{
+	if (isPermanent) {
 		p = m_permanentViewMgr.view(viewBegin, viewEnd, offset, end);
-	}
-	else
-	{
+	} else {
 		p = m_dynamicViewMgr.view(viewBegin, viewEnd, offset, end);
 		m_dynamicViewMgr.limitViewCount(m_maxDynamicViewCount);
 	}
@@ -383,8 +356,7 @@ MappedFile::viewImpl(
 }
 
 void
-MappedFile::unmapAllViews()
-{
+MappedFile::unmapAllViews() {
 	m_permanentViewMgr.clear();
 	m_dynamicViewMgr.clear();
 
@@ -402,8 +374,7 @@ SimpleMappedFile::open(
 	uint64_t offset,
 	size_t size,
 	uint_t flags
-	)
-{
+) {
 	bool result;
 
 	close();

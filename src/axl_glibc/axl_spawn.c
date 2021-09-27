@@ -31,8 +31,7 @@ __wrap_posix_spawn(
 	const posix_spawnattr_t* attrp,
 	char* const argv[],
 	char* const envp[]
-	)
-{
+) {
 	return posix_spawn(pid, path, file_actions, attrp, argv, envp);
 }
 
@@ -44,8 +43,7 @@ __wrap_posix_spawnp(
 	const posix_spawnattr_t* attrp,
 	char* const argv[],
 	char* const envp[]
-	)
-{
+) {
 	return posix_spawnp(pid, file, file_actions, attrp, argv, envp);
 }
 

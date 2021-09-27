@@ -29,10 +29,8 @@ setWinExceptionError(
 	uintptr_t codeAddress,
 	const uintptr_t* paramTable,
 	size_t paramCount
-	)
-{
-	enum
-	{
+) {
+	enum {
 		Size = sizeof(err::ErrorHdr) + sizeof(WinExceptionInfo)
 	};
 
@@ -63,10 +61,8 @@ setPosixSignalError(
 	uint32_t code,
 	uintptr_t codeAddress,
 	uintptr_t faultAddress
-	)
-{
-	enum
-	{
+) {
+	enum {
 		Size = sizeof(err::ErrorHdr) + sizeof(PosixSignalInfo)
 	};
 
@@ -92,8 +88,7 @@ setPosixSignalError(
 
 template <typename T>
 sl::StringRef
-getWinExceptionDescription(const WinExceptionInfoBase<T>* exceptionInfo)
-{
+getWinExceptionDescription(const WinExceptionInfoBase<T>* exceptionInfo) {
 	const char* pointerFormat = sizeof(exceptionInfo->m_codeAddress) == 8 ? "0x%016llx" : "0x%08x";
 
 	sl::String string;
@@ -113,15 +108,13 @@ getWinExceptionDescription(const WinExceptionInfoBase<T>* exceptionInfo)
 	// STATUS_ACCESS_VIOLATION or STATUS_IN_PAGE_ERROR
 
 	if (exceptionInfo->m_ntstatus == 0xc0000005 ||
-		exceptionInfo->m_ntstatus == 0xc0000006)
-	{
+		exceptionInfo->m_ntstatus == 0xc0000006) {
 		T op = exceptionInfo->m_paramTable[0];
 		T faultAddress = exceptionInfo->m_paramTable[1];
 
 		string += " (";
 
-		switch (op)
-		{
+		switch (op) {
 		case 0:
 			string += "read at ";
 			break;
@@ -138,12 +131,9 @@ getWinExceptionDescription(const WinExceptionInfoBase<T>* exceptionInfo)
 			string.appendFormat("op-%d at ", op);
 		}
 
-		if (!faultAddress)
-		{
+		if (!faultAddress) {
 			string += "null)";
-		}
-		else
-		{
+		} else {
 			string.appendFormat(pointerFormat, faultAddress);
 			string += ")";
 		}
@@ -153,10 +143,8 @@ getWinExceptionDescription(const WinExceptionInfoBase<T>* exceptionInfo)
 }
 
 sl::StringRef
-getLinuxSignalName(int signal)
-{
-	const char* nameTable[32] =
-	{
+getLinuxSignalName(int signal) {
+	const char* nameTable[32] = {
 		"SIGNULL",   // 0
 		"SIGHUP",    // 1
 		"SIGINT",    // 2
@@ -198,10 +186,8 @@ getLinuxSignalName(int signal)
 }
 
 sl::StringRef
-getDarwinSignalName(int signal)
-{
-	const char* nameTable[32] =
-	{
+getDarwinSignalName(int signal) {
+	const char* nameTable[32] = {
 		"SIGNULL",   // 0
 		"SIGHUP",    // 1
 		"SIGINT",    // 2
@@ -248,8 +234,7 @@ getPosixSignalDescription(
 	const PosixSignalInfoBase<T>* signalInfo,
 	const sl::StringRef& signalName,
 	bool hasFaultAddress
-	)
-{
+) {
 	const char* pointerFormat = sizeof(signalInfo->m_codeAddress) == 8 ? "0x%016llx" : "0x%08x";
 
 	sl::String string = signalName;
@@ -257,12 +242,9 @@ getPosixSignalDescription(
 	string.appendFormat(pointerFormat, signalInfo->m_codeAddress);
 
 	if (hasFaultAddress)
-		if (!signalInfo->m_faultAddress)
-		{
+		if (!signalInfo->m_faultAddress) {
 			string += " (null pointer access)";
-		}
-		else
-		{
+		} else {
 			string += " (access ";
 			string.appendFormat(pointerFormat, signalInfo->m_faultAddress);
 			string += ")";
@@ -273,33 +255,29 @@ getPosixSignalDescription(
 
 template <typename T>
 sl::StringRef
-getLinuxSignalDescription(const T* signalInfo)
-{
+getLinuxSignalDescription(const T* signalInfo) {
 	return getPosixSignalDescription(
 		signalInfo,
 		getLinuxSignalName(signalInfo->m_signal),
 		signalInfo->m_signal == 7 || signalInfo->m_signal == 11 // SIGSEGV or SIGBUS
-		);
+	);
 }
 
 template <typename T>
 sl::StringRef
-getDarwinSignalDescription(const T* signalInfo)
-{
+getDarwinSignalDescription(const T* signalInfo) {
 	return getPosixSignalDescription(
 		signalInfo,
 		getDarwinSignalName(signalInfo->m_signal),
 		signalInfo->m_signal == 10 || signalInfo->m_signal == 11 // SIGSEGV or SIGBUS
-		);
+	);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::StringRef
-ExceptionErrorProvider::getErrorDescription(const err::ErrorRef& error)
-{
-	switch (error->m_code)
-	{
+ExceptionErrorProvider::getErrorDescription(const err::ErrorRef& error) {
+	switch (error->m_code) {
 	case ExceptionErrorCode_WinException32:
 		return getWinExceptionDescription((const WinExceptionInfo32*)(error.cp() + 1));
 

@@ -47,8 +47,7 @@ GetSystemTimePreciseAsFileTimeFunc(FILETIME* time);
 static GetSystemTimePreciseAsFileTimeFunc* systemTimePreciseAsFileTime = NULL;
 
 void
-initPreciseTimestamps()
-{
+initPreciseTimestamps() {
 	HMODULE kernel32 = ::GetModuleHandleW(L"kernel32.dll");
 	ASSERT(kernel32);
 
@@ -64,8 +63,7 @@ static uint64_t g_machBaseAbsoluteTime = 0;
 static mach_timebase_info_data_t g_machTimeBaseInfo = { 0 };
 
 void
-initPreciseTimestamps()
-{
+initPreciseTimestamps() {
 	mach_timebase_info(&g_machTimeBaseInfo);
 	g_machBaseTimestamp = sys::getTimestamp();
 	g_machBaseAbsoluteTime = mach_absolute_time();
@@ -74,17 +72,14 @@ initPreciseTimestamps()
 #else
 
 void
-initPreciseTimestamps()
-{
-}
+initPreciseTimestamps() {}
 
 #endif
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint64_t
-getTimestamp()
-{
+getTimestamp() {
 	uint64_t timestamp;
 
 #if (_AXL_OS_WIN)
@@ -107,8 +102,7 @@ getTimestamp()
 }
 
 uint64_t
-getPreciseTimestamp()
-{
+getPreciseTimestamp() {
 	uint64_t timestamp;
 
 #if (_AXL_OS_WIN)
@@ -134,8 +128,7 @@ getPreciseTimestamp()
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-sleep(uint32_t msCount)
-{
+sleep(uint32_t msCount) {
 #if (_AXL_OS_WIN)
 	::Sleep(msCount);
 #else
@@ -151,8 +144,7 @@ uint64_t
 Time::getTimestampImpl(
 	bool isLocal,
 	int timeZone
-	) const
-{
+) const {
 	uint64_t timestamp = 0;
 
 #if (_AXL_OS_WIN)
@@ -199,8 +191,7 @@ Time::setTimestampImpl(
 	uint64_t timestamp,
 	bool isLocal,
 	int timeZone
-	)
-{
+) {
 #if (_AXL_OS_WIN)
 	SYSTEMTIME sysTime = { 0 };
 
@@ -224,12 +215,9 @@ Time::setTimestampImpl(
 
 	time64_t posixTime = timestamp / 10000000 - AXL_SYS_EPOCH_DIFF;
 
-	if (isLocal)
-	{
+	if (isLocal) {
 		localtime64_r(&posixTime, &tmStruct);
-	}
-	else
-	{
+	} else {
 		posixTime += getTimeZoneOffsetInMinutes(timeZone) * 60;
 		gmtime64_r(&posixTime, &tmStruct);
 	}
@@ -273,10 +261,8 @@ size_t
 Time::format(
 	sl::String* string,
 	const sl::StringRef& formatString
-	) const
-{
-	static const char* weekDayShortNameTable[7] =
-	{
+) const {
+	static const char* weekDayShortNameTable[7] = {
 		"Sun",
 		"Mon",
 		"Tue",
@@ -286,8 +272,7 @@ Time::format(
 		"Sat",
 	};
 
-	static const char* weekDayFullNameTable[7] =
-	{
+	static const char* weekDayFullNameTable[7] = {
 		"Sunday",
 		"Monday",
 		"Tuesday",
@@ -297,8 +282,7 @@ Time::format(
 		"Saturday",
 	};
 
-	static const char* monthShortNameTable[12] =
-	{
+	static const char* monthShortNameTable[12] = {
 		"Jan",
 		"Feb",
 		"Mar",
@@ -313,8 +297,7 @@ Time::format(
 		"Dec",
 	};
 
-	static const char* monthFullNameTable[12] =
-	{
+	static const char* monthFullNameTable[12] = {
 		"January",
 		"February",
 		"March",
@@ -335,8 +318,7 @@ Time::format(
 	const char* end = formatString.getEnd();
 	const char* p0 = p;
 
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		if (*p != '%')
 			continue;
 
@@ -348,8 +330,7 @@ Time::format(
 
 		int h12;
 
-		switch (*p)
-		{
+		switch (*p) {
 		case 'h':
 			string->appendFormat("%02d", m_hour);
 			break;
@@ -442,8 +423,7 @@ void
 getAbsTimespecFromTimeout(
 	uint_t timeout,
 	timespec* tspec
-	)
-{
+) {
 #if (_AXL_OS_DARWIN)
 	timeval tval;
 	gettimeofday(&tval, NULL);

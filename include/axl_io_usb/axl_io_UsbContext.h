@@ -21,12 +21,10 @@ namespace io {
 
 //..............................................................................
 
-class CloseUsbContext
-{
+class CloseUsbContext {
 public:
 	void
-	operator () (libusb_context* h)
-	{
+	operator () (libusb_context* h) {
 		libusb_exit(h);
 	}
 };
@@ -37,8 +35,7 @@ class UsbContext: public sl::Handle<
 	libusb_context*,
 	CloseUsbContext,
 	sl::MinusOne<libusb_context*>
-	>
-{
+> {
 public:
 	bool
 	create();
@@ -47,14 +44,12 @@ public:
 	createDefault();
 
 	void
-	setDebugLevel(int level)
-	{
+	setDebugLevel(int level) {
 		libusb_set_debug(m_h, level);
 	}
 
 	bool
-	handleEvents()
-	{
+	handleEvents() {
 		int result = libusb_handle_events(m_h);
 		return result == 0 ? true : err::fail(UsbError((int)result));
 	}
@@ -67,16 +62,14 @@ public:
 
 inline
 UsbContext*
-getUsbDefaultContext()
-{
+getUsbDefaultContext() {
 	static int32_t flag = 0;
 	return sl::getSingleton<UsbContext> (&flag);
 }
 
 inline
 bool
-hasUsbCapability(uint32_t capability)
-{
+hasUsbCapability(uint32_t capability) {
 	return libusb_has_capability(capability) != 0;
 }
 

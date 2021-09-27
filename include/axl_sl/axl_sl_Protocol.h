@@ -21,15 +21,13 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class ProtoPeer
-{
+class ProtoPeer {
 public:
 	void
 	sendMsg(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		static_cast<T*>(this)->sendMsgEx(&p, &size, 1);
 	}
 
@@ -39,8 +37,7 @@ public:
 		size_t size,
 		const void* extra,
 		size_t extraSize
-		)
-	{
+	) {
 		const void* blockArray[] = { p, extra };
 		size_t sizeArray[] = { size, extraSize };
 
@@ -60,8 +57,7 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class AbstractProtoPeer: public ProtoPeer<AbstractProtoPeer>
-{
+class AbstractProtoPeer: public ProtoPeer<AbstractProtoPeer> {
 public:
 	virtual
 	void
@@ -69,21 +65,19 @@ public:
 		const void* const* blockArray,
 		size_t const* sizeArray,
 		size_t count
-		) = 0;
+	) = 0;
 };
 
 //..............................................................................
 
-struct ProtoMsg
-{
+struct ProtoMsg {
 	uint32_t m_code;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-struct ProtoMsg_1: ProtoMsg
-{
+struct ProtoMsg_1: ProtoMsg {
 	T m_arg1;
 };
 
@@ -92,9 +86,8 @@ struct ProtoMsg_1: ProtoMsg
 template <
 	typename T1,
 	typename T2
-	>
-struct ProtoMsg_2: ProtoMsg
-{
+>
+struct ProtoMsg_2: ProtoMsg {
 	T1 m_arg1;
 	T2 m_arg2;
 };
@@ -105,9 +98,8 @@ template <
 	typename T1,
 	typename T2,
 	typename T3
-	>
-struct ProtoMsg_3: ProtoMsg
-{
+>
+struct ProtoMsg_3: ProtoMsg {
 	T1 m_arg1;
 	T2 m_arg2;
 	T3 m_arg3;
@@ -120,9 +112,8 @@ template <
 	typename T2,
 	typename T3,
 	typename T4
-	>
-struct ProtoMsg_4: ProtoMsg
-{
+>
+struct ProtoMsg_4: ProtoMsg {
 	T1 m_arg1;
 	T2 m_arg2;
 	T3 m_arg3;
@@ -135,8 +126,7 @@ struct ProtoMsg_4: ProtoMsg
 
 #define AXL_SL_PROTO_SEND_FUNCTION_0(code, sender) \
 	void \
-	sender() \
-	{ \
+	sender() { \
 		axl::sl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg(&msg, sizeof(msg)); \
@@ -144,8 +134,7 @@ struct ProtoMsg_4: ProtoMsg
 
 #define AXL_SL_PROTO_SEND_FUNCTION_0_STR(code, sender, strArg) \
 	void \
-	sender(const axl::sl::StringRef& strArg) \
-	{ \
+	sender(const axl::sl::StringRef& strArg) { \
 		axl::sl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg(&msg, sizeof(msg), strArg.cp(), strArg.getLength()); \
@@ -156,8 +145,7 @@ struct ProtoMsg_4: ProtoMsg
 	sender ( \
 		const void* ptrArg, \
 		size_t sizeArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg(&msg, sizeof(msg), ptrArg, sizeArg); \
@@ -165,8 +153,7 @@ struct ProtoMsg_4: ProtoMsg
 
 #define AXL_SL_PROTO_SEND_FUNCTION_0_ERR(code, sender, errArg) \
 	void \
-	sender(const axl::err::ErrorHdr* errArg) \
-	{ \
+	sender(const axl::err::ErrorHdr* errArg) { \
 		axl::sl::ProtoMsg msg; \
 		msg.m_code = code; \
 		sendMsg(&msg, sizeof(msg), errArg, errArg->m_size); \
@@ -176,8 +163,7 @@ struct ProtoMsg_4: ProtoMsg
 
 #define AXL_SL_PROTO_SEND_FUNCTION_1(code, sender, T1, arg1) \
 	void \
-	sender(T1 arg1) \
-	{ \
+	sender(T1 arg1) { \
 		axl::sl::ProtoMsg_1<T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -189,8 +175,7 @@ struct ProtoMsg_4: ProtoMsg
 	sender ( \
 		T1 arg1, \
 		const sl::StringRef& strArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_1<T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -203,8 +188,7 @@ struct ProtoMsg_4: ProtoMsg
 		T1 arg1, \
 		const void* ptrArg, \
 		size_t sizeArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_1<T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -216,8 +200,7 @@ struct ProtoMsg_4: ProtoMsg
 	sender ( \
 		T1 arg1, \
 		const axl::err::ErrorHdr* errArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_1<T1> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -231,8 +214,7 @@ struct ProtoMsg_4: ProtoMsg
 	sender ( \
 		T1 arg1, \
 		T2 arg2 \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_2<T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -246,8 +228,7 @@ struct ProtoMsg_4: ProtoMsg
 		T1 arg1, \
 		T2 arg2, \
 		const sl::StringRef& strArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_2<T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -262,8 +243,7 @@ struct ProtoMsg_4: ProtoMsg
 		T2 arg2, \
 		const void* ptrArg, \
 		size_t sizeArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_2<T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -277,8 +257,7 @@ struct ProtoMsg_4: ProtoMsg
 		T1 arg1, \
 		T2 arg2, \
 		const axl::err::ErrorHdr* errArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_2<T1, T2> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -294,8 +273,7 @@ struct ProtoMsg_4: ProtoMsg
 		T1 arg1, \
 		T2 arg2, \
 		T2 arg3 \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_3<T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -311,8 +289,7 @@ struct ProtoMsg_4: ProtoMsg
 		T2 arg2, \
 		T3 arg3, \
 		const sl::StringRef& strArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_3<T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -329,8 +306,7 @@ struct ProtoMsg_4: ProtoMsg
 		T3 arg3, \
 		const void* ptrArg, \
 		size_t sizeArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_3<T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -346,8 +322,7 @@ struct ProtoMsg_4: ProtoMsg
 		T2 arg2, \
 		T3 arg3, \
 		const axl::err::ErrorHdr* errArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_3<T1, T2, T3> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -365,8 +340,7 @@ struct ProtoMsg_4: ProtoMsg
 		T2 arg2, \
 		T3 arg3, \
 		T4 arg4 \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_4<T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -384,8 +358,7 @@ struct ProtoMsg_4: ProtoMsg
 		T3 arg3, \
 		T4 arg4, \
 		const sl::StringRef& strArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_4<T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -404,8 +377,7 @@ struct ProtoMsg_4: ProtoMsg
 		T4 arg4, \
 		const void* ptrArg, \
 		size_t sizeArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_4<T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -423,8 +395,7 @@ struct ProtoMsg_4: ProtoMsg
 		T3 arg3, \
 		T4 arg4, \
 		const axl::err::ErrorHdr* errArg \
-		) \
-	{ \
+	) { \
 		axl::sl::ProtoMsg_4<T1, T2, T3, T4> msg; \
 		msg.m_code = code; \
 		msg.m_arg1 = arg1; \
@@ -442,13 +413,11 @@ struct ProtoMsg_4: ProtoMsg
 	void processMsg ( \
 		const void* p, \
 		size_t size \
-		) \
-	{ \
+	) { \
 		if (size < sizeof(axl::sl::ProtoMsg)) \
 			return; \
 		axl::sl::ProtoMsg* hdr = (axl::sl::ProtoMsg*)p; \
-		switch (hdr->m_code) \
-		{ \
+		switch (hdr->m_code) { \
 
 #define AXL_SL_END_PROTO_RECV_MAP() \
 		} \
@@ -462,8 +431,7 @@ struct ProtoMsg_4: ProtoMsg
 		break;
 
 #define AXL_SL_PROTO_RECV_FUNCTION_0_STR(code, handler) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -475,8 +443,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_0_PTR(code, handler) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -487,8 +454,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_0_ERR(code, handler) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -500,8 +466,7 @@ struct ProtoMsg_4: ProtoMsg
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_1(code, handler, T1) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_1<T1> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -511,8 +476,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_1_STR(code, handler, T1) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_1<T1> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -524,8 +488,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_1_PTR(code, handler, T1) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_1<T1> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -536,8 +499,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_1_ERR(code, handler, T1) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_1<T1> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -549,8 +511,7 @@ struct ProtoMsg_4: ProtoMsg
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_2(code, handler, T1, T2) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_2<T1, T2> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -560,8 +521,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_2_STR(code, handler, T1, T2) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_2<T1, T2> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -573,8 +533,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_2_PTR(code, handler, T1, T2) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_2<T1, T2> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -585,8 +544,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_2_ERR(code, handler, T1, T2) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_2<T1, T2> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -598,8 +556,7 @@ struct ProtoMsg_4: ProtoMsg
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_3(code, handler, T1, T2, T3) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_3<T1, T2, T3> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -609,8 +566,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_3_STR(code, handler, T1, T2, T3) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_3<T1, T2, T3> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -622,8 +578,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_3_PTR(code, handler, T1, T2, T3) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_3<T1, T2, T3> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -634,8 +589,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_3_ERR(code, handler, T1, T2, T3) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_3<T1, T2, T3> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -648,8 +602,7 @@ struct ProtoMsg_4: ProtoMsg
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_PROTO_RECV_FUNCTION_4(code, handler, T1, T2, T3, T4) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_4<T1, T2, T3, T4> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -659,8 +612,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_4_STR(code, handler, T1, T2, T3, T4) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_4<T1, T2, T3, T4> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -672,8 +624,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_4_PTR(code, handler, T1, T2, T3, T4) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_4<T1, T2, T3, T4> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
@@ -684,8 +635,7 @@ struct ProtoMsg_4: ProtoMsg
 		}
 
 #define AXL_SL_PROTO_RECV_FUNCTION_4_ERR(code, handler, T1, T2, T3, T4) \
-	case code: \
-		{ \
+	case code: { \
 		typedef axl::sl::ProtoMsg_4<T1, T2, T3, T4> Msg; \
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \

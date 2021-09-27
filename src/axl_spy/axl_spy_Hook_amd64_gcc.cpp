@@ -10,8 +10,7 @@ namespace spy {
 // nasm -felf64 -lthunk_amd64_gcc.asm.lst thunk_amd64_gcc.asm
 // perl nasm-list-to-cpp.pl thunk_amd64_gcc.asm.lst
 
-const uint8_t g_thunkCode[] =
-{
+const uint8_t g_thunkCode[] = {
 	0x55,                                            // 00000000  push    rbp
 	0x48, 0x89, 0xE5,                                // 00000001  mov     rbp, rsp
 	0x48, 0x81, 0xEC, 0xE0, 0x00, 0x00, 0x00,        // 00000004  sub     rsp, StackFrameSize
@@ -96,8 +95,7 @@ const uint8_t g_thunkCode[] =
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ThunkCodeOffset
-{
+enum ThunkCodeOffset {
 	ThunkCodeOffset_HookPtr1      = 0x005f,
 	ThunkCodeOffset_HookEnterPtr  = 0x0070,
 	ThunkCodeOffset_HookRetPtr    = 0x00e6,
@@ -110,8 +108,7 @@ enum ThunkCodeOffset
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct Hook
-{
+struct Hook {
 	uint8_t m_thunkCode[(ThunkCodeOffset_End & ~7) + 8]; // align on 8
 	HookCommonContext m_context;
 };
@@ -123,8 +120,7 @@ hookEnter(
 	Hook* hook,
 	uint64_t rbp,
 	uint64_t originalRet
-	)
-{
+) {
 	return hookEnterCommon(&hook->m_context, rbp, originalRet);
 }
 
@@ -132,20 +128,17 @@ uint64_t
 hookLeave(
 	Hook* hook,
 	uint64_t rbp
-	)
-{
+) {
 	return hookLeaveCommon(&hook->m_context, rbp);
 }
 
 //..............................................................................
 
-HookArena::HookArena()
-{
+HookArena::HookArena() {
 	m_impl = AXL_MEM_NEW(mem::ExecutableBlockArena<Hook>);
 }
 
-HookArena::~HookArena()
-{
+HookArena::~HookArena() {
 	((mem::ExecutableBlockArena<Hook>*)m_impl)->detach(); // don't free unless explicitly requested
 	AXL_MEM_DELETE((mem::ExecutableBlockArena<Hook>*)m_impl);
 }
@@ -156,8 +149,7 @@ HookArena::allocate(
 	void* callbackParam,
 	HookEnterFunc* enterFunc,
 	HookLeaveFunc* leaveFunc
-	)
-{
+) {
 	Hook* hook = ((mem::ExecutableBlockArena<Hook>*)m_impl)->allocate();
 	if (!hook)
 		return NULL;
@@ -178,8 +170,7 @@ HookArena::allocate(
 }
 
 void
-HookArena::free()
-{
+HookArena::free() {
 	((mem::ExecutableBlockArena<Hook>*)m_impl)->free();
 }
 
@@ -189,8 +180,7 @@ void
 setHookTargetFunc(
 	Hook* hook,
 	void* targetFunc
-	)
-{
+) {
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_TargetFuncPtr) = targetFunc;
 }
 

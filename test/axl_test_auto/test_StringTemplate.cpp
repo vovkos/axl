@@ -18,16 +18,14 @@ namespace {
 //..............................................................................
 
 void
-run()
-{
+run() {
 	bool result;
 
 	const char* fileName = "test.txt.in";
 
 	io::MappedFile file;
 	result = file.open(fileName, io::FileFlag_ReadOnly);
-	if (!result)
-	{
+	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
@@ -39,8 +37,7 @@ run()
 
 	sl::String resultString;
 	result = st.process(&resultString, fileName, sl::StringRef(p, size));
-	if (!result)
-	{
+	if (!result) {
 		printf("error processing string template: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}

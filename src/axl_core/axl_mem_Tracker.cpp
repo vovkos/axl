@@ -19,21 +19,18 @@ namespace mem {
 //..............................................................................
 
 void
-addTrackerBlock(TrackerBlockHdr* hdr)
-{
+addTrackerBlock(TrackerBlockHdr* hdr) {
 	g::getModule()->getMemTracker()->add(hdr);
 }
 
 void
-removeTrackerBlock(TrackerBlockHdr* hdr)
-{
+removeTrackerBlock(TrackerBlockHdr* hdr) {
 	g::getModule()->getMemTracker()->remove(hdr);
 }
 
 //..............................................................................
 
-Tracker::Tracker()
-{
+Tracker::Tracker() {
 	m_peakBlockCount = 0;
 	m_totalBlockCount = 0;
 	m_size = 0;
@@ -42,8 +39,7 @@ Tracker::Tracker()
 }
 
 void
-Tracker::add(TrackerBlockHdr* hdr)
-{
+Tracker::add(TrackerBlockHdr* hdr) {
 	m_lock.lock();
 
 	hdr->m_seqNum = m_totalBlockCount;
@@ -66,8 +62,7 @@ Tracker::add(TrackerBlockHdr* hdr)
 }
 
 void
-Tracker::remove(TrackerBlockHdr* hdr)
-{
+Tracker::remove(TrackerBlockHdr* hdr) {
 	m_lock.lock();
 
 	m_blockList.remove(hdr);
@@ -77,8 +72,7 @@ Tracker::remove(TrackerBlockHdr* hdr)
 }
 
 void
-Tracker::trace(bool isDetailed)
-{
+Tracker::trace(bool isDetailed) {
 	m_lock.lock();
 
 	TRACE(
@@ -93,18 +87,16 @@ Tracker::trace(bool isDetailed)
 		m_peakBlockCount,
 		m_totalSize,
 		m_totalBlockCount
-		);
+	);
 
-	if (isDetailed && !m_blockList.isEmpty())
-	{
+	if (isDetailed && !m_blockList.isEmpty()) {
 		TRACE(
 			"*** Found %d unfreed blocks:\n",
 			m_blockList.getCount()
-			);
+		);
 
 		sl::Iterator<TrackerBlockHdr> it = m_blockList.getHead();
-		for (; it; it++)
-		{
+		for (; it; it++) {
 			TrackerBlockHdr* blockHdr = *it;
 
 			TRACE(
@@ -114,7 +106,7 @@ Tracker::trace(bool isDetailed)
 				blockHdr->m_tag,
 				blockHdr->m_seqNum,
 				blockHdr->m_size
-				);
+			);
 		}
 	}
 

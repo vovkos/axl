@@ -19,8 +19,7 @@ namespace io {
 //..............................................................................
 
 bool
-UsbEventThread::start(libusb_context* context)
-{
+UsbEventThread::start(libusb_context* context) {
 	stop();
 
 	m_context = context;
@@ -30,8 +29,7 @@ UsbEventThread::start(libusb_context* context)
 }
 
 void
-UsbEventThread::threadFunc()
-{
+UsbEventThread::threadFunc() {
 	UsbContext context;
 	context.attach(m_context);
 

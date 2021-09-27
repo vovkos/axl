@@ -22,10 +22,8 @@ namespace lex {
 
 // std token should be enough for most implementations
 
-struct StdTokenData
-{
-	union
-	{
+struct StdTokenData {
+	union {
 		//! \unnamed{union}
 		int m_integer;
 		int32_t m_int32;
@@ -38,16 +36,14 @@ struct StdTokenData
 
 	sl::StringRef m_string;
 
-	StdTokenData()
-	{
+	StdTokenData() {
 		m_int64 = 0;
 	}
 };
 
 //..............................................................................
 
-enum TokenChannelMask
-{
+enum TokenChannelMask {
 	TokenChannelMask_Main = 0x01,
 };
 
@@ -58,16 +54,14 @@ template <
 	typename Name0,
 	typename Data0 = StdTokenData,
 	typename Pos0 = LineCol
-	>
-struct Token
-{
+>
+struct Token {
 	typedef TokenKind0 TokenKind;
 	typedef Name0 Name;
 	typedef Data0 Data;
 	typedef Pos0 Pos;
 
-	union // it's nice to see it in debugger
-	{
+	union { // it's nice to see it in debugger
 		//! \unnamed{union:4}
 		int m_token;
 		TokenKind m_tokenKind;
@@ -75,8 +69,7 @@ struct Token
 		wchar_t m_WCharToken;
 	};
 
-	union
-	{
+	union {
 		uint_t m_channelMask;
 		uint_t m_flags;
 	};
@@ -86,22 +79,19 @@ struct Token
 
 	// define token value in derived class
 
-	Token()
-	{
+	Token() {
 		m_token = 0;
 		m_channelMask = TokenChannelMask_Main;
 	}
 
 	static
 	const char*
-	getName(int token)
-	{
+	getName(int token) {
 		return Name() (token);
 	}
 
 	const char*
-	getName() const
-	{
+	getName() const {
 		return getName(m_token);
 	}
 };
@@ -109,14 +99,11 @@ struct Token
 //..............................................................................
 
 #define AXL_LEX_BEGIN_TOKEN_NAME_MAP(Class) \
-class Class \
-{ \
+class Class { \
 public: \
 	const char* \
-	operator () (int tokenKind) \
-	{ \
-		switch (tokenKind) \
-		{
+	operator () (int tokenKind) { \
+		switch (tokenKind) {
 
 #define AXL_LEX_TOKEN_NAME(tokenKind, name) \
 		case tokenKind: \

@@ -101,7 +101,7 @@ macro(
 qt5_wrap_cpp_alt
 	_MOC_CPP_LIST
 	# ...
-	)
+)
 
 	set(${_MOC_CPP_LIST}) # clear list
 	set(_H_LIST ${ARGN})
@@ -137,7 +137,7 @@ macro(
 qt5_use_modules_alt
 	_TARGET
 	# ...
-	)
+)
 
 	get_target_property(_PREV_PIC ${_TARGET} POSITION_INDEPENDENT_CODE)
 	qt5_use_modules(${_TARGET} ${ARGN})

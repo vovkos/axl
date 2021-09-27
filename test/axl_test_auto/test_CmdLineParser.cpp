@@ -16,8 +16,7 @@ namespace {
 
 //..............................................................................
 
-enum MySwitchKind
-{
+enum MySwitchKind {
 	MySwitchKind_Help,
 	MySwitchKind_SessionProvider,
 	MySwitchKind_SessionFile,
@@ -35,12 +34,10 @@ AXL_SL_END_CMD_LINE_SWITCH_TABLE()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyParser: public sl::CmdLineParser<MyParser, MySwitchTable>
-{
+class MyParser: public sl::CmdLineParser<MyParser, MySwitchTable> {
 public:
 	bool
-	onValue(const sl::StringRef& value)
-	{
+	onValue(const sl::StringRef& value) {
 		printf("OnValue '%s'\n", value.sz());
 		return true;
 	}
@@ -49,18 +46,15 @@ public:
 	onSwitch(
 		SwitchKind switchKind,
 		const sl::StringRef& value
-		)
-	{
+	) {
 		printf("OnSwitch #%d = '%s'\n", switchKind, value.sz());
 		return true;
 	}
 };
 
 void
-run()
-{
-	const char* cmdLine[] =
-	{
+run() {
+	const char* cmdLine[] = {
 		"--help",
 		"--session-provider=serial",
 		"--session-file=my_serial_ssn.njssn",

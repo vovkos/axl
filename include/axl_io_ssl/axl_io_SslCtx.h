@@ -20,12 +20,10 @@ namespace io {
 
 //..............................................................................
 
-class FreeSslCtx
-{
+class FreeSslCtx {
 public:
 	void
-	operator () (SSL_CTX* h)
-	{
+	operator () (SSL_CTX* h) {
 		SSL_CTX_free(h);
 	}
 };
@@ -38,14 +36,14 @@ SslInfoCallbackFunc(
 	const SSL* ssl,
 	int where,
 	int ret
-	);
+);
 
 typedef
 int
 SslVerifyCallbackFunc(
 	int isPreVerifyOk,
 	X509_STORE_CTX* ctx
-	);
+);
 
 typedef
 DH*
@@ -53,68 +51,59 @@ SslTmpDhCallbackFunc(
 	SSL* ssl,
 	int isExport,
 	int keyLength
-	);
+);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class SslCtx: public sl::Handle<SSL_CTX*, FreeSslCtx>
-{
+class SslCtx: public sl::Handle<SSL_CTX*, FreeSslCtx> {
 public:
 	bool
 	create(const SSL_METHOD* method = SSLv23_method());
 
 	long
-	getOptions()
-	{
+	getOptions() {
 		ASSERT(m_h);
 		return ::SSL_CTX_get_options(m_h);
 	}
 
 	long
-	setOptions(long options)
-	{
+	setOptions(long options) {
 		ASSERT(m_h);
 		return ::SSL_CTX_set_options(m_h, options);
 	}
 
 	long
-	clearOptions(long options)
-	{
+	clearOptions(long options) {
 		ASSERT(m_h);
 		return ::SSL_CTX_clear_options(m_h, options);
 	}
 
 	void
-	setInfoCallback(SslInfoCallbackFunc* callbackFunc)
-	{
+	setInfoCallback(SslInfoCallbackFunc* callbackFunc) {
 		ASSERT(m_h);
 		::SSL_CTX_set_info_callback(m_h, callbackFunc);
 	}
 
 	int
-	getVerifyDepth()
-	{
+	getVerifyDepth() {
 		ASSERT(m_h);
 		return ::SSL_CTX_get_verify_depth(m_h);
 	}
 
 	void
-	setVerifyDepth(int depth)
-	{
+	setVerifyDepth(int depth) {
 		ASSERT(m_h);
 		::SSL_CTX_set_verify_depth(m_h, depth);
 	}
 
 	int
-	getVerifyMode()
-	{
+	getVerifyMode() {
 		ASSERT(m_h);
 		return ::SSL_CTX_get_verify_mode(m_h);
 	}
 
 	void
-	setVerifyMode(int mode)
-	{
+	setVerifyMode(int mode) {
 		ASSERT(m_h);
 		::SSL_CTX_set_verify(m_h, mode, NULL);
 	}
@@ -123,8 +112,7 @@ public:
 	setVerify(
 		int mode,
 		SslVerifyCallbackFunc* callbackFunc
-		)
-	{
+	) {
 		ASSERT(m_h);
 		::SSL_CTX_set_verify(m_h, mode, callbackFunc);
 	}
@@ -133,14 +121,13 @@ public:
 	loadVerifyLocations(
 		const sl::StringRef& caFileName,
 		const sl::StringRef& caDir = sl::StringRef()
-		);
+	);
 
 	bool
 	setTmpDh(DH* dh);
 
 	void
-	setTmpDhCallback(SslTmpDhCallbackFunc* callback)
-	{
+	setTmpDhCallback(SslTmpDhCallbackFunc* callback) {
 		ASSERT(m_h);
 		::SSL_CTX_set_tmp_dh_callback(m_h, callback);
 	}
@@ -152,8 +139,7 @@ public:
 	setCipherList(const sl::StringRef& listString);
 
 	X509*
-	getCertificate() const
-	{
+	getCertificate() const {
 		ASSERT(m_h);
 		return ::SSL_CTX_get0_certificate(m_h);
 	}
@@ -165,11 +151,10 @@ public:
 	useCertificateFile(
 		const sl::StringRef& fileName,
 		int fileType = SSL_FILETYPE_PEM
-		);
+	);
 
 	EVP_PKEY*
-	getPrivateKey() const
-	{
+	getPrivateKey() const {
 		ASSERT(m_h);
 		return ::SSL_CTX_get0_privatekey(m_h);
 	}
@@ -181,14 +166,13 @@ public:
 	usePrivateKeyFile(
 		const sl::StringRef& fileName,
 		int fileType = SSL_FILETYPE_PEM
-		);
+	);
 
 	bool
 	addExtraChainCertificate(const X509* cert);
 
 	void
-	clearExtraChainCertificates()
-	{
+	clearExtraChainCertificates() {
 		ASSERT(m_h);
 		::SSL_CTX_clear_chain_certs(m_h);
 	}

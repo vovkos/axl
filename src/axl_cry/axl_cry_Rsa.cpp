@@ -19,8 +19,7 @@ namespace cry {
 //..............................................................................
 
 bool
-Rsa::create()
-{
+Rsa::create() {
 	close();
 
 	m_h = ::RSA_new();
@@ -28,8 +27,7 @@ Rsa::create()
 }
 
 bool
-Rsa::readPublicKey(BIO* bio)
-{
+Rsa::readPublicKey(BIO* bio) {
 	close();
 
 	bool result = ::PEM_read_bio_RSA_PUBKEY(bio, &m_h, 0, NULL) != NULL;
@@ -37,8 +35,7 @@ Rsa::readPublicKey(BIO* bio)
 }
 
 bool
-Rsa::readPrivateKey(BIO* bio)
-{
+Rsa::readPrivateKey(BIO* bio) {
 	close();
 
 	bool result = ::PEM_read_bio_RSAPrivateKey(bio, &m_h, 0, NULL) != NULL;
@@ -50,8 +47,7 @@ Rsa::generate(
 	uint_t keyLength,
 	BIGNUM* publicExponent,
 	BN_GENCB* callback
-	)
-{
+) {
 	int result = ::RSA_generate_key_ex(m_h, keyLength, publicExponent, callback);
 	return completeWithLastCryptoError(result);
 }
@@ -61,8 +57,7 @@ Rsa::generate(
 	uint_t keyLength,
 	uint_t publicExponent,
 	BN_GENCB* callback
-	)
-{
+) {
 	BigNum bigNum;
 
 	return
@@ -78,8 +73,7 @@ Rsa::signHash(
 	size_t signatureBufferSize,
 	const void* hash,
 	size_t hashSize
-	)
-{
+) {
 	ASSERT(signatureBufferSize >= getSize());
 
 	uint_t signatureSize = (uint_t)signatureBufferSize;
@@ -90,7 +84,7 @@ Rsa::signHash(
 		(uchar_t*)signatureBuffer,
 		&signatureSize,
 		m_h
-		);
+	);
 
 	if (!result)
 		return failWithLastCryptoError<size_t>(-1);
@@ -105,8 +99,7 @@ Rsa::signHash(
 	sl::Array<char>* signature,
 	const void* hash,
 	size_t hashSize
-	)
-{
+) {
 	size_t signatureBufferSize = getSize();
 	bool result = signature->setCount(signatureBufferSize);
 	if (!result)

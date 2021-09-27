@@ -56,39 +56,33 @@ namespace spy {
 
 //..............................................................................
 
-class ImportIteratorBase
-{
+class ImportIteratorBase {
 protected:
 	sl::StringRef m_symbolName;
 	sl::StringRef m_moduleName;
 	void** m_slot;
 
 public:
-	ImportIteratorBase()
-	{
+	ImportIteratorBase() {
 		m_slot = NULL;
 	}
 
-	operator bool ()
-	{
+	operator bool () {
 		return m_slot != NULL;
 	}
 
 	const sl::StringRef&
-	getSymbolName() const
-	{
+	getSymbolName() const {
 		return m_symbolName;
 	}
 
 	const sl::StringRef&
-	getModuleName() const
-	{
+	getModuleName() const {
 		return m_moduleName;
 	}
 
 	void**
-	getSlot() const
-	{
+	getSlot() const {
 		return m_slot;
 	}
 
@@ -101,23 +95,19 @@ protected:
 
 //..............................................................................
 
-class PeCodeMap: public rc::RefCount
-{
+class PeCodeMap: public rc::RefCount {
 protected:
-	struct AddressRange
-	{
+	struct AddressRange {
 		size_t m_begin;
 		size_t m_end;
 
 		bool
-		isInside(size_t address)
-		{
+		isInside(size_t address) {
 			return address >= m_begin && address < m_end;
 		}
 	};
 
-	struct ModuleCodeMap
-	{
+	struct ModuleCodeMap {
 		size_t m_moduleBase;
 		size_t m_moduleEnd;
 		AddressRange m_codeSection;
@@ -141,8 +131,7 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct PeImportEnumeration: rc::RefCount
-{
+struct PeImportEnumeration: rc::RefCount {
 	char* m_moduleBase;
 	IMAGE_IMPORT_DESCRIPTOR* m_importDir;
 	size_t m_importDescCount;
@@ -150,8 +139,7 @@ struct PeImportEnumeration: rc::RefCount
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ImportIterator: public ImportIteratorBase
-{
+class ImportIterator: public ImportIteratorBase {
 protected:
 	uint_t m_ordinal;
 	uint_t m_hint;
@@ -173,14 +161,12 @@ public:
 	operator ++ (int);
 
 	uint_t
-	getOrdinal()
-	{
+	getOrdinal() {
 		return m_ordinal;
 	}
 
 	uint_t
-	getHint()
-	{
+	getHint() {
 		return m_hint;
 	}
 
@@ -189,8 +175,7 @@ protected:
 	openImportDesc();
 
 	bool
-	isCode(size_t address)
-	{
+	isCode(size_t address) {
 		return (m_codeMap ? m_codeMap : m_codeMap = AXL_RC_NEW(PeCodeMap))->isCode(address);
 	}
 
@@ -202,8 +187,7 @@ protected:
 
 //..............................................................................
 
-struct ElfImportEnumeration: rc::RefCount
-{
+struct ElfImportEnumeration: rc::RefCount {
 	size_t m_baseAddress; // relocation difference, not an absolute address
 	ElfW(Sym)* m_symbolTable;
 	char* m_stringTable;
@@ -216,15 +200,13 @@ struct ElfImportEnumeration: rc::RefCount
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ImportIterator: public ImportIteratorBase
-{
+class ImportIterator: public ImportIteratorBase {
 protected:
 	rc::Ptr<ElfImportEnumeration> m_enumeration;
 	size_t m_index;
 
 public:
-	ImportIterator()
-	{
+	ImportIterator() {
 		m_index = -1;
 	}
 
@@ -243,8 +225,7 @@ protected:
 
 #elif (_AXL_OS_DARWIN)
 
-struct ImportEnumeration: rc::RefCount
-{
+struct ImportEnumeration: rc::RefCount {
 	sl::Array<segment_command_64*> m_segmentArray;
 	sl::Array<const char*> m_dylibNameArray;
 	char* m_slide;
@@ -254,11 +235,9 @@ struct ImportEnumeration: rc::RefCount
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ImportIterator: public ImportIteratorBase
-{
+class ImportIterator: public ImportIteratorBase {
 protected:
-	enum State
-	{
+	enum State {
 		State_Idle,
 		State_Bind,
 		State_WeakBind,
@@ -281,8 +260,7 @@ protected:
 	size_t m_segmentOffset;
 
 public:
-	ImportIterator()
-	{
+	ImportIterator() {
 		init();
 	}
 
@@ -295,27 +273,23 @@ public:
 	operator ++ (int);
 
 	const sl::StringRef&
-	getSegmentName() const
-	{
+	getSegmentName() const {
 		return m_segmentName;
 	}
 
 	const sl::StringRef&
-	getSectionName() const
-	{
+	getSectionName() const {
 		return m_sectionName;
 	}
 
 	size_t
-	getSlotVmAddr()
-	{
+	getSlotVmAddr() {
 		return m_slotVmAddr;
 	}
 
 protected:
 	void
-	init()
-	{
+	init() {
 		setState(State_Idle, NULL, 0);
 	}
 
@@ -324,7 +298,7 @@ protected:
 		State state,
 		const char* p,
 		size_t size
-		);
+	);
 
 	bool
 	next();
@@ -339,7 +313,7 @@ protected:
 	findSection(
 		const struct segment_command_64* segment,
 		size_t slotVmAddr
-		);
+	);
 
 	const char*
 	getDylibName(int ordinal);
@@ -353,18 +327,17 @@ bool
 enumerateImports(
 	ImportIterator* iterator,
 	void* module = NULL
-	);
+);
 
 bool
 enumerateImports(
 	ImportIterator* importIterator,
 	const ModuleIterator& moduleIterator
-	);
+);
 
 inline
 ImportIterator
-enumerateImports(void* module = NULL)
-{
+enumerateImports(void* module = NULL) {
 	ImportIterator iterator;
 	enumerateImports(&iterator, module);
 	return iterator;
@@ -372,8 +345,7 @@ enumerateImports(void* module = NULL)
 
 inline
 ImportIterator
-enumerateImports(const ModuleIterator& moduleIterator)
-{
+enumerateImports(const ModuleIterator& moduleIterator) {
 	ImportIterator importIterator;
 	enumerateImports(&importIterator, moduleIterator);
 	return importIterator;

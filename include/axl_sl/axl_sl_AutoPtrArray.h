@@ -24,9 +24,8 @@ namespace sl {
 template <
 	typename T,
 	typename Delete0 = typename mem::StdDelete<T>
-	>
-class AutoPtrArray: public Array<T*>
-{
+>
+class AutoPtrArray: public Array<T*> {
 	AXL_DISABLE_COPY(AutoPtrArray)
 
 public:
@@ -35,52 +34,40 @@ public:
 
 public:
 	AutoPtrArray():
-		BaseType()
-	{
-	}
+		BaseType() {}
 
 	AutoPtrArray(T* e):
-		BaseType(e)
-	{
-	}
+		BaseType(e) {}
 
 	AutoPtrArray(
 		T* const* p,
 		size_t count
-		):
-		BaseType(p, count)
-	{
-	}
+	):
+		BaseType(p, count) {}
 
 	AutoPtrArray(
 		rc::BufKind bufKind,
 		void* p,
 		size_t size
-		):
-		BaseType(bufKind, p, size)
-	{
-	}
+	):
+		BaseType(bufKind, p, size) {}
 
-	~AutoPtrArray()
-	{
+	~AutoPtrArray() {
 		deleteElements();
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		deleteElements();
 		BaseType::clear();
 	}
 
 protected:
 	void
-	deleteElements()
-	{
+	deleteElements() {
 		size_t count = this->getCount();
 
-		for (size_t i = 0; i < count; i++)
-		{
+		for (size_t i = 0; i < count; i++) {
 			T* e = this->m_p[i];
 			if (e)
 				Delete() (e);

@@ -16,8 +16,7 @@ namespace {
 
 //..............................................................................
 
-void run()
-{
+void run() {
 	sl::TextBoyerMooreFind find;
 
 	char haystack[] = "hui govno i muravei";
@@ -35,8 +34,7 @@ void run()
 	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
 
 #if 1
-	for (size_t i = 0; i < lengthof(haystack); i++)
-	{
+	for (size_t i = 0; i < lengthof(haystack); i++) {
 		result = find.find(&incrementalContext, i, sl::StringRef(haystack + i, 1));
 		if (result != -1)
 			break;
@@ -46,8 +44,7 @@ void run()
 		result = find.find(&incrementalContext, lengthof(haystack), sl::StringRef(" ", 1));
 
 #elif 0
-	for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--)
-	{
+	for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
 		result = find.find(&incrementalContext, i, haystack + i, 1);
 		if (result != -1)
 			break;

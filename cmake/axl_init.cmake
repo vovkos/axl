@@ -45,7 +45,7 @@ axl_find_file_recurse_parent_dirs(
 	AXL_PATHS_CMAKE
 	paths.cmake
 	${AXL_CMAKE_ORIGIN_DIR}
-	)
+)
 
 # find and include settings.cmake to give a chance for overriding std settings...
 
@@ -53,7 +53,7 @@ axl_find_file_recurse_parent_dirs(
 	AXL_SETTINGS_CMAKE
 	settings.cmake
 	${AXL_CMAKE_ORIGIN_DIR}
-	)
+)
 
 if(AXL_SETTINGS_CMAKE)
 	include(${AXL_SETTINGS_CMAKE})
@@ -84,7 +84,7 @@ if(_FILTERED_VARIABLE_LIST)
 		"    "
 		${AXL_G_MESSAGE_ALIGN}
 		${_FILTERED_VARIABLE_LIST}
-		)
+	)
 endif()
 
 # import modules (if dependencies.cmake defines any imports)
@@ -93,7 +93,7 @@ set(
 	AXL_IMPORT_DIR_LIST
 	${AXL_IMPORT_DIR_LIST}
 	${CMAKE_CURRENT_LIST_DIR}
-	)
+)
 
 if(AXL_IMPORT_LIST)
 	axl_import(${AXL_IMPORT_LIST})

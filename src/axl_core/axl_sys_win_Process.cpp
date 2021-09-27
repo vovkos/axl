@@ -35,8 +35,7 @@ Process::create(
 	const sl::StringRef_w& currentDir,
 	const STARTUPINFOW* startupInfo,
 	handle_t* threadHandle
-	)
-{
+) {
 	bool_t result;
 
 	close();
@@ -55,7 +54,7 @@ Process::create(
 		currentDir.szn(),
 		(STARTUPINFOW*)startupInfo,
 		&processInfo
-		);
+	);
 
 	if (!result)
 		return err::failWithLastSystemError();
@@ -76,8 +75,7 @@ syncExec(
 	const sl::StringRef_w& cmdLine,
 	sl::Array<char>* output,
 	dword_t* exitCode
-	)
-{
+) {
 	bool_t result;
 
 	SECURITY_ATTRIBUTES secAttr = { 0 };
@@ -114,16 +112,14 @@ syncExec(
 
 	output->clear();
 
-	for (;;)
-	{
+	for (;;) {
 		char buffer[1024];
 
 		size_t size = parentStdOut.read(buffer, countof(buffer));
 		if (!size)
 			break;
 
-		if (size == -1)
-		{
+		if (size == -1) {
 			if (err::getLastError()->m_code == ERROR_BROKEN_PIPE)
 				break; // pipe done - normal exit path
 
@@ -140,16 +136,13 @@ syncExec(
 }
 
 sl::String_w
-getProcessImageName(dword_t pid)
-{
+getProcessImageName(dword_t pid) {
 	HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
-	if (!hProcess)
-	{
+	if (!hProcess) {
 		if (::GetLastError() == ERROR_ACCESS_DENIED)
 			hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
 
-		if (!hProcess)
-		{
+		if (!hProcess) {
 			err::setLastSystemError();
 			return NULL;
 		}
@@ -167,11 +160,10 @@ getProcessImageName(dword_t pid)
 		name,
 		sizeof(stackBuffer),
 		&length
-		);
+	);
 
 
-	if (status == STATUS_INFO_LENGTH_MISMATCH)
-	{
+	if (status == STATUS_INFO_LENGTH_MISMATCH) {
 		bool result = heapBuffer.setCount(length);
 		if (!result)
 			return NULL;
@@ -184,11 +176,10 @@ getProcessImageName(dword_t pid)
 			name,
 			length,
 			&length
-			);
+		);
 	}
 
-	if (!NT_SUCCESS(status))
-	{
+	if (!NT_SUCCESS(status)) {
 		err::setError(NtStatus(status));
 		return NULL;
 	}

@@ -6,8 +6,7 @@ namespace lnx {
 
 //..............................................................................
 
-class ElfParser
-{
+class ElfParser {
 protected:
 	size_t m_fileSize;
 	const ElfW(Ehdr)* m_elfHdr;
@@ -18,8 +17,7 @@ protected:
 
 public:
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_elfHdr != NULL;
 	}
 
@@ -30,39 +28,34 @@ public:
 	open(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
-	getFileSize()
-	{
+	getFileSize() {
 		ASSERT(isOpen());
 		return m_fileSize;
 	}
 
 	const ElfW(Ehdr)*
-	getElfHdr()
-	{
+	getElfHdr() {
 		ASSERT(isOpen());
 		return m_elfHdr;
 	}
 
 	const ElfW(Shdr)*
-	getSectionHdrTable()
-	{
+	getSectionHdrTable() {
 		ASSERT(isOpen());
 		return m_shdrTable;
 	}
 
 	const ElfW(Phdr)*
-	getProgramHdrTable()
-	{
+	getProgramHdrTable() {
 		ASSERT(isOpen());
 		return m_phdrTable;
 	}
 
 	const char*
-	getString(size_t offset)
-	{
+	getString(size_t offset) {
 		ASSERT(isOpen());
 		return offset < m_stringTableSize ? m_stringTable + offset : NULL;
 	}

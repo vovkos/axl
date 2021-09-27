@@ -23,22 +23,19 @@ sl::StringHashTable<TestFunc*> TestSet;
 
 inline
 TestSet*
-getTestCaseSet()
-{
+getTestCaseSet() {
 	static int32_t flag = 0;
 	return sl::getSingleton<TestSet> (&flag);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class AddTestCase
-{
+class AddTestCase {
 public:
 	AddTestCase(
 		const char* name,
 		TestFunc* func
-		)
-	{
+	) {
 		getTestCaseSet()->add(name, func);
 	}
 };

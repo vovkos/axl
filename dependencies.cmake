@@ -33,7 +33,7 @@ set(
 	DOXYREST_CMAKE_DIR
 	SPHINX_BUILD_EXE
 	PDFLATEX_EXE
-	)
+)
 
 set(
 	AXL_IMPORT_LIST
@@ -61,6 +61,6 @@ set(
 	AXL_IMPORT_DIR_LIST
 
 	${DOXYREST_CMAKE_DIR}
-	)
+)
 
 #...............................................................................

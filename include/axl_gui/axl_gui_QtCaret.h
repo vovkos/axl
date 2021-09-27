@@ -23,23 +23,20 @@ class WidgetDriver;
 
 //..............................................................................
 
-class QtCaret: public QTimer
-{
+class QtCaret: public QTimer {
 protected:
 	WidgetDriver* m_widgetDriver;
 	bool m_isVisible;
 	Rect m_rect;
 
 public:
-	QtCaret()
-	{
+	QtCaret() {
 		m_isVisible = false;
 		m_widgetDriver = NULL;
 	}
 
 	bool
-	isVisible()
-	{
+	isVisible() {
 		return m_isVisible;
 	}
 
@@ -48,7 +45,7 @@ public:
 		WidgetDriver* widgetDriver,
 		const Rect& rect,
 		uint_t interval = 500
-		);
+	);
 
 	void
 	hide(WidgetDriver* widgetDriver);

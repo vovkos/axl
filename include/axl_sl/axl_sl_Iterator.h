@@ -20,14 +20,13 @@ namespace sl {
 
 //..............................................................................
 
-struct ListLink
-{
+struct ListLink {
 	template <
 		typename T,
 		typename Entry,
 		typename Link,
 		typename GetLink
-		>
+	>
 	friend class IteratorBase;
 
 	template <
@@ -35,7 +34,7 @@ struct ListLink
 		typename GetLink,
 		typename Iterator,
 		typename ConstIterator
-		>
+	>
 	friend class ListBase;
 
 protected:
@@ -44,14 +43,12 @@ protected:
 
 public:
 	ListLink*
-	getNext()
-	{
+	getNext() {
 		return m_next;
 	}
 
 	ListLink*
-	getPrev()
-	{
+	getPrev() {
 		return m_prev;
 	}
 };
@@ -68,9 +65,8 @@ template <
 	typename Entry0,
 	typename Link0,
 	typename GetLink0
-	>
-class IteratorBase
-{
+>
+class IteratorBase {
 public:
 	typedef Entry0 Entry;
 	typedef Link0 Link;
@@ -80,73 +76,62 @@ protected:
 	Entry* m_p;
 
 public:
-	IteratorBase()
-	{
+	IteratorBase() {
 		m_p = NULL;
 	}
 
 	// operator bool () might seem more logical, but then '+' and '-' will not work
 
-	operator const void* () const
-	{
+	operator const void* () const {
 		return m_p;
 	}
 
 	T&
-	operator ++ ()
-	{
+	operator ++ () {
 		return next();
 	}
 
 	T&
-	operator -- ()
-	{
+	operator -- () {
 		return prev();
 	}
 
 	T
-	operator ++ (int) // post increment
-	{
+	operator ++ (int) { // post increment
 		T old = *(T*)this;
 		next();
 		return old;
 	}
 
 	T
-	operator -- (int) // post decrement
-	{
+	operator -- (int) { // post decrement
 		T old = *(T*)this;
 		prev();
 		return old;
 	}
 
 	T&
-	operator += (size_t count)
-	{
+	operator += (size_t count) {
 		return inc(count);
 	}
 
 	T&
-	operator -= (size_t count)
-	{
+	operator -= (size_t count) {
 		return inc(-count);
 	}
 
 	T
-	operator + (size_t count) const
-	{
+	operator + (size_t count) const {
 		return getInc(count);
 	}
 
 	T
-	operator - (size_t count) const
-	{
+	operator - (size_t count) const {
 		return getInc(-count);
 	}
 
 	T&
-	next()
-	{
+	next() {
 		if (m_p)
 			m_p = getEntryFromLink(getLink()->m_next);
 
@@ -154,8 +139,7 @@ public:
 	}
 
 	T&
-	prev()
-	{
+	prev() {
 		if (m_p)
 			m_p = getEntryFromLink(getLink()->m_prev);
 
@@ -163,8 +147,7 @@ public:
 	}
 
 	T&
-	inc(intptr_t count)
-	{
+	inc(intptr_t count) {
 		Link* link = getLink();
 
 		if (count > 0)
@@ -179,53 +162,45 @@ public:
 	}
 
 	T
-	getNext() const
-	{
+	getNext() const {
 		return IteratorBase(*this).next();
 	}
 
 	T
-	getPrev() const
-	{
+	getPrev() const {
 		return IteratorBase(*this).prev();
 	}
 
 	T
-	getInc(intptr_t count) const
-	{
+	getInc(intptr_t count) const {
 		return IteratorBase(*this).inc(count);
 	}
 
 	Entry*
-	getEntry() const
-	{
+	getEntry() const {
 		return m_p;
 	}
 
 	Link*
-	getLink() const
-	{
+	getLink() const {
 		return m_p ? GetLink() (m_p) : NULL;
 	}
 
 	static
 	Entry*
-	getEntryFromLink(Link* p)
-	{
+	getEntryFromLink(Link* p) {
 		return p ? (Entry*)((char*)p  + 1 - (size_t)GetLink() ((Entry*) 1)) : NULL;
 	}
 
 	static
 	Link*
-	getLinkFromEntry(Entry* p)
-	{
+	getLinkFromEntry(Entry* p) {
 		return p ? GetLink() (p) : NULL;
 	}
 
 	static
 	T
-	fromLink(Link* p)
-	{
+	fromLink(Link* p) {
 		T it;
 		it.m_p = getEntryFromLink(p);
 		return it;
@@ -239,48 +214,41 @@ template <
 	typename Entry,
 	typename Link,
 	typename GetLink = ImplicitPtrCast<T, ListLink>
-	>
+>
 class IteratorImpl: public IteratorBase<
 	T,
 	Entry,
 	Link,
 	GetLink
-	>
-{
+> {
 public:
 	Entry*
-	operator * () const
-	{
+	operator * () const {
 		return this->m_p;
 	}
 
 	Entry*
-	operator -> () const
-	{
+	operator -> () const {
 		return this->m_p;
 	}
 
 	T&
-	operator = (Entry* p)
-	{
+	operator = (Entry* p) {
 		this->m_p = p;
 		return *this;
 	}
 
 	bool
-	operator == (Entry* p) const
-	{
+	operator == (Entry* p) const {
 		return this->m_p == p;
 	}
 
 	bool
-	operator != (Entry* p) const
-	{
+	operator != (Entry* p) const {
 		return !operator == (p);
 	}
 
-	Entry* p() const
-	{
+	Entry* p() const {
 		return this->m_p;
 	}
 };
@@ -290,30 +258,25 @@ public:
 template <
 	typename T,
 	typename GetLink = ImplicitPtrCast<T, ListLink>
-	>
+>
 class Iterator: public IteratorImpl<
 	Iterator<T, GetLink>,
 	T,
 	ListLink,
 	GetLink
-	>
-{
+> {
 public:
-	Iterator()
-	{
-	}
+	Iterator() {}
 
 	template <
 		typename T2,
 		typename GetLink2
-		>
-	Iterator(const Iterator<T2, GetLink2>& src)
-	{
+	>
+	Iterator(const Iterator<T2, GetLink2>& src) {
 		this->operator = (*src);
 	}
 
-	Iterator(T* p)
-	{
+	Iterator(T* p) {
 		this->m_p = p;
 	}
 };
@@ -323,39 +286,33 @@ public:
 template <
 	typename T,
 	typename GetLink = ImplicitPtrCast<T, ListLink>
-	>
+>
 class ConstIterator: public IteratorImpl<
 	ConstIterator<T, GetLink>,
 	const T,
 	const ListLink,
 	GetLink
-	>
-{
+> {
 public:
-	ConstIterator()
-	{
-	}
+	ConstIterator() {}
 
 	template <
 		typename T2,
 		typename GetLink2
-		>
-	ConstIterator(const Iterator<T2, GetLink2>& src)
-	{
+	>
+	ConstIterator(const Iterator<T2, GetLink2>& src) {
 		this->operator = (*src);
 	}
 
 	template <
 		typename T2,
 		typename GetLink2
-		>
-	ConstIterator(const ConstIterator<T2, GetLink2>& src)
-	{
+	>
+	ConstIterator(const ConstIterator<T2, GetLink2>& src) {
 		this->operator = (*src);
 	}
 
-	ConstIterator(const T* p)
-	{
+	ConstIterator(const T* p) {
 		this->m_p = p;
 	}
 };

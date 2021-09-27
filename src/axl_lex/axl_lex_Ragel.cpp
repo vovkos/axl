@@ -21,13 +21,11 @@ void
 Ragel::setSource(
 	const sl::StringRef& source,
 	bool isBomNeeded
-	)
-{
+) {
 	m_begin = p = (char*)source.cp();
 	pe = eof = (char*)source.getEnd();
 
-	if (!isBomNeeded)
-	{
+	if (!isBomNeeded) {
 		size_t bomLength = enc::Utf8::getBomLength();
 		if (source.getLength() >= bomLength && memcmp(p, enc::Utf8::getBom(), bomLength) == 0)
 			p += bomLength;
@@ -35,8 +33,7 @@ Ragel::setSource(
 }
 
 int*
-Ragel::prePush()
-{
+Ragel::prePush() {
 	size_t count = m_stack.getCount();
 	m_stack.setCount(count + 1);
 	stack = m_stack;
@@ -44,16 +41,14 @@ Ragel::prePush()
 }
 
 void
-Ragel::postPop()
-{
+Ragel::postPop() {
 	size_t count = m_stack.getCount();
 	if (count)
 		m_stack.setCount(count - 1);
 }
 
 void
-Ragel::clear()
-{
+Ragel::clear() {
 	m_stack.clear();
 	m_begin = NULL;
 

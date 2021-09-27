@@ -18,8 +18,7 @@ namespace iok {
 //..............................................................................
 
 size_t
-getComputerGuid(sl::Array<char>* guid)
-{
+getComputerGuid(sl::Array<char>* guid) {
 	guid->clear();
 
 	mach_port_t masterPort;
@@ -37,18 +36,16 @@ getComputerGuid(sl::Array<char>* guid)
 		return 0;
 
 	CFDataRef macAddress = nil;
-	while (io_object_t service = IOIteratorNext(iterator))
-	{
+	while (io_object_t service = IOIteratorNext(iterator)) {
 		io_object_t parentService;
 
 		kernResult = IORegistryEntryGetParentEntry(
 			service,
 			kIOServicePlane,
 			&parentService
-			);
+		);
 
-		if (kernResult == KERN_SUCCESS)
-		{
+		if (kernResult == KERN_SUCCESS) {
 			if (macAddress)
 				CFRelease(macAddress);
 
@@ -57,7 +54,7 @@ getComputerGuid(sl::Array<char>* guid)
 				CFSTR("IOMACAddress"),
 				kCFAllocatorDefault,
 				0
-				);
+			);
 
 			IOObjectRelease(parentService);
 		}

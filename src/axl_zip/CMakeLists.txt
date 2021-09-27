@@ -16,17 +16,17 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_zip/axl_zip_ZipReader.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
 	axl_zip_ZipReader.cpp
-	)
+)
 
 set(
 	LIB_C_LIST
 	miniz.c
-	)
+)
 
 axl_exclude_from_build(miniz.c)
 
@@ -36,7 +36,7 @@ source_group(
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_C_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -50,14 +50,14 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_zip/axl_zip_Pch.h
-	)
+)
 
 source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -66,7 +66,7 @@ source_group(
 
 include_directories(
 	${AXL_INC_DIR}
-	)
+)
 
 add_library(
 	axl_zip
@@ -75,13 +75,13 @@ add_library(
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_C_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_zip
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -89,11 +89,11 @@ axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_zip
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_zip
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

@@ -19,8 +19,7 @@ namespace gui {
 
 //..............................................................................
 
-GdiCanvas::GdiCanvas()
-{
+GdiCanvas::GdiCanvas() {
 	m_engine = GdiEngine::getSingleton();
 	m_destructKind = DestructKind_None;
 	m_hCompatibleDc = NULL;
@@ -34,8 +33,7 @@ GdiCanvas::attach(
 	HDC hdc,
 	HWND hWnd,
 	DestructKind destructKind
-	)
-{
+) {
 	release();
 
 	m_h = hdc;
@@ -44,8 +42,7 @@ GdiCanvas::attach(
 }
 
 void
-GdiCanvas::release()
-{
+GdiCanvas::release() {
 	if (!m_h)
 		return;
 
@@ -61,8 +58,7 @@ GdiCanvas::release()
 	if (m_hCompatibleDc)
 		::DeleteDC(m_hCompatibleDc);
 
-	switch (m_destructKind)
-	{
+	switch (m_destructKind) {
 	case DestructKind_DeleteDc:
 		::DeleteDC(m_h);
 		break;
@@ -87,12 +83,10 @@ GdiCanvas::drawRect(
 	int right,
 	int bottom,
 	uint_t color
-	)
-{
+) {
 	color = overlayColor(m_baseTextAttr.m_backColor, color);
 
-	if (m_colorAttr.m_backColor != color)
-	{
+	if (m_colorAttr.m_backColor != color) {
 		m_colorAttr.m_backColor = color;
 
 		if (!(color & ColorFlag_Transparent))
@@ -116,8 +110,7 @@ GdiCanvas::drawText_utf8(
 	uint_t backColor,
 	uint_t fontFlags,
 	const sl::StringRef_utf8& text
-	)
-{
+) {
 	char buffer[256];
 	sl::String_w text_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	text_w.copy(text);
@@ -133,7 +126,7 @@ GdiCanvas::drawText_utf8(
 		backColor,
 		fontFlags,
 		text_w
-		);
+	);
 }
 
 bool
@@ -148,16 +141,14 @@ GdiCanvas::drawText_utf16(
 	uint_t backColor,
 	uint_t fontFlags,
 	const sl::StringRef_utf16& text
-	)
-{
+) {
 	textColor = overlayColor(m_baseTextAttr.m_foreColor, textColor);
 	backColor = overlayColor(m_baseTextAttr.m_backColor, backColor);
 	fontFlags = overlayFontFlags(m_baseTextAttr.m_fontFlags, fontFlags);
 
 	Font* font = m_baseFont->getFontMod(fontFlags);
 
-	if (m_font != font)
-	{
+	if (m_font != font) {
 		ASSERT(font->getEngine()->getEngineKind() == EngineKind_Gdi);
 		GdiFont* gdiFont = (GdiFont*)font;
 
@@ -168,16 +159,14 @@ GdiCanvas::drawText_utf16(
 			m_hPrevFont = hPrevFont;
 	}
 
-	if (m_colorAttr.m_foreColor != textColor)
-	{
+	if (m_colorAttr.m_foreColor != textColor) {
 		m_colorAttr.m_foreColor = textColor;
 
 		if (!(textColor & ColorFlag_Transparent))
 			::SetTextColor(m_h, m_palette.getColorRgb(textColor));
 	}
 
-	if (m_colorAttr.m_backColor != backColor)
-	{
+	if (m_colorAttr.m_backColor != backColor) {
 		m_colorAttr.m_backColor = backColor;
 
 		if (!(backColor & ColorFlag_Transparent))
@@ -204,8 +193,7 @@ GdiCanvas::drawText_utf32(
 	uint_t backColor,
 	uint_t fontFlags,
 	const sl::StringRef_utf32& text
-	)
-{
+) {
 	char buffer[256];
 	sl::String_w text_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.copy(text, length);
@@ -221,7 +209,7 @@ GdiCanvas::drawText_utf32(
 		backColor,
 		fontFlags,
 		text_w
-		);
+	);
 }
 
 bool
@@ -233,13 +221,11 @@ GdiCanvas::drawImage(
 	int top,
 	int right,
 	int bottom
-	)
-{
+) {
 	ASSERT(image->getEngine()->getEngineKind() == EngineKind_Gdi);
 	GdiImage* gdiImage = (GdiImage*)image;
 
-	if (!m_hCompatibleDc)
-	{
+	if (!m_hCompatibleDc) {
 		ScreenDc screenDc;
 		m_hCompatibleDc = ::CreateCompatibleDC(screenDc);
 	}
@@ -256,7 +242,7 @@ GdiCanvas::drawImage(
 		left,
 		top,
 		SRCCOPY
-		);
+	);
 
 	::SelectObject(m_hCompatibleDc, hPrevBitmap);
 	return true;
@@ -271,8 +257,7 @@ GdiCanvas::copyRect(
 	int ySrc,
 	int width,
 	int height
-	)
-{
+) {
 	ASSERT(srcCanvas->getEngine()->getEngineKind() == EngineKind_Gdi);
 	GdiCanvas* dc = (GdiCanvas*)srcCanvas;
 
@@ -286,7 +271,7 @@ GdiCanvas::copyRect(
 		xSrc,
 		ySrc,
 		SRCCOPY
-		);
+	);
 
 	return true;
 }

@@ -21,74 +21,59 @@ namespace cf {
 
 //..............................................................................
 
-class Data: public TypeBase<CFDataRef>
-{
+class Data: public TypeBase<CFDataRef> {
 public:
-	Data()
-	{
-	}
+	Data() {}
 
 	Data(const Data& src):
-		TypeBase<CFDataRef>(src)
-	{
-	}
+		TypeBase<CFDataRef>(src) {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Data(Data&& src):
-		TypeBase<CFDataRef>(std::move(src))
-	{
-	}
+		TypeBase<CFDataRef>(std::move(src)) {}
 #endif
 
 	Data(
 		CFDataRef p,
 		bool isAttach = false
-		):
-		TypeBase<CFDataRef>(p, isAttach)
-	{
-	}
+	):
+		TypeBase<CFDataRef>(p, isAttach) {}
 
 	Data(
 		const void* p,
 		size_t size
-	   	)
-	{
+	) {
 		create(p, size);
 	}
 
 	Data&
-	operator = (const Data& src)
-	{
+	operator = (const Data& src) {
 		copy(src);
 		return *this;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Data&
-	operator = (Data&& src)
-	{
+	operator = (Data&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	Data&
-	operator = (CFDataRef p)
-	{
+	operator = (CFDataRef p) {
 		copy(p);
 		return *this;
 	}
 
 	size_t
-	getLength() const
-	{
+	getLength() const {
 		ASSERT(m_p);
 		return ::CFDataGetLength(m_p);
 	}
 
 	const uchar_t*
-	getBytePtr() const
-	{
+	getBytePtr() const {
 		ASSERT(m_p);
 		return ::CFDataGetBytePtr(m_p);
 	}
@@ -100,7 +85,7 @@ public:
 	create(
 		const void* p,
 		size_t size
-		);
+	);
 };
 
 //..............................................................................

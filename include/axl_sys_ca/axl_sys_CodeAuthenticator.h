@@ -22,8 +22,7 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-class CodeAuthenticator
-{
+class CodeAuthenticator {
 protected:
 	sl::String_w m_expectedProgramName;
 	sl::String_w m_expectedSubjectName;
@@ -31,12 +30,9 @@ protected:
 	sl::Array<char> m_expectedSerialNumber;
 
 public:
-	CodeAuthenticator()
-	{
-	}
+	CodeAuthenticator() {}
 
-	CodeAuthenticator(const sl::StringRef& expectedIssuerName)
-	{
+	CodeAuthenticator(const sl::StringRef& expectedIssuerName) {
 		setup(expectedIssuerName);
 	}
 
@@ -45,14 +41,12 @@ public:
 		const sl::StringRef& expectedSubjectName,
 		const sl::StringRef& expectedIssuerName,
 		const sl::ArrayRef<char>& expectedSerialNumber
-		)
-	{
+	) {
 		setup(expectedProgramName, expectedSubjectName, expectedIssuerName, expectedSerialNumber);
 	}
 
 	void
-	setup(const sl::StringRef& expectedIssuerName)
-	{
+	setup(const sl::StringRef& expectedIssuerName) {
 		setup(sl::StringRef(), sl::StringRef(), expectedIssuerName, sl::ArrayRef<char>());
 	}
 
@@ -62,7 +56,7 @@ public:
 		const sl::StringRef& expectedSubjectName,
 		const sl::StringRef& expectedIssuerName,
 		const sl::ArrayRef<char>& expectedSerialNumber
-		);
+	);
 
 	bool
 	verifyFile(const sl::StringRef& fileName);
@@ -74,8 +68,7 @@ namespace lnx {
 
 //..............................................................................
 
-class ElfHashGenerator
-{
+class ElfHashGenerator {
 protected:
 	sl::String m_signatureSectionName;
 
@@ -93,21 +86,17 @@ protected:
 
 } // namespace lnx
 
-class CodeAuthenticator: lnx::ElfHashGenerator
-{
+class CodeAuthenticator: lnx::ElfHashGenerator {
 protected:
 	cry::Rsa m_publicKey;
 
 public:
-	CodeAuthenticator()
-	{
-	}
+	CodeAuthenticator() {}
 
 	CodeAuthenticator(
 		sl::StringRef& signatureSectionName,
 		const sl::StringRef& publicKeyPem
-		)
-	{
+	) {
 		setup(signatureSectionName, publicKeyPem);
 	}
 
@@ -115,7 +104,7 @@ public:
 	setup(
 		const sl::StringRef& signatureSectionName,
 		const sl::StringRef& publicKeyPem
-		);
+	);
 
 	bool
 	verifyFile(const sl::StringRef& fileName);
@@ -125,21 +114,17 @@ namespace lnx {
 
 //..............................................................................
 
-class ElfSignatureGenerator: public ElfHashGenerator
-{
+class ElfSignatureGenerator: public ElfHashGenerator {
 protected:
 	cry::Rsa m_privateKey;
 
 public:
-	ElfSignatureGenerator()
-	{
-	}
+	ElfSignatureGenerator() {}
 
 	ElfSignatureGenerator(
 		sl::StringRef& signatureSectionName,
 		const sl::StringRef& privateKeyPem
-		)
-	{
+	) {
 		setup(signatureSectionName, privateKeyPem);
 	}
 
@@ -147,11 +132,10 @@ public:
 	setup(
 		const sl::StringRef& signatureSectionName,
 		const sl::StringRef& privateKeyPem
-		);
+	);
 
 	size_t
-	getSignatureSize()
-	{
+	getSignatureSize() {
 		return m_privateKey.getSize();
 	}
 
@@ -159,7 +143,7 @@ public:
 	generateSignature(
 		const sl::StringRef& fileName,
 		sl::Array<char>* signature
-		);
+	);
 };
 
 //..............................................................................
@@ -168,33 +152,27 @@ public:
 
 #elif (_AXL_OS_DARWIN)
 
-class CodeAuthenticator
-{
+class CodeAuthenticator {
 protected:
 	cf::String m_expectedProgramId;
 	cf::String m_expectedTeamId;
 
 public:
-	CodeAuthenticator()
-	{
-	}
+	CodeAuthenticator() {}
 
-	CodeAuthenticator(const sl::StringRef& expectedIssuerName)
-	{
+	CodeAuthenticator(const sl::StringRef& expectedIssuerName) {
 		setup(expectedIssuerName);
 	}
 
 	CodeAuthenticator(
 		const sl::StringRef& expectedProgramId,
 		const sl::StringRef& expectedTeamId
-		)
-	{
+	) {
 		setup(expectedProgramId, expectedTeamId);
 	}
 
 	void
-	setup(const sl::StringRef& expectedTeamId)
-	{
+	setup(const sl::StringRef& expectedTeamId) {
 		setup(sl::StringRef(), expectedTeamId);
 	}
 
@@ -202,7 +180,7 @@ public:
 	setup(
 		const sl::StringRef& expectedProgramId,
 		const sl::StringRef& expectedTeamId
-		);
+	);
 
 	bool
 	verifyFile(const sl::StringRef& fileName);

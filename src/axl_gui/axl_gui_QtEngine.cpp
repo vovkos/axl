@@ -18,8 +18,7 @@ namespace gui {
 
 //..............................................................................
 
-QtFont* QtFontTuple::attachFont(QFont qtFont)
-{
+QtFont* QtFontTuple::attachFont(QFont qtFont) {
 	clear();
 
 	QtFont* font = AXL_MEM_NEW(QtFont);
@@ -33,8 +32,7 @@ QtFont* QtFontTuple::attachFont(QFont qtFont)
 //..............................................................................
 
 QtEngine::QtEngine():
-	m_sharedOffscreenCanvasCache(this)
-{
+	m_sharedOffscreenCanvasCache(this) {
 	m_qtClipboardMimeData = NULL;
 	memset(m_stdFontTupleArray, 0, sizeof(m_stdFontTupleArray));
 	memset(m_stdCursorArray, 0, sizeof(m_stdCursorArray));
@@ -44,8 +42,7 @@ QtEngine::QtEngine():
 	updateStdPalette();
 }
 
-QtEngine::~QtEngine()
-{
+QtEngine::~QtEngine() {
 	if (m_qtClipboardMimeData)
 		delete m_qtClipboardMimeData;
 
@@ -59,8 +56,7 @@ QtEngine::~QtEngine()
 }
 
 void
-QtEngine::updateStdPalette()
-{
+QtEngine::updateStdPalette() {
 	QPalette palette = QApplication::palette();
 
 	m_stdPalColorTable[~ColorFlag_Index & StdPalColor_WidgetText]    = palette.color(QPalette::Text).rgb() & ColorFlag_RgbMask;
@@ -84,8 +80,7 @@ QtEngine::createOffscreenCanvas(
 	Canvas* canvas,
 	uint_t width,
 	uint_t height
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 	qtCanvas->m_qtPixmap = QPixmap(width, height);
@@ -94,8 +89,7 @@ QtEngine::createOffscreenCanvas(
 }
 
 bool
-QtEngine::releaseOffscreenCanvas(Canvas* canvas)
-{
+QtEngine::releaseOffscreenCanvas(Canvas* canvas) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 	qtCanvas->m_qtPainter.end();
@@ -111,8 +105,7 @@ QtEngine::drawRect(
 	int right,
 	int bottom,
 	uint_t color
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 
@@ -131,8 +124,7 @@ QtEngine::drawAlphaRect(
 	int bottom,
 	uint_t color,
 	uint_t alpha
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 
@@ -157,8 +149,7 @@ QtEngine::drawGradientRect(
 	int x2,
 	int y2,
 	uint_t color2
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 
@@ -189,8 +180,7 @@ QtEngine::drawAlphaGradientRect(
 	int y2,
 	uint_t color2,
 	uint_t alpha2
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 
@@ -221,14 +211,12 @@ QtEngine::drawText_qt(
 	uint_t backColor,
 	uint_t fontFlags,
 	const QString& string
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 
 	Font* font = qtCanvas->m_font->getFontMod(fontFlags);
-	if (qtCanvas->m_driverFont != font)
-	{
+	if (qtCanvas->m_driverFont != font) {
 		ASSERT(font->getEngine() == this);
 		QtFont* qtFont = (QtFont*)font;
 
@@ -239,12 +227,10 @@ QtEngine::drawText_qt(
 	if (textColor & ColorFlag_Undefined)
 		textColor = qtCanvas->m_colorAttr.m_foreColor;
 
-	if (!(textColor & ColorFlag_Undefined))
-	{
+	if (!(textColor & ColorFlag_Undefined)) {
 		textColor = qtCanvas->m_palette.getColorRgb(textColor);
 
-		if (qtCanvas->m_driverColorAttr.m_foreColor != textColor)
-		{
+		if (qtCanvas->m_driverColorAttr.m_foreColor != textColor) {
 			qtCanvas->m_qtPainter.setPen(textColor);
 			qtCanvas->m_driverColorAttr.m_foreColor = textColor;
 		}
@@ -273,8 +259,7 @@ QtEngine::drawText_utf8(
 	uint_t backColor,
 	uint_t fontFlags,
 	const sl::StringRef_utf8& text
-	)
-{
+) {
 	return drawText_qt(
 		canvas,
 		x,
@@ -287,7 +272,7 @@ QtEngine::drawText_utf8(
 		backColor,
 		fontFlags,
 		QString::fromUtf8(text.cp(), text.getLength())
-		);
+	);
 }
 
 bool
@@ -303,8 +288,7 @@ QtEngine::drawText_utf16(
 	uint_t backColor,
 	uint_t fontFlags,
 	const sl::StringRef_utf16& text
-	)
-{
+) {
 	return drawText_qt(
 		canvas,
 		x,
@@ -317,7 +301,7 @@ QtEngine::drawText_utf16(
 		backColor,
 		fontFlags,
 		QString((const QChar*) text.cp(), text.getLength())
-		);
+	);
 }
 
 bool
@@ -333,8 +317,7 @@ QtEngine::drawText_utf32(
 	uint_t backColor,
 	uint_t fontFlags,
 	const sl::StringRef_utf32& text
-	)
-{
+) {
 	return drawText_qt(
 		canvas,
 		x,
@@ -347,7 +330,7 @@ QtEngine::drawText_utf32(
 		backColor,
 		fontFlags,
 		QString::fromUcs4((const uint*) text.cp(), text.getLength())
-		);
+	);
 }
 
 bool
@@ -360,8 +343,7 @@ QtEngine::drawImage(
 	int top,
 	int right,
 	int bottom
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 
@@ -376,7 +358,7 @@ QtEngine::drawImage(
 		top,
 		right - left,
 		bottom - top
-		);
+	);
 
 	return true;
 }
@@ -391,8 +373,7 @@ QtEngine::copyRect(
 	int top,
 	int right,
 	int bottom
-	)
-{
+) {
 	ASSERT(canvas->getEngine() == this);
 	QtCanvas* qtCanvas = (QtCanvas*)canvas;
 
@@ -410,7 +391,7 @@ QtEngine::copyRect(
 		top,
 		right - left,
 		bottom - top
-		);
+	);
 
 	return true;
 }
@@ -420,13 +401,11 @@ QtEngine::copyRect(
 // font
 
 void
-QtEngine::clearFontTuple(FontTuple* fontTuple)
-{
+QtEngine::clearFontTuple(FontTuple* fontTuple) {
 	ASSERT(fontTuple->getEngine() == this);
 	QtFontTuple* qtFontTuple = (QtFontTuple*)fontTuple;
 
-	for (size_t i = 0; i < countof(qtFontTuple->m_fontModArray); i++)
-	{
+	for (size_t i = 0; i < countof(qtFontTuple->m_fontModArray); i++) {
 		Font* font = qtFontTuple->m_fontModArray[i];
 		if (!font)
 			continue;
@@ -439,8 +418,7 @@ QtEngine::clearFontTuple(FontTuple* fontTuple)
 }
 
 FontTuple*
-QtEngine::getStdFontTuple(StdFontKind fontKind)
-{
+QtEngine::getStdFontTuple(StdFontKind fontKind) {
 	ASSERT(fontKind < countof(m_stdFontTupleArray));
 	if (m_stdFontTupleArray[fontKind])
 		return m_stdFontTupleArray[fontKind];
@@ -451,8 +429,7 @@ QtEngine::getStdFontTuple(StdFontKind fontKind)
 	m_stdFontTupleArray[fontKind] = fontTuple;
 	fontTuple->m_fontModArray[0] = font;
 
-	switch (fontKind)
-	{
+	switch (fontKind) {
 	case StdFontKind_Gui:
 		font->m_qtFont = QApplication::font();
 		break;
@@ -470,7 +447,7 @@ QtEngine::getStdFontTuple(StdFontKind fontKind)
 		font->m_qtFont.setStyleHint(
 			QFont::Monospace,
 			(QFont::StyleStrategy)(QFont::NoFontMerging | QFont::ForceIntegerMetrics)
-			);
+		);
 
 		break;
 	}
@@ -484,8 +461,7 @@ QtEngine::createFont(
 	const sl::StringRef& family,
 	size_t pointSize,
 	uint_t flags
-	)
-{
+) {
 	ASSERT(fontTuple->getEngine() == this);
 	QtFontTuple* qtFontTuple = (QtFontTuple*)fontTuple;
 
@@ -517,8 +493,7 @@ Font*
 QtEngine::getFontMod(
 	FontTuple* fontTuple,
 	uint_t flags
-	)
-{
+) {
 	ASSERT(fontTuple->getEngine() == this);
 	QtFontTuple* qtFontTuple = (QtFontTuple*)fontTuple;
 
@@ -544,8 +519,7 @@ bool
 QtEngine::getFontDesc(
 	Font* font,
 	FontDesc* fontDesc
-	)
-{
+) {
 	ASSERT(font->getEngine() == this);
 	QtFont* qtFont = (QtFont*)font;
 	QFontInfo qtFontInfo(qtFont->m_qtFont);
@@ -577,8 +551,7 @@ QtEngine::getFontDesc(
 }
 
 bool
-QtEngine::isMonospaceFont(Font* font)
-{
+QtEngine::isMonospaceFont(Font* font) {
 	ASSERT(font->getEngine() == this);
 	QtFont* qtFont = (QtFont*)font;
 	QFontInfo qtFontInfo(qtFont->m_qtFont);
@@ -591,14 +564,13 @@ QtEngine::calcCharSize_qt(
 	const QFont& font,
 	QPaintDevice* device,
 	QChar c
-	)
-{
+) {
 	QFontMetrics fontMetrics(font, device);
 
 	return Size(
 		fontMetrics.width(c),
 		fontMetrics.height()
-		);
+	);
 }
 
 Size
@@ -606,14 +578,13 @@ QtEngine::calcTextSize_qt(
 	const QFont& font,
 	QPaintDevice* device,
 	const QString& string
-	)
-{
+) {
 	QFontMetrics fontMetrics(font, device);
 
 	return Size(
 		fontMetrics.width(string),
 		fontMetrics.height()
-		);
+	);
 }
 
 Size
@@ -621,15 +592,14 @@ QtEngine::calcCharSize(
 	Font* font,
 	Canvas* canvas,
 	utf32_t c
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
 
 	return calcCharSize_qt(
 		((QtFont*)font)->m_qtFont,
 		((QtCanvas*)canvas)->m_qtPainter.device(),
 		c
-		);
+	);
 }
 
 Size
@@ -637,15 +607,14 @@ QtEngine::calcCharSize(
 	Font* font,
 	Widget* widget,
 	utf32_t c
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
 
 	return calcCharSize_qt(
 		((QtFont*)font)->m_qtFont,
 		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
 		c
-		);
+	);
 }
 
 Size
@@ -653,15 +622,14 @@ QtEngine::calcTextSize_utf8(
 	Font* font,
 	Canvas* canvas,
 	const sl::StringRef_utf8& text
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
 
 	return calcTextSize_qt(
 		((QtFont*)font)->m_qtFont,
 		((QtCanvas*)canvas)->m_qtPainter.device(),
 		QString::fromUtf8(text.cp(), text.getLength())
-		);
+	);
 }
 
 Size
@@ -669,15 +637,14 @@ QtEngine::calcTextSize_utf8(
 	Font* font,
 	Widget* widget,
 	const sl::StringRef_utf8& text
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
 
 	return calcTextSize_qt(
 		((QtFont*)font)->m_qtFont,
 		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
 		QString::fromUtf8(text.cp(), text.getLength())
-		);
+	);
 }
 
 Size
@@ -685,15 +652,14 @@ QtEngine::calcTextSize_utf16(
 	Font* font,
 	Canvas* canvas,
 	const sl::StringRef_utf16& text
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
 
 	return calcTextSize_qt(
 		((QtFont*)font)->m_qtFont,
 		((QtCanvas*)canvas)->m_qtPainter.device(),
 		QString((const QChar*) text.cp(), text.getLength())
-		);
+	);
 }
 
 Size
@@ -701,15 +667,14 @@ QtEngine::calcTextSize_utf16(
 	Font* font,
 	Widget* widget,
 	const sl::StringRef_utf16& text
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
 
 	return calcTextSize_qt(
 		((QtFont*)font)->m_qtFont,
 		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
 		QString((const QChar*) text.cp(), text.getLength())
-		);
+	);
 }
 
 Size
@@ -717,15 +682,14 @@ QtEngine::calcTextSize_utf32(
 	Font* font,
 	Canvas* canvas,
 	const sl::StringRef_utf32& text
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && canvas->getEngine() == this);
 
 	return calcTextSize_qt(
 		((QtFont*)font)->m_qtFont,
 		((QtCanvas*)canvas)->m_qtPainter.device(),
 		QString::fromUcs4((const uint*) text.cp(), text.getLength())
-		);
+	);
 }
 
 Size
@@ -733,15 +697,14 @@ QtEngine::calcTextSize_utf32(
 	Font* font,
 	Widget* widget,
 	const sl::StringRef_utf32& text
-	)
-{
+) {
 	ASSERT(font->getEngine() == this && widget->m_widgetDriver.getEngine() == this);
 
 	return calcTextSize_qt(
 		((QtFont*)font)->m_qtFont,
 		(QtWidgetBase*)widget->m_widgetDriver.getEngineWidget(),
 		QString::fromUcs4((const uint*) text.cp(), text.getLength())
-		);
+	);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -754,8 +717,7 @@ QtEngine::createImage(
 	uint_t width,
 	uint_t height,
 	PixelFormat pixelFormat
-	)
-{
+) {
 	ASSERT(image->getEngine() == this);
 	QtImage* qtImage = (QtImage*)image;
 	qtImage->m_qtImage = QImage(width, height, QImage::Format_ARGB32_Premultiplied);
@@ -766,8 +728,7 @@ bool
 QtEngine::getImageDesc(
 	Image* image,
 	ImageDesc* imageDesc
-	)
-{
+) {
 	ASSERT(image->getEngine() == this);
 	QtImage* qtImage = (QtImage*)image;
 	imageDesc->m_size.m_width = qtImage->m_qtImage.width();
@@ -777,14 +738,12 @@ QtEngine::getImageDesc(
 }
 
 Cursor*
-QtEngine::getStdCursor(StdCursorKind cursorKind)
-{
+QtEngine::getStdCursor(StdCursorKind cursorKind) {
 	ASSERT(cursorKind < countof(m_stdCursorArray));
 	if (m_stdCursorArray[cursorKind])
 		return m_stdCursorArray[cursorKind];
 
-	static Qt::CursorShape stdCursorShapeTable[StdCursorKind__Count] =
-	{
+	static Qt::CursorShape stdCursorShapeTable[StdCursorKind__Count] = {
 		Qt::ArrowCursor,         // StdCursorKind_Arrow = 0,
 		Qt::WaitCursor,          // StdCursorKind_Wait,
 		Qt::IBeamCursor,         // StdCursorKind_IBeam,
@@ -810,8 +769,7 @@ QtEngine::getStdCursor(StdCursorKind cursorKind)
 // clipboard
 
 uintptr_t
-QtEngine::registerClipboardFormat(const sl::StringRef& formatName)
-{
+QtEngine::registerClipboardFormat(const sl::StringRef& formatName) {
 	sl::StringHashTableIterator<uintptr_t> it = m_clipboardFormatNameMap.find(formatName);
 	if (it)
 		return it->m_value;
@@ -823,8 +781,7 @@ QtEngine::registerClipboardFormat(const sl::StringRef& formatName)
 }
 
 bool
-QtEngine::readClipboard(sl::String* string)
-{
+QtEngine::readClipboard(sl::String* string) {
 	QClipboard* qtClipboard = QApplication::clipboard();
 	QString qtString = qtClipboard->text();
 	QByteArray data = qtString.toUtf8();
@@ -836,11 +793,9 @@ bool
 QtEngine::readClipboard(
 	uintptr_t format,
 	sl::Array<char>* data
-	)
-{
+) {
 	size_t count = m_clipboardFormatNameTable.getCount();
-	if (format >= count)
-	{
+	if (format >= count) {
 		err::setError(err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
@@ -856,8 +811,7 @@ QtEngine::readClipboard(
 }
 
 bool
-QtEngine::writeClipboard(const sl::StringRef& string)
-{
+QtEngine::writeClipboard(const sl::StringRef& string) {
 	if (!m_qtClipboardMimeData)
 		m_qtClipboardMimeData = new QMimeData;
 
@@ -870,11 +824,9 @@ QtEngine::writeClipboard(
 	uintptr_t format,
 	const void* data,
 	size_t size
-	)
-{
+) {
 	size_t count = m_clipboardFormatNameTable.getCount();
-	if (format >= count)
-	{
+	if (format >= count) {
 		err::setError(err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
@@ -889,8 +841,7 @@ QtEngine::writeClipboard(
 }
 
 bool
-QtEngine::commitClipboard()
-{
+QtEngine::commitClipboard() {
 	if (!m_qtClipboardMimeData)
 		return false;
 
@@ -906,16 +857,14 @@ QtEngine::commitClipboard()
 // widget
 
 bool
-QtEngine::isWidgetFocused(WidgetDriver* widgetDriver)
-{
+QtEngine::isWidgetFocused(WidgetDriver* widgetDriver) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	return qtWidget->viewport()->hasFocus();
 }
 
 bool
-QtEngine::setWidgetFocus(WidgetDriver* widgetDriver)
-{
+QtEngine::setWidgetFocus(WidgetDriver* widgetDriver) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	qtWidget->viewport()->setFocus();
@@ -929,8 +878,7 @@ QtEngine::redrawWidget(
 	int top,
 	int right,
 	int bottom
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -949,8 +897,7 @@ QtEngine::redrawWidgetImmediate(
 	int top,
 	int right,
 	int bottom
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -967,8 +914,7 @@ QtEngine::scrollWidget(
 	WidgetDriver* widgetDriver,
 	int dx,
 	int dy
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -985,8 +931,7 @@ QtEngine::scrollWidgetRect(
 	int bottom,
 	int dx,
 	int dy
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -998,8 +943,7 @@ bool
 QtEngine::setWidgetCursor(
 	WidgetDriver* widgetDriver,
 	Cursor* cursor
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -1011,8 +955,7 @@ QtEngine::setWidgetCursor(
 }
 
 bool
-QtEngine::setMouseCapture(WidgetDriver* widgetDriver)
-{
+QtEngine::setMouseCapture(WidgetDriver* widgetDriver) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	qtWidget->viewport()->grabMouse();
@@ -1020,8 +963,7 @@ QtEngine::setMouseCapture(WidgetDriver* widgetDriver)
 }
 
 bool
-QtEngine::releaseMouse(WidgetDriver* widgetDriver)
-{
+QtEngine::releaseMouse(WidgetDriver* widgetDriver) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	qtWidget->viewport()->releaseMouse();
@@ -1032,8 +974,7 @@ bool
 QtEngine::updateWidgetScrollBar(
 	WidgetDriver* widgetDriver,
 	Orientation orientation
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -1059,8 +1000,7 @@ QtEngine::sendWidgetNotification(
 	WidgetDriver* widgetDriver,
 	uint_t code,
 	const void* params
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	qtWidget->emitNotificationSignal(code, params);
@@ -1071,8 +1011,7 @@ QtEngine::postWidgetThreadMsg(
 	WidgetDriver* widgetDriver,
 	uint_t code,
 	const rc::Ptr<void>& params
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	qtWidget->postThreadMsg(code, params);
@@ -1080,8 +1019,7 @@ QtEngine::postWidgetThreadMsg(
 }
 
 bool
-QtEngine::startWidgetAnimation(WidgetDriver* widgetDriver)
-{
+QtEngine::startWidgetAnimation(WidgetDriver* widgetDriver) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	qtWidget->m_animationTimer.start(10, qtWidget);
@@ -1089,8 +1027,7 @@ QtEngine::startWidgetAnimation(WidgetDriver* widgetDriver)
 }
 
 void
-QtEngine::stopWidgetAnimation(WidgetDriver* widgetDriver)
-{
+QtEngine::stopWidgetAnimation(WidgetDriver* widgetDriver) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 	qtWidget->m_animationTimer.stop();
@@ -1100,8 +1037,7 @@ bool
 QtEngine::scheduleToolTipMsg(
 	WidgetDriver* widgetDriver,
 	uint_t timeout
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -1113,15 +1049,14 @@ QtEngine::scheduleToolTipMsg(
 		SIGNAL(timeout()),
 		qtWidget,
 		SLOT(toolTipTimerSlot())
-		);
+	);
 
 	m_toolTipTimer.start(timeout ? timeout : Def_ToolTipTimeout);
 	return true;
 }
 
 bool
-QtEngine::cancelToolTipMsg(WidgetDriver* widgetDriver)
-{
+QtEngine::cancelToolTipMsg(WidgetDriver* widgetDriver) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -1142,8 +1077,7 @@ QtEngine::showToolTip(
 	int x,
 	int y,
 	const sl::StringRef& toolTip
-	)
-{
+) {
 	ASSERT(widgetDriver->getEngine() == this);
 	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
 
@@ -1154,15 +1088,13 @@ QtEngine::showToolTip(
 }
 
 bool
-QtEngine::hideToolTip(WidgetDriver* widgetDriver)
-{
+QtEngine::hideToolTip(WidgetDriver* widgetDriver) {
 	QToolTip::hideText();
 	return true;
 }
 
 void
-QtEngine::processUiEvents(uint32_t timeLimit)
-{
+QtEngine::processUiEvents(uint32_t timeLimit) {
 	timeLimit != -1 ?
 		qApp->processEvents(QEventLoop::AllEvents, timeLimit) :
 		qApp->processEvents(QEventLoop::AllEvents);

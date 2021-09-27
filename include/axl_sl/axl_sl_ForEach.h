@@ -23,14 +23,13 @@ namespace sl {
 template <
 	typename T,
 	typename Action
-	>
+>
 void
 loopArray(
 	T* p,
 	size_t count,
 	Action action
-	)
-{
+) {
 	T* end = p + count;
 
 	for (; p < end; p++)
@@ -40,13 +39,12 @@ loopArray(
 template <
 	typename Iterator,
 	typename Action
-	>
+>
 void
 loopIterator(
 	Iterator it,
 	Action action
-	)
-{
+) {
 	for (; it; it++)
 		action(*it);
 }
@@ -57,22 +55,20 @@ template <
 	typename T,
 	typename Filter,
 	typename Action
-	>
+>
 size_t
 filteredLoopArray(
 	T* p,
 	size_t count,
 	Filter filter,
 	Action action
-	)
-{
+) {
 	T* end = p + count;
 
 	size_t filterPassCount = 0;
 
 	for (; p < end; p++)
-		if (filter(*p))
-		{
+		if (filter(*p)) {
 			action(*p);
 			filterPassCount++;
 		}
@@ -84,19 +80,17 @@ template <
 	typename Iterator,
 	typename Filter,
 	typename Action
-	>
+>
 size_t
 filteredLoopIterator(
 	Iterator it,
 	Filter filter,
 	Action action
-	)
-{
+) {
 	size_t filterPassCount = 0;
 
 	for (; it; it++)
-		if (filter(*it))
-		{
+		if (filter(*it)) {
 			action(*it);
 			filterPassCount++;
 		}

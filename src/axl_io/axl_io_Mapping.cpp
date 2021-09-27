@@ -23,8 +23,7 @@ Mapping::open(
 	uint64_t offset,
 	size_t size,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	if (size == -1)
@@ -45,8 +44,7 @@ Mapping::open(
 		return NULL;
 
 	p = m_view.view(m_mapping, access, viewBegin, (size_t)(viewEnd - viewBegin));
-	if (!p)
-	{
+	if (!p) {
 		m_mapping.close();
 		return NULL;
 	}
@@ -68,8 +66,7 @@ Mapping::open(
 	const sl::StringRef& name,
 	size_t size,
 	uint_t flags
-	)
-{
+) {
 	ASSERT(size != -1);
 
 	close();
@@ -90,8 +87,7 @@ Mapping::open(
 		return NULL;
 
 	p = m_view.view(m_mapping, access, 0, size);
-	if (!p)
-	{
+	if (!p) {
 		m_mapping.close();
 		return NULL;
 	}
@@ -106,11 +102,9 @@ Mapping::open(
 	if (!result)
 		return NULL;
 
-	if (!(flags & FileFlag_OpenExisting) && m_sharedMemory.getSize() < size)
-	{
+	if (!(flags & FileFlag_OpenExisting) && m_sharedMemory.getSize() < size) {
 		result = m_sharedMemory.setSize(size);
-		if (!result)
-		{
+		if (!result) {
 			if (!(flags & FileFlag_OpenExisting))
 				psx::SharedMemory::unlink(name);
 
@@ -119,8 +113,7 @@ Mapping::open(
 	}
 
 	p = m_mapping.map(NULL, size, protection, MAP_SHARED, m_sharedMemory, 0);
-	if (!p)
-	{
+	if (!p) {
 		if (!(flags & FileFlag_OpenExisting))
 			psx::SharedMemory::unlink(name);
 
@@ -138,8 +131,7 @@ Mapping::open(
 }
 
 void
-Mapping::close()
-{
+Mapping::close() {
 #if (_AXL_OS_WIN)
 	m_mapping.close();
 	m_view.close();
@@ -147,8 +139,7 @@ Mapping::close()
 	m_sharedMemory.close();
 	m_mapping.close();
 
-	if (!m_sharedMemoryName.isEmpty())
-	{
+	if (!m_sharedMemoryName.isEmpty()) {
 		psx::SharedMemory::unlink(m_sharedMemoryName);
 		m_sharedMemoryName.clear();
 	}

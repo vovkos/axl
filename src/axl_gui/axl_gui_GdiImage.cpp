@@ -20,8 +20,7 @@ namespace gui {
 
 //..............................................................................
 
-GdiImage::GdiImage()
-{
+GdiImage::GdiImage() {
 	m_engine = GdiEngine::getSingleton();
 }
 
@@ -32,8 +31,7 @@ GdiImage::getData(
 	int top,
 	int right,
 	int bottom
-	)
-{
+) {
 	bool_t result;
 
 	int width = right - left;
@@ -49,8 +47,7 @@ GdiImage::getData(
 
 	ScreenDc screenDc;
 
-	if (width == m_size.m_width)
-	{
+	if (width == m_size.m_width) {
 		result = ::GetDIBits(screenDc, m_h, top, height, data, &bitmapInfo, DIB_RGB_COLORS);
 		return err::complete(result);
 	}

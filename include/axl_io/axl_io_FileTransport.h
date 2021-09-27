@@ -21,22 +21,19 @@ namespace io {
 
 //..............................................................................
 
-class FileTransport: public Transport
-{
+class FileTransport: public Transport {
 protected:
 	File* m_transmitFile;
 	File* m_receiveFile;
 
 public:
-	FileTransport()
-	{
+	FileTransport() {
 		m_transmitFile = NULL;
 		m_receiveFile = NULL;
 	}
 
 	void
-	attach(File* file)
-	{
+	attach(File* file) {
 		m_transmitFile = file;
 		m_receiveFile = file;
 	}
@@ -45,15 +42,13 @@ public:
 	attach(
 		File* transmitFile,
 		File* receiveFile
-		)
-	{
+	) {
 		m_transmitFile = transmitFile;
 		m_receiveFile = receiveFile;
 	}
 
 	void
-	detach()
-	{
+	detach() {
 		m_transmitFile = NULL;
 		m_receiveFile = NULL;
 	}
@@ -63,8 +58,7 @@ public:
 	transmit(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		ASSERT(m_transmitFile);
 		return m_transmitFile->write(p, size);
 	}
@@ -74,8 +68,7 @@ public:
 	receive(
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		ASSERT(m_receiveFile);
 		return m_receiveFile->read(p, size);
 	}

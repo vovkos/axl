@@ -20,8 +20,7 @@ namespace lex {
 
 //..............................................................................
 
-class Ragel
-{
+class Ragel {
 protected:
 	sl::Array<int> m_stack; // stack of states
 	char* m_begin;
@@ -39,8 +38,7 @@ protected:
 	int top;
 
 public:
-	Ragel()
-	{
+	Ragel() {
 		clear();
 	}
 
@@ -48,7 +46,7 @@ public:
 	setSource(
 		const sl::StringRef& source,
 		bool isBomNeeded = false
-		);
+	);
 
 protected:
 	int*
@@ -58,8 +56,7 @@ protected:
 	postPop();
 
 	void
-	stop()
-	{
+	stop() {
 		pe = p + 1;
 	}
 

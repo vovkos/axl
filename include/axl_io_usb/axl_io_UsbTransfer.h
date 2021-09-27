@@ -25,20 +25,17 @@ getUsbTransferStatusString(libusb_transfer_status status);
 
 //..............................................................................
 
-class FreeUsbTransfer
-{
+class FreeUsbTransfer {
 public:
 	void
-	operator () (libusb_transfer* h)
-	{
+	operator () (libusb_transfer* h) {
 		libusb_free_transfer(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbTransfer: public sl::Handle<libusb_transfer*, FreeUsbTransfer>
-{
+class UsbTransfer: public sl::Handle<libusb_transfer*, FreeUsbTransfer> {
 public:
 	bool
 	create(size_t isochronousPacketCount = 0);
@@ -58,8 +55,7 @@ public:
 		uint_t value,
 		uint_t index,
 		size_t size
-		)
-	{
+	) {
 		libusb_fill_control_setup((uchar_t*)setup, requestType, requestCode, value, index, size);
 	}
 
@@ -70,8 +66,7 @@ public:
 		libusb_transfer_cb_fn callback,
 		void* context,
 		uint_t timeout = -1
-		)
-	{
+	) {
 		ASSERT(m_h);
 
 		libusb_fill_control_transfer(
@@ -81,7 +76,7 @@ public:
 			callback,
 			context,
 			timeout != -1 ? timeout : 0
-			);
+		);
 	}
 
 	void
@@ -93,8 +88,7 @@ public:
 		libusb_transfer_cb_fn callback,
 		void* context,
 		uint_t timeout = -1
-		)
-	{
+	) {
 		ASSERT(m_h);
 
 		libusb_fill_bulk_transfer(
@@ -106,7 +100,7 @@ public:
 			callback,
 			context,
 			timeout != -1 ? timeout : 0
-			);
+		);
 	}
 
 	void
@@ -118,8 +112,7 @@ public:
 		libusb_transfer_cb_fn callback,
 		void* context,
 		uint_t timeout = -1
-		)
-	{
+	) {
 		ASSERT(m_h);
 
 		libusb_fill_interrupt_transfer(
@@ -131,7 +124,7 @@ public:
 			callback,
 			context,
 			timeout != -1 ? timeout : 0
-			);
+		);
 	}
 };
 

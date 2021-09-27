@@ -17,8 +17,7 @@ namespace sl {
 
 //..............................................................................
 
-BmhFind::BmhFind()
-{
+BmhFind::BmhFind() {
 	m_patternSize = 0;
 	m_incFindOffset = 0;
 	m_incFindTailSize = 0; // IncrementalFind temporary storage size -- always < m_PatternSize
@@ -26,8 +25,7 @@ BmhFind::BmhFind()
 }
 
 void
-BmhFind::clear()
-{
+BmhFind::clear() {
 	m_patternSize = 0;
 	m_incFindOffset = 0;
 	m_incFindTailSize = 0;
@@ -39,8 +37,7 @@ BmhFind::setPattern(
 	const void* p,
 	size_t size,
 	bool doMatchCase
-	)
-{
+) {
 	size_t newBufferSize = size * 2;
 
 	newBufferSize += 128 - newBufferSize % 128; // 128-byte granularity
@@ -67,8 +64,7 @@ size_t
 BmhFind::find(
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	uchar_t* p;
 	uchar_t* end;
 	size_t m;
@@ -80,8 +76,7 @@ BmhFind::find(
 	end = p + size - m_patternSize;
 	m = m_patternSize - 1;
 
-	do
-	{
+	do {
 		uchar_t y = p[m];
 
 		if (cmpPattern(p) == -1)
@@ -97,8 +92,7 @@ size_t
 BmhFind::reverseFind(
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	uchar_t* p;
 
 	if (!m_patternSize || size < m_patternSize)
@@ -106,8 +100,7 @@ BmhFind::reverseFind(
 
 	p = (uchar_t*)_p + size - m_patternSize;
 
-	do
-	{
+	do {
 		uchar_t y = *p;
 
 		if (reverseCmpPattern(p) == -1)
@@ -123,8 +116,7 @@ size_t
 BmhFind::incrementalFind(
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	uchar_t* p = (uchar_t*)_p;
 	size_t testSize = size + m_incFindTailSize;
 
@@ -135,8 +127,7 @@ BmhFind::incrementalFind(
 	if (!m_patternSize)
 		return -1;
 
-	if (testSize < m_patternSize)
-	{
+	if (testSize < m_patternSize) {
 		// incapsulate tail until BM/BMH is possible
 
 		memcpy(m_buffer + m_patternSize + m_incFindTailSize, _p, size);
@@ -148,12 +139,10 @@ BmhFind::incrementalFind(
 	iEnd = testSize - m_patternSize;
 	n = m_patternSize - m_incFindTailSize - 1;
 
-	do
-	{
+	do {
 		uchar_t y = p[n + i];
 
-		if (incrementalCmpPattern(p, i) == -1)
-		{
+		if (incrementalCmpPattern(p, i) == -1) {
 			size_t result = m_incFindOffset + i;
 			m_incFindOffset = 0;
 			m_incFindTailSize = 0;
@@ -177,8 +166,7 @@ size_t
 BmhFind::reverseIncrementalFind(
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	uchar_t* p = (uchar_t*)_p;
 	size_t testSize = size + m_incFindTailSize;
 
@@ -187,8 +175,7 @@ BmhFind::reverseIncrementalFind(
 	if (!m_patternSize)
 		return -1;
 
-	if (testSize < m_patternSize)
-	{
+	if (testSize < m_patternSize) {
 		// incapsulate tail until BM/BMH is possible
 
 		memcpy(m_buffer + 2 * m_patternSize - m_incFindTailSize - size, _p, size);
@@ -199,20 +186,17 @@ BmhFind::reverseIncrementalFind(
 
 	i = testSize - m_patternSize;
 
-	for (;;)
-	{
+	for (;;) {
 		uchar_t y = p[i];
 
-		if (reverseIncrementalCmpPattern(p, size, i) == -1)
-		{
+		if (reverseIncrementalCmpPattern(p, size, i) == -1) {
 			size_t result = m_incFindOffset + size - i;
 			m_incFindOffset = 0;
 			m_incFindTailSize = 0;
 			return result;
 		}
 
-		if (i >= m_prevBadCharTable[y])
-		{
+		if (i >= m_prevBadCharTable[y]) {
 			i -= m_prevBadCharTable[y];
 			continue;
 		}
@@ -231,36 +215,29 @@ BmhFind::reverseIncrementalFind(
 }
 
 void
-BmhFind::rebuildTables()
-{
+BmhFind::rebuildTables() {
 	size_t i;
 	size_t m = m_patternSize - 1;
 	uchar_t* p = m_buffer;
 
-	for (i = 0; i < 256; i++)
-	{
+	for (i = 0; i < 256; i++) {
 		m_nextBadCharTable[i] =
 		m_prevBadCharTable[i] = m_patternSize;
 	}
 
-	if (m_doMatchCase)
-	{
+	if (m_doMatchCase) {
 		for (i = 0; i < m; i++)
 			m_nextBadCharTable[p[i]] = m - i;
 
 		for (i = m; i > 0; i--)
 			m_prevBadCharTable[p[i]] = i;
-	}
-	else
-	{
-		for (i = 0; i < m; i++)
-		{
+	} else {
+		for (i = 0; i < m; i++) {
 			m_nextBadCharTable[tolower(p[i])] =
 			m_nextBadCharTable[toupper(p[i])] = m - i;
 		}
 
-		for (i = m; i > 0; i--)
-		{
+		for (i = m; i > 0; i--) {
 			m_prevBadCharTable[tolower(p[i])] =
 			m_prevBadCharTable[toupper(p[i])] = i;
 		}
@@ -272,19 +249,15 @@ BmhFind::rebuildTables()
 // the following 4 helpers return offset of a mismatch or -1 if argument matches the pattern
 
 size_t
-BmhFind::cmpPattern(uchar_t* _p)
-{
+BmhFind::cmpPattern(uchar_t* _p) {
 	uchar_t* p1 = m_buffer + m_patternSize - 1;
 	uchar_t* p2 = _p + m_patternSize - 1;
 
-	if (m_doMatchCase)
-	{
+	if (m_doMatchCase) {
 		for (; p1 >= m_buffer; p1--, p2--)
 			if (*p1 != *p2)
 				return p1 - m_buffer;
-	}
-	else
-	{
+	} else {
 		for (; p1 >= m_buffer; p1--, p2--)
 			if (toupper(*p1) != toupper(*p2))
 				return p1 - m_buffer;
@@ -294,20 +267,16 @@ BmhFind::cmpPattern(uchar_t* _p)
 }
 
 size_t
-BmhFind::reverseCmpPattern(uchar_t* _p)
-{
+BmhFind::reverseCmpPattern(uchar_t* _p) {
 	uchar_t* p1 = m_buffer;
 	uchar_t* p2 = _p;
 	uchar_t* end = p1 + m_patternSize;
 
-	if (m_doMatchCase)
-	{
+	if (m_doMatchCase) {
 		for (; p1 < end; p1++, p2++)
 			if (*p1 != *p2)
 				return p1 - m_buffer;
-	}
-	else
-	{
+	} else {
 		for (; p1 < end; p1++, p2++)
 			if (toupper(*p1) != toupper(*p2))
 				return p1 - m_buffer;
@@ -320,8 +289,7 @@ size_t
 BmhFind::incrementalCmpPattern(
 	uchar_t* _p,
 	size_t i
-	)
-{
+) {
 	uchar_t* p1;
 	uchar_t* p2;
 
@@ -331,8 +299,7 @@ BmhFind::incrementalCmpPattern(
 	p1 = m_buffer + m_patternSize - 1;
 	p2 = _p + i + m_patternSize - m_incFindTailSize - 1;
 
-	if (m_doMatchCase)
-	{
+	if (m_doMatchCase) {
 		for (; p2 >= _p; p1--, p2--)
 			if (*p1 != *p2)
 				return p1 - m_buffer;
@@ -342,9 +309,7 @@ BmhFind::incrementalCmpPattern(
 		for (; p1 >= m_buffer; p1--, p2--)
 			if (*p1 != *p2)
 				return p1 - m_buffer;
-	}
-	else
-	{
+	} else {
 		for (; p2 >= _p; p1--, p2--)
 			if (toupper(*p1) != toupper(*p2))
 				return p1 - m_buffer;
@@ -364,8 +329,7 @@ BmhFind::reverseIncrementalCmpPattern(
 	uchar_t* _p,
 	size_t size,
 	size_t i
-	)
-{
+) {
 	uchar_t* p1;
 	uchar_t* end1;
 
@@ -381,8 +345,7 @@ BmhFind::reverseIncrementalCmpPattern(
 	p2 = _p + i;
 	end2 = _p + size;
 
-	if (m_doMatchCase)
-	{
+	if (m_doMatchCase) {
 		for (; p2 < end2; p1++, p2++)
 			if (*p1 != *p2)
 				return p1 - m_buffer;
@@ -392,9 +355,7 @@ BmhFind::reverseIncrementalCmpPattern(
 		for (; p1 < end1; p1++, p2++)
 			if (*p1 != *p2)
 				return p1 - m_buffer;
-	}
-	else
-	{
+	} else {
 		for (; p2 < end2; p1++, p2++)
 			if (toupper(*p1) != toupper(*p2))
 				return p1 - m_buffer;
@@ -418,15 +379,13 @@ BmhFind::updateIncrementalTail(
 	uchar_t* p,
 	size_t size,
 	size_t tailSize
-	)
-{
+) {
 	size_t leftOver;
 
 	ASSERT(m_incFindTailSize + size >= m_patternSize);
 	ASSERT(tailSize < m_patternSize);
 
-	if (size >= tailSize)
-	{
+	if (size >= tailSize) {
 		// shortcut -- fill the tail all from the new data
 
 		memcpy(m_buffer + m_patternSize, p + size - tailSize, tailSize);
@@ -443,7 +402,7 @@ BmhFind::updateIncrementalTail(
 		m_buffer + m_patternSize,
 		m_buffer + m_patternSize + m_incFindTailSize - leftOver,
 		leftOver
-		);
+	);
 
 	// ... and new data too
 
@@ -451,7 +410,7 @@ BmhFind::updateIncrementalTail(
 		m_buffer + m_patternSize + leftOver,
 		p,
 		tailSize - leftOver
-		);
+	);
 
 	m_incFindTailSize = tailSize;
 }
@@ -461,15 +420,13 @@ BmhFind::updateReverseIncrementalTail(
 	uchar_t* p,
 	size_t size,
 	size_t tailSize
-	)
-{
+) {
 	size_t leftOver;
 
 	ASSERT(m_incFindTailSize + size >= m_patternSize);
 	ASSERT(tailSize < m_patternSize);
 
-	if (size >= tailSize)
-	{
+	if (size >= tailSize) {
 		// shortcut -- fill the tail all from the new data
 
 		memcpy(m_buffer + 2 * m_patternSize - tailSize, p, tailSize);
@@ -486,7 +443,7 @@ BmhFind::updateReverseIncrementalTail(
 		m_buffer + 2 * m_patternSize - leftOver,
 		m_buffer + 2 * m_patternSize - m_incFindTailSize,
 		leftOver
-		);
+	);
 
 	// ... and new data too
 
@@ -494,7 +451,7 @@ BmhFind::updateReverseIncrementalTail(
 		m_buffer + 2 * m_patternSize - tailSize,
 		p,
 		size
-		);
+	);
 
 	// tail is filled now
 

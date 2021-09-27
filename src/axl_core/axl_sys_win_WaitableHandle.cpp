@@ -20,10 +20,8 @@ namespace win {
 //..............................................................................
 
 WaitResult
-WaitableHandle::completeWait(dword_t result)
-{
-	switch (result)
-	{
+WaitableHandle::completeWait(dword_t result) {
+	switch (result) {
 	case WAIT_FAILED:
 		return err::failWithLastSystemError(WaitResult_Fail);
 
@@ -36,8 +34,7 @@ WaitableHandle::completeWait(dword_t result)
 	default:
 		if (result >= WAIT_OBJECT_0 &&
 			result <= WAIT_OBJECT_0 + MAXIMUM_WAIT_OBJECTS
-			)
-		{
+		) {
 			return (WaitResult)(WaitResult_Object0 + result - WAIT_OBJECT_0);
 		}
 

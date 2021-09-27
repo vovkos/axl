@@ -27,8 +27,7 @@ SerialSettings::setup(
 	uint_t readInterval,
 	bool dtr,
 	bool rts
-	)
-{
+) {
 	m_baudRate = baudRate;
 	m_dataBits = dataBits;
 	m_stopBits = stopBits;
@@ -42,8 +41,7 @@ SerialSettings::setup(
 #if (_AXL_OS_WIN)
 
 void
-SerialSettings::setDcb(const DCB* dcb)
-{
+SerialSettings::setDcb(const DCB* dcb) {
 	m_baudRate = dcb->BaudRate;
 	m_dataBits = dcb->ByteSize;
 	m_stopBits = (SerialStopBits)dcb->StopBits;
@@ -67,11 +65,9 @@ SerialSettings::setDcb(const DCB* dcb)
 #elif (_AXL_OS_POSIX)
 
 void
-SerialSettings::setAttr(const termios* attr)
-{
+SerialSettings::setAttr(const termios* attr) {
 	speed_t speed = cfgetispeed(attr);
-	switch (speed)
-	{
+	switch (speed) {
 	case B110:
 		m_baudRate = 110;
 		break;
@@ -122,8 +118,7 @@ SerialSettings::setAttr(const termios* attr)
 	}
 
 	uint_t byteSize = attr->c_cflag & CSIZE;
-	switch (byteSize)
-	{
+	switch (byteSize) {
 	case CS5:
 		m_dataBits = 5;
 		break;

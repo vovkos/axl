@@ -35,8 +35,7 @@ bool
 Bio::createSocket(
 	socket_t socket,
 	bool isAutoClose
-	)
-{
+) {
 	close();
 	m_h = BIO_new_socket((int)socket, isAutoClose);
 	return completeWithLastCryptoError(m_h != NULL);
@@ -46,8 +45,7 @@ bool
 Bio::createFp(
 	FILE* file,
 	bool isAutoClose
-	)
-{
+) {
 	close();
 	m_h = BIO_new_fp(file, isAutoClose);
 	return completeWithLastCryptoError(m_h != NULL);
@@ -57,8 +55,7 @@ bool
 Bio::createFd(
 	int fd,
 	bool isAutoClose
-	)
-{
+) {
 	close();
 	m_h = BIO_new_fd(fd, isAutoClose);
 	return completeWithLastCryptoError(m_h != NULL);
@@ -68,16 +65,14 @@ bool
 Bio::createMemBuf(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	close();
 	m_h = BIO_new_mem_buf((void*)p, size);
 	return completeWithLastCryptoError(m_h != NULL);
 }
 
 BUF_MEM*
-Bio::getBufMem()
-{
+Bio::getBufMem() {
 	BUF_MEM* mem = NULL;
 	BIO_get_mem_ptr(m_h, &mem);
 	return mem;

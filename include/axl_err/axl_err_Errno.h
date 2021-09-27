@@ -25,12 +25,11 @@ namespace err {
 AXL_SL_DEFINE_GUID(
 	g_errnoGuid,
 	0x25a6a7b5, 0xf662, 0x48ae, 0xbc, 0xb6, 0x9a, 0x5c, 0xb5, 0xce, 0x5b, 0xb9
-	);
+);
 
 //..............................................................................
 
-class ErrnoProvider: public ErrorProvider
-{
+class ErrnoProvider: public ErrorProvider {
 public:
 	static
 	sl::String
@@ -38,29 +37,23 @@ public:
 
 	virtual
 	sl::StringRef
-	getErrorDescription(const ErrorRef& error)
-	{
+	getErrorDescription(const ErrorRef& error) {
 		return getErrorDescription(error->m_code);
 	}
 };
 
 //..............................................................................
 
-class Errno: public Error
-{
+class Errno: public Error {
 public:
-	Errno()
-	{
-	}
+	Errno() {}
 
-	Errno(int code)
-	{
+	Errno(int code) {
 		create(code);
 	}
 
 	size_t
-	create(int code)
-	{
+	create(int code) {
 		return createSimpleError(g_errnoGuid, code);
 	}
 };
@@ -69,8 +62,7 @@ public:
 
 inline
 size_t
-setErrno(int code)
-{
+setErrno(int code) {
 	return setError(Errno(code));
 }
 

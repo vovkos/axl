@@ -19,8 +19,7 @@ namespace io {
 
 //..............................................................................
 
-class NetworkAdapterEnumerator
-{
+class NetworkAdapterEnumerator {
 public:
 	static
 	size_t
@@ -32,14 +31,13 @@ protected:
 	setupAdapter(
 		NetworkAdapterDesc* adapter,
 		IP_ADAPTER_ADDRESSES* srcAdapter
-		);
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapterList)
-{
+NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapterList) {
 	adapterList->clear();
 
 	ulong_t flags =
@@ -50,8 +48,7 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 	sl::Array<char> buffer;
 	ulong_t size = 15 * 1024; // Microsoft recommends starting with 15K
 
-	for (;;)
-	{
+	for (;;) {
 		bool result = buffer.setCount(size);
 		if (!result)
 			return -1;
@@ -60,16 +57,14 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 		if (error == ERROR_SUCCESS)
 			break;
 
-		if (error != ERROR_BUFFER_OVERFLOW)
-		{
+		if (error != ERROR_BUFFER_OVERFLOW) {
 			err::setError(error);
 			return -1;
 		}
 	}
 
 	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*)buffer.p();
-	for (; srcAdapter; srcAdapter = srcAdapter->Next)
-	{
+	for (; srcAdapter; srcAdapter = srcAdapter->Next) {
 		NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
 		setupAdapter(adapter, srcAdapter);
 		adapterList->insertTail(adapter);
@@ -82,10 +77,8 @@ void
 NetworkAdapterEnumerator::setupAdapter(
 	NetworkAdapterDesc* adapter,
 	IP_ADAPTER_ADDRESSES* srcAdapter
-	)
-{
-	switch (srcAdapter->IfType)
-	{
+) {
+	switch (srcAdapter->IfType) {
 	case IF_TYPE_SOFTWARE_LOOPBACK:
 		adapter->m_type = NetworkAdapterType_Loopback;
 		break;
@@ -140,8 +133,7 @@ NetworkAdapterEnumerator::setupAdapter(
 	memcpy(adapter->m_macAddress, srcAdapter->PhysicalAddress, 6);
 
 	IP_ADAPTER_UNICAST_ADDRESS* srcAddress = srcAdapter->FirstUnicastAddress;
-	for (; srcAddress; srcAddress = srcAddress->Next)
-	{
+	for (; srcAddress; srcAddress = srcAddress->Next) {
 		if (!srcAddress->Address.lpSockaddr || srcAddress->Address.iSockaddrLength > sizeof(io::SockAddr))
 			continue;
 
@@ -158,8 +150,7 @@ NetworkAdapterEnumerator::setupAdapter(
 //..............................................................................
 
 size_t
-createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList)
-{
+createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList) {
 	return NetworkAdapterEnumerator::createAdapterList(adapterList);
 }
 

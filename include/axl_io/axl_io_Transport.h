@@ -20,22 +20,21 @@ namespace io {
 
 //..............................................................................
 
-class Transport
-{
+class Transport {
 public:
 	virtual
 	size_t
 	transmit(
 		const void* p,
 		size_t size
-		) = 0;
+	) = 0;
 
 	virtual
 	size_t
 	receive(
 		void* p,
 		size_t size
-		) = 0;
+	) = 0;
 };
 
 //..............................................................................

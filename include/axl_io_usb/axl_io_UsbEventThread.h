@@ -22,11 +22,9 @@ namespace io {
 
 //..............................................................................
 
-class UsbEventThread: public sys::ThreadImpl<UsbEventThread>
-{
+class UsbEventThread: public sys::ThreadImpl<UsbEventThread> {
 public:
-	enum
-	{
+	enum {
 		TimerGranularity = 500,
 	};
 
@@ -35,14 +33,12 @@ protected:
 	volatile bool m_isTerminating;
 
 public:
-	UsbEventThread()
-	{
+	UsbEventThread() {
 		m_context = NULL;
 		m_isTerminating = false;
 	}
 
-	~UsbEventThread()
-	{
+	~UsbEventThread() {
 		stop();
 	}
 
@@ -50,8 +46,7 @@ public:
 	start(libusb_context* context = NULL);
 
 	void
-	stop()
-	{
+	stop() {
 		m_isTerminating = true;
 		waitAndClose();
 	}
@@ -64,8 +59,7 @@ public:
 
 inline
 UsbEventThread*
-getUsbDefaultContextEventThread()
-{
+getUsbDefaultContextEventThread() {
 	static int32_t flag = 0;
 	return sl::getSingleton<UsbEventThread> (&flag);
 }

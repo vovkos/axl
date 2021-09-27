@@ -18,8 +18,7 @@ namespace iok {
 //..............................................................................
 
 Object
-Iterator::next()
-{
+Iterator::next() {
 	io_object_t p = ::IOIteratorNext(m_p);
 
 	Object object;

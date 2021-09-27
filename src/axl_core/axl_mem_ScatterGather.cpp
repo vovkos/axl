@@ -21,8 +21,7 @@ size_t
 getScatterGatherSize(
 	const Block* blockArray,
 	size_t blockCount
-	)
-{
+) {
 	size_t size = 0;
 	const Block* block = blockArray;
 	const Block* end = blockArray + blockCount;
@@ -38,14 +37,12 @@ copyScatterGather(
 	void* buffer,
 	const Block* blockArray,
 	size_t blockCount
-	)
-{
+) {
 	char* p = (char*)buffer;
 	const Block* block = blockArray;
 	const Block* end = blockArray + blockCount;
 
-	for (; block < end; block++)
-	{
+	for (; block < end; block++) {
 		memcpy(p, block->m_p, block->m_size);
 		p += block->m_size;
 	}
@@ -59,16 +56,13 @@ safeCopyScatterGather(
 	size_t bufferSize,
 	const Block* blockArray,
 	size_t blockCount
-	)
-{
+) {
 	char* p = (char*)buffer;
 	const Block* block = blockArray;
 	const Block* blockEnd = blockArray + blockCount;
 
-	for (; block < blockEnd; block++)
-	{
-		if (block->m_size >= bufferSize)
-		{
+	for (; block < blockEnd; block++) {
+		if (block->m_size >= bufferSize) {
 			memcpy(p, block->m_p, bufferSize);
 			p += bufferSize;
 			break;

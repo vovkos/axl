@@ -20,29 +20,24 @@ namespace io {
 
 //..............................................................................
 
-class PcapFilter: public bpf_program
-{
+class PcapFilter: public bpf_program {
 public:
-	PcapFilter()
-	{
+	PcapFilter() {
 		init();
 	}
 
-	~PcapFilter()
-	{
+	~PcapFilter() {
 		free();
 	}
 
 	void
-	free()
-	{
+	free() {
 		::pcap_freecode(this);
 		init();
 	}
 
 	bool
-	isEmpty()
-	{
+	isEmpty() {
 		return bf_insns == NULL;
 	}
 
@@ -52,7 +47,7 @@ public:
 		const sl::StringRef& filter,
 		bool isOptimized = true,
 		uint32_t netMask = PCAP_NETMASK_UNKNOWN
-		);
+	);
 
 	bool
 	compile(
@@ -61,18 +56,17 @@ public:
 		const sl::StringRef& filter,
 		bool isOptimized = true,
 		uint32_t netMask = PCAP_NETMASK_UNKNOWN
-		);
+	);
 
 	bool
 	match(
 		const void* p,
 		size_t size
-		);
+	);
 
 protected:
 	void
-	init()
-	{
+	init() {
 		static bpf_program null = { 0 };
 		*(bpf_program*)this = null;
 	}

@@ -14,13 +14,11 @@ static size_t g_threadStateSlot = -1;
 
 class HookFinalizer:
 	public rc::RefCount,
-	public g::Finalizer
-{
+	public g::Finalizer {
 public:
 	virtual
 	void
-	finalize()
-	{
+	finalize() {
 		g_enableCount = INT_MIN / 2; // compensate for possible unbalanced enable calls
 	}
 };
@@ -28,63 +26,54 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-initializeHooks(int)
-{
+initializeHooks(int) {
 	g_threadDisableCountSlot = sys::createSimpleTlsSlot();
 	g_threadStateSlot = sys::getTlsMgr()->createSlot();
 	g::getModule()->addFinalizer(AXL_RC_NEW(HookFinalizer));
 }
 
 size_t
-getCurrentThreadDisableCount()
-{
+getCurrentThreadDisableCount() {
 	return sys::getSimpleTlsValue(g_threadDisableCountSlot);
 }
 
 bool
-areHooksEnabled()
-{
+areHooksEnabled() {
 	return
 		sys::atomicLoad(&g_enableCount) > 0 &&
 		getCurrentThreadDisableCount() == 0;
 }
 
 void
-enableHooks()
-{
+enableHooks() {
 	sl::callOnce(initializeHooks, 0);
 	sys::atomicInc(&g_enableCount);
 }
 
 void
-disableHooks()
-{
+disableHooks() {
 	sys::atomicDec(&g_enableCount);
 }
 
 inline
 void
-incrementCurrentThreadDisableCount(intptr_t delta)
-{
+incrementCurrentThreadDisableCount(intptr_t delta) {
 	size_t count = sys::getSimpleTlsValue(g_threadDisableCountSlot);
 	sys::setSimpleTlsValue(g_threadDisableCountSlot, count + delta);
 }
 
 void
-disableCurrentThreadHooks()
-{
+disableCurrentThreadHooks() {
 	incrementCurrentThreadDisableCount(1);
 }
 
 void
-enableCurrentThreadHooks()
-{
+enableCurrentThreadHooks() {
 	incrementCurrentThreadDisableCount(-1);
 }
 
 ThreadState*
-getCurrentThreadState(bool createIfNotExists)
-{
+getCurrentThreadState(bool createIfNotExists) {
 	ASSERT(getCurrentThreadDisableCount() && "thread hooks are not disabled (should be)");
 
 	sys::TlsMgr* tlsMgr = sys::getTlsMgr();
@@ -99,8 +88,7 @@ getCurrentThreadState(bool createIfNotExists)
 
 //..............................................................................
 
-ThreadState::~ThreadState()
-{
+ThreadState::~ThreadState() {
 	cleanup(sl::RbTreeIterator<size_t, Frame>());
 	sys::setSimpleTlsValue(g_threadDisableCountSlot, INT_MAX); // compensate for possibly unbalanced enable calls
 }
@@ -110,8 +98,7 @@ ThreadState::addFrame(
 	HookCommonContext* context,
 	size_t frameBase,
 	size_t originalRet
-	)
-{
+) {
 	sl::RbTreeIterator<size_t, Frame> it = m_frameMap.visit(frameBase);
 	if (it->m_value.m_ret.m_originalRet)
 		it->m_value.m_chainedRetStack.append(it->m_value.m_ret);
@@ -122,11 +109,9 @@ ThreadState::addFrame(
 }
 
 size_t
-ThreadState::removeFrame(size_t frameBase)
-{
+ThreadState::removeFrame(size_t frameBase) {
 	sl::RbTreeIterator<size_t, Frame> it = findFrame(frameBase);
-	if (!it)
-	{
+	if (!it) {
 		ASSERT(false && "protolesshooks: FATAL ERROR: return address not found");
 		return 0;
 	}
@@ -143,11 +128,9 @@ ThreadState::removeFrame(size_t frameBase)
 }
 
 size_t
-ThreadState::getOriginalRet(size_t frameBase)
-{
+ThreadState::getOriginalRet(size_t frameBase) {
 	sl::RbTreeIterator<size_t, Frame> it = findFrame(frameBase);
-	if (!it)
-	{
+	if (!it) {
 		ASSERT(false && "protolesshooks: FATAL ERROR: return address not found");
 		return 0;
 	}
@@ -157,20 +140,17 @@ ThreadState::getOriginalRet(size_t frameBase)
 
 inline
 void
-callHookLeaveFunc(HookCommonContext* context)
-{
+callHookLeaveFunc(HookCommonContext* context) {
 	if (context->m_leaveFunc)
 		context->m_leaveFunc(context->m_targetFunc, context->m_callbackParam, 0);
 }
 
 void
-ThreadState::cleanup(const sl::RbTreeIterator<size_t, Frame>& it)
-{
+ThreadState::cleanup(const sl::RbTreeIterator<size_t, Frame>& it) {
 	// we may end up with abandoned frames (e.g., due to SEH or longjmp-s)
 	// this loop cleans up all frames *above* `it` (or all if `it` is NULL)
 
-	while (m_frameMap.getHead() != it)
-	{
+	while (m_frameMap.getHead() != it) {
 		Frame* frame = &m_frameMap.getHead()->m_value;
 
 		size_t chainedRetCount = frame->m_chainedRetStack.getCount();

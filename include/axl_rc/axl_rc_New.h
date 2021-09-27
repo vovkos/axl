@@ -26,8 +26,7 @@ void*
 postAllocateRefCount(
 	void* p,
 	FreeFunc* freeFunc = &mem::StdAllocator::free
-	)
-{
+) {
 	if (!p)
 		return NULL;
 
@@ -38,8 +37,7 @@ postAllocateRefCount(
 
 template <typename T>
 T*
-primeAllocatedRefCount(T* p)
-{
+primeAllocatedRefCount(T* p) {
 	if (!p)
 		return NULL;
 
@@ -53,8 +51,7 @@ primeInPlaceRefCount(
 	T* p,
 	RefCount* parent,
 	uint_t flags
-	)
-{
+) {
 	ASSERT(p);
 	p->prime(parent, flags);
 	return p;

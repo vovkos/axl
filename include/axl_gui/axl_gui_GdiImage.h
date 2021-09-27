@@ -23,8 +23,7 @@ namespace gui {
 
 class GdiImage:
 	public Image,
-	public GdiObjectHandle<HBITMAP>
-{
+	public GdiObjectHandle<HBITMAP> {
 	friend class GdiEngine;
 
 protected:
@@ -41,7 +40,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		);
+	);
 };
 
 //..............................................................................

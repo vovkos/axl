@@ -25,8 +25,7 @@ namespace psx {
 
 #if (!_AXL_OS_DARWIN) // no unnamed semaphores on darwin
 
-class Sem
-{
+class Sem {
 protected:
 	sem_t m_sem;
 
@@ -34,46 +33,39 @@ public:
 	Sem(
 		bool isShared = false,
 		uint_t value = 0
-		)
-	{
+	) {
 		int result = sem_init(&m_sem, isShared, value);
 		ASSERT(result == 0);
 	}
 
-	~Sem()
-	{
+	~Sem() {
 		int result = ::sem_destroy(&m_sem);
 		ASSERT(result == 0);
 	}
 
-	operator sem_t* ()
-	{
+	operator sem_t* () {
 		return &m_sem;
 	}
 
 	bool
-	post()
-	{
+	post() {
 		int result = ::sem_post(&m_sem);
 		return err::complete(result == 0);
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		return post();
 	}
 
 	bool
-	tryWait()
-	{
+	tryWait() {
 		int result = ::sem_trywait(&m_sem);
 		return err::complete(result == 0);
 	}
 
 	bool
-	wait()
-	{
+	wait() {
 		int result = ::sem_wait(&m_sem);
 		return err::complete(result == 0);
 	}
@@ -82,8 +74,7 @@ public:
 	wait(uint_t timeout);
 
 	bool
-	getValue(int* value)
-	{
+	getValue(int* value) {
 		int result = ::sem_getvalue(&m_sem, value);
 		return err::complete(result == 0);
 	}
@@ -93,20 +84,17 @@ public:
 
 //..............................................................................
 
-class CloseNamedSem
-{
+class CloseNamedSem {
 public:
 	void
-	operator () (sem_t* h)
-	{
+	operator () (sem_t* h) {
 		::sem_close(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class NamedSem: public sl::Handle<sem_t*, CloseNamedSem>
-{
+class NamedSem: public sl::Handle<sem_t*, CloseNamedSem> {
 public:
 	bool
 	open(
@@ -114,39 +102,34 @@ public:
 		int flags = O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH,
 		uint_t value = 0
-		);
+	);
 
 	static
 	bool
-	unlink(const sl::StringRef& name)
-	{
+	unlink(const sl::StringRef& name) {
 		int result = ::sem_unlink(name.sz());
 		return err::complete(result == 0);
 	}
 
 	bool
-	post()
-	{
+	post() {
 		int result = ::sem_post(m_h);
 		return err::complete(result == 0);
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		return post();
 	}
 
 	bool
-	tryWait()
-	{
+	tryWait() {
 		int result = ::sem_trywait(m_h);
 		return err::complete(result == 0);
 	}
 
 	bool
-	wait()
-	{
+	wait() {
 		int result = ::sem_wait(m_h);
 		return err::complete(result == 0);
 	}
@@ -156,8 +139,7 @@ public:
 	wait(uint_t timeout);
 
 	bool
-	getValue(int* value)
-	{
+	getValue(int* value) {
 		int result = ::sem_getvalue(m_h, value);
 		return err::complete(result == 0);
 	}

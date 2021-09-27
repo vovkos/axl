@@ -22,44 +22,38 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class StringDetailsBase
-{
+class StringDetailsBase {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class StringDetailsImpl
-{
+class StringDetailsImpl {
 public:
 	static
 	const T*
-	getEmptyString()
-	{
+	getEmptyString() {
 		static T emptyString[] = { 0 };
 		return emptyString;
 	}
 
 	static
 	const T*
-	getCrLf()
-	{
+	getCrLf() {
 		static T crLf[] = { '\r', '\n', 0 };
 		return crLf;
 	}
 
 	static
 	const T*
-	getWhitespace()
-	{
+	getWhitespace() {
 		static T whitespace[] = { ' ', '\t', '\r', '\n', 0 };
 		return whitespace;
 	}
 
 	static
 	size_t
-	calcLength(const T* p)
-	{
+	calcLength(const T* p) {
 		if (!p)
 			return 0;
 
@@ -75,8 +69,7 @@ public:
 	calcLength(
 		const T* p,
 		size_t maxLength
-		)
-	{
+	) {
 		if (!p)
 			return 0;
 
@@ -94,8 +87,7 @@ public:
 		const T* p1,
 		const T* p2,
 		size_t length
-		)
-	{
+	) {
 		const T* end = p1 + length;
 		for (; p1 < end; p1++, p2++)
 			if (*p1 < *p2)
@@ -112,8 +104,7 @@ public:
 		const T* p,
 		size_t length,
 		T c
-		)
-	{
+	) {
 		const T* p0 = p;
 		const T* end = p + length;
 		for (; p < end; p++)
@@ -130,8 +121,7 @@ public:
 		size_t length,
 		const T* subString,
 		size_t subStringLength
-		)
-	{
+	) {
 		const T* f = (const T*) memMem(p, length * sizeof(T), subString, subStringLength * sizeof(T));
 		return f ? f - p : -1;
 	}
@@ -143,15 +133,13 @@ public:
 		size_t length,
 		const T* charSet,
 		size_t charCount
-		)
-	{
+	) {
 		if (!charCount)
 			return -1;
 
 		const T* p0 = p;
 		const T* end = p + length;
-		for (; p < end; p++)
-		{
+		for (; p < end; p++) {
 			size_t f = find(charSet, charCount, *p);
 			if (f != -1)
 				return p - p0;
@@ -167,15 +155,13 @@ public:
 		size_t length,
 		const T* charSet,
 		size_t charCount
-		)
-	{
+	) {
 		if (!charCount)
 			return -1;
 
 		const T* p0 = p;
 		const T* end = p + length;
-		for (; p < end; p++)
-		{
+		for (; p < end; p++) {
 			size_t f = find(charSet, charCount, *p);
 			if (f == -1)
 				return p - p0;
@@ -190,8 +176,7 @@ public:
 		const T* p,
 		size_t length,
 		T c
-		)
-	{
+	) {
 		if (!length)
 			return -1;
 
@@ -210,8 +195,7 @@ public:
 		size_t length,
 		const T* subString,
 		size_t subStringLength
-		)
-	{
+	) {
 		const T* f = reverseMemMem(p, length * sizeof(T), subString, subStringLength * sizeof(T));
 		return f ? f - p : -1;
 	}
@@ -223,14 +207,12 @@ public:
 		size_t length,
 		const T* charSet,
 		size_t charCount
-		)
-	{
+	) {
 		if (!length || !charCount)
 			return -1;
 
 		const T* p0 = p;
-		for (p += length - 1; p >= p0; p--)
-		{
+		for (p += length - 1; p >= p0; p--) {
 			size_t f = find(charSet, charCount, *p);
 			if (f != -1)
 				return p - p0;
@@ -246,14 +228,12 @@ public:
 		size_t length,
 		const T* charSet,
 		size_t charCount
-		)
-	{
+	) {
 		if (!length || !charCount)
 			return -1;
 
 		const T* p0 = p;
-		for (p += length - 1; p >= p0; p--)
-		{
+		for (p += length - 1; p >= p0; p--) {
 			size_t f = find(charSet, charCount, *p);
 			if (f == -1)
 				return p - p0;
@@ -267,8 +247,7 @@ public:
 		T* p,
 		T c,
 		size_t count
-		)
-	{
+	) {
 		const T* end = p + count;
 		for (; p < end; p++)
 			*p = c;
@@ -280,8 +259,7 @@ public:
 		T* dst,
 		const T* src,
 		size_t length
-		)
-	{
+	) {
 		memcpy(dst, src, length * sizeof(T));
 	}
 
@@ -291,8 +269,7 @@ public:
 		T* dst,
 		const T* src,
 		size_t length
-		)
-	{
+	) {
 		memmove(dst, src, length * sizeof(T));
 	}
 };
@@ -300,8 +277,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class StringDetailsBase<utf8_t>: public StringDetailsImpl<utf8_t>
-{
+class StringDetailsBase<utf8_t>: public StringDetailsImpl<utf8_t> {
 public:
 	typedef utf8_t  C;
 	typedef utf16_t C2;
@@ -313,8 +289,7 @@ public:
 
 	static
 	size_t
-	calcLength(const C* p)
-	{
+	calcLength(const C* p) {
 		return p ? strlen(p) : 0;
 	}
 
@@ -323,22 +298,19 @@ public:
 	calcLength(
 		const C* p,
 		size_t maxLength
-		)
-	{
+	) {
 		return p ? strnlen(p, maxLength) : 0;
 	}
 
 	static
 	C
-	toLower(C c)
-	{
+	toLower(C c) {
 		return (C)tolower((uint8_t)c);
 	}
 
 	static
 	C
-	toUpper(C c)
-	{
+	toUpper(C c) {
 		return (C)toupper((uint8_t)c);
 	}
 
@@ -348,8 +320,7 @@ public:
 		const C* p1,
 		const C* p2,
 		size_t length
-		)
-	{
+	) {
 		return memcmp(p1, p2, length);
 	}
 
@@ -359,8 +330,7 @@ public:
 		const C* p,
 		size_t length,
 		C c
-		)
-	{
+	) {
 		const C* f = (const C*) memchr(p, c, length);
 		return f ? f - p : -1;
 	}
@@ -372,8 +342,7 @@ public:
 		size_t length,
 		const C* subString,
 		size_t subStringLength
-		)
-	{
+	) {
 		return StringDetailsImpl<utf8_t>::find(p, length, subString, subStringLength);
 	}
 
@@ -383,8 +352,7 @@ public:
 		C* p,
 		C c,
 		size_t count
-		)
-	{
+	) {
 		memset(p, c, count);
 	}
 
@@ -394,8 +362,7 @@ public:
 	calcFormatLength_va(
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		return _vscprintf(formatString, va);
 	}
 
@@ -406,8 +373,7 @@ public:
 		size_t bufferLength,
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		_vsnprintf(buffer, bufferLength, formatString, va);
 		if (bufferLength)
 			buffer[bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
@@ -418,8 +384,7 @@ public:
 	calcFormatLength_va(
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		return vsnprintf(NULL, 0, formatString, va);
 	}
 
@@ -430,8 +395,7 @@ public:
 		size_t bufferLength,
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		return vsnprintf(buffer, bufferLength, formatString, va);
 	}
 #endif
@@ -440,8 +404,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class StringDetailsBase<utf16_t>: public StringDetailsImpl<utf16_t>
-{
+class StringDetailsBase<utf16_t>: public StringDetailsImpl<utf16_t> {
 public:
 	typedef utf16_t C;
 	typedef utf8_t  C2;
@@ -453,15 +416,13 @@ public:
 
 	static
 	C
-	toLower(C c)
-	{
+	toLower(C c) {
 		return (C)towlower((uint16_t)c);
 	}
 
 	static
 	C
-	toUpper(C c)
-	{
+	toUpper(C c) {
 		return (C)towupper((uint16_t)c);
 	}
 
@@ -471,8 +432,7 @@ public:
 	calcFormatLength_va(
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		return _vscwprintf(formatString, va);
 	}
 
@@ -483,8 +443,7 @@ public:
 		size_t bufferLength,
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		_vsnwprintf(buffer, bufferLength, formatString, va);
 		if (bufferLength)
 			buffer[bufferLength - 1] = 0; // not really necessary, just to make it identical to C++11 vsnprintf
@@ -495,8 +454,7 @@ public:
 	calcFormatLength_va(
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		ASSERT(false);
 		return 0;
 	}
@@ -508,8 +466,7 @@ public:
 		size_t bufferLength,
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		ASSERT(false);
 	}
 #endif
@@ -518,8 +475,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class StringDetailsBase<utf32_t>: public StringDetailsImpl<utf32_t>
-{
+class StringDetailsBase<utf32_t>: public StringDetailsImpl<utf32_t> {
 public:
 	typedef utf32_t C;
 	typedef utf8_t  C2;
@@ -531,15 +487,13 @@ public:
 
 	static
 	C
-	toLower(C c)
-	{
+	toLower(C c) {
 		return (C)towlower((uint32_t)c);
 	}
 
 	static
 	C
-	toUpper(C c)
-	{
+	toUpper(C c) {
 		return (C)towupper((uint32_t)c);
 	}
 
@@ -550,8 +504,7 @@ public:
 	calcFormatLength_va(
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		ASSERT(false);
 		return 0;
 	}
@@ -563,8 +516,7 @@ public:
 		size_t bufferLength,
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		ASSERT(false);
 	}
 };

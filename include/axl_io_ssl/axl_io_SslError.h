@@ -23,8 +23,7 @@ namespace io {
 
 inline
 void
-registerSslErrorProvider()
-{
+registerSslErrorProvider() {
 	cry::registerCryptoErrorProviders();
 	::ERR_load_SSL_strings();
 }

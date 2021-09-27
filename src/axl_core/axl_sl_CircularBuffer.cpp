@@ -17,16 +17,14 @@ namespace sl {
 
 //..............................................................................
 
-CircularBuffer::CircularBuffer()
-{
+CircularBuffer::CircularBuffer() {
 	m_reader = NULL;
 	m_writer = NULL;
 	m_dataSize = 0;
 }
 
 bool
-CircularBuffer::isValid() const
-{
+CircularBuffer::isValid() const {
 	if (m_buffer.isEmpty()) // uninitialized
 		return
 			m_buffer == NULL &&
@@ -50,8 +48,7 @@ CircularBuffer::isValid() const
 }
 
 bool
-CircularBuffer::setBufferSize(size_t size)
-{
+CircularBuffer::setBufferSize(size_t size) {
 	ASSERT(size);
 
 	if (m_buffer.getCount() == size)
@@ -73,22 +70,20 @@ CircularBuffer::setBufferSize(size_t size)
 	ASSERT(
 		isValid() &&
 		(size >= dataSize && m_dataSize == dataSize || m_dataSize == size)
-		);
+	);
 
 	return true;
 }
 
 void
-CircularBuffer::clear()
-{
+CircularBuffer::clear() {
 	m_reader = m_buffer;
 	m_writer = m_buffer;
 	m_dataSize = 0;
 }
 
 size_t
-CircularBuffer::readAll(sl::Array<char>* buffer)
-{
+CircularBuffer::readAll(sl::Array<char>* buffer) {
 	bool result = buffer->setCount(m_dataSize);
 	if (!result)
 		return -1;
@@ -96,12 +91,9 @@ CircularBuffer::readAll(sl::Array<char>* buffer)
 	if (!m_dataSize)
 		return 0;
 
-	if (m_reader < m_writer)
-	{
+	if (m_reader < m_writer) {
 		memcpy(*buffer, m_reader, m_writer - m_reader);
-	}
-	else
-	{
+	} else {
 		size_t tailSize = m_buffer.getEnd() - m_reader;
 		ASSERT(tailSize);
 
@@ -123,35 +115,28 @@ size_t
 CircularBuffer::read(
 	void* p,
 	size_t size
-	)
-{
+) {
 	size_t copySize;
 
 	if (!m_dataSize)
 		return 0;
 
-	if (m_reader < m_writer)
-	{
+	if (m_reader < m_writer) {
 		copySize = m_writer - m_reader;
 		if (copySize > size)
 			copySize = size;
 
 		memcpy(p, m_reader, copySize);
 		m_reader += copySize;
-	}
-	else
-	{
+	} else {
 		size_t tailSize = m_buffer.getEnd() - m_reader;
 		ASSERT(tailSize);
 
-		if (tailSize >= size)
-		{
+		if (tailSize >= size) {
 			memcpy(p, m_reader, size);
 			m_reader += size;
 			copySize = size;
-		}
-		else
-		{
+		} else {
 			memcpy(p, m_reader, tailSize);
 			p = (char*)p + tailSize;
 			size -= tailSize;
@@ -170,8 +155,7 @@ CircularBuffer::read(
 		m_reader = m_buffer;
 
 	m_dataSize -= copySize;
-	if (!m_dataSize) // reset
-	{
+	if (!m_dataSize) { // reset
 		m_reader = m_buffer;
 		m_writer = m_buffer;
 	}
@@ -181,23 +165,18 @@ CircularBuffer::read(
 }
 
 size_t
-CircularBuffer::drop(size_t size)
-{
+CircularBuffer::drop(size_t size) {
 	if (size > m_dataSize)
 		size = m_dataSize;
 
 	m_dataSize -= size;
-	if (!m_dataSize) // reset
-	{
+	if (!m_dataSize) { // reset
 		m_reader = m_buffer;
 		m_writer = m_buffer;
-	}
-	else
-	{
+	} else {
 		m_reader += size;
 
-		if (m_reader >= m_buffer.getEnd())
-		{
+		if (m_reader >= m_buffer.getEnd()) {
 			m_reader = m_buffer + (m_reader - m_buffer.getEnd());
 			ASSERT(m_reader < m_writer);
 		}
@@ -211,35 +190,27 @@ size_t
 CircularBuffer::write(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	size_t copySize;
 
 	if (isFull())
 		return 0;
 
-	if (m_writer < m_reader)
-	{
+	if (m_writer < m_reader) {
 		copySize = m_reader - m_writer;
 		if (copySize > size)
 			copySize = size;
 
 		memcpy(m_writer, p, copySize);
 		m_writer += copySize;
-	}
-	else
-	{
+	} else {
 		size_t tailSize = m_buffer.getEnd() - m_writer;
-		if (tailSize >= size)
-		{
+		if (tailSize >= size) {
 			memcpy(m_writer, p, size);
 			m_writer += size;
 			copySize = size;
-		}
-		else
-		{
-			if (tailSize)
-			{
+		} else {
+			if (tailSize) {
 				memcpy(m_writer, p, tailSize);
 				p = (char*)p + tailSize;
 				size -= tailSize;

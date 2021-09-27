@@ -20,21 +20,18 @@ namespace gui {
 
 //..............................................................................
 
-struct TextAttrAnchor
-{
+struct TextAttrAnchor {
 	size_t m_offset;
 	TextAttr m_attr;
 
-	TextAttrAnchor()
-	{
+	TextAttrAnchor() {
 		m_offset = 0;
 	}
 
 	TextAttrAnchor(
 		size_t offset,
 		const TextAttr& attr
-		)
-	{
+	) {
 		m_offset = offset;
 		m_attr = attr;
 	}
@@ -42,38 +39,32 @@ struct TextAttrAnchor
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class TextAttrAnchorArray
-{
+class TextAttrAnchorArray {
 protected:
 	sl::Array<TextAttrAnchor> m_array;
 
 public:
-	operator const TextAttrAnchor* () const
-	{
+	operator const TextAttrAnchor* () const {
 		return m_array;
 	}
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_array.isEmpty();
 	}
 
 	size_t
-	getCount() const
-	{
+	getCount() const {
 		return m_array.getCount();
 	}
 
 	const TextAttrAnchor*
-	cp() const
-	{
+	cp() const {
 		return m_array.cp();
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		m_array.clear();
 	}
 
@@ -84,14 +75,12 @@ public:
 	copy(
 		const TextAttrAnchor* attrAnchorArray,
 		size_t attrAnchorCount
-		)
-	{
+	) {
 		m_array.copy(attrAnchorArray, attrAnchorCount);
 	}
 
 	TextAttr
-	getAttr(size_t offset) const
-	{
+	getAttr(size_t offset) const {
 		size_t anchor = findAnchor(offset);
 		return anchor == -1 ? m_array[anchor].m_attr : TextAttr();
 	}
@@ -101,7 +90,7 @@ public:
 		size_t beginOffset,
 		size_t endOffset,
 		const TextAttr& attr
-		);
+	);
 
 #ifdef _AXL_DEBUG
 	void
@@ -122,7 +111,7 @@ protected:
 	normalize(
 		size_t start,
 		size_t end
-		);
+	);
 };
 
 //..............................................................................

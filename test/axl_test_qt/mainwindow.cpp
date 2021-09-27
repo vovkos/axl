@@ -19,13 +19,10 @@
 //..............................................................................
 
 MyWidget::MyWidget(QWidget* parent):
-	QWidget(parent)
-{
-}
+	QWidget(parent) {}
 
 void
-MyWidget::paintEvent(QPaintEvent* e)
-{
+MyWidget::paintEvent(QPaintEvent* e) {
 	char str[] = "abcdefghijklmnopqrstuvwxyz";
 
 	gui::HyperText hyperText;
@@ -36,8 +33,7 @@ MyWidget::paintEvent(QPaintEvent* e)
 
 	const gui::HyperlinkAnchor* anchor = hyperText.findHyperlinkByOffset(1);
 
-	for (size_t i = 0; i < text.getLength(); i++)
-	{
+	for (size_t i = 0; i < text.getLength(); i++) {
 		anchor = hyperText.findHyperlinkByOffset(i);
 		if (anchor)
 			printf("%d -- %s\n", i, anchor->m_hyperlink.sz());
@@ -60,41 +56,32 @@ MyWidget::paintEvent(QPaintEvent* e)
 
 //..............................................................................
 
-class SizeHintCombo: public QComboBox
-{
+class SizeHintCombo: public QComboBox {
 public:
 	SizeHintCombo(QWidget* parent):
-		QComboBox(parent)
-	{
-	}
+		QComboBox(parent) {}
 
-	void setSizeHint(const QSize& size)
-	{
+	void setSizeHint(const QSize& size) {
 		m_sizeHint = size;
 	}
 
-	void setSizeHint(int width, int height)
-	{
+	void setSizeHint(int width, int height) {
 		setSizeHint(QSize(width, height));
 	}
 
-	virtual QSize sizeHint() const
-	{
+	virtual QSize sizeHint() const {
 		return m_sizeHint.isValid() ? m_sizeHint : QComboBox::sizeHint();
 	}
 
-	void setMinimumSizeHint(const QSize& size)
-	{
+	void setMinimumSizeHint(const QSize& size) {
 		m_minimumSizeHint = size;
 	}
 
-	void setMinimumSizeHint(int width, int height)
-	{
+	void setMinimumSizeHint(int width, int height) {
 		setMinimumSizeHint(QSize(width, height));
 	}
 
-	virtual QSize minimumSizeHint() const
-	{
+	virtual QSize minimumSizeHint() const {
 		return m_minimumSizeHint.isValid() ? m_minimumSizeHint : QComboBox::minimumSizeHint();
 	}
 
@@ -107,13 +94,11 @@ int
 cloneStandardItemModel(
 	QStandardItemModel* dst,
 	const QStandardItemModel* src
-	)
-{
+) {
 	dst->clear();
 
 	int count = src->rowCount();
-	for (int i = 0 ; i < count; i++)
-	{
+	for (int i = 0 ; i < count; i++) {
 		QStandardItem* item = src->item(i);
 		dst->appendRow(item->clone());
 	}
@@ -121,28 +106,22 @@ cloneStandardItemModel(
 	return count;
 }
 
-class MyItemModel: public QStandardItemModel
-{
+class MyItemModel: public QStandardItemModel {
 public:
 	MyItemModel(QObject* parent = NULL):
-		QStandardItemModel(parent)
-	{
-	}
+		QStandardItemModel(parent) {}
 
 	MyItemModel(
 		const QStandardItemModel* model,
 		QObject* parent = NULL
-		):
-		QStandardItemModel(parent)
-	{
+	):
+		QStandardItemModel(parent) {
 		cloneStandardItemModel(this, model);
 	}
 
 protected:
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
-	{
-		if (role == Qt::DisplayRole)
-		{
+	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const {
+		if (role == Qt::DisplayRole) {
 			QVariant userData = QStandardItemModel::data(index, Qt::UserRole);
 			if (!userData.isNull())
 				return userData;
@@ -166,7 +145,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	f.setStyleHint(
 		QFont::Monospace,
 		(QFont::StyleStrategy)(QFont::NoFontMerging | QFont::ForceIntegerMetrics)
-		);
+	);
 
 	QWidget* client = new QWidget(this);
 	setCentralWidget(client);

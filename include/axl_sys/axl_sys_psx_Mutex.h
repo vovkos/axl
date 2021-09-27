@@ -21,38 +21,32 @@ namespace psx {
 
 //..............................................................................
 
-class MutexAttr
-{
+class MutexAttr {
 protected:
 	pthread_mutexattr_t m_attr;
 
 public:
-	MutexAttr()
-	{
+	MutexAttr() {
 		int result = ::pthread_mutexattr_init(&m_attr);
 		ASSERT(result == 0);
 	}
 
-	MutexAttr(int type)
-	{
+	MutexAttr(int type) {
 		int result = ::pthread_mutexattr_init(&m_attr);
 		ASSERT(result == 0);
 		setType(type);
 	}
 
-	~MutexAttr()
-	{
+	~MutexAttr() {
 		int result = ::pthread_mutexattr_destroy(&m_attr);
 		ASSERT(result == 0);
 	}
 
-	operator const pthread_mutexattr_t* () const
-	{
+	operator const pthread_mutexattr_t* () const {
 		return &m_attr;
 	}
 
-	operator pthread_mutexattr_t* ()
-	{
+	operator pthread_mutexattr_t* () {
 		return &m_attr;
 	}
 
@@ -73,33 +67,28 @@ public:
 
 //..............................................................................
 
-class Mutex
-{
+class Mutex {
 protected:
 	pthread_mutex_t m_mutex;
 
 public:
-	Mutex(const pthread_mutexattr_t* attr = NULL)
-	{
+	Mutex(const pthread_mutexattr_t* attr = NULL) {
 		int result = ::pthread_mutex_init(&m_mutex, attr);
 		ASSERT(result == 0);
 	}
 
-	Mutex(int type)
-	{
+	Mutex(int type) {
 		MutexAttr attr(type);
 		int result = ::pthread_mutex_init(&m_mutex, attr);
 		ASSERT(result == 0);
 	}
 
-	~Mutex()
-	{
+	~Mutex() {
 		int result = ::pthread_mutex_destroy(&m_mutex);
 		ASSERT(result == 0);
 	}
 
-	operator pthread_mutex_t* ()
-	{
+	operator pthread_mutex_t* () {
 		return &m_mutex;
 	}
 
@@ -107,8 +96,7 @@ public:
 	tryLock();
 
 	void
-	lock()
-	{
+	lock() {
 		int result = ::pthread_mutex_lock(&m_mutex);
 		ASSERT(result == 0);
 	}
@@ -119,8 +107,7 @@ public:
 #endif
 
 	void
-	unlock()
-	{
+	unlock() {
 		int result = ::pthread_mutex_unlock(&m_mutex);
 		ASSERT(result == 0);
 	}

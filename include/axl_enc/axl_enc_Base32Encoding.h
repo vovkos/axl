@@ -21,12 +21,10 @@ namespace enc {
 
 //..............................................................................
 
-class GetBase32Char
-{
+class GetBase32Char {
 public:
 	char
-	operator () (uchar_t x)
-	{
+	operator () (uchar_t x) {
 		static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 		return charTable[x & 0x1f];
 	}
@@ -34,16 +32,14 @@ public:
 
 //..............................................................................
 
-enum Base32EncodingFlag
-{
+enum Base32EncodingFlag {
 	Base32EncodingFlag_NoPadding  = 0x01,
 	Base32EncodingFlag_Multiline  = 0x02,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Base32Encoding
-{
+class Base32Encoding {
 public:
 	static
 	size_t
@@ -52,7 +48,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		);
+	);
 
 	static
 	sl::String
@@ -60,8 +56,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		sl::String string;
 		encode(&string, p, size, flags);
 		return string;
@@ -72,12 +67,11 @@ public:
 	decode(
 		sl::Array<char>* buffer,
 		const sl::StringRef& string
-		);
+	);
 
 	static
 	sl::Array<char>
-	decode(const sl::StringRef& string)
-	{
+	decode(const sl::StringRef& string) {
 		sl::Array<char> buffer;
 		decode(&buffer, string);
 		return buffer;

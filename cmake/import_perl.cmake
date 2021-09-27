@@ -31,7 +31,7 @@ add_perl_step
 	_INPUT_FILE
 	_SCRIPT_FILE
 	# ...
-	)
+)
 
 	if(NOT PERL_FOUND)
 		message(FATAL_ERROR "Perl is required for add_perl_step() macro")
@@ -48,7 +48,7 @@ add_perl_step
 		MAIN_DEPENDENCY ${_INPUT_PATH}
 		COMMAND ${PERL_EXE} ${_SCRIPT_PATH} ${_SWITCH_LIST} ${_INPUT_PATH} > ${_OUTPUT_PATH}
 		DEPENDS ${_SCRIPT_PATH}
-		)
+	)
 endmacro()
 
 #...............................................................................

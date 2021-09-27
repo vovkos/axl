@@ -20,20 +20,17 @@ namespace io {
 
 //..............................................................................
 
-class ClosePcap
-{
+class ClosePcap {
 public:
 	void
-	operator () (pcap_t* h)
-	{
+	operator () (pcap_t* h) {
 		::pcap_close(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum PcapLoopResult
-{
+enum PcapLoopResult {
 	PcapLoopResult_Success = 0,
 	PcapLoopResult_Error   = -1,
 	PcapLoopResult_Break   = -2,
@@ -41,8 +38,7 @@ enum PcapLoopResult
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Pcap: public sl::Handle<pcap_t*, ClosePcap>
-{
+class Pcap: public sl::Handle<pcap_t*, ClosePcap> {
 public:
 	bool
 	openDevice(const sl::StringRef& device);
@@ -53,7 +49,7 @@ public:
 		size_t snapshotSize,
 		bool isPromiscious,
 		uint_t timeout
-		);
+	);
 
 	bool
 	openFile(const sl::StringRef& fileName);
@@ -62,21 +58,19 @@ public:
 	openDead(
 		int linkType,
 		size_t snapshotSize
-		);
+	);
 
 	bool
 	activate();
 
 	int
-	getLinkType()
-	{
+	getLinkType() {
 		ASSERT(m_h);
 		return ::pcap_datalink(m_h);
 	}
 
 	size_t
-	getSnapshotSize()
-	{
+	getSnapshotSize() {
 		ASSERT(m_h);
 		return ::pcap_snapshot(m_h);
 	}
@@ -94,15 +88,13 @@ public:
 	setTimeout(uint_t timeout);
 
 	sl::StringRef
-	getLastErrorDescription()
-	{
+	getLastErrorDescription() {
 		ASSERT(m_h);
 		return ::pcap_geterr(m_h);
 	}
 
 	size_t
-	setLastError()
-	{
+	setLastError() {
 		ASSERT(m_h);
 		return err::setError(getLastErrorDescription());
 	}
@@ -115,12 +107,11 @@ public:
 		const sl::StringRef& filter,
 		bool isOptimized = true,
 		uint32_t netMask = PCAP_NETMASK_UNKNOWN
-		);
+	);
 
 #if (_AXL_POSIX)
 	int
-	getSelectableFd()
-	{
+	getSelectableFd() {
 		ASSERT(m_h);
 		return ::pcap_get_selectable_fd(m_h);
 	}
@@ -133,8 +124,7 @@ public:
 	setBlockingMode(bool isBlocking);
 
 	void
-	breakLoop()
-	{
+	breakLoop() {
 		ASSERT(m_h);
 		::pcap_breakloop(m_h);
 	}
@@ -144,27 +134,27 @@ public:
 		size_t count,
 		::pcap_handler handler,
 		void* context
-		);
+	);
 
 	size_t
 	dispatch(
 		size_t count,
 		::pcap_handler handler,
 		void* context
-		);
+	);
 
 	size_t
 	read(
 		void* p,
 		size_t size,
 		uint64_t* timestamp = NULL
-		);
+	);
 
 	size_t
 	write(
 		const void* p,
 		size_t size
-		);
+	);
 
 protected:
 	bool

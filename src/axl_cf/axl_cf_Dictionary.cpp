@@ -18,8 +18,7 @@ namespace cf {
 //..............................................................................
 
 bool
-MutableDictionary::clone(CFDictionaryRef src)
-{
+MutableDictionary::clone(CFDictionaryRef src) {
 	CFMutableDictionaryRef newDictionary = ::CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, src);
 	if (!newDictionary)
 		return err::fail(err::SystemErrorCode_InsufficientResources);

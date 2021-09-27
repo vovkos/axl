@@ -13,7 +13,7 @@ axl_find_file(
 	_CONFIG_CMAKE
 	axl_config.cmake
 	${AXL_CMAKE_DIR}
-	)
+)
 
 if(_CONFIG_CMAKE)
 	include(${_CONFIG_CMAKE})

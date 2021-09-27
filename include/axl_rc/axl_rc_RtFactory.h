@@ -22,31 +22,26 @@ namespace rc {
 //..............................................................................
 
 template <typename Alloc = mem::StdAllocator>
-class RtFactory
-{
+class RtFactory {
 protected:
 	class Box:
 		public RefCount,
-		public obj::ITypeSimpleImplT<Box>
-	{
+		public obj::ITypeSimpleImplT<Box> {
 	protected:
 		obj::IType* m_type;
 
 	public:
-		Box()
-		{
+		Box() {
 			m_type = NULL;
 		}
 
-		~Box()
-		{
+		~Box() {
 			ASSERT(m_type);
 			m_type->destruct(this + 1);
 		}
 
 		void
-		setType(obj::IType* type)
-		{
+		setType(obj::IType* type) {
 			m_type = type;
 			m_guid = type->getGuid();
 		}
@@ -55,8 +50,7 @@ protected:
 
 		virtual
 		void*
-		getObject(obj::IType** type_o)
-		{
+		getObject(obj::IType** type_o) {
 			if (type_o)
 				*type_o = this;
 
@@ -67,8 +61,7 @@ protected:
 
 		virtual
 		size_t
-		getInterfaceOffset(const sl::Guid& guid)
-		{
+		getInterfaceOffset(const sl::Guid& guid) {
 			ASSERT(m_type);
 
 			if (guid == AXL_OBJ_GUIDOF(RefCount))
@@ -82,8 +75,7 @@ protected:
 public:
 	typedef Alloc Alloc;
 
-	class New
-	{
+	class New {
 	public:
 #ifdef _AXL_DEBUG
 		Ptr<void>
@@ -92,21 +84,17 @@ public:
 			const char* filePath,
 			int line,
 			size_t extra = 0
-			) const
-		{
+		) const {
 			size_t size = type->getSize() + extra;
 			size_t refCountOffset = type->getInterfaceOffset(AXL_OBJ_GUIDOF(RefCount));
 
-			if (refCountOffset != -1)
-			{
+			if (refCountOffset != -1) {
 				void* p = Alloc::alloc(size, type->getName(), filePath, line);
 				type->construct(p);
 				RefCount* refCount = (RefCount*)((uchar_t*)p + refCountOffset);
 				refCount->setFree(&Alloc::free);
 				return Ptr<void> (p, refCount);
-			}
-			else
-			{
+			} else {
 				Ptr<Box> box = mem::StdFactory<Box, Alloc>::operatorNew(filePath, line, size);
 				type->construct(box + 1);
 				box->setType(type);
@@ -119,21 +107,17 @@ public:
 		operator () (
 			obj::IType* type,
 			size_t extra = 0
-			) const
-		{
+		) const {
 			size_t size = type->getSize() + extra;
 			size_t refCountOffset = type->getInterfaceOffset(AXL_OBJ_GUIDOF(RefCount));
 
-			if (refCountOffset != -1)
-			{
+			if (refCountOffset != -1) {
 				void* p = Alloc::alloc(size);
 				type->construct(p);
 				RefCount* refCount = (RefCount*)((uchar_t*)p + refCountOffset);
 				refCount->setFree(&Alloc::free);
 				return Ptr<void> (p, refCount);
-			}
-			else
-			{
+			} else {
 				Ptr<Box> box = mem::StdFactory<Box, Alloc>::operatorNew(size);
 				box->setClass(type);
 				box->setFree(&Alloc::free);
@@ -153,8 +137,7 @@ public:
 		const char* filePath,
 		int line,
 		size_t extra = 0
-		)
-	{
+	) {
 		return New() (type, filePath, line, extra);
 	}
 #else
@@ -163,8 +146,7 @@ public:
 	operatorNew(
 		obj::IType* type,
 		size_t extra = 0
-		)
-	{
+	) {
 		return New() (type, extra);
 	}
 #endif

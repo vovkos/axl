@@ -20,10 +20,8 @@ namespace win {
 
 inline
 wchar_t*
-getSystemMessage(dword_t code)
-{
-	enum
-	{
+getSystemMessage(dword_t code) {
+	enum {
 		Flags =
 			FORMAT_MESSAGE_ALLOCATE_BUFFER |
 			FORMAT_MESSAGE_FROM_SYSTEM |
@@ -46,11 +44,9 @@ getSystemMessage(dword_t code)
 }
 
 sl::String
-WinErrorProvider::getErrorDescription(dword_t code)
-{
+WinErrorProvider::getErrorDescription(dword_t code) {
 	wchar_t* message = getSystemMessage(code);
-	if (!message) // try again with HRESULT_FROM_SETUPAPI
-	{
+	if (!message) { // try again with HRESULT_FROM_SETUPAPI
 		HRESULT hresult = HRESULT_FROM_SETUPAPI(code);
 		message = getSystemMessage(hresult);
 		if (!message)
@@ -66,8 +62,7 @@ WinErrorProvider::getErrorDescription(dword_t code)
 //..............................................................................
 
 size_t
-WinError::create(dword_t code)
-{
+WinError::create(dword_t code) {
 	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
 	if (!error)
 		return -1;

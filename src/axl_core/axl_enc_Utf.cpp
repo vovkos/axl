@@ -25,10 +25,8 @@ namespace enc {
 //..............................................................................
 
 const char*
-getUtfKindString(UtfKind utfKind)
-{
-	static const char* stringTable[] =
-	{
+getUtfKindString(UtfKind utfKind) {
+	static const char* stringTable[] = {
 		"UTF-8",                // UtfKind_Utf8 = 0,
 		"UTF-16",               // UtfKind_Utf16,
 		"UTF-16 (big-endian)",  // UtfKind_Utf16_be,
@@ -100,16 +98,14 @@ static const uint8_t flagsOffset[256]={
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 bool
-utfIsPrintable(utf32_t c)
-{
+utfIsPrintable(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)((CAT_MASK(props)&U_GC_C_MASK)==0);
 }
 
 bool
-utfIsPrintableNonMark(utf32_t c)
-{
+utfIsPrintableNonMark(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	/* comparing ==0 returns FALSE for the categories mentioned */
@@ -117,80 +113,70 @@ utfIsPrintableNonMark(utf32_t c)
 }
 
 bool
-utfIsSpace(utf32_t c)
-{
+utfIsSpace(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)((CAT_MASK(props)&U_GC_Z_MASK)!=0 || IS_THAT_CONTROL_SPACE(c));
 }
 
 bool
-utfIsPunctuation(utf32_t c)
-{
+utfIsPunctuation(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)((CAT_MASK(props)&U_GC_P_MASK)!=0);
 }
 
 bool
-utfIsLetter(utf32_t c)
-{
+utfIsLetter(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)((CAT_MASK(props)&U_GC_L_MASK)!=0);
 }
 
 bool
-utfIsDigit(utf32_t c)
-{
+utfIsDigit(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)(GET_CATEGORY(props)==U_DECIMAL_DIGIT_NUMBER);
 }
 
 bool
-utfIsNumber(utf32_t c)
-{
+utfIsNumber(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)((CAT_MASK(props)&U_GC_N_MASK)!=0);
 }
 
 bool
-utfIsLetterOrDigit(utf32_t c)
-{
+utfIsLetterOrDigit(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)((CAT_MASK(props)&(U_GC_L_MASK|U_GC_ND_MASK))!=0);
 }
 
 bool
-utfIsLetterOrNumber(utf32_t c)
-{
+utfIsLetterOrNumber(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)((CAT_MASK(props)&(U_GC_L_MASK|U_GC_N_MASK))!=0);
 }
 
 bool
-utfIsLowerCase(utf32_t c)
-{
+utfIsLowerCase(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)(GET_CATEGORY(props)==U_LOWERCASE_LETTER);
 }
 
 bool
-utfIsUpperCase(utf32_t c)
-{
+utfIsUpperCase(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)(GET_CATEGORY(props)==U_UPPERCASE_LETTER);
 }
 
 utf32_t
-utfToLowerCase(utf32_t c)
-{
+utfToLowerCase(utf32_t c) {
 	const UCaseProps *csp = GET_CASE_PROPS();
 	uint16_t props=UTRIE2_GET16(&csp->trie, c);
 	if(!PROPS_HAS_EXCEPTION(props)) {
@@ -208,8 +194,7 @@ utfToLowerCase(utf32_t c)
 }
 
 utf32_t
-utfToUpperCase(utf32_t c)
-{
+utfToUpperCase(utf32_t c) {
 	const UCaseProps *csp = GET_CASE_PROPS();
 	uint16_t props=UTRIE2_GET16(&csp->trie, c);
 	if(!PROPS_HAS_EXCEPTION(props)) {
@@ -227,8 +212,7 @@ utfToUpperCase(utf32_t c)
 }
 
 utf32_t
-utfToCaseFolded(utf32_t c)
-{
+utfToCaseFolded(utf32_t c) {
 	uint32_t options = U_FOLD_CASE_DEFAULT;
 
 	const UCaseProps *csp = GET_CASE_PROPS();

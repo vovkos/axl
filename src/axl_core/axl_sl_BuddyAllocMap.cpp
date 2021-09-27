@@ -23,16 +23,14 @@ void
 BuddyAllocMap::Level::format(
 	Page* page,
 	size_t count
-	)
-{
+) {
 	size_t i;
 
 	m_availablePageList.clear();
 	m_firstPage = page;
 
 	ASSERT(count);
-	for (i = 0; i < count; i++, page++)
-	{
+	for (i = 0; i < count; i++, page++) {
 		m_availablePageList.insertTail(page);
 		page->m_map = 0;
 	}
@@ -42,8 +40,7 @@ void
 BuddyAllocMap::Level::setPageMap(
 	Page* page,
 	size_t map
-	)
-{
+) {
 	if (map == -1 && page->m_map != -1)
 		m_availablePageList.remove(page);
 	else if (map != -1 && page->m_map == -1)
@@ -57,21 +54,17 @@ BuddyAllocMap::Level::setBit(
 	Page* page,
 	size_t bit,
 	bool value
-	)
-{
+) {
 	size_t mask;
 
 	page += bit / AXL_PTR_BITS;
 	bit &= AXL_PTR_BITS - 1;
 	mask = (size_t) 1 << bit;
 
-	if (value)
-	{
+	if (value) {
 		ASSERT((page->m_map & mask) == 0);
 		setPageMap(page, page->m_map | mask);
-	}
-	else
-	{
+	} else {
 		ASSERT((page->m_map & mask) == mask);
 		setPageMap(page, page->m_map & ~mask);
 	}
@@ -83,8 +76,7 @@ BuddyAllocMap::Level::setBitRange(
 	size_t from,
 	size_t to,
 	bool value
-	)
-{
+) {
 	size_t pageIdx = from / AXL_PTR_BITS;
 	size_t mask;
 
@@ -92,10 +84,8 @@ BuddyAllocMap::Level::setBitRange(
 	from -= pageIdx * AXL_PTR_BITS;
 	to -= pageIdx * AXL_PTR_BITS;
 
-	if (value)
-	{
-		if (to < AXL_PTR_BITS)
-		{
+	if (value) {
+		if (to < AXL_PTR_BITS) {
 			mask = getBitmask(from, to);
 			// ASSERT((pPage->m_Map & Mask) == 0);
 			setPageMap(page, page->m_map | mask);
@@ -109,25 +99,20 @@ BuddyAllocMap::Level::setBitRange(
 		to -= AXL_PTR_BITS;
 		page++;
 
-		while (to >= AXL_PTR_BITS)
-		{
+		while (to >= AXL_PTR_BITS) {
 			// ASSERT(pPage->m_Map == 0);
 			page->m_map = -1;
 			to -= AXL_PTR_BITS;
 			page++;
 		}
 
-		if (to)
-		{
+		if (to) {
 			mask = getLoBitmask(to);
 			// ASSERT((pPage->m_Map & Mask) == 0);
 			setPageMap(page, page->m_map | mask);
 		}
-	}
-	else
-	{
-		if (to < AXL_PTR_BITS)
-		{
+	} else {
+		if (to < AXL_PTR_BITS) {
 			mask = getBitmask(from, to);
 			// ASSERT((pPage->m_Map & Mask) == Mask);
 			setPageMap(page, page->m_map & ~mask);
@@ -141,16 +126,14 @@ BuddyAllocMap::Level::setBitRange(
 		to -= AXL_PTR_BITS;
 		page++;
 
-		while (to >= AXL_PTR_BITS)
-		{
+		while (to >= AXL_PTR_BITS) {
 			// ASSERT(pPage->m_Map == -1);
 			page->m_map = 0;
 			to -= AXL_PTR_BITS;
 			page++;
 		}
 
-		if (to)
-		{
+		if (to) {
 			mask = getLoBitmask(to);
 			// ASSERT((pPage->m_Map & Mask) == Mask);
 			setPageMap(page, page->m_map & ~mask);
@@ -160,8 +143,7 @@ BuddyAllocMap::Level::setBitRange(
 
 //..............................................................................
 
-BuddyAllocMap::BuddyAllocMap()
-{
+BuddyAllocMap::BuddyAllocMap() {
 	m_width = 0;
 	m_height = 0;
 	m_totalSize = 0;
@@ -174,8 +156,7 @@ bool
 BuddyAllocMap::create(
 	size_t width,
 	size_t height
-	)
-{
+) {
 	bool_t result;
 
 	size_t totalPageCount;
@@ -197,8 +178,7 @@ BuddyAllocMap::create(
 	totalPageCount = ((1 << height) - 1) * width;
 
 	result = m_pageArray.setCount(totalPageCount) && m_levelArray.setCount(height);
-	if (!result)
-	{
+	if (!result) {
 		close();
 		return false;
 	}
@@ -216,8 +196,7 @@ BuddyAllocMap::create(
 	m_freeSizeBottom = m_totalSize;
 	m_maxAllocSize = (size_t) 1 << (height - 1);
 
-	for (; level < end; level++)
-	{
+	for (; level < end; level++) {
 		level->format(page, pageCount);
 
 		page += pageCount;
@@ -228,8 +207,7 @@ BuddyAllocMap::create(
 }
 
 void
-BuddyAllocMap::close()
-{
+BuddyAllocMap::close() {
 	m_pageArray.clear();
 	m_levelArray.clear();
 
@@ -240,16 +218,14 @@ BuddyAllocMap::close()
 }
 
 void
-BuddyAllocMap::clear()
-{
+BuddyAllocMap::clear() {
 	Page* page = m_pageArray;
 	Level* level = m_levelArray;
 	Level* end = level + m_height;
 
 	size_t pageCount = m_width << (m_height - 1); // on the bottom level
 
-	for (; level < end; level++)
-	{
+	for (; level < end; level++) {
 		level->format(page, pageCount);
 
 		page += pageCount;
@@ -261,8 +237,7 @@ BuddyAllocMap::clear()
 }
 
 size_t
-BuddyAllocMap::allocate(size_t size)
-{
+BuddyAllocMap::allocate(size_t size) {
 	Level* level;
 	Page* page;
 
@@ -275,8 +250,7 @@ BuddyAllocMap::allocate(size_t size)
 
 	size_t levelIdx;
 
-	if (size > m_maxAllocSize)
-	{
+	if (size > m_maxAllocSize) {
 		err::setError(err::SystemErrorCode_InvalidParameter);
 		return -1;
 	}
@@ -290,8 +264,7 @@ BuddyAllocMap::allocate(size_t size)
 	level = m_levelArray + levelIdx;
 
 	page = level->getFirstAvailablePage();
-	if (!page)
-	{
+	if (!page) {
 		err::setError(err::SystemErrorCode_InsufficientResources);
 		return -1;
 	}
@@ -317,8 +290,7 @@ BuddyAllocMap::allocate(size_t size)
 
 	// below the allocation level we mark ranges of clusters
 
-	for (i = 0; i < levelIdx; i++)
-	{
+	for (i = 0; i < levelIdx; i++) {
 		size_t from = address / bitSize;
 		size_t to = addressEnd / bitSize;
 
@@ -337,8 +309,7 @@ BuddyAllocMap::allocate(size_t size)
 
 	// from the allocation level and above we only mark one cluster, also we can stop as soon as we find a marked cluster
 
-	for (; i < m_height; i++)
-	{
+	for (; i < m_height; i++) {
 		size_t bit = address / bitSize;
 
 		if (getBit(page, bit))
@@ -363,8 +334,7 @@ void
 BuddyAllocMap::mark(
 	size_t address,
 	size_t size
-	)
-{
+) {
 	Level* level = m_levelArray;
 	Page* page = m_pageArray;
 
@@ -382,8 +352,7 @@ BuddyAllocMap::mark(
 
 	// below the allocation level we mark ranges of clusters
 
-	for (i = 0; i < levelIdx; i++)
-	{
+	for (i = 0; i < levelIdx; i++) {
 		size_t from = address / bitSize;
 		size_t to = addressEnd / bitSize;
 
@@ -402,8 +371,7 @@ BuddyAllocMap::mark(
 
 	// from the allocation level and above we only mark one cluster, also we can stop as soon as we find a marked cluster
 
-	for (; i < m_height; i++)
-	{
+	for (; i < m_height; i++) {
 		size_t bit = address / bitSize;
 
 		if (getBit(page, bit))
@@ -425,8 +393,7 @@ void
 BuddyAllocMap::free(
 	size_t address,
 	size_t size
-	)
-{
+) {
 	Level* level = m_levelArray;
 	Page* page = m_pageArray;
 	Page* prevPage = NULL;
@@ -449,24 +416,19 @@ BuddyAllocMap::free(
 
 	// below the allocation level we unmark ranges of clusters
 
-	for (i = 0; i < levelIdx; i++)
-	{
+	for (i = 0; i < levelIdx; i++) {
 		size_t from = address / bitSize;
 		size_t to = addressEnd / bitSize;
 		size_t mod = addressEnd % bitSize;
 
 		ASSERT(!(address % bitSize)); // beacuse we below the allocation level
 
-		if (mod && !isBlocked)
-		{
+		if (mod && !isBlocked) {
 			ASSERT(prevPage != NULL);
 
-			if (getBit(prevPage, prevBit))
-			{
+			if (getBit(prevPage, prevBit)) {
 				isBlocked = true;
-			}
-			else
-			{
+			} else {
 				addressEnd += bitSize - mod;
 				to++;
 			}
@@ -489,19 +451,14 @@ BuddyAllocMap::free(
 
 	prevBit--; // in the next cycle PrevBit has meaning of the last cleared cluster
 
-	for (; i < m_height; i++)
-	{
+	for (; i < m_height; i++) {
 		// check adjacent cluster
 
-		if (prevPage)
-		{
-			if (prevBit & 1)
-			{
+		if (prevPage) {
+			if (prevBit & 1) {
 				if (getBit(prevPage, prevBit - 1))
 					break;
-			}
-			else
-			{
+			} else {
 				if (getBit(prevPage, prevBit + 1))
 					break;
 			}

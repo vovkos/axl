@@ -7,8 +7,7 @@ namespace spy {
 //..............................................................................
 
 void
-ImportIteratorBase::reset()
-{
+ImportIteratorBase::reset() {
 	m_symbolName = NULL;
 	m_moduleName = NULL;
 	m_slot = NULL;
@@ -24,20 +23,17 @@ ImportIteratorBase::reset()
 #	endif
 
 IMAGE_NT_HEADERS*
-getPeHdr(HMODULE hModule)
-{
+getPeHdr(HMODULE hModule) {
 	char* moduleBase = (char*)hModule;
 
 	IMAGE_DOS_HEADER* dosHdr = (IMAGE_DOS_HEADER*)moduleBase;
-	if (dosHdr->e_magic != IMAGE_DOS_SIGNATURE)
-	{
+	if (dosHdr->e_magic != IMAGE_DOS_SIGNATURE) {
 		err::setError("invalid module (bad DOS signature)");
 		return NULL;
 	}
 
 	IMAGE_NT_HEADERS* peHdr = (IMAGE_NT_HEADERS*)(moduleBase + dosHdr->e_lfanew);
-	if (peHdr->Signature != IMAGE_NT_SIGNATURE)
-	{
+	if (peHdr->Signature != IMAGE_NT_SIGNATURE) {
 		err::setError("invalid module (bad PE signature)");
 		return NULL;
 	}
@@ -48,8 +44,7 @@ getPeHdr(HMODULE hModule)
 //..............................................................................
 
 bool
-PeCodeMap::isCode(size_t address)
-{
+PeCodeMap::isCode(size_t address) {
 	ModuleCodeMap* map = getModuleCodeMap(address);
 	if (!map)
 		return false;
@@ -68,11 +63,9 @@ PeCodeMap::isCode(size_t address)
 #if (_AXL_SPY_ANALYZE_NON_CODE_ADDRESS)
 
 void
-PeCodeMap::analyzeNonCodeAddress(size_t address)
-{
+PeCodeMap::analyzeNonCodeAddress(size_t address) {
 	ModuleCodeMap* map = getModuleCodeMap(address);
-	if (!map)
-	{
+	if (!map) {
 		printf("  *** parent module not found for %p\n", (void*)address);
 		return;
 	}
@@ -103,11 +96,10 @@ PeCodeMap::analyzeNonCodeAddress(size_t address)
 		(void*)map->m_moduleBase,
 		(void*)map->m_moduleEnd,
 		map->m_moduleEnd - map->m_moduleBase
-		);
+	);
 
 	IMAGE_NT_HEADERS* peHdr = getPeHdr(hModule);
-	if (!peHdr)
-	{
+	if (!peHdr) {
 		printf("  *** can't get PE header: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
@@ -116,8 +108,7 @@ PeCodeMap::analyzeNonCodeAddress(size_t address)
 	IMAGE_SECTION_HEADER* end = p + peHdr->FileHeader.NumberOfSections;
 
 	size_t moduleBase = (size_t)hModule;
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		DWORD sectionEnd = p->VirtualAddress + p->Misc.VirtualSize;
 
 		printf(
@@ -126,15 +117,14 @@ PeCodeMap::analyzeNonCodeAddress(size_t address)
 			p->Name,
 			p->VirtualAddress,
 			sectionEnd
-			);
+		);
 	}
 }
 
 #endif
 
 PeCodeMap::ModuleCodeMap*
-PeCodeMap::getModuleCodeMap(size_t address)
-{
+PeCodeMap::getModuleCodeMap(size_t address) {
 	sl::MapIterator<size_t, ModuleCodeMap> it = m_moduleMap.find(address, sl::BinTreeFindRelOp_Lt);
 	if (it && address < it->m_value.m_moduleEnd)
 		return &it->m_value;
@@ -147,16 +137,15 @@ PeCodeMap::getModuleCodeMap(size_t address)
 			GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
 			(LPCWSTR)address,
 			&hModule
-			) &&
+		) &&
 		::GetModuleInformation(
 			::GetCurrentProcess(),
 			hModule,
 			&moduleInfo,
 			sizeof(moduleInfo)
-			);
+		);
 
-	if (!result)
-	{
+	if (!result) {
 		err::setLastSystemError();
 		return NULL;
 	}
@@ -179,8 +168,7 @@ PeCodeMap::getModuleCodeMap(size_t address)
 	IMAGE_SECTION_HEADER* p = IMAGE_FIRST_SECTION(peHdr);
 	IMAGE_SECTION_HEADER* end = p + peHdr->FileHeader.NumberOfSections;
 
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		if (!(p->Characteristics & IMAGE_SCN_CNT_CODE))
 			continue;
 
@@ -203,16 +191,14 @@ PeCodeMap::getModuleCodeMap(size_t address)
 
 //..............................................................................
 
-ImportIterator::ImportIterator()
-{
+ImportIterator::ImportIterator() {
 	m_ordinal = -1;
 	m_importDescIdx = -1;
 	m_nameThunk = NULL;
 	m_addrThunk = NULL;
 }
 
-ImportIterator::ImportIterator(PeImportEnumeration* enumeration)
-{
+ImportIterator::ImportIterator(PeImportEnumeration* enumeration) {
 	m_ordinal = -1;
 	m_importDescIdx = -1;
 	m_nameThunk = NULL;
@@ -227,10 +213,8 @@ ImportIterator::ImportIterator(PeImportEnumeration* enumeration)
 }
 
 ImportIterator&
-ImportIterator::operator ++ ()
-{
-	if (!m_enumeration || m_importDescIdx >= m_enumeration->m_importDescCount)
-	{
+ImportIterator::operator ++ () {
+	if (!m_enumeration || m_importDescIdx >= m_enumeration->m_importDescCount) {
 		reset();
 		return *this;
 	}
@@ -240,8 +224,7 @@ ImportIterator::operator ++ ()
 	m_addrThunk++;
 
 	bool result = readThunk();
-	if (!result)
-	{
+	if (!result) {
 		m_importDescIdx++;
 		openImportDesc();
 	}
@@ -250,14 +233,12 @@ ImportIterator::operator ++ ()
 }
 
 bool
-ImportIterator::openImportDesc()
-{
+ImportIterator::openImportDesc() {
 	ASSERT(m_enumeration);
 
 	bool result;
 
-	for (; m_importDescIdx < m_enumeration->m_importDescCount; m_importDescIdx++)
-	{
+	for (; m_importDescIdx < m_enumeration->m_importDescCount; m_importDescIdx++) {
 		IMAGE_IMPORT_DESCRIPTOR* p = &m_enumeration->m_importDir[m_importDescIdx];
 		if (!p->Name) // NULL-terminator
 			break;
@@ -266,8 +247,7 @@ ImportIterator::openImportDesc()
 		m_addrThunk = (IMAGE_THUNK_DATA*)(m_enumeration->m_moduleBase + p->FirstThunk);
 
 		result = readThunk();
-		if (result)
-		{
+		if (result) {
 			m_moduleName = m_enumeration->m_moduleBase + p->Name;
 			return true;
 		}
@@ -278,27 +258,21 @@ ImportIterator::openImportDesc()
 }
 
 bool
-ImportIterator::readThunk()
-{
+ImportIterator::readThunk() {
 	ASSERT(m_enumeration && m_nameThunk && m_addrThunk);
 
-	for (; m_addrThunk->u1.Function; m_nameThunk++, m_addrThunk++)
-	{
-		if (IMAGE_SNAP_BY_ORDINAL(m_nameThunk->u1.Ordinal))
-		{
+	for (; m_addrThunk->u1.Function; m_nameThunk++, m_addrThunk++) {
+		if (IMAGE_SNAP_BY_ORDINAL(m_nameThunk->u1.Ordinal)) {
 			m_ordinal = IMAGE_ORDINAL(m_nameThunk->u1.Ordinal);
 			m_symbolName.clear();
-		}
-		else
-		{
+		} else {
 			IMAGE_IMPORT_BY_NAME* name = (IMAGE_IMPORT_BY_NAME*)(m_enumeration->m_moduleBase + m_nameThunk->u1.AddressOfData);
 			m_ordinal = -1;
 			m_hint = name->Hint;
 			m_symbolName = (char*)name->Name;
 		}
 
-		if (!isCode(m_addrThunk->u1.Function))
-		{
+		if (!isCode(m_addrThunk->u1.Function)) {
 #if (_AXL_SPY_TRACE_NON_CODE_IMPORT)
 			if (m_ordinal != -1)
 				AXL_TRACE("Non-code import: %s@%d\n", m_moduleName.sz(), m_ordinal);
@@ -324,8 +298,7 @@ bool
 enumerateImports(
 	ImportIterator* iterator,
 	void* module
-	)
-{
+) {
 	if (!module)
 		module = ::GetModuleHandle(NULL);
 
@@ -349,17 +322,14 @@ bool
 enumerateImports(
 	ImportIterator* importIterator,
 	const ModuleIterator& moduleIterator
-	)
-{
+) {
 	return enumerateImports(importIterator, moduleIterator.getModule());
 }
 
 #elif (_AXL_OS_LINUX)
 
-ImportIterator::ImportIterator(ElfImportEnumeration* enumeration)
-{
-	if (!enumeration)
-	{
+ImportIterator::ImportIterator(ElfImportEnumeration* enumeration) {
+	if (!enumeration) {
 		m_index = -1;
 		return;
 	}
@@ -370,11 +340,9 @@ ImportIterator::ImportIterator(ElfImportEnumeration* enumeration)
 }
 
 ImportIterator&
-ImportIterator::operator ++ ()
-{
+ImportIterator::operator ++ () {
 	if (!m_enumeration ||
-		m_index >= m_enumeration->m_pltRelCount + m_enumeration->m_gotRelCount)
-	{
+		m_index >= m_enumeration->m_pltRelCount + m_enumeration->m_gotRelCount) {
 		reset();
 		return *this;
 	}
@@ -385,31 +353,26 @@ ImportIterator::operator ++ ()
 }
 
 bool
-ImportIterator::readRel()
-{
+ImportIterator::readRel() {
 	ASSERT(m_enumeration && "attempt to read ElfRel from a null-iterator");
 
 	int relType;
 	ElfRel* rel;
 	ElfRel* end;
 
-	if (m_index < m_enumeration->m_pltRelCount)
-	{
+	if (m_index < m_enumeration->m_pltRelCount) {
 		relType = R_JUMP_SLOT;
 		rel = m_enumeration->m_pltRelTable;
 		end = rel + m_enumeration->m_pltRelCount;
 		rel += m_index;
-	}
-	else
-	{
+	} else {
 		relType = R_GLOB_DAT;
 		rel = m_enumeration->m_gotRelTable;
 		end = rel + m_enumeration->m_gotRelCount;
 		rel += m_index - m_enumeration->m_pltRelCount;
 	}
 
-	for (; rel < end; rel++, m_index++)
-	{
+	for (; rel < end; rel++, m_index++) {
 		if (ELF_R_TYPE(rel->r_info) != relType)
 			continue;
 
@@ -418,8 +381,7 @@ ImportIterator::readRel()
 		if (ELF_ST_TYPE(sym->st_info) != STT_FUNC)
 			continue;
 
-		if (sym->st_name >= m_enumeration->m_stringTableSize)
-		{
+		if (sym->st_name >= m_enumeration->m_stringTableSize) {
 			AXL_TRACE("WARNING: ImportIterator::readRel: symbol out of string table\n");
 			continue;
 		}
@@ -442,8 +404,7 @@ bool
 enumerateImports(
 	ImportIterator* iterator,
 	void* module
-	)
-{
+) {
 	link_map* linkMap = module ? (link_map*)module : _r_debug.r_map;
 
 	ElfW(Dyn)* dynTable[DT_NUM] = { 0 };
@@ -462,8 +423,7 @@ enumerateImports(
 		!dynTable[DT_GOT_REL] != !dynTable[DT_GOT_RELENT] ||
 		!dynTable[DT_JMPREL] != !dynTable[DT_PLTRELSZ] ||
 		dynTable[DT_SYMENT]->d_un.d_val != sizeof(ElfW(Sym)) ||
-		dynTable[DT_GOT_RELENT] && dynTable[DT_GOT_RELENT]->d_un.d_val != sizeof(ElfRel))
-	{
+		dynTable[DT_GOT_RELENT] && dynTable[DT_GOT_RELENT]->d_un.d_val != sizeof(ElfRel)) {
 		err::setError("invalid ELF (missing or bad section(s))");
 		return false;
 	}
@@ -471,8 +431,7 @@ enumerateImports(
 	size_t pltRelCount = dynTable[DT_PLTRELSZ] ? dynTable[DT_PLTRELSZ]->d_un.d_val / sizeof(ElfRel) : 0;
 	size_t gotRelCount = dynTable[DT_GOT_RELSZ] ? dynTable[DT_GOT_RELSZ]->d_un.d_val / sizeof(ElfRel) : 0;
 
-	if (!pltRelCount && !gotRelCount)
-	{
+	if (!pltRelCount && !gotRelCount) {
 		*iterator = ImportIterator();
 		return true;
 	}
@@ -495,15 +454,13 @@ bool
 enumerateImports(
 	ImportIterator* importIterator,
 	const ModuleIterator& moduleIterator
-	)
-{
+) {
 	return enumerateImports(importIterator, moduleIterator.getModule());
 }
 
 #elif (_AXL_OS_DARWIN)
 
-ImportIterator::ImportIterator(ImportEnumeration* enumeration)
-{
+ImportIterator::ImportIterator(ImportEnumeration* enumeration) {
 	init();
 	m_enumeration = enumeration;
 	next();
@@ -514,8 +471,7 @@ ImportIterator::setState(
 	State state,
 	const char* begin,
 	size_t size
-	)
-{
+) {
 	m_state = state;
 	m_slot = NULL;
 	m_slotVmAddr = 0;
@@ -531,10 +487,8 @@ ImportIterator::setState(
 }
 
 ImportIterator&
-ImportIterator::operator ++ ()
-{
-	if (!m_enumeration || m_state == State_Done)
-	{
+ImportIterator::operator ++ () {
+	if (!m_enumeration || m_state == State_Done) {
 		reset();
 		return *this;
 	}
@@ -546,25 +500,21 @@ ImportIterator::operator ++ ()
 // bind-opcode handling logic is taken from dyldinfo.cpp
 
 bool
-ImportIterator::next()
-{
+ImportIterator::next() {
 	m_slot = NULL;
 
-	while (!m_pendingSlotArray.isEmpty())
-	{
+	while (!m_pendingSlotArray.isEmpty()) {
 		size_t slotVmAddr = m_pendingSlotArray.getBackAndPop();
 		setSlot(slotVmAddr);
 		if (m_slot)
 			return true;
 	}
 
-	do
-	{
+	do {
 		bool isDone = false;
 		size_t bindOffsetDelta = m_state == State_LazyBind ? 0 : sizeof(void*);
 
-		while (m_p < m_end && !m_slot && !isDone)
-		{
+		while (m_p < m_end && !m_slot && !isDone) {
 			uint8_t c = *m_p++;
 			uint8_t op = c & BIND_OPCODE_MASK;
 			uint8_t imm = c & BIND_IMMEDIATE_MASK;
@@ -572,8 +522,7 @@ ImportIterator::next()
 			uint64_t uleb;
 			uint64_t skip;
 
-			switch (op)
-			{
+			switch (op) {
 			case BIND_OPCODE_DONE:
 				if (m_state != State_LazyBind)
 					isDone = true;
@@ -638,8 +587,7 @@ ImportIterator::next()
 				m_p += enc::uleb128(m_p, m_end - m_p, &skip);
 				skip += bindOffsetDelta;
 
-				for (uint64_t i = 0; i < uleb; i++)
-				{
+				for (uint64_t i = 0; i < uleb; i++) {
 					bind();
 					m_segmentOffset += skip;
 				}
@@ -656,14 +604,13 @@ ImportIterator::next()
 
 		// advance to the next bind kind
 
-		switch (m_state)
-		{
+		switch (m_state) {
 		case State_Idle:
 			setState(
 				State_Bind,
 				m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->bind_off,
 				m_enumeration->m_dyldInfoCmd->bind_size
-				);
+			);
 			break;
 
 		case State_Bind:
@@ -671,7 +618,7 @@ ImportIterator::next()
 				State_WeakBind,
 				m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->weak_bind_off,
 				m_enumeration->m_dyldInfoCmd->weak_bind_size
-				);
+			);
 			break;
 
 		case State_WeakBind:
@@ -679,7 +626,7 @@ ImportIterator::next()
 				State_LazyBind,
 				m_enumeration->m_linkEditSegmentBase + m_enumeration->m_dyldInfoCmd->lazy_bind_off,
 				m_enumeration->m_dyldInfoCmd->lazy_bind_size
-				);
+			);
 			break;
 
 		case State_LazyBind:
@@ -699,8 +646,7 @@ ImportIterator::next()
 }
 
 bool
-ImportIterator::bind()
-{
+ImportIterator::bind() {
 	if (m_segmentIdx >= m_enumeration->m_segmentArray.getCount())
 		return false;
 
@@ -711,8 +657,7 @@ ImportIterator::bind()
 	m_segmentName = segment->segname;
 
 	size_t slotVmAddr = segment->vmaddr + m_segmentOffset;
-	if (!m_slot)
-	{
+	if (!m_slot) {
 		setSlot(slotVmAddr);
 		return m_slot != NULL;
 	}
@@ -722,8 +667,7 @@ ImportIterator::bind()
 }
 
 bool
-ImportIterator::setSlot(size_t slotVmAddr)
-{
+ImportIterator::setSlot(size_t slotVmAddr) {
 	const segment_command_64* segment = m_enumeration->m_segmentArray[m_segmentIdx];
 
 	const section_64* section = findSection(segment, slotVmAddr);
@@ -744,8 +688,7 @@ const section_64*
 ImportIterator::findSection(
 	const segment_command_64* segment,
 	size_t slotVmAddr
-	)
-{
+) {
 	const section_64* section = (section_64*)(segment + 1);
 	const section_64* end = section + segment->nsects;
 	for (; section < end; section++)
@@ -756,10 +699,8 @@ ImportIterator::findSection(
 }
 
 const char*
-ImportIterator::getDylibName(int ordinal)
-{
-	switch (ordinal)
-	{
+ImportIterator::getDylibName(int ordinal) {
+	switch (ordinal) {
 	case BIND_SPECIAL_DYLIB_SELF:
 		return "this-image";
 
@@ -782,8 +723,7 @@ bool
 enumerateImports(
 	ImportIterator* iterator,
 	size_t imageIndex
-	)
-{
+) {
 	char* slide = (char*)::_dyld_get_image_vmaddr_slide(imageIndex);
 	mach_header_64* machHdr = (mach_header_64*)::_dyld_get_image_header(imageIndex);
 
@@ -793,12 +733,10 @@ enumerateImports(
 	dyld_info_command* dyldInfoCmd = NULL;
 
 	load_command* cmd = (load_command*)(machHdr + 1);
-	for (size_t i = 0; i < machHdr->ncmds; i++)
-	{
+	for (size_t i = 0; i < machHdr->ncmds; i++) {
 		segment_command_64* segmentCmd;
 		dylib_command* dylibCmd;
-		switch (cmd->cmd)
-		{
+		switch (cmd->cmd) {
 		case LC_LOAD_DYLIB:
 		case LC_LOAD_WEAK_DYLIB:
 		case LC_REEXPORT_DYLIB:
@@ -825,8 +763,7 @@ enumerateImports(
 		cmd = (load_command*)((char*)cmd + cmd->cmdsize);
 	}
 
-	if (!linkEditSegmentCmd || !dyldInfoCmd)
-	{
+	if (!linkEditSegmentCmd || !dyldInfoCmd) {
 		err::setError("invalid MACH-O file");
 		return false;
 	}
@@ -846,8 +783,7 @@ bool
 enumerateImports(
 	ImportIterator* importIterator,
 	const ModuleIterator& moduleIterator
-	)
-{
+) {
 	return enumerateImports(importIterator, moduleIterator.getImageIndex());
 }
 
@@ -855,12 +791,10 @@ bool
 enumerateImports(
 	ImportIterator* iterator,
 	void* module
-	)
-{
+) {
 	size_t i = 0;
 	size_t count = _dyld_image_count();
-	for (size_t i = 0; i < count; i++)
-	{
+	for (size_t i = 0; i < count; i++) {
 		sys::psx::DynamicLib lib;
 		const char* imageName = _dyld_get_image_name(i);
 		bool result = lib.open(imageName, RTLD_NOLOAD);
@@ -877,8 +811,7 @@ enumerateImports(
 //..............................................................................
 
 ImportIterator
-ImportIterator::operator ++ (int)
-{
+ImportIterator::operator ++ (int) {
 	ImportIterator it = *this;
 	operator ++ ();
 	return it;

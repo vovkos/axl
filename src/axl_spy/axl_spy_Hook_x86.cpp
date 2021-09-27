@@ -10,8 +10,7 @@ namespace spy {
 // nasm -fwin32 -lthunk_x86.asm.lst thunk_x86.asm
 // perl nasm-list-to-cpp.pl thunk_x86.asm.lst
 
-const uint8_t g_thunkCode[] =
-{
+const uint8_t g_thunkCode[] = {
 	0x55,                                            // 00000000  push    ebp
 	0x89, 0xE5,                                      // 00000001  mov     ebp, esp
 	0x83, 0xEC, 0x18,                                // 00000003  sub     esp, StackFrameSize
@@ -62,8 +61,7 @@ const uint8_t g_thunkCode[] =
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ThunkCodeOffset
-{
+enum ThunkCodeOffset {
 	ThunkCodeOffset_HookPtr1      = 0x15,
 	ThunkCodeOffset_CallHookEnter = 0x24,
 	ThunkCodeOffset_HookRetPtr    = 0x3e,
@@ -76,8 +74,7 @@ enum ThunkCodeOffset
 
 //..............................................................................
 
-struct Hook
-{
+struct Hook {
 	uint8_t m_thunkCode[(ThunkCodeOffset_End & ~7) + 8]; // align on 8
 	HookCommonContext m_context;
 };
@@ -89,8 +86,7 @@ hookEnter(
 	Hook* hook,
 	uint32_t ebp,
 	uint32_t originalRet
-	)
-{
+) {
 	return hookEnterCommon(&hook->m_context, ebp, originalRet);
 }
 
@@ -98,20 +94,17 @@ uint32_t
 hookLeave(
 	Hook* hook,
 	uint32_t ebp
-	)
-{
+) {
 	return hookLeaveCommon(&hook->m_context, ebp);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-HookArena::HookArena()
-{
+HookArena::HookArena() {
 	m_impl = AXL_MEM_NEW(mem::ExecutableBlockArena<Hook>);
 }
 
-HookArena::~HookArena()
-{
+HookArena::~HookArena() {
 	((mem::ExecutableBlockArena<Hook>*)m_impl)->detach(); // don't free unless explicitly requested
 	AXL_MEM_DELETE((mem::ExecutableBlockArena<Hook>*)m_impl);
 }
@@ -122,8 +115,7 @@ setCallJmpRel32Target(
 	uint8_t* code,
 	size_t offset,
 	void* target
-	)
-{
+) {
 	// CALL rel32 =>  e8 xx xx xx xx
 	// JMP  rel32 =>  e9 xx xx xx xx
 	// rel32 is relative to EIP after the instruction
@@ -137,8 +129,7 @@ HookArena::allocate(
 	void* callbackParam,
 	HookEnterFunc* enterFunc,
 	HookLeaveFunc* leaveFunc
-	)
-{
+) {
 	Hook* hook = ((mem::ExecutableBlockArena<Hook>*)m_impl)->allocate();
 	if (!hook)
 		return NULL;
@@ -160,8 +151,7 @@ HookArena::allocate(
 }
 
 void
-HookArena::free()
-{
+HookArena::free() {
 	((mem::ExecutableBlockArena<Hook>*)m_impl)->free();
 }
 
@@ -171,8 +161,7 @@ void
 setHookTargetFunc(
 	Hook* hook,
 	void* targetFunc
-	)
-{
+) {
 	setCallJmpRel32Target(hook->m_thunkCode, ThunkCodeOffset_JmpTargetFunc, (void*)targetFunc);
 }
 

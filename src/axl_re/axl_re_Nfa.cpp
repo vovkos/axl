@@ -17,17 +17,14 @@ namespace re {
 
 //..............................................................................
 
-MatchCondition::MatchCondition()
-{
+MatchCondition::MatchCondition() {
 	m_conditionKind = MatchConditionKind_Undefined;
 	m_char = 0;
 }
 
 void
-MatchCondition::addChar(uchar_t c)
-{
-	switch (m_conditionKind)
-	{
+MatchCondition::addChar(uchar_t c) {
+	switch (m_conditionKind) {
 	case MatchConditionKind_Char:
 		if (m_char == c)
 			break; // no change
@@ -52,10 +49,8 @@ MatchCondition::addChar(uchar_t c)
 }
 
 bool
-MatchCondition::isMatch(uchar_t c) const
-{
-	switch (m_conditionKind)
-	{
+MatchCondition::isMatch(uchar_t c) const {
+	switch (m_conditionKind) {
 	case MatchConditionKind_Char:
 		return c == m_char;
 
@@ -73,8 +68,7 @@ MatchCondition::isMatch(uchar_t c) const
 
 //..............................................................................
 
-NfaState::NfaState()
-{
+NfaState::NfaState() {
 	m_flags = 0;
 	m_id = -1;
 	m_acceptContext = NULL;
@@ -84,8 +78,7 @@ NfaState::NfaState()
 }
 
 void
-NfaState::createEpsilonLink(NfaState* outState)
-{
+NfaState::createEpsilonLink(NfaState* outState) {
 	ASSERT(!(m_flags & NfaStateFlag_TransitionMask) && !m_outState && !m_outState2);
 
 	m_flags |= NfaStateFlag_EpsilonLink;
@@ -96,8 +89,7 @@ void
 NfaState::createEpsilonLink(
 	NfaState* outState,
 	NfaState* outState2
-	)
-{
+) {
 	ASSERT(!(m_flags & NfaStateFlag_TransitionMask) && !m_outState && !m_outState2);
 
 	m_flags |= NfaStateFlag_EpsilonLink;
@@ -109,8 +101,7 @@ void
 NfaState::createCharMatch(
 	uint_t c,
 	NfaState* outState
-	)
-{
+) {
 	m_flags |= NfaStateFlag_Match;
 	m_matchCondition.m_conditionKind = MatchConditionKind_Char;
 	m_matchCondition.m_char = c;
@@ -120,8 +111,7 @@ NfaState::createCharMatch(
 //..............................................................................
 
 bool
-NfaStateSet::addState(NfaState* state)
-{
+NfaStateSet::addState(NfaState* state) {
 	if (m_stateSet.getBit(state->m_id))
 		return false;
 
@@ -137,26 +127,22 @@ NfaStateSet::addState(NfaState* state)
 //..............................................................................
 
 void
-NfaTransitionMgr::clear()
-{
+NfaTransitionMgr::clear() {
 	m_transitionList.clear();
 	memset(m_transitionMap, 0, sizeof(m_transitionMap));
 }
 
 void
-NfaTransitionMgr::addMatchState(NfaState* state)
-{
+NfaTransitionMgr::addMatchState(NfaState* state) {
 	ASSERT(state->m_flags & NfaStateFlag_Match);
 
-	switch (state->m_matchCondition.m_conditionKind)
-	{
+	switch (state->m_matchCondition.m_conditionKind) {
 	case MatchConditionKind_Char:
 		addMatchCharTransition(state->m_matchCondition.m_char, state->m_outState);
 		break;
 
 	case MatchConditionKind_CharSet:
-		for (size_t i = 0; i < 256; i++)
-		{
+		for (size_t i = 0; i < 256; i++) {
 			if (state->m_matchCondition.m_charSet.getBit(i))
 				addMatchCharTransition(i, state->m_outState);
 		}
@@ -173,19 +159,16 @@ NfaTransitionMgr::addMatchState(NfaState* state)
 }
 
 void
-NfaTransitionMgr::finalize()
-{
+NfaTransitionMgr::finalize() {
 	NfaStateSetMap<NfaTransition*> transitionMap;
 
 	sl::Iterator<NfaTransition> transitionIt = m_transitionList.getHead();
-	while (transitionIt)
-	{
+	while (transitionIt) {
 		NfaTransition* transition = *transitionIt++;
 		ASSERT(transition->m_matchCondition.m_conditionKind == MatchConditionKind_Char);
 
 		NfaStateSetMap<NfaTransition*>::Iterator mapIt = transitionMap.visit(&transition->m_outStateSet);
-		if (!mapIt->m_value)
-		{
+		if (!mapIt->m_value) {
 			mapIt->m_value = transition;
 			continue;
 		}
@@ -200,13 +183,11 @@ void
 NfaTransitionMgr::addMatchCharTransition(
 	uint_t c,
 	NfaState* outState
-	)
-{
+) {
 	ASSERT(c < countof(m_transitionMap));
 
 	NfaTransition* transition = m_transitionMap[c];
-	if (!transition)
-	{
+	if (!transition) {
 		transition = AXL_MEM_NEW(NfaTransition);
 		transition->m_matchCondition.m_conditionKind = MatchConditionKind_Char;
 		transition->m_matchCondition.m_char = c;

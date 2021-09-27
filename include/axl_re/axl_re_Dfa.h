@@ -22,16 +22,14 @@ struct DfaState;
 
 //..............................................................................
 
-struct DfaTransition: sl::ListLink
-{
+struct DfaTransition: sl::ListLink {
 	MatchCondition m_matchCondition;
 	DfaState* m_outState;
 };
 
 //..............................................................................
 
-struct DfaState: sl::ListLink
-{
+struct DfaState: sl::ListLink {
 	bool m_isAccept;
 	uint_t m_id;
 	uint_t m_acceptNfaStateId;

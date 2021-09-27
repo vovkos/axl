@@ -28,9 +28,8 @@ namespace sl {
 template <
 	typename Key,
 	typename Value
-	>
-struct HashTableEntry: MapEntry<Key, Value>
-{
+>
+struct HashTableEntry: MapEntry<Key, Value> {
 	template <
 		typename Key2,
 		typename Value2,
@@ -38,16 +37,14 @@ struct HashTableEntry: MapEntry<Key, Value>
 		typename Eq,
 		typename KeyArg,
 		typename ValueArg
-		>
+	>
 	friend class HashTable;
 
 protected:
-	class BucketLink
-	{
+	class BucketLink {
 	public:
 		ListLink*
-		operator () (HashTableEntry* entry) const
-		{
+		operator () (HashTableEntry* entry) const {
 			return &entry->m_bucketLink;
 		}
 	};
@@ -64,16 +61,12 @@ protected:
 template <
 	typename Key,
 	typename Value
-	>
-class HashTableIterator: public Iterator<HashTableEntry<Key, Value> >
-{
+>
+class HashTableIterator: public Iterator<HashTableEntry<Key, Value> > {
 public:
-	HashTableIterator()
-	{
-	}
+	HashTableIterator() {}
 
-	HashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src)
-	{
+	HashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
@@ -81,21 +74,16 @@ public:
 template <
 	typename Key,
 	typename Value
-	>
-class ConstHashTableIterator: public ConstIterator<HashTableEntry<Key, Value> >
-{
+>
+class ConstHashTableIterator: public ConstIterator<HashTableEntry<Key, Value> > {
 public:
-	ConstHashTableIterator()
-	{
-	}
+	ConstHashTableIterator() {}
 
-	ConstHashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src)
-	{
+	ConstHashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 
-	ConstHashTableIterator(const ConstIterator<HashTableEntry<Key, Value> >& src)
-	{
+	ConstHashTableIterator(const ConstIterator<HashTableEntry<Key, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
 };
@@ -109,12 +97,10 @@ template <
 	typename Eq = Eq<Key>,
 	typename KeyArg = typename ArgType<Key>::Type,
 	typename ValueArg = typename ArgType<Value>::Type
-	>
-class HashTable
-{
+>
+class HashTable {
 public:
-	enum Def
-	{
+	enum Def {
 		Def_InitialBucketCount = 32,
 		Def_ResizeThreshold    = 75,
 	};
@@ -135,82 +121,69 @@ public:
 	explicit HashTable(
 		const Hash& hash = Hash(),
 		const Eq& eq = Eq()
-		)
-	{
+	) {
 		m_resizeThreshold = Def_ResizeThreshold;
 		m_hash = hash;
 		m_eq = eq;
 	}
 
 	Value&
-	operator [] (KeyArg key)
-	{
+	operator [] (KeyArg key) {
 		return this->visit(key)->m_value;
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		m_table.clear();
 		m_list.clear();
 	}
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_list.isEmpty();
 	}
 
 	Iterator
-	getHead()
-	{
+	getHead() {
 		return m_list.getHead();
 	}
 
 	ConstIterator
-	getHead() const
-	{
+	getHead() const {
 		return m_list.getHead();
 	}
 
 	Iterator
-	getTail()
-	{
+	getTail() {
 		return m_list.getHead();
 	}
 
 	ConstIterator
-	getTail() const
-	{
+	getTail() const {
 		return m_list.getHead();
 	}
 
 	size_t
-	getCount() const
-	{
+	getCount() const {
 		return m_list.getCount();
 	}
 
 	size_t
-	getBucketCount() const
-	{
+	getBucketCount() const {
 		return m_table.getCount();
 	}
 
 	bool
-	setBucketCount(size_t bucketCount)
-	{
+	setBucketCount(size_t bucketCount) {
 		Array<Bucket> newTable;
 		bool result = newTable.setCount(bucketCount);
 		if (!result)
 			return false;
 
 		size_t oldBucketCount = m_table.getCount();
-		for (size_t i = 0; i < oldBucketCount; i++)
-		{
+		for (size_t i = 0; i < oldBucketCount; i++) {
 			Bucket* oldBucket = &m_table[i];
-			while (!oldBucket->isEmpty())
-			{
+			while (!oldBucket->isEmpty()) {
 				Entry* entry = oldBucket->removeHead();
 				size_t hash = m_hash(entry->m_key);
 
@@ -225,20 +198,17 @@ public:
 	}
 
 	size_t
-	getResizeThreshold() const
-	{
+	getResizeThreshold() const {
 		return m_resizeThreshold;
 	}
 
 	void
-	setResizeThreshold(size_t resizeThreshold)
-	{
+	setResizeThreshold(size_t resizeThreshold) {
 		m_resizeThreshold = resizeThreshold;
 	}
 
 	Iterator
-	find(KeyArg key)
-	{
+	find(KeyArg key) {
 		size_t bucketCount = m_table.getCount();
 		if (!bucketCount)
 			return NULL;
@@ -247,8 +217,7 @@ public:
 		Bucket* bucket = &m_table[hash % bucketCount];
 
 		typename Bucket::Iterator it = bucket->getHead();
-		for (; it; it++)
-		{
+		for (; it; it++) {
 			bool isEqual = m_eq(key, it->m_key);
 			if (isEqual)
 				return it;
@@ -258,8 +227,7 @@ public:
 	}
 
 	ConstIterator
-	find(KeyArg key) const
-	{
+	find(KeyArg key) const {
 		return ((HashTable*)this)->find(key); // a simple const-cast
 	}
 
@@ -267,18 +235,15 @@ public:
 	findValue(
 		KeyArg key,
 		ValueArg undefinedValue
-		) const
-	{
+	) const {
 		ConstIterator it = this->find(key);
 		return it ? it->m_value : undefinedValue;
 	}
 
 	Iterator
-	visit(KeyArg key)
-	{
+	visit(KeyArg key) {
 		size_t bucketCount = m_table.getCount();
-		if (!bucketCount)
-		{
+		if (!bucketCount) {
 			bucketCount = Def_InitialBucketCount;
 
 			bool result = m_table.setCount(bucketCount);
@@ -290,8 +255,7 @@ public:
 		Bucket* bucket = &m_table[hash % bucketCount];
 
 		typename Bucket::Iterator it = bucket->getHead();
-		for (; it; it++)
-		{
+		for (; it; it++) {
 			bool isEqual = m_eq(key, it->m_key);
 			if (isEqual)
 				return it;
@@ -320,8 +284,7 @@ public:
 		KeyArg key,
 		ValueArg value,
 		bool* isNew = NULL
-		)
-	{
+	) {
 		size_t prevCount = this->getCount();
 
 		Iterator it = this->visit(key);
@@ -337,8 +300,7 @@ public:
 	addIfNotExists(
 		KeyArg key,
 		ValueArg value
-		)
-	{
+	) {
 		size_t prevCount = this->getCount();
 
 		Iterator it = this->visit(key);
@@ -351,8 +313,7 @@ public:
 	}
 
 	void
-	erase(Iterator it)
-	{
+	erase(Iterator it) {
 		Entry* entry = *it;
 		entry->m_bucket->remove(entry);
 		m_list.remove(entry);
@@ -360,8 +321,7 @@ public:
 	}
 
 	bool
-	eraseKey(KeyArg key)
-	{
+	eraseKey(KeyArg key) {
 		Iterator it = find(key);
 		if (!it)
 			return false;
@@ -371,28 +331,24 @@ public:
 	}
 
 	bool
-	sortByKey()
-	{
+	sortByKey() {
 		return sortByKey(Lt<Key, KeyArg>());
 	}
 
 	template <typename Compare>
 	bool
-	sortByKey(Compare compare)
-	{
+	sortByKey(Compare compare) {
 		return m_list.sort(CompareMapEntryKey<Key, Value, Compare>(compare));
 	}
 
 	bool
-	sortByValue()
-	{
+	sortByValue() {
 		return sortByValue(Lt<Value, ValueArg>());
 	}
 
 	template <typename Compare>
 	bool
-	sortByValue(Compare compare)
-	{
+	sortByValue(Compare compare) {
 		return m_list.sort(CompareMapEntryValue<Key, Value, Compare>(compare));
 	}
 };
@@ -406,7 +362,7 @@ template <
 	typename Value,
 	typename KeyArg = typename ArgType<Key>::Type,
 	typename ValueArg = typename ArgType<Value>::Type
-	>
+>
 class SimpleHashTable: public HashTable<
 	Key,
 	Value,
@@ -414,8 +370,7 @@ class SimpleHashTable: public HashTable<
 	sl::Eq<Key>,
 	KeyArg,
 	ValueArg
-	>
-{
+> {
 };
 
 //..............................................................................
@@ -427,7 +382,7 @@ template <
 	typename Value,
 	typename KeyArg = typename ArgType<Key>::Type,
 	typename ValueArg = typename ArgType<Value>::Type
-	>
+>
 class DuckTypeHashTable: public HashTable<
 	Key,
 	Value,
@@ -435,8 +390,7 @@ class DuckTypeHashTable: public HashTable<
 	sl::EqDuckType<Key>,
 	KeyArg,
 	ValueArg
-	>
-{
+> {
 };
 
 //..............................................................................
@@ -447,7 +401,7 @@ template <
 	typename Key,
 	typename Value,
 	typename ValueArg = typename ArgType<Value>::Type
-	>
+>
 class DuckTypePtrHashTable: public HashTable<
 	Key*,
 	Value,
@@ -455,22 +409,19 @@ class DuckTypePtrHashTable: public HashTable<
 	sl::EqDuckType<Key>,
 	Key*,
 	ValueArg
-	>
-{
+> {
 };
 
 //..............................................................................
 
 #define AXL_SL_BEGIN_HASH_TABLE_EX(Class, Key, Value, Hash, Eq, KeyArg, ValueArg) \
-class Class \
-{ \
+class Class { \
 public: \
 	typedef axl::sl::HashTable<Key, Value, Hash, Eq, KeyArg, ValueArg> MapBase; \
 	typedef MapBase::Iterator Iterator; \
 	static \
 	Iterator \
-	find(KeyArg key) \
-	{ \
+	find(KeyArg key) { \
 		return axl::sl::getSingleton<Map> ()->find(key); \
 	} \
 	static \
@@ -478,16 +429,13 @@ public: \
 	findValue ( \
 		KeyArg key, \
 		ValueArg undefinedValue \
-		) \
-	{ \
+	) { \
 		return axl::sl::getSingleton<Map> ()->findValue(key, undefinedValue); \
 	} \
 protected: \
-	class Map: public MapBase \
-	{ \
+	class Map: public MapBase { \
 	public: \
-		Map() \
-		{
+		Map() {
 
 #define AXL_SL_HASH_TABLE_ENTRY(key, value) \
 			visit(key)->m_value = value;
@@ -506,7 +454,7 @@ protected: \
 		axl::sl::Eq<Key>, \
 		axl::sl::ArgType<Key>::Type, \
 		axl::sl::ArgType<Value>::Type \
-		)
+	)
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -516,7 +464,7 @@ protected: \
 		Key, \
 		Value, \
 		axl::sl::HashId<Key> \
-		)
+	)
 
 #define AXL_SL_END_SIMPLE_HASH_TABLE() \
 	AXL_SL_END_HASH_TABLE()
@@ -532,7 +480,7 @@ protected: \
 		axl::sl::EqDuckType<Key>, \
 		axl::sl::ArgType<Key>::Type, \
 		axl::sl::ArgType<Value>::Type \
-		)
+	)
 
 #define AXL_SL_END_DUCK_TYPE_HASH_TABLE() \
 	AXL_SL_END_HASH_TABLE()

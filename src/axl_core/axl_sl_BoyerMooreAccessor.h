@@ -19,20 +19,17 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class BoyerMooreAccessor
-{
+class BoyerMooreAccessor {
 protected:
 	const T* m_p;
 
 public:
-	BoyerMooreAccessor(const T* p)
-	{
+	BoyerMooreAccessor(const T* p) {
 		m_p = p;
 	}
 
 	T
-	getChar(size_t i) const
-	{
+	getChar(size_t i) const {
 		return m_p[i];
 	}
 
@@ -40,25 +37,19 @@ public:
 	saveTail(
 		size_t i,
 		size_t size
-		) const
-	{
-	}
+	) const {}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class BoyerMooreReverseAccessor: public BoyerMooreAccessor<T>
-{
+class BoyerMooreReverseAccessor: public BoyerMooreAccessor<T> {
 public:
 	BoyerMooreReverseAccessor(const T* p)
-		: BoyerMooreAccessor<T>  (p)
-	{
-	}
+		: BoyerMooreAccessor<T>  (p) {}
 
 	T
-	getChar(size_t i) const
-	{
+	getChar(size_t i) const {
 		return this->m_p[-i];
 	}
 };
@@ -66,8 +57,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class BoyerMooreIncrementalAccessor: public BoyerMooreAccessor<T>
-{
+class BoyerMooreIncrementalAccessor: public BoyerMooreAccessor<T> {
 protected:
 	BoyerMooreIncrementalContext<T>* m_incrementalContext;
 
@@ -75,14 +65,12 @@ public:
 	BoyerMooreIncrementalAccessor(
 		const T* p,
 		BoyerMooreIncrementalContext<T>* incrementalContext
-		): BoyerMooreAccessor<T>  (p)
-	{
+	): BoyerMooreAccessor<T>  (p) {
 		m_incrementalContext = incrementalContext;
 	}
 
 	T
-	getChar(size_t i) const
-	{
+	getChar(size_t i) const {
 		size_t tailLength = m_incrementalContext->m_tail.getCount();
 		return i < tailLength ?
 			this->m_incrementalContext->m_tail[i] :
@@ -93,25 +81,20 @@ public:
 	saveTail(
 		size_t i,
 		size_t size
-		) const
-	{
-		if (!size)
-		{
+	) const {
+		if (!size) {
 			m_incrementalContext->m_tail.clear();
 			return;
 		}
 
 		size_t tailLength = m_incrementalContext->m_tail.getCount();
-		if (i < tailLength)
-		{
+		if (i < tailLength) {
 			ASSERT(size > tailLength - i);
 
 			size_t copySize = size - (tailLength - i);
 			m_incrementalContext->m_tail.remove(0, i);
 			m_incrementalContext->m_tail.append(this->m_p, copySize);
-		}
-		else
-		{
+		} else {
 			m_incrementalContext->m_tail.copy(this->m_p + i - tailLength, size);
 		}
 	}
@@ -120,19 +103,15 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class BoyerMooreIncrementalReverseAccessor: public BoyerMooreIncrementalAccessor<T>
-{
+class BoyerMooreIncrementalReverseAccessor: public BoyerMooreIncrementalAccessor<T> {
 public:
 	BoyerMooreIncrementalReverseAccessor(
 		const T* p,
 		BoyerMooreIncrementalContext<T>* incrementalContext
-		): BoyerMooreIncrementalAccessor<T> (p, incrementalContext)
-	{
-	}
+	): BoyerMooreIncrementalAccessor<T> (p, incrementalContext) {}
 
 	T
-	getChar(size_t i) const
-	{
+	getChar(size_t i) const {
 		size_t tailLength = this->m_incrementalContext->m_tail.getCount();
 		return i < tailLength ?
 			this->m_incrementalContext->m_tail[i] :
@@ -143,25 +122,20 @@ public:
 	saveTail(
 		size_t i,
 		size_t size
-		) const
-	{
-		if (!size)
-		{
+	) const {
+		if (!size) {
 			this->m_incrementalContext->m_tail.clear();
 			return;
 		}
 
 		size_t tailLength = this->m_incrementalContext->m_tail.getCount();
-		if (i < tailLength)
-		{
+		if (i < tailLength) {
 			ASSERT(size > tailLength - i);
 
 			size_t copySize = size - (tailLength - i);
 			this->m_incrementalContext->m_tail.remove(0, i);
 			this->m_incrementalContext->m_tail.appendReverse(this->m_p - copySize + 1, copySize);
-		}
-		else
-		{
+		} else {
 			this->m_incrementalContext->m_tail.copyReverse(this->m_p - size - (i - tailLength) + 1, size);
 		}
 	}
@@ -170,17 +144,13 @@ public:
 //..............................................................................
 
 template <typename Base>
-class TextBoyerMooreAccessorImpl: public Base
-{
+class TextBoyerMooreAccessorImpl: public Base {
 public:
 	TextBoyerMooreAccessorImpl(const utf32_t* p):
-		Base(p)
-	{
-	}
+		Base(p) {}
 
 	bool
-	isDelimChar(size_t i) const
-	{
+	isDelimChar(size_t i) const {
 		return i == -1 ? true : !enc::utfIsLetterOrNumber(Base::getChar(i));
 	}
 };
@@ -188,19 +158,15 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
-class TextBoyerMooreIncrementalAccessorImpl: public Base
-{
+class TextBoyerMooreIncrementalAccessorImpl: public Base {
 public:
 	TextBoyerMooreIncrementalAccessorImpl(
 		const utf32_t* p,
 		BoyerMooreIncrementalContext<utf32_t>* incrementalContext
-		): Base  (p, incrementalContext)
-	{
-	}
+	): Base  (p, incrementalContext) {}
 
 	bool
-	isDelimChar(size_t i) const
-	{
+	isDelimChar(size_t i) const {
 		utf32_t c = i != -1 ? Base::getChar(i) : this->m_incrementalContext->m_prefix;
 		return !enc::utfIsLetterOrNumber(c);
 	}
@@ -209,8 +175,7 @@ public:
 	saveTail(
 		size_t i,
 		size_t size
-		) const
-	{
+	) const {
 		ASSERT(i);
 		this->m_incrementalContext->m_prefix = Base::getChar(i - 1);
 		Base::saveTail(i, size);
@@ -220,17 +185,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
-class TextBoyerMooreCaseFoldedAccessorImpl: public TextBoyerMooreAccessorImpl<Base>
-{
+class TextBoyerMooreCaseFoldedAccessorImpl: public TextBoyerMooreAccessorImpl<Base> {
 public:
 	TextBoyerMooreCaseFoldedAccessorImpl(const utf32_t* p):
-		TextBoyerMooreAccessorImpl<Base> (p)
-	{
-	}
+		TextBoyerMooreAccessorImpl<Base> (p) {}
 
 	utf32_t
-	getChar(size_t i) const
-	{
+	getChar(size_t i) const {
 		return enc::utfToCaseFolded(Base::getChar(i));
 	}
 };
@@ -238,19 +199,15 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename Base>
-class TextBoyerMooreCaseFoldedIncrementalAccessorImpl: public TextBoyerMooreIncrementalAccessorImpl<Base>
-{
+class TextBoyerMooreCaseFoldedIncrementalAccessorImpl: public TextBoyerMooreIncrementalAccessorImpl<Base> {
 public:
 	TextBoyerMooreCaseFoldedIncrementalAccessorImpl(
 		const utf32_t* p,
 		BoyerMooreIncrementalContext<utf32_t>* incrementalContext
-		): TextBoyerMooreIncrementalAccessorImpl<Base> (p, incrementalContext)
-	{
-	}
+	): TextBoyerMooreIncrementalAccessorImpl<Base> (p, incrementalContext) {}
 
 	utf32_t
-	getChar(size_t i) const
-	{
+	getChar(size_t i) const {
 		return enc::utfToCaseFolded(Base::getChar(i));
 	}
 };

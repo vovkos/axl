@@ -20,24 +20,19 @@ namespace gui {
 
 //..............................................................................
 
-class Image: public GuiItem
-{
+class Image: public GuiItem {
 protected:
 	Image(Engine* engine):
-		GuiItem(engine)
-	{
-	}
+		GuiItem(engine) {}
 
 public:
 	bool
-	getImageDesc(ImageDesc* imageDesc)
-	{
+	getImageDesc(ImageDesc* imageDesc) {
 		return m_engine->getImageDesc(this, imageDesc);
 	}
 
 	Size
-	getSize()
-	{
+	getSize() {
 		ImageDesc imageDesc;
 		getImageDesc(&imageDesc);
 		return imageDesc.m_size;
@@ -46,13 +41,10 @@ public:
 
 //..............................................................................
 
-class Cursor: public GuiItem
-{
+class Cursor: public GuiItem {
 protected:
 	Cursor(Engine* engine):
-		GuiItem(engine)
-	{
-	}
+		GuiItem(engine) {}
 };
 
 //..............................................................................

@@ -34,7 +34,7 @@ cryptQueryObjectFile(
 	HCERTSTORE* certStore,
 	HCRYPTMSG* cryptMsg,
 	const void** context
-	);
+);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -46,7 +46,7 @@ cryptDecodeObject(
 	const void* p,
 	size_t size,
 	dword_t flags = 0
-	);
+);
 
 size_t
 cryptDecodeObject(
@@ -57,7 +57,7 @@ cryptDecodeObject(
 	const void* p,
 	size_t size,
 	dword_t flags = 0
-	);
+);
 
 //..............................................................................
 

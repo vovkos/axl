@@ -24,13 +24,11 @@ PcapFilter::compile(
 	const sl::StringRef& filter,
 	bool isOptimized,
 	uint32_t netMask
-	)
-{
+) {
 	free();
 
 	int result = ::pcap_compile(pcap, this, (char*)filter.sz(), isOptimized, netMask);
-	if (result == -1)
-	{
+	if (result == -1) {
 		err::setError(::pcap_geterr(pcap));
 		return false;
 	}
@@ -45,8 +43,7 @@ PcapFilter::compile(
 	const sl::StringRef& filter,
 	bool isOptimized,
 	uint32_t netMask
-	)
-{
+) {
 	Pcap pcap;
 
 	return
@@ -58,10 +55,8 @@ bool
 PcapFilter::match(
 	const void* p,
 	size_t size
-	)
-{
-	pcap_pkthdr hdr =
-	{
+) {
+	pcap_pkthdr hdr = {
 		{ 0 }, // timestamp doesn't matter
 		size,
 		size

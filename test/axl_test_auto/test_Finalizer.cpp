@@ -18,23 +18,19 @@ namespace {
 
 class MyFinalizer:
 	public rc::RefCount,
-	public g::Finalizer
-{
+	public g::Finalizer {
 public:
-	MyFinalizer()
-	{
+	MyFinalizer() {
 		printf("MyFinalizer::MyFinalizer (this = %p)\n", this);
 	}
 
-	~MyFinalizer()
-	{
+	~MyFinalizer() {
 		printf("MyFinalizer::~MyFinalizer (this = %p)\n", this);
 	}
 
 	virtual
 	void
-	finalize()
-	{
+	finalize() {
 		printf("MyFinalizer::finalize (this = %p)\n", this);
 	}
 };
@@ -42,8 +38,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-run()
-{
+run() {
 	rc::Ptr<MyFinalizer> fin = AXL_RC_NEW(MyFinalizer);
 	g::getModule()->addFinalizer(fin);
 }

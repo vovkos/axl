@@ -20,27 +20,21 @@ namespace cry {
 
 //..............................................................................
 
-class FreeX509
-{
+class FreeX509 {
 public:
 	void
-	operator () (X509* cert)
-	{
+	operator () (X509* cert) {
 		::X509_free(cert);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class X509Cert: public sl::Handle<X509*, FreeX509>
-{
+class X509Cert: public sl::Handle<X509*, FreeX509> {
 public:
-	X509Cert()
-	{
-	}
+	X509Cert() {}
 
-	X509Cert(X509* cert)
-	{
+	X509Cert(X509* cert) {
 		attach(cert);
 	}
 
@@ -51,15 +45,14 @@ public:
 	loadDer(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	saveDer(sl::Array<char>* buffer) const;
 
 	inline
 	sl::Array<char>
-	saveDer() const
-	{
+	saveDer() const {
 		sl::Array<char> buffer;
 		saveDer(&buffer);
 		return buffer;
@@ -69,12 +62,11 @@ public:
 	loadPem(
 		const void* p,
 		size_t size
-		);
+	);
 
 	inline
 	bool
-	loadPem(const sl::StringRef& string)
-	{
+	loadPem(const sl::StringRef& string) {
 		return loadPem(string.cp(), string.getLength());
 	}
 
@@ -83,8 +75,7 @@ public:
 
 	inline
 	sl::String
-	savePem() const
-	{
+	savePem() const {
 		sl::String string;
 		savePem(&string);
 		return string;
@@ -93,27 +84,21 @@ public:
 
 //..............................................................................
 
-class FreeX509Store
-{
+class FreeX509Store {
 public:
 	void
-	operator () (X509_STORE* store)
-	{
+	operator () (X509_STORE* store) {
 		::X509_STORE_free(store);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class X509Store: public sl::Handle<X509_STORE*, FreeX509Store>
-{
+class X509Store: public sl::Handle<X509_STORE*, FreeX509Store> {
 public:
-	X509Store()
-	{
-	}
+	X509Store() {}
 
-	X509Store(X509_STORE* store)
-	{
+	X509Store(X509_STORE* store) {
 		attach(store);
 	}
 

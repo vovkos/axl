@@ -20,20 +20,17 @@ namespace xml {
 
 //..............................................................................
 
-class FreeExpatParser
-{
+class FreeExpatParser {
 public:
 	void
-	operator () (XML_Parser h)
-	{
+	operator () (XML_Parser h) {
 		::XML_ParserFree(h);
 	}
 };
 
 //..............................................................................
 
-class ExpatParserRoot: public sl::Handle<XML_Parser, FreeExpatParser>
-{
+class ExpatParserRoot: public sl::Handle<XML_Parser, FreeExpatParser> {
 public:
 	// creation methods
 
@@ -44,58 +41,50 @@ public:
 	createNs(
 		const sl::StringRef& encoding,
 		char separator
-		);
+	);
 
 	bool
-	createNs(char separator)
-	{
+	createNs(char separator) {
 		return createNs(NULL, separator);
 	}
 
 	// informational methods
 
 	XML_Error
-	getLastErrorCode() const
-	{
+	getLastErrorCode() const {
 		return ::XML_GetErrorCode(m_h);
 	}
 
 	err::Error
-	getLastError() const
-	{
+	getLastError() const {
 		XML_Error errorCode = getLastErrorCode();
 		return errorCode ? (err::Error)ExpatError(errorCode) : (err::Error) &err::g_noError;
 	}
 
 	int
-	getLineNumber() const
-	{
+	getLineNumber() const {
 		return ::XML_GetCurrentLineNumber(m_h);
 	}
 
 	int
-	getColumnNumber() const
-	{
+	getColumnNumber() const {
 		return ::XML_GetCurrentColumnNumber(m_h);
 	}
 
 	size_t
-	getByteOffset() const
-	{
+	getByteOffset() const {
 		return ::XML_GetCurrentByteIndex(m_h);
 	}
 
 	// handlers
 
 	void*
-	getUserData()
-	{
+	getUserData() {
 		return XML_GetUserData(m_h);
 	}
 
 	void
-	setUserData(void* userData)
-	{
+	setUserData(void* userData) {
 		::XML_SetUserData(m_h, userData);
 	}
 
@@ -103,38 +92,32 @@ public:
 	setElementHandler(
 		XML_StartElementHandler startHandler,
 		XML_EndElementHandler endHandler
-		)
-	{
+	) {
 		::XML_SetElementHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartElementHandler(XML_StartElementHandler handler)
-	{
+	setStartElementHandler(XML_StartElementHandler handler) {
 		::XML_SetStartElementHandler(m_h, handler);
 	}
 
 	void
-	setEndElementHandler(XML_EndElementHandler handler)
-	{
+	setEndElementHandler(XML_EndElementHandler handler) {
 		::XML_SetEndElementHandler(m_h, handler);
 	}
 
 	void
-	setCharacterDataHandler(XML_CharacterDataHandler handler)
-	{
+	setCharacterDataHandler(XML_CharacterDataHandler handler) {
 		::XML_SetCharacterDataHandler(m_h, handler);
 	}
 
 	void
-	setProcessingInstructionHandler(XML_ProcessingInstructionHandler handler)
-	{
+	setProcessingInstructionHandler(XML_ProcessingInstructionHandler handler) {
 		::XML_SetProcessingInstructionHandler(m_h, handler);
 	}
 
 	void
-	setCommentHandler(XML_CommentHandler handler)
-	{
+	setCommentHandler(XML_CommentHandler handler) {
 		::XML_SetCommentHandler(m_h, handler);
 	}
 
@@ -142,32 +125,27 @@ public:
 	setCdataSectionHandler(
 		XML_StartCdataSectionHandler startHandler,
 		XML_EndCdataSectionHandler endHandler
-		)
-	{
+	) {
 		::XML_SetCdataSectionHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartCdataSectionHandler(XML_StartCdataSectionHandler handler)
-	{
+	setStartCdataSectionHandler(XML_StartCdataSectionHandler handler) {
 		::XML_SetStartCdataSectionHandler(m_h, handler);
 	}
 
 	void
-	setEndCdataSectionHandler(XML_EndCdataSectionHandler handler)
-	{
+	setEndCdataSectionHandler(XML_EndCdataSectionHandler handler) {
 		::XML_SetEndCdataSectionHandler(m_h, handler);
 	}
 
 	void
-	setDefaultHandler(XML_DefaultHandler handler)
-	{
+	setDefaultHandler(XML_DefaultHandler handler) {
 		::XML_SetDefaultHandler(m_h, handler);
 	}
 
 	void
-	setDefaultHandlerExpand(XML_DefaultHandler handler)
-	{
+	setDefaultHandlerExpand(XML_DefaultHandler handler) {
 		::XML_SetDefaultHandlerExpand(m_h, handler);
 	}
 
@@ -175,26 +153,22 @@ public:
 	setDoctypeDeclHandler(
 		XML_StartDoctypeDeclHandler startHandler,
 		XML_EndDoctypeDeclHandler endHandler
-		)
-	{
+	) {
 		::XML_SetDoctypeDeclHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartDoctypeDeclHandler(XML_StartDoctypeDeclHandler handler)
-	{
+	setStartDoctypeDeclHandler(XML_StartDoctypeDeclHandler handler) {
 		::XML_SetStartDoctypeDeclHandler(m_h, handler);
 	}
 
 	void
-	setEndDoctypeDeclHandler(XML_EndDoctypeDeclHandler handler)
-	{
+	setEndDoctypeDeclHandler(XML_EndDoctypeDeclHandler handler) {
 		::XML_SetEndDoctypeDeclHandler(m_h, handler);
 	}
 
 	void
-	setNotationDeclHandler(XML_NotationDeclHandler handler)
-	{
+	setNotationDeclHandler(XML_NotationDeclHandler handler) {
 		::XML_SetNotationDeclHandler(m_h, handler);
 	}
 
@@ -202,32 +176,27 @@ public:
 	setNamespaceDeclHandler(
 		XML_StartNamespaceDeclHandler startHandler,
 		XML_EndNamespaceDeclHandler endHandler
-		)
-	{
+	) {
 		::XML_SetNamespaceDeclHandler(m_h, startHandler, endHandler);
 	}
 
 	void
-	setStartNamespaceDeclHandler(XML_StartNamespaceDeclHandler handler)
-	{
+	setStartNamespaceDeclHandler(XML_StartNamespaceDeclHandler handler) {
 		::XML_SetStartNamespaceDeclHandler(m_h, handler);
 	}
 
 	void
-	setEndNamespaceDeclHandler(XML_EndNamespaceDeclHandler handler)
-	{
+	setEndNamespaceDeclHandler(XML_EndNamespaceDeclHandler handler) {
 		::XML_SetEndNamespaceDeclHandler(m_h, handler);
 	}
 
 	void
-	setNotStandaloneHandler(XML_NotStandaloneHandler handler)
-	{
+	setNotStandaloneHandler(XML_NotStandaloneHandler handler) {
 		::XML_SetNotStandaloneHandler(m_h, handler);
 	}
 
 	void
-	setUnknownEncodingHandler(XML_UnknownEncodingHandler handler)
-	{
+	setUnknownEncodingHandler(XML_UnknownEncodingHandler handler) {
 		::XML_SetUnknownEncodingHandler(m_h, handler, getUserData());
 	}
 
@@ -238,8 +207,7 @@ public:
 		const void* p,
 		size_t size,
 		bool isFinal
-		)
-	{
+	) {
 		XML_Status status = ::XML_Parse(m_h, (const char*) p, size, isFinal);
 		return complete(status == XML_STATUS_OK, false);
 	}
@@ -248,8 +216,7 @@ public:
 	parseBuffer(
 		size_t size,
 		bool isFinal
-		)
-	{
+	) {
 		XML_Status status = ::XML_ParseBuffer(m_h, size, isFinal);
 		return complete(status == XML_STATUS_OK, false);
 	}
@@ -258,11 +225,10 @@ public:
 	parseFile(
 		const sl::StringRef& fileName,
 		size_t blockSize = -1
-		);
+	);
 
 	void*
-	getBuffer(size_t size)
-	{
+	getBuffer(size_t size) {
 		void* p = ::XML_GetBuffer(m_h, size);
 		return complete<void*> (p, NULL);
 	}
@@ -273,8 +239,7 @@ protected:
 	complete(
 		T result,
 		T failResult
-		)
-	{
+	) {
 		if (result == failResult)
 			err::setError(getLastError());
 
@@ -285,17 +250,14 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class ExpatParser: public ExpatParserRoot
-{
+class ExpatParser: public ExpatParserRoot {
 public:
-	ExpatParser()
-	{
+	ExpatParser() {
 		create();
 	}
 
 	bool
-	create(const sl::StringRef& encoding = NULL)
-	{
+	create(const sl::StringRef& encoding = NULL) {
 		return ExpatParserRoot::create(encoding) && setHandlers();
 	}
 
@@ -303,14 +265,12 @@ public:
 	createNs(
 		const sl::StringRef& encoding,
 		char separator
-		)
-	{
+	) {
 		return ExpatParserRoot::createNs(encoding, separator) && setHandlers();
 	}
 
 	bool
-	createNs(char separator)
-	{
+	createNs(char separator) {
 		return ExpatParserRoot::createNs(separator) && setHandlers();
 	}
 
@@ -321,61 +281,43 @@ protected:
 	onStartElement(
 		const char* name,
 		const char** attributes
-		)
-	{
-	}
+	) {}
 
 	void
-	onEndElement(const char* name)
-	{
-	}
+	onEndElement(const char* name) {}
 
 	void
 	onCharacterData(
 		const char* string,
 		size_t length
-		)
-	{
-	}
+	) {}
 
 	void
 	onProcessingInstruction(
 		const char* target,
 		const char* data
-		)
-	{
-	}
+	) {}
 
 	void
-	onComment(const char* data)
-	{
-	}
+	onComment(const char* data) {}
 
 	void
-	onStartCdataSection()
-	{
-	}
+	onStartCdataSection() {}
 
 	void
-	onEndCdataSection()
-	{
-	}
+	onEndCdataSection() {}
 
 	void
 	onDefault(
 		const char* string,
 		size_t length
-		)
-	{
-	}
+	) {}
 
 	void
 	onDefaultExpand(
 		const char* string,
 		size_t length
-		)
-	{
-	}
+	) {}
 
 	void
 	onStartDoctypeDecl(
@@ -383,14 +325,10 @@ protected:
 		const char* systemId,
 		const char* publicId,
 		bool hasInternalSubset
-		)
-	{
-	}
+	) {}
 
 	void
-	onEndDoctypeDecl()
-	{
-	}
+	onEndDoctypeDecl() {}
 
 	void
 	onNotationDecl(
@@ -398,26 +336,19 @@ protected:
 		const char* base,
 		const char* systemId,
 		const char* publicId
-		)
-	{
-	}
+	) {}
 
 	void
 	onStartNamespaceDecl(
 		const char* prefix,
 		const char* uri
-		)
-	{
-	}
+	) {}
 
 	void
-	onEndNamespaceDecl(const char* prefix)
-	{
-	}
+	onEndNamespaceDecl(const char* prefix) {}
 
 	bool
-	onNotStandalone()
-	{
+	onNotStandalone() {
 		return false;
 	}
 
@@ -425,15 +356,13 @@ protected:
 	onUnknownEncoding(
 		const char* name,
 		XML_Encoding* encoding
-		)
-	{
+	) {
 		return false;
 	}
 
 protected:
 	bool
-	setHandlers()
-	{
+	setHandlers() {
 		setUserData(static_cast<T*>(this));
 
 		if (&T::onStartElement != &ExpatParser::onStartElement)
@@ -493,8 +422,7 @@ protected:
 		void* userData,
 		const XML_Char* name,
 		const XML_Char** attributes
-		)
-	{
+	) {
 		((T*)userData)->onStartElement(name, attributes);
 	}
 
@@ -504,8 +432,7 @@ protected:
 	endElementHandler(
 		void* userData,
 		const XML_Char* name
-		)
-	{
+	) {
 		((T*)userData)->onEndElement(name);
 	}
 
@@ -516,8 +443,7 @@ protected:
 		void* userData,
 		const XML_Char* string,
 		int length
-		)
-	{
+	) {
 		((T*)userData)->onCharacterData(string, length);
 	}
 
@@ -528,8 +454,7 @@ protected:
 		void* userData,
 		const XML_Char* target,
 		const XML_Char* data
-		)
-	{
+	) {
 		((T*)userData)->onProcessingInstruction(target, data);
 	}
 
@@ -539,24 +464,21 @@ protected:
 	commentHandler(
 		void* userData,
 		const XML_Char* data
-		)
-	{
+	) {
 		((T*)userData)->onComment(data);
 	}
 
 	static
 	void
 	XMLCALL
-	startCdataSectionHandler(void* userData)
-	{
+	startCdataSectionHandler(void* userData) {
 		((T*)userData)->onStartCdataSection();
 	}
 
 	static
 	void
 	XMLCALL
-	endCdataSectionHandler(void* userData)
-	{
+	endCdataSectionHandler(void* userData) {
 		((T*)userData)->onEndCdataSection();
 	}
 
@@ -567,8 +489,7 @@ protected:
 		void* userData,
 		const XML_Char* string,
 		int length
-		)
-	{
+	) {
 		((T*)userData)->onDefault(string, length);
 	}
 
@@ -579,8 +500,7 @@ protected:
 		void* userData,
 		const XML_Char* string,
 		int length
-		)
-	{
+	) {
 		((T*)userData)->onDefaultExpand(string, length);
 	}
 
@@ -593,16 +513,14 @@ protected:
 		const XML_Char* systemId,
 		const XML_Char* publicId,
 		int hasInternalSubset
-		)
-	{
+	) {
 		((T*)userData)->onStartDoctypeDecl(doctypeName, systemId, publicId, hasInternalSubset != 0);
 	}
 
 	static
 	void
 	XMLCALL
-	endDoctypeDeclHandler(void* userData)
-	{
+	endDoctypeDeclHandler(void* userData) {
 		((T*)userData)->onEndDoctypeDecl();
 	}
 
@@ -615,8 +533,7 @@ protected:
 		const XML_Char* base,
 		const XML_Char* systemId,
 		const XML_Char* publicId
-		)
-	{
+	) {
 		((T*)userData)->onNotationDecl(notationName, base, systemId, publicId);
 	}
 
@@ -627,8 +544,7 @@ protected:
 		void* userData,
 		const XML_Char* prefix,
 		const XML_Char* uri
-		)
-	{
+	) {
 		((T*)userData)->onStartNamespaceDecl(prefix, uri);
 	}
 
@@ -638,16 +554,14 @@ protected:
 	endNamespaceDeclHandler(
 		void* userData,
 		const XML_Char* prefix
-		)
-	{
+	) {
 		((T*)userData)->onEndNamespaceDecl(prefix);
 	}
 
 	static
 	int
 	XMLCALL
-	notStandaloneHandler(void* userData)
-	{
+	notStandaloneHandler(void* userData) {
 		return ((T*)userData)->onNotStandalone();
 	}
 
@@ -658,8 +572,7 @@ protected:
 		void* userData,
 		const XML_Char* name,
 		XML_Encoding* encoding
-		)
-	{
+	) {
 		return ((T*)userData)->onUnknownEncoding(name, encoding);
 	}
 };

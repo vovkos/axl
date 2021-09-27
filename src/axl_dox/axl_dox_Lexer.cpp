@@ -19,8 +19,7 @@ namespace dox {
 //..............................................................................
 
 sl::StringRef
-Lexer::getCommandParam()
-{
+Lexer::getCommandParam() {
 	const DoxyToken* commandToken = getToken();
 	const DoxyToken* nextToken = getToken(1);
 
@@ -36,16 +35,14 @@ Lexer::createTextToken(
 	TokenKind tokenKind,
 	size_t left,
 	size_t right
-	)
-{
+) {
 	Token* token = createToken(tokenKind);
 	token->m_data.m_string = sl::StringRef(ts + left, te - ts - left - right);
 	return token;
 }
 
 DoxyToken*
-Lexer::createCustomCommandParamToken()
-{
+Lexer::createCustomCommandParamToken() {
 	size_t length = te - ts;
 	if (*(te - 1) == '}')
 		length--;
@@ -56,8 +53,7 @@ Lexer::createCustomCommandParamToken()
 }
 
 DoxyToken*
-Lexer::createNewLineToken()
-{
+Lexer::createNewLineToken() {
 	ASSERT(*ts == '\n');
 
 	Token* token = createToken('\n');

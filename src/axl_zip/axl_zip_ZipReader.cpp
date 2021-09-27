@@ -23,8 +23,7 @@ FILE*
 mz_fopen(
 	const char* fileName,
 	const char* mode
-	)
-{
+) {
 	FILE* file = NULL;
 	_wfopen_s(&file, axl::sl::String_w(fileName), axl::sl::String_w(mode) + L'N');
 	return file;
@@ -36,8 +35,7 @@ mz_freopen(
 	const char* path,
 	const char* mode,
 	FILE* stream
-	)
-{
+) {
 	FILE* file = NULL;
 	if (_wfreopen_s(&file, axl::sl::String_w(path), axl::sl::String_w(mode) + L'N', stream))
 		return NULL;
@@ -60,8 +58,7 @@ namespace zip {
 //..............................................................................
 
 void
-ZipReader::close()
-{
+ZipReader::close() {
 	if (!m_zip)
 		return;
 
@@ -71,8 +68,7 @@ ZipReader::close()
 }
 
 bool
-ZipReader::openFile(const sl::StringRef& fileName)
-{
+ZipReader::openFile(const sl::StringRef& fileName) {
 	close();
 
 	m_zip = AXL_MEM_ZERO_NEW(mz_zip_archive);
@@ -84,8 +80,7 @@ bool
 ZipReader::openMem(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	close();
 
 	m_zip = AXL_MEM_ZERO_NEW(mz_zip_archive);
@@ -94,15 +89,13 @@ ZipReader::openMem(
 }
 
 size_t
-ZipReader::getFileCount()
-{
+ZipReader::getFileCount() {
 	ASSERT(isOpen());
 	return mz_zip_reader_get_num_files(m_zip);
 }
 
 sl::String
-ZipReader::getFileName(size_t index)
-{
+ZipReader::getFileName(size_t index) {
 	ASSERT(isOpen());
 	size_t size = mz_zip_reader_get_filename(m_zip, index, NULL, 0);
 
@@ -118,8 +111,7 @@ ZipReader::getFileInfo(
 	size_t index,
 	ZipFileInfo* fileInfo,
 	sl::String* comment
-	)
-{
+) {
 	ASSERT(isOpen());
 
 	mz_zip_archive_file_stat stat;
@@ -147,15 +139,13 @@ ZipReader::getFileInfo(
 }
 
 bool
-ZipReader::isDirectoryFile(size_t index)
-{
+ZipReader::isDirectoryFile(size_t index) {
 	ASSERT(isOpen());
 	return mz_zip_reader_is_file_a_directory(m_zip, index) != 0;
 }
 
 bool
-ZipReader::isFileEncrypted(size_t index)
-{
+ZipReader::isFileEncrypted(size_t index) {
 	ASSERT(isOpen());
 	return mz_zip_reader_is_file_encrypted(m_zip, index) != 0;
 }
@@ -165,8 +155,7 @@ ZipReader::extractFileToMem(
 	size_t index,
 	void* p,
 	size_t size
-	)
-{
+) {
 	ASSERT(isOpen());
 
 	char readBuffer[1024];
@@ -178,7 +167,7 @@ ZipReader::extractFileToMem(
 		0,
 		readBuffer,
 		sizeof(readBuffer)
-		);
+	);
 
 	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }
@@ -187,8 +176,7 @@ bool
 ZipReader::extractFileToMem(
 	size_t index,
 	sl::Array<char>* buffer
-	)
-{
+) {
 	ASSERT(isOpen());
 
 	mz_zip_archive_file_stat stat;
@@ -209,8 +197,7 @@ bool
 ZipReader::extractFileToFile(
 	size_t index,
 	const sl::StringRef& fileName
-	)
-{
+) {
 	ASSERT(isOpen());
 
 	mz_bool result = mz_zip_reader_extract_to_file(
@@ -218,7 +205,7 @@ ZipReader::extractFileToFile(
 		index,
 		fileName.sz(),
 		0
-		);
+	);
 
 	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }

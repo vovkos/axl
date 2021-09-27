@@ -21,8 +21,7 @@ uint16_t
 checksum16(
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	ushort_t* p = (ushort_t*)_p;
 	uchar_t* last = (uchar_t*)_p + size - 1;
 

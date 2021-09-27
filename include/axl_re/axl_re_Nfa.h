@@ -20,8 +20,7 @@ namespace re {
 
 //..............................................................................
 
-enum MatchConditionKind
-{
+enum MatchConditionKind {
 	MatchConditionKind_Undefined,
 	MatchConditionKind_Char,
 	MatchConditionKind_CharSet,
@@ -30,8 +29,7 @@ enum MatchConditionKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct MatchCondition
-{
+struct MatchCondition {
 	MatchConditionKind m_conditionKind;
 	sl::BitMap m_charSet;
 	uint_t m_char;
@@ -47,8 +45,7 @@ struct MatchCondition
 
 //..............................................................................
 
-enum NfaStateFlag
-{
+enum NfaStateFlag {
 	NfaStateFlag_Match          = 0x0001,
 	NfaStateFlag_EpsilonLink    = 0x0002,
 	NfaStateFlag_Accept         = 0x0004,
@@ -60,8 +57,7 @@ enum NfaStateFlag
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct NfaState: sl::ListLink
-{
+struct NfaState: sl::ListLink {
 	uint_t m_id;
 	uint_t m_flags;
 	void* m_acceptContext;
@@ -80,19 +76,18 @@ struct NfaState: sl::ListLink
 	createEpsilonLink(
 		NfaState* outState,
 		NfaState* outState2
-		);
+	);
 
 	void
 	createCharMatch(
 		uint_t c,
 		NfaState* outState
-		);
+	);
 };
 
 //..............................................................................
 
-struct NfaStateSet
-{
+struct NfaStateSet {
 	sl::Array<NfaState*> m_stateArray;
 	sl::BitMap m_stateSet;
 
@@ -100,20 +95,17 @@ struct NfaStateSet
 	addState(NfaState* state);
 
 	int
-	cmp(const NfaStateSet& set) const
-	{
+	cmp(const NfaStateSet& set) const {
 		return m_stateSet.cmp(set.m_stateSet);
 	}
 
 	bool
-	isEqual(const NfaStateSet& set) const
-	{
+	isEqual(const NfaStateSet& set) const {
 		return m_stateSet.isEqual(set.m_stateSet);
 	}
 
 	size_t
-	hash() const
-	{
+	hash() const {
 		return m_stateSet.hash();
 	}
 };
@@ -126,22 +118,19 @@ class NfaStateSetMap: public sl::HashTable<
 	T,
 	sl::HashDuckType<NfaStateSet>,
 	sl::EqDuckType<NfaStateSet>
-	>
-{
+> {
 };
 
 //..............................................................................
 
-struct NfaTransition: sl::ListLink
-{
+struct NfaTransition: sl::ListLink {
 	MatchCondition m_matchCondition;
 	NfaStateSet m_outStateSet;
 };
 
 //..............................................................................
 
-class NfaTransitionMgr
-{
+class NfaTransitionMgr {
 protected:
 	sl::List<NfaTransition> m_transitionList;
 	NfaTransition* m_transitionMap[256];
@@ -153,8 +142,7 @@ public:
 	clear();
 
 	sl::ConstList<NfaTransition>
-	getTransitionList()
-	{
+	getTransitionList() {
 		return m_transitionList;
 	}
 
@@ -169,13 +157,13 @@ protected:
 	addMatchCharTransition(
 		uint_t c,
 		NfaState* outState
-		);
+	);
 
 	void
 	addMatchCharSetTransition(
 		const sl::BitMap* charSet,
 		NfaState* outState
-		);
+	);
 
 	void
 	addMatchAnyTransition(NfaState* outState);

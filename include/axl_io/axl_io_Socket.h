@@ -28,8 +28,7 @@ namespace io {
 
 //..............................................................................
 
-enum SocketShutdownKind
-{
+enum SocketShutdownKind {
 #if (_AXL_OS_WIN)
 	SocketShutdownKind_Recv = SD_RECEIVE,
 	SocketShutdownKind_Send = SD_SEND,
@@ -43,8 +42,7 @@ enum SocketShutdownKind
 
 //..............................................................................
 
-class Socket
-{
+class Socket {
 public:
 #if (_AXL_OS_WIN)
 	win::Socket m_socket;
@@ -54,8 +52,7 @@ public:
 
 public:
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_socket.isOpen();
 	}
 
@@ -64,56 +61,47 @@ public:
 		int addressFamily,
 		int sockKind,
 		int protocol
-		)
-	{
+	) {
 		return m_socket.open(addressFamily, sockKind, protocol);
 	}
 
 	void
-	close()
-	{
+	close() {
 		m_socket.close();
 	}
 
 	int
-	getError()
-	{
+	getError() {
 		return m_socket.getError();
 	}
 
 	bool
-	setBlockingMode(bool isBlocking)
-	{
+	setBlockingMode(bool isBlocking) {
 		return m_socket.setBlockingMode(isBlocking);
 	}
 
 	size_t
-	getIncomingDataSize()
-	{
+	getIncomingDataSize() {
 		return m_socket.getIncomingDataSize();
 	}
 
 	bool
-	bind(const sockaddr* addr)
-	{
+	bind(const sockaddr* addr) {
 		return m_socket.bind(addr);
 	}
 
 	bool
-	bind(const SockAddr& addr)
-	{
+	bind(const SockAddr& addr) {
 		return m_socket.bind(addr);
 	}
 
 	bool
-	getAddress(SockAddr* addr)
-	{
+	getAddress(SockAddr* addr) {
 		return m_socket.getAddress(addr);
 	}
 
 	bool
-	getPeerAddress(SockAddr* addr)
-	{
+	getPeerAddress(SockAddr* addr) {
 		return m_socket.getPeerAddress(addr);
 	}
 
@@ -123,8 +111,7 @@ public:
 		int option,
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		return m_socket.getOption(level, option, p, size);
 	}
 
@@ -134,14 +121,12 @@ public:
 		int option,
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return m_socket.setOption(level, option, p, size);
 	}
 
 	bool
-	listen(size_t backLog)
-	{
+	listen(size_t backLog) {
 		return m_socket.listen(backLog);
 	}
 
@@ -149,23 +134,20 @@ public:
 	accept(
 		Socket* socket,
 		SockAddr* addr = NULL
-		);
+	);
 
 	bool
-	connect(const sockaddr* addr)
-	{
+	connect(const sockaddr* addr) {
 		return m_socket.connect(addr);
 	}
 
 	bool
-	connect(const SockAddr& addr)
-	{
+	connect(const SockAddr& addr) {
 		return m_socket.connect(addr);
 	}
 
 	bool
-	shutdown(SocketShutdownKind shutdownKind = SocketShutdownKind_All)
-	{
+	shutdown(SocketShutdownKind shutdownKind = SocketShutdownKind_All) {
 		return m_socket.shutdown(shutdownKind);
 	}
 
@@ -173,8 +155,7 @@ public:
 	send(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return m_socket.send(p, size);
 	}
 
@@ -182,8 +163,7 @@ public:
 	recv(
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		return m_socket.recv(p, size);
 	}
 
@@ -192,8 +172,7 @@ public:
 		void* p,
 		size_t size,
 		const sockaddr* addr
-		)
-	{
+	) {
 		return m_socket.sendTo(p, size, addr);
 	}
 
@@ -202,8 +181,7 @@ public:
 		void* p,
 		size_t size,
 		const SockAddr& addr
-		)
-	{
+	) {
 		return m_socket.sendTo(p, size, addr);
 	}
 
@@ -212,8 +190,7 @@ public:
 		void* p,
 		size_t size,
 		SockAddr* addr
-		)
-	{
+	) {
 		return m_socket.recvFrom(p, size, addr);
 	}
 };

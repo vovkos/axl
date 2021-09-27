@@ -16,13 +16,13 @@ if(LINUX)
 			BUILD_AXL_SYS_LNX_LIBUDEV
 			"Build LibUdev wrappers for axl_core library"
 			ON
-			)
+		)
 
 		option(
 			BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API
 			"Build wrappers for new functions in LibUdev(e.g. udev_device_get_sysattr_value)"
 			OFF
-			)
+		)
 
 		if(BUILD_AXL_SYS_LNX_LIBUDEV)
 			add_definitions(-D_AXL_SYS_LNX_LIBUDEV=1)
@@ -45,7 +45,7 @@ if(WIN32)
 		BUILD_AXL_GUI_GDI
 		"Build GDI drivers for axl_gui library"
 		OFF
-		)
+	)
 endif()
 
 if(QT_FOUND)
@@ -53,7 +53,7 @@ if(QT_FOUND)
 		BUILD_AXL_GUI_QT
 		"Build QT drivers for axl_gui library"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_GUI_QT CACHE)
 endif()
@@ -62,7 +62,7 @@ option(
 	BUILD_AXL_GUI
 	"Build axl_gui library"
 	ON
-	)
+)
 
 if(BUILD_AXL_GUI)
 	add_subdirectory(axl_gui)
@@ -75,7 +75,7 @@ if(RAGEL_FOUND)
 		BUILD_AXL_INI
 		"Build axl_ini library"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_INI CACHE)
 endif()
@@ -91,7 +91,7 @@ if(RAGEL_FOUND)
 		BUILD_AXL_DOX
 		"Build axl_dox library (Doxygen comment processor)"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_DOX CACHE)
 endif()
@@ -107,7 +107,7 @@ if(EXPAT_FOUND)
 		BUILD_AXL_XML
 		"Build axl_xml library (Expat XML Parser wrappers)"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_XML CACHE)
 endif()
@@ -122,7 +122,7 @@ option(
 	BUILD_AXL_RE
 	"Build axl_re library (regular expressions)"
 	ON
-	)
+)
 
 if(BUILD_AXL_RE)
 	add_subdirectory(axl_re)
@@ -134,7 +134,7 @@ option(
 	BUILD_AXL_IO
 	"Build axl_io library"
 	ON
-	)
+)
 
 if(BUILD_AXL_IO)
 	add_subdirectory(axl_io)
@@ -147,7 +147,7 @@ if(PCAP_FOUND)
 		BUILD_AXL_IO_PCAP
 		"Build axl_io_pcap library (Pcap wrappers)"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_IO_PCAP CACHE)
 endif()
@@ -163,7 +163,7 @@ if(LIBUSB_FOUND)
 		BUILD_AXL_IO_USB
 		"Build axl_io_usb library (LibUSB wrappers)"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_IO_USB CACHE)
 endif()
@@ -179,7 +179,7 @@ if(OPENSSL_FOUND)
 		BUILD_AXL_IO_SSL
 		"Build axl_io_ssl library (OpenSSL libssl wrappers)"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_IO_SSL CACHE)
 endif()
@@ -194,7 +194,7 @@ option(
 	BUILD_AXL_LEX
 	"Build axl_lex library"
 	ON
-	)
+)
 
 if(BUILD_AXL_LEX)
 	add_subdirectory(axl_lex)
@@ -207,7 +207,7 @@ if(LUA_FOUND)
 		BUILD_AXL_LUA
 		"Build axl_lua library"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_LUA CACHE)
 endif()
@@ -223,7 +223,7 @@ if(RAGEL_FOUND AND LUA_FOUND)
 		BUILD_AXL_ST
 		"Build axl_st library (string templates)"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_ST CACHE)
 endif()
@@ -238,7 +238,7 @@ option(
 	BUILD_AXL_ZIP
 	"Build axl_zip library (miniz wrapper)"
 	ON
-	)
+)
 
 if(BUILD_AXL_ZIP)
 	add_subdirectory(axl_zip)
@@ -251,7 +251,7 @@ if(OPENSSL_FOUND)
 		BUILD_AXL_CRY
 		"Build axl_cry library (OpenSSL libcrypto wrappers)"
 		ON
-		)
+	)
 else()
 	unset(BUILD_AXL_CRY CACHE)
 endif()
@@ -267,19 +267,19 @@ if(APPLE)
 		BUILD_AXL_CF
 		"Build axl_cf library (Core Foundation Framework wrappers)"
 		ON
-		)
+	)
 
 	option(
 		BUILD_AXL_IOK
 		"Build axl_iok library (IOKit Framework wrappers)"
 		ON
-		)
+	)
 
 	option(
 		BUILD_AXL_SEC
 		"Build axl_sec library (Security Framework wrappers)"
 		ON
-		)
+	)
 
 	if(BUILD_AXL_CF)
 		add_subdirectory(axl_cf)
@@ -301,7 +301,7 @@ if("${TARGET_CPU}" MATCHES "x86|amd64")
 		BUILD_AXL_SPY
 		"Build axl_spy library (API spying engine)"
 		ON
-		)
+	)
 endif()
 
 if(BUILD_AXL_SPY)
@@ -316,7 +316,7 @@ if(MSVC)
 		"axl_core;axl_io"
 		CACHE STRING
 		"List of AXL libraries to build LIBCMT twins for"
-		)
+	)
 
 	add_subdirectory(axl_libcmt)
 endif()
@@ -328,7 +328,7 @@ if(OPENSSL_FOUND)
 		BUILD_AXL_SYS_CA
 		"Build axl_sys_ca library (code authentication)"
 		ON
-		)
+	)
 endif()
 
 if(BUILD_AXL_SYS_CA)

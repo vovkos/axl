@@ -22,30 +22,26 @@ namespace io {
 
 //..............................................................................
 
-enum SharedMemoryTransportConst
-{
+enum SharedMemoryTransportConst {
 	SharedMemoryTransportConst_FileSignature    = ':mhs',
 	SharedMemoryTransportConst_MessageSignature = ':sm\n',
 	SharedMemoryTransportConst_DefMappingSize   = 64 * 1024,   // 64 KB
 	SharedMemoryTransportConst_DefSizeLimitHint = 1024 * 1024, // 1 MB
 };
 
-enum SharedMemoryTransportState
-{
+enum SharedMemoryTransportState {
 	SharedMemoryTransportState_MasterConnected = 0x01,
 	SharedMemoryTransportState_SlaveConnected  = 0x02,
 	SharedMemoryTransportState_Disconnected    = 0x04,
 };
 
-enum SharedMemoryTransportFlag // should be combined with FileFlag
-{
+enum SharedMemoryTransportFlag { // should be combined with FileFlag
 	SharedMemoryTransportFlag_Message = 0x010000,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct SharedMemoryTransportHdr
-{
+struct SharedMemoryTransportHdr {
 	uint32_t m_signature;
 	uint32_t m_padding;
 	int32_t m_lock;
@@ -58,16 +54,14 @@ struct SharedMemoryTransportHdr
 	uint32_t m_dataSize;     // modified by both reader and writer
 };
 
-struct SharedMemoryTransportMessageHdr
-{
+struct SharedMemoryTransportMessageHdr {
 	uint32_t m_signature;
 	uint32_t m_size;
 };
 
 //..............................................................................
 
-class SharedMemoryTransportBase
-{
+class SharedMemoryTransportBase {
 protected:
 	uint_t m_flags;
 
@@ -82,27 +76,23 @@ protected:
 protected:
 	SharedMemoryTransportBase();
 
-	~SharedMemoryTransportBase()
-	{
+	~SharedMemoryTransportBase() {
 		close();
 	}
 
 public:
 	uint_t
-	getFlags()
-	{
+	getFlags() {
 		return m_flags;
 	}
 
 	const File*
-	getFile() const
-	{
+	getFile() const {
 		return &m_file;
 	}
 
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_hdr != NULL;
 	}
 
@@ -115,7 +105,7 @@ public:
 		const sl::StringRef& readSemaphoreName,
 		const sl::StringRef& writeSemaphoreName,
 		uint_t flags
-		);
+	);
 
 	bool
 	attach(
@@ -123,7 +113,7 @@ public:
 		const sl::StringRef& readSemaphoreName,
 		const sl::StringRef& writeSemaphoreName,
 		uint_t flags
-		);
+	);
 
 	void
 	disconnect();
@@ -137,8 +127,7 @@ protected:
 	initializeMapping(
 		size_t size,
 		bool isForced
-		)
-	{
+	) {
 		return ensureMappingSize(size);
 	}
 #else
@@ -146,30 +135,27 @@ protected:
 	initializeMapping(
 		size_t size,
 		bool isForced
-		);
+	);
 #endif
 
 	bool
 	ensureMappingSize(size_t size);
 
 	bool
-	ensureOffsetMapped(size_t offset)
-	{
+	ensureOffsetMapped(size_t offset) {
 		return ensureMappingSize(offset + sizeof(SharedMemoryTransportHdr));
 	}
 };
 
 //..............................................................................
 
-class SharedMemoryReader: public SharedMemoryTransportBase
-{
+class SharedMemoryReader: public SharedMemoryTransportBase {
 public:
 	size_t
 	read(sl::Array<char>* buffer);
 
 	sl::Array<char>
-	read()
-	{
+	read() {
 		sl::Array<char> buffer;
 		read(&buffer);
 		return buffer;
@@ -178,15 +164,13 @@ public:
 
 //..............................................................................
 
-class SharedMemoryWriter: public SharedMemoryTransportBase
-{
+class SharedMemoryWriter: public SharedMemoryTransportBase {
 protected:
 	size_t m_sizeLimitHint;
 	sys::Lock m_writeLock; // make write operations atomic
 
 public:
-	SharedMemoryWriter()
-	{
+	SharedMemoryWriter() {
 		m_sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint;
 	}
 
@@ -197,7 +181,7 @@ public:
 		const sl::StringRef& writeEventName,
 		uint_t flags,
 		size_t sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint
-		);
+	);
 
 	bool
 	attach(
@@ -206,14 +190,13 @@ public:
 		const sl::StringRef& writeEventName,
 		uint_t flags,
 		size_t sizeLimitHint = SharedMemoryTransportConst_DefSizeLimitHint
-		);
+	);
 
 	size_t
 	write(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return write(&p, &size, 1);
 	}
 
@@ -222,7 +205,7 @@ public:
 		const void* const* blockArray,
 		const size_t* sizeArray,
 		size_t count
-		);
+	);
 
 protected:
 	static
@@ -232,7 +215,7 @@ protected:
 		const void* const* blockArray,
 		const size_t* sizeArray,
 		size_t count
-		);
+	);
 };
 //..............................................................................
 

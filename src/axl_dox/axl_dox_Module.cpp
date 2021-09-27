@@ -19,8 +19,7 @@ namespace dox {
 //..............................................................................
 
 void
-Module::clear()
-{
+Module::clear() {
 	m_blockList.clear();
 	m_groupList.clear();
 	m_footnoteList.clear();
@@ -30,8 +29,7 @@ Module::clear()
 }
 
 Group*
-Module::getGroup(const sl::StringRef& name)
-{
+Module::getGroup(const sl::StringRef& name) {
 	sl::StringHashTableIterator<Group*> it = m_groupMap.visit(name);
 	if (it->m_value)
 		return it->m_value;
@@ -50,8 +48,7 @@ Module::getGroup(const sl::StringRef& name)
 }
 
 Block*
-Module::createBlock(handle_t item)
-{
+Module::createBlock(handle_t item) {
 	Block* block = AXL_MEM_NEW_ARGS(Block, (m_host));
 	block->m_item = item;
 	m_blockList.insertTail(block);
@@ -59,19 +56,16 @@ Module::createBlock(handle_t item)
 }
 
 Footnote*
-Module::createFootnote()
-{
+Module::createFootnote() {
 	Footnote* footnote = AXL_MEM_NEW_ARGS(Footnote, (m_host));
 	m_blockList.insertTail(footnote);
 	return footnote;
 }
 
 sl::String
-Module::adjustRefId(const sl::StringRef& refId)
-{
+Module::adjustRefId(const sl::StringRef& refId) {
 	sl::StringHashTableIterator<size_t> it = m_refIdMap.visit(refId);
-	if (!it->m_value) // no collisions
-	{
+	if (!it->m_value) { // no collisions
 		it->m_value = 2; // start with index 2
 		return refId;
 	}
@@ -89,8 +83,7 @@ Module::setBlockTarget(
 	int tokenKind,
 	const sl::StringRef& itemName,
 	size_t overloadIdx
-	)
-{
+) {
 	Target* target = AXL_MEM_NEW(Target);
 	target->m_block = block;
 	target->m_tokenKind = tokenKind;
@@ -100,18 +93,15 @@ Module::setBlockTarget(
 }
 
 bool
-Module::resolveBlockTargets()
-{
+Module::resolveBlockTargets() {
 	bool result = true;
 
 	sl::Iterator<Target> it = m_targetList.getHead();
-	for (; it; it++)
-	{
+	for (; it; it++) {
 		Target* target = *it;
 
 		handle_t item = m_host->findItem(target->m_itemName, target->m_overloadIdx);
-		if (!item)
-		{
+		if (!item) {
 			result = false;
 			continue;
 		}
@@ -132,21 +122,17 @@ Module::resolveBlockTargets()
 }
 
 void
-Module::deleteEmptyGroups()
-{
+Module::deleteEmptyGroups() {
 	bool isGroupDeleted;
 
-	do
-	{
+	do {
 		isGroupDeleted = false;
 
 		sl::Iterator<Group> groupIt = m_groupList.getHead();
-		while (groupIt)
-		{
+		while (groupIt) {
 			sl::Iterator<Group> nextIt = groupIt.getNext();
 
-			if (groupIt->isEmpty())
-			{
+			if (groupIt->isEmpty()) {
 				if (groupIt->m_group)
 					groupIt->m_group->m_groupList.remove(groupIt->m_parentGroupListIt);
 
@@ -165,8 +151,7 @@ Module::generateDocumentation(
 	const sl::StringRef& outputDir,
 	const sl::StringRef& indexFileName,
 	const sl::StringRef& globalNamespaceFileName
-	)
-{
+) {
 	static char indexFileHdr[] =
 		"<?xml version='1.0' encoding='UTF-8' standalone='no'?>\n"
 		"<doxygenindex>\n";
@@ -186,8 +171,7 @@ Module::generateDocumentation(
 		return false;
 
 	result = resolveBlockTargets();
-	if (!result)
-	{
+	if (!result) {
 		// generate a warning about orphan doxy blocks?
 	}
 
@@ -198,8 +182,7 @@ Module::generateDocumentation(
 	if (!result)
 		return false;
 
-	if (nspaceXml.isEmpty())
-	{
+	if (nspaceXml.isEmpty()) {
 		err::setError("module does not contain any documentable items");
 		return false;
 	}
@@ -228,8 +211,7 @@ bool
 Module::generateGroupDocumentation(
 	const sl::StringRef& outputDir,
 	sl::String* indexXml
-	)
-{
+) {
 	bool result;
 
 	static char compoundFileHdr[] =
@@ -241,8 +223,7 @@ Module::generateGroupDocumentation(
 	sl::String itemXml;
 
 	sl::Iterator<Group> groupIt = m_groupList.getHead();
-	for (; groupIt; groupIt++)
-	{
+	for (; groupIt; groupIt++) {
 		result = groupIt->generateDocumentation(outputDir, &itemXml, indexXml);
 		if (!result)
 			return false;

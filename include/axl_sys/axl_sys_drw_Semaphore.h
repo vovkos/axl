@@ -21,46 +21,39 @@ namespace drw {
 
 //..............................................................................
 
-class Semaphore
-{
+class Semaphore {
 protected:
 	semaphore_t m_semaphore;
 
 public:
-	Semaphore()
-	{
+	Semaphore() {
 		mach_error_t result = ::semaphore_create(mach_task_self(), &m_semaphore, SYNC_POLICY_FIFO, 0);
 		ASSERT(result == 0);
 	}
 
-	~Semaphore()
-	{
+	~Semaphore() {
 		mach_error_t result = ::semaphore_destroy(mach_task_self(), m_semaphore);
 		ASSERT(result == 0);
 	}
 
-	operator semaphore_t* ()
-	{
+	operator semaphore_t* () {
 		return &m_semaphore;
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		mach_error_t result = ::semaphore_signal(m_semaphore);
 		return result == 0 ? true : err::fail(sys::drw::MachError(result));
 	}
 
 	bool
-	signalAll()
-	{
+	signalAll() {
 		mach_error_t result = ::semaphore_signal_all(m_semaphore);
 		return result == 0 ? true : err::fail(sys::drw::MachError(result));
 	}
 
 	bool
-	wait()
-	{
+	wait() {
 		mach_error_t result = ::semaphore_wait(m_semaphore);
 		return result == 0 ? true : err::fail(sys::drw::MachError(result));
 	}

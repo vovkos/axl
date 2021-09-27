@@ -21,12 +21,10 @@ namespace ini {
 //..............................................................................
 
 template <typename T>
-class Parser: protected Lexer
-{
+class Parser: protected Lexer {
 public:
 	bool
-	parseFile(const sl::StringRef& filePath)
-	{
+	parseFile(const sl::StringRef& filePath) {
 		io::SimpleMappedFile file;
 		return
 			file.open(filePath, io::FileFlag_ReadOnly) &&
@@ -34,8 +32,7 @@ public:
 	}
 
 	bool
-	parse(const sl::StringRef& source)
-	{
+	parse(const sl::StringRef& source) {
 		return parse("INI", source);
 	}
 
@@ -43,23 +40,19 @@ public:
 	parse(
 		const sl::StringRef& filePath,
 		const sl::StringRef& source
-		)
-	{
+	) {
 		bool result;
 
 		Lexer::create(filePath, source);
 
-		for (;;)
-		{
+		for (;;) {
 			ScanResultKind scanResult = scanLine();
-			switch (scanResult)
-			{
+			switch (scanResult) {
 			case ScanResultKind_Error:
 				return false;
 
 			case ScanResultKind_Eof:
-				if (m_isLineContinuation)
-				{
+				if (m_isLineContinuation) {
 					result = static_cast<T*>(this)->onKeyValue(m_keyName, m_value);
 					if (!result)
 						return false;
@@ -91,21 +84,18 @@ public:
 	}
 
 	bool
-	onSection(const sl::StringRef& sectionName) // overridable
-	{
+	onSection(const sl::StringRef& sectionName) { // overridable
 		return true;
 	}
 
 	bool
-	finalize() // overridable
-	{
+	finalize() { // overridable
 		return true;
 	}
 
 	static
 	bool
-	parseBoolValue(const sl::StringRef& value)
-	{
+	parseBoolValue(const sl::StringRef& value) {
 		return _stricmp(value.sz(), "true") == 0 || atoi (value.sz()) != 0;
 	}
 };

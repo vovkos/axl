@@ -19,16 +19,14 @@ namespace st {
 //..............................................................................
 
 void
-LuaStringTemplate::close()
-{
+LuaStringTemplate::close() {
 	m_luaState.close();
 	StringTemplate<LuaStringTemplate>::clear();
 	m_argCount = 0;
 }
 
 bool
-LuaStringTemplate::create()
-{
+LuaStringTemplate::create() {
 	close();
 
 	bool result = m_luaState.create();
@@ -48,11 +46,9 @@ LuaStringTemplate::create()
 }
 
 bool
-LuaStringTemplate::setArgCount(size_t count)
-{
+LuaStringTemplate::setArgCount(size_t count) {
 	int top = m_luaState.getTop();
-	if (count > (size_t)top)
-	{
+	if (count > (size_t)top) {
 		err::setError(err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
@@ -65,16 +61,14 @@ bool
 LuaStringTemplate::runScript(
 	const sl::StringRef& fileName,
 	const sl::StringRef& source
-	)
-{
+) {
 	int top = m_luaState.getTop();
 
 	bool result = m_luaState.load(fileName, source);
 	if (!result)
 		return false;
 
-	if (m_argCount)
-	{
+	if (m_argCount) {
 		ASSERT(m_argCount <= (size_t)top);
 
 		for (int i = top - m_argCount + 1; i <= top; i++)
@@ -96,16 +90,14 @@ void
 LuaStringTemplate::createEmitCall(
 	sl::String* script,
 	const sl::StringRef& value
-	)
-{
+) {
 	script->append("emit(");
 	script->append(value);
 	script->append(");");
 }
 
 int
-LuaStringTemplate::getLine_lua(lua_State* h)
-{
+LuaStringTemplate::getLine_lua(lua_State* h) {
 	lua::LuaNonOwnerState luaState(h);
 	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
 	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
@@ -119,8 +111,7 @@ LuaStringTemplate::getLine_lua(lua_State* h)
 }
 
 int
-LuaStringTemplate::getCol_lua(lua_State* h)
-{
+LuaStringTemplate::getCol_lua(lua_State* h) {
 	lua::LuaNonOwnerState luaState(h);
 	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
 	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
@@ -133,8 +124,7 @@ LuaStringTemplate::getCol_lua(lua_State* h)
 }
 
 int
-LuaStringTemplate::getLineText_lua(lua_State* h)
-{
+LuaStringTemplate::getLineText_lua(lua_State* h) {
 	lua::LuaNonOwnerState luaState(h);
 	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
 	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
@@ -148,8 +138,7 @@ LuaStringTemplate::getLineText_lua(lua_State* h)
 }
 
 int
-LuaStringTemplate::emit_lua(lua_State* h)
-{
+LuaStringTemplate::emit_lua(lua_State* h) {
 	lua::LuaNonOwnerState luaState(h);
 	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
 	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
@@ -157,8 +146,7 @@ LuaStringTemplate::emit_lua(lua_State* h)
 	EmitContext* context = *self->m_emitContextStack.getTail();
 
 	size_t count = luaState.getTop();
-	for (size_t i = 1; i <= count; i++)
-	{
+	for (size_t i = 1; i <= count; i++) {
 		sl::StringRef string = luaState.getString(i);
 		context->m_output->append(string);
 		context->m_lineCol.incrementalCount(string);
@@ -168,8 +156,7 @@ LuaStringTemplate::emit_lua(lua_State* h)
 }
 
 int
-LuaStringTemplate::passthrough_lua(lua_State* h)
-{
+LuaStringTemplate::passthrough_lua(lua_State* h) {
 	lua::LuaNonOwnerState luaState(h);
 	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
 	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());
@@ -187,8 +174,7 @@ LuaStringTemplate::passthrough_lua(lua_State* h)
 }
 
 int
-LuaStringTemplate::trimOutput_lua(lua_State* h)
-{
+LuaStringTemplate::trimOutput_lua(lua_State* h) {
 	lua::LuaNonOwnerState luaState(h);
 	LuaStringTemplate* self = (LuaStringTemplate*)luaState.getContext();
 	ASSERT(self->m_luaState == h && !self->m_emitContextStack.isEmpty());

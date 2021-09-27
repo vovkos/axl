@@ -20,13 +20,11 @@ namespace gui {
 #ifdef _AXL_DEBUG
 
 void
-TextAttrAnchorArray::trace()
-{
+TextAttrAnchorArray::trace() {
 	size_t count = getCount();
 	TRACE("--- CTextAttrAnchorArray {%d}---\n", count);
 
-	for (size_t i = 0; i < count; i++)
-	{
+	for (size_t i = 0; i < count; i++) {
 		const TextAttrAnchor* anchor = &(m_array[i]);
 		TRACE("[%d] ofs:%02x fc:%x\n", i, anchor->m_offset, anchor->m_attr.m_foreColor);
 	}
@@ -35,15 +33,13 @@ TextAttrAnchorArray::trace()
 #endif
 
 size_t
-TextAttrAnchorArray::findAnchor(size_t offset) const
-{
+TextAttrAnchorArray::findAnchor(size_t offset) const {
 	size_t index = -1;
 	size_t count = m_array.getCount();
 	size_t begin = 0;
 	size_t end = count;
 
-	while (begin < end)
-	{
+	while (begin < end) {
 		size_t mid = (begin + end) / 2;
 		const TextAttrAnchor* anchor = &m_array[mid];
 
@@ -52,13 +48,10 @@ TextAttrAnchorArray::findAnchor(size_t offset) const
 		if (anchor->m_offset == offset)
 			return mid;
 
-		if (anchor->m_offset < offset)
-		{
+		if (anchor->m_offset < offset) {
 			index = mid;
 			begin = mid + 1;
-		}
-		else
-		{
+		} else {
 			end = mid;
 		}
 	}
@@ -67,11 +60,9 @@ TextAttrAnchorArray::findAnchor(size_t offset) const
 }
 
 size_t
-TextAttrAnchorArray::getStartAnchor(size_t offset)
-{
+TextAttrAnchorArray::getStartAnchor(size_t offset) {
 	size_t index = findAnchor(offset);
-	if (index == -1)
-	{
+	if (index == -1) {
 		m_array.insert(0, TextAttrAnchor(offset, TextAttr()));
 		return 0;
 	}
@@ -88,11 +79,9 @@ TextAttrAnchorArray::getStartAnchor(size_t offset)
 }
 
 size_t
-TextAttrAnchorArray::getEndAnchor(size_t offset)
-{
+TextAttrAnchorArray::getEndAnchor(size_t offset) {
 	size_t index = findAnchor(offset);
-	if (index == -1)
-	{
+	if (index == -1) {
 		m_array.insert(0, TextAttrAnchor(offset, TextAttr()));
 		return 0;
 	}
@@ -112,8 +101,7 @@ void
 TextAttrAnchorArray::normalize(
 	size_t start,
 	size_t end
-	)
-{
+) {
 	size_t removeIndex = -1;
 	size_t removeCount = 0;
 
@@ -122,23 +110,18 @@ TextAttrAnchorArray::normalize(
 	if (start)
 		lastAnchor = m_array[start - 1];
 
-	for (size_t i = start; i <= end; i++)
-	{
+	for (size_t i = start; i <= end; i++) {
 		TextAttrAnchor* anchor = &m_array[i];
 
-		if (anchor->m_attr.cmp(lastAnchor.m_attr) == 0)
-		{
+		if (anchor->m_attr.cmp(lastAnchor.m_attr) == 0) {
 			if (!removeCount)
 				removeIndex = i;
 
 			removeCount++;
-		}
-		else
-		{
+		} else {
 			lastAnchor = *anchor;
 
-			if (removeCount)
-			{
+			if (removeCount) {
 				m_array.remove(removeIndex, removeCount);
 				i -= removeCount;
 				end -= removeCount;
@@ -152,8 +135,7 @@ TextAttrAnchorArray::normalize(
 }
 
 void
-TextAttrAnchorArray::clearBefore(size_t offset)
-{
+TextAttrAnchorArray::clearBefore(size_t offset) {
 	size_t anchor = findAnchor(offset);
 	if (anchor != -1)
 		m_array.remove(0, anchor + 1);
@@ -164,8 +146,7 @@ TextAttrAnchorArray::setAttr(
 	size_t beginOffset,
 	size_t endOffset,
 	const TextAttr& attr
-	)
-{
+) {
 	if (beginOffset >= endOffset)
 		return;
 

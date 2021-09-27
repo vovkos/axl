@@ -20,10 +20,8 @@ namespace io {
 //..............................................................................
 
 const char*
-getNetworkAdapterTypeString(NetworkAdapterType adapterKind)
-{
-	static const char* stringTable[NetworkAdapterType__Count] =
-	{
+getNetworkAdapterTypeString(NetworkAdapterType adapterKind) {
+	static const char* stringTable[NetworkAdapterType__Count] = {
 		"unknown-adapter-kind", // NetworkAdapterType_Unknown,
 		"loopback",             // NetworkAdapterType_Loopback,
 		"ethernet",             // NetworkAdapterType_Ethernet,
@@ -42,10 +40,8 @@ getNetworkAdapterTypeString(NetworkAdapterType adapterKind)
 //..............................................................................
 
 const char*
-getNetworkAdapterFlagString(NetworkAdapterFlag flag)
-{
-	static const char* stringTable[] =
-	{
+getNetworkAdapterFlagString(NetworkAdapterFlag flag) {
+	static const char* stringTable[] = {
 		"DHCP",      // NetworkAdapterFlag_Dhcp      = 0x01,
 		"DDNS",      // NetworkAdapterFlag_Ddns      = 0x02,
 		"broadcast", // NetworkAdapterFlag_Broadcast = 0x04,
@@ -61,8 +57,7 @@ getNetworkAdapterFlagString(NetworkAdapterFlag flag)
 }
 
 sl::String
-getNetworkAdapterFlagString(uint_t flags)
-{
+getNetworkAdapterFlagString(uint_t flags) {
 	if (!flags)
 		return sl::String();
 
@@ -70,8 +65,7 @@ getNetworkAdapterFlagString(uint_t flags)
 	sl::String string = getNetworkAdapterFlagString(flag);
 	flags &= ~flag;
 
-	while (flags)
-	{
+	while (flags) {
 		flag = getFirstNetworkAdapterFlag(flags);
 
 		string += ' ';
@@ -90,8 +84,7 @@ getMacAddressString(
 	sl::String* string,
 	const uchar_t* macAddress,
 	uint_t flags
-	)
-{
+) {
 	return string->format(
 		(flags & enc::HexEncodingFlag_NoSpace) ?
 			(flags & enc::HexEncodingFlag_UpperCase) ?
@@ -106,13 +99,12 @@ getMacAddressString(
 		macAddress[3],
 		macAddress[4],
 		macAddress[5]
-		);
+	);
 }
 
 //..............................................................................
 
-NetworkAdapterDesc::NetworkAdapterDesc()
-{
+NetworkAdapterDesc::NetworkAdapterDesc() {
 	m_type = NetworkAdapterType_Unknown;
 	m_flags = 0;
 	memset(m_macAddress, 0, sizeof(m_macAddress));

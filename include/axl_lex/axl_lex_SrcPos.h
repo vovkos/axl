@@ -20,13 +20,11 @@ namespace lex {
 
 //..............................................................................
 
-struct LineCol
-{
+struct LineCol {
 	int m_line;
 	int m_col;
 
-	LineCol()
-	{
+	LineCol() {
 		m_line = 0;
 		m_col = 0;
 	}
@@ -34,22 +32,19 @@ struct LineCol
 	LineCol(
 		int line,
 		int col
-		)
-	{
+	) {
 		m_line = line;
 		m_col = col;
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		m_line = 0;
 		m_col = 0;
 	}
 
 	void
-	count(const sl::StringRef& string)
-	{
+	count(const sl::StringRef& string) {
 		clear();
 		incrementalCount(string);
 	}
@@ -60,20 +55,16 @@ struct LineCol
 
 //..............................................................................
 
-struct SrcPos: LineCol
-{
+struct SrcPos: LineCol {
 	sl::StringRef m_filePath;
 
-	SrcPos()
-	{
-	}
+	SrcPos() {}
 
 	SrcPos(
 		const sl::StringRef& filePath,
 		const LineCol& lineCol
-		):
-		LineCol(lineCol)
-	{
+	):
+		LineCol(lineCol) {
 		m_filePath = filePath;
 	}
 
@@ -81,15 +72,13 @@ struct SrcPos: LineCol
 		const sl::StringRef& filePath,
 		int line,
 		int col
-		):
-		LineCol(line, col)
-	{
+	):
+		LineCol(line, col) {
 		m_filePath = filePath;
 	}
 
 	SrcPos&
-	operator = (const LineCol& lineCol)
-	{
+	operator = (const LineCol& lineCol) {
 		*(LineCol*)this = lineCol;
 		return *this;
 	}
@@ -97,12 +86,10 @@ struct SrcPos: LineCol
 
 //..............................................................................
 
-struct LineColOffset: public LineCol
-{
+struct LineColOffset: public LineCol {
 	size_t m_offset;
 
-	LineColOffset()
-	{
+	LineColOffset() {
 		m_offset = 0;
 	}
 
@@ -110,29 +97,25 @@ struct LineColOffset: public LineCol
 		int line,
 		int col,
 		size_t offset
-		):
-		LineCol(line, col)
-	{
+	):
+		LineCol(line, col) {
 		m_offset = offset;
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		LineCol::clear();
 		m_offset = 0;
 	}
 
 	void
-	count(const sl::StringRef& string)
-	{
+	count(const sl::StringRef& string) {
 		LineCol::count(string);
 		m_offset = string.getLength();
 	}
 
 	void
-	incrementalCount(const sl::StringRef& string)
-	{
+	incrementalCount(const sl::StringRef& string) {
 		LineCol::incrementalCount(string);
 		m_offset += string.getLength();
 	}

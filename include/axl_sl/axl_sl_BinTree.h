@@ -26,9 +26,8 @@ template <
 	typename T,
 	typename Key,
 	typename Value
-	>
-struct BinTreeNodeBase: MapEntry<Key, Value>
-{
+>
+struct BinTreeNodeBase: MapEntry<Key, Value> {
 protected:
 	T* m_parent;
 	T* m_left;
@@ -42,15 +41,12 @@ protected:
 	onXcg(
 		T* node1,
 		T* node2
-		)
-	{
-	}
+	) {}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum BinTreeFindRelOp
-{
+enum BinTreeFindRelOp {
 	BinTreeFindRelOp_Eq = 0,
 	BinTreeFindRelOp_Lt,
 	BinTreeFindRelOp_Le,
@@ -68,9 +64,8 @@ template <
 	typename Cmp,
 	typename KeyArg,
 	typename ValueArg
-	>
-class BinTreeBase
-{
+>
+class BinTreeBase {
 public:
 	typedef sl::Iterator<Node> Iterator;
 	typedef sl::ConstIterator<Node> ConstIterator;
@@ -81,67 +76,56 @@ protected:
 	Cmp m_cmp;
 
 public:
-	explicit BinTreeBase(const Cmp& cmp = Cmp())
-	{
+	explicit BinTreeBase(const Cmp& cmp = Cmp()) {
 		m_root = NULL;
 		m_cmp = cmp;
 	}
 
 	Value&
-	operator [] (KeyArg key)
-	{
+	operator [] (KeyArg key) {
 		return visit(key)->m_value;
 	}
 
 	const Value&
-	operator [] (KeyArg key) const
-	{
+	operator [] (KeyArg key) const {
 		return visit(key)->m_value;
 	}
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_nodeList.isEmpty();
 	}
 
 	size_t
-	getCount() const
-	{
+	getCount() const {
 		return m_nodeList.getCount();
 	}
 
 	Iterator
-	getHead()
-	{
+	getHead() {
 		return m_nodeList.getHead();
 	}
 
 	ConstIterator
-	getHead() const
-	{
+	getHead() const {
 		return m_nodeList.getHead();
 	}
 
 	Iterator
-	getTail()
-	{
+	getTail() {
 		return m_nodeList.getTail();
 	}
 
 	ConstIterator
-	getTail() const
-	{
+	getTail() const {
 		return m_nodeList.getTail();
 	}
 
 	Iterator
-	find(KeyArg key)
-	{
+	find(KeyArg key) {
 		Node* node = m_root;
 
-		while (node)
-		{
+		while (node) {
 			int cmp = m_cmp(key, node->m_key);
 			if (cmp == 0)
 				return node;
@@ -153,8 +137,7 @@ public:
 	}
 
 	ConstIterator
-	find(KeyArg key) const
-	{
+	find(KeyArg key) const {
 		return ((BinTreeBase*)this)->find(key); // a simple const-cast
 	}
 
@@ -162,8 +145,7 @@ public:
 	find(
 		KeyArg key,
 		BinTreeFindRelOp relOp
-		)
-	{
+	) {
 		Node* node = m_root;
 		Node* prevNode;
 		int prevCmp;
@@ -171,8 +153,7 @@ public:
 		if (isEmpty())
 			return NULL;
 
-		while (node)
-		{
+		while (node) {
 			int cmp = m_cmp(key, node->m_key);
 			if (cmp == 0)
 				break; // exact match
@@ -184,8 +165,7 @@ public:
 		}
 
 		ASSERT(node || prevNode);
-		switch (relOp)
-		{
+		switch (relOp) {
 		case BinTreeFindRelOp_Lt:
 			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();
 
@@ -208,8 +188,7 @@ public:
 	find(
 		KeyArg key,
 		BinTreeFindRelOp relOp
-		) const
-	{
+	) const {
 		return ((BinTreeBase*)this)->find(key, relOp); // a simple const-cast
 	}
 
@@ -217,8 +196,7 @@ public:
 	findValue(
 		KeyArg key,
 		ValueArg undefinedValue
-		) const
-	{
+	) const {
 		ConstIterator it = find(key);
 		return it ? it->m_value : undefinedValue;
 	}
@@ -228,15 +206,13 @@ public:
 		KeyArg key,
 		BinTreeFindRelOp relOp,
 		ValueArg undefinedValue
-		) const
-	{
+	) const {
 		ConstIterator it = find(key, relOp);
 		return it ? it->m_value : undefinedValue;
 	}
 
 	Iterator
-	visit(KeyArg key)
-	{
+	visit(KeyArg key) {
 		Node* parent = NULL;
 		Node* node = m_root;
 
@@ -244,8 +220,7 @@ public:
 
 		int cmp;
 
-		while (node)
-		{
+		while (node) {
 			cmp = m_cmp(key, node->m_key);
 			if (cmp == 0)
 				return node;
@@ -262,18 +237,13 @@ public:
 		node->m_left = NULL;
 		node->m_right = NULL;
 
-		if (!parent)
-		{
+		if (!parent) {
 			m_root = node;
 			m_nodeList.insertTail(node);
-		}
-		else if (cmp < 0)
-		{
+		} else if (cmp < 0) {
 			parent->m_left = node;
 			m_nodeList.insertBefore(node, parent);
-		}
-		else
-		{
+		} else {
 			parent->m_right = node;
 			m_nodeList.insertAfter(node, parent);
 		}
@@ -287,8 +257,7 @@ public:
 		KeyArg key,
 		ValueArg value,
 		bool* isNew = NULL
-		)
-	{
+	) {
 		size_t prevCount = getCount();
 
 		Iterator it = visit(key);
@@ -304,8 +273,7 @@ public:
 	addIfNotExists(
 		KeyArg key,
 		ValueArg value
-		)
-	{
+	) {
 		size_t prevCount = getCount();
 
 		Iterator it = visit(key);
@@ -318,12 +286,10 @@ public:
 	}
 
 	void
-	erase(Iterator it)
-	{
+	erase(Iterator it) {
 		Node* node = *it;
 
-		if (node->m_left && node->m_right)
-		{
+		if (node->m_left && node->m_right) {
 			Node* next = (Node*)node->m_next;
 			ASSERT(next == getLeftmostChild(node->m_right));
 			xcg(node, next);
@@ -334,8 +300,7 @@ public:
 	}
 
 	bool
-	eraseKey(KeyArg key)
-	{
+	eraseKey(KeyArg key) {
 		Iterator it = find(key);
 		if (!it)
 			return false;
@@ -345,16 +310,14 @@ public:
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		m_nodeList.clear();
 		m_root = NULL;
 	}
 
 protected:
 	Node*
-	getLeftmostChild(Node* node)
-	{
+	getLeftmostChild(Node* node) {
 		while (node->m_left)
 			node = node->m_left;
 
@@ -362,8 +325,7 @@ protected:
 	}
 
 	Node*
-	getRightmostChild(Node* node)
-	{
+	getRightmostChild(Node* node) {
 		while (node->m_right)
 			node = node->m_right;
 
@@ -374,16 +336,14 @@ protected:
 	xcg(
 		Node* node1,
 		Node* node2
-		)
-	{
+	) {
 		Node* oldParent = node1->m_parent;
 		Node* oldLeft = node1->m_left;
 		Node* oldRight = node1->m_right;
 
 		// special cases: direct parent-child relations
 
-		if (node1 == node2->m_left)
-		{
+		if (node1 == node2->m_left) {
 			node1->m_left = node2;
 			node1->m_right = node2->m_right;
 			node1->m_parent = node2->m_parent;
@@ -391,9 +351,7 @@ protected:
 			node2->m_left = oldLeft;
 			node2->m_right = oldRight;
 			node2->m_parent = node1;
-		}
-		else if (node1 == node2->m_right)
-		{
+		} else if (node1 == node2->m_right) {
 			node1->m_left = node2->m_left;
 			node1->m_right = node2;
 			node1->m_parent = node2->m_parent;
@@ -401,9 +359,7 @@ protected:
 			node2->m_left = oldLeft;
 			node2->m_right = oldRight;
 			node2->m_parent = node1;
-		}
-		else if (node2 == node1->m_left)
-		{
+		} else if (node2 == node1->m_left) {
 			node1->m_left = node2->m_left;
 			node1->m_right = node2->m_right;
 			node1->m_parent = node2;
@@ -411,9 +367,7 @@ protected:
 			node2->m_left = node1;
 			node2->m_right = oldRight;
 			node2->m_parent = oldParent;
-		}
-		else if (node2 == node1->m_right)
-		{
+		} else if (node2 == node1->m_right) {
 			node1->m_left = node2->m_left;
 			node1->m_right = node2->m_right;
 			node1->m_parent = node2;
@@ -421,9 +375,7 @@ protected:
 			node2->m_left = oldLeft;
 			node2->m_right = node1;
 			node2->m_parent = oldParent;
-		}
-		else
-		{
+		} else {
 			node1->m_left = node2->m_left;
 			node1->m_right = node2->m_right;
 			node1->m_parent = node2->m_parent;
@@ -467,16 +419,13 @@ protected:
 	}
 
 	Node*
-	replaceWithChild(Node* node)
-	{
+	replaceWithChild(Node* node) {
 		Node* child = node->m_right ? node->m_right : node->m_left;
 
-		if (!node->m_parent)
-		{
+		if (!node->m_parent) {
 			ASSERT(node == m_root);
 			m_root = child;
-		}
-		else if (node == node->m_parent->m_left)
+		} else if (node == node->m_parent->m_left)
 			node->m_parent->m_left = child;
 		else
 			node->m_parent->m_right = child;
@@ -488,8 +437,7 @@ protected:
 	}
 
 	void
-	rotateLeft(Node* x)
-	{
+	rotateLeft(Node* x) {
 		Node* y = x->m_right;
 		ASSERT(y);
 
@@ -512,8 +460,7 @@ protected:
 	}
 
 	void
-	rotateRight(Node* x)
-	{
+	rotateRight(Node* x) {
 		Node* y = x->m_left;
 		ASSERT(y);
 
@@ -538,13 +485,10 @@ protected:
 	// overridables: tree rebalancing on insert/delete
 
 	void
-	onInsert(Node* node)
-	{
-	}
+	onInsert(Node* node) {}
 
 	void
-	onErase(Node* node)
-	{
+	onErase(Node* node) {
 		replaceWithChild(node);
 	}
 };

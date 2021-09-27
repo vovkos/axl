@@ -25,8 +25,7 @@ Sid::create_va(
 	SID_IDENTIFIER_AUTHORITY* identifierAuthority,
 	size_t subAuthorityCount,
 	axl_va_list va
-	)
-{
+) {
 	size_t size = ::GetSidLengthRequired((uchar_t)subAuthorityCount);
 	SID* sid = createBuffer(size, false);
 	if (!sid)
@@ -45,8 +44,7 @@ Sid::create_va(
 }
 
 bool
-Sid::parse(const sl::StringRef& string)
-{
+Sid::parse(const sl::StringRef& string) {
 	bool_t result;
 	SID* sid;
 
@@ -60,8 +58,7 @@ Sid::parse(const sl::StringRef& string)
 }
 
 bool
-Sid::parse(const sl::StringRef_w& string)
-{
+Sid::parse(const sl::StringRef_w& string) {
 	bool_t result;
 	SID* sid;
 
@@ -75,10 +72,8 @@ Sid::parse(const sl::StringRef_w& string)
 }
 
 bool
-Sid::getString(sl::String* string) const
-{
-	if (!m_p)
-	{
+Sid::getString(sl::String* string) const {
+	if (!m_p) {
 		string->clear();
 		return true;
 	}
@@ -98,8 +93,7 @@ Sid::lookupAccountName(
 	const sl::StringRef& systemName,
 	const sl::StringRef& accountName,
 	SID_NAME_USE* sidType
-	)
-{
+) {
 	char sidBuffer[SECURITY_MAX_SID_SIZE];
 	dword_t sidSize = sizeof(sidBuffer);
 	char domainNameBuffer[MAX_PATH];
@@ -114,7 +108,7 @@ Sid::lookupAccountName(
 		domainNameBuffer,
 		&domainNameLength,
 		sidType ? sidType : &dummySidType
-		);
+	);
 
 	if (!result)
 		return err::failWithLastSystemError();
@@ -127,8 +121,7 @@ Sid::lookupAccountName(
 	const sl::StringRef_w& systemName,
 	const sl::StringRef_w& accountName,
 	SID_NAME_USE* sidType
-	)
-{
+) {
 	char sidBuffer[SECURITY_MAX_SID_SIZE];
 	dword_t sidSize = sizeof(sidBuffer);
 	wchar_t domainNameBuffer[MAX_PATH];
@@ -143,7 +136,7 @@ Sid::lookupAccountName(
 		domainNameBuffer,
 		&domainNameLength,
 		sidType ? sidType : &dummySidType
-		);
+	);
 
 	if (!result)
 		return err::failWithLastSystemError();
@@ -157,8 +150,7 @@ Sid::lookupAccountSid(
 	const SID* sid,
 	sl::String* accountName,
 	SID_NAME_USE* sidType
-	)
-{
+) {
 	char accountNameBuffer[MAX_PATH];
 	dword_t accountNameLength = sizeof(accountNameBuffer);
 	char domainNameBuffer[MAX_PATH];
@@ -176,7 +168,7 @@ Sid::lookupAccountSid(
 		domainNameBuffer,
 		&domainNameLength,
 		sidType ? sidType : &dummySidType
-		);
+	);
 
 	if (!result)
 		return err::failWithLastSystemError();

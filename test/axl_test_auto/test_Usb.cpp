@@ -20,13 +20,11 @@ namespace {
 //..............................................................................
 
 void
-run()
-{
+run() {
 	io::registerUsbErrorProvider();
 
 	bool result = io::getUsbDefaultContext()->createDefault();
-	if (!result)
-	{
+	if (!result) {
 		printf("Cannot initialize libusb: %s\n", err::getLastErrorDescription().sz());
 		// travis-ci on linux VMs fails here with LIBUSB_ERROR_OTHER
 		// keep assert commented until finding a workaround
@@ -36,8 +34,7 @@ run()
 
 	io::UsbDeviceList deviceList;
 	size_t count = deviceList.enumerateDevices();
-	if (count == -1)
-	{
+	if (count == -1) {
 		printf("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription().sz());
 		ASSERT(false);
 		return;
@@ -47,8 +44,7 @@ run()
 	bufferString.createBuffer(4096);
 
 	libusb_device** pp = deviceList;
-	for (; *pp; pp++)
-	{
+	for (; *pp; pp++) {
 		io::UsbDevice device;
 		device.setDevice(*pp);
 
@@ -61,7 +57,7 @@ run()
 			descriptor.idProduct,
 			device.getBusNumber(),
 			device.getDeviceAddress()
-			);
+		);
 
 		result = device.open();
 		if (!result)

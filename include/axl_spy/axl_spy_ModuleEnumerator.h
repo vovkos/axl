@@ -9,23 +9,20 @@ namespace spy {
 
 #if (_AXL_OS_WIN)
 
-class ModuleIterator
-{
+class ModuleIterator {
 protected:
 	mutable sl::String m_moduleFileName;
 	sl::ArrayRef<HMODULE> m_moduleArray;
 	size_t m_index;
 
 public:
-    ModuleIterator()
-	{
+    ModuleIterator() {
 		m_index = -1;
 	}
 
 	ModuleIterator(const sl::ArrayRef<HMODULE>& moduleArray);
 
-	operator bool () const
-	{
+	operator bool () const {
 		return m_index < m_moduleArray.getCount();
 	}
 
@@ -36,14 +33,12 @@ public:
 	operator ++ (int);
 
 	void*
-	getModule() const
-	{
+	getModule() const {
 		return m_index < m_moduleArray.getCount() ? m_moduleArray[m_index] : NULL;
 	}
 
 	const sl::String&
-	getModuleFileName() const
-	{
+	getModuleFileName() const {
 		return !m_moduleFileName.isEmpty() ? m_moduleFileName : prepareModuleFileName();
 	}
 
@@ -54,25 +49,21 @@ protected:
 
 #elif (_AXL_OS_LINUX)
 
-class ModuleIterator
-{
+class ModuleIterator {
 protected:
 	mutable sl::StringRef m_moduleFileName;
 	struct link_map* m_linkMap;
 
 public:
-	ModuleIterator()
-	{
+	ModuleIterator() {
 		m_linkMap = NULL;
 	}
 
-	ModuleIterator(struct link_map* linkMap)
-	{
+	ModuleIterator(struct link_map* linkMap) {
 		m_linkMap = linkMap;
 	}
 
-	operator bool () const
-	{
+	operator bool () const {
 		return m_linkMap != NULL;
 	}
 
@@ -83,14 +74,12 @@ public:
 	operator ++ (int);
 
 	void*
-	getModule() const
-	{
+	getModule() const {
 		return m_linkMap;
 	}
 
 	const sl::StringRef&
-	getModuleFileName() const
-	{
+	getModuleFileName() const {
 		return !m_moduleFileName.isEmpty() ? m_moduleFileName : prepareModuleFileName();
 	}
 
@@ -101,8 +90,7 @@ protected:
 
 #elif (_AXL_OS_DARWIN)
 
-class ModuleIterator
-{
+class ModuleIterator {
 protected:
 	mutable sys::psx::DynamicLib m_module;
 	mutable sl::StringRef m_moduleFileName;
@@ -112,8 +100,7 @@ protected:
 public:
 	ModuleIterator(size_t count = 0);
 
-	operator bool ()
-	{
+	operator bool () {
 		return m_index < m_count;
 	}
 
@@ -124,20 +111,17 @@ public:
 	operator ++ (int);
 
 	void*
-	getModule() const
-	{
+	getModule() const {
 		return m_module.isOpen() ? (void*)m_module : prepareModule();
 	}
 
 	const sl::StringRef&
-	getModuleFileName() const
-	{
+	getModuleFileName() const {
 		return !m_moduleFileName.isEmpty() ? m_moduleFileName : prepareModuleFileName();
 	}
 
 	size_t
-	getImageIndex() const
-	{
+	getImageIndex() const {
 		return m_index;
 	}
 
@@ -158,8 +142,7 @@ enumerateModules(ModuleIterator* iterator);
 
 inline
 ModuleIterator
-enumerateModules()
-{
+enumerateModules() {
 	ModuleIterator iterator;
 	enumerateModules(&iterator);
 	return iterator;

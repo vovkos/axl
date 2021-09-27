@@ -29,7 +29,7 @@ macro(
 add_ragel_step
 	_OUTPUT_FILE
 	_INPUT_FILE
-	)
+)
 
 	if(NOT RAGEL_FOUND)
 		message(FATAL_ERROR "Ragel is required for add_ragel_step() macro")
@@ -42,7 +42,7 @@ add_ragel_step
 		OUTPUT ${_OUTPUT_PATH}
 		MAIN_DEPENDENCY ${_INPUT_PATH}
 		COMMAND ${RAGEL_EXE} ${_INPUT_PATH} -o${_OUTPUT_PATH} -L
-		)
+	)
 endmacro()
 
 #...............................................................................

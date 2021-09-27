@@ -20,8 +20,7 @@ namespace cry {
 //..............................................................................
 
 bool
-X509Cert::create()
-{
+X509Cert::create() {
 	close();
 
 	m_h = X509_new();
@@ -32,15 +31,13 @@ bool
 X509Cert::loadDer(
 	const void* p0,
 	size_t size
-	)
-{
+) {
 	close();
 
 	const uchar_t* p = (uchar_t*)p0;
 	X509* cert = X509_new();
 	X509* result = d2i_X509(&cert, &p, size);
-	if (!result)
-	{
+	if (!result) {
 		ASSERT(cert == NULL); // should have been freed already
 		return failWithLastCryptoError();
 	}
@@ -50,8 +47,7 @@ X509Cert::loadDer(
 }
 
 size_t
-X509Cert::saveDer(sl::Array<char>* buffer) const
-{
+X509Cert::saveDer(sl::Array<char>* buffer) const {
 	uchar_t* p = NULL;
 	int length = i2d_X509(m_h, &p);
 	if (length <= 0)
@@ -66,8 +62,7 @@ bool
 X509Cert::loadPem(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	close();
 
 	Bio bio;
@@ -75,8 +70,7 @@ X509Cert::loadPem(
 
 	X509* cert = X509_new();
 	X509* result = PEM_read_bio_X509(bio, &cert, NULL, NULL);
-	if (!result)
-	{
+	if (!result) {
 		ASSERT(cert == NULL); // should have been freed already
 		return failWithLastCryptoError();
 	}
@@ -86,8 +80,7 @@ X509Cert::loadPem(
 }
 
 size_t
-X509Cert::savePem(sl::String* string) const
-{
+X509Cert::savePem(sl::String* string) const {
 	Bio bio;
 	bio.createMem();
 	PEM_write_bio_X509(bio, m_h);
@@ -99,16 +92,14 @@ X509Cert::savePem(sl::String* string) const
 //..............................................................................
 
 bool
-X509Store::create()
-{
+X509Store::create() {
 	close();
 	m_h = X509_STORE_new();
 	return completeWithLastCryptoError(m_h != NULL);
 }
 
 bool
-X509Store::addCert(X509* cert)
-{
+X509Store::addCert(X509* cert) {
 	ASSERT(m_h);
 	int result = X509_STORE_add_cert(m_h, cert);
 	return completeWithLastCryptoError(result);

@@ -17,8 +17,7 @@ namespace {
 //..............................................................................
 
 void
-run()
-{
+run() {
 	printf("hui govno i muravei\n");
 
 	sl::HandleTable<int> handleTable(0xffffffff);
@@ -29,8 +28,7 @@ run()
 	uintptr_t h4 = handleTable.add(400);
 
 	sl::HandleTableIterator<int> it = handleTable.getHead();
-	for (; it; it++)
-	{
+	for (; it; it++) {
 		printf("0x%p -> %d\n", it->getKey (), it->m_value);
 	}
 }

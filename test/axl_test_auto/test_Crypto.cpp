@@ -24,8 +24,7 @@ generateEcProductKey(
 	sl::String* productKey,
 	const sl::StringRef& userName,
 	size_t hyphenDistance = 6
-	)
-{
+) {
 	char buffer[256];
 	sl::Array<char> signature(rc::BufKind_Stack, buffer, sizeof(buffer));
 
@@ -45,8 +44,7 @@ generateEcProductKey(
 	EC_KEY* ecKey,
 	const sl::StringRef& userName,
 	size_t hyphenDistance = 6
-	)
-{
+) {
 	sl::String productKey;
 	generateEcProductKey(ecKey, &productKey, userName, hyphenDistance);
 	return productKey;
@@ -57,8 +55,7 @@ verifyEcProductKey(
 	EC_KEY* ecKey0,
 	const sl::StringRef& userName,
 	const sl::StringRef& productKey
-	)
-{
+) {
 	char buffer[256];
 	sl::Array<char> signature(rc::BufKind_Stack, buffer, sizeof(buffer));
 
@@ -74,8 +71,7 @@ verifyEcProductKey(
 
 //..............................................................................
 
-void run()
-{
+void run() {
 	cry::EcKey key(NID_secp112r1);
 	key.generateKey();
 

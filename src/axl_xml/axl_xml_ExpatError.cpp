@@ -18,8 +18,7 @@ namespace xml {
 //..............................................................................
 
 err::ErrorHdr*
-ExpatError::create(XML_Error code)
-{
+ExpatError::create(XML_Error code) {
 	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
 	if (!error)
 		return NULL;

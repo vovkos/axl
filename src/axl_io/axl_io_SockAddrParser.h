@@ -20,27 +20,23 @@ namespace io {
 
 //..............................................................................
 
-class SockAddrParser
-{
+class SockAddrParser {
 protected:
 	const char* m_p;
 	const char* m_end;
 
 public:
-	SockAddrParser()
-	{
+	SockAddrParser() {
 		m_p = NULL;
 		m_end = NULL;
 	}
 
-	SockAddrParser(const sl::StringRef& source)
-	{
+	SockAddrParser(const sl::StringRef& source) {
 		create(source);
 	}
 
 	void
-	create(const sl::StringRef& source)
-	{
+	create(const sl::StringRef& source) {
 		m_p = source.cp();
 		m_end = source.getEnd();
 	}
@@ -61,7 +57,7 @@ public:
 	parse(
 		sockaddr* addr,
 		size_t size
-		);
+	);
 
 protected:
 	bool
@@ -83,7 +79,7 @@ protected:
 	parseInt(
 		uint_t* p,
 		int radix
-		);
+	);
 
 	bool
 	tryInt(int radix);

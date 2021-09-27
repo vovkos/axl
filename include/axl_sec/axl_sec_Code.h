@@ -21,32 +21,23 @@ namespace sec {
 
 //..............................................................................
 
-class Code: public cf::TypeBase<SecCodeRef>
-{
+class Code: public cf::TypeBase<SecCodeRef> {
 public:
-	Code()
-	{
-	}
+	Code() {}
 
 	Code(const Code& src):
-		cf::TypeBase<SecCodeRef>(src)
-	{
-	}
+		cf::TypeBase<SecCodeRef>(src) {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Code(Code&& src):
-		cf::TypeBase<SecCodeRef>(std::move(src))
-	{
-	}
+		cf::TypeBase<SecCodeRef>(std::move(src)) {}
 #endif
 
 	Code(
 		SecCodeRef p,
 		bool isAttach = false
-		):
-		cf::TypeBase<SecCodeRef>(p, isAttach)
-	{
-	}
+	):
+		cf::TypeBase<SecCodeRef>(p, isAttach) {}
 };
 
 //..............................................................................

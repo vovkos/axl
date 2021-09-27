@@ -30,8 +30,7 @@ class WidgetDriver;
 
 //..............................................................................
 
-enum StdFontKind
-{
+enum StdFontKind {
 	StdFontKind_Gui = 0,
 	StdFontKind_Monospace,
 
@@ -40,8 +39,7 @@ enum StdFontKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum StdCursorKind
-{
+enum StdCursorKind {
 	StdCursorKind_Arrow = 0,
 	StdCursorKind_Wait,
 	StdCursorKind_IBeam,
@@ -57,8 +55,7 @@ enum StdCursorKind
 
 //..............................................................................
 
-class Engine
-{
+class Engine {
 protected:
 	uint_t m_stdPalColorTable[StdPalColor__Count];
 
@@ -66,8 +63,7 @@ public:
 	Engine();
 
 	Palette
-	getStdPalette()
-	{
+	getStdPalette() {
 		return Palette(m_stdPalColorTable, countof(m_stdPalColorTable));
 	}
 
@@ -83,19 +79,18 @@ public:
 		Canvas* canvas,
 		uint_t width,
 		uint_t height
-		) = 0;
+	) = 0;
 
 	bool
 	createOffscreenCanvas(
 		Canvas* canvas,
 		const Size& size
-		)
-	{
+	) {
 		return createOffscreenCanvas(
 			canvas,
 			size.m_width,
 			size.m_height
-			);
+		);
 	}
 
 	virtual
@@ -107,15 +102,14 @@ public:
 	getSharedOffscreenCanvas(
 		uint_t width,
 		uint_t height
-		) = 0;
+	) = 0;
 
 	Canvas*
-	getSharedOffscreenCanvas(const Size& size)
-	{
+	getSharedOffscreenCanvas(const Size& size) {
 		return getSharedOffscreenCanvas(
 			size.m_width,
 			size.m_height
-			);
+		);
 	}
 
 	virtual
@@ -131,7 +125,7 @@ public:
 		int right,
 		int bottom,
 		uint_t color
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -143,8 +137,7 @@ public:
 		int bottom,
 		uint_t color,
 		uint_t alpha
-		)
-	{
+	) {
 		return drawRect(canvas, left, top, right, bottom, color); // draw simple opaque rect by default
 	}
 
@@ -162,8 +155,7 @@ public:
 		int x2,
 		int y2,
 		uint_t color2
-		)
-	{
+	) {
 		return drawRect(canvas, left, top, right, bottom, color1); // draw simple opaque rect by default
 	}
 
@@ -183,8 +175,7 @@ public:
 		int y2,
 		uint_t color2,
 		uint_t alpha2
-		)
-	{
+	) {
 		return drawGradientRect(canvas, left, top, right, bottom, x1, y1, color1, x2, y2, color2);
 	}
 
@@ -202,7 +193,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf8& text
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -218,7 +209,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf16& text
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -234,7 +225,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf32& text
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -247,7 +238,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -260,7 +251,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		) = 0;
+	) = 0;
 
 	// fonts
 
@@ -277,7 +268,7 @@ public:
 	getStdFont(
 		StdFontKind fontKind,
 		uint_t flags = 0
-		);
+	);
 
 	virtual
 	Font*
@@ -286,20 +277,19 @@ public:
 		const sl::StringRef& family,
 		size_t pointSize,
 		uint_t flags = 0
-		) = 0;
+	) = 0;
 
 	Font*
 	createFont(
 		FontTuple* fontTuple,
 		const FontDesc& fontDesc
-		)
-	{
+	) {
 		return createFont(
 			fontTuple,
 			fontDesc.m_family,
 			fontDesc.m_pointSize,
 			fontDesc.m_flags
-			);
+		);
 	}
 
 	virtual
@@ -307,14 +297,14 @@ public:
 	getFontMod(
 		FontTuple* fontTuple,
 		uint_t flags
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
 	getFontDesc(
 		Font* font,
 		FontDesc* fontDesc
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -326,7 +316,7 @@ public:
 		Font* font,
 		Canvas* canvas,
 		utf32_t c
-		) = 0;
+	) = 0;
 
 	virtual
 	Size
@@ -334,7 +324,7 @@ public:
 		Font* font,
 		Widget* widget,
 		utf32_t c
-		) = 0;
+	) = 0;
 
 	virtual
 	Size
@@ -342,7 +332,7 @@ public:
 		Font* font,
 		Canvas* canvas,
 		const sl::StringRef_utf8& text
-		) = 0;
+	) = 0;
 
 	virtual
 	Size
@@ -350,7 +340,7 @@ public:
 		Font* font,
 		Widget* widget,
 		const sl::StringRef_utf8& text
-		) = 0;
+	) = 0;
 
 	virtual
 	Size
@@ -358,7 +348,7 @@ public:
 		Font* font,
 		Canvas* canvas,
 		const sl::StringRef_utf16& text
-		) = 0;
+	) = 0;
 
 	virtual
 	Size
@@ -366,7 +356,7 @@ public:
 		Font* font,
 		Widget* widget,
 		const sl::StringRef_utf16& text
-		) = 0;
+	) = 0;
 
 	virtual
 	Size
@@ -374,7 +364,7 @@ public:
 		Font* font,
 		Canvas* canvas,
 		const sl::StringRef_utf32& text
-		) = 0;
+	) = 0;
 
 	virtual
 	Size
@@ -382,7 +372,7 @@ public:
 		Font* font,
 		Widget* widget,
 		const sl::StringRef_utf32& text
-		) = 0;
+	) = 0;
 
 	// images
 
@@ -393,20 +383,19 @@ public:
 		uint_t width,
 		uint_t height,
 		PixelFormat pixelFormat
-		) = 0;
+	) = 0;
 
 	bool
 	createImage(
 		Image* image,
 		const ImageDesc& imageDesc
-		)
-	{
+	) {
 		return createImage(
 			image,
 			imageDesc.m_size.m_width,
 			imageDesc.m_size.m_height,
 			imageDesc.m_pixelFormat
-			);
+		);
 	}
 
 	virtual
@@ -414,7 +403,7 @@ public:
 	getImageDesc(
 		Image* image,
 		ImageDesc* imageDesc
-		) = 0;
+	) = 0;
 
 	virtual
 	Cursor*
@@ -435,19 +424,17 @@ public:
 	readClipboard(
 		uintptr_t format,
 		sl::Array<char>* data
-		) = 0;
+	) = 0;
 
 	sl::String
-	readClipboard()
-	{
+	readClipboard() {
 		sl::String string;
 		readClipboard(&string);
 		return string;
 	}
 
 	sl::Array<char>
-	readClipboard(uintptr_t format)
-	{
+	readClipboard(uintptr_t format) {
 		sl::Array<char> data;
 		readClipboard(format, &data);
 		return data;
@@ -463,14 +450,13 @@ public:
 		uintptr_t format,
 		const void* data,
 		size_t size
-		) = 0;
+	) = 0;
 
 	bool
 	writeClipboard(
 		uintptr_t format,
 		const sl::ArrayRef<char>& data
-		)
-	{
+	) {
 		return writeClipboard(format, data, data.getCount());
 	}
 
@@ -496,7 +482,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -506,7 +492,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -514,7 +500,7 @@ public:
 		WidgetDriver* widgetDriver,
 		int dx,
 		int dy
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -526,14 +512,14 @@ public:
 		int bottom,
 		int dx,
 		int dy
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
 	setWidgetCursor(
 		WidgetDriver* widgetDriver,
 		Cursor* cursor
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -548,7 +534,7 @@ public:
 	updateWidgetScrollBar(
 		WidgetDriver* widgetDriver,
 		Orientation orientation
-		) = 0;
+	) = 0;
 
 	virtual
 	void
@@ -556,7 +542,7 @@ public:
 		WidgetDriver* widgetDriver,
 		uint_t code,
 		const void* params = NULL
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -564,7 +550,7 @@ public:
 		WidgetDriver* widgetDriver,
 		uint_t code,
 		const rc::Ptr<void>& params
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -579,7 +565,7 @@ public:
 	showCaret(
 		WidgetDriver* widgetDriver,
 		const Rect& rect
-		) = 0;
+	) = 0;
 
 	virtual
 	void
@@ -590,7 +576,7 @@ public:
 	scheduleToolTipMsg(
 		WidgetDriver* widgetDriver,
 		uint_t timeout
-		) = 0;
+	) = 0;
 
 	virtual
 	bool
@@ -603,7 +589,7 @@ public:
 		int x,
 		int y,
 		const sl::StringRef& toolTip
-		) = 0;
+	) = 0;
 
 	virtual
 	bool

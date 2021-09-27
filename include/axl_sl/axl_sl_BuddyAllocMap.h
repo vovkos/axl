@@ -21,32 +21,27 @@ namespace sl {
 
 //..............................................................................
 
-class BuddyAllocMap
-{
+class BuddyAllocMap {
 protected:
-	struct Page: ListLink
-	{
+	struct Page: ListLink {
 		size_t m_map;
 	};
 
 	// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-	class Level
-	{
+	class Level {
 	protected:
 		AuxList<Page> m_availablePageList;
 		Page* m_firstPage;
 
 	public:
 		Page*
-		getFirstPage()
-		{
+		getFirstPage() {
 			return m_firstPage;
 		}
 
 		Page*
-		getFirstAvailablePage()
-		{
+		getFirstAvailablePage() {
 			return *m_availablePageList.getHead();
 		}
 
@@ -54,20 +49,20 @@ protected:
 		format(
 			Page* page,
 			size_t count
-			);
+		);
 
 		void
 		setPageMap(
 			Page* page,
 			size_t map
-			);
+		);
 
 		void
 		setBit(
 			Page* page,
 			size_t bit,
 			bool value
-			);
+		);
 
 		void
 		setBitRange(
@@ -75,7 +70,7 @@ protected:
 			size_t from,
 			size_t to,
 			bool value
-			);
+		);
 	};
 
 protected:
@@ -96,7 +91,7 @@ public:
 	create(
 		size_t width,
 		size_t height
-		);
+	);
 
 	void
 	close();
@@ -105,26 +100,22 @@ public:
 	clear();
 
 	size_t
-	getFreeSizeTop()
-	{
+	getFreeSizeTop() {
 		return m_freeSizeTop;
 	}
 
 	size_t
-	getFreeSizeBottom()
-	{
+	getFreeSizeBottom() {
 		return m_freeSizeBottom;
 	}
 
 	size_t
-	getTotalSize()
-	{
+	getTotalSize() {
 		return m_totalSize;
 	}
 
 	bool
-	isEmpty()
-	{
+	isEmpty() {
 		return m_freeSizeBottom == m_totalSize; // can compare either (top or bottom)
 	}
 
@@ -135,17 +126,16 @@ public:
 	mark(
 		size_t address,
 		size_t size
-		);
+	);
 
 	void
 	free(
 		size_t address,
 		size_t size
-		);
+	);
 
 	bool
-	getBit(size_t address)
-	{
+	getBit(size_t address) {
 		return address < m_totalSize ? getBit(m_pageArray, address) : false;
 	}
 
@@ -155,8 +145,7 @@ protected:
 	getBit(
 		Page* page,
 		size_t bit
-		)
-	{
+	) {
 		size_t pageIdx = bit / AXL_PTR_BITS;
 		size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
 		return (page[pageIdx].m_map & mask) != 0;

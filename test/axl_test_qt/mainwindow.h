@@ -15,8 +15,7 @@
 
 //..............................................................................
 
-class MyWidget: public QWidget
-{
+class MyWidget: public QWidget {
 public:
 	MyWidget(QWidget* parent = NULL);
 
@@ -27,15 +26,13 @@ public:
 
 //..............................................................................
 
-class MainWindow: public QMainWindow
-{
+class MainWindow: public QMainWindow {
 	Q_OBJECT
 
 public:
 	MainWindow(QWidget* parent = NULL);
 
-	virtual QSize sizeHint() const
-	{
+	virtual QSize sizeHint() const {
 		return QSize(640, 480);
 	}
 

@@ -18,8 +18,7 @@ namespace lnx {
 
 //..............................................................................
 
-const char* UdevLib::m_funcNameTable[FuncId__Count] =
-{
+const char* UdevLib::m_funcNameTable[FuncId__Count] = {
 	"udev_ref",
 	"udev_unref",
 	"udev_new",

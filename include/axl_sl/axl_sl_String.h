@@ -24,8 +24,7 @@ template <typename T, typename Details> class StringBase;
 
 //..............................................................................
 
-enum CaseConvertMethod
-{
+enum CaseConvertMethod {
 	CaseConvertMethod_PerCodePoint = 0, // true UTF conversion (default)
 	CaseConvertMethod_PerCodeUnit,      // per-unit tolower/toupper (less precise, but faster)
 	CaseConvertMethod_Default = CaseConvertMethod_PerCodePoint
@@ -36,9 +35,8 @@ enum CaseConvertMethod
 template <
 	typename T,
 	typename Details0 = StringDetailsBase<T>
-	>
-class StringRefBase
-{
+>
+class StringRefBase {
 public:
 	typedef Details0 Details;
 	typedef typename Details::Details2 Details2;
@@ -67,27 +65,23 @@ protected:
 	mutable bool m_isNullTerminated;
 
 public:
-	StringRefBase()
-	{
+	StringRefBase() {
 		initialize();
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	StringRefBase(StringRef&& src)
-	{
+	StringRefBase(StringRef&& src) {
 		initialize();
 		move(std::move(src));
 	}
 #endif
 
-	StringRefBase(const StringRef& src)
-	{
+	StringRefBase(const StringRef& src) {
 		initialize();
 		attach(src);
 	}
 
-	StringRefBase(const C* p)
-	{
+	StringRefBase(const C* p) {
 		initialize();
 		attach(NULL, p, Details::calcLength(p), p != NULL);
 	}
@@ -96,8 +90,7 @@ public:
 		const C* p,
 		size_t length,
 		bool isNullTerminated = false
-		)
-	{
+	) {
 		initialize();
 		attach(NULL, p, length, isNullTerminated);
 	}
@@ -106,8 +99,7 @@ public:
 		const C* p,
 		const void* end,
 		bool isNullTerminated = false
-		)
-	{
+	) {
 		initialize();
 		attach(NULL, p, (C*)end - p, isNullTerminated);
 	}
@@ -115,8 +107,7 @@ public:
 	StringRefBase(
 		rc::BufHdr* hdr,
 		const C* p
-		)
-	{
+	) {
 		initialize();
 		attach(hdr, p, Details::calcLength(p), p != NULL);
 	}
@@ -126,8 +117,7 @@ public:
 		const C* p,
 		size_t length,
 		bool isNullTerminated = false
-		)
-	{
+	) {
 		initialize();
 		attach(hdr, p, length, isNullTerminated);
 	}
@@ -137,238 +127,202 @@ public:
 		const C* p,
 		const void* end,
 		bool isNullTerminated = false
-		)
-	{
+	) {
 		initialize();
 		attach(hdr, p, (C*)end - p, isNullTerminated);
 	}
 
-	~StringRefBase()
-	{
+	~StringRefBase() {
 		release();
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	StringRefBase&
-	operator = (StringRef&& src)
-	{
+	operator = (StringRef&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	StringRefBase&
-	operator = (const StringRef& src)
-	{
+	operator = (const StringRef& src) {
 		attach(src);
 		return *this;
 	}
 
 	bool
-	operator == (const StringRef& string) const
-	{
+	operator == (const StringRef& string) const {
 		return cmp(string) == 0;
 	}
 
 	bool
-	operator != (const StringRef& string) const
-	{
+	operator != (const StringRef& string) const {
 		return cmp(string) != 0;
 	}
 
 	bool
-	operator < (const StringRef& string) const
-	{
+	operator < (const StringRef& string) const {
 		return cmp(string) < 0;
 	}
 
 	bool
-	operator <= (const StringRef& string) const
-	{
+	operator <= (const StringRef& string) const {
 		return cmp(string) <= 0;
 	}
 
 	bool
-	operator > (const StringRef& string) const
-	{
+	operator > (const StringRef& string) const {
 		return cmp(string) > 0;
 	}
 
 	bool
-	operator >= (const StringRef& string) const
-	{
+	operator >= (const StringRef& string) const {
 		return cmp(string) >= 0;
 	}
 
 	bool
-	operator == (const C* p) const
-	{
+	operator == (const C* p) const {
 		return cmp(p) == 0;
 	}
 
 	bool
-	operator != (const C* p) const
-	{
+	operator != (const C* p) const {
 		return cmp(p) != 0;
 	}
 
 	bool
-	operator < (const C* p) const
-	{
+	operator < (const C* p) const {
 		return cmp(p) < 0;
 	}
 
 	bool
-	operator <= (const C* p) const
-	{
+	operator <= (const C* p) const {
 		return cmp(p) <= 0;
 	}
 
 	bool
-	operator > (const C* p) const
-	{
+	operator > (const C* p) const {
 		return cmp(p) > 0;
 	}
 
 	bool
-	operator >= (const C* p) const
-	{
+	operator >= (const C* p) const {
 		return cmp(p) >= 0;
 	}
 
 	String
-	operator + (const StringRef& string) const
-	{
+	operator + (const StringRef& string) const {
 		String result = *this;
 		result.append(string);
 		return result;
 	}
 
 	String
-	operator + (const StringRef2& string) const
-	{
+	operator + (const StringRef2& string) const {
 		String result = *this;
 		result.append(string);
 		return result;
 	}
 
 	String
-	operator + (const StringRef3& string) const
-	{
+	operator + (const StringRef3& string) const {
 		String result = *this;
 		result.append(string);
 		return result;
 	}
 
 	String
-	operator + (const C* p) const
-	{
+	operator + (const C* p) const {
 		String result = *this;
 		result.append(p);
 		return result;
 	}
 
 	String
-	operator + (const C2* p) const
-	{
+	operator + (const C2* p) const {
 		String result = *this;
 		result.append(p);
 		return result;
 	}
 
 	String
-	operator + (const C3* p) const
-	{
+	operator + (const C3* p) const {
 		String result = *this;
 		result.append(p);
 		return result;
 	}
 
 	String
-	operator + (utf32_t c) const
-	{
+	operator + (utf32_t c) const {
 		String result = *this;
 		result.append(c);
 		return result;
 	}
 
 	const C&
-	operator [] (intptr_t i) const
-	{
+	operator [] (intptr_t i) const {
 		ASSERT((size_t)i < m_length);
 		return m_p[(size_t)i];
 	}
 
 	const C*
-	cp() const
-	{
+	cp() const {
 		return m_p;
 	}
 
 	const C*
-	sz() const
-	{
+	sz() const {
 		return m_length ? ensureNullTerminated() : Details::getEmptyString();
 	}
 
 	const C*
-	szn() const
-	{
+	szn() const {
 		return m_length ? ensureNullTerminated() : NULL;
 	}
 
 	String2
-	s2() const
-	{
+	s2() const {
 		return String2(m_p, m_length);
 	}
 
 	String3
-	s3() const
-	{
+	s3() const {
 		return String3(m_p, m_length);
 	}
 
 	size_t
-	getLength() const
-	{
+	getLength() const {
 		return m_length;
 	}
 
 	rc::BufHdr*
-	getHdr() const
-	{
+	getHdr() const {
 		return m_hdr;
 	}
 
 	const C*
-	getEnd() const
-	{
+	getEnd() const {
 		return m_p + m_length;
 	}
 
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_length == 0;
 	}
 
 	bool
-	isNullTerminated() const
-	{
+	isNullTerminated() const {
 		return m_isNullTerminated;
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		release();
 	}
 
 	void
-	release()
-	{
+	release() {
 		if (m_hdr)
 			m_hdr->release();
 
@@ -376,8 +330,7 @@ public:
 	}
 
 	size_t
-	offset(size_t length)
-	{
+	offset(size_t length) {
 		if (length > m_length)
 			length = m_length;
 
@@ -387,8 +340,7 @@ public:
 	}
 
 	int
-	cmp(const StringRef& string) const
-	{
+	cmp(const StringRef& string) const {
 		int result = Details::cmp(m_p, string.m_p, AXL_MIN(m_length, string.m_length));
 		return
 			result ? result :
@@ -400,30 +352,26 @@ public:
 	cmpIgnoreCase(
 		const StringRef& string,
 		CaseConvertMethod method = CaseConvertMethod_Default
-		) const
-	{
+	) const {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			cmpIgnoreCase_pcu(string) :
 			cmpIgnoreCase_pcp(string);
 	}
 
 	size_t
-	hash() const
-	{
+	hash() const {
 		return djb2(m_p, m_length * sizeof(C));
 	}
 
 	size_t
-	hashIgnoreCase(CaseConvertMethod method = CaseConvertMethod_Default) const
-	{
+	hashIgnoreCase(CaseConvertMethod method = CaseConvertMethod_Default) const {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			hashIgnoreCase_pcu() :
 			hashIgnoreCase_pcp();
 	}
 
 	bool
-	isEqual(const StringRef& string) const
-	{
+	isEqual(const StringRef& string) const {
 		return
 			m_length == string.m_length &&
 			Details::cmp(m_p, string.m_p, m_length) == 0;
@@ -433,20 +381,17 @@ public:
 	isEqualIgnoreCase(
 		const StringRef& string,
 		CaseConvertMethod method = CaseConvertMethod_Default
-		) const
-	{
+	) const {
 		return cmpIgnoreCase(string, method) == 0;
 	}
 
 	bool
-	isPrefix(C c) const
-	{
+	isPrefix(C c) const {
 		return m_length && m_p[0] == c;
 	}
 
 	bool
-	isPrefix(const StringRef& string) const
-	{
+	isPrefix(const StringRef& string) const {
 		return
 			m_length >= string.m_length &&
 			Details::cmp(m_p, string.m_p, string.m_length) == 0;
@@ -456,22 +401,19 @@ public:
 	isPrefixIgnoreCase(
 		const StringRef& string,
 		CaseConvertMethod method = CaseConvertMethod_Default
-		) const
-	{
+	) const {
 		return
 			m_length >= string.m_length &&
 			getLeftSubString(string.m_length).isEqualIgnoreCase(string, method);
 	}
 
 	bool
-	isSuffix(C c) const
-	{
+	isSuffix(C c) const {
 		return m_length && m_p[m_length - 1] == c;
 	}
 
 	bool
-	isSuffix(const StringRef& string) const
-	{
+	isSuffix(const StringRef& string) const {
 		return
 			m_length >= string.m_length &&
 			Details::cmp(m_p + m_length - string.m_length, string.m_p, string.m_length) == 0;
@@ -481,8 +423,7 @@ public:
 	isSuffixIgnoreCase(
 		const StringRef& string,
 		CaseConvertMethod method = CaseConvertMethod_Default
-		) const
-	{
+	) const {
 		return
 			m_length >= string.m_length &&
 			getRightSubString(string.m_length).isEqualIgnoreCase(string, method);
@@ -492,8 +433,7 @@ public:
 	find(
 		C c,
 		size_t index = 0
-		) const
-	{
+	) const {
 		if (index >= m_length)
 			return -1;
 
@@ -508,8 +448,7 @@ public:
 	find(
 		const StringRef& subString,
 		size_t index = 0
-		) const
-	{
+	) const {
 		if (index >= m_length)
 			return -1;
 
@@ -524,8 +463,7 @@ public:
 	findOneOf(
 		const StringRef& charSet,
 		size_t index = 0
-		) const
-	{
+	) const {
 		if (index >= m_length)
 			return -1;
 
@@ -540,8 +478,7 @@ public:
 	findNotOneOf(
 		const StringRef& charSet,
 		size_t index = 0
-		) const
-	{
+	) const {
 		if (index >= m_length)
 			return -1;
 
@@ -556,8 +493,7 @@ public:
 	reverseFind(
 		C c,
 		size_t index = -1
-		) const
-	{
+	) const {
 		return index < m_length ?
 			Details::reverseFind(m_p, index + 1, c) :
 			Details::reverseFind(m_p, m_length, c);
@@ -567,8 +503,7 @@ public:
 	reverseFind(
 		const StringRef& subString,
 		size_t index = -1
-		) const
-	{
+	) const {
 		return index < m_length ?
 			Details::reverseFind(m_p, index + 1, subString.m_p, subString.m_length) :
 			Details::reverseFind(m_p, m_length, subString.m_p, subString.m_length);
@@ -578,8 +513,7 @@ public:
 	reverseFindOneOf(
 		const StringRef& charSet,
 		size_t index = -1
-		) const
-	{
+	) const {
 		return index < m_length ?
 			Details::reverseFindOneOf(m_p, index + 1, charSet.m_p, charSet.m_length) :
 			Details::reverseFindOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
@@ -589,8 +523,7 @@ public:
 	reverseFindNotOneOf(
 		const StringRef& charSet,
 		size_t index = -1
-		) const
-	{
+	) const {
 		return index < m_length ?
 			Details::reverseFindNotOneOf(m_p, index + 1, charSet.m_p, charSet.m_length) :
 			Details::reverseFindNotOneOf(m_p, m_length, charSet.m_p, charSet.m_length);
@@ -600,8 +533,7 @@ public:
 	getSubString(
 		size_t first,
 		size_t length = -1
-		) const
-	{
+	) const {
 		if (first > m_length)
 			return StringRef();
 
@@ -616,13 +548,11 @@ public:
 	setSubString(
 		size_t first,
 		size_t length = -1
-		)
-	{
+	) {
 		if (first == 0 && length >= m_length)
 			return m_length;
 
-		if (first > m_length)
-		{
+		if (first > m_length) {
 			m_p += m_length;
 			m_length = 0;
 			return 0;
@@ -638,8 +568,7 @@ public:
 	}
 
 	StringRef
-	getLeftSubString(size_t length) const
-	{
+	getLeftSubString(size_t length) const {
 		if (length >= m_length)
 			return *this;
 
@@ -647,8 +576,7 @@ public:
 	}
 
 	size_t
-	setLeftSubString(size_t length)
-	{
+	setLeftSubString(size_t length) {
 		if (length >= m_length)
 			return m_length;
 
@@ -657,8 +585,7 @@ public:
 	}
 
 	StringRef
-	getRightSubString(size_t length) const
-	{
+	getRightSubString(size_t length) const {
 		if (length >= m_length)
 			return *this;
 
@@ -666,8 +593,7 @@ public:
 	}
 
 	size_t
-	setRightSubString(size_t length)
-	{
+	setRightSubString(size_t length) {
 		if (length >= m_length)
 			return m_length;
 
@@ -677,8 +603,7 @@ public:
 	}
 
 	StringRef
-	getLeftTrimmedString() const
-	{
+	getLeftTrimmedString() const {
 		static StringRef whitespace(Details::getWhitespace(), 4);
 		size_t i = findNotOneOf(whitespace);
 		if (i == -1)
@@ -692,8 +617,7 @@ public:
 	}
 
 	StringRef
-	getRightTimmedString() const
-	{
+	getRightTimmedString() const {
 		static StringRef whitespace(Details::getWhitespace(), 4);
 		size_t i = reverseFindNotOneOf(whitespace);
 		if (i == -1)
@@ -707,8 +631,7 @@ public:
 	}
 
 	StringRef
-	getTrimmedString() const
-	{
+	getTrimmedString() const {
 		static StringRef whitespace(Details::getWhitespace(), 4);
 		size_t i = findNotOneOf(whitespace);
 		if (i == -1)
@@ -717,43 +640,35 @@ public:
 		size_t j = reverseFindNotOneOf(whitespace);
 		ASSERT(j != -1);
 
-		if (j != m_length - 1)
-		{
+		if (j != m_length - 1) {
 			StringRef string;
 			string.attach(m_hdr, m_p + i, j + 1 - i, false);
 			return string;
-		}
-		else if (i != 0)
-		{
+		} else if (i != 0) {
 			StringRef string;
 			string.attach(m_hdr, m_p + i, m_length - i, m_isNullTerminated);
 			return string;
-		}
-		else
-		{
+		} else {
 			return *this;
 		}
 	}
 
 	String
-	getLowerCaseString(CaseConvertMethod method = CaseConvertMethod_Default) const
-	{
+	getLowerCaseString(CaseConvertMethod method = CaseConvertMethod_Default) const {
 		String string = *this;
 		string.makeLowerCase(method);
 		return string;
 	}
 
 	String
-	getUpperCaseString(CaseConvertMethod method = CaseConvertMethod_Default) const
-	{
+	getUpperCaseString(CaseConvertMethod method = CaseConvertMethod_Default) const {
 		String string = *this;
 		string.makeUpperCase(method);
 		return string;
 	}
 
 	String
-	getCaseFoldedString(CaseConvertMethod method = CaseConvertMethod_Default) const
-	{
+	getCaseFoldedString(CaseConvertMethod method = CaseConvertMethod_Default) const {
 		String string = *this;
 		string.makeCaseFolded(method);
 		return string;
@@ -761,13 +676,11 @@ public:
 
 protected:
 	const C*
-	ensureNullTerminated() const
-	{
+	ensureNullTerminated() const {
 		if (m_isNullTerminated)
 			return m_p;
 
-		if (m_hdr && m_hdr->isInsideBuffer(m_p + m_length) && !m_p[m_length])
-		{
+		if (m_hdr && m_hdr->isInsideBuffer(m_p + m_length) && !m_p[m_length]) {
 			m_isNullTerminated = true;
 			return m_p;
 		}
@@ -780,8 +693,7 @@ protected:
 	}
 
 	void
-	initialize()
-	{
+	initialize() {
 		m_p = NULL;
 		m_hdr = NULL;
 		m_length = 0;
@@ -790,8 +702,7 @@ protected:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	void
-	move(StringRefBase&& src)
-	{
+	move(StringRefBase&& src) {
 		if (m_hdr)
 			m_hdr->release();
 
@@ -804,8 +715,7 @@ protected:
 #endif
 
 	void
-	attachBufHdr(rc::BufHdr* hdr) const
-	{
+	attachBufHdr(rc::BufHdr* hdr) const {
 		if (hdr == m_hdr)
 			return; // try to avoid unnecessary interlocked ops
 
@@ -819,8 +729,7 @@ protected:
 	}
 
 	void
-	attach(const StringRef& src)
-	{
+	attach(const StringRef& src) {
 		if (&src != this)
 			attach(src.m_hdr, src.m_p, src.m_length, src.m_isNullTerminated);
 	}
@@ -831,8 +740,7 @@ protected:
 		const C* p,
 		size_t length,
 		bool isNullTerminated
-		)
-	{
+	) {
 		ASSERT(length != -1 && (!isNullTerminated || !p[length]));
 
 		attachBufHdr(hdr);
@@ -843,15 +751,13 @@ protected:
 	}
 
 	int
-	cmpIgnoreCase_pcu(const StringRef& string) const
-	{
+	cmpIgnoreCase_pcu(const StringRef& string) const {
 		size_t length = AXL_MIN(m_length, string.m_length);
 
 		const C* p1 = m_p;
 		const C* p2 = string.m_p;
 		const C* end = p1 + length;
-		for (; p1 < end; p1++, p2++)
-		{
+		for (; p1 < end; p1++, p2++) {
 			C c1 = Details::toLower(*p1);
 			C c2 = Details::toLower(*p2);
 
@@ -867,15 +773,13 @@ protected:
 	}
 
 	int
-	cmpIgnoreCase_pcp(const StringRef& string) const
-	{
+	cmpIgnoreCase_pcp(const StringRef& string) const {
 		const C* p1 = m_p;
 		const C* end1 = p1 + m_length;
 		const C* p2 = string.m_p;
 		const C* end2 = p2 + string.m_length;
 
-		while (p1 < end1 && p2 < end2)
-		{
+		while (p1 < end1 && p2 < end2) {
 			size_t codePointLength1 = Encoding::getDecodeCodePointLength(*p1);
 			size_t codePointLength2 = Encoding::getDecodeCodePointLength(*p2);
 
@@ -905,13 +809,11 @@ protected:
 	}
 
 	size_t
-	hashIgnoreCase_pcu() const
-	{
+	hashIgnoreCase_pcu() const {
 		size_t h = djb2();
 
 		const C* end = m_p + m_length;
-		for (const C* p = m_p; p < end; p++)
-		{
+		for (const C* p = m_p; p < end; p++) {
 			C c = Details::toLower(*p);
 			h = djb2(h, &c, sizeof(c));
 		}
@@ -920,15 +822,13 @@ protected:
 	}
 
 	size_t
-	hashIgnoreCase_pcp() const
-	{
+	hashIgnoreCase_pcp() const {
 		size_t h = djb2();
 
 		const C* p = m_p;
 		const C* end = m_p + m_length;
 
-		while (p < end)
-		{
+		while (p < end) {
 			size_t codePointLength = Encoding::getDecodeCodePointLength(*p);
 			if (p + codePointLength > end)
 				break;
@@ -948,9 +848,8 @@ protected:
 template <
 	typename T,
 	typename Details0 = StringDetailsBase<T>
-	>
-class StringBase: public StringRefBase<T, Details0>
-{
+>
+class StringBase: public StringRefBase<T, Details0> {
 public:
 	typedef StringRefBase<T, Details0> StringRef;
 
@@ -970,100 +869,84 @@ public:
 	typedef typename StringRef::StringRef3 StringRef3;
 
 public:
-	StringBase()
-	{
-	}
+	StringBase() {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	StringBase(StringBase&& src)
-	{
+	StringBase(StringBase&& src) {
 		copy(std::move(src));
 	}
 
-	StringBase(StringRef&& src)
-	{
+	StringBase(StringRef&& src) {
 		copy(std::move(src));
 	}
 #endif
 
-	StringBase(const StringBase& src)
-	{
+	StringBase(const StringBase& src) {
 		copy(src);
 	}
 
-	StringBase(const StringRef& src)
-	{
+	StringBase(const StringRef& src) {
 		copy(src);
 	}
 
-	StringBase(const StringRef2& src)
-	{
+	StringBase(const StringRef2& src) {
 		copy(src);
 	}
 
-	StringBase(const StringRef3& src)
-	{
+	StringBase(const StringRef3& src) {
 		copy(src);
 	}
 
 	StringBase(
 		const C* p,
 		size_t length = -1
-		)
-	{
+	) {
 		copy(p, length);
 	}
 
 	StringBase(
 		const C* p,
 		const void* end
-		)
-	{
+	) {
 		copy(p, (C*)end - p);
 	}
 
 	StringBase(
 		const C2* p,
 		size_t length = -1
-		)
-	{
+	) {
 		copy(p, length);
 	}
 
 	StringBase(
 		const C2* p,
 		const void* end
-		)
-	{
+	) {
 		copy(p, (C2*)end - p);
 	}
 
 	StringBase(
 		const C3* p,
 		size_t length = -1
-		)
-	{
+	) {
 		copy(p, length);
 	}
 
 	StringBase(
 		const C3* p,
 		const void* end
-		)
-	{
+	) {
 		copy(p, (C3*)end - p);
 	}
 
-	StringBase(utf32_t x)
-	{
+	StringBase(utf32_t x) {
 		copy(x);
 	}
 
 	StringBase(
 		utf32_t x,
 		size_t count
-		)
-	{
+	) {
 		copy(x, count);
 	}
 
@@ -1071,146 +954,125 @@ public:
 		rc::BufKind kind,
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		setBuffer(kind, p, size);
 	}
 
-	operator const C* () const
-	{
+	operator const C* () const {
 		return sz();
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	StringBase&
-	operator = (StringBase&& src)
-	{
+	operator = (StringBase&& src) {
 		copy(std::move(src));
 		return *this;
 	}
 
 	StringBase&
-	operator = (StringRef&& src)
-	{
+	operator = (StringRef&& src) {
 		copy(std::move(src));
 		return *this;
 	}
 #endif
 
 	StringBase&
-	operator = (const StringBase& src)
-	{
+	operator = (const StringBase& src) {
 		copy(src);
 		return *this;
 	}
 
 	StringBase&
-	operator = (const StringRef& src)
-	{
+	operator = (const StringRef& src) {
 		copy(src);
 		return *this;
 	}
 
 	StringBase&
-	operator = (const StringRef2& src)
-	{
+	operator = (const StringRef2& src) {
 		copy(src);
 		return *this;
 	}
 
 	StringBase&
-	operator = (const StringRef3& src)
-	{
+	operator = (const StringRef3& src) {
 		copy(src);
 		return *this;
 	}
 
 	StringBase&
-	operator = (const C* p)
-	{
+	operator = (const C* p) {
 		copy(p, -1);
 		return *this;
 	}
 
 	StringBase&
-	operator = (const C2* p)
-	{
+	operator = (const C2* p) {
 		copy(p, -1);
 		return *this;
 	}
 
 	StringBase&
-	operator = (const C3* p)
-	{
+	operator = (const C3* p) {
 		copy(p, -1);
 		return *this;
 	}
 
 	StringBase&
-	operator = (utf32_t x)
-	{
+	operator = (utf32_t x) {
 		copy(x);
 		return *this;
 	}
 
 	StringBase&
-	operator += (const StringRef& string)
-	{
+	operator += (const StringRef& string) {
 		append(string);
 		return *this;
 	}
 
 	StringBase&
-	operator += (const StringRef2& string)
-	{
+	operator += (const StringRef2& string) {
 		append(string);
 		return *this;
 	}
 
 	StringBase&
-	operator += (const StringRef3& string)
-	{
+	operator += (const StringRef3& string) {
 		append(string);
 		return *this;
 	}
 
 	StringBase&
-	operator += (const C* p)
-	{
+	operator += (const C* p) {
 		append(p, -1);
 		return *this;
 	}
 
 	StringBase&
-	operator += (const C2* p)
-	{
+	operator += (const C2* p) {
 		append(p, -1);
 		return *this;
 	}
 
 	StringBase&
-	operator += (const C3* p)
-	{
+	operator += (const C3* p) {
 		append(p, -1);
 		return *this;
 	}
 
 	StringBase&
-	operator += (utf32_t x)
-	{
+	operator += (utf32_t x) {
 		append(x);
 		return *this;
 	}
 
 	const C&
-	operator [] (intptr_t i) const
-	{
+	operator [] (intptr_t i) const {
 		return StringRef::operator [] (i);
 	}
 
 	C&
-	operator [] (intptr_t i)
-	{
+	operator [] (intptr_t i) {
 		bool result = ensureExclusive();
 		ASSERT(result);
 
@@ -1218,36 +1080,30 @@ public:
 	}
 
 	C*
-	p()
-	{
+	p() {
 		return this->m_p;
 	}
 
 	const C*
-	sz() const
-	{
+	sz() const {
 		ASSERT(!this->m_length || this->m_isNullTerminated);
 		return this->m_length ? this->m_p : Details::getEmptyString();
 	}
 
 	const C*
-	szn() const
-	{
+	szn() const {
 		ASSERT(!this->m_length || this->m_isNullTerminated);
 		return this->m_length ? this->m_p : NULL;
 	}
 
 	void
-	clear()
-	{
-		if (!this->m_hdr)
-		{
+	clear() {
+		if (!this->m_hdr) {
 			ASSERT(!this->m_length);
 			return;
 		}
 
-		if (this->m_hdr->getRefCount() != 1)
-		{
+		if (this->m_hdr->getRefCount() != 1) {
 			this->release();
 			return;
 		}
@@ -1258,25 +1114,21 @@ public:
 	}
 
 	size_t
-	forceCopy(const StringRef& src)
-	{
+	forceCopy(const StringRef& src) {
 		return copy(src.cp(), src.getLength());
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
-	copy(StringRef&& src)
-	{
-		if (src.isEmpty())
-		{
+	copy(StringRef&& src) {
+		if (src.isEmpty()) {
 			clear();
 			src.release();
 			return 0;
 		}
 
 		rc::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated())
-		{
+		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated()) {
 			copy(src.cp(), src.getLength());
 			src.release();
 			return this->m_length;
@@ -1288,13 +1140,11 @@ public:
 #endif
 
 	size_t
-	copy(const StringRef& src)
-	{
+	copy(const StringRef& src) {
 		if (&src == this)
 			return this->m_length;
 
-		if (src.isEmpty())
-		{
+		if (src.isEmpty()) {
 			clear();
 			return 0;
 		}
@@ -1308,14 +1158,12 @@ public:
 	}
 
 	size_t
-	copy(const StringRef2& src)
-	{
+	copy(const StringRef2& src) {
 		return copy(src.cp(), src.getLength());
 	}
 
 	size_t
-	copy(const StringRef3& src)
-	{
+	copy(const StringRef3& src) {
 		return copy(src.cp(), src.getLength());
 	}
 
@@ -1323,22 +1171,19 @@ public:
 	copy(
 		const C* p,
 		size_t length = -1
-		)
-	{
+	) {
 		if (p == this->m_p && (length == -1 || length == this->m_length))
 			return this->m_length;
 
 		if (length == -1)
 			length = Details::calcLength(p);
 
-		if (!length)
-		{
+		if (!length) {
 			clear();
 			return 0;
 		}
 
-		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
-		{
+		if (this->m_hdr && this->m_hdr->isInsideBuffer(p)) {
 			C* end = (C*)this->m_hdr->getEnd();
 			ASSERT(p + length <= end);
 
@@ -1359,13 +1204,11 @@ public:
 	copy(
 		const C2* p,
 		size_t length = -1
-		)
-	{
+	) {
 		if (length == -1)
 			length = Details2::calcLength(p);
 
-		if (!length)
-		{
+		if (!length) {
 			clear();
 			return 0;
 		}
@@ -1382,13 +1225,11 @@ public:
 	copy(
 		const C3* p,
 		size_t length = -1
-		)
-	{
+	) {
 		if (length == -1)
 			length = Details3::calcLength(p);
 
-		if (!length)
-		{
+		if (!length) {
 			clear();
 			return 0;
 		}
@@ -1402,10 +1243,8 @@ public:
 	}
 
 	size_t
-	copy(utf32_t x)
-	{
-		if (!x)
-		{
+	copy(utf32_t x) {
+		if (!x) {
 			clear();
 			return 0;
 		}
@@ -1417,10 +1256,8 @@ public:
 	copy(
 		utf32_t x,
 		size_t count
-		)
-	{
-		if (!count)
-		{
+	) {
+		if (!count) {
 			clear();
 			return 0;
 		}
@@ -1442,20 +1279,17 @@ public:
 	}
 
 	size_t
-	append(const StringRef& src)
-	{
+	append(const StringRef& src) {
 		return insert(-1, src);
 	}
 
 	size_t
-	append(const StringRef2& src)
-	{
+	append(const StringRef2& src) {
 		return insert(-1, src);
 	}
 
 	size_t
-	append(const StringRef3& src)
-	{
+	append(const StringRef3& src) {
 		return insert(-1, src);
 	}
 
@@ -1463,8 +1297,7 @@ public:
 	append(
 		const C* p,
 		size_t length = -1
-		)
-	{
+	) {
 		return insert(-1, p, length);
 	}
 
@@ -1472,8 +1305,7 @@ public:
 	append(
 		const C2* p,
 		size_t length = -1
-		)
-	{
+	) {
 		return insert(-1, p, length);
 	}
 
@@ -1481,14 +1313,12 @@ public:
 	append(
 		const C3* p,
 		size_t length = -1
-		)
-	{
+	) {
 		return insert(-1, p, length);
 	}
 
 	size_t
-	append(utf32_t x)
-	{
+	append(utf32_t x) {
 		return x ? append(x, 1) : this->m_length;
 	}
 
@@ -1496,14 +1326,12 @@ public:
 	append(
 		utf32_t x,
 		size_t count
-		)
-	{
+	) {
 		return insert(-1, x, count);
 	}
 
 	size_t
-	appendNewLine()
-	{
+	appendNewLine() {
 		return insertNewLine(-1);
 	}
 
@@ -1511,8 +1339,7 @@ public:
 	insert(
 		size_t index,
 		const StringRef& src
-		)
-	{
+	) {
 		return !this->m_length ? copy(src) : insert(index, src.cp(), src.getLength());
 	}
 
@@ -1520,8 +1347,7 @@ public:
 	insert(
 		size_t index,
 		const StringRef2& src
-		)
-	{
+	) {
 		return insert(index, src.cp(), src.getLength());
 	}
 
@@ -1529,8 +1355,7 @@ public:
 	insert(
 		size_t index,
 		const StringRef3& src
-		)
-	{
+	) {
 		return insert(index, src.cp(), src.getLength());
 	}
 
@@ -1539,8 +1364,7 @@ public:
 		size_t index,
 		const C* p,
 		size_t length = -1
-		)
-	{
+	) {
 		size_t oldLength = this->m_length;
 
 		if (length == -1)
@@ -1566,8 +1390,7 @@ public:
 		size_t index,
 		const C2* p,
 		size_t length = -1
-		)
-	{
+	) {
 		size_t oldLength = this->m_length;
 
 		if (length == -1)
@@ -1590,8 +1413,7 @@ public:
 		size_t index,
 		const C3* p,
 		size_t length = -1
-		)
-	{
+	) {
 		size_t oldLength = this->m_length;
 
 		if (length == -1)
@@ -1613,8 +1435,7 @@ public:
 	insert(
 		size_t index,
 		utf32_t x
-		)
-	{
+	) {
 		return x ? insert(index, x, 1) : this->m_length;
 	}
 
@@ -1623,8 +1444,7 @@ public:
 		size_t index,
 		utf32_t x,
 		size_t count
-		)
-	{
+	) {
 		size_t oldLength = this->m_length;
 
 		if (count == 0)
@@ -1649,8 +1469,7 @@ public:
 	}
 
 	size_t
-	insertNewLine(size_t index)
-	{
+	insertNewLine(size_t index) {
 #if (_AXL_OS_WIN)
 		return insert(index, Details::getCrLf(), 2);
 #else
@@ -1662,8 +1481,7 @@ public:
 	remove(
 		size_t index,
 		size_t count = 1
-		)
-	{
+	) {
 		bool result;
 
 		if (count == 0)
@@ -1673,8 +1491,7 @@ public:
 		if (index >= oldLength)
 			return this->m_length;
 
-		if (count == -1 || index + count >= oldLength)
-		{
+		if (count == -1 || index + count >= oldLength) {
 			result = setReducedLength(index);
 			return result ? index : -1;
 		}
@@ -1693,12 +1510,10 @@ public:
 	}
 
 	size_t
-	trimLeft()
-	{
+	trimLeft() {
 		static StringRef whitespace(Details::getWhitespace(), 4);
 		size_t i = this->findNotOneOf(whitespace);
-		if (i == -1)
-		{
+		if (i == -1) {
 			clear();
 			return 0;
 		}
@@ -1709,12 +1524,10 @@ public:
 	}
 
 	size_t
-	trimRight()
-	{
+	trimRight() {
 		static StringRef whitespace(Details::getWhitespace(), 4);
 		size_t i = this->reverseFindNotOneOf(whitespace);
-		if (i == -1)
-		{
+		if (i == -1) {
 			clear();
 			return 0;
 		}
@@ -1724,8 +1537,7 @@ public:
 	}
 
 	size_t
-	trim()
-	{
+	trim() {
 		trimLeft();
 		return trimRight();
 	}
@@ -1734,8 +1546,7 @@ public:
 	replace(
 		const StringRef& from,
 		const StringRef& to
-		)
-	{
+	) {
 		return replace(from, from.getLength(), to, to.getLength());
 	}
 
@@ -1743,8 +1554,7 @@ public:
 	replace(
 		const C* from,
 		const C* to
-		)
-	{
+	) {
 		return replace(from, Details::calcLength(from), to, Details::calcLength(to));
 	}
 
@@ -1754,8 +1564,7 @@ public:
 		size_t fromLength,
 		const C* to,
 		size_t toLength
-		)
-	{
+	) {
 		bool result = ensureExclusive();
 		if (!result)
 			return -1;
@@ -1763,8 +1572,7 @@ public:
 		size_t count = 0;
 		size_t offset = 0;
 
-		for (;;)
-		{
+		for (;;) {
 			size_t i = Details::find(this->m_p + offset, this->m_length - offset, from, fromLength);
 			if (i == -1)
 				break;
@@ -1790,8 +1598,7 @@ public:
 	replace(
 		C from,
 		C to
-		)
-	{
+	) {
 		bool result = ensureExclusive();
 		if (!result)
 			return -1;
@@ -1808,24 +1615,21 @@ public:
 	}
 
 	size_t
-	makeLowerCase(CaseConvertMethod method = CaseConvertMethod_Default)
-	{
+	makeLowerCase(CaseConvertMethod method = CaseConvertMethod_Default) {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			convertCase_pcu(Details::toLower) :
 			convertCase_pcp<enc::UtfToLowerCase> ();
 	}
 
 	size_t
-	makeUpperCase(CaseConvertMethod method = CaseConvertMethod_Default)
-	{
+	makeUpperCase(CaseConvertMethod method = CaseConvertMethod_Default) {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			convertCase_pcu(Details::toUpper) :
 			convertCase_pcp<enc::UtfToUpperCase> ();
 	}
 
 	size_t
-	makeCaseFolded(CaseConvertMethod method = CaseConvertMethod_Default)
-	{
+	makeCaseFolded(CaseConvertMethod method = CaseConvertMethod_Default) {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			convertCase_pcu(Details::toLower) :
 			convertCase_pcp<enc::UtfToCaseFolded> ();
@@ -1835,8 +1639,7 @@ public:
 	format_va(
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		size_t length = Details::calcFormatLength_va(formatString, va);
 		if (!createBuffer(length, false))
 			return -1;
@@ -1849,8 +1652,7 @@ public:
 	format(
 		const C* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return format_va(formatString, va);
 	}
@@ -1859,8 +1661,7 @@ public:
 	appendFormat_va(
 		const C* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		size_t appendLength = Details::calcFormatLength_va(formatString, va);
 		size_t oldLength = this->m_length;
 		size_t newLength = oldLength + appendLength;
@@ -1875,21 +1676,16 @@ public:
 	appendFormat(
 		const C* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return appendFormat_va(formatString, va);
 	}
 
 	size_t
-	chop(size_t delta)
-	{
-		if (this->m_length <= delta)
-		{
+	chop(size_t delta) {
+		if (this->m_length <= delta) {
 			clear();
-		}
-		else
-		{
+		} else {
 			bool result = setReducedLength(this->m_length - delta);
 			if (!result)
 				return -1;
@@ -1899,13 +1695,11 @@ public:
 	}
 
 	bool
-	setReducedLength(size_t length)
-	{
+	setReducedLength(size_t length) {
 		if (length == this->m_length)
 			return true;
 
-		if (!length)
-		{
+		if (!length) {
 			clear();
 			return true;
 		}
@@ -1914,8 +1708,7 @@ public:
 		ASSERT(length < this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C)); // misuse otherwise
 
 		bool isNullTerminated = !this->m_p[length];
-		if (!isNullTerminated && this->m_hdr->getRefCount() == 1)
-		{
+		if (!isNullTerminated && this->m_hdr->getRefCount() == 1) {
 			this->m_p[length] = 0;
 			isNullTerminated = true;
 		}
@@ -1925,26 +1718,22 @@ public:
 	}
 
 	bool
-	isExclusive()
-	{
+	isExclusive() {
 		return !this->m_length || this->m_hdr && this->m_hdr->getRefCount() == 1;
 	}
 
 	bool
-	ensureExclusive()
-	{
+	ensureExclusive() {
 		return this->m_length ? createBuffer(this->m_length, true) != NULL : true;
 	}
 
 	C*
-	getBuffer(size_t* length = NULL)
-	{
+	getBuffer(size_t* length = NULL) {
 		C* p = createBuffer(this->m_length, true);
 		if (!p)
 			return NULL;
 
-		if (length)
-		{
+		if (length) {
 			size_t bufferLength = this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C);
 			ASSERT(bufferLength);
 
@@ -1958,19 +1747,16 @@ public:
 	createBuffer(
 		size_t length,
 		bool saveContents = false
-		)
-	{
+	) {
 		size_t size = (length + 1) * sizeof(C);
 
 		if (this->m_hdr &&
 			this->m_hdr->m_bufferSize >= size &&
-			this->m_hdr->getRefCount() == 1)
-		{
+			this->m_hdr->getRefCount() == 1) {
 			if (!this->m_length || !saveContents)
 				this->m_p = (C*)(this->m_hdr + 1);
 
-			if (this->m_hdr->getLeftoverBufferSize(this->m_p) >= size)
-			{
+			if (this->m_hdr->getLeftoverBufferSize(this->m_p) >= size) {
 				this->m_length = length;
 				this->m_p[length] = 0;
 				this->m_isNullTerminated = true;
@@ -1988,8 +1774,7 @@ public:
 
 		C* p = (C*)(hdr + 1);
 
-		if (saveContents && this->m_p)
-		{
+		if (saveContents && this->m_p) {
 			size_t copyLength = AXL_MIN(length, this->m_length);
 			Details::copy(p, this->m_p, copyLength);
 		}
@@ -2011,8 +1796,7 @@ public:
 		rc::BufKind kind,
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		ASSERT(size >= sizeof(rc::BufHdr) + sizeof(C));
 
 		uint_t flags = kind != rc::BufKind_Static ? rc::BufHdrFlag_Exclusive : 0;
@@ -2036,8 +1820,7 @@ public:
 	reserve(
 		size_t length,
 		bool saveContents = false
-		)
-	{
+	) {
 		if (saveContents && length < this->m_length)
 			length = this->m_length;
 
@@ -2053,8 +1836,7 @@ public:
 	}
 
 	size_t
-	updateLength()
-	{
+	updateLength() {
 		if (!this->m_hdr)
 			return 0;
 
@@ -2070,8 +1852,7 @@ protected:
 	insertSpace(
 		size_t index,
 		size_t length
-		)
-	{
+	) {
 		size_t oldLength = this->m_length;
 
 		if (!createBuffer(oldLength + length, true))
@@ -2095,10 +1876,8 @@ protected:
 		const C* pattern,
 		size_t patternLength,
 		size_t count
-		)
-	{
-		if (patternLength == 1)
-		{
+	) {
+		if (patternLength == 1) {
 			Details::fill(p, *pattern, count);
 			return;
 		}
@@ -2111,8 +1890,7 @@ protected:
 
 	template <typename CaseOp>
 	size_t
-	convertCase_pcu(CaseOp op)
-	{
+	convertCase_pcu(CaseOp op) {
 		bool result = ensureExclusive();
 		if (!result)
 			return -1;
@@ -2126,8 +1904,7 @@ protected:
 
 	template <typename CaseOp>
 	size_t
-	convertCase_pcp()
-	{
+	convertCase_pcp() {
 		StringRef src = *this; // save old contents -- can't convert in-place because length can increase
 
 		size_t length = enc::UtfConvert<Encoding, Encoding, CaseOp>::calcRequiredLength(this->m_p, this->m_length);
@@ -2159,22 +1936,19 @@ typedef StringBase<utf32_t> String_utf32;
 // specializations for ArgType
 
 template <>
-class ArgType<String_utf8>
-{
+class ArgType<String_utf8> {
 public:
 	typedef const StringRef_utf8& Type;
 };
 
 template <>
-class ArgType<String_utf16>
-{
+class ArgType<String_utf16> {
 public:
 	typedef const StringRef_utf16& Type;
 };
 
 template <>
-class ArgType<String_utf32>
-{
+class ArgType<String_utf32> {
 public:
 	typedef const StringRef_utf32& Type;
 };
@@ -2188,8 +1962,7 @@ StringBase<C>
 operator + (
 	const char* p,
 	const StringRefBase<C>& src
-	)
-{
+) {
 	StringBase<C> string(p);
 	string += src;
 	return string;
@@ -2200,8 +1973,7 @@ StringBase<C>
 operator + (
 	const wchar_t* p,
 	const StringRefBase<C>& src
-	)
-{
+) {
 	StringBase<C> string(p);
 	string += src;
 	return string;
@@ -2212,8 +1984,7 @@ StringBase<C>
 operator + (
 	char c,
 	const StringRefBase<C>& src
-	)
-{
+) {
 	StringBase<C> string(c);
 	string += src;
 	return string;
@@ -2224,8 +1995,7 @@ StringBase<C>
 operator + (
 	wchar_t c,
 	const StringRefBase<C>& src
-	)
-{
+) {
 	StringBase<C> string(c);
 	string += src;
 	return string;
@@ -2238,8 +2008,7 @@ String
 formatString_va(
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	String string;
 	string.format_va(formatString, va);
 	return string;
@@ -2250,8 +2019,7 @@ String
 formatString(
 	const char* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	return formatString_va(formatString, va);
 }
@@ -2261,8 +2029,7 @@ String_w
 formatString_w_va(
 	const wchar_t* formatString,
 	axl_va_list va
-	)
-{
+) {
 	String_w string;
 	string.format_va(formatString, va);
 	return string;
@@ -2273,8 +2040,7 @@ String_w
 formatString_w(
 	const wchar_t* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	return formatString_w_va(formatString, va);
 }

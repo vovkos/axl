@@ -24,8 +24,7 @@ buildScrollInfo(
 	size_t max,
 	size_t page,
 	size_t pos
-	)
-{
+) {
 	memset(scrollInfo, 0, sizeof(SCROLLINFO));
 	scrollInfo->cbSize = sizeof(SCROLLINFO);
 	scrollInfo->fMask = SIF_ALL;
@@ -38,8 +37,7 @@ buildScrollInfo(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint_t
-getModifierKeys()
-{
+getModifierKeys() {
 	uint_t modifierKeys = 0;
 
 	if (::GetAsyncKeyState(VK_SHIFT) & 0x8000)
@@ -57,8 +55,7 @@ getModifierKeys()
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 uint_t
-getMouseButtons()
-{
+getMouseButtons() {
 	uint_t buttons = 0;
 
 	if (::GetAsyncKeyState(VK_LBUTTON) & 0x8000)
@@ -76,8 +73,7 @@ getMouseButtons()
 //..............................................................................
 
 rc::Ptr<Canvas>
-GdiWidgetImpl::getCanvas(HWND hWnd)
-{
+GdiWidgetImpl::getCanvas(HWND hWnd) {
 	HDC hdc = ::GetDC(hWnd);
 
 	rc::Ptr<GdiCanvas> dc = AXL_RC_NEW(rc::Box<GdiCanvas>);
@@ -92,12 +88,10 @@ GdiWidgetImpl::windowProc(
 	WPARAM wParam,
 	LPARAM lParam,
 	bool* isHandled_o
-	)
-{
+) {
 	ASSERT(m_engine->getEngineKind() == EngineKind_Gdi);
 
-	if (checkMsgMap(WidgetMsgCode_Gdi))
-	{
+	if (checkMsgMap(WidgetMsgCode_Gdi)) {
 		WidgetGdiMsg msg(wmMsg, wParam, lParam);
 
 		bool isHandled = true;
@@ -107,8 +101,7 @@ GdiWidgetImpl::windowProc(
 	}
 
 	LRESULT lResult = 0;
-	switch (wmMsg)
-	{
+	switch (wmMsg) {
 	case WM_DESTROY:
 		if (checkMsgMap(WidgetMsgCode_Close))
 			processWidgetMsg(&WidgetMsg(WidgetMsgCode_Close), isHandled_o);
@@ -179,7 +172,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_None,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -209,7 +202,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Left,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -223,7 +216,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Left,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -237,7 +230,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Left,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -251,7 +244,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Right,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -265,7 +258,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Right,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -279,7 +272,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Right,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -293,7 +286,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Medium,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -307,7 +300,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Medium,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -321,7 +314,7 @@ GdiWidgetImpl::windowProc(
 				(short)HIWORD(lParam),
 				MouseButton_Medium,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -333,7 +326,7 @@ GdiWidgetImpl::windowProc(
 				hWnd,
 				(short)HIWORD(wParam) / WHEEL_DELTA,
 				isHandled_o
-				);
+			);
 		else
 			*isHandled_o = false;
 
@@ -392,8 +385,7 @@ GdiWidgetImpl::processWmMouse(
 	int y,
 	MouseButton button,
 	bool* isHandled_o
-	)
-{
+) {
 	WidgetMouseMsg msg;
 	msg.m_msgCode = msgCode;
 	msg.m_point.m_x = x;
@@ -410,8 +402,7 @@ GdiWidgetImpl::processWmKey(
 	WidgetMsgCode msgCode,
 	int key,
 	bool* isHandled_o
-	)
-{
+) {
 	WidgetKeyMsg msg;
 	msg.m_msgCode = msgCode;
 	msg.m_key = key;
@@ -425,8 +416,7 @@ GdiWidgetImpl::processWmMouseWheel(
 	HWND hWnd,
 	int wheelDelta,
 	bool* isHandled_o
-	)
-{
+) {
 	POINT point;
 	::GetCursorPos(&point);
 	::ScreenToClient(hWnd, &point);
@@ -447,8 +437,7 @@ void
 GdiWidgetImpl::processWmSize(
 	HWND hWnd,
 	bool* isHandled_o
-	)
-{
+) {
 	RECT rect;
 	::GetClientRect(hWnd, &rect);
 
@@ -472,8 +461,7 @@ GdiWidgetImpl::processWmScroll(
 	Orientation orientation,
 	int code,
 	bool* isHandled_o
-	)
-{
+) {
 	ASSERT((size_t)orientation < 2);
 
 	WidgetScrollBar* scrollBar = &m_scrollBarArray[orientation];
@@ -489,8 +477,7 @@ GdiWidgetImpl::processWmScroll(
 	intptr_t newPos = scrollInfo.nPos;
 	intptr_t maxPos = scrollBar->getMaxPos();
 
-	switch (code)
-	{
+	switch (code) {
 	case SB_TOP:
 		newPos = 0;
 		break;
@@ -523,8 +510,7 @@ GdiWidgetImpl::processWmScroll(
 	if (newPos > maxPos)
 		newPos = maxPos;
 
-	if (newPos != scrollInfo.nPos)
-	{
+	if (newPos != scrollInfo.nPos) {
 		scrollInfo.fMask = SIF_POS;
 		scrollInfo.nPos = (int)newPos;
 		::SetScrollInfo(hWnd, bar, &scrollInfo, TRUE);
@@ -539,8 +525,7 @@ void
 GdiWidgetImpl::processWmPaint(
 	HWND hWnd,
 	bool* isHandled_o
-	)
-{
+) {
 	PAINTSTRUCT paintStruct;
 	HDC hdc = ::BeginPaint(hWnd, &paintStruct);
 
@@ -555,7 +540,7 @@ GdiWidgetImpl::processWmPaint(
 		paintStruct.rcPaint.top,
 		paintStruct.rcPaint.right,
 		paintStruct.rcPaint.bottom
-		);
+	);
 
 	bool isHandled = true; // ignore it
 	processWidgetMsg(&WidgetPaintMsg(&dc, rect), &isHandled);
@@ -567,8 +552,7 @@ LRESULT
 GdiWidgetImpl::processWmSetCursor(
 	HWND hWnd,
 	bool* isHandled_o
-	)
-{
+) {
 	POINT mousePos;
 	RECT clientRect;
 
@@ -577,18 +561,14 @@ GdiWidgetImpl::processWmSetCursor(
 	::GetClientRect(hWnd, &clientRect);
 
 	bool_t isOnClientRect = ::PtInRect(&clientRect, mousePos);
-	if (!isOnClientRect)
-	{
+	if (!isOnClientRect) {
 		*isHandled_o = false;
 		return 0;
 	}
 
-	if (!m_cursor)
-	{
+	if (!m_cursor) {
 		::SetCursor(NULL);
-	}
-	else
-	{
+	} else {
 		ASSERT(m_cursor->getEngine()->getEngineKind() == EngineKind_Gdi);
 		::SetCursor(*(GdiCursor*)m_cursor);
 	}

@@ -23,25 +23,19 @@ namespace gui {
 template <typename T>
 class QtRagelSyntaxHighlighter:
 	public QSyntaxHighlighter,
-	public lex::Ragel
-{
+	public lex::Ragel {
 public:
     explicit
 	QtRagelSyntaxHighlighter(QObject* parent):
-		QSyntaxHighlighter(parent)
-	{
-	}
+		QSyntaxHighlighter(parent) {}
 
 	explicit
 	QtRagelSyntaxHighlighter(QTextDocument* parent):
-		QSyntaxHighlighter(parent)
-	{
-	}
+		QSyntaxHighlighter(parent) {}
 
     virtual
 	void
-	highlightBlock(const QString &text)
-	{
+	highlightBlock(const QString &text) {
 		QByteArray data = text.toUtf8();
 
 		Ragel::clear();
@@ -52,14 +46,12 @@ public:
 
 protected:
 	void
-	highlightLastToken(const QTextCharFormat& format)
-	{
+	highlightLastToken(const QTextCharFormat& format) {
 		setFormat(ts - m_begin, te - ts, format);
 	}
 
 	void
-	highlightLastToken(const QColor& color)
-	{
+	highlightLastToken(const QColor& color) {
 		setFormat(ts - m_begin, te - ts, color);
 	}
 
@@ -67,8 +59,7 @@ protected:
 	highlightLastToken(
 		const QColor& color,
 		const QVariant& userData
-		)
-	{
+	) {
 	    QTextCharFormat format;
 		format.setForeground(color);
 		format.setProperty(QTextFormat::UserFormat, userData);

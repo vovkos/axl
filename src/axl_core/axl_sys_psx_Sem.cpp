@@ -22,12 +22,10 @@ namespace psx {
 #if (!_AXL_OS_DARWIN)
 
 bool
-Sem::wait(uint_t timeout)
-{
+Sem::wait(uint_t timeout) {
 	int result;
 
-	switch (timeout)
-	{
+	switch (timeout) {
 	case 0:
 		result = ::sem_trywait(&m_sem);
 		break;
@@ -55,8 +53,7 @@ NamedSem::open(
 	int flags,
 	mode_t mode,
 	uint_t value
-	)
-{
+) {
 	close();
 
 	m_h = ::sem_open(name.sz(), flags, mode, value);
@@ -65,12 +62,10 @@ NamedSem::open(
 
 #if (!_AXL_OS_DARWIN)
 bool
-NamedSem::wait(uint_t timeout)
-{
+NamedSem::wait(uint_t timeout) {
 	int result;
 
-	switch (timeout)
-	{
+	switch (timeout) {
 	case 0:
 		result = ::sem_trywait(m_h);
 		break;

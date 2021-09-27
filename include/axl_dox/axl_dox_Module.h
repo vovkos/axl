@@ -18,13 +18,11 @@ namespace dox {
 
 //..............................................................................
 
-class Module
-{
+class Module {
 	friend class Parser;
 
 protected:
-	struct Target: sl::ListLink
-	{
+	struct Target: sl::ListLink {
 		Block* m_block;
 		int m_tokenKind;
 		sl::StringRef m_itemName;
@@ -42,14 +40,12 @@ protected:
 	sl::List<Target> m_targetList;
 
 public:
-	Module(Host* host)
-	{
+	Module(Host* host) {
 		m_host = host;
 	}
 
 	Host*
-	getHost()
-	{
+	getHost() {
 		return m_host;
 	}
 
@@ -57,14 +53,12 @@ public:
 	clear();
 
 	sl::ConstList<Block>
-	getBlockList()
-	{
+	getBlockList() {
 		return m_blockList;
 	}
 
 	sl::ConstList<Group>
-	getGroupList()
-	{
+	getGroupList() {
 		return m_groupList;
 	}
 
@@ -85,7 +79,7 @@ public:
 		const sl::StringRef& outputDir,
 		const sl::StringRef& indexFileName = "index.xml",
 		const sl::StringRef& globalNamespaceFileName = "global.xml"
-		);
+	);
 
 protected:
 	void
@@ -94,7 +88,7 @@ protected:
 		int tokenKind,
 		const sl::StringRef& itemName,
 		size_t overloadIdx
-		);
+	);
 
 	Group*
 	getGroup(const sl::StringRef& name);
@@ -106,7 +100,7 @@ protected:
 	generateGroupDocumentation(
 		const sl::StringRef& outputDir,
 		sl::String* indexXml
-		);
+	);
 };
 
 //..............................................................................

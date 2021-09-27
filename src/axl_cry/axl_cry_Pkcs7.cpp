@@ -20,8 +20,7 @@ namespace cry {
 //..............................................................................
 
 bool
-Pkcs7::create()
-{
+Pkcs7::create() {
 	close();
 
 	m_h = PKCS7_new();
@@ -32,15 +31,13 @@ bool
 Pkcs7::loadDer(
 	const void* p0,
 	size_t size
-	)
-{
+) {
 	close();
 
 	const uchar_t* p = (uchar_t*)p0;
 	PKCS7* pkcs7 = PKCS7_new();
 	PKCS7* result = d2i_PKCS7(&pkcs7, &p, size);
-	if (!result)
-	{
+	if (!result) {
 		ASSERT(pkcs7 == NULL); // should have been freed already
 		return failWithLastCryptoError();
 	}
@@ -50,8 +47,7 @@ Pkcs7::loadDer(
 }
 
 size_t
-Pkcs7::saveDer(sl::Array<char>* buffer) const
-{
+Pkcs7::saveDer(sl::Array<char>* buffer) const {
 	ASSERT(m_h);
 
 	uchar_t* p = NULL;
@@ -68,8 +64,7 @@ bool
 Pkcs7::loadPem(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	close();
 
 	Bio bio;
@@ -77,8 +72,7 @@ Pkcs7::loadPem(
 
 	PKCS7* pkcs7 = PKCS7_new();
 	PKCS7* result = PEM_read_bio_PKCS7(bio, &pkcs7, NULL, NULL);
-	if (!result)
-	{
+	if (!result) {
 		ASSERT(pkcs7 == NULL); // should have been freed already
 		return failWithLastCryptoError();
 	}
@@ -88,8 +82,7 @@ Pkcs7::loadPem(
 }
 
 size_t
-Pkcs7::savePem(sl::String* string) const
-{
+Pkcs7::savePem(sl::String* string) const {
 	ASSERT(m_h);
 
 	Bio bio;
@@ -107,8 +100,7 @@ Pkcs7::verify(
 	BIO* inData,
 	BIO* outData,
 	int flags
-	)
-{
+) {
 	ASSERT(m_h);
 	int result = PKCS7_verify(m_h, certStack, store, inData, outData, flags);
 	return completeWithLastCryptoError(result);

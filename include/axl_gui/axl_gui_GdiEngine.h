@@ -25,8 +25,7 @@ namespace gui {
 
 //..............................................................................
 
-class GdiEngine: public Engine
-{
+class GdiEngine: public Engine {
 protected:
 	HWND m_hWndClipboardOwner;
 
@@ -36,8 +35,7 @@ public:
 
 	static
 	GdiEngine*
-	getSingleton()
-	{
+	getSingleton() {
 		return sl::getSingleton<GdiEngine> ();
 	}
 
@@ -56,7 +54,7 @@ public:
 		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
-		);
+	);
 
 	rc::Ptr<Font>
 	createStockFont(int stockFontKind);
@@ -83,14 +81,14 @@ public:
 		PixelFormat pixelFormat,
 		const void* data,
 		bool isScreenCompatible = true
-		);
+	);
 
 	virtual
 	rc::Ptr<Canvas>
 	createOffscreenCanvas(
 		int width,
 		int height
-		);
+	);
 
 	// clipboard
 
@@ -107,7 +105,7 @@ public:
 	readClipboard(
 		uintptr_t format,
 		sl::Array<char>* data
-		);
+	);
 
 	virtual
 	bool
@@ -119,12 +117,11 @@ public:
 		uintptr_t format,
 		const void* data,
 		size_t size
-		);
+	);
 
 	virtual
 	bool
-	commitClipboard()
-	{
+	commitClipboard() {
 		return true;
 	}
 
@@ -135,7 +132,7 @@ public:
 	showCaret(
 		Widget* widget,
 		const Rect& rect
-		);
+	);
 
 	virtual
 	void
@@ -150,7 +147,7 @@ protected:
 	getFontMod(
 		Font* baseFont,
 		uint_t flags
-		);
+	);
 
 	virtual
 	rc::Ptr<Font>

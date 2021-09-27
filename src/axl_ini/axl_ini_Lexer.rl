@@ -52,14 +52,12 @@ ws | nl               ;
 //..............................................................................
 
 void
-Lexer::init ()
-{
+Lexer::init () {
 	%% write init;
 }
 
 bool
-Lexer::exec ()
-{
+Lexer::exec () {
 	%% write exec;
 	return cs != axl_ini_error;
 }

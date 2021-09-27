@@ -21,8 +21,7 @@ namespace io {
 
 //..............................................................................
 
-class SerialPortEnumerator
-{
+class SerialPortEnumerator {
 public:
 	static
 	size_t
@@ -32,8 +31,7 @@ public:
 //..............................................................................
 
 size_t
-SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
-{
+SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList) {
 	portList->clear();
 
 #ifdef _AXL_SYS_LNX_LIBUDEV
@@ -48,8 +46,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 		return 0;
 
 	sys::lnx::DynamicUdevListEntry it = enumerator.getListEntry();
-	for (; it; it++)
-	{
+	for (; it; it++) {
 		sl::StringRef path = it.getName();
 		sys::lnx::DynamicUdevDevice device = udev.getDeviceFromSysPath(path);
 		if (!device)
@@ -63,8 +60,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 
 		sl::StringRef name = device.getDevNode();
 		sl::StringRef driver = parentDevice.getDriver();
-		if (driver == "serial8250")
-		{
+		if (driver == "serial8250") {
 			// serial8250 driver has a hardcoded number of ports
 			// the only way to tell which actually exist on a given system
 			// is to try to open them and make an ioctl call
@@ -92,16 +88,14 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 		portList->insertTail(portDesc);
 	}
 #else
-	static const char* deviceNameTable[][2] =
-	{
+	static const char* deviceNameTable[][2] = {
 		{ "/dev/ttyS0",   "Serial device /dev/ttyS0" },
 		{ "/dev/ttyS1",   "Serial device /dev/ttyS1" },
 		{ "/dev/ttyUSB0", "USB Serial device /dev/ttyUSB0" },
 		{ "/dev/ttyUSB1", "USB Serial device /dev/ttyUSB1" },
 	};
 
-	for (size_t i = 0; i < countof(deviceNameTable); i++)
-	{
+	for (size_t i = 0; i < countof(deviceNameTable); i++) {
 		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
 		portDesc->m_deviceName = deviceNameTable[i][0];
 		portDesc->m_description = deviceNameTable[i][1];
@@ -115,8 +109,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 //..............................................................................
 
 size_t
-createSerialPortDescList(sl::List<SerialPortDesc>* portList)
-{
+createSerialPortDescList(sl::List<SerialPortDesc>* portList) {
 	return SerialPortEnumerator::createPortList(portList);
 }
 

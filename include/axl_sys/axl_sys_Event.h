@@ -32,32 +32,27 @@ namespace sys {
 #if (_AXL_OS_WIN)
 
 template <typename IsNotificationEvent>
-class EventBase
-{
+class EventBase {
 public:
 	win::Event m_event;
 
 public:
-	EventBase()
-	{
+	EventBase() {
 		m_event.create(NULL, IsNotificationEvent()(), false, NULL);
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		return m_event.signal();
 	}
 
 	bool
-	reset()
-	{
+	reset() {
 		return m_event.reset();
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		return m_event.wait(timeout) == win::WaitResult_Object0;
 	}
 };
@@ -72,33 +67,28 @@ typedef EventBase<sl::True<bool> > NotificationEvent;
 #elif (_AXL_OS_POSIX)
 
 template <typename IsNotificationEvent>
-class CondMutexEventBase
-{
+class CondMutexEventBase {
 protected:
 	psx::CondMutexPair m_condMutexPair;
 	volatile bool m_state;
 
 public:
-	CondMutexEventBase()
-	{
+	CondMutexEventBase() {
 		 m_state = false;
 	}
 
 	CondMutexEventBase(
 		const pthread_condattr_t* condAttr,
 		const pthread_mutexattr_t* mutexAttr
-		):
-		m_condMutexPair(condAttr, mutexAttr)
-	{
+	):
+		m_condMutexPair(condAttr, mutexAttr) {
 		m_state = false;
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		m_condMutexPair.lock();
-		if (m_state)
-		{
+		if (m_state) {
 			m_condMutexPair.unlock();
 			return true;
 		}
@@ -114,8 +104,7 @@ public:
 	}
 
 	bool
-	reset()
-	{
+	reset() {
 		m_condMutexPair.lock();
 		m_state = false;
 		m_condMutexPair.unlock();
@@ -123,12 +112,10 @@ public:
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		m_condMutexPair.lock();
 
-		if (m_state)
-		{
+		if (m_state) {
 			if (!IsNotificationEvent()())
 				m_state = false;
 
@@ -137,8 +124,7 @@ public:
 		}
 
 		bool result = m_condMutexPair.wait(timeout);
-		if (!result)
-		{
+		if (!result) {
 			m_condMutexPair.unlock();
 			return false;
 		}
@@ -176,51 +162,43 @@ typedef CondMutexEventBase<sl::True<bool> > NotificationEvent;
 #if (_AXL_OS_WIN)
 
 template <typename IsNotificationEvent>
-class NameableEventBase
-{
+class NameableEventBase {
 protected:
 	sys::win::Event m_event;
 
 public:
 	void
-	close()
-	{
+	close() {
 		m_event.close();
 	}
 
 	bool
-	create()
-	{
+	create() {
 		return m_event.create(NULL, IsNotificationEvent()(), false);
 	}
 
 	bool
-	create(const sl::StringRef& name)
-	{
+	create(const sl::StringRef& name) {
 		return m_event.create(NULL, IsNotificationEvent()(), false, name.s2());
 	}
 
 	bool
-	open(const sl::StringRef& name)
-	{
+	open(const sl::StringRef& name) {
 		return m_event.open(EVENT_ALL_ACCESS, false, name.s2());
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		return m_event.wait(timeout) == sys::win::WaitResult_Object0;
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		return m_event.signal();
 	}
 
 	bool
-	reset()
-	{
+	reset() {
 		return m_event.reset();
 	}
 };
@@ -231,16 +209,13 @@ public:
 #	if (_AXL_OS_DARWIN)
 
 template <typename IsNotificationEvent>
-class NamedSemEventBase
-{
+class NamedSemEventBase {
 protected:
-	struct Data
-	{
+	struct Data {
 		int32_t m_lock;
 		uint32_t m_waitCount;
 
-		union
-		{
+		union {
 			bool m_state;
 			uint64_t _m_align;
 		};
@@ -253,14 +228,12 @@ protected:
 	volatile Data* m_data;
 
 public:
-	NamedSemEventBase()
-	{
+	NamedSemEventBase() {
 		 m_data = NULL;
 	}
 
 	void
-	close()
-	{
+	close() {
 		if (!m_data)
 			return;
 
@@ -268,8 +241,7 @@ public:
 		m_mapping.close();
 		m_data = NULL;
 
-		if (!m_name.isEmpty())
-		{
+		if (!m_name.isEmpty()) {
 			psx::NamedSem::unlink(m_name);
 			io::psx::SharedMemory::unlink(m_name);
 			m_name.clear();
@@ -277,8 +249,7 @@ public:
 	}
 
 	bool
-	create(const sl::StringRef& name)
-	{
+	create(const sl::StringRef& name) {
 		close();
 
 		io::psx::SharedMemory sharedMemory;
@@ -294,17 +265,15 @@ public:
 				PROT_READ | PROT_WRITE,
 				MAP_SHARED,
 				sharedMemory
-				));
+			));
 
-		if (!result)
-		{
+		if (!result) {
 			sharedMemory.unlink(name);
 			return false;
 		}
 
 		result = m_sem.open(name, O_CREAT | O_EXCL);
-		if (!result)
-		{
+		if (!result) {
 			sharedMemory.unlink(name);
 			m_mapping.close();
 			m_data = NULL;
@@ -316,8 +285,7 @@ public:
 	}
 
 	bool
-	open(const sl::StringRef& name)
-	{
+	open(const sl::StringRef& name) {
 		close();
 
 		io::psx::SharedMemory sharedMemory;
@@ -331,14 +299,13 @@ public:
 			PROT_READ | PROT_WRITE,
 			MAP_SHARED,
 			sharedMemory
-			);
+		);
 
 		if (!m_data)
 			return false;
 
 		result = m_sem.open(name, 0);
-		if (!result)
-		{
+		if (!result) {
 			m_mapping.close();
 			m_data = NULL;
 			return false;
@@ -348,13 +315,11 @@ public:
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		ASSERT(m_data);
 
 		sys::atomicLock(&m_data->m_lock);
-		if (m_data->m_state)
-		{
+		if (m_data->m_state) {
 			sys::atomicUnlock(&m_data->m_lock);
 			return true;
 		}
@@ -373,8 +338,7 @@ public:
 	}
 
 	bool
-	reset()
-	{
+	reset() {
 		ASSERT(m_data);
 
 		sys::atomicLock(&m_data->m_lock);
@@ -384,11 +348,9 @@ public:
 	}
 
 	bool
-	wait()
-	{
+	wait() {
 		sys::atomicLock(&m_data->m_lock);
-		if (m_data->m_state)
-		{
+		if (m_data->m_state) {
 			if (!IsNotificationEvent()())
 				m_data->m_state = false;
 
@@ -398,8 +360,7 @@ public:
 
 		m_data->m_waitCount++;
 
-		for (;;)
-		{
+		for (;;) {
 			sys::atomicUnlock(&m_data->m_lock);
 
 			bool result = m_sem.wait();
@@ -422,11 +383,9 @@ public:
 // cannot be destroyed while someone is waiting on it!
 
 template <typename IsNotificationEvent>
-class NameableEventBase
-{
+class NameableEventBase {
 protected:
-	enum EventKind
-	{
+	enum EventKind {
 		EventKind_None = 0,
 		EventKind_Unnamed,
 		EventKind_Named,
@@ -436,8 +395,7 @@ protected:
 	typedef NamedSemEventBase<IsNotificationEvent> NamedEventImpl;
 
 protected:
-	union
-	{
+	union {
 		char m_eventBuffer[AXL_MAX(sizeof(UnnamedEventImpl), sizeof(NamedEventImpl))]; // avoid heap allocations
 		uint64_t _m_align;
 	};
@@ -445,20 +403,17 @@ protected:
 	EventKind m_eventKind;
 
 public:
-	NameableEventBase()
-	{
+	NameableEventBase() {
 		m_eventKind = EventKind_None;
 		create();
 	}
 
-	~NameableEventBase()
-	{
+	~NameableEventBase() {
 		close();
 	}
 
 	void
-	close()
-	{
+	close() {
 		if (!m_eventKind)
 			return;
 
@@ -470,8 +425,7 @@ public:
 	}
 
 	bool
-	create()
-	{
+	create() {
 		close();
 
 		new(m_eventBuffer) UnnamedEventImpl;
@@ -480,16 +434,14 @@ public:
 	}
 
 	bool
-	create(const sl::StringRef& name)
-	{
+	create(const sl::StringRef& name) {
 		close();
 
 		new(m_eventBuffer) NamedEventImpl;
 		m_eventKind = EventKind_Named;
 
 		bool result = getNamedEvent()->create(name);
-		if (!result)
-		{
+		if (!result) {
 			close();
 			return false;
 		}
@@ -498,16 +450,14 @@ public:
 	}
 
 	bool
-	open(const sl::StringRef& name)
-	{
+	open(const sl::StringRef& name) {
 		close();
 
 		new(m_eventBuffer) NamedEventImpl;
 		m_eventKind = EventKind_Named;
 
 		bool result = getNamedEvent()->open(name);
-		if (!result)
-		{
+		if (!result) {
 			close();
 			return false;
 		}
@@ -517,8 +467,7 @@ public:
 	}
 
 	bool
-	wait()
-	{
+	wait() {
 		ASSERT(m_eventKind);
 		return m_eventKind == EventKind_Named ?
 			getNamedEvent()->wait() :
@@ -526,8 +475,7 @@ public:
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		ASSERT(m_eventKind);
 		return m_eventKind == EventKind_Named ?
 			getNamedEvent()->signal() :
@@ -535,8 +483,7 @@ public:
 	}
 
 	bool
-	reset()
-	{
+	reset() {
 		ASSERT(m_eventKind);
 		return m_eventKind == EventKind_Named ?
 			getNamedEvent()->reset() :
@@ -545,15 +492,13 @@ public:
 
 protected:
 	UnnamedEventImpl*
-	getUnnamedEvent()
-	{
+	getUnnamedEvent() {
 		ASSERT(m_eventKind == EventKind_Unnamed);
 		return (UnnamedEventImpl*)m_eventBuffer;
 	}
 
 	NamedEventImpl*
-	getNamedEvent()
-	{
+	getNamedEvent() {
 		ASSERT(m_eventKind == EventKind_Named);
 		return (NamedEventImpl*)m_eventBuffer;
 	}
@@ -565,8 +510,7 @@ protected:
 // cannot be destroyed while someone is waiting on it!
 
 template <typename IsNotificationEvent>
-class NameableEventBase
-{
+class NameableEventBase {
 protected:
 	typedef CondMutexEventBase<IsNotificationEvent> EventImpl;
 
@@ -575,36 +519,29 @@ protected:
 	io::psx::Mapping m_mapping;
 	sl::String m_name;
 
-	union
-	{
+	union {
 		char m_unnamedEventBuffer[sizeof(EventImpl)]; // avoid heap allocations
 		uint64_t _m_align;
 	};
 
 public:
-	NameableEventBase()
-	{
+	NameableEventBase() {
 		m_event = NULL;
 		create();
 	}
 
-	~NameableEventBase()
-	{
+	~NameableEventBase() {
 		close();
 	}
 
 	void
-	close()
-	{
+	close() {
 		if (!m_event)
 			return;
 
-		if (m_event == (EventImpl*)m_unnamedEventBuffer)
-		{
+		if (m_event == (EventImpl*)m_unnamedEventBuffer) {
 			m_event->~EventImpl();
-		}
-		else if (!m_name.isEmpty())
-		{
+		} else if (!m_name.isEmpty()) {
 			io::psx::SharedMemory::unlink(m_name);
 			m_event->~EventImpl();
 		}
@@ -615,8 +552,7 @@ public:
 	}
 
 	bool
-	create()
-	{
+	create() {
 		close();
 
 		m_event = (EventImpl*)m_unnamedEventBuffer;
@@ -625,8 +561,7 @@ public:
 	}
 
 	bool
-	create(const sl::StringRef& name)
-	{
+	create(const sl::StringRef& name) {
 		close();
 
 		psx::CondAttr condAttr;
@@ -652,10 +587,9 @@ public:
 				PROT_READ | PROT_WRITE,
 				MAP_SHARED,
 				sharedMemory
-				));
+			));
 
-		if (!result)
-		{
+		if (!result) {
 			sharedMemory.unlink(name);
 			return false;
 		}
@@ -666,8 +600,7 @@ public:
 	}
 
 	bool
-	open(const sl::StringRef& name)
-	{
+	open(const sl::StringRef& name) {
 		close();
 
 		io::psx::SharedMemory sharedMemory;
@@ -682,28 +615,25 @@ public:
 			PROT_READ | PROT_WRITE,
 			MAP_SHARED,
 			sharedMemory
-			);
+		);
 
 		return m_event != NULL;
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		ASSERT(m_event);
 		return m_event->wait(timeout);
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		ASSERT(m_event);
 		return m_event->signal();
 	}
 
 	bool
-	reset()
-	{
+	reset() {
 		ASSERT(m_event);
 		return m_event->reset();
 	}

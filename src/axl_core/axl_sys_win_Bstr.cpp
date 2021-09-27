@@ -23,8 +23,7 @@ bool
 Bstr::copy(
 	BSTR p,
 	size_t length
-	)
-{
+) {
 	close();
 
 	m_h = ::SysAllocStringLen(p, length);

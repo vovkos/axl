@@ -27,8 +27,7 @@ namespace io {
 
 //..............................................................................
 
-class Serial
-{
+class Serial {
 public:
 #if (_AXL_OS_WIN)
 	win::Serial m_serial;
@@ -38,8 +37,7 @@ public:
 
 public:
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_serial.isOpen();
 	}
 
@@ -47,11 +45,10 @@ public:
 	open(
 		const sl::StringRef& name,
 		uint_t flags = 0
-		);
+	);
 
 	void
-	close()
-	{
+	close() {
 		return m_serial.close();
 	}
 
@@ -59,26 +56,23 @@ public:
 	setSettings(
 		const SerialSettings* settings,
 		uint_t mask = -1
-		);
+	);
 
 	bool
 	getSettings(SerialSettings* settings);
 
 	bool
-	setDtr(bool isSet)
-	{
+	setDtr(bool isSet) {
 		return m_serial.setDtr(isSet);
 	}
 
 	bool
-	setRts(bool isSet)
-	{
+	setRts(bool isSet) {
 		return m_serial.setRts(isSet);
 	}
 
 	bool
-	setBreakCondition(bool isSet)
-	{
+	setBreakCondition(bool isSet) {
 		return m_serial.setBreakCondition(isSet);
 	}
 
@@ -90,8 +84,7 @@ public:
 	read(
 		void* p,
 		size_t size
-		) const
-	{
+	) const {
 		return m_serial.overlappedRead(p, size);
 	}
 
@@ -99,8 +92,7 @@ public:
 	write(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return m_serial.overlappedWrite(p, size);
 	}
 #elif (_AXL_OS_POSIX)
@@ -108,8 +100,7 @@ public:
 	read(
 		void* p,
 		size_t size
-		) const
-	{
+	) const {
 		return m_serial.read(p, size);
 	}
 
@@ -117,8 +108,7 @@ public:
 	write(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return m_serial.write(p, size);
 	}
 #endif
@@ -127,8 +117,7 @@ public:
 
 //..............................................................................
 
-class SerialPortDesc: public sl::ListLink
-{
+class SerialPortDesc: public sl::ListLink {
 	friend class SerialPortEnumerator;
 
 protected:
@@ -137,14 +126,12 @@ protected:
 
 public:
 	const sl::String&
-	getDeviceName()
-	{
+	getDeviceName() {
 		return m_deviceName;
 	}
 
 	const sl::String&
-	getDescription()
-	{
+	getDescription() {
 		return m_description;
 	}
 };

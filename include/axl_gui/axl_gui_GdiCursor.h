@@ -23,8 +23,7 @@ namespace gui {
 
 class GdiCursor:
 	public Cursor,
-	public sl::Handle<HCURSOR>
-{
+	public sl::Handle<HCURSOR> {
 	friend class GdiEngine;
 
 public:

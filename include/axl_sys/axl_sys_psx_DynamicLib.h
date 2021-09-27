@@ -22,12 +22,10 @@ namespace psx {
 
 //..............................................................................
 
-class CloseDynamicLib
-{
+class CloseDynamicLib {
 public:
 	void
-	operator () (void* h)
-	{
+	operator () (void* h) {
 		int result = ::dlclose(h);
 		ASSERT(result == 0);
 	}
@@ -35,14 +33,13 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class DynamicLib: public sl::Handle<void*, CloseDynamicLib>
-{
+class DynamicLib: public sl::Handle<void*, CloseDynamicLib> {
 public:
 	bool
 	open(
 		const sl::StringRef& name,
 		int flags = RTLD_LAZY | RTLD_LOCAL
-		);
+	);
 
 	void*
 	getSymbol(const sl::StringRef& name);
@@ -52,7 +49,7 @@ public:
 	getInfo(
 		int request,
 		void* p
-		);
+	);
 #endif
 };
 

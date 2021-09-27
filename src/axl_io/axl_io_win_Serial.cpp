@@ -24,8 +24,7 @@ Serial::open(
 	const sl::StringRef& name,
 	uint_t accessMode,
 	uint_t flagsAttributes
-	)
-{
+) {
 	close();
 
 	char buffer[256];
@@ -45,14 +44,13 @@ Serial::open(
 		OPEN_EXISTING,
 		flagsAttributes,
 		NULL
-		);
+	);
 
 	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
 
 dword_t
-Serial::getStatusLines()
-{
+Serial::getStatusLines() {
 	ASSERT(isOpen());
 
 	dword_t lines;
@@ -65,8 +63,7 @@ Serial::getStatusLines()
 }
 
 dword_t
-Serial::getWaitMask()
-{
+Serial::getWaitMask() {
 	dword_t mask;
 
 	bool_t result = ::GetCommMask(m_h, &mask);
@@ -77,8 +74,7 @@ Serial::getWaitMask()
 }
 
 bool
-Serial::overlappedWait(dword_t* events)
-{
+Serial::overlappedWait(dword_t* events) {
 	dword_t actualSize; // unused
 	StdOverlapped overlapped;
 	bool result = overlappedWait(events, &overlapped);

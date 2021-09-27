@@ -22,27 +22,21 @@ namespace win {
 
 //..............................................................................
 
-class FreeCertContext
-{
+class FreeCertContext {
 public:
 	void
-	operator () (const CERT_CONTEXT* p)
-	{
+	operator () (const CERT_CONTEXT* p) {
 		::CertFreeCertificateContext(p);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Certificate: public sl::Handle<const CERT_CONTEXT*, FreeCertContext>
-{
+class Certificate: public sl::Handle<const CERT_CONTEXT*, FreeCertContext> {
 public:
-	Certificate()
-	{
-	}
+	Certificate() {}
 
-	Certificate(const CERT_CONTEXT* p)
-	{
+	Certificate(const CERT_CONTEXT* p) {
 		attach(p);
 	}
 
@@ -52,68 +46,57 @@ public:
 		dword_t type,
 		dword_t flags = 0,
 		void* typeParam = NULL
-		);
+	);
 
 	sl::String_w
 	getNameString(
 		dword_t type,
 		dword_t flags = 0,
 		void* typeParam = NULL
-		)
-	{
+	) {
 		sl::String_w string;
 		getNameString(&string, type, flags, typeParam);
 		return string;
 	}
 
 	size_t
-	getSubjectName(sl::String_w* string)
-	{
+	getSubjectName(sl::String_w* string) {
 		return getNameString(string, CERT_NAME_SIMPLE_DISPLAY_TYPE);
 	}
 
 	sl::String_w
-	getSubjectName()
-	{
+	getSubjectName() {
 		return getNameString(CERT_NAME_SIMPLE_DISPLAY_TYPE);
 	}
 
 	size_t
-	getIssuerName(sl::String_w* string)
-	{
+	getIssuerName(sl::String_w* string) {
 		return getNameString(string, CERT_NAME_SIMPLE_DISPLAY_TYPE, CERT_NAME_ISSUER_FLAG);
 	}
 
 	sl::String
-	getIssuerName()
-	{
+	getIssuerName() {
 		return getNameString(CERT_NAME_SIMPLE_DISPLAY_TYPE, CERT_NAME_ISSUER_FLAG);
 	}
 };
 
 //..............................................................................
 
-class CloseCertStore
-{
+class CloseCertStore {
 public:
 	void
-	operator () (HCERTSTORE h)
-	{
+	operator () (HCERTSTORE h) {
 		::CertCloseStore(h, 0);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class CertStore: public sl::Handle<HCERTSTORE, CloseCertStore>
-{
+class CertStore: public sl::Handle<HCERTSTORE, CloseCertStore> {
 public:
-	CertStore()
-	{
-	}
+	CertStore() {}
 
-	CertStore(HCERTSTORE h)
-	{
+	CertStore(HCERTSTORE h) {
 		attach(h);
 	}
 
@@ -125,7 +108,7 @@ public:
 		dword_t findType,
 		const void* findParam,
 		const CERT_CONTEXT* prevCertificate = NULL
-		);
+	);
 };
 
 //..............................................................................

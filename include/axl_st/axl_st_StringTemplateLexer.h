@@ -18,8 +18,7 @@ namespace st {
 
 //..............................................................................
 
-enum TokenKind
-{
+enum TokenKind {
 	TokenKind_Eof = 0,
 	TokenKind_Error = -1,
 	TokenKind_OpenCode = 256,
@@ -45,8 +44,7 @@ typedef lex::RagelToken<TokenKind, TokenName> Token;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum LexerMachineKind
-{
+enum LexerMachineKind {
 	LexerMachineKind_Main,
 	LexerMachineKind_UserData,
 	LexerMachineKind_UserCode,
@@ -54,8 +52,7 @@ enum LexerMachineKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Lexer: public lex::RagelLexer<Lexer, Token>
-{
+class Lexer: public lex::RagelLexer<Lexer, Token> {
 	friend class lex::RagelLexer<Lexer, Token>;
 
 public:
@@ -69,8 +66,7 @@ protected:
 		int tokenKind,
 		int left = 0,
 		int right = 0
-		)
-	{
+	) {
 		Token* token = createToken(tokenKind);
 		token->m_data.m_string = sl::StringRef(ts + left, token->m_pos.m_length - (left + right));
 		return token;

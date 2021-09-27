@@ -22,8 +22,7 @@ namespace zip {
 
 //..............................................................................
 
-struct ZipFileInfo
-{
+struct ZipFileInfo {
 	uint32_t m_centralDirOffset;
 	uint16_t m_versionMadeBy;
 	uint16_t m_versionNeeded;
@@ -40,25 +39,21 @@ struct ZipFileInfo
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ZipReader
-{
+class ZipReader {
 protected:
 	mz_zip_archive_tag* m_zip;
 
 public:
-	ZipReader()
-	{
+	ZipReader() {
 		m_zip = NULL;
 	}
 
-	~ZipReader()
-	{
+	~ZipReader() {
 		close();
 	}
 
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_zip != NULL;
 	}
 
@@ -72,7 +67,7 @@ public:
 	openMem(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	getFileCount();
@@ -85,7 +80,7 @@ public:
 		size_t index,
 		ZipFileInfo* fileInfo,
 		sl::String* comment = NULL
-		);
+	);
 
 	bool
 	isDirectoryFile(size_t index);
@@ -98,17 +93,16 @@ public:
 		size_t index,
 		void* p,
 		size_t size
-		);
+	);
 
 	bool
 	extractFileToMem(
 		size_t index,
 		sl::Array<char>* buffer
-		);
+	);
 
 	sl::Array<char>
-	extractFileToMem(size_t index)
-	{
+	extractFileToMem(size_t index) {
 		sl::Array<char> buffer;
 		extractFileToMem(index, &buffer);
 		return buffer;
@@ -118,7 +112,7 @@ public:
 	extractFileToFile(
 		size_t index,
 		const sl::StringRef& fileName
-		);
+	);
 };
 
 //..............................................................................

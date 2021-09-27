@@ -26,8 +26,7 @@ class Widget;
 
 // master message structure
 
-enum WidgetMsgCode
-{
+enum WidgetMsgCode {
 	WidgetMsgCode_Undefined = 0,
 
 	WidgetMsgCode_Close,                   // WidgetMsg
@@ -57,17 +56,14 @@ enum WidgetMsgCode
 
 //..............................................................................
 
-struct WidgetMsg
-{
+struct WidgetMsg {
 	WidgetMsgCode m_msgCode;
 
-	WidgetMsg()
-	{
+	WidgetMsg() {
 		m_msgCode = WidgetMsgCode_Undefined;
 	}
 
-	WidgetMsg(WidgetMsgCode msgCode)
-	{
+	WidgetMsg(WidgetMsgCode msgCode) {
 		m_msgCode = msgCode;
 	}
 };
@@ -75,19 +71,15 @@ struct WidgetMsg
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-struct WidgetMsgParam: WidgetMsg
-{
+struct WidgetMsgParam: WidgetMsg {
 	T m_param;
 
-	WidgetMsgParam()
-	{
-	}
+	WidgetMsgParam() {}
 
 	WidgetMsgParam(
 		WidgetMsgCode msgCode,
 		const T& param
-		)
-	{
+	) {
 		m_msgCode = msgCode;
 		m_param = param;
 	}
@@ -95,15 +87,13 @@ struct WidgetMsgParam: WidgetMsg
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct WidgetPaintMsg: WidgetMsg
-{
+struct WidgetPaintMsg: WidgetMsg {
 	Canvas* m_canvas;
 	Rect m_rect;
 	Rect m_region[4];
 	size_t m_regionRectCount;
 
-	WidgetPaintMsg(Canvas* canvas)
-	{
+	WidgetPaintMsg(Canvas* canvas) {
 		m_msgCode = WidgetMsgCode_Paint;
 		m_canvas = canvas;
 		m_regionRectCount = 0;
@@ -112,15 +102,13 @@ struct WidgetPaintMsg: WidgetMsg
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct WidgetMouseMsg: WidgetMsg
-{
+struct WidgetMouseMsg: WidgetMsg {
 	Point m_point;
 	uint_t m_buttons;
 	uint_t m_modifierKeys;
 	MouseButton m_button;
 
-	WidgetMouseMsg()
-	{
+	WidgetMouseMsg() {
 		m_buttons = 0;
 		m_modifierKeys = 0;
 		m_button = MouseButton_None;
@@ -129,12 +117,10 @@ struct WidgetMouseMsg: WidgetMsg
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct WidgetMouseWheelMsg: WidgetMouseMsg
-{
+struct WidgetMouseWheelMsg: WidgetMouseMsg {
 	int m_wheelDelta;
 
-	WidgetMouseWheelMsg()
-	{
+	WidgetMouseWheelMsg() {
 		m_msgCode = WidgetMsgCode_MouseWheel;
 		m_wheelDelta = 0;
 	}
@@ -142,14 +128,12 @@ struct WidgetMouseWheelMsg: WidgetMouseMsg
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct WidgetKeyMsg: WidgetMsg
-{
+struct WidgetKeyMsg: WidgetMsg {
 	uint_t m_key;
 	uint_t m_modifierKeys;
 	utf32_t m_char;
 
-	WidgetKeyMsg()
-	{
+	WidgetKeyMsg() {
 		m_key = 0;
 		m_modifierKeys = 0;
 		m_char = 0;
@@ -158,8 +142,7 @@ struct WidgetKeyMsg: WidgetMsg
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct WidgetThreadMsg: WidgetMsg
-{
+struct WidgetThreadMsg: WidgetMsg {
 	uint_t m_code;
 	rc::Ptr<void> m_params;
 };
@@ -168,14 +151,12 @@ struct WidgetThreadMsg: WidgetMsg
 
 // scroll bars
 
-struct WidgetScrollBar
-{
+struct WidgetScrollBar {
 	size_t m_end;
 	size_t m_page;
 	size_t m_pos;
 
-	WidgetScrollBar()
-	{
+	WidgetScrollBar() {
 		m_end = 0;
 		m_page = 0;
 		m_pos = 0;
@@ -185,28 +166,24 @@ struct WidgetScrollBar
 		size_t end,
 		size_t page,
 		size_t pos = 0
-		)
-	{
+	) {
 		m_end = end;
 		m_page = page;
 		m_pos = pos;
 	}
 
 	bool
-	isRelevant() const
-	{
+	isRelevant() const {
 		return m_page >= m_end;
 	}
 
 	bool
-	isMaxed() const
-	{
+	isMaxed() const {
 		return m_pos + m_page >= m_end;
 	}
 
 	size_t
-	getMaxPos()
-	{
+	getMaxPos() {
 		return m_end > m_page ? m_end - m_page : 0;
 	}
 };
@@ -218,26 +195,23 @@ void
 (Widget::*WidgetMsgProc) (
 	const WidgetMsg* msg,
 	bool* isHandled
-	);
+);
 
-struct WidgetMsgMap
-{
+struct WidgetMsgMap {
 	WidgetMsgProc m_msgProcTable[WidgetMsgCode__Count];
 	WidgetMsgMap* m_baseMap;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct WidgetConstructParam
-{
+struct WidgetConstructParam {
 	Engine* m_engine;
 	void* m_engineWidget;
 
 	WidgetConstructParam(
 		Engine* engine,
 		void* engineWidget
-		)
-	{
+	) {
 		m_engine = engine;
 		m_engineWidget = engineWidget;
 	}
@@ -245,8 +219,7 @@ struct WidgetConstructParam
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class WidgetDriver: public GuiItem
-{
+class WidgetDriver: public GuiItem {
 	friend class Engine;
 	friend class Widget;
 
@@ -270,14 +243,12 @@ protected:
 
 public:
 	void*
-	getEngineWidget()
-	{
+	getEngineWidget() {
 		return m_engineWidget;
 	}
 
 	Font*
-	getFont()
-	{
+	getFont() {
 		return m_font;
 	}
 
@@ -285,8 +256,7 @@ public:
 	setFont(Font* font);
 
 	ColorAttr
-	getColorAttr()
-	{
+	getColorAttr() {
 		return m_colorAttr;
 	}
 
@@ -294,22 +264,19 @@ public:
 	setColorAttr(
 		uint_t foreColor,
 		uint_t backColor
-		)
-	{
+	) {
 		m_colorAttr.setup(foreColor, backColor);
 		return redraw();
 	}
 
 	bool
-	setColorAttr(const ColorAttr& attr)
-	{
+	setColorAttr(const ColorAttr& attr) {
 		m_colorAttr = attr;
 		return redraw();
 	}
 
 	Palette
-	getPalette()
-	{
+	getPalette() {
 		return m_palette;
 	}
 
@@ -317,15 +284,13 @@ public:
 	setPalette(
 		const uint_t* colorArray,
 		size_t count
-		)
-	{
+	) {
 		m_palette.setup(colorArray, count);
 		return redraw();
 	}
 
 	bool
-	setPalette(const Palette& palette)
-	{
+	setPalette(const Palette& palette) {
 		m_palette = palette;
 		return redraw();
 	}
@@ -338,20 +303,17 @@ public:
 		int top,
 		int right,
 		int bottom
-		)
-	{
+	) {
 		return m_engine->redrawWidget(this, left, top, right, bottom);
 	}
 
 	bool
-	redraw(const Rect& rect)
-	{
+	redraw(const Rect& rect) {
 		return redraw(rect.m_left, rect.m_top, rect.m_right, rect.m_bottom);
 	}
 
 	bool
-	redraw()
-	{
+	redraw() {
 		return redraw(0, 0, 0, 0);
 	}
 
@@ -361,20 +323,17 @@ public:
 		int top,
 		int right,
 		int bottom
-		)
-	{
+	) {
 		return m_engine->redrawWidgetImmediate(this, left, top, right, bottom);
 	}
 
 	bool
-	redrawImmediate(const Rect& rect)
-	{
+	redrawImmediate(const Rect& rect) {
 		return redrawImmediate(rect.m_left, rect.m_top, rect.m_right, rect.m_bottom);
 	}
 
 	bool
-	redrawImmediate()
-	{
+	redrawImmediate() {
 		return redrawImmediate(0, 0, 0, 0);
 	}
 
@@ -382,8 +341,7 @@ public:
 	scroll(
 		int dx,
 		int dy
-		)
-	{
+	) {
 		return m_engine->scrollWidget(this, dx, dy);
 	}
 
@@ -395,8 +353,7 @@ public:
 		int bottom,
 		int dx,
 		int dy
-		)
-	{
+	) {
 		return m_engine->scrollWidgetRect(this, left, top, right, bottom, dx, dy);
 	}
 
@@ -405,8 +362,7 @@ public:
 		const Rect& rect,
 		int dx,
 		int dy
-		)
-	{
+	) {
 		return scrollRect(rect.m_left, rect.m_top, rect.m_right, rect.m_bottom, dx, dy);
 	}
 
@@ -414,57 +370,49 @@ public:
 	scrollRect(
 		int dx,
 		int dy
-		)
-	{
+	) {
 		return scrollRect(0, 0, m_size.m_width, m_size.m_height, dx, dy);
 	}
 
 	// focus
 
 	bool
-	isFocused()
-	{
+	isFocused() {
 		return m_engine->isWidgetFocused(this);
 	}
 
 	bool
-	setFocus()
-	{
+	setFocus() {
 		return m_engine->setWidgetFocus(this);
 	}
 
 	// mouse
 
 	Cursor*
-	getCursor()
-	{
+	getCursor() {
 		return m_cursor;
 	}
 
 	bool
-	setCursor(Cursor* cursor)
-	{
+	setCursor(Cursor* cursor) {
 		m_cursor = cursor;
 		return m_engine->setWidgetCursor(this, cursor);
 	}
 
 	bool
-	setMouseCapture()
-	{
+	setMouseCapture() {
 		return m_engine->setMouseCapture(this);
 	}
 
 	bool
-	releaseMouseCapture()
-	{
+	releaseMouseCapture() {
 		return m_engine->releaseMouse(this);
 	}
 
 	// caret
 
 	bool
-	isCaretVisible()
-	{
+	isCaretVisible() {
 		return m_isCaretVisible;
 	}
 
@@ -472,20 +420,17 @@ public:
 	setCaretVisible(bool isVisible);
 
 	Size
-	getCaretSize()
-	{
+	getCaretSize() {
 		return m_caretSize;
 	}
 
 	bool
-	setCaretWidth(uint_t width)
-	{
+	setCaretWidth(uint_t width) {
 		return setCaretSize(width, m_caretSize.m_height);
 	}
 
 	bool
-	setCaretHeight(uint_t height)
-	{
+	setCaretHeight(uint_t height) {
 		return setCaretSize(m_caretSize.m_width, height);
 	}
 
@@ -493,17 +438,15 @@ public:
 	setCaretSize(
 		uint_t width,
 		uint_t height
-		);
+	);
 
 	bool
-	setCaretSize(const Size& size)
-	{
+	setCaretSize(const Size& size) {
 		return setCaretSize(size.m_width, size.m_height);
 	}
 
 	Point
-	getCaretPos()
-	{
+	getCaretPos() {
 		return m_caretPos;
 	}
 
@@ -511,25 +454,22 @@ public:
 	setCaretPos(
 		int x,
 		int y
-		);
+	);
 
 	bool
-	setCaretPos(const Point& point)
-	{
+	setCaretPos(const Point& point) {
 		return setCaretPos(point.m_x, point.m_y);
 	}
 
 	// tooltips
 
 	bool
-	scheduleToolTipMsg(uint_t timeout = 0) // 0 -- use engine default
-	{
+	scheduleToolTipMsg(uint_t timeout = 0) { // 0 -- use engine default
 		return m_engine->scheduleToolTipMsg(this, timeout);
 	}
 
 	bool
-	cancelToolTipMsg()
-	{
+	cancelToolTipMsg() {
 		return m_engine->cancelToolTipMsg(this);
 	}
 
@@ -538,8 +478,7 @@ public:
 		int x,
 		int y,
 		const sl::StringRef& toolTip
-		)
-	{
+	) {
 		return m_engine->showToolTip(this, x, y, toolTip);
 	}
 
@@ -547,28 +486,24 @@ public:
 	showToolTip(
 		const Point& point,
 		const sl::StringRef& toolTip
-		)
-	{
+	) {
 		return m_engine->showToolTip(this, point.m_x, point.m_y, toolTip);
 	}
 
 	bool
-	hideToolTip()
-	{
+	hideToolTip() {
 		return m_engine->hideToolTip(this);
 	}
 
 	// scroll bars
 
 	bool
-	updateScrollBar(Orientation orientation)
-	{
+	updateScrollBar(Orientation orientation) {
 		return m_engine->updateWidgetScrollBar(this, orientation);
 	}
 
 	bool
-	updateScrollBars()
-	{
+	updateScrollBars() {
 		return
 			updateScrollBar(Orientation_Vertical) &&
 			updateScrollBar(Orientation_Horizontal);
@@ -583,8 +518,7 @@ public:
 	notify(
 		uint_t code,
 		const void* params = NULL
-		)
-	{
+	) {
 		m_engine->sendWidgetNotification(this, code, params);
 	}
 
@@ -592,8 +526,7 @@ public:
 	postThreadMsg(
 		uint_t code,
 		const rc::Ptr<void>& params
-		)
-	{
+	) {
 		return m_engine->postWidgetThreadMsg(this, code, params);
 	}
 
@@ -602,38 +535,33 @@ public:
 		uint_t code,
 		const void* params,
 		size_t size
-		);
+	);
 
 	bool
 	postThreadMsg(
 		uint_t code,
 		uintptr_t param
-		)
-	{
+	) {
 		return m_engine->postWidgetThreadMsg(this, code, rc::Ptr<void> ((void*)param, NULL));
 	}
 
 	bool
-	postThreadMsg(uint_t code)
-	{
+	postThreadMsg(uint_t code) {
 		return m_engine->postWidgetThreadMsg(this, code, rc::Ptr<void> (NULL, NULL));
 	}
 
 	bool
-	startAnimation()
-	{
+	startAnimation() {
 		return m_engine->startWidgetAnimation(this);
 	}
 
 	void
-	stopAnimation()
-	{
+	stopAnimation() {
 		m_engine->stopWidgetAnimation(this);
 	}
 
 	bool
-	checkMsgMap(WidgetMsgCode msgCode)
-	{
+	checkMsgMap(WidgetMsgCode msgCode) {
 		ASSERT(msgCode < WidgetMsgCode__Count);
 		return m_msgMap ? m_msgMap->m_msgProcTable[msgCode] != NULL : true;
 	}
@@ -642,13 +570,12 @@ public:
 	processMsg(
 		const WidgetMsg* msg,
 		bool* isHandled
-		);
+	);
 };
 
 //..............................................................................
 
-class Widget
-{
+class Widget {
 	friend class WidgetDriver;
 
 public:
@@ -656,15 +583,12 @@ public:
 
 protected:
 	Widget(const WidgetConstructParam& param):
-		m_widgetDriver(param)
-	{
-	}
+		m_widgetDriver(param) {}
 
 protected:
 	virtual
 	WidgetMsgMap*
-	getWidgetMsgMap()
-	{
+	getWidgetMsgMap() {
 		return NULL;
 	}
 };
@@ -674,8 +598,7 @@ protected:
 #define AXL_GUI_WIDGET_BEGIN_MSG_MAP(BaseClass) \
 virtual \
 axl::gui::WidgetMsgMap* \
-getWidgetMsgMap() \
-{ \
+getWidgetMsgMap() { \
 	static axl::gui::WidgetMsgMap map = { 0 }; \
 	static bool once = false; \
 	if (once) \

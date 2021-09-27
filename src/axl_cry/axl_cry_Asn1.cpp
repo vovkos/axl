@@ -20,8 +20,7 @@ namespace cry {
 //..............................................................................
 
 sl::String
-getAsn1TimeString(const ASN1_TIME* time)
-{
+getAsn1TimeString(const ASN1_TIME* time) {
 	Bio bio;
 	bio.createMem();
 	ASN1_TIME_print(bio, time);
@@ -31,8 +30,7 @@ getAsn1TimeString(const ASN1_TIME* time)
 }
 
 sl::String
-getAsn1StringString(const ASN1_STRING* string)
-{
+getAsn1StringString(const ASN1_STRING* string) {
 	Bio bio;
 	bio.createMem();
 	ASN1_STRING_print(bio, string);
@@ -42,8 +40,7 @@ getAsn1StringString(const ASN1_STRING* string)
 }
 
 sl::String
-getAsn1ObjectString(const ASN1_OBJECT* object)
-{
+getAsn1ObjectString(const ASN1_OBJECT* object) {
 	char buffer[256];
 	OBJ_obj2txt(buffer, sizeof(buffer), object, 0);
 	return buffer;

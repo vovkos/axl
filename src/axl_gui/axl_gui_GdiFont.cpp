@@ -26,8 +26,7 @@ buildLogFont(
 	const sl::StringRef_w& family,
 	size_t pointSize,
 	uint_t flags
-	)
-{
+) {
 	memset(logFont, 0, sizeof(LOGFONT));
 
 	size_t length = family.getLength();
@@ -36,7 +35,7 @@ buildLogFont(
 		logFont->lfFaceName,
 		family,
 		AXL_MIN(countof(logFont->lfFaceName), length) * sizeof(wchar_t)
-		);
+	);
 
 	logFont->lfCharSet = DEFAULT_CHARSET;
 
@@ -52,8 +51,7 @@ void
 modifyLogFont(
 	LOGFONTW* logFont,
 	uint_t flags
-	)
-{
+) {
 	logFont->lfWeight    = (flags & FontFlag_Bold) ? FW_BOLD : FW_NORMAL;
 	logFont->lfItalic    = (flags & FontFlag_Italic) != 0;
 	logFont->lfUnderline = (flags & FontFlag_Underline) != 0;
@@ -64,15 +62,14 @@ bool
 getFontDescFromLogFont(
 	const LOGFONT* logFont,
 	FontDesc* fontDesc
-	)
-{
+) {
 	memset(fontDesc, 0, sizeof(FontDesc));
 
 	memcpy(
 		fontDesc->m_family,
 		logFont->lfFaceName,
 		(AXL_MIN(countof(logFont->lfFaceName), countof(fontDesc->m_family)) - 1) * sizeof(char)
-		);
+	);
 
 	ScreenDc screenDc;
 	::SetMapMode(screenDc, MM_TEXT);
@@ -98,29 +95,25 @@ getFontDescFromLogFont(
 
 //..............................................................................
 
-GdiFont::GdiFont()
-{
+GdiFont::GdiFont() {
 	m_engine = GdiEngine::getSingleton();
 }
 
 bool
-GdiFont::getLogFont(LOGFONTW* logFont)
-{
+GdiFont::getLogFont(LOGFONTW* logFont) {
 	bool_t result = ::GetObject(m_h, sizeof(LOGFONT), logFont);
 	return err::complete(result);
 }
 
 bool
-GdiFont::isMonospace()
-{
+GdiFont::isMonospace() {
 	LOGFONT logFont;
 	getLogFont(&logFont);
 	return logFont.lfPitchAndFamily == FIXED_PITCH;
 }
 
 Size
-GdiFont::calcTextSize_utf8(const sl::StringRef_utf8& text)
-{
+GdiFont::calcTextSize_utf8(const sl::StringRef_utf8& text) {
 	char buffer[256];
 	sl::String_w string(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.copy(text, length);
@@ -129,8 +122,7 @@ GdiFont::calcTextSize_utf8(const sl::StringRef_utf8& text)
 }
 
 Size
-GdiFont::calcTextSize_utf16(const sl::StringRef_utf16& text)
-{
+GdiFont::calcTextSize_utf16(const sl::StringRef_utf16& text) {
 	if (length == -1)
 		length = wcslen_s(text);
 
@@ -145,8 +137,7 @@ GdiFont::calcTextSize_utf16(const sl::StringRef_utf16& text)
 }
 
 Size
-GdiFont::calcTextSize_utf32(const sl::StringRef_utf32& text)
-{
+GdiFont::calcTextSize_utf32(const sl::StringRef_utf32& text) {
 	char buffer[256];
 	sl::String_w string(rc::BufKind_Stack, buffer, sizeof(buffer));
 	string.copy(text, length);

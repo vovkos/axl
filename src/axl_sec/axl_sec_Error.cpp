@@ -19,8 +19,7 @@ namespace sec {
 //..............................................................................
 
 sl::StringRef
-ErrorProvider::getErrorDescription(OSStatus status)
-{
+ErrorProvider::getErrorDescription(OSStatus status) {
 	CFStringRef description = ::SecCopyErrorMessageString(status, NULL);
 	sl::String string = cf::String(description, true).getString();
 	return !string.isEmpty() ? string : sl::formatString("OSStatus(%d)", status);

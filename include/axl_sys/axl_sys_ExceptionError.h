@@ -23,8 +23,7 @@ AXL_SL_DEFINE_GUID(g_exceptionErrorGuid, 0xd33daeee, 0xcd49, 0x4a4c, 0x9f, 0xeb,
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ExceptionErrorCode
-{
+enum ExceptionErrorCode {
 	ExceptionErrorCode_WinException32,
 	ExceptionErrorCode_WinException64,
 	ExceptionErrorCode_LinuxSignal32,
@@ -58,8 +57,7 @@ enum ExceptionErrorCode
 //..............................................................................
 
 template <typename T>
-struct WinExceptionInfoBase
-{
+struct WinExceptionInfoBase {
 	uint32_t m_ntstatus;
 	uint32_t m_paramCount;
 	T m_codeAddress;
@@ -75,8 +73,7 @@ typedef WinExceptionInfoBase<uint64_t> WinExceptionInfo64;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-struct PosixSignalInfoBase
-{
+struct PosixSignalInfoBase {
 	uint32_t m_signal;
 	uint32_t m_code;
 	T m_codeAddress;
@@ -98,7 +95,7 @@ setWinExceptionError(
 	uintptr_t codeAddress,
 	const uintptr_t* paramTable = NULL,
 	size_t paramCount = 0
-	);
+);
 #elif (_AXL_OS_POSIX)
 size_t
 setPosixSignalError(
@@ -106,13 +103,12 @@ setPosixSignalError(
 	uint32_t code,
 	uintptr_t codeAddress,
 	uintptr_t faultAddress
-	);
+);
 #endif
 
 //..............................................................................
 
-class ExceptionErrorProvider: public err::ErrorProvider
-{
+class ExceptionErrorProvider: public err::ErrorProvider {
 public:
 	virtual
 	sl::StringRef
@@ -123,12 +119,11 @@ public:
 
 inline
 void
-registerExceptionErrorProvider()
-{
+registerExceptionErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_exceptionErrorGuid,
 		sl::getSimpleSingleton<ExceptionErrorProvider> ()
-		);
+	);
 }
 
 //..............................................................................

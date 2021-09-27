@@ -18,8 +18,7 @@ namespace dox {
 
 //..............................................................................
 
-enum TokenKind
-{
+enum TokenKind {
 	TokenKind_Eof = 0,
 	TokenKind_Error = -1,
 	TokenKind_Text = 256,
@@ -102,8 +101,7 @@ typedef lex::RagelToken<TokenKind, TokenName, lex::StdTokenData> DoxyToken;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Lexer: public lex::RagelLexer<Lexer, DoxyToken>
-{
+class Lexer: public lex::RagelLexer<Lexer, DoxyToken> {
 	friend class lex::RagelLexer<Lexer, DoxyToken>;
 
 public:
@@ -116,7 +114,7 @@ protected:
 		TokenKind tokenKind,
 		size_t left = 0,
 		size_t right = 0
-		);
+	);
 
 	DoxyToken*
 	createCustomCommandParamToken();

@@ -21,8 +21,7 @@ namespace win {
 
 //..............................................................................
 
-class NamedPipe: public File
-{
+class NamedPipe: public File {
 public:
 	bool
 	create(
@@ -34,25 +33,23 @@ public:
 		dword_t rxBufferSize,
 		uint_t timeout,
 		SECURITY_ATTRIBUTES* secAttr
-		);
+	);
 
 	bool
 	open(
 		const sl::StringRef_w& name,
 		uint_t access = GENERIC_READ | GENERIC_WRITE,
 		uint_t flags = FILE_FLAG_OVERLAPPED
-		);
+	);
 
 	bool
-	connect()
-	{
+	connect() {
 		bool_t result = ::ConnectNamedPipe(m_h, NULL);
 		return err::complete(result);
 	}
 
 	bool
-	overlappedConnect(OVERLAPPED* overlapped)
-	{
+	overlappedConnect(OVERLAPPED* overlapped) {
 		bool_t result = ::ConnectNamedPipe(m_h, overlapped);
 		return completeOverlappedRequest(result);
 	}

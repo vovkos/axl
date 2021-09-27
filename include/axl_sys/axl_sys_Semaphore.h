@@ -26,92 +26,77 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-class NamedSemaphore
-{
+class NamedSemaphore {
 public:
 	win::Semaphore m_semaphore;
 
 public:
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_semaphore.isOpen();
 	}
 
 	void
-	close()
-	{
+	close() {
 		m_semaphore.close();
 	}
 
 	bool
-	create(const sl::StringRef& name)
-	{
+	create(const sl::StringRef& name) {
 		return m_semaphore.create(NULL, 0, MAXLONG, name.s2());
 	}
 
 	bool
-	open(const sl::StringRef& name)
-	{
+	open(const sl::StringRef& name) {
 		return m_semaphore.open(SEMAPHORE_ALL_ACCESS, false, name.s2());
 	}
 
 	bool
-	signal(size_t count = 1)
-	{
+	signal(size_t count = 1) {
 		return m_semaphore.signal(count);
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		return m_semaphore.wait(timeout) == win::WaitResult_Object0;
 	}
 };
 
 #elif (_AXL_OS_POSIX)
 
-class NamedSemaphore
-{
+class NamedSemaphore {
 public:
 	psx::NamedSem m_sem;
 
 public:
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_sem.isOpen();
 	}
 
 	void
-	close()
-	{
+	close() {
 		m_sem.close();
 	}
 
 	bool
-	create(const sl::StringRef& name)
-	{
+	create(const sl::StringRef& name) {
 		return m_sem.open(name, O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, 0);
 	}
 
 	bool
-	open(const sl::StringRef& name)
-	{
+	open(const sl::StringRef& name) {
 		return m_sem.open(name, 0, 0, 0);
 	}
 
 	bool
-	signal()
-	{
+	signal() {
 		return m_sem.post();
 	}
 
 	bool
-	signal(size_t count)
-	{
-		for (; count; count--)
-		{
+	signal(size_t count) {
+		for (; count; count--) {
 			bool result = m_sem.post();
 			if (!result)
 				return false;
@@ -121,21 +106,18 @@ public:
 	}
 
 	bool
-	tryWait()
-	{
+	tryWait() {
 		return m_sem.tryWait();
 	}
 
 	bool
-	wait()
-	{
+	wait() {
 		return m_sem.wait();
 	}
 
 #if (!_AXL_OS_DARWIN)
 	bool
-	wait(uint_t timeout)
-	{
+	wait(uint_t timeout) {
 		return m_sem.wait(timeout);
 	}
 #endif

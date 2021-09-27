@@ -22,8 +22,7 @@ namespace mem {
 
 //..............................................................................
 
-class Tracker
-{
+class Tracker {
 protected:
 	sys::Lock m_lock;
 	sl::AuxList<TrackerBlockHdr> m_blockList;
@@ -38,38 +37,32 @@ public:
 	Tracker();
 
 	size_t
-	getBlockCount()
-	{
+	getBlockCount() {
 		return m_blockList.getCount();
 	}
 
 	size_t
-	getPeakBlockCount()
-	{
+	getPeakBlockCount() {
 		return m_peakBlockCount;
 	}
 
 	size_t
-	getTotalBlockCount()
-	{
+	getTotalBlockCount() {
 		return m_totalBlockCount;
 	}
 
 	size_t
-	getSize()
-	{
+	getSize() {
 		return m_size;
 	}
 
 	size_t
-	getPeakSize()
-	{
+	getPeakSize() {
 		return m_peakSize;
 	}
 
 	size_t
-	getTotalSize()
-	{
+	getTotalSize() {
 		return m_totalSize;
 	}
 

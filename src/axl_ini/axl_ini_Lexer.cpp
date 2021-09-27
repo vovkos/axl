@@ -22,8 +22,7 @@ bool
 Lexer::create(
 	const sl::StringRef& filePath,
 	const sl::StringRef& source
-	)
-{
+) {
 	this->reset();
 
 	init();
@@ -40,12 +39,10 @@ void
 Lexer::parseSection(
 	const char* p,
 	const char* end
-	)
-{
+) {
 	ASSERT(*p == '[' && end[-1] == ']');
 
-	if (m_isLineContinuation)
-	{
+	if (m_isLineContinuation) {
 		err::setError("incomplete multi-line value");
 		lex::pushSrcPosError(m_filePath, m_line, p - m_begin - m_lineOffset);
 		m_scanResultKind = ScanResultKind_Error;
@@ -71,12 +68,10 @@ void
 Lexer::parseKeyValue(
 	const char* p,
 	const char* end
-	)
-{
+) {
 	ASSERT(!isspace(*p));
 
-	if (m_isLineContinuation)
-	{
+	if (m_isLineContinuation) {
 		parseValue(p, end);
 		return;
 	}
@@ -91,13 +86,10 @@ Lexer::parseKeyValue(
 	while (p < end && isspace(*p))
 		p++;
 
-	if (*p == '=')
-	{
+	if (*p == '=') {
 		p++;
 		parseValue(p, end);
-	}
-	else
-	{
+	} else {
 		m_scanResultKind = ScanResultKind_KeyValue;
 	}
 }
@@ -106,8 +98,7 @@ void
 Lexer::parseValue(
 	const char* p,
 	const char* end
-	)
-{
+) {
 	while (p < end && isspace(*p))
 		p++;
 
@@ -115,8 +106,7 @@ Lexer::parseValue(
 		end--;
 
 	bool isLineContinuation = p < end && end[-1] == '\\';
-	if (isLineContinuation)
-	{
+	if (isLineContinuation) {
 		end--;
 		while (p < end && isspace(end[-1]))
 			end--;
@@ -138,16 +128,14 @@ Lexer::parseValue(
 }
 
 Lexer::ScanResultKind
-Lexer::scanLine()
-{
+Lexer::scanLine() {
 	if (p == eof)
 		return ScanResultKind_Eof;
 
 	pe = eof;
 	m_sectionName.clear();
 
-	if (!m_isLineContinuation)
-	{
+	if (!m_isLineContinuation) {
 		m_keyName.clear();
 		m_value.clear();
 	}
@@ -155,8 +143,7 @@ Lexer::scanLine()
 	m_scanResultKind = ScanResultKind_Eof; // assume eof
 
 	bool result = exec();
-	if (!result)
-	{
+	if (!result) {
 		err::setError("invalid syntax");
 		lex::pushSrcPosError(m_filePath, m_line, p - m_begin - m_lineOffset);
 		return ScanResultKind_Error;
@@ -166,8 +153,7 @@ Lexer::scanLine()
 }
 
 void
-Lexer::reset()
-{
+Lexer::reset() {
 	p = NULL;
 	pe = NULL;
 	eof = NULL;
@@ -189,8 +175,7 @@ Lexer::reset()
 }
 
 void
-Lexer::newLine(char* line)
-{
+Lexer::newLine(char* line) {
 	ASSERT(line[-1] == '\n');
 
 	m_lineOffset = line - m_begin;

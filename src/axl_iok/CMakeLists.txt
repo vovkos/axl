@@ -19,21 +19,21 @@ set(
 	${AXL_INC_DIR}/axl_iok/axl_iok_Iterator.h
 	${AXL_INC_DIR}/axl_iok/axl_iok_RegistryEntry.h
 	${AXL_INC_DIR}/axl_iok/axl_iok_ComputerGuid.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
 	axl_iok_Iterator.cpp
 	axl_iok_RegistryEntry.cpp
 	axl_iok_ComputerGuid.cpp
-	)
+)
 
 source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -47,14 +47,14 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_iok/axl_iok_Pch.h
-	)
+)
 
 source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -69,13 +69,13 @@ add_library(
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_iok
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -83,11 +83,11 @@ axl_install_redirected_includes(
 	${INSTALL_INCLUDE_DIR}
 	axl_iok
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_iok
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

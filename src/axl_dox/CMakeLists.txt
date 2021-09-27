@@ -21,7 +21,7 @@ set(
 	${AXL_INC_DIR}/axl_dox/axl_dox_Parser.h
 	${AXL_INC_DIR}/axl_dox/axl_dox_Host.h
 	axl_dox_Lexer.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
@@ -30,12 +30,12 @@ set(
 	axl_dox_Module.cpp
 	axl_dox_Lexer.cpp
 	axl_dox_Parser.cpp
-	)
+)
 
 set(
 	LIB_RL_LIST
 	axl_dox_Lexer.rl
-	)
+)
 
 source_group(
 	dox
@@ -43,7 +43,7 @@ source_group(
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_RL_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -58,14 +58,14 @@ axl_push_and_set(CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
 add_ragel_step(
 	axl_dox_Lexer.rl.cpp
 	axl_dox_Lexer.rl
-	)
+)
 
 axl_pop(CMAKE_CURRENT_BINARY_DIR)
 
 set(
 	GEN_RL_CPP_LIST
 	${GEN_DIR}/axl_dox_Lexer.rl.cpp
-	)
+)
 
 axl_exclude_from_build(${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
 
@@ -73,7 +73,7 @@ source_group(
 	gen
 	FILES
 	${GEN_RL_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -87,14 +87,14 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_dox/axl_dox_Pch.h
-	)
+)
 
 source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -104,7 +104,7 @@ source_group(
 include_directories(
 	${AXL_INC_DIR}
 	${GEN_DIR}
-	)
+)
 
 add_library(
 	axl_dox
@@ -114,13 +114,13 @@ add_library(
 	${LIB_CPP_LIST}
 	${LIB_RL_LIST}
 	${GEN_RL_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_dox
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -128,11 +128,11 @@ axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_dox
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_dox
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

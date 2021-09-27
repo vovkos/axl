@@ -25,12 +25,11 @@ namespace win {
 AXL_SL_DEFINE_GUID(
 	g_ntStatusGuid,
 	0x81443347, 0x3bc9, 0x4d5e, 0x8b, 0x23, 0x32, 0xd7, 0x80, 0xed, 0xb5, 0x2b
-	);
+);
 
 //..............................................................................
 
-class NtStatusProvider: public err::ErrorProvider
-{
+class NtStatusProvider: public err::ErrorProvider {
 public:
 	static
 	sl::String
@@ -38,23 +37,18 @@ public:
 
 	virtual
 	sl::StringRef
-	getErrorDescription(const err::ErrorRef& error)
-	{
+	getErrorDescription(const err::ErrorRef& error) {
 		return getErrorDescription(error->m_code);
 	}
 };
 
 //..............................................................................
 
-class NtStatus: public err::Error
-{
+class NtStatus: public err::Error {
 public:
-	NtStatus()
-	{
-	}
+	NtStatus() {}
 
-	NtStatus(long status)
-	{
+	NtStatus(long status) {
 		create(status);
 	}
 
@@ -66,8 +60,7 @@ public:
 
 inline
 size_t
-setNtStatus(long status)
-{
+setNtStatus(long status) {
 	return setError(NtStatus(status));
 }
 

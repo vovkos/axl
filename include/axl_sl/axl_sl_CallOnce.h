@@ -23,16 +23,14 @@ namespace sl {
 template <
 	typename Functor,
 	typename Argument
-	>
+>
 void
 callOnce(
 	Functor functor,
 	Argument argument,
 	volatile int32_t* flag = NULL
-	)
-{
-	enum OnceFlag
-	{
+) {
+	enum OnceFlag {
 		OnceFlag_Uninitialized = 0,
 		OnceFlag_Initializing  = 1,
 		OnceFlag_Initialized   = 2,
@@ -47,13 +45,10 @@ callOnce(
 		return;
 
 	if (value == OnceFlag_Uninitialized && // try to save one interlocked cmpxcg
-		sys::atomicCmpXchg(flag, OnceFlag_Uninitialized, OnceFlag_Initializing) == OnceFlag_Uninitialized)
-	{
+		sys::atomicCmpXchg(flag, OnceFlag_Uninitialized, OnceFlag_Initializing) == OnceFlag_Uninitialized) {
 		functor(argument);
 		sys::atomicXchg(flag, OnceFlag_Initialized);
-	}
-	else do
-	{
+	} else do {
 		sys::yieldProcessor();
 	} while (*flag != OnceFlag_Initialized);
 }

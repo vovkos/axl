@@ -23,10 +23,8 @@ BinaryBoyerMooreFind::setPattern(
 	const void* p,
 	size_t size,
 	uint_t flags
-	)
-{
-	if (!size)
-	{
+) {
+	if (!size) {
 		clear();
 		return true;
 	}
@@ -46,8 +44,7 @@ BinaryBoyerMooreFind::setPattern(
 }
 
 void
-BinaryBoyerMooreFind::buildBadSkipTable()
-{
+BinaryBoyerMooreFind::buildBadSkipTable() {
 	size_t patternSize = m_pattern.getCount();
 
 	m_badSkipTable.setCount(256);
@@ -64,8 +61,7 @@ size_t
 BinaryBoyerMooreFind::find(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	size_t patternSize = m_pattern.getCount();
 	if (!patternSize)
 		return 0;
@@ -92,8 +88,7 @@ BinaryBoyerMooreFind::find(
 	size_t offset,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	size_t patternSize = m_pattern.getCount();
 	if (!patternSize)
 		return offset;
@@ -101,8 +96,7 @@ BinaryBoyerMooreFind::find(
 	size_t tailSize = incrementalContext->m_tail.getCount();
 	size_t fullSize = size + tailSize;
 
-	if (fullSize < patternSize)
-	{
+	if (fullSize < patternSize) {
 		if (m_flags & BoyerMooreFlag_Reverse)
 			incrementalContext->m_tail.appendReverse((const uchar_t*) p, size);
 		else
@@ -133,8 +127,7 @@ size_t
 BinaryBoyerMooreFind::findImpl(
 	const Accessor& accessor,
 	size_t size
-	)
-{
+) {
 	size_t patternSize = m_pattern.getCount();
 	ASSERT(patternSize && size >= patternSize);
 
@@ -143,14 +136,12 @@ BinaryBoyerMooreFind::findImpl(
 	size_t i = last;
 
 	if (m_flags & BoyerMooreFlag_Horspool)
-		while (i < size)
-		{
+		while (i < size) {
 			intptr_t j = last;
 
 			uchar_t c;
 
-			for (;;)
-			{
+			for (;;) {
 				c = accessor.getChar(i);
 
 				if (c != m_pattern[j])
@@ -164,16 +155,13 @@ BinaryBoyerMooreFind::findImpl(
 			}
 
 			i += m_badSkipTable[c];
-		}
-	else
-		while (i < size)
-		{
+		} else
+		while (i < size) {
 			intptr_t j = last;
 
 			uchar_t c;
 
-			for (;;)
-			{
+			for (;;) {
 				c = accessor.getChar(i);
 
 				if (c != m_pattern[j])
@@ -209,12 +197,10 @@ TextBoyerMooreFind::setPattern(
 	const void* p,
 	size_t size,
 	uint_t flags
-	)
-{
+) {
 	sl::String_utf32 text = codec->decode_utf32(p, size);
 	size_t length = text.getLength();
-	if (!length)
-	{
+	if (!length) {
 		clear();
 		return true;
 	}
@@ -239,8 +225,7 @@ TextBoyerMooreFind::setPattern(
 }
 
 bool
-TextBoyerMooreFind::buildBadSkipTable(size_t tableSize)
-{
+TextBoyerMooreFind::buildBadSkipTable(size_t tableSize) {
 	size_t patternSize = m_pattern.getCount();
 
 	bool result = m_badSkipTable.setCount(tableSize);
@@ -251,8 +236,7 @@ TextBoyerMooreFind::buildBadSkipTable(size_t tableSize)
 		m_badSkipTable[i] = patternSize;
 
 	size_t last = patternSize - 1;
-	for (size_t i = 0, j = last; i < last; i++, j--)
-	{
+	for (size_t i = 0, j = last; i < last; i++, j--) {
 		uint32_t c = m_pattern[i];
 		m_badSkipTable[c % tableSize] = j;
 	}
@@ -265,8 +249,7 @@ TextBoyerMooreFind::find(
 	enc::CharCodec* codec,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	size_t patternLength = m_pattern.getCount();
 	if (!patternLength)
 		return 0;
@@ -306,8 +289,7 @@ TextBoyerMooreFind::find(
 	size_t offset,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	size_t patternLength = m_pattern.getCount();
 	if (!patternLength)
 		return offset;
@@ -323,8 +305,7 @@ TextBoyerMooreFind::find(
 	if (m_flags & TextBoyerMooreFlag_WholeWord)
 		end--;
 
-	if (end < patternLength)
-	{
+	if (end < patternLength) {
 		if (m_flags & BoyerMooreFlag_Reverse)
 			incrementalContext->m_tail.appendReverse(m_buffer.cp(), chunkLength);
 		else
@@ -339,23 +320,23 @@ TextBoyerMooreFind::find(
 				TextBoyerMooreCaseFoldedIncrementalReverseAccessor(m_buffer.cp() + chunkLength - 1, incrementalContext),
 				end,
 				fullLength
-				) :
+			) :
 			findImpl(
 				TextBoyerMooreCaseFoldedIncrementalAccessor(m_buffer.cp(), incrementalContext),
 				end,
 				fullLength
-				) :
+			) :
 		(m_flags & BoyerMooreFlag_Reverse) ?
 			findImpl(
 				TextBoyerMooreIncrementalReverseAccessor(m_buffer.cp() + chunkLength - 1, incrementalContext),
 				end,
 				fullLength
-				) :
+			) :
 			findImpl(
 				TextBoyerMooreIncrementalAccessor(m_buffer.cp(), incrementalContext),
 				end,
 				fullLength
-				);
+			);
 
 	if (result == -1)
 		return -1;
@@ -365,13 +346,10 @@ TextBoyerMooreFind::find(
 	if (m_flags & BoyerMooreFlag_Reverse)
 		result = chunkLength - result - patternLength;
 
-	if ((intptr_t)result < 0)
-	{
+	if ((intptr_t)result < 0) {
 		ASSERT(-result <= tailLength);
 		result = -codec->calcRequiredBufferSizeToEncode_utf32(incrementalContext->m_tail, -result);
-	}
-	else if (result)
-	{
+	} else if (result) {
 		ASSERT(result <= chunkLength);
 		result = codec->calcRequiredBufferSizeToEncode_utf32(m_buffer.cp(), result);
 	}
@@ -386,8 +364,7 @@ TextBoyerMooreFind::findImpl(
 	const Accessor& accessor,
 	size_t end,
 	size_t size
-	)
-{
+) {
 	size_t badSkipTableSize = m_badSkipTable.getCount();
 	size_t patternSize = m_pattern.getCount();
 	ASSERT(patternSize && end >= patternSize);
@@ -397,24 +374,20 @@ TextBoyerMooreFind::findImpl(
 	size_t i = last;
 
 	if (m_flags & BoyerMooreFlag_Horspool)
-		while (i < end)
-		{
+		while (i < end) {
 			intptr_t j = last;
 
 			uint32_t c;
 
-			for (;;)
-			{
+			for (;;) {
 				c = accessor.getChar(i);
 
 				if (c != m_pattern[j])
 					break;
 
-				if (j == 0)
-				{
+				if (j == 0) {
 					if ((m_flags & TextBoyerMooreFlag_WholeWord) &&
-						(!accessor.isDelimChar(i - 1) || !accessor.isDelimChar(i + patternSize)))
-					{
+						(!accessor.isDelimChar(i - 1) || !accessor.isDelimChar(i + patternSize))) {
 						break;
 					}
 
@@ -426,26 +399,21 @@ TextBoyerMooreFind::findImpl(
 			}
 
 			i += m_badSkipTable[c % badSkipTableSize];
-		}
-	else
-		while (i < end)
-		{
+		} else
+		while (i < end) {
 			intptr_t j = last;
 
 			uint32_t c;
 
-			for (;;)
-			{
+			for (;;) {
 				c = accessor.getChar(i);
 
 				if (c != m_pattern[j])
 					break;
 
-				if (j == 0)
-				{
+				if (j == 0) {
 					if ((m_flags & TextBoyerMooreFlag_WholeWord) &&
-						(!accessor.isDelimChar(i - 1) || !accessor.isDelimChar(i + patternSize)))
-					{
+						(!accessor.isDelimChar(i - 1) || !accessor.isDelimChar(i + patternSize))) {
 						break;
 					}
 

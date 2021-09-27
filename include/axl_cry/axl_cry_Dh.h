@@ -21,24 +21,19 @@ namespace cry {
 
 //..............................................................................
 
-class FreeDh
-{
+class FreeDh {
 public:
 	void
-	operator () (DH* h)
-	{
+	operator () (DH* h) {
 		DH_free(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Dh: public sl::Handle<DH*, FreeDh>
-{
+class Dh: public sl::Handle<DH*, FreeDh> {
 public:
-	Dh()
-	{
-	}
+	Dh() {}
 
 	bool
 	create();
@@ -53,8 +48,7 @@ public:
 	create2048x256();
 
 	size_t
-	getSize()
-	{
+	getSize() {
 		return DH_size(m_h);
 	}
 
@@ -65,8 +59,7 @@ public:
 	readParameters(
 		const void* pem,
 		size_t size
-		)
-	{
+	) {
 		Bio bio;
 		return bio.createMemBuf(pem, size) && readParameters(bio);
 	}

@@ -27,41 +27,39 @@ buildLogFont(
 	const sl::StringRef_w& family,
 	size_t pointSize,
 	uint_t flags = 0
-	);
+);
 
 inline
 bool
 getLogFontFromFontDesc(
 	const FontDesc& fontDesc,
 	LOGFONTW* logFont
-	)
-{
+) {
 	return buildLogFont(
 		logFont,
 		sl::String_w(fontDesc.m_family),
 		fontDesc.m_pointSize,
 		fontDesc.m_flags
-		);
+	);
 }
 
 void
 modifyLogFont(
 	LOGFONTW* logFont,
 	uint_t flags
-	);
+);
 
 bool
 getFontDescFromLogFont(
 	const LOGFONTW* logFont,
 	FontDesc* fontDesc
-	);
+);
 
 //..............................................................................
 
 class GdiFont:
 	public Font,
-	public GdiObjectHandle<HFONT>
-{
+	public GdiObjectHandle<HFONT> {
 	friend class GdiEngine;
 
 public:

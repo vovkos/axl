@@ -12,8 +12,7 @@ hookEnterCommon(
 	HookCommonContext* context,
 	size_t frameBase,
 	size_t originalRet
-	)
-{
+) {
 	if (!areHooksEnabled())
 		return HookAction_JumpTarget;
 
@@ -39,8 +38,7 @@ size_t
 hookLeaveCommon(
 	HookCommonContext* context,
 	size_t frameBase
-	)
-{
+) {
 	disableCurrentThreadHooks();
 	ThreadState* threadState = getCurrentThreadState(false);
 	ASSERT(threadState && "missing thread-state in leave-hook");

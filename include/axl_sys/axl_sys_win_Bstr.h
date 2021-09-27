@@ -22,70 +22,57 @@ namespace win {
 
 //..............................................................................
 
-class FreeBstr
-{
+class FreeBstr {
 public:
 	void
-	operator () (BSTR h)
-	{
+	operator () (BSTR h) {
 		::SysFreeString(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Bstr: public sl::Handle<BSTR, FreeBstr>
-{
+class Bstr: public sl::Handle<BSTR, FreeBstr> {
 public:
-	Bstr()
-	{
-	}
+	Bstr() {}
 
-	Bstr(const Bstr& src)
-	{
+	Bstr(const Bstr& src) {
 		copy(src.m_h);
 	}
 
-	Bstr(const sl::StringRef& string)
-	{
+	Bstr(const sl::StringRef& string) {
 		copy(string);
 	}
 
-	Bstr(const sl::StringRef_w& string)
-	{
+	Bstr(const sl::StringRef_w& string) {
 		copy(string);
 	}
 
 	Bstr&
-	operator = (const Bstr& src)
-	{
+	operator = (const Bstr& src) {
 		copy(src.m_h);
 		return *this;
 	}
 
 	Bstr&
-	operator = (const sl::StringRef& string)
-	{
+	operator = (const sl::StringRef& string) {
 		copy(string);
 		return *this;
 	}
 
 	Bstr&
-	operator = (const sl::StringRef_w& string)
-	{
+	operator = (const sl::StringRef_w& string) {
 		copy(string);
 		return *this;
 	}
 
 	size_t
-	getLength() const
-	{
+	getLength() const {
 		return ::SysStringLen(m_h);
 	}
 
 	size_t
-	getByteLength() const
-	{
+	getByteLength() const {
 		return ::SysStringByteLen(m_h);
 	}
 
@@ -93,17 +80,15 @@ public:
 	copy(
 		BSTR p,
 		size_t length
-		);
+	);
 
 	bool
-	copy(const sl::StringRef& string)
-	{
+	copy(const sl::StringRef& string) {
 		return copy(sl::String_w(string));
 	}
 
 	bool
-	copy(const sl::StringRef_w& string)
-	{
+	copy(const sl::StringRef_w& string) {
 		return copy((BSTR)string.cp(), string.getLength());
 	}
 };
@@ -118,8 +103,7 @@ HRESULT
 createBstrFromString(
 	BSTR* p,
 	const sl::StringRefBase<T>& string
-	)
-{
+) {
 	ASSERT(p);
 
 	Bstr bstr;

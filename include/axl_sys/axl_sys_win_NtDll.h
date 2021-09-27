@@ -24,8 +24,7 @@ namespace win {
 
 //..............................................................................
 
-enum
-{
+enum {
 	STATUS_NO_MORE_FILES          = 0x80000006,
 	STATUS_NO_MORE_ENTRIES        = 0x8000001a,
 	STATUS_INFO_LENGTH_MISMATCH   = 0xc0000004,
@@ -37,8 +36,7 @@ enum
 	DIRECTORY_CREATE_SUBDIRECTORY = 0x0008,
 };
 
-enum FILE_INFORMATION_CLASS
-{
+enum FILE_INFORMATION_CLASS {
 	FileDirectoryInformation                 =  1,
 	FileFullDirectoryInformation,            // 2
 	FileBothDirectoryInformation,            // 3
@@ -97,8 +95,7 @@ enum FILE_INFORMATION_CLASS
 	FileMaximumInformation
 };
 
-enum PROCESSINFOCLASS
-{
+enum PROCESSINFOCLASS {
     ProcessBasicInformation,
     ProcessQuotaLimits,
     ProcessIoCounters,
@@ -154,8 +151,7 @@ enum PROCESSINFOCLASS
 };
 
 
-enum OBJECT_INFORMATION_CLASS
-{
+enum OBJECT_INFORMATION_CLASS {
 	ObjectBasicInformation,
 	ObjectNameInformation,
 	ObjectTypeInformation,
@@ -163,8 +159,7 @@ enum OBJECT_INFORMATION_CLASS
 	ObjectDataInformation
 };
 
-struct FILE_BASIC_INFORMATION
-{
+struct FILE_BASIC_INFORMATION {
 	LARGE_INTEGER CreationTime;
 	LARGE_INTEGER LastAccessTime;
 	LARGE_INTEGER LastWriteTime;
@@ -172,8 +167,7 @@ struct FILE_BASIC_INFORMATION
 	ULONG FileAttributes;
 };
 
-struct FILE_DIRECTORY_INFORMATION
-{
+struct FILE_DIRECTORY_INFORMATION {
 	ULONG NextEntryOffset;
 	ULONG FileIndex;
 	LARGE_INTEGER CreationTime;
@@ -187,14 +181,12 @@ struct FILE_DIRECTORY_INFORMATION
 	WCHAR FileName[1];
 };
 
-struct OBJECT_NAME_INFORMATION
-{
+struct OBJECT_NAME_INFORMATION {
 	UNICODE_STRING Name; // defined in winternl.h
 	WCHAR NameBuffer[1];
 };
 
-struct OBJECT_DIRECTORY_INFORMATION
-{
+struct OBJECT_DIRECTORY_INFORMATION {
 	UNICODE_STRING Name;
 	UNICODE_STRING TypeName;
 };
@@ -216,7 +208,7 @@ NtQueryDirectoryFileFunc(
 	IN BOOLEAN ReturnSingleEntry,
 	IN PVOID FileName,
 	IN BOOLEAN RestartScan
-	);
+);
 
 typedef
 NTSTATUS
@@ -225,7 +217,7 @@ NtOpenDirectoryObjectFunc(
 	OUT PHANDLE DirectoryHandle,
 	IN ACCESS_MASK DesiredAccess,
 	IN POBJECT_ATTRIBUTES ObjectAttributes
-	);
+);
 
 typedef
 NTSTATUS
@@ -238,7 +230,7 @@ NtQueryDirectoryObjectFunc(
 	IN BOOLEAN RestartScan,
 	IN PULONG Context,
 	OUT PULONG ReturnLength
-	);
+);
 
 typedef
 NTSTATUS
@@ -247,7 +239,7 @@ NtOpenSymbolicLinkObjectFunc(
 	OUT PHANDLE LinkHandle,
 	IN ACCESS_MASK DesiredAccess,
 	IN POBJECT_ATTRIBUTES ObjectAttributes
-	);
+);
 
 typedef
 NTSTATUS
@@ -256,7 +248,7 @@ NtQuerySymbolicLinkObjectFunc(
 	IN HANDLE LinkHandle,
 	OUT PUNICODE_STRING LinkTarget,
 	OUT PULONG ReturnedLength
-	);
+);
 
 typedef
 NTSTATUS
@@ -267,7 +259,7 @@ NtQueryInformationFileFunc(
 	PVOID FileInformation,
 	ULONG Length,
 	FILE_INFORMATION_CLASS FileInformationClass
-	);
+);
 
 typedef
 NTSTATUS
@@ -278,7 +270,7 @@ NtQueryInformationProcessFunc(
 	PVOID ProcessInformation,
 	ULONG ProcessInformationLength,
 	PULONG ReturnLength
-	);
+);
 
 typedef
 NTSTATUS
@@ -289,7 +281,7 @@ NtQueryObjectFunc(
 	OUT PVOID Buffer,
 	IN ULONG BufferSize,
 	OUT PULONG ReturnedLength
-	);
+);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

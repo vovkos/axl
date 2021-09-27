@@ -19,8 +19,7 @@ namespace win {
 //..............................................................................
 
 bool
-Iocp::create(dword_t threadCount)
-{
+Iocp::create(dword_t threadCount) {
 	close();
 
 	m_h = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, threadCount);

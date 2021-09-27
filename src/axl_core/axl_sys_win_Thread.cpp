@@ -25,14 +25,12 @@ Thread::create(
 	PTHREAD_START_ROUTINE threadFunc,
 	void* context,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	dword_t threadId;
 	m_h = ::CreateThread(secAttr, stackSize, threadFunc, context, flags, &threadId);
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::setLastSystemError();
 		return false;
 	}

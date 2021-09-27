@@ -21,50 +21,42 @@ namespace psx {
 
 //..............................................................................
 
-class Mapping
-{
+class Mapping {
 protected:
 	void* m_p;
 	size_t m_size;
 
 public:
-	Mapping()
-	{
+	Mapping() {
 		m_p = NULL;
 		m_size = 0;
 	}
 
-	~Mapping()
-	{
+	~Mapping() {
 		close();
 	}
 
-	operator void* () const
-	{
+	operator void* () const {
 		return m_p;
 	}
 
 	void*
-	p() const
-	{
+	p() const {
 		return m_p;
 	}
 
 	size_t
-	getSize()
-	{
+	getSize() {
 		return m_size;
 	}
 
 	bool
-	isOpen() const
-	{
+	isOpen() const {
 		return m_p != NULL;
 	}
 
 	void
-	close()
-	{
+	close() {
 		unmap(m_size);
 	}
 
@@ -76,11 +68,10 @@ public:
 		uint_t flags,
 		int fd,
 		size_t offset = 0
-		);
+	);
 
 	bool
-	protect(int protection)
-	{
+	protect(int protection) {
 		int result = ::mprotect(m_p, m_size, protection);
 		return err::complete(result != -1);
 	}
@@ -91,20 +82,18 @@ public:
 
 //..............................................................................
 
-class SharedMemory: public File
-{
+class SharedMemory: public File {
 public:
 	bool
 	open(
 		const sl::StringRef& name,
 		uint_t flags = O_RDWR | O_CREAT,
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
-		);
+	);
 
 	static
 	bool
-	unlink(const sl::StringRef& name)
-	{
+	unlink(const sl::StringRef& name) {
 		int result = ::shm_unlink(name.sz());
 		return err::complete(result != -1);
 	}
@@ -112,23 +101,18 @@ public:
 
 //..............................................................................
 
-class AutoUnlinkSharedMemory
-{
+class AutoUnlinkSharedMemory {
 public:
 	sl::String m_name;
 
 public:
-	AutoUnlinkSharedMemory()
-	{
-	}
+	AutoUnlinkSharedMemory() {}
 
-	AutoUnlinkSharedMemory(const sl::StringRef& name)
-	{
+	AutoUnlinkSharedMemory(const sl::StringRef& name) {
 		m_name = name;
 	}
 
-	~AutoUnlinkSharedMemory()
-	{
+	~AutoUnlinkSharedMemory() {
 		if (!m_name.isEmpty())
 			::shm_unlink(m_name.sz());;
 	}

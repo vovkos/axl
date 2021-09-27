@@ -21,21 +21,21 @@ set(
 	${AXL_INC_DIR}/axl_lex/axl_lex_Ragel.h
 	${AXL_INC_DIR}/axl_lex/axl_lex_RagelLexer.h
 	${AXL_INC_DIR}/axl_lex/axl_lex_ParseError.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
 	axl_lex_SrcPos.cpp
 	axl_lex_Ragel.cpp
 	axl_lex_ParseError.cpp
-	)
+)
 
 source_group(
 	lex
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -49,14 +49,14 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_lex/axl_lex_Pch.h
-	)
+)
 
 source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -71,13 +71,13 @@ add_library(
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_lex
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -85,11 +85,11 @@ axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_lex
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_lex
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

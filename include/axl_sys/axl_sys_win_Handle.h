@@ -22,12 +22,10 @@ namespace win {
 
 //..............................................................................
 
-class CloseHandle
-{
+class CloseHandle {
 public:
 	void
-	operator () (HANDLE h)
-	{
+	operator () (HANDLE h) {
 		bool_t result = ::CloseHandle(h);
 		ASSERT(result);
 	}
@@ -39,12 +37,10 @@ typedef sl::Handle<HANDLE, CloseHandle> Handle;
 
 //..............................................................................
 
-class CloseRegKey
-{
+class CloseRegKey {
 public:
 	void
-	operator () (HKEY h)
-	{
+	operator () (HKEY h) {
 		long result = ::RegCloseKey(h);
 		ASSERT(result == ERROR_SUCCESS);
 	}

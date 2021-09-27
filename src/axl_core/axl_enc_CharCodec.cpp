@@ -18,8 +18,7 @@ namespace enc {
 //..............................................................................
 
 CharCodec*
-getCharCodec(CharCodecKind codecKind)
-{
+getCharCodec(CharCodecKind codecKind) {
 	static AsciiCodec         asciiCodec;
 	static UtfCodec<Utf8>     utf8Codec;
 	static UtfCodec<Utf16>    utf16Codec;
@@ -27,8 +26,7 @@ getCharCodec(CharCodecKind codecKind)
 	static UtfCodec<Utf32>    utf32Codec;
 	static UtfCodec<Utf32_be> utf32Codec_be;
 
-	static CharCodec* codecTable[] =
-	{
+	static CharCodec* codecTable[] = {
 		&asciiCodec,
 		&utf8Codec,
 		&utf16Codec,
@@ -47,14 +45,12 @@ CharCodec::encode_utf8(
 	sl::Array<char>* buffer,
 	const utf8_t* p,
 	size_t length
-	)
-{
+) {
 	buffer->clear();
 	buffer->reserve(length * m_unitSize);
 
 	const utf8_t* end = p + length;
-	while (p < end)
-	{
+	while (p < end) {
 		char tmpBuffer[256];
 
 		size_t takenLength;
@@ -77,14 +73,12 @@ CharCodec::encode_utf16(
 	sl::Array<char>* buffer,
 	const utf16_t* p,
 	size_t length
-	)
-{
+) {
 	buffer->clear();
 	buffer->reserve(length * m_unitSize);
 
 	const utf16_t* end = p + length;
-	while (p < end)
-	{
+	while (p < end) {
 		char tmpBuffer[256];
 
 		size_t takenLength;
@@ -107,14 +101,12 @@ CharCodec::encode_utf32(
 	sl::Array<char>* buffer,
 	const utf32_t* p,
 	size_t length
-	)
-{
+) {
 	buffer->clear();
 	buffer->reserve(length * m_unitSize);
 
 	const utf32_t* end = p + length;
-	while (p < end)
-	{
+	while (p < end) {
 		char tmpBuffer[256];
 
 		size_t takenLength;
@@ -139,8 +131,7 @@ CharCodec::decode_utf8(
 	sl::String_utf8* string,
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	size_t length = size / m_unitSize;
 	size_t leftover = size % m_unitSize;
 
@@ -149,8 +140,7 @@ CharCodec::decode_utf8(
 
 	const char* p = (const char*) _p;
 	const char* end = p + size - leftover;
-	while (p < end)
-	{
+	while (p < end) {
 		utf8_t tmpBuffer[256];
 
 		size_t takenSize;
@@ -173,8 +163,7 @@ CharCodec::decode_utf16(
 	sl::String_utf16* string,
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	size_t length = size / m_unitSize;
 	size_t leftover = size % m_unitSize;
 
@@ -183,8 +172,7 @@ CharCodec::decode_utf16(
 
 	const char* p = (const char*) _p;
 	const char* end = p + size - leftover;
-	while (p < end)
-	{
+	while (p < end) {
 		utf16_t tmpBuffer[256];
 
 		size_t takenSize;
@@ -207,8 +195,7 @@ CharCodec::decode_utf32(
 	sl::String_utf32* string,
 	const void* _p,
 	size_t size
-	)
-{
+) {
 	size_t length = size / m_unitSize;
 	size_t leftover = size % m_unitSize;
 
@@ -217,8 +204,7 @@ CharCodec::decode_utf32(
 
 	const char* p = (const char*) _p;
 	const char* end = p + size - leftover;
-	while (p < end)
-	{
+	while (p < end) {
 		utf32_t tmpBuffer[256];
 
 		size_t takenSize;
@@ -239,15 +225,13 @@ CharCodec::decode_utf32(
 //..............................................................................
 
 void
-CodePointDecoder::loadState(uint32_t state)
-{
+CodePointDecoder::loadState(uint32_t state) {
 	*((uint32_t*)m_accumulator) = state;
 	m_accumulatorCount = (state & 0x03000000) >> 24;
 }
 
 uint32_t
-CodePointDecoder::saveState()
-{
+CodePointDecoder::saveState() {
 	uint32_t state = *((const uint32_t*) m_accumulator) & 0x00ffffff;
 	state |= (m_accumulatorCount & 0x03) << 24;
 	return state;
@@ -260,13 +244,11 @@ CodePointDecoder::decode(
 	const void* p,
 	size_t size,
 	size_t* takenSize_o
-	)
-{
+) {
 	size_t takenBufferLength;
 	size_t takenSize;
 
-	if (!m_accumulatorCount)
-	{
+	if (!m_accumulatorCount) {
 		takenBufferLength = decodeImpl(buffer, bufferLength, p, size, &takenSize);
 
 		if (takenSize_o)
@@ -288,10 +270,9 @@ CodePointDecoder::decode(
 		m_accumulator,
 		m_accumulatorCount + copySize,
 		&takenSize
-		);
+	);
 
-	if (!takenBufferLength)
-	{
+	if (!takenBufferLength) {
 		ASSERT(takenSize == 0);
 		m_accumulatorCount += copySize;
 
@@ -306,8 +287,7 @@ CodePointDecoder::decode(
 	takenSize -= m_accumulatorCount;
 	m_accumulatorCount = 0;
 
-	if (takenSize < size)
-	{
+	if (takenSize < size) {
 		size_t takenSize2;
 		takenBufferLength += decodeImpl(
 			buffer + 1,
@@ -315,7 +295,7 @@ CodePointDecoder::decode(
 			(char*)p + takenSize,
 			size - takenSize,
 			&takenSize2
-			);
+		);
 
 		takenSize += takenSize2;
 	}
@@ -334,13 +314,11 @@ CodePointDecoder::decode(
 	const void* p,
 	size_t size,
 	size_t* takenSize_o
-	)
-{
+) {
 	size_t takenBufferLength;
 	size_t takenSize;
 
-	if (!m_accumulatorCount)
-	{
+	if (!m_accumulatorCount) {
 		takenBufferLength = decodeImpl(cplBuffer, textBuffer, bufferLength, p, size, &takenSize);
 
 		if (takenSize_o)
@@ -363,10 +341,9 @@ CodePointDecoder::decode(
 		m_accumulator,
 		m_accumulatorCount + copySize,
 		&takenSize
-		);
+	);
 
-	if (!takenBufferLength)
-	{
+	if (!takenBufferLength) {
 		ASSERT(takenSize == 0);
 		m_accumulatorCount += copySize;
 
@@ -381,8 +358,7 @@ CodePointDecoder::decode(
 	takenSize -= m_accumulatorCount;
 	m_accumulatorCount = 0;
 
-	if (takenSize < size)
-	{
+	if (takenSize < size) {
 		size_t takenSize2;
 		takenBufferLength += decodeImpl(
 			cplBuffer + 1,
@@ -391,7 +367,7 @@ CodePointDecoder::decode(
 			(char*)p + takenSize,
 			size - takenSize,
 			&takenSize2
-			);
+		);
 
 		takenSize += takenSize2;
 	}
@@ -409,8 +385,7 @@ CodePointDecoder::decodeImpl(
 	const void* p,
 	size_t size,
 	size_t* takenSize_o
-	)
-{
+) {
 	ASSERT(takenSize_o);
 
 	size_t takenSize;
@@ -420,10 +395,9 @@ CodePointDecoder::decodeImpl(
 		p,
 		size,
 		&takenSize
-		);
+	);
 
-	if (takenBufferLength < bufferLength && takenSize < size)
-	{
+	if (takenBufferLength < bufferLength && takenSize < size) {
 		ASSERT(size - takenSize < sizeof(m_accumulator));
 		m_accumulatorCount = size - takenSize;
 		memcpy(m_accumulator, (char*)p + takenSize, m_accumulatorCount);
@@ -442,8 +416,7 @@ CodePointDecoder::decodeImpl(
 	const void* p,
 	size_t size,
 	size_t* takenSize_o
-	)
-{
+) {
 	ASSERT(takenSize_o);
 
 	size_t takenSize;
@@ -455,10 +428,9 @@ CodePointDecoder::decodeImpl(
 		p,
 		size,
 		&takenSize
-		);
+	);
 
-	if (takenBufferLength < bufferLength && takenSize < size)
-	{
+	if (takenBufferLength < bufferLength && takenSize < size) {
 		ASSERT(size - takenSize < sizeof(m_accumulator));
 		m_accumulatorCount = size - takenSize;
 		memcpy(m_accumulator, (char*)p + takenSize, m_accumulatorCount);

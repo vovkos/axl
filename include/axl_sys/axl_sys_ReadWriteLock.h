@@ -22,18 +22,15 @@ namespace sys {
 
 //..............................................................................
 
-class ReadWriteLock
-{
+class ReadWriteLock {
 protected:
 	// locking data may be shared between processes
 
-	enum
-	{
+	enum {
 		Signature = 'klwr',
 	};
 
-	struct Data
-	{
+	struct Data {
 		uint32_t m_signature;
 		int32_t m_lock;
 		uint32_t m_activeReadCount;
@@ -49,13 +46,11 @@ protected:
 	NameableEvent m_writeEvent;
 
 public:
-	ReadWriteLock()
-	{
+	ReadWriteLock() {
 		m_data = NULL;
 	}
 
-	~ReadWriteLock()
-	{
+	~ReadWriteLock() {
 		close();
 	}
 
@@ -70,14 +65,14 @@ public:
 		const sl::StringRef& mappingName,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName
-		);
+	);
 
 	bool
 	open(
 		const sl::StringRef& mappingName,
 		const sl::StringRef& readEventName,
 		const sl::StringRef& writeEventName
-		);
+	);
 
 	void
 	readLock();

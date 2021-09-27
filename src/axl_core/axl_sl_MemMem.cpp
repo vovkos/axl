@@ -25,8 +25,7 @@ memMem(
 	size_t size1,
 	const void* p2,
 	size_t size2
-	)
-{
+) {
 	BinaryBoyerMooreFind find(p2, size2, BoyerMooreFlag_Horspool);
 	size_t offset = find.find(p1, size1);
 	return offset != -1 ? (char*)p1 + offset : NULL;
@@ -38,8 +37,7 @@ reverseMemMem(
 	size_t size1,
 	const void* p2,
 	size_t size2
-	)
-{
+) {
 	BinaryBoyerMooreFind find(p2, size2, BoyerMooreFlag_Horspool | BoyerMooreFlag_Reverse);
 	size_t offset = find.find(p1, size1);
 	return offset != -1 ? (char*)p1 + offset : NULL;

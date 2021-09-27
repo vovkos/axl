@@ -16,8 +16,7 @@ namespace {
 
 //..............................................................................
 
-struct MyStruct
-{
+struct MyStruct {
 	sl::ListLink m_Link1;
 	sl::ListLink m_Link2;
 
@@ -26,25 +25,23 @@ struct MyStruct
 	int m_c;
 };
 
-struct MyStruct2: sl::ListLink
-{
+struct MyStruct2: sl::ListLink {
 	int m_x;
 	int m_y;
 	int m_z;
 };
 
-void run()
-{
+void run() {
 	sl::List<
 		MyStruct,
 		sl::Offset<MyStruct, sl::ListLink, offsetof(MyStruct, m_Link1) >,
 		mem::CppDelete<MyStruct>
-		> list1;
+	> list1;
 
 	sl::AuxList<
 		MyStruct,
 		sl::Offset<MyStruct, sl::ListLink, offsetof(MyStruct, m_Link2) >
-		> list2;
+	> list2;
 
 	MyStruct* p = new MyStruct;
 	list1.insertHead(p);
@@ -58,7 +55,7 @@ void run()
 		MyStruct2,
 		sl::ExplicitCast<MyStruct2*, sl::ListLink*>,
 		mem::CppDelete<MyStruct2>
-		> list3;
+	> list3;
 
 	MyStruct2* p2 = new MyStruct2;
 	list3.insertTail(p2);
@@ -72,8 +69,7 @@ void run()
 	boxList.removeHead();
 
 	sl::BoxIterator<int> it = boxList.getHead();
-	for (; it; it++)
-	{
+	for (; it; it++) {
 		printf("%d\n", *it);
 	}
 };

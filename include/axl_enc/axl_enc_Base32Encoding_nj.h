@@ -21,8 +21,7 @@ namespace enc {
 
 //..............................................................................
 
-class Base32Encoding_nj
-{
+class Base32Encoding_nj {
 public:
 	static
 	size_t
@@ -31,7 +30,7 @@ public:
 		const void* p,
 		size_t size,
 		size_t hyphenDistance = 5
-		);
+	);
 
 	static
 	sl::String
@@ -39,8 +38,7 @@ public:
 		const void* p,
 		size_t size,
 		size_t hyphenDistance = 5
-		)
-	{
+	) {
 		sl::String string;
 		encode(&string, p, size, hyphenDistance);
 		return string;
@@ -51,12 +49,11 @@ public:
 	decode(
 		sl::Array<char>* buffer,
 		const sl::StringRef& string
-		);
+	);
 
 	static
 	sl::Array<char>
-	decode(const sl::StringRef& string)
-	{
+	decode(const sl::StringRef& string) {
 		sl::Array<char> buffer;
 		decode(&buffer, string);
 		return buffer;

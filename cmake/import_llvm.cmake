@@ -43,7 +43,7 @@ macro(
 target_link_llvm_libraries
 	_TARGET
 	# ...
-	)
+)
 
 	set(_COMPONENT_LIST ${ARGN})
 
@@ -62,7 +62,7 @@ macro(
 target_link_llvm_jit_libraries
 	_TARGET
 	# ...
-	)
+)
 
 	set(_EXTRA_COMPONENT_LIST ${ARGN})
 
@@ -71,7 +71,7 @@ target_link_llvm_jit_libraries
 		native
 		MCJIT
 		IPO
-		)
+	)
 
 	if(${LLVM_VERSION} VERSION_LESS 3.6)
 		set(_COMPONENT_LIST ${_COMPONENT_LIST} jit)
@@ -81,7 +81,7 @@ target_link_llvm_jit_libraries
 		${_TARGET}
 		${_COMPONENT_LIST}
 		${_EXTRA_COMPONENT_LIST}
-		)
+	)
 endmacro()
 
 #...............................................................................

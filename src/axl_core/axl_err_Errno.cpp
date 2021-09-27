@@ -18,8 +18,7 @@ namespace err {
 //..............................................................................
 
 sl::String
-ErrnoProvider::getErrorDescription(int code)
-{
+ErrnoProvider::getErrorDescription(int code) {
 	char buffer[512] = { 0 };
 #if (_AXL_OS_WIN)
 	strerror_s(buffer, countof(buffer) - 1, code);

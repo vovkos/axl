@@ -24,14 +24,14 @@ size_t
 getScatterGatherSize(
 	const Block* blockArray,
 	size_t blockCount
-	);
+);
 
 size_t
 copyScatterGather(
 	void* buffer,
 	const Block* blockArray,
 	size_t blockCount
-	);
+);
 
 size_t
 safeCopyScatterGather(
@@ -39,7 +39,7 @@ safeCopyScatterGather(
 	size_t bufferSize,
 	const Block* blockArray,
 	size_t blockCount
-	);
+);
 
 //..............................................................................
 

@@ -18,8 +18,7 @@ namespace sys {
 //..............................................................................
 
 void
-ReadWriteLock::close()
-{
+ReadWriteLock::close() {
 	if (m_data && m_data != m_mapping.p())
 		AXL_MEM_FREE((void*)m_data);
 
@@ -31,8 +30,7 @@ ReadWriteLock::close()
 }
 
 bool
-ReadWriteLock::create()
-{
+ReadWriteLock::create() {
 	close();
 
 	m_data = AXL_MEM_ZERO_NEW(Data);
@@ -49,8 +47,7 @@ ReadWriteLock::create(
 	const sl::StringRef& mappingName,
 	const sl::StringRef& readEventName,
 	const sl::StringRef& writeEventName
-	)
-{
+) {
 	close();
 
 	bool result =
@@ -72,8 +69,7 @@ ReadWriteLock::open(
 	const sl::StringRef& mappingName,
 	const sl::StringRef& readEventName,
 	const sl::StringRef& writeEventName
-	)
-{
+) {
 	close();
 
 	bool result =
@@ -86,8 +82,7 @@ ReadWriteLock::open(
 
 	m_data = (Data*)m_mapping.p();
 
-	if (m_data->m_signature != Signature)
-	{
+	if (m_data->m_signature != Signature) {
 		err::setError(err::SystemErrorCode_InvalidParameter);
 		return false;
 	}
@@ -96,13 +91,11 @@ ReadWriteLock::open(
 }
 
 void
-ReadWriteLock::readLock()
-{
+ReadWriteLock::readLock() {
 	bool result;
 
 	sys::atomicLock(&m_data->m_lock);
-	if (!m_data->m_activeWriteCount && !m_data->m_queuedWriteCount)
-	{
+	if (!m_data->m_activeWriteCount && !m_data->m_queuedWriteCount) {
 		m_data->m_activeReadCount++;
 		sys::atomicUnlock(&m_data->m_lock);
 		return;
@@ -110,8 +103,7 @@ ReadWriteLock::readLock()
 
 	m_data->m_queuedReadCount++;
 
-	do
-	{
+	do {
 		sys::atomicUnlock(&m_data->m_lock);
 
 		result = m_readEvent.wait();
@@ -134,24 +126,18 @@ ReadWriteLock::readLock()
 }
 
 void
-ReadWriteLock::readUnlock()
-{
+ReadWriteLock::readUnlock() {
 	sys::atomicLock(&m_data->m_lock);
 	ASSERT(m_data->m_activeReadCount && !m_data->m_activeWriteCount);
 	m_data->m_activeReadCount--;
 
-	if (m_data->m_queuedWriteCount) // wake writers first (so that we alternate)
-	{
-		if (!m_data->m_activeReadCount)
-		{
+	if (m_data->m_queuedWriteCount) { // wake writers first (so that we alternate)
+		if (!m_data->m_activeReadCount) {
 			bool result = m_writeEvent.signal();
 			ASSERT(result);
 		}
-	}
-	else
-	{
-		if (m_data->m_queuedReadCount)
-		{
+	} else {
+		if (m_data->m_queuedReadCount) {
 			bool result = m_readEvent.signal();
 			ASSERT(result);
 		}
@@ -161,11 +147,9 @@ ReadWriteLock::readUnlock()
 }
 
 void
-ReadWriteLock::writeLock()
-{
+ReadWriteLock::writeLock() {
 	sys::atomicLock(&m_data->m_lock);
-	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount)
-	{
+	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount) {
 		m_readEvent.reset();
 		m_data->m_activeWriteCount = 1;
 		sys::atomicUnlock(&m_data->m_lock);
@@ -174,8 +158,7 @@ ReadWriteLock::writeLock()
 
 	m_data->m_queuedWriteCount++;
 
-	do
-	{
+	do {
 		sys::atomicUnlock(&m_data->m_lock);
 
 		// another writer might squeeze in here, finish and wake up readers
@@ -199,19 +182,15 @@ ReadWriteLock::writeLock()
 }
 
 void
-ReadWriteLock::writeUnlock()
-{
+ReadWriteLock::writeUnlock() {
 	sys::atomicLock(&m_data->m_lock);
 	ASSERT(!m_data->m_activeReadCount && m_data->m_activeWriteCount == 1);
 	m_data->m_activeWriteCount = 0;
 
-	if (m_data->m_queuedReadCount) // wake readers first (so that we alternate)
-	{
+	if (m_data->m_queuedReadCount) { // wake readers first (so that we alternate)
 		bool result = m_readEvent.signal();
 		ASSERT(result);
-	}
-	else if (m_data->m_queuedWriteCount)
-	{
+	} else if (m_data->m_queuedWriteCount) {
 		bool result = m_writeEvent.signal();
 		ASSERT(result);
 	}
@@ -220,15 +199,13 @@ ReadWriteLock::writeUnlock()
 }
 
 void
-ReadWriteLock::upgradeReadLockToWriteLock()
-{
+ReadWriteLock::upgradeReadLockToWriteLock() {
 	bool result;
 
 	sys::atomicLock(&m_data->m_lock);
 	ASSERT(m_data->m_activeReadCount >= 1);
 
-	if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount)
-	{
+	if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount) {
 		m_readEvent.reset();
 		m_data->m_activeWriteCount = 1;
 		m_data->m_activeReadCount = 0;
@@ -238,8 +215,7 @@ ReadWriteLock::upgradeReadLockToWriteLock()
 
 	m_data->m_queuedWriteCount++;
 
-	do
-	{
+	do {
 		sys::atomicUnlock(&m_data->m_lock);
 
 		// another writer might squeeze in here, finish and wake up readers
@@ -264,15 +240,13 @@ ReadWriteLock::upgradeReadLockToWriteLock()
 }
 
 void
-ReadWriteLock::downgradeWriteLockToReadLock()
-{
+ReadWriteLock::downgradeWriteLockToReadLock() {
 	sys::atomicLock(&m_data->m_lock);
 	ASSERT(m_data->m_activeReadCount == 0 && m_data->m_activeWriteCount == 1);
 	m_data->m_activeWriteCount = 0;
 	m_data->m_activeReadCount = 1;
 
-	if (m_data->m_queuedReadCount) // wake queued readers
-	{
+	if (m_data->m_queuedReadCount) { // wake queued readers
 		bool result = m_readEvent.signal();
 		ASSERT(result);
 	}

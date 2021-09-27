@@ -22,8 +22,7 @@ class NetworkAdapterEnumerator;
 
 //..............................................................................
 
-enum NetworkAdapterType
-{
+enum NetworkAdapterType {
 	NetworkAdapterType_Unknown,
 	NetworkAdapterType_Loopback,
 	NetworkAdapterType_Ethernet,
@@ -42,8 +41,7 @@ getNetworkAdapterTypeString(NetworkAdapterType adapterKind);
 
 //..............................................................................
 
-enum NetworkAdapterFlag
-{
+enum NetworkAdapterFlag {
 	NetworkAdapterFlag_Dhcp      = 0x01,
 	NetworkAdapterFlag_Ddns      = 0x02,
 	NetworkAdapterFlag_Broadcast = 0x04,
@@ -56,8 +54,7 @@ enum NetworkAdapterFlag
 
 inline
 NetworkAdapterFlag
-getFirstNetworkAdapterFlag(uint_t flags)
-{
+getFirstNetworkAdapterFlag(uint_t flags) {
 	return (NetworkAdapterFlag)(1 << sl::getLoBitIdx(flags));
 }
 
@@ -74,15 +71,14 @@ getMacAddressString(
 	sl::String* string,
 	const uchar_t* macAddress,
 	uint_t flags = 0 // HexEncodingFlag-s
-	);
+);
 
 inline
 sl::String
 getMacAddressString(
 	const uchar_t* macAddress,
 	uint_t flags = 0 // HexEncodingFlag-s
-	)
-{
+) {
 	sl::String string;
 	getMacAddressString(&string, macAddress, flags);
 	return string;
@@ -90,16 +86,14 @@ getMacAddressString(
 
 //..............................................................................
 
-struct NetworkAdapterAddress: sl::ListLink
-{
+struct NetworkAdapterAddress: sl::ListLink {
 	SockAddr m_address;
 	size_t m_netMaskBitCount;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class NetworkAdapterDesc: public sl::ListLink
-{
+class NetworkAdapterDesc: public sl::ListLink {
 	friend class NetworkAdapterEnumerator;
 
 protected:
@@ -114,45 +108,38 @@ public:
 	NetworkAdapterDesc();
 
 	NetworkAdapterType
-	getType() const
-	{
+	getType() const {
 		return m_type;
 	}
 
 	uint_t
-	getFlags() const
-	{
+	getFlags() const {
 		return m_flags;
 	}
 
 	const sl::String&
-	getName() const
-	{
+	getName() const {
 		return m_name;
 	}
 
 	const sl::String&
-	getDescription() const
-	{
+	getDescription() const {
 		return m_description;
 	}
 
 	bool
-	isNullMacAddress() const
-	{
+	isNullMacAddress() const {
 		static uchar_t nullMacAddress[6] = { 0 };
 		return memcmp(m_macAddress, nullMacAddress, 6) == 0;
 	}
 
 	const uchar_t*
-	getMacAddress() const
-	{
+	getMacAddress() const {
 		return m_macAddress;
 	}
 
 	sl::ConstList<NetworkAdapterAddress>
-	getAddressList() const
-	{
+	getAddressList() const {
 		return m_addressList;
 	}
 };

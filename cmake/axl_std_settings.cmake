@@ -27,7 +27,7 @@ axl_create_target_cpu_setting)
 			DEFAULT ${_CPU}
 			"x86"
 			"amd64"
-			)
+		)
 	endif()
 endmacro()
 
@@ -73,7 +73,7 @@ axl_create_build_type_setting)
 		"Debug"
 		"Release"
 		CACHE STRING "List of supported configurations" FORCE
-		)
+	)
 
 	# Microsoft Visual C++ and Xcode are multi-configuration generators
 
@@ -88,7 +88,7 @@ axl_create_build_type_setting)
 			DESCRIPTION "Build configuration"
 			DEFAULT Release
 			${CMAKE_CONFIGURATION_TYPES}
-			)
+		)
 	endif()
 endmacro()
 
@@ -126,78 +126,78 @@ axl_create_msvc_settings)
 		MSVC_USE_FOLDERS
 		"Use solution folders in Microsoft Visual Studio"
 		ON
-		)
+	)
 
 	option(
 		MSVC_USE_PCH
 		"Use precompiled headers in Microsoft Visual C/C++"
 		ON
-		)
+	)
 
 	option(
 		MSVC_USE_UNICODE
 		"Compile for UNICODE rather than multibyte"
 		ON
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_SHOW_INCLUDES
 		DESCRIPTION "Microsoft Visual C++ shows includes stack during compilation"
 		"/showIncludes"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_EH
 		DESCRIPTION "Microsoft Visual C++ EH(exception handling) model"
 		"/EHsc" "/EHs-c-"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_RTTI
 		DESCRIPTION "Microsoft Visual C++ RTTI(run-time type information) support"
 		"/GR" "/GR-"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_CRT_DEBUG
 		DESCRIPTION "Microsoft Visual C++ CRT(Debug)"
 		DEFAULT "/MDd"
 		"/MT" "/MTd" "/MD" "/MDd"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_CRT_RELEASE
 		DESCRIPTION "Microsoft Visual C++ CRT(Release)"
 		DEFAULT "/MD"
 		"/MT" "/MTd" "/MD" "/MDd"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_DEBUG_INFO_DEBUG
 		DESCRIPTION "Microsoft Visual C++ debug information format(Debug)"
 		DEFAULT "/Zi"
 		"/Z7" "/Zi" "/ZI"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_DEBUG_INFO_RELEASE
 		DESCRIPTION "Microsoft Visual C++ debug information format(Release)"
 		DEFAULT "/Zi"
 		"/Z7" "/Zi" "/ZI"
-		)
+	)
 
 	axl_create_setting(
 		MSVC_LINK_FLAG_IGNORE4221
 		DESCRIPTION "Ignore linker warning LNK4221(object file doesn't define new symbols)"
 		DEFAULT "/IGNORE:4221"
 		" " "/IGNORE:4221"
-		)
+	)
 
 	option(
 		MSVC_LINK_DEBUG_INFO_RELEASE
 		"Generate linker debug information in Release builds"
 		ON
-		)
+	)
 endmacro()
 
 macro(
@@ -206,7 +206,7 @@ axl_apply_msvc_settings)
 	set_property(
 		GLOBAL PROPERTY
 		USE_FOLDERS ${MSVC_USE_FOLDERS}
-		)
+	)
 
 	if(MSVC_USE_UNICODE)
 		add_definitions(-DUNICODE -D_UNICODE)
@@ -218,7 +218,7 @@ axl_apply_msvc_settings)
 		set(
 			_RELEASE_DEBUG_FLAGS
 			"/DEBUG /OPT:REF"
-			)
+		)
 
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${_RELEASE_DEBUG_FLAGS}")
 		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${_RELEASE_DEBUG_FLAGS}")
@@ -230,7 +230,7 @@ axl_apply_msvc_settings)
 		CMAKE_MODULE_LINKER_FLAGS
 		CMAKE_SHARED_LINKER_FLAGS
 		CMAKE_STATIC_LINKER_FLAGS
-		)
+	)
 endmacro()
 
 #...............................................................................
@@ -242,31 +242,31 @@ axl_create_gcc_settings)
 		GCC_USE_PCH
 		"Use precompiled headers in GNU C/C++"
 		ON
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_SHOW_INCLUDES
 		DESCRIPTION "GNU C++ shows include stack during compilation"
 		"-H"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_DEBUG_INFO_RELEASE
 		DESCRIPTION "Add debugging information to Release builds"
 		"-g"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_C_STANDARD
 		DESCRIPTION "Specify the C standard to use"
 		"-std=c90" "-std=c99" "-std=c11" "-std=gnu90" "-std=gnu99" "-std=gnu11"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_CPP_STANDARD
 		DESCRIPTION "Specify the C++ standard to use"
 		"-std=c++98" "-std=c++11" "-std=c++14" "-std=gnu++98" "-std=gnu++11" "-std=gnu++14"
-		)
+	)
 
 	if(NOT CLANG)
 		axl_create_compiler_flag_setting(
@@ -274,69 +274,69 @@ axl_create_gcc_settings)
 			DESCRIPTION "Use static linkage to libgcc"
 			DEFAULT "-static-libgcc"
 			"-static-libgcc"
-			)
+		)
 
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_CPP_STATIC_LIBSTDCPP
 			DESCRIPTION "Use static linkage to libstdc++"
 			DEFAULT "-static-libstdc++"
 			"-static-libstdc++"
-			)
+		)
 	endif()
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_CPP_RTTI
 		DESCRIPTION "GNU C++ emits RTTI info"
 		"-frtti" "-fno-rtti"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_PIC
 		DESCRIPTION "GNU C++ generates position independent code"
 		DEFAULT "-fPIC"
 		"-fpic" "-fPIC" "-fpie" "-fPIE"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_VISIBILITY
 		DESCRIPTION "GNU C++ doesn't export all symbols by default(-fvisibility=hidden)"
 		DEFAULT "-fvisibility=hidden"
 		"-fvisibility=default" "-fvisibility=hidden"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_SANITIZE
 		DESCRIPTION "Compile with a specific sanitizer instrumentation"
 		"-fsanitize=address" "-fsanitize=memory" "-fsanitize=thread"
 		"-fsanitize=fuzzer" "-fsanitize=fuzzer,address" "-fsanitize=fuzzer,memory"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_COVERAGE
 		DESCRIPTION "Compile with code coverage instrumentation"
 		"-coverage"
-		)
+	)
 
 	axl_create_setting(
 		GCC_LINK_FLAG_RDYNAMIC
 		DESCRIPTION "Remove -rdynamic flag from default linker options"
 		DEFAULT " "
 		" " "-rdynamic"
-		)
+	)
 
 	if(NOT APPLE)
 		option(
 			GCC_LINK_EXPORTLESS_EXE
 			"Don't export ANYTHING from executables"
 			ON
-			)
+		)
 
 		if("${TARGET_CPU}" STREQUAL "amd64" OR "${TARGET_CPU}" STREQUAL "x86")
 			option(
 				GCC_LINK_GLIBC_WRAPPERS
 				"Add wraps to a set of versioned GLIBC functions for improved compatibility"
 				ON
-				)
+			)
 		else()
 			unset(GCC_LINK_GLIBC_WRAPPERS CACHE)
 		endif()
@@ -350,56 +350,56 @@ axl_create_gcc_settings)
 		DESCRIPTION "Warn about unknown warning command-line options"
 		DEFAULT "-Wno-unknown-warning-option"
 		"-Wunknown-warning-option" "-Wno-unknown-warning-option"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_DEPRECATED_DECLARATIONS
 		DESCRIPTION "Warn about uses of functions/variables/types marked as deprecated"
 		DEFAULT "-Wno-deprecated-declarations"
 		"-Wdeprecated-declarations" "-Wno-deprecated-declarations"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_MULTICHAR
 		DESCRIPTION "Warn if a multicharacter constant(‘'FOOF'’) is used"
 		DEFAULT "-Wno-multichar"
 		"-Wmultichar" "-Wno-multichar"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_FORMAT
 		DESCRIPTION "Check calls to printf/scanf/etc to ensure that the arguments are appropriate to the format string"
 		DEFAULT "-Wno-format"
 		"-Wformat" "-Wno-format"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
 		DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
 		DEFAULT "-Wno-incompatible-ms-struct"
 		"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_DANGLING_ELSE
 		DESCRIPTION "Warn about dangling else without explicit braces"
 		DEFAULT "-Wno-dangling-else"
 		"-Wdangling-else" "-Wno-dangling-else"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_LOGICAL_OP_PARENTHESES
 		DESCRIPTION "Warn about '&&' within '||'"
 		DEFAULT "-Wno-logical-op-parentheses"
 		"-Wlogical-op-parentheses" "-Wno-logical-op-parentheses"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_SWITCH
 		DESCRIPTION "Warn about missing case values in a switch statement"
 		DEFAULT "-Wno-switch"
 		"-Wswitch" "-Wno-switch"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_STRINGOP_OVERFLOW
@@ -411,7 +411,7 @@ axl_create_gcc_settings)
 		"-Wstringop-overflow=3"
 		"-Wstringop-overflow=4"
 		"-Wno-stringop-overflow"
-		)
+	)
 
 	# C++ specific warnings
 
@@ -420,28 +420,28 @@ axl_create_gcc_settings)
 		DESCRIPTION "Warn about use of the 'register' keyword"
 		DEFAULT "-Wno-register"
 		"-Wregister" "-Wno-register"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_CPP_WARNING_INVALID_OFFSETOF
 		DESCRIPTION "Warn about applying the offsetof macro to a non-POD type"
 		DEFAULT "-Wno-invalid-offsetof"
 		"-Winvalid-offsetof" "-Wno-invalid-offsetof"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_CPP_WARNING_NARROWING
 		DESCRIPTION "Warn about narrowing conversions"
 		DEFAULT "-Wno-narrowing"
 		"-Wnarrowing" "-Wno-narrowing"
-		)
+	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_CPP_WARNING_C11EXTENSION
 		DESCRIPTION "Warn about C++11 extensions"
 		DEFAULT "-Wno-c++11-extensions"
 		"-Wc++11-extensions" "-Wno-c++11-extensions"
-		)
+	)
 
 	# these warnings only pop up with -Wmost (hardcoded by the Xcode generator)
 
@@ -451,35 +451,35 @@ axl_create_gcc_settings)
 			DESCRIPTION "Warn about missing braces in aggregate initializers"
 			DEFAULT "-Wno-missing-braces"
 			"-Wmissing-braces" "-Wno-missing-braces"
-			)
+		)
 
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_UNUSED_VARIABLE
 			DESCRIPTION "Warn about unused variables"
 			DEFAULT "-Wno-unused-variable"
 			"-Wunused-variable" "-Wno-unused-variable"
-			)
+		)
 
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_UNUSED_VALUE
 			DESCRIPTION "Warn about unused expressions"
 			DEFAULT "-Wno-unused-value"
 			"-Wunused-value" "-Wno-unused-value"
-			)
+		)
 
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_CHAR_SUBSCRIPTS
 			DESCRIPTION "Warn about array subsciprts of type 'char'"
 			DEFAULT "-Wno-char-subscripts"
 			"-Wchar-subscripts" "-Wno-char-subscripts"
-			)
+		)
 
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_CPP_WARNING_DELETE_NON_VIRTUAL_DTOR
 			DESCRIPTION "Warn about calling non-virtual dtor of a class with virtual funtions"
 			DEFAULT "-Wno-delete-non-virtual-dtor"
 			"-Wdelete-non-virtual-dtor" "-Wno-delete-non-virtual-dtor"
-			)
+		)
 	endif()
 
 	# the cppcheck static analyzer (introduced in CMake 3.10)
@@ -494,7 +494,7 @@ axl_create_gcc_settings)
 				GCC_USE_CPPCHECK
 				"Use cppcheck for static analysis during build"
 				OFF
-				)
+			)
 		endif()
 	endif()
 endmacro()
@@ -534,7 +534,7 @@ axl_apply_gcc_settings)
 				exp2
 				log
 				log2
-				)
+			)
 
 			set(_WRAPPER_FLAGS "-u __wrap_memcpy -Wl") # link memcpy even if not directly called (used in libstdc++)
 
@@ -570,7 +570,7 @@ axl_apply_gcc_settings)
 				${CMAKE_C_COMPILER}
 				${_EMPTY_C_FILE}
 				${_CPPCHECK_C_PREAMBLE_FILE}
-				)
+			)
 		endif()
 
 		if(NOT EXISTS ${_CPPCHECK_CPP_PREAMBLE_FILE})
@@ -578,7 +578,7 @@ axl_apply_gcc_settings)
 				${CMAKE_CXX_COMPILER}
 				${_EMPTY_CPP_FILE}
 				${_CPPCHECK_CPP_PREAMBLE_FILE}
-				)
+			)
 		endif()
 
 		set(
@@ -587,7 +587,7 @@ axl_apply_gcc_settings)
 			--quiet
 			--include=${_CPPCHECK_C_PREAMBLE_FILE}
 			-D_AXL_CPPCHECK=1
-			)
+		)
 
 		set(
 			CMAKE_CXX_CPPCHECK
@@ -595,7 +595,7 @@ axl_apply_gcc_settings)
 			--quiet
 			--include=${_CPPCHECK_CPP_PREAMBLE_FILE}
 			-D_AXL_CPPCHECK=1
-			)
+		)
 	endif()
 endmacro()
 
@@ -644,7 +644,7 @@ macro(
 axl_cleanup_compiler_flags
 	_FLAGS
 	_WARNING_FLAG_LIST
-	)
+)
 
 	string(REPLACE " " ";" _FLAG_LIST "${${_FLAGS}}")
 	list(REMOVE_DUPLICATES _FLAG_LIST)

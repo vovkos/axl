@@ -9,15 +9,13 @@ namespace spy {
 
 #if (_AXL_OS_WIN)
 
-ModuleIterator::ModuleIterator(const sl::ArrayRef<HMODULE>& moduleArray)
-{
+ModuleIterator::ModuleIterator(const sl::ArrayRef<HMODULE>& moduleArray) {
 	m_moduleArray = moduleArray;
 	m_index = 0;
 }
 
 ModuleIterator&
-ModuleIterator::operator ++ ()
-{
+ModuleIterator::operator ++ () {
 	if (m_index >= m_moduleArray.getCount())
 		return *this;
 
@@ -27,8 +25,7 @@ ModuleIterator::operator ++ ()
 }
 
 const sl::String&
-ModuleIterator::prepareModuleFileName() const
-{
+ModuleIterator::prepareModuleFileName() const {
 	ASSERT(m_moduleFileName.isEmpty());
 
 	if (m_index >= m_moduleArray.getCount())
@@ -44,12 +41,10 @@ ModuleIterator::prepareModuleFileName() const
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
-enumerateModules(ModuleIterator* iterator)
-{
+enumerateModules(ModuleIterator* iterator) {
 	sl::Array<HMODULE> moduleArray;
 
-	for (;;)
-	{
+	for (;;) {
 		size_t currentCount = moduleArray.getCount();
 		dword_t requiredSize;
 
@@ -58,7 +53,7 @@ enumerateModules(ModuleIterator* iterator)
 			moduleArray.p(),
 			currentCount * sizeof(HMODULE),
 			&requiredSize
-			);
+		);
 
 		size_t requiredCount = requiredSize / sizeof(HMODULE);
 		if (requiredCount <= currentCount)
@@ -76,10 +71,8 @@ enumerateModules(ModuleIterator* iterator)
 #elif (_AXL_OS_LINUX)
 
 ModuleIterator&
-ModuleIterator::operator ++ ()
-{
-	if (m_linkMap)
-	{
+ModuleIterator::operator ++ () {
+	if (m_linkMap) {
 		m_linkMap = m_linkMap->l_next;
 		m_moduleFileName.clear();
 	}
@@ -88,8 +81,7 @@ ModuleIterator::operator ++ ()
 }
 
 const sl::StringRef&
-ModuleIterator::prepareModuleFileName() const
-{
+ModuleIterator::prepareModuleFileName() const {
 	if (!m_linkMap)
 		return m_moduleFileName;
 
@@ -102,23 +94,20 @@ ModuleIterator::prepareModuleFileName() const
 }
 
 bool
-enumerateModules(ModuleIterator* iterator)
-{
+enumerateModules(ModuleIterator* iterator) {
 	*iterator = ModuleIterator(_r_debug.r_map);
 	return true;
 }
 
 #elif (_AXL_OS_DARWIN)
 
-ModuleIterator::ModuleIterator(size_t count)
-{
+ModuleIterator::ModuleIterator(size_t count) {
 	m_count = count;
 	m_index = 0;
 }
 
 ModuleIterator&
-ModuleIterator::operator ++ ()
-{
+ModuleIterator::operator ++ () {
 	if (m_index >= m_count)
 		return *this;
 
@@ -128,8 +117,7 @@ ModuleIterator::operator ++ ()
 }
 
 void*
-ModuleIterator::prepareModule() const
-{
+ModuleIterator::prepareModule() const {
 	ASSERT(!m_module.isOpen() && "module handle is already set");
 
 	if (m_index < m_count)
@@ -139,8 +127,7 @@ ModuleIterator::prepareModule() const
 }
 
 const sl::StringRef&
-ModuleIterator::prepareModuleFileName() const
-{
+ModuleIterator::prepareModuleFileName() const {
 	ASSERT(m_moduleFileName.isEmpty() && "module file name is already set");
 
 	if (m_index < m_count)
@@ -150,8 +137,7 @@ ModuleIterator::prepareModuleFileName() const
 }
 
 bool
-enumerateModules(ModuleIterator* iterator)
-{
+enumerateModules(ModuleIterator* iterator) {
 	*iterator = ModuleIterator(_dyld_image_count());
 	return true;
 }
@@ -161,8 +147,7 @@ enumerateModules(ModuleIterator* iterator)
 //..............................................................................
 
 ModuleIterator
-ModuleIterator::operator ++ (int)
-{
+ModuleIterator::operator ++ (int) {
 	ModuleIterator it = *this;
 	operator ++ ();
 	return it;

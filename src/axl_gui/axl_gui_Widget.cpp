@@ -20,8 +20,7 @@ namespace gui {
 //..............................................................................
 
 WidgetDriver::WidgetDriver(const WidgetConstructParam& param):
-	GuiItem(param.m_engine)
-{
+	GuiItem(param.m_engine) {
 	m_engineWidget = param.m_engineWidget;
 	m_cursor = m_engine->getStdCursor(StdCursorKind_Arrow);
 	m_font = m_engine->getStdFont(StdFontKind_Monospace);
@@ -36,8 +35,7 @@ WidgetDriver::WidgetDriver(const WidgetConstructParam& param):
 }
 
 bool
-WidgetDriver::setFont(Font* font)
-{
+WidgetDriver::setFont(Font* font) {
 	if (m_font == font)
 		return true;
 
@@ -48,8 +46,7 @@ WidgetDriver::setFont(Font* font)
 }
 
 bool
-WidgetDriver::setCaretVisible(bool isVisible)
-{
+WidgetDriver::setCaretVisible(bool isVisible) {
 	// don't check if nothing changed, force caret update --
 	// otherwise, this sequence will work incorrectly:
 
@@ -70,8 +67,7 @@ bool
 WidgetDriver::setCaretSize(
 	uint_t width,
 	uint_t height
-	)
-{
+) {
 	if (m_caretSize.m_width == width && m_caretSize.m_height == height)
 		return true; // nothing changed
 
@@ -83,8 +79,7 @@ bool
 WidgetDriver::setCaretPos(
 	int x,
 	int y
-	)
-{
+) {
 	if (m_caretPos.m_x == x && m_caretPos.m_y == y)
 		return true; // nothing changed
 
@@ -93,8 +88,7 @@ WidgetDriver::setCaretPos(
 }
 
 bool
-WidgetDriver::updateScrollBars(uint_t mask)
-{
+WidgetDriver::updateScrollBars(uint_t mask) {
 	bool result = true;
 
 	if (mask & (1 << Orientation_Vertical))
@@ -111,8 +105,7 @@ WidgetDriver::postThreadMsg(
 	uint_t code,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	if (!p || !size)
 		return m_engine->postWidgetThreadMsg(this, code, rc::Ptr<void> ());
 
@@ -129,8 +122,7 @@ void
 WidgetDriver::processMsg(
 	const WidgetMsg* msg,
 	bool* isHandled
-	)
-{
+) {
 	ASSERT(msg->m_msgCode < WidgetMsgCode__Count);
 
 	Widget* widget = containerof(this, Widget, m_widgetDriver);
@@ -140,8 +132,7 @@ WidgetDriver::processMsg(
 	bool result = false;
 
 	WidgetMsgMap* msgMap = m_msgMap;
-	for (; msgMap; msgMap = msgMap->m_baseMap)
-	{
+	for (; msgMap; msgMap = msgMap->m_baseMap) {
 		WidgetMsgProc proc = msgMap->m_msgProcTable[msg->m_msgCode];
 		if (!proc)
 			break;

@@ -21,57 +21,50 @@ namespace win {
 
 //..............................................................................
 
-class Serial: public File
-{
+class Serial: public File {
 public:
 	bool
 	open(
 		const sl::StringRef& name,
 		uint_t accessMode = GENERIC_READ | GENERIC_WRITE,
 		uint_t flagsAttributes = 0
-		);
+	);
 
 	bool
 	clearError(
 		dword_t* errors,
 		COMSTAT* stat
-		)
-	{
+	) {
 		bool_t result = ::ClearCommError(m_h, errors, stat);
 		return err::complete(result);
 	}
 
 	bool
-	getSettings(DCB* dcb)
-	{
+	getSettings(DCB* dcb) {
 		bool_t result = ::GetCommState(m_h, dcb);
 		return err::complete(result);
 	}
 
 	bool
-	setSettings(const DCB* dcb)
-	{
+	setSettings(const DCB* dcb) {
 		bool_t result = ::SetCommState(m_h, (DCB*)dcb);
 		return err::complete(result);
 	}
 
 	bool
-	getTimeouts(COMMTIMEOUTS* timeouts)
-	{
+	getTimeouts(COMMTIMEOUTS* timeouts) {
 		bool_t result = ::GetCommTimeouts(m_h, timeouts);
 		return err::complete(result);
 	}
 
 	bool
-	setTimeouts(const COMMTIMEOUTS* timeouts)
-	{
+	setTimeouts(const COMMTIMEOUTS* timeouts) {
 		bool_t result = ::SetCommTimeouts(m_h, (COMMTIMEOUTS*)timeouts);
 		return err::complete(result);
 	}
 
 	bool
-	escape(uint_t function)
-	{
+	escape(uint_t function) {
 		bool_t result = ::EscapeCommFunction(m_h, function);
 		return err::complete(result);
 	}
@@ -80,20 +73,17 @@ public:
 	getStatusLines();
 
 	bool
-	setDtr(bool isSet)
-	{
+	setDtr(bool isSet) {
 		return escape(isSet ? SETDTR : CLRDTR);
 	}
 
 	bool
-	setRts(bool isSet)
-	{
+	setRts(bool isSet) {
 		return escape(isSet ? SETRTS : CLRRTS);
 	}
 
 	bool
-	setBreakCondition(bool isSet)
-	{
+	setBreakCondition(bool isSet) {
 		return escape(isSet ? SETBREAK : CLRBREAK);
 	}
 
@@ -101,15 +91,13 @@ public:
 	getWaitMask();
 
 	bool
-	setWaitMask(dword_t mask)
-	{
+	setWaitMask(dword_t mask) {
 		bool_t result = ::SetCommMask(m_h, mask);
 		return err::complete(result);
 	}
 
 	bool
-	wait(dword_t* events)
-	{
+	wait(dword_t* events) {
 		bool_t result = ::WaitCommEvent(m_h, events, NULL);
 		return err::complete(result);
 	}
@@ -118,8 +106,7 @@ public:
 	overlappedWait(
 		dword_t* events,
 		OVERLAPPED* overlapped
-		)
-	{
+	) {
 		bool_t result = ::WaitCommEvent(m_h, events, overlapped);
 		return completeOverlappedRequest(result);
 	}
@@ -131,13 +118,13 @@ public:
 	read(
 		void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	write(
 		const void* p,
 		size_t size
-		);
+	);
 };
 
 //..............................................................................

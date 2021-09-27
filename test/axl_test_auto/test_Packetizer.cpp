@@ -16,36 +16,31 @@ namespace {
 
 //..............................................................................
 
-class MyPacketizer: public sl::Packetizer<MyPacketizer>
-{
+class MyPacketizer: public sl::Packetizer<MyPacketizer> {
 public:
 	void
 	onPacket(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		printf("packet received: %s\n", p);
 	}
 };
 
 void
-run()
-{
+run() {
 	printf("test_Packetizer::Run ()\n");
 
 	MyPacketizer packetizer;
 
 	char data[] = "papapaapak:\xf\0\0\0pizda ivanovna";
 
-	for (size_t i = 0; i < 64; i++)
-	{
+	for (size_t i = 0; i < 64; i++) {
 		char* p = data;
 		size_t size = sizeof(data);
 
 		size_t j = 0;
-		for (; size; j++)
-		{
+		for (; size; j++) {
 			size_t chunkSize = rand() % (sizeof(data) + 1);
 			if (chunkSize > size)
 				chunkSize = size;

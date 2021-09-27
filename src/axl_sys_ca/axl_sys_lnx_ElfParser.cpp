@@ -8,8 +8,7 @@ namespace lnx {
 //..............................................................................
 
 void
-ElfParser::close()
-{
+ElfParser::close() {
 	m_fileSize = 0;
 	m_elfHdr = NULL;
 	m_shdrTable = NULL;
@@ -22,8 +21,7 @@ bool
 ElfParser::open(
 	const void* p0,
 	size_t size
-	)
-{
+) {
 	close();
 
 	char* p = (char*)p0;
@@ -44,7 +42,7 @@ ElfParser::open(
 		elfHdr->e_shoff + elfHdr->e_shnum * elfHdr->e_shentsize > size ||
 		elfHdr->e_shstrndx == SHN_UNDEF ||
 		elfHdr->e_shstrndx >= elfHdr->e_shnum
-		)
+	)
 		return err::fail("invalid ELF-file");
 
 	ElfW(Phdr)* phdrTable = (ElfW(Phdr)*)(p + elfHdr->e_phoff);

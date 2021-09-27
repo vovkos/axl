@@ -19,16 +19,14 @@ namespace sl {
 //..............................................................................
 
 bool
-Guid::generate()
-{
+Guid::generate() {
 	// not yet
 	memset(this, 0, sizeof(Guid));
 	return false;
 }
 
 bool
-Guid::parse(const sl::StringRef& string)
-{
+Guid::parse(const sl::StringRef& string) {
 	const char* p = string.sz();
 	while (isspace(*p))
 		p++;
@@ -37,8 +35,7 @@ Guid::parse(const sl::StringRef& string)
 
 	char terminatorChar = 0;
 
-	if (*p == '{')
-	{
+	if (*p == '{') {
 		p++;
 		while (isspace(*p))
 			p++;
@@ -74,8 +71,7 @@ Guid::parse(const sl::StringRef& string)
 	if (end != p + 12)
 		return err::fail(err::SystemErrorCode_InvalidParameter);
 
-	if (terminatorChar)
-	{
+	if (terminatorChar) {
 		p = end;
 		while (isspace(*p))
 			p++;
@@ -100,15 +96,11 @@ Guid::parse(const sl::StringRef& string)
 }
 
 sl::String
-Guid::getString(uint_t flags) const
-{
-	static const char* formatTable[2][2] =
-	{
-		{
+Guid::getString(uint_t flags) const {
+	static const char* formatTable[2][2] = { {
 			"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 			"%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-		},
-		{
+		}, {
 			"{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
 			"{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
 		}
@@ -126,7 +118,7 @@ Guid::getString(uint_t flags) const
 		m_data4[2], m_data4[3],
 		m_data4[4], m_data4[5],
 		m_data4[6], m_data4[7]
-		);
+	);
 }
 
 //..............................................................................

@@ -21,8 +21,7 @@ namespace win {
 
 //..............................................................................
 
-enum WaitResult
-{
+enum WaitResult {
 	WaitResult_Fail         = -1,
 	WaitResult_Timeout      = -2,
 	WaitResult_Object0      = 0,
@@ -31,15 +30,13 @@ enum WaitResult
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class WaitableHandle: public sys::win::Handle
-{
+class WaitableHandle: public sys::win::Handle {
 public:
 	WaitResult
 	wait(
 		uint_t timeout = -1,
 		bool isAlertable = false
-		)
-	{
+	) {
 		dword_t result = ::WaitForSingleObjectEx(m_h, timeout, isAlertable);
 		return completeWait(result);
 	}
@@ -52,8 +49,7 @@ public:
 		bool doWaitAll = false,
 		uint_t timeout = -1,
 		bool isAlertable = false
-		)
-	{
+	) {
 		dword_t result = ::WaitForMultipleObjectsEx(count, waitArray, doWaitAll, timeout, isAlertable);
 		return completeWait(result);
 	}

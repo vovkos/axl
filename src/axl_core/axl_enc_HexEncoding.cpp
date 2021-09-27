@@ -17,28 +17,24 @@ namespace enc {
 
 //..............................................................................
 
-class InsertNoSpace
-{
+class InsertNoSpace {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		return 0;
 	}
 };
 
-class InsertNoSpaceMultiline
-{
+class InsertNoSpaceMultiline {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		if (i & 0x0f)
 			return 0;
 
@@ -47,29 +43,25 @@ public:
 	}
 };
 
-class InsertSpace
-{
+class InsertSpace {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		*p = ' ';
 		return 1;
 	}
 };
 
-class InsertSpaceMultiline
-{
+class InsertSpaceMultiline {
 public:
 	size_t
 	operator () (
 		char* p,
 		size_t i
-		)
-	{
+	) {
 		*p = (i & 0x0f) ? ' ' : '\n';
 		return 1;
 	}
@@ -80,20 +72,18 @@ public:
 template <
 	typename GetHexChar,
 	typename InsertSpace
-	>
+>
 void
 encodeImpl(
 	char* dst,
 	const uchar_t* src,
 	size_t size
-	)
-{
+) {
 	uchar_t x = src[0];
 	*dst++ = GetHexChar()(x >> 4);
 	*dst++ = GetHexChar()(x);
 
-	for (size_t i = 1; i < size; i++)
-	{
+	for (size_t i = 1; i < size; i++) {
 		uchar_t x = src[i];
 		dst += InsertSpace()(dst, i);
 		*dst++ = GetHexChar()(x >> 4);
@@ -109,10 +99,8 @@ HexEncoding::encode(
 	const void* p,
 	size_t size,
 	uint_t flags
-	)
-{
-	if (!size)
-	{
+) {
+	if (!size) {
 		string->clear();
 		return 0;
 	}
@@ -120,11 +108,9 @@ HexEncoding::encode(
 	const uchar_t* src = (const uchar_t*) p;
 
 	size_t length;
-	if ((flags & HexEncodingFlag_NoSpace))
-	{
+	if ((flags & HexEncodingFlag_NoSpace)) {
 		length = size * 2;
-		if (flags & HexEncodingFlag_Multiline)
-		{
+		if (flags & HexEncodingFlag_Multiline) {
 			size_t lineCount = length / 16;
 			if (lineCount & 0x0f)
 				lineCount++;
@@ -146,9 +132,7 @@ HexEncoding::encode(
 				encodeImpl<GetHexChar_u, InsertNoSpace>(dst, src, size);
 			else
 				encodeImpl<GetHexChar_l, InsertNoSpace>(dst, src, size);
-	}
-	else
-	{
+	} else {
 		length = size * 3 - 1;
 		char* dst = string->createBuffer(length);
 		if (!dst)
@@ -173,10 +157,8 @@ size_t
 HexEncoding::decode(
 	sl::Array<char>* buffer,
 	const sl::StringRef& source
-	)
-{
-	enum State
-	{
+) {
+	enum State {
 		State_Normal = 0,
 		State_Hex
 	};
@@ -195,12 +177,10 @@ HexEncoding::decode(
 	const char* p = source.cp();
 	const char* end = source.getEnd();
 
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		bool_t isSpace = isspace(*p);
 
-		switch (state)
-		{
+		switch (state) {
 		case State_Normal:
 			if (isSpace)
 				break;
@@ -211,8 +191,7 @@ HexEncoding::decode(
 			break;
 
 		case State_Hex:
-			if (!isSpace)
-			{
+			if (!isSpace) {
 				hexCodeString[hexCodeLen++] = *p;
 				if (hexCodeLen < 2)
 					break;
@@ -231,8 +210,7 @@ HexEncoding::decode(
 		}
 	}
 
-	if (state == State_Hex)
-	{
+	if (state == State_Hex) {
 		hexCodeString[hexCodeLen] = 0;
 		x = (uchar_t)strtoul(hexCodeString, &hexCodeEnd, 16);
 

@@ -18,8 +18,7 @@ namespace io {
 //..............................................................................
 
 bool
-Ssl::create(SSL_CTX* ctx)
-{
+Ssl::create(SSL_CTX* ctx) {
 	close();
 
 	m_h = SSL_new(ctx);
@@ -27,8 +26,7 @@ Ssl::create(SSL_CTX* ctx)
 }
 
 bool
-Ssl::complete(int result)
-{
+Ssl::complete(int result) {
 	if (result > 0)
 		return true;
 
@@ -37,32 +35,28 @@ Ssl::complete(int result)
 }
 
 bool
-Ssl::setTmpDh(DH* dh)
-{
+Ssl::setTmpDh(DH* dh) {
 	ASSERT(m_h);
 	int result = ::SSL_set_tmp_dh(m_h, dh);
 	return cry::completeWithLastCryptoError(result > 0);
 }
 
 bool
-Ssl::setTmpEcdh(EC_KEY* ec)
-{
+Ssl::setTmpEcdh(EC_KEY* ec) {
 	ASSERT(m_h);
 	int result = ::SSL_set_tmp_ecdh(m_h, ec);
 	return cry::completeWithLastCryptoError(result > 0);
 }
 
 bool
-Ssl::setCipherList(const sl::StringRef& listString)
-{
+Ssl::setCipherList(const sl::StringRef& listString) {
 	ASSERT(m_h);
 	int result = ::SSL_set_cipher_list(m_h, listString.sz());
 	return complete(result);
 }
 
 sl::String
-Ssl::getCurrentCipherDescription()
-{
+Ssl::getCurrentCipherDescription() {
 	ASSERT(m_h);
 	const SSL_CIPHER* cipher = ::SSL_get_current_cipher(m_h);
 	if (!cipher)
@@ -74,8 +68,7 @@ Ssl::getCurrentCipherDescription()
 }
 
 int
-Ssl::getCurrentCipherBits()
-{
+Ssl::getCurrentCipherBits() {
 	ASSERT(m_h);
 	int bits = 0;
 	::SSL_CIPHER_get_bits(SSL_get_current_cipher(m_h), &bits);
@@ -86,16 +79,14 @@ bool
 Ssl::setExtraData(
 	int index,
 	void* p
-	)
-{
+) {
 	ASSERT(m_h);
 	int result = ::SSL_set_ex_data(m_h, index, p);
 	return complete(result);
 }
 
 bool
-Ssl::useCertificate(const X509* cert)
-{
+Ssl::useCertificate(const X509* cert) {
 	ASSERT(m_h);
 	int result = ::SSL_use_certificate(m_h, (X509*)cert);
 	return complete(result);
@@ -105,16 +96,14 @@ bool
 Ssl::useCertificateFile(
 	const sl::StringRef& fileName,
 	int fileType
-	)
-{
+) {
 	ASSERT(m_h);
 	int result = ::SSL_use_certificate_file(m_h, fileName.sz(), fileType);
 	return complete(result);
 }
 
 bool
-Ssl::usePrivateKey(const EVP_PKEY* key)
-{
+Ssl::usePrivateKey(const EVP_PKEY* key) {
 	ASSERT(m_h);
 	int result = ::SSL_use_PrivateKey(m_h, (EVP_PKEY*)key);
 	return complete(result);
@@ -124,21 +113,18 @@ bool
 Ssl::usePrivateKeyFile(
 	const sl::StringRef& fileName,
 	int fileType
-	)
-{
+) {
 	ASSERT(m_h);
 	int result = ::SSL_use_PrivateKey_file(m_h, fileName.sz(), fileType);
 	return complete(result);
 }
 
 bool
-Ssl::doHandshake()
-{
+Ssl::doHandshake() {
 	ASSERT(m_h);
 
 	int result = ::SSL_do_handshake(m_h);
-	if (result <= 0)
-	{
+	if (result <= 0) {
 		setError(result);
 		return false;
 	}
@@ -147,13 +133,11 @@ Ssl::doHandshake()
 }
 
 bool
-Ssl::shutdown()
-{
+Ssl::shutdown() {
 	ASSERT(m_h);
 
 	int result = ::SSL_shutdown(m_h);
-	if (result < 0) // 0 here means shutdown in progress
-	{
+	if (result < 0) { // 0 here means shutdown in progress
 		setError(result);
 		return false;
 	}
@@ -165,13 +149,11 @@ size_t
 Ssl::write(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	ASSERT(m_h);
 
 	int result = ::SSL_write(m_h, p, (int)size);
-	if (result < 0)
-	{
+	if (result < 0) {
 		setError(result);
 		return -1;
 	}
@@ -183,13 +165,11 @@ size_t
 Ssl::read(
 	void* p,
 	size_t size
-	)
-{
+) {
 	ASSERT(m_h);
 
 	int result = ::SSL_read(m_h, p, (int)size);
-	if (result < 0)
-	{
+	if (result < 0) {
 		setError(result);
 		return -1;
 	}

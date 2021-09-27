@@ -16,35 +16,30 @@ namespace {
 
 //..............................................................................
 
-class MyClass
-{
+class MyClass {
 public:
 	int m_x;
 	int m_y;
 
 public:
-	MyClass()
-	{
+	MyClass() {
 		printf("MyClass::MyClass ()\n");
 		m_x = 0;
 		m_y = 0;
 	}
 
-	MyClass(const MyClass& src)
-	{
+	MyClass(const MyClass& src) {
 		printf("MyClass::MyClass (const MyClass&)\n");
 		m_x = src.m_x;
 		m_y = src.m_y;
 	}
 
-	~MyClass()
-	{
+	~MyClass() {
 		printf("MyClass::~MyClass ()\n");
 	}
 
 	MyClass&
-	operator = (const MyClass& src)
-	{
+	operator = (const MyClass& src) {
 		printf("MyClass::operator = (const MyClass&)\n");
 		m_x = src.m_x;
 		m_y = src.m_y;
@@ -57,12 +52,10 @@ public:
 
 #if (_AXL_OS_WIN)
 
-class DcbGetSize
-{
+class DcbGetSize {
 public:
 	size_t
-	operator () (const DCB* dcb)
-	{
+	operator () (const DCB* dcb) {
 		return dcb->DCBlength;
 	}
 };
@@ -71,22 +64,19 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Point
-{
+class Point {
 public:
 	int x;
 	int y;
 
 public:
-	Point()
-	{
+	Point() {
 		printf("Point::Point ()\n");
 		x = 10;
 		y = 20;
 	}
 
-	~Point()
-	{
+	~Point() {
 		printf("Point::~Point ()\n");
 	}
 };
@@ -96,8 +86,7 @@ typedef rc::Buf<Point> PointBuf;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-run_Buf()
-{
+run_Buf() {
 	sl::String s;
 	s = "sdkjhasdljadljasdklj";
 	char x = s[10];
@@ -164,16 +153,13 @@ run_Buf()
 
 //..............................................................................
 
-class MyClass2: public rc::RefCount
-{
+class MyClass2: public rc::RefCount {
 public:
-	MyClass2()
-	{
+	MyClass2() {
 		printf("MyClass2::MyClass2 ()\n");
 	}
 
-	~MyClass2()
-	{
+	~MyClass2() {
 		printf("MyClass2::MyClass2 ()\n");
 	}
 };
@@ -181,8 +167,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-run_WeakRef()
-{
+run_WeakRef() {
 	rc::Ptr<MyClass2> p = AXL_RC_NEW(MyClass2);
 //	rc::CPtrT <MyClass2> p2 = rc::GetPtrOrClone ((MyClass2*) p);
 //	rc::CPtrT <MyClass2> p3 = rc::Clone (p);
@@ -193,8 +178,7 @@ run_WeakRef()
 
 //..............................................................................
 
-struct IMyInterface
-{
+struct IMyInterface {
 	virtual rc::Ptr<IMyInterface> getChild(int i) = 0;
 	virtual void doSomething() = 0;
 	virtual void doSomethingElse() = 0;
@@ -202,8 +186,7 @@ struct IMyInterface
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class MyClass4: public IMyInterface
-{
+class MyClass4: public IMyInterface {
 public:
 	MyClass4()
 		{ printf("MyClass4::MyClass4 ()\n"); }
@@ -225,8 +208,7 @@ public:
 
 class MyContainer:
 	public rc::RefCount,
-	public IMyInterface
-{
+	public IMyInterface {
 public:
 	rc::Child<rc::Box<MyClass4> > m_child1;
 	rc::Child<rc::Box<MyClass4> > m_child2;
@@ -242,10 +224,8 @@ public:
 	~MyContainer()
 		{ printf("MyContainer::~MyContainer ()\n"); }
 
-	rc::Ptr<IMyInterface> getChild(int i)
-	{
-		switch (i)
-		{
+	rc::Ptr<IMyInterface> getChild(int i) {
+		switch (i) {
 		case 0:
 			return &m_child1;
 
@@ -271,8 +251,7 @@ public:
 
 class MySuperContainer:
 	public rc::RefCount,
-	public IMyInterface
-{
+	public IMyInterface {
 public:
 	rc::Child<MyContainer> m_child1;
 	rc::Child<MyContainer> m_child2;
@@ -288,10 +267,8 @@ public:
 	~MySuperContainer()
 		{ printf("MySuperContainer::~MySuperContainer ()\n"); }
 
-	rc::Ptr<IMyInterface> getChild(int i)
-	{
-		switch (i)
-		{
+	rc::Ptr<IMyInterface> getChild(int i) {
+		switch (i) {
 		case 0:
 			return &m_child1;
 
@@ -316,8 +293,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-run_Container()
-{
+run_Container() {
 	rc::Ptr<IMyInterface> p;
 	rc::Ptr<IMyInterface> p2;
 	rc::Ptr<IMyInterface> p3;
@@ -352,8 +328,7 @@ run_Container()
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
-run()
-{
+run() {
 	run_Buf();
 	run_WeakRef();
 	run_Container();

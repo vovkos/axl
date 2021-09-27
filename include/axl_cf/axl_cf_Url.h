@@ -22,87 +22,70 @@ namespace cf {
 
 //..............................................................................
 
-class Url: public TypeBase<CFURLRef>
-{
+class Url: public TypeBase<CFURLRef> {
 public:
-	Url()
-	{
-	}
+	Url() {}
 
 	Url(const Url& src):
-		TypeBase<CFURLRef>(src)
-	{
-	}
+		TypeBase<CFURLRef>(src) {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Url(Url&& src):
-		TypeBase<CFURLRef>(std::move(src))
-	{
-	}
+		TypeBase<CFURLRef>(std::move(src)) {}
 #endif
 
 	Url(
 		CFURLRef p,
 		bool isAttach = false
-		):
-		TypeBase<CFURLRef>(p, isAttach)
-	{
-	}
+	):
+		TypeBase<CFURLRef>(p, isAttach) {}
 
 	Url&
-	operator = (const Url& src)
-	{
+	operator = (const Url& src) {
 		copy(src);
 		return *this;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Url&
-	operator = (Url&& src)
-	{
+	operator = (Url&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	Url&
-	operator = (CFURLRef p)
-	{
+	operator = (CFURLRef p) {
 		copy(p);
 		return *this;
 	}
 
 	CFURLRef
-	getBaseUrl()
-	{
+	getBaseUrl() {
 		ASSERT(m_p);
 		return ::CFURLGetBaseURL(m_p);
 	}
 
 	bool
-	isDirectory()
-	{
+	isDirectory() {
 		ASSERT(m_p);
 		return ::CFURLHasDirectoryPath(m_p);
 	}
 
 	sl::String
-	getString()
-	{
+	getString() {
 		ASSERT(m_p);
 		return cf::String(::CFURLGetString(m_p), false).getString();
 	}
 
 	sl::String
-	getPath()
-	{
+	getPath() {
 		ASSERT(m_p);
 		return cf::String(::CFURLCopyPath(m_p), true).getString();
 	}
 
 	sl::String
-	getFileSystemPath(CFURLPathStyle pathStyle = kCFURLPOSIXPathStyle)
-	{
+	getFileSystemPath(CFURLPathStyle pathStyle = kCFURLPOSIXPathStyle) {
 		ASSERT(m_p);
 		return cf::String(::CFURLCopyFileSystemPath(m_p, pathStyle), true).getString();
 	}
@@ -111,14 +94,13 @@ public:
 	create(
 		CFStringRef string,
 		CFURLRef baseUrl = NULL
-		);
+	);
 
 	bool
 	create(
 		const sl::StringRef& string,
 		CFURLRef baseUrl = NULL
-		)
-	{
+	) {
 		return create(cf::String(string), baseUrl);
 	}
 
@@ -128,7 +110,7 @@ public:
 		CFURLPathStyle pathStyle,
 		bool isDirectory,
 		CFURLRef baseUrl = NULL
-		);
+	);
 
 	bool
 	create(
@@ -136,8 +118,7 @@ public:
 		CFURLPathStyle pathStyle,
 		bool isDirectory,
 		CFURLRef baseUrl = NULL
-		)
-	{
+	) {
 		return create(cf::String(filePath), pathStyle, isDirectory, baseUrl);
 	}
 
@@ -145,8 +126,7 @@ public:
 	startAccessingSecurityScopedResource();
 
 	void
-	stopAccessingSecurityScopedResource()
-	{
+	stopAccessingSecurityScopedResource() {
 		ASSERT(m_p);
 		::CFURLStopAccessingSecurityScopedResource(m_p);
 	}
@@ -157,7 +137,7 @@ public:
 		uint_t options,
 		CFURLRef relativeToUrl = NULL,
 		bool* isStale = NULL
-		);
+	);
 
 	bool
 	resolveBookmark(
@@ -166,8 +146,7 @@ public:
 		uint_t options,
 		CFURLRef relativeToUrl = NULL,
 		bool* isStale = NULL
-		)
-	{
+	) {
 		return resolveBookmark(cf::Data(p, size), options, relativeToUrl, isStale);
 	}
 
@@ -176,14 +155,14 @@ public:
 		cf::Data* data,
 		uint_t options,
 		CFURLRef relativeToUrl = NULL
-		);
+	);
 
 	bool
 	createBookmark(
 		sl::Array<char>* data,
 		uint_t options,
 		CFURLRef relativeToUrl = NULL
-		);
+	);
 };
 
 //..............................................................................

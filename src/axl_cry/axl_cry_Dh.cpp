@@ -18,8 +18,7 @@ namespace cry {
 //..............................................................................
 
 bool
-Dh::create()
-{
+Dh::create() {
 	close();
 
 	m_h = ::DH_new();
@@ -27,8 +26,7 @@ Dh::create()
 }
 
 bool
-Dh::create1024x160()
-{
+Dh::create1024x160() {
 	close();
 
 	m_h = ::DH_get_1024_160();
@@ -36,8 +34,7 @@ Dh::create1024x160()
 }
 
 bool
-Dh::create2048x224()
-{
+Dh::create2048x224() {
 	close();
 
 	m_h = ::DH_get_2048_224();
@@ -45,8 +42,7 @@ Dh::create2048x224()
 }
 
 bool
-Dh::create2048x256()
-{
+Dh::create2048x256() {
 	close();
 
 	m_h = ::DH_get_2048_256();
@@ -54,8 +50,7 @@ Dh::create2048x256()
 }
 
 bool
-Dh::readParameters(BIO* bio)
-{
+Dh::readParameters(BIO* bio) {
 	close();
 
 	bool result = ::PEM_read_bio_DHparams(bio, &m_h, 0, NULL) != NULL;

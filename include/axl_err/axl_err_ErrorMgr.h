@@ -24,8 +24,7 @@ namespace err {
 
 //..............................................................................
 
-class ErrorRouter
-{
+class ErrorRouter {
 public:
 	virtual
 	void
@@ -38,11 +37,9 @@ public:
 
 //..............................................................................
 
-class ErrorMgr: public ErrorRouter
-{
+class ErrorMgr: public ErrorRouter {
 protected:
-	struct ThreadEntry
-	{
+	struct ThreadEntry {
 		Error m_error;
 	};
 
@@ -59,20 +56,18 @@ public:
 	registerProvider(
 		const sl::Guid& guid,
 		ErrorProvider* provider
-		);
+	);
 
 	ErrorProvider*
 	findProvider(const sl::Guid& guid);
 
 	ErrorRouter*
-	getRouter()
-	{
+	getRouter() {
 		return m_router;
 	}
 
 	void
-	setRouter(ErrorRouter* router)
-	{
+	setRouter(ErrorRouter* router) {
 		ASSERT(router != this);
 		m_router = router;
 	}
@@ -89,8 +84,7 @@ public:
 protected:
 	virtual
 	void
-	routeError(const ErrorHdr* error)
-	{
+	routeError(const ErrorHdr* error) {
 		setError(error);
 	}
 
@@ -99,8 +93,7 @@ protected:
 	routeErrorDescription(const ErrorHdr* error);
 
 	ThreadEntry*
-	findThreadEntry()
-	{
+	findThreadEntry() {
 		return (ThreadEntry*)(void*)sys::getTlsMgr()->getSlotValue(m_tlsSlot);
 	}
 
@@ -112,8 +105,7 @@ protected:
 
 inline
 ErrorMgr*
-getErrorMgr()
-{
+getErrorMgr() {
 	return sl::getSingleton<ErrorMgr> ();
 }
 

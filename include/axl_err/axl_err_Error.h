@@ -25,8 +25,7 @@ namespace err {
 
 extern AXL_SELECT_ANY const sl::Guid g_stdErrorGuid = sl::g_nullGuid;
 
-enum StdErrorCode
-{
+enum StdErrorCode {
 	StdErrorCode_NoError,
 	StdErrorCode_String,
 	StdErrorCode_Stack,
@@ -36,8 +35,7 @@ enum StdErrorCode
 
 // POD structure
 
-struct ErrorHdr
-{
+struct ErrorHdr {
 	uint32_t m_size;
 	sl::Guid m_guid;
 	uint32_t m_code;
@@ -46,20 +44,17 @@ struct ErrorHdr
 	isKindOf(
 		const sl::Guid& guid,
 		uint_t code
-		) const
-	{
+	) const {
 		return m_guid == guid && m_code == code;
 	}
 
 	bool
-	isNoError() const
-	{
+	isNoError() const {
 		return isKindOf(g_stdErrorGuid, StdErrorCode_NoError);
 	}
 
 	bool
-	isStack() const
-	{
+	isStack() const {
 		return
 			m_size >= sizeof(ErrorHdr)* 2 &&
 			isKindOf(g_stdErrorGuid, StdErrorCode_Stack);
@@ -69,8 +64,7 @@ struct ErrorHdr
 	isStackTopKindOf(
 		const sl::Guid& guid,
 		uint_t code
-		) const
-	{
+	) const {
 		return isStack() && (this + 1)->isKindOf(guid, code);
 	}
 
@@ -80,20 +74,17 @@ struct ErrorHdr
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class SizeOfError
-{
+class SizeOfError {
 public:
 	size_t
-	operator () (const ErrorHdr* error) const
-	{
+	operator () (const ErrorHdr* error) const {
 		return AXL_MAX(error->m_size, sizeof(ErrorHdr));
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-extern AXL_SELECT_ANY const ErrorHdr g_noError =
-{
+extern AXL_SELECT_ANY const ErrorHdr g_noError = {
 	sizeof(ErrorHdr),
 	g_stdErrorGuid,
 	StdErrorCode_NoError,
@@ -101,32 +92,23 @@ extern AXL_SELECT_ANY const ErrorHdr g_noError =
 
 //..............................................................................
 
-class ErrorRef: public rc::BufRef<ErrorHdr, SizeOfError>
-{
+class ErrorRef: public rc::BufRef<ErrorHdr, SizeOfError> {
 public:
 	typedef rc::BufRef<ErrorHdr, SizeOfError> BaseType;
 
 public:
-	ErrorRef()
-	{
-	}
+	ErrorRef() {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	ErrorRef(ErrorRef&& src):
-		BaseType(std::move(src))
-	{
-	}
+		BaseType(std::move(src)) {}
 #endif
 
 	ErrorRef(const ErrorRef& src):
-		BaseType(src)
-	{
-	}
+		BaseType(src) {}
 
 	ErrorRef(const ErrorHdr* src):
-		BaseType(src)
-	{
-	}
+		BaseType(src) {}
 
 	ErrorRef(uint_t code);
 	ErrorRef(const sl::StringRef& string);
@@ -135,20 +117,18 @@ public:
 	ErrorRef(
 		const sl::Guid& guid,
 		uint_t code
-		);
+	);
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	ErrorRef&
-	operator = (ErrorRef&& src)
-	{
+	operator = (ErrorRef&& src) {
 		this->move(std::move(src));
 		return *this;
 	}
 #endif
 
 	ErrorRef&
-	operator = (const ErrorRef& src)
-	{
+	operator = (const ErrorRef& src) {
 		attach(src);
 		return *this;
 	}
@@ -157,14 +137,12 @@ public:
 	isKindOf(
 		const sl::Guid& guid,
 		uint_t code
-		) const
-	{
+	) const {
 		return !isEmpty() && m_p->isKindOf(guid, code);
 	}
 
 	bool
-	isNoError() const
-	{
+	isNoError() const {
 		return isEmpty() || m_p->isNoError();
 	}
 
@@ -174,60 +152,48 @@ public:
 
 //..............................................................................
 
-class Error: public rc::Buf<ErrorHdr, SizeOfError, ErrorRef>
-{
+class Error: public rc::Buf<ErrorHdr, SizeOfError, ErrorRef> {
 public:
-	Error()
-	{
-	}
+	Error() {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	Error(Error&& src)
-	{
+	Error(Error&& src) {
 		copy(std::move(src));
 	}
 
-	Error(ErrorRef&& src)
-	{
+	Error(ErrorRef&& src) {
 		copy(std::move(src));
 	}
 #endif
 
-	Error(const Error& src)
-	{
+	Error(const Error& src) {
 		copy(src);
 	}
 
-	Error(const ErrorRef& src)
-	{
+	Error(const ErrorRef& src) {
 		copy(src);
 	}
 
-	Error(const ErrorHdr* src)
-	{
+	Error(const ErrorHdr* src) {
 		copy(src);
 	}
 
-	Error(uint_t code)
-	{
+	Error(uint_t code) {
 		createSystemError(code);
 	}
 
 	Error(
 		const sl::Guid& guid,
 		uint_t code
-		)
-	{
+	) {
 		createSimpleError(guid, code);
 	}
 
-	Error(const sl::StringRef& string)
-	{
+	Error(const sl::StringRef& string) {
 		createStringError(string);
 	}
 
-	Error(const char* string) // for overload resolving
-	{
+	Error(const char* string) { // for overload resolving
 		createStringError(string);
 	}
 
@@ -235,51 +201,44 @@ public:
 		rc::BufKind kind,
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		setBuffer(kind, p, size);
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Error&
-	operator = (Error&& src)
-	{
+	operator = (Error&& src) {
 		copy(std::move(src));
 		return *this;
 	}
 
 	Error&
-	operator = (ErrorRef&& src)
-	{
+	operator = (ErrorRef&& src) {
 		copy(std::move(src));
 		return *this;
 	}
 #endif
 
 	Error&
-	operator = (const Error& src)
-	{
+	operator = (const Error& src) {
 		copy(src);
 		return *this;
 	}
 
 	Error&
-	operator = (const ErrorRef& src)
-	{
+	operator = (const ErrorRef& src) {
 		copy(src);
 		return *this;
 	}
 
 	Error&
-	operator = (const ErrorHdr* src)
-	{
+	operator = (const ErrorHdr* src) {
 		copy(src);
 		return *this;
 	}
 
 	Error&
-	operator = (uint_t code)
-	{
+	operator = (uint_t code) {
 		createSystemError(code);
 		return *this;
 	}
@@ -295,8 +254,7 @@ public:
 		const sl::Guid& guid,
 		uint_t code,
 		axl_va_list va
-		)
-	{
+	) {
 		size_t packSize;
 		Pack() (NULL, &packSize, va);
 
@@ -319,8 +277,7 @@ public:
 		const sl::Guid& guid,
 		uint_t code,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, code);
 		return pack_va<Pack> (guid, code, va);
 	}
@@ -331,8 +288,7 @@ public:
 		const sl::Guid& guid,
 		uint_t code,
 		axl_va_list va
-		)
-	{
+	) {
 		if (!m_p)
 			return pack_va<Pack> (guid, code, va);
 
@@ -347,8 +303,7 @@ public:
 		const sl::Guid& guid,
 		uint_t code,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, code);
 		return pushPack_va<Pack> (guid, code, va);
 	}
@@ -361,7 +316,7 @@ public:
 		uint_t code,
 		const char* formatString,
 		axl_va_list va
-		);
+	);
 
 	size_t
 	format(
@@ -369,8 +324,7 @@ public:
 		uint_t code,
 		const char* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return format_va(guid, code, formatString, va);
 	}
@@ -381,8 +335,7 @@ public:
 		uint_t code,
 		const char* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		if (!m_p)
 			return format_va(guid, code, formatString, va);
 
@@ -397,8 +350,7 @@ public:
 		uint_t code,
 		const char* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return pushFormat_va(guid, code, formatString, va);
 	}
@@ -406,8 +358,7 @@ public:
 	// system error (push is irrelevant for system errors)
 
 	size_t
-	createSystemError(uint_t code)
-	{
+	createSystemError(uint_t code) {
 		return createSimpleError(g_systemErrorGuid, code);
 	}
 
@@ -417,14 +368,13 @@ public:
 	createSimpleError(
 		const sl::Guid& guid,
 		uint_t code
-		);
+	);
 
 	size_t
 	pushSimpleError(
 		const sl::Guid& guid,
 		uint_t code
-		)
-	{
+	) {
 		if (!m_p)
 			return createSimpleError(guid, code);
 
@@ -439,8 +389,7 @@ public:
 	createStringError(const sl::StringRef& string);
 
 	size_t
-	pushStringError(const sl::StringRef& string)
-	{
+	pushStringError(const sl::StringRef& string) {
 		if (!m_p)
 			return createStringError(string);
 
@@ -453,14 +402,13 @@ public:
 	formatStringError_va(
 		const char* formatString,
 		axl_va_list va
-		);
+	);
 
 	size_t
 	formatStringError(
 		const char* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return formatStringError_va(formatString, va);
 	}
@@ -469,8 +417,7 @@ public:
 	pushFormatStringError_va(
 		const char* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		if (!m_p)
 			return formatStringError_va(formatString, va);
 
@@ -483,8 +430,7 @@ public:
 	pushFormatStringError(
 		const char* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return pushFormatStringError_va(formatString, va);
 	}
@@ -494,30 +440,22 @@ public:
 
 inline
 ErrorRef::ErrorRef(uint_t code):
-	BaseType(Error(code))
-{
-}
+	BaseType(Error(code)) {}
 
 inline
 ErrorRef::ErrorRef(const sl::StringRef& string):
-	BaseType(Error(string))
-{
-}
+	BaseType(Error(string)) {}
 
 inline
 ErrorRef::ErrorRef(const char* string):
-	BaseType(Error(string))
-{
-}
+	BaseType(Error(string)) {}
 
 inline
 ErrorRef::ErrorRef(
 	const sl::Guid& guid,
 	uint_t code
-	):
-	BaseType(Error(guid, code))
-{
-}
+):
+	BaseType(Error(guid, code)) {}
 
 //..............................................................................
 
@@ -534,22 +472,19 @@ pushError(const ErrorRef& error);
 
 inline
 sl::String
-getLastErrorDescription()
-{
+getLastErrorDescription() {
 	return getLastError().getDescription();
 }
 
 inline
 Error
-getLastSystemError()
-{
+getLastSystemError() {
 	return Error(getLastSystemErrorCode());
 }
 
 inline
 sl::String
-getLastSystemErrorDescription()
-{
+getLastSystemErrorDescription() {
 	return getLastSystemError().getDescription();
 }
 
@@ -563,8 +498,7 @@ setPackError_va(
 	const sl::Guid& guid,
 	uint_t code,
 	axl_va_list va
-	)
-{
+) {
 	Error error;
 	size_t result = error.pack_va<Pack> (guid, code, va);
 	return result != -1 ? setError(error) : -1;
@@ -576,8 +510,7 @@ setPackError(
 	const sl::Guid& guid,
 	uint_t code,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, code);
 	return setPackError_va<Pack> (guid, code, va);
 }
@@ -588,8 +521,7 @@ pushPackError_va(
 	const sl::Guid& guid,
 	uint_t code,
 	axl_va_list va
-	)
-{
+) {
 	Error error;
 	size_t result = error.pack_va<Pack> (guid, code, va);
 	return result != -1 ? pushError(error) : -1;
@@ -601,8 +533,7 @@ pushPackError(
 	const sl::Guid& guid,
 	uint_t code,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, code);
 	return pushPackError_va<Pack> (guid, code, va);
 }
@@ -617,7 +548,7 @@ setFormatError_va(
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
-	);
+);
 
 inline
 size_t
@@ -626,8 +557,7 @@ setFormatError(
 	uint_t code,
 	const char* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	return setFormatError_va(guid, code, formatString, va);
 }
@@ -638,7 +568,7 @@ pushFormatError_va(
 	uint_t code,
 	const char* formatString,
 	axl_va_list va
-	);
+);
 
 inline
 size_t
@@ -647,8 +577,7 @@ pushFormatError(
 	uint_t code,
 	const char* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	return pushFormatError_va(guid, code, formatString, va);
 }
@@ -662,8 +591,7 @@ size_t
 setError(
 	const sl::Guid& guid,
 	uint_t code
-	)
-{
+) {
 	return setError(Error(guid, code));
 }
 
@@ -672,8 +600,7 @@ size_t
 pushError(
 	const sl::Guid& guid,
 	uint_t code
-	)
-{
+) {
 	return pushError(Error(guid, code));
 }
 
@@ -685,15 +612,14 @@ size_t
 setFormatStringError_va(
 	const char* formatString,
 	axl_va_list va
-	);
+);
 
 inline
 size_t
 setFormatStringError(
 	const char* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	return setFormatStringError_va(formatString, va);
 }
@@ -702,15 +628,14 @@ size_t
 pushFormatStringError_va(
 	const char* formatString,
 	axl_va_list va
-	);
+);
 
 inline
 size_t
 pushFormatStringError(
 	const char* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	return pushFormatStringError_va(formatString, va);
 }
@@ -724,38 +649,33 @@ T
 fail(
 	T failResult,
 	const ErrorRef& error
-	)
-{
+) {
 	setError(error);
 	return failResult;
 }
 
 inline
 bool
-fail(const ErrorRef& error)
-{
+fail(const ErrorRef& error) {
 	return fail<bool>(false, error);
 }
 
 inline
 size_t
-setLastSystemError()
-{
+setLastSystemError() {
 	return setError(getLastSystemErrorCode());
 }
 
 template <typename T>
 T
-failWithLastSystemError(T failResult)
-{
+failWithLastSystemError(T failResult) {
 	setLastSystemError();
 	return failResult;
 }
 
 inline
 bool
-failWithLastSystemError()
-{
+failWithLastSystemError() {
 	return failWithLastSystemError<bool> (false);
 }
 
@@ -765,8 +685,7 @@ completeWithSystemError(
 	T result,
 	T failResult,
 	uint_t errorCode
-	)
-{
+) {
 	if (result == failResult)
 		setError(errorCode);
 
@@ -778,8 +697,7 @@ bool
 completeWithSystemError(
 	int result,
 	uint_t errorCode
-	)
-{
+) {
 	return completeWithSystemError<bool> (result != 0, false, errorCode);
 }
 
@@ -788,8 +706,7 @@ T
 complete(
 	T result,
 	T failResult
-	)
-{
+) {
 	if (result == failResult)
 		setLastSystemError();
 
@@ -798,8 +715,7 @@ complete(
 
 inline
 bool
-complete(int result)
-{
+complete(int result) {
 	return complete<bool> (result != 0, false);
 }
 
@@ -807,8 +723,7 @@ complete(int result)
 
 // providers
 
-class ErrorProvider
-{
+class ErrorProvider {
 public:
 	virtual
 	sl::StringRef
@@ -817,8 +732,7 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class StdErrorProvider: public ErrorProvider
-{
+class StdErrorProvider: public ErrorProvider {
 public:
 	virtual
 	sl::StringRef

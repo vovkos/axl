@@ -22,27 +22,23 @@ namespace win {
 
 //..............................................................................
 
-class FreeLibrary
-{
+class FreeLibrary {
 public:
 	void
-	operator () (HMODULE h)
-	{
+	operator () (HMODULE h) {
 		::FreeLibrary(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Library: public sl::Handle<HMODULE, FreeLibrary>
-{
+class Library: public sl::Handle<HMODULE, FreeLibrary> {
 public:
 	bool
 	loadLibrary(const sl::StringRef_w& fileName);
 
 	void*
-	getProcAddress(const sl::StringRef& name)
-	{
+	getProcAddress(const sl::StringRef& name) {
 		void* p = ::GetProcAddress(m_h, name.sz());
 		return err::complete<void*> (p, NULL);
 	}

@@ -23,8 +23,7 @@ namespace cf {
 
 //..............................................................................
 
-class SecScopedBookmark
-{
+class SecScopedBookmark {
 protected:
 	sl::String m_filePath;
 	mutable sl::Array<char> m_dataCache;
@@ -32,57 +31,48 @@ protected:
 	bool m_isDirectory;
 
 public:
-	SecScopedBookmark()
-	{
+	SecScopedBookmark() {
 		m_isDirectory = false;
 	}
 
-	SecScopedBookmark(const SecScopedBookmark& src)
-	{
+	SecScopedBookmark(const SecScopedBookmark& src) {
 		operator = (src);
 	}
 
-	SecScopedBookmark(SecScopedBookmark& src)
-	{
+	SecScopedBookmark(SecScopedBookmark& src) {
 		operator = (src);
 	}
 
-	~SecScopedBookmark()
-	{
+	~SecScopedBookmark() {
 		close();
 	}
 
 	SecScopedBookmark&
-	operator = (const SecScopedBookmark& src)
-	{
+	operator = (const SecScopedBookmark& src) {
 		copy(src);
 		return *this;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	SecScopedBookmark&
-	operator = (SecScopedBookmark&& src)
-	{
+	operator = (SecScopedBookmark&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_filePath.isEmpty();
 	}
 
 	const sl::String&
-	getFilePath() const
-	{
+	getFilePath() const {
 		return m_filePath;
 	}
 
 	bool
-	isDirectory() const
-	{
+	isDirectory() const {
 		return m_isDirectory;
 	}
 
@@ -93,7 +83,7 @@ public:
 	create(
 		const sl::StringRef& filePath,
 		bool isDirectory
-		);
+	);
 
 	void
 	copy(const SecScopedBookmark& src);
@@ -107,14 +97,13 @@ public:
 	load(
 		const void* p,
 		size_t size
-		);
+	);
 
 	bool
 	save(sl::Array<char>* buffer) const;
 
 	sl::Array<char>
-	save() const
-	{
+	save() const {
 		sl::Array<char> buffer;
 		save(&buffer);
 		return buffer;

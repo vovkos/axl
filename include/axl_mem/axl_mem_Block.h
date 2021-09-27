@@ -22,21 +22,18 @@ namespace mem {
 
 // memory block descriptor
 
-struct Block
-{
+struct Block {
 	const void* m_p;
 	size_t m_size;
 
-	Block()
-	{
+	Block() {
 		setup(NULL, 0);
 	}
 
 	Block(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		setup(p, size);
 	}
 
@@ -44,8 +41,7 @@ struct Block
 	setup(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		m_p = p;
 		m_size = size;
 	}

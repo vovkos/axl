@@ -22,12 +22,10 @@ namespace io {
 
 #if (_AXL_OS_WIN)
 
-class CloseFileEnumeratorHandle
-{
+class CloseFileEnumeratorHandle {
 public:
 	void
-	operator () (HANDLE h)
-	{
+	operator () (HANDLE h) {
 		::FindClose(h);
 	}
 };
@@ -36,12 +34,10 @@ typedef sl::Handle<HANDLE, CloseFileEnumeratorHandle, sl::MinusOne<HANDLE> > Fil
 
 #elif (_AXL_OS_POSIX)
 
-class CloseFileEnumeratorHandle
-{
+class CloseFileEnumeratorHandle {
 public:
 	void
-	operator () (DIR* h)
-	{
+	operator () (DIR* h) {
 		::closedir(h);
 	}
 };
@@ -50,8 +46,7 @@ typedef sl::Handle<DIR*, CloseFileEnumeratorHandle> FileEnumeratorHandle;
 
 #endif
 
-class FileEnumerator: public FileEnumeratorHandle
-{
+class FileEnumerator: public FileEnumeratorHandle {
 protected:
 	sl::String m_nextFileName;
 
@@ -60,8 +55,7 @@ public:
 	openDir(const sl::StringRef& dir);
 
 	bool
-	hasNextFile()
-	{
+	hasNextFile() {
 		return !m_nextFileName.isEmpty();
 	}
 

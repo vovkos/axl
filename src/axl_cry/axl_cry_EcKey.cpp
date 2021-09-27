@@ -18,8 +18,7 @@ namespace cry {
 //..............................................................................
 
 void
-EcKey::setFlags(uint_t flags)
-{
+EcKey::setFlags(uint_t flags) {
 	int prevFlags = getFlags();
 
 	addFlags(flags & ~prevFlags);
@@ -27,8 +26,7 @@ EcKey::setFlags(uint_t flags)
 }
 
 bool
-EcKey::create()
-{
+EcKey::create() {
 	close();
 
 	m_h = EC_KEY_new();
@@ -36,8 +34,7 @@ EcKey::create()
 }
 
 bool
-EcKey::create(uint_t curveId)
-{
+EcKey::create(uint_t curveId) {
 	close();
 
 	m_h = EC_KEY_new_by_curve_name(curveId);
@@ -45,8 +42,7 @@ EcKey::create(uint_t curveId)
 }
 
 bool
-EcKey::createCopy(EC_KEY* src)
-{
+EcKey::createCopy(EC_KEY* src) {
 	close();
 
 	m_h = EC_KEY_dup(src);
@@ -58,8 +54,7 @@ EcKey::setPublicKeyData(
 	const void* p,
 	size_t size,
 	BN_CTX* ctx
-	)
-{
+) {
 	EC_GROUP* group = getGroup();
 	EcPoint key(group);
 
@@ -72,8 +67,7 @@ bool
 EcKey::setPublicKeyDecString(
 	const sl::StringRef& string,
 	BN_CTX* ctx
-	)
-{
+) {
 	EC_GROUP* group = getGroup();
 	EcPoint key(group);
 
@@ -86,8 +80,7 @@ bool
 EcKey::setPublicKeyHexString(
 	const sl::StringRef& string,
 	BN_CTX* ctx
-	)
-{
+) {
 	EC_GROUP* group = getGroup();
 	EcPoint key(group);
 
@@ -102,8 +95,7 @@ EcKey::signHash(
 	size_t signatureBufferSize,
 	const void* hash,
 	size_t hashSize
-	)
-{
+) {
 	ASSERT(signatureBufferSize >= getMaxSignatureSize());
 
 	uint_t resultSize = (uint_t)signatureBufferSize;
@@ -114,7 +106,7 @@ EcKey::signHash(
 		(uchar_t*)signatureBuffer,
 		&resultSize,
 		m_h
-		);
+	);
 
 	if (!result)
 		return failWithLastCryptoError<size_t>(-1);
@@ -128,8 +120,7 @@ EcKey::signHash(
 	sl::Array<char>* signature,
 	const void* hash,
 	size_t hashSize
-	)
-{
+) {
 	size_t maxSize = getMaxSignatureSize();
 	bool result = signature->setCount(maxSize);
 	if (!result)

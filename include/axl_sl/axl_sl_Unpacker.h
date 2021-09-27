@@ -21,16 +21,14 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class UnpackStringBase
-{
+class UnpackStringBase {
 public:
 	size_t
 	operator () (
 		const void* p,
 		size_t size,
 		const T** value
-		)
-	{
+	) {
 		size_t length = StringDetailsBase<T>::calcLength((T*)p);
 		size_t stringSize = (length + 1) * sizeof(T);
 
@@ -46,8 +44,7 @@ public:
 		const void* p,
 		size_t size,
 		T** value
-		)
-	{
+	) {
 		return operator () (p, size, (const T**) value);
 	}
 };
@@ -55,16 +52,14 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class UnpackPtr
-{
+class UnpackPtr {
 public:
 	size_t
 	operator () (
 		const void* p,
 		size_t size,
 		T** value
-		)
-	{
+	) {
 		if (size < sizeof(T))
 			return -1;
 
@@ -80,17 +75,15 @@ public:
 template <
 	typename T,
 	typename SizeOf = sl::SizeOf<T>
-	>
-class UnpackSelfSizedPtr
-{
+>
+class UnpackSelfSizedPtr {
 public:
 	size_t
 	operator () (
 		const void* p,
 		size_t size,
 		T** value
-		)
-	{
+	) {
 		if (size < sizeof(T))
 			return -1;
 
@@ -118,16 +111,14 @@ typedef UnpackStringBase<utf32_t> UnpackString_utf32;
 // most common case
 
 template <typename T>
-class Unpack
-{
+class Unpack {
 public:
 	size_t
 	operator () (
 		const void* p,
 		size_t size,
 		T* value
-		)
-	{
+	) {
 		if (size < sizeof(T))
 			return -1;
 
@@ -141,23 +132,19 @@ public:
 // specialization for strings
 
 template <>
-class Unpack<char*>: public UnpackStringBase<char>
-{
+class Unpack<char*>: public UnpackStringBase<char> {
 };
 
 template <>
-class Unpack<const char*>: public UnpackStringBase<char>
-{
+class Unpack<const char*>: public UnpackStringBase<char> {
 };
 
 template <>
-class Unpack<wchar_t*>: public UnpackStringBase<wchar_t>
-{
+class Unpack<wchar_t*>: public UnpackStringBase<wchar_t> {
 };
 
 template <>
-class Unpack<const wchar_t*>: public UnpackStringBase<wchar_t>
-{
+class Unpack<const wchar_t*>: public UnpackStringBase<wchar_t> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -165,8 +152,7 @@ class Unpack<const wchar_t*>: public UnpackStringBase<wchar_t>
 // specialization for pointers
 
 template <typename T>
-class Unpack<T*>: public UnpackPtr<T>
-{
+class Unpack<T*>: public UnpackPtr<T> {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -177,37 +163,32 @@ template <>
 class Unpack<err::ErrorHdr*>: public UnpackSelfSizedPtr<
 	err::ErrorHdr,
 	err::SizeOfError
-	>
-{
+> {
 };
 
 template <>
 class Unpack<const err::ErrorHdr*>: public UnpackSelfSizedPtr<
 	const err::ErrorHdr,
 	err::SizeOfError
-	>
-{
+> {
 };
 //..............................................................................
 
-class Unpacker
-{
+class Unpacker {
 protected:
 	const void* m_begin;
 	const void* m_current;
 	size_t m_size;
 
 public:
-	Unpacker()
-	{
+	Unpacker() {
 		setup(NULL, 0);
 	}
 
 	Unpacker(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		setup(p, size);
 	}
 
@@ -215,28 +196,24 @@ public:
 	setup(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		m_begin = p;
 		m_current = p;
 		m_size = size;
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		setup(NULL, 0);
 	}
 
 	void
-	rewind()
-	{
+	rewind() {
 		m_current = m_begin;
 	}
 
 	size_t
-	getLeftoverSize()
-	{
+	getLeftoverSize() {
 		return m_size - ((uchar_t*)m_current - (uchar_t*)m_begin);
 	}
 
@@ -244,15 +221,14 @@ public:
 	unpack(
 		void* p,
 		size_t size
-		);
+	);
 
 	template <
 		typename T,
 		typename Unpack
-		>
+	>
 	bool
-	unpack(T* value)
-	{
+	unpack(T* value) {
 		size_t leftoverSize = getLeftoverSize();
 		size_t size = Unpack() (m_current, leftoverSize, value);
 		if (size > leftoverSize)
@@ -264,8 +240,7 @@ public:
 
 	template <typename T>
 	bool
-	unpack(T* value)
-	{
+	unpack(T* value) {
 		return unpack<T, Unpack<T> > (value);
 	}
 
@@ -273,14 +248,13 @@ public:
 	scan_va(
 		const char* formatString,
 		axl_va_list va
-		);
+	);
 
 	size_t
 	scan(
 		const char* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return scan_va(formatString, va);
 	}

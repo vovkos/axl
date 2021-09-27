@@ -25,8 +25,7 @@ class Image;
 
 //..............................................................................
 
-class Canvas: public GuiItem
-{
+class Canvas: public GuiItem {
 protected:
 	Font* m_driverFont;
 	ColorAttr m_driverColorAttr;
@@ -38,8 +37,7 @@ public:
 
 protected:
 	Canvas(Engine* engine):
-		GuiItem(engine)
-	{
+		GuiItem(engine) {
 		m_font = engine->getStdFont(StdFontKind_Gui);
 		m_driverFont = NULL;
 		m_colorAttr.setup(StdPalColor_WidgetText, StdPalColor_WidgetBack);
@@ -47,8 +45,7 @@ protected:
 
 public:
 	void
-	setTextAttr(const TextAttr& attr)
-	{
+	setTextAttr(const TextAttr& attr) {
 		m_colorAttr = attr;
 		m_font = m_font->getFontMod(attr.m_fontFlags);
 	}
@@ -62,8 +59,7 @@ public:
 		int right,
 		int bottom,
 		uint_t color
-		)
-	{
+	) {
 		return m_engine->drawRect(this, left, top, right, bottom, color);
 	}
 
@@ -73,8 +69,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		)
-	{
+	) {
 		return drawRect(left, top, right, bottom, m_colorAttr.m_backColor);
 	}
 
@@ -82,27 +77,25 @@ public:
 	drawRect(
 		const Rect& rect,
 		uint_t color
-		)
-	{
+	) {
 		return drawRect(
 			rect.m_left,
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom,
 			color
-			);
+		);
 	}
 
 	bool
-	drawRect(const Rect& rect)
-	{
+	drawRect(const Rect& rect) {
 		return drawRect(
 			rect.m_left,
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom,
 			m_colorAttr.m_backColor
-			);
+		);
 	}
 
 	// alpha rect drawing
@@ -115,8 +108,7 @@ public:
 		int bottom,
 		uint_t color,
 		uint_t alpha
-		)
-	{
+	) {
 		return m_engine->drawAlphaRect(this, left, top, right, bottom, color, alpha);
 	}
 
@@ -127,8 +119,7 @@ public:
 		int right,
 		int bottom,
 		uint_t alpha
-		)
-	{
+	) {
 		return drawAlphaRect(left, top, right, bottom, m_colorAttr.m_backColor, alpha);
 	}
 
@@ -137,8 +128,7 @@ public:
 		const Rect& rect,
 		uint_t color,
 		uint_t alpha
-		)
-	{
+	) {
 		return drawAlphaRect(
 			rect.m_left,
 			rect.m_top,
@@ -146,15 +136,14 @@ public:
 			rect.m_bottom,
 			color,
 			alpha
-			);
+		);
 	}
 
 	bool
 	drawAlphaRect(
 		const Rect& rect,
 		uint_t alpha
-		)
-	{
+	) {
 		return drawAlphaRect(
 			rect.m_left,
 			rect.m_top,
@@ -162,7 +151,7 @@ public:
 			rect.m_bottom,
 			m_colorAttr.m_backColor,
 			alpha
-			);
+		);
 	}
 
 	// gradient rect drawing
@@ -179,8 +168,7 @@ public:
 		int x2,
 		int y2,
 		uint_t color2
-		)
-	{
+	) {
 		return m_engine->drawGradientRect(
 			this,
 			left,
@@ -193,7 +181,7 @@ public:
 			x2,
 			y2,
 			color2
-			);
+		);
 	}
 
 	bool
@@ -203,8 +191,7 @@ public:
 		uint_t color1,
 		const Point& point2,
 		uint_t color2
-		)
-	{
+	) {
 		return m_engine->drawGradientRect(
 			this,
 			rect.m_left,
@@ -217,7 +204,7 @@ public:
 			point2.m_x,
 			point2.m_y,
 			color2
-			);
+		);
 	}
 
 	// alpha gradient rect drawing
@@ -236,8 +223,7 @@ public:
 		int y2,
 		uint_t color2,
 		uint_t alpha2
-		)
-	{
+	) {
 		return m_engine->drawAlphaGradientRect(
 			this,
 			left,
@@ -252,7 +238,7 @@ public:
 			y2,
 			color2,
 			alpha2
-			);
+		);
 	}
 
 	bool
@@ -264,8 +250,7 @@ public:
 		const Point& point2,
 		uint_t color2,
 		uint_t alpha2
-		)
-	{
+	) {
 		return m_engine->drawAlphaGradientRect(
 			this,
 			rect.m_left,
@@ -280,30 +265,26 @@ public:
 			point2.m_y,
 			color2,
 			alpha2
-			);
+		);
 	}
 
 	Size
-	calcCharSize(utf32_t c)
-	{
+	calcCharSize(utf32_t c) {
 		return m_engine->calcCharSize(m_font, this, c);
 	}
 
 	Size
-	calcTextSize_utf8(const sl::StringRef_utf8& text)
-	{
+	calcTextSize_utf8(const sl::StringRef_utf8& text) {
 		return m_engine->calcTextSize_utf8(m_font, this, text);
 	}
 
 	Size
-	calcTextSize_utf16(const sl::StringRef_utf16& text)
-	{
+	calcTextSize_utf16(const sl::StringRef_utf16& text) {
 		return m_engine->calcTextSize_utf16(m_font, this, text);
 	}
 
 	Size
-	calcTextSize_utf32(const sl::StringRef_utf32& text)
-	{
+	calcTextSize_utf32(const sl::StringRef_utf32& text) {
 		return m_engine->calcTextSize_utf32(m_font, this, text);
 	}
 
@@ -321,8 +302,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawText_utf8(
 			x,
 			y,
@@ -334,7 +314,7 @@ public:
 			backColor,
 			fontFlags,
 			text
-			);
+		);
 	}
 
 	bool
@@ -346,8 +326,7 @@ public:
 		int right,
 		int bottom,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawText_utf8(x, y, left, top, right, bottom, text);
 	}
 
@@ -357,8 +336,7 @@ public:
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawText_utf8(point, rect, textAttr, text);
 	}
 
@@ -367,8 +345,7 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef& text
-		)
-	{
+	) {
 		return drawText_utf8(point, rect, text);
 	}
 
@@ -386,8 +363,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return m_engine->drawText_utf8(
 			this,
 			x,
@@ -400,7 +376,7 @@ public:
 			backColor,
 			fontFlags,
 			text
-			);
+		);
 	}
 
 	bool
@@ -412,8 +388,7 @@ public:
 		int right,
 		int bottom,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawText_utf8(
 			x,
 			y,
@@ -425,7 +400,7 @@ public:
 			m_colorAttr.m_backColor,
 			-1,
 			text
-			);
+		);
 	}
 
 	bool
@@ -434,8 +409,7 @@ public:
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawText_utf8(
 			point.m_x,
 			point.m_y,
@@ -447,7 +421,7 @@ public:
 			textAttr.m_backColor,
 			textAttr.m_fontFlags,
 			text
-			);
+		);
 	}
 
 	bool
@@ -455,8 +429,7 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef_utf8& text
-		)
-	{
+	) {
 		return drawText_utf8(
 			point.m_x,
 			point.m_y,
@@ -468,7 +441,7 @@ public:
 			m_colorAttr.m_backColor,
 			0,
 			text
-			);
+		);
 	}
 
 	// utf16 text drawing
@@ -485,8 +458,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf16& text
-		)
-	{
+	) {
 		return m_engine->drawText_utf16(
 			this,
 			x,
@@ -499,7 +471,7 @@ public:
 			backColor,
 			fontFlags,
 			text
-			);
+		);
 	}
 
 	bool
@@ -511,8 +483,7 @@ public:
 		int right,
 		int bottom,
 		const sl::StringRef_utf16& text
-		)
-	{
+	) {
 		return drawText_utf16(
 			x,
 			y,
@@ -524,7 +495,7 @@ public:
 			m_colorAttr.m_backColor,
 			-1,
 			text
-			);
+		);
 	}
 
 	bool
@@ -533,8 +504,7 @@ public:
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef_utf16& text
-		)
-	{
+	) {
 		return drawText_utf16(
 			point.m_x,
 			point.m_y,
@@ -546,7 +516,7 @@ public:
 			textAttr.m_backColor,
 			textAttr.m_fontFlags,
 			text
-			);
+		);
 	}
 
 	bool
@@ -554,8 +524,7 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef_utf16& text
-		)
-	{
+	) {
 		return drawText_utf16(
 			point.m_x,
 			point.m_y,
@@ -567,7 +536,7 @@ public:
 			m_colorAttr.m_backColor,
 			-1,
 			text
-			);
+		);
 	}
 
 	// utf32 text drawing
@@ -584,8 +553,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return m_engine->drawText_utf32(
 			this,
 			x,
@@ -598,7 +566,7 @@ public:
 			backColor,
 			fontFlags,
 			text
-			);
+		);
 	}
 
 	bool
@@ -610,8 +578,7 @@ public:
 		int right,
 		int bottom,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawText_utf32(
 			x,
 			y,
@@ -623,7 +590,7 @@ public:
 			m_colorAttr.m_backColor,
 			-1,
 			text
-			);
+		);
 	}
 
 	bool
@@ -632,8 +599,7 @@ public:
 		const Rect& rect,
 		const TextAttr& textAttr,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawText_utf32(
 			point.m_x,
 			point.m_y,
@@ -645,7 +611,7 @@ public:
 			textAttr.m_backColor,
 			textAttr.m_fontFlags,
 			text
-			);
+		);
 	}
 
 	bool
@@ -653,8 +619,7 @@ public:
 		const Point& point,
 		const Rect& rect,
 		const sl::StringRef_utf32& text
-		)
-	{
+	) {
 		return drawText_utf32(
 			point.m_x,
 			point.m_y,
@@ -666,7 +631,7 @@ public:
 			m_colorAttr.m_backColor,
 			0,
 			text
-			);
+		);
 	}
 
 	// image drawing
@@ -680,8 +645,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		)
-	{
+	) {
 		return m_engine->drawImage(
 			this,
 			x,
@@ -691,7 +655,7 @@ public:
 			top,
 			right,
 			bottom
-			);
+		);
 	}
 
 	bool
@@ -699,8 +663,7 @@ public:
 		const Point& point,
 		Image* image,
 		const Rect& rect = Rect()
-		)
-	{
+	) {
 		return drawImage(
 			point.m_x,
 			point.m_y,
@@ -709,7 +672,7 @@ public:
 			rect.m_top,
 			rect.m_right,
 			rect.m_bottom
-			);
+		);
 	}
 
 	// bitblt
@@ -723,8 +686,7 @@ public:
 		int top,
 		int right,
 		int bottom
-		)
-	{
+	) {
 		return m_engine->copyRect(
 			this,
 			x,
@@ -734,7 +696,7 @@ public:
 			right,
 			top,
 			bottom
-			);
+		);
 	}
 
 	bool
@@ -742,8 +704,7 @@ public:
 		const Point& point,
 		Canvas* srcCanvas,
 		const Rect& srcRect
-		)
-	{
+	) {
 		return copyRect(
 			point.m_x,
 			point.m_y,
@@ -752,18 +713,16 @@ public:
 			srcRect.m_top,
 			srcRect.m_right,
 			srcRect.m_bottom
-			);
+		);
 	}
 };
 
 //..............................................................................
 
 template <typename T>
-class OffscreenCanvasCache
-{
+class OffscreenCanvasCache {
 protected:
-	struct Entry
-	{
+	struct Entry {
 		Size m_size;
 		T m_canvas;
 	};
@@ -773,20 +732,17 @@ protected:
 	Entry* m_canvasTable[FormFactor__Count];
 
 public:
-	OffscreenCanvasCache(Engine* engine)
-	{
+	OffscreenCanvasCache(Engine* engine) {
 		m_engine = engine;
 		memset(m_canvasTable, 0, sizeof(m_canvasTable));
 	}
 
-	~OffscreenCanvasCache()
-	{
+	~OffscreenCanvasCache() {
 		clear();
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		for (size_t i = 0; i < countof(m_canvasTable); i++)
 			if (m_canvasTable[i])
 				AXL_MEM_DELETE(m_canvasTable[i]);
@@ -798,14 +754,12 @@ public:
 	getCanvas(
 		uint_t width,
 		uint_t height
-		)
-	{
+	) {
 		FormFactor formFactor = getFormFactor(width, height);
 		ASSERT(formFactor < countof(m_canvasTable));
 
 		Entry* entry = m_canvasTable[formFactor];
-		if (!entry)
-		{
+		if (!entry) {
 			entry = AXL_MEM_NEW(Entry);
 			m_canvasTable[formFactor] = entry;
 		}
@@ -832,8 +786,7 @@ public:
 	}
 
 	T*
-	getCanvas(const Size& size)
-	{
+	getCanvas(const Size& size) {
 		return getCanvas(size.m_width, size.m_height);
 	}
 };

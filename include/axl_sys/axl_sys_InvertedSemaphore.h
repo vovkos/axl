@@ -21,29 +21,25 @@ namespace sys {
 
 //..............................................................................
 
-class InvertedSemaphore: public NotificationEvent
-{
+class InvertedSemaphore: public NotificationEvent {
 protected:
 	Lock m_lock;
 	intptr_t m_count;
 
 public:
-	InvertedSemaphore(intptr_t count = 0)
-	{
+	InvertedSemaphore(intptr_t count = 0) {
 		setImpl(count);
 	}
 
 	void
-	set(intptr_t count)
-	{
+	set(intptr_t count) {
 		m_lock.lock();
 		setImpl(count);
 		m_lock.unlock();
 	}
 
 	void
-	add(intptr_t delta)
-	{
+	add(intptr_t delta) {
 		m_lock.lock();
 		setImpl(m_count + delta);
 		m_lock.unlock();
@@ -51,8 +47,7 @@ public:
 
 protected:
 	void
-	setImpl(intptr_t count) // called under lock
-	{
+	setImpl(intptr_t count) { // called under lock
 		ASSERT(count >= 0);
 		m_count = count;
 

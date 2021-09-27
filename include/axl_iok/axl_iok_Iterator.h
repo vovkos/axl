@@ -20,29 +20,23 @@ namespace iok {
 
 //..............................................................................
 
-class Iterator: public ObjectBase<io_iterator_t>
-{
+class Iterator: public ObjectBase<io_iterator_t> {
 public:
-	Iterator()
-	{
-	}
+	Iterator() {}
 
-	Iterator(const Iterator& src)
-	{
+	Iterator(const Iterator& src) {
 		copy(src);
 	}
 
 	Iterator(
 		io_iterator_t p,
 		bool isAttach = false
-		)
-	{
+	) {
 		isAttach ? copy(p) : attach(p);
 	}
 
 	bool
-	isValid()
-	{
+	isValid() {
 		return ::IOIteratorIsValid(m_p);
 	}
 
@@ -50,8 +44,7 @@ public:
 	next();
 
 	void
-	reset()
-	{
+	reset() {
 		::IOIteratorReset(m_p);
 	}
 };

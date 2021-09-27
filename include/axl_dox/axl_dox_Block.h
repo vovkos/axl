@@ -23,16 +23,14 @@ class Group;
 
 //..............................................................................
 
-struct Param: sl::ListLink
-{
+struct Param: sl::ListLink {
 	sl::String m_name;
 	sl::String m_description;
 };
 
 //..............................................................................
 
-enum BlockKind
-{
+enum BlockKind {
 	BlockKind_Normal,
 	BlockKind_Group,
 	BlockKind_Footnote,
@@ -40,8 +38,7 @@ enum BlockKind
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct BlockData
-{
+struct BlockData {
 	BlockKind m_blockKind;
 	Group* m_group;
 
@@ -66,8 +63,7 @@ struct BlockData
 
 class Block:
 	public sl::ListLink,
-	protected BlockData
-{
+	protected BlockData {
 	friend class Module;
 	friend class Parser;
 
@@ -81,26 +77,22 @@ public:
 	Block(Host* host);
 
 	BlockKind
-	getBlockKind()
-	{
+	getBlockKind() {
 		return m_blockKind;
 	}
 
 	Group*
-	getGroup()
-	{
+	getGroup() {
 		return m_group;
 	}
 
 	handle_t
-	getItem()
-	{
+	getItem() {
 		return m_item;
 	}
 
 	const sl::String&
-	getSource()
-	{
+	getSource() {
 		return m_source;
 	}
 
@@ -108,38 +100,32 @@ public:
 	getRefId();
 
 	const sl::String&
-	getTitle()
-	{
+	getTitle() {
 		return m_title;
 	}
 
 	const sl::String&
-	getBriefDescription()
-	{
+	getBriefDescription() {
 		return m_briefDescription;
 	}
 
 	const sl::String&
-	getDetailedDescription()
-	{
+	getDetailedDescription() {
 		return m_detailedDescription;
 	}
 
 	const sl::String&
-	getSeeAlsoDescription()
-	{
+	getSeeAlsoDescription() {
 		return m_seeAlsoDescription;
 	}
 
 	const sl::String&
-	getInternalDescription()
-	{
+	getInternalDescription() {
 		return m_internalDescription;
 	}
 
 	bool
-	isDescriptionEmpty()
-	{
+	isDescriptionEmpty() {
 		return m_briefDescription.isEmpty() && m_detailedDescription.isEmpty();
 	}
 
@@ -155,8 +141,7 @@ public:
 
 //..............................................................................
 
-class Footnote: public Block
-{
+class Footnote: public Block {
 	friend class Parser;
 
 protected:
@@ -164,15 +149,13 @@ protected:
 
 public:
 	Footnote(Host* host):
-		Block(host)
-	{
+		Block(host) {
 		m_blockKind = BlockKind_Footnote;
 		m_parent = NULL;
 	}
 
 	Block*
-	getParent()
-	{
+	getParent() {
 		return m_parent;
 	}
 };
@@ -183,7 +166,7 @@ void
 appendXmlElementContents(
 	sl::String* string,
 	const sl::StringRef& contents
-	);
+);
 
 //..............................................................................
 

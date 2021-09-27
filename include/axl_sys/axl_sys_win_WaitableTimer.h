@@ -21,16 +21,14 @@ namespace win {
 
 //..............................................................................
 
-class WaitableTimer: public WaitableHandle
-{
+class WaitableTimer: public WaitableHandle {
 public:
 	bool
 	create(
 		SECURITY_ATTRIBUTES* secAttr = NULL,
 		bool isManualReset = false,
 		const sl::StringRef_w& name = NULL
-		)
-	{
+	) {
 		close();
 
 		m_h = ::CreateWaitableTimerW(secAttr, isManualReset, name);
@@ -42,8 +40,7 @@ public:
 		uint_t access = EVENT_ALL_ACCESS,
 		bool doInheritHandle = false,
 		const sl::StringRef_w& name = NULL
-		)
-	{
+	) {
 		close();
 
 		m_h = ::OpenWaitableTimerW(access, doInheritHandle, name);
@@ -57,8 +54,7 @@ public:
 		PTIMERAPCROUTINE completionRoutine = NULL,
 		void* completionContext = NULL,
 		bool resume = false
-		)
-	{
+	) {
 		bool_t result = ::SetWaitableTimer(m_h, (LARGE_INTEGER*) &dueTime, period, completionRoutine, completionContext, resume);
 		return err::complete(result);
 	}
@@ -70,15 +66,13 @@ public:
 		PTIMERAPCROUTINE completionRoutine = NULL,
 		void* completionContext = NULL,
 		bool resume = false
-		)
-	{
+	) {
 		uint64_t dueTime = (int64_t) -10000 * timeout;
 		return setTimer(dueTime, period, completionRoutine, completionContext, resume);
 	}
 
 	bool
-	cancel()
-	{
+	cancel() {
 		bool_t result = ::CancelWaitableTimer(m_h);
 		return err::complete(result);
 	}

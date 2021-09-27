@@ -351,15 +351,13 @@ typedef wchar_t           utf32_t;
 
 inline
 size_t
-strlen_s(const char* p)
-{
+strlen_s(const char* p) {
 	return p ? strlen(p) : 0;
 }
 
 inline
 size_t
-wcslen_s(const wchar_t* p)
-{
+wcslen_s(const wchar_t* p) {
 	return p ? wcslen(p) : 0;
 }
 
@@ -476,81 +474,68 @@ private: \
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class axl_va_list
-{
+class axl_va_list {
 protected:
 	va_list m_va;
 	bool m_isInitialized;
 
 public:
-	axl_va_list()
-	{
+	axl_va_list() {
 		m_isInitialized = false;
 	}
 
-	axl_va_list(const axl_va_list& src)
-	{
+	axl_va_list(const axl_va_list& src) {
 		m_isInitialized = false;
 		copy(src);
 	}
 
-	axl_va_list(va_list va)
-	{
+	axl_va_list(va_list va) {
 		m_isInitialized = false;
 		copy(va);
 	}
 
-	~axl_va_list()
-	{
+	~axl_va_list() {
 		end();
 	}
 
 	axl_va_list&
-	operator = (const axl_va_list& src)
-	{
+	operator = (const axl_va_list& src) {
 		copy(src);
 		return *this;
 	}
 
 	axl_va_list&
-	operator = (va_list va)
-	{
+	operator = (va_list va) {
 		copy(va);
 		return *this;
 	}
 
-	operator va_list& ()
-	{
+	operator va_list& () {
 		ASSERT(m_isInitialized);
 		return m_va;
 	}
 
 	va_list*
-	initialize()
-	{
+	initialize() {
 		m_isInitialized = true;
 		return &m_va;
 	}
 
 	void
-	end()
-	{
-		if (m_isInitialized)
-		{
+	end() {
+		if (m_isInitialized) {
 			va_end(m_va);
 			m_isInitialized = false;
 		}
 	}
 
 	void
-	copy(const axl_va_list& src)
-	{
+	copy(const axl_va_list& src) {
 		copy((va_list&) src.m_va);
 	}
 
 	void
-	copy(va_list va)
-	{
+	copy(va_list va) {
 		end();
 
 #ifdef va_copy
@@ -563,8 +548,7 @@ public:
 
 	template <typename T>
 	T
-	arg()
-	{
+	arg() {
 		ASSERT(m_isInitialized);
 		return va_arg(m_va, T);
 	}
@@ -600,7 +584,7 @@ void
 axl_trace_va(
 	const char* formatString,
 	axl_va_list va
-	);
+);
 #	else
 AXL_SELECT_ANY FILE* axl_g_traceFile = stdout;
 
@@ -609,8 +593,7 @@ void
 axl_trace_va(
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	vfprintf(axl_g_traceFile, formatString, va);
 	fflush(axl_g_traceFile);
 }
@@ -621,8 +604,7 @@ void
 axl_trace(
 	const char* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	axl_trace_va(formatString, va);
 }

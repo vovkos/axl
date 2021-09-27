@@ -19,16 +19,14 @@ namespace gui {
 //..............................................................................
 
 uint_t
-Palette::getColorRgb(uint_t color)
-{
+Palette::getColorRgb(uint_t color) {
 	if (!(color & ColorFlag_Index))
 		return color;
 
 	size_t i = color & ColorFlag_IndexMask;
 	color = i < m_count ? m_colorArray[i] : -1;
 
-	if (color & ColorFlag_Index) // allow two-staged index lookups
-	{
+	if (color & ColorFlag_Index) { // allow two-staged index lookups
 		i = color & ColorFlag_IndexMask;
 		color = i < m_count ? m_colorArray[i] : -1;
 	}

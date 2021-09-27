@@ -23,16 +23,14 @@ namespace sl {
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class Cmp
-{
+>
+class Cmp {
 public:
 	int
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a < b ? -1 : a > b ? 1 : 0;
 	}
 };
@@ -40,15 +38,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CmpBin
-{
+class CmpBin {
 public:
 	int
 	operator () (
 		const T& a,
 		const T& b
-		) const
-	{
+	) const {
 		return memcmp(&a, &b, sizeof(T));
 	}
 
@@ -56,8 +52,7 @@ public:
 	operator () (
 		const T* a,
 		const T* b
-		) const
-	{
+	) const {
 		return memcmp(a, b, sizeof(T));
 	}
 };
@@ -67,16 +62,14 @@ public:
 template <
 	typename T,
 	typename C
-	>
-class CmpPtr
-{
+>
+class CmpPtr {
 public:
 	int
 	operator () (
 		const T* a,
 		const T* b
-		) const
-	{
+	) const {
 		return C() (*a, *b);
 	}
 };
@@ -84,27 +77,23 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CmpSzBase
-{
+class CmpSzBase {
 };
 
 template <typename T>
-class CmpSzBase_i
-{
+class CmpSzBase_i {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpSzBase<char>
-{
+class CmpSzBase<char> {
 public:
 	int
 	operator () (
 		const char* p1,
 		const char* p2
-		) const
-	{
+	) const {
 		return p1 ? p2 ? strcmp(p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
@@ -112,15 +101,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpSzBase_i<char>
-{
+class CmpSzBase_i<char> {
 public:
 	int
 	operator () (
 		const char* p1,
 		const char* p2
-		) const
-	{
+	) const {
 		return p1 ? p2 ? _stricmp(p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
@@ -128,15 +115,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpSzBase<wchar_t>
-{
+class CmpSzBase<wchar_t> {
 public:
 	int
 	operator () (
 		const wchar_t* p1,
 		const wchar_t* p2
-		) const
-	{
+	) const {
 		return p1 ? p2 ? wcscmp(p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
@@ -144,15 +129,13 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <>
-class CmpSzBase_i<wchar_t>
-{
+class CmpSzBase_i<wchar_t> {
 public:
 	int
 	operator () (
 		const wchar_t* p1,
 		const wchar_t* p2
-		) const
-	{
+	) const {
 		return p1 ? p2 ? _wcsicmp(p1, p2) : 1 : p2 ? -1 : 0;
 	}
 };
@@ -169,16 +152,14 @@ typedef CmpSzBase_i<wchar_t> CmpSz_wi;
 template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
-	>
-class CmpDuckType
-{
+>
+class CmpDuckType {
 public:
 	int
 	operator () (
 		Arg a,
 		Arg b
-		) const
-	{
+	) const {
 		return a.cmp(b);
 	}
 
@@ -186,22 +167,19 @@ public:
 	operator () (
 		const T* a,
 		const T* b
-		) const
-	{
+	) const {
 		return a->cmp(*b);
 	}
 };
 
 template <typename T>
-class CmpDuckTypePtr
-{
+class CmpDuckTypePtr {
 public:
 	int
 	operator () (
 		const T& a,
 		const T& b
-		) const
-	{
+	) const {
 		return a.cmp(&b);
 	}
 
@@ -209,8 +187,7 @@ public:
 	operator () (
 		const T* a,
 		const T* b
-		) const
-	{
+	) const {
 		return a->cmp(b);
 	}
 };

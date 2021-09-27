@@ -20,30 +20,24 @@ namespace cry {
 
 //..............................................................................
 
-class FreeEcPoint
-{
+class FreeEcPoint {
 public:
 	void
-	operator () (EC_POINT* h)
-	{
+	operator () (EC_POINT* h) {
 		EC_POINT_free(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class EcPoint: public sl::Handle<EC_POINT*, FreeEcPoint>
-{
+class EcPoint: public sl::Handle<EC_POINT*, FreeEcPoint> {
 public:
-	EcPoint(EC_GROUP* group)
-	{
+	EcPoint(EC_GROUP* group) {
 		create(group);
 	}
 
 	EcPoint(EC_POINT* h):
-		sl::Handle<EC_POINT*, FreeEcPoint> (h)
-	{
-	}
+		sl::Handle<EC_POINT*, FreeEcPoint> (h) {}
 
 	bool
 	create(EC_GROUP* group);
@@ -52,11 +46,10 @@ public:
 	createCopy(
 		EC_POINT* src,
 		EC_GROUP* group
-		);
+	);
 
 	bool
-	copy(EC_POINT* src)
-	{
+	copy(EC_POINT* src) {
 		int result = EC_POINT_copy(m_h, src);
 		return completeWithLastCryptoError(result);
 	}
@@ -67,15 +60,14 @@ public:
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-		);
+	);
 
 	sl::Array<char>
 	getData(
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		sl::Array<char> data;
 		getData(&data, group, form, ctx);
 		return data;
@@ -87,8 +79,7 @@ public:
 		const void* p,
 		size_t size,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		int result = EC_POINT_oct2point(group, m_h, (const uchar_t*) p, size, ctx);
 		return completeWithLastCryptoError(result);
 	}
@@ -99,8 +90,7 @@ public:
 		BIGNUM* bigNum,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		BIGNUM* result = EC_POINT_point2bn(group, m_h, form, bigNum, ctx);
 		return completeWithLastCryptoError(result != NULL);
 	}
@@ -110,8 +100,7 @@ public:
 		EC_GROUP* group,
 		const BIGNUM* bigNum,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		EC_POINT* result = EC_POINT_bn2point(group, bigNum, m_h, ctx);
 		return completeWithLastCryptoError(result != NULL);
 	}
@@ -122,8 +111,7 @@ public:
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		BigNum bigNum;
 		return getBigNum(group, bigNum, form, ctx) && bigNum.getDecString(string);
 	}
@@ -133,8 +121,7 @@ public:
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		sl::String string;
 		getDecString(&string, group, form, ctx);
 		return string;
@@ -145,8 +132,7 @@ public:
 		EC_GROUP* group,
 		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		BigNum bigNum;
 		return bigNum.setDecString(string) && setBigNum(group, bigNum, ctx);
 	}
@@ -157,15 +143,14 @@ public:
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-		);
+	);
 
 	sl::String
 	getHexString(
 		EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		sl::String string;
 		getHexString(&string, group, form, ctx);
 		return string;
@@ -176,15 +161,13 @@ public:
 		EC_GROUP* group,
 		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		EC_POINT* result = EC_POINT_hex2point(group, string.sz(), m_h, ctx);
 		return completeWithLastCryptoError(result != NULL);
 	}
 
 	bool
-	isAtInfinity(EC_GROUP* group)
-	{
+	isAtInfinity(EC_GROUP* group) {
 		return EC_POINT_is_at_infinity(group, m_h) == 1;
 	}
 
@@ -192,8 +175,7 @@ public:
 	isOnCurve(
 		EC_GROUP* group,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		return EC_POINT_is_on_curve(group, m_h, ctx) == 1;
 	}
 
@@ -202,8 +184,7 @@ public:
 		EC_GROUP* group,
 		EC_POINT* op,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		return EC_POINT_cmp(group, m_h, op, ctx) == 1;
 	}
 
@@ -213,8 +194,7 @@ public:
 		EC_POINT* op1,
 		EC_POINT* op2,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		int result = EC_POINT_add(group, m_h, op1, op2, ctx);
 		return completeWithLastCryptoError(result);
 	}
@@ -226,8 +206,7 @@ public:
 		EC_POINT* op2,
 		BIGNUM* op3,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		int result = EC_POINT_mul(group, m_h, op1, op2, op3, ctx);
 		return completeWithLastCryptoError(result);
 	}
@@ -237,8 +216,7 @@ public:
 		EC_GROUP* group,
 		BIGNUM* op,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		int result = EC_POINT_mul(group, m_h, op, NULL, NULL, ctx);
 		return completeWithLastCryptoError(result);
 	}
@@ -248,8 +226,7 @@ public:
 		EC_GROUP* group,
 		EC_POINT* op,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		int result = EC_POINT_dbl(group, m_h, op, ctx);
 		return completeWithLastCryptoError(result);
 	}
@@ -258,8 +235,7 @@ public:
 	invert(
 		EC_GROUP* group,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		int result = EC_POINT_invert(group, m_h, ctx);
 		return completeWithLastCryptoError(result);
 	}
@@ -268,8 +244,7 @@ public:
 	makeAffine(
 		EC_GROUP* group,
 		BN_CTX* ctx = NULL
-		)
-	{
+	) {
 		int result = EC_POINT_make_affine(group, m_h, ctx);
 		return completeWithLastCryptoError(result);
 	}

@@ -21,12 +21,10 @@ namespace mem {
 //..............................................................................
 
 template <typename T>
-class StdDelete
-{
+class StdDelete {
 public:
 	void
-	operator () (T* p) const
-	{
+	operator () (T* p) const {
 		p->~T();
 		StdAllocator::free(p);
 	}
@@ -35,12 +33,10 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class CppDelete
-{
+class CppDelete {
 public:
 	void
-	operator () (T* p) const
-	{
+	operator () (T* p) const {
 		delete p;
 	}
 };
@@ -49,8 +45,7 @@ public:
 
 template <typename T>
 void
-stdDelete(T* p)
-{
+stdDelete(T* p) {
 	p->~T();
 	StdAllocator::free(p);
 }

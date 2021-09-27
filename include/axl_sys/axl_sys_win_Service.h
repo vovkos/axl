@@ -22,12 +22,10 @@ namespace win {
 
 //..............................................................................
 
-class CloseServiceHandle
-{
+class CloseServiceHandle {
 public:
 	void
-	operator () (SC_HANDLE h)
-	{
+	operator () (SC_HANDLE h) {
 		::CloseServiceHandle(h);
 	}
 };
@@ -38,28 +36,24 @@ typedef sl::Handle<SC_HANDLE, CloseServiceHandle> ServiceHandle;
 
 //..............................................................................
 
-class Service: public ServiceHandle
-{
+class Service: public ServiceHandle {
 public:
 	bool
 	start(
 		const wchar_t* argv[],
 		size_t argc
-		)
-	{
+	) {
 		bool_t result = ::StartServiceW(m_h, argc, argv);
 		return err::complete(result);
 	}
 
 	bool
-	start()
-	{
+	start() {
 		return start(NULL, 0);
 	}
 
 	bool
-	stop()
-	{
+	stop() {
 		SERVICE_STATUS serviceStatus;
 		return control(SERVICE_CONTROL_STOP, &serviceStatus);
 	}
@@ -68,34 +62,29 @@ public:
 	control(
 		dword_t code,
 		SERVICE_STATUS* serviceStatus
-		)
-	{
+	) {
 		bool_t result = ::ControlService(m_h, code, serviceStatus);
 		return err::complete(result);
 	}
 
 	bool
-	remove()
-	{
+	remove() {
 		bool_t result = ::DeleteService(m_h);
 		return err::complete(result);
 	}
 
 	bool
-	setServiceType(dword_t serviceType)
-	{
+	setServiceType(dword_t serviceType) {
 		return changeServiceConfig(serviceType, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE);
 	}
 
 	bool
-	setStartType(dword_t startType)
-	{
+	setStartType(dword_t startType) {
 		return changeServiceConfig(SERVICE_NO_CHANGE, startType, SERVICE_NO_CHANGE);
 	}
 
 	bool
-	setErrorControl(dword_t errorControl)
-	{
+	setErrorControl(dword_t errorControl) {
 		return changeServiceConfig(SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, errorControl);
 	}
 
@@ -103,8 +92,7 @@ public:
 	setDescription(const sl::StringRef_w& description);
 
 	bool
-	queryServiceStatus(SERVICE_STATUS* serviceStatus)
-	{
+	queryServiceStatus(SERVICE_STATUS* serviceStatus) {
 		bool_t result = ::QueryServiceStatus(m_h, serviceStatus);
 		return err::complete(result);
 	}
@@ -121,8 +109,7 @@ public:
 		const sl::StringRef_w& serviceStartName = NULL,
 		const sl::StringRef_w& password = NULL,
 		const sl::StringRef_w& displayName = NULL
-		)
-	{
+	) {
 		bool_t result = ::ChangeServiceConfigW(
 			m_h,
 			serviceType,
@@ -135,7 +122,7 @@ public:
 			serviceStartName.szn(),
 			password.szn(),
 			displayName.szn()
-			);
+		);
 
 		return err::complete(result);
 	}
@@ -144,8 +131,7 @@ public:
 	changeServiceConfig2(
 		dword_t infoLevel,
 		const void* info
-		)
-	{
+	) {
 		bool_t result = ::ChangeServiceConfig2W(m_h, infoLevel, (void*)info);
 		return err::complete(result);
 	}

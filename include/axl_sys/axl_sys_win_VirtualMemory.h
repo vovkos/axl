@@ -21,37 +21,31 @@ namespace win {
 
 //..............................................................................
 
-class VirtualMemory
-{
+class VirtualMemory {
 protected:
 	void* m_p;
 	size_t m_size;
 
 public:
-	VirtualMemory()
-	{
+	VirtualMemory() {
 		m_p = NULL;
 		m_size = 0;
 	}
 
-	~VirtualMemory()
-	{
+	~VirtualMemory() {
 		release();
 	}
 
-	operator void* () const
-	{
+	operator void* () const {
 		return m_p;
 	}
 
-	void* p() const
-	{
+	void* p() const {
 		return m_p;
 	}
 
 	size_t
-	getSize() const
-	{
+	getSize() const {
 		return m_size;
 	}
 
@@ -61,15 +55,14 @@ public:
 		size_t size,
 		uint_t allocationFlags = MEM_RESERVE | MEM_COMMIT,
 		uint_t protection = PAGE_READWRITE
-		);
+	);
 
 	void*
 	alloc(
 		size_t size,
 		uint_t allocationFlags = MEM_RESERVE | MEM_COMMIT,
 		uint_t protectionFlags = PAGE_READWRITE
-		)
-	{
+	) {
 		return alloc(NULL, size, allocationFlags, protectionFlags);
 	}
 
@@ -79,15 +72,13 @@ public:
 		void* p,
 		size_t size,
 		uint_t protectionFlags = PAGE_READWRITE
-		)
-	{
+	) {
 		void* result = ::VirtualAlloc(p, size, MEM_COMMIT, protectionFlags);
 		return err::complete(result != NULL);
 	}
 
 	bool
-	commit(uint_t protectionFlags = PAGE_READWRITE)
-	{
+	commit(uint_t protectionFlags = PAGE_READWRITE) {
 		return commit(m_p, m_size, protectionFlags);
 	}
 
@@ -96,15 +87,13 @@ public:
 	decommit(
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		bool_t result = ::VirtualFree(p, size, MEM_DECOMMIT);
 		return err::complete(result);
 	}
 
 	bool
-	decommit()
-	{
+	decommit() {
 		return decommit(m_p, m_size);
 	}
 
@@ -115,22 +104,20 @@ public:
 	protect(
 		uint_t protectionFlags,
 		uint_t* prevProtectionFlags = NULL
-		);
+	);
 
 	static
 	bool
 	lock(
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		bool_t result = ::VirtualLock(p, size);
 		return err::complete(result);
 	}
 
 	bool
-	lock()
-	{
+	lock() {
 		return lock(m_p, m_size);
 	}
 
@@ -139,15 +126,13 @@ public:
 	unlock(
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		bool_t result = ::VirtualUnlock(p, size);
 		return err::complete(result);
 	}
 
 	bool
-	unlock()
-	{
+	unlock() {
 		return unlock(m_p, m_size);
 	}
 
@@ -156,15 +141,13 @@ public:
 	query(
 		void* p,
 		MEMORY_BASIC_INFORMATION* information
-		)
-	{
+	) {
 		size_t result = ::VirtualQuery(p, information, sizeof(MEMORY_BASIC_INFORMATION));
 		return err::complete(result != 0);
 	}
 
 	bool
-	query(MEMORY_BASIC_INFORMATION* information)
-	{
+	query(MEMORY_BASIC_INFORMATION* information) {
 		return query(m_p, information);
 	}
 };

@@ -21,8 +21,7 @@ namespace win {
 
 //.............................................................................
 
-class File: public sl::Handle<HANDLE, sys::win::CloseHandle, sl::MinusOne<HANDLE> >
-{
+class File: public sl::Handle<HANDLE, sys::win::CloseHandle, sl::MinusOne<HANDLE> > {
 public:
 	bool
 	create(
@@ -32,7 +31,7 @@ public:
 		SECURITY_ATTRIBUTES* secAttr,
 		uint_t creationDisposition,
 		uint_t flagsAttributes = 0
-		);
+	);
 
 	bool
 	duplicate(
@@ -42,11 +41,10 @@ public:
 		dword_t accessMode,
 		bool isInheritable,
 		dword_t options
-		);
+	);
 
 	dword_t
-	getType() const
-	{
+	getType() const {
 		return ::GetFileType(m_h);
 	}
 
@@ -63,8 +61,7 @@ public:
 	setPosition(uint64_t offset) const;
 
 	bool
-	flush()
-	{
+	flush() {
 		bool_t result = ::FlushFileBuffers(m_h);
 		return err::complete(result);
 	}
@@ -74,8 +71,7 @@ public:
 		void* p,
 		dword_t size,
 		dword_t* actualSize
-		) const
-	{
+	) const {
 		bool_t result = ::ReadFile(m_h, p, size, actualSize, NULL);
 		return err::complete(result);
 	}
@@ -85,8 +81,7 @@ public:
 		const void* p,
 		dword_t size,
 		dword_t* actualSize
-		)
-	{
+	) {
 		bool_t result = ::WriteFile(m_h, p, size, actualSize, NULL);
 		return err::complete(result);
 	}
@@ -99,8 +94,7 @@ public:
 		void* outData,
 		dword_t outDataSize,
 		dword_t* actualSize
-		)
-	{
+	) {
 		bool_t result = ::DeviceIoControl(m_h, code, (void*)inData, inDataSize, outData, outDataSize, actualSize, NULL);
 		return err::complete(result);
 	}
@@ -110,8 +104,7 @@ public:
 		void* p,
 		dword_t size,
 		OVERLAPPED* overlapped
-		) const
-	{
+	) const {
 		bool_t result = ::ReadFile(m_h, p, size, NULL, overlapped);
 		return completeOverlappedRequest(result);
 	}
@@ -121,8 +114,7 @@ public:
 		const void* p,
 		dword_t size,
 		OVERLAPPED* overlapped
-		)
-	{
+	) {
 		bool_t result = ::WriteFile(m_h, p, size, NULL, overlapped);
 		return completeOverlappedRequest(result);
 	}
@@ -135,8 +127,7 @@ public:
 		void* outData,
 		dword_t outDataSize,
 		OVERLAPPED* overlapped
-		)
-	{
+	) {
 		bool_t result = ::DeviceIoControl(m_h, code, (void*)inData, inDataSize, outData, outDataSize, NULL, overlapped);
 		return completeOverlappedRequest(result);
 	}
@@ -147,8 +138,7 @@ public:
 		dword_t size,
 		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
-		) const
-	{
+	) const {
 		bool_t result = ::ReadFileEx(m_h, p, size, overlapped, completionFunc);
 		return err::complete(result);
 	}
@@ -159,8 +149,7 @@ public:
 		dword_t size,
 		OVERLAPPED* overlapped,
 		LPOVERLAPPED_COMPLETION_ROUTINE completionFunc
-		)
-	{
+	) {
 		bool_t result = ::WriteFileEx(m_h, p, size, overlapped, completionFunc);
 		return err::complete(result);
 	}
@@ -169,39 +158,39 @@ public:
 	read(
 		void* p,
 		size_t size
-		) const;
+	) const;
 
 	size_t
 	write(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	overlappedRead(
 		void* p,
 		size_t size
-		) const;
+	) const;
 
 	size_t
 	overlappedWrite(
 		const void* p,
 		size_t size
-		);
+	);
 
 	bool
 	overlappedRead(
 		void* p,
 		dword_t size,
 		dword_t* actualSize
-		) const;
+	) const;
 
 	bool
 	overlappedWrite(
 		const void* p,
 		dword_t size,
 		dword_t* actualSize
-		);
+	);
 
 	bool
 	overlappedIoctl(
@@ -211,7 +200,7 @@ public:
 		void* outData,
 		dword_t outDataSize,
 		dword_t* actualSize
-		);
+	);
 
 	static
 	bool
@@ -221,14 +210,13 @@ public:
 	getOverlappedResult(
 		OVERLAPPED* overlapped,
 		dword_t* actualSize
-		) const;
+	) const;
 
 	size_t
 	getOverlappedResult(OVERLAPPED* overlapped) const;
 
 	bool
-	cancelIo(OVERLAPPED* overlapped)
-	{
+	cancelIo(OVERLAPPED* overlapped) {
 		bool_t result = ::CancelIo(m_h);
 		return err::complete(result);
 	}
@@ -236,14 +224,12 @@ public:
 
 //..............................................................................
 
-class StdOverlapped: public OVERLAPPED
-{
+class StdOverlapped: public OVERLAPPED {
 public:
 	sys::NotificationEvent m_completionEvent;
 
 public:
-	StdOverlapped()
-	{
+	StdOverlapped() {
 		memset(this, 0, sizeof(OVERLAPPED));
 		hEvent = m_completionEvent.m_event;
 	}

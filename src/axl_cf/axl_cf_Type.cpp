@@ -19,8 +19,7 @@ namespace cf {
 //..............................................................................
 
 sl::String
-getStringFromCfString(CFStringRef cfString)
-{
+getStringFromCfString(CFStringRef cfString) {
 	size_t length = ::CFStringGetLength(cfString);
 	if (!length)
 		return sl::String();
@@ -36,7 +35,7 @@ getStringFromCfString(CFStringRef cfString)
 		NULL,
 		0,
 		&bufferLength
-		);
+	);
 
 	if (!bufferLength)
 		return sl::String();
@@ -53,14 +52,13 @@ getStringFromCfString(CFStringRef cfString)
 			(UInt8*)p,
 			bufferLength,
 			&bufferLength
-			);
+		);
 
 	return string;
 }
 
 sl::String
-getTypeIdDescription(CFTypeID typeId)
-{
+getTypeIdDescription(CFTypeID typeId) {
 	CFStringRef cfString = ::CFCopyTypeIDDescription(typeId);
 	return String(cfString, true).getString();
 }
@@ -69,45 +67,32 @@ sl::String
 cfTypeToString(
 	CFTypeRef cfType,
 	bool isVerbose
-	)
-{
+) {
 	CFTypeID typeId = ::CFGetTypeID(cfType);
-	if (typeId == getStringTypeId())
-	{
+	if (typeId == getStringTypeId()) {
 		CFStringRef cfString = (CFStringRef)cfType;
 		return getStringFromCfString(cfString);
-	}
-	else if (typeId == getBooleanTypeId())
-	{
+	} else if (typeId == getBooleanTypeId()) {
 		CFBooleanRef cfBoolean = (CFBooleanRef)cfType;
 		bool b = ::CFBooleanGetValue(cfBoolean);
 		return b ? "true" : "false";
-	}
-	else if (typeId == getNumberTypeId())
-	{
+	} else if (typeId == getNumberTypeId()) {
 		CFNumberRef cfNumber = (CFNumberRef)cfType;
 		bool isFloat = ::CFNumberIsFloatType(cfNumber);
-		if (isFloat)
-		{
+		if (isFloat) {
 			double x = 0;
 			::CFNumberGetValue(cfNumber, kCFNumberDoubleType, &x);
 			return sl::formatString("%f", x);
-		}
-		else
-		{
+		} else {
 			long long x = 0;
 			::CFNumberGetValue(cfNumber, kCFNumberLongLongType, &x);
 			return sl::formatString("%lld", x);
 		}
 
-	}
-	else if (isVerbose)
-	{
+	} else if (isVerbose) {
 		CFStringRef cfString = ::CFCopyDescription(cfType);
 		return String(cfString, true).getString();
-	}
-	else
-	{
+	} else {
 		return getTypeIdDescription(typeId);
 	}
 }

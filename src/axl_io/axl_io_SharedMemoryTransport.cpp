@@ -22,8 +22,7 @@ namespace io {
 
 //..............................................................................
 
-SharedMemoryTransportBase::SharedMemoryTransportBase()
-{
+SharedMemoryTransportBase::SharedMemoryTransportBase() {
 	m_flags = 0;
 	m_hdr = NULL;
 	m_data = NULL;
@@ -35,8 +34,7 @@ SharedMemoryTransportBase::open(
 	const sl::StringRef& readSemaphoreName,
 	const sl::StringRef& writeSemaphoreName,
 	uint_t flags
-	)
-{
+) {
 	io::File file;
 	bool result = file.open(fileName, flags | io::FileFlag_ShareWrite);
 	if (!result)
@@ -47,7 +45,7 @@ SharedMemoryTransportBase::open(
 		readSemaphoreName,
 		writeSemaphoreName,
 		flags
-		);
+	);
 }
 
 bool
@@ -56,19 +54,16 @@ SharedMemoryTransportBase::attach(
 	const sl::StringRef& readSemaphoreName,
 	const sl::StringRef& writeSemaphoreName,
 	uint_t flags
-	)
-{
+) {
 	bool result;
 
 	close();
 
 	m_file.m_file.attach(fileHandle);
 
-	if (!(flags & FileFlag_OpenExisting))
-	{
+	if (!(flags & FileFlag_OpenExisting)) {
 		result = initializeMapping(SharedMemoryTransportConst_DefMappingSize, true);
-		if (!result)
-		{
+		if (!result) {
 			closeImpl();
 			return false;
 		}
@@ -87,18 +82,14 @@ SharedMemoryTransportBase::attach(
 		result =
 			m_readSemaphore.create(readSemaphoreName) &&
 			m_writeSemaphore.create(writeSemaphoreName);
-	}
-	else
-	{
+	} else {
 		result = initializeMapping(sizeof(SharedMemoryTransportHdr), false);
-		if (!result)
-		{
+		if (!result) {
 			closeImpl();
 			return false;
 		}
 
-		if (m_hdr->m_signature != SharedMemoryTransportConst_FileSignature)
-		{
+		if (m_hdr->m_signature != SharedMemoryTransportConst_FileSignature) {
 			err::setError(err::SystemErrorCode_InvalidParameter);
 			closeImpl();
 			return false;
@@ -108,8 +99,7 @@ SharedMemoryTransportBase::attach(
 
 		if (!(m_hdr->m_state & SharedMemoryTransportState_MasterConnected) ||
 			(m_hdr->m_state & SharedMemoryTransportState_SlaveConnected) ||
-			m_hdr->m_readOffset != 0)
-		{
+			m_hdr->m_readOffset != 0) {
 			sys::atomicUnlock(&m_hdr->m_lock);
 			err::setError(err::SystemErrorCode_InvalidDeviceState);
 			closeImpl();
@@ -125,8 +115,7 @@ SharedMemoryTransportBase::attach(
 			m_writeSemaphore.open(writeSemaphoreName);
 	}
 
-	if (!result)
-	{
+	if (!result) {
 		closeImpl();
 		return false;
 	}
@@ -136,8 +125,7 @@ SharedMemoryTransportBase::attach(
 }
 
 void
-SharedMemoryTransportBase::close()
-{
+SharedMemoryTransportBase::close() {
 	if (!isOpen())
 		return;
 
@@ -146,8 +134,7 @@ SharedMemoryTransportBase::close()
 }
 
 void
-SharedMemoryTransportBase::closeImpl()
-{
+SharedMemoryTransportBase::closeImpl() {
 	m_file.close();
 	m_readSemaphore.close();
 	m_writeSemaphore.close();
@@ -156,20 +143,17 @@ SharedMemoryTransportBase::closeImpl()
 }
 
 void
-SharedMemoryTransportBase::disconnect()
-{
+SharedMemoryTransportBase::disconnect() {
 	sys::atomicLock(&m_hdr->m_lock);
 
 	m_hdr->m_state |= SharedMemoryTransportState_Disconnected;
 
-	if (m_hdr->m_readSemaphoreWaitCount)
-	{
+	if (m_hdr->m_readSemaphoreWaitCount) {
 		m_readSemaphore.signal(m_hdr->m_readSemaphoreWaitCount);
 		m_hdr->m_readSemaphoreWaitCount = 0;
 	}
 
-	if (m_hdr->m_writeSemaphoreWaitCount)
-	{
+	if (m_hdr->m_writeSemaphoreWaitCount) {
 		m_writeSemaphore.signal(m_hdr->m_writeSemaphoreWaitCount);
 		m_hdr->m_writeSemaphoreWaitCount = 0;
 	}
@@ -182,24 +166,19 @@ bool
 SharedMemoryTransportBase::initializeMapping(
 	size_t size,
 	bool isForced
-	)
-{
+) {
 	const g::SystemInfo* systemInfo = g::getModule()->getSystemInfo();
 	size_t remSize = size % systemInfo->m_pageSize;
 	if (remSize)
 		size = size - remSize + systemInfo->m_pageSize;
 
-	if (isForced)
-	{
+	if (isForced) {
 		bool result = m_file.setSize(size);
 		if (!result)
 			return false;
-	}
-	else
-	{
+	} else {
 		uint64_t fileSize = m_file.getSize();
-		if (fileSize < size)
-		{
+		if (fileSize < size) {
 			err::setError(err::SystemErrorCode_InvalidParameter);
 			return false;
 		}
@@ -216,8 +195,7 @@ SharedMemoryTransportBase::initializeMapping(
 #endif
 
 bool
-SharedMemoryTransportBase::ensureMappingSize(size_t size)
-{
+SharedMemoryTransportBase::ensureMappingSize(size_t size) {
 	if (size <= m_mapping.getSize())
 		return true;
 
@@ -226,12 +204,9 @@ SharedMemoryTransportBase::ensureMappingSize(size_t size)
 
 #if (_AXL_OS_POSIX)
 	sys::atomicLock(&m_hdr->m_lock);
-	if (size <= m_file.getSize())
-	{
+	if (size <= m_file.getSize()) {
 		sys::atomicUnlock(&m_hdr->m_lock);
-	}
-	else
-	{
+	} else {
 		bool result = m_file.setSize(size);
 		sys::atomicUnlock(&m_hdr->m_lock);
 		if (!result)
@@ -251,20 +226,17 @@ SharedMemoryTransportBase::ensureMappingSize(size_t size)
 //..............................................................................
 
 size_t
-SharedMemoryReader::read(sl::Array<char>* buffer)
-{
+SharedMemoryReader::read(sl::Array<char>* buffer) {
 	ASSERT(isOpen());
 
 	sys::atomicLock(&m_hdr->m_lock);
 
 	// wait until we have any data or remote disconnects
 
-	if (!m_hdr->m_dataSize)
-	{
+	if (!m_hdr->m_dataSize) {
 		while (
 			!m_hdr->m_dataSize &&
-			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected))
-		{
+			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected)) {
 			m_hdr->m_writeSemaphoreWaitCount++;
 			sys::atomicUnlock(&m_hdr->m_lock);
 
@@ -273,8 +245,7 @@ SharedMemoryReader::read(sl::Array<char>* buffer)
 			sys::atomicLock(&m_hdr->m_lock);
 		}
 
-		if (!m_hdr->m_dataSize)
-		{
+		if (!m_hdr->m_dataSize) {
 			ASSERT(m_hdr->m_state & SharedMemoryTransportState_Disconnected);
 
 			sys::atomicUnlock(&m_hdr->m_lock);
@@ -296,8 +267,7 @@ SharedMemoryReader::read(sl::Array<char>* buffer)
 
 	size_t readSize = 0;
 
-	if (m_flags & SharedMemoryTransportFlag_Message)
-	{
+	if (m_flags & SharedMemoryTransportFlag_Message) {
 		SharedMemoryTransportMessageHdr* msgHdr = (SharedMemoryTransportMessageHdr*)(m_data + readOffset);
 		readSize = msgHdr->m_size;
 		size_t readEndOffset = readOffset + sizeof(SharedMemoryTransportMessageHdr) + msgHdr->m_size;
@@ -307,8 +277,7 @@ SharedMemoryReader::read(sl::Array<char>* buffer)
 		readEndOffset = sl::align<AXL_PTR_SIZE> (readEndOffset);
 #endif
 
-		if (msgHdr->m_signature != SharedMemoryTransportConst_MessageSignature || readEndOffset > endOffset)
-		{
+		if (msgHdr->m_signature != SharedMemoryTransportConst_MessageSignature || readEndOffset > endOffset) {
 			err::setError(err::SystemErrorCode_InvalidParameter);
 			return -1;
 		}
@@ -320,16 +289,11 @@ SharedMemoryReader::read(sl::Array<char>* buffer)
 
 		m_hdr->m_readOffset = m_hdr->m_endOffset != m_hdr->m_writeOffset && readEndOffset >= m_hdr->m_endOffset ?
 			0 : readEndOffset; // wrap : no wrap
-	}
-	else
-	{
-		if (readOffset < writeOffset)
-		{
+	} else {
+		if (readOffset < writeOffset) {
 			readSize = writeOffset - readOffset;
 			buffer->copy(m_data + readOffset, readSize);
-		}
-		else
-		{
+		} else {
 			size_t size1 = endOffset - readOffset;
 			size_t size2 = writeOffset;
 			readSize = size1 + size2;
@@ -349,8 +313,7 @@ SharedMemoryReader::read(sl::Array<char>* buffer)
 
 	m_hdr->m_dataSize -= readSize;
 
-	if (m_hdr->m_readSemaphoreWaitCount)
-	{
+	if (m_hdr->m_readSemaphoreWaitCount) {
 		m_readSemaphore.signal(m_hdr->m_readSemaphoreWaitCount);
 		m_hdr->m_readSemaphoreWaitCount = 0;
 	}
@@ -369,8 +332,7 @@ SharedMemoryWriter::open(
 	const sl::StringRef& writeEventName,
 	uint_t flags,
 	size_t sizeLimitHint
-	)
-{
+) {
 	bool result = SharedMemoryTransportBase::open(fileName, readEventName, writeEventName, flags);
 	if (!result)
 		return false;
@@ -386,8 +348,7 @@ SharedMemoryWriter::attach(
 	const sl::StringRef& writeEventName,
 	uint_t flags,
 	size_t sizeLimitHint
-	)
-{
+) {
 	bool result = SharedMemoryTransportBase::attach(fileHandle, readEventName, writeEventName, flags);
 	if (!result)
 		return false;
@@ -401,8 +362,7 @@ SharedMemoryWriter::write(
 	const void* const* blockArray,
 	const size_t* sizeArray,
 	size_t count
-	)
-{
+) {
 	ASSERT(isOpen());
 
 	bool result;
@@ -416,8 +376,7 @@ SharedMemoryWriter::write(
 
 	size_t writeSize = chainSize;
 
-	if (m_flags & SharedMemoryTransportFlag_Message)
-	{
+	if (m_flags & SharedMemoryTransportFlag_Message) {
 		writeSize += sizeof(SharedMemoryTransportMessageHdr);
 #if (_AXL_IO_SHMT_ALIGN_MESSAGES)
 		writeSize = sl::align<AXL_PTR_SIZE> (writeSize);
@@ -432,14 +391,12 @@ SharedMemoryWriter::write(
 
 	if (m_hdr->m_dataSize &&
 		m_hdr->m_writeOffset <= m_hdr->m_readOffset &&
-		m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset)
-	{
+		m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset) {
 		while (
 			m_hdr->m_dataSize &&
 			m_hdr->m_writeOffset <= m_hdr->m_readOffset &&
 			m_hdr->m_writeOffset + writeSize > m_hdr->m_readOffset &&
-			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected))
-		{
+			!(m_hdr->m_state & SharedMemoryTransportState_Disconnected)) {
 			m_hdr->m_readSemaphoreWaitCount++;
 			sys::atomicUnlock(&m_hdr->m_lock);
 
@@ -448,8 +405,7 @@ SharedMemoryWriter::write(
 			sys::atomicLock(&m_hdr->m_lock);
 		}
 
-		if (m_hdr->m_state & SharedMemoryTransportState_Disconnected)
-		{
+		if (m_hdr->m_state & SharedMemoryTransportState_Disconnected) {
 			sys::atomicUnlock(&m_hdr->m_lock);
 			err::setError(err::SystemErrorCode_InvalidDeviceState);
 			return -1;
@@ -466,8 +422,7 @@ SharedMemoryWriter::write(
 	if (!result)
 		return -1;
 
-	if (m_flags & SharedMemoryTransportFlag_Message)
-	{
+	if (m_flags & SharedMemoryTransportFlag_Message) {
 #if (_AXL_IO_SHMT_ALIGN_MESSAGES)
 		ASSERT(sl::isAligned<AXL_PTR_SIZE> (writeOffset));
 #endif
@@ -476,28 +431,22 @@ SharedMemoryWriter::write(
 		msgHdr->m_signature = SharedMemoryTransportConst_MessageSignature;
 		msgHdr->m_size = chainSize;
 		copyWriteChain(msgHdr + 1, blockArray, sizeArray, count);
-	}
-	else
-	{
+	} else {
 		copyWriteChain(m_data + writeOffset, blockArray, sizeArray, count);
 	}
 
 	sys::atomicLock(&m_hdr->m_lock);
 
-	if (m_hdr->m_writeOffset <= m_hdr->m_readOffset && m_hdr->m_dataSize) // wrapped
-	{
+	if (m_hdr->m_writeOffset <= m_hdr->m_readOffset && m_hdr->m_dataSize) { // wrapped
 		m_hdr->m_writeOffset = writeEndOffset;
-	}
-	else
-	{
+	} else {
 		m_hdr->m_writeOffset = writeEndOffset > m_sizeLimitHint ? 0 : writeEndOffset;
 		m_hdr->m_endOffset = writeEndOffset;
 	}
 
 	m_hdr->m_dataSize += chainSize;
 
-	if (m_hdr->m_writeSemaphoreWaitCount)
-	{
+	if (m_hdr->m_writeSemaphoreWaitCount) {
 		m_writeSemaphore.signal(m_hdr->m_writeSemaphoreWaitCount);
 		m_hdr->m_writeSemaphoreWaitCount = 0;
 	}
@@ -513,12 +462,10 @@ SharedMemoryWriter::copyWriteChain(
 	const void* const* blockArray,
 	const size_t* sizeArray,
 	size_t count
-	)
-{
+) {
 	char* dst = (char*)_pDst;
 
-	for (size_t i = 0; i < count; i++)
-	{
+	for (size_t i = 0; i < count; i++) {
 		const void* src = blockArray[i];
 		size_t size = sizeArray[i];
 

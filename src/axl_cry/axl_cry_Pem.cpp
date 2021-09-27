@@ -26,8 +26,7 @@ encodePem(
 	const sl::StringRef& header,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	cry::Bio bio;
 	bio.createMem();
 
@@ -45,8 +44,7 @@ decodePem(
 	sl::String* header,
 	sl::Array<char>* buffer,
 	const sl::StringRef& pem
-	)
-{
+) {
 	cry::Bio bio;
 	bio.createMemBuf(pem.cp(), pem.getLength());
 
@@ -78,8 +76,7 @@ decodePem(
 	sl::String* header,
 	sl::Array<char>* buffer,
 	const sl::StringRef& pem
-	)
-{
+) {
 	sl::String name;
 	bool result = decodePem(&name, header, buffer, pem);
 	if (!result)

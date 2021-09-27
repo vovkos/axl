@@ -24,12 +24,10 @@ bool
 Cond::wait(
 	pthread_mutex_t* mutex,
 	uint_t timeout
-	)
-{
+) {
 	int result;
 
-	switch (timeout)
-	{
+	switch (timeout) {
 	case -1:
 		result = ::pthread_cond_wait(&m_cond, mutex);
 		break;

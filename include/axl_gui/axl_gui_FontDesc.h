@@ -20,8 +20,7 @@ namespace gui {
 
 //..............................................................................
 
-enum FontFlag
-{
+enum FontFlag {
 	FontFlag_Undefined = 0x10,
 	FontFlag_Bold      = 0x01,
 	FontFlag_Italic    = 0x02,
@@ -33,8 +32,7 @@ enum FontFlag
 
 inline
 FontFlag
-getFirstFontFlag(uint_t flags)
-{
+getFirstFontFlag(uint_t flags) {
 	return (FontFlag)(1 << sl::getLoBitIdx(flags));
 }
 
@@ -43,8 +41,7 @@ getFontFlagString(FontFlag flag);
 
 inline
 const char*
-getFontFlagString(uint_t flags)
-{
+getFontFlagString(uint_t flags) {
 	return getFontFlagString(getFirstFontFlag(flags));
 }
 
@@ -53,21 +50,18 @@ uint_t
 overlayFontFlags(
 	uint_t baseFontFlags,
 	uint_t overlayFontFlags
-	)
-{
+) {
 	return (overlayFontFlags & FontFlag_Undefined) ? baseFontFlags : overlayFontFlags;
 }
 
 //..............................................................................
 
-struct FontDesc
-{
+struct FontDesc {
 	char m_family[32];
 	size_t m_pointSize;
 	uint_t m_flags;
 
-	FontDesc()
-	{
+	FontDesc() {
 		memset(this, 0, sizeof(FontDesc));
 	}
 
@@ -75,8 +69,7 @@ struct FontDesc
 		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
-		)
-	{
+	) {
 		setup(family, pointSize, flags);
 	}
 
@@ -85,7 +78,7 @@ struct FontDesc
 		const sl::StringRef& family,
 		size_t pointSize = 0,
 		uint_t flags = 0
-		);
+	);
 };
 
 //..............................................................................

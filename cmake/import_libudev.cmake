@@ -14,7 +14,7 @@ unset(_DIR)
 find_path(
 	_DIR
 	NAMES libudev.h
-	)
+)
 
 if(_DIR)
 	set(LIBUDEV_FOUND TRUE)

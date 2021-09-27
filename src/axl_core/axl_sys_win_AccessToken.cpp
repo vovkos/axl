@@ -21,8 +21,7 @@ namespace win {
 bool AccessToken::openProcessToken(
 	handle_t process,
 	dword_t access
-	)
-{
+) {
 	close();
 
 	bool_t result = ::OpenProcessToken(process, access, &m_h);
@@ -34,8 +33,7 @@ AccessToken::openThreadToken(
 	handle_t thread,
 	dword_t access,
 	bool openAsSelf
-	)
-{
+) {
 	close();
 
 	bool_t result = ::OpenThreadToken(thread, access, openAsSelf, &m_h);
@@ -46,8 +44,7 @@ bool
 AccessToken::getTokenInformation(
 	TOKEN_INFORMATION_CLASS infoClass,
 	sl::Array<char>* buffer
-	)
-{
+) {
 	dword_t size = 0;
 	bool_t result = ::GetTokenInformation(m_h, infoClass, NULL, 0, &size);
 	if (size == 0)
@@ -59,8 +56,7 @@ AccessToken::getTokenInformation(
 }
 
 bool
-AccessToken::isMemberOf(PSID group)
-{
+AccessToken::isMemberOf(PSID group) {
 	sl::Array<char> buffer;
 	bool result = getTokenInformation(TokenGroups, &buffer);
 	if (!result)

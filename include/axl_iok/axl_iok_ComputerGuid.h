@@ -30,8 +30,7 @@ getComputerGuid(sl::Array<char>* guid);
 
 inline
 sl::Array<char>
-getComputerGuid()
-{
+getComputerGuid() {
 	sl::Array<char> guid;
 	getComputerGuid(&guid);
 	return guid;

@@ -21,8 +21,7 @@ namespace cry {
 
 //..............................................................................
 
-struct AppStoreIap: sl::ListLink
-{
+struct AppStoreIap: sl::ListLink {
 	size_t m_quantity;
 	uint_t m_webOrderLineItemId;
 
@@ -44,8 +43,7 @@ struct AppStoreIap: sl::ListLink
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct AppStoreReceipt
-{
+struct AppStoreReceipt {
 	sl::String m_bundleId;
 	sl::String m_appVersion;
 	sl::String m_originalAppVersion;
@@ -69,11 +67,9 @@ struct AppStoreReceipt
 
 //..............................................................................
 
-class AppStoreReceiptPayloadParser
-{
+class AppStoreReceiptPayloadParser {
 protected:
-	enum State
-	{
+	enum State {
 		State_Idle = 0,
 		State_Set,
 		State_Attribute,
@@ -82,8 +78,7 @@ protected:
 		State_AttributeIntegerValue,
 	};
 
-	enum AttributeId
-	{
+	enum AttributeId {
 		AttributeId_Undefined             = 0,
 		AttributeId_BundleId              = 2,
 		AttributeId_AppVersion            = 3,
@@ -120,7 +115,7 @@ public:
 		AppStoreReceipt* receipt,
 		const void* p,
 		size_t size
-		);
+	);
 
 protected:
 	const char*
@@ -130,13 +125,12 @@ protected:
 		const char* unexpectedTagError,
 		const char* p,
 		size_t size
-		);
+	);
 };
 
 //..............................................................................
 
-enum VerifyAppStoreReceiptFlag
-{
+enum VerifyAppStoreReceiptFlag {
 	VerifyAppStoreReceiptFlag_SkipSignatureCheck = 0x01,
 	VerifyAppStoreReceiptFlag_SkipHashCheck      = 0x02,
 };
@@ -151,7 +145,7 @@ verifyAppStoreReceipt(
 	const void* computerGuid,
 	size_t computerGuidSize,
 	uint_t flags = 0
-	);
+);
 
 bool
 verifyAppStoreReceipt(
@@ -159,7 +153,7 @@ verifyAppStoreReceipt(
 	const void* p,
 	size_t size,
 	uint_t flags = 0
-	);
+);
 
 //..............................................................................
 

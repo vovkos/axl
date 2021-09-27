@@ -20,11 +20,9 @@ void
 lua_len_impl(
 	lua_State* state,
 	int index
-	)
-{
+) {
 	int type = lua_type(state, index);
-	switch (type)
-	{
+	switch (type) {
 	case LUA_TSTRING:
 		lua_pushinteger(state, lua_objlen(state, index));
 		break;
@@ -53,13 +51,11 @@ namespace lua {
 //..............................................................................
 
 bool
-LuaState::create()
-{
+LuaState::create() {
 	close();
 
 	m_h = luaL_newstate();
-	if (!m_h)
-	{
+	if (!m_h) {
 		err::setError(err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
@@ -68,8 +64,7 @@ LuaState::create()
 }
 
 bool
-LuaState::complete(int result)
-{
+LuaState::complete(int result) {
 	ASSERT(isOpen());
 
 	if (result == LUA_OK)
@@ -83,8 +78,7 @@ bool
 LuaState::load(
 	const sl::StringRef& name,
 	const sl::StringRef& source
-	)
-{
+) {
 	ASSERT(isOpen());
 
 	int result = luaL_loadbuffer(m_h, source.cp(), source.getLength(), name.sz());
@@ -92,8 +86,7 @@ LuaState::load(
 }
 
 bool
-LuaState::loadFile(const sl::StringRef& fileName)
-{
+LuaState::loadFile(const sl::StringRef& fileName) {
 	ASSERT(isOpen());
 
 	int result = luaL_loadfile(m_h, fileName.cp());
@@ -101,8 +94,7 @@ LuaState::loadFile(const sl::StringRef& fileName)
 }
 
 bool
-LuaState::doFile(const sl::StringRef& fileName)
-{
+LuaState::doFile(const sl::StringRef& fileName) {
 	ASSERT(isOpen());
 
 	int result = luaL_dofile(m_h, fileName.cp());
@@ -111,17 +103,14 @@ LuaState::doFile(const sl::StringRef& fileName)
 
 #ifdef _AXL_DEBUG
 void
-LuaState::trace()
-{
+LuaState::trace() {
 	int top = getTop();
 
-	for (int i = 1; i <= top; i++)
-	{
+	for (int i = 1; i <= top; i++) {
 		int type = getType(i);
 		const void* p = lua_topointer(m_h, i);
 
-		switch (type)
-		{
+		switch (type) {
 		case LUA_TSTRING:
 			TRACE("%08x %s\n", p, getString(i).sz());
 			break;
@@ -144,8 +133,7 @@ LuaState::trace()
 #endif
 
 void
-LuaState::prepareErrorString(const sl::StringRef& string)
-{
+LuaState::prepareErrorString(const sl::StringRef& string) {
 	ASSERT(isOpen());
 
 	int result = lua_checkstack(m_h, 2);
@@ -157,13 +145,11 @@ LuaState::prepareErrorString(const sl::StringRef& string)
 }
 
 bool
-LuaState::tryCheckStack(int extraSlotCount)
-{
+LuaState::tryCheckStack(int extraSlotCount) {
 	ASSERT(isOpen());
 
 	int result = lua_checkstack(m_h, extraSlotCount);
-	if (!result)
-	{
+	if (!result) {
 		err::setError(err::SystemErrorCode_InsufficientResources);
 		return false;
 	}
@@ -172,11 +158,9 @@ LuaState::tryCheckStack(int extraSlotCount)
 }
 
 void
-LuaState::checkStack(int extraSlotCount)
-{
+LuaState::checkStack(int extraSlotCount) {
 	bool result = tryCheckStack(extraSlotCount);
-	if (!result)
-	{
+	if (!result) {
 		prepareLastErrorString();
 		error();
 	}
@@ -187,8 +171,7 @@ LuaState::tryCreateTable(
 	size_t elementCount,
 	size_t memberCount,
 	size_t extraStackSlotCount
-	)
-{
+) {
 	bool result = tryCheckStack(extraStackSlotCount);
 	if (!result)
 		return false;
@@ -202,19 +185,16 @@ LuaState::createTable(
 	size_t elementCount,
 	size_t memberCount,
 	size_t extraStackSlotCount
-	)
-{
+) {
 	bool result = tryCreateTable(elementCount, memberCount, extraStackSlotCount);
-	if (!result)
-	{
+	if (!result) {
 		prepareLastErrorString();
 		error();
 	}
 }
 
 int
-LuaState::getGlobalArrayLen(const sl::StringRef& name)
-{
+LuaState::getGlobalArrayLen(const sl::StringRef& name) {
 	getGlobal(name);
 	size_t len = getRawLen();
 	pop();
@@ -225,8 +205,7 @@ void
 LuaState::setGlobalArrayElement(
 	const sl::StringRef& name,
 	int index
-	)
-{
+) {
 	getGlobal(name);
 	swap();
 	setArrayElement(index);
@@ -237,8 +216,7 @@ void
 LuaState::setGlobalMember(
 	const sl::StringRef& name,
 	const sl::StringRef& member
-	)
-{
+) {
 	getGlobal(name);
 	swap();
 	setMember(member);

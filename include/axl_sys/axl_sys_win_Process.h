@@ -23,8 +23,7 @@ namespace win {
 
 //..............................................................................
 
-class Process: public WaitableHandle
-{
+class Process: public WaitableHandle {
 public:
 	bool
 	create(
@@ -38,7 +37,7 @@ public:
 		const sl::StringRef_w& currentDir,
 		const STARTUPINFOW* startupInfo,
 		handle_t* threadHandle
-		);
+	);
 
 	bool
 	create(
@@ -46,8 +45,7 @@ public:
 		bool inheritHandles,
 		dword_t flags,
 		const STARTUPINFOW* startupInfo
-		)
-	{
+	) {
 		return create(
 			NULL,
 			cmdLine,
@@ -59,26 +57,23 @@ public:
 			NULL,
 			startupInfo,
 			NULL
-			);
+		);
 	}
 
 	dword_t
-	getProcessId()
-	{
+	getProcessId() {
 		dword_t id = ::GetProcessId(m_h);
 		return err::complete<dword_t> (id, -1);
 	}
 
 	bool
-	getExitCode(dword_t* exitCode)
-	{
+	getExitCode(dword_t* exitCode) {
 		bool_t result = ::GetExitCodeProcess(m_h, exitCode);
 		return err::complete(result);
 	}
 
 	bool
-	terminate(uint_t exitCode)
-	{
+	terminate(uint_t exitCode) {
 		bool_t result = ::TerminateProcess(m_h, exitCode);
 		return err::complete(result);
 	}
@@ -91,7 +86,7 @@ syncExec(
 	const sl::StringRef_w& cmdLine,
 	sl::Array<char>* output,
 	dword_t* exitCode = NULL
-	);
+);
 
 sl::String_w
 getProcessImageName(dword_t pid);

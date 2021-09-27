@@ -19,29 +19,22 @@ namespace re {
 
 static
 sl::String
-getCharSetString(const sl::BitMap* charSet)
-{
+getCharSetString(const sl::BitMap* charSet) {
 	sl::String string;
 
 	uint_t c1 = -1;
 
-	for (uint_t i = 0; i < 256; i++)
-	{
+	for (uint_t i = 0; i < 256; i++) {
 		bool isSet = charSet->getBit(i);
-		if (isSet)
-		{
-			if (c1 == -1)
-			{
+		if (isSet) {
+			if (c1 == -1) {
 				c1 = i;
 				string.appendFormat(isprint(c1) ? "%c" : "\\x%02x", c1);
 			}
-		}
-		else if (c1 != -1)
-		{
+		} else if (c1 != -1) {
 			uint_t c2 = i - 1;
 
-			if (c2 > c1)
-			{
+			if (c2 > c1) {
 				if (c2 > c1 + 1)
 					string += '-';
 
@@ -52,12 +45,10 @@ getCharSetString(const sl::BitMap* charSet)
 		}
 	}
 
-	if (c1 != -1)
-	{
+	if (c1 != -1) {
 		uint_t c2 = 255;
 
-		if (c2 > c1)
-		{
+		if (c2 > c1) {
 			if (c2 > c1 + 1)
 				string += '-';
 
@@ -70,12 +61,10 @@ getCharSetString(const sl::BitMap* charSet)
 
 static
 sl::String
-getMatchConditionString(const MatchCondition* condition)
-{
+getMatchConditionString(const MatchCondition* condition) {
 	sl::String string;
 
-	switch (condition->m_conditionKind)
-	{
+	switch (condition->m_conditionKind) {
 	case MatchConditionKind_Char:
 		string.format(isprint(condition->m_char) ? "'%c'" : "'\\x%02x'", condition->m_char);
 		break;
@@ -98,8 +87,7 @@ getMatchConditionString(const MatchCondition* condition)
 //..............................................................................
 
 void
-Regex::clear()
-{
+Regex::clear() {
 	m_groupCount = 0;
 	m_nfaStateList.clear();
 	m_dfaStateList.clear();
@@ -107,8 +95,7 @@ Regex::clear()
 }
 
 bool
-Regex::match(const sl::StringRef& string)
-{
+Regex::match(const sl::StringRef& string) {
 	if (isEmpty())
 		return true;
 
@@ -116,14 +103,11 @@ Regex::match(const sl::StringRef& string)
 	char const* p = string.cp();
 	char const* end = string.getEnd();
 
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		sl::ConstIterator<DfaTransition> it = state->m_transitionList.getHead();
-		for (; it; it++)
-		{
+		for (; it; it++) {
 			bool isMatch = it->m_matchCondition.isMatch(*p);
-			if (isMatch)
-			{
+			if (isMatch) {
 				state = it->m_outState;
 				break;
 			}
@@ -137,28 +121,25 @@ Regex::match(const sl::StringRef& string)
 }
 
 bool
-Regex::compile(const sl::StringRef& source)
-{
+Regex::compile(const sl::StringRef& source) {
 	RegexCompiler compiler(this);
 	return compiler.compile(source);
 }
 
 #if (_AXL_DEBUG)
 void
-Regex::print() const
-{
+Regex::print() const {
 	printf("NFA\n");
 	printf("==================\n");
 
 	sl::ConstIterator<NfaState> nfaIt = m_nfaStateList.getHead();
-	for (; nfaIt; nfaIt++)
-	{
+	for (; nfaIt; nfaIt++) {
 		const NfaState* nfaState = *nfaIt;
 		printf(
 			"%c %02d ",
 			(nfaState->m_flags & NfaStateFlag_Accept) ? '*' : ' ',
 			nfaState->m_id
-			);
+		);
 
 		if (nfaState->m_flags & NfaStateFlag_OpenCapture)
 			printf("open (%d) ", nfaState->m_captureId);
@@ -166,13 +147,10 @@ Regex::print() const
 		if (nfaState->m_flags & NfaStateFlag_CloseCapture)
 			printf("close (%d) ", nfaState->m_captureId);
 
-		if (nfaState->m_flags & NfaStateFlag_Match)
-		{
+		if (nfaState->m_flags & NfaStateFlag_Match) {
 			ASSERT(nfaState->m_outState && !nfaState->m_outState2);
 			printf("%s -> %02d", getMatchConditionString(&nfaState->m_matchCondition).sz(), nfaState->m_outState->m_id);
-		}
-		else if (nfaState->m_flags & NfaStateFlag_EpsilonLink)
-		{
+		} else if (nfaState->m_flags & NfaStateFlag_EpsilonLink) {
 			ASSERT(nfaState->m_outState);
 			printf("eps -> %02d", nfaState->m_outState->m_id);
 
@@ -187,18 +165,16 @@ Regex::print() const
 	printf("==================\n");
 
 	sl::ConstIterator<DfaState> dfaIt = m_dfaStateList.getHead();
-	for (; dfaIt; dfaIt++)
-	{
+	for (; dfaIt; dfaIt++) {
 		const DfaState* dfaState = *dfaIt;
 		printf(
 			"%c %02d = { ",
 			(dfaState->m_isAccept) ? '*' : ' ',
 			dfaState->m_id
-			);
+		);
 
 		size_t count = dfaState->m_nfaStateSet.m_stateArray.getCount();
-		for (size_t i = 0; i < count; i++)
-		{
+		for (size_t i = 0; i < count; i++) {
 			NfaState* nfaState = dfaState->m_nfaStateSet.m_stateArray[i];
 			printf("%02d ", nfaState->m_id);
 		}
@@ -206,12 +182,10 @@ Regex::print() const
 		printf("}");
 
 		size_t i = dfaState->m_openCaptureIdSet.findBit(0);
-		if (i != -1)
-		{
+		if (i != -1) {
 			printf(" open ( ");
 
-			do
-			{
+			do {
 				printf("%d ", i);
 				i = dfaState->m_openCaptureIdSet.findBit(i + 1);
 			} while (i != -1);
@@ -220,12 +194,10 @@ Regex::print() const
 		}
 
 		i = dfaState->m_closeCaptureIdSet.findBit(0);
-		if (i != -1)
-		{
+		if (i != -1) {
 			printf(" close ( ");
 
-			do
-			{
+			do {
 				printf("%d ", i);
 				i = dfaState->m_closeCaptureIdSet.findBit(i + 1);
 			} while (i != -1);
@@ -236,8 +208,7 @@ Regex::print() const
 		printf("\n");
 
 		sl::ConstIterator<DfaTransition> dfaTransitionIt = dfaState->m_transitionList.getHead();
-		for (; dfaTransitionIt; dfaTransitionIt++)
-		{
+		for (; dfaTransitionIt; dfaTransitionIt++) {
 			const DfaTransition* transition = *dfaTransitionIt;
 			printf("    %s -> %02d\n", getMatchConditionString(&transition->m_matchCondition).sz(), transition->m_outState->m_id);
 		}
@@ -249,8 +220,7 @@ Regex::print() const
 
 static
 void
-initValidSingleTable(bool* table)
-{
+initValidSingleTable(bool* table) {
 	table['.'] = true;
 	table['['] = true;
 	table['('] = true;
@@ -267,8 +237,7 @@ initValidSingleTable(bool* table)
 }
 
 bool
-RegexCompiler::Token::isValidSingle()
-{
+RegexCompiler::Token::isValidSingle() {
 	if (m_tokenKind != TokenKind_SpecialChar)
 		return true;
 
@@ -284,8 +253,7 @@ RegexCompiler::construct(
 	uint_t flags,
 	Regex* regex,
 	RegexNameMgr* nameMgr
-	)
-{
+) {
 	m_regex = regex;
 	m_nameMgr = nameMgr;
 	m_flags = flags;
@@ -299,8 +267,7 @@ bool
 RegexCompiler::compile(
 	const sl::StringRef& source,
 	void* acceptContext
-	)
-{
+) {
 	m_regex->clear();
 
 	bool result = incrementalCompile(source, acceptContext);
@@ -315,8 +282,7 @@ bool
 RegexCompiler::incrementalCompile(
 	const sl::StringRef& source,
 	void* acceptContext
-	)
-{
+) {
 	m_p = source.cp();
 	m_end = source.getEnd();
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
@@ -334,8 +300,7 @@ RegexCompiler::incrementalCompile(
 	accept->m_flags |= NfaStateFlag_Accept;
 	accept->m_acceptContext = acceptContext;
 
-	if (oldStart)
-	{
+	if (oldStart) {
 		NfaState* split = AXL_MEM_NEW(NfaState);
 		split->createEpsilonLink(oldStart, body);
 		m_regex->m_nfaStateList.insertHead(split);
@@ -345,8 +310,7 @@ RegexCompiler::incrementalCompile(
 }
 
 void
-RegexCompiler::finalize()
-{
+RegexCompiler::finalize() {
 	assignNfaIds();
 	makeDfa();
 	minimizeDfa();
@@ -354,25 +318,21 @@ RegexCompiler::finalize()
 }
 
 void
-RegexCompiler::assignNfaIds()
-{
+RegexCompiler::assignNfaIds() {
 	sl::Iterator<NfaState> nfaIt = m_regex->m_nfaStateList.getHead();
-	for (uint_t i = 0; nfaIt; i++, nfaIt++)
-	{
+	for (uint_t i = 0; nfaIt; i++, nfaIt++) {
 		NfaState* nfaState = *nfaIt;
 		nfaState->m_id = i;
 	}
 }
 
 void
-RegexCompiler::assignDfaIds()
-{
+RegexCompiler::assignDfaIds() {
 	size_t dfaStateCount = m_regex->m_dfaStateList.getCount();
 	m_regex->m_dfaStateArray.setCount(dfaStateCount);
 
 	sl::Iterator<DfaState> dfaIt = m_regex->m_dfaStateList.getHead();
-	for (uint_t i = 0; dfaIt; i++, dfaIt++)
-	{
+	for (uint_t i = 0; dfaIt; i++, dfaIt++) {
 		DfaState* state = *dfaIt;
 		state->m_id = i;
 		m_regex->m_dfaStateArray[i] = state;
@@ -380,8 +340,7 @@ RegexCompiler::assignDfaIds()
 }
 
 void
-RegexCompiler::makeDfa()
-{
+RegexCompiler::makeDfa() {
 	m_regex->m_dfaStateList.clear();
 
 	if (m_regex->m_nfaStateList.isEmpty())
@@ -401,15 +360,13 @@ RegexCompiler::makeDfa()
 	NfaTransitionMgr nfaTransitionMgr;
 	sl::BitMap tmpSet;
 
-	while (!workingSet.isEmpty())
-	{
+	while (!workingSet.isEmpty()) {
 		DfaState* dfaState = workingSet.getBackAndPop();
 
 		nfaTransitionMgr.clear();
 
 		size_t nfaStateCount = dfaState->m_nfaStateSet.m_stateArray.getCount();
-		for (size_t i = 0; i < nfaStateCount; i++)
-		{
+		for (size_t i = 0; i < nfaStateCount; i++) {
 			NfaState* nfaState = dfaState->m_nfaStateSet.m_stateArray[i];
 			if (nfaState->m_flags & NfaStateFlag_Match)
 				nfaTransitionMgr.addMatchState(nfaState);
@@ -419,15 +376,13 @@ RegexCompiler::makeDfa()
 
 		sl::ConstList<NfaTransition> nfaTransitionList = nfaTransitionMgr.getTransitionList();
 		sl::ConstIterator<NfaTransition> nfaTransitionIt = nfaTransitionList.getHead();
-		for (; nfaTransitionIt; nfaTransitionIt++)
-		{
+		for (; nfaTransitionIt; nfaTransitionIt++) {
 			const NfaTransition* nfaTransition = *nfaTransitionIt;
 
 			DfaState* dfaState2 = AXL_MEM_NEW(DfaState);
 
 			size_t outCount = nfaTransition->m_outStateSet.m_stateArray.getCount();
-			for (size_t i = 0; i < outCount; i++)
-			{
+			for (size_t i = 0; i < outCount; i++) {
 				NfaState* nfaState = nfaTransition->m_outStateSet.m_stateArray[i];
 				dfaState2->addNfaState(nfaState);
 			}
@@ -435,13 +390,10 @@ RegexCompiler::makeDfa()
 			dfaState2->makeEpsilonClosure();
 
 			NfaStateSetMap<DfaState*>::Iterator mapIt = dfaStateMap.visit(&dfaState2->m_nfaStateSet);
-			if (mapIt->m_value)
-			{
+			if (mapIt->m_value) {
 				AXL_MEM_DELETE(dfaState2);
 				dfaState2 = mapIt->m_value;
-			}
-			else
-			{
+			} else {
 				m_regex->m_dfaStateList.insertTail(dfaState2);
 				workingSet.append(dfaState2);
 				mapIt->m_value = dfaState2;
@@ -456,16 +408,13 @@ RegexCompiler::makeDfa()
 }
 
 void
-RegexCompiler::minimizeDfa()
-{
-}
+RegexCompiler::minimizeDfa() {}
 
 bool
 getHexValue(
 	uint_t c,
 	uint_t* value
-	)
-{
+) {
 	if (c >= '0' && c <= '9')
 		*value = c - '0';
 	else if (c >= 'a' && c <= 'f')
@@ -479,8 +428,7 @@ getHexValue(
 }
 
 bool
-RegexCompiler::readHexEscapeSequence(uchar_t* c)
-{
+RegexCompiler::readHexEscapeSequence(uchar_t* c) {
 	ASSERT(*m_p == 'x');
 	m_p++;
 
@@ -492,8 +440,7 @@ RegexCompiler::readHexEscapeSequence(uchar_t* c)
 		getHexValue(m_p[0], &x1) &&
 		getHexValue(m_p[1], &x2);
 
-	if (!result)
-	{
+	if (!result) {
 		err::setFormatStringError("invalid hex escape sequence");
 		return false;
 	}
@@ -504,19 +451,16 @@ RegexCompiler::readHexEscapeSequence(uchar_t* c)
 }
 
 bool
-RegexCompiler::readEscapeSequence(uchar_t* c)
-{
+RegexCompiler::readEscapeSequence(uchar_t* c) {
 	ASSERT(*m_p == '\\');
 	m_p++;
 
-	if (m_p >= m_end)
-	{
+	if (m_p >= m_end) {
 		err::setError("invalid escape sequence");
 		return false;
 	}
 
-	switch (*m_p)
-	{
+	switch (*m_p) {
 	case '0':
 		*c = '\0';
 		break;
@@ -565,24 +509,19 @@ RegexCompiler::readEscapeSequence(uchar_t* c)
 }
 
 bool
-RegexCompiler::readLiteral(sl::String* string)
-{
+RegexCompiler::readLiteral(sl::String* string) {
 	char delimiter = *m_p++;
 	ASSERT(delimiter == '"' || delimiter == '\'');
 
-	for (const char* p = m_p;; p++)
-	{
-		if (p >= m_end)
-		{
+	for (const char* p = m_p;; p++) {
+		if (p >= m_end) {
 			err::setError("unclosed literal");
 			return false;
 		}
 
-		switch (*p)
-		{
+		switch (*p) {
 		case '\\':
-			if (++p >= m_end)
-			{
+			if (++p >= m_end) {
 				err::setError("invalid escape sequence");
 				return false;
 			}
@@ -591,8 +530,7 @@ RegexCompiler::readLiteral(sl::String* string)
 
 		case '"':
 		case '\'':
-			if (*p == delimiter)
-			{
+			if (*p == delimiter) {
 				size_t size = enc::EscapeEncoding::decode(string, sl::StringRef(m_p, p - m_p));
 				if (size == -1)
 					return false;
@@ -605,28 +543,23 @@ RegexCompiler::readLiteral(sl::String* string)
 }
 
 bool
-RegexCompiler::readHexLiteral(sl::String* string)
-{
+RegexCompiler::readHexLiteral(sl::String* string) {
 	ASSERT(m_p[0] == '0' && m_p[1] == 'x');
 	m_p += 2;
 
 	char delimiter = *m_p++;
 	ASSERT(delimiter == '"' || delimiter == '\'');
 
-	for (const char* p = m_p;; p++)
-	{
-		if (p >= m_end)
-		{
+	for (const char* p = m_p;; p++) {
+		if (p >= m_end) {
 			err::setError("unclosed literal");
 			return false;
 		}
 
-		switch (*p)
-		{
+		switch (*p) {
 		case '"':
 		case '\'':
-			if (*p == delimiter)
-			{
+			if (*p == delimiter) {
 				sl::Array<char> buffer;
 				size_t size = enc::HexEncoding::decode(&buffer, sl::StringRef(m_p, p - m_p));
 				if (size == -1)
@@ -641,14 +574,12 @@ RegexCompiler::readHexLiteral(sl::String* string)
 }
 
 bool
-RegexCompiler::readIdentifier(sl::String* name)
-{
+RegexCompiler::readIdentifier(sl::String* name) {
 	ASSERT(isalpha((uchar_t)*m_p) || *m_p == '_');
 
 	name->copy((uchar_t)*m_p++);
 
-	while (m_p < m_end && isalnum((uchar_t)*m_p) || *m_p == '_')
-	{
+	while (m_p < m_end && isalnum((uchar_t)*m_p) || *m_p == '_') {
 		name->append((uchar_t)*m_p);
 		m_p++;
 	}
@@ -657,15 +588,13 @@ RegexCompiler::readIdentifier(sl::String* name)
 }
 
 bool
-RegexCompiler::readQuantifier(size_t* count)
-{
+RegexCompiler::readQuantifier(size_t* count) {
 	char buffer[16] = { 0 };
 	for (
 		size_t i = 0;
 		i < countof(buffer) - 1 && m_p < m_end && isdigit((uchar_t)*m_p);
 		i++, m_p++
-		)
-	{
+	) {
 		buffer[i] = *m_p;
 	}
 
@@ -675,12 +604,11 @@ RegexCompiler::readQuantifier(size_t* count)
 	if (result)
 		result = expectSpecialChar('}');
 
-	if (!result)
-	{
+	if (!result) {
 		err::setFormatStringError(
 			"invalid quantifier; only simple quantifiers are supported: {n}, 1 <= n <= %d",
 			Const_MaxQuantifier
-			);
+		);
 		return false;
 	}
 
@@ -689,37 +617,29 @@ RegexCompiler::readQuantifier(size_t* count)
 }
 
 bool
-RegexCompiler::getToken(Token* token)
-{
-	if (m_lastToken.m_tokenKind)
-	{
+RegexCompiler::getToken(Token* token) {
+	if (m_lastToken.m_tokenKind) {
 		*token = m_lastToken;
 		m_lastToken.m_tokenKind = TokenKind_Undefined;
 		return true;
 	}
 
-	if (!(m_flags & Flag_SparseSyntax))
-	{
-		for (;;)
-		{
-			if (m_p >= m_end)
-			{
+	if (!(m_flags & Flag_SparseSyntax)) {
+		for (;;) {
+			if (m_p >= m_end) {
 				token->m_tokenKind = TokenKind_SpecialChar;
 				token->m_char = 0; // don't advance m_p
 				return true;
 			}
 
-			switch (*m_p)
-			{
+			switch (*m_p) {
 			case '\\':
-				if (m_p + 1 >= m_end)
-				{
+				if (m_p + 1 >= m_end) {
 					err::setError("invalid escape sequence");
 					return false;
 				}
 
-				switch (m_p[1])
-				{
+				switch (m_p[1]) {
 				case 's':
 				case 'S':
 				case 'd':
@@ -738,8 +658,7 @@ RegexCompiler::getToken(Token* token)
 					break;
 
 				case '\r':
-					if (m_p + 2 < m_end && m_p[2] == '\n')
-					{
+					if (m_p + 2 < m_end && m_p[2] == '\n') {
 						m_p += 3; // line continuation (CR-LF)
 						break;
 					}
@@ -774,28 +693,22 @@ RegexCompiler::getToken(Token* token)
 				return true;
 			}
 		}
-	}
-	else
-		for (;;)
-		{
-			if (m_p >= m_end)
-			{
+	} else
+		for (;;) {
+			if (m_p >= m_end) {
 				token->m_tokenKind = TokenKind_SpecialChar;
 				token->m_char = 0; // don't advance m_p
 				return true;
 			}
 
-			switch (*m_p)
-			{
+			switch (*m_p) {
 			case '\\':
-				if (m_p + 1 >= m_end)
-				{
+				if (m_p + 1 >= m_end) {
 					err::setError("invalid escape sequence");
 					return false;
 				}
 
-				switch (m_p[1])
-				{
+				switch (m_p[1]) {
 				case 's':
 				case 'S':
 				case 'd':
@@ -814,8 +727,7 @@ RegexCompiler::getToken(Token* token)
 					break;
 
 				case '\r':
-					if (m_p + 2 < m_end && m_p[2] == '\n')
-					{
+					if (m_p + 2 < m_end && m_p[2] == '\n') {
 						m_p += 3; // line continuation (CR-LF)
 						break;
 					}
@@ -857,15 +769,13 @@ RegexCompiler::getToken(Token* token)
 				return true;
 
 			case '0':
-				if (m_p + 2 < m_end && m_p[1] == 'x' && (m_p[2] == '"' || m_p [2] == '\''))
-				{
+				if (m_p + 2 < m_end && m_p[1] == 'x' && (m_p[2] == '"' || m_p [2] == '\'')) {
 					token->m_tokenKind = TokenKind_Literal;
 					return readHexLiteral(&token->m_string);
 				}
 
 			default:
-				if (isalpha((uchar_t)*m_p) || *m_p == '_')
-				{
+				if (isalpha((uchar_t)*m_p) || *m_p == '_') {
 					token->m_tokenKind = TokenKind_Identifier;
 					return readIdentifier(&token->m_string);
 				}
@@ -878,15 +788,13 @@ RegexCompiler::getToken(Token* token)
 }
 
 bool
-RegexCompiler::expectSpecialChar(char c)
-{
+RegexCompiler::expectSpecialChar(char c) {
 	Token token;
 	bool result = getToken(&token);
 	if (!result)
 		return false;
 
-	if (!token.isSpecialChar(c))
-	{
+	if (!token.isSpecialChar(c)) {
 		err::setFormatStringError("'%c' expected", c);
 		return false;
 	}
@@ -895,15 +803,13 @@ RegexCompiler::expectSpecialChar(char c)
 }
 
 bool
-RegexCompiler::expectEof()
-{
+RegexCompiler::expectEof() {
 	Token token;
 	bool result = getToken(&token);
 	if (!result)
 		return false;
 
-	if (!token.isSpecialChar(0))
-	{
+	if (!token.isSpecialChar(0)) {
 		err::setError("invalid regexp syntax");
 		return false;
 	}
@@ -912,8 +818,7 @@ RegexCompiler::expectEof()
 }
 
 NfaState*
-RegexCompiler::expression()
-{
+RegexCompiler::expression() {
 	NfaState* op1 = concat();
 	if (!op1)
 		return NULL;
@@ -923,8 +828,7 @@ RegexCompiler::expression()
 	if (!result)
 		return NULL;
 
-	if (!token.isSpecialChar('|'))
-	{
+	if (!token.isSpecialChar('|')) {
 		m_lastToken = token; // unget token
 		return op1;
 	}
@@ -953,14 +857,12 @@ RegexCompiler::expression()
 }
 
 NfaState*
-RegexCompiler::concat()
-{
+RegexCompiler::concat() {
 	NfaState* start = repeat();
 	if (!start)
 		return NULL;
 
-	for (;;)
-	{
+	for (;;) {
 		Token token;
 		bool result = getToken(&token);
 		if (!result)
@@ -984,8 +886,7 @@ RegexCompiler::concat()
 }
 
 NfaState*
-RegexCompiler::repeat()
-{
+RegexCompiler::repeat() {
 	NfaState* start = single();
 	if (!start)
 		return NULL;
@@ -996,8 +897,7 @@ RegexCompiler::repeat()
 		return NULL;
 
 	if (token.m_tokenKind == TokenKind_SpecialChar)
-		switch (token.m_char)
-		{
+		switch (token.m_char) {
 		case '?':
 			return question(start);
 
@@ -1018,8 +918,7 @@ RegexCompiler::repeat()
 }
 
 NfaState*
-RegexCompiler::question(NfaState* start)
-{
+RegexCompiler::question(NfaState* start) {
 	NfaState* accept = *m_regex->m_nfaStateList.getTail();
 
 	NfaState* split = AXL_MEM_NEW(NfaState);
@@ -1030,8 +929,7 @@ RegexCompiler::question(NfaState* start)
 }
 
 NfaState*
-RegexCompiler::star(NfaState* start)
-{
+RegexCompiler::star(NfaState* start) {
 	NfaState* oldAccept = *m_regex->m_nfaStateList.getTail();
 
 	NfaState* newAccept = AXL_MEM_NEW(NfaState);
@@ -1046,8 +944,7 @@ RegexCompiler::star(NfaState* start)
 }
 
 NfaState*
-RegexCompiler::plus(NfaState* start)
-{
+RegexCompiler::plus(NfaState* start) {
 	NfaState* oldAccept = *m_regex->m_nfaStateList.getTail();
 
 	NfaState* newAccept = AXL_MEM_NEW(NfaState);
@@ -1062,14 +959,12 @@ NfaState*
 RegexCompiler::quantify(
 	NfaState* start,
 	size_t count
-	)
-{
+) {
 	ASSERT(count <= Const_MaxQuantifier);
 
 	NfaState* originalStart = start;
 	NfaState* accept = *m_regex->m_nfaStateList.getTail();
-	for (size_t i = 1; i < count; i++)
-	{
+	for (size_t i = 1; i < count; i++) {
 		start = clone(start, accept);
 		accept->createEpsilonLink(start);
 		accept = *m_regex->m_nfaStateList.getTail();
@@ -1082,14 +977,12 @@ NfaState*
 RegexCompiler::clone(
 	NfaState* first,
 	NfaState* last
-	)
-{
+) {
 	sl::SimpleHashTable<NfaState*, NfaState*> stateMap;
 
 	sl::Iterator<NfaState> end = m_regex->m_nfaStateList.getTail();
 	sl::Iterator<NfaState> it = first;
-	for (;;)
-	{
+	for (;;) {
 		NfaState* oldState = *it;
 		NfaState* newState = AXL_MEM_NEW(NfaState);
 		*newState = *oldState;
@@ -1104,20 +997,17 @@ RegexCompiler::clone(
 
 	it = end + 1;
 	NfaState* result = *it;
-	for (; it; it++)
-	{
+	for (; it; it++) {
 		NfaState* state = *it;
 
 		sl::HashTableIterator<NfaState*, NfaState*> mapIt;
-		if (state->m_outState)
-		{
+		if (state->m_outState) {
 			mapIt = stateMap.find(state->m_outState);
 			if (mapIt)
 				state->m_outState = mapIt->m_value;
 		}
 
-		if (state->m_outState2)
-		{
+		if (state->m_outState2) {
 			mapIt = stateMap.find(state->m_outState2);
 			if (mapIt)
 				state->m_outState2 = mapIt->m_value;
@@ -1128,8 +1018,7 @@ RegexCompiler::clone(
 }
 
 NfaState*
-RegexCompiler::single()
-{
+RegexCompiler::single() {
 	bool result;
 
 	Token token;
@@ -1137,23 +1026,16 @@ RegexCompiler::single()
 	if (!result)
 		return NULL;
 
-	switch (token.m_tokenKind)
-	{
+	switch (token.m_tokenKind) {
 	case TokenKind_SpecialChar:
-		switch (token.m_char)
-		{
+		switch (token.m_char) {
 		case '(':
-			if (m_p + 1 < m_end && m_p[0] == '?' && m_p[1] == ':')
-			{
+			if (m_p + 1 < m_end && m_p[0] == '?' && m_p[1] == ':') {
 				m_p += 2;
 				return nonCapturingGroup();
-			}
-			else if (m_flags & Flag_NonCapturingGroups)
-			{
+			} else if (m_flags & Flag_NonCapturingGroups) {
 				return nonCapturingGroup();
-			}
-			else
-			{
+			} else {
 				return capturingGroup();
 			}
 
@@ -1194,16 +1076,14 @@ RegexCompiler::single()
 }
 
 NfaState*
-RegexCompiler::literal(const sl::StringRef& string)
-{
+RegexCompiler::literal(const sl::StringRef& string) {
 	NfaState* start = AXL_MEM_NEW(NfaState);
 	m_regex->m_nfaStateList.insertTail(start);
 
 	NfaState* mid = start;
 	const char* p = string.cp();
 	const char* end = string.getEnd();
-	for (; p < end; p++)
-	{
+	for (; p < end; p++) {
 		ch((uchar_t)*p, mid);
 		mid = *m_regex->m_nfaStateList.getTail();
 	}
@@ -1212,8 +1092,7 @@ RegexCompiler::literal(const sl::StringRef& string)
 }
 
 NfaState*
-RegexCompiler::ch(uint_t c)
-{
+RegexCompiler::ch(uint_t c) {
 	NfaState* start = AXL_MEM_NEW(NfaState);
 	m_regex->m_nfaStateList.insertTail(start);
 	ch(c, start);
@@ -1224,22 +1103,19 @@ void
 RegexCompiler::ch(
 	uint_t c,
 	NfaState* start
-	)
-{
+) {
 	NfaState* accept = AXL_MEM_NEW(NfaState);
 	m_regex->m_nfaStateList.insertTail(accept);
 	start->createCharMatch(c, accept);
 }
 
 NfaState*
-RegexCompiler::charClass()
-{
+RegexCompiler::charClass() {
 	bool result;
 
 	bool isInversed = false;
 
-	if (m_p < m_end && *m_p == '^')
-	{
+	if (m_p < m_end && *m_p == '^') {
 		isInversed = true;
 		m_p++;
 	}
@@ -1252,16 +1128,13 @@ RegexCompiler::charClass()
 
 	size_t count = 0;
 
-	for (;;)
-	{
-		if (m_p >= m_end)
-		{
+	for (;;) {
+		if (m_p >= m_end) {
 			err::setError("invalid character class");
 			return NULL;
 		}
 
-		if (*m_p == ']')
-		{
+		if (*m_p == ']') {
 			m_p++;
 			break;
 		}
@@ -1273,8 +1146,7 @@ RegexCompiler::charClass()
 		count++;
 	}
 
-	if (!count)
-	{
+	if (!count) {
 		err::setError("empty character class");
 		return NULL;
 	}
@@ -1290,8 +1162,7 @@ RegexCompiler::charClass()
 }
 
 bool
-RegexCompiler::charClassItem(sl::BitMap* charSet)
-{
+RegexCompiler::charClassItem(sl::BitMap* charSet) {
 	ASSERT(m_p < m_end);
 
 	bool result;
@@ -1299,17 +1170,14 @@ RegexCompiler::charClassItem(sl::BitMap* charSet)
 	uchar_t c1;
 	uchar_t c2;
 
-	switch (*m_p)
-	{
+	switch (*m_p) {
 	case '\\':
-		if (m_p + 1 >= m_end)
-		{
+		if (m_p + 1 >= m_end) {
 			err::setError("invalid escape sequence");
 			return false;
 		}
 
-		switch (m_p[1])
-		{
+		switch (m_p[1]) {
 		case 'd':
 		case 'D':
 		case 'h':
@@ -1333,22 +1201,19 @@ RegexCompiler::charClassItem(sl::BitMap* charSet)
 		c1 = *m_p++;
 	}
 
-	if (m_p >= m_end || *m_p != '-')
-	{
+	if (m_p >= m_end || *m_p != '-') {
 		charSet->setBit(c1);
 		return true;
 	}
 
 	m_p++;
 
-	if (m_p >= m_end)
-	{
+	if (m_p >= m_end) {
 		err::setError("invalid char class");
 		return false;
 	}
 
-	switch (*m_p)
-	{
+	switch (*m_p) {
 	case '\\':
 		result = readEscapeSequence(&c2);
 		if (!result)
@@ -1360,8 +1225,7 @@ RegexCompiler::charClassItem(sl::BitMap* charSet)
 		c2 = *m_p++;
 	}
 
-	if (c2 < c1)
-	{
+	if (c2 < c1) {
 		char t = c2;
 		c2 = c1;
 		c1 = t;
@@ -1372,8 +1236,7 @@ RegexCompiler::charClassItem(sl::BitMap* charSet)
 }
 
 NfaState*
-RegexCompiler::stdCharClass(uint_t c)
-{
+RegexCompiler::stdCharClass(uint_t c) {
 	NfaState* start = AXL_MEM_NEW(NfaState);
 	start->m_flags |= NfaStateFlag_Match;
 	start->m_matchCondition.m_conditionKind = MatchConditionKind_CharSet;
@@ -1393,12 +1256,10 @@ void
 RegexCompiler::stdCharClass(
 	uint_t c,
 	sl::BitMap* charSet
-	)
-{
+) {
 	bool isInverted = false;
 
-	switch (c)
-	{
+	switch (c) {
 	case 'D':
 		isInverted = true;
 		// and fall through
@@ -1448,8 +1309,7 @@ RegexCompiler::stdCharClass(
 }
 
 NfaState*
-RegexCompiler::any()
-{
+RegexCompiler::any() {
 	NfaState* start = AXL_MEM_NEW(NfaState);
 	start->m_flags |= NfaStateFlag_Match;
 	start->m_matchCondition.m_conditionKind = MatchConditionKind_Any;
@@ -1463,8 +1323,7 @@ RegexCompiler::any()
 }
 
 NfaState*
-RegexCompiler::capturingGroup()
-{
+RegexCompiler::capturingGroup() {
 	size_t captureId = m_regex->m_groupCount++;
 
 	NfaState* open = AXL_MEM_NEW(NfaState);
@@ -1490,8 +1349,7 @@ RegexCompiler::capturingGroup()
 }
 
 NfaState*
-RegexCompiler::nonCapturingGroup()
-{
+RegexCompiler::nonCapturingGroup() {
 	NfaState* start = expression();
 	if (!start)
 		return NULL;
@@ -1504,17 +1362,14 @@ RegexCompiler::nonCapturingGroup()
 }
 
 NfaState*
-RegexCompiler::namedRegex(const sl::StringRef& name)
-{
-	if (!m_nameMgr)
-	{
+RegexCompiler::namedRegex(const sl::StringRef& name) {
+	if (!m_nameMgr) {
 		err::setFormatStringError("named regexp '%s' is used but name manager is not set", name.sz());
 		return NULL;
 	}
 
 	sl::StringRef source = m_nameMgr->findName(name);
-	if (source.isEmpty())
-	{
+	if (source.isEmpty()) {
 		err::setFormatStringError("named regexp '%s' is not defined", name.sz());
 		return NULL;
 	}

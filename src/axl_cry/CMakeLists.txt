@@ -28,7 +28,7 @@ set(
 	${AXL_INC_DIR}/axl_cry/axl_cry_X509.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pkcs7.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pem.h
-	)
+)
 
 set(
 	LIB_CPP_LIST
@@ -44,14 +44,14 @@ set(
 	axl_cry_X509.cpp
 	axl_cry_Pkcs7.cpp
 	axl_cry_Pem.cpp
-	)
+)
 
 source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -65,14 +65,14 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pch.h
-	)
+)
 
 source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -82,7 +82,7 @@ source_group(
 include_directories(
 	${OPENSSL_INC_DIR}
 	${AXL_INC_DIR}
-	)
+)
 
 add_library(
 	axl_cry
@@ -90,13 +90,13 @@ add_library(
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_cry
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -104,11 +104,11 @@ axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_cry
 	${LIB_H_LIST}
-	)
+)
 
 install(
 	TARGETS axl_cry
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
-	)
+)
 
 #...............................................................................

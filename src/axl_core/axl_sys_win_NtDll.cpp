@@ -19,8 +19,7 @@ namespace win {
 //..............................................................................
 
 void
-initNtDllFunctions()
-{
+initNtDllFunctions() {
 	HMODULE hNtDll = ::GetModuleHandleW(L"ntdll.dll");
 	ASSERT(hNtDll);
 

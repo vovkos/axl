@@ -20,8 +20,7 @@ namespace io {
 #if (_AXL_OS_WIN)
 
 bool
-FileEnumerator::openDir(const sl::StringRef& dir)
-{
+FileEnumerator::openDir(const sl::StringRef& dir) {
 	close();
 	m_nextFileName.clear();
 
@@ -38,8 +37,7 @@ FileEnumerator::openDir(const sl::StringRef& dir)
 }
 
 sl::String
-FileEnumerator::getNextFileName()
-{
+FileEnumerator::getNextFileName() {
 	if (!isOpen())
 		return sl::String();
 
@@ -58,8 +56,7 @@ FileEnumerator::getNextFileName()
 #elif (_AXL_OS_POSIX)
 
 bool
-FileEnumerator::openDir(const sl::StringRef& dir)
-{
+FileEnumerator::openDir(const sl::StringRef& dir) {
 	close();
 	m_nextFileName.clear();
 
@@ -81,8 +78,7 @@ FileEnumerator::openDir(const sl::StringRef& dir)
 }
 
 sl::String
-FileEnumerator::getNextFileName()
-{
+FileEnumerator::getNextFileName() {
 	if (!isOpen())
 		return sl::String();
 

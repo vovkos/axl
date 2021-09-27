@@ -21,8 +21,7 @@ namespace spy {
 #if (_AXL_CPU_AMD64)
 #	if (_AXL_CPP_MSC)
 
-struct RegArgBlock
-{
+struct RegArgBlock {
 	uint64_t m_rcx;
 	uint64_t m_rdx;
 	uint64_t m_r8;
@@ -33,24 +32,21 @@ struct RegArgBlock
 	double m_xmm3[2];
 };
 
-struct RegRetBlock
-{
+struct RegRetBlock {
 	uint64_t m_rax;
 	uint64_t _m_padding;
 };
 
 #	elif (_AXL_CPP_GCC)
 
-struct RegRetBlock
-{
+struct RegRetBlock {
 	uint64_t m_rax;
 	uint64_t m_rdx;
 	double m_xmm0[2];
 	double m_xmm1[2];
 };
 
-struct RegArgBlock
-{
+struct RegArgBlock {
 	uint64_t m_rdi;
 	uint64_t m_rsi;
 	uint64_t m_rdx;
@@ -70,14 +66,12 @@ struct RegArgBlock
 #	endif
 #elif (_AXL_CPU_X86)
 
-struct RegRetBlock
-{
+struct RegRetBlock {
 	uint32_t m_eax;
 	uint32_t m_edx;
 };
 
-struct RegArgBlock // MSC __thiscall/__fastcall; GCC __attribute__((regparm(n)))
-{
+struct RegArgBlock { // MSC __thiscall/__fastcall; GCC __attribute__((regparm(n)))
 	uint32_t m_ecx;
 	uint32_t m_edx;
 	uint32_t m_eax;
@@ -88,8 +82,7 @@ struct RegArgBlock // MSC __thiscall/__fastcall; GCC __attribute__((regparm(n)))
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum FrameOffset
-{
+enum FrameOffset {
 #if (_AXL_CPU_X86)
 	FrameOffset_StackArgBlock = 8,
 	FrameOffset_RegRetBlock   = -(int)(sizeof(RegRetBlock) + 4),
@@ -108,8 +101,7 @@ enum FrameOffset
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct VaList
-{
+struct VaList {
 	char* m_p;
 };
 
@@ -118,15 +110,13 @@ void
 vaStart(
 	VaList& va,
 	size_t frameBase
-	)
-{
+) {
 	va.m_p = (char*)(frameBase + FrameOffset_StackArgBlock);
 }
 
 template<typename T>
 T&
-vaArg(VaList& va)
-{
+vaArg(VaList& va) {
 	T* p = (T*)va.m_p;
 	va.m_p += (sizeof(T) + sizeof(intptr_t) - 1) & ~(sizeof(intptr_t) - 1);
 	return *p;
@@ -134,14 +124,11 @@ vaArg(VaList& va)
 
 inline
 void
-vaEnd(VaList& va)
-{
-}
+vaEnd(VaList& va) {}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum HookAction
-{
+enum HookAction {
 	HookAction_Default    = 0,
 	HookAction_Return     = 0x01,
 	HookAction_JumpTarget = 0x02,
@@ -155,7 +142,7 @@ HookEnterFunc(
 	void* targetFunc,
 	void* callbackParam,
 	size_t frameBase
-	);
+);
 
 typedef
 void
@@ -163,7 +150,7 @@ HookLeaveFunc(
 	void* targetFunc,
 	void* callbackParam,
 	size_t frameBase // if zero, it's an abandoned frame (due to SJLJ/SEH/thread-destruction/etc)
-	);
+);
 
 #if (_AXL_CPP_MSC && _AXL_CPU_AMD64)
 
@@ -175,7 +162,7 @@ HookExceptionFunc(
 	size_t frameBase,
 	EXCEPTION_RECORD* exception,
 	CONTEXT* context
-	);
+);
 
 #endif
 
@@ -183,8 +170,7 @@ HookExceptionFunc(
 
 struct Hook; // ABI-dependent
 
-class HookArena
-{
+class HookArena {
 protected:
 	void* m_impl;
 
@@ -198,7 +184,7 @@ public:
 		void* callbackParam,
 		HookEnterFunc* enterFunc,
 		HookLeaveFunc* leaveFunc
-		);
+	);
 
 	void
 	free(); // CAUTION: normally, you DO NOT WANT to ever unhook and free thunks
@@ -213,7 +199,7 @@ void
 setHookTargetFunc(
 	Hook* hook,
 	void* targetFunc
-	);
+);
 
 #if (_AXL_CPP_MSC && _AXL_CPU_AMD64)
 
@@ -221,7 +207,7 @@ void
 setHookExceptionFunc(
 	Hook* hook,
 	HookExceptionFunc* exceptionFunc
-	);
+);
 
 #endif
 

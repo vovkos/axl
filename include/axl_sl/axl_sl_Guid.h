@@ -21,20 +21,16 @@ namespace sl {
 
 //..............................................................................
 
-enum GuidStringFlag
-{
+enum GuidStringFlag {
 	GuidStringFlag_UpperCase   = 0x01,
 	GuidStringFlag_CurlyBraces = 0x02,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct Guid
-{
-	union
-	{
-		struct
-		{
+struct Guid {
+	union {
+		struct {
 			//! \unnamed{union/struct:4}
 			uint32_t m_data1;
 			uint16_t m_data2;
@@ -42,8 +38,7 @@ struct Guid
 			uint8_t m_data4[8];
 		};
 
-		struct
-		{
+		struct {
 			//! \unnamed{struct:4}
 			uint32_t m_dword1;
 			uint32_t m_dword2;
@@ -57,32 +52,27 @@ struct Guid
 	};
 
 	bool
-	operator == (const Guid& guid) const
-	{
+	operator == (const Guid& guid) const {
 		return isEqual(guid);
 	}
 
 	bool
-	operator != (const Guid& guid) const
-	{
+	operator != (const Guid& guid) const {
 		return !isEqual(guid);
 	}
 
 	int
-	cmp(const Guid& guid) const
-	{
+	cmp(const Guid& guid) const {
 		return memcmp(this, &guid, sizeof(Guid));
 	}
 
 	size_t
-	hash() const
-	{
+	hash() const {
 		return djb2(this, sizeof(Guid));
 	}
 
 	bool
-	isNull() const
-	{
+	isNull() const {
 		return
 			!m_dword1 &&
 			!m_dword2 &&
@@ -91,8 +81,7 @@ struct Guid
 	}
 
 	bool
-	isEqual(const Guid& guid) const
-	{
+	isEqual(const Guid& guid) const {
 		return
 			m_dword1 == guid.m_dword1 &&
 			m_dword2 == guid.m_dword2 &&
@@ -116,8 +105,7 @@ struct Guid
 		uint8_t b6,
 		uint8_t b7,
 		uint8_t b8
-		)
-	{
+	) {
 		m_data1 = l;
 		m_data2 = s1;
 		m_data3 = s2;
@@ -154,8 +142,7 @@ buildGuid(
 	uint8_t b6,
 	uint8_t b7,
 	uint8_t b8
-	)
-{
+) {
 	Guid guid;
 	guid.setup(l, s1, s2, b1, b2, b3, b4, b5, b6, b7, b8);
 	return guid;
@@ -163,8 +150,7 @@ buildGuid(
 
 inline
 Guid
-parseGuid(const sl::StringRef& string)
-{
+parseGuid(const sl::StringRef& string) {
 	Guid guid;
 	guid.parse(string);
 	return guid;
@@ -172,8 +158,7 @@ parseGuid(const sl::StringRef& string)
 
 inline
 Guid
-generateGuid()
-{
+generateGuid() {
 	Guid guid;
 	guid.generate();
 	return guid;

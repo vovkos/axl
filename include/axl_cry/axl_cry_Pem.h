@@ -27,7 +27,7 @@ encodePem(
 	const sl::StringRef& header,
 	const void* p,
 	size_t size
-	);
+);
 
 inline
 bool
@@ -36,8 +36,7 @@ encodePem(
 	const sl::StringRef& name,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	return encodePem(buffer, name, sl::StringRef(), p, size);
 }
 
@@ -48,8 +47,7 @@ encodePem(
 	const sl::StringRef& header,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	sl::String string;
 	encodePem(&string, name, p, size);
 	return string;
@@ -61,8 +59,7 @@ encodePem(
 	const sl::StringRef& name,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	return encodePem(name, sl::StringRef(), p, size);
 }
 
@@ -74,7 +71,7 @@ decodePem(
 	sl::String* header,
 	sl::Array<char>* buffer,
 	const sl::StringRef& pem
-	);
+);
 
 inline
 bool
@@ -82,8 +79,7 @@ decodePem(
 	sl::String* name,
 	sl::Array<char>* buffer,
 	const sl::StringRef& pem
-	)
-{
+) {
 	return decodePem(name, NULL, buffer, pem);
 }
 
@@ -93,7 +89,7 @@ decodePem(
 	sl::String* header,
 	sl::Array<char>* buffer,
 	const sl::StringRef& pem
-	);
+);
 
 inline
 bool
@@ -101,8 +97,7 @@ decodePem(
 	const sl::StringRef& expectedName,
 	sl::Array<char>* buffer,
 	const sl::StringRef& pem
-	)
-{
+) {
 	return decodePem(expectedName, NULL, buffer, pem);
 }
 

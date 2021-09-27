@@ -25,8 +25,7 @@ __wrap_fcntl(
 	int fd,
 	int cmd,
 	char* arg
-	)
-{
+) {
 	return fcntl(fd, cmd, arg);
 }
 

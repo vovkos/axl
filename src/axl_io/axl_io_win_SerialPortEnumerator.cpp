@@ -23,8 +23,7 @@ namespace io {
 
 //..............................................................................
 
-class SerialPortEnumerator
-{
+class SerialPortEnumerator {
 public:
 	static
 	size_t
@@ -39,8 +38,7 @@ protected:
 //..............................................................................
 
 size_t
-SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
-{
+SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList) {
 	bool result;
 
 	portList->clear();
@@ -56,8 +54,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 	if (!result)
 		return 0;
 
-	for (size_t i = 0;; i++)
-	{
+	for (size_t i = 0;; i++) {
 		sys::win::DeviceInfo deviceInfo;
 		result = deviceInfoSet.getDeviceInfo(i, &deviceInfo);
 		if (!result)
@@ -72,8 +69,7 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList)
 }
 
 SerialPortDesc*
-SerialPortEnumerator::createPortDesc(sys::win::DeviceInfo* deviceInfo)
-{
+SerialPortEnumerator::createPortDesc(sys::win::DeviceInfo* deviceInfo) {
 	long result;
 
 	sys::win::RegKeyHandle devRegKey = deviceInfo->openDeviceRegistryKey(KEY_QUERY_VALUE);
@@ -98,7 +94,7 @@ SerialPortEnumerator::createPortDesc(sys::win::DeviceInfo* deviceInfo)
 		&type,
 		(byte_t*)bufferString.p(),
 		&size
-		);
+	);
 
 	if (result != ERROR_SUCCESS)
 		return NULL;
@@ -116,8 +112,7 @@ SerialPortEnumerator::createPortDesc(sys::win::DeviceInfo* deviceInfo)
 //..............................................................................
 
 size_t
-createSerialPortDescList(sl::List<SerialPortDesc>* portList)
-{
+createSerialPortDescList(sl::List<SerialPortDesc>* portList) {
 	return SerialPortEnumerator::createPortList(portList);
 }
 

@@ -25,8 +25,7 @@ int
 __wrap_clock_gettime(
 	clockid_t id,
 	struct timespec *ts
-	)
-{
+) {
 	return clock_gettime(id, ts);
 }
 

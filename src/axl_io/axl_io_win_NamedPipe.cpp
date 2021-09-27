@@ -28,8 +28,7 @@ NamedPipe::create(
 	dword_t rxBufferSize,
 	uint_t timeout,
 	SECURITY_ATTRIBUTES* secAttr
-	)
-{
+) {
 	close();
 
 	m_h = ::CreateNamedPipeW(
@@ -41,7 +40,7 @@ NamedPipe::create(
 		rxBufferSize,
 		timeout,
 		secAttr
-		);
+	);
 
 	return err::complete(m_h != INVALID_HANDLE_VALUE);
 }
@@ -51,8 +50,7 @@ NamedPipe::open(
 	const sl::StringRef_w& name,
 	uint_t access,
 	uint_t flags
-	)
-{
+) {
 	close();
 
 	m_h = ::CreateFileW(name.sz(), access, 0, NULL, OPEN_EXISTING, flags, NULL);
@@ -60,8 +58,7 @@ NamedPipe::open(
 }
 
 bool
-NamedPipe::overlappedConnect()
-{
+NamedPipe::overlappedConnect() {
 	dword_t actualSize; // unused
 	StdOverlapped overlapped;
 	bool result = overlappedConnect(&overlapped);

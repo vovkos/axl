@@ -31,8 +31,7 @@ namespace cry {
 
 static
 uint64_t
-decodeRfc3339Timestamp(const sl::StringRef& string)
-{
+decodeRfc3339Timestamp(const sl::StringRef& string) {
 	int year = 0;
 	int month = 0;
 	int monthDay = 0;
@@ -49,10 +48,9 @@ decodeRfc3339Timestamp(const sl::StringRef& string)
 		&hour,
 		&minute,
 		&second
-		);
+	);
 
-	if (result < 3)
-	{
+	if (result < 3) {
 		err::setError(err::SystemErrorCode_InvalidParameter);
 		return 0;
 	}
@@ -70,8 +68,7 @@ decodeRfc3339Timestamp(const sl::StringRef& string)
 
 //..............................................................................
 
-AppStoreIap::AppStoreIap()
-{
+AppStoreIap::AppStoreIap() {
 	m_quantity = 0;
 	m_webOrderLineItemId = 0;
 	m_purchaseTimestamp = 0;
@@ -82,15 +79,13 @@ AppStoreIap::AppStoreIap()
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AppStoreReceipt::AppStoreReceipt()
-{
+AppStoreReceipt::AppStoreReceipt() {
 	m_receiptCreationTimestamp = 0;
 	m_receiptExpirationTimestamp = 0;
 }
 
 void
-AppStoreReceipt::clear()
-{
+AppStoreReceipt::clear() {
 	m_bundleId.clear();
 	m_appVersion.clear();
 	m_originalAppVersion.clear();
@@ -104,8 +99,7 @@ AppStoreReceipt::clear()
 
 //..............................................................................
 
-AppStoreReceiptPayloadParser::AppStoreReceiptPayloadParser()
-{
+AppStoreReceiptPayloadParser::AppStoreReceiptPayloadParser() {
 	m_receipt = NULL;
 	m_iap = NULL;
 	m_attributeId = AttributeId_Undefined;
@@ -119,8 +113,7 @@ AppStoreReceiptPayloadParser::parse(
 	AppStoreReceipt* receipt,
 	const void* p,
 	size_t size
-	)
-{
+) {
 	m_receipt = receipt;
 
 	return decode(
@@ -129,7 +122,7 @@ AppStoreReceiptPayloadParser::parse(
 		"invalid app receipt (expected ASN1 SET)",
 		(char*)p,
 		size
-		) != NULL;
+	) != NULL;
 }
 
 const char*
@@ -139,8 +132,7 @@ AppStoreReceiptPayloadParser::decode(
 	const char* unexpectedTagError,
 	const char* p,
 	size_t size
-	)
-{
+) {
 	ASSERT(m_receipt);
 
 	long length;
@@ -156,18 +148,16 @@ AppStoreReceiptPayloadParser::decode(
 
 	const char* end = p + length;
 
-	switch (state)
-	{
+	switch (state) {
 	case State_Set:
-		while (p < end)
-		{
+		while (p < end) {
 			p = decode(
 				State_Attribute,
 				V_ASN1_SEQUENCE,
 				"invalid app receipt attribute (expected ASN1 SEQUENCE)",
 				p,
 				end - p
-				);
+			);
 
 			if (!p)
 				return NULL;
@@ -187,7 +177,7 @@ AppStoreReceiptPayloadParser::decode(
 			"invalid app receipt attribute type (expected ASN1 INTEGER)",
 			p,
 			end - p
-			);
+		);
 
 		if (!p)
 			return NULL;
@@ -200,7 +190,7 @@ AppStoreReceiptPayloadParser::decode(
 			"invalid app receipt attribute version (expected ASN1 INTEGER)",
 			p,
 			end - p
-			);
+		);
 
 		if (!p)
 			return NULL;
@@ -211,7 +201,7 @@ AppStoreReceiptPayloadParser::decode(
 			"invalid app receipt attribute value (expected ASN1 OCTET STRING)",
 			p,
 			end - p
-			);
+		);
 
 		if (!p)
 			return NULL;
@@ -219,8 +209,7 @@ AppStoreReceiptPayloadParser::decode(
 		break;
 
 	case State_AttributeValue:
-		switch (m_attributeId)
-		{
+		switch (m_attributeId) {
 		case AttributeId_BundleId:
 			m_receipt->m_rawBundleId.copy(p, length);
 			m_attributeString = &m_receipt->m_bundleId;
@@ -231,7 +220,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt bundle ID (expected ASN1 UTF8 STRING)",
 				p,
 				length
-				);
+			);
 
 			break;
 
@@ -244,7 +233,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt version (expected ASN1 UTF8 STRING)",
 				p,
 				length
-				);
+			);
 
 			break;
 
@@ -257,7 +246,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt original version (expected ASN1 UTF8 STRING)",
 				p,
 				length
-				);
+			);
 
 			break;
 
@@ -270,7 +259,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt creation date (expected ASN1 IA5 STRING)",
 				p,
 				length
-				);
+			);
 
 			m_receipt->m_receiptCreationTimestamp = decodeRfc3339Timestamp(m_receipt->m_receiptCreationDateString);
 			break;
@@ -284,7 +273,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP (expected ASN1 SET)",
 				p,
 				end - p
-				);
+			);
 
 			m_iap = NULL;
 			break;
@@ -310,7 +299,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP quantity (expected ASN1 INTEGER)",
 				p,
 				length
-				);
+			);
 			break;
 
 		case AttributeId_IapProductId:
@@ -325,7 +314,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP product ID (expected ASN1 UTF8 STRING)",
 				p,
 				length
-				);
+			);
 
 			break;
 
@@ -341,7 +330,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP transaction ID (expected ASN1 UTF8 STRING)",
 				p,
 				length
-				);
+			);
 
 			break;
 
@@ -357,7 +346,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP purchase date (expected ASN1 IA5 STRING)",
 				p,
 				length
-				);
+			);
 
 			m_iap->m_purchaseTimestamp = decodeRfc3339Timestamp(m_iap->m_purchaseDateString);
 			break;
@@ -374,7 +363,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP original transaction ID (expected ASN1 UTF8 STRING)",
 				p,
 				length
-				);
+			);
 
 			break;
 
@@ -390,7 +379,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP original purchase date (expected ASN1 IA5 STRING)",
 				p,
 				length
-				);
+			);
 
 			m_iap->m_originalPurchaseTimestamp = decodeRfc3339Timestamp(m_iap->m_originalPurchaseDateString);
 			break;
@@ -407,7 +396,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP subscription expiration date (expected ASN1 IA5 STRING)",
 				p,
 				length
-				);
+			);
 
 			m_iap->m_subscriptionExpirationTimestamp = decodeRfc3339Timestamp(m_iap->m_subscriptionExpirationDateString);
 			break;
@@ -425,7 +414,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP web order line item ID (expected ASN1 INTEGER)",
 				p,
 				length
-				);
+			);
 
 			break;
 
@@ -441,7 +430,7 @@ AppStoreReceiptPayloadParser::decode(
 				"invalid app receipt IAP purchase date (expected ASN1 IA5 STRING)",
 				p,
 				length
-				);
+			);
 
 			m_iap->m_cancellationTimestamp = decodeRfc3339Timestamp(m_iap->m_cancellationDateString);
 			break;
@@ -461,8 +450,7 @@ AppStoreReceiptPayloadParser::decode(
 		break;
 
 	case State_AttributeIntegerValue:
-		if (m_attributeInteger)
-		{
+		if (m_attributeInteger) {
 			size_t size = AXL_MIN((size_t)length, m_attributeIntegerSize);
 			sl::ArrayDetails<char>::copyReverse((char*)m_attributeInteger, p, size); // big-endian
 		}
@@ -486,8 +474,7 @@ verifyAppStoreReceipt(
 	const void* computerGuid,
 	size_t computerGuidSize,
 	uint_t flags
-	)
-{
+) {
 	static const char appleRootCertPem[] =
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIIEuzCCA6OgAwIBAgIBAjANBgkqhkiG9w0BAQUFADBiMQswCQYDVQQGEwJVUzET\n"
@@ -526,11 +513,9 @@ verifyAppStoreReceipt(
 	Bio bio;
 	bio.createMem();
 
-	if (flags & VerifyAppStoreReceiptFlag_SkipSignatureCheck)
-	{
+	if (flags & VerifyAppStoreReceiptFlag_SkipSignatureCheck) {
 		result = pkcs7.verify(NULL, NULL, NULL, bio, PKCS7_NOVERIFY | PKCS7_NOSIGS);
-	} else
-	{
+	} else {
 		X509Cert appleRootCert;
 		X509Store store;
 
@@ -579,13 +564,11 @@ verifyAppStoreReceipt(
 	const void* p,
 	size_t size,
 	uint_t flags
-	)
-{
+) {
 	sl::Array<char> computerGuid;
 
 #if (_AXL_OS_DARWIN)
-	if (!(flags & VerifyAppStoreReceiptFlag_SkipSignatureCheck))
-	{
+	if (!(flags & VerifyAppStoreReceiptFlag_SkipSignatureCheck)) {
 		size_t result = iok::getComputerGuid(&computerGuid);
 		if (result == -1)
 			return false;

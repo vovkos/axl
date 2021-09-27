@@ -24,12 +24,10 @@
 
 #if (_AXL_OS_DARWIN)
 char*
-get_current_dir_name()
-{
+get_current_dir_name() {
 	size_t size = 128;
 
-	for (;;)
-	{
+	for (;;) {
 		char* buffer = (char*) ::malloc(size);
 		char* result = ::getcwd(buffer, size);
 		if (result == buffer)
@@ -51,8 +49,7 @@ namespace io {
 //..............................................................................
 
 sl::String
-getTempDir()
-{
+getTempDir() {
 #if (_AXL_OS_WIN)
 	wchar_t dir[1024] = { 0 };
 	::GetTempPathW(countof(dir) - 1, dir);
@@ -64,8 +61,7 @@ getTempDir()
 }
 
 sl::String
-getHomeDir()
-{
+getHomeDir() {
 #if (_AXL_OS_WIN)
 	wchar_t buffer_w[MAX_PATH];
 	HRESULT result = ::SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, buffer_w);
@@ -81,8 +77,7 @@ getHomeDir()
 }
 
 sl::String
-getCurrentDir()
-{
+getCurrentDir() {
 #if (_AXL_OS_WIN)
 	wchar_t dir[1024] = { 0 };
 	::GetCurrentDirectoryW(countof(dir) - 1, dir);
@@ -96,8 +91,7 @@ getCurrentDir()
 }
 
 bool
-setCurrentDir(const sl::StringRef& dir)
-{
+setCurrentDir(const sl::StringRef& dir) {
 #if (_AXL_OS_WIN)
 	bool_t result = ::SetCurrentDirectoryW(dir.s2().sz());
 	return err::complete(result);
@@ -108,8 +102,7 @@ setCurrentDir(const sl::StringRef& dir)
 }
 
 sl::String
-getExeFilePath()
-{
+getExeFilePath() {
 #if (_AXL_OS_WIN)
 	wchar_t buffer[1024] = { 0 };
 	::GetModuleFileNameW(::GetModuleHandle(NULL), buffer, countof(buffer) - 1);
@@ -134,14 +127,12 @@ getExeFilePath()
 }
 
 sl::String
-getExeDir()
-{
+getExeDir() {
 	return io::getDir(io::getExeFilePath());
 }
 
 bool
-doesFileExist(const sl::StringRef& fileName)
-{
+doesFileExist(const sl::StringRef& fileName) {
 #if (_AXL_OS_WIN)
 	char buffer[256];
 	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
@@ -155,23 +146,20 @@ doesFileExist(const sl::StringRef& fileName)
 
 #if (_AXL_OS_WIN)
 bool
-isDir(const sl::StringRef_w& fileName)
-{
+isDir(const sl::StringRef_w& fileName) {
 	dword_t attributes = ::GetFileAttributesW(fileName.sz());
 	return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 bool
-isDir(const sl::StringRef& fileName)
-{
+isDir(const sl::StringRef& fileName) {
 	char buffer[256];
 	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	return isDir(fileName_w);
 }
 
 bool
-ensureDirExists(const sl::StringRef& fileName)
-{
+ensureDirExists(const sl::StringRef& fileName) {
 	char buffer[256] = { 0 };
 	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	fileName_w = fileName;
@@ -186,8 +174,7 @@ ensureDirExists(const sl::StringRef& fileName)
 	while (*p == '\\' || *p == '/') // skip root
 		p++;
 
-	while (*p)
-	{
+	while (*p) {
 		wchar_t* p2 = p + 1;
 		while (*p2 && *p2 != '\\' && *p2 != '/')
 			p2++;
@@ -195,8 +182,7 @@ ensureDirExists(const sl::StringRef& fileName)
 		wchar_t c = *p2; // save
 		*(wchar_t*)p2 = 0;
 
-		if (!isDir(fileName_w))
-		{
+		if (!isDir(fileName_w)) {
 			bool_t result = ::CreateDirectoryW(fileName_w, NULL);
 			if (!result)
 				return err::failWithLastSystemError();
@@ -218,8 +204,7 @@ ensureDirExists(const sl::StringRef& fileName)
 #elif (_AXL_OS_POSIX)
 
 bool
-isDir(const sl::StringRef& fileName)
-{
+isDir(const sl::StringRef& fileName) {
 	struct stat st;
 
 	int result = ::stat(fileName.sz(), &st);
@@ -227,8 +212,7 @@ isDir(const sl::StringRef& fileName)
 }
 
 bool
-ensureDirExists(const sl::StringRef& fileName0)
-{
+ensureDirExists(const sl::StringRef& fileName0) {
 	if (fileName0.isEmpty() || isDir(fileName0))
 		return true;
 
@@ -238,8 +222,7 @@ ensureDirExists(const sl::StringRef& fileName0)
 	while (*p == '/') // skip root
 		p++;
 
-	while (*p)
-	{
+	while (*p) {
 		char* p2 = p + 1;
 		while (*p2 && *p2 != '/')
 			p2++;
@@ -247,8 +230,7 @@ ensureDirExists(const sl::StringRef& fileName0)
 		char c = *p2; // save
 		*p2 = 0;
 
-		if (!isDir(fileName))
-		{
+		if (!isDir(fileName)) {
 			int result = ::mkdir(fileName, S_IRWXU);
 			if (result != 0)
 				return err::failWithLastSystemError();
@@ -270,8 +252,7 @@ ensureDirExists(const sl::StringRef& fileName0)
 #endif
 
 sl::String
-getFullFilePath(const sl::StringRef& fileName)
-{
+getFullFilePath(const sl::StringRef& fileName) {
 #if (_AXL_OS_WIN)
 	char buffer[256];
 	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
@@ -283,8 +264,7 @@ getFullFilePath(const sl::StringRef& fileName)
 
 	sl::String_w filePath;
 
-	for (;;)
-	{
+	for (;;) {
 		wchar_t* p = filePath.createBuffer(bufferLength);
 		if (!p)
 			return NULL;
@@ -309,8 +289,7 @@ getFullFilePath(const sl::StringRef& fileName)
 }
 
 sl::String
-getDir(const sl::StringRef& filePath)
-{
+getDir(const sl::StringRef& filePath) {
 #if (_AXL_OS_WIN)
 	char buffer[256];
 	sl::String_w filePath_w(rc::BufKind_Stack, buffer, sizeof(buffer));
@@ -325,7 +304,7 @@ getDir(const sl::StringRef& filePath)
 		dir, countof(dir) - 1,
 		NULL, 0,
 		NULL, 0
-		);
+	);
 
 	sl::String string = drive;
 	string.append(dir);
@@ -338,8 +317,7 @@ getDir(const sl::StringRef& filePath)
 }
 
 sl::String
-getFileName(const sl::StringRef& filePath)
-{
+getFileName(const sl::StringRef& filePath) {
 #if (_AXL_OS_WIN)
 	char buffer[256];
 	sl::String_w filePath_w(rc::BufKind_Stack, buffer, sizeof(buffer));
@@ -354,7 +332,7 @@ getFileName(const sl::StringRef& filePath)
 		NULL, 0,
 		fileName, countof(fileName) - 1,
 		extension, countof(extension) - 1
-		);
+	);
 
 	sl::String string = fileName;
 	string.append(extension);
@@ -366,8 +344,7 @@ getFileName(const sl::StringRef& filePath)
 }
 
 sl::String
-getExtension(const sl::StringRef& filePath)
-{
+getExtension(const sl::StringRef& filePath) {
 	size_t i = filePath.find('.');
 	return i != -1 ? filePath.getSubString(i) : NULL;
 }
@@ -376,10 +353,8 @@ sl::String
 concatFilePath(
 	sl::String* filePath,
 	const sl::StringRef& fileName
-	)
-{
-	if (filePath->isEmpty())
-	{
+) {
+	if (filePath->isEmpty()) {
 		*filePath = fileName;
 		return *filePath;
 	}
@@ -404,12 +379,10 @@ findFilePath(
 	const sl::StringRef& firstDir,
 	const sl::BoxList<sl::String>* dirList,
 	bool doFindInCurrentDir
-	)
-{
+) {
 	sl::String filePath;
 
-	if (!firstDir.isEmpty())
-	{
+	if (!firstDir.isEmpty()) {
 		filePath = concatFilePath(firstDir, fileName);
 		if (doesFileExist(filePath))
 			return getFullFilePath(filePath);
@@ -419,11 +392,9 @@ findFilePath(
 		if (doesFileExist(fileName))
 			return getFullFilePath(fileName);
 
-	if (dirList)
-	{
+	if (dirList) {
 		sl::ConstBoxIterator<sl::String> dir = dirList->getHead();
-		for (; dir; dir++)
-		{
+		for (; dir; dir++) {
 			filePath.forceCopy(*dir);
 			concatFilePath(&filePath, fileName);
 			if (doesFileExist(filePath))
@@ -440,8 +411,7 @@ bool
 getSymbolicLinkTarget(
 	sl::String* targetName,
 	const sl::StringRef& linkName
-	)
-{
+) {
 	using namespace axl::sys::win;
 
 	NTSTATUS status;
@@ -463,10 +433,9 @@ getSymbolicLinkTarget(
 		link.p(),
 		GENERIC_READ,
 		&oa
-		);
+	);
 
-	if (status < 0)
-	{
+	if (status < 0) {
 		err::setError(sys::win::NtStatus(status));
 		return false;
 	}
@@ -475,8 +444,7 @@ getSymbolicLinkTarget(
 	ULONG bufferSize = 0;
 
 	status = ntQuerySymbolicLinkObject(link, &uniTarget, &bufferSize);
-	if (status != STATUS_BUFFER_TOO_SMALL)
-	{
+	if (status != STATUS_BUFFER_TOO_SMALL) {
 		err::setError(sys::win::NtStatus(status));
 		return false;
 	}
@@ -489,8 +457,7 @@ getSymbolicLinkTarget(
 	uniTarget.MaximumLength = (USHORT)bufferSize;
 
 	status = ntQuerySymbolicLinkObject(link, &uniTarget, &bufferSize);
-	if (status < 0)
-	{
+	if (status < 0) {
 		err::setError(sys::win::NtStatus(status));
 		return false;
 	}
@@ -504,8 +471,7 @@ getSymbolicLinkTarget(
 #elif (_AXL_OS_POSIX)
 
 bool
-isSymbolicLink(const sl::StringRef& fileName)
-{
+isSymbolicLink(const sl::StringRef& fileName) {
 	struct stat fileStat;
 	int result = ::lstat(fileName.sz(), &fileStat);
 	return result != -1 && S_ISLNK(fileStat.st_mode);
@@ -515,8 +481,7 @@ bool
 getSymbolicLinkTarget(
 	sl::String* targetName,
 	const sl::StringRef& linkName
-	)
-{
+) {
 	struct stat linkStat = { 0 };
 
 	int result = ::lstat(linkName.sz(), &linkStat);
@@ -550,8 +515,7 @@ getSymbolicLinkTarget(
 namespace win {
 
 sl::String_w
-getWindowsDir()
-{
+getWindowsDir() {
 	uint_t length = ::GetWindowsDirectoryW(NULL, 0);
 
 	sl::String_w dir;
@@ -565,8 +529,7 @@ getWindowsDir()
 }
 
 sl::String_w
-getSystemDir()
-{
+getSystemDir() {
 	uint_t length = ::GetSystemDirectoryW(NULL, 0);
 
 	sl::String_w dir;
@@ -592,12 +555,10 @@ bool
 matchWildcard(
 	const sl::StringRef& string0,
 	const sl::StringRef& wildcard0
-	)
-{
+) {
 	const char* wildcard = wildcard0.sz();
 
-	if (string0.isEmpty()) // empty input shortcut
-	{
+	if (string0.isEmpty()) { // empty input shortcut
 		while (*wildcard == '*')
 			wildcard++;
 
@@ -609,20 +570,16 @@ matchWildcard(
 	const char* wildcardBookmark = NULL;
 	char c;
 
-	for (;;)
-	{
-		if (*wildcard == '*')
-		{
+	for (;;) {
+		if (*wildcard == '*') {
 			while (*++wildcard == '*')
 				;
 
 			if (!*wildcard)
 				return true;
 
-			if (*wildcard != '?')
-			{
-				while (*string != *wildcard)
-				{
+			if (*wildcard != '?') {
+				while (*string != *wildcard) {
 					if (!(*(++string)))
 						return false;
 				}
@@ -630,31 +587,22 @@ matchWildcard(
 
 			wildcardBookmark = wildcard;
 			stringBookmark = string;
-		}
-		else
-		{
+		} else {
 			c = *string;
-			if (c != *wildcard && *wildcard != '?')
-			{
-				if (wildcardBookmark)
-				{
-					if (wildcard != wildcardBookmark)
-					{
+			if (c != *wildcard && *wildcard != '?') {
+				if (wildcardBookmark) {
+					if (wildcard != wildcardBookmark) {
 						wildcard = wildcardBookmark;
 
-						if (c != *wildcard)
-						{
+						if (c != *wildcard) {
 							string = ++stringBookmark;
 							continue;
-						}
-						else
-						{
+						} else {
 							wildcard++;
 						}
 					}
 
-					if (*string)
-					{
+					if (*string) {
 						string++;
 						continue;
 					}
@@ -667,8 +615,7 @@ matchWildcard(
 		string++;
 		wildcard++;
 
-		if (!*string)
-		{
+		if (!*string) {
 			while (*wildcard == '*')
 				wildcard++;
 

@@ -21,8 +21,7 @@ namespace psx {
 
 //..............................................................................
 
-class Pipe
-{
+class Pipe {
 public:
 	File m_readFile;
 	File m_writeFile;
@@ -32,8 +31,7 @@ public:
 	create();
 
 	void
-	close()
-	{
+	close() {
 		m_readFile.close();
 		m_writeFile.close();
 	}
@@ -42,8 +40,7 @@ public:
 	read(
 		void* p,
 		size_t size
-		) const
-	{
+	) const {
 		return m_readFile.read(p, size);
 	}
 
@@ -51,8 +48,7 @@ public:
 	write(
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return m_writeFile.write(p, size);
 	}
 };

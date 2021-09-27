@@ -21,8 +21,7 @@ namespace enc {
 
 //..............................................................................
 
-enum EscapeEncodingFlag
-{
+enum EscapeEncodingFlag {
 	EscapeEncodingFlag_UpperCase   = 0x01,
 	EscapeEncodingFlag_NoTabEscape = 0x02,
 	EscapeEncodingFlag_NoCrEscape  = 0x04,
@@ -31,18 +30,15 @@ enum EscapeEncodingFlag
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class EscapeEncodingRoot
-{
+class EscapeEncodingRoot {
 public:
 	static
 	utf32_t
 	findEscapeChar(
 		utf32_t c,
 		uint_t flags = 0
-		)
-	{
-		switch (c)
-		{
+	) {
+		switch (c) {
 		case '\0':
 			return '0';
 
@@ -77,10 +73,8 @@ public:
 
 	static
 	utf32_t
-	findEscapeReplaceChar(utf32_t c)
-	{
-		switch (c)
-		{
+	findEscapeReplaceChar(utf32_t c) {
+		switch (c) {
 		case '0':
 			return '\0';
 
@@ -115,8 +109,7 @@ public:
 
 	static
 	bool
-	isHexChar(utf32_t c)
-	{
+	isHexChar(utf32_t c) {
 		return
 			c >= '0' && c <= '9' ||
 			c >= 'a' && c <= 'f' ||
@@ -127,24 +120,21 @@ protected:
 	template <
 		typename GetHexChar,
 		typename C
-		>
+	>
 	static
 	size_t
 	buildHexCodeEscapeSequence(
 		C* escapeSequence,
 		utf32_t c
-		)
-	{
-		if ((uint32_t)c <= 0xff)
-		{
+	) {
+		if ((uint32_t)c <= 0xff) {
 			escapeSequence[1] = 'x';
 			escapeSequence[2] = GetHexChar()(c >> 4);
 			escapeSequence[3] = GetHexChar()(c);
 			return 4;
 		}
 
-		if ((uint32_t)c <= 0xffff)
-		{
+		if ((uint32_t)c <= 0xffff) {
 			escapeSequence[1] = 'u';
 			escapeSequence[2] = GetHexChar()(c >> 12);
 			escapeSequence[3] = GetHexChar()(c >> 8);
@@ -170,8 +160,7 @@ protected:
 //..............................................................................
 
 template <typename T>
-class EscapeEncodingUtf: public EscapeEncodingRoot
-{
+class EscapeEncodingUtf: public EscapeEncodingRoot {
 public:
 	typedef T C;
 	typedef typename sl::StringDetailsBase<T>::Encoding UtfEncoding;
@@ -183,8 +172,7 @@ public:
 		sl::StringBase<C>* string,
 		const sl::StringRefBase<C>& source,
 		uint_t flags = 0
-		)
-	{
+	) {
 		string->clear();
 		string->reserve(source.getLength());
 
@@ -193,8 +181,7 @@ public:
 		const C* src = source.cp();
 		const C* srcEnd = source.getEnd();
 
-		while (src < srcEnd)
-		{
+		while (src < srcEnd) {
 			utf32_t buffer[64];
 
 			size_t takenSrcLength;
@@ -204,7 +191,7 @@ public:
 				src,
 				srcEnd - src,
 				&takenSrcLength
-				);
+			);
 
 			if (!takenSrcLength)
 				break;
@@ -215,19 +202,15 @@ public:
 			const utf32_t* end = p + takenBufferLength;
 			const utf32_t* base = p;
 
-			for (; p < end; p++)
-			{
+			for (; p < end; p++) {
 				utf32_t c = *p;
 
-				if (c == '\\')
-				{
+				if (c == '\\') {
 					escapeSequence[1] = '\\';
 					string->append(base, p - base);
 					string->append(escapeSequence, 2);
 					base = p + 1;
-				}
-				else
-				{
+				} else {
 					if (utfIsPrintable(c))
 						continue;
 
@@ -238,13 +221,10 @@ public:
 					string->append(base, p - base);
 
 					size_t escapeSequenceLength;
-					if (escape != c)
-					{
+					if (escape != c) {
 						escapeSequence[1] = (C)escape;
 						escapeSequenceLength = 2;
-					}
-					else
-					{
+					} else {
 						escapeSequenceLength = (flags & EscapeEncodingFlag_UpperCase) ?
 							buildHexCodeEscapeSequence<GetHexChar_u>(escapeSequence, c) :
 							buildHexCodeEscapeSequence<GetHexChar_l>(escapeSequence, c);
@@ -266,8 +246,7 @@ public:
 	encode(
 		const sl::StringRefBase<C>& source,
 		uint_t flags = 0
-		)
-	{
+	) {
 		sl::StringBase<C> string;
 		encode(&string, source, flags);
 		return string;
@@ -278,10 +257,8 @@ public:
 	decode(
 		sl::StringBase<C>* string,
 		const sl::StringRefBase<C>& source
-		)
-	{
-		enum State
-		{
+	) {
+		enum State {
 			State_Normal = 0,
 			State_Escape,
 			State_Hex,
@@ -301,15 +278,12 @@ public:
 		const C* end = source.getEnd();
 		const C* base = p;
 
-		for (; p < end; p++)
-		{
+		for (; p < end; p++) {
 			C c = *p;
 
-			switch (state)
-			{
+			switch (state) {
 			case State_Normal:
-				if (c == '\\')
-				{
+				if (c == '\\') {
 					string->append(base, p - base);
 					state = State_Escape;
 				}
@@ -317,8 +291,7 @@ public:
 				break;
 
 			case State_Escape:
-				switch (c)
-				{
+				switch (c) {
 				case 'x':
 					state = State_Hex;
 					hexCodeLen = 0;
@@ -339,13 +312,10 @@ public:
 
 				default:
 					C replace = (C)findEscapeReplaceChar(c);
-					if (replace != c)
-					{
+					if (replace != c) {
 						string->append(replace, 1);
 						base = p + 1;
-					}
-					else
-					{
+					} else {
 						base = p;
 					}
 
@@ -355,28 +325,22 @@ public:
 				break;
 
 			case State_Hex:
-				if (isHexChar(c))
-				{
+				if (isHexChar(c)) {
 					hexCodeString[hexCodeLen++] = (char)c;
 					if (hexCodeLen < hexCodeMaxLen)
 						break;
 
 					base = p + 1;
-				}
-				else
-				{
+				} else {
 					base = p;
 				}
 
 				hexCodeString[hexCodeLen] = 0;
 				hexCode = strtoul(hexCodeString, NULL, 16);
 
-				if (hexCodeMaxLen == 2) // \x
-				{
+				if (hexCodeMaxLen == 2) { // \x
 					string->append((const C*)&hexCode, 1);
-				}
-				else // \u or \U
-				{
+				} else { // \u or \U
 					C buffer[4];
 					size_t length = UtfEncoding::getEncodeCodePointLength(hexCode);
 					UtfEncoding::encodeCodePoint(buffer, hexCode);
@@ -396,8 +360,7 @@ public:
 
 	static
 	sl::StringBase<C>
-	decode(const sl::StringRefBase<C>& source)
-	{
+	decode(const sl::StringRefBase<C>& source) {
 		sl::StringBase<C> string;
 		decode(&string, source);
 		return string;
@@ -414,8 +377,7 @@ typedef EscapeEncodingUtf<utf32_t> EscapeEncoding_utf32;
 
 //..............................................................................
 
-class EscapeEncodingDynamic: EscapeEncodingRoot
-{
+class EscapeEncodingDynamic: EscapeEncodingRoot {
 public:
 	static
 	size_t
@@ -425,7 +387,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		);
+	);
 
 	static
 	size_t
@@ -435,8 +397,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return encode(getCharCodec(codecKind), buffer, p, size, flags);
 	}
 
@@ -447,8 +408,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		sl::Array<char> buffer;
 		encode(codec, &buffer, p, size, flags);
 		return buffer;
@@ -461,8 +421,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		return encode(getCharCodec(codecKind), p, size, flags);
 	}
 
@@ -473,7 +432,7 @@ public:
 		sl::Array<char>* buffer,
 		const void* p,
 		size_t size
-		);
+	);
 
 	static
 	size_t
@@ -482,8 +441,7 @@ public:
 		sl::Array<char>* buffer,
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return decode(getCharCodec(codecKind), buffer, p, size);
 	}
 
@@ -493,8 +451,7 @@ public:
 		CharCodec* codec,
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		sl::Array<char> buffer;
 		decode(codec, &buffer, p, size);
 		return buffer;
@@ -506,8 +463,7 @@ public:
 		CharCodecKind codecKind,
 		const void* p,
 		size_t size
-		)
-	{
+	) {
 		return decode(getCharCodec(codecKind), p, size);
 	}
 };

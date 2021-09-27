@@ -26,24 +26,19 @@ typedef int socket_t;
 
 //..............................................................................
 
-class FreeBio
-{
+class FreeBio {
 public:
 	void
-	operator () (BIO* h)
-	{
+	operator () (BIO* h) {
 		::BIO_free(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Bio: public sl::Handle<BIO*, FreeBio>
-{
+class Bio: public sl::Handle<BIO*, FreeBio> {
 public:
-	Bio()
-	{
-	}
+	Bio() {}
 
 #if (OPENSSL_VERSION_NUMBER >= 0x10100000)
 	bool
@@ -54,8 +49,7 @@ public:
 #endif
 
 	bool
-	createMem()
-	{
+	createMem() {
 		return create(BIO_s_mem());
 	}
 
@@ -63,29 +57,28 @@ public:
 	createMemBuf(
 		const void* p,
 		size_t size = -1
-		);
+	);
 
 	bool
 	createSocket(
 		socket_t socket,
 		bool isAutoClose = false
-		);
+	);
 
 	bool
 	createFp(
 		FILE* file,
 		bool isAutoClose = false
-		);
+	);
 
 	bool
 	createFd(
 		int fd,
 		bool isAutoClose = false
-		);
+	);
 
 	void
-	freeAll()
-	{
+	freeAll() {
 		ASSERT(m_h);
 		::BIO_free_all(detach());
 	}

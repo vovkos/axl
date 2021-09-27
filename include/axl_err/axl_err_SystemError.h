@@ -38,8 +38,7 @@ namespace err {
 
 AXL_SELECT_ANY const sl::Guid& g_systemErrorGuid = sys::win::g_winErrorGuid;
 
-enum SystemErrorCode
-{
+enum SystemErrorCode {
 	SystemErrorCode_Success                  = ERROR_SUCCESS,
 	SystemErrorCode_Cancelled                = ERROR_OPERATION_ABORTED,
 	SystemErrorCode_Unsuccessful             = ERROR_GEN_FAILURE,
@@ -66,8 +65,7 @@ enum SystemErrorCode
 
 inline
 uint_t
-getLastSystemErrorCode()
-{
+getLastSystemErrorCode() {
 	return ::GetLastError();
 }
 
@@ -78,8 +76,7 @@ getLastSystemErrorCode()
 extern const sl::Guid g_errnoGuid;
 AXL_SELECT_ANY const sl::Guid& g_systemErrorGuid = g_errnoGuid;
 
-enum SystemErrorCode
-{
+enum SystemErrorCode {
 	SystemErrorCode_Success                  = 0,
 	SystemErrorCode_Cancelled                = ECANCELED,
 	SystemErrorCode_Unsuccessful             = EIO,
@@ -105,8 +102,7 @@ enum SystemErrorCode
 
 inline
 uint_t
-getLastSystemErrorCode()
-{
+getLastSystemErrorCode() {
 	return errno;
 }
 

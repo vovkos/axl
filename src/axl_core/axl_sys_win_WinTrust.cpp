@@ -20,16 +20,14 @@ namespace win {
 //..............................................................................
 
 bool
-verifyTrustFile(const sl::StringRef& fileName)
-{
+verifyTrustFile(const sl::StringRef& fileName) {
 	char buffer[256];
 	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 	return verifyTrustFile(fileName_w);
 }
 
 bool
-verifyTrustFile(const sl::StringRef_w& fileName)
-{
+verifyTrustFile(const sl::StringRef_w& fileName) {
 	WINTRUST_FILE_INFO fileInfo = { 0 };
 	fileInfo.cbStruct = sizeof(WINTRUST_FILE_INFO);
 	fileInfo.pcwszFilePath = fileName.sz();

@@ -29,21 +29,18 @@ namespace sys {
 
 #if (_AXL_OS_WIN)
 
-class DynamicLib
-{
+class DynamicLib {
 protected:
 	win::Library m_library;
 
 public:
 	bool
-	isOpen() const
-	{
+	isOpen() const {
 		return m_library.isOpen();
 	}
 
 	bool
-	open(const sl::StringRef& fileName)
-	{
+	open(const sl::StringRef& fileName) {
 		char buffer[256];
 		sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
 		fileName_w = fileName;
@@ -52,20 +49,17 @@ public:
 	}
 
 	void
-	close()
-	{
+	close() {
 		m_library.close();
 	}
 
 	void
-	detach()
-	{
+	detach() {
 		m_library.detach();
 	}
 
 	void*
-	getFunction(const sl::StringRef& name)
-	{
+	getFunction(const sl::StringRef& name) {
 		return m_library.getProcAddress(name);
 	}
 };
@@ -74,39 +68,33 @@ public:
 
 #elif (_AXL_OS_POSIX)
 
-class DynamicLib
-{
+class DynamicLib {
 protected:
 	psx::DynamicLib m_library;
 
 public:
 	bool
-	isOpen() const
-	{
+	isOpen() const {
 		return m_library.isOpen();
 	}
 
 	bool
-	open(const sl::StringRef& fileName)
-	{
+	open(const sl::StringRef& fileName) {
 		return m_library.open(fileName);
 	}
 
 	void
-	close()
-	{
+	close() {
 		m_library.close();
 	}
 
 	void
-	detach()
-	{
+	detach() {
 		m_library.detach();
 	}
 
 	void*
-	getFunction(const sl::StringRef& name)
-	{
+	getFunction(const sl::StringRef& name) {
 		return m_library.getSymbol(name);
 	}
 };

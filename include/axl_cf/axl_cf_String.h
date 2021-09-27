@@ -21,21 +21,15 @@ namespace cf {
 
 //..............................................................................
 
-class String: public TypeBase<CFStringRef>
-{
+class String: public TypeBase<CFStringRef> {
 public:
-	String()
-	{
-	}
+	String() {}
 
 	String(const String& src):
-		TypeBase<CFStringRef>(src)
-	{
-	}
+		TypeBase<CFStringRef>(src) {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	String(String&& src)
-	{
+	String(String&& src) {
 		m_p = src.m_p;
 		src.m_p = NULL;
 	}
@@ -44,57 +38,48 @@ public:
 	String(
 		CFStringRef p,
 		bool isAttach = false
-		):
-		TypeBase<CFStringRef>(p, isAttach)
-	{
-	}
+	):
+		TypeBase<CFStringRef>(p, isAttach) {}
 
 	String(
 		const char* p,
 		size_t length = -1
-		)
-	{
+	) {
 		create(p, length);
 	}
 
-	String(const sl::StringRef& string)
-	{
+	String(const sl::StringRef& string) {
 		create(string);
 	}
 
 	String&
-	operator = (const String& src)
-	{
+	operator = (const String& src) {
 		copy(src);
 		return *this;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	String&
-	operator = (String&& src)
-	{
+	operator = (String&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	String&
-	operator = (CFStringRef p)
-	{
+	operator = (CFStringRef p) {
 		copy(p);
 		return *this;
 	}
 
 	String&
-	operator = (const sl::StringRef& string)
-	{
+	operator = (const sl::StringRef& string) {
 		create(string);
 		return *this;
 	}
 
 	String&
-	operator = (const char* p)
-	{
+	operator = (const char* p) {
 		create(p);
 		return *this;
 	}
@@ -106,17 +91,15 @@ public:
 	create(
 		const char* p,
 		size_t length = -1
-		);
+	);
 
 	bool
-	create(const sl::StringRef& string)
-	{
+	create(const sl::StringRef& string) {
 		return create(string.cp(), string.getLength());
 	}
 
 	size_t
-	getLength() const
-	{
+	getLength() const {
 		ASSERT(m_p);
 		return ::CFStringGetLength(m_p);
 	}
@@ -125,15 +108,13 @@ public:
 	compare(
 		CFStringRef p2,
 		CFStringCompareFlags flags = 0
-		) const
-	{
+	) const {
 		ASSERT(m_p);
 		return ::CFStringCompare(m_p, p2, flags);
 	}
 
 	sl::String
-	getString() const
-	{
+	getString() const {
 		ASSERT(m_p);
 		return getStringFromCfString(m_p);
 	}

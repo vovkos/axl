@@ -18,8 +18,7 @@ namespace io {
 //..............................................................................
 
 bool
-UsbContext::create()
-{
+UsbContext::create() {
 	close();
 
 	int result = libusb_init(&m_h);
@@ -27,8 +26,7 @@ UsbContext::create()
 }
 
 bool
-UsbContext::createDefault()
-{
+UsbContext::createDefault() {
 	close();
 
 	int result = libusb_init(NULL);
@@ -40,8 +38,7 @@ UsbContext::createDefault()
 }
 
 bool
-UsbContext::handleEvents(uint_t timeout)
-{
+UsbContext::handleEvents(uint_t timeout) {
 	if (timeout == -1)
 		return handleEvents();
 

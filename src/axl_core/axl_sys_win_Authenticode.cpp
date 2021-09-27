@@ -30,8 +30,7 @@ verifyAuthenticodeSignature(
 	sl::String_w* issuerName,
 	sl::Array<char>* serialNumber,
 	uint64_t* timestamp
-	)
-{
+) {
 	bool result = verifyTrustFile(fileName);
 	if (!result)
 		return false;
@@ -55,7 +54,7 @@ verifyAuthenticodeSignature(
 		store.p(),
 		msg.p(),
 		NULL
-		) != 0;
+	) != 0;
 
 	sl::Array<char> signerInfoBuffer;
 	result = msg.getParam(&signerInfoBuffer, CMSG_SIGNER_INFO_PARAM) != -1;
@@ -84,7 +83,7 @@ verifyAuthenticodeSignature(
 		0,
 		CERT_FIND_SUBJECT_CERT,
 		&certInfo
-		);
+	);
 
 	if (!result)
 		return false;

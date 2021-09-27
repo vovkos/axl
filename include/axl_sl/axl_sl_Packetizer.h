@@ -20,11 +20,9 @@ namespace sl {
 
 //..............................................................................
 
-class PacketizerRoot
-{
+class PacketizerRoot {
 protected:
-	enum
-	{
+	enum {
 		PacketHdrSignature = 'kap\x02',
 	};
 
@@ -33,15 +31,13 @@ protected:
 
 public:
 	void
-	reset()
-	{
+	reset() {
 		m_buffer.clear();
 	}
 
 	static
 	uint64_t
-	createHdr(size_t size)
-	{
+	createHdr(size_t size) {
 		return ((uint64_t)size << 32) | PacketHdrSignature;
 	}
 
@@ -50,23 +46,20 @@ protected:
 	writeImpl(
 		const void* p,
 		size_t size
-		);
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class Packetizer: public PacketizerRoot
-{
+class Packetizer: public PacketizerRoot {
 public:
 	void
 	write(
 		const void* p,
 		size_t size
-		)
-	{
-		while (size)
-		{
+	) {
+		while (size) {
 			size_t taken = writeImpl(p, size);
 			if (taken == -1)
 				break;
@@ -88,16 +81,13 @@ public:
 
 // old AXL used different format of header
 
-class LegacyPacketizerRoot
-{
+class LegacyPacketizerRoot {
 protected:
-	enum
-	{
+	enum {
 		PacketHdrSignature = '.GSM',
 	};
 
-	struct PacketHdr
-	{
+	struct PacketHdr {
 		uint32_t m_signature;
 		uint16_t m_dataSize;
 		uint16_t m_checksum; // CRC16
@@ -108,8 +98,7 @@ protected:
 
 public:
 	void
-	reset()
-	{
+	reset() {
 		m_buffer.clear();
 	}
 
@@ -122,23 +111,20 @@ protected:
 	writeImpl(
 		const void* p,
 		size_t size
-		);
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class LegacyPacketizer: public LegacyPacketizerRoot
-{
+class LegacyPacketizer: public LegacyPacketizerRoot {
 public:
 	void
 	write(
 		const void* p,
 		size_t size
-		)
-	{
-		while (size)
-		{
+	) {
+		while (size) {
 			size_t taken = writeImpl(p, size);
 			if (taken == -1)
 				break;

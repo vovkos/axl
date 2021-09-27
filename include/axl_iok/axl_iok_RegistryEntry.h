@@ -22,29 +22,23 @@ namespace iok {
 
 //..............................................................................
 
-class RegistryEntry: public ObjectBase<io_registry_entry_t>
-{
+class RegistryEntry: public ObjectBase<io_registry_entry_t> {
 public:
-	RegistryEntry()
-	{
-	}
+	RegistryEntry() {}
 
-	RegistryEntry(const RegistryEntry& src)
-	{
+	RegistryEntry(const RegistryEntry& src) {
 		copy(src);
 	}
 
 	RegistryEntry(
 		io_registry_entry_t p,
 		bool isAttach = false
-		)
-	{
+	) {
 		isAttach ? copy(p) : attach(p);
 	}
 
 	bool
-	isInPlane(const char* plane) const
-	{
+	isInPlane(const char* plane) const {
 		return ::IORegistryEntryInPlane(m_p, plane);
 	}
 
@@ -61,8 +55,7 @@ public:
 	getAllProperties() const;
 
 	cf::Type
-	getProperty(const char* key) const
-	{
+	getProperty(const char* key) const {
 		CFTypeRef p = ::IORegistryEntryCreateCFProperty(m_p, cf::String(key), kCFAllocatorDefault, 0);
 		return cf::Type(p, true);
 	}
@@ -78,8 +71,7 @@ public:
 
 inline
 cf::MutableDictionary
-createServiceMatchingDictionary(const char* service)
-{
+createServiceMatchingDictionary(const char* service) {
 	CFMutableDictionaryRef p = ::IOServiceMatching(service);
 	return cf::MutableDictionary(p, true);
 }

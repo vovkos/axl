@@ -16,13 +16,13 @@
 set(
 	SRC_H_LIST
 	mainwindow.h
-	)
+)
 
 set(
 	SRC_CPP_LIST
 	main.cpp
 	mainwindow.cpp
-	)
+)
 
 source_group(
 	src
@@ -30,7 +30,7 @@ source_group(
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${SRC_RL_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -46,12 +46,12 @@ set(
 	MOC_H_LIST
 	mainwindow.h
 	${AXL_INC_DIR}/axl_gui/axl_gui_QtWidget.h
-	)
+)
 
 qt5_wrap_cpp_alt(
 	GEN_MOC_CPP_LIST
 	${MOC_H_LIST}
-	)
+)
 
 axl_pop(CMAKE_CURRENT_BINARY_DIR)
 
@@ -61,7 +61,7 @@ source_group(
 	gen
 	FILES
 	${GEN_MOC_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -76,7 +76,7 @@ source_group(
 	FILES
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -86,14 +86,14 @@ source_group(
 include_directories(
 	${AXL_INC_DIR}
 	${GEN_DIR}
-	)
+)
 
 link_directories(${AXL_LIB_DIR})
 
 add_definitions(
 	-DQT_COMPILING_QSTRING_COMPAT_CPP
 	-DQT_COMPILING_QIMAGE_COMPAT_CPP
-	)
+)
 
 add_executable(
 	axl_test_qt
@@ -102,7 +102,7 @@ add_executable(
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${GEN_MOC_CPP_LIST}
-	)
+)
 
 qt5_use_modules_alt(axl_test_qt Widgets)
 
@@ -110,32 +110,32 @@ axl_set_pch(
 	axl_test_qt
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 set_target_properties(
 	axl_test_qt
 	PROPERTIES
 	FOLDER test
-	)
+)
 
 target_link_libraries(
 	axl_test_qt
 	axl_gui
 	axl_io
 	axl_core
-	)
+)
 
 if(UNIX)
 	target_link_libraries(
 		axl_test_qt
 		pthread
-		)
+	)
 
 	if(NOT APPLE)
 		target_link_libraries(
 			axl_test_qt
 			rt
-			)
+		)
 	endif()
 endif()
 

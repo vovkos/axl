@@ -23,12 +23,10 @@ JobObject::queryInformation(
 	JOBOBJECTINFOCLASS infoClass,
 	void* p,
 	size_t size
-	)
-{
+) {
 	dword_t resultSize;
 	bool_t result = ::QueryInformationJobObject(m_h, infoClass, p,  (dword_t)size, &resultSize);
-	if (!result)
-	{
+	if (!result) {
 		err::setLastSystemError();
 		return -1;
 	}

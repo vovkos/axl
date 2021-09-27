@@ -19,21 +19,18 @@ namespace win {
 
 //..............................................................................
 
-class PerfCounter
-{
+class PerfCounter {
 protected:
 	LARGE_INTEGER m_frequency;
 	LARGE_INTEGER m_startTime;
 
 public:
-	PerfCounter()
-	{
+	PerfCounter() {
 		start();
 	}
 
 	bool
-	start()
-	{
+	start() {
 		bool_t result =
 			::QueryPerformanceFrequency(&m_frequency) &&
 			::QueryPerformanceCounter(&m_startTime);
@@ -42,8 +39,7 @@ public:
 	}
 
 	uint64_t
-	getElapsedTime()
-	{
+	getElapsedTime() {
 		LARGE_INTEGER time;
 		::QueryPerformanceCounter(&time);
 		return ((time.QuadPart - m_startTime.QuadPart) * 1000000 / m_frequency.QuadPart);

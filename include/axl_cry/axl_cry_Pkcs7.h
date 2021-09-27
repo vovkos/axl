@@ -20,27 +20,21 @@ namespace cry {
 
 //..............................................................................
 
-class FreePkcs7
-{
+class FreePkcs7 {
 public:
 	void
-	operator () (PKCS7* msg)
-	{
+	operator () (PKCS7* msg) {
 		::PKCS7_free(msg);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Pkcs7: public sl::Handle<PKCS7*, FreePkcs7>
-{
+class Pkcs7: public sl::Handle<PKCS7*, FreePkcs7> {
 public:
-	Pkcs7()
-	{
-	}
+	Pkcs7() {}
 
-	Pkcs7(PKCS7* src)
-	{
+	Pkcs7(PKCS7* src) {
 		attach(src);
 	}
 
@@ -51,15 +45,14 @@ public:
 	loadDer(
 		const void* p,
 		size_t size
-		);
+	);
 
 	size_t
 	saveDer(sl::Array<char>* buffer) const;
 
 	inline
 	sl::Array<char>
-	saveDer() const
-	{
+	saveDer() const {
 		sl::Array<char> buffer;
 		saveDer(&buffer);
 		return buffer;
@@ -69,12 +62,11 @@ public:
 	loadPem(
 		const void* p,
 		size_t size
-		);
+	);
 
 	inline
 	bool
-	loadPem(const sl::StringRef& string)
-	{
+	loadPem(const sl::StringRef& string) {
 		return loadPem(string.cp(), string.getLength());
 	}
 
@@ -83,8 +75,7 @@ public:
 
 	inline
 	sl::String
-	savePem()
-	{
+	savePem() {
 		sl::String string;
 		savePem(&string);
 		return string;
@@ -97,7 +88,7 @@ public:
 		BIO* inData,
 		BIO* outData,
 		int flags = 0
-		);
+	);
 };
 
 //..............................................................................

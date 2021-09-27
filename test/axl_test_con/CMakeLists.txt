@@ -15,19 +15,19 @@
 
 set(
 	APP_H_LIST
-	)
+)
 
 set(
 	APP_CPP_LIST
 	main.cpp
-	)
+)
 
 source_group(
 	app
 	FILES
 	${APP_H_LIST}
 	${APP_CPP_LIST}
-	)
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -42,7 +42,7 @@ source_group(
 	FILES
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 #...............................................................................
 #
@@ -131,40 +131,40 @@ add_executable(
 	${PCH_CPP}
 	${APP_H_LIST}
 	${APP_CPP_LIST}
-	)
+)
 
 axl_set_pch(
 	axl_test_con
 	${PCH_H}
 	${PCH_CPP}
-	)
+)
 
 set_target_properties(
 	axl_test_con
 	PROPERTIES
 	FOLDER test
-	)
+)
 
 target_link_libraries(
 	axl_test_con
 	${OPT_LIB_LIST}
 	axl_io
 	axl_core
-	)
+)
 
 if(WIN32)
 	target_link_libraries(
 		axl_test_con
 		setupapi
 		psapi
-		)
+	)
 
 	if(BUILD_AXL_IO_PCAP)
 		set_target_properties(
 			axl_test_con
 			PROPERTIES
 			LINK_FLAGS "/DELAYLOAD:wpcap.dll"
-			)
+		)
 	endif()
 endif()
 
@@ -173,13 +173,13 @@ if(UNIX)
 		axl_test_con
 		pthread
 		dl
-		)
+	)
 
 	if(LINUX AND LIBUDEV_FOUND)
 		target_link_libraries(
 			axl_test_con
 			udev
-			)
+		)
 	endif()
 
 	if(APPLE)
@@ -194,12 +194,12 @@ if(UNIX)
 			${CORE_FOUNDATION_FRAMEWORK}
 			${IOKIT_FRAMEWORK}
 			${SECURITY_FRAMEWORK}
-			)
+		)
 	else()
 		target_link_libraries(
 			axl_test_con
 			rt
-			)
+		)
 	endif()
 endif()
 
@@ -213,7 +213,7 @@ if(WIN32)
 			APPEND _DLL_LIST
 			${OPENSSL_DLL_DIR}/${OPENSSL_SSL_DLL_NAME}.dll
 			${OPENSSL_DLL_DIR}/${OPENSSL_CRYPTO_DLL_NAME}.dll
-			)
+		)
 	endif()
 
 	if(BUILD_AXL_XML AND EXPAT_DLL_DIR)

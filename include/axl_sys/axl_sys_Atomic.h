@@ -52,15 +52,13 @@ namespace sys {
 
 inline
 int32_t
-atomicLoad(volatile int32_t* p)
-{
+atomicLoad(volatile int32_t* p) {
 	return *p;
 }
 
 inline
 size_t
-atomicLoad(volatile size_t* p)
-{
+atomicLoad(volatile size_t* p) {
 	return *p;
 }
 
@@ -69,8 +67,7 @@ int32_t
 atomicXchg(
 	volatile int32_t* p,
 	int32_t value
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC32(Exchange)((long*)p, value);
 }
 
@@ -79,8 +76,7 @@ int64_t
 atomicXchg(
 	volatile int64_t* p,
 	int64_t value
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC64(Exchange64)(p, value);
 }
 
@@ -90,8 +86,7 @@ atomicCmpXchg(
 	volatile int32_t* p,
 	int32_t cmpValue,
 	int32_t newValue
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC32(CompareExchange)((long*)p, newValue, cmpValue); // inverse order!
 }
 
@@ -101,36 +96,31 @@ atomicCmpXchg(
 	volatile int64_t* p,
 	int64_t cmpValue,
 	int64_t newValue
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC64(CompareExchange64)(p, newValue, cmpValue); // inverse order!
 }
 
 inline
 int32_t
-atomicInc(volatile int32_t* p)
-{
+atomicInc(volatile int32_t* p) {
 	return AXL_INTERLOCKED_FUNC32(Increment)((long*)p);
 }
 
 inline
 int64_t
-atomicInc(volatile int64_t* p)
-{
+atomicInc(volatile int64_t* p) {
 	return AXL_INTERLOCKED_FUNC64(Increment64)(p);
 }
 
 inline
 int32_t
-atomicDec(volatile int32_t* p)
-{
+atomicDec(volatile int32_t* p) {
 	return AXL_INTERLOCKED_FUNC32(Decrement)((long*)p);
 }
 
 inline
 int64_t
-atomicDec(volatile int64_t* p)
-{
+atomicDec(volatile int64_t* p) {
 	return AXL_INTERLOCKED_FUNC64(Decrement64)(p);
 }
 
@@ -139,8 +129,7 @@ int32_t
 atomicAdd(
 	volatile int32_t* p,
 	int32_t x
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC32(ExchangeAdd)((long*)p, x);
 }
 
@@ -149,8 +138,7 @@ int64_t
 atomicAdd(
 	volatile int64_t* p,
 	int64_t x
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC64(ExchangeAdd64)(p, x);
 }
 
@@ -158,8 +146,7 @@ atomicAdd(
 
 inline
 int64_t
-atomicLoad(volatile int64_t* p)
-{
+atomicLoad(volatile int64_t* p) {
 	return *p;
 }
 
@@ -168,8 +155,7 @@ size_t
 atomicXchg(
 	volatile size_t* p,
 	size_t value
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC64(Exchange64)((int64_t*)p, value);
 }
 
@@ -179,22 +165,19 @@ atomicCmpXchg(
 	volatile size_t* p,
 	size_t cmpValue,
 	size_t newValue
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC64(CompareExchange64)((int64_t*)p, newValue, cmpValue); // inverse order!
 }
 
 inline
 size_t
-atomicInc(volatile size_t* p)
-{
+atomicInc(volatile size_t* p) {
 	return AXL_INTERLOCKED_FUNC64(Increment64)((int64_t*)p);
 }
 
 inline
 size_t
-atomicDec(volatile size_t* p)
-{
+atomicDec(volatile size_t* p) {
 	return AXL_INTERLOCKED_FUNC64(Decrement64)((int64_t*)p);
 }
 
@@ -203,8 +186,7 @@ size_t
 atomicAdd(
 	volatile size_t* p,
 	size_t x
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC64(ExchangeAdd64)((int64_t*)p, x);
 }
 
@@ -212,8 +194,7 @@ atomicAdd(
 
 inline
 int64_t
-atomicLoad(volatile int64_t* p)
-{
+atomicLoad(volatile int64_t* p) {
 	return AXL_INTERLOCKED_FUNC64(CompareExchange64)(p, 0, 0); // any value will do
 }
 
@@ -222,8 +203,7 @@ size_t
 atomicXchg(
 	volatile size_t* p,
 	size_t value
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC32(Exchange)((long*)p, value);
 }
 
@@ -233,22 +213,19 @@ atomicCmpXchg(
 	volatile size_t* p,
 	size_t cmpValue,
 	size_t newValue
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC32(CompareExchange)((long*)p, newValue, cmpValue); // inverse order!
 }
 
 inline
 size_t
-atomicInc(volatile size_t* p)
-{
+atomicInc(volatile size_t* p) {
 	return AXL_INTERLOCKED_FUNC32(Increment)((long*)p);
 }
 
 inline
 size_t
-atomicDec(volatile size_t* p)
-{
+atomicDec(volatile size_t* p) {
 	return AXL_INTERLOCKED_FUNC32(Decrement)((long*)p);
 }
 
@@ -257,8 +234,7 @@ size_t
 atomicInc(
 	volatile size_t* p,
 	size_t x
-	)
-{
+) {
 	return AXL_INTERLOCKED_FUNC32(ExchangeAdd)((long*)p, x);
 }
 
@@ -267,15 +243,13 @@ atomicInc(
 
 inline
 int32_t
-atomicLoad(volatile int32_t* p)
-{
+atomicLoad(volatile int32_t* p) {
 	return *p;
 }
 
 inline
 size_t
-atomicLoad(volatile size_t* p)
-{
+atomicLoad(volatile size_t* p) {
 	return *p;
 }
 
@@ -284,8 +258,7 @@ int32_t
 atomicXchg(
 	volatile int32_t* p,
 	int32_t value
-	)
-{
+) {
 	return __sync_lock_test_and_set(p, value);
 }
 
@@ -294,8 +267,7 @@ int64_t
 atomicXchg(
 	volatile int64_t* p,
 	int64_t value
-	)
-{
+) {
 	return __sync_lock_test_and_set(p, value);
 }
 
@@ -304,8 +276,7 @@ size_t
 atomicXchg(
 	volatile size_t* p,
 	size_t value
-	)
-{
+) {
 	return __sync_lock_test_and_set(p, value);
 }
 
@@ -315,8 +286,7 @@ atomicCmpXchg(
 	volatile int32_t* p,
 	int32_t cmpValue,
 	int32_t newValue
-	)
-{
+) {
 	return __sync_val_compare_and_swap(p, cmpValue, newValue);
 }
 
@@ -326,8 +296,7 @@ atomicCmpXchg(
 	volatile int64_t* p,
 	int64_t cmpValue,
 	int64_t newValue
-	)
-{
+) {
 	return __sync_val_compare_and_swap(p, cmpValue, newValue);
 }
 
@@ -337,50 +306,43 @@ atomicCmpXchg(
 	volatile size_t* p,
 	size_t cmpValue,
 	size_t newValue
-	)
-{
+) {
 	return __sync_val_compare_and_swap(p, cmpValue, newValue);
 }
 
 inline
 int32_t
-atomicInc(volatile int32_t* p)
-{
+atomicInc(volatile int32_t* p) {
 	return __sync_add_and_fetch(p, 1);
 }
 
 inline
 int64_t
-atomicInc(volatile int64_t* p)
-{
+atomicInc(volatile int64_t* p) {
 	return __sync_add_and_fetch(p, 1);
 }
 
 inline
 size_t
-atomicInc(volatile size_t* p)
-{
+atomicInc(volatile size_t* p) {
 	return __sync_add_and_fetch(p, 1);
 }
 
 inline
 int32_t
-atomicDec(volatile int32_t* p)
-{
+atomicDec(volatile int32_t* p) {
 	return __sync_sub_and_fetch(p, 1);
 }
 
 inline
 int64_t
-atomicDec(volatile int64_t* p)
-{
+atomicDec(volatile int64_t* p) {
 	return __sync_sub_and_fetch(p, 1);
 }
 
 inline
 size_t
-atomicDec(volatile size_t* p)
-{
+atomicDec(volatile size_t* p) {
 	return __sync_sub_and_fetch(p, 1);
 }
 
@@ -389,8 +351,7 @@ int32_t
 atomicAdd(
 	volatile int32_t* p,
 	int32_t x
-	)
-{
+) {
 	return __sync_add_and_fetch(p, x);
 }
 
@@ -399,8 +360,7 @@ int64_t
 atomicAdd(
 	volatile int64_t* p,
 	int64_t x
-	)
-{
+) {
 	return __sync_add_and_fetch(p, x);
 }
 
@@ -409,8 +369,7 @@ size_t
 atomicAdd(
 	volatile size_t* p,
 	size_t x
-	)
-{
+) {
 	return __sync_add_and_fetch(p, x);
 }
 
@@ -421,8 +380,7 @@ intptr_t
 atomicXchg(
 	volatile intptr_t* p,
 	intptr_t value
-	)
-{
+) {
 	return __sync_lock_test_and_set(p, value);
 }
 
@@ -432,22 +390,19 @@ atomicCmpXchg(
 	volatile intptr_t* p,
 	intptr_t cmpValue,
 	intptr_t newValue
-	)
-{
+) {
 	return __sync_val_compare_and_swap(p, cmpValue, newValue);
 }
 
 inline
 intptr_t
-atomicInc(volatile intptr_t* p)
-{
+atomicInc(volatile intptr_t* p) {
 	return __sync_add_and_fetch(p, 1);
 }
 
 inline
 intptr_t
-atomicDec(volatile intptr_t* p)
-{
+atomicDec(volatile intptr_t* p) {
 	return __sync_sub_and_fetch(p, 1);
 }
 
@@ -456,8 +411,7 @@ intptr_t
 atomicAdd(
 	volatile intptr_t* p,
 	intptr_t x
-	)
-{
+) {
 	return __sync_add_and_fetch(p, x);
 }
 
@@ -466,8 +420,7 @@ atomicAdd(
 
 inline
 int64_t
-atomicLoad(volatile int64_t* p)
-{
+atomicLoad(volatile int64_t* p) {
 	return *p;
 }
 
@@ -475,8 +428,7 @@ atomicLoad(volatile int64_t* p)
 
 inline
 int64_t
-atomicLoad(volatile int64_t* p)
-{
+atomicLoad(volatile int64_t* p) {
 	return __sync_val_compare_and_swap(p, 0, 0); // any value will do
 }
 
@@ -490,10 +442,8 @@ void
 atomicUpdatePeak(
 	volatile int32_t* peak,
 	int32_t current
-	)
-{
-	for (;;)
-	{
+) {
+	for (;;) {
 		int32_t old = *peak;
 
 		if (current <= old)
@@ -506,8 +456,7 @@ atomicUpdatePeak(
 
 inline
 void
-yieldProcessor()
-{
+yieldProcessor() {
 #if (_AXL_OS_WIN)
 	::YieldProcessor();
 #elif (_AXL_OS_POSIX)
@@ -519,10 +468,8 @@ yieldProcessor()
 
 inline
 void
-atomicLock(volatile int32_t* lock)
-{
-	for (;;)
-	{
+atomicLock(volatile int32_t* lock) {
+	for (;;) {
 		uint32_t result = sys::atomicCmpXchg(lock, 0, 1);
 		if (result == 0)
 			break;
@@ -533,8 +480,7 @@ atomicLock(volatile int32_t* lock)
 
 inline
 void
-atomicUnlock(volatile int32_t* lock)
-{
+atomicUnlock(volatile int32_t* lock) {
 	uint32_t result = sys::atomicCmpXchg(lock, 1, 0);
 	ASSERT(result == 1);
 }

@@ -18,15 +18,13 @@ namespace lex {
 //..............................................................................
 
 void
-LineCol::incrementalCount(const sl::StringRef& string)
-{
+LineCol::incrementalCount(const sl::StringRef& string) {
 	const char* p = string.cp();
 	const char* end = string.getEnd();
 	const char* line = p;
 
 	for (; p < end; p++)
-		if (*p == '\n')
-		{
+		if (*p == '\n') {
 			m_line++;
 			line = p + 1;
 		}

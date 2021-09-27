@@ -25,8 +25,7 @@ namespace io {
 
 //..............................................................................
 
-class NetworkAdapterEnumerator
-{
+class NetworkAdapterEnumerator {
 public:
 	static
 	size_t
@@ -39,7 +38,7 @@ protected:
 		NetworkAdapterDesc* adapter,
 		ifaddrs* iface,
 		io::psx::Socket* socket
-		);
+	);
 
 	static
 	void
@@ -47,20 +46,18 @@ protected:
 		NetworkAdapterDesc* adapter,
 		const sockaddr* addr,
 		const sockaddr* netMask
-		);
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapterList)
-{
+NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapterList) {
 	adapterList->clear();
 
 	ifaddrs* ifaceAddressList = NULL;
 	int result = ::getifaddrs(&ifaceAddressList);
-	if (result != 0 || !ifaceAddressList)
-	{
+	if (result != 0 || !ifaceAddressList) {
 		err::setLastSystemError();
 		return -1;
 	}
@@ -72,14 +69,12 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 
 	sl::StringHashTable<NetworkAdapterDesc*> adapterMap;
 
-	for (ifaddrs* iface = ifaceAddressList; iface; iface = iface->ifa_next)
-	{
+	for (ifaddrs* iface = ifaceAddressList; iface; iface = iface->ifa_next) {
 		if (!(iface->ifa_flags & IFF_UP))
 			continue;
 
 		sl::StringHashTableIterator<NetworkAdapterDesc*> it = adapterMap.visit(iface->ifa_name);
-		if (!it->m_value)
-		{
+		if (!it->m_value) {
 			NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
 			setupAdapter(adapter, iface, &socket);
 			adapterList->insertTail(adapter);
@@ -99,8 +94,7 @@ NetworkAdapterEnumerator::setupAdapter(
 	NetworkAdapterDesc* adapter,
 	ifaddrs* iface,
 	io::psx::Socket* socket
-	)
-{
+) {
 	adapter->m_type =
 		(iface->ifa_flags & IFF_LOOPBACK) ? NetworkAdapterType_Loopback :
 		(iface->ifa_flags & IFF_POINTOPOINT) ? NetworkAdapterType_Ppp :
@@ -118,8 +112,7 @@ NetworkAdapterEnumerator::setupAdapter(
 	adapter->m_description = iface->ifa_name; // no special description
 
 #if (_AXL_IO_USE_SIOCGIFHWADDR)
-	if (socket->isOpen()) // try to get MAC-address
-	{
+	if (socket->isOpen()) { // try to get MAC-address
 		ifreq req;
 		strncpy(req.ifr_name, iface->ifa_name, countof(req.ifr_name));
 		int result = socket->ioctl(SIOCGIFHWADDR, &req);
@@ -134,18 +127,15 @@ NetworkAdapterEnumerator::addAdapterAddress(
 	NetworkAdapterDesc* adapter,
 	const sockaddr* addr,
 	const sockaddr* netMask
-	)
-{
+) {
 #if (_AXL_OS_DARWIN)
-	if (addr->sa_family == AF_LINK)
-	{
+	if (addr->sa_family == AF_LINK) {
 		const sockaddr_dl* sdl = (sockaddr_dl*)addr;
 		memcpy(adapter->m_macAddress, LLADDR(sdl), sizeof(adapter->m_macAddress));
 		return;
 	}
 #elif (_AXL_OS_LINUX)
-	if (addr->sa_family == AF_PACKET)
-	{
+	if (addr->sa_family == AF_PACKET) {
 		const sockaddr_ll* sll = (sockaddr_ll*)addr;
 		memcpy(adapter->m_macAddress, sll->sll_addr, sizeof(adapter->m_macAddress));
 		return;
@@ -161,8 +151,7 @@ NetworkAdapterEnumerator::addAdapterAddress(
 //..............................................................................
 
 size_t
-createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList)
-{
+createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList) {
 	return NetworkAdapterEnumerator::createAdapterList(adapterList);
 }
 

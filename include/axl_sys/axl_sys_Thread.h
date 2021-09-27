@@ -30,47 +30,39 @@ namespace sys {
 #if (_AXL_OS_WIN)
 
 template <typename T>
-class ThreadImpl
-{
+class ThreadImpl {
 public:
 	win::Thread m_thread;
 
 public:
-	~ThreadImpl()
-	{
+	~ThreadImpl() {
 		waitAndClose();
 	}
 
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_thread.isOpen();
 	}
 
 	uint64_t
-	getThreadId()
-	{
+	getThreadId() {
 		return m_thread.getThreadId();
 	}
 
 	bool
-	start()
-	{
+	start() {
 		return m_thread.create(NULL, 0, threadFuncImpl, (T*)this, 0);
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		return !m_thread.isOpen() || m_thread.wait(timeout) == win::WaitResult_Object0;
 	}
 
 	void
-	waitAndClose(uint_t timeout = -1)
-	{
+	waitAndClose(uint_t timeout = -1) {
 		bool result = wait(timeout);
-		if (!result)
-		{
+		if (!result) {
 			ASSERT(false); // terminating thread
 			m_thread.terminate(err::SystemErrorCode_IoTimeout);
 		}
@@ -79,8 +71,7 @@ public:
 	}
 
 	bool
-	terminate()
-	{
+	terminate() {
 		return m_thread.terminate(err::SystemErrorCode_IoTimeout);
 	}
 
@@ -88,8 +79,7 @@ protected:
 	static
 	dword_t
 	WINAPI
-	threadFuncImpl(void* context)
-	{
+	threadFuncImpl(void* context) {
 		((T*)context)->threadFunc();
 		return 0;
 	}
@@ -99,8 +89,7 @@ protected:
 
 inline
 uint64_t
-getCurrentThreadId()
-{
+getCurrentThreadId() {
 	return ::GetCurrentThreadId();
 }
 
@@ -108,27 +97,23 @@ getCurrentThreadId()
 
 #elif (_AXL_OS_POSIX)
 
-class ThreadImplRoot
-{
+class ThreadImplRoot {
 public:
 	psx::Thread m_thread;
 
 public:
 	bool
-	isOpen()
-	{
+	isOpen() {
 		return m_thread.isOpen();
 	}
 
 	uint64_t
-	getThreadId()
-	{
+	getThreadId() {
 		return (uint64_t)(pthread_t)m_thread;
 	}
 
 	bool
-	terminate()
-	{
+	terminate() {
 		return m_thread.cancel();
 	}
 };
@@ -138,20 +123,17 @@ public:
 #if (_AXL_OS_DARWIN)
 
 template <typename T>
-class ThreadImpl: public ThreadImplRoot
-{
+class ThreadImpl: public ThreadImplRoot {
 public:
 	NotificationEvent m_threadCompletedEvent;
 
 public:
-	~ThreadImpl()
-	{
+	~ThreadImpl() {
 		waitAndClose();
 	}
 
 	bool
-	start()
-	{
+	start() {
 		ASSERT(!m_thread.isOpen());
 
 		m_threadCompletedEvent.reset();
@@ -159,24 +141,19 @@ public:
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		return !m_thread.isOpen() || m_threadCompletedEvent.wait(timeout);
 	}
 
 	void
-	waitAndClose(uint_t timeout = -1)
-	{
+	waitAndClose(uint_t timeout = -1) {
 		if (!m_thread.isOpen())
 			return;
 
 		bool result = m_threadCompletedEvent.wait(timeout);
-		if (result)
-		{
+		if (result) {
 			m_thread.join();
-		}
-		else
-		{
+		} else {
 			ASSERT(false); // cancelling thread
 			m_thread.cancel();
 		}
@@ -187,8 +164,7 @@ public:
 protected:
 	static
 	void*
-	threadFuncImpl(void* context)
-	{
+	threadFuncImpl(void* context) {
 		T* self = (T*)context;
 		self->threadFunc();
 		self->m_threadCompletedEvent.signal();
@@ -201,33 +177,27 @@ protected:
 //..............................................................................
 
 template <typename T>
-class ThreadImpl: public ThreadImplRoot
-{
+class ThreadImpl: public ThreadImplRoot {
 public:
-	~ThreadImpl()
-	{
+	~ThreadImpl() {
 		waitAndClose();
 	}
 
 	bool
-	start()
-	{
+	start() {
 		ASSERT(!m_thread.isOpen());
 		return m_thread.create(threadFunc, (T*)this);
 	}
 
 	bool
-	wait(uint_t timeout = -1)
-	{
+	wait(uint_t timeout = -1) {
 		return !m_thread.isOpen() || m_thread.join(timeout);
 	}
 
 	void
-	waitAndClose(uint_t timeout = -1)
-	{
+	waitAndClose(uint_t timeout = -1) {
 		bool result = wait(timeout);
-		if (!result)
-		{
+		if (!result) {
 			ASSERT(false);
 			m_thread.cancel();
 		}
@@ -238,8 +208,7 @@ public:
 protected:
 	static
 	void*
-	threadFunc(void* context)
-	{
+	threadFunc(void* context) {
 		((T*)context)->threadFunc();
 		return NULL;
 	}
@@ -251,8 +220,7 @@ protected:
 
 inline
 uint64_t
-getCurrentThreadId()
-{
+getCurrentThreadId() {
 	return (uint64_t)::pthread_self();
 }
 

@@ -23,8 +23,7 @@ decodeSrcPosError(
 	sl::StringRef* filePath_o,
 	LineCol* lineCol,
 	const err::ErrorHdr* error
-	)
-{
+) {
 	ASSERT(isSrcPosError(error));
 
 	sl::Unpacker unpacker(error + 2, error[1].m_size - sizeof(err::ErrorHdr));
@@ -41,14 +40,11 @@ decodeSrcPosError(
 //..............................................................................
 
 sl::StringRef
-ParseErrorProvider::getErrorDescription(const err::ErrorRef& error)
-{
+ParseErrorProvider::getErrorDescription(const err::ErrorRef& error) {
 	sl::Unpacker unpacker(error + 1, error->m_size - sizeof(err::ErrorHdr));
 
-	switch (error->m_code)
-	{
-	case ParseErrorCode_SrcPos:
-		{
+	switch (error->m_code) {
+	case ParseErrorCode_SrcPos: {
 		const char* filePath;
 		int line;
 		int col;
@@ -63,16 +59,14 @@ ParseErrorProvider::getErrorDescription(const err::ErrorRef& error)
 	case ParseErrorCode_InvalidSyntax:
 		return "syntax error";
 
-	case ParseErrorCode_InvalidSyntaxIn:
-		{
+	case ParseErrorCode_InvalidSyntaxIn: {
 		const char* location;
 
 		unpacker.unpack(&location);
 		return sl::formatString("invalid syntax in '%s'", location);
 		}
 
-	case ParseErrorCode_ExpectedToken:
-		{
+	case ParseErrorCode_ExpectedToken: {
 		const char* expectedToken;
 		const char* actualToken;
 
@@ -81,16 +75,14 @@ ParseErrorProvider::getErrorDescription(const err::ErrorRef& error)
 		return sl::formatString("expected '%s' before '%s'", expectedToken, actualToken);
 		}
 
-	case ParseErrorCode_UnexpectedToken:
-		{
+	case ParseErrorCode_UnexpectedToken: {
 		const char* token;
 
 		unpacker.unpack(&token);
 		return sl::formatString("unexpected '%s'", token);
 		}
 
-	case ParseErrorCode_UnexpectedTokenIn:
-		{
+	case ParseErrorCode_UnexpectedTokenIn: {
 		const char* token;
 		const char* location;
 

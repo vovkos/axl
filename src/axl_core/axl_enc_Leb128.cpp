@@ -24,15 +24,13 @@ uleb128(
 	const void* p0,
 	size_t size,
 	uint64_t* result0
-	)
-{
+) {
 	const uint8_t* p = (uint8_t*)p0;
 	size_t i = 0;
 	uint64_t result = 0;
 	uint_t shift = 0;
 
-	while (i < size)
-	{
+	while (i < size) {
 		uint8_t byte = p[i++];
 		result |= (uint64_t)(byte & 0x7f) << shift;
 		if (!(byte & 0x80))
@@ -52,21 +50,18 @@ sleb128(
 	const void* p0,
 	size_t size,
 	int64_t* result0
-	)
-{
+) {
 	const uint8_t* p = (uint8_t*)p0;
 	size_t i = 0;
 	uint64_t result = 0;
 	uint_t shift = 0;
 
-	while (i < size)
-	{
+	while (i < size) {
 		uint8_t byte = p[i++];
 		result |= (uint64_t)(byte & 0x7f) << shift;
 		shift += 7;
 
-		if (!(byte & 0x80))
-		{
+		if (!(byte & 0x80)) {
 			if (shift < 64 && (byte & 0x40))
 				result |= (~0 << shift);
 

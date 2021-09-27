@@ -22,8 +22,7 @@ size_t
 PacketizerRoot::writeImpl(
 	const void* p0,
 	size_t size0
-	)
-{
+) {
 	const char* p = (char*)p0;
 	size_t size = size0;
 	size_t bufferSize = m_buffer.getCount();
@@ -31,25 +30,20 @@ PacketizerRoot::writeImpl(
 	static uint32_t signatureBuffer = PacketHdrSignature;
 	const char* signature = (char*) &signatureBuffer;
 
-	while (bufferSize < sizeof(uint32_t)) // append signature byte-by-byte
-	{
+	while (bufferSize < sizeof(uint32_t)) { // append signature byte-by-byte
 		if (!size)
 			return -1; // all is buffered
 
 		char c = *p;
 
-		if (c == signature[bufferSize])
-		{
+		if (c == signature[bufferSize]) {
 			m_buffer.append(c);
 			bufferSize++;
-		}
-		else if (bufferSize)
-		{
+		} else if (bufferSize) {
 			m_buffer.clear();
 			bufferSize = 0;
 
-			if (c == signature[0])
-			{
+			if (c == signature[0]) {
 				m_buffer.copy(c);
 				bufferSize = 1;
 			}
@@ -59,11 +53,9 @@ PacketizerRoot::writeImpl(
 		size--;
 	}
 
-	if (bufferSize < sizeof(uint64_t)) // packet size
-	{
+	if (bufferSize < sizeof(uint64_t)) { // packet size
 		size_t chunkSize = sizeof(uint64_t) - bufferSize;
-		if (size < chunkSize)
-		{
+		if (size < chunkSize) {
 			m_buffer.append(p, size);
 			return -1; // all is buffered
 		}
@@ -78,11 +70,9 @@ PacketizerRoot::writeImpl(
 	uint32_t dataSize = ((const uint32_t*) m_buffer.cp()) [1];
 	uint32_t packetSize = sizeof(uint64_t) + dataSize;
 
-	if (bufferSize < packetSize)
-	{
+	if (bufferSize < packetSize) {
 		size_t chunkSize = packetSize - bufferSize;
-		if (size < chunkSize)
-		{
+		if (size < chunkSize) {
 			m_buffer.append(p, size);
 			return -1; // all is buffered
 		}
@@ -99,8 +89,7 @@ PacketizerRoot::writeImpl(
 //..............................................................................
 
 uint64_t
-LegacyPacketizerRoot::createHdr(size_t size)
-{
+LegacyPacketizerRoot::createHdr(size_t size) {
 	PacketHdr hdr;
 	hdr.m_signature = PacketHdrSignature;
 	hdr.m_dataSize = (uint16_t)size;
@@ -114,8 +103,7 @@ size_t
 LegacyPacketizerRoot::writeImpl(
 	const void* p0,
 	size_t size0
-	)
-{
+) {
 	const char* p = (char*)p0;
 	size_t size = size0;
 	size_t bufferSize = m_buffer.getCount();
@@ -123,25 +111,20 @@ LegacyPacketizerRoot::writeImpl(
 	static uint32_t signatureBuffer = PacketHdrSignature;
 	const char* signature = (char*) &signatureBuffer;
 
-	while (bufferSize < sizeof(uint32_t)) // append signature byte-by-byte
-	{
+	while (bufferSize < sizeof(uint32_t)) { // append signature byte-by-byte
 		if (!size)
 			return -1; // all is buffered
 
 		char c = *p;
 
-		if (c == signature[bufferSize])
-		{
+		if (c == signature[bufferSize]) {
 			m_buffer.append(c);
 			bufferSize++;
-		}
-		else if (bufferSize)
-		{
+		} else if (bufferSize) {
 			m_buffer.clear();
 			bufferSize = 0;
 
-			if (c == signature[0])
-			{
+			if (c == signature[0]) {
 				m_buffer.copy(c);
 				bufferSize = 1;
 			}
@@ -151,11 +134,9 @@ LegacyPacketizerRoot::writeImpl(
 		size--;
 	}
 
-	if (bufferSize < sizeof(uint64_t)) // packet size and crc
-	{
+	if (bufferSize < sizeof(uint64_t)) { // packet size and crc
 		size_t chunkSize = sizeof(uint64_t) - bufferSize;
-		if (size < chunkSize)
-		{
+		if (size < chunkSize) {
 			m_buffer.append(p, size);
 			return -1; // all is buffered
 		}
@@ -174,11 +155,9 @@ LegacyPacketizerRoot::writeImpl(
 	uint32_t dataSize = ((const PacketHdr*) m_buffer.cp())->m_dataSize;
 	uint32_t packetSize = sizeof(uint64_t) + dataSize;
 
-	if (bufferSize < packetSize)
-	{
+	if (bufferSize < packetSize) {
 		size_t chunkSize = packetSize - bufferSize;
-		if (size < chunkSize)
-		{
+		if (size < chunkSize) {
 			m_buffer.append(p, size);
 			return -1; // all is buffered
 		}

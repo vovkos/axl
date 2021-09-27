@@ -27,13 +27,11 @@ Mapping::map(
 	uint_t flags,
 	int fd,
 	size_t offset
-	)
-{
+) {
 	close();
 
 	void* p = ::mmap(addrHint, size, protection, flags, fd, offset);
-	if (p == (void*)-1)
-	{
+	if (p == (void*)-1) {
 		err::setLastSystemError();
 		return NULL;
 	}
@@ -44,8 +42,7 @@ Mapping::map(
 }
 
 void
-Mapping::unmap(size_t size)
-{
+Mapping::unmap(size_t size) {
 	if (!isOpen())
 		return;
 
@@ -63,8 +60,7 @@ SharedMemory::open(
 	const sl::StringRef& name,
 	uint_t flags,
 	mode_t mode
-	)
-{
+) {
 	close();
 
 	m_h = ::shm_open(name.sz(), flags, mode);

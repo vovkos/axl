@@ -29,11 +29,9 @@ namespace sys {
 
 typedef rc::Ptr<void> TlsValue;
 
-class TlsMgr
-{
+class TlsMgr {
 protected:
-	struct Page
-	{
+	struct Page {
 		sl::Array<sl::BoxListEntry<TlsValue>*> m_array;
 		sl::BoxList<TlsValue> m_valueList;
 	};
@@ -53,8 +51,7 @@ public:
 	~TlsMgr();
 
 	size_t
-	createSlot()
-	{
+	createSlot() {
 		return sys::atomicInc(&m_slotCount) - 1;
 	}
 
@@ -65,7 +62,7 @@ public:
 	setSlotValue(
 		size_t slot,
 		const TlsValue& value
-		);
+	);
 
 #if (_AXL_OS_WIN)
 	static
@@ -75,7 +72,7 @@ public:
 		HANDLE hModule,
 		dword_t reason,
 		void* reserved
-		);
+	);
 #endif
 
 protected:
@@ -84,33 +81,28 @@ protected:
 
 #if (_AXL_OS_WIN)
 	Page*
-	findCurrentThreadPage()
-	{
+	findCurrentThreadPage() {
 		return (Page*)::TlsGetValue(m_tlsIdx);
 	}
 
 	void
-	setCurrentThreadPage(Page* page)
-	{
+	setCurrentThreadPage(Page* page) {
 		::TlsSetValue(m_tlsIdx, page);
 	}
 #elif (_AXL_OS_POSIX)
 	Page*
-	findCurrentThreadPage()
-	{
+	findCurrentThreadPage() {
 		return (Page*)::pthread_getspecific(m_tlsKey);
 	}
 
 	void
-	setCurrentThreadPage(Page* page)
-	{
+	setCurrentThreadPage(Page* page) {
 		::pthread_setspecific(m_tlsKey, page);
 	}
 
 	static
 	void
-	tlsDestructor(void* p)
-	{
+	tlsDestructor(void* p) {
 		ASSERT(p);
 		AXL_MEM_DELETE((Page*)p);
 	}
@@ -121,8 +113,7 @@ protected:
 
 inline
 TlsMgr*
-getTlsMgr()
-{
+getTlsMgr() {
 	return sl::getSingleton<TlsMgr> ();
 }
 
@@ -138,8 +129,7 @@ deleteSimpleTlsSlot(size_t slot);
 
 inline
 intptr_t
-getSimpleTlsValue(size_t slot)
-{
+getSimpleTlsValue(size_t slot) {
 	return (intptr_t)::TlsGetValue(slot);
 }
 
@@ -148,8 +138,7 @@ bool
 setSimpleTlsValue(
 	size_t slot,
 	intptr_t value
-	)
-{
+) {
 	bool_t result = ::TlsSetValue(slot, (void*)value);
 	return err::complete(result);
 }
@@ -158,8 +147,7 @@ setSimpleTlsValue(
 
 inline
 intptr_t
-getSimpleTlsValue(size_t slot)
-{
+getSimpleTlsValue(size_t slot) {
 	return (intptr_t)::pthread_getspecific((pthread_key_t)slot);
 }
 
@@ -168,8 +156,7 @@ intptr_t
 setSimpleTlsValue(
 	size_t slot,
 	intptr_t value
-	)
-{
+) {
 	int result = ::pthread_setspecific((pthread_key_t)slot, (void*)value);
 	return result != 0 ? err::fail(result) : true;
 }

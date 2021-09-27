@@ -21,15 +21,13 @@ bool
 gotoEndOfScriptSnippet(
 	Lexer* lexer,
 	lex::RagelTokenPos* endPos
-	)
-{
+) {
 	int openBracket;
 	int closeBracket;
 	LexerMachineKind machine;
 
 	const Token* token = lexer->getToken();
-	switch (token->m_token)
-	{
+	switch (token->m_token) {
 	case TokenKind_OpenData_r:
 		openBracket = '(';
 		closeBracket = ')';
@@ -54,28 +52,20 @@ gotoEndOfScriptSnippet(
 		Lexer::getMachineState(machine),
 		token,
 		Lexer::GotoStateKind_EatToken
-		);
+	);
 
 	int level = 1;
-	for (;;)
-	{
+	for (;;) {
 		token = lexer->getToken();
-		if (token->m_token == TokenKind_Error)
-		{
+		if (token->m_token == TokenKind_Error) {
 			err::setFormatStringError("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 			return false;
-		}
-		else if (token->m_token == TokenKind_Eof)
-		{
+		} else if (token->m_token == TokenKind_Eof) {
 			lex::setUnexpectedTokenError("eof", "user-code");
 			return false;
-		}
-		else if (token->m_token == openBracket)
-		{
+		} else if (token->m_token == openBracket) {
 			level++;
-		}
-		else if (token->m_token == closeBracket)
-		{
+		} else if (token->m_token == closeBracket) {
 			level--;
 			if (level <= 0)
 				break;
@@ -90,7 +80,7 @@ gotoEndOfScriptSnippet(
 		Lexer::getMachineState(LexerMachineKind_Main),
 		token,
 		Lexer::GotoStateKind_EatToken
-		);
+	);
 
 	return true;
 }

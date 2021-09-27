@@ -21,17 +21,14 @@ namespace sys {
 
 bool TlsMgr::m_isDestructed = false;
 
-TlsMgr::TlsMgr()
-{
+TlsMgr::TlsMgr() {
 	m_tlsIdx = ::TlsAlloc();
 	m_slotCount = 0;
 }
 
-TlsMgr::~TlsMgr()
-{
+TlsMgr::~TlsMgr() {
 	Page* page = findCurrentThreadPage();
-	if (page)
-	{
+	if (page) {
 		AXL_MEM_DELETE(page);
 		setCurrentThreadPage(NULL);
 	}
@@ -46,8 +43,7 @@ TlsMgr::tlsCallback(
 	HANDLE hModule,
 	dword_t reason,
 	void* reserved
-	)
-{
+) {
 	if (reason != DLL_THREAD_DETACH || m_isDestructed)
 		return;
 
@@ -64,17 +60,14 @@ TlsMgr::tlsCallback(
 
 #elif (_AXL_OS_POSIX)
 
-TlsMgr::TlsMgr()
-{
+TlsMgr::TlsMgr() {
 	::pthread_key_create(&m_tlsKey, tlsDestructor);
 	m_slotCount = 0;
 }
 
-TlsMgr::~TlsMgr()
-{
+TlsMgr::~TlsMgr() {
 	Page* page = findCurrentThreadPage();
-	if (page)
-	{
+	if (page) {
 		AXL_MEM_DELETE(page);
 		setCurrentThreadPage(NULL);
 	}
@@ -85,8 +78,7 @@ TlsMgr::~TlsMgr()
 #endif
 
 TlsValue
-TlsMgr::getSlotValue(size_t slot)
-{
+TlsMgr::getSlotValue(size_t slot) {
 	Page* page = findCurrentThreadPage();
 	if (!page)
 		return rc::g_nullPtr;
@@ -106,13 +98,11 @@ TlsValue
 TlsMgr::setSlotValue(
 	size_t slot,
 	const TlsValue& value
-	)
-{
+) {
 	Page* page = getCurrentThreadPage();
 
 	size_t count = page->m_array.getCount();
-	if (slot >= count)
-	{
+	if (slot >= count) {
 		if (!value)
 			return TlsValue();
 
@@ -123,22 +113,16 @@ TlsMgr::setSlotValue(
 
 	TlsValue oldValue;
 
-	if (entry)
-	{
+	if (entry) {
 		oldValue = entry->m_value;
 
-		if (value)
-		{
+		if (value) {
 			entry->m_value = value;
-		}
-		else
-		{
+		} else {
 			page->m_valueList.remove(entry);
 			page->m_array[slot] = NULL;
 		}
-	}
-	else if (value)
-	{
+	} else if (value) {
 		entry = page->m_valueList.insertTail(value).getEntry();
 		page->m_array[slot] = entry;
 	}
@@ -147,8 +131,7 @@ TlsMgr::setSlotValue(
 }
 
 TlsMgr::Page*
-TlsMgr::getCurrentThreadPage()
-{
+TlsMgr::getCurrentThreadPage() {
 	Page* page = findCurrentThreadPage();
 	if (page)
 		return page;
@@ -163,11 +146,9 @@ TlsMgr::getCurrentThreadPage()
 #if (_AXL_OS_WIN)
 
 size_t
-createSimpleTlsSlot()
-{
+createSimpleTlsSlot() {
 	dword_t slot = ::TlsAlloc();
-	if (slot == TLS_OUT_OF_INDEXES)
-	{
+	if (slot == TLS_OUT_OF_INDEXES) {
 		err::setLastSystemError();
 		return -1;
 	}
@@ -176,8 +157,7 @@ createSimpleTlsSlot()
 }
 
 bool
-deleteSimpleTlsSlot(size_t slot)
-{
+deleteSimpleTlsSlot(size_t slot) {
 	bool_t result = ::TlsFree(slot);
 	return err::complete(result);
 }
@@ -185,12 +165,10 @@ deleteSimpleTlsSlot(size_t slot)
 #else
 
 size_t
-createSimpleTlsSlot()
-{
+createSimpleTlsSlot() {
 	pthread_key_t key;
 	int result = ::pthread_key_create(&key, NULL);
-	if (result != 0)
-	{
+	if (result != 0) {
 		err::setError(result);
 		return -1;
 	}
@@ -200,8 +178,7 @@ createSimpleTlsSlot()
 }
 
 bool
-deleteSimpleTlsSlot(size_t key)
-{
+deleteSimpleTlsSlot(size_t key) {
 	int result = ::pthread_key_delete((pthread_key_t)key);
 	return result != 0 ? err::fail(result) : true;
 }

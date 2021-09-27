@@ -26,8 +26,7 @@ Thread::create(
 	const pthread_attr_t* attr,
 	ThreadFunc* threadFunc,
 	void* context
-	)
-{
+) {
 	detach();
 
 	int result = ::pthread_create(&m_threadId, attr, threadFunc, context);
@@ -39,8 +38,7 @@ Thread::create(
 }
 
 bool
-Thread::join(void** retVal)
-{
+Thread::join(void** retVal) {
 	if (!m_isOpen)
 		return true;
 
@@ -54,8 +52,7 @@ Thread::join(void** retVal)
 
 #if (!_AXL_OS_DARWIN)
 bool
-Thread::tryJoin(void** retVal)
-{
+Thread::tryJoin(void** retVal) {
 	if (!m_isOpen)
 		return true;
 
@@ -71,15 +68,13 @@ bool
 Thread::join(
 	uint_t timeout,
 	void** retVal
-	)
-{
+) {
 	if (!m_isOpen)
 		return true;
 
 	int result;
 
-	switch (timeout)
-	{
+	switch (timeout) {
 	case 0:
 		result = ::pthread_tryjoin_np(m_threadId, retVal);
 		break;
@@ -103,8 +98,7 @@ Thread::join(
 #endif
 
 bool
-Thread::detach()
-{
+Thread::detach() {
 	if (!m_isOpen)
 		return true;
 

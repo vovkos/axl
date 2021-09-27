@@ -18,10 +18,8 @@ namespace gui {
 //..............................................................................
 
 const char*
-getPixelFormatString(PixelFormat pixelFormat)
-{
-	static const char* stringTable[] =
-	{
+getPixelFormatString(PixelFormat pixelFormat) {
+	static const char* stringTable[] = {
 		"RGBA", // PixelFormat_Rgba = 0,
 		"RGB",  // PixelFormat_Rgb,
 	};

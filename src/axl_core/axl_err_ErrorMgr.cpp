@@ -26,8 +26,7 @@ namespace err {
 
 //..............................................................................
 
-ErrorMgr::ErrorMgr()
-{
+ErrorMgr::ErrorMgr() {
 	m_tlsSlot = sys::getTlsMgr()->createSlot();
 	m_router = NULL;
 
@@ -46,23 +45,20 @@ void
 ErrorMgr::registerProvider(
 	const sl::Guid& guid,
 	ErrorProvider* provider
-	)
-{
+) {
 	sys::ScopeLock scopeLock(&m_lock);
 	m_providerMap.visit(guid)->m_value = provider;
 }
 
 ErrorProvider*
-ErrorMgr::findProvider(const sl::Guid& guid)
-{
+ErrorMgr::findProvider(const sl::Guid& guid) {
 	sys::ScopeLock scopeLock(&m_lock);
 	sl::HashTableIterator<sl::Guid, ErrorProvider*> it = m_providerMap.find(guid);
 	return it ? it->m_value : NULL;
 }
 
 ErrorRef
-ErrorMgr::getLastError()
-{
+ErrorMgr::getLastError() {
 	ThreadEntry* entry = findThreadEntry();
 	if (entry && !entry->m_error.isEmpty())
 		return entry->m_error;
@@ -71,8 +67,7 @@ ErrorMgr::getLastError()
 }
 
 void
-ErrorMgr::setError(const ErrorRef& error)
-{
+ErrorMgr::setError(const ErrorRef& error) {
 	ThreadEntry* entry = getThreadEntry();
 	entry->m_error = error;
 
@@ -81,8 +76,7 @@ ErrorMgr::setError(const ErrorRef& error)
 }
 
 sl::StringRef
-ErrorMgr::getErrorDescription(const ErrorRef& error)
-{
+ErrorMgr::getErrorDescription(const ErrorRef& error) {
 	if (m_router)
 		return m_router->routeErrorDescription(error);
 
@@ -94,8 +88,7 @@ ErrorMgr::getErrorDescription(const ErrorRef& error)
 }
 
 const char*
-ErrorMgr::routeErrorDescription(const ErrorHdr* error)
-{
+ErrorMgr::routeErrorDescription(const ErrorHdr* error) {
 	if (m_router)
 		return m_router->routeErrorDescription(error);
 
@@ -106,8 +99,7 @@ ErrorMgr::routeErrorDescription(const ErrorHdr* error)
 }
 
 ErrorMgr::ThreadEntry*
-ErrorMgr::getThreadEntry()
-{
+ErrorMgr::getThreadEntry() {
 	ThreadEntry* entry = findThreadEntry();
 	if (entry)
 		return entry;

@@ -19,8 +19,7 @@ namespace cf {
 //..............................................................................
 
 bool
-String::create(CFStringRef src)
-{
+String::create(CFStringRef src) {
 	CFStringRef newString = ::CFStringCreateCopy(kCFAllocatorDefault, src);
 	if (!newString)
 		return err::fail(err::SystemErrorCode_InsufficientResources);
@@ -33,8 +32,7 @@ bool
 String::create(
 	const char* p,
 	size_t length
-	)
-{
+) {
 	if (length == -1)
 		length = strlen_s(p);
 
@@ -44,7 +42,7 @@ String::create(
 		length,
 		kCFStringEncodingUTF8,
 		false
-		);
+	);
 
 	if (!newString)
 		return err::fail(err::SystemErrorCode_InsufficientResources);

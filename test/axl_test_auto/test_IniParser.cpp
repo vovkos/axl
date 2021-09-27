@@ -16,18 +16,15 @@ namespace {
 
 //..............................................................................
 
-class MyParser: public ini::Parser<MyParser>
-{
+class MyParser: public ini::Parser<MyParser> {
 protected:
-	enum SectionKind
-	{
+	enum SectionKind {
 		SectionKind_Undefined,
 		SectionKind_Session,
 		SectionKind_Scripts,
 	};
 
-	enum KeyKind
-	{
+	enum KeyKind {
 		KeyKind_Undefined,
 		KeyKind_Name,
 		KeyKind_Description,
@@ -53,8 +50,7 @@ protected:
 
 public:
 	bool
-	onSection(const char* name)
-	{
+	onSection(const char* name) {
 		SectionNameMap::Iterator it = SectionNameMap::find(name);
 		SectionKind section = it ? it->m_value : SectionKind_Undefined;
 		printf("OnSection '%s'\n", name);
@@ -65,8 +61,7 @@ public:
 	onKeyValue(
 		const char* name,
 		const char* value
-		)
-	{
+	) {
 		KeyNameMap::Iterator it = KeyNameMap::find(name);
 		KeyKind key = it ? it->m_value : KeyKind_Undefined;
 		printf("OnKeyValue '%s' = '%s'\n", name, value);
@@ -75,16 +70,14 @@ public:
 };
 
 void
-run()
-{
+run() {
 	bool result;
 
 	const char* filePath = "D:/Prj/Ninja/ioninja/scripts/nj_ssn/nj_ssn_Serial/nj_ssn_Serial.njini";
 
 	io::MappedFile file;
 	result = file.open(filePath, io::FileFlag_ReadOnly);
-	if (!result)
-	{
+	if (!result) {
 		printf("error opening file: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
@@ -94,8 +87,7 @@ run()
 
 	MyParser parser;
 	result = parser.parse(filePath, sl::StringRef(p, (size_t)size));
-	if (!result)
-	{
+	if (!result) {
 		printf("error parsing file: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}

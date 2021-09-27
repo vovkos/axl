@@ -21,15 +21,13 @@ namespace lex {
 
 //..............................................................................
 
-class RagelTokenPos: public LineColOffset
-{
+class RagelTokenPos: public LineColOffset {
 public:
 	char* m_p;
 	size_t m_length;
 
 public:
-	RagelTokenPos()
-	{
+	RagelTokenPos() {
 		m_p = NULL;
 		m_length = 0;
 	}
@@ -41,13 +39,11 @@ template <
 	typename Enum,
 	typename GetName,
 	typename Data = StdTokenData
-	>
-class RagelToken: public Token<Enum, GetName, Data, RagelTokenPos>
-{
+>
+class RagelToken: public Token<Enum, GetName, Data, RagelTokenPos> {
 public:
 	sl::StringRef
-	getText() const
-	{
+	getText() const {
 		return sl::StringRef(this->m_pos.m_p, this->m_pos.m_length);
 	}
 
@@ -57,8 +53,7 @@ public:
 	getTokenListString(
 		const sl::BoxList<RagelToken>& list,
 		const IsSpaceNeeded& isSpaceNeeded
-		)
-	{
+	) {
 		if (list.isEmpty())
 			return sl::String();
 
@@ -66,8 +61,7 @@ public:
 		int prevToken = token->m_token;
 		sl::String string(token->m_pos.m_p, token->m_pos.m_length);
 
-		for (token++; token; token++)
-		{
+		for (token++; token; token++) {
 			if (isSpaceNeeded(prevToken, token->m_token))
 				string.append(' ');
 
@@ -80,8 +74,7 @@ public:
 
 	static
 	sl::String
-	getTokenListString(const sl::BoxList<RagelToken>& list)
-	{
+	getTokenListString(const sl::BoxList<RagelToken>& list) {
 		return getTokenListString(list, isSpaceNeededStd);
 	}
 
@@ -91,8 +84,7 @@ protected:
 	isSpaceNeededStd(
 		int token1,
 		int token2
-		)
-	{
+	) {
 		return token1 != '.' && token2 != '.' && token2 != ',' && token2 != ';';
 	}
 };
@@ -106,11 +98,10 @@ typedef RagelToken<int, StdTokenData> StdRagelToken;
 template <
 	typename T,
 	typename Token = StdRagelToken
-	>
+>
 class RagelLexer:
 	public Lexer<T, Token>,
-	public Ragel
-{
+	public Ragel {
 	friend class Lexer<T, Token>;
 
 protected:
@@ -123,20 +114,17 @@ protected:
 	size_t m_lineOffset;
 
 public:
-	RagelLexer()
-	{
+	RagelLexer() {
 		onReset();
 	}
 
 	size_t
-	getTokenizeLimit()
-	{
+	getTokenizeLimit() {
 		return m_tokenizeLimit;
 	}
 
 	void
-	setTokenizeLimit(size_t tokenizeLimit)
-	{
+	setTokenizeLimit(size_t tokenizeLimit) {
 		ASSERT(tokenizeLimit);
 		m_tokenizeLimit = tokenizeLimit;
 	}
@@ -147,8 +135,7 @@ public:
 		const sl::StringRef& filePath,
 		const sl::StringRef& source,
 		bool isBomNeeded = false
-		)
-	{
+	) {
 		create(filePath, source, isBomNeeded);
 		cs = state;
 	}
@@ -158,8 +145,7 @@ public:
 		const sl::StringRef& filePath,
 		const sl::StringRef& source,
 		bool isBomNeeded = false
-		)
-	{
+	) {
 		this->reset();
 		static_cast<T*>(this)->init();
 		m_filePath = filePath;
@@ -167,8 +153,7 @@ public:
 	}
 
 	const Token*
-	expectToken(int tokenKind)
-	{
+	expectToken(int tokenKind) {
 		const Token* token = this->getToken();
 		if (token->m_token == tokenKind)
 			return token;
@@ -178,14 +163,12 @@ public:
 	}
 
 	void
-	ensureSrcPosError()
-	{
+	ensureSrcPosError() {
 		if (!lex::isLastSrcPosError())
 			lex::pushSrcPosError(m_filePath, this->m_lastTokenPos);
 	}
 
-	enum GotoStateKind
-	{
+	enum GotoStateKind {
 		GotoStateKind_ReparseToken,
 		GotoStateKind_EatToken,
 	};
@@ -195,8 +178,7 @@ public:
 		int state,
 		const Token* token,
 		GotoStateKind kind
-		)
-	{
+	) {
 		p = m_begin + token->m_pos.m_offset;
 
 		if (kind == GotoStateKind_EatToken)
@@ -212,8 +194,7 @@ public:
 	setLineCol(
 		int line,
 		int col
-		)
-	{
+	) {
 		m_line = line;
 		m_lineOffset = p - m_begin - col;
 	}
@@ -223,21 +204,18 @@ public:
 		int line,
 		int col,
 		size_t offset
-		)
-	{
+	) {
 		setLineCol(line, col);
 		m_begin -= offset;
 	}
 
 	void
-	setLineCol(const LineCol& pos)
-	{
+	setLineCol(const LineCol& pos) {
 		setLineCol(pos.m_line, pos.m_col);
 	}
 
 	void
-	setLineColOffset(const LineColOffset& pos)
-	{
+	setLineColOffset(const LineColOffset& pos) {
 		setLineColOffset(pos.m_line, pos.m_col, pos.m_offset);
 	}
 
@@ -245,8 +223,7 @@ protected:
 	// these are to be called from withing ragel scanner (*.rl)
 
 	void
-	newLine(char* line)
-	{
+	newLine(char* line) {
 		ASSERT(line[-1] == '\n');
 
 		m_lineOffset = line - m_begin;
@@ -254,16 +231,13 @@ protected:
 	}
 
 	void
-	onLexerError()
-	{
-	}
+	onLexerError() {}
 
 	Token*
 	preCreateToken(
 		int tokenKind,
 		uint_t channelMask = TokenChannelMask_Main
-		)
-	{
+	) {
 		size_t offset = ts - m_begin;
 		size_t length = te - ts;
 
@@ -279,8 +253,7 @@ protected:
 	}
 
 	void
-	postCreateToken()
-	{
+	postCreateToken() {
 		m_tokenizeCount++;
 		if (m_tokenizeCount >= m_tokenizeLimit)
 			stop();
@@ -290,16 +263,14 @@ protected:
 	createToken(
 		int tokenKind,
 		uint_t channelMask = TokenChannelMask_Main
-		)
-	{
+	) {
 		Token* token = preCreateToken(tokenKind, channelMask);
 		postCreateToken();
 		return token;
 	}
 
 	Token*
-	createErrorToken(int c)
-	{
+	createErrorToken(int c) {
 		Token* token = createToken(-1);
 		token->m_data.m_integer = c;
 		stop();
@@ -307,8 +278,7 @@ protected:
 	}
 
 	void
-	onReset()
-	{
+	onReset() {
 		Ragel::clear();
 
 		m_line = 0;
@@ -320,16 +290,12 @@ protected:
 	}
 
 	void
-	tokenize()
-	{
-		if (p != eof)
-		{
+	tokenize() {
+		if (p != eof) {
 			pe = eof;
 			m_tokenizeCount = 0;
 			static_cast<T*>(this)->exec();
-		}
-		else
-		{
+		} else {
 			// add eof token
 			ts = te = p;
 			createToken(0);

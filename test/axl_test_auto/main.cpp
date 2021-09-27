@@ -20,28 +20,22 @@ runTest(
 	size_t total,
 	const char* name,
 	TestFunc* func
-	)
-{
+) {
 	printf(
 		"Test %d/%d: %s\n"
 		"...................................................................\n",
 		index,
 		total,
 		name
-		);
+	);
 
 	bool result = true;
-	try
-	{
+	try {
 		func();
-	}
-	catch(const char* message)
-	{
+	} catch (const char* message) {
 		printf("%s\n", message);
 		result = false;
-	}
-	catch(...)
-	{
+	} catch (...) {
 		result = false;
 	}
 
@@ -56,13 +50,13 @@ int
 wmain(
 	int argc,
 	wchar_t* argv[]
-	)
+)
 #else
 int
 main(
 	int argc,
 	char* argv[]
-	)
+)
 #endif
 {
 #if (_AXL_OS_POSIX)
@@ -82,20 +76,16 @@ main(
 	size_t total;
 	size_t passed = 0;
 
-	if (argc < 2) // run all
-	{
+	if (argc < 2) { // run all
 		total = getTestCaseSet()->getCount();
 		sl::StringHashTableIterator<TestFunc*> it = getTestCaseSet()->getHead();
 		for (size_t i = 0; it; it++, i++)
 			passed += runTest(i, total, it->getKey(), it->m_value);
-	}
-	else
-	{
+	} else {
 		total = argc - 1;
 		sl::String name;
 
-		for (int i = 1; i < argc; i++)
-		{
+		for (int i = 1; i < argc; i++) {
 			name = argv[i];
 			sl::StringHashTableIterator<TestFunc*> it = getTestCaseSet()->find(name);
 			if (it)
@@ -109,7 +99,7 @@ main(
 		total ? passed * 100 / total : 0,
 		total - passed,
 		total
-		);
+	);
 
 	return passed - total; // return negation of the number of failed tests
 }

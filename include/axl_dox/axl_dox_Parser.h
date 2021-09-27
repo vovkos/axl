@@ -20,17 +20,14 @@ class Module;
 
 //..............................................................................
 
-class Parser
-{
+class Parser {
 protected:
-	struct GroupStackEntry
-	{
+	struct GroupStackEntry {
 		handle_t m_namespace;
 		Group* m_group;
 	};
 
-	enum BlockTargetKind
-	{
+	enum BlockTargetKind {
 		BlockTargetKind_None = 0,
 		BlockTargetKind_Member,
 		BlockTargetKind_Compound,
@@ -49,8 +46,7 @@ protected:
 	size_t m_overloadIdx;
 
 public:
-	Parser(Module* module)
-	{
+	Parser(Module* module) {
 		init();
 		m_module = module;
 	}
@@ -67,7 +63,7 @@ public:
 		const lex::LineCol& pos,
 		bool isSingleLine,
 		handle_t lastDeclaredItem
-		);
+	);
 
 protected:
 	void
@@ -77,7 +73,7 @@ protected:
 	setBlockTarget(
 		int tokenKind,
 		const sl::StringRef& name
-		);
+	);
 };
 
 //..............................................................................

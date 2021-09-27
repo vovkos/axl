@@ -21,15 +21,14 @@ namespace win {
 
 //..............................................................................
 
-class ServiceMgr: public ServiceHandle
-{
+class ServiceMgr: public ServiceHandle {
 public:
 	bool
 	open(
 		const sl::StringRef_w& machineName,
 		const sl::StringRef_w& databaseName,
 		dword_t access
-		);
+	);
 
 	bool
 	createService(
@@ -46,14 +45,14 @@ public:
 		const sl::StringRef_w& dependencies = NULL,
 		const sl::StringRef_w& startName = NULL,
 		const sl::StringRef_w& password = NULL
-		);
+	);
 
 	bool
 	openService(
 		Service* service,
 		const sl::StringRef_w& name,
 		dword_t access = SERVICE_ALL_ACCESS
-		);
+	);
 };
 
 //..............................................................................

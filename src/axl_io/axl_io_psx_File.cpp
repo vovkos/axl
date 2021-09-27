@@ -24,8 +24,7 @@ File::open(
 	const sl::StringRef& fileName,
 	uint_t openFlags,
 	mode_t mode
-	)
-{
+) {
 	close();
 
 	m_h = ::open(fileName.sz(), openFlags, mode);
@@ -33,8 +32,7 @@ File::open(
 }
 
 bool
-File::duplicate(int fd)
-{
+File::duplicate(int fd) {
 	close();
 
 	m_h = ::dup(fd);
@@ -42,8 +40,7 @@ File::duplicate(int fd)
 }
 
 bool
-File::setBlockingMode(bool isBlocking)
-{
+File::setBlockingMode(bool isBlocking) {
 	int result = ::fcntl(m_h, F_GETFL, 0);
 	if (result == -1)
 		return err::failWithLastSystemError();
@@ -59,8 +56,7 @@ File::setBlockingMode(bool isBlocking)
 }
 
 uint64_t
-File::getSize() const
-{
+File::getSize() const {
 #if (_AXL_OS_DARWIN)
 	struct stat stat;
 	int result = ::fstat(m_h, &stat);
@@ -69,8 +65,7 @@ File::getSize() const
 	int result = ::fstat64(m_h, &stat);
 #endif
 
-	if (result == -1)
-	{
+	if (result == -1) {
 		err::setLastSystemError();
 		return -1;
 	}
@@ -79,8 +74,7 @@ File::getSize() const
 }
 
 uint64_t
-File::getPosition() const
-{
+File::getPosition() const {
 #if (_AXL_OS_DARWIN)
 	uint64_t offset = ::lseek(m_h, 0, SEEK_CUR);
 #else
@@ -94,12 +88,10 @@ File::getPosition() const
 }
 
 size_t
-File::getIncomingDataSize()
-{
+File::getIncomingDataSize() {
 	int value;
 	int result = ::ioctl(m_h, FIONREAD, &value);
-	if (result == -1)
-	{
+	if (result == -1) {
 		err::setLastSystemError();
 		return -1;
 	}
@@ -111,8 +103,7 @@ size_t
 File::read(
 	void* p,
 	size_t size
-	) const
-{
+) const {
 	size_t actualSize = ::read(m_h, p, size);
 	if (actualSize == -1)
 		err::setLastSystemError();
@@ -124,8 +115,7 @@ size_t
 File::write(
 	const void* p,
 	size_t size
-	)
-{
+) {
 	size_t actualSize = ::write(m_h, p, size);
 	if (actualSize == -1)
 		err::setLastSystemError();

@@ -17,8 +17,7 @@ namespace {
 //..............................................................................
 
 void
-run()
-{
+run() {
 	err::Error error;
 
 	error.pack<sl::PackSeq_4<
@@ -26,11 +25,11 @@ run()
 		int,
 		const char*,
 		int
-		> > (
+	> > (
 		sl::g_nullGuid,
 		12345,
 		"hui", 0xdead, "govno", 0xbeaf
-		);
+	);
 
 	sl::String s = enc::HexEncoding::encode(error.cp(), error.getSize());
 	printf("error: %s\n", s.sz());
@@ -41,7 +40,7 @@ run()
 		12345,
 		"%s %d %s %d",
 		"hui", 0xdead, "govno", 0xbeaf
-		);
+	);
 
 	s = enc::HexEncoding::encode(error.cp(), error.getSize());
 	printf("error: %s\n", s.sz());

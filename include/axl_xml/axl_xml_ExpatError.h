@@ -24,25 +24,22 @@ namespace xml {
 AXL_SL_DEFINE_GUID(
 	g_expatErrorGuid,
 	0x34b6d20, 0x64f7, 0x4ec1, 0x8c, 0x5f, 0xb2, 0x3f, 0x14, 0x6c, 0x87, 0x65
-	);
+);
 
 //..............................................................................
 
-class ExpatErrorProvider: public err::ErrorProvider
-{
+class ExpatErrorProvider: public err::ErrorProvider {
 public:
 	static
 	sl::StringRef
-	getErrorDescription(XML_Error code)
-	{
+	getErrorDescription(XML_Error code) {
 		const XML_LChar* string = XML_ErrorString(code);
 		return string ? string : "undefined XML error";
 	}
 
 	virtual
 	sl::StringRef
-	getErrorDescription(const err::ErrorRef& error)
-	{
+	getErrorDescription(const err::ErrorRef& error) {
 		return getErrorDescription((XML_Error)error->m_code);
 	}
 };
@@ -51,25 +48,20 @@ public:
 
 inline
 void
-registerExpatErrorProvider()
-{
+registerExpatErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_expatErrorGuid,
 		sl::getSimpleSingleton<ExpatErrorProvider> ()
-		);
+	);
 }
 
 //..............................................................................
 
-class ExpatError: public err::Error
-{
+class ExpatError: public err::Error {
 public:
-	ExpatError()
-	{
-	}
+	ExpatError() {}
 
-	ExpatError(XML_Error code)
-	{
+	ExpatError(XML_Error code) {
 		create(code);
 	}
 
@@ -81,8 +73,7 @@ public:
 
 inline
 size_t
-setExpatError(XML_Error code)
-{
+setExpatError(XML_Error code) {
 	return setError(ExpatError(code));
 }
 

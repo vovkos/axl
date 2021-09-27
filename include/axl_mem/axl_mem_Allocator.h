@@ -41,31 +41,26 @@ namespace mem {
 
 //..............................................................................
 
-class DirectAllocator
-{
+class DirectAllocator {
 public:
 #if (defined _AXL_MEM_ALLOCATE_IMPL && defined _AXL_MEM_FREE_IMPL)
 	static
 	void*
-	allocate(size_t size)
-	{
+	allocate(size_t size) {
 		return ::_AXL_MEM_ALLOCATE_IMPL(size);
 	}
 
 	static
 	void
-	free(void* p)
-	{
+	free(void* p) {
 		::_AXL_MEM_FREE_IMPL(p);
 	}
 #else
 	static
 	void*
-	allocate(size_t size)
-	{
+	allocate(size_t size) {
 		void* p = ::malloc(size);
-		if (!p)
-		{
+		if (!p) {
 			err::setOutOfMemoryError();
 			return NULL;
 		}
@@ -78,8 +73,7 @@ public:
 
 	static
 	void
-	free(void* p)
-	{
+	free(void* p) {
 		::free(p);
 	}
 #endif
@@ -87,13 +81,11 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class ZeroAllocator: public DirectAllocator
-{
+class ZeroAllocator: public DirectAllocator {
 public:
 	static
 	void*
-	allocate(size_t size)
-	{
+	allocate(size_t size) {
 		void* p = DirectAllocator::allocate(size);
 		if (p)
 			memset(p, 0, size);
@@ -105,8 +97,7 @@ public:
 //..............................................................................
 
 template <typename BaseAllocator>
-class TrackingAllocator
-{
+class TrackingAllocator {
 public:
 	static
 	void*
@@ -115,8 +106,7 @@ public:
 		const char* tag,
 		const char* filePath,
 		int line
-		)
-	{
+	) {
 		size_t allocSize = size + sizeof(TrackerBlockHdr);
 
 		TrackerBlockHdr* hdr = (TrackerBlockHdr*)BaseAllocator::allocate(allocSize);
@@ -135,8 +125,7 @@ public:
 
 	static
 	void
-	free(void* p)
-	{
+	free(void* p) {
 		TrackerBlockHdr* hdr = (TrackerBlockHdr*)p - 1;
 		removeTrackerBlock(hdr);
 		BaseAllocator::free(hdr);
@@ -146,12 +135,10 @@ public:
 //..............................................................................
 
 template <typename BaseAllocator>
-class Allocate
-{
+class Allocate {
 public:
 	void*
-	operator () (size_t size) const
-	{
+	operator () (size_t size) const {
 		return BaseAllocator::allocate(size);
 	}
 };
@@ -159,12 +146,10 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename BaseAllocator>
-class Free
-{
+class Free {
 public:
 	void
-	operator () (void* p) const
-	{
+	operator () (void* p) const {
 		BaseAllocator::free(p);
 	}
 };
@@ -172,8 +157,7 @@ public:
 //..............................................................................
 
 template <typename BaseAllocator>
-class TrackingAllocate
-{
+class TrackingAllocate {
 public:
 	void*
 	operator () (
@@ -181,8 +165,7 @@ public:
 		const char* tag,
 		const char* filePath,
 		int line
-		) const
-	{
+	) const {
 		return TrackingAllocator<BaseAllocator>::allocate(size, tag, filePath, line);
 	}
 };
@@ -190,12 +173,10 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename BaseAllocator>
-class TrackingFree
-{
+class TrackingFree {
 public:
 	void
-	operator () (void* p) const
-	{
+	operator () (void* p) const {
 		TrackingAllocator<BaseAllocator>::free(p);
 	}
 };

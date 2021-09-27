@@ -17,10 +17,8 @@ namespace gui {
 
 //..............................................................................
 
-Engine::Engine()
-{
-	static uint_t colorInitTable[StdPalColor__Count] =
-	{
+Engine::Engine() {
+	static uint_t colorInitTable[StdPalColor__Count] = {
 		StdColor_AnsiBlack,         // StdColor_AnsiBlack,
 		StdColor_AnsiRed,           // StdPalColor_AnsiRed,
 		StdColor_AnsiGreen,         // StdPalColor_AnsiGreen,

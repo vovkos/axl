@@ -12,8 +12,7 @@
 #	define UNW_FLAG_EHANDLER       0x1
 #endif
 
-struct AXL_UNWIND_INFO
-{
+struct AXL_UNWIND_INFO {
 	UCHAR Version       : 3;
 	UCHAR Flags         : 5;
 	UCHAR SizeOfProlog;
@@ -22,8 +21,7 @@ struct AXL_UNWIND_INFO
 	UCHAR FrameOffset   : 4;
 };
 
-struct AXL_DISPATCHER_CONTEXT
-{
+struct AXL_DISPATCHER_CONTEXT {
 	DWORD64 ControlPc;
 	DWORD64 ImageBase;
 	PRUNTIME_FUNCTION FunctionEntry;
@@ -45,8 +43,7 @@ namespace spy {
 // nasm -fwin64 -lthunk_amd64_msc.asm.lst thunk_amd64_msc.asm
 // perl nasm-list-to-cpp.pl thunk_amd64_msc.asm.lst
 
-const uint8_t g_thunkCode[] =
-{
+const uint8_t g_thunkCode[] = {
 	0x55,                                           // 00000000  push    rbp
 	0x48, 0x89, 0xE5,                                // 00000001  mov     rbp, rsp
 	0x48, 0x81, 0xEC, 0x90, 0x00, 0x00, 0x00,        // 00000004  sub     rsp, StackFrameSize
@@ -124,8 +121,7 @@ const uint8_t g_thunkCode[] =
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum ThunkCodeOffset
-{
+enum ThunkCodeOffset {
 	ThunkCodeOffset_HookPtr1         = 0x0031,
 	ThunkCodeOffset_HookEnterPtr     = 0x0042,
 	ThunkCodeOffset_HookRetPtr       = 0x008a,
@@ -140,8 +136,7 @@ enum ThunkCodeOffset
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct Hook
-{
+struct Hook {
 	uint8_t m_thunkCode[(ThunkCodeOffset_End & ~7) + 8]; // align on 8
 	RUNTIME_FUNCTION m_runtimeFunction;
 	AXL_UNWIND_INFO m_unwindInfo;
@@ -161,20 +156,17 @@ dispatchException(
 	CONTEXT* exceptionContext,
 	uint64_t rip0,
 	uint64_t rsp0
-	)
-{
+) {
 	CONTEXT currentContext = *exceptionContext;
 	currentContext.Rip = rip0;
 	currentContext.Rsp = rsp0;
 
 	uint64_t rspLimit = (uint64_t)((NT_TIB*)NtCurrentTeb())->StackBase;
-	while (currentContext.Rsp <= rspLimit)
-	{
+	while (currentContext.Rsp <= rspLimit) {
 		uint64_t imageBase;
 		RUNTIME_FUNCTION* function = ::RtlLookupFunctionEntry(currentContext.Rip, &imageBase, NULL);
 
-		if (!function)
-		{
+		if (!function) {
 			uint64_t retRip = *(uint64_t*)currentContext.Rsp;
 			if (currentContext.Rip == retRip) // broken stack
 				break;
@@ -200,7 +192,7 @@ dispatchException(
 			&handlerData,
 			&establisherFrame,
 			NULL
-			);
+		);
 
 		if (handlerRsp >= currentContext.Rsp) // broken stack (rsp must grow)
 			break;
@@ -226,12 +218,11 @@ dispatchException(
 			(void*)establisherFrame,
 			exceptionContext,
 			&dispatcherContext
-			);
+		);
 
 		disableCurrentThreadHooks();
 
-		switch (disposition)
-		{
+		switch (disposition) {
 		case ExceptionContinueExecution:
 			return true;
 
@@ -265,8 +256,7 @@ hookEnter(
 	Hook* hook,
 	uint64_t rbp,
 	uint64_t originalRet
-	)
-{
+) {
 	return hookEnterCommon(&hook->m_commonContext, rbp, originalRet);
 }
 
@@ -274,8 +264,7 @@ uint64_t
 hookLeave(
 	Hook* hook,
 	uint64_t rbp
-	)
-{
+) {
 	return hookLeaveCommon(&hook->m_commonContext, rbp);
 }
 
@@ -285,8 +274,7 @@ hookException(
 	uint64_t establisherFrame,
 	CONTEXT* contextRecord,
 	AXL_DISPATCHER_CONTEXT* dispatcherContext
-	)
-{
+) {
 	disableCurrentThreadHooks();
 
 	ThreadState* threadState = getCurrentThreadState(false);
@@ -302,7 +290,7 @@ hookException(
 			rbp,
 			exceptionRecord,
 			contextRecord
-			);
+		);
 
 	uint64_t originalRet = threadState->getOriginalRet(rbp);
 	if (!originalRet)
@@ -313,7 +301,7 @@ hookException(
 		contextRecord,
 		originalRet,
 		establisherFrame
-		);
+	);
 
 	enableCurrentThreadHooks();
 	return result ? 0 : originalRet; // returning NULL means ExceptionContinueExecution
@@ -321,13 +309,11 @@ hookException(
 
 //..............................................................................
 
-HookArena::HookArena()
-{
+HookArena::HookArena() {
 	m_impl = AXL_MEM_NEW(mem::ExecutableBlockArena<Hook>);
 }
 
-HookArena::~HookArena()
-{
+HookArena::~HookArena() {
 	((mem::ExecutableBlockArena<Hook>*)m_impl)->detach(); // don't free unless explicitly requested
 	AXL_MEM_DELETE((mem::ExecutableBlockArena<Hook>*)m_impl);
 }
@@ -338,8 +324,7 @@ HookArena::allocate(
 	void* callbackParam,
 	HookEnterFunc* enterFunc,
 	HookLeaveFunc* leaveFunc
-	)
-{
+) {
 	Hook* hook = ((mem::ExecutableBlockArena<Hook>*)m_impl)->allocate();
 	if (!hook)
 		return NULL;
@@ -377,8 +362,7 @@ HookArena::allocate(
 }
 
 void
-HookArena::free()
-{
+HookArena::free() {
 	((mem::ExecutableBlockArena<Hook>*)m_impl)->free();
 }
 
@@ -388,8 +372,7 @@ void
 setHookTargetFunc(
 	Hook* hook,
 	void* targetFunc
-	)
-{
+) {
 	*(void**)(hook->m_thunkCode + ThunkCodeOffset_TargetFuncPtr) = targetFunc;
 }
 
@@ -397,8 +380,7 @@ void
 setHookExceptionFunc(
 	Hook* hook,
 	HookExceptionFunc* exceptionFunc
-	)
-{
+) {
 	hook->m_exceptionFunc = exceptionFunc;
 }
 

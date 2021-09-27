@@ -24,9 +24,8 @@ namespace sl {
 template <
 	typename T,
 	typename Details0 = ArrayDetails<T>
-	>
-class ArrayRef
-{
+>
+class ArrayRef {
 public:
 	typedef Details0 Details;
 	typedef typename Details::Hdr Hdr;
@@ -38,21 +37,18 @@ protected:
 	size_t m_count;
 
 public:
-	ArrayRef()
-	{
+	ArrayRef() {
 		initialize();
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	ArrayRef(ArrayRef&& src)
-	{
+	ArrayRef(ArrayRef&& src) {
 		initialize();
 		move(std::move(src));
 	}
 #endif
 
-	ArrayRef(const ArrayRef& src)
-	{
+	ArrayRef(const ArrayRef& src) {
 		initialize();
 		attach(src);
 	}
@@ -60,8 +56,7 @@ public:
 	ArrayRef(
 		const T* p,
 		size_t count
-		)
-	{
+	) {
 		initialize();
 		attach(NULL, (T*)p, count);
 	}
@@ -69,8 +64,7 @@ public:
 	ArrayRef(
 		const T* p,
 		const void* end
-		)
-	{
+	) {
 		initialize();
 		attach(NULL, (T*)p, (const T*)end - p);
 	}
@@ -79,8 +73,7 @@ public:
 		Hdr* hdr,
 		const T* p,
 		size_t count
-		)
-	{
+	) {
 		initialize();
 		attach(hdr, (T*)p, count);
 	}
@@ -89,99 +82,84 @@ public:
 		Hdr* hdr,
 		const T* p,
 		const void* end
-		)
-	{
+	) {
 		initialize();
 		attach(hdr, (T*)p, (const T*)end - p);
 	}
 
 
-	~ArrayRef()
-	{
+	~ArrayRef() {
 		release();
 	}
 
-	operator const T* () const
-	{
+	operator const T* () const {
 		return m_p;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	ArrayRef&
-	operator = (ArrayRef&& src)
-	{
+	operator = (ArrayRef&& src) {
 		move(std::move(src));
 		return *this;
 	}
 #endif
 
 	ArrayRef&
-	operator = (const ArrayRef& src)
-	{
+	operator = (const ArrayRef& src) {
 		attach(src);
 		return *this;
 	}
 
 	const T&
-	operator [] (intptr_t i) const
-	{
+	operator [] (intptr_t i) const {
 		ASSERT((size_t)i < m_count);
 		return m_p[i];
 	}
 
 	const T*
-	cp() const
-	{
+	cp() const {
 		return m_p;
 	}
 
 	size_t
-	getCount() const
-	{
+	getCount() const {
 		return m_count;
 	}
 
 	Hdr*
-	getHdr() const
-	{
+	getHdr() const {
 		return m_hdr;
 	}
 
 	bool
-	isEmpty() const
-	{
+	isEmpty() const {
 		return m_count == 0;
 	}
 
 	const T*
-	getBegin() const
-	{
+	getBegin() const {
 		return m_p;
 	}
 
 	const T*
-	getEnd() const
-	{
+	getEnd() const {
 		return m_p + m_count;
 	}
 
 	const T&
-	getFront() const
-	{
+	getFront() const {
 		ASSERT(m_count);
 		return m_p[0];
 	}
 
 	const T&
-	getBack() const
-	{
+	getBack() const {
 		ASSERT(m_count);
 		return m_p[m_count - 1];
 	}
 
 	size_t
-	find(ValueArg e) const
-	{
+	find(ValueArg e) const {
 		for (size_t i = 0; i < m_count; i++)
 			if (m_p[i] == e)
 				return i;
@@ -190,8 +168,7 @@ public:
 	}
 
 	size_t
-	findReverse(ValueArg e) const
-	{
+	findReverse(ValueArg e) const {
 		for (intptr_t i = m_count - 1; i >= 0; i--)
 			if (m_p[i] == e)
 				return i;
@@ -200,8 +177,7 @@ public:
 	}
 
 	void
-	release()
-	{
+	release() {
 		if (m_hdr)
 			m_hdr->release();
 
@@ -210,8 +186,7 @@ public:
 
 protected:
 	void
-	initialize()
-	{
+	initialize() {
 		m_p = NULL;
 		m_hdr = NULL;
 		m_count = 0;
@@ -219,8 +194,7 @@ protected:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	void
-	move(ArrayRef&& src)
-	{
+	move(ArrayRef&& src) {
 		if (m_hdr)
 			m_hdr->release();
 
@@ -232,8 +206,7 @@ protected:
 #endif
 
 	void
-	attach(const ArrayRef& src)
-	{
+	attach(const ArrayRef& src) {
 		if (&src != this)
 			attach(src.m_hdr, src.m_p, src.m_count);
 	}
@@ -243,10 +216,8 @@ protected:
 		Hdr* hdr,
 		T* p,
 		size_t count
-		)
-	{
-		if (hdr != m_hdr) // try to avoid unnecessary interlocked ops
-		{
+	) {
+		if (hdr != m_hdr) { // try to avoid unnecessary interlocked ops
 			if (hdr)
 				hdr->addRef();
 
@@ -266,9 +237,8 @@ protected:
 template <
 	typename T,
 	typename Details0 = ArrayDetails<T>
-	>
-class Array: public ArrayRef<T, Details0>
-{
+>
+class Array: public ArrayRef<T, Details0> {
 public:
 	typedef sl::ArrayRef<T, Details0> ArrayRef;
 
@@ -279,50 +249,41 @@ public:
 	typedef typename Details::ZeroConstruct ZeroConstruct;
 
 public:
-	Array()
-	{
-	}
+	Array() {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	Array(Array&& src)
-	{
+	Array(Array&& src) {
 		copy(std::move(src));
 	}
 
-	Array(ArrayRef&& src)
-	{
+	Array(ArrayRef&& src) {
 		copy(std::move(src));
 	}
 #endif
 
-	Array(const Array& src)
-	{
+	Array(const Array& src) {
 		copy(src);
 	}
 
-	Array(const ArrayRef& src)
-	{
+	Array(const ArrayRef& src) {
 		copy(src);
 	}
 
-	explicit Array(size_t count)
-	{
+	explicit Array(size_t count) {
 		setCount(count);
 	}
 
 	Array(
 		const T* p,
 		size_t count
-		)
-	{
+	) {
 		copy(p, count);
 	}
 
 	Array(
 		const T* p,
 		const void* end
-		)
-	{
+	) {
 		copy(p, (T*)end - p);
 	}
 
@@ -330,60 +291,51 @@ public:
 		rc::BufKind bufKind,
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		setBuffer(bufKind, p, size);
 	}
 
-	operator const T* () const
-	{
+	operator const T* () const {
 		return this->m_p;
 	}
 
-	operator T* ()
-	{
+	operator T* () {
 		return p();
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Array&
-	operator = (Array&& src)
-	{
+	operator = (Array&& src) {
 		copy(std::move(src));
 		return *this;
 	}
 
 	Array&
-	operator = (ArrayRef&& src)
-	{
+	operator = (ArrayRef&& src) {
 		copy(std::move(src));
 		return *this;
 	}
 #endif
 
 	Array&
-	operator = (const Array& src)
-	{
+	operator = (const Array& src) {
 		copy(src);
 		return *this;
 	}
 
 	Array&
-	operator = (const ArrayRef& src)
-	{
+	operator = (const ArrayRef& src) {
 		copy(src);
 		return *this;
 	}
 
 	const T&
-	operator [] (intptr_t i) const
-	{
+	operator [] (intptr_t i) const {
 		return ArrayRef::operator [] (i);
 	}
 
 	T&
-	operator [] (intptr_t i)
-	{
+	operator [] (intptr_t i) {
 		bool result = ensureExclusive();
 		ASSERT(result);
 
@@ -391,62 +343,52 @@ public:
 	}
 
 	T*
-	p()
-	{
+	p() {
 		return ensureExclusive() ? this->m_p : NULL;
 	}
 
 	const T*
-	getBegin() const
-	{
+	getBegin() const {
 		return this->cp();
 	}
 
 	T*
-	getBegin()
-	{
+	getBegin() {
 		return p();
 	}
 
 	const T*
-	getEnd() const
-	{
+	getEnd() const {
 		return ArrayRef::getEnd();
 	}
 
 	T*
-	getEnd()
-	{
+	getEnd() {
 		return (T*)ArrayRef::getEnd();
 	}
 
 	const T&
-	getFront() const
-	{
+	getFront() const {
 		return ArrayRef::getFront();
 	}
 
 	T&
-	getFront()
-	{
+	getFront() {
 		return (T&) ArrayRef::getFront();
 	}
 
 	const T&
-	getBack() const
-	{
+	getBack() const {
 		return ArrayRef::getBack();
 	}
 
 	T&
-	getBack()
-	{
+	getBack() {
 		return (T&) ArrayRef::getBack();
 	}
 
 	void
-	clear()
-	{
+	clear() {
 		setCount(0);
 	}
 
@@ -454,8 +396,7 @@ public:
 	zeroConstruct(
 		size_t index,
 		size_t count
-		)
-	{
+	) {
 		if (index >= this->m_count)
 			return;
 
@@ -468,26 +409,22 @@ public:
 	}
 
 	void
-	zeroConstruct()
-	{
+	zeroConstruct() {
 		Details::destruct(this->m_p, this->m_count);
 		ZeroConstruct() (this->m_p, this->m_count);
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
-	copy(ArrayRef&& src)
-	{
-		if (src.isEmpty())
-		{
+	copy(ArrayRef&& src) {
+		if (src.isEmpty()) {
 			clear();
 			src.release();
 			return 0;
 		}
 
 		Hdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive))
-		{
+		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive)) {
 			copy(src, src.getCount());
 			src.release();
 			return this->m_count;
@@ -499,13 +436,11 @@ public:
 #endif
 
 	size_t
-	copy(const ArrayRef& src)
-	{
+	copy(const ArrayRef& src) {
 		if (&src == this)
 			return this->m_count;
 
-		if (src.isEmpty())
-		{
+		if (src.isEmpty()) {
 			clear();
 			return 0;
 		}
@@ -519,8 +454,7 @@ public:
 	}
 
 	size_t
-	copyReverse(const ArrayRef& src)
-	{
+	copyReverse(const ArrayRef& src) {
 		return copyReverse(src, src.m_count);
 	}
 
@@ -528,18 +462,15 @@ public:
 	copy(
 		const T* p,
 		size_t count
-		)
-	{
-		if (count == 0)
-		{
+	) {
+		if (count == 0) {
 			clear();
 			return 0;
 		}
 
 		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
-			if (Details::IsSimple)
-			{
+			if (Details::IsSimple) {
 				// for simple non-ctor-dtor types we can apply in-buffer shift
 
 				T* end = (T*)this->m_hdr->getEnd();
@@ -548,9 +479,7 @@ public:
 				this->m_p = (T*)p;
 				this->m_count = count;
 				return count;
-			}
-			else
-			{
+			} else {
 				shadow = this->m_hdr; // ensure we keep p intact
 			}
 
@@ -566,10 +495,8 @@ public:
 	copyReverse(
 		const T* p,
 		size_t count
-		)
-	{
-		if (count == 0)
-		{
+	) {
+		if (count == 0) {
 			clear();
 			return 0;
 		}
@@ -587,20 +514,17 @@ public:
 	}
 
 	size_t
-	copy(ValueArg e)
-	{
+	copy(ValueArg e) {
 		return copy(&e, 1);
 	}
 
 	size_t
-	appendEmptySpace(size_t count)
-	{
+	appendEmptySpace(size_t count) {
 		return insertEmptySpace(-1, count);
 	}
 
 	size_t
-	appendZeroConstruct(size_t count)
-	{
+	appendZeroConstruct(size_t count) {
 		return insertZeroConstruct(-1, count);
 	}
 
@@ -608,8 +532,7 @@ public:
 	append(
 		const T* p,
 		size_t count
-		)
-	{
+	) {
 		return insert(-1, p, count);
 	}
 
@@ -617,14 +540,12 @@ public:
 	appendReverse(
 		const T* p,
 		size_t count
-		)
-	{
+	) {
 		return insertReverse(-1, p, count);
 	}
 
 	size_t
-	append(ValueArg e)
-	{
+	append(ValueArg e) {
 		return insert(-1, e);
 	}
 
@@ -632,20 +553,17 @@ public:
 	appendMultiply(
 		ValueArg e,
 		size_t count
-		)
-	{
+	) {
 		return insertMultiply(-1, e, count);
 	}
 
 	size_t
-	append(const ArrayRef& src)
-	{
+	append(const ArrayRef& src) {
 		return insert(-1, src, src.getCount());
 	}
 
 	size_t
-	appendReverse(const ArrayRef& src)
-	{
+	appendReverse(const ArrayRef& src) {
 		return insertReverse(-1, src, src.getCount());
 	}
 
@@ -653,8 +571,7 @@ public:
 	insertEmptySpace(
 		size_t index,
 		size_t count
-		)
-	{
+	) {
 		T* dst = insertSpace(index, count);
 		return dst ? this->m_count : -1;
 	}
@@ -663,8 +580,7 @@ public:
 	insertZeroConstruct(
 		size_t index,
 		size_t count
-		)
-	{
+	) {
 		T* dst = insertSpace(index, count);
 		if (!dst)
 			return -1;
@@ -679,8 +595,7 @@ public:
 		size_t index,
 		const T* p,
 		size_t count
-		)
-	{
+	) {
 		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
@@ -700,8 +615,7 @@ public:
 		size_t index,
 		const T* p,
 		size_t count
-		)
-	{
+	) {
 		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
@@ -720,8 +634,7 @@ public:
 	insert(
 		size_t index,
 		ValueArg e
-		)
-	{
+	) {
 		T* dst = insertSpace(index, 1);
 		if (!dst)
 			return -1;
@@ -735,8 +648,7 @@ public:
 		size_t index,
 		ValueArg e,
 		size_t count
-		)
-	{
+	) {
 		T* dst = insertSpace(index, count);
 		if (!dst)
 			return -1;
@@ -753,8 +665,7 @@ public:
 	insert(
 		size_t index,
 		const ArrayRef& src
-		)
-	{
+	) {
 		return insert(index, src, src.getCount());
 	}
 
@@ -762,8 +673,7 @@ public:
 	insertReverse(
 		size_t index,
 		const ArrayRef& src
-		)
-	{
+	) {
 		return insertReverse(index, src, src.getCount());
 	}
 
@@ -771,8 +681,7 @@ public:
 	remove(
 		size_t index,
 		size_t count = 1
-		)
-	{
+	) {
 		bool result;
 
 		if (count == 0)
@@ -782,8 +691,7 @@ public:
 		if (index >= oldCount)
 			return this->m_count;
 
-		if (count == -1 || index + count >= oldCount)
-		{
+		if (count == -1 || index + count >= oldCount) {
 			result = setCount(index);
 			return result ? index : -1;
 		}
@@ -802,8 +710,7 @@ public:
 	}
 
 	size_t
-	pop(size_t count = 1)
-	{
+	pop(size_t count = 1) {
 		if (count >= this->m_count)
 			count = this->m_count;
 
@@ -813,8 +720,7 @@ public:
 	}
 
 	T
-	getBackAndPop()
-	{
+	getBackAndPop() {
 		T e = this->getBack();
 		pop();
 		return e;
@@ -824,8 +730,7 @@ public:
 	reverse(
 		size_t index,
 		size_t count
-		)
-	{
+	) {
 		size_t thisCount = this->m_count;
 
 		if (index >= thisCount)
@@ -838,38 +743,32 @@ public:
 	}
 
 	void
-	reverse()
-	{
+	reverse() {
 		reverse(0, -1);
 	}
 
 	void
-	reverseFrom(size_t index)
-	{
+	reverseFrom(size_t index) {
 		reverse(index, -1);
 	}
 
 	void
-	reverseUntil(size_t index)
-	{
+	reverseUntil(size_t index) {
 		reverse(0, index);
 	}
 
 	bool
-	isExclusive()
-	{
+	isExclusive() {
 		return !this->m_count || this->m_hdr && this->m_hdr->getRefCount() == 1;
 	}
 
 	bool
-	ensureExclusive()
-	{
+	ensureExclusive() {
 		return this->m_count ? setCount(this->m_count) : true;
 	}
 
 	bool
-	reserve(size_t count)
-	{
+	reserve(size_t count) {
 		size_t size = count * sizeof(T);
 
 		if (this->m_hdr &&
@@ -900,20 +799,17 @@ public:
 	}
 
 	bool
-	setCount(size_t count)
-	{
+	setCount(size_t count) {
 		return setCountImpl<Construct> (count);
 	}
 
 	bool
-	setCountZeroConstruct(size_t count)
-	{
+	setCountZeroConstruct(size_t count) {
 		return setCountImpl<ZeroConstruct> (count);
 	}
 
 	size_t
-	ensureCount(size_t count)
-	{
+	ensureCount(size_t count) {
 		if (this->m_count < count)
 			setCount(count);
 
@@ -921,8 +817,7 @@ public:
 	}
 
 	size_t
-	ensureCountZeroConstruct(size_t count)
-	{
+	ensureCountZeroConstruct(size_t count) {
 		if (this->m_count < count)
 			setCountZeroConstruct(count);
 
@@ -934,8 +829,7 @@ public:
 		rc::BufKind kind,
 		void* p,
 		size_t size
-		)
-	{
+	) {
 		ASSERT(size >= sizeof(Hdr) + sizeof(T));
 
 		uint_t flags = kind != rc::BufKind_Static ? rc::BufHdrFlag_Exclusive : 0;
@@ -960,8 +854,7 @@ protected:
 	insertSpace(
 		size_t index,
 		size_t count
-		)
-	{
+	) {
 		size_t oldCount = this->m_count;
 		bool result = setCount(this->m_count + count);
 		if (!result)
@@ -980,18 +873,15 @@ protected:
 
 	template <typename Construct>
 	bool
-	setCountImpl(size_t count)
-	{
+	setCountImpl(size_t count) {
 		size_t size = count * sizeof(T);
 
 		if (this->m_hdr &&
-			this->m_hdr->getRefCount() == 1)
-		{
+			this->m_hdr->getRefCount() == 1) {
 			if (this->m_count == count)
 				return true;
 
-			if (this->m_hdr->m_bufferSize >= size)
-			{
+			if (this->m_hdr->m_bufferSize >= size) {
 				if (count > this->m_count)
 					Construct() (this->m_p + this->m_count, count - this->m_count);
 				else
@@ -1003,14 +893,12 @@ protected:
 			}
 		}
 
-		if (count == 0)
-		{
+		if (count == 0) {
 			this->release();
 			return true;
 		}
 
-		if (!this->m_count)
-		{
+		if (!this->m_count) {
 			bool result = reserve(count);
 			if (!result)
 				return false;
@@ -1034,12 +922,9 @@ protected:
 
 		T* p = (T*)(hdr + 1);
 
-		if (count <= this->m_count)
-		{
+		if (count <= this->m_count) {
 			Details::constructCopy(p, this->m_p, count);
-		}
-		else
-		{
+		} else {
 			Details::constructCopy(p, this->m_p, this->m_count);
 			Construct() (p + this->m_count, count - this->m_count);
 		}

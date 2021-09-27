@@ -21,12 +21,10 @@ namespace enc {
 
 //..............................................................................
 
-class GetBase64Char
-{
+class GetBase64Char {
 public:
 	char
-	operator () (uchar_t x)
-	{
+	operator () (uchar_t x) {
 		static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 		return charTable[x & 0x3f];
 	}
@@ -34,12 +32,10 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class GetBase64UrlChar
-{
+class GetBase64UrlChar {
 public:
 	char
-	operator () (uchar_t x)
-	{
+	operator () (uchar_t x) {
 		static const char charTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 		return charTable[x & 0x3f];
 	}
@@ -47,8 +43,7 @@ public:
 
 //..............................................................................
 
-enum Base64EncodingFlag
-{
+enum Base64EncodingFlag {
 	Base64EncodingFlag_NoPadding  = 0x01,
 	Base64EncodingFlag_UrlChars   = 0x02,
 	Base64EncodingFlag_Url        = Base64EncodingFlag_UrlChars | Base64EncodingFlag_NoPadding,
@@ -57,8 +52,7 @@ enum Base64EncodingFlag
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Base64Encoding
-{
+class Base64Encoding {
 public:
 	static
 	size_t
@@ -67,7 +61,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		);
+	);
 
 	static
 	sl::String
@@ -75,8 +69,7 @@ public:
 		const void* p,
 		size_t size,
 		uint_t flags = 0
-		)
-	{
+	) {
 		sl::String string;
 		encode(&string, p, size, flags);
 		return string;
@@ -87,12 +80,11 @@ public:
 	decode(
 		sl::Array<char>* buffer,
 		const sl::StringRef& string
-		);
+	);
 
 	static
 	sl::Array<char>
-	decode(const sl::StringRef& string)
-	{
+	decode(const sl::StringRef& string) {
 		sl::Array<char> buffer;
 		decode(&buffer, string);
 		return buffer;

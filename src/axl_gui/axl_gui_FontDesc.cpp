@@ -18,10 +18,8 @@ namespace gui {
 //..............................................................................
 
 const char*
-getFontFlagString(FontFlag flag)
-{
-	static const char* stringTable[] =
-	{
+getFontFlagString(FontFlag flag) {
+	static const char* stringTable[] = {
 		"bold",            // FontFlag_Bold      = 0x01,
 		"italic",          // FontFlag_Italic    = 0x02,
 		"underline",       // FontFlag_Underline = 0x04,
@@ -46,8 +44,7 @@ FontDesc::setup(
 	const sl::StringRef& family,
 	size_t pointSize,
 	uint_t flags
-	)
-{
+) {
 	size_t length = family.getLength();
 
 	if (length >= countof(m_family))

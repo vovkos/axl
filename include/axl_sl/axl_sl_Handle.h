@@ -24,9 +24,8 @@ template <
 	typename T,
 	typename Close = Void<T>,
 	typename GetInvalidHandle = Zero<T>
-	>
-class Handle
-{
+>
+class Handle {
 public:
 	typedef T H;
 
@@ -34,79 +33,66 @@ protected:
 	T m_h;
 
 public:
-	Handle()
-	{
+	Handle() {
 		m_h = GetInvalidHandle()();
 	}
 
-	Handle(T h)
-	{
+	Handle(T h) {
 		m_h = h;
 	}
 
-	~Handle()
-	{
+	~Handle() {
 		close();
 	}
 
 	static
 	T
-	getInvalidHandle()
-	{
+	getInvalidHandle() {
 		return GetInvalidHandle()();
 	}
 
-	operator T() const
-	{
+	operator T() const {
 		return m_h;
 	}
 
-	T operator -> () const
-	{
+	T operator -> () const {
 		return m_h;
 	}
 
 	const Handle&
-	operator = (T h)
-	{
+	operator = (T h) {
 		attach(h);
 		return *this;
 	}
 
 	bool
-	isOpen() const
-	{
+	isOpen() const {
 		return m_h != GetInvalidHandle()();
 	}
 
 	void
-	close()
-	{
-		if (isOpen())
-		{
+	close() {
+		if (isOpen()) {
 			Close() (m_h);
 			m_h = GetInvalidHandle()();
 		}
 	}
 
 	void
-	attach(T h)
-	{
+	attach(T h) {
 		close();
 		m_h = h;
 	}
 
 	T
-	detach()
-	{
+	detach() {
 		T h = m_h;
 		m_h = GetInvalidHandle()();
 		return h;
 	}
 
 	T*
-	p()
-	{
+	p() {
 		ASSERT(m_h == GetInvalidHandle()());
 		return &m_h;
 	}

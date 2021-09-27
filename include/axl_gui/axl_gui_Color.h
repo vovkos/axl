@@ -20,8 +20,7 @@ namespace gui {
 
 //..............................................................................
 
-enum
-{
+enum {
 	ColorFlag_Undefined   = 0x80000000,
 	ColorFlag_Index       = 0x40000000,
 	ColorFlag_IndexMask   = 0x3fffffff,
@@ -30,8 +29,7 @@ enum
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum StdColor
-{
+enum StdColor {
 	StdColor_AnsiBlack         = 0x000000,
 	StdColor_AnsiRed           = 0xbb0000,
 	StdColor_AnsiGreen         = 0x00bb00,
@@ -77,8 +75,7 @@ enum StdColor
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum StdPalColor
-{
+enum StdPalColor {
 	// ansi colors
 
 	StdPalColor_AnsiBlack          = ColorFlag_Index | 0,
@@ -146,8 +143,7 @@ enum StdPalColor
 
 inline
 uint_t
-getColorIndex(uint_t color)
-{
+getColorIndex(uint_t color) {
 	return (color & ColorFlag_Index) ? color & ColorFlag_IndexMask : -1;
 }
 
@@ -156,35 +152,30 @@ uint_t
 overlayColor(
 	uint_t baseColor,
 	uint_t overlayColor
-	)
-{
+) {
 	return (overlayColor & ColorFlag_Undefined) ? baseColor : overlayColor;
 }
 
 inline
 uint_t
-inverseRgb(uint_t rgb)
-{
+inverseRgb(uint_t rgb) {
 	return ((rgb & 0x0000ff) << 16) | ((rgb & 0xff0000) >> 16) | (rgb & 0x00ff00);
 }
 
 //..............................................................................
 
-struct Palette
-{
+struct Palette {
 	const uint_t* m_colorArray;
 	size_t m_count;
 
-	Palette()
-	{
+	Palette() {
 		setup(NULL, 0);
 	}
 
 	Palette(
 		const uint_t* colorTable,
 		size_t count
-		)
-	{
+	) {
 		m_colorArray = colorTable;
 		m_count = count;
 	}
@@ -196,8 +187,7 @@ struct Palette
 	setup(
 		const uint_t* colorTable,
 		size_t count
-		)
-	{
+	) {
 		m_colorArray = colorTable;
 		m_count = count;
 	}

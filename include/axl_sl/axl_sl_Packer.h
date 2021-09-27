@@ -22,8 +22,7 @@ namespace sl {
 
 //..............................................................................
 
-class Packer
-{
+class Packer {
 public:
 	virtual
 	axl_va_list
@@ -31,22 +30,20 @@ public:
 		void* p,
 		size_t* size,
 		axl_va_list va
-		) = 0;
+	) = 0;
 
 	void
 	pack(
 		void* p,
 		size_t* size,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, size);
 		pack_va(p, size, va);
 	}
 
 	size_t
-	count_va(axl_va_list va)
-	{
+	count_va(axl_va_list va) {
 		size_t size = 0;
 		pack_va(NULL, &size, va);
 		return size;
@@ -56,15 +53,13 @@ public:
 	count(
 		int unused,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, unused);
 		return count_va(va);
 	}
 
 	rc::Ptr<mem::Block>
-	createPackage_va(axl_va_list va)
-	{
+	createPackage_va(axl_va_list va) {
 		size_t size = 0;
 		pack_va(NULL, &size, va);
 
@@ -84,8 +79,7 @@ public:
 	createPackage(
 		int unused,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, unused);
 		return createPackage_va(va);
 	}
@@ -94,8 +88,7 @@ public:
 //..............................................................................
 
 template <typename Pack>
-class PackerImpl: public Packer
-{
+class PackerImpl: public Packer {
 public:
 	virtual
 	axl_va_list
@@ -103,15 +96,13 @@ public:
 		void* p,
 		size_t* size,
 		axl_va_list va
-		)
-	{
+	) {
 		return Pack() (p, size, va);
 	}
 
 	static
 	PackerImpl*
-	getSingleton()
-	{
+	getSingleton() {
 		return sl::getSimpleSingleton<PackerImpl> ();
 	}
 };
@@ -120,8 +111,7 @@ public:
 
 // run-time sequencing
 
-class PackerSeq: public Packer
-{
+class PackerSeq: public Packer {
 protected:
 	sl::Array<Packer*> m_sequence;
 
@@ -132,25 +122,22 @@ public:
 		void* p,
 		size_t* size,
 		axl_va_list va
-		);
+	);
 
 	void
-	clear()
-	{
+	clear() {
 		m_sequence.clear();
 	}
 
 	size_t
-	append(Packer* packer)
-	{
+	append(Packer* packer) {
 		m_sequence.append(packer);
 		return m_sequence.getCount();
 	}
 
 	template <typename T>
 	size_t
-	append()
-	{
+	append() {
 		return append(PackerImpl<T>::getSingleton());
 	}
 
@@ -160,8 +147,7 @@ public:
 	appendFormat(const char* formatString);
 
 	size_t
-	format(const char* formatString)
-	{
+	format(const char* formatString) {
 		clear();
 		return appendFormat(formatString);
 	}
@@ -174,8 +160,7 @@ rc::Ptr<mem::Block>
 formatPackage_va(
 	const char* formatString,
 	axl_va_list va
-	)
-{
+) {
 	PackerSeq packer;
 	packer.format(formatString);
 	return packer.createPackage_va(va);
@@ -188,8 +173,7 @@ rc::Ptr<mem::Block>
 formatPackage(
 	const char* formatString,
 	...
-	)
-{
+) {
 	AXL_VA_DECL(va, formatString);
 	return formatPackage_va(formatString, va);
 }
@@ -198,27 +182,23 @@ formatPackage(
 
 // package:
 
-class Package
-{
+class Package {
 protected:
 	axl::sl::Array<uchar_t> m_buffer;
 
 public:
 	void
-	clear()
-	{
+	clear() {
 		m_buffer.clear();
 	}
 
 	const uchar_t*
-	getBuffer()
-	{
+	getBuffer() {
 		return m_buffer;
 	}
 
 	size_t
-	getSize()
-	{
+	getSize() {
 		return m_buffer.getCount();
 	}
 
@@ -226,12 +206,11 @@ public:
 	append_va(
 		Packer* pack,
 		axl_va_list va
-		);
+	);
 
 	template <typename Pack>
 	size_t
-	append_va(axl_va_list va)
-	{
+	append_va(axl_va_list va) {
 		Packer* pack = PackerImpl<Pack>::getSingleton();
 		return append_va(pack, va);
 	}
@@ -240,12 +219,11 @@ public:
 	append(
 		const void* p,
 		size_t size
-		);
+	);
 /*
 	template <typename T>
 	size_t
-	append(const T& data)
-	{
+	append(const T& data) {
 		Packer* pack = PackerImpl<Pack<T> >::getSingleton();
 		return pack(&data, sizeof(data));
 	}
@@ -254,8 +232,7 @@ public:
 	appendFormat_va(
 		const char* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		PackerSeq packer;
 		packer.format(formatString);
 		return append_va(&packer, va);
@@ -265,8 +242,7 @@ public:
 	appendFormat(
 		const char* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return appendFormat_va(formatString, va);
 	}
@@ -275,8 +251,7 @@ public:
 	format_va(
 		const char* formatString,
 		axl_va_list va
-		)
-	{
+	) {
 		clear();
 		return appendFormat_va(formatString, va);
 	}
@@ -285,8 +260,7 @@ public:
 	format(
 		const char* formatString,
 		...
-		)
-	{
+	) {
 		AXL_VA_DECL(va, formatString);
 		return format_va(formatString, va);
 	}

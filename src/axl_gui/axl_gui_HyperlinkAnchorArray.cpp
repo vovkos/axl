@@ -18,28 +18,23 @@ namespace gui {
 //..............................................................................
 
 const HyperlinkAnchor*
-HyperlinkAnchorArray::find(size_t offset) const
-{
+HyperlinkAnchorArray::find(size_t offset) const {
 	const HyperlinkAnchor* result = NULL;
 
 	size_t begin = 0;
 	size_t end = m_array.getCount();
 
-	while (begin < end)
-	{
+	while (begin < end) {
 		size_t mid = (begin + end) / 2;
 
 		HyperlinkAnchor* anchor = m_array[mid];
 		if (anchor->m_offset == offset)
 			return anchor;
 
-		if (anchor->m_offset < offset)
-		{
+		if (anchor->m_offset < offset) {
 			result = anchor;
 			begin = mid + 1;
-		}
-		else
-		{
+		} else {
 			end = mid;
 		}
 	}
@@ -51,25 +46,20 @@ HyperlinkAnchor*
 HyperlinkAnchorArray::openHyperlink(
 	size_t offset,
 	const sl::StringRef& hyperlink
-	)
-{
+) {
 	HyperlinkAnchor* anchor;
 
 	size_t count = m_array.getCount();
-	if (count)
-	{
+	if (count) {
 		anchor = m_array[count - 1];
 
 		if (anchor->m_hyperlink == hyperlink)
 			return anchor; // same attr
 
-		if (anchor->m_offset == offset)
-		{
-			if (count >= 2)
-			{
+		if (anchor->m_offset == offset) {
+			if (count >= 2) {
 				HyperlinkAnchor* prevAnchor = m_array[count - 2];
-				if (prevAnchor->m_hyperlink == hyperlink)
-				{
+				if (prevAnchor->m_hyperlink == hyperlink) {
 					// remove last anchor to normalize array
 
 					m_list.removeTail();
@@ -103,8 +93,7 @@ HyperlinkAnchor*
 HyperlinkAnchorArray::closeHyperlink(
 	size_t offset,
 	bool closeEmpty
-	)
-{
+) {
 	if (!isHyperlinkOpened())
 		return NULL;
 

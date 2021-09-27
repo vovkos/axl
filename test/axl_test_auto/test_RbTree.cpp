@@ -16,37 +16,30 @@ namespace {
 
 //..............................................................................
 
-struct Base: sl::ListLink
-{
+struct Base: sl::ListLink {
 	int a, b;
 };
 
-struct Derived: Base
-{
+struct Derived: Base {
 	int c, d;
 };
 
 template <
 	typename Key,
 	typename Value
-	>
-class MapIteratorX: public sl::Iterator<sl::MapEntry<Key, Value> >
-{
+>
+class MapIteratorX: public sl::Iterator<sl::MapEntry<Key, Value> > {
 public:
-	MapIteratorX()
-	{
-	}
+	MapIteratorX() {}
 
 	template <typename T>
-	MapIteratorX(const sl::Iterator<T>& src)
-	{
+	MapIteratorX(const sl::Iterator<T>& src) {
 		this->m_p = src.getEntry();
 	}
 };
 
 void
-run()
-{
+run() {
 	sl::Iterator<Derived> itDerived;
 	sl::Iterator<Base> itBase;
 
