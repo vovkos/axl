@@ -10,9 +10,22 @@
 #...............................................................................
 
 import re
+import os.path
 from docutils.parsers.rst import Directive, directives
 from docutils import nodes
-import os.path
+from packaging import version
+from sphinx import __version__ as sphinx_version_string
+
+
+# Sphinx.add_stylesheet was renamed to add_css_file in 1.8.0
+
+sphinx_version = version.parse(sphinx_version_string)
+if sphinx_version >= version.parse('1.8.0'):
+    def add_css_file(app, filename):
+        app.add_css_file(filename)
+else:
+    def add_css_file(app, filename):
+        app.add_stylesheet(filename)
 
 
 class DefineMacroDirective(Directive):
@@ -92,14 +105,14 @@ class ExpandMacroDirective(Directive):
 def on_builder_inited(app):
     css_dir = os.path.dirname(os.path.realpath(__file__)) + '/css/'
     app.config.html_static_path += [css_dir + 'axl-pygments.css']
-    app.add_stylesheet('axl-pygments.css')
+    add_css_file(app, 'axl-pygments.css')
 
     supported_themes = {'sphinx_rtd_theme', 'sphinxdoc'}
 
     if app.config.html_theme in supported_themes:
         css_file = 'axl-' + app.config.html_theme + '.css'
         app.config.html_static_path += [css_dir + css_file];
-        app.add_stylesheet(css_file);
+        add_css_file(app, css_file);
 
 
 def setup(app):
