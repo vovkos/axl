@@ -32,16 +32,16 @@ GdiEngine::~GdiEngine() {
 
 void
 GdiEngine::updateStdPalette() {
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetText]    = inverseRgb(::GetSysColor(COLOR_WINDOWTEXT));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetBack]    = inverseRgb(::GetSysColor(COLOR_WINDOW));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_GrayText]      = inverseRgb(::GetSysColor(COLOR_GRAYTEXT));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_SelectionText] = inverseRgb(::GetSysColor(COLOR_HIGHLIGHTTEXT));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_SelectionBack] = inverseRgb(::GetSysColor(COLOR_HIGHLIGHT));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DFace]        = inverseRgb(::GetSysColor(COLOR_3DFACE));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DShadow]      = inverseRgb(::GetSysColor(COLOR_3DSHADOW));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DDarkShadow]  = inverseRgb(::GetSysColor(COLOR_3DDKSHADOW));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DLight]       = inverseRgb(::GetSysColor(COLOR_3DLIGHT));
-	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DHiLight]     = inverseRgb(::GetSysColor(COLOR_3DHILIGHT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetText]    = invertRgb(::GetSysColor(COLOR_WINDOWTEXT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_WidgetBack]    = invertRgb(::GetSysColor(COLOR_WINDOW));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_GrayText]      = invertRgb(::GetSysColor(COLOR_GRAYTEXT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_SelectionText] = invertRgb(::GetSysColor(COLOR_HIGHLIGHTTEXT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_SelectionBack] = invertRgb(::GetSysColor(COLOR_HIGHLIGHT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DFace]        = invertRgb(::GetSysColor(COLOR_3DFACE));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DShadow]      = invertRgb(::GetSysColor(COLOR_3DSHADOW));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DDarkShadow]  = invertRgb(::GetSysColor(COLOR_3DDKSHADOW));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DLight]       = invertRgb(::GetSysColor(COLOR_3DLIGHT));
+	g_stdPalColorArray[~ColorFlag_Index & StdPalColor_3DHiLight]     = invertRgb(::GetSysColor(COLOR_3DHILIGHT));
 }
 
 rc::Ptr<Font>

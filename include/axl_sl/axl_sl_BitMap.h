@@ -64,7 +64,7 @@ mergeBitMaps(
 
 inline
 void
-inverseBitMap(
+invertBitMap(
 	size_t* map,
 	size_t pageCount
 ) {
@@ -163,8 +163,8 @@ public:
 	}
 
 	void
-	inverse() {
-		sl::inverseBitMap(m_map, pageCount);
+	invert() {
+		sl::invertBitMap(m_map, pageCount);
 	}
 
 	size_t
@@ -315,8 +315,8 @@ public:
 	);
 
 	void
-	inverse() {
-		sl::inverseBitMap(m_map, m_map.getCount());
+	invert() {
+		sl::invertBitMap(m_map, m_map.getCount());
 	}
 
 	size_t
@@ -325,6 +325,11 @@ public:
 		bool value = true
 	) const {
 		return sl::findBit(m_map, m_map.getCount(), start, value);
+	}
+
+	size_t
+	findBit() const {
+		return findBit(0, true);
 	}
 };
 

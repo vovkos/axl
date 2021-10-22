@@ -523,6 +523,33 @@ testLongJmpTry() {
 #if (_AXL_RE)
 
 void
+testCharSet() {
+	re::CharSet charSet;
+
+	charSet.add(10, 12);
+	charSet.add(14, 20);
+	charSet.trace();
+
+	charSet.invert();
+	charSet.trace();
+
+	charSet.invert();
+	charSet.trace();
+
+	charSet.add(13);
+	charSet.trace();
+
+	charSet.invert();
+	charSet.trace();
+
+	charSet.invert();
+	charSet.trace();
+
+	for (utf32_t c = 5; c < 25; c++)
+		printf("isSet(%d): %d\n", c, charSet.isSet(c));
+}
+
+void
 testRegex() {
 	re::StdRegexNameMgr nameMgr;
 
@@ -550,7 +577,7 @@ testRegex() {
 	regex.print();
 */
 
-	bool result = regexCompiler.compile(".*ray[.].*");
+	bool result = regexCompiler.compile("^([abc]+)$");
 
 /*	bool result =
 		regexCompiler.incrementalCompile("(\\h{2})   ' '+ (\\d{2})") &&
@@ -566,7 +593,7 @@ testRegex() {
 	regex.print();
 #endif
 
-	char fileName[] = "C:\\Projects\\repos\\ioninja\\jancy\\src\\jnc_ext\\jnc_std\\jnc\\std_Array.jnc";
+	char fileName[] = "abcabcabc";
 	result = regex.match(fileName);
 	printf("match: %d\n", result);
 }
@@ -5448,7 +5475,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testReadWriteLock();
+	testRegex();
 	return 0;
 }
 

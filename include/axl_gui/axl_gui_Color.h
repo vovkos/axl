@@ -158,7 +158,7 @@ overlayColor(
 
 inline
 uint_t
-inverseRgb(uint_t rgb) {
+invertRgb(uint_t rgb) {
 	return ((rgb & 0x0000ff) << 16) | ((rgb & 0xff0000) >> 16) | (rgb & 0x00ff00);
 }
 

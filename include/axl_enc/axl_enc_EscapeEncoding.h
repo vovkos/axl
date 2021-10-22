@@ -254,6 +254,59 @@ public:
 
 	static
 	size_t
+	decodeEscape(
+		utf32_t* result,
+		const sl::StringRefBase<C>& source
+	) {
+		size_t length = source.getLength();
+		if (length < 2) {
+			err::setError("invalid escape sequence");
+			return -1;
+		}
+
+		ASSERT(source[0] == '\\');
+		C c = source[1];
+
+		size_t hexCodeLen;
+
+		switch (c) {
+		case 'x':
+			hexCodeLen = 2;
+			break;
+
+		case 'u':
+			hexCodeLen = 4;
+			break;
+
+		case 'U':
+			hexCodeLen = 8;
+			break;
+
+		default:
+			*result = findEscapeReplaceChar(c);
+			return 2;
+		}
+
+		const C* p = source.cp() + 2;
+		const C* end = source.getEnd();
+		char hexCodeString[16];
+
+		size_t i = 0;
+		for (; i < hexCodeLen && p < end && isHexChar(*p); i++, p++)
+			hexCodeString[i] = *p;
+
+		if (!i) {
+			err::setError("invalid escape sequence");
+			return -1;
+		}
+
+		hexCodeString[i] = 0;
+		*result = strtoul(hexCodeString, NULL, 16);
+		return 2 + i;
+	}
+
+	static
+	size_t
 	decode(
 		sl::StringBase<C>* string,
 		const sl::StringRefBase<C>& source

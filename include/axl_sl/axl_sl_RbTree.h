@@ -118,6 +118,21 @@ public:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename Key,
+	typename Value
+>
+class ConstRbTreeIterator: public ConstIterator<RbTreeNode<Key, Value> > {
+public:
+	ConstRbTreeIterator() {}
+
+	ConstRbTreeIterator(const ConstIterator<RbTreeNode<Key, Value> >& src) {
+		this->m_p = src.getEntry();
+	}
+};
+
 //..............................................................................
 
 template <

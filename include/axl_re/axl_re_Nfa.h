@@ -13,160 +13,131 @@
 
 #define _AXL_RE_NFA_H
 
-#include "axl_re_Pch.h"
+#include "axl_re_CharSet.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-enum MatchConditionKind {
-	MatchConditionKind_Undefined,
-	MatchConditionKind_Char,
-	MatchConditionKind_CharSet,
-	MatchConditionKind_Any,
+enum Anchor {
+	Anchor_Begin  = 0x01,
+	Anchor_End    = 0x02,
+	Anchor_Word   = 0x04,
+	Anchor__Count = 3,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct MatchCondition {
-	MatchConditionKind m_conditionKind;
-	sl::BitMap m_charSet;
-	uint_t m_char;
+enum NfaStateKind {
+	NfaStateKind_Undefined = 0,
+	NfaStateKind_Accept,
+	NfaStateKind_Epsilon,
+	NfaStateKind_Split,
+	NfaStateKind_OpenCapture,
+	NfaStateKind_CloseCapture,
+	NfaStateKind_MatchAnchor,
+	NfaStateKind_MatchChar,
+	NfaStateKind_MatchCharSet,
+	NfaStateKind_MatchAnyChar,
 
-	MatchCondition();
-
-	void
-	addChar(uchar_t c);
-
-	bool
-	isMatch(uchar_t c) const;
-};
-
-//..............................................................................
-
-enum NfaStateFlag {
-	NfaStateFlag_Match          = 0x0001,
-	NfaStateFlag_EpsilonLink    = 0x0002,
-	NfaStateFlag_Accept         = 0x0004,
-	NfaStateFlag_TransitionMask = 0x0007,
-
-	NfaStateFlag_OpenCapture    = 0x0010,
-	NfaStateFlag_CloseCapture   = 0x0020,
+	NfaStateKind_LastNonConsuming = NfaStateKind_MatchAnchor,
+	NfaStateKind_FirstConsuming   = NfaStateKind_MatchChar,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct NfaState: sl::ListLink {
+	NfaStateKind m_stateKind;
 	uint_t m_id;
-	uint_t m_flags;
-	void* m_acceptContext;
-	size_t m_captureId;
 
-	MatchCondition m_matchCondition;
-	NfaState* m_outState;
-	NfaState* m_outState2;
+	union {
+		utf32_t m_char;
+		Anchor m_anchor;
+		size_t m_captureId;
+		CharSet* m_charSet;
+		void* m_acceptContext;
+	};
+
+	NfaState* m_nextState;
+	NfaState* m_splitState;
 
 	NfaState();
-
-	void
-	createEpsilonLink(NfaState* outState);
-
-	void
-	createEpsilonLink(
-		NfaState* outState,
-		NfaState* outState2
-	);
-
-	void
-	createCharMatch(
-		uint_t c,
-		NfaState* outState
-	);
-};
-
-//..............................................................................
-
-struct NfaStateSet {
-	sl::Array<NfaState*> m_stateArray;
-	sl::BitMap m_stateSet;
+	~NfaState();
 
 	bool
-	addState(NfaState* state);
-
-	int
-	cmp(const NfaStateSet& set) const {
-		return m_stateSet.cmp(set.m_stateSet);
+	isConsuming() const {
+		return m_stateKind >= NfaStateKind_FirstConsuming;
 	}
 
 	bool
-	isEqual(const NfaStateSet& set) const {
-		return m_stateSet.isEqual(set.m_stateSet);
-	}
+	isMatchChar(utf32_t c) const;
 
-	size_t
-	hash() const {
-		return m_stateSet.hash();
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class NfaStateSetMap: public sl::HashTable<
-	NfaStateSet*,
-	T,
-	sl::HashDuckType<NfaStateSet>,
-	sl::EqDuckType<NfaStateSet>
-> {
-};
-
-//..............................................................................
-
-struct NfaTransition: sl::ListLink {
-	MatchCondition m_matchCondition;
-	NfaStateSet m_outStateSet;
-};
-
-//..............................................................................
-
-class NfaTransitionMgr {
-protected:
-	sl::List<NfaTransition> m_transitionList;
-	NfaTransition* m_transitionMap[256];
-
-	// for UTF regexps m_transitionMap should be replaced with interval tree
-
-public:
-	void
-	clear();
-
-	sl::ConstList<NfaTransition>
-	getTransitionList() {
-		return m_transitionList;
+	bool
+	isMatchAnchor(uint_t anchors) const {
+		ASSERT(m_stateKind == NfaStateKind_MatchAnchor);
+		return (anchors & m_anchor) != 0;
 	}
 
 	void
-	addMatchState(NfaState* state);
+	createAccept(void* context);
 
 	void
-	finalize();
+	createEpsilon(NfaState* nextState);
 
-protected:
 	void
-	addMatchCharTransition(
+	createSplit(
+		NfaState* nextState,
+		NfaState* splitState
+	);
+
+	void
+	createMatchChar(
 		uint_t c,
-		NfaState* outState
+		NfaState* nextState
 	);
 
 	void
-	addMatchCharSetTransition(
-		const sl::BitMap* charSet,
-		NfaState* outState
+	createMatchCharSet(NfaState* nextState);
+
+	void
+	createMatchAnyChar(NfaState* nextState);
+
+	void
+	createMatchAnchor(
+		Anchor anchor,
+		NfaState* nextState
 	);
 
 	void
-	addMatchAnyTransition(NfaState* outState);
+	createOpenCapture(
+		size_t captureId,
+		NfaState* nextState
+	);
+
+	void
+	createCloseCapture(
+		size_t captureId,
+		NfaState* nextState
+	);
+
+	void
+	resolveOutStates();
+
+	NfaState*
+	resolveEpsilon();
+
+	void
+	addChar(utf32_t c);
+
+	void
+	addCharRange(
+		utf32_t from,
+		utf32_t to
+	);
+
+	void
+	copy(NfaState& src);
 };
 
 //..............................................................................

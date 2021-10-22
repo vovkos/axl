@@ -255,8 +255,18 @@ public:
 	Iterator
 	add(
 		KeyArg key,
+		ValueArg value
+	) {
+		Iterator it = visit(key);
+		it->m_value = value;
+		return it;
+	}
+
+	Iterator
+	add(
+		KeyArg key,
 		ValueArg value,
-		bool* isNew = NULL
+		bool* isNew
 	) {
 		size_t prevCount = getCount();
 

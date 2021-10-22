@@ -15,4 +15,5 @@
 #include "axl_sl_Array.h"
 #include "axl_sl_String.h"
 #include "axl_sl_BitMap.h"
+#include "axl_sl_RbTree.h"
 #include "axl_sl_StringHashTable.h"
