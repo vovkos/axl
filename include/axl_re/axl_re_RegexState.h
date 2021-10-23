@@ -75,6 +75,8 @@ protected:
 	bool m_isPrevCharAlphanumeric;
 	size_t m_offset;
 
+	RegexMatch m_match;
+	sl::Array<RegexMatch*> m_captureArray;
 	NfaState* m_lastAcceptState;
 	size_t m_lastAcceptedOffset;
 
@@ -98,8 +100,8 @@ public:
 	bool
 	isEmpty() {
 		return
-			m_consumingStateSetTable[m_consumingStateSetIdx].findBit(0) ||
-			m_nonConsumingStateSet.findBit(0);
+			!m_consumingStateSetTable[m_consumingStateSetIdx].findBit() &&
+			!m_nonConsumingStateSet.findBit();
 	}
 
 	void
