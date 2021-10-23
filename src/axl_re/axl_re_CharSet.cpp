@@ -108,7 +108,7 @@ CharSet::copy(const CharSet& src) {
 		m_map.add(it->getKey(), it->m_value);
 }
 
-#if (_DEBUG)
+#if (_AXL_DEBUG)
 
 void
 CharSet::trace() const {

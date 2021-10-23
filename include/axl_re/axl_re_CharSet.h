@@ -72,7 +72,7 @@ public:
 	void
 	copy(const CharSet& src);
 
-#if (_DEBUG)
+#if (_AXL_DEBUG)
 	void
 	trace() const;
 #endif
