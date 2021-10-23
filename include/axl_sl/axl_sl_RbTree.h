@@ -128,6 +128,10 @@ class ConstRbTreeIterator: public ConstIterator<RbTreeNode<Key, Value> > {
 public:
 	ConstRbTreeIterator() {}
 
+	ConstRbTreeIterator(const Iterator<RbTreeNode<Key, Value> >& src) {
+		this->m_p = src.getEntry();
+	}
+
 	ConstRbTreeIterator(const ConstIterator<RbTreeNode<Key, Value> >& src) {
 		this->m_p = src.getEntry();
 	}
