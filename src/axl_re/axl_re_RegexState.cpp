@@ -79,13 +79,14 @@ RegexState::exec(
 	bool result = false;
 
 	while (p < end) {
-		utf32_t buffer[DecodeBufferSize];
+		uchar_t cplBuffer[DecodeBufferSize];
+		utf32_t textBuffer[DecodeBufferSize];
 		size_t takenSize;
-		size_t length = m_codec->decode_utf32(buffer, countof(buffer), p, end - p, &takenSize);
+		size_t length = m_codec->decode_utf32(cplBuffer, textBuffer, DecodeBufferSize, p, end - p, &takenSize);
 		p += takenSize;
 
-		for (size_t i = 0; i < length; i++, m_offset++) {
-			utf32_t c = buffer[i];
+		for (size_t i = 0; i < length; i++) {
+			utf32_t c = textBuffer[i];
 			bool isAlphanumeric = enc::utfIsLetterOrDigit(c);
 
 			uint_t anchors = !m_offset ? Anchor_Begin : 0;
@@ -128,6 +129,8 @@ RegexState::exec(
 					ASSERT(false);
 				}
 			}
+
+			m_offset += cplBuffer[i];
 		}
 	}
 
