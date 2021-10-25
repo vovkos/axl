@@ -24,7 +24,7 @@ class RegexState;
 
 //..............................................................................
 
-class RegexMatch {
+class RegexMatch: public sl::ListLink {
 	friend class RegexState;
 
 protected:
@@ -61,7 +61,17 @@ public:
 
 //..............................................................................
 
+enum RegexStateFlag {
+	RegexStateFlag_Incremental = 0x01,
+	RegexStateFlag_Lexer       = 0x02,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class RegexState {
+	friend class Regex;
+
+protected:
 	enum {
 		DecodeBufferSize = 64
 	};
@@ -73,12 +83,22 @@ protected:
 	sl::BitMap m_nonConsumingStateSet;
 	size_t m_consumingStateSetIdx;
 	bool m_isPrevCharAlphanumeric;
-	size_t m_offset;
-
-	RegexMatch m_match;
-	sl::Array<RegexMatch*> m_captureArray;
 	NfaState* m_lastAcceptState;
-	size_t m_lastAcceptedOffset;
+
+	uint_t m_flags;
+
+	size_t m_offset;
+	size_t m_matchLengthLimit;
+	size_t m_matchOffset;
+	size_t m_replayBufferOffset;
+	size_t m_replayLength;
+	size_t m_lastAcceptMatchLength;
+	size_t m_consumedLength;
+
+	sl::Array<char> m_matchBuffer;
+	sl::List<RegexMatch> m_matchList;
+	RegexMatch* m_match;
+	sl::Array<RegexMatch*> m_subMatchArray;
 
 public:
 	RegexState();
@@ -98,10 +118,30 @@ public:
 	}
 
 	bool
-	isEmpty() {
+	isEmpty() const {
 		return
 			!m_consumingStateSetTable[m_consumingStateSetIdx].findBit() &&
 			!m_nonConsumingStateSet.findBit();
+	}
+
+	const Regex*
+	getRegex() const {
+		return m_regex;
+	}
+
+	enc::CharCodec*
+	getCodec() const {
+		return m_codec;
+	}
+
+	const RegexMatch*
+	getMatch() const {
+		return m_match;
+	}
+
+	const RegexMatch*
+	getSubMatch(size_t i) const {
+		return i < m_subMatchArray.getCount() ? m_subMatchArray[i] : NULL;
 	}
 
 	void
@@ -121,11 +161,12 @@ public:
 		initialize(regex, enc::getCharCodec(codecKind));
 	}
 
-	NfaState*
+	const NfaState*
 	getLastAcceptedState() {
 		return m_lastAcceptState;
 	}
 
+protected: // should be called by Regex::match
 	bool
 	exec(
 		const void* p,
@@ -142,6 +183,16 @@ protected:
 	void
 	advanceNonConsumingStates(uint32_t anchors);
 };
+
+//..............................................................................
+
+inline
+sl::StringRef
+RegexMatch::getText() const {
+	if (m_text.isEmpty())
+		m_text = m_state->getCodec()->decode_utf8(m_p, m_length);
+	return m_text;
+}
 
 //..............................................................................
 

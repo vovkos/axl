@@ -87,12 +87,6 @@ public:
 		void* acceptContext = NULL
 	);
 
-	bool
-	incrementalCompile(
-		const sl::StringRef& source,
-		void* acceptContext = NULL
-	);
-
 	void
 	finalize();
 

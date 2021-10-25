@@ -59,11 +59,70 @@ getCharSetString(const CharSet* charSet) {
 
 //..............................................................................
 
+Regex::Regex() {
+	m_regexKind = RegexKind_Undefined;
+	m_groupCount = 0;
+	m_maxSubMatchCount = 0;
+}
+
 void
 Regex::clear() {
+	m_regexKind = RegexKind_Undefined;
 	m_groupCount = 0;
+	m_maxSubMatchCount = 0;
 	m_stateList.clear();
 	m_stateArray.clear();
+	m_caseContextList.clear();
+}
+
+bool
+Regex::compile(const sl::StringRef& source) {
+	clear();
+	m_regexKind = RegexKind_Normal;
+
+	RegexCompiler compiler(this);
+	bool result = compiler.compile(source);
+	if (!result)
+		return false;
+
+	compiler.finalize();
+	return true;
+}
+
+void
+Regex::createSwitch() {
+	clear();
+	m_regexKind = RegexKind_Switch;
+}
+
+bool
+Regex::compileSwitchCase(
+	const sl::StringRef& source,
+	const rc::Ptr<void>& caseContext
+) {
+	ASSERT(m_regexKind = RegexKind_Switch);
+
+	SwitchCaseContext* context = AXL_MEM_NEW(SwitchCaseContext);
+	context->m_index = m_caseContextList.getCount();
+	context->m_context = caseContext;
+	context->m_firstGroupId = m_groupCount;
+	m_caseContextList.insertTail(context);
+
+	RegexCompiler compiler(this);
+	bool result = compiler.compile(source, context);
+	if (!result)
+		return false;
+
+	context->m_groupCount = m_groupCount - context->m_firstGroupId;
+	return true;
+}
+
+bool
+Regex::finalizeSwitch() {
+	ASSERT(m_regexKind = RegexKind_Switch);
+	RegexCompiler compiler(this);
+	compiler.finalize();
+	return true;
 }
 
 bool
@@ -79,12 +138,6 @@ Regex::match(
 	state.exec(p, size);
 	state.eof();
 	return true;
-}
-
-bool
-Regex::compile(const sl::StringRef& source) {
-	RegexCompiler compiler(this);
-	return compiler.compile(source);
 }
 
 #if (_AXL_DEBUG)

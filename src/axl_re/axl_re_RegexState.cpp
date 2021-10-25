@@ -19,24 +19,21 @@ namespace re {
 
 //..............................................................................
 
-sl::StringRef
-RegexMatch::getText() const {
-	if (!m_text.isEmpty())
-		return m_text;
-
-	m_text = sl::StringRef(m_p, m_length);
-	return m_text;
-}
-
-//..............................................................................
-
 RegexState::RegexState() {
 	m_regex = NULL;
 	m_codec = NULL;
 	m_consumingStateSetIdx = 0;
-	m_lastAcceptState = NULL;
 	m_isPrevCharAlphanumeric = false;
+	m_lastAcceptState = NULL;
+	m_flags = 0;
 	m_offset = 0;
+	m_matchLengthLimit = 0;
+	m_matchOffset = 0;
+	m_replayBufferOffset = 0;
+	m_replayLength = 0;
+	m_lastAcceptMatchLength = 0;
+	m_consumedLength = 0;
+	m_match = NULL;
 }
 
 void
@@ -65,6 +62,7 @@ RegexState::initialize(
 	m_nonConsumingStateSet.setBitCount(stateCount);
 	m_nonConsumingStateSet.clear();
 	m_offset = 0;
+	m_matchOffset = 0;
 	addState(regex->getState(0));
 }
 
@@ -168,7 +166,7 @@ RegexState::advanceNonConsumingStates(uint32_t anchors) {
 		case NfaStateKind_Accept:
 			printf("%p: accept\n", m_offset);
 			m_lastAcceptState = state;
-			m_lastAcceptedOffset = m_offset;
+			m_lastAcceptMatchLength = m_offset - m_matchOffset;
 			break;
 
 		case NfaStateKind_Split:

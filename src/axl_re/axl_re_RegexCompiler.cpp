@@ -68,21 +68,10 @@ RegexCompiler::compile(
 	const sl::StringRef& source,
 	void* acceptContext
 ) {
-	m_regex->clear();
+	if (m_regex->m_regexKind == RegexKind_Switch) {
+		Regex::SwitchCaseContext* caseContext = AXL_MEM_NEW(Regex::SwitchCaseContext);
+	}
 
-	bool result = incrementalCompile(source, acceptContext);
-	if (!result)
-		return false;
-
-	finalize();
-	return true;
-}
-
-bool
-RegexCompiler::incrementalCompile(
-	const sl::StringRef& source,
-	void* acceptContext
-) {
 	m_p = source.cp();
 	m_end = source.getEnd();
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
@@ -1033,7 +1022,7 @@ RegexCompiler::namedRegex(const sl::StringRef& name) {
 	Regex subRegex;
 	RegexCompiler subRegexCompiler(Flag_NonCapturingGroups, &subRegex, m_nameMgr);
 
-	bool result = subRegexCompiler.compile(source);
+	bool result = subRegexCompiler.compile(source, NULL);
 	if (!result)
 		return NULL;
 

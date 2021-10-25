@@ -20,27 +20,54 @@ namespace re {
 
 //..............................................................................
 
+enum RegexKind {
+	RegexKind_Undefined,
+	RegexKind_Normal,
+	RegexKind_Switch
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class Regex {
 	friend class RegexCompiler;
 
 protected:
+	struct SwitchCaseContext: sl::ListLink {
+		size_t m_index;
+		size_t m_firstGroupId;
+		size_t m_groupCount;
+		rc::Ptr<void> m_context;
+	};
+
+protected:
+	RegexKind m_regexKind;
 	sl::List<NfaState> m_stateList;
 	sl::Array<NfaState*> m_stateArray;
+	sl::List<SwitchCaseContext> m_caseContextList;
 	size_t m_groupCount;
+	size_t m_maxSubMatchCount; // out of all switch-cases
 
 public:
-	Regex() {
-		m_groupCount = 0;
-	}
+	Regex();
 
 	bool
 	isEmpty() const {
 		return m_stateList.isEmpty();
 	}
 
+	RegexKind
+	getRegexKind() {
+		return m_regexKind;
+	}
+
 	size_t
 	getGroupCount() const {
 		return m_groupCount;
+	}
+
+	size_t
+	getMaxSubMatchCount() const {
+		return m_maxSubMatchCount;
 	}
 
 	size_t
@@ -58,7 +85,19 @@ public:
 	clear();
 
 	bool
-	compile(const sl::StringRef& regexp);
+	compile(const sl::StringRef& source);
+
+	void
+	createSwitch();
+
+	bool
+	compileSwitchCase(
+		const sl::StringRef& source,
+		const rc::Ptr<void>& caseContext
+		);
+
+	bool
+	finalizeSwitch();
 
 	bool
 	match(
