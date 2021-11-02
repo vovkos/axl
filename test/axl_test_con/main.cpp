@@ -588,7 +588,6 @@ testRegex() {
 		return;
 	}
 
-	regexCompiler.finalize();
 #if (_AXL_DEBUG)
 	regex.print();
 #endif

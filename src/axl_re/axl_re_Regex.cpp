@@ -70,8 +70,10 @@ Regex::clear() {
 	m_regexKind = RegexKind_Undefined;
 	m_groupCount = 0;
 	m_maxSubMatchCount = 0;
-	m_stateList.clear();
-	m_stateArray.clear();
+	m_nfaStateList.clear();
+	m_nfaStateArray.clear();
+	m_dfaStateList.clear();
+	m_dfaStateMap.clear();
 	m_caseContextList.clear();
 }
 
@@ -85,14 +87,14 @@ Regex::compile(const sl::StringRef& source) {
 	if (!result)
 		return false;
 
-	compiler.finalize();
+	finalize();
 	return true;
 }
 
 void
-Regex::createSwitch() {
+Regex::createSwitch(RegexKind switchKind) {
 	clear();
-	m_regexKind = RegexKind_Switch;
+	m_regexKind = switchKind;
 }
 
 bool
@@ -117,12 +119,99 @@ Regex::compileSwitchCase(
 	return true;
 }
 
-bool
-Regex::finalizeSwitch() {
-	ASSERT(m_regexKind = RegexKind_Switch);
-	RegexCompiler compiler(this);
-	compiler.finalize();
-	return true;
+void
+Regex::finalize() {
+	ASSERT(m_dfaStateList.isEmpty()); // only once
+
+	// firstly, get rid of non-split epsilon transition
+
+	sl::List<NfaState> epsilonList; // must keep epsilon states alive while finalizing
+	m_nfaStateArray.reserve(m_nfaStateList.getCount() / 2); // estimate
+	m_nfaStateArray.clear();
+
+	sl::Iterator<NfaState> it = m_nfaStateList.getHead();
+	for (uint_t i = 0; it; ) {
+		NfaState* state = *it++;
+		if (state->m_stateKind == NfaStateKind_Epsilon) {
+			m_nfaStateList.remove(state);
+			epsilonList.insertTail(state);
+		} else {
+			state->m_id = i++;
+			m_nfaStateArray.append(state);
+			state->resolveOutStates();
+		}
+	}
+
+	ASSERT(m_nfaStateList.getCount() == m_nfaStateArray.getCount());
+	if (m_nfaStateList.isEmpty())
+		return;
+
+	// now, create the initial DFA state
+
+	DfaState* start = AXL_MEM_NEW(DfaState);
+	start->addNfaState(*m_nfaStateList.getHead());
+	start->makeEpsilonClosure();
+	addDfaState(start);
+}
+
+DfaState*
+Regex::addDfaState(DfaState* state) {
+	NfaStateSetMap<DfaState*>::Iterator it = m_dfaStateMap.visit(&state->m_nfaStateSet);
+	if (it->m_value) {
+		AXL_MEM_DELETE(state);
+		return it->m_value;
+	}
+
+	m_dfaStateList.insertTail(state);
+	it->m_value = state;
+	return state;
+}
+
+void
+Regex::prepareDfaState(DfaState* state) {
+#if (0)
+	nfaTransitionMgr.clear();
+
+	size_t nfaStateCount = dfaState->m_nfaStateSet.m_stateArray.getCount();
+	for (size_t i = 0; i < nfaStateCount; i++) {
+		NfaState* nfaState = dfaState->m_nfaStateSet.m_stateArray[i];
+		if (nfaState->m_flags & NfaStateFlag_Match)
+			nfaTransitionMgr.addMatchState(nfaState);
+	}
+
+	nfaTransitionMgr.finalize();
+
+	sl::ConstList<NfaTransition> nfaTransitionList = nfaTransitionMgr.getTransitionList();
+	sl::ConstIterator<NfaTransition> nfaTransitionIt = nfaTransitionList.getHead();
+	for (; nfaTransitionIt; nfaTransitionIt++) {
+		const NfaTransition* nfaTransition = *nfaTransitionIt;
+
+		DfaState* dfaState2 = AXL_MEM_NEW(DfaState);
+
+		size_t outCount = nfaTransition->m_outStateSet.m_stateArray.getCount();
+		for (size_t i = 0; i < outCount; i++) {
+			NfaState* nfaState = nfaTransition->m_outStateSet.m_stateArray[i];
+			dfaState2->addNfaState(nfaState);
+		}
+
+		dfaState2->makeEpsilonClosure();
+
+		NfaStateSetMap<DfaState*>::Iterator mapIt = dfaStateMap.visit(&dfaState2->m_nfaStateSet);
+		if (mapIt->m_value) {
+			AXL_MEM_DELETE(dfaState2);
+			dfaState2 = mapIt->m_value;
+		} else {
+			m_regex->m_dfaStateList.insertTail(dfaState2);
+			workingSet.append(dfaState2);
+			mapIt->m_value = dfaState2;
+		}
+
+		DfaTransition* dfaTransition = AXL_MEM_NEW(DfaTransition);
+		dfaTransition->m_matchCondition = nfaTransition->m_matchCondition;
+		dfaTransition->m_outState = dfaState2;
+		dfaState->m_transitionList.insertTail(dfaTransition);
+	}
+#endif
 }
 
 bool
@@ -148,7 +237,7 @@ Regex::print() const {
 
 	sl::String string;
 
-	sl::ConstIterator<NfaState> it = m_stateList.getHead();
+	sl::ConstIterator<NfaState> it = m_nfaStateList.getHead();
 	for (; it; it++) {
 		const NfaState* state = *it;
 		printf("%02d: ", state->m_id);
@@ -171,47 +260,47 @@ Regex::print() const {
 			printf("split -> %02d : %02d", state->m_nextState->m_id, state->m_splitState->m_id);
 			break;
 
-		case NfaStateKind_MatchChar:
-			ASSERT(state->m_nextState && !state->m_splitState);
+		case NfaStateKind_Match:
+			switch (state->m_matchCondition.m_matchKind) {
+			case FsmMatchKind_Char:
+				ASSERT(state->m_nextState && !state->m_splitState);
 
-			string.clear();
-			appendChar(&string, state->m_char);
-
-			printf("'%s' -> %02d", string.sz(), state->m_nextState->m_id);
-			break;
-
-		case NfaStateKind_MatchCharSet:
-			ASSERT(state->m_nextState && !state->m_splitState);
-			printf("[%s] -> %02d", getCharSetString(state->m_charSet).sz(), state->m_nextState->m_id);
-			break;
-
-		case NfaStateKind_MatchAnyChar:
-			ASSERT(state->m_nextState && !state->m_splitState);
-			printf(". -> %02d", state->m_nextState->m_id);
-			break;
-
-		case NfaStateKind_MatchAnchor:
-			ASSERT(state->m_nextState && !state->m_splitState);
-
-			switch (state->m_anchor)
-			{
-			case Anchor_Begin:
-				printf("^ -> %02d", state->m_nextState->m_id);
+				string.clear();
+				appendChar(&string, state->m_matchCondition.m_char);
+				printf("'%s' -> %02d", string.sz(), state->m_nextState->m_id);
 				break;
 
-			case Anchor_End:
-				printf("$ -> %02d", state->m_nextState->m_id);
+			case FsmMatchKind_CharSet:
+				ASSERT(state->m_nextState && !state->m_splitState);
+				printf("[%s] -> %02d", getCharSetString(state->m_matchCondition.m_charSet).sz(), state->m_nextState->m_id);
 				break;
 
-			case Anchor_Word:
-				printf("\\b -> %02d", state->m_nextState->m_id);
+			case FsmMatchKind_AnyChar:
+				ASSERT(state->m_nextState && !state->m_splitState);
+				printf(". -> %02d", state->m_nextState->m_id);
 				break;
 
-			default:
-				ASSERT(false);
+			case FsmMatchKind_Anchor:
+					ASSERT(state->m_nextState && !state->m_splitState);
+					switch (state->m_matchCondition.m_anchor) {
+					case FsmAnchor_Begin:
+						printf("^ -> %02d", state->m_nextState->m_id);
+						break;
+
+					case FsmAnchor_End:
+						printf("$ -> %02d", state->m_nextState->m_id);
+						break;
+
+					case FsmAnchor_Word:
+						printf("\\b -> %02d", state->m_nextState->m_id);
+						break;
+
+					default:
+							ASSERT(false);
+					}
+
+				break;
 			}
-
-			break;
 
 		case NfaStateKind_OpenCapture:
 			ASSERT(state->m_nextState && !state->m_splitState);

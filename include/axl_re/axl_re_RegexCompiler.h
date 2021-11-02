@@ -87,9 +87,6 @@ public:
 		void* acceptContext = NULL
 	);
 
-	void
-	finalize();
-
 protected:
 	void
 	construct(
@@ -177,7 +174,7 @@ protected:
 	literal(const sl::StringRef& string);
 
 	NfaState*
-	anchor(Anchor anchor);
+	anchor(FsmAnchor anchor);
 
 	NfaState*
 	ch(uint_t c);

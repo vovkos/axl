@@ -23,7 +23,8 @@ namespace re {
 enum RegexKind {
 	RegexKind_Undefined,
 	RegexKind_Normal,
-	RegexKind_Switch
+	RegexKind_Switch,
+	RegexKind_LexicalSwitch,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -41,8 +42,10 @@ protected:
 
 protected:
 	RegexKind m_regexKind;
-	sl::List<NfaState> m_stateList;
-	sl::Array<NfaState*> m_stateArray;
+	sl::List<NfaState> m_nfaStateList;
+	sl::Array<NfaState*> m_nfaStateArray;
+	sl::List<DfaState> m_dfaStateList;
+	NfaStateSetMap<DfaState*> m_dfaStateMap;
 	sl::List<SwitchCaseContext> m_caseContextList;
 	size_t m_groupCount;
 	size_t m_maxSubMatchCount; // out of all switch-cases
@@ -52,7 +55,7 @@ public:
 
 	bool
 	isEmpty() const {
-		return m_stateList.isEmpty();
+		return m_nfaStateList.isEmpty();
 	}
 
 	RegexKind
@@ -71,15 +74,23 @@ public:
 	}
 
 	size_t
-	getStateCount() const {
-		ASSERT(m_stateList.getCount() == m_stateArray.getCount());
-		return m_stateList.getCount();
+	getNfaStateCount() const {
+		ASSERT(m_nfaStateList.getCount() == m_nfaStateArray.getCount());
+		return m_nfaStateList.getCount();
 	}
 
-	NfaState*
-	getState(size_t i) const {
-		return m_stateArray[i];
+	const NfaState*
+	getNfaState(size_t i) const {
+		return m_nfaStateArray[i];
 	}
+
+	const DfaState*
+	getStartDfaState() const {
+		return *m_dfaStateList.getHead();
+	}
+
+	void
+	prepareDfaState(DfaState* state);
 
 	void
 	clear();
@@ -88,7 +99,17 @@ public:
 	compile(const sl::StringRef& source);
 
 	void
-	createSwitch();
+	createSwitch(RegexKind switchKind);
+
+	void
+	createSwitch() {
+		createSwitch(RegexKind_Switch);
+	}
+
+	void
+	createLexicalSwitch() {
+		createSwitch(RegexKind_LexicalSwitch);
+	}
 
 	bool
 	compileSwitchCase(
@@ -96,8 +117,11 @@ public:
 		const rc::Ptr<void>& caseContext
 		);
 
-	bool
-	finalizeSwitch();
+	void
+	finalizeSwitch() {
+		ASSERT(m_regexKind = RegexKind_Switch);
+		finalize();
+	}
 
 	bool
 	match(
@@ -124,6 +148,13 @@ public:
 	void
 	print() const;
 #endif
+
+protected:
+	void
+	finalize();
+
+	DfaState*
+	addDfaState(DfaState* state);
 };
 
 //..............................................................................

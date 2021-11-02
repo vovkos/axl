@@ -23,14 +23,12 @@ RegexState::RegexState() {
 	m_regex = NULL;
 	m_codec = NULL;
 	m_consumingStateSetIdx = 0;
-	m_isPrevCharAlphanumeric = false;
+	m_prevCharFlags = false;
 	m_lastAcceptState = NULL;
 	m_flags = 0;
-	m_offset = 0;
 	m_matchLengthLimit = 0;
+	m_offset = 0;
 	m_matchOffset = 0;
-	m_replayBufferOffset = 0;
-	m_replayLength = 0;
 	m_lastAcceptMatchLength = 0;
 	m_consumedLength = 0;
 	m_match = NULL;
@@ -41,9 +39,17 @@ RegexState::reset() {
 	m_regex = NULL;
 	m_codec = NULL;
 	m_consumingStateSetIdx = 0;
+	m_prevCharFlags = 0;
 	m_lastAcceptState = NULL;
-	m_isPrevCharAlphanumeric = false;
+	m_flags = 0;
+	m_matchLengthLimit = 0;
 	m_offset = 0;
+	m_matchOffset = 0;
+	m_lastAcceptMatchLength = 0;
+	m_consumedLength = 0;
+	m_match = NULL;
+	m_matchList.clear();
+	m_subMatchArray.clear();
 }
 
 void
@@ -54,7 +60,7 @@ RegexState::initialize(
 	reset();
 	m_regex = regex;
 	m_codec = codec;
-	size_t stateCount = regex->getStateCount();
+	size_t stateCount = regex->getNfaStateCount();
 	m_consumingStateSetTable[0].setBitCount(stateCount);
 	m_consumingStateSetTable[0].clear();
 	m_consumingStateSetTable[1].setBitCount(stateCount);
@@ -63,7 +69,7 @@ RegexState::initialize(
 	m_nonConsumingStateSet.clear();
 	m_offset = 0;
 	m_matchOffset = 0;
-	addState(regex->getState(0));
+	addState(regex->getNfaState(0));
 }
 
 bool
@@ -85,13 +91,29 @@ RegexState::exec(
 
 		for (size_t i = 0; i < length; i++) {
 			utf32_t c = textBuffer[i];
-			bool isAlphanumeric = enc::utfIsLetterOrDigit(c);
+			uint_t anchors = 0;
 
-			uint_t anchors = !m_offset ? Anchor_Begin : 0;
-			if (isAlphanumeric != m_isPrevCharAlphanumeric)
-				anchors |= Anchor_Word;
+			if (!m_offset || (m_prevCharFlags & PrevCharFlag_NewLine))
+				anchors |= FsmAnchor_Begin;
 
-			m_isPrevCharAlphanumeric = isAlphanumeric;
+			if (c == '\r') {
+				anchors |= FsmAnchor_End;
+			} else if (c == '\n') {
+				anchors |= FsmAnchor_End;
+				m_prevCharFlags |= PrevCharFlag_NewLine;
+			}
+
+			if (enc::utfIsLetterOrDigit(c)) {
+				if (!(m_prevCharFlags & PrevCharFlag_AlphaNum)) {
+					anchors |= FsmAnchor_Word;
+					m_prevCharFlags |= PrevCharFlag_AlphaNum;
+				}
+			} else {
+				if (m_prevCharFlags & PrevCharFlag_AlphaNum) {
+					anchors |= FsmAnchor_Word;
+					m_prevCharFlags &= ~PrevCharFlag_AlphaNum;
+				}
+			}
 
 			advanceNonConsumingStates(anchors);
 			m_nonConsumingStateSet.clear(); // nc-states that were not advanced, die out
@@ -107,19 +129,19 @@ RegexState::exec(
 				if (j == -1)
 					break;
 
-				NfaState* state = m_regex->getState(j);
-				switch (state->m_stateKind) {
-				case NfaStateKind_MatchChar:
-					if (state->m_char == c)
+				const NfaState* state = m_regex->getNfaState(j);
+				switch (state->m_matchCondition.m_matchKind) {
+				case FsmMatchKind_Char:
+					if (state->m_matchCondition.m_char == c)
 						addState(state->m_nextState);
 					break;
 
-				case NfaStateKind_MatchCharSet:
-					if (state->m_charSet->isSet(c))
+				case FsmMatchKind_CharSet:
+					if (state->m_matchCondition.m_charSet->isSet(c))
 						addState(state->m_nextState);
 					break;
 
-				case NfaStateKind_MatchAnyChar:
+				case FsmMatchKind_AnyChar:
 					addState(state->m_nextState);
 					break;
 
@@ -137,17 +159,17 @@ RegexState::exec(
 
 bool
 RegexState::eof() {
-	uint_t anchors = Anchor_End;
-	if (m_isPrevCharAlphanumeric)
-		anchors |= Anchor_Word;
+	uint_t anchors = FsmAnchor_End;
+	if (m_prevCharFlags & PrevCharFlag_AlphaNum)
+		anchors |= FsmAnchor_Word;
 
 	advanceNonConsumingStates(anchors);
 	return m_lastAcceptState != NULL;
 }
 
 void
-RegexState::addState(NfaState* state) {
-	if (state->m_stateKind >= NfaStateKind_FirstConsuming)
+RegexState::addState(const NfaState* state) {
+	if (state->m_matchCondition.isConsuming())
 		m_consumingStateSetTable[m_consumingStateSetIdx].setBit(state->m_id);
 	else
 		m_nonConsumingStateSet.setBit(state->m_id);
@@ -161,7 +183,7 @@ RegexState::advanceNonConsumingStates(uint32_t anchors) {
 			break;
 
 		m_nonConsumingStateSet.setBit(i, false);
-		NfaState* state = m_regex->getState(i);
+		const NfaState* state = m_regex->getNfaState(i);
 		switch (state->m_stateKind) {
 		case NfaStateKind_Accept:
 			printf("%p: accept\n", m_offset);
@@ -184,8 +206,9 @@ RegexState::advanceNonConsumingStates(uint32_t anchors) {
 			addState(state->m_nextState);
 			break;
 
-		case NfaStateKind_MatchAnchor:
-			if (anchors & state->m_anchor)
+		case NfaStateKind_Match:
+			ASSERT(state->m_matchCondition.m_matchKind == FsmMatchKind_Anchor);
+			if (anchors & state->m_matchCondition.m_anchor)
 				addState(state->m_nextState);
 			break;
 

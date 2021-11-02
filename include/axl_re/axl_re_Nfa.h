@@ -13,21 +13,12 @@
 
 #define _AXL_RE_NFA_H
 
-#include "axl_re_CharSet.h"
+#include "axl_re_FsmMatchCondition.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
-
-enum Anchor {
-	Anchor_Begin  = 0x01,
-	Anchor_End    = 0x02,
-	Anchor_Word   = 0x04,
-	Anchor__Count = 3,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum NfaStateKind {
 	NfaStateKind_Undefined = 0,
@@ -36,13 +27,7 @@ enum NfaStateKind {
 	NfaStateKind_Split,
 	NfaStateKind_OpenCapture,
 	NfaStateKind_CloseCapture,
-	NfaStateKind_MatchAnchor,
-	NfaStateKind_MatchChar,
-	NfaStateKind_MatchCharSet,
-	NfaStateKind_MatchAnyChar,
-
-	NfaStateKind_LastNonConsuming = NfaStateKind_MatchAnchor,
-	NfaStateKind_FirstConsuming   = NfaStateKind_MatchChar,
+	NfaStateKind_Match,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -51,11 +36,10 @@ struct NfaState: sl::ListLink {
 	NfaStateKind m_stateKind;
 	uint_t m_id;
 
+	FsmMatchCondition m_matchCondition;
+
 	union {
-		utf32_t m_char;
-		Anchor m_anchor;
 		size_t m_captureId;
-		CharSet* m_charSet;
 		void* m_acceptContext;
 	};
 
@@ -63,21 +47,6 @@ struct NfaState: sl::ListLink {
 	NfaState* m_splitState;
 
 	NfaState();
-	~NfaState();
-
-	bool
-	isConsuming() const {
-		return m_stateKind >= NfaStateKind_FirstConsuming;
-	}
-
-	bool
-	isMatchChar(utf32_t c) const;
-
-	bool
-	isMatchAnchor(uint_t anchors) const {
-		ASSERT(m_stateKind == NfaStateKind_MatchAnchor);
-		return (anchors & m_anchor) != 0;
-	}
 
 	void
 	createAccept(void* context);
@@ -92,8 +61,14 @@ struct NfaState: sl::ListLink {
 	);
 
 	void
+	createMatchAnchor(
+		FsmAnchor anchor,
+		NfaState* nextState
+	);
+
+	void
 	createMatchChar(
-		uint_t c,
+		utf32_t c,
 		NfaState* nextState
 	);
 
@@ -102,12 +77,6 @@ struct NfaState: sl::ListLink {
 
 	void
 	createMatchAnyChar(NfaState* nextState);
-
-	void
-	createMatchAnchor(
-		Anchor anchor,
-		NfaState* nextState
-	);
 
 	void
 	createOpenCapture(
@@ -128,16 +97,43 @@ struct NfaState: sl::ListLink {
 	resolveEpsilon();
 
 	void
-	addChar(utf32_t c);
-
-	void
-	addCharRange(
-		utf32_t from,
-		utf32_t to
-	);
-
-	void
 	copy(NfaState& src);
+};
+
+//..............................................................................
+
+struct NfaStateSet {
+	sl::Array<NfaState*> m_stateArray;
+	sl::BitMap m_stateSet;
+
+	bool
+	addState(NfaState* state);
+
+	int
+	cmp(const NfaStateSet& set) const {
+		return m_stateSet.cmp(set.m_stateSet);
+	}
+
+	bool
+	isEqual(const NfaStateSet& set) const {
+		return m_stateSet.isEqual(set.m_stateSet);
+	}
+
+	size_t
+	hash() const {
+		return m_stateSet.hash();
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class NfaStateSetMap: public sl::HashTable<
+	NfaStateSet*,
+	T,
+	sl::HashDuckType<NfaStateSet>,
+	sl::EqDuckType<NfaStateSet>
+> {
 };
 
 //..............................................................................

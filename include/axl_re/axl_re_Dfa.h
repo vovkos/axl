@@ -22,24 +22,31 @@ struct DfaState;
 
 //..............................................................................
 
+enum DfaStateFlag {
+	DfaStateFlag_Ready  = 0x01,
+	DfaStateFlag_Accept = 0x02,
+};
+
+//..............................................................................
+
 struct DfaTransition: sl::ListLink {
-	MatchCondition m_matchCondition;
-	DfaState* m_outState;
+	FsmMatchCondition m_matchCondition;
+	DfaState* m_nextState;
 };
 
 //..............................................................................
 
 struct DfaState: sl::ListLink {
-	bool m_isAccept;
 	uint_t m_id;
+	uint_t m_flags;
 	uint_t m_acceptNfaStateId;
 	void* m_acceptContext;
-
-	sl::List<DfaTransition> m_transitionList;
 
 	NfaStateSet m_nfaStateSet;
 	sl::BitMap m_openCaptureIdSet;
 	sl::BitMap m_closeCaptureIdSet;
+
+	sl::List<DfaTransition> m_transitionList;
 
 	DfaState();
 

@@ -16,7 +16,10 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_re/axl_re_CharSet.h
+	${AXL_INC_DIR}/axl_re/axl_re_CharRangeMap.h
+	${AXL_INC_DIR}/axl_re/axl_re_FsmMatchCondition.h
 	${AXL_INC_DIR}/axl_re/axl_re_Nfa.h
+	${AXL_INC_DIR}/axl_re/axl_re_Dfa.h
 	${AXL_INC_DIR}/axl_re/axl_re_Regex.h
 	${AXL_INC_DIR}/axl_re/axl_re_RegexNameMgr.h
 	${AXL_INC_DIR}/axl_re/axl_re_RegexCompiler.h
@@ -26,7 +29,9 @@ set(
 set(
 	LIB_CPP_LIST
 	axl_re_CharSet.cpp
+	axl_re_FsmMatchCondition.cpp
 	axl_re_Nfa.cpp
+	axl_re_Dfa.cpp
 	axl_re_Regex.cpp
 	axl_re_RegexCompiler.cpp
 	axl_re_RegexState.cpp

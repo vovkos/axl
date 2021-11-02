@@ -14,6 +14,7 @@
 #define _AXL_RE_REGEXSTATE_H
 
 #include "axl_re_Nfa.h"
+#include "axl_re_Dfa.h"
 #include "axl_re_RegexNameMgr.h"
 
 namespace axl {
@@ -62,7 +63,6 @@ public:
 //..............................................................................
 
 enum RegexStateFlag {
-	RegexStateFlag_Incremental = 0x01,
 	RegexStateFlag_Lexer       = 0x02,
 };
 
@@ -76,26 +76,28 @@ protected:
 		DecodeBufferSize = 64
 	};
 
+	enum PrevCharFlag {
+		PrevCharFlag_AlphaNum = 0x01,
+		PrevCharFlag_NewLine  = 0x02,
+	};
+
 protected:
 	Regex* m_regex;
 	enc::CharCodec* m_codec;
+	uint_t m_flags;
+	size_t m_matchLengthLimit;
+
 	sl::BitMap m_consumingStateSetTable[2];
 	sl::BitMap m_nonConsumingStateSet;
 	size_t m_consumingStateSetIdx;
-	bool m_isPrevCharAlphanumeric;
-	NfaState* m_lastAcceptState;
-
-	uint_t m_flags;
+	uint_t m_prevCharFlags;
+	const NfaState* m_lastAcceptState;
 
 	size_t m_offset;
-	size_t m_matchLengthLimit;
 	size_t m_matchOffset;
-	size_t m_replayBufferOffset;
-	size_t m_replayLength;
 	size_t m_lastAcceptMatchLength;
 	size_t m_consumedLength;
 
-	sl::Array<char> m_matchBuffer;
 	sl::List<RegexMatch> m_matchList;
 	RegexMatch* m_match;
 	sl::Array<RegexMatch*> m_subMatchArray;
@@ -178,7 +180,7 @@ protected: // should be called by Regex::match
 
 protected:
 	void
-	addState(NfaState* state);
+	addState(const NfaState* state);
 
 	void
 	advanceNonConsumingStates(uint32_t anchors);
