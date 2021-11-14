@@ -774,22 +774,22 @@ public:
 	}
 
 	CharCodec*
-	getCharCodec() {
+	getCharCodec() const {
 		return m_charCodec;
 	}
 
 	size_t
-	getAccumulatorCount() {
+	getAccumulatorCount() const {
 		return m_accumulatorCount;
 	}
 
 	const char*
-	getAccumulator() {
+	getAccumulator() const {
 		return m_accumulator;
 	}
 
 	uint32_t
-	getAccumulator_i32() {
+	getAccumulator_i32() const {
 		return m_accumulator_i32;
 	}
 
@@ -825,7 +825,7 @@ public:
 	loadState(uint32_t state);
 
 	uint32_t
-	saveState();
+	saveState() const;
 
 	size_t
 	decode(

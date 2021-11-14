@@ -287,11 +287,11 @@ public:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Buf(Buf&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 
 	Buf(Ref&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 #endif
 
@@ -341,13 +341,13 @@ public:
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Buf&
 	operator = (Buf&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 
 	Buf&
 	operator = (Ref&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 #endif
@@ -396,7 +396,7 @@ public:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
-	copy(Ref&& src) {
+	move(Ref&& src) {
 		if (src.isEmpty()) {
 			clear();
 			src.release();
@@ -410,7 +410,7 @@ public:
 			return this->m_size;
 		}
 
-		this->move(std::move(src));
+		this->Ref::move(std::move(src));
 		return this->m_size;
 	}
 #endif

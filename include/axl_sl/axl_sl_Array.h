@@ -253,11 +253,11 @@ public:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Array(Array&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 
 	Array(ArrayRef&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 #endif
 
@@ -306,13 +306,13 @@ public:
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Array&
 	operator = (Array&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 
 	Array&
 	operator = (ArrayRef&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 #endif
@@ -416,7 +416,7 @@ public:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
-	copy(ArrayRef&& src) {
+	move(ArrayRef&& src) {
 		if (src.isEmpty()) {
 			clear();
 			src.release();
@@ -430,7 +430,7 @@ public:
 			return this->m_count;
 		}
 
-		this->move(std::move(src));
+		this->ArrayRef::move(std::move(src));
 		return this->m_count;
 	}
 #endif

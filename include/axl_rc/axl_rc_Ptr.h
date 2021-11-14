@@ -34,36 +34,41 @@ protected:
 
 public:
 	Ptr() {
-		m_p = NULL;
-		m_refCount = NULL;
+		initialize();
 	}
 
 	Ptr(const NullPtr&) {
-		m_p = NULL;
-		m_refCount = NULL;
+		initialize();
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Ptr(Ptr&& src) {
+		initialize();
+		move(std::move(src));
+	}
+#endif
+
 	Ptr(const Ptr& src) {
-		m_p = NULL, m_refCount = NULL;
-		copy(src.m_p, src.m_refCount);
+		initialize();
+		copy(src);
 	}
 
 	template <typename A>
 	Ptr(const Ptr<A>& src) {
-		m_p = NULL, m_refCount = NULL;
+		initialize();
 		copy(src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
 	Ptr(const WeakPtr<A>& src) {
-		m_p = NULL, m_refCount = NULL;
+		initialize();
 		if (src.m_refCount && src.m_refCount->addRefByWeakPtr())
 			attach(src.m_p, src.m_refCount);
 	}
 
 	template <typename A>
 	Ptr(A* p) {
-		m_p = NULL, m_refCount = NULL;
+		initialize();
 		copy(p, p);
 	}
 
@@ -95,9 +100,17 @@ public:
 		return *this;
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Ptr&
+	operator = (Ptr&& src) {
+		copy(src);
+		return *this;
+	}
+#endif
+
 	Ptr&
 	operator = (const Ptr& src) {
-		copy(src.m_p, src.m_refCount);
+		copy(src);
 		return *this;
 	}
 
@@ -106,9 +119,29 @@ public:
 		return m_p;
 	}
 
+	bool
+	isExclusive() const {
+		ASSERT(m_p);
+		return m_p->getRefCount() == 1;
+	}
+
 	RefCount*
 	getRefCount() const {
 		return m_refCount;
+	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move(Ptr&& src) {
+		m_p = src.m_p;
+		m_refCount = src.m_refCount;
+		src.initialize();
+	}
+#endif
+
+	void
+	copy(const Ptr& src) {
+		copy(src.m_p, src.m_refCount);
 	}
 
 	void
@@ -149,8 +182,7 @@ public:
 		if (refCount)
 			*refCount = m_refCount;
 
-		m_p = NULL;
-		m_refCount = NULL;
+		initialize();
 		return p;
 	}
 
@@ -159,6 +191,12 @@ public:
 		if (m_refCount)
 			m_refCount->release();
 
+		initialize();
+	}
+
+protected:
+	void
+	initialize() {
 		m_p = NULL;
 		m_refCount = NULL;
 	}

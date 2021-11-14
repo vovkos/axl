@@ -122,7 +122,7 @@ public:
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	ErrorRef&
 	operator = (ErrorRef&& src) {
-		this->move(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 #endif
@@ -158,11 +158,11 @@ public:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Error(Error&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 
 	Error(ErrorRef&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 #endif
 
@@ -208,13 +208,13 @@ public:
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Error&
 	operator = (Error&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 
 	Error&
 	operator = (ErrorRef&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 #endif

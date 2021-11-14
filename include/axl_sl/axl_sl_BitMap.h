@@ -187,9 +187,23 @@ public:
 		create(bitCount);
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	BitMap(BitMap&& src) {
+		move(std::move(src));
+	}
+#endif
+
 	BitMap(const BitMap& src) {
 		copy(src);
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	BitMap&
+	operator = (BitMap&& src) {
+		move(std::move(src));
+		return *this;
+	}
+#endif
 
 	BitMap&
 	operator = (const BitMap& src) {
@@ -231,6 +245,13 @@ public:
 	clear() {
 		memset(m_map, 0, m_map.getCount() * sizeof(size_t));
 	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move(BitMap&& src) {
+		m_map.move(std::move(src.m_map));
+	}
+#endif
 
 	void
 	copy(const BitMap& src) {

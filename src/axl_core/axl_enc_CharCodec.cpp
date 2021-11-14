@@ -231,7 +231,7 @@ CodePointDecoder::loadState(uint32_t state) {
 }
 
 uint32_t
-CodePointDecoder::saveState() {
+CodePointDecoder::saveState() const {
 	uint32_t state = *((const uint32_t*) m_accumulator) & 0x00ffffff;
 	state |= (m_accumulatorCount & 0x03) << 24;
 	return state;

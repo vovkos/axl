@@ -79,11 +79,10 @@ set(
 
 set(
 	RC_CPP_LIST
-	axl_rc_RefCount.cpp
 )
 
 source_group(
-	ref
+	rc
 	FILES
 	${RC_H_LIST}
 	${RC_CPP_LIST}
@@ -277,6 +276,7 @@ source_group(
 	FILES
 	${SYS_H_LIST}
 	${SYS_CPP_LIST}
+	${SYS_C_LIST}
 )
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -494,8 +494,8 @@ add_library(
 	${G_CPP_LIST}
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
-	${REF_H_LIST}
-	${REF_CPP_LIST}
+	${RC_H_LIST}
+	${RC_CPP_LIST}
 	${ERR_H_LIST}
 	${ERR_CPP_LIST}
 	${SL_H_LIST}

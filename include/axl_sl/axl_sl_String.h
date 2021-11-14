@@ -873,11 +873,11 @@ public:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	StringBase(StringBase&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 
 	StringBase(StringRef&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 	}
 #endif
 
@@ -965,13 +965,13 @@ public:
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	StringBase&
 	operator = (StringBase&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 
 	StringBase&
 	operator = (StringRef&& src) {
-		copy(std::move(src));
+		move(std::move(src));
 		return *this;
 	}
 #endif
@@ -1120,7 +1120,7 @@ public:
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
-	copy(StringRef&& src) {
+	move(StringRef&& src) {
 		if (src.isEmpty()) {
 			clear();
 			src.release();
@@ -1134,7 +1134,7 @@ public:
 			return this->m_length;
 		}
 
-		this->move(std::move(src));
+		this->StringRef::move(std::move(src));
 		return this->m_length;
 	}
 #endif
