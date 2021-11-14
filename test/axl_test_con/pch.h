@@ -47,7 +47,7 @@
 
 #ifdef _AXL_RE
 #	include "axl_re_Regex.h"
-#	include "axl_re_RegexCompiler.h"
+#	include "axl_re_RegexNameMgr.h"
 #endif
 
 #ifdef _AXL_ZIP

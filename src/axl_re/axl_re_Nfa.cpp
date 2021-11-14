@@ -17,25 +17,59 @@ namespace re {
 
 //..............................................................................
 
+const char* getAnchorString(uint_t anchors) {
+	const char* stringTable[Anchor__TransitionMapSize] = {
+		"",      // 0
+		"^",     // Anchor_Begin
+		"$",     // Anchor_End
+		"^$",    // Anchor_Begin | Anchor_End
+		"\\b",   // Anchor_Word
+		"\\b^",  // Anchor_Word | Anchor_Begin
+		"\\b$",  // Anchor_Word | Anchor_End
+		"\\b^$", // Anchor_Word | Anchor_Begin | Anchor_End
+	};
+
+	return anchors < countof(stringTable) ? stringTable[anchors] : "invalid-anchor";
+}
+
+//..............................................................................
+
 NfaState::NfaState() {
 	m_stateKind = NfaStateKind_Undefined;
 	m_id = -1;
-	m_acceptContext = NULL;
+	m_unionData = NULL;
 	m_nextState = NULL;
-	m_splitState = NULL;
 }
 
-void
-NfaState::createAccept(void* context) {
-	ASSERT(!m_stateKind && !m_nextState && !m_splitState);
+NfaState::~NfaState() {
+	if (m_stateKind == NfaStateKind_MatchCharSet) {
+		ASSERT(m_charSet);
+		AXL_MEM_DELETE(m_charSet);
+	}
+}
 
-	m_stateKind = NfaStateKind_Accept;
-	m_acceptContext = context;
+bool
+NfaState::isMatchChar(utf32_t c) const {
+	switch (m_stateKind) {
+	case NfaStateKind_MatchChar:
+		return c == m_char;
+
+	case NfaStateKind_MatchCharSet:
+		ASSERT(m_charSet);
+		return m_charSet->isSet(c);
+
+	case NfaStateKind_MatchAnyChar:
+		return true;
+
+	default:
+		ASSERT(false);
+		return false;
+	}
 }
 
 void
 NfaState::createEpsilon(NfaState* nextState) {
-	ASSERT(!m_stateKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
 	m_stateKind = NfaStateKind_Epsilon;
 	m_nextState = nextState;
@@ -46,7 +80,7 @@ NfaState::createSplit(
 	NfaState* nextState,
 	NfaState* splitState
 ) {
-	ASSERT(!m_stateKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
 	m_stateKind = NfaStateKind_Split;
 	m_nextState = nextState;
@@ -54,15 +88,22 @@ NfaState::createSplit(
 }
 
 void
+NfaState::createAccept(size_t acceptId) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_Accept;
+	m_acceptId = acceptId;
+}
+
+void
 NfaState::createMatchAnchor(
-	FsmAnchor anchor,
+	Anchor anchor,
 	NfaState* nextState
 ) {
-	ASSERT(!m_stateKind && !m_matchCondition.m_matchKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
-	m_stateKind = NfaStateKind_Match;
-	m_matchCondition.m_matchKind = FsmMatchKind_Anchor;
-	m_matchCondition.m_anchor = anchor;
+	m_stateKind = NfaStateKind_MatchAnchor;
+	m_anchor = anchor;
 	m_nextState = nextState;
 }
 
@@ -71,30 +112,27 @@ NfaState::createMatchChar(
 	utf32_t c,
 	NfaState* nextState
 ) {
-	ASSERT(!m_stateKind && !m_matchCondition.m_matchKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
-	m_stateKind = NfaStateKind_Match;
-	m_matchCondition.m_matchKind = FsmMatchKind_Char;
-	m_matchCondition.m_char = c;
+	m_stateKind = NfaStateKind_MatchChar;
+	m_char = c;
 	m_nextState = nextState;
 }
 
 void
 NfaState::createMatchCharSet(NfaState* nextState) {
-	ASSERT(!m_stateKind && !m_matchCondition.m_matchKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
-	m_stateKind = NfaStateKind_Match;
-	m_matchCondition.m_matchKind = FsmMatchKind_CharSet;
-	m_matchCondition.m_charSet = AXL_MEM_NEW(CharSet);
+	m_stateKind = NfaStateKind_MatchCharSet;
+	m_charSet = AXL_MEM_NEW(CharSet);
 	m_nextState = nextState;
 }
 
 void
 NfaState::createMatchAnyChar(NfaState* nextState) {
-	ASSERT(!m_stateKind && !m_matchCondition.m_matchKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
-	m_stateKind = NfaStateKind_Match;
-	m_matchCondition.m_matchKind = FsmMatchKind_AnyChar;
+	m_stateKind = NfaStateKind_MatchAnyChar;
 	m_nextState = nextState;
 }
 
@@ -103,7 +141,7 @@ NfaState::createOpenCapture(
 	size_t captureId,
 	NfaState* nextState
 ) {
-	ASSERT(!m_stateKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
 	m_stateKind = NfaStateKind_OpenCapture;
 	m_captureId = captureId;
@@ -115,7 +153,7 @@ NfaState::createCloseCapture(
 	size_t captureId,
 	NfaState* nextState
 ) {
-	ASSERT(!m_stateKind && !m_nextState && !m_splitState);
+	ASSERT(!m_stateKind && !m_nextState);
 
 	m_stateKind = NfaStateKind_CloseCapture;
 	m_captureId = captureId;
@@ -123,11 +161,67 @@ NfaState::createCloseCapture(
 }
 
 void
+NfaState::addChar(utf32_t c) {
+	switch (m_stateKind) {
+	case NfaStateKind_MatchChar:
+		if (m_char == c)
+			break; // no change
+
+		m_stateKind = NfaStateKind_MatchCharSet;
+		ASSERT(!m_charSet);
+		m_charSet = AXL_MEM_NEW(CharSet);
+		m_charSet->add(m_char);
+
+		// and fall through
+
+	case NfaStateKind_MatchCharSet:
+		m_charSet->add(c);
+		break;
+
+	case NfaStateKind_MatchAnyChar:
+		break; // no change
+
+	default:
+		ASSERT(false);
+	}
+}
+
+void
+NfaState::addCharRange(
+	utf32_t from,
+	utf32_t to
+) {
+	switch (m_stateKind) {
+	case NfaStateKind_MatchChar:
+		if (from == to && from == m_char)
+			break; // no change
+
+		m_stateKind = NfaStateKind_MatchCharSet;
+		ASSERT(!m_charSet);
+		m_charSet = AXL_MEM_NEW(CharSet);
+		m_charSet->add(m_char);
+
+		// and fall through
+
+	case NfaStateKind_MatchCharSet:
+		ASSERT(m_charSet);
+		m_charSet->add(from, to);
+		break;
+
+	case NfaStateKind_MatchAnyChar:
+		break; // no change
+
+	default:
+		ASSERT(false);
+	}
+}
+
+void
 NfaState::resolveOutStates() {
 	if (m_nextState && m_nextState->m_stateKind == NfaStateKind_Epsilon)
 		m_nextState = m_nextState->resolveEpsilon();
 
-	if (m_splitState && m_splitState->m_stateKind == NfaStateKind_Epsilon)
+	if (m_stateKind == NfaStateKind_Split && m_splitState->m_stateKind == NfaStateKind_Epsilon)
 		m_splitState = m_splitState->resolveEpsilon();
 }
 
@@ -144,28 +238,34 @@ NfaState::resolveEpsilon() {
 
 void
 NfaState::copy(NfaState& src) {
+	if (m_stateKind == NfaStateKind_MatchCharSet) {
+		ASSERT(m_charSet);
+		AXL_MEM_DELETE(m_charSet);
+	}
+
 	m_stateKind = src.m_stateKind;
 	m_id = src.m_id;
-	m_acceptContext = src.m_acceptContext;
+	m_acceptId = src.m_acceptId;
 	m_captureId = src.m_captureId;
 	m_nextState = src.m_nextState;
 	m_splitState = src.m_splitState;
-	m_matchCondition.copy(src.m_matchCondition);
+
+	if (m_stateKind == NfaStateKind_MatchCharSet) {
+		ASSERT(!m_charSet && src.m_charSet);
+		m_charSet = AXL_MEM_NEW(CharSet);
+		m_charSet->copy(*src.m_charSet);
+	}
 }
 
 //..............................................................................
 
 bool
-NfaStateSet::addState(NfaState* state) {
-	if (m_stateSet.getBit(state->m_id))
+NfaStateSet::add(const NfaState* state) {
+	if (m_map.getBit(state->m_id))
 		return false;
 
-	m_stateArray.append(state);
-
-	if (state->m_id >= m_stateSet.getBitCount())
-		m_stateSet.setBitCount(state->m_id + 1);
-
-	m_stateSet.setBit(state->m_id);
+	m_array.append(state);
+	m_map.setBitResize(state->m_id);
 	return true;
 }
 

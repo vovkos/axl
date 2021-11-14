@@ -63,15 +63,11 @@ RegexCompiler::construct(
 	m_lastToken.m_char = 0;
 }
 
-bool
+NfaState*
 RegexCompiler::compile(
 	const sl::StringRef& source,
-	void* acceptContext
+	size_t acceptId
 ) {
-	if (m_regex->m_regexKind == RegexKind_Switch) {
-		Regex::SwitchCaseContext* caseContext = AXL_MEM_NEW(Regex::SwitchCaseContext);
-	}
-
 	m_p = source.cp();
 	m_end = source.getEnd();
 	m_lastToken.m_tokenKind = TokenKind_Undefined;
@@ -79,38 +75,36 @@ RegexCompiler::compile(
 	NfaState* oldStart = !m_regex->m_nfaStateList.isEmpty() ? *m_regex->m_nfaStateList.getHead() : NULL;
 	NfaState* body = expression();
 	if (!body)
-		return false;
+		return NULL;
 
 	bool result = expectEof();
 	if (!result)
-		return false;
+		return NULL;
 
 	NfaState* accept = *m_regex->m_nfaStateList.getTail();
-	accept->createAccept(acceptContext);
+	accept->createAccept(acceptId);
 
 	if (oldStart) {
 		NfaState* split = addState();
 		split->createSplit(oldStart, body);
 	}
 
-	return true;
+	return body;
 }
 
-bool
-getHexValue(
-	uint_t c,
-	uint_t* value
+NfaState*
+RegexCompiler::compileSwitchCase(
+	const sl::StringRef& source,
+	size_t acceptId
 ) {
-	if (c >= '0' && c <= '9')
-		*value = c - '0';
-	else if (c >= 'a' && c <= 'f')
-		*value = 10 + c - 'a';
-	else if (c >= 'A' && c <= 'F')
-		*value = 10 + c - 'A';
-	else
-		return false;
+	if (m_regex->m_nfaStateList.isEmpty())
+		return compile(source, acceptId);
 
-	return true;
+	NfaState* prevStart = *m_regex->m_nfaStateList.getHead();
+	NfaState* caseStart = compile(source, acceptId);
+	NfaState* split = insertState(prevStart);
+	split->createSplit(prevStart, caseStart);
+	return caseStart;
 }
 
 bool
@@ -227,14 +221,14 @@ RegexCompiler::readQuantifier(size_t* count) {
 
 	char* end;
 	long n  = strtoul(buffer, &end, 10);
-	bool result = n >= 1 && n <= Const_MaxQuantifier;
+	bool result = n >= 1 && n <= MaxQuantifier;
 	if (result)
 		result = expectSpecialChar('}');
 
 	if (!result) {
 		err::setFormatStringError(
 			"invalid quantifier; only simple quantifiers are supported: {n}, 1 <= n <= %d",
-			Const_MaxQuantifier
+			MaxQuantifier
 		);
 		return false;
 	}
@@ -251,7 +245,7 @@ RegexCompiler::getToken(Token* token) {
 		return true;
 	}
 
-	if (!(m_flags & Flag_SparseSyntax)) {
+	if (!(m_flags & RegexCompileFlag_SparseSyntax)) {
 		for (;;) {
 			if (m_p >= m_end) {
 				token->m_tokenKind = TokenKind_SpecialChar;
@@ -555,9 +549,11 @@ RegexCompiler::repeat() {
 
 NfaState*
 RegexCompiler::question(NfaState* start) {
-	NfaState* accept = *m_regex->m_nfaStateList.getTail();
-	NfaState* split = addState();
-	split->createSplit(start, accept);
+	NfaState* oldAccept = *m_regex->m_nfaStateList.getTail();
+	NfaState* newAccept = addState();
+	NfaState* split = insertState(start);
+	split->createSplit(start, newAccept);
+	oldAccept->createEpsilon(newAccept);
 	return split;
 }
 
@@ -567,7 +563,7 @@ RegexCompiler::star(NfaState* start) {
 	NfaState* newAccept = addState();
 	NfaState* split = insertState(start);
 	split->createSplit(start, newAccept);
-	oldAccept->createSplit(start, newAccept);
+	oldAccept->createEpsilon(split);
 	return split;
 }
 
@@ -584,7 +580,7 @@ RegexCompiler::quantify(
 	NfaState* start,
 	size_t count
 ) {
-	ASSERT(count <= Const_MaxQuantifier);
+	ASSERT(count <= MaxQuantifier);
 
 	NfaState* originalStart = start;
 	NfaState* accept = *m_regex->m_nfaStateList.getTail();
@@ -651,7 +647,7 @@ RegexCompiler::single() {
 
 	switch (token.m_tokenKind) {
 	case TokenKind_WordBoundary:
-		return anchor(FsmAnchor_Word);
+		return anchor(Anchor_Word);
 
 	case TokenKind_SpecialChar:
 		switch (token.m_char) {
@@ -659,7 +655,7 @@ RegexCompiler::single() {
 			if (m_p + 1 < m_end && m_p[0] == '?' && m_p[1] == ':') {
 				m_p += 2;
 				return nonCapturingGroup();
-			} else if (m_flags & Flag_NonCapturingGroups) {
+			} else if (m_flags & RegexCompileFlag_NoCapture) {
 				return nonCapturingGroup();
 			} else {
 				return capturingGroup();
@@ -682,10 +678,10 @@ RegexCompiler::single() {
 			return any();
 
 		case '^':
-			return anchor(FsmAnchor_Begin);
+			return anchor(Anchor_Begin);
 
 		case '$':
-			return anchor(FsmAnchor_End);
+			return anchor(Anchor_End);
 
 		default:
 			err::setError("invalid regexp syntax");
@@ -723,7 +719,7 @@ RegexCompiler::literal(const sl::StringRef& string) {
 }
 
 NfaState*
-RegexCompiler::anchor(FsmAnchor anchor) {
+RegexCompiler::anchor(Anchor anchor) {
 	NfaState* start = addState();
 	NfaState* accept = addState();
 	start->createMatchAnchor(anchor, accept);
@@ -774,7 +770,7 @@ RegexCompiler::charClass() {
 			break;
 		}
 
-		result = charClassItem(start->m_matchCondition.m_charSet);
+		result = charClassItem(start->m_charSet);
 		if (!result)
 			return NULL;
 
@@ -787,7 +783,7 @@ RegexCompiler::charClass() {
 	}
 
 	if (isInversed)
-		start->m_matchCondition.m_charSet->invert();
+		start->m_charSet->invert();
 
 	return start;
 }
@@ -875,7 +871,7 @@ RegexCompiler::stdCharClass(char c) {
 	NfaState* start = addState();
 	NfaState* accept = addState();
 	start->createMatchCharSet(accept);
-	stdCharClass(c, start->m_matchCondition.m_charSet);
+	stdCharClass(c, start->m_charSet);
 	return start;
 }
 
@@ -955,7 +951,7 @@ RegexCompiler::any() {
 
 NfaState*
 RegexCompiler::capturingGroup() {
-	size_t captureId = m_regex->m_groupCount++;
+	size_t captureId = m_regex->m_captureCount++;
 
 	NfaState* open = addState();
 	NfaState* start = nonCapturingGroup();
@@ -998,7 +994,7 @@ RegexCompiler::namedRegex(const sl::StringRef& name) {
 	}
 
 	Regex subRegex;
-	RegexCompiler subRegexCompiler(Flag_NonCapturingGroups, &subRegex, m_nameMgr);
+	RegexCompiler subRegexCompiler(RegexCompileFlag_NoCapture, &subRegex, m_nameMgr);
 
 	bool result = subRegexCompiler.compile(source, NULL);
 	if (!result)

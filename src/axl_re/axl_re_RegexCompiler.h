@@ -14,6 +14,7 @@
 #define _AXL_RE_REGEX_H
 
 #include "axl_re_Regex.h"
+#include "axl_re_RegexNameMgr.h"
 
 namespace axl {
 namespace re {
@@ -21,17 +22,11 @@ namespace re {
 //..............................................................................
 
 class RegexCompiler {
-public:
-	enum Flag {
-		Flag_NonCapturingGroups = 0x01,
-		Flag_SparseSyntax       = 0x02,
-	};
-
-	enum Const {
-		Const_MaxQuantifier = 32,
-	};
-
 protected:
+	enum {
+		MaxQuantifier = 32,
+	};
+
 	enum TokenKind {
 		TokenKind_Undefined,
 		TokenKind_Char,
@@ -81,10 +76,16 @@ public:
 		construct(flags, regex, nameMgr);
 	}
 
-	bool
+	NfaState*
 	compile(
 		const sl::StringRef& source,
-		void* acceptContext = NULL
+		size_t acceptId = 0
+	);
+
+	NfaState*
+	compileSwitchCase(
+		const sl::StringRef& source,
+		size_t acceptId
 	);
 
 protected:
@@ -174,7 +175,7 @@ protected:
 	literal(const sl::StringRef& string);
 
 	NfaState*
-	anchor(FsmAnchor anchor);
+	anchor(Anchor anchor);
 
 	NfaState*
 	ch(uint_t c);

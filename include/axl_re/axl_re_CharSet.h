@@ -22,6 +22,7 @@ namespace re {
 
 class CharSet {
 public:
+	typedef sl::RbTreeIterator<utf32_t, utf32_t> Iterator;
 	typedef sl::ConstRbTreeIterator<utf32_t, utf32_t> ConstIterator;
 
 protected:
@@ -38,6 +39,11 @@ public:
 		m_map.clear();
 	}
 
+	size_t
+	getCount() const {
+		return m_map.getCount();
+	}
+
 	ConstIterator
 	getHead() const {
 		return m_map.getHead();
@@ -50,7 +56,7 @@ public:
 
 	bool
 	isSet(utf32_t c) const {
-		sl::ConstRbTreeIterator<utf32_t, utf32_t> it = m_map.find(c, sl::BinTreeFindRelOp_Le);
+		ConstIterator it = m_map.find(c, sl::BinTreeFindRelOp_Le);
 		return it && c <= it->m_value;
 	}
 
@@ -72,11 +78,50 @@ public:
 	void
 	copy(const CharSet& src);
 
-#if (_AXL_DEBUG)
 	void
-	trace() const;
-#endif
+	getString(sl::String* string) const;
+
+	sl::String
+	getString() const {
+		sl::String string;
+		getString(&string);
+		return string;
+	}
 };
+
+void
+appendCharString(
+	sl::String* string,
+	utf32_t c
+);
+
+inline
+void
+getCharString(
+	sl::String* string,
+	utf32_t c
+) {
+	string->clear();
+	appendCharString(string, c);
+}
+
+void
+appendCharRangeString(
+	sl::String* string,
+	utf32_t from,
+	utf32_t to
+);
+
+inline
+void
+getCharRangeString(
+	sl::String* string,
+	utf32_t from,
+	utf32_t to
+) {
+	string->clear();
+	appendCharRangeString(string, from, to);
+}
 
 //..............................................................................
 

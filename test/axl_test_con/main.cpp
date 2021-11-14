@@ -528,22 +528,22 @@ testCharSet() {
 
 	charSet.add(10, 12);
 	charSet.add(14, 20);
-	charSet.trace();
+	printf("%s\n", charSet.getString().sz());
 
 	charSet.invert();
-	charSet.trace();
+	printf("%s\n", charSet.getString().sz());
 
 	charSet.invert();
-	charSet.trace();
+	printf("%s\n", charSet.getString().sz());
 
 	charSet.add(13);
-	charSet.trace();
+	printf("%s\n", charSet.getString().sz());
 
 	charSet.invert();
-	charSet.trace();
+	printf("%s\n", charSet.getString().sz());
 
 	charSet.invert();
-	charSet.trace();
+	printf("%s\n", charSet.getString().sz());
 
 	for (utf32_t c = 5; c < 25; c++)
 		printf("isSet(%d): %d\n", c, charSet.isSet(c));
@@ -559,7 +559,6 @@ testRegex() {
 	uint_t flags = 0; // re::RegexCompiler::Flag_SparseSyntax;
 
 	re::Regex regex;
-	re::RegexCompiler regexCompiler(flags, &regex, &nameMgr);
 
 /*	char const* src[] = {
 		"'\\x02' V '\\r'",
@@ -577,7 +576,11 @@ testRegex() {
 	regex.print();
 */
 
-	bool result = regexCompiler.compile("^([abc]+)$");
+	bool result;
+
+	result = regex.compile("a*(b*)c");
+	// result = regex.compile("[abc]");
+	// result = regex.compile("^([abc]+)$");
 
 /*	bool result =
 		regexCompiler.incrementalCompile("(\\h{2})   ' '+ (\\d{2})") &&
@@ -589,12 +592,209 @@ testRegex() {
 	}
 
 #if (_AXL_DEBUG)
-	regex.print();
+	printf("NFA:\n");
+	regex.printNfa();
 #endif
 
-	char fileName[] = "abcabcabc";
-	result = regex.match(fileName);
-	printf("match: %d\n", result);
+	sl::Array<char> storage;
+	regex.saveNfa(&storage);
+	printf("\nNFA storage: %d B\n", storage.getCount());
+
+	re::Regex regex2;
+	result = regex2.load(storage) != -1;
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+#if (_AXL_DEBUG)
+	regex2.printNfa();
+
+	printf("\nDFA:\n");
+	regex.buildFullDfa();
+	regex.printDfa();
+#endif
+
+	regex.saveDfa(&storage);
+	printf("\nDFA storage: %d B\n", storage.getCount());
+
+	result = regex2.load(storage) != -1;
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+#if (_AXL_DEBUG)
+	regex2.printDfa();
+#endif
+
+	const char text[] = "abxxxaaabbbbcd";
+//	const char text[] = "xaaabbbbcd";
+	printf("\nMATCHING TEXT: %s\n", text);
+
+	re::RegexState state = regex.match(text);
+	if (!state) {
+		printf("NO MATCH!\n");
+		return;
+	}
+
+	const re::RegexMatch* match;
+	size_t count;
+
+#if (1)
+	match = state.getMatch();
+	ASSERT(match);
+
+	printf(
+		"$0: %p(%d) '%s'\n",
+		match->getOffset(),
+		match->getSize(),
+		match->getText().sz()
+	);
+
+	count = state.getSubMatchCount();
+	for (size_t i = 1; i < count; i++) {
+		const re::RegexMatch* subMatch = state.getSubMatch(i);
+		if (subMatch)
+			printf(
+				"$%d: %p(%d) '%s'\n",
+				i,
+				subMatch->getOffset(),
+				subMatch->getSize(),
+				subMatch->getText().sz()
+			);
+	}
+#endif
+
+#if (1)
+	printf("STREAM MATCH:\n");
+
+	state.initialize(re::RegexExecFlag_Stream);
+
+	const char* p = text;
+	const char* end = text + lengthof(text);
+	for (; p < end; p++) {
+		result = regex.match(&state, p, 1);
+		if (result && state.getMatch())
+			break;
+	}
+
+	match = state.getMatch();
+	if (!match) {
+		printf("NO MATCH!\n");
+		return;
+	}
+
+	printf(
+		"$0: %p(%d)\n",
+		match->getOffset(),
+		match->getSize()
+	);
+
+	count = state.getSubMatchCount();
+	for (size_t i = 1; i < count; i++) {
+		const re::RegexMatch* subMatch = state.getSubMatch(i);
+		if (subMatch)
+			printf(
+				"$%d: %p(%d)\n",
+				i,
+				subMatch->getOffset(),
+				subMatch->getSize()
+			);
+	}
+#endif
+
+#if (1)
+	regex.createSwitch();
+	regex.compileSwitchCase("char");
+	regex.compileSwitchCase("int");
+	regex.compileSwitchCase("long");
+	regex.compileSwitchCase("[0-9]+");
+	regex.compileSwitchCase("0x[0-9a-fA-F]+");
+	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*");
+	regex.finalizeSwitch();
+
+	static const char* caseNameMap[] = {
+		"<char>",
+		"<int>",
+		"<long>",
+		"<decimal>",
+		"<hexadecimal>",
+		"<identifier>",
+	};
+
+#if (_AXL_DEBUG)
+	printf("\nNFA:\n");
+	regex.printNfa();
+#endif
+
+	regex.saveNfa(&storage);
+	printf("\nNFA storage: %d B\n", storage.getCount());
+
+	result = regex2.load(storage) != -1;
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+#if (_AXL_DEBUG)
+	regex2.printNfa();
+
+	printf("\nDFA:\n");
+	regex.buildFullDfa();
+	regex.printDfa();
+#endif
+
+	regex.saveDfa(&storage);
+	printf("\nDFA storage: %d B\n", storage.getCount());
+
+	result = regex2.load(storage) != -1;
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+#if (_AXL_DEBUG)
+	regex2.printDfa();
+#endif
+
+	static const char* lexemes[] = {
+		"char",
+		" int",
+		"  long",
+		"12345",
+		" 0xabcdef",
+		"  0x123abdef",
+		"suka",
+		" suka_hui_123",
+	};
+
+	printf("\n");
+
+	for (size_t i = 0; i < countof(lexemes); i++) {
+		printf("MATCHING: %s\n", lexemes[i]);
+
+		// re::RegexState state = regex.match(re::RegexExecFlag_ExactMatch, lexemes[i]);
+		re::RegexState state = regex.match(lexemes[i]);
+		if (!state) {
+			printf("NO MATCH!\n");
+			continue;
+		}
+
+		size_t id = state.getMatchSwitchCaseId();
+		match = state.getMatch();
+		ASSERT(match);
+
+		printf("#%d %s: %p(%d) '%s'\n",
+			id,
+			caseNameMap[id],
+			match->getOffset(),
+			match->getSize(),
+			match->getText().sz()
+		);
+	}
+#endif
+
 }
 
 #endif

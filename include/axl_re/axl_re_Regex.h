@@ -18,37 +18,48 @@
 namespace axl {
 namespace re {
 
+class RegexState;
+struct RegexStorageHdr;
+
 //..............................................................................
 
 enum RegexKind {
 	RegexKind_Undefined,
-	RegexKind_Normal,
+	RegexKind_Single,
 	RegexKind_Switch,
-	RegexKind_LexicalSwitch,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum RegexCompileFlag {
+	RegexCompileFlag_SparseSyntax    = 0x01,
+	RegexCompileFlag_CaseInsensitive = 0x02,
+	RegexCompileFlag_NoCapture       = 0x10, // same as RegexExecFlag_NoCapture
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Regex {
 	friend class RegexCompiler;
+	friend class DfaBuilder;
 
 protected:
 	struct SwitchCaseContext: sl::ListLink {
-		size_t m_index;
-		size_t m_firstGroupId;
-		size_t m_groupCount;
-		rc::Ptr<void> m_context;
+		size_t m_baseCaptureId;
+		size_t m_captureCount;
+		NfaState* m_nfaState;
+		DfaState* m_dfaState;
 	};
 
 protected:
 	RegexKind m_regexKind;
 	sl::List<NfaState> m_nfaStateList;
-	sl::Array<NfaState*> m_nfaStateArray;
 	sl::List<DfaState> m_dfaStateList;
+	sl::List<DfaState> m_preDfaStateList;
 	NfaStateSetMap<DfaState*> m_dfaStateMap;
-	sl::List<SwitchCaseContext> m_caseContextList;
-	size_t m_groupCount;
-	size_t m_maxSubMatchCount; // out of all switch-cases
+	sl::List<SwitchCaseContext> m_switchCaseContextList;
+	sl::Array<SwitchCaseContext*> m_switchCaseContextArray;
+	size_t m_captureCount;
 
 public:
 	Regex();
@@ -64,58 +75,112 @@ public:
 	}
 
 	size_t
-	getGroupCount() const {
-		return m_groupCount;
-	}
-
-	size_t
-	getMaxSubMatchCount() const {
-		return m_maxSubMatchCount;
+	getCaptureCount() const {
+		return m_captureCount;
 	}
 
 	size_t
 	getNfaStateCount() const {
-		ASSERT(m_nfaStateList.getCount() == m_nfaStateArray.getCount());
 		return m_nfaStateList.getCount();
 	}
 
 	const NfaState*
-	getNfaState(size_t i) const {
-		return m_nfaStateArray[i];
+	getNfaStartState() const {
+		return *m_nfaStateList.getHead();
 	}
 
 	const DfaState*
-	getStartDfaState() const {
-		return *m_dfaStateList.getHead();
+	getDfaStartState() {
+		return !m_dfaStateList.isEmpty() ?
+			*m_dfaStateList.getHead() :
+			createDfaStartState(*m_nfaStateList.getHead());
 	}
 
-	void
-	prepareDfaState(DfaState* state);
+	size_t
+	getSwitchCaseCount() {
+		ASSERT(m_regexKind == RegexKind_Switch);
+		return m_switchCaseContextArray.getCount();
+	}
+
+	size_t
+	getSwitchCaseBaseCaptureId(size_t id) {
+		ASSERT(m_regexKind == RegexKind_Switch);
+		return m_switchCaseContextArray[id]->m_baseCaptureId;
+	}
+
+	size_t
+	getSwitchCaseCaptureCount(size_t id) {
+		ASSERT(m_regexKind == RegexKind_Switch);
+		return m_switchCaseContextArray[id]->m_captureCount;
+	}
+
+	const NfaState*
+	getSwitchCaseNfaState(size_t id) {
+		ASSERT(m_regexKind == RegexKind_Switch);
+		return m_switchCaseContextArray[id]->m_nfaState;
+	}
+
+	const DfaState*
+	getSwitchCaseDfaState(size_t id);
 
 	void
 	clear();
 
-	bool
-	compile(const sl::StringRef& source);
+	size_t
+	load(
+		const void* p,
+		size_t size
+	);
 
-	void
-	createSwitch(RegexKind switchKind);
-
-	void
-	createSwitch() {
-		createSwitch(RegexKind_Switch);
+	size_t
+	load(const sl::ArrayRef<char>& buffer) {
+		return load(buffer.cp(), buffer.getCount());
 	}
 
-	void
-	createLexicalSwitch() {
-		createSwitch(RegexKind_LexicalSwitch);
+	size_t
+	saveNfa(sl::Array<char>* buffer);
+
+	size_t
+	saveDfa(sl::Array<char>* buffer);
+
+	sl::Array<char>
+	saveNfa() {
+		sl::Array<char> buffer;
+		saveNfa(&buffer);
+		return buffer;
+	}
+
+	sl::Array<char>
+	saveDfa() {
+		sl::Array<char> buffer;
+		saveDfa(&buffer);
+		return buffer;
 	}
 
 	bool
-	compileSwitchCase(
-		const sl::StringRef& source,
-		const rc::Ptr<void>& caseContext
+	compile(
+		uint_t flags,
+		const sl::StringRef& source
 		);
+
+	bool
+	compile(const sl::StringRef& source) {
+		return compile(0, source);
+	}
+
+	void
+	createSwitch();
+
+	size_t
+	compileSwitchCase(
+		uint_t flags,
+		const sl::StringRef& source
+	);
+
+	size_t
+	compileSwitchCase(const sl::StringRef& source) {
+		return compileSwitchCase(0, source);
+	}
 
 	void
 	finalizeSwitch() {
@@ -123,30 +188,79 @@ public:
 		finalize();
 	}
 
+	void
+	buildFullDfa();
+
+	bool
+	eof(RegexState* state) {
+		ASSERT(state->getRegex() == this && (state->getExecFlags() & RegexExecFlag_Stream));
+		return state->eof();
+	}
+
 	bool
 	match(
-		enc::CharCodec* codec,
+		RegexState* state,
 		const void* p,
 		size_t size
 	);
 
-	bool
+	RegexState
 	match(
+		uint_t flags,
+		enc::CharCodec* codec,
+		const void* p,
+		size_t size
+	) {
+		RegexState state(flags, codec);
+		return match(&state, p, size) ? state : RegexState();
+	}
+
+	RegexState
+	match(
+		uint_t flags,
 		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t size
 	) {
-		return match(enc::getCharCodec(codecKind), p, size);
+		return match(flags, enc::getCharCodec(codecKind), p, size);
 	}
 
-	bool
+	RegexState
+	match(
+		uint_t flags,
+		const void* p,
+		size_t size
+	) {
+		return match(flags, enc::CharCodecKind_Utf8, p, size);
+	}
+
+	RegexState
+	match(
+		const void* p,
+		size_t size
+	) {
+		return match(0, enc::CharCodecKind_Utf8, p, size);
+	}
+
+	RegexState
+	match(
+		uint_t flags,
+		const sl::StringRef& string
+	) {
+		return match(flags, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
+	}
+
+	RegexState
 	match(const sl::StringRef& string) {
-		return match(enc::CharCodecKind_Utf8, string.cp(), string.getLength());
+		return match(0, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
 	}
 
 #if (_AXL_DEBUG)
 	void
-	print() const;
+	printNfa() const;
+
+	void
+	printDfa() const;
 #endif
 
 protected:
@@ -154,7 +268,16 @@ protected:
 	finalize();
 
 	DfaState*
+	createDfaStartState(NfaState* state);
+
+	DfaState*
 	addDfaState(DfaState* state);
+
+	bool
+	loadNfa(const RegexStorageHdr* hdr);
+
+	bool
+	loadDfa(const RegexStorageHdr* hdr);
 };
 
 //..............................................................................
