@@ -126,7 +126,7 @@ template <
 class HandleTable: public HandleTableBase<uintptr_t, T, Arg> {
 public:
 	HandleTable(uintptr_t seed = 1):
-		HandleTableBase<uintptr_t, T, Arg> (seed) {}
+		HandleTableBase<uintptr_t, T, Arg>(seed) {}
 };
 
 //..............................................................................

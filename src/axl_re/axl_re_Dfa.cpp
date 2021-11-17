@@ -13,6 +13,8 @@
 #include "axl_re_Dfa.h"
 #include "axl_re_Regex.h"
 
+#define _AXL_RE_DFA_MERGE_CHAR_RANGES 1
+
 namespace axl {
 namespace re {
 
@@ -22,32 +24,31 @@ void
 DfaCharTransitionMap::add(
 	utf32_t from,
 	utf32_t to,
-	const DfaState* state
+	const DfaState* state,
+	uint_t flags
 ) {
 	ASSERT(from >= 0 && to <= 0x7fffffff && from <= to);
 
 	Iterator it = m_map.visit(from);
-	it->m_value.m_last = to;
-	it->m_value.m_state = state;
-
-#if (_AXL_DEBUG)
-	ConstIterator prevIt = it.getPrev();
-	ConstIterator nextIt = it.getNext();
+	Iterator prevIt = it.getPrev();
 	ASSERT(!prevIt || prevIt->m_value.m_last < from);
-	ASSERT(!nextIt || nextIt->getKey() > to);
+
+#if (_AXL_RE_DFA_MERGE_CHAR_RANGES)
+	if (prevIt &&
+		prevIt->m_value.m_last + 1 == from &&
+		prevIt->m_value.m_state == state &&
+		prevIt->m_value.m_flags == flags
+	) {
+		prevIt->m_value.m_last = to;
+		m_map.erase(it);
+		it = prevIt;
+	} else
 #endif
-}
-
-//..............................................................................
-
-bool
-DfaCaptureIdSet::add(size_t captureId) {
-	if (m_map.getBit(captureId))
-		return false;
-
-	m_array.append(captureId);
-	m_map.setBitResize(captureId);
-	return true;
+	{
+		it->m_value.m_last = to;
+		it->m_value.m_state = state;
+		it->m_value.m_flags = flags;
+	}
 }
 
 //..............................................................................
@@ -57,21 +58,6 @@ DfaState::DfaState() {
 	m_flags = 0;
 	m_anchorMask = 0;
 	m_acceptId = -1;
-	m_acceptNfaStateId = -1;
-}
-
-void
-DfaState::copy(const DfaState& src) {
-	// don't update id
-
-	m_flags = src.m_flags & ~DfaStateFlag_CharTransitionMap;
-	m_acceptId = src.m_acceptId;
-	m_acceptNfaStateId = src.m_acceptNfaStateId;
-	m_openCaptureIdSet = src.m_openCaptureIdSet;
-	m_closeCaptureIdSet = src.m_closeCaptureIdSet;
-	m_nfaStateSet.copy(src.m_nfaStateSet);
-	m_anchorTransitionMap.clear();
-	m_charTransitionMap.clear();
 }
 
 void
@@ -83,39 +69,42 @@ DfaState::finalize() {
 		const NfaState* nfaState = m_nfaStateSet[i];
 		ASSERT(nfaState->m_stateKind != NfaStateKind_Epsilon);
 
-		switch (nfaState->m_stateKind) {
-		case NfaStateKind_Accept:
-			if (!(m_flags & DfaStateFlag_Accept) || nfaState->m_id < m_acceptNfaStateId) {
-				m_acceptNfaStateId = nfaState->m_id;
-				m_acceptId = nfaState->m_acceptId;
-			}
-
+		if (nfaState->m_stateKind == NfaStateKind_Accept &&
+			(!(m_flags & DfaStateFlag_Accept) || nfaState->m_acceptId < m_acceptId)
+		) {
 			m_flags |= DfaStateFlag_Accept;
-			break;
-
-		case NfaStateKind_OpenCapture:
-			ASSERT(nfaState->m_captureId != -1);
-			m_openCaptureIdSet.add(nfaState->m_captureId);
-			break;
-
-		case NfaStateKind_CloseCapture:
-			ASSERT(nfaState->m_captureId != -1);
-			m_closeCaptureIdSet.add(nfaState->m_captureId);
-			break;
+			m_acceptId = nfaState->m_acceptId;
 		}
 	}
 }
 
 //..............................................................................
 
-struct DfaWorkingSetEntry {
+void
+DfaBuilder::buildTransitionMaps(DfaState* state) {
+	ASSERT(!(state->m_flags & DfaStateFlag_TransitionMaps) && state->m_id == -1);
+
+	buildAnchorTransitionMap(state);
+	buildCharTransitionMap(state);
+
+	if ((state->m_flags & DfaStateFlag_Accept) && !state->m_anchorMask && state->m_charTransitionMap.isEmpty())
+		state->m_flags |= DfaStateFlag_Final; // final states insta-match
+
+	state->m_flags |= DfaStateFlag_TransitionMaps;
+	state->m_id = m_regex->m_dfaStateList.getCount();
+
+	m_regex->m_preDfaStateList.remove(state);
+	m_regex->m_dfaStateList.insertTail(state);
+}
+
+struct DfaAtmWorkingSetEntry {
 	DfaState* m_dfaState;
 	const NfaState* m_nfaState;
 	uint_t m_anchors;
 
-	DfaWorkingSetEntry() {}
+	DfaAtmWorkingSetEntry() {}
 
-	DfaWorkingSetEntry(
+	DfaAtmWorkingSetEntry(
 		DfaState* dfaState,
 		const NfaState* nfaState,
 		uint_t anchors = 0
@@ -135,51 +124,55 @@ struct DfaWorkingSetEntry {
 	}
 };
 
-//..............................................................................
-
 void
-DfaBuilder::makeEpsilonClosure(DfaState* dfaState) {
-	ASSERT(!(dfaState->m_flags & DfaStateFlag_EpsilonClosure));
-
+DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
 	DfaState* anchorTransitionMap[Anchor__TransitionMapSize] = { 0 };
 	uint_t anchorMask = 0;
 
-	sl::Array<DfaWorkingSetEntry> workingSet;
-	size_t count = dfaState->m_nfaStateSet.getCount();
-	workingSet.setCount(count);
+	char buffer[256];
+	sl::Array<DfaAtmWorkingSetEntry> workingSet(rc::BufKind_Stack, buffer, sizeof(buffer));
 
-	for (size_t i = 0; i < count; i++)
-		workingSet[i].setup(dfaState, dfaState->m_nfaStateSet[i]);
+	size_t count = dfaState->m_nfaStateSet.getCount();
+	for (size_t i = 0; i < count; i++) {
+		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
+		if (nfaState->m_stateKind != NfaStateKind_MatchAnchor)
+			continue;
+
+		ASSERT(nfaState->m_anchor <= Anchor_Last);
+		DfaState* anchorState = anchorTransitionMap[nfaState->m_anchor];
+		if (!anchorState) {
+			anchorState = AXL_MEM_NEW(DfaState);
+			anchorState->m_nfaStateSet.copy(dfaState->m_nfaStateSet);
+			anchorTransitionMap[nfaState->m_anchor] = anchorState;
+		}
+
+		workingSet.append(DfaAtmWorkingSetEntry(anchorState, nfaState, nfaState->m_anchor));
+	}
 
 	while (!workingSet.isEmpty()) {
-		DfaWorkingSetEntry entry = workingSet.getBackAndPop();
+		DfaAtmWorkingSetEntry entry = workingSet.getBackAndPop();
 
 		bool isAdded;
 		uint_t anchors;
 		DfaState* anchorState;
 
 		switch (entry.m_nfaState->m_stateKind) {
-		case NfaStateKind_Accept:
-			if (entry.m_nfaState->m_nextState)
-				entry.m_dfaState->m_nfaStateSet.add(entry.m_nfaState->m_nextState);
-			break;
-
 		case NfaStateKind_Split:
 			isAdded = entry.m_dfaState->m_nfaStateSet.add(entry.m_nfaState->m_nextState);
-			if (isAdded)
-				workingSet.append(DfaWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_nextState, entry.m_anchors));
+			if (isAdded && entry.m_nfaState->m_nextState->m_stateKind <= NfaStateKind_MatchAnchor)
+				workingSet.append(DfaAtmWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_nextState, entry.m_anchors));
 
 			isAdded = entry.m_dfaState->m_nfaStateSet.add(entry.m_nfaState->m_splitState);
-			if (isAdded)
-				workingSet.append(DfaWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_splitState, entry.m_anchors));
+			if (isAdded && entry.m_nfaState->m_splitState->m_stateKind <= NfaStateKind_MatchAnchor)
+				workingSet.append(DfaAtmWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_splitState, entry.m_anchors));
 
 			break;
 
 		case NfaStateKind_OpenCapture:
 		case NfaStateKind_CloseCapture:
 			isAdded = entry.m_dfaState->m_nfaStateSet.add(entry.m_nfaState->m_nextState);
-			if (isAdded)
-				workingSet.append(DfaWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_nextState, entry.m_anchors));
+			if (isAdded && entry.m_nfaState->m_nextState->m_stateKind <= NfaStateKind_MatchAnchor)
+				workingSet.append(DfaAtmWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_nextState, entry.m_anchors));
 
 			break;
 
@@ -189,13 +182,13 @@ DfaBuilder::makeEpsilonClosure(DfaState* dfaState) {
 			anchorState = anchorTransitionMap[anchors];
 			if (!anchorState) {
 				anchorState = AXL_MEM_NEW(DfaState);
-				anchorState->m_nfaStateSet.copy(dfaState->m_nfaStateSet);
+				anchorState->m_nfaStateSet.copy(entry.m_dfaState->m_nfaStateSet);
 				anchorTransitionMap[anchors] = anchorState;
 			}
 
 			isAdded = anchorState->m_nfaStateSet.add(entry.m_nfaState->m_nextState);
-			if (isAdded)
-				workingSet.append(DfaWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_nextState, entry.m_anchors));
+			if (isAdded && entry.m_nfaState->m_nextState->m_stateKind <= NfaStateKind_MatchAnchor)
+				workingSet.append(DfaAtmWorkingSetEntry(anchorState, entry.m_nfaState->m_nextState, anchors));
 
 			break;
 		}
@@ -203,10 +196,11 @@ DfaBuilder::makeEpsilonClosure(DfaState* dfaState) {
 
 	if (anchorMask) {
 		dfaState->m_anchorTransitionMap.setCount(anchorMask + 1);
-		for (size_t i = 0; i <= anchorMask; i++)
+		for (size_t i = 0; i <= anchorMask; i++) {
 			dfaState->m_anchorTransitionMap[i] = anchorTransitionMap[i] ?
 				m_regex->addDfaState(anchorTransitionMap[i]) :
 				NULL;
+		}
 
 		dfaState->m_anchorMask = anchorMask;
 	}
@@ -214,34 +208,61 @@ DfaBuilder::makeEpsilonClosure(DfaState* dfaState) {
 
 void
 DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
-	ASSERT(!(dfaState->m_flags & DfaStateFlag_CharTransitionMap) && dfaState->m_id == -1);
+	ASSERT(dfaState->m_id == -1);
 
 	m_charRangeMap.clear();
 
 	size_t nfaStateCount = dfaState->m_nfaStateSet.getCount();
+
+	sl::BitMap epsilonClosureMinusSearchStart; // exluding the DFA search start state
+	const DfaState* dfaSearchStartState = m_regex->getDfaSearchStartState();
+	if (dfaSearchStartState) {
+		// build epsilon closure minus DFA search start;
+		// can only check SPLITs because we've already did buildEpsilonClosure() for dfaState
+
+		for (size_t i = 0; i < nfaStateCount; i++) {
+			const NfaState* nfaState = dfaState->m_nfaStateSet[i];
+			if (nfaState->m_stateKind == NfaStateKind_Split && !dfaSearchStartState->m_nfaStateSet.find(nfaState)) {
+				epsilonClosureMinusSearchStart.setBitResize(nfaState->m_nextState->m_id);
+				epsilonClosureMinusSearchStart.setBitResize(nfaState->m_splitState->m_id);
+			}
+		}
+	}
+
+	// add all transitions to the char range map
+
 	for (size_t i = 0; i < nfaStateCount; i++) {
 		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
+		if (nfaState->m_stateKind < NfaStateKind_FirstConsuming)
+			continue;
+
+		uint_t transitionFlags =
+			dfaSearchStartState ?
+			!dfaSearchStartState->m_nfaStateSet.find(nfaState->m_id) || // not in the DFA search start epsilon-closure OR...
+			epsilonClosureMinusSearchStart.getBit(nfaState->m_id) ?     // ... can epsilon-jump here from some other state
+			DfaTransitionFlag_Alive :
+			0 :
+			DfaTransitionFlag_Alive; // !dfaSearchStartState
 
 		switch (nfaState->m_stateKind) {
 		case NfaStateKind_MatchChar:
-			addMatchChar(nfaState->m_char, nfaState->m_nextState);
+			addMatchChar(nfaState->m_char, nfaState->m_nextState, transitionFlags);
 			break;
 
 		case NfaStateKind_MatchCharSet:
-			addMatchCharSet(*nfaState->m_charSet, nfaState->m_nextState);
+			addMatchCharSet(*nfaState->m_charSet, nfaState->m_nextState, transitionFlags);
 			break;
 
 		case NfaStateKind_MatchAnyChar:
-			addMatchAnyChar(nfaState->m_nextState);
+			addMatchAnyChar(nfaState->m_nextState, transitionFlags);
 			break;
 		}
 	}
 
 	sl::List<CharRangeListEntry> charRangeList;
 
-	// pass 1 -- build state sets
+	// split transitions into non-overlapping state sets
 
-	CharRangeMapIterator prevIt;
 	CharRangeMapIterator it = m_charRangeMap.getHead();
 	while (it != m_charRangeMap.getTail()) {
 		CharRangeMapIterator nextIt = it.getNext();
@@ -254,19 +275,18 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 
 			if (it2->m_last < c)
 				charRangeList.erase(it2);
-			else
+			else {
 				it->m_value.m_nfaStateSet.add(it2->m_nfaState);
+				it->m_value.m_transitionFlags |= it2->m_transitionFlags;
+			}
 
 			it2 = nextIt;
 		}
 
-		if (prevIt && it->m_value.m_nfaStateSet.cmp(prevIt->m_value.m_nfaStateSet)) // merge identical state sets
-			m_charRangeMap.erase(it);
-
 		it = nextIt;
 	}
 
-	// pass 2 -- finalize transition map
+	// finalize transition map
 
 	it = m_charRangeMap.getHead();
 	while (it != m_charRangeMap.getTail()) {
@@ -279,50 +299,60 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 
 		DfaState* targetState = AXL_MEM_NEW(DfaState);
 		sl::takeOver(&targetState->m_nfaStateSet, &it->m_value.m_nfaStateSet);
-		makeEpsilonClosure(targetState);
+		targetState->m_nfaStateSet.buildEpsilonClosure();
 		targetState = m_regex->addDfaState(targetState);
 
-		dfaState->m_charTransitionMap.add(it->getKey(), nextIt->getKey() - 1, targetState);
+		dfaState->m_charTransitionMap.add(it->getKey(), nextIt->getKey() - 1, targetState, it->m_value.m_transitionFlags);
 		it = nextIt;
 	}
-
-	dfaState->m_flags |= DfaStateFlag_CharTransitionMap;
-
-	if ((dfaState->m_flags & DfaStateFlag_Accept) && !dfaState->m_anchorMask && dfaState->m_charTransitionMap.isEmpty())
-		dfaState->m_flags |= DfaStateFlag_Final; // final states insta-match
-
-	dfaState->m_id = m_regex->m_dfaStateList.getCount();
-
-	m_regex->m_preDfaStateList.remove(dfaState);
-	m_regex->m_dfaStateList.insertTail(dfaState);
 }
 
 void
 DfaBuilder::buildFullDfa() {
-	if (m_regex->isEmpty())
-		return;
+	if (m_regex->m_dfaStateList.isEmpty() &&
+		m_regex->m_preDfaStateList.isEmpty() &&
+		m_regex->m_nfaSearchStartState
+	) {
+		// from the clean slate it's safe to first build the match DFA without checking for the search DFA
 
-	m_regex->getDfaStartState(); // bootstrap
+		NfaState* prevNfaSearchStartState = m_regex->m_nfaSearchStartState;
+		m_regex->m_nfaSearchStartState = NULL;
+		m_regex->getDfaMatchStartState();
 
-	while (!m_regex->m_preDfaStateList.isEmpty())
-		buildCharTransitionMap(*m_regex->m_preDfaStateList.getHead());
+		while (!m_regex->m_preDfaStateList.isEmpty())
+			buildTransitionMaps(*m_regex->m_preDfaStateList.getHead());
+
+		m_regex->m_nfaSearchStartState = prevNfaSearchStartState;
+		m_regex->getDfaSearchStartState();
+
+		while (!m_regex->m_preDfaStateList.isEmpty())
+			buildTransitionMaps(*m_regex->m_preDfaStateList.getHead());
+	} else {
+		m_regex->getDfaMatchStartState();
+		m_regex->getDfaSearchStartState();
+
+		while (!m_regex->m_preDfaStateList.isEmpty())
+			buildTransitionMaps(*m_regex->m_preDfaStateList.getHead());
+	}
 }
 
 void
 DfaBuilder::addMatchCharSet(
 	const CharSet& charSet,
-	const NfaState* state
+	const NfaState* state,
+	uint_t transitionFlags
 ) {
 	CharSet::ConstIterator it = charSet.getHead();
 	for (; it; it++)
-		addMatchCharRange(it->getKey(), it->m_value, state);
+		addMatchCharRange(it->getKey(), it->m_value, state, transitionFlags);
 }
 
 void
 DfaBuilder::addMatchCharRange(
 	uint32_t from,
 	uint32_t to,
-	const NfaState* state
+	const NfaState* state,
+	uint_t transitionFlags
 ) {
 	ASSERT(from >= 0 && from <= to);
 
@@ -332,6 +362,7 @@ DfaBuilder::addMatchCharRange(
 	CharRangeListEntry* entry = AXL_MEM_NEW(CharRangeListEntry);
 	entry->m_last = to;
 	entry->m_nfaState = state;
+	entry->m_transitionFlags = transitionFlags;
 	it->m_value.m_rangeList.insertTail(entry);
 }
 

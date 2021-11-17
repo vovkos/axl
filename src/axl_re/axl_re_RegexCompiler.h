@@ -11,8 +11,6 @@
 
 #pragma once
 
-#define _AXL_RE_REGEX_H
-
 #include "axl_re_Regex.h"
 #include "axl_re_RegexNameMgr.h"
 

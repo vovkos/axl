@@ -22,12 +22,20 @@ namespace re {
 Regex::Regex() {
 	m_regexKind = RegexKind_Undefined;
 	m_captureCount = 0;
+	m_nfaMatchStartState = NULL;
+	m_nfaSearchStartState = NULL;
+	m_dfaMatchStartState = NULL;
+	m_dfaSearchStartState = NULL;
 }
 
 void
 Regex::clear() {
 	m_regexKind = RegexKind_Undefined;
 	m_captureCount = 0;
+	m_nfaMatchStartState = NULL;
+	m_nfaSearchStartState = NULL;
+	m_dfaMatchStartState = NULL;
+	m_dfaSearchStartState = NULL;
 	m_nfaStateList.clear();
 	m_dfaStateList.clear();
 	m_dfaStateMap.clear();
@@ -46,8 +54,10 @@ Regex::load(
 	clear();
 
 	const RegexStorageHdr* hdr = (const RegexStorageHdr*)p;
-	if (hdr->m_dataSize > size - sizeof(RegexStorageHdr))
-		return err::fail<size_t>(-1, "regex storage buffer incomplete");
+	if (hdr->m_dataSize > size - sizeof(RegexStorageHdr) ||
+		hdr->m_matchStartStateId >= hdr->m_stateCount ||
+		hdr->m_searchStartStateId != -1 && hdr->m_searchStartStateId >= hdr->m_stateCount)
+		return err::fail<size_t>(-1, "invalid regex storage");
 
 	switch (hdr->m_regexKind) {
 	case RegexKind_Single:
@@ -93,6 +103,9 @@ Regex::loadNfa(const RegexStorageHdr* hdr) {
 		stateArray[i] = state;
 	}
 
+	m_nfaMatchStartState = stateArray[hdr->m_matchStartStateId];
+	m_nfaSearchStartState = hdr->m_searchStartStateId != 1 ? stateArray[hdr->m_searchStartStateId] : NULL;
+
 	bool result = m_switchCaseContextArray.setCount(hdr->m_switchCaseCount);
 	if (!result)
 		return false;
@@ -101,7 +114,7 @@ Regex::loadNfa(const RegexStorageHdr* hdr) {
 		const RegexSwitchCaseStorage* caseStorage = (RegexSwitchCaseStorage*)p;
 
 		if (end - p < sizeof(RegexSwitchCaseStorage) ||
-			caseStorage->m_startStateId >= hdr->m_stateCount ||
+			caseStorage->m_matchStartStateId >= hdr->m_stateCount ||
 			caseStorage->m_captureCount && caseStorage->m_baseCaptureId >= hdr->m_captureCount ||
 			caseStorage->m_captureCount > hdr->m_captureCount - caseStorage->m_baseCaptureId)
 			return err::fail("invalid regex switch-case storage");
@@ -109,8 +122,7 @@ Regex::loadNfa(const RegexStorageHdr* hdr) {
 		SwitchCaseContext* context = AXL_MEM_NEW(SwitchCaseContext);
 		context->m_baseCaptureId = caseStorage->m_baseCaptureId;
 		context->m_captureCount = caseStorage->m_captureCount;
-		context->m_nfaState = stateArray[caseStorage->m_startStateId];
-		context->m_dfaState = NULL;
+		context->m_nfaMatchStartState = stateArray[caseStorage->m_matchStartStateId];
 		m_switchCaseContextList.insertTail(context);
 		m_switchCaseContextArray[i] = context;
 
@@ -150,12 +162,12 @@ Regex::loadNfa(const RegexStorageHdr* hdr) {
 			state->m_charSet = AXL_MEM_NEW(CharSet);
 
 			for (size_t j = 0; j < stateStorage->m_charRangeCount; j++) {
-				const CharRangeStorage* rangeStorage = (CharRangeStorage*)p;
-				if (end - p < sizeof(CharRangeStorage))
+				const NfaCharRangeStorage* rangeStorage = (NfaCharRangeStorage*)p;
+				if (end - p < sizeof(NfaCharRangeStorage))
 					return err::fail("invalid regex char set storage");
 
 				state->m_charSet->add(rangeStorage->m_charFrom, rangeStorage->m_charTo);
-				p += sizeof(CharRangeStorage);
+				p += sizeof(NfaCharRangeStorage);
 			}
 		}
 	}
@@ -182,6 +194,9 @@ Regex::loadDfa(const RegexStorageHdr* hdr) {
 		stateArray[i] = state;
 	}
 
+	m_dfaMatchStartState = stateArray[hdr->m_matchStartStateId];
+	m_dfaSearchStartState = hdr->m_searchStartStateId != 1 ? stateArray[hdr->m_searchStartStateId] : NULL;
+
 	bool result = m_switchCaseContextArray.setCount(hdr->m_switchCaseCount);
 	if (!result)
 		return false;
@@ -190,7 +205,6 @@ Regex::loadDfa(const RegexStorageHdr* hdr) {
 		const RegexSwitchCaseStorage* caseStorage = (RegexSwitchCaseStorage*)p;
 
 		if (end - p < sizeof(RegexSwitchCaseStorage) ||
-			caseStorage->m_startStateId >= hdr->m_stateCount ||
 			caseStorage->m_captureCount && caseStorage->m_baseCaptureId >= hdr->m_captureCount ||
 			caseStorage->m_captureCount > hdr->m_captureCount - caseStorage->m_baseCaptureId)
 			return err::fail("invalid regex switch-case storage");
@@ -198,8 +212,7 @@ Regex::loadDfa(const RegexStorageHdr* hdr) {
 		SwitchCaseContext* context = AXL_MEM_NEW(SwitchCaseContext);
 		context->m_baseCaptureId = caseStorage->m_baseCaptureId;
 		context->m_captureCount = caseStorage->m_captureCount;
-		context->m_nfaState = NULL;
-		context->m_dfaState = stateArray[caseStorage->m_startStateId];
+		context->m_nfaMatchStartState = NULL;
 		m_switchCaseContextList.insertTail(context);
 		m_switchCaseContextArray[i] = context;
 
@@ -222,24 +235,6 @@ Regex::loadDfa(const RegexStorageHdr* hdr) {
 
 		p += sizeof(DfaStateStorage);
 
-		for (size_t i = 1; i <= stateStorage->m_openCaptureCount; i++) {
-			const uint32_t* id = (uint32_t*)p;
-			if (end - p < sizeof(uint32_t) || *id >= hdr->m_captureCount)
-				return err::fail("invalid regex open capture storage");
-
-			state->m_openCaptureIdSet.add(*id);
-			p += sizeof(uint32_t);
-		}
-
-		for (size_t i = 1; i <= stateStorage->m_closeCaptureCount; i++) {
-			const uint32_t* id = (uint32_t*)p;
-			if (end - p < sizeof(uint32_t) || *id >= hdr->m_captureCount)
-				return err::fail("invalid regex close capture storage");
-
-			state->m_closeCaptureIdSet.add(*id);
-			p += sizeof(uint32_t);
-		}
-
 		for (size_t i = 1; i <= stateStorage->m_anchorMask; i++) {
 			const uint32_t* id = (uint32_t*)p;
 			if (end - p < sizeof(uint32_t) || *id >= hdr->m_stateCount)
@@ -250,18 +245,19 @@ Regex::loadDfa(const RegexStorageHdr* hdr) {
 		}
 
 		for (size_t i = 1; i <= stateStorage->m_charTransitionCount; i++) {
-			const CharTransitionStorage* transitionStorage = (CharTransitionStorage*)p;
-			if (end - p < sizeof(CharTransitionStorage) ||
+			const DfaCharTransitionStorage* transitionStorage = (DfaCharTransitionStorage*)p;
+			if (end - p < sizeof(DfaCharTransitionStorage) ||
 				transitionStorage->m_stateId >= hdr->m_stateCount)
 				return err::fail("invalid regex char transition storage");
 
 			state->m_charTransitionMap.add(
 				transitionStorage->m_charFrom,
 				transitionStorage->m_charTo,
-				stateArray[transitionStorage->m_stateId]
+				stateArray[transitionStorage->m_stateId],
+				transitionStorage->m_flags
 			);
 
-			p += sizeof(CharTransitionStorage);
+			p += sizeof(DfaCharTransitionStorage);
 		}
 	}
 
@@ -291,7 +287,9 @@ Regex::saveNfa(sl::Array<char>* buffer) {
 	hdr->m_stateCount = stateCount;
 	hdr->m_switchCaseCount = switchCaseCount;
 	hdr->m_captureCount = m_captureCount;
- 	hdr->m_dataSize = 0;
+	hdr->m_matchStartStateId = m_nfaMatchStartState ? m_nfaMatchStartState->m_id : -1;
+	hdr->m_searchStartStateId = m_nfaSearchStartState ? m_nfaSearchStartState->m_id : -1;
+	hdr->m_dataSize = 0;
 
 	size_t offset = sizeof(RegexStorageHdr);
 
@@ -301,11 +299,11 @@ Regex::saveNfa(sl::Array<char>* buffer) {
 		RegexSwitchCaseStorage* caseStorage = (RegexSwitchCaseStorage*)(buffer->p() + offset);
 		for (size_t i = 0; i < switchCaseCount; i++, caseStorage++) {
 			const SwitchCaseContext* context = m_switchCaseContextArray[i];
-			ASSERT(context->m_nfaState);
+			ASSERT(context->m_nfaMatchStartState);
 
 			caseStorage->m_baseCaptureId = context->m_baseCaptureId;
 			caseStorage->m_captureCount = context->m_captureCount;
-			caseStorage->m_startStateId = context->m_nfaState->m_id;
+			caseStorage->m_matchStartStateId = context->m_nfaMatchStartState->m_id;
 		}
 
 		offset += switchCaseSize;
@@ -315,7 +313,7 @@ Regex::saveNfa(sl::Array<char>* buffer) {
 	for (; it; it++) {
 		const NfaState* state = *it;
 		size_t stateSize = state->m_stateKind == NfaStateKind_MatchCharSet ?
-			sizeof(NfaStateStorage) + sizeof(CharRangeStorage) * state->m_charSet->getCount() :
+			sizeof(NfaStateStorage) + sizeof(NfaCharRangeStorage) * state->m_charSet->getCount() :
 			sizeof(NfaStateStorage);
 
 		buffer->appendEmptySpace(stateSize);
@@ -329,7 +327,7 @@ Regex::saveNfa(sl::Array<char>* buffer) {
 		else if (state->m_stateKind == NfaStateKind_MatchCharSet) {
 			stateStorage->m_charRangeCount = state->m_charSet->getCount();
 
-			CharRangeStorage* rangeStorage = (CharRangeStorage*)(stateStorage + 1);
+			NfaCharRangeStorage* rangeStorage = (NfaCharRangeStorage*)(stateStorage + 1);
 			CharSet::ConstIterator it = state->m_charSet->getHead();
 			for (; it; it++, rangeStorage++) {
 				rangeStorage->m_charFrom = it->getKey();
@@ -353,6 +351,8 @@ size_t
 Regex::saveDfa(sl::Array<char>* buffer) {
 	buffer->clear();
 
+	buildFullDfa();
+
 	size_t switchCaseCount = m_switchCaseContextArray.getCount();
 	size_t stateCount = m_dfaStateList.getCount();
 
@@ -369,6 +369,8 @@ Regex::saveDfa(sl::Array<char>* buffer) {
 	hdr->m_stateCount = stateCount;
 	hdr->m_switchCaseCount = switchCaseCount;
 	hdr->m_captureCount = m_captureCount;
+	hdr->m_matchStartStateId = m_dfaMatchStartState ? m_dfaMatchStartState->m_id : -1;
+	hdr->m_searchStartStateId = m_dfaSearchStartState ? m_dfaSearchStartState->m_id : -1;
 	hdr->m_dataSize = 0;
 
 	size_t offset = sizeof(RegexStorageHdr);
@@ -379,60 +381,49 @@ Regex::saveDfa(sl::Array<char>* buffer) {
 		RegexSwitchCaseStorage* caseStorage = (RegexSwitchCaseStorage*)(buffer->p() + offset);
 		for (size_t i = 0; i < switchCaseCount; i++, caseStorage++) {
 			const SwitchCaseContext* context = m_switchCaseContextArray[i];
-			ASSERT(context->m_nfaState);
+			ASSERT(context->m_nfaMatchStartState);
 
 			caseStorage->m_baseCaptureId = context->m_baseCaptureId;
 			caseStorage->m_captureCount = context->m_captureCount;
-			caseStorage->m_startStateId = getSwitchCaseDfaState(i)->m_id;
+			caseStorage->m_matchStartStateId = -1;
 		}
 
+		buildFullDfa(); // ensure switch-case DFA match states are built
 		offset += switchCaseSize;
 	}
-
-	buildFullDfa(); // ensure all DFA states are built
 
 	sl::ConstIterator<DfaState> it = m_dfaStateList.getHead();
 	for (; it; it++) {
 		const DfaState* state = *it;
-		size_t openCaptureCount = state->m_openCaptureIdSet.getCount();
-		size_t closeCaptureCount = state->m_closeCaptureIdSet.getCount();
 		size_t charTransitionCount = state->m_charTransitionMap.getCount();
 
 		size_t stateSize =
 			sizeof(DfaStateStorage) +
-			(openCaptureCount + closeCaptureCount) * sizeof(uint32_t) +
 			state->m_anchorMask * sizeof(uint32_t) +
-			charTransitionCount * sizeof(CharTransitionStorage);
+			charTransitionCount * sizeof(DfaCharTransitionStorage);
 
 		buffer->appendEmptySpace(stateSize);
 		DfaStateStorage* stateStorage = (DfaStateStorage*)(buffer->p() + offset);
 		stateStorage->m_flags = state->m_flags;
 		stateStorage->m_anchorMask = state->m_anchorMask;
 		stateStorage->m_acceptId = state->m_acceptId;
-		stateStorage->m_openCaptureCount = openCaptureCount;
-		stateStorage->m_closeCaptureCount = closeCaptureCount;
 		stateStorage->m_charTransitionCount = charTransitionCount;
 
 		uint32_t* idStorage = (uint32_t*)(stateStorage + 1);
-
-		for (size_t i = 0; i < openCaptureCount; i++, idStorage++)
-			*idStorage = state->m_openCaptureIdSet[i];
-
-		for (size_t i = 0; i < closeCaptureCount; i++, idStorage++)
-			*idStorage = state->m_closeCaptureIdSet[i];
 
 		for (size_t i = 1; i <= state->m_anchorMask; i++) {
 			const DfaState* transitionState = state->m_anchorTransitionMap[i];
 			*idStorage = transitionState ? transitionState->m_id : -1;
 		}
 
-		CharTransitionStorage* transitionStorage = (CharTransitionStorage*)idStorage;
+		DfaCharTransitionStorage* transitionStorage = (DfaCharTransitionStorage*)idStorage;
 
 		DfaCharTransitionMap::ConstIterator it2 = state->m_charTransitionMap.getHead();
 		for (; it2; it2++, transitionStorage++) {
 			transitionStorage->m_charFrom = it2->getKey();
 			transitionStorage->m_charTo = it2->m_value.m_last;
 			transitionStorage->m_stateId = it2->m_value.m_state->m_id;
+			transitionStorage->m_flags = it2->m_value.m_flags;
 		}
 
 		ASSERT((char*)transitionStorage == buffer->getEnd());
@@ -460,7 +451,7 @@ Regex::compile(
 	if (!result)
 		return false;
 
-	finalize();
+	finalize(flags);
 	return true;
 }
 
@@ -476,40 +467,30 @@ Regex::createSwitch() {
 	m_regexKind = RegexKind_Switch;
 }
 
-const DfaState*
-Regex::getSwitchCaseDfaState(size_t id) {
-	ASSERT(m_regexKind == RegexKind_Switch);
-
-	SwitchCaseContext* context = m_switchCaseContextArray[id];
-	if (!context->m_dfaState)
-		context->m_dfaState = createDfaStartState(context->m_nfaState);
-
-	return context->m_dfaState;
-}
-
 size_t
 Regex::compileSwitchCase(
 	uint_t flags,
 	const sl::StringRef& source
 ) {
 	ASSERT(m_regexKind = RegexKind_Switch);
+	ASSERT(flags ^ RegexCompileFlag_MatchOnly); // RegexCompileFlag_MatchOnly only for finalizeSwitch()
 
 	size_t id = m_switchCaseContextList.getCount();
 
 	SwitchCaseContext* context = AXL_MEM_NEW(SwitchCaseContext);
 	context->m_baseCaptureId = m_captureCount;
-	context->m_dfaState = NULL;
+	context->m_dfaMatchStartState = NULL;
 	m_switchCaseContextList.insertTail(context);
 	m_switchCaseContextArray.append(context);
 
 	RegexCompiler compiler(flags, this);
-	context->m_nfaState = compiler.compileSwitchCase(source, id);
+	context->m_nfaMatchStartState = compiler.compileSwitchCase(source, id);
 	context->m_captureCount = m_captureCount - context->m_baseCaptureId;
 	return id;
 }
 
 bool
-Regex::match(
+Regex::exec(
 	RegexState* state,
 	const void* p,
 	size_t size
@@ -526,9 +507,25 @@ Regex::match(
 }
 
 void
-Regex::finalize() {
-	// (1) get rid of epsilon transitions
-	// (2) assign NFA state IDs
+Regex::finalize(uint_t flags) {
+	if (isEmpty())
+		return;
+
+	m_nfaMatchStartState = *m_nfaStateList.getHead();
+
+	// insert search prefix (.*)
+
+	if (!(flags & RegexCompileFlag_MatchOnly)) {
+		NfaState* matchAny = AXL_MEM_NEW(NfaState);
+		NfaState* split = AXL_MEM_NEW(NfaState);
+		split->createSplit(matchAny, m_nfaMatchStartState);
+		matchAny->createMatchAnyChar(split);
+		m_nfaStateList.insertHead(matchAny);
+		m_nfaStateList.insertHead(split);
+		m_nfaSearchStartState = split;
+	}
+
+	// get rid of epsilon transitions and assign NFA state IDs
 
 	sl::List<NfaState> epsilonList; // must keep epsilon states alive while finalizing
 
@@ -543,17 +540,21 @@ Regex::finalize() {
 			state->resolveOutStates();
 		}
 	}
+
+	// demux the epsilon closure of the search prefix
+
+	if (!(flags & RegexCompileFlag_MatchOnly)) {
+		NfaDemuxer demuxer(this);
+		demuxer.demux();
+	}
 }
 
 DfaState*
-Regex::createDfaStartState(NfaState* nfaState) {
-	DfaBuilder builder(this);
+Regex::createDfaStartState(const NfaState* nfaState) {
 	DfaState* dfaState = AXL_MEM_NEW(DfaState);
 	dfaState->m_nfaStateSet.add(nfaState);
-	builder.makeEpsilonClosure(dfaState);
-	addDfaState(dfaState);
-	builder.buildCharTransitionMap(dfaState);
-	return dfaState;
+	dfaState->m_nfaStateSet.buildEpsilonClosure();
+	return addDfaState(dfaState);
 }
 
 DfaState*
@@ -579,7 +580,13 @@ Regex::printNfa() const {
 	sl::ConstIterator<NfaState> it = m_nfaStateList.getHead();
 	for (; it; it++) {
 		const NfaState* state = *it;
-		printf("%02d: ", state->m_id);
+
+		printf(
+			"%c %02d: ",
+			state == m_nfaMatchStartState ? 'M' :
+			state == m_nfaSearchStartState ? 'S' : ' ',
+			state->m_id
+		);
 
 		switch (state->m_stateKind) {
 		case NfaStateKind_Accept:
@@ -651,6 +658,9 @@ Regex::printNfa() const {
 			ASSERT(false);
 		}
 
+		if (state->m_demuxState && state->m_demuxState != (NfaState*)-1)
+			printf(" demux(%02d)", state->m_demuxState->m_id);
+
 		printf("\n");
 	}
 }
@@ -659,10 +669,15 @@ void
 Regex::printDfa() const {
 	sl::String string;
 
-	sl::ConstIterator<DfaState> it2 = m_dfaStateList.getHead();
-	for (; it2; it2++) {
-		const DfaState* state = *it2;
-		printf("%02d: { ", state->m_id);
+	sl::ConstIterator<DfaState> it = m_dfaStateList.getHead();
+	for (; it; it++) {
+		const DfaState* state = *it;
+		printf(
+			"%c %02d: { ",
+			state == m_dfaMatchStartState ? 'M' :
+			state == m_dfaSearchStartState ? 'S' : ' ',
+			state->m_id
+		);
 
 		size_t count = state->m_nfaStateSet.getCount();
 		for (size_t i = 0; i < count; i++) {
@@ -678,26 +693,6 @@ Regex::printDfa() const {
 			else
 				printf("    accept\n");
 
-		count = state->m_openCaptureIdSet.getCount();
-		if (count) {
-			printf("    open({ ");
-
-			for (size_t i = 0; i < count; i++)
-				printf("%d ", state->m_openCaptureIdSet[i]);
-
-			printf("})\n");
-		}
-
-		count = state->m_closeCaptureIdSet.getCount();
-		if (count) {
-			printf("    close({ ");
-
-			for (size_t i = 0; i < count; i++)
-				printf("%d ", state->m_closeCaptureIdSet[i]);
-
-			printf("})\n");
-		}
-
 		count = state->m_anchorTransitionMap.getCount();
 		for (size_t i = 0; i < count; i++) {
 			const DfaState* state2 = state->m_anchorTransitionMap[i];
@@ -705,10 +700,15 @@ Regex::printDfa() const {
 				printf("    %s -> %02d\n", getAnchorString(i), state2->m_id);
 		}
 
-		DfaCharTransitionMap::ConstIterator it3 = state->m_charTransitionMap.getHead();
-		for (; it3; it3++) {
-			getCharRangeString(&string, it3->getKey(), it3->m_value.m_last);
-			printf("    %s -> %02d\n", string.sz(), it3->m_value.m_state->m_id);
+		DfaCharTransitionMap::ConstIterator it2 = state->m_charTransitionMap.getHead();
+		for (; it2; it2++) {
+			getCharRangeString(&string, it2->getKey(), it2->m_value.m_last);
+			printf(
+				"    %s %c> %02d\n",
+				string.sz(),
+				(it2->m_value.m_flags & DfaTransitionFlag_Alive) ? '-' : '~',
+				it2->m_value.m_state->m_id
+			);
 		}
 	}
 }

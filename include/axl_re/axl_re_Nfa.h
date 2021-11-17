@@ -18,6 +18,8 @@
 namespace axl {
 namespace re {
 
+class Regex;
+
 //..............................................................................
 
 enum Anchor {
@@ -48,6 +50,7 @@ enum NfaStateKind {
 	NfaStateKind_MatchCharSet,
 	NfaStateKind_MatchAnyChar,
 
+	NfaStateKind_LastEpsilon    = NfaStateKind_CloseCapture,
 	NfaStateKind_FirstConsuming = NfaStateKind_MatchChar,
 	NfaStateKind_FirstStorable  = NfaStateKind_Split,
 	NfaStateKind_LastStorable   = NfaStateKind_MatchAnyChar,
@@ -61,8 +64,8 @@ struct NfaState: sl::ListLink {
 
 	union {
 		intptr_t m_unionData;
-		size_t m_captureId;
 		size_t m_acceptId;
+		size_t m_captureId;
 		utf32_t m_char;
 		Anchor m_anchor;
 		CharSet* m_charSet;
@@ -70,6 +73,7 @@ struct NfaState: sl::ListLink {
 	};
 
 	NfaState* m_nextState;
+	NfaState* m_demuxState;
 
 	NfaState();
 	~NfaState();
@@ -184,6 +188,16 @@ public:
 		return m_array.getCount();
 	}
 
+	bool
+	find(size_t id) const {
+		return m_map.getBit(id);
+	}
+
+	bool
+	find(const NfaState* state) const {
+		return m_map.getBit(state->m_id);
+	}
+
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(NfaStateSet&& src) {
@@ -213,6 +227,9 @@ public:
 	bool
 	add(const NfaState* state);
 
+	void
+	buildEpsilonClosure();
+
 	int
 	cmp(const NfaStateSet& set) const {
 		return m_map.cmp(set.m_map);
@@ -229,7 +246,7 @@ public:
 	}
 };
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//..............................................................................
 
 template <typename T>
 class NfaStateSetMap: public sl::HashTable<
@@ -238,6 +255,25 @@ class NfaStateSetMap: public sl::HashTable<
 	sl::HashDuckType<NfaStateSet>,
 	sl::EqDuckType<NfaStateSet>
 > {
+};
+
+//..............................................................................
+
+class NfaDemuxer {
+protected:
+	Regex* m_regex;
+
+public:
+	NfaDemuxer(Regex* regex) {
+		m_regex = regex;
+	}
+
+	void
+	demux();
+
+protected:
+	NfaState*
+	demuxState(NfaState* state);
 };
 
 //..............................................................................

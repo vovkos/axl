@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_re_Nfa.h"
+#include "axl_re_Regex.h"
 
 namespace axl {
 namespace re {
@@ -39,10 +40,11 @@ NfaState::NfaState() {
 	m_id = -1;
 	m_unionData = NULL;
 	m_nextState = NULL;
+	m_demuxState = NULL;
 }
 
 NfaState::~NfaState() {
-	if (m_stateKind == NfaStateKind_MatchCharSet) {
+	if (m_stateKind == NfaStateKind_MatchCharSet && (!m_demuxState || m_demuxState == (NfaState*)-1)) {
 		ASSERT(m_charSet);
 		AXL_MEM_DELETE(m_charSet);
 	}
@@ -267,6 +269,121 @@ NfaStateSet::add(const NfaState* state) {
 	m_array.append(state);
 	m_map.setBitResize(state->m_id);
 	return true;
+}
+
+void
+NfaStateSet::buildEpsilonClosure() {
+	char buffer[256];
+	sl::Array<const NfaState*> workingSet(rc::BufKind_Stack, buffer, sizeof(buffer));
+
+	size_t count = m_array.getCount();
+	for (size_t i = 0; i < count; i++) {
+		const NfaState* state = m_array[i];
+		if (state->m_stateKind <= NfaStateKind_LastEpsilon)
+			workingSet.append(state);
+	}
+
+	while (!workingSet.isEmpty()) {
+		const NfaState* state = workingSet.getBackAndPop();
+		switch (state->m_stateKind) {
+			bool isAdded;
+
+		case NfaStateKind_Split:
+			isAdded = add(state->m_nextState);
+			if (isAdded && state->m_nextState->m_stateKind <= NfaStateKind_LastEpsilon)
+				workingSet.append(state->m_nextState);
+
+			isAdded = add(state->m_splitState);
+			if (isAdded && state->m_splitState->m_stateKind <= NfaStateKind_LastEpsilon)
+				workingSet.append(state->m_splitState);
+
+			break;
+
+		case NfaStateKind_OpenCapture:
+		case NfaStateKind_CloseCapture:
+			isAdded = add(state->m_nextState);
+			if (isAdded && state->m_nextState->m_stateKind <= NfaStateKind_LastEpsilon)
+				workingSet.append(state->m_nextState);
+
+			break;
+		}
+	}
+}
+
+//..............................................................................
+
+void
+NfaDemuxer::demux() {
+	ASSERT(!m_regex->m_nfaStateList.isEmpty());
+
+	sl::Iterator<NfaState> it = m_regex->m_nfaStateList.getHead();
+
+	ASSERT(it->m_stateKind == NfaStateKind_Split && it.getNext()->m_stateKind == NfaStateKind_MatchAnyChar);
+	it.inc(2); // skip the search prefix (.*)
+
+	char buffer[256];
+	sl::Array<NfaState*> workingSet(rc::BufKind_Stack, buffer, sizeof(buffer));
+	workingSet.append(*it);
+
+	// mark the start epsilon closure as potentially needing demux
+
+	while (!workingSet.isEmpty()) {
+		NfaState* state = workingSet.getBackAndPop();
+		state->m_demuxState = (NfaState*)-1;
+
+		switch (state->m_stateKind) {
+		case NfaStateKind_Split:
+			if (!state->m_nextState->m_demuxState)
+				workingSet.append(state->m_nextState);
+
+			if (!state->m_splitState->m_demuxState)
+				workingSet.append(state->m_splitState);
+
+			break;
+
+		case NfaStateKind_OpenCapture:
+		case NfaStateKind_CloseCapture:
+			if (!state->m_nextState->m_demuxState)
+				workingSet.append(state->m_nextState);
+
+			break;
+		}
+	}
+
+	// demux states that are accessible from the outside of the start epsilon closure
+
+	for (; it; it++) {
+		NfaState* state = *it;
+
+		if (state->m_stateKind == NfaStateKind_Split && !state->m_demuxState) { // split from outside of the closure into the closure
+			if (state->m_nextState->m_demuxState == (NfaState*)-1)
+				state->m_nextState = state->m_nextState->m_demuxState = demuxState(state->m_nextState);
+			else if (state->m_nextState->m_demuxState)
+				state->m_nextState = state->m_nextState->m_demuxState;
+
+			if (state->m_splitState->m_demuxState == (NfaState*)-1)
+				state->m_splitState = state->m_splitState->m_demuxState = demuxState(state->m_splitState);
+			else if (state->m_splitState->m_demuxState)
+				state->m_splitState = state->m_splitState->m_demuxState;
+		} else if (state->m_stateKind >= NfaStateKind_MatchAnchor) { // match into the closure
+			if (state->m_nextState->m_demuxState == (NfaState*)-1)
+				state->m_nextState = state->m_nextState->m_demuxState = demuxState(state->m_nextState);
+			else if (state->m_nextState->m_demuxState)
+				state->m_nextState = state->m_nextState->m_demuxState;
+		}
+	}
+}
+
+NfaState*
+NfaDemuxer::demuxState(NfaState* state) {
+	ASSERT(state->m_demuxState == (NfaState*)-1);
+
+	NfaState* demuxState = AXL_MEM_NEW(NfaState);
+	*demuxState = *state;
+	demuxState->m_demuxState = NULL;
+	demuxState->m_id = m_regex->m_nfaStateList.getCount();
+	m_regex->m_nfaStateList.insertTail(demuxState);
+	return demuxState;
 }
 
 //..............................................................................

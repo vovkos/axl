@@ -25,13 +25,21 @@ enum RegexStorageKind {
 	RegexStorageKind_Dfa = '.AFD'
 };
 
+enum RegexStorageVersion {
+	RegexStorageVersion_v1_0_0  = 0x010000,
+	RegexStorageVersion_Current = RegexStorageVersion_v1_0_0
+};
+
 struct RegexStorageHdr {
 	uint32_t m_storageKind;
+	uint32_t m_storageVersion;
 	uint32_t m_dataSize;
 	uint32_t m_regexKind;
 	uint32_t m_stateCount;
 	uint32_t m_switchCaseCount;
 	uint32_t m_captureCount;
+	uint32_t m_matchStartStateId;
+	uint32_t m_searchStartStateId;
 
 	// followed by m_dataSize bytes:
 	// RegexSwitchCaseStorage[m_switchCaseCount]
@@ -42,7 +50,7 @@ struct RegexStorageHdr {
 struct RegexSwitchCaseStorage {
 	uint32_t m_baseCaptureId;
 	uint32_t m_captureCount;
-	uint32_t m_startStateId;
+	uint32_t m_matchStartStateId;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -63,10 +71,10 @@ struct NfaStateStorage {
 	uint32_t m_nextStateId;
 
 	// followed by:
-	// for NfaStateKind_MatchCharSet: CharRangeStorage[m_charRangeCount]
+	// for NfaStateKind_MatchCharSet: NfaCharRangeStorage[m_charRangeCount]
 };
 
-struct CharRangeStorage {
+struct NfaCharRangeStorage {
 	utf32_t m_charFrom;
 	utf32_t m_charTo; // including
 };
@@ -75,23 +83,20 @@ struct CharRangeStorage {
 
 struct DfaStateStorage {
 	uint32_t m_flags;
-	uint32_t m_anchorMask;
 	uint32_t m_acceptId;
-	uint32_t m_openCaptureCount;
-	uint32_t m_closeCaptureCount;
+	uint32_t m_anchorMask;
 	uint32_t m_charTransitionCount;
 
 	// followed by:
-	// uint32_t[m_openCaptureCount]
-	// uint32_t[m_closeCaptureCount]
 	// uint32_t[m_anchorMask + 1] (anchor transition map)
 	// CharTransitionStorage[m_charTransitionCount]
 };
 
-struct CharTransitionStorage {
+struct DfaCharTransitionStorage {
 	utf32_t m_charFrom;
 	utf32_t m_charTo; // including
 	uint32_t m_stateId;
+	uint_t m_flags; // DfaTransitionFlag
 };
 
 //..............................................................................

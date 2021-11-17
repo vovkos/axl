@@ -34,32 +34,38 @@ enum RegexKind {
 enum RegexCompileFlag {
 	RegexCompileFlag_SparseSyntax    = 0x01,
 	RegexCompileFlag_CaseInsensitive = 0x02,
-	RegexCompileFlag_NoCapture       = 0x10, // same as RegexExecFlag_NoCapture
+	RegexCompileFlag_MatchOnly       = 0x10, // don't demux NFA and no search start states
+	RegexCompileFlag_DisableCapture  = 0x20, // same as RegexExecFlag_NoCapture
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Regex {
 	friend class RegexCompiler;
+	friend class NfaDemuxer;
 	friend class DfaBuilder;
 
 protected:
 	struct SwitchCaseContext: sl::ListLink {
 		size_t m_baseCaptureId;
 		size_t m_captureCount;
-		NfaState* m_nfaState;
-		DfaState* m_dfaState;
+		const NfaState* m_nfaMatchStartState;
+		const DfaState* m_dfaMatchStartState;
 	};
 
 protected:
 	RegexKind m_regexKind;
+	size_t m_captureCount;
+	NfaState* m_nfaMatchStartState;
+	NfaState* m_nfaSearchStartState;
+	DfaState* m_dfaMatchStartState;
+	DfaState* m_dfaSearchStartState;
 	sl::List<NfaState> m_nfaStateList;
 	sl::List<DfaState> m_dfaStateList;
 	sl::List<DfaState> m_preDfaStateList;
 	NfaStateSetMap<DfaState*> m_dfaStateMap;
 	sl::List<SwitchCaseContext> m_switchCaseContextList;
 	sl::Array<SwitchCaseContext*> m_switchCaseContextArray;
-	size_t m_captureCount;
 
 public:
 	Regex();
@@ -85,15 +91,29 @@ public:
 	}
 
 	const NfaState*
-	getNfaStartState() const {
-		return *m_nfaStateList.getHead();
+	getNfaMatchStartState() const {
+		return m_nfaMatchStartState;
+	}
+
+	const NfaState*
+	getNfaSearchStartState() const {
+		return m_nfaSearchStartState;
 	}
 
 	const DfaState*
-	getDfaStartState() {
-		return !m_dfaStateList.isEmpty() ?
-			*m_dfaStateList.getHead() :
-			createDfaStartState(*m_nfaStateList.getHead());
+	getDfaMatchStartState() {
+		return
+			m_dfaMatchStartState ? m_dfaMatchStartState :
+			m_nfaMatchStartState ? m_dfaMatchStartState = createDfaStartState(m_nfaMatchStartState) :
+			NULL;
+	}
+
+	const DfaState*
+	getDfaSearchStartState() {
+		return
+			m_dfaSearchStartState ? m_dfaSearchStartState :
+			m_nfaSearchStartState ? m_dfaSearchStartState = createDfaStartState(m_nfaSearchStartState) :
+			NULL;
 	}
 
 	size_t
@@ -115,16 +135,18 @@ public:
 	}
 
 	const NfaState*
-	getSwitchCaseNfaState(size_t id) {
+	getSwitchCaseNfaMatchStartState(size_t id) {
 		ASSERT(m_regexKind == RegexKind_Switch);
-		return m_switchCaseContextArray[id]->m_nfaState;
+		return m_switchCaseContextArray[id]->m_nfaMatchStartState;
 	}
 
 	const DfaState*
-	getSwitchCaseDfaState(size_t id);
+	getSwitchCaseDfaMatchStartState(size_t id);
 
 	void
 	clear();
+
+	// serialization
 
 	size_t
 	load(
@@ -157,6 +179,8 @@ public:
 		return buffer;
 	}
 
+	// compilation
+
 	bool
 	compile(
 		uint_t flags,
@@ -183,77 +207,13 @@ public:
 	}
 
 	void
-	finalizeSwitch() {
+	finalizeSwitch(uint_t flags = 0) { // only RegexCompileFlag_MatchOnly makes sense here
 		ASSERT(m_regexKind = RegexKind_Switch);
-		finalize();
+		finalize(flags);
 	}
 
 	void
 	buildFullDfa();
-
-	bool
-	eof(RegexState* state) {
-		ASSERT(state->getRegex() == this && (state->getExecFlags() & RegexExecFlag_Stream));
-		return state->eof();
-	}
-
-	bool
-	match(
-		RegexState* state,
-		const void* p,
-		size_t size
-	);
-
-	RegexState
-	match(
-		uint_t flags,
-		enc::CharCodec* codec,
-		const void* p,
-		size_t size
-	) {
-		RegexState state(flags, codec);
-		return match(&state, p, size) ? state : RegexState();
-	}
-
-	RegexState
-	match(
-		uint_t flags,
-		enc::CharCodecKind codecKind,
-		const void* p,
-		size_t size
-	) {
-		return match(flags, enc::getCharCodec(codecKind), p, size);
-	}
-
-	RegexState
-	match(
-		uint_t flags,
-		const void* p,
-		size_t size
-	) {
-		return match(flags, enc::CharCodecKind_Utf8, p, size);
-	}
-
-	RegexState
-	match(
-		const void* p,
-		size_t size
-	) {
-		return match(0, enc::CharCodecKind_Utf8, p, size);
-	}
-
-	RegexState
-	match(
-		uint_t flags,
-		const sl::StringRef& string
-	) {
-		return match(flags, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
-	}
-
-	RegexState
-	match(const sl::StringRef& string) {
-		return match(0, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
-	}
 
 #if (_AXL_DEBUG)
 	void
@@ -263,12 +223,78 @@ public:
 	printDfa() const;
 #endif
 
+	// execution (match/search)
+
+	bool
+	exec(
+		RegexState* state,
+		const void* p,
+		size_t size
+	);
+
+	RegexState
+	exec(
+		uint_t flags,
+		enc::CharCodec* codec,
+		const void* p,
+		size_t size
+	) {
+		RegexState state(flags, codec);
+		return exec(&state, p, size) ? state : RegexState();
+	}
+
+	RegexState
+	exec(
+		uint_t flags,
+		enc::CharCodecKind codecKind,
+		const void* p,
+		size_t size
+	) {
+		return exec(flags, enc::getCharCodec(codecKind), p, size);
+	}
+
+	RegexState
+	exec(
+		uint_t flags,
+		const void* p,
+		size_t size
+	) {
+		return exec(flags, enc::CharCodecKind_Utf8, p, size);
+	}
+
+	RegexState
+	exec(
+		const void* p,
+		size_t size
+	) {
+		return exec(0, enc::CharCodecKind_Utf8, p, size);
+	}
+
+	RegexState
+	exec(
+		uint_t flags,
+		const sl::StringRef& string
+	) {
+		return exec(flags, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
+	}
+
+	RegexState
+	exec(const sl::StringRef& string) {
+		return exec(0, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
+	}
+
+	bool
+	eof(RegexState* state) {
+		ASSERT(state->getRegex() == this && (state->getExecFlags() & RegexExecFlag_Stream));
+		return state->eof();
+	}
+
 protected:
 	void
-	finalize();
+	finalize(uint_t flags);
 
 	DfaState*
-	createDfaStartState(NfaState* state);
+	createDfaStartState(const NfaState* state);
 
 	DfaState*
 	addDfaState(DfaState* state);
@@ -279,6 +305,21 @@ protected:
 	bool
 	loadDfa(const RegexStorageHdr* hdr);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+const DfaState*
+Regex::getSwitchCaseDfaMatchStartState(size_t id) {
+	ASSERT(m_regexKind == RegexKind_Switch);
+
+	SwitchCaseContext* context = m_switchCaseContextArray[id];
+	ASSERT(context->m_nfaMatchStartState);
+
+	return
+		context->m_dfaMatchStartState ? context->m_dfaMatchStartState :
+		context->m_dfaMatchStartState = createDfaStartState(context->m_nfaMatchStartState);
+}
 
 //..............................................................................
 

@@ -1,0 +1,99 @@
+//..............................................................................
+//
+//  This file is part of the AXL library.
+//
+//  AXL is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/axl/license.txt
+//
+//..............................................................................
+
+#pragma once
+
+#define _AXL_RE_REGEXMATCH_H
+
+#include "axl_re_Pch.h"
+
+namespace axl {
+namespace re {
+
+struct RegexStateImpl;
+
+//..............................................................................
+
+struct RegexMatchPos {
+	size_t m_offset;
+	size_t m_endOffset;
+
+	RegexMatchPos() {
+		m_offset = -1;
+		m_endOffset = -1;
+	}
+
+	RegexMatchPos(
+		size_t offset,
+		size_t endOffset
+	) {
+		m_offset = offset;
+		m_endOffset = endOffset;
+	}
+};
+
+//..............................................................................
+
+class RegexMatch: protected RegexMatchPos {
+	friend struct RegexStateImpl;
+
+protected:
+	enc::CharCodec* m_charCodec;
+	const char* m_p;
+	mutable sl::StringRef m_text; // cache
+
+public:
+	RegexMatch():
+		RegexMatchPos(0, 0) {
+
+		m_charCodec = NULL;
+		m_p = NULL;
+	}
+
+	size_t
+	getOffset() const {
+		return m_offset;
+	}
+
+	size_t
+	getEndOffset() const {
+		return m_endOffset;
+	}
+
+	size_t
+	getSize() const {
+		return m_endOffset - m_offset;
+	}
+
+	const char*
+	p() const {
+		return m_p;
+	}
+
+	sl::StringRef
+	getText() const  {
+		ASSERT(m_p && m_charCodec);
+ 		return !m_text.isEmpty() ? m_text : cacheText();
+	}
+
+protected:
+	sl::StringRef
+	cacheText() const {
+		return m_text = m_charCodec == enc::getCharCodec(enc::CharCodecKind_Utf8) ?
+			sl::StringRef(m_p, getSize()) :
+			m_charCodec->decode_utf8(m_p, getSize());
+	}
+};
+
+//..............................................................................
+
+} // namespace re
+} // namespace axl

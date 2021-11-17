@@ -549,6 +549,8 @@ testCharSet() {
 		printf("isSet(%d): %d\n", c, charSet.isSet(c));
 }
 
+#define _AXL_RE_TEST_SAVE 1
+
 void
 testRegex() {
 	re::StdRegexNameMgr nameMgr;
@@ -578,14 +580,13 @@ testRegex() {
 
 	bool result;
 
-	result = regex.compile("a*(b*)c");
-	// result = regex.compile("[abc]");
-	// result = regex.compile("^([abc]+)$");
+	const char src[] = "a*b*c";
+	// const char src[] = "[abc]";
+	// const char src[] = "^([abc]+)$";
 
-/*	bool result =
-		regexCompiler.incrementalCompile("(\\h{2})   ' '+ (\\d{2})") &&
-		regexCompiler.incrementalCompile("([a-z]{3}) ' '+ ([A-Z]{3})\\n");
-*/
+	printf("REGEX: %s\n\n", src);
+
+	result = regex.compile(src);
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
@@ -594,8 +595,13 @@ testRegex() {
 #if (_AXL_DEBUG)
 	printf("NFA:\n");
 	regex.printNfa();
+
+	printf("\nDFA:\n");
+	regex.buildFullDfa();
+	regex.printDfa();
 #endif
 
+#if (_AXL_RE_TEST_SAVE)
 	sl::Array<char> storage;
 	regex.saveNfa(&storage);
 	printf("\nNFA storage: %d B\n", storage.getCount());
@@ -607,13 +613,9 @@ testRegex() {
 		return;
 	}
 
-#if (_AXL_DEBUG)
+#	if (_AXL_DEBUG)
 	regex2.printNfa();
-
-	printf("\nDFA:\n");
-	regex.buildFullDfa();
-	regex.printDfa();
-#endif
+#	endif
 
 	regex.saveDfa(&storage);
 	printf("\nDFA storage: %d B\n", storage.getCount());
@@ -624,24 +626,26 @@ testRegex() {
 		return;
 	}
 
-#if (_AXL_DEBUG)
+#	if (_AXL_DEBUG)
 	regex2.printDfa();
+#	endif
 #endif
 
+	re::RegexState state;
+	const re::RegexMatch* match;
+	size_t count;
+
+#if (1)
 	const char text[] = "abxxxaaabbbbcd";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
-	re::RegexState state = regex.match(text);
+	state = regex.exec(text);
 	if (!state) {
 		printf("NO MATCH!\n");
 		return;
 	}
 
-	const re::RegexMatch* match;
-	size_t count;
-
-#if (1)
 	match = state.getMatch();
 	ASSERT(match);
 
@@ -666,7 +670,7 @@ testRegex() {
 	}
 #endif
 
-#if (1)
+#if (0)
 	printf("STREAM MATCH:\n");
 
 	state.initialize(re::RegexExecFlag_Stream);
@@ -674,7 +678,7 @@ testRegex() {
 	const char* p = text;
 	const char* end = text + lengthof(text);
 	for (; p < end; p++) {
-		result = regex.match(&state, p, 1);
+		result = regex.exec(&state, p, 1);
 		if (result && state.getMatch())
 			break;
 	}
@@ -726,8 +730,13 @@ testRegex() {
 #if (_AXL_DEBUG)
 	printf("\nNFA:\n");
 	regex.printNfa();
+
+	printf("\nDFA:\n");
+	regex.buildFullDfa();
+	regex.printDfa();
 #endif
 
+#if (_AXL_RE_TEST_SAVE)
 	regex.saveNfa(&storage);
 	printf("\nNFA storage: %d B\n", storage.getCount());
 
@@ -737,13 +746,9 @@ testRegex() {
 		return;
 	}
 
-#if (_AXL_DEBUG)
+#	if (_AXL_DEBUG)
 	regex2.printNfa();
-
-	printf("\nDFA:\n");
-	regex.buildFullDfa();
-	regex.printDfa();
-#endif
+#	endif
 
 	regex.saveDfa(&storage);
 	printf("\nDFA storage: %d B\n", storage.getCount());
@@ -754,8 +759,9 @@ testRegex() {
 		return;
 	}
 
-#if (_AXL_DEBUG)
+#	if (_AXL_DEBUG)
 	regex2.printDfa();
+#	endif
 #endif
 
 	static const char* lexemes[] = {
@@ -775,7 +781,7 @@ testRegex() {
 		printf("MATCHING: %s\n", lexemes[i]);
 
 		// re::RegexState state = regex.match(re::RegexExecFlag_ExactMatch, lexemes[i]);
-		re::RegexState state = regex.match(lexemes[i]);
+		re::RegexState state = regex.exec(lexemes[i]);
 		if (!state) {
 			printf("NO MATCH!\n");
 			continue;
@@ -794,7 +800,30 @@ testRegex() {
 		);
 	}
 #endif
+}
 
+void
+testRegex2() {
+	re::Regex regex;
+	bool result;
+
+	static const char src[] = "[a-b]*c+";
+	printf("REGEX: %s\n\n", src);
+
+	result = regex.compile(re::RegexCompileFlag_DisableCapture, src);
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+#if (_AXL_DEBUG)
+	printf("NFA:\n");
+	regex.printNfa();
+
+	printf("\nDFA:\n");
+	regex.buildFullDfa();
+	regex.printDfa();
+#endif
 }
 
 #endif

@@ -19,10 +19,16 @@ set(
 	${AXL_INC_DIR}/axl_re/axl_re_Nfa.h
 	${AXL_INC_DIR}/axl_re/axl_re_Dfa.h
 	${AXL_INC_DIR}/axl_re/axl_re_Regex.h
-	${AXL_INC_DIR}/axl_re/axl_re_RegexNameMgr.h
+	${AXL_INC_DIR}/axl_re/axl_re_RegexExec.h
+	${AXL_INC_DIR}/axl_re/axl_re_RegexMatch.h
 	${AXL_INC_DIR}/axl_re/axl_re_RegexState.h
+	${AXL_INC_DIR}/axl_re/axl_re_RegexStorage.h
+	${AXL_INC_DIR}/axl_re/axl_re_RegexNameMgr.h
 	axl_re_RegexCompiler.h
-	axl_re_RegexStorage.h
+	axl_re_RegexExecDfa.h
+	axl_re_RegexExecNfaBt.h
+	axl_re_RegexExecNfaSp.h
+	axl_re_RegexExecNfaVm.h
 )
 
 set(
@@ -33,6 +39,10 @@ set(
 	axl_re_Regex.cpp
 	axl_re_RegexCompiler.cpp
 	axl_re_RegexState.cpp
+	axl_re_RegexExecDfa.cpp
+	axl_re_RegexExecNfaBt.cpp
+	axl_re_RegexExecNfaSp.cpp
+	axl_re_RegexExecNfaVm.cpp
 )
 
 source_group(

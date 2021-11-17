@@ -48,6 +48,24 @@ RegexCompiler::Token::isValidSingle() {
 
 //..............................................................................
 
+inline
+NfaState*
+RegexCompiler::addState() {
+	NfaState* state = AXL_MEM_NEW(NfaState);
+	m_regex->m_nfaStateList.insertTail(state);
+	return state;
+}
+
+inline
+NfaState*
+RegexCompiler::insertState(NfaState* beforeState) {
+	NfaState* state = AXL_MEM_NEW(NfaState);
+	m_regex->m_nfaStateList.insertBefore(state, beforeState);
+	return state;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 void
 RegexCompiler::construct(
 	uint_t flags,
@@ -443,20 +461,6 @@ RegexCompiler::expectEof() {
 }
 
 NfaState*
-RegexCompiler::addState() {
-	NfaState* state = AXL_MEM_NEW(NfaState);
-	m_regex->m_nfaStateList.insertTail(state);
-	return state;
-}
-
-NfaState*
-RegexCompiler::insertState(NfaState* beforeState) {
-	NfaState* state = AXL_MEM_NEW(NfaState);
-	m_regex->m_nfaStateList.insertBefore(state, beforeState);
-	return state;
-}
-
-NfaState*
 RegexCompiler::expression() {
 	NfaState* op1 = concat();
 	if (!op1)
@@ -655,7 +659,7 @@ RegexCompiler::single() {
 			if (m_p + 1 < m_end && m_p[0] == '?' && m_p[1] == ':') {
 				m_p += 2;
 				return nonCapturingGroup();
-			} else if (m_flags & RegexCompileFlag_NoCapture) {
+			} else if (m_flags & RegexCompileFlag_DisableCapture) {
 				return nonCapturingGroup();
 			} else {
 				return capturingGroup();
@@ -994,8 +998,7 @@ RegexCompiler::namedRegex(const sl::StringRef& name) {
 	}
 
 	Regex subRegex;
-	RegexCompiler subRegexCompiler(RegexCompileFlag_NoCapture, &subRegex, m_nameMgr);
-
+	RegexCompiler subRegexCompiler(RegexCompileFlag_DisableCapture, &subRegex, m_nameMgr);
 	bool result = subRegexCompiler.compile(source, NULL);
 	if (!result)
 		return NULL;

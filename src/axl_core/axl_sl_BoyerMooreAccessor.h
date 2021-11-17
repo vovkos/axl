@@ -45,8 +45,8 @@ public:
 template <typename T>
 class BoyerMooreReverseAccessor: public BoyerMooreAccessor<T> {
 public:
-	BoyerMooreReverseAccessor(const T* p)
-		: BoyerMooreAccessor<T>  (p) {}
+	BoyerMooreReverseAccessor(const T* p):
+		BoyerMooreAccessor<T> (p) {}
 
 	T
 	getChar(size_t i) const {
@@ -65,7 +65,8 @@ public:
 	BoyerMooreIncrementalAccessor(
 		const T* p,
 		BoyerMooreIncrementalContext<T>* incrementalContext
-	): BoyerMooreAccessor<T>  (p) {
+	):
+		BoyerMooreAccessor<T> (p) {
 		m_incrementalContext = incrementalContext;
 	}
 
@@ -108,7 +109,8 @@ public:
 	BoyerMooreIncrementalReverseAccessor(
 		const T* p,
 		BoyerMooreIncrementalContext<T>* incrementalContext
-	): BoyerMooreIncrementalAccessor<T> (p, incrementalContext) {}
+	):
+		BoyerMooreIncrementalAccessor<T>(p, incrementalContext) {}
 
 	T
 	getChar(size_t i) const {
@@ -163,7 +165,8 @@ public:
 	TextBoyerMooreIncrementalAccessorImpl(
 		const utf32_t* p,
 		BoyerMooreIncrementalContext<utf32_t>* incrementalContext
-	): Base  (p, incrementalContext) {}
+	):
+		Base(p, incrementalContext) {}
 
 	bool
 	isDelimChar(size_t i) const {
@@ -204,7 +207,8 @@ public:
 	TextBoyerMooreCaseFoldedIncrementalAccessorImpl(
 		const utf32_t* p,
 		BoyerMooreIncrementalContext<utf32_t>* incrementalContext
-	): TextBoyerMooreIncrementalAccessorImpl<Base> (p, incrementalContext) {}
+	):
+		TextBoyerMooreIncrementalAccessorImpl<Base> (p, incrementalContext) {}
 
 	utf32_t
 	getChar(size_t i) const {
