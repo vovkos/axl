@@ -14,6 +14,9 @@
 #include "axl_re_Regex.h"
 #include "axl_re_RegexNameMgr.h"
 
+#define _AXL_RE_QUANTIFY    0
+#define _AXL_RE_NAMED_REGEX 0
+
 namespace axl {
 namespace re {
 
@@ -83,7 +86,7 @@ public:
 	NfaState*
 	compileSwitchCase(
 		const sl::StringRef& source,
-		size_t acceptId
+		size_t acceptId = 0
 	);
 
 protected:
@@ -92,6 +95,13 @@ protected:
 		uint_t flags,
 		Regex* regex,
 		RegexNameMgr* nameMgr
+	);
+
+	NfaState*
+	compileImpl(
+		const NfaState* preStart,
+		const sl::StringRef& source,
+		size_t acceptId
 	);
 
 	bool
@@ -109,8 +119,10 @@ protected:
 	bool
 	readIdentifier(sl::String* name);
 
+#if (_AXL_RE_QUANTIFY)
 	bool
 	readQuantifier(size_t* count);
+#endif
 
 	bool
 	getToken(Token* token);
@@ -122,19 +134,25 @@ protected:
 	expectEof();
 
 	NfaState*
-	addState();
+	addState(const NfaState* preStart);
 
 	NfaState*
-	insertState(NfaState* beforeState);
+	addMatchState(const NfaState* preStart);
 
 	NfaState*
-	expression();
+	insertSplitState(
+		NfaState* beforeState,
+		NfaState* splitState
+	);
 
 	NfaState*
-	concat();
+	expression(const NfaState* preStart);
 
 	NfaState*
-	repeat();
+	concat(const NfaState* preStart);
+
+	NfaState*
+	repeat(const NfaState* preStart);
 
 	NfaState*
 	question(NfaState* start);
@@ -146,22 +164,16 @@ protected:
 	plus(NfaState* start);
 
 	NfaState*
-	quantify(
-		NfaState* start,
-		size_t count
+	single(const NfaState* preStart);
+
+	NfaState*
+	charClass(const NfaState* preStart);
+
+	NfaState*
+	stdCharClass(
+		const NfaState* preStart,
+		char c
 	);
-
-	NfaState*
-	single();
-
-	NfaState*
-	charClass();
-
-	NfaState*
-	stdCharClass(char c);
-
-	NfaState*
-	namedRegex(const sl::StringRef& name);
 
 	void
 	stdCharClass(
@@ -170,37 +182,53 @@ protected:
 	);
 
 	NfaState*
-	literal(const sl::StringRef& string);
-
-	NfaState*
-	anchor(Anchor anchor);
-
-	NfaState*
-	ch(uint_t c);
-
-	void
-	ch(
-		uint_t c,
-		NfaState* start
+	literal(
+		const NfaState* preStart,
+		const sl::StringRef& string
 	);
 
 	NfaState*
-	any();
+	anchor(
+		const NfaState* preStart,
+		Anchor anchor
+	);
+
+	NfaState*
+	ch(
+		const NfaState* preStart,
+		uint_t c
+	);
+
+	NfaState*
+	any(const NfaState* preStart);
+
+#if (_AXL_RE_QUANTIFY)
+	NfaState*
+	quantify(
+		NfaState* start,
+		size_t count
+	);
 
 	NfaState*
 	clone(
 		NfaState* first,
 		NfaState* last
 	);
+#endif
 
 	bool
 	charClassItem(CharSet* charSet);
 
 	NfaState*
-	capturingGroup();
+	capturingGroup(const NfaState* preStart);
 
 	NfaState*
-	nonCapturingGroup();
+	nonCapturingGroup(const NfaState* preStart);
+
+#if (_AXL_RE_NAMED_REGEX)
+	NfaState*
+	namedRegex(const sl::StringRef& name);
+#endif
 };
 
 //..............................................................................

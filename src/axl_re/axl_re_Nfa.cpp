@@ -38,13 +38,14 @@ const char* getAnchorString(uint_t anchors) {
 NfaState::NfaState() {
 	m_stateKind = NfaStateKind_Undefined;
 	m_id = -1;
+	m_flags = 0;
 	m_unionData = NULL;
 	m_nextState = NULL;
 	m_demuxState = NULL;
 }
 
 NfaState::~NfaState() {
-	if (m_stateKind == NfaStateKind_MatchCharSet && (!m_demuxState || m_demuxState == (NfaState*)-1)) {
+	if (m_stateKind == NfaStateKind_MatchCharSet && !m_demuxState) {
 		ASSERT(m_charSet);
 		AXL_MEM_DELETE(m_charSet);
 	}
@@ -312,6 +313,35 @@ NfaStateSet::buildEpsilonClosure() {
 
 //..............................................................................
 
+struct NfaDemuxWorkingSetEntry {
+	NfaState* m_state;
+	size_t m_alternativeId; // -1 -- not in the closure
+
+	NfaDemuxWorkingSetEntry() {}
+
+	NfaDemuxWorkingSetEntry(
+		NfaState* state,
+		size_t alternativeId = -1
+	) {
+		m_state = state;
+		m_alternativeId = alternativeId;
+	}
+};
+
+NfaState*
+NfaDemuxer::demuxState(NfaState* state) {
+	ASSERT(!state->m_demuxState && (state->m_flags & NfaStateFlag_StartEpsilonClosure));
+
+	NfaState* demuxState = AXL_MEM_NEW_ARGS(NfaState, (*state));
+	demuxState->m_demuxState = NULL;
+	demuxState->m_flags &= ~NfaStateFlag_StartEpsilonClosure;
+	demuxState->m_flags |= NfaStateFlag_Demux;
+	demuxState->m_id = m_regex->m_nfaStateList.getCount();
+	m_regex->m_nfaStateList.insertTail(demuxState);
+	state->m_demuxState = demuxState;
+	return demuxState;
+}
+
 void
 NfaDemuxer::demux() {
 	ASSERT(!m_regex->m_nfaStateList.isEmpty());
@@ -321,69 +351,22 @@ NfaDemuxer::demux() {
 	ASSERT(it->m_stateKind == NfaStateKind_Split && it.getNext()->m_stateKind == NfaStateKind_MatchAnyChar);
 	it.inc(2); // skip the search prefix (.*)
 
-	char buffer[256];
-	sl::Array<NfaState*> workingSet(rc::BufKind_Stack, buffer, sizeof(buffer));
-	workingSet.append(*it);
-
-	// mark the start epsilon closure as potentially needing demux
-
-	while (!workingSet.isEmpty()) {
-		NfaState* state = workingSet.getBackAndPop();
-		state->m_demuxState = (NfaState*)-1;
-
-		switch (state->m_stateKind) {
-		case NfaStateKind_Split:
-			if (!state->m_nextState->m_demuxState)
-				workingSet.append(state->m_nextState);
-
-			if (!state->m_splitState->m_demuxState)
-				workingSet.append(state->m_splitState);
-
-			break;
-
-		case NfaStateKind_OpenCapture:
-		case NfaStateKind_CloseCapture:
-			if (!state->m_nextState->m_demuxState)
-				workingSet.append(state->m_nextState);
-
-			break;
-		}
-	}
-
 	// demux states that are accessible from the outside of the start epsilon closure
 
 	for (; it; it++) {
 		NfaState* state = *it;
 
-		if (state->m_stateKind == NfaStateKind_Split && !state->m_demuxState) { // split from outside of the closure into the closure
-			if (state->m_nextState->m_demuxState == (NfaState*)-1)
-				state->m_nextState = state->m_nextState->m_demuxState = demuxState(state->m_nextState);
-			else if (state->m_nextState->m_demuxState)
-				state->m_nextState = state->m_nextState->m_demuxState;
+		if (state->m_stateKind == NfaStateKind_Split && !(state->m_flags & NfaStateFlag_StartEpsilonClosure)) { // split from outside of the closure into the closure
+			if (state->m_nextState->m_flags & NfaStateFlag_StartEpsilonClosure)
+				state->m_nextState = getDemuxState(state->m_nextState);
 
-			if (state->m_splitState->m_demuxState == (NfaState*)-1)
-				state->m_splitState = state->m_splitState->m_demuxState = demuxState(state->m_splitState);
-			else if (state->m_splitState->m_demuxState)
-				state->m_splitState = state->m_splitState->m_demuxState;
+			if (state->m_splitState->m_flags & NfaStateFlag_StartEpsilonClosure)
+				state->m_splitState = getDemuxState(state->m_splitState);
 		} else if (state->m_stateKind >= NfaStateKind_MatchAnchor) { // match into the closure
-			if (state->m_nextState->m_demuxState == (NfaState*)-1)
-				state->m_nextState = state->m_nextState->m_demuxState = demuxState(state->m_nextState);
-			else if (state->m_nextState->m_demuxState)
-				state->m_nextState = state->m_nextState->m_demuxState;
+			if (state->m_nextState->m_flags & NfaStateFlag_StartEpsilonClosure)
+				state->m_nextState = getDemuxState(state->m_nextState);
 		}
 	}
-}
-
-NfaState*
-NfaDemuxer::demuxState(NfaState* state) {
-	ASSERT(state->m_demuxState == (NfaState*)-1);
-
-	NfaState* demuxState = AXL_MEM_NEW(NfaState);
-	*demuxState = *state;
-	demuxState->m_demuxState = NULL;
-	demuxState->m_id = m_regex->m_nfaStateList.getCount();
-	m_regex->m_nfaStateList.insertTail(demuxState);
-	return demuxState;
 }
 
 //..............................................................................

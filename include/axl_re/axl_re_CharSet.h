@@ -112,16 +112,12 @@ appendCharRangeString(
 	utf32_t to
 );
 
-inline
 void
 getCharRangeString(
 	sl::String* string,
 	utf32_t from,
 	utf32_t to
-) {
-	string->clear();
-	appendCharRangeString(string, from, to);
-}
+);
 
 //..............................................................................
 

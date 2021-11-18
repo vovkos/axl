@@ -549,38 +549,21 @@ testCharSet() {
 		printf("isSet(%d): %d\n", c, charSet.isSet(c));
 }
 
-#define _AXL_RE_TEST_SAVE 1
+#define _AXL_RE_TEST_SAVE 0
 
 void
 testRegex() {
 	re::StdRegexNameMgr nameMgr;
-
 	nameMgr.addName("ws",  "[ \\t\\r\\n]");
 	nameMgr.addName("dec", "[0-9]");
 
 	uint_t flags = 0; // re::RegexCompiler::Flag_SparseSyntax;
 
 	re::Regex regex;
+	bool result = true;
 
-/*	char const* src[] = {
-		"'\\x02' V '\\r'",
-	};
-
-	for (size_t i = 0; i < countof(src); i++) {
-		bool result = regexCompiler.incrementalCompile(src[i]);
-		if (!result) {
-			printf("error: %s\n", err::getLastErrorDescription().sz());
-			return;
-		}
-	}
-
-	regexCompiler.finalize();
-	regex.print();
-*/
-
-	bool result;
-
-	const char src[] = "a*b*c";
+#if (1)
+	const char src[] = "a|[a-z]+";
 	// const char src[] = "[abc]";
 	// const char src[] = "^([abc]+)$";
 
@@ -599,6 +582,7 @@ testRegex() {
 	printf("\nDFA:\n");
 	regex.buildFullDfa();
 	regex.printDfa();
+#endif
 #endif
 
 #if (_AXL_RE_TEST_SAVE)
@@ -635,8 +619,8 @@ testRegex() {
 	const re::RegexMatch* match;
 	size_t count;
 
-#if (1)
-	const char text[] = "abxxxaaabbbbcd";
+#if (0)
+	const char text[] = "abxccxxaaabbbbccd";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
@@ -708,14 +692,14 @@ testRegex() {
 	}
 #endif
 
-#if (1)
+#if (0)
 	regex.createSwitch();
 	regex.compileSwitchCase("char");
 	regex.compileSwitchCase("int");
-	regex.compileSwitchCase("long");
+	/*regex.compileSwitchCase("long");
 	regex.compileSwitchCase("[0-9]+");
 	regex.compileSwitchCase("0x[0-9a-fA-F]+");
-	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*");
+	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*#");*/
 	regex.finalizeSwitch();
 
 	static const char* caseNameMap[] = {
@@ -764,15 +748,16 @@ testRegex() {
 #	endif
 #endif
 
+#	if (0)
 	static const char* lexemes[] = {
-		"char",
+		"sukacharp",
 		" int",
 		"  long",
 		"12345",
 		" 0xabcdef",
 		"  0x123abdef",
-		"suka",
-		" suka_hui_123",
+		"suka#",
+		" suka_hui_123#",
 	};
 
 	printf("\n");
@@ -799,6 +784,7 @@ testRegex() {
 			match->getText().sz()
 		);
 	}
+#	endif
 #endif
 }
 

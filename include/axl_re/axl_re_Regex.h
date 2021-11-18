@@ -55,6 +55,7 @@ protected:
 
 protected:
 	RegexKind m_regexKind;
+	size_t m_startCount;
 	size_t m_captureCount;
 	NfaState* m_nfaMatchStartState;
 	NfaState* m_nfaSearchStartState;

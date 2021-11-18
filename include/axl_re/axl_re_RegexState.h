@@ -44,6 +44,7 @@ struct RegexStateImpl: public rc::RefCount {
 	uint_t m_prevCharFlags;
 	size_t m_offset;
 	size_t m_matchAcceptId;
+	sl::Array<size_t> m_alternativeOffsetArray;
 	RegexMatch m_match;
 	sl::BoxList<RegexMatch> m_subMatchList;
 	sl::Array<RegexMatch*> m_subMatchArray;

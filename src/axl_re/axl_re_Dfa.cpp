@@ -13,7 +13,7 @@
 #include "axl_re_Dfa.h"
 #include "axl_re_Regex.h"
 
-#define _AXL_RE_DFA_MERGE_CHAR_RANGES 1
+#define _AXL_RE_DFA_MERGE_CHAR_RANGES 0
 
 namespace axl {
 namespace re {
@@ -105,15 +105,6 @@ struct DfaAtmWorkingSetEntry {
 	DfaAtmWorkingSetEntry() {}
 
 	DfaAtmWorkingSetEntry(
-		DfaState* dfaState,
-		const NfaState* nfaState,
-		uint_t anchors = 0
-	) {
-		setup(dfaState, nfaState, anchors);
-	}
-
-	void
-	setup(
 		DfaState* dfaState,
 		const NfaState* nfaState,
 		uint_t anchors = 0

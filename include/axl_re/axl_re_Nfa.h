@@ -58,9 +58,17 @@ enum NfaStateKind {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum NfaStateFlag {
+	NfaStateFlag_StartEpsilonClosure = 0x01,
+	NfaStateFlag_Demux               = 0x02,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 struct NfaState: sl::ListLink {
 	NfaStateKind m_stateKind;
 	size_t m_id;
+	uint_t m_flags;
 
 	union {
 		intptr_t m_unionData;
@@ -74,6 +82,7 @@ struct NfaState: sl::ListLink {
 
 	NfaState* m_nextState;
 	NfaState* m_demuxState;
+	sl::BitMap m_startIdSet;
 
 	NfaState();
 	~NfaState();
@@ -272,6 +281,11 @@ public:
 	demux();
 
 protected:
+	NfaState*
+	getDemuxState(NfaState* state) {
+		return state->m_demuxState ? state->m_demuxState : demuxState(state);
+	}
+
 	NfaState*
 	demuxState(NfaState* state);
 };

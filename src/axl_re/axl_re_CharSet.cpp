@@ -147,6 +147,24 @@ appendCharRangeString(
 	}
 }
 
+void
+getCharRangeString(
+	sl::String* string,
+	utf32_t from,
+	utf32_t to
+) {
+	string->clear();
+	if (from == to) {
+		*string = '\'';
+		appendCharRangeString(string, from, to);
+		*string += '\'';
+	} else {
+		*string = '[';
+		appendCharRangeString(string, from, to);
+		*string += ']';
+	}
+}
+
 //..............................................................................
 
 } // namespace re

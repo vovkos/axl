@@ -21,6 +21,7 @@ namespace re {
 
 Regex::Regex() {
 	m_regexKind = RegexKind_Undefined;
+	m_startCount = 0;
 	m_captureCount = 0;
 	m_nfaMatchStartState = NULL;
 	m_nfaSearchStartState = NULL;
@@ -31,6 +32,7 @@ Regex::Regex() {
 void
 Regex::clear() {
 	m_regexKind = RegexKind_Undefined;
+	m_startCount = 0;
 	m_captureCount = 0;
 	m_nfaMatchStartState = NULL;
 	m_nfaSearchStartState = NULL;
@@ -582,9 +584,11 @@ Regex::printNfa() const {
 		const NfaState* state = *it;
 
 		printf(
-			"%c %02d: ",
+			"%c %c (%02d): ",
 			state == m_nfaMatchStartState ? 'M' :
 			state == m_nfaSearchStartState ? 'S' : ' ',
+			(state->m_flags & NfaStateFlag_StartEpsilonClosure) ? '*' :
+			(state->m_flags & NfaStateFlag_Demux) ? '+' : ' ',
 			state->m_id
 		);
 
@@ -661,6 +665,18 @@ Regex::printNfa() const {
 		if (state->m_demuxState && state->m_demuxState != (NfaState*)-1)
 			printf(" demux(%02d)", state->m_demuxState->m_id);
 
+		size_t i = state->m_startIdSet.findBit(0);
+		if (i != -1) {
+			printf(" start({");
+
+			do {
+				printf(" %02d", i);
+				i = state->m_startIdSet.findBit(++i);
+			} while (i != -1);
+
+			printf(" })");
+		}
+
 		printf("\n");
 	}
 }
@@ -673,11 +689,13 @@ Regex::printDfa() const {
 	for (; it; it++) {
 		const DfaState* state = *it;
 		printf(
-			"%c %02d: { ",
+			"%c %02d: nfa({ ",
 			state == m_dfaMatchStartState ? 'M' :
 			state == m_dfaSearchStartState ? 'S' : ' ',
 			state->m_id
 		);
+
+#define INDENT "      "
 
 		size_t count = state->m_nfaStateSet.getCount();
 		for (size_t i = 0; i < count; i++) {
@@ -685,26 +703,26 @@ Regex::printDfa() const {
 			printf("%02d ", nfaState->m_id);
 		}
 
-		printf("}\n");
+		printf("})\n");
 
 		if (state->m_flags & DfaStateFlag_Accept)
 			if (m_regexKind == RegexKind_Switch)
-				printf("    accept #%0d\n", state->m_acceptId);
+				printf(INDENT "accept #%0d\n", state->m_acceptId);
 			else
-				printf("    accept\n");
+				printf(INDENT "accept\n");
 
 		count = state->m_anchorTransitionMap.getCount();
 		for (size_t i = 0; i < count; i++) {
 			const DfaState* state2 = state->m_anchorTransitionMap[i];
 			if (state2)
-				printf("    %s -> %02d\n", getAnchorString(i), state2->m_id);
+				printf(INDENT "%s -> %02d\n", getAnchorString(i), state2->m_id);
 		}
 
 		DfaCharTransitionMap::ConstIterator it2 = state->m_charTransitionMap.getHead();
 		for (; it2; it2++) {
 			getCharRangeString(&string, it2->getKey(), it2->m_value.m_last);
 			printf(
-				"    %s %c> %02d\n",
+				INDENT "%s %c> %02d\n",
 				string.sz(),
 				(it2->m_value.m_flags & DfaTransitionFlag_Alive) ? '-' : '~',
 				it2->m_value.m_state->m_id
