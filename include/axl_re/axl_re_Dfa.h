@@ -16,6 +16,8 @@
 #include "axl_re_Nfa.h"
 #include "axl_re_CharRangeMap.h"
 
+#define _AXL_RE_DFA_MERGE_CHAR_RANGES 1
+
 namespace axl {
 namespace re {
 
@@ -24,36 +26,11 @@ struct DfaState;
 
 //..............................................................................
 
-// when searching, DFA never completely dies out due to the (.*) prefix.
-// hence, we explicitly mark those transitions that keep the "matching" portion
-// of the DFA alive
-
-enum DfaTransitionFlag {
-	DfaTransitionFlag_Alive = 0x01,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct DfaTransition {
-	const DfaState* m_state;
-	uint_t m_flags;
-
-	DfaTransition() {
-		m_state = NULL;
-		m_flags = 0;
-	}
-
-	operator bool () const {
-		return m_state != NULL;
-	}
-};
-
-//..............................................................................
-
 class DfaCharTransitionMap {
 public:
-	struct Value: DfaTransition {
+	struct Value {
 		utf32_t m_last;
+		const DfaState* m_state;
 	};
 
 	typedef sl::RbTreeIterator<utf32_t, Value> Iterator;
@@ -88,18 +65,17 @@ public:
 		return m_map.getTail();
 	}
 
-	DfaTransition
+	const DfaState*
 	find(utf32_t c) const {
 		ConstIterator it = m_map.find(c, sl::BinTreeFindRelOp_Le);
-		return it && c <= it->m_value.m_last ? it->m_value : DfaTransition();
+		return it && c <= it->m_value.m_last ? it->m_value.m_state : NULL;
 	}
 
-	void
+	bool
 	add(
 		utf32_t from,
 		utf32_t to,
-		const DfaState* state,
-		uint_t flags
+		const DfaState* state
 	);
 };
 
@@ -115,17 +91,24 @@ enum DfaStateFlag {
 
 struct DfaState: sl::ListLink {
 	size_t m_id;
+	size_t m_acceptId;
 	uint_t m_flags;
 	uint_t m_anchorMask;
-	size_t m_acceptId;
 	NfaStateSet m_nfaStateSet;
 	sl::Array<const DfaState*> m_anchorTransitionMap;
 	DfaCharTransitionMap m_charTransitionMap;
 
 	DfaState();
 
+	bool
+	isFinal() const {
+		return m_anchorTransitionMap.isEmpty() && m_charTransitionMap.isEmpty();
+	}
+
+#if (_AXL_DEBUG)
 	void
-	finalize();
+	print(FILE* file = stdout) const;
+#endif
 };
 
 //..............................................................................
@@ -134,24 +117,12 @@ class DfaBuilder {
 protected:
 	// ensure unsigned comparisons in CharRangeMap (we need 0x80000000)
 
-	struct CharRangeListEntry: sl::ListLink {
-		uint32_t m_last;
-		uint_t m_transitionFlags;
-		const NfaState* m_nfaState;
-	};
-
-	struct CharRangeMapEntry {
-		sl::List<CharRangeListEntry> m_rangeList;
-		NfaStateSet m_nfaStateSet;
-		uint_t m_transitionFlags;
-	};
-
-	typedef sl::RbTree<uint32_t, CharRangeMapEntry> CharRangeMap;
+	typedef sl::RbTree<uint32_t, NfaStateSet> CharRangeMap;
 	typedef CharRangeMap::Iterator CharRangeMapIterator;
 
 protected:
 	Regex* m_regex;
-	sl::RbTree<uint32_t, CharRangeMapEntry> m_charRangeMap;
+	CharRangeMap m_charRangeMap;
 
 public:
 	DfaBuilder(Regex* regex) {
@@ -172,35 +143,48 @@ protected:
 	buildCharTransitionMap(DfaState* state);
 
 	void
+	visitMatchChar(uint32_t c) {
+		visitMatchCharRange(c, c);
+	}
+
+	void
+	visitMatchCharSet(const CharSet& charSet);
+
+	void
+	visitMatchAnyChar() {
+		visitMatchCharRange(0, 0x7fffffff);
+	}
+
+	void
+	visitMatchCharRange(
+		uint32_t from,
+		uint32_t to
+	);
+
+	void
 	addMatchChar(
 		uint32_t c,
-		const NfaState* state,
-		uint_t transitionFlags
+		const NfaState* state
 	) {
-		addMatchCharRange(c, c, state, transitionFlags);
+		addMatchCharRange(c, c, state);
 	}
 
 	void
 	addMatchCharSet(
 		const CharSet& charSet,
-		const NfaState* state,
-		uint_t transitionFlags
+		const NfaState* state
 	);
 
 	void
-	addMatchAnyChar(
-		const NfaState* state,
-		uint_t transitionFlags
-	) {
-		addMatchCharRange(0, 0x7fffffff, state, transitionFlags);
+	addMatchAnyChar(const NfaState* state) {
+		addMatchCharRange(0, 0x7fffffff, state);
 	}
 
 	void
 	addMatchCharRange(
 		uint32_t from,
 		uint32_t to,
-		const NfaState* state,
-		uint_t transitionFlags
+		const NfaState* state
 	);
 };
 

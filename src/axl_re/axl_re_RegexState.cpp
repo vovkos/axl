@@ -126,13 +126,6 @@ RegexStateImpl::calcAnchors(utf32_t c) {
 	return anchors;
 }
 
-void
-RegexStateImpl::accept(size_t acceptId) {
-	AXL_RE_TRACE_CAPTURE("%p: accept(%d)\n", m_offset, acceptId);
-	m_matchAcceptId = acceptId;
-	m_match.m_endOffset = m_offset;
-}
-
 bool
 RegexStateImpl::finalize(bool isEof) {
 	if (m_matchAcceptId == -1)
@@ -157,7 +150,7 @@ RegexStateImpl::finalize(bool isEof) {
 	}
 
 	if (m_execFlags & RegexExecFlag_DisableCapture)
-		m_subMatchArray.copy(&m_match);
+		m_subMatchArray.copy(&m_match); /*
 	else if (m_regex->getRegexKind() != RegexKind_Switch)
 		createSubMatches(
 			0,
@@ -169,7 +162,7 @@ RegexStateImpl::finalize(bool isEof) {
 			m_regex->getSwitchCaseBaseCaptureId(m_matchAcceptId),
 			m_regex->getSwitchCaseCaptureCount(m_matchAcceptId),
 			m_engine->getCapturePosArray()
-		);
+		); */
 
 	return true;
 }

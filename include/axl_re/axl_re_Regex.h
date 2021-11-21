@@ -46,8 +46,7 @@ class Regex {
 	friend class DfaBuilder;
 
 protected:
-	struct SwitchCaseContext: sl::ListLink {
-		size_t m_baseCaptureId;
+	struct SwitchCase {
 		size_t m_captureCount;
 		const NfaState* m_nfaMatchStartState;
 		const DfaState* m_dfaMatchStartState;
@@ -55,7 +54,6 @@ protected:
 
 protected:
 	RegexKind m_regexKind;
-	size_t m_startCount;
 	size_t m_captureCount;
 	NfaState* m_nfaMatchStartState;
 	NfaState* m_nfaSearchStartState;
@@ -65,8 +63,7 @@ protected:
 	sl::List<DfaState> m_dfaStateList;
 	sl::List<DfaState> m_preDfaStateList;
 	NfaStateSetMap<DfaState*> m_dfaStateMap;
-	sl::List<SwitchCaseContext> m_switchCaseContextList;
-	sl::Array<SwitchCaseContext*> m_switchCaseContextArray;
+	sl::Array<SwitchCase> m_switchCaseArray;
 
 public:
 	Regex();
@@ -120,25 +117,13 @@ public:
 	size_t
 	getSwitchCaseCount() {
 		ASSERT(m_regexKind == RegexKind_Switch);
-		return m_switchCaseContextArray.getCount();
-	}
-
-	size_t
-	getSwitchCaseBaseCaptureId(size_t id) {
-		ASSERT(m_regexKind == RegexKind_Switch);
-		return m_switchCaseContextArray[id]->m_baseCaptureId;
-	}
-
-	size_t
-	getSwitchCaseCaptureCount(size_t id) {
-		ASSERT(m_regexKind == RegexKind_Switch);
-		return m_switchCaseContextArray[id]->m_captureCount;
+		return m_switchCaseArray.getCount();
 	}
 
 	const NfaState*
 	getSwitchCaseNfaMatchStartState(size_t id) {
 		ASSERT(m_regexKind == RegexKind_Switch);
-		return m_switchCaseContextArray[id]->m_nfaMatchStartState;
+		return m_switchCaseArray[id].m_nfaMatchStartState;
 	}
 
 	const DfaState*
@@ -161,22 +146,12 @@ public:
 	}
 
 	size_t
-	saveNfa(sl::Array<char>* buffer);
-
-	size_t
-	saveDfa(sl::Array<char>* buffer);
+	save(sl::Array<char>* buffer);
 
 	sl::Array<char>
-	saveNfa() {
+	save() {
 		sl::Array<char> buffer;
-		saveNfa(&buffer);
-		return buffer;
-	}
-
-	sl::Array<char>
-	saveDfa() {
-		sl::Array<char> buffer;
-		saveDfa(&buffer);
+		save(&buffer);
 		return buffer;
 	}
 
@@ -194,7 +169,7 @@ public:
 	}
 
 	void
-	createSwitch();
+	createSwitch(size_t caseCountHint = 4);
 
 	size_t
 	compileSwitchCase(
@@ -218,10 +193,10 @@ public:
 
 #if (_AXL_DEBUG)
 	void
-	printNfa() const;
+	printNfa(FILE* file = stdout) const;
 
 	void
-	printDfa() const;
+	printDfa(FILE* file = stdout) const;
 #endif
 
 	// execution (match/search)
@@ -299,12 +274,6 @@ protected:
 
 	DfaState*
 	addDfaState(DfaState* state);
-
-	bool
-	loadNfa(const RegexStorageHdr* hdr);
-
-	bool
-	loadDfa(const RegexStorageHdr* hdr);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -314,12 +283,12 @@ const DfaState*
 Regex::getSwitchCaseDfaMatchStartState(size_t id) {
 	ASSERT(m_regexKind == RegexKind_Switch);
 
-	SwitchCaseContext* context = m_switchCaseContextArray[id];
-	ASSERT(context->m_nfaMatchStartState);
+	SwitchCase& scase = m_switchCaseArray[id];
+	ASSERT(scase.m_nfaMatchStartState);
 
 	return
-		context->m_dfaMatchStartState ? context->m_dfaMatchStartState :
-		context->m_dfaMatchStartState = createDfaStartState(context->m_nfaMatchStartState);
+		scase.m_dfaMatchStartState ? scase.m_dfaMatchStartState :
+		scase.m_dfaMatchStartState = createDfaStartState(scase.m_nfaMatchStartState);
 }
 
 //..............................................................................

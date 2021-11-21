@@ -58,17 +58,9 @@ enum NfaStateKind {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum NfaStateFlag {
-	NfaStateFlag_StartEpsilonClosure = 0x01,
-	NfaStateFlag_Demux               = 0x02,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 struct NfaState: sl::ListLink {
 	NfaStateKind m_stateKind;
 	size_t m_id;
-	uint_t m_flags;
 
 	union {
 		intptr_t m_unionData;
@@ -81,8 +73,6 @@ struct NfaState: sl::ListLink {
 	};
 
 	NfaState* m_nextState;
-	NfaState* m_demuxState;
-	sl::BitMap m_startIdSet;
 
 	NfaState();
 	~NfaState();
@@ -111,7 +101,7 @@ struct NfaState: sl::ListLink {
 	);
 
 	void
-	createAccept(size_t acceptId);
+	createAccept(size_t id);
 
 	void
 	createMatchAnchor(
@@ -160,6 +150,11 @@ struct NfaState: sl::ListLink {
 
 	void
 	copy(NfaState& src);
+
+#if (_AXL_DEBUG)
+	void
+	print(FILE* file = stdout) const;
+#endif
 };
 
 //..............................................................................
@@ -170,18 +165,6 @@ protected:
 	sl::BitMap m_map;
 
 public:
-	NfaStateSet() {}
-
-#if (_AXL_CPP_HAS_RVALUE_REF)
-	NfaStateSet(NfaStateSet&& src) {
-		move(std::move(src));
-	}
-#endif
-
-	NfaStateSet(const NfaStateSet& src) {
-		copy(src);
-	}
-
 	const NfaState*
 	operator [] (size_t i) const {
 		return m_array[i];
@@ -192,9 +175,19 @@ public:
 		return m_array.isEmpty();
 	}
 
+	bool
+	isAccept() const {
+		return !m_array.isEmpty() && m_array.getBack()->m_stateKind == NfaStateKind_Accept;
+	}
+
 	size_t
 	getCount() const {
 		return m_array.getCount();
+	}
+
+	const NfaState*
+	getLastState() const {
+		return m_array.getBack();
 	}
 
 	bool
@@ -236,22 +229,20 @@ public:
 	bool
 	add(const NfaState* state);
 
+	// NFA sets are ORDERED!
+
 	void
 	buildEpsilonClosure();
 
-	int
-	cmp(const NfaStateSet& set) const {
-		return m_map.cmp(set.m_map);
-	}
-
 	bool
 	isEqual(const NfaStateSet& set) const {
-		return m_map.isEqual(set.m_map);
+		size_t count = m_array.getCount();
+		return count == set.m_array.getCount() && memcmp(m_array, set.m_array, count * sizeof(NfaState*)) == 0;
 	}
 
 	size_t
 	hash() const {
-		return m_map.hash();
+		return sl::djb2(m_array, m_array.getCount() * sizeof(NfaState*));
 	}
 };
 
@@ -264,30 +255,6 @@ class NfaStateSetMap: public sl::HashTable<
 	sl::HashDuckType<NfaStateSet>,
 	sl::EqDuckType<NfaStateSet>
 > {
-};
-
-//..............................................................................
-
-class NfaDemuxer {
-protected:
-	Regex* m_regex;
-
-public:
-	NfaDemuxer(Regex* regex) {
-		m_regex = regex;
-	}
-
-	void
-	demux();
-
-protected:
-	NfaState*
-	getDemuxState(NfaState* state) {
-		return state->m_demuxState ? state->m_demuxState : demuxState(state);
-	}
-
-	NfaState*
-	demuxState(NfaState* state);
 };
 
 //..............................................................................

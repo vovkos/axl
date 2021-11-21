@@ -18,8 +18,19 @@ namespace re {
 
 //..............................................................................
 
+RegexExecDfa::RegexExecDfa(RegexStateImpl* parent):
+	RegexExecEngine(parent) {
+	m_state = NULL;
+	m_matchEndOffset = -1;
+	m_matchAcceptId = -1;
+
+}
+
 void
 RegexExecDfa::reset() {
+	m_matchEndOffset = -1;
+	m_matchAcceptId = -1;
+
 	gotoState(
 		(m_parent->m_execFlags & RegexExecFlag_AnchorDataBegin) ?
 			m_parent->m_regex->getDfaMatchStartState() :
@@ -52,21 +63,14 @@ RegexExecDfa::exec(
 				gotoState(m_state->m_anchorTransitionMap[anchors]);
 			}
 
-			DfaTransition transition = m_state->m_charTransitionMap.find(c);
-			if (!transition)
+			const DfaState* nextState = m_state->m_charTransitionMap.find(c);
+			if (!nextState)
 				return m_parent->finalize(false);
 
-			if (!(transition.m_flags & DfaTransitionFlag_Alive)) {
-				if (m_parent->m_matchAcceptId != -1)
-					return m_parent->finalize(false);
-
-				m_parent->resetMatchOffset();
-			}
-
 			m_parent->m_offset += cplBuffer[i];
-			gotoState(transition.m_state);
+			gotoState(nextState);
 
-			if (transition.m_state->m_flags & DfaStateFlag_Final)
+			if (nextState->m_flags & DfaStateFlag_Final)
 				return m_parent->finalize(false);
 		}
 	}
@@ -100,8 +104,10 @@ RegexExecDfa::gotoState(const DfaState* state) {
 
 	// process accept state
 
-	if (state->m_flags & DfaStateFlag_Accept)
-		m_parent->accept(state->m_acceptId);
+	if (state->m_flags & DfaStateFlag_Accept) {
+		m_matchAcceptId = state->m_acceptId;
+		m_matchEndOffset = m_parent->m_offset;
+	}
 
 	m_state = state;
 }

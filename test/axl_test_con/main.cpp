@@ -563,7 +563,7 @@ testRegex() {
 	bool result = true;
 
 #if (1)
-	const char src[] = "a|[a-z]+";
+	const char src[] = "a|[a-z]+1";
 	// const char src[] = "[abc]";
 	// const char src[] = "^([abc]+)$";
 

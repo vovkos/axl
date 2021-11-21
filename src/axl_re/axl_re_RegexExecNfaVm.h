@@ -25,12 +25,6 @@ public:
 	}
 
 	virtual
-	sl::ArrayRef<RegexMatchPos>
-	getCapturePosArray() {
-		return sl::ArrayRef<RegexMatchPos>(); // not yet
-	}
-
-	virtual
 	void
 	reset();
 

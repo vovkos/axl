@@ -139,8 +139,8 @@ RegexExecNfaSp::advanceNonConsumingStates(uint32_t anchors) {
 			const NfaState* state = m_nonConsumingStateSetTable[srcSetIdx][i];
 			switch (state->m_stateKind) {
 			case NfaStateKind_Accept:
-				if (m_parent->m_offset > m_parent->m_match.getEndOffset() || state->m_acceptId < m_parent->m_matchAcceptId)
-					m_parent->accept(state->m_acceptId);
+				// if (m_parent->m_offset > m_parent->m_match.getEndOffset() || state->m_acceptId < m_parent->m_matchAcceptId)
+				//	m_parent->accept(state->m_acceptId);
 
 				break;
 

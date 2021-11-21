@@ -31,12 +31,6 @@ public:
 	RegexExecNfaSp(RegexStateImpl* parent);
 
 	virtual
-	sl::ArrayRef<RegexMatchPos>
-	getCapturePosArray() {
-		return m_capturePosArray;
-	}
-
-	virtual
 	void
 	reset();
 

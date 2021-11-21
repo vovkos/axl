@@ -72,10 +72,6 @@ public:
 	virtual
 	bool
 	eof() = 0;
-
-	virtual
-	sl::ArrayRef<RegexMatchPos>
-	getCapturePosArray() = 0;
 };
 
 //..............................................................................

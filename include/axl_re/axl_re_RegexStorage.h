@@ -20,35 +20,33 @@ namespace re {
 
 //..............................................................................
 
-enum RegexStorageKind {
-	RegexStorageKind_Nfa = '.AFN',
-	RegexStorageKind_Dfa = '.AFD'
+enum {
+	RegexStorageSignature = '.AFN',
 };
 
 enum RegexStorageVersion {
-	RegexStorageVersion_v1_0_0  = 0x010000,
-	RegexStorageVersion_Current = RegexStorageVersion_v1_0_0
+	RegexStorageVersion_1_0_0   = 0x010000,
+	RegexStorageVersion_Current = RegexStorageVersion_1_0_0,
 };
 
 struct RegexStorageHdr {
-	uint32_t m_storageKind;
-	uint32_t m_storageVersion;
+	uint32_t m_signature;
+	uint32_t m_version;
 	uint32_t m_dataSize;
 	uint32_t m_regexKind;
+	uint32_t m_captureCount;
 	uint32_t m_stateCount;
 	uint32_t m_switchCaseCount;
-	uint32_t m_captureCount;
 	uint32_t m_matchStartStateId;
 	uint32_t m_searchStartStateId;
 
 	// followed by m_dataSize bytes:
 	// RegexSwitchCaseStorage[m_switchCaseCount]
-	// for RegexStorageKind_Nfa: NfaStateStorage[m_stateCount]
-	// for RegexStorageKind_Dfa: DfaStateStorage[m_stateCount]
+	// NfaStateStorage[m_stateCount]
 };
 
 struct RegexSwitchCaseStorage {
-	uint32_t m_baseCaptureId;
+	uint32_t m_startCount;
 	uint32_t m_captureCount;
 	uint32_t m_matchStartStateId;
 };
@@ -77,26 +75,6 @@ struct NfaStateStorage {
 struct NfaCharRangeStorage {
 	utf32_t m_charFrom;
 	utf32_t m_charTo; // including
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct DfaStateStorage {
-	uint32_t m_flags;
-	uint32_t m_acceptId;
-	uint32_t m_anchorMask;
-	uint32_t m_charTransitionCount;
-
-	// followed by:
-	// uint32_t[m_anchorMask + 1] (anchor transition map)
-	// CharTransitionStorage[m_charTransitionCount]
-};
-
-struct DfaCharTransitionStorage {
-	utf32_t m_charFrom;
-	utf32_t m_charTo; // including
-	uint32_t m_stateId;
-	uint_t m_flags; // DfaTransitionFlag
 };
 
 //..............................................................................

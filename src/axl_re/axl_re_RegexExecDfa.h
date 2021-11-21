@@ -21,18 +21,11 @@ namespace re {
 class RegexExecDfa: public RegexExecEngine {
 protected:
 	const DfaState* m_state;
+	size_t m_matchEndOffset;
+	size_t m_matchAcceptId;
 
 public:
-	RegexExecDfa(RegexStateImpl* parent):
-		RegexExecEngine(parent) {
-		m_state = NULL;
-	}
-
-	virtual
-	sl::ArrayRef<RegexMatchPos>
-	getCapturePosArray() {
-		return sl::ArrayRef<RegexMatchPos>(); // DFA doesn't capture
-	}
+	RegexExecDfa(RegexStateImpl* parent);
 
 	virtual
 	void

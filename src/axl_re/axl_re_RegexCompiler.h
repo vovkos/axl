@@ -80,13 +80,13 @@ public:
 	NfaState*
 	compile(
 		const sl::StringRef& source,
-		size_t acceptId = 0
+		size_t acceptId
 	);
 
 	NfaState*
 	compileSwitchCase(
 		const sl::StringRef& source,
-		size_t acceptId = 0
+		size_t acceptId
 	);
 
 protected:
@@ -95,13 +95,6 @@ protected:
 		uint_t flags,
 		Regex* regex,
 		RegexNameMgr* nameMgr
-	);
-
-	NfaState*
-	compileImpl(
-		const NfaState* preStart,
-		const sl::StringRef& source,
-		size_t acceptId
 	);
 
 	bool
@@ -134,10 +127,7 @@ protected:
 	expectEof();
 
 	NfaState*
-	addState(const NfaState* preStart);
-
-	NfaState*
-	addMatchState(const NfaState* preStart);
+	addState();
 
 	NfaState*
 	insertSplitState(
@@ -146,13 +136,13 @@ protected:
 	);
 
 	NfaState*
-	expression(const NfaState* preStart);
+	expression();
 
 	NfaState*
-	concat(const NfaState* preStart);
+	concat();
 
 	NfaState*
-	repeat(const NfaState* preStart);
+	repeat();
 
 	NfaState*
 	question(NfaState* start);
@@ -164,16 +154,13 @@ protected:
 	plus(NfaState* start);
 
 	NfaState*
-	single(const NfaState* preStart);
+	single();
 
 	NfaState*
-	charClass(const NfaState* preStart);
+	charClass();
 
 	NfaState*
-	stdCharClass(
-		const NfaState* preStart,
-		char c
-	);
+	stdCharClass(char c);
 
 	void
 	stdCharClass(
@@ -182,25 +169,16 @@ protected:
 	);
 
 	NfaState*
-	literal(
-		const NfaState* preStart,
-		const sl::StringRef& string
-	);
+	literal(const sl::StringRef& string);
 
 	NfaState*
-	anchor(
-		const NfaState* preStart,
-		Anchor anchor
-	);
+	anchor(Anchor anchor);
 
 	NfaState*
-	ch(
-		const NfaState* preStart,
-		uint_t c
-	);
+	ch(uint_t c);
 
 	NfaState*
-	any(const NfaState* preStart);
+	any();
 
 #if (_AXL_RE_QUANTIFY)
 	NfaState*
@@ -220,10 +198,10 @@ protected:
 	charClassItem(CharSet* charSet);
 
 	NfaState*
-	capturingGroup(const NfaState* preStart);
+	capturingGroup();
 
 	NfaState*
-	nonCapturingGroup(const NfaState* preStart);
+	nonCapturingGroup();
 
 #if (_AXL_RE_NAMED_REGEX)
 	NfaState*

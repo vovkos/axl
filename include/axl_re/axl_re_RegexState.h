@@ -43,9 +43,8 @@ struct RegexStateImpl: public rc::RefCount {
 	uint_t m_execFlags;
 	uint_t m_prevCharFlags;
 	size_t m_offset;
-	size_t m_matchAcceptId;
-	sl::Array<size_t> m_alternativeOffsetArray;
 	RegexMatch m_match;
+	size_t m_matchAcceptId;
 	sl::BoxList<RegexMatch> m_subMatchList;
 	sl::Array<RegexMatch*> m_subMatchArray;
 
@@ -80,11 +79,10 @@ public:
 	uint32_t
 	calcAnchors(utf32_t c);
 
-	void
-	accept(size_t switchCaseIdx);
-
 	bool
-	finalize(bool isEof);
+	finalize(
+		bool isEof
+	);
 
 	bool
 	exec(
@@ -179,10 +177,7 @@ public:
 	}
 
 	bool
-	getMatchOffset() const {
-		ASSERT(m_p);
-		return m_p->m_match.getOffset();
-	}
+	getLeftmostPotentialMatchOffset() const;
 
 	size_t
 	getMatchSwitchCaseId() const {

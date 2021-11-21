@@ -13,68 +13,91 @@
 #include "axl_re_Dfa.h"
 #include "axl_re_Regex.h"
 
-#define _AXL_RE_DFA_MERGE_CHAR_RANGES 0
-
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-void
+bool
 DfaCharTransitionMap::add(
 	utf32_t from,
 	utf32_t to,
-	const DfaState* state,
-	uint_t flags
+	const DfaState* state
 ) {
 	ASSERT(from >= 0 && to <= 0x7fffffff && from <= to);
 
-	Iterator it = m_map.visit(from);
-	Iterator prevIt = it.getPrev();
+#if (_AXL_RE_DFA_MERGE_CHAR_RANGES)
+	Iterator prevIt = m_map.find(from, sl::BinTreeFindRelOp_Lt);
 	ASSERT(!prevIt || prevIt->m_value.m_last < from);
 
-#if (_AXL_RE_DFA_MERGE_CHAR_RANGES)
 	if (prevIt &&
 		prevIt->m_value.m_last + 1 == from &&
-		prevIt->m_value.m_state == state &&
-		prevIt->m_value.m_flags == flags
+		prevIt->m_value.m_state == state
 	) {
 		prevIt->m_value.m_last = to;
-		m_map.erase(it);
-		it = prevIt;
-	} else
-#endif
-	{
-		it->m_value.m_last = to;
-		it->m_value.m_state = state;
-		it->m_value.m_flags = flags;
+		return false;
 	}
+
+	Iterator it = m_map.visit(from);
+#else
+#	if (_DEBUG)
+	Iterator prevIt = m_map.find(from, sl::BinTreeFindRelOp_Lt);
+	ASSERT(!prevIt || prevIt->m_value.m_last < from);
+#	endif
+
+	Iterator it = m_map.visit(from);
+#endif
+
+	it->m_value.m_last = to;
+	it->m_value.m_state = state;
+	return true;
 }
 
 //..............................................................................
 
 DfaState::DfaState() {
 	m_id = -1;
+	m_acceptId = -1;
 	m_flags = 0;
 	m_anchorMask = 0;
-	m_acceptId = -1;
 }
 
 void
-DfaState::finalize() {
-	ASSERT(!(m_flags & DfaStateFlag_Accept));
+DfaState::print(FILE* file) const {
+	fprintf(file, "%02d: nfa({ ", m_id);
+
+#undef INDENT
+#define INDENT "      "
 
 	size_t count = m_nfaStateSet.getCount();
-	for (size_t i = 0; i < count; i++) {
-		const NfaState* nfaState = m_nfaStateSet[i];
-		ASSERT(nfaState->m_stateKind != NfaStateKind_Epsilon);
+	for (size_t i = 0; i < count; i++)
+		fprintf(file, "%02d ", m_nfaStateSet[i]->m_id);
 
-		if (nfaState->m_stateKind == NfaStateKind_Accept &&
-			(!(m_flags & DfaStateFlag_Accept) || nfaState->m_acceptId < m_acceptId)
-		) {
-			m_flags |= DfaStateFlag_Accept;
-			m_acceptId = nfaState->m_acceptId;
-		}
+	fprintf(file, "})\n");
+
+	if (m_flags & DfaStateFlag_Accept)
+		fprintf(file, INDENT "accept %d\n", m_acceptId);
+
+	count = m_anchorTransitionMap.getCount();
+	for (size_t i = 0; i < count; i++) {
+		const DfaState* state2 = m_anchorTransitionMap[i];
+		if (state2)
+			fprintf(file, INDENT "%s -> %02d\n", getAnchorString(i), state2->m_id);
+	}
+
+	char buffer[256];
+	sl::String string(rc::BufKind_Stack, buffer, sizeof(buffer));
+
+	DfaCharTransitionMap::ConstIterator it2 = m_charTransitionMap.getHead();
+	for (; it2; it2++) {
+		getCharRangeString(&string, it2->getKey(), it2->m_value.m_last);
+		fprintf(file,
+			INDENT "%s -> %02d",
+			string.sz(),
+			it2->m_value.m_state->m_id
+		);
+
+		fprintf(file, "\n");
 	}
 }
 
@@ -114,6 +137,8 @@ struct DfaAtmWorkingSetEntry {
 		m_anchors = anchors;
 	}
 };
+
+// TODO: REWORK! Now, NfaStateSet is ordered! Take special care of state priorities!
 
 void
 DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
@@ -202,98 +227,75 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 	ASSERT(dfaState->m_id == -1);
 
 	m_charRangeMap.clear();
-
 	size_t nfaStateCount = dfaState->m_nfaStateSet.getCount();
-
-	sl::BitMap epsilonClosureMinusSearchStart; // exluding the DFA search start state
 	const DfaState* dfaSearchStartState = m_regex->getDfaSearchStartState();
-	if (dfaSearchStartState) {
-		// build epsilon closure minus DFA search start;
-		// can only check SPLITs because we've already did buildEpsilonClosure() for dfaState
 
-		for (size_t i = 0; i < nfaStateCount; i++) {
-			const NfaState* nfaState = dfaState->m_nfaStateSet[i];
-			if (nfaState->m_stateKind == NfaStateKind_Split && !dfaSearchStartState->m_nfaStateSet.find(nfaState)) {
-				epsilonClosureMinusSearchStart.setBitResize(nfaState->m_nextState->m_id);
-				epsilonClosureMinusSearchStart.setBitResize(nfaState->m_splitState->m_id);
-			}
-		}
-	}
-
-	// add all transitions to the char range map
+	// pass 1 -- visit all breaking points in the char range map
 
 	for (size_t i = 0; i < nfaStateCount; i++) {
 		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
 		if (nfaState->m_stateKind < NfaStateKind_FirstConsuming)
 			continue;
 
-		uint_t transitionFlags =
-			dfaSearchStartState ?
-			!dfaSearchStartState->m_nfaStateSet.find(nfaState->m_id) || // not in the DFA search start epsilon-closure OR...
-			epsilonClosureMinusSearchStart.getBit(nfaState->m_id) ?     // ... can epsilon-jump here from some other state
-			DfaTransitionFlag_Alive :
-			0 :
-			DfaTransitionFlag_Alive; // !dfaSearchStartState
-
 		switch (nfaState->m_stateKind) {
 		case NfaStateKind_MatchChar:
-			addMatchChar(nfaState->m_char, nfaState->m_nextState, transitionFlags);
+			visitMatchChar(nfaState->m_char);
 			break;
 
 		case NfaStateKind_MatchCharSet:
-			addMatchCharSet(*nfaState->m_charSet, nfaState->m_nextState, transitionFlags);
+			visitMatchCharSet(*nfaState->m_charSet);
 			break;
 
 		case NfaStateKind_MatchAnyChar:
-			addMatchAnyChar(nfaState->m_nextState, transitionFlags);
+			visitMatchAnyChar();
 			break;
 		}
 	}
 
-	sl::List<CharRangeListEntry> charRangeList;
+	// pass 2 -- "colorize" the char range map from top priority to bottom
 
-	// split transitions into non-overlapping state sets
+	for (size_t i = 0; i < nfaStateCount; i++) {
+		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
+		if (nfaState->m_stateKind < NfaStateKind_FirstConsuming)
+			continue;
 
-	CharRangeMapIterator it = m_charRangeMap.getHead();
-	while (it != m_charRangeMap.getTail()) {
-		CharRangeMapIterator nextIt = it.getNext();
-		uint32_t c = it->getKey();
+		switch (nfaState->m_stateKind) {
+		case NfaStateKind_MatchChar:
+			addMatchChar(nfaState->m_char, nfaState->m_nextState);
+			break;
 
-		charRangeList.insertListTail(&it->m_value.m_rangeList);
-		sl::Iterator<CharRangeListEntry> it2 = charRangeList.getHead();
-		while (it2) {
-			sl::Iterator<CharRangeListEntry> nextIt = it2.getNext();
+		case NfaStateKind_MatchCharSet:
+			addMatchCharSet(*nfaState->m_charSet, nfaState->m_nextState);
+			break;
 
-			if (it2->m_last < c)
-				charRangeList.erase(it2);
-			else {
-				it->m_value.m_nfaStateSet.add(it2->m_nfaState);
-				it->m_value.m_transitionFlags |= it2->m_transitionFlags;
-			}
-
-			it2 = nextIt;
+		case NfaStateKind_MatchAnyChar:
+			addMatchAnyChar(nfaState->m_nextState);
+			break;
 		}
-
-		it = nextIt;
 	}
 
 	// finalize transition map
 
-	it = m_charRangeMap.getHead();
+	CharRangeMapIterator it = m_charRangeMap.getHead();
 	while (it != m_charRangeMap.getTail()) {
 		CharRangeMapIterator nextIt = it.getNext();
 
-		if (it->m_value.m_nfaStateSet.isEmpty()) {
+		if (it->m_value.isEmpty()) {
 			it = nextIt;
 			continue;
 		}
 
 		DfaState* targetState = AXL_MEM_NEW(DfaState);
-		sl::takeOver(&targetState->m_nfaStateSet, &it->m_value.m_nfaStateSet);
+		sl::takeOver(&targetState->m_nfaStateSet, &it->m_value);
 		targetState->m_nfaStateSet.buildEpsilonClosure();
 		targetState = m_regex->addDfaState(targetState);
 
-		dfaState->m_charTransitionMap.add(it->getKey(), nextIt->getKey() - 1, targetState, it->m_value.m_transitionFlags);
+		dfaState->m_charTransitionMap.add(
+			it->getKey(),
+			nextIt->getKey() - 1,
+			targetState
+		);
+
 		it = nextIt;
 	}
 }
@@ -304,7 +306,7 @@ DfaBuilder::buildFullDfa() {
 		m_regex->m_preDfaStateList.isEmpty() &&
 		m_regex->m_nfaSearchStartState
 	) {
-		// from the clean slate it's safe to first build the match DFA without checking for the search DFA
+		// from the clean slate it's safe to first build the match DFA
 
 		NfaState* prevNfaSearchStartState = m_regex->m_nfaSearchStartState;
 		m_regex->m_nfaSearchStartState = NULL;
@@ -319,6 +321,8 @@ DfaBuilder::buildFullDfa() {
 		while (!m_regex->m_preDfaStateList.isEmpty())
 			buildTransitionMaps(*m_regex->m_preDfaStateList.getHead());
 	} else {
+		// otherwise, bootstrap (ensure start states are created) and then build the rest
+
 		m_regex->getDfaMatchStartState();
 		m_regex->getDfaSearchStartState();
 
@@ -328,33 +332,46 @@ DfaBuilder::buildFullDfa() {
 }
 
 void
+DfaBuilder::visitMatchCharSet(const CharSet& charSet) {
+	CharSet::ConstIterator it = charSet.getHead();
+	for (; it; it++)
+		visitMatchCharRange(it->getKey(), it->m_value);
+}
+
+void
+DfaBuilder::visitMatchCharRange(
+	uint32_t from,
+	uint32_t to
+) {
+	ASSERT(from >= 0 && from <= to);
+
+	m_charRangeMap.visit(from);
+	m_charRangeMap.visit(to + 1);
+}
+
+void
 DfaBuilder::addMatchCharSet(
 	const CharSet& charSet,
-	const NfaState* state,
-	uint_t transitionFlags
+	const NfaState* state
 ) {
 	CharSet::ConstIterator it = charSet.getHead();
 	for (; it; it++)
-		addMatchCharRange(it->getKey(), it->m_value, state, transitionFlags);
+		addMatchCharRange(it->getKey(), it->m_value, state);
 }
 
 void
 DfaBuilder::addMatchCharRange(
 	uint32_t from,
 	uint32_t to,
-	const NfaState* state,
-	uint_t transitionFlags
+	const NfaState* state
 ) {
 	ASSERT(from >= 0 && from <= to);
 
 	CharRangeMapIterator it = m_charRangeMap.visit(from);
-	CharRangeMapIterator endIt = m_charRangeMap.visit(to + 1);
-
-	CharRangeListEntry* entry = AXL_MEM_NEW(CharRangeListEntry);
-	entry->m_last = to;
-	entry->m_nfaState = state;
-	entry->m_transitionFlags = transitionFlags;
-	it->m_value.m_rangeList.insertTail(entry);
+	do {
+		if (!it->m_value.isAccept())
+			it->m_value.add(state);
+	} while ((++it)->getKey() <= to);
 }
 
 //..............................................................................
