@@ -30,31 +30,113 @@ enum BitOpKind {
 
 //..............................................................................
 
+inline
+bool
+getBit_u(
+	const size_t* map,
+	size_t bit
+) {
+	size_t page = bit / AXL_PTR_BITS;
+	size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
+	return (map[page] & mask) != 0;
+}
+
+inline
 bool
 getBit(
 	const size_t* map,
 	size_t pageCount,
 	size_t bit
-);
+) {
+	size_t page = bit / AXL_PTR_BITS;
+	if (page >= pageCount)
+		return false;
 
-bool
+	size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
+	return (map[page] & mask) != 0;
+}
+
+inline
+void
+setBit_u(
+	size_t* map,
+	size_t bit
+) {
+	size_t page = bit / AXL_PTR_BITS;
+	size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
+	map[page] |= mask;
+}
+
+inline
+void
 setBit(
 	size_t* map,
 	size_t pageCount,
-	size_t bit,
-	bool value = true
+	size_t bit
+) {
+	size_t page = bit / AXL_PTR_BITS;
+	if (page < pageCount) {
+		size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
+		map[page] |= mask;
+	}
+}
+
+inline
+void
+clearBit_u(
+	size_t* map,
+	size_t bit
+) {
+	size_t page = bit / AXL_PTR_BITS;
+	size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
+	map[page] &= ~mask;
+}
+
+inline
+void
+clearBit(
+	size_t* map,
+	size_t pageCount,
+	size_t bit
+) {
+	size_t page = bit / AXL_PTR_BITS;
+	if (page < pageCount) {
+		size_t mask = (size_t) 1 << (bit & (AXL_PTR_BITS - 1));
+		map[page] &= ~ mask;
+	}
+}
+
+void
+setBitRange_u(
+	size_t* map,
+	size_t from,
+	size_t to
 );
 
-bool
+void
 setBitRange(
 	size_t* map,
 	size_t pageCount,
 	size_t from,
-	size_t to,
-	bool value = true
+	size_t to
 );
 
-bool
+void
+clearBitRange_u(
+	size_t* map,
+	size_t from,
+	size_t to
+);
+
+void
+clearBitRange(
+	size_t* map,
+	size_t pageCount,
+	size_t from,
+	size_t to
+);
+
+void
 mergeBitMaps(
 	size_t* map,
 	const size_t* map2,
@@ -76,8 +158,14 @@ size_t
 findBit(
 	const size_t* map,
 	size_t pageCount,
-	size_t from,
-	bool value = true
+	size_t from
+);
+
+size_t
+findZeroBit(
+	const size_t* map,
+	size_t pageCount,
+	size_t from
 );
 
 //..............................................................................
@@ -86,11 +174,11 @@ template <size_t bitCount>
 class BitMapN {
 public:
 	enum {
-		pageCount = bitCount / AXL_PTR_BITS + bitCount % AXL_PTR_BITS ? 1 : 0
+		PageCount = bitCount / AXL_PTR_BITS + bitCount % AXL_PTR_BITS ? 1 : 0
 	};
 
 protected:
-	size_t m_map[pageCount];
+	size_t m_map[PageCount];
 
 public:
 	BitMapN() {
@@ -112,67 +200,65 @@ public:
 		return djb2(m_map, sizeof(m_map));
 	}
 
-	int
-	cmp(const BitMapN& src) const {
-		return memcmp(m_map, src.m_map, sizeof(m_map));
+	bool
+	isEqual(const BitMapN& src) const {
+		return memcmp(m_map, src.m_map, sizeof(m_map)) == 0;
 	}
 
 	const size_t*
-	getMap() const {
+	p() const {
 		return m_map;
 	}
 
 	size_t*
-	getMap() {
+	p() {
 		return m_map;
 	}
 
 	size_t
 	getPageCount() const {
-		return pageCount;
+		return PageCount;
 	}
 
 	bool
 	getBit(size_t bit) const {
-		return sl::getBit(m_map, pageCount, bit);
+		return sl::getBit(m_map, PageCount, bit);
 	}
 
-	bool
-	setBit(
-		size_t bit,
-		bool value = true
-	) {
-		return sl::setBit(m_map, pageCount, bit, value);
+	void
+	setBit(size_t bit) {
+		sl::setBit(m_map, PageCount, bit);
 	}
 
-	bool
+	void
 	setBitRange(
 		size_t from,
-		size_t to,
-		bool value = true
+		size_t to
 	) {
-		return sl::setBitRange(m_map, pageCount, from, to, value);
+		sl::setBitRange(m_map, PageCount, from, to);
 	}
 
-	bool
+	void
 	merge(
 		const BitMapN& bitMap2,
 		BitOpKind op
 	) {
-		return sl::mergeBitMaps(m_map, bitMap2.m_map, pageCount, op);
+		sl::mergeBitMaps(m_map, bitMap2.m_map, PageCount, op);
 	}
 
 	void
 	invert() {
-		sl::invertBitMap(m_map, pageCount);
+		sl::invertBitMap(m_map, PageCount);
 	}
 
 	size_t
-	findBit(
-		size_t start,
-		bool value = true
-	) const {
-		return sl::findBit(m_map, pageCount, start, value);
+	findBit(size_t start = 0) const {
+		return sl::findBit(m_map, PageCount, start);
+	}
+
+	size_t
+	findZeroBit(size_t start = 0) const {
+		return sl::findZeroBit(m_map, PageCount, start);
 	}
 };
 
@@ -183,32 +269,10 @@ protected:
 	Array<size_t> m_map;
 
 public:
-	BitMap(size_t bitCount = 0) {
+	BitMap() {}
+
+	BitMap(size_t bitCount) {
 		create(bitCount);
-	}
-
-#if (_AXL_CPP_HAS_RVALUE_REF)
-	BitMap(BitMap&& src) {
-		move(std::move(src));
-	}
-#endif
-
-	BitMap(const BitMap& src) {
-		copy(src);
-	}
-
-#if (_AXL_CPP_HAS_RVALUE_REF)
-	BitMap&
-	operator = (BitMap&& src) {
-		move(std::move(src));
-		return *this;
-	}
-#endif
-
-	BitMap&
-	operator = (const BitMap& src) {
-		copy(src);
-		return *this;
 	}
 
 	bool
@@ -222,13 +286,13 @@ public:
 	}
 
 	const size_t*
-	getMap() const {
-		return m_map;
+	cp() const {
+		return m_map.cp();
 	}
 
 	size_t*
-	getMap() {
-		return m_map;
+	p() {
+		return m_map.p();
 	}
 
 	size_t
@@ -255,7 +319,7 @@ public:
 
 	void
 	copy(const BitMap& src) {
-		m_map.copy(src.m_map, src.m_map.getCount());
+		m_map.copy(src.m_map);
 	}
 
 	size_t
@@ -263,19 +327,16 @@ public:
 		return djb2(m_map, m_map.getCount() * sizeof(size_t));
 	}
 
-	int
-	cmp(const BitMap& src) const;
-
 	bool
-	isEqual(const BitMap& src) const {
-		return cmp(src) == 0;
-	}
+	isEqual(const BitMap& src) const;
 
 	bool
 	create(size_t bitCount);
 
 	bool
-	setBitCount(size_t bitCount);
+	setBitCount(size_t bitCount)  {
+		return m_map.setCountZeroConstruct(sl::align<AXL_PTR_BITS>(bitCount));
+	}
 
 	bool
 	ensureBitCount(size_t bitCount) {
@@ -288,39 +349,55 @@ public:
 	}
 
 	bool
-	setBit(
-		size_t bit,
-		bool value = true
-	) {
-		return sl::setBit(m_map, m_map.getCount(), bit, value);
+	setBit(size_t bit) {
+		return m_map.ensureExclusive() ? (sl::setBit(m_map, m_map.getCount(), bit), true) : false;
 	}
 
 	bool
-	setBitResize(
-		size_t bit,
-		bool value = true
-	) {
-		ensureBitCount(bit + 1);
-		return sl::setBit(m_map, m_map.getCount(), bit, value);
+	setBitResize(size_t bit) {
+		return ensureBitCount(bit + 1) ? (sl::setBit(m_map, m_map.getCount(), bit), true) : false;
 	}
 
-	bool
+	void
 	setBitRange(
 		size_t from,
-		size_t to,
-		bool value = true
+		size_t to
 	) {
-		return sl::setBitRange(m_map, m_map.getCount(), from, to, value);
+		sl::setBitRange(m_map, m_map.getCount(), from, to);
 	}
 
 	bool
 	setBitRangeResize(
 		size_t from,
-		size_t to,
-		bool value = true
+		size_t to
 	) {
-		ensureBitCount(to);
-		return sl::setBitRange(m_map, m_map.getCount(), from, to, value);
+		return ensureBitCount(to) ? (sl::setBitRange(m_map, m_map.getCount(), from, to), true) : false;
+	}
+
+	bool
+	clearBit(size_t bit) {
+		return m_map.ensureExclusive() ? (sl::clearBit(m_map, m_map.getCount(), bit), true) : false;
+	}
+
+	bool
+	clearBitResize(size_t bit) {
+		return ensureBitCount(bit + 1) ? (sl::clearBit(m_map, m_map.getCount(), bit), true) : false;
+	}
+
+	bool
+	clearBitRange(
+		size_t from,
+		size_t to
+	) {
+		return m_map.ensureExclusive() ? (sl::clearBitRange(m_map, m_map.getCount(), from, to), true) : false;
+	}
+
+	bool
+	clearBitRangeResize(
+		size_t from,
+		size_t to
+	) {
+		return ensureBitCount(to) ? (sl::clearBitRange(m_map, m_map.getCount(), from, to), true) : false;
 	}
 
 	bool
@@ -335,24 +412,43 @@ public:
 		BitOpKind op
 	);
 
-	void
+	bool
 	invert() {
-		sl::invertBitMap(m_map, m_map.getCount());
+		return m_map.ensureExclusive() ? (sl::invertBitMap(m_map, m_map.getCount()), true) : false;
 	}
 
 	size_t
-	findBit(
-		size_t start,
-		bool value = true
-	) const {
-		return sl::findBit(m_map, m_map.getCount(), start, value);
+	findBit(size_t start = 0) const {
+		return sl::findBit(m_map, m_map.getCount(), start);
 	}
 
 	size_t
-	findBit() const {
-		return findBit(0, true);
+	findZeroBit(size_t start = 0) const {
+		return sl::findZeroBit(m_map, m_map.getCount(), start);
 	}
+
+protected:
+	static
+	bool
+	isEqualImpl(
+		const size_t* p1,
+		size_t count1,
+		const size_t* p2,
+		size_t count2
+	);
 };
+
+inline
+bool
+BitMap::isEqual(const BitMap& src) const {
+	size_t count = m_map.getCount();
+	size_t count2 = src.m_map.getCount();
+
+	return
+		count == count2 ? memcmp(m_map, src.m_map, count * sizeof(size_t)) == 0 :
+		count < count2 ? isEqualImpl(m_map, count, src.m_map, count2) :
+		isEqualImpl(src.m_map, count2, m_map, count);
+}
 
 //..............................................................................
 

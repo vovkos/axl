@@ -69,17 +69,16 @@ getSockProtoString(uint_t proto) {
 
 size_t
 getSockAddrNetMaskBitCount_ip4(const sockaddr_in* addr) {
-	size_t bitIdx = sl::findBit((size_t*) &addr->sin_addr, 1, 0, false);
+	size_t bitIdx = sl::findZeroBit((size_t*) &addr->sin_addr, 1, 0);
 	return AXL_MIN(bitIdx, 32);
 }
 
 size_t
 getSockAddrNetMaskBitCount_ip6(const sockaddr_in6* addr) {
-	size_t bitIdx = sl::findBit(
+	size_t bitIdx = sl::findZeroBit(
 		(size_t*) &addr->sin6_addr,
 		sizeof(addr->sin6_addr) / sizeof(size_t),
-		0,
-		false
+		0
 	);
 
 	return AXL_MIN(bitIdx, 128);
