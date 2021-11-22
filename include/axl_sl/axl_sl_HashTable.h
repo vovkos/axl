@@ -127,6 +127,11 @@ public:
 		m_eq = eq;
 	}
 
+	const Value&
+	operator [] (KeyArg key) const {
+		return this->find(key)->m_value;
+	}
+
 	Value&
 	operator [] (KeyArg key) {
 		return this->visit(key)->m_value;

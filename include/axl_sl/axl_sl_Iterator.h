@@ -229,6 +229,7 @@ public:
 
 	Entry*
 	operator -> () const {
+		ASSERT(m_p);
 		return this->m_p;
 	}
 
