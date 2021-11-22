@@ -30,8 +30,10 @@ struct RegexStateImpl: public rc::RefCount {
 	friend class RegexState;
 
 	enum CharFlag {
-		CharFlag_AlphaNum = 0x01,
-		CharFlag_NewLine  = 0x02,
+		CharFlag_Cr   = 0x01,
+		CharFlag_Lf   = 0x02,
+		CharFlag_Nl   = CharFlag_Lf,
+		CharFlag_Word = 0x04,
 	};
 
 	Regex* m_regex;
@@ -76,8 +78,15 @@ public:
 		m_match.m_offset = m_offset;
 	}
 
-	uint32_t
-	calcAnchors(utf32_t c);
+	static
+	uint_t
+	calcCharFlags(utf32_t c);
+
+	uint_t
+	calcAnchors(uint_t charFlags);
+
+	uint_t
+	calcAnchorsUpdateCharFlags(utf32_t c);
 
 	bool
 	finalize(
@@ -97,6 +106,50 @@ public:
 		const sl::ArrayRef<RegexMatchPos>& capturePosArray
 	);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+uint_t
+RegexStateImpl::calcCharFlags(utf32_t c) {
+	uint_t charFlags = 0;
+
+	if (c == '\r')
+		charFlags |= CharFlag_Cr;
+	else if (c == '\n')
+		charFlags |= CharFlag_Lf;
+	else if (c == '_' || enc::utfIsLetterOrDigit(c))
+		charFlags |= CharFlag_Word;
+
+	return charFlags;
+}
+
+inline
+uint_t
+RegexStateImpl::calcAnchors(uint_t charFlags) {
+	uint_t anchors = 0;
+
+	if (m_prevCharFlags & CharFlag_Lf)
+		anchors |= Anchor_BeginLine;
+
+	if (charFlags & (CharFlag_Cr | CharFlag_Lf))
+		anchors |= Anchor_EndLine;
+
+	if ((charFlags & m_prevCharFlags) & CharFlag_Word)
+		anchors |= Anchor_WordBoundary;
+	else
+		anchors |= Anchor_NotWordBoundary;
+
+	return anchors;
+}
+
+inline
+uint_t
+RegexStateImpl::calcAnchorsUpdateCharFlags(utf32_t c) {
+	uint_t charFlags = calcCharFlags(c);
+	uint_t anchors = calcAnchors(charFlags);
+	m_prevCharFlags = charFlags;
+}
 
 //..............................................................................
 

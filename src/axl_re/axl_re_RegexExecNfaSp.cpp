@@ -82,9 +82,11 @@ RegexExecNfaSp::exec(
 
 bool
 RegexExecNfaSp::eof() {
-	uint_t anchors = Anchor_End;
-	if (m_parent->m_prevCharFlags & RegexStateImpl::CharFlag_AlphaNum)
-		anchors |= Anchor_Word;
+	uint_t anchors = Anchor_EndLine | Anchor_EndText;
+	if (m_parent->m_prevCharFlags & RegexStateImpl::CharFlag_Word)
+		anchors |= Anchor_WordBoundary;
+	else
+		anchors |= Anchor_NotWordBoundary;
 
 	advanceNonConsumingStates(anchors);
 	return m_parent->finalize(true);

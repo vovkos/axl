@@ -115,8 +115,8 @@ Regex::load(
 		const NfaStateStorage* stateStorage = (NfaStateStorage*)p;
 
 		if (end - p < sizeof(NfaStateStorage) ||
-			stateStorage->m_stateKind < NfaStateKind_FirstStorable ||
-			stateStorage->m_stateKind > NfaStateKind_LastStorable)
+			!stateStorage->m_stateKind ||
+			stateStorage->m_stateKind > NfaStateKind_Last)
 			return err::fail("invalid regex NFA state storage");
 
 		NfaState* state = stateArray[i];
@@ -355,21 +355,22 @@ Regex::finalize(uint_t flags) {
 
 DfaState*
 Regex::createDfaStartState(const NfaState* nfaState) {
-	DfaState* dfaState = AXL_MEM_NEW(DfaState);
-	dfaState->m_nfaStateSet.add(nfaState);
-	dfaState->m_nfaStateSet.buildEpsilonClosure();
-	return addDfaState(dfaState);
+	NfaStateSet nfaStateSet;
+	nfaStateSet.add(nfaState);
+	nfaStateSet.buildEpsilonClosure();
+	return getDfaState(nfaStateSet);
 }
 
 DfaState*
-Regex::addDfaState(DfaState* state) {
-	NfaStateSetMap<DfaState*>::Iterator it = m_dfaStateMap.visit(&state->m_nfaStateSet);
-	if (it->m_value) {
-		AXL_MEM_DELETE(state);
+Regex::getDfaState(const NfaStateSet& nfaStateSet) {
+	NfaStateSetMap<DfaState*>::Iterator it = m_dfaStateMap.visit(&nfaStateSet);
+	if (it->m_value)
 		return it->m_value;
-	}
 
-	if (state->m_nfaStateSet.isAccept()) {
+	DfaState* state = AXL_MEM_NEW(DfaState);
+	state->m_nfaStateSet = nfaStateSet;
+
+	if (nfaStateSet.isAccept()) {
 		state->m_acceptId = state->m_nfaStateSet.getLastState()->m_acceptId;
 		state->m_flags |= DfaStateFlag_Accept;
 	}

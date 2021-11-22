@@ -34,7 +34,6 @@ protected:
 		TokenKind_SpecialChar,
 		TokenKind_Literal,
 		TokenKind_Identifier,
-		TokenKind_WordBoundary,
 		TokenKind_Quantifier,
 	};
 

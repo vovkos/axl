@@ -18,19 +18,44 @@ namespace re {
 
 //..............................................................................
 
-const char* getAnchorString(uint_t anchors) {
-	const char* stringTable[Anchor__TransitionMapSize] = {
-		"",      // 0
-		"^",     // Anchor_Begin
-		"$",     // Anchor_End
-		"^$",    // Anchor_Begin | Anchor_End
-		"\\b",   // Anchor_Word
-		"\\b^",  // Anchor_Word | Anchor_Begin
-		"\\b$",  // Anchor_Word | Anchor_End
-		"\\b^$", // Anchor_Word | Anchor_Begin | Anchor_End
+const char*
+getAnchorString(Anchor anchor) {
+	const char* stringTable[] = {
+		"^",     // Anchor_BeginLine
+		"$",     // Anchor_EndLine
+		"\\A",   // Anchor_BeginText
+		"\\z",   // Anchor_EndText
+		"\\b",   // Anchor_WordBoundary
+		"\\B",   // Anchor_NotWordBoundary
 	};
 
-	return anchors < countof(stringTable) ? stringTable[anchors] : "invalid-anchor";
+	size_t i = sl::getLoBitIdx(anchor);
+	return i < countof(stringTable) ? stringTable[i] : "invalid-anchor";
+}
+
+sl::String
+getAnchorsString(uint_t anchors) {
+	sl::String string;
+
+	if (anchors & Anchor_BeginLine)
+		string = "^";
+
+	if (anchors & Anchor_EndLine)
+		string += "$";
+
+	if (anchors & Anchor_BeginText)
+		string += "\\A";
+
+	if (anchors & Anchor_EndText)
+		string += "\\z";
+
+	if (anchors & Anchor_WordBoundary)
+		string += "\\b";
+
+	if (anchors & Anchor_NotWordBoundary)
+		string += "\\B";
+
+	return string;
 }
 
 //..............................................................................
@@ -300,23 +325,7 @@ NfaState::print(FILE* file) const {
 
 	case NfaStateKind_MatchAnchor:
 		ASSERT(m_nextState);
-		switch (m_anchor) {
-		case Anchor_Begin:
-			fprintf(file, "^ -> %02d", m_nextState->m_id);
-			break;
-
-		case Anchor_End:
-			fprintf(file, "$ -> %02d", m_nextState->m_id);
-			break;
-
-		case Anchor_Word:
-			fprintf(file, "\\b -> %02d", m_nextState->m_id);
-			break;
-
-		default:
-				ASSERT(false);
-		}
-
+		fprintf(file, "%s -> %02d", getAnchorString(m_anchor), m_nextState->m_id);
 		break;
 
 	case NfaStateKind_OpenCapture:
@@ -342,7 +351,7 @@ NfaState::print(FILE* file) const {
 
 bool
 NfaStateSet::add(const NfaState* state) {
-	if (m_map.getBit(state->m_id))
+	if (m_map.getBit(state->m_id) || isAccept())
 		return false;
 
 	m_array.append(state);
@@ -351,7 +360,7 @@ NfaStateSet::add(const NfaState* state) {
 }
 
 void
-NfaStateSet::buildEpsilonClosure() {
+NfaStateSet::buildAnchorClosure(uint_t anchors) {
 	char buffer[256];
 	sl::Array<const NfaState*> stack(rc::BufKind_Stack, buffer, sizeof(buffer));
 
@@ -367,39 +376,38 @@ NfaStateSet::buildEpsilonClosure() {
 
 	while (!stack.isEmpty()) {
 		const NfaState* state = stack.getBackAndPop();
-		if (m_map.getBit(state->m_id))
-			continue;
+		while (!m_map.getBit(state->m_id)) {
+			m_array.append(state);
+			m_map.setBit(state->m_id);
 
-		m_array.append(state);
-		m_map.setBit(state->m_id);
+			switch (state->m_stateKind) {
+			case NfaStateKind_Accept:
+				return; // we are done
 
-		switch (state->m_stateKind) {
-			bool isFound;
+			case NfaStateKind_Split:
+				if (!m_map.getBit(state->m_splitState->m_id))
+					stack.append(state->m_splitState);
 
-		case NfaStateKind_Accept:
-			return; // we are done
+				// ... and fall-through
 
-		case NfaStateKind_Split:
-			// next must pop before split
+			case NfaStateKind_OpenCapture:
+			case NfaStateKind_CloseCapture:
+				state = state->m_nextState;
+				break;
 
-			isFound = m_map.getBit(state->m_splitState->m_id);
-			if (!isFound)
-				stack.append(state->m_splitState);
+			case NfaStateKind_MatchAnchor:
+				if (anchors & state->m_anchor) {
+					state = state->m_nextState;
+					break;
+				}
 
-			isFound = m_map.getBit(state->m_nextState->m_id);
-			if (!isFound)
-				stack.append(state->m_nextState);
+				// ... and fall-through
 
-			break;
-
-		case NfaStateKind_OpenCapture:
-		case NfaStateKind_CloseCapture:
-			isFound = m_map.getBit(state->m_nextState->m_id);
-			if (!isFound)
-				stack.append(state->m_nextState);
-
-			break;
+			default:
+				goto Break2;
+			}
 		}
+	Break2:;
 	}
 }
 

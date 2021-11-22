@@ -277,11 +277,10 @@ RegexCompiler::getToken(Token* token) {
 				}
 
 				switch (m_p[1]) {
+				case 'A':
+				case 'z':
 				case 'b':
-					token->m_tokenKind = TokenKind_WordBoundary;
-					m_p += 2;
-					return true;
-
+				case 'B':
 				case 's':
 				case 'S':
 				case 'd':
@@ -350,6 +349,10 @@ RegexCompiler::getToken(Token* token) {
 				}
 
 				switch (m_p[1]) {
+				case 'A':
+				case 'z':
+				case 'b':
+				case 'B':
 				case 's':
 				case 'S':
 				case 'd':
@@ -648,9 +651,6 @@ RegexCompiler::single() {
 		return NULL;
 
 	switch (token.m_tokenKind) {
-	case TokenKind_WordBoundary:
-		return anchor(Anchor_Word);
-
 	case TokenKind_SpecialChar:
 		switch (token.m_char) {
 		case '(':
@@ -680,10 +680,22 @@ RegexCompiler::single() {
 			return any();
 
 		case '^':
-			return anchor(Anchor_Begin);
+			return anchor(Anchor_BeginLine);
 
 		case '$':
-			return anchor(Anchor_End);
+			return anchor(Anchor_EndLine);
+
+		case 'A':
+			return anchor(Anchor_BeginText);
+
+		case 'Z':
+			return anchor(Anchor_EndText);
+
+		case 'b':
+			return anchor(Anchor_WordBoundary);
+
+		case 'B':
+			return anchor(Anchor_NotWordBoundary);
 
 		default:
 			err::setError("invalid regexp syntax");

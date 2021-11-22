@@ -66,8 +66,7 @@ void
 DfaState::print(FILE* file) const {
 	fprintf(file, "%02d: nfa({ ", m_id);
 
-#undef INDENT
-#define INDENT "      "
+	#define INDENT "      "
 
 	size_t count = m_nfaStateSet.getCount();
 	for (size_t i = 0; i < count; i++)
@@ -76,14 +75,11 @@ DfaState::print(FILE* file) const {
 	fprintf(file, "})\n");
 
 	if (m_flags & DfaStateFlag_Accept)
-		fprintf(file, INDENT "accept %d\n", m_acceptId);
+		fprintf(file, INDENT "accept(%d)\n", m_acceptId);
 
-	count = m_anchorTransitionMap.getCount();
-	for (size_t i = 0; i < count; i++) {
-		const DfaState* state2 = m_anchorTransitionMap[i];
-		if (state2)
-			fprintf(file, INDENT "%s -> %02d\n", getAnchorString(i), state2->m_id);
-	}
+	sl::ConstHashTableIterator<uint_t, const DfaState*> it = m_anchorTransitionMap.getHead();
+	for (; it; it++)
+		fprintf(file, INDENT "%s -> %02d\n", getAnchorsString(it->getKey()).sz(), it->m_value->m_id);
 
 	char buffer[256];
 	sl::String string(rc::BufKind_Stack, buffer, sizeof(buffer));
@@ -107,11 +103,15 @@ void
 DfaBuilder::buildTransitionMaps(DfaState* state) {
 	ASSERT(!(state->m_flags & DfaStateFlag_TransitionMaps) && state->m_id == -1);
 
-	buildAnchorTransitionMap(state);
 	buildCharTransitionMap(state);
 
-	if ((state->m_flags & DfaStateFlag_Accept) && !state->m_anchorMask && state->m_charTransitionMap.isEmpty())
-		state->m_flags |= DfaStateFlag_Final; // final states insta-match
+	if ((state->m_flags & (DfaStateFlag_AnchorTransition | DfaStateFlag_HasMatchAnchor)) == DfaStateFlag_HasMatchAnchor)
+		buildAnchorTransitionMap(state);
+
+	if ((state->m_flags & DfaStateFlag_Accept) &&
+		state->m_anchorTransitionMap.isEmpty() &&
+		state->m_charTransitionMap.isEmpty())
+		state->m_flags |= DfaStateFlag_InstaMatch;
 
 	state->m_flags |= DfaStateFlag_TransitionMaps;
 	state->m_id = m_regex->m_dfaStateList.getCount();
@@ -120,105 +120,110 @@ DfaBuilder::buildTransitionMaps(DfaState* state) {
 	m_regex->m_dfaStateList.insertTail(state);
 }
 
-struct DfaAtmWorkingSetEntry {
-	DfaState* m_dfaState;
+struct DfaAnchorCalcEntry {
 	const NfaState* m_nfaState;
 	uint_t m_anchors;
 
-	DfaAtmWorkingSetEntry() {}
+	DfaAnchorCalcEntry() {}
 
-	DfaAtmWorkingSetEntry(
-		DfaState* dfaState,
+	DfaAnchorCalcEntry(
 		const NfaState* nfaState,
-		uint_t anchors = 0
+		uint_t anchors
 	) {
-		m_dfaState = dfaState;
+		setup(nfaState, anchors);
+	}
+
+	void
+	setup(
+		const NfaState* nfaState,
+		uint_t anchors
+	) {
 		m_nfaState = nfaState;
 		m_anchors = anchors;
 	}
 };
 
-// TODO: REWORK! Now, NfaStateSet is ordered! Take special care of state priorities!
-
 void
 DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
-	DfaState* anchorTransitionMap[Anchor__TransitionMapSize] = { 0 };
-	uint_t anchorMask = 0;
+	ASSERT(dfaState->m_flags & DfaStateFlag_HasMatchAnchor);
+
+	DfaAnchorTransitionPreMap::Iterator it;
+	DfaAnchorTransitionPreMap anchorTransitionPreMap;
 
 	char buffer[256];
-	sl::Array<DfaAtmWorkingSetEntry> workingSet(rc::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<DfaAnchorCalcEntry> stack(rc::BufKind_Stack, buffer, sizeof(buffer));
+
+	// stage 1 -- add anchor transition roots (order is not important)
 
 	size_t count = dfaState->m_nfaStateSet.getCount();
 	for (size_t i = 0; i < count; i++) {
 		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
-		if (nfaState->m_stateKind != NfaStateKind_MatchAnchor)
-			continue;
+		if (nfaState->m_stateKind == NfaStateKind_MatchAnchor) {
+			it = anchorTransitionPreMap.visit(nfaState->m_anchor);
+			if (it->m_value.isEmpty())
+				it->m_value = dfaState->m_nfaStateSet; // build anchor closure later
 
-		ASSERT(nfaState->m_anchor <= Anchor_Last);
-		DfaState* anchorState = anchorTransitionMap[nfaState->m_anchor];
-		if (!anchorState) {
-			anchorState = AXL_MEM_NEW(DfaState);
-			anchorState->m_nfaStateSet.copy(dfaState->m_nfaStateSet);
-			anchorTransitionMap[nfaState->m_anchor] = anchorState;
+			stack.append(DfaAnchorCalcEntry(nfaState->m_nextState, nfaState->m_anchor));
 		}
-
-		workingSet.append(DfaAtmWorkingSetEntry(anchorState, nfaState, nfaState->m_anchor));
 	}
 
-	while (!workingSet.isEmpty()) {
-		DfaAtmWorkingSetEntry entry = workingSet.getBackAndPop();
+	// stage 2 -- calculate which anchor combinations are possible; add anchor transition map entries (but don't fill NFA state sets yet)
 
-		bool isAdded;
-		uint_t anchors;
-		DfaState* anchorState;
+	sl::BitMap nfaStateSet = dfaState->m_nfaStateSet.getMap();
+	while (!stack.isEmpty()) {
+		DfaAnchorCalcEntry entry = stack.getBackAndPop();
+		const NfaState* nfaState = entry.m_nfaState;
 
-		switch (entry.m_nfaState->m_stateKind) {
-		case NfaStateKind_Split:
-			isAdded = entry.m_dfaState->m_nfaStateSet.add(entry.m_nfaState->m_nextState);
-			if (isAdded && entry.m_nfaState->m_nextState->m_stateKind <= NfaStateKind_MatchAnchor)
-				workingSet.append(DfaAtmWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_nextState, entry.m_anchors));
+		while (!nfaStateSet.getBit(nfaState->m_id)) {
+			nfaStateSet.setBit(nfaState->m_id);
 
-			isAdded = entry.m_dfaState->m_nfaStateSet.add(entry.m_nfaState->m_splitState);
-			if (isAdded && entry.m_nfaState->m_splitState->m_stateKind <= NfaStateKind_MatchAnchor)
-				workingSet.append(DfaAtmWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_splitState, entry.m_anchors));
+			switch (nfaState->m_stateKind) {
+				uint_t anchors;
 
-			break;
+			case NfaStateKind_Split:
+				if (!nfaStateSet.getBit(nfaState->m_splitState->m_id))
+					stack.append(DfaAnchorCalcEntry(nfaState->m_splitState, entry.m_anchors));
 
-		case NfaStateKind_OpenCapture:
-		case NfaStateKind_CloseCapture:
-			isAdded = entry.m_dfaState->m_nfaStateSet.add(entry.m_nfaState->m_nextState);
-			if (isAdded && entry.m_nfaState->m_nextState->m_stateKind <= NfaStateKind_MatchAnchor)
-				workingSet.append(DfaAtmWorkingSetEntry(entry.m_dfaState, entry.m_nfaState->m_nextState, entry.m_anchors));
+				// ... and fall-through
 
-			break;
+			case NfaStateKind_OpenCapture:
+			case NfaStateKind_CloseCapture:
+				nfaState = nfaState->m_nextState;
+				break;
 
-		case NfaStateKind_MatchAnchor:
-			anchorMask |= entry.m_nfaState->m_anchor;
-			anchors = entry.m_anchors | entry.m_nfaState->m_anchor;
-			anchorState = anchorTransitionMap[anchors];
-			if (!anchorState) {
-				anchorState = AXL_MEM_NEW(DfaState);
-				anchorState->m_nfaStateSet.copy(entry.m_dfaState->m_nfaStateSet);
-				anchorTransitionMap[anchors] = anchorState;
+			case NfaStateKind_MatchAnchor:
+				anchors = entry.m_anchors | nfaState->m_anchor;
+				it = anchorTransitionPreMap.visit(anchors);
+				if (it->m_value.isEmpty())
+					it->m_value = dfaState->m_nfaStateSet; // build anchor closure later
+
+				if (anchors == entry.m_anchors) { // no need to go deeper
+					nfaState = nfaState->m_nextState;
+					break;
+				}
+
+				stack.append(DfaAnchorCalcEntry(nfaState->m_nextState, anchors));
+				// ... and fall-through
+
+			default:
+				goto Break2;
 			}
-
-			isAdded = anchorState->m_nfaStateSet.add(entry.m_nfaState->m_nextState);
-			if (isAdded && entry.m_nfaState->m_nextState->m_stateKind <= NfaStateKind_MatchAnchor)
-				workingSet.append(DfaAtmWorkingSetEntry(anchorState, entry.m_nfaState->m_nextState, anchors));
-
-			break;
 		}
+	Break2:;
 	}
 
-	if (anchorMask) {
-		dfaState->m_anchorTransitionMap.setCount(anchorMask + 1);
-		for (size_t i = 0; i <= anchorMask; i++) {
-			dfaState->m_anchorTransitionMap[i] = anchorTransitionMap[i] ?
-				m_regex->addDfaState(anchorTransitionMap[i]) :
-				NULL;
-		}
+	ASSERT(!anchorTransitionPreMap.isEmpty());
 
-		dfaState->m_anchorMask = anchorMask;
+	// stage 3 -- finalize anchor transition map (build epsilon+anchor closures and cache resulting DFA states)
+
+	it = anchorTransitionPreMap.getHead();
+	for (; it; it++) {
+		uint_t anchors = it->getKey();
+		it->m_value.buildAnchorClosure(anchors);
+		DfaState* dfaAnchorTransition = m_regex->getDfaState(it->m_value);
+		dfaAnchorTransition->m_flags |= DfaStateFlag_AnchorTransition; // prevent buildAnchorTransitionMap on this state
+		dfaState->m_anchorTransitionMap[anchors] = dfaAnchorTransition;
+		dfaState->m_anchorMask |= anchors;
 	}
 }
 
@@ -230,14 +235,18 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 	size_t nfaStateCount = dfaState->m_nfaStateSet.getCount();
 	const DfaState* dfaSearchStartState = m_regex->getDfaSearchStartState();
 
-	// pass 1 -- visit all breaking points in the char range map
+	// stage 1 -- visit all breaking points in the char range map
 
 	for (size_t i = 0; i < nfaStateCount; i++) {
 		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
-		if (nfaState->m_stateKind < NfaStateKind_FirstConsuming)
+		if (nfaState->m_stateKind < NfaStateKind_FirstMatch)
 			continue;
 
 		switch (nfaState->m_stateKind) {
+		case NfaStateKind_MatchAnchor:
+			dfaState->m_flags |= DfaStateFlag_HasMatchAnchor;
+			break;
+
 		case NfaStateKind_MatchChar:
 			visitMatchChar(nfaState->m_char);
 			break;
@@ -252,7 +261,7 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 		}
 	}
 
-	// pass 2 -- "colorize" the char range map from top priority to bottom
+	// stage 2 -- "colorize" the char range map from top priority to bottom
 
 	for (size_t i = 0; i < nfaStateCount; i++) {
 		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
@@ -274,7 +283,7 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 		}
 	}
 
-	// finalize transition map
+	// stage 3 -- finalize transition map
 
 	CharRangeMapIterator it = m_charRangeMap.getHead();
 	while (it != m_charRangeMap.getTail()) {
@@ -285,15 +294,12 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 			continue;
 		}
 
-		DfaState* targetState = AXL_MEM_NEW(DfaState);
-		sl::takeOver(&targetState->m_nfaStateSet, &it->m_value);
-		targetState->m_nfaStateSet.buildEpsilonClosure();
-		targetState = m_regex->addDfaState(targetState);
+		it->m_value.buildEpsilonClosure();
 
 		dfaState->m_charTransitionMap.add(
 			it->getKey(),
 			nextIt->getKey() - 1,
-			targetState
+			m_regex->getDfaState(it->m_value)
 		);
 
 		it = nextIt;
@@ -369,8 +375,7 @@ DfaBuilder::addMatchCharRange(
 
 	CharRangeMapIterator it = m_charRangeMap.visit(from);
 	do {
-		if (!it->m_value.isAccept())
-			it->m_value.add(state);
+		it->m_value.add(state);
 	} while ((++it)->getKey() <= to);
 }
 

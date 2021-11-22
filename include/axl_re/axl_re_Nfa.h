@@ -23,26 +23,31 @@ class Regex;
 //..............................................................................
 
 enum Anchor {
-	Anchor_Begin  = 0x01,
-	Anchor_End    = 0x02,
-	Anchor_Word   = 0x04,
-
-	Anchor_Last   = Anchor_Word,
-	Anchor__Count = 3,
-	Anchor__TransitionMapSize = 1 << Anchor__Count,
+	Anchor_BeginLine       = 0x01,  // ^
+	Anchor_EndLine         = 0x02,  // $
+	Anchor_BeginText       = 0x04,  // \A
+	Anchor_EndText         = 0x08,  // \z
+	Anchor_WordBoundary    = 0x10,  // \b
+	Anchor_NotWordBoundary = 0x20,  // \B
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const char* getAnchorString(uint_t anchors);
+const char*
+getAnchorString(Anchor anchor);
+
+sl::String
+getAnchorsString(uint_t anchors);
 
 //..............................................................................
 
 enum NfaStateKind {
 	NfaStateKind_Undefined = 0,
+	NfaStateKind_Start,
+	NfaStateKind_Accept,
+	NfaStateKind_Concat,
 	NfaStateKind_Epsilon,
 	NfaStateKind_Split,
-	NfaStateKind_Accept,
 	NfaStateKind_OpenCapture,
 	NfaStateKind_CloseCapture,
 	NfaStateKind_MatchAnchor,
@@ -50,10 +55,10 @@ enum NfaStateKind {
 	NfaStateKind_MatchCharSet,
 	NfaStateKind_MatchAnyChar,
 
+	NfaStateKind_Last           = NfaStateKind_MatchAnyChar,
 	NfaStateKind_LastEpsilon    = NfaStateKind_CloseCapture,
+	NfaStateKind_FirstMatch     = NfaStateKind_MatchAnchor,
 	NfaStateKind_FirstConsuming = NfaStateKind_MatchChar,
-	NfaStateKind_FirstStorable  = NfaStateKind_Split,
-	NfaStateKind_LastStorable   = NfaStateKind_MatchAnyChar,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -61,18 +66,18 @@ enum NfaStateKind {
 struct NfaState: sl::ListLink {
 	NfaStateKind m_stateKind;
 	size_t m_id;
+	NfaState* m_nextState;      // all except NfaStateKind_Accept
 
 	union {
 		intptr_t m_unionData;
-		size_t m_acceptId;
-		size_t m_captureId;
-		utf32_t m_char;
-		Anchor m_anchor;
-		CharSet* m_charSet;
-		NfaState* m_splitState;
+		size_t m_acceptId;      // NfaStateKind_Accept
+		size_t m_captureId;     // NfaStateKind_Open/ClostCapture
+		Anchor m_anchor;        // NfaStateKind_MatchAnchor
+		utf32_t m_char;         // NfaStateKind_MatchChar
+		CharSet* m_charSet;     // NfaStateKind_MatchCharSet
+		NfaState* m_prevState;  // NfaStateKind_Concat
+		NfaState* m_splitState; // NfaStateKind_Split
 	};
-
-	NfaState* m_nextState;
 
 	NfaState();
 	~NfaState();
@@ -159,6 +164,8 @@ struct NfaState: sl::ListLink {
 
 //..............................................................................
 
+// NFA sets are ORDERED by STATE PRIORITY
+
 class NfaStateSet {
 protected:
 	sl::Array<const NfaState*> m_array;
@@ -190,6 +197,11 @@ public:
 		return m_array.getBack();
 	}
 
+	const sl::BitMap&
+	getMap() const {
+		return m_map;
+	}
+
 	bool
 	find(size_t id) const {
 		return m_map.getBit(id);
@@ -200,18 +212,27 @@ public:
 		return m_map.getBit(state->m_id);
 	}
 
+	bool
+	isEqual(const NfaStateSet& set) const {
+		size_t count = m_array.getCount();
+		return count == set.m_array.getCount() && memcmp(m_array, set.m_array, count * sizeof(NfaState*)) == 0;
+	}
+
+	size_t
+	hash() const {
+		return sl::djb2(m_array, m_array.getCount() * sizeof(NfaState*));
+	}
+
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(NfaStateSet&& src) {
-		m_array.move(std::move(src.m_array));
-		m_map.move(std::move(src.m_map));
+		sl::takeOver(this, &src);
 	}
 #endif
 
 	void
 	copy(const NfaStateSet& src) {
-		m_array.copy(src.m_array);
-		m_map.copy(src.m_map);
+		*this = src;
 	}
 
 	void
@@ -229,28 +250,20 @@ public:
 	bool
 	add(const NfaState* state);
 
-	// NFA sets are ORDERED!
+	void
+	buildEpsilonClosure() {
+		buildAnchorClosure(0);
+	}
 
 	void
-	buildEpsilonClosure();
-
-	bool
-	isEqual(const NfaStateSet& set) const {
-		size_t count = m_array.getCount();
-		return count == set.m_array.getCount() && memcmp(m_array, set.m_array, count * sizeof(NfaState*)) == 0;
-	}
-
-	size_t
-	hash() const {
-		return sl::djb2(m_array, m_array.getCount() * sizeof(NfaState*));
-	}
+	buildAnchorClosure(uint_t anchors);
 };
 
 //..............................................................................
 
 template <typename T>
 class NfaStateSetMap: public sl::HashTable<
-	NfaStateSet*,
+	const NfaStateSet*,
 	T,
 	sl::HashDuckType<NfaStateSet>,
 	sl::EqDuckType<NfaStateSet>

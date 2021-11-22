@@ -26,6 +26,13 @@ struct DfaState;
 
 //..............................................................................
 
+// the key is a combination of NfaAnchor
+
+typedef sl::SimpleHashTable<uint_t, NfaStateSet> DfaAnchorTransitionPreMap;
+typedef sl::SimpleHashTable<uint_t, const DfaState*> DfaAnchorTransitionMap;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class DfaCharTransitionMap {
 public:
 	struct Value {
@@ -82,9 +89,11 @@ public:
 //..............................................................................
 
 enum DfaStateFlag {
-	DfaStateFlag_Accept         = 0x01,
-	DfaStateFlag_Final          = 0x02,
-	DfaStateFlag_TransitionMaps = 0x10,
+	DfaStateFlag_Accept           = 0x01,
+	DfaStateFlag_InstaMatch       = 0x02, // accepts + no transitions
+	DfaStateFlag_HasMatchAnchor   = 0x04,
+	DfaStateFlag_AnchorTransition = 0x08,
+	DfaStateFlag_TransitionMaps   = 0x10,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -95,15 +104,13 @@ struct DfaState: sl::ListLink {
 	uint_t m_flags;
 	uint_t m_anchorMask;
 	NfaStateSet m_nfaStateSet;
-	sl::Array<const DfaState*> m_anchorTransitionMap;
+	DfaAnchorTransitionMap m_anchorTransitionMap;
 	DfaCharTransitionMap m_charTransitionMap;
 
 	DfaState();
 
-	bool
-	isFinal() const {
-		return m_anchorTransitionMap.isEmpty() && m_charTransitionMap.isEmpty();
-	}
+	void
+	buildClosure();
 
 #if (_AXL_DEBUG)
 	void

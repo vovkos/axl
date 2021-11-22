@@ -273,7 +273,7 @@ protected:
 	createDfaStartState(const NfaState* state);
 
 	DfaState*
-	addDfaState(DfaState* state);
+	getDfaState(const NfaStateSet& nfaStateSet);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

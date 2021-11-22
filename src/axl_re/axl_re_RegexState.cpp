@@ -52,7 +52,7 @@ RegexStateImpl::initialize(
 	m_regex = NULL;
 	m_decoder.setup(codec);
 	m_execFlags = execFlags;
-	m_prevCharFlags = RegexStateImpl::CharFlag_NewLine;
+	m_prevCharFlags = RegexStateImpl::CharFlag_Lf;
 }
 
 void
@@ -97,33 +97,6 @@ RegexStateImpl::reset() {
 	m_subMatchList.clear();
 	m_subMatchArray.clear();
 	m_engine->reset();
-}
-
-uint32_t
-RegexStateImpl::calcAnchors(utf32_t c) {
-	uint_t anchors = 0;
-	uint_t charFlags = 0;
-
-	if (m_prevCharFlags & CharFlag_NewLine)
-		anchors |= Anchor_Begin;
-
-	if (c == '\r') {
-		anchors |= Anchor_End;
-	} else if (c == '\n') {
-		anchors |= Anchor_End;
-		charFlags |= CharFlag_NewLine;
-	}
-
-	if (enc::utfIsLetterOrDigit(c)) {
-		if (!(m_prevCharFlags & CharFlag_AlphaNum))
-			anchors |= Anchor_Word;
-		charFlags |= CharFlag_AlphaNum;
-	} else if (m_prevCharFlags & CharFlag_AlphaNum) {
-		anchors |= Anchor_Word;
-	}
-
-	m_prevCharFlags = charFlags;
-	return anchors;
 }
 
 bool
