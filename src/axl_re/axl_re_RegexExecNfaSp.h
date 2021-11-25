@@ -25,6 +25,8 @@ protected:
 	NfaStateSet m_nonConsumingStateSetTable[2];
 	size_t m_consumingStateSetIdx;
 	size_t m_nonConsumingStateSetIdx;
+	size_t m_matchAcceptId;
+	size_t m_matchEndOffset;
 	bool m_isEmpty;
 
 public:
@@ -60,6 +62,9 @@ protected:
 
 	void
 	advanceConsumingStates(utf32_t c);
+
+	bool
+	finalize(bool isEof);
 };
 
 //..............................................................................

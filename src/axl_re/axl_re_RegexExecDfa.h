@@ -45,6 +45,9 @@ public:
 protected:
 	void
 	gotoState(const DfaState* state);
+
+	bool
+	finalize(bool isEof);
 };
 
 //..............................................................................

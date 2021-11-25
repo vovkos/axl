@@ -50,19 +50,15 @@ protected:
 		size_t m_captureCount;
 		const NfaState* m_nfaMatchStartState;
 		const DfaState* m_dfaMatchStartState;
+
+		SwitchCase();
 	};
 
 protected:
 	RegexKind m_regexKind;
-	size_t m_captureCount;
-	NfaState* m_nfaMatchStartState;
-	NfaState* m_nfaSearchStartState;
-	DfaState* m_dfaMatchStartState;
-	DfaState* m_dfaSearchStartState;
-	sl::List<NfaState> m_nfaStateList;
-	sl::List<DfaState> m_dfaStateList;
-	sl::List<DfaState> m_preDfaStateList;
-	NfaStateSetMap<DfaState*> m_dfaStateMap;
+	NfaProgram m_nfaProgram;
+	DfaProgram m_dfaProgram;
+	DfaProgram m_dfaReverseProgram;
 	sl::Array<SwitchCase> m_switchCaseArray;
 
 public:
@@ -70,7 +66,7 @@ public:
 
 	bool
 	isEmpty() const {
-		return m_nfaStateList.isEmpty();
+		return m_nfaProgram.m_stateList.isEmpty();
 	}
 
 	RegexKind
@@ -80,37 +76,45 @@ public:
 
 	size_t
 	getCaptureCount() const {
-		return m_captureCount;
+		return m_nfaProgram.m_captureCount;
 	}
 
 	size_t
 	getNfaStateCount() const {
-		return m_nfaStateList.getCount();
+		return m_nfaProgram.m_stateList.getCount();
 	}
 
 	const NfaState*
 	getNfaMatchStartState() const {
-		return m_nfaMatchStartState;
+		return m_nfaProgram.m_matchStartState;
 	}
 
 	const NfaState*
 	getNfaSearchStartState() const {
-		return m_nfaSearchStartState;
+		return m_nfaProgram.m_searchStartState;
 	}
 
 	const DfaState*
 	getDfaMatchStartState() {
 		return
-			m_dfaMatchStartState ? m_dfaMatchStartState :
-			m_nfaMatchStartState ? m_dfaMatchStartState = createDfaStartState(m_nfaMatchStartState) :
+			m_dfaProgram.m_matchStartState ? m_dfaProgram.m_matchStartState :
+			m_nfaProgram.m_matchStartState ? m_dfaProgram.m_matchStartState = m_dfaProgram.createStartState(m_nfaProgram.m_matchStartState) :
 			NULL;
 	}
 
 	const DfaState*
 	getDfaSearchStartState() {
 		return
-			m_dfaSearchStartState ? m_dfaSearchStartState :
-			m_nfaSearchStartState ? m_dfaSearchStartState = createDfaStartState(m_nfaSearchStartState) :
+			m_dfaProgram.m_searchStartState ? m_dfaProgram.m_searchStartState :
+			m_nfaProgram.m_searchStartState ? m_dfaProgram.m_searchStartState = m_dfaProgram.createStartState(m_nfaProgram.m_searchStartState) :
+			NULL;
+	}
+
+	const DfaState*
+	getDfaReverseMatchStartState() {
+		return
+			m_dfaReverseProgram.m_matchStartState ? m_dfaReverseProgram.m_matchStartState :
+			m_nfaProgram.m_matchStartState ? m_dfaReverseProgram.m_matchStartState = m_dfaReverseProgram.createStartState(m_nfaProgram.m_matchStartState) :
 			NULL;
 	}
 
@@ -185,19 +189,14 @@ public:
 	void
 	finalizeSwitch(uint_t flags = 0) { // only RegexCompileFlag_MatchOnly makes sense here
 		ASSERT(m_regexKind = RegexKind_Switch);
-		finalize(flags);
+		m_nfaProgram.finalize((flags & RegexCompileFlag_MatchOnly) != 0);
 	}
 
 	void
 	buildFullDfa();
 
-#if (_AXL_DEBUG)
 	void
-	printNfa(FILE* file = stdout) const;
-
-	void
-	printDfa(FILE* file = stdout) const;
-#endif
+	buildFullReverseDfa();
 
 	// execution (match/search)
 
@@ -265,15 +264,24 @@ public:
 		return state->eof();
 	}
 
-protected:
+#if (_AXL_DEBUG)
+	// debug printing
+
 	void
-	finalize(uint_t flags);
+	printNfa(FILE* file = stdout) const {
+		m_nfaProgram.print(file);
+	}
 
-	DfaState*
-	createDfaStartState(const NfaState* state);
+	void
+	printDfa(FILE* file = stdout) const {
+		m_dfaProgram.print(file);
+	}
 
-	DfaState*
-	getDfaState(const NfaStateSet& nfaStateSet);
+	void
+	printReverseDfa(FILE* file = stdout) const {
+		m_dfaReverseProgram.print(file);
+	}
+#endif
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -288,7 +296,14 @@ Regex::getSwitchCaseDfaMatchStartState(size_t id) {
 
 	return
 		scase.m_dfaMatchStartState ? scase.m_dfaMatchStartState :
-		scase.m_dfaMatchStartState = createDfaStartState(scase.m_nfaMatchStartState);
+		scase.m_dfaMatchStartState = m_dfaProgram.createStartState(scase.m_nfaMatchStartState);
+}
+
+//..............................................................................
+
+inline
+DfaBuilder::DfaBuilder(Regex* regex) {
+	m_program = &regex->m_dfaProgram;
 }
 
 //..............................................................................

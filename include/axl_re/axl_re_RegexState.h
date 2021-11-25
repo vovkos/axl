@@ -88,22 +88,17 @@ public:
 	uint_t
 	calcAnchorsUpdateCharFlags(utf32_t c);
 
-	bool
-	finalize(
-		bool isEof
+	void
+	createMatch(
+		size_t acceptId,
+		const RegexMatchPos& matchPos,
+		const sl::ArrayRef<RegexMatchPos>& capturePosArray = sl::ArrayRef<RegexMatchPos>()
 	);
 
 	bool
 	exec(
 		const void* p,
 		size_t size
-	);
-
-	void
-	createSubMatches(
-		size_t baseCaptureId,
-		size_t captureCount,
-		const sl::ArrayRef<RegexMatchPos>& capturePosArray
 	);
 };
 

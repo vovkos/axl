@@ -99,61 +99,34 @@ RegexStateImpl::reset() {
 	m_engine->reset();
 }
 
-bool
-RegexStateImpl::finalize(bool isEof) {
-	if (m_matchAcceptId == -1)
-		return false;
+void
+RegexStateImpl::createMatch(
+	size_t acceptId,
+	const RegexMatchPos& matchPos,
+	const sl::ArrayRef<RegexMatchPos>& capturePosArray
+) {
+	ASSERT(m_matchAcceptId == -1);
 
-	if (!m_subMatchArray.isEmpty()) { // already finalized
-		ASSERT(m_subMatchArray.getFront() == &m_match);
-		return true;
-	}
-
-	if (m_execFlags & RegexExecFlag_AnchorDataEnd) {
-		if (!isEof)
-			return m_lastExecOffset + m_lastExecSize == m_match.m_endOffset + m_decoder.getAccumulatorCount(); // account for the incomplete codepoint
-
-		if (m_lastExecOffset + m_lastExecSize != m_match.m_endOffset)
-			return false;
-	}
+	m_matchAcceptId = acceptId;
+	m_match.m_offset = matchPos.m_offset;
+	m_match.m_endOffset = matchPos.m_endOffset;
 
 	if (!(m_execFlags & RegexExecFlag_Stream)) {
 		m_match.m_charCodec = m_decoder.getCharCodec();
 		m_match.m_p = (char*)m_lastExecBuffer + m_match.m_offset - m_lastExecOffset;
 	}
 
-	if (m_execFlags & RegexExecFlag_DisableCapture)
-		m_subMatchArray.copy(&m_match); /*
-	else if (m_regex->getRegexKind() != RegexKind_Switch)
-		createSubMatches(
-			0,
-			m_regex->getCaptureCount(),
-			m_engine->getCapturePosArray()
-		);
-	else
-		createSubMatches(
-			m_regex->getSwitchCaseBaseCaptureId(m_matchAcceptId),
-			m_regex->getSwitchCaseCaptureCount(m_matchAcceptId),
-			m_engine->getCapturePosArray()
-		); */
+	size_t count = capturePosArray.getCount();
 
-	return true;
-}
+	if (!count || (m_execFlags & RegexExecFlag_DisableCapture)) {
+		m_subMatchArray.copy(&m_match);
+		return;
+	}
 
-void
-RegexStateImpl::createSubMatches(
-	size_t baseCaptureId,
-	size_t captureCount,
-	const sl::ArrayRef<RegexMatchPos>& capturePosArray
-) {
-	m_subMatchArray.setCountZeroConstruct(captureCount + 1);
+	m_subMatchArray.setCountZeroConstruct(count + 1);
 	m_subMatchArray[0] = &m_match;
 
-	size_t count = capturePosArray.getCount();
-	if (count > captureCount)
-		count = captureCount;
-
-	for (size_t i = baseCaptureId; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		const RegexMatchPos& pos = capturePosArray[i];
 		if (pos.m_endOffset == -1)
 			continue;
@@ -169,7 +142,7 @@ RegexStateImpl::createSubMatches(
 			match->m_p = (char*)m_lastExecBuffer + pos.m_offset - m_lastExecOffset;
 		}
 
-		m_subMatchArray[i - baseCaptureId + 1] = match;
+		m_subMatchArray[i + 1] = match;
 	}
 }
 

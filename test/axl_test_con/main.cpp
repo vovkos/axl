@@ -563,7 +563,7 @@ testRegex() {
 	bool result = true;
 
 #if (1)
-	const char src[] = "a|[a-z]+1";
+	const char src[] = "a*b*"; // "x(a*b)*(a*c)*";
 	// const char src[] = "[abc]";
 	// const char src[] = "^([abc]+)$";
 
@@ -584,6 +584,8 @@ testRegex() {
 	regex.printDfa();
 #endif
 #endif
+
+	return;
 
 #if (_AXL_RE_TEST_SAVE)
 	sl::Array<char> storage;
@@ -619,8 +621,7 @@ testRegex() {
 	const re::RegexMatch* match;
 	size_t count;
 
-#if (0)
-	const char text[] = "abxccxxaaabbbbccd";
+	const char text[] = "sabxcacxxaaabbbbccd";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
@@ -652,7 +653,6 @@ testRegex() {
 				subMatch->getText().sz()
 			);
 	}
-#endif
 
 #if (0)
 	printf("STREAM MATCH:\n");

@@ -43,12 +43,12 @@ getAnchorsString(uint_t anchors);
 
 enum NfaStateKind {
 	NfaStateKind_Undefined = 0,
-	NfaStateKind_Start,
 	NfaStateKind_Accept,
-	NfaStateKind_Concat,
 	NfaStateKind_Epsilon,
 	NfaStateKind_Split,
-	NfaStateKind_OpenCapture,
+	NfaStateKind_Link,
+	NfaStateKind_Sequence,
+ 	NfaStateKind_OpenCapture,
 	NfaStateKind_CloseCapture,
 	NfaStateKind_MatchAnchor,
 	NfaStateKind_MatchChar,
@@ -63,20 +63,36 @@ enum NfaStateKind {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+const char*
+getNfaStateKindCodeString(NfaStateKind stateKind);
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum NfaStateFlag {
+	NfaStateFlag_Nullable = 0x01,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 struct NfaState: sl::ListLink {
 	NfaStateKind m_stateKind;
+	uint_t m_flags;
 	size_t m_id;
 	NfaState* m_nextState;      // all except NfaStateKind_Accept
 
 	union {
-		intptr_t m_unionData;
+		uintptr_t m_unionData[2];
 		size_t m_acceptId;      // NfaStateKind_Accept
-		size_t m_captureId;     // NfaStateKind_Open/ClostCapture
+		size_t m_captureId;     // NfaStateKind_Open/CloseCapture
 		Anchor m_anchor;        // NfaStateKind_MatchAnchor
 		utf32_t m_char;         // NfaStateKind_MatchChar
 		CharSet* m_charSet;     // NfaStateKind_MatchCharSet
-		NfaState* m_prevState;  // NfaStateKind_Concat
 		NfaState* m_splitState; // NfaStateKind_Split
+		NfaState* m_tailState;  // NfaStateKind_Sequence
+		struct {                // NfaStateKind_Link
+			NfaState* m_opState;
+			NfaState* m_reverseState;
+		};
 	};
 
 	NfaState();
@@ -97,6 +113,9 @@ struct NfaState: sl::ListLink {
 	}
 
 	void
+	createAccept(size_t id);
+
+	void
 	createEpsilon(NfaState* nextState);
 
 	void
@@ -106,7 +125,16 @@ struct NfaState: sl::ListLink {
 	);
 
 	void
-	createAccept(size_t id);
+	createLink(
+		NfaState* opState,
+		NfaState* reverseState
+	);
+
+	void
+	createSequence(
+		NfaState* headState,
+		NfaState* tailState
+	);
 
 	void
 	createMatchAnchor(
@@ -139,6 +167,12 @@ struct NfaState: sl::ListLink {
 	);
 
 	void
+	finalizeLink(NfaState* nextState)  {
+		ASSERT(m_stateKind == NfaStateKind_Link && !m_nextState);
+		m_nextState = nextState;
+	}
+
+	void
 	addChar(utf32_t c);
 
 	void
@@ -162,9 +196,140 @@ struct NfaState: sl::ListLink {
 #endif
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void
+NfaState::createAccept(size_t id) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_Accept;
+	m_acceptId = id;
+}
+
+inline
+void
+NfaState::createEpsilon(NfaState* nextState) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_Epsilon;
+	m_nextState = nextState;
+}
+
+inline
+void
+NfaState::createSplit(
+	NfaState* nextState,
+	NfaState* splitState
+) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_Split;
+	m_nextState = nextState;
+	m_splitState = splitState;
+}
+
+inline
+void
+NfaState::createLink(
+	NfaState* opState,
+	NfaState* reverseState
+) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_Link;
+	m_opState = opState;
+	m_reverseState = reverseState;
+}
+
+inline
+void
+NfaState::createSequence(
+	NfaState* headState,
+	NfaState* tailState
+) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_Sequence;
+	m_nextState = headState;
+	m_tailState = tailState;
+}
+
+inline
+void
+NfaState::createMatchAnchor(
+	Anchor anchor,
+	NfaState* nextState
+) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_MatchAnchor;
+	m_anchor = anchor;
+	m_nextState = nextState;
+}
+
+inline
+void
+NfaState::createMatchChar(
+	utf32_t c,
+	NfaState* nextState
+) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_MatchChar;
+	m_char = c;
+	m_nextState = nextState;
+}
+
+inline
+void
+NfaState::createMatchCharSet(NfaState* nextState) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_MatchCharSet;
+	m_charSet = AXL_MEM_NEW(CharSet);
+	m_nextState = nextState;
+}
+
+inline
+void
+NfaState::createMatchAnyChar(NfaState* nextState) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_MatchAnyChar;
+	m_nextState = nextState;
+}
+
+inline
+void
+NfaState::createOpenCapture(
+	size_t captureId,
+	NfaState* nextState
+) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_OpenCapture;
+	m_flags = nextState->m_flags;
+	m_captureId = captureId;
+	m_nextState = nextState;
+}
+
+inline
+void
+NfaState::createCloseCapture(
+	size_t captureId,
+	NfaState* nextState
+) {
+	ASSERT(!m_stateKind && !m_nextState);
+
+	m_stateKind = NfaStateKind_CloseCapture;
+	m_captureId = captureId;
+	m_nextState = nextState;
+}
+
 //..............................................................................
 
-// NFA sets are ORDERED by STATE PRIORITY
+// NFA sets are strictly ORDERED by STATE PRIORITY
 
 class NfaStateSet {
 protected:
@@ -250,25 +415,112 @@ public:
 	bool
 	add(const NfaState* state);
 
+	template <typename IsReverse>
 	void
 	buildEpsilonClosure() {
-		buildAnchorClosure(0);
+		buildClosureImpl<sl::False, IsReverse, sl::False>(0);
+	}
+
+	template <typename IsReverse>
+	void
+	buildAnchorClosure(uint_t anchors) {
+		buildClosureImpl<sl::False, IsReverse, sl::True>(anchors);
 	}
 
 	void
-	buildAnchorClosure(uint_t anchors);
+	buildRollbackClosure() {
+		buildClosureImpl<sl::True, sl::False, sl::False>(0);
+	}
+
+protected:
+	template <
+		typename IsRollback,
+		typename IsReverse,
+		typename UseAnchors
+	>
+	void
+	buildClosureImpl(uint_t anchors);
 };
 
 //..............................................................................
 
 template <typename T>
 class NfaStateSetMap: public sl::HashTable<
-	const NfaStateSet*,
+	NfaStateSet,
 	T,
 	sl::HashDuckType<NfaStateSet>,
-	sl::EqDuckType<NfaStateSet>
+	sl::EqDuckType<NfaStateSet>,
+	const NfaStateSet&
 > {
 };
+
+//..............................................................................
+
+struct NfaProgram {
+	sl::List<NfaState> m_stateList;
+	NfaState* m_matchStartState;
+	NfaState* m_searchStartState;
+	size_t m_captureCount;
+
+	NfaProgram();
+
+	void
+	clear();
+
+	void
+	finalize(bool isMatchOnly = false);
+
+	NfaState*
+	getLastState() {
+		return *m_stateList.getTail();
+	}
+
+	NfaState*
+	addState();
+
+	NfaState*
+	insertState(NfaState* beforeState);
+
+	NfaState*
+	insertSplitState(
+		NfaState* beforeState,
+		NfaState* splitState
+	);
+
+#if (_AXL_DEBUG)
+	void
+	print(FILE* file) const;
+#endif
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+NfaState*
+NfaProgram::addState() {
+	NfaState* state = AXL_MEM_NEW(NfaState);
+	m_stateList.insertTail(state);
+	return state;
+}
+
+inline
+NfaState*
+NfaProgram::insertState(NfaState* beforeState) {
+	NfaState* state = AXL_MEM_NEW(NfaState);
+	m_stateList.insertBefore(state, beforeState);
+	return state;
+}
+
+inline
+NfaState*
+NfaProgram::insertSplitState(
+	NfaState* beforeState,
+	NfaState* splitState
+) {
+	NfaState* state = insertState(beforeState);
+	state->createSplit(beforeState, splitState);
+	return state;
+}
 
 //..............................................................................
 

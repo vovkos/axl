@@ -48,35 +48,14 @@ RegexCompiler::Token::isValidSingle() {
 
 //..............................................................................
 
-inline
-NfaState*
-RegexCompiler::addState() {
-	NfaState* state = AXL_MEM_NEW(NfaState);
-	m_regex->m_nfaStateList.insertTail(state);
-	return state;
-}
-
-inline
-NfaState*
-RegexCompiler::insertSplitState(
-	NfaState* beforeState,
-	NfaState* splitState
-) {
-	NfaState* state = AXL_MEM_NEW(NfaState);
-	state->createSplit(beforeState, splitState);
-	m_regex->m_nfaStateList.insertBefore(state, beforeState);
-	return state;
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 RegexCompiler::construct(
 	uint_t flags,
-	Regex* regex,
+	NfaProgram* program,
 	RegexNameMgr* nameMgr
 ) {
-	m_regex = regex;
+	m_program = program;
 	m_nameMgr = nameMgr;
 	m_flags = flags;
 	m_p = NULL;
@@ -90,11 +69,11 @@ RegexCompiler::compileSwitchCase(
 	const sl::StringRef& source,
 	size_t acceptId
 ) {
-	NfaState* oldStart = !m_regex->m_nfaStateList.isEmpty() ? *m_regex->m_nfaStateList.getHead() : NULL;
+	NfaState* oldStart = !m_program->m_stateList.isEmpty() ? *m_program->m_stateList.getHead() : NULL;
 	NfaState* newStart = compile(source, acceptId);
 
 	if (oldStart)
-		insertSplitState(oldStart, newStart);
+		m_program->insertSplitState(oldStart, newStart);
 
 	return newStart;
 }
@@ -116,7 +95,7 @@ RegexCompiler::compile(
 	if (!result)
 		return NULL;
 
-	NfaState* accept = *m_regex->m_nfaStateList.getTail();
+	NfaState* accept = m_program->getLastState();
 	accept->createAccept(acceptId);
 	return newStart;
 }
@@ -125,7 +104,7 @@ bool
 RegexCompiler::readChar(utf32_t* c) {
 	size_t length = enc::Utf8::getDecodeCodePointLength(*m_p);
 	if (length > (size_t)(m_end - m_p)) {
-		err::setError("incomplete UTF8 code-point");
+		err::setError("incomplete UTF8 codepoint");
 		return false;
 	}
 
@@ -222,7 +201,6 @@ RegexCompiler::readIdentifier(sl::String* name) {
 	return true;
 }
 
-#if (_AXL_RE_QUANTIFY)
 bool
 RegexCompiler::readQuantifier(size_t* count) {
 	char buffer[16] = { 0 };
@@ -251,7 +229,6 @@ RegexCompiler::readQuantifier(size_t* count) {
 	*count = n;
 	return true;
 }
-#endif
 
 bool
 RegexCompiler::getToken(Token* token) {
@@ -477,16 +454,17 @@ RegexCompiler::expression() {
 		return op1;
 	}
 
-	NfaState* accept1 = *m_regex->m_nfaStateList.getTail();
+	NfaState* accept1 = m_program->getLastState();
 	NfaState* op2 = expression();
 	if (!op2)
 		return NULL;
 
-	NfaState* accept2 = *m_regex->m_nfaStateList.getTail();
-	NfaState* start = insertSplitState(op1, op2);
-	NfaState* accept = addState();
+	NfaState* accept2 = m_program->getLastState();
+	NfaState* start = m_program->insertSplitState(op1, op2);
+	NfaState* accept = m_program->addState();
 	accept1->createEpsilon(accept);
 	accept2->createEpsilon(accept);
+	start->m_flags |= op1->m_flags | op2->m_flags;
 	return start;
 }
 
@@ -496,26 +474,51 @@ RegexCompiler::concat() {
 	if (!start)
 		return NULL;
 
-	for (;;) {
-		Token token;
-		bool result = getToken(&token);
-		if (!result)
+	Token token;
+	bool result = getToken(&token);
+	if (!result)
+		return NULL;
+
+	m_lastToken = token; // unget token
+	if (!token.isValidSingle())
+		return start; // not a sequence
+
+	uint_t flags = start->m_flags;
+	NfaState* link = m_program->getLastState();
+	NfaState* accept = AXL_MEM_NEW(NfaState);
+	NfaState* head = link;
+	head->createLink(start, accept);
+
+	do {
+		NfaState* op = repeat();
+		if (!op) {
+			AXL_MEM_DELETE(accept);
 			return NULL;
+		}
+
+		if (!(op->m_flags & NfaStateFlag_Nullable))
+			flags &= ~NfaStateFlag_Nullable;
+
+		NfaState* link2 = m_program->getLastState();
+		link->finalizeLink(link2);
+		link2->createLink(op, link);
+		link = link2;
+
+		bool result = getToken(&token);
+		if (!result) {
+			AXL_MEM_DELETE(accept);
+			return NULL;
+		}
 
 		m_lastToken = token; // unget token
+	} while (token.isValidSingle());
 
-		if (!token.isValidSingle())
-			break;
-
-		NfaState* accept1 = *m_regex->m_nfaStateList.getTail();
-		NfaState* op2 = repeat();
-		if (!op2)
-			return NULL;
-
-		accept1->createEpsilon(op2);
-	}
-
-	return start;
+	m_program->m_stateList.insertTail(accept);
+	NfaState* sequence = m_program->insertState(start);
+	sequence->createSequence(head, link);
+	sequence->m_flags = flags;
+	link->finalizeLink(accept);
+	return sequence;
 }
 
 NfaState*
@@ -540,45 +543,68 @@ RegexCompiler::repeat() {
 		case '+':
 			return plus(start);
 
-#if (_AXL_RE_QUANTIFY)
 		case '{':
 			size_t count;
 			result = readQuantifier(&count);
 			return result ? quantify(start, count) : NULL;
-#endif
 		}
 
 	m_lastToken = token; // unget token
 	return start;
 }
 
+bool
+RegexCompiler::nonGreedyRepeat() {
+	Token token;
+	bool result = getToken(&token);
+	if (result && token.m_tokenKind == TokenKind_SpecialChar && token.m_char == '?')
+		return true;
+
+	m_lastToken = token; // unget token
+	return false;
+}
+
 NfaState*
 RegexCompiler::question(NfaState* start) {
-	NfaState* oldAccept = *m_regex->m_nfaStateList.getTail();
-	NfaState* newAccept = addState();
-	NfaState* split = insertSplitState(start, newAccept);
+	bool isNonGreedy = nonGreedyRepeat();
+	NfaState* oldAccept = m_program->getLastState();
+	NfaState* newAccept = m_program->addState();
+	NfaState* split = isNonGreedy ?
+		m_program->insertSplitState(newAccept, start) :
+		m_program->insertSplitState(start, newAccept);
+
 	oldAccept->createEpsilon(newAccept);
+	split->m_flags |= NfaStateFlag_Nullable;
 	return split;
 }
 
 NfaState*
 RegexCompiler::star(NfaState* start) {
-	NfaState* oldAccept = *m_regex->m_nfaStateList.getTail();
-	NfaState* newAccept = addState();
-	NfaState* split = insertSplitState(start, newAccept);
+	bool isNonGreedy = nonGreedyRepeat();
+	NfaState* oldAccept = m_program->getLastState();
+	NfaState* newAccept = m_program->addState();
+	NfaState* split = isNonGreedy ?
+		m_program->insertSplitState(newAccept, start) :
+		m_program->insertSplitState(start, newAccept);
+
 	oldAccept->createEpsilon(split);
+	split->m_flags |= NfaStateFlag_Nullable;
 	return split;
 }
 
 NfaState*
 RegexCompiler::plus(NfaState* start) {
-	NfaState* oldAccept = *m_regex->m_nfaStateList.getTail();
-	NfaState* newAccept = addState();
-	oldAccept->createSplit(start, newAccept);
+	bool isNonGreedy = nonGreedyRepeat();
+	NfaState* oldAccept = m_program->getLastState();
+	NfaState* newAccept = m_program->addState();
+	if (isNonGreedy)
+		oldAccept->createSplit(newAccept, start);
+	else
+		oldAccept->createSplit(start, newAccept);
+
 	return start;
 }
 
-#if (_AXL_RE_QUANTIFY)
 NfaState*
 RegexCompiler::quantify(
 	NfaState* start,
@@ -587,11 +613,11 @@ RegexCompiler::quantify(
 	ASSERT(count <= MaxQuantifier);
 
 	NfaState* originalStart = start;
-	NfaState* accept = *m_regex->m_nfaStateList.getTail();
+	NfaState* accept = m_program->getLastState();
 	for (size_t i = 1; i < count; i++) {
 		start = clone(start, accept);
 		accept->createEpsilon(start);
-		accept = *m_regex->m_nfaStateList.getTail();
+		accept = m_program->getLastState();
 	}
 
 	return originalStart;
@@ -604,11 +630,11 @@ RegexCompiler::clone(
 ) {
 	sl::SimpleHashTable<NfaState*, NfaState*> stateMap;
 
-	sl::Iterator<NfaState> end = m_regex->m_nfaStateList.getTail();
+	sl::Iterator<NfaState> end = m_program->m_stateList.getTail();
 	sl::Iterator<NfaState> it = first;
 	for (;;) {
 		NfaState* oldState = *it;
-		NfaState* newState = addState();
+		NfaState* newState = m_program->addState();
 		newState->copy(*oldState);
 		stateMap[oldState] = newState;
 
@@ -639,7 +665,6 @@ RegexCompiler::clone(
 
 	return result;
 }
-#endif
 
 NfaState*
 RegexCompiler::single() {
@@ -723,13 +748,13 @@ NfaState*
 RegexCompiler::literal(const sl::StringRef& string) {
 	ASSERT(!string.isEmpty());
 
-	NfaState* start = addState();
+	NfaState* start = m_program->addState();
 	NfaState* mid = start;
 
 	const char* p = string.cp();
 	const char* end = string.getEnd();
 	for (; p < end; p++) {
-		NfaState* accept = addState();
+		NfaState* accept = m_program->addState();
 		mid->createMatchChar(*p, accept);
 		mid = accept;
 	}
@@ -739,16 +764,16 @@ RegexCompiler::literal(const sl::StringRef& string) {
 
 NfaState*
 RegexCompiler::anchor(Anchor anchor) {
-	NfaState* start = addState();
-	NfaState* accept = addState();
+	NfaState* start = m_program->addState();
+	NfaState* accept = m_program->addState();
 	start->createMatchAnchor(anchor, accept);
 	return start;
 }
 
 NfaState*
 RegexCompiler::ch(uint_t c) {
-	NfaState* start = addState();
-	NfaState* accept = addState();
+	NfaState* start = m_program->addState();
+	NfaState* accept = m_program->addState();
 	start->createMatchChar(c, accept);
 	return start;
 }
@@ -764,8 +789,8 @@ RegexCompiler::charClass() {
 		m_p++;
 	}
 
-	NfaState* start = addState();
-	NfaState* accept = addState();
+	NfaState* start = m_program->addState();
+	NfaState* accept = m_program->addState();
 	start->createMatchCharSet(accept);
 
 	size_t count = 0;
@@ -879,8 +904,8 @@ RegexCompiler::charClassItem(CharSet* charSet) {
 
 NfaState*
 RegexCompiler::stdCharClass(char c) {
-	NfaState* start = addState();
-	NfaState* accept = addState();
+	NfaState* start = m_program->addState();
+	NfaState* accept = m_program->addState();
 	start->createMatchCharSet(accept);
 	stdCharClass(c, start->m_charSet);
 	return start;
@@ -954,24 +979,24 @@ RegexCompiler::stdCharClass(
 
 NfaState*
 RegexCompiler::any() {
-	NfaState* start = addState();
-	NfaState* accept = addState();
+	NfaState* start = m_program->addState();
+	NfaState* accept = m_program->addState();
 	start->createMatchAnyChar(accept);
 	return start;
 }
 
 NfaState*
 RegexCompiler::capturingGroup() {
-	size_t captureId = m_regex->m_captureCount++;
+	size_t captureId = m_program->m_captureCount++;
 
-	NfaState* open = addState();
+	NfaState* open = m_program->addState();
 	NfaState* start = nonCapturingGroup();
 	if (!start)
 		return NULL;
 
-	NfaState* innerAccept = *m_regex->m_nfaStateList.getTail();
-	NfaState* close = addState();
-	NfaState* outerAccept = addState();
+	NfaState* innerAccept = m_program->getLastState();
+	NfaState* close = m_program->addState();
+	NfaState* outerAccept = m_program->addState();
 	open->createOpenCapture(captureId, start);
 	innerAccept->createEpsilon(close);
 	close->createCloseCapture(captureId, outerAccept);
@@ -1013,7 +1038,7 @@ RegexCompiler::namedRegex(const sl::StringRef& name) {
 
 	RegexCompiler subRegexCompiler(RegexCompileFlag_DisableCapture, &subRegex, m_nameMgr);
 	NfaState* start = subRegexCompiler.compileImpl(source, 0);
-	m_regex->m_nfaStateList.remove(&preStart);
+	m_program->m_stateList.remove(&preStart);
 	if (!start)
 		return NULL;
 
@@ -1021,7 +1046,7 @@ RegexCompiler::namedRegex(const sl::StringRef& name) {
 	ASSERT(accept->m_stateKind == NfaStateKind_Accept);
 	accept->m_stateKind = NfaStateKind_Undefined;
 
-	m_regex->m_nfaStateList.insertListTail(&subRegex.m_nfaStateList);
+	m_program->m_stateList.insertListTail(&subRegex.m_nfaStateList);
 	return start;
 }
 #endif

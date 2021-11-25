@@ -90,13 +90,13 @@ RegexExecDfa::exec(
 
 			const DfaState* nextState = m_state->m_charTransitionMap.find(c);
 			if (!nextState)
-				return m_parent->finalize(false);
+				return finalize(false);
 
 			m_parent->m_offset += cplBuffer[i];
 			gotoState(nextState);
 
 			if (nextState->m_flags & DfaStateFlag_InstaMatch)
-				return m_parent->finalize(false);
+				return finalize(false);
 		}
 	}
 
@@ -117,7 +117,27 @@ RegexExecDfa::eof() {
 		gotoState(m_state->m_anchorTransitionMap[anchors]);
 	}
 
-	return m_parent->finalize(true);
+	return finalize(true);
+}
+
+bool
+RegexExecDfa::finalize(bool isEof) {
+	if (m_parent->m_matchAcceptId != -1) // already finalized
+		return true;
+
+	if (m_matchAcceptId == -1)
+		return false;
+
+	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataEnd) {
+		if (!isEof)
+			return true; // can't verify until we see EOF
+
+		if (m_matchEndOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+			return false;
+	}
+
+	m_parent->createMatch(m_matchAcceptId, RegexMatchPos(0, m_matchEndOffset));
+	return true;
 }
 
 //..............................................................................

@@ -14,7 +14,6 @@
 #include "axl_re_Regex.h"
 #include "axl_re_RegexNameMgr.h"
 
-#define _AXL_RE_QUANTIFY    0
 #define _AXL_RE_NAMED_REGEX 0
 
 namespace axl {
@@ -52,7 +51,7 @@ protected:
 	};
 
 protected:
-	Regex* m_regex;
+	NfaProgram* m_program;
 	RegexNameMgr* m_nameMgr;
 	uint_t m_flags;
 
@@ -62,18 +61,18 @@ protected:
 
 public:
 	RegexCompiler(
-		Regex* regex,
+		NfaProgram* program,
 		RegexNameMgr* nameMgr = NULL
 	) {
-		construct(0, regex, nameMgr);
+		construct(0, program, nameMgr);
 	}
 
 	RegexCompiler(
 		uint_t flags,
-		Regex* regex,
+		NfaProgram* program,
 		RegexNameMgr* nameMgr = NULL
 	) {
-		construct(flags, regex, nameMgr);
+		construct(flags, program, nameMgr);
 	}
 
 	NfaState*
@@ -92,7 +91,7 @@ protected:
 	void
 	construct(
 		uint_t flags,
-		Regex* regex,
+		NfaProgram* program,
 		RegexNameMgr* nameMgr
 	);
 
@@ -111,10 +110,8 @@ protected:
 	bool
 	readIdentifier(sl::String* name);
 
-#if (_AXL_RE_QUANTIFY)
 	bool
 	readQuantifier(size_t* count);
-#endif
 
 	bool
 	getToken(Token* token);
@@ -124,15 +121,6 @@ protected:
 
 	bool
 	expectEof();
-
-	NfaState*
-	addState();
-
-	NfaState*
-	insertSplitState(
-		NfaState* beforeState,
-		NfaState* splitState
-	);
 
 	NfaState*
 	expression();
@@ -161,6 +149,9 @@ protected:
 	NfaState*
 	stdCharClass(char c);
 
+	bool
+	nonGreedyRepeat();
+
 	void
 	stdCharClass(
 		char c,
@@ -179,7 +170,6 @@ protected:
 	NfaState*
 	any();
 
-#if (_AXL_RE_QUANTIFY)
 	NfaState*
 	quantify(
 		NfaState* start,
@@ -191,7 +181,6 @@ protected:
 		NfaState* first,
 		NfaState* last
 	);
-#endif
 
 	bool
 	charClassItem(CharSet* charSet);

@@ -19,26 +19,26 @@ namespace re {
 
 //..............................................................................
 
-Regex::Regex() {
-	m_regexKind = RegexKind_Undefined;
+Regex::SwitchCase::SwitchCase() {
 	m_captureCount = 0;
 	m_nfaMatchStartState = NULL;
-	m_nfaSearchStartState = NULL;
 	m_dfaMatchStartState = NULL;
-	m_dfaSearchStartState = NULL;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+Regex::Regex():
+	m_dfaProgram(0),
+	m_dfaReverseProgram(DfaStateFlag_Reverse) {
+	m_regexKind = RegexKind_Undefined;
 }
 
 void
 Regex::clear() {
 	m_regexKind = RegexKind_Undefined;
-	m_captureCount = 0;
-	m_nfaMatchStartState = NULL;
-	m_nfaSearchStartState = NULL;
-	m_dfaMatchStartState = NULL;
-	m_dfaSearchStartState = NULL;
-	m_nfaStateList.clear();
-	m_dfaStateList.clear();
-	m_dfaStateMap.clear();
+	m_nfaProgram.clear();
+	m_dfaProgram.clear();
+	m_dfaReverseProgram.clear();
 	m_switchCaseArray.clear();
 }
 
@@ -86,12 +86,12 @@ Regex::load(
 	for (size_t i = 0; i < hdr->m_stateCount; i++) {
 		NfaState* state = AXL_MEM_NEW(NfaState);
 		state->m_id = i;
-		m_nfaStateList.insertTail(state);
+		m_nfaProgram.m_stateList.insertTail(state);
 		stateArray[i] = state;
 	}
 
-	m_nfaMatchStartState = stateArray[hdr->m_matchStartStateId];
-	m_nfaSearchStartState = hdr->m_searchStartStateId != 1 ? stateArray[hdr->m_searchStartStateId] : NULL;
+	m_nfaProgram.m_matchStartState = stateArray[hdr->m_matchStartStateId];
+	m_nfaProgram.m_searchStartState = hdr->m_searchStartStateId != 1 ? stateArray[hdr->m_searchStartStateId] : NULL;
 
 	bool result = m_switchCaseArray.setCount(hdr->m_switchCaseCount);
 	if (!result)
@@ -121,26 +121,47 @@ Regex::load(
 
 		NfaState* state = stateArray[i];
 		state->m_stateKind = (NfaStateKind)stateStorage->m_stateKind;
-		state->m_unionData = stateStorage->m_unionData;
+		state->m_unionData[0] = stateStorage->m_unionData[0];
+		state->m_unionData[1] = stateStorage->m_unionData[1];
+		state->m_unionData[2] = stateStorage->m_unionData[2];
 
 		if (stateStorage->m_nextStateId == -1) {
 			if (stateStorage->m_stateKind != NfaStateKind_Accept)
-				return err::fail("missing next regex NFA state");
+				return err::fail("missing regex NFA next state");
 
 			state->m_nextState = NULL;
 		} else if (stateStorage->m_nextStateId < hdr->m_stateCount)
 			state->m_nextState = stateArray[stateStorage->m_nextStateId];
 		else
-			return err::fail("invalid next regex NFA state index");
+			return err::fail("invalid regex NFA next state index");
 
 		p += sizeof(NfaStateStorage);
 
-		if (stateStorage->m_stateKind == NfaStateKind_Split) {
+		switch (stateStorage->m_stateKind) {
+		case NfaStateKind_Split:
 			if (stateStorage->m_splitStateId > hdr->m_stateCount)
-				return err::fail("invalid split regex NFA state index");
+				return err::fail("invalid split NFA regex state index");
 
 			state->m_splitState = stateArray[stateStorage->m_splitStateId];
-		} else if (stateStorage->m_stateKind == NfaStateKind_MatchCharSet) {
+			break;
+
+		case NfaStateKind_Link:
+			if (stateStorage->m_opStateId > hdr->m_stateCount ||
+				stateStorage->m_reverseStateId > hdr->m_stateCount)
+				return err::fail("invalid regex NFA state index");
+
+			state->m_opState = stateArray[stateStorage->m_opStateId];
+			state->m_reverseState = stateArray[stateStorage->m_reverseStateId];
+			break;
+
+		case NfaStateKind_Sequence:
+			if (stateStorage->m_tailStateId > hdr->m_stateCount)
+				return err::fail("invalid regex NFA sequence state index");
+
+			state->m_tailState = stateArray[stateStorage->m_tailStateId];
+			break;
+
+		case NfaStateKind_MatchCharSet:
 			state->m_charSet = AXL_MEM_NEW(CharSet);
 
 			for (size_t j = 0; j < stateStorage->m_charRangeCount; j++) {
@@ -165,7 +186,7 @@ Regex::save(sl::Array<char>* buffer) {
 	buffer->clear();
 
 	size_t switchCaseCount = m_switchCaseArray.getCount();
-	size_t stateCount = m_nfaStateList.getCount();
+	size_t stateCount = m_nfaProgram.m_stateList.getCount();
 
 	buffer->reserve(
 		sizeof(RegexStorageHdr) +
@@ -180,9 +201,9 @@ Regex::save(sl::Array<char>* buffer) {
 	hdr->m_regexKind = m_regexKind;
 	hdr->m_stateCount = stateCount;
 	hdr->m_switchCaseCount = switchCaseCount;
-	hdr->m_captureCount = m_captureCount;
-	hdr->m_matchStartStateId = m_nfaMatchStartState ? m_nfaMatchStartState->m_id : -1;
-	hdr->m_searchStartStateId = m_nfaSearchStartState ? m_nfaSearchStartState->m_id : -1;
+	hdr->m_captureCount = m_nfaProgram.m_captureCount;
+	hdr->m_matchStartStateId = m_nfaProgram.m_matchStartState ? m_nfaProgram.m_matchStartState->m_id : -1;
+	hdr->m_searchStartStateId = m_nfaProgram.m_searchStartState ? m_nfaProgram.m_searchStartState->m_id : -1;
 	hdr->m_dataSize = 0;
 
 	size_t offset = sizeof(RegexStorageHdr);
@@ -202,7 +223,7 @@ Regex::save(sl::Array<char>* buffer) {
 		offset += switchCaseSize;
 	}
 
-	sl::ConstIterator<NfaState> it = m_nfaStateList.getHead();
+	sl::ConstIterator<NfaState> it = m_nfaProgram.m_stateList.getHead();
 	for (; it; it++) {
 		const NfaState* state = *it;
 		size_t stateSize = state->m_stateKind == NfaStateKind_MatchCharSet ?
@@ -212,12 +233,26 @@ Regex::save(sl::Array<char>* buffer) {
 		buffer->appendEmptySpace(stateSize);
 		NfaStateStorage* stateStorage = (NfaStateStorage*)(buffer->p() + offset);
 		stateStorage->m_stateKind = state->m_stateKind;
-		stateStorage->m_unionData = (uint32_t)state->m_unionData;
+		stateStorage->m_unionData[0] = (uint32_t)state->m_unionData[0];
+		stateStorage->m_unionData[1] = (uint32_t)state->m_unionData[1];
+		stateStorage->m_unionData[2] = (uint32_t)state->m_unionData[2];
 		stateStorage->m_nextStateId = state->m_nextState ? state->m_nextState->m_id : -1;
 
-		if (state->m_stateKind == NfaStateKind_Split)
+		switch (state->m_stateKind) {
+		case NfaStateKind_Split:
 			stateStorage->m_splitStateId = state->m_splitState->m_id;
-		else if (state->m_stateKind == NfaStateKind_MatchCharSet) {
+			break;
+
+		case NfaStateKind_Link:
+			stateStorage->m_opStateId = state->m_opState->m_id;
+			stateStorage->m_reverseStateId = state->m_reverseState->m_id;
+			break;
+
+		case NfaStateKind_Sequence:
+			stateStorage->m_tailStateId = state->m_tailState->m_id;
+			break;
+
+		case NfaStateKind_MatchCharSet:
 			stateStorage->m_charRangeCount = state->m_charSet->getCount();
 
 			NfaCharRangeStorage* rangeStorage = (NfaCharRangeStorage*)(stateStorage + 1);
@@ -248,12 +283,12 @@ Regex::compile(
 	clear();
 	m_regexKind = RegexKind_Single;
 
-	RegexCompiler compiler(flags, this);
+	RegexCompiler compiler(flags, &m_nfaProgram);
 	bool result = compiler.compile(source, 0);
 	if (!result)
 		return false;
 
-	finalize(flags);
+	m_nfaProgram.finalize((flags & RegexCompileFlag_MatchOnly) != 0);
 	return true;
 }
 
@@ -272,16 +307,16 @@ Regex::compileSwitchCase(
 	ASSERT(m_regexKind = RegexKind_Switch);
 	ASSERT(flags ^ RegexCompileFlag_MatchOnly); // RegexCompileFlag_MatchOnly only for finalizeSwitch()
 
-	SwitchCase scase = { 0 };
+	SwitchCase scase;
 	size_t id = m_switchCaseArray.getCount();
-	size_t prevCaptureCount = m_captureCount;
-	m_captureCount = 0;
+	size_t prevCaptureCount = m_nfaProgram.m_captureCount;
+	m_nfaProgram.m_captureCount = 0;
 
-	RegexCompiler compiler(flags, this);
+	RegexCompiler compiler(flags, &m_nfaProgram);
 	scase.m_nfaMatchStartState = compiler.compileSwitchCase(source, id);
 
-	if (prevCaptureCount > m_captureCount)
-		m_captureCount = m_captureCount;
+	if (prevCaptureCount > m_nfaProgram.m_captureCount)
+		m_nfaProgram.m_captureCount = prevCaptureCount;
 
 	m_switchCaseArray.append(scase);
 	return id;
@@ -289,8 +324,24 @@ Regex::compileSwitchCase(
 
 void
 Regex::buildFullDfa() {
-	DfaBuilder builder(this);
-	builder.buildFullDfa();
+	DfaBuilder builder(&m_dfaProgram);
+
+	getDfaMatchStartState();
+	while (!m_dfaProgram.m_preStateList.isEmpty())
+		builder.buildTransitionMaps(*m_dfaProgram.m_preStateList.getHead());
+
+	if (getDfaSearchStartState())
+		while (!m_dfaProgram.m_preStateList.isEmpty())
+			builder.buildTransitionMaps(*m_dfaProgram.m_preStateList.getHead());
+}
+
+void
+Regex::buildFullReverseDfa() {
+	DfaBuilder builder(&m_dfaReverseProgram);
+
+	getDfaReverseMatchStartState();
+	while (!m_dfaReverseProgram.m_preStateList.isEmpty())
+		builder.buildTransitionMaps(*m_dfaProgram.m_preStateList.getHead());
 }
 
 bool
@@ -309,116 +360,6 @@ Regex::exec(
 	bool result = state->exec(p, size);
 	return result ? (state->getExecFlags() & RegexExecFlag_Stream) ? true : state->eof() : false;
 }
-
-void
-Regex::finalize(uint_t flags) {
-	if (isEmpty())
-		return;
-
-	m_nfaMatchStartState = *m_nfaStateList.getHead();
-
-	// insert search prefix (.*)
-
-	if (!(flags & RegexCompileFlag_MatchOnly)) {
-		NfaState* matchAny = AXL_MEM_NEW(NfaState);
-		NfaState* split = AXL_MEM_NEW(NfaState);
-		split->createSplit(m_nfaMatchStartState, matchAny);
-		matchAny->createMatchAnyChar(split);
-		m_nfaStateList.insertHead(matchAny);
-		m_nfaStateList.insertHead(split);
-		m_nfaSearchStartState = split;
-	}
-
-	// get rid of epsilon transitions and assign NFA state IDs
-
-	sl::List<NfaState> epsilonList; // must keep epsilon states alive while finalizing
-
-	sl::Iterator<NfaState> it = m_nfaStateList.getHead();
-	for (uint_t i = 0; it; ) {
-		NfaState* state = *it++;
-		if (state->m_stateKind == NfaStateKind_Epsilon) {
-			m_nfaStateList.remove(state);
-			epsilonList.insertTail(state);
-		} else {
-			state->m_id = i++;
-			state->resolveOutStates();
-		}
-	}
-	/*
-	// demux the epsilon closure of the search prefix
-
-	if (!(flags & RegexCompileFlag_MatchOnly)) {
-		NfaDemuxer demuxer(this);
-		demuxer.demux();
-	} */
-}
-
-DfaState*
-Regex::createDfaStartState(const NfaState* nfaState) {
-	NfaStateSet nfaStateSet;
-	nfaStateSet.add(nfaState);
-	nfaStateSet.buildEpsilonClosure();
-	return getDfaState(nfaStateSet);
-}
-
-DfaState*
-Regex::getDfaState(const NfaStateSet& nfaStateSet) {
-	NfaStateSetMap<DfaState*>::Iterator it = m_dfaStateMap.visit(&nfaStateSet);
-	if (it->m_value)
-		return it->m_value;
-
-	DfaState* state = AXL_MEM_NEW(DfaState);
-	state->m_nfaStateSet = nfaStateSet;
-
-	if (nfaStateSet.isAccept()) {
-		state->m_acceptId = state->m_nfaStateSet.getLastState()->m_acceptId;
-		state->m_flags |= DfaStateFlag_Accept;
-	}
-
-	m_preDfaStateList.insertTail(state);
-	it->m_value = state;
-	return state;
-}
-
-#if (_AXL_DEBUG)
-
-void
-Regex::printNfa(FILE* file) const {
-	sl::String string;
-
-	sl::ConstIterator<NfaState> it = m_nfaStateList.getHead();
-	for (; it; it++) {
-		const NfaState* state = *it;
-		fprintf(
-			file,
-			"%c ",
-			state == m_nfaMatchStartState ? 'M' :
-			state == m_nfaSearchStartState ? 'S' : ' '
-		);
-
-		state->print(file);
-	}
-}
-
-void
-Regex::printDfa(FILE* file) const {
-	sl::String string;
-
-	sl::ConstIterator<DfaState> it = m_dfaStateList.getHead();
-	for (; it; it++) {
-		const DfaState* state = *it;
-		fprintf(
-			file,
-			"%c ",
-			state == m_dfaMatchStartState ? 'M' :
-			state == m_dfaSearchStartState ? 'S' : ' '
-		);
-
-		state->print(file);
-	}
-}
-
-#endif
 
 //..............................................................................
 

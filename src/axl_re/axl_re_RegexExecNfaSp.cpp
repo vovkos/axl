@@ -20,19 +20,25 @@ namespace re {
 
 RegexExecNfaSp::RegexExecNfaSp(RegexStateImpl* parent):
 	RegexExecEngine(parent) {
-	m_consumingStateSetIdx = 0;
-	m_nonConsumingStateSetIdx = 0;
-	m_isEmpty = false;
+	m_matchAcceptId = -1;
+	m_matchEndOffset = -1;
+	m_isEmpty = true;
 
 	size_t stateCount = m_parent->m_regex->getNfaStateCount();
 	m_consumingStateSetTable[0].reserve(stateCount);
 	m_consumingStateSetTable[1].reserve(stateCount);
+	m_consumingStateSetIdx = 0;
 	m_nonConsumingStateSetTable[0].reserve(stateCount);
 	m_nonConsumingStateSetTable[1].reserve(stateCount);
+	m_nonConsumingStateSetIdx = 0;
 }
 
 void
 RegexExecNfaSp::reset() {
+	m_matchAcceptId = -1;
+	m_matchEndOffset = -1;
+	m_isEmpty = true;
+
 	m_consumingStateSetTable[0].clear();
 	m_consumingStateSetTable[1].clear();
 	m_consumingStateSetIdx = 0;
@@ -71,7 +77,7 @@ RegexExecNfaSp::exec(
 			advanceConsumingStates(c);
 
 			if (m_isEmpty)
-				return m_parent->finalize(false);
+				return finalize(false);
 
 			m_parent->m_offset += cplBuffer[i];
 		}
@@ -89,7 +95,7 @@ RegexExecNfaSp::eof() {
 		anchors |= Anchor_NotWordBoundary;
 
 	advanceNonConsumingStates(anchors);
-	return m_parent->finalize(true);
+	return finalize(true);
 }
 
 void
@@ -141,9 +147,10 @@ RegexExecNfaSp::advanceNonConsumingStates(uint32_t anchors) {
 			const NfaState* state = m_nonConsumingStateSetTable[srcSetIdx][i];
 			switch (state->m_stateKind) {
 			case NfaStateKind_Accept:
-				// if (m_parent->m_offset > m_parent->m_match.getEndOffset() || state->m_acceptId < m_parent->m_matchAcceptId)
-				//	m_parent->accept(state->m_acceptId);
+				if (state->m_acceptId < m_matchAcceptId)
+					m_matchAcceptId = state->m_acceptId;
 
+				m_matchEndOffset = m_parent->m_offset;
 				break;
 
 			case NfaStateKind_Split:
@@ -211,6 +218,23 @@ RegexExecNfaSp::advanceConsumingStates(utf32_t c) {
 			ASSERT(false); // the rest of states are non-consuming
 		}
 	}
+}
+
+bool
+RegexExecNfaSp::finalize(bool isEof) {
+	if (m_matchAcceptId == -1)
+		return false;
+
+	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataEnd) {
+		if (!isEof)
+			return true; // can't verify until we see EOF
+
+		if (m_matchEndOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+			return false;
+	}
+
+	m_parent->createMatch(m_matchAcceptId, RegexMatchPos(0, m_matchEndOffset));
+	return true;
 }
 
 //..............................................................................

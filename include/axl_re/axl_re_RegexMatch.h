@@ -40,7 +40,7 @@ struct RegexMatchPos {
 	}
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class RegexMatch: protected RegexMatchPos {
 	friend struct RegexStateImpl;

@@ -94,6 +94,7 @@ enum DfaStateFlag {
 	DfaStateFlag_HasMatchAnchor   = 0x04,
 	DfaStateFlag_AnchorTransition = 0x08,
 	DfaStateFlag_TransitionMaps   = 0x10,
+	DfaStateFlag_Reverse          = 0x20,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -106,6 +107,7 @@ struct DfaState: sl::ListLink {
 	NfaStateSet m_nfaStateSet;
 	DfaAnchorTransitionMap m_anchorTransitionMap;
 	DfaCharTransitionMap m_charTransitionMap;
+	DfaState* m_reverseState;
 
 	DfaState();
 
@@ -120,34 +122,71 @@ struct DfaState: sl::ListLink {
 
 //..............................................................................
 
+struct DfaProgram {
+	uint_t m_stateFlags;
+	sl::List<DfaState> m_stateList;
+	sl::List<DfaState> m_preStateList;
+	NfaStateSetMap<DfaState*> m_stateMap;
+	DfaState* m_matchStartState;
+	DfaState* m_searchStartState;
+
+	DfaProgram(uint_t stateFlags);
+
+	void
+	clear();
+
+#if (_AXL_DEBUG)
+	void
+	print(FILE* file) const;
+#endif
+
+	DfaState*
+	getState(const NfaStateSet& nfaStateSet);
+
+	DfaState*
+	createStartState(const NfaState* nfaState);
+};
+
+//..............................................................................
+
 class DfaBuilder {
-protected:
+public:
 	// ensure unsigned comparisons in CharRangeMap (we need 0x80000000)
 
 	typedef sl::RbTree<uint32_t, NfaStateSet> CharRangeMap;
 	typedef CharRangeMap::Iterator CharRangeMapIterator;
 
 protected:
-	Regex* m_regex;
+	DfaProgram* m_program;
 	CharRangeMap m_charRangeMap;
 
 public:
-	DfaBuilder(Regex* regex) {
-		m_regex = regex;
+	DfaBuilder(Regex* regex);
+
+	DfaBuilder(DfaProgram* program) {
+		m_program = program;
 	}
 
 	void
 	buildTransitionMaps(DfaState* state);
 
-	void
-	buildFullDfa();
-
 protected:
 	void
 	buildAnchorTransitionMap(DfaState* state);
 
+	template <typename IsReverse>
+	void
+	finalzeAnchorTransitionMap(
+		DfaState* state,
+		DfaAnchorTransitionPreMap& preMap
+	);
+
 	void
 	buildCharTransitionMap(DfaState* state);
+
+	template <typename IsReverse>
+	void
+	finalzeCharTransitionMap(DfaState* state);
 
 	void
 	visitMatchChar(uint32_t c) {
@@ -195,8 +234,55 @@ protected:
 	);
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+inline
+void
+DfaBuilder::visitMatchCharSet(const CharSet& charSet) {
+	CharSet::ConstIterator it = charSet.getHead();
+	for (; it; it++)
+		visitMatchCharRange(it->getKey(), it->m_value);
+}
+
+inline
+void
+DfaBuilder::visitMatchCharRange(
+	uint32_t from,
+	uint32_t to
+) {
+	ASSERT(from >= 0 && from <= to);
+
+	m_charRangeMap.visit(from);
+	m_charRangeMap.visit(to + 1);
+}
+
+inline
+void
+DfaBuilder::addMatchCharSet(
+	const CharSet& charSet,
+	const NfaState* state
+) {
+	CharSet::ConstIterator it = charSet.getHead();
+	for (; it; it++)
+		addMatchCharRange(it->getKey(), it->m_value, state);
+}
+
+inline
+void
+DfaBuilder::addMatchCharRange(
+	uint32_t from,
+	uint32_t to,
+	const NfaState* state
+) {
+	ASSERT(from >= 0 && from <= to);
+
+	CharRangeMapIterator it = m_charRangeMap.visit(from);
+	do {
+		it->m_value.add(state);
+	} while ((++it)->getKey() <= to);
+}
+
+//..............................................................................
 
 } // namespace re
 } // namespace axl

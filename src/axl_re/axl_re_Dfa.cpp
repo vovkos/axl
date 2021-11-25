@@ -60,6 +60,7 @@ DfaState::DfaState() {
 	m_acceptId = -1;
 	m_flags = 0;
 	m_anchorMask = 0;
+	m_reverseState = NULL;
 }
 
 void
@@ -69,10 +70,24 @@ DfaState::print(FILE* file) const {
 	#define INDENT "      "
 
 	size_t count = m_nfaStateSet.getCount();
-	for (size_t i = 0; i < count; i++)
-		fprintf(file, "%02d ", m_nfaStateSet[i]->m_id);
+	for (size_t i = 0; i < count; i++) {
+		const NfaState* nfaState = m_nfaStateSet[i];
+		fprintf(file, "%02d%s ", nfaState->m_id, getNfaStateKindCodeString(nfaState->m_stateKind));
+	}
 
 	fprintf(file, "})\n");
+
+	if (m_reverseState) {
+		fprintf(file, INDENT "rev({ ");
+
+		count = m_reverseState->m_nfaStateSet.getCount();
+		for (size_t i = 0; i < count; i++) {
+			const NfaState* nfaState = m_reverseState->m_nfaStateSet[i];
+			fprintf(file, "%02d%s ", nfaState->m_id, getNfaStateKindCodeString(nfaState->m_stateKind));
+		}
+
+		fprintf(file, "})\n");
+	}
 
 	if (m_flags & DfaStateFlag_Accept)
 		fprintf(file, INDENT "accept(%d)\n", m_acceptId);
@@ -99,6 +114,78 @@ DfaState::print(FILE* file) const {
 
 //..............................................................................
 
+DfaProgram::DfaProgram(uint_t stateFlags) {
+	m_stateFlags = stateFlags;
+	m_matchStartState = NULL;
+	m_searchStartState = NULL;
+}
+
+void
+DfaProgram::clear() {
+	m_stateList.clear();
+	m_preStateList.clear();
+	m_stateMap.clear();
+	m_matchStartState = NULL;
+	m_searchStartState = NULL;
+}
+
+DfaState*
+DfaProgram::getState(const NfaStateSet& nfaStateSet) {
+	NfaStateSetMap<DfaState*>::Iterator it = m_stateMap.visit(nfaStateSet);
+	if (it->m_value)
+		return it->m_value;
+
+	DfaState* state = AXL_MEM_NEW(DfaState);
+	state->m_flags = m_stateFlags;
+	state->m_nfaStateSet = nfaStateSet;
+
+	if (nfaStateSet.isAccept()) {
+		state->m_acceptId = state->m_nfaStateSet.getLastState()->m_acceptId;
+		state->m_flags |= DfaStateFlag_Accept;
+	}
+
+	m_preStateList.insertTail(state);
+	it->m_value = state;
+	return state;
+}
+
+DfaState*
+DfaProgram::createStartState(const NfaState* nfaState) {
+	NfaStateSet nfaStateSet;
+	nfaStateSet.add(nfaState);
+
+	if (m_stateFlags & DfaStateFlag_Reverse)
+		nfaStateSet.buildEpsilonClosure<sl::True>();
+	else
+		nfaStateSet.buildEpsilonClosure<sl::False>();
+
+	return getState(nfaStateSet);
+}
+
+#if (_AXL_DEBUG)
+
+void
+DfaProgram::print(FILE* file) const {
+	sl::String string;
+
+	sl::ConstIterator<DfaState> it = m_stateList.getHead();
+	for (; it; it++) {
+		const DfaState* state = *it;
+		fprintf(
+			file,
+			"%c ",
+			state == m_matchStartState ? 'M' :
+			state == m_searchStartState ? 'S' : ' '
+		);
+
+		state->print(file);
+	}
+}
+
+#endif
+
+//..............................................................................
+
 void
 DfaBuilder::buildTransitionMaps(DfaState* state) {
 	ASSERT(!(state->m_flags & DfaStateFlag_TransitionMaps) && state->m_id == -1);
@@ -114,10 +201,10 @@ DfaBuilder::buildTransitionMaps(DfaState* state) {
 		state->m_flags |= DfaStateFlag_InstaMatch;
 
 	state->m_flags |= DfaStateFlag_TransitionMaps;
-	state->m_id = m_regex->m_dfaStateList.getCount();
+	state->m_id = m_program->m_stateList.getCount();
 
-	m_regex->m_preDfaStateList.remove(state);
-	m_regex->m_dfaStateList.insertTail(state);
+	m_program->m_preStateList.remove(state);
+	m_program->m_stateList.insertTail(state);
 }
 
 struct DfaAnchorCalcEntry {
@@ -212,18 +299,31 @@ DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
 	Break2:;
 	}
 
-	ASSERT(!anchorTransitionPreMap.isEmpty());
-
 	// stage 3 -- finalize anchor transition map (build epsilon+anchor closures and cache resulting DFA states)
 
-	it = anchorTransitionPreMap.getHead();
+	ASSERT(!anchorTransitionPreMap.isEmpty());
+
+	if (m_program->m_stateFlags & DfaStateFlag_Reverse)
+		finalzeAnchorTransitionMap<sl::True>(dfaState, anchorTransitionPreMap);
+	else
+		finalzeAnchorTransitionMap<sl::False>(dfaState, anchorTransitionPreMap);
+}
+
+template <typename IsReverse>
+void
+DfaBuilder::finalzeAnchorTransitionMap(
+	DfaState* state,
+	DfaAnchorTransitionPreMap& preMap
+) {
+	DfaAnchorTransitionPreMap::Iterator it = preMap.getHead();
+
 	for (; it; it++) {
 		uint_t anchors = it->getKey();
-		it->m_value.buildAnchorClosure(anchors);
-		DfaState* dfaAnchorTransition = m_regex->getDfaState(it->m_value);
-		dfaAnchorTransition->m_flags |= DfaStateFlag_AnchorTransition; // prevent buildAnchorTransitionMap on this state
-		dfaState->m_anchorTransitionMap[anchors] = dfaAnchorTransition;
-		dfaState->m_anchorMask |= anchors;
+		it->m_value.buildAnchorClosure<IsReverse>(anchors);
+		DfaState* targetState = m_program->getState(it->m_value);
+		targetState->m_flags |= DfaStateFlag_AnchorTransition; // prevent buildAnchorTransitionMap on this state
+		state->m_anchorTransitionMap[anchors] = targetState;
+		state->m_anchorMask |= anchors;
 	}
 }
 
@@ -233,7 +333,6 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 
 	m_charRangeMap.clear();
 	size_t nfaStateCount = dfaState->m_nfaStateSet.getCount();
-	const DfaState* dfaSearchStartState = m_regex->getDfaSearchStartState();
 
 	// stage 1 -- visit all breaking points in the char range map
 
@@ -285,98 +384,28 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 
 	// stage 3 -- finalize transition map
 
+	if (m_program->m_stateFlags & DfaStateFlag_Reverse)
+		finalzeCharTransitionMap<sl::True>(dfaState);
+	else
+		finalzeCharTransitionMap<sl::False>(dfaState);
+}
+
+template <typename IsReverse>
+void
+DfaBuilder::finalzeCharTransitionMap(DfaState* state) {
 	CharRangeMapIterator it = m_charRangeMap.getHead();
 	while (it != m_charRangeMap.getTail()) {
 		CharRangeMapIterator nextIt = it.getNext();
-
 		if (it->m_value.isEmpty()) {
 			it = nextIt;
 			continue;
 		}
 
-		it->m_value.buildEpsilonClosure();
-
-		dfaState->m_charTransitionMap.add(
-			it->getKey(),
-			nextIt->getKey() - 1,
-			m_regex->getDfaState(it->m_value)
-		);
-
+		it->m_value.buildEpsilonClosure<IsReverse>();
+		DfaState* targetState = m_program->getState(it->m_value);
+		state->m_charTransitionMap.add(it->getKey(), nextIt->getKey() - 1, targetState);
 		it = nextIt;
 	}
-}
-
-void
-DfaBuilder::buildFullDfa() {
-	if (m_regex->m_dfaStateList.isEmpty() &&
-		m_regex->m_preDfaStateList.isEmpty() &&
-		m_regex->m_nfaSearchStartState
-	) {
-		// from the clean slate it's safe to first build the match DFA
-
-		NfaState* prevNfaSearchStartState = m_regex->m_nfaSearchStartState;
-		m_regex->m_nfaSearchStartState = NULL;
-		m_regex->getDfaMatchStartState();
-
-		while (!m_regex->m_preDfaStateList.isEmpty())
-			buildTransitionMaps(*m_regex->m_preDfaStateList.getHead());
-
-		m_regex->m_nfaSearchStartState = prevNfaSearchStartState;
-		m_regex->getDfaSearchStartState();
-
-		while (!m_regex->m_preDfaStateList.isEmpty())
-			buildTransitionMaps(*m_regex->m_preDfaStateList.getHead());
-	} else {
-		// otherwise, bootstrap (ensure start states are created) and then build the rest
-
-		m_regex->getDfaMatchStartState();
-		m_regex->getDfaSearchStartState();
-
-		while (!m_regex->m_preDfaStateList.isEmpty())
-			buildTransitionMaps(*m_regex->m_preDfaStateList.getHead());
-	}
-}
-
-void
-DfaBuilder::visitMatchCharSet(const CharSet& charSet) {
-	CharSet::ConstIterator it = charSet.getHead();
-	for (; it; it++)
-		visitMatchCharRange(it->getKey(), it->m_value);
-}
-
-void
-DfaBuilder::visitMatchCharRange(
-	uint32_t from,
-	uint32_t to
-) {
-	ASSERT(from >= 0 && from <= to);
-
-	m_charRangeMap.visit(from);
-	m_charRangeMap.visit(to + 1);
-}
-
-void
-DfaBuilder::addMatchCharSet(
-	const CharSet& charSet,
-	const NfaState* state
-) {
-	CharSet::ConstIterator it = charSet.getHead();
-	for (; it; it++)
-		addMatchCharRange(it->getKey(), it->m_value, state);
-}
-
-void
-DfaBuilder::addMatchCharRange(
-	uint32_t from,
-	uint32_t to,
-	const NfaState* state
-) {
-	ASSERT(from >= 0 && from <= to);
-
-	CharRangeMapIterator it = m_charRangeMap.visit(from);
-	do {
-		it->m_value.add(state);
-	} while ((++it)->getKey() <= to);
 }
 
 //..............................................................................

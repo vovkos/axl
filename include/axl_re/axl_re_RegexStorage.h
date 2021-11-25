@@ -55,18 +55,22 @@ struct RegexSwitchCaseStorage {
 
 struct NfaStateStorage {
 	uint32_t m_stateKind;
+	uint32_t m_nextStateId;
 
 	union {
-		uint32_t m_unionData;
+		uint32_t m_unionData[2];
 		uint32_t m_captureId;
 		uint32_t m_acceptId;
 		utf32_t m_char;
 		uint32_t m_anchor;
 		uint32_t m_charRangeCount;
 		uint32_t m_splitStateId;
+		uint32_t m_tailStateId;
+		struct {
+			uint32_t m_opStateId;
+			uint32_t m_reverseStateId;
+		};
 	};
-
-	uint32_t m_nextStateId;
 
 	// followed by:
 	// for NfaStateKind_MatchCharSet: NfaCharRangeStorage[m_charRangeCount]
