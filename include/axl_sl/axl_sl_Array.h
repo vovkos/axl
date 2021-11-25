@@ -436,6 +436,11 @@ public:
 #endif
 
 	size_t
+	forceCopy(const ArrayRef& src) {
+		return copy(src, src.getCount());
+	}
+
+	size_t
 	copy(const ArrayRef& src) {
 		if (&src == this)
 			return this->m_count;
@@ -455,7 +460,7 @@ public:
 
 	size_t
 	copyReverse(const ArrayRef& src) {
-		return copyReverse(src, src.m_count);
+		return copyReverse(src, src.getCount());
 	}
 
 	size_t

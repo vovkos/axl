@@ -322,9 +322,14 @@ public:
 	}
 #endif
 
-	void
+	bool
+	forceCopy(const BitMap& src) {
+		return m_map.forceCopy(src.m_map) != -1;
+	}
+
+	bool
 	copy(const BitMap& src) {
-		m_map.copy(src.m_map);
+		return m_map.copy(src.m_map) != -1;
 	}
 
 	size_t

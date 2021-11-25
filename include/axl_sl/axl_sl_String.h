@@ -1113,11 +1113,6 @@ public:
 		this->m_length = 0;
 	}
 
-	size_t
-	forceCopy(const StringRef& src) {
-		return copy(src.cp(), src.getLength());
-	}
-
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
 	move(StringRef&& src) {
@@ -1138,6 +1133,11 @@ public:
 		return this->m_length;
 	}
 #endif
+
+	size_t
+	forceCopy(const StringRef& src) {
+		return copy(src.cp(), src.getLength());
+	}
 
 	size_t
 	copy(const StringRef& src) {
