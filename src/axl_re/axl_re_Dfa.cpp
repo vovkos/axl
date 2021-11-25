@@ -60,7 +60,7 @@ DfaState::DfaState() {
 	m_acceptId = -1;
 	m_flags = 0;
 	m_anchorMask = 0;
-	m_reverseState = NULL;
+	m_rollbackState = NULL;
 }
 
 void
@@ -77,17 +77,8 @@ DfaState::print(FILE* file) const {
 
 	fprintf(file, "})\n");
 
-	if (m_reverseState) {
-		fprintf(file, INDENT "rev({ ");
-
-		count = m_reverseState->m_nfaStateSet.getCount();
-		for (size_t i = 0; i < count; i++) {
-			const NfaState* nfaState = m_reverseState->m_nfaStateSet[i];
-			fprintf(file, "%02d%s ", nfaState->m_id, getNfaStateKindCodeString(nfaState->m_stateKind));
-		}
-
-		fprintf(file, "})\n");
-	}
+	if (m_rollbackState)
+		fprintf(file, INDENT "rollback(%02d)\n", m_rollbackState->m_id);
 
 	if (m_flags & DfaStateFlag_Accept)
 		fprintf(file, INDENT "accept(%d)\n", m_acceptId);
@@ -162,6 +153,13 @@ DfaProgram::createStartState(const NfaState* nfaState) {
 	return getState(nfaStateSet);
 }
 
+DfaState*
+DfaProgram::createRollbackState(const DfaState* dfaState) {
+	NfaStateSet nfaStateSet = dfaState->m_nfaStateSet;
+	nfaStateSet.buildRollbackClosure();
+	return getState(nfaStateSet);
+}
+
 #if (_AXL_DEBUG)
 
 void
@@ -188,19 +186,17 @@ DfaProgram::print(FILE* file) const {
 
 void
 DfaBuilder::buildTransitionMaps(DfaState* state) {
-	ASSERT(!(state->m_flags & DfaStateFlag_TransitionMaps) && state->m_id == -1);
+	ASSERT(!(state->m_flags & DfaStateFlag_Ready) && state->m_id == -1);
 
-	buildCharTransitionMap(state);
-
-	if ((state->m_flags & (DfaStateFlag_AnchorTransition | DfaStateFlag_HasMatchAnchor)) == DfaStateFlag_HasMatchAnchor)
+	bool hasMatchAnchors = buildCharTransitionMap(state);
+	if (hasMatchAnchors)
 		buildAnchorTransitionMap(state);
 
-	if ((state->m_flags & DfaStateFlag_Accept) &&
-		state->m_anchorTransitionMap.isEmpty() &&
+	if (state->m_anchorTransitionMap.isEmpty() &&
 		state->m_charTransitionMap.isEmpty())
-		state->m_flags |= DfaStateFlag_InstaMatch;
+		state->m_flags |= DfaStateFlag_Dead;
 
-	state->m_flags |= DfaStateFlag_TransitionMaps;
+	state->m_flags |= DfaStateFlag_Ready;
 	state->m_id = m_program->m_stateList.getCount();
 
 	m_program->m_preStateList.remove(state);
@@ -232,8 +228,6 @@ struct DfaAnchorCalcEntry {
 
 void
 DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
-	ASSERT(dfaState->m_flags & DfaStateFlag_HasMatchAnchor);
-
 	DfaAnchorTransitionPreMap::Iterator it;
 	DfaAnchorTransitionPreMap anchorTransitionPreMap;
 
@@ -321,13 +315,12 @@ DfaBuilder::finalzeAnchorTransitionMap(
 		uint_t anchors = it->getKey();
 		it->m_value.buildAnchorClosure<IsReverse>(anchors);
 		DfaState* targetState = m_program->getState(it->m_value);
-		targetState->m_flags |= DfaStateFlag_AnchorTransition; // prevent buildAnchorTransitionMap on this state
 		state->m_anchorTransitionMap[anchors] = targetState;
 		state->m_anchorMask |= anchors;
 	}
 }
 
-void
+bool
 DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 	ASSERT(dfaState->m_id == -1);
 
@@ -336,6 +329,8 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 
 	// stage 1 -- visit all breaking points in the char range map
 
+	bool hasMatchAnchors = false;
+
 	for (size_t i = 0; i < nfaStateCount; i++) {
 		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
 		if (nfaState->m_stateKind < NfaStateKind_FirstMatch)
@@ -343,7 +338,7 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 
 		switch (nfaState->m_stateKind) {
 		case NfaStateKind_MatchAnchor:
-			dfaState->m_flags |= DfaStateFlag_HasMatchAnchor;
+			hasMatchAnchors = true;
 			break;
 
 		case NfaStateKind_MatchChar:
@@ -388,6 +383,8 @@ DfaBuilder::buildCharTransitionMap(DfaState* dfaState) {
 		finalzeCharTransitionMap<sl::True>(dfaState);
 	else
 		finalzeCharTransitionMap<sl::False>(dfaState);
+
+	return hasMatchAnchors;
 }
 
 template <typename IsReverse>

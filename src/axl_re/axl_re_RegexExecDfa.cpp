@@ -43,8 +43,12 @@ void
 RegexExecDfa::gotoState(const DfaState* state) {
 	// build DFA on-the-fly
 
-	if (!(state->m_flags & DfaStateFlag_TransitionMaps)) {
-		DfaBuilder builder(m_parent->m_regex);
+	if (!(state->m_flags & DfaStateFlag_Ready)) {
+		DfaBuilder builder(
+			(state->m_flags & DfaStateFlag_Reverse) ?
+				&m_parent->m_regex->m_dfaReverseProgram :
+				&m_parent->m_regex->m_dfaProgram
+		);
 		builder.buildTransitionMaps((DfaState*)state);
 	}
 
@@ -95,7 +99,7 @@ RegexExecDfa::exec(
 			m_parent->m_offset += cplBuffer[i];
 			gotoState(nextState);
 
-			if (nextState->m_flags & DfaStateFlag_InstaMatch)
+			if (nextState->m_flags & DfaStateFlag_Dead)
 				return finalize(false);
 		}
 	}

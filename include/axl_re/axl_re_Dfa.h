@@ -89,12 +89,10 @@ public:
 //..............................................................................
 
 enum DfaStateFlag {
-	DfaStateFlag_Accept           = 0x01,
-	DfaStateFlag_InstaMatch       = 0x02, // accepts + no transitions
-	DfaStateFlag_HasMatchAnchor   = 0x04,
-	DfaStateFlag_AnchorTransition = 0x08,
-	DfaStateFlag_TransitionMaps   = 0x10,
-	DfaStateFlag_Reverse          = 0x20,
+	DfaStateFlag_Reverse = 0x01,
+	DfaStateFlag_Dead    = 0x02,
+	DfaStateFlag_Accept  = 0x04,
+	DfaStateFlag_Ready   = 0x08,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -107,12 +105,9 @@ struct DfaState: sl::ListLink {
 	NfaStateSet m_nfaStateSet;
 	DfaAnchorTransitionMap m_anchorTransitionMap;
 	DfaCharTransitionMap m_charTransitionMap;
-	DfaState* m_reverseState;
+	DfaState* m_rollbackState;
 
 	DfaState();
-
-	void
-	buildClosure();
 
 #if (_AXL_DEBUG)
 	void
@@ -144,7 +139,10 @@ struct DfaProgram {
 	getState(const NfaStateSet& nfaStateSet);
 
 	DfaState*
-	createStartState(const NfaState* nfaState);
+	createStartState(const NfaState* state);
+
+	DfaState*
+	createRollbackState(const DfaState* state);
 };
 
 //..............................................................................
@@ -161,8 +159,6 @@ protected:
 	CharRangeMap m_charRangeMap;
 
 public:
-	DfaBuilder(Regex* regex);
-
 	DfaBuilder(DfaProgram* program) {
 		m_program = program;
 	}
@@ -181,8 +177,8 @@ protected:
 		DfaAnchorTransitionPreMap& preMap
 	);
 
-	void
-	buildCharTransitionMap(DfaState* state);
+	bool
+	buildCharTransitionMap(DfaState* state); // returns if state has match-anchors (to save a loop)
 
 	template <typename IsReverse>
 	void

@@ -51,9 +51,9 @@ RegexCompiler::Token::isValidSingle() {
 
 void
 RegexCompiler::construct(
-	uint_t flags,
+	RegexNameMgr* nameMgr,
 	NfaProgram* program,
-	RegexNameMgr* nameMgr
+	uint_t flags
 ) {
 	m_program = program;
 	m_nameMgr = nameMgr;

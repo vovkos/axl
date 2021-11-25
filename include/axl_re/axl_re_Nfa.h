@@ -401,6 +401,12 @@ public:
 	}
 
 	void
+	forceCopy(const NfaStateSet& src) {
+		m_array.forceCopy(src.m_array);
+		m_map.forceCopy(src.m_map);
+	}
+
+	void
 	clear() {
 		m_array.clear();
 		m_map.clear();

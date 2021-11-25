@@ -277,13 +277,14 @@ Regex::save(sl::Array<char>* buffer) {
 
 bool
 Regex::compile(
-	uint_t flags,
-	const sl::StringRef& source
+	RegexNameMgr* nameMgr,
+	const sl::StringRef& source,
+	uint_t flags
 ) {
 	clear();
 	m_regexKind = RegexKind_Single;
 
-	RegexCompiler compiler(flags, &m_nfaProgram);
+	RegexCompiler compiler(nameMgr, &m_nfaProgram, flags);
 	bool result = compiler.compile(source, 0);
 	if (!result)
 		return false;
@@ -301,18 +302,19 @@ Regex::createSwitch(size_t caseCountHint) {
 
 size_t
 Regex::compileSwitchCase(
-	uint_t flags,
-	const sl::StringRef& source
+	RegexNameMgr* nameMgr,
+	const sl::StringRef& source,
+	uint_t flags
 ) {
 	ASSERT(m_regexKind = RegexKind_Switch);
-	ASSERT(flags ^ RegexCompileFlag_MatchOnly); // RegexCompileFlag_MatchOnly only for finalizeSwitch()
+	ASSERT(!(flags & RegexCompileFlag_MatchOnly)); // RegexCompileFlag_MatchOnly only for finalizeSwitch()
 
 	SwitchCase scase;
 	size_t id = m_switchCaseArray.getCount();
 	size_t prevCaptureCount = m_nfaProgram.m_captureCount;
 	m_nfaProgram.m_captureCount = 0;
 
-	RegexCompiler compiler(flags, &m_nfaProgram);
+	RegexCompiler compiler(nameMgr, &m_nfaProgram, flags);
 	scase.m_nfaMatchStartState = compiler.compileSwitchCase(source, id);
 
 	if (prevCaptureCount > m_nfaProgram.m_captureCount)
@@ -341,7 +343,19 @@ Regex::buildFullReverseDfa() {
 
 	getDfaReverseMatchStartState();
 	while (!m_dfaReverseProgram.m_preStateList.isEmpty())
-		builder.buildTransitionMaps(*m_dfaProgram.m_preStateList.getHead());
+		builder.buildTransitionMaps(*m_dfaReverseProgram.m_preStateList.getHead());
+}
+
+void
+Regex::buildFullRollbackDfa() {
+	DfaBuilder builder(&m_dfaReverseProgram);
+
+	sl::Iterator<DfaState> it = m_dfaProgram.m_stateList.getHead();
+	for (; it; it++)
+		getDfaRollbackState(*it);
+
+	while (!m_dfaReverseProgram.m_preStateList.isEmpty())
+		builder.buildTransitionMaps(*m_dfaReverseProgram.m_preStateList.getHead());
 }
 
 bool

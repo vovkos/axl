@@ -62,17 +62,17 @@ protected:
 public:
 	RegexCompiler(
 		NfaProgram* program,
-		RegexNameMgr* nameMgr = NULL
+		uint_t flags
 	) {
-		construct(0, program, nameMgr);
+		construct(NULL, program, flags);
 	}
 
 	RegexCompiler(
-		uint_t flags,
+		RegexNameMgr* nameMgr,
 		NfaProgram* program,
-		RegexNameMgr* nameMgr = NULL
+		uint_t flags
 	) {
-		construct(flags, program, nameMgr);
+		construct(nameMgr, program, flags);
 	}
 
 	NfaState*
@@ -90,9 +90,9 @@ public:
 protected:
 	void
 	construct(
-		uint_t flags,
+		RegexNameMgr* nameMgr,
 		NfaProgram* program,
-		RegexNameMgr* nameMgr
+		uint_t flags
 	);
 
 	bool

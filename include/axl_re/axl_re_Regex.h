@@ -18,8 +18,7 @@
 namespace axl {
 namespace re {
 
-class RegexState;
-struct RegexStorageHdr;
+class RegexNameMgr;
 
 //..............................................................................
 
@@ -42,7 +41,7 @@ enum RegexCompileFlag {
 
 class Regex {
 	friend class RegexCompiler;
-	friend class NfaDemuxer;
+	friend class RegexExecDfa;
 	friend class DfaBuilder;
 
 protected:
@@ -118,6 +117,13 @@ public:
 			NULL;
 	}
 
+	const DfaState*
+	getDfaRollbackState(const DfaState* state) {
+		return
+			state->m_rollbackState ? state->m_rollbackState :
+			((DfaState*)state)->m_rollbackState = m_dfaReverseProgram.createRollbackState(state);
+	}
+
 	size_t
 	getSwitchCaseCount() {
 		ASSERT(m_regexKind == RegexKind_Switch);
@@ -163,28 +169,36 @@ public:
 
 	bool
 	compile(
-		uint_t flags,
-		const sl::StringRef& source
-		);
+		const sl::StringRef& source,
+		uint_t flags = 0
+	) {
+		return compile(NULL, source, flags);
+	}
 
 	bool
-	compile(const sl::StringRef& source) {
-		return compile(0, source);
-	}
+	compile(
+		RegexNameMgr* nameMgr,
+		const sl::StringRef& source,
+		uint_t flags = 0
+	);
 
 	void
 	createSwitch(size_t caseCountHint = 4);
 
 	size_t
 	compileSwitchCase(
-		uint_t flags,
-		const sl::StringRef& source
-	);
+		const sl::StringRef& source,
+		uint_t flags = 0
+	) {
+		return compileSwitchCase(NULL, source, flags);
+	}
 
 	size_t
-	compileSwitchCase(const sl::StringRef& source) {
-		return compileSwitchCase(0, source);
-	}
+	compileSwitchCase(
+		RegexNameMgr* nameMgr,
+		const sl::StringRef& source,
+		uint_t flags = 0
+	);
 
 	void
 	finalizeSwitch(uint_t flags = 0) { // only RegexCompileFlag_MatchOnly makes sense here
@@ -197,6 +211,9 @@ public:
 
 	void
 	buildFullReverseDfa();
+
+	void
+	buildFullRollbackDfa();
 
 	// execution (match/search)
 
@@ -297,13 +314,6 @@ Regex::getSwitchCaseDfaMatchStartState(size_t id) {
 	return
 		scase.m_dfaMatchStartState ? scase.m_dfaMatchStartState :
 		scase.m_dfaMatchStartState = m_dfaProgram.createStartState(scase.m_nfaMatchStartState);
-}
-
-//..............................................................................
-
-inline
-DfaBuilder::DfaBuilder(Regex* regex) {
-	m_program = &regex->m_dfaProgram;
 }
 
 //..............................................................................

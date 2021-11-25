@@ -557,13 +557,12 @@ testRegex() {
 	nameMgr.addName("ws",  "[ \\t\\r\\n]");
 	nameMgr.addName("dec", "[0-9]");
 
-	uint_t flags = 0; // re::RegexCompiler::Flag_SparseSyntax;
-
 	re::Regex regex;
 	bool result = true;
 
 #if (1)
-	const char src[] = "a*b*"; // "x(a*b)*(a*c)*";
+	const char src[] = "a|[a-z]+1";
+	// const char src[] = "x(a*b)*(a*c)*";
 	// const char src[] = "[abc]";
 	// const char src[] = "^([abc]+)$";
 
@@ -579,9 +578,15 @@ testRegex() {
 	printf("NFA:\n");
 	regex.printNfa();
 
-	printf("\nDFA:\n");
 	regex.buildFullDfa();
+	regex.buildFullReverseDfa();
+	regex.buildFullRollbackDfa();
+
+	printf("\nDFA:\n");
 	regex.printDfa();
+
+	printf("\nrDFA:\n");
+	regex.printReverseDfa();
 #endif
 #endif
 
@@ -796,7 +801,7 @@ testRegex2() {
 	static const char src[] = "[a-b]*c+";
 	printf("REGEX: %s\n\n", src);
 
-	result = regex.compile(re::RegexCompileFlag_DisableCapture, src);
+	result = regex.compile(src, re::RegexCompileFlag_DisableCapture);
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;

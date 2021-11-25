@@ -26,7 +26,7 @@ getNfaStateKindCodeString(NfaStateKind stateKind) {
 		"-", // NfaStateKind_Epsilon,
 		"|", // NfaStateKind_Split,
 		"+", // NfaStateKind_Link,
-		":", // NfaStateKind_Sequence,
+		">", // NfaStateKind_Sequence,
  		"(", // NfaStateKind_OpenCapture,
 		")", // NfaStateKind_CloseCapture,
 		"m", // NfaStateKind_MatchAnchor,
@@ -409,9 +409,9 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 	sl::Array<const NfaState*> stack(rc::BufKind_Stack, buffer, sizeof(buffer));
 
 	if (IsRollback()())
-		initializeClosureStack(&stack, m_array);
-	else
 		initializeRollbackClosureStack(&stack, m_array);
+	else
+		initializeClosureStack(&stack, m_array);
 
 	m_array.clear();
 	m_map.clear();
@@ -419,14 +419,17 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 	while (!stack.isEmpty()) {
 		const NfaState* state = stack.getBackAndPop();
 		while (!m_map.getBit(state->m_id)) {
-			m_array.append(state);
 			m_map.setBit(state->m_id);
 
 			switch (state->m_stateKind) {
 			case NfaStateKind_Accept:
- 				return; // we are done
+				m_array.append(state);
+ 				return; // done!
 
 			case NfaStateKind_Link:
+				if (!IsRollback()() && !IsReverse()()) // links are only needed for rollbacks
+					m_array.append(state);
+
 				state = IsReverse()() ? state->m_reverseState : state->m_nextState;
 				if (state->m_stateKind == NfaStateKind_Link)
 					state = state->m_opState;
@@ -448,10 +451,21 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 				break;
 
 			case NfaStateKind_MatchAnchor:
-				if (UseAnchors()() && (anchors & state->m_anchor)) {
-					state = state->m_nextState;
-					break;
+				if (UseAnchors()()) {
+					if (anchors & state->m_anchor) {
+						state = state->m_nextState;
+						break;
+					}
+
+					goto Break2; // don't add match anchor states to anchor closures
 				}
+
+				// ... and fall-through
+
+			case NfaStateKind_MatchChar:
+			case NfaStateKind_MatchCharSet:
+			case NfaStateKind_MatchAnyChar:
+				m_array.append(state);
 
 				// ... and fall-through
 
