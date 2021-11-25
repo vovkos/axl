@@ -20,21 +20,19 @@ namespace sl {
 
 //..............................................................................
 
-// cast operators
+// constants
 
-template <typename T>
 class True {
 public:
-	T
+	bool
 	operator () () const {
 		return true;
 	}
 };
 
-template <typename T>
 class False {
 public:
-	T
+	bool
 	operator () () const {
 		return false;
 	}
@@ -45,7 +43,16 @@ class Zero {
 public:
 	T
 	operator () () const {
-		return 0;
+		return (T)0;
+	}
+};
+
+template <typename T>
+class One {
+public:
+	T
+	operator () () const {
+		return (T)1;
 	}
 };
 
@@ -54,9 +61,11 @@ class MinusOne {
 public:
 	T
 	operator () () const {
-		return (T) -1;
+		return (T)-1;
 	}
 };
+
+// cast operators
 
 template <typename T>
 class Void {

@@ -59,8 +59,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef EventBase<sl::False<bool> > Event;
-typedef EventBase<sl::True<bool> > NotificationEvent;
+typedef EventBase<sl::False> Event;
+typedef EventBase<sl::True> NotificationEvent;
 
 //..............................................................................
 
@@ -644,8 +644,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef NameableEventBase<sl::False<bool> > NameableEvent;
-typedef NameableEventBase<sl::True<bool> > NameableNotificationEvent;
+typedef NameableEventBase<sl::False> NameableEvent;
+typedef NameableEventBase<sl::True> NameableNotificationEvent;
 
 //..............................................................................
 

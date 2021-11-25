@@ -295,6 +295,11 @@ public:
 		return m_map.p();
 	}
 
+	bool
+	isNull() const { // name it 'isNull' to avoid confusion (isEmpty sounds like "no bits set")
+		return m_map.isEmpty();
+	}
+
 	size_t
 	getPageCount() const {
 		return m_map.getCount();
