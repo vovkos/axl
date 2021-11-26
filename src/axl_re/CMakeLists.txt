@@ -19,16 +19,17 @@ set(
 	${AXL_INC_DIR}/axl_re/axl_re_Nfa.h
 	${AXL_INC_DIR}/axl_re/axl_re_Dfa.h
 	${AXL_INC_DIR}/axl_re/axl_re_Regex.h
-	${AXL_INC_DIR}/axl_re/axl_re_RegexExec.h
-	${AXL_INC_DIR}/axl_re/axl_re_RegexMatch.h
-	${AXL_INC_DIR}/axl_re/axl_re_RegexState.h
-	${AXL_INC_DIR}/axl_re/axl_re_RegexStorage.h
-	${AXL_INC_DIR}/axl_re/axl_re_RegexNameMgr.h
-	axl_re_RegexCompiler.h
-	axl_re_RegexExecDfa.h
-	axl_re_RegexExecNfaBt.h
-	axl_re_RegexExecNfaSp.h
-	axl_re_RegexExecNfaVm.h
+	${AXL_INC_DIR}/axl_re/axl_re_Exec.h
+	${AXL_INC_DIR}/axl_re/axl_re_Match.h
+	${AXL_INC_DIR}/axl_re/axl_re_State.h
+	${AXL_INC_DIR}/axl_re/axl_re_Storage.h
+	${AXL_INC_DIR}/axl_re/axl_re_NameMgr.h
+	axl_re_StdCharClass.h
+	axl_re_Lexer.h
+	axl_re_Compiler.h
+	axl_re_ExecDfa.h
+	axl_re_ExecNfaSp.h
+	axl_re_ExecNfaVm.h
 )
 
 set(
@@ -37,12 +38,17 @@ set(
 	axl_re_Nfa.cpp
 	axl_re_Dfa.cpp
 	axl_re_Regex.cpp
-	axl_re_RegexCompiler.cpp
-	axl_re_RegexState.cpp
-	axl_re_RegexExecDfa.cpp
-	axl_re_RegexExecNfaBt.cpp
-	axl_re_RegexExecNfaSp.cpp
-	axl_re_RegexExecNfaVm.cpp
+	axl_re_Lexer.cpp
+	axl_re_Compiler.cpp
+	axl_re_State.cpp
+	axl_re_ExecDfa.cpp
+	axl_re_ExecNfaSp.cpp
+	axl_re_ExecNfaVm.cpp
+)
+
+set(
+	LIB_RL_LIST
+	axl_re_Lexer.rl
 )
 
 source_group(
@@ -50,6 +56,37 @@ source_group(
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
+	${LIB_RL_LIST}
+)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# gen folder
+#
+
+set(GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/gen)
+file(MAKE_DIRECTORY ${GEN_DIR})
+
+axl_push_and_set(CMAKE_CURRENT_BINARY_DIR ${GEN_DIR})
+
+add_ragel_step(
+	axl_re_Lexer.rl.cpp
+	axl_re_Lexer.rl
+)
+
+axl_pop(CMAKE_CURRENT_BINARY_DIR)
+
+set(
+	GEN_RL_CPP_LIST
+	${GEN_DIR}/axl_re_Lexer.rl.cpp
+)
+
+axl_exclude_from_build(${GEN_RL_CPP_LIST})  # include "*.rl.cpp" manually
+
+source_group(
+	gen
+	FILES
+	${GEN_RL_CPP_LIST}
 )
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -78,7 +115,10 @@ source_group(
 # axl_re library (finite state machines)
 #
 
-include_directories(${AXL_INC_DIR})
+include_directories(
+	${AXL_INC_DIR}
+	${GEN_DIR}
+)
 
 add_library(
 	axl_re
@@ -86,6 +126,8 @@ add_library(
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
+	${LIB_RL_LIST}
+	${GEN_RL_CPP_LIST}
 )
 
 axl_set_pch(

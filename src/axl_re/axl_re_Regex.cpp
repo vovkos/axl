@@ -11,8 +11,8 @@
 
 #include "pch.h"
 #include "axl_re_Regex.h"
-#include "axl_re_RegexCompiler.h"
-#include "axl_re_RegexStorage.h"
+#include "axl_re_Compiler.h"
+#include "axl_re_Storage.h"
 
 namespace axl {
 namespace re {
@@ -47,15 +47,15 @@ Regex::load(
 	const void* data,
 	size_t size
 ) {
-	if (size < sizeof(RegexStorageHdr))
+	if (size < sizeof(StorageHdr))
 		return err::fail<size_t>(-1, "regex storage buffer too small");
 
 	clear();
 
-	const RegexStorageHdr* hdr = (const RegexStorageHdr*)data;
-	if (hdr->m_signature != RegexStorageSignature ||
-		hdr->m_version != RegexStorageVersion_Current ||
-		hdr->m_dataSize > size - sizeof(RegexStorageHdr) ||
+	const StorageHdr* hdr = (const StorageHdr*)data;
+	if (hdr->m_signature != StorageSignature ||
+		hdr->m_version != StorageVersion_Current ||
+		hdr->m_dataSize > size - sizeof(StorageHdr) ||
 		hdr->m_matchStartStateId >= hdr->m_stateCount ||
 		hdr->m_searchStartStateId != -1 && hdr->m_searchStartStateId >= hdr->m_stateCount)
 		return err::fail<size_t>(-1, "invalid regex storage");
@@ -98,9 +98,9 @@ Regex::load(
 		return false;
 
 	for (size_t i = 0; i < hdr->m_switchCaseCount; i++) {
-		const RegexSwitchCaseStorage* caseStorage = (RegexSwitchCaseStorage*)p;
+		const SwitchCaseStorage* caseStorage = (SwitchCaseStorage*)p;
 
-		if (end - p < sizeof(RegexSwitchCaseStorage) ||
+		if (end - p < sizeof(SwitchCaseStorage) ||
 			caseStorage->m_matchStartStateId >= hdr->m_stateCount ||
 			caseStorage->m_captureCount > hdr->m_captureCount)
 			return err::fail("invalid regex switch-case storage");
@@ -108,7 +108,7 @@ Regex::load(
 		SwitchCase& scase = m_switchCaseArray[i];
 		scase.m_captureCount = caseStorage->m_captureCount;
 		scase.m_nfaMatchStartState = stateArray[caseStorage->m_matchStartStateId];
-		p += sizeof(RegexSwitchCaseStorage);
+		p += sizeof(SwitchCaseStorage);
 	}
 
 	for (size_t i = 0; i < hdr->m_stateCount; i++) {
@@ -189,15 +189,15 @@ Regex::save(sl::Array<char>* buffer) {
 	size_t stateCount = m_nfaProgram.m_stateList.getCount();
 
 	buffer->reserve(
-		sizeof(RegexStorageHdr) +
+		sizeof(StorageHdr) +
 		sizeof(NfaStateStorage) * stateCount +
-		sizeof(RegexSwitchCaseStorage) * switchCaseCount
+		sizeof(SwitchCaseStorage) * switchCaseCount
 	);
 
-	buffer->appendEmptySpace(sizeof(RegexStorageHdr));
-	RegexStorageHdr* hdr = (RegexStorageHdr*)buffer->p();
-	hdr->m_signature = RegexStorageSignature;
-	hdr->m_version = RegexStorageVersion_Current;
+	buffer->appendEmptySpace(sizeof(StorageHdr));
+	StorageHdr* hdr = (StorageHdr*)buffer->p();
+	hdr->m_signature = StorageSignature;
+	hdr->m_version = StorageVersion_Current;
 	hdr->m_regexKind = m_regexKind;
 	hdr->m_stateCount = stateCount;
 	hdr->m_switchCaseCount = switchCaseCount;
@@ -206,12 +206,12 @@ Regex::save(sl::Array<char>* buffer) {
 	hdr->m_searchStartStateId = m_nfaProgram.m_searchStartState ? m_nfaProgram.m_searchStartState->m_id : -1;
 	hdr->m_dataSize = 0;
 
-	size_t offset = sizeof(RegexStorageHdr);
+	size_t offset = sizeof(StorageHdr);
 
 	if (switchCaseCount) {
-		size_t switchCaseSize = sizeof(RegexSwitchCaseStorage) * switchCaseCount;
+		size_t switchCaseSize = sizeof(SwitchCaseStorage) * switchCaseCount;
 		buffer->appendEmptySpace(switchCaseSize);
-		RegexSwitchCaseStorage* caseStorage = (RegexSwitchCaseStorage*)(buffer->p() + offset);
+		SwitchCaseStorage* caseStorage = (SwitchCaseStorage*)(buffer->p() + offset);
 		for (size_t i = 0; i < switchCaseCount; i++, caseStorage++) {
 			const SwitchCase& scase = m_switchCaseArray[i];
 			ASSERT(scase.m_nfaMatchStartState);
@@ -270,8 +270,8 @@ Regex::save(sl::Array<char>* buffer) {
 
 	ASSERT(offset == buffer->getCount());
 
-	hdr = (RegexStorageHdr*)buffer->p();
-	hdr->m_dataSize = offset - sizeof(RegexStorageHdr);
+	hdr = (StorageHdr*)buffer->p();
+	hdr->m_dataSize = offset - sizeof(StorageHdr);
 	return offset;
 }
 
@@ -284,7 +284,7 @@ Regex::compile(
 	clear();
 	m_regexKind = RegexKind_Single;
 
-	RegexCompiler compiler(nameMgr, &m_nfaProgram, flags);
+	Compiler compiler(nameMgr, &m_nfaProgram, flags);
 	bool result = compiler.compile(source, 0);
 	if (!result)
 		return false;
@@ -314,7 +314,7 @@ Regex::compileSwitchCase(
 	size_t prevCaptureCount = m_nfaProgram.m_captureCount;
 	m_nfaProgram.m_captureCount = 0;
 
-	RegexCompiler compiler(nameMgr, &m_nfaProgram, flags);
+	Compiler compiler(nameMgr, &m_nfaProgram, flags);
 	scase.m_nfaMatchStartState = compiler.compileSwitchCase(source, id);
 
 	if (prevCaptureCount > m_nfaProgram.m_captureCount)
@@ -360,7 +360,7 @@ Regex::buildFullRollbackDfa() {
 
 bool
 Regex::exec(
-	RegexState* state,
+	State* state,
 	const void* p,
 	size_t size
 ) {

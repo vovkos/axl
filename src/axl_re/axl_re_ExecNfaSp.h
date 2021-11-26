@@ -11,21 +11,26 @@
 
 #pragma once
 
-#include "axl_re_RegexState.h"
+#include "axl_re_State.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-class RegexExecDfa: public RegexExecEngine {
+class ExecNfaSp: public ExecEngine {
 protected:
-	const DfaState* m_state;
-	size_t m_matchEndOffset;
+	sl::Array<MatchPos> m_capturePosArray;
+	NfaStateSet m_consumingStateSetTable[2];
+	NfaStateSet m_nonConsumingStateSetTable[2];
+	size_t m_consumingStateSetIdx;
+	size_t m_nonConsumingStateSetIdx;
 	size_t m_matchAcceptId;
+	size_t m_matchEndOffset;
+	bool m_isEmpty;
 
 public:
-	RegexExecDfa(RegexStateImpl* parent);
+	ExecNfaSp(StateImpl* parent);
 
 	virtual
 	void
@@ -44,7 +49,19 @@ public:
 
 protected:
 	void
-	gotoState(const DfaState* state);
+	addState(const NfaState* state);
+
+	void
+	openCapture(size_t captureId);
+
+	void
+	closeCapture(size_t captureId);
+
+	void
+	advanceNonConsumingStates(uint32_t anchors);
+
+	void
+	advanceConsumingStates(utf32_t c);
 
 	bool
 	finalize(bool isEof);

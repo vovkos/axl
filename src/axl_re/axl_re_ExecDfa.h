@@ -9,30 +9,48 @@
 //
 //..............................................................................
 
-#include "pch.h"
-#include "axl_re_RegexExecNfaBt.h"
+#pragma once
+
+#include "axl_re_State.h"
 
 namespace axl {
 namespace re {
 
+struct DfaState;
+
 //..............................................................................
 
-void
-RegexExecNfaBt::reset() {
-}
+class ExecDfa: public ExecEngine {
+protected:
+	const DfaState* m_state;
+	size_t m_matchEndOffset;
+	size_t m_matchAcceptId;
 
-bool
-RegexExecNfaBt::exec(
-	const void* p,
-	size_t size
-) {
-	return err::fail("RegexExecNfaBt is not implemented yet");
-}
+public:
+	ExecDfa(StateImpl* parent);
 
-bool
-RegexExecNfaBt::eof() {
-	return err::fail("RegexExecNfaBt is not implemented yet");
-}
+	virtual
+	void
+	reset();
+
+	virtual
+	bool
+	exec(
+		const void* p,
+		size_t size
+	);
+
+	virtual
+	bool
+	eof();
+
+protected:
+	void
+	gotoState(const DfaState* state);
+
+	bool
+	finalize(bool isEof);
+};
 
 //..............................................................................
 

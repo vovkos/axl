@@ -285,7 +285,6 @@ protected:
 		m_lineOffset = 0;
 		m_tokenizeLimit = 8;
 		m_tokenizeCount = 0;
-
 		m_filePath.clear();
 	}
 
@@ -305,13 +304,11 @@ protected:
 	// to be implemented in lexer instance:
 
 	// void
-	// init ()
-	// {
+	// init () {
 	// }
 
 	// void
-	// exec ()
-	// {
+	// exec () {
 	// }
 };
 

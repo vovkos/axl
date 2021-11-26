@@ -10,7 +10,8 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_re_RegexExecDfa.h"
+#include "axl_re_ExecDfa.h"
+#include "axl_re_Dfa.h"
 #include "axl_re_Regex.h"
 
 namespace axl {
@@ -18,16 +19,15 @@ namespace re {
 
 //..............................................................................
 
-RegexExecDfa::RegexExecDfa(RegexStateImpl* parent):
-	RegexExecEngine(parent) {
+ExecDfa::ExecDfa(StateImpl* parent):
+	ExecEngine(parent) {
 	m_state = NULL;
 	m_matchEndOffset = -1;
 	m_matchAcceptId = -1;
-
 }
 
 void
-RegexExecDfa::reset() {
+ExecDfa::reset() {
 	m_matchEndOffset = -1;
 	m_matchAcceptId = -1;
 
@@ -40,7 +40,7 @@ RegexExecDfa::reset() {
 
 inline
 void
-RegexExecDfa::gotoState(const DfaState* state) {
+ExecDfa::gotoState(const DfaState* state) {
 	// build DFA on-the-fly
 
 	if (!(state->m_flags & DfaStateFlag_Ready)) {
@@ -63,7 +63,7 @@ RegexExecDfa::gotoState(const DfaState* state) {
 }
 
 bool
-RegexExecDfa::exec(
+ExecDfa::exec(
 	const void* p0,
 	size_t size
 ) {
@@ -79,7 +79,7 @@ RegexExecDfa::exec(
 
 		for (size_t i = 0; i < length; i++) {
 			utf32_t c = textBuffer[i];
-			uint_t charFlags = RegexStateImpl::calcCharFlags(c);
+			uint_t charFlags = StateImpl::calcCharFlags(c);
 
 			if (m_state->m_anchorMask) {
 				uint_t anchors = m_parent->calcAnchors(charFlags) & m_state->m_anchorMask;
@@ -108,9 +108,9 @@ RegexExecDfa::exec(
 }
 
 bool
-RegexExecDfa::eof() {
+ExecDfa::eof() {
 	uint_t anchors = Anchor_EndLine | Anchor_EndText;
-	if (m_parent->m_prevCharFlags & RegexStateImpl::CharFlag_Word)
+	if (m_parent->m_prevCharFlags & StateImpl::CharFlag_Word)
 		anchors |= Anchor_WordBoundary;
 	else
 		anchors |= Anchor_NotWordBoundary;
@@ -125,7 +125,7 @@ RegexExecDfa::eof() {
 }
 
 bool
-RegexExecDfa::finalize(bool isEof) {
+ExecDfa::finalize(bool isEof) {
 	if (m_parent->m_matchAcceptId != -1) // already finalized
 		return true;
 
@@ -140,7 +140,11 @@ RegexExecDfa::finalize(bool isEof) {
 			return false;
 	}
 
-	m_parent->createMatch(m_matchAcceptId, RegexMatchPos(0, m_matchEndOffset));
+	// roll back to the beginning
+
+
+
+	m_parent->createMatch(m_matchAcceptId, MatchPos(0, m_matchEndOffset));
 	return true;
 }
 

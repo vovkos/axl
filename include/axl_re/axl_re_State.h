@@ -14,20 +14,19 @@
 #define _AXL_RE_REGEXSTATE_H
 
 #include "axl_re_Nfa.h"
-#include "axl_re_Dfa.h"
-#include "axl_re_RegexExec.h"
+#include "axl_re_Exec.h"
 
 namespace axl {
 namespace re {
 
 class Regex;
-class RegexState;
+class State;
 class RegexEngine;
 
 //..............................................................................
 
-struct RegexStateImpl: public rc::RefCount {
-	friend class RegexState;
+struct StateImpl: public rc::RefCount {
+	friend class State;
 
 	enum CharFlag {
 		CharFlag_Cr   = 0x01,
@@ -37,7 +36,7 @@ struct RegexStateImpl: public rc::RefCount {
 	};
 
 	Regex* m_regex;
-	RegexExecEngine* m_engine;
+	ExecEngine* m_engine;
 	enc::CodePointDecoder m_decoder;
 	const void* m_lastExecBuffer;
 	size_t m_lastExecOffset;
@@ -45,16 +44,16 @@ struct RegexStateImpl: public rc::RefCount {
 	uint_t m_execFlags;
 	uint_t m_prevCharFlags;
 	size_t m_offset;
-	RegexMatch m_match;
+	Match m_match;
 	size_t m_matchAcceptId;
-	sl::BoxList<RegexMatch> m_subMatchList;
-	sl::Array<RegexMatch*> m_subMatchArray;
+	sl::BoxList<Match> m_subMatchList;
+	sl::Array<Match*> m_subMatchArray;
 
 protected:
-	RegexStateImpl(); // only creatable by RegexState
+	StateImpl(); // only creatable by State
 
 public:
-	~RegexStateImpl() {
+	~StateImpl() {
 		freeEngine();
 	}
 
@@ -91,8 +90,8 @@ public:
 	void
 	createMatch(
 		size_t acceptId,
-		const RegexMatchPos& matchPos,
-		const sl::ArrayRef<RegexMatchPos>& capturePosArray = sl::ArrayRef<RegexMatchPos>()
+		const MatchPos& matchPos,
+		const sl::ArrayRef<MatchPos>& capturePosArray = sl::ArrayRef<MatchPos>()
 	);
 
 	bool
@@ -106,7 +105,7 @@ public:
 
 inline
 uint_t
-RegexStateImpl::calcCharFlags(utf32_t c) {
+StateImpl::calcCharFlags(utf32_t c) {
 	uint_t charFlags = 0;
 
 	if (c == '\r')
@@ -121,7 +120,7 @@ RegexStateImpl::calcCharFlags(utf32_t c) {
 
 inline
 uint_t
-RegexStateImpl::calcAnchors(uint_t charFlags) {
+StateImpl::calcAnchors(uint_t charFlags) {
 	uint_t anchors = 0;
 
 	if (m_prevCharFlags & CharFlag_Lf)
@@ -140,7 +139,7 @@ RegexStateImpl::calcAnchors(uint_t charFlags) {
 
 inline
 uint_t
-RegexStateImpl::calcAnchorsUpdateCharFlags(utf32_t c) {
+StateImpl::calcAnchorsUpdateCharFlags(utf32_t c) {
 	uint_t charFlags = calcCharFlags(c);
 	uint_t anchors = calcAnchors(charFlags);
 	m_prevCharFlags = charFlags;
@@ -148,34 +147,34 @@ RegexStateImpl::calcAnchorsUpdateCharFlags(utf32_t c) {
 
 //..............................................................................
 
-class RegexState {
+class State {
 	friend class Regex;
-	friend class RegexMatch;
+	friend class Match;
 
 protected:
-	rc::Ptr<RegexStateImpl> m_p;
+	rc::Ptr<StateImpl> m_p;
 
 public:
-	RegexState() {}
+	State() {}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	RegexState(RegexState&& src) {
+	State(State&& src) {
 		m_p.move(std::move(src.m_p));
 	}
 #endif
 
-	RegexState(const RegexState& src) {
+	State(const State& src) {
 		m_p.copy(src.m_p);
 	}
 
-	RegexState(
+	State(
 		uint32_t flags,
 		enc::CharCodec* codec
 	) {
 		initialize(flags, codec);
 	}
 
-	RegexState(
+	State(
 		uint32_t flags,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
 	) {
@@ -187,15 +186,15 @@ public:
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	RegexState&
-	operator = (RegexState&& src) {
+	State&
+	operator = (State&& src) {
 		m_p.move(std::move(src.m_p));
 		return *this;
 	}
 #endif
 
-	RegexState&
-	operator = (const RegexState& src) {
+	State&
+	operator = (const State& src) {
 		m_p.copy(src.m_p);
 		return *this;
 	}
@@ -233,7 +232,7 @@ public:
 		return m_p->m_matchAcceptId;
 	}
 
-	const RegexMatch*
+	const Match*
 	getMatch() const {
 		ASSERT(m_p);
 		return isMatch() ? &m_p->m_match : NULL;
@@ -245,7 +244,7 @@ public:
 		return m_p->m_subMatchArray.getCount();
 	}
 
-	const RegexMatch*
+	const Match*
 	getSubMatch(size_t i) const {
 		ASSERT(m_p);
 		return i < m_p->m_subMatchArray.getCount() ? m_p->m_subMatchArray[i] : NULL;

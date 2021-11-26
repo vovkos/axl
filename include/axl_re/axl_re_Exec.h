@@ -11,9 +11,9 @@
 
 #pragma once
 
-#define _AXL_RE_REGEXEXEC_H
+#define _AXL_RE_EXEC_H
 
-#include "axl_re_RegexMatch.h"
+#include "axl_re_Match.h"
 
 namespace axl {
 namespace re {
@@ -22,14 +22,12 @@ namespace re {
 
 enum RegexExecFlag {
 	RegexExecFlag_NfaThreading    = 0x0001,
-	RegexExecFlag_NfaBacktracking = 0x0002,
-	RegexExecFlag_NfaSinglePass   = 0x0004,
-	RegexExecFlag_Dfa             = 0x0008,
+	RegexExecFlag_NfaSinglePass   = 0x0002,
+	RegexExecFlag_Dfa             = 0x0004,
 	RegexExecFlag_NfaVm           = RegexExecFlag_NfaThreading,
 	RegexExecFlag_NfaSp           = RegexExecFlag_NfaSinglePass,
-	RegexExecFlag_NfaBt           = RegexExecFlag_NfaBacktracking,
-	RegexExecFlag_Nfa             = RegexExecFlag_NfaVm, // default Ng
-	RegexExecFlag_EngineMask      = RegexExecFlag_NfaVm | RegexExecFlag_NfaBt | RegexExecFlag_NfaSp | RegexExecFlag_Dfa,
+	RegexExecFlag_Nfa             = RegexExecFlag_NfaVm, // default
+	RegexExecFlag_EngineMask      = RegexExecFlag_NfaVm | RegexExecFlag_NfaSp | RegexExecFlag_Dfa,
 
 	RegexExecFlag_Stream          = 0x0010,
 	RegexExecFlag_DisableCapture  = 0x0020, // capture by default for all NFA-based engines
@@ -41,22 +39,22 @@ enum RegexExecFlag {
 
 //..............................................................................
 
-class RegexExecEngine {
+class ExecEngine {
 protected:
 	enum {
 		DecodeBufferSize = 64
 	};
 
 protected:
-	RegexStateImpl* m_parent;
+	StateImpl* m_parent;
 
 public:
-	RegexExecEngine(RegexStateImpl* parent) {
+	ExecEngine(StateImpl* parent) {
 		m_parent = parent;
 	}
 
 	virtual
-	~RegexExecEngine() {}
+	~ExecEngine() {}
 
 	virtual
 	void

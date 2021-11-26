@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_re_RegexExecNfaVm.h"
+#include "axl_re_ExecNfaVm.h"
 
 namespace axl {
 namespace re {
@@ -18,11 +18,11 @@ namespace re {
 //..............................................................................
 
 void
-RegexExecNfaVm::reset() {
+ExecNfaVm::reset() {
 }
 
 bool
-RegexExecNfaVm::exec(
+ExecNfaVm::exec(
 	const void* p,
 	size_t size
 ) {
@@ -30,7 +30,7 @@ RegexExecNfaVm::exec(
 }
 
 bool
-RegexExecNfaVm::eof() {
+ExecNfaVm::eof() {
 	return true;
 }
 

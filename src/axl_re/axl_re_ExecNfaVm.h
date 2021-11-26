@@ -11,17 +11,17 @@
 
 #pragma once
 
-#include "axl_re_RegexState.h"
+#include "axl_re_State.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-class RegexExecNfaBt: public RegexExecEngine {
+class ExecNfaVm: public ExecEngine {
 public:
-	RegexExecNfaBt(RegexStateImpl* parent):
-		RegexExecEngine(parent) {
+	ExecNfaVm(StateImpl* parent):
+		ExecEngine(parent) {
 	}
 
 	virtual

@@ -13,7 +13,8 @@
 
 #define _AXL_RE_REGEX_H
 
-#include "axl_re_RegexState.h"
+#include "axl_re_State.h"
+#include "axl_re_Dfa.h"
 
 namespace axl {
 namespace re {
@@ -31,17 +32,16 @@ enum RegexKind {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum RegexCompileFlag {
-	RegexCompileFlag_SparseSyntax    = 0x01,
-	RegexCompileFlag_CaseInsensitive = 0x02,
-	RegexCompileFlag_MatchOnly       = 0x10, // don't demux NFA and no search start states
-	RegexCompileFlag_DisableCapture  = 0x20, // same as RegexExecFlag_NoCapture
+	RegexCompileFlag_CaseInsensitive = 0x01,
+	RegexCompileFlag_MatchOnly       = 0x02, // don't demux NFA and no search start states
+	RegexCompileFlag_DisableCapture  = 0x04, // same as RegexExecFlag_NoCapture
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Regex {
-	friend class RegexCompiler;
-	friend class RegexExecDfa;
+	friend class Compiler;
+	friend class ExecDfa;
 	friend class DfaBuilder;
 
 protected:
@@ -219,23 +219,23 @@ public:
 
 	bool
 	exec(
-		RegexState* state,
+		State* state,
 		const void* p,
 		size_t size
 	);
 
-	RegexState
+	State
 	exec(
 		uint_t flags,
 		enc::CharCodec* codec,
 		const void* p,
 		size_t size
 	) {
-		RegexState state(flags, codec);
-		return exec(&state, p, size) ? state : RegexState();
+		State state(flags, codec);
+		return exec(&state, p, size) ? state : State();
 	}
 
-	RegexState
+	State
 	exec(
 		uint_t flags,
 		enc::CharCodecKind codecKind,
@@ -245,7 +245,7 @@ public:
 		return exec(flags, enc::getCharCodec(codecKind), p, size);
 	}
 
-	RegexState
+	State
 	exec(
 		uint_t flags,
 		const void* p,
@@ -254,7 +254,7 @@ public:
 		return exec(flags, enc::CharCodecKind_Utf8, p, size);
 	}
 
-	RegexState
+	State
 	exec(
 		const void* p,
 		size_t size
@@ -262,7 +262,7 @@ public:
 		return exec(0, enc::CharCodecKind_Utf8, p, size);
 	}
 
-	RegexState
+	State
 	exec(
 		uint_t flags,
 		const sl::StringRef& string
@@ -270,13 +270,13 @@ public:
 		return exec(flags, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
 	}
 
-	RegexState
+	State
 	exec(const sl::StringRef& string) {
 		return exec(0, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
 	}
 
 	bool
-	eof(RegexState* state) {
+	eof(State* state) {
 		ASSERT(state->getRegex() == this && (state->getExecFlags() & RegexExecFlag_Stream));
 		return state->eof();
 	}

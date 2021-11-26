@@ -10,19 +10,18 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_re_RegexState.h"
+#include "axl_re_State.h"
 #include "axl_re_Regex.h"
-#include "axl_re_RegexExecNfaBt.h"
-#include "axl_re_RegexExecNfaSp.h"
-#include "axl_re_RegexExecNfaVm.h"
-#include "axl_re_RegexExecDfa.h"
+#include "axl_re_ExecNfaSp.h"
+#include "axl_re_ExecNfaVm.h"
+#include "axl_re_ExecDfa.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-RegexStateImpl::RegexStateImpl() {
+StateImpl::StateImpl() {
 	m_regex = NULL;
 	m_engine = NULL;
 	m_lastExecBuffer = NULL;
@@ -35,7 +34,7 @@ RegexStateImpl::RegexStateImpl() {
 }
 
 void
-RegexStateImpl::freeEngine() {
+StateImpl::freeEngine() {
 	if (m_engine) {
 		AXL_MEM_DELETE(m_engine);
 		m_engine = NULL;
@@ -43,7 +42,7 @@ RegexStateImpl::freeEngine() {
 }
 
 void
-RegexStateImpl::initialize(
+StateImpl::initialize(
 	uint_t execFlags,
 	enc::CharCodec* codec
 ) {
@@ -52,11 +51,11 @@ RegexStateImpl::initialize(
 	m_regex = NULL;
 	m_decoder.setup(codec);
 	m_execFlags = execFlags;
-	m_prevCharFlags = RegexStateImpl::CharFlag_Lf;
+	m_prevCharFlags = StateImpl::CharFlag_Lf;
 }
 
 void
-RegexStateImpl::postInitialize(Regex* regex) {
+StateImpl::postInitialize(Regex* regex) {
 	ASSERT(!m_regex && !m_engine);
 
 	m_regex = regex;
@@ -64,31 +63,29 @@ RegexStateImpl::postInitialize(Regex* regex) {
 	switch (m_execFlags & RegexExecFlag_EngineMask) {
 	case 0: // test default
 	case RegexExecFlag_Dfa:
-		m_engine = AXL_MEM_NEW_ARGS(RegexExecDfa, (this));
-		break;
-
-	case RegexExecFlag_NfaBt:
-		m_engine = AXL_MEM_NEW_ARGS(RegexExecNfaBt, (this));
+		m_engine = AXL_MEM_NEW_ARGS(ExecDfa, (this));
 		break;
 
 	case RegexExecFlag_NfaSp:
-		m_engine = AXL_MEM_NEW_ARGS(RegexExecNfaSp, (this));
+		m_engine = AXL_MEM_NEW_ARGS(ExecNfaSp, (this));
 		break;
 
 	case RegexExecFlag_NfaVm:
-		m_engine = AXL_MEM_NEW_ARGS(RegexExecNfaVm, (this));
+		m_engine = AXL_MEM_NEW_ARGS(ExecNfaVm, (this));
 		break;
 
 	default:
 		ASSERT(false);
-		m_engine = AXL_MEM_NEW_ARGS(RegexExecNfaVm, (this)); // fall back to threading NFA
+		m_engine = AXL_MEM_NEW_ARGS(ExecNfaVm, (this)); // fall back to threading NFA
 	}
 
 	reset();
 }
 
+axl::lex::LineCol lc;
+
 void
-RegexStateImpl::reset() {
+StateImpl::reset() {
 	ASSERT(m_engine);
 
 	m_matchAcceptId = -1;
@@ -100,10 +97,10 @@ RegexStateImpl::reset() {
 }
 
 void
-RegexStateImpl::createMatch(
+StateImpl::createMatch(
 	size_t acceptId,
-	const RegexMatchPos& matchPos,
-	const sl::ArrayRef<RegexMatchPos>& capturePosArray
+	const MatchPos& matchPos,
+	const sl::ArrayRef<MatchPos>& capturePosArray
 ) {
 	ASSERT(m_matchAcceptId == -1);
 
@@ -127,13 +124,13 @@ RegexStateImpl::createMatch(
 	m_subMatchArray[0] = &m_match;
 
 	for (size_t i = 0; i < count; i++) {
-		const RegexMatchPos& pos = capturePosArray[i];
+		const MatchPos& pos = capturePosArray[i];
 		if (pos.m_endOffset == -1)
 			continue;
 
 		ASSERT(pos.m_offset != -1 && pos.m_offset <= pos.m_endOffset);
 
-		RegexMatch* match = m_subMatchList.insertTail().p();
+		Match* match = m_subMatchList.insertTail().p();
 		match->m_offset = pos.m_offset;
 		match->m_endOffset = pos.m_endOffset;
 
@@ -147,7 +144,7 @@ RegexStateImpl::createMatch(
 }
 
 bool
-RegexStateImpl::exec(
+StateImpl::exec(
 	const void* p,
 	size_t size
 ) {
@@ -161,12 +158,12 @@ RegexStateImpl::exec(
 //..............................................................................
 
 void
-RegexState::initialize(
+State::initialize(
 	uint_t execFlags,
 	enc::CharCodec* codec
 ) {
 	if (!m_p)
-		m_p = AXL_RC_NEW(RegexStateImpl);
+		m_p = AXL_RC_NEW(StateImpl);
 	else
 		ASSERT(m_p.isExclusive());
 
@@ -174,25 +171,25 @@ RegexState::initialize(
 }
 
 void
-RegexState::initialize(Regex* regex) {
+State::initialize(Regex* regex) {
 	ASSERT(!m_p);
-	m_p = AXL_RC_NEW(RegexStateImpl);
+	m_p = AXL_RC_NEW(StateImpl);
 	m_p->initialize(0, enc::getCharCodec(enc::CharCodecKind_Utf8));
 	m_p->postInitialize(regex);
 }
 
 void
-RegexState::reset(size_t offset) {
+State::reset(size_t offset) {
 	ASSERT(m_p);
 
 	if (m_p.isExclusive()) {
 		m_p->m_offset = offset;
 		m_p->reset();
 	} else {
-		rc::Ptr<RegexStateImpl> p;
+		rc::Ptr<StateImpl> p;
 		sl::takeOver(&p, &m_p);
 
-		m_p = AXL_RC_NEW(RegexStateImpl);
+		m_p = AXL_RC_NEW(StateImpl);
 		m_p->initialize(p->m_execFlags, p->m_decoder.getCharCodec());
 		m_p->m_offset = offset;
 		m_p->postInitialize(p->m_regex);

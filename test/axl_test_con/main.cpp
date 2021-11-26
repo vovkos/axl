@@ -590,8 +590,6 @@ testRegex() {
 #endif
 #endif
 
-	return;
-
 #if (_AXL_RE_TEST_SAVE)
 	sl::Array<char> storage;
 	regex.saveNfa(&storage);
@@ -622,11 +620,11 @@ testRegex() {
 #	endif
 #endif
 
-	re::RegexState state;
-	const re::RegexMatch* match;
+	re::State state;
+	const re::Match* match;
 	size_t count;
 
-	const char text[] = "sabxcacxxaaabbbbccd";
+	const char text[] = "    sukasabxcacxxaaabbbbccd";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
@@ -648,7 +646,7 @@ testRegex() {
 
 	count = state.getSubMatchCount();
 	for (size_t i = 1; i < count; i++) {
-		const re::RegexMatch* subMatch = state.getSubMatch(i);
+		const re::Match* subMatch = state.getSubMatch(i);
 		if (subMatch)
 			printf(
 				"$%d: %p(%d) '%s'\n",
@@ -686,7 +684,7 @@ testRegex() {
 
 	count = state.getSubMatchCount();
 	for (size_t i = 1; i < count; i++) {
-		const re::RegexMatch* subMatch = state.getSubMatch(i);
+		const re::Match* subMatch = state.getSubMatch(i);
 		if (subMatch)
 			printf(
 				"$%d: %p(%d)\n",
@@ -770,8 +768,8 @@ testRegex() {
 	for (size_t i = 0; i < countof(lexemes); i++) {
 		printf("MATCHING: %s\n", lexemes[i]);
 
-		// re::RegexState state = regex.match(re::RegexExecFlag_ExactMatch, lexemes[i]);
-		re::RegexState state = regex.exec(lexemes[i]);
+		// re::State state = regex.match(re::RegexExecFlag_ExactMatch, lexemes[i]);
+		re::State state = regex.exec(lexemes[i]);
 		if (!state) {
 			printf("NO MATCH!\n");
 			continue;

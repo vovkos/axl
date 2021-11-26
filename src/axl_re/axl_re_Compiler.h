@@ -11,63 +11,30 @@
 
 #pragma once
 
-#include "axl_re_Regex.h"
-#include "axl_re_RegexNameMgr.h"
-
-#define _AXL_RE_NAMED_REGEX 0
+#include "axl_re_Lexer.h"
+#include "axl_re_Nfa.h"
+#include "axl_re_NameMgr.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-class RegexCompiler {
-protected:
-	enum {
-		MaxQuantifier = 32,
-	};
-
-	enum TokenKind {
-		TokenKind_Undefined,
-		TokenKind_Char,
-		TokenKind_SpecialChar,
-		TokenKind_Literal,
-		TokenKind_Identifier,
-		TokenKind_Quantifier,
-	};
-
-	struct Token {
-		TokenKind m_tokenKind;
-		utf32_t m_char;
-		sl::String m_string;
-
-		bool
-		isSpecialChar(char c) {
-			return m_tokenKind == TokenKind_SpecialChar && m_char == c;
-		}
-
-		bool
-		isValidSingle();
-	};
-
+class Compiler: protected Lexer {
 protected:
 	NfaProgram* m_program;
 	RegexNameMgr* m_nameMgr;
 	uint_t m_flags;
 
-	const char* m_p;
-	const char* m_end;
-	Token m_lastToken;
-
 public:
-	RegexCompiler(
+	Compiler(
 		NfaProgram* program,
 		uint_t flags
 	) {
 		construct(NULL, program, flags);
 	}
 
-	RegexCompiler(
+	Compiler(
 		RegexNameMgr* nameMgr,
 		NfaProgram* program,
 		uint_t flags
@@ -96,31 +63,7 @@ protected:
 	);
 
 	bool
-	readChar(utf32_t* c);
-
-	bool
-	readEscapeSequence(utf32_t* c);
-
-	bool
-	readLiteral(sl::String* string);
-
-	bool
-	readHexLiteral(sl::String* string);
-
-	bool
-	readIdentifier(sl::String* name);
-
-	bool
-	readQuantifier(size_t* count);
-
-	bool
-	getToken(Token* token);
-
-	bool
-	expectSpecialChar(char c);
-
-	bool
-	expectEof();
+	expectToken(TokenKind tokenKind);
 
 	NfaState*
 	expression();
@@ -131,50 +74,40 @@ protected:
 	NfaState*
 	repeat();
 
+	template <typename IsNonGreedy>
 	NfaState*
 	question(NfaState* start);
 
+	template <typename IsNonGreedy>
 	NfaState*
 	star(NfaState* start);
 
+	template <typename IsNonGreedy>
 	NfaState*
 	plus(NfaState* start);
 
 	NfaState*
 	single();
 
+	template <typename IsNegated>
 	NfaState*
 	charClass();
 
+	template <typename StdCharClass>
 	NfaState*
-	stdCharClass(char c);
-
-	bool
-	nonGreedyRepeat();
-
-	void
-	stdCharClass(
-		char c,
-		CharSet* charSet
-	);
-
-	NfaState*
-	literal(const sl::StringRef& string);
+	stdCharClass();
 
 	NfaState*
 	anchor(Anchor anchor);
 
 	NfaState*
-	ch(uint_t c);
+	ch(utf32_t c);
 
 	NfaState*
-	any();
+	anyChar();
 
 	NfaState*
-	quantify(
-		NfaState* start,
-		size_t count
-	);
+	quantifier(NfaState* start);
 
 	NfaState*
 	clone(
@@ -182,19 +115,11 @@ protected:
 		NfaState* last
 	);
 
-	bool
-	charClassItem(CharSet* charSet);
-
 	NfaState*
 	capturingGroup();
 
 	NfaState*
 	nonCapturingGroup();
-
-#if (_AXL_RE_NAMED_REGEX)
-	NfaState*
-	namedRegex(const sl::StringRef& name);
-#endif
 };
 
 //..............................................................................

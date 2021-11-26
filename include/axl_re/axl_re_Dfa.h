@@ -14,7 +14,6 @@
 #define _AXL_RE_DFA_H
 
 #include "axl_re_Nfa.h"
-#include "axl_re_CharRangeMap.h"
 
 #define _AXL_RE_DFA_MERGE_CHAR_RANGES 1
 

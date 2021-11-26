@@ -21,15 +21,15 @@ namespace re {
 //..............................................................................
 
 enum {
-	RegexStorageSignature = '.AFN',
+	StorageSignature = '.AFN',
 };
 
-enum RegexStorageVersion {
-	RegexStorageVersion_1_0_0   = 0x010000,
-	RegexStorageVersion_Current = RegexStorageVersion_1_0_0,
+enum StorageVersion {
+	StorageVersion_1_0_0   = 0x010000,
+	StorageVersion_Current = StorageVersion_1_0_0,
 };
 
-struct RegexStorageHdr {
+struct StorageHdr {
 	uint32_t m_signature;
 	uint32_t m_version;
 	uint32_t m_dataSize;
@@ -41,11 +41,11 @@ struct RegexStorageHdr {
 	uint32_t m_searchStartStateId;
 
 	// followed by m_dataSize bytes:
-	// RegexSwitchCaseStorage[m_switchCaseCount]
+	// SwitchCaseStorage[m_switchCaseCount]
 	// NfaStateStorage[m_stateCount]
 };
 
-struct RegexSwitchCaseStorage {
+struct SwitchCaseStorage {
 	uint32_t m_startCount;
 	uint32_t m_captureCount;
 	uint32_t m_matchStartStateId;

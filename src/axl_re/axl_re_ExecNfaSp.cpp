@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_re_RegexExecNfaSp.h"
+#include "axl_re_ExecNfaSp.h"
 #include "axl_re_Regex.h"
 
 namespace axl {
@@ -18,8 +18,8 @@ namespace re {
 
 //..............................................................................
 
-RegexExecNfaSp::RegexExecNfaSp(RegexStateImpl* parent):
-	RegexExecEngine(parent) {
+ExecNfaSp::ExecNfaSp(StateImpl* parent):
+	ExecEngine(parent) {
 	m_matchAcceptId = -1;
 	m_matchEndOffset = -1;
 	m_isEmpty = true;
@@ -34,7 +34,7 @@ RegexExecNfaSp::RegexExecNfaSp(RegexStateImpl* parent):
 }
 
 void
-RegexExecNfaSp::reset() {
+ExecNfaSp::reset() {
 	m_matchAcceptId = -1;
 	m_matchEndOffset = -1;
 	m_isEmpty = true;
@@ -55,7 +55,7 @@ RegexExecNfaSp::reset() {
 }
 
 bool
-RegexExecNfaSp::exec(
+ExecNfaSp::exec(
 	const void* p0,
 	size_t size
 ) {
@@ -87,9 +87,9 @@ RegexExecNfaSp::exec(
 }
 
 bool
-RegexExecNfaSp::eof() {
+ExecNfaSp::eof() {
 	uint_t anchors = Anchor_EndLine | Anchor_EndText;
-	if (m_parent->m_prevCharFlags & RegexStateImpl::CharFlag_Word)
+	if (m_parent->m_prevCharFlags & StateImpl::CharFlag_Word)
 		anchors |= Anchor_WordBoundary;
 	else
 		anchors |= Anchor_NotWordBoundary;
@@ -99,7 +99,7 @@ RegexExecNfaSp::eof() {
 }
 
 void
-RegexExecNfaSp::addState(const NfaState* state) {
+ExecNfaSp::addState(const NfaState* state) {
 	if (state->isConsuming())
 		m_consumingStateSetTable[m_consumingStateSetIdx].add(state);
 	else
@@ -109,7 +109,7 @@ RegexExecNfaSp::addState(const NfaState* state) {
 }
 
 void
-RegexExecNfaSp::openCapture(size_t captureId) {
+ExecNfaSp::openCapture(size_t captureId) {
 	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
 
 	size_t offset = m_parent->m_offset;
@@ -123,7 +123,7 @@ RegexExecNfaSp::openCapture(size_t captureId) {
 }
 
 void
-RegexExecNfaSp::closeCapture(size_t captureId) {
+ExecNfaSp::closeCapture(size_t captureId) {
 	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
 
 	size_t offset = m_parent->m_offset;
@@ -134,7 +134,7 @@ RegexExecNfaSp::closeCapture(size_t captureId) {
 }
 
 void
-RegexExecNfaSp::advanceNonConsumingStates(uint32_t anchors) {
+ExecNfaSp::advanceNonConsumingStates(uint32_t anchors) {
 	while (!m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx].isEmpty()) {
 		size_t srcSetIdx = m_nonConsumingStateSetIdx;
 		size_t dstSetIdx = !srcSetIdx;
@@ -186,7 +186,7 @@ RegexExecNfaSp::advanceNonConsumingStates(uint32_t anchors) {
 }
 
 void
-RegexExecNfaSp::advanceConsumingStates(utf32_t c) {
+ExecNfaSp::advanceConsumingStates(utf32_t c) {
 	size_t srcSetIdx = m_consumingStateSetIdx;
 	size_t dstSetIdx = !srcSetIdx;
 
@@ -221,7 +221,7 @@ RegexExecNfaSp::advanceConsumingStates(utf32_t c) {
 }
 
 bool
-RegexExecNfaSp::finalize(bool isEof) {
+ExecNfaSp::finalize(bool isEof) {
 	if (m_matchAcceptId == -1)
 		return false;
 
@@ -233,7 +233,7 @@ RegexExecNfaSp::finalize(bool isEof) {
 			return false;
 	}
 
-	m_parent->createMatch(m_matchAcceptId, RegexMatchPos(0, m_matchEndOffset));
+	m_parent->createMatch(m_matchAcceptId, MatchPos(0, m_matchEndOffset));
 	return true;
 }
 

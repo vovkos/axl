@@ -66,13 +66,11 @@ protected:
 	// to be implemented:
 
 	// void
-	// init ()
-	// {
+	// init () {
 	// }
 
 	// void
-	// exec ()
-	// {
+	// exec () {
 	// }
 };
 

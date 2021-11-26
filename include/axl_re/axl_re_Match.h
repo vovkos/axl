@@ -18,20 +18,20 @@
 namespace axl {
 namespace re {
 
-struct RegexStateImpl;
+struct StateImpl;
 
 //..............................................................................
 
-struct RegexMatchPos {
+struct MatchPos {
 	size_t m_offset;
 	size_t m_endOffset;
 
-	RegexMatchPos() {
+	MatchPos() {
 		m_offset = -1;
 		m_endOffset = -1;
 	}
 
-	RegexMatchPos(
+	MatchPos(
 		size_t offset,
 		size_t endOffset
 	) {
@@ -42,8 +42,8 @@ struct RegexMatchPos {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class RegexMatch: protected RegexMatchPos {
-	friend struct RegexStateImpl;
+class Match: protected MatchPos {
+	friend struct StateImpl;
 
 protected:
 	enc::CharCodec* m_charCodec;
@@ -51,8 +51,8 @@ protected:
 	mutable sl::StringRef m_text; // cache
 
 public:
-	RegexMatch():
-		RegexMatchPos(0, 0) {
+	Match():
+		MatchPos(0, 0) {
 
 		m_charCodec = NULL;
 		m_p = NULL;
