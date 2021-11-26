@@ -63,10 +63,12 @@ enum TokenKind {
 	TokenKind_Group,
 	TokenKind_NonCapturingGroup,
 
-	TokenKind_FirstValid       = TokenKind_Question,
-	TokenKind_FirstValidSingle = TokenKind_Char,
+	TokenKind_FirstValid        = TokenKind_Question,
+	TokenKind_FirstValidSingle  = TokenKind_Char,
 	TokenKind_FirstStdCharClass = TokenKind_StdCharClassDigit,
-	TokenKind_LastStdCharClass = TokenKind_StdCharClassNonSpace,
+	TokenKind_LastStdCharClass  = TokenKind_StdCharClassNonSpace,
+	TokenKind_FirstAnchor       = TokenKind_AnchorBeginLine,
+	TokenKind_LastAnchor        = TokenKind_AnchorNotWordBoundary,
 };
 
 const char*
@@ -84,7 +86,9 @@ struct Token {
 		uint32_t m_number;
 	};
 
-	Token(TokenKind tokenKind = TokenKind_Undefined) {
+	Token() {}
+
+	Token(TokenKind tokenKind) {
 		m_tokenKind = tokenKind;
 	}
 
@@ -108,7 +112,7 @@ struct Token {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// lex::RagelLexer would be an overkill
+// lex::RagelLexer would be an overkill here
 
 class Lexer: public lex::Ragel {
 public:
@@ -135,9 +139,6 @@ public:
 
 	Token
 	getToken();
-
-	Token
-	getNextToken();
 
 	Token
 	nextToken();
@@ -261,36 +262,31 @@ Lexer::getToken() {
 
 inline
 Token
-Lexer::getNextToken() {
-	if (m_tokenCount < 2)
-		tokenize();
-
-	return m_tokenBuffer[getNextReadIdx()];
-}
-
-inline
-Token
 Lexer::nextToken() {
 	ASSERT(m_tokenCount);
 
 	Token token = m_tokenBuffer[m_readIdx];
-	if (token.m_tokenKind > TokenKind_FirstValid)
+	if (token > TokenKind_FirstValid)
 		m_readIdx = getNextReadIdx();
 
+	m_tokenCount--;
 	return token;
 }
 
 inline
 void
 Lexer::tokenize() {
-	ASSERT(m_tokenCount < 2); // otherwise, why are we tokenizing?
+	ASSERT(!m_tokenCount); // otherwise, why are we tokenizing?
 
 	if (p == eof)
 		createToken(TokenKind_Eof);
-	else if (!exec())
-		createToken(TokenKind_Error);
-	else
-		ASSERT(m_tokenCount >= 2);
+	else {
+		pe = eof;
+		if (!exec())
+			createToken(TokenKind_Error);
+		else
+			ASSERT(m_tokenCount);
+	}
 }
 
 //..............................................................................

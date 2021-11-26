@@ -381,6 +381,9 @@ Compiler::single() {
 
 NfaState*
 Compiler::anchor(Anchor anchor) {
+	Token token = nextToken();
+	ASSERT(token >= TokenKind_FirstAnchor && token <= TokenKind_LastAnchor);
+
 	NfaState* start = m_program->addState();
 	NfaState* accept = m_program->addState();
 	start->createMatchAnchor(anchor, accept);
@@ -389,6 +392,9 @@ Compiler::anchor(Anchor anchor) {
 
 NfaState*
 Compiler::ch(utf32_t c) {
+	Token token = nextToken();
+	ASSERT(token == TokenKind_Char && token.m_char == c);
+
 	NfaState* start = m_program->addState();
 	NfaState* accept = m_program->addState();
 	start->createMatchChar(c, accept);
@@ -411,8 +417,8 @@ NfaState*
 Compiler::charClass() {
 	Token token = nextToken();
 	ASSERT(
-		IsNegated()() && token == TokenKind_CharClass ||
-		!IsNegated()() && token == TokenKind_NegatedCharClass
+		IsNegated()() && token == TokenKind_NegatedCharClass ||
+		!IsNegated()() && token == TokenKind_CharClass
 	);
 
 	NfaState* start = m_program->addState();
@@ -491,7 +497,7 @@ Compiler::charClass() {
 	if (IsNegated()())
 		start->m_charSet->invert();
 
-	if (!start->m_charSet->isEmpty()) {
+	if (start->m_charSet->isEmpty()) {
 		err::setError("empty character class");
 		return NULL;
 	}
