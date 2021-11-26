@@ -28,6 +28,7 @@ StateImpl::StateImpl() {
 	m_lastExecOffset = 0;
 	m_lastExecSize = 0;
 	m_execFlags = 0;
+	m_prevChar = 0;
 	m_prevCharFlags = 0;
 	m_offset = 0;
 	m_matchAcceptId = -1;
@@ -51,7 +52,8 @@ StateImpl::initialize(
 	m_regex = NULL;
 	m_decoder.setup(codec);
 	m_execFlags = execFlags;
-	m_prevCharFlags = StateImpl::CharFlag_Lf;
+	m_prevChar = '\n';
+	m_prevCharFlags = CharFlag_Nl;
 }
 
 void

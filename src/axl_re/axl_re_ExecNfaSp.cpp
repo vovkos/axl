@@ -71,7 +71,7 @@ ExecNfaSp::exec(
 
 		for (size_t i = 0; i < length; i++) {
 			utf32_t c = textBuffer[i];
-			uint_t anchors = m_parent->calcAnchors(c);
+			uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c);
 
 			advanceNonConsumingStates(anchors);
 			advanceConsumingStates(c);

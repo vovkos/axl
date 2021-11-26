@@ -29,10 +29,11 @@ struct StateImpl: public rc::RefCount {
 	friend class State;
 
 	enum CharFlag {
-		CharFlag_Cr   = 0x01,
-		CharFlag_Lf   = 0x02,
-		CharFlag_Nl   = CharFlag_Lf,
-		CharFlag_Word = 0x04,
+		CharFlag_Cr    = 0x01,
+		CharFlag_Lf    = 0x02,
+		CharFlag_Nl    = CharFlag_Lf,
+		CharFlag_Word  = 0x04,
+		CharFlag_Other = 0x08, // non-zero
 	};
 
 	Regex* m_regex;
@@ -42,6 +43,7 @@ struct StateImpl: public rc::RefCount {
 	size_t m_lastExecOffset;
 	size_t m_lastExecSize;
 	uint_t m_execFlags;
+	utf32_t m_prevChar;
 	uint_t m_prevCharFlags;
 	size_t m_offset;
 	Match m_match;
@@ -81,8 +83,12 @@ public:
 	uint_t
 	calcCharFlags(utf32_t c);
 
+	static
 	uint_t
-	calcAnchors(uint_t charFlags);
+	calcAnchors(
+		uint_t prevCharFlags,
+		uint_t charFlags
+	);
 
 	uint_t
 	calcAnchorsUpdateCharFlags(utf32_t c);
@@ -106,30 +112,28 @@ public:
 inline
 uint_t
 StateImpl::calcCharFlags(utf32_t c) {
-	uint_t charFlags = 0;
-
-	if (c == '\r')
-		charFlags |= CharFlag_Cr;
-	else if (c == '\n')
-		charFlags |= CharFlag_Lf;
-	else if (c == '_' || enc::utfIsLetterOrDigit(c))
-		charFlags |= CharFlag_Word;
-
-	return charFlags;
+	return
+		c == '\r' ? CharFlag_Cr :
+		c == '\n' ? CharFlag_Lf :
+		c == '_' || enc::utfIsLetterOrDigit(c) ? CharFlag_Word :
+		CharFlag_Other;
 }
 
 inline
 uint_t
-StateImpl::calcAnchors(uint_t charFlags) {
+StateImpl::calcAnchors(
+	uint_t prevCharFlags,
+	uint_t charFlags
+) {
 	uint_t anchors = 0;
 
-	if (m_prevCharFlags & CharFlag_Lf)
+	if (prevCharFlags & CharFlag_Lf)
 		anchors |= Anchor_BeginLine;
 
 	if (charFlags & (CharFlag_Cr | CharFlag_Lf))
 		anchors |= Anchor_EndLine;
 
-	if ((charFlags & m_prevCharFlags) & CharFlag_Word)
+	if ((prevCharFlags & CharFlag_Word) ^ (charFlags & CharFlag_Word))
 		anchors |= Anchor_WordBoundary;
 	else
 		anchors |= Anchor_NotWordBoundary;
@@ -141,8 +145,12 @@ inline
 uint_t
 StateImpl::calcAnchorsUpdateCharFlags(utf32_t c) {
 	uint_t charFlags = calcCharFlags(c);
-	uint_t anchors = calcAnchors(charFlags);
+	uint_t anchors = m_prevCharFlags ?
+		calcAnchors(m_prevCharFlags, charFlags) :
+		calcAnchors(calcCharFlags(m_prevChar), calcCharFlags(c));
+
 	m_prevCharFlags = charFlags;
+	return anchors;
 }
 
 //..............................................................................

@@ -79,18 +79,18 @@ ExecDfa::exec(
 
 		for (size_t i = 0; i < length; i++) {
 			utf32_t c = textBuffer[i];
-			uint_t charFlags = StateImpl::calcCharFlags(c);
 
 			if (m_state->m_anchorMask) {
-				uint_t anchors = m_parent->calcAnchors(charFlags) & m_state->m_anchorMask;
+				uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c) & m_state->m_anchorMask;
 				if (anchors) {
 					const DfaState* anchorState = m_state->m_anchorTransitionMap.findValue(anchors, NULL);
 					if (anchorState)
 						gotoState(anchorState);
 				}
+			} else {
+				m_parent->m_prevChar = c;
+				m_parent->m_prevCharFlags = 0;
 			}
-
-			m_parent->m_prevCharFlags = charFlags;
 
 			const DfaState* nextState = m_state->m_charTransitionMap.find(c);
 			if (!nextState)

@@ -553,15 +553,12 @@ testCharSet() {
 
 void
 testRegex() {
-	re::StdRegexNameMgr nameMgr;
-	nameMgr.addName("ws",  "[ \\t\\r\\n]");
-	nameMgr.addName("dec", "[0-9]");
-
 	re::Regex regex;
 	bool result = true;
 
 #if (1)
-	const char src[] = "a|[a-z]+1";
+	const char src[] = "[\xd0\xb1-\xd0\xb3]+";
+	// const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";
 	// const char src[] = "[abc]";
 	// const char src[] = "^([abc]+)$";
@@ -624,7 +621,8 @@ testRegex() {
 	const re::Match* match;
 	size_t count;
 
-	const char text[] = "    sukasabxcacxxaaabbbbccd";
+	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
+//	const char text[] = "    sukasdabxcacxxaaabbbbccd";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
