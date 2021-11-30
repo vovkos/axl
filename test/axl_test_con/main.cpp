@@ -5658,6 +5658,444 @@ testListSort() {
 
 //..............................................................................
 
+// accepts everything (surrogates, overlong sequences, invalid code-points)
+// ensures that forward and backward decoders produce identical code-point sequences
+// for bad UTF-8 sequences emits replacements for EACH code-unit (each byte)
+// no retries for bad UTF-8 sequences
+
+//..............................................................................
+
+// char class map
+
+class Utf8CcMap {
+public:
+	// really 6, but round up to 8 so that multiplication by CcCount
+	// would not break bit properties
+
+	enum {
+		CcCount = 8,
+	};
+
+protected:
+	static const uchar_t m_map[];
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const uchar_t Utf8CcMap::m_map[] = {
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 00..0f
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 10..1f
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 20..2f
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 30..3f
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 40..4f
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 50..5f
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 60..6f
+	0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  // 70..7f
+	1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1,  // 80..8f
+	1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1,  // 90..9f
+	1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1,  // a0..af
+	1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1,  // b0..bf
+	2, 2, 2, 2, 2, 2, 2, 2,  2, 2, 2, 2, 2, 2, 2, 2,  // c0..cf
+	2, 2, 2, 2, 2, 2, 2, 2,  2, 2, 2, 2, 2, 2, 2, 2,  // d0..df
+	3, 3, 3, 3, 3, 3, 3, 3,  3, 3, 3, 3, 3, 3, 3, 3,  // e0..ef
+	4, 4, 4, 4, 4, 4, 4, 4,  5, 5, 5, 5, 5, 5, 5, 5,  // f0..ff
+};
+
+//..............................................................................
+
+template <typename T>
+class Utf8DfaBase: public Utf8CcMap {
+public:
+	// state values are pre-multiplied for faster DFA table lookups
+
+protected:
+	uint_t m_state;
+	utf32_t m_cp;
+
+public:
+	Utf8DfaBase() {
+		m_state = T::State_Start;
+		m_cp = 0;
+	}
+
+	void
+	reset() {
+		m_state = T::State_Start;
+	}
+
+	uint_t
+	getState() {
+		return m_state;
+	}
+
+	utf32_t getCp() const {
+		return m_cp;
+	}
+
+	// skip codepoint calculations
+
+	uint_t count(char c) {
+		uchar_t cc = m_map[(uchar_t)c];
+		return m_state = T::m_dfa[m_state + cc];
+	}
+};
+
+//..............................................................................
+
+/*
+	Utf8Dfa dfa;
+
+	// if only need to emit a single replacement char
+
+	for (size_t i = 0; i < size; i++) {
+		uchar_t state = dfa.decode(data[i]);
+
+		if (Utf8Dfa::isError(state))
+			; // emit replacement char
+
+		if (Utf8Dfa::isAccept(state))
+			; // emit cp
+	}
+
+	// if need to emit a replacement char per byte
+
+	size_t last = 0;
+
+	for (size_t i = 0; i < size; i++) {
+		uchar_t state = dfa.decode(data[i]);
+
+		if (Utf8Dfa::isError(state)) {
+			; // emit replacement char
+		} else if (Utf8Dfa::isReady(state))
+			; // emit cp
+		}
+	}
+
+*/
+
+class Utf8Dfa: public Utf8DfaBase<Utf8Dfa> {
+public:
+	// state values are pre-multiplied for faster table lookups
+
+	// bit 0 indicates accept
+	// bit 1 indicates error
+
+	enum State {
+		State_Start       = 0,
+		State_Error       = 1 * CcCount,   // 8   - invalid sequence
+
+		State_1_2         = 2 * CcCount,   // 16  - 1st byte in a 2-byte sequence
+		State_1_2_Error   = 3 * CcCount,   // 24  - 1st byte in a 2-byte sequence (with error)
+
+		State_1_3         = 4 * CcCount,   // 32  - 1st byte in a 3-byte sequence
+		State_1_3_Error   = 5 * CcCount,   // 40  - 1st byte in a 3-byte sequence (with error)
+		State_2_3         = 6 * CcCount,   // 48  - 2nd byte in a 3-byte sequence
+
+		State_1_4         = 8 * CcCount,   // 64  - 1st byte in a 4-byte sequence
+		State_1_4_Error   = 9 * CcCount,   // 72  - 1st byte in a 4-byte sequence (with error)
+		State_2_4         = 10 * CcCount,  // 80  - 2nd byte in a 4-byte sequence
+		State_3_4         = 12 * CcCount,  // 96  - 3rd byte in a 4-byte sequence
+
+		State_Ready       = 14 * CcCount,  // 112 - codepoint is ready
+		State_Ready_Error = 15 * CcCount,  // 120 - codepoint is ready (with error)
+	};
+
+protected:
+	enum {
+		StateCount = 16,
+	};
+
+	static const uchar_t m_dfa[StateCount * CcCount];
+
+public:
+	static
+	bool
+	isError(uint_t state)  {
+		return (state & State_Error) != 0;
+	}
+
+	static
+	bool
+	isReady(uint_t state)  {
+		return state >= State_Ready;
+	}
+
+	uint_t
+	decode(char c) {
+		uchar_t cc = m_map[(uchar_t)c];
+		m_cp = (m_state & State_Ready_Error) ?
+			(0xff >> cc) & c :
+			(m_cp << 6) | (c & 0x3f);
+		return m_state = m_dfa[m_state + cc];
+	}
+};
+
+const uchar_t Utf8Dfa::m_dfa[] = {
+//  00..0f 80..bf c0..df e0..ef f0..f7 f8..ff
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 0   - State_Start
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 8   - State_Error
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 32  - State_1_2
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 40  - State_1_2_Error
+	24,    64,    40,    56,    88,    8,     -1, -1,  // 48  - State_1_3
+	24,    64,    40,    56,    88,    8,     -1, -1,  // 56  - State_1_3_Error
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 64  - State_2_3
+	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 72  - unused
+	24,    96,    40,    56,    88,    8,     -1, -1,  // 80  - State_1_4
+	24,    96,    40,    56,    88,    8,     -1, -1,  // 88  - State_1_4_Error
+	24,    112,   40,    56,    88,    8,     -1, -1,  // 96  - State_2_4
+	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 104 - unused
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 112 - State_3_4
+	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 104 - unused
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 16  - State_Ready
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 24  - State_Ready_Error
+};
+
+//..............................................................................
+
+/*
+	Utf8ReverseDfa dfa;
+
+	for (size_t i = 0; i < size; i++) {
+		uchar_t state = dfa.decode(data[i]);
+
+		if (Utf8ReverseDfa::isError(state))
+			; // emit replacement char
+
+		if (Utf8ReverseDfa::isReady(state))
+			; // emit cp
+	}
+*/
+
+class Utf8ReverseDfa: public Utf8DfaBase<Utf8ReverseDfa> {
+public:
+	// state values are pre-multiplied for faster table lookups
+
+	enum State {
+		State_Start         = 0,
+		State_Error         = 1 * CcCount,  // 8   - 1st continuation byte
+
+		State_Cb_1          = 2 * CcCount,  // 12  - 1st continuation byte
+		State_Cb_2          = 4 * CcCount,  // 24  - 2nd continuation byte
+		State_Cb_3          = 6 * CcCount,  // 36  - 3rd continuation byte
+		State_Cb_3_Error    = 7 * CcCount,  // 56  - 3rd continuation byte (with error)
+
+		State_Ready         = 8 * CcCount,  // 64  - codepoint is ready
+		State_Ready_Error   = 9 * CcCount,  // 72  - codepoint is ready (with error)
+		State_Ready_Error_2 = 11 * CcCount, // 88  - codepoint is ready (with double error)
+		State_Ready_Error_3 = 13 * CcCount, // 104 - codepoint is ready (with triple error)
+	};
+
+protected:
+	enum {
+		StateCount = 14,
+	};
+
+	static const uchar_t m_dfa[StateCount * CcCount];
+
+public:
+	static
+	bool
+	isError(uint_t state)  {
+		return (state & State_Error) != 0;
+	}
+
+	static
+	bool
+	isReady(uint_t state)  {
+		return state >= State_Ready;
+	}
+
+	uint_t decode(char c) {
+		uchar_t cc = m_map[(uchar_t)c];
+		m_cp = m_state ? m_cp | (((0xff >> cc) & c) << 6) : (0xff >> cc) & c;
+		return m_state = m_dfa[m_state + cc];
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const uchar_t Utf8ReverseDfa::m_dfa[] = {
+//  00..0f 80..bf c0..df e0..ef f0..f7 f8..ff
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 0   - State_Start
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 8   - State_Error
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 16  - State_Accept
+	16,    8,     32,    48,    80,    8,     -1, -1,  // 24  - State_Accept_Error
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 32  - State_1_2
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 40  - State_1_2_Error
+	24,    64,    40,    56,    88,    8,     -1, -1,  // 48  - State_1_3
+	24,    64,    40,    56,    88,    8,     -1, -1,  // 56  - State_1_3_Error
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 64  - State_2_3
+	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 72  - unused
+	24,    96,    40,    56,    88,    8,     -1, -1,  // 80  - State_1_4
+	24,    96,    40,    56,    88,    8,     -1, -1,  // 88  - State_1_4_Error
+	24,    112,   40,    56,    88,    8,     -1, -1,  // 96  - State_2_4
+	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 104 - unused
+	24,    16,    40,    56,    88,    8,     -1, -1,  // 112 - State_3_4
+};
+
+//..............................................................................
+
+struct UnicodeReplacementChar {
+	enum {
+		ReplacementChar = 0xfffd,
+	};
+};
+
+struct UnicodeInvalidChar {
+	enum {
+		ReplacementChar = 0xffff,
+	};
+};
+
+//..............................................................................
+
+namespace utf8_0 {
+
+enum {
+	UTF8_ACCEPT = 0,
+	UTF8_REJECT = 1,
+};
+
+static const uint8_t utf8d[] = {
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 00..1f
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 20..3f
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 40..5f
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 60..7f
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9, // 80..9f
+  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, // a0..bf
+  8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, // c0..df
+  0xa,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x4,0x3,0x3, // e0..ef
+  0xb,0x6,0x6,0x6,0x5,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8, // f0..ff
+  0x0,0x1,0x2,0x3,0x5,0x8,0x7,0x1,0x1,0x1,0x4,0x6,0x1,0x1,0x1,0x1, // s0..s0
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1, // s1..s2
+  1,2,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1, // s3..s4
+  1,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1, // s5..s6
+  1,3,1,1,1,1,1,3,1,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // s7..s8
+};
+
+uint32_t inline
+decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
+  uint32_t type = utf8d[byte];
+
+  *codep = (*state != UTF8_ACCEPT) ?
+    (byte & 0x3fu) | (*codep << 6) :
+    (0xff >> type) & (byte);
+
+  *state = utf8d[256 + *state*16 + type];
+  return *state;
+}
+
+} // namespace utf8_0
+
+// Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
+// See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
+
+enum {
+	UTF8_ACCEPT = 0,
+	UTF8_REJECT = 12,
+};
+
+static const uint8_t utf8d[] = {
+  // The first part of the table maps bytes to character classes that
+  // to reduce the size of the transition table and create bitmasks.
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+   8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
+
+  // The second part is a transition table that maps a combination
+  // of a state of the automaton and a character class to a state.
+   0,12,24,36,60,96,84,12,12,12,48,72, 12,12,12,12,12,12,12,12,12,12,12,12,
+  12, 0,12,12,12,12,12, 0,12, 0,12,12, 12,24,12,12,12,12,12,24,12,24,12,12,
+  12,12,12,12,12,12,12,24,12,12,12,12, 12,24,12,12,12,12,12,12,12,24,12,12,
+  12,12,12,12,12,12,12,36,12,36,12,12, 12,36,12,12,12,12,12,36,12,36,12,12,
+  12,36,12,12,12,12,12,12,12,12,12,12,
+};
+
+uint32_t inline
+decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
+  uint32_t type = utf8d[byte];
+
+  *codep = (*state != UTF8_ACCEPT) ?
+    (byte & 0x3fu) | (*codep << 6) :
+    (0xff >> type) & (byte);
+
+  *state = utf8d[256 + *state + type];
+  return *state;
+}
+
+void
+testUtf8() {
+	const uchar_t data[] = {
+		0x74, 0x61, 0x6b, 0x69, 0x65, 0xf1, 0x80, 0x80,
+		0xd0, 0xb0, 0xd0, 0xb1, 0xd0, 0xb2, 0xd0, 0xb3,
+		0xd0, 0xb4, 0x20, 0x64, 0x65, 0x6c, 0x61, 0x62,
+	};
+
+	uint32_t prevState = UTF8_ACCEPT;
+	uint32_t state = UTF8_ACCEPT;
+	uint32_t cp;
+
+	printf("Hoehrmann:\n");
+
+	for (size_t i = 0; i < sizeof(data); i++) {
+		if (!decode(&state, &cp, data[i]))
+			printf("cp 0x%02x '%c'\n", cp, cp);
+		else if (state == UTF8_REJECT) {
+			printf("broken cp 0x%02x\n", cp);
+			state = UTF8_ACCEPT;
+			if (prevState != UTF8_ACCEPT)
+				i--;
+		}
+
+		prevState = state;
+	}
+
+	printf("AXL DFA:\n");
+
+	Utf8Decoder decoder;
+
+	for (size_t i = 0; i < sizeof(data); i++) {
+		uint_t state = decoder.decode(data[i]);
+		if (!state)
+			printf("cp 0x%02x '%c'\n", decoder.cp(), decoder.cp());
+		else if (state == Utf8Decoder::State_Error) {
+			printf("broken cp 0x%02x '%c'\n", decoder.cp(), decoder.cp());
+			decoder.reset();
+			if (prevState > Utf8Decoder::State_Start)
+				i--;
+		}
+
+		prevState = state;
+	}
+
+	printf("AXL RDFA:\n");
+
+	Utf8ReverseDecoder rdecoder;
+
+	for (intptr_t i = sizeof(data) - 1; i >= 0; i--) {
+		uint_t state = rdecoder.decode(data[i]);
+		if (!state)
+			printf("cp 0x%02x '%c'\n", rdecoder.cp(), rdecoder.cp());
+		else if (state == Utf8Decoder::State_Error) {
+			printf("broken cp 0x%02x\n", rdecoder.cp());
+			rdecoder.reset();
+			if (prevState > Utf8Decoder::State_Start)
+				i++;
+		}
+
+		prevState = state;
+	}
+
+	printf("done!\n");
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -5690,7 +6128,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testRegex();
+	testUtf8();
 	return 0;
 }
 
