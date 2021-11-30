@@ -1,4 +1,4 @@
-//..............................................................................
+ //..............................................................................
 //
 //  This file is part of the AXL library.
 //
@@ -5670,7 +5670,7 @@ testListSort() {
 class Utf8CcMap {
 public:
 	// really 6, but round up to 8 so that multiplication by CcCount
-	// would not break bit properties
+	// does not break bit properties
 
 	enum {
 		CcCount = 8,
@@ -5781,8 +5781,7 @@ public:
 	// bit 1 indicates error
 
 	enum State {
-		State_Start       = 0,
-		State_Error       = 1 * CcCount,   // 8   - invalid sequence
+		State_ErrorBit    = 1 * CcCount,   // 8   - invalid sequence bit
 
 		State_1_2         = 2 * CcCount,   // 16  - 1st byte in a 2-byte sequence
 		State_1_2_Error   = 3 * CcCount,   // 24  - 1st byte in a 2-byte sequence (with error)
@@ -5796,8 +5795,11 @@ public:
 		State_2_4         = 10 * CcCount,  // 80  - 2nd byte in a 4-byte sequence
 		State_3_4         = 12 * CcCount,  // 96  - 3rd byte in a 4-byte sequence
 
+		State_Error       = 13 * CcCount,  // 104 - invalid sequence
 		State_Ready       = 14 * CcCount,  // 112 - codepoint is ready
 		State_Ready_Error = 15 * CcCount,  // 120 - codepoint is ready (with error)
+
+		State_Start       = State_Ready,
 	};
 
 protected:
@@ -5811,7 +5813,7 @@ public:
 	static
 	bool
 	isError(uint_t state)  {
-		return (state & State_Error) != 0;
+		return (state & State_ErrorBit) != 0;
 	}
 
 	static
@@ -5823,7 +5825,7 @@ public:
 	uint_t
 	decode(char c) {
 		uchar_t cc = m_map[(uchar_t)c];
-		m_cp = (m_state & State_Ready_Error) ?
+		m_cp = (m_state >= State_Error) ?
 			(0xff >> cc) & c :
 			(m_cp << 6) | (c & 0x3f);
 		return m_state = m_dfa[m_state + cc];
@@ -5831,23 +5833,23 @@ public:
 };
 
 const uchar_t Utf8Dfa::m_dfa[] = {
-//  00..0f 80..bf c0..df e0..ef f0..f7 f8..ff
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 0   - State_Start
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 8   - State_Error
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 32  - State_1_2
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 40  - State_1_2_Error
-	24,    64,    40,    56,    88,    8,     -1, -1,  // 48  - State_1_3
-	24,    64,    40,    56,    88,    8,     -1, -1,  // 56  - State_1_3_Error
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 64  - State_2_3
-	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 72  - unused
-	24,    96,    40,    56,    88,    8,     -1, -1,  // 80  - State_1_4
-	24,    96,    40,    56,    88,    8,     -1, -1,  // 88  - State_1_4_Error
-	24,    112,   40,    56,    88,    8,     -1, -1,  // 96  - State_2_4
-	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 104 - unused
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 112 - State_3_4
-	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 104 - unused
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 16  - State_Ready
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 24  - State_Ready_Error
+//  00..0f             80..bf        c0..df           e0..ef           f0..f7           f8..ff
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 0   - unused
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 8   - unused
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 16  - State_1_2
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 24  - State_1_2_Error
+	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 32  - State_1_3
+	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 40  - State_1_3_Error
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 48  - State_2_3
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 56  - unused
+	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 64  - State_1_4
+	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 72  - State_1_4_Error
+	State_Ready_Error, State_3_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 80  - State_2_4
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 88  - unused
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 96  - State_3_4
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 104 - State_Error
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 112 - State_Ready
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 120 - State_Ready_Error
 };
 
 //..............................................................................
@@ -5871,23 +5873,25 @@ public:
 	// state values are pre-multiplied for faster table lookups
 
 	enum State {
-		State_Start         = 0,
-		State_Error         = 1 * CcCount,  // 8   - 1st continuation byte
+		State_ErrorBit      = 1 * CcCount,  // 8   - 1st continuation byte
 
-		State_Cb_1          = 2 * CcCount,  // 12  - 1st continuation byte
-		State_Cb_2          = 4 * CcCount,  // 24  - 2nd continuation byte
-		State_Cb_3          = 6 * CcCount,  // 36  - 3rd continuation byte
+		State_Cb_1          = 2 * CcCount,  // 16  - 1st continuation byte
+		State_Cb_2          = 4 * CcCount,  // 32  - 2nd continuation byte
+		State_Cb_3          = 6 * CcCount,  // 48  - 3rd continuation byte
 		State_Cb_3_Error    = 7 * CcCount,  // 56  - 3rd continuation byte (with error)
 
-		State_Ready         = 8 * CcCount,  // 64  - codepoint is ready
-		State_Ready_Error   = 9 * CcCount,  // 72  - codepoint is ready (with error)
-		State_Ready_Error_2 = 11 * CcCount, // 88  - codepoint is ready (with double error)
-		State_Ready_Error_3 = 13 * CcCount, // 104 - codepoint is ready (with triple error)
+		State_Error         = 9 * CcCount,  // 72  - 1st continuation byte
+		State_Ready         = 10 * CcCount, // 80  - codepoint is ready
+		State_Ready_Error   = 11 * CcCount, // 88  - codepoint is ready (with error)
+		State_Ready_Error_2 = 13 * CcCount, // 104 - codepoint is ready (with double error)
+		State_Ready_Error_3 = 15 * CcCount, // 120 - codepoint is ready (with triple error)
+
+		State_Start         = State_Ready,
 	};
 
 protected:
 	enum {
-		StateCount = 14,
+		StateCount = 16,
 	};
 
 	static const uchar_t m_dfa[StateCount * CcCount];
@@ -5896,7 +5900,7 @@ public:
 	static
 	bool
 	isError(uint_t state)  {
-		return (state & State_Error) != 0;
+		return (state & State_ErrorBit) != 0;
 	}
 
 	static
@@ -5915,22 +5919,23 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const uchar_t Utf8ReverseDfa::m_dfa[] = {
-//  00..0f 80..bf c0..df e0..ef f0..f7 f8..ff
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 0   - State_Start
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 8   - State_Error
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 16  - State_Accept
-	16,    8,     32,    48,    80,    8,     -1, -1,  // 24  - State_Accept_Error
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 32  - State_1_2
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 40  - State_1_2_Error
-	24,    64,    40,    56,    88,    8,     -1, -1,  // 48  - State_1_3
-	24,    64,    40,    56,    88,    8,     -1, -1,  // 56  - State_1_3_Error
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 64  - State_2_3
-	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 72  - unused
-	24,    96,    40,    56,    88,    8,     -1, -1,  // 80  - State_1_4
-	24,    96,    40,    56,    88,    8,     -1, -1,  // 88  - State_1_4_Error
-	24,    112,   40,    56,    88,    8,     -1, -1,  // 96  - State_2_4
-	-1,    -1,    -1,    -1,    -1,    -1,    -1, -1,  // 104 - unused
-	24,    16,    40,    56,    88,    8,     -1, -1,  // 112 - State_3_4
+//  00..0f               80..bf            c0..df               e0..ef             f0..f7       f8..ff
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 0   - unused
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 8   - unused
+	State_Ready_Error,   State_Cb_2,       State_Ready,         State_Error,       State_Error, State_Error,  0, 0,  // 16  - State_Cb_1
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 24  - unused
+	State_Ready_Error_2, State_Cb_3,       State_Ready_Error,   State_Ready,       State_Error, State_Error,  0, 0,  // 32  - State_Cb_2
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 40  - unused
+	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 48  - State_Cb_3
+	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 56  - State_Cb_3_Error
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 64  - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 72  - State_Error
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 80  - State_Ready
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 88  - State_Ready_Error
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 96  - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 104 - State_Ready_Error_2
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 112 - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 120 - State_Ready_Error_3
 };
 
 //..............................................................................
@@ -6057,38 +6062,28 @@ testUtf8() {
 
 	printf("AXL DFA:\n");
 
-	Utf8Decoder decoder;
+	Utf8Dfa dfa;
 
 	for (size_t i = 0; i < sizeof(data); i++) {
-		uint_t state = decoder.decode(data[i]);
-		if (!state)
-			printf("cp 0x%02x '%c'\n", decoder.cp(), decoder.cp());
-		else if (state == Utf8Decoder::State_Error) {
-			printf("broken cp 0x%02x '%c'\n", decoder.cp(), decoder.cp());
-			decoder.reset();
-			if (prevState > Utf8Decoder::State_Start)
-				i--;
-		}
+		uint_t state = dfa.decode(data[i]);
+		if (Utf8Dfa::isError(state))
+			printf("broken cp\n");
 
-		prevState = state;
+		if (Utf8Dfa::isReady(state))
+			printf("cp 0x%02x '%c'\n", dfa.getCp(), dfa.getCp());
 	}
 
-	printf("AXL RDFA:\n");
+	printf("AXL rDFA:\n");
 
-	Utf8ReverseDecoder rdecoder;
+	Utf8ReverseDfa rdfa;
 
 	for (intptr_t i = sizeof(data) - 1; i >= 0; i--) {
-		uint_t state = rdecoder.decode(data[i]);
-		if (!state)
-			printf("cp 0x%02x '%c'\n", rdecoder.cp(), rdecoder.cp());
-		else if (state == Utf8Decoder::State_Error) {
-			printf("broken cp 0x%02x\n", rdecoder.cp());
-			rdecoder.reset();
-			if (prevState > Utf8Decoder::State_Start)
-				i++;
-		}
+		uint_t state = rdfa.decode(data[i]);
+		if (Utf8Dfa::isError(state))
+			printf("broken cp\n");
 
-		prevState = state;
+		if (Utf8Dfa::isReady(state))
+			printf("cp 0x%02x '%c'\n", dfa.getCp(), dfa.getCp());
 	}
 
 	printf("done!\n");
