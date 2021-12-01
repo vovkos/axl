@@ -5669,6 +5669,15 @@ testListSort() {
 
 class Utf8CcMap {
 public:
+	enum Cc {
+		Cc_Ascii, // ASCII range
+		Cc_Cb,    // continuation byte
+		Cc_Hdr2,  // header of a 2-byte sequence
+		Cc_Hdr3,  // header of a 3-byte sequence
+		Cc_Hdr4,  // header of a 4-byte sequence
+	};
+
+public:
 	// really 6, but round up to 8 so that multiplication by CcCount
 	// does not break bit properties
 
@@ -5705,36 +5714,52 @@ const uchar_t Utf8CcMap::m_map[] = {
 
 template <typename T>
 class Utf8DfaBase: public Utf8CcMap {
-public:
-	// state values are pre-multiplied for faster DFA table lookups
-
 protected:
 	uint_t m_state;
 	utf32_t m_cp;
 
 public:
 	Utf8DfaBase() {
-		m_state = T::State_Start;
 		m_cp = 0;
+		m_state = T::State_Start;
 	}
 
-	void
-	reset() {
-		m_state = T::State_Start;
+	static
+	bool
+	isError(uint_t state)  {
+		return (state & T::State_ErrorBit) != 0;
+	}
+
+	static
+	bool
+	isReady(uint_t state)  {
+		return state >= T::State_FirstReady;
+	}
+
+	bool
+	isError() const {
+		return isError(m_state);
+	}
+
+	bool
+	isReady() const  {
+		return isReady(m_state);
 	}
 
 	uint_t
-	getState() {
+	getState() const {
 		return m_state;
 	}
 
-	utf32_t getCp() const {
+	utf32_t
+	getCp() const {
 		return m_cp;
 	}
 
 	// skip codepoint calculations
 
-	uint_t count(char c) {
+	uint_t
+	count(char c) {
 		uchar_t cc = m_map[(uchar_t)c];
 		return m_state = T::m_dfa[m_state + cc];
 	}
@@ -5742,217 +5767,7 @@ public:
 
 //..............................................................................
 
-/*
-	Utf8Dfa dfa;
-
-	// if only need to emit a single replacement char
-
-	for (size_t i = 0; i < size; i++) {
-		uchar_t state = dfa.decode(data[i]);
-
-		if (Utf8Dfa::isError(state))
-			; // emit replacement char
-
-		if (Utf8Dfa::isAccept(state))
-			; // emit cp
-	}
-
-	// if need to emit a replacement char per byte
-
-	size_t last = 0;
-
-	for (size_t i = 0; i < size; i++) {
-		uchar_t state = dfa.decode(data[i]);
-
-		if (Utf8Dfa::isError(state)) {
-			; // emit replacement char
-		} else if (Utf8Dfa::isReady(state))
-			; // emit cp
-		}
-	}
-
-*/
-
-class Utf8Dfa: public Utf8DfaBase<Utf8Dfa> {
-public:
-	// state values are pre-multiplied for faster table lookups
-
-	// bit 0 indicates accept
-	// bit 1 indicates error
-
-	enum State {
-		State_ErrorBit    = 1 * CcCount,   // 8   - invalid sequence bit
-
-		State_1_2         = 2 * CcCount,   // 16  - 1st byte in a 2-byte sequence
-		State_1_2_Error   = 3 * CcCount,   // 24  - 1st byte in a 2-byte sequence (with error)
-
-		State_1_3         = 4 * CcCount,   // 32  - 1st byte in a 3-byte sequence
-		State_1_3_Error   = 5 * CcCount,   // 40  - 1st byte in a 3-byte sequence (with error)
-		State_2_3         = 6 * CcCount,   // 48  - 2nd byte in a 3-byte sequence
-
-		State_1_4         = 8 * CcCount,   // 64  - 1st byte in a 4-byte sequence
-		State_1_4_Error   = 9 * CcCount,   // 72  - 1st byte in a 4-byte sequence (with error)
-		State_2_4         = 10 * CcCount,  // 80  - 2nd byte in a 4-byte sequence
-		State_3_4         = 12 * CcCount,  // 96  - 3rd byte in a 4-byte sequence
-
-		State_Error       = 13 * CcCount,  // 104 - invalid sequence
-		State_Ready       = 14 * CcCount,  // 112 - codepoint is ready
-		State_Ready_Error = 15 * CcCount,  // 120 - codepoint is ready (with error)
-
-		State_Start       = State_Ready,
-	};
-
-protected:
-	enum {
-		StateCount = 16,
-	};
-
-	static const uchar_t m_dfa[StateCount * CcCount];
-
-public:
-	static
-	bool
-	isError(uint_t state)  {
-		return (state & State_ErrorBit) != 0;
-	}
-
-	static
-	bool
-	isReady(uint_t state)  {
-		return state >= State_Ready;
-	}
-
-	uint_t
-	decode(char c) {
-		uchar_t cc = m_map[(uchar_t)c];
-		m_cp = (m_state >= State_Error) ?
-			(0xff >> cc) & c :
-			(m_cp << 6) | (c & 0x3f);
-		return m_state = m_dfa[m_state + cc];
-	}
-};
-
-const uchar_t Utf8Dfa::m_dfa[] = {
-//  00..0f             80..bf        c0..df           e0..ef           f0..f7           f8..ff
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 0   - unused
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 8   - unused
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 16  - State_1_2
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 24  - State_1_2_Error
-	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 32  - State_1_3
-	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 40  - State_1_3_Error
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 48  - State_2_3
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 56  - unused
-	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 64  - State_1_4
-	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 72  - State_1_4_Error
-	State_Ready_Error, State_3_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 80  - State_2_4
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 88  - unused
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 96  - State_3_4
-	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 104 - State_Error
-	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 112 - State_Ready
-	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 120 - State_Ready_Error
-};
-
-//..............................................................................
-
-/*
-	Utf8ReverseDfa dfa;
-
-	for (size_t i = 0; i < size; i++) {
-		uchar_t state = dfa.decode(data[i]);
-
-		if (Utf8ReverseDfa::isError(state))
-			; // emit replacement char
-
-		if (Utf8ReverseDfa::isReady(state))
-			; // emit cp
-	}
-*/
-
-class Utf8ReverseDfa: public Utf8DfaBase<Utf8ReverseDfa> {
-public:
-	// state values are pre-multiplied for faster table lookups
-
-	enum State {
-		State_ErrorBit      = 1 * CcCount,  // 8   - 1st continuation byte
-
-		State_Cb_1          = 2 * CcCount,  // 16  - 1st continuation byte
-		State_Cb_2          = 4 * CcCount,  // 32  - 2nd continuation byte
-		State_Cb_3          = 6 * CcCount,  // 48  - 3rd continuation byte
-		State_Cb_3_Error    = 7 * CcCount,  // 56  - 3rd continuation byte (with error)
-
-		State_Error         = 9 * CcCount,  // 72  - 1st continuation byte
-		State_Ready         = 10 * CcCount, // 80  - codepoint is ready
-		State_Ready_Error   = 11 * CcCount, // 88  - codepoint is ready (with error)
-		State_Ready_Error_2 = 13 * CcCount, // 104 - codepoint is ready (with double error)
-		State_Ready_Error_3 = 15 * CcCount, // 120 - codepoint is ready (with triple error)
-
-		State_Start         = State_Ready,
-	};
-
-protected:
-	enum {
-		StateCount = 16,
-	};
-
-	static const uchar_t m_dfa[StateCount * CcCount];
-
-public:
-	static
-	bool
-	isError(uint_t state)  {
-		return (state & State_ErrorBit) != 0;
-	}
-
-	static
-	bool
-	isReady(uint_t state)  {
-		return state >= State_Ready;
-	}
-
-	uint_t decode(char c) {
-		uchar_t cc = m_map[(uchar_t)c];
-		m_cp = m_state ? m_cp | (((0xff >> cc) & c) << 6) : (0xff >> cc) & c;
-		return m_state = m_dfa[m_state + cc];
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const uchar_t Utf8ReverseDfa::m_dfa[] = {
-//  00..0f               80..bf            c0..df               e0..ef             f0..f7       f8..ff
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 0   - unused
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 8   - unused
-	State_Ready_Error,   State_Cb_2,       State_Ready,         State_Error,       State_Error, State_Error,  0, 0,  // 16  - State_Cb_1
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 24  - unused
-	State_Ready_Error_2, State_Cb_3,       State_Ready_Error,   State_Ready,       State_Error, State_Error,  0, 0,  // 32  - State_Cb_2
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 40  - unused
-	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 48  - State_Cb_3
-	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 56  - State_Cb_3_Error
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 64  - unused
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 72  - State_Error
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 80  - State_Ready
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 88  - State_Ready_Error
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 96  - unused
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 104 - State_Ready_Error_2
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 112 - unused
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 120 - State_Ready_Error_3
-};
-
-//..............................................................................
-
-struct UnicodeReplacementChar {
-	enum {
-		ReplacementChar = 0xfffd,
-	};
-};
-
-struct UnicodeInvalidChar {
-	enum {
-		ReplacementChar = 0xffff,
-	};
-};
-
-//..............................................................................
+// Hoehrmann
 
 namespace utf8_0 {
 
@@ -6033,12 +5848,332 @@ decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
   return *state;
 }
 
+//..............................................................................
+
+/*
+	Utf8Dfa dfa;
+
+	// if only care about valid UTF-8 codepoints
+
+	for (size_t i = 0; i < size; i++) {
+		uint_t state = dfa.decode(data[i]);
+		if (Utf8Dfa::isAccept(state))
+			; // emit cp
+	}
+
+	// if only need to emit "at least one" replacement char
+
+	for (size_t i = 0; i < size; i++) {
+		uint_t state = dfa.decode(data[i]);
+
+		if (Utf8Dfa::isError(state))
+			; // emit replacement char
+
+		if (Utf8Dfa::isAccept(state))
+			; // emit cp
+	}
+
+	// if need to emit one replacement char per byte
+
+	for (size_t i = 0, j = 0; i < sizeof(data); i++) {
+		uint_t state = dfa.decode(data[i]);
+		if (Utf8Dfa::isError(state))
+			if (state == Utf8Dfa::State_Error)
+				do {
+					; // emit replacement char
+				} while (++j <= i);
+			else
+				do {
+					; // emit replacement char
+				} while (++j < i);
+
+		if (Utf8Dfa::isReady(state))
+			; // emit cp
+	}
+
+*/
+
+class Utf8Dfa: public Utf8DfaBase<Utf8Dfa> {
+public:
+	// pre-multiply state values for a tiny bit faster table lookups
+
+	// bit 0 indicates accept
+	// bit 1 indicates error
+
+	enum State {
+		State_ErrorBit    = 1 * CcCount,   // 8   - invalid sequence bit
+
+		State_1_2         = 2 * CcCount,   // 16  - 1st byte in a 2-byte sequence
+		State_1_2_Error   = 3 * CcCount,   // 24  - 1st byte in a 2-byte sequence (with error)
+
+		State_1_3         = 4 * CcCount,   // 32  - 1st byte in a 3-byte sequence
+		State_1_3_Error   = 5 * CcCount,   // 40  - 1st byte in a 3-byte sequence (with error)
+		State_2_3         = 6 * CcCount,   // 48  - 2nd byte in a 3-byte sequence
+
+		State_1_4         = 8 * CcCount,   // 64  - 1st byte in a 4-byte sequence
+		State_1_4_Error   = 9 * CcCount,   // 72  - 1st byte in a 4-byte sequence (with error)
+		State_2_4         = 10 * CcCount,  // 80  - 2nd byte in a 4-byte sequence
+		State_3_4         = 12 * CcCount,  // 96  - 3rd byte in a 4-byte sequence
+
+		State_Error       = 13 * CcCount,  // 104 - invalid sequence
+		State_Ready       = 14 * CcCount,  // 112 - codepoint is ready
+		State_Ready_Error = 15 * CcCount,  // 120 - codepoint is ready (with error)
+
+		State_Start       = State_Ready,
+		State_FirstReady  = State_Ready,
+	};
+
+protected:
+	enum {
+		StateCount = 17,
+	};
+
+	static const uchar_t m_dfa[StateCount * CcCount];
+
+public:
+	void
+	reset() {
+		m_state = State_Start;
+	}
+
+	uint32_t
+	save() const {
+		return (m_state << 21) | (m_cp & 0xffffff);
+	}
+
+	void
+	load(uint32_t storage){
+		m_state = (storage & 0xff000000) >> 21;
+		m_cp = storage & 0xffffff;
+	}
+
+	uint_t
+	decode(char c) {
+		uint_t cc = m_map[(uchar_t)c];
+
+		m_cp = cc == Cc_Cb ?
+			(m_cp << 6) | (c & 0x3f) : // continuation byte
+			(0xff >> cc) & c;          // starter byte
+
+		return m_state = m_dfa[m_state + cc];
+	}
+};
+
+const uchar_t Utf8Dfa::m_dfa[] = {
+//  00..0f             80..bf       c0..df            e0..ef           f0..f7           f8..ff
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 0   - unused
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 8   - unused
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 16  - State_1_2
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 24  - State_1_2_Error
+	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 32  - State_1_3
+	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 40  - State_1_3_Error
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 48  - State_2_3
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 56  - unused
+	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 64  - State_1_4
+	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 72  - State_1_4_Error
+	State_Ready_Error, State_3_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 80  - State_2_4
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 88  - unused
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 96  - State_3_4
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 104 - State_Error
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 112 - State_Ready
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 120 - State_Ready_Error
+};
+
+//..............................................................................
+
+/*
+	Utf8ReverseDfa dfa;
+
+	// if only care about valid UTF-8 codepoints
+
+	for (intptr_t i = size - 1; i >= 0; i--) {
+		uint_t state = dfa.decode(data[i]);
+
+		if (Utf8ReverseDfa::isReady(state))
+			; // emit cp
+	}
+
+	// if only need to emit "at least one" replacement char
+
+	for (intptr_t i = size - 1; i >= 0; i--) {
+		uint_t state = dfa.decode(data[i]);
+
+		if (Utf8ReverseDfa::isError(state))
+			; // emit replacement char
+
+		if (Utf8ReverseDfa::isReady(state))
+			; // emit cp
+	}
+
+	// if need to emit one replacement char per byte
+
+	for (intptr_t i = sizeof(data) - 1, j = i; i >= 0; i--) {
+		uint_t state = rdfa.decode(data[i]);
+		if (Utf8ReverseDfa::isError(state))
+			if (state == Utf8ReverseDfa::State_Error) // standalone error
+				do {
+					; // emit replacement char
+				} while (--j >= i);
+			else { // combined error
+				size_t errorCount = Utf8ReverseDfa::getErrorCount(state);
+				intptr_t k = j - errorCount;
+				do {
+					; // emit replacement char
+				} while (--j > k);
+			}
+
+		if (Utf8ReverseDfa::isReady(state))
+			; // emit cp
+	}
+
+*/
+
+class Utf8ReverseDfa: public Utf8DfaBase<Utf8ReverseDfa> {
+public:
+	// don't pre-multiply state values because we need bits
+
+	enum State {
+		State_ErrorBit      = 1,   // invalid sequence bit
+
+		State_Cb_1          = 2,   // 1st continuation byte
+		State_Cb_2          = 4,   // 2nd continuation byte
+		State_Cb_3          = 6,   // 3rd continuation byte
+		State_Cb_3_Error    = 7,   // 3rd continuation byte (with error)
+
+		State_Error         = 9,   // invalid sequence
+		State_Ready         = 10,  // codepoint is ready
+		State_Ready_Error   = 11,  // codepoint is ready (with error)
+		State_Ready_Error_2 = 13,  // codepoint is ready (with double error)
+		State_Ready_Error_3 = 15,  // codepoint is ready (with triple error)
+
+		State_Start         = State_Ready,
+		State_FirstReady    = State_Ready,
+	};
+
+protected:
+	enum {
+		StateCount = 16,
+	};
+
+	static const uchar_t m_dfa[StateCount * CcCount];
+	static const uchar_t m_errorCountTable[StateCount];
+	uint_t m_acc;
+
+public:
+	Utf8ReverseDfa() {
+		m_acc = 0;
+	}
+
+	static
+	uint_t
+	getErrorCount(uint_t state) {
+		return m_errorCountTable[state];
+	}
+
+	void
+	reset() {
+		m_state = State_Start;
+		m_acc = 0;
+	}
+
+	uint32_t
+	save() const {
+		return (m_state << 21) | (m_acc & 0xffffff);
+	}
+
+	void
+	load(uint32_t storage){
+		m_state = (storage & 0xff000000) >> 21;
+		m_acc = storage & 0xffffff;
+	}
+
+	uint_t
+	decode(char c) {
+		uchar_t cc = m_map[(uchar_t)c];
+		uint_t prevState = m_state;
+		uint_t nextState = m_dfa[prevState * CcCount + cc];
+
+		if (nextState <= State_Cb_3_Error) { // continuation byte
+			ASSERT(cc == Cc_Cb);
+			uint_t shift = 6 * ((nextState >> 1) - 1);
+			m_acc >>= 6 & -(nextState & 1); // drop last continuation byte on error
+			m_acc |= (c & 0x3f) << shift;   // shift according to the position
+		} else {
+			uint_t shift = 6 * ((prevState >> 1) & (((prevState & 8) >> 3) - 1)); // zero if state >= 8
+			m_acc |= ((0xff >> cc) & c) << shift; // shift according to the previous position
+			m_acc >>= 6 * ((nextState - 9) >> 1); // drop continuation bytes on errors
+			m_cp = m_acc;
+			m_acc = 0;
+		}
+
+		return m_state = nextState;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const uchar_t Utf8ReverseDfa::m_dfa[] = {
+//  00..0f               80..bf            c0..df               e0..ef             f0..f7       f8..ff
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 0  - unused
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 1  - unused
+	State_Ready_Error,   State_Cb_2,       State_Ready,         State_Error,       State_Error, State_Error,  0, 0,  // 2  - State_Cb_1
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 3  - unused
+	State_Ready_Error_2, State_Cb_3,       State_Ready_Error,   State_Ready,       State_Error, State_Error,  0, 0,  // 4  - State_Cb_2
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 5  - unused
+	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 6  - State_Cb_3
+	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 7  - State_Cb_3_Error
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 8  - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 9  - State_Error
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 10 - State_Ready
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 11 - State_Ready_Error
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 12 - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 13 - State_Ready_Error_2
+	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 14 - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 15 - State_Ready_Error_3
+};
+
+const uchar_t Utf8ReverseDfa::m_errorCountTable[Utf8ReverseDfa::StateCount] = {
+	0,  // 0  - unused
+	0,  // 1  - unused
+	0,  // 2  - State_Cb_1
+	0,  // 3  - unused
+	0,  // 4  - State_Cb_2
+	0,  // 5  - unused
+	0,  // 6  - State_Cb_3
+	1,  // 7  - State_Cb_3_Error
+	0,  // 8  - unused
+	0,  // 9  - State_Error
+	0,  // 10 - State_Ready
+	1,  // 11 - State_Ready_Error
+	0,  // 12 - unused
+	2,  // 13 - State_Ready_Error_2
+	0,  // 14 - unused
+	3,  // 15 - State_Ready_Error_3
+};
+
+//..............................................................................
+
 void
 testUtf8() {
 	const uchar_t data[] = {
-		0x74, 0x61, 0x6b, 0x69, 0x65, 0xf1, 0x80, 0x80,
-		0xd0, 0xb0, 0xd0, 0xb1, 0xd0, 0xb2, 0xd0, 0xb3,
-		0xd0, 0xb4, 0x20, 0x64, 0x65, 0x6c, 0x61, 0x62,
+		'a',
+		0xf1, 0x80, 0x80,
+		'b',
+		0xe1, 0x80,
+		'c',
+		0xc1,
+		'd',
+		0xf1, 0x80, 0x80,
+		0xe1, 0x80,
+		0xc1,
+		0xe1, 0x80,
+		0xf1, 0x80, 0x80,
+		'x',
+		0x80, 0x80, 0x80,
+		't', 'a', 'k', 'i', 'e',
+		0xf1, 0x80, 0x80,
+		0xd0, 0xb0, 0xd0, 0xb1, 0xd0, 0xb2, 0xd0, 0xb3, 0xd0, 0xb4,
+		'd', 'e', 'l', 'a', '.',
 	};
 
 	uint32_t prevState = UTF8_ACCEPT;
@@ -6048,45 +6183,72 @@ testUtf8() {
 	printf("Hoehrmann:\n");
 
 	for (size_t i = 0; i < sizeof(data); i++) {
-		if (!decode(&state, &cp, data[i]))
+		uchar_t c = data[i];
+		if (!decode(&state, &cp, c))
 			printf("cp 0x%02x '%c'\n", cp, cp);
 		else if (state == UTF8_REJECT) {
-			printf("broken cp 0x%02x\n", cp);
+			printf("broken cp\n");
 			state = UTF8_ACCEPT;
-			if (prevState != UTF8_ACCEPT)
-				i--;
+			if (prevState != UTF8_ACCEPT) {
+				if (!decode(&state, &cp, c))
+					printf("cp 0x%02x '%c'\n", cp, cp);
+				else if (state == UTF8_REJECT)
+					printf("broken cp\n");
+			}
 		}
 
 		prevState = state;
 	}
 
-	printf("AXL DFA:\n");
+	printf("\nAXL DFA:\n");
 
 	Utf8Dfa dfa;
 
-	for (size_t i = 0; i < sizeof(data); i++) {
+	for (size_t i = 0, j = i; i < sizeof(data); i++) {
 		uint_t state = dfa.decode(data[i]);
 		if (Utf8Dfa::isError(state))
-			printf("broken cp\n");
+			if (state == Utf8Dfa::State_Error) // standalone error
+				do {
+					printf("@%04x:%04x: broken cp\n", j, j);
+				} while (++j <= i);
+			else // combined error (minus last byte)
+				do {
+					printf("@%04x:%04x: broken cp\n", j, j);
+				} while (++j < i);
 
-		if (Utf8Dfa::isReady(state))
-			printf("cp 0x%02x '%c'\n", dfa.getCp(), dfa.getCp());
+		if (Utf8Dfa::isReady(state)) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa.getCp(), dfa.getCp());
+			j = i + 1;
+		}
 	}
 
-	printf("AXL rDFA:\n");
+	printf("\nAXL rDFA:\n");
 
 	Utf8ReverseDfa rdfa;
 
-	for (intptr_t i = sizeof(data) - 1; i >= 0; i--) {
+	for (intptr_t i = sizeof(data) - 1, j = i; i >= 0; i--) {
 		uint_t state = rdfa.decode(data[i]);
-		if (Utf8Dfa::isError(state))
-			printf("broken cp\n");
+		if (Utf8ReverseDfa::isError(state))
+			if (state == Utf8ReverseDfa::State_Error) // standalone error
+				do {
+					printf("@%04x:%04x: broken cp\n", j, j);
+				} while (--j >= i);
+			else { // combined error
+				size_t errorCount = Utf8ReverseDfa::getErrorCount(state);
+				intptr_t k = j - errorCount;
+				do {
+					printf("@%04x:%04x: broken cp\n", j, j);
+				} while (--j > k);
+			}
 
-		if (Utf8Dfa::isReady(state))
-			printf("cp 0x%02x '%c'\n", dfa.getCp(), dfa.getCp());
+		if (Utf8ReverseDfa::isReady(state)) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, rdfa.getCp(), rdfa.getCp());
+			j = i - 1;
+		}
 	}
 
-	printf("done!\n");
+	printf("sequence end: %d (@%04x)\n", sizeof(data), sizeof(data));
+	printf("\ndone!\n");
 }
 
 //..............................................................................
