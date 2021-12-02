@@ -205,6 +205,9 @@ set(
 	${AXL_INC_DIR}/axl_enc/axl_enc_EscapeEncoding.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_HexEncoding.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_UtfDfa.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf8Dfa.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16Dfa.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Leb128.h
 	icu_def.h
 	icu_uchar_props_data.h
