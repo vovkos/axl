@@ -14,7 +14,6 @@
 #define _AXL_SL_ARRAY_H
 
 #include "axl_sl_ArrayDetails.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace sl {

@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_sys_win_CryptMsg.h"
 #include "axl_sys_win_WinCrypt.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace sys {

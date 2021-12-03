@@ -17,6 +17,7 @@
 #include "axl_sl_Array.h"
 #include "axl_rc_Ptr.h"
 #include "axl_sl_Singleton.h"
+#include "axl_err_Error.h"
 
 #if (_AXL_OS_WIN)
 #	define AXL_SYS_TLS_CALLBACK_SECTION ".CRT$XLD"

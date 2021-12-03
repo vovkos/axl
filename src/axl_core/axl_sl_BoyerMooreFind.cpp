@@ -210,7 +210,7 @@ TextBoyerMooreFind::setPattern(
 
 	if (flags & TextBoyerMooreFlag_CaseInsensitive)
 		for (size_t i = 0; i < length; i++)
-			m_pattern[i] = enc::utfToCaseFolded(m_pattern[i]);
+			m_pattern[i] = enc::toCaseFolded(m_pattern[i]);
 
 	if (flags & BoyerMooreFlag_Reverse)
 		m_pattern.reverse();

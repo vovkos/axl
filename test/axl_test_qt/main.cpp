@@ -256,47 +256,47 @@ testUtf() {
 	printf("Testing UTF...\n");
 
 	for (uint_t c = 0; c < 0x10ffff; c++) {
-		if (axl::enc::utfIsDigit(c) != QChar::isDigit(c))
-			printf("%x\taxl::enc::utfIsDigit -> %d\tQChar::isDigit -> %d\n", c, axl::enc::utfIsDigit (c), QChar::isDigit (c));
+		if (axl::enc::isDigit(c) != QChar::isDigit(c))
+			printf("%x\taxl::enc::isDigit -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isDigit (c), QChar::isDigit (c));
 
-		if (axl::enc::utfIsLetter(c) != QChar::isLetter(c))
-			printf("%x\taxl::enc::utfIsLetter -> %d\tQChar::isLetter -> %d\n", c, axl::enc::utfIsLetter (c), QChar::isLetter (c));
+		if (axl::enc::isLetter(c) != QChar::isLetter(c))
+			printf("%x\taxl::enc::isLetter -> %d\tQChar::isLetter -> %d\n", c, axl::enc::isLetter (c), QChar::isLetter (c));
 
-		if (axl::enc::utfIsNumber(c) != QChar::isNumber(c))
-			printf("%x\taxl::enc::utfIsNumber -> %d\tQChar::isNumber -> %d\n", c, axl::enc::utfIsNumber (c), QChar::isNumber (c));
+		if (axl::enc::isNumber(c) != QChar::isNumber(c))
+			printf("%x\taxl::enc::isNumber -> %d\tQChar::isNumber -> %d\n", c, axl::enc::isNumber (c), QChar::isNumber (c));
 
-		if (axl::enc::utfIsLetterOrDigit(c) != (QChar::isLetter(c) || QChar::isDigit(c)))
-			printf("%x\taxl::enc::utfIsLetterOrDigit -> %d\tQChar::isLetter -> %d\tQChar::isDigit -> %d\n", c, axl::enc::utfIsLetterOrDigit (c), QChar::isLetter (c), QChar::isDigit (c));
+		if (axl::enc::isLetterOrDigit(c) != (QChar::isLetter(c) || QChar::isDigit(c)))
+			printf("%x\taxl::enc::isLetterOrDigit -> %d\tQChar::isLetter -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isLetterOrDigit (c), QChar::isLetter (c), QChar::isDigit (c));
 
-		if (axl::enc::utfIsLetterOrNumber(c) != QChar::isLetterOrNumber(c))
-			printf("%x\taxl::enc::utfIsLetterOrNumber -> %d\tQChar::isLetterOrNumber  -> %d\n", c, axl::enc::utfIsLetterOrNumber (c), QChar::isLetterOrNumber  (c));
+		if (axl::enc::isLetterOrNumber(c) != QChar::isLetterOrNumber(c))
+			printf("%x\taxl::enc::isLetterOrNumber -> %d\tQChar::isLetterOrNumber  -> %d\n", c, axl::enc::isLetterOrNumber (c), QChar::isLetterOrNumber  (c));
 
-		if (axl::enc::utfIsPunctuation(c) != QChar::isPunct(c))
-			printf("%x\taxl::enc::utfIsPunctuation -> %d\tQChar::isPunct -> %d\n", c, axl::enc::utfIsPunctuation (c), QChar::isPunct (c));
+		if (axl::enc::isPunctuation(c) != QChar::isPunct(c))
+			printf("%x\taxl::enc::isPunctuation -> %d\tQChar::isPunct -> %d\n", c, axl::enc::isPunctuation (c), QChar::isPunct (c));
 
-		if (axl::enc::utfIsSpace(c) != QChar::isSpace(c))
-			printf("%x\taxl::enc::utfIsSpace -> %d\tQChar::isDigit -> %d\n", c, axl::enc::utfIsSpace (c), QChar::isSpace (c));
+		if (axl::enc::isSpace(c) != QChar::isSpace(c))
+			printf("%x\taxl::enc::isSpace -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isSpace (c), QChar::isSpace (c));
 
-		if (axl::enc::utfIsPrintable(c) != QChar::isPrint(c))
-			printf("%x\taxl::enc::utfIsPrintable -> %d\tQChar::isPrint -> %d\n", c, axl::enc::utfIsPrintable (c), QChar::isPrint (c));
+		if (axl::enc::isPrintable(c) != QChar::isPrint(c))
+			printf("%x\taxl::enc::isPrintable -> %d\tQChar::isPrint -> %d\n", c, axl::enc::isPrintable (c), QChar::isPrint (c));
 
-		if (axl::enc::utfIsPrintableNonMark(c) != (QChar::isPrint(c) && !QChar::isMark(c)))
-			printf("%x\taxl::enc::utfIsPrintableNonMark -> %d\tQChar::isPrint -> %d\tQChar::isMark -> %d\n", c, axl::enc::utfIsPrintableNonMark (c), QChar::isPrint (c), QChar::isMark (c));
+		if (axl::enc::isPrintableNonMark(c) != (QChar::isPrint(c) && !QChar::isMark(c)))
+			printf("%x\taxl::enc::isPrintableNonMark -> %d\tQChar::isPrint -> %d\tQChar::isMark -> %d\n", c, axl::enc::isPrintableNonMark (c), QChar::isPrint (c), QChar::isMark (c));
 
-		if (axl::enc::utfIsLowerCase(c) != QChar::isLower(c))
-			printf("%x\taxl::enc::utfIsLowerCase -> %d\tQChar::isLower -> %d\n", c, axl::enc::utfIsLowerCase (c), QChar::isLower (c));
+		if (axl::enc::isLowerCase(c) != QChar::isLower(c))
+			printf("%x\taxl::enc::isLowerCase -> %d\tQChar::isLower -> %d\n", c, axl::enc::isLowerCase (c), QChar::isLower (c));
 
-		if (axl::enc::utfIsUpperCase(c) != QChar::isUpper(c))
-			printf("%x\taxl::enc::utfIsUpperCase -> %d\tQChar::isUpper -> %d\n", c, axl::enc::utfIsUpperCase (c), QChar::isUpper (c));
+		if (axl::enc::isUpperCase(c) != QChar::isUpper(c))
+			printf("%x\taxl::enc::isUpperCase -> %d\tQChar::isUpper -> %d\n", c, axl::enc::isUpperCase (c), QChar::isUpper (c));
 
-		if (axl::enc::utfToLowerCase(c) != QChar::toLower(c))
-			printf("%x\taxl::enc::utfToLowerCase -> %x\tQChar::toLower -> %x\n", c, axl::enc::utfToLowerCase (c), QChar::toLower (c));
+		if (axl::enc::toLowerCase(c) != QChar::toLower(c))
+			printf("%x\taxl::enc::toLowerCase -> %x\tQChar::toLower -> %x\n", c, axl::enc::toLowerCase (c), QChar::toLower (c));
 
-		if (axl::enc::utfToUpperCase(c) != QChar::toUpper(c))
-			printf("%x\taxl::enc::utfToUpperCase -> %x\tQChar::toUpper -> %x\n", c, axl::enc::utfToUpperCase (c), QChar::toUpper (c));
+		if (axl::enc::toUpperCase(c) != QChar::toUpper(c))
+			printf("%x\taxl::enc::toUpperCase -> %x\tQChar::toUpper -> %x\n", c, axl::enc::toUpperCase (c), QChar::toUpper (c));
 
-		if (axl::enc::utfToCaseFolded(c) != QChar::toCaseFolded(c))
-			printf("%x\taxl::enc::utfToCaseFolded -> %x\tQChar::toCaseFolded -> %x\n", c, axl::enc::utfToCaseFolded (c), QChar::toCaseFolded (c));
+		if (axl::enc::toCaseFolded(c) != QChar::toCaseFolded(c))
+			printf("%x\taxl::enc::toCaseFolded -> %x\tQChar::toCaseFolded -> %x\n", c, axl::enc::toCaseFolded (c), QChar::toCaseFolded (c));
 	}
 
 	printf("Done\n");

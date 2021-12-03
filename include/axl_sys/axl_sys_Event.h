@@ -139,8 +139,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef CondMutexEventBase<sl::False<bool> > Event;
-typedef CondMutexEventBase<sl::True<bool> > NotificationEvent;
+typedef CondMutexEventBase<sl::False> Event;
+typedef CondMutexEventBase<sl::True> NotificationEvent;
 
 #endif
 

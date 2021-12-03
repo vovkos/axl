@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_sys_CodeAuthenticator.h"
+#include "axl_err_Error.h"
 #if (_AXL_OS_LINUX)
 #	include "axl_sys_lnx_ElfParser.h"
 #endif

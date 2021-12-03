@@ -24,6 +24,8 @@ namespace sl {
 
 class True {
 public:
+	const bool Value = true;
+
 	bool
 	operator () () const {
 		return true;
@@ -32,6 +34,8 @@ public:
 
 class False {
 public:
+	const bool Value = false;
+
 	bool
 	operator () () const {
 		return false;
@@ -41,6 +45,8 @@ public:
 template <typename T>
 class Zero {
 public:
+	const T Value = (T)0;
+
 	T
 	operator () () const {
 		return (T)0;
@@ -50,6 +56,8 @@ public:
 template <typename T>
 class One {
 public:
+	const T Value = (T)1;
+
 	T
 	operator () () const {
 		return (T)1;
@@ -59,6 +67,8 @@ public:
 template <typename T>
 class MinusOne {
 public:
+	const T Value = (T)-1;
+
 	T
 	operator () () const {
 		return (T)-1;

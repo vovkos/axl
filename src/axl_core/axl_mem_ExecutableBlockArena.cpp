@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "axl_mem_ExecutableBlockArena.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace mem {

@@ -791,8 +791,8 @@ protected:
 			utf32_t c1 = Encoding::decodeCodePoint(p1);
 			utf32_t c2 = Encoding::decodeCodePoint(p2);
 
-			c1 = enc::UtfToCaseFolded() (c1);
-			c2 = enc::UtfToCaseFolded() (c2);
+			c1 = enc::toCaseFolded(c1);
+			c2 = enc::toCaseFolded(c2);
 
 			if (c1 < c2)
 				return -1;
@@ -834,7 +834,7 @@ protected:
 				break;
 
 			utf32_t c = Encoding::decodeCodePoint(p);
-			c = enc::UtfToCaseFolded() (c);
+			c = enc::toCaseFolded(c);
 			h = djb2(h, &c, sizeof(c));
 			p += codePointLength;
 		}
@@ -1618,21 +1618,21 @@ public:
 	makeLowerCase(CaseConvertMethod method = CaseConvertMethod_Default) {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			convertCase_pcu(Details::toLower) :
-			convertCase_pcp<enc::UtfToLowerCase> ();
+			convertCase_pcp<enc::ToLowerCase>();
 	}
 
 	size_t
 	makeUpperCase(CaseConvertMethod method = CaseConvertMethod_Default) {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			convertCase_pcu(Details::toUpper) :
-			convertCase_pcp<enc::UtfToUpperCase> ();
+			convertCase_pcp<enc::ToUpperCase>();
 	}
 
 	size_t
 	makeCaseFolded(CaseConvertMethod method = CaseConvertMethod_Default) {
 		return method == CaseConvertMethod_PerCodeUnit ?
 			convertCase_pcu(Details::toLower) :
-			convertCase_pcp<enc::UtfToCaseFolded> ();
+			convertCase_pcp<enc::ToCaseFolded>();
 	}
 
 	size_t

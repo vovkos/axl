@@ -5891,7 +5891,245 @@ testUtf16() {
 	printf("\ndone!\n");
 }
 
+void
+encodeCodePoint(
+	utf8_t* p,
+	utf32_t x
+) {
+	if (x < 0x80) {
+		p[0] = (uint8_t)x;                             // 0xxxxxxx
+	} else if (x < 0x10000) {
+		if (x < 0x800) {
+			p[0] = (uint8_t)(x >> 6)          | 0xc0;  // 110xxxxx 10xxxxxx
+			p[1] = (uint8_t)(x & 0x3f)        | 0x80;
+		} else {
+			p[0] = (uint8_t)(x >> 12)         | 0xe0;  // 1110xxxx 10xxxxxx 10xxxxxx
+			p[1] = (uint8_t)((x >> 6) & 0x3f) | 0x80;
+			p[2] = (uint8_t)(x & 0x3f)        | 0x80;
+		}
+	} else if (x < 0x200000) {
+		p[0] = (uint8_t)(x >> 18)             | 0xf0; // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		p[1] = (uint8_t)((x >> 12) & 0x3f)    | 0x80;
+		p[2] = (uint8_t)((x >> 6) & 0x3f)     | 0x80;
+		p[3] = (uint8_t)(x & 0x3f)            | 0x80;
+	} else {
+		p[0] = -1;
+	}
 }
+
+void
+encodeCodePoint_old(
+	utf8_t* p,
+	utf32_t x
+) {
+	if (x < 0x80) { // 0xxxxxxx
+		p[0] = (uint8_t)x;
+	} else if (x < 0x800) { // 110xxxxx 10xxxxxx
+		p[0] = (uint8_t)(x >> 6)           | 0xc0;
+		p[1] = (uint8_t)(x & 0x3f)         | 0x80;
+	} else if (x < 0x10000) { // 1110xxxx 10xxxxxx 10xxxxxx
+		p[0] = (uint8_t)(x >> 12)          | 0xe0;
+		p[1] = (uint8_t)((x >> 6) & 0x3f)  | 0x80;
+		p[2] = (uint8_t)(x & 0x3f)         | 0x80;
+	} else if (x < 0x200000) { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		p[0] = (uint8_t)(x >> 18)          | 0xf0;
+		p[1] = (uint8_t)((x >> 12) & 0x3f) | 0x80;
+		p[2] = (uint8_t)((x >> 6) & 0x3f)  | 0x80;
+		p[3] = (uint8_t)(x & 0x3f)         | 0x80;
+	} else {
+		p[0] = -1;
+	}
+}
+
+volatile uint32_t g_v;
+
+void
+testUtf8Encode() {
+	union {
+		utf8_t m_c[4];
+		uint32_t m_x;
+	} utf8[2];
+
+	printf("verifying...\n");
+
+	for (utf32_t c = 0; c < 0x200000; c++) {
+		utf8[0].m_x = 0;
+		utf8[1].m_x = 0;
+
+		encodeCodePoint(utf8[0].m_c, c);
+		encodeCodePoint_old(utf8[1].m_c, c);
+		ASSERT(utf8[0].m_x == utf8[1].m_x);
+		g_v = utf8[0].m_x;
+		g_v = utf8[1].m_x;
+	}
+
+	printf("done\n");
+
+	enum {
+//		LoopCount = 500,
+//		MaxChar   = 0x200000,
+
+//		LoopCount = 5000,
+//		MaxChar   = 0x10000,
+
+		LoopCount = 500000,
+		MaxChar   = 0x800,
+	};
+
+	printf("original...");
+
+	uint64_t time = sys::getPreciseTimestamp();
+
+	for (size_t i = 0; i < LoopCount; i++)
+		for (utf32_t c = 0; c < MaxChar; c++) {
+			utf8[0].m_x = 0;
+			encodeCodePoint_old(utf8[0].m_c, c);
+			g_v = utf8[0].m_x;
+		}
+
+	time = sys::getPreciseTimestamp() - time;
+
+	printf("done, %.3f sec\n", (double)time / 10000000);
+
+	printf("new........");
+
+	time = sys::getPreciseTimestamp();
+
+	for (size_t i = 0; i < LoopCount; i++)
+		for (utf32_t c = 0; c < MaxChar; c++) {
+			utf8[0].m_x = 0;
+			encodeCodePoint(utf8[0].m_c, c);
+			g_v = utf8[0].m_x;
+		}
+
+	time = sys::getPreciseTimestamp() - time;
+
+	printf("done, %.3f sec\n", (double)time / 10000000);
+}
+
+//..............................................................................
+
+template <
+	typename DstEncoding0,
+	typename SrcEncoding0,
+	typename CaseOp = sl::NoOp<utf32_t>
+>
+class UtfConvert {
+public:
+	typedef DstEncoding0 DstEncoding;
+	typedef SrcEncoding0 SrcEncoding;
+	typedef typename DstEncoding::C DstUnit;
+	typedef typename SrcEncoding::C SrcUnit;
+
+public:
+	static
+	size_t
+	calcRequiredLength(
+		const SrcUnit* p,
+		size_t length
+	) {
+		const SrcUnit* end = p + length;
+
+		size_t resultLength = 0;
+		while (p < end) {
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength(*p);
+			if (p + srcCodePointLength > end)
+				break;
+
+			utf32_t x = CaseOp() (SrcEncoding::decodeCodePoint(p));
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength(x);
+
+			resultLength += dstCodePointLength;
+			p += srcCodePointLength;
+		}
+
+		return resultLength;
+	}
+
+	static
+	DstUnit*
+	convert(
+		DstUnit* dst,
+		size_t dstLength,
+		const SrcUnit* src,
+		size_t srcLength,
+		size_t* takenSrcLength_o = NULL
+	) {
+		DstUnit* dst0 = dst;
+		DstUnit* dstEnd = dst + dstLength;
+		const SrcUnit* src0 = src;
+		const SrcUnit* srcEnd = src + srcLength;
+
+		while (src < srcEnd) {
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength(*src);
+			if (src + srcCodePointLength > srcEnd)
+				break;
+
+			utf32_t x = CaseOp() (SrcEncoding::decodeCodePoint(src));
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength(x);
+			if (dst + dstCodePointLength > dstEnd)
+				break;
+
+			DstEncoding::encodeCodePoint(dst, x);
+
+			dst += dstCodePointLength;
+			src += srcCodePointLength;
+		}
+
+		if (takenSrcLength_o)
+			*takenSrcLength_o = src - src0;
+
+		return dst - dst0;
+	}
+
+	static
+	size_t
+	convert(
+		uchar_t* cpl, // src code point length table
+		DstUnit* dst,
+		size_t dstLength,
+		const SrcUnit* src,
+		size_t srcLength,
+		size_t* takenSrcLength_o = NULL
+	) {
+		DstUnit* dst0 = dst;
+		DstUnit* dstEnd = dst + dstLength;
+		const SrcUnit* src0 = src;
+		const SrcUnit* srcEnd = src + srcLength;
+
+		while (src < srcEnd) {
+			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength(*src);
+			if (src + srcCodePointLength > srcEnd)
+				break;
+
+			utf32_t x = CaseOp() (SrcEncoding::decodeCodePoint(src));
+			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength(x);
+			if (dst + dstCodePointLength > dstEnd)
+				break;
+
+			DstEncoding::encodeCodePoint(dst, x);
+			*cpl++ = (uchar_t)srcCodePointLength;
+
+			dst += dstCodePointLength;
+			src += srcCodePointLength;
+		}
+
+		if (takenSrcLength_o)
+			*takenSrcLength_o = src - src0;
+
+		return dst - dst0;
+	}
+};
+
+void
+testConvert() {
+	utf8_t source[] = "abc";
+	utf16_t buffer[128] = { 0 };
+
+
+}
+
+} // namespace utf
 
 //..............................................................................
 
@@ -5928,7 +6166,10 @@ main(
 #endif
 
 	// utf::testUtf8();
-	utf::testUtf16();
+	// utf::testUtf16();
+	// utf::testUtf8Encode();
+
+	utf::testConvert();
 	return 0;
 }
 

@@ -15,6 +15,7 @@
 
 #include "axl_sl_Handle.h"
 #include "axl_sl_Array.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace sys {

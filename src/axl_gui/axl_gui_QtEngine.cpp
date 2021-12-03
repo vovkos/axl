@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_gui_QtEngine.h"
 #include "axl_gui_QtWidget.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace gui {
