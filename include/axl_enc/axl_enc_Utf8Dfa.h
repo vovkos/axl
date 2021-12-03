@@ -16,7 +16,7 @@
 #include "axl_enc_UtfDfa.h"
 
 //
-// AXL UTF-8 specifics:
+// AXL UTF-8 DFA specifics:
 //
 // - Never backtrack on errors;
 // - Provide both forward and backward DFAs;
@@ -130,6 +130,10 @@ AXL_SELECT_ANY const uchar_t Utf8CcMap::m_map[] = {
 
 class Utf8Dfa: public UtfDfa<Utf8Dfa, Utf8CcMap> {
 public:
+	enum {
+		IsReverse = false,
+	};
+
 	// pre-multiply state values for a tiny bit faster table lookups
 
 	enum State {
@@ -162,6 +166,12 @@ protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 
 public:
+	Utf8Dfa() {}
+
+	Utf8Dfa(uint32_t storage) {
+		load(storage);
+	}
+
 	uint_t
 	decode(uchar_t c);
 
@@ -260,6 +270,10 @@ Utf8Dfa::decode(uchar_t c) {
 
 class Utf8ReverseDfa: public UtfDfa<Utf8ReverseDfa, Utf8CcMap> {
 public:
+	enum {
+		IsReverse = true,
+	};
+
 	// don't pre-multiply state values because we need state bits
 	// for branchless codepoint calculations; right-shifting would
 	// kill all the benefits of pre-multiplication
@@ -292,6 +306,10 @@ protected:
 public:
 	Utf8ReverseDfa() {
 		m_acc = 0;
+	}
+
+	Utf8ReverseDfa(uint32_t storage) {
+		load(storage);
 	}
 
 	static

@@ -13,8 +13,9 @@
 
 #define _AXL_ENC_UTF_H
 
-#include "axl_sl_ByteOrder.h"
-#include "axl_sl_Operator.h"
+#include "axl_enc_Utf8Decoder.h"
+#include "axl_enc_Utf16Decoder.h"
+#include "axl_enc_Utf32Decoder.h"
 
 namespace axl {
 namespace enc {
@@ -36,106 +37,68 @@ getUtfKindString(UtfKind utfKind);
 
 //..............................................................................
 
-bool
-utfIsPrintable(utf32_t c);
+// three strategies for handling invalid sequences or codepoints
 
-bool
-utfIsPrintableNonMark(utf32_t c);
+// ignore errors and only emit valid codepoints
 
-bool
-utfIsSpace(utf32_t c);
-
-bool
-utfIsPunctuation(utf32_t c);
-
-bool
-utfIsLetter(utf32_t c);
-
-bool
-utfIsDigit(utf32_t c);
-
-bool
-utfIsNumber(utf32_t c);
-
-bool
-utfIsLetterOrDigit(utf32_t c);
-
-bool
-utfIsLetterOrNumber(utf32_t c);
-
-bool
-utfIsLowerCase(utf32_t c);
-
-bool
-utfIsUpperCase(utf32_t c);
-
-//..............................................................................
-
-// case ops
-
-utf32_t
-utfToLowerCase(utf32_t c);
-
-utf32_t
-utfToUpperCase(utf32_t c);
-
-utf32_t
-utfToCaseFolded(utf32_t c);
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class UtfToLowerCase {
-public:
-	utf32_t
-	operator () (utf32_t x) const {
-		return utfToLowerCase(x);
-	}
+class UtfOnConvertErrorIgnore {
 };
 
-class UtfToUpperCase {
-public:
-	utf32_t
-	operator () (utf32_t x) const {
-		return utfToUpperCase(x);
-	}
+// emit at least one replacement char for an invalid sequence
+
+class UtfOnConvertErrorReplaceOneOrMore {
 };
 
-class UtfToCaseFolded {
-public:
-	utf32_t
-	operator () (utf32_t x) const {
-		return utfToCaseFolded(x);
-	}
+// emit one replacement char for each code unit in an invalid sequence
+
+class UtfOnConvertErrorReplaceEach {
 };
-
-//..............................................................................
-
-template <typename T>
-size_t
-calcUtfCodePointCount(
-	const typename T::C* p,
-	size_t length
-) {
-	const typename T::C* end = p + length;
-
-	size_t count = 0;
-	while (p < end) {
-		size_t srcCodePointLength = T::getDecodeCodePointLength(*p);
-		if (p + srcCodePointLength > end)
-			break;
-
-		p += srcCodePointLength;
-		count++;
-	}
-
-	return count;
-}
 
 //..............................................................................
 
 class Utf8 {
 public:
 	typedef utf8_t C;
+	typedef Utf8Decoder Decoder;
+	typedef Utf8ReverseDecoder ReverseDecoder;
+
+	/////////////////////////////////
+	// deprecated
+	/////////////////////////////////
+
+	static
+	size_t
+	getDecodeCodePointLength(utf8_t c) {
+		return
+			(c & 0x80) == 0    ? 1 : // 0xxxxxxx
+			(c & 0xe0) == 0xc0 ? 2 : // 110xxxxx 10xxxxxx
+			(c & 0xf0) == 0xe0 ? 3 : // 1110xxxx 10xxxxxx 10xxxxxx
+			(c & 0xf8) == 0xf0 ? 4 : // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+			1;
+	}
+
+	static
+	utf32_t
+	decodeCodePoint(const utf8_t* p) {
+		return
+			((*p & 0x80) == 0)    ?      // 0xxxxxxx
+				*p :
+			((*p & 0xe0) == 0xc0) ?      // 110xxxxx 10xxxxxx
+				((p[0] & 0x1f) << 6)  |
+				 (p[1] & 0x3f) :
+			((*p & 0xf0) == 0xe0) ?      // 1110xxxx 10xxxxxx 10xxxxxx
+				((p[0] & 0x0f) << 12) |
+				((p[1] & 0x3f) << 6)  |
+				 (p[2] & 0x3f) :
+			((*p & 0xf8) == 0xf0) ?      // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+				((p[0] & 0x07) << 18) |
+				((p[1] & 0x3f) << 12) |
+				((p[2] & 0x3f) << 6)  |
+				 (p[3] & 0x3f) :
+			StdChar_Replacement;
+	}
+
+	/////////////////////////////////
 
 	static
 	UtfKind
@@ -158,94 +121,125 @@ public:
 
 	static
 	size_t
-	getDecodeCodePointLength(utf8_t c) {
+	getEncodeCodePointLength(
+		utf32_t cp,
+		utf32_t replacement = StdChar_Replacement
+	) {
 		return
-			(c & 0x80) == 0    ? 1 :     // 0xxxxxxx
-			(c & 0xe0) == 0xc0 ? 2 :     // 110xxxxx 10xxxxxx
-			(c & 0xf0) == 0xe0 ? 3 :     // 1110xxxx 10xxxxxx 10xxxxxx
-			(c & 0xf8) == 0xf0 ? 4 : 1;  // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-	}
-
-	static
-	size_t
-	getEncodeCodePointLength(utf32_t x) {
-		return
-			x == 0xffff ? 1 :            // non-character U+FFFF
-			x < 0x80 ? 1 :               // 0xxxxxxx
-			x < 0x800 ? 2 :              // 110xxxxx 10xxxxxx
-			x < 0x10000 ? 3 :            // 1110xxxx 10xxxxxx 10xxxxxx
-			x < 0x200000 ? 4 : 1;        // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-	}
-
-	static
-	utf32_t
-	decodeCodePoint(const utf8_t* p) {
-		return
-			((*p & 0x80) == 0)    ?      // 0xxxxxxx
-				*p :
-			((*p & 0xe0) == 0xc0) ?      // 110xxxxx 10xxxxxx
-				((p[0] & 0x1f) << 6)  |
-				 (p[1] & 0x3f) :
-			((*p & 0xf0) == 0xe0) ?      // 1110xxxx 10xxxxxx 10xxxxxx
-				((p[0] & 0x0f) << 12) |
-				((p[1] & 0x3f) << 6)  |
-				 (p[2] & 0x3f) :
-			((*p & 0xf8) == 0xf0) ?      // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-				((p[0] & 0x07) << 18) |
-				((p[1] & 0x3f) << 12) |
-				((p[2] & 0x3f) << 6)  |
-				 (p[3] & 0x3f) : 0xffff; // use non-character U+FFFF (needs no surrogate in UTF-16)
+			cp < 0x80 ? 1 :      // 0xxxxxxx
+			cp < 0x10000 ?
+				cp < 0x800 ? 2 : // 110xxxxx 10xxxxxx
+				3 :             // 1110xxxx 10xxxxxx 10xxxxxx
+			cp < 0x200000 ? 4 :  // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+			getEncodeCodePointLength(replacement);
 	}
 
 	static
 	void
 	encodeCodePoint(
 		utf8_t* p,
-		utf32_t x
+		utf32_t cp,
+		utf32_t replacement = StdChar_Replacement
 	) {
-		if (x == 0xffff) { // non-character U+FFFF
-			p[0] = -1;
-		} else if (x < 0x80) { // 0xxxxxxx
-			p[0] = (uint8_t)x;
-		} else if (x < 0x800) { // 110xxxxx 10xxxxxx
-			p[0] = (uint8_t)(x >> 6)          | 0xc0;
-			p[1] = (uint8_t)(x & 0x3f)        | 0x80;
-		} else if (x < 0x10000) { // 1110xxxx 10xxxxxx 10xxxxxx
-			p[0] = (uint8_t)(x >> 12)         | 0xe0;
-			p[1] = (uint8_t)((x >> 6) & 0x3f) | 0x80;
-			p[2] = (uint8_t)(x & 0x3f)        | 0x80;
-		} else if (x < 0x200000) { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-			p[0] = (uint8_t)(x >> 18)         | 0xf0;
-			p[1] = (uint8_t)((x >> 12) & 0x3f)| 0x80;
-			p[2] = (uint8_t)((x >> 6) & 0x3f) | 0x80;
-			p[3] = (uint8_t)(x & 0x3f)        | 0x80;
+		if (cp < 0x80) {
+			p[0] = (uint8_t)cp;                             // 0xxxxxxx
+		} else if (cp < 0x10000) {
+			if (cp < 0x800) {
+				p[0] = (uint8_t)(cp >> 6)          | 0xc0;  // 110xxxxx 10xxxxxx
+				p[1] = (uint8_t)(cp & 0x3f)        | 0x80;
+			} else {
+				p[0] = (uint8_t)(cp >> 12)         | 0xe0;  // 1110xxxx 10xxxxxx 10xxxxxx
+				p[1] = (uint8_t)((cp >> 6) & 0x3f) | 0x80;
+				p[2] = (uint8_t)(cp & 0x3f)        | 0x80;
+			}
+		} else if (cp < 0x200000) {
+			p[0] = (uint8_t)(cp >> 18)             | 0xf0; // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+			p[1] = (uint8_t)((cp >> 12) & 0x3f)    | 0x80;
+			p[2] = (uint8_t)((cp >> 6) & 0x3f)     | 0x80;
+			p[3] = (uint8_t)(cp & 0x3f)            | 0x80;
 		} else {
-			p[0] = -1;
+			encodeCodePoint(p, replacement);
 		}
-	}
-
-	static
-	size_t
-	calcCodePointCount(
-		const C* p,
-		size_t length
-	) {
-		return calcUtfCodePointCount<Utf8> (p, length);
 	}
 };
 
 //..............................................................................
 
-class Utf16 {
+class Utf16Base {
 public:
 	typedef utf16_t C;
 
-	enum SurrogateKind {
-		SurrogateKind_MinLead  = 0xd800,
-		SurrogateKind_MaxLead  = 0xdbff,
-		SurrogateKind_MinTrail = 0xdc00,
-		SurrogateKind_MaxTrail = 0xdfff,
-	};
+	static
+	size_t
+	getBomLength() {
+		return 2;
+	}
+
+	static
+	bool
+	isSurrogate(uint32_t c) {
+        return (c - 0xd800 < 0x800);  // d800 .. dfff;
+	}
+
+	static
+	bool
+	isSurrogateNeeded(uint32_t cp) {
+		return cp >= 0x10000;
+	}
+
+	static
+	utf16_t
+	getHiSurrogate(uint32_t cp) {
+		return 0xd800 + (((cp - 0x10000) >> 10) & 0x3ff);
+	}
+
+	static
+	utf16_t
+	getLoSurrogate(uint32_t cp) {
+		return 0xdc00 + (cp & 0x3ff);
+	}
+
+	static
+	size_t
+	getEncodeCodePointLength(utf32_t cp) {
+		return isSurrogateNeeded(cp) ? 2 : 1;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class Utf16: public Utf16Base {
+public:
+	typedef Utf16Decoder Decoder;
+	typedef Utf16ReverseDecoder ReverseDecoder;
+
+	/////////////////////////////////
+	// deprecated
+	/////////////////////////////////
+
+	static
+	size_t
+	getDecodeCodePointLength(utf16_t c) {
+		return isHiSurrogate(c) ? 2 : 1;
+	}
+
+	static
+	utf32_t
+	decodeCodePoint(const utf16_t* p) {
+		return isHiSurrogate(*p) ? getSurrogateCodePoint(p[0], p[1]) : (uint16_t)*p;
+ 	}
+
+	static
+	utf32_t
+	getSurrogateCodePoint(
+		uint16_t lead,
+		uint16_t trail
+	) {
+		ASSERT(isLeadSurrogate(lead) && isTrailSurrogate(trail));
+		return 0x10000 - (0xd800 << 10) - 0xdc00 + (lead << 10) + trail;
+	}
+
+	/////////////////////////////////
 
 	static
 	UtfKind
@@ -261,97 +255,58 @@ public:
 	}
 
 	static
-	size_t
-	getBomLength() {
-		return 2;
+	bool
+	isHiSurrogate(uint16_t c) {
+		return (c & 0xfc00) == 0xd800; // d800 .. dbff;
 	}
 
 	static
 	bool
-	isLeadSurrogate(uint16_t c) {
-		return c >= 0xd800 && c <= 0xdbff;
-	}
-
-	static
-	bool
-	isTrailSurrogate(uint16_t c) {
-		return c >= 0xdc00 && c <= 0xdfff;
-	}
-
-	static
-	bool
-	needSurrogate(uint32_t x) {
-		return x >= 0x10000;
-	}
-
-	static
-	utf16_t
-	getLeadSurrogate(uint32_t x) {
-		return 0xd800 + (((x - 0x10000) >> 10) & 0x3ff);
-	}
-
-	static
-	utf16_t
-	getTrailSurrogate(uint32_t x) {
-		return 0xdc00 + (x & 0x3ff);
-	}
-
-	static
-	utf32_t
-	getSurrogateCodePoint(
-		uint16_t lead,
-		uint16_t trail
-	) {
-		ASSERT(isLeadSurrogate(lead) && isTrailSurrogate(trail));
-		return 0x10000 - (0xd800 << 10) - 0xdc00 + (lead << 10) + trail;
-	}
-
-	static
-	size_t
-	getDecodeCodePointLength(utf16_t c) {
-		return isLeadSurrogate(c) ? 2 : 1;
-	}
-
-	static
-	size_t
-	getEncodeCodePointLength(utf32_t x) {
-		return needSurrogate(x) ? 2 : 1;
-	}
-
-	static
-	utf32_t
-	decodeCodePoint(const utf16_t* p) {
-		return isLeadSurrogate(*p) ? getSurrogateCodePoint(p[0], p[1]) : (uint16_t)*p;
+	isLoSurrogate(uint16_t c) {
+		return (c & 0xfc00) == 0xdc00; // dc00 .. dfff;
 	}
 
 	static
 	void
 	encodeCodePoint(
 		utf16_t* p,
-		utf32_t x
+		utf32_t cp
 	) {
-		if (!needSurrogate(x)) {
-			*p = (utf16_t)x;
+		if (!isSurrogateNeeded(cp)) {
+			*p = (utf16_t)cp;
 		} else {
-			p[0] = getLeadSurrogate(x);
-			p[1] = getTrailSurrogate(x);
+			p[0] = getHiSurrogate(cp);
+			p[1] = getLoSurrogate(cp);
 		}
-	}
-
-	static
-	size_t
-	calcCodePointCount(
-		const C* p,
-		size_t length
-	) {
-		return calcUtfCodePointCount<Utf16> (p, length);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Utf16_be: public Utf16 {
+class Utf16_be: public Utf16Base {
 public:
+	typedef Utf16Decoder_be Decoder;
+	typedef Utf16ReverseDecoder_be ReverseDecoder;
+
+	/////////////////////////////////
+	// deprecated
+	/////////////////////////////////
+
+	static
+	size_t
+	getDecodeCodePointLength(utf16_t c) {
+		return isHiSurrogate(sl::swapByteOrder16(c)) ? 2 : 1;
+	}
+
+	static
+	utf32_t
+	decodeCodePoint(const utf16_t* p) {
+		uint16_t c = sl::swapByteOrder16(p[0]);
+		return isHiSurrogate(c) ? Utf16::getSurrogateCodePoint(c, sl::swapByteOrder16(p[1])) : c;
+ 	}
+
+	/////////////////////////////////
+
 	static
 	UtfKind
 	getUtfKind() {
@@ -366,59 +321,37 @@ public:
 	}
 
 	static
-	size_t
-	getDecodeCodePointLength(utf16_t c) {
-		return isTrailSurrogate(c) ? 2 : 1;
+	bool
+	isHiSurrogate(uint16_t c) {
+		return Utf16::isHiSurrogate(sl::swapByteOrder16(c));
 	}
 
 	static
-	utf32_t
-	decodeCodePoint(const utf16_t* p) {
-		return isTrailSurrogate(*p) ? getSurrogateCodePoint(p[1], p[0]) : (uint16_t)*p;
+	bool
+	isLoSurrogate(uint16_t c) {
+		return Utf16::isLoSurrogate(sl::swapByteOrder16(c));
 	}
 
 	static
 	void
 	encodeCodePoint(
 		utf16_t* p,
-		utf32_t x
+		utf32_t cp
 	) {
-		if (!needSurrogate(x)) {
-			*p = (utf16_t)x;
+		if (!isSurrogateNeeded(cp)) {
+			*p = sl::swapByteOrder16((utf16_t)cp);
 		} else {
-			p[0] = getTrailSurrogate(x);
-			p[1] = getLeadSurrogate(x);
+			p[0] = sl::swapByteOrder16(getHiSurrogate(cp));
+			p[1] = sl::swapByteOrder16(getLoSurrogate(cp));
 		}
-	}
-
-	static
-	size_t
-	calcCodePointCount(
-		const C* p,
-		size_t length
-	) {
-		return calcUtfCodePointCount<Utf16_be> (p, length);
 	}
 };
 
 //..............................................................................
 
-class Utf32 {
+class Utf32Base {
 public:
 	typedef utf32_t C;
-
-	static
-	UtfKind
-	getUtfKind() {
-		return UtfKind_Utf32;
-	}
-
-	static
-	const uint8_t*
-	getBom() {
-		static uint8_t bom[] = { 0xff, 0xfe, 0x00, 0x00 };
-		return bom;
-	}
 
 	static
 	size_t
@@ -437,6 +370,27 @@ public:
 	getEncodeCodePointLength(utf32_t x) {
 		return 1;
 	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class Utf32: public Utf32Base {
+public:
+	typedef Utf8Decoder Decoder;
+	typedef Utf8ReverseDecoder ReverseDecoder;
+
+	static
+	UtfKind
+	getUtfKind() {
+		return UtfKind_Utf32;
+	}
+
+	static
+	const uint8_t*
+	getBom() {
+		static uint8_t bom[] = { 0xff, 0xfe, 0x00, 0x00 };
+		return bom;
+	}
 
 	static
 	utf32_t
@@ -452,20 +406,11 @@ public:
 	) {
 		*p = x;
 	}
-
-	static
-	size_t
-	calcCodePointCount(
-		const C* p,
-		size_t length
-	) {
-		return length;
-	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Utf32_be: public Utf32 {
+class Utf32_be: public Utf32Base {
 public:
 	static
 	UtfKind

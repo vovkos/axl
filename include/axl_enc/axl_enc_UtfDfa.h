@@ -24,9 +24,9 @@ namespace enc {
 
 template <
 	typename T,
-	typename B
+	typename Base
 >
-class UtfDfa: public B {
+class UtfDfa: public Base {
 protected:
 	uint_t m_state;
 	utf32_t m_cp;
@@ -87,6 +87,30 @@ public:
 };
 
 //..............................................................................
+
+// common result structure for UTF-8, UTF-16, UTF-32 decoders
+
+template <typename T>
+struct UtfDecodeResult {
+	utf32_t* m_dst;
+	const T* m_src;
+
+	UtfDecodeResult() {
+		m_dst = NULL;
+		m_src = NULL;
+	}
+
+	UtfDecodeResult(
+		utf32_t* dst,
+		const T* src
+	) {
+		m_dst = dst;
+		m_src = src;
+	}
+};
+
+//..............................................................................
+
 
 } // namespace enc
 } // namespace axl

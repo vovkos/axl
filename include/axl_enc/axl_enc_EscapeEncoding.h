@@ -211,7 +211,7 @@ public:
 					string->append(escapeSequence, 2);
 					base = p + 1;
 				} else {
-					if (utfIsPrintable(c))
+					if (isPrintable(c))
 						continue;
 
 					utf32_t escape = findEscapeChar(c, flags);

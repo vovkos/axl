@@ -14,9 +14,10 @@
 #define _AXL_ENC_UTF16DFA_H
 
 #include "axl_enc_UtfDfa.h"
+#include "axl_sl_Operator.h"
 
 //
-// AXL UTF-16 specifics:
+// AXL UTF-16 DFA specifics:
 //
 // - Never backtrack on errors;
 // - Provide both forward and backward DFAs;
@@ -185,6 +186,12 @@ template <
 class Utf16DfaBase: public DfaTable
 {
 public:
+	Utf16DfaBase() {}
+
+	Utf16DfaBase(uint32_t storage) {
+		load(storage);
+	}
+
 	uint_t
 	decode(uint16_t c);
 
