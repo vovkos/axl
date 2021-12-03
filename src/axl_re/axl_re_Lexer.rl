@@ -36,7 +36,8 @@ ws  = [ \t\r];
 utf8_1 = 0x00 .. 0x7f;
 utf8_2 = 0xc0 .. 0xdf;
 utf8_3 = 0xe0 .. 0xef;
-utf8_4 = 0xf0 .. 0xff;
+utf8_4 = 0xf0 .. 0xf7;
+utf8_c = 0x80 .. 0xbf;
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -92,12 +93,12 @@ main := |*
 '\\'  oct{3}   { createOctCharToken(ts + 1); };
 '\\'  any      { createCharToken(ts[1]); };
 
-utf8_1         { createCharToken(ts[0]); };
-utf8_2 any     { createUtf8CharToken_2(ts); };
-utf8_3 any{2}  { createUtf8CharToken_3(ts); };
-utf8_4 any{3}  { createUtf8CharToken_4(ts); };
+utf8_1            { createCharToken(ts[0]); };
+utf8_2 utf8_c     { createUtf8CharToken_2(ts); };
+utf8_3 utf8_c{2}  { createUtf8CharToken_3(ts); };
+utf8_4 utf8_c{3}  { createUtf8CharToken_4(ts); };
 
-any            { createCharToken(ts[0]); };
+any               { createCharToken(ts[0]); };
 
 *|;
 
@@ -138,12 +139,12 @@ char_class := |*
 '\\'  oct{3}   { createOctCharToken(ts + 1); };
 '\\'  any      { createCharToken(ts[1]); };
 
-utf8_1         { createCharToken(ts[0]); };
-utf8_2 any     { createUtf8CharToken_2(ts); };
-utf8_3 any{2}  { createUtf8CharToken_3(ts); };
-utf8_4 any{3}  { createUtf8CharToken_4(ts); };
+utf8_1            { createCharToken(ts[0]); };
+utf8_2 utf8_c     { createUtf8CharToken_2(ts); };
+utf8_3 utf8_c{2}  { createUtf8CharToken_3(ts); };
+utf8_4 utf8_c{3}  { createUtf8CharToken_4(ts); };
 
-any            { createCharToken(ts[0]); };
+any               { createCharToken(ts[0]); };
 
 *|;
 

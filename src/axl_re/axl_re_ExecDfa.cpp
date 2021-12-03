@@ -26,6 +26,15 @@ ExecDfa::ExecDfa(StateImpl* parent):
 	m_matchAcceptId = -1;
 }
 
+ExecEngine*
+ExecDfa::clone(StateImpl* parent) {
+	ExecDfa* exec = AXL_MEM_NEW_ARGS(ExecDfa, (parent));
+	exec->m_state = m_state;
+	exec->m_matchEndOffset = m_matchEndOffset;
+	exec->m_matchAcceptId = m_matchAcceptId;
+	return exec;
+}
+
 void
 ExecDfa::reset() {
 	m_matchEndOffset = -1;

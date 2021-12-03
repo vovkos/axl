@@ -124,7 +124,7 @@ appendCharString(
 	sl::String* string,
 	utf32_t c
 ) {
-	if (enc::utfIsPrintable(c) && c < 0x80)
+	if (enc::isPrintable(c) && c < 0x80)
 		string->append(c);
 	else if (c <= 0xffff)
 		string->appendFormat("\\u%04x", c);

@@ -25,7 +25,7 @@ struct DfaState;
 
 //..............................................................................
 
-// the key is a combination of NfaAnchor
+// the key is a combination of NfaAnchor-s
 
 typedef sl::SimpleHashTable<uint_t, NfaStateSet> DfaAnchorTransitionPreMap;
 typedef sl::SimpleHashTable<uint_t, const DfaState*> DfaAnchorTransitionMap;

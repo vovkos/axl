@@ -25,6 +25,10 @@ public:
 	}
 
 	virtual
+	ExecEngine*
+	clone(StateImpl* parent);
+
+	virtual
 	void
 	reset();
 

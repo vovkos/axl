@@ -33,6 +33,20 @@ ExecNfaSp::ExecNfaSp(StateImpl* parent):
 	m_nonConsumingStateSetIdx = 0;
 }
 
+ExecEngine*
+ExecNfaSp::clone(StateImpl* parent) {
+	ExecNfaSp* exec = AXL_MEM_NEW_ARGS(ExecNfaSp, (parent));
+	exec->m_capturePosArray = m_capturePosArray;
+	exec->m_consumingStateSetTable[m_consumingStateSetIdx] = m_consumingStateSetTable[m_consumingStateSetIdx];
+	exec->m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx] = m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx];
+	exec->m_consumingStateSetIdx = m_consumingStateSetIdx;
+	exec->m_nonConsumingStateSetIdx = m_nonConsumingStateSetIdx;
+	exec->m_matchAcceptId = m_matchAcceptId;
+	exec->m_matchEndOffset = m_matchEndOffset;
+	exec->m_isEmpty = m_isEmpty;
+	return exec;
+}
+
 void
 ExecNfaSp::reset() {
 	m_matchAcceptId = -1;

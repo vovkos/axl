@@ -53,7 +53,6 @@ protected:
 public:
 	Match():
 		MatchPos(0, 0) {
-
 		m_charCodec = NULL;
 		m_p = NULL;
 	}

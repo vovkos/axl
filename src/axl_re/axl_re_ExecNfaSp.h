@@ -33,6 +33,10 @@ public:
 	ExecNfaSp(StateImpl* parent);
 
 	virtual
+	ExecEngine*
+	clone(StateImpl* parent);
+
+	virtual
 	void
 	reset();
 

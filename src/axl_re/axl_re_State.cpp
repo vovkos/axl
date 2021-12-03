@@ -28,6 +28,7 @@ StateImpl::StateImpl() {
 	m_lastExecOffset = 0;
 	m_lastExecSize = 0;
 	m_execFlags = 0;
+	m_streamState = StreamState_Idle;
 	m_prevChar = 0;
 	m_prevCharFlags = 0;
 	m_offset = 0;
@@ -56,6 +57,42 @@ StateImpl::initialize(
 	m_prevCharFlags = CharFlag_Nl;
 }
 
+StateImpl*
+StateImpl::clone() {
+	StateImpl* state = AXL_MEM_NEW(StateImpl);
+
+	state->m_regex = m_regex;
+	state->m_engine = m_engine->clone(state);
+	state->m_decoder.loadState(m_decoder.saveState());
+	state->m_lastExecBuffer = m_lastExecBuffer;
+	state->m_lastExecOffset = m_lastExecOffset;
+	state->m_lastExecSize = m_lastExecSize;
+	state->m_execFlags = m_execFlags;
+	state->m_prevChar = m_prevChar;
+	state->m_prevCharFlags = m_prevCharFlags;
+	state->m_offset = m_offset;
+
+	if (m_matchAcceptId == -1) // we are done
+		return state;
+
+	state->m_match = m_match;
+	state->m_matchAcceptId = m_matchAcceptId;
+
+	size_t count = m_subMatchArray.getCount();
+	ASSERT(count == state->m_subMatchList.getCount() + 1);
+	state->m_subMatchArray.setCount(count);
+	state->m_subMatchArray[0] = &state->m_match;
+
+	sl::ConstBoxIterator<Match> it = m_subMatchList.getHead();
+	for (size_t i = 1; it; it++, i++) {
+		Match* match = state->m_subMatchList.insertTail().p();
+		*match = *it;
+		state->m_subMatchArray[i] = match;
+	}
+
+	return state;
+}
+
 void
 StateImpl::postInitialize(Regex* regex) {
 	ASSERT(!m_regex && !m_engine);
@@ -68,10 +105,7 @@ StateImpl::postInitialize(Regex* regex) {
 		m_engine = AXL_MEM_NEW_ARGS(ExecDfa, (this));
 		break;
 
-	case RegexExecFlag_NfaSp:
-		m_engine = AXL_MEM_NEW_ARGS(ExecNfaSp, (this));
-		break;
-
+	case RegexExecFlag_NfaAuto:
 	case RegexExecFlag_NfaVm:
 		m_engine = AXL_MEM_NEW_ARGS(ExecNfaVm, (this));
 		break;
@@ -83,8 +117,6 @@ StateImpl::postInitialize(Regex* regex) {
 
 	reset();
 }
-
-axl::lex::LineCol lc;
 
 void
 StateImpl::reset() {

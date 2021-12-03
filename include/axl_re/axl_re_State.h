@@ -25,6 +25,15 @@ class RegexEngine;
 
 //..............................................................................
 
+enum StreamState {
+	StreamState_Idle,
+	StreamState_Searching,
+	StreamState_RequestBackData, // reverse DFA (on match) or rollback DFA (on search)
+	StreamState_MatchReady,
+};
+
+//..............................................................................
+
 struct StateImpl: public rc::RefCount {
 	friend class State;
 
@@ -38,10 +47,12 @@ struct StateImpl: public rc::RefCount {
 
 	Regex* m_regex;
 	ExecEngine* m_engine;
+	StreamState m_streamState;
 	enc::CodePointDecoder m_decoder;
 	const void* m_lastExecBuffer;
 	size_t m_lastExecOffset;
 	size_t m_lastExecSize;
+	size_t m_maxRollbackLimit; // don't rollback further than this
 	uint_t m_execFlags;
 	utf32_t m_prevChar;
 	uint_t m_prevCharFlags;
@@ -67,6 +78,9 @@ public:
 		uint_t execFlags,
 		enc::CharCodec* codec
 	);
+
+	StateImpl*
+	clone();
 
 	void
 	postInitialize(Regex* regex);
@@ -115,7 +129,7 @@ StateImpl::calcCharFlags(utf32_t c) {
 	return
 		c == '\r' ? CharFlag_Cr :
 		c == '\n' ? CharFlag_Lf :
-		c == '_' || enc::utfIsLetterOrDigit(c) ? CharFlag_Word :
+		c == '_' || enc::isLetterOrDigit(c) ? CharFlag_Word :
 		CharFlag_Other;
 }
 
@@ -225,6 +239,12 @@ public:
 		return m_p->m_execFlags;
 	}
 
+	StreamState
+	getStreamState() const {
+		ASSERT(m_p);
+		return m_p->m_streamState;
+	}
+
 	bool
 	isMatch() const {
 		ASSERT(m_p);
@@ -277,12 +297,19 @@ public:
 
 protected:
 	void
+	ensureExclusive() {
+		ASSERT(m_p);
+		if (!m_p.isExclusive())
+			m_p = m_p->clone();
+	}
+
+	void
 	initialize(Regex* regex);
 
 	void
 	postInitialize(Regex* regex) {
-		ASSERT(m_p && m_p.isExclusive());
-		return m_p->postInitialize(regex);
+		ensureExclusive();
+		m_p->postInitialize(regex);
 	}
 
 	bool
@@ -290,13 +317,13 @@ protected:
 		const void* p,
 		size_t size
 	) {
-		ASSERT(m_p && m_p.isExclusive());
+		ensureExclusive();
 		return m_p->exec(p, size);
 	}
 
 	bool
 	eof() {
-		ASSERT(m_p && m_p.isExclusive());
+		ensureExclusive();
 		return m_p->m_engine->eof();
 	}
 };

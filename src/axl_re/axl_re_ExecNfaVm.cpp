@@ -17,6 +17,12 @@ namespace re {
 
 //..............................................................................
 
+ExecEngine*
+ExecNfaVm::clone(StateImpl* parent) {
+	ExecNfaVm* exec = AXL_MEM_NEW_ARGS(ExecNfaVm, (parent));
+	return exec;
+}
+
 void
 ExecNfaVm::reset() {
 }

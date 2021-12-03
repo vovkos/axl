@@ -63,6 +63,8 @@ DfaState::DfaState() {
 	m_rollbackState = NULL;
 }
 
+#if (_AXL_DEBUG)
+
 void
 DfaState::print(FILE* file) const {
 	fprintf(file, "%02d: nfa({ ", m_id);
@@ -102,6 +104,8 @@ DfaState::print(FILE* file) const {
 		fprintf(file, "\n");
 	}
 }
+
+#endif
 
 //..............................................................................
 

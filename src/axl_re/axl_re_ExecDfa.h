@@ -30,6 +30,10 @@ public:
 	ExecDfa(StateImpl* parent);
 
 	virtual
+	ExecEngine*
+	clone(StateImpl* parent);
+
+	virtual
 	void
 	reset();
 

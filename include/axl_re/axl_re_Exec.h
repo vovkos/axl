@@ -21,19 +21,17 @@ namespace re {
 //..............................................................................
 
 enum RegexExecFlag {
-	RegexExecFlag_NfaThreading    = 0x0001,
-	RegexExecFlag_NfaSinglePass   = 0x0002,
-	RegexExecFlag_Dfa             = 0x0004,
-	RegexExecFlag_NfaVm           = RegexExecFlag_NfaThreading,
-	RegexExecFlag_NfaSp           = RegexExecFlag_NfaSinglePass,
-	RegexExecFlag_Nfa             = RegexExecFlag_NfaVm, // default
-	RegexExecFlag_EngineMask      = RegexExecFlag_NfaVm | RegexExecFlag_NfaSp | RegexExecFlag_Dfa,
+	RegexExecFlag_Dfa             = 0x0001, // default
+	RegexExecFlag_NfaAuto         = 0x0002, // auto-select threading or single-pass NFA
+	RegexExecFlag_NfaVm           = 0x0004, // force threading NFA
+	RegexExecFlag_Nfa             = RegexExecFlag_NfaAuto,
+	RegexExecFlag_EngineMask      = RegexExecFlag_Dfa | RegexExecFlag_NfaAuto | RegexExecFlag_NfaVm,
 
-	RegexExecFlag_Stream          = 0x0010,
-	RegexExecFlag_DisableCapture  = 0x0020, // capture by default for all NFA-based engines
-	RegexExecFlag_Multiline       = 0x0040,
-	RegexExecFlag_AnchorDataBegin = 0x0100,
-	RegexExecFlag_AnchorDataEnd   = 0x0200,
+	RegexExecFlag_Stream          = 0x0010, // can feed data chunk-by-chunk
+	RegexExecFlag_DisableCapture  = 0x0020, // capture by default for NFA-based engines
+	RegexExecFlag_Multiline       = 0x0040, // ^ and $ match newline
+	RegexExecFlag_AnchorDataBegin = 0x0100, // match must start on the first byte of data
+	RegexExecFlag_AnchorDataEnd   = 0x0200, // match must end on the last byte of data
 	RegexExecFlag_ExactMatch      = RegexExecFlag_AnchorDataBegin | RegexExecFlag_AnchorDataEnd,
 };
 
@@ -55,6 +53,10 @@ public:
 
 	virtual
 	~ExecEngine() {}
+
+	virtual
+	ExecEngine*
+	clone(StateImpl* parent) = 0;
 
 	virtual
 	void
