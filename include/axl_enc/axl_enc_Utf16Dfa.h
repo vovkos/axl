@@ -84,6 +84,7 @@ public:
 	// pre-multiply state values for a tiny bit faster table lookups
 
 	enum State {
+		State_Start             = 0 * CcCount,  // 0  - start state
 		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
 
 		State_Error             = 1 * CcCount,  // 4  - unpaired trail surrogate
@@ -92,8 +93,6 @@ public:
 		State_Ready             = 4 * CcCount,  // 16 - codepoint is ready
 		State_Ready_Error       = 5 * CcCount,  // 20 - codepoint is ready (with error)
 		State_ReadyPair         = 6 * CcCount,  // 24 - codepoint is ready (surrogate pair)
-
-		State_Start             = State_Ready,
 	};
 
 protected:
@@ -105,11 +104,12 @@ protected:
 //..............................................................................
 
 class Utf16DfaTable: public Utf16DfaRoot {
-protected:
+public:
 	enum {
 		IsReverse = false,
 	};
 
+protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 };
 
@@ -117,7 +117,7 @@ protected:
 
 AXL_SELECT_ANY const uchar_t Utf16DfaTable::m_dfa[] = {
 //  Cc_Single          Cc_HiSurrogate           Cc_LoSurrogate
-	0,                 0,                       0,                0,  // 0  - unused
+	State_Ready,       State_HiSurrogate,       State_Error,      0,  // 0  - State_Start
 	State_Ready,       State_HiSurrogate,       State_Error,      0,  // 4  - State_Error
 	State_Ready_Error, State_HiSurrogate_Error, State_ReadyPair,  0,  // 8  - State_HiSurrogate
 	State_Ready_Error, State_HiSurrogate_Error, State_ReadyPair,  0,  // 12 - State_HiSurrogate_Error
@@ -129,11 +129,12 @@ AXL_SELECT_ANY const uchar_t Utf16DfaTable::m_dfa[] = {
 //..............................................................................
 
 class Utf16ReverseDfaTable: public Utf16DfaRoot {
-protected:
+public:
 	enum {
 		IsReverse = true,
 	};
 
+protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 };
 
@@ -141,7 +142,7 @@ protected:
 
 AXL_SELECT_ANY const uchar_t Utf16ReverseDfaTable::m_dfa[] = {
 //  Cc_Single          Cc_HiSurrogate   Cc_LoSurrogate
-	0,                 0,               0,                       0,  // 0  - unused
+	State_Ready,       State_Error,     State_HiSurrogate,       0,  // 0  - State_Start
 	State_Ready,       State_Error,     State_HiSurrogate,       0,  // 4  - State_Error
 	State_Ready_Error, State_ReadyPair, State_HiSurrogate_Error, 0,  // 8  - State_HiSurrogate
 	State_Ready_Error, State_ReadyPair, State_HiSurrogate_Error, 0,  // 12 - State_HiSurrogate_Error
@@ -199,7 +200,7 @@ public:
 
 	uint_t
 	count(uint16_t c) {
-		uint_t cc = m_map[IsBigEndian()() ? c & 0xff : c >> 8] :
+		uint_t cc = m_map[IsBigEndian()() ? c & 0xff : c >> 8];
 		return m_state = m_dfa[m_state + cc];
 	}
 };

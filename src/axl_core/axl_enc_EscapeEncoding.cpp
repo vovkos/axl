@@ -59,28 +59,28 @@ EscapeEncodingDynamic::encode(
 	sl::Array<char> encodeBuffer;
 	char escapeSequence[16] = { '\\' };
 
+	uint32_t decoderState = 0;
 	const char* src = (char*)p0;
 	const char* srcEnd = src + size;
 
 	while (src < srcEnd) {
 		utf32_t decodeBuffer[64];
 
-		size_t takenSrcSize;
-		size_t takenBufferLength = codec->decode_utf32(
+		EncodeLengthResult result = codec->decode_utf32(
+			&decoderState,
 			decodeBuffer,
 			countof(decodeBuffer),
 			src,
-			srcEnd - src,
-			&takenSrcSize
+			srcEnd - src
 		);
 
-		if (!takenSrcSize)
+		if (!result.m_srcLength)
 			break;
 
-		src += takenSrcSize;
+		src += result.m_srcLength;
 
 		const utf32_t* p = decodeBuffer;
-		const utf32_t* end = p + takenBufferLength;
+		const utf32_t* end = p + result.m_dstLength;
 		const utf32_t* base = p;
 
 		for (; p < end; p++) {
@@ -146,28 +146,28 @@ EscapeEncodingDynamic::decode(
 	size_t hexCodeMaxLen;
 	ulong_t hexCode;
 
+	uint32_t decoderState = 0;
 	const char* src = (char*)p0;
 	const char* srcEnd = src + size;
 
 	while (src < srcEnd) {
 		utf32_t decodeBuffer[64];
 
-		size_t takenSrcSize;
-		size_t takenBufferLength = codec->decode_utf32(
+		EncodeLengthResult result = codec->decode_utf32(
+			&decoderState,
 			decodeBuffer,
 			countof(decodeBuffer),
 			src,
-			srcEnd - src,
-			&takenSrcSize
+			srcEnd - src
 		);
 
-		if (!takenSrcSize)
+		if (!result.m_srcLength)
 			break;
 
-		src += takenSrcSize;
+		src += result.m_srcLength;
 
 		const utf32_t* p = decodeBuffer;
-		const utf32_t* end = p + takenBufferLength;
+		const utf32_t* end = p + result.m_dstLength;
 		const utf32_t* base = p;
 
 		for (; p < end; p++) {

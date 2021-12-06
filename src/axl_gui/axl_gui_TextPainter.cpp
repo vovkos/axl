@@ -440,11 +440,10 @@ TextPainter::buildBinTextBuffer(
 
 	while (i < dataSize && p < end) {
 		utf32_t codePoint;
-		size_t takenSize;
 		size_t leftover = end - p;
 
-		codec->decode_utf32(&codePoint, 1, p, leftover, &takenSize);
-		if (!takenSize) {
+		enc::EncodeLengthResult result = codec->decode_utf32(&codePoint, 1, p, leftover);
+		if (!result.m_srcLength) {
 			size_t end = i + leftover;
 			if (end > dataSize)
 				end = dataSize;
@@ -457,14 +456,14 @@ TextPainter::buildBinTextBuffer(
 
 		buffer[i] = enc::isPrintableNonMark(codePoint) ? codePoint : unprintableChar;
 
-		size_t end = i + takenSize;
+		size_t end = i + result.m_srcLength;
 		if (end > dataSize)
 			end = dataSize;
 
 		for (i++; i < end; i++)
 			buffer[i] = unprintableChar;
 
-		p += takenSize;
+		p += result.m_srcLength;
 	}
 
 	return i;

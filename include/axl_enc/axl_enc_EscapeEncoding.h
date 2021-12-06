@@ -184,22 +184,20 @@ public:
 		while (src < srcEnd) {
 			utf32_t buffer[64];
 
-			size_t takenSrcLength;
-			size_t takenBufferLength = UtfConvert<Utf32, UtfEncoding>::convert(
+			EncodeLengthResult result = Convert<Utf32, UtfEncoding>::convert(
 				buffer,
 				countof(buffer),
 				src,
-				srcEnd - src,
-				&takenSrcLength
+				srcEnd - src
 			);
 
-			if (!takenSrcLength)
+			if (!result.m_srcLength)
 				break;
 
-			src += takenSrcLength;
+			src += result.m_srcLength;
 
 			const utf32_t* p = buffer;
-			const utf32_t* end = p + takenBufferLength;
+			const utf32_t* end = p + result.m_dstLength;
 			const utf32_t* base = p;
 
 			for (; p < end; p++) {
@@ -395,9 +393,8 @@ public:
 					string->append((const C*)&hexCode, 1);
 				} else { // \u or \U
 					C buffer[4];
-					size_t length = UtfEncoding::getEncodeCodePointLength(hexCode);
-					UtfEncoding::encodeCodePoint(buffer, hexCode);
-					string->append(buffer, length);
+					C* end = UtfEncoding::Encoder::encode(buffer, hexCode);
+					string->append(buffer, end - buffer);
 				}
 
 				state = State_Normal;

@@ -137,6 +137,7 @@ public:
 	// pre-multiply state values for a tiny bit faster table lookups
 
 	enum State {
+		State_Start       = 0 * CcCount,   // 0   - start state
 		State_ErrorBit    = 1 * CcCount,   // 8   - invalid sequence bit
 
 		State_1_2         = 2 * CcCount,   // 16  - 1st byte in a 2-byte sequence
@@ -154,8 +155,6 @@ public:
 		State_Error       = 13 * CcCount,  // 104 - invalid sequence
 		State_Ready       = 14 * CcCount,  // 112 - codepoint is ready
 		State_Ready_Error = 15 * CcCount,  // 120 - codepoint is ready (with error)
-
-		State_Start       = State_Ready,
 	};
 
 protected:
@@ -170,6 +169,19 @@ public:
 
 	Utf8Dfa(uint32_t storage) {
 		load(storage);
+	}
+
+	static
+	size_t
+	getCombinedErrorCount(uint_t state) {
+		ASSERT(false);
+		return 0;
+	}
+
+	size_t
+	getCombinedErrorCount() {
+		ASSERT(false);
+		return 0;
 	}
 
 	uint_t
@@ -187,7 +199,7 @@ public:
 
 AXL_SELECT_ANY const uchar_t Utf8Dfa::m_dfa[] = {
 //  00..0f             80..bf       c0..df            e0..ef           f0..f7           f8..ff
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 0   - unused
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 0   - State_Start
 	0,                 0,           0,                0,               0,               0,            0, 0,  // 8   - unused
 	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 16  - State_1_2
 	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 24  - State_1_2_Error
@@ -279,6 +291,7 @@ public:
 	// kill all the benefits of pre-multiplication
 
 	enum State {
+		State_Start         = 0,   // start state
 		State_ErrorBit      = 1,   // invalid sequence bit
 
 		State_Cb_1          = 2,   // 1st continuation byte
@@ -291,8 +304,6 @@ public:
 		State_Ready_Error   = 11,  // codepoint is ready (with error)
 		State_Ready_Error_2 = 13,  // codepoint is ready (with double error)
 		State_Ready_Error_3 = 15,  // codepoint is ready (with triple error)
-
-		State_Start         = State_Ready,
 	};
 
 protected:
@@ -353,7 +364,7 @@ public:
 
 AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_dfa[] = {
 //  00..0f               80..bf            c0..df               e0..ef             f0..f7       f8..ff
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 0  - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 0  - State_Start
 	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 1  - unused
 	State_Ready_Error,   State_Cb_2,       State_Ready,         State_Error,       State_Error, State_Error,  0, 0,  // 2  - State_Cb_1
 	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 3  - unused

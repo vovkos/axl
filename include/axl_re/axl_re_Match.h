@@ -46,14 +46,14 @@ class Match: protected MatchPos {
 	friend struct StateImpl;
 
 protected:
-	enc::CharCodec* m_charCodec;
+	enc::CharCodec* m_codec;
 	const char* m_p;
 	mutable sl::StringRef m_text; // cache
 
 public:
 	Match():
 		MatchPos(0, 0) {
-		m_charCodec = NULL;
+		m_codec = NULL;
 		m_p = NULL;
 	}
 
@@ -86,9 +86,9 @@ public:
 protected:
 	sl::StringRef
 	cacheText() const {
-		return m_text = m_charCodec == enc::getCharCodec(enc::CharCodecKind_Utf8) ?
+		return m_text = m_codec == enc::getCharCodec(enc::CharCodecKind_Utf8) ?
 			sl::StringRef(m_p, getSize()) :
-			m_charCodec->decode_utf8(m_p, getSize());
+			m_codec->decode_utf8(m_p, getSize());
 	}
 };
 

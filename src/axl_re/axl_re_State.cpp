@@ -51,7 +51,8 @@ StateImpl::initialize(
 	freeEngine();
 
 	m_regex = NULL;
-	m_decoder.setup(codec);
+	m_codec = codec;
+	m_decoderState = 0;
 	m_execFlags = execFlags;
 	m_prevChar = '\n';
 	m_prevCharFlags = CharFlag_Nl;
@@ -63,7 +64,8 @@ StateImpl::clone() {
 
 	state->m_regex = m_regex;
 	state->m_engine = m_engine->clone(state);
-	state->m_decoder.loadState(m_decoder.saveState());
+	state->m_codec = m_codec;
+	state->m_decoderState = m_decoderState;
 	state->m_lastExecBuffer = m_lastExecBuffer;
 	state->m_lastExecOffset = m_lastExecOffset;
 	state->m_lastExecSize = m_lastExecSize;
@@ -143,7 +145,7 @@ StateImpl::createMatch(
 	m_match.m_endOffset = matchPos.m_endOffset;
 
 	if (!(m_execFlags & RegexExecFlag_Stream)) {
-		m_match.m_charCodec = m_decoder.getCharCodec();
+		m_match.m_codec = m_codec;
 		m_match.m_p = (char*)m_lastExecBuffer + m_match.m_offset - m_lastExecOffset;
 	}
 
@@ -169,7 +171,7 @@ StateImpl::createMatch(
 		match->m_endOffset = pos.m_endOffset;
 
 		if (!(m_execFlags & RegexExecFlag_Stream)) {
-			match->m_charCodec = m_decoder.getCharCodec();
+			match->m_codec = m_codec;
 			match->m_p = (char*)m_lastExecBuffer + pos.m_offset - m_lastExecOffset;
 		}
 
@@ -224,7 +226,7 @@ State::reset(size_t offset) {
 		sl::takeOver(&p, &m_p);
 
 		m_p = AXL_RC_NEW(StateImpl);
-		m_p->initialize(p->m_execFlags, p->m_decoder.getCharCodec());
+		m_p->initialize(p->m_execFlags, p->m_codec);
 		m_p->m_offset = offset;
 		m_p->postInitialize(p->m_regex);
 	}

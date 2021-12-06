@@ -204,15 +204,16 @@ set(
 	${AXL_INC_DIR}/axl_enc/axl_enc_CharCodec.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_EscapeEncoding.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_HexEncoding.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Leb128.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Unicode.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Utf.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Ascii.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_UtfDfa.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf8Dfa.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Utf8Decoder.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16Dfa.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16Decoder.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Utf32Decoder.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Leb128.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf8.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf32.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf.h
 	icu_def.h
 	icu_uchar_props_data.h
 	icu_ucase_props_data.h

@@ -20,10 +20,16 @@ namespace sl {
 
 //..............................................................................
 
+enum {
+	Djb2Seed = 5381,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 inline
 size_t
 djb2() {
-	return 5381;
+	return Djb2Seed;
 }
 
 inline
@@ -48,7 +54,22 @@ djb2(
 	const void* p,
 	size_t size
 ) {
-	return djb2(5381, p, size);
+	return djb2(Djb2Seed, p, size);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+size_t
+djb2(
+	size_t hash,
+	utf32_t c
+) {
+	hash = ((hash << 5) + hash) + c & 0xff;
+	hash = ((hash << 5) + hash) + (c >> 8) & 0xff;
+	hash = ((hash << 5) + hash) + (c >> 16) & 0xff;
+	hash = ((hash << 5) + hash) + (c >> 24) & 0xff;
+	return hash;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -140,7 +161,7 @@ djb2_op(
 	const T* p,
 	size_t length
 ) {
-	return djb2_op(op, 5381, p, length);
+	return djb2_op(op, Djb2Seed, p, length);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

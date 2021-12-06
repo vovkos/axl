@@ -5812,7 +5812,7 @@ testUtf8() {
 				} while (++j < i);
 
 		if (enc::Utf8Dfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa.getCp(), dfa.getCp());
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa.getCodePoint(), dfa.getCodePoint());
 			j = i + 1;
 		}
 	}
@@ -5837,7 +5837,7 @@ testUtf8() {
 			}
 
 		if (enc::Utf8ReverseDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, rdfa.getCp(), rdfa.getCp());
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, rdfa.getCodePoint(), rdfa.getCodePoint());
 			j = i - 1;
 		}
 	}
@@ -5865,7 +5865,7 @@ testUtf16() {
 		}
 
 		if (enc::Utf16Dfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa.getCp(), dfa.getCp());
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa.getCodePoint(), dfa.getCodePoint());
 			j = i + 1;
 		}
 	}
@@ -5882,7 +5882,7 @@ testUtf16() {
 		}
 
 		if (enc::Utf16ReverseDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, rdfa.getCp(), rdfa.getCp());
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, rdfa.getCodePoint(), rdfa.getCodePoint());
 			j = i - 1;
 		}
 	}
@@ -6008,118 +6008,6 @@ testUtf8Encode() {
 }
 
 //..............................................................................
-
-template <
-	typename DstEncoding0,
-	typename SrcEncoding0,
-	typename CaseOp = sl::NoOp<utf32_t>
->
-class UtfConvert {
-public:
-	typedef DstEncoding0 DstEncoding;
-	typedef SrcEncoding0 SrcEncoding;
-	typedef typename DstEncoding::C DstUnit;
-	typedef typename SrcEncoding::C SrcUnit;
-
-public:
-	static
-	size_t
-	calcRequiredLength(
-		const SrcUnit* p,
-		size_t length
-	) {
-		const SrcUnit* end = p + length;
-
-		size_t resultLength = 0;
-		while (p < end) {
-			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength(*p);
-			if (p + srcCodePointLength > end)
-				break;
-
-			utf32_t x = CaseOp() (SrcEncoding::decodeCodePoint(p));
-			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength(x);
-
-			resultLength += dstCodePointLength;
-			p += srcCodePointLength;
-		}
-
-		return resultLength;
-	}
-
-	static
-	DstUnit*
-	convert(
-		DstUnit* dst,
-		size_t dstLength,
-		const SrcUnit* src,
-		size_t srcLength,
-		size_t* takenSrcLength_o = NULL
-	) {
-		DstUnit* dst0 = dst;
-		DstUnit* dstEnd = dst + dstLength;
-		const SrcUnit* src0 = src;
-		const SrcUnit* srcEnd = src + srcLength;
-
-		while (src < srcEnd) {
-			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength(*src);
-			if (src + srcCodePointLength > srcEnd)
-				break;
-
-			utf32_t x = CaseOp() (SrcEncoding::decodeCodePoint(src));
-			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength(x);
-			if (dst + dstCodePointLength > dstEnd)
-				break;
-
-			DstEncoding::encodeCodePoint(dst, x);
-
-			dst += dstCodePointLength;
-			src += srcCodePointLength;
-		}
-
-		if (takenSrcLength_o)
-			*takenSrcLength_o = src - src0;
-
-		return dst - dst0;
-	}
-
-	static
-	size_t
-	convert(
-		uchar_t* cpl, // src code point length table
-		DstUnit* dst,
-		size_t dstLength,
-		const SrcUnit* src,
-		size_t srcLength,
-		size_t* takenSrcLength_o = NULL
-	) {
-		DstUnit* dst0 = dst;
-		DstUnit* dstEnd = dst + dstLength;
-		const SrcUnit* src0 = src;
-		const SrcUnit* srcEnd = src + srcLength;
-
-		while (src < srcEnd) {
-			size_t srcCodePointLength = SrcEncoding::getDecodeCodePointLength(*src);
-			if (src + srcCodePointLength > srcEnd)
-				break;
-
-			utf32_t x = CaseOp() (SrcEncoding::decodeCodePoint(src));
-			size_t dstCodePointLength = DstEncoding::getEncodeCodePointLength(x);
-			if (dst + dstCodePointLength > dstEnd)
-				break;
-
-			DstEncoding::encodeCodePoint(dst, x);
-			*cpl++ = (uchar_t)srcCodePointLength;
-
-			dst += dstCodePointLength;
-			src += srcCodePointLength;
-		}
-
-		if (takenSrcLength_o)
-			*takenSrcLength_o = src - src0;
-
-		return dst - dst0;
-	}
-};
 
 void
 testConvert() {

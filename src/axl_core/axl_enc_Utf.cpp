@@ -11,9 +11,9 @@
 
 #include "pch.h"
 #include "axl_enc_Utf.h"
-#include "axl_enc_Utf8Decoder.h"
-#include "axl_enc_Utf16Decoder.h"
-#include "axl_enc_Utf32Decoder.h"
+#include "axl_enc_Utf8.h"
+#include "axl_enc_Utf16.h"
+#include "axl_enc_Utf32.h"
 
 #define INCLUDED_FROM_UCHAR_C
 #define INCLUDED_FROM_UCASE_CPP

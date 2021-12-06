@@ -20,7 +20,7 @@ namespace enc {
 
 //..............................................................................
 
-// common fields and methods for UTF-8, UTF-16 DFAs (forward and backward)
+// common fields and methods for UTF-8 and UTF-16 DFAs (forward and backward)
 
 template <
 	typename T,
@@ -65,7 +65,7 @@ public:
 	}
 
 	utf32_t
-	getCp() const {
+	getCodePoint() const {
 		return m_cp;
 	}
 
@@ -87,30 +87,6 @@ public:
 };
 
 //..............................................................................
-
-// common result structure for UTF-8, UTF-16, UTF-32 decoders
-
-template <typename T>
-struct UtfDecodeResult {
-	utf32_t* m_dst;
-	const T* m_src;
-
-	UtfDecodeResult() {
-		m_dst = NULL;
-		m_src = NULL;
-	}
-
-	UtfDecodeResult(
-		utf32_t* dst,
-		const T* src
-	) {
-		m_dst = dst;
-		m_src = src;
-	}
-};
-
-//..............................................................................
-
 
 } // namespace enc
 } // namespace axl

@@ -774,33 +774,37 @@ protected:
 
 	int
 	cmpIgnoreCase_pcp(const StringRef& string) const {
+		typedef enc::Convert<enc::Utf32, Encoding> Convert;
+		typedef enc::EncodeResult<utf32_t, C> DecodeResult;
+
 		const C* p1 = m_p;
 		const C* end1 = p1 + m_length;
 		const C* p2 = string.m_p;
 		const C* end2 = p2 + string.m_length;
 
 		while (p1 < end1 && p2 < end2) {
-			size_t codePointLength1 = Encoding::getDecodeCodePointLength(*p1);
-			size_t codePointLength2 = Encoding::getDecodeCodePointLength(*p2);
+			utf32_t buffer1[64];
+			utf32_t buffer2[64];
 
-			if (p1 + codePointLength1 > end1)
-				return p2 + codePointLength2 > end2 ? 0 : -1; // if both are badly terminated, return 0
-			else if (p2 + codePointLength2 > end2)
-				return 1;
+			DecodeResult result1 = Convert::convert(buffer1, buffer1 + countof(buffer1), p1, end1);
+			DecodeResult result2 = Convert::convert(buffer2, buffer2 + countof(buffer2), p2, end2);
 
-			utf32_t c1 = Encoding::decodeCodePoint(p1);
-			utf32_t c2 = Encoding::decodeCodePoint(p2);
+			size_t length1 = result1.m_dst - buffer1;
+			size_t length2 = result2.m_dst - buffer2;
+			size_t length = AXL_MIN(length1, length2);
 
-			c1 = enc::toCaseFolded(c1);
-			c2 = enc::toCaseFolded(c2);
+			for (size_t i = 0; i < length; i++) {
+				utf32_t c1 = enc::toCaseFolded(buffer1[i]);
+				utf32_t c2 = enc::toCaseFolded(buffer2[i]);
 
-			if (c1 < c2)
-				return -1;
-			else if (c1 > c2)
-				return 1;
+				if (c1 < c2)
+					return -1;
+				else if (c1 > c2)
+					return 1;
+			}
 
-			p1 += codePointLength1;
-			p2 += codePointLength2;
+			p1 = result1.m_src;
+			p2 = result2.m_src;
 		}
 
 		return
@@ -823,20 +827,18 @@ protected:
 
 	size_t
 	hashIgnoreCase_pcp() const {
-		size_t h = djb2();
+		typedef enc::Convert<enc::Utf32, Encoding> Convert;
+		typedef enc::EncodeResult<utf32_t, C> DecodeResult;
 
+		size_t h = djb2();
 		const C* p = m_p;
 		const C* end = m_p + m_length;
 
 		while (p < end) {
-			size_t codePointLength = Encoding::getDecodeCodePointLength(*p);
-			if (p + codePointLength > end)
-				break;
-
-			utf32_t c = Encoding::decodeCodePoint(p);
-			c = enc::toCaseFolded(c);
-			h = djb2(h, &c, sizeof(c));
-			p += codePointLength;
+			utf32_t buffer[128];
+			DecodeResult result = Convert::convert(buffer, buffer + countof(buffer), p, end);
+			h = djb2_op(enc::toCaseFolded, h, buffer, result.m_dst - buffer);
+			p = result.m_src;
 		}
 
 		return h;
@@ -1213,11 +1215,11 @@ public:
 			return 0;
 		}
 
-		size_t newLength = enc::UtfConvert<Encoding, Encoding2>::calcRequiredLength(p, length);
+		size_t newLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, length);
 		if (!createBuffer(newLength, false))
 			return -1;
 
-		enc::UtfConvert<Encoding, Encoding2>::convert(this->m_p, newLength, p, length);
+		enc::Convert<Encoding, Encoding2>::convert(this->m_p, newLength, p, length);
 		return newLength;
 	}
 
@@ -1234,11 +1236,11 @@ public:
 			return 0;
 		}
 
-		size_t newLength = enc::UtfConvert<Encoding, Encoding3>::calcRequiredLength(p, length);
+		size_t newLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, length);
 		if (!createBuffer(newLength, false))
 			return -1;
 
-		enc::UtfConvert<Encoding, Encoding3>::convert(this->m_p, newLength, p, length);
+		enc::Convert<Encoding, Encoding3>::convert(this->m_p, newLength, p, length);
 		return newLength;
 	}
 
@@ -1262,18 +1264,15 @@ public:
 			return 0;
 		}
 
-		size_t codePointLength = Encoding::getEncodeCodePointLength(x);
-		if (codePointLength == -1)
-			return -1;
-
-		ASSERT(codePointLength <= 4);
+		C pattern[sizeof(utf32_t) / sizeof(C)];
+		C* end = Encoding::Encoder::encode(pattern, x);
+		size_t codePointLength = end - pattern;
+		ASSERT(codePointLength <= countof(pattern));
 
 		size_t newLength = count * codePointLength;
 		if (!createBuffer(newLength, false))
 			return -1;
 
-		C pattern[sizeof(utf32_t) / sizeof(C)];
-		Encoding::encodeCodePoint(pattern, x);
 		fillWithPattern(this->m_p, pattern, codePointLength, count);
 		return newLength;
 	}
@@ -1399,12 +1398,12 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		size_t insertLength = enc::UtfConvert<Encoding, Encoding2>::calcRequiredLength(p, length);
+		size_t insertLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, length);
 		C* dst = insertSpace(index, insertLength);
 		if (!dst)
 			return -1;
 
-		enc::UtfConvert<Encoding, Encoding2>::convert(dst, insertLength, p, length);
+		enc::Convert<Encoding, Encoding2>::convert(dst, insertLength, p, length);
 		return oldLength + insertLength;
 	}
 
@@ -1422,12 +1421,12 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		size_t insertLength = enc::UtfConvert<Encoding, Encoding3>::calcRequiredLength(p, length);
+		size_t insertLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, length);
 		C* dst = insertSpace(index, insertLength);
 		if (!dst)
 			return -1;
 
-		enc::UtfConvert<Encoding, Encoding3>::convert(dst, insertLength, p, length);
+		enc::Convert<Encoding, Encoding3>::convert(dst, insertLength, p, length);
 		return oldLength + insertLength;
 	}
 
@@ -1450,20 +1449,16 @@ public:
 		if (count == 0)
 			return oldLength;
 
-		size_t codePointLength = Encoding::getEncodeCodePointLength(x);
-		if (codePointLength == -1)
-			return -1;
-
-		ASSERT(codePointLength <= 4);
+		C pattern[sizeof(utf32_t) / sizeof(C)];
+		C* end = Encoding::Encoder::encode(pattern, x);
+		size_t codePointLength = end - pattern;
+		ASSERT(codePointLength <= countof(pattern));
 
 		size_t insertLength = count * codePointLength;
-
 		C* dst = insertSpace(index, count * codePointLength);
 		if (!dst)
 			return -1;
 
-		C pattern[sizeof(utf32_t) / sizeof(C)];
-		Encoding::encodeCodePoint(pattern, x);
 		fillWithPattern(dst, pattern, codePointLength, count);
 		return oldLength + insertLength;
 	}
@@ -1907,12 +1902,12 @@ protected:
 	convertCase_pcp() {
 		StringRef src = *this; // save old contents -- can't convert in-place because length can increase
 
-		size_t length = enc::UtfConvert<Encoding, Encoding, CaseOp>::calcRequiredLength(this->m_p, this->m_length);
+		size_t length = enc::Convert<Encoding, Encoding, CaseOp>::calcRequiredLength(this->m_p, this->m_length);
 		C* p = createBuffer(length);
 		if (!p)
 			return -1;
 
-		enc::UtfConvert<Encoding, Encoding, CaseOp>::convert(p, length, src.cp(), src.getLength());
+		enc::Convert<Encoding, Encoding, CaseOp>::convert(p, length, src.cp(), src.getLength());
 		return length;
 	}
 };

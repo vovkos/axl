@@ -47,8 +47,9 @@ struct StateImpl: public rc::RefCount {
 
 	Regex* m_regex;
 	ExecEngine* m_engine;
+	enc::CharCodec* m_codec;
+	uint32_t m_decoderState;
 	StreamState m_streamState;
-	enc::CodePointDecoder m_decoder;
 	const void* m_lastExecBuffer;
 	size_t m_lastExecOffset;
 	size_t m_lastExecSize;
@@ -230,7 +231,7 @@ public:
 	enc::CharCodec*
 	getCodec() const {
 		ASSERT(m_p);
-		return m_p->m_decoder.getCharCodec();
+		return m_p->m_codec;
 	}
 
 	uint_t
