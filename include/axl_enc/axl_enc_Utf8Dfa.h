@@ -138,30 +138,27 @@ public:
 
 	enum State {
 		State_Start       = 0 * CcCount,   // 0   - start state
-		State_ErrorBit    = 1 * CcCount,   // 8   - invalid sequence bit
-
 		State_1_2         = 2 * CcCount,   // 16  - 1st byte in a 2-byte sequence
 		State_1_2_Error   = 3 * CcCount,   // 24  - 1st byte in a 2-byte sequence (with error)
-
 		State_1_3         = 4 * CcCount,   // 32  - 1st byte in a 3-byte sequence
 		State_1_3_Error   = 5 * CcCount,   // 40  - 1st byte in a 3-byte sequence (with error)
 		State_2_3         = 6 * CcCount,   // 48  - 2nd byte in a 3-byte sequence
-
 		State_1_4         = 8 * CcCount,   // 64  - 1st byte in a 4-byte sequence
 		State_1_4_Error   = 9 * CcCount,   // 72  - 1st byte in a 4-byte sequence (with error)
 		State_2_4         = 10 * CcCount,  // 80  - 2nd byte in a 4-byte sequence
 		State_3_4         = 12 * CcCount,  // 96  - 3rd byte in a 4-byte sequence
-
 		State_Error       = 13 * CcCount,  // 104 - invalid sequence
 		State_Ready       = 14 * CcCount,  // 112 - codepoint is ready
 		State_Ready_Error = 15 * CcCount,  // 120 - codepoint is ready (with error)
+
+		State_ErrorBit    = 1 * CcCount,   // 8   - invalid sequence bit
 	};
 
-protected:
 	enum {
 		StateCount = 16,
 	};
 
+protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 
 public:
@@ -174,13 +171,13 @@ public:
 	static
 	size_t
 	getCombinedErrorCount(uint_t state) {
-		ASSERT(false);
+		ASSERT(false); // shouldn't be called for the forward DFA
 		return 0;
 	}
 
 	size_t
 	getCombinedErrorCount() {
-		ASSERT(false);
+		ASSERT(false); // shouldn't be called for the forward DFA
 		return 0;
 	}
 
@@ -292,25 +289,24 @@ public:
 
 	enum State {
 		State_Start         = 0,   // start state
-		State_ErrorBit      = 1,   // invalid sequence bit
-
 		State_Cb_1          = 2,   // 1st continuation byte
 		State_Cb_2          = 4,   // 2nd continuation byte
 		State_Cb_3          = 6,   // 3rd continuation byte
 		State_Cb_3_Error    = 7,   // 3rd continuation byte (with error)
-
 		State_Error         = 9,   // invalid sequence
 		State_Ready         = 10,  // codepoint is ready
 		State_Ready_Error   = 11,  // codepoint is ready (with error)
 		State_Ready_Error_2 = 13,  // codepoint is ready (with double error)
 		State_Ready_Error_3 = 15,  // codepoint is ready (with triple error)
+
+		State_ErrorBit      = 1,   // invalid sequence bit
 	};
 
-protected:
 	enum {
 		StateCount = 16,
 	};
 
+protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 	uint_t m_acc;
 

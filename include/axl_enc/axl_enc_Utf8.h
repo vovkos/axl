@@ -80,7 +80,7 @@ public:
 
 //..............................................................................
 
-// emits a replacement char per each byte of an invalid UTF-8 sequence
+// emits a replacement per each byte of an invalid UTF-8 sequence
 
 template <typename Dfa0>
 class Utf8DecoderBase {
@@ -91,173 +91,84 @@ public:
 
 	typedef utf8_t C;
 	typedef Dfa0 Dfa;
-	typedef uint32_t State;
 
 public:
-	template <typename Encoder>
+	template <typename Emitter>
 	static
-	size_t
-	count(
-		State* state,
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
+	const C*
+	decode(
+		DecoderState* state,
+		Emitter& emitter,
+		const C* src,
+		const C* srcEnd
 	) {
 		Dfa dfa(*state);
-		size_t result = count<Encoder>(dfa, p, end, replacement);
+		src = decode(dfa, emitter, src, srcEnd);
 		*state = dfa.save();
-		return result;
+		return src;
 	}
 
-	template <typename Encoder>
+	template <typename Emitter>
 	static
-	size_t
-	count(
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		return count<Encoder>(Dfa(), p, end, replacement);
-	}
-
-	template <typename Encoder>
-	static
-	EncodeResult<typename Encoder::C, C>
+	const C*
 	decode(
-		State* state,
-		typename Encoder::C* dst, // provide room to encode at least 4 codepoints
-		typename Encoder::C* dstEnd,
+		Emitter& emitter,
 		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
+		const C* srcEnd
 	) {
-		Dfa dfa(*state);
-		EncodeResult<typename Encoder::C, C> result = decode<Encoder>(dfa, dst, dstEnd, src, srcEnd, replacement);
-		*state = dfa.save();
-		return result;
-	}
-
-	template <typename Encoder>
-	static
-	EncodeResult<typename Encoder::C, C>
-	decode(
-		typename Encoder::C* dst, // provide room to encode at least 4 codepoints
-		typename Encoder::C* dstEnd,
-		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		return decode<Encoder>(Dfa(), dst, dstEnd, src, srcEnd, replacement);
+		return decode(Dfa(), emitter, src, srcEnd);
 	}
 
 protected:
-	template <typename Encoder>
+	template <typename Emitter>
 	static
-	size_t
-	count(
-		Dfa& dfa,
-		const C* src,
-		const C* srcEnd,
-		utf32_t replacement
-	) {
-		size_t length = 0;
-
-		if (Dfa::IsReverse)
-			for (const C* p = src; src > srcEnd; src--) {
-				uint_t state = dfa.count(*src);
-				if (Dfa::isError(state))
-					if (state == Dfa::State_Error)
-						do {
-							length += Encoder::getEncodeLength(replacement);
-						} while (--p >= src);
-					else {
-						const C* p0 = p - Dfa::getCombinedErrorCount(state);
-						do {
-							length += Encoder::getEncodeLength(replacement);
-						} while (--p > p0);
-					}
-
-				if (Dfa::isReady(state)) {
-					length += Encoder::getEncodeLength(dfa.getCodePoint(), replacement);
-					p = src - 1;
-				}
-			}
-		else
-			for (const C* p = src; src < srcEnd; src++) {
-				uint_t state = dfa.count(*src);
-				if (Dfa::isError(state))
-					if (state == Dfa::State_Error)
-						do {
-							length += Encoder::getEncodeLength(replacement);
-						} while (++p <= src);
-					else
-						do {
-							length += Encoder::getEncodeLength(replacement);
-						} while (++p < src);
-
-				if (Dfa::isReady(state)) {
-					length += Encoder::getEncodeLength(dfa.getCodePoint(), replacement);
-					p = src + 1;
-				}
-			}
-
-		return length;
-	}
-
-	template <typename Encoder>
-	static
-	EncodeResult<typename Encoder::C, C>
+	const C*
 	decode(
 		Dfa& dfa,
-		typename Encoder::C* dst,
-		typename Encoder::C* dstEnd,
+		Emitter& emitter,
 		const C* src,
-		const C* srcEnd,
-		utf32_t replacement
+		const C* srcEnd
 	) {
-		ASSERT(dstEnd - dst >= MaxEmitLength * Encoder::MaxEncodeLength);
-		dstEnd -= MaxEmitLength * Encoder::MaxEncodeLength - 1;
-
 		if (Dfa::IsReverse)
-			for (const C* p = src; dst < dstEnd && src > srcEnd; src--) {
-				uint_t state = dfa.count(*src);
+			for (const C* p = src; src > srcEnd && emitter.canEmit(); src--) {
+				uint_t state = dfa.decode(*src);
 				if (Dfa::isError(state))
 					if (state == Dfa::State_Error)
 						do {
-							dst = Encoder::encode(dst, replacement);
-						} while (--p >= src);
+							emitter.emitReplacement(--p);
+						} while (p >= src);
 					else {
 						const C* p0 = p - Dfa::getCombinedErrorCount(state);
 						do {
-							dst = Encoder::encode(dst, replacement);
-						} while (--p > src);
+							emitter.emitReplacement(--p);
+						} while (p > p0);
 					}
 
 				if (Dfa::isReady(state)) {
-					dst = Encoder::encode(dst, dfa.getCodePoint(), replacement);
 					p = src - 1;
+					emitter.emitCodePoint(p, dfa.getCodePoint());
 				}
 			}
 		else
-			for (const C* p = src; dst < dstEnd && src < srcEnd; src++) {
-				uint_t state = dfa.count(*src);
+			for (const C* p = src; src < srcEnd && emitter.canEmit(); src++) {
+				uint_t state = dfa.decode(*src);
 				if (Dfa::isError(state))
 					if (state == Dfa::State_Error)
 						do {
-							dst = Encoder::encode(dst, replacement);
-						} while (++p <= src);
+							emitter.emitReplacement(++p);
+						} while (p <= src);
 					else
 						do {
-							dst = Encoder::encode(dst, replacement);
-						} while (++p < src);
+							emitter.emitReplacement(++p);
+						} while (p < src);
 
 				if (Dfa::isReady(state)) {
-					dst = Encoder::encode(dst, dfa.getCodePoint(), replacement);
 					p = src + 1;
+					emitter.emitCodePoint(p, dfa.getCodePoint());
 				}
 			}
 
-		return EncodeResult<typename Encoder::C, C>(dst, src);
+		return src;
 	}
 };
 
@@ -265,6 +176,30 @@ protected:
 
 typedef Utf8DecoderBase<Utf8Dfa>        Utf8Decoder;
 typedef Utf8DecoderBase<Utf8ReverseDfa> Utf8ReverseDecoder;
+
+//..............................................................................
+
+class Utf8 {
+public:
+	typedef utf8_t C;
+	typedef Utf8Encoder Encoder;
+	typedef Utf8Decoder Decoder;
+	typedef Utf8ReverseDecoder ReverseDecoder;
+
+public:
+	static
+	const uint8_t*
+	getBom() {
+		static uint8_t bom[] = { 0xef, 0xbb, 0xbf };
+		return bom;
+	}
+
+	static
+	size_t
+	getBomLength() {
+		return 3;
+	}
+};
 
 //..............................................................................
 

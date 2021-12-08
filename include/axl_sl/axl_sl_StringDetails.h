@@ -13,7 +13,9 @@
 
 #define _AXL_SL_STRING_H
 
-#include "axl_enc_Utf.h"
+#include "axl_enc_Utf8.h"
+#include "axl_enc_Utf16.h"
+#include "axl_enc_Utf32.h"
 #include "axl_sl_MemMem.h"
 
 namespace axl {

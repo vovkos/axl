@@ -365,7 +365,7 @@ Regex::exec(
 	size_t size
 ) {
 	if (!*state)
-		state->initialize(this);
+		state->initialize(0, enc::CharCodecKind_Utf8, this);
 	else if (!state->getRegex())
 		state->postInitialize(this);
 	else

@@ -12,14 +12,17 @@
 #include "pch.h"
 #include "axl_re_ExecNfaSp.h"
 #include "axl_re_Regex.h"
+#include "axl_enc_Utf16s.h"
+#include "axl_enc_Utf32s.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-ExecNfaSp::ExecNfaSp(StateImpl* parent):
+ExecNfaSpBase::ExecNfaSpBase(StateImpl* parent):
 	ExecEngine(parent) {
+	m_execResult = ExecResult_Undefined;
 	m_matchAcceptId = -1;
 	m_matchEndOffset = -1;
 	m_isEmpty = true;
@@ -33,22 +36,19 @@ ExecNfaSp::ExecNfaSp(StateImpl* parent):
 	m_nonConsumingStateSetIdx = 0;
 }
 
-ExecEngine*
-ExecNfaSp::clone(StateImpl* parent) {
-	ExecNfaSp* exec = AXL_MEM_NEW_ARGS(ExecNfaSp, (parent));
-	exec->m_capturePosArray = m_capturePosArray;
-	exec->m_consumingStateSetTable[m_consumingStateSetIdx] = m_consumingStateSetTable[m_consumingStateSetIdx];
-	exec->m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx] = m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx];
-	exec->m_consumingStateSetIdx = m_consumingStateSetIdx;
-	exec->m_nonConsumingStateSetIdx = m_nonConsumingStateSetIdx;
-	exec->m_matchAcceptId = m_matchAcceptId;
-	exec->m_matchEndOffset = m_matchEndOffset;
-	exec->m_isEmpty = m_isEmpty;
-	return exec;
+void
+ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
+	m_capturePosArray = src->m_capturePosArray;
+	m_consumingStateSetIdx = src->m_consumingStateSetIdx;
+	m_nonConsumingStateSetIdx = src->m_nonConsumingStateSetIdx;
+	m_consumingStateSetTable[m_consumingStateSetIdx] = src->m_consumingStateSetTable[m_consumingStateSetIdx];
+	m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx] = src->m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx];
+	m_matchAcceptId = src->m_matchAcceptId;
+	m_matchEndOffset = src->m_matchEndOffset;
 }
 
 void
-ExecNfaSp::reset() {
+ExecNfaSpBase::reset(size_t offset) {
 	m_matchAcceptId = -1;
 	m_matchEndOffset = -1;
 	m_isEmpty = true;
@@ -69,39 +69,7 @@ ExecNfaSp::reset() {
 }
 
 bool
-ExecNfaSp::exec(
-	const void* p0,
-	size_t size
-) {
-	char const* p = (char*)p0;
-	char const* end = p + size;
-
-	while (p < end) {
-		uchar_t cplBuffer[DecodeBufferSize];
-		utf32_t textBuffer[DecodeBufferSize];
-		size_t takenSize;
-		size_t length = m_parent->m_decoder.decode(cplBuffer, textBuffer, DecodeBufferSize, p, end - p, &takenSize);
-		p += takenSize;
-
-		for (size_t i = 0; i < length; i++) {
-			utf32_t c = textBuffer[i];
-			uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c);
-
-			advanceNonConsumingStates(anchors);
-			advanceConsumingStates(c);
-
-			if (m_isEmpty)
-				return finalize(false);
-
-			m_parent->m_offset += cplBuffer[i];
-		}
-	}
-
-	return true;
-}
-
-bool
-ExecNfaSp::eof() {
+ExecNfaSpBase::eof() {
 	uint_t anchors = Anchor_EndLine | Anchor_EndText;
 	if (m_parent->m_prevCharFlags & StateImpl::CharFlag_Word)
 		anchors |= Anchor_WordBoundary;
@@ -113,7 +81,7 @@ ExecNfaSp::eof() {
 }
 
 void
-ExecNfaSp::addState(const NfaState* state) {
+ExecNfaSpBase::addState(const NfaState* state) {
 	if (state->isConsuming())
 		m_consumingStateSetTable[m_consumingStateSetIdx].add(state);
 	else
@@ -123,7 +91,7 @@ ExecNfaSp::addState(const NfaState* state) {
 }
 
 void
-ExecNfaSp::openCapture(size_t captureId) {
+ExecNfaSpBase::openCapture(size_t captureId) {
 	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
 
 	size_t offset = m_parent->m_offset;
@@ -137,7 +105,7 @@ ExecNfaSp::openCapture(size_t captureId) {
 }
 
 void
-ExecNfaSp::closeCapture(size_t captureId) {
+ExecNfaSpBase::closeCapture(size_t captureId) {
 	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
 
 	size_t offset = m_parent->m_offset;
@@ -148,7 +116,7 @@ ExecNfaSp::closeCapture(size_t captureId) {
 }
 
 void
-ExecNfaSp::advanceNonConsumingStates(uint32_t anchors) {
+ExecNfaSpBase::advanceNonConsumingStates(uint32_t anchors) {
 	while (!m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx].isEmpty()) {
 		size_t srcSetIdx = m_nonConsumingStateSetIdx;
 		size_t dstSetIdx = !srcSetIdx;
@@ -200,7 +168,7 @@ ExecNfaSp::advanceNonConsumingStates(uint32_t anchors) {
 }
 
 void
-ExecNfaSp::advanceConsumingStates(utf32_t c) {
+ExecNfaSpBase::advanceConsumingStates(utf32_t c) {
 	size_t srcSetIdx = m_consumingStateSetIdx;
 	size_t dstSetIdx = !srcSetIdx;
 
@@ -235,7 +203,7 @@ ExecNfaSp::advanceConsumingStates(utf32_t c) {
 }
 
 bool
-ExecNfaSp::finalize(bool isEof) {
+ExecNfaSpBase::finalize(bool isEof) {
 	if (m_matchAcceptId == -1)
 		return false;
 
@@ -249,6 +217,93 @@ ExecNfaSp::finalize(bool isEof) {
 
 	m_parent->createMatch(m_matchAcceptId, MatchPos(0, m_matchEndOffset));
 	return true;
+}
+
+//..............................................................................
+
+template <typename Encoding>
+class ExecNfaSp: public ExecNfaSpBase {
+public:
+	ExecNfaSp(StateImpl* parent):
+		ExecNfaSpBase(parent) {}
+
+	// ExecEngine
+
+	virtual
+	ExecEngine*
+	clone(StateImpl* parent) {
+		ExecNfaSp* exec = AXL_MEM_NEW_ARGS(ExecNfaSp, (parent));
+		exec->copy(this);
+		return exec;
+	}
+
+	virtual
+	bool
+	exec(
+		const void* p,
+		size_t size
+	) {
+		m_execResult = ExecResult_Undefined;
+		Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, (char*)p + size);
+		return m_execResult != ExecResult_False; // undefined or true => true
+	}
+
+	// DecodeEmitter
+
+	bool
+	canEmit() const {
+		return m_execResult == ExecResult_Undefined;
+	}
+
+	void
+	emitReplacement(const char* p) {
+		emitCodePoint(p, enc::StdChar_Replacement);
+	}
+
+	void
+	emitCodePoint(
+		const char* p,
+		utf32_t c
+	) {
+		uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c);
+		advanceNonConsumingStates(anchors);
+		advanceConsumingStates(c);
+
+		if (m_isEmpty) {
+			m_execResult = (ExecResult)finalize(false);
+			return;
+		}
+
+		m_parent->m_offset = m_parent->m_lastExecOffset + p - (char*)m_parent->m_lastExecBuffer;
+	}
+};
+
+//..............................................................................
+
+ExecEngine*
+createExecNfaSp(
+	StateImpl* parent,
+	enc::CharCodecKind codecKind
+) {
+	switch (codecKind) {
+	case enc::CharCodecKind_Ascii:
+		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Ascii>, (parent));
+	case enc::CharCodecKind_Utf8:
+		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Utf8>, (parent));
+	case enc::CharCodecKind_Utf16:
+		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Utf16s>, (parent));
+	case enc::CharCodecKind_Utf16_be:
+		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Utf16s_be>, (parent));
+	case enc::CharCodecKind_Utf32:
+		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Utf32s>, (parent));
+	case enc::CharCodecKind_Utf32_be:
+		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Utf32s_be>, (parent));
+	default:
+		ASSERT(false);
+		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Ascii>, (parent));
+	}
+
+	return NULL;
 }
 
 //..............................................................................

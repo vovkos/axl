@@ -11,132 +11,78 @@
 
 #pragma once
 
-#define _AXL_ENC_UTF16_H
+#define _AXL_ENC_UTF32_H
 
-#include "axl_enc_Unicode.h"
-#include "axl_enc_Utf16Dfa.h"
-#include "axl_sl_ByteOrder.h"
+#include "axl_enc_Utf32.h"
+#include "axl_enc_Utf32sDfa.h"
 
 namespace axl {
 namespace enc {
 
 //..............................................................................
 
-class Utf16EncoderBase {
+class Utf32sEncoderBase {
 public:
 	enum {
-		MaxEncodeLength = 2 // no more than two 16-bit codeunits per codepoint
+		MaxEncodeLength = 4 // always four 8-bit codeunits per codepoint
 	};
 
-	typedef utf16_t C;
+	typedef char C;
 
 public:
-	static
-	bool
-	isSurrogateNeeded(uint32_t cp) {
-		return cp >= 0x10000;
-	}
-
-	static
-	bool
-	isSurrogate(uint32_t cp) {
-		return cp - 0xd800 < 0x800;
-	}
-
-	static
-	utf16_t
-	getHiSurrogate(uint32_t cp) {
-		return 0xd800 + (((cp - 0x10000) >> 10) & 0x3ff);
-	}
-
-	static
-	utf16_t
-	getLoSurrogate(uint32_t cp) {
-		return 0xdc00 + (cp & 0x3ff);
-	}
-
 	static
 	size_t
 	getEncodeLength(
 		utf32_t cp,
-		utf32_t replacement = StdChar_Replacement
+		utf32_t unused = 0
 	) {
-		ASSERT(!isSurrogate(replacement));
-
-		return
-			isSurrogateNeeded(cp) ? 2 :
-			isSurrogate(cp) ? getEncodeLength(replacement) :
-			1;
+		return 4;
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Utf16Encoder: public Utf16EncoderBase {
+class Utf32sEncoder: public Utf32sEncoderBase {
 public:
 	static
 	C*
 	encode(
 		C* p,
 		utf32_t cp,
-		utf32_t replacement = StdChar_Replacement
+		utf32_t unused = 0
 	) {
-		ASSERT(!isSurrogate(replacement));
-
-		if (isSurrogateNeeded(cp)) {
-			p[0] = getHiSurrogate(cp);
-			p[1] = getLoSurrogate(cp);
-			return p + 2;
-		} else if (isSurrogate(cp)) {
-			return encode(p, replacement);
-		} else {
-			*p = (utf16_t)cp;
-			return p + 1;
-		}
+		return (C*)Utf32Encoder::encode((utf32_t*)p, cp);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Utf16Encoder_be: public Utf16EncoderBase {
+class Utf32sEncoder_be: public Utf32sEncoderBase {
 public:
 	static
 	C*
 	encode(
 		C* p,
 		utf32_t cp,
-		utf32_t replacement = StdChar_Replacement
+		utf32_t unused = 0
 	) {
-		ASSERT(!isSurrogate(replacement));
-
-		if (isSurrogateNeeded(cp)) {
-			p[0] = sl::swapByteOrder16(getHiSurrogate(cp));
-			p[1] = sl::swapByteOrder16(getLoSurrogate(cp));
-			return p + 2;
-		} else if (isSurrogate(cp)) {
-			return encode(p, replacement);
-		} else {
-			*p = sl::swapByteOrder16((utf16_t)cp);
-			return p + 1;
-		}
+		return (C*)Utf32Encoder_be::encode((utf32_t*)p, cp);
 	}
 };
 
 //..............................................................................
 
-// emits a replacement per each unpaired surrogate
-
 template <
-	typename C0,
+	typename IsReverse,
 	typename Dfa0
 >
-class Utf16DecoderBase {
+class Utf32sDecoderBase {
 public:
 	enum {
-		MaxEmitLength = 2, // replacement + cp
+		MaxEmitLength = 1, // always one codepoint
 	};
 
-	typedef C0 C;
+	typedef char C;
 	typedef Dfa0 Dfa;
 
 public:
@@ -176,13 +122,10 @@ protected:
 		const C* src,
 		const C* srcEnd
 	) {
-		if (Dfa::IsReverse)
+		if (IsReverse()())
 			while (src > srcEnd && emitter.canEmit()) {
 				C c = *src--;
 				uint_t state = dfa.decode(c);
-				if (Dfa::isError(state))
-					emitter.emitReplacement(src);
-
 				if (Dfa::isReady(state))
 					emitter.emitCodePoint(src, dfa.getCodePoint());
 			}
@@ -190,9 +133,6 @@ protected:
 			while (src < srcEnd && emitter.canEmit()) {
 				C c = *src++;
 				uint_t state = dfa.decode(c);
-				if (Dfa::isError(state))
-					emitter.emitReplacement(src);
-
 				if (Dfa::isReady(state))
 					emitter.emitCodePoint(src, dfa.getCodePoint());
 			}
@@ -203,56 +143,54 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef Utf16DecoderBase<utf16_t, Utf16Dfa>           Utf16Decoder;
-typedef Utf16DecoderBase<utf16_t, Utf16ReverseDfa>    Utf16ReverseDecoder;
-typedef Utf16DecoderBase<utf16_t, Utf16Dfa_be>        Utf16Decoder_be;
-typedef Utf16DecoderBase<utf16_t, Utf16ReverseDfa_be> Utf16ReverseDecoder_be;
+typedef Utf32sDecoderBase<sl::False, Utf32sDfa>    Utf32sDecoder;
+typedef Utf32sDecoderBase<sl::False, Utf32sDfa_be> Utf32sDecoder_be;
+typedef Utf32sDecoderBase<sl::True,  Utf32sDfa_be> Utf32sReverseDecoder;
+typedef Utf32sDecoderBase<sl::True,  Utf32sDfa>    Utf32sReverseDecoder_be;
 
 //..............................................................................
 
-class Utf16 {
+class Utf32s {
 public:
-	typedef utf16_t C;
-	typedef Utf16Encoder Encoder;
-	typedef Utf16Decoder Decoder;
-	typedef Utf16ReverseDecoder ReverseDecoder;
+	typedef char C;
+	typedef Utf32sEncoder Encoder;
+	typedef Utf32sDecoder Decoder;
+	typedef Utf32sReverseDecoder ReverseDecoder;
 
 public:
 	static
 	const uint8_t*
 	getBom() {
-		static uint8_t bom[] = { 0xff, 0xfe };
-		return bom;
+		return Utf32::getBom();
 	}
 
 	static
 	size_t
 	getBomLength() {
-		return 2;
+		return Utf32::getBomLength();
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Utf16_be {
+class Utf32s_be {
 public:
-	typedef utf16_t C;
-	typedef Utf16Encoder_be Encoder;
-	typedef Utf16Decoder_be Decoder;
-	typedef Utf16ReverseDecoder_be ReverseDecoder;
+	typedef char C;
+	typedef Utf32sEncoder_be Encoder;
+	typedef Utf32sDecoder_be Decoder;
+	typedef Utf32sReverseDecoder_be ReverseDecoder;
 
 public:
 	static
 	const uint8_t*
 	getBom() {
-		static uint8_t bom[] = { 0xfe, 0xff };
-		return bom;
+		return Utf32_be::getBom();
 	}
 
 	static
 	size_t
 	getBomLength() {
-		return 2;
+		return Utf32_be::getBomLength();
 	}
 };
 

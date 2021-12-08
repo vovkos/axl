@@ -30,7 +30,7 @@ public:
 
 	virtual
 	void
-	reset();
+	reset(size_t offset);
 
 	virtual
 	bool
@@ -43,6 +43,14 @@ public:
 	bool
 	eof();
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+ExecEngine*
+createExecNfaVm(
+	StateImpl* parent,
+	enc::CharCodecKind codecKind
+);
 
 //..............................................................................
 

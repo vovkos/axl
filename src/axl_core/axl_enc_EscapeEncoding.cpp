@@ -66,7 +66,7 @@ EscapeEncodingDynamic::encode(
 	while (src < srcEnd) {
 		utf32_t decodeBuffer[64];
 
-		EncodeLengthResult result = codec->decode_utf32(
+		ConvertLengthResult result = codec->decode_utf32(
 			&decoderState,
 			decodeBuffer,
 			countof(decodeBuffer),
@@ -153,7 +153,7 @@ EscapeEncodingDynamic::decode(
 	while (src < srcEnd) {
 		utf32_t decodeBuffer[64];
 
-		EncodeLengthResult result = codec->decode_utf32(
+		ConvertLengthResult result = codec->decode_utf32(
 			&decoderState,
 			decodeBuffer,
 			countof(decodeBuffer),

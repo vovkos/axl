@@ -18,7 +18,7 @@ namespace re {
 
 //..............................................................................
 
-class ExecNfaSp: public ExecEngine {
+class ExecNfaSpBase: public ExecEngine {
 protected:
 	sl::Array<MatchPos> m_capturePosArray;
 	NfaStateSet m_consumingStateSetTable[2];
@@ -30,28 +30,20 @@ protected:
 	bool m_isEmpty;
 
 public:
-	ExecNfaSp(StateImpl* parent);
-
-	virtual
-	ExecEngine*
-	clone(StateImpl* parent);
+	ExecNfaSpBase(StateImpl* parent);
 
 	virtual
 	void
-	reset();
-
-	virtual
-	bool
-	exec(
-		const void* p,
-		size_t size
-	);
+	reset(size_t offset);
 
 	virtual
 	bool
 	eof();
 
 protected:
+	void
+	copy(const ExecNfaSpBase* src);
+
 	void
 	addState(const NfaState* state);
 
@@ -70,6 +62,14 @@ protected:
 	bool
 	finalize(bool isEof);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+ExecEngine*
+createExecNfaSp(
+	StateImpl* parent,
+	enc::CharCodecKind codecKind
+);
 
 //..............................................................................
 

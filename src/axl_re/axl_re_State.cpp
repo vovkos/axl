@@ -46,12 +46,12 @@ StateImpl::freeEngine() {
 void
 StateImpl::initialize(
 	uint_t execFlags,
-	enc::CharCodec* codec
+	enc::CharCodecKind codecKind
 ) {
 	freeEngine();
 
 	m_regex = NULL;
-	m_codec = codec;
+	m_codecKind = codecKind;
 	m_decoderState = 0;
 	m_execFlags = execFlags;
 	m_prevChar = '\n';
@@ -64,7 +64,7 @@ StateImpl::clone() {
 
 	state->m_regex = m_regex;
 	state->m_engine = m_engine->clone(state);
-	state->m_codec = m_codec;
+	state->m_codecKind = m_codecKind;
 	state->m_decoderState = m_decoderState;
 	state->m_lastExecBuffer = m_lastExecBuffer;
 	state->m_lastExecOffset = m_lastExecOffset;
@@ -104,17 +104,17 @@ StateImpl::postInitialize(Regex* regex) {
 	switch (m_execFlags & RegexExecFlag_EngineMask) {
 	case 0: // test default
 	case RegexExecFlag_Dfa:
-		m_engine = AXL_MEM_NEW_ARGS(ExecDfa, (this));
+		m_engine = createExecDfa(this, m_codecKind);
 		break;
 
 	case RegexExecFlag_NfaAuto:
 	case RegexExecFlag_NfaVm:
-		m_engine = AXL_MEM_NEW_ARGS(ExecNfaVm, (this));
+		m_engine = createExecNfaVm(this, m_codecKind);
 		break;
 
 	default:
 		ASSERT(false);
-		m_engine = AXL_MEM_NEW_ARGS(ExecNfaVm, (this)); // fall back to threading NFA
+		m_engine = createExecNfaVm(this, m_codecKind); // fall back to threading NFA
 	}
 
 	reset();
@@ -129,7 +129,7 @@ StateImpl::reset() {
 	m_match.m_endOffset = -1;
 	m_subMatchList.clear();
 	m_subMatchArray.clear();
-	m_engine->reset();
+	m_engine->reset(m_offset);
 }
 
 void
@@ -143,11 +143,11 @@ StateImpl::createMatch(
 	m_matchAcceptId = acceptId;
 	m_match.m_offset = matchPos.m_offset;
 	m_match.m_endOffset = matchPos.m_endOffset;
+	m_match.m_text.clear();
+	m_match.m_codec = enc::getCharCodec(m_codecKind);
 
-	if (!(m_execFlags & RegexExecFlag_Stream)) {
-		m_match.m_codec = m_codec;
-		m_match.m_p = (char*)m_lastExecBuffer + m_match.m_offset - m_lastExecOffset;
-	}
+	char* base = (char*)m_lastExecBuffer - m_lastExecOffset;
+	m_match.m_p = !(m_execFlags & RegexExecFlag_Stream) ? base + m_match.m_offset : NULL;
 
 	size_t count = capturePosArray.getCount();
 
@@ -171,8 +171,8 @@ StateImpl::createMatch(
 		match->m_endOffset = pos.m_endOffset;
 
 		if (!(m_execFlags & RegexExecFlag_Stream)) {
-			match->m_codec = m_codec;
-			match->m_p = (char*)m_lastExecBuffer + pos.m_offset - m_lastExecOffset;
+			match->m_codec = m_match.m_codec;
+			match->m_p = base + pos.m_offset;
 		}
 
 		m_subMatchArray[i + 1] = match;
@@ -196,21 +196,25 @@ StateImpl::exec(
 void
 State::initialize(
 	uint_t execFlags,
-	enc::CharCodec* codec
+	enc::CharCodecKind codecKind
 ) {
 	if (!m_p)
 		m_p = AXL_RC_NEW(StateImpl);
 	else
 		ASSERT(m_p.isExclusive());
 
-	m_p->initialize(execFlags, codec);
+	m_p->initialize(execFlags, codecKind);
 }
 
 void
-State::initialize(Regex* regex) {
+State::initialize(
+	uint_t execFlags,
+	enc::CharCodecKind codecKind,
+	Regex* regex
+) {
 	ASSERT(!m_p);
 	m_p = AXL_RC_NEW(StateImpl);
-	m_p->initialize(0, enc::getCharCodec(enc::CharCodecKind_Utf8));
+	m_p->initialize(execFlags, codecKind);
 	m_p->postInitialize(regex);
 }
 
@@ -226,7 +230,7 @@ State::reset(size_t offset) {
 		sl::takeOver(&p, &m_p);
 
 		m_p = AXL_RC_NEW(StateImpl);
-		m_p->initialize(p->m_execFlags, p->m_codec);
+		m_p->initialize(p->m_execFlags, p->m_codecKind);
 		m_p->m_offset = offset;
 		m_p->postInitialize(p->m_regex);
 	}

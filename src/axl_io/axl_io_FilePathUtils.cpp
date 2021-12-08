@@ -12,7 +12,6 @@
 #include "pch.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_err_Error.h"
-#include "axl_enc_Utf.h"
 
 #if (_AXL_OS_WIN)
 #	include "axl_io_File.h"

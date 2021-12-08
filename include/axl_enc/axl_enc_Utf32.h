@@ -62,7 +62,7 @@ class Utf32Encoder_be: public Utf32EncoderBase {
 public:
 	static
 	C*
-	encodeCodePoint(
+	encode(
 		C* p,
 		utf32_t x,
 		utf32_t unused = 0
@@ -85,78 +85,40 @@ public:
 	};
 
 	typedef utf32_t C;
-	typedef uint32_t State; // unused
 
 public:
-	template <typename Encoder>
+	template <typename Emitter>
 	static
-	size_t
-	count(
-		State* unused,
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		return count<Encoder>(p, end, replacement);
-	}
-
-	template <typename Encoder>
-	static
-	size_t
-	count(
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		size_t length = 0;
-
-		for (; p < end; p++) {
-			utf32_t cp = IsBigEndian()() ? sl::swapByteOrder32(*p) : *p;
-			length += Encoder::getEncodeLength(cp, replacement);
-		}
-
-		return length;
-	}
-
-	template <typename Encoder>
-	static
-	EncodeResult<typename Encoder::C, C>
+	const C*
 	decode(
-		State* unused,
-		typename Encoder::C* dst,  // provide room to encode at least 1 codepoint
-		typename Encoder::C* dstEnd,
+		DecoderState* unused,
+		Emitter& emitter,
 		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
+		const C* srcEnd
 	) {
-		return decode<Encoder>(dst, dstEnd, src, srcEnd, replacement);
+		return decode(emitter, src, srcEnd);
 	}
 
-	template <typename Encoder>
+	template <typename Emitter>
 	static
-	EncodeResult<typename Encoder::C, C>
+	const C*
 	decode(
-		typename Encoder::C* dst,  // provide room to encode at least 1 codepoint
-		typename Encoder::C* dstEnd,
+		Emitter& emitter,
 		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
+		const C* srcEnd
 	) {
-		ASSERT(dstEnd - dst >= Encoder::MaxEncodeLength);
-		dstEnd -= Encoder::MaxEncodeLength - 1;
-
 		if (IsReverse()())
-			for (; dst < dstEnd && src > srcEnd; src--) {
-				utf32_t cp = IsBigEndian()() ? sl::swapByteOrder32(*src) : *src;
-				dst = Encoder::encode(dst, cp, replacement);
+			while (src > srcEnd && emitter.canEmit()) {
+				utf32_t c = *src--;
+				emitter.emitCodePoint(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
 			}
 		else
-			for (; dst < dstEnd && src < srcEnd; src++) {
-				utf32_t cp = IsBigEndian()() ? sl::swapByteOrder32(*src) : *src;
-				dst = Encoder::encode(dst, cp, replacement);
+			while (src < srcEnd && emitter.canEmit()) {
+				utf32_t c = *src++;
+				emitter.emitCodePoint(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
 			}
 
-		return EncodeResult<typename Encoder::C, C>(dst, src);
+		return src;
 	}
 };
 
@@ -166,6 +128,54 @@ typedef Utf32DecoderBase<sl::False, sl::False> Utf32Decoder;
 typedef Utf32DecoderBase<sl::True, sl::False>  Utf32ReverseDecoder;
 typedef Utf32DecoderBase<sl::False, sl::True>  Utf32Decoder_be;
 typedef Utf32DecoderBase<sl::True, sl::True>   Utf32ReverseDecoder_be;
+
+//..............................................................................
+
+class Utf32 {
+public:
+	typedef utf32_t C;
+	typedef Utf32Encoder Encoder;
+	typedef Utf32Decoder Decoder;
+	typedef Utf32ReverseDecoder ReverseDecoder;
+
+public:
+	static
+	const uint8_t*
+	getBom() {
+		static uint8_t bom[] = { 0xff, 0xfe, 0x00, 0x00 };
+		return bom;
+	}
+
+	static
+	size_t
+	getBomLength() {
+		return 4;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class Utf32_be {
+public:
+	typedef utf32_t C;
+	typedef Utf32Encoder Encoder;
+	typedef Utf32Decoder Decoder;
+	typedef Utf32ReverseDecoder ReverseDecoder;
+
+public:
+	static
+	const uint8_t*
+	getBom() {
+		static uint8_t bom[] = { 0x00, 0x00, 0xfe, 0xff };
+		return bom;
+	}
+
+	static
+	size_t
+	getBomLength() {
+		return 4;
+	}
+};
 
 //..............................................................................
 

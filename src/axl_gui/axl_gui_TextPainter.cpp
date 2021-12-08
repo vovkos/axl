@@ -442,7 +442,7 @@ TextPainter::buildBinTextBuffer(
 		utf32_t codePoint;
 		size_t leftover = end - p;
 
-		enc::EncodeLengthResult result = codec->decode_utf32(&codePoint, 1, p, leftover);
+		enc::ConvertLengthResult result = codec->decode_utf32(&codePoint, 1, p, leftover);
 		if (!result.m_srcLength) {
 			size_t end = i + leftover;
 			if (end > dataSize)

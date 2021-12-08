@@ -47,7 +47,7 @@ struct StateImpl: public rc::RefCount {
 
 	Regex* m_regex;
 	ExecEngine* m_engine;
-	enc::CharCodec* m_codec;
+	enc::CharCodecKind m_codecKind;
 	uint32_t m_decoderState;
 	StreamState m_streamState;
 	const void* m_lastExecBuffer;
@@ -77,7 +77,7 @@ public:
 	void
 	initialize(
 		uint_t execFlags,
-		enc::CharCodec* codec
+		enc::CharCodecKind codecKind
 	);
 
 	StateImpl*
@@ -192,13 +192,6 @@ public:
 
 	State(
 		uint32_t flags,
-		enc::CharCodec* codec
-	) {
-		initialize(flags, codec);
-	}
-
-	State(
-		uint32_t flags,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
 	) {
 		initialize(flags, codecKind);
@@ -228,10 +221,10 @@ public:
 		return m_p->m_regex;
 	}
 
-	enc::CharCodec*
-	getCodec() const {
+	enc::CharCodecKind
+	getCodecKind() const {
 		ASSERT(m_p);
-		return m_p->m_codec;
+		return m_p->m_codecKind;
 	}
 
 	uint_t
@@ -251,9 +244,6 @@ public:
 		ASSERT(m_p);
 		return m_p->m_matchAcceptId != -1;
 	}
-
-	bool
-	getLeftmostPotentialMatchOffset() const;
 
 	size_t
 	getMatchSwitchCaseId() const {
@@ -281,17 +271,9 @@ public:
 
 	void
 	initialize(
-		uint_t execFlags,
-		enc::CharCodec* codec
-	);
-
-	void
-	initialize(
 		uint_t execFlags = 0,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
-	) {
-		initialize(execFlags, enc::getCharCodec(codecKind));
-	}
+	);
 
 	void
 	reset(size_t offset = 0);
@@ -304,8 +286,13 @@ protected:
 			m_p = m_p->clone();
 	}
 
+
 	void
-	initialize(Regex* regex);
+	initialize(
+		uint_t execFlags,
+		enc::CharCodecKind codecKind,
+		Regex* regex
+	);
 
 	void
 	postInitialize(Regex* regex) {

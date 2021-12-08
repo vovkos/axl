@@ -39,16 +39,22 @@ enum RegexExecFlag {
 
 class ExecEngine {
 protected:
-	enum {
-		DecodeBufferSize = 64
+	enum ExecResult {
+		ExecResult_Undefined = -1,
+		ExecResult_False     = false,
+		ExecResult_True      = true,
 	};
 
 protected:
 	StateImpl* m_parent;
+	ExecResult m_execResult;
+	enc::DecoderState m_decoderState;
 
 public:
 	ExecEngine(StateImpl* parent) {
 		m_parent = parent;
+		m_execResult = ExecResult_Undefined;
+		m_decoderState = 0;
 	}
 
 	virtual
@@ -60,7 +66,7 @@ public:
 
 	virtual
 	void
-	reset() = 0;
+	reset(size_t offset) = 0;
 
 	virtual
 	bool

@@ -184,7 +184,7 @@ public:
 		while (src < srcEnd) {
 			utf32_t buffer[64];
 
-			EncodeLengthResult result = Convert<Utf32, UtfEncoding>::convert(
+			ConvertLengthResult result = Convert<Utf32, UtfEncoding>::convert(
 				buffer,
 				countof(buffer),
 				src,

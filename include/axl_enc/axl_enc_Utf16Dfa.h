@@ -79,34 +79,25 @@ AXL_SELECT_ANY const uchar_t Utf16CcMap::m_map[] = {
 
 //..............................................................................
 
-class Utf16DfaRoot: public UtfDfa<Utf16DfaRoot, Utf16CcMap> {
+class Utf16DfaTable: public UtfDfa<Utf16DfaTable, Utf16CcMap> {
 public:
 	// pre-multiply state values for a tiny bit faster table lookups
 
 	enum State {
 		State_Start             = 0 * CcCount,  // 0  - start state
-		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
-
 		State_Error             = 1 * CcCount,  // 4  - unpaired trail surrogate
 		State_HiSurrogate       = 2 * CcCount,  // 8  - lead surrogate
 		State_HiSurrogate_Error = 3 * CcCount,  // 12 - lead surrogate (with error)
 		State_Ready             = 4 * CcCount,  // 16 - codepoint is ready
 		State_Ready_Error       = 5 * CcCount,  // 20 - codepoint is ready (with error)
 		State_ReadyPair         = 6 * CcCount,  // 24 - codepoint is ready (surrogate pair)
+
+		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
 	};
 
-protected:
 	enum {
 		StateCount = 7,
-	};
-};
-
-//..............................................................................
-
-class Utf16DfaTable: public Utf16DfaRoot {
-public:
-	enum {
-		IsReverse = false,
+		IsReverse  = false,
 	};
 
 protected:
@@ -128,9 +119,24 @@ AXL_SELECT_ANY const uchar_t Utf16DfaTable::m_dfa[] = {
 
 //..............................................................................
 
-class Utf16ReverseDfaTable: public Utf16DfaRoot {
+class Utf16ReverseDfaTable: public UtfDfa<Utf16ReverseDfaTable, Utf16CcMap> {
 public:
+	// pre-multiply state values for a tiny bit faster table lookups
+
+	enum State {
+		State_Start             = 0 * CcCount,  // 0  - start state
+		State_Error             = 1 * CcCount,  // 4  - unpaired trail surrogate
+		State_LoSurrogate       = 2 * CcCount,  // 8  - trail surrogate
+		State_LoSurrogate_Error = 3 * CcCount,  // 12 - trail surrogate (with error)
+		State_Ready             = 4 * CcCount,  // 16 - codepoint is ready
+		State_Ready_Error       = 5 * CcCount,  // 20 - codepoint is ready (with error)
+		State_ReadyPair         = 6 * CcCount,  // 24 - codepoint is ready (surrogate pair)
+
+		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
+	};
+
 	enum {
+		StateCount = 7,
 		IsReverse = true,
 	};
 
@@ -142,13 +148,13 @@ protected:
 
 AXL_SELECT_ANY const uchar_t Utf16ReverseDfaTable::m_dfa[] = {
 //  Cc_Single          Cc_HiSurrogate   Cc_LoSurrogate
-	State_Ready,       State_Error,     State_HiSurrogate,       0,  // 0  - State_Start
-	State_Ready,       State_Error,     State_HiSurrogate,       0,  // 4  - State_Error
-	State_Ready_Error, State_ReadyPair, State_HiSurrogate_Error, 0,  // 8  - State_HiSurrogate
-	State_Ready_Error, State_ReadyPair, State_HiSurrogate_Error, 0,  // 12 - State_HiSurrogate_Error
-	State_Ready,       State_Error,     State_HiSurrogate,       0,  // 16 - State_Ready
-	State_Ready,       State_Error,     State_HiSurrogate,       0,  // 20 - State_Ready_Error
-	State_Ready,       State_Error,     State_HiSurrogate,       0,  // 24 - State_ReadyPair
+	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 0  - State_Start
+	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 4  - State_Error
+	State_Ready_Error, State_ReadyPair, State_LoSurrogate_Error, 0,  // 8  - State_LoSurrogate
+	State_Ready_Error, State_ReadyPair, State_LoSurrogate_Error, 0,  // 12 - State_LoSurrogate_Error
+	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 16 - State_Ready
+	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 20 - State_Ready_Error
+	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 24 - State_ReadyPair
 };
 
 //..............................................................................
@@ -219,8 +225,9 @@ Utf16DfaBase<DfaTable, IsBigEndian>::decode(uint16_t c) {
 	if (IsBigEndian()())
 		c = sl::swapByteOrder16(c);
 
-	m_cp = nextState == State_ReadyPair ?
-		0x10000 - (0xd800 << 10) - 0xdc00 + (IsReverse ? (c << 10) + m_cp : (m_cp << 10) + c) :
+	m_cp = nextState == State_ReadyPair ? IsReverse ?
+		0x10000 - (0xd800 << 10) - 0xdc00 + (c << 10) + m_cp :
+		0x10000 - (0xd800 << 10) - 0xdc00 + (m_cp << 10) + c :
 		c;
 
 	return m_state = nextState;

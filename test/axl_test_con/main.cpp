@@ -5819,10 +5819,10 @@ testUtf8() {
 
 	printf("\nAXL UTF-8 rDFA:\n");
 
-	enc::Utf8ReverseDfa rdfa;
+	enc::Utf8ReverseDfa dfa2;
 
 	for (intptr_t i = length - 1, j = i; i >= 0; i--) {
-		uint_t state = rdfa.decode(data[i]);
+		uint_t state = dfa2.decode(data[i]);
 		if (enc::Utf8ReverseDfa::isError(state))
 			if (state == enc::Utf8ReverseDfa::State_Error) // standalone error
 				do {
@@ -5837,7 +5837,7 @@ testUtf8() {
 			}
 
 		if (enc::Utf8ReverseDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, rdfa.getCodePoint(), rdfa.getCodePoint());
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, dfa2.getCodePoint(), dfa2.getCodePoint());
 			j = i - 1;
 		}
 	}
@@ -5850,10 +5850,10 @@ testUtf8() {
 
 void
 testUtf16() {
-	printf("\nUTF-16 DFA:\n");
-
 	sl::String_utf16 data((char*)g_data, sizeof(g_data));
 	size_t length = data.getLength();
+
+	printf("\nUTF-16 DFA:\n");
 
 	enc::Utf16Dfa dfa;
 
@@ -5872,22 +5872,59 @@ testUtf16() {
 
 	printf("\nUTF-16 rDFA:\n");
 
-	enc::Utf16ReverseDfa rdfa;
+	enc::Utf16ReverseDfa dfa2;
 
 	for (intptr_t i = length - 1, j = i; i >= 0; i--) {
-		uint_t state = rdfa.decode(data[i]);
+		uint_t state = dfa2.decode(data[i]);
 		if (enc::Utf16ReverseDfa::isError(state)) {
 			printf("@%04x:%04x: broken cp\n", j, j);
 			j--;
 		}
 
 		if (enc::Utf16ReverseDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, rdfa.getCodePoint(), rdfa.getCodePoint());
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, dfa2.getCodePoint(), dfa2.getCodePoint());
 			j = i - 1;
 		}
 	}
 
-	printf("sequence end: @%04x\n", length);
+	char* data2 = (char*)data.cp();
+	size_t length2 = length * 2;
+
+	printf("\nUTF-16-S DFA:\n");
+
+	enc::Utf16sDfa dfa3;
+
+	for (size_t i = 0, j = i; i < length2; i++) {
+		uint_t state = dfa3.decode(data2[i]);
+		if (enc::Utf16sDfa::isError(state)) {
+			printf("@%04x:%04x: broken cp\n", j, j);
+			j--;
+		}
+
+		if (enc::Utf16sDfa::isReady(state)) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa3.getCodePoint(), dfa3.getCodePoint());
+			j = i + 1;
+		}
+	}
+
+	printf("\nUTF-16-S rDFA:\n");
+
+	enc::Utf16sReverseDfa dfa4;
+
+	for (intptr_t i = length2 - 1, j = i; i >= 0; i--) {
+		uint_t state = dfa4.decode(data2[i]);
+		if (enc::Utf16sReverseDfa::isError(state)) {
+			printf("@%04x:%04x: broken cp\n", j, j);
+			j--;
+		}
+
+		if (enc::Utf16sReverseDfa::isReady(state)) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, dfa4.getCodePoint(), dfa4.getCodePoint());
+			j = i - 1;
+		}
+	}
+
+	printf("sequence end: @%04x\n", length2);
 	printf("\ndone!\n");
 }
 
@@ -6007,16 +6044,6 @@ testUtf8Encode() {
 	printf("done, %.3f sec\n", (double)time / 10000000);
 }
 
-//..............................................................................
-
-void
-testConvert() {
-	utf8_t source[] = "abc";
-	utf16_t buffer[128] = { 0 };
-
-
-}
-
 } // namespace utf
 
 //..............................................................................
@@ -6054,10 +6081,8 @@ main(
 #endif
 
 	// utf::testUtf8();
-	// utf::testUtf16();
+	utf::testUtf16();
 	// utf::testUtf8Encode();
-
-	utf::testConvert();
 	return 0;
 }
 

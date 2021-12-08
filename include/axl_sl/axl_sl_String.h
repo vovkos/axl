@@ -775,7 +775,7 @@ protected:
 	int
 	cmpIgnoreCase_pcp(const StringRef& string) const {
 		typedef enc::Convert<enc::Utf32, Encoding> Convert;
-		typedef enc::EncodeResult<utf32_t, C> DecodeResult;
+		typedef enc::ConvertResult<utf32_t, C> ConvertResult;
 
 		const C* p1 = m_p;
 		const C* end1 = p1 + m_length;
@@ -786,8 +786,8 @@ protected:
 			utf32_t buffer1[64];
 			utf32_t buffer2[64];
 
-			DecodeResult result1 = Convert::convert(buffer1, buffer1 + countof(buffer1), p1, end1);
-			DecodeResult result2 = Convert::convert(buffer2, buffer2 + countof(buffer2), p2, end2);
+			ConvertResult result1 = Convert::convert(buffer1, buffer1 + countof(buffer1), p1, end1);
+			ConvertResult result2 = Convert::convert(buffer2, buffer2 + countof(buffer2), p2, end2);
 
 			size_t length1 = result1.m_dst - buffer1;
 			size_t length2 = result2.m_dst - buffer2;
@@ -828,7 +828,7 @@ protected:
 	size_t
 	hashIgnoreCase_pcp() const {
 		typedef enc::Convert<enc::Utf32, Encoding> Convert;
-		typedef enc::EncodeResult<utf32_t, C> DecodeResult;
+		typedef enc::ConvertResult<utf32_t, C> ConvertResult;
 
 		size_t h = djb2();
 		const C* p = m_p;
@@ -836,7 +836,7 @@ protected:
 
 		while (p < end) {
 			utf32_t buffer[128];
-			DecodeResult result = Convert::convert(buffer, buffer + countof(buffer), p, end);
+			ConvertResult result = Convert::convert(buffer, buffer + countof(buffer), p, end);
 			h = djb2_op(enc::toCaseFolded, h, buffer, result.m_dst - buffer);
 			p = result.m_src;
 		}
@@ -1215,11 +1215,13 @@ public:
 			return 0;
 		}
 
+		// TODO: remove pre-calculation of required length
+
 		size_t newLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, length);
 		if (!createBuffer(newLength, false))
 			return -1;
 
-		enc::Convert<Encoding, Encoding2>::convert(this->m_p, newLength, p, length);
+		enc::Convert<Encoding, Encoding2>::convert_u(this->m_p, p, length);
 		return newLength;
 	}
 
@@ -1236,11 +1238,13 @@ public:
 			return 0;
 		}
 
+		// TODO: remove pre-calculation of required length
+
 		size_t newLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, length);
 		if (!createBuffer(newLength, false))
 			return -1;
 
-		enc::Convert<Encoding, Encoding3>::convert(this->m_p, newLength, p, length);
+		enc::Convert<Encoding, Encoding3>::convert_u(this->m_p, p, length);
 		return newLength;
 	}
 
@@ -1398,12 +1402,14 @@ public:
 		if (length == 0)
 			return oldLength;
 
+		// TODO: remove pre-calculation of required length
+
 		size_t insertLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, length);
 		C* dst = insertSpace(index, insertLength);
 		if (!dst)
 			return -1;
 
-		enc::Convert<Encoding, Encoding2>::convert(dst, insertLength, p, length);
+		enc::Convert<Encoding, Encoding2>::convert_u(dst, p, length);
 		return oldLength + insertLength;
 	}
 
@@ -1421,12 +1427,14 @@ public:
 		if (length == 0)
 			return oldLength;
 
+		// TODO: remove pre-calculation of required length
+
 		size_t insertLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, length);
 		C* dst = insertSpace(index, insertLength);
 		if (!dst)
 			return -1;
 
-		enc::Convert<Encoding, Encoding3>::convert(dst, insertLength, p, length);
+		enc::Convert<Encoding, Encoding3>::convert_u(dst, p, length);
 		return oldLength + insertLength;
 	}
 
@@ -1907,7 +1915,7 @@ protected:
 		if (!p)
 			return -1;
 
-		enc::Convert<Encoding, Encoding, CaseOp>::convert(p, length, src.cp(), src.getLength());
+		enc::Convert<Encoding, Encoding, CaseOp>::convert_u(p, src.cp(), src.getLength());
 		return length;
 	}
 };

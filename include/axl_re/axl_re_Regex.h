@@ -41,7 +41,7 @@ enum RegexCompileFlag {
 
 class Regex {
 	friend class Compiler;
-	friend class ExecDfa;
+	friend class ExecDfaBase;
 	friend class DfaBuilder;
 
 protected:
@@ -227,22 +227,12 @@ public:
 	State
 	exec(
 		uint_t flags,
-		enc::CharCodec* codec,
-		const void* p,
-		size_t size
-	) {
-		State state(flags, codec);
-		return exec(&state, p, size) ? state : State();
-	}
-
-	State
-	exec(
-		uint_t flags,
 		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t size
 	) {
-		return exec(flags, enc::getCharCodec(codecKind), p, size);
+		State state(flags, codecKind);
+		return exec(&state, p, size) ? state : State();
 	}
 
 	State

@@ -61,72 +61,40 @@ public:
 	};
 
 	typedef char C;
-	typedef uint32_t State; // unused
 
 public:
-	template <typename Encoder>
+	template <typename Emitter>
 	static
-	size_t
-	count(
-		State* unused,
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		return count<Encoder>(p, end, replacement);
-	}
-
-	template <typename Encoder>
-	static
-	size_t
-	count(
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		size_t length = 0;
-
-		for (; p < p; p++)
-			length += Encoder::getEncodeLength((uchar_t)*p, replacement);
-
-		return length;
-	}
-
-	template <typename Encoder>
-	static
-	EncodeResult<typename Encoder::C, C>
+	const C*
 	decode(
-		State* unused,
-		typename Encoder::C* dst,  // provide room to encode at least 1 codepoint
-		typename Encoder::C* dstEnd,
+		DecoderState* unused,
+		Emitter& action,
 		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
+		const C* srcEnd
 	) {
-		return decode(dst, dstEnd, src, srcEnd, replacement);
+		return decode(action, src, srcEnd);
 	}
 
-	template <typename Encoder>
+	template <typename Emitter>
 	static
-	EncodeResult<typename Encoder::C, C>
+	const C*
 	decode(
-		typename Encoder::C* dst,  // provide room to encode at least 1 codepoint
-		typename Encoder::C* dstEnd,
+		Emitter& emitter,
 		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
+		const C* srcEnd
 	) {
-		ASSERT(dstEnd - dst >= Encoder::MaxEncodeLength);
-		dstEnd -= Encoder::MaxEncodeLength - 1;
-
 		if (IsReverse()())
-			for (; dst < dstEnd && src > srcEnd; src--)
-				dst = Encoder::encode(dst, (uchar_t)*src, replacement);
+			while (src > srcEnd && emitter.canEmit()) {
+				utf32_t cp = (uchar_t)*src--;
+				emitter.emitCodePoint(src, cp);
+			}
 		else
-			for (; dst < dstEnd && src < srcEnd; src++)
-				dst = Encoder::encode(dst, (uchar_t)*src, replacement);
+			while (src < srcEnd && emitter.canEmit()) {
+				utf32_t cp = (uchar_t)*src++;
+				emitter.emitCodePoint(src, cp);
+			}
 
-		return EncodeResult<typename Encoder::C, C>(dst, src);
+		return src;
 	}
 };
 
@@ -134,6 +102,16 @@ public:
 
 typedef AsciiDecoderBase<sl::False> AsciiDecoder;
 typedef AsciiDecoderBase<sl::True>  AsciiReverseDecoder;
+
+//..............................................................................
+
+class Ascii {
+public:
+	typedef char C;
+	typedef AsciiEncoder Encoder;
+	typedef AsciiDecoder Decoder;
+	typedef AsciiReverseDecoder ReverseDecoder;
+};
 
 //..............................................................................
 

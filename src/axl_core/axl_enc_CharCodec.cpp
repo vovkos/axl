@@ -11,6 +11,8 @@
 
 #include "pch.h"
 #include "axl_enc_CharCodec.h"
+#include "axl_enc_Utf16s.h"
+#include "axl_enc_Utf32s.h"
 
 namespace axl {
 namespace enc {
@@ -19,14 +21,14 @@ namespace enc {
 
 CharCodec*
 getCharCodec(CharCodecKind codecKind) {
-	static AsciiCodec         asciiCodec;
-	static UtfCodec<Utf8>     utf8Codec;
-	static UtfCodec<Utf16>    utf16Codec;
-	static UtfCodec<Utf16_be> utf16Codec_be;
-	static UtfCodec<Utf32>    utf32Codec;
-	static UtfCodec<Utf32_be> utf32Codec_be;
+	static StdCodec<Ascii>     asciiCodec;
+	static StdCodec<Utf8>      utf8Codec;
+	static StdCodec<Utf16s>    utf16Codec;
+	static StdCodec<Utf16s_be> utf16Codec_be;
+	static StdCodec<Utf32s>    utf32Codec;
+	static StdCodec<Utf32s_be> utf32Codec_be;
 
-	static CharCodec* codecTable[] = {
+	static CharCodec* codecTable[CharCodecKind__Count] = {
 		&asciiCodec,
 		&utf8Codec,
 		&utf16Codec,
@@ -47,13 +49,12 @@ CharCodec::encode_utf8(
 	size_t length
 ) {
 	buffer->clear();
-	buffer->reserve(length * m_unitSize);
 
 	const utf8_t* end = p + length;
 	while (p < end) {
 		char tmpBuffer[256];
 
-		EncodeLengthResult result = encode_utf8(tmpBuffer, sizeof(tmpBuffer), p, end - p);
+		ConvertLengthResult result = encode_utf8(tmpBuffer, sizeof(tmpBuffer), p, end - p);
 		if (!result.m_srcLength)
 			break;
 
@@ -74,13 +75,12 @@ CharCodec::encode_utf16(
 	size_t length
 ) {
 	buffer->clear();
-	buffer->reserve(length * m_unitSize);
 
 	const utf16_t* end = p + length;
 	while (p < end) {
 		char tmpBuffer[256];
 
-		EncodeLengthResult result = encode_utf16(tmpBuffer, sizeof(tmpBuffer), p, end - p);
+		ConvertLengthResult result = encode_utf16(tmpBuffer, sizeof(tmpBuffer), p, end - p);
 		if (!result.m_srcLength)
 			break;
 
@@ -101,13 +101,12 @@ CharCodec::encode_utf32(
 	size_t length
 ) {
 	buffer->clear();
-	buffer->reserve(length * m_unitSize);
 
 	const utf32_t* end = p + length;
 	while (p < end) {
 		char tmpBuffer[256];
 
-		EncodeLengthResult result = encode_utf32(tmpBuffer, sizeof(tmpBuffer), p, end - p);
+		ConvertLengthResult result = encode_utf32(tmpBuffer, sizeof(tmpBuffer), p, end - p);
 		if (!result.m_srcLength)
 			break;
 
@@ -126,22 +125,17 @@ CharCodec::encode_utf32(
 size_t
 CharCodec::decode_utf8(
 	sl::String_utf8* string,
-	const void* _p,
+	const void* p0,
 	size_t size
 ) {
-	size_t length = size / m_unitSize;
-	size_t leftover = size % m_unitSize;
-
 	string->clear();
-	string->reserve(length);
 
 	DecoderState state = 0;
-	const char* p = (const char*) _p;
-	const char* end = p + size - leftover;
+	const char* p = (const char*)p0;
+	const char* end = p + size;
 	while (p < end) {
 		utf8_t tmpBuffer[256];
-
-		EncodeLengthResult result = decode_utf8(&state, tmpBuffer, countof(tmpBuffer), p, end - p);
+		ConvertLengthResult result = decode_utf8(&state, tmpBuffer, countof(tmpBuffer), p, end - p);
 		if (!result.m_srcLength)
 			break;
 
@@ -158,22 +152,17 @@ CharCodec::decode_utf8(
 size_t
 CharCodec::decode_utf16(
 	sl::String_utf16* string,
-	const void* _p,
+	const void* p0,
 	size_t size
 ) {
-	size_t length = size / m_unitSize;
-	size_t leftover = size % m_unitSize;
-
 	string->clear();
-	string->reserve(length);
 
 	DecoderState state = 0;
-	const char* p = (const char*) _p;
-	const char* end = p + size - leftover;
+	const char* p = (const char*)p0;
+	const char* end = p + size;
 	while (p < end) {
 		utf16_t tmpBuffer[256];
-
-		EncodeLengthResult result = decode_utf16(&state, tmpBuffer, countof(tmpBuffer), p, end - p);
+		ConvertLengthResult result = decode_utf16(&state, tmpBuffer, countof(tmpBuffer), p, end - p);
 		if (!result.m_srcLength)
 			break;
 
@@ -190,22 +179,17 @@ CharCodec::decode_utf16(
 size_t
 CharCodec::decode_utf32(
 	sl::String_utf32* string,
-	const void* _p,
+	const void* p0,
 	size_t size
 ) {
-	size_t length = size / m_unitSize;
-	size_t leftover = size % m_unitSize;
-
 	string->clear();
-	string->reserve(length);
 
 	DecoderState state = 0;
-	const char* p = (const char*) _p;
-	const char* end = p + size - leftover;
+	const char* p = (const char*)p0;
+	const char* end = p + size;
 	while (p < end) {
 		utf32_t tmpBuffer[256];
-
-		EncodeLengthResult result = decode_utf32(&state, tmpBuffer, countof(tmpBuffer), p, end - p);
+		ConvertLengthResult result = decode_utf32(&state, tmpBuffer, countof(tmpBuffer), p, end - p);
 		if (!result.m_srcLength)
 			break;
 

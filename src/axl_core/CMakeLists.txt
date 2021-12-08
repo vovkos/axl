@@ -210,10 +210,13 @@ set(
 	${AXL_INC_DIR}/axl_enc/axl_enc_UtfDfa.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf8Dfa.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16Dfa.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16sDfa.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf32sDfa.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf8.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16s.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf32.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Utf.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Utf32s.h
 	icu_def.h
 	icu_uchar_props_data.h
 	icu_ucase_props_data.h
@@ -228,7 +231,6 @@ set(
 	axl_enc_EscapeEncoding.cpp
 	axl_enc_HexEncoding.cpp
 	axl_enc_Unicode.cpp
-	axl_enc_Utf.cpp
 	axl_enc_Leb128.cpp
 )
 

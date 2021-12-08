@@ -20,29 +20,18 @@ struct DfaState;
 
 //..............................................................................
 
-class ExecDfa: public ExecEngine {
+class ExecDfaBase: public ExecEngine {
 protected:
-	const DfaState* m_state;
+	const DfaState* m_dfaState;
 	size_t m_matchEndOffset;
 	size_t m_matchAcceptId;
 
 public:
-	ExecDfa(StateImpl* parent);
-
-	virtual
-	ExecEngine*
-	clone(StateImpl* parent);
+	ExecDfaBase(StateImpl* parent);
 
 	virtual
 	void
-	reset();
-
-	virtual
-	bool
-	exec(
-		const void* p,
-		size_t size
-	);
+	reset(size_t offset);
 
 	virtual
 	bool
@@ -50,11 +39,34 @@ public:
 
 protected:
 	void
-	gotoState(const DfaState* state);
+	copy(const ExecDfaBase* src);
+
+	void
+	gotoDfaStateImpl(const DfaState* state);
+
+	void
+	gotoDfaState(
+		size_t offset,
+		const DfaState* state
+	);
+
+	void
+	gotoDfaState(
+		const void* p,
+		const DfaState* state
+	);
 
 	bool
 	finalize(bool isEof);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+ExecEngine*
+createExecDfa(
+	StateImpl* parent,
+	enc::CharCodecKind codecKind
+);
 
 //..............................................................................
 

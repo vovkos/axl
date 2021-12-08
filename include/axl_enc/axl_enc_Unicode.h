@@ -101,22 +101,113 @@ public:
 
 //..............................................................................
 
-// common result structure for encoders/decoders/converters
+// the decoder state (if any) must fit in 32 bits
+
+typedef uint32_t DecoderState;
+
+//..............................................................................
+
+/*
+
+// Unicode char encoder interface:
+
+class Encoder {
+public:
+	enum {
+		MaxEncodeLength, // maximum number of code units per code point
+	};
+
+	typedef <code-unit-type> C;
+
+public:
+	static
+	size_t
+	getEncodeLength(
+		utf32_t cp,
+		utf32_t replacement = StdChar_Replacement
+	);
+
+	static
+	C*
+	encode(
+		C* p,
+		utf32_t cp,
+		utf32_t replacement = StdChar_Replacement
+	);
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// Unicode char decode emitter interface:
+
+class Emitter {
+public:
+	bool
+	canEmit() const;
+
+	// invoked for each codepoint (return true to continue, false to halt)
+
+	void
+	emitCodePoint(
+		const C* src,
+		utf32_t cp
+	);
+
+	void
+	emitReplacement(const C* src);
+};
+
+// Unicode char decoder interface:
+
+class Decoder {
+public:
+	enum {
+		MaxEmitLength, // maximum number of code points emitted at once
+	};
+
+	typedef <code-unit-type> C;
+
+public:
+	template <typename Emitter>
+	static
+	const C*
+	decode(
+		DecoderState* state,
+		Emitter& emitter,
+		const C* src,
+		const C* srcEnd
+	);
+
+	template <typename Emitter>
+	static
+	const C*
+	decode(
+		Emitter& emitter,
+		const C* src,
+		const C* srcEnd
+	);
+};
+
+*/
+
+//..............................................................................
+
+// common result structures for encoding converstions
 
 template <
 	typename DstUnit,
 	typename SrcUnit
 >
-struct EncodeResult {
+struct ConvertResult {
 	DstUnit* m_dst;
 	const SrcUnit* m_src;
 
-	EncodeResult() {
+	ConvertResult() {
 		m_dst = NULL;
 		m_src = NULL;
 	}
 
-	EncodeResult(
+	ConvertResult(
 		DstUnit* dst,
 		const SrcUnit* src
 	) {
@@ -127,16 +218,16 @@ struct EncodeResult {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct EncodeLengthResult {
+struct ConvertLengthResult {
 	size_t m_dstLength; // in code-units
 	size_t m_srcLength; // in code-units
 
-	EncodeLengthResult() {
+	ConvertLengthResult() {
 		m_dstLength = 0;
 		m_srcLength = 0;
 	}
 
-	EncodeLengthResult(
+	ConvertLengthResult(
 		size_t dstLength,
 		size_t srcLength
 	) {
@@ -176,94 +267,6 @@ public:
 };
 
 //..............................................................................
-/*
-
-// Unicode char encoder interface:
-
-class Encoder {
-public:
-	enum {
-		MaxEncodeLength, // maximum number of code units per code point
-	};
-
-	typedef int C;
-
-public:
-	static
-	size_t
-	getEncodeLength(
-		utf32_t cp,
-		utf32_t replacement = StdChar_Replacement
-	);
-
-	static
-	C*
-	encode(
-		C* p,
-		utf32_t cp,
-		utf32_t replacement = StdChar_Replacement
-	);
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// Unicode char decoder interface:
-
-class Decoder {
-public:
-	enum {
-		MaxEmitLength,   // maximum number of code points emitted at once
-	};
-
-	typedef int C;     // code unit type
-	typedef int State; // decoder state storage (if any)
-
-public:
-	template <typename Encoder>
-	static
-	size_t
-	count(
-		State* state,
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
-	);
-
-	template <typename Encoder>
-	static
-	size_t
-	count(
-		const C* p,
-		const C* end,
-		utf32_t replacement = StdChar_Replacement
-	);
-
-	template <typename Encoder>
-	static
-	EncodeResult<typename Encoder::C, C>
-	decode(
-		State* state,
-		typename Encoder::C* dst,
-		typename Encoder::C* dstEnd,
-		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
-	);
-
-	template <typename Encoder>
-	static
-	EncodeResult<typename Encoder::C, C>
-	decode(
-		typename Encoder::C* dst,
-		typename Encoder::C* dstEnd,
-		const C* src,
-		const C* srcEnd,
-		utf32_t replacement = StdChar_Replacement
-	);
-};
-
-*/
-//..............................................................................
 
 template <
 	typename DstEncoding0,
@@ -276,10 +279,102 @@ public:
 	typedef SrcEncoding0 SrcEncoding;
 	typedef typename DstEncoding::C DstUnit;
 	typedef typename SrcEncoding::C SrcUnit;
-	typedef OpEncoder<typename DstEncoding::Encoder, Op> Encoder;
+	typedef typename DstEncoding::Encoder Encoder;
 	typedef typename SrcEncoding::Decoder Decoder;
-	typedef typename SrcEncoding::Decoder::State DecoderState;
-	typedef EncodeResult<DstUnit, SrcUnit> ConvertResult;
+	typedef ConvertResult<DstUnit, SrcUnit> ConvertResult;
+
+	class CountingEmitter {
+	protected:
+		size_t m_length;
+		utf32_t m_replacement;
+
+	public:
+		CountingEmitter(utf32_t replacement) {
+			m_length = 0;
+			m_replacement = replacement;
+		}
+
+		size_t
+		getLength() const {
+			return m_length;
+		}
+
+		bool
+		canEmit() const {
+			return true;
+		}
+
+		void
+		emitCodePoint(
+			const SrcUnit* p,
+			utf32_t cp
+		) {
+			m_length += Encoder::getEncodeLength(Op()(cp), m_replacement);
+		}
+
+		void
+		emitReplacement(const SrcUnit* p) {
+			m_length += Encoder::getEncodeLength(m_replacement);
+		}
+	};
+
+	class EncodingEmitter_u {
+	protected:
+		DstUnit* m_p;
+		utf32_t m_replacement;
+
+	public:
+		EncodingEmitter_u(
+			DstUnit* p,
+			utf32_t replacement
+		) {
+			m_p = p;
+			m_replacement = replacement;
+		}
+
+		DstUnit*
+		p() const {
+			return m_p;
+		}
+
+		bool
+		canEmit() const {
+			return true;
+		}
+
+		void
+		emitCodePoint(
+			const SrcUnit* p,
+			utf32_t cp
+		) {
+			m_p = Encoder::encode(m_p, Op()(cp), m_replacement);
+		}
+
+		void
+		emitReplacement(const SrcUnit* p) {
+			m_p = Encoder::encode(m_p, m_replacement);
+		}
+	};
+
+	class EncodingEmitter_s: public EncodingEmitter_u {
+	protected:
+		DstUnit* m_end;
+
+	public:
+		EncodingEmitter_s(
+			DstUnit* p,
+			DstUnit* end,
+			utf32_t replacement
+		): EncodingEmitter_u(p, replacement) {
+			ASSERT(end - p >= Decoder::MaxEmitLength * Encoder::MaxEncodeLength);
+			m_end = end - Decoder::MaxEmitLength * Encoder::MaxEncodeLength - 1;
+		}
+
+		bool
+		canEmit() const {
+			return m_p < m_end;
+		}
+	};
 
 public:
 	static
@@ -290,7 +385,9 @@ public:
 		const SrcUnit* end,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Decoder::count<Encoder>(state, p, end, replacement);
+		CountingEmitter emitter(replacement);
+		Decoder::decode(state, emitter, p, end);
+		return emitter.getLength();
 	}
 
 	static
@@ -301,7 +398,7 @@ public:
 		size_t length,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Decoder::count<Encoder>(state, p, p + length, replacement);
+		return calcRequiredLength(state, p, p + length, replacement);
 	}
 
 	static
@@ -311,7 +408,9 @@ public:
 		const SrcUnit* end,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Decoder::count<Encoder>(p, end, replacement);
+		CountingEmitter emitter(replacement);
+		Decoder::decode(emitter, p, end);
+		return emitter.getLength();
 	}
 
 	static
@@ -321,7 +420,59 @@ public:
 		size_t length,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Decoder::count<Encoder>(p, p + length, replacement);
+		return calcRequiredLength(p, p + length, replacement);
+	}
+
+	static
+	ConvertResult
+	convert_u(
+		DecoderState* state,
+		DstUnit* dst,
+		const SrcUnit* src,
+		const SrcUnit* srcEnd,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		EncodingEmitter_u emitter(dst, replacement);
+		src = Decoder::decode(state, emitter, src, srcEnd);
+		return ConvertResult(emitter.p(), src);
+	}
+
+	static
+	ConvertLengthResult
+	convert_u(
+		DecoderState* state,
+		DstUnit* dst,
+		const SrcUnit* src,
+		size_t srcLength,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		ConvertResult result = convert_u(state, dst, src, src + srcLength, replacement);
+		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
+	}
+
+	static
+	ConvertResult
+	convert_u(
+		DstUnit* dst,
+		const SrcUnit* src,
+		const SrcUnit* srcEnd,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		EncodingEmitter_u emitter(dst, replacement);
+		src = Decoder::decode(emitter, src, srcEnd);
+		return ConvertResult(emitter.p(), src);
+	}
+
+	static
+	ConvertLengthResult
+	convert_u(
+		DstUnit* dst,
+		const SrcUnit* src,
+		size_t srcLength,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		ConvertResult result = convert_u(dst, src, src + srcLength, replacement);
+		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 
 	static
@@ -334,11 +485,13 @@ public:
 		const SrcUnit* srcEnd,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Decoder::decode<Encoder>(state, dst, dstEnd, src, srcEnd, replacement);
+		EncodingEmitter_s emitter(dst, dstEnd, replacement);
+		src = Decoder::decode(state, emitter, src, srcEnd);
+		return ConvertResult(emitter.p(), src);
 	}
 
 	static
-	EncodeLengthResult
+	ConvertLengthResult
 	convert(
 		DecoderState* state,
 		DstUnit* dst,
@@ -347,8 +500,8 @@ public:
 		size_t srcLength,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertResult result = Decoder::decode<Encoder>(state, dst, dst + dstLength, src, src + srcLength, replacement);
-		return EncodeLengthResult(result.m_dst - dst, result.m_src - src);
+		ConvertResult result = convert(state, dst, dst + dstLength, src, src + srcLength, replacement);
+		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 
 	static
@@ -360,11 +513,13 @@ public:
 		const SrcUnit* srcEnd,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Decoder::decode<Encoder>(dst, dstEnd, src, srcEnd, replacement);
+		EncodingEmitter_s emitter(dst, dstEnd, replacement);
+		src = Decoder::decode(emitter, src, srcEnd);
+		return ConvertResult(emitter.p(), src);
 	}
 
 	static
-	EncodeLengthResult
+	ConvertLengthResult
 	convert(
 		DstUnit* dst,
 		size_t dstLength,
@@ -372,8 +527,8 @@ public:
 		size_t srcLength,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertResult result = Decoder::decode<Encoder>(dst, dst + dstLength, src, src + srcLength, replacement);
-		return EncodeLengthResult(result.m_dst - dst, result.m_src - src);
+		ConvertResult result = convert(dst, dst + dstLength, src, src + srcLength, replacement);
+		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 };
 
