@@ -9,48 +9,40 @@
 //
 //..............................................................................
 
-#pragma once
-
-#include "axl_re_State.h"
+#include "pch.h"
+#include "axl_re_Exec.h"
 
 namespace axl {
 namespace re {
 
 //..............................................................................
 
-class ExecNfaVm: public ExecEngine {
-public:
-	ExecNfaVm(StateImpl* parent):
-		ExecEngine(parent) {
-	}
+ExecEngine::ExecEngine(StateImpl* parent) {
+	m_parent = parent;
+	m_execResult = ExecResult_Undefined;
+	m_decoderState = 0;
+	m_p = NULL;
+	m_matchEnd = NULL;
+	m_matchEndOffset = -1;
+	m_matchAcceptId = -1;
+}
 
-	virtual
-	ExecEngine*
-	clone(StateImpl* parent);
+void
+ExecEngine::reset(size_t offset) {
+	m_decoderState = 0;
+	m_matchEnd = NULL;
+	m_matchEndOffset = -1;
+	m_matchAcceptId = -1;
+}
 
-	virtual
-	void
-	reset(size_t offset);
-
-	virtual
-	void
-	exec(
-		const void* p,
-		size_t size
-	);
-
-	virtual
-	bool
-	eof();
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-ExecEngine*
-createExecNfaVm(
-	StateImpl* parent,
-	enc::CharCodecKind codecKind
-);
+void
+ExecEngine::copy(const ExecEngine* src) {
+	m_decoderState = src->m_decoderState;
+	m_p = src->m_p;
+	m_matchEnd = src->m_matchEnd;
+	m_matchEndOffset = src->m_matchEndOffset;
+	m_matchAcceptId = src->m_matchAcceptId;
+}
 
 //..............................................................................
 

@@ -171,10 +171,7 @@ protected:
 
 	template <typename IsReverse>
 	void
-	finalzeAnchorTransitionMap(
-		DfaState* state,
-		DfaAnchorTransitionPreMap& preMap
-	);
+	finalzeAnchorTransitionMap(DfaState* state);
 
 	bool
 	buildCharTransitionMap(DfaState* state); // returns if state has match-anchors (to save a loop)

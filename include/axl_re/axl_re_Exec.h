@@ -49,16 +49,32 @@ protected:
 	StateImpl* m_parent;
 	ExecResult m_execResult;
 	enc::DecoderState m_decoderState;
+	const void* m_p;
+	const void* m_matchEnd;
+	size_t m_matchEndOffset;
+	size_t m_matchAcceptId;
 
 public:
-	ExecEngine(StateImpl* parent) {
-		m_parent = parent;
-		m_execResult = ExecResult_Undefined;
-		m_decoderState = 0;
-	}
+	ExecEngine(StateImpl* parent);
 
 	virtual
 	~ExecEngine() {}
+
+	bool
+	getExecResult() const {
+		return m_execResult != ExecResult_False; // true or undefined
+	}
+
+	const void*
+	p() const {
+		return m_p;
+	}
+
+	inline
+	void
+	preExec() {
+		m_execResult = ExecResult_Undefined;
+	}
 
 	virtual
 	ExecEngine*
@@ -66,10 +82,10 @@ public:
 
 	virtual
 	void
-	reset(size_t offset) = 0;
+	reset(size_t offset);
 
 	virtual
-	bool
+	void
 	exec(
 		const void* p,
 		size_t size
@@ -78,6 +94,10 @@ public:
 	virtual
 	bool
 	eof() = 0;
+
+protected:
+	void
+	copy(const ExecEngine* src);
 };
 
 //..............................................................................

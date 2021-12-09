@@ -207,36 +207,10 @@ DfaBuilder::buildTransitionMaps(DfaState* state) {
 	m_program->m_stateList.insertTail(state);
 }
 
-struct DfaAnchorCalcEntry {
-	const NfaState* m_nfaState;
-	uint_t m_anchors;
-
-	DfaAnchorCalcEntry() {}
-
-	DfaAnchorCalcEntry(
-		const NfaState* nfaState,
-		uint_t anchors
-	) {
-		setup(nfaState, anchors);
-	}
-
-	void
-	setup(
-		const NfaState* nfaState,
-		uint_t anchors
-	) {
-		m_nfaState = nfaState;
-		m_anchors = anchors;
-	}
-};
-
 void
 DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
-	DfaAnchorTransitionPreMap::Iterator it;
-	DfaAnchorTransitionPreMap anchorTransitionPreMap;
-
 	char buffer[256];
-	sl::Array<DfaAnchorCalcEntry> stack(rc::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<const NfaState*> stack(rc::BufKind_Stack, buffer, sizeof(buffer));
 
 	// stage 1 -- add anchor transition roots (order is not important)
 
@@ -244,30 +218,23 @@ DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
 	for (size_t i = 0; i < count; i++) {
 		const NfaState* nfaState = dfaState->m_nfaStateSet[i];
 		if (nfaState->m_stateKind == NfaStateKind_MatchAnchor) {
-			it = anchorTransitionPreMap.visit(nfaState->m_anchor);
-			if (it->m_value.isEmpty())
-				it->m_value = dfaState->m_nfaStateSet; // build anchor closure later
-
-			stack.append(DfaAnchorCalcEntry(nfaState->m_nextState, nfaState->m_anchor));
+			dfaState->m_anchorMask |= nfaState->m_anchor;
+			stack.append(nfaState->m_nextState);
 		}
 	}
 
-	// stage 2 -- calculate which anchor combinations are possible; add anchor transition map entries (but don't fill NFA state sets yet)
+	// stage 2 -- find all nested anchor transitions
 
 	sl::BitMap nfaStateSet = dfaState->m_nfaStateSet.getMap();
 	while (!stack.isEmpty()) {
-		DfaAnchorCalcEntry entry = stack.getBackAndPop();
-		const NfaState* nfaState = entry.m_nfaState;
-
+		const NfaState* nfaState = stack.getBackAndPop();
 		while (!nfaStateSet.getBit(nfaState->m_id)) {
 			nfaStateSet.setBit(nfaState->m_id);
 
 			switch (nfaState->m_stateKind) {
-				uint_t anchors;
-
 			case NfaStateKind_Split:
 				if (!nfaStateSet.getBit(nfaState->m_splitState->m_id))
-					stack.append(DfaAnchorCalcEntry(nfaState->m_splitState, entry.m_anchors));
+					stack.append(nfaState->m_splitState);
 
 				// ... and fall-through
 
@@ -277,18 +244,9 @@ DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
 				break;
 
 			case NfaStateKind_MatchAnchor:
-				anchors = entry.m_anchors | nfaState->m_anchor;
-				it = anchorTransitionPreMap.visit(anchors);
-				if (it->m_value.isEmpty())
-					it->m_value = dfaState->m_nfaStateSet; // build anchor closure later
-
-				if (anchors == entry.m_anchors) { // no need to go deeper
-					nfaState = nfaState->m_nextState;
-					break;
-				}
-
-				stack.append(DfaAnchorCalcEntry(nfaState->m_nextState, anchors));
-				// ... and fall-through
+				dfaState->m_anchorMask |= nfaState->m_anchor;
+				nfaState = nfaState->m_nextState;
+				break;
 
 			default:
 				goto Break2;
@@ -299,28 +257,25 @@ DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
 
 	// stage 3 -- finalize anchor transition map (build epsilon+anchor closures and cache resulting DFA states)
 
-	ASSERT(!anchorTransitionPreMap.isEmpty());
+	ASSERT(dfaState->m_anchorMask);
 
 	if (m_program->m_stateFlags & DfaStateFlag_Reverse)
-		finalzeAnchorTransitionMap<sl::True>(dfaState, anchorTransitionPreMap);
+		finalzeAnchorTransitionMap<sl::True>(dfaState);
 	else
-		finalzeAnchorTransitionMap<sl::False>(dfaState, anchorTransitionPreMap);
+		finalzeAnchorTransitionMap<sl::False>(dfaState);
 }
 
 template <typename IsReverse>
 void
-DfaBuilder::finalzeAnchorTransitionMap(
-	DfaState* state,
-	DfaAnchorTransitionPreMap& preMap
-) {
-	DfaAnchorTransitionPreMap::Iterator it = preMap.getHead();
+DfaBuilder::finalzeAnchorTransitionMap(DfaState* state) {
+	uint_t from = sl::getLoBit32(state->m_anchorMask);
 
-	for (; it; it++) {
-		uint_t anchors = it->getKey();
-		it->m_value.buildAnchorClosure<IsReverse>(anchors);
-		DfaState* targetState = m_program->getState(it->m_value);
-		state->m_anchorTransitionMap[anchors] = targetState;
-		state->m_anchorMask |= anchors;
+	for (uint_t anchors = from; anchors <= state->m_anchorMask; anchors++) {
+		NfaStateSet nfaStateSet = state->m_nfaStateSet;
+		nfaStateSet.buildAnchorClosure<IsReverse>(anchors);
+		DfaState* targetState = m_program->getState(nfaStateSet);
+		if (targetState != state)
+			state->m_anchorTransitionMap[anchors] = targetState;
 	}
 }
 

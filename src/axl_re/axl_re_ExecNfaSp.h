@@ -25,8 +25,6 @@ protected:
 	NfaStateSet m_nonConsumingStateSetTable[2];
 	size_t m_consumingStateSetIdx;
 	size_t m_nonConsumingStateSetIdx;
-	size_t m_matchAcceptId;
-	size_t m_matchEndOffset;
 	bool m_isEmpty;
 
 public:
@@ -38,7 +36,10 @@ public:
 
 	virtual
 	bool
-	eof();
+	eof() {
+		advanceNonConsumingStates(Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+		return finalize(true);
+	}
 
 protected:
 	void

@@ -25,8 +25,6 @@ ExecDfaBase::ExecDfaBase(StateImpl* parent):
 	ExecEngine(parent) {
 	m_direction = Direction_Forward;
 	m_dfaState = NULL;
-	m_matchEndOffset = -1;
-	m_matchAcceptId = -1;
 	m_savedMatchEndOffset = -1;
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = -1;
@@ -35,10 +33,9 @@ ExecDfaBase::ExecDfaBase(StateImpl* parent):
 
 void
 ExecDfaBase::copy(const ExecDfaBase* src) {
-	m_decoderState = src->m_decoderState;
+	ExecEngine::copy(src);
+	m_direction = src->m_direction;
 	m_dfaState = src->m_dfaState;
-	m_matchEndOffset = src->m_matchEndOffset;
-	m_matchAcceptId = src->m_matchAcceptId;
 	m_savedMatchEndOffset = src->m_savedMatchEndOffset;
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = src->m_savedMatchAcceptId;
@@ -47,10 +44,7 @@ ExecDfaBase::copy(const ExecDfaBase* src) {
 
 void
 ExecDfaBase::reset(size_t offset) {
-	m_decoderState = 0;
-	m_matchEnd = NULL;
-	m_matchEndOffset = -1;
-	m_matchAcceptId = -1;
+	ExecEngine::reset(offset);
 	m_savedMatchEndOffset = -1;
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = -1;
@@ -110,17 +104,11 @@ ExecDfaBase::gotoDfaState(
 
 bool
 ExecDfaBase::eof() {
-	uint_t anchors = Anchor_EndLine | Anchor_EndText;
-	if (m_parent->m_prevCharFlags & StateImpl::CharFlag_Word)
-		anchors |= Anchor_WordBoundary;
-	else
-		anchors |= Anchor_NotWordBoundary;
-
-	anchors &= m_dfaState->m_anchorMask;
+	uint_t anchors = (Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary) & m_dfaState->m_anchorMask;
 	if (anchors) {
 		const DfaState* anchorState = m_dfaState->m_anchorTransitionMap.findValue(anchors, NULL);
-		ASSERT(anchorState);
-		gotoDfaState(m_parent->m_offset, anchorState);
+		if (anchorState)
+			gotoDfaState(m_parent->m_offset, anchorState);
 	}
 
 	return finalize(true);
@@ -170,9 +158,19 @@ ExecDfaBase::finalize(bool isEof) {
 	m_matchEnd = NULL;
 
 	gotoDfaState(matchEndOffset, m_parent->m_regex->getDfaReverseMatchStartState());
-	bool result = exec(m_parent->m_lastExecBuffer, matchEndOffset);
-	ASSERT(result);
-	return result;
+	exec(m_parent->m_lastExecBuffer, matchEndOffset);
+	ASSERT(m_execResult != ExecResult_False);
+
+	if (m_parent->m_offset == m_parent->m_baseOffset && m_dfaState->m_anchorMask) {
+		uint_t anchors = (Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary) & m_dfaState->m_anchorMask;
+		if (anchors) {
+			const DfaState* anchorState = m_dfaState->m_anchorTransitionMap.findValue(anchors, NULL);
+			if (anchorState)
+				gotoDfaState(m_parent->m_offset - 1, anchorState); // backward offsets are one-off
+		}
+	}
+
+	return finalize(true);
 }
 
 //..............................................................................
@@ -194,19 +192,20 @@ public:
 	}
 
 	virtual
-	bool
+	void
 	exec(
 		const void* p,
 		size_t size
 	) {
-		m_execResult = ExecResult_Undefined;
-
-		p = m_direction == Direction_Backward ?
-			Encoding::ReverseDecoder::decode(&m_decoderState, *this, (char*)p + size - 1, (char*)p - 1) :
-			Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, (char*)p + size);
-
-		m_parent->m_offset = m_parent->m_lastExecOffset + (char*)p - (char*)m_parent->m_lastExecBuffer;
-		return m_execResult != ExecResult_False; // undefined or true => true
+		if (m_direction == Direction_Forward) {
+			const char* end = (char*)p + size;
+			m_p = p;
+			p = Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, end);
+		} else {
+			const char* end = (char*)p - 1;
+			m_p = end + size;
+			p = Encoding::ReverseDecoder::decode(&m_decoderState, *this, (char*)m_p, end);
+		}
 	}
 
 	// DecodeEmitter
@@ -227,11 +226,15 @@ public:
 		utf32_t c
 	) {
 		if (m_dfaState->m_anchorMask) {
-			uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c) & m_dfaState->m_anchorMask;
+			uint_t anchors = m_direction == Direction_Backward ?
+				m_parent->calcReverseAnchorsUpdateCharFlags(c) :
+				m_parent->calcAnchorsUpdateCharFlags(c);
+
+			anchors &= m_dfaState->m_anchorMask;
 			if (anchors) {
 				const DfaState* anchorState = m_dfaState->m_anchorTransitionMap.findValue(anchors, NULL);
-				ASSERT(anchorState);
-				gotoDfaState(p, anchorState);
+				if (anchorState)
+					gotoDfaState(m_p, anchorState);
 			}
 		} else {
 			m_parent->m_prevChar = c;
@@ -248,6 +251,8 @@ public:
 
 		if (nextState->m_flags & DfaStateFlag_Dead)
 			m_execResult = (ExecResult)finalize(false);
+
+		m_p = p;
 	}
 };
 

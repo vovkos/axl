@@ -43,6 +43,7 @@ struct StateImpl: public rc::RefCount {
 		CharFlag_Nl    = CharFlag_Lf,
 		CharFlag_Word  = 0x04,
 		CharFlag_Other = 0x08, // non-zero
+		CharFlag_ForcedWordBoundary = 0x10, // enforce word boundary at the 1st char
 	};
 
 	Regex* m_regex;
@@ -53,13 +54,14 @@ struct StateImpl: public rc::RefCount {
 	const void* m_lastExecBuffer;
 	size_t m_lastExecOffset;
 	size_t m_lastExecSize;
-	size_t m_maxRollbackLimit; // don't rollback further than this
+	size_t m_rollbackLimit; // don't rollback further than this
 	uint_t m_execFlags;
 	utf32_t m_prevChar;
 	uint_t m_prevCharFlags;
+	size_t m_baseOffset;
 	size_t m_offset;
-	Match m_match;
 	size_t m_matchAcceptId;
+	Match m_match;
 	sl::BoxList<Match> m_subMatchList;
 	sl::Array<Match*> m_subMatchArray;
 
@@ -89,11 +91,6 @@ public:
 	void
 	reset();
 
-	void
-	resetMatchOffset() {
-		m_match.m_offset = m_offset;
-	}
-
 	static
 	uint_t
 	calcCharFlags(utf32_t c);
@@ -108,6 +105,9 @@ public:
 	uint_t
 	calcAnchorsUpdateCharFlags(utf32_t c);
 
+	uint_t
+	calcReverseAnchorsUpdateCharFlags(utf32_t c);
+
 	void
 	createMatch(
 		size_t acceptId,
@@ -120,6 +120,11 @@ public:
 		const void* p,
 		size_t size
 	);
+
+	bool
+	eof() {
+		return m_engine->eof();
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -148,7 +153,7 @@ StateImpl::calcAnchors(
 	if (charFlags & (CharFlag_Cr | CharFlag_Lf))
 		anchors |= Anchor_EndLine;
 
-	if ((prevCharFlags & CharFlag_Word) ^ (charFlags & CharFlag_Word))
+	if ((prevCharFlags & (CharFlag_Word | CharFlag_ForcedWordBoundary)) ^ (charFlags & CharFlag_Word))
 		anchors |= Anchor_WordBoundary;
 	else
 		anchors |= Anchor_NotWordBoundary;
@@ -163,6 +168,18 @@ StateImpl::calcAnchorsUpdateCharFlags(utf32_t c) {
 	uint_t anchors = m_prevCharFlags ?
 		calcAnchors(m_prevCharFlags, charFlags) :
 		calcAnchors(calcCharFlags(m_prevChar), calcCharFlags(c));
+
+	m_prevCharFlags = charFlags;
+	return anchors;
+}
+
+inline
+uint_t
+StateImpl::calcReverseAnchorsUpdateCharFlags(utf32_t c) {
+	uint_t charFlags = calcCharFlags(c);
+	uint_t anchors = m_prevCharFlags ?
+		calcAnchors(charFlags, m_prevCharFlags) :
+		calcAnchors(calcCharFlags(c), calcCharFlags(m_prevChar));
 
 	m_prevCharFlags = charFlags;
 	return anchors;
@@ -312,7 +329,7 @@ protected:
 	bool
 	eof() {
 		ensureExclusive();
-		return m_p->m_engine->eof();
+		return m_p->eof();
 	}
 };
 

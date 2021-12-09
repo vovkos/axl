@@ -41,6 +41,7 @@ set(
 	axl_re_Lexer.cpp
 	axl_re_Compiler.cpp
 	axl_re_State.cpp
+	axl_re_Exec.cpp
 	axl_re_ExecDfa.cpp
 	axl_re_ExecNfaSp.cpp
 	axl_re_ExecNfaVm.cpp

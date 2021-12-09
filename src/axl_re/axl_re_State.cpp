@@ -27,10 +27,12 @@ StateImpl::StateImpl() {
 	m_lastExecBuffer = NULL;
 	m_lastExecOffset = 0;
 	m_lastExecSize = 0;
+	m_rollbackLimit = 256;
 	m_execFlags = 0;
 	m_streamState = StreamState_Idle;
 	m_prevChar = 0;
 	m_prevCharFlags = 0;
+	m_baseOffset = 0;
 	m_offset = 0;
 	m_matchAcceptId = -1;
 }
@@ -54,8 +56,8 @@ StateImpl::initialize(
 	m_codecKind = codecKind;
 	m_decoderState = 0;
 	m_execFlags = execFlags;
-	m_prevChar = '\n';
-	m_prevCharFlags = CharFlag_Nl;
+	m_prevChar = 0;
+	m_prevCharFlags = CharFlag_Nl | CharFlag_ForcedWordBoundary;
 }
 
 StateImpl*
@@ -72,6 +74,7 @@ StateImpl::clone() {
 	state->m_execFlags = m_execFlags;
 	state->m_prevChar = m_prevChar;
 	state->m_prevCharFlags = m_prevCharFlags;
+	state->m_baseOffset = m_baseOffset;
 	state->m_offset = m_offset;
 
 	if (m_matchAcceptId == -1) // we are done
@@ -125,8 +128,9 @@ StateImpl::reset() {
 	ASSERT(m_engine);
 
 	m_matchAcceptId = -1;
-	m_match.m_offset = m_offset;
+	m_match.m_offset = -1;
 	m_match.m_endOffset = -1;
+	m_prevCharFlags = CharFlag_Lf | CharFlag_ForcedWordBoundary;
 	m_subMatchList.clear();
 	m_subMatchArray.clear();
 	m_engine->reset(m_offset);
@@ -188,7 +192,10 @@ StateImpl::exec(
 	m_lastExecOffset = m_offset;
 	m_lastExecSize = size;
 
-	return m_engine->exec(p, size);
+	m_engine->preExec();
+	m_engine->exec(p, size);
+	m_offset += (char*)m_engine->p() - (char*)p;
+	return m_engine->getExecResult();
 }
 
 //..............................................................................
@@ -224,6 +231,7 @@ State::reset(size_t offset) {
 
 	if (m_p.isExclusive()) {
 		m_p->m_offset = offset;
+		m_p->m_baseOffset = offset;
 		m_p->reset();
 	} else {
 		rc::Ptr<StateImpl> p;
@@ -232,6 +240,7 @@ State::reset(size_t offset) {
 		m_p = AXL_RC_NEW(StateImpl);
 		m_p->initialize(p->m_execFlags, p->m_codecKind);
 		m_p->m_offset = offset;
+		m_p->m_baseOffset = offset;
 		m_p->postInitialize(p->m_regex);
 	}
 }

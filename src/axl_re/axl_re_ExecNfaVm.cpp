@@ -29,12 +29,11 @@ void
 ExecNfaVm::reset(size_t offset) {
 }
 
-bool
+void
 ExecNfaVm::exec(
 	const void* p,
 	size_t size
 ) {
-	return true;
 }
 
 bool

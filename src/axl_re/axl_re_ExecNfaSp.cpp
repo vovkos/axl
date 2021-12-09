@@ -22,9 +22,6 @@ namespace re {
 
 ExecNfaSpBase::ExecNfaSpBase(StateImpl* parent):
 	ExecEngine(parent) {
-	m_execResult = ExecResult_Undefined;
-	m_matchAcceptId = -1;
-	m_matchEndOffset = -1;
 	m_isEmpty = true;
 
 	size_t stateCount = m_parent->m_regex->getNfaStateCount();
@@ -38,19 +35,17 @@ ExecNfaSpBase::ExecNfaSpBase(StateImpl* parent):
 
 void
 ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
+	ExecEngine::copy(src);
 	m_capturePosArray = src->m_capturePosArray;
 	m_consumingStateSetIdx = src->m_consumingStateSetIdx;
 	m_nonConsumingStateSetIdx = src->m_nonConsumingStateSetIdx;
 	m_consumingStateSetTable[m_consumingStateSetIdx] = src->m_consumingStateSetTable[m_consumingStateSetIdx];
 	m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx] = src->m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx];
-	m_matchAcceptId = src->m_matchAcceptId;
-	m_matchEndOffset = src->m_matchEndOffset;
 }
 
 void
 ExecNfaSpBase::reset(size_t offset) {
-	m_matchAcceptId = -1;
-	m_matchEndOffset = -1;
+	ExecEngine::reset(offset);
 	m_isEmpty = true;
 
 	m_consumingStateSetTable[0].clear();
@@ -66,18 +61,6 @@ ExecNfaSpBase::reset(size_t offset) {
 			m_parent->m_regex->getNfaMatchStartState() :
 			m_parent->m_regex->getNfaSearchStartState()
 	);
-}
-
-bool
-ExecNfaSpBase::eof() {
-	uint_t anchors = Anchor_EndLine | Anchor_EndText;
-	if (m_parent->m_prevCharFlags & StateImpl::CharFlag_Word)
-		anchors |= Anchor_WordBoundary;
-	else
-		anchors |= Anchor_NotWordBoundary;
-
-	advanceNonConsumingStates(anchors);
-	return finalize(true);
 }
 
 void
@@ -204,6 +187,9 @@ ExecNfaSpBase::advanceConsumingStates(utf32_t c) {
 
 bool
 ExecNfaSpBase::finalize(bool isEof) {
+	if (m_parent->m_matchAcceptId != -1) // already finalized
+		return true;
+
 	if (m_matchAcceptId == -1)
 		return false;
 
@@ -238,14 +224,12 @@ public:
 	}
 
 	virtual
-	bool
+	void
 	exec(
 		const void* p,
 		size_t size
 	) {
-		m_execResult = ExecResult_Undefined;
 		Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, (char*)p + size);
-		return m_execResult != ExecResult_False; // undefined or true => true
 	}
 
 	// DecodeEmitter

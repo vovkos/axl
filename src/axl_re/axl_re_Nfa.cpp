@@ -53,8 +53,9 @@ getAnchorString(Anchor anchor) {
 		"\\B",   // Anchor_NotWordBoundary
 	};
 
-	return (size_t)anchor < countof(stringTable) ?
-		stringTable[anchor] :
+	size_t i = sl::getLoBitIdx(anchor);
+	return i < countof(stringTable) ?
+		stringTable[i] :
 		"invalid-anchor";
 }
 
