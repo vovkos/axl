@@ -5926,6 +5926,104 @@ testUtf16() {
 
 	printf("sequence end: @%04x\n", length2);
 	printf("\ndone!\n");
+
+	enum {
+//		LoopCount = 500,
+//		LoopCount = 5000,
+		LoopCount = 5000000,
+	};
+
+	printf("original...");
+
+	dfa.reset();
+
+	size_t errorCount = 0;
+	size_t cpCount = 0;
+
+	uint64_t time = sys::getPreciseTimestamp();
+
+	for (size_t i = 0; i < LoopCount; i++)
+		for (size_t j = 0; j < length; j++) {
+			uint_t state = dfa.decode(data[j]);
+			if (enc::Utf16Dfa::isError(state))
+				errorCount++;
+
+			if (enc::Utf16Dfa::isReady(state))
+				cpCount++;
+		}
+
+	time = sys::getPreciseTimestamp() - time;
+
+	printf("done (%d/%d); %.3f sec\n", cpCount, errorCount, (double)time / 10000000);
+
+	printf("reverse....");
+
+	dfa2.reset();
+
+	errorCount = 0;
+	cpCount = 0;
+
+	time = sys::getPreciseTimestamp();
+
+	for (size_t i = 0; i < LoopCount; i++)
+		for (intptr_t j = length - 1; j >= 0; j--) {
+			uint_t state = dfa2.decode(data[j]);
+			if (enc::Utf16ReverseDfa::isError(state))
+				errorCount++;
+
+			if (enc::Utf16ReverseDfa::isReady(state))
+				cpCount++;
+		}
+
+	time = sys::getPreciseTimestamp() - time;
+
+	printf("done (%d/%d); %.3f sec\n", cpCount, errorCount, (double)time / 10000000);
+
+	printf("new........");
+
+	dfa3.reset();
+
+	errorCount = 0;
+	cpCount = 0;
+
+	time = sys::getPreciseTimestamp();
+
+	for (size_t i = 0; i < LoopCount; i++)
+		for (size_t j = 0; j < length2; j++) {
+			uint_t state = dfa3.decode(data2[j]);
+			if (enc::Utf16sDfa::isError(state))
+				errorCount++;
+
+			if (enc::Utf16sDfa::isReady(state))
+				cpCount++;
+		}
+
+	time = sys::getPreciseTimestamp() - time;
+
+	printf("done (%d/%d), %.3f sec\n", cpCount, errorCount, (double)time / 10000000);
+
+	printf("new........");
+
+	dfa4.reset();
+
+	errorCount = 0;
+	cpCount = 0;
+
+	time = sys::getPreciseTimestamp();
+
+	for (size_t i = 0; i < LoopCount; i++)
+		for (intptr_t j = length2 - 1; j >= 0; j--) {
+			uint_t state = dfa4.decode(data2[j]);
+			if (enc::Utf16sReverseDfa::isError(state))
+				errorCount++;
+
+			if (enc::Utf16sReverseDfa::isReady(state))
+				cpCount++;
+		}
+
+	time = sys::getPreciseTimestamp() - time;
+
+	printf("done (%d/%d), %.3f sec\n", cpCount, errorCount, (double)time / 10000000);
 }
 
 void
