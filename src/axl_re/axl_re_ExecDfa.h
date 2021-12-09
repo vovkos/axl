@@ -22,9 +22,25 @@ struct DfaState;
 
 class ExecDfaBase: public ExecEngine {
 protected:
+	enum Direction {
+		Direction_Forward,
+		Direction_Backward,
+	};
+
+protected:
+	Direction m_direction;
 	const DfaState* m_dfaState;
-	size_t m_matchEndOffset;
+	const void* m_matchEnd;
 	size_t m_matchAcceptId;
+	size_t m_matchEndOffset;
+	union {
+		size_t m_matchBeginOffset;
+		size_t m_savedMatchEndOffset;
+	};
+
+#if (_AXL_DEBUG)
+	size_t m_savedMatchAcceptId;
+#endif
 
 public:
 	ExecDfaBase(StateImpl* parent);

@@ -28,7 +28,7 @@ class RegexEngine;
 enum StreamState {
 	StreamState_Idle,
 	StreamState_Searching,
-	StreamState_RequestBackData, // reverse DFA (on match) or rollback DFA (on search)
+	StreamState_RequestBackData, // reverse DFA (on match)
 	StreamState_MatchReady,
 };
 

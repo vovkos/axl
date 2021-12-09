@@ -23,11 +23,14 @@ namespace re {
 
 ExecDfaBase::ExecDfaBase(StateImpl* parent):
 	ExecEngine(parent) {
-	m_execResult = ExecResult_Undefined;
-	m_decoderState = 0;
+	m_direction = Direction_Forward;
 	m_dfaState = NULL;
 	m_matchEndOffset = -1;
 	m_matchAcceptId = -1;
+	m_savedMatchEndOffset = -1;
+#if (_AXL_DEBUG)
+	m_savedMatchAcceptId = -1;
+#endif
 }
 
 void
@@ -36,20 +39,29 @@ ExecDfaBase::copy(const ExecDfaBase* src) {
 	m_dfaState = src->m_dfaState;
 	m_matchEndOffset = src->m_matchEndOffset;
 	m_matchAcceptId = src->m_matchAcceptId;
+	m_savedMatchEndOffset = src->m_savedMatchEndOffset;
+#if (_AXL_DEBUG)
+	m_savedMatchAcceptId = src->m_savedMatchAcceptId;
+#endif
 }
 
 void
 ExecDfaBase::reset(size_t offset) {
 	m_decoderState = 0;
+	m_matchEnd = NULL;
 	m_matchEndOffset = -1;
 	m_matchAcceptId = -1;
+	m_savedMatchEndOffset = -1;
+#if (_AXL_DEBUG)
+	m_savedMatchAcceptId = -1;
+#endif
 
-	gotoDfaState(
-		offset,
-		(m_parent->m_execFlags & RegexExecFlag_AnchorDataBegin) ?
-			m_parent->m_regex->getDfaMatchStartState() :
-			m_parent->m_regex->getDfaSearchStartState()
-	);
+	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataBegin) {
+		m_matchBeginOffset = offset;
+		gotoDfaState(offset, m_parent->m_regex->getDfaMatchStartState());
+	} else {
+		gotoDfaState(offset, m_parent->m_regex->getDfaSearchStartState());
+	}
 }
 
 inline
@@ -75,7 +87,7 @@ ExecDfaBase::gotoDfaState(
 ) {
 	if (state->m_flags & DfaStateFlag_Accept) {
 		m_matchAcceptId = state->m_acceptId;
-		m_matchEndOffset = m_parent->m_lastExecOffset + (char*)p - (char*)m_parent->m_lastExecBuffer;
+		m_matchEnd = p;
 	}
 
 	gotoDfaStateImpl(state);
@@ -90,6 +102,7 @@ ExecDfaBase::gotoDfaState(
 	if (state->m_flags & DfaStateFlag_Accept) {
 		m_matchAcceptId = state->m_acceptId;
 		m_matchEndOffset = offset;
+		m_matchEnd = NULL;
 	}
 
 	gotoDfaStateImpl(state);
@@ -121,18 +134,45 @@ ExecDfaBase::finalize(bool isEof) {
 	if (m_matchAcceptId == -1)
 		return false;
 
+	size_t matchEndOffset = m_matchEnd ?
+		m_parent->m_lastExecOffset + (char*)m_matchEnd - (char*)m_parent->m_lastExecBuffer :
+		m_matchEndOffset;
+
+	if (m_direction == Direction_Backward) {
+		ASSERT(m_matchAcceptId == m_savedMatchAcceptId);
+		m_parent->createMatch(m_matchAcceptId, MatchPos(matchEndOffset + 1, m_savedMatchEndOffset));
+		return true;
+	}
+
 	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataEnd) {
 		if (!isEof)
 			return true; // can't verify until we see EOF
 
-		if (m_matchEndOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+		if (matchEndOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
 			return false;
 	}
 
-	// TODO: roll back to the beginning of the match
+	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataBegin) {
+		m_parent->createMatch(m_matchAcceptId, MatchPos(m_matchBeginOffset, matchEndOffset));
+		return true;
+	}
 
-	m_parent->createMatch(m_matchAcceptId, MatchPos(0, m_matchEndOffset));
-	return true;
+	// reset the engine before going backwards
+
+#if (_AXL_DEBUG)
+	m_savedMatchAcceptId = m_matchAcceptId;
+#endif
+	m_savedMatchEndOffset = matchEndOffset;
+	m_direction = Direction_Backward;
+	m_decoderState = 0;
+	m_matchAcceptId = -1;
+	m_matchEndOffset = -1;
+	m_matchEnd = NULL;
+
+	gotoDfaState(matchEndOffset, m_parent->m_regex->getDfaReverseMatchStartState());
+	bool result = exec(m_parent->m_lastExecBuffer, matchEndOffset);
+	ASSERT(result);
+	return result;
 }
 
 //..............................................................................
@@ -160,7 +200,11 @@ public:
 		size_t size
 	) {
 		m_execResult = ExecResult_Undefined;
-		p = Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, (char*)p + size);
+
+		p = m_direction == Direction_Backward ?
+			Encoding::ReverseDecoder::decode(&m_decoderState, *this, (char*)p + size - 1, (char*)p - 1) :
+			Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, (char*)p + size);
+
 		m_parent->m_offset = m_parent->m_lastExecOffset + (char*)p - (char*)m_parent->m_lastExecBuffer;
 		return m_execResult != ExecResult_False; // undefined or true => true
 	}

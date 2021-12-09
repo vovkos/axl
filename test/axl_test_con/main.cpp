@@ -557,8 +557,8 @@ testRegex() {
 	bool result = true;
 
 #if (1)
-	const char src[] = "[\xd0\xb1-\xd0\xb3]+";
-	// const char src[] = "a|[a-z]+1";
+	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
+	const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";
 	// const char src[] = "[abc]";
 	// const char src[] = "^([abc]+)$";
@@ -621,8 +621,9 @@ testRegex() {
 	const re::Match* match;
 	size_t count;
 
-	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
-//	const char text[] = "    sukasdabxcacxxaaabbbbccd";
+//	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
+//	const char text[] = "ahgbcbcbcdedsdds";
+	const char text[] = "    sukasdabxcacxxaaab1bbbccd";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
@@ -6179,8 +6180,10 @@ main(
 #endif
 
 	// utf::testUtf8();
-	utf::testUtf16();
+	// utf::testUtf16();
 	// utf::testUtf8Encode();
+
+	testRegex();
 	return 0;
 }
 
