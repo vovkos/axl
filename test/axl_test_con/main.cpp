@@ -626,7 +626,7 @@ testRegex() {
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
-	state = regex.exec(text);
+	state = regex.exec(re::RegexExecFlag_Nfa, text);
 	if (!state) {
 		printf("NO MATCH!\n");
 		return;

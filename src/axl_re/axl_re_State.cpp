@@ -194,7 +194,6 @@ StateImpl::exec(
 
 	m_engine->preExec();
 	m_engine->exec(p, size);
-	m_offset += (char*)m_engine->p() - (char*)p;
 	return m_engine->getExecResult();
 }
 

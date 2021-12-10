@@ -30,11 +30,14 @@ protected:
 protected:
 	Direction m_direction;
 	const DfaState* m_dfaState;
+	const void* m_p;
+	const void* m_matchEnd;
+	size_t m_matchAcceptId;
+	size_t m_matchEndOffset;
 	union {
-		size_t m_matchBeginOffset;
+		size_t m_dataBeginOffset;
 		size_t m_savedMatchEndOffset;
 	};
-
 #if (_AXL_DEBUG)
 	size_t m_savedMatchAcceptId;
 #endif

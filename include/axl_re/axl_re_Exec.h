@@ -49,10 +49,6 @@ protected:
 	StateImpl* m_parent;
 	ExecResult m_execResult;
 	enc::DecoderState m_decoderState;
-	const void* m_p;
-	const void* m_matchEnd;
-	size_t m_matchEndOffset;
-	size_t m_matchAcceptId;
 
 public:
 	ExecEngine(StateImpl* parent);
@@ -63,11 +59,6 @@ public:
 	bool
 	getExecResult() const {
 		return m_execResult != ExecResult_False; // true or undefined
-	}
-
-	const void*
-	p() const {
-		return m_p;
 	}
 
 	inline
@@ -82,7 +73,9 @@ public:
 
 	virtual
 	void
-	reset(size_t offset);
+	reset(size_t offset) {
+		m_decoderState = 0;
+	}
 
 	virtual
 	void
@@ -97,18 +90,12 @@ public:
 
 protected:
 	void
-	copy(const ExecEngine* src);
+	copy(const ExecEngine* src) {
+		m_decoderState = src->m_decoderState;
+	}
 };
 
 //..............................................................................
-
-#define _AXL_RE_TRACE_CAPTURE 0
-
-#if (_AXL_RE_TRACE_CAPTURE)
-#	define AXL_RE_TRACE_CAPTURE AXL_TRACE
-#else
-#	define AXL_RE_TRACE_CAPTURE (void)
-#endif
 
 } // namespace re
 } // namespace axl

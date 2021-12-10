@@ -18,30 +18,78 @@ namespace re {
 
 //..............................................................................
 
-class ExecNfaVm: public ExecEngine {
+class ExecNfaVmBase: public ExecEngine {
+protected:
+	struct Thread: sl::ListLink {
+		const NfaState* m_state;
+		size_t m_matchEndOffset;
+		sl::Array<MatchPos> m_capturePosArray;
+
+		void
+		openCapture(
+			size_t offset,
+			size_t captureId
+		);
+
+		void
+		closeCapture(
+			size_t offset,
+			size_t captureId
+		) {
+			ASSERT(captureId < m_capturePosArray.getCount());
+			m_capturePosArray[captureId].m_endOffset = offset;
+		}
+
+	};
+
+protected:
+	sl::List<Thread> m_consumingThreadList;
+	sl::List<Thread> m_nonConsumingThreadList;
+	Thread* m_acceptingThread;
+	size_t m_matchOffset;
+
 public:
-	ExecNfaVm(StateImpl* parent):
-		ExecEngine(parent) {
-	}
+	ExecNfaVmBase(StateImpl* parent);
 
 	virtual
-	ExecEngine*
-	clone(StateImpl* parent);
+	~ExecNfaVmBase() {
+		freeAcceptingThread();
+	}
 
 	virtual
 	void
 	reset(size_t offset);
 
 	virtual
-	void
-	exec(
-		const void* p,
-		size_t size
-	);
-
-	virtual
 	bool
-	eof();
+	eof() {
+		advanceNonConsumingThreads(Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+		return finalize(true);
+	}
+
+protected:
+	void
+	copy(const ExecNfaVmBase* src);
+
+	void
+	freeAcceptingThread() {
+		if (m_acceptingThread) {
+			AXL_MEM_DELETE(m_acceptingThread);
+			m_acceptingThread = NULL;
+		}
+	}
+
+	void
+	continueConsumingThread(Thread* thread);
+
+	void
+	advanceNonConsumingThreads(uint32_t anchors);
+
+	void
+	advanceConsumingThreads(utf32_t c);
+
+	bool
+	finalize(bool isEof);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

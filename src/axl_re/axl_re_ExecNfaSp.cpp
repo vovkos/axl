@@ -15,6 +15,14 @@
 #include "axl_enc_Utf16s.h"
 #include "axl_enc_Utf32s.h"
 
+#define _AXL_RE_TRACE_CAPTURE 0
+
+#if (_AXL_RE_TRACE_CAPTURE)
+#	define AXL_RE_TRACE_CAPTURE AXL_TRACE
+#else
+#	define AXL_RE_TRACE_CAPTURE (void)
+#endif
+
 namespace axl {
 namespace re {
 
@@ -22,6 +30,7 @@ namespace re {
 
 ExecNfaSpBase::ExecNfaSpBase(StateImpl* parent):
 	ExecEngine(parent) {
+	m_matchAcceptId = -1;
 	m_isEmpty = true;
 
 	size_t stateCount = m_parent->m_regex->getNfaStateCount();
@@ -36,6 +45,8 @@ ExecNfaSpBase::ExecNfaSpBase(StateImpl* parent):
 void
 ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
 	ExecEngine::copy(src);
+	m_matchAcceptId = src->m_matchAcceptId;
+	m_matchPos = src->m_matchPos;
 	m_capturePosArray = src->m_capturePosArray;
 	m_consumingStateSetIdx = src->m_consumingStateSetIdx;
 	m_nonConsumingStateSetIdx = src->m_nonConsumingStateSetIdx;
@@ -46,6 +57,8 @@ ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
 void
 ExecNfaSpBase::reset(size_t offset) {
 	ExecEngine::reset(offset);
+	m_matchAcceptId = -1;
+	m_matchPos.m_offset = offset;
 	m_isEmpty = true;
 
 	m_consumingStateSetTable[0].clear();
@@ -56,23 +69,18 @@ ExecNfaSpBase::reset(size_t offset) {
 	m_nonConsumingStateSetIdx = 0;
 	m_capturePosArray.clear();
 
-	addState(
-		(m_parent->m_execFlags & RegexExecFlag_AnchorDataBegin) ?
-			m_parent->m_regex->getNfaMatchStartState() :
-			m_parent->m_regex->getNfaSearchStartState()
-	);
-
+	addState(m_parent->m_regex->getNfaMatchStartState()); // NFAs are for matching only
 	advanceNonConsumingStates(Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 }
 
 void
 ExecNfaSpBase::addState(const NfaState* state) {
-	if (state->isConsuming())
-		m_consumingStateSetTable[m_consumingStateSetIdx].add(state);
-	else
+	if (!state->isConsuming())
 		m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx].add(state);
-
-	m_isEmpty = false;
+	else {
+		m_consumingStateSetTable[m_consumingStateSetIdx].add(state);
+		m_isEmpty = false;
+	}
 }
 
 void
@@ -117,7 +125,7 @@ ExecNfaSpBase::advanceNonConsumingStates(uint32_t anchors) {
 				if (state->m_acceptId < m_matchAcceptId)
 					m_matchAcceptId = state->m_acceptId;
 
-				m_matchEndOffset = m_parent->m_offset;
+				m_matchPos.m_endOffset = m_parent->m_offset;
 				break;
 
 			case NfaStateKind_Split:
@@ -199,11 +207,11 @@ ExecNfaSpBase::finalize(bool isEof) {
 		if (!isEof)
 			return true; // can't verify until we see EOF
 
-		if (m_matchEndOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+		if (m_matchPos.m_endOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
 			return false;
 	}
 
-	m_parent->createMatch(m_matchAcceptId, MatchPos(0, m_matchEndOffset));
+	m_parent->createMatch(m_matchAcceptId, m_matchPos);
 	return true;
 }
 
@@ -253,7 +261,6 @@ public:
 	) {
 		uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c);
 		advanceNonConsumingStates(anchors);
-		advanceConsumingStates(c);
 
 		if (m_isEmpty) {
 			m_execResult = (ExecResult)finalize(false);
@@ -261,6 +268,7 @@ public:
 		}
 
 		m_parent->m_offset = m_parent->m_lastExecOffset + p - (char*)m_parent->m_lastExecBuffer;
+		advanceConsumingStates(c);
 	}
 };
 

@@ -20,11 +20,13 @@ namespace re {
 
 class ExecNfaSpBase: public ExecEngine {
 protected:
+	MatchPos m_matchPos;
 	sl::Array<MatchPos> m_capturePosArray;
 	NfaStateSet m_consumingStateSetTable[2];
 	NfaStateSet m_nonConsumingStateSetTable[2];
 	size_t m_consumingStateSetIdx;
 	size_t m_nonConsumingStateSetIdx;
+	size_t m_matchAcceptId;
 	bool m_isEmpty;
 
 public:
