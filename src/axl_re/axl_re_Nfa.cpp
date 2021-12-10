@@ -317,11 +317,11 @@ NfaState::print(FILE* file) const {
 
 // instantiate templated closure builders
 
-void (NfaStateSet::*NfaStateSet_buildClosure0)() = &NfaStateSet::buildEpsilonClosure<sl::False>;
-void (NfaStateSet::*NfaStateSet_buildClosure1)() = &NfaStateSet::buildEpsilonClosure<sl::True>;
-void (NfaStateSet::*NfaStateSet_buildClosure2)(uint_t) = &NfaStateSet::buildAnchorClosure<sl::False>;
-void (NfaStateSet::*NfaStateSet_buildClosure3)(uint_t) = &NfaStateSet::buildAnchorClosure<sl::True>;
-void (NfaStateSet::*NfaStateSet_buildClosure4)() = &NfaStateSet::buildRollbackClosure;
+bool (NfaStateSet::*NfaStateSet_buildClosure0)() = &NfaStateSet::buildEpsilonClosure<sl::False>;
+bool (NfaStateSet::*NfaStateSet_buildClosure1)() = &NfaStateSet::buildEpsilonClosure<sl::True>;
+bool (NfaStateSet::*NfaStateSet_buildClosure2)(uint_t) = &NfaStateSet::buildAnchorClosure<sl::False>;
+bool (NfaStateSet::*NfaStateSet_buildClosure3)(uint_t) = &NfaStateSet::buildAnchorClosure<sl::True>;
+bool (NfaStateSet::*NfaStateSet_buildClosure4)() = &NfaStateSet::buildRollbackClosure;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -404,7 +404,7 @@ template <
 	typename IsReverse,
 	typename UseAnchors
 >
-void
+bool
 NfaStateSet::buildClosureImpl(uint_t anchors) {
 	char buffer[256];
 	sl::Array<const NfaState*> stack(rc::BufKind_Stack, buffer, sizeof(buffer));
@@ -417,6 +417,8 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 	m_array.clear();
 	m_map.clear();
 
+	bool result = false;
+
 	while (!stack.isEmpty()) {
 		const NfaState* state = stack.getBackAndPop();
 		while (!m_map.getBit(state->m_id)) {
@@ -425,7 +427,7 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 			switch (state->m_stateKind) {
 			case NfaStateKind_Accept:
 				m_array.append(state);
- 				return; // done!
+ 				return true; // done!
 
 			case NfaStateKind_Link:
 				if (!IsRollback()() && !IsReverse()()) // links are only needed for rollbacks
@@ -467,6 +469,7 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 			case NfaStateKind_MatchCharSet:
 			case NfaStateKind_MatchAnyChar:
 				m_array.append(state);
+				result = true;
 
 				// ... and fall-through
 
@@ -476,6 +479,8 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 		}
 	Break2:;
 	}
+
+	return result;
 }
 
 //..............................................................................

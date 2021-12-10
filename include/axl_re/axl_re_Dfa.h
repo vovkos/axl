@@ -27,7 +27,6 @@ struct DfaState;
 
 // the key is a combination of NfaAnchor-s
 
-typedef sl::SimpleHashTable<uint_t, NfaStateSet> DfaAnchorTransitionPreMap;
 typedef sl::SimpleHashTable<uint_t, const DfaState*> DfaAnchorTransitionMap;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -166,12 +165,9 @@ public:
 	buildTransitionMaps(DfaState* state);
 
 protected:
-	void
-	buildAnchorTransitionMap(DfaState* state);
-
 	template <typename IsReverse>
 	void
-	finalzeAnchorTransitionMap(DfaState* state);
+	buildAnchorTransitionMap(DfaState* state);
 
 	bool
 	buildCharTransitionMap(DfaState* state); // returns if state has match-anchors (to save a loop)

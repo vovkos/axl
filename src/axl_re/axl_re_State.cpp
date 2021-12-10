@@ -57,7 +57,7 @@ StateImpl::initialize(
 	m_decoderState = 0;
 	m_execFlags = execFlags;
 	m_prevChar = 0;
-	m_prevCharFlags = CharFlag_Nl | CharFlag_ForcedWordBoundary;
+	m_prevCharFlags = CharFlag_Other;
 }
 
 StateImpl*
@@ -130,7 +130,7 @@ StateImpl::reset() {
 	m_matchAcceptId = -1;
 	m_match.m_offset = -1;
 	m_match.m_endOffset = -1;
-	m_prevCharFlags = CharFlag_Lf | CharFlag_ForcedWordBoundary;
+	m_prevCharFlags = CharFlag_Other;
 	m_subMatchList.clear();
 	m_subMatchArray.clear();
 	m_engine->reset(m_offset);

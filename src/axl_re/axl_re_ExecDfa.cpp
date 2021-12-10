@@ -56,6 +56,8 @@ ExecDfaBase::reset(size_t offset) {
 	} else {
 		gotoDfaState(offset, m_parent->m_regex->getDfaSearchStartState());
 	}
+
+	processBoundary(offset, Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 }
 
 inline
@@ -102,16 +104,18 @@ ExecDfaBase::gotoDfaState(
 	gotoDfaStateImpl(state);
 }
 
-bool
-ExecDfaBase::eof() {
-	uint_t anchors = (Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary) & m_dfaState->m_anchorMask;
+inline
+void
+ExecDfaBase::processBoundary(
+	size_t offset,
+	uint_t anchors
+) {
+	anchors &= m_dfaState->m_anchorMask;
 	if (anchors) {
 		const DfaState* anchorState = m_dfaState->m_anchorTransitionMap.findValue(anchors, NULL);
 		if (anchorState)
-			gotoDfaState(m_parent->m_offset, anchorState);
+			gotoDfaState(offset, anchorState);
 	}
-
-	return finalize(true);
 }
 
 bool
@@ -145,7 +149,7 @@ ExecDfaBase::finalize(bool isEof) {
 		return true;
 	}
 
-	// reset the engine before going backwards
+	// reset the engine before going backwards (but keep the pre-calculated m_prevCharFlags)
 
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = m_matchAcceptId;
@@ -158,17 +162,15 @@ ExecDfaBase::finalize(bool isEof) {
 	m_matchEnd = NULL;
 
 	gotoDfaState(matchEndOffset, m_parent->m_regex->getDfaReverseMatchStartState());
+	if (isEof && matchEndOffset == m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+		processBoundary(matchEndOffset, Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+
 	exec(m_parent->m_lastExecBuffer, matchEndOffset);
+	size_t offset = (char*)m_p - (char*)m_parent->m_lastExecBuffer;
 	ASSERT(m_execResult != ExecResult_False);
 
-	if (m_parent->m_offset == m_parent->m_baseOffset && m_dfaState->m_anchorMask) {
-		uint_t anchors = (Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary) & m_dfaState->m_anchorMask;
-		if (anchors) {
-			const DfaState* anchorState = m_dfaState->m_anchorTransitionMap.findValue(anchors, NULL);
-			if (anchorState)
-				gotoDfaState(m_parent->m_offset - 1, anchorState); // backward offsets are one-off
-		}
-	}
+	if (offset == m_parent->m_baseOffset - 1)
+		processBoundary(offset, Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 
 	return finalize(true);
 }

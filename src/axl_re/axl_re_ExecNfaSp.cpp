@@ -61,6 +61,8 @@ ExecNfaSpBase::reset(size_t offset) {
 			m_parent->m_regex->getNfaMatchStartState() :
 			m_parent->m_regex->getNfaSearchStartState()
 	);
+
+	advanceNonConsumingStates(Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 }
 
 void

@@ -48,7 +48,10 @@ public:
 
 	virtual
 	bool
-	eof();
+	eof() {
+		processBoundary(m_parent->m_offset, Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+		return finalize(true);
+	}
 
 protected:
 	void
@@ -67,6 +70,12 @@ protected:
 	gotoDfaState(
 		const void* p,
 		const DfaState* state
+	);
+
+	void
+	processBoundary(
+		size_t offset,
+		uint_t anchors
 	);
 
 	bool

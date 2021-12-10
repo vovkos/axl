@@ -29,6 +29,7 @@ enum Anchor {
 	Anchor_EndText         = 0x08,  // \z
 	Anchor_WordBoundary    = 0x10,  // \b
 	Anchor_NotWordBoundary = 0x20,  // \B
+	Anchor_Last            = Anchor_NotWordBoundary
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -422,20 +423,20 @@ public:
 	add(const NfaState* state);
 
 	template <typename IsReverse>
-	void
+	bool
 	buildEpsilonClosure() {
-		buildClosureImpl<sl::False, IsReverse, sl::False>(0);
+		return buildClosureImpl<sl::False, IsReverse, sl::False>(0);
 	}
 
 	template <typename IsReverse>
-	void
+	bool
 	buildAnchorClosure(uint_t anchors) {
-		buildClosureImpl<sl::False, IsReverse, sl::True>(anchors);
+		return buildClosureImpl<sl::False, IsReverse, sl::True>(anchors);
 	}
 
-	void
+	bool
 	buildRollbackClosure() {
-		buildClosureImpl<sl::True, sl::False, sl::False>(0);
+		return buildClosureImpl<sl::True, sl::False, sl::False>(0);
 	}
 
 protected:
@@ -444,7 +445,7 @@ protected:
 		typename IsReverse,
 		typename UseAnchors
 	>
-	void
+	bool
 	buildClosureImpl(uint_t anchors);
 };
 

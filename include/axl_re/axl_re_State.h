@@ -153,7 +153,7 @@ StateImpl::calcAnchors(
 	if (charFlags & (CharFlag_Cr | CharFlag_Lf))
 		anchors |= Anchor_EndLine;
 
-	if ((prevCharFlags & (CharFlag_Word | CharFlag_ForcedWordBoundary)) ^ (charFlags & CharFlag_Word))
+	if ((prevCharFlags & CharFlag_Word) ^ (charFlags & CharFlag_Word))
 		anchors |= Anchor_WordBoundary;
 	else
 		anchors |= Anchor_NotWordBoundary;
