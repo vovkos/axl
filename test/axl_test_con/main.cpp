@@ -560,7 +560,7 @@ testRegex() {
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";
-	const char src[] = "\\b([abc]+)\\b";
+	const char src[] = "\\b([a-z]+)([0-9]*)\\b";
 
 	printf("REGEX: %s\n\n", src);
 
@@ -574,6 +574,7 @@ testRegex() {
 	printf("NFA:\n");
 	regex.printNfa();
 
+#	if (0)
 	regex.buildFullDfa();
 	regex.buildFullReverseDfa();
 	regex.buildFullRollbackDfa();
@@ -583,6 +584,7 @@ testRegex() {
 
 	printf("\nrDFA:\n");
 	regex.printReverseDfa();
+#	endif
 #endif
 #endif
 
@@ -622,7 +624,7 @@ testRegex() {
 
 //	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
 //	const char text[] = "ahgbcbcbcdedsdds";
-	const char text[] = "xxxx cabcab cabc";
+	const char text[] = "cabcab123 cabc";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
@@ -6145,6 +6147,29 @@ testUtf8Encode() {
 } // namespace utf
 
 //..............................................................................
+
+struct A {
+	A(int x) {
+		printf("A::A(%d)\n", x);
+	}
+};
+
+struct B {
+	B(int x) {
+		printf("B::B(%d)\n", x);
+	}
+};
+
+struct C {
+	A m_a;
+	B m_b;
+
+	C():
+		m_b(10),
+		m_a(20) {
+		printf("C::C\n");
+	}
+};
 
 #if (_AXL_OS_WIN)
 int

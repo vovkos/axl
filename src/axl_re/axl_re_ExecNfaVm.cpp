@@ -36,8 +36,7 @@ ExecNfaVmBase::Thread::openCapture(
 
 ExecNfaVmBase::ExecNfaVmBase(StateImpl* parent):
 	ExecEngine(parent) {
-	m_acceptingThread = NULL;
-	m_matchOffset = -1;
+	m_matchState = NULL;
 }
 
 void
@@ -63,16 +62,15 @@ ExecNfaVmBase::copy(const ExecNfaVmBase* src) {
 void
 ExecNfaVmBase::reset(size_t offset) {
 	ExecEngine::reset(offset);
-	m_matchOffset = offset;
+	m_matchPos.m_offset = offset;
 	m_consumingThreadList.clear();
 	m_nonConsumingThreadList.clear();
-	freeAcceptingThread();
+	m_matchState = NULL;
 
 	Thread* thread = AXL_MEM_NEW(Thread);
 	thread->m_state = m_parent->m_regex->getNfaMatchStartState();
-	thread->m_matchEndOffset = -1;
 
-	if (thread->m_state->m_stateKind >= NfaStateKind_FirstConsuming)
+	if (thread->isConsuming())
 		m_consumingThreadList.insertTail(thread);
 	else
 		m_nonConsumingThreadList.insertTail(thread);
@@ -82,7 +80,7 @@ ExecNfaVmBase::reset(size_t offset) {
 
 void
 ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
-	while (m_nonConsumingThreadList.isEmpty()) {
+	while (!m_nonConsumingThreadList.isEmpty()) {
 		Thread* thread = m_nonConsumingThreadList.removeHead();
 		const NfaState* state = thread->m_state;
 		for (;;)
@@ -100,26 +98,23 @@ ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 				break;
 
 			case NfaStateKind_Split:
-				state = state->m_nextState;
 				newThread = AXL_MEM_NEW_ARGS(Thread, (*thread));
-				newThread->m_state = state;
-
-				if (state->m_stateKind >= NfaStateKind_FirstConsuming)
+				newThread->m_state = state->m_splitState;
+				if (newThread->isConsuming())
 					m_consumingThreadList.insertTail(newThread);
 				else
 					m_nonConsumingThreadList.insertTail(newThread);
+
+				state = state->m_nextState;
 				break;
 
 			case NfaStateKind_Accept:
-				if (!m_acceptingThread)
-					m_acceptingThread = thread;
-				else if (state->m_acceptId >= m_acceptingThread->m_state->m_acceptId)
-					AXL_MEM_DELETE(thread);
-				else {
-					thread->m_state = state;
-					thread->m_matchEndOffset = m_parent->m_offset;
-					m_acceptingThread = thread;
+				if (!m_matchState || state->m_id <= m_matchState->m_id) {
+					m_matchState = state;
+					m_matchPos.m_endOffset = m_parent->m_offset;
+					m_capturePosArray = thread->m_capturePosArray;
 				}
+				AXL_MEM_DELETE(thread);
 				goto Break2;
 
 			case NfaStateKind_OpenCapture:
@@ -159,15 +154,15 @@ inline
 void
 ExecNfaVmBase::continueConsumingThread(Thread* thread) {
 	thread->m_state = thread->m_state->m_nextState;
-	ASSERT(thread->m_state->m_stateKind < NfaStateKind_FirstConsuming); // must be a link
+	ASSERT(!thread->isConsuming()); // must be a link
 	m_nonConsumingThreadList.insertTail(thread);
 }
 
 void
 ExecNfaVmBase::advanceConsumingThreads(utf32_t c) {
-	while (m_consumingThreadList.isEmpty()) {
+	while (!m_consumingThreadList.isEmpty()) {
 		Thread* thread = m_consumingThreadList.removeHead();
-		switch (thread->m_state->m_stateKind) {
+ 		switch (thread->m_state->m_stateKind) {
 		case NfaStateKind_MatchChar:
 			if (thread->m_state->m_char == c)
 				continueConsumingThread(thread);
@@ -197,22 +192,19 @@ ExecNfaVmBase::finalize(bool isEof) {
 	if (m_parent->m_matchAcceptId != -1) // already finalized
 		return true;
 
-	if (!m_acceptingThread)
+	if (!m_matchState)
 		return false;
 
 	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataEnd) {
 		if (!isEof)
 			return true; // can't verify until we see EOF
 
-		if (m_acceptingThread->m_matchEndOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+		if (m_matchPos.m_endOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
 			return false;
 	}
 
-	m_parent->createMatch(
-		m_acceptingThread->m_state->m_acceptId,
-		MatchPos(m_matchOffset, m_acceptingThread->m_matchEndOffset)
-	);
-
+	m_parent->createMatch(m_matchState->m_acceptId, m_matchPos, m_capturePosArray);
+	// TODO: create sub-matches
 	return true;
 }
 

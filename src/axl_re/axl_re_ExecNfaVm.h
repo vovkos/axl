@@ -22,8 +22,12 @@ class ExecNfaVmBase: public ExecEngine {
 protected:
 	struct Thread: sl::ListLink {
 		const NfaState* m_state;
-		size_t m_matchEndOffset;
 		sl::Array<MatchPos> m_capturePosArray;
+
+		bool
+		isConsuming() const {
+			return m_state->m_stateKind >= NfaStateKind_FirstConsuming;
+		}
 
 		void
 		openCapture(
@@ -45,16 +49,12 @@ protected:
 protected:
 	sl::List<Thread> m_consumingThreadList;
 	sl::List<Thread> m_nonConsumingThreadList;
-	Thread* m_acceptingThread;
-	size_t m_matchOffset;
+	const NfaState* m_matchState;
+	MatchPos m_matchPos;
+	sl::Array<MatchPos> m_capturePosArray;
 
 public:
 	ExecNfaVmBase(StateImpl* parent);
-
-	virtual
-	~ExecNfaVmBase() {
-		freeAcceptingThread();
-	}
 
 	virtual
 	void
@@ -70,14 +70,6 @@ public:
 protected:
 	void
 	copy(const ExecNfaVmBase* src);
-
-	void
-	freeAcceptingThread() {
-		if (m_acceptingThread) {
-			AXL_MEM_DELETE(m_acceptingThread);
-			m_acceptingThread = NULL;
-		}
-	}
 
 	void
 	continueConsumingThread(Thread* thread);

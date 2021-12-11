@@ -76,9 +76,9 @@ enum NfaStateFlag {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct NfaState: sl::ListLink {
+	size_t m_id;
 	NfaStateKind m_stateKind;
 	uint_t m_flags;
-	size_t m_id;
 	NfaState* m_nextState;      // all except NfaStateKind_Accept
 
 	union {
