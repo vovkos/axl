@@ -39,6 +39,16 @@ enum RegexCompileFlag {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum RegexExecFlag {
+	RegexExecFlag_Stream          = 0x01, // feed data chunk-by-chunk, then call re::Regex::eof()
+	RegexExecFlag_DisableCapture  = 0x02, // don't capture sub-matches
+	RegexExecFlag_AnchorDataBegin = 0x04, // match must start on the first byte of data
+	RegexExecFlag_AnchorDataEnd   = 0x08, // match must end on the last byte of data
+	RegexExecFlag_ExactMatch      = RegexExecFlag_AnchorDataBegin | RegexExecFlag_AnchorDataEnd,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class Regex {
 	friend class Compiler;
 	friend class ExecDfaBase;

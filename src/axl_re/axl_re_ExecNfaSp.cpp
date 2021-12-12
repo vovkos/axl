@@ -29,7 +29,7 @@ namespace re {
 //..............................................................................
 
 ExecNfaSpBase::ExecNfaSpBase(StateImpl* parent):
-	ExecEngine(parent) {
+	ExecNfaEngine(parent) {
 	m_matchAcceptId = -1;
 	m_isEmpty = true;
 
@@ -56,6 +56,14 @@ ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
 
 void
 ExecNfaSpBase::reset(size_t offset) {
+	reset(offset, m_parent->m_regex->getNfaMatchStartState());
+}
+
+void
+ExecNfaSpBase::reset(
+	size_t offset,
+	const NfaState* state
+) {
 	ExecEngine::reset(offset);
 	m_matchAcceptId = -1;
 	m_matchPos.m_offset = offset;
@@ -69,7 +77,7 @@ ExecNfaSpBase::reset(size_t offset) {
 	m_nonConsumingStateSetIdx = 0;
 	m_capturePosArray.clear();
 
-	addState(m_parent->m_regex->getNfaMatchStartState()); // NFAs are for matching only
+	addState(state);
 	advanceNonConsumingStates(Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 }
 
@@ -87,25 +95,23 @@ void
 ExecNfaSpBase::openCapture(size_t captureId) {
 	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
 
-	size_t offset = m_parent->m_offset;
-	AXL_RE_TRACE_CAPTURE("%p: open capture(%d)\n", offset, captureId);
+	AXL_RE_TRACE_CAPTURE("%p: open capture(%d)\n", m_offset, captureId);
 
 	if (captureId >= m_capturePosArray.getCount())
 		m_capturePosArray.setCount(captureId + 1);
 
-	m_capturePosArray[captureId].m_offset = offset;
-	m_capturePosArray[captureId].m_endOffset = offset;
+	m_capturePosArray[captureId].m_offset = m_offset;
+	m_capturePosArray[captureId].m_endOffset = m_offset;
 }
 
 void
 ExecNfaSpBase::closeCapture(size_t captureId) {
 	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
 
-	size_t offset = m_parent->m_offset;
-	AXL_RE_TRACE_CAPTURE("%p: close capture(%d)\n", offset, captureId);
+	AXL_RE_TRACE_CAPTURE("%p: close capture(%d)\n", m_offset, captureId);
 
 	ASSERT(captureId < m_capturePosArray.getCount());
-	m_capturePosArray[captureId].m_endOffset = offset;
+	m_capturePosArray[captureId].m_endOffset = m_offset;
 }
 
 void
@@ -125,7 +131,7 @@ ExecNfaSpBase::advanceNonConsumingStates(uint32_t anchors) {
 				if (state->m_acceptId < m_matchAcceptId)
 					m_matchAcceptId = state->m_acceptId;
 
-				m_matchPos.m_endOffset = m_parent->m_offset;
+				m_matchPos.m_endOffset = m_offset;
 				break;
 
 			case NfaStateKind_Split:
@@ -207,11 +213,11 @@ ExecNfaSpBase::finalize(bool isEof) {
 		if (!isEof)
 			return true; // can't verify until we see EOF
 
-		if (m_matchPos.m_endOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+		if (m_matchPos.m_endOffset != m_lastExecEndOffset)
 			return false;
 	}
 
-	m_parent->createMatch(m_matchAcceptId, m_matchPos);
+	m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, m_lastExecData, m_matchPos);
 	return true;
 }
 
@@ -259,7 +265,7 @@ public:
 		const char* p,
 		utf32_t c
 	) {
-		uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c);
+		uint_t anchors = calcAnchorsUpdateCharFlags(c);
 		advanceNonConsumingStates(anchors);
 
 		if (m_isEmpty) {
@@ -267,14 +273,14 @@ public:
 			return;
 		}
 
-		m_parent->m_offset = m_parent->m_lastExecOffset + p - (char*)m_parent->m_lastExecBuffer;
+		m_offset = m_lastExecOffset + p - (char*)m_lastExecData;
 		advanceConsumingStates(c);
 	}
 };
 
 //..............................................................................
 
-ExecEngine*
+ExecNfaEngine*
 createExecNfaSp(
 	StateImpl* parent,
 	enc::CharCodecKind codecKind

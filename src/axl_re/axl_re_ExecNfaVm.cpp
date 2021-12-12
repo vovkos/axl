@@ -35,7 +35,7 @@ ExecNfaVmBase::Thread::openCapture(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 ExecNfaVmBase::ExecNfaVmBase(StateImpl* parent):
-	ExecEngine(parent) {
+	ExecNfaEngine(parent) {
 	m_matchState = NULL;
 }
 
@@ -61,6 +61,14 @@ ExecNfaVmBase::copy(const ExecNfaVmBase* src) {
 
 void
 ExecNfaVmBase::reset(size_t offset) {
+	reset(offset, m_parent->m_regex->getNfaMatchStartState());
+}
+
+void
+ExecNfaVmBase::reset(
+	size_t offset,
+	const NfaState* state
+) {
 	ExecEngine::reset(offset);
 	m_matchPos.m_offset = offset;
 	m_consumingThreadList.clear();
@@ -68,7 +76,7 @@ ExecNfaVmBase::reset(size_t offset) {
 	m_matchState = NULL;
 
 	Thread* thread = AXL_MEM_NEW(Thread);
-	thread->m_state = m_parent->m_regex->getNfaMatchStartState();
+	thread->m_state = state;
 
 	if (thread->isConsuming())
 		m_consumingThreadList.insertTail(thread);
@@ -111,19 +119,21 @@ ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 			case NfaStateKind_Accept:
 				if (!m_matchState || state->m_id <= m_matchState->m_id) {
 					m_matchState = state;
-					m_matchPos.m_endOffset = m_parent->m_offset;
+					m_matchPos.m_endOffset = m_offset;
 					m_capturePosArray = thread->m_capturePosArray;
 				}
 				AXL_MEM_DELETE(thread);
 				goto Break2;
 
 			case NfaStateKind_OpenCapture:
-				thread->openCapture(m_parent->m_offset, state->m_captureId);
+				if (!(m_parent->m_execFlags & RegexExecFlag_DisableCapture))
+					thread->openCapture(m_offset, state->m_captureId);
 				state = state->m_nextState;
 				break;
 
 			case NfaStateKind_CloseCapture:
-				thread->closeCapture(m_parent->m_offset, state->m_captureId);
+				if (!(m_parent->m_execFlags & RegexExecFlag_DisableCapture))
+					thread->closeCapture(m_offset, state->m_captureId);
 				state = state->m_nextState;
 				break;
 
@@ -182,7 +192,7 @@ ExecNfaVmBase::advanceConsumingThreads(utf32_t c) {
 			break;
 
 		default:
-			ASSERT(false); // shouldn't be on consuming thread list
+			ASSERT(false); // shouldn't be on the consuming thread list
 		}
 	}
 }
@@ -199,12 +209,11 @@ ExecNfaVmBase::finalize(bool isEof) {
 		if (!isEof)
 			return true; // can't verify until we see EOF
 
-		if (m_matchPos.m_endOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+		if (m_matchPos.m_endOffset != m_lastExecEndOffset)
 			return false;
 	}
 
-	m_parent->createMatch(m_matchState->m_acceptId, m_matchPos, m_capturePosArray);
-	// TODO: create sub-matches
+	m_parent->createMatch(m_matchState->m_acceptId, m_lastExecOffset, m_lastExecData, m_matchPos, m_capturePosArray);
 	return true;
 }
 
@@ -252,7 +261,7 @@ public:
 		const char* p,
 		utf32_t c
 	) {
-		uint_t anchors = m_parent->calcAnchorsUpdateCharFlags(c);
+		uint_t anchors = calcAnchorsUpdateCharFlags(c);
 		advanceNonConsumingThreads(anchors);
 
 		if (m_consumingThreadList.isEmpty()) {
@@ -260,19 +269,16 @@ public:
 			return;
 		}
 
-		m_parent->m_offset = m_parent->m_lastExecOffset + p - (char*)m_parent->m_lastExecBuffer;
+		m_offset = m_lastExecOffset + p - (char*)m_lastExecData;
 		advanceConsumingThreads(c);
 	}
 };
 
 //..............................................................................
 
-ExecEngine*
-createExecNfaVm(
-	StateImpl* parent,
-	enc::CharCodecKind codecKind
-) {
-	switch (codecKind) {
+ExecNfaEngine*
+createExecNfaVm(StateImpl* parent) {
+	switch (parent->m_codecKind) {
 	case enc::CharCodecKind_Ascii:
 		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Ascii>, (parent));
 	case enc::CharCodecKind_Utf8:

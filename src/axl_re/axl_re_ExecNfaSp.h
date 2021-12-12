@@ -18,7 +18,7 @@ namespace re {
 
 //..............................................................................
 
-class ExecNfaSpBase: public ExecEngine {
+class ExecNfaSpBase: public ExecNfaEngine {
 protected:
 	MatchPos m_matchPos;
 	sl::Array<MatchPos> m_capturePosArray;
@@ -35,6 +35,13 @@ public:
 	virtual
 	void
 	reset(size_t offset);
+
+	virtual
+	void
+	reset(
+		size_t offset,
+		const NfaState* state
+	);
 
 	virtual
 	bool
@@ -68,7 +75,7 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-ExecEngine*
+ExecNfaEngine*
 createExecNfaSp(
 	StateImpl* parent,
 	enc::CharCodecKind codecKind

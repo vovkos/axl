@@ -11,7 +11,7 @@
 
 #include "pch.h"
 #include "axl_re_ExecDfa.h"
-#include "axl_re_Dfa.h"
+#include "axl_re_ExecNfaVm.h"
 #include "axl_re_Regex.h"
 #include "axl_enc_Utf16s.h"
 #include "axl_enc_Utf32s.h"
@@ -23,10 +23,11 @@ namespace re {
 
 ExecDfaBase::ExecDfaBase(StateImpl* parent):
 	ExecEngine(parent) {
-	m_direction = Direction_Forward;
+	m_flags = 0;
 	m_dfaState = NULL;
 	m_p = NULL;
 	m_matchEnd = NULL;
+	m_baseOffset = 0;
 	m_matchAcceptId = -1;
 	m_matchEndOffset = -1;
 	m_savedMatchEndOffset = -1;
@@ -38,7 +39,7 @@ ExecDfaBase::ExecDfaBase(StateImpl* parent):
 void
 ExecDfaBase::copy(const ExecDfaBase* src) {
 	ExecEngine::copy(src);
-	m_direction = src->m_direction;
+	m_flags = src->m_flags;
 	m_dfaState = src->m_dfaState;
 	m_matchEnd = src->m_matchEnd;
 	m_matchAcceptId = src->m_matchAcceptId;
@@ -52,7 +53,9 @@ ExecDfaBase::copy(const ExecDfaBase* src) {
 void
 ExecDfaBase::reset(size_t offset) {
 	ExecEngine::reset(offset);
+	m_flags = 0;
 	m_matchEnd = NULL;
+	m_baseOffset = offset;
 	m_matchAcceptId = -1;
 	m_matchEndOffset = -1;
 	m_savedMatchEndOffset = -1;
@@ -61,7 +64,6 @@ ExecDfaBase::reset(size_t offset) {
 #endif
 
 	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataBegin) {
-		m_dataBeginOffset = offset;
 		gotoDfaState(offset, m_parent->m_regex->getDfaMatchStartState());
 	} else {
 		gotoDfaState(offset, m_parent->m_regex->getDfaSearchStartState());
@@ -137,12 +139,12 @@ ExecDfaBase::finalize(bool isEof) {
 		return false;
 
 	size_t matchEndOffset = m_matchEnd ?
-		m_parent->m_lastExecOffset + (char*)m_matchEnd - (char*)m_parent->m_lastExecBuffer :
+		m_lastExecOffset + (char*)m_matchEnd - (char*)m_lastExecData :
 		m_matchEndOffset;
 
-	if (m_direction == Direction_Backward) {
+	if (m_flags & Flag_Backward) {
 		ASSERT(m_matchAcceptId == m_savedMatchAcceptId);
-		m_parent->createMatch(m_matchAcceptId, MatchPos(matchEndOffset + 1, m_savedMatchEndOffset));
+		createMatch(MatchPos(matchEndOffset + 1, m_savedMatchEndOffset));
 		return true;
 	}
 
@@ -150,12 +152,12 @@ ExecDfaBase::finalize(bool isEof) {
 		if (!isEof)
 			return true; // can't verify until we see EOF
 
-		if (matchEndOffset != m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+		if (matchEndOffset != m_lastExecEndOffset)
 			return false;
 	}
 
 	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataBegin) {
-		m_parent->createMatch(m_matchAcceptId, MatchPos(m_dataBeginOffset, matchEndOffset));
+		createMatch(MatchPos(m_baseOffset, matchEndOffset));
 		return true;
 	}
 
@@ -165,24 +167,51 @@ ExecDfaBase::finalize(bool isEof) {
 	m_savedMatchAcceptId = m_matchAcceptId;
 #endif
 	m_savedMatchEndOffset = matchEndOffset;
-	m_direction = Direction_Backward;
+	m_flags = Flag_Backward;
 	m_decoderState = 0;
 	m_matchAcceptId = -1;
 	m_matchEndOffset = -1;
 	m_matchEnd = NULL;
 
 	gotoDfaState(matchEndOffset, m_parent->m_regex->getDfaReverseMatchStartState());
-	if (isEof && matchEndOffset == m_parent->m_lastExecOffset + m_parent->m_lastExecSize)
+	if (isEof && matchEndOffset == m_lastExecEndOffset)
 		processBoundary(matchEndOffset, Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
 
-	exec(m_parent->m_lastExecBuffer, matchEndOffset);
-	size_t offset = (char*)m_p - (char*)m_parent->m_lastExecBuffer;
+	exec(m_lastExecData, matchEndOffset);
+	size_t offset = (char*)m_p - (char*)m_lastExecData;
 	ASSERT(m_execResult != ExecResult_False);
 
-	if (offset == m_parent->m_baseOffset - 1)
+	if (offset == m_baseOffset - 1)
 		processBoundary(offset, Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 
 	return finalize(true);
+}
+
+bool
+ExecDfaBase::createMatch(const MatchPos& pos) {
+	if (!pos.isInside(m_lastExecOffset, m_lastExecEndOffset)) {
+		// match is scattered across multiple blocks; don't run the NFA
+		m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, m_lastExecData, pos);
+		return true;
+	}
+
+	// TODO: use NFA-SP if possible
+
+	const NfaState* nfaState = m_parent->m_regex->getRegexKind() == RegexKind_Switch ?
+		m_parent->m_regex->getSwitchCaseNfaMatchStartState(m_matchAcceptId) :
+		m_parent->m_regex->getNfaMatchStartState();
+
+	const void* p = (char*)m_lastExecData - m_lastExecOffset + pos.m_offset;
+	size_t length = pos.m_endOffset - pos.m_offset;
+
+	ExecNfaEngine* engine = createExecNfaVm(m_parent);
+	engine->reset(pos.m_offset, nfaState);
+	engine->preExec(p, length);
+	engine->exec(p, length);
+	bool result = engine->eof();
+	AXL_MEM_DELETE(engine);
+
+	return result;
 }
 
 //..............................................................................
@@ -209,17 +238,17 @@ public:
 		const void* p,
 		size_t size
 	) {
-		if (m_direction == Direction_Forward) {
-			const char* end = (char*)p + size;
-			m_p = p;
-			p = Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, end);
-		} else {
+		if (m_flags & Flag_Backward) {
 			const char* end = (char*)p - 1;
 			m_p = end + size;
 			p = Encoding::ReverseDecoder::decode(&m_decoderState, *this, (char*)m_p, end);
+		} else {
+			const char* end = (char*)p + size;
+			m_p = p;
+			p = Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, end);
 		}
 
-		m_parent->m_offset += (char*)m_p - (char*)p;
+		m_offset += (char*)m_p - (char*)p;
 	}
 
 	// DecodeEmitter
@@ -240,9 +269,9 @@ public:
 		utf32_t c
 	) {
 		if (m_dfaState->m_anchorMask) {
-			uint_t anchors = m_direction == Direction_Backward ?
-				m_parent->calcReverseAnchorsUpdateCharFlags(c) :
-				m_parent->calcAnchorsUpdateCharFlags(c);
+			uint_t anchors = (m_flags & Flag_Backward) ?
+				calcReverseAnchorsUpdateCharFlags(c) :
+				calcAnchorsUpdateCharFlags(c);
 
 			anchors &= m_dfaState->m_anchorMask;
 			if (anchors) {
@@ -251,8 +280,8 @@ public:
 					gotoDfaState(m_p, anchorState);
 			}
 		} else {
-			m_parent->m_prevChar = c;
-			m_parent->m_prevCharFlags = 0;
+			m_prevChar = c;
+			m_prevCharFlags = 0;
 		}
 
 		const DfaState* nextState = m_dfaState->m_charTransitionMap.find(c);
@@ -273,11 +302,8 @@ public:
 //..............................................................................
 
 ExecEngine*
-createExecDfa(
-	StateImpl* parent,
-	enc::CharCodecKind codecKind
-) {
-	switch (codecKind) {
+createExecDfa(StateImpl* parent) {
+	switch (parent->m_codecKind) {
 	case enc::CharCodecKind_Ascii:
 		return AXL_MEM_NEW_ARGS(ExecDfa<enc::Ascii>, (parent));
 	case enc::CharCodecKind_Utf8:

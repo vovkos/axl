@@ -14,6 +14,7 @@
 #define _AXL_RE_REGEXSTATE_H
 
 #include "axl_re_Nfa.h"
+#include "axl_re_Match.h"
 #include "axl_re_Exec.h"
 
 namespace axl {
@@ -21,7 +22,6 @@ namespace re {
 
 class Regex;
 class State;
-class RegexEngine;
 
 //..............................................................................
 
@@ -37,29 +37,13 @@ enum StreamState {
 struct StateImpl: public rc::RefCount {
 	friend class State;
 
-	enum CharFlag {
-		CharFlag_Cr    = 0x01,
-		CharFlag_Lf    = 0x02,
-		CharFlag_Nl    = CharFlag_Lf,
-		CharFlag_Word  = 0x04,
-		CharFlag_Other = 0x08, // non-zero
-		CharFlag_ForcedWordBoundary = 0x10, // enforce word boundary at the 1st char
-	};
-
 	Regex* m_regex;
 	ExecEngine* m_engine;
 	enc::CharCodecKind m_codecKind;
-	uint32_t m_decoderState;
 	StreamState m_streamState;
-	const void* m_lastExecBuffer;
-	size_t m_lastExecOffset;
-	size_t m_lastExecSize;
 	size_t m_rollbackLimit; // don't rollback further than this
 	uint_t m_execFlags;
-	utf32_t m_prevChar;
-	uint_t m_prevCharFlags;
-	size_t m_baseOffset;
-	size_t m_offset;
+
 	size_t m_matchAcceptId;
 	Match m_match;
 	sl::BoxList<Match> m_subMatchList;
@@ -86,31 +70,19 @@ public:
 	clone();
 
 	void
-	postInitialize(Regex* regex);
-
-	void
-	reset();
-
-	static
-	uint_t
-	calcCharFlags(utf32_t c);
-
-	static
-	uint_t
-	calcAnchors(
-		uint_t prevCharFlags,
-		uint_t charFlags
+	postInitialize(
+		Regex* regex,
+		size_t offset
 	);
 
-	uint_t
-	calcAnchorsUpdateCharFlags(utf32_t c);
-
-	uint_t
-	calcReverseAnchorsUpdateCharFlags(utf32_t c);
+	void
+	reset(size_t offset);
 
 	void
 	createMatch(
 		size_t acceptId,
+		size_t lastExecOffset,
+		const void* lastExecData,
 		const MatchPos& matchPos,
 		const sl::ArrayRef<MatchPos>& capturePosArray = sl::ArrayRef<MatchPos>()
 	);
@@ -126,64 +98,6 @@ public:
 		return m_engine->eof();
 	}
 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-uint_t
-StateImpl::calcCharFlags(utf32_t c) {
-	return
-		c == '\r' ? CharFlag_Cr :
-		c == '\n' ? CharFlag_Lf :
-		c == '_' || enc::isLetterOrDigit(c) ? CharFlag_Word :
-		CharFlag_Other;
-}
-
-inline
-uint_t
-StateImpl::calcAnchors(
-	uint_t prevCharFlags,
-	uint_t charFlags
-) {
-	uint_t anchors = 0;
-
-	if (prevCharFlags & CharFlag_Lf)
-		anchors |= Anchor_BeginLine;
-
-	if (charFlags & (CharFlag_Cr | CharFlag_Lf))
-		anchors |= Anchor_EndLine;
-
-	if ((prevCharFlags & CharFlag_Word) ^ (charFlags & CharFlag_Word))
-		anchors |= Anchor_WordBoundary;
-	else
-		anchors |= Anchor_NotWordBoundary;
-
-	return anchors;
-}
-
-inline
-uint_t
-StateImpl::calcAnchorsUpdateCharFlags(utf32_t c) {
-	uint_t charFlags = calcCharFlags(c);
-	uint_t anchors = m_prevCharFlags ?
-		calcAnchors(m_prevCharFlags, charFlags) :
-		calcAnchors(calcCharFlags(m_prevChar), calcCharFlags(c));
-
-	m_prevCharFlags = charFlags;
-	return anchors;
-}
-
-inline
-uint_t
-StateImpl::calcReverseAnchorsUpdateCharFlags(utf32_t c) {
-	uint_t charFlags = calcCharFlags(c);
-	uint_t anchors = m_prevCharFlags ?
-		calcAnchors(charFlags, m_prevCharFlags) :
-		calcAnchors(calcCharFlags(c), calcCharFlags(m_prevChar));
-
-	m_prevCharFlags = charFlags;
-	return anchors;
-}
 
 //..............................................................................
 
@@ -314,7 +228,7 @@ protected:
 	void
 	postInitialize(Regex* regex) {
 		ensureExclusive();
-		m_p->postInitialize(regex);
+		m_p->postInitialize(regex, 0);
 	}
 
 	bool

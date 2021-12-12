@@ -24,16 +24,9 @@ namespace re {
 StateImpl::StateImpl() {
 	m_regex = NULL;
 	m_engine = NULL;
-	m_lastExecBuffer = NULL;
-	m_lastExecOffset = 0;
-	m_lastExecSize = 0;
 	m_rollbackLimit = 256;
 	m_execFlags = 0;
 	m_streamState = StreamState_Idle;
-	m_prevChar = 0;
-	m_prevCharFlags = 0;
-	m_baseOffset = 0;
-	m_offset = 0;
 	m_matchAcceptId = -1;
 }
 
@@ -54,10 +47,7 @@ StateImpl::initialize(
 
 	m_regex = NULL;
 	m_codecKind = codecKind;
-	m_decoderState = 0;
 	m_execFlags = execFlags;
-	m_prevChar = 0;
-	m_prevCharFlags = CharFlag_Other;
 }
 
 StateImpl*
@@ -67,15 +57,7 @@ StateImpl::clone() {
 	state->m_regex = m_regex;
 	state->m_engine = m_engine->clone(state);
 	state->m_codecKind = m_codecKind;
-	state->m_decoderState = m_decoderState;
-	state->m_lastExecBuffer = m_lastExecBuffer;
-	state->m_lastExecOffset = m_lastExecOffset;
-	state->m_lastExecSize = m_lastExecSize;
 	state->m_execFlags = m_execFlags;
-	state->m_prevChar = m_prevChar;
-	state->m_prevCharFlags = m_prevCharFlags;
-	state->m_baseOffset = m_baseOffset;
-	state->m_offset = m_offset;
 
 	if (m_matchAcceptId == -1) // we are done
 		return state;
@@ -99,46 +81,34 @@ StateImpl::clone() {
 }
 
 void
-StateImpl::postInitialize(Regex* regex) {
+StateImpl::postInitialize(
+	Regex* regex,
+	size_t offset
+) {
 	ASSERT(!m_regex && !m_engine);
 
 	m_regex = regex;
-
-	switch (m_execFlags & RegexExecFlag_EngineMask) {
-	case 0: // test default
-	case RegexExecFlag_Dfa:
-		m_engine = createExecDfa(this, m_codecKind);
-		break;
-
-	case RegexExecFlag_NfaAuto:
-	case RegexExecFlag_NfaVm:
-		m_engine = createExecNfaVm(this, m_codecKind);
-		break;
-
-	default:
-		ASSERT(false);
-		m_engine = createExecNfaVm(this, m_codecKind); // fall back to threading NFA
-	}
-
-	reset();
+	m_engine = createExecDfa(this); // the first engine is always DFA
+	reset(offset);
 }
 
 void
-StateImpl::reset() {
+StateImpl::reset(size_t offset) {
 	ASSERT(m_engine);
 
 	m_matchAcceptId = -1;
 	m_match.m_offset = -1;
 	m_match.m_endOffset = -1;
-	m_prevCharFlags = CharFlag_Other;
 	m_subMatchList.clear();
 	m_subMatchArray.clear();
-	m_engine->reset(m_offset);
+	m_engine->reset(offset);
 }
 
 void
 StateImpl::createMatch(
 	size_t acceptId,
+	size_t lastExecOffset,
+	const void* lastExecData,
 	const MatchPos& matchPos,
 	const sl::ArrayRef<MatchPos>& capturePosArray
 ) {
@@ -148,13 +118,16 @@ StateImpl::createMatch(
 	m_match.m_offset = matchPos.m_offset;
 	m_match.m_endOffset = matchPos.m_endOffset;
 	m_match.m_text.clear();
-	m_match.m_codec = enc::getCharCodec(m_codecKind);
 
-	char* base = (char*)m_lastExecBuffer - m_lastExecOffset;
-	m_match.m_p = !(m_execFlags & RegexExecFlag_Stream) ? base + m_match.m_offset : NULL;
+	char* base;
+
+	if (lastExecData) {
+		base = (char*)lastExecData - lastExecOffset;
+		m_match.m_codec = enc::getCharCodec(m_codecKind);
+		m_match.m_p = base + m_match.m_offset;
+	}
 
 	size_t count = capturePosArray.getCount();
-
 	if (!count || (m_execFlags & RegexExecFlag_DisableCapture)) {
 		m_subMatchArray.copy(&m_match);
 		return;
@@ -174,7 +147,7 @@ StateImpl::createMatch(
 		match->m_offset = pos.m_offset;
 		match->m_endOffset = pos.m_endOffset;
 
-		if (!(m_execFlags & RegexExecFlag_Stream)) {
+		if (lastExecData) {
 			match->m_codec = m_match.m_codec;
 			match->m_p = base + pos.m_offset;
 		}
@@ -188,11 +161,7 @@ StateImpl::exec(
 	const void* p,
 	size_t size
 ) {
-	m_lastExecBuffer = p;
-	m_lastExecOffset = m_offset;
-	m_lastExecSize = size;
-
-	m_engine->preExec();
+	m_engine->preExec(p, size);
 	m_engine->exec(p, size);
 	return m_engine->getExecResult();
 }
@@ -221,7 +190,7 @@ State::initialize(
 	ASSERT(!m_p);
 	m_p = AXL_RC_NEW(StateImpl);
 	m_p->initialize(execFlags, codecKind);
-	m_p->postInitialize(regex);
+	m_p->postInitialize(regex, 0);
 }
 
 void
@@ -229,18 +198,14 @@ State::reset(size_t offset) {
 	ASSERT(m_p);
 
 	if (m_p.isExclusive()) {
-		m_p->m_offset = offset;
-		m_p->m_baseOffset = offset;
-		m_p->reset();
+		m_p->reset(offset);
 	} else {
 		rc::Ptr<StateImpl> p;
 		sl::takeOver(&p, &m_p);
 
 		m_p = AXL_RC_NEW(StateImpl);
 		m_p->initialize(p->m_execFlags, p->m_codecKind);
-		m_p->m_offset = offset;
-		m_p->m_baseOffset = offset;
-		m_p->postInitialize(p->m_regex);
+		m_p->postInitialize(p->m_regex, offset);
 	}
 }
 

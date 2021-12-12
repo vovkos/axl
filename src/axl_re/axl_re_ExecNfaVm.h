@@ -18,7 +18,7 @@ namespace re {
 
 //..............................................................................
 
-class ExecNfaVmBase: public ExecEngine {
+class ExecNfaVmBase: public ExecNfaEngine {
 protected:
 	struct Thread: sl::ListLink {
 		const NfaState* m_state;
@@ -61,6 +61,13 @@ public:
 	reset(size_t offset);
 
 	virtual
+	void
+	reset(
+		size_t offset,
+		const NfaState* state
+	);
+
+	virtual
 	bool
 	eof() {
 		advanceNonConsumingThreads(Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
@@ -86,11 +93,8 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-ExecEngine*
-createExecNfaVm(
-	StateImpl* parent,
-	enc::CharCodecKind codecKind
-);
+ExecNfaEngine*
+createExecNfaVm(StateImpl* parent);
 
 //..............................................................................
 

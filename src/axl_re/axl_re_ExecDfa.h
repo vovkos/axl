@@ -12,6 +12,7 @@
 #pragma once
 
 #include "axl_re_State.h"
+#include "axl_re_Exec.h"
 
 namespace axl {
 namespace re {
@@ -22,22 +23,20 @@ struct DfaState;
 
 class ExecDfaBase: public ExecEngine {
 protected:
-	enum Direction {
-		Direction_Forward,
-		Direction_Backward,
+	enum Flag {
+		// running the DFA backwards to find the beginning of the match
+		Flag_Backward = 0x01,
 	};
 
 protected:
-	Direction m_direction;
+	uint_t m_flags;
 	const DfaState* m_dfaState;
 	const void* m_p;
 	const void* m_matchEnd;
+	size_t m_baseOffset;
 	size_t m_matchAcceptId;
 	size_t m_matchEndOffset;
-	union {
-		size_t m_dataBeginOffset;
-		size_t m_savedMatchEndOffset;
-	};
+	size_t m_savedMatchEndOffset;
 #if (_AXL_DEBUG)
 	size_t m_savedMatchAcceptId;
 #endif
@@ -52,7 +51,7 @@ public:
 	virtual
 	bool
 	eof() {
-		processBoundary(m_parent->m_offset, Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+		processBoundary(m_offset, Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
 		return finalize(true);
 	}
 
@@ -83,15 +82,15 @@ protected:
 
 	bool
 	finalize(bool isEof);
+
+	bool
+	createMatch(const MatchPos& pos);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 ExecEngine*
-createExecDfa(
-	StateImpl* parent,
-	enc::CharCodecKind codecKind
-);
+createExecDfa(StateImpl* parent);
 
 //..............................................................................
 

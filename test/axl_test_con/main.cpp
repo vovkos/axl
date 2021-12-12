@@ -560,7 +560,7 @@ testRegex() {
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";
-	const char src[] = "\\b([a-z]+)([0-9]*)\\b";
+	const char src[] = "\\b([a-c]+)([0-9]+)\\b";
 
 	printf("REGEX: %s\n\n", src);
 
@@ -624,11 +624,11 @@ testRegex() {
 
 //	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
 //	const char text[] = "ahgbcbcbcdedsdds";
-	const char text[] = "cabcab123 cabc";
+	const char text[] = "   jk hkjhjk jk cabcab123 cabc";
 //	const char text[] = "xaaabbbbcd";
 	printf("\nMATCHING TEXT: %s\n", text);
 
-	state = regex.exec(re::RegexExecFlag_Nfa, text);
+	state = regex.exec(text);
 	if (!state) {
 		printf("NO MATCH!\n");
 		return;

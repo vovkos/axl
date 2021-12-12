@@ -13,27 +13,13 @@
 
 #define _AXL_RE_EXEC_H
 
-#include "axl_re_Match.h"
+#include "axl_re_Nfa.h"
 
 namespace axl {
 namespace re {
 
-//..............................................................................
-
-enum RegexExecFlag {
-	RegexExecFlag_Dfa             = 0x0001, // default
-	RegexExecFlag_NfaAuto         = 0x0002, // auto-select threading or single-pass NFA
-	RegexExecFlag_NfaVm           = 0x0004, // force threading NFA
-	RegexExecFlag_Nfa             = RegexExecFlag_NfaAuto,
-	RegexExecFlag_EngineMask      = RegexExecFlag_Dfa | RegexExecFlag_NfaAuto | RegexExecFlag_NfaVm,
-
-	RegexExecFlag_Stream          = 0x0010, // can feed data chunk-by-chunk
-	RegexExecFlag_DisableCapture  = 0x0020, // capture by default for NFA-based engines
-	RegexExecFlag_Multiline       = 0x0040, // ^ and $ match newline
-	RegexExecFlag_AnchorDataBegin = 0x0100, // match must start on the first byte of data
-	RegexExecFlag_AnchorDataEnd   = 0x0200, // match must end on the last byte of data
-	RegexExecFlag_ExactMatch      = RegexExecFlag_AnchorDataBegin | RegexExecFlag_AnchorDataEnd,
-};
+struct StateImpl;
+struct NfaState;
 
 //..............................................................................
 
@@ -45,10 +31,26 @@ protected:
 		ExecResult_True      = true,
 	};
 
+	enum CharFlag {
+		CharFlag_Cr    = 0x01,
+		CharFlag_Lf    = 0x02,
+		CharFlag_Nl    = CharFlag_Lf,
+		CharFlag_Word  = 0x04,
+		CharFlag_Other = 0x08, // non-zero
+		CharFlag_ForcedWordBoundary = 0x10, // enforce word boundary at the 1st char
+	};
+
 protected:
 	StateImpl* m_parent;
+	const void* m_lastExecData;
+	size_t m_lastExecOffset;
+	size_t m_lastExecEndOffset;
 	ExecResult m_execResult;
 	enc::DecoderState m_decoderState;
+
+	utf32_t m_prevChar;
+	uint_t m_prevCharFlags;
+	size_t m_offset;
 
 public:
 	ExecEngine(StateImpl* parent);
@@ -61,11 +63,11 @@ public:
 		return m_execResult != ExecResult_False; // true or undefined
 	}
 
-	inline
 	void
-	preExec() {
-		m_execResult = ExecResult_Undefined;
-	}
+	preExec(
+		const void* p,
+		size_t size
+	);
 
 	virtual
 	ExecEngine*
@@ -73,9 +75,7 @@ public:
 
 	virtual
 	void
-	reset(size_t offset) {
-		m_decoderState = 0;
-	}
+	reset(size_t offset);
 
 	virtual
 	void
@@ -90,9 +90,111 @@ public:
 
 protected:
 	void
-	copy(const ExecEngine* src) {
-		m_decoderState = src->m_decoderState;
-	}
+	copy(const ExecEngine* src);
+
+	static
+	uint_t
+	calcCharFlags(utf32_t c);
+
+	static
+	uint_t
+	calcAnchors(
+		uint_t prevCharFlags,
+		uint_t charFlags
+	);
+
+	uint_t
+	calcAnchorsUpdateCharFlags(utf32_t c);
+
+	uint_t
+	calcReverseAnchorsUpdateCharFlags(utf32_t c);
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void
+ExecEngine::preExec(
+	const void* p,
+	size_t size
+) {
+	m_execResult = ExecResult_Undefined;
+	m_lastExecData = p;
+	m_lastExecOffset = m_offset;
+	m_lastExecEndOffset = m_offset + size;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+uint_t
+ExecEngine::calcCharFlags(utf32_t c) {
+	return
+		c == '\r' ? CharFlag_Cr :
+		c == '\n' ? CharFlag_Lf :
+		c == '_' || enc::isLetterOrDigit(c) ? CharFlag_Word :
+		CharFlag_Other;
+}
+
+inline
+uint_t
+ExecEngine::calcAnchors(
+	uint_t prevCharFlags,
+	uint_t charFlags
+) {
+	uint_t anchors = 0;
+
+	if (prevCharFlags & CharFlag_Lf)
+		anchors |= Anchor_BeginLine;
+
+	if (charFlags & (CharFlag_Cr | CharFlag_Lf))
+		anchors |= Anchor_EndLine;
+
+	if ((prevCharFlags & CharFlag_Word) ^ (charFlags & CharFlag_Word))
+		anchors |= Anchor_WordBoundary;
+	else
+		anchors |= Anchor_NotWordBoundary;
+
+	return anchors;
+}
+
+inline
+uint_t
+ExecEngine::calcAnchorsUpdateCharFlags(utf32_t c) {
+	uint_t charFlags = calcCharFlags(c);
+	uint_t anchors = m_prevCharFlags ?
+		calcAnchors(m_prevCharFlags, charFlags) :
+		calcAnchors(calcCharFlags(m_prevChar), calcCharFlags(c));
+
+	m_prevCharFlags = charFlags;
+	return anchors;
+}
+
+inline
+uint_t
+ExecEngine::calcReverseAnchorsUpdateCharFlags(utf32_t c) {
+	uint_t charFlags = calcCharFlags(c);
+	uint_t anchors = m_prevCharFlags ?
+		calcAnchors(charFlags, m_prevCharFlags) :
+		calcAnchors(calcCharFlags(c), calcCharFlags(m_prevChar));
+
+	m_prevCharFlags = charFlags;
+	return anchors;
+}
+
+//..............................................................................
+
+class ExecNfaEngine: public ExecEngine {
+public:
+	ExecNfaEngine(StateImpl* parent):
+		ExecEngine(parent) {}
+
+	virtual
+	void
+	reset(
+		size_t offset,
+		const NfaState* state
+	) = 0;
 };
 
 //..............................................................................
