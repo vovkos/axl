@@ -55,6 +55,9 @@ bool
 isLetterOrNumber(utf32_t c);
 
 bool
+isWord(utf32_t c);
+
+bool
 isLowerCase(utf32_t c);
 
 bool

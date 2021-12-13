@@ -146,6 +146,13 @@ isLetterOrNumber(utf32_t c) {
 }
 
 bool
+isWord(utf32_t c) {
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&(U_GC_L_MASK|U_GC_N_MASK|U_GC_PC_MASK))!=0);
+}
+
+bool
 isLowerCase(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
