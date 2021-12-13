@@ -575,7 +575,7 @@ testRegex() {
 	printf("NFA:\n");
 	regex.printNfa();
 
-#	if (1)
+#	if (0)
 	regex.buildFullDfa();
 	regex.buildFullReverseDfa();
 	regex.buildFullRollbackDfa();
@@ -625,8 +625,10 @@ testRegex() {
 
 //	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
 //	const char text[] = "ahgbcbcbcdedsdds";
-	const char text[] = " ds hjk d abc123 dfsjk";
+	const char text[] = "   abc123   ";
 //	const char text[] = "xaaabbbbcd";
+
+#if (0)
 	printf("\nMATCHING TEXT: %s\n", text);
 
 	state = regex.exec(text);
@@ -657,8 +659,9 @@ testRegex() {
 				subMatch->getText().sz()
 			);
 	}
+#endif
 
-#if (0)
+#if (1)
 	printf("STREAM MATCH:\n");
 
 	state.initialize(re::RegexExecFlag_Stream);
@@ -682,28 +685,16 @@ testRegex() {
 		match->getOffset(),
 		match->getSize()
 	);
-
-	count = state.getSubMatchCount();
-	for (size_t i = 1; i < count; i++) {
-		const re::Match* subMatch = state.getSubMatch(i);
-		if (subMatch)
-			printf(
-				"$%d: %p(%d)\n",
-				i,
-				subMatch->getOffset(),
-				subMatch->getSize()
-			);
-	}
 #endif
 
 #if (0)
 	regex.createSwitch();
 	regex.compileSwitchCase("char");
 	regex.compileSwitchCase("int");
-	/*regex.compileSwitchCase("long");
+	regex.compileSwitchCase("long");
 	regex.compileSwitchCase("[0-9]+");
 	regex.compileSwitchCase("0x[0-9a-fA-F]+");
-	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*#");*/
+	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*#");
 	regex.finalizeSwitch();
 
 	static const char* caseNameMap[] = {

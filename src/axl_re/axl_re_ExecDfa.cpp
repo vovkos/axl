@@ -59,7 +59,7 @@ ExecDfaBase::copyForReverse(const ExecDfaBase* src) {
 	m_offset = src->m_offset;
 	m_baseOffset = src->m_baseOffset;
 #if (_AXL_DEBUG)
-	m_matchAcceptId = src->m_matchAcceptId;
+	m_savedMatchAcceptId = src->m_matchAcceptId;
 #endif
 }
 
@@ -117,9 +117,6 @@ public:
 		ASSERT(IsReverse()() && m_forwardEngine);
 
 		m_savedMatchEndOffset = matchEndOffset;
-	#if (_AXL_DEBUG)
-		m_savedMatchAcceptId = m_matchAcceptId;
-	#endif
 
 		if (isEof && matchEndOffset == m_lastExecEndOffset)
 			m_prevCharFlags = Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary;
@@ -130,9 +127,17 @@ public:
 				m_prevCharFlags |= Anchor_EndLine;
 		}
 
+		ASSERT(matchEndOffset >= m_lastExecOffset);
+		size_t size = matchEndOffset - m_lastExecOffset;
 		gotoState(matchEndOffset, m_parent->m_regex->getDfaReverseMatchStartState());
-		exec(m_lastExecData, matchEndOffset);
+		exec(m_lastExecData, size);
 		ASSERT(m_execResult != ExecResult_False);
+
+		if (!isFinalized()) {
+			ASSERT(m_parent->m_execFlags & RegexExecFlag_Stream);
+			m_parent->reverseStream(); // request more reverse blocks
+		}
+
 		return true;
 	}
 

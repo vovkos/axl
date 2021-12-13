@@ -30,9 +30,7 @@ namespace re {
 StateImpl::StateImpl() {
 	m_regex = NULL;
 	m_engine = NULL;
-	m_rollbackLimit = 256;
 	m_execFlags = 0;
-	m_streamState = StreamState_Idle;
 	m_matchAcceptId = -1;
 }
 
@@ -53,7 +51,7 @@ StateImpl::initialize(
 
 	m_regex = NULL;
 	m_codecKind = codecKind;
-	m_execFlags = execFlags;
+	m_execFlags = execFlags & ~ExecFlag_ReverseStream;
 }
 
 StateImpl*
@@ -112,6 +110,7 @@ void
 StateImpl::reset(size_t offset) {
 	ASSERT(m_engine);
 
+	m_execFlags &= ~ExecFlag_ReverseStream;
 	m_matchAcceptId = -1;
 	m_match.m_offset = -1;
 	m_match.m_endOffset = -1;

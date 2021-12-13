@@ -25,23 +25,16 @@ class State;
 
 //..............................................................................
 
-enum StreamState {
-	StreamState_Idle,
-	StreamState_Searching,
-	StreamState_RequestBackData, // reverse DFA (on match)
-	StreamState_MatchReady,
-};
-
-//..............................................................................
-
 struct StateImpl: public rc::RefCount {
 	friend class State;
+
+	enum ExecFlag {
+		ExecFlag_ReverseStream = 0x100, // don't overlap with RegexExecFlag
+	};
 
 	Regex* m_regex;
 	ExecEngine* m_engine;
 	enc::CharCodecKind m_codecKind;
-	StreamState m_streamState;
-	size_t m_rollbackLimit; // don't rollback further than this
 	uint_t m_execFlags;
 
 	size_t m_matchAcceptId;
@@ -59,6 +52,11 @@ public:
 
 	void
 	freeEngine();
+
+	void
+	reverseStream() {
+		m_execFlags |= ExecFlag_ReverseStream;
+	}
 
 	void
 	initialize(
@@ -153,10 +151,10 @@ public:
 		return m_p->m_execFlags;
 	}
 
-	StreamState
-	getStreamState() const {
+	bool
+	isReverseStream() const {
 		ASSERT(m_p);
-		return m_p->m_streamState;
+		return (m_p->m_execFlags & (StateImpl::ExecFlag_ReverseStream)) != 0;
 	}
 
 	bool
