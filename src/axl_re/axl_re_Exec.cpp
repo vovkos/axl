@@ -33,7 +33,7 @@ void
 ExecEngine::reset(size_t offset) {
 	m_offset = offset;
 	m_decoderState = 0;
-	m_prevCharFlags = CharFlag_Other;
+	m_prevCharFlags = Anchor_BeginText | Anchor_BeginLine | Anchor_WordBoundary;
 }
 
 void

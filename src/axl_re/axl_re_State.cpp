@@ -19,6 +19,12 @@
 namespace axl {
 namespace re {
 
+// if no streaming is required and we are matching from the beginning of the text
+// then  we can start with NFA; it will work faster if there is a match
+
+// #define _AXL_RE_CAN_SKIP_DFA 1
+#define _AXL_RE_CAN_SKIP_DFA 0
+
 //..............................................................................
 
 StateImpl::StateImpl() {
@@ -88,7 +94,17 @@ StateImpl::postInitialize(
 	ASSERT(!m_regex && !m_engine);
 
 	m_regex = regex;
-	m_engine = createExecDfa(this); // the first engine is always DFA
+
+#if (_AXL_RE_CAN_SKIP_DFA)
+	if (regex->getRegexKind() != RegexKind_Switch &&
+		(m_execFlags & (RegexExecFlag_Stream | RegexExecFlag_AnchorDataBegin)) == RegexExecFlag_AnchorDataBegin)
+		m_engine = createExecNfaVm(this);
+	else
+		m_engine = createExecDfa(this);
+#else
+	m_engine = createExecDfa(this);
+#endif
+
 	reset(offset);
 }
 
@@ -154,16 +170,6 @@ StateImpl::createMatch(
 
 		m_subMatchArray[i + 1] = match;
 	}
-}
-
-bool
-StateImpl::exec(
-	const void* p,
-	size_t size
-) {
-	m_engine->preExec(p, size);
-	m_engine->exec(p, size);
-	return m_engine->getExecResult();
 }
 
 //..............................................................................

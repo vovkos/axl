@@ -39,11 +39,7 @@ protected:
 		closeCapture(
 			size_t offset,
 			size_t captureId
-		) {
-			ASSERT(captureId < m_capturePosArray.getCount());
-			m_capturePosArray[captureId].m_endOffset = offset;
-		}
-
+		);
 	};
 
 protected:
@@ -70,7 +66,7 @@ public:
 	virtual
 	bool
 	eof() {
-		advanceNonConsumingThreads(Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+		advanceNonConsumingThreads(m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
 		return finalize(true);
 	}
 

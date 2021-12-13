@@ -217,6 +217,9 @@ public:
 	}
 
 	void
+	prepareDfaState(const DfaState* state);
+
+	void
 	buildFullDfa();
 
 	void
@@ -277,7 +280,7 @@ public:
 
 	bool
 	eof(State* state) {
-		ASSERT(state->getRegex() == this && (state->getExecFlags() & RegexExecFlag_Stream));
+		ASSERT(state->getRegex() == this && (state->getExecFlags() & RegexExecFlag_Stream) && !state->isFinal());
 		return state->eof();
 	}
 

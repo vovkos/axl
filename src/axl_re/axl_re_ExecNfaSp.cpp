@@ -15,14 +15,6 @@
 #include "axl_enc_Utf16s.h"
 #include "axl_enc_Utf32s.h"
 
-#define _AXL_RE_TRACE_CAPTURE 0
-
-#if (_AXL_RE_TRACE_CAPTURE)
-#	define AXL_RE_TRACE_CAPTURE AXL_TRACE
-#else
-#	define AXL_RE_TRACE_CAPTURE (void)
-#endif
-
 namespace axl {
 namespace re {
 
@@ -78,7 +70,6 @@ ExecNfaSpBase::reset(
 	m_capturePosArray.clear();
 
 	addState(state);
-	advanceNonConsumingStates(Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 }
 
 void
@@ -93,8 +84,6 @@ ExecNfaSpBase::addState(const NfaState* state) {
 
 void
 ExecNfaSpBase::openCapture(size_t captureId) {
-	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
-
 	AXL_RE_TRACE_CAPTURE("%p: open capture(%d)\n", m_offset, captureId);
 
 	if (captureId >= m_capturePosArray.getCount())
@@ -106,8 +95,6 @@ ExecNfaSpBase::openCapture(size_t captureId) {
 
 void
 ExecNfaSpBase::closeCapture(size_t captureId) {
-	ASSERT(!(m_parent->m_execFlags & RegexExecFlag_DisableCapture));
-
 	AXL_RE_TRACE_CAPTURE("%p: close capture(%d)\n", m_offset, captureId);
 
 	ASSERT(captureId < m_capturePosArray.getCount());
@@ -203,8 +190,7 @@ ExecNfaSpBase::advanceConsumingStates(utf32_t c) {
 
 bool
 ExecNfaSpBase::finalize(bool isEof) {
-	if (m_parent->m_matchAcceptId != -1) // already finalized
-		return true;
+	ASSERT(m_parent->m_matchAcceptId == -1);
 
 	if (m_matchAcceptId == -1)
 		return false;
@@ -224,41 +210,14 @@ ExecNfaSpBase::finalize(bool isEof) {
 //..............................................................................
 
 template <typename Encoding>
-class ExecNfaSp: public ExecNfaSpBase {
+class ExecNfaSp: public ExecImpl<
+	ExecNfaSp<Encoding>,
+	ExecNfaSpBase,
+	Encoding
+> {
 public:
 	ExecNfaSp(StateImpl* parent):
-		ExecNfaSpBase(parent) {}
-
-	// ExecEngine
-
-	virtual
-	ExecEngine*
-	clone(StateImpl* parent) {
-		ExecNfaSp* exec = AXL_MEM_NEW_ARGS(ExecNfaSp, (parent));
-		exec->copy(this);
-		return exec;
-	}
-
-	virtual
-	void
-	exec(
-		const void* p,
-		size_t size
-	) {
-		Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, (char*)p + size);
-	}
-
-	// DecodeEmitter
-
-	bool
-	canEmit() const {
-		return m_execResult == ExecResult_Undefined;
-	}
-
-	void
-	emitReplacement(const char* p) {
-		emitCodePoint(p, enc::StdChar_Replacement);
-	}
+		ExecImpl<ExecNfaSp, ExecNfaSpBase, Encoding>(parent) {}
 
 	void
 	emitCodePoint(

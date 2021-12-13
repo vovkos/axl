@@ -25,10 +25,22 @@ ExecNfaVmBase::Thread::openCapture(
 	size_t offset,
 	size_t captureId
 ) {
+	AXL_RE_TRACE_CAPTURE("%p: open capture(%d)\n", offset, captureId);
+
 	if (captureId >= m_capturePosArray.getCount())
 		m_capturePosArray.setCount(captureId + 1);
 
 	m_capturePosArray[captureId].m_offset = offset;
+	m_capturePosArray[captureId].m_endOffset = offset;
+}
+
+void
+ExecNfaVmBase::Thread::closeCapture(
+	size_t offset,
+	size_t captureId
+) {
+	ASSERT(captureId < m_capturePosArray.getCount());
+	AXL_RE_TRACE_CAPTURE("%p: close capture(%d)\n", offset, captureId);
 	m_capturePosArray[captureId].m_endOffset = offset;
 }
 
@@ -61,7 +73,7 @@ ExecNfaVmBase::copy(const ExecNfaVmBase* src) {
 
 void
 ExecNfaVmBase::reset(size_t offset) {
-	reset(offset, m_parent->m_regex->getNfaMatchStartState());
+	reset(offset, m_parent->m_regex->getNfaMatchStartState()); // NFAs are for matching only
 }
 
 void
@@ -82,8 +94,6 @@ ExecNfaVmBase::reset(
 		m_consumingThreadList.insertTail(thread);
 	else
 		m_nonConsumingThreadList.insertTail(thread);
-
-	advanceNonConsumingThreads(Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 }
 
 void
@@ -199,8 +209,7 @@ ExecNfaVmBase::advanceConsumingThreads(utf32_t c) {
 
 bool
 ExecNfaVmBase::finalize(bool isEof) {
-	if (m_parent->m_matchAcceptId != -1) // already finalized
-		return true;
+	ASSERT(m_parent->m_matchAcceptId == -1);
 
 	if (!m_matchState)
 		return false;
@@ -220,41 +229,14 @@ ExecNfaVmBase::finalize(bool isEof) {
 //..............................................................................
 
 template <typename Encoding>
-class ExecNfaVm: public ExecNfaVmBase {
+class ExecNfaVm: public ExecImpl<
+	ExecNfaVm<Encoding>,
+	ExecNfaVmBase,
+	Encoding
+> {
 public:
 	ExecNfaVm(StateImpl* parent):
-		ExecNfaVmBase(parent) {}
-
-	// ExecEngine
-
-	virtual
-	ExecEngine*
-	clone(StateImpl* parent) {
-		ExecNfaVm* exec = AXL_MEM_NEW_ARGS(ExecNfaVm, (parent));
-		exec->copy(this);
-		return exec;
-	}
-
-	virtual
-	void
-	exec(
-		const void* p,
-		size_t size
-	) {
-		Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, (char*)p + size);
-	}
-
-	// DecodeEmitter
-
-	bool
-	canEmit() const {
-		return m_execResult == ExecResult_Undefined;
-	}
-
-	void
-	emitReplacement(const char* p) {
-		emitCodePoint(p, enc::StdChar_Replacement);
-	}
+		ExecImpl<ExecNfaVm, ExecNfaVmBase, Encoding>(parent) {}
 
 	void
 	emitCodePoint(

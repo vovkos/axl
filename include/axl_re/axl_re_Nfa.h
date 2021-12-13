@@ -29,7 +29,8 @@ enum Anchor {
 	Anchor_EndText         = 0x08,  // \z
 	Anchor_WordBoundary    = 0x10,  // \b
 	Anchor_NotWordBoundary = 0x20,  // \B
-	Anchor_Last            = Anchor_NotWordBoundary
+	Anchor__Mask           = 0x3f,
+	Anchor_Last            = Anchor_NotWordBoundary,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

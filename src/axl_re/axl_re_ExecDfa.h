@@ -23,68 +23,34 @@ struct DfaState;
 
 class ExecDfaBase: public ExecEngine {
 protected:
-	enum Flag {
-		// running the DFA backwards to find the beginning of the match
-		Flag_Backward = 0x01,
-	};
-
-protected:
-	uint_t m_flags;
-	const DfaState* m_dfaState;
+	const DfaState* m_state;
 	const void* m_p;
 	const void* m_matchEnd;
 	size_t m_baseOffset;
 	size_t m_matchAcceptId;
 	size_t m_matchEndOffset;
-	size_t m_savedMatchEndOffset;
+
+	union {
+		uint_t m_matchCharFlags;      // forward DFA only
+		size_t m_savedMatchEndOffset; // reverse DFA only
+	};
+
 #if (_AXL_DEBUG)
-	size_t m_savedMatchAcceptId;
+	size_t m_savedMatchAcceptId;      // reverse DFA only
 #endif
 
 public:
 	ExecDfaBase(StateImpl* parent);
-
-	virtual
-	void
-	reset(size_t offset);
-
-	virtual
-	bool
-	eof() {
-		processBoundary(m_offset, Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
-		return finalize(true);
-	}
 
 protected:
 	void
 	copy(const ExecDfaBase* src);
 
 	void
-	gotoDfaStateImpl(const DfaState* state);
+	copyForReverse(const ExecDfaBase* src);
 
 	void
-	gotoDfaState(
-		size_t offset,
-		const DfaState* state
-	);
-
-	void
-	gotoDfaState(
-		const void* p,
-		const DfaState* state
-	);
-
-	void
-	processBoundary(
-		size_t offset,
-		uint_t anchors
-	);
-
-	bool
-	finalize(bool isEof);
-
-	bool
-	createMatch(const MatchPos& pos);
+	gotoStateImpl(const DfaState* state);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -86,17 +86,6 @@ public:
 		const MatchPos& matchPos,
 		const sl::ArrayRef<MatchPos>& capturePosArray = sl::ArrayRef<MatchPos>()
 	);
-
-	bool
-	exec(
-		const void* p,
-		size_t size
-	);
-
-	bool
-	eof() {
-		return m_engine->eof();
-	}
 };
 
 //..............................................................................
@@ -171,6 +160,17 @@ public:
 	}
 
 	bool
+	getLastExecResult() const {
+		return m_p->m_engine->getExecResult();
+	}
+
+	bool
+	isFinal() const {
+		ASSERT(m_p);
+		return m_p->m_engine->isFinalized();
+	}
+
+	bool
 	isMatch() const {
 		ASSERT(m_p);
 		return m_p->m_matchAcceptId != -1;
@@ -184,6 +184,7 @@ public:
 
 	const Match*
 	getMatch() const {
+		ASSERT(m_p);
 		ASSERT(m_p);
 		return isMatch() ? &m_p->m_match : NULL;
 	}
@@ -235,17 +236,43 @@ protected:
 	exec(
 		const void* p,
 		size_t size
-	) {
-		ensureExclusive();
-		return m_p->exec(p, size);
-	}
+	);
 
 	bool
-	eof() {
-		ensureExclusive();
-		return m_p->eof();
-	}
+	eof();
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+State::exec(
+	const void* p,
+	size_t size
+) {
+	ensureExclusive();
+	m_p->m_engine->preExec(p, size);
+	m_p->m_engine->exec(p, size);
+	return m_p->m_engine->getExecResult();
+}
+
+inline
+bool
+State::eof() {
+	ASSERT(!m_p->m_engine->isFinalized());
+	ensureExclusive();
+	return m_p->m_engine->eof();
+}
+
+//..............................................................................
+
+// need a definition of StateImpl
+
+inline
+ExecNfaEngine::ExecNfaEngine(StateImpl* parent):
+	ExecEngine(parent) {
+	m_execFlags = parent->m_execFlags;
+}
 
 //..............................................................................
 

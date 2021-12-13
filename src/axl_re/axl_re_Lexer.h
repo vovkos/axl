@@ -263,7 +263,8 @@ Lexer::getToken() {
 inline
 Token
 Lexer::nextToken() {
-	ASSERT(m_tokenCount);
+	if (!m_tokenCount)
+		tokenize();
 
 	Token token = m_tokenBuffer[m_readIdx];
 	if (token > TokenKind_FirstValid)

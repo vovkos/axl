@@ -32,12 +32,13 @@ protected:
 	};
 
 	enum CharFlag {
-		CharFlag_Cr    = 0x01,
-		CharFlag_Lf    = 0x02,
+		// can be combined with Anchor-s, so make sure these don't overlap
+
+		CharFlag_Cr    = 0x100,
+		CharFlag_Lf    = 0x200,
 		CharFlag_Nl    = CharFlag_Lf,
-		CharFlag_Word  = 0x04,
-		CharFlag_Other = 0x08, // non-zero
-		CharFlag_ForcedWordBoundary = 0x10, // enforce word boundary at the 1st char
+		CharFlag_Word  = 0x400,
+		CharFlag_Other = 0x800, // token of pre-calculated flags
 	};
 
 protected:
@@ -58,9 +59,19 @@ public:
 	virtual
 	~ExecEngine() {}
 
+	StateImpl*
+	getParent() const {
+		return m_parent;
+	}
+
 	bool
 	getExecResult() const {
 		return m_execResult != ExecResult_False; // true or undefined
+	}
+
+	bool
+	isFinalized() const {
+		return m_execResult != ExecResult_Undefined;
 	}
 
 	void
@@ -99,15 +110,10 @@ protected:
 	static
 	uint_t
 	calcAnchors(
+		uint_t anchors,
 		uint_t prevCharFlags,
 		uint_t charFlags
 	);
-
-	uint_t
-	calcAnchorsUpdateCharFlags(utf32_t c);
-
-	uint_t
-	calcReverseAnchorsUpdateCharFlags(utf32_t c);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -131,22 +137,18 @@ uint_t
 ExecEngine::calcCharFlags(utf32_t c) {
 	return
 		c == '\r' ? CharFlag_Cr :
-		c == '\n' ? CharFlag_Lf :
-		c == '_' || enc::isLetterOrDigit(c) ? CharFlag_Word :
+		c == '\n' ? CharFlag_Lf | Anchor_BeginLine :
+		enc::isWord(c) ? CharFlag_Word :
 		CharFlag_Other;
 }
 
 inline
 uint_t
 ExecEngine::calcAnchors(
+	uint_t anchors,
 	uint_t prevCharFlags,
 	uint_t charFlags
 ) {
-	uint_t anchors = 0;
-
-	if (prevCharFlags & CharFlag_Lf)
-		anchors |= Anchor_BeginLine;
-
 	if (charFlags & (CharFlag_Cr | CharFlag_Lf))
 		anchors |= Anchor_EndLine;
 
@@ -158,36 +160,14 @@ ExecEngine::calcAnchors(
 	return anchors;
 }
 
-inline
-uint_t
-ExecEngine::calcAnchorsUpdateCharFlags(utf32_t c) {
-	uint_t charFlags = calcCharFlags(c);
-	uint_t anchors = m_prevCharFlags ?
-		calcAnchors(m_prevCharFlags, charFlags) :
-		calcAnchors(calcCharFlags(m_prevChar), calcCharFlags(c));
-
-	m_prevCharFlags = charFlags;
-	return anchors;
-}
-
-inline
-uint_t
-ExecEngine::calcReverseAnchorsUpdateCharFlags(utf32_t c) {
-	uint_t charFlags = calcCharFlags(c);
-	uint_t anchors = m_prevCharFlags ?
-		calcAnchors(charFlags, m_prevCharFlags) :
-		calcAnchors(calcCharFlags(c), calcCharFlags(m_prevChar));
-
-	m_prevCharFlags = charFlags;
-	return anchors;
-}
-
 //..............................................................................
 
 class ExecNfaEngine: public ExecEngine {
+protected:
+	uint_t m_execFlags; // cache to save one indirection
+
 public:
-	ExecNfaEngine(StateImpl* parent):
-		ExecEngine(parent) {}
+	ExecNfaEngine(StateImpl* parent);
 
 	virtual
 	void
@@ -195,9 +175,77 @@ public:
 		size_t offset,
 		const NfaState* state
 	) = 0;
+
+protected:
+	uint_t
+	calcAnchorsUpdateCharFlags(utf32_t c);
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+uint_t
+ExecNfaEngine::calcAnchorsUpdateCharFlags(utf32_t c) {
+	ASSERT(m_prevCharFlags);
+	uint_t charFlags = calcCharFlags(c);
+	uint_t anchors = calcAnchors(m_prevCharFlags, m_prevCharFlags, charFlags);
+	m_prevCharFlags = charFlags;
+	return anchors;
+}
+
+//..............................................................................
+
+template <
+	typename T,
+	typename Base,
+	typename Encoding
+>
+class ExecImpl: public Base {
+public:
+	ExecImpl(StateImpl* parent):
+		Base(parent) {}
+
+	// ExecEngine
+
+	virtual
+	ExecEngine*
+	clone(StateImpl* parent) {
+		T* exec = AXL_MEM_NEW_ARGS(T, (parent));
+		exec->copy(this);
+		return exec;
+	}
+
+	virtual
+	void
+	exec(
+		const void* p,
+		size_t size
+	) {
+		Encoding::Decoder::decode(&m_decoderState, *static_cast<T*>(this), (char*)p, (char*)p + size);
+	}
+
+	// DecodeEmitter
+
+	bool
+	canEmit() const {
+		return m_execResult == ExecResult_Undefined;
+	}
+
+	void
+	emitReplacement(const char* p) {
+		static_cast<T*>(this)->emitCodePoint(p, enc::StdChar_Replacement);
+	}
 };
 
 //..............................................................................
+
+#define _AXL_RE_TRACE_CAPTURE 0
+
+#if (_AXL_RE_TRACE_CAPTURE)
+#	define AXL_RE_TRACE_CAPTURE AXL_TRACE
+#else
+#	define AXL_RE_TRACE_CAPTURE (void)
+#endif
 
 } // namespace re
 } // namespace axl

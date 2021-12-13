@@ -46,7 +46,7 @@ public:
 	virtual
 	bool
 	eof() {
-		advanceNonConsumingStates(Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+		advanceNonConsumingStates(m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
 		return finalize(true);
 	}
 

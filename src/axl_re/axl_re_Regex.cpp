@@ -325,6 +325,14 @@ Regex::compileSwitchCase(
 }
 
 void
+Regex::prepareDfaState(const DfaState* state) {
+	ASSERT(!(state->m_flags & DfaStateFlag_Ready));
+
+	DfaBuilder builder((state->m_flags & DfaStateFlag_Reverse) ? &m_dfaReverseProgram : &m_dfaProgram);
+	builder.buildTransitionMaps((DfaState*)state);
+}
+
+void
 Regex::buildFullDfa() {
 	DfaBuilder builder(&m_dfaProgram);
 
@@ -372,7 +380,9 @@ Regex::exec(
 		ASSERT(state->getRegex() == this);
 
 	bool result = state->exec(p, size);
-	return result ? (state->getExecFlags() & RegexExecFlag_Stream) ? true : state->eof() : false;
+	return result && !state->isFinal() && !(state->getExecFlags() & RegexExecFlag_Stream) ?
+		state->eof() :
+		result;
 }
 
 //..............................................................................
