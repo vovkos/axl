@@ -19,32 +19,20 @@
 namespace axl {
 namespace re {
 
-class RegexNameMgr;
-
 //..............................................................................
+
+enum CompileFlag {
+	CompileFlag_CaseInsensitive = 0x01,
+	CompileFlag_MatchOnly       = 0x02, // don't demux NFA and no search start states
+	CompileFlag_DisableCapture  = 0x04, // same as ExecFlag_NoCapture
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum RegexKind {
 	RegexKind_Undefined,
 	RegexKind_Single,
 	RegexKind_Switch,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum RegexCompileFlag {
-	RegexCompileFlag_CaseInsensitive = 0x01,
-	RegexCompileFlag_MatchOnly       = 0x02, // don't demux NFA and no search start states
-	RegexCompileFlag_DisableCapture  = 0x04, // same as RegexExecFlag_NoCapture
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum RegexExecFlag {
-	RegexExecFlag_Stream          = 0x01, // feed data chunk-by-chunk, then call re::Regex::eof()
-	RegexExecFlag_DisableCapture  = 0x02, // don't capture sub-matches
-	RegexExecFlag_AnchorDataBegin = 0x04, // match must start on the first byte of data
-	RegexExecFlag_AnchorDataEnd   = 0x08, // match must end on the last byte of data
-	RegexExecFlag_ExactMatch      = RegexExecFlag_AnchorDataBegin | RegexExecFlag_AnchorDataEnd,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -94,13 +82,8 @@ public:
 	}
 
 	const NfaState*
-	getNfaMatchStartState() const {
+	getNfaStartState() const {
 		return m_nfaProgram.m_matchStartState;
-	}
-
-	const NfaState*
-	getNfaSearchStartState() const {
-		return m_nfaProgram.m_searchStartState;
 	}
 
 	const DfaState*
@@ -120,7 +103,7 @@ public:
 	}
 
 	const DfaState*
-	getDfaReverseMatchStartState() {
+	getDfaReverseStartState() {
 		return
 			m_dfaReverseProgram.m_matchStartState ? m_dfaReverseProgram.m_matchStartState :
 			m_nfaProgram.m_matchStartState ? m_dfaReverseProgram.m_matchStartState = m_dfaReverseProgram.createStartState(m_nfaProgram.m_matchStartState) :
@@ -141,13 +124,10 @@ public:
 	}
 
 	const NfaState*
-	getSwitchCaseNfaMatchStartState(size_t id) {
+	getSwitchCaseNfaStartState(size_t id) {
 		ASSERT(m_regexKind == RegexKind_Switch);
 		return m_switchCaseArray[id].m_nfaMatchStartState;
 	}
-
-	const DfaState*
-	getSwitchCaseDfaMatchStartState(size_t id);
 
 	void
 	clear();
@@ -181,15 +161,6 @@ public:
 	compile(
 		const sl::StringRef& source,
 		uint_t flags = 0
-	) {
-		return compile(NULL, source, flags);
-	}
-
-	bool
-	compile(
-		RegexNameMgr* nameMgr,
-		const sl::StringRef& source,
-		uint_t flags = 0
 	);
 
 	void
@@ -199,21 +170,12 @@ public:
 	compileSwitchCase(
 		const sl::StringRef& source,
 		uint_t flags = 0
-	) {
-		return compileSwitchCase(NULL, source, flags);
-	}
-
-	size_t
-	compileSwitchCase(
-		RegexNameMgr* nameMgr,
-		const sl::StringRef& source,
-		uint_t flags = 0
 	);
 
 	void
-	finalizeSwitch(uint_t flags = 0) { // only RegexCompileFlag_MatchOnly makes sense here
+	finalizeSwitch(uint_t flags = 0) { // only CompileFlag_MatchOnly makes sense here
 		ASSERT(m_regexKind = RegexKind_Switch);
-		m_nfaProgram.finalize((flags & RegexCompileFlag_MatchOnly) != 0);
+		m_nfaProgram.finalize((flags & CompileFlag_MatchOnly) != 0);
 	}
 
 	void
@@ -230,7 +192,7 @@ public:
 
 	// execution (match/search)
 
-	bool
+	ExecResult
 	exec(
 		State* state,
 		const void* p,
@@ -278,9 +240,9 @@ public:
 		return exec(0, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
 	}
 
-	bool
+	ExecResult
 	eof(State* state) {
-		ASSERT(state->getRegex() == this && (state->getExecFlags() & RegexExecFlag_Stream) && !state->isFinal());
+		ASSERT(state->getRegex() == this && (state->getExecFlags() & ExecFlag_Stream) && !state->isFinal());
 		return state->eof();
 	}
 
@@ -303,21 +265,6 @@ public:
 	}
 #endif
 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-const DfaState*
-Regex::getSwitchCaseDfaMatchStartState(size_t id) {
-	ASSERT(m_regexKind == RegexKind_Switch);
-
-	SwitchCase& scase = m_switchCaseArray[id];
-	ASSERT(scase.m_nfaMatchStartState);
-
-	return
-		scase.m_dfaMatchStartState ? scase.m_dfaMatchStartState :
-		scase.m_dfaMatchStartState = m_dfaProgram.createStartState(scase.m_nfaMatchStartState);
-}
 
 //..............................................................................
 

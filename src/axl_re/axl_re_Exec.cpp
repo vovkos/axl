@@ -22,7 +22,7 @@ ExecEngine::ExecEngine(StateImpl* parent) {
 	m_lastExecData = NULL;
 	m_lastExecOffset = 0;
 	m_lastExecEndOffset = 0;
-	m_execResult = ExecResult_Undefined;
+	m_execResult = ExecResult_Continue;
 	m_decoderState = 0;
 	m_prevChar = 0;
 	m_prevCharFlags = 0;
@@ -34,6 +34,7 @@ ExecEngine::reset(size_t offset) {
 	m_offset = offset;
 	m_decoderState = 0;
 	m_prevCharFlags = Anchor_BeginText | Anchor_BeginLine | Anchor_WordBoundary;
+	m_execResult = ExecResult_Continue;
 }
 
 void

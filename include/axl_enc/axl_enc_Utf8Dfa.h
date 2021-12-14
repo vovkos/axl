@@ -336,13 +336,13 @@ public:
 
 	void
 	load(uint32_t storage) {
-		m_state = (storage & 0xff000000) >> 21;
+		m_state = (storage & 0xff000000) >> 24;
 		m_acc = storage & 0x00ffffff;
 	}
 
 	uint32_t
 	save() const {
-		return (m_state << 21) | (m_acc & 0x00ffffff);
+		return (m_state << 24) | (m_acc & 0x00ffffff);
 	}
 
 	uint_t

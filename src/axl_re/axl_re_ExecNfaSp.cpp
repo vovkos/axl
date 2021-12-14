@@ -48,7 +48,7 @@ ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
 
 void
 ExecNfaSpBase::reset(size_t offset) {
-	reset(offset, m_parent->m_regex->getNfaMatchStartState());
+	reset(offset, m_parent->m_regex->getNfaStartState());
 }
 
 void
@@ -127,14 +127,14 @@ ExecNfaSpBase::advanceNonConsumingStates(uint32_t anchors) {
 				break;
 
 			case NfaStateKind_OpenCapture:
-				if (!(m_parent->m_execFlags & RegexExecFlag_DisableCapture))
+				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
 					openCapture(state->m_captureId);
 
 				addState(state->m_nextState);
 				break;
 
 			case NfaStateKind_CloseCapture:
-				if (!(m_parent->m_execFlags & RegexExecFlag_DisableCapture))
+				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
 					closeCapture(state->m_captureId);
 
 				addState(state->m_nextState);
@@ -188,23 +188,27 @@ ExecNfaSpBase::advanceConsumingStates(utf32_t c) {
 	}
 }
 
-bool
+void
 ExecNfaSpBase::finalize(bool isEof) {
 	ASSERT(m_parent->m_matchAcceptId == -1);
 
-	if (m_matchAcceptId == -1)
-		return false;
+	if (m_matchAcceptId == -1) {
+		m_execResult = ExecResult_NoMatch;
+		return;
+	}
 
-	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataEnd) {
+	if (m_parent->m_execFlags & ExecFlag_AnchorDataEnd) {
 		if (!isEof)
-			return true; // can't verify until we see EOF
+			return; // can't verify until we see EOF
 
-		if (m_matchPos.m_endOffset != m_lastExecEndOffset)
-			return false;
+		if (m_matchPos.m_endOffset != m_lastExecEndOffset) {
+			m_execResult = ExecResult_NoMatch;
+			return;
+		}
 	}
 
 	m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, m_lastExecData, m_matchPos);
-	return true;
+	m_execResult = ExecResult_Match;
 }
 
 //..............................................................................
@@ -228,7 +232,7 @@ public:
 		advanceNonConsumingStates(anchors);
 
 		if (m_isEmpty) {
-			m_execResult = (ExecResult)finalize(false);
+			finalize(false);
 			return;
 		}
 

@@ -23,6 +23,7 @@ struct DfaState;
 
 class ExecDfaBase: public ExecEngine {
 protected:
+	ExecDfaBase* m_forwardEngine;     // reverse DFA only
 	const DfaState* m_state;
 	const void* m_p;
 	const void* m_matchEnd;
@@ -47,7 +48,7 @@ protected:
 	copy(const ExecDfaBase* src);
 
 	void
-	copyForReverse(const ExecDfaBase* src);
+	setForwardEngine(ExecDfaBase* forwardEngine);
 
 	void
 	gotoStateImpl(const DfaState* state);

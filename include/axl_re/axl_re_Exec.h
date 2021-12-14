@@ -23,14 +23,28 @@ struct NfaState;
 
 //..............................................................................
 
+enum ExecFlag {
+	ExecFlag_Stream          = 0x01, // feed data chunk-by-chunk, then call re::Regex::eof()
+	ExecFlag_DisableCapture  = 0x02, // don't capture sub-matches
+	ExecFlag_AnchorDataBegin = 0x04, // match must start on the first byte of data
+	ExecFlag_AnchorDataEnd   = 0x08, // match must end on the last byte of data
+	ExecFlag_ExactMatch      = ExecFlag_AnchorDataBegin | ExecFlag_AnchorDataEnd,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum ExecResult {
+	ExecResult_Match            = 2,
+	ExecResult_MatchOffsetsOnly = 1,
+	ExecResult_NoMatch          = 0,
+	ExecResult_Continue         = -1, // continue feeding data
+	ExecResult_ContinueBackward = -2, // continue feeding backward data
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class ExecEngine {
 protected:
-	enum ExecResult {
-		ExecResult_Undefined = -1,
-		ExecResult_False     = false,
-		ExecResult_True      = true,
-	};
-
 	enum CharFlag {
 		// can be combined with Anchor-s, so make sure these don't overlap
 
@@ -38,7 +52,7 @@ protected:
 		CharFlag_Lf    = 0x200,
 		CharFlag_Nl    = CharFlag_Lf,
 		CharFlag_Word  = 0x400,
-		CharFlag_Other = 0x800, // token of pre-calculated flags
+		CharFlag_Other = 0x800, // the token of pre-calculated flags
 	};
 
 protected:
@@ -64,21 +78,15 @@ public:
 		return m_parent;
 	}
 
-	bool
+	ExecResult
 	getExecResult() const {
-		return m_execResult != ExecResult_False; // true or undefined
+		return m_execResult;
 	}
 
 	bool
 	isFinalized() const {
-		return m_execResult != ExecResult_Undefined;
+		return m_execResult >= 0;
 	}
-
-	void
-	preExec(
-		const void* p,
-		size_t size
-	);
 
 	virtual
 	ExecEngine*
@@ -96,7 +104,7 @@ public:
 	) = 0;
 
 	virtual
-	bool
+	void
 	eof() = 0;
 
 protected:
@@ -115,20 +123,6 @@ protected:
 		uint_t charFlags
 	);
 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-void
-ExecEngine::preExec(
-	const void* p,
-	size_t size
-) {
-	m_execResult = ExecResult_Undefined;
-	m_lastExecData = p;
-	m_lastExecOffset = m_offset;
-	m_lastExecEndOffset = m_offset + size;
-}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -221,6 +215,9 @@ public:
 		const void* p,
 		size_t size
 	) {
+		m_lastExecData = p;
+		m_lastExecOffset = m_offset;
+		m_lastExecEndOffset = m_offset + size;
 		Encoding::Decoder::decode(&m_decoderState, *static_cast<T*>(this), (char*)p, (char*)p + size);
 	}
 
@@ -228,7 +225,7 @@ public:
 
 	bool
 	canEmit() const {
-		return m_execResult == ExecResult_Undefined;
+		return m_execResult < 0;
 	}
 
 	void

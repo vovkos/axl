@@ -628,8 +628,8 @@ testRegex() {
 	const char text[] = "   abc123   ";
 //	const char text[] = "xaaabbbbcd";
 
-#if (0)
-	printf("\nMATCHING TEXT: %s\n", text);
+#if (1)
+	printf("\nMATCHING TEXT: '%s'\n", text);
 
 	state = regex.exec(text);
 	if (!state) {
@@ -662,16 +662,26 @@ testRegex() {
 #endif
 
 #if (1)
-	printf("STREAM MATCH:\n");
+	printf("STREAM MATCH: '%s':\n", text);
 
-	state.initialize(re::RegexExecFlag_Stream);
+	state.initialize(re::ExecFlag_Stream);
 
 	const char* p = text;
 	const char* end = text + lengthof(text);
 	for (; p < end; p++) {
-		result = regex.exec(&state, p, 1);
-		if (result && state.getMatch())
+		re::ExecResult result = regex.exec(&state, p, 1);
+		if (result != re::ExecResult_Continue) {
+			if (result != re::ExecResult_ContinueBackward)
+				break;
+
+			for (p--; p >= text; p--) {
+				result = regex.exec(&state, p, 1);
+				if (result >= 0)
+					break;
+			}
+
 			break;
+		}
 	}
 
 	match = state.getMatch();
@@ -760,7 +770,7 @@ testRegex() {
 	for (size_t i = 0; i < countof(lexemes); i++) {
 		printf("MATCHING: %s\n", lexemes[i]);
 
-		// re::State state = regex.match(re::RegexExecFlag_ExactMatch, lexemes[i]);
+		// re::State state = regex.match(re::ExecFlag_ExactMatch, lexemes[i]);
 		re::State state = regex.exec(lexemes[i]);
 		if (!state) {
 			printf("NO MATCH!\n");
@@ -791,7 +801,7 @@ testRegex2() {
 	static const char src[] = "[a-b]*c+";
 	printf("REGEX: %s\n\n", src);
 
-	result = regex.compile(src, re::RegexCompileFlag_DisableCapture);
+	result = regex.compile(src, re::CompileFlag_DisableCapture);
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;

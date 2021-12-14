@@ -23,7 +23,6 @@ set(
 	${AXL_INC_DIR}/axl_re/axl_re_Match.h
 	${AXL_INC_DIR}/axl_re/axl_re_State.h
 	${AXL_INC_DIR}/axl_re/axl_re_Storage.h
-	${AXL_INC_DIR}/axl_re/axl_re_NameMgr.h
 	axl_re_StdCharClass.h
 	axl_re_Lexer.h
 	axl_re_Compiler.h

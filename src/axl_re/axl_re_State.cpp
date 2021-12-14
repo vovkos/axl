@@ -51,7 +51,7 @@ StateImpl::initialize(
 
 	m_regex = NULL;
 	m_codecKind = codecKind;
-	m_execFlags = execFlags & ~ExecFlag_ReverseStream;
+	m_execFlags = execFlags;
 }
 
 StateImpl*
@@ -95,7 +95,7 @@ StateImpl::postInitialize(
 
 #if (_AXL_RE_CAN_SKIP_DFA)
 	if (regex->getRegexKind() != RegexKind_Switch &&
-		(m_execFlags & (RegexExecFlag_Stream | RegexExecFlag_AnchorDataBegin)) == RegexExecFlag_AnchorDataBegin)
+		(m_execFlags & (ExecFlag_Stream | ExecFlag_AnchorDataBegin)) == ExecFlag_AnchorDataBegin)
 		m_engine = createExecNfaVm(this);
 	else
 		m_engine = createExecDfa(this);
@@ -110,7 +110,6 @@ void
 StateImpl::reset(size_t offset) {
 	ASSERT(m_engine);
 
-	m_execFlags &= ~ExecFlag_ReverseStream;
 	m_matchAcceptId = -1;
 	m_match.m_offset = -1;
 	m_match.m_endOffset = -1;
@@ -143,7 +142,7 @@ StateImpl::createMatch(
 	}
 
 	size_t count = capturePosArray.getCount();
-	if (!count || (m_execFlags & RegexExecFlag_DisableCapture)) {
+	if (!count || (m_execFlags & ExecFlag_DisableCapture)) {
 		m_subMatchArray.copy(&m_match);
 		return;
 	}

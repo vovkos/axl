@@ -13,7 +13,6 @@
 
 #include "axl_re_Lexer.h"
 #include "axl_re_Nfa.h"
-#include "axl_re_NameMgr.h"
 
 namespace axl {
 namespace re {
@@ -23,7 +22,6 @@ namespace re {
 class Compiler: protected Lexer {
 protected:
 	NfaProgram* m_program;
-	RegexNameMgr* m_nameMgr;
 	uint_t m_flags;
 
 public:
@@ -31,15 +29,8 @@ public:
 		NfaProgram* program,
 		uint_t flags
 	) {
-		construct(NULL, program, flags);
-	}
-
-	Compiler(
-		RegexNameMgr* nameMgr,
-		NfaProgram* program,
-		uint_t flags
-	) {
-		construct(nameMgr, program, flags);
+		m_program = program;
+		m_flags = flags;
 	}
 
 	NfaState*
@@ -55,13 +46,6 @@ public:
 	);
 
 protected:
-	void
-	construct(
-		RegexNameMgr* nameMgr,
-		NfaProgram* program,
-		uint_t flags
-	);
-
 	bool
 	expectToken(TokenKind tokenKind);
 

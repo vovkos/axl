@@ -44,10 +44,10 @@ public:
 	);
 
 	virtual
-	bool
+	void
 	eof() {
 		advanceNonConsumingStates(m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
-		return finalize(true);
+		finalize(true);
 	}
 
 protected:
@@ -69,7 +69,7 @@ protected:
 	void
 	advanceConsumingStates(utf32_t c);
 
-	bool
+	void
 	finalize(bool isEof);
 };
 

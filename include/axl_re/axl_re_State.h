@@ -28,10 +28,6 @@ class State;
 struct StateImpl: public rc::RefCount {
 	friend class State;
 
-	enum ExecFlag {
-		ExecFlag_ReverseStream = 0x100, // don't overlap with RegexExecFlag
-	};
-
 	Regex* m_regex;
 	ExecEngine* m_engine;
 	enc::CharCodecKind m_codecKind;
@@ -52,11 +48,6 @@ public:
 
 	void
 	freeEngine();
-
-	void
-	reverseStream() {
-		m_execFlags |= ExecFlag_ReverseStream;
-	}
 
 	void
 	initialize(
@@ -152,12 +143,12 @@ public:
 	}
 
 	bool
-	isReverseStream() const {
+	isStream() const {
 		ASSERT(m_p);
-		return (m_p->m_execFlags & (StateImpl::ExecFlag_ReverseStream)) != 0;
+		return (m_p->m_execFlags & ExecFlag_Stream) != 0;
 	}
 
-	bool
+	ExecResult
 	getLastExecResult() const {
 		return m_p->m_engine->getExecResult();
 	}
@@ -230,36 +221,35 @@ protected:
 		m_p->postInitialize(regex, 0);
 	}
 
-	bool
+	ExecResult
 	exec(
 		const void* p,
 		size_t size
 	);
 
-	bool
+	ExecResult
 	eof();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-bool
+ExecResult
 State::exec(
 	const void* p,
 	size_t size
 ) {
 	ensureExclusive();
-	m_p->m_engine->preExec(p, size);
 	m_p->m_engine->exec(p, size);
 	return m_p->m_engine->getExecResult();
 }
 
 inline
-bool
+ExecResult
 State::eof() {
-	ASSERT(!m_p->m_engine->isFinalized());
 	ensureExclusive();
-	return m_p->m_engine->eof();
+	m_p->m_engine->eof();
+	return m_p->m_engine->getExecResult();
 }
 
 //..............................................................................

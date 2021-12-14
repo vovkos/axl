@@ -73,7 +73,7 @@ ExecNfaVmBase::copy(const ExecNfaVmBase* src) {
 
 void
 ExecNfaVmBase::reset(size_t offset) {
-	reset(offset, m_parent->m_regex->getNfaMatchStartState()); // NFAs are for matching only
+	reset(offset, m_parent->m_regex->getNfaStartState());
 }
 
 void
@@ -136,13 +136,13 @@ ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 				goto Break2;
 
 			case NfaStateKind_OpenCapture:
-				if (!(m_parent->m_execFlags & RegexExecFlag_DisableCapture))
+				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
 					thread->openCapture(m_offset, state->m_captureId);
 				state = state->m_nextState;
 				break;
 
 			case NfaStateKind_CloseCapture:
-				if (!(m_parent->m_execFlags & RegexExecFlag_DisableCapture))
+				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
 					thread->closeCapture(m_offset, state->m_captureId);
 				state = state->m_nextState;
 				break;
@@ -207,23 +207,27 @@ ExecNfaVmBase::advanceConsumingThreads(utf32_t c) {
 	}
 }
 
-bool
+void
 ExecNfaVmBase::finalize(bool isEof) {
 	ASSERT(m_parent->m_matchAcceptId == -1);
 
-	if (!m_matchState)
-		return false;
+	if (!m_matchState) {
+		m_execResult = ExecResult_NoMatch;
+		return;
+	}
 
-	if (m_parent->m_execFlags & RegexExecFlag_AnchorDataEnd) {
+	if (m_parent->m_execFlags & ExecFlag_AnchorDataEnd) {
 		if (!isEof)
-			return true; // can't verify until we see EOF
+			return; // can't verify until we see EOF
 
-		if (m_matchPos.m_endOffset != m_lastExecEndOffset)
-			return false;
+		if (m_matchPos.m_endOffset != m_lastExecEndOffset) {
+			m_execResult = ExecResult_NoMatch;
+			return;
+		}
 	}
 
 	m_parent->createMatch(m_matchState->m_acceptId, m_lastExecOffset, m_lastExecData, m_matchPos, m_capturePosArray);
-	return true;
+	m_execResult = ExecResult_Match;
 }
 
 //..............................................................................
@@ -247,7 +251,7 @@ public:
 		advanceNonConsumingThreads(anchors);
 
 		if (m_consumingThreadList.isEmpty()) {
-			m_execResult = (ExecResult)finalize(false);
+			finalize(false);
 			return;
 		}
 

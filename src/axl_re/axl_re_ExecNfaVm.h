@@ -64,10 +64,10 @@ public:
 	);
 
 	virtual
-	bool
+	void
 	eof() {
 		advanceNonConsumingThreads(m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
-		return finalize(true);
+		finalize(true);
 	}
 
 protected:
@@ -83,7 +83,7 @@ protected:
 	void
 	advanceConsumingThreads(utf32_t c);
 
-	bool
+	void
 	finalize(bool isEof);
 };
 

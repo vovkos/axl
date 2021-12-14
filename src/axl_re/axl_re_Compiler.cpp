@@ -19,17 +19,6 @@ namespace re {
 
 //..............................................................................
 
-void
-Compiler::construct(
-	RegexNameMgr* nameMgr,
-	NfaProgram* program,
-	uint_t flags
-) {
-	m_program = program;
-	m_nameMgr = nameMgr;
-	m_flags = flags;
-}
-
 NfaState*
 Compiler::compileSwitchCase(
 	const sl::StringRef& source,
@@ -311,7 +300,7 @@ Compiler::single() {
 
 	switch (token.m_tokenKind) {
 	case TokenKind_Group:
-		return (m_flags & RegexCompileFlag_DisableCapture) ?
+		return (m_flags & CompileFlag_DisableCapture) ?
 			nonCapturingGroup() :
 			capturingGroup();
 

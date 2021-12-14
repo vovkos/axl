@@ -277,19 +277,18 @@ Regex::save(sl::Array<char>* buffer) {
 
 bool
 Regex::compile(
-	RegexNameMgr* nameMgr,
 	const sl::StringRef& source,
 	uint_t flags
 ) {
 	clear();
 	m_regexKind = RegexKind_Single;
 
-	Compiler compiler(nameMgr, &m_nfaProgram, flags);
+	Compiler compiler(&m_nfaProgram, flags);
 	bool result = compiler.compile(source, 0);
 	if (!result)
 		return false;
 
-	m_nfaProgram.finalize((flags & RegexCompileFlag_MatchOnly) != 0);
+	m_nfaProgram.finalize((flags & CompileFlag_MatchOnly) != 0);
 	return true;
 }
 
@@ -302,19 +301,18 @@ Regex::createSwitch(size_t caseCountHint) {
 
 size_t
 Regex::compileSwitchCase(
-	RegexNameMgr* nameMgr,
 	const sl::StringRef& source,
 	uint_t flags
 ) {
 	ASSERT(m_regexKind = RegexKind_Switch);
-	ASSERT(!(flags & RegexCompileFlag_MatchOnly)); // RegexCompileFlag_MatchOnly only for finalizeSwitch()
+	ASSERT(!(flags & CompileFlag_MatchOnly)); // CompileFlag_MatchOnly only for finalizeSwitch()
 
 	SwitchCase scase;
 	size_t id = m_switchCaseArray.getCount();
 	size_t prevCaptureCount = m_nfaProgram.m_captureCount;
 	m_nfaProgram.m_captureCount = 0;
 
-	Compiler compiler(nameMgr, &m_nfaProgram, flags);
+	Compiler compiler(&m_nfaProgram, flags);
 	scase.m_nfaMatchStartState = compiler.compileSwitchCase(source, id);
 
 	if (prevCaptureCount > m_nfaProgram.m_captureCount)
@@ -349,7 +347,7 @@ void
 Regex::buildFullReverseDfa() {
 	DfaBuilder builder(&m_dfaReverseProgram);
 
-	getDfaReverseMatchStartState();
+	getDfaReverseStartState();
 	while (!m_dfaReverseProgram.m_preStateList.isEmpty())
 		builder.buildTransitionMaps(*m_dfaReverseProgram.m_preStateList.getHead());
 }
@@ -366,7 +364,7 @@ Regex::buildFullRollbackDfa() {
 		builder.buildTransitionMaps(*m_dfaReverseProgram.m_preStateList.getHead());
 }
 
-bool
+ExecResult
 Regex::exec(
 	State* state,
 	const void* p,
@@ -379,8 +377,8 @@ Regex::exec(
 	else
 		ASSERT(state->getRegex() == this);
 
-	bool result = state->exec(p, size);
-	return result && !state->isFinal() && !(state->getExecFlags() & RegexExecFlag_Stream) ?
+	ExecResult result = state->exec(p, size);
+	return result && !state->isFinal() && !state->isStream() ?
 		state->eof() :
 		result;
 }
