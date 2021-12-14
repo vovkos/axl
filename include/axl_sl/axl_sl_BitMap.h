@@ -146,7 +146,7 @@ mergeBitMaps(
 ) {
 	size_t* end = p + pageCount;
 	for (; p < end; p++, p2++)
-		*p = Op(*p, *p2);
+		*p = Op()(*p, *p2);
 }
 
 template <typename Op>

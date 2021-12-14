@@ -801,7 +801,7 @@ testRegex2() {
 	static const char src[] = "[a-b]*c+";
 	printf("REGEX: %s\n\n", src);
 
-	result = regex.compile(src, re::CompileFlag_DisableCapture);
+	result = regex.compile(re::CompileFlag_DisableCapture, src);
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;

@@ -277,8 +277,8 @@ Regex::save(sl::Array<char>* buffer) {
 
 bool
 Regex::compile(
-	const sl::StringRef& source,
-	uint_t flags
+	uint_t flags,
+	const sl::StringRef& source
 ) {
 	clear();
 	m_regexKind = RegexKind_Single;
@@ -292,17 +292,10 @@ Regex::compile(
 	return true;
 }
 
-void
-Regex::createSwitch(size_t caseCountHint) {
-	clear();
-	m_regexKind = RegexKind_Switch;
-	m_switchCaseArray.reserve(caseCountHint);
-}
-
 size_t
 Regex::compileSwitchCase(
-	const sl::StringRef& source,
-	uint_t flags
+	uint_t flags,
+	const sl::StringRef& source
 ) {
 	ASSERT(m_regexKind = RegexKind_Switch);
 	ASSERT(!(flags & CompileFlag_MatchOnly)); // CompileFlag_MatchOnly only for finalizeSwitch()

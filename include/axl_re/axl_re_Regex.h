@@ -159,18 +159,31 @@ public:
 
 	bool
 	compile(
-		const sl::StringRef& source,
-		uint_t flags = 0
+		uint_t flags,
+		const sl::StringRef& source
 	);
 
+	bool
+	compile(const sl::StringRef& source) {
+		return compile(0, source);
+	}
+
 	void
-	createSwitch(size_t caseCountHint = 4);
+	createSwitch() {
+		clear();
+		m_regexKind = RegexKind_Switch;
+	}
 
 	size_t
 	compileSwitchCase(
-		const sl::StringRef& source,
-		uint_t flags = 0
+		uint_t flags,
+		const sl::StringRef& source
 	);
+
+	size_t
+	compileSwitchCase(const sl::StringRef& source) {
+		return compileSwitchCase(0, source);
+	}
 
 	void
 	finalizeSwitch(uint_t flags = 0) { // only CompileFlag_MatchOnly makes sense here
