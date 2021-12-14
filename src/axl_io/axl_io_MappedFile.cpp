@@ -38,7 +38,7 @@ MappedViewMgr::find(
 
 	// ok, now try to find existing view using the view map...
 
-	ViewMap::Iterator it = m_viewMap.find(begin, sl::BinTreeFindRelOp_Le);
+	ViewMap::Iterator it = m_viewMap.find<sl::RelOpKind_Le>(begin);
 	if (!it)
 		return NULL;
 

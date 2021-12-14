@@ -125,7 +125,7 @@ PeCodeMap::analyzeNonCodeAddress(size_t address) {
 
 PeCodeMap::ModuleCodeMap*
 PeCodeMap::getModuleCodeMap(size_t address) {
-	sl::MapIterator<size_t, ModuleCodeMap> it = m_moduleMap.find(address, sl::BinTreeFindRelOp_Lt);
+	sl::MapIterator<size_t, ModuleCodeMap> it = m_moduleMap.find<sl::RelOpKind_Lt>(address);
 	if (it && address < it->m_value.m_moduleEnd)
 		return &it->m_value;
 

@@ -49,7 +49,7 @@ protected:
 	#if (!_AXL_CPU_X86)
 		return m_frameMap.find(frameBase);
 	#else // allowance for stdcall ret <n>
-		return m_frameMap.find(frameBase, sl::BinTreeFindRelOp_Le);
+		return m_frameMap.find<sl::RelOpKind_Le>(frameBase);
 	#endif
 	}
 

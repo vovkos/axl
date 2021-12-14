@@ -21,7 +21,7 @@ void
 CharSet::add(utf32_t c) {
 	ASSERT(c >= 0);
 
-	Iterator it = m_map.find(c, sl::BinTreeFindRelOp_Le);
+	Iterator it = m_map.find<sl::RelOpKind_Le>(c);
 	if (!it || it->m_value + 1 < c)
 		it = m_map.visit(c);
 	else if (it->m_value >= c)
@@ -44,7 +44,7 @@ CharSet::add(
 ) {
 	ASSERT(from >= 0 && from <= to);
 
-	Iterator it = m_map.find(from, sl::BinTreeFindRelOp_Le);
+	Iterator it = m_map.find<sl::RelOpKind_Le>(from);
 	if (!it || it->m_value + 1 < from)
 		it = m_map.visit(from);
 	else if (it->m_value >= to)

@@ -72,7 +72,7 @@ public:
 
 	const DfaState*
 	find(utf32_t c) const {
-		ConstIterator it = m_map.find(c, sl::BinTreeFindRelOp_Le);
+		ConstIterator it = m_map.find<sl::RelOpKind_Le>(c);
 		return it && c <= it->m_value.m_last ? it->m_value.m_state : NULL;
 	}
 

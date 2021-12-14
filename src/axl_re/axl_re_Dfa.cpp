@@ -27,7 +27,7 @@ DfaCharTransitionMap::add(
 	ASSERT(from >= 0 && to <= 0x7fffffff && from <= to);
 
 #if (_AXL_RE_DFA_MERGE_CHAR_RANGES)
-	Iterator prevIt = m_map.find(from, sl::BinTreeFindRelOp_Lt);
+	Iterator prevIt = m_map.find<sl::RelOpKind_Lt>(from);
 	ASSERT(!prevIt || prevIt->m_value.m_last < from);
 
 	if (prevIt &&
@@ -41,7 +41,7 @@ DfaCharTransitionMap::add(
 	Iterator it = m_map.visit(from);
 #else
 #	if (_DEBUG)
-	Iterator prevIt = m_map.find(from, sl::BinTreeFindRelOp_Lt);
+	Iterator prevIt = m_map.find<sl::RelOpKind_Lt>(from);
 	ASSERT(!prevIt || prevIt->m_value.m_last < from);
 #	endif
 
