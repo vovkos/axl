@@ -114,47 +114,6 @@ clearBitRange(
 	clearBitRange_u(map, from, to);
 }
 
-void
-mergeBitMaps(
-	size_t* map,
-	const size_t* map2,
-	size_t pageCount,
-	BitOpKind op
-) {
-	size_t* p = map;
-	size_t* end = p + pageCount;
-	const size_t* p2 = map2;
-
-	switch (op) {
-	case BitOpKind_Or:
-		for (; p < end; p++, p2++)
-			*p |= *p2;
-
-		break;
-
-	case BitOpKind_Xor:
-		for (; p < end; p++, p2++)
-			*p ^= *p2;
-
-		break;
-
-	case BitOpKind_And:
-		for (; p < end; p++, p2++)
-			*p &= *p2;
-
-		break;
-
-	case BitOpKind_AndNot:
-		for (; p < end; p++, p2++)
-			*p &= ~*p2;
-
-		break;
-
-	default:
-		ASSERT(false);
-	}
-}
-
 size_t
 findBit(
 	const size_t* map,
@@ -231,37 +190,6 @@ BitMap::isEqualImpl(
 		if (p2[i])
 			return false;
 
-	return true;
-}
-
-bool
-BitMap::merge(
-	const BitMap& bitMap2,
-	BitOpKind op
-) {
-	if (!m_map.ensureExclusive())
-		return false;
-
-	size_t pageCount = m_map.getCount();
-	size_t pageCount2 = bitMap2.m_map.getCount();
-	sl::mergeBitMaps(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2), op);
-	return true;
-}
-
-bool
-BitMap::mergeResize(
-	const BitMap& bitMap2,
-	BitOpKind op
-) {
-	if (!m_map.ensureExclusive())
-		return false;
-
-	size_t pageCount2 = bitMap2.m_map.getCount();
-	size_t pageCount = m_map.ensureCountZeroConstruct(pageCount2);
-	if (pageCount == -1)
-		return false;
-
-	sl::mergeBitMaps(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2), op);
 	return true;
 }
 

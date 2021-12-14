@@ -385,6 +385,21 @@ template <
 	typename T,
 	typename Arg = typename ArgType<T>::Type
 >
+class AndNot {
+public:
+	T
+	operator () (
+		Arg a,
+		Arg b
+	) const {
+		return a & ~b;
+	}
+};
+
+template <
+	typename T,
+	typename Arg = typename ArgType<T>::Type
+>
 class Xor {
 public:
 	T
@@ -444,6 +459,17 @@ public:
 //..............................................................................
 
 // relational operators
+
+enum RelOpKind {
+	RelOpKind_Eq = 0,
+	RelOpKind_Ne,
+	RelOpKind_Lt,
+	RelOpKind_Le,
+	RelOpKind_Gt,
+	RelOpKind_Ge,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename T,

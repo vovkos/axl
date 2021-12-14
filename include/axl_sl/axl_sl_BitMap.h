@@ -15,18 +15,19 @@
 
 #include "axl_sl_Array.h"
 #include "axl_sl_Hash.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace sl {
 
 //..............................................................................
 
-enum BitOpKind {
-	BitOpKind_Or = 0,
-	BitOpKind_Xor,
-	BitOpKind_And,
-	BitOpKind_AndNot,
-};
+// for merging bit maps
+
+typedef Or<size_t>     BitMapOr;
+typedef Xor<size_t>    BitMapXor;
+typedef And<size_t>    BitMapAnd;
+typedef AndNot<size_t> BitMapAndNot;
 
 //..............................................................................
 
@@ -136,13 +137,38 @@ clearBitRange(
 	size_t to
 );
 
+template <typename Op>
 void
 mergeBitMaps(
-	size_t* map,
-	const size_t* map2,
-	size_t pageCount,
-	BitOpKind op
-);
+	size_t* p,
+	const size_t* p2,
+	size_t pageCount
+) {
+	size_t* end = p + pageCount;
+	for (; p < end; p++, p2++)
+		*p = Op(*p, *p2);
+}
+
+template <typename Op>
+bool
+mergeCmpBitMaps(
+	size_t* p,
+	const size_t* p2,
+	size_t pageCount
+) {
+	bool isChanged = false;
+
+	size_t* end = p + pageCount;
+	for (; p < end; p++, p2++) {
+		size_t value = Op()(*p, *p2);
+		if (*p != value)
+			isChanged = true;
+
+		*p = value;
+	}
+
+	return isChanged;
+}
 
 inline
 void
@@ -238,12 +264,16 @@ public:
 		sl::setBitRange(m_map, PageCount, from, to);
 	}
 
+	template <typename Op>
 	void
-	merge(
-		const BitMapN& bitMap2,
-		BitOpKind op
-	) {
-		sl::mergeBitMaps(m_map, bitMap2.m_map, PageCount, op);
+	merge(const BitMapN& bitMap2) {
+		sl::mergeBitMaps<Op>(m_map, bitMap2.m_map, PageCount);
+	}
+
+	template <typename Op>
+	bool
+	mergeCmp(const BitMapN& bitMap2) {
+		return sl::mergeCmpBitMaps<Op>(m_map, bitMap2.m_map, PageCount);
 	}
 
 	void
@@ -410,17 +440,21 @@ public:
 		return ensureBitCount(to) ? (sl::clearBitRange(m_map, m_map.getCount(), from, to), true) : false;
 	}
 
+	template <typename Op>
 	bool
-	merge(
-		const BitMap& bitMap2,
-		BitOpKind op
-	);
+	merge(const BitMap& bitMap2);
 
+	template <typename Op>
 	bool
-	mergeResize(
-		const BitMap& bitMap2,
-		BitOpKind op
-	);
+	mergeCmp(const BitMap& bitMap2);
+
+	template <typename Op>
+	bool
+	mergeResize(const BitMap& bitMap2);
+
+	template <typename Op>
+	bool
+	mergeCmpResize(const BitMap& bitMap2);
 
 	bool
 	invert() {
@@ -448,6 +482,8 @@ protected:
 	);
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 inline
 bool
 BitMap::isEqual(const BitMap& src) const {
@@ -458,6 +494,58 @@ BitMap::isEqual(const BitMap& src) const {
 		count == count2 ? memcmp(m_map, src.m_map, count * sizeof(size_t)) == 0 :
 		count < count2 ? isEqualImpl(m_map, count, src.m_map, count2) :
 		isEqualImpl(src.m_map, count2, m_map, count);
+}
+
+template <typename Op>
+bool
+BitMap::merge(const BitMap& bitMap2) {
+	if (!m_map.ensureExclusive())
+		return false;
+
+	size_t pageCount = m_map.getCount();
+	size_t pageCount2 = bitMap2.m_map.getCount();
+	sl::mergeBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
+	return true;
+}
+
+template <typename Op>
+bool
+BitMap::mergeCmp(const BitMap& bitMap2) {
+	if (!m_map.ensureExclusive())
+		return false;
+
+	size_t pageCount = m_map.getCount();
+	size_t pageCount2 = bitMap2.m_map.getCount();
+	return sl::mergeCmpBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
+}
+
+template <typename Op>
+bool
+BitMap::mergeResize(const BitMap& bitMap2) {
+	if (!m_map.ensureExclusive())
+		return false;
+
+	size_t pageCount2 = bitMap2.m_map.getCount();
+	size_t pageCount = m_map.ensureCountZeroConstruct(pageCount2);
+	if (pageCount == -1)
+		return false;
+
+	sl::mergeBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
+	return true;
+}
+
+template <typename Op>
+bool
+BitMap::mergeCmpResize(const BitMap& bitMap2) {
+	if (!m_map.ensureExclusive())
+		return false;
+
+	size_t pageCount2 = bitMap2.m_map.getCount();
+	size_t pageCount = m_map.ensureCountZeroConstruct(pageCount2);
+	if (pageCount == -1)
+		return false;
+
+	return sl::mergeCmpBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
 }
 
 //..............................................................................

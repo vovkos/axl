@@ -46,16 +46,6 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum BinTreeFindRelOp {
-	BinTreeFindRelOp_Eq = 0,
-	BinTreeFindRelOp_Lt,
-	BinTreeFindRelOp_Le,
-	BinTreeFindRelOp_Gt,
-	BinTreeFindRelOp_Ge,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 template <
 	typename T,
 	typename Node,
@@ -141,11 +131,9 @@ public:
 		return ((BinTreeBase*)this)->find(key); // a simple const-cast
 	}
 
+	template <RelOpKind opKind>
 	Iterator
-	find(
-		KeyArg key,
-		BinTreeFindRelOp relOp
-	) {
+	find(KeyArg key) {
 		Node* node = m_root;
 		Node* prevNode;
 		int prevCmp;
@@ -160,36 +148,33 @@ public:
 
 			prevNode = node;
 			prevCmp = cmp;
-
 			node = cmp < 0 ? node->m_left : node->m_right;
 		}
 
 		ASSERT(node || prevNode);
-		switch (relOp) {
-		case BinTreeFindRelOp_Lt:
+		switch (opKind) {
+		case RelOpKind_Lt:
 			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();
 
-		case BinTreeFindRelOp_Le:
+		case RelOpKind_Le:
 			return node ? node : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();
 
-		case BinTreeFindRelOp_Gt:
+		case RelOpKind_Gt:
 			return node ? node->m_right : prevCmp < 0 ? prevNode : Iterator(prevNode).getNext();
 
-		case BinTreeFindRelOp_Ge:
+		case RelOpKind_Ge:
 			return node ? node : prevCmp < 0 ? prevNode : Iterator(prevNode).getNext();
 
-		case BinTreeFindRelOp_Eq:
 		default:
+			ASSERT(opKind == RelOpKind_Eq);
 			return node;
 		}
 	}
 
+	template <RelOpKind opKind>
 	ConstIterator
-	find(
-		KeyArg key,
-		BinTreeFindRelOp relOp
-	) const {
-		return ((BinTreeBase*)this)->find(key, relOp); // a simple const-cast
+	find(KeyArg key) const {
+		return ((BinTreeBase*)this)->find<opKind>(key); // a simple const-cast
 	}
 
 	Value
@@ -201,13 +186,13 @@ public:
 		return it ? it->m_value : undefinedValue;
 	}
 
+	template <RelOpKind opKind>
 	Value
 	findValue(
 		KeyArg key,
-		BinTreeFindRelOp relOp,
 		ValueArg undefinedValue
 	) const {
-		ConstIterator it = find(key, relOp);
+		ConstIterator it = find<opKind>(key);
 		return it ? it->m_value : undefinedValue;
 	}
 
