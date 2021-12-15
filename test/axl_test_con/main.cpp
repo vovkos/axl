@@ -549,7 +549,9 @@ testCharSet() {
 		printf("isSet(%d): %d\n", c, charSet.isSet(c));
 }
 
-#define _AXL_RE_TEST_SAVE 0
+#define _AXL_RE_TEST_LOAD_SAVE 1
+#define _AXL_RE_TEST_FULL_DFA  1
+#define _AXL_RE_TEST_SWITCH    1
 
 void
 testRegex() {
@@ -575,7 +577,7 @@ testRegex() {
 	printf("NFA:\n");
 	regex.printNfa();
 
-#	if (0)
+#	if (_AXL_RE_TEST_DFA)
 	regex.buildFullDfa();
 	regex.buildFullReverseDfa();
 	regex.buildFullRollbackDfa();
@@ -589,9 +591,9 @@ testRegex() {
 #endif
 #endif
 
-#if (_AXL_RE_TEST_SAVE)
+#if (_AXL_RE_TEST_LOAD_SAVE)
 	sl::Array<char> storage;
-	regex.saveNfa(&storage);
+	regex.save(&storage);
 	printf("\nNFA storage: %d B\n", storage.getCount());
 
 	re::Regex regex2;
@@ -603,19 +605,6 @@ testRegex() {
 
 #	if (_AXL_DEBUG)
 	regex2.printNfa();
-#	endif
-
-	regex.saveDfa(&storage);
-	printf("\nDFA storage: %d B\n", storage.getCount());
-
-	result = regex2.load(storage) != -1;
-	if (!result) {
-		printf("error: %s\n", err::getLastErrorDescription().sz());
-		return;
-	}
-
-#	if (_AXL_DEBUG)
-	regex2.printDfa();
 #	endif
 #endif
 
@@ -697,7 +686,7 @@ testRegex() {
 	);
 #endif
 
-#if (0)
+#if (_AXL_RE_TEST_SWITCH)
 	regex.createSwitch();
 	regex.compileSwitchCase("char");
 	regex.compileSwitchCase("int");
@@ -725,8 +714,8 @@ testRegex() {
 	regex.printDfa();
 #endif
 
-#if (_AXL_RE_TEST_SAVE)
-	regex.saveNfa(&storage);
+#if (_AXL_RE_TEST_LOAD_SAVE)
+	regex.save(&storage);
 	printf("\nNFA storage: %d B\n", storage.getCount());
 
 	result = regex2.load(storage) != -1;
@@ -737,19 +726,6 @@ testRegex() {
 
 #	if (_AXL_DEBUG)
 	regex2.printNfa();
-#	endif
-
-	regex.saveDfa(&storage);
-	printf("\nDFA storage: %d B\n", storage.getCount());
-
-	result = regex2.load(storage) != -1;
-	if (!result) {
-		printf("error: %s\n", err::getLastErrorDescription().sz());
-		return;
-	}
-
-#	if (_AXL_DEBUG)
-	regex2.printDfa();
 #	endif
 #endif
 

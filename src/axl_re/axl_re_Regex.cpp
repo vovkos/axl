@@ -121,9 +121,9 @@ Regex::load(
 
 		NfaState* state = stateArray[i];
 		state->m_stateKind = (NfaStateKind)stateStorage->m_stateKind;
+		state->m_flags = stateStorage->m_flags;
 		state->m_unionData[0] = stateStorage->m_unionData[0];
 		state->m_unionData[1] = stateStorage->m_unionData[1];
-		state->m_unionData[2] = stateStorage->m_unionData[2];
 
 		if (stateStorage->m_nextStateId == -1) {
 			if (stateStorage->m_stateKind != NfaStateKind_Accept)
@@ -233,9 +233,9 @@ Regex::save(sl::Array<char>* buffer) {
 		buffer->appendEmptySpace(stateSize);
 		NfaStateStorage* stateStorage = (NfaStateStorage*)(buffer->p() + offset);
 		stateStorage->m_stateKind = state->m_stateKind;
+		stateStorage->m_flags = state->m_flags;
 		stateStorage->m_unionData[0] = (uint32_t)state->m_unionData[0];
 		stateStorage->m_unionData[1] = (uint32_t)state->m_unionData[1];
-		stateStorage->m_unionData[2] = (uint32_t)state->m_unionData[2];
 		stateStorage->m_nextStateId = state->m_nextState ? state->m_nextState->m_id : -1;
 
 		switch (state->m_stateKind) {

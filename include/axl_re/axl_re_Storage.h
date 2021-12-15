@@ -55,14 +55,15 @@ struct SwitchCaseStorage {
 
 struct NfaStateStorage {
 	uint32_t m_stateKind;
+	uint32_t m_flags;
 	uint32_t m_nextStateId;
 
 	union {
 		uint32_t m_unionData[2];
-		uint32_t m_captureId;
 		uint32_t m_acceptId;
-		utf32_t m_char;
+		uint32_t m_captureId;
 		uint32_t m_anchor;
+		utf32_t m_char;
 		uint32_t m_charRangeCount;
 		uint32_t m_splitStateId;
 		uint32_t m_tailStateId;
