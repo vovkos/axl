@@ -100,10 +100,10 @@ public:
 	}
 
 	State(
-		uint32_t flags,
+		uint32_t execFlags,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
 	) {
-		initialize(flags, codecKind);
+		initialize(execFlags, codecKind);
 	}
 
 	operator bool () const {
@@ -124,6 +124,24 @@ public:
 		return *this;
 	}
 
+	bool
+	isStream() const {
+		ASSERT(m_p);
+		return (m_p->m_execFlags & ExecFlag_Stream) != 0;
+	}
+
+	bool
+	isFinal() const {
+		ASSERT(m_p);
+		return m_p->m_engine->isFinalized();
+	}
+
+	bool
+	isMatch() const {
+		ASSERT(m_p);
+		return m_p->m_matchAcceptId != -1;
+	}
+
 	const Regex*
 	getRegex() const {
 		ASSERT(m_p);
@@ -142,27 +160,15 @@ public:
 		return m_p->m_execFlags;
 	}
 
-	bool
-	isStream() const {
+	size_t
+	getOffset() const {
 		ASSERT(m_p);
-		return (m_p->m_execFlags & ExecFlag_Stream) != 0;
+		return m_p->m_engine->getOffset();
 	}
 
 	ExecResult
 	getLastExecResult() const {
 		return m_p->m_engine->getExecResult();
-	}
-
-	bool
-	isFinal() const {
-		ASSERT(m_p);
-		return m_p->m_engine->isFinalized();
-	}
-
-	bool
-	isMatch() const {
-		ASSERT(m_p);
-		return m_p->m_matchAcceptId != -1;
 	}
 
 	size_t

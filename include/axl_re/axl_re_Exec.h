@@ -60,12 +60,11 @@ protected:
 	const void* m_lastExecData;
 	size_t m_lastExecOffset;
 	size_t m_lastExecEndOffset;
-	ExecResult m_execResult;
+	size_t m_offset;
 	enc::DecoderState m_decoderState;
-
 	utf32_t m_prevChar;
 	uint_t m_prevCharFlags;
-	size_t m_offset;
+	ExecResult m_execResult;
 
 public:
 	ExecEngine(StateImpl* parent);
@@ -76,6 +75,11 @@ public:
 	StateImpl*
 	getParent() const {
 		return m_parent;
+	}
+
+	size_t
+	getOffset() const {
+		return m_offset;
 	}
 
 	ExecResult
