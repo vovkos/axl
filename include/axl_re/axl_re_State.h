@@ -240,7 +240,9 @@ State::exec(
 	size_t size
 ) {
 	ensureExclusive();
-	m_p->m_engine->exec(p, size);
+	size ?
+		m_p->m_engine->exec(p, size) :
+		m_p->m_engine->eof();
 	return m_p->m_engine->getExecResult();
 }
 
