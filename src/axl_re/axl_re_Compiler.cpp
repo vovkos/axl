@@ -498,7 +498,7 @@ template <typename StdCharClass>
 NfaState*
 Compiler::stdCharClass() {
 	Token token = nextToken();
-	ASSERT(token >= TokenKind_FirstStdCharClass && token >= TokenKind_LastStdCharClass);
+	ASSERT(token >= TokenKind_FirstStdCharClass && token <= TokenKind_LastStdCharClass);
 
 	NfaState* start = m_program->addState();
 	NfaState* accept = m_program->addState();
