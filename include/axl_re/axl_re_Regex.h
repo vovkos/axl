@@ -214,30 +214,20 @@ public:
 
 	State
 	exec(
-		uint_t flags,
-		enc::CharCodecKind codecKind,
+		const StateInit& stateInit,
 		const void* p,
 		size_t size
 	) {
-		State state(flags, codecKind);
+		State state(stateInit);
 		return exec(&state, p, size) ? state : State();
 	}
 
 	State
 	exec(
-		uint_t flags,
 		const void* p,
 		size_t size
 	) {
-		return exec(flags, enc::CharCodecKind_Utf8, p, size);
-	}
-
-	State
-	exec(
-		const void* p,
-		size_t size
-	) {
-		return exec(0, enc::CharCodecKind_Utf8, p, size);
+		return exec(StateInit(), p, size);
 	}
 
 	State
@@ -245,12 +235,12 @@ public:
 		uint_t flags,
 		const sl::StringRef& string
 	) {
-		return exec(flags, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
+		return exec(StateInit(flags), string.cp(), string.getLength());
 	}
 
 	State
 	exec(const sl::StringRef& string) {
-		return exec(0, enc::CharCodecKind_Utf8, string.cp(), string.getLength());
+		return exec(StateInit(), string.cp(), string.getLength());
 	}
 
 	ExecResult

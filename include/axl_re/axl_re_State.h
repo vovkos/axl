@@ -25,14 +25,35 @@ class State;
 
 //..............................................................................
 
+// passing four ints as arguments is error-prone; better use a struct
+
+struct StateInit {
+	uint_t m_execFlags;
+	enc::CharCodecKind m_codecKind;
+	enc::DecoderState m_decoderState;
+	size_t m_offset;
+
+	StateInit(uint_t execFlags = 0); // most times, we only want exec flags
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+StateInit::StateInit(uint_t execFlags) {
+	m_execFlags = execFlags;
+	m_codecKind = enc::CharCodecKind_Utf8;
+	m_decoderState = 0;
+	m_offset = 0;
+}
+
+//..............................................................................
+
 struct StateImpl: public rc::RefCount {
 	friend class State;
 
 	Regex* m_regex;
 	ExecEngine* m_engine;
-	enc::CharCodecKind m_codecKind;
-	uint_t m_execFlags;
-
+	StateInit m_init;
 	size_t m_matchAcceptId;
 	Match m_match;
 	sl::BoxList<Match> m_subMatchList;
@@ -49,23 +70,23 @@ public:
 	void
 	freeEngine();
 
-	void
-	initialize(
-		uint_t execFlags,
-		enc::CharCodecKind codecKind
-	);
-
 	StateImpl*
 	clone();
 
 	void
-	postInitialize(
-		Regex* regex,
-		size_t offset
-	);
+	initialize(const StateInit& init);
+
+	void
+	setRegex(Regex* regex);
 
 	void
 	reset(size_t offset);
+
+	void
+	preCreateMatch(
+		size_t acceptId,
+		size_t endOffset
+	);
 
 	void
 	createMatch(
@@ -99,11 +120,8 @@ public:
 		m_p.copy(src.m_p);
 	}
 
-	State(
-		uint32_t execFlags,
-		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
-	) {
-		initialize(execFlags, codecKind);
+	State(const StateInit& init) {
+		initialize(init);
 	}
 
 	operator bool () const {
@@ -127,19 +145,25 @@ public:
 	bool
 	isStream() const {
 		ASSERT(m_p);
-		return (m_p->m_execFlags & ExecFlag_Stream) != 0;
+		return (m_p->m_init.m_execFlags & ExecFlag_Stream) != 0;
 	}
 
 	bool
 	isFinal() const {
-		ASSERT(m_p);
+		ASSERT(m_p && m_p->m_engine);
 		return m_p->m_engine->isFinalized();
+	}
+
+	bool
+	isPreMatch() const {
+		ASSERT(m_p);
+		return m_p->m_matchAcceptId != -1;
 	}
 
 	bool
 	isMatch() const {
 		ASSERT(m_p);
-		return m_p->m_matchAcceptId != -1;
+		return m_p->m_match.getOffset() != -1;
 	}
 
 	const Regex*
@@ -151,23 +175,18 @@ public:
 	enc::CharCodecKind
 	getCodecKind() const {
 		ASSERT(m_p);
-		return m_p->m_codecKind;
+		return m_p->m_init.m_codecKind;
 	}
 
 	uint_t
 	getExecFlags() const {
 		ASSERT(m_p);
-		return m_p->m_execFlags;
-	}
-
-	size_t
-	getOffset() const {
-		ASSERT(m_p);
-		return m_p->m_engine->getOffset();
+		return m_p->m_init.m_execFlags;
 	}
 
 	ExecResult
 	getLastExecResult() const {
+		ASSERT(m_p && m_p->m_engine);
 		return m_p->m_engine->getExecResult();
 	}
 
@@ -177,9 +196,14 @@ public:
 		return m_p->m_matchAcceptId;
 	}
 
+	size_t
+	getMatchEndOffset() const {
+		ASSERT(m_p);
+		return isPreMatch() ? m_p->m_match.getEndOffset() : -1;
+	}
+
 	const Match*
 	getMatch() const {
-		ASSERT(m_p);
 		ASSERT(m_p);
 		return isMatch() ? &m_p->m_match : NULL;
 	}
@@ -197,13 +221,21 @@ public:
 	}
 
 	void
-	initialize(
-		uint_t execFlags = 0,
-		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
-	);
+	initialize() {
+		initialize(StateInit());
+	}
 
 	void
-	reset(size_t offset = 0);
+	initialize(const StateInit& init);
+
+	void
+	reset(size_t offset);
+
+	void
+	resume() {
+		ASSERT(isMatch());
+		reset(m_p->m_match.getEndOffset());
+	}
 
 protected:
 	void
@@ -213,18 +245,16 @@ protected:
 			m_p = m_p->clone();
 	}
 
-
 	void
 	initialize(
-		uint_t execFlags,
-		enc::CharCodecKind codecKind,
+		const StateInit& init,
 		Regex* regex
 	);
 
 	void
-	postInitialize(Regex* regex) {
+	setRegex(Regex* regex) {
 		ensureExclusive();
-		m_p->postInitialize(regex, 0);
+		m_p->setRegex(regex);
 	}
 
 	ExecResult
@@ -258,16 +288,6 @@ State::eof() {
 	ensureExclusive();
 	m_p->m_engine->eof();
 	return m_p->m_engine->getExecResult();
-}
-
-//..............................................................................
-
-// need a definition of StateImpl
-
-inline
-ExecNfaEngine::ExecNfaEngine(StateImpl* parent):
-	ExecEngine(parent) {
-	m_execFlags = parent->m_execFlags;
 }
 
 //..............................................................................

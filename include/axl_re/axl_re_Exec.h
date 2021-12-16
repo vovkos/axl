@@ -61,10 +61,11 @@ protected:
 	size_t m_lastExecOffset;
 	size_t m_lastExecEndOffset;
 	size_t m_offset;
+	uint_t m_execFlags; // cache to save one indirection
+	ExecResult m_execResult;
 	enc::DecoderState m_decoderState;
 	utf32_t m_prevChar;
 	uint_t m_prevCharFlags;
-	ExecResult m_execResult;
 
 public:
 	ExecEngine(StateImpl* parent);
@@ -75,11 +76,6 @@ public:
 	StateImpl*
 	getParent() const {
 		return m_parent;
-	}
-
-	size_t
-	getOffset() const {
-		return m_offset;
 	}
 
 	ExecResult
@@ -161,11 +157,9 @@ ExecEngine::calcAnchors(
 //..............................................................................
 
 class ExecNfaEngine: public ExecEngine {
-protected:
-	uint_t m_execFlags; // cache to save one indirection
-
 public:
-	ExecNfaEngine(StateImpl* parent);
+	ExecNfaEngine(StateImpl* parent):
+		ExecEngine(parent) {}
 
 	virtual
 	void

@@ -155,7 +155,7 @@ public:
 
 		gotoState(
 			offset,
-			m_parent->m_execFlags & ExecFlag_AnchorDataBegin ?
+			m_execFlags & ExecFlag_AnchorDataBegin ?
 				m_parent->m_regex->getDfaMatchStartState() :
 				m_parent->m_regex->getDfaSearchStartState()
 		);
@@ -289,7 +289,7 @@ protected:
 
 	void
 	finalize(bool isEof)  {
-		ASSERT(m_parent->m_matchAcceptId == -1);
+		ASSERT(m_parent->m_match.getOffset() == -1);
 
 		if (m_matchAcceptId == -1) {
 			m_execResult = ExecResult_NoMatch;
@@ -306,7 +306,7 @@ protected:
 			return;
 		}
 
-		if (m_parent->m_execFlags & ExecFlag_AnchorDataEnd) {
+		if (m_execFlags & ExecFlag_AnchorDataEnd) {
 			if (!isEof)
 				return; // can't verify until we see EOF
 
@@ -316,7 +316,7 @@ protected:
 			}
 		}
 
-		if (m_parent->m_execFlags & ExecFlag_AnchorDataBegin) {
+		if (m_execFlags & ExecFlag_AnchorDataBegin) {
 			createMatch(MatchPos(m_baseOffset, matchEndOffset));
 			return;
 		}
@@ -324,6 +324,9 @@ protected:
 		ExecDfa<sl::True, Encoding>* reverseDfa = AXL_MEM_NEW_ARGS((ExecDfa<sl::True, Encoding>), (this));
 		m_parent->m_engine = reverseDfa; // replace engine
 		reverseDfa->reverse(isEof, matchEndOffset, m_matchCharFlags);
+		if (!reverseDfa->isFinalized())
+			m_parent->preCreateMatch(m_matchAcceptId, matchEndOffset);
+
 		m_execResult = ExecResult_Match; // stop decoder from feeding us more chars
 	}
 
@@ -333,7 +336,7 @@ protected:
 			// match is scattered across stream; return offsets only
 			m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, NULL, pos);
 			m_execResult = ExecResult_MatchOffsetsOnly;
-		} else if (m_parent->m_execFlags & ExecFlag_DisableCapture) {
+		} else if (m_execFlags & ExecFlag_DisableCapture) {
 			// user doesn't want captures so no need to run the NFA
 			m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, m_lastExecData, pos);
 			m_execResult = ExecResult_Match;
@@ -422,7 +425,7 @@ protected:
 
 ExecEngine*
 createExecDfa(StateImpl* parent) {
-	switch (parent->m_codecKind) {
+	switch (parent->m_init.m_codecKind) {
 	case enc::CharCodecKind_Ascii:
 		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Ascii>), (parent));
 	case enc::CharCodecKind_Utf8:

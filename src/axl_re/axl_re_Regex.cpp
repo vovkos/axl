@@ -364,11 +364,13 @@ Regex::exec(
 	size_t size
 ) {
 	if (!*state)
-		state->initialize(0, enc::CharCodecKind_Utf8, this);
-	else if (!state->getRegex())
-		state->postInitialize(this);
-	else
-		ASSERT(state->getRegex() == this);
+		state->initialize(StateInit(), this);
+	else if (state->getRegex() != this)
+		state->setRegex(this);
+	else if (state->isMatch())
+		state->resume();
+	else if (state->isFinal())
+		return ExecResult_NoMatch;
 
 	ExecResult result = state->exec(p, size);
 	return result && !state->isFinal() && !state->isStream() ?

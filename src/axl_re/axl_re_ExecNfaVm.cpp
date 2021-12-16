@@ -136,13 +136,13 @@ ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 				goto Break2;
 
 			case NfaStateKind_OpenCapture:
-				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
+				if (!(m_execFlags & ExecFlag_DisableCapture))
 					thread->openCapture(m_offset, state->m_captureId);
 				state = state->m_nextState;
 				break;
 
 			case NfaStateKind_CloseCapture:
-				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
+				if (!(m_execFlags & ExecFlag_DisableCapture))
 					thread->closeCapture(m_offset, state->m_captureId);
 				state = state->m_nextState;
 				break;
@@ -209,14 +209,14 @@ ExecNfaVmBase::advanceConsumingThreads(utf32_t c) {
 
 void
 ExecNfaVmBase::finalize(bool isEof) {
-	ASSERT(m_parent->m_matchAcceptId == -1);
+	ASSERT(m_parent->m_match.getOffset() == -1);
 
 	if (!m_matchState) {
 		m_execResult = ExecResult_NoMatch;
 		return;
 	}
 
-	if (m_parent->m_execFlags & ExecFlag_AnchorDataEnd) {
+	if (m_execFlags & ExecFlag_AnchorDataEnd) {
 		if (!isEof)
 			return; // can't verify until we see EOF
 
@@ -264,7 +264,7 @@ public:
 
 ExecNfaEngine*
 createExecNfaVm(StateImpl* parent) {
-	switch (parent->m_codecKind) {
+	switch (parent->m_init.m_codecKind) {
 	case enc::CharCodecKind_Ascii:
 		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Ascii>, (parent));
 	case enc::CharCodecKind_Utf8:

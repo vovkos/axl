@@ -549,16 +549,22 @@ testCharSet() {
 		printf("isSet(%d): %d\n", c, charSet.isSet(c));
 }
 
+#define _AXL_RE_TEST_SIMPLE_MATCH    0
+#define _AXL_RE_TEST_STREAM    0
+#define _AXL_RE_TEST_SWITCH    1
 #define _AXL_RE_TEST_LOAD_SAVE 1
 #define _AXL_RE_TEST_FULL_DFA  1
-#define _AXL_RE_TEST_SWITCH    1
 
 void
 testRegex() {
 	re::Regex regex;
-	bool result = true;
+	re::State state;
+	const re::Match* match = NULL;
+	size_t count = 0;
+	bool result;
+	const char* p;
+	const char* end;
 
-#if (1)
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";
@@ -589,7 +595,6 @@ testRegex() {
 	regex.printReverseDfa();
 #	endif
 #endif
-#endif
 
 #if (_AXL_RE_TEST_LOAD_SAVE)
 	sl::Array<char> storage;
@@ -608,16 +613,12 @@ testRegex() {
 #	endif
 #endif
 
-	re::State state;
-	const re::Match* match;
-	size_t count;
-
 //	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
 //	const char text[] = "ahgbcbcbcdedsdds";
 	const char text[] = "   abc123   ";
 //	const char text[] = "xaaabbbbcd";
 
-#if (1)
+#if (_AXL_RE_TEST_SIMPLE_MATCH)
 	printf("\nMATCHING TEXT: '%s'\n", text);
 
 	state = regex.exec(text);
@@ -650,13 +651,13 @@ testRegex() {
 	}
 #endif
 
-#if (1)
+#if (_AXL_RE_TEST_STREAM)
 	printf("STREAM MATCH: '%s':\n", text);
 
 	state.initialize(re::ExecFlag_Stream);
 
-	const char* p = text;
-	const char* end = text + lengthof(text);
+	p = text;
+	end = text + lengthof(text);
 	for (; p < end; p++) {
 		re::ExecResult result = regex.exec(&state, p, 1);
 		if (result != re::ExecResult_Continue) {
@@ -693,7 +694,8 @@ testRegex() {
 	regex.compileSwitchCase("long");
 	regex.compileSwitchCase("[0-9]+");
 	regex.compileSwitchCase("0x[0-9a-fA-F]+");
-	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*#");
+	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*");
+	regex.compileSwitchCase("\\s+");
 	regex.finalizeSwitch();
 
 	static const char* caseNameMap[] = {
@@ -703,6 +705,7 @@ testRegex() {
 		"<decimal>",
 		"<hexadecimal>",
 		"<identifier>",
+		"<whitespace>",
 	};
 
 #if (_AXL_DEBUG)
@@ -729,28 +732,25 @@ testRegex() {
 #	endif
 #endif
 
-#	if (0)
-	static const char* lexemes[] = {
-		"sukacharp",
-		" int",
-		"  long",
-		"12345",
-		" 0xabcdef",
-		"  0x123abdef",
-		"suka#",
-		" suka_hui_123#",
-	};
+	static const char source[] =
+		"suka\n"
+		" int\n"
+		"  long\n"
+		"12345\n"
+		" 0xabcdef\n"
+		"  0x123abdef\n"
+		"suka\n"
+		" suka_hui_123\n";
 
-	printf("\n");
+	p = source;
+	end = p + lengthof(source);
 
-	for (size_t i = 0; i < countof(lexemes); i++) {
-		printf("MATCHING: %s\n", lexemes[i]);
-
-		// re::State state = regex.match(re::ExecFlag_ExactMatch, lexemes[i]);
-		re::State state = regex.exec(lexemes[i]);
-		if (!state) {
+	state.initialize(re::ExecFlag_AnchorDataBegin);
+	while (p < end) {
+		re::ExecResult result = regex.exec(&state, p, end - p);
+		if (!result) {
 			printf("NO MATCH!\n");
-			continue;
+			break;
 		}
 
 		size_t id = state.getMatchSwitchCaseId();
@@ -764,8 +764,9 @@ testRegex() {
 			match->getSize(),
 			match->getText().sz()
 		);
+
+		p += match->getSize();
 	}
-#	endif
 #endif
 }
 

@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_re_Exec.h"
+#include "axl_re_State.h"
 
 namespace axl {
 namespace re {
@@ -23,9 +24,10 @@ ExecEngine::ExecEngine(StateImpl* parent) {
 	m_lastExecOffset = 0;
 	m_lastExecEndOffset = 0;
 	m_offset = 0;
-	m_decoderState = 0;
 	m_prevChar = 0;
 	m_prevCharFlags = 0;
+	m_decoderState = parent->m_init.m_decoderState;
+	m_execFlags = parent->m_init.m_execFlags; // cache to save one indirection
 	m_execResult = ExecResult_Continue;
 }
 

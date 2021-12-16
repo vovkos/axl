@@ -127,14 +127,14 @@ ExecNfaSpBase::advanceNonConsumingStates(uint32_t anchors) {
 				break;
 
 			case NfaStateKind_OpenCapture:
-				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
+				if (!(m_execFlags & ExecFlag_DisableCapture))
 					openCapture(state->m_captureId);
 
 				addState(state->m_nextState);
 				break;
 
 			case NfaStateKind_CloseCapture:
-				if (!(m_parent->m_execFlags & ExecFlag_DisableCapture))
+				if (!(m_execFlags & ExecFlag_DisableCapture))
 					closeCapture(state->m_captureId);
 
 				addState(state->m_nextState);
@@ -190,14 +190,14 @@ ExecNfaSpBase::advanceConsumingStates(utf32_t c) {
 
 void
 ExecNfaSpBase::finalize(bool isEof) {
-	ASSERT(m_parent->m_matchAcceptId == -1);
+	ASSERT(m_parent->m_match.getOffset() == -1);
 
 	if (m_matchAcceptId == -1) {
 		m_execResult = ExecResult_NoMatch;
 		return;
 	}
 
-	if (m_parent->m_execFlags & ExecFlag_AnchorDataEnd) {
+	if (m_execFlags & ExecFlag_AnchorDataEnd) {
 		if (!isEof)
 			return; // can't verify until we see EOF
 
@@ -244,11 +244,8 @@ public:
 //..............................................................................
 
 ExecNfaEngine*
-createExecNfaSp(
-	StateImpl* parent,
-	enc::CharCodecKind codecKind
-) {
-	switch (codecKind) {
+createExecNfaSp(StateImpl* parent) {
+	switch (parent->m_init.m_codecKind) {
 	case enc::CharCodecKind_Ascii:
 		return AXL_MEM_NEW_ARGS(ExecNfaSp<enc::Ascii>, (parent));
 	case enc::CharCodecKind_Utf8:
