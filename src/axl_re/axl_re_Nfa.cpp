@@ -226,7 +226,7 @@ NfaState::copy(NfaState& src) {
 	m_unionData[1] = src.m_unionData[1];
 
 	if (m_stateKind == NfaStateKind_MatchCharSet) {
-		ASSERT(!m_charSet && src.m_charSet);
+		ASSERT(src.m_charSet);
 		m_charSet = AXL_MEM_NEW(CharSet);
 		m_charSet->copy(*src.m_charSet);
 	}
