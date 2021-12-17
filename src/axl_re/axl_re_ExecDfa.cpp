@@ -186,10 +186,14 @@ public:
 		}
 
 		m_offset += (char*)p - (char*)p0;
-
 		if (IsReverse()() && !isFinalized() && m_offset == m_baseOffset) {
 			processBoundary(m_offset - 1, m_prevCharFlags | Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 			finalize(false);
+		}
+
+		if (m_matchEnd) {
+			m_matchEndOffset = m_lastExecOffset + (char*)m_matchEnd - (char*)p0;
+			m_matchEnd = NULL;
 		}
 	}
 
@@ -336,16 +340,16 @@ protected:
 			// match is scattered across stream; return offsets only
 			m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, NULL, pos);
 			m_execResult = ExecResult_MatchOffsetsOnly;
-		} else if (m_execFlags & ExecFlag_DisableCapture) {
-			// user doesn't want captures so no need to run the NFA
+		} else if (
+			(m_execFlags & ExecFlag_DisableCapture) ||
+			!m_parent->m_regex->getMatchCaptureCount(m_matchAcceptId)
+		) {
+			// no captures so no need to run the NFA
 			m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, m_lastExecData, pos);
 			m_execResult = ExecResult_Match;
 		} else {
 			// TODO: use NFA-SP when possible
-			const NfaState* nfaState = m_parent->m_regex->getRegexKind() == RegexKind_Switch ?
-				m_parent->m_regex->getSwitchCaseNfaStartState(m_matchAcceptId) :
-				m_parent->m_regex->getNfaStartState();
-
+			const NfaState* nfaState = m_parent->m_regex->getMatchNfaStartState(m_matchAcceptId);
 			const void* p = (char*)m_lastExecData - m_lastExecOffset + pos.m_offset;
 			size_t length = pos.m_endOffset - pos.m_offset;
 
