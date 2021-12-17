@@ -26,6 +26,8 @@ Compiler::compileSwitchCase(
 ) {
 	NfaState* oldStart = !m_program->m_stateList.isEmpty() ? *m_program->m_stateList.getHead() : NULL;
 	NfaState* newStart = compile(source, acceptId);
+	if (!newStart)
+		return NULL;
 
 	if (oldStart)
 		m_program->insertSplitState(oldStart, newStart);

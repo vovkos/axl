@@ -267,7 +267,7 @@ Lexer::nextToken() {
 		tokenize();
 
 	Token token = m_tokenBuffer[m_readIdx];
-	if (token > TokenKind_FirstValid)
+	if (token >= TokenKind_FirstValid)
 		m_readIdx = getNextReadIdx();
 
 	m_tokenCount--;
