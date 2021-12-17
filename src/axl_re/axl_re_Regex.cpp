@@ -307,8 +307,9 @@ Regex::compileSwitchCase(
 
 	Compiler compiler(&m_nfaProgram, flags);
 	scase.m_nfaMatchStartState = compiler.compileSwitchCase(source, id);
+	scase.m_captureCount = m_nfaProgram.m_captureCount;
 
-	if (prevCaptureCount > m_nfaProgram.m_captureCount)
+	if (m_nfaProgram.m_captureCount < prevCaptureCount)
 		m_nfaProgram.m_captureCount = prevCaptureCount;
 
 	m_switchCaseArray.append(scase);
