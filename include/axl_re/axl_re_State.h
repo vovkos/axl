@@ -33,17 +33,49 @@ struct StateInit {
 	enc::DecoderState m_decoderState;
 	size_t m_offset;
 
-	StateInit(uint_t execFlags = 0); // most times, we only want exec flags
+	StateInit(uint_t execFlags = 0) {  // most times, we only want exec flags
+		setup(execFlags, enc::CharCodecKind_Utf8, 0, 0);
+	}
+
+	StateInit(
+		uint_t execFlags,
+		size_t offset
+	) {
+		setup(execFlags, enc::CharCodecKind_Utf8, 0, offset);
+	}
+
+	StateInit(
+		uint_t execFlags,
+		enc::CharCodecKind codecKind,
+		enc::DecoderState decoderState,
+		size_t offset
+	) {
+		setup(execFlags, codecKind, decoderState, offset);
+	}
+
+	void
+	setup(
+		uint_t execFlags,
+		enc::CharCodecKind codecKind,
+		enc::DecoderState decoderState,
+		size_t offset
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-StateInit::StateInit(uint_t execFlags) {
+void
+StateInit::setup(
+	uint_t execFlags,
+	enc::CharCodecKind codecKind,
+	enc::DecoderState decoderState,
+	size_t offset
+) {
 	m_execFlags = execFlags;
-	m_codecKind = enc::CharCodecKind_Utf8;
-	m_decoderState = 0;
-	m_offset = 0;
+	m_codecKind = codecKind;
+	m_decoderState = decoderState;
+	m_offset = offset;
 }
 
 //..............................................................................
@@ -74,7 +106,10 @@ public:
 	clone();
 
 	void
-	initialize(const StateInit& init);
+	initialize(
+		const StateInit& init,
+		Regex* regex
+	);
 
 	void
 	setRegex(Regex* regex);
@@ -229,13 +264,7 @@ public:
 	initialize(const StateInit& init);
 
 	void
-	reset(size_t offset);
-
-	void
-	resume() {
-		ASSERT(isMatch());
-		reset(m_p->m_match.getEndOffset());
-	}
+	resume();
 
 protected:
 	void

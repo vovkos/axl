@@ -40,6 +40,21 @@ struct MatchPos {
 	}
 
 	bool
+	operator == (const MatchPos& pos) {
+		return isEqual(pos);
+	}
+
+	bool
+	operator != (const MatchPos& pos) {
+		return !isEqual(pos);
+	}
+
+	bool
+	isEqual(const MatchPos& pos) {
+		return m_offset == pos.m_offset && m_endOffset == pos.m_endOffset;
+	}
+
+	bool
 	isInside(
 		size_t offset,
 		size_t endOffset
@@ -65,6 +80,16 @@ public:
 		m_p = NULL;
 	}
 
+	bool
+	operator == (const Match& match) {
+		return isEqual(match);
+	}
+
+	bool
+	operator != (const Match& match) {
+		return !isEqual(match);
+	}
+
 	size_t
 	getOffset() const {
 		return m_offset;
@@ -83,6 +108,11 @@ public:
 	const void*
 	p() const {
 		return m_p;
+	}
+
+	bool
+	isEqual(const Match& match) {
+		return MatchPos::isEqual(match) && m_codec == match.m_codec && m_p == match.m_p;
 	}
 
 	sl::StringRef

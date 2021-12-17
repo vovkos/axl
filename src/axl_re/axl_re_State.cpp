@@ -70,17 +70,36 @@ StateImpl::clone() {
 }
 
 void
-StateImpl::initialize(const StateInit& init) {
-	freeEngine();
-
-	m_regex = NULL;
+StateImpl::initialize(
+	const StateInit& init,
+	Regex* regex
+) {
 	m_init = init;
+
+	if (!regex)
+		m_regex = NULL;
+	else
+		setRegex(regex);
 }
 
 void
 StateImpl::setRegex(Regex* regex) {
 	m_regex = regex;
+	reset(m_matchAcceptId != -1 ? m_match.getEndOffset() : m_init.m_offset);
+}
 
+void
+StateImpl::reset(size_t offset) {
+	ASSERT(m_regex);
+
+	m_init.m_decoderState = 0;
+	m_matchAcceptId = -1;
+	m_match.m_offset = -1;
+	m_match.m_endOffset = -1;
+	m_subMatchList.clear();
+	m_subMatchArray.clear();
+
+	freeEngine();
 #if (_AXL_RE_CAN_SKIP_DFA)
 	if (regex->getRegexKind() != RegexKind_Switch &&
 		(m_execFlags & (ExecFlag_Stream | ExecFlag_AnchorDataBegin)) == ExecFlag_AnchorDataBegin)
@@ -91,23 +110,6 @@ StateImpl::setRegex(Regex* regex) {
 	m_engine = createExecDfa(this);
 #endif
 
-	reset(m_matchAcceptId != -1 ? m_match.getEndOffset() : m_init.m_offset);
-}
-
-
-void
-StateImpl::reset(size_t offset) {
-	ASSERT(m_regex);
-	freeEngine();
-
-	m_init.m_decoderState = 0;
-	m_matchAcceptId = -1;
-	m_match.m_offset = -1;
-	m_match.m_endOffset = -1;
-	m_subMatchList.clear();
-	m_subMatchArray.clear();
-
-	m_engine = createExecDfa(this);
 	m_engine->reset(offset);
 }
 
@@ -178,12 +180,13 @@ StateImpl::createMatch(
 
 void
 State::initialize(const StateInit& init) {
-	if (!m_p)
+	if (!m_p) {
 		m_p = AXL_RC_NEW(StateImpl);
-	else
+		m_p->initialize(init, NULL);
+	} else {
 		ASSERT(m_p.isExclusive());
-
-	m_p->initialize(init);
+		m_p->initialize(init, m_p->m_regex);
+	}
 }
 
 void
@@ -193,28 +196,19 @@ State::initialize(
 ) {
 	ASSERT(!m_p);
 	m_p = AXL_RC_NEW(StateImpl);
-	m_p->initialize(init);
-	m_p->setRegex(regex);
+	m_p->initialize(init, regex);
 }
 
 void
-State::reset(size_t offset) {
-	ASSERT(m_p);
+State::resume() {
+	ASSERT(isMatch());
 
-	if (m_p.isExclusive()) {
-		m_p->reset(offset);
-	} else {
-		Regex* regex = m_p->m_regex;
-		StateInit init;
-		init.m_execFlags = m_p->m_init.m_execFlags;
-		init.m_codecKind = m_p->m_init.m_codecKind;
-		init.m_decoderState = 0;
-		init.m_offset = offset;
-
-		m_p = AXL_RC_NEW(StateImpl);
-		m_p->initialize(init);
-		m_p->setRegex(regex);
-	}
+	StateInit init;
+	init.m_execFlags = m_p->m_init.m_execFlags;
+	init.m_codecKind = m_p->m_init.m_codecKind;
+	init.m_decoderState = 0;
+	init.m_offset = m_p->m_match.getEndOffset();
+	m_p->initialize(init, m_p->m_regex);
 }
 
 //..............................................................................

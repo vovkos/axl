@@ -565,6 +565,49 @@ testRegex() {
 	const char* p;
 	const char* end;
 
+	do {
+		result = regex.compile("(a)?");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+		return;
+	} while (0);
+
+	do {
+		printf("compiling\n");
+
+		regex.createSwitch();
+		regex.compileSwitchCase("[0-9]+");
+		regex.compileSwitchCase(".");
+		regex.finalizeSwitch();
+
+		printf("matching\n");
+
+		re::ExecResult result;
+		re::State state(re::StateInit(re::ExecFlag_AnchorDataBegin | re::ExecFlag_Stream, 1000));
+
+		result = regex.exec(&state, "\r123456\r");
+		printf("regex result: %d, match offset: %d, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
+		ASSERT(result == re::ExecResult_Match && state.getMatchSwitchCaseId() == 1 && state.getMatch()->getSize() == 1);
+
+		result = regex.exec(&state, "123456");
+		printf("regex result: %d\n", result);
+		ASSERT(result == re::ExecResult_Continue);
+
+		result = regex.exec(&state, "\x2e");
+		printf("regex result: %d, match offset: %d, match length: %d\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize());
+		ASSERT(result == re::ExecResult_MatchOffsetsOnly && state.getMatchSwitchCaseId() == 0 && state.getMatch()->getSize() == 6);
+
+		result = regex.exec(&state, "123456");
+		result = regex.eof(&state);
+		printf("regex result: %d, match offset: %d, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
+		ASSERT(result == re::ExecResult_Match && state.getMatchSwitchCaseId() == 0 && state.getMatch()->getSize() == 6);
+
+		return;
+	} while (0);
+
+
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";

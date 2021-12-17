@@ -129,6 +129,28 @@ public:
 		return m_switchCaseArray[id].m_nfaMatchStartState;
 	}
 
+	size_t
+	getSwitchCaseCaptureCount(size_t id) {
+		ASSERT(m_regexKind == RegexKind_Switch);
+		return m_switchCaseArray[id].m_captureCount;
+	}
+
+	const NfaState*
+	getMatchNfaStartState(size_t acceptId) {
+		ASSERT(m_regexKind == RegexKind_Switch || acceptId == 0);
+		return m_regexKind == RegexKind_Switch ?
+			m_switchCaseArray[acceptId].m_nfaMatchStartState :
+			m_nfaProgram.m_matchStartState;
+	}
+
+	size_t
+	getMatchCaptureCount(size_t acceptId) {
+		ASSERT(m_regexKind == RegexKind_Switch || acceptId == 0);
+		return m_regexKind == RegexKind_Switch ?
+			m_switchCaseArray[acceptId].m_captureCount :
+			m_nfaProgram.m_captureCount;
+	}
+
 	void
 	clear();
 
@@ -230,12 +252,21 @@ public:
 		return exec(StateInit(), p, size);
 	}
 
-	State
+	ExecResult
 	exec(
-		uint_t flags,
+		State* state,
 		const sl::StringRef& string
 	) {
-		return exec(StateInit(flags), string.cp(), string.getLength());
+		return exec(state, string.cp(), string.getLength());
+	}
+
+	State
+	exec(
+		const StateInit& stateInit,
+		const sl::StringRef& string
+	) {
+		State state(stateInit);
+		return exec(&state, string.cp(), string.getLength()) ? state : State();
 	}
 
 	State
