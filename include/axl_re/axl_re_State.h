@@ -88,8 +88,8 @@ struct StateImpl: public rc::RefCount {
 	StateInit m_init;
 	size_t m_matchAcceptId;
 	Match m_match;
-	sl::BoxList<Match> m_subMatchList;
-	sl::Array<Match*> m_subMatchArray;
+	sl::BoxList<Match> m_captureList;
+	sl::Array<Match*> m_captureArray;
 
 protected:
 	StateImpl(); // only creatable by State
@@ -244,15 +244,20 @@ public:
 	}
 
 	size_t
-	getSubMatchCount() const {
+	getCaptureCount() const {
 		ASSERT(m_p);
-		return m_p->m_subMatchArray.getCount();
+		return m_p->m_captureArray.getCount();
 	}
 
 	const Match*
-	getSubMatch(size_t i) const {
+	getCapture(size_t i) const {
 		ASSERT(m_p);
-		return i < m_p->m_subMatchArray.getCount() ? m_p->m_subMatchArray[i] : NULL;
+		return i < m_p->m_captureArray.getCount() ? m_p->m_captureArray[i] : NULL;
+	}
+
+	const Match*
+	getGroup(size_t i) const {
+		return i == 0 ? getMatch() : getCapture(i - 1);
 	}
 
 	void

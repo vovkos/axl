@@ -54,14 +54,14 @@ StateImpl::clone() {
 	if (m_match.getOffset() == -1) // we are done
 		return state;
 
-	size_t count = m_subMatchArray.getCount();
-	state->m_subMatchArray.setCount(count);
+	size_t count = m_captureArray.getCount();
+	state->m_captureArray.setCount(count);
 
-	sl::ConstBoxIterator<Match> it = m_subMatchList.getHead();
+	sl::ConstBoxIterator<Match> it = m_captureList.getHead();
 	for (size_t i = 0; it; it++, i++) {
-		Match* match = state->m_subMatchList.insertTail().p();
+		Match* match = state->m_captureList.insertTail().p();
 		*match = *it;
-		state->m_subMatchArray[i] = match;
+		state->m_captureArray[i] = match;
 	}
 
 	return state;
@@ -94,8 +94,8 @@ StateImpl::reset(size_t offset) {
 	m_matchAcceptId = -1;
 	m_match.m_offset = -1;
 	m_match.m_endOffset = -1;
-	m_subMatchList.clear();
-	m_subMatchArray.clear();
+	m_captureList.clear();
+	m_captureArray.clear();
 
 	freeEngine();
 #if (_AXL_RE_CAN_SKIP_DFA)
@@ -149,7 +149,7 @@ StateImpl::createMatch(
 	if (!count || (m_init.m_execFlags & ExecFlag_DisableCapture))
 		return;
 
-	m_subMatchArray.setCountZeroConstruct(count);
+	m_captureArray.setCountZeroConstruct(count);
 
 	for (size_t i = 0; i < count; i++) {
 		const MatchPos& pos = capturePosArray[i];
@@ -158,7 +158,7 @@ StateImpl::createMatch(
 
 		ASSERT(pos.m_offset != -1 && pos.m_offset <= pos.m_endOffset);
 
-		Match* match = m_subMatchList.insertTail().p();
+		Match* match = m_captureList.insertTail().p();
 		match->m_offset = pos.m_offset;
 		match->m_endOffset = pos.m_endOffset;
 
@@ -167,7 +167,7 @@ StateImpl::createMatch(
 			match->m_p = base + pos.m_offset;
 		}
 
-		m_subMatchArray[i] = match;
+		m_captureArray[i] = match;
 	}
 }
 

@@ -680,16 +680,16 @@ testRegex() {
 		match->getText().sz()
 	);
 
-	count = state.getSubMatchCount();
+	count = state.getCaptureCount();
 	for (size_t i = 1; i < count; i++) {
-		const re::Match* subMatch = state.getSubMatch(i);
-		if (subMatch)
+		const re::Match* capture = state.getCapture(i);
+		if (capture)
 			printf(
 				"$%d: %p(%d) '%s'\n",
 				i,
-				subMatch->getOffset(),
-				subMatch->getSize(),
-				subMatch->getText().sz()
+				capture->getOffset(),
+				capture->getSize(),
+				capture->getText().sz()
 			);
 	}
 #endif
