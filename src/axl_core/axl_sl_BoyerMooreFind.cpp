@@ -348,10 +348,10 @@ TextBoyerMooreFind::find(
 
 	if ((intptr_t)result < 0) {
 		ASSERT(-result <= tailLength);
-		result = -codec->calcRequiredBufferSizeToEncode_utf32(incrementalContext->m_tail, -result);
+		result = -codec->calcRequiredBufferSizeToEncode_utf32(sl::StringRef_utf32(incrementalContext->m_tail, -result));
 	} else if (result) {
 		ASSERT(result <= chunkLength);
-		result = codec->calcRequiredBufferSizeToEncode_utf32(m_buffer.cp(), result);
+		result = codec->calcRequiredBufferSizeToEncode_utf32(sl::StringRef_utf32(m_buffer.cp(), result));
 	}
 
 	incrementalContext->reset();
