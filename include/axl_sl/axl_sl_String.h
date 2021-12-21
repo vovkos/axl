@@ -1083,7 +1083,7 @@ public:
 
 	C*
 	p() {
-		return this->m_p;
+		return ensureExclusive() ? this->m_p : NULL;
 	}
 
 	const C*
@@ -1727,12 +1727,17 @@ public:
 
 	bool
 	ensureExclusive() {
-		return this->m_length ? createBuffer(this->m_length, true) != NULL : true;
+		return isExclusive() ? true : createBuffer(this->m_length, true) != NULL;
 	}
 
 	C*
-	getBuffer(size_t* length = NULL) {
-		C* p = createBuffer(this->m_length, true);
+	getBuffer() {
+		return ensureExclusive() ? this->m_p : NULL;
+	}
+
+	C*
+	getBuffer(size_t* length) {
+		C* p = getBuffer();
 		if (!p)
 			return NULL;
 
@@ -1819,23 +1824,19 @@ public:
 		return bufferSize / sizeof(C) - 1;
 	}
 
-	C*
-	reserve(
-		size_t length,
-		bool saveContents = false
-	) {
-		if (saveContents && length < this->m_length)
-			length = this->m_length;
+	bool
+	reserve(size_t length) {
+		if (length <= this->m_length)
+			return ensureExclusive();
 
 		size_t oldLength = this->m_length;
+		if (!createBuffer(length, true))
+			return false;
 
-		if (!createBuffer(length, saveContents))
-			return NULL;
-
+		ASSERT(this->m_isNullTerminated);
+		this->m_length = oldLength; // restore original length
 		this->m_p[oldLength] = 0;
-		this->m_length = oldLength;
-		this->m_isNullTerminated = true;
-		return this->m_p;
+		return true;
 	}
 
 	size_t
