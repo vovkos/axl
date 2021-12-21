@@ -156,6 +156,15 @@ ExecEngine::calcAnchors(
 
 //..............................................................................
 
+class ExecEngineFactory {
+public:
+	virtual
+	ExecEngine*
+	createExecEngine(StateImpl* parent) = 0;
+};
+
+//..............................................................................
+
 class ExecNfaEngine: public ExecEngine {
 public:
 	ExecNfaEngine(StateImpl* parent):
@@ -190,7 +199,7 @@ ExecNfaEngine::calcAnchorsUpdateCharFlags(utf32_t c) {
 template <
 	typename T,
 	typename Base,
-	typename Encoding
+	typename Decoder
 >
 class ExecImpl: public Base {
 public:
@@ -216,7 +225,7 @@ public:
 		m_lastExecData = p;
 		m_lastExecOffset = m_offset;
 		m_lastExecEndOffset = m_offset + size;
-		Encoding::Decoder::decode(&m_decoderState, *static_cast<T*>(this), (char*)p, (char*)p + size);
+		Decoder::decode(&m_decoderState, *static_cast<T*>(this), (char*)p, (char*)p + size);
 	}
 
 	// DecodeEmitter
@@ -241,6 +250,8 @@ public:
 #else
 #	define AXL_RE_TRACE_CAPTURE (void)
 #endif
+
+//..............................................................................
 
 } // namespace re
 } // namespace axl

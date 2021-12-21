@@ -262,27 +262,43 @@ public:
 
 //..............................................................................
 
+template <typename Decoder>
+class ExecNfaVmFactory: public ExecEngineFactory {
+public:
+	virtual
+	ExecEngine*
+	createExecEngine(StateImpl* parent) {
+		return AXL_MEM_NEW_ARGS((ExecNfaVm<Decoder>), (parent));
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 ExecNfaEngine*
 createExecNfaVm(StateImpl* parent) {
-	switch (parent->m_init.m_codecKind) {
-	case enc::CharCodecKind_Ascii:
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Ascii>, (parent));
-	case enc::CharCodecKind_Utf8:
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Utf8>, (parent));
-	case enc::CharCodecKind_Utf16:
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Utf16s>, (parent));
-	case enc::CharCodecKind_Utf16_be:
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Utf16s_be>, (parent));
-	case enc::CharCodecKind_Utf32:
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Utf32s>, (parent));
-	case enc::CharCodecKind_Utf32_be:
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Utf32s_be>, (parent));
-	default:
+	static ExecNfaVmFactory<enc::AsciiDecoder>     asciiFactory;
+	static ExecNfaVmFactory<enc::Utf8Decoder>      utf8Factory;
+	static ExecNfaVmFactory<enc::Utf16sDecoder>    utf16Factory;
+	static ExecNfaVmFactory<enc::Utf16sDecoder_be> utf16Factory_be;
+	static ExecNfaVmFactory<enc::Utf32sDecoder>    utf32Factory;
+	static ExecNfaVmFactory<enc::Utf32sDecoder_be> utf32Factory_be;
+
+	static ExecEngineFactory* factoryTable[enc::CharCodecKind__Count] = {
+		&asciiFactory,
+		&utf8Factory,
+		&utf16Factory,
+		&utf16Factory_be,
+		&utf32Factory,
+		&utf32Factory_be,
+	};
+
+	size_t i = parent->m_init.m_codecKind;
+	if (i >= countof(factoryTable)) {
 		ASSERT(false);
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<enc::Ascii>, (parent));
+		i = enc::CharCodecKind_Ascii;
 	}
 
-	return NULL;
+	return (ExecNfaEngine*)factoryTable[i]->createExecEngine(parent);
 }
 
 //..............................................................................

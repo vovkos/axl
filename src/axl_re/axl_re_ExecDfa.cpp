@@ -83,16 +83,16 @@ template <
 class ExecDfa: public ExecImpl<
 	ExecDfa<IsReverse, Encoding>,
 	ExecDfaBase,
-	Encoding
+	typename Encoding::Decoder
 > {
 public:
 	ExecDfa(StateImpl* parent):
-		ExecImpl<ExecDfa, ExecDfaBase, Encoding>(parent) {
+		ExecImpl<ExecDfa, ExecDfaBase, Encoding::Decoder>(parent) {
 		ASSERT(!IsReverse()());
 	}
 
 	ExecDfa(ExecDfaBase* forwardEngine):
-		ExecImpl<ExecDfa, ExecDfaBase, Encoding>(forwardEngine->getParent()) {
+		ExecImpl<ExecDfa, ExecDfaBase, Encoding::Decoder>(forwardEngine->getParent()) {
 		ASSERT(IsReverse()());
 		setForwardEngine(forwardEngine);
 	}
@@ -427,25 +427,43 @@ protected:
 
 //..............................................................................
 
+template <typename Encoding>
+class ExecDfaFactory: public ExecEngineFactory {
+public:
+	virtual
+	ExecEngine*
+	createExecEngine(StateImpl* parent) {
+		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, Encoding>), (parent));
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 ExecEngine*
 createExecDfa(StateImpl* parent) {
-	switch (parent->m_init.m_codecKind) {
-	case enc::CharCodecKind_Ascii:
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Ascii>), (parent));
-	case enc::CharCodecKind_Utf8:
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Utf8>), (parent));
-	case enc::CharCodecKind_Utf16:
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Utf16s>), (parent));
-	case enc::CharCodecKind_Utf16_be:
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Utf16s_be>), (parent));
-	case enc::CharCodecKind_Utf32:
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Utf32s>), (parent));
-	case enc::CharCodecKind_Utf32_be:
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Utf32s_be>), (parent));
-	default:
+	static ExecDfaFactory<enc::Ascii>     asciiFactory;
+	static ExecDfaFactory<enc::Utf8>      utf8Factory;
+	static ExecDfaFactory<enc::Utf16s>    utf16Factory;
+	static ExecDfaFactory<enc::Utf16s_be> utf16Factory_be;
+	static ExecDfaFactory<enc::Utf32s>    utf32Factory;
+	static ExecDfaFactory<enc::Utf32s_be> utf32Factory_be;
+
+	static ExecEngineFactory* factoryTable[enc::CharCodecKind__Count] = {
+		&asciiFactory,
+		&utf8Factory,
+		&utf16Factory,
+		&utf16Factory_be,
+		&utf32Factory,
+		&utf32Factory_be,
+	};
+
+	size_t i = parent->m_init.m_codecKind;
+	if (i >= countof(factoryTable)) {
 		ASSERT(false);
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, enc::Ascii>), (parent));
+		i = enc::CharCodecKind_Ascii;
 	}
+
+	return factoryTable[i]->createExecEngine(parent);
 }
 
 //..............................................................................
