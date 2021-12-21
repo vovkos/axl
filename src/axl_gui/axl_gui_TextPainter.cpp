@@ -13,6 +13,8 @@
 #include "axl_gui_TextPainter.h"
 #include "axl_gui_Font.h"
 #include "axl_enc_HexEncoding.h"
+#include "axl_enc_Utf16s.h"
+#include "axl_enc_Utf32s.h"
 
 namespace axl {
 namespace gui {
@@ -395,20 +397,20 @@ size_t
 TextPainter::buildBinTextString(
 	sl::Array<utf32_t>* binTextBuffer,
 	sl::String* stringBuffer,
-	enc::CharCodec* codec,
+	enc::CharCodecKind codecKind,
 	const void* p,
 	size_t dataSize,
 	size_t bufferSize,
 	utf32_t unprintableChar
 ) {
-	size_t length = buildBinTextBuffer(binTextBuffer, codec, p, dataSize, bufferSize, unprintableChar);
+	size_t length = buildBinTextBuffer(binTextBuffer, codecKind, p, dataSize, bufferSize, unprintableChar);
 	stringBuffer->copy(sl::StringRef_utf32(*binTextBuffer, length));
 	return length;
 }
 
 sl::String
 TextPainter::buildBinTextString(
-	enc::CharCodec* codec,
+	enc::CharCodecKind codecKind,
 	const void* p,
 	size_t dataSize,
 	size_t bufferSize,
@@ -416,57 +418,8 @@ TextPainter::buildBinTextString(
 ) {
 	sl::Array<utf32_t> binTextBuffer;
 	sl::String stringBuffer;
-	buildBinTextString(&binTextBuffer, &stringBuffer, codec, p, dataSize, bufferSize, unprintableChar);
+	buildBinTextString(&binTextBuffer, &stringBuffer, codecKind, p, dataSize, bufferSize, unprintableChar);
 	return stringBuffer;
-}
-
-size_t
-TextPainter::buildBinTextBuffer(
-	sl::Array<utf32_t>* binTextBuffer,
-	enc::CharCodec* codec,
-	const void* p0,
-	size_t dataSize,
-	size_t bufferSize,
-	utf32_t unprintableChar
-) {
-	binTextBuffer->setCount(dataSize);
-	utf32_t* buffer = binTextBuffer->p();
-
-	size_t i = 0;
-	const char* p = (const char*) p0;
-	const char* end = p + bufferSize;
-
-	AXL_TODO("do a whole buffer decode rather than codepoint-after-codepoint")
-
-	while (i < dataSize && p < end) {
-		utf32_t codePoint;
-		size_t leftover = end - p;
-
-		enc::ConvertLengthResult result = codec->decode_utf32(&codePoint, 1, p, leftover);
-		if (!result.m_srcLength) {
-			size_t end = i + leftover;
-			if (end > dataSize)
-				end = dataSize;
-
-			for (; i < end; i++)
-				buffer[i] = unprintableChar;
-
-			break;
-		}
-
-		buffer[i] = enc::isPrintableNonMark(codePoint) ? codePoint : unprintableChar;
-
-		size_t end = i + result.m_srcLength;
-		if (end > dataSize)
-			end = dataSize;
-
-		for (i++; i < end; i++)
-			buffer[i] = unprintableChar;
-
-		p += result.m_srcLength;
-	}
-
-	return i;
 }
 
 int
@@ -474,7 +427,7 @@ TextPainter::drawBinText(
 	uint_t textColor0,
 	uint_t backColor0,
 	uint_t fontFlags0,
-	enc::CharCodec* codec,
+	enc::CharCodecKind codecKind,
 	const void* p,
 	size_t dataSize,
 	size_t bufferSize
@@ -482,7 +435,7 @@ TextPainter::drawBinText(
 	if (!dataSize)
 		return m_point.m_x;
 
-	size_t length = buildBinTextBuffer(codec, p, dataSize, bufferSize);
+	size_t length = buildBinTextBuffer(codecKind, p, dataSize, bufferSize);
 	return drawText_utf32(sl::StringRef_utf32(m_binTextBuffer, length));
 }
 
@@ -492,7 +445,7 @@ TextPainter::drawHyperBinText(
 	uint_t backColor0,
 	uint_t fontFlags0,
 	const TextAttrAnchorArray* attrArray,
-	enc::CharCodec* codec,
+	enc::CharCodecKind codecKind,
 	const void* p,
 	size_t dataSize,
 	size_t bufferSize
@@ -500,7 +453,7 @@ TextPainter::drawHyperBinText(
 	if (!dataSize)
 		return m_point.m_x;
 
-	size_t length = buildBinTextBuffer(codec, p, dataSize, bufferSize);
+	size_t length = buildBinTextBuffer(codecKind, p, dataSize, bufferSize);
 	return drawHyperText_utf32(
 		textColor0,
 		backColor0,
@@ -519,7 +472,7 @@ TextPainter::drawSelHyperBinText(
 	const TextAttr& selAttr,
 	size_t selStart,
 	size_t selEnd,
-	enc::CharCodec* codec,
+	enc::CharCodecKind codecKind,
 	const void* p,
 	size_t dataSize,
 	size_t bufferSize
@@ -527,7 +480,7 @@ TextPainter::drawSelHyperBinText(
 	if (!dataSize)
 		return m_point.m_x;
 
-	size_t length = buildBinTextBuffer(codec, p, dataSize, bufferSize);
+	size_t length = buildBinTextBuffer(codecKind, p, dataSize, bufferSize);
 	return drawSelHyperText_utf32(
 		textColor0,
 		backColor0,
@@ -538,6 +491,126 @@ TextPainter::drawSelHyperBinText(
 		selEnd,
 		sl::StringRef_utf32(m_binTextBuffer, length)
 	);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class BinTextBuilderBase {
+public:
+	virtual
+	size_t
+	build(
+		utf32_t* buffer,
+		size_t bufferLength,
+		const void* p,
+		size_t size,
+		utf32_t unprintableChar
+	) = 0;
+};
+
+template <typename Decoder>
+class BinTextBuilder: public BinTextBuilderBase {
+protected:
+	utf32_t* m_dst;
+	utf32_t* m_dstEnd;
+	const char* m_src;
+	utf32_t m_unprintableChar;
+
+public:
+	virtual
+	size_t
+	build(
+		utf32_t* buffer,
+		size_t bufferLength,
+		const void* p,
+		size_t size,
+		utf32_t unprintableChar
+	) {
+		m_dst = buffer;
+		m_dstEnd = buffer + bufferLength;
+		m_src = (char*)p;
+		m_unprintableChar = unprintableChar;
+
+		Decoder::decode(*this, (char*)p, (char*)p + size);
+		return m_dst - buffer;
+	}
+
+	// DecodeEmitter
+
+	bool
+	canEmit() const {
+		return m_dst < m_dstEnd;
+	}
+
+	void
+	emitReplacement(const char* p) {
+		emitCodePoint(p, enc::StdChar_Replacement);
+	}
+
+	void
+	emitCodePoint(
+		const char* p,
+		utf32_t c
+	) {
+		if (m_dst < m_dstEnd)
+			*m_dst++ = enc::isPrintableNonMark(c) ? c : m_unprintableChar;
+
+		for (const char* cb = m_src + 1; cb < p && m_dst < m_dstEnd; cb++)
+			*m_dst++ = m_unprintableChar;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+BinTextBuilderBase*
+getBinTextBuilder(enc::CharCodecKind codecKind) {
+	static BinTextBuilder<enc::AsciiDecoder>     asciiBuilder;
+	static BinTextBuilder<enc::Utf8Decoder>      utf8Builder;
+	static BinTextBuilder<enc::Utf16sDecoder>    utf16Builder;
+	static BinTextBuilder<enc::Utf16sDecoder_be> utf16Builder_be;
+	static BinTextBuilder<enc::Utf32sDecoder>    utf32Builder;
+	static BinTextBuilder<enc::Utf32sDecoder_be> utf32Builder_be;
+
+	static BinTextBuilderBase* builderTable[enc::CharCodecKind__Count] = {
+		&asciiBuilder,
+		&utf8Builder,
+		&utf16Builder,
+		&utf16Builder_be,
+		&utf32Builder,
+		&utf32Builder_be,
+	};
+
+	if (codecKind >= countof(builderTable)) {
+		ASSERT(false);
+		codecKind = enc::CharCodecKind_Ascii;
+	}
+
+	return builderTable[codecKind];
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+size_t
+TextPainter::buildBinTextBuffer(
+	sl::Array<utf32_t>* binTextBuffer,
+	enc::CharCodecKind codecKind,
+	const void* p0,
+	size_t dataSize,
+	size_t bufferSize,
+	utf32_t unprintableChar
+) {
+	binTextBuffer->setCount(dataSize);
+
+	BinTextBuilderBase* builder = getBinTextBuilder(codecKind);
+	size_t length = builder->build(
+		binTextBuffer->p(),
+		dataSize,
+		(char*)p0,
+		bufferSize,
+		unprintableChar
+	);
+
+	return AXL_MIN(length, dataSize);
 }
 
 //..............................................................................

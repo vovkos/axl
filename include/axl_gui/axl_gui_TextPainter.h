@@ -23,11 +23,6 @@ namespace gui {
 
 class TextPainter {
 protected:
-	enum Def {
-		Def_BinTextDecodeBufferLength = 2 * 1024, // 8K
-	};
-
-protected:
 	TextAttrAnchorArray m_selOverlayBuffer;
 	sl::String m_stringBuffer;
 	sl::Array<utf32_t> m_binTextBuffer;
@@ -622,7 +617,7 @@ public:
 		uint_t textColor,
 		uint_t backColor,
 		uint_t fontFlags,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -631,7 +626,7 @@ public:
 	int
 	drawBinText(
 		const TextAttr& attr,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -640,7 +635,7 @@ public:
 			attr.m_foreColor,
 			attr.m_backColor,
 			attr.m_fontFlags,
-			codec,
+			codecKind,
 			p,
 			dataSize,
 			bufferSize
@@ -649,7 +644,7 @@ public:
 
 	int
 	drawBinText(
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -658,7 +653,7 @@ public:
 			m_canvas->m_colorAttr.m_foreColor,
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
-			codec,
+			codecKind,
 			p,
 			dataSize,
 			bufferSize
@@ -671,7 +666,7 @@ public:
 		uint_t backColor,
 		uint_t fontFlags,
 		const TextAttrAnchorArray* attrArray,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -681,7 +676,7 @@ public:
 	drawHyperBinText(
 		const TextAttr& attr,
 		const TextAttrAnchorArray* attrArray,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -691,7 +686,7 @@ public:
 			attr.m_backColor,
 			attr.m_fontFlags,
 			attrArray,
-			codec,
+			codecKind,
 			p,
 			dataSize,
 			bufferSize
@@ -701,7 +696,7 @@ public:
 	int
 	drawHyperBinText(
 		const TextAttrAnchorArray* attrArray,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -711,7 +706,7 @@ public:
 			m_canvas->m_colorAttr.m_backColor,
 			-1,
 			attrArray,
-			codec,
+			codecKind,
 			p,
 			dataSize,
 			bufferSize
@@ -727,7 +722,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart,
 		size_t selEnd,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -740,7 +735,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart,
 		size_t selEnd,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -753,7 +748,7 @@ public:
 			selAttr,
 			selStart,
 			selEnd,
-			codec,
+			codecKind,
 			p,
 			dataSize,
 			bufferSize
@@ -766,7 +761,7 @@ public:
 		const TextAttr& selAttr,
 		size_t selStart,
 		size_t selEnd,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
@@ -779,7 +774,7 @@ public:
 			selAttr,
 			selStart,
 			selEnd,
-			codec,
+			codecKind,
 			p,
 			dataSize,
 			bufferSize
@@ -791,7 +786,7 @@ public:
 	buildBinTextString(
 		sl::Array<utf32_t>* binTextBuffer,
 		sl::String* stringBuffer,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize,
@@ -801,7 +796,7 @@ public:
 	static
 	sl::String
 	buildBinTextString(
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize,
@@ -816,7 +811,7 @@ protected:
 	size_t
 	buildBinTextBuffer(
 		sl::Array<utf32_t>* binTextBuffer,
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize,
@@ -825,14 +820,14 @@ protected:
 
 	size_t
 	buildBinTextBuffer(
-		enc::CharCodec* codec,
+		enc::CharCodecKind codecKind,
 		const void* p,
 		size_t dataSize,
 		size_t bufferSize
 	) {
 		return buildBinTextBuffer(
 			&m_binTextBuffer,
-			codec,
+			codecKind,
 			p,
 			dataSize,
 			bufferSize,

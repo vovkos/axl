@@ -22,7 +22,7 @@ namespace gui {
 void
 TextAttrAnchorArray::trace() {
 	size_t count = getCount();
-	TRACE("--- CTextAttrAnchorArray {%d}---\n", count);
+	TRACE("--- TextAttrAnchorArray {%d}---\n", count);
 
 	for (size_t i = 0; i < count; i++) {
 		const TextAttrAnchor* anchor = &(m_array[i]);
