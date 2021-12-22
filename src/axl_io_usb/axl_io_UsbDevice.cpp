@@ -422,7 +422,7 @@ UsbDevice::getStringDesrciptor(
 		p = string->createBuffer(length - 1);
 	}
 
-	string->setReducedLength(length);
+	string->overrideLength(length);
 	return true;
 }
 
@@ -461,7 +461,7 @@ UsbDevice::getStringDesrciptor(
 		p = string->createBuffer(length - 1);
 	}
 
-	string->setReducedLength(length);
+	string->overrideLength(length);
 	return true;
 }
 

@@ -557,6 +557,8 @@ public:
 
 		for (const char* cb = m_src + 1; cb < p && m_dst < m_dstEnd; cb++)
 			*m_dst++ = m_unprintableChar;
+
+		m_src = p;
 	}
 };
 

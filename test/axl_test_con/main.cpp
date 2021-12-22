@@ -977,7 +977,7 @@ querySymbolicLink(
 		return false;
 	}
 
-	string->setReducedLength(uniTarget.Length / sizeof(wchar_t));
+	string->overrideLength(uniTarget.Length / sizeof(wchar_t));
 	return true;
 }
 

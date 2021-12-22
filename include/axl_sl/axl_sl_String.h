@@ -1495,7 +1495,7 @@ public:
 			return this->m_length;
 
 		if (count == -1 || index + count >= oldLength) {
-			result = setReducedLength(index);
+			result = overrideLength(index);
 			return result ? index : -1;
 		}
 
@@ -1508,7 +1508,7 @@ public:
 		T* dst = this->m_p + index;
 		Details::copy(dst, dst + count, newLength - index);
 
-		result = setReducedLength(newLength);
+		result = overrideLength(newLength);
 		return result ? newLength : -1;
 	}
 
@@ -1535,7 +1535,7 @@ public:
 			return 0;
 		}
 
-		setReducedLength(i + 1);
+		overrideLength(i + 1);
 		return this->m_length;
 	}
 
@@ -1689,35 +1689,12 @@ public:
 		if (this->m_length <= delta) {
 			clear();
 		} else {
-			bool result = setReducedLength(this->m_length - delta);
+			bool result = overrideLength(this->m_length - delta);
 			if (!result)
 				return -1;
 		}
 
 		return this->m_length;
-	}
-
-	bool
-	setReducedLength(size_t length) {
-		if (length == this->m_length)
-			return true;
-
-		if (!length) {
-			clear();
-			return true;
-		}
-
-		ASSERT(this->m_p && this->m_hdr);
-		ASSERT(length < this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C)); // misuse otherwise
-
-		bool isNullTerminated = !this->m_p[length];
-		if (!isNullTerminated && this->m_hdr->getRefCount() == 1) {
-			this->m_p[length] = 0;
-			isNullTerminated = true;
-		}
-
-		this->m_length = length;
-		return isNullTerminated || createBuffer(length, true) != NULL;
 	}
 
 	bool
@@ -1826,9 +1803,6 @@ public:
 
 	bool
 	reserve(size_t length) {
-		if (length <= this->m_length)
-			return ensureExclusive();
-
 		size_t oldLength = this->m_length;
 		if (!createBuffer(length, true))
 			return false;
@@ -1844,11 +1818,38 @@ public:
 		if (!this->m_hdr)
 			return 0;
 
-		size_t fullLength = this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C);
-		ASSERT(fullLength);
+		size_t bufferLength = this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C);
+		ASSERT(bufferLength);
 
-		this->m_length = Details::calcLength(this->m_p, fullLength - 1);
+		this->m_length = Details::calcLength(this->m_p, bufferLength - 1);
 		return this->m_length;
+	}
+
+	bool
+	overrideLength(size_t length) {
+		if (length == this->m_length)
+			return true;
+
+		if (!length) {
+			clear();
+			return true;
+		}
+
+		ASSERT(this->m_p && this->m_hdr && this->m_isNullTerminated);
+		ASSERT(length < this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C)); // misuse otherwise
+
+		if (!this->m_p[length]) { // already null-terminated
+			this->m_length = length;
+			return true;
+		}
+
+		if (this->m_hdr->getRefCount() == 1) {
+			this->m_p[length] = 0;
+			this->m_length = length;
+			return true;
+		}
+
+		return createBuffer(length, true) != NULL;
 	}
 
 protected:

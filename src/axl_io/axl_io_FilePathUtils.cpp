@@ -462,7 +462,7 @@ getSymbolicLinkTarget(
 	}
 
 	ASSERT(uniTarget.Length <= uniTarget.MaximumLength);
-	targetName_w.setReducedLength(uniTarget.Length / sizeof(WCHAR));
+	targetName_w.overrideLength(uniTarget.Length / sizeof(WCHAR));
 	*targetName = targetName_w;
 	return true;
 }
@@ -501,7 +501,7 @@ getSymbolicLinkTarget(
 		return err::failWithLastSystemError();
 
 	ASSERT(result <= bufferLength);
-	targetName->setReducedLength(result);
+	targetName->overrideLength(result);
 	return true;
 }
 
