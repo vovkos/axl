@@ -544,7 +544,7 @@ public:
 
 	void
 	emitReplacement(const char* p) {
-		emitCodePoint(p, enc::StdChar_Replacement);
+		emitCodePoint(p, m_unprintableChar);
 	}
 
 	void

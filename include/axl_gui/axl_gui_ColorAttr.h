@@ -35,9 +35,19 @@ struct ColorAttr {
 		setup(foreColor, backColor);
 	}
 
-	int
-	cmp(const ColorAttr& attr) {
-		return memcmp(this, &attr, sizeof(ColorAttr));
+	bool
+	operator == (const ColorAttr& attr) const {
+		return isEqual(attr);
+	}
+
+	bool
+	operator != (const ColorAttr& attr) const {
+		return !isEqual(attr);
+	}
+
+	bool
+	isEqual(const ColorAttr& attr) const {
+		return m_foreColor == attr.m_foreColor && m_backColor == attr.m_backColor;
 	}
 
 	void

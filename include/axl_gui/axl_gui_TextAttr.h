@@ -43,9 +43,19 @@ struct TextAttr: public ColorAttr {
 		setup(colorAttr, fontFlags);
 	}
 
-	int
-	cmp(const TextAttr& attr) {
-		return memcmp(this, &attr, sizeof(TextAttr));
+	bool
+	operator == (const TextAttr& attr) const {
+		return isEqual(attr);
+	}
+
+	bool
+	operator != (const TextAttr& attr) const {
+		return !isEqual(attr);
+	}
+
+	bool
+	isEqual(const TextAttr& attr) const {
+		return ColorAttr::isEqual(attr) && m_fontFlags == attr.m_fontFlags;
 	}
 
 	void

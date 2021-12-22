@@ -92,6 +92,12 @@ public:
 		const TextAttr& attr
 	);
 
+	void
+	setTailAttr(
+		size_t offset,
+		const TextAttr& attr
+	);
+
 #ifdef _AXL_DEBUG
 	void
 	trace();

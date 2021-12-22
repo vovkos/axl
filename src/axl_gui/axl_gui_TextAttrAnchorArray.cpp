@@ -113,7 +113,7 @@ TextAttrAnchorArray::normalize(
 	for (size_t i = start; i <= end; i++) {
 		TextAttrAnchor* anchor = &m_array[i];
 
-		if (anchor->m_attr.cmp(lastAnchor.m_attr) == 0) {
+		if (anchor->m_attr == lastAnchor.m_attr) {
 			if (!removeCount)
 				removeIndex = i;
 
@@ -168,6 +168,25 @@ TextAttrAnchorArray::setAttr(
 		m_array[i].m_attr.overlay(attr);
 
 	normalize(startIdx, endIdx);
+}
+
+void
+TextAttrAnchorArray::setTailAttr(
+	size_t offset,
+	const TextAttr& attr
+) {
+	if (m_array.isEmpty()) {
+		m_array.append(TextAttrAnchor(offset, attr));
+		return;
+	}
+
+	TextAttrAnchor* tail = &m_array.getBack();
+	ASSERT(offset >= tail->m_offset);
+	if (attr != tail->m_attr)
+		if (offset == tail->m_offset)
+			tail->m_attr = attr;
+		else
+			m_array.append(TextAttrAnchor(offset, attr));
 }
 
 //..............................................................................
