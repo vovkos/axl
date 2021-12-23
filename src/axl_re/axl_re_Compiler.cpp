@@ -235,21 +235,36 @@ Compiler::quantifier(NfaState* start) {
 	token = nextToken();
 
 	if (tokenCount != TokenKind_Number ||
+		tokenCount.m_number == 0 ||
 		token != TokenKind_EndQuantifier
 	) {
 		err::setFormatStringError("invalid quantifier (only simple quantifiers are currently supported)");
 		return NULL;
 	}
 
-	NfaState* originalStart = start;
-	NfaState* accept = m_program->getLastState();
-	for (size_t i = 1; i < tokenCount.m_number; i++) {
-		start = clone(start, accept);
-		accept->createEpsilon(start);
-		accept = m_program->getLastState();
-	}
+	if (tokenCount.m_number == 1)
+		return start;
 
-	return originalStart;
+	NfaState* originalAccept = m_program->getLastState();
+	NfaState* link = originalAccept;
+	NfaState* accept = AXL_MEM_NEW(NfaState);
+	NfaState* head = link;
+	head->createLink(start, accept);
+
+	for (size_t i = 1; i < tokenCount.m_number; i++) {
+		NfaState* op = clone(start, originalAccept);
+		NfaState* link2 = m_program->getLastState();
+		link->finalizeLink(link2);
+		link2->createLink(op, link);
+		link = link2;
+	} while (token.isValidSingle());
+
+	m_program->m_stateList.insertTail(accept);
+	NfaState* sequence = m_program->insertState(start);
+	sequence->createSequence(head, link);
+	sequence->m_flags = start->m_flags;
+	link->finalizeLink(accept);
+	return sequence;
 }
 
 NfaState*
@@ -267,8 +282,10 @@ Compiler::clone(
 		newState->copy(*oldState);
 		stateMap[oldState] = newState;
 
-		if (it == last)
+		if (it == last) {
+			newState->clear();
 			break;
+		}
 
 		it++;
 	}

@@ -556,6 +556,107 @@ testCharSet() {
 #define _AXL_RE_TEST_FULL_DFA  1
 
 void
+testUsbRegex() {
+	static const char file[] =
+		/* "#\n"
+		"#	List of USB ID's\n"
+		"#\n"
+		"#	Maintained by Stephen J. Gowdy <linux.usb.ids@gmail.com>\n"
+		"#	If you have any new entries, please submit them via\n"
+		"#		http://www.linux-usb.org/usb-ids.html\n"
+		"#	or send entries as patches (diff -u old new) in the\n"
+		"#	body of your email (a bot will attempt to deal with it).\n"
+		"#	The latest version can be obtained from\n"
+		"#		http://www.linux-usb.org/usb.ids\n"
+		"#\n"
+		"# Version: 2016.10.13\n"
+		"# Date:    2016-10-13 20:34:14\n"
+		"#\n"
+		"\n"
+		"# Vendors, devices and interfaces. Please keep sorted.\n"
+		"\n"
+		"# Syntax:\n"
+		"# vendor  vendor_name\n"
+		"#	device  device_name				<-- single tab\n"
+		"#		interface  interface_name		<-- two tabs\n"
+		"\n" */
+		"0001  Fry's Electronics\n"
+		"	7778  Counterfeit flash drive [Kingston]\n"
+		"0002  Ingram\n"
+		"0003  Club Mac\n"
+		"0004  Nebraska Furniture Mart\n"
+		"0011  Unknown\n"
+		"	7788  counterfeit flash drive\n"
+		"0053  Planex\n"
+		"	5301  GW-US54ZGL 802.11bg\n"
+		"0079  DragonRise Inc.\n"
+		"	0006  PC TWIN SHOCK Gamepad\n"
+		"	0011  Gamepad\n"
+		"0105  Trust International B.V.\n"
+		"	145f  NW-3100 802.11b/g 54Mbps Wireless Network Adapter [zd1211]\n"
+		"0127  IBP\n"
+		"	0002  HDM Interface\n"
+		"0145  Unknown\n"
+		"	0112  Card Reader\n"
+		"017c  MLK\n"
+		"	145f  Trust Deskset\n"
+		"0200  TP-Link\n"
+		"	0201  MA180 UMTS Modem\n"
+		"0204  Chipsbank Microelectronics Co., Ltd\n"
+		"	6025  CBM2080 / CBM2090 Flash drive controller\n"
+		"	6026  CBM1180 Flash drive controller\n"
+		;
+
+	re::Regex regex;
+
+	regex.createSwitch();
+	regex.compileSwitchCase("(\\h{4})\\s+([^\\n]+[^\\s])\\s*\\n");
+	regex.compileSwitchCase("\\t(\\h{4})\\s+([^\\n]+[^\\s])\\s*\\n");
+	regex.compileSwitchCase("\\s*#[^\\n]*\\n");
+	regex.compileSwitchCase("\\s*\\n");
+	regex.finalizeSwitch();
+
+	// printf("NFA:\n");
+	// regex.printNfa();
+
+	/*
+	regex.compile("a{3}");//|a+|ba");
+	printf("NFA:\n");
+	regex.printNfa();
+	regex.buildFullDfa();
+	 printf("\nDFA:\n");
+	regex.printDfa();
+	regex.buildFullReverseDfa();
+	printf("\nrDFA:\n");
+	regex.printReverseDfa();
+	// */
+
+	const char* p = file;
+	const char* end = p + lengthof(file);
+
+	re::State state;
+
+	while (p < end) {
+		re::ExecResult result = regex.exec(&state, p, end - p);
+		if (!result) {
+			printf("mismatch @%d\n", p - file);
+			break;
+		}
+
+		const re::Match* match = state.getMatch();
+		printf(
+			"match-%d: @%d(%dB) '%s'\n",
+			state.getMatchSwitchCaseId(),
+			match->getOffset(),
+			match->getSize(),
+			match->getText().sz()
+		); // all matches are nl-terminated
+
+		p += match->getSize();
+	}
+}
+
+void
 testRegex() {
 	re::Regex regex;
 	re::State state;
@@ -566,11 +667,17 @@ testRegex() {
 	const char* end;
 
 	do {
-		result = regex.compile("(a)?");
+		result = regex.compile(re::CompileFlag_MatchOnly, "a|ba");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
 		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+		regex.printDfa();
+		regex.printReverseDfa();
+
 		return;
 	} while (0);
 
@@ -6170,29 +6277,6 @@ testUtf8Encode() {
 
 //..............................................................................
 
-struct A {
-	A(int x) {
-		printf("A::A(%d)\n", x);
-	}
-};
-
-struct B {
-	B(int x) {
-		printf("B::B(%d)\n", x);
-	}
-};
-
-struct C {
-	A m_a;
-	B m_b;
-
-	C():
-		m_b(10),
-		m_a(20) {
-		printf("C::C\n");
-	}
-};
-
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -6225,11 +6309,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	// utf::testUtf8();
-	// utf::testUtf16();
-	// utf::testUtf8Encode();
-
-	testRegex();
+	testUsbRegex();
 	return 0;
 }
 
