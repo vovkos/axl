@@ -86,7 +86,8 @@ getAnchorsString(uint_t anchors) {
 
 //..............................................................................
 
-NfaState::NfaState() {
+void
+NfaState::init() {
 	m_stateKind = NfaStateKind_Undefined;
 	m_flags = 0;
 	m_id = -1;
@@ -95,7 +96,8 @@ NfaState::NfaState() {
 	m_unionData[1] = 0;
 }
 
-NfaState::~NfaState() {
+void
+NfaState::freeCharSet() {
 	if (m_stateKind == NfaStateKind_MatchCharSet) {
 		ASSERT(m_charSet);
 		AXL_MEM_DELETE(m_charSet);
@@ -414,6 +416,10 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 	else
 		initializeClosureStack(&stack, m_array);
 
+	m_closureKind = UseAnchors()() ?
+		IsReverse()() ? NfaClosureKind_ReverseAnchor : NfaClosureKind_Anchor :
+		IsReverse()() ? NfaClosureKind_ReverseEpsilon : NfaClosureKind_Epsilon;
+
 	m_array.clear();
 	m_map.clear();
 
@@ -427,10 +433,16 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 			switch (state->m_stateKind) {
 			case NfaStateKind_Accept:
 				m_array.append(state);
- 				return true; // done!
+				if (!IsReverse()()) { // we are done! the very first accept matches.
+					m_acceptId = state->m_acceptId;
+	 				return true;
+				}
+
+				m_acceptId = AXL_MIN(m_acceptId, state->m_acceptId);
+				break;
 
 			case NfaStateKind_Link:
-				if (!IsRollback()() && !IsReverse()()) // links are only needed for rollbacks
+				if (!IsReverse()()) // links are only needed for rollbacks
 					m_array.append(state);
 
 				state = IsReverse()() ? state->m_reverseState : state->m_nextState;

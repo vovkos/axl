@@ -135,7 +135,7 @@ DfaProgram::getState(const NfaStateSet& nfaStateSet) {
 	state->m_nfaStateSet = nfaStateSet;
 
 	if (nfaStateSet.isAccept()) {
-		state->m_acceptId = state->m_nfaStateSet.getLastState()->m_acceptId;
+		state->m_acceptId = state->m_nfaStateSet.getAcceptId();
 		state->m_flags |= DfaStateFlag_Accept;
 	}
 

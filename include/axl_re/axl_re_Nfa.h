@@ -97,8 +97,13 @@ struct NfaState: sl::ListLink {
 		};
 	};
 
-	NfaState();
-	~NfaState();
+	NfaState() {
+		init();
+	}
+
+	~NfaState() {
+		freeCharSet();
+	}
 
 	bool
 	isConsuming() const {
@@ -112,6 +117,12 @@ struct NfaState: sl::ListLink {
 	isMatchAnchor(uint_t anchors) const {
 		ASSERT(m_stateKind == NfaStateKind_MatchAnchor);
 		return (anchors & m_anchor) != 0;
+	}
+
+	void
+	clear() {
+		freeCharSet();
+		init();
 	}
 
 	void
@@ -196,6 +207,13 @@ struct NfaState: sl::ListLink {
 	void
 	print(FILE* file = stdout) const;
 #endif
+
+protected:
+	void
+	init();
+
+	void
+	freeCharSet();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -331,14 +349,32 @@ NfaState::createCloseCapture(
 
 //..............................................................................
 
-// NFA sets are strictly ORDERED by STATE PRIORITY
+enum NfaClosureKind {
+	NfaClosureKind_None,
+	NfaClosureKind_Epsilon,
+	NfaClosureKind_Anchor,
+	NfaClosureKind_ReverseEpsilon,
+	NfaClosureKind_ReverseAnchor,
+	NfaClosureKind_Rollback,
+	NfaClosureKind_FirstReverse = NfaClosureKind_ReverseEpsilon,
+};
+
+// forward NFA sets are ORDERED by STATE PRIORITY to mimic PCRE (yield the first leftmost match)
+// reverse & rollback NFA sets are UNORDERED (yield the longest match)
 
 class NfaStateSet {
 protected:
-	sl::Array<const NfaState*> m_array;
 	sl::BitMap m_map;
+	sl::Array<const NfaState*> m_array;
+	NfaClosureKind m_closureKind;
+	size_t m_acceptId;
 
 public:
+	NfaStateSet() {
+		m_closureKind = NfaClosureKind_None;
+		m_acceptId = -1;
+	}
+
 	const NfaState*
 	operator [] (size_t i) const {
 		return m_array[i];
@@ -351,7 +387,12 @@ public:
 
 	bool
 	isAccept() const {
-		return !m_array.isEmpty() && m_array.getBack()->m_stateKind == NfaStateKind_Accept;
+		return m_acceptId != -1;
+	}
+
+	bool
+	isReverse() const {
+		return m_closureKind >= NfaClosureKind_FirstReverse;
 	}
 
 	size_t
@@ -359,9 +400,9 @@ public:
 		return m_array.getCount();
 	}
 
-	const NfaState*
-	getLastState() const {
-		return m_array.getBack();
+	size_t
+	getAcceptId() const {
+		return m_acceptId;
 	}
 
 	const sl::BitMap&
@@ -380,14 +421,11 @@ public:
 	}
 
 	bool
-	isEqual(const NfaStateSet& set) const {
-		size_t count = m_array.getCount();
-		return count == set.m_array.getCount() && memcmp(m_array, set.m_array, count * sizeof(NfaState*)) == 0;
-	}
+	isEqual(const NfaStateSet& set) const;
 
 	size_t
 	hash() const {
-		return sl::djb2(m_array, m_array.getCount() * sizeof(NfaState*));
+		return isReverse() ? m_map.hash() : sl::djb2(m_array, m_array.getCount() * sizeof(NfaState*));
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
@@ -437,7 +475,7 @@ public:
 
 	bool
 	buildRollbackClosure() {
-		return buildClosureImpl<sl::True, sl::False, sl::False>(0);
+		return buildClosureImpl<sl::True, sl::True, sl::False>(0);
 	}
 
 protected:
@@ -449,6 +487,20 @@ protected:
 	bool
 	buildClosureImpl(uint_t anchors);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+NfaStateSet::isEqual(const NfaStateSet& set) const {
+	if (isReverse())
+		return m_map.isEqual(set.m_map);
+
+	size_t count = m_array.getCount();
+	return
+		count == set.m_array.getCount() &&
+		memcmp(m_array, set.m_array, count * sizeof(NfaState*)) == 0;
+}
 
 //..............................................................................
 
