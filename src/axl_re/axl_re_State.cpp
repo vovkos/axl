@@ -70,7 +70,7 @@ StateImpl::clone() {
 void
 StateImpl::initialize(
 	const StateInit& init,
-	Regex* regex
+	const Regex* regex
 ) {
 	m_init = init;
 
@@ -81,7 +81,7 @@ StateImpl::initialize(
 }
 
 void
-StateImpl::setRegex(Regex* regex) {
+StateImpl::setRegex(const Regex* regex) {
 	m_regex = regex;
 	reset(m_matchAcceptId != -1 ? m_match.getEndOffset() : m_init.m_offset);
 }
@@ -187,7 +187,7 @@ State::initialize(const StateInit& init) {
 void
 State::initialize(
 	const StateInit& init,
-	Regex* regex
+	const Regex* regex
 ) {
 	ASSERT(!m_p);
 	m_p = AXL_RC_NEW(StateImpl);

@@ -83,7 +83,7 @@ StateInit::setup(
 struct StateImpl: public rc::RefCount {
 	friend class State;
 
-	Regex* m_regex;
+	const Regex* m_regex;
 	ExecEngine* m_engine;
 	StateInit m_init;
 	size_t m_matchAcceptId;
@@ -108,11 +108,11 @@ public:
 	void
 	initialize(
 		const StateInit& init,
-		Regex* regex
+		const Regex* regex
 	);
 
 	void
-	setRegex(Regex* regex);
+	setRegex(const Regex* regex);
 
 	void
 	reset(size_t offset);
@@ -282,11 +282,11 @@ protected:
 	void
 	initialize(
 		const StateInit& init,
-		Regex* regex
+		const Regex* regex
 	);
 
 	void
-	setRegex(Regex* regex) {
+	setRegex(const Regex* regex) {
 		ensureExclusive();
 		m_p->setRegex(regex);
 	}

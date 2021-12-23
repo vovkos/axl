@@ -54,8 +54,8 @@ protected:
 protected:
 	RegexKind m_regexKind;
 	NfaProgram m_nfaProgram;
-	DfaProgram m_dfaProgram;
-	DfaProgram m_dfaReverseProgram;
+	mutable DfaProgram m_dfaProgram;
+	mutable DfaProgram m_dfaReverseProgram;
 	sl::Array<SwitchCase> m_switchCaseArray;
 
 public:
@@ -67,7 +67,7 @@ public:
 	}
 
 	RegexKind
-	getRegexKind() {
+	getRegexKind() const {
 		return m_regexKind;
 	}
 
@@ -87,7 +87,7 @@ public:
 	}
 
 	const DfaState*
-	getDfaMatchStartState() {
+	getDfaMatchStartState() const {
 		return
 			m_dfaProgram.m_matchStartState ? m_dfaProgram.m_matchStartState :
 			m_nfaProgram.m_matchStartState ? m_dfaProgram.m_matchStartState = m_dfaProgram.createStartState(m_nfaProgram.m_matchStartState) :
@@ -95,7 +95,7 @@ public:
 	}
 
 	const DfaState*
-	getDfaSearchStartState() {
+	getDfaSearchStartState() const {
 		return
 			m_dfaProgram.m_searchStartState ? m_dfaProgram.m_searchStartState :
 			m_nfaProgram.m_searchStartState ? m_dfaProgram.m_searchStartState = m_dfaProgram.createStartState(m_nfaProgram.m_searchStartState) :
@@ -103,7 +103,7 @@ public:
 	}
 
 	const DfaState*
-	getDfaReverseStartState() {
+	getDfaReverseStartState() const {
 		return
 			m_dfaReverseProgram.m_matchStartState ? m_dfaReverseProgram.m_matchStartState :
 			m_nfaProgram.m_matchStartState ? m_dfaReverseProgram.m_matchStartState = m_dfaReverseProgram.createStartState(m_nfaProgram.m_matchStartState) :
@@ -111,32 +111,32 @@ public:
 	}
 
 	const DfaState*
-	getDfaRollbackState(const DfaState* state) {
+	getDfaRollbackState(const DfaState* state) const {
 		return
 			state->m_rollbackState ? state->m_rollbackState :
 			((DfaState*)state)->m_rollbackState = m_dfaReverseProgram.createRollbackState(state);
 	}
 
 	size_t
-	getSwitchCaseCount() {
+	getSwitchCaseCount() const {
 		ASSERT(m_regexKind == RegexKind_Switch);
 		return m_switchCaseArray.getCount();
 	}
 
 	const NfaState*
-	getSwitchCaseNfaStartState(size_t id) {
+	getSwitchCaseNfaStartState(size_t id) const {
 		ASSERT(m_regexKind == RegexKind_Switch);
 		return m_switchCaseArray[id].m_nfaMatchStartState;
 	}
 
 	size_t
-	getSwitchCaseCaptureCount(size_t id) {
+	getSwitchCaseCaptureCount(size_t id) const {
 		ASSERT(m_regexKind == RegexKind_Switch);
 		return m_switchCaseArray[id].m_captureCount;
 	}
 
 	const NfaState*
-	getMatchNfaStartState(size_t acceptId) {
+	getMatchNfaStartState(size_t acceptId) const {
 		ASSERT(m_regexKind == RegexKind_Switch || acceptId == 0);
 		return m_regexKind == RegexKind_Switch ?
 			m_switchCaseArray[acceptId].m_nfaMatchStartState :
@@ -144,7 +144,7 @@ public:
 	}
 
 	size_t
-	getMatchCaptureCount(size_t acceptId) {
+	getMatchCaptureCount(size_t acceptId) const {
 		ASSERT(m_regexKind == RegexKind_Switch || acceptId == 0);
 		return m_regexKind == RegexKind_Switch ?
 			m_switchCaseArray[acceptId].m_captureCount :
@@ -168,10 +168,10 @@ public:
 	}
 
 	size_t
-	save(sl::Array<char>* buffer);
+	save(sl::Array<char>* buffer) const;
 
 	sl::Array<char>
-	save() {
+	save() const {
 		sl::Array<char> buffer;
 		save(&buffer);
 		return buffer;
@@ -214,16 +214,16 @@ public:
 	}
 
 	void
-	prepareDfaState(const DfaState* state);
+	prepareDfaState(const DfaState* state) const;
 
 	void
-	buildFullDfa();
+	buildFullDfa() const;
 
 	void
-	buildFullReverseDfa();
+	buildFullReverseDfa() const;
 
 	void
-	buildFullRollbackDfa();
+	buildFullRollbackDfa() const;
 
 	// execution (match/search)
 
@@ -232,14 +232,14 @@ public:
 		State* state,
 		const void* p,
 		size_t size
-	);
+	) const;
 
 	State
 	exec(
 		const StateInit& stateInit,
 		const void* p,
 		size_t size
-	) {
+	) const {
 		State state(stateInit);
 		return exec(&state, p, size) ? state : State();
 	}
@@ -248,7 +248,7 @@ public:
 	exec(
 		const void* p,
 		size_t size
-	) {
+	) const {
 		return exec(StateInit(), p, size);
 	}
 
@@ -256,7 +256,7 @@ public:
 	exec(
 		State* state,
 		const sl::StringRef& string
-	) {
+	) const {
 		return exec(state, string.cp(), string.getLength());
 	}
 
@@ -264,18 +264,18 @@ public:
 	exec(
 		const StateInit& stateInit,
 		const sl::StringRef& string
-	) {
+	) const {
 		State state(stateInit);
 		return exec(&state, string.cp(), string.getLength()) ? state : State();
 	}
 
 	State
-	exec(const sl::StringRef& string) {
+	exec(const sl::StringRef& string) const {
 		return exec(StateInit(), string.cp(), string.getLength());
 	}
 
 	ExecResult
-	eof(State* state) {
+	eof(State* state) const {
 		ASSERT(state->getRegex() == this && (state->getExecFlags() & ExecFlag_Stream) && !state->isFinal());
 		return state->eof();
 	}

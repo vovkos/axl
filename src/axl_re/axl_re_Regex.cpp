@@ -182,7 +182,7 @@ Regex::load(
 }
 
 size_t
-Regex::save(sl::Array<char>* buffer) {
+Regex::save(sl::Array<char>* buffer) const {
 	buffer->clear();
 
 	size_t switchCaseCount = m_switchCaseArray.getCount();
@@ -317,7 +317,7 @@ Regex::compileSwitchCase(
 }
 
 void
-Regex::prepareDfaState(const DfaState* state) {
+Regex::prepareDfaState(const DfaState* state) const {
 	ASSERT(!(state->m_flags & DfaStateFlag_Ready));
 
 	DfaBuilder builder((state->m_flags & DfaStateFlag_Reverse) ? &m_dfaReverseProgram : &m_dfaProgram);
@@ -325,7 +325,7 @@ Regex::prepareDfaState(const DfaState* state) {
 }
 
 void
-Regex::buildFullDfa() {
+Regex::buildFullDfa() const {
 	DfaBuilder builder(&m_dfaProgram);
 
 	getDfaMatchStartState();
@@ -338,7 +338,7 @@ Regex::buildFullDfa() {
 }
 
 void
-Regex::buildFullReverseDfa() {
+Regex::buildFullReverseDfa() const {
 	DfaBuilder builder(&m_dfaReverseProgram);
 
 	getDfaReverseStartState();
@@ -347,7 +347,7 @@ Regex::buildFullReverseDfa() {
 }
 
 void
-Regex::buildFullRollbackDfa() {
+Regex::buildFullRollbackDfa() const {
 	DfaBuilder builder(&m_dfaReverseProgram);
 
 	sl::Iterator<DfaState> it = m_dfaProgram.m_stateList.getHead();
@@ -363,7 +363,7 @@ Regex::exec(
 	State* state,
 	const void* p,
 	size_t size
-) {
+) const {
 	if (!*state)
 		state->initialize(StateInit(), this);
 	else if (state->getRegex() != this)
