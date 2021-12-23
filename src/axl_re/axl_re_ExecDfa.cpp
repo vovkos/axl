@@ -186,8 +186,9 @@ public:
 		}
 
 		m_offset += (char*)p - (char*)p0;
-		if (IsReverse()() && !isFinalized() && m_offset == m_baseOffset) {
-			processBoundary(m_offset - 1, m_prevCharFlags | Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
+		if (IsReverse()() && !isFinalized() && m_offset <= m_baseOffset) {
+			ASSERT(m_offset == m_baseOffset); // otherwise, there was a reverse codec failure
+			processBoundary(m_baseOffset - 1, m_prevCharFlags | Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
 			finalize(false);
 		}
 
