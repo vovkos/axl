@@ -317,15 +317,7 @@ Regex::compileSwitchCase(
 }
 
 void
-Regex::prepareDfaState(const DfaState* state) const {
-	ASSERT(!(state->m_flags & DfaStateFlag_Ready));
-
-	DfaBuilder builder((state->m_flags & DfaStateFlag_Reverse) ? &m_dfaReverseProgram : &m_dfaProgram);
-	builder.buildTransitionMaps((DfaState*)state);
-}
-
-void
-Regex::buildFullDfa() const {
+Regex::buildFullDfa() {
 	DfaBuilder builder(&m_dfaProgram);
 
 	getDfaMatchStartState();
@@ -338,7 +330,7 @@ Regex::buildFullDfa() const {
 }
 
 void
-Regex::buildFullReverseDfa() const {
+Regex::buildFullReverseDfa() {
 	DfaBuilder builder(&m_dfaReverseProgram);
 
 	getDfaReverseStartState();
@@ -347,7 +339,7 @@ Regex::buildFullReverseDfa() const {
 }
 
 void
-Regex::buildFullRollbackDfa() const {
+Regex::buildFullRollbackDfa() {
 	DfaBuilder builder(&m_dfaReverseProgram);
 
 	sl::Iterator<DfaState> it = m_dfaProgram.m_stateList.getHead();
@@ -356,6 +348,19 @@ Regex::buildFullRollbackDfa() const {
 
 	while (!m_dfaReverseProgram.m_preStateList.isEmpty())
 		builder.buildTransitionMaps(*m_dfaReverseProgram.m_preStateList.getHead());
+}
+
+void
+Regex::prepareDfaState(const DfaState* state) const {
+	m_dfaLock.lock();
+	if (state->m_flags & DfaStateFlag_Ready) {
+		m_dfaLock.unlock();
+		return;
+	}
+
+	DfaBuilder builder((state->m_flags & DfaStateFlag_Reverse) ? &m_dfaReverseProgram : &m_dfaProgram);
+	builder.buildTransitionMaps((DfaState*)state);
+	m_dfaLock.unlock();
 }
 
 ExecResult

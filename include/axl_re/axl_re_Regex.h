@@ -54,9 +54,10 @@ protected:
 protected:
 	RegexKind m_regexKind;
 	NfaProgram m_nfaProgram;
+	sl::Array<SwitchCase> m_switchCaseArray;
+	mutable sys::Lock m_dfaLock; // for when DFA is built on the fly
 	mutable DfaProgram m_dfaProgram;
 	mutable DfaProgram m_dfaReverseProgram;
-	sl::Array<SwitchCase> m_switchCaseArray;
 
 public:
 	Regex();
@@ -214,16 +215,13 @@ public:
 	}
 
 	void
-	prepareDfaState(const DfaState* state) const;
+	buildFullDfa();
 
 	void
-	buildFullDfa() const;
+	buildFullReverseDfa();
 
 	void
-	buildFullReverseDfa() const;
-
-	void
-	buildFullRollbackDfa() const;
+	buildFullRollbackDfa();
 
 	// execution (match/search)
 
@@ -298,6 +296,10 @@ public:
 		m_dfaReverseProgram.print(file);
 	}
 #endif
+
+protected:
+	void
+	prepareDfaState(const DfaState* state) const;
 };
 
 //..............................................................................
