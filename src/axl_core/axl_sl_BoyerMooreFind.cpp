@@ -399,7 +399,8 @@ TextBoyerMooreFind::findImpl(
 			}
 
 			i += m_badSkipTable[c % badSkipTableSize];
-		} else
+		}
+	else
 		while (i < end) {
 			intptr_t j = last;
 

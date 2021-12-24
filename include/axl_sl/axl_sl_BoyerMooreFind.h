@@ -56,8 +56,8 @@ public:
 
 protected:
 	Array<T> m_pattern;
-	Array<size_t, ArrayDetails<size_t> > m_badSkipTable;
-	Array<size_t, ArrayDetails<size_t> > m_goodSkipTable;
+	Array<size_t> m_badSkipTable;
+	Array<size_t> m_goodSkipTable;
 	uint_t m_flags;
 
 public:
