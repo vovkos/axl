@@ -197,13 +197,13 @@ public:
 		m_regexKind = RegexKind_Switch;
 	}
 
-	size_t
+	bool
 	compileSwitchCase(
 		uint_t flags,
 		const sl::StringRef& source
 	);
 
-	size_t
+	bool
 	compileSwitchCase(const sl::StringRef& source) {
 		return compileSwitchCase(0, source);
 	}

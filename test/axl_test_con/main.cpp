@@ -646,7 +646,7 @@ testUsbRegex() {
 		const re::Match* match = state.getMatch();
 		printf(
 			"match-%d: @%d(%dB) '%s'\n",
-			state.getMatchSwitchCaseId(),
+			state.getMatchAcceptId(),
 			match->getOffset(),
 			match->getSize(),
 			match->getText().sz()
@@ -696,7 +696,7 @@ testRegex() {
 
 		result = regex.exec(&state, "\r123456\r");
 		printf("regex result: %d, match offset: %d, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
-		ASSERT(result == re::ExecResult_Match && state.getMatchSwitchCaseId() == 1 && state.getMatch()->getSize() == 1);
+		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 1 && state.getMatch()->getSize() == 1);
 
 		result = regex.exec(&state, "123456");
 		printf("regex result: %d\n", result);
@@ -704,12 +704,12 @@ testRegex() {
 
 		result = regex.exec(&state, "\x2e");
 		printf("regex result: %d, match offset: %d, match length: %d\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize());
-		ASSERT(result == re::ExecResult_MatchOffsetsOnly && state.getMatchSwitchCaseId() == 0 && state.getMatch()->getSize() == 6);
+		ASSERT(result == re::ExecResult_MatchOffsetsOnly && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
 
 		result = regex.exec(&state, "123456");
 		result = regex.eof(&state);
 		printf("regex result: %d, match offset: %d, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
-		ASSERT(result == re::ExecResult_Match && state.getMatchSwitchCaseId() == 0 && state.getMatch()->getSize() == 6);
+		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
 
 		return;
 	} while (0);
@@ -903,7 +903,7 @@ testRegex() {
 			break;
 		}
 
-		size_t id = state.getMatchSwitchCaseId();
+		size_t id = state.getMatchAcceptId();
 		match = state.getMatch();
 		ASSERT(match);
 

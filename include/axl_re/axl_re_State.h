@@ -226,7 +226,7 @@ public:
 	}
 
 	size_t
-	getMatchSwitchCaseId() const {
+	getMatchAcceptId() const {
 		ASSERT(m_p);
 		return m_p->m_matchAcceptId;
 	}
@@ -269,7 +269,13 @@ public:
 	initialize(const StateInit& init);
 
 	void
-	resume();
+	reset(size_t offset = 0);
+
+	void
+	resume() {
+		ASSERT(isMatch());
+		reset(m_p->m_match.getEndOffset());
+	}
 
 protected:
 	void

@@ -195,14 +195,14 @@ State::initialize(
 }
 
 void
-State::resume() {
-	ASSERT(isMatch());
+State::reset(size_t offset) {
+	ASSERT(m_p);
 
 	StateInit init;
 	init.m_execFlags = m_p->m_init.m_execFlags;
 	init.m_codecKind = m_p->m_init.m_codecKind;
 	init.m_decoderState = 0;
-	init.m_offset = m_p->m_match.getEndOffset();
+	init.m_offset = offset;
 	m_p->initialize(init, m_p->m_regex);
 }
 

@@ -292,7 +292,7 @@ Regex::compile(
 	return true;
 }
 
-size_t
+bool
 Regex::compileSwitchCase(
 	uint_t flags,
 	const sl::StringRef& source
@@ -304,7 +304,6 @@ Regex::compileSwitchCase(
 	size_t id = m_switchCaseArray.getCount();
 	size_t prevCaptureCount = m_nfaProgram.m_captureCount;
 	m_nfaProgram.m_captureCount = 0;
-
 	Compiler compiler(&m_nfaProgram, flags);
 	scase.m_nfaMatchStartState = compiler.compileSwitchCase(source, id);
 	scase.m_captureCount = m_nfaProgram.m_captureCount;
@@ -312,8 +311,11 @@ Regex::compileSwitchCase(
 	if (m_nfaProgram.m_captureCount < prevCaptureCount)
 		m_nfaProgram.m_captureCount = prevCaptureCount;
 
+	if (!scase.m_nfaMatchStartState)
+		return false;
+
 	m_switchCaseArray.append(scase);
-	return id;
+	return true;
 }
 
 void
