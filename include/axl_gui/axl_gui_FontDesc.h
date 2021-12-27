@@ -47,7 +47,7 @@ getFontFlagString(uint_t flags) {
 
 inline
 uint_t
-overlayFontFlags(
+getOverlayFontFlags(
 	uint_t baseFontFlags,
 	uint_t overlayFontFlags
 ) {

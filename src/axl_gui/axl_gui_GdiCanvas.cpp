@@ -84,7 +84,7 @@ GdiCanvas::drawRect(
 	int bottom,
 	uint_t color
 ) {
-	color = overlayColor(m_baseTextAttr.m_backColor, color);
+	color = getOverlayColor(m_baseTextAttr.m_backColor, color);
 
 	if (m_colorAttr.m_backColor != color) {
 		m_colorAttr.m_backColor = color;
@@ -142,9 +142,9 @@ GdiCanvas::drawText_utf16(
 	uint_t fontFlags,
 	const sl::StringRef_utf16& text
 ) {
-	textColor = overlayColor(m_baseTextAttr.m_foreColor, textColor);
-	backColor = overlayColor(m_baseTextAttr.m_backColor, backColor);
-	fontFlags = overlayFontFlags(m_baseTextAttr.m_fontFlags, fontFlags);
+	textColor = getOverlayColor(m_baseTextAttr.m_foreColor, textColor);
+	backColor = getOverlayColor(m_baseTextAttr.m_backColor, backColor);
+	fontFlags = getOverlayFontFlags(m_baseTextAttr.m_fontFlags, fontFlags);
 
 	Font* font = m_baseFont->getFontMod(fontFlags);
 

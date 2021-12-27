@@ -65,17 +65,28 @@ struct ColorAttr {
 	}
 
 	void
+	overlay(const ColorAttr& overlayAttr) {
+		*this = getOverlayAttr(*this, overlayAttr);
+	}
+
+	void
 	overlay(
 		const ColorAttr& baseAttr,
 		const ColorAttr& overlayAttr
 	) {
-		m_foreColor = overlayColor(baseAttr.m_foreColor, overlayAttr.m_foreColor);
-		m_backColor = overlayColor(baseAttr.m_backColor, overlayAttr.m_backColor);
+		*this = getOverlayAttr(baseAttr, overlayAttr);
 	}
 
-	void
-	overlay(const ColorAttr& overlayAttr) {
-		overlay(*this, overlayAttr);
+	static
+	ColorAttr
+	getOverlayAttr(
+		const ColorAttr& baseAttr,
+		const ColorAttr& overlayAttr
+	) {
+		return ColorAttr(
+			getOverlayColor(baseAttr.m_foreColor, overlayAttr.m_foreColor),
+			getOverlayColor(baseAttr.m_backColor, overlayAttr.m_backColor)
+		);
 	}
 };
 

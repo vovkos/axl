@@ -198,7 +198,7 @@ TextPainter::drawHyperText_utf32(
 	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount();
 
 	if (!nextAttr->m_offset) {
-		attr.overlay(attr, nextAttr->m_attr);
+		attr.overlay(nextAttr->m_attr);
 		nextAttr++;
 	}
 
@@ -335,7 +335,7 @@ TextPainter::drawHyperBinHex(
 	const TextAttrAnchor* attrEnd = nextAttr + attrArray->getCount();
 
 	if (!nextAttr->m_offset) {
-		attr.overlay(attr, nextAttr->m_attr);
+		attr.overlay(nextAttr->m_attr);
 		nextAttr++;
 	}
 

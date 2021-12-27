@@ -149,7 +149,7 @@ getColorIndex(uint_t color) {
 
 inline
 uint_t
-overlayColor(
+getOverlayColor(
 	uint_t baseColor,
 	uint_t overlayColor
 ) {

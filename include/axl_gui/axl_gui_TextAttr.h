@@ -70,8 +70,7 @@ struct TextAttr: public ColorAttr {
 		uint_t backColor,
 		uint_t fontFlags
 	) {
-		m_foreColor = foreColor;
-		m_backColor = backColor;
+		ColorAttr::setup(foreColor, backColor);
 		m_fontFlags = fontFlags;
 	}
 
@@ -80,9 +79,25 @@ struct TextAttr: public ColorAttr {
 		const ColorAttr& colorAttr,
 		uint_t fontFlags
 	) {
-
 		*(ColorAttr*)this = colorAttr;
 		m_fontFlags = fontFlags;
+	}
+
+	static
+	TextAttr
+	getOverlayAttr(
+		const TextAttr& baseAttr,
+		const TextAttr& overlayAttr
+	) {
+		return TextAttr(
+			ColorAttr::getOverlayAttr(baseAttr, overlayAttr),
+			getOverlayFontFlags(baseAttr.m_fontFlags, overlayAttr.m_fontFlags)
+		);
+	}
+
+	void
+	overlay(const TextAttr& overlayAttr) {
+		*this = getOverlayAttr(*this, overlayAttr);
 	}
 
 	void
@@ -90,13 +105,7 @@ struct TextAttr: public ColorAttr {
 		const TextAttr& baseAttr,
 		const TextAttr& overlayAttr
 	) {
-		ColorAttr::overlay(baseAttr, overlayAttr);
-		m_fontFlags = overlayFontFlags(baseAttr.m_fontFlags, overlayAttr.m_fontFlags);
-	}
-
-	void
-	overlay(const TextAttr& overlayAttr) {
-		overlay(*this, overlayAttr);
+		*this = getOverlayAttr(baseAttr, overlayAttr);
 	}
 };
 

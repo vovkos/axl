@@ -18,18 +18,16 @@ namespace gui {
 //..............................................................................
 
 #ifdef _AXL_DEBUG
-
 void
-TextAttrAnchorArray::trace() {
+TextAttrAnchorArray::print(FILE* file) {
 	size_t count = getCount();
-	TRACE("--- TextAttrAnchorArray {%d}---\n", count);
+	fprintf(file, "--- TextAttrAnchorArray {%d}---\n", count);
 
 	for (size_t i = 0; i < count; i++) {
 		const TextAttrAnchor* anchor = &(m_array[i]);
-		TRACE("[%d] ofs:%02x fc:%x\n", i, anchor->m_offset, anchor->m_attr.m_foreColor);
+		fprintf(file, "[%d] ofs:%02x fg:%x bg:%x\n", i, anchor->m_offset, anchor->m_attr.m_foreColor, anchor->m_attr.m_backColor);
 	}
 }
-
 #endif
 
 size_t
@@ -60,26 +58,7 @@ TextAttrAnchorArray::findAnchor(size_t offset) const {
 }
 
 size_t
-TextAttrAnchorArray::getStartAnchor(size_t offset) {
-	size_t index = findAnchor(offset);
-	if (index == -1) {
-		m_array.insert(0, TextAttrAnchor(offset, TextAttr()));
-		return 0;
-	}
-
-	TextAttrAnchor* anchor = &m_array[index];
-	if (anchor->m_offset == offset)
-		return index;
-
-	TextAttr lastAttr = anchor->m_attr;
-	index++;
-
-	m_array.insert(index, TextAttrAnchor(offset, lastAttr));
-	return index;
-}
-
-size_t
-TextAttrAnchorArray::getEndAnchor(size_t offset) {
+TextAttrAnchorArray::getAnchor(size_t offset) {
 	size_t index = findAnchor(offset);
 	if (index == -1) {
 		m_array.insert(0, TextAttrAnchor(offset, TextAttr()));
@@ -142,6 +121,60 @@ TextAttrAnchorArray::clearBefore(size_t offset) {
 }
 
 void
+TextAttrAnchorArray::overlay(
+	const TextAttrAnchor* anchor,
+	size_t count
+) {
+	if (!count)
+		return;
+
+	size_t oldCount = m_array.getCount();
+	if (!oldCount) {
+		m_array.copy(anchor, count);
+		return;
+	}
+
+	sl::Array<TextAttrAnchor> array;
+	sl::takeOver(&array, &m_array);
+
+	const TextAttrAnchor* oldAnchor = array;
+	const TextAttrAnchor* oldEnd = array + oldCount;
+	const TextAttrAnchor* newAnchor = anchor;
+	const TextAttrAnchor* newEnd = anchor + count;
+
+	TextAttr oldAttr;
+	TextAttr newAttr;
+
+	while (oldAnchor < oldEnd && newAnchor < newEnd) {
+		if (oldAnchor->m_offset < newAnchor->m_offset) {
+			TextAttr attr = TextAttr::getOverlayAttr(oldAnchor->m_attr, newAttr);
+			m_array.append(TextAttrAnchor(oldAnchor->m_offset, attr));
+			oldAttr = oldAnchor->m_attr;
+			oldAnchor++;
+		} else {
+			TextAttr attr = TextAttr::getOverlayAttr(oldAttr, newAnchor->m_attr);
+			m_array.append(TextAttrAnchor(newAnchor->m_offset, attr));
+			newAttr = newAnchor->m_attr;
+			newAnchor++;
+		}
+	}
+
+	while (oldAnchor < oldEnd) {
+		TextAttr attr = TextAttr::getOverlayAttr(oldAnchor->m_attr, newAttr);
+		m_array.append(TextAttrAnchor(oldAnchor->m_offset, attr));
+		oldAttr = oldAnchor->m_attr;
+		oldAnchor++;
+	}
+
+	while (newAnchor < newEnd) {
+		TextAttr attr = TextAttr::getOverlayAttr(oldAttr, newAnchor->m_attr);
+		m_array.append(TextAttrAnchor(newAnchor->m_offset, attr));
+		newAttr = newAnchor->m_attr;
+		newAnchor++;
+	}
+}
+
+void
 TextAttrAnchorArray::setAttr(
 	size_t beginOffset,
 	size_t endOffset,
@@ -154,14 +187,13 @@ TextAttrAnchorArray::setAttr(
 
 	// important: END anchor first! otherwise the first anchor could "bleed" to the right
 
-	size_t endIdx = getEndAnchor(endOffset);
-
-	size_t oldCount = m_array.getCount();
-	size_t startIdx = getStartAnchor(beginOffset);
+	size_t endIdx = getAnchor(endOffset);
+	size_t count = m_array.getCount();
+	size_t startIdx = getAnchor(beginOffset);
 
 	// detect insertion
 
-	if (startIdx <= endIdx && m_array.getCount() > oldCount)
+	if (startIdx <= endIdx && m_array.getCount() > count)
 		endIdx++;
 
 	for (size_t i = startIdx; i < endIdx; i++)

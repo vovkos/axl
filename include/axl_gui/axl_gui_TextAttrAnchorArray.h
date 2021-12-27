@@ -73,10 +73,26 @@ public:
 
 	void
 	copy(
-		const TextAttrAnchor* attrAnchorArray,
-		size_t attrAnchorCount
+		const TextAttrAnchor* anchor,
+		size_t count
 	) {
-		m_array.copy(attrAnchorArray, attrAnchorCount);
+		m_array.copy(anchor, count);
+	}
+
+	void
+	copy(const TextAttrAnchorArray& attrAnchorArray) {
+		m_array = attrAnchorArray.m_array;
+	}
+
+	void
+	overlay(
+		const TextAttrAnchor* anchor,
+		size_t count
+	);
+
+	void
+	overlay(const TextAttrAnchorArray& attrAnchorArray) {
+		overlay(attrAnchorArray.m_array, attrAnchorArray.m_array.getCount());
 	}
 
 	TextAttr
@@ -100,7 +116,7 @@ public:
 
 #ifdef _AXL_DEBUG
 	void
-	trace();
+	print(FILE* file = stdout);
 #endif
 
 protected:
@@ -108,10 +124,7 @@ protected:
 	findAnchor(size_t offset) const;
 
 	size_t
-	getStartAnchor(size_t offset);
-
-	size_t
-	getEndAnchor(size_t offset);
+	getAnchor(size_t offset);
 
 	void
 	normalize(
