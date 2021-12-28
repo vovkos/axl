@@ -273,7 +273,7 @@ public:
 
 	void
 	resume() {
-		ASSERT(isMatch());
+		ASSERT(isPreMatch());
 		reset(m_p->m_match.getEndOffset());
 	}
 
