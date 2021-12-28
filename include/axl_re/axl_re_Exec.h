@@ -43,6 +43,14 @@ enum ExecResult {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum ExecEngineKind {
+	ExecEngineKind_Undefined,
+	ExecEngineKind_Dfa,
+	ExecEngineKind_Nfa,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class ExecEngine {
 protected:
 	enum CharFlag {
@@ -56,6 +64,7 @@ protected:
 	};
 
 protected:
+	ExecEngineKind m_engineKind;
 	StateImpl* m_parent;
 	const void* m_lastExecData;
 	size_t m_lastExecOffset;
@@ -68,10 +77,18 @@ protected:
 	uint_t m_prevCharFlags;
 
 public:
-	ExecEngine(StateImpl* parent);
+	ExecEngine(
+		ExecEngineKind engineKind,
+		StateImpl* parent
+	);
 
 	virtual
 	~ExecEngine() {}
+
+	ExecEngineKind
+	getEngineKind() const {
+		return m_engineKind;
+	}
 
 	StateImpl*
 	getParent() const {
@@ -168,7 +185,8 @@ public:
 class ExecNfaEngine: public ExecEngine {
 public:
 	ExecNfaEngine(StateImpl* parent):
-		ExecEngine(parent) {}
+		ExecEngine(ExecEngineKind_Nfa, parent) {
+	}
 
 	virtual
 	void

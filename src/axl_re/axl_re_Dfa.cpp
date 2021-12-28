@@ -117,6 +117,7 @@ DfaProgram::DfaProgram(uint_t stateFlags) {
 
 void
 DfaProgram::clear() {
+	m_stateArray.clear();
 	m_stateList.clear();
 	m_preStateList.clear();
 	m_stateMap.clear();
@@ -202,11 +203,14 @@ DfaBuilder::buildTransitionMaps(DfaState* state) {
 		state->m_charTransitionMap.isEmpty())
 		state->m_flags |= DfaStateFlag_Dead;
 
-	state->m_flags |= DfaStateFlag_Ready;
+	ASSERT(m_program->m_stateList.getCount() == m_program->m_stateArray.getCount());
 	state->m_id = m_program->m_stateList.getCount();
+	state->m_flags |= DfaStateFlag_Ready;
 
 	m_program->m_preStateList.remove(state);
 	m_program->m_stateList.insertTail(state);
+	m_program->m_stateArray.append(state);
+
 }
 
 template <typename IsReverse>

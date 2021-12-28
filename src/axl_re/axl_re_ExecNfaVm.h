@@ -54,10 +54,6 @@ public:
 
 	virtual
 	void
-	reset(size_t offset);
-
-	virtual
-	void
 	reset(
 		size_t offset,
 		const NfaState* state

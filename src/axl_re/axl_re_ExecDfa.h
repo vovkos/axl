@@ -13,6 +13,7 @@
 
 #include "axl_re_State.h"
 #include "axl_re_Exec.h"
+#include "axl_re_Dfa.h"
 
 namespace axl {
 namespace re {
@@ -43,6 +44,18 @@ protected:
 public:
 	ExecDfaBase(StateImpl* parent);
 
+	size_t
+	getDfaStateId() const {
+		return m_state->m_id;
+	}
+
+	virtual
+	void
+	reset(
+		size_t offset,
+		const DfaState* state
+	) = 0;
+
 protected:
 	void
 	copy(const ExecDfaBase* src);
@@ -56,7 +69,7 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-ExecEngine*
+ExecDfaBase*
 createExecDfa(StateImpl* parent);
 
 //..............................................................................

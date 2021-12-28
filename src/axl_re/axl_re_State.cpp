@@ -82,15 +82,9 @@ StateImpl::initialize(
 
 void
 StateImpl::setRegex(const Regex* regex) {
+	ASSERT(regex);
+
 	m_regex = regex;
-	reset(m_matchAcceptId != -1 ? m_match.getEndOffset() : m_init.m_offset);
-}
-
-void
-StateImpl::reset(size_t offset) {
-	ASSERT(m_regex);
-
-	m_init.m_decoderState = 0;
 	m_matchAcceptId = -1;
 	m_match.m_offset = -1;
 	m_match.m_endOffset = -1;
@@ -98,17 +92,27 @@ StateImpl::reset(size_t offset) {
 	m_captureArray.clear();
 
 	freeEngine();
+
 #if (_AXL_RE_CAN_SKIP_DFA)
 	if (regex->getRegexKind() != RegexKind_Switch &&
-		(m_execFlags & (ExecFlag_Stream | ExecFlag_AnchorDataBegin)) == ExecFlag_AnchorDataBegin)
+		(m_execFlags & (ExecFlag_Stream | ExecFlag_AnchorDataBegin)) == ExecFlag_AnchorDataBegin) {
 		m_engine = createExecNfaVm(this);
-	else
-		m_engine = createExecDfa(this);
-#else
-	m_engine = createExecDfa(this);
+		return;
+	}
 #endif
 
-	m_engine->reset(offset);
+	const DfaState* dfaState = NULL;
+
+	if (m_init.m_dfaStateId != -1)
+		dfaState = m_regex->getDfaState(m_init.m_dfaStateId);
+
+	if (!dfaState)
+		dfaState = m_init.m_execFlags & ExecFlag_AnchorDataBegin ?
+			m_regex->getDfaMatchStartState() :
+			m_regex->getDfaSearchStartState();
+
+	m_engine = createExecDfa(this);
+	((ExecDfaBase*)m_engine)->reset(m_init.m_offset, dfaState);
 }
 
 void
@@ -172,6 +176,12 @@ StateImpl::createMatch(
 }
 
 //..............................................................................
+
+size_t
+State::getDfaStateId() const {
+	ASSERT(m_p && m_p->m_engine->getEngineKind() == ExecEngineKind_Dfa);
+	return ((ExecDfaBase*)m_p->m_engine)->getDfaStateId();
+}
 
 void
 State::initialize(const StateInit& init) {

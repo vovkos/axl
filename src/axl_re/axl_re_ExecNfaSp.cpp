@@ -47,11 +47,6 @@ ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
 }
 
 void
-ExecNfaSpBase::reset(size_t offset) {
-	reset(offset, m_parent->m_regex->getNfaStartState());
-}
-
-void
 ExecNfaSpBase::reset(
 	size_t offset,
 	const NfaState* state

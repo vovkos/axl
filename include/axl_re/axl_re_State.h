@@ -25,40 +25,32 @@ class State;
 
 //..............................................................................
 
-// passing four ints as arguments is error-prone; better use a struct
+// passing four integers as arguments is error-prone; better use a struct
 
 struct StateInit {
 	uint_t m_execFlags;
 	enc::CharCodecKind m_codecKind;
 	enc::DecoderState m_decoderState;
 	size_t m_offset;
-
-	StateInit(uint_t execFlags = 0) {  // most times, we only want exec flags
-		setup(execFlags, enc::CharCodecKind_Utf8, 0, 0);
-	}
+	size_t m_dfaStateId;
 
 	StateInit(
-		uint_t execFlags,
-		size_t offset
+		uint_t execFlags = 0,
+		size_t offset = 0,
+		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8,
+		enc::DecoderState decoderState = 0,
+		size_t dfaState = -1
 	) {
-		setup(execFlags, enc::CharCodecKind_Utf8, 0, offset);
-	}
-
-	StateInit(
-		uint_t execFlags,
-		enc::CharCodecKind codecKind,
-		enc::DecoderState decoderState,
-		size_t offset
-	) {
-		setup(execFlags, codecKind, decoderState, offset);
+		setup(execFlags, offset, codecKind, decoderState, dfaState);
 	}
 
 	void
 	setup(
 		uint_t execFlags,
-		enc::CharCodecKind codecKind,
-		enc::DecoderState decoderState,
-		size_t offset
+		size_t offset = 0,
+		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8,
+		enc::DecoderState decoderState = 0,
+		size_t dfaStateId = -1
 	);
 };
 
@@ -68,14 +60,16 @@ inline
 void
 StateInit::setup(
 	uint_t execFlags,
+	size_t offset,
 	enc::CharCodecKind codecKind,
 	enc::DecoderState decoderState,
-	size_t offset
+	size_t dfaStateId
 ) {
 	m_execFlags = execFlags;
+	m_offset = offset;
 	m_codecKind = codecKind;
 	m_decoderState = decoderState;
-	m_offset = offset;
+	m_dfaStateId = dfaStateId;
 }
 
 //..............................................................................
@@ -113,9 +107,6 @@ public:
 
 	void
 	setRegex(const Regex* regex);
-
-	void
-	reset(size_t offset);
 
 	void
 	preCreateMatch(
@@ -224,6 +215,9 @@ public:
 		ASSERT(m_p && m_p->m_engine);
 		return m_p->m_engine->getExecResult();
 	}
+
+	size_t
+	getDfaStateId() const;
 
 	size_t
 	getMatchAcceptId() const {

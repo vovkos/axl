@@ -117,6 +117,7 @@ struct DfaState: sl::ListLink {
 
 struct DfaProgram {
 	uint_t m_stateFlags;
+	sl::Array<DfaState*> m_stateArray;
 	sl::List<DfaState> m_stateList;
 	sl::List<DfaState> m_preStateList;
 	NfaStateSetMap<DfaState*> m_stateMap;

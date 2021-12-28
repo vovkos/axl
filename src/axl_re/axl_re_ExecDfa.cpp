@@ -22,7 +22,7 @@ namespace re {
 //..............................................................................
 
 ExecDfaBase::ExecDfaBase(StateImpl* parent):
-	ExecEngine(parent) {
+	ExecEngine(ExecEngineKind_Dfa, parent) {
 	m_forwardEngine = NULL;
 	m_state = NULL;
 	m_p = NULL;
@@ -133,14 +133,11 @@ public:
 
 	virtual
 	void
-	reset(size_t offset) {
-		if (IsReverse()()) {
-			ASSERT(m_forwardEngine);
-			m_forwardEngine->reset(offset);
-			m_parent->m_engine = m_forwardEngine;
-			AXL_MEM_DELETE(this);
-			return;
-		}
+	reset(
+		size_t offset,
+		const DfaState* state
+	) {
+		ASSERT(!IsReverse()());
 
 		ExecEngine::reset(offset);
 		m_matchEnd = NULL;
@@ -153,12 +150,7 @@ public:
 		m_savedMatchAcceptId = -1;
 	#endif
 
-		gotoState(
-			offset,
-			m_execFlags & ExecFlag_AnchorDataBegin ?
-				m_parent->m_regex->getDfaMatchStartState() :
-				m_parent->m_regex->getDfaSearchStartState()
-		);
+		gotoState(offset, state);
 	}
 
 	virtual
@@ -440,7 +432,7 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-ExecEngine*
+ExecDfaBase*
 createExecDfa(StateImpl* parent) {
 	static ExecDfaFactory<enc::Ascii>     asciiFactory;
 	static ExecDfaFactory<enc::Utf8>      utf8Factory;
@@ -464,7 +456,7 @@ createExecDfa(StateImpl* parent) {
 		i = enc::CharCodecKind_Ascii;
 	}
 
-	return factoryTable[i]->createExecEngine(parent);
+	return (ExecDfaBase*)factoryTable[i]->createExecEngine(parent);
 }
 
 //..............................................................................

@@ -72,11 +72,6 @@ ExecNfaVmBase::copy(const ExecNfaVmBase* src) {
 }
 
 void
-ExecNfaVmBase::reset(size_t offset) {
-	reset(offset, m_parent->m_regex->getNfaStartState());
-}
-
-void
 ExecNfaVmBase::reset(
 	size_t offset,
 	const NfaState* state
