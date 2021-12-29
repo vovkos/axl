@@ -135,13 +135,12 @@ public:
 	void
 	reset(
 		size_t offset,
+		size_t baseOffset,
 		const DfaState* state
 	) {
-		ASSERT(!IsReverse()());
-
 		ExecEngine::reset(offset);
 		m_matchEnd = NULL;
-		m_baseOffset = offset;
+		m_baseOffset = baseOffset;
 		m_matchCharFlags = 0;
 		m_matchAcceptId = -1;
 		m_matchEndOffset = -1;
@@ -168,6 +167,16 @@ public:
 			m_p = p0 = end + size;
 			m_lastExecOffset = m_offset - size;
 			m_lastExecEndOffset = m_offset;
+
+			// be careful not to overshoot m_baseOffset
+
+			if (m_baseOffset > m_lastExecOffset) {
+				size_t delta = m_baseOffset - m_lastExecOffset;
+				end += delta;
+				m_lastExecData = (char*)p + delta;
+				m_lastExecOffset = m_baseOffset;
+			}
+
 			p = Encoding::ReverseDecoder::decode(&m_decoderState, *this, (char*)m_p, end);
 		} else {
 			const char* end = (char*)p + size;
@@ -179,9 +188,12 @@ public:
 
 		m_offset += (char*)p - (char*)p0;
 		if (IsReverse()() && !isFinalized() && m_offset <= m_baseOffset) {
-			ASSERT(m_offset == m_baseOffset); // otherwise, there was a reverse codec failure
+			ASSERT(m_offset == m_baseOffset);
 			processBoundary(m_baseOffset - 1, m_prevCharFlags | Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
-			finalize(false);
+			if (m_matchAcceptId != -1) { // can happen if we start from a DFA state within a match
+				ASSERT(m_execResult == ExecResult_ContinueBackward);
+				return;
+			}
 		}
 
 		if (m_matchEnd) {
@@ -324,7 +336,7 @@ protected:
 		if (!reverseDfa->isFinalized())
 			m_parent->preCreateMatch(m_matchAcceptId, matchEndOffset);
 
-		m_execResult = ExecResult_Match; // stop decoder from feeding us more chars
+		m_execResult = ExecResult_MatchOffsetsOnly; // stop decoder from feeding us more chars
 	}
 
 	void
@@ -420,13 +432,16 @@ protected:
 
 //..............................................................................
 
-template <typename Encoding>
+template <
+	typename IsReverse,
+	typename Encoding
+>
 class ExecDfaFactory: public ExecEngineFactory {
 public:
 	virtual
 	ExecEngine*
 	createExecEngine(StateImpl* parent) {
-		return AXL_MEM_NEW_ARGS((ExecDfa<sl::False, Encoding>), (parent));
+		return AXL_MEM_NEW_ARGS((ExecDfa<IsReverse, Encoding>), (parent));
 	}
 };
 
@@ -434,12 +449,39 @@ public:
 
 ExecDfaBase*
 createExecDfa(StateImpl* parent) {
-	static ExecDfaFactory<enc::Ascii>     asciiFactory;
-	static ExecDfaFactory<enc::Utf8>      utf8Factory;
-	static ExecDfaFactory<enc::Utf16s>    utf16Factory;
-	static ExecDfaFactory<enc::Utf16s_be> utf16Factory_be;
-	static ExecDfaFactory<enc::Utf32s>    utf32Factory;
-	static ExecDfaFactory<enc::Utf32s_be> utf32Factory_be;
+	static ExecDfaFactory<sl::False, enc::Ascii>     asciiFactory;
+	static ExecDfaFactory<sl::False, enc::Utf8>      utf8Factory;
+	static ExecDfaFactory<sl::False, enc::Utf16s>    utf16Factory;
+	static ExecDfaFactory<sl::False, enc::Utf16s_be> utf16Factory_be;
+	static ExecDfaFactory<sl::False, enc::Utf32s>    utf32Factory;
+	static ExecDfaFactory<sl::False, enc::Utf32s_be> utf32Factory_be;
+
+	static ExecEngineFactory* factoryTable[enc::CharCodecKind__Count] = {
+		&asciiFactory,
+		&utf8Factory,
+		&utf16Factory,
+		&utf16Factory_be,
+		&utf32Factory,
+		&utf32Factory_be,
+	};
+
+	size_t i = parent->m_init.m_codecKind;
+	if (i >= countof(factoryTable)) {
+		ASSERT(false);
+		i = enc::CharCodecKind_Ascii;
+	}
+
+	return (ExecDfaBase*)factoryTable[i]->createExecEngine(parent);
+}
+
+ExecDfaBase*
+createExecDfaReverse(StateImpl* parent) {
+	static ExecDfaFactory<sl::True, enc::Ascii>     asciiFactory;
+	static ExecDfaFactory<sl::True, enc::Utf8>      utf8Factory;
+	static ExecDfaFactory<sl::True, enc::Utf16s>    utf16Factory;
+	static ExecDfaFactory<sl::True, enc::Utf16s_be> utf16Factory_be;
+	static ExecDfaFactory<sl::True, enc::Utf32s>    utf32Factory;
+	static ExecDfaFactory<sl::True, enc::Utf32s_be> utf32Factory_be;
 
 	static ExecEngineFactory* factoryTable[enc::CharCodecKind__Count] = {
 		&asciiFactory,

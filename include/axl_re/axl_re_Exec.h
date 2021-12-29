@@ -29,13 +29,14 @@ enum ExecFlag {
 	ExecFlag_AnchorDataBegin = 0x04, // match must start on the first byte of data
 	ExecFlag_AnchorDataEnd   = 0x08, // match must end on the last byte of data
 	ExecFlag_ExactMatch      = ExecFlag_AnchorDataBegin | ExecFlag_AnchorDataEnd,
+	ExecFlag_Reverse         = 0x10, // run the reverse DFA to find the beginning of the match
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ExecResult {
-	ExecResult_Match            = 2,
-	ExecResult_MatchOffsetsOnly = 1,
+	ExecResult_Match            = 2,  // match (with data)
+	ExecResult_MatchOffsetsOnly = 1,  // match (without data)
 	ExecResult_NoMatch          = 0,
 	ExecResult_Continue         = -1, // continue feeding data
 	ExecResult_ContinueBackward = -2, // continue feeding backward data

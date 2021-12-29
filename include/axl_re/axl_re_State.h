@@ -32,25 +32,43 @@ struct StateInit {
 	enc::CharCodecKind m_codecKind;
 	enc::DecoderState m_decoderState;
 	size_t m_offset;
+	size_t m_baseOffset;
 	size_t m_dfaStateId;
 
 	StateInit(
 		uint_t execFlags = 0,
 		size_t offset = 0,
-		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8,
-		enc::DecoderState decoderState = 0,
-		size_t dfaState = -1
+		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
 	) {
-		setup(execFlags, offset, codecKind, decoderState, dfaState);
+		setup(execFlags, offset, codecKind);
+	}
+
+	StateInit(
+		uint_t execFlags,
+		size_t offset,
+		size_t baseOffset,
+		size_t dfaStateId,
+		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8,
+		enc::DecoderState decoderState = 0
+	) {
+		setup(execFlags, offset, baseOffset, dfaStateId, codecKind, decoderState);
 	}
 
 	void
 	setup(
 		uint_t execFlags,
 		size_t offset = 0,
+		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
+	);
+
+	void
+	setup(
+		uint_t execFlags,
+		size_t offset,
+		size_t baseOffset,
+		size_t dfaStateId,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8,
-		enc::DecoderState decoderState = 0,
-		size_t dfaStateId = -1
+		enc::DecoderState decoderState = 0
 	);
 };
 
@@ -61,14 +79,31 @@ void
 StateInit::setup(
 	uint_t execFlags,
 	size_t offset,
-	enc::CharCodecKind codecKind,
-	enc::DecoderState decoderState,
-	size_t dfaStateId
+	enc::CharCodecKind codecKind
 ) {
 	m_execFlags = execFlags;
+	m_codecKind = codecKind;
+	m_decoderState = 0;
 	m_offset = offset;
+	m_baseOffset = offset;
+	m_dfaStateId = -1;
+}
+
+inline
+void
+StateInit::setup(
+	uint_t execFlags,
+	size_t offset,
+	size_t baseOffset,
+	size_t dfaStateId,
+	enc::CharCodecKind codecKind,
+	enc::DecoderState decoderState
+) {
+	m_execFlags = execFlags;
 	m_codecKind = codecKind;
 	m_decoderState = decoderState;
+	m_offset = offset;
+	m_baseOffset = baseOffset;
 	m_dfaStateId = dfaStateId;
 }
 

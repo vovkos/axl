@@ -93,6 +93,11 @@ public:
 	}
 
 	const DfaState*
+	getDfaReverseState(size_t id) const {
+		return id < m_dfaReverseProgram.m_stateArray.getCount() ? m_dfaReverseProgram.m_stateArray[id] : NULL;
+	}
+
+	const DfaState*
 	getDfaMatchStartState() const {
 		return
 			m_dfaProgram.m_matchStartState ? m_dfaProgram.m_matchStartState :

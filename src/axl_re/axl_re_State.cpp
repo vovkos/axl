@@ -19,12 +19,6 @@
 namespace axl {
 namespace re {
 
-// if no streaming is required and we are matching from the beginning of the text
-// then  we can start with NFA; it will work faster if there is a match
-
-// #define _AXL_RE_CAN_SKIP_DFA 1
-#define _AXL_RE_CAN_SKIP_DFA 0
-
 //..............................................................................
 
 StateImpl::StateImpl() {
@@ -93,26 +87,29 @@ StateImpl::setRegex(const Regex* regex) {
 
 	freeEngine();
 
-#if (_AXL_RE_CAN_SKIP_DFA)
-	if (regex->getRegexKind() != RegexKind_Switch &&
-		(m_execFlags & (ExecFlag_Stream | ExecFlag_AnchorDataBegin)) == ExecFlag_AnchorDataBegin) {
-		m_engine = createExecNfaVm(this);
-		return;
-	}
-#endif
-
 	const DfaState* dfaState = NULL;
 
-	if (m_init.m_dfaStateId != -1)
-		dfaState = m_regex->getDfaState(m_init.m_dfaStateId);
+	if (m_init.m_execFlags & ExecFlag_Reverse) {
+		if (m_init.m_dfaStateId != -1)
+			dfaState = m_regex->getDfaReverseState(m_init.m_dfaStateId);
 
-	if (!dfaState)
-		dfaState = m_init.m_execFlags & ExecFlag_AnchorDataBegin ?
-			m_regex->getDfaMatchStartState() :
-			m_regex->getDfaSearchStartState();
+		if (!dfaState)
+			dfaState = m_regex->getDfaReverseStartState();
 
-	m_engine = createExecDfa(this);
-	((ExecDfaBase*)m_engine)->reset(m_init.m_offset, dfaState);
+		m_engine = createExecDfaReverse(this);
+	} else {
+		if (m_init.m_dfaStateId != -1)
+			dfaState = m_regex->getDfaState(m_init.m_dfaStateId);
+
+		if (!dfaState)
+			dfaState = m_init.m_execFlags & ExecFlag_AnchorDataBegin ?
+				m_regex->getDfaMatchStartState() :
+				m_regex->getDfaSearchStartState();
+
+		m_engine = createExecDfa(this);
+	}
+
+	((ExecDfaBase*)m_engine)->reset(m_init.m_offset, m_init.m_baseOffset, dfaState);
 }
 
 void

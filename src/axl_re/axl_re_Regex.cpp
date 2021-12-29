@@ -381,9 +381,11 @@ Regex::exec(
 		return ExecResult_NoMatch;
 
 	ExecResult result = state->exec(p, size);
-	return result && !state->isFinal() && !state->isStream() ?
-		state->eof() :
-		result;
+	if (!result || state->isFinal() || state->isStream())
+		return result;
+
+	ASSERT(result == ExecResult_Continue);
+	return state->eof();
 }
 
 //..............................................................................

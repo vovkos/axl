@@ -53,6 +53,7 @@ public:
 	void
 	reset(
 		size_t offset,
+		size_t baseOffset,
 		const DfaState* state
 	) = 0;
 
@@ -71,6 +72,9 @@ protected:
 
 ExecDfaBase*
 createExecDfa(StateImpl* parent);
+
+ExecDfaBase*
+createExecDfaReverse(StateImpl* parent);
 
 //..............................................................................
 
