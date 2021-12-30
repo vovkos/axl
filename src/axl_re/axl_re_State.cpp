@@ -96,20 +96,36 @@ StateImpl::setRegex(const Regex* regex) {
 		if (!dfaState)
 			dfaState = m_regex->getDfaReverseStartState();
 
+		ASSERT(dfaState);
 		m_engine = createExecDfaReverse(this);
+
+		((ExecDfaBase*)m_engine)->reset(
+			m_init.m_prevCharFlags,
+			m_init.m_offset,
+			m_init.m_baseCharFlags,
+			m_init.m_baseOffset,
+			dfaState
+		);
 	} else {
 		if (m_init.m_dfaStateId != -1)
 			dfaState = m_regex->getDfaState(m_init.m_dfaStateId);
 
 		if (!dfaState)
-			dfaState = m_init.m_execFlags & ExecFlag_AnchorDataBegin ?
+			dfaState = (m_init.m_execFlags & ExecFlag_AnchorDataBegin) || m_regex->isMatchOnly() ?
 				m_regex->getDfaMatchStartState() :
 				m_regex->getDfaSearchStartState();
 
+		ASSERT(dfaState);
 		m_engine = createExecDfa(this);
-	}
 
-	((ExecDfaBase*)m_engine)->reset(m_init.m_offset, m_init.m_baseOffset, dfaState);
+		((ExecDfaBase*)m_engine)->reset(
+			m_init.m_prevCharFlags,
+			m_init.m_offset,
+			m_init.m_prevCharFlags,
+			m_init.m_offset,
+			dfaState
+		);
+	}
 }
 
 void
@@ -205,11 +221,7 @@ void
 State::reset(size_t offset) {
 	ASSERT(m_p);
 
-	StateInit init;
-	init.m_execFlags = m_p->m_init.m_execFlags;
-	init.m_codecKind = m_p->m_init.m_codecKind;
-	init.m_decoderState = 0;
-	init.m_offset = offset;
+	StateInit init(m_p->m_init.m_execFlags, offset, m_p->m_init.m_codecKind);
 	m_p->initialize(init, m_p->m_regex);
 }
 

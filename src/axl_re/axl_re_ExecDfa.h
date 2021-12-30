@@ -28,17 +28,14 @@ protected:
 	const DfaState* m_state;
 	const void* m_p;
 	const void* m_matchEnd;
+	uint_t m_baseCharFlags;
 	size_t m_baseOffset;
 	size_t m_matchAcceptId;
 	size_t m_matchEndOffset;
-
-	union {
-		uint_t m_matchCharFlags;      // forward DFA only
-		size_t m_savedMatchEndOffset; // reverse DFA only
-	};
+	size_t m_savedMatchEndOffset; // reverse DFA only
 
 #if (_AXL_DEBUG)
-	size_t m_savedMatchAcceptId;      // reverse DFA only
+	size_t m_savedMatchAcceptId;  // reverse DFA only
 #endif
 
 public:
@@ -52,7 +49,9 @@ public:
 	virtual
 	void
 	reset(
+		uint_t prevCharFlags,
 		size_t offset,
+		uint_t baseCharFlags,
 		size_t baseOffset,
 		const DfaState* state
 	) = 0;

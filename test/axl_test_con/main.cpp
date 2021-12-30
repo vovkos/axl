@@ -667,7 +667,7 @@ testRegex() {
 	const char* end;
 
 	do {
-		result = regex.compile(re::CompileFlag_MatchOnly, "a|ba");
+		result = regex.compile("a|ba");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -677,6 +677,13 @@ testRegex() {
 		regex.buildFullReverseDfa();
 		regex.printDfa();
 		regex.printReverseDfa();
+
+		re::State state = regex.exec("...ba...");
+		const re::Match* match = state.getMatch();
+		if (match)
+			printf("match: %d..%d '%s'\n", match->getOffset(), match->getEndOffset(), match->getText().sz());
+		else
+			printf("mismatch\n");
 
 		return;
 	} while (0);
@@ -6309,6 +6316,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
+	// testRegex();
 	testUsbRegex();
 	return 0;
 }

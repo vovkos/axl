@@ -25,50 +25,33 @@ class State;
 
 //..............................................................................
 
-// passing four integers as arguments is error-prone; better use a struct
-
 struct StateInit {
 	uint_t m_execFlags;
 	enc::CharCodecKind m_codecKind;
 	enc::DecoderState m_decoderState;
+	uint_t m_prevCharFlags;
 	size_t m_offset;
+	uint_t m_baseCharFlags;
 	size_t m_baseOffset;
 	size_t m_dfaStateId;
 
+	StateInit() {
+		setup(0, 0, enc::CharCodecKind_Utf8);
+	}
+
 	StateInit(
-		uint_t execFlags = 0,
+		uint_t execFlags,
 		size_t offset = 0,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
 	) {
 		setup(execFlags, offset, codecKind);
 	}
 
-	StateInit(
-		uint_t execFlags,
-		size_t offset,
-		size_t baseOffset,
-		size_t dfaStateId,
-		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8,
-		enc::DecoderState decoderState = 0
-	) {
-		setup(execFlags, offset, baseOffset, dfaStateId, codecKind, decoderState);
-	}
-
 	void
 	setup(
 		uint_t execFlags,
 		size_t offset = 0,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
-	);
-
-	void
-	setup(
-		uint_t execFlags,
-		size_t offset,
-		size_t baseOffset,
-		size_t dfaStateId,
-		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8,
-		enc::DecoderState decoderState = 0
 	);
 };
 
@@ -83,28 +66,11 @@ StateInit::setup(
 ) {
 	m_execFlags = execFlags;
 	m_codecKind = codecKind;
-	m_decoderState = 0;
+	m_prevCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 	m_offset = offset;
+	m_baseCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 	m_baseOffset = offset;
 	m_dfaStateId = -1;
-}
-
-inline
-void
-StateInit::setup(
-	uint_t execFlags,
-	size_t offset,
-	size_t baseOffset,
-	size_t dfaStateId,
-	enc::CharCodecKind codecKind,
-	enc::DecoderState decoderState
-) {
-	m_execFlags = execFlags;
-	m_codecKind = codecKind;
-	m_decoderState = decoderState;
-	m_offset = offset;
-	m_baseOffset = baseOffset;
-	m_dfaStateId = dfaStateId;
 }
 
 //..............................................................................
@@ -298,7 +264,7 @@ public:
 	initialize(const StateInit& init);
 
 	void
-	reset(size_t offset = 0);
+	reset(size_t offset);
 
 	void
 	resume() {

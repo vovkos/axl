@@ -27,14 +27,15 @@ ExecDfaBase::ExecDfaBase(StateImpl* parent):
 	m_state = NULL;
 	m_p = NULL;
 	m_matchEnd = NULL;
+	m_baseCharFlags = 0;
 	m_baseOffset = 0;
 	m_matchAcceptId = -1;
-	m_matchCharFlags = 0;
 	m_matchEndOffset = -1;
 	m_savedMatchEndOffset = -1;
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = -1;
 #endif
+
 }
 
 void
@@ -43,9 +44,9 @@ ExecDfaBase::copy(const ExecDfaBase* src) {
 	m_forwardEngine = src->m_forwardEngine;
 	m_state = src->m_state;
 	m_matchEnd = src->m_matchEnd;
+	m_baseCharFlags = src->m_baseCharFlags;
 	m_baseOffset = src->m_baseOffset;
 	m_matchAcceptId = src->m_matchAcceptId;
-	m_matchCharFlags = src->m_matchCharFlags;
 	m_matchEndOffset = src->m_matchEndOffset;
 	m_savedMatchEndOffset = src->m_savedMatchEndOffset;
 #if (_AXL_DEBUG)
@@ -53,13 +54,10 @@ ExecDfaBase::copy(const ExecDfaBase* src) {
 #endif
 }
 
+inline
 void
 ExecDfaBase::setForwardEngine(ExecDfaBase* forwardEngine) {
 	m_forwardEngine = forwardEngine;
-	m_lastExecData = forwardEngine->m_lastExecData;
-	m_lastExecOffset = forwardEngine->m_lastExecOffset;
-	m_lastExecEndOffset = forwardEngine->m_lastExecEndOffset;
-	m_baseOffset = forwardEngine->m_baseOffset;
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = forwardEngine->m_matchAcceptId;
 #endif
@@ -103,48 +101,22 @@ public:
 			AXL_MEM_DELETE(m_forwardEngine);
 	}
 
-	void
-	reverse(
-		bool isEof,
-		size_t matchEndOffset,
-		uint_t matchCharFlags
-	) {
-		ASSERT(IsReverse()() && m_forwardEngine && matchEndOffset >= m_lastExecOffset);
-
-		if (isEof && matchEndOffset == m_lastExecEndOffset)
-			m_prevCharFlags = Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary;
-		else {
-			// flip BeginLine/EndLine
-			m_prevCharFlags = matchCharFlags & ~Anchor_BeginLine;
-			if (matchCharFlags & (CharFlag_Cr | CharFlag_Lf))
-				m_prevCharFlags |= Anchor_EndLine;
-		}
-
-		m_savedMatchEndOffset = m_offset = matchEndOffset;
-		m_execResult = ExecResult_ContinueBackward;
-		gotoState(matchEndOffset, m_parent->m_regex->getDfaReverseStartState());
-
-		size_t size = matchEndOffset - m_lastExecOffset;
-		if (size) {
-			exec(m_lastExecData, size);
-			ASSERT(m_execResult);
-		}
-	}
-
 	virtual
 	void
 	reset(
+		uint_t prevCharFlags,
 		size_t offset,
+		uint_t baseCharFlags,
 		size_t baseOffset,
 		const DfaState* state
 	) {
-		ExecEngine::reset(offset);
-		m_matchEnd = NULL;
+		ExecEngine::reset(prevCharFlags, offset);
+		m_baseCharFlags = baseCharFlags;
 		m_baseOffset = baseOffset;
-		m_matchCharFlags = 0;
+		m_matchEnd = NULL;
 		m_matchAcceptId = -1;
 		m_matchEndOffset = -1;
-		m_savedMatchEndOffset = -1;
+		m_savedMatchEndOffset = IsReverse()() ? offset : -1;
 	#if (_AXL_DEBUG)
 		m_savedMatchAcceptId = -1;
 	#endif
@@ -168,7 +140,7 @@ public:
 			m_lastExecOffset = m_offset - size;
 			m_lastExecEndOffset = m_offset;
 
-			// be careful not to overshoot m_baseOffset
+			// be careful not to overshoot base offset
 
 			if (m_baseOffset > m_lastExecOffset) {
 				size_t delta = m_baseOffset - m_lastExecOffset;
@@ -189,11 +161,8 @@ public:
 		m_offset += (char*)p - (char*)p0;
 		if (IsReverse()() && !isFinalized() && m_offset <= m_baseOffset) {
 			ASSERT(m_offset == m_baseOffset);
-			processBoundary(m_baseOffset - 1, m_prevCharFlags | Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary);
-			if (m_matchAcceptId != -1) { // can happen if we start from a DFA state within a match
-				ASSERT(m_execResult == ExecResult_ContinueBackward);
-				return;
-			}
+			createMatch(m_baseCharFlags, MatchPos(m_baseOffset, m_savedMatchEndOffset));
+			return;
 		}
 
 		if (m_matchEnd) {
@@ -225,7 +194,7 @@ public:
 			if (anchors) {
 				const DfaState* anchorState = m_state->m_anchorTransitionMap.findValue(anchors, NULL);
 				if (anchorState)
-					gotoState(m_p, anchorState, m_prevCharFlags);
+					gotoState(m_p, anchorState);
 			}
 		} else {
 			m_prevChar = c;
@@ -259,9 +228,6 @@ protected:
 			m_matchAcceptId = state->m_acceptId;
 			m_matchEndOffset = offset;
 			m_matchEnd = NULL;
-
-			if (!IsReverse()())
-				m_matchCharFlags = CharFlag_Other;
 		}
 	}
 
@@ -269,17 +235,13 @@ protected:
 	void
 	gotoState(
 		const void* p,
-		const DfaState* state,
-		uint_t matchCharFlags = CharFlag_Other
+		const DfaState* state
 	) {
 		gotoStateImpl(state);
 
 		if (state->m_flags & DfaStateFlag_Accept) {
 			m_matchAcceptId = state->m_acceptId;
 			m_matchEnd = p;
-
-			if (!IsReverse()())
-				m_matchCharFlags = matchCharFlags;
 		}
 	}
 
@@ -311,7 +273,7 @@ protected:
 
 		if (IsReverse()()) {
 			ASSERT(m_matchAcceptId == m_savedMatchAcceptId);
-			createMatch(MatchPos(matchEndOffset + 1, m_savedMatchEndOffset));
+			createMatch(m_prevCharFlags, MatchPos(matchEndOffset + 1, m_savedMatchEndOffset));
 			return;
 		}
 
@@ -326,27 +288,64 @@ protected:
 		}
 
 		if (m_execFlags & ExecFlag_AnchorDataBegin) {
-			createMatch(MatchPos(m_baseOffset, matchEndOffset));
+			createMatch(m_baseCharFlags, MatchPos(m_baseOffset, matchEndOffset));
 			return;
 		}
 
-		ExecDfa<sl::True, Encoding>* reverseDfa = AXL_MEM_NEW_ARGS((ExecDfa<sl::True, Encoding>), (this));
-		m_parent->m_engine = reverseDfa; // replace engine
-		reverseDfa->reverse(isEof, matchEndOffset, m_matchCharFlags);
-		if (!reverseDfa->isFinalized())
-			m_parent->preCreateMatch(m_matchAcceptId, matchEndOffset);
-
+		reverse(isEof, matchEndOffset);
 		m_execResult = ExecResult_MatchOffsetsOnly; // stop decoder from feeding us more chars
 	}
 
 	void
-	createMatch(const MatchPos& pos)  {
+	reverse(
+		bool isEof,
+		size_t matchEndOffset
+	) {
+		ASSERT(!IsReverse()() && matchEndOffset >= m_lastExecOffset);
+
+		ExecDfa<sl::True, Encoding>* reverseDfa = AXL_MEM_NEW_ARGS((ExecDfa<sl::True, Encoding>), (this));
+		m_parent->m_engine = reverseDfa; // replace engine
+
+		uint_t prevCharFlags;
+
+		if (isEof && matchEndOffset == m_lastExecEndOffset)
+			prevCharFlags = Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary;
+		else {
+			// flip BeginLine/EndLine
+			prevCharFlags = m_prevCharFlags & ~Anchor_BeginLine;
+			if (prevCharFlags & (CharFlag_Cr | CharFlag_Lf))
+				prevCharFlags |= Anchor_EndLine;
+		}
+
+		reverseDfa->reset(
+			prevCharFlags,
+			matchEndOffset,
+			m_baseCharFlags,
+			m_baseOffset,
+			m_parent->m_regex->getDfaReverseStartState()
+		);
+
+		size_t size = matchEndOffset - m_lastExecOffset;
+		if (size) {
+			reverseDfa->exec(m_lastExecData, size);
+			ASSERT(m_execResult);
+		}
+
+		if (!reverseDfa->isFinalized())
+			m_parent->preCreateMatch(m_matchAcceptId, matchEndOffset);
+	}
+
+	void
+	createMatch(
+		uint_t prevCharFlags,
+		const MatchPos& pos
+	)  {
 		if (!pos.isInside(m_lastExecOffset, m_lastExecEndOffset)) {
 			// match is scattered across stream; return offsets only
 			m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, NULL, pos);
 			m_execResult = ExecResult_MatchOffsetsOnly;
 		} else if (
-			(m_execFlags & ExecFlag_DisableCapture) ||
+			(m_execFlags & (ExecFlag_DisableCapture | ExecFlag_Stream)) ||
 			!m_parent->m_regex->getMatchCaptureCount(m_matchAcceptId)
 		) {
 			// no captures so no need to run the NFA
@@ -359,7 +358,7 @@ protected:
 			size_t length = pos.m_endOffset - pos.m_offset;
 
 			ExecNfaEngine* engine = createExecNfaVm(m_parent);
-			engine->reset(pos.m_offset, nfaState);
+			engine->reset(prevCharFlags, pos.m_offset, nfaState);
 			engine->exec(p, length);
 			engine->eof();
 			m_execResult = engine->getExecResult();

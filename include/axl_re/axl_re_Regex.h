@@ -67,6 +67,11 @@ public:
 		return m_nfaProgram.m_stateList.isEmpty();
 	}
 
+	bool
+	isMatchOnly() const {
+		return m_nfaProgram.m_searchStartState == 0;
+	}
+
 	RegexKind
 	getRegexKind() const {
 		return m_regexKind;

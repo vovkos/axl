@@ -73,10 +73,11 @@ ExecNfaVmBase::copy(const ExecNfaVmBase* src) {
 
 void
 ExecNfaVmBase::reset(
+	uint_t prevCharFlags,
 	size_t offset,
 	const NfaState* state
 ) {
-	ExecEngine::reset(offset);
+	ExecEngine::reset(prevCharFlags, offset);
 	m_matchPos.m_offset = offset;
 	m_consumingThreadList.clear();
 	m_nonConsumingThreadList.clear();

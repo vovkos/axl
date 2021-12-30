@@ -107,12 +107,14 @@ public:
 	}
 
 	virtual
-	ExecEngine*
-	clone(StateImpl* parent) = 0;
+	uint_t
+	getPrevCharFlags() const {
+		return m_prevCharFlags ? m_prevCharFlags : calcCharFlags(m_prevChar);
+	}
 
 	virtual
-	void
-	reset(size_t offset);
+	ExecEngine*
+	clone(StateImpl* parent) = 0;
 
 	virtual
 	void
@@ -126,6 +128,12 @@ public:
 	eof() = 0;
 
 protected:
+	void
+	reset(
+		uint_t prevCharFlags,
+		size_t offset
+	);
+
 	void
 	copy(const ExecEngine* src);
 
@@ -192,6 +200,7 @@ public:
 	virtual
 	void
 	reset(
+		uint_t prevCharFlags,
 		size_t offset,
 		const NfaState* state
 	) = 0;

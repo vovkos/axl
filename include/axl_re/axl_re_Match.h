@@ -90,6 +90,11 @@ public:
 		return !isEqual(match);
 	}
 
+	bool
+	isEmpty() const {
+		return m_offset == m_endOffset;
+	}
+
 	size_t
 	getOffset() const {
 		return m_offset;
