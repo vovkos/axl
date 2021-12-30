@@ -136,6 +136,7 @@ StateImpl::preCreateMatch(
 	ASSERT(m_matchAcceptId == -1);
 
 	m_matchAcceptId = acceptId;
+	m_match.m_offset = m_init.m_baseOffset;
 	m_match.m_endOffset = endOffset;
 }
 

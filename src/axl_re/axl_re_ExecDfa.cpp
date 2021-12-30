@@ -35,7 +35,6 @@ ExecDfaBase::ExecDfaBase(StateImpl* parent):
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = -1;
 #endif
-
 }
 
 void
@@ -58,6 +57,7 @@ inline
 void
 ExecDfaBase::setForwardEngine(ExecDfaBase* forwardEngine) {
 	m_forwardEngine = forwardEngine;
+	m_matchAcceptId = forwardEngine->m_matchAcceptId;
 #if (_AXL_DEBUG)
 	m_savedMatchAcceptId = forwardEngine->m_matchAcceptId;
 #endif
@@ -117,11 +117,9 @@ public:
 		m_matchAcceptId = -1;
 		m_matchEndOffset = -1;
 		m_savedMatchEndOffset = IsReverse()() ? offset : -1;
-	#if (_AXL_DEBUG)
-		m_savedMatchAcceptId = -1;
-	#endif
-
 		gotoState(offset, state);
+
+		// do
 	}
 
 	virtual
@@ -160,7 +158,7 @@ public:
 
 		m_offset += (char*)p - (char*)p0;
 		if (IsReverse()() && !isFinalized() && m_offset <= m_baseOffset) {
-			ASSERT(m_offset == m_baseOffset);
+			ASSERT(m_offset == m_baseOffset && m_matchAcceptId == m_savedMatchAcceptId);
 			createMatch(m_baseCharFlags, MatchPos(m_baseOffset, m_savedMatchEndOffset));
 			return;
 		}
@@ -292,8 +290,12 @@ protected:
 			return;
 		}
 
-		reverse(isEof, matchEndOffset);
-		m_execResult = ExecResult_MatchOffsetsOnly; // stop decoder from feeding us more chars
+		if (m_execFlags & ExecFlag_DisableReverse)
+			m_parent->preCreateMatch(m_matchAcceptId, matchEndOffset);
+		else
+			reverse(isEof, matchEndOffset);
+
+		m_execResult = ExecResult_MatchEndOffsetOnly; // reverse will report the full match
 	}
 
 	void
@@ -345,7 +347,7 @@ protected:
 			m_parent->createMatch(m_matchAcceptId, m_lastExecOffset, NULL, pos);
 			m_execResult = ExecResult_MatchOffsetsOnly;
 		} else if (
-			(m_execFlags & (ExecFlag_DisableCapture | ExecFlag_Stream)) ||
+			(m_execFlags & ExecFlag_DisableCapture) ||
 			!m_parent->m_regex->getMatchCaptureCount(m_matchAcceptId)
 		) {
 			// no captures so no need to run the NFA

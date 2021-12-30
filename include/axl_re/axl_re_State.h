@@ -220,22 +220,28 @@ public:
 	size_t
 	getDfaStateId() const;
 
+	uint_t
+	getPrevCharFlags() const {
+		ASSERT(m_p && m_p->m_engine);
+		return m_p->m_engine->getPrevCharFlags();
+	}
+
+	enc::DecoderState
+	getDecoderState() {
+		ASSERT(m_p && m_p->m_engine);
+		return m_p->m_engine->getDecoderState();
+	}
+
 	size_t
 	getMatchAcceptId() const {
 		ASSERT(m_p);
 		return m_p->m_matchAcceptId;
 	}
 
-	size_t
-	getMatchEndOffset() const {
-		ASSERT(m_p);
-		return isPreMatch() ? m_p->m_match.getEndOffset() : -1;
-	}
-
 	const Match*
 	getMatch() const {
 		ASSERT(m_p);
-		return isMatch() ? &m_p->m_match : NULL;
+		return isPreMatch() ? &m_p->m_match : NULL;
 	}
 
 	size_t
@@ -264,7 +270,7 @@ public:
 	initialize(const StateInit& init);
 
 	void
-	reset(size_t offset);
+	reset(size_t offset = 0);
 
 	void
 	resume() {

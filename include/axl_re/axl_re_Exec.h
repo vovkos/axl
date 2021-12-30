@@ -25,21 +25,23 @@ struct NfaState;
 
 enum ExecFlag {
 	ExecFlag_Stream          = 0x01, // feed data chunk-by-chunk, then call re::Regex::eof()
-	ExecFlag_DisableCapture  = 0x02, // don't capture sub-matches
-	ExecFlag_AnchorDataBegin = 0x04, // match must start on the first byte of data
-	ExecFlag_AnchorDataEnd   = 0x08, // match must end on the last byte of data
+	ExecFlag_Reverse         = 0x02, // run the reverse DFA to find the beginning of the match
+	ExecFlag_DisableReverse  = 0x04, // only run the forward DFA (report ends of matches)
+	ExecFlag_DisableCapture  = 0x08, // don't capture sub-matches
+	ExecFlag_AnchorDataBegin = 0x10, // match must start on the first byte of data
+	ExecFlag_AnchorDataEnd   = 0x20, // match must end on the last byte of data
 	ExecFlag_ExactMatch      = ExecFlag_AnchorDataBegin | ExecFlag_AnchorDataEnd,
-	ExecFlag_Reverse         = 0x10, // run the reverse DFA to find the beginning of the match
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum ExecResult {
-	ExecResult_Match            = 2,  // match (with data)
-	ExecResult_MatchOffsetsOnly = 1,  // match (without data)
-	ExecResult_NoMatch          = 0,
-	ExecResult_Continue         = -1, // continue feeding data
-	ExecResult_ContinueBackward = -2, // continue feeding backward data
+	ExecResult_Match              = 3,  // match with data
+	ExecResult_MatchOffsetsOnly   = 2,  // match without data
+	ExecResult_MatchEndOffsetOnly = 1,  // match without data and begin offset
+	ExecResult_NoMatch            = 0,
+	ExecResult_Continue           = -1, // continue feeding data
+	ExecResult_ContinueBackward   = -2, // continue feeding backward data
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -106,7 +108,11 @@ public:
 		return m_execResult >= 0;
 	}
 
-	virtual
+	enc::DecoderState
+	getDecoderState() {
+		return m_decoderState;
+	}
+
 	uint_t
 	getPrevCharFlags() const {
 		return m_prevCharFlags ? m_prevCharFlags : calcCharFlags(m_prevChar);
