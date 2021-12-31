@@ -86,7 +86,6 @@ class ExecDfa: public ExecImpl<
 public:
 	ExecDfa(StateImpl* parent):
 		ExecImpl<ExecDfa, ExecDfaBase, Encoding::Decoder>(parent) {
-		ASSERT(!IsReverse()());
 	}
 
 	ExecDfa(ExecDfaBase* forwardEngine):
@@ -116,10 +115,14 @@ public:
 		m_matchEnd = NULL;
 		m_matchAcceptId = -1;
 		m_matchEndOffset = -1;
-		m_savedMatchEndOffset = IsReverse()() ? offset : -1;
-		gotoState(offset, state);
+		m_savedMatchEndOffset = -1;
 
-		// do
+		if (IsReverse()()) {
+			m_savedMatchEndOffset = offset;
+			m_execResult = ExecResult_ContinueBackward;
+		}
+
+		gotoState(offset, state);
 	}
 
 	virtual
@@ -158,7 +161,13 @@ public:
 
 		m_offset += (char*)p - (char*)p0;
 		if (IsReverse()() && !isFinalized() && m_offset <= m_baseOffset) {
-			ASSERT(m_offset == m_baseOffset && m_matchAcceptId == m_savedMatchAcceptId);
+			ASSERT(m_offset == m_baseOffset);
+
+			if (m_matchAcceptId == -1) // didn't reached the beginning of the match (due to the base offset limit)
+				m_matchAcceptId = m_savedMatchAcceptId;
+			else
+				ASSERT(m_matchAcceptId == m_savedMatchAcceptId);
+
 			createMatch(m_baseCharFlags, MatchPos(m_baseOffset, m_savedMatchEndOffset));
 			return;
 		}

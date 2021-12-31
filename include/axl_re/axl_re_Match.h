@@ -120,6 +120,12 @@ public:
 		return MatchPos::isEqual(match) && m_codec == match.m_codec && m_p == match.m_p;
 	}
 
+	bool
+	hasText() const {
+		ASSERT((m_p != NULL) == (m_codec != NULL));
+		return m_p != NULL;
+	}
+
 	sl::StringRef
 	getText() const  {
 		ASSERT(m_p && m_codec);

@@ -189,8 +189,7 @@ public:
 
 	bool
 	isMatch() const {
-		ASSERT(m_p);
-		return m_p->m_match.getOffset() != -1;
+		return getLastExecResult() > 0;
 	}
 
 	const Regex*

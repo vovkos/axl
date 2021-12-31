@@ -98,14 +98,6 @@ StateImpl::setRegex(const Regex* regex) {
 
 		ASSERT(dfaState);
 		m_engine = createExecDfaReverse(this);
-
-		((ExecDfaBase*)m_engine)->reset(
-			m_init.m_prevCharFlags,
-			m_init.m_offset,
-			m_init.m_baseCharFlags,
-			m_init.m_baseOffset,
-			dfaState
-		);
 	} else {
 		if (m_init.m_dfaStateId != -1)
 			dfaState = m_regex->getDfaState(m_init.m_dfaStateId);
@@ -117,15 +109,15 @@ StateImpl::setRegex(const Regex* regex) {
 
 		ASSERT(dfaState);
 		m_engine = createExecDfa(this);
-
-		((ExecDfaBase*)m_engine)->reset(
-			m_init.m_prevCharFlags,
-			m_init.m_offset,
-			m_init.m_prevCharFlags,
-			m_init.m_offset,
-			dfaState
-		);
 	}
+
+	((ExecDfaBase*)m_engine)->reset(
+		m_init.m_prevCharFlags,
+		m_init.m_offset,
+		m_init.m_baseCharFlags,
+		m_init.m_baseOffset,
+		dfaState
+	);
 }
 
 void
@@ -136,7 +128,6 @@ StateImpl::preCreateMatch(
 	ASSERT(m_matchAcceptId == -1);
 
 	m_matchAcceptId = acceptId;
-	m_match.m_offset = m_init.m_baseOffset;
 	m_match.m_endOffset = endOffset;
 }
 

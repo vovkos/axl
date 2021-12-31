@@ -26,7 +26,7 @@ struct NfaState;
 enum ExecFlag {
 	ExecFlag_Stream          = 0x01, // feed data chunk-by-chunk, then call re::Regex::eof()
 	ExecFlag_Reverse         = 0x02, // run the reverse DFA to find the beginning of the match
-	ExecFlag_DisableReverse  = 0x04, // only run the forward DFA (report ends of matches)
+	ExecFlag_DisableReverse  = 0x04, // don't run the reverse DFA to find beginnings of matches
 	ExecFlag_DisableCapture  = 0x08, // don't capture sub-matches
 	ExecFlag_AnchorDataBegin = 0x10, // match must start on the first byte of data
 	ExecFlag_AnchorDataEnd   = 0x20, // match must end on the last byte of data

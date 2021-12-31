@@ -667,6 +667,33 @@ testRegex() {
 	const char* end;
 
 	do {
+		result = regex.compile("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+		// regex.printDfa();
+		// regex.printReverseDfa();
+
+		re::State state(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
+
+		re::ExecResult result = regex.exec(&state, "  ");
+		result = regex.exec(&state, "  abcdefghijklmnopqrstuvwxyz");
+		result = regex.exec(&state, "abcdefghijklmnopqrstuvwxyz");
+
+		const re::Match* match = state.getMatch();
+		if (match)
+			printf("match: %d..%d\n", match->getOffset(), match->getEndOffset());
+		else
+			printf("mismatch\n");
+
+		return;
+	} while (0);
+
+	do {
 		result = regex.compile("a|ba");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
@@ -6316,8 +6343,8 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	// testRegex();
-	testUsbRegex();
+	testRegex();
+	// testUsbRegex();
 	return 0;
 }
 
