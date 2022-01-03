@@ -21,6 +21,7 @@ set(
 	${AXL_INC_DIR}/axl_re/axl_re_Regex.h
 	${AXL_INC_DIR}/axl_re/axl_re_Exec.h
 	${AXL_INC_DIR}/axl_re/axl_re_Match.h
+	${AXL_INC_DIR}/axl_re/axl_re_StateInit.h
 	${AXL_INC_DIR}/axl_re/axl_re_State.h
 	${AXL_INC_DIR}/axl_re/axl_re_Storage.h
 	axl_re_StdCharClass.h

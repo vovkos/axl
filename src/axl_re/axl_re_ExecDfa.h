@@ -32,11 +32,8 @@ protected:
 	size_t m_baseOffset;
 	size_t m_matchAcceptId;
 	size_t m_matchEndOffset;
-	size_t m_savedMatchEndOffset; // reverse DFA only
-
-#if (_AXL_DEBUG)
 	size_t m_savedMatchAcceptId;  // reverse DFA only
-#endif
+	size_t m_savedMatchEndOffset; // reverse DFA only
 
 public:
 	ExecDfaBase(StateImpl* parent);
@@ -48,11 +45,8 @@ public:
 
 	virtual
 	void
-	reset(
-		uint_t prevCharFlags,
-		size_t offset,
-		uint_t baseCharFlags,
-		size_t baseOffset,
+	initialize(
+		const StateInit& init,
 		const DfaState* state
 	) = 0;
 

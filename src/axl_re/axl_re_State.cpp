@@ -111,13 +111,7 @@ StateImpl::setRegex(const Regex* regex) {
 		m_engine = createExecDfa(this);
 	}
 
-	((ExecDfaBase*)m_engine)->reset(
-		m_init.m_prevCharFlags,
-		m_init.m_offset,
-		m_init.m_baseCharFlags,
-		m_init.m_baseOffset,
-		dfaState
-	);
+	((ExecDfaBase*)m_engine)->initialize(m_init, dfaState);
 }
 
 void

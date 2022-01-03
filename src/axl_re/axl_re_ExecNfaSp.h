@@ -34,9 +34,8 @@ public:
 
 	virtual
 	void
-	reset(
-		uint_t prevCharFlags,
-		size_t offset,
+	initialize(
+		const StateInit& init,
 		const NfaState* state
 	);
 

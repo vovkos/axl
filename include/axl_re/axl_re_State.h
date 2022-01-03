@@ -16,62 +16,13 @@
 #include "axl_re_Nfa.h"
 #include "axl_re_Match.h"
 #include "axl_re_Exec.h"
+#include "axl_re_StateInit.h"
 
 namespace axl {
 namespace re {
 
 class Regex;
 class State;
-
-//..............................................................................
-
-struct StateInit {
-	uint_t m_execFlags;
-	enc::CharCodecKind m_codecKind;
-	enc::DecoderState m_decoderState;
-	uint_t m_prevCharFlags;
-	size_t m_offset;
-	uint_t m_baseCharFlags;
-	size_t m_baseOffset;
-	size_t m_dfaStateId;
-
-	StateInit() {
-		setup(0, 0, enc::CharCodecKind_Utf8);
-	}
-
-	StateInit(
-		uint_t execFlags,
-		size_t offset = 0,
-		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
-	) {
-		setup(execFlags, offset, codecKind);
-	}
-
-	void
-	setup(
-		uint_t execFlags,
-		size_t offset = 0,
-		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
-	);
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-void
-StateInit::setup(
-	uint_t execFlags,
-	size_t offset,
-	enc::CharCodecKind codecKind
-) {
-	m_execFlags = execFlags;
-	m_codecKind = codecKind;
-	m_prevCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
-	m_offset = offset;
-	m_baseCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
-	m_baseOffset = offset;
-	m_dfaStateId = -1;
-}
 
 //..............................................................................
 

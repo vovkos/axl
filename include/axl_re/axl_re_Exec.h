@@ -13,7 +13,7 @@
 
 #define _AXL_RE_EXEC_H
 
-#include "axl_re_Nfa.h"
+#include "axl_re_StateInit.h"
 
 namespace axl {
 namespace re {
@@ -63,7 +63,7 @@ protected:
 		CharFlag_Lf    = 0x200,
 		CharFlag_Nl    = CharFlag_Lf,
 		CharFlag_Word  = 0x400,
-		CharFlag_Other = 0x800, // the token of pre-calculated flags
+		CharFlag_Other = 0x800, // denotes pre-calculated flags
 	};
 
 protected:
@@ -135,10 +135,7 @@ public:
 
 protected:
 	void
-	reset(
-		uint_t prevCharFlags,
-		size_t offset
-	);
+	initialize(const StateInit& init);
 
 	void
 	copy(const ExecEngine* src);
@@ -205,9 +202,8 @@ public:
 
 	virtual
 	void
-	reset(
-		uint_t prevCharFlags,
-		size_t offset,
+	initialize(
+		const StateInit& init,
 		const NfaState* state
 	) = 0;
 

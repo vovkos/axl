@@ -47,13 +47,12 @@ ExecNfaSpBase::copy(const ExecNfaSpBase* src) {
 }
 
 void
-ExecNfaSpBase::reset(
-	uint_t prevCharFlags,
-	size_t offset,
+ExecNfaSpBase::initialize(
+	const StateInit& init,
 	const NfaState* state
 ) {
-	ExecEngine::reset(prevCharFlags, offset);
-	m_matchPos.m_offset = offset;
+	ExecEngine::initialize(init);
+	m_matchPos.m_offset = init.m_offset;
 	m_matchAcceptId = -1;
 	m_isEmpty = true;
 
