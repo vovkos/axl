@@ -154,7 +154,7 @@ public:
 		if (IsReverse()() && !isFinalized() && m_offset <= m_baseOffset) {
 			ASSERT(m_offset == m_baseOffset);
 
-			if (m_matchAcceptId == -1) // didn't reached the beginning of the match (due to the base offset limit)
+			if (m_matchAcceptId == -1) // didn't reach the beginning of the match (due to the base offset limit)
 				m_matchAcceptId = m_savedMatchAcceptId;
 			else
 				ASSERT(m_matchAcceptId == m_savedMatchAcceptId);

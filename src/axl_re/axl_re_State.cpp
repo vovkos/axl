@@ -90,8 +90,11 @@ StateImpl::setRegex(const Regex* regex) {
 	const DfaState* dfaState = NULL;
 
 	if (m_init.m_execFlags & ExecFlag_Reverse) {
-		if (m_init.m_dfaStateId != -1)
+		if (m_init.m_dfaStateId != -1) {
 			dfaState = m_regex->getDfaReverseState(m_init.m_dfaStateId);
+			if (!dfaState)
+				AXL_TRACE("invalid reverse DFA state %d\n", m_init.m_dfaStateId);
+		}
 
 		if (!dfaState)
 			dfaState = m_regex->getDfaReverseStartState();
@@ -99,8 +102,11 @@ StateImpl::setRegex(const Regex* regex) {
 		ASSERT(dfaState);
 		m_engine = createExecDfaReverse(this);
 	} else {
-		if (m_init.m_dfaStateId != -1)
+		if (m_init.m_dfaStateId != -1) {
 			dfaState = m_regex->getDfaState(m_init.m_dfaStateId);
+			if (!dfaState)
+				AXL_TRACE("invalid DFA state %d\n", m_init.m_dfaStateId);
+		}
 
 		if (!dfaState)
 			dfaState = (m_init.m_execFlags & ExecFlag_AnchorDataBegin) || m_regex->isMatchOnly() ?
