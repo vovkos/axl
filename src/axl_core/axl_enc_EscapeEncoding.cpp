@@ -27,7 +27,7 @@ appendEncoded_utf32(
 	const utf32_t* p,
 	size_t length
 ) {
-	codec->encode_utf32(encodeBuffer, p, length);
+	codec->encode_utf32(encodeBuffer, sl::StringRef_utf32(p, length));
 	return finalBuffer->append(*encodeBuffer);
 }
 
@@ -41,7 +41,7 @@ appendEncoded_utf8(
 	const utf8_t* p,
 	size_t length
 ) {
-	codec->encode_utf8(encodeBuffer, p, length);
+	codec->encode_utf8(encodeBuffer, sl::StringRef_utf8(p, length));
 	return finalBuffer->append(*encodeBuffer);
 }
 
