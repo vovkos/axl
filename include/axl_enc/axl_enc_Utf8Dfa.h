@@ -160,12 +160,19 @@ public:
 
 protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
+	static const uchar_t m_pendingLengthTable[StateCount];
 
 public:
 	Utf8Dfa() {}
 
 	Utf8Dfa(uint32_t storage) {
 		load(storage);
+	}
+
+	static
+	uint_t
+	getPendingLength(uint_t state) {
+		return m_pendingLengthTable[state >> 3];
 	}
 
 	static
@@ -212,6 +219,25 @@ AXL_SELECT_ANY const uchar_t Utf8Dfa::m_dfa[] = {
 	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 104 - State_Error
 	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 112 - State_Ready
 	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 120 - State_Ready_Error
+};
+
+AXL_SELECT_ANY const uchar_t Utf8Dfa::m_pendingLengthTable[] = {
+	0,  // 0   - State_Start
+	0,  // 8   - unused
+	1,  // 16  - State_1_2
+	1,  // 24  - State_1_2_Error
+	1,  // 32  - State_1_3
+	1,  // 40  - State_1_3_Error
+	2,  // 48  - State_2_3
+	0,  // 56  - unused
+	1,  // 64  - State_1_4
+	1,  // 72  - State_1_4_Error
+	2,  // 80  - State_2_4
+	0,  // 88  - unused
+	3,  // 96  - State_3_4
+	0,  // 104 - State_Error
+	0,  // 112 - State_Ready
+	0,  // 120 - State_Ready_Error
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -308,6 +334,7 @@ public:
 
 protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
+	static const uchar_t m_pendingLengthTable[StateCount];
 	uint_t m_acc;
 
 public:
@@ -317,6 +344,12 @@ public:
 
 	Utf8ReverseDfa(uint32_t storage) {
 		load(storage);
+	}
+
+	static
+	uint_t
+	getPendingLength(uint_t state) {
+		return m_pendingLengthTable[state];
 	}
 
 	static
@@ -376,6 +409,25 @@ AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_dfa[] = {
 	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 13 - State_Ready_Error_2
 	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 14 - unused
 	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 15 - State_Ready_Error_3
+};
+
+AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_pendingLengthTable[] = {
+	0,  // 0  - State_Start
+	0,  // 1  - unused
+	1,  // 2  - State_Cb_1
+	0,  // 3  - unused
+	2,  // 4  - State_Cb_2
+	0,  // 5  - unused
+	3,  // 6  - State_Cb_3
+	3,  // 7  - State_Cb_3_Error
+	0,  // 8  - unused
+	0,  // 9  - State_Error
+	0,  // 10 - State_Ready
+	0,  // 11 - State_Ready_Error
+	0,  // 12 - unused
+	0,  // 13 - State_Ready_Error_2
+	0,  // 14 - unused
+	0,  // 15 - State_Ready_Error_3
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -46,6 +46,11 @@ public:
 	}
 
 	uint_t
+	getPendingLength(uint_t state) {
+		return state & 3;
+	}
+
+	uint_t
 	decode(uchar_t c);
 
 	// skip codepoint calculations when simply counting codepoints

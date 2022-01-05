@@ -102,6 +102,7 @@ public:
 
 protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
+	static const uchar_t m_pendingLengthTable[StateCount];
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -115,6 +116,16 @@ AXL_SELECT_ANY const uchar_t Utf16DfaTable::m_dfa[] = {
 	State_Ready,       State_HiSurrogate,       State_Error,      0,  // 16 - State_Ready
 	State_Ready,       State_HiSurrogate,       State_Error,      0,  // 20 - State_Ready_Error
 	State_Ready,       State_HiSurrogate,       State_Error,      0,  // 24 - State_ReadyPair
+};
+
+AXL_SELECT_ANY const uchar_t Utf16DfaTable::m_pendingLengthTable[] = {
+	0,  // 0  - State_Start
+	0,  // 4  - State_Error
+	1,  // 8  - State_HiSurrogate
+	1,  // 12 - State_HiSurrogate_Error
+	0,  // 16 - State_Ready
+	0,  // 20 - State_Ready_Error
+	0,  // 24 - State_ReadyPair
 };
 
 //..............................................................................
@@ -142,6 +153,7 @@ public:
 
 protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
+	static const uchar_t m_pendingLengthTable[StateCount];
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -155,6 +167,16 @@ AXL_SELECT_ANY const uchar_t Utf16ReverseDfaTable::m_dfa[] = {
 	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 16 - State_Ready
 	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 20 - State_Ready_Error
 	State_Ready,       State_Error,     State_LoSurrogate,       0,  // 24 - State_ReadyPair
+};
+
+AXL_SELECT_ANY const uchar_t Utf16ReverseDfaTable::m_pendingLengthTable[] = {
+	0,  // 0  - State_Start
+	0,  // 4  - State_Error
+	1,  // 8  - State_LoSurrogate
+	1,  // 12 - State_LoSurrogate_Error
+	0,  // 16 - State_Ready
+	0,  // 20 - State_Ready_Error
+	0,  // 24 - State_ReadyPair
 };
 
 //..............................................................................
@@ -197,6 +219,12 @@ public:
 
 	Utf16DfaBase(uint32_t storage) {
 		load(storage);
+	}
+
+	static
+	uint_t
+	getPendingLength(uint_t state) {
+		return m_pendingLengthTable[state >> 2];
 	}
 
 	uint_t
