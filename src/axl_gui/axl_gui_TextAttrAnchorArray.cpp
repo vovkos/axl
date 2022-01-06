@@ -121,18 +121,12 @@ TextAttrAnchorArray::clearBefore(size_t offset) {
 }
 
 void
-TextAttrAnchorArray::overlay(
+TextAttrAnchorArray::overlayImpl(
 	const TextAttrAnchor* anchor,
 	size_t count
 ) {
-	if (!count)
-		return;
-
 	size_t oldCount = m_array.getCount();
-	if (!oldCount) {
-		m_array.copy(anchor, count);
-		return;
-	}
+	ASSERT(count && oldCount);
 
 	sl::Array<TextAttrAnchor> array;
 	sl::takeOver(&array, &m_array);

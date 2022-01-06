@@ -80,19 +80,23 @@ public:
 	}
 
 	void
-	copy(const TextAttrAnchorArray& attrAnchorArray) {
-		m_array = attrAnchorArray.m_array;
+	copy(const TextAttrAnchorArray& src) {
+		m_array = src.m_array;
 	}
 
 	void
 	overlay(
 		const TextAttrAnchor* anchor,
 		size_t count
-	);
+	) {
+		if (count)
+			isEmpty() ? copy(anchor, count) : overlayImpl(anchor, count);
+	}
 
 	void
-	overlay(const TextAttrAnchorArray& attrAnchorArray) {
-		overlay(attrAnchorArray.m_array, attrAnchorArray.m_array.getCount());
+	overlay(const TextAttrAnchorArray& src) {
+		if (!src.isEmpty())
+			isEmpty() ? copy(src) : overlayImpl(src.m_array, src.m_array.getCount());
 	}
 
 	TextAttr
@@ -120,6 +124,12 @@ public:
 #endif
 
 protected:
+	void
+	overlayImpl(
+		const TextAttrAnchor* anchor,
+		size_t count
+	);
+
 	size_t
 	findAnchor(size_t offset) const;
 
