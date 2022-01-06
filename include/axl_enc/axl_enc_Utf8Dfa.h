@@ -335,6 +335,7 @@ public:
 protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 	static const uchar_t m_pendingLengthTable[StateCount];
+	static const uchar_t m_combinedErrorCountTable[StateCount];
 	uint_t m_acc;
 
 public:
@@ -354,7 +355,9 @@ public:
 
 	static
 	size_t
-	getCombinedErrorCount(uint_t state);
+	getCombinedErrorCount(uint_t state) {
+		return m_combinedErrorCountTable[state];
+	}
 
 	size_t
 	getCombinedErrorCount() const {
@@ -419,9 +422,31 @@ AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_pendingLengthTable[] = {
 	0,  // 15 - State_Ready_Error_3
 };
 
+AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_combinedErrorCountTable[] = {
+	0,  // 0  - State_Start
+	0,  // 1  - unused
+	0,  // 2  - State_Cb_1
+	0,  // 3  - unused
+	0,  // 4  - State_Cb_2
+	0,  // 5  - unused
+	0,  // 6  - State_Cb_3
+	1,  // 7  - State_Cb_3_Error
+	0,  // 8  - unused
+	0,  // 9  - State_Error
+	0,  // 10 - State_Ready
+	1,  // 11 - State_Ready_Error
+	0,  // 12 - unused
+	2,  // 13 - State_Ready_Error_2
+	0,  // 14 - unused
+	3,  // 15 - State_Ready_Error_3
+};
+
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
- // branchless arithmetics to extract combined error count
+#define _AXL_ENC_UTF8_REVERSE_DFA_ARITHM_COMBINED_ERROR_COUNT 0
+#if (_AXL_ENC_UTF8_REVERSE_DFA_ARITHM_COMBINED_ERROR_COUNT)
+
+// can also use branchless arithmetics to calc combined error count
 
 inline
 size_t
@@ -434,6 +459,8 @@ Utf8ReverseDfa::getCombinedErrorCount(uint_t state) {
 	uint_t mask = state >> 31; //  1,  0,  0,  0
 	return (state + mask) ^ mask;
 }
+
+#endif
 
 // use branchless arithmetics as it's (most likely) faster on modern CPUs
 // TODO: still need some benchmarking against simpler and shorter branched impls
