@@ -87,6 +87,12 @@ public:
 	typedef utf32_t C;
 
 public:
+	static
+	uint_t
+	getPendingLength(DecoderState unused) {
+		return 0;
+	}
+
 	template <typename Emitter>
 	static
 	const C*

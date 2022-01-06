@@ -353,8 +353,8 @@ public:
 
 	static
 	uint_t
-	getPendingLength(uint_t state) {
-		return m_pendingLengthTable[state >> 2];
+	getPendingLength(uint_t storage) {
+		return m_pendingLengthTable[extractState(storage) >> 2];
 	}
 
 	uint_t

@@ -84,6 +84,12 @@ public:
 	save() const {
 		return (m_state << 24) | (m_cp & 0x00ffffff);
 	}
+
+	static
+	uint32_t
+	extractState(uint32_t storage) {
+		return storage >> 24;
+	}
 };
 
 //..............................................................................

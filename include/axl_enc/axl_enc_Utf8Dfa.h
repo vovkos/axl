@@ -171,8 +171,8 @@ public:
 
 	static
 	uint_t
-	getPendingLength(uint_t state) {
-		return m_pendingLengthTable[state >> 3];
+	getPendingLength(uint_t storage) {
+		return m_pendingLengthTable[extractState(storage) >> 3];
 	}
 
 	static
@@ -348,8 +348,8 @@ public:
 
 	static
 	uint_t
-	getPendingLength(uint_t state) {
-		return m_pendingLengthTable[state];
+	getPendingLength(uint_t storage) {
+		return m_pendingLengthTable[extractState(storage)];
 	}
 
 	static
@@ -365,17 +365,6 @@ public:
 	reset() {
 		m_state = State_Start;
 		m_acc = 0;
-	}
-
-	void
-	load(uint32_t storage) {
-		m_state = (storage & 0xff000000) >> 24;
-		m_acc = storage & 0x00ffffff;
-	}
-
-	uint32_t
-	save() const {
-		return (m_state << 24) | (m_acc & 0x00ffffff);
 	}
 
 	uint_t

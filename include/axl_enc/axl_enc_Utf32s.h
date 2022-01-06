@@ -86,6 +86,12 @@ public:
 	typedef Dfa0 Dfa;
 
 public:
+	static
+	uint_t
+	getPendingLength(DecoderState state) {
+		return Dfa::getPendingLength(state);
+	}
+
 	template <typename Emitter>
 	static
 	const C*

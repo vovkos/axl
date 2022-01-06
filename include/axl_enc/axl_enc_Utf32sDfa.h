@@ -45,9 +45,10 @@ public:
 		load(storage);
 	}
 
+	static
 	uint_t
-	getPendingLength(uint_t state) {
-		return state & 3;
+	getPendingLength(uint_t storage) {
+		return extractState(storage) & 3;
 	}
 
 	uint_t
