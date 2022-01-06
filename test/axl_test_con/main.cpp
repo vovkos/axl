@@ -675,8 +675,10 @@ testRegex() {
 
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
-		// regex.printDfa();
-		// regex.printReverseDfa();
+#if (_AXL_DEBUG)
+		regex.printDfa();
+		regex.printReverseDfa();
+#endif
 
 		re::State state(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
 
@@ -702,8 +704,10 @@ testRegex() {
 
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
+#if (_AXL_DEBUG)
 		regex.printDfa();
 		regex.printReverseDfa();
+#endif
 
 		re::State state = regex.exec("...ba...");
 		const re::Match* match = state.getMatch();
