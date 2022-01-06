@@ -81,28 +81,28 @@ stdDelete(T* p) {
 #else
 
 #define AXL_MEM_NEW(T) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T))) T)
+	(new(AXL_MEM_ALLOCATE(sizeof T)) T)
 
 #define AXL_MEM_NEW_EXTRA(T, extra) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T) + extra)) T)
+	(new(AXL_MEM_ALLOCATE(sizeof T + extra)) T)
 
 #define AXL_MEM_NEW_ARGS(T, args) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T))) T args)
+	(new(AXL_MEM_ALLOCATE(sizeof T)) T args)
 
 #define AXL_MEM_NEW_ARGS_EXTRA(T, args, extra) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T) + extra)) T args)
+	(new(AXL_MEM_ALLOCATE(sizeof T + extra)) T args)
 
 #define AXL_MEM_ZERO_NEW(T) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T))) T)
+	(new(AXL_MEM_ZERO_ALLOCATE(sizeof T)) T)
 
 #define AXL_MEM_ZERO_NEW_EXTRA(T, extra) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T) + extra)) T)
+	(new(AXL_MEM_ZERO_ALLOCATE(sizeof T + extra)) T)
 
 #define AXL_MEM_ZERO_NEW_ARGS(T, args) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T))) T args)
+	(new(AXL_MEM_ZERO_ALLOCATE(sizeof T)) T args)
 
 #define AXL_MEM_ZERO_NEW_ARGS_EXTRA(T, args, extra) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T) + extra)) T args)
+	(new(AXL_MEM_ZERO_ALLOCATE(sizeof T + extra)) T args)
 
 #endif
 
