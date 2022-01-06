@@ -517,6 +517,13 @@ protected:
 	utf32_t m_unprintableChar;
 
 public:
+#if (_AXL_DEBUG)
+	bool
+	isBufferOverflow() const {
+		return m_dst > m_dstEnd + 4;
+	}
+#endif
+
 	virtual
 	size_t
 	build(
@@ -532,6 +539,8 @@ public:
 		m_unprintableChar = unprintableChar;
 
 		Decoder::decode(*this, (char*)p, (char*)p + size);
+
+		ASSERT(m_dst <= m_dstEnd + 4);
 		return m_dst - buffer;
 	}
 
@@ -544,7 +553,8 @@ public:
 
 	void
 	emitReplacement(const char* p) {
-		emitCodePoint(p, m_unprintableChar);
+		*m_dst++ = m_unprintableChar;
+		m_src = p;
 	}
 
 	void
@@ -552,10 +562,9 @@ public:
 		const char* p,
 		utf32_t c
 	) {
-		if (m_dst < m_dstEnd)
-			*m_dst++ = enc::isPrintableNonMark(c) ? c : m_unprintableChar;
+		*m_dst++ = enc::isPrintableNonMark(c) ? c : m_unprintableChar;
 
-		for (const char* cb = m_src + 1; cb < p && m_dst < m_dstEnd; cb++)
+		for (const char* cb = m_src + 1; cb < p; cb++)
 			*m_dst++ = m_unprintableChar;
 
 		m_src = p;
@@ -601,18 +610,23 @@ TextPainter::buildBinTextBuffer(
 	size_t bufferSize,
 	utf32_t unprintableChar
 ) {
-	binTextBuffer->setCount(dataSize);
+	binTextBuffer->setCount(dataSize + 4); // UTF-8 can emit up to 4 codepoints at once
+	utf32_t* buffer = binTextBuffer->p();
 
 	BinTextBuilderBase* builder = getBinTextBuilder(codecKind);
+
 	size_t length = builder->build(
-		binTextBuffer->p(),
+		buffer,
 		dataSize,
 		(char*)p0,
 		bufferSize,
 		unprintableChar
 	);
 
-	return AXL_MIN(length, dataSize);
+	for (size_t i = length; i < dataSize; i++)
+		buffer[i] = unprintableChar;
+
+	return dataSize;
 }
 
 //..............................................................................
